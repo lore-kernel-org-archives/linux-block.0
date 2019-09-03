@@ -2,383 +2,279 @@ Return-Path: <SRS0=Gq2m=W6=vger.kernel.org=linux-block-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-9.7 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
-	INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,
-	UNPARSEABLE_RELAY,URIBL_BLOCKED,USER_AGENT_GIT autolearn=ham
+X-Spam-Status: No, score=-8.3 required=3.0 tests=DKIM_SIGNED,DKIM_VALID,
+	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,
+	SPF_HELO_NONE,SPF_PASS,USER_AGENT_SANE_1 autolearn=unavailable
 	autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 4142CC3A5A7
-	for <linux-block@archiver.kernel.org>; Tue,  3 Sep 2019 15:14:20 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 996ADC3A5A7
+	for <linux-block@archiver.kernel.org>; Tue,  3 Sep 2019 15:20:55 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.kernel.org (Postfix) with ESMTP id 18B542339D
-	for <linux-block@archiver.kernel.org>; Tue,  3 Sep 2019 15:14:20 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id 704FB233A1
+	for <linux-block@archiver.kernel.org>; Tue,  3 Sep 2019 15:20:55 +0000 (UTC)
+Authentication-Results: mail.kernel.org;
+	dkim=pass (2048-bit key) header.d=yahoo.com header.i=@yahoo.com header.b="hmAa8yTg"
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1729582AbfICPOT (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Tue, 3 Sep 2019 11:14:19 -0400
-Received: from mail-il-dmz.mellanox.com ([193.47.165.129]:47248 "EHLO
-        mellanox.co.il" rhost-flags-OK-OK-OK-FAIL) by vger.kernel.org
-        with ESMTP id S1727667AbfICPOT (ORCPT
-        <rfc822;linux-block@vger.kernel.org>); Tue, 3 Sep 2019 11:14:19 -0400
-Received: from Internal Mail-Server by MTLPINE1 (envelope-from maxg@mellanox.com)
-        with ESMTPS (AES256-SHA encrypted); 3 Sep 2019 18:14:15 +0300
-Received: from r-vnc12.mtr.labs.mlnx (r-vnc12.mtr.labs.mlnx [10.208.0.12])
-        by labmailer.mlnx (8.13.8/8.13.8) with ESMTP id x83FEFl1016624;
-        Tue, 3 Sep 2019 18:14:15 +0300
-From:   Max Gurtovoy <maxg@mellanox.com>
-To:     linux-block@vger.kernel.org, axboe@kernel.dk,
-        martin.petersen@oracle.com, linux-nvme@lists.infradead.org,
-        keith.busch@intel.com, hch@lst.de, sagi@grimberg.me
-Cc:     shlomin@mellanox.com, israelr@mellanox.com,
-        Max Gurtovoy <maxg@mellanox.com>
-Subject: [PATCH 1/4] block: centrelize PI remapping logic to the block layer
-Date:   Tue,  3 Sep 2019 18:14:12 +0300
-Message-Id: <1567523655-23989-1-git-send-email-maxg@mellanox.com>
-X-Mailer: git-send-email 1.7.1
+        id S1729578AbfICPUy (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Tue, 3 Sep 2019 11:20:54 -0400
+Received: from sonic311-22.consmr.mail.bf2.yahoo.com ([74.6.131.196]:41007
+        "EHLO sonic311-22.consmr.mail.bf2.yahoo.com" rhost-flags-OK-OK-OK-OK)
+        by vger.kernel.org with ESMTP id S1729109AbfICPUy (ORCPT
+        <rfc822;linux-block@vger.kernel.org>);
+        Tue, 3 Sep 2019 11:20:54 -0400
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=yahoo.com; s=s2048; t=1567524052; bh=TMtiGR6eRY4JXVQE6K2FOJLCSh0SN/dUnRdFJ4kOeVo=; h=Subject:To:Cc:References:From:Date:In-Reply-To:From:Subject; b=hmAa8yTgiOPbZrVPgL9JwC1XL0sxZm7aAOmTe0qLday0oV9rzjFHHJZH5ow68g17xI9eWDJ/aXpwH3zMCKWRhoUW4IsBUTqC28r9TrLDmLDbx16PpFhRSFPreRBc53VAGbcwOMSPcmcQqnluOnuLfFEdFCy5iloo6WHWWRkh+H41LVp2bDqVuscV9QwQFC7Pe4SQCHt7kFaGMCydDVQS9XGvdH4kDjC2YwCjkq3GzLkilJodRvKdvF53Y7XfNTZu9XnbKstD7wk7xGBXJ1sVfpC6pzUmlfctiKvKlLYGVinFIAZOAQHyZxk9u1gYdT3ZyqINj1xHW2h4wA78LDt7Sg==
+X-YMail-OSG: Ga9GgFAVM1mOyefZobTWD0KwaHVmaeIZcH1YDkBkmdPYCP6TbWAQtP_y41YcNYr
+ EVgP7RSplZbgovcHLHFMBn0rUodYKeqLFmzy88izTYToMfSonqsYp.2Wy2STh9tOeRgi_Te7xTwH
+ slGV.5sIPD6s7cBnrnLc4BI.AQw0y4ZEX3tYrKgUZdl0SevAbhHNFYYldQl3QcjrvvbK9b8oOzpQ
+ gWm0Cr0cWEIc4RVE97P_CcV_lmSL5X1evatsNByrKcRNogvM8bFBQClXNlJUQKCQTvL5tdy.6MnH
+ zrizCTGm4.Q8p1OWerCtwu0sYixmDmU6w_D3ROMOnQTnS8zGoXOkSuX72rwBjlsVQw7HvquYbjAu
+ ny83hN.eroFTZg.TwcOxiFIdM4qZPfTMB_kfaCpxPMGDhyMtC0akhmxzTdzl8OL6S_uklm_2dwXY
+ 6KJhis7KxmC8.iXSnRyKpOtHSPhSMGAuOrg7Yp7SKrw_zwj24SGzWr._B_1ZWu6GLvx9DK5Qrix0
+ ISQjyJOwz_n7IH2vZiuAO7SjDzT7XyYrr_E04pcoWgZn3QTpbRGnI8cDPgDaLc9R13T7JH.Ie1Xx
+ NR45.u8QthEZ2j6r8Zdtj2QiYxk86M2O5SeNvCHdewytUc81i2Jl2WYrWk2nYl9l2.gbUxpyStYU
+ h9rWjynkHQqJNySlEv3Qn.M0wgBFhl7_jU0rQ6YSA38iDRwlq7QOQqzald2EaDFft_rTuGcxryTV
+ 4ck_UCfG1GIXglAf8oomVpYVmXMZDuX0Vvcx4xfex7blwn2F_6oT4AHJfUeK5SxObKHhadAEYPNy
+ bazW.nFZBum5TgB40qFwW4r0pSdCKQIWyCPvm7xecw1v.qS7yhhPpKluyq7mTu1jgnPPMiFd6dES
+ iL0pPdjhyNUit56plUfd5_o0n4tB2jEHrQcrUSw44k5aq6D.MJxo2n_YOr6Y1Al8jU2Dcfd4Nsvk
+ 6jpjDj0p15ArKg7OL08_TNkPc8x3icb0RiM4XvvSqwhKkpysi9PE0mKHMQg18ntd4EosWN9DXzro
+ imN9jTjWyJZ3v2U7NEBCrdxPtzhJCDPYd6FfZfTR2rcJqAs2IuNQjvwSQVBtsaxb35mVmbS9xn37
+ Us8NfZLKvoXhLLrsrhDQJVSke_SCxkO8IW72DNl.w4_ithkCKJGk5.xMJoHl0ujcAYve0F7MK2TL
+ M_u0K4W8QMk56aPCeNdB1AEzuMWtk2TVL3glEA8dngC53gWpLl3foLa4J8yUFVZ0Q_8_HL3MurK6
+ ryrHGo7kqVfELnDyRs5MvKmG5vYOgOtqISUITzsT.HFSuJIN.
+Received: from sonic.gate.mail.ne1.yahoo.com by sonic311.consmr.mail.bf2.yahoo.com with HTTP; Tue, 3 Sep 2019 15:20:52 +0000
+Received: by smtp403.mail.bf1.yahoo.com (Oath Hermes SMTP Server) with ESMTPA ID 37155d70885c019b8dadd518967841e9;
+          Tue, 03 Sep 2019 15:20:49 +0000 (UTC)
+Subject: Re: [PATCH 11/11] smack: Implement the watch_key and
+ post_notification hooks [untested] [ver #7]
+To:     David Howells <dhowells@redhat.com>, viro@zeniv.linux.org.uk
+Cc:     Stephen Smalley <sds@tycho.nsa.gov>,
+        Greg Kroah-Hartman <gregkh@linuxfoundation.org>,
+        nicolas.dichtel@6wind.com, raven@themaw.net,
+        Christian Brauner <christian@brauner.io>,
+        keyrings@vger.kernel.org, linux-usb@vger.kernel.org,
+        linux-security-module@vger.kernel.org,
+        linux-fsdevel@vger.kernel.org, linux-api@vger.kernel.org,
+        linux-block@vger.kernel.org, linux-kernel@vger.kernel.org,
+        casey@schaufler-ca.com
+References: <156717343223.2204.15875738850129174524.stgit@warthog.procyon.org.uk>
+ <156717352917.2204.17206219813087348132.stgit@warthog.procyon.org.uk>
+From:   Casey Schaufler <casey@schaufler-ca.com>
+Openpgp: preference=signencrypt
+Autocrypt: addr=casey@schaufler-ca.com; keydata=
+ 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
+ abzjfg==
+Message-ID: <e36fa722-a300-2abf-ae9c-a0246fc66d0e@schaufler-ca.com>
+Date:   Tue, 3 Sep 2019 08:20:46 -0700
+User-Agent: Mozilla/5.0 (Windows NT 10.0; WOW64; rv:60.0) Gecko/20100101
+ Thunderbird/60.8.0
+MIME-Version: 1.0
+In-Reply-To: <156717352917.2204.17206219813087348132.stgit@warthog.procyon.org.uk>
+Content-Type: text/plain; charset=utf-8
+Content-Transfer-Encoding: quoted-printable
+Content-Language: en-US
 Sender: linux-block-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-Currently dif_prepare/dif_complete functions are called during the
-NVMe and SCSi layers command preparetion/completion, but their actual
-place should be the block layer since T10-PI is a general data integrity
-feature that is used by block storage protocols.
+On 8/30/2019 6:58 AM, David Howells wrote:
+> Implement the watch_key security hook in Smack to make sure that a key
+> grants the caller Read permission in order to set a watch on a key.
+>
+> Also implement the post_notification security hook to make sure that th=
+e
+> notification source is granted Write permission by the watch queue.
+>
+> For the moment, the watch_devices security hook is left unimplemented a=
+s
+> it's not obvious what the object should be since the queue is global an=
+d
+> didn't previously exist.
+>
+> Signed-off-by: David Howells <dhowells@redhat.com>
 
-Suggested-by: Christoph Hellwig <hch@lst.de>
-Signed-off-by: Max Gurtovoy <maxg@mellanox.com>
----
- block/blk-core.c         |  6 ++++++
- block/blk-mq.c           |  4 ++++
- block/t10-pi.c           | 11 ++++-------
- drivers/nvme/host/core.c | 28 +++++++++++++++++++---------
- drivers/scsi/sd.c        | 28 ++++++++++------------------
- drivers/scsi/sd.h        |  1 -
- drivers/scsi/sd_dif.c    |  2 +-
- include/linux/genhd.h    |  1 +
- include/linux/t10-pi.h   | 10 ++++------
- 9 files changed, 49 insertions(+), 42 deletions(-)
+I tried running your key tests and they fail in "keyctl/move/valid",
+with 11 FAILED messages, finally hanging after "UNLINK KEY FROM SESSION".=
 
-diff --git a/block/blk-core.c b/block/blk-core.c
-index d0cc6e1..58ecfd3 100644
---- a/block/blk-core.c
-+++ b/block/blk-core.c
-@@ -34,6 +34,7 @@
- #include <linux/ratelimit.h>
- #include <linux/pm_runtime.h>
- #include <linux/blk-cgroup.h>
-+#include <linux/t10-pi.h>
- #include <linux/debugfs.h>
- #include <linux/bpf.h>
- 
-@@ -1405,6 +1406,11 @@ bool blk_update_request(struct request *req, blk_status_t error,
- 	if (!req->bio)
- 		return false;
- 
-+	if (blk_integrity_rq(req) && req_op(req) == REQ_OP_READ &&
-+	    error == BLK_STS_OK)
-+		t10_pi_complete(req,
-+				nr_bytes / queue_logical_block_size(req->q));
-+
- 	if (unlikely(error && !blk_rq_is_passthrough(req) &&
- 		     !(req->rq_flags & RQF_QUIET)))
- 		print_req_error(req, error, __func__);
-diff --git a/block/blk-mq.c b/block/blk-mq.c
-index 0835f4d..30ec078 100644
---- a/block/blk-mq.c
-+++ b/block/blk-mq.c
-@@ -30,6 +30,7 @@
- #include <trace/events/block.h>
- 
- #include <linux/blk-mq.h>
-+#include <linux/t10-pi.h>
- #include "blk.h"
- #include "blk-mq.h"
- #include "blk-mq-debugfs.h"
-@@ -693,6 +694,9 @@ void blk_mq_start_request(struct request *rq)
- 		 */
- 		rq->nr_phys_segments++;
- 	}
-+
-+	if (blk_integrity_rq(rq) && req_op(rq) == REQ_OP_WRITE)
-+		t10_pi_prepare(rq);
- }
- EXPORT_SYMBOL(blk_mq_start_request);
- 
-diff --git a/block/t10-pi.c b/block/t10-pi.c
-index 0c00946..a6d9722 100644
---- a/block/t10-pi.c
-+++ b/block/t10-pi.c
-@@ -171,7 +171,6 @@ static blk_status_t t10_pi_type3_verify_ip(struct blk_integrity_iter *iter)
- /**
-  * t10_pi_prepare - prepare PI prior submitting request to device
-  * @rq:              request with PI that should be prepared
-- * @protection_type: PI type (Type 1/Type 2/Type 3)
-  *
-  * For Type 1/Type 2, the virtual start sector is the one that was
-  * originally submitted by the block layer for the ref_tag usage. Due to
-@@ -181,8 +180,9 @@ static blk_status_t t10_pi_type3_verify_ip(struct blk_integrity_iter *iter)
-  *
-  * Type 3 does not have a reference tag so no remapping is required.
-  */
--void t10_pi_prepare(struct request *rq, u8 protection_type)
-+void t10_pi_prepare(struct request *rq)
- {
-+	u8 protection_type = rq->rq_disk->protection_type;
- 	const int tuple_sz = rq->q->integrity.tuple_size;
- 	u32 ref_tag = t10_pi_ref_tag(rq);
- 	struct bio *bio;
-@@ -222,12 +222,10 @@ void t10_pi_prepare(struct request *rq, u8 protection_type)
- 		bip->bip_flags |= BIP_MAPPED_INTEGRITY;
- 	}
- }
--EXPORT_SYMBOL(t10_pi_prepare);
- 
- /**
-  * t10_pi_complete - prepare PI prior returning request to the block layer
-  * @rq:              request with PI that should be prepared
-- * @protection_type: PI type (Type 1/Type 2/Type 3)
-  * @intervals:       total elements to prepare
-  *
-  * For Type 1/Type 2, the virtual start sector is the one that was
-@@ -239,9 +237,9 @@ void t10_pi_prepare(struct request *rq, u8 protection_type)
-  *
-  * Type 3 does not have a reference tag so no remapping is required.
-  */
--void t10_pi_complete(struct request *rq, u8 protection_type,
--		     unsigned int intervals)
-+void t10_pi_complete(struct request *rq, unsigned int intervals)
- {
-+	u8 protection_type = rq->rq_disk->protection_type;
- 	const int tuple_sz = rq->q->integrity.tuple_size;
- 	u32 ref_tag = t10_pi_ref_tag(rq);
- 	struct bio *bio;
-@@ -276,4 +274,3 @@ void t10_pi_complete(struct request *rq, u8 protection_type,
- 		}
- 	}
- }
--EXPORT_SYMBOL(t10_pi_complete);
-diff --git a/drivers/nvme/host/core.c b/drivers/nvme/host/core.c
-index d3d6b7b..b91ea60 100644
---- a/drivers/nvme/host/core.c
-+++ b/drivers/nvme/host/core.c
-@@ -659,8 +659,6 @@ static inline blk_status_t nvme_setup_rw(struct nvme_ns *ns,
- 			if (WARN_ON_ONCE(!nvme_ns_has_pi(ns)))
- 				return BLK_STS_NOTSUPP;
- 			control |= NVME_RW_PRINFO_PRACT;
--		} else if (req_op(req) == REQ_OP_WRITE) {
--			t10_pi_prepare(req, ns->pi_type);
- 		}
- 
- 		switch (ns->pi_type) {
-@@ -683,13 +681,6 @@ static inline blk_status_t nvme_setup_rw(struct nvme_ns *ns,
- 
- void nvme_cleanup_cmd(struct request *req)
- {
--	if (blk_integrity_rq(req) && req_op(req) == REQ_OP_READ &&
--	    nvme_req(req)->status == 0) {
--		struct nvme_ns *ns = req->rq_disk->private_data;
--
--		t10_pi_complete(req, ns->pi_type,
--				blk_rq_bytes(req) >> ns->lba_shift);
--	}
- 	if (req->rq_flags & RQF_SPECIAL_PAYLOAD) {
- 		struct nvme_ns *ns = req->rq_disk->private_data;
- 		struct page *page = req->special_vec.bv_page;
-@@ -1693,6 +1684,24 @@ static void nvme_update_disk_info(struct gendisk *disk,
- 	blk_mq_unfreeze_queue(disk->queue);
- }
- 
-+static void nvme_set_disk_prot_type(struct nvme_ns *ns, struct gendisk *disk)
-+{
-+	switch (ns->pi_type) {
-+	case NVME_NS_DPS_PI_TYPE1:
-+		disk->protection_type = T10_PI_TYPE1_PROTECTION;
-+		break;
-+	case NVME_NS_DPS_PI_TYPE2:
-+		disk->protection_type = T10_PI_TYPE2_PROTECTION;
-+		break;
-+	case NVME_NS_DPS_PI_TYPE3:
-+		disk->protection_type = T10_PI_TYPE3_PROTECTION;
-+		break;
-+	default:
-+		disk->protection_type = T10_PI_TYPE0_PROTECTION;
-+		break;
-+	}
-+}
-+
- static void __nvme_revalidate_disk(struct gendisk *disk, struct nvme_id_ns *id)
- {
- 	struct nvme_ns *ns = disk->private_data;
-@@ -1712,6 +1721,7 @@ static void __nvme_revalidate_disk(struct gendisk *disk, struct nvme_id_ns *id)
- 		ns->pi_type = id->dps & NVME_NS_DPS_PI_MASK;
- 	else
- 		ns->pi_type = 0;
-+	nvme_set_disk_prot_type(ns, disk);
- 
- 	if (ns->noiob)
- 		nvme_set_chunk_size(ns);
-diff --git a/drivers/scsi/sd.c b/drivers/scsi/sd.c
-index 149d406..fa7e7d4 100644
---- a/drivers/scsi/sd.c
-+++ b/drivers/scsi/sd.c
-@@ -55,7 +55,6 @@
- #include <linux/sed-opal.h>
- #include <linux/pm_runtime.h>
- #include <linux/pr.h>
--#include <linux/t10-pi.h>
- #include <linux/uaccess.h>
- #include <asm/unaligned.h>
- 
-@@ -309,7 +308,7 @@ static void sd_set_flush_flag(struct scsi_disk *sdkp)
- {
- 	struct scsi_disk *sdkp = to_scsi_disk(dev);
- 
--	return sprintf(buf, "%u\n", sdkp->protection_type);
-+	return sprintf(buf, "%u\n", sdkp->disk->protection_type);
- }
- 
- static ssize_t
-@@ -329,7 +328,7 @@ static void sd_set_flush_flag(struct scsi_disk *sdkp)
- 		return err;
- 
- 	if (val <= T10_PI_TYPE3_PROTECTION)
--		sdkp->protection_type = val;
-+		sdkp->disk->protection_type = val;
- 
- 	return count;
- }
-@@ -343,8 +342,8 @@ static void sd_set_flush_flag(struct scsi_disk *sdkp)
- 	struct scsi_device *sdp = sdkp->device;
- 	unsigned int dif, dix;
- 
--	dif = scsi_host_dif_capable(sdp->host, sdkp->protection_type);
--	dix = scsi_host_dix_capable(sdp->host, sdkp->protection_type);
-+	dif = scsi_host_dif_capable(sdp->host, sdkp->disk->protection_type);
-+	dix = scsi_host_dix_capable(sdp->host, sdkp->disk->protection_type);
- 
- 	if (!dix && scsi_host_dix_capable(sdp->host, T10_PI_TYPE0_PROTECTION)) {
- 		dif = 0;
-@@ -1209,17 +1208,15 @@ static blk_status_t sd_setup_read_write_cmnd(struct scsi_cmnd *cmd)
- 
- 	fua = rq->cmd_flags & REQ_FUA ? 0x8 : 0;
- 	dix = scsi_prot_sg_count(cmd);
--	dif = scsi_host_dif_capable(cmd->device->host, sdkp->protection_type);
--
--	if (write && dix)
--		t10_pi_prepare(cmd->request, sdkp->protection_type);
-+	dif = scsi_host_dif_capable(cmd->device->host,
-+				    sdkp->disk->protection_type);
- 
- 	if (dif || dix)
- 		protect = sd_setup_protect_cmnd(cmd, dix, dif);
- 	else
- 		protect = 0;
- 
--	if (protect && sdkp->protection_type == T10_PI_TYPE2_PROTECTION) {
-+	if (protect && sdkp->disk->protection_type == T10_PI_TYPE2_PROTECTION) {
- 		ret = sd_setup_rw32_cmnd(cmd, write, lba, nr_blocks,
- 					 protect | fua);
- 	} else if (sdp->use_16_for_rw || (nr_blocks > 0xffff)) {
-@@ -2051,11 +2048,6 @@ static int sd_done(struct scsi_cmnd *SCpnt)
- 					   "sd_done: completed %d of %d bytes\n",
- 					   good_bytes, scsi_bufflen(SCpnt)));
- 
--	if (rq_data_dir(SCpnt->request) == READ && scsi_prot_sg_count(SCpnt) &&
--	    good_bytes)
--		t10_pi_complete(SCpnt->request, sdkp->protection_type,
--				good_bytes / scsi_prot_interval(SCpnt));
--
- 	return good_bytes;
- }
- 
-@@ -2204,7 +2196,7 @@ static int sd_read_protection_type(struct scsi_disk *sdkp, unsigned char *buffer
- 	else if (scsi_host_dif_capable(sdp->host, type))
- 		ret = 1;
- 
--	if (sdkp->first_scan || type != sdkp->protection_type)
-+	if (sdkp->first_scan || type != sdkp->disk->protection_type)
- 		switch (ret) {
- 		case -ENODEV:
- 			sd_printk(KERN_ERR, sdkp, "formatted with unsupported" \
-@@ -2221,7 +2213,7 @@ static int sd_read_protection_type(struct scsi_disk *sdkp, unsigned char *buffer
- 			break;
- 		}
- 
--	sdkp->protection_type = type;
-+	sdkp->disk->protection_type = type;
- 
- 	return ret;
- }
-@@ -2813,7 +2805,7 @@ static void sd_read_app_tag_own(struct scsi_disk *sdkp, unsigned char *buffer)
- 	if (sdp->type != TYPE_DISK && sdp->type != TYPE_ZBC)
- 		return;
- 
--	if (sdkp->protection_type == 0)
-+	if (sdkp->disk->protection_type == 0)
- 		return;
- 
- 	res = scsi_mode_sense(sdp, 1, 0x0a, buffer, 36, SD_TIMEOUT,
-diff --git a/drivers/scsi/sd.h b/drivers/scsi/sd.h
-index 38c5094..770b6b0f 100644
---- a/drivers/scsi/sd.h
-+++ b/drivers/scsi/sd.h
-@@ -94,7 +94,6 @@ struct scsi_disk {
- 	unsigned int	medium_access_timed_out;
- 	u8		media_present;
- 	u8		write_prot;
--	u8		protection_type;/* Data Integrity Field */
- 	u8		provisioning_mode;
- 	u8		zeroing_mode;
- 	unsigned	ATO : 1;	/* state of disk ATO bit */
-diff --git a/drivers/scsi/sd_dif.c b/drivers/scsi/sd_dif.c
-index 4cadb26..cbd0cce 100644
---- a/drivers/scsi/sd_dif.c
-+++ b/drivers/scsi/sd_dif.c
-@@ -28,7 +28,7 @@ void sd_dif_config_host(struct scsi_disk *sdkp)
- {
- 	struct scsi_device *sdp = sdkp->device;
- 	struct gendisk *disk = sdkp->disk;
--	u8 type = sdkp->protection_type;
-+	u8 type = sdkp->disk->protection_type;
- 	struct blk_integrity bi;
- 	int dif, dix;
- 
-diff --git a/include/linux/genhd.h b/include/linux/genhd.h
-index 8b5330d..5f58736 100644
---- a/include/linux/genhd.h
-+++ b/include/linux/genhd.h
-@@ -219,6 +219,7 @@ struct gendisk {
- 	int node_id;
- 	struct badblocks *bb;
- 	struct lockdep_map lockdep_map;
-+	u8 protection_type;/* Data Integrity Field */
- };
- 
- static inline struct gendisk *part_to_disk(struct hd_struct *part)
-diff --git a/include/linux/t10-pi.h b/include/linux/t10-pi.h
-index 3e2a80c..108008e 100644
---- a/include/linux/t10-pi.h
-+++ b/include/linux/t10-pi.h
-@@ -54,15 +54,13 @@ static inline u32 t10_pi_ref_tag(struct request *rq)
- extern const struct blk_integrity_profile t10_pi_type3_ip;
- 
- #ifdef CONFIG_BLK_DEV_INTEGRITY
--extern void t10_pi_prepare(struct request *rq, u8 protection_type);
--extern void t10_pi_complete(struct request *rq, u8 protection_type,
--			    unsigned int intervals);
-+extern void t10_pi_prepare(struct request *rq);
-+extern void t10_pi_complete(struct request *rq, unsigned int intervals);
- #else
--static inline void t10_pi_complete(struct request *rq, u8 protection_type,
--				   unsigned int intervals)
-+static inline void t10_pi_complete(struct request *rq, unsigned int intervals)
- {
- }
--static inline void t10_pi_prepare(struct request *rq, u8 protection_type)
-+static inline void t10_pi_prepare(struct request *rq)
- {
- }
- #endif
--- 
-1.8.3.1
+It's possible that my Fedora26 system is somehow incompatible with the
+tests. I don't see anything in your code that would cause this, as the
+Smack policy on the system shouldn't restrict any access.
+
+> ---
+>
+>  include/linux/lsm_audit.h  |    1 +
+>  security/smack/smack_lsm.c |   82 ++++++++++++++++++++++++++++++++++++=
++++++++-
+>  2 files changed, 82 insertions(+), 1 deletion(-)
+>
+> diff --git a/include/linux/lsm_audit.h b/include/linux/lsm_audit.h
+> index 915330abf6e5..734d67889826 100644
+> --- a/include/linux/lsm_audit.h
+> +++ b/include/linux/lsm_audit.h
+> @@ -74,6 +74,7 @@ struct common_audit_data {
+>  #define LSM_AUDIT_DATA_FILE	12
+>  #define LSM_AUDIT_DATA_IBPKEY	13
+>  #define LSM_AUDIT_DATA_IBENDPORT 14
+> +#define LSM_AUDIT_DATA_NOTIFICATION 15
+>  	union 	{
+>  		struct path path;
+>  		struct dentry *dentry;
+> diff --git a/security/smack/smack_lsm.c b/security/smack/smack_lsm.c
+> index 4c5e5a438f8b..1c2a908c6446 100644
+> --- a/security/smack/smack_lsm.c
+> +++ b/security/smack/smack_lsm.c
+> @@ -4274,7 +4274,7 @@ static int smack_key_permission(key_ref_t key_ref=
+,
+>  	if (tkp =3D=3D NULL)
+>  		return -EACCES;
+> =20
+> -	if (smack_privileged_cred(CAP_MAC_OVERRIDE, cred))
+> +	if (smack_privileged(CAP_MAC_OVERRIDE))
+>  		return 0;
+> =20
+>  #ifdef CONFIG_AUDIT
+> @@ -4320,8 +4320,81 @@ static int smack_key_getsecurity(struct key *key=
+, char **_buffer)
+>  	return length;
+>  }
+> =20
+> +
+> +#ifdef CONFIG_KEY_NOTIFICATIONS
+> +/**
+> + * smack_watch_key - Smack access to watch a key for notifications.
+> + * @key: The key to be watched
+> + *
+> + * Return 0 if the @watch->cred has permission to read from the key ob=
+ject and
+> + * an error otherwise.
+> + */
+> +static int smack_watch_key(struct key *key)
+> +{
+> +	struct smk_audit_info ad;
+> +	struct smack_known *tkp =3D smk_of_current();
+> +	int rc;
+> +
+> +	if (key =3D=3D NULL)
+> +		return -EINVAL;
+> +	/*
+> +	 * If the key hasn't been initialized give it access so that
+> +	 * it may do so.
+> +	 */
+> +	if (key->security =3D=3D NULL)
+> +		return 0;
+> +	/*
+> +	 * This should not occur
+> +	 */
+> +	if (tkp =3D=3D NULL)
+> +		return -EACCES;
+> +
+> +	if (smack_privileged_cred(CAP_MAC_OVERRIDE, current_cred()))
+> +		return 0;
+> +
+> +#ifdef CONFIG_AUDIT
+> +	smk_ad_init(&ad, __func__, LSM_AUDIT_DATA_KEY);
+> +	ad.a.u.key_struct.key =3D key->serial;
+> +	ad.a.u.key_struct.key_desc =3D key->description;
+> +#endif
+> +	rc =3D smk_access(tkp, key->security, MAY_READ, &ad);
+> +	rc =3D smk_bu_note("key watch", tkp, key->security, MAY_READ, rc);
+> +	return rc;
+> +}
+> +#endif /* CONFIG_KEY_NOTIFICATIONS */
+>  #endif /* CONFIG_KEYS */
+> =20
+> +#ifdef CONFIG_WATCH_QUEUE
+> +/**
+> + * smack_post_notification - Smack access to post a notification to a =
+queue
+> + * @w_cred: The credentials of the watcher.
+> + * @cred: The credentials of the event source (may be NULL).
+> + * @n: The notification message to be posted.
+> + */
+> +static int smack_post_notification(const struct cred *w_cred,
+> +				   const struct cred *cred,
+> +				   struct watch_notification *n)
+> +{
+> +	struct smk_audit_info ad;
+> +	struct smack_known *subj, *obj;
+> +	int rc;
+> +
+> +	/* Always let maintenance notifications through. */
+> +	if (n->type =3D=3D WATCH_TYPE_META)
+> +		return 0;
+> +
+> +	if (!cred)
+> +		return 0;
+> +	subj =3D smk_of_task(smack_cred(cred));
+> +	obj =3D smk_of_task(smack_cred(w_cred));
+> +
+> +	smk_ad_init(&ad, __func__, LSM_AUDIT_DATA_NOTIFICATION);
+> +	rc =3D smk_access(subj, obj, MAY_WRITE, &ad);
+> +	rc =3D smk_bu_note("notification", subj, obj, MAY_WRITE, rc);
+> +	return rc;
+> +}
+> +#endif /* CONFIG_WATCH_QUEUE */
+> +
+>  /*
+>   * Smack Audit hooks
+>   *
+> @@ -4710,8 +4783,15 @@ static struct security_hook_list smack_hooks[] _=
+_lsm_ro_after_init =3D {
+>  	LSM_HOOK_INIT(key_free, smack_key_free),
+>  	LSM_HOOK_INIT(key_permission, smack_key_permission),
+>  	LSM_HOOK_INIT(key_getsecurity, smack_key_getsecurity),
+> +#ifdef CONFIG_KEY_NOTIFICATIONS
+> +	LSM_HOOK_INIT(watch_key, smack_watch_key),
+> +#endif
+>  #endif /* CONFIG_KEYS */
+> =20
+> +#ifdef CONFIG_WATCH_QUEUE
+> +	LSM_HOOK_INIT(post_notification, smack_post_notification),
+> +#endif
+> +
+>   /* Audit hooks */
+>  #ifdef CONFIG_AUDIT
+>  	LSM_HOOK_INIT(audit_rule_init, smack_audit_rule_init),
+>
 
