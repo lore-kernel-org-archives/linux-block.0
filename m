@@ -2,94 +2,105 @@ Return-Path: <SRS0=Gq2m=W6=vger.kernel.org=linux-block-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-2.3 required=3.0 tests=DKIM_SIGNED,DKIM_VALID,
-	HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,
-	USER_AGENT_SANE_1 autolearn=no autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-9.7 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
+	INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,
+	UNPARSEABLE_RELAY,URIBL_BLOCKED,USER_AGENT_GIT autolearn=ham
+	autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id E6AE1C3A5A7
-	for <linux-block@archiver.kernel.org>; Tue,  3 Sep 2019 14:06:42 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id A4BB1C3A5A2
+	for <linux-block@archiver.kernel.org>; Tue,  3 Sep 2019 15:14:18 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.kernel.org (Postfix) with ESMTP id BEE1F23891
-	for <linux-block@archiver.kernel.org>; Tue,  3 Sep 2019 14:06:42 +0000 (UTC)
-Authentication-Results: mail.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel-dk.20150623.gappssmtp.com header.i=@kernel-dk.20150623.gappssmtp.com header.b="1Q9bi1VI"
+	by mail.kernel.org (Postfix) with ESMTP id 840BD2339D
+	for <linux-block@archiver.kernel.org>; Tue,  3 Sep 2019 15:14:18 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1725782AbfICOGl (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Tue, 3 Sep 2019 10:06:41 -0400
-Received: from mail-io1-f66.google.com ([209.85.166.66]:33645 "EHLO
-        mail-io1-f66.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1728576AbfICOGl (ORCPT
-        <rfc822;linux-block@vger.kernel.org>); Tue, 3 Sep 2019 10:06:41 -0400
-Received: by mail-io1-f66.google.com with SMTP id m11so4190401ioo.0
-        for <linux-block@vger.kernel.org>; Tue, 03 Sep 2019 07:06:40 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=kernel-dk.20150623.gappssmtp.com; s=20150623;
-        h=subject:to:references:from:message-id:date:user-agent:mime-version
-         :in-reply-to:content-language:content-transfer-encoding;
-        bh=0p3oWLhAQWaGVemN+5EpRiaC7HumZE71N/2ba/fW6JY=;
-        b=1Q9bi1VIzUqAMTYaHO9z9TpvDFwOZ+0dH9NVanlMlykig3srm3wskTSPXdjXa6Jrbv
-         1HA9BfwMkf/TPF5ev2nhry6re0D+KIJQzTm5/b/mIcWDg0+kDFx3xVuf1mbs0cEldcw0
-         bJxlBU0u0D0soKewZHyXOY5hYpTi15LMaAa3ctQ8YWhToZhcZ3rXitF6ziQCUZA47GaT
-         x/vdPsZUW30aYziNM+ESkpRcvfYkBt9uAjhT8ChgpTCNP0okGG0g5jVB54W4cytIaFAT
-         t9cjEpdy0S6rd1jiLNmOzj6kqyfKx3lJfYKaNgr+XxD3Heed5+Y72l169Gnpcr3/oqxX
-         M+Tw==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20161025;
-        h=x-gm-message-state:subject:to:references:from:message-id:date
-         :user-agent:mime-version:in-reply-to:content-language
-         :content-transfer-encoding;
-        bh=0p3oWLhAQWaGVemN+5EpRiaC7HumZE71N/2ba/fW6JY=;
-        b=Xl9sOXSAXZkT0cOckz4t0JnxpNHzArS4CKgM5WAiCxkWvhwmcBzV2aevTykI25Femb
-         bmtJ0m6gKx/etXFfcCobWpOzvRcfAjfSa8AFTxGyd6t0nQMKs6j+uqa1IK28m6NQE932
-         v5EgYp0X/iXwXlRnN5jC4V2/N3BlLMwo1AAqFDAoUqnLsVYsvPYVF/6a9MKEJQmtxH2K
-         MnXcvQYK6/uStx6FOnsaYI9ih0FEZJeI4OSd7JC2SP7SxIxffw+1kTEMATVjKxMsJ7Cf
-         /iNakOMPi1IoLZzrL3CRjHp+0L8JyJ59bJiJVuJ9w2VL9d7mbXonMXvt8imqP0wm3mrJ
-         NPPQ==
-X-Gm-Message-State: APjAAAUl9N4rAyhMVZhobt9zZXcfaHzC/5SqbCaAg0kJhckkM5KN+exp
-        wnYiQn5gMwPKWYNuRrmY4bhzZvxBtIbIpg==
-X-Google-Smtp-Source: APXvYqx03uOP/C8Dqwl5Q+wDp0JvHsGemvVGA6YOvYAgWggFpmv/rcZ3Ucmu6Ek5/kCC5fF+sj+pcg==
-X-Received: by 2002:a05:6602:2508:: with SMTP id i8mr29737153ioe.91.1567519600140;
-        Tue, 03 Sep 2019 07:06:40 -0700 (PDT)
-Received: from [192.168.1.50] ([65.144.74.34])
-        by smtp.gmail.com with ESMTPSA id k21sm15220719iob.49.2019.09.03.07.06.38
-        (version=TLS1_2 cipher=ECDHE-RSA-AES128-GCM-SHA256 bits=128/128);
-        Tue, 03 Sep 2019 07:06:39 -0700 (PDT)
-Subject: Re: [RESEND PATCH 0/4] Remove elevator kernel parameter
-To:     Marcos Paulo de Souza <marcos.souza.org@gmail.com>,
-        linux-kernel@vger.kernel.org, linux-block@vger.kernel.org
-References: <20190828011930.29791-1-marcos.souza.org@gmail.com>
-From:   Jens Axboe <axboe@kernel.dk>
-Message-ID: <80b367d6-393e-330a-c5df-f48e73bae86b@kernel.dk>
-Date:   Tue, 3 Sep 2019 08:06:38 -0600
-User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:60.0) Gecko/20100101
- Thunderbird/60.8.0
-MIME-Version: 1.0
-In-Reply-To: <20190828011930.29791-1-marcos.souza.org@gmail.com>
-Content-Type: text/plain; charset=utf-8
-Content-Language: en-US
-Content-Transfer-Encoding: 7bit
+        id S1729578AbfICPOR (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Tue, 3 Sep 2019 11:14:17 -0400
+Received: from mail-il-dmz.mellanox.com ([193.47.165.129]:47241 "EHLO
+        mellanox.co.il" rhost-flags-OK-OK-OK-FAIL) by vger.kernel.org
+        with ESMTP id S1729536AbfICPOR (ORCPT
+        <rfc822;linux-block@vger.kernel.org>); Tue, 3 Sep 2019 11:14:17 -0400
+Received: from Internal Mail-Server by MTLPINE1 (envelope-from maxg@mellanox.com)
+        with ESMTPS (AES256-SHA encrypted); 3 Sep 2019 18:14:15 +0300
+Received: from r-vnc12.mtr.labs.mlnx (r-vnc12.mtr.labs.mlnx [10.208.0.12])
+        by labmailer.mlnx (8.13.8/8.13.8) with ESMTP id x83FEFl2016624;
+        Tue, 3 Sep 2019 18:14:15 +0300
+From:   Max Gurtovoy <maxg@mellanox.com>
+To:     linux-block@vger.kernel.org, axboe@kernel.dk,
+        martin.petersen@oracle.com, linux-nvme@lists.infradead.org,
+        keith.busch@intel.com, hch@lst.de, sagi@grimberg.me
+Cc:     shlomin@mellanox.com, israelr@mellanox.com,
+        Max Gurtovoy <maxg@mellanox.com>
+Subject: [PATCH 2/4] nvme-rdma: simplify error flow in nvme_rdma_queue_rq
+Date:   Tue,  3 Sep 2019 18:14:13 +0300
+Message-Id: <1567523655-23989-2-git-send-email-maxg@mellanox.com>
+X-Mailer: git-send-email 1.7.1
+In-Reply-To: <1567523655-23989-1-git-send-email-maxg@mellanox.com>
+References: <1567523655-23989-1-git-send-email-maxg@mellanox.com>
 Sender: linux-block-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-On 8/27/19 7:19 PM, Marcos Paulo de Souza wrote:
-> This is just a resend, now with reviews by Hannes and Bob in place. These
-> patches were based in linux-block/for-next branch.
-> 
-> Original cover letter:
-> After the first patch sent[1], together with some background from Jens[2], this
-> patchset aims to remove completely elevator kernel parameter, since it is not
-> being used since blk-mq was set by default.
-> 
-> Along with elevator code, some documentation was also updated to remove elevator
-> references.
+Make the error flow symmetric to the good flow by moving the call to
+nvme_cleanup_cmd from nvme_rdma_unmap_data function.
 
-Applied, but:
+Signed-off-by: Max Gurtovoy <maxg@mellanox.com>
+---
+ drivers/nvme/host/rdma.c | 12 ++++++------
+ 1 file changed, 6 insertions(+), 6 deletions(-)
 
-1) Folded patch 1+2
-2) Patch 3+4 .txt files are dead
-
+diff --git a/drivers/nvme/host/rdma.c b/drivers/nvme/host/rdma.c
+index 1a6449b..db4a60f 100644
+--- a/drivers/nvme/host/rdma.c
++++ b/drivers/nvme/host/rdma.c
+@@ -1149,7 +1149,6 @@ static void nvme_rdma_unmap_data(struct nvme_rdma_queue *queue,
+ 			req->nents, rq_data_dir(rq) ==
+ 				    WRITE ? DMA_TO_DEVICE : DMA_FROM_DEVICE);
+ 
+-	nvme_cleanup_cmd(rq);
+ 	sg_free_table_chained(&req->sg_table, SG_CHUNK_SIZE);
+ }
+ 
+@@ -1748,7 +1747,6 @@ static blk_status_t nvme_rdma_queue_rq(struct blk_mq_hw_ctx *hctx,
+ 	if (unlikely(err < 0)) {
+ 		dev_err(queue->ctrl->ctrl.device,
+ 			     "Failed to map data (%d)\n", err);
+-		nvme_cleanup_cmd(rq);
+ 		goto err;
+ 	}
+ 
+@@ -1759,18 +1757,19 @@ static blk_status_t nvme_rdma_queue_rq(struct blk_mq_hw_ctx *hctx,
+ 
+ 	err = nvme_rdma_post_send(queue, sqe, req->sge, req->num_sge,
+ 			req->mr ? &req->reg_wr.wr : NULL);
+-	if (unlikely(err)) {
+-		nvme_rdma_unmap_data(queue, rq);
+-		goto err;
+-	}
++	if (unlikely(err))
++		goto err_unmap;
+ 
+ 	return BLK_STS_OK;
+ 
++err_unmap:
++	nvme_rdma_unmap_data(queue, rq);
+ err:
+ 	if (err == -ENOMEM || err == -EAGAIN)
+ 		ret = BLK_STS_RESOURCE;
+ 	else
+ 		ret = BLK_STS_IOERR;
++	nvme_cleanup_cmd(rq);
+ unmap_qe:
+ 	ib_dma_unmap_single(dev, req->sqe.dma, sizeof(struct nvme_command),
+ 			    DMA_TO_DEVICE);
+@@ -1791,6 +1790,7 @@ static void nvme_rdma_complete_rq(struct request *rq)
+ 	struct ib_device *ibdev = queue->device->dev;
+ 
+ 	nvme_rdma_unmap_data(queue, rq);
++	nvme_cleanup_cmd(rq);
+ 	ib_dma_unmap_single(ibdev, req->sqe.dma, sizeof(struct nvme_command),
+ 			    DMA_TO_DEVICE);
+ 	nvme_complete_rq(rq);
 -- 
-Jens Axboe
+1.8.3.1
 
