@@ -2,100 +2,85 @@ Return-Path: <SRS0=Gq2m=W6=vger.kernel.org=linux-block-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-0.8 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
-	MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED autolearn=no
-	autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-5.3 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
+	MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,USER_AGENT_SANE_1
+	autolearn=unavailable autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 55448C3A5A2
-	for <linux-block@archiver.kernel.org>; Tue,  3 Sep 2019 17:17:09 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id D8102C3A5A7
+	for <linux-block@archiver.kernel.org>; Tue,  3 Sep 2019 17:29:10 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.kernel.org (Postfix) with ESMTP id 31FAC21881
-	for <linux-block@archiver.kernel.org>; Tue,  3 Sep 2019 17:17:09 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id B218821897
+	for <linux-block@archiver.kernel.org>; Tue,  3 Sep 2019 17:29:10 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1730212AbfICRRI (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Tue, 3 Sep 2019 13:17:08 -0400
-Received: from iolanthe.rowland.org ([192.131.102.54]:33028 "HELO
-        iolanthe.rowland.org" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with SMTP id S1730199AbfICRRI (ORCPT
-        <rfc822;linux-block@vger.kernel.org>); Tue, 3 Sep 2019 13:17:08 -0400
-Received: (qmail 5101 invoked by uid 2102); 3 Sep 2019 13:17:07 -0400
-Received: from localhost (sendmail-bs@127.0.0.1)
-  by localhost with SMTP; 3 Sep 2019 13:17:07 -0400
-Date:   Tue, 3 Sep 2019 13:17:07 -0400 (EDT)
-From:   Alan Stern <stern@rowland.harvard.edu>
-X-X-Sender: stern@iolanthe.rowland.org
-To:     David Howells <dhowells@redhat.com>
-cc:     Guenter Roeck <linux@roeck-us.net>, <viro@zeniv.linux.org.uk>,
-        Casey Schaufler <casey@schaufler-ca.com>,
-        Stephen Smalley <sds@tycho.nsa.gov>,
-        Greg Kroah-Hartman <gregkh@linuxfoundation.org>,
-        <nicolas.dichtel@6wind.com>, <raven@themaw.net>,
-        Christian Brauner <christian@brauner.io>,
-        <keyrings@vger.kernel.org>, <linux-usb@vger.kernel.org>,
-        <linux-security-module@vger.kernel.org>,
-        <linux-fsdevel@vger.kernel.org>, <linux-api@vger.kernel.org>,
-        <linux-block@vger.kernel.org>, <linux-kernel@vger.kernel.org>
-Subject: Re: [PATCH 08/11] usb: Add USB subsystem notifications [ver #7]
-In-Reply-To: <Pine.LNX.4.44L0.1909031303500.1859-100000@iolanthe.rowland.org>
-Message-ID: <Pine.LNX.4.44L0.1909031316130.1859-100000@iolanthe.rowland.org>
+        id S1729113AbfICR3K (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Tue, 3 Sep 2019 13:29:10 -0400
+Received: from foss.arm.com ([217.140.110.172]:41538 "EHLO foss.arm.com"
+        rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
+        id S1728571AbfICR3J (ORCPT <rfc822;linux-block@vger.kernel.org>);
+        Tue, 3 Sep 2019 13:29:09 -0400
+Received: from usa-sjc-imap-foss1.foss.arm.com (unknown [10.121.207.14])
+        by usa-sjc-mx-foss1.foss.arm.com (Postfix) with ESMTP id 52AB3360;
+        Tue,  3 Sep 2019 10:29:09 -0700 (PDT)
+Received: from [10.1.194.37] (e113632-lin.cambridge.arm.com [10.1.194.37])
+        by usa-sjc-imap-foss1.foss.arm.com (Postfix) with ESMTPSA id 3302E3F59C;
+        Tue,  3 Sep 2019 10:29:08 -0700 (PDT)
+Subject: Re: [PATCH] sched: make struct task_struct::state 32-bit
+To:     Alexey Dobriyan <adobriyan@gmail.com>, mingo@redhat.com,
+        peterz@infradead.org
+Cc:     linux-kernel@vger.kernel.org, rcu@vger.kernel.org,
+        linux-block@vger.kernel.org, dm-devel@redhat.com, axboe@kernel.dk,
+        aarcange@redhat.com
+References: <20190902210558.GA23013@avx2>
+From:   Valentin Schneider <valentin.schneider@arm.com>
+Message-ID: <d8ad0be1-4ed7-df74-d415-2b1c9a44bac7@arm.com>
+Date:   Tue, 3 Sep 2019 18:29:06 +0100
+User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:60.0) Gecko/20100101
+ Thunderbird/60.8.0
 MIME-Version: 1.0
-Content-Type: TEXT/PLAIN; charset=US-ASCII
+In-Reply-To: <20190902210558.GA23013@avx2>
+Content-Type: text/plain; charset=utf-8
+Content-Language: en-US
+Content-Transfer-Encoding: 7bit
 Sender: linux-block-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-On Tue, 3 Sep 2019, Alan Stern wrote:
+On 02/09/2019 22:05, Alexey Dobriyan wrote:
+> 32-bit accesses are shorter than 64-bit accesses on x86_64.
+> Nothing uses 64-bitness of ->state.
+> 
+> Space savings are ~2KB on F30 kernel config.
+> 
+> Signed-off-by: Alexey Dobriyan <adobriyan@gmail.com>
+> ---
+> 
+>  arch/ia64/kernel/perfmon.c   |    4 ++--
+>  block/blk-mq.c               |    2 +-
+>  drivers/md/dm.c              |    4 ++--
+>  fs/userfaultfd.c             |    2 +-
+>  include/linux/sched.h        |    6 +++---
+>  include/linux/sched/debug.h  |    2 +-
+>  include/linux/sched/signal.h |    2 +-
+>  kernel/freezer.c             |    2 +-
+>  kernel/kthread.c             |    4 ++--
+>  kernel/locking/mutex.c       |    6 +++---
+>  kernel/locking/semaphore.c   |    2 +-
+>  kernel/rcu/rcutorture.c      |    4 ++--
+>  kernel/rcu/tree_stall.h      |    6 +++---
+>  kernel/sched/core.c          |    8 ++++----
+>  lib/syscall.c                |    2 +-
+>  15 files changed, 28 insertions(+), 28 deletions(-)
+> 
 
-> On Tue, 3 Sep 2019, David Howells wrote:
-> 
-> > Guenter Roeck <linux@roeck-us.net> wrote:
-> > 
-> > > > > This added call to usbdev_remove() results in a crash when running
-> > > > > the qemu "tosa" emulation. Removing the call fixes the problem.
-> > > > 
-> > > > Yeah - I'm going to drop the bus notification messages for now.
-> > > > 
-> > > It is not the bus notification itself causing problems. It is the
-> > > call to usbdev_remove().
-> > 
-> > Unfortunately, I don't know how to fix it and don't have much time to
-> > investigate it right now - and it's something that can be added back later.
-> 
-> The cause of your problem is quite simple:
-> 
->  static int usbdev_notify(struct notifier_block *self,
->  			       unsigned long action, void *dev)
->  {
->  	switch (action) {
->  	case USB_DEVICE_ADD:
-> +		post_usb_device_notification(dev, NOTIFY_USB_DEVICE_ADD, 0);
->  		break;
->  	case USB_DEVICE_REMOVE:
-> +		post_usb_device_notification(dev, NOTIFY_USB_DEVICE_REMOVE, 0);
-> +		usbdev_remove(dev);
-> +		break;
-> +	case USB_BUS_ADD:
-> +		post_usb_bus_notification(dev, NOTIFY_USB_BUS_ADD, 0);
-> +		break;
-> +	case USB_BUS_REMOVE:
-> +		post_usb_bus_notification(dev, NOTIFY_USB_BUS_REMOVE, 0);
->  		usbdev_remove(dev);
->  		break;
->  	}
-> 
-> The original code had usbdev_remove(dev) under the USB_DEVICE_REMOVE
-> case.  The patch mistakenly moves it, putting it under the
-------------------------------^^^^^
+It looks like you missed a few places. There's a long prev_state in
+sched/core.c::finish_task_switch() for instance.
 
-Sorry, I should have said "duplicates" it.
+I suppose that's where coccinelle oughta help but I'm really not fluent
+in that. Is there a way to make it match p.state accesses with p task_struct?
+And if so, can we make it change the type of the variable being read from
+/ written to?
 
-Alan Stern
+How did you come up with this changeset, did you pickaxe for some regexp?
 
-> USB_BUS_REMOVE case.
-> 
-> If the usbdev_remove() call were left where it was originally, the 
-> problem would be solved.
-> 
-> Alan Stern
-
+[...]
