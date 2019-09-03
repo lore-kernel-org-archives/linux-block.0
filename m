@@ -2,72 +2,202 @@ Return-Path: <SRS0=Gq2m=W6=vger.kernel.org=linux-block-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-0.8 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
-	MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED autolearn=no
+X-Spam-Status: No, score=-10.1 required=3.0 tests=DKIMWL_WL_HIGH,DKIM_SIGNED,
+	DKIM_VALID,DKIM_VALID_AU,INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,
+	SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED,USER_AGENT_GIT autolearn=unavailable
 	autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id B25C0C3A5A2
-	for <linux-block@archiver.kernel.org>; Tue,  3 Sep 2019 16:29:31 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id E5873C3A5A7
+	for <linux-block@archiver.kernel.org>; Tue,  3 Sep 2019 16:31:39 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.kernel.org (Postfix) with ESMTP id 8A0DE2343A
-	for <linux-block@archiver.kernel.org>; Tue,  3 Sep 2019 16:29:31 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id BE3BF238CD
+	for <linux-block@archiver.kernel.org>; Tue,  3 Sep 2019 16:31:39 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+	s=default; t=1567528299;
+	bh=C0os0u59lpcVwQNJ3fMkWbkaHLQ/ZyBoPdY1311WfMQ=;
+	h=From:To:Cc:Subject:Date:In-Reply-To:References:List-ID:From;
+	b=fWnrpt5qv62kwq7bhtEPJTfe2r14v2jh4NIB2LEqJjx7ggn6we72Yl8o3Qx46Sq8l
+	 9/9HT4Mo4FuitCidIpLKVsRJYxXs1g0JAZ2v+/QHMs98F1D59oKfls1Izq3EnCzgJ9
+	 sShpSpZm1/zHdVEx+SBE+/zyjBd78u3ACm3+toQc=
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1730800AbfICQ30 (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Tue, 3 Sep 2019 12:29:26 -0400
-Received: from mx1.redhat.com ([209.132.183.28]:34172 "EHLO mx1.redhat.com"
+        id S1731092AbfICQ2T (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Tue, 3 Sep 2019 12:28:19 -0400
+Received: from mail.kernel.org ([198.145.29.99]:50206 "EHLO mail.kernel.org"
         rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-        id S1730333AbfICQ30 (ORCPT <rfc822;linux-block@vger.kernel.org>);
-        Tue, 3 Sep 2019 12:29:26 -0400
-Received: from smtp.corp.redhat.com (int-mx08.intmail.prod.int.phx2.redhat.com [10.5.11.23])
-        (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
+        id S1731088AbfICQ2T (ORCPT <rfc822;linux-block@vger.kernel.org>);
+        Tue, 3 Sep 2019 12:28:19 -0400
+Received: from sasha-vm.mshome.net (c-73-47-72-35.hsd1.nh.comcast.net [73.47.72.35])
+        (using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
         (No client certificate requested)
-        by mx1.redhat.com (Postfix) with ESMTPS id 563E187521B;
-        Tue,  3 Sep 2019 16:29:25 +0000 (UTC)
-Received: from warthog.procyon.org.uk (ovpn-120-255.rdu2.redhat.com [10.10.120.255])
-        by smtp.corp.redhat.com (Postfix) with ESMTP id 57C0A19C78;
-        Tue,  3 Sep 2019 16:29:22 +0000 (UTC)
-Organization: Red Hat UK Ltd. Registered Address: Red Hat UK Ltd, Amberley
-        Place, 107-111 Peascod Street, Windsor, Berkshire, SI4 1TE, United
-        Kingdom.
-        Registered in England and Wales under Company Registration No. 3798903
-From:   David Howells <dhowells@redhat.com>
-In-Reply-To: <20190903161202.GB22754@roeck-us.net>
-References: <20190903161202.GB22754@roeck-us.net> <20190903125129.GA18838@roeck-us.net> <156717343223.2204.15875738850129174524.stgit@warthog.procyon.org.uk> <156717350329.2204.7056537095039252263.stgit@warthog.procyon.org.uk> <7481.1567526867@warthog.procyon.org.uk>
-To:     Guenter Roeck <linux@roeck-us.net>
-Cc:     dhowells@redhat.com, viro@zeniv.linux.org.uk,
-        Casey Schaufler <casey@schaufler-ca.com>,
-        Stephen Smalley <sds@tycho.nsa.gov>,
-        Greg Kroah-Hartman <gregkh@linuxfoundation.org>,
-        nicolas.dichtel@6wind.com, raven@themaw.net,
-        Christian Brauner <christian@brauner.io>,
-        keyrings@vger.kernel.org, linux-usb@vger.kernel.org,
-        linux-security-module@vger.kernel.org,
-        linux-fsdevel@vger.kernel.org, linux-api@vger.kernel.org,
-        linux-block@vger.kernel.org, linux-kernel@vger.kernel.org
-Subject: Re: [PATCH 08/11] usb: Add USB subsystem notifications [ver #7]
+        by mail.kernel.org (Postfix) with ESMTPSA id 400DE238CE;
+        Tue,  3 Sep 2019 16:28:17 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+        s=default; t=1567528098;
+        bh=C0os0u59lpcVwQNJ3fMkWbkaHLQ/ZyBoPdY1311WfMQ=;
+        h=From:To:Cc:Subject:Date:In-Reply-To:References:From;
+        b=wRCEcicboszdO/yEAIB+ctiSjwCSKJEcaEC3mL0E0oIARwYnDi6xIxYeP+jO5FPv1
+         Bb0Y8pogScSIdChINCtmZyIrITj7T1PWVoGDE+GGwnrE9xjuMQ8lssfwB4LZYt2GSL
+         P1opxFqy8ZMDMoOSx8PhPcLeW9gVZn1uTXOf2kdY=
+From:   Sasha Levin <sashal@kernel.org>
+To:     linux-kernel@vger.kernel.org, stable@vger.kernel.org
+Cc:     Ming Lei <ming.lei@redhat.com>,
+        Dongli Zhang <dongli.zhang@oracle.com>,
+        James Smart <james.smart@broadcom.com>,
+        Bart Van Assche <bart.vanassche@wdc.com>,
+        linux-scsi@vger.kernel.org,
+        "Martin K . Petersen" <martin.petersen@oracle.com>,
+        Christoph Hellwig <hch@lst.de>,
+        "James E . J . Bottomley" <jejb@linux.vnet.ibm.com>,
+        Hannes Reinecke <hare@suse.com>, Jens Axboe <axboe@kernel.dk>,
+        Sasha Levin <sashal@kernel.org>, linux-block@vger.kernel.org
+Subject: [PATCH AUTOSEL 4.19 106/167] blk-mq: free hw queue's resource in hctx's release handler
+Date:   Tue,  3 Sep 2019 12:24:18 -0400
+Message-Id: <20190903162519.7136-106-sashal@kernel.org>
+X-Mailer: git-send-email 2.20.1
+In-Reply-To: <20190903162519.7136-1-sashal@kernel.org>
+References: <20190903162519.7136-1-sashal@kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset="us-ascii"
-Content-ID: <29418.1567528161.1@warthog.procyon.org.uk>
-Date:   Tue, 03 Sep 2019 17:29:21 +0100
-Message-ID: <29419.1567528161@warthog.procyon.org.uk>
-X-Scanned-By: MIMEDefang 2.84 on 10.5.11.23
-X-Greylist: Sender IP whitelisted, not delayed by milter-greylist-4.6.2 (mx1.redhat.com [10.5.110.68]); Tue, 03 Sep 2019 16:29:25 +0000 (UTC)
+X-stable: review
+X-Patchwork-Hint: Ignore
+Content-Transfer-Encoding: 8bit
 Sender: linux-block-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-Guenter Roeck <linux@roeck-us.net> wrote:
+From: Ming Lei <ming.lei@redhat.com>
 
-> > > This added call to usbdev_remove() results in a crash when running
-> > > the qemu "tosa" emulation. Removing the call fixes the problem.
-> > 
-> > Yeah - I'm going to drop the bus notification messages for now.
-> > 
-> It is not the bus notification itself causing problems. It is the
-> call to usbdev_remove().
+[ Upstream commit c7e2d94b3d1634988a95ac4d77a72dc7487ece06 ]
 
-Unfortunately, I don't know how to fix it and don't have much time to
-investigate it right now - and it's something that can be added back later.
+Once blk_cleanup_queue() returns, tags shouldn't be used any more,
+because blk_mq_free_tag_set() may be called. Commit 45a9c9d909b2
+("blk-mq: Fix a use-after-free") fixes this issue exactly.
 
-David
+However, that commit introduces another issue. Before 45a9c9d909b2,
+we are allowed to run queue during cleaning up queue if the queue's
+kobj refcount is held. After that commit, queue can't be run during
+queue cleaning up, otherwise oops can be triggered easily because
+some fields of hctx are freed by blk_mq_free_queue() in blk_cleanup_queue().
+
+We have invented ways for addressing this kind of issue before, such as:
+
+	8dc765d438f1 ("SCSI: fix queue cleanup race before queue initialization is done")
+	c2856ae2f315 ("blk-mq: quiesce queue before freeing queue")
+
+But still can't cover all cases, recently James reports another such
+kind of issue:
+
+	https://marc.info/?l=linux-scsi&m=155389088124782&w=2
+
+This issue can be quite hard to address by previous way, given
+scsi_run_queue() may run requeues for other LUNs.
+
+Fixes the above issue by freeing hctx's resources in its release handler, and this
+way is safe becasue tags isn't needed for freeing such hctx resource.
+
+This approach follows typical design pattern wrt. kobject's release handler.
+
+Cc: Dongli Zhang <dongli.zhang@oracle.com>
+Cc: James Smart <james.smart@broadcom.com>
+Cc: Bart Van Assche <bart.vanassche@wdc.com>
+Cc: linux-scsi@vger.kernel.org,
+Cc: Martin K . Petersen <martin.petersen@oracle.com>,
+Cc: Christoph Hellwig <hch@lst.de>,
+Cc: James E . J . Bottomley <jejb@linux.vnet.ibm.com>,
+Reported-by: James Smart <james.smart@broadcom.com>
+Fixes: 45a9c9d909b2 ("blk-mq: Fix a use-after-free")
+Cc: stable@vger.kernel.org
+Reviewed-by: Hannes Reinecke <hare@suse.com>
+Reviewed-by: Christoph Hellwig <hch@lst.de>
+Tested-by: James Smart <james.smart@broadcom.com>
+Signed-off-by: Ming Lei <ming.lei@redhat.com>
+Signed-off-by: Jens Axboe <axboe@kernel.dk>
+Signed-off-by: Sasha Levin <sashal@kernel.org>
+---
+ block/blk-core.c     | 3 ++-
+ block/blk-mq-sysfs.c | 6 ++++++
+ block/blk-mq.c       | 8 ++------
+ block/blk-mq.h       | 2 +-
+ 4 files changed, 11 insertions(+), 8 deletions(-)
+
+diff --git a/block/blk-core.c b/block/blk-core.c
+index 4a3e1f4178804..af635f878f966 100644
+--- a/block/blk-core.c
++++ b/block/blk-core.c
+@@ -816,7 +816,8 @@ void blk_cleanup_queue(struct request_queue *q)
+ 	blk_exit_queue(q);
+ 
+ 	if (q->mq_ops)
+-		blk_mq_free_queue(q);
++		blk_mq_exit_queue(q);
++
+ 	percpu_ref_exit(&q->q_usage_counter);
+ 
+ 	spin_lock_irq(lock);
+diff --git a/block/blk-mq-sysfs.c b/block/blk-mq-sysfs.c
+index aafb44224c896..0b7297a43ccd2 100644
+--- a/block/blk-mq-sysfs.c
++++ b/block/blk-mq-sysfs.c
+@@ -10,6 +10,7 @@
+ #include <linux/smp.h>
+ 
+ #include <linux/blk-mq.h>
++#include "blk.h"
+ #include "blk-mq.h"
+ #include "blk-mq-tag.h"
+ 
+@@ -21,6 +22,11 @@ static void blk_mq_hw_sysfs_release(struct kobject *kobj)
+ {
+ 	struct blk_mq_hw_ctx *hctx = container_of(kobj, struct blk_mq_hw_ctx,
+ 						  kobj);
++
++	if (hctx->flags & BLK_MQ_F_BLOCKING)
++		cleanup_srcu_struct(hctx->srcu);
++	blk_free_flush_queue(hctx->fq);
++	sbitmap_free(&hctx->ctx_map);
+ 	free_cpumask_var(hctx->cpumask);
+ 	kfree(hctx->ctxs);
+ 	kfree(hctx);
+diff --git a/block/blk-mq.c b/block/blk-mq.c
+index 70d839b9c3b09..455fda99255a4 100644
+--- a/block/blk-mq.c
++++ b/block/blk-mq.c
+@@ -2157,12 +2157,7 @@ static void blk_mq_exit_hctx(struct request_queue *q,
+ 	if (set->ops->exit_hctx)
+ 		set->ops->exit_hctx(hctx, hctx_idx);
+ 
+-	if (hctx->flags & BLK_MQ_F_BLOCKING)
+-		cleanup_srcu_struct(hctx->srcu);
+-
+ 	blk_mq_remove_cpuhp(hctx);
+-	blk_free_flush_queue(hctx->fq);
+-	sbitmap_free(&hctx->ctx_map);
+ }
+ 
+ static void blk_mq_exit_hw_queues(struct request_queue *q,
+@@ -2662,7 +2657,8 @@ struct request_queue *blk_mq_init_allocated_queue(struct blk_mq_tag_set *set,
+ }
+ EXPORT_SYMBOL(blk_mq_init_allocated_queue);
+ 
+-void blk_mq_free_queue(struct request_queue *q)
++/* tags can _not_ be used after returning from blk_mq_exit_queue */
++void blk_mq_exit_queue(struct request_queue *q)
+ {
+ 	struct blk_mq_tag_set	*set = q->tag_set;
+ 
+diff --git a/block/blk-mq.h b/block/blk-mq.h
+index 9497b47e2526c..5ad9251627f80 100644
+--- a/block/blk-mq.h
++++ b/block/blk-mq.h
+@@ -31,7 +31,7 @@ struct blk_mq_ctx {
+ } ____cacheline_aligned_in_smp;
+ 
+ void blk_mq_freeze_queue(struct request_queue *q);
+-void blk_mq_free_queue(struct request_queue *q);
++void blk_mq_exit_queue(struct request_queue *q);
+ int blk_mq_update_nr_requests(struct request_queue *q, unsigned int nr);
+ void blk_mq_wake_waiters(struct request_queue *q);
+ bool blk_mq_dispatch_rq_list(struct request_queue *, struct list_head *, bool);
+-- 
+2.20.1
+
