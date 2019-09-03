@@ -2,60 +2,74 @@ Return-Path: <SRS0=Gq2m=W6=vger.kernel.org=linux-block-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-2.3 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
-	MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,USER_AGENT_SANE_1 autolearn=no
-	autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-2.3 required=3.0 tests=DKIM_SIGNED,DKIM_VALID,
+	HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,
+	USER_AGENT_SANE_1 autolearn=no autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 99039C3A5A2
-	for <linux-block@archiver.kernel.org>; Tue,  3 Sep 2019 19:15:52 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 3B21DC3A5A2
+	for <linux-block@archiver.kernel.org>; Tue,  3 Sep 2019 19:22:03 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.kernel.org (Postfix) with ESMTP id 76582206BB
-	for <linux-block@archiver.kernel.org>; Tue,  3 Sep 2019 19:15:52 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id 0D4E02077B
+	for <linux-block@archiver.kernel.org>; Tue,  3 Sep 2019 19:22:03 +0000 (UTC)
+Authentication-Results: mail.kernel.org;
+	dkim=pass (2048-bit key) header.d=kernel-dk.20150623.gappssmtp.com header.i=@kernel-dk.20150623.gappssmtp.com header.b="voEl1xim"
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1726635AbfICTPv (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Tue, 3 Sep 2019 15:15:51 -0400
-Received: from mail-oi1-f193.google.com ([209.85.167.193]:37010 "EHLO
-        mail-oi1-f193.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1726606AbfICTPv (ORCPT
-        <rfc822;linux-block@vger.kernel.org>); Tue, 3 Sep 2019 15:15:51 -0400
-Received: by mail-oi1-f193.google.com with SMTP id b25so13719514oib.4
-        for <linux-block@vger.kernel.org>; Tue, 03 Sep 2019 12:15:51 -0700 (PDT)
+        id S1726090AbfICTWC (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Tue, 3 Sep 2019 15:22:02 -0400
+Received: from mail-io1-f65.google.com ([209.85.166.65]:44228 "EHLO
+        mail-io1-f65.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S1725914AbfICTWC (ORCPT
+        <rfc822;linux-block@vger.kernel.org>); Tue, 3 Sep 2019 15:22:02 -0400
+Received: by mail-io1-f65.google.com with SMTP id j4so38509465iog.11
+        for <linux-block@vger.kernel.org>; Tue, 03 Sep 2019 12:22:02 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=kernel-dk.20150623.gappssmtp.com; s=20150623;
+        h=subject:to:cc:references:from:message-id:date:user-agent
+         :mime-version:in-reply-to:content-language:content-transfer-encoding;
+        bh=29dtAFPf34LxGH/UUfzYlaG1O5dS7BXSw9jlWp67F8c=;
+        b=voEl1ximKls/CHflGcztyqprJBz4GJWnF0D9iQrARetjSUY5FM8m65i3q5k3tbQWQ7
+         Yj2s+fKyQle47M78dVTd4avxZcIGVNxEZvlfKUPf/zbvuro4G3mTEfJNXHeG0wF1VXrI
+         RjEtncz1zhWQwN3m1ah3oWfp67udechQZOV9XX4AxpvTvLrd8uaAyQD+gCHpJkRPDjRf
+         xn+ptBl2YqBWF8COlppdc2taHxz3dT6K4ZVvVSmSHqZ+ZhwhPQbT/YMePjt2IcLrmmoy
+         MiAlNNV2jg1Hm9ZXhDMH1xfRC0JV8/YLBqKlYAU99/nk1Xt9TE5w8hWTV+rLv1idTxgH
+         aoag==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=1e100.net; s=20161025;
         h=x-gm-message-state:subject:to:cc:references:from:message-id:date
          :user-agent:mime-version:in-reply-to:content-language
          :content-transfer-encoding;
-        bh=mAOsk3v+mGWoFMnNBMYGwd8dnmyJmNgXPI3w1pcXB+c=;
-        b=LomRawf0V/L8SsrNV2oXDdSE0T7VxcU5Md4wLsxhc+eSDK5eP8/TZwnCCUvtisbfDG
-         5AamNYEvketnm9H2QNpE0m+Yj2OlZUc+9tXJabIejj65wI0AdHZvlvarPIHwvV/YMQ3y
-         GkYUFyZbuK/tdKFwVg87yCWCKfYkq4aEvCO4JXOjxYEyq8Ls/MbHnFEf6dTDZwC3MkMR
-         nXWWSM3qzmaDO7UjIDc02NpmLZUeRPHyyVslzYS04h7WClBoPHFwLvry1ReYcKanIsCe
-         +Clt/G0HscUCna6cq9tbfmj6ACFH6+eJLLQPfm78q/AwqI0MlG1pV9WbOW/5eMnaGQzq
-         8xAw==
-X-Gm-Message-State: APjAAAWbgGus6xY7BVlRlbE29/ttGGYzelN6Hbm8CJH4eDAmPKg1Jb6d
-        bVfmVXUFbfxOfy4t5xTMcKY=
-X-Google-Smtp-Source: APXvYqwE2C7oaOtRtmT8t2Z8lATUvZSej/eQ/Z51Mp1OstlAFQOhFD07S4XgepHERL72YIfHU80nPg==
-X-Received: by 2002:a05:6808:7c8:: with SMTP id f8mr615332oij.118.1567538150702;
-        Tue, 03 Sep 2019 12:15:50 -0700 (PDT)
-Received: from ?IPv6:2600:1700:65a0:78e0:514:7862:1503:8e4d? ([2600:1700:65a0:78e0:514:7862:1503:8e4d])
-        by smtp.gmail.com with ESMTPSA id 36sm94811ott.66.2019.09.03.12.15.48
+        bh=29dtAFPf34LxGH/UUfzYlaG1O5dS7BXSw9jlWp67F8c=;
+        b=UirhuLjxKDhODfdRT3+p1pVaqNnQUb8rVT8yr+Ul/ojvxPc30J1rcQZtiQAmhWYRlF
+         1T7hN1x9F3HuXDt4Igu1GkTkCxF0EInUPLEeKmJf8jkDJM0C91NpdJy7LR1TwPD+A/k5
+         apEP02HN4piTd6JVSTkqLA76fI0ki2V7GDrs7Cg8X2wJ5C0pVbTSHJ0D7F3ZdGuxVZ8N
+         hA+zxxQMDR5So2g5s0ktbZ7lcR9N9XJwTI3xHRDCkUdgR8YlsSMMZh+mkNO2kmob5UIC
+         I94ZlLG26c4XQ5WNqbqujD/TPMHWsLTx+e6GMTAveFpGOwJne30EPdzsa7ATFeeJtC6C
+         RWKA==
+X-Gm-Message-State: APjAAAV39IXQ53SRPdwlQtX6fmfOvPqr1w9H3Ty8yf4QjMEV198oD7MU
+        GcpIqrwRYpiFN05zeHKPvTXKcsvPOCz9HA==
+X-Google-Smtp-Source: APXvYqzBMtMZ2ZLDWbSZL0p1Rzk8Q6xurNani/F3mC7VqI3TC/2Wga/K5TZsESkUAb0XIIkxdMiP7g==
+X-Received: by 2002:a02:ab90:: with SMTP id t16mr4273892jan.110.1567538521476;
+        Tue, 03 Sep 2019 12:22:01 -0700 (PDT)
+Received: from [192.168.1.50] ([65.144.74.34])
+        by smtp.gmail.com with ESMTPSA id i62sm13973375ioa.4.2019.09.03.12.22.00
         (version=TLS1_2 cipher=ECDHE-RSA-AES128-GCM-SHA256 bits=128/128);
-        Tue, 03 Sep 2019 12:15:49 -0700 (PDT)
-Subject: Re: [PATCH 3/4] nvme-tcp: introduce nvme_tcp_complete_rq callback
-To:     Max Gurtovoy <maxg@mellanox.com>, linux-block@vger.kernel.org,
-        axboe@kernel.dk, martin.petersen@oracle.com,
+        Tue, 03 Sep 2019 12:22:00 -0700 (PDT)
+Subject: Re: [PATCH 1/4] block: centrelize PI remapping logic to the block
+ layer
+To:     Sagi Grimberg <sagi@grimberg.me>, Max Gurtovoy <maxg@mellanox.com>,
+        linux-block@vger.kernel.org, martin.petersen@oracle.com,
         linux-nvme@lists.infradead.org, keith.busch@intel.com, hch@lst.de
 Cc:     shlomin@mellanox.com, israelr@mellanox.com
 References: <1567523655-23989-1-git-send-email-maxg@mellanox.com>
- <1567523655-23989-3-git-send-email-maxg@mellanox.com>
-From:   Sagi Grimberg <sagi@grimberg.me>
-Message-ID: <c5757c95-2a4f-410d-a275-85d8c9da737f@grimberg.me>
-Date:   Tue, 3 Sep 2019 12:15:48 -0700
+ <8df57b71-9404-904d-7abd-587942814039@grimberg.me>
+From:   Jens Axboe <axboe@kernel.dk>
+Message-ID: <e9e36b41-f262-e825-15dc-aecadb44cf85@kernel.dk>
+Date:   Tue, 3 Sep 2019 13:21:59 -0600
 User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:60.0) Gecko/20100101
  Thunderbird/60.8.0
 MIME-Version: 1.0
-In-Reply-To: <1567523655-23989-3-git-send-email-maxg@mellanox.com>
-Content-Type: text/plain; charset=utf-8; format=flowed
+In-Reply-To: <8df57b71-9404-904d-7abd-587942814039@grimberg.me>
+Content-Type: text/plain; charset=utf-8
 Content-Language: en-US
 Content-Transfer-Encoding: 7bit
 Sender: linux-block-owner@vger.kernel.org
@@ -63,9 +77,26 @@ Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
+On 9/3/19 1:11 PM, Sagi Grimberg wrote:
+> 
+>> +	if (blk_integrity_rq(req) && req_op(req) == REQ_OP_READ &&
+>> +	    error == BLK_STS_OK)
+>> +		t10_pi_complete(req,
+>> +				nr_bytes / queue_logical_block_size(req->q));
+>> +
+> 
+> div in this path? better to use  >> ilog2(block_size).
+> 
+> Also, would be better to have a wrapper in place like:
+> 
+> static inline unsigned short blk_integrity_interval(struct request *rq)
+> {
+> 	return queue_logical_block_size(rq->q);
+> }
 
-> The nvme_cleanup_cmd function should be called to avoid resource leakage
-> (it's the opposite to nvme_setup_cmd). Fix the error flow during command
-> submission and also fix the missing call in command completion.
+If it's a hot path thing that matters, I'd strongly suggest to add
+a queue block size shift instead.
 
-Is it always called with nvme_complete_rq? Why not just put it there?
+-- 
+Jens Axboe
+
