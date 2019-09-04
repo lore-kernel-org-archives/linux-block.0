@@ -6,42 +6,55 @@ X-Spam-Status: No, score=-2.2 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
 	MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,USER_AGENT_SANE_1 autolearn=no
 	autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 141AAC41514
-	for <linux-block@archiver.kernel.org>; Wed,  4 Sep 2019 17:48:53 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 34B8AC3A5A8
+	for <linux-block@archiver.kernel.org>; Wed,  4 Sep 2019 17:49:17 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.kernel.org (Postfix) with ESMTP id DFC1521670
-	for <linux-block@archiver.kernel.org>; Wed,  4 Sep 2019 17:48:52 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id 15F6321670
+	for <linux-block@archiver.kernel.org>; Wed,  4 Sep 2019 17:49:17 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1730238AbfIDRsw (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Wed, 4 Sep 2019 13:48:52 -0400
-Received: from foss.arm.com ([217.140.110.172]:59344 "EHLO foss.arm.com"
-        rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-        id S1729594AbfIDRsw (ORCPT <rfc822;linux-block@vger.kernel.org>);
-        Wed, 4 Sep 2019 13:48:52 -0400
-Received: from usa-sjc-imap-foss1.foss.arm.com (unknown [10.121.207.14])
-        by usa-sjc-mx-foss1.foss.arm.com (Postfix) with ESMTP id 96343337;
-        Wed,  4 Sep 2019 10:48:51 -0700 (PDT)
-Received: from [10.1.194.37] (e113632-lin.cambridge.arm.com [10.1.194.37])
-        by usa-sjc-imap-foss1.foss.arm.com (Postfix) with ESMTPSA id 76BA03F67D;
-        Wed,  4 Sep 2019 10:48:50 -0700 (PDT)
-Subject: Re: [PATCH] sched: make struct task_struct::state 32-bit
-From:   Valentin Schneider <valentin.schneider@arm.com>
-To:     Alexey Dobriyan <adobriyan@gmail.com>
-Cc:     mingo@redhat.com, peterz@infradead.org,
-        linux-kernel@vger.kernel.org, rcu@vger.kernel.org,
-        linux-block@vger.kernel.org, dm-devel@redhat.com, axboe@kernel.dk,
-        aarcange@redhat.com
-References: <20190902210558.GA23013@avx2>
- <d8ad0be1-4ed7-df74-d415-2b1c9a44bac7@arm.com> <20190903181920.GA22358@avx2>
- <92ead22e-0580-c720-1a29-7db79d76f7d7@arm.com>
- <a43fe392-bd6a-71f5-8611-c6b764ba56c3@arm.com>
-Message-ID: <f0328a66-ca9f-974d-3799-e73308fb1d34@arm.com>
-Date:   Wed, 4 Sep 2019 18:48:49 +0100
+        id S1729963AbfIDRtQ (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Wed, 4 Sep 2019 13:49:16 -0400
+Received: from mail-pf1-f196.google.com ([209.85.210.196]:40846 "EHLO
+        mail-pf1-f196.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S1729594AbfIDRtQ (ORCPT
+        <rfc822;linux-block@vger.kernel.org>); Wed, 4 Sep 2019 13:49:16 -0400
+Received: by mail-pf1-f196.google.com with SMTP id x127so1015676pfb.7
+        for <linux-block@vger.kernel.org>; Wed, 04 Sep 2019 10:49:15 -0700 (PDT)
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20161025;
+        h=x-gm-message-state:subject:to:cc:references:from:message-id:date
+         :user-agent:mime-version:in-reply-to:content-language
+         :content-transfer-encoding;
+        bh=bXjlaA+cJTDpBVthjWSEhfdyBmu64WqVPQD2IzEDFds=;
+        b=TwqyGRhEihDRKofkmS7NN8IhVvg1YqXFjJuxuxIYaBAvRZx3YlCDCUibPBYyxGFIQj
+         zkVf/cnJduQuappGqfcx7XepkUS8gyfrP08HbVWmJ/WFS/fA2GGO7J5KePD0lA0fv6sE
+         8dacvRxJPNMWUXudrGu6LHHhuOkZWUeP6FYb1CboUpOiWlxbrOnwOjmPbdW4xlVOFfKw
+         /BvuFWp6MvZ5jzzQ0kpTzvT7vTsHZ7FrH4v9JcGqqdlOAkZACq4d9smyBNu0eLploTkX
+         ilKamqgV4OK3BD0BmU4ZcQO3dKk4WtNOCDpKWDoTp/SCAiPpevtNuI3c7sbwfSKDG5or
+         9nNg==
+X-Gm-Message-State: APjAAAX5J10mbT9WyntR/vcKqtykLEgD+EZ8PZeCj4Bo1fGX0PiUylYC
+        5fUXYPivt6LWyRSw4kfFTHk=
+X-Google-Smtp-Source: APXvYqxccRPpld0d1hn+tS5K6QNf35w6UuU4NxDkC5OUHgiwyvDkqFUEtkpLaoOwS8eTLclTGSVLoA==
+X-Received: by 2002:a17:90a:8d0c:: with SMTP id c12mr6250486pjo.119.1567619355315;
+        Wed, 04 Sep 2019 10:49:15 -0700 (PDT)
+Received: from desktop-bart.svl.corp.google.com ([2620:15c:2cd:202:4308:52a3:24b6:2c60])
+        by smtp.gmail.com with ESMTPSA id i74sm11432392pfe.28.2019.09.04.10.49.14
+        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
+        Wed, 04 Sep 2019 10:49:14 -0700 (PDT)
+Subject: Re: [PATCH blktests 0/4] Four blktests patches
+To:     Omar Sandoval <osandov@fb.com>
+Cc:     linux-block@vger.kernel.org,
+        Johannes Thumshirn <jthumshirn@suse.de>,
+        Logan Gunthorpe <logang@deltatee.com>
+References: <20190808200506.186137-1-bvanassche@acm.org>
+From:   Bart Van Assche <bvanassche@acm.org>
+Message-ID: <2e2e3abb-1420-7743-eb7f-cd9744d36686@acm.org>
+Date:   Wed, 4 Sep 2019 10:49:13 -0700
 User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:60.0) Gecko/20100101
  Thunderbird/60.8.0
 MIME-Version: 1.0
-In-Reply-To: <a43fe392-bd6a-71f5-8611-c6b764ba56c3@arm.com>
-Content-Type: text/plain; charset=utf-8
+In-Reply-To: <20190808200506.186137-1-bvanassche@acm.org>
+Content-Type: text/plain; charset=utf-8; format=flowed
 Content-Language: en-US
 Content-Transfer-Encoding: 7bit
 Sender: linux-block-owner@vger.kernel.org
@@ -49,98 +62,21 @@ Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-On 04/09/2019 13:07, Valentin Schneider wrote:
-> [...]
-> Baby steps...
+On 8/8/19 1:05 PM, Bart Van Assche wrote:
+> Hi Omar,
+> 
+> This series includes one improvement for the NVMe tests, two improvements for
+> the NVMeOF-multipath tests and version two of the SRP test that triggers a SCSI
+> reset while I/O is ongoing. Please consider these for the official blktests
+> git repository.
 
+(replying to my own e-mail)
 
-There's something regarding coccinelle disjunctions that just can't grasp,
-and this also fails to recognize "current" as being "struct task_struct*".
+Hi Omar,
 
-Once I fix these, it's "just" a matter of finding out how to write a rule
-for layered calls (e.g. __kthread_bind() -> __kthread_bind_mask() ->
-wait_task_inactive()), and we should be close to having something somewhat
-usable.
+This patch series was posted about one month ago. Feedback about how to
+proceed with this patch series is still welcome.
 
----
-virtual patch
-virtual report
+Thanks,
 
-@state_access@
-identifier func;
-struct task_struct *p;
-identifier state_var;
-position fpos;
-position epos;
-@@
-
-func(...)@fpos
-{
-	<...
-(
-  p->state & state_var@epos
-|
-  p->state | state_var@epos
-|
-  p->state < state_var@epos
-|
-  p->state > state_var@epos
-|
-  state_var@epos = p->state
-// For some reason adding this disjunction gives us more matches, but causes
-// some to go away :/
-// |
-//   p->state == state_var@epos
-|
-  p->state != state_var@epos
-)
-	...>
-}
-
-@depends on patch@
-identifier fn = state_access.func;
-identifier state_var = state_access.state_var;
-@@
-
-fn(...,
-- long state_var
-+ int state_var
-,...)
-{
-	...
-}
-
-// Should be merged in the above but can't get disjunction to work
-@depends on patch@
-identifier fn = state_access.func;
-identifier state_var = state_access.state_var;
-@@
-
-fn(...,
-- unsigned long state_var
-+ unsigned int state_var
-,...)
-{
-	...
-}
-
-// Is it possible to match without semicolons? :/
-@depends on patch@
-identifier state_var = state_access.state_var;
-expression E;
-@@
-
-(
-- long state_var;
-+ int state_var;
-|
-- long state_var = E;
-+ int state_var = E;
-)
-
-@script:python depends on report@
-fp << state_access.fpos;
-ep << state_access.epos;
-@@
-cocci.print_main("Func at", fp)
-cocci.print_main("Expr at", ep)
+Bart.
