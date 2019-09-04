@@ -2,150 +2,84 @@ Return-Path: <SRS0=cenR=W7=vger.kernel.org=linux-block-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-8.2 required=3.0 tests=DKIM_SIGNED,DKIM_VALID,
-	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,
-	SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED,USER_AGENT_SANE_1 autolearn=ham
-	autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-2.2 required=3.0 tests=DKIM_SIGNED,DKIM_VALID,
+	HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,
+	USER_AGENT_SANE_1 autolearn=no autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 4C41AC3A5A8
-	for <linux-block@archiver.kernel.org>; Wed,  4 Sep 2019 18:21:06 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 1D166C3A5A8
+	for <linux-block@archiver.kernel.org>; Wed,  4 Sep 2019 19:31:34 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.kernel.org (Postfix) with ESMTP id 2349A20882
-	for <linux-block@archiver.kernel.org>; Wed,  4 Sep 2019 18:21:06 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id D9C8322CED
+	for <linux-block@archiver.kernel.org>; Wed,  4 Sep 2019 19:31:33 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=pass (2048-bit key) header.d=osandov-com.20150623.gappssmtp.com header.i=@osandov-com.20150623.gappssmtp.com header.b="tRoNPbpV"
+	dkim=pass (1024-bit key) header.d=amazonses.com header.i=@amazonses.com header.b="GwHMsNh0"
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S2389500AbfIDSVF (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Wed, 4 Sep 2019 14:21:05 -0400
-Received: from mail-pf1-f193.google.com ([209.85.210.193]:33236 "EHLO
-        mail-pf1-f193.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S2387878AbfIDSVE (ORCPT
-        <rfc822;linux-block@vger.kernel.org>); Wed, 4 Sep 2019 14:21:04 -0400
-Received: by mail-pf1-f193.google.com with SMTP id q10so8702789pfl.0
-        for <linux-block@vger.kernel.org>; Wed, 04 Sep 2019 11:21:03 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=osandov-com.20150623.gappssmtp.com; s=20150623;
-        h=date:from:to:cc:subject:message-id:references:mime-version
-         :content-disposition:in-reply-to:user-agent;
-        bh=BC0W8gVR8nr+ywA1XU/dSNIOA5fh8+NVvu22c6Msxow=;
-        b=tRoNPbpVkpTry8+7UTGW8zLNnlf2+r3uiX1dDy5/EJ/330T9ktYJwmEKJa0DAYnzte
-         PTMfZp7btZuTxx9v6L9thW4a4vd6o09EY0ZxVifhJdYW711Qg4Q31I9fWLdxs7fXDA4S
-         XFCsE8iV4S68jBDb++8zSA3OjdHMFoucPKtS2AvKdMR90lE+pFn1phYzlGwSHbURU8Va
-         TiV1yGs4tTmdO4dDlectzikFEUfB9mEAWzMd+Rz8AQYMXnoTUH4PiayzMTgpWEB7nO6d
-         jPFuCIeiGGOgm5tAtNn8PZJyIg45f5x1qcaSODuCFVOLcumCjJJ6AtuPqJA3edxfVE+T
-         ZSzA==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20161025;
-        h=x-gm-message-state:date:from:to:cc:subject:message-id:references
-         :mime-version:content-disposition:in-reply-to:user-agent;
-        bh=BC0W8gVR8nr+ywA1XU/dSNIOA5fh8+NVvu22c6Msxow=;
-        b=RZcdXno2T3Dy6v7MpjW1S21lqJ5Tl/xVYmSU3FSB6p6tcYQv6RFxvJvm51pSrTAs34
-         9ruIclMCTmuTg5Kpgqc2+2TIDCtoQTNsFHty5EntgdV2tT0fJxzQZF/WvTYCVJYlZ75g
-         6wM488cbohzyDqfy2lVX11OHql2f1NSnoAMsVwi9nbxCpCaLCJEvgLsXG9m2dRb2GuMG
-         /JnV8sUn3PGjkKa9Bkzrrt/oHZE1hHljGfdQCUIxxzE/XoYQEPBBUZCQrUGJ/Fn11q8B
-         xFfCvf110wpQVK5wQ+8UHHCq3rgyv/x5/REAeGs3/GBJGPkTtCb1+M2YRkeP6HcoofDV
-         jX5g==
-X-Gm-Message-State: APjAAAXq0qYqkwlCf/3CGpm/ceEb2tjWWJV7Da+Sej8wXYtyQUEk9W1O
-        xMFSo9cNi1CI8x0298a0HH28Xw==
-X-Google-Smtp-Source: APXvYqyXEzdne2D+FItAKrOtEseUbh4VttYjTNcn58+lcHOi2c4pzjIO7d7o1imU7yGqMMNU7VNGvw==
-X-Received: by 2002:a63:1d0e:: with SMTP id d14mr36371373pgd.324.1567621263225;
-        Wed, 04 Sep 2019 11:21:03 -0700 (PDT)
-Received: from vader ([2601:602:8b80:8e0:e6a7:a0ff:fe0b:c9a8])
-        by smtp.gmail.com with ESMTPSA id k36sm19713797pgl.42.2019.09.04.11.21.02
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Wed, 04 Sep 2019 11:21:02 -0700 (PDT)
-Date:   Wed, 4 Sep 2019 11:21:02 -0700
-From:   Omar Sandoval <osandov@osandov.com>
-To:     Yi Zhang <yi.zhang@redhat.com>
-Cc:     linux-block@vger.kernel.org, osandov@fb.com, ming.lei@redhat.com
-Subject: Re: [PATCH blktests] nvme: Add new test case about nvme
- rescan/reset/remove during IO
-Message-ID: <20190904182102.GE7452@vader>
-References: <20190903081752.463-1-yi.zhang@redhat.com>
+        id S1730441AbfIDTbd (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Wed, 4 Sep 2019 15:31:33 -0400
+Received: from a9-54.smtp-out.amazonses.com ([54.240.9.54]:43374 "EHLO
+        a9-54.smtp-out.amazonses.com" rhost-flags-OK-OK-OK-OK)
+        by vger.kernel.org with ESMTP id S1729803AbfIDTbd (ORCPT
+        <rfc822;linux-block@vger.kernel.org>);
+        Wed, 4 Sep 2019 15:31:33 -0400
+DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/simple;
+        s=6gbrjpgwjskckoa6a5zn6fwqkn67xbtw; d=amazonses.com; t=1567625491;
+        h=Date:From:To:cc:Subject:In-Reply-To:Message-ID:References:MIME-Version:Content-Type:Feedback-ID;
+        bh=PcFJmgXphXAgMTzEqtGAmyZoYWFr5XRnp0kHdbyqz4s=;
+        b=GwHMsNh0TlGnNbVoMm7+dx7dxoBn/weDacqBs00YnSm/6FPhetXhaKq4djrf5Unz
+        rYFSYQZdou6MsJEjMIKrMRLWImApiZkCjzrC6D96ACCVw+/tdIOrAjBncyGYXS5n0Lj
+        /4YdNYH/kmEZmxPCMoUxC3iDBf/wOYGWtdPgu+z4=
+Date:   Wed, 4 Sep 2019 19:31:31 +0000
+From:   Christopher Lameter <cl@linux.com>
+X-X-Sender: cl@nuc-kabylake
+To:     Matthew Wilcox <willy@infradead.org>
+cc:     Michal Hocko <mhocko@kernel.org>, Vlastimil Babka <vbabka@suse.cz>,
+        Andrew Morton <akpm@linux-foundation.org>, linux-mm@kvack.org,
+        linux-kernel@vger.kernel.org, Pekka Enberg <penberg@kernel.org>,
+        David Rientjes <rientjes@google.com>,
+        Ming Lei <ming.lei@redhat.com>,
+        Dave Chinner <david@fromorbit.com>,
+        "Darrick J . Wong" <darrick.wong@oracle.com>,
+        Christoph Hellwig <hch@lst.de>, linux-xfs@vger.kernel.org,
+        linux-fsdevel@vger.kernel.org, linux-block@vger.kernel.org,
+        James Bottomley <James.Bottomley@hansenpartnership.com>,
+        linux-btrfs@vger.kernel.org
+Subject: Re: [PATCH v2 2/2] mm, sl[aou]b: guarantee natural alignment for
+ kmalloc(power-of-two)
+In-Reply-To: <20190903205312.GK29434@bombadil.infradead.org>
+Message-ID: <0100016cfdc2b4a1-355182af-3d27-4ae8-94f3-e3b6e8cc6814-000000@email.amazonses.com>
+References: <20190826111627.7505-1-vbabka@suse.cz> <20190826111627.7505-3-vbabka@suse.cz> <0100016cd98bb2c1-a2af7539-706f-47ba-a68e-5f6a91f2f495-000000@email.amazonses.com> <20190828194607.GB6590@bombadil.infradead.org> <20190829073921.GA21880@dhcp22.suse.cz>
+ <0100016ce39e6bb9-ad20e033-f3f4-4e6d-85d6-87e7d07823ae-000000@email.amazonses.com> <20190901005205.GA2431@bombadil.infradead.org> <0100016cf8c3033d-bbcc9ba3-2d59-4654-a7c2-8ba094f8a7de-000000@email.amazonses.com>
+ <20190903205312.GK29434@bombadil.infradead.org>
+User-Agent: Alpine 2.21 (DEB 202 2017-01-01)
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <20190903081752.463-1-yi.zhang@redhat.com>
-User-Agent: Mutt/1.12.1 (2019-06-15)
+Content-Type: text/plain; charset=US-ASCII
+X-SES-Outgoing: 2019.09.04-54.240.9.54
+Feedback-ID: 1.us-east-1.fQZZZ0Xtj2+TD7V5apTT/NrT6QKuPgzCT/IC7XYgDKI=:AmazonSES
 Sender: linux-block-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-On Tue, Sep 03, 2019 at 04:17:52PM +0800, Yi Zhang wrote:
-> Add one test to cover NVMe SSD rescan/reset/remove operation during
-> IO, the steps found several issues during my previous testing, check
-> them here:
-> http://lists.infradead.org/pipermail/linux-nvme/2017-February/008358.html
-> http://lists.infradead.org/pipermail/linux-nvme/2017-May/010259.html
-> 
-> Signed-off-by: Yi Zhang <yi.zhang@redhat.com>
-> ---
->  tests/nvme/031     | 43 +++++++++++++++++++++++++++++++++++++++++++
->  tests/nvme/031.out |  2 ++
->  2 files changed, 45 insertions(+)
->  create mode 100755 tests/nvme/031
->  create mode 100644 tests/nvme/031.out
-> 
-> diff --git a/tests/nvme/031 b/tests/nvme/031
-> new file mode 100755
-> index 0000000..4113d12
-> --- /dev/null
-> +++ b/tests/nvme/031
-> @@ -0,0 +1,43 @@
-> +#!/bin/bash
-> +# SPDX-License-Identifier: GPL-3.0+
-> +# Copyright (C) 2019 Yi Zhang <yi.zhang@redhat.com>
-> +#
-> +# Test nvme pci adapter rescan/reset/remove operation during I/O
-> +#
-> +# Regression test for bellow two commits:
-> +# http://lists.infradead.org/pipermail/linux-nvme/2017-May/010367.html
-> +# 986f75c876db nvme: avoid to use blk_mq_abort_requeue_list()
-> +# 806f026f9b90 nvme: use blk_mq_start_hw_queues() in nvme_kill_queues()
-> +
-> +. tests/nvme/rc
-> +
-> +DESCRIPTION="test nvme pci adapter rescan/reset/remove during I/O"
-> +TIMED=1
-> +
-> +requires() {
-> +	_have_fio
-> +}
-> +
-> +device_requires() {
-> +	_test_dev_is_nvme
-> +}
-> +
-> +test_device() {
-> +	echo "Running ${TEST_NAME}"
-> +
-> +	pdev="$(_get_pci_dev_from_blkdev)"
-> +
-> +	# start fio job
-> +	_run_fio_rand_io --filename="$TEST_DEV" --size=1g \
-> +		--ignore_error=EIO,ENXIO,ENODEV --group_reporting  &> /dev/null &
-> +
-> +	# do rescan/reset/remove operation
-> +	echo 1 > /sys/bus/pci/devices/"${pdev}"/rescan
-> +	echo 1 > /sys/bus/pci/devices/"${pdev}"/reset
+On Tue, 3 Sep 2019, Matthew Wilcox wrote
 
-My QEMU VM doesn't have the "reset" attribute, I'm guessing because of
-this code in pci_create_capabilities_sysfs():
+> > Its enabled in all full debug session as far as I know. Fedora for
+> > example has been running this for ages to find breakage in device drivers
+> > etc etc.
+>
+> Are you telling me nobody uses the ramdisk driver on fedora?  Because
+> that's one of the affected drivers.
 
-	if (dev->reset_fn) {
-		retval = device_create_file(&dev->dev, &reset_attr);
-		if (retval)
-			goto error;
-	}
+How do I know? I dont run these tests.
 
-We can skip the reset if the attribute doesn't exist.
+> > decade now) I am having a hard time believing the stories of great
+> > breakage here. These drivers were not tested with debugging on before?
+> > Never ran with a debug kernel?
+>
+> Whatever is being done is clearly not enough to trigger the bug.  So how
+> about it?  Create an option to slab/slub to always return misaligned
+> memory.
 
-> +	echo 1 > /sys/bus/pci/devices/"${pdev}"/remove
-> +	sleep .5
-> +	echo 1 > /sys/bus/pci/rescan
-> +	sleep 5
+It already exists
 
-Instead of sleep, we can kill and wait for fio.
+Add "slub_debug" on the kernel command line.
 
-Thanks!
