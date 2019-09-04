@@ -2,440 +2,366 @@ Return-Path: <SRS0=cenR=W7=vger.kernel.org=linux-block-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-9.7 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
-	INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,
-	UNPARSEABLE_RELAY,URIBL_BLOCKED,USER_AGENT_GIT autolearn=ham
+X-Spam-Status: No, score=-8.2 required=3.0 tests=DKIM_SIGNED,DKIM_VALID,
+	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,
+	SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED,USER_AGENT_SANE_1 autolearn=ham
 	autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id B0E82C3A5A8
-	for <linux-block@archiver.kernel.org>; Wed,  4 Sep 2019 16:27:40 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 907D8C3A5A8
+	for <linux-block@archiver.kernel.org>; Wed,  4 Sep 2019 17:42:44 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.kernel.org (Postfix) with ESMTP id 7F0ED21881
-	for <linux-block@archiver.kernel.org>; Wed,  4 Sep 2019 16:27:40 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id 5D66022CEA
+	for <linux-block@archiver.kernel.org>; Wed,  4 Sep 2019 17:42:44 +0000 (UTC)
+Authentication-Results: mail.kernel.org;
+	dkim=pass (2048-bit key) header.d=osandov-com.20150623.gappssmtp.com header.i=@osandov-com.20150623.gappssmtp.com header.b="KsYslVeE"
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1731540AbfIDQ1j (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Wed, 4 Sep 2019 12:27:39 -0400
-Received: from mail-il-dmz.mellanox.com ([193.47.165.129]:55589 "EHLO
-        mellanox.co.il" rhost-flags-OK-OK-OK-FAIL) by vger.kernel.org
-        with ESMTP id S1731479AbfIDQ1j (ORCPT
-        <rfc822;linux-block@vger.kernel.org>); Wed, 4 Sep 2019 12:27:39 -0400
-Received: from Internal Mail-Server by MTLPINE1 (envelope-from maxg@mellanox.com)
-        with ESMTPS (AES256-SHA encrypted); 4 Sep 2019 19:27:32 +0300
-Received: from r-vnc12.mtr.labs.mlnx (r-vnc12.mtr.labs.mlnx [10.208.0.12])
-        by labmailer.mlnx (8.13.8/8.13.8) with ESMTP id x84GRWkF002758;
-        Wed, 4 Sep 2019 19:27:32 +0300
-From:   Max Gurtovoy <maxg@mellanox.com>
-To:     linux-block@vger.kernel.org, axboe@kernel.dk,
-        martin.petersen@oracle.com, linux-nvme@lists.infradead.org,
-        keith.busch@intel.com, hch@lst.de, sagi@grimberg.me
-Cc:     shlomin@mellanox.com, israelr@mellanox.com,
-        Max Gurtovoy <maxg@mellanox.com>
-Subject: [PATCH v2 1/1] block: centralize PI remapping logic to the block layer
-Date:   Wed,  4 Sep 2019 19:27:32 +0300
-Message-Id: <1567614452-26251-1-git-send-email-maxg@mellanox.com>
-X-Mailer: git-send-email 1.7.1
+        id S1729727AbfIDRmn (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Wed, 4 Sep 2019 13:42:43 -0400
+Received: from mail-pg1-f194.google.com ([209.85.215.194]:33928 "EHLO
+        mail-pg1-f194.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S1725965AbfIDRmn (ORCPT
+        <rfc822;linux-block@vger.kernel.org>); Wed, 4 Sep 2019 13:42:43 -0400
+Received: by mail-pg1-f194.google.com with SMTP id n9so11629713pgc.1
+        for <linux-block@vger.kernel.org>; Wed, 04 Sep 2019 10:42:43 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=osandov-com.20150623.gappssmtp.com; s=20150623;
+        h=date:from:to:cc:subject:message-id:references:mime-version
+         :content-disposition:in-reply-to:user-agent;
+        bh=FzAJSFaQ2ZY88bQQwUHWa2MDUugwX/tEerS7MGc1OAE=;
+        b=KsYslVeE2KqRAiwyfc/gyZ0ElnmypJhmy2WCfpJDfgaGwffcyvCC8aOcEK3WAgHXDS
+         WwzNZ1Ic2cY80Rb12sXGrCEC+jeIexJI+/2ABwxf/tTuA0cXkx6TgrTOJd5uyOqrvWWC
+         Ns9fj8PJR/Gn5sBLoHPxk89cVyHwQatV3G9TNWxVsbbsR27xb54wKGoEct/dzQ0qNHG0
+         8MSl3SDuqWvkfRL7Li4P6rgd4jFNWgm4qKw+/a95OBjp0OgmTBrv75pRtBmtK2u6mcXw
+         wGlomiY5mAbqzE8UZlzIhFoi9GVJG9+02x9Lf5i9AIFmlokh7Pe/3QkmfwumzPNj7a6V
+         NnmQ==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20161025;
+        h=x-gm-message-state:date:from:to:cc:subject:message-id:references
+         :mime-version:content-disposition:in-reply-to:user-agent;
+        bh=FzAJSFaQ2ZY88bQQwUHWa2MDUugwX/tEerS7MGc1OAE=;
+        b=k+whSsS83hC4+TSNB2nVcfan1rGnnrcetQIIu2HFfXoQCjqxguQhzkDdB7kB/I3yLs
+         WqYL3U/pa+k6R2AN5/v1Py2hal6KpS3hFxvJr6JW9wk8aEYQ7hwxwjm2BPLGerbBI1bt
+         IDp1a3iFo7+XqyrcLv6PhsC7WTn4SRCeU1HacZOmvY3KBF0ueiIHy0MolGlrrLjdoL47
+         dGypHi+HjNoXh5efeZmnnnPXeJp0E/zo8mAXXLui+kjXEOpl9kTrDIY44clq/Rlpp9To
+         TiaWD+1DayMc5w4AaXmzBb/OgsMjJQvaAKoU9pKu1Hb8NXjgCL97uI6WDi4GSNi3P0yZ
+         GgWg==
+X-Gm-Message-State: APjAAAVO2DnufIJsrOX22OFhLUE8PvdMbQua3nb1y+wdmlvaNDCiOnAv
+        ZM15D3zELZQjHHmEAbVQXMxe/Q==
+X-Google-Smtp-Source: APXvYqzGxetscgF58dzrmKYirQuMQwd1Uq/obLIpVSM+ndxlxypK8L8LGJDSV1mUYKX90ftk5rkUUA==
+X-Received: by 2002:a17:90a:890c:: with SMTP id u12mr6171475pjn.124.1567618962354;
+        Wed, 04 Sep 2019 10:42:42 -0700 (PDT)
+Received: from vader ([2601:602:8b80:8e0:e6a7:a0ff:fe0b:c9a8])
+        by smtp.gmail.com with ESMTPSA id d11sm11399340pfn.151.2019.09.04.10.42.41
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Wed, 04 Sep 2019 10:42:41 -0700 (PDT)
+Date:   Wed, 4 Sep 2019 10:42:40 -0700
+From:   Omar Sandoval <osandov@osandov.com>
+To:     Sun Ke <sunke32@huawei.com>
+Cc:     osandov@fb.com, linux-block@vger.kernel.org
+Subject: Re: [PATCH blktests] nbd/003:add mount and clear_sock test for nbd
+Message-ID: <20190904174240.GC7452@vader>
+References: <1567567949-87156-1-git-send-email-sunke32@huawei.com>
+MIME-Version: 1.0
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <1567567949-87156-1-git-send-email-sunke32@huawei.com>
+User-Agent: Mutt/1.12.1 (2019-06-15)
 Sender: linux-block-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-Currently dif_prepare/dif_complete functions are called during the
-NVMe and SCSi layers command preparetion/completion, but their actual
-place should be the block layer since T10-PI is a general data integrity
-feature that is used by block storage protocols.
+On Wed, Sep 04, 2019 at 11:32:29AM +0800, Sun Ke wrote:
+> Add the test case to check nbd devices.This test case catches regressions
+> fixed by commit 92b5c8f0063e4 "nbd: replace kill_bdev() with
+> __invalidate_device() again".
+> 
+> Establish the nbd connection.Run two processes.One do mount and umount,
+> anther one do clear_sock ioctl.
+> 
+> Signed-off-by: Sun Ke <sunke32@huawei.com>
 
-Suggested-by: Christoph Hellwig <hch@lst.de>
-Signed-off-by: Max Gurtovoy <maxg@mellanox.com>
----
+Thanks for the test! A few comments below.
 
-changes from v1:
- - seperate from nvme_cleanup command patches
- - introduce blk_integrity_interval_shift to avoid div in fast path
+> ---
+>  src/Makefile      |  3 +-
+>  src/nbdmount.c    | 89 +++++++++++++++++++++++++++++++++++++++++++++++++++++++
+>  tests/nbd/003     | 47 +++++++++++++++++++++++++++++
+>  tests/nbd/003.out |  1 +
+>  tests/nbd/rc      | 22 ++++++++++++++
+>  5 files changed, 161 insertions(+), 1 deletion(-)
+>  create mode 100644 src/nbdmount.c
+>  create mode 100644 tests/nbd/003
+>  create mode 100644 tests/nbd/003.out
+> 
+> diff --git a/src/Makefile b/src/Makefile
+> index 917d6f4..f48f264 100644
+> --- a/src/Makefile
+> +++ b/src/Makefile
+> @@ -10,7 +10,8 @@ C_TARGETS := \
+>  	sg/syzkaller1 \
+>  	nbdsetsize \
+>  	loop_change_fd \
+> -	zbdioctl
+> +	zbdioctl \
+> +	nbdmount
 
----
- block/blk-core.c         |  6 ++++++
- block/blk-mq.c           |  4 ++++
- block/blk-settings.c     |  1 +
- block/t10-pi.c           | 11 ++++-------
- drivers/nvme/host/core.c | 28 +++++++++++++++++++---------
- drivers/scsi/sd.c        | 28 ++++++++++------------------
- drivers/scsi/sd.h        |  1 -
- drivers/scsi/sd_dif.c    |  2 +-
- include/linux/blkdev.h   | 12 ++++++++++++
- include/linux/genhd.h    |  1 +
- include/linux/t10-pi.h   | 10 ++++------
- 11 files changed, 62 insertions(+), 42 deletions(-)
+This could use a less generic name.
 
-diff --git a/block/blk-core.c b/block/blk-core.c
-index d0cc6e1..fbf7fe5 100644
---- a/block/blk-core.c
-+++ b/block/blk-core.c
-@@ -34,6 +34,7 @@
- #include <linux/ratelimit.h>
- #include <linux/pm_runtime.h>
- #include <linux/blk-cgroup.h>
-+#include <linux/t10-pi.h>
- #include <linux/debugfs.h>
- #include <linux/bpf.h>
- 
-@@ -1405,6 +1406,11 @@ bool blk_update_request(struct request *req, blk_status_t error,
- 	if (!req->bio)
- 		return false;
- 
-+	if (blk_integrity_rq(req) && req_op(req) == REQ_OP_READ &&
-+	    error == BLK_STS_OK)
-+		t10_pi_complete(req,
-+			nr_bytes >> blk_integrity_interval_shift(req->q));
-+
- 	if (unlikely(error && !blk_rq_is_passthrough(req) &&
- 		     !(req->rq_flags & RQF_QUIET)))
- 		print_req_error(req, error, __func__);
-diff --git a/block/blk-mq.c b/block/blk-mq.c
-index 0835f4d..30ec078 100644
---- a/block/blk-mq.c
-+++ b/block/blk-mq.c
-@@ -30,6 +30,7 @@
- #include <trace/events/block.h>
- 
- #include <linux/blk-mq.h>
-+#include <linux/t10-pi.h>
- #include "blk.h"
- #include "blk-mq.h"
- #include "blk-mq-debugfs.h"
-@@ -693,6 +694,9 @@ void blk_mq_start_request(struct request *rq)
- 		 */
- 		rq->nr_phys_segments++;
- 	}
-+
-+	if (blk_integrity_rq(rq) && req_op(rq) == REQ_OP_WRITE)
-+		t10_pi_prepare(rq);
- }
- EXPORT_SYMBOL(blk_mq_start_request);
- 
-diff --git a/block/blk-settings.c b/block/blk-settings.c
-index 2c18312..8183ffc 100644
---- a/block/blk-settings.c
-+++ b/block/blk-settings.c
-@@ -330,6 +330,7 @@ void blk_queue_max_segment_size(struct request_queue *q, unsigned int max_size)
- void blk_queue_logical_block_size(struct request_queue *q, unsigned short size)
- {
- 	q->limits.logical_block_size = size;
-+	q->limits.logical_block_shift = ilog2(size);
- 
- 	if (q->limits.physical_block_size < size)
- 		q->limits.physical_block_size = size;
-diff --git a/block/t10-pi.c b/block/t10-pi.c
-index 0c00946..a6d9722 100644
---- a/block/t10-pi.c
-+++ b/block/t10-pi.c
-@@ -171,7 +171,6 @@ static blk_status_t t10_pi_type3_verify_ip(struct blk_integrity_iter *iter)
- /**
-  * t10_pi_prepare - prepare PI prior submitting request to device
-  * @rq:              request with PI that should be prepared
-- * @protection_type: PI type (Type 1/Type 2/Type 3)
-  *
-  * For Type 1/Type 2, the virtual start sector is the one that was
-  * originally submitted by the block layer for the ref_tag usage. Due to
-@@ -181,8 +180,9 @@ static blk_status_t t10_pi_type3_verify_ip(struct blk_integrity_iter *iter)
-  *
-  * Type 3 does not have a reference tag so no remapping is required.
-  */
--void t10_pi_prepare(struct request *rq, u8 protection_type)
-+void t10_pi_prepare(struct request *rq)
- {
-+	u8 protection_type = rq->rq_disk->protection_type;
- 	const int tuple_sz = rq->q->integrity.tuple_size;
- 	u32 ref_tag = t10_pi_ref_tag(rq);
- 	struct bio *bio;
-@@ -222,12 +222,10 @@ void t10_pi_prepare(struct request *rq, u8 protection_type)
- 		bip->bip_flags |= BIP_MAPPED_INTEGRITY;
- 	}
- }
--EXPORT_SYMBOL(t10_pi_prepare);
- 
- /**
-  * t10_pi_complete - prepare PI prior returning request to the block layer
-  * @rq:              request with PI that should be prepared
-- * @protection_type: PI type (Type 1/Type 2/Type 3)
-  * @intervals:       total elements to prepare
-  *
-  * For Type 1/Type 2, the virtual start sector is the one that was
-@@ -239,9 +237,9 @@ void t10_pi_prepare(struct request *rq, u8 protection_type)
-  *
-  * Type 3 does not have a reference tag so no remapping is required.
-  */
--void t10_pi_complete(struct request *rq, u8 protection_type,
--		     unsigned int intervals)
-+void t10_pi_complete(struct request *rq, unsigned int intervals)
- {
-+	u8 protection_type = rq->rq_disk->protection_type;
- 	const int tuple_sz = rq->q->integrity.tuple_size;
- 	u32 ref_tag = t10_pi_ref_tag(rq);
- 	struct bio *bio;
-@@ -276,4 +274,3 @@ void t10_pi_complete(struct request *rq, u8 protection_type,
- 		}
- 	}
- }
--EXPORT_SYMBOL(t10_pi_complete);
-diff --git a/drivers/nvme/host/core.c b/drivers/nvme/host/core.c
-index d3d6b7b..b91ea60 100644
---- a/drivers/nvme/host/core.c
-+++ b/drivers/nvme/host/core.c
-@@ -659,8 +659,6 @@ static inline blk_status_t nvme_setup_rw(struct nvme_ns *ns,
- 			if (WARN_ON_ONCE(!nvme_ns_has_pi(ns)))
- 				return BLK_STS_NOTSUPP;
- 			control |= NVME_RW_PRINFO_PRACT;
--		} else if (req_op(req) == REQ_OP_WRITE) {
--			t10_pi_prepare(req, ns->pi_type);
- 		}
- 
- 		switch (ns->pi_type) {
-@@ -683,13 +681,6 @@ static inline blk_status_t nvme_setup_rw(struct nvme_ns *ns,
- 
- void nvme_cleanup_cmd(struct request *req)
- {
--	if (blk_integrity_rq(req) && req_op(req) == REQ_OP_READ &&
--	    nvme_req(req)->status == 0) {
--		struct nvme_ns *ns = req->rq_disk->private_data;
--
--		t10_pi_complete(req, ns->pi_type,
--				blk_rq_bytes(req) >> ns->lba_shift);
--	}
- 	if (req->rq_flags & RQF_SPECIAL_PAYLOAD) {
- 		struct nvme_ns *ns = req->rq_disk->private_data;
- 		struct page *page = req->special_vec.bv_page;
-@@ -1693,6 +1684,24 @@ static void nvme_update_disk_info(struct gendisk *disk,
- 	blk_mq_unfreeze_queue(disk->queue);
- }
- 
-+static void nvme_set_disk_prot_type(struct nvme_ns *ns, struct gendisk *disk)
-+{
-+	switch (ns->pi_type) {
-+	case NVME_NS_DPS_PI_TYPE1:
-+		disk->protection_type = T10_PI_TYPE1_PROTECTION;
-+		break;
-+	case NVME_NS_DPS_PI_TYPE2:
-+		disk->protection_type = T10_PI_TYPE2_PROTECTION;
-+		break;
-+	case NVME_NS_DPS_PI_TYPE3:
-+		disk->protection_type = T10_PI_TYPE3_PROTECTION;
-+		break;
-+	default:
-+		disk->protection_type = T10_PI_TYPE0_PROTECTION;
-+		break;
-+	}
-+}
-+
- static void __nvme_revalidate_disk(struct gendisk *disk, struct nvme_id_ns *id)
- {
- 	struct nvme_ns *ns = disk->private_data;
-@@ -1712,6 +1721,7 @@ static void __nvme_revalidate_disk(struct gendisk *disk, struct nvme_id_ns *id)
- 		ns->pi_type = id->dps & NVME_NS_DPS_PI_MASK;
- 	else
- 		ns->pi_type = 0;
-+	nvme_set_disk_prot_type(ns, disk);
- 
- 	if (ns->noiob)
- 		nvme_set_chunk_size(ns);
-diff --git a/drivers/scsi/sd.c b/drivers/scsi/sd.c
-index 149d406..fa7e7d4 100644
---- a/drivers/scsi/sd.c
-+++ b/drivers/scsi/sd.c
-@@ -55,7 +55,6 @@
- #include <linux/sed-opal.h>
- #include <linux/pm_runtime.h>
- #include <linux/pr.h>
--#include <linux/t10-pi.h>
- #include <linux/uaccess.h>
- #include <asm/unaligned.h>
- 
-@@ -309,7 +308,7 @@ static void sd_set_flush_flag(struct scsi_disk *sdkp)
- {
- 	struct scsi_disk *sdkp = to_scsi_disk(dev);
- 
--	return sprintf(buf, "%u\n", sdkp->protection_type);
-+	return sprintf(buf, "%u\n", sdkp->disk->protection_type);
- }
- 
- static ssize_t
-@@ -329,7 +328,7 @@ static void sd_set_flush_flag(struct scsi_disk *sdkp)
- 		return err;
- 
- 	if (val <= T10_PI_TYPE3_PROTECTION)
--		sdkp->protection_type = val;
-+		sdkp->disk->protection_type = val;
- 
- 	return count;
- }
-@@ -343,8 +342,8 @@ static void sd_set_flush_flag(struct scsi_disk *sdkp)
- 	struct scsi_device *sdp = sdkp->device;
- 	unsigned int dif, dix;
- 
--	dif = scsi_host_dif_capable(sdp->host, sdkp->protection_type);
--	dix = scsi_host_dix_capable(sdp->host, sdkp->protection_type);
-+	dif = scsi_host_dif_capable(sdp->host, sdkp->disk->protection_type);
-+	dix = scsi_host_dix_capable(sdp->host, sdkp->disk->protection_type);
- 
- 	if (!dix && scsi_host_dix_capable(sdp->host, T10_PI_TYPE0_PROTECTION)) {
- 		dif = 0;
-@@ -1209,17 +1208,15 @@ static blk_status_t sd_setup_read_write_cmnd(struct scsi_cmnd *cmd)
- 
- 	fua = rq->cmd_flags & REQ_FUA ? 0x8 : 0;
- 	dix = scsi_prot_sg_count(cmd);
--	dif = scsi_host_dif_capable(cmd->device->host, sdkp->protection_type);
--
--	if (write && dix)
--		t10_pi_prepare(cmd->request, sdkp->protection_type);
-+	dif = scsi_host_dif_capable(cmd->device->host,
-+				    sdkp->disk->protection_type);
- 
- 	if (dif || dix)
- 		protect = sd_setup_protect_cmnd(cmd, dix, dif);
- 	else
- 		protect = 0;
- 
--	if (protect && sdkp->protection_type == T10_PI_TYPE2_PROTECTION) {
-+	if (protect && sdkp->disk->protection_type == T10_PI_TYPE2_PROTECTION) {
- 		ret = sd_setup_rw32_cmnd(cmd, write, lba, nr_blocks,
- 					 protect | fua);
- 	} else if (sdp->use_16_for_rw || (nr_blocks > 0xffff)) {
-@@ -2051,11 +2048,6 @@ static int sd_done(struct scsi_cmnd *SCpnt)
- 					   "sd_done: completed %d of %d bytes\n",
- 					   good_bytes, scsi_bufflen(SCpnt)));
- 
--	if (rq_data_dir(SCpnt->request) == READ && scsi_prot_sg_count(SCpnt) &&
--	    good_bytes)
--		t10_pi_complete(SCpnt->request, sdkp->protection_type,
--				good_bytes / scsi_prot_interval(SCpnt));
--
- 	return good_bytes;
- }
- 
-@@ -2204,7 +2196,7 @@ static int sd_read_protection_type(struct scsi_disk *sdkp, unsigned char *buffer
- 	else if (scsi_host_dif_capable(sdp->host, type))
- 		ret = 1;
- 
--	if (sdkp->first_scan || type != sdkp->protection_type)
-+	if (sdkp->first_scan || type != sdkp->disk->protection_type)
- 		switch (ret) {
- 		case -ENODEV:
- 			sd_printk(KERN_ERR, sdkp, "formatted with unsupported" \
-@@ -2221,7 +2213,7 @@ static int sd_read_protection_type(struct scsi_disk *sdkp, unsigned char *buffer
- 			break;
- 		}
- 
--	sdkp->protection_type = type;
-+	sdkp->disk->protection_type = type;
- 
- 	return ret;
- }
-@@ -2813,7 +2805,7 @@ static void sd_read_app_tag_own(struct scsi_disk *sdkp, unsigned char *buffer)
- 	if (sdp->type != TYPE_DISK && sdp->type != TYPE_ZBC)
- 		return;
- 
--	if (sdkp->protection_type == 0)
-+	if (sdkp->disk->protection_type == 0)
- 		return;
- 
- 	res = scsi_mode_sense(sdp, 1, 0x0a, buffer, 36, SD_TIMEOUT,
-diff --git a/drivers/scsi/sd.h b/drivers/scsi/sd.h
-index 38c5094..770b6b0f 100644
---- a/drivers/scsi/sd.h
-+++ b/drivers/scsi/sd.h
-@@ -94,7 +94,6 @@ struct scsi_disk {
- 	unsigned int	medium_access_timed_out;
- 	u8		media_present;
- 	u8		write_prot;
--	u8		protection_type;/* Data Integrity Field */
- 	u8		provisioning_mode;
- 	u8		zeroing_mode;
- 	unsigned	ATO : 1;	/* state of disk ATO bit */
-diff --git a/drivers/scsi/sd_dif.c b/drivers/scsi/sd_dif.c
-index 4cadb26..cbd0cce 100644
---- a/drivers/scsi/sd_dif.c
-+++ b/drivers/scsi/sd_dif.c
-@@ -28,7 +28,7 @@ void sd_dif_config_host(struct scsi_disk *sdkp)
- {
- 	struct scsi_device *sdp = sdkp->device;
- 	struct gendisk *disk = sdkp->disk;
--	u8 type = sdkp->protection_type;
-+	u8 type = sdkp->disk->protection_type;
- 	struct blk_integrity bi;
- 	int dif, dix;
- 
-diff --git a/include/linux/blkdev.h b/include/linux/blkdev.h
-index 1ef375d..5901a53 100644
---- a/include/linux/blkdev.h
-+++ b/include/linux/blkdev.h
-@@ -332,6 +332,7 @@ struct queue_limits {
- 	unsigned int		discard_alignment;
- 
- 	unsigned short		logical_block_size;
-+	unsigned short		logical_block_shift;
- 	unsigned short		max_segments;
- 	unsigned short		max_integrity_segments;
- 	unsigned short		max_discard_segments;
-@@ -1543,6 +1544,12 @@ static inline void blk_queue_max_integrity_segments(struct request_queue *q,
- }
- 
- static inline unsigned short
-+blk_integrity_interval_shift(struct request_queue *q)
-+{
-+	return q->limits.logical_block_shift;
-+}
-+
-+static inline unsigned short
- queue_max_integrity_segments(struct request_queue *q)
- {
- 	return q->limits.max_integrity_segments;
-@@ -1626,6 +1633,11 @@ static inline void blk_queue_max_integrity_segments(struct request_queue *q,
- 						    unsigned int segs)
- {
- }
-+static inline unsigned short
-+blk_integrity_interval_shift(struct request_queue *q)
-+{
-+	return 0;
-+}
- static inline unsigned short queue_max_integrity_segments(struct request_queue *q)
- {
- 	return 0;
-diff --git a/include/linux/genhd.h b/include/linux/genhd.h
-index 8b5330d..5f58736 100644
---- a/include/linux/genhd.h
-+++ b/include/linux/genhd.h
-@@ -219,6 +219,7 @@ struct gendisk {
- 	int node_id;
- 	struct badblocks *bb;
- 	struct lockdep_map lockdep_map;
-+	u8 protection_type;/* Data Integrity Field */
- };
- 
- static inline struct gendisk *part_to_disk(struct hd_struct *part)
-diff --git a/include/linux/t10-pi.h b/include/linux/t10-pi.h
-index 3e2a80c..108008e 100644
---- a/include/linux/t10-pi.h
-+++ b/include/linux/t10-pi.h
-@@ -54,15 +54,13 @@ static inline u32 t10_pi_ref_tag(struct request *rq)
- extern const struct blk_integrity_profile t10_pi_type3_ip;
- 
- #ifdef CONFIG_BLK_DEV_INTEGRITY
--extern void t10_pi_prepare(struct request *rq, u8 protection_type);
--extern void t10_pi_complete(struct request *rq, u8 protection_type,
--			    unsigned int intervals);
-+extern void t10_pi_prepare(struct request *rq);
-+extern void t10_pi_complete(struct request *rq, unsigned int intervals);
- #else
--static inline void t10_pi_complete(struct request *rq, u8 protection_type,
--				   unsigned int intervals)
-+static inline void t10_pi_complete(struct request *rq, unsigned int intervals)
- {
- }
--static inline void t10_pi_prepare(struct request *rq, u8 protection_type)
-+static inline void t10_pi_prepare(struct request *rq)
- {
- }
- #endif
--- 
-1.8.3.1
+>  CXX_TARGETS := \
+>  	discontiguous-io
+> diff --git a/src/nbdmount.c b/src/nbdmount.c
+> new file mode 100644
+> index 0000000..bd77c32
+> --- /dev/null
+> +++ b/src/nbdmount.c
+> @@ -0,0 +1,89 @@
+> +// SPDX-License-Identifier: GPL-3.0+
+> +// Copyright (C) 2019 Sun Ke
+> +
+> +#include <stdio.h>
+> +#include <stdlib.h>
+> +
+> +#include <sys/types.h>
+> +#include <sys/stat.h>
+> +#include <fcntl.h>
+> +
+> +#include <linux/nbd.h>
+> +#include <assert.h>
+> +#include <sys/wait.h>
+> +#include <unistd.h>
+> +#include <string.h>
+> +#include <sys/ioctl.h>
+> +#include <sys/mount.h>
+> +#include <linux/fs.h>
+> +
+> +struct mount_para
+> +{
+> +	char *mp;
+> +	char *dev;
+> +	char *fs;
+> +};
+> +
+> +struct mount_para para;
 
+Get rid of this structure and global variable, just pass the fields to
+ops_nbd().
+
+> +static int nbd_fd = -1;
+
+Same here, this doesn't really need to be global.
+
+> +void setup_nbd(char *dev)
+> +{
+> +	nbd_fd = open(dev, O_RDWR);
+> +	if (nbd_fd < 0 ) {
+> +		printf("open the nbd failed\n");
+
+Instead of printf(), do:
+
+		perror("open");
+
+> +	}
+> +}
+> +
+> +void teardown_nbd(void)
+> +{
+> +	close(nbd_fd);
+> +}
+
+Fold these two trival functions (setup_nbd() and teardown_nbd()) into
+main().
+
+> +void clear_sock(void)
+> +{
+> +	int err;
+> +
+> +	err = ioctl(nbd_fd, NBD_CLEAR_SOCK, 0);
+> +	assert(!err);
+> +}
+
+perror("ioctl")
+
+> +void mount_nbd(char *dev, char *mp, char *fs)
+> +{
+> +	mount(dev, mp, fs, 2 | 16, 0);
+
+What are these flags?      ^^^^^^
+
+> +	umount(mp);
+> +}
+> +
+> +void ops_nbd(void)
+> +{
+> +	int i;
+> +
+> +	fflush(stdout);
+
+What is this fflush() here for?
+
+> +	for (i=0; i < 2; i++) {
+> +		if (fork() == 0) {
+> +			if (i == 0) {
+> +				mount_nbd(para.dev, para.mp, para.fs);
+> +				exit(0);
+> +			}
+> +			if (i == 1) {
+> +				clear_sock();
+> +				exit(0);
+> +			}
+> +		}
+> +	}
+
+This shouldn't be a loop. You can do:
+
+if (fork() == 0) {
+	mount_nbd(dev, mp, fs);
+	exit(0);
+}
+if (fork() == 0) {
+	clear_sock(fd);
+	exit(0);
+}
+
+> +	while(wait(NULL) > 0)
+> +		continue;
+> +}
+> +
+> +int main(int argc, char **argv)
+> +{
+
+Check argc and print a usage message here, please:
+
+if (argc != 4) {
+	fprintf(stderr, "usage: $0 MOUNTPOINT DEV FS");
+	return EXIT_FAILURE;
+}
+
+> +	para.mp = argv[1];
+> +	para.dev = argv[2];
+> +	para.fs = argv[3];
+> +
+> +	setup_nbd(para.dev);
+> +	ops_nbd();
+> +	teardown_nbd();
+> +
+> +	return 0;
+> +}
+> diff --git a/tests/nbd/003 b/tests/nbd/003
+> new file mode 100644
+> index 0000000..1c2dcea
+> --- /dev/null
+> +++ b/tests/nbd/003
+> @@ -0,0 +1,47 @@
+> +#!/bin/bash
+> +
+> +# SPDX-License-Identifier: GPL-3.0+
+> +# Copyright (C) 2019 Sun Ke
+> +#
+> +# Test nbd device resizing. Regression test for patch 
+> +#
+> +# 2b5c8f0063e4 ("nbd: replace kill_bdev() with __invalidate_device() again")
+> +
+> +. tests/nbd/rc
+> +
+> +DESCRIPTION="resize a connected nbd device"
+> +QUICK=1
+> +
+> +fs_type=ext4
+> +disk_capacity=256M
+> +run_cnt=1
+> +
+> +requires() {
+> +	_have_nbd && _have_src_program nbdmount
+> +}
+> +
+> +test() {
+> +	echo "Running ${TEST_NAME}"
+> +	for i in $(seq 0 15)
+
+As documented in the new test template:
+
+	Use bash for loops instead of seq. E.g., for ((i = 0; i < 10; i++)), not
+	for i in $(seq 0 9).
+
+> +	do
+> +		_start_nbd_mount_server  $disk_capacity $fs_type
+> +		nbd-client localhost 800$i /dev/nbd$i >> "$FULL" 2>&1
+
+So the test creates 15 nbd connections, runs the test on all of them,
+then tears them down? Would it work to only use one connection and just
+repeat the test 15 times? That way you can keep track of the nbd-client
+process to kill instead of having to use pkill later down.
+
+> +		if [ "$?" -ne "0" ]; then
+
+Also from the new test template:
+
+	Use the bash [[ ]] form of tests instead of [ ].
+
+> +			echo "nbd$i connnect failed" 
+> +		fi 
+> +	done
+> +
+> +	for j in $(seq 0 $run_cnt)
+> +	do
+> +		for i in $(seq 0 15)
+> +		do
+> +			src/nbdmount  "${TMPDIR}/$i" /dev/nbd$i $fs_type
+
+Also from the new test template:
+
+	Always quote variable expansions unless the variable is a number or inside of
+	a [[ ]] test.
+
+> +		done
+> +	done	
+
+> +
+> +	for i in $(seq 0 15)
+> +	do
+> +		nbd-client -d /dev/nbd$i
+> +		_stop_nbd_mount_server
+> +	done
+> +}
+> diff --git a/tests/nbd/003.out b/tests/nbd/003.out
+> new file mode 100644
+> index 0000000..aa340db
+> --- /dev/null
+> +++ b/tests/nbd/003.out
+> @@ -0,0 +1 @@
+> +Running nbd/003
+> diff --git a/tests/nbd/rc b/tests/nbd/rc
+> index 9d0e3d1..eb7ff24 100644
+> --- a/tests/nbd/rc
+> +++ b/tests/nbd/rc
+> @@ -76,3 +76,25 @@ _stop_nbd_server() {
+>  	rm -f "${TMPDIR}/nbd.pid"
+>  	rm -f "${TMPDIR}/export"
+>  }
+> +
+> +
+> +_start_nbd_mount_server() {
+> +
+> +	fallocate -l $1 "${TMPDIR}/mnt_$i"
+> +
+> +	if [ "$2"x = "ext4"x ];
+> +	then
+> +		mkfs.ext4 "${TMPDIR}/mnt_$i" >> "$FULL" 2>&1
+> +	else
+> +		mkdosfs "${TMPDIR}/mnt_$i" >> "$FULL" 2>&1
+> +	fi
+> +	nbd-server 800$i "${TMPDIR}/mnt_$i" >> "$FULL" 2>&1
+> +
+> +	mkdir -p "${TMPDIR}/$i"
+> +}
+> +
+> +_stop_nbd_mount_server() {
+> +	pkill -9 -f 800$i
+> +	rm -f "${TMPDIR}/mnt_$i"
+> +	rm -rf "${TMPDIR}/$i"
+> +}
+
+These helpers are using a variable ($i) that happens to be set by the
+calling function. That's really icky. Just fold these into your test
+case, we can make them generic helpers if someone else needs them.
