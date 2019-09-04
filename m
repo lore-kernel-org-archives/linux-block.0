@@ -6,29 +6,30 @@ X-Spam-Status: No, score=-2.2 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
 	MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED,USER_AGENT_SANE_1
 	autolearn=no autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 70844C3A5A9
-	for <linux-block@archiver.kernel.org>; Wed,  4 Sep 2019 08:51:50 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 376E0C3A5A7
+	for <linux-block@archiver.kernel.org>; Wed,  4 Sep 2019 08:52:23 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.kernel.org (Postfix) with ESMTP id 5542622DBF
-	for <linux-block@archiver.kernel.org>; Wed,  4 Sep 2019 08:51:50 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id 1700122CF7
+	for <linux-block@archiver.kernel.org>; Wed,  4 Sep 2019 08:52:23 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1727787AbfIDIvt (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Wed, 4 Sep 2019 04:51:49 -0400
-Received: from mx2.suse.de ([195.135.220.15]:58088 "EHLO mx1.suse.de"
+        id S1729254AbfIDIwL (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Wed, 4 Sep 2019 04:52:11 -0400
+Received: from mx2.suse.de ([195.135.220.15]:58260 "EHLO mx1.suse.de"
         rhost-flags-OK-OK-OK-FAIL) by vger.kernel.org with ESMTP
-        id S1725938AbfIDIvt (ORCPT <rfc822;linux-block@vger.kernel.org>);
-        Wed, 4 Sep 2019 04:51:49 -0400
+        id S1727387AbfIDIwK (ORCPT <rfc822;linux-block@vger.kernel.org>);
+        Wed, 4 Sep 2019 04:52:10 -0400
 X-Virus-Scanned: by amavisd-new at test-mx.suse.de
 Received: from relay2.suse.de (unknown [195.135.220.254])
-        by mx1.suse.de (Postfix) with ESMTP id 55510B624;
-        Wed,  4 Sep 2019 08:51:47 +0000 (UTC)
-Subject: Re: [PATCH v3 4/7] block: Improve default elevator selection
+        by mx1.suse.de (Postfix) with ESMTP id 64DB8B657;
+        Wed,  4 Sep 2019 08:52:08 +0000 (UTC)
+Subject: Re: [PATCH v3 6/7] block: Set ELEVATOR_F_ZBD_SEQ_WRITE for nullblk
+ zoned disks
 To:     Damien Le Moal <damien.lemoal@wdc.com>,
         linux-block@vger.kernel.org, Jens Axboe <axboe@kernel.dk>,
         linux-scsi@vger.kernel.org,
         "Martin K . Petersen" <martin.petersen@oracle.com>
 References: <20190904084247.23338-1-damien.lemoal@wdc.com>
- <20190904084247.23338-5-damien.lemoal@wdc.com>
+ <20190904084247.23338-7-damien.lemoal@wdc.com>
 From:   Johannes Thumshirn <jthumshirn@suse.de>
 Openpgp: preference=signencrypt
 Autocrypt: addr=jthumshirn@suse.de; prefer-encrypt=mutual; keydata=
@@ -86,12 +87,12 @@ Autocrypt: addr=jthumshirn@suse.de; prefer-encrypt=mutual; keydata=
  l2t2TyTuHm7wVUY2J3gJYgG723/PUGW4LaoqNrYQUr/rqo6NXw6c+EglRpm1BdpkwPwAng63
  W5VOQMdnozD2RsDM5GfA4aEFi5m00tE+8XPICCtkduyWw+Z+zIqYk2v+zraPLs9Gs0X2C7X0
  yvqY9voUoJjG6skkOToGZbqtMX9K4GOv9JAxVs075QRXL3brHtHONDt6udYobzz+
-Message-ID: <f3bde4fb-e5a8-09e1-bbfd-ef7c3919d364@suse.de>
-Date:   Wed, 4 Sep 2019 10:51:46 +0200
+Message-ID: <b7666ae5-3c1b-c0cf-e819-91d5264a6056@suse.de>
+Date:   Wed, 4 Sep 2019 10:52:08 +0200
 User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:60.0) Gecko/20100101
  Thunderbird/60.8.0
 MIME-Version: 1.0
-In-Reply-To: <20190904084247.23338-5-damien.lemoal@wdc.com>
+In-Reply-To: <20190904084247.23338-7-damien.lemoal@wdc.com>
 Content-Type: text/plain; charset=utf-8
 Content-Language: en-US
 Content-Transfer-Encoding: 8bit
