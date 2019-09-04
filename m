@@ -2,84 +2,85 @@ Return-Path: <SRS0=cenR=W7=vger.kernel.org=linux-block-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-2.2 required=3.0 tests=DKIM_SIGNED,DKIM_VALID,
-	HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,
+X-Spam-Status: No, score=-2.6 required=3.0 tests=DKIMWL_WL_HIGH,DKIM_SIGNED,
+	DKIM_VALID,DKIM_VALID_AU,MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,
 	USER_AGENT_SANE_1 autolearn=no autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 1D166C3A5A8
-	for <linux-block@archiver.kernel.org>; Wed,  4 Sep 2019 19:31:34 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 17673C3A5A9
+	for <linux-block@archiver.kernel.org>; Wed,  4 Sep 2019 19:45:21 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.kernel.org (Postfix) with ESMTP id D9C8322CED
-	for <linux-block@archiver.kernel.org>; Wed,  4 Sep 2019 19:31:33 +0000 (UTC)
-Authentication-Results: mail.kernel.org;
-	dkim=pass (1024-bit key) header.d=amazonses.com header.i=@amazonses.com header.b="GwHMsNh0"
+	by mail.kernel.org (Postfix) with ESMTP id D2F3421726
+	for <linux-block@archiver.kernel.org>; Wed,  4 Sep 2019 19:45:20 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+	s=default; t=1567626320;
+	bh=gnyL+9orpP2pkS2kJagmmSk8yjXPITpaBZpNDTGxonU=;
+	h=Date:From:To:Cc:Subject:References:In-Reply-To:List-ID:From;
+	b=YqOrILR+AWEFgWAl/Gn8JhZdqwOrUt+LHdr7ZITfoABxSMbRj+yumkutnHAuLNn0f
+	 Kbkm9ldqIOim5T+1q43/umJkpOHdgdRLnguLa+5WhpsGNjjjbF7o83Samf9b3hUdGD
+	 99AeUL5h/SQUNbXnYYfVnhux/QQA5PfgOAQd7Wlw=
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1730441AbfIDTbd (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Wed, 4 Sep 2019 15:31:33 -0400
-Received: from a9-54.smtp-out.amazonses.com ([54.240.9.54]:43374 "EHLO
-        a9-54.smtp-out.amazonses.com" rhost-flags-OK-OK-OK-OK)
-        by vger.kernel.org with ESMTP id S1729803AbfIDTbd (ORCPT
-        <rfc822;linux-block@vger.kernel.org>);
-        Wed, 4 Sep 2019 15:31:33 -0400
-DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/simple;
-        s=6gbrjpgwjskckoa6a5zn6fwqkn67xbtw; d=amazonses.com; t=1567625491;
-        h=Date:From:To:cc:Subject:In-Reply-To:Message-ID:References:MIME-Version:Content-Type:Feedback-ID;
-        bh=PcFJmgXphXAgMTzEqtGAmyZoYWFr5XRnp0kHdbyqz4s=;
-        b=GwHMsNh0TlGnNbVoMm7+dx7dxoBn/weDacqBs00YnSm/6FPhetXhaKq4djrf5Unz
-        rYFSYQZdou6MsJEjMIKrMRLWImApiZkCjzrC6D96ACCVw+/tdIOrAjBncyGYXS5n0Lj
-        /4YdNYH/kmEZmxPCMoUxC3iDBf/wOYGWtdPgu+z4=
-Date:   Wed, 4 Sep 2019 19:31:31 +0000
-From:   Christopher Lameter <cl@linux.com>
-X-X-Sender: cl@nuc-kabylake
-To:     Matthew Wilcox <willy@infradead.org>
-cc:     Michal Hocko <mhocko@kernel.org>, Vlastimil Babka <vbabka@suse.cz>,
-        Andrew Morton <akpm@linux-foundation.org>, linux-mm@kvack.org,
-        linux-kernel@vger.kernel.org, Pekka Enberg <penberg@kernel.org>,
-        David Rientjes <rientjes@google.com>,
-        Ming Lei <ming.lei@redhat.com>,
-        Dave Chinner <david@fromorbit.com>,
-        "Darrick J . Wong" <darrick.wong@oracle.com>,
-        Christoph Hellwig <hch@lst.de>, linux-xfs@vger.kernel.org,
-        linux-fsdevel@vger.kernel.org, linux-block@vger.kernel.org,
-        James Bottomley <James.Bottomley@hansenpartnership.com>,
-        linux-btrfs@vger.kernel.org
-Subject: Re: [PATCH v2 2/2] mm, sl[aou]b: guarantee natural alignment for
- kmalloc(power-of-two)
-In-Reply-To: <20190903205312.GK29434@bombadil.infradead.org>
-Message-ID: <0100016cfdc2b4a1-355182af-3d27-4ae8-94f3-e3b6e8cc6814-000000@email.amazonses.com>
-References: <20190826111627.7505-1-vbabka@suse.cz> <20190826111627.7505-3-vbabka@suse.cz> <0100016cd98bb2c1-a2af7539-706f-47ba-a68e-5f6a91f2f495-000000@email.amazonses.com> <20190828194607.GB6590@bombadil.infradead.org> <20190829073921.GA21880@dhcp22.suse.cz>
- <0100016ce39e6bb9-ad20e033-f3f4-4e6d-85d6-87e7d07823ae-000000@email.amazonses.com> <20190901005205.GA2431@bombadil.infradead.org> <0100016cf8c3033d-bbcc9ba3-2d59-4654-a7c2-8ba094f8a7de-000000@email.amazonses.com>
- <20190903205312.GK29434@bombadil.infradead.org>
-User-Agent: Alpine 2.21 (DEB 202 2017-01-01)
+        id S1726834AbfIDTpU (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Wed, 4 Sep 2019 15:45:20 -0400
+Received: from mga01.intel.com ([192.55.52.88]:31161 "EHLO mga01.intel.com"
+        rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
+        id S1726240AbfIDTpU (ORCPT <rfc822;linux-block@vger.kernel.org>);
+        Wed, 4 Sep 2019 15:45:20 -0400
+X-Amp-Result: UNKNOWN
+X-Amp-Original-Verdict: FILE UNKNOWN
+X-Amp-File-Uploaded: False
+Received: from orsmga002.jf.intel.com ([10.7.209.21])
+  by fmsmga101.fm.intel.com with ESMTP/TLS/DHE-RSA-AES256-GCM-SHA384; 04 Sep 2019 12:45:19 -0700
+X-ExtLoop1: 1
+X-IronPort-AV: E=Sophos;i="5.64,468,1559545200"; 
+   d="scan'208";a="194841917"
+Received: from unknown (HELO localhost.localdomain) ([10.232.112.69])
+  by orsmga002.jf.intel.com with ESMTP; 04 Sep 2019 12:45:18 -0700
+Date:   Wed, 4 Sep 2019 13:43:48 -0600
+From:   Keith Busch <kbusch@kernel.org>
+To:     Max Gurtovoy <maxg@mellanox.com>
+Cc:     linux-block@vger.kernel.org, axboe@kernel.dk,
+        martin.petersen@oracle.com, linux-nvme@lists.infradead.org,
+        keith.busch@intel.com, hch@lst.de, sagi@grimberg.me,
+        shlomin@mellanox.com, israelr@mellanox.com
+Subject: Re: [PATCH v2 1/1] block: centralize PI remapping logic to the block
+ layer
+Message-ID: <20190904194347.GH21302@localhost.localdomain>
+References: <1567614452-26251-1-git-send-email-maxg@mellanox.com>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=US-ASCII
-X-SES-Outgoing: 2019.09.04-54.240.9.54
-Feedback-ID: 1.us-east-1.fQZZZ0Xtj2+TD7V5apTT/NrT6QKuPgzCT/IC7XYgDKI=:AmazonSES
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <1567614452-26251-1-git-send-email-maxg@mellanox.com>
+User-Agent: Mutt/1.9.1 (2017-09-22)
 Sender: linux-block-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-On Tue, 3 Sep 2019, Matthew Wilcox wrote
+On Wed, Sep 04, 2019 at 07:27:32PM +0300, Max Gurtovoy wrote:
+> +	if (blk_integrity_rq(req) && req_op(req) == REQ_OP_READ &&
+> +	    error == BLK_STS_OK)
+> +		t10_pi_complete(req,
+> +			nr_bytes >> blk_integrity_interval_shift(req->q));
 
-> > Its enabled in all full debug session as far as I know. Fedora for
-> > example has been running this for ages to find breakage in device drivers
-> > etc etc.
->
-> Are you telling me nobody uses the ramdisk driver on fedora?  Because
-> that's one of the affected drivers.
+This is not created by your patch, but while reviewing it, I noticed
+we're corrupting metadata for TYPE0. Even if there's no in-kernel use
+for accessing this data, changing it is still wrong.
 
-How do I know? I dont run these tests.
+Perhaps these t10_pi complete/prepare functions should be part of the
+integrity profile like generate_fn/verify_fn.
 
-> > decade now) I am having a hard time believing the stories of great
-> > breakage here. These drivers were not tested with debugging on before?
-> > Never ran with a debug kernel?
->
-> Whatever is being done is clearly not enough to trigger the bug.  So how
-> about it?  Create an option to slab/slub to always return misaligned
-> memory.
+Or as a quicker fix, we could exclude type0 like below:
 
-It already exists
-
-Add "slub_debug" on the kernel command line.
-
+---
+@@ -246,7 +247,8 @@ void t10_pi_complete(struct request *rq, u8 protection_type,
+ 	u32 ref_tag = t10_pi_ref_tag(rq);
+ 	struct bio *bio;
+ 
+-	if (protection_type == T10_PI_TYPE3_PROTECTION)
++	if (protection_type == T10_PI_TYPE0_PROTECTION ||
++	    protection_type == T10_PI_TYPE3_PROTECTION)
+ 		return;
+ 
+ 	__rq_for_each_bio(bio, rq) {
+-- 
+2.14.5
