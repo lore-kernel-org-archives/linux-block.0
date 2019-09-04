@@ -2,81 +2,66 @@ Return-Path: <SRS0=cenR=W7=vger.kernel.org=linux-block-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-2.2 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
-	MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,USER_AGENT_SANE_1 autolearn=no
+X-Spam-Status: No, score=-0.7 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
+	MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED autolearn=no
 	autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 987E4C3A5A9
-	for <linux-block@archiver.kernel.org>; Wed,  4 Sep 2019 12:07:22 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 8C99DC3A5A9
+	for <linux-block@archiver.kernel.org>; Wed,  4 Sep 2019 12:09:09 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.kernel.org (Postfix) with ESMTP id 7C52E22CED
-	for <linux-block@archiver.kernel.org>; Wed,  4 Sep 2019 12:07:22 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id 65FF922CED
+	for <linux-block@archiver.kernel.org>; Wed,  4 Sep 2019 12:09:09 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1729740AbfIDMHW (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Wed, 4 Sep 2019 08:07:22 -0400
-Received: from foss.arm.com ([217.140.110.172]:53176 "EHLO foss.arm.com"
+        id S1727741AbfIDMJD (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Wed, 4 Sep 2019 08:09:03 -0400
+Received: from mx1.redhat.com ([209.132.183.28]:41892 "EHLO mx1.redhat.com"
         rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-        id S1729316AbfIDMHV (ORCPT <rfc822;linux-block@vger.kernel.org>);
-        Wed, 4 Sep 2019 08:07:21 -0400
-Received: from usa-sjc-imap-foss1.foss.arm.com (unknown [10.121.207.14])
-        by usa-sjc-mx-foss1.foss.arm.com (Postfix) with ESMTP id 2E0B8337;
-        Wed,  4 Sep 2019 05:07:21 -0700 (PDT)
-Received: from [10.1.194.37] (e113632-lin.cambridge.arm.com [10.1.194.37])
-        by usa-sjc-imap-foss1.foss.arm.com (Postfix) with ESMTPSA id 0EB923F59C;
-        Wed,  4 Sep 2019 05:07:19 -0700 (PDT)
-Subject: Re: [PATCH] sched: make struct task_struct::state 32-bit
-From:   Valentin Schneider <valentin.schneider@arm.com>
-To:     Alexey Dobriyan <adobriyan@gmail.com>
-Cc:     mingo@redhat.com, peterz@infradead.org,
-        linux-kernel@vger.kernel.org, rcu@vger.kernel.org,
-        linux-block@vger.kernel.org, dm-devel@redhat.com, axboe@kernel.dk,
-        aarcange@redhat.com
-References: <20190902210558.GA23013@avx2>
- <d8ad0be1-4ed7-df74-d415-2b1c9a44bac7@arm.com> <20190903181920.GA22358@avx2>
- <92ead22e-0580-c720-1a29-7db79d76f7d7@arm.com>
-Message-ID: <a43fe392-bd6a-71f5-8611-c6b764ba56c3@arm.com>
-Date:   Wed, 4 Sep 2019 13:07:18 +0100
-User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:60.0) Gecko/20100101
- Thunderbird/60.8.0
+        id S1726010AbfIDMJD (ORCPT <rfc822;linux-block@vger.kernel.org>);
+        Wed, 4 Sep 2019 08:09:03 -0400
+Received: from smtp.corp.redhat.com (int-mx06.intmail.prod.int.phx2.redhat.com [10.5.11.16])
+        (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
+        (No client certificate requested)
+        by mx1.redhat.com (Postfix) with ESMTPS id 13C2185542;
+        Wed,  4 Sep 2019 12:09:03 +0000 (UTC)
+Received: from warthog.procyon.org.uk (ovpn-120-255.rdu2.redhat.com [10.10.120.255])
+        by smtp.corp.redhat.com (Postfix) with ESMTP id E9D2F5C219;
+        Wed,  4 Sep 2019 12:08:59 +0000 (UTC)
+Organization: Red Hat UK Ltd. Registered Address: Red Hat UK Ltd, Amberley
+        Place, 107-111 Peascod Street, Windsor, Berkshire, SI4 1TE, United
+        Kingdom.
+        Registered in England and Wales under Company Registration No. 3798903
+From:   David Howells <dhowells@redhat.com>
+In-Reply-To: <23d61564-026e-b37a-8b16-ce68d5949f6c@schaufler-ca.com>
+References: <23d61564-026e-b37a-8b16-ce68d5949f6c@schaufler-ca.com> <87bf0363-af77-1e5a-961f-72730e39e3a6@schaufler-ca.com> <e36fa722-a300-2abf-ae9c-a0246fc66d0e@schaufler-ca.com> <156717343223.2204.15875738850129174524.stgit@warthog.procyon.org.uk> <156717352917.2204.17206219813087348132.stgit@warthog.procyon.org.uk> <4910.1567525310@warthog.procyon.org.uk> <11467.1567534014@warthog.procyon.org.uk>
+To:     Casey Schaufler <casey@schaufler-ca.com>
+Cc:     dhowells@redhat.com, viro@zeniv.linux.org.uk,
+        Stephen Smalley <sds@tycho.nsa.gov>,
+        Greg Kroah-Hartman <gregkh@linuxfoundation.org>,
+        nicolas.dichtel@6wind.com, raven@themaw.net,
+        Christian Brauner <christian@brauner.io>,
+        keyrings@vger.kernel.org, linux-usb@vger.kernel.org,
+        linux-security-module@vger.kernel.org,
+        linux-fsdevel@vger.kernel.org, linux-api@vger.kernel.org,
+        linux-block@vger.kernel.org, linux-kernel@vger.kernel.org
+Subject: Re: [PATCH 11/11] smack: Implement the watch_key and post_notification hooks [untested] [ver #7]
 MIME-Version: 1.0
-In-Reply-To: <92ead22e-0580-c720-1a29-7db79d76f7d7@arm.com>
-Content-Type: text/plain; charset=utf-8
-Content-Language: en-US
-Content-Transfer-Encoding: 7bit
+Content-Type: text/plain; charset="us-ascii"
+Content-ID: <31204.1567598939.1@warthog.procyon.org.uk>
+Date:   Wed, 04 Sep 2019 13:08:59 +0100
+Message-ID: <31205.1567598939@warthog.procyon.org.uk>
+X-Scanned-By: MIMEDefang 2.79 on 10.5.11.16
+X-Greylist: Sender IP whitelisted, not delayed by milter-greylist-4.5.16 (mx1.redhat.com [10.5.110.28]); Wed, 04 Sep 2019 12:09:03 +0000 (UTC)
 Sender: linux-block-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-On 03/09/2019 22:51, Valentin Schneider wrote:
-[...]
-> I tried something for function parameters, which seems to be feasible
-> according to [1], but couldn't get it to work (yet). Here's what I have
-> so far:
-> 
-[...]
+Casey Schaufler <casey@schaufler-ca.com> wrote:
 
-So now I have this:
+> I rebuilt with keys-next, updated the tests again, and now
+> the suite looks to be running trouble free.
 
----
-@funcmatch@
-identifier func;
-identifier p;
-identifier state_var;
-@@
+Can I put you down as an Acked-by or something on this patch?
 
-  func(..., struct task_struct *p, ...
--      , long state_var
-+      , int state_var
-       ,...)
-{
-	...
-}
----
-
-Which seems to be doing roughly what I want. I probably need another
-version to cover functions with reverse parameter order, and also need
-to make it match functions that assign state_var to p->state (or pass it
-down to another function that might do it).
-
-Baby steps...
+Thanks,
+David
