@@ -6,167 +6,134 @@ X-Spam-Status: No, score=-8.2 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
 	INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,
 	URIBL_BLOCKED,USER_AGENT_SANE_1 autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id E6F50C3A5A7
-	for <linux-block@archiver.kernel.org>; Wed,  4 Sep 2019 09:05:39 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 799F9C3A5A7
+	for <linux-block@archiver.kernel.org>; Wed,  4 Sep 2019 09:29:43 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.kernel.org (Postfix) with ESMTP id C571422CF7
-	for <linux-block@archiver.kernel.org>; Wed,  4 Sep 2019 09:05:39 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id 5D61421670
+	for <linux-block@archiver.kernel.org>; Wed,  4 Sep 2019 09:29:43 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1727426AbfIDJFj (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Wed, 4 Sep 2019 05:05:39 -0400
-Received: from mx1.redhat.com ([209.132.183.28]:65055 "EHLO mx1.redhat.com"
+        id S1727387AbfIDJ3m (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Wed, 4 Sep 2019 05:29:42 -0400
+Received: from mx1.redhat.com ([209.132.183.28]:60470 "EHLO mx1.redhat.com"
         rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-        id S1728878AbfIDJFj (ORCPT <rfc822;linux-block@vger.kernel.org>);
-        Wed, 4 Sep 2019 05:05:39 -0400
+        id S1725840AbfIDJ3m (ORCPT <rfc822;linux-block@vger.kernel.org>);
+        Wed, 4 Sep 2019 05:29:42 -0400
 Received: from smtp.corp.redhat.com (int-mx03.intmail.prod.int.phx2.redhat.com [10.5.11.13])
         (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
         (No client certificate requested)
-        by mx1.redhat.com (Postfix) with ESMTPS id 76A778980EA;
-        Wed,  4 Sep 2019 09:05:38 +0000 (UTC)
+        by mx1.redhat.com (Postfix) with ESMTPS id 6F9A57FDE9;
+        Wed,  4 Sep 2019 09:29:42 +0000 (UTC)
 Received: from ming.t460p (ovpn-8-23.pek2.redhat.com [10.72.8.23])
-        by smtp.corp.redhat.com (Postfix) with ESMTPS id 9CA4B60606;
-        Wed,  4 Sep 2019 09:05:32 +0000 (UTC)
-Date:   Wed, 4 Sep 2019 17:05:27 +0800
+        by smtp.corp.redhat.com (Postfix) with ESMTPS id 1323160625;
+        Wed,  4 Sep 2019 09:29:21 +0000 (UTC)
+Date:   Wed, 4 Sep 2019 17:29:17 +0800
 From:   Ming Lei <ming.lei@redhat.com>
 To:     Damien Le Moal <damien.lemoal@wdc.com>
 Cc:     linux-block@vger.kernel.org, Jens Axboe <axboe@kernel.dk>,
         linux-scsi@vger.kernel.org,
-        "Martin K . Petersen" <martin.petersen@oracle.com>
-Subject: Re: [PATCH v3 2/7] block: Change elevator_init_mq() to always succeed
-Message-ID: <20190904090526.GE7578@ming.t460p>
+        "Martin K . Petersen" <martin.petersen@oracle.com>,
+        Mike Snitzer <snitzer@redhat.com>, dm-devel@redhat.com
+Subject: Re: [PATCH v3 5/7] block: Delay default elevator initialization
+Message-ID: <20190904092915.GF7578@ming.t460p>
 References: <20190904084247.23338-1-damien.lemoal@wdc.com>
- <20190904084247.23338-3-damien.lemoal@wdc.com>
+ <20190904084247.23338-6-damien.lemoal@wdc.com>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=us-ascii
 Content-Disposition: inline
-In-Reply-To: <20190904084247.23338-3-damien.lemoal@wdc.com>
+In-Reply-To: <20190904084247.23338-6-damien.lemoal@wdc.com>
 User-Agent: Mutt/1.11.3 (2019-02-01)
 X-Scanned-By: MIMEDefang 2.79 on 10.5.11.13
-X-Greylist: Sender IP whitelisted, not delayed by milter-greylist-4.6.2 (mx1.redhat.com [10.5.110.67]); Wed, 04 Sep 2019 09:05:38 +0000 (UTC)
+X-Greylist: Sender IP whitelisted, not delayed by milter-greylist-4.5.16 (mx1.redhat.com [10.5.110.27]); Wed, 04 Sep 2019 09:29:42 +0000 (UTC)
 Sender: linux-block-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-On Wed, Sep 04, 2019 at 05:42:42PM +0900, Damien Le Moal wrote:
-> If the default elevator chosen is mq-deadline, elevator_init_mq() may
-> return an error if mq-deadline initialization fails, leading to
-> blk_mq_init_allocated_queue() returning an error, which in turn will
-> cause the block device initialization to fail and the device not being
-> exposed.
+On Wed, Sep 04, 2019 at 05:42:45PM +0900, Damien Le Moal wrote:
+> When elevator_init_mq() is called from blk_mq_init_allocated_queue(),
+> the only information known about the device is the number of hardware
+> queues as the block device scan by the device driver is not completed
+> yet. The device type and the device required features are not set yet,
+> preventing to correctly choose the default elevator most suitable for
+> the device.
 > 
-> Instead of taking such extreme measure, handle mq-deadline
-> initialization failures in the same manner as when mq-deadline is not
-> available (no module to load), that is, default to the "none" scheduler.
-> With this change, elevator_init_mq() return type can be changed to void.
+> This currently affects all multi-queue zoned block devices which default
+> to the "none" elevator instead of the required "mq-deadline" elevator.
+> These drives currently include host-managed SMR disks connected to a
+> smartpqi HBA and null_blk block devices with zoned mode enabled.
+> Upcoming NVMe Zoned Namespace devices will also be affected.
+> 
+> Fix this by moving the execution of elevator_init_mq() from
+> blk_mq_init_allocated_queue() into __device_add_disk() to allow for the
+> device driver to probe the device characteristics and set attributes
+> of the device request queue prior to the elevator initialization.
+> 
+> Also to make sure that the elevator initialization is never done while
+> requests are in-flight (there should be none when the device driver
+> calls device_add_disk()), freeze and quiesce the device request queue
+> before executing blk_mq_init_sched().
 > 
 > Signed-off-by: Damien Le Moal <damien.lemoal@wdc.com>
-> Reviewed-by: Johannes Thumshirn <jthumshirn@suse.de>
-> Reviewed-by: Christoph Hellwig <hch@lst.de>
 > ---
->  block/blk-mq.c   |  8 +-------
->  block/blk.h      |  2 +-
->  block/elevator.c | 23 ++++++++++++-----------
->  3 files changed, 14 insertions(+), 19 deletions(-)
+>  block/blk-mq.c   | 2 --
+>  block/elevator.c | 7 +++++++
+>  block/genhd.c    | 8 ++++++++
+>  3 files changed, 15 insertions(+), 2 deletions(-)
 > 
 > diff --git a/block/blk-mq.c b/block/blk-mq.c
-> index 13923630e00a..ee4caf0c0807 100644
+> index ee4caf0c0807..a37503984206 100644
 > --- a/block/blk-mq.c
 > +++ b/block/blk-mq.c
-> @@ -2842,8 +2842,6 @@ static unsigned int nr_hw_queues(struct blk_mq_tag_set *set)
->  struct request_queue *blk_mq_init_allocated_queue(struct blk_mq_tag_set *set,
->  						  struct request_queue *q)
->  {
-> -	int ret = -ENOMEM;
-> -
->  	/* mark the queue as mq asap */
->  	q->mq_ops = set->ops;
->  
-> @@ -2904,14 +2902,10 @@ struct request_queue *blk_mq_init_allocated_queue(struct blk_mq_tag_set *set,
+> @@ -2902,8 +2902,6 @@ struct request_queue *blk_mq_init_allocated_queue(struct blk_mq_tag_set *set,
 >  	blk_mq_add_queue_tag_set(set, q);
 >  	blk_mq_map_swqueue(q);
 >  
-> -	ret = elevator_init_mq(q);
-> -	if (ret)
-> -		goto err_tag_set;
-> +	elevator_init_mq(q);
->  
+> -	elevator_init_mq(q);
+> -
 >  	return q;
 >  
-> -err_tag_set:
-> -	blk_mq_del_queue_tag_set(q);
 >  err_hctxs:
->  	kfree(q->queue_hw_ctx);
->  	q->nr_hw_queues = 0;
-> diff --git a/block/blk.h b/block/blk.h
-> index e4619fc5c99a..ed347f7a97b1 100644
-> --- a/block/blk.h
-> +++ b/block/blk.h
-> @@ -184,7 +184,7 @@ void blk_account_io_done(struct request *req, u64 now);
->  
->  void blk_insert_flush(struct request *rq);
->  
-> -int elevator_init_mq(struct request_queue *q);
-> +void elevator_init_mq(struct request_queue *q);
->  int elevator_switch_mq(struct request_queue *q,
->  			      struct elevator_type *new_e);
->  void __elevator_exit(struct request_queue *, struct elevator_queue *);
 > diff --git a/block/elevator.c b/block/elevator.c
-> index 4721834815bb..2944c129760c 100644
+> index 520d6b224b74..096a670d22d7 100644
 > --- a/block/elevator.c
 > +++ b/block/elevator.c
-> @@ -628,34 +628,35 @@ static inline bool elv_support_iosched(struct request_queue *q)
->  
->  /*
->   * For blk-mq devices supporting IO scheduling, we default to using mq-deadline,
-> - * if available, for single queue devices. If deadline isn't available OR we
-> - * have multiple queues, default to "none".
-> + * if available, for single queue devices. If deadline isn't available OR
-> + * deadline initialization fails OR we have multiple queues, default to "none".
->   */
-> -int elevator_init_mq(struct request_queue *q)
-> +void elevator_init_mq(struct request_queue *q)
->  {
->  	struct elevator_type *e;
-> -	int err = 0;
-> +	int err;
->  
->  	if (!elv_support_iosched(q))
-> -		return 0;
-> +		return;
->  
->  	if (q->nr_hw_queues != 1)
-> -		return 0;
-> +		return;
->  
->  	WARN_ON_ONCE(test_bit(QUEUE_FLAG_REGISTERED, &q->queue_flags));
->  
->  	if (unlikely(q->elevator))
-> -		goto out;
-> +		return;
->  
->  	e = elevator_get(q, "mq-deadline", false);
+> @@ -712,7 +712,14 @@ void elevator_init_mq(struct request_queue *q)
 >  	if (!e)
-> -		goto out;
-> +		return;
+>  		return;
 >  
+> +	blk_mq_freeze_queue(q);
+> +	blk_mq_quiesce_queue(q);
+> +
 >  	err = blk_mq_init_sched(q, e);
-> -	if (err)
-> +	if (err) {
-> +		pr_warn("\"%s\" elevator initialization failed, "
-> +			"falling back to \"none\"\n", e->elevator_name);
->  		elevator_put(e);
-> -out:
-> -	return err;
-> +	}
->  }
+> +
+> +	blk_mq_unquiesce_queue(q);
+> +	blk_mq_unfreeze_queue(q);
+> +
+>  	if (err) {
+>  		pr_warn("\"%s\" elevator initialization failed, "
+>  			"falling back to \"none\"\n", e->elevator_name);
+> diff --git a/block/genhd.c b/block/genhd.c
+> index 54f1f0d381f4..7380dd7b2257 100644
+> --- a/block/genhd.c
+> +++ b/block/genhd.c
+> @@ -695,6 +695,13 @@ static void __device_add_disk(struct device *parent, struct gendisk *disk,
+>  	dev_t devt;
+>  	int retval;
+>  
+> +	/*
+> +	 * The disk queue should now be all set with enough information about
+> +	 * the device for the elevator code to pick an adequate default
+> +	 * elevator.
+> +	 */
+> +	elevator_init_mq(disk->queue);
+> +
 
-Looks fine:
+For dm-rq, add_disk_no_queue_reg() is called before blk_mq_init_allocated_queue().
 
-Reviewed-by: Ming Lei <ming.lei@redhat.com>
+That means this patch actually sets elevator early for dm-rq, and I
+guess this way may not work as expected since hw/sw queues aren't allocated
+yet.
 
-BTW, blk_mq_init_sched()'s failure patch should have restored
-q->nr_request. And that could be done in another standalone patch.
 
--- 
+Thanks,
 Ming
