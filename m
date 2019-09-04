@@ -2,90 +2,102 @@ Return-Path: <SRS0=cenR=W7=vger.kernel.org=linux-block-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-2.2 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
-	MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,USER_AGENT_SANE_1 autolearn=no
-	autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-2.2 required=3.0 tests=DKIM_SIGNED,DKIM_VALID,
+	HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,
+	URIBL_BLOCKED,USER_AGENT_SANE_1 autolearn=no autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 397B6C3A5A7
-	for <linux-block@archiver.kernel.org>; Wed,  4 Sep 2019 12:49:55 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id B5AF9C3A5A7
+	for <linux-block@archiver.kernel.org>; Wed,  4 Sep 2019 12:57:00 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.kernel.org (Postfix) with ESMTP id 190A421883
-	for <linux-block@archiver.kernel.org>; Wed,  4 Sep 2019 12:49:55 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id 87F6C2073F
+	for <linux-block@archiver.kernel.org>; Wed,  4 Sep 2019 12:57:00 +0000 (UTC)
+Authentication-Results: mail.kernel.org;
+	dkim=pass (2048-bit key) header.d=kernel-dk.20150623.gappssmtp.com header.i=@kernel-dk.20150623.gappssmtp.com header.b="kdG9noEp"
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1729398AbfIDMty (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Wed, 4 Sep 2019 08:49:54 -0400
-Received: from verein.lst.de ([213.95.11.211]:39028 "EHLO verein.lst.de"
-        rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-        id S1727675AbfIDMty (ORCPT <rfc822;linux-block@vger.kernel.org>);
-        Wed, 4 Sep 2019 08:49:54 -0400
-Received: by verein.lst.de (Postfix, from userid 2407)
-        id 14C1A227A8A; Wed,  4 Sep 2019 14:49:50 +0200 (CEST)
-Date:   Wed, 4 Sep 2019 14:49:49 +0200
-From:   Christoph Hellwig <hch@lst.de>
-To:     Max Gurtovoy <maxg@mellanox.com>
-Cc:     Christoph Hellwig <hch@lst.de>, Jens Axboe <axboe@kernel.dk>,
-        Sagi Grimberg <sagi@grimberg.me>, linux-block@vger.kernel.org,
-        martin.petersen@oracle.com, linux-nvme@lists.infradead.org,
-        keith.busch@intel.com, shlomin@mellanox.com, israelr@mellanox.com
-Subject: Re: [PATCH 1/4] block: centrelize PI remapping logic to the block
- layer
-Message-ID: <20190904124949.GA17285@lst.de>
-References: <1567523655-23989-1-git-send-email-maxg@mellanox.com> <8df57b71-9404-904d-7abd-587942814039@grimberg.me> <e9e36b41-f262-e825-15dc-aecadb44cf85@kernel.dk> <20190904054956.GA10553@lst.de> <fd70d115-bb29-a8a7-83ae-7e3dcaa1dc1c@mellanox.com>
+        id S1727083AbfIDM5A (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Wed, 4 Sep 2019 08:57:00 -0400
+Received: from mail-io1-f65.google.com ([209.85.166.65]:34172 "EHLO
+        mail-io1-f65.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S1726528AbfIDM47 (ORCPT
+        <rfc822;linux-block@vger.kernel.org>); Wed, 4 Sep 2019 08:56:59 -0400
+Received: by mail-io1-f65.google.com with SMTP id s21so44013539ioa.1
+        for <linux-block@vger.kernel.org>; Wed, 04 Sep 2019 05:56:59 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=kernel-dk.20150623.gappssmtp.com; s=20150623;
+        h=subject:to:references:from:message-id:date:user-agent:mime-version
+         :in-reply-to:content-language:content-transfer-encoding;
+        bh=75iMfH7EEXhbGGrWPnlP6nj0Xir+moE5RQ+sKgLPRNY=;
+        b=kdG9noEpHEHEBAQRW2XMpdpvLr511vFWRb6qxgP+Q6UPrnAn8JxFi39xw2eqlADNHV
+         Bxt5LCA9y0Tk/5AyDOoKB/A6bnbywBAUrDiG7YgmnvYBLLYsI7EaWRcPNMVfhcRPGU+i
+         gbuAUMojbQpIqkv4GJ6zE9Jehrd0RcywdkHQjKPxDOYq4tMQro8/luMwv1bXuoiLeT5Y
+         kxJJFx8o3ZyG5mBqnaLjErbNe8z+lQBHqLqH8lm4iis9RvmAVZ39mop9GRJyDprJG6Zi
+         Q3HKqoD+nt5FZxALgfs+Gau8qrKWbJy5Ci8xuzMlrz5qDBbWGFeP6uYPdiwSUwTr8hVF
+         j39g==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20161025;
+        h=x-gm-message-state:subject:to:references:from:message-id:date
+         :user-agent:mime-version:in-reply-to:content-language
+         :content-transfer-encoding;
+        bh=75iMfH7EEXhbGGrWPnlP6nj0Xir+moE5RQ+sKgLPRNY=;
+        b=Z8yIAgxPDj3vx4C85FaCa0eK1pQXMzgkO2xaz89b0dmpeXBXaDwUPFCz+QBwdn4a8R
+         ATAd3d0MG/s/Dzc9Y3n1Uch1dk0CMrXWanwnGdojv0OdLT1K8Ul4vLI2RVl5Je7TLmkq
+         l/NZeN0BDG4KBJnmZAxGS8OcsW/vplr5SYbmBiQffd3WjzmytWrLH6QpHnvONhx4ZCqW
+         q99mwtxN1scZDu9AXWDqEaPZR73GV724o31Hbt4RFzkGcS/eCLxaddVTPUhA2vaAkKJE
+         PapTwuur46I4jCnfxpUDV8ZnyHkq1iSoZlZNLxB/Pj30XP9w8TeDNfvJxgVnApwnvSq/
+         LLwg==
+X-Gm-Message-State: APjAAAUJM7waU/0XeA2Oezs7pynJ3+aMy0J8TURpeavnuifdN2YhZ9tg
+        Ya81KCemANaY7hXseOIyTHBLa3gFMyArzQ==
+X-Google-Smtp-Source: APXvYqxOc9zhjcAdOOZR/ZoC0fv44rZYBtSMM14qc1QfkygD/0cSMfcO48ZA37T8nh7y6BWeNxrR5g==
+X-Received: by 2002:a5d:8e15:: with SMTP id e21mr25845056iod.296.1567601819078;
+        Wed, 04 Sep 2019 05:56:59 -0700 (PDT)
+Received: from [192.168.1.50] ([65.144.74.34])
+        by smtp.gmail.com with ESMTPSA id l13sm21622537iob.73.2019.09.04.05.56.57
+        (version=TLS1_2 cipher=ECDHE-RSA-AES128-GCM-SHA256 bits=128/128);
+        Wed, 04 Sep 2019 05:56:58 -0700 (PDT)
+Subject: Re: [PATCH v3 5/7] block: Delay default elevator initialization
+To:     Damien Le Moal <Damien.LeMoal@wdc.com>,
+        Johannes Thumshirn <jthumshirn@suse.de>,
+        "linux-block@vger.kernel.org" <linux-block@vger.kernel.org>,
+        "linux-scsi@vger.kernel.org" <linux-scsi@vger.kernel.org>,
+        "Martin K . Petersen" <martin.petersen@oracle.com>
+References: <20190904084247.23338-1-damien.lemoal@wdc.com>
+ <20190904084247.23338-6-damien.lemoal@wdc.com>
+ <22bc754b-541d-3c72-6bb0-68cd841faee5@suse.de>
+ <BYAPR04MB5816ADDE69D61A3CB47DCC3FE7B80@BYAPR04MB5816.namprd04.prod.outlook.com>
+From:   Jens Axboe <axboe@kernel.dk>
+Message-ID: <68bd56dd-46cf-efa3-14f2-4f8e50ac15c0@kernel.dk>
+Date:   Wed, 4 Sep 2019 06:56:56 -0600
+User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:60.0) Gecko/20100101
+ Thunderbird/60.8.0
 MIME-Version: 1.0
-Content-Type: text/plain; charset=iso-8859-1
-Content-Disposition: inline
-Content-Transfer-Encoding: 8bit
-In-Reply-To: <fd70d115-bb29-a8a7-83ae-7e3dcaa1dc1c@mellanox.com>
-User-Agent: Mutt/1.5.17 (2007-11-01)
+In-Reply-To: <BYAPR04MB5816ADDE69D61A3CB47DCC3FE7B80@BYAPR04MB5816.namprd04.prod.outlook.com>
+Content-Type: text/plain; charset=utf-8
+Content-Language: en-US
+Content-Transfer-Encoding: 7bit
 Sender: linux-block-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-On Wed, Sep 04, 2019 at 11:32:04AM +0300, Max Gurtovoy wrote:
->
-> On 9/4/2019 8:49 AM, Christoph Hellwig wrote:
->> On Tue, Sep 03, 2019 at 01:21:59PM -0600, Jens Axboe wrote:
->>> On 9/3/19 1:11 PM, Sagi Grimberg wrote:
->>>>> +	if (blk_integrity_rq(req) && req_op(req) == REQ_OP_READ &&
->>>>> +	    error == BLK_STS_OK)
->>>>> +		t10_pi_complete(req,
->>>>> +				nr_bytes / queue_logical_block_size(req->q));
->>>>> +
->>>> div in this path? better to use  >> ilog2(block_size).
->>>>
->>>> Also, would be better to have a wrapper in place like:
->>>>
->>>> static inline unsigned short blk_integrity_interval(struct request *rq)
->>>> {
->>>> 	return queue_logical_block_size(rq->q);
->>>> }
->>> If it's a hot path thing that matters, I'd strongly suggest to add
->>> a queue block size shift instead.
->> Make that a protection_interval_shift, please.  While that currently
->> is the same as the logical block size the concepts are a little
->> different, and that makes it clear.  Except for that this patch looks
->> very nice to me, it is great to avoid having drivers to deal with the
->> PI remapping.
->
-> Christoph,
->
-> I was thinking about the following addition to the code (combination of all 
-> the suggestions):
+On 9/4/19 3:02 AM, Damien Le Moal wrote:
+> On 2019/09/04 17:56, Johannes Thumshirn wrote:
+>> On 04/09/2019 10:42, Damien Le Moal wrote:
+>>> @@ -734,6 +741,7 @@ static void __device_add_disk(struct device *parent, struct gendisk *disk,
+>>>   				    exact_match, exact_lock, disk);
+>>>   	}
+>>>   	register_disk(parent, disk, groups);
+>>> +
+>>>   	if (register_queue)
+>>>   		blk_register_queue(disk);
+>>
+>> That hunk looks unrelated, but anyways:
+>> Reviewed-by: Johannes Thumshirn <jthumshirn@suse.de>
+> 
+> Oops. Yes, did not delete the blank line when I moved elevator_init_mq() call.
+> Jens, should I resend a v4 to fix this ?
 
-I'll defer to Martin, but I think we still need the integrity_interval
-naming in some form.
+Series looks good to me, I'll just delete this one hunk, not a big deal.
 
-static inline unsigned short queue_logical_block_shift(struct  request_queue *q)
-> +{
-> +       unsigned short retval = 9;
-> +
-> +       if (q && q->limits.logical_block_shift)
-> +               retval = q->limits.logical_block_shift;
-> +
-> +       return retval;
+-- 
+Jens Axboe
 
-I don't think a NULL queue makes any sense here.  And I'd rather
-ensure the field is always set rather than adding a conditional here.
-
-And btw, centrelize in the Subject should be centralize.
