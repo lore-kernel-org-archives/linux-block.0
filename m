@@ -4,67 +4,67 @@ X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 X-Spam-Level: 
 X-Spam-Status: No, score=-9.5 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
 	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,
-	SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED,USER_AGENT_GIT autolearn=unavailable
+	SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED,USER_AGENT_GIT autolearn=ham
 	autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id DB4FAC3A5A8
-	for <linux-block@archiver.kernel.org>; Wed,  4 Sep 2019 08:43:02 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 529E9C3A5A9
+	for <linux-block@archiver.kernel.org>; Wed,  4 Sep 2019 08:43:03 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.kernel.org (Postfix) with ESMTP id B31C622CEA
-	for <linux-block@archiver.kernel.org>; Wed,  4 Sep 2019 08:43:02 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id 2A51822CEA
+	for <linux-block@archiver.kernel.org>; Wed,  4 Sep 2019 08:43:03 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (2048-bit key) header.d=wdc.com header.i=@wdc.com header.b="oAVWZHp5"
+	dkim=fail reason="signature verification failed" (2048-bit key) header.d=wdc.com header.i=@wdc.com header.b="l/Lo/jwO"
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1727722AbfIDInB (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Wed, 4 Sep 2019 04:43:01 -0400
+        id S1728598AbfIDInC (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Wed, 4 Sep 2019 04:43:02 -0400
 Received: from esa4.hgst.iphmx.com ([216.71.154.42]:39238 "EHLO
         esa4.hgst.iphmx.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1727929AbfIDInB (ORCPT
+        with ESMTP id S1728448AbfIDInB (ORCPT
         <rfc822;linux-block@vger.kernel.org>); Wed, 4 Sep 2019 04:43:01 -0400
 DKIM-Signature: v=1; a=rsa-sha256; c=simple/simple;
   d=wdc.com; i=@wdc.com; q=dns/txt; s=dkim.wdc.com;
-  t=1567586580; x=1599122580;
+  t=1567586581; x=1599122581;
   h=from:to:subject:date:message-id:in-reply-to:references:
    mime-version:content-transfer-encoding;
-  bh=fyqaXKmTgfoQv/FSTOhGEWhXUip2jSRO9hudTs5/bE4=;
-  b=oAVWZHp5qb5u1wJ3lV35Szu5hbwW+mWy+/HEBRdfWReqyWb9p7PZxWZp
-   u4mhPs9BsIG3uHsL/PLdoYfA6tLrlI236vLDFe3ct8y1DJKbm4mvffUMC
-   /ep/5/3bNMWlR4oB3j4IGm3GvgHh8Vh7aYrxetVpGhl+N7V+NJPEFpodo
-   +d/sAoLAwB/60VyXqsCB/vhsgb3csN03yIKnDT7DyCzAu0uxmdjnfEFWJ
-   V+nzKT9HMlKkNywzReNR0CqKcNGHFq/5dDRtPHnh1GU3Y9TTH6TmmlNXx
-   Hu4yVSNgp1lqZ/iPtHs8TmVY7b/8BR0HwAo7JtO51ECGiyicRb1O8yRx7
-   g==;
-IronPort-SDR: 20UvYgXyLGk1nK6pjQDWs5S3dlYpPHy4jYPdHVXpxOW8uk4aPVa+6Kf0AxHKBhgsin767UjVck
- iJ38LWj8wzlyJYwKPbmqvoC+mPG97L0wsmTsiEW95RaVlzbKmUtWTo26AKAk2S6x7prJmiPzwI
- 4MPuKU0GFidQzawynjIa2vrDnZBfafk7bkU5fZnxWOmqsUW0u2fzC7/ENoOwjoWEPn56h1RGLx
- Q25cegd/tVVAAOiMqPNKA2utm3+a/Q1U5xX3E5L/ItjcNvUURQwnePzZEr4EWF3GUW34c38pgz
- 4PY=
+  bh=fh2X6sgqVyA/YgEaWwJn5yd67V2WgvSpchuXNuvnbp4=;
+  b=l/Lo/jwOWc/bmQprdXHUO4rYmeEhpaex930AZiykMZduq3oDKfJp5Soz
+   nWOSh9Guq+UyP3rEVzwlSTUnTuGeEaA/OLGQcEjQ3jS3SQ3j2GA82KTER
+   UICp0yX+X7+O71/r4EUnr662LsUu55FD+vvFjj4Yf8pBJgaCPvz4TO5Ch
+   LMyr1OwrDZiORxAhhaYhkQ3Wrt8FFXZZ6Kuh+O5lS8fSqk7rY1V1t/kcg
+   AU/P5baI/g6Eg/b0pVyVGRKopDdvGLARrRDWqk75MAa5XKcP4rJt+u68y
+   ME8ksp5ZXpom5RNImIr/yzYUL4RlgykVoW3mPfoNkG6t6umaHmCBBhsHA
+   A==;
+IronPort-SDR: q7rl7ihhzsAm9pnM3iKXUdaDMTieZvohZMRD6tKesqHxRPVkfDSAXy9+WNWyccp9MyaIOenGNK
+ rTJ09TaGgxdOUUDFR5FXSyY8VqccVuWHduBCAY0HlInhAtASBtzd/1uKiYDUpsOhFGQBrgc5pd
+ BNb0oXANl5IMaymaIreVWr5jwNgJY+6JlNmsv/ZFIt/eK7c/2pPqAZIKxyC7gkhHrn17zWntKz
+ pOb39zCdNfc+HxJC8Bi/kc3AYkqLqTddSlDc0nHRZ1bcx2/JPeg7xahAs8bJiBpgto2rmQI4J1
+ rw4=
 X-IronPort-AV: E=Sophos;i="5.64,465,1559491200"; 
-   d="scan'208";a="117374683"
+   d="scan'208";a="117374685"
 Received: from h199-255-45-15.hgst.com (HELO uls-op-cesaep02.wdc.com) ([199.255.45.15])
-  by ob1.hgst.iphmx.com with ESMTP; 04 Sep 2019 16:42:53 +0800
-IronPort-SDR: ioznrVdYbmeOyISeMzoZu5lfjgpRo+VjMd4yP7XxhmaMy/Xz4qBfVvZEHGIMedmv0M56UBIiNd
- 5CV3w6yRTJxkpucOIO5VNZeViOitslXpV4Oceorc98wnyiBs7lX/08fpmUj6TzZNCk3pKoXuQ4
- 4MlOvonWfwuCkulpJNBpgmON6gYv0rNUlyZzXbWFt4UBATvNWMyhSYvcECdyPrlvZxVG2kNyqC
- v1KdcGMujv4U+140x9Z6bvPGrSRcPwEJmGvetMwgO52HIKYOm5vjLAzTAqDUqdYu4hpwWu+IHV
- 12axxkdQEIsOsKnmVGEd6kYY
+  by ob1.hgst.iphmx.com with ESMTP; 04 Sep 2019 16:42:54 +0800
+IronPort-SDR: 3DAFxzdsO3kNmYow1Dxy+bCLVK4L2MQtafUsBJtYBes1ihiXrbIacFzGU6++cNC/IrsMBqAiHB
+ R4MgJZzLbUAvd8D3+RTt/0gKvWmU/imIBgO1Qh+Ujb50O2iZe/DpFjkqTNeEKGEr1e+AU8QRcL
+ diqUgimM4OIDeVuOffmqzRac4U3EhTtt9u1ctc1oI233NzW2Y5B6NL4kN4uzdFnoEC4vSJ69LB
+ 7Grk2C9jFyhQryfxSK5l+gyZU/6WV2PCTXEuIVMlecxgWYu0TmSZCLPKNeBsnE+gIQcZ3XoQdp
+ xpSPV4T7Yzsy/LSMfgCgQyFv
 Received: from uls-op-cesaip02.wdc.com ([10.248.3.37])
-  by uls-op-cesaep02.wdc.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 04 Sep 2019 01:39:51 -0700
-IronPort-SDR: gybW6RVAYE3RomyMxGkOijCkXQC/kkxJdeF3wj/6TVK8qy/zBKU5foJIOCjfyNbH9H7ojYLQY1
- 5w62kqAAtizTNOXtR1enHTbznoU5gUkjALcf1NUi5n77sZ4ZW6onpy6b9rA4NBEOn2rmxwM2/f
- G6jaMN1X9TYBDDSRNWvw0nRYn1xZ5jNhXXmwz2M/2S9OWhO6QY7EpLjrMXhDsc0TVaklSEWwRT
- Ebo1/GG6MrXvftN4pCM2/OfT2vd/e038pNQpF43EaGNoFsyvV56+zGuc6aX0zgWpXkWcud2upR
- zRI=
+  by uls-op-cesaep02.wdc.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 04 Sep 2019 01:39:52 -0700
+IronPort-SDR: blnx04rCNK6PSIJNFSPMdCGTO2BygABGR9ZMqg7LFcOSekPqR7JdvT0W0iNCbXOWoZ3hkO9pbw
+ NJbKXx6AJ5OGRO8jAebtR4J3PMnvWU2yYd7WEI0XyG/ClP858COeqnuq3VKv0pdwztbYB5olg/
+ 2BBTt5KkEmSbeET/8a7/rdIAqm5Y1cxXOnC//FvHjLJf6mSE0+oNWNeFbJQ+KxG7+u0ulAUzkY
+ pv9B13F62+U+YyiB+73K0fBZG84b3COPybZ+vpGn2CUAPm0nN7m0qbtuYnFBZUfAGGMmG08UZH
+ m+c=
 WDCIronportException: Internal
 Received: from washi.fujisawa.hgst.com ([10.149.53.254])
-  by uls-op-cesaip02.wdc.com with ESMTP; 04 Sep 2019 01:42:51 -0700
+  by uls-op-cesaip02.wdc.com with ESMTP; 04 Sep 2019 01:42:53 -0700
 From:   Damien Le Moal <damien.lemoal@wdc.com>
 To:     linux-block@vger.kernel.org, Jens Axboe <axboe@kernel.dk>,
         linux-scsi@vger.kernel.org,
         "Martin K . Petersen" <martin.petersen@oracle.com>
-Subject: [PATCH v3 4/7] block: Improve default elevator selection
-Date:   Wed,  4 Sep 2019 17:42:44 +0900
-Message-Id: <20190904084247.23338-5-damien.lemoal@wdc.com>
+Subject: [PATCH v3 5/7] block: Delay default elevator initialization
+Date:   Wed,  4 Sep 2019 17:42:45 +0900
+Message-Id: <20190904084247.23338-6-damien.lemoal@wdc.com>
 X-Mailer: git-send-email 2.21.0
 In-Reply-To: <20190904084247.23338-1-damien.lemoal@wdc.com>
 References: <20190904084247.23338-1-damien.lemoal@wdc.com>
@@ -75,94 +75,93 @@ Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-For block devices that do not specify required features, preserve the
-current default elevator selection (mq-deadline for single queue
-devices, none for multi-queue devices). However, for devices specifying
-required features (e.g. zoned block devices ELEVATOR_F_ZBD_SEQ_WRITE
-feature), select the first available elevator providing the required
-features.
+When elevator_init_mq() is called from blk_mq_init_allocated_queue(),
+the only information known about the device is the number of hardware
+queues as the block device scan by the device driver is not completed
+yet. The device type and the device required features are not set yet,
+preventing to correctly choose the default elevator most suitable for
+the device.
 
-In all cases, default to "none" if no elevator is available or if the
-initialization of the default elevator fails.
+This currently affects all multi-queue zoned block devices which default
+to the "none" elevator instead of the required "mq-deadline" elevator.
+These drives currently include host-managed SMR disks connected to a
+smartpqi HBA and null_blk block devices with zoned mode enabled.
+Upcoming NVMe Zoned Namespace devices will also be affected.
+
+Fix this by moving the execution of elevator_init_mq() from
+blk_mq_init_allocated_queue() into __device_add_disk() to allow for the
+device driver to probe the device characteristics and set attributes
+of the device request queue prior to the elevator initialization.
+
+Also to make sure that the elevator initialization is never done while
+requests are in-flight (there should be none when the device driver
+calls device_add_disk()), freeze and quiesce the device request queue
+before executing blk_mq_init_sched().
 
 Signed-off-by: Damien Le Moal <damien.lemoal@wdc.com>
 ---
- block/elevator.c | 51 +++++++++++++++++++++++++++++++++++++++++-------
- 1 file changed, 44 insertions(+), 7 deletions(-)
+ block/blk-mq.c   | 2 --
+ block/elevator.c | 7 +++++++
+ block/genhd.c    | 8 ++++++++
+ 3 files changed, 15 insertions(+), 2 deletions(-)
 
+diff --git a/block/blk-mq.c b/block/blk-mq.c
+index ee4caf0c0807..a37503984206 100644
+--- a/block/blk-mq.c
++++ b/block/blk-mq.c
+@@ -2902,8 +2902,6 @@ struct request_queue *blk_mq_init_allocated_queue(struct blk_mq_tag_set *set,
+ 	blk_mq_add_queue_tag_set(set, q);
+ 	blk_mq_map_swqueue(q);
+ 
+-	elevator_init_mq(q);
+-
+ 	return q;
+ 
+ err_hctxs:
 diff --git a/block/elevator.c b/block/elevator.c
-index ac7c8ad580ba..520d6b224b74 100644
+index 520d6b224b74..096a670d22d7 100644
 --- a/block/elevator.c
 +++ b/block/elevator.c
-@@ -651,9 +651,46 @@ static inline bool elv_support_iosched(struct request_queue *q)
- }
- 
- /*
-- * For blk-mq devices supporting IO scheduling, we default to using mq-deadline,
-- * if available, for single queue devices. If deadline isn't available OR
-- * deadline initialization fails OR we have multiple queues, default to "none".
-+ * For single queue devices, default to using mq-deadline. If we have multiple
-+ * queues or mq-deadline is not available, default to "none".
-+ */
-+static struct elevator_type *elevator_get_default(struct request_queue *q)
-+{
-+	if (q->nr_hw_queues != 1)
-+		return NULL;
-+
-+	return elevator_get(q, "mq-deadline", false);
-+}
-+
-+/*
-+ * Get the first elevator providing the features required by the request queue.
-+ * Default to "none" if no matching elevator is found.
-+ */
-+static struct elevator_type *elevator_get_by_features(struct request_queue *q)
-+{
-+	struct elevator_type *e;
-+
-+	spin_lock(&elv_list_lock);
-+
-+	list_for_each_entry(e, &elv_list, list) {
-+		if (elv_support_features(e->elevator_features,
-+					 q->required_elevator_features))
-+			break;
-+	}
-+
-+	if (e && !try_module_get(e->elevator_owner))
-+		e = NULL;
-+
-+	spin_unlock(&elv_list_lock);
-+
-+	return e;
-+}
-+
-+/*
-+ * For a device queue that has no required features, use the default elevator
-+ * settings. Otherwise, use the first elevator available matching the required
-+ * features. If no suitable elevator is find or if the chosen elevator
-+ * initialization fails, fall back to the "none" elevator (no elevator).
-  */
- void elevator_init_mq(struct request_queue *q)
- {
-@@ -663,15 +700,15 @@ void elevator_init_mq(struct request_queue *q)
- 	if (!elv_support_iosched(q))
- 		return;
- 
--	if (q->nr_hw_queues != 1)
--		return;
--
- 	WARN_ON_ONCE(test_bit(QUEUE_FLAG_REGISTERED, &q->queue_flags));
- 
- 	if (unlikely(q->elevator))
- 		return;
- 
--	e = elevator_get(q, "mq-deadline", false);
-+	if (!q->required_elevator_features)
-+		e = elevator_get_default(q);
-+	else
-+		e = elevator_get_by_features(q);
+@@ -712,7 +712,14 @@ void elevator_init_mq(struct request_queue *q)
  	if (!e)
  		return;
+ 
++	blk_mq_freeze_queue(q);
++	blk_mq_quiesce_queue(q);
++
+ 	err = blk_mq_init_sched(q, e);
++
++	blk_mq_unquiesce_queue(q);
++	blk_mq_unfreeze_queue(q);
++
+ 	if (err) {
+ 		pr_warn("\"%s\" elevator initialization failed, "
+ 			"falling back to \"none\"\n", e->elevator_name);
+diff --git a/block/genhd.c b/block/genhd.c
+index 54f1f0d381f4..7380dd7b2257 100644
+--- a/block/genhd.c
++++ b/block/genhd.c
+@@ -695,6 +695,13 @@ static void __device_add_disk(struct device *parent, struct gendisk *disk,
+ 	dev_t devt;
+ 	int retval;
+ 
++	/*
++	 * The disk queue should now be all set with enough information about
++	 * the device for the elevator code to pick an adequate default
++	 * elevator.
++	 */
++	elevator_init_mq(disk->queue);
++
+ 	/* minors == 0 indicates to use ext devt from part0 and should
+ 	 * be accompanied with EXT_DEVT flag.  Make sure all
+ 	 * parameters make sense.
+@@ -734,6 +741,7 @@ static void __device_add_disk(struct device *parent, struct gendisk *disk,
+ 				    exact_match, exact_lock, disk);
+ 	}
+ 	register_disk(parent, disk, groups);
++
+ 	if (register_queue)
+ 		blk_register_queue(disk);
  
 -- 
 2.21.0
