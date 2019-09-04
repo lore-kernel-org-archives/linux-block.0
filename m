@@ -2,35 +2,36 @@ Return-Path: <SRS0=cenR=W7=vger.kernel.org=linux-block-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-6.8 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
-	INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS
-	autolearn=unavailable autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-6.7 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
+	INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,
+	URIBL_BLOCKED autolearn=unavailable autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 1B3C5C3A59E
-	for <linux-block@archiver.kernel.org>; Wed,  4 Sep 2019 22:17:29 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 98C7FC3A5AA
+	for <linux-block@archiver.kernel.org>; Wed,  4 Sep 2019 22:17:38 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.kernel.org (Postfix) with ESMTP id E4D5821670
-	for <linux-block@archiver.kernel.org>; Wed,  4 Sep 2019 22:17:28 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id 7B36B21881
+	for <linux-block@archiver.kernel.org>; Wed,  4 Sep 2019 22:17:38 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1730892AbfIDWRK (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Wed, 4 Sep 2019 18:17:10 -0400
-Received: from mx1.redhat.com ([209.132.183.28]:40540 "EHLO mx1.redhat.com"
+        id S1728008AbfIDWRa (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Wed, 4 Sep 2019 18:17:30 -0400
+Received: from mx1.redhat.com ([209.132.183.28]:59222 "EHLO mx1.redhat.com"
         rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-        id S1727722AbfIDWRK (ORCPT <rfc822;linux-block@vger.kernel.org>);
-        Wed, 4 Sep 2019 18:17:10 -0400
-Received: from smtp.corp.redhat.com (int-mx03.intmail.prod.int.phx2.redhat.com [10.5.11.13])
+        id S1730435AbfIDWR3 (ORCPT <rfc822;linux-block@vger.kernel.org>);
+        Wed, 4 Sep 2019 18:17:29 -0400
+Received: from smtp.corp.redhat.com (int-mx02.intmail.prod.int.phx2.redhat.com [10.5.11.12])
         (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
         (No client certificate requested)
-        by mx1.redhat.com (Postfix) with ESMTPS id 6D97330860C0;
-        Wed,  4 Sep 2019 22:17:09 +0000 (UTC)
+        by mx1.redhat.com (Postfix) with ESMTPS id 9B8F43007C30;
+        Wed,  4 Sep 2019 22:17:28 +0000 (UTC)
 Received: from warthog.procyon.org.uk (ovpn-120-255.rdu2.redhat.com [10.10.120.255])
-        by smtp.corp.redhat.com (Postfix) with ESMTP id 7C53F6092D;
-        Wed,  4 Sep 2019 22:17:06 +0000 (UTC)
+        by smtp.corp.redhat.com (Postfix) with ESMTP id D534460C18;
+        Wed,  4 Sep 2019 22:17:24 +0000 (UTC)
 Organization: Red Hat UK Ltd. Registered Address: Red Hat UK Ltd, Amberley
  Place, 107-111 Peascod Street, Windsor, Berkshire, SI4 1TE, United
  Kingdom.
  Registered in England and Wales under Company Registration No. 3798903
-Subject: [PATCH 09/11] Add sample notification program [ver #8]
+Subject: [PATCH 11/11] smack: Implement the watch_key and post_notification
+ hooks [ver #8]
 From:   David Howells <dhowells@redhat.com>
 To:     keyrings@vger.kernel.org, linux-usb@vger.kernel.org,
         linux-block@vger.kernel.org
@@ -43,340 +44,160 @@ Cc:     dhowells@redhat.com, torvalds@linux-foundation.org,
         linux-security-module@vger.kernel.org,
         linux-fsdevel@vger.kernel.org, linux-api@vger.kernel.org,
         linux-security-module@vger.kernel.org, linux-kernel@vger.kernel.org
-Date:   Wed, 04 Sep 2019 23:17:05 +0100
-Message-ID: <156763542571.18676.10450446815486316014.stgit@warthog.procyon.org.uk>
+Date:   Wed, 04 Sep 2019 23:17:24 +0100
+Message-ID: <156763544404.18676.1316696252943973122.stgit@warthog.procyon.org.uk>
 In-Reply-To: <156763534546.18676.3530557439501101639.stgit@warthog.procyon.org.uk>
 References: <156763534546.18676.3530557439501101639.stgit@warthog.procyon.org.uk>
 User-Agent: StGit/unknown-version
 MIME-Version: 1.0
 Content-Type: text/plain; charset="utf-8"
 Content-Transfer-Encoding: 7bit
-X-Scanned-By: MIMEDefang 2.79 on 10.5.11.13
-X-Greylist: Sender IP whitelisted, not delayed by milter-greylist-4.5.16 (mx1.redhat.com [10.5.110.44]); Wed, 04 Sep 2019 22:17:09 +0000 (UTC)
+X-Scanned-By: MIMEDefang 2.79 on 10.5.11.12
+X-Greylist: Sender IP whitelisted, not delayed by milter-greylist-4.5.16 (mx1.redhat.com [10.5.110.40]); Wed, 04 Sep 2019 22:17:28 +0000 (UTC)
 Sender: linux-block-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-This needs to be linked with -lkeyutils.
+Implement the watch_key security hook in Smack to make sure that a key
+grants the caller Read permission in order to set a watch on a key.
 
-It is run like:
+Also implement the post_notification security hook to make sure that the
+notification source is granted Write permission by the watch queue.
 
-	./watch_test
-
-and watches "/" for mount changes and the current session keyring for key
-changes:
-
-	# keyctl add user a a @s
-	1035096409
-	# keyctl unlink 1035096409 @s
-
-producing:
-
-	# ./watch_test
-	ptrs h=4 t=2 m=20003
-	NOTIFY[00000004-00000002] ty=0003 sy=0002 i=01000010
-	KEY 2ffc2e5d change=2[linked] aux=1035096409
-	ptrs h=6 t=4 m=20003
-	NOTIFY[00000006-00000004] ty=0003 sy=0003 i=01000010
-	KEY 2ffc2e5d change=3[unlinked] aux=1035096409
-
-Other events may be produced, such as with a failing disk:
-
-	ptrs h=5 t=2 m=6000004
-	NOTIFY[00000005-00000002] ty=0004 sy=0006 i=04000018
-	BLOCK 00800050 e=6[critical medium] s=5be8
-
-This corresponds to:
-
-	print_req_error: critical medium error, dev sdf, sector 23528 flags 0
-
-in dmesg.
+For the moment, the watch_devices security hook is left unimplemented as
+it's not obvious what the object should be since the queue is global and
+didn't previously exist.
 
 Signed-off-by: David Howells <dhowells@redhat.com>
+Acked-by: Casey Schaufler <casey@schaufler-ca.com>
 ---
 
- samples/Kconfig                  |    6 +
- samples/Makefile                 |    1 
- samples/watch_queue/Makefile     |    8 +
- samples/watch_queue/watch_test.c |  231 ++++++++++++++++++++++++++++++++++++++
- 4 files changed, 246 insertions(+)
- create mode 100644 samples/watch_queue/Makefile
- create mode 100644 samples/watch_queue/watch_test.c
+ include/linux/lsm_audit.h  |    1 +
+ security/smack/smack_lsm.c |   82 +++++++++++++++++++++++++++++++++++++++++++-
+ 2 files changed, 82 insertions(+), 1 deletion(-)
 
-diff --git a/samples/Kconfig b/samples/Kconfig
-index c8dacb4dda80..2c3e07addd38 100644
---- a/samples/Kconfig
-+++ b/samples/Kconfig
-@@ -169,4 +169,10 @@ config SAMPLE_VFS
- 	  as mount API and statx().  Note that this is restricted to the x86
- 	  arch whilst it accesses system calls that aren't yet in all arches.
+diff --git a/include/linux/lsm_audit.h b/include/linux/lsm_audit.h
+index 915330abf6e5..734d67889826 100644
+--- a/include/linux/lsm_audit.h
++++ b/include/linux/lsm_audit.h
+@@ -74,6 +74,7 @@ struct common_audit_data {
+ #define LSM_AUDIT_DATA_FILE	12
+ #define LSM_AUDIT_DATA_IBPKEY	13
+ #define LSM_AUDIT_DATA_IBENDPORT 14
++#define LSM_AUDIT_DATA_NOTIFICATION 15
+ 	union 	{
+ 		struct path path;
+ 		struct dentry *dentry;
+diff --git a/security/smack/smack_lsm.c b/security/smack/smack_lsm.c
+index 4c5e5a438f8b..1c2a908c6446 100644
+--- a/security/smack/smack_lsm.c
++++ b/security/smack/smack_lsm.c
+@@ -4274,7 +4274,7 @@ static int smack_key_permission(key_ref_t key_ref,
+ 	if (tkp == NULL)
+ 		return -EACCES;
  
-+config SAMPLE_WATCH_QUEUE
-+	bool "Build example /dev/watch_queue notification consumer"
-+	help
-+	  Build example userspace program to use the new mount_notify(),
-+	  sb_notify() syscalls and the KEYCTL_WATCH_KEY keyctl() function.
+-	if (smack_privileged_cred(CAP_MAC_OVERRIDE, cred))
++	if (smack_privileged(CAP_MAC_OVERRIDE))
+ 		return 0;
+ 
+ #ifdef CONFIG_AUDIT
+@@ -4320,8 +4320,81 @@ static int smack_key_getsecurity(struct key *key, char **_buffer)
+ 	return length;
+ }
+ 
 +
- endif # SAMPLES
-diff --git a/samples/Makefile b/samples/Makefile
-index 7d6e4ca28d69..a61a39047d02 100644
---- a/samples/Makefile
-+++ b/samples/Makefile
-@@ -20,3 +20,4 @@ obj-$(CONFIG_SAMPLE_TRACE_PRINTK)	+= trace_printk/
- obj-$(CONFIG_VIDEO_PCI_SKELETON)	+= v4l/
- obj-y					+= vfio-mdev/
- subdir-$(CONFIG_SAMPLE_VFS)		+= vfs
-+subdir-$(CONFIG_SAMPLE_WATCH_QUEUE)	+= watch_queue
-diff --git a/samples/watch_queue/Makefile b/samples/watch_queue/Makefile
-new file mode 100644
-index 000000000000..6ee61e3ca8d2
---- /dev/null
-+++ b/samples/watch_queue/Makefile
-@@ -0,0 +1,8 @@
-+# List of programs to build
-+hostprogs-y := watch_test
-+
-+# Tell kbuild to always build the programs
-+always := $(hostprogs-y)
-+
-+HOSTCFLAGS_watch_test.o += -I$(objtree)/usr/include
-+HOSTLDLIBS_watch_test += -lkeyutils
-diff --git a/samples/watch_queue/watch_test.c b/samples/watch_queue/watch_test.c
-new file mode 100644
-index 000000000000..ecc191174b7a
---- /dev/null
-+++ b/samples/watch_queue/watch_test.c
-@@ -0,0 +1,231 @@
-+// SPDX-License-Identifier: GPL-2.0
-+/* Use /dev/watch_queue to watch for notifications.
++#ifdef CONFIG_KEY_NOTIFICATIONS
++/**
++ * smack_watch_key - Smack access to watch a key for notifications.
++ * @key: The key to be watched
 + *
-+ * Copyright (C) 2019 Red Hat, Inc. All Rights Reserved.
-+ * Written by David Howells (dhowells@redhat.com)
++ * Return 0 if the @watch->cred has permission to read from the key object and
++ * an error otherwise.
 + */
++static int smack_watch_key(struct key *key)
++{
++	struct smk_audit_info ad;
++	struct smack_known *tkp = smk_of_current();
++	int rc;
 +
-+#include <stdbool.h>
-+#include <stdarg.h>
-+#include <stdio.h>
-+#include <stdlib.h>
-+#include <string.h>
-+#include <signal.h>
-+#include <unistd.h>
-+#include <fcntl.h>
-+#include <dirent.h>
-+#include <errno.h>
-+#include <sys/wait.h>
-+#include <sys/ioctl.h>
-+#include <sys/mman.h>
-+#include <poll.h>
-+#include <limits.h>
-+#include <linux/watch_queue.h>
-+#include <linux/unistd.h>
-+#include <linux/keyctl.h>
++	if (key == NULL)
++		return -EINVAL;
++	/*
++	 * If the key hasn't been initialized give it access so that
++	 * it may do so.
++	 */
++	if (key->security == NULL)
++		return 0;
++	/*
++	 * This should not occur
++	 */
++	if (tkp == NULL)
++		return -EACCES;
 +
-+#ifndef KEYCTL_WATCH_KEY
-+#define KEYCTL_WATCH_KEY -1
++	if (smack_privileged_cred(CAP_MAC_OVERRIDE, current_cred()))
++		return 0;
++
++#ifdef CONFIG_AUDIT
++	smk_ad_init(&ad, __func__, LSM_AUDIT_DATA_KEY);
++	ad.a.u.key_struct.key = key->serial;
++	ad.a.u.key_struct.key_desc = key->description;
 +#endif
-+#ifndef __NR_watch_devices
-+#define __NR_watch_devices -1
-+#endif
-+
-+#define BUF_SIZE 4
-+
-+static long keyctl_watch_key(int key, int watch_fd, int watch_id)
-+{
-+	return syscall(__NR_keyctl, KEYCTL_WATCH_KEY, key, watch_fd, watch_id);
++	rc = smk_access(tkp, key->security, MAY_READ, &ad);
++	rc = smk_bu_note("key watch", tkp, key->security, MAY_READ, rc);
++	return rc;
 +}
-+
-+static const char *key_subtypes[256] = {
-+	[NOTIFY_KEY_INSTANTIATED]	= "instantiated",
-+	[NOTIFY_KEY_UPDATED]		= "updated",
-+	[NOTIFY_KEY_LINKED]		= "linked",
-+	[NOTIFY_KEY_UNLINKED]		= "unlinked",
-+	[NOTIFY_KEY_CLEARED]		= "cleared",
-+	[NOTIFY_KEY_REVOKED]		= "revoked",
-+	[NOTIFY_KEY_INVALIDATED]	= "invalidated",
-+	[NOTIFY_KEY_SETATTR]		= "setattr",
-+};
-+
-+static void saw_key_change(struct watch_notification *n)
-+{
-+	struct key_notification *k = (struct key_notification *)n;
-+	unsigned int len = (n->info & WATCH_INFO_LENGTH) >> WATCH_INFO_LENGTH__SHIFT;
-+
-+	if (len != sizeof(struct key_notification) / WATCH_LENGTH_GRANULARITY)
-+		return;
-+
-+	printf("KEY %08x change=%u[%s] aux=%u\n",
-+	       k->key_id, n->subtype, key_subtypes[n->subtype], k->aux);
-+}
-+
-+static const char *block_subtypes[256] = {
-+	[NOTIFY_BLOCK_ERROR_TIMEOUT]			= "timeout",
-+	[NOTIFY_BLOCK_ERROR_NO_SPACE]			= "critical space allocation",
-+	[NOTIFY_BLOCK_ERROR_RECOVERABLE_TRANSPORT]	= "recoverable transport",
-+	[NOTIFY_BLOCK_ERROR_CRITICAL_TARGET]		= "critical target",
-+	[NOTIFY_BLOCK_ERROR_CRITICAL_NEXUS]		= "critical nexus",
-+	[NOTIFY_BLOCK_ERROR_CRITICAL_MEDIUM]		= "critical medium",
-+	[NOTIFY_BLOCK_ERROR_PROTECTION]			= "protection",
-+	[NOTIFY_BLOCK_ERROR_KERNEL_RESOURCE]		= "kernel resource",
-+	[NOTIFY_BLOCK_ERROR_DEVICE_RESOURCE]		= "device resource",
-+	[NOTIFY_BLOCK_ERROR_IO]				= "I/O",
-+};
-+
-+static void saw_block_change(struct watch_notification *n)
-+{
-+	struct block_notification *b = (struct block_notification *)n;
-+	unsigned int len = (n->info & WATCH_INFO_LENGTH) >> WATCH_INFO_LENGTH__SHIFT;
-+
-+	if (len < sizeof(struct block_notification) / WATCH_LENGTH_GRANULARITY)
-+		return;
-+
-+	printf("BLOCK %08llx e=%u[%s] s=%llx\n",
-+	       (unsigned long long)b->dev,
-+	       n->subtype, block_subtypes[n->subtype],
-+	       (unsigned long long)b->sector);
-+}
-+
-+static const char *usb_subtypes[256] = {
-+	[NOTIFY_USB_DEVICE_ADD]		= "dev-add",
-+	[NOTIFY_USB_DEVICE_REMOVE]	= "dev-remove",
-+	[NOTIFY_USB_DEVICE_RESET]	= "dev-reset",
-+	[NOTIFY_USB_DEVICE_ERROR]	= "dev-error",
-+};
-+
-+static void saw_usb_event(struct watch_notification *n)
-+{
-+	struct usb_notification *u = (struct usb_notification *)n;
-+	unsigned int len = (n->info & WATCH_INFO_LENGTH) >> WATCH_INFO_LENGTH__SHIFT;
-+
-+	if (len < sizeof(struct usb_notification) / WATCH_LENGTH_GRANULARITY)
-+		return;
-+
-+	printf("USB %*.*s %s e=%x r=%x\n",
-+	       u->name_len, u->name_len, u->name,
-+	       usb_subtypes[n->subtype],
-+	       u->error, u->reserved);
-+}
-+
-+/*
-+ * Consume and display events.
++#endif /* CONFIG_KEY_NOTIFICATIONS */
+ #endif /* CONFIG_KEYS */
+ 
++#ifdef CONFIG_WATCH_QUEUE
++/**
++ * smack_post_notification - Smack access to post a notification to a queue
++ * @w_cred: The credentials of the watcher.
++ * @cred: The credentials of the event source (may be NULL).
++ * @n: The notification message to be posted.
 + */
-+static int consumer(int fd, struct watch_queue_buffer *buf)
++static int smack_post_notification(const struct cred *w_cred,
++				   const struct cred *cred,
++				   struct watch_notification *n)
 +{
-+	struct watch_notification *n;
-+	struct pollfd p[1];
-+	unsigned int head, tail, mask = buf->meta.mask;
++	struct smk_audit_info ad;
++	struct smack_known *subj, *obj;
++	int rc;
 +
-+	for (;;) {
-+		p[0].fd = fd;
-+		p[0].events = POLLIN | POLLERR;
-+		p[0].revents = 0;
++	/* Always let maintenance notifications through. */
++	if (n->type == WATCH_TYPE_META)
++		return 0;
 +
-+		if (poll(p, 1, -1) == -1) {
-+			perror("poll");
-+			break;
-+		}
++	if (!cred)
++		return 0;
++	subj = smk_of_task(smack_cred(cred));
++	obj = smk_of_task(smack_cred(w_cred));
 +
-+		printf("ptrs h=%x t=%x m=%x\n",
-+		       buf->meta.head, buf->meta.tail, buf->meta.mask);
-+
-+		while (head = __atomic_load_n(&buf->meta.head, __ATOMIC_ACQUIRE),
-+		       tail = buf->meta.tail,
-+		       tail != head
-+		       ) {
-+			n = &buf->slots[tail & mask];
-+			printf("NOTIFY[%08x-%08x] ty=%04x sy=%04x i=%08x\n",
-+			       head, tail, n->type, n->subtype, n->info);
-+			if ((n->info & WATCH_INFO_LENGTH) == 0)
-+				goto out;
-+
-+			switch (n->type) {
-+			case WATCH_TYPE_META:
-+				if (n->subtype == WATCH_META_REMOVAL_NOTIFICATION)
-+					printf("REMOVAL of watchpoint %08x\n",
-+					       (n->info & WATCH_INFO_ID) >>
-+					       WATCH_INFO_ID__SHIFT);
-+				break;
-+			case WATCH_TYPE_KEY_NOTIFY:
-+				saw_key_change(n);
-+				break;
-+			case WATCH_TYPE_BLOCK_NOTIFY:
-+				saw_block_change(n);
-+				break;
-+			case WATCH_TYPE_USB_NOTIFY:
-+				saw_usb_event(n);
-+				break;
-+			}
-+
-+			tail += (n->info & WATCH_INFO_LENGTH) >> WATCH_INFO_LENGTH__SHIFT;
-+			__atomic_store_n(&buf->meta.tail, tail, __ATOMIC_RELEASE);
-+		}
-+	}
-+
-+out:
-+	return 0;
++	smk_ad_init(&ad, __func__, LSM_AUDIT_DATA_NOTIFICATION);
++	rc = smk_access(subj, obj, MAY_WRITE, &ad);
++	rc = smk_bu_note("notification", subj, obj, MAY_WRITE, rc);
++	return rc;
 +}
++#endif /* CONFIG_WATCH_QUEUE */
 +
-+static struct watch_notification_filter filter = {
-+	.nr_filters	= 3,
-+	.__reserved	= 0,
-+	.filters = {
-+		[0]	= {
-+			.type			= WATCH_TYPE_KEY_NOTIFY,
-+			.subtype_filter[0]	= UINT_MAX,
-+		},
-+		[1]	= {
-+			.type			= WATCH_TYPE_BLOCK_NOTIFY,
-+			.subtype_filter[0]	= UINT_MAX,
-+		},
-+		[2]	= {
-+			.type			= WATCH_TYPE_USB_NOTIFY,
-+			.subtype_filter[0]	= UINT_MAX,
-+		},
-+	},
-+};
+ /*
+  * Smack Audit hooks
+  *
+@@ -4710,8 +4783,15 @@ static struct security_hook_list smack_hooks[] __lsm_ro_after_init = {
+ 	LSM_HOOK_INIT(key_free, smack_key_free),
+ 	LSM_HOOK_INIT(key_permission, smack_key_permission),
+ 	LSM_HOOK_INIT(key_getsecurity, smack_key_getsecurity),
++#ifdef CONFIG_KEY_NOTIFICATIONS
++	LSM_HOOK_INIT(watch_key, smack_watch_key),
++#endif
+ #endif /* CONFIG_KEYS */
+ 
++#ifdef CONFIG_WATCH_QUEUE
++	LSM_HOOK_INIT(post_notification, smack_post_notification),
++#endif
 +
-+int main(int argc, char **argv)
-+{
-+	struct watch_queue_buffer *buf;
-+	size_t page_size;
-+	int fd;
-+
-+	fd = open("/dev/watch_queue", O_RDWR);
-+	if (fd == -1) {
-+		perror("/dev/watch_queue");
-+		exit(1);
-+	}
-+
-+	if (ioctl(fd, IOC_WATCH_QUEUE_SET_SIZE, BUF_SIZE) == -1) {
-+		perror("/dev/watch_queue(size)");
-+		exit(1);
-+	}
-+
-+	if (ioctl(fd, IOC_WATCH_QUEUE_SET_FILTER, &filter) == -1) {
-+		perror("/dev/watch_queue(filter)");
-+		exit(1);
-+	}
-+
-+	page_size = sysconf(_SC_PAGESIZE);
-+	buf = mmap(NULL, BUF_SIZE * page_size, PROT_READ | PROT_WRITE,
-+		   MAP_SHARED, fd, 0);
-+	if (buf == MAP_FAILED) {
-+		perror("mmap");
-+		exit(1);
-+	}
-+
-+	if (keyctl_watch_key(KEY_SPEC_SESSION_KEYRING, fd, 0x01) == -1) {
-+		perror("keyctl");
-+		exit(1);
-+	}
-+
-+	if (syscall(__NR_watch_devices, fd, 0x04, 0) == -1) {
-+		perror("watch_devices");
-+		exit(1);
-+	}
-+
-+	return consumer(fd, buf);
-+}
+  /* Audit hooks */
+ #ifdef CONFIG_AUDIT
+ 	LSM_HOOK_INIT(audit_rule_init, smack_audit_rule_init),
 
