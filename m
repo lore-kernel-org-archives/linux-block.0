@@ -4,73 +4,69 @@ X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 X-Spam-Level: 
 X-Spam-Status: No, score=-2.2 required=3.0 tests=DKIM_SIGNED,DKIM_VALID,
 	HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,
-	URIBL_BLOCKED,USER_AGENT_SANE_1 autolearn=no autolearn_force=no version=3.4.0
+	USER_AGENT_SANE_1 autolearn=no autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id B5AF9C3A5A7
-	for <linux-block@archiver.kernel.org>; Wed,  4 Sep 2019 12:57:00 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 17020C3A5A7
+	for <linux-block@archiver.kernel.org>; Wed,  4 Sep 2019 13:00:52 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.kernel.org (Postfix) with ESMTP id 87F6C2073F
-	for <linux-block@archiver.kernel.org>; Wed,  4 Sep 2019 12:57:00 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id D756F2073F
+	for <linux-block@archiver.kernel.org>; Wed,  4 Sep 2019 13:00:51 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel-dk.20150623.gappssmtp.com header.i=@kernel-dk.20150623.gappssmtp.com header.b="kdG9noEp"
+	dkim=pass (2048-bit key) header.d=kernel-dk.20150623.gappssmtp.com header.i=@kernel-dk.20150623.gappssmtp.com header.b="o+0TO2k8"
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1727083AbfIDM5A (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Wed, 4 Sep 2019 08:57:00 -0400
-Received: from mail-io1-f65.google.com ([209.85.166.65]:34172 "EHLO
-        mail-io1-f65.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1726528AbfIDM47 (ORCPT
-        <rfc822;linux-block@vger.kernel.org>); Wed, 4 Sep 2019 08:56:59 -0400
-Received: by mail-io1-f65.google.com with SMTP id s21so44013539ioa.1
-        for <linux-block@vger.kernel.org>; Wed, 04 Sep 2019 05:56:59 -0700 (PDT)
+        id S1729773AbfIDNAv (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Wed, 4 Sep 2019 09:00:51 -0400
+Received: from mail-io1-f43.google.com ([209.85.166.43]:43884 "EHLO
+        mail-io1-f43.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S1729471AbfIDNAv (ORCPT
+        <rfc822;linux-block@vger.kernel.org>); Wed, 4 Sep 2019 09:00:51 -0400
+Received: by mail-io1-f43.google.com with SMTP id u185so40145923iod.10
+        for <linux-block@vger.kernel.org>; Wed, 04 Sep 2019 06:00:50 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=kernel-dk.20150623.gappssmtp.com; s=20150623;
-        h=subject:to:references:from:message-id:date:user-agent:mime-version
-         :in-reply-to:content-language:content-transfer-encoding;
-        bh=75iMfH7EEXhbGGrWPnlP6nj0Xir+moE5RQ+sKgLPRNY=;
-        b=kdG9noEpHEHEBAQRW2XMpdpvLr511vFWRb6qxgP+Q6UPrnAn8JxFi39xw2eqlADNHV
-         Bxt5LCA9y0Tk/5AyDOoKB/A6bnbywBAUrDiG7YgmnvYBLLYsI7EaWRcPNMVfhcRPGU+i
-         gbuAUMojbQpIqkv4GJ6zE9Jehrd0RcywdkHQjKPxDOYq4tMQro8/luMwv1bXuoiLeT5Y
-         kxJJFx8o3ZyG5mBqnaLjErbNe8z+lQBHqLqH8lm4iis9RvmAVZ39mop9GRJyDprJG6Zi
-         Q3HKqoD+nt5FZxALgfs+Gau8qrKWbJy5Ci8xuzMlrz5qDBbWGFeP6uYPdiwSUwTr8hVF
-         j39g==
+        h=subject:to:cc:references:from:message-id:date:user-agent
+         :mime-version:in-reply-to:content-language:content-transfer-encoding;
+        bh=kHvsYIPVyPrUtgXpVzAKmikiV88yaoyBN+SV18aGzfc=;
+        b=o+0TO2k8SoJIAwfT9TRLi5C8byPw+7nvaqcYwe//baieUHhw5qm83ledVB/SjoRISi
+         wSDkbN8Punu6GfZw4fS9hNjrmMAprZp7f+wNzZ5nVpIbpEEjXrX1V3PI5ax/As5jkk9l
+         jsFM23M6x/vqubYu9FQUcz4Dg5GWWbT3sDl2IHjSdOvELeq6v2dhe9bExAbPmDLaxcgK
+         GE2qema3nwelZ2WtfghharRGbklxGQxjzgRIG7qNmRFUDeAtaJmATCDnbzP4N3DARmRo
+         +q9jlPRI9YCTEUA1UwVU2MFFnJLu35W4v/3tWihfIiQ8566gPdSkHR6R9RFEp62UveLl
+         Tssg==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=1e100.net; s=20161025;
-        h=x-gm-message-state:subject:to:references:from:message-id:date
+        h=x-gm-message-state:subject:to:cc:references:from:message-id:date
          :user-agent:mime-version:in-reply-to:content-language
          :content-transfer-encoding;
-        bh=75iMfH7EEXhbGGrWPnlP6nj0Xir+moE5RQ+sKgLPRNY=;
-        b=Z8yIAgxPDj3vx4C85FaCa0eK1pQXMzgkO2xaz89b0dmpeXBXaDwUPFCz+QBwdn4a8R
-         ATAd3d0MG/s/Dzc9Y3n1Uch1dk0CMrXWanwnGdojv0OdLT1K8Ul4vLI2RVl5Je7TLmkq
-         l/NZeN0BDG4KBJnmZAxGS8OcsW/vplr5SYbmBiQffd3WjzmytWrLH6QpHnvONhx4ZCqW
-         q99mwtxN1scZDu9AXWDqEaPZR73GV724o31Hbt4RFzkGcS/eCLxaddVTPUhA2vaAkKJE
-         PapTwuur46I4jCnfxpUDV8ZnyHkq1iSoZlZNLxB/Pj30XP9w8TeDNfvJxgVnApwnvSq/
-         LLwg==
-X-Gm-Message-State: APjAAAUJM7waU/0XeA2Oezs7pynJ3+aMy0J8TURpeavnuifdN2YhZ9tg
-        Ya81KCemANaY7hXseOIyTHBLa3gFMyArzQ==
-X-Google-Smtp-Source: APXvYqxOc9zhjcAdOOZR/ZoC0fv44rZYBtSMM14qc1QfkygD/0cSMfcO48ZA37T8nh7y6BWeNxrR5g==
-X-Received: by 2002:a5d:8e15:: with SMTP id e21mr25845056iod.296.1567601819078;
-        Wed, 04 Sep 2019 05:56:59 -0700 (PDT)
+        bh=kHvsYIPVyPrUtgXpVzAKmikiV88yaoyBN+SV18aGzfc=;
+        b=f24JhaRRpWS85yXKQOOhw+WbPE1J/M7U7VqTqKKLh5suVqhPznqObKz79Nb3iN/6ze
+         HsBAv8NILgUP6Xvgp6+uykk2/GEHuEQ0kKRp4JCIOxCnUQo88yBSa0xpD1OKjrJEaVPd
+         1bJFMzsur3XjPIIryhq8acCqi/Mp6cUC+6vbyKvWYQ4BB+nTmDAEPnGMAaOGguXP9llx
+         vCke4fNQKcw7hvZWmPRYILpunXk7gwphwafgwb3aLxSGu5pMvxwqFiqkOP9ygQOdC1YG
+         2Xa4gc10NxVjVTNeOmlzR7Q+W+pmwDlse1VYeOTEwCJaCgFJtj1dOHjcO2TjUU0w/wfl
+         HOYg==
+X-Gm-Message-State: APjAAAVzw6G8LTdxplN92VcndztJKRX8vqYlXHzjZj4IlhpCS06MXule
+        NsO8mYJqbBmpMvj9092Y87jzkAzd3bkAnQ==
+X-Google-Smtp-Source: APXvYqyWF+7bVvowkNAZ+b7/sOOvaLn03RkgWOK2E18DVwlXndUmwpT8RGqc2PvD0B5p4bdk1HGwdA==
+X-Received: by 2002:a6b:7e45:: with SMTP id k5mr43254533ioq.178.1567602050373;
+        Wed, 04 Sep 2019 06:00:50 -0700 (PDT)
 Received: from [192.168.1.50] ([65.144.74.34])
-        by smtp.gmail.com with ESMTPSA id l13sm21622537iob.73.2019.09.04.05.56.57
+        by smtp.gmail.com with ESMTPSA id s5sm17295423iol.88.2019.09.04.06.00.48
         (version=TLS1_2 cipher=ECDHE-RSA-AES128-GCM-SHA256 bits=128/128);
-        Wed, 04 Sep 2019 05:56:58 -0700 (PDT)
-Subject: Re: [PATCH v3 5/7] block: Delay default elevator initialization
-To:     Damien Le Moal <Damien.LeMoal@wdc.com>,
-        Johannes Thumshirn <jthumshirn@suse.de>,
-        "linux-block@vger.kernel.org" <linux-block@vger.kernel.org>,
-        "linux-scsi@vger.kernel.org" <linux-scsi@vger.kernel.org>,
-        "Martin K . Petersen" <martin.petersen@oracle.com>
-References: <20190904084247.23338-1-damien.lemoal@wdc.com>
- <20190904084247.23338-6-damien.lemoal@wdc.com>
- <22bc754b-541d-3c72-6bb0-68cd841faee5@suse.de>
- <BYAPR04MB5816ADDE69D61A3CB47DCC3FE7B80@BYAPR04MB5816.namprd04.prod.outlook.com>
+        Wed, 04 Sep 2019 06:00:49 -0700 (PDT)
+Subject: Re: [PATCH] paride/pf: need to set queue to NULL before put_disk
+To:     zhengbin <zhengbin13@huawei.com>, tim@cyberelk.net,
+        linux-block@vger.kernel.org
+Cc:     yi.zhang@huawei.com
+References: <1565686784-50375-1-git-send-email-zhengbin13@huawei.com>
+ <1565686784-50375-2-git-send-email-zhengbin13@huawei.com>
 From:   Jens Axboe <axboe@kernel.dk>
-Message-ID: <68bd56dd-46cf-efa3-14f2-4f8e50ac15c0@kernel.dk>
-Date:   Wed, 4 Sep 2019 06:56:56 -0600
+Message-ID: <7b830da4-eeae-f2cf-22e5-5fe706b23040@kernel.dk>
+Date:   Wed, 4 Sep 2019 07:00:48 -0600
 User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:60.0) Gecko/20100101
  Thunderbird/60.8.0
 MIME-Version: 1.0
-In-Reply-To: <BYAPR04MB5816ADDE69D61A3CB47DCC3FE7B80@BYAPR04MB5816.namprd04.prod.outlook.com>
+In-Reply-To: <1565686784-50375-2-git-send-email-zhengbin13@huawei.com>
 Content-Type: text/plain; charset=utf-8
 Content-Language: en-US
 Content-Transfer-Encoding: 7bit
@@ -79,24 +75,16 @@ Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-On 9/4/19 3:02 AM, Damien Le Moal wrote:
-> On 2019/09/04 17:56, Johannes Thumshirn wrote:
->> On 04/09/2019 10:42, Damien Le Moal wrote:
->>> @@ -734,6 +741,7 @@ static void __device_add_disk(struct device *parent, struct gendisk *disk,
->>>   				    exact_match, exact_lock, disk);
->>>   	}
->>>   	register_disk(parent, disk, groups);
->>> +
->>>   	if (register_queue)
->>>   		blk_register_queue(disk);
->>
->> That hunk looks unrelated, but anyways:
->> Reviewed-by: Johannes Thumshirn <jthumshirn@suse.de>
+On 8/13/19 2:59 AM, zhengbin wrote:
+> In pf_init_units, if blk_mq_init_sq_queue fails, need to set queue to
+> NULL before put_disk, otherwise null-ptr-deref Read will occur.
 > 
-> Oops. Yes, did not delete the blank line when I moved elevator_init_mq() call.
-> Jens, should I resend a v4 to fix this ?
+> put_disk
+>    kobject_put
+>      disk_release
+>        blk_put_queue(disk->queue)
 
-Series looks good to me, I'll just delete this one hunk, not a big deal.
+Thanks, applied.
 
 -- 
 Jens Axboe
