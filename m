@@ -6,77 +6,89 @@ X-Spam-Status: No, score=-2.2 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
 	MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,USER_AGENT_SANE_1 autolearn=no
 	autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 34B8AC3A5A8
-	for <linux-block@archiver.kernel.org>; Wed,  4 Sep 2019 17:49:17 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 0CB88C3A5A8
+	for <linux-block@archiver.kernel.org>; Wed,  4 Sep 2019 17:51:47 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.kernel.org (Postfix) with ESMTP id 15F6321670
-	for <linux-block@archiver.kernel.org>; Wed,  4 Sep 2019 17:49:17 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id DB6D721670
+	for <linux-block@archiver.kernel.org>; Wed,  4 Sep 2019 17:51:46 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1729963AbfIDRtQ (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Wed, 4 Sep 2019 13:49:16 -0400
-Received: from mail-pf1-f196.google.com ([209.85.210.196]:40846 "EHLO
-        mail-pf1-f196.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1729594AbfIDRtQ (ORCPT
-        <rfc822;linux-block@vger.kernel.org>); Wed, 4 Sep 2019 13:49:16 -0400
-Received: by mail-pf1-f196.google.com with SMTP id x127so1015676pfb.7
-        for <linux-block@vger.kernel.org>; Wed, 04 Sep 2019 10:49:15 -0700 (PDT)
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20161025;
-        h=x-gm-message-state:subject:to:cc:references:from:message-id:date
-         :user-agent:mime-version:in-reply-to:content-language
-         :content-transfer-encoding;
-        bh=bXjlaA+cJTDpBVthjWSEhfdyBmu64WqVPQD2IzEDFds=;
-        b=TwqyGRhEihDRKofkmS7NN8IhVvg1YqXFjJuxuxIYaBAvRZx3YlCDCUibPBYyxGFIQj
-         zkVf/cnJduQuappGqfcx7XepkUS8gyfrP08HbVWmJ/WFS/fA2GGO7J5KePD0lA0fv6sE
-         8dacvRxJPNMWUXudrGu6LHHhuOkZWUeP6FYb1CboUpOiWlxbrOnwOjmPbdW4xlVOFfKw
-         /BvuFWp6MvZ5jzzQ0kpTzvT7vTsHZ7FrH4v9JcGqqdlOAkZACq4d9smyBNu0eLploTkX
-         ilKamqgV4OK3BD0BmU4ZcQO3dKk4WtNOCDpKWDoTp/SCAiPpevtNuI3c7sbwfSKDG5or
-         9nNg==
-X-Gm-Message-State: APjAAAX5J10mbT9WyntR/vcKqtykLEgD+EZ8PZeCj4Bo1fGX0PiUylYC
-        5fUXYPivt6LWyRSw4kfFTHk=
-X-Google-Smtp-Source: APXvYqxccRPpld0d1hn+tS5K6QNf35w6UuU4NxDkC5OUHgiwyvDkqFUEtkpLaoOwS8eTLclTGSVLoA==
-X-Received: by 2002:a17:90a:8d0c:: with SMTP id c12mr6250486pjo.119.1567619355315;
-        Wed, 04 Sep 2019 10:49:15 -0700 (PDT)
-Received: from desktop-bart.svl.corp.google.com ([2620:15c:2cd:202:4308:52a3:24b6:2c60])
-        by smtp.gmail.com with ESMTPSA id i74sm11432392pfe.28.2019.09.04.10.49.14
-        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
-        Wed, 04 Sep 2019 10:49:14 -0700 (PDT)
-Subject: Re: [PATCH blktests 0/4] Four blktests patches
-To:     Omar Sandoval <osandov@fb.com>
-Cc:     linux-block@vger.kernel.org,
-        Johannes Thumshirn <jthumshirn@suse.de>,
-        Logan Gunthorpe <logang@deltatee.com>
-References: <20190808200506.186137-1-bvanassche@acm.org>
-From:   Bart Van Assche <bvanassche@acm.org>
-Message-ID: <2e2e3abb-1420-7743-eb7f-cd9744d36686@acm.org>
-Date:   Wed, 4 Sep 2019 10:49:13 -0700
-User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:60.0) Gecko/20100101
- Thunderbird/60.8.0
+        id S1730289AbfIDRvq (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Wed, 4 Sep 2019 13:51:46 -0400
+Received: from verein.lst.de ([213.95.11.211]:41045 "EHLO verein.lst.de"
+        rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
+        id S1726495AbfIDRvq (ORCPT <rfc822;linux-block@vger.kernel.org>);
+        Wed, 4 Sep 2019 13:51:46 -0400
+Received: by verein.lst.de (Postfix, from userid 2407)
+        id 97B6C227A81; Wed,  4 Sep 2019 19:51:42 +0200 (CEST)
+Date:   Wed, 4 Sep 2019 19:51:42 +0200
+From:   Christoph Hellwig <hch@lst.de>
+To:     Max Gurtovoy <maxg@mellanox.com>
+Cc:     linux-block@vger.kernel.org, axboe@kernel.dk,
+        martin.petersen@oracle.com, linux-nvme@lists.infradead.org,
+        keith.busch@intel.com, hch@lst.de, sagi@grimberg.me,
+        shlomin@mellanox.com, israelr@mellanox.com
+Subject: Re: [PATCH v2 1/1] block: centralize PI remapping logic to the
+ block layer
+Message-ID: <20190904175142.GA21990@lst.de>
+References: <1567614452-26251-1-git-send-email-maxg@mellanox.com>
 MIME-Version: 1.0
-In-Reply-To: <20190808200506.186137-1-bvanassche@acm.org>
-Content-Type: text/plain; charset=utf-8; format=flowed
-Content-Language: en-US
-Content-Transfer-Encoding: 7bit
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <1567614452-26251-1-git-send-email-maxg@mellanox.com>
+User-Agent: Mutt/1.5.17 (2007-11-01)
 Sender: linux-block-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-On 8/8/19 1:05 PM, Bart Van Assche wrote:
-> Hi Omar,
-> 
-> This series includes one improvement for the NVMe tests, two improvements for
-> the NVMeOF-multipath tests and version two of the SRP test that triggers a SCSI
-> reset while I/O is ongoing. Please consider these for the official blktests
-> git repository.
+On Wed, Sep 04, 2019 at 07:27:32PM +0300, Max Gurtovoy wrote:
+> @@ -1405,6 +1406,11 @@ bool blk_update_request(struct request *req, blk_status_t error,
+>  	if (!req->bio)
+>  		return false;
+>  
+> +	if (blk_integrity_rq(req) && req_op(req) == REQ_OP_READ &&
+> +	    error == BLK_STS_OK)
+> +		t10_pi_complete(req,
+> +			nr_bytes >> blk_integrity_interval_shift(req->q));
 
-(replying to my own e-mail)
+I think it would be nicer to just pass nr_bytes to t10_pi_complete and 
+do the calculation internally.  That keeps the caller a littler cleaner.
 
-Hi Omar,
+> -void t10_pi_prepare(struct request *rq, u8 protection_type)
+> +void t10_pi_prepare(struct request *rq)
+>  {
+> +	u8 protection_type = rq->rq_disk->protection_type;
 
-This patch series was posted about one month ago. Feedback about how to
-proceed with this patch series is still welcome.
+The protection_type variable is only used once, so we might as well
+remove it.
 
-Thanks,
+> +void t10_pi_complete(struct request *rq, unsigned int intervals)
+>  {
+> +	u8 protection_type = rq->rq_disk->protection_type;
 
-Bart.
+Same here.
+
+> +static void nvme_set_disk_prot_type(struct nvme_ns *ns, struct gendisk *disk)
+> +{
+> +	switch (ns->pi_type) {
+> +	case NVME_NS_DPS_PI_TYPE1:
+> +		disk->protection_type = T10_PI_TYPE1_PROTECTION;
+> +		break;
+> +	case NVME_NS_DPS_PI_TYPE2:
+> +		disk->protection_type = T10_PI_TYPE2_PROTECTION;
+> +		break;
+> +	case NVME_NS_DPS_PI_TYPE3:
+> +		disk->protection_type = T10_PI_TYPE3_PROTECTION;
+> +		break;
+> +	default:
+> +		disk->protection_type = T10_PI_TYPE0_PROTECTION;
+> +		break;
+> +	}
+> +}
+
+We just passed the value in direttly before, so I think we can keep
+it that way.  In fact it might make sense to just remove the
+NVME_NS_DPS_PI_TYPE* values entirely (in a separate patch).
+
+But I think we should remove the pi_type field in struct nvme_ns here,
+just like in sd.
