@@ -2,155 +2,349 @@ Return-Path: <SRS0=DC0a=XA=vger.kernel.org=linux-block-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-0.7 required=3.0 tests=DKIM_SIGNED,DKIM_VALID,
-	HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,
-	URIBL_BLOCKED autolearn=no autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-8.2 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
+	INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,
+	URIBL_BLOCKED,USER_AGENT_SANE_1 autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 165E4C3A5A5
-	for <linux-block@archiver.kernel.org>; Thu,  5 Sep 2019 04:30:40 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 8BF6CC3A5A5
+	for <linux-block@archiver.kernel.org>; Thu,  5 Sep 2019 06:06:01 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.kernel.org (Postfix) with ESMTP id C21E02080C
-	for <linux-block@archiver.kernel.org>; Thu,  5 Sep 2019 04:30:39 +0000 (UTC)
-Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (2048-bit key) header.d=wdc.com header.i=@wdc.com header.b="OG7TLAGp";
-	dkim=pass (1024-bit key) header.d=sharedspace.onmicrosoft.com header.i=@sharedspace.onmicrosoft.com header.b="Z0LCIScI"
+	by mail.kernel.org (Postfix) with ESMTP id 5B5B621743
+	for <linux-block@archiver.kernel.org>; Thu,  5 Sep 2019 06:06:01 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1730524AbfIEEaj (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Thu, 5 Sep 2019 00:30:39 -0400
-Received: from esa4.hgst.iphmx.com ([216.71.154.42]:49085 "EHLO
-        esa4.hgst.iphmx.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1725921AbfIEEaj (ORCPT
-        <rfc822;linux-block@vger.kernel.org>); Thu, 5 Sep 2019 00:30:39 -0400
-DKIM-Signature: v=1; a=rsa-sha256; c=simple/simple;
-  d=wdc.com; i=@wdc.com; q=dns/txt; s=dkim.wdc.com;
-  t=1567657838; x=1599193838;
-  h=from:to:subject:date:message-id:references:
-   content-transfer-encoding:mime-version;
-  bh=ym8mqyJA38G31WMTpJxRxGcOovRBhTSMWcqct5LY0pY=;
-  b=OG7TLAGpt6hwMDcNZ2/HfZVlWV883oZbK+U+/MeN9ZNMpjsrDq3XNGK3
-   ga7XV6jB7qkwTr6TbQU/VzqurdzHOwIS1R4Tu+WfZUdRXIzJp80ha+Kcs
-   LZHnLofsVstyEMWlagdchZfvAMVq+uF4AedGVowpeUyrBj3326G2WfvW3
-   D0Buu8rMBK0ymNLCo228rjj11oW+btwpgS5Znhj+oQ5V82S2+oymGdCHj
-   2/FYNpZjWSCah7emKdkiUsqkXasZvbJGNPvRYHytq6IgqVLgAPHm/wOqY
-   TIyn9cG5pdcYJ3C18pvDclIemgYnUxSPa0JFoN9iCcYL/sCDbf+NPdlNh
-   Q==;
-IronPort-SDR: /W6IYbHQXS38kX0SAuNYjWIRQs4IqRNvggpRmd4JOy6QqDuQTAdAbUXhTTHrgGxIOjYrhwqE8T
- UWHeRnJqmYAVA05+4Tu9GIM4qUMGgT5957IPe6yrlxjVsq89echqiS+TfL2wrZb9IMV7r6FbTi
- oTK2OmVLLyFfklYw53cBTLbzfSA5wWyyZ2axdZgioZ/G09Px7Q7azokEyI6cgkm6kzgTa+NtwS
- /1njGKl1d57P4e804Wl3Wbxb397drMV9K0kAzdlaxYKtJaL6HO8pVtXKE1mLbfRbn/RVsPJiGs
- 5RI=
-X-IronPort-AV: E=Sophos;i="5.64,469,1559491200"; 
-   d="scan'208";a="117494111"
-Received: from mail-by2nam03lp2056.outbound.protection.outlook.com (HELO NAM03-BY2-obe.outbound.protection.outlook.com) ([104.47.42.56])
-  by ob1.hgst.iphmx.com with ESMTP; 05 Sep 2019 12:30:38 +0800
-ARC-Seal: i=1; a=rsa-sha256; s=arcselector9901; d=microsoft.com; cv=none;
- b=F5kTOkWW2MRzMMZ5F62a6lL7pbkOxR+2/lPKYtPr6I9q8uXeJmk8r2CoRI5wyo4ugvm+iFHP5zt8cEY4XMBBv/MtVJkZX0HIBPI9Jjinf4T0H3WFeSZDmKRm3RWwEowFLntZbyFEw6oTN0GbQjllmIAUi0SqQYOSgksN9HjcrtHiFBwf2PMDNcMmYyRcIqQkZ7qrq3pRYFyxPGINUD91CRq9pjFxpfrcxaQC4+SQD3ZZDJ0pMwGt7ybHUARvHBedrZ++btcRSnEarMwGQTXqn4rjtOZ14LvsttzMHsFfEsTuaHOdPUHgB5VTSNVCfM9AXC/1utzR05DoY0mcMYG0LQ==
-ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com;
- s=arcselector9901;
- h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
- bh=p9dn0blk9IAM1I4tctfERe6usAURzi97izBqf/OxVt0=;
- b=IUS3k3/8OQH4Bo7qguOHt0YGOL0oarBgMqPS12zHqFZ7h5j6PIrkmN7eqG4fTVdFGmuoMze0rKa/AXK/CHCoLrhpJB6ZVfqY4wd+q67jHAUM1gLqVsU9o1sqG5+V+igR6+S5HudXVMS4rX500x5cYZWfrCgK2oVxqSxLtXj5et0fLLb94qE+/ksUPTlx2rbVLlQJZBSQkcKG8Yv+ZFE4XVOOE3YKu3iXAdNZ7HCKqNO65GbRl2OZiI3cZjALB8iY7b2MVl9mkIs2d5KSS2B5cNRHzTGz66XxCqp+cqZhr6V2VIWv1L4V70xfpCcHVelbX/3Zu8TxGHEBn0OvxLzhQg==
-ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass
- smtp.mailfrom=wdc.com; dmarc=pass action=none header.from=wdc.com; dkim=pass
- header.d=wdc.com; arc=none
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
- d=sharedspace.onmicrosoft.com; s=selector2-sharedspace-onmicrosoft-com;
- h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
- bh=p9dn0blk9IAM1I4tctfERe6usAURzi97izBqf/OxVt0=;
- b=Z0LCIScIOf5yPTTLCFgYTnGq8EJEpwDbc1x/68KpKgIewRdCXGrmqs5zK9XrklRrbfxCLDlUiabItsqz4gIIt0tyAAgudxDhf4iVNbKrOrTSWIiao4Al7XZmISkIeaCXfijIx8RzICMm91GtDVPOlrLEi2RGj2AfBC6IhOMjRGg=
-Received: from BYAPR04MB5816.namprd04.prod.outlook.com (20.179.58.207) by
- BYAPR04MB5174.namprd04.prod.outlook.com (20.178.49.11) with Microsoft SMTP
- Server (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
- 15.20.2241.14; Thu, 5 Sep 2019 04:30:36 +0000
-Received: from BYAPR04MB5816.namprd04.prod.outlook.com
- ([fe80::50cc:80d2:5c1b:3a10]) by BYAPR04MB5816.namprd04.prod.outlook.com
- ([fe80::50cc:80d2:5c1b:3a10%5]) with mapi id 15.20.2241.014; Thu, 5 Sep 2019
- 04:30:36 +0000
-From:   Damien Le Moal <Damien.LeMoal@wdc.com>
-To:     Jens Axboe <axboe@kernel.dk>,
-        Johannes Thumshirn <jthumshirn@suse.de>,
-        "linux-block@vger.kernel.org" <linux-block@vger.kernel.org>,
-        "linux-scsi@vger.kernel.org" <linux-scsi@vger.kernel.org>,
-        "Martin K . Petersen" <martin.petersen@oracle.com>
-Subject: Re: [PATCH v3 5/7] block: Delay default elevator initialization
-Thread-Topic: [PATCH v3 5/7] block: Delay default elevator initialization
-Thread-Index: AQHVYvzHEKIbafAg9UipJ8XeLfwVBA==
-Date:   Thu, 5 Sep 2019 04:30:36 +0000
-Message-ID: <BYAPR04MB58166AA744FE3A240050BAC1E7BB0@BYAPR04MB5816.namprd04.prod.outlook.com>
-References: <20190904084247.23338-1-damien.lemoal@wdc.com>
- <20190904084247.23338-6-damien.lemoal@wdc.com>
- <22bc754b-541d-3c72-6bb0-68cd841faee5@suse.de>
- <BYAPR04MB5816ADDE69D61A3CB47DCC3FE7B80@BYAPR04MB5816.namprd04.prod.outlook.com>
- <68bd56dd-46cf-efa3-14f2-4f8e50ac15c0@kernel.dk>
-Accept-Language: en-US
-Content-Language: en-US
-X-MS-Has-Attach: 
-X-MS-TNEF-Correlator: 
-authentication-results: spf=none (sender IP is )
- smtp.mailfrom=Damien.LeMoal@wdc.com; 
-x-originating-ip: [129.253.182.57]
-x-ms-publictraffictype: Email
-x-ms-office365-filtering-correlation-id: d6689d2a-0883-40c5-ed52-08d731b9cc9c
-x-ms-office365-filtering-ht: Tenant
-x-microsoft-antispam: BCL:0;PCL:0;RULEID:(2390118)(7020095)(4652040)(8989299)(4534185)(4627221)(201703031133081)(201702281549075)(8990200)(5600166)(711020)(4605104)(1401327)(4618075)(2017052603328)(7193020);SRVR:BYAPR04MB5174;
-x-ms-traffictypediagnostic: BYAPR04MB5174:
-x-microsoft-antispam-prvs: <BYAPR04MB5174C258C6410A314CE72538E7BB0@BYAPR04MB5174.namprd04.prod.outlook.com>
-wdcipoutbound: EOP-TRUE
-x-ms-oob-tlc-oobclassifiers: OLM:4941;
-x-forefront-prvs: 015114592F
-x-forefront-antispam-report: SFV:NSPM;SFS:(10019020)(4636009)(346002)(376002)(396003)(39860400002)(136003)(366004)(189003)(199004)(52536014)(71200400001)(71190400001)(476003)(6246003)(486006)(25786009)(14454004)(8676002)(14444005)(256004)(53936002)(7736002)(305945005)(9686003)(74316002)(99286004)(55016002)(229853002)(446003)(6436002)(66946007)(66476007)(66556008)(64756008)(66446008)(66066001)(33656002)(26005)(7696005)(186003)(76116006)(6506007)(2906002)(2201001)(5660300002)(2501003)(8936002)(86362001)(102836004)(110136005)(3846002)(76176011)(53546011)(478600001)(6116002)(81156014)(4744005)(81166006)(316002);DIR:OUT;SFP:1102;SCL:1;SRVR:BYAPR04MB5174;H:BYAPR04MB5816.namprd04.prod.outlook.com;FPR:;SPF:None;LANG:en;PTR:InfoNoRecords;MX:1;A:1;
-x-ms-exchange-senderadcheck: 1
-x-microsoft-antispam-message-info: hjuj+jonTiulxGOosta0RSUe+CDmbwPr8gIWAGCI/LDH6Oc3CEnwzLzAjvG014q48Nqm11FCzi0Shu3zYCrIiiN3yxRnA+CQWqrdwoouRjtjCayBupjv3ESXzs74GVBVJJwX1YX+qRAvlNOx87kC1di2Sh8l3XFplT6idlP5IV+IyxL/Qjm6SamUf7jDmkiS7XWoC6ygtj9N2xkPDmAM73YE19ZQSuVaiUeXHvOvyw9NsiUDbD4HPFck9WXwjlsbcpZk59FIRZh5euD9EqkEuF9pbMDdtfZBGWQJZ0UB8Yw8RdnwvfS7SxiOZDOcKDPGjHj6sOwdReHKA3QGyXcVxIj1c3XgtZ1r2CtIOqDIJ9HNbE6hlDm/dfwAYa1Gt158LiH9h+RBdhSz+lKoXTOwgVIfiwVYxoVAXK/oYOtgU/4=
-x-ms-exchange-transport-forked: True
-Content-Type: text/plain; charset="us-ascii"
-Content-Transfer-Encoding: quoted-printable
+        id S1731095AbfIEGGA (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Thu, 5 Sep 2019 02:06:00 -0400
+Received: from szxga04-in.huawei.com ([45.249.212.190]:6675 "EHLO huawei.com"
+        rhost-flags-OK-OK-OK-FAIL) by vger.kernel.org with ESMTP
+        id S1728267AbfIEGGA (ORCPT <rfc822;linux-block@vger.kernel.org>);
+        Thu, 5 Sep 2019 02:06:00 -0400
+Received: from DGGEMS411-HUB.china.huawei.com (unknown [172.30.72.60])
+        by Forcepoint Email with ESMTP id DDCE6C072835D2BB6C4E;
+        Thu,  5 Sep 2019 14:05:58 +0800 (CST)
+Received: from [127.0.0.1] (10.184.194.169) by DGGEMS411-HUB.china.huawei.com
+ (10.3.19.211) with Microsoft SMTP Server id 14.3.439.0; Thu, 5 Sep 2019
+ 14:05:55 +0800
+Subject: Re: [PATCH blktests] nbd/003:add mount and clear_sock test for nbd
+To:     Omar Sandoval <osandov@osandov.com>
+CC:     <osandov@fb.com>, <linux-block@vger.kernel.org>
+References: <1567567949-87156-1-git-send-email-sunke32@huawei.com>
+ <20190904174240.GC7452@vader>
+From:   "sunke (E)" <sunke32@huawei.com>
+Message-ID: <cea59c46-52ba-942a-bab3-bcf0ebeb71c6@huawei.com>
+Date:   Thu, 5 Sep 2019 14:05:55 +0800
+User-Agent: Mozilla/5.0 (Windows NT 6.1; WOW64; rv:60.0) Gecko/20100101
+ Thunderbird/60.7.0
 MIME-Version: 1.0
-X-OriginatorOrg: wdc.com
-X-MS-Exchange-CrossTenant-Network-Message-Id: d6689d2a-0883-40c5-ed52-08d731b9cc9c
-X-MS-Exchange-CrossTenant-originalarrivaltime: 05 Sep 2019 04:30:36.6542
- (UTC)
-X-MS-Exchange-CrossTenant-fromentityheader: Hosted
-X-MS-Exchange-CrossTenant-id: b61c8803-16f3-4c35-9b17-6f65f441df86
-X-MS-Exchange-CrossTenant-mailboxtype: HOSTED
-X-MS-Exchange-CrossTenant-userprincipalname: 3zu1ll2i348XW71LMTRfqN7qbj9YEQL1jVnFjqTS0qWZ4vfB65B/vUHySxAHil3wFE1DXx07Cx61p/fyeT/hSA==
-X-MS-Exchange-Transport-CrossTenantHeadersStamped: BYAPR04MB5174
+In-Reply-To: <20190904174240.GC7452@vader>
+Content-Type: text/plain; charset="gbk"; format=flowed
+Content-Transfer-Encoding: 8bit
+X-Originating-IP: [10.184.194.169]
+X-CFilter-Loop: Reflected
 Sender: linux-block-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-On 2019/09/04 21:57, Jens Axboe wrote:=0A=
-> On 9/4/19 3:02 AM, Damien Le Moal wrote:=0A=
->> On 2019/09/04 17:56, Johannes Thumshirn wrote:=0A=
->>> On 04/09/2019 10:42, Damien Le Moal wrote:=0A=
->>>> @@ -734,6 +741,7 @@ static void __device_add_disk(struct device *paren=
-t, struct gendisk *disk,=0A=
->>>>   				    exact_match, exact_lock, disk);=0A=
->>>>   	}=0A=
->>>>   	register_disk(parent, disk, groups);=0A=
->>>> +=0A=
->>>>   	if (register_queue)=0A=
->>>>   		blk_register_queue(disk);=0A=
->>>=0A=
->>> That hunk looks unrelated, but anyways:=0A=
->>> Reviewed-by: Johannes Thumshirn <jthumshirn@suse.de>=0A=
->>=0A=
->> Oops. Yes, did not delete the blank line when I moved elevator_init_mq()=
- call.=0A=
->> Jens, should I resend a v4 to fix this ?=0A=
-> =0A=
-> Series looks good to me, I'll just delete this one hunk, not a big deal.=
-=0A=
-> =0A=
-=0A=
-Jens,=0A=
-=0A=
-Thanks. But Ming's comment needed to be addressed, which I did in the V4 I =
-just=0A=
-sent out. I removed the white line chunk too.=0A=
-=0A=
-Best regards.=0A=
-=0A=
--- =0A=
-Damien Le Moal=0A=
-Western Digital Research=0A=
+
+Thanks for your careful guidance.
+
+
+ÔÚ 2019/9/5 1:42, Omar Sandoval Ð´µÀ:
+> On Wed, Sep 04, 2019 at 11:32:29AM +0800, Sun Ke wrote:
+>> Add the test case to check nbd devices.This test case catches regressions
+>> fixed by commit 92b5c8f0063e4 "nbd: replace kill_bdev() with
+>> __invalidate_device() again".
+>>
+>> Establish the nbd connection.Run two processes.One do mount and umount,
+>> anther one do clear_sock ioctl.
+>>
+>> Signed-off-by: Sun Ke <sunke32@huawei.com>
+> 
+> Thanks for the test! A few comments below.
+> 
+>> ---
+>>   src/Makefile      |  3 +-
+>>   src/nbdmount.c    | 89 +++++++++++++++++++++++++++++++++++++++++++++++++++++++
+>>   tests/nbd/003     | 47 +++++++++++++++++++++++++++++
+>>   tests/nbd/003.out |  1 +
+>>   tests/nbd/rc      | 22 ++++++++++++++
+>>   5 files changed, 161 insertions(+), 1 deletion(-)
+>>   create mode 100644 src/nbdmount.c
+>>   create mode 100644 tests/nbd/003
+>>   create mode 100644 tests/nbd/003.out
+>>
+>> diff --git a/src/Makefile b/src/Makefile
+>> index 917d6f4..f48f264 100644
+>> --- a/src/Makefile
+>> +++ b/src/Makefile
+>> @@ -10,7 +10,8 @@ C_TARGETS := \
+>>   	sg/syzkaller1 \
+>>   	nbdsetsize \
+>>   	loop_change_fd \
+>> -	zbdioctl
+>> +	zbdioctl \
+>> +	nbdmount
+> 
+> This could use a less generic name.
+> 
+>>   CXX_TARGETS := \
+>>   	discontiguous-io
+>> diff --git a/src/nbdmount.c b/src/nbdmount.c
+>> new file mode 100644
+>> index 0000000..bd77c32
+>> --- /dev/null
+>> +++ b/src/nbdmount.c
+>> @@ -0,0 +1,89 @@
+>> +// SPDX-License-Identifier: GPL-3.0+
+>> +// Copyright (C) 2019 Sun Ke
+>> +
+>> +#include <stdio.h>
+>> +#include <stdlib.h>
+>> +
+>> +#include <sys/types.h>
+>> +#include <sys/stat.h>
+>> +#include <fcntl.h>
+>> +
+>> +#include <linux/nbd.h>
+>> +#include <assert.h>
+>> +#include <sys/wait.h>
+>> +#include <unistd.h>
+>> +#include <string.h>
+>> +#include <sys/ioctl.h>
+>> +#include <sys/mount.h>
+>> +#include <linux/fs.h>
+>> +
+>> +struct mount_para
+>> +{
+>> +	char *mp;
+>> +	char *dev;
+>> +	char *fs;
+>> +};
+>> +
+>> +struct mount_para para;
+> 
+> Get rid of this structure and global variable, just pass the fields to
+> ops_nbd().
+> 
+>> +static int nbd_fd = -1;
+> 
+> Same here, this doesn't really need to be global.
+> 
+>> +void setup_nbd(char *dev)
+>> +{
+>> +	nbd_fd = open(dev, O_RDWR);
+>> +	if (nbd_fd < 0 ) {
+>> +		printf("open the nbd failed\n");
+> 
+> Instead of printf(), do:
+> 
+> 		perror("open");
+> 
+>> +	}
+>> +}
+>> +
+>> +void teardown_nbd(void)
+>> +{
+>> +	close(nbd_fd);
+>> +}
+> 
+> Fold these two trival functions (setup_nbd() and teardown_nbd()) into
+> main().
+> 
+>> +void clear_sock(void)
+>> +{
+>> +	int err;
+>> +
+>> +	err = ioctl(nbd_fd, NBD_CLEAR_SOCK, 0);
+>> +	assert(!err);
+>> +}
+> 
+> perror("ioctl")
+> 
+>> +void mount_nbd(char *dev, char *mp, char *fs)
+>> +{
+>> +	mount(dev, mp, fs, 2 | 16, 0);
+> 
+> What are these flags?      ^^^^^^
+> 
+>> +	umount(mp);
+>> +}
+>> +
+>> +void ops_nbd(void)
+>> +{
+>> +	int i;
+>> +
+>> +	fflush(stdout);
+> 
+> What is this fflush() here for?
+> 
+>> +	for (i=0; i < 2; i++) {
+>> +		if (fork() == 0) {
+>> +			if (i == 0) {
+>> +				mount_nbd(para.dev, para.mp, para.fs);
+>> +				exit(0);
+>> +			}
+>> +			if (i == 1) {
+>> +				clear_sock();
+>> +				exit(0);
+>> +			}
+>> +		}
+>> +	}
+> 
+> This shouldn't be a loop. You can do:
+> 
+> if (fork() == 0) {
+> 	mount_nbd(dev, mp, fs);
+> 	exit(0);
+> }
+> if (fork() == 0) {
+> 	clear_sock(fd);
+> 	exit(0);
+> }
+> 
+>> +	while(wait(NULL) > 0)
+>> +		continue;
+>> +}
+>> +
+>> +int main(int argc, char **argv)
+>> +{
+> 
+> Check argc and print a usage message here, please:
+> 
+> if (argc != 4) {
+> 	fprintf(stderr, "usage: $0 MOUNTPOINT DEV FS");
+> 	return EXIT_FAILURE;
+> }
+> 
+>> +	para.mp = argv[1];
+>> +	para.dev = argv[2];
+>> +	para.fs = argv[3];
+>> +
+>> +	setup_nbd(para.dev);
+>> +	ops_nbd();
+>> +	teardown_nbd();
+>> +
+>> +	return 0;
+>> +}
+>> diff --git a/tests/nbd/003 b/tests/nbd/003
+>> new file mode 100644
+>> index 0000000..1c2dcea
+>> --- /dev/null
+>> +++ b/tests/nbd/003
+>> @@ -0,0 +1,47 @@
+>> +#!/bin/bash
+>> +
+>> +# SPDX-License-Identifier: GPL-3.0+
+>> +# Copyright (C) 2019 Sun Ke
+>> +#
+>> +# Test nbd device resizing. Regression test for patch
+>> +#
+>> +# 2b5c8f0063e4 ("nbd: replace kill_bdev() with __invalidate_device() again")
+>> +
+>> +. tests/nbd/rc
+>> +
+>> +DESCRIPTION="resize a connected nbd device"
+>> +QUICK=1
+>> +
+>> +fs_type=ext4
+>> +disk_capacity=256M
+>> +run_cnt=1
+>> +
+>> +requires() {
+>> +	_have_nbd && _have_src_program nbdmount
+>> +}
+>> +
+>> +test() {
+>> +	echo "Running ${TEST_NAME}"
+>> +	for i in $(seq 0 15)
+> 
+> As documented in the new test template:
+> 
+> 	Use bash for loops instead of seq. E.g., for ((i = 0; i < 10; i++)), not
+> 	for i in $(seq 0 9).
+> 
+>> +	do
+>> +		_start_nbd_mount_server  $disk_capacity $fs_type
+>> +		nbd-client localhost 800$i /dev/nbd$i >> "$FULL" 2>&1
+> 
+> So the test creates 15 nbd connections, runs the test on all of them,
+> then tears them down? Would it work to only use one connection and just
+> repeat the test 15 times? That way you can keep track of the nbd-client
+> process to kill instead of having to use pkill later down.
+> 
+>> +		if [ "$?" -ne "0" ]; then
+> 
+> Also from the new test template:
+> 
+> 	Use the bash [[ ]] form of tests instead of [ ].
+> 
+>> +			echo "nbd$i connnect failed"
+>> +		fi
+>> +	done
+>> +
+>> +	for j in $(seq 0 $run_cnt)
+>> +	do
+>> +		for i in $(seq 0 15)
+>> +		do
+>> +			src/nbdmount  "${TMPDIR}/$i" /dev/nbd$i $fs_type
+> 
+> Also from the new test template:
+> 
+> 	Always quote variable expansions unless the variable is a number or inside of
+> 	a [[ ]] test.
+> 
+>> +		done
+>> +	done	
+> 
+>> +
+>> +	for i in $(seq 0 15)
+>> +	do
+>> +		nbd-client -d /dev/nbd$i
+>> +		_stop_nbd_mount_server
+>> +	done
+>> +}
+>> diff --git a/tests/nbd/003.out b/tests/nbd/003.out
+>> new file mode 100644
+>> index 0000000..aa340db
+>> --- /dev/null
+>> +++ b/tests/nbd/003.out
+>> @@ -0,0 +1 @@
+>> +Running nbd/003
+>> diff --git a/tests/nbd/rc b/tests/nbd/rc
+>> index 9d0e3d1..eb7ff24 100644
+>> --- a/tests/nbd/rc
+>> +++ b/tests/nbd/rc
+>> @@ -76,3 +76,25 @@ _stop_nbd_server() {
+>>   	rm -f "${TMPDIR}/nbd.pid"
+>>   	rm -f "${TMPDIR}/export"
+>>   }
+>> +
+>> +
+>> +_start_nbd_mount_server() {
+>> +
+>> +	fallocate -l $1 "${TMPDIR}/mnt_$i"
+>> +
+>> +	if [ "$2"x = "ext4"x ];
+>> +	then
+>> +		mkfs.ext4 "${TMPDIR}/mnt_$i" >> "$FULL" 2>&1
+>> +	else
+>> +		mkdosfs "${TMPDIR}/mnt_$i" >> "$FULL" 2>&1
+>> +	fi
+>> +	nbd-server 800$i "${TMPDIR}/mnt_$i" >> "$FULL" 2>&1
+>> +
+>> +	mkdir -p "${TMPDIR}/$i"
+>> +}
+>> +
+>> +_stop_nbd_mount_server() {
+>> +	pkill -9 -f 800$i
+>> +	rm -f "${TMPDIR}/mnt_$i"
+>> +	rm -rf "${TMPDIR}/$i"
+>> +}
+> 
+> These helpers are using a variable ($i) that happens to be set by the
+> calling function. That's really icky. Just fold these into your test
+> case, we can make them generic helpers if someone else needs them.
+> 
+> .
+> 
+
