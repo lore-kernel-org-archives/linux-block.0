@@ -1,141 +1,136 @@
-Return-Path: <SRS0=cenR=W7=vger.kernel.org=linux-block-owner@kernel.org>
+Return-Path: <SRS0=DC0a=XA=vger.kernel.org=linux-block-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-0.9 required=3.0 tests=DKIMWL_WL_HIGH,DKIM_SIGNED,
-	DKIM_VALID,DKIM_VALID_AU,HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,
-	SPF_HELO_NONE,SPF_PASS autolearn=no autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-3.5 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
+	HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,
+	USER_AGENT_GIT autolearn=no autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id B9AF6C3A5A9
-	for <linux-block@archiver.kernel.org>; Wed,  4 Sep 2019 22:28:28 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id C12FBC3A5A5
+	for <linux-block@archiver.kernel.org>; Thu,  5 Sep 2019 04:29:04 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.kernel.org (Postfix) with ESMTP id 9196422CED
-	for <linux-block@archiver.kernel.org>; Wed,  4 Sep 2019 22:28:28 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=default; t=1567636108;
-	bh=uDOuymAhR3WDG7e7vxkKlX8QlIfAIuOQLJ96dDSevFI=;
-	h=References:In-Reply-To:From:Date:Subject:To:Cc:List-ID:From;
-	b=q2pcGEirqq0on+M4M3N/fC8OH+w0zZaS4UDix90wkWkb/zgdlQK7342DL3X2Hx/TD
-	 y1ubZfVr8p0Boq4b5jqfmAxKbPGAsg6L/IdYU4d2xtJCwbA1sT25GtIrmdg2Lo9D+i
-	 s6Ftdx0aEqTtdlJ4hgTkO3X1ev20EX+sNUFFv5k0=
+	by mail.kernel.org (Postfix) with ESMTP id 7E3532080C
+	for <linux-block@archiver.kernel.org>; Thu,  5 Sep 2019 04:29:04 +0000 (UTC)
+Authentication-Results: mail.kernel.org;
+	dkim=fail reason="signature verification failed" (2048-bit key) header.d=wdc.com header.i=@wdc.com header.b="V2AUftpK"
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1730498AbfIDW21 (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Wed, 4 Sep 2019 18:28:27 -0400
-Received: from mail-lf1-f68.google.com ([209.85.167.68]:43913 "EHLO
-        mail-lf1-f68.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1730541AbfIDW21 (ORCPT
-        <rfc822;linux-block@vger.kernel.org>); Wed, 4 Sep 2019 18:28:27 -0400
-Received: by mail-lf1-f68.google.com with SMTP id q27so275291lfo.10
-        for <linux-block@vger.kernel.org>; Wed, 04 Sep 2019 15:28:25 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=linux-foundation.org; s=google;
-        h=mime-version:references:in-reply-to:from:date:message-id:subject:to
-         :cc;
-        bh=N2MMR8Y9nF2WKJ/GwXu7Orie3221sa5b9mT2pSMScP0=;
-        b=fJ3Uw5l+iJ6RQgyGxaGpdfmIjWnE5F6x31rjDuCqfKxB8VAjbqJtmAWjWR9quPy177
-         kSc2B1tiYJnm6N1rDryl38O0XT+KrCxDR5lxJB7HlM5pTNWW6oATfW3XbXy7OWukzkZ2
-         g/kQFWidQUGLu16LN7J3E3MLC7X6Q8WHam9qY=
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20161025;
-        h=x-gm-message-state:mime-version:references:in-reply-to:from:date
-         :message-id:subject:to:cc;
-        bh=N2MMR8Y9nF2WKJ/GwXu7Orie3221sa5b9mT2pSMScP0=;
-        b=cTte3SvbsjWSDEQj3OysU73eZrj/KAMoUikZrmSk98WZD2sT0l7QCyDDjA9ky0J5de
-         QDa5XpySEPAgFVfTMv/szsFjq5WAs7Zifw7uxQtCgLl3rXNLwcAQB8fZg7uqj2xIiylL
-         ozpX2JmcnsReCERwfUeghteVYjQFAzSi/KoPIAoRll/gFcl11K5/GQ1SWJjdJbPMXL46
-         +PfP+mdNa63u4qYplCsRgHEo1lsAva83tjj1LwDQFe78MIiSmdGGhslS9PmW6y9PBpI1
-         nOeqfsnu/2JcKiCpvcVV2nklJMPEhByFuuFN+VxYDz3Lt+e2GH7CuDVYnukldAR1uqHd
-         y/7A==
-X-Gm-Message-State: APjAAAXHg1kbJvndjxMOQSKm2Uq4TdsA0ifM8etIlgoAXXTdzc4d1qJh
-        pfnq5PAni7EnN2ngXYwUNtUeyyHT4O0=
-X-Google-Smtp-Source: APXvYqzKVHNcDRmOnO9ime3b0/F/FoZ1nqiK8Ijv0DNy5i+0idhP1DyI6OSCc1Py2n4Ohjm635NvyQ==
-X-Received: by 2002:a19:381a:: with SMTP id f26mr253643lfa.168.1567636104750;
-        Wed, 04 Sep 2019 15:28:24 -0700 (PDT)
-Received: from mail-lj1-f182.google.com (mail-lj1-f182.google.com. [209.85.208.182])
-        by smtp.gmail.com with ESMTPSA id m23sm38224lfl.62.2019.09.04.15.28.22
-        for <linux-block@vger.kernel.org>
-        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
-        Wed, 04 Sep 2019 15:28:22 -0700 (PDT)
-Received: by mail-lj1-f182.google.com with SMTP id u14so286155ljj.11
-        for <linux-block@vger.kernel.org>; Wed, 04 Sep 2019 15:28:22 -0700 (PDT)
-X-Received: by 2002:a05:651c:1104:: with SMTP id d4mr7069ljo.90.1567636101831;
- Wed, 04 Sep 2019 15:28:21 -0700 (PDT)
+        id S1731128AbfIEE3D (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Thu, 5 Sep 2019 00:29:03 -0400
+Received: from esa1.hgst.iphmx.com ([68.232.141.245]:62199 "EHLO
+        esa1.hgst.iphmx.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S1729941AbfIEE3D (ORCPT
+        <rfc822;linux-block@vger.kernel.org>); Thu, 5 Sep 2019 00:29:03 -0400
+DKIM-Signature: v=1; a=rsa-sha256; c=simple/simple;
+  d=wdc.com; i=@wdc.com; q=dns/txt; s=dkim.wdc.com;
+  t=1567657743; x=1599193743;
+  h=from:to:subject:date:message-id:mime-version:
+   content-transfer-encoding;
+  bh=GOxacEXZXEefgxGTxRDZr3EdquI5qXE1LSwK6vh5JeU=;
+  b=V2AUftpKHUdlLxUw9wy8300hfInyUqyrp6LiE8sa1la13H/qhZX9LORr
+   Q7TXSLgKNgl0z47mfiXTHIJSkjw8RPipmssT+8VJ0jHNIaIwBQ2dU7sd2
+   KkF/soUk1B8O7/vt3fjdf4gI/7hDGCOrYNh/6OglFYYZPuCX3Uk0msVXA
+   lB2+V2f/ygKgcPjdmOJzL4hJUtCpIF7bBR9zKuTyF2AQ2/O6qDmBKMXtC
+   JE5nnvvOVcD+s8bnsxAdW9r/PFCs1S18LfPCGjXtQ9u0T3qdhv7dhKV+a
+   Vxtzfe8jxCGiMEhqy1X/c7NG15Q+s9ttjg7QUBURWK+S78CpXRxwABQcd
+   w==;
+IronPort-SDR: RjCK+Ae0m0JNiRsr8s/6Gszv76FeLNyQITord5rYyQi5bzqMPqsFU7s5tJA5iAVwnxMds7kDUi
+ F7N4est8jxcBz4xdWBAeUlU9Iex1iy5mYZA/SVxltprwBmJ1170eLaNZGm5xuUxZVAmXoXeWCZ
+ 9zajvK1Oal27LJcRuREjMWyR7OY5oGNLm8BLSfbfqhDzX9ZXhl2SLXmc9FpSStVC47Q4f0p4I0
+ gQq7A6/oLh5bUCAkadR+3AfLdt28ZKNPS/s24XKMGXCrkwZlQH1nPKmKd+xUnhJT8xwmJ3RK1n
+ 2Vs=
+X-IronPort-AV: E=Sophos;i="5.64,469,1559491200"; 
+   d="scan'208";a="224233065"
+Received: from uls-op-cesaip02.wdc.com (HELO uls-op-cesaep02.wdc.com) ([199.255.45.15])
+  by ob1.hgst.iphmx.com with ESMTP; 05 Sep 2019 12:29:02 +0800
+IronPort-SDR: l5TrKMNCK17vq/WGXa3a3TTFazBsrXthJXXm/1iubzZMHFOtdVSblv5AZU+FBVga/Ikyvz/D9/
+ cqYq6cNen34je23RztO7tYVtv51hTMwwt20IjdqHnfmyW8XRzvYQK2SLCeibh2hu+E5zp3rNtl
+ 9gz8HLL6lGjDSbdjOWF/Ui5v5ToauSSdnegV7ZZC+8ZHrqDp+7JHxgjuKgn0QRWZCHXJlu+R/d
+ +5fP32psL1T1rHdkARn0BXr/7I5/6wm+0fuvvfwfetHnTgaLr0y3/IA4/oQITFy6nSY7l0QYIX
+ HcFl3HAbOpftn0VBsF/ZltiD
+Received: from uls-op-cesaip01.wdc.com ([10.248.3.36])
+  by uls-op-cesaep02.wdc.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 04 Sep 2019 21:25:59 -0700
+IronPort-SDR: QZDAUlwCGEtbsteLmfzka8YZB6Dk0kHinBMXmyfP2RIP6yKTn5VgEUSqYH088jbxuCoJiDlnO0
+ 29vsQK+uOx1eug0WkvxxRkaDPXSrDPK+7a6zZLXDPOvaHykf/QvaFWozOmRCLb48KGI2Ao6Iri
+ zVEn45Nbbpvtx1UYj4TiBbWp/oCFb1rb/ozDpSVkePPjt+XBh12jTRO4n2VqwywTvzxNUkxuBA
+ 0saGSiVAfhtyKE989mlAScPCSVxJwBGAGAntCWzt7EkY5XykEuSYnoqL3rg9VAuCSfcGHAa+6J
+ jNI=
+WDCIronportException: Internal
+Received: from washi.fujisawa.hgst.com ([10.149.53.254])
+  by uls-op-cesaip01.wdc.com with ESMTP; 04 Sep 2019 21:29:02 -0700
+From:   Damien Le Moal <damien.lemoal@wdc.com>
+To:     linux-block@vger.kernel.org, Jens Axboe <axboe@kernel.dk>,
+        linux-scsi@vger.kernel.org,
+        "Martin K . Petersen" <martin.petersen@oracle.com>
+Subject: [PATCH v4 0/7] Elevator cleanups and improvements
+Date:   Thu,  5 Sep 2019 13:28:54 +0900
+Message-Id: <20190905042901.5830-1-damien.lemoal@wdc.com>
+X-Mailer: git-send-email 2.21.0
 MIME-Version: 1.0
-References: <156763534546.18676.3530557439501101639.stgit@warthog.procyon.org.uk>
-In-Reply-To: <156763534546.18676.3530557439501101639.stgit@warthog.procyon.org.uk>
-From:   Linus Torvalds <torvalds@linux-foundation.org>
-Date:   Wed, 4 Sep 2019 15:28:06 -0700
-X-Gmail-Original-Message-ID: <CAHk-=wh5ZNE9pBwrnr5MX3iqkUP4nspz17rtozrSxs5-OGygNw@mail.gmail.com>
-Message-ID: <CAHk-=wh5ZNE9pBwrnr5MX3iqkUP4nspz17rtozrSxs5-OGygNw@mail.gmail.com>
-Subject: Re: [PATCH 00/11] Keyrings, Block and USB notifications [ver #8]
-To:     David Howells <dhowells@redhat.com>
-Cc:     keyrings@vger.kernel.org, linux-usb@vger.kernel.org,
-        linux-block <linux-block@vger.kernel.org>,
-        Casey Schaufler <casey@schaufler-ca.com>,
-        Stephen Smalley <sds@tycho.nsa.gov>,
-        Greg Kroah-Hartman <gregkh@linuxfoundation.org>,
-        nicolas.dichtel@6wind.com, raven@themaw.net,
-        Christian Brauner <christian@brauner.io>,
-        LSM List <linux-security-module@vger.kernel.org>,
-        linux-fsdevel <linux-fsdevel@vger.kernel.org>,
-        Linux API <linux-api@vger.kernel.org>,
-        Linux List Kernel Mailing <linux-kernel@vger.kernel.org>
-Content-Type: text/plain; charset="UTF-8"
+Content-Transfer-Encoding: 8bit
 Sender: linux-block-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-On Wed, Sep 4, 2019 at 3:15 PM David Howells <dhowells@redhat.com> wrote:
->
->
-> Here's a set of patches to add a general notification queue concept and to
-> add event sources such as:
+This patch series implements some cleanup of the elevator initialization
+code and introduces elevator features identification and device matching
+to enhance checks for elevator/device compatibility and fitness.
 
-Why?
+The first 2 patches of the series are simple cleanups which simplify 
+elevator initialization for newly allocated device queues.
 
-I'm just going to be very blunt about this, and say that there is no
-way I can merge any of this *ever*, unless other people stand up and
-say that
+Patch 3 introduce elevator features, allowing a clean and extensible
+definition of devices and features that an elevator supports and match
+these against features required by a block device. With this, the sysfs
+elevator list for a device always shows only elevators matching the
+features that a particular device requires, with the exception of the
+none elevator which has no features but is always available for use
+with any device.
 
- (a) they'll use it
+The first feature defined is for zoned block device sequential write
+constraint support through zone write locking which prevents the use of
+any elevator that does not support this feature with zoned devices.
 
-and
+The last 4 patches of this series rework the default elevator selection
+and initialization to allow for the elevator/device features matching
+to work, doing so addressing cases not currently well supported, namely,
+multi-queue zoned block devices.
 
- (b) they'll actively develop it and participate in testing and coding
+Changes from v3:
+* Fixed patch 5 to correctly handle DM devices which do not register a
+  request queue and so do not need elevator initialization.
 
-Because I'm simply not willing to have the same situation that
-happened with the keyring ACL stuff this merge window happen with some
-other random feature some day in the future.
+Changes from v2:
+* Fixed patch 4
+* Call elevator_init_mq() earlier in device_add_disk() as suggested by
+  Christoph (patch 5)
+* Fixed title of patch 7
 
-That change never had anybody else that showed any interest in it, it
-was never really clear why it was made, and it broke booting for me.
+Changes from v1:
+* Addressed Johannes comments
+* Rebased on newest for-next branch to include Ming's sysfs lock changes
 
-That had better never happen again, and I'm tired of seeing
-unexplained random changes to key handling that have one single author
-and nobody else involved.
+Damien Le Moal (7):
+  block: Cleanup elevator_init_mq() use
+  block: Change elevator_init_mq() to always succeed
+  block: Introduce elevator features
+  block: Improve default elevator selection
+  block: Delay default elevator initialization
+  block: Set ELEVATOR_F_ZBD_SEQ_WRITE for nullblk zoned disks
+  sd: Set ELEVATOR_F_ZBD_SEQ_WRITE for ZBC disks
 
-And there is this whole long cover letter to explain what the code
-does, what you can do with it, and what the changes have been in
-revisions, but AT NO POINT does it explain what the point of the
-feature is at all.
+ block/blk-mq.c                |  10 ---
+ block/blk-settings.c          |  16 ++++
+ block/blk.h                   |   2 +-
+ block/elevator.c              | 137 ++++++++++++++++++++++++++--------
+ block/genhd.c                 |   9 +++
+ block/mq-deadline.c           |   1 +
+ drivers/block/null_blk_main.c |   2 +
+ drivers/scsi/sd_zbc.c         |   2 +
+ include/linux/blkdev.h        |   4 +
+ include/linux/elevator.h      |   8 ++
+ 10 files changed, 149 insertions(+), 42 deletions(-)
 
-Why would we want this, and what is the advantage over udev etc that
-already has event handling for things like block events and USB
-events?
+-- 
+2.21.0
 
-What's the advantage of another random character device, and what's
-the use? Who is asking for this, and who would use it? Why are keys
-special, and why should you be able to track events on keys in the
-first place? Who is co-developing and testing this, and what's the
-point?
-
-Fundamentally, I'm not even interested in seeing "Reviewed-by". New
-features need actual users and explanations for what they are, over
-and beyond the developer itself.
-
-IOW, you need to have an outside person step in and say "yes, I need
-this". No more of these "David makes random changes without any
-external input" series.
-
-                 Linus
