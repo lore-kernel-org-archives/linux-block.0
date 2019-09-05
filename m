@@ -3,58 +3,56 @@ X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
 X-Spam-Status: No, score=-2.2 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
-	MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,USER_AGENT_SANE_1 autolearn=no
-	autolearn_force=no version=3.4.0
+	MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED,USER_AGENT_SANE_1
+	autolearn=no autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 6EDE5C43331
-	for <linux-block@archiver.kernel.org>; Thu,  5 Sep 2019 20:52:47 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 27A7FC43331
+	for <linux-block@archiver.kernel.org>; Thu,  5 Sep 2019 20:54:27 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.kernel.org (Postfix) with ESMTP id 88282206BB
-	for <linux-block@archiver.kernel.org>; Thu,  5 Sep 2019 20:52:47 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id 4E256206BB
+	for <linux-block@archiver.kernel.org>; Thu,  5 Sep 2019 20:54:27 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1729538AbfIEUwq (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Thu, 5 Sep 2019 16:52:46 -0400
-Received: from mail-wr1-f67.google.com ([209.85.221.67]:41284 "EHLO
-        mail-wr1-f67.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1729290AbfIEUwq (ORCPT
-        <rfc822;linux-block@vger.kernel.org>); Thu, 5 Sep 2019 16:52:46 -0400
-Received: by mail-wr1-f67.google.com with SMTP id h7so3286073wrw.8
-        for <linux-block@vger.kernel.org>; Thu, 05 Sep 2019 13:52:45 -0700 (PDT)
+        id S1728967AbfIEUy0 (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Thu, 5 Sep 2019 16:54:26 -0400
+Received: from mail-wr1-f46.google.com ([209.85.221.46]:40211 "EHLO
+        mail-wr1-f46.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S1726936AbfIEUy0 (ORCPT
+        <rfc822;linux-block@vger.kernel.org>); Thu, 5 Sep 2019 16:54:26 -0400
+Received: by mail-wr1-f46.google.com with SMTP id w13so4301724wru.7
+        for <linux-block@vger.kernel.org>; Thu, 05 Sep 2019 13:54:25 -0700 (PDT)
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=1e100.net; s=20161025;
-        h=x-gm-message-state:subject:to:cc:references:from:message-id:date
+        h=x-gm-message-state:subject:to:references:from:message-id:date
          :user-agent:mime-version:in-reply-to:content-language
          :content-transfer-encoding;
-        bh=o3XAFZlSwvqRShai5GXTckpV9x85IprbqlbdmH2dFzA=;
-        b=Qy3cZYbdKjTF6uDVK4GkXLrSQ3PzwHPeOVP64uw8EThX9wBNkAjM726eKLXuUmPQKj
-         5pYpyHiRJvLAJWPWZo39DqY0f0jLH+IIL1U7smaHLFSDu2nh22+Y+7HnrEoSHBUc99uE
-         U7cSO5E5GbOy9TRUnecwZ/Efj9WtujwHy1AbjgRzknj5KTz7xiKVdY4iM/N6FzcmD2On
-         sW1fZS8Iy6qCpHMKeFFkNkcIRpo2PgG3qn+3ECnUgWPhLS+T0kjPtEcvwA2yip6R+LiX
-         di2phN4WuE5+0coh6z1g1oQnYY7+2j/kSqJHvWCl47sxIY+Sug8gjgs8MJDw7zIsxINK
-         dJfQ==
-X-Gm-Message-State: APjAAAWZ8Ur/RT+Br02/w8fJHruY7FsegMeLCKFc/SuQ4icLn+E2iH0W
-        WUQTfZwkknU59soC2ES2pUQ=
-X-Google-Smtp-Source: APXvYqw7fWpSR45UDDGyicWGQaRxX1KRznOmvLRir/OHV+VwnLFzdVgSOKrCaxvdCcxcTv0bVnw8yA==
-X-Received: by 2002:adf:ed42:: with SMTP id u2mr4473776wro.330.1567716764579;
-        Thu, 05 Sep 2019 13:52:44 -0700 (PDT)
+        bh=ZllE0gIBJhpo05kcIgz3B2wrvprdqJzTT5m8KUHoNB8=;
+        b=ARHSRJe2T4dC9y8eDSOlqkfbkzCmV2B1IOYzc3C8QnW0E/55/1ArO7YFp7Lc0eBphS
+         AEUQT9Nzy4CAmNtcKtCBNvxecL9aCI6XugnzGZ5Tbg+6QN9/dhilOlpLAIT0iYrkY+1K
+         aWOQIMeuXg2fkMJtLAzZMh+a+4GF32QKNegacqitvfHJQna8CQnb744cBcSbFeJjYMGZ
+         l6BXYB+lUiGHDfq6PfVG6XH0F6bCMjATCOXjr4JhYuTSn+tSyIgdncB1seTpmDaVPsyS
+         LkybkHMU0MzE49ADiEvcpbU90TNUe2vMMfOiiyloHfVb6kiIqFV10EW+nNEUW4+Ciglk
+         guuw==
+X-Gm-Message-State: APjAAAUzqDxaCCMHKq19yvZMOsDnElnweptMZvSsgsqulAKeeX6AuaJY
+        IPxpTh1LQvqQ96OixzXvndg=
+X-Google-Smtp-Source: APXvYqwiBhJHRNM263x1v6IXqCmw3woJ3rBTFzNpWREjsOeG8Ud+Dyku0ZqxeRKaibBKJHrqGliW8g==
+X-Received: by 2002:adf:f186:: with SMTP id h6mr4116341wro.274.1567716864631;
+        Thu, 05 Sep 2019 13:54:24 -0700 (PDT)
 Received: from ?IPv6:2600:1700:65a0:78e0:514:7862:1503:8e4d? ([2600:1700:65a0:78e0:514:7862:1503:8e4d])
-        by smtp.gmail.com with ESMTPSA id u18sm1988516wmj.11.2019.09.05.13.52.42
+        by smtp.gmail.com with ESMTPSA id x17sm7209495wrd.85.2019.09.05.13.54.23
         (version=TLS1_2 cipher=ECDHE-RSA-AES128-GCM-SHA256 bits=128/128);
-        Thu, 05 Sep 2019 13:52:43 -0700 (PDT)
-Subject: Re: [PATCH 3/3] nvme: remove PI values definition from NVMe subsystem
-To:     Max Gurtovoy <maxg@mellanox.com>, linux-block@vger.kernel.org,
-        axboe@kernel.dk, martin.petersen@oracle.com,
-        linux-nvme@lists.infradead.org, keith.busch@intel.com, hch@lst.de
-Cc:     shlomin@mellanox.com, israelr@mellanox.com
-References: <1567701836-29725-1-git-send-email-maxg@mellanox.com>
- <1567701836-29725-3-git-send-email-maxg@mellanox.com>
+        Thu, 05 Sep 2019 13:54:24 -0700 (PDT)
+Subject: Re: [PATCH blktests] nvme/031: Add test to check controller deletion
+ after setup
+To:     Logan Gunthorpe <logang@deltatee.com>, linux-block@vger.kernel.org,
+        linux-nvme@lists.infradead.org, Omar Sandoval <osandov@fb.com>
+References: <20190905174347.30886-1-logang@deltatee.com>
 From:   Sagi Grimberg <sagi@grimberg.me>
-Message-ID: <882441fc-599a-21fb-9030-5208b3b671cc@grimberg.me>
-Date:   Thu, 5 Sep 2019 13:52:39 -0700
+Message-ID: <2b48ae83-77ff-9235-83b7-98469f591c8e@grimberg.me>
+Date:   Thu, 5 Sep 2019 13:54:21 -0700
 User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:60.0) Gecko/20100101
  Thunderbird/60.8.0
 MIME-Version: 1.0
-In-Reply-To: <1567701836-29725-3-git-send-email-maxg@mellanox.com>
+In-Reply-To: <20190905174347.30886-1-logang@deltatee.com>
 Content-Type: text/plain; charset=utf-8; format=flowed
 Content-Language: en-US
 Content-Transfer-Encoding: 7bit
@@ -63,11 +61,6 @@ Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
+Looks good Logan,
 
-> Use block layer definition instead of re-defining it with the same
-> values.
-
-The nvme_setup_rw is fine, but nvme_init_integrity gets values from
-the controller id structure so I think it will be better to stick with
-the enums that are referenced in the spec (even if they happen to match
-the block layer values).
+Reviewed-by: Sagi Grimberg <sagi@grimberg.me>
