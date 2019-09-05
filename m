@@ -2,91 +2,110 @@ Return-Path: <SRS0=DC0a=XA=vger.kernel.org=linux-block-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-2.2 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
-	MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,USER_AGENT_SANE_1 autolearn=no
-	autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-2.6 required=3.0 tests=DKIMWL_WL_HIGH,DKIM_SIGNED,
+	DKIM_VALID,DKIM_VALID_AU,MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,
+	USER_AGENT_SANE_1 autolearn=no autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 3DFBBC43331
-	for <linux-block@archiver.kernel.org>; Thu,  5 Sep 2019 16:52:36 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 34AE2C43331
+	for <linux-block@archiver.kernel.org>; Thu,  5 Sep 2019 16:55:50 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.kernel.org (Postfix) with ESMTP id 0723B2082E
-	for <linux-block@archiver.kernel.org>; Thu,  5 Sep 2019 16:52:37 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id F2F3420825
+	for <linux-block@archiver.kernel.org>; Thu,  5 Sep 2019 16:55:50 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+	s=default; t=1567702551;
+	bh=0MWJ6ZAls/L7WXz3UVt3svjGiQR65RaWoxBHhcneZIc=;
+	h=Date:From:To:Cc:Subject:References:In-Reply-To:List-ID:From;
+	b=RiABCXq/eafuyS4AKUF9Jd+dnxEMJEooEV640vmfBfDy9mEePcFUfrvmloOgvCuc5
+	 FOmcteUk5JM41PkOgQdluvA9QIlcFiGxA77xajNl12xxXcRcsN0NMRWenCy/zAIWJc
+	 iUDqhEmm1umQR00sdWOI5ETkuIVvidfdK0qZI5Wg=
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1733232AbfIEQwf (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Thu, 5 Sep 2019 12:52:35 -0400
-Received: from foss.arm.com ([217.140.110.172]:47510 "EHLO foss.arm.com"
-        rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-        id S1728254AbfIEQwf (ORCPT <rfc822;linux-block@vger.kernel.org>);
-        Thu, 5 Sep 2019 12:52:35 -0400
-Received: from usa-sjc-imap-foss1.foss.arm.com (unknown [10.121.207.14])
-        by usa-sjc-mx-foss1.foss.arm.com (Postfix) with ESMTP id 7D10D28;
-        Thu,  5 Sep 2019 09:52:34 -0700 (PDT)
-Received: from [10.1.194.37] (e113632-lin.cambridge.arm.com [10.1.194.37])
-        by usa-sjc-imap-foss1.foss.arm.com (Postfix) with ESMTPSA id 4354C3F718;
-        Thu,  5 Sep 2019 09:52:33 -0700 (PDT)
-Subject: Re: sched: make struct task_struct::state 32-bit
-To:     Markus Elfring <Markus.Elfring@web.de>,
-        Alexey Dobriyan <adobriyan@gmail.com>, dm-devel@redhat.com,
-        linux-block@vger.kernel.org, rcu@vger.kernel.org
-Cc:     linux-kernel@vger.kernel.org,
-        Andrea Arcangeli <aarcange@redhat.com>,
-        Ingo Molnar <mingo@redhat.com>, Jens Axboe <axboe@kernel.dk>,
-        Peter Zijlstra <peterz@infradead.org>
-References: <a43fe392-bd6a-71f5-8611-c6b764ba56c3@arm.com>
- <7e3e784c-e8e6-f9ba-490f-ec3bf956d96b@web.de>
-From:   Valentin Schneider <valentin.schneider@arm.com>
-Message-ID: <0c4dcb91-4830-0013-b8c6-64b9e1ce47d4@arm.com>
-Date:   Thu, 5 Sep 2019 17:52:32 +0100
-User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:60.0) Gecko/20100101
- Thunderbird/60.8.0
+        id S2390732AbfIEQzp (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Thu, 5 Sep 2019 12:55:45 -0400
+Received: from mail-qt1-f169.google.com ([209.85.160.169]:39423 "EHLO
+        mail-qt1-f169.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S1731492AbfIEQzp (ORCPT
+        <rfc822;linux-block@vger.kernel.org>); Thu, 5 Sep 2019 12:55:45 -0400
+Received: by mail-qt1-f169.google.com with SMTP id n7so3615939qtb.6;
+        Thu, 05 Sep 2019 09:55:44 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=gmail.com; s=20161025;
+        h=sender:date:from:to:cc:subject:message-id:references:mime-version
+         :content-disposition:in-reply-to:user-agent;
+        bh=U86ZblmgaF4eBV4iyqRJf/CbV9WbHkWYMeJ0zFkqIu0=;
+        b=TyUOTJJGoo8GODrCt/6YB1x/8aj4n9IE8jT/v+K7tCsOLINcESeyD/Ij4NXtMIB6Sy
+         17L6qDvWQyCyeC7XEmXxoOnrWrvCkDJaDG0IEmRd9h3bbbHGAAp7YN0Z5zIHZIZQLjXo
+         e7R4fvWV6g6XW9aD+hLJiCg7Lmv5aeBV8tuo+o7VsPjG3fXt7UmiwBwDqQNJlFXWk3TH
+         5zwtfxF6mzHV0xMeRObFu3TfF099rR2GJ8US0yfbmsALUGRng05iBs5g6jzYHGRvKk8h
+         FRvrTCHS5oUC5grWyibA9V7qghdaMk9oAmt6exGDzNOXAJpBRPdCLJ0cj/yBZJkPaFfd
+         sbuQ==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20161025;
+        h=x-gm-message-state:sender:date:from:to:cc:subject:message-id
+         :references:mime-version:content-disposition:in-reply-to:user-agent;
+        bh=U86ZblmgaF4eBV4iyqRJf/CbV9WbHkWYMeJ0zFkqIu0=;
+        b=AaGh5aAxS1kkttwlWW1hzOrtLI04mgCTsJuuHe/KUgC6l7CNGVlFoGPKxQY3ibD06M
+         SCSC8X+4RRoEDzGI6q36Stpv+YyyKV2Uip9jN10hOteMbSMN4P1pZNZGw7QFRgg59SwG
+         lXnKMoDmohrsgXZpwrR8m/HevTmN134AU2EUOwZnmsQ7A991TtHQV6s57IA0qwAxsZPQ
+         UxuQzbK1g0M4j4KkjffyPFv0n9I4Wx/q3SDwH9sEG/K9kxBtUS9eQhBwEK9SwlspDL12
+         0qerDkdbz/MXVX3b/Sz5iRqqPsJSsN8d3e24K7YJKCr7n2AsR4efrlUbW4OlPTV0y/z+
+         PzTA==
+X-Gm-Message-State: APjAAAU9ptiZiNXOtCObdJWOrdGF8URMTjPe2nFnDjAm8y3UWh5M+8K2
+        n0vHJVdEe9NZbdwsc7zVwbY=
+X-Google-Smtp-Source: APXvYqxWVpg+iwFh32fbJZ2IVVdvSiiBQD6AcEmV0uXtGrMn3YPk/UP/cg4q73bDG/04BT3T30UTyg==
+X-Received: by 2002:ac8:2914:: with SMTP id y20mr4722757qty.150.1567702543675;
+        Thu, 05 Sep 2019 09:55:43 -0700 (PDT)
+Received: from localhost ([2620:10d:c091:500::1:5196])
+        by smtp.gmail.com with ESMTPSA id e7sm1083953qto.43.2019.09.05.09.55.42
+        (version=TLS1_2 cipher=ECDHE-RSA-AES128-GCM-SHA256 bits=128/128);
+        Thu, 05 Sep 2019 09:55:42 -0700 (PDT)
+Date:   Thu, 5 Sep 2019 09:55:40 -0700
+From:   Tejun Heo <tj@kernel.org>
+To:     Paolo Valente <paolo.valente@linaro.org>
+Cc:     Jens Axboe <axboe@kernel.dk>, newella@fb.com, clm@fb.com,
+        Josef Bacik <josef@toxicpanda.com>, dennisz@fb.com,
+        Li Zefan <lizefan@huawei.com>,
+        Johannes Weiner <hannes@cmpxchg.org>,
+        linux-kernel <linux-kernel@vger.kernel.org>,
+        linux-block <linux-block@vger.kernel.org>, kernel-team@fb.com,
+        cgroups@vger.kernel.org, ast@kernel.org, daniel@iogearbox.net,
+        kafai@fb.com, songliubraving@fb.com, yhs@fb.com,
+        bpf@vger.kernel.org
+Subject: Re: [PATCHSET block/for-next] IO cost model based work-conserving
+ porportional controller
+Message-ID: <20190905165540.GJ2263813@devbig004.ftw2.facebook.com>
+References: <20190614015620.1587672-1-tj@kernel.org>
+ <20190614175642.GA657710@devbig004.ftw2.facebook.com>
+ <5A63F937-F7B5-4D09-9DB4-C73D6F571D50@linaro.org>
+ <B5E431F7-549D-4FC4-A098-D074DF9586A1@linaro.org>
+ <20190820151903.GH2263813@devbig004.ftw2.facebook.com>
+ <9EB760CE-0028-4766-AE9D-6E90028D8579@linaro.org>
+ <20190831065358.GF2263813@devbig004.ftw2.facebook.com>
+ <88C7DC68-680E-49BB-9699-509B9B0B12A0@linaro.org>
+ <20190902155652.GH2263813@devbig004.ftw2.facebook.com>
+ <D9F6BC6D-FEB3-40CA-A33C-F501AE4434F0@linaro.org>
 MIME-Version: 1.0
-In-Reply-To: <7e3e784c-e8e6-f9ba-490f-ec3bf956d96b@web.de>
-Content-Type: text/plain; charset=utf-8
-Content-Language: en-US
-Content-Transfer-Encoding: 7bit
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <D9F6BC6D-FEB3-40CA-A33C-F501AE4434F0@linaro.org>
+User-Agent: Mutt/1.5.21 (2010-09-15)
 Sender: linux-block-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
+Hello, Paolo.
 
+So, I'm currently verifying iocost in the FB fleet.  Around three
+thousand machines running v5.2 (+ some backports) with btrfs on a
+handful of different models of consumer grade SSDs.  I haven't seen
+complete loss of control as you're reporting.  Given that you're
+reporting the same thing on io.latency, which is deployed on multiple
+orders of magnitude more machines at this point, it's likely that
+there's something common affecting your test setup.  Can you please
+describe your test configuration and if you aren't already try testing
+on btrfs?
 
-On 05/09/2019 16:51, Markus Elfring wrote:
-> Can a transformation approach like the following work also
-> for your software?
-> 
-> @replacement@
-> 
-> identifier func, p, state_var;
-> 
-> @@
-> 
->  func(...,
->       struct task_struct *p,
->       ...
-> ,
-> -     long
-> +     int
->       state_var
-> ,
->       ...)
-> 
->  {
-> 
->  ...
-> 
->  }
-> 
-> 
+Thanks.
 
-I actually got rid of the task_struct* parameter and now just match
-against task_struct.p accesses in the function body, which has the
-added bonus of not caring about the order of the parameters.
-
-Still not there yet but making progress in the background, hope it's
-passable entertainment to see me struggle my way there :)
-
-> 
-> Regards,
-> Markus
-> 
+-- 
+tejun
