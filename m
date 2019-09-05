@@ -2,94 +2,110 @@ Return-Path: <SRS0=DC0a=XA=vger.kernel.org=linux-block-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-2.2 required=3.0 tests=DKIM_SIGNED,DKIM_VALID,
-	HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,
-	USER_AGENT_SANE_1 autolearn=no autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-0.8 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
+	MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS autolearn=no autolearn_force=no
+	version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id B1F93C43331
-	for <linux-block@archiver.kernel.org>; Thu,  5 Sep 2019 19:17:32 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id F30EDC43331
+	for <linux-block@archiver.kernel.org>; Thu,  5 Sep 2019 20:10:02 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.kernel.org (Postfix) with ESMTP id 6D7C52070C
-	for <linux-block@archiver.kernel.org>; Thu,  5 Sep 2019 19:17:33 +0000 (UTC)
-Authentication-Results: mail.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel-dk.20150623.gappssmtp.com header.i=@kernel-dk.20150623.gappssmtp.com header.b="G6D6hbs3"
+	by mail.kernel.org (Postfix) with ESMTP id 3B38D212CC
+	for <linux-block@archiver.kernel.org>; Thu,  5 Sep 2019 20:10:03 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1731881AbfIETRb (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Thu, 5 Sep 2019 15:17:31 -0400
-Received: from mail-io1-f65.google.com ([209.85.166.65]:45768 "EHLO
-        mail-io1-f65.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1729067AbfIETRb (ORCPT
-        <rfc822;linux-block@vger.kernel.org>); Thu, 5 Sep 2019 15:17:31 -0400
-Received: by mail-io1-f65.google.com with SMTP id f12so7214485iog.12
-        for <linux-block@vger.kernel.org>; Thu, 05 Sep 2019 12:17:31 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=kernel-dk.20150623.gappssmtp.com; s=20150623;
-        h=subject:to:cc:references:from:message-id:date:user-agent
-         :mime-version:in-reply-to:content-language:content-transfer-encoding;
-        bh=07l5/Jsc4rfr7mEknFKWMgXZVVL/gt11eZpE2uqlnWI=;
-        b=G6D6hbs3OQCyBGac4MAnfNpozwHAPKW4Ng4nKHnqWVQpDlgoQnUNXDdJI2S6oQDv5T
-         7pTWFGykQ3c5pWUA281I2jvFTgK5O0gCgG+sdjS/6Kjh/xpHNMn3rnHKxwTyqsZ7sO0w
-         aahz8fVhvCckzdkQmg/d/bQA4SZ+IaoL8u6EC5CbSR7HZozoNL1BbQVUx8+3wpvNjbUg
-         7jODd0oF4UIHu8nTaqMgyDmDIHMfO2obBB3Ecas1V2FEovopNENBCr+V5EmL2m03kjtk
-         ZE7SoW3/SInhBd3AVcYbSS5uAbuhdL4dbSOE5Xk2YdELyeeGI4wIoONC1wDxKUe/4vgY
-         9oFQ==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20161025;
-        h=x-gm-message-state:subject:to:cc:references:from:message-id:date
-         :user-agent:mime-version:in-reply-to:content-language
-         :content-transfer-encoding;
-        bh=07l5/Jsc4rfr7mEknFKWMgXZVVL/gt11eZpE2uqlnWI=;
-        b=o5G9OiFusn59l1FCKpOdWn0AaoO0SDnis/ij1uG077WjPgz+qtb1oZ/oJfX8kUsWvX
-         /lWP9QyQProShUYIHPKfsnc4/14p33bFao72VEj1+LDSU7U4uLOyxq8cu1ozC7m9XI4J
-         Mbrlm7A8M6eKZ65UHVanl70tfiAn+Zjkdw98VaFjbu5UEyR30+2oIMcsH7+59d1iKMtb
-         NABe0v4kQob10StZPNctq5OmqcJqLNQk87vX41WulL8n8P1+g2L/ZrFNjDdVmM14D+sK
-         F23VF01RNxLFqc4w0b2/HpTQHrAZ6OmPoIOgIMbfdXI13MWutp/gHirzIE8MOMig6MMJ
-         uPgQ==
-X-Gm-Message-State: APjAAAUtdVogzSXcIIR3C0fXK5dIoDxg2h+gzFHyOzFzdtLHTjQmWHAa
-        x0gXXiNZcepwWPWHrQU53k0iTbYWMC/dsQ==
-X-Google-Smtp-Source: APXvYqwcWd4GiAMfp6QCg6xW1thuGLMjfSkv3UpdNbv3CnPE/bFg3mZZ/plXxVEZRAtGfVTrIi1tdw==
-X-Received: by 2002:a5d:8502:: with SMTP id q2mr5926036ion.287.1567711050783;
-        Thu, 05 Sep 2019 12:17:30 -0700 (PDT)
-Received: from [192.168.1.50] ([65.144.74.34])
-        by smtp.gmail.com with ESMTPSA id u3sm2537795iog.36.2019.09.05.12.17.29
-        (version=TLS1_2 cipher=ECDHE-RSA-AES128-GCM-SHA256 bits=128/128);
-        Thu, 05 Sep 2019 12:17:29 -0700 (PDT)
-Subject: Re: [GIT PULL 0/2] lightnvm updates for 5.4
-To:     =?UTF-8?Q?Matias_Bj=c3=b8rling?= <mb@lightnvm.io>
-Cc:     linux-block@vger.kernel.org, linux-kernel@vger.kernel.org
-References: <20190905190433.8247-1-mb@lightnvm.io>
-From:   Jens Axboe <axboe@kernel.dk>
-Message-ID: <2138dd03-4969-4e02-b1dc-d8209a835a22@kernel.dk>
-Date:   Thu, 5 Sep 2019 13:17:28 -0600
-User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:60.0) Gecko/20100101
- Thunderbird/60.8.0
+        id S2387845AbfIEUKC (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Thu, 5 Sep 2019 16:10:02 -0400
+Received: from mx1.redhat.com ([209.132.183.28]:39844 "EHLO mx1.redhat.com"
+        rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
+        id S1732468AbfIEUKC (ORCPT <rfc822;linux-block@vger.kernel.org>);
+        Thu, 5 Sep 2019 16:10:02 -0400
+Received: from smtp.corp.redhat.com (int-mx06.intmail.prod.int.phx2.redhat.com [10.5.11.16])
+        (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
+        (No client certificate requested)
+        by mx1.redhat.com (Postfix) with ESMTPS id 5C742300BEAE;
+        Thu,  5 Sep 2019 20:10:01 +0000 (UTC)
+Received: from ovpn-124-235.rdu2.redhat.com (ovpn-124-235.rdu2.redhat.com [10.10.124.235])
+        by smtp.corp.redhat.com (Postfix) with ESMTP id 26E605C1D4;
+        Thu,  5 Sep 2019 20:09:59 +0000 (UTC)
+Message-ID: <d19e8783e7fe47e51fbc12bf33c95fea16c93070.camel@redhat.com>
+Subject: Re: Why add the general notification queue and its sources
+From:   David Lehman <dlehman@redhat.com>
+To:     Ray Strode <rstrode@redhat.com>,
+        Steven Whitehouse <swhiteho@redhat.com>
+Cc:     Linus Torvalds <torvalds@linux-foundation.org>,
+        David Howells <dhowells@redhat.com>,
+        Greg Kroah-Hartman <gregkh@linuxfoundation.org>,
+        Nicolas Dichtel <nicolas.dichtel@6wind.com>, raven@themaw.net,
+        keyrings@vger.kernel.org, linux-usb@vger.kernel.org,
+        linux-block <linux-block@vger.kernel.org>,
+        Christian Brauner <christian@brauner.io>,
+        LSM List <linux-security-module@vger.kernel.org>,
+        linux-fsdevel <linux-fsdevel@vger.kernel.org>,
+        Linux API <linux-api@vger.kernel.org>,
+        Linux List Kernel Mailing <linux-kernel@vger.kernel.org>,
+        Ian Kent <ikent@redhat.com>
+Date:   Thu, 05 Sep 2019 16:09:58 -0400
+In-Reply-To: <CAKCoTu7ms4ckwDA_-onuJg+famnMzGZE9gGUcqqMz0kCAAECRg@mail.gmail.com>
+References: <156763534546.18676.3530557439501101639.stgit@warthog.procyon.org.uk>
+         <CAHk-=wh5ZNE9pBwrnr5MX3iqkUP4nspz17rtozrSxs5-OGygNw@mail.gmail.com>
+         <17703.1567702907@warthog.procyon.org.uk>
+         <CAHk-=wjQ5Fpv0D7rxX0W=obx9xoOAxJ_Cr+pGCYOAi2S9FiCNg@mail.gmail.com>
+         <11667f69-fbb5-28d2-3c31-7f865f2b93e5@redhat.com>
+         <CAKCoTu7ms4ckwDA_-onuJg+famnMzGZE9gGUcqqMz0kCAAECRg@mail.gmail.com>
+Organization: Red Hat, Inc.
+Content-Type: text/plain; charset="UTF-8"
+User-Agent: Evolution 3.30.5 (3.30.5-1.fc29) 
 MIME-Version: 1.0
-In-Reply-To: <20190905190433.8247-1-mb@lightnvm.io>
-Content-Type: text/plain; charset=utf-8
-Content-Language: en-US
-Content-Transfer-Encoding: 8bit
+Content-Transfer-Encoding: 7bit
+X-Scanned-By: MIMEDefang 2.79 on 10.5.11.16
+X-Greylist: Sender IP whitelisted, not delayed by milter-greylist-4.5.16 (mx1.redhat.com [10.5.110.40]); Thu, 05 Sep 2019 20:10:01 +0000 (UTC)
 Sender: linux-block-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-On 9/5/19 1:04 PM, Matias Bjørling wrote:
-> Hi Jens,
+On Thu, 2019-09-05 at 14:51 -0400, Ray Strode wrote:
+> Hi,
 > 
-> Two small patches for the 5.4 window. Can you please pick them up?
+> On Thu, Sep 5, 2019 at 2:37 PM Steven Whitehouse <swhiteho@redhat.com
+> > wrote:
+> > The original reason for the mount notification mechanism was so
+> > that we
+> > are able to provide information to GUIs and similar filesystem and
+> > storage management tools, matching the state of the filesystem with
+> > the
+> > state of the underlying devices. This is part of a larger project
+> > entitled "Project Springfield" to try and provide better management
+> > tools for storage and filesystems. I've copied David Lehman in,
+> > since he
+> > can provide a wider view on this topic.
+> So one problem that I've heard discussed before is what happens in a
+> thinp
+> setup when the disk space is overallocated and gets used up. IIRC,
+> the
+> volumes just sort of eat themselves?
 > 
-> Thank you,
-> Matias
+> Getting proper notification of looming catastrophic failure to the
+> workstation user
+> before it's too late would be useful, indeed.
 > 
-> Minwoo Im (2):
->    lightnvm: introduce pr_fmt for the prefix nvm
->    lightnvm: print error when target is not found
-> 
->   drivers/lightnvm/core.c | 54 ++++++++++++++++++++++-------------------
->   1 file changed, 29 insertions(+), 25 deletions(-)
+> I don't know if this new mechanism dhowells has development can help
+> with that,
 
-Applied, thanks.
+My understanding is that there is already a dm devent that gets sent
+when the low water mark is crossed for a thin pool, but there is
+nothing in userspace that knows how to effectively get the user's
+attention at that time.
 
--- 
-Jens Axboe
+> and/or if solving that problem is part of the Project Springfield
+> initiative or not. Do you
+> know off hand?
+
+We have been looking into building a userspace event notification
+service (for storage, initially) to aggregate and add context to low-
+level events such as these, providing a single source for all kinds of
+storage events with an excellent signal:noise ratio. Thin pool
+exhaustion is high on the list of problems we would want to address.
+
+
+David
 
