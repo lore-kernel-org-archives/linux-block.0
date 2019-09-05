@@ -4,67 +4,67 @@ X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 X-Spam-Level: 
 X-Spam-Status: No, score=-9.6 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
 	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,
-	SPF_HELO_NONE,SPF_PASS,USER_AGENT_GIT autolearn=unavailable
-	autolearn_force=no version=3.4.0
+	SPF_HELO_NONE,SPF_PASS,USER_AGENT_GIT autolearn=ham autolearn_force=no
+	version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 8675AC3A5AA
-	for <linux-block@archiver.kernel.org>; Thu,  5 Sep 2019 04:29:05 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id DAA4CC3A5A5
+	for <linux-block@archiver.kernel.org>; Thu,  5 Sep 2019 04:29:08 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.kernel.org (Postfix) with ESMTP id 58A652080C
-	for <linux-block@archiver.kernel.org>; Thu,  5 Sep 2019 04:29:05 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id AEBFE2080C
+	for <linux-block@archiver.kernel.org>; Thu,  5 Sep 2019 04:29:08 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (2048-bit key) header.d=wdc.com header.i=@wdc.com header.b="ZYF35tSy"
+	dkim=fail reason="signature verification failed" (2048-bit key) header.d=wdc.com header.i=@wdc.com header.b="Q5tg4z5j"
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1729941AbfIEE3E (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Thu, 5 Sep 2019 00:29:04 -0400
+        id S1731143AbfIEE3I (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Thu, 5 Sep 2019 00:29:08 -0400
 Received: from esa1.hgst.iphmx.com ([68.232.141.245]:62199 "EHLO
         esa1.hgst.iphmx.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1731095AbfIEE3E (ORCPT
-        <rfc822;linux-block@vger.kernel.org>); Thu, 5 Sep 2019 00:29:04 -0400
+        with ESMTP id S1731095AbfIEE3F (ORCPT
+        <rfc822;linux-block@vger.kernel.org>); Thu, 5 Sep 2019 00:29:05 -0400
 DKIM-Signature: v=1; a=rsa-sha256; c=simple/simple;
   d=wdc.com; i=@wdc.com; q=dns/txt; s=dkim.wdc.com;
-  t=1567657743; x=1599193743;
+  t=1567657745; x=1599193745;
   h=from:to:subject:date:message-id:in-reply-to:references:
    mime-version:content-transfer-encoding;
-  bh=qtVWwALxJeFLEm5MyqWAjj8rH1FAELNGevTMV0H6ZXk=;
-  b=ZYF35tSyqR3gegwj/p9MfvUXIdUN2cFEl4e5Ave/KxfJinH0giZBjfaJ
-   nTNZKn2+X5/HpdeMIbb3KGSwPcBkgS6jvScXVbCn3DhbeyLVC9Pr9vRqP
-   +r91afhD8UcVMvbqm3bOqWZCpUrHtr8wfWdm6S6pgQA5V/cPPnyCI3QYd
-   LAoer56jvTEU4+zJOez+SdAA8mc0au7D0tI3L3aaHBk+LlYT/7ZOrld6I
-   0xTG+YQLtNcVECK/wTdRKvH7eGG9y+aDhc5k8FNT8L8P8IpDpiG52wuY6
-   dTfzHACurKT1lQIF+Gi60olepYVRJgRLpY5qLJoMnyL61v28oEh2zk8v/
-   A==;
-IronPort-SDR: 09150fBcQvlfxkvSqFX3sn1FZgzQ/leVTjSXFieLou7P4nbQ+UyUmu17jk1GjbaLcJ6LbmtHlw
- UUVSIHXgZgfCWKRCBIAARdbyDwaPNJ/RRrg4d7qF0GGvcP5DwKCmXsUWH5BJmZNztHZiVkb3F1
- eqJn4xZDNtiMYtoYimay5g7Yg2N1PhJiu8kCCZuhwt6RrjMYY6EfLAmIEHs/VilN8Eowv4Xwdx
- Cg7UEITzTGeTP7X7qDKGQYALl0TQ/RCpPJ1+Gz7WknDPlyuXyuL2Jf3alk4S7Mwmv6nSVL7s7m
- uYc=
+  bh=4es099Tzn+1lybmV19FyhcM0o6YKAGlTweyIXLI8G2M=;
+  b=Q5tg4z5jfpwQcwbO5s0Tpg7LsZ5Y0dQOW3yElhxBazGRNlSr3Onl7aeP
+   OvLcMR4s9nlvoM+3SjLC/UBpN1kH7sMEZxUbL9GxG45o2pPTknAnslAJP
+   76EZ5ssKD7DYY7hiYdSTc12IPDNLgxTP5asoNbsH/94Ng8CX2/XnmamDB
+   TaLrtcogkSnziqLwLyxZomnp4EaJHl5Gsl4TsB/E3CUqGiX9kh0Bf+Wmd
+   PnXOccr60hVd0LmDnPRMKy4v9JFxNH7YWOL8CUKv6qTryYVOpAwtSp1le
+   6m8oLbt7I47WAsB7v0klwDhmkimj31WfZogg3rjzQE7hSnLD3YgsrNivd
+   g==;
+IronPort-SDR: mDlEBW6ucd9Nvjb9I8HynlO4pizPfyaGNvTxTEWc1DRahFp5wcQD9JBsjQJMm7jvvupApnVkox
+ BeFqXpSb50af0CbIhTdNBEO2PHpz9hJjQ72uHL+o7JDwiGy1et3yOSo/02aqHfjT/iMW7uC7aa
+ NXbbDBR5gvzjrHFbI/vz7sRR91LxEHGS6KCWpeQig+/Qlfjt/W9c29QVhpZ4JbmINzocEohqAv
+ QwqY1qG1Hyj4oMFdCP9h3FeEu4DzoC9kKL1r3x8++FOaa22bj90mxQ0ze3mNndAb5P4Hkx9i9M
+ t/o=
 X-IronPort-AV: E=Sophos;i="5.64,469,1559491200"; 
-   d="scan'208";a="224233069"
+   d="scan'208";a="224233073"
 Received: from uls-op-cesaip02.wdc.com (HELO uls-op-cesaep02.wdc.com) ([199.255.45.15])
-  by ob1.hgst.iphmx.com with ESMTP; 05 Sep 2019 12:29:03 +0800
-IronPort-SDR: f3W0iS3aGjsD1MzllTfijdIA04QC2dd1DU0quxT6y57RBQKCY+lwI4vq9IEvNLt+eC1za6Su2m
- USslcH2l4pJkl7i7R0swZy2mZLvaOHTGgOqde6kSGRsVHBocRNOwG9DawMCiwXd3u9qHkrrnN+
- buGvyNIFiKofab6lAF7zmkpfovy/QXkaZPT1LOQjHrum7LAnn37bUSF6mNcGWoqrIbRuBpnC7j
- yksfx2QqjC2wB5g+ZHfExDOZjR8JwDcKIGaN6vLx6wE1XAXjvEnTRd/YrMh2G2IMZ0UT6bWT/I
- J44SeRRYC9eR+O+sQ6a7banb
+  by ob1.hgst.iphmx.com with ESMTP; 05 Sep 2019 12:29:04 +0800
+IronPort-SDR: gnDPaI8zDUxDx/4zFnOgRWWF/i+XWPB0YNn1UNQDJ20c5NFJaKtxe0mIwBbqULFpphT7RTPYO4
+ p/PscSviE5qmHNzJvxQPIXF1998ThCcad84HcoWz6+R8bomJ2exDTSSjiaV69a5zBQwRzItWJp
+ wfwZA0MCYHUB5raj8enk3hC+NTv/rbtM63GtJDdfkWbG0QmA7j3IP/QeT9Ccd7rFicGRa/h114
+ VTXIV9Fzl5OUGj8su686kqT78eIEqMrhxEXFU5hkBuqYmJ6FSwtfmnHFLlQuBdTusMw3CS6GIh
+ rLo19urMWC7gqollPT4ZtY+G
 Received: from uls-op-cesaip01.wdc.com ([10.248.3.36])
-  by uls-op-cesaep02.wdc.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 04 Sep 2019 21:26:00 -0700
-IronPort-SDR: v4B8gCMzULr//ZLaNoU6WtXqF1j6Ep8cTKQbUMXFdawALoDILK0oa5WjDMcJ0KDuN5sLnF6aqV
- 47qJExAYV1U6EDdunktcB7yHfTULJQbkq8wtXoOrKzqPgHkwwkLmcTRaT0XcDerEE9HQRsFk7x
- uTSTBvgXBablfbsVyQjz/QGB3CvqzXZiiLSIHQHMSv4JUfIJlxNxMedKPkfz4R/OQid9pYVrvl
- oBh8zRmljOkTgkv714QLjKWK1fiJTzH6QgC34KzPh/VWitKSimdnldf8vLN3qB3NjOLZJTsvGU
- erU=
+  by uls-op-cesaep02.wdc.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 04 Sep 2019 21:26:01 -0700
+IronPort-SDR: swWbFTikVbWqQ4x8Nafg6Dfmxd/Jl7AFEMMKNSU6536CyJS2tqFks9byp/SS90QypqA3a80V48
+ 0VGP1FaTGC1qZuD4MWfvgtMsnZtYh7+t2L5GmRSuB8DKffVtQcpvQpk6q++uk8fq1cWy4U+Uss
+ DqeUiiJQODiWaKo8aFbnzAhDOL0pRSpJD2O3/CE5B60n/6OzpTmmbsujZ23rOz3Zo5rYjWBADg
+ qxeIPt8HUL88A2R5NcDTUvlHBFZVWpmxg+YjWpTu93agR4/xR7XbBl+oaHVuZf/UNH4hj+wfvY
+ J3c=
 WDCIronportException: Internal
 Received: from washi.fujisawa.hgst.com ([10.149.53.254])
-  by uls-op-cesaip01.wdc.com with ESMTP; 04 Sep 2019 21:29:03 -0700
+  by uls-op-cesaip01.wdc.com with ESMTP; 04 Sep 2019 21:29:04 -0700
 From:   Damien Le Moal <damien.lemoal@wdc.com>
 To:     linux-block@vger.kernel.org, Jens Axboe <axboe@kernel.dk>,
         linux-scsi@vger.kernel.org,
         "Martin K . Petersen" <martin.petersen@oracle.com>
-Subject: [PATCH v4 1/7] block: Cleanup elevator_init_mq() use
-Date:   Thu,  5 Sep 2019 13:28:55 +0900
-Message-Id: <20190905042901.5830-2-damien.lemoal@wdc.com>
+Subject: [PATCH v4 2/7] block: Change elevator_init_mq() to always succeed
+Date:   Thu,  5 Sep 2019 13:28:56 +0900
+Message-Id: <20190905042901.5830-3-damien.lemoal@wdc.com>
 X-Mailer: git-send-email 2.21.0
 In-Reply-To: <20190905042901.5830-1-damien.lemoal@wdc.com>
 References: <20190905042901.5830-1-damien.lemoal@wdc.com>
@@ -75,88 +75,119 @@ Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-Instead of checking a queue tag_set BLK_MQ_F_NO_SCHED flag before
-calling elevator_init_mq() to make sure that the queue supports IO
-scheduling, use the elevator.c function elv_support_iosched() in
-elevator_init_mq(). This does not introduce any functional change but
-ensure that elevator_init_mq() does the right thing based on the queue
-settings.
+If the default elevator chosen is mq-deadline, elevator_init_mq() may
+return an error if mq-deadline initialization fails, leading to
+blk_mq_init_allocated_queue() returning an error, which in turn will
+cause the block device initialization to fail and the device not being
+exposed.
+
+Instead of taking such extreme measure, handle mq-deadline
+initialization failures in the same manner as when mq-deadline is not
+available (no module to load), that is, default to the "none" scheduler.
+With this change, elevator_init_mq() return type can be changed to void.
 
 Signed-off-by: Damien Le Moal <damien.lemoal@wdc.com>
 Reviewed-by: Johannes Thumshirn <jthumshirn@suse.de>
 Reviewed-by: Christoph Hellwig <hch@lst.de>
 ---
- block/blk-mq.c   |  8 +++-----
- block/elevator.c | 23 +++++++++++++----------
- 2 files changed, 16 insertions(+), 15 deletions(-)
+ block/blk-mq.c   |  8 +-------
+ block/blk.h      |  2 +-
+ block/elevator.c | 23 ++++++++++++-----------
+ 3 files changed, 14 insertions(+), 19 deletions(-)
 
 diff --git a/block/blk-mq.c b/block/blk-mq.c
-index b622029b19ea..13923630e00a 100644
+index 13923630e00a..ee4caf0c0807 100644
 --- a/block/blk-mq.c
 +++ b/block/blk-mq.c
-@@ -2904,11 +2904,9 @@ struct request_queue *blk_mq_init_allocated_queue(struct blk_mq_tag_set *set,
+@@ -2842,8 +2842,6 @@ static unsigned int nr_hw_queues(struct blk_mq_tag_set *set)
+ struct request_queue *blk_mq_init_allocated_queue(struct blk_mq_tag_set *set,
+ 						  struct request_queue *q)
+ {
+-	int ret = -ENOMEM;
+-
+ 	/* mark the queue as mq asap */
+ 	q->mq_ops = set->ops;
+ 
+@@ -2904,14 +2902,10 @@ struct request_queue *blk_mq_init_allocated_queue(struct blk_mq_tag_set *set,
  	blk_mq_add_queue_tag_set(set, q);
  	blk_mq_map_swqueue(q);
  
--	if (!(set->flags & BLK_MQ_F_NO_SCHED)) {
--		ret = elevator_init_mq(q);
--		if (ret)
--			goto err_tag_set;
--	}
-+	ret = elevator_init_mq(q);
-+	if (ret)
-+		goto err_tag_set;
+-	ret = elevator_init_mq(q);
+-	if (ret)
+-		goto err_tag_set;
++	elevator_init_mq(q);
  
  	return q;
  
+-err_tag_set:
+-	blk_mq_del_queue_tag_set(q);
+ err_hctxs:
+ 	kfree(q->queue_hw_ctx);
+ 	q->nr_hw_queues = 0;
+diff --git a/block/blk.h b/block/blk.h
+index e4619fc5c99a..ed347f7a97b1 100644
+--- a/block/blk.h
++++ b/block/blk.h
+@@ -184,7 +184,7 @@ void blk_account_io_done(struct request *req, u64 now);
+ 
+ void blk_insert_flush(struct request *rq);
+ 
+-int elevator_init_mq(struct request_queue *q);
++void elevator_init_mq(struct request_queue *q);
+ int elevator_switch_mq(struct request_queue *q,
+ 			      struct elevator_type *new_e);
+ void __elevator_exit(struct request_queue *, struct elevator_queue *);
 diff --git a/block/elevator.c b/block/elevator.c
-index 86100de88883..4721834815bb 100644
+index 4721834815bb..2944c129760c 100644
 --- a/block/elevator.c
 +++ b/block/elevator.c
-@@ -619,16 +619,26 @@ int elevator_switch_mq(struct request_queue *q,
- 	return ret;
- }
+@@ -628,34 +628,35 @@ static inline bool elv_support_iosched(struct request_queue *q)
  
-+static inline bool elv_support_iosched(struct request_queue *q)
-+{
-+	if (q->tag_set && (q->tag_set->flags & BLK_MQ_F_NO_SCHED))
-+		return false;
-+	return true;
-+}
-+
  /*
-- * For blk-mq devices, we default to using mq-deadline, if available, for single
-- * queue devices.  If deadline isn't available OR we have multiple queues,
-- * default to "none".
-+ * For blk-mq devices supporting IO scheduling, we default to using mq-deadline,
-+ * if available, for single queue devices. If deadline isn't available OR we
-+ * have multiple queues, default to "none".
+  * For blk-mq devices supporting IO scheduling, we default to using mq-deadline,
+- * if available, for single queue devices. If deadline isn't available OR we
+- * have multiple queues, default to "none".
++ * if available, for single queue devices. If deadline isn't available OR
++ * deadline initialization fails OR we have multiple queues, default to "none".
   */
- int elevator_init_mq(struct request_queue *q)
+-int elevator_init_mq(struct request_queue *q)
++void elevator_init_mq(struct request_queue *q)
  {
  	struct elevator_type *e;
- 	int err = 0;
+-	int err = 0;
++	int err;
  
-+	if (!elv_support_iosched(q))
-+		return 0;
-+
+ 	if (!elv_support_iosched(q))
+-		return 0;
++		return;
+ 
  	if (q->nr_hw_queues != 1)
- 		return 0;
+-		return 0;
++		return;
  
-@@ -706,13 +716,6 @@ static int __elevator_change(struct request_queue *q, const char *name)
- 	return elevator_switch(q, e);
+ 	WARN_ON_ONCE(test_bit(QUEUE_FLAG_REGISTERED, &q->queue_flags));
+ 
+ 	if (unlikely(q->elevator))
+-		goto out;
++		return;
+ 
+ 	e = elevator_get(q, "mq-deadline", false);
+ 	if (!e)
+-		goto out;
++		return;
+ 
+ 	err = blk_mq_init_sched(q, e);
+-	if (err)
++	if (err) {
++		pr_warn("\"%s\" elevator initialization failed, "
++			"falling back to \"none\"\n", e->elevator_name);
+ 		elevator_put(e);
+-out:
+-	return err;
++	}
  }
  
--static inline bool elv_support_iosched(struct request_queue *q)
--{
--	if (q->tag_set && (q->tag_set->flags & BLK_MQ_F_NO_SCHED))
--		return false;
--	return true;
--}
--
- ssize_t elv_iosched_store(struct request_queue *q, const char *name,
- 			  size_t count)
- {
+ 
 -- 
 2.21.0
 
