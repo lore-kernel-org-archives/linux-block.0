@@ -2,161 +2,89 @@ Return-Path: <SRS0=sY57=XB=vger.kernel.org=linux-block-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-8.2 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
-	INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,
-	URIBL_BLOCKED,USER_AGENT_SANE_1 autolearn=ham autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-0.8 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
+	MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS autolearn=no autolearn_force=no
+	version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 79ED6C43331
-	for <linux-block@archiver.kernel.org>; Fri,  6 Sep 2019 09:23:25 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id AE6C4C43331
+	for <linux-block@archiver.kernel.org>; Fri,  6 Sep 2019 10:09:22 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.kernel.org (Postfix) with ESMTP id 5C52620842
-	for <linux-block@archiver.kernel.org>; Fri,  6 Sep 2019 09:23:25 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id 8DD2D2082C
+	for <linux-block@archiver.kernel.org>; Fri,  6 Sep 2019 10:09:22 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S2392878AbfIFJXY (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Fri, 6 Sep 2019 05:23:24 -0400
-Received: from mx1.redhat.com ([209.132.183.28]:50368 "EHLO mx1.redhat.com"
+        id S2388127AbfIFKJW (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Fri, 6 Sep 2019 06:09:22 -0400
+Received: from mx1.redhat.com ([209.132.183.28]:49512 "EHLO mx1.redhat.com"
         rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-        id S2392864AbfIFJXY (ORCPT <rfc822;linux-block@vger.kernel.org>);
-        Fri, 6 Sep 2019 05:23:24 -0400
+        id S2387843AbfIFKJV (ORCPT <rfc822;linux-block@vger.kernel.org>);
+        Fri, 6 Sep 2019 06:09:21 -0400
 Received: from smtp.corp.redhat.com (int-mx03.intmail.prod.int.phx2.redhat.com [10.5.11.13])
         (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
         (No client certificate requested)
-        by mx1.redhat.com (Postfix) with ESMTPS id 4F4D27E427;
-        Fri,  6 Sep 2019 09:23:24 +0000 (UTC)
-Received: from localhost.localdomain (ovpn-12-25.pek2.redhat.com [10.72.12.25])
-        by smtp.corp.redhat.com (Postfix) with ESMTPS id 6A4E560A97;
-        Fri,  6 Sep 2019 09:23:18 +0000 (UTC)
-Subject: Fwd: Re: [PATCH blktests] nvme: Add new test case about nvme
- rescan/reset/remove during IO
-References: <f77317f0-401d-614c-f136-d96ee7b9dd34@redhat.com>
-From:   Yi Zhang <yi.zhang@redhat.com>
-To:     Omar Sandoval <osandov@osandov.com>
-Cc:     linux-block <linux-block@vger.kernel.org>, osandov@fb.com,
-        Ming Lei <ming.lei@redhat.com>
-X-Forwarded-Message-Id: <f77317f0-401d-614c-f136-d96ee7b9dd34@redhat.com>
-Message-ID: <27060ac3-dbed-7d38-95d8-378b935adab7@redhat.com>
-Date:   Fri, 6 Sep 2019 17:23:13 +0800
-User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:60.0) Gecko/20100101
- Thunderbird/60.7.0
+        by mx1.redhat.com (Postfix) with ESMTPS id 9B78C3084288;
+        Fri,  6 Sep 2019 10:09:21 +0000 (UTC)
+Received: from warthog.procyon.org.uk (ovpn-120-255.rdu2.redhat.com [10.10.120.255])
+        by smtp.corp.redhat.com (Postfix) with ESMTP id 126BB60A97;
+        Fri,  6 Sep 2019 10:09:17 +0000 (UTC)
+Organization: Red Hat UK Ltd. Registered Address: Red Hat UK Ltd, Amberley
+        Place, 107-111 Peascod Street, Windsor, Berkshire, SI4 1TE, United
+        Kingdom.
+        Registered in England and Wales under Company Registration No. 3798903
+From:   David Howells <dhowells@redhat.com>
+In-Reply-To: <CAHk-=wjt2Eb+yEDOcQwCa0SrZ4cWu967OtQG8Vz21c=n5ZP1Nw@mail.gmail.com>
+References: <CAHk-=wjt2Eb+yEDOcQwCa0SrZ4cWu967OtQG8Vz21c=n5ZP1Nw@mail.gmail.com> <156763534546.18676.3530557439501101639.stgit@warthog.procyon.org.uk> <CAHk-=wh5ZNE9pBwrnr5MX3iqkUP4nspz17rtozrSxs5-OGygNw@mail.gmail.com> <17703.1567702907@warthog.procyon.org.uk> <CAHk-=wjQ5Fpv0D7rxX0W=obx9xoOAxJ_Cr+pGCYOAi2S9FiCNg@mail.gmail.com> <CAKCoTu7ms_Mr-q08d9XB3uascpzwBa5LF9JTT2aq8uUsoFE8aQ@mail.gmail.com> <CAHk-=wjcsxQ8QB_v=cwBQw4pkJg7pp-bBsdWyPivFO_OeF-y+g@mail.gmail.com> <5396.1567719164@warthog.procyon.org.uk> <CAHk-=wgbCXea1a9OTWgMMvcsCGGiNiPp+ty-edZrBWn63NCYdw@mail.gmail.com> <14883.1567725508@warthog.procyon.org.uk>
+To:     Linus Torvalds <torvalds@linux-foundation.org>
+Cc:     dhowells@redhat.com, Ray Strode <rstrode@redhat.com>,
+        Greg Kroah-Hartman <gregkh@linuxfoundation.org>,
+        Steven Whitehouse <swhiteho@redhat.com>,
+        Nicolas Dichtel <nicolas.dichtel@6wind.com>, raven@themaw.net,
+        keyrings@vger.kernel.org, linux-usb@vger.kernel.org,
+        linux-block <linux-block@vger.kernel.org>,
+        Christian Brauner <christian@brauner.io>,
+        LSM List <linux-security-module@vger.kernel.org>,
+        linux-fsdevel <linux-fsdevel@vger.kernel.org>,
+        Linux API <linux-api@vger.kernel.org>,
+        Linux List Kernel Mailing <linux-kernel@vger.kernel.org>,
+        Al Viro <viro@zeniv.linux.org.uk>,
+        "Ray, Debarshi" <debarshi.ray@gmail.com>,
+        Robbie Harwood <rharwood@redhat.com>
+Subject: Re: Why add the general notification queue and its sources
 MIME-Version: 1.0
-In-Reply-To: <f77317f0-401d-614c-f136-d96ee7b9dd34@redhat.com>
-Content-Type: text/plain; charset=utf-8; format=flowed
-Content-Transfer-Encoding: 8bit
-Content-Language: en-US
+Content-Type: text/plain; charset="us-ascii"
+Content-ID: <27731.1567764557.1@warthog.procyon.org.uk>
+Date:   Fri, 06 Sep 2019 11:09:17 +0100
+Message-ID: <27732.1567764557@warthog.procyon.org.uk>
 X-Scanned-By: MIMEDefang 2.79 on 10.5.11.13
-X-Greylist: Sender IP whitelisted, not delayed by milter-greylist-4.5.16 (mx1.redhat.com [10.5.110.27]); Fri, 06 Sep 2019 09:23:24 +0000 (UTC)
+X-Greylist: Sender IP whitelisted, not delayed by milter-greylist-4.5.16 (mx1.redhat.com [10.5.110.40]); Fri, 06 Sep 2019 10:09:21 +0000 (UTC)
 Sender: linux-block-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-Hi Omar
+Linus Torvalds <torvalds@linux-foundation.org> wrote:
 
-Thanks for your review, pls check my comments inline
+> But it's *literally* just finding the places that work with
+> pipe->curbuf/nrbufs and making them use atomic updates.
 
-On 9/5/19 2:21 AM, Omar Sandoval wrote:
-> On Tue, Sep 03, 2019 at 04:17:52PM +0800, Yi Zhang wrote:
->> Add one test to cover NVMe SSD rescan/reset/remove operation during
->> IO, the steps found several issues during my previous testing, check
->> them here:
->> http://lists.infradead.org/pipermail/linux-nvme/2017-February/008358.html
->> http://lists.infradead.org/pipermail/linux-nvme/2017-May/010259.html
->>
->> Signed-off-by: Yi Zhang <yi.zhang@redhat.com>
->> ---
->> tests/nvme/031 | 43 +++++++++++++++++++++++++++++++++++++++++++
->> tests/nvme/031.out | 2 ++
->> 2 files changed, 45 insertions(+)
->> create mode 100755 tests/nvme/031
->> create mode 100644 tests/nvme/031.out
->>
->> diff --git a/tests/nvme/031 b/tests/nvme/031
->> new file mode 100755
->> index 0000000..4113d12
->> --- /dev/null
->> +++ b/tests/nvme/031
->> @@ -0,0 +1,43 @@
->> +#!/bin/bash
->> +# SPDX-License-Identifier: GPL-3.0+
->> +# Copyright (C) 2019 Yi Zhang <yi.zhang@redhat.com>
->> +#
->> +# Test nvme pci adapter rescan/reset/remove operation during I/O
->> +#
->> +# Regression test for bellow two commits:
->> +# http://lists.infradead.org/pipermail/linux-nvme/2017-May/010367.html
->> +# 986f75c876db nvme: avoid to use blk_mq_abort_requeue_list()
->> +# 806f026f9b90 nvme: use blk_mq_start_hw_queues() in nvme_kill_queues()
->> +
->> +. tests/nvme/rc
->> +
->> +DESCRIPTION="test nvme pci adapter rescan/reset/remove during I/O"
->> +TIMED=1
->> +
->> +requires() {
->> + _have_fio
->> +}
->> +
->> +device_requires() {
->> + _test_dev_is_nvme
->> +}
->> +
->> +test_device() {
->> + echo "Running ${TEST_NAME}"
->> +
->> + pdev="$(_get_pci_dev_from_blkdev)"
->> +
->> + # start fio job
->> + _run_fio_rand_io --filename="$TEST_DEV" --size=1g \
->> + --ignore_error=EIO,ENXIO,ENODEV --group_reporting &> /dev/null &
->> +
->> + # do rescan/reset/remove operation
->> + echo 1 > /sys/bus/pci/devices/"${pdev}"/rescan
->> + echo 1 > /sys/bus/pci/devices/"${pdev}"/reset
-> My QEMU VM doesn't have the "reset" attribute, I'm guessing because of
-> this code in pci_create_capabilities_sysfs():
->
-> if (dev->reset_fn) {
-> retval = device_create_file(&dev->dev, &reset_attr);
-> if (retval)
-> goto error;
-> }
->
-> We can skip the reset if the attribute doesn't exist.
+No.  It really isn't.  That's two variables that describe the occupied section
+of the buffer.  Unless you have something like a 68020 with CAS2, or put them
+next to each other so you can use CMPXCHG8, you can't do that.
 
-OK, will change to bellow to skip it.
+They need converting to head/tail pointers first.
 
-   # QEMU VM doesn't have the "reset" attribute, skip it
+> They really would work with almost anything. You could even mix-and-match
+> "data generated by kernel" and "data done by 'write()' or 'splice()' by a
+> user process".
 
-     if [[ -e /sys/bus/pci/devices/"${pdev}"/reset ]]; then
-             echo 1 > /sys/bus/pci/devices/"${pdev}"/reset
-     fi
+Imagine that userspace writes a large message and takes the mutex.  At the
+same time something in softirq context decides *it* wants to write a message -
+it can't take the mutex and it can't wait, so the userspace write would have
+to cause the kernel message to be dropped.
 
->> + echo 1 > /sys/bus/pci/devices/"${pdev}"/remove
->> + sleep .5
->> + echo 1 > /sys/bus/pci/rescan
->> + sleep 5
-> Instead of sleep, we can kill and wait for fio.
+What I would have to do is make a write to a notification pipe go through
+post_notification() and limit the size to the maximum for a single message.
 
-OK, will add bellow kill and wait cmd
+Much easier to simply suppress writes and splices on pipes that have been set
+up to be notification queues - at least for now.
 
-     { kill $!; wait; } &> /dev/null
-
-After remve/rescan operation, the nvme  need about 3s to be 
-reinitialized on my environment, so I added sleep 5 here,
-
-how about add bellow loop to wait for the device node?
-
-     # wait nvme reinitialized
-     local m
-     for ((m = 0; m < 10; m++)); do
-             if [[ -b "${TEST_DEV}" ]]; then
-                 break
-             fi
-             sleep 0.5
-     done
-     if (( m > 9 )); then
-             echo "nvme still not reinitialized after 5 seconds!"
-     fi
-
->
-> Thanks!
+David
