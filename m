@@ -2,89 +2,148 @@ Return-Path: <SRS0=sY57=XB=vger.kernel.org=linux-block-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-0.8 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
-	MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS autolearn=no autolearn_force=no
-	version=3.4.0
+X-Spam-Status: No, score=-0.8 required=3.0 tests=DKIM_SIGNED,DKIM_VALID,
+	DKIM_VALID_AU,HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SPF_HELO_NONE,
+	SPF_PASS,URIBL_BLOCKED autolearn=no autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id AE6C4C43331
-	for <linux-block@archiver.kernel.org>; Fri,  6 Sep 2019 10:09:22 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 040F3C43331
+	for <linux-block@archiver.kernel.org>; Fri,  6 Sep 2019 14:28:48 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.kernel.org (Postfix) with ESMTP id 8DD2D2082C
-	for <linux-block@archiver.kernel.org>; Fri,  6 Sep 2019 10:09:22 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id CDCB22067B
+	for <linux-block@archiver.kernel.org>; Fri,  6 Sep 2019 14:28:47 +0000 (UTC)
+Authentication-Results: mail.kernel.org;
+	dkim=pass (2048-bit key) header.d=linaro.org header.i=@linaro.org header.b="SgMVkFcz"
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S2388127AbfIFKJW (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Fri, 6 Sep 2019 06:09:22 -0400
-Received: from mx1.redhat.com ([209.132.183.28]:49512 "EHLO mx1.redhat.com"
-        rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-        id S2387843AbfIFKJV (ORCPT <rfc822;linux-block@vger.kernel.org>);
-        Fri, 6 Sep 2019 06:09:21 -0400
-Received: from smtp.corp.redhat.com (int-mx03.intmail.prod.int.phx2.redhat.com [10.5.11.13])
-        (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
-        (No client certificate requested)
-        by mx1.redhat.com (Postfix) with ESMTPS id 9B78C3084288;
-        Fri,  6 Sep 2019 10:09:21 +0000 (UTC)
-Received: from warthog.procyon.org.uk (ovpn-120-255.rdu2.redhat.com [10.10.120.255])
-        by smtp.corp.redhat.com (Postfix) with ESMTP id 126BB60A97;
-        Fri,  6 Sep 2019 10:09:17 +0000 (UTC)
-Organization: Red Hat UK Ltd. Registered Address: Red Hat UK Ltd, Amberley
-        Place, 107-111 Peascod Street, Windsor, Berkshire, SI4 1TE, United
-        Kingdom.
-        Registered in England and Wales under Company Registration No. 3798903
-From:   David Howells <dhowells@redhat.com>
-In-Reply-To: <CAHk-=wjt2Eb+yEDOcQwCa0SrZ4cWu967OtQG8Vz21c=n5ZP1Nw@mail.gmail.com>
-References: <CAHk-=wjt2Eb+yEDOcQwCa0SrZ4cWu967OtQG8Vz21c=n5ZP1Nw@mail.gmail.com> <156763534546.18676.3530557439501101639.stgit@warthog.procyon.org.uk> <CAHk-=wh5ZNE9pBwrnr5MX3iqkUP4nspz17rtozrSxs5-OGygNw@mail.gmail.com> <17703.1567702907@warthog.procyon.org.uk> <CAHk-=wjQ5Fpv0D7rxX0W=obx9xoOAxJ_Cr+pGCYOAi2S9FiCNg@mail.gmail.com> <CAKCoTu7ms_Mr-q08d9XB3uascpzwBa5LF9JTT2aq8uUsoFE8aQ@mail.gmail.com> <CAHk-=wjcsxQ8QB_v=cwBQw4pkJg7pp-bBsdWyPivFO_OeF-y+g@mail.gmail.com> <5396.1567719164@warthog.procyon.org.uk> <CAHk-=wgbCXea1a9OTWgMMvcsCGGiNiPp+ty-edZrBWn63NCYdw@mail.gmail.com> <14883.1567725508@warthog.procyon.org.uk>
-To:     Linus Torvalds <torvalds@linux-foundation.org>
-Cc:     dhowells@redhat.com, Ray Strode <rstrode@redhat.com>,
-        Greg Kroah-Hartman <gregkh@linuxfoundation.org>,
-        Steven Whitehouse <swhiteho@redhat.com>,
-        Nicolas Dichtel <nicolas.dichtel@6wind.com>, raven@themaw.net,
-        keyrings@vger.kernel.org, linux-usb@vger.kernel.org,
-        linux-block <linux-block@vger.kernel.org>,
-        Christian Brauner <christian@brauner.io>,
-        LSM List <linux-security-module@vger.kernel.org>,
-        linux-fsdevel <linux-fsdevel@vger.kernel.org>,
-        Linux API <linux-api@vger.kernel.org>,
-        Linux List Kernel Mailing <linux-kernel@vger.kernel.org>,
-        Al Viro <viro@zeniv.linux.org.uk>,
-        "Ray, Debarshi" <debarshi.ray@gmail.com>,
-        Robbie Harwood <rharwood@redhat.com>
-Subject: Re: Why add the general notification queue and its sources
-MIME-Version: 1.0
-Content-Type: text/plain; charset="us-ascii"
-Content-ID: <27731.1567764557.1@warthog.procyon.org.uk>
-Date:   Fri, 06 Sep 2019 11:09:17 +0100
-Message-ID: <27732.1567764557@warthog.procyon.org.uk>
-X-Scanned-By: MIMEDefang 2.79 on 10.5.11.13
-X-Greylist: Sender IP whitelisted, not delayed by milter-greylist-4.5.16 (mx1.redhat.com [10.5.110.40]); Fri, 06 Sep 2019 10:09:21 +0000 (UTC)
+        id S2394421AbfIFO2r (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Fri, 6 Sep 2019 10:28:47 -0400
+Received: from mail-wm1-f65.google.com ([209.85.128.65]:53489 "EHLO
+        mail-wm1-f65.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S1731142AbfIFO2q (ORCPT
+        <rfc822;linux-block@vger.kernel.org>); Fri, 6 Sep 2019 10:28:46 -0400
+Received: by mail-wm1-f65.google.com with SMTP id q19so6743183wmc.3
+        for <linux-block@vger.kernel.org>; Fri, 06 Sep 2019 07:28:45 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=linaro.org; s=google;
+        h=mime-version:subject:from:in-reply-to:date:cc
+         :content-transfer-encoding:message-id:references:to;
+        bh=CPNhO04EXqyOcEwUnPkRjub5+4HJbhPw4k4lP1BUIFY=;
+        b=SgMVkFczhy1adqzEWg0jDFl+ms6YylZJ+CPw0meDi4tUKNT8GSH+BXVqYMst9hiMpB
+         ahVaFQ2nBY9/RFvc6TbN6UuBnQKQ3l/SvFs0p2M2wqUn2P7rT7dzpxtzj1BejrOrcNf5
+         GrJ+AkVNYBb/t76oZGsJzPhQKcne+Xrh7uGpnNSTVyWvb4al4388+x1HdL299wqPpp1c
+         Lyg4KemDwXk0laBb06V79aAKdNQXdABlbYod4zV5iP3plkj5i/7NqDb4AJ7966TZklBZ
+         Rg/lM3x03AjmR4EuOcvd1a7sRypF0naq0keKBd7Tttg3niHeMUPYrn5FnIk5e5EGmGFX
+         cO6w==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20161025;
+        h=x-gm-message-state:mime-version:subject:from:in-reply-to:date:cc
+         :content-transfer-encoding:message-id:references:to;
+        bh=CPNhO04EXqyOcEwUnPkRjub5+4HJbhPw4k4lP1BUIFY=;
+        b=a3U6si9NYV5ZlEAHHujpSyqV4+oXpGA60ZJd3HCJ7xWyMK2oldef0o8UUqguzYPC/i
+         wdwdcn+jmIKPTXEtHa3uGkzG7/z50cqTuhJIm1TMfmE4k8cFFsaBGYkI1W44rmG5PiJs
+         nvuGn7oOzx8u7iMSDj9Cf47hUkXJm18YxL9PpyI051mp2yCrF4U5XViAKZWd/KgrMzsb
+         XZAxujj/EWcMlreHpKdijGrNKwhXw8RlAMvxGZRDjvAjHH30oc+zB7Hi0GqrAYgw79Vy
+         GR13DoVwRSPqZbpz7K6DLi/ALP/oMCSpQ41zrslF0Q7GleB8jcBu3PJJpCoH1Wf34Huu
+         iK+w==
+X-Gm-Message-State: APjAAAWb7TE6TvnUBt1Xli9jRVMnE2oPfZebhyOyQ4Jc6Ku9nRepopwa
+        sO/nXH2Gs70WnRZG4nR6IV1/PA==
+X-Google-Smtp-Source: APXvYqyc6RBd2jtYFzjwtUHsMgQOUvTqHDhABOM21BWYEwlWnWzlh9cQtUKb1Yj7ckJuA6gf4WcLwg==
+X-Received: by 2002:a1c:cb07:: with SMTP id b7mr7937000wmg.41.1567780124531;
+        Fri, 06 Sep 2019 07:28:44 -0700 (PDT)
+Received: from [192.168.0.103] (88-147-65-157.dyn.eolo.it. [88.147.65.157])
+        by smtp.gmail.com with ESMTPSA id q25sm6346078wmq.27.2019.09.06.07.28.43
+        (version=TLS1_2 cipher=ECDHE-RSA-AES128-GCM-SHA256 bits=128/128);
+        Fri, 06 Sep 2019 07:28:43 -0700 (PDT)
+Content-Type: text/plain;
+        charset=us-ascii
+Mime-Version: 1.0 (Mac OS X Mail 12.4 \(3445.104.8\))
+Subject: Re: [PATCH v3 0/3] Implement BFQ per-device weight interface
+From:   Paolo Valente <paolo.valente@linaro.org>
+In-Reply-To: <20190828035453.18129-1-zhengfeiran@bytedance.com>
+Date:   Fri, 6 Sep 2019 16:28:42 +0200
+Cc:     linux-kernel <linux-kernel@vger.kernel.org>, axboe@kernel.dk,
+        Fam Zheng <fam@euphon.net>, duanxiongchun@bytedance.com,
+        cgroups@vger.kernel.org, zhangjiachen.jc@bytedance.com,
+        tj@kernel.org, linux-block@vger.kernel.org
+Content-Transfer-Encoding: quoted-printable
+Message-Id: <A9FD0759-F1A7-4675-A2B3-26E5F11019EF@linaro.org>
+References: <20190828035453.18129-1-zhengfeiran@bytedance.com>
+To:     Fam Zheng <zhengfeiran@bytedance.com>
+X-Mailer: Apple Mail (2.3445.104.8)
 Sender: linux-block-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-Linus Torvalds <torvalds@linux-foundation.org> wrote:
+Hi Jens,
+is this patch series fine now?
 
-> But it's *literally* just finding the places that work with
-> pipe->curbuf/nrbufs and making them use atomic updates.
+Thanks,
+Paolo
 
-No.  It really isn't.  That's two variables that describe the occupied section
-of the buffer.  Unless you have something like a 68020 with CAS2, or put them
-next to each other so you can use CMPXCHG8, you can't do that.
+> Il giorno 28 ago 2019, alle ore 05:54, Fam Zheng =
+<zhengfeiran@bytedance.com> ha scritto:
+>=20
+> v3: Pick up rev-by and ack-by from Paolo and Tejun.
+>    Add commit message to patch 3.
+>=20
+> (Revision starting from v2 since v1 was used off-list)
+>=20
+> Hi Paolo and others,
+>=20
+> This adds to BFQ the missing per-device weight interfaces:
+> blkio.bfq.weight_device on legacy and io.bfq.weight on unified. The
+> implementation pretty closely resembles what we had in CFQ and the =
+parsing code
+> is basically reused.
+>=20
+> Tests
+> =3D=3D=3D=3D=3D
+>=20
+> Using two cgroups and three block devices, having weights setup as:
+>=20
+> Cgroup          test1           test2
+> =3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=
+=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D
+> default         100             500
+> sda             500             100
+> sdb             default         default
+> sdc             200             200
+>=20
+> cgroup v1 runs
+> --------------
+>=20
+>    sda.test1.out:   READ: bw=3D913MiB/s
+>    sda.test2.out:   READ: bw=3D183MiB/s
+>=20
+>    sdb.test1.out:   READ: bw=3D213MiB/s
+>    sdb.test2.out:   READ: bw=3D1054MiB/s
+>=20
+>    sdc.test1.out:   READ: bw=3D650MiB/s
+>    sdc.test2.out:   READ: bw=3D650MiB/s
+>=20
+> cgroup v2 runs
+> --------------
+>=20
+>    sda.test1.out:   READ: bw=3D915MiB/s
+>    sda.test2.out:   READ: bw=3D184MiB/s
+>=20
+>    sdb.test1.out:   READ: bw=3D216MiB/s
+>    sdb.test2.out:   READ: bw=3D1069MiB/s
+>=20
+>    sdc.test1.out:   READ: bw=3D621MiB/s
+>    sdc.test2.out:   READ: bw=3D622MiB/s
+>=20
+> Fam Zheng (3):
+>  bfq: Fix the missing barrier in __bfq_entity_update_weight_prio
+>  bfq: Extract bfq_group_set_weight from bfq_io_set_weight_legacy
+>  bfq: Add per-device weight
+>=20
+> block/bfq-cgroup.c  | 151 +++++++++++++++++++++++++++++++++-----------
+> block/bfq-iosched.h |   3 +
+> block/bfq-wf2q.c    |   2 +
+> 3 files changed, 119 insertions(+), 37 deletions(-)
+>=20
+> --=20
+> 2.22.1
+>=20
 
-They need converting to head/tail pointers first.
-
-> They really would work with almost anything. You could even mix-and-match
-> "data generated by kernel" and "data done by 'write()' or 'splice()' by a
-> user process".
-
-Imagine that userspace writes a large message and takes the mutex.  At the
-same time something in softirq context decides *it* wants to write a message -
-it can't take the mutex and it can't wait, so the userspace write would have
-to cause the kernel message to be dropped.
-
-What I would have to do is make a write to a notification pipe go through
-post_notification() and limit the size to the maximum for a single message.
-
-Much easier to simply suppress writes and splices on pipes that have been set
-up to be notification queues - at least for now.
-
-David
