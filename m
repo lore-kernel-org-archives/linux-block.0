@@ -2,198 +2,123 @@ Return-Path: <SRS0=sY57=XB=vger.kernel.org=linux-block-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-0.9 required=3.0 tests=DKIMWL_WL_HIGH,DKIM_SIGNED,
-	DKIM_VALID,DKIM_VALID_AU,HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,
-	SPF_HELO_NONE,SPF_PASS autolearn=no autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-2.2 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
+	MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,USER_AGENT_SANE_1 autolearn=no
+	autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 62D13C43331
-	for <linux-block@archiver.kernel.org>; Fri,  6 Sep 2019 00:15:10 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id C39F8C43331
+	for <linux-block@archiver.kernel.org>; Fri,  6 Sep 2019 00:31:47 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.kernel.org (Postfix) with ESMTP id 5DB9E20828
-	for <linux-block@archiver.kernel.org>; Fri,  6 Sep 2019 00:15:10 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=default; t=1567728910;
-	bh=KhjFNpiRFHK9PPEK1PzJJvml1QDKiwN5IywzZB/DABo=;
-	h=References:In-Reply-To:From:Date:Subject:To:Cc:List-ID:From;
-	b=2iVM/mkYY6ELinTjK5G4HD2mwHSU0SLTQcdx3bFe5BcqKEhn49L44p0bVhSQbwhIx
-	 LVEWSVVd3NYfzz2YnYOZwwad5uK6U1WSJcrv8FEnilzn+oXVnV0dwqernSBZqSnPOx
-	 mApmvzYlICoTSK6FOStnZdZisx3NWXXKP08UvQ1k=
+	by mail.kernel.org (Postfix) with ESMTP id BCBB920820
+	for <linux-block@archiver.kernel.org>; Fri,  6 Sep 2019 00:31:47 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S2391499AbfIFAPJ (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Thu, 5 Sep 2019 20:15:09 -0400
-Received: from mail-lj1-f193.google.com ([209.85.208.193]:44951 "EHLO
-        mail-lj1-f193.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S2391444AbfIFAPJ (ORCPT
-        <rfc822;linux-block@vger.kernel.org>); Thu, 5 Sep 2019 20:15:09 -0400
-Received: by mail-lj1-f193.google.com with SMTP id u14so4269598ljj.11
-        for <linux-block@vger.kernel.org>; Thu, 05 Sep 2019 17:15:07 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=linux-foundation.org; s=google;
-        h=mime-version:references:in-reply-to:from:date:message-id:subject:to
-         :cc;
-        bh=0NMHQZwfVd4ulDW3P9IBDkOOXGi1t10wFsvSD1QyNDE=;
-        b=PrQ/gz4Yvh3kDyFvFLcH3TLv78hTzoNA/ToV1HPN5PDzcNoSoVUwUoP72QpHgogaxX
-         CLkzLD1zXZqq6zgzwke2sO6s4DA395H5eQOgvJCtQoWHNcdLmv5+5Qv3OTtes1ZdYxgr
-         dP7NEV3rjX1ke9HkH3D1w0hGa1cOD5ShRa+2M=
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20161025;
-        h=x-gm-message-state:mime-version:references:in-reply-to:from:date
-         :message-id:subject:to:cc;
-        bh=0NMHQZwfVd4ulDW3P9IBDkOOXGi1t10wFsvSD1QyNDE=;
-        b=pcTAocjFbJgZ+PU/XcueXILfcCt+/F9km5rFlZBs3DHG7psw5HzPk3UFcyDcsRq83v
-         TZdu5vOhOdfui4Pdhh8qCS/iNWxIqeVc5y6D+8VgHVp75PxBX5wubJ/yFhJbeVC6WzVF
-         qfiwmR5kFbC3JnXd8hDJ9Gc8iKo+4eaY2J4ngYAiPh02aCXdAKA0+rxCWI/KNRucc3m8
-         Qu4WHVt7UnQe6nG6Isq6mpZFe5Y+c7kECO+CaNgx6NH0XWwWYWWho4zP12cBu4qwDGhn
-         nP47BCbvrufF75iPNpug5Yh6jcoKOSJmxb1NDtNUWvTab5HlGXJxm0V7nMkFkDZilx6K
-         yc8w==
-X-Gm-Message-State: APjAAAWgA+DmhwNpkgIPrwvKzQlqRs3wkMs4LkLlpG4Biy63AiEyetDK
-        NfzOtqMjjn2+fYd9G1RQ49R75lI/2Vc=
-X-Google-Smtp-Source: APXvYqyBnFKXSegoJlJVEKN+qoXGKCBFDwjQb0/Nw69OXBmo601l6ajEgQK2vtsTw/IKP+nxocSTBw==
-X-Received: by 2002:a2e:50b:: with SMTP id 11mr3972440ljf.11.1567728906323;
-        Thu, 05 Sep 2019 17:15:06 -0700 (PDT)
-Received: from mail-lj1-f171.google.com (mail-lj1-f171.google.com. [209.85.208.171])
-        by smtp.gmail.com with ESMTPSA id o17sm713481ljd.9.2019.09.05.17.15.05
-        for <linux-block@vger.kernel.org>
-        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
-        Thu, 05 Sep 2019 17:15:06 -0700 (PDT)
-Received: by mail-lj1-f171.google.com with SMTP id a22so4337468ljd.0
-        for <linux-block@vger.kernel.org>; Thu, 05 Sep 2019 17:15:05 -0700 (PDT)
-X-Received: by 2002:a2e:3c14:: with SMTP id j20mr3770452lja.84.1567728461450;
- Thu, 05 Sep 2019 17:07:41 -0700 (PDT)
+        id S2390250AbfIFAbr (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Thu, 5 Sep 2019 20:31:47 -0400
+Received: from mx1.redhat.com ([209.132.183.28]:37662 "EHLO mx1.redhat.com"
+        rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
+        id S2389986AbfIFAbq (ORCPT <rfc822;linux-block@vger.kernel.org>);
+        Thu, 5 Sep 2019 20:31:46 -0400
+Received: from smtp.corp.redhat.com (int-mx05.intmail.prod.int.phx2.redhat.com [10.5.11.15])
+        (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
+        (No client certificate requested)
+        by mx1.redhat.com (Postfix) with ESMTPS id 85CE4307D8BE;
+        Fri,  6 Sep 2019 00:31:46 +0000 (UTC)
+Received: from ming.t460p (ovpn-8-16.pek2.redhat.com [10.72.8.16])
+        by smtp.corp.redhat.com (Postfix) with ESMTPS id 799B75D6A5;
+        Fri,  6 Sep 2019 00:31:35 +0000 (UTC)
+Date:   Fri, 6 Sep 2019 08:31:30 +0800
+From:   Ming Lei <ming.lei@redhat.com>
+To:     Damien Le Moal <damien.lemoal@wdc.com>
+Cc:     linux-block@vger.kernel.org, Jens Axboe <axboe@kernel.dk>,
+        linux-scsi@vger.kernel.org,
+        "Martin K . Petersen" <martin.petersen@oracle.com>,
+        dm-devel@redhat.com, Mike Snitzer <snitzer@redhat.com>
+Subject: Re: [PATCH v5 0/7] Elevator cleanups and improvements
+Message-ID: <20190906003129.GA27116@ming.t460p>
+References: <20190905095135.26026-1-damien.lemoal@wdc.com>
 MIME-Version: 1.0
-References: <156763534546.18676.3530557439501101639.stgit@warthog.procyon.org.uk>
- <CAHk-=wh5ZNE9pBwrnr5MX3iqkUP4nspz17rtozrSxs5-OGygNw@mail.gmail.com>
- <17703.1567702907@warthog.procyon.org.uk> <CAHk-=wjQ5Fpv0D7rxX0W=obx9xoOAxJ_Cr+pGCYOAi2S9FiCNg@mail.gmail.com>
- <CAKCoTu7ms_Mr-q08d9XB3uascpzwBa5LF9JTT2aq8uUsoFE8aQ@mail.gmail.com>
- <CAHk-=wjcsxQ8QB_v=cwBQw4pkJg7pp-bBsdWyPivFO_OeF-y+g@mail.gmail.com>
- <5396.1567719164@warthog.procyon.org.uk> <CAHk-=wgbCXea1a9OTWgMMvcsCGGiNiPp+ty-edZrBWn63NCYdw@mail.gmail.com>
- <14883.1567725508@warthog.procyon.org.uk>
-In-Reply-To: <14883.1567725508@warthog.procyon.org.uk>
-From:   Linus Torvalds <torvalds@linux-foundation.org>
-Date:   Thu, 5 Sep 2019 17:07:25 -0700
-X-Gmail-Original-Message-ID: <CAHk-=wjt2Eb+yEDOcQwCa0SrZ4cWu967OtQG8Vz21c=n5ZP1Nw@mail.gmail.com>
-Message-ID: <CAHk-=wjt2Eb+yEDOcQwCa0SrZ4cWu967OtQG8Vz21c=n5ZP1Nw@mail.gmail.com>
-Subject: Re: Why add the general notification queue and its sources
-To:     David Howells <dhowells@redhat.com>
-Cc:     Ray Strode <rstrode@redhat.com>,
-        Greg Kroah-Hartman <gregkh@linuxfoundation.org>,
-        Steven Whitehouse <swhiteho@redhat.com>,
-        Nicolas Dichtel <nicolas.dichtel@6wind.com>, raven@themaw.net,
-        keyrings@vger.kernel.org, linux-usb@vger.kernel.org,
-        linux-block <linux-block@vger.kernel.org>,
-        Christian Brauner <christian@brauner.io>,
-        LSM List <linux-security-module@vger.kernel.org>,
-        linux-fsdevel <linux-fsdevel@vger.kernel.org>,
-        Linux API <linux-api@vger.kernel.org>,
-        Linux List Kernel Mailing <linux-kernel@vger.kernel.org>,
-        Al Viro <viro@zeniv.linux.org.uk>,
-        "Ray, Debarshi" <debarshi.ray@gmail.com>,
-        Robbie Harwood <rharwood@redhat.com>
-Content-Type: text/plain; charset="UTF-8"
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <20190905095135.26026-1-damien.lemoal@wdc.com>
+User-Agent: Mutt/1.11.3 (2019-02-01)
+X-Scanned-By: MIMEDefang 2.79 on 10.5.11.15
+X-Greylist: Sender IP whitelisted, not delayed by milter-greylist-4.5.16 (mx1.redhat.com [10.5.110.48]); Fri, 06 Sep 2019 00:31:46 +0000 (UTC)
 Sender: linux-block-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-On Thu, Sep 5, 2019 at 4:18 PM David Howells <dhowells@redhat.com> wrote:
->
-> Can you write into a pipe from softirq context and/or with spinlocks held
-> and/or with the RCU read lock held?  That is a requirement.  Another is that
-> messages get inserted whole or not at all (or if they are truncated, the size
-> field gets updated).
+On Thu, Sep 05, 2019 at 06:51:28PM +0900, Damien Le Moal wrote:
+> This patch series implements some cleanup of the elevator initialization
+> code and introduces elevator features identification and device matching
+> to enhance checks for elevator/device compatibility and fitness.
+> 
+> The first 2 patches of the series are simple cleanups which simplify 
+> elevator initialization for newly allocated device queues.
+> 
+> Patch 3 introduce elevator features, allowing a clean and extensible
+> definition of devices and features that an elevator supports and match
+> these against features required by a block device. With this, the sysfs
+> elevator list for a device always shows only elevators matching the
+> features that a particular device requires, with the exception of the
+> none elevator which has no features but is always available for use
+> with any device.
+> 
+> The first feature defined is for zoned block device sequential write
+> constraint support through zone write locking which prevents the use of
+> any elevator that does not support this feature with zoned devices.
+> 
+> The last 4 patches of this series rework the default elevator selection
+> and initialization to allow for the elevator/device features matching
+> to work, doing so addressing cases not currently well supported, namely,
+> multi-queue zoned block devices.
+> 
+> Changes from v4:
+> * Fix patch 5 again to correctly handle request based DM devices and
+>   avoid that default queue elevator of these devices end up always
+>   being "none".
+> 
+> Changes from v3:
+> * Fixed patch 5 to correctly handle DM devices which do not register a
+>   request queue and so do not need elevator initialization.
+> 
+> Changes from v2:
+> * Fixed patch 4
+> * Call elevator_init_mq() earlier in device_add_disk() as suggested by
+>   Christoph (patch 5)
+> * Fixed title of patch 7
+> 
+> Changes from v1:
+> * Addressed Johannes comments
+> * Rebased on newest for-next branch to include Ming's sysfs lock changes
+> 
+> Damien Le Moal (7):
+>   block: Cleanup elevator_init_mq() use
+>   block: Change elevator_init_mq() to always succeed
+>   block: Introduce elevator features
+>   block: Improve default elevator selection
+>   block: Delay default elevator initialization
+>   block: Set ELEVATOR_F_ZBD_SEQ_WRITE for nullblk zoned disks
+>   sd: Set ELEVATOR_F_ZBD_SEQ_WRITE for ZBC disks
+> 
+>  block/blk-mq.c                |  20 +++--
+>  block/blk-settings.c          |  16 ++++
+>  block/blk.h                   |   2 +-
+>  block/elevator.c              | 137 ++++++++++++++++++++++++++--------
+>  block/genhd.c                 |   9 +++
+>  block/mq-deadline.c           |   1 +
+>  drivers/block/null_blk_main.c |   2 +
+>  drivers/md/dm-rq.c            |   2 +-
+>  drivers/scsi/sd_zbc.c         |   2 +
+>  include/linux/blk-mq.h        |   3 +-
+>  include/linux/blkdev.h        |   4 +
+>  include/linux/elevator.h      |   8 ++
+>  12 files changed, 161 insertions(+), 45 deletions(-)
 
-Right now we use a mutex for the buffer locking, so no, pipe buffers
-are not irq-safe or atomic. That's due to the whole "we may block on
-data from user space" when doing a write.
+Looks fine for the series:
 
-HOWEVER.
+Reviewed-by: Ming Lei <ming.lei@redhat.com>
 
-Pipes actually have buffers on two different levels: there's the
-actual data buffers themselves (each described by a "struct
-pipe_buffer"), and there's the circular queue of them (the
-"pipe->buf[]" array, with pipe->curbuf/nrbufs) that points to
-individual data buffers.
 
-And we could easily separate out that data buffer management. Right
-now it's not really all that separated: people just do things like
-
-        int newbuf = (pipe->curbuf + bufs) & (pipe->buffers-1);
-        struct pipe_buffer *buf = pipe->bufs + newbuf;
-...
-        pipe->nrbufs++;
-
-to add a buffer into that circular array of buffers, but _that_ part
-could be made separate.  It's just all protected by the pipe mutex
-right now, so it has never been an issue.
-
-And yes, atomicity of writes has actually been an integral part of
-pipes since forever. It's actually the only unambiguous atomicity that
-POSIX guarantees. It only holds for writes to pipes() of less than
-PIPE_BUF blocks, but that's 4096 on Linux.
-
-> Since one end would certainly be attached to an fd, it looks on the face of it
-> that writing into the pipe would require taking pipe->mutex.
-
-That's how the normal synchronization is done, yes. And changing that
-in general would be pretty painful. For example, two concurrent
-user-space writers might take page faults and just generally be
-painful, and the pipe locking needs to serialize that.
-
-So the mutex couldn't go away from pipes in general - it would remain
-for read/write/splice mutual exclusion (and it's not just the data it
-protects, it's the reader/writer logic for EPIPE etc).
-
-But the low-level pipe->bufs[] handling is another issue entirely.
-Even when a user space writer copies things from user space, it does
-so into a pre-allocated buffer that is then attached to the list of
-buffers somewhat separately (there's a magical special case where you
-can re-use a buffer that is marked as "I can be reused" and append
-into an already allocated buffer).
-
-And adding new buffers *could* be done with it's own separate locking.
-If you have a blocking writer (ie a user space data source), that
-would still take the pipe mutex, and it would delay the user space
-readers (because the readers also need the mutex), but it should not
-be all that hard to just make the whole "curbuf/nrbufs" handling use
-its own locking (maybe even some lockless atomics and cmpxchg).
-
-So a kernel writer could "insert" a "struct pipe_buffer" atomically,
-and wake up the reader atomically. No need for the other complexity
-that is protected by the mutex.
-
-The buggest problem is perhaps that the number of pipe buffers per
-pipe is fairly limited by default. PIPE_DEF_BUFFERS is 16, and if we'd
-insert using the ->bufs[] array, that would be the limit of "number of
-messages". But each message could be any size (we've historically
-limited pipe buffers to one page each, but that limit isn't all that
-hard. You could put more data in there).
-
-The number of pipe buffers _is_ dynamic, so the above PIPE_DEF_BUFFERS
-isn't a hard limit, but it would be the default.
-
-Would it be entirely trivial to do all the above? No. But it's
-*literally* just finding the places that work with pipe->curbuf/nrbufs
-and making them use atomic updates. You'd find all the places by just
-renaming them (and making them atomic or whatever) and the compiler
-will tell you "this area needs fixing".
-
-We've actually used pipes for messages before: autofs uses a magic
-packetized pipe buffer thing. It didn't need any extra atomicity,
-though, so it stil all worked with the regular pipe->mutex thing.
-
-And there is a big advantage from using pipes. They really would work
-with almost anything. You could even mix-and-match "data generated by
-kernel" and "data done by 'write()' or 'splice()' by a user process".
-
-NOTE! I'm not at all saying that pipes are perfect. You'll find people
-who swear by sockets instead. They have their own advantages (and
-disadvantages). Most people who do packet-based stuff tend to prefer
-sockets, because those have standard packet-based models (Linux pipes
-have that packet mode too, but it's certainly not standard, and I'm
-not even sure we ever exposed it to user space - it could be that it's
-only used by the autofs daemon).
-
-I have a soft spot for pipes, just because I think they are simpler
-than sockets. But that soft spot might be misplaced.
-
-                   Linus
+Thanks,
+Ming
