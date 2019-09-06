@@ -2,155 +2,156 @@ Return-Path: <SRS0=sY57=XB=vger.kernel.org=linux-block-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-5.2 required=3.0 tests=DKIM_SIGNED,DKIM_VALID,
-	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,SPF_HELO_NONE,
-	SPF_PASS,USER_AGENT_SANE_1 autolearn=ham autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-0.9 required=3.0 tests=DKIMWL_WL_HIGH,DKIM_SIGNED,
+	DKIM_VALID,DKIM_VALID_AU,HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,
+	SPF_HELO_NONE,SPF_PASS autolearn=no autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 1C89AC43331
-	for <linux-block@archiver.kernel.org>; Fri,  6 Sep 2019 16:26:22 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id BEB67C43331
+	for <linux-block@archiver.kernel.org>; Fri,  6 Sep 2019 17:08:24 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.kernel.org (Postfix) with ESMTP id E581C206CD
-	for <linux-block@archiver.kernel.org>; Fri,  6 Sep 2019 16:26:21 +0000 (UTC)
-Authentication-Results: mail.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel-dk.20150623.gappssmtp.com header.i=@kernel-dk.20150623.gappssmtp.com header.b="ia9N/Tkg"
+	by mail.kernel.org (Postfix) with ESMTP id 9472220578
+	for <linux-block@archiver.kernel.org>; Fri,  6 Sep 2019 17:08:24 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+	s=default; t=1567789704;
+	bh=HHQWMX/RVYod409nhseiVQqsQ+InudwbsY3vud7WzqU=;
+	h=References:In-Reply-To:From:Date:Subject:To:Cc:List-ID:From;
+	b=UfnkexnOH23SOxBN1rJrMU91JmmMHA6CI5MV/eXWZCN1iRc1O8XAeHnJYkD2xZ+52
+	 h1sME3n1uALE98hyR2KDsG8jysXBdoVdVxDl/qLDMq/AE1VQgzbVnDlcld8BTAEkvf
+	 h7eVQq1zu6mZGT1eOWDw0TGMp6FkDeIzWv8Qwkyw=
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1730858AbfIFQ0V (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Fri, 6 Sep 2019 12:26:21 -0400
-Received: from mail-io1-f65.google.com ([209.85.166.65]:33957 "EHLO
-        mail-io1-f65.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1729557AbfIFQ0V (ORCPT
-        <rfc822;linux-block@vger.kernel.org>); Fri, 6 Sep 2019 12:26:21 -0400
-Received: by mail-io1-f65.google.com with SMTP id s21so14085487ioa.1
-        for <linux-block@vger.kernel.org>; Fri, 06 Sep 2019 09:26:20 -0700 (PDT)
+        id S2405964AbfIFRIU (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Fri, 6 Sep 2019 13:08:20 -0400
+Received: from mail-lj1-f182.google.com ([209.85.208.182]:33983 "EHLO
+        mail-lj1-f182.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S2395131AbfIFRIT (ORCPT
+        <rfc822;linux-block@vger.kernel.org>); Fri, 6 Sep 2019 13:08:19 -0400
+Received: by mail-lj1-f182.google.com with SMTP id h2so164063ljk.1
+        for <linux-block@vger.kernel.org>; Fri, 06 Sep 2019 10:08:17 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=kernel-dk.20150623.gappssmtp.com; s=20150623;
-        h=subject:from:to:cc:references:message-id:date:user-agent
-         :mime-version:in-reply-to:content-language:content-transfer-encoding;
-        bh=TYNr98of8+in5on9XW6tz20SLhCfZ+SGJ05OSa5BNr4=;
-        b=ia9N/TkgVDpzi0usTDyYjsOq1WTcM/IzeYRwaalB/qF3UAzmEe4GKGVcKZhkKaYYHz
-         8stJjPdzNtxHnGPkVQb6u9XKo/b33aPrOqyks9hDAjkrLjl8ZuWhQbzou34lcRYJqYHK
-         3hTuPB0mp+3h2865ggN9qjcVVo9FvGvcSZdhPqGGwhLPwxsGvH6BwB0AhVL2jIMYQDpd
-         1i4or52HRc+fW6Ydh3SnQSWMhSZk4adml9P5RN2OL/NHqq02vmbigWP/GqO66HQCX25a
-         qsNAtodjL2QBNm8FzGTfr+RWBdv26Qdgv5YnK+HJfoIusW1NaVY3Szm+bdhCAWmU0V+O
-         qE7w==
+        d=linux-foundation.org; s=google;
+        h=mime-version:references:in-reply-to:from:date:message-id:subject:to
+         :cc;
+        bh=px6LlxUmzkx1m0e18cjKznO/fFTclAviZPrgSZRKBVI=;
+        b=MCWoYx3wwPNe3ejnJN5r5oIxq9QPmZRawZ44NCyAtTl3MEC96N3xYQha1TuJooW6hy
+         9YlTT61GP1L5xuTti11KucisLSfvTL5wG4swlhrjsZCCW2j7m8wFJW8y7EMIvNgAYJy+
+         xzirKOyunebm6EAqZhhsgW62bHn0OrSMJb0FQ=
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=1e100.net; s=20161025;
-        h=x-gm-message-state:subject:from:to:cc:references:message-id:date
-         :user-agent:mime-version:in-reply-to:content-language
-         :content-transfer-encoding;
-        bh=TYNr98of8+in5on9XW6tz20SLhCfZ+SGJ05OSa5BNr4=;
-        b=F82WzzWhrFxyiRKzijSvN+6wsWC1vEq5wWtxvV2l2+vP9+I3OKAj8LEWQFirJ5EvVf
-         0R3vu4WPXAJKVuhPHgLS1KzaS5UM770Fep0lHZ3aZzfIts3wUy41dN0OZqjGhfIRXtnR
-         DsfFKzVRDG41sApo65zAs2hKSO5hZYNsrD5Hkol/T14ZjO5Qpujp8kLs3yu/hGMVbkOY
-         1xFIbBCmljRqwRFd0Hkq0o8QxB70TSQh8jdbLZXyhUX1IiwpcVKofnwyG1fGfOp5BOAs
-         wHzzPe85S5lhN/Jw98cgmQ13A8pDj+x8NwzUR+Sig+t39GnY4+j6gzmiRqzIvzOrwfDl
-         fNyg==
-X-Gm-Message-State: APjAAAURXGw2KkfoR+lVQJqerd2/rSliHI4TdrBQ71rF0v+ZzU0ceoHW
-        qXDehlJogp+SO3S/8oZgny8dVUiqIMV6Yg==
-X-Google-Smtp-Source: APXvYqy3fmAluznF4tfOS22HdXNeNekL70tkl5TG0gH8s4FPbzuocc0FvjBhhGFraOb4laKw3E/7RA==
-X-Received: by 2002:a6b:c8cf:: with SMTP id y198mr11417513iof.179.1567787179869;
-        Fri, 06 Sep 2019 09:26:19 -0700 (PDT)
-Received: from [192.168.1.50] ([65.144.74.34])
-        by smtp.gmail.com with ESMTPSA id f7sm4452311ioc.31.2019.09.06.09.26.17
-        (version=TLS1_2 cipher=ECDHE-RSA-AES128-GCM-SHA256 bits=128/128);
-        Fri, 06 Sep 2019 09:26:18 -0700 (PDT)
-Subject: Re: [PATCH] io_uring: allocate the two rings together
-From:   Jens Axboe <axboe@kernel.dk>
-To:     Hristo Venev <hristo@venev.name>
-Cc:     linux-block@vger.kernel.org
-References: <20190826172346.8341-1-hristo@venev.name>
- <80e0e408-f602-4446-d244-60f9d4ce9c71@kernel.dk>
- <2f409a14ea27516a97cb7a7f1d70de7fe45c7c69.camel@venev.name>
- <dec45613-ab82-24b2-71bb-69693a22ee46@kernel.dk>
-Message-ID: <c0ab3b6a-3e30-8a91-512e-aed9218015a7@kernel.dk>
-Date:   Fri, 6 Sep 2019 10:26:16 -0600
-User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:60.0) Gecko/20100101
- Thunderbird/60.8.0
+        h=x-gm-message-state:mime-version:references:in-reply-to:from:date
+         :message-id:subject:to:cc;
+        bh=px6LlxUmzkx1m0e18cjKznO/fFTclAviZPrgSZRKBVI=;
+        b=iVdcQSwZ2UqGN4vIftFZb+NQGOuHzgABFvJ03UleqKmB+RbSjC9lkgZBDcJWcOSG92
+         bNhEoY3ROCKVAxmeehoaawzR1wJnC8iJEct7WNsSjcz3Ev6HMvZFti5uFAl63bKrKaBd
+         2fx7fvSSuBOGO9MEXJ9Sj+jGxEvT4ZkNUNbkoFVoC8R1334l7OCzkk4DjQnLr1Jm4CYz
+         E3X7wytSqoAGJ5kV4NqcuRkVTrXDGKz6fkJAfpQv2l7ccMFirsoHYarOhG2qMmBnX7DW
+         Ak3t4Z22mdRwhReMNKhn7gCWMRPFLrItA0yiR4Fvm6hsx5VBJI23wZMpcV1nIFaGWad9
+         5I6Q==
+X-Gm-Message-State: APjAAAVPjYKe+3OQyhRyMazlptuiDVrw4yXypK6bD0S+e0NcUh8bOWby
+        dNnINFtzbBkg6+zNAjU818R3jEOjC08=
+X-Google-Smtp-Source: APXvYqyi5rqxXhEX0xb1Fx4OHR/BndiJJ4u2qWpMwYAZXxphtpGxDJ4spvioD225tytws/pzoVvOLg==
+X-Received: by 2002:a2e:654a:: with SMTP id z71mr6404084ljb.37.1567789696432;
+        Fri, 06 Sep 2019 10:08:16 -0700 (PDT)
+Received: from mail-lj1-f182.google.com (mail-lj1-f182.google.com. [209.85.208.182])
+        by smtp.gmail.com with ESMTPSA id x15sm1411889lff.54.2019.09.06.10.08.15
+        for <linux-block@vger.kernel.org>
+        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
+        Fri, 06 Sep 2019 10:08:15 -0700 (PDT)
+Received: by mail-lj1-f182.google.com with SMTP id a4so6665491ljk.8
+        for <linux-block@vger.kernel.org>; Fri, 06 Sep 2019 10:08:15 -0700 (PDT)
+X-Received: by 2002:a2e:3a0e:: with SMTP id h14mr6369908lja.180.1567789694898;
+ Fri, 06 Sep 2019 10:08:14 -0700 (PDT)
 MIME-Version: 1.0
-In-Reply-To: <dec45613-ab82-24b2-71bb-69693a22ee46@kernel.dk>
-Content-Type: text/plain; charset=utf-8
-Content-Language: en-US
-Content-Transfer-Encoding: 7bit
+References: <156763534546.18676.3530557439501101639.stgit@warthog.procyon.org.uk>
+ <CAHk-=wh5ZNE9pBwrnr5MX3iqkUP4nspz17rtozrSxs5-OGygNw@mail.gmail.com>
+ <17703.1567702907@warthog.procyon.org.uk> <CAHk-=wjQ5Fpv0D7rxX0W=obx9xoOAxJ_Cr+pGCYOAi2S9FiCNg@mail.gmail.com>
+ <CAKCoTu7ms_Mr-q08d9XB3uascpzwBa5LF9JTT2aq8uUsoFE8aQ@mail.gmail.com>
+ <CAHk-=wjcsxQ8QB_v=cwBQw4pkJg7pp-bBsdWyPivFO_OeF-y+g@mail.gmail.com>
+ <5396.1567719164@warthog.procyon.org.uk> <CAHk-=wgbCXea1a9OTWgMMvcsCGGiNiPp+ty-edZrBWn63NCYdw@mail.gmail.com>
+ <14883.1567725508@warthog.procyon.org.uk> <CAHk-=wjt2Eb+yEDOcQwCa0SrZ4cWu967OtQG8Vz21c=n5ZP1Nw@mail.gmail.com>
+ <27732.1567764557@warthog.procyon.org.uk> <CAHk-=wiR1fpahgKuxSOQY6OfgjWD+MKz8UF6qUQ6V_y2TC_V6w@mail.gmail.com>
+ <CAHk-=wioHmz69394xKRqFkhK8si86P_704KgcwjKxawLAYAiug@mail.gmail.com> <8e60555e-9247-e03f-e8b4-1d31f70f1221@redhat.com>
+In-Reply-To: <8e60555e-9247-e03f-e8b4-1d31f70f1221@redhat.com>
+From:   Linus Torvalds <torvalds@linux-foundation.org>
+Date:   Fri, 6 Sep 2019 10:07:58 -0700
+X-Gmail-Original-Message-ID: <CAHk-=wg6=qhw0-F=2_8y=VdT+fj8k7G1+t2XNSkRYimXhampVg@mail.gmail.com>
+Message-ID: <CAHk-=wg6=qhw0-F=2_8y=VdT+fj8k7G1+t2XNSkRYimXhampVg@mail.gmail.com>
+Subject: Re: Why add the general notification queue and its sources
+To:     Steven Whitehouse <swhiteho@redhat.com>
+Cc:     David Howells <dhowells@redhat.com>,
+        Ray Strode <rstrode@redhat.com>,
+        Greg Kroah-Hartman <gregkh@linuxfoundation.org>,
+        Nicolas Dichtel <nicolas.dichtel@6wind.com>, raven@themaw.net,
+        keyrings@vger.kernel.org, linux-usb@vger.kernel.org,
+        linux-block <linux-block@vger.kernel.org>,
+        Christian Brauner <christian@brauner.io>,
+        LSM List <linux-security-module@vger.kernel.org>,
+        linux-fsdevel <linux-fsdevel@vger.kernel.org>,
+        Linux API <linux-api@vger.kernel.org>,
+        Linux List Kernel Mailing <linux-kernel@vger.kernel.org>,
+        Al Viro <viro@zeniv.linux.org.uk>,
+        "Ray, Debarshi" <debarshi.ray@gmail.com>,
+        Robbie Harwood <rharwood@redhat.com>
+Content-Type: text/plain; charset="UTF-8"
 Sender: linux-block-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-On 8/29/19 9:04 AM, Jens Axboe wrote:
-> On 8/27/19 1:35 PM, Hristo Venev wrote:
->> Sorry for the duplicate reply, I forgot to CC the mailing list.
->>
->> On Tue, 2019-08-27 at 09:50 -0600, Jens Axboe wrote:
->>> Outside of going for a cleanup, have you observed any wins from this
->>> change?
->>
->> I haven't ran any interesting benchmarks. The cp examples in liburing
->> are running as fast as before, at least on x86_64.
->>
->> Do you think it makes sense to tell userspace that the sq and cq mmap
->> offsets now mean the same thing? We could add a flag set by the kernel
->> to io_uring_params.
-> 
-> Not sure, there isn't a whole lot of overhead associated with having
-> to do two mmaps vs just one.
-> 
-> If you wanted to, the best approach would be to change one of the
-> io_uring_params reserved fields to be a feature field or something
-> like that. As features get added, we could flag them there. Then
-> the app could do:
-> 
-> io_uring_setup(depth, &params);
-> if (params.features & IORING_FEAT_SINGLE_MMAP)
-> 	....
-> else
-> 	mmap rings individually
-> 
-> and so forth.
+On Fri, Sep 6, 2019 at 9:12 AM Steven Whitehouse <swhiteho@redhat.com> wrote:
+>
+> The events are generally not independent - we would need ordering either
+> implicit in the protocol or explicit in the messages.
 
-This would do it for the kernel side. I'd suggest integrating the
-feature check into liburing, which means that applications get
-the optimization for free.
+Note that pipes certainly would never re-order messages. It's just
+that _if_ you have two independent and concurrent readers of the same
+pipe, they could read one message each, and you couldn't tell which
+was first in user space.
 
-Do you want to do it?
+Of course, I would suggest that anything that actually has
+non-independent messages should always use a sequence number or
+something like that in the message anyway. But then it would have to
+be on a protocol level.
 
+And it's not clear that all notifications need it. If it's just a
+random "things changed" notification, mnaybe that doesn't need a
+sequence number or anything else. So being on a protocol/data stream
+level might be the right thing regardless.
 
-diff --git a/fs/io_uring.c b/fs/io_uring.c
-index 17dfe57c57f8..be24596e90d7 100644
---- a/fs/io_uring.c
-+++ b/fs/io_uring.c
-@@ -3391,6 +3391,8 @@ static int io_uring_create(unsigned entries, struct io_uring_params *p)
- 	p->cq_off.ring_entries = offsetof(struct io_rings, cq_ring_entries);
- 	p->cq_off.overflow = offsetof(struct io_rings, cq_overflow);
- 	p->cq_off.cqes = offsetof(struct io_rings, cqes);
-+
-+	p->features = IORING_FEAT_SINGLE_MMAP;
- 	return ret;
- err:
- 	io_ring_ctx_wait_and_kill(ctx);
-diff --git a/include/uapi/linux/io_uring.h b/include/uapi/linux/io_uring.h
-index 1e1652f25cc1..96ee9d94b73e 100644
---- a/include/uapi/linux/io_uring.h
-+++ b/include/uapi/linux/io_uring.h
-@@ -128,11 +128,17 @@ struct io_uring_params {
- 	__u32 flags;
- 	__u32 sq_thread_cpu;
- 	__u32 sq_thread_idle;
--	__u32 resv[5];
-+	__u32 features;
-+	__u32 resv[4];
- 	struct io_sqring_offsets sq_off;
- 	struct io_cqring_offsets cq_off;
- };
- 
-+/*
-+ * io_uring_params->features flags
-+ */
-+#define IORING_FEAT_SINGLE_MMAP		(1U << 0)
-+
- /*
-  * io_uring_register(2) opcodes and arguments
-  */
+Another possibility is to just say "don't do that then". If you want
+multiple concurrent readers, open multiple pipes for them and use
+separate events, and be happy in the knowledge that you don't have any
+complicated cases.
 
--- 
-Jens Axboe
+>  We also need to
+> know in case messages are dropped too - doesn't need to be anything
+> fancy, just some idea that since we last did a read, there are messages
+> that got lost, most likely due to buffer overrun.
 
+Pipes don't have that, but another flag certainly wouldn't be _hard_ to add.
+
+But one problem (and this is fundamental) is that while O_DIRECT works
+today (and works with kernels going back years), any new features like
+overflow notification would obviously not work with legacy kernels.
+
+On the user write side, with an O_NONBLOCK pipe, you currently just
+get an -EAGAIN, so you _see_ the drop happening. But (again) there's
+no sticky flag for it anywhere else, and there's no clean automatic
+way for the reader to see "ok, the writer overflowed".
+
+That's not a problem for any future extensions - the feature sounds
+like a new flag and a couple of lines to do it - but it's a problem
+for the whole "prototype in user space using existing pipe support"
+that I personally find so nice, and which I think is such a good way
+to prove the user space _need_ for anything like this.
+
+But if people are ok with the pipe model in theory, _that_ kind of
+small and directed feature I have absolutely no problem with adding.
+It's just whole new untested character mode drivers with odd semantics
+that I find troublesome.
+
+Hmm. Maybe somebody can come up with a good legacy signaling solution
+(and "just use another pipe for error notification and OOB data" for
+the first one may _work_, but that sounds pretty hacky and just not
+very convenient).
+
+               Linus
