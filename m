@@ -2,161 +2,161 @@ Return-Path: <SRS0=sY57=XB=vger.kernel.org=linux-block-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-0.8 required=3.0 tests=DKIM_SIGNED,DKIM_VALID,
-	DKIM_VALID_AU,HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SPF_HELO_NONE,
-	SPF_PASS autolearn=no autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-8.2 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
+	INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,
+	URIBL_BLOCKED,USER_AGENT_SANE_1 autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 0CA53C43331
-	for <linux-block@archiver.kernel.org>; Fri,  6 Sep 2019 09:07:27 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 79ED6C43331
+	for <linux-block@archiver.kernel.org>; Fri,  6 Sep 2019 09:23:25 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.kernel.org (Postfix) with ESMTP id D259620854
-	for <linux-block@archiver.kernel.org>; Fri,  6 Sep 2019 09:07:26 +0000 (UTC)
-Authentication-Results: mail.kernel.org;
-	dkim=pass (2048-bit key) header.d=linaro.org header.i=@linaro.org header.b="g2/f8zaL"
+	by mail.kernel.org (Postfix) with ESMTP id 5C52620842
+	for <linux-block@archiver.kernel.org>; Fri,  6 Sep 2019 09:23:25 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S2392856AbfIFJHW (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Fri, 6 Sep 2019 05:07:22 -0400
-Received: from mail-wm1-f52.google.com ([209.85.128.52]:51575 "EHLO
-        mail-wm1-f52.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S2389138AbfIFJHW (ORCPT
-        <rfc822;linux-block@vger.kernel.org>); Fri, 6 Sep 2019 05:07:22 -0400
-Received: by mail-wm1-f52.google.com with SMTP id k1so5679676wmi.1
-        for <linux-block@vger.kernel.org>; Fri, 06 Sep 2019 02:07:20 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=linaro.org; s=google;
-        h=mime-version:subject:from:in-reply-to:date:cc
-         :content-transfer-encoding:message-id:references:to;
-        bh=bRNpTF+jlVTEA0th1ETWAk1qTJWN6Qeu8URjuG4vuw0=;
-        b=g2/f8zaLtJ58LwSPZ4Fxp31XofUqLVy6CiLpQZDRxqfSFCkkkcQLmP2pN2lCr2Rvma
-         iQJYDrF+zvyU/PUN6bEeU5c3tIgPkZfK545NpqirU+wuHQnRcG43TdxBmEC2cEZRwsiY
-         rtFeoV8dRoYX1yt6xiu7gsSNbRo/a2xy2lLe+bnBCfBxMj1ZL9K1yYgTC0JgUyLrQ8Up
-         SGrBhpTBm62GcF/Xcwdw5RbV4mP9XNKsL94XLYOL+Z65LESWw2zQzD1bbFKib96Bk+9s
-         KAaQoiygmpBNgES7OYeyQdBSdamFxGxMR9Rl/R6obORIq2TlsRfCcMnN7w819OT00gC7
-         vLkw==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20161025;
-        h=x-gm-message-state:mime-version:subject:from:in-reply-to:date:cc
-         :content-transfer-encoding:message-id:references:to;
-        bh=bRNpTF+jlVTEA0th1ETWAk1qTJWN6Qeu8URjuG4vuw0=;
-        b=V4QxMl61ELLNs8EGm1X0b6UfYR13w4+VBfMLBLxyO+rhRrGPRI9oZ3zrNUAEIp0FkT
-         c/V7XcJW3CtI84b7CMYM9ZjKeNce2oGIW7dWApd259zdx7RR9bI6DqwI4g//5aY1K4+a
-         wQmBxjq27Th1Md3YFy7kQiEJvrp7orlIkydRj9T+WoP6q5jfd+fVsSV+Sl5P+Dms+GPs
-         ntt68v9Qh7s/gBg30l7U1r6uW+wSYPNECUp1PaP63ZyM05BT30lD6z/xSWiYHn4R3wW1
-         2rDEqz7VllbB05WkuzGpIkeoV4pLnUktSFfWc3P3yaSgYPRCJ02u+1JzL92Yx17gkcBE
-         WyLQ==
-X-Gm-Message-State: APjAAAVwwXBg3zuEJf4xflO946KSQYa0poLxDF1r6CL+0/Nk0WMbq9cb
-        LOmna+9+BhOlF+e81ePl4Vjmbg==
-X-Google-Smtp-Source: APXvYqzTkSfIsU3hU/2q5f43wN5BDN/9Qf5vdBDJjz92GTwgZTlvkevjXpGIrHIxjNr/Bdt75k4Fig==
-X-Received: by 2002:a7b:c935:: with SMTP id h21mr6004171wml.35.1567760839881;
-        Fri, 06 Sep 2019 02:07:19 -0700 (PDT)
-Received: from [192.168.0.103] (88-147-65-157.dyn.eolo.it. [88.147.65.157])
-        by smtp.gmail.com with ESMTPSA id j22sm9584317wre.45.2019.09.06.02.07.18
-        (version=TLS1_2 cipher=ECDHE-RSA-AES128-GCM-SHA256 bits=128/128);
-        Fri, 06 Sep 2019 02:07:19 -0700 (PDT)
-Content-Type: text/plain;
-        charset=us-ascii
-Mime-Version: 1.0 (Mac OS X Mail 12.4 \(3445.104.8\))
-Subject: Re: [PATCHSET block/for-next] IO cost model based work-conserving
- porportional controller
-From:   Paolo Valente <paolo.valente@linaro.org>
-In-Reply-To: <20190905165540.GJ2263813@devbig004.ftw2.facebook.com>
-Date:   Fri, 6 Sep 2019 11:07:17 +0200
-Cc:     Jens Axboe <axboe@kernel.dk>, newella@fb.com, clm@fb.com,
-        Josef Bacik <josef@toxicpanda.com>, dennisz@fb.com,
-        Li Zefan <lizefan@huawei.com>,
-        Johannes Weiner <hannes@cmpxchg.org>,
-        linux-kernel <linux-kernel@vger.kernel.org>,
-        linux-block <linux-block@vger.kernel.org>, kernel-team@fb.com,
-        cgroups@vger.kernel.org, ast@kernel.org, daniel@iogearbox.net,
-        kafai@fb.com, songliubraving@fb.com, yhs@fb.com,
-        bpf@vger.kernel.org
-Content-Transfer-Encoding: 7bit
-Message-Id: <EFFA2298-8614-4AFC-9208-B36976F6548C@linaro.org>
-References: <20190614015620.1587672-1-tj@kernel.org>
- <20190614175642.GA657710@devbig004.ftw2.facebook.com>
- <5A63F937-F7B5-4D09-9DB4-C73D6F571D50@linaro.org>
- <B5E431F7-549D-4FC4-A098-D074DF9586A1@linaro.org>
- <20190820151903.GH2263813@devbig004.ftw2.facebook.com>
- <9EB760CE-0028-4766-AE9D-6E90028D8579@linaro.org>
- <20190831065358.GF2263813@devbig004.ftw2.facebook.com>
- <88C7DC68-680E-49BB-9699-509B9B0B12A0@linaro.org>
- <20190902155652.GH2263813@devbig004.ftw2.facebook.com>
- <D9F6BC6D-FEB3-40CA-A33C-F501AE4434F0@linaro.org>
- <20190905165540.GJ2263813@devbig004.ftw2.facebook.com>
-To:     Tejun Heo <tj@kernel.org>
-X-Mailer: Apple Mail (2.3445.104.8)
+        id S2392878AbfIFJXY (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Fri, 6 Sep 2019 05:23:24 -0400
+Received: from mx1.redhat.com ([209.132.183.28]:50368 "EHLO mx1.redhat.com"
+        rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
+        id S2392864AbfIFJXY (ORCPT <rfc822;linux-block@vger.kernel.org>);
+        Fri, 6 Sep 2019 05:23:24 -0400
+Received: from smtp.corp.redhat.com (int-mx03.intmail.prod.int.phx2.redhat.com [10.5.11.13])
+        (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
+        (No client certificate requested)
+        by mx1.redhat.com (Postfix) with ESMTPS id 4F4D27E427;
+        Fri,  6 Sep 2019 09:23:24 +0000 (UTC)
+Received: from localhost.localdomain (ovpn-12-25.pek2.redhat.com [10.72.12.25])
+        by smtp.corp.redhat.com (Postfix) with ESMTPS id 6A4E560A97;
+        Fri,  6 Sep 2019 09:23:18 +0000 (UTC)
+Subject: Fwd: Re: [PATCH blktests] nvme: Add new test case about nvme
+ rescan/reset/remove during IO
+References: <f77317f0-401d-614c-f136-d96ee7b9dd34@redhat.com>
+From:   Yi Zhang <yi.zhang@redhat.com>
+To:     Omar Sandoval <osandov@osandov.com>
+Cc:     linux-block <linux-block@vger.kernel.org>, osandov@fb.com,
+        Ming Lei <ming.lei@redhat.com>
+X-Forwarded-Message-Id: <f77317f0-401d-614c-f136-d96ee7b9dd34@redhat.com>
+Message-ID: <27060ac3-dbed-7d38-95d8-378b935adab7@redhat.com>
+Date:   Fri, 6 Sep 2019 17:23:13 +0800
+User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:60.0) Gecko/20100101
+ Thunderbird/60.7.0
+MIME-Version: 1.0
+In-Reply-To: <f77317f0-401d-614c-f136-d96ee7b9dd34@redhat.com>
+Content-Type: text/plain; charset=utf-8; format=flowed
+Content-Transfer-Encoding: 8bit
+Content-Language: en-US
+X-Scanned-By: MIMEDefang 2.79 on 10.5.11.13
+X-Greylist: Sender IP whitelisted, not delayed by milter-greylist-4.5.16 (mx1.redhat.com [10.5.110.27]); Fri, 06 Sep 2019 09:23:24 +0000 (UTC)
 Sender: linux-block-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
+Hi Omar
 
+Thanks for your review, pls check my comments inline
 
-> Il giorno 5 set 2019, alle ore 18:55, Tejun Heo <tj@kernel.org> ha scritto:
-> 
-> Hello, Paolo.
-> 
-> So, I'm currently verifying iocost in the FB fleet.  Around three
-> thousand machines running v5.2 (+ some backports) with btrfs on a
-> handful of different models of consumer grade SSDs.  I haven't seen
-> complete loss of control as you're reporting.  Given that you're
-> reporting the same thing on io.latency, which is deployed on multiple
-> orders of magnitude more machines at this point, it's likely that
-> there's something common affecting your test setup.
+On 9/5/19 2:21 AM, Omar Sandoval wrote:
+> On Tue, Sep 03, 2019 at 04:17:52PM +0800, Yi Zhang wrote:
+>> Add one test to cover NVMe SSD rescan/reset/remove operation during
+>> IO, the steps found several issues during my previous testing, check
+>> them here:
+>> http://lists.infradead.org/pipermail/linux-nvme/2017-February/008358.html
+>> http://lists.infradead.org/pipermail/linux-nvme/2017-May/010259.html
+>>
+>> Signed-off-by: Yi Zhang <yi.zhang@redhat.com>
+>> ---
+>> tests/nvme/031 | 43 +++++++++++++++++++++++++++++++++++++++++++
+>> tests/nvme/031.out | 2 ++
+>> 2 files changed, 45 insertions(+)
+>> create mode 100755 tests/nvme/031
+>> create mode 100644 tests/nvme/031.out
+>>
+>> diff --git a/tests/nvme/031 b/tests/nvme/031
+>> new file mode 100755
+>> index 0000000..4113d12
+>> --- /dev/null
+>> +++ b/tests/nvme/031
+>> @@ -0,0 +1,43 @@
+>> +#!/bin/bash
+>> +# SPDX-License-Identifier: GPL-3.0+
+>> +# Copyright (C) 2019 Yi Zhang <yi.zhang@redhat.com>
+>> +#
+>> +# Test nvme pci adapter rescan/reset/remove operation during I/O
+>> +#
+>> +# Regression test for bellow two commits:
+>> +# http://lists.infradead.org/pipermail/linux-nvme/2017-May/010367.html
+>> +# 986f75c876db nvme: avoid to use blk_mq_abort_requeue_list()
+>> +# 806f026f9b90 nvme: use blk_mq_start_hw_queues() in nvme_kill_queues()
+>> +
+>> +. tests/nvme/rc
+>> +
+>> +DESCRIPTION="test nvme pci adapter rescan/reset/remove during I/O"
+>> +TIMED=1
+>> +
+>> +requires() {
+>> + _have_fio
+>> +}
+>> +
+>> +device_requires() {
+>> + _test_dev_is_nvme
+>> +}
+>> +
+>> +test_device() {
+>> + echo "Running ${TEST_NAME}"
+>> +
+>> + pdev="$(_get_pci_dev_from_blkdev)"
+>> +
+>> + # start fio job
+>> + _run_fio_rand_io --filename="$TEST_DEV" --size=1g \
+>> + --ignore_error=EIO,ENXIO,ENODEV --group_reporting &> /dev/null &
+>> +
+>> + # do rescan/reset/remove operation
+>> + echo 1 > /sys/bus/pci/devices/"${pdev}"/rescan
+>> + echo 1 > /sys/bus/pci/devices/"${pdev}"/reset
+> My QEMU VM doesn't have the "reset" attribute, I'm guessing because of
+> this code in pci_create_capabilities_sysfs():
+>
+> if (dev->reset_fn) {
+> retval = device_create_file(&dev->dev, &reset_attr);
+> if (retval)
+> goto error;
+> }
+>
+> We can skip the reset if the attribute doesn't exist.
 
-Yep, I had that doubt too, so I extended my tests to one more PC and
-two more drives: a fast SAMSUNG NVMe SSD 970 PRO and an HITACHI
-HTS72755 HDD, using the QoS configurations suggested in your last
-email.  As for the filesystem, I'm interested in ext4, because it is
-the most widely used file system, and, with some workloads, it makes
-it hard to control I/O while keeping throughput high.  I'll provide hw
-and sw details in my reply to your next question.  I'm willing to run
-tests with btrfs too, at a later time.
+OK, will change to bellow to skip it.
 
-Something is wrong with io.cost also with the other PC and the other
-drives.  In the next table, each pair of numbers contains the target's
-throughput and the total throughput:
+   # QEMU VM doesn't have the "reset" attribute, skip it
 
-                  none                 io.cost               bfq
-SAMSUNG SSD    11.373  3295.517     6.468  3273.892    10.802  1862.288
-HITACHI HDD    0.026    11.531      0.042    30.299     0.067    76.642
+     if [[ -e /sys/bus/pci/devices/"${pdev}"/reset ]]; then
+             echo 1 > /sys/bus/pci/devices/"${pdev}"/reset
+     fi
 
-With the SAMSUNG SSD, io.cost gives to the target less throughput than
-none (and bfq is behaving badly too, but this is my problem).  On the
-HDD, io.cost gives to the target a little bit more than half the
-throughput guaranteed by bfq, and reaches less than half the total
-throughput reached by bfq.
+>> + echo 1 > /sys/bus/pci/devices/"${pdev}"/remove
+>> + sleep .5
+>> + echo 1 > /sys/bus/pci/rescan
+>> + sleep 5
+> Instead of sleep, we can kill and wait for fio.
 
-I do agree that three thousand is an overwhelming number of machines,
-and I'll probably never have that many resources for my tests.  Still,
-it seems rather unlikely that two different PCs, and three different
-drives, all suffer from a common anomaly that causes troubles only to
-io.cost and io.latency.
+OK, will add bellow kill and wait cmd
 
-I try to never overlook also me being the problematic link in the
-chain.  But I'm executing this test with the public script I mentioned
-in my previous emails; and all steps seem correct.
+     { kill $!; wait; } &> /dev/null
 
->  Can you please
-> describe your test configuration and if you aren't already try testing
-> on btrfs?
-> 
+After remve/rescan operation, the nvme  need about 3s to be 
+reinitialized on my environment, so I added sleep 5 here,
 
-PC 1: Thinkpad W520, Ubuntu 18.04 (no configuration change w.r.t.
-defaults), PLEXTOR SATA PX-256M5S SSD, HITACHI HTS72755 HDD, ext4.
+how about add bellow loop to wait for the device node?
 
-PC 2: Thinkpad X1 Extreme, Ubuntu 19.04 (no configuration change
-w.r.t.  defaults), SAMSUNG NVMe SSD 970 PRO, ext4.
+     # wait nvme reinitialized
+     local m
+     for ((m = 0; m < 10; m++)); do
+             if [[ -b "${TEST_DEV}" ]]; then
+                 break
+             fi
+             sleep 0.5
+     done
+     if (( m > 9 )); then
+             echo "nvme still not reinitialized after 5 seconds!"
+     fi
 
-If you need more details, just ask.
-
-Thanks,
-Paolo
-
-
-
-> Thanks.
-> 
-> -- 
-> tejun
-
+>
+> Thanks!
