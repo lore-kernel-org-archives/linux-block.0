@@ -2,67 +2,84 @@ Return-Path: <SRS0=sY57=XB=vger.kernel.org=linux-block-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-0.7 required=3.0 tests=DKIM_SIGNED,DKIM_VALID,
-	HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,
-	URIBL_BLOCKED autolearn=no autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-0.8 required=3.0 tests=DKIMWL_WL_HIGH,DKIM_SIGNED,
+	DKIM_VALID,DKIM_VALID_AU,HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,
+	SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED autolearn=no autolearn_force=no
+	version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id ACB4DC43140
-	for <linux-block@archiver.kernel.org>; Fri,  6 Sep 2019 17:14:25 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 36D3EC43331
+	for <linux-block@archiver.kernel.org>; Fri,  6 Sep 2019 17:15:08 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.kernel.org (Postfix) with ESMTP id 83E4520640
-	for <linux-block@archiver.kernel.org>; Fri,  6 Sep 2019 17:14:25 +0000 (UTC)
-Authentication-Results: mail.kernel.org;
-	dkim=pass (2048-bit key) header.d=amacapital-net.20150623.gappssmtp.com header.i=@amacapital-net.20150623.gappssmtp.com header.b="yd2a+54P"
+	by mail.kernel.org (Postfix) with ESMTP id 0BC0620640
+	for <linux-block@archiver.kernel.org>; Fri,  6 Sep 2019 17:15:08 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+	s=default; t=1567790108;
+	bh=Pdd5X5KdmhTY3zVAeyGvUCWFX8Plc6Z4m96rFXEwVAk=;
+	h=References:In-Reply-To:From:Date:Subject:To:Cc:List-ID:From;
+	b=ufTF9UbwbLQ4YrWKEDRHnKiia2puk5tQ+jeP9obLDF7orirs8MHzQHZSQJAG9eGxa
+	 rvwhLlVcsfAZCCjBuQ2nVDTXXMHBRezR4o5yABTt6ZsXSV0BfQaj/cWdz5ByMXrjg9
+	 2wwQSiG03mx9wMYuiuEDuB1/zadi5B0vhp+137ZI=
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S2389535AbfIFROY (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Fri, 6 Sep 2019 13:14:24 -0400
-Received: from mail-pg1-f195.google.com ([209.85.215.195]:36814 "EHLO
-        mail-pg1-f195.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S2389712AbfIFROT (ORCPT
-        <rfc822;linux-block@vger.kernel.org>); Fri, 6 Sep 2019 13:14:19 -0400
-Received: by mail-pg1-f195.google.com with SMTP id l21so3847172pgm.3
-        for <linux-block@vger.kernel.org>; Fri, 06 Sep 2019 10:14:19 -0700 (PDT)
+        id S2390079AbfIFRPH (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Fri, 6 Sep 2019 13:15:07 -0400
+Received: from mail-lf1-f65.google.com ([209.85.167.65]:34384 "EHLO
+        mail-lf1-f65.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S2391470AbfIFRPH (ORCPT
+        <rfc822;linux-block@vger.kernel.org>); Fri, 6 Sep 2019 13:15:07 -0400
+Received: by mail-lf1-f65.google.com with SMTP id z21so5692891lfe.1
+        for <linux-block@vger.kernel.org>; Fri, 06 Sep 2019 10:15:06 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=amacapital-net.20150623.gappssmtp.com; s=20150623;
-        h=mime-version:subject:from:in-reply-to:date:cc
-         :content-transfer-encoding:message-id:references:to;
-        bh=hOgSaQ9OiZSGTbwU3Edr701ZO2qKZIOjSVp4gAjrJTU=;
-        b=yd2a+54PEaXqiHA9W/77hkPN2VhfSOlLkSERJRJ/Bh1zlws9GocZGNGdm3pxHNPP2k
-         apcVkjkZdq9vP5K898Y0K0fp9Msz4ZIqXGLi1k3bvPTRUs1UDb+7WxEM6JDLxMiQC9Wu
-         hspuXC71/2nCgTYC+nFZhbQMqN+6eyywKJmqPax8RWIZzApVcyFl5TPK/9Tjjmez1ZGz
-         l0D7JZ/pzEMsGILSnd+o1gvbgawAXhr39KQszkwTSRT6FrgwFODq1N4F8fWIgP3aj4VH
-         YyfGqiifL7/wZTGB2yK1JGhsxMeKoGttY75RNEmXrHy9j6PIB31lmiA0uGmL+SbUOsUT
-         Xwwg==
+        d=linux-foundation.org; s=google;
+        h=mime-version:references:in-reply-to:from:date:message-id:subject:to
+         :cc;
+        bh=HgnD7xuPPV7kJPJv1y/oxrmL+dxJJMuTrQ4Q4FChOdU=;
+        b=S6FXIRgesHQioG8oGxLk5Tjwzb4SPiDI6TQkN/1PfVNUkJMeUM47+DjxmFZZnsgnqF
+         aVUh5gjMjdVeG3Ez1LdJPa9NKOGaCIHQumkrSOBf3OS+YC+yfMLrM6/zSsHJRG8ghrAg
+         d5Mr3bY5beGZhlJwy9YNIxLVtQzi4ydOFbhE4=
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=1e100.net; s=20161025;
-        h=x-gm-message-state:mime-version:subject:from:in-reply-to:date:cc
-         :content-transfer-encoding:message-id:references:to;
-        bh=hOgSaQ9OiZSGTbwU3Edr701ZO2qKZIOjSVp4gAjrJTU=;
-        b=HS2BZmhkb7/PzW+grzUNQNki6Lvfb8PmtsRhFYloBretxhXt9NjEP6NvSCewW+XxD3
-         qQfiCtbKAvnh0/C03cifk0NAXRBpj2KQXh2lKn+z1lEd5rZQtYyNeCg9sJSReduc8Z6c
-         ebAcX2GS98Br0m0f3ONnIhbensOt4BJhF1vk2srLj331qm6Pr1Piei6yCLvF+DErjlLZ
-         Ol9v1pA0+fExz8cGjOG2cP9JCAv8WpKpi69HWeoD9dtDFcm6YVawaa+eHn88djln0Lv2
-         ETe45Mh4oYCzgBaVtShUGf6c/LEefDWVwR/Qg+yZUNMSth9aeYpJjeE1Cc8TlRjYlSE2
-         3LCg==
-X-Gm-Message-State: APjAAAVk8fT2KA8F+tn6kg+1biaxc0FTIcgcacOLCq+EbtvVTNzER4Pq
-        U6YN0MEo+sS7sXIAsatz4pfEkA==
-X-Google-Smtp-Source: APXvYqxbn2eHgWIJBYiC3a5/vs29BS1qCgh/M+Xwxl6za2nTiM7gcJSTtHUvTCE+hcKMSoFjghMKew==
-X-Received: by 2002:a63:7e17:: with SMTP id z23mr8935117pgc.14.1567790058681;
-        Fri, 06 Sep 2019 10:14:18 -0700 (PDT)
-Received: from ?IPv6:2600:100f:b121:da37:bc66:d4de:83c7:e0cd? ([2600:100f:b121:da37:bc66:d4de:83c7:e0cd])
-        by smtp.gmail.com with ESMTPSA id l11sm4930140pgq.58.2019.09.06.10.14.17
-        (version=TLS1_2 cipher=ECDHE-RSA-AES128-GCM-SHA256 bits=128/128);
-        Fri, 06 Sep 2019 10:14:17 -0700 (PDT)
-Content-Type: text/plain;
-        charset=us-ascii
-Mime-Version: 1.0 (1.0)
+        h=x-gm-message-state:mime-version:references:in-reply-to:from:date
+         :message-id:subject:to:cc;
+        bh=HgnD7xuPPV7kJPJv1y/oxrmL+dxJJMuTrQ4Q4FChOdU=;
+        b=KVAo71vZ8i3czxWVX04N/WyAqpXBeqnGTkcEv6IuRNcCGRnZlLh8CGZCBMf5y+UOF4
+         C9CKHVqYf8Yu0Fj4/yTtrcddFiZG05xfdRaVhb7vxJ2PfSasJCKJ8rDMJVzAcnPl2fUS
+         TeoYzL7iSTmkdmU7PaIRzvxPomKSf64wy9dnwrW2c1s3n0JDMbSrhfyZ4Zgs/Czgr4p2
+         45rU0oC7GdOYnB9jy62zeQ5PO63g/IbjkEno3nOQ+0BnCMNzFW68cyT5MIdrSVTE65Hi
+         wos6k7XndhWb/lW3sp7oBxxORUbWUQLwp7jyqUDeQaKJ4CEdIORrJkwqolu1zC9Qk3FV
+         /vjw==
+X-Gm-Message-State: APjAAAVbLyOgRETqB37iu0nonOQMp9mcAmAi36q19hxZIveWOdmkB1Sr
+        4l0wRaWM1HqKbZWLOML574/CAQJIVZg=
+X-Google-Smtp-Source: APXvYqxyOt/9cfYwnJzVmwJJ4lJe6FUvtXShx8hOkTmJo3+bJeCmQSUHVfmofaKfZJAMcd9aBYK2Dw==
+X-Received: by 2002:ac2:5181:: with SMTP id u1mr7613267lfi.114.1567790105350;
+        Fri, 06 Sep 2019 10:15:05 -0700 (PDT)
+Received: from mail-lj1-f179.google.com (mail-lj1-f179.google.com. [209.85.208.179])
+        by smtp.gmail.com with ESMTPSA id r8sm1244355lfm.71.2019.09.06.10.15.04
+        for <linux-block@vger.kernel.org>
+        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
+        Fri, 06 Sep 2019 10:15:04 -0700 (PDT)
+Received: by mail-lj1-f179.google.com with SMTP id y23so6674490lje.9
+        for <linux-block@vger.kernel.org>; Fri, 06 Sep 2019 10:15:04 -0700 (PDT)
+X-Received: by 2002:a2e:8507:: with SMTP id j7mr6626752lji.156.1567790104003;
+ Fri, 06 Sep 2019 10:15:04 -0700 (PDT)
+MIME-Version: 1.0
+References: <156763534546.18676.3530557439501101639.stgit@warthog.procyon.org.uk>
+ <CAHk-=wh5ZNE9pBwrnr5MX3iqkUP4nspz17rtozrSxs5-OGygNw@mail.gmail.com>
+ <17703.1567702907@warthog.procyon.org.uk> <CAHk-=wjQ5Fpv0D7rxX0W=obx9xoOAxJ_Cr+pGCYOAi2S9FiCNg@mail.gmail.com>
+ <CAKCoTu7ms_Mr-q08d9XB3uascpzwBa5LF9JTT2aq8uUsoFE8aQ@mail.gmail.com>
+ <CAHk-=wjcsxQ8QB_v=cwBQw4pkJg7pp-bBsdWyPivFO_OeF-y+g@mail.gmail.com>
+ <5396.1567719164@warthog.procyon.org.uk> <CAHk-=wgbCXea1a9OTWgMMvcsCGGiNiPp+ty-edZrBWn63NCYdw@mail.gmail.com>
+ <14883.1567725508@warthog.procyon.org.uk> <CAHk-=wjt2Eb+yEDOcQwCa0SrZ4cWu967OtQG8Vz21c=n5ZP1Nw@mail.gmail.com>
+ <27732.1567764557@warthog.procyon.org.uk> <CAHk-=wiR1fpahgKuxSOQY6OfgjWD+MKz8UF6qUQ6V_y2TC_V6w@mail.gmail.com>
+ <CAHk-=wioHmz69394xKRqFkhK8si86P_704KgcwjKxawLAYAiug@mail.gmail.com>
+ <8e60555e-9247-e03f-e8b4-1d31f70f1221@redhat.com> <CAHk-=wg6=qhw0-F=2_8y=VdT+fj8k7G1+t2XNSkRYimXhampVg@mail.gmail.com>
+In-Reply-To: <CAHk-=wg6=qhw0-F=2_8y=VdT+fj8k7G1+t2XNSkRYimXhampVg@mail.gmail.com>
+From:   Linus Torvalds <torvalds@linux-foundation.org>
+Date:   Fri, 6 Sep 2019 10:14:47 -0700
+X-Gmail-Original-Message-ID: <CAHk-=wjaSzdzYNuQXUSZNkT75Wmfw2v96tekgnV8nOwBQ3h0ig@mail.gmail.com>
+Message-ID: <CAHk-=wjaSzdzYNuQXUSZNkT75Wmfw2v96tekgnV8nOwBQ3h0ig@mail.gmail.com>
 Subject: Re: Why add the general notification queue and its sources
-From:   Andy Lutomirski <luto@amacapital.net>
-X-Mailer: iPhone Mail (16G102)
-In-Reply-To: <8e60555e-9247-e03f-e8b4-1d31f70f1221@redhat.com>
-Date:   Fri, 6 Sep 2019 10:14:17 -0700
-Cc:     Linus Torvalds <torvalds@linux-foundation.org>,
-        David Howells <dhowells@redhat.com>,
+To:     Steven Whitehouse <swhiteho@redhat.com>
+Cc:     David Howells <dhowells@redhat.com>,
         Ray Strode <rstrode@redhat.com>,
         Greg Kroah-Hartman <gregkh@linuxfoundation.org>,
         Nicolas Dichtel <nicolas.dichtel@6wind.com>, raven@themaw.net,
@@ -76,93 +93,34 @@ Cc:     Linus Torvalds <torvalds@linux-foundation.org>,
         Al Viro <viro@zeniv.linux.org.uk>,
         "Ray, Debarshi" <debarshi.ray@gmail.com>,
         Robbie Harwood <rharwood@redhat.com>
-Content-Transfer-Encoding: quoted-printable
-Message-Id: <930B6F39-4174-46C2-B556-E98ED72E27F8@amacapital.net>
-References: <156763534546.18676.3530557439501101639.stgit@warthog.procyon.org.uk> <CAHk-=wh5ZNE9pBwrnr5MX3iqkUP4nspz17rtozrSxs5-OGygNw@mail.gmail.com> <17703.1567702907@warthog.procyon.org.uk> <CAHk-=wjQ5Fpv0D7rxX0W=obx9xoOAxJ_Cr+pGCYOAi2S9FiCNg@mail.gmail.com> <CAKCoTu7ms_Mr-q08d9XB3uascpzwBa5LF9JTT2aq8uUsoFE8aQ@mail.gmail.com> <CAHk-=wjcsxQ8QB_v=cwBQw4pkJg7pp-bBsdWyPivFO_OeF-y+g@mail.gmail.com> <5396.1567719164@warthog.procyon.org.uk> <CAHk-=wgbCXea1a9OTWgMMvcsCGGiNiPp+ty-edZrBWn63NCYdw@mail.gmail.com> <14883.1567725508@warthog.procyon.org.uk> <CAHk-=wjt2Eb+yEDOcQwCa0SrZ4cWu967OtQG8Vz21c=n5ZP1Nw@mail.gmail.com> <27732.1567764557@warthog.procyon.org.uk> <CAHk-=wiR1fpahgKuxSOQY6OfgjWD+MKz8UF6qUQ6V_y2TC_V6w@mail.gmail.com> <CAHk-=wioHmz69394xKRqFkhK8si86P_704KgcwjKxawLAYAiug@mail.gmail.com> <8e60555e-9247-e03f-e8b4-1d31f70f1221@redhat.com>
-To:     Steven Whitehouse <swhiteho@redhat.com>
+Content-Type: text/plain; charset="UTF-8"
 Sender: linux-block-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
+On Fri, Sep 6, 2019 at 10:07 AM Linus Torvalds
+<torvalds@linux-foundation.org> wrote:
+>
+> Hmm. Maybe somebody can come up with a good legacy signaling solution
+> (and "just use another pipe for error notification and OOB data" for
+> the first one may _work_, but that sounds pretty hacky and just not
+> very convenient).
 
+... actually, maybe the trivial solution for at least some prototyping
+cases is to make any user mode writers never drop messages. Don't use
+a non-blocking fd for the write direction.
 
-> On Sep 6, 2019, at 9:12 AM, Steven Whitehouse <swhiteho@redhat.com> wrote:=
+That's obviously *not* acceptable for a kernel writer, and it's not
+acceptable for an actual system daemon writer (that you could block by
+just not reading the notifications), but it's certainly acceptable for
+the "let's prototype having kernel support for /proc/mounts
+notifications using a local thread that just polls for it every few
+seconds".
 
->=20
-> Hi,
->=20
->> On 06/09/2019 16:53, Linus Torvalds wrote:
->> On Fri, Sep 6, 2019 at 8:35 AM Linus Torvalds
->> <torvalds@linux-foundation.org> wrote:
->>> This is why I like pipes. You can use them today. They are simple, and
->>> extensible, and you don't need to come up with a new subsystem and
->>> some untested ad-hoc thing that nobody has actually used.
->> The only _real_ complexity is to make sure that events are reliably parse=
-able.
->>=20
->> That's where you really want to use the Linux-only "packet pipe"
->> thing, becasue otherwise you have to have size markers or other things
->> to delineate events. But if you do that, then it really becomes
->> trivial.
->>=20
->> And I checked, we made it available to user space, even if the
->> original reason for that code was kernel-only autofs use: you just
->> need to make the pipe be O_DIRECT.
->>=20
->> This overly stupid program shows off the feature:
->>=20
->>         #define _GNU_SOURCE
->>         #include <fcntl.h>
->>         #include <unistd.h>
->>=20
->>         int main(int argc, char **argv)
->>         {
->>                 int fd[2];
->>                 char buf[10];
->>=20
->>                 pipe2(fd, O_DIRECT | O_NONBLOCK);
->>                 write(fd[1], "hello", 5);
->>                 write(fd[1], "hi", 2);
->>                 read(fd[0], buf, sizeof(buf));
->>                 read(fd[0], buf, sizeof(buf));
->>                 return 0;
->>         }
->>=20
->> and it you strace it (because I was too lazy to add error handling or
->> printing of results), you'll see
->>=20
->>     write(4, "hello", 5)                    =3D 5
->>     write(4, "hi", 2)                       =3D 2
->>     read(3, "hello", 10)                    =3D 5
->>     read(3, "hi", 10)                       =3D 2
->>=20
->> note how you got packets of data on the reader side, instead of
->> getting the traditional "just buffer it as a stream".
->>=20
->> So now you can even have multiple readers of the same event pipe, and
->> packetization is obvious and trivial. Of course, I'm not sure why
->> you'd want to have multiple readers, and you'd lose _ordering_, but if
->> all events are independent, this _might_ be a useful thing in a
->> threaded environment. Maybe.
->>=20
->> (Side note: a zero-sized write will not cause a zero-sized packet. It
->> will just be dropped).
->>=20
->>                Linus
->=20
-> The events are generally not independent - we would need ordering either i=
-mplicit in the protocol or explicit in the messages. We also need to know in=
- case messages are dropped too - doesn't need to be anything fancy, just som=
-e idea that since we last did a read, there are messages that got lost, most=
- likely due to buffer overrun.
+So at least for _some_ prototypes you can probably just ignore the
+overflow issue. It won't get you full test coverage, but it will get
+you a working legacy solution and a "look, if we have kernel support
+for this, we can do better".
 
-This could be a bit fancier: if the pipe recorded the bitwise or of the firs=
-t few bytes of dropped message, then the messages could set a bit in the hea=
-der indicating the type, and readers could then learn which *types* of messa=
-ges were dropped.
-
-Or they could just use multiple pipes.
-
-If this whole mechanism catches on, I wonder if implementing recvmmsg() on p=
-ipes would be worthwhile.=
+                 Linus
