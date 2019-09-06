@@ -2,79 +2,69 @@ Return-Path: <SRS0=sY57=XB=vger.kernel.org=linux-block-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-0.8 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
-	MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS autolearn=no autolearn_force=no
-	version=3.4.0
+X-Spam-Status: No, score=-2.2 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
+	MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED,USER_AGENT_SANE_1
+	autolearn=no autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 737D4C43331
-	for <linux-block@archiver.kernel.org>; Fri,  6 Sep 2019 21:19:21 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 88915C43331
+	for <linux-block@archiver.kernel.org>; Fri,  6 Sep 2019 23:33:32 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.kernel.org (Postfix) with ESMTP id 4A4A82070C
-	for <linux-block@archiver.kernel.org>; Fri,  6 Sep 2019 21:19:21 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id 5952020842
+	for <linux-block@archiver.kernel.org>; Fri,  6 Sep 2019 23:33:32 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S2391303AbfIFVTP (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Fri, 6 Sep 2019 17:19:15 -0400
-Received: from mx1.redhat.com ([209.132.183.28]:49602 "EHLO mx1.redhat.com"
-        rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-        id S2388619AbfIFVTP (ORCPT <rfc822;linux-block@vger.kernel.org>);
-        Fri, 6 Sep 2019 17:19:15 -0400
-Received: from smtp.corp.redhat.com (int-mx05.intmail.prod.int.phx2.redhat.com [10.5.11.15])
-        (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
-        (No client certificate requested)
-        by mx1.redhat.com (Postfix) with ESMTPS id 067E2195DB80;
-        Fri,  6 Sep 2019 21:19:15 +0000 (UTC)
-Received: from warthog.procyon.org.uk (ovpn-120-255.rdu2.redhat.com [10.10.120.255])
-        by smtp.corp.redhat.com (Postfix) with ESMTP id 6272C5D712;
-        Fri,  6 Sep 2019 21:19:11 +0000 (UTC)
-Organization: Red Hat UK Ltd. Registered Address: Red Hat UK Ltd, Amberley
-        Place, 107-111 Peascod Street, Windsor, Berkshire, SI4 1TE, United
-        Kingdom.
-        Registered in England and Wales under Company Registration No. 3798903
-From:   David Howells <dhowells@redhat.com>
-In-Reply-To: <20190906174102.GB2819@mit.edu>
-References: <20190906174102.GB2819@mit.edu> <5396.1567719164@warthog.procyon.org.uk> <CAHk-=wgbCXea1a9OTWgMMvcsCGGiNiPp+ty-edZrBWn63NCYdw@mail.gmail.com> <14883.1567725508@warthog.procyon.org.uk> <CAHk-=wjt2Eb+yEDOcQwCa0SrZ4cWu967OtQG8Vz21c=n5ZP1Nw@mail.gmail.com> <27732.1567764557@warthog.procyon.org.uk> <CAHk-=wiR1fpahgKuxSOQY6OfgjWD+MKz8UF6qUQ6V_y2TC_V6w@mail.gmail.com> <CAHk-=wioHmz69394xKRqFkhK8si86P_704KgcwjKxawLAYAiug@mail.gmail.com> <8e60555e-9247-e03f-e8b4-1d31f70f1221@redhat.com> <CAHk-=wg6=qhw0-F=2_8y=VdT+fj8k7G1+t2XNSkRYimXhampVg@mail.gmail.com> <CAHk-=wjaSzdzYNuQXUSZNkT75Wmfw2v96tekgnV8nOwBQ3h0ig@mail.gmail.com>
-To:     "Theodore Y. Ts'o" <tytso@mit.edu>
-Cc:     dhowells@redhat.com,
-        Linus Torvalds <torvalds@linux-foundation.org>,
-        Steven Whitehouse <swhiteho@redhat.com>,
-        Ray Strode <rstrode@redhat.com>,
-        Greg Kroah-Hartman <gregkh@linuxfoundation.org>,
-        Nicolas Dichtel <nicolas.dichtel@6wind.com>, raven@themaw.net,
-        keyrings@vger.kernel.org, linux-usb@vger.kernel.org,
-        linux-block <linux-block@vger.kernel.org>,
-        Christian Brauner <christian@brauner.io>,
-        LSM List <linux-security-module@vger.kernel.org>,
-        linux-fsdevel <linux-fsdevel@vger.kernel.org>,
-        Linux API <linux-api@vger.kernel.org>,
-        Linux List Kernel Mailing <linux-kernel@vger.kernel.org>,
-        Al Viro <viro@zeniv.linux.org.uk>,
-        "Ray, Debarshi" <debarshi.ray@gmail.com>,
-        Robbie Harwood <rharwood@redhat.com>
-Subject: Re: Why add the general notification queue and its sources
+        id S2392926AbfIFXdb (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Fri, 6 Sep 2019 19:33:31 -0400
+Received: from mail-ot1-f68.google.com ([209.85.210.68]:35843 "EHLO
+        mail-ot1-f68.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S2392874AbfIFXdb (ORCPT
+        <rfc822;linux-block@vger.kernel.org>); Fri, 6 Sep 2019 19:33:31 -0400
+Received: by mail-ot1-f68.google.com with SMTP id 67so7352044oto.3;
+        Fri, 06 Sep 2019 16:33:31 -0700 (PDT)
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20161025;
+        h=x-gm-message-state:subject:to:cc:references:from:message-id:date
+         :user-agent:mime-version:in-reply-to:content-language
+         :content-transfer-encoding;
+        bh=nWpDQmZNg8zKVk12QskQ7NNS05C4fI/JmZBKLdKyu8Q=;
+        b=jdesAfIeqYR/VZVBFIv9KOmq7Ibhq3CC0pLqIHgiUA9qioYXELpFeWTaKtAFfT5nS2
+         Bsq4SMztUC28ZmyxFJiHYZs/hGBAJ1vbZXpckvQQkPRE1/kioo0M2Ln0EHlSk1ZQIwKe
+         eSriNg1g02CP0PAkTGWECTXYsOh2lEMEDM84Mom1SkaMhVuFgAHC+A+JWlHr0t8Ek5RY
+         dS5Z+VR9bKpW1BPR4wnFFhGyGNidBcscEfeo1ZUeB6zmKrnNna3cDmxPoeSO08+Q6HWh
+         o4T+5zmnwRS8CIxgJHmMvfnsMqBH9VLo1TOgoHXqfVr/B3O0cSAKZxUzpB3Rl8omyTFq
+         RSDQ==
+X-Gm-Message-State: APjAAAVQOGgJSwGkqDIu0cYKcqrukhGtGrkFeXNwpCKiS8KIuxnRhxKV
+        NFHIZwgIWSY6BedKeHiZYuU=
+X-Google-Smtp-Source: APXvYqyerfyqDjBSkqBV5awpri+gcw1eOii1hkXi4+t7I8BPKUfhltTsqe2asvXehkt1m+lTJphnMw==
+X-Received: by 2002:a9d:6acb:: with SMTP id m11mr9725890otq.40.1567812810260;
+        Fri, 06 Sep 2019 16:33:30 -0700 (PDT)
+Received: from ?IPv6:2600:1700:65a0:78e0:514:7862:1503:8e4d? ([2600:1700:65a0:78e0:514:7862:1503:8e4d])
+        by smtp.gmail.com with ESMTPSA id z33sm2710525otb.75.2019.09.06.16.33.28
+        (version=TLS1_2 cipher=ECDHE-RSA-AES128-GCM-SHA256 bits=128/128);
+        Fri, 06 Sep 2019 16:33:29 -0700 (PDT)
+Subject: Re: [PATCH v8 01/13] nvme-core: introduce nvme_ctrl_get_by_path()
+To:     Logan Gunthorpe <logang@deltatee.com>,
+        linux-kernel@vger.kernel.org, linux-nvme@lists.infradead.org,
+        linux-block@vger.kernel.org, linux-fsdevel@vger.kernel.org
+Cc:     Christoph Hellwig <hch@lst.de>, Keith Busch <kbusch@kernel.org>,
+        Jens Axboe <axboe@fb.com>,
+        Chaitanya Kulkarni <Chaitanya.Kulkarni@wdc.com>,
+        Max Gurtovoy <maxg@mellanox.com>,
+        Stephen Bates <sbates@raithlin.com>
+References: <20190828215429.4572-1-logang@deltatee.com>
+ <20190828215429.4572-2-logang@deltatee.com>
+From:   Sagi Grimberg <sagi@grimberg.me>
+Message-ID: <f67b6e12-8d88-6dab-1211-64595ea58421@grimberg.me>
+Date:   Fri, 6 Sep 2019 16:33:27 -0700
+User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:60.0) Gecko/20100101
+ Thunderbird/60.8.0
 MIME-Version: 1.0
-Content-Type: text/plain; charset="us-ascii"
-Content-ID: <24429.1567804750.1@warthog.procyon.org.uk>
-Date:   Fri, 06 Sep 2019 22:19:10 +0100
-Message-ID: <24430.1567804750@warthog.procyon.org.uk>
-X-Scanned-By: MIMEDefang 2.79 on 10.5.11.15
-X-Greylist: Sender IP whitelisted, not delayed by milter-greylist-4.6.2 (mx1.redhat.com [10.5.110.62]); Fri, 06 Sep 2019 21:19:15 +0000 (UTC)
+In-Reply-To: <20190828215429.4572-2-logang@deltatee.com>
+Content-Type: text/plain; charset=utf-8; format=flowed
+Content-Language: en-US
+Content-Transfer-Encoding: 7bit
 Sender: linux-block-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-Theodore Y. Ts'o <tytso@mit.edu> wrote:
-
-> Something else which we should consider up front is how to handle the
-> case where you have multiple userspace processes that want to
-> subscribe to the same notification.
-
-I have that.
-
-> This also implies that we'll need to have some kind of standard header
-> at the beginning to specify the source of a particular notification
-> message.
-
-That too.
-
-David
+Reviewed-by: Sagi Grimberg <sagi@grimberg.me>
