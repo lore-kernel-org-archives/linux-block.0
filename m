@@ -2,167 +2,95 @@ Return-Path: <SRS0=sY57=XB=vger.kernel.org=linux-block-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-0.7 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
-	MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED autolearn=no
-	autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-2.2 required=3.0 tests=DKIM_SIGNED,DKIM_VALID,
+	HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,
+	USER_AGENT_SANE_1 autolearn=no autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 48564C43331
-	for <linux-block@archiver.kernel.org>; Fri,  6 Sep 2019 19:53:42 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id EE472C00307
+	for <linux-block@archiver.kernel.org>; Fri,  6 Sep 2019 20:34:23 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.kernel.org (Postfix) with ESMTP id 2884720838
-	for <linux-block@archiver.kernel.org>; Fri,  6 Sep 2019 19:53:42 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id C578A208C3
+	for <linux-block@archiver.kernel.org>; Fri,  6 Sep 2019 20:34:23 +0000 (UTC)
+Authentication-Results: mail.kernel.org;
+	dkim=pass (2048-bit key) header.d=kernel-dk.20150623.gappssmtp.com header.i=@kernel-dk.20150623.gappssmtp.com header.b="OBMSFHpU"
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S2388061AbfIFTxl (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Fri, 6 Sep 2019 15:53:41 -0400
-Received: from mx1.redhat.com ([209.132.183.28]:45548 "EHLO mx1.redhat.com"
-        rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-        id S1727004AbfIFTxl (ORCPT <rfc822;linux-block@vger.kernel.org>);
-        Fri, 6 Sep 2019 15:53:41 -0400
-Received: from smtp.corp.redhat.com (int-mx07.intmail.prod.int.phx2.redhat.com [10.5.11.22])
-        (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
-        (No client certificate requested)
-        by mx1.redhat.com (Postfix) with ESMTPS id A18E92A09AB;
-        Fri,  6 Sep 2019 19:53:40 +0000 (UTC)
-Received: from localhost (dhcp-10-20-1-130.bss.redhat.com [10.20.1.130])
-        by smtp.corp.redhat.com (Postfix) with ESMTP id 4050B10018F8;
-        Fri,  6 Sep 2019 19:53:40 +0000 (UTC)
-From:   Robbie Harwood <rharwood@redhat.com>
-To:     Ray Strode <rstrode@redhat.com>,
-        Linus Torvalds <torvalds@linux-foundation.org>
-Cc:     David Howells <dhowells@redhat.com>,
-        Greg Kroah-Hartman <gregkh@linuxfoundation.org>,
-        Steven Whitehouse <swhiteho@redhat.com>,
-        Nicolas Dichtel <nicolas.dichtel@6wind.com>, raven@themaw.net,
-        keyrings@vger.kernel.org, linux-usb@vger.kernel.org,
-        linux-block <linux-block@vger.kernel.org>,
-        Christian Brauner <christian@brauner.io>,
-        LSM List <linux-security-module@vger.kernel.org>,
-        linux-fsdevel <linux-fsdevel@vger.kernel.org>,
-        Linux API <linux-api@vger.kernel.org>,
-        Linux List Kernel Mailing <linux-kernel@vger.kernel.org>,
-        Al Viro <viro@zeniv.linux.org.uk>,
-        "Ray\, Debarshi" <debarshi.ray@gmail.com>
-Subject: Re: Why add the general notification queue and its sources
-In-Reply-To: <CAKCoTu70E9cbVu=jVG4EiXnTNiG-znvri6Omh2t++1zRw+639Q@mail.gmail.com>
-References: <156763534546.18676.3530557439501101639.stgit@warthog.procyon.org.uk> <CAHk-=wh5ZNE9pBwrnr5MX3iqkUP4nspz17rtozrSxs5-OGygNw@mail.gmail.com> <17703.1567702907@warthog.procyon.org.uk> <CAHk-=wjQ5Fpv0D7rxX0W=obx9xoOAxJ_Cr+pGCYOAi2S9FiCNg@mail.gmail.com> <CAKCoTu7ms_Mr-q08d9XB3uascpzwBa5LF9JTT2aq8uUsoFE8aQ@mail.gmail.com> <CAHk-=wjcsxQ8QB_v=cwBQw4pkJg7pp-bBsdWyPivFO_OeF-y+g@mail.gmail.com> <CAKCoTu70E9cbVu=jVG4EiXnTNiG-znvri6Omh2t++1zRw+639Q@mail.gmail.com>
-Date:   Fri, 06 Sep 2019 15:53:38 -0400
-Message-ID: <jlg7e6l19rx.fsf@redhat.com>
+        id S2387400AbfIFUeW (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Fri, 6 Sep 2019 16:34:22 -0400
+Received: from mail-pl1-f194.google.com ([209.85.214.194]:33779 "EHLO
+        mail-pl1-f194.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S2392014AbfIFUeW (ORCPT
+        <rfc822;linux-block@vger.kernel.org>); Fri, 6 Sep 2019 16:34:22 -0400
+Received: by mail-pl1-f194.google.com with SMTP id t11so3741221plo.0
+        for <linux-block@vger.kernel.org>; Fri, 06 Sep 2019 13:34:21 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=kernel-dk.20150623.gappssmtp.com; s=20150623;
+        h=subject:to:cc:references:from:message-id:date:user-agent
+         :mime-version:in-reply-to:content-language:content-transfer-encoding;
+        bh=jG4+RgP/pviUKJ8QbJcP8qw2XnaK/vU+SiEUpD2jM1E=;
+        b=OBMSFHpUBrpgwRkuVSPuBXbTZeB7AfzZ02OBd9Cgdn1S+8h270Jx/KJtcH8H2re6K/
+         QknBx24vAAsFHkJy9KIFbcB9pHKUvQoYsGTRPYmsbO301vXvzn3C32XPJki9Yc9mYaPr
+         M4RSGBUaA7CAlN6Kupdt8WteuEj7jN26aRtadlJ57R/wGEm5knMLk2IHvMlHwOhuJ/CQ
+         3pMYOyWHvBo/daB2+3QR4DK7BVvaFF/QuYl/SvP4fKHkFXgMuTbiRj5QzgSU6thfzqsK
+         n9lUD14fI+mG59+DGd61uprySi1oepwNw6B7eqNFFeFptt9dhedT82pelGc+watqkcWU
+         TP0A==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20161025;
+        h=x-gm-message-state:subject:to:cc:references:from:message-id:date
+         :user-agent:mime-version:in-reply-to:content-language
+         :content-transfer-encoding;
+        bh=jG4+RgP/pviUKJ8QbJcP8qw2XnaK/vU+SiEUpD2jM1E=;
+        b=hMDnO+XVOvrClj4jRLZ/HegBxCAS65oPJWCR7nKujszXa0gntEzzWvgNSN2EZCb3GK
+         RDRS7qK6Q18g4nsPreMQkaD0kQyMlnwtlduJlvyENNojyjrC9bF6JSeznHIEcCTA9RqK
+         ZI9/nHpHrniKXn6oSTnKYu+emgpLJYW/Ck/QY8dRZear+tIWrgDZQjpRZ56oag0Qp0i0
+         +UkCHlm/BHiDAqpKcW3kKZ15+0gzDX19kPSXGcpIZ3Y8CaO+cdQQLhZtbbggurRgO4dJ
+         yOZllxsPlFlXjua92uu/YMHsIVaVEPODdrARV8QP3krpTrAo03x5Sr9jjoFJ9G4tyZkb
+         R3GQ==
+X-Gm-Message-State: APjAAAUta1ZuVYZzNj8RdEiIkgBZX1wKw/xMRrRuElug6ttH4gwhApU3
+        z6eA5qTAnLh78FjKsSrBU0GkShZXqH4=
+X-Google-Smtp-Source: APXvYqxCMyfMPGhJ+8OxvxljdQJNFJZh4UuGqj9+wa3Gv7L3n/x6Nwh1/cnKvuvHVhsl2AZ1md1NYQ==
+X-Received: by 2002:a17:902:20cc:: with SMTP id v12mr10443768plg.188.1567802060586;
+        Fri, 06 Sep 2019 13:34:20 -0700 (PDT)
+Received: from ?IPv6:2600:380:774b:941b:9c06:647e:785b:f82f? ([2600:380:774b:941b:9c06:647e:785b:f82f])
+        by smtp.gmail.com with ESMTPSA id 64sm9025671pfx.31.2019.09.06.13.34.18
+        (version=TLS1_2 cipher=ECDHE-RSA-AES128-GCM-SHA256 bits=128/128);
+        Fri, 06 Sep 2019 13:34:19 -0700 (PDT)
+Subject: Re: [PATCH v3 0/3] Implement BFQ per-device weight interface
+To:     Fam Zheng <zhengfeiran@bytedance.com>, linux-kernel@vger.kernel.org
+Cc:     paolo.valente@linaro.org, fam@euphon.net,
+        duanxiongchun@bytedance.com, cgroups@vger.kernel.org,
+        zhangjiachen.jc@bytedance.com, tj@kernel.org,
+        linux-block@vger.kernel.org
+References: <20190828035453.18129-1-zhengfeiran@bytedance.com>
+From:   Jens Axboe <axboe@kernel.dk>
+Message-ID: <437c831d-179e-f8a3-5687-f93459d28b53@kernel.dk>
+Date:   Fri, 6 Sep 2019 14:34:17 -0600
+User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:60.0) Gecko/20100101
+ Thunderbird/60.8.0
 MIME-Version: 1.0
-Content-Type: multipart/signed; boundary="=-=-=";
-        micalg=pgp-sha512; protocol="application/pgp-signature"
-X-Scanned-By: MIMEDefang 2.84 on 10.5.11.22
-X-Greylist: Sender IP whitelisted, not delayed by milter-greylist-4.5.16 (mx1.redhat.com [10.5.110.38]); Fri, 06 Sep 2019 19:53:40 +0000 (UTC)
+In-Reply-To: <20190828035453.18129-1-zhengfeiran@bytedance.com>
+Content-Type: text/plain; charset=utf-8
+Content-Language: en-US
+Content-Transfer-Encoding: 7bit
 Sender: linux-block-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
---=-=-=
-Content-Type: text/plain; charset=utf-8
-Content-Transfer-Encoding: quoted-printable
+On 8/27/19 9:54 PM, Fam Zheng wrote:
+> v3: Pick up rev-by and ack-by from Paolo and Tejun.
+>      Add commit message to patch 3.
+> 
+> (Revision starting from v2 since v1 was used off-list)
+> 
+> Hi Paolo and others,
+> 
+> This adds to BFQ the missing per-device weight interfaces:
+> blkio.bfq.weight_device on legacy and io.bfq.weight on unified. The
+> implementation pretty closely resembles what we had in CFQ and the parsing code
+> is basically reused.
 
-Ray Strode <rstrode@redhat.com> writes:
+Applied, thanks.
 
-> Linus Torvalds <torvalds@linux-foundation.org> wrote:
->
->> That is *way* too specific to make for any kind of generic
->> notification mechanism.
->
-> Well from my standpoint, I just don't want to have to poll... I don't
-> have a strong opinion about how it looks architecturally to reach that
-> goal.
->
-> Ideally, at a higher level, I want the userspace api that gnome uses
-> to be something like:
->
-> err =3D krb5_cc_watch (ctx, ccache, (krb5_cc_change_fct) on_cc_change ,
-> &watch_fd);
->
-> then a watch_fd would get handed back and caller could poll on it. if
-> it woke up poll(), caller would do
->
-> krb5_cc_watch_update (ctx, ccache, watch_fd)
->
-> or so and it would trigger on_cc_change to get called (or something like =
-that).
->
-> If under the hood, fd comes from opening /dev/watch_queue, and
-> krb5_cc_watch_update reads from some mmap'ed buffer to decide whether
-> or not to call on_cc_change, that's fine with me.
->
-> If under the hood, fd comes from a pipe fd returned from some ioctl or
-> syscall, and krb5_cc_watch_update reads messages directly from that fd
-> to decide whether or not to call on_cc_change, that's fine with
-> me. too.
->
-> it could be an eventfd too, or whatever, too, just as long as its
-> something I can add to poll() and don't have to intermittently poll
-> ... :-)
->
->
->> And why would you do a broken big-key thing in the kernel in the
->> first place? Why don't you just have a kernel key to indirectly
->> encrypt using a key and "additional user space data". The kernel
->> should simply not take care of insane 1MB keys.
->
-> =F0=9F=A4=B7 dunno.  I assume you're referencing the discussions from com=
-ment 0
-> on that 2013 bug.  I wasn't involved in those discussions, I just
-> chimed in after they happened trying to avoid having to add polling
-> :-)
->
-> I have no idea why a ticket would get that large. I assume it only is
-> in weird edge cases.
+-- 
+Jens Axboe
 
-Sadly they're not weird, but yes.  Kerberos tickets can get decently
-large due to Microsoft's PACs (see MS-PAC and MS-KILE), which we need to
-process, understand, and store for Active Directory interop.  I'm not
-sure if I've personally made one over 1MB, but it could easily occur
-given enough claims (MS-ADTS).
-
-> Anyway, gnome treats the tickets as opaque blobs.  it doesn't do anything
-> with them other than tell the user when they need to get refreshed...
->
-> all the actual key manipulation happens from krb5 libraries.
->
-> of course, one advantage of having the tickets kernel side is nfs
-> could in theory access them directly, rather than up calling back to
-> userspace...
-
-Easy availability to filesystems is in fact the main theoretical
-advantage of the keyring for us in krb5 (and, for whatever it's worth,
-is why we're interested in namespaced keyrings for containers).  Our
-privilege separation mechanism (gssproxy) is cache-type agnostic, and we
-do have other credential cache types (KCM and DIR/FILE) in the
-implementation.
-
-Thanks,
-=2D-Robbie
-
-=2D-
-Robbie Harwood
-Kerberos Development Lead
-Security Engineering Team
-Red Hat, Inc.
-Boston, MA, US
-
---=-=-=
-Content-Type: application/pgp-signature; name="signature.asc"
-
------BEGIN PGP SIGNATURE-----
-
-iQIzBAEBCgAdFiEEA5qc6hnelQjDaHWqJTL5F2qVpEIFAl1yuUIACgkQJTL5F2qV
-pEKhxBAApTOa699cr0sDXl0rHPK+Ibj1T49ryHpbykhJ30RKQmC9xRFoxqJmN/N9
-sy+xVpHxUikuVktp6So7ZNXh6mcY7bKYzZUpT/LITdDRo/NZxgAwk3DSLxXVNwWx
-6h0lJTX95uHxfdxLlYJOOTyndCgdXGDAr2jFovZo06mb/VPK1WL4q5mIjTKtN47u
-lG2YnU6SyY/zLwL3BKaQnUq/VruFbuQm+28zwsrVmZEZxIBs/bNcnkD0vT+mOTTa
-dXVqi6VNmXmtlsctsVbCXAQSNXOVC+K3qZBZAEJo5kObyRwctzIUOehOLnGZ89/K
-5mny02IPPLCpvUBhvVYroE0lyLKHpbkWnXyGmcPTNpyKNa5bylsoZmN4DWZevdQn
-hPrar7/gYlPoaQOot2VVYMeqn0rT4XJLf/DzG0YsSmMD5EUd5/0GZ8TVTw2iZKnj
-FIhGdP0MwIYrGARma830/iffk4dLj/qzn8K1mpgr2aaYBzQOalyrE8DJ7xgba386
-S1A+hlwSY7Byi4aFXT/vZgGrJ9FEPStD2N8xYHYdntZKe0t3TqCHEn8SM57yN6mR
-aOvzPHaPG/4OsCuugySMtR/8uzGY/tSuItEQF/vLX8azZkeyPLsqBLRyUsCLPGAV
-Zv+fpFJtNC8PYLtUiZXRYYk4THFX20bIU/Ky8LCiRs0vddyhHvc=
-=Si8+
------END PGP SIGNATURE-----
---=-=-=--
