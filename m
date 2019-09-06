@@ -2,147 +2,155 @@ Return-Path: <SRS0=sY57=XB=vger.kernel.org=linux-block-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-2.2 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
-	MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED,USER_AGENT_SANE_1
-	autolearn=no autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-5.2 required=3.0 tests=DKIM_SIGNED,DKIM_VALID,
+	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,SPF_HELO_NONE,
+	SPF_PASS,USER_AGENT_SANE_1 autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 16C00C43140
-	for <linux-block@archiver.kernel.org>; Fri,  6 Sep 2019 16:12:29 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 1C89AC43331
+	for <linux-block@archiver.kernel.org>; Fri,  6 Sep 2019 16:26:22 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.kernel.org (Postfix) with ESMTP id EC2682082C
-	for <linux-block@archiver.kernel.org>; Fri,  6 Sep 2019 16:12:28 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id E581C206CD
+	for <linux-block@archiver.kernel.org>; Fri,  6 Sep 2019 16:26:21 +0000 (UTC)
+Authentication-Results: mail.kernel.org;
+	dkim=pass (2048-bit key) header.d=kernel-dk.20150623.gappssmtp.com header.i=@kernel-dk.20150623.gappssmtp.com header.b="ia9N/Tkg"
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1729118AbfIFQMV (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Fri, 6 Sep 2019 12:12:21 -0400
-Received: from mx1.redhat.com ([209.132.183.28]:43716 "EHLO mx1.redhat.com"
-        rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-        id S1729137AbfIFQMU (ORCPT <rfc822;linux-block@vger.kernel.org>);
-        Fri, 6 Sep 2019 12:12:20 -0400
-Received: from smtp.corp.redhat.com (int-mx08.intmail.prod.int.phx2.redhat.com [10.5.11.23])
-        (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
-        (No client certificate requested)
-        by mx1.redhat.com (Postfix) with ESMTPS id AC0284E832;
-        Fri,  6 Sep 2019 16:12:19 +0000 (UTC)
-Received: from fogou.chygwyn.com (unknown [10.33.36.100])
-        by smtp.corp.redhat.com (Postfix) with ESMTPS id 9E0823CC8;
-        Fri,  6 Sep 2019 16:12:15 +0000 (UTC)
-Subject: Re: Why add the general notification queue and its sources
-To:     Linus Torvalds <torvalds@linux-foundation.org>,
-        David Howells <dhowells@redhat.com>
-Cc:     Ray Strode <rstrode@redhat.com>,
-        Greg Kroah-Hartman <gregkh@linuxfoundation.org>,
-        Nicolas Dichtel <nicolas.dichtel@6wind.com>, raven@themaw.net,
-        keyrings@vger.kernel.org, linux-usb@vger.kernel.org,
-        linux-block <linux-block@vger.kernel.org>,
-        Christian Brauner <christian@brauner.io>,
-        LSM List <linux-security-module@vger.kernel.org>,
-        linux-fsdevel <linux-fsdevel@vger.kernel.org>,
-        Linux API <linux-api@vger.kernel.org>,
-        Linux List Kernel Mailing <linux-kernel@vger.kernel.org>,
-        Al Viro <viro@zeniv.linux.org.uk>,
-        "Ray, Debarshi" <debarshi.ray@gmail.com>,
-        Robbie Harwood <rharwood@redhat.com>
-References: <156763534546.18676.3530557439501101639.stgit@warthog.procyon.org.uk>
- <CAHk-=wh5ZNE9pBwrnr5MX3iqkUP4nspz17rtozrSxs5-OGygNw@mail.gmail.com>
- <17703.1567702907@warthog.procyon.org.uk>
- <CAHk-=wjQ5Fpv0D7rxX0W=obx9xoOAxJ_Cr+pGCYOAi2S9FiCNg@mail.gmail.com>
- <CAKCoTu7ms_Mr-q08d9XB3uascpzwBa5LF9JTT2aq8uUsoFE8aQ@mail.gmail.com>
- <CAHk-=wjcsxQ8QB_v=cwBQw4pkJg7pp-bBsdWyPivFO_OeF-y+g@mail.gmail.com>
- <5396.1567719164@warthog.procyon.org.uk>
- <CAHk-=wgbCXea1a9OTWgMMvcsCGGiNiPp+ty-edZrBWn63NCYdw@mail.gmail.com>
- <14883.1567725508@warthog.procyon.org.uk>
- <CAHk-=wjt2Eb+yEDOcQwCa0SrZ4cWu967OtQG8Vz21c=n5ZP1Nw@mail.gmail.com>
- <27732.1567764557@warthog.procyon.org.uk>
- <CAHk-=wiR1fpahgKuxSOQY6OfgjWD+MKz8UF6qUQ6V_y2TC_V6w@mail.gmail.com>
- <CAHk-=wioHmz69394xKRqFkhK8si86P_704KgcwjKxawLAYAiug@mail.gmail.com>
-From:   Steven Whitehouse <swhiteho@redhat.com>
-Message-ID: <8e60555e-9247-e03f-e8b4-1d31f70f1221@redhat.com>
-Date:   Fri, 6 Sep 2019 17:12:13 +0100
+        id S1730858AbfIFQ0V (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Fri, 6 Sep 2019 12:26:21 -0400
+Received: from mail-io1-f65.google.com ([209.85.166.65]:33957 "EHLO
+        mail-io1-f65.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S1729557AbfIFQ0V (ORCPT
+        <rfc822;linux-block@vger.kernel.org>); Fri, 6 Sep 2019 12:26:21 -0400
+Received: by mail-io1-f65.google.com with SMTP id s21so14085487ioa.1
+        for <linux-block@vger.kernel.org>; Fri, 06 Sep 2019 09:26:20 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=kernel-dk.20150623.gappssmtp.com; s=20150623;
+        h=subject:from:to:cc:references:message-id:date:user-agent
+         :mime-version:in-reply-to:content-language:content-transfer-encoding;
+        bh=TYNr98of8+in5on9XW6tz20SLhCfZ+SGJ05OSa5BNr4=;
+        b=ia9N/TkgVDpzi0usTDyYjsOq1WTcM/IzeYRwaalB/qF3UAzmEe4GKGVcKZhkKaYYHz
+         8stJjPdzNtxHnGPkVQb6u9XKo/b33aPrOqyks9hDAjkrLjl8ZuWhQbzou34lcRYJqYHK
+         3hTuPB0mp+3h2865ggN9qjcVVo9FvGvcSZdhPqGGwhLPwxsGvH6BwB0AhVL2jIMYQDpd
+         1i4or52HRc+fW6Ydh3SnQSWMhSZk4adml9P5RN2OL/NHqq02vmbigWP/GqO66HQCX25a
+         qsNAtodjL2QBNm8FzGTfr+RWBdv26Qdgv5YnK+HJfoIusW1NaVY3Szm+bdhCAWmU0V+O
+         qE7w==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20161025;
+        h=x-gm-message-state:subject:from:to:cc:references:message-id:date
+         :user-agent:mime-version:in-reply-to:content-language
+         :content-transfer-encoding;
+        bh=TYNr98of8+in5on9XW6tz20SLhCfZ+SGJ05OSa5BNr4=;
+        b=F82WzzWhrFxyiRKzijSvN+6wsWC1vEq5wWtxvV2l2+vP9+I3OKAj8LEWQFirJ5EvVf
+         0R3vu4WPXAJKVuhPHgLS1KzaS5UM770Fep0lHZ3aZzfIts3wUy41dN0OZqjGhfIRXtnR
+         DsfFKzVRDG41sApo65zAs2hKSO5hZYNsrD5Hkol/T14ZjO5Qpujp8kLs3yu/hGMVbkOY
+         1xFIbBCmljRqwRFd0Hkq0o8QxB70TSQh8jdbLZXyhUX1IiwpcVKofnwyG1fGfOp5BOAs
+         wHzzPe85S5lhN/Jw98cgmQ13A8pDj+x8NwzUR+Sig+t39GnY4+j6gzmiRqzIvzOrwfDl
+         fNyg==
+X-Gm-Message-State: APjAAAURXGw2KkfoR+lVQJqerd2/rSliHI4TdrBQ71rF0v+ZzU0ceoHW
+        qXDehlJogp+SO3S/8oZgny8dVUiqIMV6Yg==
+X-Google-Smtp-Source: APXvYqy3fmAluznF4tfOS22HdXNeNekL70tkl5TG0gH8s4FPbzuocc0FvjBhhGFraOb4laKw3E/7RA==
+X-Received: by 2002:a6b:c8cf:: with SMTP id y198mr11417513iof.179.1567787179869;
+        Fri, 06 Sep 2019 09:26:19 -0700 (PDT)
+Received: from [192.168.1.50] ([65.144.74.34])
+        by smtp.gmail.com with ESMTPSA id f7sm4452311ioc.31.2019.09.06.09.26.17
+        (version=TLS1_2 cipher=ECDHE-RSA-AES128-GCM-SHA256 bits=128/128);
+        Fri, 06 Sep 2019 09:26:18 -0700 (PDT)
+Subject: Re: [PATCH] io_uring: allocate the two rings together
+From:   Jens Axboe <axboe@kernel.dk>
+To:     Hristo Venev <hristo@venev.name>
+Cc:     linux-block@vger.kernel.org
+References: <20190826172346.8341-1-hristo@venev.name>
+ <80e0e408-f602-4446-d244-60f9d4ce9c71@kernel.dk>
+ <2f409a14ea27516a97cb7a7f1d70de7fe45c7c69.camel@venev.name>
+ <dec45613-ab82-24b2-71bb-69693a22ee46@kernel.dk>
+Message-ID: <c0ab3b6a-3e30-8a91-512e-aed9218015a7@kernel.dk>
+Date:   Fri, 6 Sep 2019 10:26:16 -0600
 User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:60.0) Gecko/20100101
- Thunderbird/60.7.0
+ Thunderbird/60.8.0
 MIME-Version: 1.0
-In-Reply-To: <CAHk-=wioHmz69394xKRqFkhK8si86P_704KgcwjKxawLAYAiug@mail.gmail.com>
-Content-Type: text/plain; charset=utf-8; format=flowed
-Content-Transfer-Encoding: 7bit
+In-Reply-To: <dec45613-ab82-24b2-71bb-69693a22ee46@kernel.dk>
+Content-Type: text/plain; charset=utf-8
 Content-Language: en-US
-X-Scanned-By: MIMEDefang 2.84 on 10.5.11.23
-X-Greylist: Sender IP whitelisted, not delayed by milter-greylist-4.5.16 (mx1.redhat.com [10.5.110.38]); Fri, 06 Sep 2019 16:12:20 +0000 (UTC)
+Content-Transfer-Encoding: 7bit
 Sender: linux-block-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-Hi,
+On 8/29/19 9:04 AM, Jens Axboe wrote:
+> On 8/27/19 1:35 PM, Hristo Venev wrote:
+>> Sorry for the duplicate reply, I forgot to CC the mailing list.
+>>
+>> On Tue, 2019-08-27 at 09:50 -0600, Jens Axboe wrote:
+>>> Outside of going for a cleanup, have you observed any wins from this
+>>> change?
+>>
+>> I haven't ran any interesting benchmarks. The cp examples in liburing
+>> are running as fast as before, at least on x86_64.
+>>
+>> Do you think it makes sense to tell userspace that the sq and cq mmap
+>> offsets now mean the same thing? We could add a flag set by the kernel
+>> to io_uring_params.
+> 
+> Not sure, there isn't a whole lot of overhead associated with having
+> to do two mmaps vs just one.
+> 
+> If you wanted to, the best approach would be to change one of the
+> io_uring_params reserved fields to be a feature field or something
+> like that. As features get added, we could flag them there. Then
+> the app could do:
+> 
+> io_uring_setup(depth, &params);
+> if (params.features & IORING_FEAT_SINGLE_MMAP)
+> 	....
+> else
+> 	mmap rings individually
+> 
+> and so forth.
 
-On 06/09/2019 16:53, Linus Torvalds wrote:
-> On Fri, Sep 6, 2019 at 8:35 AM Linus Torvalds
-> <torvalds@linux-foundation.org> wrote:
->> This is why I like pipes. You can use them today. They are simple, and
->> extensible, and you don't need to come up with a new subsystem and
->> some untested ad-hoc thing that nobody has actually used.
-> The only _real_ complexity is to make sure that events are reliably parseable.
->
-> That's where you really want to use the Linux-only "packet pipe"
-> thing, becasue otherwise you have to have size markers or other things
-> to delineate events. But if you do that, then it really becomes
-> trivial.
->
-> And I checked, we made it available to user space, even if the
-> original reason for that code was kernel-only autofs use: you just
-> need to make the pipe be O_DIRECT.
->
-> This overly stupid program shows off the feature:
->
->          #define _GNU_SOURCE
->          #include <fcntl.h>
->          #include <unistd.h>
->
->          int main(int argc, char **argv)
->          {
->                  int fd[2];
->                  char buf[10];
->
->                  pipe2(fd, O_DIRECT | O_NONBLOCK);
->                  write(fd[1], "hello", 5);
->                  write(fd[1], "hi", 2);
->                  read(fd[0], buf, sizeof(buf));
->                  read(fd[0], buf, sizeof(buf));
->                  return 0;
->          }
->
-> and it you strace it (because I was too lazy to add error handling or
-> printing of results), you'll see
->
->      write(4, "hello", 5)                    = 5
->      write(4, "hi", 2)                       = 2
->      read(3, "hello", 10)                    = 5
->      read(3, "hi", 10)                       = 2
->
-> note how you got packets of data on the reader side, instead of
-> getting the traditional "just buffer it as a stream".
->
-> So now you can even have multiple readers of the same event pipe, and
-> packetization is obvious and trivial. Of course, I'm not sure why
-> you'd want to have multiple readers, and you'd lose _ordering_, but if
-> all events are independent, this _might_ be a useful thing in a
-> threaded environment. Maybe.
->
-> (Side note: a zero-sized write will not cause a zero-sized packet. It
-> will just be dropped).
->
->                 Linus
+This would do it for the kernel side. I'd suggest integrating the
+feature check into liburing, which means that applications get
+the optimization for free.
 
-The events are generally not independent - we would need ordering either 
-implicit in the protocol or explicit in the messages. We also need to 
-know in case messages are dropped too - doesn't need to be anything 
-fancy, just some idea that since we last did a read, there are messages 
-that got lost, most likely due to buffer overrun.
+Do you want to do it?
 
-That is why the initial idea was to use netlink, since it solves a lot 
-of those issues. The downside was that the indirect nature of the 
-netlink sockets resulted in making it tricky to know the namespace of 
-the process to which the message was to be delivered (and hence whether 
-it should be delivered at all),
 
-Steve.
+diff --git a/fs/io_uring.c b/fs/io_uring.c
+index 17dfe57c57f8..be24596e90d7 100644
+--- a/fs/io_uring.c
++++ b/fs/io_uring.c
+@@ -3391,6 +3391,8 @@ static int io_uring_create(unsigned entries, struct io_uring_params *p)
+ 	p->cq_off.ring_entries = offsetof(struct io_rings, cq_ring_entries);
+ 	p->cq_off.overflow = offsetof(struct io_rings, cq_overflow);
+ 	p->cq_off.cqes = offsetof(struct io_rings, cqes);
++
++	p->features = IORING_FEAT_SINGLE_MMAP;
+ 	return ret;
+ err:
+ 	io_ring_ctx_wait_and_kill(ctx);
+diff --git a/include/uapi/linux/io_uring.h b/include/uapi/linux/io_uring.h
+index 1e1652f25cc1..96ee9d94b73e 100644
+--- a/include/uapi/linux/io_uring.h
++++ b/include/uapi/linux/io_uring.h
+@@ -128,11 +128,17 @@ struct io_uring_params {
+ 	__u32 flags;
+ 	__u32 sq_thread_cpu;
+ 	__u32 sq_thread_idle;
+-	__u32 resv[5];
++	__u32 features;
++	__u32 resv[4];
+ 	struct io_sqring_offsets sq_off;
+ 	struct io_cqring_offsets cq_off;
+ };
+ 
++/*
++ * io_uring_params->features flags
++ */
++#define IORING_FEAT_SINGLE_MMAP		(1U << 0)
++
+ /*
+  * io_uring_register(2) opcodes and arguments
+  */
+
+-- 
+Jens Axboe
 
