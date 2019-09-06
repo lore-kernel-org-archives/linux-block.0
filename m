@@ -2,157 +2,140 @@ Return-Path: <SRS0=sY57=XB=vger.kernel.org=linux-block-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-8.2 required=3.0 tests=DKIM_SIGNED,DKIM_VALID,
-	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,
-	SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED,USER_AGENT_SANE_1 autolearn=ham
+X-Spam-Status: No, score=-0.7 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
+	MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED autolearn=no
 	autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 8A00BC43331
-	for <linux-block@archiver.kernel.org>; Fri,  6 Sep 2019 19:30:52 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 09478C43331
+	for <linux-block@archiver.kernel.org>; Fri,  6 Sep 2019 19:33:19 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.kernel.org (Postfix) with ESMTP id 5E2552173E
-	for <linux-block@archiver.kernel.org>; Fri,  6 Sep 2019 19:30:52 +0000 (UTC)
-Authentication-Results: mail.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel-dk.20150623.gappssmtp.com header.i=@kernel-dk.20150623.gappssmtp.com header.b="cJo0KC7b"
+	by mail.kernel.org (Postfix) with ESMTP id D97FE2070C
+	for <linux-block@archiver.kernel.org>; Fri,  6 Sep 2019 19:33:18 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S2393290AbfIFTav (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Fri, 6 Sep 2019 15:30:51 -0400
-Received: from mail-pf1-f195.google.com ([209.85.210.195]:44039 "EHLO
-        mail-pf1-f195.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1730615AbfIFTav (ORCPT
-        <rfc822;linux-block@vger.kernel.org>); Fri, 6 Sep 2019 15:30:51 -0400
-Received: by mail-pf1-f195.google.com with SMTP id q21so5152444pfn.11
-        for <linux-block@vger.kernel.org>; Fri, 06 Sep 2019 12:30:51 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=kernel-dk.20150623.gappssmtp.com; s=20150623;
-        h=subject:to:cc:references:from:message-id:date:user-agent
-         :mime-version:in-reply-to:content-language:content-transfer-encoding;
-        bh=GyxPezVm29JdDb7VEucfmunQmYEsUqlRx3OlLTLH5Ew=;
-        b=cJo0KC7b4EI5hCIyXM02y/aqTAWBocdXEANLreCjyknneTFy1JDYhjqkw/Xsc3VLA+
-         ZwJXSdZh49hRGmLyAnsoRfVW3Sgie0FToVCYTqCXjLpRz3yWUUi5ZY3NfZGl0YOoeotr
-         WsDPP2oIPF1iokVHZHZUMf9PwFz/qml/mCAzwbXdrM9SRQg4a1FdyB7vMP05O7+NT+7Y
-         Go5XhsCUAv/aKQrORx8ODTubcb6fQKPG8MKytBdsvAlrD0UNCOV7nI/DQF2gTRRh4lRr
-         Pqas+YR8wpQpCbYp7bpUwvOnxLl6lV2DtxANN6epnFa8zd+Wxcp+xhSYE0UXFs1FkRJz
-         Tq7w==
+        id S2393348AbfIFTdS convert rfc822-to-8bit (ORCPT
+        <rfc822;linux-block@archiver.kernel.org>);
+        Fri, 6 Sep 2019 15:33:18 -0400
+Received: from mx1.redhat.com ([209.132.183.28]:33354 "EHLO mx1.redhat.com"
+        rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
+        id S2392015AbfIFTdS (ORCPT <rfc822;linux-block@vger.kernel.org>);
+        Fri, 6 Sep 2019 15:33:18 -0400
+Received: from mail-wr1-f70.google.com (mail-wr1-f70.google.com [209.85.221.70])
+        (using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+        (No client certificate requested)
+        by mx1.redhat.com (Postfix) with ESMTPS id 7248076528
+        for <linux-block@vger.kernel.org>; Fri,  6 Sep 2019 19:33:17 +0000 (UTC)
+Received: by mail-wr1-f70.google.com with SMTP id n6so2979694wrw.14
+        for <linux-block@vger.kernel.org>; Fri, 06 Sep 2019 12:33:17 -0700 (PDT)
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=1e100.net; s=20161025;
-        h=x-gm-message-state:subject:to:cc:references:from:message-id:date
-         :user-agent:mime-version:in-reply-to:content-language
-         :content-transfer-encoding;
-        bh=GyxPezVm29JdDb7VEucfmunQmYEsUqlRx3OlLTLH5Ew=;
-        b=pVyArXp1EgXW8/xV6aj9v0Gu3jmdH2KrFbwbu0PFQF4EUEjkb4pCGEOFAxpMQxe6Oc
-         yK3XcKzt+9pFOpprlFz8sQVDlxFiT4mWCTFeYWcFa615uAmk2Phu2EYiLbHkqdMAxwzQ
-         6w5hIPtFWFXNXEBEDDqzL6Xde5BTyYFYABp3X6oD8G7omcv5Y49EfNbp7ydiZPdIaBap
-         hyHtQiyIBr+47+gi0LtZ9RWP25n5zscHEp/oOv76gna6L3IliLAxGYhA3dqYnUsGCodT
-         V3DvxV481CT79zpO1UXGYEnYj+SyZ9zyYOIOimlkzW8xuMXULovVp+2KBLTzKChRoKJc
-         n4qg==
-X-Gm-Message-State: APjAAAWkBwjelcvxQ1XsiFrETbc10NB8wvoESXs9frfryLdYSPoX8dPX
-        tCSFAkHRBl7Sk/cYdjM/xlib3hpVLpXgQg==
-X-Google-Smtp-Source: APXvYqwU6KT+J+Arf4M26OI+JlIc/MdyU+mw4QjZNzgIULRNc6EBYQUL+Gkr9kJOvwhnttAKqoJwUw==
-X-Received: by 2002:a65:6904:: with SMTP id s4mr9361662pgq.33.1567798250386;
-        Fri, 06 Sep 2019 12:30:50 -0700 (PDT)
-Received: from [192.168.1.188] (66.29.164.166.static.utbb.net. [66.29.164.166])
-        by smtp.gmail.com with ESMTPSA id l62sm12861869pfl.167.2019.09.06.12.30.48
-        (version=TLS1_2 cipher=ECDHE-RSA-AES128-GCM-SHA256 bits=128/128);
-        Fri, 06 Sep 2019 12:30:49 -0700 (PDT)
-Subject: Re: [PATCH 2/2] liburing: Use the single mmap feature
-To:     Hristo Venev <hristo@venev.name>
-Cc:     linux-block@vger.kernel.org
-References: <c0ab3b6a-3e30-8a91-512e-aed9218015a7@kernel.dk>
- <20190906191252.30332-1-hristo@venev.name>
- <20190906191252.30332-2-hristo@venev.name>
-From:   Jens Axboe <axboe@kernel.dk>
-Message-ID: <8fe8111a-6564-4266-e6ca-443575eb9ca2@kernel.dk>
-Date:   Fri, 6 Sep 2019 13:30:47 -0600
-User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:60.0) Gecko/20100101
- Thunderbird/60.8.0
+        h=x-gm-message-state:mime-version:references:in-reply-to:from:date
+         :message-id:subject:to:cc:content-transfer-encoding;
+        bh=R/U7mUhygsddH+fGB+zy3E9CKa5h+Z8Nm54osdGuOgs=;
+        b=JdLt2KUhIsxvKjaaatmcXFNqmz6x7zUI+MuvP890pgit1lhbaoOqFXUGT/ur160JCl
+         9FghB7mZoqIZbo+IsKTLNxELjjd/ZlWPAj2owIGlnoYBmj+GFrOm/ZDNZJP1EjGllhaM
+         iC6KDgdEpFMQ9wJoM0QZGbOerXAs/G94cbmPN07jCsZnUJmyPOLmQxHCF6vZNgRckLg9
+         bGJa4IO+a9rLMnISmDzeI87T/4NRCO8K539Tbn4FUH/QAWnqhr3ZlcM5AJVAenIuY0ll
+         eT6E9LPpCnmgIHco0sz7bxH7YVdfYZd9xFDv44B9H8Lwso04mxJHIEakYMlLhLwqPNqm
+         NTxA==
+X-Gm-Message-State: APjAAAWUFVQ7/m2hpg60wLJs5YQ7DW6rZo5U9P0SELFDpygyb3xrjKRa
+        Ak33SCLsjcVrd+nML0bP9scvZGg0dgfHAXC7bCkkaXszUV1k4l2B3WTSvQoNDJtbI55m558NlSM
+        Ai1FrVX1D4lHBglozvzYb3TkMV/+06uOLhdvd9W8=
+X-Received: by 2002:a1c:ca02:: with SMTP id a2mr9252527wmg.127.1567798396044;
+        Fri, 06 Sep 2019 12:33:16 -0700 (PDT)
+X-Google-Smtp-Source: APXvYqyTIyfiPV/yAsPvflKtcRM07P7nCUNe0sQoeZ2AMSNSLR0dzqdoxrOYrd5Bg/c1ZdH+IG1R0aOFq6s5vYlI0XA=
+X-Received: by 2002:a1c:ca02:: with SMTP id a2mr9252505wmg.127.1567798395711;
+ Fri, 06 Sep 2019 12:33:15 -0700 (PDT)
 MIME-Version: 1.0
-In-Reply-To: <20190906191252.30332-2-hristo@venev.name>
-Content-Type: text/plain; charset=utf-8
-Content-Language: en-US
-Content-Transfer-Encoding: 7bit
+References: <156763534546.18676.3530557439501101639.stgit@warthog.procyon.org.uk>
+ <CAHk-=wh5ZNE9pBwrnr5MX3iqkUP4nspz17rtozrSxs5-OGygNw@mail.gmail.com>
+ <17703.1567702907@warthog.procyon.org.uk> <CAHk-=wjQ5Fpv0D7rxX0W=obx9xoOAxJ_Cr+pGCYOAi2S9FiCNg@mail.gmail.com>
+ <CAKCoTu7ms_Mr-q08d9XB3uascpzwBa5LF9JTT2aq8uUsoFE8aQ@mail.gmail.com> <CAHk-=wjcsxQ8QB_v=cwBQw4pkJg7pp-bBsdWyPivFO_OeF-y+g@mail.gmail.com>
+In-Reply-To: <CAHk-=wjcsxQ8QB_v=cwBQw4pkJg7pp-bBsdWyPivFO_OeF-y+g@mail.gmail.com>
+From:   Ray Strode <rstrode@redhat.com>
+Date:   Fri, 6 Sep 2019 15:32:37 -0400
+Message-ID: <CAKCoTu70E9cbVu=jVG4EiXnTNiG-znvri6Omh2t++1zRw+639Q@mail.gmail.com>
+Subject: Re: Why add the general notification queue and its sources
+To:     Linus Torvalds <torvalds@linux-foundation.org>
+Cc:     David Howells <dhowells@redhat.com>,
+        Greg Kroah-Hartman <gregkh@linuxfoundation.org>,
+        Steven Whitehouse <swhiteho@redhat.com>,
+        Nicolas Dichtel <nicolas.dichtel@6wind.com>, raven@themaw.net,
+        keyrings@vger.kernel.org, linux-usb@vger.kernel.org,
+        linux-block <linux-block@vger.kernel.org>,
+        Christian Brauner <christian@brauner.io>,
+        LSM List <linux-security-module@vger.kernel.org>,
+        linux-fsdevel <linux-fsdevel@vger.kernel.org>,
+        Linux API <linux-api@vger.kernel.org>,
+        Linux List Kernel Mailing <linux-kernel@vger.kernel.org>,
+        Al Viro <viro@zeniv.linux.org.uk>,
+        "Ray, Debarshi" <debarshi.ray@gmail.com>,
+        Robbie Harwood <rharwood@redhat.com>
+Content-Type: text/plain; charset="UTF-8"
+Content-Transfer-Encoding: 8BIT
 Sender: linux-block-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-On 9/6/19 1:12 PM, Hristo Venev wrote:
-> Signed-off-by: Hristo Venev <hristo@venev.name>
-> ---
->   src/setup.c | 35 ++++++++++++++++++++++++++---------
->   1 file changed, 26 insertions(+), 9 deletions(-)
-> 
-> diff --git a/src/setup.c b/src/setup.c
-> index 47b0deb..48c96a0 100644
-> --- a/src/setup.c
-> +++ b/src/setup.c
-> @@ -16,10 +16,30 @@ static int io_uring_mmap(int fd, struct io_uring_params *p,
->   	int ret;
->   
->   	sq->ring_sz = p->sq_off.array + p->sq_entries * sizeof(unsigned);
-> +	cq->ring_sz = p->cq_off.cqes + p->cq_entries * sizeof(struct io_uring_cqe);
-> +
-> +	if (p->features & IORING_FEAT_SINGLE_MMAP) {
-> +		if (cq->ring_sz > sq->ring_sz) {
-> +			sq->ring_sz = cq->ring_sz;
-> +		}
-> +		cq->ring_sz = sq->ring_sz;
-> +	}
->   	sq->ring_ptr = mmap(0, sq->ring_sz, PROT_READ | PROT_WRITE,
->   			MAP_SHARED | MAP_POPULATE, fd, IORING_OFF_SQ_RING);
->   	if (sq->ring_ptr == MAP_FAILED)
->   		return -errno;
-> +
-> +	if (p->features & IORING_FEAT_SINGLE_MMAP) {
-> +		cq->ring_ptr = sq->ring_ptr;
-> +	} else {
-> +		cq->ring_ptr = mmap(0, cq->ring_sz, PROT_READ | PROT_WRITE,
-> +				MAP_SHARED | MAP_POPULATE, fd, IORING_OFF_CQ_RING);
-> +		if (cq->ring_ptr == MAP_FAILED) {
-> +			ret = -errno;
-> +			goto err;
-> +		}
-> +	}
-> +
->   	sq->khead = sq->ring_ptr + p->sq_off.head;
->   	sq->ktail = sq->ring_ptr + p->sq_off.tail;
->   	sq->kring_mask = sq->ring_ptr + p->sq_off.ring_mask;
-> @@ -34,19 +54,14 @@ static int io_uring_mmap(int fd, struct io_uring_params *p,
->   				IORING_OFF_SQES);
->   	if (sq->sqes == MAP_FAILED) {
->   		ret = -errno;
-> +		if (cq->ring_ptr != sq->ring_ptr) {
-> +			munmap(cq->ring_ptr, cq->ring_sz);
-> +		}
->   err:
->   		munmap(sq->ring_ptr, sq->ring_sz);
->   		return ret;
->   	}
->   
-> -	cq->ring_sz = p->cq_off.cqes + p->cq_entries * sizeof(struct io_uring_cqe);
-> -	cq->ring_ptr = mmap(0, cq->ring_sz, PROT_READ | PROT_WRITE,
-> -			MAP_SHARED | MAP_POPULATE, fd, IORING_OFF_CQ_RING);
-> -	if (cq->ring_ptr == MAP_FAILED) {
-> -		ret = -errno;
-> -		munmap(sq->sqes, *sq->kring_entries * sizeof(struct io_uring_sqe));
-> -		goto err;
-> -	}
->   	cq->khead = cq->ring_ptr + p->cq_off.head;
->   	cq->ktail = cq->ring_ptr + p->cq_off.tail;
->   	cq->kring_mask = cq->ring_ptr + p->cq_off.ring_mask;
-> @@ -105,6 +120,8 @@ void io_uring_queue_exit(struct io_uring *ring)
->   
->   	munmap(sq->sqes, *sq->kring_entries * sizeof(struct io_uring_sqe));
->   	munmap(sq->ring_ptr, sq->ring_sz);
-> -	munmap(cq->ring_ptr, cq->ring_sz);
-> +	if (cq->ring_ptr != sq->ring_ptr) {
-> +		munmap(cq->ring_ptr, cq->ring_sz);
-> +	}
->   	close(ring->ring_fd);
->   }
+Hi,
 
-Thanks, applied.
+On Thu, Sep 5, 2019 at 4:39 PM Linus Torvalds
+<torvalds@linux-foundation.org> wrote:
+> That is *way* too specific to make for any kind of generic
+> notification mechanism.
+Well from my standpoint, I just don't want to have to poll... I don't
+have a strong opinion
+about how it looks architecturally to reach that goal.
 
--- 
-Jens Axboe
+Ideally, at a higher level, I want the userspace api that gnome uses
+to be something
+like:
 
+err = krb5_cc_watch (ctx, ccache, (krb5_cc_change_fct) on_cc_change ,
+&watch_fd);
+
+then a watch_fd would get handed back and caller could poll on it. if
+it woke up poll(),
+caller would do
+
+krb5_cc_watch_update (ctx, ccache, watch_fd)
+
+or so and it would trigger on_cc_change to get called (or something like that).
+
+If under the hood,  fd comes from opening /dev/watch_queue, and
+krb5_cc_watch_update reads from some mmap'ed buffer to decide whether
+or not to call on_cc_change, that's fine with me.
+
+If under the hood, fd comes from a pipe fd returned from some ioctl or syscall,
+and krb5_cc_watch_update reads messages directly from that fd to decide
+whether or not to call on_cc_change, that's fine with me. too.
+
+it could be an eventfd too, or whatever, too, just as long as its
+something I can add
+to poll() and don't have to intermittently poll ... :-)
+
+> Also, what is the security model here? Open a special character
+> device, and you get access to random notifications from random
+> sources?
+I guess dhowells answered this...
+
+> And why would you do a broken big-key thing in the kernel in the first
+> place? Why don't you just have a kernel key to indirectly encrypt
+> using a key and "additional user space data". The kernel should simply
+> not take care of insane 1MB keys.
+🤷 dunno.  I assume you're referencing the discussions from comment 0
+on that 2013 bug.  I wasn't involved in those discussions, I just chimed in
+after they happened trying to avoid having to add polling :-)
+
+I have no idea why a ticket would get that large. I assume it only is in weird
+edge cases.
+
+Anyway, gnome treats the tickets as opaque blobs.  it doesn't do anything
+with them other than tell the user when they need to get refreshed...
+
+all the actual key manipulation happens from krb5 libraries.
+
+of course, one advantage of having the tickets kernel side is nfs could
+in theory access them directly, rather than up calling back to userspace...
+
+--Ray
