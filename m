@@ -2,93 +2,158 @@ Return-Path: <SRS0=IQpB=XC=vger.kernel.org=linux-block-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-8.2 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
+X-Spam-Status: No, score=-9.8 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
 	INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,
-	URIBL_BLOCKED,USER_AGENT_SANE_1 autolearn=unavailable autolearn_force=no
-	version=3.4.0
+	URIBL_BLOCKED,USER_AGENT_GIT autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id A44AEC43140
-	for <linux-block@archiver.kernel.org>; Sat,  7 Sep 2019 00:00:29 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 7DF8EC43331
+	for <linux-block@archiver.kernel.org>; Sat,  7 Sep 2019 10:04:35 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.kernel.org (Postfix) with ESMTP id 87C4621871
-	for <linux-block@archiver.kernel.org>; Sat,  7 Sep 2019 00:00:29 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id 526EB20854
+	for <linux-block@archiver.kernel.org>; Sat,  7 Sep 2019 10:04:35 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S2406256AbfIGAAX (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Fri, 6 Sep 2019 20:00:23 -0400
-Received: from mail-oi1-f194.google.com ([209.85.167.194]:43151 "EHLO
-        mail-oi1-f194.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S2405572AbfIGAAW (ORCPT
-        <rfc822;linux-block@vger.kernel.org>); Fri, 6 Sep 2019 20:00:22 -0400
-Received: by mail-oi1-f194.google.com with SMTP id t84so6448340oih.10;
-        Fri, 06 Sep 2019 17:00:22 -0700 (PDT)
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20161025;
-        h=x-gm-message-state:subject:to:cc:references:from:message-id:date
-         :user-agent:mime-version:in-reply-to:content-language
-         :content-transfer-encoding;
-        bh=CTESiiiEsvvGtzHjMvt+Vs+YyinAgG2nRdj8V0GoeRI=;
-        b=Pq81b9Tzy56Piznk485w3DSx9Fz/UgdOXrizeHAIFpTL8PJ0NJv5WiM8mM/HzVPNSc
-         ZZeUPpM8TK+5Zdn0436NfXkG6nbwB2PKnnEq3TkExuWzap53mmZiY+PnksG6XBEAtQHl
-         E4VsnTLamUyT+R5jTBEudkUhJdsjXQio5vMnxoKyXOxoyil6mK/y1NjA2N6/2m+A+ruf
-         BO2bWtg5BLmymucCJAc5RV/eVNY1HDeBtD4hFtWlZlfnxYR1HyquvJ5qD0cL8XLGu9J6
-         USkNtgVNehtnZjnpdiHpIrFSI3cuz9A8ub2u6SZ8I6QD8QRdbXchaVJyKtQxvm1cwr4i
-         fo4w==
-X-Gm-Message-State: APjAAAWIm1Id4mN4gCUHz9oc9MPjBWFsFs/bglgL0yuVMDD1OfG94Em1
-        dHhJcob7dNih+JmpOWBGYCA=
-X-Google-Smtp-Source: APXvYqxVnW04a3pr7A6Hae0d1zkxWcP9AgzgoZUhAC/S/OwAbr5Y/KKWFoseJliFrz3GXCxEwxRWkA==
-X-Received: by 2002:aca:6707:: with SMTP id z7mr2532791oix.12.1567814421581;
-        Fri, 06 Sep 2019 17:00:21 -0700 (PDT)
-Received: from ?IPv6:2600:1700:65a0:78e0:514:7862:1503:8e4d? ([2600:1700:65a0:78e0:514:7862:1503:8e4d])
-        by smtp.gmail.com with ESMTPSA id i20sm2195084oie.13.2019.09.06.17.00.19
-        (version=TLS1_2 cipher=ECDHE-RSA-AES128-GCM-SHA256 bits=128/128);
-        Fri, 06 Sep 2019 17:00:20 -0700 (PDT)
-Subject: Re: [PATCH v8 13/13] nvmet-passthru: support block accounting
-To:     Logan Gunthorpe <logang@deltatee.com>,
-        linux-kernel@vger.kernel.org, linux-nvme@lists.infradead.org,
-        linux-block@vger.kernel.org, linux-fsdevel@vger.kernel.org
-Cc:     Christoph Hellwig <hch@lst.de>, Keith Busch <kbusch@kernel.org>,
-        Jens Axboe <axboe@fb.com>,
-        Chaitanya Kulkarni <Chaitanya.Kulkarni@wdc.com>,
-        Max Gurtovoy <maxg@mellanox.com>,
-        Stephen Bates <sbates@raithlin.com>
-References: <20190828215429.4572-1-logang@deltatee.com>
- <20190828215429.4572-14-logang@deltatee.com>
-From:   Sagi Grimberg <sagi@grimberg.me>
-Message-ID: <92d61426-65a2-827c-936b-55f12f3d6afb@grimberg.me>
-Date:   Fri, 6 Sep 2019 17:00:18 -0700
-User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:60.0) Gecko/20100101
- Thunderbird/60.8.0
+        id S1728525AbfIGKEe (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Sat, 7 Sep 2019 06:04:34 -0400
+Received: from szxga04-in.huawei.com ([45.249.212.190]:7140 "EHLO huawei.com"
+        rhost-flags-OK-OK-OK-FAIL) by vger.kernel.org with ESMTP
+        id S1728117AbfIGKEe (ORCPT <rfc822;linux-block@vger.kernel.org>);
+        Sat, 7 Sep 2019 06:04:34 -0400
+Received: from DGGEMS407-HUB.china.huawei.com (unknown [172.30.72.59])
+        by Forcepoint Email with ESMTP id 6B019B71E51E0F6DDD94;
+        Sat,  7 Sep 2019 18:04:31 +0800 (CST)
+Received: from huawei.com (10.175.124.28) by DGGEMS407-HUB.china.huawei.com
+ (10.3.19.207) with Microsoft SMTP Server id 14.3.439.0; Sat, 7 Sep 2019
+ 18:04:21 +0800
+From:   Yufen Yu <yuyufen@huawei.com>
+To:     <axboe@kernel.dk>
+CC:     <linux-block@vger.kernel.org>, <hch@infradead.org>,
+        <keith.busch@intel.com>, <tj@kernel.org>, <yuyufen@huawei.com>,
+        <zhangxiaoxu5@huawei.com>
+Subject: [PATCH] block: fix null pointer dereference in blk_mq_rq_timed_out()
+Date:   Sat, 7 Sep 2019 18:24:50 +0800
+Message-ID: <20190907102450.40291-1-yuyufen@huawei.com>
+X-Mailer: git-send-email 2.17.2
 MIME-Version: 1.0
-In-Reply-To: <20190828215429.4572-14-logang@deltatee.com>
-Content-Type: text/plain; charset=utf-8; format=flowed
-Content-Language: en-US
-Content-Transfer-Encoding: 7bit
+Content-Type: text/plain
+X-Originating-IP: [10.175.124.28]
+X-CFilter-Loop: Reflected
 Sender: linux-block-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
+There is a race condition between timeout check and completion for
+flush request as follow:
 
-> Support block disk accounting by setting the RQF_IO_STAT flag
-> and gendisk in the request.
-> 
-> After this change, IO counts will be reflected correctly in
-> /proc/diskstats for drives being used by passthru.
-> 
-> Signed-off-by: Logan Gunthorpe <logang@deltatee.com>
-> ---
->   drivers/nvme/target/io-cmd-passthru.c | 5 ++++-
->   1 file changed, 4 insertions(+), 1 deletion(-)
-> 
-> diff --git a/drivers/nvme/target/io-cmd-passthru.c b/drivers/nvme/target/io-cmd-passthru.c
-> index 7557927a3451..63f12750a80d 100644
-> --- a/drivers/nvme/target/io-cmd-passthru.c
-> +++ b/drivers/nvme/target/io-cmd-passthru.c
-> @@ -410,6 +410,9 @@ static struct request *nvmet_passthru_blk_make_request(struct nvmet_req *req,
->   	if (unlikely(IS_ERR(rq)))
->   		return rq;
->   
-> +	if (blk_queue_io_stat(q) && cmd->common.opcode != nvme_cmd_flush)
-> +		rq->rq_flags |= RQF_IO_STAT;
+timeout_work    issue flush      issue flush
+                blk_insert_flush
+                                 blk_insert_flush
+blk_mq_timeout_work
+                blk_kick_flush
 
-Does flush has data bytes in the request? Why the special casing?
+blk_mq_queue_tag_busy_iter
+blk_mq_check_expired(flush_rq)
+
+                __blk_mq_end_request
+               flush_end_io
+               blk_kick_flush
+               blk_rq_init(flush_rq)
+               memset(flush_rq, 0)
+
+blk_mq_timed_out
+BUG_ON flush_rq->q->mq_ops
+
+For normal request, we need to get a tag and then allocate corresponding request.
+Thus, the request cannot be reallocated before the tag have been free.
+Commit 1d9bd5161ba ("blk-mq: replace timeout synchronization with a RCU and
+generation based scheme") and commit 12f5b93145 ("blk-mq: Remove generation
+seqeunce") can guarantee the consistency of timeout handle and completion.
+
+However, 'flush_rq' have been forgotten. 'flush_rq' allocation management
+dependents on flush implemention mechanism. Each hctx has only one 'flush_rq'.
+When a flush request have completed, the next flush request will hold the 'flush_rq'.
+In the end, timeout handle may access the cleared 'flush_rq'.
+
+We fix this problem by checking request refcount 'rq->ref', as normal request.
+If the refcount is not zero, flush_end_io() return and wait the last holder
+recall it. To record the request status, we add a new entry 'rq_status',
+which will be used in flush_end_io().
+
+Signed-off-by: Yufen Yu <yuyufen@huawei.com>
+---
+ block/blk-flush.c      | 8 ++++++++
+ block/blk-mq.c         | 7 +++++--
+ block/blk.h            | 5 +++++
+ include/linux/blkdev.h | 2 ++
+ 4 files changed, 20 insertions(+), 2 deletions(-)
+
+diff --git a/block/blk-flush.c b/block/blk-flush.c
+index aedd9320e605..359a7e1a0925 100644
+--- a/block/blk-flush.c
++++ b/block/blk-flush.c
+@@ -212,6 +212,14 @@ static void flush_end_io(struct request *flush_rq, blk_status_t error)
+ 	struct blk_flush_queue *fq = blk_get_flush_queue(q, flush_rq->mq_ctx);
+ 	struct blk_mq_hw_ctx *hctx;
+ 
++	if (!refcount_dec_and_test(&flush_rq->ref)) {
++		flush_rq->rq_status = error;
++		return;
++	}
++
++	if (flush_rq->rq_status != BLK_STS_OK)
++		error = flush_rq->rq_status;
++
+ 	/* release the tag's ownership to the req cloned from */
+ 	spin_lock_irqsave(&fq->mq_flush_lock, flags);
+ 	hctx = flush_rq->mq_hctx;
+diff --git a/block/blk-mq.c b/block/blk-mq.c
+index 0835f4d8d42e..3d2b2c2e9cdf 100644
+--- a/block/blk-mq.c
++++ b/block/blk-mq.c
+@@ -905,9 +905,12 @@ static bool blk_mq_check_expired(struct blk_mq_hw_ctx *hctx,
+ 	 */
+ 	if (blk_mq_req_expired(rq, next))
+ 		blk_mq_rq_timed_out(rq, reserved);
+-	if (refcount_dec_and_test(&rq->ref))
+-		__blk_mq_free_request(rq);
+ 
++	if (is_flush_rq(rq, hctx)) {
++		rq->end_io(rq, 0);
++	} else if (refcount_dec_and_test(&rq->ref)) {
++		__blk_mq_free_request(rq);
++	}
+ 	return true;
+ }
+ 
+diff --git a/block/blk.h b/block/blk.h
+index de6b2e146d6e..f503ef9ad3e6 100644
+--- a/block/blk.h
++++ b/block/blk.h
+@@ -47,6 +47,11 @@ static inline void __blk_get_queue(struct request_queue *q)
+ 	kobject_get(&q->kobj);
+ }
+ 
++static inline bool
++is_flush_rq(struct request *req, struct blk_mq_hw_ctx *hctx) {
++	return hctx->fq->flush_rq == req;
++}
++
+ struct blk_flush_queue *blk_alloc_flush_queue(struct request_queue *q,
+ 		int node, int cmd_size, gfp_t flags);
+ void blk_free_flush_queue(struct blk_flush_queue *q);
+diff --git a/include/linux/blkdev.h b/include/linux/blkdev.h
+index 1ef375dafb1c..b1d05077e03f 100644
+--- a/include/linux/blkdev.h
++++ b/include/linux/blkdev.h
+@@ -237,6 +237,8 @@ struct request {
+ 	 */
+ 	rq_end_io_fn *end_io;
+ 	void *end_io_data;
++
++	blk_status_t rq_status;
+ };
+ 
+ static inline bool blk_op_is_scsi(unsigned int op)
+-- 
+2.17.2
+
