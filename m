@@ -2,174 +2,99 @@ Return-Path: <SRS0=IO0U=XE=vger.kernel.org=linux-block-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-7.0 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
-	INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS
-	autolearn=ham autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-9.1 required=3.0 tests=DKIM_SIGNED,DKIM_VALID,
+	DKIM_VALID_AU,HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,
+	MENTIONS_GIT_HOSTING,SPF_HELO_NONE,SPF_PASS,USER_AGENT_GIT autolearn=ham
+	autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id B1B86C00307
-	for <linux-block@archiver.kernel.org>; Mon,  9 Sep 2019 06:58:38 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 1639DC00307
+	for <linux-block@archiver.kernel.org>; Mon,  9 Sep 2019 07:32:03 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.kernel.org (Postfix) with ESMTP id 8FC4021479
-	for <linux-block@archiver.kernel.org>; Mon,  9 Sep 2019 06:58:38 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id D818F21A4A
+	for <linux-block@archiver.kernel.org>; Mon,  9 Sep 2019 07:32:02 +0000 (UTC)
+Authentication-Results: mail.kernel.org;
+	dkim=pass (2048-bit key) header.d=linaro.org header.i=@linaro.org header.b="HKRj88wL"
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1731277AbfIIG6h (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Mon, 9 Sep 2019 02:58:37 -0400
-Received: from mx2.suse.de ([195.135.220.15]:53136 "EHLO mx1.suse.de"
-        rhost-flags-OK-OK-OK-FAIL) by vger.kernel.org with ESMTP
-        id S1727385AbfIIG6h (ORCPT <rfc822;linux-block@vger.kernel.org>);
-        Mon, 9 Sep 2019 02:58:37 -0400
-X-Virus-Scanned: by amavisd-new at test-mx.suse.de
-Received: from relay2.suse.de (unknown [195.135.220.254])
-        by mx1.suse.de (Postfix) with ESMTP id 45CF8B011;
-        Mon,  9 Sep 2019 06:58:35 +0000 (UTC)
-From:   NeilBrown <neilb@suse.de>
-To:     Coly Li <colyli@suse.de>, Song Liu <songliubraving@fb.com>
-Date:   Mon, 09 Sep 2019 16:58:28 +1000
-Cc:     NeilBrown <neilb@suse.com>,
-        "linux-block\@vger.kernel.org" <linux-block@vger.kernel.org>,
-        linux-raid <linux-raid@vger.kernel.org>
-Subject: [PATCH 2/2] md: add feature flag MD_FEATURE_RAID0_LAYOUT
-In-Reply-To: <87pnkaardl.fsf@notabene.neil.brown.name>
-References: <10ca59ff-f1ba-1464-030a-0d73ff25d2de@suse.de> <87blwghhq7.fsf@notabene.neil.brown.name> <FBF1B443-64C9-472A-9F41-5303738C0DC7@fb.com> <f3c41c4b-5b1d-bd2f-ad2d-9aa5108ad798@suse.de> <9008538C-A2BE-429C-A90E-18FBB91E7B34@fb.com> <bede41a5-45c5-0ea0-25af-964bb854a94c@suse.de> <87pnkaardl.fsf@notabene.neil.brown.name>
-Message-ID: <87lfuyarcb.fsf@notabene.neil.brown.name>
+        id S1732356AbfIIHcC (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Mon, 9 Sep 2019 03:32:02 -0400
+Received: from mail-wm1-f65.google.com ([209.85.128.65]:36609 "EHLO
+        mail-wm1-f65.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S1732252AbfIIHcC (ORCPT
+        <rfc822;linux-block@vger.kernel.org>); Mon, 9 Sep 2019 03:32:02 -0400
+Received: by mail-wm1-f65.google.com with SMTP id p13so13372301wmh.1
+        for <linux-block@vger.kernel.org>; Mon, 09 Sep 2019 00:32:01 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=linaro.org; s=google;
+        h=from:to:cc:subject:date:message-id:mime-version
+         :content-transfer-encoding;
+        bh=B1DB8hLBI0DfoqSgN7BPkx2C4LPQLRBtlT6+2pkAJhs=;
+        b=HKRj88wLIuKKvMVrlcCv44LZGStlBJSMMWn4leonTHif3dSsI6XAAv+OM86+GCrN1v
+         /hOaBr4dA9agJJsMN2NYIiBjmsuYpTNf+QT52+rpd974601QbtgJW3WkeenkfG758vHI
+         8ZxT/x+F2of1EhU+ByWFVGSyy1wTh1hM88FeSE1dPOx5hCgQYmVMy2M94iciqXojaTmL
+         3VOUCnsFbF9Ancywa6eTxH/S//UOOLO/4AZLR5wRM1KS4iGmDekWn9sLA1XZwuc5p3s5
+         QmPtliwpPqY1PJaqx6n0mXBW58VfnEJe87NWLZ/rah0/r1Rte+oSMwZzDYGlc18n3Dpp
+         7wUA==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20161025;
+        h=x-gm-message-state:from:to:cc:subject:date:message-id:mime-version
+         :content-transfer-encoding;
+        bh=B1DB8hLBI0DfoqSgN7BPkx2C4LPQLRBtlT6+2pkAJhs=;
+        b=HFA4VWHV52zkOKwQHFkSWFmszT4yzTMB2K8Wau1+Nqp3mThl/k5oJWqRBby64MX2Eb
+         zsY8L6kvWkxZ0aGcJApczU5HsYTqDXFOG08DjKiRTQRaFUu9hJ35SIEjqR4rLFIH5g2Z
+         4pwtbRvZi1ku5XOAPWvg6SkMCIHBvTBInKehG0tPe+pF5NOU0726UpOXmNBUmccxomim
+         jyaS00pDJFuOL/wLh5SGLKIXylF0CKdWtrX0zlodlRLogBwzntHTxzU+sToKKVhqkL1k
+         FLXDR/4wc9SomNylUXFL2OB5lWxuDIkKQbciqnhjRU/4C91tRwZxCTK9Q42IgCgYImXX
+         EuSQ==
+X-Gm-Message-State: APjAAAU1H8jJ3/MwTEFiaxs62sLDBO64IbPDc3u0e/g2i8a2f9O+98Mt
+        Hktiddx80w1zUxxdsyrI0IW1HQ==
+X-Google-Smtp-Source: APXvYqzv1j7KdbWHRbYvFmEQmw0sUCnWSiYEhKtrI2a3yeQ+7I2WDIr3T9Q1zYOP3/YMvnPk/YV7DA==
+X-Received: by 2002:a1c:7f4f:: with SMTP id a76mr11413619wmd.117.1568014320844;
+        Mon, 09 Sep 2019 00:32:00 -0700 (PDT)
+Received: from localhost.localdomain (146-241-7-242.dyn.eolo.it. [146.241.7.242])
+        by smtp.gmail.com with ESMTPSA id c8sm617012wrr.49.2019.09.09.00.31.59
+        (version=TLS1_2 cipher=ECDHE-RSA-AES128-GCM-SHA256 bits=128/128);
+        Mon, 09 Sep 2019 00:32:00 -0700 (PDT)
+From:   Paolo Valente <paolo.valente@linaro.org>
+To:     Jens Axboe <axboe@kernel.dk>
+Cc:     linux-block@vger.kernel.org, linux-kernel@vger.kernel.org,
+        ulf.hansson@linaro.org, linus.walleij@linaro.org,
+        bfq-iosched@googlegroups.com, oleksandr@natalenko.name,
+        Tejun Heo <tj@kernel.org>, cgroups@vger.kernel.org,
+        Paolo Valente <paolo.valente@linaro.org>
+Subject: [PATCH 0/1] block, bfq: remove bfq prefix from cgroups filenames
+Date:   Mon,  9 Sep 2019 09:31:16 +0200
+Message-Id: <20190909073117.20625-1-paolo.valente@linaro.org>
+X-Mailer: git-send-email 2.20.1
 MIME-Version: 1.0
-Content-Type: multipart/signed; boundary="=-=-=";
-        micalg=pgp-sha256; protocol="application/pgp-signature"
+Content-Transfer-Encoding: 8bit
 Sender: linux-block-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
---=-=-=
-Content-Type: text/plain
-Content-Transfer-Encoding: quoted-printable
+Hi Jens,
+now that BFQ's weight interface has been fixed [1], can we proceed
+with this change?
 
+In addition to acking this solution, in [2] Tejun already suggested a
+reduced version of the present patch. In Tejun's version, only
+bfq.weight is changed. But I guess that legacy code may use also some
+of the other bfq parameters in cgroups, without the bfq prefix. Apart
+from that, any version is ok for me, provided that it solves the
+current confusing situation for userspace [3].
 
-Due to a bug introduced in Linux 3.14 we cannot determine the
-correctly layout for a multi-zone RAID0 array - there are two
-possibiities.
+Thanks,
+Paolo
 
-It is possible to tell the kernel which to chose using a module
-parameter, but this can be clumsy to use.  It would be best if
-the choice were recorded in the metadata.
-So add a feature flag for this purpose.
-If it is set, then the 'layout' field of the superblock is used
-to determine which layout to use.
+[1] https://lkml.org/lkml/2019/8/27/1716
+[2] https://www.mail-archive.com/linux-block@vger.kernel.org/msg35823.html
+[3] https://github.com/systemd/systemd/issues/7057
 
-If this flag is not set, then mddev->layout gets set to -1,
-which causes the module parameter to be required.
+Angelo Ruocco (1):
+  block, bfq: delete "bfq" prefix from cgroup filenames
 
-Signed-off-by: NeilBrown <neilb@suse.de>
-=2D--
- drivers/md/md.c                | 13 +++++++++++++
- drivers/md/raid0.c             |  2 ++
- include/uapi/linux/raid/md_p.h |  2 ++
- 3 files changed, 17 insertions(+)
+ block/bfq-cgroup.c | 46 +++++++++++++++++++++++-----------------------
+ 1 file changed, 23 insertions(+), 23 deletions(-)
 
-diff --git a/drivers/md/md.c b/drivers/md/md.c
-index 1f70ec595282..a41fce7f8b4c 100644
-=2D-- a/drivers/md/md.c
-+++ b/drivers/md/md.c
-@@ -1232,6 +1232,8 @@ static int super_90_validate(struct mddev *mddev, str=
-uct md_rdev *rdev)
- 			mddev->new_layout =3D mddev->layout;
- 			mddev->new_chunk_sectors =3D mddev->chunk_sectors;
- 		}
-+		if (mddev->level =3D=3D 0)
-+			mddev->layout =3D -1;
-=20
- 		if (sb->state & (1<<MD_SB_CLEAN))
- 			mddev->recovery_cp =3D MaxSector;
-@@ -1647,6 +1649,10 @@ static int super_1_load(struct md_rdev *rdev, struct=
- md_rdev *refdev, int minor_
- 		rdev->ppl.sector =3D rdev->sb_start + rdev->ppl.offset;
- 	}
-=20
-+	if ((le32_to_cpu(sb->feature_map) & MD_FEATURE_RAID0_LAYOUT) &&
-+	    sb->level !=3D 0)
-+		return -EINVAL;
-+
- 	if (!refdev) {
- 		ret =3D 1;
- 	} else {
-@@ -1757,6 +1763,10 @@ static int super_1_validate(struct mddev *mddev, str=
-uct md_rdev *rdev)
- 			mddev->new_chunk_sectors =3D mddev->chunk_sectors;
- 		}
-=20
-+		if (mddev->level =3D=3D 0 &&
-+		    !(le32_to_cpu(sb->feature_map) & MD_FEATURE_RAID0_LAYOUT))
-+			mddev->layout =3D -1;
-+
- 		if (le32_to_cpu(sb->feature_map) & MD_FEATURE_JOURNAL)
- 			set_bit(MD_HAS_JOURNAL, &mddev->flags);
-=20
-@@ -6852,6 +6862,9 @@ static int set_array_info(struct mddev *mddev, mdu_ar=
-ray_info_t *info)
- 	mddev->external	     =3D 0;
-=20
- 	mddev->layout        =3D info->layout;
-+	if (mddev->level =3D=3D 0)
-+		/* Cannot trust RAID0 layout info here */
-+		mddev->layout =3D -1;
- 	mddev->chunk_sectors =3D info->chunk_size >> 9;
-=20
- 	if (mddev->persistent) {
-diff --git a/drivers/md/raid0.c b/drivers/md/raid0.c
-index a8888c12308a..6f095b0b6f5c 100644
-=2D-- a/drivers/md/raid0.c
-+++ b/drivers/md/raid0.c
-@@ -145,6 +145,8 @@ static int create_strip_zones(struct mddev *mddev, stru=
-ct r0conf **private_conf)
-=20
- 	if (conf->nr_strip_zones =3D=3D 1) {
- 		conf->layout =3D RAID0_ORIG_LAYOUT;
-+	} else if (mddev->layout =3D=3D RAID0_ORIG_LAYOUT ||
-+		   mddev->layout =3D=3D RAID0_ALT_MULTIZONE_LAYOUT) {
- 	} else if (default_layout =3D=3D RAID0_ORIG_LAYOUT ||
- 		   default_layout =3D=3D RAID0_ALT_MULTIZONE_LAYOUT) {
- 		conf->layout =3D default_layout;
-diff --git a/include/uapi/linux/raid/md_p.h b/include/uapi/linux/raid/md_p.h
-index b0d15c73f6d7..1f2d8c81f0e0 100644
-=2D-- a/include/uapi/linux/raid/md_p.h
-+++ b/include/uapi/linux/raid/md_p.h
-@@ -329,6 +329,7 @@ struct mdp_superblock_1 {
- #define	MD_FEATURE_JOURNAL		512 /* support write cache */
- #define	MD_FEATURE_PPL			1024 /* support PPL */
- #define	MD_FEATURE_MULTIPLE_PPLS	2048 /* support for multiple PPLs */
-+#define	MD_FEATURE_RAID0_LAYOUT		4096 /* layout is meaningful for RAID0 */
- #define	MD_FEATURE_ALL			(MD_FEATURE_BITMAP_OFFSET	\
- 					|MD_FEATURE_RECOVERY_OFFSET	\
- 					|MD_FEATURE_RESHAPE_ACTIVE	\
-@@ -341,6 +342,7 @@ struct mdp_superblock_1 {
- 					|MD_FEATURE_JOURNAL		\
- 					|MD_FEATURE_PPL			\
- 					|MD_FEATURE_MULTIPLE_PPLS	\
-+					|MD_FEATURE_RAID0_LAYOUT	\
- 					)
-=20
- struct r5l_payload_header {
-=2D-=20
-2.14.0.rc0.dirty
-
-
---=-=-=
-Content-Type: application/pgp-signature; name="signature.asc"
-
------BEGIN PGP SIGNATURE-----
-
-iQIzBAEBCAAdFiEEG8Yp69OQ2HB7X0l6Oeye3VZigbkFAl11+BUACgkQOeye3VZi
-gbnBXg/6At5rjQ0DVWJLkMJ7jQQA2RJQY5Y2iHRclkwJA3m7bfffAJxwusgWob5B
-TD2B5BmlnyLVoqNPpoFEt8OFMSNKHVNycsNNG4B/SXHWuWGUj0t2A8Ezxjecyz2D
-93ADAD2wVHzVbWn+mbpP/3KZPGn9qUBbz3FTUSjE/gmaVqHkU9m3l1AqsTnFeG0I
-oPE4yClQWf7FGVBlmCLw+j9yRgDsMBT+PKvoyr01n0ksD7ao9aKxLkot4vEc21yt
-SDwODpA7vwrAS+qf74LZjU/NwXf0HMiUNcVyl164bl/n6ZKTDQonyC0MUWCQmebG
-eH/FINXcxIdjj9NOQ0ZW5C3fGLqfuOUkucieNKA0QFG1mQp4AQNWatYpdbO7M6u4
-HgGz4hKFyr6ZN/uTibzu6rUfenSTU/KsaPlsp9rARZXxgiGQ3K8GibeS7g0H1YV8
-+9NKUZ2nZc56fB97h0dyz76FdtKwRHa6UGiEnWYPR1qcsIyXHvv/YCm80g8ad5Mr
-yGNKvzjhl3+29Fd7bctxS6gA0sNiKcDZ58LNYpC8Cjis/UzLLlB1QXZHS2dBeV3k
-x0nD0IF8JvPho+fr2RMsYRZGGcd2+HWbVUO/vRc3hv9TSrOl/cY3BzMFZR8JbfCh
-9D1ikhZv1Bwccsr3IbRTNQk3AEq3Dx7nnYoY4l2vsaPgXXcYavE=
-=g/q1
------END PGP SIGNATURE-----
---=-=-=--
+--
+2.20.1
