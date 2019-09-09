@@ -4,102 +4,100 @@ X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 X-Spam-Level: 
 X-Spam-Status: No, score=-1.1 required=3.0 tests=DKIM_SIGNED,DKIM_VALID,
 	DKIM_VALID_AU,HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SPF_HELO_NONE,
-	SPF_PASS,URIBL_BLOCKED autolearn=no autolearn_force=no version=3.4.0
+	SPF_PASS autolearn=no autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 99EDFC433EF
-	for <linux-block@archiver.kernel.org>; Mon,  9 Sep 2019 05:57:59 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 35479C00307
+	for <linux-block@archiver.kernel.org>; Mon,  9 Sep 2019 06:09:09 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.kernel.org (Postfix) with ESMTP id 66DB721A49
-	for <linux-block@archiver.kernel.org>; Mon,  9 Sep 2019 05:57:59 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id EDCD32089F
+	for <linux-block@archiver.kernel.org>; Mon,  9 Sep 2019 06:09:08 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=pass (2048-bit key) header.d=linaro.org header.i=@linaro.org header.b="dnFVSsjo"
+	dkim=pass (1024-bit key) header.d=natalenko.name header.i=@natalenko.name header.b="RW7yB7VN"
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1727333AbfIIF56 (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Mon, 9 Sep 2019 01:57:58 -0400
-Received: from mail-wm1-f68.google.com ([209.85.128.68]:35073 "EHLO
-        mail-wm1-f68.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1727076AbfIIF56 (ORCPT
-        <rfc822;linux-block@vger.kernel.org>); Mon, 9 Sep 2019 01:57:58 -0400
-Received: by mail-wm1-f68.google.com with SMTP id n10so13088419wmj.0
-        for <linux-block@vger.kernel.org>; Sun, 08 Sep 2019 22:57:56 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=linaro.org; s=google;
-        h=mime-version:subject:from:in-reply-to:date:cc
-         :content-transfer-encoding:message-id:references:to;
-        bh=00uQqKGc3ntry1sUHA28NuC7W2YW52OB0uzh/6SRnk4=;
-        b=dnFVSsjoxqSQxLiFpd7+EBfRtZDxKWV8t82KXqAehO1Vsl2O22PFD7pPt3gzFtlblQ
-         5FA9tNp5HySNWlDNCLPb7WPNYH1XzJH6mtgjEske8i+sUegf0BUZkw9A+9OSJczNf8al
-         dhDX6UvKUJihuhitVElv3mGro33zvxV69SxtHBYFJ2HM1hWtOk+LrhidapysjUR0cd9M
-         YmH6nlM2Wdsa0ALFBH2n753qXT5rddEiAyg5Ji4XcUSd/nJcotRIXyiLuCkJOHq+8UGP
-         LC0hqVg+J2fq4kA8cJYMtD92Jz0Rodd/4o4Bf7qmvnKhnamI2KcLMP9IN6HPjuwbYb4H
-         zd5w==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20161025;
-        h=x-gm-message-state:mime-version:subject:from:in-reply-to:date:cc
-         :content-transfer-encoding:message-id:references:to;
-        bh=00uQqKGc3ntry1sUHA28NuC7W2YW52OB0uzh/6SRnk4=;
-        b=rSTVifqhOCg7HkwzbVE4vATyRsnZlAU9uYy69dAWdQW+dCKR+RjrDOFP3zGFbKmnKF
-         9AEDvH5izlnmzGj7qwVX2kQXXDD6XW8gk3BexaKHcaiIOsmIq0NpHfnJsyaJDR3mefIr
-         c0p/TlmgVxHr8adYi2zehRKahmqBOIo5Hgvv9qFa0QI71riLYaqEX1CuJbrVLbXkkdH6
-         5PiqWnzOis2KRYtVzJVm2zutw8XX16ADvteb2dnVMEiXtihmVYj1+S7XzwikSWZ+zbY8
-         9g7En49WQgjzmBeIkqypMhtEigQ9jfhQFl5ywJpUakMVgF2GUoMqVM2ornbYCePUDqnM
-         eacg==
-X-Gm-Message-State: APjAAAUei93g60VZqY56hPwSTD6xkClTkmZrNgTvOk9TgBcQJVOkIpGT
-        ov2oJ7MVtgtHqrk4q5NdSjBc/A==
-X-Google-Smtp-Source: APXvYqyTuOYWiPrJQegHYIEdG0b8fajJCGI0sjBqLXu6MTa5++KDoPx8Kxrq8U2i/YY6IhYKXCtKjQ==
-X-Received: by 2002:a1c:7414:: with SMTP id p20mr17169399wmc.68.1568008676005;
-        Sun, 08 Sep 2019 22:57:56 -0700 (PDT)
-Received: from [192.168.0.102] (146-241-7-242.dyn.eolo.it. [146.241.7.242])
-        by smtp.gmail.com with ESMTPSA id r18sm14513325wrx.36.2019.09.08.22.57.54
-        (version=TLS1_2 cipher=ECDHE-RSA-AES128-GCM-SHA256 bits=128/128);
-        Sun, 08 Sep 2019 22:57:55 -0700 (PDT)
-Content-Type: text/plain;
-        charset=us-ascii
-Mime-Version: 1.0 (Mac OS X Mail 12.4 \(3445.104.8\))
+        id S1727058AbfIIGJI (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Mon, 9 Sep 2019 02:09:08 -0400
+Received: from vulcan.natalenko.name ([104.207.131.136]:37358 "EHLO
+        vulcan.natalenko.name" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S1726875AbfIIGJH (ORCPT
+        <rfc822;linux-block@vger.kernel.org>); Mon, 9 Sep 2019 02:09:07 -0400
+X-Greylist: delayed 317 seconds by postgrey-1.27 at vger.kernel.org; Mon, 09 Sep 2019 02:09:06 EDT
+Received: from mail.natalenko.name (vulcan.natalenko.name [IPv6:fe80::5400:ff:fe0c:dfa0])
+        (using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+        (No client certificate requested)
+        by vulcan.natalenko.name (Postfix) with ESMTPSA id C2C755D6045;
+        Mon,  9 Sep 2019 08:03:47 +0200 (CEST)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=natalenko.name;
+        s=dkim-20170712; t=1568009027;
+        h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+         to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+         content-transfer-encoding:content-transfer-encoding:
+         in-reply-to:in-reply-to:references:references;
+        bh=vcNUCkbMLofJESYwiLvXZxB1JxtkjqS0l4Y8aXZHaB8=;
+        b=RW7yB7VNqZ//fQmFwXf6q/ueYkqf4/OLcTr1Wnpy4T8uTQNZBU6vpXJyQYu+fh7ua5dlaX
+        cud3B6xoWA/fdK1fSaQC7pF6QbwS/QzlqbNpHLl10T/TKSGbAjV/1Br33mbJ0X+AEc4VCf
+        bEZi5jJ4YI5dyQ0iy3NRY02XxwzcvKc=
+MIME-Version: 1.0
+Content-Type: text/plain; charset=US-ASCII;
+ format=flowed
+Content-Transfer-Encoding: 7bit
+Date:   Mon, 09 Sep 2019 08:03:47 +0200
+From:   Oleksandr Natalenko <oleksandr@natalenko.name>
+To:     Paolo Valente <paolo.valente@linaro.org>
+Cc:     Jens Axboe <axboe@kernel.dk>, linux-block@vger.kernel.org,
+        linux-kernel@vger.kernel.org, ulf.hansson@linaro.org,
+        linus.walleij@linaro.org, bfq-iosched@googlegroups.com
 Subject: Re: [PATCH 0/4] block, bfq: series of improvements and small fixes of
  the injection mechanism
-From:   Paolo Valente <paolo.valente@linaro.org>
 In-Reply-To: <20190822152037.15413-1-paolo.valente@linaro.org>
-Date:   Mon, 9 Sep 2019 07:57:55 +0200
-Cc:     linux-block <linux-block@vger.kernel.org>,
-        linux-kernel@vger.kernel.org, ulf.hansson@linaro.org,
-        linus.walleij@linaro.org, bfq-iosched@googlegroups.com,
-        oleksandr@natalenko.name
-Content-Transfer-Encoding: quoted-printable
-Message-Id: <B7AE7BB9-667F-4732-87D4-F28C2D864645@linaro.org>
 References: <20190822152037.15413-1-paolo.valente@linaro.org>
-To:     Jens Axboe <axboe@kernel.dk>
-X-Mailer: Apple Mail (2.3445.104.8)
+Message-ID: <9088f78edc97279e34f6a96277d088f9@natalenko.name>
+X-Sender: oleksandr@natalenko.name
+User-Agent: Roundcube Webmail/1.3.10
+ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=natalenko.name;
+        s=arc-20170712; t=1568009028;
+        h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+         to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+         content-transfer-encoding:content-transfer-encoding:
+         in-reply-to:in-reply-to:references:references;
+        bh=vcNUCkbMLofJESYwiLvXZxB1JxtkjqS0l4Y8aXZHaB8=;
+        b=Mr9oP/lV/M2M52dZIg4L9ybmL3UhN5khVLwPiBbsr+V1BWl9/T3PZILDtGYqn7exK6ak+u
+        BXJ6iGo7BA4HEDsBPzxGaPm5wOo1fDb6qxrnGowdVtYbIDjhrRllBM+rkKok/Mxy3RELQP
+        UFa8PXVHBokdWKd2KMXgFpLcgTzHevI=
+ARC-Seal: i=1; s=arc-20170712; d=natalenko.name; t=1568009028; a=rsa-sha256;
+        cv=none;
+        b=PbYcbBiP6sBkCNLu7WQxL2h490EROYLol/K59+8xCpvmxM88RaqCZeO1raRT+fPkONmyIi
+        DT2exlJHqPiF/Y7VuVKG13QLGSmGn3SXSa59/Sts3RGLhfG8Moo0qw5m1sdWudBMgtlAen
+        6uB1RjCKsNJn0IqIQEm1X40BuTtUZrs=
+ARC-Authentication-Results: i=1;
+        vulcan.natalenko.name;
+        auth=pass smtp.auth=oleksandr@natalenko.name smtp.mailfrom=oleksandr@natalenko.name
 Sender: linux-block-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-Hi Jens,
-have you looked into this?
-
-Thanks,
-Paolo
-
-> Il giorno 22 ago 2019, alle ore 17:20, Paolo Valente =
-<paolo.valente@linaro.org> ha scritto:
->=20
+On 22.08.2019 17:20, Paolo Valente wrote:
 > Hi Jens,
 > this patch series makes the injection mechanism better at preserving
 > control on I/O.
->=20
+> 
 > Thanks,
 > Paolo
->=20
+> 
 > Paolo Valente (4):
->  block, bfq: update inject limit only after injection occurred
->  block, bfq: reduce upper bound for inject limit to max_rq_in_driver+1
->  block, bfq: increase update frequency of inject limit
->  block, bfq: push up injection only after setting service time
->=20
-> block/bfq-iosched.c | 35 ++++++++++++++++++++++++++---------
-> 1 file changed, 26 insertions(+), 9 deletions(-)
->=20
+>   block, bfq: update inject limit only after injection occurred
+>   block, bfq: reduce upper bound for inject limit to max_rq_in_driver+1
+>   block, bfq: increase update frequency of inject limit
+>   block, bfq: push up injection only after setting service time
+> 
+>  block/bfq-iosched.c | 35 ++++++++++++++++++++++++++---------
+>  1 file changed, 26 insertions(+), 9 deletions(-)
+> 
 > --
 > 2.20.1
 
+FWIW, Tested-by: Oleksandr Natalenko <oleksandr@natalenko.name> (I run 
+it for quite some time already).
+
+-- 
+   Oleksandr Natalenko (post-factum)
