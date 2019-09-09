@@ -2,179 +2,142 @@ Return-Path: <SRS0=IO0U=XE=vger.kernel.org=linux-block-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-8.5 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
-	INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,
-	USER_AGENT_SANE_1 autolearn=ham autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-2.6 required=3.0 tests=DKIM_SIGNED,DKIM_VALID,
+	DKIM_VALID_AU,FREEMAIL_FORGED_FROMDOMAIN,FREEMAIL_FROM,
+	HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,
+	USER_AGENT_SANE_1 autolearn=no autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id C6E08C4740A
-	for <linux-block@archiver.kernel.org>; Mon,  9 Sep 2019 18:26:38 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 53D8FC4740A
+	for <linux-block@archiver.kernel.org>; Mon,  9 Sep 2019 19:19:20 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.kernel.org (Postfix) with ESMTP id AAE0121A4A
-	for <linux-block@archiver.kernel.org>; Mon,  9 Sep 2019 18:26:38 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id 24B14218AF
+	for <linux-block@archiver.kernel.org>; Mon,  9 Sep 2019 19:19:20 +0000 (UTC)
+Authentication-Results: mail.kernel.org;
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="IIyQMR9Z"
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1730955AbfIIS0i (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Mon, 9 Sep 2019 14:26:38 -0400
-Received: from mx1.redhat.com ([209.132.183.28]:52652 "EHLO mx1.redhat.com"
-        rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-        id S1730561AbfIIS0h (ORCPT <rfc822;linux-block@vger.kernel.org>);
-        Mon, 9 Sep 2019 14:26:37 -0400
-Received: from smtp.corp.redhat.com (int-mx03.intmail.prod.int.phx2.redhat.com [10.5.11.13])
-        (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
-        (No client certificate requested)
-        by mx1.redhat.com (Postfix) with ESMTPS id 4924C18C8900;
-        Mon,  9 Sep 2019 18:26:37 +0000 (UTC)
-Received: from [10.10.121.183] (ovpn-121-183.rdu2.redhat.com [10.10.121.183])
-        by smtp.corp.redhat.com (Postfix) with ESMTP id 1F13760923;
-        Mon,  9 Sep 2019 18:26:36 +0000 (UTC)
-Subject: Re: [RFC PATCH] Add proc interface to set PF_MEMALLOC flags
-To:     axboe@kernel.dk, James.Bottomley@HansenPartnership.com,
-        martin.petersen@oracle.com, linux-kernel@vger.kernel.org,
-        linux-scsi@vger.kernel.org, linux-block@vger.kernel.org,
-        Linux-MM <linux-mm@kvack.org>
-References: <20190909162804.5694-1-mchristi@redhat.com>
-From:   Mike Christie <mchristi@redhat.com>
-Message-ID: <5D76995B.1010507@redhat.com>
-Date:   Mon, 9 Sep 2019 13:26:35 -0500
-User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:38.0) Gecko/20100101
- Thunderbird/38.6.0
+        id S1730011AbfIITTS (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Mon, 9 Sep 2019 15:19:18 -0400
+Received: from mail-wr1-f68.google.com ([209.85.221.68]:34534 "EHLO
+        mail-wr1-f68.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S1726814AbfIITTR (ORCPT
+        <rfc822;linux-block@vger.kernel.org>); Mon, 9 Sep 2019 15:19:17 -0400
+Received: by mail-wr1-f68.google.com with SMTP id a11so5622792wrx.1;
+        Mon, 09 Sep 2019 12:19:14 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=gmail.com; s=20161025;
+        h=date:from:to:cc:subject:message-id:references:mime-version
+         :content-disposition:in-reply-to:user-agent;
+        bh=r66d4BYEgHUxOR3huNv8G+gUhZfgwceZJlB7X7E2Auw=;
+        b=IIyQMR9Z3PNc7WMmpLhX14tESPk15ABwQuTI15q0vFFQgM4JmzoAi/RLhycSkEyQKW
+         +c3keZ+xqURPEQGloh0jzRTozvYGj94eFfgsL51dtm+GY5y2s+r3dr78k/hPopa1lF0H
+         MU17MYNzkLRBIda57peHvR3hH6wgN9KxyfVWlD89tuPPHFsxXEDi/JQ1PXU2VeR531X7
+         gBQoYa2FqowVyd86rfxGpgcPs5FMlopHalmWz4B9KqAelY/1CxslNNPhg1nDGcW8w7xl
+         LWMxwPHxHnzmgwaYGy+Q3G4dfq7kNKmpB4J6ssytL91K9oPnCnNflWcJxSXGgahLzypG
+         o70g==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20161025;
+        h=x-gm-message-state:date:from:to:cc:subject:message-id:references
+         :mime-version:content-disposition:in-reply-to:user-agent;
+        bh=r66d4BYEgHUxOR3huNv8G+gUhZfgwceZJlB7X7E2Auw=;
+        b=Rc6HpKt1Mb/j36T+aMvNJR1xX+EGHh5ruQyOqOgS9qScBDukPDUDczOPAHeQ/4tdzE
+         wdfc98++wC7AbruMWojm7QnzOFh4uk19UOvCeGlFBAH58ednEojEBPCEEPZaFSetJLu/
+         /mLNk/Oifs0LyuHtl8sm8t0XFsGWcU/IDgWBB1Om6E3W+Gpq7plqQ9IVG7Mvt3RhTXYI
+         gdHr4SwIwmqgm6VVIR0L5y/dAYCMqGkDPA90AdRVWUYQ6k0s+dREj+JH1foKEj7RFU95
+         uFAsOOxm3VGaWaYHFjzhchPO/Zz9l1uSsMFhxaAmdFlxdv8scw4gELMk/E9z/UKsifLf
+         /jfA==
+X-Gm-Message-State: APjAAAWZ6SLB+kbDECfcqVcVtdLzEAYHxyAOGiS6Ki6yDhC7FaVyJsKt
+        WAwqrVODeXOnbyYO9RAYVodnyMWt
+X-Google-Smtp-Source: APXvYqxzb5qbwmdG9sJb6tMns3ACZ8bACZQPb/aD3Wgpte3mQ5QZNm7HEjrNYRG9ihan4YFQ48Bv7w==
+X-Received: by 2002:a5d:438c:: with SMTP id i12mr19476713wrq.238.1568056753698;
+        Mon, 09 Sep 2019 12:19:13 -0700 (PDT)
+Received: from localhost (p200300E41F12DF00021F3CFFFE37B91B.dip0.t-ipconnect.de. [2003:e4:1f12:df00:21f:3cff:fe37:b91b])
+        by smtp.gmail.com with ESMTPSA id 74sm497052wma.15.2019.09.09.12.19.11
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Mon, 09 Sep 2019 12:19:12 -0700 (PDT)
+Date:   Mon, 9 Sep 2019 21:19:11 +0200
+From:   Thierry Reding <thierry.reding@gmail.com>
+To:     Christoph Hellwig <hch@lst.de>
+Cc:     Jens Axboe <axboe@kernel.dk>, Ulf Hansson <ulf.hansson@linaro.org>,
+        Adrian Hunter <adrian.hunter@intel.com>,
+        Yoshihiro Shimoda <yoshihiro.shimoda.uh@renesas.com>,
+        Simon Horman <horms+renesas@verge.net.au>,
+        Jon Hunter <jonathanh@nvidia.com>, linux-block@vger.kernel.org,
+        linux-mmc@vger.kernel.org, linux-tegra@vger.kernel.org
+Subject: Re: [PATCH 1/3] block: Respect the device's maximum segment size
+Message-ID: <20190909191911.GC23804@mithrandir>
+References: <20190909125658.30559-1-thierry.reding@gmail.com>
+ <20190909125658.30559-2-thierry.reding@gmail.com>
+ <20190909161331.GA19650@lst.de>
 MIME-Version: 1.0
-In-Reply-To: <20190909162804.5694-1-mchristi@redhat.com>
-Content-Type: text/plain; charset=windows-1252
-Content-Transfer-Encoding: 7bit
-X-Scanned-By: MIMEDefang 2.79 on 10.5.11.13
-X-Greylist: Sender IP whitelisted, not delayed by milter-greylist-4.6.2 (mx1.redhat.com [10.5.110.70]); Mon, 09 Sep 2019 18:26:37 +0000 (UTC)
+Content-Type: multipart/signed; micalg=pgp-sha256;
+        protocol="application/pgp-signature"; boundary="/Uq4LBwYP4y1W6pO"
+Content-Disposition: inline
+In-Reply-To: <20190909161331.GA19650@lst.de>
+User-Agent: Mutt/1.12.1 (2019-06-15)
 Sender: linux-block-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-Forgot to cc linux-mm.
 
-On 09/09/2019 11:28 AM, Mike Christie wrote:
-> There are several storage drivers like dm-multipath, iscsi, and nbd that
-> have userspace components that can run in the IO path. For example,
-> iscsi and nbd's userspace deamons may need to recreate a socket and/or
-> send IO on it, and dm-multipath's daemon multipathd may need to send IO
-> to figure out the state of paths and re-set them up.
-> 
-> In the kernel these drivers have access to GFP_NOIO/GFP_NOFS and the
-> memalloc_*_save/restore functions to control the allocation behavior,
-> but for userspace we would end up hitting a allocation that ended up
-> writing data back to the same device we are trying to allocate for.
-> 
-> This patch allows the userspace deamon to set the PF_MEMALLOC* flags
-> through procfs. It currently only supports PF_MEMALLOC_NOIO, but
-> depending on what other drivers and userspace file systems need, for
-> the final version I can add the other flags for that file or do a file
-> per flag or just do a memalloc_noio file.
-> 
-> Signed-off-by: Mike Christie <mchristi@redhat.com>
-> ---
->  Documentation/filesystems/proc.txt |  6 ++++
->  fs/proc/base.c                     | 53 ++++++++++++++++++++++++++++++
->  2 files changed, 59 insertions(+)
-> 
-> diff --git a/Documentation/filesystems/proc.txt b/Documentation/filesystems/proc.txt
-> index 99ca040e3f90..b5456a61a013 100644
-> --- a/Documentation/filesystems/proc.txt
-> +++ b/Documentation/filesystems/proc.txt
-> @@ -46,6 +46,7 @@ Table of Contents
->    3.10  /proc/<pid>/timerslack_ns - Task timerslack value
->    3.11	/proc/<pid>/patch_state - Livepatch patch operation state
->    3.12	/proc/<pid>/arch_status - Task architecture specific information
-> +  3.13  /proc/<pid>/memalloc - Control task's memory reclaim behavior
->  
->    4	Configuring procfs
->    4.1	Mount options
-> @@ -1980,6 +1981,11 @@ Example
->   $ cat /proc/6753/arch_status
->   AVX512_elapsed_ms:      8
->  
-> +3.13 /proc/<pid>/memalloc - Control task's memory reclaim behavior
-> +-----------------------------------------------------------------------
-> +A value of "noio" indicates that when a task allocates memory it will not
-> +reclaim memory that requires starting phisical IO.
-> +
->  Description
->  -----------
->  
-> diff --git a/fs/proc/base.c b/fs/proc/base.c
-> index ebea9501afb8..c4faa3464602 100644
-> --- a/fs/proc/base.c
-> +++ b/fs/proc/base.c
-> @@ -1223,6 +1223,57 @@ static const struct file_operations proc_oom_score_adj_operations = {
->  	.llseek		= default_llseek,
->  };
->  
-> +static ssize_t memalloc_read(struct file *file, char __user *buf, size_t count,
-> +			     loff_t *ppos)
-> +{
-> +	struct task_struct *task;
-> +	ssize_t rc = 0;
-> +
-> +	task = get_proc_task(file_inode(file));
-> +	if (!task)
-> +		return -ESRCH;
-> +
-> +	if (task->flags & PF_MEMALLOC_NOIO)
-> +		rc = simple_read_from_buffer(buf, count, ppos, "noio", 4);
-> +	put_task_struct(task);
-> +	return rc;
-> +}
-> +
-> +static ssize_t memalloc_write(struct file *file, const char __user *buf,
-> +			      size_t count, loff_t *ppos)
-> +{
-> +	struct task_struct *task;
-> +	char buffer[5];
-> +	int rc = count;
-> +
-> +	memset(buffer, 0, sizeof(buffer));
-> +	if (count != sizeof(buffer) - 1)
-> +		return -EINVAL;
-> +
-> +	if (copy_from_user(buffer, buf, count))
-> +		return -EFAULT;
-> +	buffer[count] = '\0';
-> +
-> +	task = get_proc_task(file_inode(file));
-> +	if (!task)
-> +		return -ESRCH;
-> +
-> +	if (!strcmp(buffer, "noio")) {
-> +		task->flags |= PF_MEMALLOC_NOIO;
-> +	} else {
-> +		rc = -EINVAL;
-> +	}
-> +
-> +	put_task_struct(task);
-> +	return rc;
-> +}
-> +
-> +static const struct file_operations proc_memalloc_operations = {
-> +	.read		= memalloc_read,
-> +	.write		= memalloc_write,
-> +	.llseek		= default_llseek,
-> +};
-> +
->  #ifdef CONFIG_AUDIT
->  #define TMPBUFLEN 11
->  static ssize_t proc_loginuid_read(struct file * file, char __user * buf,
-> @@ -3097,6 +3148,7 @@ static const struct pid_entry tgid_base_stuff[] = {
->  #ifdef CONFIG_PROC_PID_ARCH_STATUS
->  	ONE("arch_status", S_IRUGO, proc_pid_arch_status),
->  #endif
-> +	REG("memalloc", S_IRUGO|S_IWUSR, proc_memalloc_operations),
->  };
->  
->  static int proc_tgid_base_readdir(struct file *file, struct dir_context *ctx)
-> @@ -3487,6 +3539,7 @@ static const struct pid_entry tid_base_stuff[] = {
->  #ifdef CONFIG_PROC_PID_ARCH_STATUS
->  	ONE("arch_status", S_IRUGO, proc_pid_arch_status),
->  #endif
-> +	REG("memalloc", S_IRUGO|S_IWUSR, proc_memalloc_operations),
->  };
->  
->  static int proc_tid_base_readdir(struct file *file, struct dir_context *ctx)
-> 
+--/Uq4LBwYP4y1W6pO
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+Content-Transfer-Encoding: quoted-printable
 
+On Mon, Sep 09, 2019 at 06:13:31PM +0200, Christoph Hellwig wrote:
+> On Mon, Sep 09, 2019 at 02:56:56PM +0200, Thierry Reding wrote:
+> > From: Thierry Reding <treding@nvidia.com>
+> >=20
+> > When enabling the DMA map merging capability for a queue, ensure that
+> > the maximum segment size does not exceed the device's limit.
+>=20
+> We can't do that unfortunately.  If we use the virt_boundary setting
+> we do aggressive merges that there is no accounting for.  So we can't
+> limit the segment size.
+
+But that's kind of the point here. My understanding is that the maximum
+segment size in the device's DMA parameters defines the maximum size of
+the segment that the device can handle.
+
+In the particular case that I'm trying to fix, according to the SDHCI
+specification, these devices can handle segments that are a maximum of
+64 KiB in size. If we allow that segment size to be exceeded, the device
+will no longer be able to handle them.
+
+> And at least for the case how devices usually do the addressing
+> (page based on not sgl based) that needs the virt_boundary there isn't
+> really any concept like a segment anyway.
+
+I do understand that aspect of it. However, devices that do the
+addressing this way, wouldn't they want to set the maximum segment size
+to something large (like UINT_MAX, which many users that don't have the
+concept of a segment already do)?
+
+If you disagree, do you have any alternative proposals other than
+reverting the offending patch? linux-next is currently broken on all
+systems where the SDHCI controller is behind an IOMMU.
+
+Thierry
+
+--/Uq4LBwYP4y1W6pO
+Content-Type: application/pgp-signature; name="signature.asc"
+
+-----BEGIN PGP SIGNATURE-----
+
+iQIzBAABCAAdFiEEiOrDCAFJzPfAjcif3SOs138+s6EFAl12pa8ACgkQ3SOs138+
+s6HrWg//aN5PxrCWIsl0Y2QXlqhiL+PeVvdDm9nf8/CdONMVuGetb/xY/jQ7JMRx
+I3RYYhHauxPMMLUxVloENIXnfjv005SaAE2TFhQ1oLxNomS/75KC+26920kSGwHg
+zV8QHyu3uFiqdgkQLunbPs5PVQky7YTVqT/HTTl5XHkLnrsQyj+x00kayTmVjtPy
+QmqqRJZsJ0G77ewpGXJT3edhMLqkmWF5s3ql0vB+8d+KObr4msjn7bl3nvp09sNN
+n7ilt0f/qRZDWQKrVAMKMkOs9Ip8nZXPhkCVzTxST6cDrefMhDyED644IETl+HiI
+1bRB+d1nJXg4gjsAFCrGCz4WdUcYOtVQ8CQJnkX9Wt5N2Zq/Mc9/VWU++C+Fb0sU
+xkPPBOZaI9fKYe0pe9QR75iKD/bKEf8+p9gxjZV04QHW7zrsUhmEWyFmtuDwHsTa
+Hkx8LNEp8sK96ly7nG8oYVGG7kvtpXWZCxk1WRrVw6MZdKb3rmF7AlTMlO3zntTQ
+nsWYgX/SE2b17ckXWQQAlKjXeHFj2ax/E9bOzChAcsh/5DtQQXHOkKIQO6dmGNCQ
+koleIlK0eAS0xY3cH5Bt5OlrmWMwCpb8pQ5t/gudb6Gs56aMGUOnXBg5SoVmnNvD
+EJdRvM6EszKzeuQ6MNmsvwBw7+drIAHS1cmNITKBmiKWmnd+eHQ=
+=Gpqn
+-----END PGP SIGNATURE-----
+
+--/Uq4LBwYP4y1W6pO--
