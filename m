@@ -6,69 +6,69 @@ X-Spam-Status: No, score=-2.5 required=3.0 tests=DKIM_SIGNED,DKIM_VALID,
 	HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,
 	USER_AGENT_SANE_1 autolearn=no autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id AACA3C49ED9
-	for <linux-block@archiver.kernel.org>; Tue, 10 Sep 2019 18:21:23 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 32DA2C49ED7
+	for <linux-block@archiver.kernel.org>; Tue, 10 Sep 2019 18:32:09 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.kernel.org (Postfix) with ESMTP id 85A6D2082C
-	for <linux-block@archiver.kernel.org>; Tue, 10 Sep 2019 18:21:23 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id 09065206A1
+	for <linux-block@archiver.kernel.org>; Tue, 10 Sep 2019 18:32:09 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel-dk.20150623.gappssmtp.com header.i=@kernel-dk.20150623.gappssmtp.com header.b="xqDdzksC"
+	dkim=pass (2048-bit key) header.d=kernel-dk.20150623.gappssmtp.com header.i=@kernel-dk.20150623.gappssmtp.com header.b="eFEJ0DHd"
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1726162AbfIJSVW (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Tue, 10 Sep 2019 14:21:22 -0400
-Received: from mail-pf1-f178.google.com ([209.85.210.178]:36178 "EHLO
-        mail-pf1-f178.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1726618AbfIJSVV (ORCPT
+        id S1727135AbfIJScI (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Tue, 10 Sep 2019 14:32:08 -0400
+Received: from mail-pl1-f195.google.com ([209.85.214.195]:36037 "EHLO
+        mail-pl1-f195.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S1726663AbfIJScI (ORCPT
         <rfc822;linux-block@vger.kernel.org>);
-        Tue, 10 Sep 2019 14:21:21 -0400
-Received: by mail-pf1-f178.google.com with SMTP id y22so12044660pfr.3
-        for <linux-block@vger.kernel.org>; Tue, 10 Sep 2019 11:21:19 -0700 (PDT)
+        Tue, 10 Sep 2019 14:32:08 -0400
+Received: by mail-pl1-f195.google.com with SMTP id f19so8983208plr.3
+        for <linux-block@vger.kernel.org>; Tue, 10 Sep 2019 11:32:07 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=kernel-dk.20150623.gappssmtp.com; s=20150623;
         h=subject:to:cc:references:from:message-id:date:user-agent
          :mime-version:in-reply-to:content-language:content-transfer-encoding;
-        bh=He18b5RVxxpe8smLyrpLpEIbfLqZ+paKB0vO+pHwR0g=;
-        b=xqDdzksClH+VzDniz0I3kbc4+dbzzazVKzgT6Ff4DZMABzndDy97UPPfDYpirqRCml
-         PFu9R4FCQtPyGcxX/uYeajB/GMRFM0mZUbiZDKp83Aky9HTCz45hCcdFFkDt+V2HvzYI
-         TfNIAcMWT4/Z38wIcFGpNBTsAjEeuCKY5GHcu/2ZO9zytYqipZbjE6Pr1OmE2xFFJNpK
-         jGApnEkDxlX0I2fd6Kv4CSpKDI5HI1r7tfX8JMs0XYpDeZRO2KhFEAeTVCP8v/l80S7J
-         haD3WvPie8GxrBV3FQyZcasYkmMDtrDImkPwXs4nib/c5wR/YXhvjZfcP7BG5/yvZREU
-         obew==
+        bh=gmihbRTTguhKuF5poqPrKOZtRuKZ2B/FVhu85kYPomo=;
+        b=eFEJ0DHdQ+gOjr08che3M4Ms36pQZ/j0IezL7oi03HQnX2YjfG1S+nNKpcLRqLGWtQ
+         PPxCQw+rHkJOyVpzA+WrbkIWHKwEQwYWJoThRT+YJ+Z3FLxkwzRk/gUSR4mBaYxPs/A3
+         ZHHHb/+KW51o1rmGeub/erimGc9yzYv0SnByD5rdzoyIJ7PwZNxKm4n1vCbrVDwpCWvS
+         sAbC06jkTUKjyfwSL8GcQMX4lTVlRzbXbCyowRdrk/eNaJMSv2bHcL8+UjIkLfgVeR0a
+         eK1lxBcNMUCi4/G5rr+vfxQG/ioz4oWUm9RgMCHhKh1G9K44i828u1woNK4lOf65DSik
+         a8Bg==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=1e100.net; s=20161025;
         h=x-gm-message-state:subject:to:cc:references:from:message-id:date
          :user-agent:mime-version:in-reply-to:content-language
          :content-transfer-encoding;
-        bh=He18b5RVxxpe8smLyrpLpEIbfLqZ+paKB0vO+pHwR0g=;
-        b=mW4npkW4V98nwA/ZCXCiunTQ1Xk6BT+WGwM9bDvDtGEGnOqwPC4zOZvsClXfURF+jM
-         dWEgKETS1MCIzNvgzKNe0YkzgycC/NIKE9p7hbbgScaJ31v5rDWrGc1PG4KnVOQmVZmI
-         m7/xwpEtFE4owknwFvwKQT48ZqOk5ey44s5UzOyUmREAN4Uq7ayl92li6srdx/YKpeRO
-         qVW6Ur7L0XWobXdXANlUdhWJbrIdKM1ZW4/oENeTxIqkq35/Ljh73SL5+4dvwnDwk+JV
-         lIJ3zyQbepqeRx5tCx7w1MJJcTrQetjBMwzDOGE8bm9tmGEftIWvMfMEEMYavGeaENWL
-         pEtg==
-X-Gm-Message-State: APjAAAXMELrK30T/7G9Cx6mx0/nXU0/WzR8vWTLgUFOK4ao3Jsiya4DN
-        rXhVXcRgr9IVRFsNwRGbKJXjhA==
-X-Google-Smtp-Source: APXvYqxEGGAanfl9SlthPWRKT+GwrUUtorAPx3HUFq4hKMuGjQSTQz95q8I0tLNAn4ATjGR8vVobqw==
-X-Received: by 2002:a62:3893:: with SMTP id f141mr21107527pfa.221.1568139679352;
-        Tue, 10 Sep 2019 11:21:19 -0700 (PDT)
-Received: from ?IPv6:2600:380:b456:5481:e4d0:d8e2:e397:e69f? ([2600:380:b456:5481:e4d0:d8e2:e397:e69f])
-        by smtp.gmail.com with ESMTPSA id g2sm20935834pfm.32.2019.09.10.11.21.15
+        bh=gmihbRTTguhKuF5poqPrKOZtRuKZ2B/FVhu85kYPomo=;
+        b=g4kpzYa+NfQjay/HgDNW/QP7+hgwg9NuAzm7kJBfsZto5RErQX8WTQYhP8C//rsiv5
+         96nBNu8FwBWdh4PpKsAp4VNFe6TXz3zE0Yc5Cq2syjwH5s6Ra6QNDRDXoASP+JaI5wM5
+         eenPCQUC4B/GL1mLBbQL10RFTVINgi25bch9p5GG9i1sQ0fjw0WwZIC4+sZ4aD+PG4+i
+         w1anhc32JRpGXbsbUWkQt+gjfXRCSHg9ilCG+rwV2eNt1wsV1rn2Sc1LyGVKJkFdh/qa
+         MokfRyxbqpsXn+36siucZ605PjrXCW9mntUA3g3/iqklQj+m94xU31sFn0FcVoHl6R2a
+         ZbOA==
+X-Gm-Message-State: APjAAAXwo68ztpqau4CBZAWZQokCmJKc8gHA3Puolv0kjJWd/dxLBS0x
+        /2xYN5RSJvX0rLd8f9O4hSJDpZzoILjOug==
+X-Google-Smtp-Source: APXvYqxUyL7Z6oVqM2K/cpBXdQ5XU4zczgojdiiYF8PPrDacQNODuEfl8nlxlhZ7o1pEL7sF4f2lww==
+X-Received: by 2002:a17:902:b086:: with SMTP id p6mr32047305plr.315.1568140326506;
+        Tue, 10 Sep 2019 11:32:06 -0700 (PDT)
+Received: from ?IPv6:2600:380:b456:5481:2ce0:140c:7117:4b2a? ([2600:380:b456:5481:2ce0:140c:7117:4b2a])
+        by smtp.gmail.com with ESMTPSA id b20sm22735360pff.158.2019.09.10.11.32.04
         (version=TLS1_2 cipher=ECDHE-RSA-AES128-GCM-SHA256 bits=128/128);
-        Tue, 10 Sep 2019 11:21:17 -0700 (PDT)
-Subject: Re: [block/for-next] iocost: Fix incorrect operation order during
- iocg free
+        Tue, 10 Sep 2019 11:32:05 -0700 (PDT)
+Subject: Re: [PATCHSET block/for-next] blk-iocost: Implement absolute debt
+ handling
 To:     Tejun Heo <tj@kernel.org>
 Cc:     linux-block@vger.kernel.org, linux-kernel@vger.kernel.org,
-        cgroups@vger.kernel.org, kernel-team@fb.com,
-        Dave Jones <davej@codemonkey.org.uk>
-References: <20190910161525.GT2263813@devbig004.ftw2.facebook.com>
+        kernel-team@vger.kernel.org, cgroups@vger.kernel.org,
+        newella@fb.com
+References: <20190904194556.2984857-1-tj@kernel.org>
 From:   Jens Axboe <axboe@kernel.dk>
-Message-ID: <2222732f-09f7-1434-31a6-b591630d2efb@kernel.dk>
-Date:   Tue, 10 Sep 2019 12:21:14 -0600
+Message-ID: <1d8b7394-09bc-63ef-5bb7-de0f2ff2c75a@kernel.dk>
+Date:   Tue, 10 Sep 2019 12:32:02 -0600
 User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:60.0) Gecko/20100101
  Thunderbird/60.8.0
 MIME-Version: 1.0
-In-Reply-To: <20190910161525.GT2263813@devbig004.ftw2.facebook.com>
+In-Reply-To: <20190904194556.2984857-1-tj@kernel.org>
 Content-Type: text/plain; charset=utf-8
 Content-Language: en-US
 Content-Transfer-Encoding: 7bit
@@ -77,36 +77,51 @@ Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-On 9/10/19 10:15 AM, Tejun Heo wrote:
-> ioc_pd_free() first cancels the hrtimers and then deactivates the
-> iocg.  However, the iocg timer can run inbetween and reschedule the
-> hrtimers which will end up running after the iocg is freed leading to
-> crashes like the following.
+On 9/4/19 1:45 PM, Tejun Heo wrote:
+> Currently, when a given cgroup doesn't have enough budget, a forced or
+> merged bio will advance the cgroup's vtime by the cost calculated
+> according to the hierarchical weight at the time of issue.  Once vtime
+> is advanced, how the cgroup's weight changes doesn't matter.  It has
+> to wait until global vtime catches up with the cgroup's.
 > 
->    general protection fault: 0000 [#1] SMP
->    ...
->    RIP: 0010:iocg_kick_delay+0xbe/0x1b0
->    RSP: 0018:ffffc90003598ea0 EFLAGS: 00010046
->    RAX: 1cee00fd69512b54 RBX: ffff8881bba48400 RCX: 00000000000003e8
->    RDX: 0000000000000000 RSI: 0000000000000001 RDI: ffff8881bba48400
->    RBP: 0000000000004e20 R08: 0000000000000002 R09: 00000000000003e8
->    R10: 0000000000000000 R11: 0000000000000000 R12: ffffc90003598ef0
->    R13: 00979f3810ad461f R14: ffff8881bba4b400 R15: 25439f950d26e1d1
->    FS:  0000000000000000(0000) GS:ffff88885f800000(0000) knlGS:0000000000000000
->    CS:  0010 DS: 0000 ES: 0000 CR0: 0000000080050033
->    CR2: 00007f64328c7e40 CR3: 0000000002409005 CR4: 00000000003606e0
->    DR0: 0000000000000000 DR1: 0000000000000000 DR2: 0000000000000000
->    DR3: 0000000000000000 DR6: 00000000fffe0ff0 DR7: 0000000000000400
->    Call Trace:
->     <IRQ>
->     iocg_delay_timer_fn+0x3d/0x60
->     __hrtimer_run_queues+0xfe/0x270
->     hrtimer_interrupt+0xf4/0x210
->     smp_apic_timer_interrupt+0x5e/0x120
->     apic_timer_interrupt+0xf/0x20
->     </IRQ>
+> This means that the cost is calculated based on the hweight at the
+> time of issuing but may later be paid at the wrong hweight.  This, for
+> example, can lead to a scenario like the following.
 > 
-> Fix it by canceling hrtimers after deactivating the iocg.
+> 1. A cgroup with a very low hweight runs out of budget.
+> 
+> 2. A storm of swap-out happens on it.  All of them are scaled
+>     according to the current low hweight and charged to vtime pushing
+>     it to a far future.
+> 
+> 3. All other cgroups go idle and now the above cgroup has access to
+>     the whole device.  However, because vtime is already wound using
+>     the past low hweight, what its current hweight is doesn't matter
+>     until global vtime catches up to the local vtime.
+> 
+> 4. As a result, either vrate gets ramped up extremely or the IOs stall
+>     while the underlying device is idle.
+> 
+> This patchset fixes the behavior by accounting the cost of forced or
+> merged bios in absolute vtime rather than cgroup-relative.  This
+> allows the cgroup to pay back the debt with whatever actual budget it
+> has each period removing the hweight discrepancy.
+> 
+> Note that !forced bios' costs are already accounted in absolute vtime.
+> This patchset puts forced charges on the same ground.
+> 
+> This patchset contains the following five patches and is on top of the
+> current linux-block.git for-next 35e7ae82f62b ("Merge branch
+> 'for-5.4/block' into for-next").
+> 
+>   0001-blk-iocost-Account-force-charged-overage-in-absolute.patch
+>   0002-blk-iocost-Don-t-let-merges-push-vtime-into-the-futu.patch
+>   0003-iocost_monitor-Always-use-strings-for-json-values.patch
+>   0004-iocost_monitor-Report-more-info-with-higher-accuracy.patch
+>   0005-iocost_monitor-Report-debt.patch
+> 
+> 0001-0002 implement absolute debt handling.  0003-0005 improve the
+> monitoring script and add debt reporting.
 
 Applied, thanks.
 
