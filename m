@@ -2,154 +2,133 @@ Return-Path: <SRS0=q0Gp=XF=vger.kernel.org=linux-block-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-8.5 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
-	INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,
-	USER_AGENT_SANE_1 autolearn=ham autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-2.6 required=3.0 tests=DKIMWL_WL_HIGH,DKIM_SIGNED,
+	DKIM_VALID,DKIM_VALID_AU,MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,
+	USER_AGENT_SANE_1 autolearn=no autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id CB065C49ED9
-	for <linux-block@archiver.kernel.org>; Tue, 10 Sep 2019 16:06:06 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 7A598C49ED8
+	for <linux-block@archiver.kernel.org>; Tue, 10 Sep 2019 16:09:00 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.kernel.org (Postfix) with ESMTP id AA71D206A1
-	for <linux-block@archiver.kernel.org>; Tue, 10 Sep 2019 16:06:06 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id 445D3206A1
+	for <linux-block@archiver.kernel.org>; Tue, 10 Sep 2019 16:09:00 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+	s=default; t=1568131740;
+	bh=Iyom6nVo13zvWT0J4vP9mpQMZj8t1KHSkeSG+h6adVs=;
+	h=Date:From:To:Cc:Subject:References:In-Reply-To:List-ID:From;
+	b=W6iWsx0DW/wymKMIbfLqm7epIoIRUPWj3z9wkpFM96sOUheKw+B0v2bGGpfFsP0pU
+	 9iTWvRkAzWMT2kX9WMRwPGMv6hmowhhokfi4XgUSdHMoCnIbLW7hcGxhDcr9p+1R91
+	 pxXsVXTClFcSpBrWPElWRq5R+2EUkpqUTDXPayIA=
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S2394100AbfIJQGG (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Tue, 10 Sep 2019 12:06:06 -0400
-Received: from mx1.redhat.com ([209.132.183.28]:39576 "EHLO mx1.redhat.com"
-        rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-        id S1730821AbfIJQGG (ORCPT <rfc822;linux-block@vger.kernel.org>);
-        Tue, 10 Sep 2019 12:06:06 -0400
-Received: from smtp.corp.redhat.com (int-mx05.intmail.prod.int.phx2.redhat.com [10.5.11.15])
-        (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
-        (No client certificate requested)
-        by mx1.redhat.com (Postfix) with ESMTPS id 44A1D302C08C;
-        Tue, 10 Sep 2019 16:06:05 +0000 (UTC)
-Received: from [10.10.120.129] (ovpn-120-129.rdu2.redhat.com [10.10.120.129])
-        by smtp.corp.redhat.com (Postfix) with ESMTP id 149295D6B2;
-        Tue, 10 Sep 2019 16:06:03 +0000 (UTC)
-Subject: Re: [RFC PATCH] Add proc interface to set PF_MEMALLOC flags
-To:     "Kirill A. Shutemov" <kirill@shutemov.name>
-References: <20190909162804.5694-1-mchristi@redhat.com>
- <20190910100000.mcik63ot6o3dyzjv@box.shutemov.name>
-Cc:     axboe@kernel.dk, James.Bottomley@HansenPartnership.com,
-        martin.petersen@oracle.com, linux-kernel@vger.kernel.org,
-        linux-scsi@vger.kernel.org, linux-block@vger.kernel.org,
-        Linux-MM <linux-mm@kvack.org>
-From:   Mike Christie <mchristi@redhat.com>
-Message-ID: <5D77C9EB.90807@redhat.com>
-Date:   Tue, 10 Sep 2019 11:06:03 -0500
-User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:38.0) Gecko/20100101
- Thunderbird/38.6.0
+        id S2394077AbfIJQI7 (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Tue, 10 Sep 2019 12:08:59 -0400
+Received: from mail-qt1-f194.google.com ([209.85.160.194]:36605 "EHLO
+        mail-qt1-f194.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S1726998AbfIJQI7 (ORCPT
+        <rfc822;linux-block@vger.kernel.org>);
+        Tue, 10 Sep 2019 12:08:59 -0400
+Received: by mail-qt1-f194.google.com with SMTP id o12so21425827qtf.3;
+        Tue, 10 Sep 2019 09:08:58 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=gmail.com; s=20161025;
+        h=sender:date:from:to:cc:subject:message-id:references:mime-version
+         :content-disposition:content-transfer-encoding:in-reply-to
+         :user-agent;
+        bh=bdd/RVi8vfAfg851AYquHh04me7NuiJ7iVVTsDpYp68=;
+        b=fUA+fYqvDaEh6XnC8UBQ3JpjN/2WjcxI+8CiRk4SalHIoVe5prkjFMu71bb/uLhLEi
+         vdSRmM1ImkGHh+5l222crJZZ8/ZbN5H9jaqs5XiMxOkLTzGZGkekXnXHoceWM87OVVZW
+         t0OZsTU5TT8dmyCn/uOnVU4OzwLHubfn9Uk/eyxwR46e9wcUNF0twyojDJIJ4r9hPgm+
+         ctrVk79+ExOfFiWG/zP/jiTtOv9aL/Mk6GmHBR0tH9tBI793M0JSgUKIbdE11v4CZcki
+         biWouuq8snH+yIDMNXZDgpkw+bvxzlXrTIXXskJqm/qPfuoXfRt7hgJ7cl/2r4M4jd6M
+         /rRQ==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20161025;
+        h=x-gm-message-state:sender:date:from:to:cc:subject:message-id
+         :references:mime-version:content-disposition
+         :content-transfer-encoding:in-reply-to:user-agent;
+        bh=bdd/RVi8vfAfg851AYquHh04me7NuiJ7iVVTsDpYp68=;
+        b=Xt5SG5XtyBA6qhASIRM4KZGFpyopS97sn8S5HuVAFUEbkVzbcEsEyDWUHo1RX1mwrW
+         rhQG9GLGfmIGNhOP3G+V5XbJP0/LyKEPvCQXmy6uJkYVuRXzT9CigmeimNN72DXwbTlS
+         zpFWATZi5N9rrPzyUxPOR4+X9zHvLO0oQE4MXq/nxiZLb5s/kzDlssfqRjSzCHsbz6D9
+         fFD/rvzTbF6NRtUD2IyWDax53rPajgUWVWQmduRvPFvX8g1jNpuSzdDDgkkQcTrJkk99
+         bfSzed4xzb7DZHoFqIFLYsdDxMNv4CT+5a+mb6sElaCpTrQyExoWfm020ri3ZH1k9Bxb
+         8c+Q==
+X-Gm-Message-State: APjAAAWPIbZUEyyqpRYG70FV9tEbe6mC9V0sAO03Z5vWqerhrI8gsDlX
+        EmghMwuQtq2teD9SWSg+pPY=
+X-Google-Smtp-Source: APXvYqy1mXMLatf/bfCumeTCUJ4Qv5l0eyL7tNeUKutGwTA1BrLjrBcgiAJOawTlqrJzUwRaNUHvnw==
+X-Received: by 2002:ac8:23b9:: with SMTP id q54mr31058151qtq.107.1568131737923;
+        Tue, 10 Sep 2019 09:08:57 -0700 (PDT)
+Received: from localhost ([2620:10d:c091:500::2:f049])
+        by smtp.gmail.com with ESMTPSA id a134sm9730633qkc.95.2019.09.10.09.08.56
+        (version=TLS1_2 cipher=ECDHE-RSA-AES128-GCM-SHA256 bits=128/128);
+        Tue, 10 Sep 2019 09:08:57 -0700 (PDT)
+Date:   Tue, 10 Sep 2019 09:08:55 -0700
+From:   Tejun Heo <tj@kernel.org>
+To:     Michal =?iso-8859-1?Q?Koutn=FD?= <mkoutny@suse.com>
+Cc:     hannes@cmpxchg.org, clm@fb.com, dennisz@fb.com, newella@fb.com,
+        lizefan@huawei.com, axboe@kernel.dk, josef@toxicpanda.com,
+        Josef Bacik <jbacik@fb.com>, kernel-team@fb.com,
+        Rik van Riel <riel@surriel.com>, cgroups@vger.kernel.org,
+        linux-block@vger.kernel.org, linux-kernel@vger.kernel.org,
+        Paolo Valente <paolo.valente@linaro.org>
+Subject: Re: [PATCH 08/10] blkcg: implement blk-iocost
+Message-ID: <20190910160855.GS2263813@devbig004.ftw2.facebook.com>
+References: <20190828220600.2527417-1-tj@kernel.org>
+ <20190828220600.2527417-9-tj@kernel.org>
+ <20190910125513.GA6399@blackbody.suse.cz>
 MIME-Version: 1.0
-In-Reply-To: <20190910100000.mcik63ot6o3dyzjv@box.shutemov.name>
-Content-Type: text/plain; charset=windows-1252
-Content-Transfer-Encoding: 7bit
-X-Scanned-By: MIMEDefang 2.79 on 10.5.11.15
-X-Greylist: Sender IP whitelisted, not delayed by milter-greylist-4.5.16 (mx1.redhat.com [10.5.110.46]); Tue, 10 Sep 2019 16:06:05 +0000 (UTC)
+Content-Type: text/plain; charset=iso-8859-1
+Content-Disposition: inline
+Content-Transfer-Encoding: 8bit
+In-Reply-To: <20190910125513.GA6399@blackbody.suse.cz>
+User-Agent: Mutt/1.5.21 (2010-09-15)
 Sender: linux-block-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-On 09/10/2019 05:00 AM, Kirill A. Shutemov wrote:
-> On Mon, Sep 09, 2019 at 11:28:04AM -0500, Mike Christie wrote:
->> There are several storage drivers like dm-multipath, iscsi, and nbd that
->> have userspace components that can run in the IO path. For example,
->> iscsi and nbd's userspace deamons may need to recreate a socket and/or
->> send IO on it, and dm-multipath's daemon multipathd may need to send IO
->> to figure out the state of paths and re-set them up.
->>
->> In the kernel these drivers have access to GFP_NOIO/GFP_NOFS and the
->> memalloc_*_save/restore functions to control the allocation behavior,
->> but for userspace we would end up hitting a allocation that ended up
->> writing data back to the same device we are trying to allocate for.
->>
->> This patch allows the userspace deamon to set the PF_MEMALLOC* flags
->> through procfs. It currently only supports PF_MEMALLOC_NOIO, but
->> depending on what other drivers and userspace file systems need, for
->> the final version I can add the other flags for that file or do a file
->> per flag or just do a memalloc_noio file.
->>
->> Signed-off-by: Mike Christie <mchristi@redhat.com>
->> ---
->>  Documentation/filesystems/proc.txt |  6 ++++
->>  fs/proc/base.c                     | 53 ++++++++++++++++++++++++++++++
->>  2 files changed, 59 insertions(+)
->>
->> diff --git a/Documentation/filesystems/proc.txt b/Documentation/filesystems/proc.txt
->> index 99ca040e3f90..b5456a61a013 100644
->> --- a/Documentation/filesystems/proc.txt
->> +++ b/Documentation/filesystems/proc.txt
->> @@ -46,6 +46,7 @@ Table of Contents
->>    3.10  /proc/<pid>/timerslack_ns - Task timerslack value
->>    3.11	/proc/<pid>/patch_state - Livepatch patch operation state
->>    3.12	/proc/<pid>/arch_status - Task architecture specific information
->> +  3.13  /proc/<pid>/memalloc - Control task's memory reclaim behavior
->>  
->>    4	Configuring procfs
->>    4.1	Mount options
->> @@ -1980,6 +1981,11 @@ Example
->>   $ cat /proc/6753/arch_status
->>   AVX512_elapsed_ms:      8
->>  
->> +3.13 /proc/<pid>/memalloc - Control task's memory reclaim behavior
->> +-----------------------------------------------------------------------
->> +A value of "noio" indicates that when a task allocates memory it will not
->> +reclaim memory that requires starting phisical IO.
->> +
->>  Description
->>  -----------
->>  
->> diff --git a/fs/proc/base.c b/fs/proc/base.c
->> index ebea9501afb8..c4faa3464602 100644
->> --- a/fs/proc/base.c
->> +++ b/fs/proc/base.c
->> @@ -1223,6 +1223,57 @@ static const struct file_operations proc_oom_score_adj_operations = {
->>  	.llseek		= default_llseek,
->>  };
->>  
->> +static ssize_t memalloc_read(struct file *file, char __user *buf, size_t count,
->> +			     loff_t *ppos)
->> +{
->> +	struct task_struct *task;
->> +	ssize_t rc = 0;
->> +
->> +	task = get_proc_task(file_inode(file));
->> +	if (!task)
->> +		return -ESRCH;
->> +
->> +	if (task->flags & PF_MEMALLOC_NOIO)
->> +		rc = simple_read_from_buffer(buf, count, ppos, "noio", 4);
->> +	put_task_struct(task);
->> +	return rc;
->> +}
->> +
->> +static ssize_t memalloc_write(struct file *file, const char __user *buf,
->> +			      size_t count, loff_t *ppos)
->> +{
->> +	struct task_struct *task;
->> +	char buffer[5];
->> +	int rc = count;
->> +
->> +	memset(buffer, 0, sizeof(buffer));
->> +	if (count != sizeof(buffer) - 1)
->> +		return -EINVAL;
->> +
->> +	if (copy_from_user(buffer, buf, count))
->> +		return -EFAULT;
->> +	buffer[count] = '\0';
->> +
->> +	task = get_proc_task(file_inode(file));
->> +	if (!task)
->> +		return -ESRCH;
->> +
->> +	if (!strcmp(buffer, "noio")) {
->> +		task->flags |= PF_MEMALLOC_NOIO;
->> +	} else {
->> +		rc = -EINVAL;
->> +	}
-> 
-> Really? Without any privilege check? So any random user can tap into
-> __GFP_NOIO allocations?
+Hello, Michal.
 
-That was a mistake on my part. I will add it in.
+On Tue, Sep 10, 2019 at 02:55:14PM +0200, Michal Koutný wrote:
+> This adds the generic io.weight attribute. How will this compose with
+> the weight from IO schedulers? (AFAIK, only BFQ allows proportional
+> control as of now. +CC Paolo.)
 
+The two being enabled at the same time doesn't make sense, so we can
+just switch over to bfq when bfq is selected as the iosched.  I asked
+what Paolo wanted to do in terms of interface a couple times now but
+didn't get an answer and he posted a patch which makes the two
+controllers conflict, so....  Paolo, so it looks like you want to
+rename all bfq files to drop the bfq prefix, right?  I can implement
+the switching if so.
+
+> I see this attributes are effectively per-cgroup per-device. Apparently,
+> one device should have only one weight across hierarchy. Would it make
+> sense to have io.bfq.weight and io.cost.weight with disjunctive devices?
+
+It never makes sense to have both enabled, so I don't think that
+interface makes sense.
+
+> > +		.name = "cost.qos",
+> > +		.flags = CFTYPE_ONLY_ON_ROOT,
+> > [...]
+> > +		.name = "cost.model",
+> > +		.flags = CFTYPE_ONLY_ON_ROOT,
+> I'm concerned that these aren't true cgroup attributes. The root cgroup
+> would act as container for global configuration options. Wouldn't these
+> values better fit as (configurable) attributes of the respective
+> devices?
+
+Initially, I put them under block device sysfs but it was too clumsy
+with different config file formats and all.  I think it's better to
+have global controller configs at the root cgroup.
+
+> Secondly, how is CFTYPE_ONLY_ON_ROOT supposed to be presented in cgroup
+> namespaces?
+
+Not at all.  These are system-wide configs.  cgroup namespaces
+shouldn't have anything which aren't in non-root cgroups.
+
+Thanks.
+
+-- 
+tejun
