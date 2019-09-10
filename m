@@ -2,185 +2,126 @@ Return-Path: <SRS0=q0Gp=XF=vger.kernel.org=linux-block-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-8.5 required=3.0 tests=DKIM_SIGNED,DKIM_VALID,
-	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,
-	SPF_HELO_NONE,SPF_PASS,USER_AGENT_SANE_1 autolearn=unavailable
+X-Spam-Status: No, score=-7.1 required=3.0 tests=DKIMWL_WL_HIGH,DKIM_SIGNED,
+	DKIM_VALID,DKIM_VALID_AU,HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,
+	MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS autolearn=unavailable
 	autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 95220C49ED6
-	for <linux-block@archiver.kernel.org>; Tue, 10 Sep 2019 10:00:07 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 5F6ACC3A5A2
+	for <linux-block@archiver.kernel.org>; Tue, 10 Sep 2019 10:12:44 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.kernel.org (Postfix) with ESMTP id 6D3D820872
-	for <linux-block@archiver.kernel.org>; Tue, 10 Sep 2019 10:00:07 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id 3650E20863
+	for <linux-block@archiver.kernel.org>; Tue, 10 Sep 2019 10:12:44 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=pass (2048-bit key) header.d=shutemov-name.20150623.gappssmtp.com header.i=@shutemov-name.20150623.gappssmtp.com header.b="GxPXDkYL"
+	dkim=pass (2048-bit key) header.d=android.com header.i=@android.com header.b="QF1YyFIk"
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S2391923AbfIJKAE (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Tue, 10 Sep 2019 06:00:04 -0400
-Received: from mail-ed1-f67.google.com ([209.85.208.67]:33564 "EHLO
-        mail-ed1-f67.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S2391889AbfIJKAD (ORCPT
+        id S2392186AbfIJKMn (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Tue, 10 Sep 2019 06:12:43 -0400
+Received: from mail-lj1-f195.google.com ([209.85.208.195]:41609 "EHLO
+        mail-lj1-f195.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S2392136AbfIJKMm (ORCPT
         <rfc822;linux-block@vger.kernel.org>);
-        Tue, 10 Sep 2019 06:00:03 -0400
-Received: by mail-ed1-f67.google.com with SMTP id o9so16525158edq.0
-        for <linux-block@vger.kernel.org>; Tue, 10 Sep 2019 03:00:02 -0700 (PDT)
+        Tue, 10 Sep 2019 06:12:42 -0400
+Received: by mail-lj1-f195.google.com with SMTP id a4so15802869ljk.8
+        for <linux-block@vger.kernel.org>; Tue, 10 Sep 2019 03:12:39 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=shutemov-name.20150623.gappssmtp.com; s=20150623;
-        h=date:from:to:cc:subject:message-id:references:mime-version
-         :content-disposition:in-reply-to:user-agent;
-        bh=pUWhX3ThjBsfsGFjHTg5vM8zbxi9HZ/0nZMiaDbj8tw=;
-        b=GxPXDkYLjPwpEyC9jWChtUTWeR0/79A5cu90rpnDmM8on2MRXtnBKzG29ORgLNA6f1
-         txcUcoaQTdyTAiUGkQUZZPJkuD7nugbVl3CoybHPuQAFAMtvHrQNCku4QefgSsIOGT5b
-         GUwbPSSrp+wXw9hrMHdTQNdmUSFac6yQhUk7I67mBDwyM41vxlCITlbm0a6vv00s+fSY
-         qXDIpgTKRMsVg9s5v3fD0Iea3f5IqYCoYeYadWUZdGSt94hYnIyN0FHw7mmmsMZPFsKe
-         4eW7ii0xEN698uaYMy49yVN+Hursc/82AAUIRsnWjFuvJblw4Boic9ulaxPxCxm0f7Y3
-         0oLQ==
+        d=android.com; s=20161025;
+        h=mime-version:references:in-reply-to:from:date:message-id:subject:to
+         :cc;
+        bh=vIypOE6gjfATSZoix2kguReUWJHTcsgf5EsyS0T781E=;
+        b=QF1YyFIkmZH8XMjdajrv1LsBZvMStMtL9CdUSsoqF53hVExeBX3ofrdCsBZ/RfLbEZ
+         bF4iUNbPwTMCFtuQY7B4eVyLSqzqCXxcg4t2ySUWC4RnI1xw47mTDnuJPWLAvv0Eo9yU
+         609AkfC6pXkT7Imqgs74GtajM0JLN+FY+WK9b9qvpWMRLyfRzMGzlwPB3JVr637fDM2A
+         AI6JTjXcTKRxXeiVwtwR+OqEQLANkMr6+OEr4ATQm8mkUDW8kvYvuhlm5VjTcWVfhFRc
+         h2Fdu1B2THjxZfDG5pRqklTDwtnEmJLYNHkxRdzInkLugfKm1y9uLWZYt9S6gEzgB1/6
+         DPQA==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=1e100.net; s=20161025;
-        h=x-gm-message-state:date:from:to:cc:subject:message-id:references
-         :mime-version:content-disposition:in-reply-to:user-agent;
-        bh=pUWhX3ThjBsfsGFjHTg5vM8zbxi9HZ/0nZMiaDbj8tw=;
-        b=N51Kq5pHp9hGvriqbfandrknHgOgSmpEps2wc7bzPqEccaecRrlW6+zqfyE4SeGTFv
-         jGFX7ug0S6q9hIWEDmRSLxiMoWF6jJ4wgQh2tojRqUaqc3iEdrINRc4jHhHf+7h4R3TC
-         PVxX0Uc2Qjc4fzLdjUuIrLDeY3fL9gvDpk5HsY+vaWwXUO65fhEDRMOzXPkENHX7rYlM
-         NVW5aMDssKhjox5tKzg3oEy62lshBFe+XUpoYiTyzxUseqq3AemfKnyTkjUNd0R+M2li
-         YM07KRCvXCtc0dvY6hteHajA8lIii2XOiux8sqzVEuYnonHuB7NUuaEpm/UGRqw8Udvm
-         nSIA==
-X-Gm-Message-State: APjAAAXLd6sT+lWrRHVJwiJgpI9WAvQ3rDWYNDuSqnm+zSm2vHrjAtpv
-        AXQYaf1HTdkmtaZOdlK2BOUau4mGQHHCtg==
-X-Google-Smtp-Source: APXvYqzz4uL9Be0Dv1iBucS5Ebliv1AOhngwcvBEpja1udqCYli84dpW7omCy5uIzxmAlbj9c8Usvw==
-X-Received: by 2002:a17:906:5f84:: with SMTP id a4mr23374522eju.109.1568109601468;
-        Tue, 10 Sep 2019 03:00:01 -0700 (PDT)
-Received: from box.localdomain ([86.57.175.117])
-        by smtp.gmail.com with ESMTPSA id a55sm3486246edd.34.2019.09.10.03.00.00
-        (version=TLS1_2 cipher=ECDHE-RSA-AES128-GCM-SHA256 bits=128/128);
-        Tue, 10 Sep 2019 03:00:00 -0700 (PDT)
-Received: by box.localdomain (Postfix, from userid 1000)
-        id E0B701009F6; Tue, 10 Sep 2019 13:00:00 +0300 (+03)
-Date:   Tue, 10 Sep 2019 13:00:00 +0300
-From:   "Kirill A. Shutemov" <kirill@shutemov.name>
-To:     Mike Christie <mchristi@redhat.com>
-Cc:     axboe@kernel.dk, James.Bottomley@HansenPartnership.com,
-        martin.petersen@oracle.com, linux-kernel@vger.kernel.org,
-        linux-scsi@vger.kernel.org, linux-block@vger.kernel.org
-Subject: Re: [RFC PATCH] Add proc interface to set PF_MEMALLOC flags
-Message-ID: <20190910100000.mcik63ot6o3dyzjv@box.shutemov.name>
-References: <20190909162804.5694-1-mchristi@redhat.com>
+        h=x-gm-message-state:mime-version:references:in-reply-to:from:date
+         :message-id:subject:to:cc;
+        bh=vIypOE6gjfATSZoix2kguReUWJHTcsgf5EsyS0T781E=;
+        b=WZnLwHIDOamQaCpmzDI0/qLvqzCGmgSAXELZtZw4OOKdkkCuC32ePpdirX6MnbB48x
+         wK3np0JKkqF3Qc3AQFEbRfOs4Z3xk7LJze5xp283a80RqJQ50NcjmrDP7CHBxeDMo/r7
+         0oe3TRW4wlDgxIFHpEc0yppoAon6tbaPdJOfZBlnv7O7ZaY+JM6F5IZXPzgWQ4TnpdCc
+         O4QScvkR6SaneVG4cqNu/6RQJFCJlNdcoGa0XkwLorBufLk6jhH1IuE3AId7oTDLB+N6
+         GtmIDf8KtQCEZ/fIuI/GsRRbyFMG0iKRTXikzfTur/qI1MAVNZMC6lCATTDmtkFxqLkR
+         omNw==
+X-Gm-Message-State: APjAAAWD2gj7jh+rfwsKBkji/r269qZMvPvALj0xf8VKWQjXjfIEMv/v
+        k+d6aXZ4IuijznJUn6aHDfWe0Ozcb3tbt1BWsVYJmg==
+X-Google-Smtp-Source: APXvYqyn5Iv26yGhGRoybRCrkATjmQRFJ0chHHX7nMpvtSffVmLBw/0PY1zHPe2ZxcY10fGaOxP0+hSePlHfRh5I4zU=
+X-Received: by 2002:a2e:9602:: with SMTP id v2mr19496698ljh.215.1568110359105;
+ Tue, 10 Sep 2019 03:12:39 -0700 (PDT)
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <20190909162804.5694-1-mchristi@redhat.com>
-User-Agent: NeoMutt/20180716
+References: <20190828103229.191853-1-maco@android.com> <20190904194901.165883-1-maco@android.com>
+In-Reply-To: <20190904194901.165883-1-maco@android.com>
+From:   Martijn Coenen <maco@android.com>
+Date:   Tue, 10 Sep 2019 12:12:28 +0200
+Message-ID: <CAB0TPYHjPbzMNqS6wiYmjUjrmROSVVCYsSQLjwE+PUOBsMH_mw@mail.gmail.com>
+Subject: Re: [PATCH v2] loop: change queue block size to match when using DIO.
+To:     Jens Axboe <axboe@kernel.dk>,
+        Christoph Hellwig <hch@infradead.org>,
+        Ming Lei <ming.lei@redhat.com>
+Cc:     linux-block <linux-block@vger.kernel.org>,
+        LKML <linux-kernel@vger.kernel.org>,
+        Greg KH <gregkh@linuxfoundation.org>, kernel-team@android.com,
+        Narayan Kamath <narayan@google.com>,
+        Dario Freni <dariofreni@google.com>,
+        Nikita Ioffe <ioffe@google.com>,
+        Jiyong Park <jiyong@google.com>,
+        Martijn Coenen <maco@google.com>
+Content-Type: text/plain; charset="UTF-8"
 Sender: linux-block-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-On Mon, Sep 09, 2019 at 11:28:04AM -0500, Mike Christie wrote:
-> There are several storage drivers like dm-multipath, iscsi, and nbd that
-> have userspace components that can run in the IO path. For example,
-> iscsi and nbd's userspace deamons may need to recreate a socket and/or
-> send IO on it, and dm-multipath's daemon multipathd may need to send IO
-> to figure out the state of paths and re-set them up.
-> 
-> In the kernel these drivers have access to GFP_NOIO/GFP_NOFS and the
-> memalloc_*_save/restore functions to control the allocation behavior,
-> but for userspace we would end up hitting a allocation that ended up
-> writing data back to the same device we are trying to allocate for.
-> 
-> This patch allows the userspace deamon to set the PF_MEMALLOC* flags
-> through procfs. It currently only supports PF_MEMALLOC_NOIO, but
-> depending on what other drivers and userspace file systems need, for
-> the final version I can add the other flags for that file or do a file
-> per flag or just do a memalloc_noio file.
-> 
-> Signed-off-by: Mike Christie <mchristi@redhat.com>
+Hi Jens, Ming,
+
+Do you have any thoughts about this patch?
+
+Thanks,
+Martijn
+
+On Wed, Sep 4, 2019 at 9:49 PM Martijn Coenen <maco@android.com> wrote:
+>
+> The loop driver assumes that if the passed in fd is opened with
+> O_DIRECT, the caller wants to use direct I/O on the loop device.
+> However, if the underlying block device has a different block size than
+> the loop block queue, direct I/O can't be enabled. Instead of requiring
+> userspace to manually change the blocksize and re-enable direct I/O,
+> just change the queue block sizes to match, as well as the io_min size.
+>
+> Signed-off-by: Martijn Coenen <maco@android.com>
 > ---
->  Documentation/filesystems/proc.txt |  6 ++++
->  fs/proc/base.c                     | 53 ++++++++++++++++++++++++++++++
->  2 files changed, 59 insertions(+)
-> 
-> diff --git a/Documentation/filesystems/proc.txt b/Documentation/filesystems/proc.txt
-> index 99ca040e3f90..b5456a61a013 100644
-> --- a/Documentation/filesystems/proc.txt
-> +++ b/Documentation/filesystems/proc.txt
-> @@ -46,6 +46,7 @@ Table of Contents
->    3.10  /proc/<pid>/timerslack_ns - Task timerslack value
->    3.11	/proc/<pid>/patch_state - Livepatch patch operation state
->    3.12	/proc/<pid>/arch_status - Task architecture specific information
-> +  3.13  /proc/<pid>/memalloc - Control task's memory reclaim behavior
->  
->    4	Configuring procfs
->    4.1	Mount options
-> @@ -1980,6 +1981,11 @@ Example
->   $ cat /proc/6753/arch_status
->   AVX512_elapsed_ms:      8
->  
-> +3.13 /proc/<pid>/memalloc - Control task's memory reclaim behavior
-> +-----------------------------------------------------------------------
-> +A value of "noio" indicates that when a task allocates memory it will not
-> +reclaim memory that requires starting phisical IO.
+> v2 changes:
+> - Fixed commit message to say the block size must match the underlying
+>   block device, not the underlying filesystem.
+> - Also set physical blocksize and minimal io size correspondingly.
+>
+>  drivers/block/loop.c | 10 ++++++++++
+>  1 file changed, 10 insertions(+)
+>
+> diff --git a/drivers/block/loop.c b/drivers/block/loop.c
+> index ab7ca5989097a..b547182037af2 100644
+> --- a/drivers/block/loop.c
+> +++ b/drivers/block/loop.c
+> @@ -994,6 +994,16 @@ static int loop_set_fd(struct loop_device *lo, fmode_t mode,
+>         if (!(lo_flags & LO_FLAGS_READ_ONLY) && file->f_op->fsync)
+>                 blk_queue_write_cache(lo->lo_queue, true, false);
+>
+> +       if (io_is_direct(lo->lo_backing_file) && inode->i_sb->s_bdev) {
+> +               /* In case of direct I/O, match underlying block size */
+> +               unsigned short bsize = bdev_logical_block_size(
+> +                       inode->i_sb->s_bdev);
 > +
->  Description
->  -----------
->  
-> diff --git a/fs/proc/base.c b/fs/proc/base.c
-> index ebea9501afb8..c4faa3464602 100644
-> --- a/fs/proc/base.c
-> +++ b/fs/proc/base.c
-> @@ -1223,6 +1223,57 @@ static const struct file_operations proc_oom_score_adj_operations = {
->  	.llseek		= default_llseek,
->  };
->  
-> +static ssize_t memalloc_read(struct file *file, char __user *buf, size_t count,
-> +			     loff_t *ppos)
-> +{
-> +	struct task_struct *task;
-> +	ssize_t rc = 0;
+> +               blk_queue_logical_block_size(lo->lo_queue, bsize);
+> +               blk_queue_physical_block_size(lo->lo_queue, bsize);
+> +               blk_queue_io_min(lo->lo_queue, bsize);
+> +       }
 > +
-> +	task = get_proc_task(file_inode(file));
-> +	if (!task)
-> +		return -ESRCH;
-> +
-> +	if (task->flags & PF_MEMALLOC_NOIO)
-> +		rc = simple_read_from_buffer(buf, count, ppos, "noio", 4);
-> +	put_task_struct(task);
-> +	return rc;
-> +}
-> +
-> +static ssize_t memalloc_write(struct file *file, const char __user *buf,
-> +			      size_t count, loff_t *ppos)
-> +{
-> +	struct task_struct *task;
-> +	char buffer[5];
-> +	int rc = count;
-> +
-> +	memset(buffer, 0, sizeof(buffer));
-> +	if (count != sizeof(buffer) - 1)
-> +		return -EINVAL;
-> +
-> +	if (copy_from_user(buffer, buf, count))
-> +		return -EFAULT;
-> +	buffer[count] = '\0';
-> +
-> +	task = get_proc_task(file_inode(file));
-> +	if (!task)
-> +		return -ESRCH;
-> +
-> +	if (!strcmp(buffer, "noio")) {
-> +		task->flags |= PF_MEMALLOC_NOIO;
-> +	} else {
-> +		rc = -EINVAL;
-> +	}
-
-Really? Without any privilege check? So any random user can tap into
-__GFP_NOIO allocations?
-
-NAK.
-
-I don't think that it's great idea in general to expose this low-level
-machinery to userspace. But it's better to get comment from people move
-familiar with reclaim path.
-
--- 
- Kirill A. Shutemov
+>         loop_update_rotational(lo);
+>         loop_update_dio(lo);
+>         set_capacity(lo->lo_disk, size);
+> --
+> 2.23.0.187.g17f5b7556c-goog
+>
