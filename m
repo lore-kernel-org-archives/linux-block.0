@@ -2,139 +2,112 @@ Return-Path: <SRS0=q0Gp=XF=vger.kernel.org=linux-block-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-8.6 required=3.0 tests=DKIMWL_WL_HIGH,DKIM_SIGNED,
-	DKIM_VALID,DKIM_VALID_AU,INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,
-	SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED,USER_AGENT_SANE_1 autolearn=ham
+X-Spam-Status: No, score=-1.0 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
+	MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED autolearn=no
 	autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 0285DC49ED9
-	for <linux-block@archiver.kernel.org>; Tue, 10 Sep 2019 16:15:30 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 38B1CC49ED7
+	for <linux-block@archiver.kernel.org>; Tue, 10 Sep 2019 16:27:12 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.kernel.org (Postfix) with ESMTP id CD0C321019
-	for <linux-block@archiver.kernel.org>; Tue, 10 Sep 2019 16:15:29 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=default; t=1568132129;
-	bh=5W/Rry5FFVI4GmLW/JWJkq+73Cv1NHVWc8L9Yrwkn68=;
-	h=Date:From:To:Cc:Subject:List-ID:From;
-	b=zxqiAoPnnn9jjy5sVYVVV+go3ElX2YyJ0BgwfNsWeKe5Zk3Si5kG60D95H2zGru7H
-	 yPP1E7OnzXvyfSa0wkYi+GQvvV7Utn3iunBKR1UtzZaEwkbuROrT4NjlxuIy6hh/8U
-	 5MeruuazTRJ6Mg3Md+FaN8nMMM2cT+mbUmFpXtp0=
+	by mail.kernel.org (Postfix) with ESMTP id 14C342089F
+	for <linux-block@archiver.kernel.org>; Tue, 10 Sep 2019 16:27:12 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S2436696AbfIJQP3 (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Tue, 10 Sep 2019 12:15:29 -0400
-Received: from mail-qt1-f193.google.com ([209.85.160.193]:40317 "EHLO
-        mail-qt1-f193.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S2436575AbfIJQP3 (ORCPT
-        <rfc822;linux-block@vger.kernel.org>);
-        Tue, 10 Sep 2019 12:15:29 -0400
-Received: by mail-qt1-f193.google.com with SMTP id g4so21426927qtq.7;
-        Tue, 10 Sep 2019 09:15:28 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20161025;
-        h=sender:date:from:to:cc:subject:message-id:mime-version
-         :content-disposition:user-agent;
-        bh=BzSkrvowps0g0N5g6HScYMxe8xO2mx5UwGqeLTuW+Hk=;
-        b=ParuHlsgLMt+EXk5iwj5kllgfVd78Xqi8XxmT53ucKqxnnfE9HO1f70TItdD4QTprD
-         NSI2+nSSvd0DYFCBc/MYuP/0c21UzIXD3t0PjcjjuelpRvBobkcN3+HCpgtP2rWKgIUJ
-         +gy6rh9Tp0ZCS6BiO7coXzGiUQIE+Rg/GI+WbVE5Nx9gDt6fKH30h7tddn6FTpqTfoyp
-         WbVyAMGGuFpwjE6MtE+FCUW0R4lw8vsBpG4FJAIdTV9YmqRudzlnzSX5XLtaAdJGWfbI
-         E/gWUk5lSZgExw+x22kpQ2NEsvbI0H4SfrVZySWh+0M1No6viAjzSv711nFqxfPcoAiI
-         bHRw==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20161025;
-        h=x-gm-message-state:sender:date:from:to:cc:subject:message-id
-         :mime-version:content-disposition:user-agent;
-        bh=BzSkrvowps0g0N5g6HScYMxe8xO2mx5UwGqeLTuW+Hk=;
-        b=M38Nayzu2e6KcXBQR00BJzGTyMfEucIAXATM2T5ylHOuGD3nDHq7ryHBK3tAcbDA12
-         lOlQfsQwCblAupd/ix4xZFwQo7RuFYWLu52P0E5SIAp4OQPaqDI7iGrMdG96ibKLhqJk
-         rnNxuhAxvdW8x2k8oGpuFn9/UW3AtMwfgHojUmo39dJKDuVQV39Bi4p8owjgpUMQHv4Q
-         usLvDWKRp3hWnnFpMAYw1wLkokqjhqKjpIyVWJHzhGK5C5H7QOwMJf7bZXRui7TO2Zdu
-         LQ6zZrtqlmJzhTY9BAlRHQTtuns23A7rj9Fs8OWzngSd5uO2K6XIsF+v5xjQU3H3Oog1
-         GLdg==
-X-Gm-Message-State: APjAAAUST1zLEOtpJ3Jg3cDmMGdVS/WKvGApzArIpMZqSj6vRXOtlc/5
-        jFNNJd95eUfv883ayGoau77JTZwTziA=
-X-Google-Smtp-Source: APXvYqz+fRhZSzqN0CIOHMhPrk/SeU7rcytoTB+/zfQXi6mmIdIDRH2vqSMTY0gjwRxRcjtRFKpq6Q==
-X-Received: by 2002:ac8:43c8:: with SMTP id w8mr29145969qtn.322.1568132127861;
-        Tue, 10 Sep 2019 09:15:27 -0700 (PDT)
-Received: from localhost ([2620:10d:c091:500::2:f049])
-        by smtp.gmail.com with ESMTPSA id z200sm8663032qkb.5.2019.09.10.09.15.27
-        (version=TLS1_2 cipher=ECDHE-RSA-AES128-GCM-SHA256 bits=128/128);
-        Tue, 10 Sep 2019 09:15:27 -0700 (PDT)
-Date:   Tue, 10 Sep 2019 09:15:25 -0700
-From:   Tejun Heo <tj@kernel.org>
-To:     Jens Axboe <axboe@kernel.dk>
-Cc:     linux-block@vger.kernel.org, linux-kernel@vger.kernel.org,
-        cgroups@vger.kernel.org, kernel-team@fb.com,
-        Dave Jones <davej@codemonkey.org.uk>
-Subject: [block/for-next] iocost: Fix incorrect operation order during iocg
- free
-Message-ID: <20190910161525.GT2263813@devbig004.ftw2.facebook.com>
+        id S2436508AbfIJQ1L (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Tue, 10 Sep 2019 12:27:11 -0400
+Received: from mx1.redhat.com ([209.132.183.28]:34017 "EHLO mx1.redhat.com"
+        rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
+        id S2436494AbfIJQ1L (ORCPT <rfc822;linux-block@vger.kernel.org>);
+        Tue, 10 Sep 2019 12:27:11 -0400
+Received: from smtp.corp.redhat.com (int-mx02.intmail.prod.int.phx2.redhat.com [10.5.11.12])
+        (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
+        (No client certificate requested)
+        by mx1.redhat.com (Postfix) with ESMTPS id AC52C3016F49;
+        Tue, 10 Sep 2019 16:27:10 +0000 (UTC)
+Received: from colo-mx.corp.redhat.com (colo-mx02.intmail.prod.int.phx2.redhat.com [10.5.11.21])
+        by smtp.corp.redhat.com (Postfix) with ESMTPS id A009C60BFB;
+        Tue, 10 Sep 2019 16:27:10 +0000 (UTC)
+Received: from zmail17.collab.prod.int.phx2.redhat.com (zmail17.collab.prod.int.phx2.redhat.com [10.5.83.19])
+        by colo-mx.corp.redhat.com (Postfix) with ESMTP id 9008224F2F;
+        Tue, 10 Sep 2019 16:27:10 +0000 (UTC)
+Date:   Tue, 10 Sep 2019 12:27:10 -0400 (EDT)
+From:   Jan Stancek <jstancek@redhat.com>
+To:     OGAWA Hirofumi <hirofumi@mail.parknet.co.jp>
+Cc:     linux-kernel@vger.kernel.org, linux-block@vger.kernel.org,
+        systemd-devel@lists.freedesktop.org,
+        Jan Stancek <jstancek@redhat.com>
+Message-ID: <1802022622.11216716.1568132830207.JavaMail.zimbra@redhat.com>
+In-Reply-To: <87r24o24eo.fsf@mail.parknet.co.jp>
+References: <fc8878aeefea128c105c49671b2a1ac4694e1f48.1567468225.git.jstancek@redhat.com> <87v9u3xf5q.fsf@mail.parknet.co.jp> <339755031.10549626.1567969588805.JavaMail.zimbra@redhat.com> <87r24o24eo.fsf@mail.parknet.co.jp>
+Subject: Re: [PATCH] fat: fix corruption in fat_alloc_new_dir()
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-User-Agent: Mutt/1.5.21 (2010-09-15)
+Content-Type: text/plain; charset=utf-8
+Content-Transfer-Encoding: 7bit
+X-Originating-IP: [10.43.17.163, 10.4.195.13]
+Thread-Topic: fix corruption in fat_alloc_new_dir()
+Thread-Index: btCRHWvdReVkaymHhT2xSAQwL/tLmw==
+X-Scanned-By: MIMEDefang 2.79 on 10.5.11.12
+X-Greylist: Sender IP whitelisted, not delayed by milter-greylist-4.5.16 (mx1.redhat.com [10.5.110.48]); Tue, 10 Sep 2019 16:27:11 +0000 (UTC)
 Sender: linux-block-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-ioc_pd_free() first cancels the hrtimers and then deactivates the
-iocg.  However, the iocg timer can run inbetween and reschedule the
-hrtimers which will end up running after the iocg is freed leading to
-crashes like the following.
 
-  general protection fault: 0000 [#1] SMP
-  ...
-  RIP: 0010:iocg_kick_delay+0xbe/0x1b0
-  RSP: 0018:ffffc90003598ea0 EFLAGS: 00010046
-  RAX: 1cee00fd69512b54 RBX: ffff8881bba48400 RCX: 00000000000003e8
-  RDX: 0000000000000000 RSI: 0000000000000001 RDI: ffff8881bba48400
-  RBP: 0000000000004e20 R08: 0000000000000002 R09: 00000000000003e8
-  R10: 0000000000000000 R11: 0000000000000000 R12: ffffc90003598ef0
-  R13: 00979f3810ad461f R14: ffff8881bba4b400 R15: 25439f950d26e1d1
-  FS:  0000000000000000(0000) GS:ffff88885f800000(0000) knlGS:0000000000000000
-  CS:  0010 DS: 0000 ES: 0000 CR0: 0000000080050033
-  CR2: 00007f64328c7e40 CR3: 0000000002409005 CR4: 00000000003606e0
-  DR0: 0000000000000000 DR1: 0000000000000000 DR2: 0000000000000000
-  DR3: 0000000000000000 DR6: 00000000fffe0ff0 DR7: 0000000000000400
-  Call Trace:
-   <IRQ>
-   iocg_delay_timer_fn+0x3d/0x60
-   __hrtimer_run_queues+0xfe/0x270
-   hrtimer_interrupt+0xf4/0x210
-   smp_apic_timer_interrupt+0x5e/0x120
-   apic_timer_interrupt+0xf/0x20
-   </IRQ>
 
-Fix it by canceling hrtimers after deactivating the iocg.
+----- Original Message -----
+> Jan Stancek <jstancek@redhat.com> writes:
+> 
+> >> Using the device while mounting same device doesn't work reliably like
+> >> this race. (getblk() is intentionally used to get the buffer to write
+> >> new data.)
+> >
+> > Are you saying this is expected even if 'usage' is just read?
+> 
+> Yes, assuming exclusive access.
 
-Signed-off-by: Tejun Heo <tj@kernel.org>
-Reported-by: Dave Jones <davej@codemonkey.org.uk>
-Fixes: 7caa47151ab2 ("blkcg: implement blk-iocost")
----
- block/blk-iocost.c |    6 +++---
- 1 file changed, 3 insertions(+), 3 deletions(-)
+Seems we were lucky so far to only hit this with FAT.
 
-diff --git a/block/blk-iocost.c b/block/blk-iocost.c
-index 2aae8ec391ef..7af350293c2f 100644
---- a/block/blk-iocost.c
-+++ b/block/blk-iocost.c
-@@ -1957,15 +1957,15 @@ static void ioc_pd_free(struct blkg_policy_data *pd)
- 	struct ioc *ioc = iocg->ioc;
- 
- 	if (ioc) {
--		hrtimer_cancel(&iocg->waitq_timer);
--		hrtimer_cancel(&iocg->delay_timer);
--
- 		spin_lock(&ioc->lock);
- 		if (!list_empty(&iocg->active_list)) {
- 			propagate_active_weight(iocg, 0, 0);
- 			list_del_init(&iocg->active_list);
- 		}
- 		spin_unlock(&ioc->lock);
-+
-+		hrtimer_cancel(&iocg->waitq_timer);
-+		hrtimer_cancel(&iocg->delay_timer);
- 	}
- 	kfree(iocg);
- }
+I also tried couple variations of reproducer:
+
+- Disabling udevd and running just "blkid --probe" in parallel
+  also reproduced it
+- Disabling udevd and running read() on first 1024 sectors in parallel
+  also reproduced it
+- aio_read() submitted prior to mount could reproduce it,
+  as long as fd was held open
+- I couldn't reproduce it with fadvise/madvise WILLNEED submitted prior to mount
+
+> 
+> >> mount(2) internally opens the device by EXCL mode, so I guess udev opens
+> >> without EXCL (I dont know if it is intent or not).
+> >
+> > I gave this a try and added O_EXCL to udev-builtin-blkid.c. My system had
+> > trouble
+> > booting, it was getting stuck on mounting LVM volumes.
+> >
+> > So, I'm not sure how to move forward here.
+> 
+> OK. I'm still think the userspace should avoid to use blockdev while
+> mounting though, this patch will workaround this race with small race.
+
+https://systemd.io/BLOCK_DEVICE_LOCKING.html mentions flock(LOCK_EX) as a way
+to avoid probing while "another program concurrently modifies a superblock or
+partition table". Adding flock(LOCK_EX) works around the problem too, but that
+would address problem only for LTP (and tools/scripts that use this approach).
+
+> 
+> Can you test this?
+> 
+> Thanks.
+> --
+> OGAWA Hirofumi <hirofumi@mail.parknet.co.jp>
+> 
+> 
+> [PATCH] fat: Workaround the race with userspace's read via blockdev while
+> mounting
+
+I ran reproducer on patched kernel for 5 hours, it made over 25000 iterations,
+there was no corruption. Thank you for looking at this.
+
+Regards,
+Jan
