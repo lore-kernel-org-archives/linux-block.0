@@ -2,116 +2,117 @@ Return-Path: <SRS0=ntoj=XG=vger.kernel.org=linux-block-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-8.5 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
-	INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,
-	USER_AGENT_SANE_1 autolearn=ham autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-2.5 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
+	MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,USER_AGENT_SANE_1 autolearn=no
+	autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id CE93EC49ED6
-	for <linux-block@archiver.kernel.org>; Wed, 11 Sep 2019 16:53:46 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 33120ECDE20
+	for <linux-block@archiver.kernel.org>; Wed, 11 Sep 2019 16:57:00 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.kernel.org (Postfix) with ESMTP id AA1142084F
-	for <linux-block@archiver.kernel.org>; Wed, 11 Sep 2019 16:53:46 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id 131A020863
+	for <linux-block@archiver.kernel.org>; Wed, 11 Sep 2019 16:57:00 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1729061AbfIKQxq (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Wed, 11 Sep 2019 12:53:46 -0400
-Received: from ale.deltatee.com ([207.54.116.67]:48026 "EHLO ale.deltatee.com"
+        id S1729509AbfIKQ47 (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Wed, 11 Sep 2019 12:56:59 -0400
+Received: from mx1.redhat.com ([209.132.183.28]:40118 "EHLO mx1.redhat.com"
         rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-        id S1729028AbfIKQxp (ORCPT <rfc822;linux-block@vger.kernel.org>);
-        Wed, 11 Sep 2019 12:53:45 -0400
-Received: from s0106ac1f6bb1ecac.cg.shawcable.net ([70.73.163.230] helo=[192.168.11.155])
-        by ale.deltatee.com with esmtpsa (TLS1.2:ECDHE_RSA_AES_128_GCM_SHA256:128)
-        (Exim 4.89)
-        (envelope-from <logang@deltatee.com>)
-        id 1i85s8-00013U-0b; Wed, 11 Sep 2019 10:53:37 -0600
-To:     Sagi Grimberg <sagi@grimberg.me>, linux-kernel@vger.kernel.org,
-        linux-nvme@lists.infradead.org, linux-block@vger.kernel.org,
-        linux-fsdevel@vger.kernel.org
-Cc:     Chaitanya Kulkarni <Chaitanya.Kulkarni@wdc.com>,
-        Stephen Bates <sbates@raithlin.com>, Jens Axboe <axboe@fb.com>,
-        Keith Busch <kbusch@kernel.org>,
-        Max Gurtovoy <maxg@mellanox.com>,
-        Christoph Hellwig <hch@lst.de>
-References: <20190828215429.4572-1-logang@deltatee.com>
- <20190828215429.4572-14-logang@deltatee.com>
- <92d61426-65a2-827c-936b-55f12f3d6afb@grimberg.me>
- <ca4ebcd9-fa5d-5ddf-c2a7-70318410dd97@deltatee.com>
- <7954e8a4-6026-2210-7192-94a4e483facf@grimberg.me>
- <b23c72b2-c9db-cb8e-5519-63eb195b7fd4@deltatee.com>
- <ca811aea-c4ae-10ee-15a5-2332d5a9e29a@grimberg.me>
-From:   Logan Gunthorpe <logang@deltatee.com>
-Message-ID: <19da6ca1-3cde-3f29-59ee-923c562e6487@deltatee.com>
-Date:   Wed, 11 Sep 2019 10:53:30 -0600
-User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:60.0) Gecko/20100101
- Thunderbird/60.8.0
+        id S1729242AbfIKQ46 (ORCPT <rfc822;linux-block@vger.kernel.org>);
+        Wed, 11 Sep 2019 12:56:58 -0400
+Received: from smtp.corp.redhat.com (int-mx07.intmail.prod.int.phx2.redhat.com [10.5.11.22])
+        (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
+        (No client certificate requested)
+        by mx1.redhat.com (Postfix) with ESMTPS id 3947030832E9;
+        Wed, 11 Sep 2019 16:56:58 +0000 (UTC)
+Received: from [10.10.125.194] (ovpn-125-194.rdu2.redhat.com [10.10.125.194])
+        by smtp.corp.redhat.com (Postfix) with ESMTP id 36AEA10018F8;
+        Wed, 11 Sep 2019 16:56:56 +0000 (UTC)
+Subject: Re: [RFC PATCH] Add proc interface to set PF_MEMALLOC flags
+To:     Martin Raiber <martin@urbackup.org>,
+        "linux-kernel@vger.kernel.org" <linux-kernel@vger.kernel.org>,
+        "linux-scsi@vger.kernel.org" <linux-scsi@vger.kernel.org>,
+        "linux-block@vger.kernel.org" <linux-block@vger.kernel.org>,
+        Linux-MM <linux-mm@kvack.org>
+References: <20190909162804.5694-1-mchristi@redhat.com>
+ <5D76995B.1010507@redhat.com>
+ <BYAPR04MB5816DABF3C5071D13D823990E7B60@BYAPR04MB5816.namprd04.prod.outlook.com>
+ <0102016d1f7af966-334f093b-2a62-4baa-9678-8d90d5fba6d9-000000@eu-west-1.amazonses.com>
+From:   Mike Christie <mchristi@redhat.com>
+Message-ID: <5D792758.2060706@redhat.com>
+Date:   Wed, 11 Sep 2019 11:56:56 -0500
+User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:38.0) Gecko/20100101
+ Thunderbird/38.6.0
 MIME-Version: 1.0
-In-Reply-To: <ca811aea-c4ae-10ee-15a5-2332d5a9e29a@grimberg.me>
+In-Reply-To: <0102016d1f7af966-334f093b-2a62-4baa-9678-8d90d5fba6d9-000000@eu-west-1.amazonses.com>
 Content-Type: text/plain; charset=utf-8
-Content-Language: en-US
-Content-Transfer-Encoding: 8bit
-X-SA-Exim-Connect-IP: 70.73.163.230
-X-SA-Exim-Rcpt-To: hch@lst.de, maxg@mellanox.com, kbusch@kernel.org, axboe@fb.com, sbates@raithlin.com, Chaitanya.Kulkarni@wdc.com, linux-fsdevel@vger.kernel.org, linux-block@vger.kernel.org, linux-nvme@lists.infradead.org, linux-kernel@vger.kernel.org, sagi@grimberg.me
-X-SA-Exim-Mail-From: logang@deltatee.com
-Subject: Re: [PATCH v8 13/13] nvmet-passthru: support block accounting
-X-SA-Exim-Version: 4.2.1 (built Tue, 02 Aug 2016 21:08:31 +0000)
-X-SA-Exim-Scanned: Yes (on ale.deltatee.com)
+Content-Transfer-Encoding: 7bit
+X-Scanned-By: MIMEDefang 2.84 on 10.5.11.22
+X-Greylist: Sender IP whitelisted, not delayed by milter-greylist-4.5.16 (mx1.redhat.com [10.5.110.44]); Wed, 11 Sep 2019 16:56:58 +0000 (UTC)
 Sender: linux-block-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-
-
-On 2019-09-09 5:15 p.m., Sagi Grimberg wrote:
-> 
->>>>>> Support block disk accounting by setting the RQF_IO_STAT flag
->>>>>> and gendisk in the request.
->>>>>>
->>>>>> After this change, IO counts will be reflected correctly in
->>>>>> /proc/diskstats for drives being used by passthru.
->>>>>>
->>>>>> Signed-off-by: Logan Gunthorpe <logang@deltatee.com>
->>>>>> ---
->>>>>>     drivers/nvme/target/io-cmd-passthru.c | 5 ++++-
->>>>>>     1 file changed, 4 insertions(+), 1 deletion(-)
->>>>>>
->>>>>> diff --git a/drivers/nvme/target/io-cmd-passthru.c
->>>>>> b/drivers/nvme/target/io-cmd-passthru.c
->>>>>> index 7557927a3451..63f12750a80d 100644
->>>>>> --- a/drivers/nvme/target/io-cmd-passthru.c
->>>>>> +++ b/drivers/nvme/target/io-cmd-passthru.c
->>>>>> @@ -410,6 +410,9 @@ static struct request
->>>>>> *nvmet_passthru_blk_make_request(struct nvmet_req *req,
->>>>>>         if (unlikely(IS_ERR(rq)))
->>>>>>             return rq;
->>>>>>     +    if (blk_queue_io_stat(q) && cmd->common.opcode !=
->>>>>> nvme_cmd_flush)
->>>>>> +        rq->rq_flags |= RQF_IO_STAT;
->>>>
->>>> Thanks for the review!
->>>>
->>>>> Does flush has data bytes in the request? Why the special casing?
->>>>
->>>> Well it was special cased in the vanilla blk account flow... But I
->>>> think
->>>> it's required to be special cased so the IO and in_flight counts don't
->>>> count flushes (as they do not for regular block device traffic).
->>>
->>> I think that the accounting exclude I/O that is yielded from the flush
->>> sequence. Don't think its relevant here...
+On 09/11/2019 03:40 AM, Martin Raiber wrote:
+> On 10.09.2019 10:35 Damien Le Moal wrote:
+>> Mike,
 >>
->> What? Per blk_account_io_done(), RQF_FLUSH_SEQ will not be set by us for
->> passthru commands and I don't think it's appropriate to do so. Thus, if
->> we set RQF_IO_STAT for passthru flush commands, they will be counted
->> which we do not want.
+>> On 2019/09/09 19:26, Mike Christie wrote:
+>>> Forgot to cc linux-mm.
+>>>
+>>> On 09/09/2019 11:28 AM, Mike Christie wrote:
+>>>> There are several storage drivers like dm-multipath, iscsi, and nbd that
+>>>> have userspace components that can run in the IO path. For example,
+>>>> iscsi and nbd's userspace deamons may need to recreate a socket and/or
+>>>> send IO on it, and dm-multipath's daemon multipathd may need to send IO
+>>>> to figure out the state of paths and re-set them up.
+>>>>
+>>>> In the kernel these drivers have access to GFP_NOIO/GFP_NOFS and the
+>>>> memalloc_*_save/restore functions to control the allocation behavior,
+>>>> but for userspace we would end up hitting a allocation that ended up
+>>>> writing data back to the same device we are trying to allocate for.
+>>>>
+>>>> This patch allows the userspace deamon to set the PF_MEMALLOC* flags
+>>>> through procfs. It currently only supports PF_MEMALLOC_NOIO, but
+>>>> depending on what other drivers and userspace file systems need, for
+>>>> the final version I can add the other flags for that file or do a file
+>>>> per flag or just do a memalloc_noio file.
+>> Awesome. That probably will be the perfect solution for the problem we hit with
+>> tcmu-runner a while back (please see this thread:
+>> https://www.spinics.net/lists/linux-fsdevel/msg148912.html).
+>>
+>> I think we definitely need nofs as well for dealing with cases where the backend
+>> storage for the user daemon is a file.
+>>
+>> I will give this patch a try as soon as possible (I am traveling currently).
+>>
+>> Best regards.
 > 
-> Have you considered to have nvmet_passthru_blk_make_request set RQF_FUA
-> for nvme_cmd_flush? this way blk_insert_flush will be called and
-> RQF_FLUSH_SEQ will be set and you don't need to worry about this
-> special casing...
+> I had issues with this as well, and work on this is appreciated! In my
+> case it is a loop block device on a fuse file system.
+> Setting PF_LESS_THROTTLE was the one that helped the most, though, so
+> add an option for that as well? I set this via prctl() for the thread
+> calling it (was easiest to add to).
+> 
+> Sorry, I have no idea about the current rationale, but wouldn't it be
+> better to have a way to mask a set of block devices/file systems not to
+> write-back to in a thread. So in my case I'd specify that the fuse
+> daemon threads cannot write-back to the file system and loop device
+> running on top of the fuse file system, while all other block
+> devices/file systems can be write-back to (causing less swapping/OOM
+> issues).
 
-Well, I haven't done that mostly because I'm not sure of all the side
-effects of doing so. However, I've tried it and everything seems to
-still work, so I'll make that change for v9 which I'll probably send out
-after the merge window.
+I'm not sure I understood you.
 
-Logan
+The storage daemons I mentioned normally kick off N threads per M
+devices. The threads handle duties like IO and error handling for those
+devices. Those threads would set the flag, so those IO/error-handler
+related operations do not end up writing back to them. So it works
+similar to how storage drivers work in the kernel where iscsi_tcp has an
+xmit thread and that does memalloc_noreclaim_save. Only the threads for
+those specific devices being would set the flag.
+
+In your case, it sounds like you have a thread/threads that would
+operate on multiple devices and some need the behavior and some do not.
+Is that right?
+
+
