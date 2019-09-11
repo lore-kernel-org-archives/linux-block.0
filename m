@@ -6,110 +6,70 @@ X-Spam-Status: No, score=-2.5 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
 	MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,USER_AGENT_SANE_1 autolearn=no
 	autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id AF795C49ED6
-	for <linux-block@archiver.kernel.org>; Wed, 11 Sep 2019 10:07:42 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 308FCC49ED6
+	for <linux-block@archiver.kernel.org>; Wed, 11 Sep 2019 10:36:45 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.kernel.org (Postfix) with ESMTP id 8963421479
-	for <linux-block@archiver.kernel.org>; Wed, 11 Sep 2019 10:07:42 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id 0C80620CC7
+	for <linux-block@archiver.kernel.org>; Wed, 11 Sep 2019 10:36:45 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1727289AbfIKKHl (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Wed, 11 Sep 2019 06:07:41 -0400
-Received: from www262.sakura.ne.jp ([202.181.97.72]:63909 "EHLO
-        www262.sakura.ne.jp" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1726930AbfIKKHl (ORCPT
-        <rfc822;linux-block@vger.kernel.org>);
-        Wed, 11 Sep 2019 06:07:41 -0400
-Received: from fsav302.sakura.ne.jp (fsav302.sakura.ne.jp [153.120.85.133])
-        by www262.sakura.ne.jp (8.15.2/8.15.2) with ESMTP id x8BA7cIq048562;
-        Wed, 11 Sep 2019 19:07:38 +0900 (JST)
-        (envelope-from penguin-kernel@I-love.SAKURA.ne.jp)
-Received: from www262.sakura.ne.jp (202.181.97.72)
- by fsav302.sakura.ne.jp (F-Secure/fsigk_smtp/530/fsav302.sakura.ne.jp);
- Wed, 11 Sep 2019 19:07:38 +0900 (JST)
-X-Virus-Status: clean(F-Secure/fsigk_smtp/530/fsav302.sakura.ne.jp)
-Received: from [192.168.1.8] (softbank126227201116.bbtec.net [126.227.201.116])
-        (authenticated bits=0)
-        by www262.sakura.ne.jp (8.15.2/8.15.2) with ESMTPSA id x8BA7YlU048512
-        (version=TLSv1.2 cipher=AES256-SHA bits=256 verify=NO);
-        Wed, 11 Sep 2019 19:07:38 +0900 (JST)
-        (envelope-from penguin-kernel@I-love.SAKURA.ne.jp)
-Subject: Re: [RFC PATCH] Add proc interface to set PF_MEMALLOC flags
-To:     Hillf Danton <hdanton@sina.com>,
-        Mike Christie <mchristi@redhat.com>
-Cc:     "Kirill A. Shutemov" <kirill@shutemov.name>, axboe@kernel.dk,
-        James.Bottomley@HansenPartnership.com, martin.petersen@oracle.com,
-        linux-kernel@vger.kernel.org, linux-scsi@vger.kernel.org,
-        linux-block@vger.kernel.org, Linux-MM <linux-mm@kvack.org>
-References: <20190911031348.9648-1-hdanton@sina.com>
-From:   Tetsuo Handa <penguin-kernel@I-love.SAKURA.ne.jp>
-Message-ID: <c48cd3d8-699d-a614-b12d-1ddef71691f3@I-love.SAKURA.ne.jp>
-Date:   Wed, 11 Sep 2019 19:07:34 +0900
-User-Agent: Mozilla/5.0 (Windows NT 6.3; WOW64; rv:60.0) Gecko/20100101
- Thunderbird/60.9.0
+        id S1727307AbfIKKgo (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Wed, 11 Sep 2019 06:36:44 -0400
+Received: from verein.lst.de ([213.95.11.211]:38113 "EHLO verein.lst.de"
+        rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
+        id S1725616AbfIKKgo (ORCPT <rfc822;linux-block@vger.kernel.org>);
+        Wed, 11 Sep 2019 06:36:44 -0400
+Received: by verein.lst.de (Postfix, from userid 2407)
+        id 6E40268B02; Wed, 11 Sep 2019 12:36:39 +0200 (CEST)
+Date:   Wed, 11 Sep 2019 12:36:39 +0200
+From:   Christoph Hellwig <hch@lst.de>
+To:     Thierry Reding <thierry.reding@gmail.com>
+Cc:     Christoph Hellwig <hch@lst.de>,
+        Yoshihiro Shimoda <yoshihiro.shimoda.uh@renesas.com>,
+        Ulf Hansson <ulf.hansson@linaro.org>,
+        Jens Axboe <axboe@kernel.dk>,
+        Adrian Hunter <adrian.hunter@intel.com>,
+        Simon Horman <horms+renesas@verge.net.au>,
+        Jon Hunter <jonathanh@nvidia.com>,
+        "linux-block@vger.kernel.org" <linux-block@vger.kernel.org>,
+        "linux-mmc@vger.kernel.org" <linux-mmc@vger.kernel.org>,
+        "linux-tegra@vger.kernel.org" <linux-tegra@vger.kernel.org>
+Subject: Re: [PATCH 1/3] block: Respect the device's maximum segment size
+Message-ID: <20190911103639.GA28124@lst.de>
+References: <20190909125658.30559-1-thierry.reding@gmail.com> <20190909125658.30559-2-thierry.reding@gmail.com> <20190909161331.GA19650@lst.de> <20190909191911.GC23804@mithrandir> <TYAPR01MB454470364B682B9BF708E557D8B60@TYAPR01MB4544.jpnprd01.prod.outlook.com> <20190910061348.GA30982@lst.de> <20190910073739.GB12537@ulmo>
 MIME-Version: 1.0
-In-Reply-To: <20190911031348.9648-1-hdanton@sina.com>
-Content-Type: text/plain; charset=utf-8
-Content-Language: en-US
-Content-Transfer-Encoding: 7bit
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <20190910073739.GB12537@ulmo>
+User-Agent: Mutt/1.5.17 (2007-11-01)
 Sender: linux-block-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-On 2019/09/11 12:13, Hillf Danton wrote:
+On Tue, Sep 10, 2019 at 09:37:39AM +0200, Thierry Reding wrote:
+> > > After that, all mmc controllers disable the feature as default, and if a mmc
+> > > controller has such capable, the host driver should set the flag.
+> > 
+> > That sounds sensible to me.  Alternatively we'd have to limit
+> > max_sectors to 16-bit values for sdhci if using an iommu that can
+> > merge.
 > 
-> On Tue, 10 Sep 2019 11:06:03 -0500 From: Mike Christie <mchristi@redhat.com>
->>
->>> Really? Without any privilege check? So any random user can tap into
->>> __GFP_NOIO allocations?
->>
->> That was a mistake on my part. I will add it in.
->>
-> You may alternatively madvise a nutcracker as long as you would have
-> added a sledgehammer under /proc instead of a gavel.
-> 
-> --- a/include/uapi/asm-generic/mman-common.h
-> +++ b/include/uapi/asm-generic/mman-common.h
-> @@ -45,6 +45,7 @@
->  #define MADV_SEQUENTIAL	2		/* expect sequential page references */
->  #define MADV_WILLNEED	3		/* will need these pages */
->  #define MADV_DONTNEED	4		/* don't need these pages */
-> +#define MADV_NOIO	5		/* set PF_MEMALLOC_NOIO */
->  
->  /* common parameters: try to keep these consistent across architectures */
->  #define MADV_FREE	8		/* free pages only if memory pressure */
-> --- a/mm/madvise.c
-> +++ b/mm/madvise.c
-> @@ -716,6 +716,7 @@ madvise_behavior_valid(int behavior)
->  	case MADV_WILLNEED:
->  	case MADV_DONTNEED:
->  	case MADV_FREE:
-> +	case MADV_NOIO:
->  #ifdef CONFIG_KSM
->  	case MADV_MERGEABLE:
->  	case MADV_UNMERGEABLE:
-> @@ -813,6 +814,11 @@ SYSCALL_DEFINE3(madvise, unsigned long,
->  	if (!madvise_behavior_valid(behavior))
->  		return error;
->  
-> +	if (behavior == MADV_NOIO) {
-> +		current->flags |= PF_MEMALLOC_NOIO;
+> Isn't that effectively what dma_set_max_seg_size() is supposed to be
+> doing? That tells the DMA API what the maximum size of a segment can
+> be for the given device, right? If we make sure never to exceed that
+> when compacting the SG, the SG that we get back should map just fine
+> into the descriptors that SDHCI supports.
 
-Yes, for "modifying p->flags when p != current" is not permitted.
+dma_set_max_seg_size() does indeed instruct the iommu drivers about
+the merging capabilities (btw, swiotlb should be able to implement
+this kind of merging as well, but that is a different discussion).
 
-But I guess that there is a problem. Setting PF_MEMALLOC_NOIO causes
-current_gfp_context() to mask __GFP_IO | __GFP_FS, but the OOM killer cannot
-be invoked when __GFP_FS is masked. As a result, any userspace thread which
-has PF_MEMALLOC_NOIO cannot invoke the OOM killer. If the userspace thread
-which uses PF_MEMALLOC_NOIO is involved in memory reclaiming activities,
-the memory reclaiming activities won't be able to make forward progress when
-the userspace thread triggered e.g. a page fault. Can the "userspace components
-that can run in the IO path" survive without any memory allocation?
-
-> +		return 0;
-> +	}
-> +
->  	if (start & ~PAGE_MASK)
->  		return error;
->  	len = (len_in + ~PAGE_MASK) & PAGE_MASK;
-
+But the problem is that you don't just change the dma_set_max_seg_size,
+but also the block layer max segment size setting, which is used for
+block layer merges.  And we don't have the accounting for the first and
+last segment in a request (those that are being merged to), so if you
+enable the virt_boundary segments can grow to a size only limited by the
+maximum request size.  We could add that accounting with a bit of
+work, it's just that for devices that typicall use the virt boundary
+there is no point (their actually segment is a page and not related
+to the Linux "segment").
