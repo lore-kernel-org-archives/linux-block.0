@@ -2,105 +2,151 @@ Return-Path: <SRS0=ntoj=XG=vger.kernel.org=linux-block-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-2.5 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
-	MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED,USER_AGENT_SANE_1
-	autolearn=no autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-10.0 required=3.0
+	tests=HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,
+	SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,UNPARSEABLE_RELAY,USER_AGENT_GIT
+	autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 7867EC5ACAE
-	for <linux-block@archiver.kernel.org>; Wed, 11 Sep 2019 15:23:24 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id C97FFC49ED6
+	for <linux-block@archiver.kernel.org>; Wed, 11 Sep 2019 15:23:25 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.kernel.org (Postfix) with ESMTP id 5447C207FC
-	for <linux-block@archiver.kernel.org>; Wed, 11 Sep 2019 15:23:24 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id A969F20863
+	for <linux-block@archiver.kernel.org>; Wed, 11 Sep 2019 15:23:25 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1728270AbfIKPXX (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Wed, 11 Sep 2019 11:23:23 -0400
-Received: from mx1.redhat.com ([209.132.183.28]:44502 "EHLO mx1.redhat.com"
-        rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-        id S1726510AbfIKPXX (ORCPT <rfc822;linux-block@vger.kernel.org>);
-        Wed, 11 Sep 2019 11:23:23 -0400
-Received: from smtp.corp.redhat.com (int-mx02.intmail.prod.int.phx2.redhat.com [10.5.11.12])
-        (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
-        (No client certificate requested)
-        by mx1.redhat.com (Postfix) with ESMTPS id C7BEF1DA2;
-        Wed, 11 Sep 2019 15:23:22 +0000 (UTC)
-Received: from [10.10.125.194] (ovpn-125-194.rdu2.redhat.com [10.10.125.194])
-        by smtp.corp.redhat.com (Postfix) with ESMTP id 9212C60BEC;
-        Wed, 11 Sep 2019 15:23:21 +0000 (UTC)
-Subject: Re: [RFC PATCH] Add proc interface to set PF_MEMALLOC flags
-To:     Tetsuo Handa <penguin-kernel@I-love.SAKURA.ne.jp>
-References: <20190909162804.5694-1-mchristi@redhat.com>
- <5D76995B.1010507@redhat.com>
- <ee39d997-ee07-22c7-3e59-a436cef4d587@I-love.SAKURA.ne.jp>
-Cc:     axboe@kernel.dk, James.Bottomley@HansenPartnership.com,
-        martin.petersen@oracle.com, linux-kernel@vger.kernel.org,
-        linux-scsi@vger.kernel.org, linux-block@vger.kernel.org,
-        Linux-MM <linux-mm@kvack.org>
-From:   Mike Christie <mchristi@redhat.com>
-Message-ID: <5D791169.2090807@redhat.com>
-Date:   Wed, 11 Sep 2019 10:23:21 -0500
-User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:38.0) Gecko/20100101
- Thunderbird/38.6.0
-MIME-Version: 1.0
-In-Reply-To: <ee39d997-ee07-22c7-3e59-a436cef4d587@I-love.SAKURA.ne.jp>
-Content-Type: text/plain; charset=utf-8
-Content-Transfer-Encoding: 7bit
-X-Scanned-By: MIMEDefang 2.79 on 10.5.11.12
-X-Greylist: Sender IP whitelisted, not delayed by milter-greylist-4.6.2 (mx1.redhat.com [10.5.110.71]); Wed, 11 Sep 2019 15:23:23 +0000 (UTC)
+        id S1726510AbfIKPXY (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Wed, 11 Sep 2019 11:23:24 -0400
+Received: from mail-il-dmz.mellanox.com ([193.47.165.129]:40745 "EHLO
+        mellanox.co.il" rhost-flags-OK-OK-OK-FAIL) by vger.kernel.org
+        with ESMTP id S1728244AbfIKPXY (ORCPT
+        <rfc822;linux-block@vger.kernel.org>);
+        Wed, 11 Sep 2019 11:23:24 -0400
+Received: from Internal Mail-Server by MTLPINE1 (envelope-from maxg@mellanox.com)
+        with ESMTPS (AES256-SHA encrypted); 11 Sep 2019 18:23:17 +0300
+Received: from r-vnc12.mtr.labs.mlnx (r-vnc12.mtr.labs.mlnx [10.208.0.12])
+        by labmailer.mlnx (8.13.8/8.13.8) with ESMTP id x8BFNHrb031358;
+        Wed, 11 Sep 2019 18:23:17 +0300
+From:   Max Gurtovoy <maxg@mellanox.com>
+To:     linux-block@vger.kernel.org, axboe@kernel.dk,
+        martin.petersen@oracle.com, linux-nvme@lists.infradead.org,
+        keith.busch@intel.com, hch@lst.de, sagi@grimberg.me
+Cc:     shlomin@mellanox.com, israelr@mellanox.com,
+        Max Gurtovoy <maxg@mellanox.com>
+Subject: [PATCH v5 1/2] block: use symbolic constants for t10_pi type
+Date:   Wed, 11 Sep 2019 18:23:16 +0300
+Message-Id: <1568215397-15496-1-git-send-email-maxg@mellanox.com>
+X-Mailer: git-send-email 1.7.1
 Sender: linux-block-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-On 09/10/2019 05:12 PM, Tetsuo Handa wrote:
-> On 2019/09/10 3:26, Mike Christie wrote:
->> Forgot to cc linux-mm.
->>
->> On 09/09/2019 11:28 AM, Mike Christie wrote:
->>> There are several storage drivers like dm-multipath, iscsi, and nbd that
->>> have userspace components that can run in the IO path. For example,
->>> iscsi and nbd's userspace deamons may need to recreate a socket and/or
->>> send IO on it, and dm-multipath's daemon multipathd may need to send IO
->>> to figure out the state of paths and re-set them up.
->>>
->>> In the kernel these drivers have access to GFP_NOIO/GFP_NOFS and the
->>> memalloc_*_save/restore functions to control the allocation behavior,
->>> but for userspace we would end up hitting a allocation that ended up
->>> writing data back to the same device we are trying to allocate for.
->>>
->>> This patch allows the userspace deamon to set the PF_MEMALLOC* flags
->>> through procfs. It currently only supports PF_MEMALLOC_NOIO, but
->>> depending on what other drivers and userspace file systems need, for
->>> the final version I can add the other flags for that file or do a file
->>> per flag or just do a memalloc_noio file.
-> 
-> Interesting patch. But can't we instead globally mask __GFP_NOFS / __GFP_NOIO
-> than playing games with per a thread masking (which suffers from inability to
-> propagate current thread's mask to other threads indirectly involved)?
+Signed-off-by: Max Gurtovoy <maxg@mellanox.com>
+---
+ block/t10-pi.c | 28 ++++++++++++++--------------
+ 1 file changed, 14 insertions(+), 14 deletions(-)
 
-If I understood you, then that had been discussed in the past:
+diff --git a/block/t10-pi.c b/block/t10-pi.c
+index 0c00946..7fed587 100644
+--- a/block/t10-pi.c
++++ b/block/t10-pi.c
+@@ -27,7 +27,7 @@ static __be16 t10_pi_ip_fn(void *data, unsigned int len)
+  * tag.
+  */
+ static blk_status_t t10_pi_generate(struct blk_integrity_iter *iter,
+-		csum_fn *fn, unsigned int type)
++		csum_fn *fn, enum t10_dif_type type)
+ {
+ 	unsigned int i;
+ 
+@@ -37,7 +37,7 @@ static blk_status_t t10_pi_generate(struct blk_integrity_iter *iter,
+ 		pi->guard_tag = fn(iter->data_buf, iter->interval);
+ 		pi->app_tag = 0;
+ 
+-		if (type == 1)
++		if (type == T10_PI_TYPE1_PROTECTION)
+ 			pi->ref_tag = cpu_to_be32(lower_32_bits(iter->seed));
+ 		else
+ 			pi->ref_tag = 0;
+@@ -51,7 +51,7 @@ static blk_status_t t10_pi_generate(struct blk_integrity_iter *iter,
+ }
+ 
+ static blk_status_t t10_pi_verify(struct blk_integrity_iter *iter,
+-		csum_fn *fn, unsigned int type)
++		csum_fn *fn, enum t10_dif_type type)
+ {
+ 	unsigned int i;
+ 
+@@ -60,8 +60,8 @@ static blk_status_t t10_pi_verify(struct blk_integrity_iter *iter,
+ 		__be16 csum;
+ 
+ 		switch (type) {
+-		case 1:
+-		case 2:
++		case T10_PI_TYPE1_PROTECTION:
++		case T10_PI_TYPE2_PROTECTION:
+ 			if (pi->app_tag == T10_PI_APP_ESCAPE)
+ 				goto next;
+ 
+@@ -74,7 +74,7 @@ static blk_status_t t10_pi_verify(struct blk_integrity_iter *iter,
+ 				return BLK_STS_PROTECTION;
+ 			}
+ 			break;
+-		case 3:
++		case T10_PI_TYPE3_PROTECTION:
+ 			if (pi->app_tag == T10_PI_APP_ESCAPE &&
+ 			    pi->ref_tag == T10_PI_REF_ESCAPE)
+ 				goto next;
+@@ -102,42 +102,42 @@ static blk_status_t t10_pi_verify(struct blk_integrity_iter *iter,
+ 
+ static blk_status_t t10_pi_type1_generate_crc(struct blk_integrity_iter *iter)
+ {
+-	return t10_pi_generate(iter, t10_pi_crc_fn, 1);
++	return t10_pi_generate(iter, t10_pi_crc_fn, T10_PI_TYPE1_PROTECTION);
+ }
+ 
+ static blk_status_t t10_pi_type1_generate_ip(struct blk_integrity_iter *iter)
+ {
+-	return t10_pi_generate(iter, t10_pi_ip_fn, 1);
++	return t10_pi_generate(iter, t10_pi_ip_fn, T10_PI_TYPE1_PROTECTION);
+ }
+ 
+ static blk_status_t t10_pi_type1_verify_crc(struct blk_integrity_iter *iter)
+ {
+-	return t10_pi_verify(iter, t10_pi_crc_fn, 1);
++	return t10_pi_verify(iter, t10_pi_crc_fn, T10_PI_TYPE1_PROTECTION);
+ }
+ 
+ static blk_status_t t10_pi_type1_verify_ip(struct blk_integrity_iter *iter)
+ {
+-	return t10_pi_verify(iter, t10_pi_ip_fn, 1);
++	return t10_pi_verify(iter, t10_pi_ip_fn, T10_PI_TYPE1_PROTECTION);
+ }
+ 
+ static blk_status_t t10_pi_type3_generate_crc(struct blk_integrity_iter *iter)
+ {
+-	return t10_pi_generate(iter, t10_pi_crc_fn, 3);
++	return t10_pi_generate(iter, t10_pi_crc_fn, T10_PI_TYPE3_PROTECTION);
+ }
+ 
+ static blk_status_t t10_pi_type3_generate_ip(struct blk_integrity_iter *iter)
+ {
+-	return t10_pi_generate(iter, t10_pi_ip_fn, 3);
++	return t10_pi_generate(iter, t10_pi_ip_fn, T10_PI_TYPE3_PROTECTION);
+ }
+ 
+ static blk_status_t t10_pi_type3_verify_crc(struct blk_integrity_iter *iter)
+ {
+-	return t10_pi_verify(iter, t10_pi_crc_fn, 3);
++	return t10_pi_verify(iter, t10_pi_crc_fn, T10_PI_TYPE3_PROTECTION);
+ }
+ 
+ static blk_status_t t10_pi_type3_verify_ip(struct blk_integrity_iter *iter)
+ {
+-	return t10_pi_verify(iter, t10_pi_ip_fn, 3);
++	return t10_pi_verify(iter, t10_pi_ip_fn, T10_PI_TYPE3_PROTECTION);
+ }
+ 
+ const struct blk_integrity_profile t10_pi_type1_crc = {
+-- 
+1.8.3.1
 
-https://www.spinics.net/lists/linux-fsdevel/msg149035.html
-
-We only need this for specific threads which implement part of a storage
-driver in userspace.
-
-> 
->>> +static ssize_t memalloc_write(struct file *file, const char __user *buf,
->>> +			      size_t count, loff_t *ppos)
->>> +{
->>> +	struct task_struct *task;
->>> +	char buffer[5];
->>> +	int rc = count;
->>> +
->>> +	memset(buffer, 0, sizeof(buffer));
->>> +	if (count != sizeof(buffer) - 1)
->>> +		return -EINVAL;
->>> +
->>> +	if (copy_from_user(buffer, buf, count))
-> 
-> copy_from_user() / copy_to_user() might involve memory allocation
-> via page fault which has to be done under the mask? Moreover, since
-> just open()ing this file can involve memory allocation, do we forbid
-> open("/proc/thread-self/memalloc") ?
-
-I was having the daemons set the flag when they initialize.
