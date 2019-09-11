@@ -2,118 +2,276 @@ Return-Path: <SRS0=ntoj=XG=vger.kernel.org=linux-block-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-2.5 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
-	MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,USER_AGENT_SANE_1 autolearn=no
-	autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-5.6 required=3.0 tests=DKIMWL_WL_HIGH,DKIM_SIGNED,
+	DKIM_VALID,DKIM_VALID_AU,INCLUDES_PATCH,MAILING_LIST_MULTI,SPF_HELO_NONE,
+	SPF_PASS,USER_AGENT_SANE_1 autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 985A4ECDE20
-	for <linux-block@archiver.kernel.org>; Wed, 11 Sep 2019 15:44:46 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 863ECC49ED6
+	for <linux-block@archiver.kernel.org>; Wed, 11 Sep 2019 15:55:02 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.kernel.org (Postfix) with ESMTP id 79E172168B
-	for <linux-block@archiver.kernel.org>; Wed, 11 Sep 2019 15:44:46 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id 4F84320CC7
+	for <linux-block@archiver.kernel.org>; Wed, 11 Sep 2019 15:55:02 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+	s=default; t=1568217302;
+	bh=mWazBz14KQpmgg/o+0E4JzHIclA6TK+WlDDvb+Zv/5M=;
+	h=Date:From:To:Cc:Subject:References:In-Reply-To:List-ID:From;
+	b=TbdKaw/1wW3jJ0vGeWxALhe50nc1W4Cp6vTysP3cT0xkZAZ2MolPT5xa6vbeXNueH
+	 wtxV28YjfIWcCqH6LE9aZivE1xxhQAP9ii28S7d1bUSJ1s4ZWNSqCP7ihLl6fhk4aA
+	 0F6IPRDE9ud0mYq4gERLmXmIc+M56V1zqiaePDYA=
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1728637AbfIKPom (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Wed, 11 Sep 2019 11:44:42 -0400
-Received: from mx1.redhat.com ([209.132.183.28]:53446 "EHLO mx1.redhat.com"
-        rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-        id S1728266AbfIKPol (ORCPT <rfc822;linux-block@vger.kernel.org>);
-        Wed, 11 Sep 2019 11:44:41 -0400
-Received: from smtp.corp.redhat.com (int-mx05.intmail.prod.int.phx2.redhat.com [10.5.11.15])
-        (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
-        (No client certificate requested)
-        by mx1.redhat.com (Postfix) with ESMTPS id 61BBAA371AF;
-        Wed, 11 Sep 2019 15:44:41 +0000 (UTC)
-Received: from [10.10.125.194] (ovpn-125-194.rdu2.redhat.com [10.10.125.194])
-        by smtp.corp.redhat.com (Postfix) with ESMTP id 176E35D6A5;
-        Wed, 11 Sep 2019 15:44:38 +0000 (UTC)
-Subject: Re: [RFC PATCH] Add proc interface to set PF_MEMALLOC flags
-To:     Tetsuo Handa <penguin-kernel@I-love.SAKURA.ne.jp>,
-        Hillf Danton <hdanton@sina.com>
-References: <20190911031348.9648-1-hdanton@sina.com>
- <c48cd3d8-699d-a614-b12d-1ddef71691f3@I-love.SAKURA.ne.jp>
-Cc:     "Kirill A. Shutemov" <kirill@shutemov.name>, axboe@kernel.dk,
-        James.Bottomley@HansenPartnership.com, martin.petersen@oracle.com,
-        linux-kernel@vger.kernel.org, linux-scsi@vger.kernel.org,
-        linux-block@vger.kernel.org, Linux-MM <linux-mm@kvack.org>
-From:   Mike Christie <mchristi@redhat.com>
-Message-ID: <5D791666.7080302@redhat.com>
-Date:   Wed, 11 Sep 2019 10:44:38 -0500
-User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:38.0) Gecko/20100101
- Thunderbird/38.6.0
+        id S1728768AbfIKPzB (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Wed, 11 Sep 2019 11:55:01 -0400
+Received: from mail-qt1-f193.google.com ([209.85.160.193]:40214 "EHLO
+        mail-qt1-f193.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S1727839AbfIKPzB (ORCPT
+        <rfc822;linux-block@vger.kernel.org>);
+        Wed, 11 Sep 2019 11:55:01 -0400
+Received: by mail-qt1-f193.google.com with SMTP id g4so25877356qtq.7;
+        Wed, 11 Sep 2019 08:55:00 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=gmail.com; s=20161025;
+        h=sender:date:from:to:cc:subject:message-id:references:mime-version
+         :content-disposition:in-reply-to:user-agent;
+        bh=QHtvXZdJhxnSSB+tt58qotfhmjmO1WJZUkRUMqmYHaA=;
+        b=rEG1LEpjQqN5rSQBkSx9VcIiZ/LShjkPMMCi0QvFtOoePPn9YEhEAmAHR1z19zuUN7
+         t2jm2MM4N/1MqJOKn04Uhfv5xFZk9eCTHNdS4e027HuTZCFpCTrJINKOJmAHtrbgfo3q
+         pAb+W050CnfIvQdxNZ7MBMk9lhe/b3I2cc0/s7dy/MsCGsSfj97LUbXXRwI9ALC1Tzvu
+         FbyPLY4LWKXgU3ms52KAvgzx7Z4TXKgM9jZDxaXyBJlYmkxgi6oKuQ6f0zp1NLMt1uIQ
+         rAQ7bc2jplo5/rB50PQ1MYilA83qY2KmVfR+Lyak4WJlRwWCgYlY5rOwpeoYhFgNlCm/
+         QG+A==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20161025;
+        h=x-gm-message-state:sender:date:from:to:cc:subject:message-id
+         :references:mime-version:content-disposition:in-reply-to:user-agent;
+        bh=QHtvXZdJhxnSSB+tt58qotfhmjmO1WJZUkRUMqmYHaA=;
+        b=fwTu7y6dk5dwj2Xa0O3X6dWnmKNEbvZhxcJFR3FtqGG+fcHOEHBOiGd6WlBrXzsKg+
+         +/n8bZRcmiR9g+AdlaVOLh9EizeA92FMecPfmxeA+J14iFZ2XiAAGH5bwV/aA+niwG7V
+         NTsfqml0c7Hem5MPvlAxcN7uoOYJ/QDbpIl1c+bVInmX7B+qSToxhXJ5lPdRgpPtl3G+
+         O+olLjDt3lw0QK/5dgzNVGPxMbx2WNuYAzzPJNK+2OObFLVtU3MbRBLWhF2SRhfix3+I
+         s7+zvj7oB85OMlYngCJar0NO0C/Keq/NrZdoz6+4QeS9IfUW92plHbDSOvE3/fNjHDD4
+         aA2Q==
+X-Gm-Message-State: APjAAAUpeYHIzPfF0tmswkIoxkreYzememb43grbiEtM014ZH5HijJgi
+        AdDj5Cfwvp+AM86bq2ZcTps=
+X-Google-Smtp-Source: APXvYqwjukYuvfUgQ+Aacq2Nz2oOJFjGDm8cUzhW3IoRCsNBhBgx35NaeiQEDfraEPLiLgDD6dAknA==
+X-Received: by 2002:ad4:4bca:: with SMTP id l10mr23356580qvw.139.1568217299897;
+        Wed, 11 Sep 2019 08:54:59 -0700 (PDT)
+Received: from localhost ([2620:10d:c091:500::1:8b2])
+        by smtp.gmail.com with ESMTPSA id f5sm5963815qkg.9.2019.09.11.08.54.59
+        (version=TLS1_2 cipher=ECDHE-RSA-AES128-GCM-SHA256 bits=128/128);
+        Wed, 11 Sep 2019 08:54:59 -0700 (PDT)
+Date:   Wed, 11 Sep 2019 08:54:57 -0700
+From:   Tejun Heo <tj@kernel.org>
+To:     Paolo Valente <paolo.valente@linaro.org>
+Cc:     Michal =?iso-8859-1?Q?Koutn=FD?= <mkoutny@suse.com>,
+        Johannes Weiner <hannes@cmpxchg.org>, clm@fb.com,
+        dennisz@fb.com, newella@fb.com, Li Zefan <lizefan@huawei.com>,
+        Jens Axboe <axboe@kernel.dk>,
+        Josef Bacik <josef@toxicpanda.com>,
+        Josef Bacik <jbacik@fb.com>, kernel-team@fb.com,
+        Rik van Riel <riel@surriel.com>, cgroups@vger.kernel.org,
+        linux-block@vger.kernel.org, linux-kernel@vger.kernel.org
+Subject: Re: [PATCH 08/10] blkcg: implement blk-iocost
+Message-ID: <20190911155457.GW2263813@devbig004.ftw2.facebook.com>
+References: <20190828220600.2527417-1-tj@kernel.org>
+ <20190828220600.2527417-9-tj@kernel.org>
+ <20190910125513.GA6399@blackbody.suse.cz>
+ <20190910160855.GS2263813@devbig004.ftw2.facebook.com>
+ <A69EF8D0-8156-46DB-A4DA-C5334764116E@linaro.org>
+ <20190911141630.GV2263813@devbig004.ftw2.facebook.com>
 MIME-Version: 1.0
-In-Reply-To: <c48cd3d8-699d-a614-b12d-1ddef71691f3@I-love.SAKURA.ne.jp>
-Content-Type: text/plain; charset=utf-8
-Content-Transfer-Encoding: 7bit
-X-Scanned-By: MIMEDefang 2.79 on 10.5.11.15
-X-Greylist: Sender IP whitelisted, not delayed by milter-greylist-4.6.2 (mx1.redhat.com [10.5.110.68]); Wed, 11 Sep 2019 15:44:41 +0000 (UTC)
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <20190911141630.GV2263813@devbig004.ftw2.facebook.com>
+User-Agent: Mutt/1.5.21 (2010-09-15)
 Sender: linux-block-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-On 09/11/2019 05:07 AM, Tetsuo Handa wrote:
-> On 2019/09/11 12:13, Hillf Danton wrote:
->>
->> On Tue, 10 Sep 2019 11:06:03 -0500 From: Mike Christie <mchristi@redhat.com>
->>>
->>>> Really? Without any privilege check? So any random user can tap into
->>>> __GFP_NOIO allocations?
->>>
->>> That was a mistake on my part. I will add it in.
->>>
->> You may alternatively madvise a nutcracker as long as you would have
->> added a sledgehammer under /proc instead of a gavel.
->>
->> --- a/include/uapi/asm-generic/mman-common.h
->> +++ b/include/uapi/asm-generic/mman-common.h
->> @@ -45,6 +45,7 @@
->>  #define MADV_SEQUENTIAL	2		/* expect sequential page references */
->>  #define MADV_WILLNEED	3		/* will need these pages */
->>  #define MADV_DONTNEED	4		/* don't need these pages */
->> +#define MADV_NOIO	5		/* set PF_MEMALLOC_NOIO */
->>  
->>  /* common parameters: try to keep these consistent across architectures */
->>  #define MADV_FREE	8		/* free pages only if memory pressure */
->> --- a/mm/madvise.c
->> +++ b/mm/madvise.c
->> @@ -716,6 +716,7 @@ madvise_behavior_valid(int behavior)
->>  	case MADV_WILLNEED:
->>  	case MADV_DONTNEED:
->>  	case MADV_FREE:
->> +	case MADV_NOIO:
->>  #ifdef CONFIG_KSM
->>  	case MADV_MERGEABLE:
->>  	case MADV_UNMERGEABLE:
->> @@ -813,6 +814,11 @@ SYSCALL_DEFINE3(madvise, unsigned long,
->>  	if (!madvise_behavior_valid(behavior))
->>  		return error;
->>  
->> +	if (behavior == MADV_NOIO) {
->> +		current->flags |= PF_MEMALLOC_NOIO;
-> 
-> Yes, for "modifying p->flags when p != current" is not permitted.
-> 
-> But I guess that there is a problem. Setting PF_MEMALLOC_NOIO causes
-> current_gfp_context() to mask __GFP_IO | __GFP_FS, but the OOM killer cannot
-> be invoked when __GFP_FS is masked. As a result, any userspace thread which
-> has PF_MEMALLOC_NOIO cannot invoke the OOM killer. If the userspace thread
-> which uses PF_MEMALLOC_NOIO is involved in memory reclaiming activities,
-> the memory reclaiming activities won't be able to make forward progress when
-> the userspace thread triggered e.g. a page fault. Can the "userspace components
-> that can run in the IO path" survive without any memory allocation?
-> 
+Hey,
 
-Yes and no, when they can they will have preallocated the resources they
-need to make forward progress similar to how kernel storage drivers do.
-However for some resources, like in the network layer, both userspace
-and kernel drivers are not able to preallocate and may fail.
-
-
->> +		return 0;
->> +	}
->> +
->>  	if (start & ~PAGE_MASK)
->>  		return error;
->>  	len = (len_in + ~PAGE_MASK) & PAGE_MASK;
+On Wed, Sep 11, 2019 at 07:16:30AM -0700, Tejun Heo wrote:
+> > >  I can implement
+> > > the switching if so.
+> > 
+> > That would be perfect.
 > 
+> Whichever way it gets decided, this is easy enough.  I'll prep a
+> patch.
 
+Here's the patch.
+
+* It disables iocost when bfq iosched is selected.  iocost is only
+  re-enabled when bfq module is unloaded.  While it can easily be made
+  to flip when there's no bfq queue left, I think minimizing the
+  number of switches is likely is better.
+
+* It looks like building bfq as module has been broken for some time
+  and I added symbol exports to make it work.  They should be
+  separated into a separate patch.
+
+* It doesn't actually rename any of the bfq interface files.  It just
+  gets rid of potential conflict from iocost.
+
+Please feel free to use / modify the patch however you see fit.
+
+Thanks.
+
+---
+diff --git a/block/bfq-cgroup.c b/block/bfq-cgroup.c
+index 86a607cf19a1..decda96770f4 100644
+--- a/block/bfq-cgroup.c
++++ b/block/bfq-cgroup.c
+@@ -1194,7 +1194,9 @@ struct bfq_group *bfq_create_group_hierarchy(struct bfq_data *bfqd, int node)
+ }
+ 
+ struct blkcg_policy blkcg_policy_bfq = {
++#ifndef CONFIG_BLK_CGROUP_IOCOST
+ 	.dfl_cftypes		= bfq_blkg_files,
++#endif
+ 	.legacy_cftypes		= bfq_blkcg_legacy_files,
+ 
+ 	.cpd_alloc_fn		= bfq_cpd_alloc,
+diff --git a/block/bfq-iosched.c b/block/bfq-iosched.c
+index b33be928d164..b4aaeef1fb87 100644
+--- a/block/bfq-iosched.c
++++ b/block/bfq-iosched.c
+@@ -6365,6 +6365,36 @@ static void bfq_init_root_group(struct bfq_group *root_group,
+ 	root_group->sched_data.bfq_class_idle_last_service = jiffies;
+ }
+ 
++#if defined(CONFIG_BFQ_GROUP_IOSCHED) && defined(CONFIG_BLK_CGROUP_IOCOST)
++static bool bfq_enabled = false;
++
++static void bfq_enable(void)
++{
++	static DEFINE_MUTEX(bfq_enable_mutex);
++
++	mutex_lock(&bfq_enable_mutex);
++	if (!bfq_enabled) {
++		pr_info("bfq-iosched: Overriding iocost\n");
++		blkcg_policy_unregister(&blkcg_policy_iocost);
++		cgroup_add_dfl_cftypes(&io_cgrp_subsys, bfq_blkg_files);
++		bfq_enabled = true;
++	}
++	mutex_unlock(&bfq_enable_mutex);
++}
++
++static void __exit bfq_disable(void)
++{
++	if (bfq_enabled) {
++		pr_info("bfq-iosched: Restoring iocost\n");
++		cgroup_rm_cftypes(bfq_blkg_files);
++		blkcg_policy_register(&blkcg_policy_iocost);
++	}
++}
++#else
++static void bfq_enable(void) {}
++static void __exit bfq_disable(void) {}
++#endif
++
+ static int bfq_init_queue(struct request_queue *q, struct elevator_type *e)
+ {
+ 	struct bfq_data *bfqd;
+@@ -6489,6 +6519,7 @@ static int bfq_init_queue(struct request_queue *q, struct elevator_type *e)
+ 	bfq_init_entity(&bfqd->oom_bfqq.entity, bfqd->root_group);
+ 
+ 	wbt_disable_default(q);
++	bfq_enable();
+ 	return 0;
+ 
+ out_free:
+@@ -6806,6 +6837,7 @@ static void __exit bfq_exit(void)
+ 	blkcg_policy_unregister(&blkcg_policy_bfq);
+ #endif
+ 	bfq_slab_kill();
++	bfq_disable();
+ }
+ 
+ module_init(bfq_init);
+diff --git a/block/blk-cgroup.c b/block/blk-cgroup.c
+index 0e2619c1a422..b6f20be0fc78 100644
+--- a/block/blk-cgroup.c
++++ b/block/blk-cgroup.c
+@@ -900,6 +900,7 @@ int blkg_conf_prep(struct blkcg *blkcg, const struct blkcg_policy *pol,
+ 	}
+ 	return ret;
+ }
++EXPORT_SYMBOL_GPL(blkg_conf_prep);
+ 
+ /**
+  * blkg_conf_finish - finish up per-blkg config update
+@@ -915,6 +916,7 @@ void blkg_conf_finish(struct blkg_conf_ctx *ctx)
+ 	rcu_read_unlock();
+ 	put_disk_and_module(ctx->disk);
+ }
++EXPORT_SYMBOL_GPL(blkg_conf_finish);
+ 
+ static int blkcg_print_stat(struct seq_file *sf, void *v)
+ {
+diff --git a/block/blk-iocost.c b/block/blk-iocost.c
+index 3b39deb8b9f8..1ef5b443c09a 100644
+--- a/block/blk-iocost.c
++++ b/block/blk-iocost.c
+@@ -605,8 +605,6 @@ static u32 vrate_adj_pct[] =
+ 	  2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2,
+ 	  4, 4, 4, 4, 4, 4, 4, 4, 8, 8, 8, 8, 8, 8, 8, 8, 16 };
+ 
+-static struct blkcg_policy blkcg_policy_iocost;
+-
+ /* accessors and helpers */
+ static struct ioc *rqos_to_ioc(struct rq_qos *rqos)
+ {
+@@ -2434,7 +2432,7 @@ static struct cftype ioc_files[] = {
+ 	{}
+ };
+ 
+-static struct blkcg_policy blkcg_policy_iocost = {
++struct blkcg_policy blkcg_policy_iocost = {
+ 	.dfl_cftypes	= ioc_files,
+ 	.cpd_alloc_fn	= ioc_cpd_alloc,
+ 	.cpd_free_fn	= ioc_cpd_free,
+@@ -2442,6 +2440,7 @@ static struct blkcg_policy blkcg_policy_iocost = {
+ 	.pd_init_fn	= ioc_pd_init,
+ 	.pd_free_fn	= ioc_pd_free,
+ };
++EXPORT_SYMBOL_GPL(blkcg_policy_iocost);
+ 
+ static int __init ioc_init(void)
+ {
+diff --git a/include/linux/blk-cgroup.h b/include/linux/blk-cgroup.h
+index bed9e43f9426..5669e3cfa1bc 100644
+--- a/include/linux/blk-cgroup.h
++++ b/include/linux/blk-cgroup.h
+@@ -815,6 +815,11 @@ static inline void blkcg_clear_delay(struct blkcg_gq *blkg)
+ void blkcg_add_delay(struct blkcg_gq *blkg, u64 now, u64 delta);
+ void blkcg_schedule_throttle(struct request_queue *q, bool use_memdelay);
+ void blkcg_maybe_throttle_current(void);
++
++#ifdef CONFIG_BLK_CGROUP_IOCOST
++extern struct blkcg_policy blkcg_policy_iocost;
++#endif
++
+ #else	/* CONFIG_BLK_CGROUP */
+ 
+ struct blkcg {
+diff --git a/kernel/cgroup/cgroup.c b/kernel/cgroup/cgroup.c
+index 753afbca549f..ced23229f359 100644
+--- a/kernel/cgroup/cgroup.c
++++ b/kernel/cgroup/cgroup.c
+@@ -4059,6 +4059,7 @@ int cgroup_rm_cftypes(struct cftype *cfts)
+ 	mutex_unlock(&cgroup_mutex);
+ 	return ret;
+ }
++EXPORT_SYMBOL_GPL(cgroup_rm_cftypes);
+ 
+ /**
+  * cgroup_add_cftypes - add an array of cftypes to a subsystem
+@@ -4115,6 +4116,7 @@ int cgroup_add_dfl_cftypes(struct cgroup_subsys *ss, struct cftype *cfts)
+ 		cft->flags |= __CFTYPE_ONLY_ON_DFL;
+ 	return cgroup_add_cftypes(ss, cfts);
+ }
++EXPORT_SYMBOL_GPL(cgroup_add_dfl_cftypes);
+ 
+ /**
+  * cgroup_add_legacy_cftypes - add an array of cftypes for legacy hierarchies
