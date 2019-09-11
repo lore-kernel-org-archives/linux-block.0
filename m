@@ -2,142 +2,168 @@ Return-Path: <SRS0=ntoj=XG=vger.kernel.org=linux-block-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-2.6 required=3.0 tests=DKIM_SIGNED,DKIM_VALID,
-	DKIM_VALID_AU,HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SPF_HELO_NONE,
-	SPF_PASS,USER_AGENT_SANE_1 autolearn=no autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-9.1 required=3.0 tests=DKIM_SIGNED,DKIM_VALID,
+	DKIM_VALID_AU,FREEMAIL_FORGED_FROMDOMAIN,FREEMAIL_FROM,
+	HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,MENTIONS_GIT_HOSTING,
+	SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS autolearn=ham autolearn_force=no
+	version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 37302ECDE20
-	for <linux-block@archiver.kernel.org>; Wed, 11 Sep 2019 09:12:17 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 7C5D4C49ED6
+	for <linux-block@archiver.kernel.org>; Wed, 11 Sep 2019 09:56:52 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.kernel.org (Postfix) with ESMTP id E50F621928
-	for <linux-block@archiver.kernel.org>; Wed, 11 Sep 2019 09:12:16 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id 44BE92075C
+	for <linux-block@archiver.kernel.org>; Wed, 11 Sep 2019 09:56:52 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=pass (1024-bit key) header.d=Mellanox.com header.i=@Mellanox.com header.b="RFLi5C4f"
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="s+FubhSI"
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1726889AbfIKJMQ (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Wed, 11 Sep 2019 05:12:16 -0400
-Received: from mail-eopbgr140047.outbound.protection.outlook.com ([40.107.14.47]:63360
-        "EHLO EUR01-VE1-obe.outbound.protection.outlook.com"
-        rhost-flags-OK-OK-OK-FAIL) by vger.kernel.org with ESMTP
-        id S1726781AbfIKJMQ (ORCPT <rfc822;linux-block@vger.kernel.org>);
-        Wed, 11 Sep 2019 05:12:16 -0400
-ARC-Seal: i=1; a=rsa-sha256; s=arcselector9901; d=microsoft.com; cv=none;
- b=FCWbemChoGSVWwA4p2nHqYJrB6JCW4QVYfLAPasttONEeLW/dKCYywKGgaWKwyZejOzYDbGv3FA2JOjaHV3Npeem1elOeiJse/xAKX7X8f4zGhmYbAdjOeveRtXhpIVTpREQ5OyOOeQnd4/ilZG3+9vkpA7PvZoAJErvn1Z5H2X5Bp0/PdnL7UmL4o1cdKwt9nv6GFOQXs+n3VAEoCncU/KpBeAJvCxRGzlrp8G1mqTbOoHzRshNgrXltsJYaDen6TySozwRnRupIIDGMHCSsaV83SUm/GyWIVnFvKidIc5d9bE9kT1HTjtYEeZino/D7xu2XQKBRgF9SnBjEVgu+w==
-ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com;
- s=arcselector9901;
- h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
- bh=ubbXKUd1bdbtHqW2UB1mLwwKZ7ch1HiuZJdOsQU+tco=;
- b=V7K/9y1Hv3JvjEu4Zu0fS/IWCCZEUIuUyLzdS1s4KlJWdfxtq1x0LZ0cDyWXdkmonISuLI023dwCalRWvzftKvUctvxybxErIjmk+HZRxD5VyK3PgOLX4fYAxByAtIdn/bkDyASboSOuEdXg7RmioORuEtOwic5Ulgi7kpuO6Qwh2nvkTDuL3a93CrYX+8oLQsbceha1ZQV8/HVrPhUQG33BFQsG5zEBvfKFEsTyUmo2vat5qJYEaWwqmL+bSkZkEg++Ag/cWCebrWyFmYjxLLBU33v6w8WYGq+IxVPBGbMw4T529rZMaQSdW2p9c+hjL1iAi82Ull47g/bN9cHEDA==
-ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass (sender ip is
- 193.47.165.251) smtp.rcpttodomain=lst.de smtp.mailfrom=mellanox.com;
- dmarc=pass (p=none sp=none pct=100) action=none header.from=mellanox.com;
- dkim=none (message not signed); arc=none
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=Mellanox.com;
- s=selector2;
- h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
- bh=ubbXKUd1bdbtHqW2UB1mLwwKZ7ch1HiuZJdOsQU+tco=;
- b=RFLi5C4fob6+X27WH2EpiBTgEXXezkKm2jrmMiA2A0F5MwXJaVgGmYmxHaWovq2gFjn0F9sRokODFhCWmeoet6ZKj4emQIwkh/M/w4Fr6clNHb1CepumntQ1A8eV1YOZseLFgVTM/qBVm/j/vKIw3FjRJcnqwGL2t4MEX1z3ecs=
-Received: from AM3PR05CA0116.eurprd05.prod.outlook.com (2603:10a6:207:2::18)
- by VI1PR05MB4382.eurprd05.prod.outlook.com (2603:10a6:803:42::13) with
- Microsoft SMTP Server (version=TLS1_2,
- cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.2241.13; Wed, 11 Sep
- 2019 09:12:11 +0000
-Received: from AM5EUR03FT043.eop-EUR03.prod.protection.outlook.com
- (2a01:111:f400:7e08::203) by AM3PR05CA0116.outlook.office365.com
- (2603:10a6:207:2::18) with Microsoft SMTP Server (version=TLS1_2,
- cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.2263.15 via Frontend
- Transport; Wed, 11 Sep 2019 09:12:11 +0000
-Authentication-Results: spf=pass (sender IP is 193.47.165.251)
- smtp.mailfrom=mellanox.com; lst.de; dkim=none (message not signed)
- header.d=none;lst.de; dmarc=pass action=none header.from=mellanox.com;
-Received-SPF: Pass (protection.outlook.com: domain of mellanox.com designates
- 193.47.165.251 as permitted sender) receiver=protection.outlook.com;
- client-ip=193.47.165.251; helo=mtlcas13.mtl.com;
-Received: from mtlcas13.mtl.com (193.47.165.251) by
- AM5EUR03FT043.mail.protection.outlook.com (10.152.17.43) with Microsoft SMTP
- Server (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_CBC_SHA384) id
- 15.20.2263.14 via Frontend Transport; Wed, 11 Sep 2019 09:12:10 +0000
-Received: from MTLCAS13.mtl.com (10.0.8.78) by mtlcas13.mtl.com (10.0.8.78)
- with Microsoft SMTP Server (TLS) id 15.0.1178.4; Wed, 11 Sep 2019 12:12:10
- +0300
-Received: from MTLCAS01.mtl.com (10.0.8.71) by MTLCAS13.mtl.com (10.0.8.78)
- with Microsoft SMTP Server (TLS) id 15.0.1178.4 via Frontend Transport; Wed,
- 11 Sep 2019 12:12:10 +0300
-Received: from [10.223.0.54] (10.223.0.54) by MTLCAS01.mtl.com (10.0.8.71)
- with Microsoft SMTP Server (TLS) id 14.3.468.0; Wed, 11 Sep 2019 12:12:08
- +0300
-Subject: Re: [PATCH v4 1/3] block: centralize PI remapping logic to the block
- layer
-To:     "Martin K. Petersen" <martin.petersen@oracle.com>
-CC:     <axboe@kernel.dk>, <keith.busch@intel.com>, <sagi@grimberg.me>,
-        <israelr@mellanox.com>, <linux-nvme@lists.infradead.org>,
-        <linux-block@vger.kernel.org>, <shlomin@mellanox.com>, <hch@lst.de>
-References: <1567956405-5585-1-git-send-email-maxg@mellanox.com>
- <yq1mufei4zk.fsf@oracle.com>
- <d6cfe6e5-508a-f01c-267d-c8009fafc571@mellanox.com>
- <yq1d0g8hoj5.fsf@oracle.com>
- <61ab22ba-6f2d-3dbd-3991-693426db1133@mellanox.com>
- <yq1k1affx8v.fsf@oracle.com>
-From:   Max Gurtovoy <maxg@mellanox.com>
-Message-ID: <e59b2d78-4cf6-971a-1926-7969140d2a01@mellanox.com>
-Date:   Wed, 11 Sep 2019 12:12:08 +0300
-User-Agent: Mozilla/5.0 (Windows NT 10.0; WOW64; rv:60.0) Gecko/20100101
- Thunderbird/60.8.0
+        id S1727289AbfIKJ4v (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Wed, 11 Sep 2019 05:56:51 -0400
+Received: from mail-qk1-f194.google.com ([209.85.222.194]:34472 "EHLO
+        mail-qk1-f194.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S1726341AbfIKJ4v (ORCPT
+        <rfc822;linux-block@vger.kernel.org>);
+        Wed, 11 Sep 2019 05:56:51 -0400
+Received: by mail-qk1-f194.google.com with SMTP id q203so20198639qke.1;
+        Wed, 11 Sep 2019 02:56:50 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=gmail.com; s=20161025;
+        h=mime-version:references:in-reply-to:from:date:message-id:subject:to
+         :cc;
+        bh=SbOJQdjzyccaSb6mfd+E5KOchM3Q8NLZ/FNshUuA6q4=;
+        b=s+FubhSIf3tOMGNDgXOMZWXr98x8fyiHUQsmu3h8v+9+SJgo5khMS0IlpMWR04/iZR
+         4sQmy5V5Hd6D/qegn1mayzJYc7x09OG4ABCm8G0A9sX75h8JLszaGvQAThXs+5MyGXcg
+         Eu92hjIbSNMZjCfpayb4lgXaXeNUVC3JoWoiuRKRSLaLfRC/BPch0BpS4cibqxQodW5K
+         TO3MhEtL0j8ihjy+xZ8aJqYhBDaytB1pC/SuKWTGGM8qj/OSYfK7NgKPPO2254Ktxjbs
+         Zqrb3jQZKlOJAaeUhu/fw2BjlbrLXY2UFPVuQohAdsQGmwv3fdw5d+cv5HPxYpKirZQZ
+         nf1A==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20161025;
+        h=x-gm-message-state:mime-version:references:in-reply-to:from:date
+         :message-id:subject:to:cc;
+        bh=SbOJQdjzyccaSb6mfd+E5KOchM3Q8NLZ/FNshUuA6q4=;
+        b=EWVyyVIEhnXMakIpsszqNvqNIIVCK76nGfOO9osq2J3mTXHgZYqIh/FY+UQLPdB6rg
+         +berzdUwo4lddSB0/3FbJUVgE9me8U7lcrv2hHpX7UXzwPK3uRDIHP/V5xXdVbO8/M/t
+         Tto6cXdW+0wXnsCTzsqk+G7yPF3rqJAjLAGBYyQAYBW8AC4xPr7ncP66CQCvp5dTCFFM
+         Qg7+T5t1a9r+QkUS1/MhD/tRo9kskbcbhXXSix4QgmC1qgb+8ARVENnQmxKe+RCLAZNl
+         YpwEy4Vnnno8igrmOT6NX9mP66jSEMkqU7ByaMHaKfIWG+dGMxhxkG9Ck2Vso2kANnO0
+         DxQA==
+X-Gm-Message-State: APjAAAVzipa5x7M9lXfXCebfCk9msCcDGnJSKvIvObGXZfA4Qrri2hbH
+        12EHA7McxXwdpq7yDobySkI6EcGd/33H4V98xe4=
+X-Google-Smtp-Source: APXvYqy495AoitoVWFQXwZRElfdaaJVf/Xgn2Xz0X9IENf3ngd7rGaiycbhywm0HBEFVWGJdvcrS9lZ0YqoR5kbf1nE=
+X-Received: by 2002:a37:4c9:: with SMTP id 192mr35467011qke.177.1568195809535;
+ Wed, 11 Sep 2019 02:56:49 -0700 (PDT)
 MIME-Version: 1.0
-In-Reply-To: <yq1k1affx8v.fsf@oracle.com>
-Content-Type: text/plain; charset="utf-8"; format=flowed
-Content-Transfer-Encoding: 7bit
-Content-Language: en-US
-X-Originating-IP: [10.223.0.54]
-X-EOPAttributedMessage: 0
-X-MS-Office365-Filtering-HT: Tenant
-X-Forefront-Antispam-Report: CIP:193.47.165.251;IPV:NLI;CTRY:IL;EFV:NLI;SFV:NSPM;SFS:(10009020)(4636009)(346002)(396003)(136003)(39860400002)(376002)(199004)(189003)(53936002)(106002)(36906005)(11346002)(229853002)(230700001)(81166006)(305945005)(26005)(76176011)(58126008)(16576012)(7736002)(2906002)(316002)(6916009)(53546011)(31696002)(54906003)(31686004)(86362001)(14444005)(65956001)(8676002)(47776003)(50466002)(23676004)(16526019)(356004)(65806001)(3846002)(6116002)(8936002)(4326008)(5660300002)(476003)(126002)(446003)(70206006)(2486003)(70586007)(478600001)(81156014)(336012)(486006)(186003)(6246003)(2616005)(36756003)(3940600001);DIR:OUT;SFP:1101;SCL:1;SRVR:VI1PR05MB4382;H:mtlcas13.mtl.com;FPR:;SPF:Pass;LANG:en;PTR:InfoDomainNonexistent;A:1;MX:1;
-X-MS-PublicTrafficType: Email
-X-MS-Office365-Filtering-Correlation-Id: 3969b29d-2644-4af2-4bd8-08d7369820e9
-X-Microsoft-Antispam: BCL:0;PCL:0;RULEID:(2390118)(7020095)(4652040)(8989299)(4534185)(4627221)(201703031133081)(201702281549075)(8990200)(5600166)(711020)(4605104)(4709080)(1401327)(4618075)(2017052603328)(7193020);SRVR:VI1PR05MB4382;
-X-MS-TrafficTypeDiagnostic: VI1PR05MB4382:
-X-Microsoft-Antispam-PRVS: <VI1PR05MB4382751AEBA632DA8A0BF869B6B10@VI1PR05MB4382.eurprd05.prod.outlook.com>
-X-MS-Oob-TLC-OOBClassifiers: OLM:8273;
-X-Forefront-PRVS: 0157DEB61B
-X-MS-Exchange-SenderADCheck: 1
-X-Microsoft-Antispam-Message-Info: lmaJxtS6W/E8XBXZFRwl049tgq8gpxgWqNY37WhB1367g5gYSUpFPMnRbFQflPMUxl1ipumXFwZw4hSPz2pdU8vG/xPo436lhyjbtjbFWAbuQJKkCsZYVC4e1cGmxeYs43ajYPHeT6cIdMUZ6i2jEDkpoq330RkrhlwKKyDETfakV/la01Y+B0GEyWzbdH4R7zCDQ3EyVbHVifq7DYvlibYsvQTleienygqk68GVGhDSKYRzB5/djbpbRLMX0SFNKA5XsY0yCpyqFwCUF8sLRmR4bDSgeY3ygf9+29bsd8/dsPdAFcdQKptVRQPQ70xITyiKGxJHtEwPck6sQGF5qNCioI4qUM6P3MWNXYD2dkRc7pDex/c+gCKuC/W+B4ghO/AqUGqenY4fLJKjZPKfINVuF5T+7gUyC3KmLtDkiO4=
-X-OriginatorOrg: Mellanox.com
-X-MS-Exchange-CrossTenant-OriginalArrivalTime: 11 Sep 2019 09:12:10.8591
- (UTC)
-X-MS-Exchange-CrossTenant-Network-Message-Id: 3969b29d-2644-4af2-4bd8-08d7369820e9
-X-MS-Exchange-CrossTenant-Id: a652971c-7d2e-4d9b-a6a4-d149256f461b
-X-MS-Exchange-CrossTenant-OriginalAttributedTenantConnectingIp: TenantId=a652971c-7d2e-4d9b-a6a4-d149256f461b;Ip=[193.47.165.251];Helo=[mtlcas13.mtl.com]
-X-MS-Exchange-CrossTenant-FromEntityHeader: HybridOnPrem
-X-MS-Exchange-Transport-CrossTenantHeadersStamped: VI1PR05MB4382
+References: <10ca59ff-f1ba-1464-030a-0d73ff25d2de@suse.de> <87blwghhq7.fsf@notabene.neil.brown.name>
+ <FBF1B443-64C9-472A-9F41-5303738C0DC7@fb.com> <f3c41c4b-5b1d-bd2f-ad2d-9aa5108ad798@suse.de>
+ <9008538C-A2BE-429C-A90E-18FBB91E7B34@fb.com> <bede41a5-45c5-0ea0-25af-964bb854a94c@suse.de>
+ <87pnkaardl.fsf@notabene.neil.brown.name> <242E3FBD-C969-44E1-8DC7-BFE9E7CBE7FD@fb.com>
+ <87ftl5avtx.fsf@notabene.neil.brown.name> <33AD3B45-E20D-4019-91FA-CA90B9B3C3A9@fb.com>
+ <58722139-ebc0-f49f-424a-c3b1aa455dd8@cloud.ionos.com> <877e6fbvh2.fsf@notabene.neil.brown.name>
+In-Reply-To: <877e6fbvh2.fsf@notabene.neil.brown.name>
+From:   Song Liu <liu.song.a23@gmail.com>
+Date:   Wed, 11 Sep 2019 10:56:37 +0100
+Message-ID: <CAPhsuW6obHkwKdYU=dt2x0t4kPK=eMfXO6S3a79i4PnMgskcqg@mail.gmail.com>
+Subject: Re: [PATCH] md/raid0: avoid RAID0 data corruption due to layout confusion.
+To:     NeilBrown <neilb@suse.de>
+Cc:     Guoqing Jiang <guoqing.jiang@cloud.ionos.com>,
+        Song Liu <songliubraving@fb.com>,
+        Guoqing Jiang <jgq516@gmail.com>, Coly Li <colyli@suse.de>,
+        NeilBrown <neilb@suse.com>,
+        "linux-block@vger.kernel.org" <linux-block@vger.kernel.org>,
+        linux-raid <linux-raid@vger.kernel.org>
+Content-Type: text/plain; charset="UTF-8"
 Sender: linux-block-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-
-On 9/11/2019 4:16 AM, Martin K. Petersen wrote:
-> Max,
+On Wed, Sep 11, 2019 at 12:10 AM NeilBrown <neilb@suse.de> wrote:
 >
->> I guess Type 1 and Type 3 mirrors can work because Type 3 doesn't have
->> a ref tag, right ?
-> It will work but you'll lose ref tag checking on the Type 3 side of the
-> mirror. So not exactly desirable. And in our experience, the ref tag is
-> hugely important.
+> On Tue, Sep 10 2019, Guoqing Jiang wrote:
 >
-> Also, there are probably some headaches lurking in the slightly
-> different app/ref tag escape handling if you mix the two
-> formats. Whereas Type 1 and 2 are 100% identical in behavior if you use
-> the LBA as the ref tag.
+> > On 9/10/19 5:45 PM, Song Liu wrote:
+> >>
+> >>
+> >>> On Sep 10, 2019, at 12:33 AM, NeilBrown <neilb@suse.de> wrote:
+> >>>
+> >>> On Mon, Sep 09 2019, Song Liu wrote:
+> >>>
+> >>>> Hi Neil,
+> >>>>
+> >>>>> On Sep 9, 2019, at 7:57 AM, NeilBrown <neilb@suse.de> wrote:
+> >>>>>
+> >>>>>
+> >>>>> If the drives in a RAID0 are not all the same size, the array is
+> >>>>> divided into zones.
+> >>>>> The first zone covers all drives, to the size of the smallest.
+> >>>>> The second zone covers all drives larger than the smallest, up to
+> >>>>> the size of the second smallest - etc.
+> >>>>>
+> >>>>> A change in Linux 3.14 unintentionally changed the layout for the
+> >>>>> second and subsequent zones.  All the correct data is still stored, but
+> >>>>> each chunk may be assigned to a different device than in pre-3.14 kernels.
+> >>>>> This can lead to data corruption.
+> >>>>>
+> >>>>> It is not possible to determine what layout to use - it depends which
+> >>>>> kernel the data was written by.
+> >>>>> So we add a module parameter to allow the old (0) or new (1) layout to be
+> >>>>> specified, and refused to assemble an affected array if that parameter is
+> >>>>> not set.
+> >>>>>
+> >>>>> Fixes: 20d0189b1012 ("block: Introduce new bio_split()")
+> >>>>> cc: stable@vger.kernel.org (3.14+)
+> >>>>> Signed-off-by: NeilBrown <neilb@suse.de>
+> >>>>
+> >>>> Thanks for the patches. They look great. However, I am having problem
+> >>>> apply them (not sure whether it is a problem on my side). Could you
+> >>>> please push it somewhere so I can use cherry-pick instead?
+> >>>
+> >>> I rebased them on block/for-next, fixed the problems that Guoqing found,
+> >>> and pushed them to
+> >>>   https://github.com/neilbrown/linux md/raid0
+> >>>
+> >>> NeilBrown
+> >>
+> >> Thanks Neil!
+> >
+> > Thanks for the explanation about set the flag.
+> >
+> >>
+> >> Guoqing, if this looks good, please reply with your Reviewed-by
+> >> or Acked-by.
+> >
+> > No more comments from my side, but I am not sure if it is better/possible to use one
+> > sysfs node to control the behavior instead of module parameter, then we can support
+> > different raid0 layout dynamically.
 >
->>> Anyway. So my take on all this is that the T10-DIF-TYPE1-CRC profile is
->>> "it" and everything else is legacy.
->> do you see any reason to support the broken type 3 ?
-> Only to support existing installations. We can't really remove it
-> without the risk of breaking something for somebody out there.
+> A strength of module parameters is that you can set them in
+>   /etc/modprobe.d/00-local.conf
+> and then they are automatically set on boot.
+> For sysfs, you need some tool to set them.
+>
+> >
+> > Anyway, Acked-by: Guoqing Jiang <guoqing.jiang@cloud.ionos.com>
+> >
 
-what about broken type 3 in the NVMe spec ?
+I am adding the following change to the 1/2. Please let me know if it doesn't
+make sense.
 
-I don't really know what is broken there but maybe we can avoid 
-supporting it for NVMe until it's fixed.
+Thanks,
+Song
 
+diff --git i/drivers/md/raid0.c w/drivers/md/raid0.c
+index a9fcff50bbfc..54d0064787a8 100644
+--- i/drivers/md/raid0.c
++++ w/drivers/md/raid0.c
+@@ -615,6 +615,10 @@ static bool raid0_make_request(struct mddev
+*mddev, struct bio *bio)
+        case RAID0_ALT_MULTIZONE_LAYOUT:
+                tmp_dev = map_sector(mddev, zone, sector, &sector);
+                break;
++       default:
++               WARN("md/raid0:%s: Invalid layout\n", mdname(mddev));
++               bio_io_error(bio);
++               return true;
+        }
 
+        if (unlikely(is_mddev_broken(tmp_dev, "raid0"))) {
