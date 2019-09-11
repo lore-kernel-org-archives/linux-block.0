@@ -2,120 +2,109 @@ Return-Path: <SRS0=ntoj=XG=vger.kernel.org=linux-block-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-2.6 required=3.0 tests=DKIMWL_WL_HIGH,DKIM_SIGNED,
-	DKIM_VALID,DKIM_VALID_AU,MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,
-	USER_AGENT_SANE_1 autolearn=no autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-2.5 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
+	MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,USER_AGENT_SANE_1 autolearn=no
+	autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 5605CC5ACAE
-	for <linux-block@archiver.kernel.org>; Wed, 11 Sep 2019 14:16:39 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 3E214C49ED6
+	for <linux-block@archiver.kernel.org>; Wed, 11 Sep 2019 14:20:46 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.kernel.org (Postfix) with ESMTP id 2A78720863
-	for <linux-block@archiver.kernel.org>; Wed, 11 Sep 2019 14:16:39 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=default; t=1568211399;
-	bh=FIfh8abaa8XlGAP/1eddhG+gO/seYnQRvWxG9Irag7E=;
-	h=Date:From:To:Cc:Subject:References:In-Reply-To:List-ID:From;
-	b=ip1h8AKdgxIEJPRe3vKXC9xqF/8uQIUwiCoSyLVTpIbyTVsi8EUWBt5ZER+qtT+wa
-	 gNUlv33mMfAnaUZb1Yse9VGNaPeV05ZKUnvRWAEBdNKkZaCB9jlCDigfQTXbdSSap5
-	 wm6ob0bwQNjit4l393/4Z/nNc5T9CmBf6rCTybTM=
+	by mail.kernel.org (Postfix) with ESMTP id 1D5B72089F
+	for <linux-block@archiver.kernel.org>; Wed, 11 Sep 2019 14:20:46 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1726626AbfIKOQf (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Wed, 11 Sep 2019 10:16:35 -0400
-Received: from mail-qk1-f193.google.com ([209.85.222.193]:42450 "EHLO
-        mail-qk1-f193.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1726341AbfIKOQf (ORCPT
+        id S1727946AbfIKOUp (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Wed, 11 Sep 2019 10:20:45 -0400
+Received: from www262.sakura.ne.jp ([202.181.97.72]:62856 "EHLO
+        www262.sakura.ne.jp" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S1726012AbfIKOUp (ORCPT
         <rfc822;linux-block@vger.kernel.org>);
-        Wed, 11 Sep 2019 10:16:35 -0400
-Received: by mail-qk1-f193.google.com with SMTP id f13so20923089qkm.9;
-        Wed, 11 Sep 2019 07:16:34 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20161025;
-        h=sender:date:from:to:cc:subject:message-id:references:mime-version
-         :content-disposition:in-reply-to:user-agent;
-        bh=bz1mSsuTl+E4vAwMyWtdro8hF2w1GwA4uT5lSquTwhw=;
-        b=XP5xHqZ7xOlRXj7HOW4YfjSKWQCcUqBQprIziluIiQnuAsTEkzCybcB7fFfJm27yPR
-         GDds5yZIiLTxvxACCXmb197OBE3R2vYBFbX5oUURMbg2GGKciF0uxI85nxPNfswKjMSJ
-         W0LYPjiH0p1Z6JT+dM8YBJOmfnn360bKFYmhkBPKstBRfZBnC9kt+Jn6sOkTNkutXH65
-         /3JoF0p9BKrGEW2kPfjAkiwAPxJyIapUHhtb2UtDTYd7m2R18FXNoDQX7EiN8uvrfeaY
-         m6jQPJfEBMe0sY3RlHXJKhkxcJ2G52HBucA1bVupG1GNaLxpC5whk5FvSs6tN/1JwvTL
-         mz5g==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20161025;
-        h=x-gm-message-state:sender:date:from:to:cc:subject:message-id
-         :references:mime-version:content-disposition:in-reply-to:user-agent;
-        bh=bz1mSsuTl+E4vAwMyWtdro8hF2w1GwA4uT5lSquTwhw=;
-        b=GZyPR5TpcteGzat3Yb8Xwr9/sMVUbZ4lm60BEK2n5M/nvqKk/NAi4maLuhtntQq0ID
-         fnMwQN/yKhIJUMsuJ0+aZPHkT6TFWI0j7bKIhdj4OlIEUqZGa9+MUKViS1z7giXuMdOX
-         Dv9AzbSCNwQlvpJNkKDNfnbYvvBPDp+4pxVTNBVTU89D9zyGdhVOHQErPwAIlTPO2WoT
-         WNGixiZ/1pg6ERnz8ax85eqi909t5xNYd7Yj1L8X5ezAR+lKn9obLcWb77Dnpr7BiZMy
-         gh0qGl8lBncn0aj/T+GIXzrWmBIQTFTpXVpFtx2GC5FV/Iv83mI+mIrT4wel1owgDH63
-         ++4w==
-X-Gm-Message-State: APjAAAWAxiz8uMkCST/4s8RJW8DiubtyrIVxnJJJFrOt7AqRzuqUKLLy
-        /Qj1xNqcvcsqZE700c1lbMQ=
-X-Google-Smtp-Source: APXvYqwuwH+uTdCa1/gFy0lDxUqqnquHphTP7vop0X2azQQu3OGdlEUhBiSQpiRxhOW6fyirrD/wFw==
-X-Received: by 2002:a37:a3cc:: with SMTP id m195mr34540776qke.443.1568211393921;
-        Wed, 11 Sep 2019 07:16:33 -0700 (PDT)
-Received: from localhost ([2620:10d:c091:500::1:8b2])
-        by smtp.gmail.com with ESMTPSA id u23sm10041210qkm.49.2019.09.11.07.16.32
-        (version=TLS1_2 cipher=ECDHE-RSA-AES128-GCM-SHA256 bits=128/128);
-        Wed, 11 Sep 2019 07:16:33 -0700 (PDT)
-Date:   Wed, 11 Sep 2019 07:16:30 -0700
-From:   Tejun Heo <tj@kernel.org>
-To:     Paolo Valente <paolo.valente@linaro.org>
-Cc:     Michal =?iso-8859-1?Q?Koutn=FD?= <mkoutny@suse.com>,
-        Johannes Weiner <hannes@cmpxchg.org>, clm@fb.com,
-        dennisz@fb.com, newella@fb.com, Li Zefan <lizefan@huawei.com>,
-        Jens Axboe <axboe@kernel.dk>,
-        Josef Bacik <josef@toxicpanda.com>,
-        Josef Bacik <jbacik@fb.com>, kernel-team@fb.com,
-        Rik van Riel <riel@surriel.com>, cgroups@vger.kernel.org,
-        linux-block@vger.kernel.org, linux-kernel@vger.kernel.org
-Subject: Re: [PATCH 08/10] blkcg: implement blk-iocost
-Message-ID: <20190911141630.GV2263813@devbig004.ftw2.facebook.com>
-References: <20190828220600.2527417-1-tj@kernel.org>
- <20190828220600.2527417-9-tj@kernel.org>
- <20190910125513.GA6399@blackbody.suse.cz>
- <20190910160855.GS2263813@devbig004.ftw2.facebook.com>
- <A69EF8D0-8156-46DB-A4DA-C5334764116E@linaro.org>
+        Wed, 11 Sep 2019 10:20:45 -0400
+Received: from fsav403.sakura.ne.jp (fsav403.sakura.ne.jp [133.242.250.102])
+        by www262.sakura.ne.jp (8.15.2/8.15.2) with ESMTP id x8BEKgld005032;
+        Wed, 11 Sep 2019 23:20:42 +0900 (JST)
+        (envelope-from penguin-kernel@i-love.sakura.ne.jp)
+Received: from www262.sakura.ne.jp (202.181.97.72)
+ by fsav403.sakura.ne.jp (F-Secure/fsigk_smtp/530/fsav403.sakura.ne.jp);
+ Wed, 11 Sep 2019 23:20:42 +0900 (JST)
+X-Virus-Status: clean(F-Secure/fsigk_smtp/530/fsav403.sakura.ne.jp)
+Received: from [192.168.1.8] (softbank126227201116.bbtec.net [126.227.201.116])
+        (authenticated bits=0)
+        by www262.sakura.ne.jp (8.15.2/8.15.2) with ESMTPSA id x8BEKg1D005028
+        (version=TLSv1.2 cipher=AES256-SHA bits=256 verify=NO);
+        Wed, 11 Sep 2019 23:20:42 +0900 (JST)
+        (envelope-from penguin-kernel@i-love.sakura.ne.jp)
+Subject: Re: [RFC PATCH] Add proc interface to set PF_MEMALLOC flags
+To:     Hillf Danton <hdanton@sina.com>
+Cc:     Mike Christie <mchristi@redhat.com>,
+        "Kirill A. Shutemov" <kirill@shutemov.name>, axboe@kernel.dk,
+        James.Bottomley@HansenPartnership.com, martin.petersen@oracle.com,
+        linux-kernel@vger.kernel.org, linux-scsi@vger.kernel.org,
+        linux-block@vger.kernel.org, Linux-MM <linux-mm@kvack.org>
+References: <20190911031348.9648-1-hdanton@sina.com>
+ <20190911135237.11248-1-hdanton@sina.com>
+From:   Tetsuo Handa <penguin-kernel@i-love.sakura.ne.jp>
+Message-ID: <6cff2ae9-4436-8df7-55a7-59e2e80b1054@i-love.sakura.ne.jp>
+Date:   Wed, 11 Sep 2019 23:20:38 +0900
+User-Agent: Mozilla/5.0 (Windows NT 6.3; WOW64; rv:60.0) Gecko/20100101
+ Thunderbird/60.9.0
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <A69EF8D0-8156-46DB-A4DA-C5334764116E@linaro.org>
-User-Agent: Mutt/1.5.21 (2010-09-15)
+In-Reply-To: <20190911135237.11248-1-hdanton@sina.com>
+Content-Type: text/plain; charset=utf-8
+Content-Language: en-US
+Content-Transfer-Encoding: 7bit
 Sender: linux-block-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-Hello,
-
-On Wed, Sep 11, 2019 at 10:18:53AM +0200, Paolo Valente wrote:
-> > The two being enabled at the same time doesn't make sense, so we can
-> > just switch over to bfq when bfq is selected as the iosched.  I asked
-> > what Paolo wanted to do in terms of interface a couple times now but
-> > didn't get an answer and he posted a patch which makes the two
-> > controllers conflict, so....  Paolo, so it looks like you want to
-> > rename all bfq files to drop the bfq prefix, right?
+On 2019/09/11 22:52, Hillf Danton wrote:
 > 
-> Yep, mainly because ... this is the solution you voted and you
-> yourself proposed [1] :)
+> On Wed, 11 Sep 2019 19:07:34 +0900
+>>
+>> But I guess that there is a problem.
 > 
-> [1] https://patchwork.kernel.org/patch/10988261/
-
-So, that was then.  Since then the interface change has been published
-and userspace, at least some of them, already had to adjust.  Now, I
-don't have any opinion on the matter and flipping again will cause
-inconveniences to some subset of users.  It's your call.
-
-> >  I can implement
-> > the switching if so.
+> Not a new one. (see commit 7dea19f9ee63)
 > 
-> That would be perfect.
+>> Setting PF_MEMALLOC_NOIO causes
+>> current_gfp_context() to mask __GFP_IO | __GFP_FS, but the OOM killer cannot
+>> be invoked when __GFP_FS is masked. As a result, any userspace thread which
+>> has PF_MEMALLOC_NOIO cannot invoke the OOM killer.
+> 
+> Correct.
+> 
+>> If the userspace thread
+>> which uses PF_MEMALLOC_NOIO is involved in memory reclaiming activities,
+>> the memory reclaiming activities won't be able to make forward progress when
+>> the userspace thread triggered e.g. a page fault. Can the "userspace components
+>> that can run in the IO path" survive without any memory allocation?
+> 
+> Good question.
+> 
+> It can be solved without oom killer involved because user should be
+> aware of the risk of PF_MEMALLOC_NOIO if they ask for the convenience.
+> OTOH we are able to control any abuse of it as you worry, knowing that
+> the combination of __GFP_FS and oom killer can not get more than 50 users
+> works done, and we have to pay as much attention as we can to the decisions
+> they make. In case of PF_MEMALLOC_NOIO, we simply fail the allocation
+> rather than killing a random victim.
 
-Whichever way it gets decided, this is easy enough.  I'll prep a
-patch.
+According to commit c288983dddf71421 ("mm/page_alloc.c: make sure OOM victim can
+try allocations with no watermarks once"), memory allocation failure from a page
+fault results in invocation of the OOM killer via pagefault_out_of_memory() which
+after all kills a random victim.
 
-Thanks.
-
--- 
-tejun
+> 
+> 
+> --- a/mm/page_alloc.c
+> +++ b/mm/page_alloc.c
+> @@ -3854,6 +3854,8 @@ __alloc_pages_may_oom(gfp_t gfp_mask, un
+>  	 * out_of_memory). Once filesystems are ready to handle allocation
+>  	 * failures more gracefully we should just bail out here.
+>  	 */
+> +	if (current->flags & PF_MEMALLOC_NOIO)
+> +		goto out;
+>  
+>  	/* The OOM killer may not free memory on a specific node */
+>  	if (gfp_mask & __GFP_THISNODE)
+> 
+> 
