@@ -2,225 +2,200 @@ Return-Path: <SRS0=ntoj=XG=vger.kernel.org=linux-block-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-7.0 required=3.0 tests=DKIM_SIGNED,DKIM_VALID,
-	DKIM_VALID_AU,FORGED_MUA_MOZILLA,HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,
-	MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED,
-	USER_AGENT_SANE_1 autolearn=unavailable autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-8.5 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
+	INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,
+	USER_AGENT_SANE_1 autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id DA440ECDE28
-	for <linux-block@archiver.kernel.org>; Wed, 11 Sep 2019 08:43:08 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id AA33FECDE27
+	for <linux-block@archiver.kernel.org>; Wed, 11 Sep 2019 08:48:41 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.kernel.org (Postfix) with ESMTP id B035920863
-	for <linux-block@archiver.kernel.org>; Wed, 11 Sep 2019 08:43:08 +0000 (UTC)
-Authentication-Results: mail.kernel.org;
-	dkim=pass (1024-bit key) header.d=urbackup.org header.i=@urbackup.org header.b="TLoD1gqx";
-	dkim=pass (1024-bit key) header.d=amazonses.com header.i=@amazonses.com header.b="grYXhPHg"
+	by mail.kernel.org (Postfix) with ESMTP id 89A0421D7D
+	for <linux-block@archiver.kernel.org>; Wed, 11 Sep 2019 08:48:41 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1727016AbfIKInF (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Wed, 11 Sep 2019 04:43:05 -0400
-Received: from a4-5.smtp-out.eu-west-1.amazonses.com ([54.240.4.5]:34714 "EHLO
-        a4-5.smtp-out.eu-west-1.amazonses.com" rhost-flags-OK-OK-OK-OK)
-        by vger.kernel.org with ESMTP id S1725379AbfIKInF (ORCPT
-        <rfc822;linux-block@vger.kernel.org>);
-        Wed, 11 Sep 2019 04:43:05 -0400
-DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/simple;
-        s=ob2ngmaigrjtzxgmrxn2h6b3gszyqty3; d=urbackup.org; t=1568191382;
-        h=Subject:To:References:From:Message-ID:Date:MIME-Version:In-Reply-To:Content-Type:Content-Transfer-Encoding;
-        bh=qQV7uqEq2fVv9oREM0bMzbb0KcjU3d8iebg1LaeyBTc=;
-        b=TLoD1gqxxP7r6utL/9OtMw8yUySe+K7y4cLzzPu6J8sE1TtJ0MiB2y01znctz8F7
-        6BRID5yGQaZi1TPVDhRv3V1HRf2mBj16mhs23GeN+tG6ZiLBpKfH0jHCYSrJ+MJTcZW
-        Dmzqh9DJzKRRgdoOD/1qYH68u5ASBCYg9GvzWNPc=
-DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/simple;
-        s=ihchhvubuqgjsxyuhssfvqohv7z3u4hn; d=amazonses.com; t=1568191382;
-        h=Subject:To:References:From:Message-ID:Date:MIME-Version:In-Reply-To:Content-Type:Content-Transfer-Encoding:Feedback-ID;
-        bh=qQV7uqEq2fVv9oREM0bMzbb0KcjU3d8iebg1LaeyBTc=;
-        b=grYXhPHgGJgLXTMb/as/jG6VbPuWhQEA6kIWj49qooBq6W+2PKnfZm6ywbXqXUF0
-        gs7utbsvGgT/M+hGfW7vmH0Z2yU+kX3fol3NWnWplSFVoXnrwO9/dFWsVLAVvwv0p8y
-        bHfYoEw7ZsgXQUIVE++Jhaoxt+atkYX96OeudsW0=
-Subject: Re: [RFC PATCH] Add proc interface to set PF_MEMALLOC flags
-To:     Damien Le Moal <Damien.LeMoal@wdc.com>,
-        Mike Christie <mchristi@redhat.com>,
-        "linux-kernel@vger.kernel.org" <linux-kernel@vger.kernel.org>,
-        "linux-scsi@vger.kernel.org" <linux-scsi@vger.kernel.org>,
-        "linux-block@vger.kernel.org" <linux-block@vger.kernel.org>,
-        Linux-MM <linux-mm@kvack.org>
-References: <20190909162804.5694-1-mchristi@redhat.com>
- <5D76995B.1010507@redhat.com>
- <BYAPR04MB5816DABF3C5071D13D823990E7B60@BYAPR04MB5816.namprd04.prod.outlook.com>
-From:   Martin Raiber <martin@urbackup.org>
-Message-ID: <0102016d1f7d8136-cb7bca70-0509-4a29-b687-5b93a36e3fec-000000@eu-west-1.amazonses.com>
-Date:   Wed, 11 Sep 2019 08:43:02 +0000
-User-Agent: Mozilla/5.0 (Windows NT 10.0; WOW64; rv:60.0) Gecko/20100101
- Thunderbird/60.9.0
+        id S1726724AbfIKIsk (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Wed, 11 Sep 2019 04:48:40 -0400
+Received: from mx1.redhat.com ([209.132.183.28]:47738 "EHLO mx1.redhat.com"
+        rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
+        id S1726579AbfIKIsk (ORCPT <rfc822;linux-block@vger.kernel.org>);
+        Wed, 11 Sep 2019 04:48:40 -0400
+Received: from smtp.corp.redhat.com (int-mx07.intmail.prod.int.phx2.redhat.com [10.5.11.22])
+        (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
+        (No client certificate requested)
+        by mx1.redhat.com (Postfix) with ESMTPS id 99AFAA37196;
+        Wed, 11 Sep 2019 08:48:39 +0000 (UTC)
+Received: from localhost.localdomain (ovpn-12-78.pek2.redhat.com [10.72.12.78])
+        by smtp.corp.redhat.com (Postfix) with ESMTPS id CDE541001944;
+        Wed, 11 Sep 2019 08:48:29 +0000 (UTC)
+Subject: Re: [PATCH V2 blktests] nvme: Add new test case about nvme
+ rescan/reset/remove during IO
+To:     Chaitanya Kulkarni <Chaitanya.Kulkarni@wdc.com>
+Cc:     "linux-block@vger.kernel.org" <linux-block@vger.kernel.org>,
+        "osandov@osandov.com" <osandov@osandov.com>,
+        "ming.lei@redhat.com" <ming.lei@redhat.com>
+References: <20190909164537.2729-1-yi.zhang@redhat.com>
+ <BYAPR04MB57492918C78F461EDF94D23586B70@BYAPR04MB5749.namprd04.prod.outlook.com>
+From:   Yi Zhang <yi.zhang@redhat.com>
+Message-ID: <08e230e1-f4c1-80ef-1432-efbf761f2804@redhat.com>
+Date:   Wed, 11 Sep 2019 16:48:22 +0800
+User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:60.0) Gecko/20100101
+ Thunderbird/60.7.0
 MIME-Version: 1.0
-In-Reply-To: <BYAPR04MB5816DABF3C5071D13D823990E7B60@BYAPR04MB5816.namprd04.prod.outlook.com>
-Content-Type: text/plain; charset=utf-8
+In-Reply-To: <BYAPR04MB57492918C78F461EDF94D23586B70@BYAPR04MB5749.namprd04.prod.outlook.com>
+Content-Type: text/plain; charset=utf-8; format=flowed
 Content-Transfer-Encoding: 7bit
-X-SES-Outgoing: 2019.09.11-54.240.4.5
-Feedback-ID: 1.eu-west-1.zKMZH6MF2g3oUhhjaE2f3oQ8IBjABPbvixQzV8APwT0=:AmazonSES
+Content-Language: en-US
+X-Scanned-By: MIMEDefang 2.84 on 10.5.11.22
+X-Greylist: Sender IP whitelisted, not delayed by milter-greylist-4.6.2 (mx1.redhat.com [10.5.110.68]); Wed, 11 Sep 2019 08:48:39 +0000 (UTC)
 Sender: linux-block-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-On 10.09.2019 10:35 Damien Le Moal wrote:
-> Mike,
->
-> On 2019/09/09 19:26, Mike Christie wrote:
->> Forgot to cc linux-mm.
+Hi Chaitanya
+Thanks for your review.
+
+On 9/10/19 1:03 AM, Chaitanya Kulkarni wrote:
+> On 09/09/2019 09:47 AM, Yi Zhang wrote:
+>> Add one test to cover NVMe SSD rescan/reset/remove operation during
+>> IO, the steps found several issues during my previous testing, check
+>> them here:
+>> http://lists.infradead.org/pipermail/linux-nvme/2017-February/008358.html
+>> http://lists.infradead.org/pipermail/linux-nvme/2017-May/010259.html
 >>
->> On 09/09/2019 11:28 AM, Mike Christie wrote:
->>> There are several storage drivers like dm-multipath, iscsi, and nbd that
->>> have userspace components that can run in the IO path. For example,
->>> iscsi and nbd's userspace deamons may need to recreate a socket and/or
->>> send IO on it, and dm-multipath's daemon multipathd may need to send IO
->>> to figure out the state of paths and re-set them up.
->>>
->>> In the kernel these drivers have access to GFP_NOIO/GFP_NOFS and the
->>> memalloc_*_save/restore functions to control the allocation behavior,
->>> but for userspace we would end up hitting a allocation that ended up
->>> writing data back to the same device we are trying to allocate for.
->>>
->>> This patch allows the userspace deamon to set the PF_MEMALLOC* flags
->>> through procfs. It currently only supports PF_MEMALLOC_NOIO, but
->>> depending on what other drivers and userspace file systems need, for
->>> the final version I can add the other flags for that file or do a file
->>> per flag or just do a memalloc_noio file.
-> Awesome. That probably will be the perfect solution for the problem we hit with
-> tcmu-runner a while back (please see this thread:
-> https://www.spinics.net/lists/linux-fsdevel/msg148912.html).
->
-> I think we definitely need nofs as well for dealing with cases where the backend
-> storage for the user daemon is a file.
->
-> I will give this patch a try as soon as possible (I am traveling currently).
->
-> Best regards.
-I had issues with this as well, and work on this is appreciated! In my
-case it is a loop block device on a fuse file system.
-
-Setting PF_LESS_THROTTLE was the one that helped the most, though, so
-add an option for that as well? I set this via prctl() for the thread
-calling it (was easiest to add to).
-
-Sorry, I have no idea about the current rationale, but wouldn't it be
-better to have a way to mask a set of block devices/file systems not to
-write-back to in a thread. So in my case I'd specify that the fuse
-daemon threads cannot write-back to the file system and loop device
-running on top of the fuse file system, while all other block
-devices/file systems can be write-back to (causing less swapping/OOM
-issues).
-
->
->>> Signed-off-by: Mike Christie <mchristi@redhat.com>
->>> ---
->>>  Documentation/filesystems/proc.txt |  6 ++++
->>>  fs/proc/base.c                     | 53 ++++++++++++++++++++++++++++++
->>>  2 files changed, 59 insertions(+)
->>>
->>> diff --git a/Documentation/filesystems/proc.txt b/Documentation/filesystems/proc.txt
->>> index 99ca040e3f90..b5456a61a013 100644
->>> --- a/Documentation/filesystems/proc.txt
->>> +++ b/Documentation/filesystems/proc.txt
->>> @@ -46,6 +46,7 @@ Table of Contents
->>>    3.10  /proc/<pid>/timerslack_ns - Task timerslack value
->>>    3.11	/proc/<pid>/patch_state - Livepatch patch operation state
->>>    3.12	/proc/<pid>/arch_status - Task architecture specific information
->>> +  3.13  /proc/<pid>/memalloc - Control task's memory reclaim behavior
->>>  
->>>    4	Configuring procfs
->>>    4.1	Mount options
->>> @@ -1980,6 +1981,11 @@ Example
->>>   $ cat /proc/6753/arch_status
->>>   AVX512_elapsed_ms:      8
->>>  
->>> +3.13 /proc/<pid>/memalloc - Control task's memory reclaim behavior
->>> +-----------------------------------------------------------------------
->>> +A value of "noio" indicates that when a task allocates memory it will not
->>> +reclaim memory that requires starting phisical IO.
->>> +
->>>  Description
->>>  -----------
->>>  
->>> diff --git a/fs/proc/base.c b/fs/proc/base.c
->>> index ebea9501afb8..c4faa3464602 100644
->>> --- a/fs/proc/base.c
->>> +++ b/fs/proc/base.c
->>> @@ -1223,6 +1223,57 @@ static const struct file_operations proc_oom_score_adj_operations = {
->>>  	.llseek		= default_llseek,
->>>  };
->>>  
->>> +static ssize_t memalloc_read(struct file *file, char __user *buf, size_t count,
->>> +			     loff_t *ppos)
->>> +{
->>> +	struct task_struct *task;
->>> +	ssize_t rc = 0;
->>> +
->>> +	task = get_proc_task(file_inode(file));
->>> +	if (!task)
->>> +		return -ESRCH;
->>> +
->>> +	if (task->flags & PF_MEMALLOC_NOIO)
->>> +		rc = simple_read_from_buffer(buf, count, ppos, "noio", 4);
->>> +	put_task_struct(task);
->>> +	return rc;
->>> +}
->>> +
->>> +static ssize_t memalloc_write(struct file *file, const char __user *buf,
->>> +			      size_t count, loff_t *ppos)
->>> +{
->>> +	struct task_struct *task;
->>> +	char buffer[5];
->>> +	int rc = count;
->>> +
->>> +	memset(buffer, 0, sizeof(buffer));
->>> +	if (count != sizeof(buffer) - 1)
->>> +		return -EINVAL;
->>> +
->>> +	if (copy_from_user(buffer, buf, count))
->>> +		return -EFAULT;
->>> +	buffer[count] = '\0';
->>> +
->>> +	task = get_proc_task(file_inode(file));
->>> +	if (!task)
->>> +		return -ESRCH;
->>> +
->>> +	if (!strcmp(buffer, "noio")) {
->>> +		task->flags |= PF_MEMALLOC_NOIO;
->>> +	} else {
->>> +		rc = -EINVAL;
->>> +	}
->>> +
->>> +	put_task_struct(task);
->>> +	return rc;
->>> +}
->>> +
->>> +static const struct file_operations proc_memalloc_operations = {
->>> +	.read		= memalloc_read,
->>> +	.write		= memalloc_write,
->>> +	.llseek		= default_llseek,
->>> +};
->>> +
->>>  #ifdef CONFIG_AUDIT
->>>  #define TMPBUFLEN 11
->>>  static ssize_t proc_loginuid_read(struct file * file, char __user * buf,
->>> @@ -3097,6 +3148,7 @@ static const struct pid_entry tgid_base_stuff[] = {
->>>  #ifdef CONFIG_PROC_PID_ARCH_STATUS
->>>  	ONE("arch_status", S_IRUGO, proc_pid_arch_status),
->>>  #endif
->>> +	REG("memalloc", S_IRUGO|S_IWUSR, proc_memalloc_operations),
->>>  };
->>>  
->>>  static int proc_tgid_base_readdir(struct file *file, struct dir_context *ctx)
->>> @@ -3487,6 +3539,7 @@ static const struct pid_entry tid_base_stuff[] = {
->>>  #ifdef CONFIG_PROC_PID_ARCH_STATUS
->>>  	ONE("arch_status", S_IRUGO, proc_pid_arch_status),
->>>  #endif
->>> +	REG("memalloc", S_IRUGO|S_IWUSR, proc_memalloc_operations),
->>>  };
->>>  
->>>  static int proc_tid_base_readdir(struct file *file, struct dir_context *ctx)
->>>
+>> Signed-off-by: Yi Zhang <yi.zhang@redhat.com>
+>> ---
 >>
+>> changes from v1:
+>>    - add variable for "/sys/bus/pci/devices/${pdev}"
+>>    - add kill $!; wait; for background fio
+>>    - add rescan/reset/remove sysfs node check
+>>    - add loop checking for nvme reinitialized
+>>
+>> ---
+>> ---
+>>    tests/nvme/031     | 71 ++++++++++++++++++++++++++++++++++++++++++++++
+>>    tests/nvme/031.out |  2 ++
+>>    2 files changed, 73 insertions(+)
+>>    create mode 100755 tests/nvme/031
+>>    create mode 100644 tests/nvme/031.out
+>>
+>> diff --git a/tests/nvme/031 b/tests/nvme/031
+>> new file mode 100755
+>> index 0000000..db163a2
+>> --- /dev/null
+>> +++ b/tests/nvme/031
+>> @@ -0,0 +1,71 @@
+>> +#!/bin/bash
+>> +# SPDX-License-Identifier: GPL-3.0+
+>> +# Copyright (C) 2019 Yi Zhang <yi.zhang@redhat.com>
+>> +#
+>> +# Test nvme pci adapter rescan/reset/remove operation during I/O
+>> +#
+>> +# Regression test for bellow two commits:
+>> +# http://lists.infradead.org/pipermail/linux-nvme/2017-May/010367.html
+>> +# 986f75c876db nvme: avoid to use blk_mq_abort_requeue_list()
+>> +# 806f026f9b90 nvme: use blk_mq_start_hw_queues() in nvme_kill_queues()
+>> +
+>> +. tests/nvme/rc
+>> +
+>> +DESCRIPTION="test nvme pci adapter rescan/reset/remove during I/O"
+>> +TIMED=1
+>> +
+>> +requires() {
+>> +	_have_fio
+>> +}
+>> +
+>> +device_requires() {
+>> +	_test_dev_is_nvme
+>> +}
+>> +
+>> +test_device() {
+>> +	echo "Running ${TEST_NAME}"
+>> +
+>> +	pdev="$(_get_pci_dev_from_blkdev)"
+>> +	local sysfs="/sys/bus/pci/devices/${pdev}"
+>> +
+>> +	# start fio job
+>> +	_run_fio_rand_io --filename="$TEST_DEV" --size=1g \
+>> +		--group_reporting  &> /dev/null &
+>> +
+>> +	sleep 5
+>> +
+>> +	# do rescan/reset/remove operation
+>> +	if [[ -f "${sysfs}"/rescan ]]; then
+>> +		echo 1 > "${sysfs}"/rescan
+>> +	else
+>> +		echo "${sysfs}/rescan doesn't exist!"
+>> +	fi
+>> +	# QEMU VM doesn't have the "reset" attribute, skip it
+>> +	if [[ -f "${sysfs}"/reset ]]; then
+>> +		echo 1 > "${sysfs}"/reset
+>> +	fi
+>> +	if [[ -f "${sysfs}"/remove ]]; then
+>> +		echo 1 > "${sysfs}"/remove
+>> +	else
+>> +		echo "${sysfs}/remove doesn't exist!"
+>> +
+>> +	fi
+> This is a lot of code repetition. You should be creating one helper
+> and passing just file names. (No need to check the return value).
+> something like this :-
 >
+> check_sysfs()
+> {
+> 	local sysfs_attr=$1
+>
+> 	if [[ -f "${sysfs_attr}" ]]; then
+> 		echo 1 > "${sysfs_attr}"
+> 	else
+> 		#TODO : add a check to not print if sysfs_attr is not
+>                   #reset
+> 		echo "${sysfs_attr] doesn't exist!"
+> 	fi
+> }
+> and call above function here :-
+>
+> 	for i in rescan remove reset; do
+> 		check_sysfs_attr $i
+> 	done
+will fix it in next version
+
+>> +
+>> +	{ kill $!; wait; } &> /dev/null
+>> +
+>> +	echo 1 > /sys/bus/pci/rescan
+>> +
+>> +	# wait nvme reinitialized
+>> +	local m
+> Please declare all the local variables at the start of the function.
+>
+> Do we need to call udevadm settle here ?
+agree, will add it.
+
+>
+>> +	for ((m = 0; m < 10; m++)); do
+>> +		if [[ -b "${TEST_DEV}" ]]; then
+>> +			break
+>> +		fi
+>> +		sleep 0.5
+>> +	done
+>> +        if (( m > 9 )); then
+>> +                echo "nvme still not reinitialized after 5 seconds!"
+>> +        fi
+> Please recheck the alignment in the above if.
+Thanks.
+
+>
+>> +
+>> +	echo "Test complete"
+>> +}
+>> diff --git a/tests/nvme/031.out b/tests/nvme/031.out
+>> new file mode 100644
+>> index 0000000..ae902bd
+>> --- /dev/null
+>> +++ b/tests/nvme/031.out
+>> @@ -0,0 +1,2 @@
+>> +Running nvme/031
+>> +Test complete
+>>
 
