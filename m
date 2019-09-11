@@ -2,144 +2,134 @@ Return-Path: <SRS0=ntoj=XG=vger.kernel.org=linux-block-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-1.0 required=3.0 tests=DKIM_SIGNED,DKIM_VALID,
-	DKIM_VALID_AU,FORGED_MUA_MOZILLA,HEADER_FROM_DIFFERENT_DOMAINS,
-	MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED,USER_AGENT_SANE_1
-	autolearn=no autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-4.0 required=3.0 tests=DKIM_SIGNED,DKIM_VALID,
+	HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,
+	SPF_PASS,URIBL_BLOCKED autolearn=no autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 788E1C49ED6
-	for <linux-block@archiver.kernel.org>; Wed, 11 Sep 2019 19:21:42 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id AB229C5ACAE
+	for <linux-block@archiver.kernel.org>; Wed, 11 Sep 2019 20:39:01 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.kernel.org (Postfix) with ESMTP id 4859D2085B
-	for <linux-block@archiver.kernel.org>; Wed, 11 Sep 2019 19:21:42 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id 6F4CB2082C
+	for <linux-block@archiver.kernel.org>; Wed, 11 Sep 2019 20:39:01 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=pass (1024-bit key) header.d=urbackup.org header.i=@urbackup.org header.b="G3nQ1rSy";
-	dkim=pass (1024-bit key) header.d=amazonses.com header.i=@amazonses.com header.b="fM1Ha/RN"
+	dkim=fail reason="signature verification failed" (2048-bit key) header.d=wdc.com header.i=@wdc.com header.b="Yjttr6d9";
+	dkim=pass (1024-bit key) header.d=sharedspace.onmicrosoft.com header.i=@sharedspace.onmicrosoft.com header.b="eHx58X63"
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1728588AbfIKTVi (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Wed, 11 Sep 2019 15:21:38 -0400
-Received: from a4-15.smtp-out.eu-west-1.amazonses.com ([54.240.4.15]:55192
-        "EHLO a4-15.smtp-out.eu-west-1.amazonses.com" rhost-flags-OK-OK-OK-OK)
-        by vger.kernel.org with ESMTP id S1728554AbfIKTVi (ORCPT
+        id S1730643AbfIKUjA (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Wed, 11 Sep 2019 16:39:00 -0400
+Received: from esa3.hgst.iphmx.com ([216.71.153.141]:39857 "EHLO
+        esa3.hgst.iphmx.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S1728877AbfIKUi4 (ORCPT
         <rfc822;linux-block@vger.kernel.org>);
-        Wed, 11 Sep 2019 15:21:38 -0400
-DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/simple;
-        s=ob2ngmaigrjtzxgmrxn2h6b3gszyqty3; d=urbackup.org; t=1568229695;
-        h=Subject:To:References:From:Message-ID:Date:MIME-Version:In-Reply-To:Content-Type:Content-Transfer-Encoding;
-        bh=59uwGM4pJHMCdblcEPt/Fvw4TL4wwHzA/X28KUFue3I=;
-        b=G3nQ1rSyB48pRZdQDv+uufB2Vcs0TLLb5gGL19jiCtLnKCT5K9fUl1vYX7spDjNi
-        k4AbTcBlnfNSWJ1Ak0nue0x7s9NUG3oIuB1F0LztmZYLUo85zQQA5AhOLNPeInvSMEp
-        oGkvnR8RiquJJLrFtyzU/zc6VN7Th+MfoaOmg36E=
-DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/simple;
-        s=ihchhvubuqgjsxyuhssfvqohv7z3u4hn; d=amazonses.com; t=1568229695;
-        h=Subject:To:References:From:Message-ID:Date:MIME-Version:In-Reply-To:Content-Type:Content-Transfer-Encoding:Feedback-ID;
-        bh=59uwGM4pJHMCdblcEPt/Fvw4TL4wwHzA/X28KUFue3I=;
-        b=fM1Ha/RNmcr1i4oE3mqYGN+X6q7QP1JquVojnQPrmF3YY6BHEP0ham9ft+lnv8YU
-        NaskoVhw3YiBSsfW1H8rHEE4jqPisjhjZsvMc06f4mQfoUdTmVa3WClMVtk/SgAcM56
-        ZZMWDPu+9zbO3GrB51ISKopFRuNq5FfR0bdPAWHc=
-Subject: Re: [RFC PATCH] Add proc interface to set PF_MEMALLOC flags
-To:     Mike Christie <mchristi@redhat.com>,
-        "linux-kernel@vger.kernel.org" <linux-kernel@vger.kernel.org>,
-        "linux-scsi@vger.kernel.org" <linux-scsi@vger.kernel.org>,
+        Wed, 11 Sep 2019 16:38:56 -0400
+DKIM-Signature: v=1; a=rsa-sha256; c=simple/simple;
+  d=wdc.com; i=@wdc.com; q=dns/txt; s=dkim.wdc.com;
+  t=1568234336; x=1599770336;
+  h=from:to:cc:subject:date:message-id:references:
+   content-transfer-encoding:mime-version;
+  bh=fA0Yrji4qfI+gV3pm1GcvSvbB2oGuuXbNCzK6MdEoMg=;
+  b=Yjttr6d9z/UvI5pZ+luWSP0pWVHbY4aecEsuJhMeWGQz9AHowxx1EqC+
+   4JCrjkANEW7di1LTAaXZnOHxEUItpCio5coaNBW55LgZjBGEl9YiBJscI
+   p3D/om7W2/cgOKBlIf7X3z2CHERor436f8yrRpsiMjdeaHn2ofzst8bLF
+   r7crgzKf+HAvIIkWkDzVNaNHByhdoNPqFps89Ipc3mdnimj8qFUtz0vQX
+   ijDG0IztbzOJObW1Aq8nk8dvEarx224yTeu8y0j8644XerfUtS3y4fOm5
+   +WAKzwb50V0keT50MatuPMBLRSa8t2+Ae4poY3OMmkaZy/TQwz8VGX2EJ
+   w==;
+IronPort-SDR: Ddtv9nCCR6W6MqylayqSWqtZwTkizsP57xyh5/ZY1ZMRgaOXmxH3RdeVL+gPJoheJc198BEICL
+ AFZxFnCf69XtckMcBBcePFra54TfTdtPbzhL44oNIbwm1QV6ej0dNhgzkiFHTBo3y1jBPGiY9m
+ TuNIu2d4PeVo9unxZ2SjKTigW+5XKrOBOmfaPtrVrti5G2dQ4zM1NMEQp2DWmRcb9KQ+nvh1jf
+ E5S2djUC4ujyOKbFg5/7vyiaPp5CMjfaUJD32IZE6bXDzePFBAy46fjDfhMjFLUU2Kh0WP2iCV
+ jsk=
+X-IronPort-AV: E=Sophos;i="5.64,494,1559491200"; 
+   d="scan'208";a="122574028"
+Received: from mail-co1nam05lp2052.outbound.protection.outlook.com (HELO NAM05-CO1-obe.outbound.protection.outlook.com) ([104.47.48.52])
+  by ob1.hgst.iphmx.com with ESMTP; 12 Sep 2019 04:38:55 +0800
+ARC-Seal: i=1; a=rsa-sha256; s=arcselector9901; d=microsoft.com; cv=none;
+ b=UeXtZn/dDyloX96qW03nTMSlx4GqakdckpQey8JRnZVk5+MKk74T2n5EoZ5zzXPwryEf27DWGb1yJGTRKuRyIka8yCyyYh6rosrBOFZpzjqOPFDhVkUhwcaILhOpei25EmTCqmGPT9x9P9an26xpQ+NX+XsFzRagMcwq41WD/jNopWVOeuaUJBM+8aWP0jArTU4YaLgmJbJvpROqMN/67NL8Yo80GuVD2ZmMrJmxIKJrWpvvdXDomxa2e6lcrZOwvsUqwWkljrZ9M1tAxbYxQ/VUT8TtNlNcuxbeko57Epdv0FqS3Av4fvOKvEST+7o1uXTqedG45IDObWAdy9fk9g==
+ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com;
+ s=arcselector9901;
+ h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
+ bh=fA0Yrji4qfI+gV3pm1GcvSvbB2oGuuXbNCzK6MdEoMg=;
+ b=jmCDUNKtU4qxeBZ5UtcdRQRdf6drtKu3gc/qfD8piVCXcS/TH0ScjdOO7oFEgDUVsRLjhyQOLEEyxiaP5vFvRUVaU6avBrubQhl8Y+VKwWPA4UMCBb4dZjW9j4MvPjKpT/Tf+kaQjrL6dhGCvDjE08ltXvnKyAtAIk14fKdxA+mbfAiVtqQldqJMsFrbSzOvcBzR1SBuC9ukdQtmNh1gPN43oWRgiP9bvtbf6Biopx1UxPAkIymZ9JQOomATqwfzJidbyj/6ID7nbnt8wQcgaDViZumO1qtXhI6cn38GmZ3UXqFfoJ25ZnOZwv2zCZj/mKN/egK27ebM2n7bpYoN0w==
+ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass
+ smtp.mailfrom=wdc.com; dmarc=pass action=none header.from=wdc.com; dkim=pass
+ header.d=wdc.com; arc=none
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+ d=sharedspace.onmicrosoft.com; s=selector2-sharedspace-onmicrosoft-com;
+ h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
+ bh=fA0Yrji4qfI+gV3pm1GcvSvbB2oGuuXbNCzK6MdEoMg=;
+ b=eHx58X63+KJoqXBBvBOPcJ1ZXykbeRHvYgkZrpLLarBQBDHy0S85cxqKYL9bZVvainJcASjlc/eEmy5K9LCCaUoSbEg+lVxY2IB2lzVWe6/fkVKB0ChkIVHf9j3ZHjC2FiRf/T3xCWkh47zLqO3pV9Pzz69+fejKDRtiDqSaqaU=
+Received: from BYAPR04MB5749.namprd04.prod.outlook.com (20.179.58.26) by
+ BYAPR04MB4870.namprd04.prod.outlook.com (52.135.233.143) with Microsoft SMTP
+ Server (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
+ 15.20.2241.13; Wed, 11 Sep 2019 20:38:54 +0000
+Received: from BYAPR04MB5749.namprd04.prod.outlook.com
+ ([fe80::6169:680:44fc:965d]) by BYAPR04MB5749.namprd04.prod.outlook.com
+ ([fe80::6169:680:44fc:965d%6]) with mapi id 15.20.2263.016; Wed, 11 Sep 2019
+ 20:38:54 +0000
+From:   Chaitanya Kulkarni <Chaitanya.Kulkarni@wdc.com>
+To:     Logan Gunthorpe <logang@deltatee.com>,
         "linux-block@vger.kernel.org" <linux-block@vger.kernel.org>,
-        Linux-MM <linux-mm@kvack.org>
-References: <20190909162804.5694-1-mchristi@redhat.com>
- <5D76995B.1010507@redhat.com>
- <BYAPR04MB5816DABF3C5071D13D823990E7B60@BYAPR04MB5816.namprd04.prod.outlook.com>
- <0102016d1f7af966-334f093b-2a62-4baa-9678-8d90d5fba6d9-000000@eu-west-1.amazonses.com>
- <5D792758.2060706@redhat.com>
-From:   Martin Raiber <martin@urbackup.org>
-Message-ID: <0102016d21c61ec3-4e148e0f-24f5-4e00-a74e-6249653167c7-000000@eu-west-1.amazonses.com>
-Date:   Wed, 11 Sep 2019 19:21:35 +0000
-User-Agent: Mozilla/5.0 (Windows NT 10.0; WOW64; rv:60.0) Gecko/20100101
- Thunderbird/60.9.0
+        "linux-nvme@lists.infradead.org" <linux-nvme@lists.infradead.org>,
+        Omar Sandoval <osandov@fb.com>
+CC:     Sagi Grimberg <sagi@grimberg.me>
+Subject: Re: [PATCH blktests v3] nvme/031: Add test to check controller
+ deletion after setup
+Thread-Topic: [PATCH blktests v3] nvme/031: Add test to check controller
+ deletion after setup
+Thread-Index: AQHVaMU8QUU7CWdh+U6FXoE9awxRVQ==
+Date:   Wed, 11 Sep 2019 20:38:54 +0000
+Message-ID: <BYAPR04MB57497809CA89CFC73487A19486B10@BYAPR04MB5749.namprd04.prod.outlook.com>
+References: <20190911172021.5760-1-logang@deltatee.com>
+Accept-Language: en-US
+Content-Language: en-US
+X-MS-Has-Attach: 
+X-MS-TNEF-Correlator: 
+authentication-results: spf=none (sender IP is )
+ smtp.mailfrom=Chaitanya.Kulkarni@wdc.com; 
+x-originating-ip: [199.255.45.62]
+x-ms-publictraffictype: Email
+x-ms-office365-filtering-correlation-id: 0bde0c98-2741-4fbe-4ce9-08d736f80ff3
+x-ms-office365-filtering-ht: Tenant
+x-microsoft-antispam: BCL:0;PCL:0;RULEID:(2390118)(7020095)(4652040)(8989299)(4534185)(4627221)(201703031133081)(201702281549075)(8990200)(5600166)(711020)(4605104)(1401327)(4618075)(2017052603328)(7193020);SRVR:BYAPR04MB4870;
+x-ms-traffictypediagnostic: BYAPR04MB4870:
+x-microsoft-antispam-prvs: <BYAPR04MB487027229DE95A077825248086B10@BYAPR04MB4870.namprd04.prod.outlook.com>
+wdcipoutbound: EOP-TRUE
+x-ms-oob-tlc-oobclassifiers: OLM:1751;
+x-forefront-prvs: 0157DEB61B
+x-forefront-antispam-report: SFV:NSPM;SFS:(10019020)(4636009)(396003)(366004)(136003)(376002)(39860400002)(346002)(199004)(189003)(55016002)(71190400001)(2906002)(229853002)(76176011)(8936002)(6436002)(81156014)(2501003)(6506007)(81166006)(8676002)(102836004)(53546011)(478600001)(52536014)(66446008)(66066001)(66946007)(6116002)(9686003)(3846002)(64756008)(25786009)(66476007)(66556008)(76116006)(6246003)(5660300002)(74316002)(110136005)(476003)(305945005)(7696005)(316002)(4326008)(86362001)(14454004)(99286004)(71200400001)(4744005)(53936002)(26005)(2201001)(7736002)(446003)(33656002)(256004)(486006)(186003);DIR:OUT;SFP:1102;SCL:1;SRVR:BYAPR04MB4870;H:BYAPR04MB5749.namprd04.prod.outlook.com;FPR:;SPF:None;LANG:en;PTR:InfoNoRecords;A:1;MX:1;
+x-ms-exchange-senderadcheck: 1
+x-microsoft-antispam-message-info: DV33dCE28dSQhGWuPJQanIBVJK8z2+7shJHPK0YzZhmU4XS3aes1436fGhfv2Ae/4krrwRG067HUgdd1wtcCQ1fLOYoHs8Lfnp7DQs7UNu1NKdKSKc72UozZFYtI43KESyS+3trRUEkoihwMtlmHWCWMu0TAVktNbZ+VUPuVHs3q93FA8PkJxsDATSAMP0geore09eGFcjYm7fwwgmoqSG6dOEnY+0jO3qJEq05rMS7FrVlT68Xj57uoJKhFv2LIoXgMTgb6FZ6PXcf9vkDxM3TiGg/EDIMfYFtNhGitqhRdSkKb6bBjpkZndNQQYsvvgpxYG9pdaeq/pISvooMgUnpFDxoLltKnUA/PC1vE9vr1rnJbpIOhb1WtoXz6G2Y0/MzPO5UIIPqbvg9h8ugsu5oEfdKMPjYsj2nrVd8W/X8=
+x-ms-exchange-transport-forked: True
+Content-Type: text/plain; charset="us-ascii"
+Content-Transfer-Encoding: quoted-printable
 MIME-Version: 1.0
-In-Reply-To: <5D792758.2060706@redhat.com>
-Content-Type: text/plain; charset=utf-8
-Content-Transfer-Encoding: 7bit
-X-SES-Outgoing: 2019.09.11-54.240.4.15
-Feedback-ID: 1.eu-west-1.zKMZH6MF2g3oUhhjaE2f3oQ8IBjABPbvixQzV8APwT0=:AmazonSES
+X-OriginatorOrg: wdc.com
+X-MS-Exchange-CrossTenant-Network-Message-Id: 0bde0c98-2741-4fbe-4ce9-08d736f80ff3
+X-MS-Exchange-CrossTenant-originalarrivaltime: 11 Sep 2019 20:38:54.2527
+ (UTC)
+X-MS-Exchange-CrossTenant-fromentityheader: Hosted
+X-MS-Exchange-CrossTenant-id: b61c8803-16f3-4c35-9b17-6f65f441df86
+X-MS-Exchange-CrossTenant-mailboxtype: HOSTED
+X-MS-Exchange-CrossTenant-userprincipalname: DB6r6WsNpUvXUjIMdPwEln0oo8xDClToJdALJiYJNIaLfLjIIn79Yi/DlICIRuSyLMqX8QYO1wXLMbc84RaapqrkvZHMj1+xTX8poH947Wg=
+X-MS-Exchange-Transport-CrossTenantHeadersStamped: BYAPR04MB4870
 Sender: linux-block-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-On 11.09.2019 18:56 Mike Christie wrote:
-> On 09/11/2019 03:40 AM, Martin Raiber wrote:
->> On 10.09.2019 10:35 Damien Le Moal wrote:
->>> Mike,
->>>
->>> On 2019/09/09 19:26, Mike Christie wrote:
->>>> Forgot to cc linux-mm.
->>>>
->>>> On 09/09/2019 11:28 AM, Mike Christie wrote:
->>>>> There are several storage drivers like dm-multipath, iscsi, and nbd that
->>>>> have userspace components that can run in the IO path. For example,
->>>>> iscsi and nbd's userspace deamons may need to recreate a socket and/or
->>>>> send IO on it, and dm-multipath's daemon multipathd may need to send IO
->>>>> to figure out the state of paths and re-set them up.
->>>>>
->>>>> In the kernel these drivers have access to GFP_NOIO/GFP_NOFS and the
->>>>> memalloc_*_save/restore functions to control the allocation behavior,
->>>>> but for userspace we would end up hitting a allocation that ended up
->>>>> writing data back to the same device we are trying to allocate for.
->>>>>
->>>>> This patch allows the userspace deamon to set the PF_MEMALLOC* flags
->>>>> through procfs. It currently only supports PF_MEMALLOC_NOIO, but
->>>>> depending on what other drivers and userspace file systems need, for
->>>>> the final version I can add the other flags for that file or do a file
->>>>> per flag or just do a memalloc_noio file.
->>> Awesome. That probably will be the perfect solution for the problem we hit with
->>> tcmu-runner a while back (please see this thread:
->>> https://www.spinics.net/lists/linux-fsdevel/msg148912.html).
->>>
->>> I think we definitely need nofs as well for dealing with cases where the backend
->>> storage for the user daemon is a file.
->>>
->>> I will give this patch a try as soon as possible (I am traveling currently).
->>>
->>> Best regards.
->> I had issues with this as well, and work on this is appreciated! In my
->> case it is a loop block device on a fuse file system.
->> Setting PF_LESS_THROTTLE was the one that helped the most, though, so
->> add an option for that as well? I set this via prctl() for the thread
->> calling it (was easiest to add to).
->>
->> Sorry, I have no idea about the current rationale, but wouldn't it be
->> better to have a way to mask a set of block devices/file systems not to
->> write-back to in a thread. So in my case I'd specify that the fuse
->> daemon threads cannot write-back to the file system and loop device
->> running on top of the fuse file system, while all other block
->> devices/file systems can be write-back to (causing less swapping/OOM
->> issues).
-> I'm not sure I understood you.
->
-> The storage daemons I mentioned normally kick off N threads per M
-> devices. The threads handle duties like IO and error handling for those
-> devices. Those threads would set the flag, so those IO/error-handler
-> related operations do not end up writing back to them. So it works
-> similar to how storage drivers work in the kernel where iscsi_tcp has an
-> xmit thread and that does memalloc_noreclaim_save. Only the threads for
-> those specific devices being would set the flag.
->
-> In your case, it sounds like you have a thread/threads that would
-> operate on multiple devices and some need the behavior and some do not.
-> Is that right?
-
-No, sounds the same as your case. As an example think of vdfuse (or
-qemu-nbd locally). You'd have something like
-
-ext4(a) <- loop <- fuse file system <- vdfuse <- disk.vdi container file
-<- ext4(b) <- block device
-
-If vdfuse threads cause writeback to ext4(a), you'd get the issue we
-have. Setting PF_LESS_THROTTLE and/or PF_MEMALLOC_NOIO mostly avoids
-this problem, but with only PF_LESS_THROTTLE there are still corner
-cases (I think if ext4(b) slows down suddenly) where it wedges itself
-and the side effect of setting PF_MEMALLOC_NOIO are being discussed...
-The best solution would be, I guess, to have a way for vdfuse to set
-something, such that write-back to ext4(a) isn't allowed from those
-threads, but write-back to ext4(b) (and all other block devices) is. But
-I only have a rough idea of how write-back works, so this is really only
-a guess.
-
+Looks good.=0A=
+=0A=
+Reviewed-by: Chaitanya Kulkarni <chaitanya.kulkarni@wdc.com>=0A=
+=0A=
+On 09/11/2019 10:20 AM, Logan Gunthorpe wrote:=0A=
+> A number of bug fixes have been submitted to the kernel to=0A=
+> fix bugs when a controller is removed immediately after it is=0A=
+> set up. This new test ensures this doesn't regress.=0A=
+>=0A=
+> Signed-off-by: Logan Gunthorpe<logang@deltatee.com>=0A=
+> Reviewed-by: Sagi Grimberg<sagi@grimberg.me>=0A=
+> ---=0A=
+>=0A=
+> Changes for v3:=0A=
+=0A=
