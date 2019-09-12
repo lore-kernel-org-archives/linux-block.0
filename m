@@ -2,146 +2,96 @@ Return-Path: <SRS0=MetK=XH=vger.kernel.org=linux-block-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-5.5 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
-	INCLUDES_PATCH,MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,USER_AGENT_SANE_1
-	autolearn=ham autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-2.5 required=3.0 tests=DKIM_SIGNED,DKIM_VALID,
+	HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,
+	USER_AGENT_SANE_1 autolearn=no autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 60E7EC5ACAE
-	for <linux-block@archiver.kernel.org>; Thu, 12 Sep 2019 10:08:09 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id EC07AC47404
+	for <linux-block@archiver.kernel.org>; Thu, 12 Sep 2019 13:12:36 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.kernel.org (Postfix) with ESMTP id 3FE4B20CC7
-	for <linux-block@archiver.kernel.org>; Thu, 12 Sep 2019 10:08:09 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id BE7D92084D
+	for <linux-block@archiver.kernel.org>; Thu, 12 Sep 2019 13:12:35 +0000 (UTC)
+Authentication-Results: mail.kernel.org;
+	dkim=pass (2048-bit key) header.d=kernel-dk.20150623.gappssmtp.com header.i=@kernel-dk.20150623.gappssmtp.com header.b="HnE6QibG"
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1730898AbfILKII (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Thu, 12 Sep 2019 06:08:08 -0400
-Received: from mx1.redhat.com ([209.132.183.28]:42216 "EHLO mx1.redhat.com"
-        rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-        id S1730454AbfILKII (ORCPT <rfc822;linux-block@vger.kernel.org>);
-        Thu, 12 Sep 2019 06:08:08 -0400
-Received: from smtp.corp.redhat.com (int-mx04.intmail.prod.int.phx2.redhat.com [10.5.11.14])
-        (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
-        (No client certificate requested)
-        by mx1.redhat.com (Postfix) with ESMTPS id 88F4181DEB;
-        Thu, 12 Sep 2019 10:08:07 +0000 (UTC)
-Received: from ming.t460p (ovpn-8-28.pek2.redhat.com [10.72.8.28])
-        by smtp.corp.redhat.com (Postfix) with ESMTPS id 819AF5D9CA;
-        Thu, 12 Sep 2019 10:08:00 +0000 (UTC)
-Date:   Thu, 12 Sep 2019 18:07:56 +0800
-From:   Ming Lei <ming.lei@redhat.com>
-To:     Yufen Yu <yuyufen@huawei.com>
-Cc:     axboe@kernel.dk, linux-block@vger.kernel.org, hch@infradead.org,
-        keith.busch@intel.com, tj@kernel.org, zhangxiaoxu5@huawei.com
-Subject: Re: [PATCH] block: fix null pointer dereference in
- blk_mq_rq_timed_out()
-Message-ID: <20190912100755.GB9897@ming.t460p>
-References: <20190907102450.40291-1-yuyufen@huawei.com>
- <20190912024618.GE2731@ming.t460p>
- <b3d7b459-5f31-d473-2508-20048119c1b2@huawei.com>
- <20190912041658.GA5020@ming.t460p>
- <d3549c6d-ca07-efa9-af15-7cee61ce5ff2@huawei.com>
+        id S1731783AbfILNMf (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Thu, 12 Sep 2019 09:12:35 -0400
+Received: from mail-pg1-f196.google.com ([209.85.215.196]:33600 "EHLO
+        mail-pg1-f196.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S1731760AbfILNMe (ORCPT
+        <rfc822;linux-block@vger.kernel.org>);
+        Thu, 12 Sep 2019 09:12:34 -0400
+Received: by mail-pg1-f196.google.com with SMTP id n190so13500923pgn.0
+        for <linux-block@vger.kernel.org>; Thu, 12 Sep 2019 06:12:33 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=kernel-dk.20150623.gappssmtp.com; s=20150623;
+        h=subject:to:cc:references:from:message-id:date:user-agent
+         :mime-version:in-reply-to:content-language:content-transfer-encoding;
+        bh=eDPbVXqU+y+RmPn4/ZLvHXxFmtHPu9FG57Z6VOzUMvY=;
+        b=HnE6QibGc8QbXvgR7z4lNSDL09+NmGKGy1fRXULhjvG0xbmEdafAJkCDi0302zxTwt
+         qBPwDfRYcQB7pUUuEdBpFzdGMwGnMo4BwjofoqTRT2+qK7/5cCDO40UvT4ULFlUtOzWU
+         z5aajg2c+ulNJSH3EudIAIulziEwBpZphkcXIGpikHIGOXTeYK99PrDs43X1xUeKmjc4
+         vRVE60SnTPpsjQrfNkCwMLRLNhm38Eu7xU6Qo/5AeJ+CJE1ve6p8qsbZ7Tmna+66s5N6
+         cbui7ZzWXNWy377MilRPai/306n+XaMMeck8va3DiwUhi3Vh+LNL9HVtJocbHL8yNGyV
+         HGcA==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20161025;
+        h=x-gm-message-state:subject:to:cc:references:from:message-id:date
+         :user-agent:mime-version:in-reply-to:content-language
+         :content-transfer-encoding;
+        bh=eDPbVXqU+y+RmPn4/ZLvHXxFmtHPu9FG57Z6VOzUMvY=;
+        b=G0BbgAi+PYqhuGaxtDdMK6p7datXKI73aRAPQH9Ma55rON2GQjHbLNrBqAIQLcGc6e
+         4uzIjiZcys9kd4EacKA3mRu5tfKuYHgLqNzof7KHtFG8L+Uww4eUUDZzNbpg/1WW9In2
+         7DZphgh0EXLuxZbaOH7DPsKoLeLrhSr9Kxcp34HYRTmKg/brIcoZ1u0TXJb3lvDM2YE+
+         ORdta3xXnkQEY7ix6bvoc6pHfhd2H+9qX8pSN09K+h2D2Nojoz99jayxn11uOiHHL6vv
+         P+WpJITgtQ6ysUppdKsmKJJdHH/X2WEf69WQ0jj92JEE3mJJ7CkEkvkzOIdG01sv36Hv
+         FuAQ==
+X-Gm-Message-State: APjAAAXT0ZWwuzSv7EVBZsdTpuPFANq7PHY/uVHF0yuQw7Dva8/RbOkT
+        xqMAZw18JkbQShR1BN9PjkOlbw==
+X-Google-Smtp-Source: APXvYqy5IRnkfN40k2/B7q313u2BRWeMvX80jlePX/MlMV1tGW/e5n3Y99EGn/AhhLeBvPK61j8c0Q==
+X-Received: by 2002:a62:2787:: with SMTP id n129mr10490181pfn.45.1568293952678;
+        Thu, 12 Sep 2019 06:12:32 -0700 (PDT)
+Received: from ?IPv6:2600:380:4b2e:3b64:29ff:2f14:b019:100? ([2600:380:4b2e:3b64:29ff:2f14:b019:100])
+        by smtp.gmail.com with ESMTPSA id m13sm24678837pgn.57.2019.09.12.06.12.29
+        (version=TLS1_2 cipher=ECDHE-RSA-AES128-GCM-SHA256 bits=128/128);
+        Thu, 12 Sep 2019 06:12:31 -0700 (PDT)
+Subject: Re: [PATCH v2] fixup null q->dev checking in both block and scsi
+ layer
+To:     Stanley Chu <stanley.chu@mediatek.com>, linux-scsi@vger.kernel.org,
+        linux-block@vger.kernel.org, martin.petersen@oracle.com,
+        jejb@linux.ibm.com, matthias.bgg@gmail.com
+Cc:     linux-mediatek@lists.infradead.org,
+        linux-arm-kernel@lists.infradead.org, kuohong.wang@mediatek.com,
+        peter.wang@mediatek.com, chun-hung.wu@mediatek.com,
+        andy.teng@mediatek.com
+References: <1568277328-4597-1-git-send-email-stanley.chu@mediatek.com>
+From:   Jens Axboe <axboe@kernel.dk>
+Message-ID: <2a285805-cdf3-fe7a-0d1a-9f53f821d025@kernel.dk>
+Date:   Thu, 12 Sep 2019 07:12:28 -0600
+User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:60.0) Gecko/20100101
+ Thunderbird/60.8.0
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <d3549c6d-ca07-efa9-af15-7cee61ce5ff2@huawei.com>
-User-Agent: Mutt/1.11.3 (2019-02-01)
-X-Scanned-By: MIMEDefang 2.79 on 10.5.11.14
-X-Greylist: Sender IP whitelisted, not delayed by milter-greylist-4.5.16 (mx1.redhat.com [10.5.110.25]); Thu, 12 Sep 2019 10:08:07 +0000 (UTC)
+In-Reply-To: <1568277328-4597-1-git-send-email-stanley.chu@mediatek.com>
+Content-Type: text/plain; charset=utf-8
+Content-Language: en-US
+Content-Transfer-Encoding: 7bit
 Sender: linux-block-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-On Thu, Sep 12, 2019 at 04:49:15PM +0800, Yufen Yu wrote:
+On 9/12/19 2:35 AM, Stanley Chu wrote:
+> Some devices may skip blk_pm_runtime_init() and have null pointer in
+> its request_queue->dev. For example, SCSI devices of UFS Well-Known
+> LUNs.
 > 
-> 
-> On 2019/9/12 12:16, Ming Lei wrote:
-> > On Thu, Sep 12, 2019 at 11:29:18AM +0800, Yufen Yu wrote:
-> > > 
-> > > On 2019/9/12 10:46, Ming Lei wrote:
-> > > > On Sat, Sep 07, 2019 at 06:24:50PM +0800, Yufen Yu wrote:
-> > > > > There is a race condition between timeout check and completion for
-> > > > > flush request as follow:
-> > > > > 
-> > > > > timeout_work    issue flush      issue flush
-> > > > >                   blk_insert_flush
-> > > > >                                    blk_insert_flush
-> > > > > blk_mq_timeout_work
-> > > > >                   blk_kick_flush
-> > > > > 
-> > > > > blk_mq_queue_tag_busy_iter
-> > > > > blk_mq_check_expired(flush_rq)
-> > > > > 
-> > > > >                   __blk_mq_end_request
-> > > > >                  flush_end_io
-> > > > >                  blk_kick_flush
-> > > > >                  blk_rq_init(flush_rq)
-> > > > >                  memset(flush_rq, 0)
-> > > > Not see there is memset(flush_rq, 0) in block/blk-flush.c
-> > > Call path as follow:
-> > > 
-> > > blk_kick_flush
-> > >      blk_rq_init
-> > >          memset(rq, 0, sizeof(*rq));
-> > Looks I miss this one in blk_rq_init(), sorry for that.
-> > 
-> > Given there are only two users of blk_rq_init(), one simple fix could be
-> > not clearing queue in blk_rq_init(), something like below?
-> > 
-> > diff --git a/block/blk-core.c b/block/blk-core.c
-> > index 77807a5d7f9e..25e6a045c821 100644
-> > --- a/block/blk-core.c
-> > +++ b/block/blk-core.c
-> > @@ -107,7 +107,9 @@ EXPORT_SYMBOL_GPL(blk_queue_flag_test_and_set);
-> >   void blk_rq_init(struct request_queue *q, struct request *rq)
-> >   {
-> > -	memset(rq, 0, sizeof(*rq));
-> > +	const int offset = offsetof(struct request, q);
-> > +
-> > +	memset((void *)rq + offset, 0, sizeof(*rq) - offset);
-> >   	INIT_LIST_HEAD(&rq->queuelist);
-> >   	rq->q = q;
-> > diff --git a/include/linux/blkdev.h b/include/linux/blkdev.h
-> > index 1ac790178787..382e71b8787d 100644
-> > --- a/include/linux/blkdev.h
-> > +++ b/include/linux/blkdev.h
-> > @@ -130,7 +130,7 @@ enum mq_rq_state {
-> >    * especially blk_mq_rq_ctx_init() to take care of the added fields.
-> >    */
-> >   struct request {
-> > -	struct request_queue *q;
-> > +	struct request_queue *q;	/* Must be the 1st field */
-> >   	struct blk_mq_ctx *mq_ctx;
-> >   	struct blk_mq_hw_ctx *mq_hctx;
-> 
-> Not set req->q as '0' can just avoid BUG_ON for NULL pointer deference.
-> 
-> However, the root problem is that 'flush_rq' have been reused while
-> timeout function handle it currently. That means mq_ops->timeout() may
-> access old values remained by the last flush request and make the wrong
-> decision.
-> 
-> Take the race condition in the patch as an example.
-> 
-> blk_mq_check_expired
->     blk_mq_rq_timed_out
->         req->q->mq_ops->timeout  // Driver timeout handle may read old data
->     refcount_dec_and_test(&rq)
->     __blk_mq_free_request   // If rq have been reset has '1' in
-> blk_rq_init(), it will be free here.
-> 
-> So, I think we should solve this problem completely. Just like normal
-> request,
-> we can prevent flush request to call end_io when timeout handle the request.
+> Currently the null pointer is checked by the user of
+> blk_set_runtime_active(), i.e., scsi_dev_type_resume(). It is better
+> to check it by blk_set_runtime_active() itself instead of by its
+> users.
 
-Seems it isn't specific for 'flush_rq', and it should be one generic issue
-for any request which implements .end_io.
+Applied, thanks.
 
-For requests without defining .end_io, rq->ref is applied for protecting
-its lifetime. However, rq->end_io() is still called even if rq->ref doesn't
-drop to zero.
+-- 
+Jens Axboe
 
-If the above is correct, we need to let rq->ref to cover rq->end_io().
-
-
-Thanks,
-Ming
