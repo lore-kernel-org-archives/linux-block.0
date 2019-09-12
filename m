@@ -2,167 +2,118 @@ Return-Path: <SRS0=MetK=XH=vger.kernel.org=linux-block-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-2.5 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
-	MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED,USER_AGENT_SANE_1
-	autolearn=no autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-13.8 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
+	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PULL_REQUEST,MAILING_LIST_MULTI,
+	MENTIONS_GIT_HOSTING,SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED,USER_AGENT_GIT
+	autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 7D44FC4CEC6
-	for <linux-block@archiver.kernel.org>; Thu, 12 Sep 2019 16:27:33 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 03538C4CEC5
+	for <linux-block@archiver.kernel.org>; Thu, 12 Sep 2019 16:41:55 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.kernel.org (Postfix) with ESMTP id 505DA20692
-	for <linux-block@archiver.kernel.org>; Thu, 12 Sep 2019 16:27:33 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id C728D2084D
+	for <linux-block@archiver.kernel.org>; Thu, 12 Sep 2019 16:41:54 +0000 (UTC)
+Authentication-Results: mail.kernel.org;
+	dkim=fail reason="signature verification failed" (2048-bit key) header.d=infradead.org header.i=@infradead.org header.b="gL37jush"
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1733093AbfILQ1c (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Thu, 12 Sep 2019 12:27:32 -0400
-Received: from mx1.redhat.com ([209.132.183.28]:42684 "EHLO mx1.redhat.com"
-        rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-        id S1730609AbfILQ1c (ORCPT <rfc822;linux-block@vger.kernel.org>);
-        Thu, 12 Sep 2019 12:27:32 -0400
-Received: from smtp.corp.redhat.com (int-mx05.intmail.prod.int.phx2.redhat.com [10.5.11.15])
-        (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
-        (No client certificate requested)
-        by mx1.redhat.com (Postfix) with ESMTPS id 58059C059B7A;
-        Thu, 12 Sep 2019 16:27:32 +0000 (UTC)
-Received: from [10.10.125.97] (ovpn-125-97.rdu2.redhat.com [10.10.125.97])
-        by smtp.corp.redhat.com (Postfix) with ESMTP id 9CCD55D704;
-        Thu, 12 Sep 2019 16:27:31 +0000 (UTC)
-Subject: Re: [RFC PATCH] Add proc interface to set PF_MEMALLOC flags
-To:     Martin Raiber <martin@urbackup.org>,
-        "linux-kernel@vger.kernel.org" <linux-kernel@vger.kernel.org>,
-        "linux-scsi@vger.kernel.org" <linux-scsi@vger.kernel.org>,
-        "linux-block@vger.kernel.org" <linux-block@vger.kernel.org>,
-        Linux-MM <linux-mm@kvack.org>
-References: <20190909162804.5694-1-mchristi@redhat.com>
- <5D76995B.1010507@redhat.com>
- <BYAPR04MB5816DABF3C5071D13D823990E7B60@BYAPR04MB5816.namprd04.prod.outlook.com>
- <0102016d1f7af966-334f093b-2a62-4baa-9678-8d90d5fba6d9-000000@eu-west-1.amazonses.com>
- <5D792758.2060706@redhat.com>
- <0102016d21c61ec3-4e148e0f-24f5-4e00-a74e-6249653167c7-000000@eu-west-1.amazonses.com>
- <5D7A70B0.9010407@redhat.com>
-From:   Mike Christie <mchristi@redhat.com>
-Message-ID: <5D7A71F3.7040700@redhat.com>
-Date:   Thu, 12 Sep 2019 11:27:31 -0500
-User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:38.0) Gecko/20100101
- Thunderbird/38.6.0
-MIME-Version: 1.0
-In-Reply-To: <5D7A70B0.9010407@redhat.com>
-Content-Type: text/plain; charset=utf-8
-Content-Transfer-Encoding: 7bit
-X-Scanned-By: MIMEDefang 2.79 on 10.5.11.15
-X-Greylist: Sender IP whitelisted, not delayed by milter-greylist-4.5.16 (mx1.redhat.com [10.5.110.32]); Thu, 12 Sep 2019 16:27:32 +0000 (UTC)
+        id S1726681AbfILQly (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Thu, 12 Sep 2019 12:41:54 -0400
+Received: from bombadil.infradead.org ([198.137.202.133]:56666 "EHLO
+        bombadil.infradead.org" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S1725972AbfILQlx (ORCPT
+        <rfc822;linux-block@vger.kernel.org>);
+        Thu, 12 Sep 2019 12:41:53 -0400
+DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed;
+        d=infradead.org; s=bombadil.20170209; h=Message-Id:Date:Subject:Cc:To:From:
+        Sender:Reply-To:MIME-Version:Content-Type:Content-Transfer-Encoding:
+        Content-ID:Content-Description:Resent-Date:Resent-From:Resent-Sender:
+        Resent-To:Resent-Cc:Resent-Message-ID:In-Reply-To:References:List-Id:
+        List-Help:List-Unsubscribe:List-Subscribe:List-Post:List-Owner:List-Archive;
+         bh=GXaYUC4tstRsXbF/7GL9yMO7jPei8IUh8BBoF7swSR4=; b=gL37jushVLmbm5U/j0JSPKVvV
+        n7w+yAKZEf28w0wdR/leAcvOuixgKp8P28OK8wOnDY5QNqELzz7dalG3/4OyEU2Nr2RO7XiMWPgfH
+        Tuc1yyVVyrt90im9Mo4pgP8ozzugNbHpFMEl+FPFvxueNzosAYoqmiiReh0wUvWFWXKdvy9MzbSzl
+        dF0AUXzOETVDBLG8zujxsHlBfr/1uFQXTSWMRo0zlQIrdLUrEeSTV4b/yW5GxrW+yRxmkowth1AR+
+        rXEvDFNzirAbcdQo7d8CvysE5KDYHUHu6ECASx2BlE8F3QC+gCrWZxPlmhgfkbzS/I5GD58yFgCU2
+        VxzusSbkA==;
+Received: from [2601:647:4800:973f:c36:579b:9814:69b7] (helo=bombadil.infradead.org)
+        by bombadil.infradead.org with esmtpsa (Exim 4.92.2 #3 (Red Hat Linux))
+        id 1i8SAK-0006GY-LM; Thu, 12 Sep 2019 16:41:52 +0000
+From:   Sagi Grimberg <sagi@grimberg.me>
+To:     Jens Axboe <axboe@kernel.dk>
+Cc:     linux-nvme@lists.infradead.org, linux-block@vger.kernel.org,
+        Christoph Hellwig <hch@lst.de>,
+        Keith Busch <keith.busch@intel.com>
+Subject: [GIT PULL] second round of nvme updates for 5.4
+Date:   Thu, 12 Sep 2019 09:41:51 -0700
+Message-Id: <20190912164151.7788-1-sagi@grimberg.me>
+X-Mailer: git-send-email 2.17.1
 Sender: linux-block-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-On 09/12/2019 11:22 AM, Mike Christie wrote:
-> On 09/11/2019 02:21 PM, Martin Raiber wrote:
->> On 11.09.2019 18:56 Mike Christie wrote:
->>> On 09/11/2019 03:40 AM, Martin Raiber wrote:
->>>> On 10.09.2019 10:35 Damien Le Moal wrote:
->>>>> Mike,
->>>>>
->>>>> On 2019/09/09 19:26, Mike Christie wrote:
->>>>>> Forgot to cc linux-mm.
->>>>>>
->>>>>> On 09/09/2019 11:28 AM, Mike Christie wrote:
->>>>>>> There are several storage drivers like dm-multipath, iscsi, and nbd that
->>>>>>> have userspace components that can run in the IO path. For example,
->>>>>>> iscsi and nbd's userspace deamons may need to recreate a socket and/or
->>>>>>> send IO on it, and dm-multipath's daemon multipathd may need to send IO
->>>>>>> to figure out the state of paths and re-set them up.
->>>>>>>
->>>>>>> In the kernel these drivers have access to GFP_NOIO/GFP_NOFS and the
->>>>>>> memalloc_*_save/restore functions to control the allocation behavior,
->>>>>>> but for userspace we would end up hitting a allocation that ended up
->>>>>>> writing data back to the same device we are trying to allocate for.
->>>>>>>
->>>>>>> This patch allows the userspace deamon to set the PF_MEMALLOC* flags
->>>>>>> through procfs. It currently only supports PF_MEMALLOC_NOIO, but
->>>>>>> depending on what other drivers and userspace file systems need, for
->>>>>>> the final version I can add the other flags for that file or do a file
->>>>>>> per flag or just do a memalloc_noio file.
->>>>> Awesome. That probably will be the perfect solution for the problem we hit with
->>>>> tcmu-runner a while back (please see this thread:
->>>>> https://www.spinics.net/lists/linux-fsdevel/msg148912.html).
->>>>>
->>>>> I think we definitely need nofs as well for dealing with cases where the backend
->>>>> storage for the user daemon is a file.
->>>>>
->>>>> I will give this patch a try as soon as possible (I am traveling currently).
->>>>>
->>>>> Best regards.
->>>> I had issues with this as well, and work on this is appreciated! In my
->>>> case it is a loop block device on a fuse file system.
->>>> Setting PF_LESS_THROTTLE was the one that helped the most, though, so
->>>> add an option for that as well? I set this via prctl() for the thread
->>>> calling it (was easiest to add to).
->>>>
->>>> Sorry, I have no idea about the current rationale, but wouldn't it be
->>>> better to have a way to mask a set of block devices/file systems not to
->>>> write-back to in a thread. So in my case I'd specify that the fuse
->>>> daemon threads cannot write-back to the file system and loop device
->>>> running on top of the fuse file system, while all other block
->>>> devices/file systems can be write-back to (causing less swapping/OOM
->>>> issues).
->>> I'm not sure I understood you.
->>>
->>> The storage daemons I mentioned normally kick off N threads per M
->>> devices. The threads handle duties like IO and error handling for those
->>> devices. Those threads would set the flag, so those IO/error-handler
->>> related operations do not end up writing back to them. So it works
->>> similar to how storage drivers work in the kernel where iscsi_tcp has an
->>> xmit thread and that does memalloc_noreclaim_save. Only the threads for
->>> those specific devices being would set the flag.
->>>
->>> In your case, it sounds like you have a thread/threads that would
->>> operate on multiple devices and some need the behavior and some do not.
->>> Is that right?
->>
->> No, sounds the same as your case. As an example think of vdfuse (or
->> qemu-nbd locally). You'd have something like
->>
->> ext4(a) <- loop <- fuse file system <- vdfuse <- disk.vdi container file
->> <- ext4(b) <- block device
->>
->> If vdfuse threads cause writeback to ext4(a), you'd get the issue we
->> have. Setting PF_LESS_THROTTLE and/or PF_MEMALLOC_NOIO mostly avoids
->> this problem, but with only PF_LESS_THROTTLE there are still corner
->> cases (I think if ext4(b) slows down suddenly) where it wedges itself
->> and the side effect of setting PF_MEMALLOC_NOIO are being discussed...
->> The best solution would be, I guess, to have a way for vdfuse to set
->> something, such that write-back to ext4(a) isn't allowed from those
->> threads, but write-back to ext4(b) (and all other block devices) is. But
->> I only have a rough idea of how write-back works, so this is really only
->> a guess.
-> 
-> I see now.
-> 
-> Initially, would it be ok to keep it simple and keep the existing kernel
-> behavior? For your example, is the PF_MEMALLOC_NOIO use in loop today
+Hey Jens,
 
-Or do it in two stages.
+This is the second batch of nvme updates for 5.4.
 
-1. For devices like mine, we just use the existing behavior where it
-gets set for the thread and is for all devices. We know from iscsi/nbd
-it is already ok from their kernel use. I do not need to add any extra
-locking/complexity to the block, vm, fs code.
+Highlights includes:
+- controller reset and namespace scan races fixes
+- nvme discovery log change uevent support
+- naming improvements from Keith
+- multiple discovery controllers reject fix from James
+- some regular cleanups from various people
 
-2. We can then add the ability to pass in a mount or upper layer block
-device for setups like yours where we already know the topology and it
-isn't going to change.
+The following changes since commit 0a67b5a926e63ff5492c3c675eab5900580d056d:
 
+  block: fix race between switching elevator and removing queues (2019-09-12 07:13:22 -0600)
 
-> causing a lot of swap/oom issues? For iscsi_tcp and nbd their memalloc
-> and GFP_NOIO use is not.
-> 
-> The problem for the storage driver daemons I mentioned in the patch is
-> that they are at the bottom of the stack and they do not know what is
-> going to be added above them plus it can change, so we will have to walk
-> the storage device stack while IO is running and allocations are trying
-> to execute. It looks like I will end up having to insert extra
-> locking/refcounts into multiple layers, and I am not sure if the extra
-> complexity is going to be worth it if we are not seeing problems from
-> existing kernel users.
-> 
+are available in the Git repository at:
 
+  git://git.infradead.org/nvme.git nvme-5.4 
+
+for you to fetch changes up to 5f8badbcbeac298a77ee634a10a375f3e66923f9:
+
+  nvmet: fix a wrong error status returned in error log page (2019-09-12 08:50:46 -0700)
+
+----------------------------------------------------------------
+Amit (1):
+      nvmet: fix a wrong error status returned in error log page
+
+Colin Ian King (1):
+      nvme: tcp: remove redundant assignment to variable ret
+
+Edmund Nadolski (1):
+      nvme: include admin_q sync with nvme_sync_queues
+
+Israel Rukshin (1):
+      nvme: Remove redundant assignment of cq vector
+
+James Smart (2):
+      nvme-fc: Fail transport errors with NVME_SC_HOST_PATH
+      nvme: Treat discovery subsystems as unique subsystems
+
+Keith Busch (1):
+      nvme: Assign subsys instance from first ctrl
+
+Markus Elfring (1):
+      nvmet: Use PTR_ERR_OR_ZERO() in nvmet_init_discovery()
+
+Sagi Grimberg (10):
+      nvme: fail cancelled commands with NVME_SC_HOST_PATH_ERROR
+      nvme-tcp: fail command with NVME_SC_HOST_PATH_ERROR send failed
+      nvme: pass status to nvme_error_status
+      nvme: make nvme_identify_ns propagate errors back
+      nvme: make nvme_report_ns_ids propagate error back
+      nvme: fix ns removal hang when failing to revalidate due to a transient error
+      nvme-fabrics: allow discovery subsystems accept a kato
+      nvme: enable aen regardless of the presence of I/O queues
+      nvme: add uevent variables for controller devices
+      nvme: send discovery log page change events to userspace
+
+ drivers/nvme/host/core.c        | 158 +++++++++++++++++++++++++++++-----------
+ drivers/nvme/host/fabrics.c     |  12 +--
+ drivers/nvme/host/fc.c          |  37 ++++++++--
+ drivers/nvme/host/pci.c         |   1 -
+ drivers/nvme/host/tcp.c         |   4 +-
+ drivers/nvme/target/admin-cmd.c |   8 +-
+ drivers/nvme/target/discovery.c |   4 +-
+ 7 files changed, 153 insertions(+), 71 deletions(-)
