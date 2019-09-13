@@ -7,83 +7,77 @@ X-Spam-Status: No, score=-1.1 required=3.0 tests=DKIMWL_WL_HIGH,DKIM_SIGNED,
 	SPF_HELO_NONE,SPF_PASS,UNPARSEABLE_RELAY autolearn=no autolearn_force=no
 	version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 075B4C4CEC5
-	for <linux-block@archiver.kernel.org>; Fri, 13 Sep 2019 22:20:58 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 886F8C49ED7
+	for <linux-block@archiver.kernel.org>; Fri, 13 Sep 2019 22:24:36 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.kernel.org (Postfix) with ESMTP id D27C5208C2
-	for <linux-block@archiver.kernel.org>; Fri, 13 Sep 2019 22:20:57 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id 5AF3D206A5
+	for <linux-block@archiver.kernel.org>; Fri, 13 Sep 2019 22:24:36 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=pass (2048-bit key) header.d=oracle.com header.i=@oracle.com header.b="bbete2sn"
+	dkim=pass (2048-bit key) header.d=oracle.com header.i=@oracle.com header.b="birHyDiC"
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S2404023AbfIMWU5 (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Fri, 13 Sep 2019 18:20:57 -0400
-Received: from aserp2120.oracle.com ([141.146.126.78]:58370 "EHLO
-        aserp2120.oracle.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S2404021AbfIMWU5 (ORCPT
+        id S2404008AbfIMWYf (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Fri, 13 Sep 2019 18:24:35 -0400
+Received: from userp2130.oracle.com ([156.151.31.86]:37670 "EHLO
+        userp2130.oracle.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S2403866AbfIMWYf (ORCPT
         <rfc822;linux-block@vger.kernel.org>);
-        Fri, 13 Sep 2019 18:20:57 -0400
-Received: from pps.filterd (aserp2120.oracle.com [127.0.0.1])
-        by aserp2120.oracle.com (8.16.0.27/8.16.0.27) with SMTP id x8DM3pqS146692;
-        Fri, 13 Sep 2019 22:20:32 GMT
+        Fri, 13 Sep 2019 18:24:35 -0400
+Received: from pps.filterd (userp2130.oracle.com [127.0.0.1])
+        by userp2130.oracle.com (8.16.0.27/8.16.0.27) with SMTP id x8DMNuw4019710;
+        Fri, 13 Sep 2019 22:23:56 GMT
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=oracle.com; h=to : cc : subject :
  from : references : date : in-reply-to : message-id : mime-version :
  content-type; s=corp-2019-08-05;
- bh=I7MG1IhMgHYPqdXB/W6w8aJgPGeRPrEsbTf678ZbsSs=;
- b=bbete2snAIuAEXVRzrpa5LJ4U25cuYg4PsS+prUAPraZy2nAdsALqmxwPIMrkrVqHULD
- XhRSUThM/kl6RefPJs9IMifdNFriGx4zvOnrktAgTrtojtMUU4EF+Inu3xqTDopiHU0K
- wb1zqVv3Q+NfPBqJtkeMtQRh3DWAKjyQ3mkSJ0QuzN/ucv+sYqDL7/DZRU+UUh7kBb+s
- T9xAm2Dh1AzyqrrHtXoF43mrkYPMW08uczU/YbEGyO0jPzOaPkVeJc3QvOTpBmr7pSpb
- 8fakpzvLLKzad7La6vU5XNAhe2scGaE20u+Zu+df/MtSdxUxlJS+/r23glOeJDlvj0wz eA== 
-Received: from userp3030.oracle.com (userp3030.oracle.com [156.151.31.80])
-        by aserp2120.oracle.com with ESMTP id 2uytd379yb-1
+ bh=j+qSjnzoeoehEFbgI1btZmgDexEPjWIseINMumkV/3M=;
+ b=birHyDiClt+Gwk3Qqdgv2Y8ENibQFyP2kvc2AVng4MexiOsmPCBVKm5JqwxZNKOyTM9c
+ 9hF/SPxWgxKS6nad3o6UbxMnfWe3hrZRf4pqkWtQ6zuLOtfBFVdbCN8zEx+6ymSDgWmt
+ AMbP58r1UOTpBm8QwsOROaTcB4UqdJPzIgDgEGnLKmyoXE4KFLFWGsyvTtRfSUbDN75b
+ pS0gTH44JaFe6mb9UZY+BAoljSx+NTdwTio3kMNEVyBfItIsTPQrIi1/4Stk36RPhOXP
+ I055U/mahAbeSv71Tt+ypqMdzxTSiZI7rZNf4mUH5nAKyhzzJn54dbsNBvJgTdg28M9F Kg== 
+Received: from userp3020.oracle.com (userp3020.oracle.com [156.151.31.79])
+        by userp2130.oracle.com with ESMTP id 2uytd3q7c5-1
         (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=OK);
-        Fri, 13 Sep 2019 22:20:31 +0000
-Received: from pps.filterd (userp3030.oracle.com [127.0.0.1])
-        by userp3030.oracle.com (8.16.0.27/8.16.0.27) with SMTP id x8DM3egZ052747;
-        Fri, 13 Sep 2019 22:20:31 GMT
-Received: from aserv0121.oracle.com (aserv0121.oracle.com [141.146.126.235])
-        by userp3030.oracle.com with ESMTP id 2v0cwk4jet-1
+        Fri, 13 Sep 2019 22:23:56 +0000
+Received: from pps.filterd (userp3020.oracle.com [127.0.0.1])
+        by userp3020.oracle.com (8.16.0.27/8.16.0.27) with SMTP id x8DM4LdA138353;
+        Fri, 13 Sep 2019 22:21:56 GMT
+Received: from aserv0122.oracle.com (aserv0122.oracle.com [141.146.126.236])
+        by userp3020.oracle.com with ESMTP id 2uytdndthj-1
         (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=OK);
-        Fri, 13 Sep 2019 22:20:30 +0000
-Received: from abhmp0011.oracle.com (abhmp0011.oracle.com [141.146.116.17])
-        by aserv0121.oracle.com (8.14.4/8.13.8) with ESMTP id x8DMKQHV031508;
-        Fri, 13 Sep 2019 22:20:26 GMT
+        Fri, 13 Sep 2019 22:21:55 +0000
+Received: from abhmp0004.oracle.com (abhmp0004.oracle.com [141.146.116.10])
+        by aserv0122.oracle.com (8.14.4/8.14.4) with ESMTP id x8DMLtea010394;
+        Fri, 13 Sep 2019 22:21:55 GMT
 Received: from ca-mkp.ca.oracle.com (/10.159.214.123)
         by default (Oracle Beehive Gateway v4.0)
-        with ESMTP ; Fri, 13 Sep 2019 15:20:26 -0700
+        with ESMTP ; Fri, 13 Sep 2019 15:21:54 -0700
 To:     Max Gurtovoy <maxg@mellanox.com>
-Cc:     "Martin K. Petersen" <martin.petersen@oracle.com>,
-        <axboe@kernel.dk>, <keith.busch@intel.com>, <sagi@grimberg.me>,
-        <israelr@mellanox.com>, <linux-nvme@lists.infradead.org>,
-        <linux-block@vger.kernel.org>, <shlomin@mellanox.com>, <hch@lst.de>
-Subject: Re: [PATCH v4 1/3] block: centralize PI remapping logic to the block layer
+Cc:     linux-block@vger.kernel.org, axboe@kernel.dk,
+        martin.petersen@oracle.com, linux-nvme@lists.infradead.org,
+        keith.busch@intel.com, hch@lst.de, sagi@grimberg.me,
+        shlomin@mellanox.com, israelr@mellanox.com
+Subject: Re: [PATCH v5 1/2] block: use symbolic constants for t10_pi type
 From:   "Martin K. Petersen" <martin.petersen@oracle.com>
 Organization: Oracle Corporation
-References: <1567956405-5585-1-git-send-email-maxg@mellanox.com>
-        <yq1mufei4zk.fsf@oracle.com>
-        <d6cfe6e5-508a-f01c-267d-c8009fafc571@mellanox.com>
-        <yq1d0g8hoj5.fsf@oracle.com>
-        <61ab22ba-6f2d-3dbd-3991-693426db1133@mellanox.com>
-        <yq1k1affx8v.fsf@oracle.com>
-        <e59b2d78-4cf6-971a-1926-7969140d2a01@mellanox.com>
-Date:   Fri, 13 Sep 2019 18:20:23 -0400
-In-Reply-To: <e59b2d78-4cf6-971a-1926-7969140d2a01@mellanox.com> (Max
-        Gurtovoy's message of "Wed, 11 Sep 2019 12:12:08 +0300")
-Message-ID: <yq1lfurdejc.fsf@oracle.com>
+References: <1568215397-15496-1-git-send-email-maxg@mellanox.com>
+Date:   Fri, 13 Sep 2019 18:21:45 -0400
+In-Reply-To: <1568215397-15496-1-git-send-email-maxg@mellanox.com> (Max
+        Gurtovoy's message of "Wed, 11 Sep 2019 18:23:16 +0300")
+Message-ID: <yq1h85fdeh2.fsf@oracle.com>
 User-Agent: Gnus/5.13 (Gnus v5.13) Emacs/26.1.92 (gnu/linux)
 MIME-Version: 1.0
 Content-Type: text/plain
 X-Proofpoint-Virus-Version: vendor=nai engine=6000 definitions=9379 signatures=668685
 X-Proofpoint-Spam-Details: rule=notspam policy=default score=0 suspectscore=0 malwarescore=0
- phishscore=0 bulkscore=0 spamscore=0 mlxscore=0 mlxlogscore=915
+ phishscore=0 bulkscore=0 spamscore=0 mlxscore=0 mlxlogscore=752
  adultscore=0 classifier=spam adjust=0 reason=mlx scancount=1
  engine=8.0.1-1908290000 definitions=main-1909130218
 X-Proofpoint-Virus-Version: vendor=nai engine=6000 definitions=9379 signatures=668685
 X-Proofpoint-Spam-Details: rule=notspam policy=default score=0 priorityscore=1501 malwarescore=0
  suspectscore=0 phishscore=0 bulkscore=0 spamscore=0 clxscore=1015
- lowpriorityscore=0 mlxscore=0 impostorscore=0 mlxlogscore=981 adultscore=0
+ lowpriorityscore=0 mlxscore=0 impostorscore=0 mlxlogscore=835 adultscore=0
  classifier=spam adjust=0 reason=mlx scancount=1 engine=8.0.1-1908290000
- definitions=main-1909130218
+ definitions=main-1909130219
 Sender: linux-block-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
@@ -92,15 +86,7 @@ X-Mailing-List: linux-block@vger.kernel.org
 
 Max,
 
-> what about broken type 3 in the NVMe spec ?
->
-> I don't really know what is broken there but maybe we can avoid
-> supporting it for NVMe until it's fixed.
-
-The intent in NVMe was for Type 3 to work exactly like it does in
-SCSI. But the way the spec is worded it does not. So it is unclear
-whether implementors (if any) went with the SCSI compatible route or
-with what the NVMe spec actually says.
+Reviewed-by: Martin K. Petersen <martin.petersen@oracle.com>
 
 -- 
 Martin K. Petersen	Oracle Linux Engineering
