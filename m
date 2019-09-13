@@ -2,134 +2,127 @@ Return-Path: <SRS0=03jz=XI=vger.kernel.org=linux-block-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-4.0 required=3.0 tests=DKIM_SIGNED,DKIM_VALID,
-	HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,
-	SPF_PASS,URIBL_BLOCKED autolearn=no autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-1.1 required=3.0 tests=DKIM_SIGNED,DKIM_VALID,
+	DKIM_VALID_AU,HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SPF_HELO_NONE,
+	SPF_PASS autolearn=no autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 62745C4CEC5
-	for <linux-block@archiver.kernel.org>; Fri, 13 Sep 2019 23:02:29 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id D54CDC49ED7
+	for <linux-block@archiver.kernel.org>; Fri, 13 Sep 2019 23:41:14 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.kernel.org (Postfix) with ESMTP id 2F3B72089F
-	for <linux-block@archiver.kernel.org>; Fri, 13 Sep 2019 23:02:29 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id 707FF20692
+	for <linux-block@archiver.kernel.org>; Fri, 13 Sep 2019 23:41:14 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (2048-bit key) header.d=wdc.com header.i=@wdc.com header.b="oTv9/sMA";
-	dkim=pass (1024-bit key) header.d=sharedspace.onmicrosoft.com header.i=@sharedspace.onmicrosoft.com header.b="ExKAMp7U"
+	dkim=pass (2048-bit key) header.d=anarazel.de header.i=@anarazel.de header.b="G4RDVMp7";
+	dkim=pass (2048-bit key) header.d=messagingengine.com header.i=@messagingengine.com header.b="Yw5/OTHE"
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S2404236AbfIMXC2 (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Fri, 13 Sep 2019 19:02:28 -0400
-Received: from esa3.hgst.iphmx.com ([216.71.153.141]:54551 "EHLO
-        esa3.hgst.iphmx.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S2404024AbfIMXC2 (ORCPT
+        id S2390604AbfIMXlN (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Fri, 13 Sep 2019 19:41:13 -0400
+Received: from out1-smtp.messagingengine.com ([66.111.4.25]:54739 "EHLO
+        out1-smtp.messagingengine.com" rhost-flags-OK-OK-OK-OK)
+        by vger.kernel.org with ESMTP id S2390603AbfIMXlN (ORCPT
         <rfc822;linux-block@vger.kernel.org>);
-        Fri, 13 Sep 2019 19:02:28 -0400
-DKIM-Signature: v=1; a=rsa-sha256; c=simple/simple;
-  d=wdc.com; i=@wdc.com; q=dns/txt; s=dkim.wdc.com;
-  t=1568415748; x=1599951748;
-  h=from:to:cc:subject:date:message-id:references:
-   content-transfer-encoding:mime-version;
-  bh=4mIhv7wcRoD+NQUuBVBR4EiECmhztDEHr8YMlKctSwQ=;
-  b=oTv9/sMA/2fAcBRh7Yiukwk8IOCtNF8PvvJxNpE3ih4zbD9HLOaALayW
-   8SZtVVKGWqUOST++1wXRtnSgtFAj4AC+ptRxRaUQjVOeopBr9ur5gl3HV
-   JXkuqyNBpTcVrpNb8z7BebXrL+HREJMtVhDYPdawMzqU9+hhDG/L/Oa46
-   O5FBWl/3wZedWYoDUZMpjcTIDonb2VgVDuVKqN6D5toK7yYnqCERNB54Q
-   dyaKvu/wXpJbMkHORCR7FsDsppUw6G5h0rkFWVYfUw1I7N0wsRNdyweAP
-   FWjl4nrzp1xBrTrtVlXITG4OWJMxcM4SGNlwqmbVhsLXuh1mmpZ9rpPrC
-   w==;
-IronPort-SDR: WQ4Np73b79MHJjSk7oQPnYqPSm/dCvV0lDAZT15lV7ZDZ28wan+QJjDh7fNpx0old1UUvnwQFX
- JuZ59zEHPh2R8gstk+YpV0BmTgAqzOAeIEipUH4eiGkD5BYnYXCi1Cww020CiyhsAbtqBlfEr8
- zd2vci66ZrsiaDKwQemq+KAI9XKRiHis9CENJSNlZnAeZWNCT6dba6ey3Mc1JqtxNiZ4QyOAyw
- O5Ov/9501kGUpQYZ3uhVCfvTvO9LQFcvvjbrWMpfYN+pM4PASDT9nbLULAxECnx9e1LSMz+KGs
- dyE=
-X-IronPort-AV: E=Sophos;i="5.64,501,1559491200"; 
-   d="scan'208";a="122736842"
-Received: from mail-dm3nam05lp2058.outbound.protection.outlook.com (HELO NAM05-DM3-obe.outbound.protection.outlook.com) ([104.47.49.58])
-  by ob1.hgst.iphmx.com with ESMTP; 14 Sep 2019 07:02:16 +0800
-ARC-Seal: i=1; a=rsa-sha256; s=arcselector9901; d=microsoft.com; cv=none;
- b=Hd/zoHINrjENjT+uGpk1qZsoaWWzirdd+IK4aEi6ovRh9yuhOBpIlSDMB4TbMb/2nhyFOBCPz8rH9eKtrUEhGbxY8mBabDQ9cmVgJTCa1XwPcGLpWbka5s+bRzBO4rUWwgJzBXlvXqrL24eL5SVTun/OY2FHlnqn4GMOXD4ngrUriBovfe6MFIQPLsQcfKM2KZDwzM71isgKb9Nx5LFcS6s491D/4j4qkpvwY0M/3Vo8gCVS+f+dOl8gOSVp3lgLiHADXWg0uJ6XuEMBse3sDremNbFAn5zRhl91unLHUE6NOcEBKOMgrXfC46I5tQ4seS6KM7ronm+UsennqWboAQ==
-ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com;
- s=arcselector9901;
- h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
- bh=4mIhv7wcRoD+NQUuBVBR4EiECmhztDEHr8YMlKctSwQ=;
- b=GRSxWak7ZusqftMqB+wnAt4/A6KPM0GKhKHeoyj3p5bUH+XSzyBTGgUD5XbaZopxq9p5jnRlNSLGuI+ualbEa8R1Mgvx6FFOt9O4YXfpLdngVripJlWg5c/8eFmJV0v1DLVw+Ihs4EiUdcyoJE/NZka5S821JWRN3DLdjlstp5VH9Dz6K3o6u4Y0Par2yCHKzbiq2lAv0rx0yfy5tNA71Wa6QE68zLKAP3sdiCra8905cLgELNA4rXU91tcx8XDv1CYsAKkXPH2SRs1aCZ/cLC827Xq1zGDcgawK+oSnUT7AoCz10dpRHS4Rnc2F1EGQq3Zi9ozIzjJBdZzn/O9SmA==
-ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass
- smtp.mailfrom=wdc.com; dmarc=pass action=none header.from=wdc.com; dkim=pass
- header.d=wdc.com; arc=none
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
- d=sharedspace.onmicrosoft.com; s=selector2-sharedspace-onmicrosoft-com;
- h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
- bh=4mIhv7wcRoD+NQUuBVBR4EiECmhztDEHr8YMlKctSwQ=;
- b=ExKAMp7UMwAxGxPauBBG0J/AXlmJLjvvOv19CvFNSoiA7AvRSDMaJxVZDbdGaZY9HiDWwq9wfVTTvSvw+/hHHqCoJTIzk8oCCd/1TPsXTDKT87icV0k83o6ZVlafgN2sQbzj7IrCLGUkQHqUujG92wC7YrZv3Hf748o409BJIMM=
-Received: from BYAPR04MB5749.namprd04.prod.outlook.com (20.179.58.26) by
- BYAPR04MB5109.namprd04.prod.outlook.com (52.135.233.223) with Microsoft SMTP
- Server (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
- 15.20.2263.17; Fri, 13 Sep 2019 23:02:14 +0000
-Received: from BYAPR04MB5749.namprd04.prod.outlook.com
- ([fe80::6169:680:44fc:965d]) by BYAPR04MB5749.namprd04.prod.outlook.com
- ([fe80::6169:680:44fc:965d%6]) with mapi id 15.20.2263.018; Fri, 13 Sep 2019
- 23:02:14 +0000
-From:   Chaitanya Kulkarni <Chaitanya.Kulkarni@wdc.com>
-To:     Bart Van Assche <bvanassche@acm.org>, Jens Axboe <axboe@kernel.dk>
-CC:     "linux-block@vger.kernel.org" <linux-block@vger.kernel.org>,
-        Christoph Hellwig <hch@lst.de>,
-        Johannes Thumshirn <jthumshirn@suse.de>,
-        Christoph Hellwig <hch@infradead.org>,
-        Ming Lei <ming.lei@redhat.com>, Hannes Reinecke <hare@suse.com>
-Subject: Re: [PATCH v2 2/5] block: Document the bio splitting functions
-Thread-Topic: [PATCH v2 2/5] block: Document the bio splitting functions
-Thread-Index: AQHVSLucVzVEov8uFkWSoTjYwgK01g==
-Date:   Fri, 13 Sep 2019 23:02:13 +0000
-Message-ID: <BYAPR04MB5749FAFD19DCFFBAD38A34C186B30@BYAPR04MB5749.namprd04.prod.outlook.com>
-References: <20190801225044.143478-1-bvanassche@acm.org>
- <20190801225044.143478-3-bvanassche@acm.org>
-Accept-Language: en-US
-Content-Language: en-US
-X-MS-Has-Attach: 
-X-MS-TNEF-Correlator: 
-authentication-results: spf=none (sender IP is )
- smtp.mailfrom=Chaitanya.Kulkarni@wdc.com; 
-x-originating-ip: [199.255.45.62]
-x-ms-publictraffictype: Email
-x-ms-office365-filtering-correlation-id: c42dc93f-bbce-4e28-b56d-08d7389e6a9b
-x-ms-office365-filtering-ht: Tenant
-x-microsoft-antispam: BCL:0;PCL:0;RULEID:(2390118)(7020095)(4652040)(8989299)(4534185)(4627221)(201703031133081)(201702281549075)(8990200)(5600166)(711020)(4605104)(1401327)(4618075)(2017052603328)(7193020);SRVR:BYAPR04MB5109;
-x-ms-traffictypediagnostic: BYAPR04MB5109:
-x-microsoft-antispam-prvs: <BYAPR04MB5109B084B5F6B4B941AFF3DE86B30@BYAPR04MB5109.namprd04.prod.outlook.com>
-wdcipoutbound: EOP-TRUE
-x-ms-oob-tlc-oobclassifiers: OLM:747;
-x-forefront-prvs: 0159AC2B97
-x-forefront-antispam-report: SFV:NSPM;SFS:(10019020)(4636009)(136003)(396003)(346002)(39860400002)(366004)(376002)(199004)(189003)(9686003)(7696005)(4744005)(8676002)(71200400001)(71190400001)(53936002)(81156014)(33656002)(81166006)(86362001)(25786009)(6116002)(8936002)(110136005)(99286004)(3846002)(2906002)(446003)(55016002)(186003)(14454004)(54906003)(5660300002)(316002)(486006)(6436002)(305945005)(476003)(7736002)(66556008)(66946007)(6246003)(66446008)(74316002)(66476007)(66066001)(229853002)(64756008)(76176011)(76116006)(102836004)(256004)(26005)(478600001)(53546011)(6506007)(4326008)(52536014);DIR:OUT;SFP:1102;SCL:1;SRVR:BYAPR04MB5109;H:BYAPR04MB5749.namprd04.prod.outlook.com;FPR:;SPF:None;LANG:en;PTR:InfoNoRecords;A:1;MX:1;
-x-ms-exchange-senderadcheck: 1
-x-microsoft-antispam-message-info: BoT4jbUlcnYXCTKe2m2d3KHR1JuSgJLZfFH/FSkE3MPL1YnY2knuRUYCd7Aj5Ij/ix6bge1sa79bkv8AvgcTuJJDgG4iyomfIcpAwFBXrGCcAydvst07wSd9du+ZEOl623JBSC5sN6LgiKletBKWrTSTrM2/v2LZ+5oksUpBFAvNxUMEj3fSsviqg1c2KEc/7xkYAo48hYpxxZc3lXQPtk8PgvcCrDjCBj2lwNxAo0J3VS6KFTQn4zh/QCAlN6l5wj4NIKpun97CaDIKLGW0gDm7c1lZNr3w9i9tZv9kIHB2MdYrct3WG4fwP0EPZxjuH5j45TLQsCsIbJjEY0JMLgXiqTHm1Y9UgoTHVpuM1mpwexWZqKedfYmyczD44ZuciKv/SsAyfiorsuRmdgBBTKYZ7xe6wTld+Iw//guFEqw=
-x-ms-exchange-transport-forked: True
-Content-Type: text/plain; charset="us-ascii"
-Content-Transfer-Encoding: quoted-printable
+        Fri, 13 Sep 2019 19:41:13 -0400
+Received: from compute5.internal (compute5.nyi.internal [10.202.2.45])
+        by mailout.nyi.internal (Postfix) with ESMTP id 7C7AB21BA9;
+        Fri, 13 Sep 2019 19:41:12 -0400 (EDT)
+Received: from mailfrontend2 ([10.202.2.163])
+  by compute5.internal (MEProxy); Fri, 13 Sep 2019 19:41:12 -0400
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=anarazel.de; h=
+        date:from:to:cc:subject:message-id:mime-version:content-type; s=
+        fm2; bh=y5EBeYOKSkkZGcC8iqxhvnyhrtPlS249Ck9HCUkn4qw=; b=G4RDVMp7
+        n/wWYYrbuOrAaAY57xg+X+yTEJTvo3HvhpuW6RvyVrcnT/PFJ3ushPMTPFKgnA8M
+        cdYhetL9W/YDGplRcCYk98W6YCCWIKEO8foVIvGrHA4hcxDRUCiHL28ywEGUPi61
+        qsg/lUQpS2oyLGt/lY6eiaroh/hvrajaiFwHZGmlJcMPxcH7zLkQMcFKvqrFIpvU
+        HN2pS1EbMzFz9TMKOmH6LJ8ZRVvQ6rj4sU9PJP2x1smOWZ+GAgTw+EtTj+BwZ/K4
+        D9qMeUkjMguB11LFzhIa859hlprPT9KCqBMmybCVglBJ3z+ixrnMb7Jzr0vX8D5o
+        q6NcpyXSpDV16Q==
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=
+        messagingengine.com; h=cc:content-type:date:from:message-id
+        :mime-version:subject:to:x-me-proxy:x-me-proxy:x-me-sender
+        :x-me-sender:x-sasl-enc; s=fm3; bh=y5EBeYOKSkkZGcC8iqxhvnyhrtPlS
+        249Ck9HCUkn4qw=; b=Yw5/OTHEWs/dIWIOMQ/TzF1eTAB5nxoSu6t+bzOs1AVdf
+        C8435jADHzJ+CmAZAGAzvYjU/2ggRvTxK6aAU45hHJkoivDPc9FVl5rm1+rPnBWP
+        efBJb/3vWy4SK5cjAzAiyfhEabbZn7jSzf34F2ILZ/eaKo4BmwKu4CLyj/O1VuBQ
+        +0ClZsPrmqMWujCgBeL+hkv57kM4xBeEKwISNFuo6spRQbuqPhMRPwJx8lHEM3co
+        5nHH3rDbiF0/+jWTYsV4Quy309xMHJgsLUVSQHtPEcvOfY7pM12Hfg9aFo+1Gx4P
+        GrF6NpY9khsiS4QV4kPzaMe5HzY2Loga+ce/8tflQ==
+X-ME-Sender: <xms:GCl8XZZ34qJnv40q__Ogf071k-xTFJObbOodwNQ67aXGc1q98HGPDw>
+X-ME-Proxy-Cause: gggruggvucftvghtrhhoucdtuddrgedufedrtdekgddvtdcutefuodetggdotefrodftvf
+    curfhrohhfihhlvgemucfhrghsthforghilhdpqfgfvfdpuffrtefokffrpgfnqfghnecu
+    uegrihhlohhuthemuceftddtnecusecvtfgvtghiphhivghnthhsucdlqddutddtmdenuc
+    fjughrpeffhffvuffkgggtugesthdtredttddtvdenucfhrhhomheptehnughrvghsucfh
+    rhgvuhhnugcuoegrnhgurhgvshesrghnrghrrgiivghlrdguvgeqnecukfhppedvudeird
+    dukeelrddvuddurdduhedtnecurfgrrhgrmhepmhgrihhlfhhrohhmpegrnhgurhgvshes
+    rghnrghrrgiivghlrdguvgenucevlhhushhtvghrufhiiigvpedt
+X-ME-Proxy: <xmx:GCl8XadT78plijyOP3K8HAfzuAcfjvjf4O3-f8oY2TX0f6sPueixUw>
+    <xmx:GCl8Xe0AgK2lbjTnsFtgXb_J2Vaj57beiF9O2kuKj8TePW0xgLNnjQ>
+    <xmx:GCl8Xfk9NgoXrDpxpTY-NqwUSad44d6CYlh3ynq4vJ4iZ3lVOvzzXw>
+    <xmx:GCl8XUxFLEQxEbzYrnM0H-DZbndiIXd5r93gVe6iBi905Co-WmMevw>
+Received: from intern.anarazel.de (unknown [216.189.211.150])
+        by mail.messagingengine.com (Postfix) with ESMTPA id D8B55D60057;
+        Fri, 13 Sep 2019 19:41:11 -0400 (EDT)
+Date:   Fri, 13 Sep 2019 16:41:08 -0700
+From:   Andres Freund <andres@anarazel.de>
+To:     Jens Axboe <axboe@kernel.dk>
+Cc:     linux-block@vger.kernel.org
+Subject: buffered io_uring vs task io accounting
+Message-ID: <20190913234108.gdux4v5xqckohfru@alap3.anarazel.de>
 MIME-Version: 1.0
-X-OriginatorOrg: wdc.com
-X-MS-Exchange-CrossTenant-Network-Message-Id: c42dc93f-bbce-4e28-b56d-08d7389e6a9b
-X-MS-Exchange-CrossTenant-originalarrivaltime: 13 Sep 2019 23:02:13.9862
- (UTC)
-X-MS-Exchange-CrossTenant-fromentityheader: Hosted
-X-MS-Exchange-CrossTenant-id: b61c8803-16f3-4c35-9b17-6f65f441df86
-X-MS-Exchange-CrossTenant-mailboxtype: HOSTED
-X-MS-Exchange-CrossTenant-userprincipalname: FmHiyq62gdbiJkxp3Gf07pR+2ss2658jkfRXEKGZppoYW+D7pBSoexLupZIWAa4mNggd0HhvaBLtFz7EK8Je2TflTMZ1dkNRDGAiyFbivjY=
-X-MS-Exchange-Transport-CrossTenantHeadersStamped: BYAPR04MB5109
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
 Sender: linux-block-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-Looks good.=0A=
-=0A=
-Reviewed-by: Chaitanya Kulkarni <chaitanya.kulkarni@wdc.com>=0A=
-=0A=
-On 08/01/2019 03:51 PM, Bart Van Assche wrote:=0A=
-> Since what the bio splitting functions do is nontrivial, document these=
-=0A=
-> functions.=0A=
->=0A=
-> Reviewed-by: Johannes Thumshirn<jthumshirn@suse.de>=0A=
-> Cc: Christoph Hellwig<hch@infradead.org>=0A=
-> Cc: Ming Lei<ming.lei@redhat.com>=0A=
-> Cc: Hannes Reinecke<hare@suse.com>=0A=
-> Signed-off-by: Bart Van Assche<bvanassche@acm.org>=0A=
-=0A=
+Hi,
+
+It appears that task io accounting doesn't currently work when io_uring
+defers work to workqueues.
+
+E.g. while I get system wide "iostats -xm 1 /dev/sda" stats like:
+
+Device            r/s     w/s     rMB/s     wMB/s   rrqm/s   wrqm/s  %rrqm  %wrqm r_await w_await aqu-sz rareq-sz wareq-sz  svctm  %util
+sda              0.00 36475.00      0.00    250.52     0.00   660.00   0.00   1.78    0.00    0.14   0.00     0.00     7.03   0.03  99.70
+
+"pidstat -d 1" as the user execution fio just shows
+
+03:15:37 PM   UID       PID   kB_rd/s   kB_wr/s kB_ccwr/s iodelay  Command
+03:15:38 PM     0     13626     -1.00     -1.00     -1.00      53  kworker/u16:2-io_ring-wq
+03:15:38 PM     0     13734     -1.00     -1.00     -1.00      51  kworker/u16:3+io_ring-write-wq
+03:15:38 PM     0     13735     -1.00     -1.00     -1.00      53  kworker/u16:4+io_ring-wq
+03:15:38 PM     0     13736     -1.00     -1.00     -1.00      50  kworker/u16:5-io_ring-wq
+03:15:38 PM     0     13766     -1.00     -1.00     -1.00      52  kworker/u16:7-io_ring-wq
+03:15:38 PM     0     13767     -1.00     -1.00     -1.00      51  kworker/u16:8-io_ring-write-wq
+03:15:38 PM     0     13769     -1.00     -1.00     -1.00      51  kworker/u16:10+io_ring-wq
+
+and as root I get:
+
+03:20:05 PM   UID       PID   kB_rd/s   kB_wr/s kB_ccwr/s iodelay  Command
+03:20:06 PM     0     13735      0.00  34344.00      0.00      49  kworker/u16:4+io_ring-wq
+03:20:06 PM     0     13736      0.00  36080.00      0.00      47  kworker/u16:5+io_ring-wq
+03:20:06 PM     0     13737      0.00  36624.00      0.00      43  kworker/u16:6+io_ring-wq
+03:20:06 PM     0     13766      0.00  30616.00      0.00      50  kworker/u16:7+io_ring-wq
+03:20:06 PM     0     13768      0.00  38728.00      0.00      47  kworker/u16:9+io_ring-wq
+03:20:06 PM     0     13769      0.00  37792.00      0.00      51  kworker/u16:10+io_ring-wq
+03:20:06 PM     0     13890      0.00  39176.00      0.00      47  kworker/u16:13+io_ring-wq
+
+and nothing is attributed to fio itself.  For DIO I do get working task
+stats however.
+
+That is not all that surprising because tasks deferred to the workqueue
+won't properly be accounted for, because the page is dirtied from within
+the workqueue, rather than the normal process context.
+
+
+I suspect this doesn't just affect task io stats, but also means that
+io_uring writes will be able to escape writeback throttling, because
+presumably the workqueue kthreads are going to be throttled as
+individual tasks, rather than using causing the issuing process to be
+throttled.
+
+I assume this is a problem that needs to be fixed?
+
+Greetings,
+
+Andres Freund
