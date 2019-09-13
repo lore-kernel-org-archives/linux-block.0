@@ -1,165 +1,191 @@
-Return-Path: <SRS0=MetK=XH=vger.kernel.org=linux-block-owner@kernel.org>
+Return-Path: <SRS0=03jz=XI=vger.kernel.org=linux-block-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-1.0 required=3.0 tests=DKIM_SIGNED,DKIM_VALID,
-	HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS
-	autolearn=no autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-8.5 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
+	INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,
+	USER_AGENT_SANE_1 autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 75565C4CEC6
-	for <linux-block@archiver.kernel.org>; Thu, 12 Sep 2019 22:20:59 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 0A165C49ED7
+	for <linux-block@archiver.kernel.org>; Fri, 13 Sep 2019 07:08:13 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.kernel.org (Postfix) with ESMTP id 331E72084D
-	for <linux-block@archiver.kernel.org>; Thu, 12 Sep 2019 22:20:59 +0000 (UTC)
-Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (2048-bit key) header.d=wdc.com header.i=@wdc.com header.b="N5qDW4UE";
-	dkim=pass (1024-bit key) header.d=sharedspace.onmicrosoft.com header.i=@sharedspace.onmicrosoft.com header.b="RxVOSHC2"
+	by mail.kernel.org (Postfix) with ESMTP id D842E20830
+	for <linux-block@archiver.kernel.org>; Fri, 13 Sep 2019 07:08:12 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1727400AbfILWU6 (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Thu, 12 Sep 2019 18:20:58 -0400
-Received: from esa3.hgst.iphmx.com ([216.71.153.141]:7481 "EHLO
-        esa3.hgst.iphmx.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1726897AbfILWU6 (ORCPT
-        <rfc822;linux-block@vger.kernel.org>);
-        Thu, 12 Sep 2019 18:20:58 -0400
-DKIM-Signature: v=1; a=rsa-sha256; c=simple/simple;
-  d=wdc.com; i=@wdc.com; q=dns/txt; s=dkim.wdc.com;
-  t=1568326857; x=1599862857;
-  h=from:to:cc:subject:date:message-id:references:
-   content-transfer-encoding:mime-version;
-  bh=rpo67BWJURBiGFuhguDg+F6l+IqO54VZT2DLK4MQXKQ=;
-  b=N5qDW4UEF5sl1DDlD1ll1pyYfCy7njrPTdKcKtCgNP1GKLB7KJMyUnQy
-   xwc1wC/HXx6oz9BI+ebTZwv+2Eetg1o6W0oNQkJQQIKEWlpOpH5K6dNEH
-   EZFkAulRM7/AxZLSnLcu7/JgfXKXiaf6bWn/J+nM+7flUBTCwfMNIFnlq
-   hvP342KrCV6wAXSb7LufDwRfbR4REE3fSYz8W7iBB8IiDBWQb8bEHwVpP
-   uQGmInPds2Tww2YD9WsHuOGYHazD1nYEcZ3QhD6u1IFb0LYc5H5KDSpjo
-   AoDtvWiboyHMjOvQYWuLt3xuNGDr15miq9jlsRBNObqRn4fbC86FJAeov
-   A==;
-IronPort-SDR: kx+dzzXKrIuM5WY0nEqXTFR7+dJmrWQSJQOyKnpxpOKlvYdX4twDl4/zgGI1TnCoIOa5UeS2R2
- HgdSyjQzxSXZm9rKXFSiOzMHxDMEz7svCCT5ldzJCsQZwkisUJ4ztQ9SKVdK1B7tULcfUzjcq0
- F7lPZI9U0p0Eas+0W51FsEIKme0tpLrVuU823x7LXLH2vSnHwUEBj5Ne9aD7WOY5CaBFaEfcAa
- 4vYD4pNN+b8GBThJ0sha4fvJ0xRqGX6ZACO/n4bjJ9hHXhdtforLBVaB9wf3PpewKMN55rJXW9
- bO4=
-X-IronPort-AV: E=Sophos;i="5.64,498,1559491200"; 
-   d="scan'208";a="122659531"
-Received: from mail-cys01nam02lp2057.outbound.protection.outlook.com (HELO NAM02-CY1-obe.outbound.protection.outlook.com) ([104.47.37.57])
-  by ob1.hgst.iphmx.com with ESMTP; 13 Sep 2019 06:20:56 +0800
-ARC-Seal: i=1; a=rsa-sha256; s=arcselector9901; d=microsoft.com; cv=none;
- b=QBB2qpzPz5KfI+5CHI0B7gUpgApyGKVqOf7DThf2RE3PcH7tL8cWQl73ZPJrEV3zNYe0iDDdhzaH8jYXvKAHnHvhr6oYTy22LtlyBw/QDIAGE3we5W+NTZN7YwmtAzlafiGWcDvrgE99vDoshL9pYFwkMxJUxUGatrDjNvc/EywPMcn4nObgH+4E3Xz9wTlDazPPyqJrinvwDqGVM4HFNfmsu+T9eWvIXMW0gVpLKEBGd9LWLrlsR06yiZkrGH8v2REi3bnYvPOsxJ6zqo9uZlOikOj3Zbdri6T7ojO/3d7EeqEWZLHYvXGDp/1BLLbzpXUl8zkh74sRp7rvos6byQ==
-ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com;
- s=arcselector9901;
- h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
- bh=Bu+t3ZhL4VSNdr0emaYSFRU9Nnc24XEh7NWxhxmxukc=;
- b=hcDha+7oQia1SQ6yFdCYJR0L8GnfSo1/tBha2O0xdzMRwCa9DQZuu7tONYoVEyb1mH9wtBhK2LmR9t/tDHqKhR5Ctf0gW0kd6d22nmorKj6VLdhoyzTA/IHiKNsRuFMPScOL6ksnGmMg5hS0WNOUTZXLxQ4S8dmLol74fha1F5TEqwz5OYy1D7b+gbkQiaeXO0gQAFI/BuNiJL+QHrTDgcSZrbSVfFqPftg9CTO6PgEUArjxkDoE+ertEptulX0xRn/M5rjoO9Ct/a1vzrr5t4f2pH5cQeRdLk4iSggCCU2s80LHMjxmybEOOjnPi5kfvLbOQxqTguh1Fo8RJJKLcQ==
-ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass
- smtp.mailfrom=wdc.com; dmarc=pass action=none header.from=wdc.com; dkim=pass
- header.d=wdc.com; arc=none
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
- d=sharedspace.onmicrosoft.com; s=selector2-sharedspace-onmicrosoft-com;
- h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
- bh=Bu+t3ZhL4VSNdr0emaYSFRU9Nnc24XEh7NWxhxmxukc=;
- b=RxVOSHC2zxyetBrSVbkMnoWfP2djBdDkQniLiLJjWgR0KPpZ+xUolPASZCwQnM5k05FZz6W1qwm6wiqYYn1hCEL4GpbVxTiEMvj9Y8//s161X2DgXulHzWSaPb5JwFAQF6vq3bRFW4aIO4pA7nDwJVmdcrnh8qiQ8kikNhfzKw8=
-Received: from DM6PR04MB5754.namprd04.prod.outlook.com (20.179.52.22) by
- DM6PR04MB4907.namprd04.prod.outlook.com (20.176.109.80) with Microsoft SMTP
- Server (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
- 15.20.2263.15; Thu, 12 Sep 2019 22:20:55 +0000
-Received: from DM6PR04MB5754.namprd04.prod.outlook.com
- ([fe80::81ec:c517:7b2f:c5d4]) by DM6PR04MB5754.namprd04.prod.outlook.com
- ([fe80::81ec:c517:7b2f:c5d4%7]) with mapi id 15.20.2241.022; Thu, 12 Sep 2019
- 22:20:55 +0000
-From:   Chaitanya Kulkarni <Chaitanya.Kulkarni@wdc.com>
-To:     =?iso-8859-1?Q?Andr=E9_Almeida?= <andrealmeid@collabora.com>,
-        Matthew Wilcox <willy@infradead.org>
-CC:     "linux-block@vger.kernel.org" <linux-block@vger.kernel.org>,
-        "linux-doc@vger.kernel.org" <linux-doc@vger.kernel.org>,
-        "corbet@lwn.net" <corbet@lwn.net>,
-        "axboe@kernel.dk" <axboe@kernel.dk>,
-        "m@bjorling.me" <m@bjorling.me>,
-        "kernel@collabora.com" <kernel@collabora.com>,
-        "krisman@collabora.com" <krisman@collabora.com>
-Subject: Re: [PATCH 3/3] null_blk: validated the number of devices
-Thread-Topic: [PATCH 3/3] null_blk: validated the number of devices
-Thread-Index: AQHVaK/tthLu0hDHKk6eugQSeTinSQ==
-Date:   Thu, 12 Sep 2019 22:20:54 +0000
-Message-ID: <DM6PR04MB5754177B405819C802549AE686B00@DM6PR04MB5754.namprd04.prod.outlook.com>
-References: <20190911144636.226945-1-andrealmeid@collabora.com>
- <20190911144636.226945-3-andrealmeid@collabora.com>
- <20190912161937.GK29434@bombadil.infradead.org>
- <dbdb0415-8762-f9c1-a65a-3531d9cca109@collabora.com>
-Accept-Language: en-US
-Content-Language: en-US
-X-MS-Has-Attach: 
-X-MS-TNEF-Correlator: 
-authentication-results: spf=none (sender IP is )
- smtp.mailfrom=Chaitanya.Kulkarni@wdc.com; 
-x-originating-ip: [199.255.45.62]
-x-ms-publictraffictype: Email
-x-ms-office365-filtering-correlation-id: f7103ae0-3ed3-4bc2-d9b7-08d737cf7a8c
-x-ms-office365-filtering-ht: Tenant
-x-microsoft-antispam: BCL:0;PCL:0;RULEID:(2390118)(7020095)(4652040)(8989299)(4534185)(4627221)(201703031133081)(201702281549075)(8990200)(5600166)(711020)(4605104)(1401327)(4618075)(2017052603328)(7193020);SRVR:DM6PR04MB4907;
-x-ms-traffictypediagnostic: DM6PR04MB4907:
-x-microsoft-antispam-prvs: <DM6PR04MB4907719A422D1E0C1304963D86B00@DM6PR04MB4907.namprd04.prod.outlook.com>
-wdcipoutbound: EOP-TRUE
-x-ms-oob-tlc-oobclassifiers: OLM:7691;
-x-forefront-prvs: 01583E185C
-x-forefront-antispam-report: SFV:NSPM;SFS:(10019020)(4636009)(136003)(346002)(376002)(39850400004)(396003)(366004)(189003)(199004)(76116006)(52536014)(229853002)(26005)(2906002)(256004)(186003)(110136005)(478600001)(53546011)(6116002)(14454004)(316002)(5660300002)(6436002)(6506007)(102836004)(71200400001)(7696005)(76176011)(64756008)(66446008)(66556008)(476003)(25786009)(486006)(91956017)(66946007)(54906003)(66066001)(4744005)(3846002)(446003)(86362001)(9686003)(66476007)(4326008)(81166006)(99286004)(71190400001)(53936002)(74316002)(33656002)(7736002)(305945005)(55016002)(8676002)(81156014)(8936002)(6246003);DIR:OUT;SFP:1102;SCL:1;SRVR:DM6PR04MB4907;H:DM6PR04MB5754.namprd04.prod.outlook.com;FPR:;SPF:None;LANG:en;PTR:InfoNoRecords;MX:1;A:1;
-x-ms-exchange-senderadcheck: 1
-x-microsoft-antispam-message-info: LJ64QhQO0cQkZoJGnu2aq0QxfXVqbxqGC/mt22/BYDJ+dZRub/j/hgoad7PwfIM4rGuSuJlJsmLAIdJaoe18OvW9SJmgVC1RpinGaP6GRA1coKXwSevUv+B2KC8IvEPnpqT0kNTgWK0v+C1dRdeirRi94Ta/B6qnpZG4iG7Go7SMLMqHWrvttP9mEuUbF6MPp/jJd3nBhJkkExSnbhnQt9FxOG0M3cjctl4S2R7K7RWA5P2KGCD3VG3eH8yHxPkaOaC6h5mVl1vCr1Gjb7tKEVGlMWSi5S8sqIRaicjfcxQPFocpl0/nnfxdHjKSX6BX980lglEBt2YV2QkhQLsWUQkFIZF4wah0c17P13S3swFiyIG1h7qME03HeXTDnNlb0CfN6R1CWmPtktj2s3Gwpue6+kKbE9csePFocHVjk3w=
-x-ms-exchange-transport-forked: True
-Content-Type: text/plain; charset="iso-8859-1"
-Content-Transfer-Encoding: quoted-printable
+        id S1727405AbfIMHIM (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Fri, 13 Sep 2019 03:08:12 -0400
+Received: from mx2.suse.de ([195.135.220.15]:54552 "EHLO mx1.suse.de"
+        rhost-flags-OK-OK-OK-FAIL) by vger.kernel.org with ESMTP
+        id S1727380AbfIMHIL (ORCPT <rfc822;linux-block@vger.kernel.org>);
+        Fri, 13 Sep 2019 03:08:11 -0400
+X-Virus-Scanned: by amavisd-new at test-mx.suse.de
+Received: from relay2.suse.de (unknown [195.135.220.254])
+        by mx1.suse.de (Postfix) with ESMTP id 34867AF23;
+        Fri, 13 Sep 2019 07:08:09 +0000 (UTC)
+Subject: Re: [PATCH] io_uring: extend async work merging
+To:     Jens Axboe <axboe@kernel.dk>,
+        "linux-block@vger.kernel.org" <linux-block@vger.kernel.org>
+References: <0b62fee7-d3bd-f60e-ae81-27880f42d508@kernel.dk>
+From:   Nikolay Borisov <nborisov@suse.com>
+Openpgp: preference=signencrypt
+Autocrypt: addr=nborisov@suse.com; prefer-encrypt=mutual; keydata=
+ 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
+Message-ID: <e1e49ab6-108c-6da9-ebfb-c47ffd1c89b5@suse.com>
+Date:   Fri, 13 Sep 2019 10:08:07 +0300
+User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:60.0) Gecko/20100101
+ Thunderbird/60.8.0
 MIME-Version: 1.0
-X-OriginatorOrg: wdc.com
-X-MS-Exchange-CrossTenant-Network-Message-Id: f7103ae0-3ed3-4bc2-d9b7-08d737cf7a8c
-X-MS-Exchange-CrossTenant-originalarrivaltime: 12 Sep 2019 22:20:54.8734
- (UTC)
-X-MS-Exchange-CrossTenant-fromentityheader: Hosted
-X-MS-Exchange-CrossTenant-id: b61c8803-16f3-4c35-9b17-6f65f441df86
-X-MS-Exchange-CrossTenant-mailboxtype: HOSTED
-X-MS-Exchange-CrossTenant-userprincipalname: fDcx8ff84EhfPNnsMOsxSzU0niw2KQLmpWhzVMk8SXANBYtdBBaSHw90o/eUkU16pNIy2T89utWn2xySF96pYbiwIH8qg4S9NSIHnV0io6U=
-X-MS-Exchange-Transport-CrossTenantHeadersStamped: DM6PR04MB4907
+In-Reply-To: <0b62fee7-d3bd-f60e-ae81-27880f42d508@kernel.dk>
+Content-Type: text/plain; charset=utf-8
+Content-Language: en-US
+Content-Transfer-Encoding: 8bit
 Sender: linux-block-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-On 09/12/2019 03:09 PM, Andr=E9 Almeida wrote:=0A=
-> Hello Matthew,=0A=
->=0A=
-> On 9/12/19 1:19 PM, Matthew Wilcox wrote:=0A=
->> On Wed, Sep 11, 2019 at 11:46:36AM -0300, Andr=E9 Almeida wrote:=0A=
->>>=0A=
->>> -static int nr_devices =3D 1;=0A=
->>> +static unsigned int nr_devices =3D 1;=0A=
->>>   module_param(nr_devices, int, 0444);=0A=
->>=0A=
->> ^^^ you forgot to change the module_param to match=0A=
->>=0A=
->>> +	if (!nr_devices) {=0A=
->>> +		pr_err("null_blk: invalid number of devices\n");=0A=
->>> +		return -EINVAL;=0A=
->>> +	}=0A=
->>=0A=
->> I don't think this is necessary.=0A=
->>=0A=
->=0A=
-> Could you explain why you don't think is necessary? As I see, the module=
-=0A=
-> can't be used without any /dev/nullb* device, so why we should load it?=
-=0A=
->=0A=
-> Thanks,=0A=
-> 	Andr=E9=0A=
->=0A=
-=0A=
-I think Matthew is right here. I think module can be loaded with =0A=
-nr_devices=3D0.=0A=
-=0A=
-Did you get a chance to test nr_device=3D0 condition ?=0A=
-=0A=
-Also, did you get a chance to test this patch with all the=0A=
-possible conditions ?=0A=
-=0A=
-=0A=
-=0A=
-=0A=
+
+
+On 11.09.19 г. 19:15 ч., Jens Axboe wrote:
+> We currently merge async work items if we see a strict sequential hit.
+> This helps avoid unnecessary workqueue switches when we don't need
+> them. We can extend this merging to cover cases where it's not a strict
+> sequential hit, but the IO still fits within the same page. If an
+> application is doing multiple requests within the same page, we don't
+> want separate workers waiting on the same page to complete IO. It's much
+> faster to let the first worker bring in the page, then operate on that
+> page from the same worker to complete the next request(s).
+> 
+> Signed-off-by: Jens Axboe <axboe@kernel.dk>
+> 
+> ---
+> 
+> diff --git a/fs/io_uring.c b/fs/io_uring.c
+> index 03fcd974fd1d..4bc3ee4ea81f 100644
+> --- a/fs/io_uring.c
+> +++ b/fs/io_uring.c
+> @@ -167,7 +167,7 @@ struct async_list {
+>  	struct list_head	list;
+>  
+>  	struct file		*file;
+> -	off_t			io_end;
+> +	off_t			io_start;
+>  	size_t			io_len;
+>  };
+>  
+> @@ -1189,6 +1189,28 @@ static ssize_t io_import_iovec(struct io_ring_ctx *ctx, int rw,
+>  	return import_iovec(rw, buf, sqe_len, UIO_FASTIOV, iovec, iter);
+>  }
+>  
+> +static inline bool io_should_merge(struct async_list *al, struct kiocb *kiocb)
+> +{
+> +	if (al->file == kiocb->ki_filp) {
+> +		off_t start, end;
+> +
+> +		/*
+> +		 * Allow merging if we're anywhere in the range of the same
+> +		 * page. Generally this happens for sub-page reads or writes,
+> +		 * and it's beneficial to allow the first worker to bring the
+> +		 * page in and the piggy backed work can then work on the
+> +		 * cached page.
+> +		 */
+> +		start = al->io_start & PAGE_MASK;
+
+nit: round_down(al->io_start, PAGE_SIZE);
+
+> +		end = (al->io_start + al->io_len + PAGE_SIZE - 1) & PAGE_MASK;
+nit: round_up(al->io_start+io_len, PAGE_SIZE)
+
+> +		if (kiocb->ki_pos >= start && kiocb->ki_pos <= end)
+> +			return true;
+> +	}
+> +
+> +	al->file = NULL;
+> +	return false;
+> +}
+> +
+>  /*
+>   * Make a note of the last file/offset/direction we punted to async
+>   * context. We'll use this information to see if we can piggy back a
+> @@ -1200,9 +1222,8 @@ static void io_async_list_note(int rw, struct io_kiocb *req, size_t len)
+>  	struct async_list *async_list = &req->ctx->pending_async[rw];
+>  	struct kiocb *kiocb = &req->rw;
+>  	struct file *filp = kiocb->ki_filp;
+> -	off_t io_end = kiocb->ki_pos + len;
+>  
+> -	if (filp == async_list->file && kiocb->ki_pos == async_list->io_end) {
+> +	if (io_should_merge(async_list, kiocb)) {
+>  		unsigned long max_bytes;
+>  
+>  		/* Use 8x RA size as a decent limiter for both reads/writes */
+> @@ -1215,17 +1236,16 @@ static void io_async_list_note(int rw, struct io_kiocb *req, size_t len)
+>  			req->flags |= REQ_F_SEQ_PREV;
+>  			async_list->io_len += len;
+>  		} else {
+> -			io_end = 0;
+> -			async_list->io_len = 0;
+> +			async_list->file = NULL;
+>  		}
+>  	}
+>  
+>  	/* New file? Reset state. */
+>  	if (async_list->file != filp) {
+> -		async_list->io_len = 0;
+> +		async_list->io_start = kiocb->ki_pos;
+> +		async_list->io_len = len;
+>  		async_list->file = filp;
+>  	}
+> -	async_list->io_end = io_end;
+>  }
+>  
+>  static int io_read(struct io_kiocb *req, const struct sqe_submit *s,
+> @@ -1994,7 +2014,7 @@ static void io_sq_wq_submit_work(struct work_struct *work)
+>   */
+>  static bool io_add_to_prev_work(struct async_list *list, struct io_kiocb *req)
+>  {
+> -	bool ret = false;
+> +	bool ret;
+>  
+>  	if (!list)
+>  		return false;
+> 
