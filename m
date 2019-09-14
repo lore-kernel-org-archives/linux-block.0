@@ -2,104 +2,88 @@ Return-Path: <SRS0=imFw=XJ=vger.kernel.org=linux-block-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-10.1 required=3.0 tests=DKIM_SIGNED,DKIM_VALID,
-	DKIM_VALID_AU,HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,
-	SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED,USER_AGENT_GIT
-	autolearn=ham autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-2.5 required=3.0 tests=DKIM_SIGNED,DKIM_VALID,
+	HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,
+	USER_AGENT_SANE_1 autolearn=no autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 3E12AC4CECA
-	for <linux-block@archiver.kernel.org>; Sat, 14 Sep 2019 21:30:54 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 1AAC1C4CEC9
+	for <linux-block@archiver.kernel.org>; Sat, 14 Sep 2019 23:09:13 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.kernel.org (Postfix) with ESMTP id F0E022081B
-	for <linux-block@archiver.kernel.org>; Sat, 14 Sep 2019 21:30:53 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id D655C20693
+	for <linux-block@archiver.kernel.org>; Sat, 14 Sep 2019 23:09:12 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=pass (2048-bit key) header.d=dxuuu.xyz header.i=@dxuuu.xyz header.b="KHrMpm2u";
-	dkim=pass (2048-bit key) header.d=messagingengine.com header.i=@messagingengine.com header.b="TtKiMPMW"
+	dkim=pass (2048-bit key) header.d=kernel-dk.20150623.gappssmtp.com header.i=@kernel-dk.20150623.gappssmtp.com header.b="jJaYVqrI"
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1726582AbfINVax (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Sat, 14 Sep 2019 17:30:53 -0400
-Received: from wnew1-smtp.messagingengine.com ([64.147.123.26]:54773 "EHLO
-        wnew1-smtp.messagingengine.com" rhost-flags-OK-OK-OK-OK)
-        by vger.kernel.org with ESMTP id S1725835AbfINVax (ORCPT
+        id S1727721AbfINXJM (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Sat, 14 Sep 2019 19:09:12 -0400
+Received: from mail-pl1-f195.google.com ([209.85.214.195]:37499 "EHLO
+        mail-pl1-f195.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S1727584AbfINXJM (ORCPT
         <rfc822;linux-block@vger.kernel.org>);
-        Sat, 14 Sep 2019 17:30:53 -0400
-X-Greylist: delayed 399 seconds by postgrey-1.27 at vger.kernel.org; Sat, 14 Sep 2019 17:30:52 EDT
-Received: from compute4.internal (compute4.nyi.internal [10.202.2.44])
-        by mailnew.west.internal (Postfix) with ESMTP id 152D94C1;
-        Sat, 14 Sep 2019 17:24:13 -0400 (EDT)
-Received: from mailfrontend2 ([10.202.2.163])
-  by compute4.internal (MEProxy); Sat, 14 Sep 2019 17:24:13 -0400
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=dxuuu.xyz; h=
-        from:to:cc:subject:date:message-id:mime-version
-        :content-transfer-encoding; s=fm1; bh=NjWTZPsB0Na17uJ46vCITbbUDs
-        /Halzk/K7hR4bxfec=; b=KHrMpm2uifTwLJm3lXbzdKxZBuB1cxkkbnoDWZEbA7
-        IA52V+Ymqc00sI+cHupRQqd0wIzZf993Ii7Lk8nICnArxosS2uBcfeaduylaE3cf
-        Rm0C5MH6+tOctkByYRRyUOfcFWBG+PNHHfidl5ebWekttYFf9CWv0YGJQoBt6wia
-        K5yR1lIpuGSNY6Tq/MyVDMmnDm336sUtBRrLDDBwZnXMMEJgmnNgH+4eolhlqWoy
-        SGKVknlRIkaI9xQivUtw14dc+9oSLt/cjFnBRwApLx8AnJ+Ue5xpY7HlvtX05sH2
-        YylgDSFtU2RbTv5/NyZi10s24KcOJGnFCT6VAV0Cif0Q==
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=
-        messagingengine.com; h=cc:content-transfer-encoding:date:from
-        :message-id:mime-version:subject:to:x-me-proxy:x-me-proxy
-        :x-me-sender:x-me-sender:x-sasl-enc; s=fm3; bh=NjWTZPsB0Na17uJ46
-        vCITbbUDs/Halzk/K7hR4bxfec=; b=TtKiMPMWMHuTpu+uVaFMOkg3mfJawrCEF
-        mtCd0mhH5Ib3u0EOIoNtmi+EpUzgfClLd5X9trmJ13L71Cz6HLGh1CAKDFf0aH30
-        EXh4Vuxyy1u8y2Usv6cGuT1zcStkDKRKAOFIhDSjx4B+lAYwsPwkG2u3b/qvGsb+
-        2VD7ZSLzeASeJ5kh5kLew6z2n2nIJSSW17G0LugtvWxKdpdkUC/cSHDH53oM+R50
-        eO0sfRtaW3ZznR3v+j0JHLaI9wx1MD8Qpg5d5XnNFTT3CP1JREAt/6ZO9f9+LD97
-        AInIMagaQVljyJDrwz8EbIVton/ds4nZiinSmdVOqZSddNcF/w7Rw==
-X-ME-Sender: <xms:fFp9XefRPHaSEnLWYD2JLi9tzxca047ANhZ74EGQ5IQ0sprpDka8MA>
-X-ME-Proxy-Cause: gggruggvucftvghtrhhoucdtuddrgedufedrtdelgdduiedvucetufdoteggodetrfdotf
-    fvucfrrhhofhhilhgvmecuhfgrshhtofgrihhlpdfqfgfvpdfurfetoffkrfgpnffqhgen
-    uceurghilhhouhhtmecufedttdenucgfrhhlucfvnfffucdlfeehmdenucfjughrpefhvf
-    fufffkofgggfestdekredtredttdenucfhrhhomhepffgrnhhivghlucgiuhcuoegugihu
-    segugihuuhhurdighiiiqeenucfkphepudeifedruddugedrudeftddrudenucfrrghrrg
-    hmpehmrghilhhfrhhomhepugiguhesugiguhhuuhdrgiihiienucevlhhushhtvghrufhi
-    iigvpedt
-X-ME-Proxy: <xmx:fFp9XT4gnp3V3wstG8z7FdTzSrPn0a3nnQusMDTPSmvH28lT9CJdsw>
-    <xmx:fFp9XXhiIxvz_AqoVqP3S1KIyKqXIIXsKLDAWRwrGDmwXt7IEojO0w>
-    <xmx:fFp9XaFM43OcFu4sUmmhVOP8jB8g84bnqdiei15rfmwYeT4oji6y-A>
-    <xmx:fFp9XQRPrfrbmLJPJhv5K0kDDWpmg1_DrcS9yziVVV9NAZ7eMLXTSoxslH0>
-Received: from dlxu-fedora-R90QNFJV.thefacebook.com (unknown [163.114.130.1])
-        by mail.messagingengine.com (Postfix) with ESMTPA id 65B4BD6005A;
-        Sat, 14 Sep 2019 17:24:06 -0400 (EDT)
-From:   Daniel Xu <dxu@dxuuu.xyz>
-To:     axboe@kernel.dk
-Cc:     Daniel Xu <dxu@dxuuu.xyz>, linux-block@vger.kernel.org, dmm@fb.com
-Subject: [PATCH] io_uring: increase IORING_MAX_ENTRIES to 32K
-Date:   Sat, 14 Sep 2019 14:23:45 -0700
-Message-Id: <20190914212345.23861-1-dxu@dxuuu.xyz>
-X-Mailer: git-send-email 2.21.0
+        Sat, 14 Sep 2019 19:09:12 -0400
+Received: by mail-pl1-f195.google.com with SMTP id b10so14901406plr.4
+        for <linux-block@vger.kernel.org>; Sat, 14 Sep 2019 16:09:11 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=kernel-dk.20150623.gappssmtp.com; s=20150623;
+        h=subject:to:cc:references:from:message-id:date:user-agent
+         :mime-version:in-reply-to:content-language:content-transfer-encoding;
+        bh=jjy7WLC06UabcXJGEnoewA0bcwHmtjb9bGun5d6rqTU=;
+        b=jJaYVqrILukIB8ADX6eZySnQWWNzGOMu1wZW0WB/QLImCkBdWRzw8evvQWySKdI7VD
+         UPdggLUQem2WYaWgIDgqrz8Uz77pGmw6DfvpNsor/gcsJ5THBryT3OC4b/avUnHyGgUK
+         Aqbkix0FFUWnuyeb6dzOwfbi44Zp3QZmK0DcUsFcSFYn4stGhTmuAEVsy6vAiPUrPxwV
+         4E2IPqDa60uR6Rz0aYDijDW9twPFntFHDDuxNYBNbQ2iEEbS/cY6jnZ5h4xjjs9E4LB5
+         aEOP22xLumrOVQ+oxlFDzrcKatd6cM2FwPaS/dZgclZqlEUY9TmyJ2VW2KbSLbtLsHH5
+         ORNw==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20161025;
+        h=x-gm-message-state:subject:to:cc:references:from:message-id:date
+         :user-agent:mime-version:in-reply-to:content-language
+         :content-transfer-encoding;
+        bh=jjy7WLC06UabcXJGEnoewA0bcwHmtjb9bGun5d6rqTU=;
+        b=QdG1hrnobLnAllGOo2Yad1VwYM1T/dX5D5Q3LnsHVa38PQ5nLYHU9xAcUKwOuyehtb
+         56UBJ/AVINYbtlMRvuQ8f44iYeitJvT1nsRYxK7Kc7JDP6x5vOyYyIX4t9cHOKAqaabG
+         RJSoEYsa6t1E7rq+ovKDR77MyBAKFUYGob14G/49TyrHmnif9aWf1FW1+vW5mDYVJgWC
+         8LuucwhQK/yiBmuZU8rffYV4WkjWdzZOpUzc/GtyZxBOPFtKrMVy/mOS6FFTLw4Zpb9L
+         ecbtuJ2qPP5FOu87ruJ8x9wYRH3yo9FLKgeXueEPXVfaZVFWBsL0bt51JXAOsPPfZErJ
+         rMOw==
+X-Gm-Message-State: APjAAAWX5dbXZHwQuZLTx6gzj9tzbZqPFeXozs9wlUkEKzGz6W2ARXoU
+        dWpKVsWtwmqw3/cxxggRDMusBQ==
+X-Google-Smtp-Source: APXvYqxVipQbqNQpJ+KF/0o/4/71U1IZJYn97hTwEzEkdhAPOH3WHKKCF/sCDOm9xuCY9iQBkDVSaQ==
+X-Received: by 2002:a17:902:20b:: with SMTP id 11mr4635692plc.62.1568502551031;
+        Sat, 14 Sep 2019 16:09:11 -0700 (PDT)
+Received: from ?IPv6:2605:e000:100e:83a1:f871:451d:4a26:44d6? ([2605:e000:100e:83a1:f871:451d:4a26:44d6])
+        by smtp.gmail.com with ESMTPSA id u7sm26287556pgr.94.2019.09.14.16.09.08
+        (version=TLS1_2 cipher=ECDHE-RSA-AES128-GCM-SHA256 bits=128/128);
+        Sat, 14 Sep 2019 16:09:09 -0700 (PDT)
+Subject: Re: [PATCH] io_uring: increase IORING_MAX_ENTRIES to 32K
+To:     Daniel Xu <dxu@dxuuu.xyz>
+Cc:     linux-block@vger.kernel.org, dmm@fb.com
+References: <20190914212345.23861-1-dxu@dxuuu.xyz>
+From:   Jens Axboe <axboe@kernel.dk>
+Message-ID: <ff5ab7dc-f6c6-14a6-18f0-dbf94a1a9be4@kernel.dk>
+Date:   Sat, 14 Sep 2019 17:09:07 -0600
+User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:60.0) Gecko/20100101
+ Thunderbird/60.8.0
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
+In-Reply-To: <20190914212345.23861-1-dxu@dxuuu.xyz>
+Content-Type: text/plain; charset=utf-8
+Content-Language: en-US
+Content-Transfer-Encoding: 7bit
 Sender: linux-block-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-Some workloads can require far more than 4K oustanding entries. For
-example memcached can have ~300K sockets over ~40 cores. Bumping the max
-to 32K seems to work pretty well.
+On 9/14/19 3:23 PM, Daniel Xu wrote:
+> Some workloads can require far more than 4K oustanding entries. For
+> example memcached can have ~300K sockets over ~40 cores. Bumping the max
+> to 32K seems to work pretty well.
 
-Reported-by: Dan Melnic <dmm@fb.com>
-Signed-off-by: Daniel Xu <dxu@dxuuu.xyz>
----
- fs/io_uring.c | 2 +-
- 1 file changed, 1 insertion(+), 1 deletion(-)
+Should clarify that this is for poll entries, not actual pending IO.
+But makes sense, thanks, applied. We've got rlimit in place for mem
+usage, so there's really no reason to put anything else in place before
+bumping this (arbitrary) limit.
 
-diff --git a/fs/io_uring.c b/fs/io_uring.c
-index 3c8859d417eb..0dadbdbead0f 100644
---- a/fs/io_uring.c
-+++ b/fs/io_uring.c
-@@ -75,7 +75,7 @@
- 
- #include "internal.h"
- 
--#define IORING_MAX_ENTRIES	4096
-+#define IORING_MAX_ENTRIES	32768
- #define IORING_MAX_FIXED_FILES	1024
- 
- struct io_uring {
 -- 
-2.21.0
+Jens Axboe
 
