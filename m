@@ -2,129 +2,170 @@ Return-Path: <SRS0=sa6N=XL=vger.kernel.org=linux-block-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-0.9 required=3.0 tests=DKIM_SIGNED,DKIM_VALID,
-	DKIM_VALID_AU,HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SPF_HELO_NONE,
-	SPF_PASS autolearn=no autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-2.3 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
+	MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED,USER_AGENT_SANE_1
+	autolearn=no autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 275FCC49ED7
-	for <linux-block@archiver.kernel.org>; Mon, 16 Sep 2019 16:45:11 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 0555AC49ED7
+	for <linux-block@archiver.kernel.org>; Mon, 16 Sep 2019 16:46:27 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.kernel.org (Postfix) with ESMTP id F173321881
-	for <linux-block@archiver.kernel.org>; Mon, 16 Sep 2019 16:45:10 +0000 (UTC)
-Authentication-Results: mail.kernel.org;
-	dkim=pass (2048-bit key) header.d=linaro.org header.i=@linaro.org header.b="iTecFQlo"
+	by mail.kernel.org (Postfix) with ESMTP id D0E37214D9
+	for <linux-block@archiver.kernel.org>; Mon, 16 Sep 2019 16:46:26 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1729043AbfIPQpJ (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Mon, 16 Sep 2019 12:45:09 -0400
-Received: from mail-wr1-f67.google.com ([209.85.221.67]:36911 "EHLO
-        mail-wr1-f67.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S2390121AbfIPQpJ (ORCPT
+        id S1731656AbfIPQq0 (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Mon, 16 Sep 2019 12:46:26 -0400
+Received: from mail-pg1-f194.google.com ([209.85.215.194]:33082 "EHLO
+        mail-pg1-f194.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S1728172AbfIPQq0 (ORCPT
         <rfc822;linux-block@vger.kernel.org>);
-        Mon, 16 Sep 2019 12:45:09 -0400
-Received: by mail-wr1-f67.google.com with SMTP id i1so175248wro.4
-        for <linux-block@vger.kernel.org>; Mon, 16 Sep 2019 09:45:06 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=linaro.org; s=google;
-        h=mime-version:subject:from:in-reply-to:date:cc
-         :content-transfer-encoding:message-id:references:to;
-        bh=zZRFcLGUdVnVAcdne0uKeJBEyAx10rOBH/SeHFjSiQc=;
-        b=iTecFQloHelDoj6BafiGIlqL2AubioTSSuqHSPljPp0BFzKdCsfUFYs6FkMgymxurN
-         SLRwOfBqdo1mHpt/4gs6khElgLAZBd/NP4eO6+msUb31cUXvlCroT59lBMhZEay4+7it
-         tAHsJZUItXHSTCZuQbZqHtYGSV7yPeTsxIWKcMcAL71zhBY/n7fX9nDqdqtAutUB6YFU
-         u26U6ob0F8N8FJKYqyA1v/GKIFISZ76NQH4WwvW0cQ1c/4yl5+m7g9YG7PCgW37R+9Kx
-         bArVoTQG/Xsgn6dATft0MlWCt7vVe48bDpaXWKE0isC7xvqa0z3pS5jCp1+cbf9dGQz/
-         7lwQ==
+        Mon, 16 Sep 2019 12:46:26 -0400
+Received: by mail-pg1-f194.google.com with SMTP id n190so338598pgn.0;
+        Mon, 16 Sep 2019 09:46:25 -0700 (PDT)
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=1e100.net; s=20161025;
-        h=x-gm-message-state:mime-version:subject:from:in-reply-to:date:cc
-         :content-transfer-encoding:message-id:references:to;
-        bh=zZRFcLGUdVnVAcdne0uKeJBEyAx10rOBH/SeHFjSiQc=;
-        b=SP/ja+lgJjC6w6is3w7z3nT9YQHWProNdkZpm3VV+U5i0LoOULqZQrnCKVgQnoRPwQ
-         xVbMRXew7n9qUo2cmb+n3I2JpWzPwwy+LEXzj05LzvwZHRDZdRqie9Q5ykOsP7e8Ebk9
-         NFtP+u1Egds7hTHlnz/ueSIioML9L3VeHCJul3ykmfQIc169PfzTyi5l4JhkdOFyBpoF
-         CZU6nPVSESmkqALARIX4Rv2qNQX6QWVvbsTNkqPy4SvbdrPGD8INrvI4fmHH3TQIBaS/
-         9HmaMzr9EW94DGmsUZ8mQ4goA98CxN9mxdQ6DAfUXU87ub1D3CdqxY9D91BMlJ6OX2Q0
-         Q7Tw==
-X-Gm-Message-State: APjAAAXhcHFG5vslfi6YcaLOqlI760oht/KWfd0cni6ZF4YcqasYyVFa
-        YpK6Ql5NAxNFsHiwJw/6D+YEsA==
-X-Google-Smtp-Source: APXvYqwQyZm1F9Hvt002acDGUK3Kr5O8wzIu0QqNxbFoJ7OAg+Ux4GFV8wWzsqzSspfo1pRL+ESKwA==
-X-Received: by 2002:a05:6000:1c4:: with SMTP id t4mr575374wrx.183.1568652305834;
-        Mon, 16 Sep 2019 09:45:05 -0700 (PDT)
-Received: from [192.168.0.101] (146-241-102-115.dyn.eolo.it. [146.241.102.115])
-        by smtp.gmail.com with ESMTPSA id z3sm72237wma.29.2019.09.16.09.45.04
-        (version=TLS1_2 cipher=ECDHE-RSA-AES128-GCM-SHA256 bits=128/128);
-        Mon, 16 Sep 2019 09:45:05 -0700 (PDT)
-Content-Type: text/plain;
-        charset=us-ascii
-Mime-Version: 1.0 (Mac OS X Mail 12.4 \(3445.104.8\))
-Subject: Re: [PATCH 0/1] block, bfq: remove bfq prefix from cgroups filenames
-From:   Paolo Valente <paolo.valente@linaro.org>
-In-Reply-To: <91deff5b-4a0d-a7ef-8bb2-7e7e5dad767b@kernel.dk>
-Date:   Mon, 16 Sep 2019 18:45:03 +0200
-Cc:     Tejun Heo <tj@kernel.org>,
-        linux-block <linux-block@vger.kernel.org>,
-        linux-kernel <linux-kernel@vger.kernel.org>,
-        Ulf Hansson <ulf.hansson@linaro.org>,
-        Linus Walleij <linus.walleij@linaro.org>,
-        noreply-spamdigest via bfq-iosched 
-        <bfq-iosched@googlegroups.com>,
-        Oleksandr Natalenko <oleksandr@natalenko.name>,
-        cgroups@vger.kernel.org
-Content-Transfer-Encoding: quoted-printable
-Message-Id: <8766046C-485D-479E-A4D0-AD9EF2F8EF7C@linaro.org>
-References: <20190909073117.20625-1-paolo.valente@linaro.org>
- <80C56C11-DA21-4036-9006-2F459ACE9A8C@linaro.org>
- <c67c4d4b-ee56-85c1-5b94-7ae1704918b6@kernel.dk>
- <1F3898DA-C61F-4FA7-B586-F0FA0CAF5069@linaro.org>
- <20190916151643.GC3084169@devbig004.ftw2.facebook.com>
- <64329DDB-FFF4-4709-83B1-39D5E6BF6AB6@linaro.org>
- <91deff5b-4a0d-a7ef-8bb2-7e7e5dad767b@kernel.dk>
-To:     Jens Axboe <axboe@kernel.dk>
-X-Mailer: Apple Mail (2.3445.104.8)
+        h=x-gm-message-state:subject:to:cc:references:from:message-id:date
+         :user-agent:mime-version:in-reply-to:content-language
+         :content-transfer-encoding;
+        bh=wEkeJ052ZX1ngLqI2odICGwwwz3h/3/oT5mtOI36tmM=;
+        b=qPHwROhyHtgXkylFnO96XRstqPHM5aZLdIaBGeBwaaExn5DT1HWrFkQ7X6LEfvu1qM
+         6Sssd12NaluA2uF/NxPdkGqHHOoj6stNLmombq61lr1040uvS6yXJa9dCRH+gmEWJA/h
+         DlmrU79+TO1Nr6Tv7h4CNbEdutJX4d7mqSenKmdmtzAC+0TqjK6YpLytJjVVd7gYBX81
+         cyqhVL/2Sn4OJL0UjMST5NbgizJPpDZeHn8yPAywQd9wTFsIfYuGVCayLYQ6ppTdrpue
+         cDPZBUz8i5CPzgPxDmw/qtAj3lTcfhbHRJeLk/AAsAaJwV87WUVjBx/oawMKTWf/e6bx
+         Hi8Q==
+X-Gm-Message-State: APjAAAV18dpxvqsN5i2NDloHPoMgO97KtKFdqcodKJH3RpePb9BitOno
+        uUIg5iDPJxpmC19hQ4nLJxY=
+X-Google-Smtp-Source: APXvYqyy9sPBI2EU1kaxLg8ZrmSHsRE1OtaiYTIlBwjlTuHc11KgivHlm/nWhIF8aYg7uS5YZHy5Gg==
+X-Received: by 2002:a17:90a:9f0b:: with SMTP id n11mr156821pjp.102.1568652384943;
+        Mon, 16 Sep 2019 09:46:24 -0700 (PDT)
+Received: from desktop-bart.svl.corp.google.com ([2620:15c:2cd:202:4308:52a3:24b6:2c60])
+        by smtp.gmail.com with ESMTPSA id f128sm56403828pfg.143.2019.09.16.09.46.22
+        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
+        Mon, 16 Sep 2019 09:46:23 -0700 (PDT)
+Subject: Re: [PATCH v4 17/25] ibnbd: client: main functionality
+To:     Danil Kipnis <danil.kipnis@cloud.ionos.com>
+Cc:     Jack Wang <jinpuwang@gmail.com>, linux-block@vger.kernel.org,
+        linux-rdma@vger.kernel.org, Jens Axboe <axboe@kernel.dk>,
+        Christoph Hellwig <hch@infradead.org>,
+        Sagi Grimberg <sagi@grimberg.me>,
+        Jason Gunthorpe <jgg@mellanox.com>,
+        Doug Ledford <dledford@redhat.com>, rpenyaev@suse.de,
+        Jack Wang <jinpu.wang@cloud.ionos.com>,
+        Roman Pen <r.peniaev@gmail.com>
+References: <20190620150337.7847-1-jinpuwang@gmail.com>
+ <20190620150337.7847-18-jinpuwang@gmail.com>
+ <bd8963e2-d186-dbd0-fe39-7f4a518f4177@acm.org>
+ <CAHg0HuwzHnzPQAqjtYFTZb7BhzFagJ0NJ=pW=VkTqn5HML-0Vw@mail.gmail.com>
+From:   Bart Van Assche <bvanassche@acm.org>
+Message-ID: <5c5ff7df-2cce-ec26-7893-55911e4d8595@acm.org>
+Date:   Mon, 16 Sep 2019 09:46:22 -0700
+User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:60.0) Gecko/20100101
+ Thunderbird/60.8.0
+MIME-Version: 1.0
+In-Reply-To: <CAHg0HuwzHnzPQAqjtYFTZb7BhzFagJ0NJ=pW=VkTqn5HML-0Vw@mail.gmail.com>
+Content-Type: text/plain; charset=utf-8; format=flowed
+Content-Language: en-US
+Content-Transfer-Encoding: 7bit
 Sender: linux-block-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
+On 9/16/19 7:17 AM, Danil Kipnis wrote:
+> On Sat, Sep 14, 2019 at 1:46 AM Bart Van Assche <bvanassche@acm.org> wrote:
+>> On 6/20/19 8:03 AM, Jack Wang wrote:
+>>> +/*
+>>> + * This is for closing devices when unloading the module:
+>>> + * we might be closing a lot (>256) of devices in parallel
+>>> + * and it is better not to use the system_wq.
+>>> + */
+>>> +static struct workqueue_struct *unload_wq;
+>>
+>> I think that a better motivation is needed for the introduction of a new
+>> workqueue.
+ >
+> We didn't want to pollute the system workqueue when unmapping a big
+> number of devices at once in parallel. Will reiterate on it.
+
+There are multiple system workqueues. From <linux/workqueue.h>:
+
+extern struct workqueue_struct *system_wq;
+extern struct workqueue_struct *system_highpri_wq;
+extern struct workqueue_struct *system_long_wq;
+extern struct workqueue_struct *system_unbound_wq;
+extern struct workqueue_struct *system_freezable_wq;
+extern struct workqueue_struct *system_power_efficient_wq;
+extern struct workqueue_struct *system_freezable_power_efficient_wq;
+
+Has it been considered to use e.g. system_long_wq?
+
+>> A more general question is why ibnbd needs its own queue management
+>> while no other block driver needs this?
+>
+> Each IBNBD device promises to have a queue_depth (of say 512) on each
+> of its num_cpus hardware queues. In fact we can only process a
+> queue_depth inflights at once on the whole ibtrs session connecting a
+> given client with a given server. Those 512 inflights (corresponding
+> to the number of buffers reserved by the server for this particular
+> client) have to be shared among all the devices mapped on this
+> session. This leads to the situation, that we receive more requests
+> than we can process at the moment. So we need to stop queues and start
+> them again later in some fair fashion.
+
+Can a single CPU really sustain a queue depth of 512 commands? Is it 
+really necessary to have one hardware queue per CPU or is e.g. four 
+queues per NUMA node sufficient? Has it been considered to send the 
+number of hardware queues that the initiator wants to use and also the 
+command depth per queue during login to the target side? That would 
+allow the target side to allocate an independent set of buffers for each 
+initiator hardware queue and would allow to remove the queue management 
+at the initiator side. This might even yield better performance.
+
+>>> +static void msg_conf(void *priv, int errno)
+>>> +{
+>>> +     struct ibnbd_iu *iu = (struct ibnbd_iu *)priv;
+>>
+>> The kernel code I'm familiar with does not cast void pointers explicitly
+>> into another type. Please follow that convention and leave the cast out
+>> from the above and also from similar statements.
+> msg_conf() is a callback which IBNBD passes down with a request to
+> IBTRS when calling ibtrs_clt_request(). msg_conf() is called when a
+> request is completed with a pointer to a struct defined in IBNBD. So
+> IBTRS as transport doesn't know what's inside the private pointer
+> which IBNBD passed down with the request, it's opaque, since struct
+> ibnbd_iu is not visible in IBTRS. I will try to find how others avoid
+> a cast in similar situations.
+
+Are you aware that the C language can cast a void pointer into a 
+non-void pointer implicitly, that means, without having to use a cast?
 
 
-> Il giorno 16 set 2019, alle ore 18:01, Jens Axboe <axboe@kernel.dk> ha =
-scritto:
->=20
-> On 9/16/19 9:21 AM, Paolo Valente wrote:
->>=20
->>=20
->>> Il giorno 16 set 2019, alle ore 17:16, Tejun Heo <tj@kernel.org> ha =
-scritto:
->>>=20
->>> Hello, Paolo.
->>>=20
->>> On Mon, Sep 16, 2019 at 05:07:29PM +0200, Paolo Valente wrote:
->>>> Tejun, could you put your switch-off-io-cost code into a standalone
->>>> patch, so that I can put it together with this one in a complete
->>>> series?
->>>=20
->>> It was more of a proof-of-concept / example, so the note in the =
-email
->>> that the code is free to be modified / used any way you see fit.  =
-That
->>> said, if you like it as it is, I can surely prep it as a standalone
->>> patch.
->>>=20
->>=20
->> AFAICT your proposal contains no evident error.  Plus, no one seems =
-to
->> have complained about the idea (regardless from the exact
->> implementation).  So I guess the best next step is to go for it.
->=20
-> Not filling me with a lot of confidence that you actually tested it?
->=20
+>>> +static void wait_for_ibtrs_disconnection(struct ibnbd_clt_session *sess)
+>>> +__releases(&sess_lock)
+>>> +__acquires(&sess_lock)
+>>> +{
+>>> +     DEFINE_WAIT_FUNC(wait, autoremove_wake_function);
+>>> +
+>>> +     prepare_to_wait(&sess->ibtrs_waitq, &wait, TASK_UNINTERRUPTIBLE);
+>>> +     if (IS_ERR_OR_NULL(sess->ibtrs)) {
+>>> +             finish_wait(&sess->ibtrs_waitq, &wait);
+>>> +             return;
+>>> +     }
+>>> +     mutex_unlock(&sess_lock);
+>>> +     /* After unlock session can be freed, so careful */
+>>> +     schedule();
+>>> +     mutex_lock(&sess_lock);
+>>> +}
+>>
+>> This doesn't look right: any random wake_up() call can wake up this
+>> function. Shouldn't there be a loop in this function that causes the
+>> schedule() call to be repeated until the disconnect has happened?
+> The loop is inside __find_and_get_sess(), which is calling that
+> function. We need to schedule() here in order for another thread to be
+> able to remove the dying session we just found and tried to get
+> reference to from the list of sessions, so that we can go over the
+> list again in __find_and_get_sess().
 
-Tested it too. Waiting for Tejun's patch to re-submit it with mine.
+Thanks for the clarification.
 
-Thanks,
-Paolo
-
-> --=20
-> Jens Axboe
-
+Bart.
