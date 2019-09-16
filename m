@@ -2,124 +2,149 @@ Return-Path: <SRS0=sa6N=XL=vger.kernel.org=linux-block-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-7.0 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
-	INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS
+X-Spam-Status: No, score=-5.5 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
+	INCLUDES_PATCH,MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,USER_AGENT_SANE_1
 	autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id BFBD2C4CEC4
-	for <linux-block@archiver.kernel.org>; Mon, 16 Sep 2019 02:16:51 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 0D9BBC4CEC7
+	for <linux-block@archiver.kernel.org>; Mon, 16 Sep 2019 02:40:18 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.kernel.org (Postfix) with ESMTP id A0A8C2077C
-	for <linux-block@archiver.kernel.org>; Mon, 16 Sep 2019 02:16:51 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id DE4F721479
+	for <linux-block@archiver.kernel.org>; Mon, 16 Sep 2019 02:40:17 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1729386AbfIPCQv (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Sun, 15 Sep 2019 22:16:51 -0400
-Received: from mx1.redhat.com ([209.132.183.28]:33612 "EHLO mx1.redhat.com"
-        rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-        id S1727635AbfIPCQv (ORCPT <rfc822;linux-block@vger.kernel.org>);
-        Sun, 15 Sep 2019 22:16:51 -0400
-Received: from smtp.corp.redhat.com (int-mx06.intmail.prod.int.phx2.redhat.com [10.5.11.16])
-        (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
-        (No client certificate requested)
-        by mx1.redhat.com (Postfix) with ESMTPS id CC5E258569;
-        Mon, 16 Sep 2019 02:16:50 +0000 (UTC)
-Received: from localhost.localdomain (unknown [10.70.39.226])
-        by smtp.corp.redhat.com (Postfix) with ESMTP id 9A4E05C1D6;
-        Mon, 16 Sep 2019 02:16:48 +0000 (UTC)
-From:   xiubli@redhat.com
-To:     josef@toxicpanda.com, axboe@kernel.dk
-Cc:     mchristi@redhat.com, linux-block@vger.kernel.org,
-        Xiubo Li <xiubli@redhat.com>, Ming Lei <ming.lei@redhat.com>
-Subject: [PATCHv2 2/2] blk-mq: use BLK_MQ_GFP_FLAGS macro instead
-Date:   Mon, 16 Sep 2019 07:46:31 +0530
-Message-Id: <20190916021631.4327-3-xiubli@redhat.com>
-In-Reply-To: <20190916021631.4327-1-xiubli@redhat.com>
-References: <20190916021631.4327-1-xiubli@redhat.com>
+        id S1726872AbfIPCkR (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Sun, 15 Sep 2019 22:40:17 -0400
+Received: from szxga07-in.huawei.com ([45.249.212.35]:38574 "EHLO huawei.com"
+        rhost-flags-OK-OK-OK-FAIL) by vger.kernel.org with ESMTP
+        id S1726057AbfIPCkR (ORCPT <rfc822;linux-block@vger.kernel.org>);
+        Sun, 15 Sep 2019 22:40:17 -0400
+Received: from DGGEMS414-HUB.china.huawei.com (unknown [172.30.72.59])
+        by Forcepoint Email with ESMTP id 318ACEC30F75591A2ABF;
+        Mon, 16 Sep 2019 10:40:15 +0800 (CST)
+Received: from [127.0.0.1] (10.177.219.49) by DGGEMS414-HUB.china.huawei.com
+ (10.3.19.214) with Microsoft SMTP Server id 14.3.439.0; Mon, 16 Sep 2019
+ 10:40:06 +0800
+Subject: Re: [PATCH] block: fix null pointer dereference in
+ blk_mq_rq_timed_out()
+To:     Ming Lei <ming.lei@redhat.com>
+CC:     <axboe@kernel.dk>, <linux-block@vger.kernel.org>,
+        <hch@infradead.org>, <keith.busch@intel.com>, <tj@kernel.org>,
+        <zhangxiaoxu5@huawei.com>
+References: <20190907102450.40291-1-yuyufen@huawei.com>
+ <20190912024618.GE2731@ming.t460p>
+ <b3d7b459-5f31-d473-2508-20048119c1b2@huawei.com>
+ <20190912041658.GA5020@ming.t460p>
+ <d3549c6d-ca07-efa9-af15-7cee61ce5ff2@huawei.com>
+ <20190912100755.GB9897@ming.t460p>
+From:   Yufen Yu <yuyufen@huawei.com>
+Message-ID: <6acffbb3-37b9-217d-ba04-d4190f88ea7f@huawei.com>
+Date:   Mon, 16 Sep 2019 10:40:04 +0800
+User-Agent: Mozilla/5.0 (Windows NT 6.1; WOW64; rv:52.0) Gecko/20100101
+ Thunderbird/52.2.1
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
-X-Scanned-By: MIMEDefang 2.79 on 10.5.11.16
-X-Greylist: Sender IP whitelisted, not delayed by milter-greylist-4.5.16 (mx1.redhat.com [10.5.110.39]); Mon, 16 Sep 2019 02:16:50 +0000 (UTC)
+In-Reply-To: <20190912100755.GB9897@ming.t460p>
+Content-Type: text/plain; charset="utf-8"; format=flowed
+Content-Transfer-Encoding: 7bit
+Content-Language: en-US
+X-Originating-IP: [10.177.219.49]
+X-CFilter-Loop: Reflected
 Sender: linux-block-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-From: Xiubo Li <xiubli@redhat.com>
 
-There at least 6 places are using the same combined GFP flags,
-switch them to one macro instead to make the code get cleaner.
 
-Signed-off-by: Xiubo Li <xiubli@redhat.com>
-Reviewed-by: Ming Lei <ming.lei@redhat.com>
----
- block/blk-mq.c | 16 ++++++++--------
- 1 file changed, 8 insertions(+), 8 deletions(-)
+On 2019/9/12 18:07, Ming Lei wrote:
+> On Thu, Sep 12, 2019 at 04:49:15PM +0800, Yufen Yu wrote:
+>>
+>> On 2019/9/12 12:16, Ming Lei wrote:
+>>> On Thu, Sep 12, 2019 at 11:29:18AM +0800, Yufen Yu wrote:
+>>>> On 2019/9/12 10:46, Ming Lei wrote:
+>>>>> On Sat, Sep 07, 2019 at 06:24:50PM +0800, Yufen Yu wrote:
+>>>>>> There is a race condition between timeout check and completion for
+>>>>>> flush request as follow:
+>>>>>>
+>>>>>> timeout_work    issue flush      issue flush
+>>>>>>                    blk_insert_flush
+>>>>>>                                     blk_insert_flush
+>>>>>> blk_mq_timeout_work
+>>>>>>                    blk_kick_flush
+>>>>>>
+>>>>>> blk_mq_queue_tag_busy_iter
+>>>>>> blk_mq_check_expired(flush_rq)
+>>>>>>
+>>>>>>                    __blk_mq_end_request
+>>>>>>                   flush_end_io
+>>>>>>                   blk_kick_flush
+>>>>>>                   blk_rq_init(flush_rq)
+>>>>>>                   memset(flush_rq, 0)
+>>>>> Not see there is memset(flush_rq, 0) in block/blk-flush.c
+>>>> Call path as follow:
+>>>>
+>>>> blk_kick_flush
+>>>>       blk_rq_init
+>>>>           memset(rq, 0, sizeof(*rq));
+>>> Looks I miss this one in blk_rq_init(), sorry for that.
+>>>
+>>> Given there are only two users of blk_rq_init(), one simple fix could be
+>>> not clearing queue in blk_rq_init(), something like below?
+>>>
+>>> diff --git a/block/blk-core.c b/block/blk-core.c
+>>> index 77807a5d7f9e..25e6a045c821 100644
+>>> --- a/block/blk-core.c
+>>> +++ b/block/blk-core.c
+>>> @@ -107,7 +107,9 @@ EXPORT_SYMBOL_GPL(blk_queue_flag_test_and_set);
+>>>    void blk_rq_init(struct request_queue *q, struct request *rq)
+>>>    {
+>>> -	memset(rq, 0, sizeof(*rq));
+>>> +	const int offset = offsetof(struct request, q);
+>>> +
+>>> +	memset((void *)rq + offset, 0, sizeof(*rq) - offset);
+>>>    	INIT_LIST_HEAD(&rq->queuelist);
+>>>    	rq->q = q;
+>>> diff --git a/include/linux/blkdev.h b/include/linux/blkdev.h
+>>> index 1ac790178787..382e71b8787d 100644
+>>> --- a/include/linux/blkdev.h
+>>> +++ b/include/linux/blkdev.h
+>>> @@ -130,7 +130,7 @@ enum mq_rq_state {
+>>>     * especially blk_mq_rq_ctx_init() to take care of the added fields.
+>>>     */
+>>>    struct request {
+>>> -	struct request_queue *q;
+>>> +	struct request_queue *q;	/* Must be the 1st field */
+>>>    	struct blk_mq_ctx *mq_ctx;
+>>>    	struct blk_mq_hw_ctx *mq_hctx;
+>> Not set req->q as '0' can just avoid BUG_ON for NULL pointer deference.
+>>
+>> However, the root problem is that 'flush_rq' have been reused while
+>> timeout function handle it currently. That means mq_ops->timeout() may
+>> access old values remained by the last flush request and make the wrong
+>> decision.
+>>
+>> Take the race condition in the patch as an example.
+>>
+>> blk_mq_check_expired
+>>      blk_mq_rq_timed_out
+>>          req->q->mq_ops->timeout  // Driver timeout handle may read old data
+>>      refcount_dec_and_test(&rq)
+>>      __blk_mq_free_request   // If rq have been reset has '1' in
+>> blk_rq_init(), it will be free here.
+>>
+>> So, I think we should solve this problem completely. Just like normal
+>> request,
+>> we can prevent flush request to call end_io when timeout handle the request.
+> Seems it isn't specific for 'flush_rq', and it should be one generic issue
+> for any request which implements .end_io.
+>
+> For requests without defining .end_io, rq->ref is applied for protecting
+> its lifetime. However, rq->end_io() is still called even if rq->ref doesn't
+> drop to zero.
+>
+> If the above is correct, we need to let rq->ref to cover rq->end_io().
 
-diff --git a/block/blk-mq.c b/block/blk-mq.c
-index 9c52e4dfe132..a5faad4690cf 100644
---- a/block/blk-mq.c
-+++ b/block/blk-mq.c
-@@ -39,6 +39,8 @@
- #include "blk-mq-sched.h"
- #include "blk-rq-qos.h"
- 
-+#define BLK_MQ_GFP_FLAGS (GFP_NOIO | __GFP_NOWARN | __GFP_NORETRY)
-+
- static void blk_mq_poll_stats_start(struct request_queue *q);
- static void blk_mq_poll_stats_fn(struct blk_stat_callback *cb);
- 
-@@ -2091,21 +2093,19 @@ struct blk_mq_tags *blk_mq_alloc_rq_map(struct blk_mq_tag_set *set,
- 
- 	tags = blk_mq_init_tags(nr_tags, reserved_tags, node,
- 				BLK_MQ_FLAG_TO_ALLOC_POLICY(set->flags),
--				GFP_NOIO | __GFP_NOWARN | __GFP_NORETRY);
-+				BLK_MQ_GFP_FLAGS);
- 	if (!tags)
- 		return NULL;
- 
- 	tags->rqs = kcalloc_node(nr_tags, sizeof(struct request *),
--				 GFP_NOIO | __GFP_NOWARN | __GFP_NORETRY,
--				 node);
-+				 BLK_MQ_GFP_FLAGS, node);
- 	if (!tags->rqs) {
- 		blk_mq_free_tags(tags);
- 		return NULL;
- 	}
- 
- 	tags->static_rqs = kcalloc_node(nr_tags, sizeof(struct request *),
--					GFP_NOIO | __GFP_NOWARN | __GFP_NORETRY,
--					node);
-+					BLK_MQ_GFP_FLAGS, node);
- 	if (!tags->static_rqs) {
- 		kfree(tags->rqs);
- 		blk_mq_free_tags(tags);
-@@ -2167,7 +2167,7 @@ int blk_mq_alloc_rqs(struct blk_mq_tag_set *set, struct blk_mq_tags *tags,
- 
- 		do {
- 			page = alloc_pages_node(node,
--				GFP_NOIO | __GFP_NOWARN | __GFP_NORETRY | __GFP_ZERO,
-+				BLK_MQ_GFP_FLAGS | __GFP_ZERO,
- 				this_order);
- 			if (page)
- 				break;
-@@ -2333,7 +2333,7 @@ blk_mq_alloc_hctx(struct request_queue *q, struct blk_mq_tag_set *set,
- 		int node)
- {
- 	struct blk_mq_hw_ctx *hctx;
--	gfp_t gfp = GFP_NOIO | __GFP_NOWARN | __GFP_NORETRY;
-+	gfp_t gfp = BLK_MQ_GFP_FLAGS;
- 
- 	hctx = kzalloc_node(blk_mq_hw_ctx_size(set), gfp, node);
- 	if (!hctx)
-@@ -3194,7 +3194,7 @@ static bool blk_mq_elv_switch_none(struct list_head *head,
- 	if (!q->elevator)
- 		return true;
- 
--	qe = kmalloc(sizeof(*qe), GFP_NOIO | __GFP_NOWARN | __GFP_NORETRY);
-+	qe = kmalloc(sizeof(*qe), BLK_MQ_GFP_FLAGS);
- 	if (!qe)
- 		return false;
- 
--- 
-2.21.0
+Thanks for catching what I have ignored. I am trying to fix the problem.
+
+Thanks,
+Yufen
 
