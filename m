@@ -2,68 +2,74 @@ Return-Path: <SRS0=sa6N=XL=vger.kernel.org=linux-block-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-2.3 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
-	MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED,USER_AGENT_SANE_1
-	autolearn=no autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-2.3 required=3.0 tests=DKIM_SIGNED,DKIM_VALID,
+	HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,
+	USER_AGENT_SANE_1 autolearn=no autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 0555AC49ED7
-	for <linux-block@archiver.kernel.org>; Mon, 16 Sep 2019 16:46:27 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id DBC54C49ED7
+	for <linux-block@archiver.kernel.org>; Mon, 16 Sep 2019 16:52:39 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.kernel.org (Postfix) with ESMTP id D0E37214D9
-	for <linux-block@archiver.kernel.org>; Mon, 16 Sep 2019 16:46:26 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id AD91F21852
+	for <linux-block@archiver.kernel.org>; Mon, 16 Sep 2019 16:52:39 +0000 (UTC)
+Authentication-Results: mail.kernel.org;
+	dkim=pass (2048-bit key) header.d=kernel-dk.20150623.gappssmtp.com header.i=@kernel-dk.20150623.gappssmtp.com header.b="PdGG8+M6"
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1731656AbfIPQq0 (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Mon, 16 Sep 2019 12:46:26 -0400
-Received: from mail-pg1-f194.google.com ([209.85.215.194]:33082 "EHLO
-        mail-pg1-f194.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1728172AbfIPQq0 (ORCPT
+        id S1732016AbfIPQwj (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Mon, 16 Sep 2019 12:52:39 -0400
+Received: from mail-pl1-f172.google.com ([209.85.214.172]:45189 "EHLO
+        mail-pl1-f172.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S1729084AbfIPQwj (ORCPT
         <rfc822;linux-block@vger.kernel.org>);
-        Mon, 16 Sep 2019 12:46:26 -0400
-Received: by mail-pg1-f194.google.com with SMTP id n190so338598pgn.0;
-        Mon, 16 Sep 2019 09:46:25 -0700 (PDT)
+        Mon, 16 Sep 2019 12:52:39 -0400
+Received: by mail-pl1-f172.google.com with SMTP id x3so131642plr.12
+        for <linux-block@vger.kernel.org>; Mon, 16 Sep 2019 09:52:37 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=kernel-dk.20150623.gappssmtp.com; s=20150623;
+        h=subject:to:cc:references:from:message-id:date:user-agent
+         :mime-version:in-reply-to:content-language:content-transfer-encoding;
+        bh=mafOmfUjFV3O7Ul/Un1dHRGe62gU1AXzGq1aE/zr7+g=;
+        b=PdGG8+M6evNNuGiNOLut3OfoX6EaOSQTLzB0zq6KWfmfOiNvtOqFv0Dhzo9JnIpz3h
+         60lDa3N3AQC+aLma8k568u0aenrA8m+cYQRHZrpvS1wBSA3n1B5U1zcjRK7jTvVb0VdJ
+         gRB/j+8qSKas4mOwQrfZPJUV7Drf5/RdSAVy1DABfTM3zVElVmAD7jtCG01HY2HT/7+L
+         wGCv1eP1rIVD5rd3otYPoIG0TetNGk895r1EKDUIRHM3L2yxdSVIzxoFDYJfEvOEE6v4
+         i1uqUQe2ODiIKus+VkW3nTDGOO3geyAKMNSMQqaxulgsjPi+0DGOxNVomn2vAcCL139u
+         81dg==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=1e100.net; s=20161025;
         h=x-gm-message-state:subject:to:cc:references:from:message-id:date
          :user-agent:mime-version:in-reply-to:content-language
          :content-transfer-encoding;
-        bh=wEkeJ052ZX1ngLqI2odICGwwwz3h/3/oT5mtOI36tmM=;
-        b=qPHwROhyHtgXkylFnO96XRstqPHM5aZLdIaBGeBwaaExn5DT1HWrFkQ7X6LEfvu1qM
-         6Sssd12NaluA2uF/NxPdkGqHHOoj6stNLmombq61lr1040uvS6yXJa9dCRH+gmEWJA/h
-         DlmrU79+TO1Nr6Tv7h4CNbEdutJX4d7mqSenKmdmtzAC+0TqjK6YpLytJjVVd7gYBX81
-         cyqhVL/2Sn4OJL0UjMST5NbgizJPpDZeHn8yPAywQd9wTFsIfYuGVCayLYQ6ppTdrpue
-         cDPZBUz8i5CPzgPxDmw/qtAj3lTcfhbHRJeLk/AAsAaJwV87WUVjBx/oawMKTWf/e6bx
-         Hi8Q==
-X-Gm-Message-State: APjAAAV18dpxvqsN5i2NDloHPoMgO97KtKFdqcodKJH3RpePb9BitOno
-        uUIg5iDPJxpmC19hQ4nLJxY=
-X-Google-Smtp-Source: APXvYqyy9sPBI2EU1kaxLg8ZrmSHsRE1OtaiYTIlBwjlTuHc11KgivHlm/nWhIF8aYg7uS5YZHy5Gg==
-X-Received: by 2002:a17:90a:9f0b:: with SMTP id n11mr156821pjp.102.1568652384943;
-        Mon, 16 Sep 2019 09:46:24 -0700 (PDT)
-Received: from desktop-bart.svl.corp.google.com ([2620:15c:2cd:202:4308:52a3:24b6:2c60])
-        by smtp.gmail.com with ESMTPSA id f128sm56403828pfg.143.2019.09.16.09.46.22
-        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
-        Mon, 16 Sep 2019 09:46:23 -0700 (PDT)
-Subject: Re: [PATCH v4 17/25] ibnbd: client: main functionality
-To:     Danil Kipnis <danil.kipnis@cloud.ionos.com>
-Cc:     Jack Wang <jinpuwang@gmail.com>, linux-block@vger.kernel.org,
-        linux-rdma@vger.kernel.org, Jens Axboe <axboe@kernel.dk>,
-        Christoph Hellwig <hch@infradead.org>,
-        Sagi Grimberg <sagi@grimberg.me>,
-        Jason Gunthorpe <jgg@mellanox.com>,
-        Doug Ledford <dledford@redhat.com>, rpenyaev@suse.de,
-        Jack Wang <jinpu.wang@cloud.ionos.com>,
-        Roman Pen <r.peniaev@gmail.com>
-References: <20190620150337.7847-1-jinpuwang@gmail.com>
- <20190620150337.7847-18-jinpuwang@gmail.com>
- <bd8963e2-d186-dbd0-fe39-7f4a518f4177@acm.org>
- <CAHg0HuwzHnzPQAqjtYFTZb7BhzFagJ0NJ=pW=VkTqn5HML-0Vw@mail.gmail.com>
-From:   Bart Van Assche <bvanassche@acm.org>
-Message-ID: <5c5ff7df-2cce-ec26-7893-55911e4d8595@acm.org>
-Date:   Mon, 16 Sep 2019 09:46:22 -0700
+        bh=mafOmfUjFV3O7Ul/Un1dHRGe62gU1AXzGq1aE/zr7+g=;
+        b=ZXGf48xFu8eJd1cC3CwQaJ9cbQyvrO9UGkRyCAkvMu/0Br4eqCtEhjBMTbuZoM7fNt
+         5N2VL/IbVwlFrEF1jFMIqw4jeJYgL39nQjfLwG+T9PUk9tRgqxFFNhHBqvUzum2yG22l
+         Wi+t7/j/UgyNxPS5Lj04BgS+uMmchXteHNBmmy+aXPDszmPIN1NV1OAAMq2UkiblOxIF
+         n7vK73HrzA+LgqcvNdeFM+vka8rF8jI/18g+4fckNpAnCBnKLwHHCg5mJXoFiFFDxaiX
+         OhaB5ql0/NUeZRfk+9kS+hi5QEpKID59FIwgP7jxdpb+T5aqMe2Gll4g/q/GtBCFZGld
+         aLDQ==
+X-Gm-Message-State: APjAAAXgTvwa9BPPjrzZ53vh186ZPZlL5yFIoTlGKDteU30cHjyfb6DB
+        WIRX9sl1Z6TRFDVCphaA9U7enAdeN6pY9A==
+X-Google-Smtp-Source: APXvYqyYg3fFRtVZZAz0CA8BCv6BzdNux11yToJP0h2s+jKEaxXM9bnSw57pGcfHJrdyUZWIAMj7ZA==
+X-Received: by 2002:a17:902:a98a:: with SMTP id bh10mr715335plb.343.1568652755744;
+        Mon, 16 Sep 2019 09:52:35 -0700 (PDT)
+Received: from ?IPv6:2605:e000:100e:83a1:c484:c1a1:f495:ecae? ([2605:e000:100e:83a1:c484:c1a1:f495:ecae])
+        by smtp.gmail.com with ESMTPSA id l72sm100442pjb.7.2019.09.16.09.52.34
+        (version=TLS1_2 cipher=ECDHE-RSA-AES128-GCM-SHA256 bits=128/128);
+        Mon, 16 Sep 2019 09:52:34 -0700 (PDT)
+Subject: Re: [PATCHv2 0/2] blk-mq: Avoid memory reclaim when allocating
+ request map
+To:     Christoph Hellwig <hch@infradead.org>, xiubli@redhat.com
+Cc:     josef@toxicpanda.com, mchristi@redhat.com,
+        linux-block@vger.kernel.org
+References: <20190916021631.4327-1-xiubli@redhat.com>
+ <20190916090606.GA13266@infradead.org>
+From:   Jens Axboe <axboe@kernel.dk>
+Message-ID: <8c08e9f8-cf71-8fcc-cff3-0d92dd859a59@kernel.dk>
+Date:   Mon, 16 Sep 2019 10:52:33 -0600
 User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:60.0) Gecko/20100101
  Thunderbird/60.8.0
 MIME-Version: 1.0
-In-Reply-To: <CAHg0HuwzHnzPQAqjtYFTZb7BhzFagJ0NJ=pW=VkTqn5HML-0Vw@mail.gmail.com>
-Content-Type: text/plain; charset=utf-8; format=flowed
+In-Reply-To: <20190916090606.GA13266@infradead.org>
+Content-Type: text/plain; charset=utf-8
 Content-Language: en-US
 Content-Transfer-Encoding: 7bit
 Sender: linux-block-owner@vger.kernel.org
@@ -71,101 +77,23 @@ Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-On 9/16/19 7:17 AM, Danil Kipnis wrote:
-> On Sat, Sep 14, 2019 at 1:46 AM Bart Van Assche <bvanassche@acm.org> wrote:
->> On 6/20/19 8:03 AM, Jack Wang wrote:
->>> +/*
->>> + * This is for closing devices when unloading the module:
->>> + * we might be closing a lot (>256) of devices in parallel
->>> + * and it is better not to use the system_wq.
->>> + */
->>> +static struct workqueue_struct *unload_wq;
+On 9/16/19 3:06 AM, Christoph Hellwig wrote:
+> On Mon, Sep 16, 2019 at 07:46:29AM +0530, xiubli@redhat.com wrote:
+>> From: Xiubo Li <xiubli@redhat.com>
 >>
->> I think that a better motivation is needed for the introduction of a new
->> workqueue.
- >
-> We didn't want to pollute the system workqueue when unmapping a big
-> number of devices at once in parallel. Will reiterate on it.
+>> To make the patch more readable and cleaner I just split them into 2
+>> small ones to address the issue from @Ming Lei, thanks very much.
+> 
+> I'd be much happier to just see memalloc_noio_save +
+> memalloc_noio_restore calls in the right places over sprinkling even
+> more magic GFP_NOIO arguments.
 
-There are multiple system workqueues. From <linux/workqueue.h>:
+Ugh, I always thought those were kind of lame and band aiding around
+places where people are too lazy to fix the path to the gfp args.
+Or maybe areas where it's just feasible.
 
-extern struct workqueue_struct *system_wq;
-extern struct workqueue_struct *system_highpri_wq;
-extern struct workqueue_struct *system_long_wq;
-extern struct workqueue_struct *system_unbound_wq;
-extern struct workqueue_struct *system_freezable_wq;
-extern struct workqueue_struct *system_power_efficient_wq;
-extern struct workqueue_struct *system_freezable_power_efficient_wq;
+This is not one of those.
 
-Has it been considered to use e.g. system_long_wq?
+-- 
+Jens Axboe
 
->> A more general question is why ibnbd needs its own queue management
->> while no other block driver needs this?
->
-> Each IBNBD device promises to have a queue_depth (of say 512) on each
-> of its num_cpus hardware queues. In fact we can only process a
-> queue_depth inflights at once on the whole ibtrs session connecting a
-> given client with a given server. Those 512 inflights (corresponding
-> to the number of buffers reserved by the server for this particular
-> client) have to be shared among all the devices mapped on this
-> session. This leads to the situation, that we receive more requests
-> than we can process at the moment. So we need to stop queues and start
-> them again later in some fair fashion.
-
-Can a single CPU really sustain a queue depth of 512 commands? Is it 
-really necessary to have one hardware queue per CPU or is e.g. four 
-queues per NUMA node sufficient? Has it been considered to send the 
-number of hardware queues that the initiator wants to use and also the 
-command depth per queue during login to the target side? That would 
-allow the target side to allocate an independent set of buffers for each 
-initiator hardware queue and would allow to remove the queue management 
-at the initiator side. This might even yield better performance.
-
->>> +static void msg_conf(void *priv, int errno)
->>> +{
->>> +     struct ibnbd_iu *iu = (struct ibnbd_iu *)priv;
->>
->> The kernel code I'm familiar with does not cast void pointers explicitly
->> into another type. Please follow that convention and leave the cast out
->> from the above and also from similar statements.
-> msg_conf() is a callback which IBNBD passes down with a request to
-> IBTRS when calling ibtrs_clt_request(). msg_conf() is called when a
-> request is completed with a pointer to a struct defined in IBNBD. So
-> IBTRS as transport doesn't know what's inside the private pointer
-> which IBNBD passed down with the request, it's opaque, since struct
-> ibnbd_iu is not visible in IBTRS. I will try to find how others avoid
-> a cast in similar situations.
-
-Are you aware that the C language can cast a void pointer into a 
-non-void pointer implicitly, that means, without having to use a cast?
-
-
->>> +static void wait_for_ibtrs_disconnection(struct ibnbd_clt_session *sess)
->>> +__releases(&sess_lock)
->>> +__acquires(&sess_lock)
->>> +{
->>> +     DEFINE_WAIT_FUNC(wait, autoremove_wake_function);
->>> +
->>> +     prepare_to_wait(&sess->ibtrs_waitq, &wait, TASK_UNINTERRUPTIBLE);
->>> +     if (IS_ERR_OR_NULL(sess->ibtrs)) {
->>> +             finish_wait(&sess->ibtrs_waitq, &wait);
->>> +             return;
->>> +     }
->>> +     mutex_unlock(&sess_lock);
->>> +     /* After unlock session can be freed, so careful */
->>> +     schedule();
->>> +     mutex_lock(&sess_lock);
->>> +}
->>
->> This doesn't look right: any random wake_up() call can wake up this
->> function. Shouldn't there be a loop in this function that causes the
->> schedule() call to be repeated until the disconnect has happened?
-> The loop is inside __find_and_get_sess(), which is calling that
-> function. We need to schedule() here in order for another thread to be
-> able to remove the dying session we just found and tried to get
-> reference to from the list of sessions, so that we can go over the
-> list again in __find_and_get_sess().
-
-Thanks for the clarification.
-
-Bart.
