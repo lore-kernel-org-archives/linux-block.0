@@ -2,118 +2,76 @@ Return-Path: <SRS0=sa6N=XL=vger.kernel.org=linux-block-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-2.6 required=3.0 tests=DKIMWL_WL_HIGH,DKIM_SIGNED,
-	DKIM_VALID,DKIM_VALID_AU,MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,
-	URIBL_BLOCKED,USER_AGENT_SANE_1 autolearn=no autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-2.4 required=3.0 tests=DKIM_SIGNED,DKIM_VALID,
+	DKIM_VALID_AU,HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SPF_HELO_NONE,
+	SPF_PASS,USER_AGENT_SANE_1 autolearn=no autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 5E0F6C4CECF
-	for <linux-block@archiver.kernel.org>; Mon, 16 Sep 2019 05:27:35 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id EA6F1C49ED7
+	for <linux-block@archiver.kernel.org>; Mon, 16 Sep 2019 06:23:00 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.kernel.org (Postfix) with ESMTP id 342C4214D9
-	for <linux-block@archiver.kernel.org>; Mon, 16 Sep 2019 05:27:35 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=default; t=1568611655;
-	bh=5V0xxOh8NLjEKs+yRiSk0RdBVTcGkJjjPD1bZy3GmEo=;
-	h=Date:From:To:Cc:Subject:References:In-Reply-To:List-ID:From;
-	b=zoEGw/nc9GH3Bf4J6uSnzgGutdpbnUJvmT7NMoMR5MSbKstdPjPAxVB7FF7V5h8FM
-	 D27XtRYrf9mixFW1r2vsW6aaDh5DbIdmsPOw3crVjEzjwYyNM+6LfrtbqRkKW2Hb1z
-	 1KHRoZYehQcJaCH2TNqB8ztNcKXDBrwIQiuDsKiE=
+	by mail.kernel.org (Postfix) with ESMTP id 5EB37214AF
+	for <linux-block@archiver.kernel.org>; Mon, 16 Sep 2019 06:23:00 +0000 (UTC)
+Authentication-Results: mail.kernel.org;
+	dkim=pass (1024-bit key) header.d=euphon.net header.i=fam@euphon.net header.b="PLsaCF/Z"
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1727039AbfIPF1e (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Mon, 16 Sep 2019 01:27:34 -0400
-Received: from mail.kernel.org ([198.145.29.99]:51716 "EHLO mail.kernel.org"
-        rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-        id S1725775AbfIPF1e (ORCPT <rfc822;linux-block@vger.kernel.org>);
-        Mon, 16 Sep 2019 01:27:34 -0400
-Received: from localhost (unknown [77.137.89.37])
-        (using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
-        (No client certificate requested)
-        by mail.kernel.org (Postfix) with ESMTPSA id 446AC2067B;
-        Mon, 16 Sep 2019 05:27:32 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-        s=default; t=1568611652;
-        bh=5V0xxOh8NLjEKs+yRiSk0RdBVTcGkJjjPD1bZy3GmEo=;
-        h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
-        b=dOVmpJ/egQuUlM1hhw//+VgIGm6GlLI8BFCF9LWaLVLUnTo9j56CJ36dlQFvHQEJX
-         I+8Z912w6C2UFt4sStOxDq2+t2mTYVGHVPqkQKbMDiZPDSxR7iSX/ijEXJL7XRmv43
-         QYLqe06LxJtl18H35qH0FAA62Q2vDt7nbdtSHVYA=
-Date:   Mon, 16 Sep 2019 08:27:29 +0300
-From:   Leon Romanovsky <leon@kernel.org>
-To:     Jinpu Wang <jinpu.wang@cloud.ionos.com>
-Cc:     Bart Van Assche <bvanassche@acm.org>,
-        Jack Wang <jinpuwang@gmail.com>, linux-block@vger.kernel.org,
-        linux-rdma@vger.kernel.org, Jens Axboe <axboe@kernel.dk>,
-        Christoph Hellwig <hch@infradead.org>,
-        Sagi Grimberg <sagi@grimberg.me>,
-        Jason Gunthorpe <jgg@mellanox.com>,
-        Doug Ledford <dledford@redhat.com>,
-        Danil Kipnis <danil.kipnis@cloud.ionos.com>, rpenyaev@suse.de,
-        Roman Pen <roman.penyaev@profitbricks.com>
-Subject: Re: [PATCH v4 15/25] ibnbd: private headers with IBNBD protocol
- structs and helpers
-Message-ID: <20190916052729.GB18203@unreal>
-References: <20190620150337.7847-1-jinpuwang@gmail.com>
- <20190620150337.7847-16-jinpuwang@gmail.com>
- <4fbad80b-f551-131e-9a5c-a24f1fa98fea@acm.org>
- <CAMGffEnVFHpmDCiazHFX1jwi4=p401T9goSkes3j1AttV0t1Ng@mail.gmail.com>
+        id S1728228AbfIPGW7 (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Mon, 16 Sep 2019 02:22:59 -0400
+Received: from sender3-op-o12.zoho.com.cn ([124.251.121.243]:17926 "EHLO
+        sender3-op-o12.zoho.com.cn" rhost-flags-OK-OK-OK-OK)
+        by vger.kernel.org with ESMTP id S1728106AbfIPGW7 (ORCPT
+        <rfc822;linux-block@vger.kernel.org>);
+        Mon, 16 Sep 2019 02:22:59 -0400
+ARC-Seal: i=1; a=rsa-sha256; t=1568614966; cv=none; 
+        d=zoho.com.cn; s=zohoarc; 
+        b=q7cO6nl0+/+L5iKEuWg2kOdVW3GnIEu9TUY5Zn92WkZaL2CDV2tkAfIYRqnkZlTjSTRqHSCm8h3Lm5pIez32EtESfLxiGRyjxEbvX40S4lKSYgt8SFLKl/nhYHIfiyhQaV1HMeyYwHpKp0WDVP1reuUxD6wTxWnGi+IHtQFhn+Q=
+ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=zoho.com.cn; s=zohoarc; 
+        t=1568614966; h=Content-Type:Cc:Date:From:In-Reply-To:MIME-Version:Message-ID:References:Subject:To:ARC-Authentication-Results; 
+        bh=KFnu+vV3Emgd9lQvV4LU1uDFKh1nPCY+rE9r8UbqdJc=; 
+        b=kN/vs5B8WKat/YTMyvNaGzUA4gL1qR3Pc4k6qKxy/rV0EEJ86lcBXuU5fdOG9myk/Yzg9BdCPxe07Dr2GUFiKg/uvSjvleruMgPbVKJCK/ZbgUseOjssA1FCsuuk7ZuaM0XexuVQWrvGQtHSyM0k720dxHyR1bg3CiTwMKMjAtE=
+ARC-Authentication-Results: i=1; mx.zoho.com.cn;
+        dkim=pass  header.i=euphon.net;
+        spf=pass  smtp.mailfrom=fam@euphon.net;
+        dmarc=pass header.from=<fam@euphon.net> header.from=<fam@euphon.net>
+DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed; t=1568614966;
+        s=zoho; d=euphon.net; i=fam@euphon.net;
+        h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:Content-Type:In-Reply-To;
+        l=456; bh=KFnu+vV3Emgd9lQvV4LU1uDFKh1nPCY+rE9r8UbqdJc=;
+        b=PLsaCF/ZNUaXdsuUfQT3RjukIynRsfmhNBSiKf8447Pu6MBrmXP5GYoIQG+u4vta
+        /Ecmn1jKpIICFeiODXTk9uDSYEcNha4vDSUAv0HdTV++zTLfJvNXO9Ka3pz+em7fUDY
+        DEr46E6GelXjTAaSmgAfyiZ9tI3z109JX4JpxaPA=
+Received: from localhost (120.52.147.46 [120.52.147.46]) by mx.zoho.com.cn
+        with SMTPS id 156861496368045.56814894994807; Mon, 16 Sep 2019 14:22:43 +0800 (CST)
+Date:   Mon, 16 Sep 2019 14:22:42 +0800
+From:   Fam Zheng <fam@euphon.net>
+To:     Jens Axboe <axboe@kernel.dk>
+Cc:     "Pavel Begunkov (Silence)" <asml.silence@gmail.com>,
+        linux-block@vger.kernel.org, linux-kernel@vger.kernel.org
+Subject: Re: [PATCH] bfq: Fix bfq linkage error
+Message-ID: <20190916062242.GA25284@magic>
+References: <9afc7a2cd013344290096d9dfe9355bcb57b3bbd.1568482098.git.asml.silence@gmail.com>
+ <333de59c-d4ca-3bc2-fffa-35d60bd14126@kernel.dk>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=us-ascii
 Content-Disposition: inline
-In-Reply-To: <CAMGffEnVFHpmDCiazHFX1jwi4=p401T9goSkes3j1AttV0t1Ng@mail.gmail.com>
+In-Reply-To: <333de59c-d4ca-3bc2-fffa-35d60bd14126@kernel.dk>
 User-Agent: Mutt/1.12.1 (2019-06-15)
+X-ZohoCNMailClient: External
 Sender: linux-block-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-On Sun, Sep 15, 2019 at 04:30:04PM +0200, Jinpu Wang wrote:
-> Thanks Bart for detailed review, reply inline.
->
-> On Sat, Sep 14, 2019 at 12:10 AM Bart Van Assche <bvanassche@acm.org> wrote:
-> >
-> > On 6/20/19 8:03 AM, Jack Wang wrote:
-> > > +#define ibnbd_log(fn, dev, fmt, ...) ({                              \
-> > > +     __builtin_choose_expr(                                          \
-> > > +             __builtin_types_compatible_p(                           \
-> > > +                     typeof(dev), struct ibnbd_clt_dev *),           \
-> > > +             fn("<%s@%s> " fmt, (dev)->pathname,                     \
-> > > +             (dev)->sess->sessname,                                  \
-> > > +                ##__VA_ARGS__),                                      \
-> > > +             __builtin_choose_expr(                                  \
-> > > +                     __builtin_types_compatible_p(typeof(dev),       \
-> > > +                                     struct ibnbd_srv_sess_dev *),   \
-> > > +                     fn("<%s@%s>: " fmt, (dev)->pathname,            \
-> > > +                        (dev)->sess->sessname, ##__VA_ARGS__),       \
-> > > +                     unknown_type()));                               \
-> > > +})
-> >
-> > Please remove the __builtin_choose_expr() /
-> > __builtin_types_compatible_p() construct and split this macro into two
-> > macros or inline functions: one for struct ibnbd_clt_dev and another one
-> > for struct ibnbd_srv_sess_dev.
-> Ok, will split to two macros.
->
-> >
-> > > +#define IBNBD_PROTO_VER_MAJOR 2
-> > > +#define IBNBD_PROTO_VER_MINOR 0
-> > > +
-> > > +#define IBNBD_PROTO_VER_STRING __stringify(IBNBD_PROTO_VER_MAJOR) "." \
-> > > +                            __stringify(IBNBD_PROTO_VER_MINOR)
-> > > +
-> > > +#ifndef IBNBD_VER_STRING
-> > > +#define IBNBD_VER_STRING __stringify(IBNBD_PROTO_VER_MAJOR) "." \
-> > > +                      __stringify(IBNBD_PROTO_VER_MINOR)
-> >
-> > Upstream code should not have a version number.
-> IBNBD_VER_STRING can be removed together with MODULE_VERSION.
-> >
-> > > +/* TODO: should be configurable */
-> > > +#define IBTRS_PORT 1234
-> >
-> > How about converting this macro into a kernel module parameter?
-> Sounds good, will do.
+On Sat, 09/14 11:32, Jens Axboe wrote:
+> On 9/14/19 11:31 AM, Pavel Begunkov (Silence) wrote:
+> > From: Pavel Begunkov <asml.silence@gmail.com>
+> > 
+> > Since commit 795fe54c2a828099e ("bfq: Add per-device weight"), bfq uses
+> > blkg_conf_prep() and blkg_conf_finish(), which are not exported. So, it
+> > causes linkage error if bfq compiled as a module.
+> 
+> Thanks, I'll apply and add the Fixes tag.
 
-Don't rush to do it and defer it to be the last change before merging,
-this is controversial request which not everyone will like here.
+Thanks!  This is indeed my oversight.
 
-Thanks
+Fam
+
