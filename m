@@ -2,98 +2,115 @@ Return-Path: <SRS0=sa6N=XL=vger.kernel.org=linux-block-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-2.3 required=3.0 tests=DKIM_SIGNED,DKIM_VALID,
-	HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,
-	USER_AGENT_SANE_1 autolearn=no autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-0.9 required=3.0 tests=DKIMWL_WL_HIGH,DKIM_SIGNED,
+	DKIM_VALID,DKIM_VALID_AU,HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,
+	SPF_HELO_NONE,SPF_PASS,UNPARSEABLE_RELAY autolearn=no autolearn_force=no
+	version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id DBC54C49ED7
-	for <linux-block@archiver.kernel.org>; Mon, 16 Sep 2019 16:52:39 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id E526AC4CECE
+	for <linux-block@archiver.kernel.org>; Mon, 16 Sep 2019 17:22:17 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.kernel.org (Postfix) with ESMTP id AD91F21852
-	for <linux-block@archiver.kernel.org>; Mon, 16 Sep 2019 16:52:39 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id BCA33214D9
+	for <linux-block@archiver.kernel.org>; Mon, 16 Sep 2019 17:22:17 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel-dk.20150623.gappssmtp.com header.i=@kernel-dk.20150623.gappssmtp.com header.b="PdGG8+M6"
+	dkim=pass (2048-bit key) header.d=oracle.com header.i=@oracle.com header.b="ZrCMRNMB"
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1732016AbfIPQwj (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Mon, 16 Sep 2019 12:52:39 -0400
-Received: from mail-pl1-f172.google.com ([209.85.214.172]:45189 "EHLO
-        mail-pl1-f172.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1729084AbfIPQwj (ORCPT
+        id S1729670AbfIPRWR (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Mon, 16 Sep 2019 13:22:17 -0400
+Received: from userp2130.oracle.com ([156.151.31.86]:46928 "EHLO
+        userp2130.oracle.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S1727593AbfIPRWR (ORCPT
         <rfc822;linux-block@vger.kernel.org>);
-        Mon, 16 Sep 2019 12:52:39 -0400
-Received: by mail-pl1-f172.google.com with SMTP id x3so131642plr.12
-        for <linux-block@vger.kernel.org>; Mon, 16 Sep 2019 09:52:37 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=kernel-dk.20150623.gappssmtp.com; s=20150623;
-        h=subject:to:cc:references:from:message-id:date:user-agent
-         :mime-version:in-reply-to:content-language:content-transfer-encoding;
-        bh=mafOmfUjFV3O7Ul/Un1dHRGe62gU1AXzGq1aE/zr7+g=;
-        b=PdGG8+M6evNNuGiNOLut3OfoX6EaOSQTLzB0zq6KWfmfOiNvtOqFv0Dhzo9JnIpz3h
-         60lDa3N3AQC+aLma8k568u0aenrA8m+cYQRHZrpvS1wBSA3n1B5U1zcjRK7jTvVb0VdJ
-         gRB/j+8qSKas4mOwQrfZPJUV7Drf5/RdSAVy1DABfTM3zVElVmAD7jtCG01HY2HT/7+L
-         wGCv1eP1rIVD5rd3otYPoIG0TetNGk895r1EKDUIRHM3L2yxdSVIzxoFDYJfEvOEE6v4
-         i1uqUQe2ODiIKus+VkW3nTDGOO3geyAKMNSMQqaxulgsjPi+0DGOxNVomn2vAcCL139u
-         81dg==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20161025;
-        h=x-gm-message-state:subject:to:cc:references:from:message-id:date
-         :user-agent:mime-version:in-reply-to:content-language
-         :content-transfer-encoding;
-        bh=mafOmfUjFV3O7Ul/Un1dHRGe62gU1AXzGq1aE/zr7+g=;
-        b=ZXGf48xFu8eJd1cC3CwQaJ9cbQyvrO9UGkRyCAkvMu/0Br4eqCtEhjBMTbuZoM7fNt
-         5N2VL/IbVwlFrEF1jFMIqw4jeJYgL39nQjfLwG+T9PUk9tRgqxFFNhHBqvUzum2yG22l
-         Wi+t7/j/UgyNxPS5Lj04BgS+uMmchXteHNBmmy+aXPDszmPIN1NV1OAAMq2UkiblOxIF
-         n7vK73HrzA+LgqcvNdeFM+vka8rF8jI/18g+4fckNpAnCBnKLwHHCg5mJXoFiFFDxaiX
-         OhaB5ql0/NUeZRfk+9kS+hi5QEpKID59FIwgP7jxdpb+T5aqMe2Gll4g/q/GtBCFZGld
-         aLDQ==
-X-Gm-Message-State: APjAAAXgTvwa9BPPjrzZ53vh186ZPZlL5yFIoTlGKDteU30cHjyfb6DB
-        WIRX9sl1Z6TRFDVCphaA9U7enAdeN6pY9A==
-X-Google-Smtp-Source: APXvYqyYg3fFRtVZZAz0CA8BCv6BzdNux11yToJP0h2s+jKEaxXM9bnSw57pGcfHJrdyUZWIAMj7ZA==
-X-Received: by 2002:a17:902:a98a:: with SMTP id bh10mr715335plb.343.1568652755744;
-        Mon, 16 Sep 2019 09:52:35 -0700 (PDT)
-Received: from ?IPv6:2605:e000:100e:83a1:c484:c1a1:f495:ecae? ([2605:e000:100e:83a1:c484:c1a1:f495:ecae])
-        by smtp.gmail.com with ESMTPSA id l72sm100442pjb.7.2019.09.16.09.52.34
-        (version=TLS1_2 cipher=ECDHE-RSA-AES128-GCM-SHA256 bits=128/128);
-        Mon, 16 Sep 2019 09:52:34 -0700 (PDT)
-Subject: Re: [PATCHv2 0/2] blk-mq: Avoid memory reclaim when allocating
- request map
-To:     Christoph Hellwig <hch@infradead.org>, xiubli@redhat.com
-Cc:     josef@toxicpanda.com, mchristi@redhat.com,
-        linux-block@vger.kernel.org
-References: <20190916021631.4327-1-xiubli@redhat.com>
- <20190916090606.GA13266@infradead.org>
-From:   Jens Axboe <axboe@kernel.dk>
-Message-ID: <8c08e9f8-cf71-8fcc-cff3-0d92dd859a59@kernel.dk>
-Date:   Mon, 16 Sep 2019 10:52:33 -0600
-User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:60.0) Gecko/20100101
- Thunderbird/60.8.0
+        Mon, 16 Sep 2019 13:22:17 -0400
+Received: from pps.filterd (userp2130.oracle.com [127.0.0.1])
+        by userp2130.oracle.com (8.16.0.27/8.16.0.27) with SMTP id x8GHJ1v8030790;
+        Mon, 16 Sep 2019 17:19:55 GMT
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=oracle.com; h=to : cc : subject :
+ from : references : date : in-reply-to : message-id : mime-version :
+ content-type; s=corp-2019-08-05;
+ bh=cv+DwWu9qoA7iqv3H2CpGW617J3RoXHp/vizYrY+tpY=;
+ b=ZrCMRNMBnZlDrtqwP8+dWglJrV2cGcPJexJJOkZWUlOaXHwOmKWyhKw1v79KTFHsHQ4t
+ tRVXhGRos4gX2mYvfqLgWKO69LEq7POoj/KBvsUozw6QIb6QVczGByQALTVGRfw3/rha
+ 5/p3LEu9DDdm+xgb3qLe/tJYhSg0jER2apZMeGhZV2PoSTJcNu2DyA2mPwM99gaEt30b
+ Lxu3sC2GzLh7h+pyG0ZbPtDpH5YV/3rkRky0wmMfwd7cPe6C28EKm6dQzQ0zmODPakJd
+ RXiH+E6yQhjsE6mqvghJeXymtVoZE7Gg+Re5EX9L0rJ3Eq8hJuLRURKboZXZRsfSuhfG fw== 
+Received: from aserp3030.oracle.com (aserp3030.oracle.com [141.146.126.71])
+        by userp2130.oracle.com with ESMTP id 2v2bx2s5nd-1
+        (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=OK);
+        Mon, 16 Sep 2019 17:19:55 +0000
+Received: from pps.filterd (aserp3030.oracle.com [127.0.0.1])
+        by aserp3030.oracle.com (8.16.0.27/8.16.0.27) with SMTP id x8GHIngj084270;
+        Mon, 16 Sep 2019 17:19:54 GMT
+Received: from aserv0121.oracle.com (aserv0121.oracle.com [141.146.126.235])
+        by aserp3030.oracle.com with ESMTP id 2v0p8uwmbn-1
+        (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=OK);
+        Mon, 16 Sep 2019 17:19:54 +0000
+Received: from abhmp0006.oracle.com (abhmp0006.oracle.com [141.146.116.12])
+        by aserv0121.oracle.com (8.14.4/8.13.8) with ESMTP id x8GHJsEq014272;
+        Mon, 16 Sep 2019 17:19:54 GMT
+Received: from ca-mkp.ca.oracle.com (/10.159.214.123)
+        by default (Oracle Beehive Gateway v4.0)
+        with ESMTP ; Mon, 16 Sep 2019 10:19:53 -0700
+To:     Christoph Hellwig <hch@lst.de>
+Cc:     "Martin K. Petersen" <martin.petersen@oracle.com>,
+        Max Gurtovoy <maxg@mellanox.com>, axboe@kernel.dk,
+        keith.busch@intel.com, sagi@grimberg.me, israelr@mellanox.com,
+        linux-nvme@lists.infradead.org, linux-block@vger.kernel.org,
+        shlomin@mellanox.com
+Subject: Re: [PATCH v4 1/3] block: centralize PI remapping logic to the block layer
+From:   "Martin K. Petersen" <martin.petersen@oracle.com>
+Organization: Oracle Corporation
+References: <1567956405-5585-1-git-send-email-maxg@mellanox.com>
+        <yq1mufei4zk.fsf@oracle.com>
+        <d6cfe6e5-508a-f01c-267d-c8009fafc571@mellanox.com>
+        <yq1d0g8hoj5.fsf@oracle.com>
+        <61ab22ba-6f2d-3dbd-3991-693426db1133@mellanox.com>
+        <yq1k1affx8v.fsf@oracle.com>
+        <e59b2d78-4cf6-971a-1926-7969140d2a01@mellanox.com>
+        <yq1lfurdejc.fsf@oracle.com> <20190916080328.GB25898@lst.de>
+Date:   Mon, 16 Sep 2019 13:19:51 -0400
+In-Reply-To: <20190916080328.GB25898@lst.de> (Christoph Hellwig's message of
+        "Mon, 16 Sep 2019 10:03:28 +0200")
+Message-ID: <yq17e68b1l4.fsf@oracle.com>
+User-Agent: Gnus/5.13 (Gnus v5.13) Emacs/26.1.92 (gnu/linux)
 MIME-Version: 1.0
-In-Reply-To: <20190916090606.GA13266@infradead.org>
-Content-Type: text/plain; charset=utf-8
-Content-Language: en-US
-Content-Transfer-Encoding: 7bit
+Content-Type: text/plain
+X-Proofpoint-Virus-Version: vendor=nai engine=6000 definitions=9382 signatures=668685
+X-Proofpoint-Spam-Details: rule=notspam policy=default score=0 suspectscore=0 malwarescore=0
+ phishscore=0 bulkscore=0 spamscore=0 mlxscore=0 mlxlogscore=795
+ adultscore=0 classifier=spam adjust=0 reason=mlx scancount=1
+ engine=8.0.1-1908290000 definitions=main-1909160171
+X-Proofpoint-Virus-Version: vendor=nai engine=6000 definitions=9382 signatures=668685
+X-Proofpoint-Spam-Details: rule=notspam policy=default score=0 priorityscore=1501 malwarescore=0
+ suspectscore=0 phishscore=0 bulkscore=0 spamscore=0 clxscore=1015
+ lowpriorityscore=0 mlxscore=0 impostorscore=0 mlxlogscore=870 adultscore=0
+ classifier=spam adjust=0 reason=mlx scancount=1 engine=8.0.1-1908290000
+ definitions=main-1909160172
 Sender: linux-block-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-On 9/16/19 3:06 AM, Christoph Hellwig wrote:
-> On Mon, Sep 16, 2019 at 07:46:29AM +0530, xiubli@redhat.com wrote:
->> From: Xiubo Li <xiubli@redhat.com>
->>
->> To make the patch more readable and cleaner I just split them into 2
->> small ones to address the issue from @Ming Lei, thanks very much.
-> 
-> I'd be much happier to just see memalloc_noio_save +
-> memalloc_noio_restore calls in the right places over sprinkling even
-> more magic GFP_NOIO arguments.
 
-Ugh, I always thought those were kind of lame and band aiding around
-places where people are too lazy to fix the path to the gfp args.
-Or maybe areas where it's just feasible.
+Christoph,
 
-This is not one of those.
+> Do we actually have Linux users of Type 3 at all?  I think for NVMe
+> we could just trivially disable Linux support, and I suspect for SCSI
+> as well, but I'll have to defer to you on that.
+
+There were several companies looking into building Linux things using
+Type 3 SCSI devices. No idea whether this happened. I definitely still
+get lots of mail from people using Type 2. Something which also really
+shouldn't exist outside of a disk array.
+
+For NVMe, I assume nobody has tried Type 3 given the discrepancy between
+how SCSI works and how the NVMe spec is currently written.
+
+In any case. Since Type 3 is a pretty trivial subset of Type 1, I don't
+see much benefit in actively removing it. One could argue we could
+reduce the plumbing by removing a level of indirection. However, we'll
+need the infrastructure to support the impending Type 4 as well. So my
+preference is to just leave things as-is for now.
 
 -- 
-Jens Axboe
-
+Martin K. Petersen	Oracle Linux Engineering
