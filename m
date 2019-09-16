@@ -7,33 +7,33 @@ X-Spam-Status: No, score=-9.8 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
 	URIBL_BLOCKED,USER_AGENT_GIT autolearn=unavailable autolearn_force=no
 	version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id B80C0C4CED0
-	for <linux-block@archiver.kernel.org>; Mon, 16 Sep 2019 14:09:28 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 66378C4CED2
+	for <linux-block@archiver.kernel.org>; Mon, 16 Sep 2019 14:09:29 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.kernel.org (Postfix) with ESMTP id 8E6A42171F
-	for <linux-block@archiver.kernel.org>; Mon, 16 Sep 2019 14:09:28 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id 3B7AC20650
+	for <linux-block@archiver.kernel.org>; Mon, 16 Sep 2019 14:09:29 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S2388490AbfIPOJU (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Mon, 16 Sep 2019 10:09:20 -0400
-Received: from bhuna.collabora.co.uk ([46.235.227.227]:57166 "EHLO
+        id S2388468AbfIPOJR (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Mon, 16 Sep 2019 10:09:17 -0400
+Received: from bhuna.collabora.co.uk ([46.235.227.227]:57160 "EHLO
         bhuna.collabora.co.uk" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1728149AbfIPOJU (ORCPT
+        with ESMTP id S2387788AbfIPOJR (ORCPT
         <rfc822;linux-block@vger.kernel.org>);
-        Mon, 16 Sep 2019 10:09:20 -0400
+        Mon, 16 Sep 2019 10:09:17 -0400
 Received: from turingmachine.home (unknown [IPv6:2804:431:c7f4:d32a:d711:794d:1c68:5ed3])
         (using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
         (No client certificate requested)
         (Authenticated sender: tonyk)
-        by bhuna.collabora.co.uk (Postfix) with ESMTPSA id 510EB28D456;
-        Mon, 16 Sep 2019 15:09:16 +0100 (BST)
+        by bhuna.collabora.co.uk (Postfix) with ESMTPSA id 5869E28D44E;
+        Mon, 16 Sep 2019 15:09:13 +0100 (BST)
 From:   =?UTF-8?q?Andr=C3=A9=20Almeida?= <andrealmeid@collabora.com>
 To:     linux-block@vger.kernel.org, linux-kernel@vger.kernel.org
 Cc:     axboe@kernel.dk, kernel@collabora.com, krisman@collabora.com,
         =?UTF-8?q?Andr=C3=A9=20Almeida?= <andrealmeid@collabora.com>,
         Chaitanya Kulkarni <chaitanya.kulkarni@wdc.com>
-Subject: [PATCH v3 2/3] null_blk: match the type of parameter nr_devices
-Date:   Mon, 16 Sep 2019 11:07:58 -0300
-Message-Id: <20190916140759.52491-3-andrealmeid@collabora.com>
+Subject: [PATCH v3 1/3] null_blk: do not fail the module load with zero devices
+Date:   Mon, 16 Sep 2019 11:07:57 -0300
+Message-Id: <20190916140759.52491-2-andrealmeid@collabora.com>
 X-Mailer: git-send-email 2.23.0
 In-Reply-To: <20190916140759.52491-1-andrealmeid@collabora.com>
 References: <20190916140759.52491-1-andrealmeid@collabora.com>
@@ -45,8 +45,12 @@ Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-Since the variable nr_devices is an unsigned int, the module_param()
-should also use this type. Change the type so they can match.
+The module load should fail only if there is something wrong with the
+configuration or if an error prevents it to work properly. The module
+should be able to be loaded with (nr_device == 0), since it will not
+trigger errors or be in malfunction state. Preventing loading with zero
+devices also breaks applications that configures this module using
+configfs API. Remove the nr_device check to fix this.
 
 Fixes: f7c4ce890dd2 ("null_blk: validate the number of devices")
 Reviewed-by: Chaitanya Kulkarni <chaitanya.kulkarni@wdc.com>
@@ -56,24 +60,26 @@ Changes since v2:
 - None
 
 Changes since v1:
-- Add "Fixes" tag
+- None
 ---
- drivers/block/null_blk_main.c | 2 +-
- 1 file changed, 1 insertion(+), 1 deletion(-)
+ drivers/block/null_blk_main.c | 4 ----
+ 1 file changed, 4 deletions(-)
 
 diff --git a/drivers/block/null_blk_main.c b/drivers/block/null_blk_main.c
-index be32cb5ed339..5d20d65041bd 100644
+index ab4b87677139..be32cb5ed339 100644
 --- a/drivers/block/null_blk_main.c
 +++ b/drivers/block/null_blk_main.c
-@@ -142,7 +142,7 @@ module_param_named(bs, g_bs, int, 0444);
- MODULE_PARM_DESC(bs, "Block size (in bytes)");
- 
- static unsigned int nr_devices = 1;
--module_param(nr_devices, int, 0444);
-+module_param(nr_devices, uint, 0444);
- MODULE_PARM_DESC(nr_devices, "Number of devices to register");
- 
- static bool g_blocking;
+@@ -1758,10 +1758,6 @@ static int __init null_init(void)
+ 		pr_err("null_blk: legacy IO path no longer available\n");
+ 		return -EINVAL;
+ 	}
+-	if (!nr_devices) {
+-		pr_err("null_blk: invalid number of devices\n");
+-		return -EINVAL;
+-	}
+ 	if (g_queue_mode == NULL_Q_MQ && g_use_per_node_hctx) {
+ 		if (g_submit_queues != nr_online_nodes) {
+ 			pr_warn("null_blk: submit_queues param is set to %u.\n",
 -- 
 2.23.0
 
