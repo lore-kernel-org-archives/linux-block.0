@@ -2,107 +2,49 @@ Return-Path: <SRS0=sa6N=XL=vger.kernel.org=linux-block-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-0.9 required=3.0 tests=DKIM_SIGNED,DKIM_VALID,
-	DKIM_VALID_AU,HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SPF_HELO_NONE,
-	SPF_PASS autolearn=no autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-5.3 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
+	MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,USER_AGENT_SANE_1
+	autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id B8349C4CEC7
-	for <linux-block@archiver.kernel.org>; Mon, 16 Sep 2019 07:08:14 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 9AA46C49ED7
+	for <linux-block@archiver.kernel.org>; Mon, 16 Sep 2019 07:51:56 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.kernel.org (Postfix) with ESMTP id 8E06F2067D
-	for <linux-block@archiver.kernel.org>; Mon, 16 Sep 2019 07:08:14 +0000 (UTC)
-Authentication-Results: mail.kernel.org;
-	dkim=pass (2048-bit key) header.d=cloud.ionos.com header.i=@cloud.ionos.com header.b="cbK2DjZv"
+	by mail.kernel.org (Postfix) with ESMTP id 7581D20650
+	for <linux-block@archiver.kernel.org>; Mon, 16 Sep 2019 07:51:56 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1725847AbfIPHIN (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Mon, 16 Sep 2019 03:08:13 -0400
-Received: from mail-io1-f65.google.com ([209.85.166.65]:40552 "EHLO
-        mail-io1-f65.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1727329AbfIPHIN (ORCPT
-        <rfc822;linux-block@vger.kernel.org>);
-        Mon, 16 Sep 2019 03:08:13 -0400
-Received: by mail-io1-f65.google.com with SMTP id h144so76180149iof.7
-        for <linux-block@vger.kernel.org>; Mon, 16 Sep 2019 00:08:13 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=cloud.ionos.com; s=google;
-        h=mime-version:references:in-reply-to:from:date:message-id:subject:to
-         :cc;
-        bh=zEc3XY4ZACvXcwSfiokSL2ixBOdX4sGF6A5ghbDhIoM=;
-        b=cbK2DjZvbrNzwK2luQX49r9+wTsXo8mqZ0RF2hQwPR7ocnV0VwQbt6tj1fTuyM7mPw
-         1lRiAlJcDI7tViZztVPb9Mid9EUYhe8CGPajnyhSkSydf50OwhWr5mKgxGpc8g/I+fOY
-         DEe9He3fO+jkGsxpeGQ0MaP/SjSGfM0M9aK6E4KoYGN5HLMLxNBQETGy3raFxs5/rmxM
-         gfz520J+gnAaaeGTbcebGWYTu931Bw9+SJgvSMj9m5vh0kjGGh6f0Yu5QKtFnrkZx183
-         gh1b5VebLiDE9Gm4zJJNheljSQhzW225Ldj4RB8e6gMKrL2eCpi39ZMeqhR9z1gZmSoY
-         3zBA==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20161025;
-        h=x-gm-message-state:mime-version:references:in-reply-to:from:date
-         :message-id:subject:to:cc;
-        bh=zEc3XY4ZACvXcwSfiokSL2ixBOdX4sGF6A5ghbDhIoM=;
-        b=mOnBU+jGwupkdSt8Yn3ssrleeRiJku0YNUAxNMhMn6n9jz8TGflWKKMnIVBZsSh6ha
-         bVtsMk0gCQ3ub/qMj+n6PgAzFij+jhczOQfkK8H3WUAbXJPHkELbXMev1VvU1ee+0TXu
-         iGmxwA6V0BV9cvSJOcp69OY+cwHRzgtQgDhpnInooxHUVqLVXWkevn2tKIvK7Q1W/6To
-         FcPVyLsLUPij3Qnr5smmXY+c3U+l8jXKokTWEkU2sE9dwVq/xj9fkDWP21M/5VrOGbvY
-         qsldnYxGCcjASy5psH5Sz1/8nNEcQIMWDDFduRXRIgIIIsNX0U0TTODKpvcdmPMACR4Z
-         6wWw==
-X-Gm-Message-State: APjAAAX3ae59ZZ2TCCQsEF7HpiV83dq/LborI/chGLjCS9BMo/gYNWz1
-        JMexBANzDgVHpvcN+mQ0clgOohywDdG58JMmcHjw
-X-Google-Smtp-Source: APXvYqwsgmC5JxAG7iowEc1HKDnuBnltRXTuF0KQc6KxH/xI2OgxJyXYXd365qagiHa1yY+yENk+xf9Llj+eSVXJwtw=
-X-Received: by 2002:a02:e47:: with SMTP id 68mr14035334jae.126.1568617692506;
- Mon, 16 Sep 2019 00:08:12 -0700 (PDT)
+        id S1725912AbfIPHv4 (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Mon, 16 Sep 2019 03:51:56 -0400
+Received: from verein.lst.de ([213.95.11.211]:42930 "EHLO verein.lst.de"
+        rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
+        id S1725847AbfIPHvz (ORCPT <rfc822;linux-block@vger.kernel.org>);
+        Mon, 16 Sep 2019 03:51:55 -0400
+Received: by verein.lst.de (Postfix, from userid 2407)
+        id 2AE1668B05; Mon, 16 Sep 2019 09:51:52 +0200 (CEST)
+Date:   Mon, 16 Sep 2019 09:51:51 +0200
+From:   Christoph Hellwig <hch@lst.de>
+To:     Max Gurtovoy <maxg@mellanox.com>
+Cc:     linux-block@vger.kernel.org, axboe@kernel.dk,
+        martin.petersen@oracle.com, linux-nvme@lists.infradead.org,
+        keith.busch@intel.com, hch@lst.de, sagi@grimberg.me,
+        shlomin@mellanox.com, israelr@mellanox.com
+Subject: Re: [PATCH v6 1/2] block: use symbolic constants for t10_pi type
+Message-ID: <20190916075151.GA25796@lst.de>
+References: <1568493253-18142-1-git-send-email-maxg@mellanox.com>
 MIME-Version: 1.0
-References: <20190620150337.7847-1-jinpuwang@gmail.com> <20190620150337.7847-16-jinpuwang@gmail.com>
- <4fbad80b-f551-131e-9a5c-a24f1fa98fea@acm.org> <CAMGffEnVFHpmDCiazHFX1jwi4=p401T9goSkes3j1AttV0t1Ng@mail.gmail.com>
-In-Reply-To: <CAMGffEnVFHpmDCiazHFX1jwi4=p401T9goSkes3j1AttV0t1Ng@mail.gmail.com>
-From:   Danil Kipnis <danil.kipnis@cloud.ionos.com>
-Date:   Mon, 16 Sep 2019 09:08:01 +0200
-Message-ID: <CAHg0HuzBGLGhweQ-ow_LG+66sC6RFyFAvJPG9wJJvnYncRtoAA@mail.gmail.com>
-Subject: Re: [PATCH v4 15/25] ibnbd: private headers with IBNBD protocol
- structs and helpers
-To:     Jinpu Wang <jinpu.wang@cloud.ionos.com>
-Cc:     Bart Van Assche <bvanassche@acm.org>,
-        Jack Wang <jinpuwang@gmail.com>, linux-block@vger.kernel.org,
-        linux-rdma@vger.kernel.org, Jens Axboe <axboe@kernel.dk>,
-        Christoph Hellwig <hch@infradead.org>,
-        Sagi Grimberg <sagi@grimberg.me>,
-        Jason Gunthorpe <jgg@mellanox.com>,
-        Doug Ledford <dledford@redhat.com>, rpenyaev@suse.de,
-        Roman Pen <roman.penyaev@profitbricks.com>
-Content-Type: text/plain; charset="UTF-8"
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <1568493253-18142-1-git-send-email-maxg@mellanox.com>
+User-Agent: Mutt/1.5.17 (2007-11-01)
 Sender: linux-block-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-> > > +/**
-> > > + * struct ibnbd_msg_open_rsp - response message to IBNBD_MSG_OPEN
-> > > + * @hdr:             message header
-> > > + * @nsectors:                number of sectors
-> >
-> > What is the size of a single sector?
-> 512b, will mention explicitly in the next round.
-We only have KERNEL_SECTOR_SIZE=512, defined in ibnbd-clt.c. Looks we
-only depend on this exact number to set the capacity of the block
-device on client side. I'm not sure whether it is worth extending the
-protocol to send the number from the server instead.
+On Sat, Sep 14, 2019 at 11:34:12PM +0300, Max Gurtovoy wrote:
+> Reviewed-by: Martin K. Petersen <martin.petersen@oracle.com>
+> Signed-off-by: Max Gurtovoy <maxg@mellanox.com>
 
-> > > + * @max_segments:    max segments hardware support in one transfer
-> >
-> > Does 'hardware' refer to the RDMA adapter that transfers the IBNBD
-> > message or to the storage device? In the latter case, I assume that
-> > transfer refers to a DMA transaction?
-> "hardware" refers to the storage device on the server-side.
-The field contains queue_max_segments() of the target block device.
-And is used to call blk_queue_max_segments() on the corresponding
-device on the client side.
-We do also have BMAX_SEGMENTS define in ibnbd-clt.h which sets an
-upper limit to max_segments and does refer to the capabilities of the
-RDMA adapter. This information should only be known to the transport
-module and ideally would be returned to IBNBD during the registration
-in IBTRS.
+A little bit of a changelog would have been nice, but otherwise this
+looks fine to me:
 
-> > Note: I plan to review the entire patch series but it may take some time
-> > before I have finished reviewing the entire patch series.
-> >
-> That will be great, thanks a  lot, Bart
-Thank you Bart!
+Reviewed-by: Christoph Hellwig <hch@lst.de>
