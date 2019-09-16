@@ -6,70 +6,69 @@ X-Spam-Status: No, score=-2.3 required=3.0 tests=DKIM_SIGNED,DKIM_VALID,
 	HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,
 	USER_AGENT_SANE_1 autolearn=no autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 51272C49ED7
-	for <linux-block@archiver.kernel.org>; Mon, 16 Sep 2019 16:13:04 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 9C53DC49ED7
+	for <linux-block@archiver.kernel.org>; Mon, 16 Sep 2019 16:17:51 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.kernel.org (Postfix) with ESMTP id 2390120678
-	for <linux-block@archiver.kernel.org>; Mon, 16 Sep 2019 16:13:04 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id 6EE57214D9
+	for <linux-block@archiver.kernel.org>; Mon, 16 Sep 2019 16:17:51 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel-dk.20150623.gappssmtp.com header.i=@kernel-dk.20150623.gappssmtp.com header.b="oaCWuswN"
+	dkim=pass (2048-bit key) header.d=kernel-dk.20150623.gappssmtp.com header.i=@kernel-dk.20150623.gappssmtp.com header.b="l21eG8ve"
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1728228AbfIPQND (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Mon, 16 Sep 2019 12:13:03 -0400
-Received: from mail-pg1-f194.google.com ([209.85.215.194]:42333 "EHLO
-        mail-pg1-f194.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1728426AbfIPQND (ORCPT
+        id S1728049AbfIPQRu (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Mon, 16 Sep 2019 12:17:50 -0400
+Received: from mail-pg1-f195.google.com ([209.85.215.195]:44317 "EHLO
+        mail-pg1-f195.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S1725270AbfIPQRu (ORCPT
         <rfc822;linux-block@vger.kernel.org>);
-        Mon, 16 Sep 2019 12:13:03 -0400
-Received: by mail-pg1-f194.google.com with SMTP id z12so260258pgp.9
-        for <linux-block@vger.kernel.org>; Mon, 16 Sep 2019 09:13:02 -0700 (PDT)
+        Mon, 16 Sep 2019 12:17:50 -0400
+Received: by mail-pg1-f195.google.com with SMTP id i18so258339pgl.11
+        for <linux-block@vger.kernel.org>; Mon, 16 Sep 2019 09:17:50 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=kernel-dk.20150623.gappssmtp.com; s=20150623;
         h=subject:to:cc:references:from:message-id:date:user-agent
          :mime-version:in-reply-to:content-language:content-transfer-encoding;
-        bh=Ngns2aZQDk8lD0GtZWORQNTVK+rxzxi28UBcZgbJoZA=;
-        b=oaCWuswNbauDH2oisRLajp7tOrQT2Mky1p/Uxd+XPFP/qlKb7uU10XrbSkartWxxZb
-         mGr1lVC80Fn7igRf0Tj8vVKu33vjSWxbZ9unCFA1sDVN0XhIMu+yiGKSdU/klp1RsVwG
-         Mn40XdRq90F6W9tbzdYjCy0r3IvlOS5qCKhYtcG0ACXeh2ggzXyKG4nwH84smstPh6DL
-         2cfhwg6WOARdKBRyeqXF4HX2kyCVxc4OnBPGuvGd4eoawPcJqBhFe1QKNFK2v8aDPmxu
-         pawlgzO2SbT4HOEk4Cc7HjNTb1qRLNNRollHEZ0zlqQPm8Z26qYorHH8xQ/DQlC6dnCO
-         Ck9g==
+        bh=sg+rKbrnTJbgR+NJ8QZZaCm04HUmVdI27xNUqxqbc1I=;
+        b=l21eG8ve4kGqoaP/uEZGS+srtJoVlzN8Aw0HF+n2pNPOXrRYFEPElZY2miEwEA9Hjd
+         qOtr4Mj5hslg2qnanka7RFbRLUwnvKM7RsykdxKan/SsQaHmFW8R8D4534utgMumdCg0
+         clnVrMGMNSQnKZBk+MAedYp13IKZhZhBUZ+9F+wLiihY6PS1m1uTKcKgw79kRmnfo1WS
+         RzgrZu7Vy/gpqlenhiTU1d9jpTqqGQIFnL9TCikoCIougst1B5/uT1cZZVHprTkwyYXT
+         av6KAyHt5Q/Gf98CN074DOlHxTlRBKUXR4HaVxmXlDQGDbU+lSPKgS73MgziTO/Btn+U
+         XSuQ==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=1e100.net; s=20161025;
         h=x-gm-message-state:subject:to:cc:references:from:message-id:date
          :user-agent:mime-version:in-reply-to:content-language
          :content-transfer-encoding;
-        bh=Ngns2aZQDk8lD0GtZWORQNTVK+rxzxi28UBcZgbJoZA=;
-        b=gJI/wxgTLYz1dkq4Ea6i8BKEJZhrtu1Q3ZiT5jaN+2KXyRMnQU/WYEMb8zl069yF0h
-         byQNSPO5o7VlFfC0CXqcDQoIInEbDgwCIz8MlfefSF/53tNTXP4frCK+VHkPSdS/MygW
-         sXPk8dfI+MtU1rPjH9PyPGzRA/UWA9faQUti8XPG8URwJefovzq3Mgey7qdwcH0uigLC
-         2xKOtXcf3IvEdEHqFnjkor4QtXQI6SY2YGLRbXGD6FZvNxb+6xq4m3GZccFWDZSOLWNt
-         hTaXOst09o7OxQz3in/GJLxXde13SSUswoktVGRcOQ9wV1RiLyd/Ysr+ASxhI+OhduxB
-         7GPg==
-X-Gm-Message-State: APjAAAU9xmjxP9wQ+obBN40jUwrtu//3Y1nT7N90BTza3LNDk3GTMRfc
-        8oeqg8Hlam9/3Ftt1Xo2r2nAjQ==
-X-Google-Smtp-Source: APXvYqzoI1MIdwgXIaldAvl4WtNnSZXN+zP3IjYUvchSSGvKCwmOB6fBDixfPEPrUt9pUC7czo7J/w==
-X-Received: by 2002:a65:5348:: with SMTP id w8mr56564593pgr.176.1568650382556;
-        Mon, 16 Sep 2019 09:13:02 -0700 (PDT)
+        bh=sg+rKbrnTJbgR+NJ8QZZaCm04HUmVdI27xNUqxqbc1I=;
+        b=rdoHaK8P9O/7289vprEVP3J1tjmcBEttLHlHT1buMEQob0PC46/nO/enPQbzjmCfwk
+         PcQ/QYCakyaGmAWAHefSgxc8+s1ZqzJ4iYV25T2AchttXT61c/L7vupyzkq/tcpG6qgR
+         Dm8S6VmJ+ji7HsqP4hN+Q1lVCqhiD8F3p077eVys2ThcppCaICaMV+dEZrjmdm5CB4MX
+         Ct5NMXjjWsh5uCY+80kfL+uzuL/Tb1UmMIEq9qtstVt6/vszEvDUo1nLu68M5YZNw5gF
+         GguZgFmqzET4GYqeshq9yjdkAaS8CwxrxwIMaiHK20SGWjxELzmBuL+pYTA7e1eAEnO7
+         4+ig==
+X-Gm-Message-State: APjAAAWBeGR76gdAZvMD59ddUUjlak95Nqq4uz9OXUfrPGD67qe5zCPd
+        LkgMLmLNd0ZL2epbdPTLxe1S0g==
+X-Google-Smtp-Source: APXvYqyHwegb6ytoRKzWCa3UbHRvPgC8rPKLgmGGxsEIjFPXHQjLiqKa158WRJvNEqeL+kix0Bz9Kg==
+X-Received: by 2002:a63:ed12:: with SMTP id d18mr5893619pgi.211.1568650669880;
+        Mon, 16 Sep 2019 09:17:49 -0700 (PDT)
 Received: from ?IPv6:2605:e000:100e:83a1:c484:c1a1:f495:ecae? ([2605:e000:100e:83a1:c484:c1a1:f495:ecae])
-        by smtp.gmail.com with ESMTPSA id h186sm70982796pfb.63.2019.09.16.09.13.00
+        by smtp.gmail.com with ESMTPSA id ep10sm1099575pjb.2.2019.09.16.09.17.48
         (version=TLS1_2 cipher=ECDHE-RSA-AES128-GCM-SHA256 bits=128/128);
-        Mon, 16 Sep 2019 09:13:01 -0700 (PDT)
-Subject: Re: [PATCH v7 2/2] block: centralize PI remapping logic to the block
- layer
-To:     Max Gurtovoy <maxg@mellanox.com>, linux-block@vger.kernel.org,
-        martin.petersen@oracle.com, linux-nvme@lists.infradead.org,
-        keith.busch@intel.com, hch@lst.de, sagi@grimberg.me
-Cc:     shlomin@mellanox.com, israelr@mellanox.com
-References: <1568648669-5855-1-git-send-email-maxg@mellanox.com>
- <1568648669-5855-2-git-send-email-maxg@mellanox.com>
+        Mon, 16 Sep 2019 09:17:49 -0700 (PDT)
+Subject: Re: [PATCH 0/4] block, bfq: series of improvements and small fixes of
+ the injection mechanism
+To:     Paolo Valente <paolo.valente@linaro.org>
+Cc:     linux-block@vger.kernel.org, linux-kernel@vger.kernel.org,
+        ulf.hansson@linaro.org, linus.walleij@linaro.org,
+        bfq-iosched@googlegroups.com, oleksandr@natalenko.name
+References: <20190822152037.15413-1-paolo.valente@linaro.org>
 From:   Jens Axboe <axboe@kernel.dk>
-Message-ID: <f56d2bef-93f4-95b1-b607-d97396626359@kernel.dk>
-Date:   Mon, 16 Sep 2019 10:12:59 -0600
+Message-ID: <74a65657-a988-a1ce-04b1-93486c5fb08f@kernel.dk>
+Date:   Mon, 16 Sep 2019 10:17:47 -0600
 User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:60.0) Gecko/20100101
  Thunderbird/60.8.0
 MIME-Version: 1.0
-In-Reply-To: <1568648669-5855-2-git-send-email-maxg@mellanox.com>
+In-Reply-To: <20190822152037.15413-1-paolo.valente@linaro.org>
 Content-Type: text/plain; charset=utf-8
 Content-Language: en-US
 Content-Transfer-Encoding: 7bit
@@ -78,20 +77,12 @@ Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-On 9/16/19 9:44 AM, Max Gurtovoy wrote:
-> Currently t10_pi_prepare/t10_pi_complete functions are called during the
-> NVMe and SCSi layers command preparetion/completion, but their actual
-> place should be the block layer since T10-PI is a general data integrity
-> feature that is used by block storage protocols. Introduce .prepare_fn
-> and .complete_fn callbacks within the integrity profile that each type
-> can implement according to its needs.
+On 8/22/19 9:20 AM, Paolo Valente wrote:
+> Hi Jens,
+> this patch series makes the injection mechanism better at preserving
+> control on I/O.
 
-Two notes (for future reference):
-
-1) This doesn't apply against for-5.4/block, I had to fix it up
-   manually.
-
-2) For more than one patch, always use a cover letter.
+Applied, thanks.
 
 -- 
 Jens Axboe
