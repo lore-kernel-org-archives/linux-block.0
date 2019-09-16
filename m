@@ -2,153 +2,140 @@ Return-Path: <SRS0=sa6N=XL=vger.kernel.org=linux-block-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-8.5 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
-	INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,
-	USER_AGENT_SANE_1 autolearn=ham autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-2.5 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
+	MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED,USER_AGENT_SANE_1
+	autolearn=no autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id F0FD1C4CEC4
-	for <linux-block@archiver.kernel.org>; Mon, 16 Sep 2019 01:53:54 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id C14B8C4CEC7
+	for <linux-block@archiver.kernel.org>; Mon, 16 Sep 2019 02:11:41 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.kernel.org (Postfix) with ESMTP id CD2AC2067D
-	for <linux-block@archiver.kernel.org>; Mon, 16 Sep 2019 01:53:54 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id 9DB262067D
+	for <linux-block@archiver.kernel.org>; Mon, 16 Sep 2019 02:11:41 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1728040AbfIPBxy (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Sun, 15 Sep 2019 21:53:54 -0400
-Received: from mx1.redhat.com ([209.132.183.28]:46776 "EHLO mx1.redhat.com"
+        id S1729350AbfIPCLl (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Sun, 15 Sep 2019 22:11:41 -0400
+Received: from mx1.redhat.com ([209.132.183.28]:60860 "EHLO mx1.redhat.com"
         rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-        id S1727415AbfIPBxy (ORCPT <rfc822;linux-block@vger.kernel.org>);
-        Sun, 15 Sep 2019 21:53:54 -0400
-Received: from smtp.corp.redhat.com (int-mx01.intmail.prod.int.phx2.redhat.com [10.5.11.11])
+        id S1728207AbfIPCLk (ORCPT <rfc822;linux-block@vger.kernel.org>);
+        Sun, 15 Sep 2019 22:11:40 -0400
+Received: from smtp.corp.redhat.com (int-mx03.intmail.prod.int.phx2.redhat.com [10.5.11.13])
         (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
         (No client certificate requested)
-        by mx1.redhat.com (Postfix) with ESMTPS id C90F318CB8F5;
-        Mon, 16 Sep 2019 01:53:53 +0000 (UTC)
-Received: from [10.72.12.58] (ovpn-12-58.pek2.redhat.com [10.72.12.58])
-        by smtp.corp.redhat.com (Postfix) with ESMTPS id 3A573600CD;
-        Mon, 16 Sep 2019 01:53:48 +0000 (UTC)
-Subject: Re: [RFC PATCH] blk-mq: Avoid memory reclaim when allocating request
- map
-To:     Ming Lei <ming.lei@redhat.com>
-Cc:     josef@toxicpanda.com, axboe@kernel.dk, mchristi@redhat.com,
-        linux-block@vger.kernel.org,
-        Gabriel Krisman Bertazi <krisman@linux.vnet.ibm.com>
-References: <20190915122656.11376-1-xiubli@redhat.com>
- <20190916014915.GB5162@ming.t460p>
-From:   Xiubo Li <xiubli@redhat.com>
-Message-ID: <4a0a4ffb-3e5e-4fea-6436-1720c52243aa@redhat.com>
-Date:   Mon, 16 Sep 2019 09:53:46 +0800
-User-Agent: Mozilla/5.0 (Windows NT 10.0; WOW64; rv:60.0) Gecko/20100101
- Thunderbird/60.9.0
+        by mx1.redhat.com (Postfix) with ESMTPS id 09FD23082132;
+        Mon, 16 Sep 2019 02:11:40 +0000 (UTC)
+Received: from ming.t460p (ovpn-8-18.pek2.redhat.com [10.72.8.18])
+        by smtp.corp.redhat.com (Postfix) with ESMTPS id D9F2960923;
+        Mon, 16 Sep 2019 02:11:35 +0000 (UTC)
+Date:   Mon, 16 Sep 2019 10:11:30 +0800
+From:   Ming Lei <ming.lei@redhat.com>
+To:     Manuel Bentele <development@manuel-bentele.de>
+Cc:     linux-block@vger.kernel.org
+Subject: Re: [PATCH 0/5] block: loop: add file format subsystem and QCOW2
+ file format driver
+Message-ID: <20190916021129.GC5162@ming.t460p>
+References: <20190823225619.15530-1-development@manuel-bentele.de>
+ <20190912022359.GD2731@ming.t460p>
+ <dc9e1697-ee11-622a-0f48-ebd65ff2a4e7@manuel-bentele.de>
 MIME-Version: 1.0
-In-Reply-To: <20190916014915.GB5162@ming.t460p>
-Content-Type: text/plain; charset=utf-8; format=flowed
-Content-Transfer-Encoding: 7bit
-Content-Language: en-US
-X-Scanned-By: MIMEDefang 2.79 on 10.5.11.11
-X-Greylist: Sender IP whitelisted, not delayed by milter-greylist-4.6.2 (mx1.redhat.com [10.5.110.63]); Mon, 16 Sep 2019 01:53:53 +0000 (UTC)
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <dc9e1697-ee11-622a-0f48-ebd65ff2a4e7@manuel-bentele.de>
+User-Agent: Mutt/1.11.3 (2019-02-01)
+X-Scanned-By: MIMEDefang 2.79 on 10.5.11.13
+X-Greylist: Sender IP whitelisted, not delayed by milter-greylist-4.5.16 (mx1.redhat.com [10.5.110.42]); Mon, 16 Sep 2019 02:11:40 +0000 (UTC)
 Sender: linux-block-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-On 2019/9/16 9:49, Ming Lei wrote:
-> On Sun, Sep 15, 2019 at 05:56:56PM +0530, xiubli@redhat.com wrote:
->> From: Xiubo Li <xiubli@redhat.com>
->>
->> For some storage drivers, such as the nbd, when there has new socket
->> connections added, it will update the hardware queue number by calling
->> blk_mq_update_nr_hw_queues(), in which it will freeze all the queues
->> first. And then tries to do the hardware queue updating stuff.
->>
->> But int blk_mq_alloc_rq_map()-->blk_mq_init_tags(), when allocating
->> memory for tags, it may cause the mm do the memories direct reclaiming,
->> since the queues has been freezed, so if needs to flush the page cache
->> to disk, it will stuck in generic_make_request()-->blk_queue_enter() by
->> waiting the queues to be unfreezed and then cause deadlock here.
->>
->> Since the memory size requested here is a small one, which will make
->> it not that easy to happen with a large size, but in theory this could
->> happen when the OS is running in pressure and out of memory.
->>
->> Gabriel Krisman Bertazi has hit the similar issue by fixing it in
->> commit 36e1f3d10786 ("blk-mq: Avoid memory reclaim when remapping
->> queues"), but might forget this part.
->>
->> Signed-off-by: Xiubo Li <xiubli@redhat.com>
->> CC: Gabriel Krisman Bertazi <krisman@linux.vnet.ibm.com>
->> ---
->>   block/blk-mq-tag.c | 5 +++--
->>   block/blk-mq-tag.h | 5 ++++-
->>   block/blk-mq.c     | 3 ++-
->>   3 files changed, 9 insertions(+), 4 deletions(-)
->>
->> diff --git a/block/blk-mq-tag.c b/block/blk-mq-tag.c
->> index 008388e82b5c..04ee0e4c3fa1 100644
->> --- a/block/blk-mq-tag.c
->> +++ b/block/blk-mq-tag.c
->> @@ -462,7 +462,8 @@ static struct blk_mq_tags *blk_mq_init_bitmap_tags(struct blk_mq_tags *tags,
->>   
->>   struct blk_mq_tags *blk_mq_init_tags(unsigned int total_tags,
->>   				     unsigned int reserved_tags,
->> -				     int node, int alloc_policy)
->> +				     int node, int alloc_policy,
->> +				     gfp_t flags)
->>   {
->>   	struct blk_mq_tags *tags;
->>   
->> @@ -471,7 +472,7 @@ struct blk_mq_tags *blk_mq_init_tags(unsigned int total_tags,
->>   		return NULL;
->>   	}
->>   
->> -	tags = kzalloc_node(sizeof(*tags), GFP_KERNEL, node);
->> +	tags = kzalloc_node(sizeof(*tags), flags, node);
->>   	if (!tags)
->>   		return NULL;
->>   
->> diff --git a/block/blk-mq-tag.h b/block/blk-mq-tag.h
->> index 61deab0b5a5a..296e0bc97126 100644
->> --- a/block/blk-mq-tag.h
->> +++ b/block/blk-mq-tag.h
->> @@ -22,7 +22,10 @@ struct blk_mq_tags {
->>   };
->>   
->>   
->> -extern struct blk_mq_tags *blk_mq_init_tags(unsigned int nr_tags, unsigned int reserved_tags, int node, int alloc_policy);
->> +extern struct blk_mq_tags *blk_mq_init_tags(unsigned int nr_tags,
->> +					    unsigned int reserved_tags,
->> +					    int node, int alloc_policy,
->> +					    gfp_t flags);
->>   extern void blk_mq_free_tags(struct blk_mq_tags *tags);
->>   
->>   extern unsigned int blk_mq_get_tag(struct blk_mq_alloc_data *data);
->> diff --git a/block/blk-mq.c b/block/blk-mq.c
->> index 240416057f28..9c52e4dfe132 100644
->> --- a/block/blk-mq.c
->> +++ b/block/blk-mq.c
->> @@ -2090,7 +2090,8 @@ struct blk_mq_tags *blk_mq_alloc_rq_map(struct blk_mq_tag_set *set,
->>   		node = set->numa_node;
->>   
->>   	tags = blk_mq_init_tags(nr_tags, reserved_tags, node,
->> -				BLK_MQ_FLAG_TO_ALLOC_POLICY(set->flags));
->> +				BLK_MQ_FLAG_TO_ALLOC_POLICY(set->flags),
->> +				GFP_NOIO | __GFP_NOWARN | __GFP_NORETRY);
-> Now, there are three uses on 'GFP_NOIO | __GFP_NOWARN | __GFP_NORETRY',
-> and code gets cleaner if you make it as one const variable in
-> blk_mq_alloc_rq_map.
+On Fri, Sep 13, 2019 at 01:57:33PM +0200, Manuel Bentele wrote:
+> Hi Ming,
+> 
+> On 9/12/19 4:24 AM, Ming Lei wrote:
+> > On Sat, Aug 24, 2019 at 12:56:14AM +0200, development@manuel-bentele.de wrote:
+> >> From: Manuel Bentele <development@manuel-bentele.de>
+> >>
+> >> Hi
+> >>
+> >> Regarding to the following discussion [1] on the mailing list I show you 
+> >> the result of my work as announced at the end of the discussion [2].
+> >>
+> >> The discussion was about the project topic of how to implement the 
+> >> reading/writing of QCOW2 in the kernel. The project focuses on an read-only 
+> >> in-kernel QCOW2 implementation to increase the read/write performance 
+> >> and tries to avoid nbd. Furthermore, the project is part of a project 
+> >> series to develop a in-kernel network boot infrastructure that has no need 
+> > I'd suggest you to share more details about this use case first:
+> >
+> > 1) what is the in-kernel network boot infrastructure? which functions
+> > does it provide for user?
+> 
+> Some time ago, I started to describe the setup a little bit in [1]. Now
+> I want to extend the description:
+> 
+> The boot infrastructure is used in the university environment and
+> quarrels with network-related limitations. Step-by-step, the network
+> hardware is renewed and improved, but there are still many university
+> branches which are spread all over the city and connected by poor uplink
+> connections. Sometimes there exist cases where 15 until 20 desktop
+> computers have to share only 1 gigabit uplink. To accelerate the network
+> boot, the idea came up to use the QCOW2 file format and its compression
+> feature for the image content. Tests have shown, that the usage of
+> compression is already measurable at gigabit uplinks and clearly
+> noticeable at 100 megabit uplinks.
 
-@Ming Lei
+Got it, looks a good use case for compression, but not has to be QCOW2.
 
-Yeah, this makes sense and will post a V2 to fix it.
+> 
+> The network boot infrastructure is based on a classical PXE network boot
+> to load the Linux kernel and the initramfs. In the initramfs, the
+> compressed QCOW2 image is fetched via nfs or cifs or something else. The
+> fetched QCOW2 image is now decompressed and read in the kernel. Compared
+> to a decompression and read in the user space, like qemu-nbd does, this
+> approach does not need any user space process, is faster and avoids
+> switchroot problems.
 
-Thanks very much.
-BRs
-Xiubo
-> Otherwise, looks fine:
->
-> Reviewed-by: Ming Lei <ming.lei@redhat.com>
->
->
-> thanks,
-> Ming
+This image can be compressed via xz, and fetched via wget or what
+ever. 'xz' could have better compression ratio than qcow2, I guess.
 
+> 
+> > 2) how does the in kernel QCOW2 interacts with in-kernel network boot
+> > infrastructure?
+> 
+> The in-kernel QCOW2 implementation uses the fetched QCOW2 image and
+> exposes it as block device.
+> 
+> Therefore, my implementation extends the loop device module by a general
+> file format subsystem to implement various file format drivers including
+> a driver for the QCOW2 and RAW file format. The configuration utility
+> losetup is used to set up a loop device and specify the file format
+> driver to use.
 
+You still need to update losetup.  xz-utils can be installed for
+decompressing the image, then you still can create loop disk over
+the image.
+
+> 
+> > 3) most important thing, what are the exact steps for one user to use
+> > the in-kernel network boot infrastructure and in-kernel QCOW2?
+> 
+> To achieve a running system one have to complete the following items:
+> 
+>   * Set up a PXE boot server and configure client computers to boot from
+>     the network
+>   * Build a Linux kernel for the network boot with built-in QCOW2
+>     implementation
+>   * Prepare the initramfs for the network boot. Use a network file
+>     system or copy tool to fetch the compressed QCOW2 image.
+>   * Create a compressed QCOW2 image that contains a complete environment
+>     for the user to work with after a successful network boot
+>   * Set up the reading of the fetched QCOW2 image using the in-kernel
+>     QCOW2 implementation and mount the file systems located in the QCOW2
+>     image.
+>   * Perform a switchroot to change into the mounted environment of the
+>     QCOW2 image.
+
+As I mentioned above, seems not necessary to introduce loop-qcow2.
+
+Thanks,
+Ming
