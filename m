@@ -2,117 +2,95 @@ Return-Path: <SRS0=sa6N=XL=vger.kernel.org=linux-block-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-5.9 required=3.0 tests=DKIM_SIGNED,DKIM_VALID,
-	DKIM_VALID_AU,HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,
-	MENTIONS_GIT_HOSTING,SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED
-	autolearn=unavailable autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-5.3 required=3.0 tests=DKIM_SIGNED,DKIM_VALID,
+	HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,
+	SPF_PASS,URIBL_BLOCKED,USER_AGENT_SANE_1 autolearn=ham autolearn_force=no
+	version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 12226C4CECD
-	for <linux-block@archiver.kernel.org>; Mon, 16 Sep 2019 14:56:13 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id CDA54C49ED7
+	for <linux-block@archiver.kernel.org>; Mon, 16 Sep 2019 14:57:22 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.kernel.org (Postfix) with ESMTP id DD7872067B
-	for <linux-block@archiver.kernel.org>; Mon, 16 Sep 2019 14:56:12 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id 9B2A720650
+	for <linux-block@archiver.kernel.org>; Mon, 16 Sep 2019 14:57:22 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=pass (2048-bit key) header.d=linaro.org header.i=@linaro.org header.b="OjrwaYz2"
+	dkim=pass (2048-bit key) header.d=kernel-dk.20150623.gappssmtp.com header.i=@kernel-dk.20150623.gappssmtp.com header.b="mKNgvD5s"
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S2388070AbfIPO4L (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Mon, 16 Sep 2019 10:56:11 -0400
-Received: from mail-wm1-f66.google.com ([209.85.128.66]:55625 "EHLO
-        mail-wm1-f66.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S2388876AbfIPO4L (ORCPT
+        id S1727176AbfIPO5W (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Mon, 16 Sep 2019 10:57:22 -0400
+Received: from mail-pg1-f195.google.com ([209.85.215.195]:36185 "EHLO
+        mail-pg1-f195.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S1725798AbfIPO5W (ORCPT
         <rfc822;linux-block@vger.kernel.org>);
-        Mon, 16 Sep 2019 10:56:11 -0400
-Received: by mail-wm1-f66.google.com with SMTP id g207so105401wmg.5
-        for <linux-block@vger.kernel.org>; Mon, 16 Sep 2019 07:56:08 -0700 (PDT)
+        Mon, 16 Sep 2019 10:57:22 -0400
+Received: by mail-pg1-f195.google.com with SMTP id m29so159488pgc.3
+        for <linux-block@vger.kernel.org>; Mon, 16 Sep 2019 07:57:21 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=linaro.org; s=google;
-        h=mime-version:subject:from:in-reply-to:date:cc
-         :content-transfer-encoding:message-id:references:to;
-        bh=gBWC3snefCabDrXZ1x4w/4vScF2L6+ltsxd1AOElg+8=;
-        b=OjrwaYz2AQwT5OelSHDlmDJTq6d0W9vtp6R/Mf+Rxp3t1feUrbsXjI3gOk5kiQBo/F
-         efj1fQ7n39FshL6tti/+V7aMUF2f3svbaUUu5cj8lO3QiMcrEurtxCpsGvugrG50YT+A
-         Vkakk7cd9B2ISXHfmQrfSP1J7zemHWVgL0HteBJA/zQYrq8/07FlLfJ2JXCqFSlpZipo
-         88Qf1QCBSnjzOpgUndKfw8fL5YW1M69Dpl2EvndiWoLC249vJBdEF2svILgs/I/WMmwI
-         YyeYDzcEQUIOLOQEWyXgcLDiA1Ief9EiZZElT/V4q94l6RwEJ5GA2bWqnVfi1XDzhM48
-         d8iw==
+        d=kernel-dk.20150623.gappssmtp.com; s=20150623;
+        h=subject:to:cc:references:from:message-id:date:user-agent
+         :mime-version:in-reply-to:content-language:content-transfer-encoding;
+        bh=7WUNnN9yv61rt6RXUBjyfgyIhNh7aVIJr3pGT7+CnMg=;
+        b=mKNgvD5so4AGdkx4mkBeWTYa3r8Fm5dmfCEXgKPu7EOkmrzxT7SeJixToGX/PDai4z
+         PouMD+FWY+yLUMyOnetznsuFLfVrdDOHmf7OnhLqz+RCOE8ocHaVL1wk9omdhs9qr7Po
+         vTaFA6I6q/F1r1UCPaXjijc0UxP1SDYt9G7vxE1QWGns0SHQYmPCjyJusHH8/UdoI7JK
+         daPATNGa6VHYDv7y2HbTRIjiFtmfeezD8xkQjAAT5Q5ZuQs99DgswY33ufxkh9Dc3Sn8
+         6e0wkKeYk+/j9ilKR5lmDxSC3zqXWP8LUPWmxqKMnb6XzYAUKz6XfQGSojk9MnLAFVc2
+         DbQw==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=1e100.net; s=20161025;
-        h=x-gm-message-state:mime-version:subject:from:in-reply-to:date:cc
-         :content-transfer-encoding:message-id:references:to;
-        bh=gBWC3snefCabDrXZ1x4w/4vScF2L6+ltsxd1AOElg+8=;
-        b=AvU6tfuNiHBsaih/JZkhinQ151KmNl0BuiBoi1BN305lSZRNqR7oBTwijIIESuAsWr
-         Aw5yKPE0z3/HUK6xhWiUGK1yWZbqmfIXnuGCynS6kWFL04ejrlbBuBevF8iaQBD4DwS0
-         /iadNOAADOTJwdbs3fpkPi0EytzA/yl4Adie5xRGwTD3ysTg0hGv/3lNDyv982lsGMHf
-         X2GDFa8eHcsj4h5OfHyh76zDfM7elOgoVh1oehp1r/PKh4zlu+NJQfXeM9imDkAWT/2R
-         F4ATlDt/loMJYYVjkZXO5tM1LxRuCEznay+jR3M8wHdqvfoH2C2YE3ZQcO5WuXETEPBr
-         eh0Q==
-X-Gm-Message-State: APjAAAXbYQIV3Y5mp+A6/dOHafwuw2wojDXjOtS2ZNNy2cqa1T1aC487
-        XGVW+w6VvxsEb2hELaT7CTWzUQ==
-X-Google-Smtp-Source: APXvYqxxGliveFj5rRtU91G+rUagNoaG4zG7frcMy88jLejSwZ6OCXSOBT0eN5UBYzyWzrdq23T4cQ==
-X-Received: by 2002:a05:600c:141:: with SMTP id w1mr77779wmm.75.1568645768078;
-        Mon, 16 Sep 2019 07:56:08 -0700 (PDT)
-Received: from [192.168.0.101] (146-241-102-115.dyn.eolo.it. [146.241.102.115])
-        by smtp.gmail.com with ESMTPSA id n8sm99707wma.7.2019.09.16.07.56.07
+        h=x-gm-message-state:subject:to:cc:references:from:message-id:date
+         :user-agent:mime-version:in-reply-to:content-language
+         :content-transfer-encoding;
+        bh=7WUNnN9yv61rt6RXUBjyfgyIhNh7aVIJr3pGT7+CnMg=;
+        b=gN+ZybVGkOq5hRLO5sv2EbxSZ3QKvas6CE+58lYWD13jpqmlgNM5+zXkQH9rzF13ZV
+         qzTzUCrn7mS6fckTCh0hdYhY4+fPjZpJ7OWbKzuUu/MqaWeL7uVw5050uccbxniCZt8F
+         BCRyUwhjNo4QXrzXZNfbUftpmggrIxpjRu8dzOHCVzVs25xcTntqkrhST6W4cFJ/5KwI
+         Yc7bh5G6vSX669m+R7uxcf41spJs/CXTs2YYUVgXs5HIf0ypWDnfp+lM3OS16Sb9yHce
+         wtiYoxzJrgSrWn7XMIBpL343eh80FwnF5dS+45sJJ19nnQJnn+7sfyXhF+3pFueg7GIf
+         l8Jw==
+X-Gm-Message-State: APjAAAUStBe/nDwXve7Zjn5BNMlV2X7FtqUERkExgI6hPm7Gr2M1nhQy
+        g52USk9MpPjmRde/bqlIh3ri2Fq9qL9cyg==
+X-Google-Smtp-Source: APXvYqwNJ5iLvpSHH/8GfUPkCJnmc9k4dCLIT6kuDM0OHFDEjWpwYV02cv4diyjelI9+gIvh7UMqvQ==
+X-Received: by 2002:a63:6d0:: with SMTP id 199mr25066981pgg.299.1568645841195;
+        Mon, 16 Sep 2019 07:57:21 -0700 (PDT)
+Received: from ?IPv6:2605:e000:100e:83a1:30f3:8cde:93f5:74f2? ([2605:e000:100e:83a1:30f3:8cde:93f5:74f2])
+        by smtp.gmail.com with ESMTPSA id b3sm58303667pfp.65.2019.09.16.07.57.19
         (version=TLS1_2 cipher=ECDHE-RSA-AES128-GCM-SHA256 bits=128/128);
-        Mon, 16 Sep 2019 07:56:07 -0700 (PDT)
-Content-Type: text/plain;
-        charset=us-ascii
-Mime-Version: 1.0 (Mac OS X Mail 12.4 \(3445.104.8\))
-Subject: Re: [PATCH 0/1] block, bfq: remove bfq prefix from cgroups filenames
-From:   Paolo Valente <paolo.valente@linaro.org>
-In-Reply-To: <20190909073117.20625-1-paolo.valente@linaro.org>
-Date:   Mon, 16 Sep 2019 16:56:06 +0200
-Cc:     linux-block <linux-block@vger.kernel.org>,
-        linux-kernel <linux-kernel@vger.kernel.org>,
-        Ulf Hansson <ulf.hansson@linaro.org>,
-        Linus Walleij <linus.walleij@linaro.org>,
-        noreply-spamdigest via bfq-iosched 
-        <bfq-iosched@googlegroups.com>, oleksandr@natalenko.name,
-        Tejun Heo <tj@kernel.org>, cgroups@vger.kernel.org
-Content-Transfer-Encoding: quoted-printable
-Message-Id: <80C56C11-DA21-4036-9006-2F459ACE9A8C@linaro.org>
-References: <20190909073117.20625-1-paolo.valente@linaro.org>
-To:     Jens Axboe <axboe@kernel.dk>
-X-Mailer: Apple Mail (2.3445.104.8)
+        Mon, 16 Sep 2019 07:57:20 -0700 (PDT)
+Subject: Re: [PATCH v6 1/2] block: use symbolic constants for t10_pi type
+To:     Christoph Hellwig <hch@lst.de>, Max Gurtovoy <maxg@mellanox.com>
+Cc:     linux-block@vger.kernel.org, martin.petersen@oracle.com,
+        linux-nvme@lists.infradead.org, keith.busch@intel.com,
+        sagi@grimberg.me, shlomin@mellanox.com, israelr@mellanox.com
+References: <1568493253-18142-1-git-send-email-maxg@mellanox.com>
+ <20190916075151.GA25796@lst.de>
+From:   Jens Axboe <axboe@kernel.dk>
+Message-ID: <7465169a-dc9d-ae72-99bd-204e7402c279@kernel.dk>
+Date:   Mon, 16 Sep 2019 08:57:18 -0600
+User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:60.0) Gecko/20100101
+ Thunderbird/60.8.0
+MIME-Version: 1.0
+In-Reply-To: <20190916075151.GA25796@lst.de>
+Content-Type: text/plain; charset=utf-8
+Content-Language: en-US
+Content-Transfer-Encoding: 7bit
 Sender: linux-block-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-News of this change?  Can we have it (or the solution with the
-symlinks if you prefer it) for 5.4?
+On 9/16/19 1:51 AM, Christoph Hellwig wrote:
+> On Sat, Sep 14, 2019 at 11:34:12PM +0300, Max Gurtovoy wrote:
+>> Reviewed-by: Martin K. Petersen <martin.petersen@oracle.com>
+>> Signed-off-by: Max Gurtovoy <maxg@mellanox.com>
+> 
+> A little bit of a changelog would have been nice, but otherwise this
+> looks fine to me:
+> 
+> Reviewed-by: Christoph Hellwig <hch@lst.de>
 
-Thanks,
-Paolo
+Yeah, please always include a commit message. There's always some
+possible explanation, even if you think the title covers it.
 
-> Il giorno 9 set 2019, alle ore 09:31, Paolo Valente =
-<paolo.valente@linaro.org> ha scritto:
->=20
-> Hi Jens,
-> now that BFQ's weight interface has been fixed [1], can we proceed
-> with this change?
->=20
-> In addition to acking this solution, in [2] Tejun already suggested a
-> reduced version of the present patch. In Tejun's version, only
-> bfq.weight is changed. But I guess that legacy code may use also some
-> of the other bfq parameters in cgroups, without the bfq prefix. Apart
-> from that, any version is ok for me, provided that it solves the
-> current confusing situation for userspace [3].
->=20
-> Thanks,
-> Paolo
->=20
-> [1] https://lkml.org/lkml/2019/8/27/1716
-> [2] =
-https://www.mail-archive.com/linux-block@vger.kernel.org/msg35823.html
-> [3] https://github.com/systemd/systemd/issues/7057
->=20
-> Angelo Ruocco (1):
->  block, bfq: delete "bfq" prefix from cgroup filenames
->=20
-> block/bfq-cgroup.c | 46 +++++++++++++++++++++++-----------------------
-> 1 file changed, 23 insertions(+), 23 deletions(-)
->=20
-> --
-> 2.20.1
+-- 
+Jens Axboe
 
