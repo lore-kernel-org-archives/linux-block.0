@@ -2,95 +2,89 @@ Return-Path: <SRS0=sa6N=XL=vger.kernel.org=linux-block-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-2.3 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
-	MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED,USER_AGENT_SANE_1
-	autolearn=no autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-3.8 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
+	MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,USER_AGENT_GIT autolearn=no
+	autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 558D4C4CECD
-	for <linux-block@archiver.kernel.org>; Mon, 16 Sep 2019 13:45:21 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 33F19C4CECD
+	for <linux-block@archiver.kernel.org>; Mon, 16 Sep 2019 14:09:15 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.kernel.org (Postfix) with ESMTP id 3620121848
-	for <linux-block@archiver.kernel.org>; Mon, 16 Sep 2019 13:45:21 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id 0B5FB20650
+	for <linux-block@archiver.kernel.org>; Mon, 16 Sep 2019 14:09:15 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1728151AbfIPNpU (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Mon, 16 Sep 2019 09:45:20 -0400
-Received: from mail-pg1-f196.google.com ([209.85.215.196]:39867 "EHLO
-        mail-pg1-f196.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1727995AbfIPNpU (ORCPT
+        id S2388451AbfIPOJO (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Mon, 16 Sep 2019 10:09:14 -0400
+Received: from bhuna.collabora.co.uk ([46.235.227.227]:57158 "EHLO
+        bhuna.collabora.co.uk" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S2387788AbfIPOJO (ORCPT
         <rfc822;linux-block@vger.kernel.org>);
-        Mon, 16 Sep 2019 09:45:20 -0400
-Received: by mail-pg1-f196.google.com with SMTP id u17so33555pgi.6;
-        Mon, 16 Sep 2019 06:45:19 -0700 (PDT)
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20161025;
-        h=x-gm-message-state:subject:to:cc:references:from:message-id:date
-         :user-agent:mime-version:in-reply-to:content-language
-         :content-transfer-encoding;
-        bh=VQG7ALu4L/cSp4xpQkyFn1+C4l/g5Dbj9fB6d8n56Fk=;
-        b=cd9vhQptq/E+/WcLZ11LVsI2SCRzQ4QZZ9uy5npR/IBgoV9y1CGMD25xjxtwXDcPhp
-         NHRlQtz9HopW7BvNlhyrrGUW3xvLlRrDbLyfjPRtiVnvrz/0Q1tWj72yiKtpIPfU30IB
-         Mry9okiB2wCwyBHp+QCn/Zy+XCnNdtqRy8k2sD+JzNlgV11YKKYmxX6rlxL50ogNozZ9
-         lCPUTdcrZ4KF891OfaAWBkpzVGduqDR2Y64y/wTIu34pM1PHgh5tCPrB4d/nMrNpZIZP
-         OEgCHa1MJpW9hvbqfxOSJttYyIiV7b6Sa2OWmno6dgRyu8dt4iIo01yPMK+DwfuJ5g6l
-         7NOA==
-X-Gm-Message-State: APjAAAVXw4q/p977JY/gmMGTap9xC1r/bNSd02mr0t/YAB9J22dHVDa9
-        UmDgWoag/ChQKRoJdZ5seUt5MB/K
-X-Google-Smtp-Source: APXvYqwl1GQ9X2TO7CvGZbc5So/gBQqguRdquR/9cCBbTE1nYdqX1XDTyFYJgCupgi9JYMIKYcAy3g==
-X-Received: by 2002:a17:90a:154f:: with SMTP id y15mr57814pja.73.1568641519431;
-        Mon, 16 Sep 2019 06:45:19 -0700 (PDT)
-Received: from asus.site ([2601:647:4000:1bdb:75d0:9089:df96:87d3])
-        by smtp.gmail.com with ESMTPSA id 37sm20295087pgv.32.2019.09.16.06.45.17
-        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
-        Mon, 16 Sep 2019 06:45:18 -0700 (PDT)
-Subject: Re: [PATCH v4 15/25] ibnbd: private headers with IBNBD protocol
- structs and helpers
-To:     Leon Romanovsky <leon@kernel.org>,
-        Jinpu Wang <jinpu.wang@cloud.ionos.com>
-Cc:     Jack Wang <jinpuwang@gmail.com>, linux-block@vger.kernel.org,
-        linux-rdma@vger.kernel.org, Jens Axboe <axboe@kernel.dk>,
-        Christoph Hellwig <hch@infradead.org>,
-        Sagi Grimberg <sagi@grimberg.me>,
-        Jason Gunthorpe <jgg@mellanox.com>,
-        Doug Ledford <dledford@redhat.com>,
-        Danil Kipnis <danil.kipnis@cloud.ionos.com>, rpenyaev@suse.de,
-        Roman Pen <roman.penyaev@profitbricks.com>
-References: <20190620150337.7847-1-jinpuwang@gmail.com>
- <20190620150337.7847-16-jinpuwang@gmail.com>
- <4fbad80b-f551-131e-9a5c-a24f1fa98fea@acm.org>
- <CAMGffEnVFHpmDCiazHFX1jwi4=p401T9goSkes3j1AttV0t1Ng@mail.gmail.com>
- <20190916052729.GB18203@unreal>
-From:   Bart Van Assche <bvanassche@acm.org>
-Message-ID: <25bd79e1-9523-8354-873a-0ff1db92659a@acm.org>
-Date:   Mon, 16 Sep 2019 06:45:17 -0700
-User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:60.0) Gecko/20100101
- Thunderbird/60.8.0
+        Mon, 16 Sep 2019 10:09:14 -0400
+Received: from turingmachine.home (unknown [IPv6:2804:431:c7f4:d32a:d711:794d:1c68:5ed3])
+        (using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+        (No client certificate requested)
+        (Authenticated sender: tonyk)
+        by bhuna.collabora.co.uk (Postfix) with ESMTPSA id AB57C28D44A;
+        Mon, 16 Sep 2019 15:09:10 +0100 (BST)
+From:   =?UTF-8?q?Andr=C3=A9=20Almeida?= <andrealmeid@collabora.com>
+To:     linux-block@vger.kernel.org, linux-kernel@vger.kernel.org
+Cc:     axboe@kernel.dk, kernel@collabora.com, krisman@collabora.com,
+        =?UTF-8?q?Andr=C3=A9=20Almeida?= <andrealmeid@collabora.com>
+Subject: [PATCH v3 0/3] null_blk: fixes around nr_devices and log improvements
+Date:   Mon, 16 Sep 2019 11:07:56 -0300
+Message-Id: <20190916140759.52491-1-andrealmeid@collabora.com>
+X-Mailer: git-send-email 2.23.0
 MIME-Version: 1.0
-In-Reply-To: <20190916052729.GB18203@unreal>
-Content-Type: text/plain; charset=utf-8; format=flowed
-Content-Language: en-US
-Content-Transfer-Encoding: 7bit
+Content-Type: text/plain; charset=UTF-8
+Content-Transfer-Encoding: 8bit
 Sender: linux-block-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-On 9/15/19 10:27 PM, Leon Romanovsky wrote:
-> On Sun, Sep 15, 2019 at 04:30:04PM +0200, Jinpu Wang wrote:
->> On Sat, Sep 14, 2019 at 12:10 AM Bart Van Assche <bvanassche@acm.org> wrote:
->>>> +/* TODO: should be configurable */
->>>> +#define IBTRS_PORT 1234
->>>
->>> How about converting this macro into a kernel module parameter?
->> Sounds good, will do.
-> 
-> Don't rush to do it and defer it to be the last change before merging,
-> this is controversial request which not everyone will like here.
+Hello,
 
-Hi Leon,
+This patch series address feedback for a previous patch series sent by
+me "docs: block: null_blk: enhance document style"[1].
 
-If you do not agree with changing this macro into a kernel module 
-parameter please suggest an alternative.
+First patch removes a restriction that prevents null_blk to load with
+(nr_devices == 0). This restriction breaks applications, so it's a bug. I
+have tested it running the kernel with `null_blk.nr_devices=0`.
+
+In the previous series I have changed the type of var nr_devices, but I
+forgot to change the type at module_param(). The second patch fix that.
+
+The third patch uses a cleaver approach to make log messages consistent
+using pr_fmt and the last one add a note on how to do that at the
+coding style documentation.
 
 Thanks,
+	André
 
-Bart.
+Changes since v2:
+- Add "Reviewed-by: Chaitanya Kulkarni" (thanks!)
+- Drop "[v2,4/4] coding-style: add explanation about pr_fmt macro"
+from this series
+
+Changes since v1:
+ - Add "Fixes" tag at [2/4]
+ - No more headers reordering at [3/4]
+ - Use #undef pr_fmt and KBUILD_MODNAME at [3/4] and [4/4]
+ - Replace "printk.h" for "kernel.h" at [4/4]
+
+ More details are provided at each patch changelog
+
+[1] https://patchwork.kernel.org/project/linux-block/list/?series=172853
+
+André Almeida (3):
+  null_blk: do not fail the module load with zero devices
+  null_blk: match the type of parameter nr_devices
+  null_blk: format pr_* logs with pr_fmt
+
+ drivers/block/null_blk.h       |  5 ++++-
+ drivers/block/null_blk_main.c  | 22 +++++++++-------------
+ drivers/block/null_blk_zoned.c |  4 ++--
+ 3 files changed, 15 insertions(+), 16 deletions(-)
+
+-- 
+2.23.0
+
