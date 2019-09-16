@@ -2,79 +2,104 @@ Return-Path: <SRS0=sa6N=XL=vger.kernel.org=linux-block-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-2.3 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
-	MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,USER_AGENT_SANE_1 autolearn=no
-	autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-5.3 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
+	INCLUDES_PATCH,MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED,
+	USER_AGENT_SANE_1 autolearn=unavailable autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id C99F0C49ED7
-	for <linux-block@archiver.kernel.org>; Mon, 16 Sep 2019 10:40:42 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id B427DC49ED7
+	for <linux-block@archiver.kernel.org>; Mon, 16 Sep 2019 13:40:02 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.kernel.org (Postfix) with ESMTP id A04A9206A4
-	for <linux-block@archiver.kernel.org>; Mon, 16 Sep 2019 10:40:42 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id 92707216C8
+	for <linux-block@archiver.kernel.org>; Mon, 16 Sep 2019 13:40:02 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1728228AbfIPKkm (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Mon, 16 Sep 2019 06:40:42 -0400
-Received: from mx1.redhat.com ([209.132.183.28]:60733 "EHLO mx1.redhat.com"
-        rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-        id S1726055AbfIPKkm (ORCPT <rfc822;linux-block@vger.kernel.org>);
-        Mon, 16 Sep 2019 06:40:42 -0400
-Received: from smtp.corp.redhat.com (int-mx08.intmail.prod.int.phx2.redhat.com [10.5.11.23])
-        (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
+        id S1733138AbfIPNkB (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Mon, 16 Sep 2019 09:40:01 -0400
+Received: from bhuna.collabora.co.uk ([46.235.227.227]:56886 "EHLO
+        bhuna.collabora.co.uk" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S1732992AbfIPNkB (ORCPT
+        <rfc822;linux-block@vger.kernel.org>);
+        Mon, 16 Sep 2019 09:40:01 -0400
+Received: from [IPv6:2804:431:c7f4:d32a:d711:794d:1c68:5ed3] (unknown [IPv6:2804:431:c7f4:d32a:d711:794d:1c68:5ed3])
+        (using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
         (No client certificate requested)
-        by mx1.redhat.com (Postfix) with ESMTPS id ED7AA10DCC91;
-        Mon, 16 Sep 2019 10:40:41 +0000 (UTC)
-Received: from [10.72.12.58] (ovpn-12-58.pek2.redhat.com [10.72.12.58])
-        by smtp.corp.redhat.com (Postfix) with ESMTPS id 25B2319C78;
-        Mon, 16 Sep 2019 10:40:39 +0000 (UTC)
-Subject: Re: [PATCHv2 0/2] blk-mq: Avoid memory reclaim when allocating
- request map
-To:     Christoph Hellwig <hch@infradead.org>
-Cc:     josef@toxicpanda.com, axboe@kernel.dk, mchristi@redhat.com,
-        linux-block@vger.kernel.org
-References: <20190916021631.4327-1-xiubli@redhat.com>
- <20190916090606.GA13266@infradead.org>
-From:   Xiubo Li <xiubli@redhat.com>
-Message-ID: <28bd4a18-eadb-b37c-6024-de7d6e76c80b@redhat.com>
-Date:   Mon, 16 Sep 2019 18:40:36 +0800
-User-Agent: Mozilla/5.0 (Windows NT 10.0; WOW64; rv:60.0) Gecko/20100101
- Thunderbird/60.9.0
+        (Authenticated sender: tonyk)
+        by bhuna.collabora.co.uk (Postfix) with ESMTPSA id 1688828D3B4;
+        Mon, 16 Sep 2019 14:39:57 +0100 (BST)
+Subject: Re: [PATCH v2 4/4] coding-style: add explanation about pr_fmt macro
+To:     Jonathan Corbet <corbet@lwn.net>
+Cc:     linux-block@vger.kernel.org, linux-doc@vger.kernel.org,
+        linux-kernel@vger.kernel.org, axboe@kernel.dk,
+        kernel@collabora.com, krisman@collabora.com
+References: <20190913220300.422869-1-andrealmeid@collabora.com>
+ <20190913220300.422869-5-andrealmeid@collabora.com>
+ <20190914015018.4fa90f28@lwn.net>
+From:   =?UTF-8?Q?Andr=c3=a9_Almeida?= <andrealmeid@collabora.com>
+Message-ID: <e8e82c8b-7a2f-e238-a687-8505195ecb39@collabora.com>
+Date:   Mon, 16 Sep 2019 10:38:50 -0300
+User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:68.0) Gecko/20100101
+ Thunderbird/68.0
 MIME-Version: 1.0
-In-Reply-To: <20190916090606.GA13266@infradead.org>
-Content-Type: text/plain; charset=utf-8; format=flowed
-Content-Transfer-Encoding: 7bit
+In-Reply-To: <20190914015018.4fa90f28@lwn.net>
+Content-Type: text/plain; charset=utf-8
 Content-Language: en-US
-X-Scanned-By: MIMEDefang 2.84 on 10.5.11.23
-X-Greylist: Sender IP whitelisted, not delayed by milter-greylist-4.6.2 (mx1.redhat.com [10.5.110.64]); Mon, 16 Sep 2019 10:40:42 +0000 (UTC)
+Content-Transfer-Encoding: 8bit
 Sender: linux-block-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-On 2019/9/16 17:06, Christoph Hellwig wrote:
-> On Mon, Sep 16, 2019 at 07:46:29AM +0530, xiubli@redhat.com wrote:
->> From: Xiubo Li <xiubli@redhat.com>
->>
->> To make the patch more readable and cleaner I just split them into 2
->> small ones to address the issue from @Ming Lei, thanks very much.
-> I'd be much happier to just see memalloc_noio_save +
-> memalloc_noio_restore calls in the right places over sprinkling even
-> more magic GFP_NOIO arguments.
+On 9/14/19 4:50 AM, Jonathan Corbet wrote:
+> On Fri, 13 Sep 2019 19:03:00 -0300
+> André Almeida <andrealmeid@collabora.com> wrote:
+> 
+>> The pr_fmt macro is useful to format log messages printed by pr_XXXX()
+>> functions. Add text to explain the purpose of it, how to use and an
+>> example.
+> 
+> So I've finally had a chance to take a real look at this...
+> 
+>> diff --git a/Documentation/process/coding-style.rst b/Documentation/process/coding-style.rst
+>> index f4a2198187f9..1a33a933fbd3 100644
+>> --- a/Documentation/process/coding-style.rst
+>> +++ b/Documentation/process/coding-style.rst
+>> @@ -819,7 +819,15 @@ which you should use to make sure messages are matched to the right device
+>>  and driver, and are tagged with the right level:  dev_err(), dev_warn(),
+>>  dev_info(), and so forth.  For messages that aren't associated with a
+>>  particular device, <linux/printk.h> defines pr_notice(), pr_info(),
+>> -pr_warn(), pr_err(), etc.
+>> +pr_warn(), pr_err(), etc. It's possible to format pr_XXX() messages using the
+>> +macro pr_fmt() to prevent rewriting the style of messages. It should be
+>> +defined before ``#include <linux/kernel.h>``, to avoid compiler warning about
+>> +redefinitions, or just use ``#undef pr_fmt``. This is particularly useful for
+>> +adding the name of the module at the beginning of the message, for instance:
+>> +
+>> +.. code-block:: c
+>> +
+>> +        #define pr_fmt(fmt) KBUILD_MODNAME ": " fmt
+> 
+> Honestly, I think that this is out of scope for a document on coding
+> style.  That document is already far too long for most people to read, I
+> don't think we should load it down with more stuff that isn't directly
+> style related.
+> 
+> That said, the information can be useful.  I wanted to say that it should
+> go with the documentation of the pr_* macros but ... well ... um ... we
+> don't seem to have a whole lot of that.  Figures.
+> 
+> I suspect this is more than you wanted to sign up for, but...IMO, the right
+> thing to do is to fill printk.h with a nice set of kerneldoc comments
+> describing how this stuff should be used, then to pull that information
+> into the core-api manual, somewhere near our extensive discussion of printk
+> formats.  It's amazing that we lack docs for something so basic.
+> 
 
-Hi Christoph,
+Thanks for the feedback jon. For now, I'll drop this patch for this
+series. In a future patch I'll move this text for
+Documentation/core-api/printk-formats.rst and will also add kernel-doc
+comments to pr_XXXX() functions.
 
-BTW, then to make the code to be more readable, should I just keep the 
-BLK_MQ_GFP_GLAGS as:
+> Thanks,
+> 
+> jon
+> 
 
-#define BLK_MQ_GFP_FLAGS (GFP_NOIO | __GFP_NOWARN | __GFP_NORETRY)
-
-Or just switch to:
-
-#define BLK_MQ_GFP_FLAGS (GFP_KERNEL | __GFP_NOWARN | __GFP_NORETRY)
-
-?
-
-Any advice about this ?
-
-Thanks very much,
-BRs
-Xiubo
