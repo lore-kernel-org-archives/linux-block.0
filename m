@@ -2,115 +2,107 @@ Return-Path: <SRS0=sa6N=XL=vger.kernel.org=linux-block-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-0.9 required=3.0 tests=DKIMWL_WL_HIGH,DKIM_SIGNED,
-	DKIM_VALID,DKIM_VALID_AU,HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,
-	SPF_HELO_NONE,SPF_PASS,UNPARSEABLE_RELAY autolearn=no autolearn_force=no
-	version=3.4.0
+X-Spam-Status: No, score=-2.3 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
+	MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,USER_AGENT_SANE_1 autolearn=no
+	autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id E526AC4CECE
-	for <linux-block@archiver.kernel.org>; Mon, 16 Sep 2019 17:22:17 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 7110BC49ED7
+	for <linux-block@archiver.kernel.org>; Mon, 16 Sep 2019 17:25:17 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.kernel.org (Postfix) with ESMTP id BCA33214D9
-	for <linux-block@archiver.kernel.org>; Mon, 16 Sep 2019 17:22:17 +0000 (UTC)
-Authentication-Results: mail.kernel.org;
-	dkim=pass (2048-bit key) header.d=oracle.com header.i=@oracle.com header.b="ZrCMRNMB"
+	by mail.kernel.org (Postfix) with ESMTP id 4F4D3214D9
+	for <linux-block@archiver.kernel.org>; Mon, 16 Sep 2019 17:25:17 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1729670AbfIPRWR (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Mon, 16 Sep 2019 13:22:17 -0400
-Received: from userp2130.oracle.com ([156.151.31.86]:46928 "EHLO
-        userp2130.oracle.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1727593AbfIPRWR (ORCPT
+        id S1729496AbfIPRZQ (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Mon, 16 Sep 2019 13:25:16 -0400
+Received: from mail-pg1-f196.google.com ([209.85.215.196]:41225 "EHLO
+        mail-pg1-f196.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S1727987AbfIPRZQ (ORCPT
         <rfc822;linux-block@vger.kernel.org>);
-        Mon, 16 Sep 2019 13:22:17 -0400
-Received: from pps.filterd (userp2130.oracle.com [127.0.0.1])
-        by userp2130.oracle.com (8.16.0.27/8.16.0.27) with SMTP id x8GHJ1v8030790;
-        Mon, 16 Sep 2019 17:19:55 GMT
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=oracle.com; h=to : cc : subject :
- from : references : date : in-reply-to : message-id : mime-version :
- content-type; s=corp-2019-08-05;
- bh=cv+DwWu9qoA7iqv3H2CpGW617J3RoXHp/vizYrY+tpY=;
- b=ZrCMRNMBnZlDrtqwP8+dWglJrV2cGcPJexJJOkZWUlOaXHwOmKWyhKw1v79KTFHsHQ4t
- tRVXhGRos4gX2mYvfqLgWKO69LEq7POoj/KBvsUozw6QIb6QVczGByQALTVGRfw3/rha
- 5/p3LEu9DDdm+xgb3qLe/tJYhSg0jER2apZMeGhZV2PoSTJcNu2DyA2mPwM99gaEt30b
- Lxu3sC2GzLh7h+pyG0ZbPtDpH5YV/3rkRky0wmMfwd7cPe6C28EKm6dQzQ0zmODPakJd
- RXiH+E6yQhjsE6mqvghJeXymtVoZE7Gg+Re5EX9L0rJ3Eq8hJuLRURKboZXZRsfSuhfG fw== 
-Received: from aserp3030.oracle.com (aserp3030.oracle.com [141.146.126.71])
-        by userp2130.oracle.com with ESMTP id 2v2bx2s5nd-1
-        (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=OK);
-        Mon, 16 Sep 2019 17:19:55 +0000
-Received: from pps.filterd (aserp3030.oracle.com [127.0.0.1])
-        by aserp3030.oracle.com (8.16.0.27/8.16.0.27) with SMTP id x8GHIngj084270;
-        Mon, 16 Sep 2019 17:19:54 GMT
-Received: from aserv0121.oracle.com (aserv0121.oracle.com [141.146.126.235])
-        by aserp3030.oracle.com with ESMTP id 2v0p8uwmbn-1
-        (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=OK);
-        Mon, 16 Sep 2019 17:19:54 +0000
-Received: from abhmp0006.oracle.com (abhmp0006.oracle.com [141.146.116.12])
-        by aserv0121.oracle.com (8.14.4/8.13.8) with ESMTP id x8GHJsEq014272;
-        Mon, 16 Sep 2019 17:19:54 GMT
-Received: from ca-mkp.ca.oracle.com (/10.159.214.123)
-        by default (Oracle Beehive Gateway v4.0)
-        with ESMTP ; Mon, 16 Sep 2019 10:19:53 -0700
-To:     Christoph Hellwig <hch@lst.de>
-Cc:     "Martin K. Petersen" <martin.petersen@oracle.com>,
-        Max Gurtovoy <maxg@mellanox.com>, axboe@kernel.dk,
-        keith.busch@intel.com, sagi@grimberg.me, israelr@mellanox.com,
-        linux-nvme@lists.infradead.org, linux-block@vger.kernel.org,
-        shlomin@mellanox.com
-Subject: Re: [PATCH v4 1/3] block: centralize PI remapping logic to the block layer
-From:   "Martin K. Petersen" <martin.petersen@oracle.com>
-Organization: Oracle Corporation
-References: <1567956405-5585-1-git-send-email-maxg@mellanox.com>
-        <yq1mufei4zk.fsf@oracle.com>
-        <d6cfe6e5-508a-f01c-267d-c8009fafc571@mellanox.com>
-        <yq1d0g8hoj5.fsf@oracle.com>
-        <61ab22ba-6f2d-3dbd-3991-693426db1133@mellanox.com>
-        <yq1k1affx8v.fsf@oracle.com>
-        <e59b2d78-4cf6-971a-1926-7969140d2a01@mellanox.com>
-        <yq1lfurdejc.fsf@oracle.com> <20190916080328.GB25898@lst.de>
-Date:   Mon, 16 Sep 2019 13:19:51 -0400
-In-Reply-To: <20190916080328.GB25898@lst.de> (Christoph Hellwig's message of
-        "Mon, 16 Sep 2019 10:03:28 +0200")
-Message-ID: <yq17e68b1l4.fsf@oracle.com>
-User-Agent: Gnus/5.13 (Gnus v5.13) Emacs/26.1.92 (gnu/linux)
+        Mon, 16 Sep 2019 13:25:16 -0400
+Received: by mail-pg1-f196.google.com with SMTP id x15so371409pgg.8;
+        Mon, 16 Sep 2019 10:25:16 -0700 (PDT)
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20161025;
+        h=x-gm-message-state:subject:to:cc:references:from:message-id:date
+         :user-agent:mime-version:in-reply-to:content-language
+         :content-transfer-encoding;
+        bh=zsVhWs+rZSQ9pmPp93CkIV3JOWjcR8BN6wXm6TfggU4=;
+        b=ggpj5aZB0HsJ6jCKeDm+N/L3I0GQOmS9TWQj6HZZpI/NyM3i7TV+KcvffJIVnPSqK3
+         nvFsw9IN7SUBW2PKC/uyDT29dpWUqt/lLjSHBI6j073cZbwBxN7GAZCxkVmpQVWAmuTD
+         aXtIgJbHXFnBEKrbtD7awjANd5gphLNszCEcqtF1iLzm+j72X5VAiiAM0VGYtJHeUYjN
+         +JOG4c8p+VIziZFT4h4GWmJ95+AXEu7J0+kjLADrzgGk0Twjj2ONGULSGr5edcAAKRZA
+         r2Lqtmx1XMSuDxJrj/UGBjToxCkzvIFn3BaKTBD56Xg0XF2kKImyO+Rd6BD6385OaODW
+         WRQA==
+X-Gm-Message-State: APjAAAUPzDf+1uH6SxBfvBRUidi8pkhs67PRoYcnZUziQ38i6EUBgkGU
+        /1hFFSIAyM9KdjWQhkQk96s=
+X-Google-Smtp-Source: APXvYqxT2OZ8W+ffke5agKcEDwOXkz6O6frQr2306GKIMGIjlZ5J2dLWhPTweusEJaFXPupFvDr7kQ==
+X-Received: by 2002:aa7:8189:: with SMTP id g9mr440437pfi.78.1568654715966;
+        Mon, 16 Sep 2019 10:25:15 -0700 (PDT)
+Received: from desktop-bart.svl.corp.google.com ([2620:15c:2cd:202:4308:52a3:24b6:2c60])
+        by smtp.gmail.com with ESMTPSA id f188sm52105937pfa.170.2019.09.16.10.25.14
+        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
+        Mon, 16 Sep 2019 10:25:14 -0700 (PDT)
+Subject: Re: [PATCH v4 15/25] ibnbd: private headers with IBNBD protocol
+ structs and helpers
+To:     Jinpu Wang <jinpu.wang@cloud.ionos.com>
+Cc:     Jack Wang <jinpuwang@gmail.com>, linux-block@vger.kernel.org,
+        linux-rdma@vger.kernel.org, Jens Axboe <axboe@kernel.dk>,
+        Christoph Hellwig <hch@infradead.org>,
+        Sagi Grimberg <sagi@grimberg.me>,
+        Jason Gunthorpe <jgg@mellanox.com>,
+        Doug Ledford <dledford@redhat.com>,
+        Danil Kipnis <danil.kipnis@cloud.ionos.com>, rpenyaev@suse.de,
+        Roman Pen <roman.penyaev@profitbricks.com>
+References: <20190620150337.7847-1-jinpuwang@gmail.com>
+ <20190620150337.7847-16-jinpuwang@gmail.com>
+ <4fbad80b-f551-131e-9a5c-a24f1fa98fea@acm.org>
+ <CAMGffEnVFHpmDCiazHFX1jwi4=p401T9goSkes3j1AttV0t1Ng@mail.gmail.com>
+ <CAMGffEmnTG4ixN1Hfy7oY93TgG3qQtF9TkpGzi=BxWm5a2i3Eg@mail.gmail.com>
+From:   Bart Van Assche <bvanassche@acm.org>
+Message-ID: <a7d4b3eb-d0c7-0c9d-ce64-da37a732564a@acm.org>
+Date:   Mon, 16 Sep 2019 10:25:13 -0700
+User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:60.0) Gecko/20100101
+ Thunderbird/60.8.0
 MIME-Version: 1.0
-Content-Type: text/plain
-X-Proofpoint-Virus-Version: vendor=nai engine=6000 definitions=9382 signatures=668685
-X-Proofpoint-Spam-Details: rule=notspam policy=default score=0 suspectscore=0 malwarescore=0
- phishscore=0 bulkscore=0 spamscore=0 mlxscore=0 mlxlogscore=795
- adultscore=0 classifier=spam adjust=0 reason=mlx scancount=1
- engine=8.0.1-1908290000 definitions=main-1909160171
-X-Proofpoint-Virus-Version: vendor=nai engine=6000 definitions=9382 signatures=668685
-X-Proofpoint-Spam-Details: rule=notspam policy=default score=0 priorityscore=1501 malwarescore=0
- suspectscore=0 phishscore=0 bulkscore=0 spamscore=0 clxscore=1015
- lowpriorityscore=0 mlxscore=0 impostorscore=0 mlxlogscore=870 adultscore=0
- classifier=spam adjust=0 reason=mlx scancount=1 engine=8.0.1-1908290000
- definitions=main-1909160172
+In-Reply-To: <CAMGffEmnTG4ixN1Hfy7oY93TgG3qQtF9TkpGzi=BxWm5a2i3Eg@mail.gmail.com>
+Content-Type: text/plain; charset=utf-8; format=flowed
+Content-Language: en-US
+Content-Transfer-Encoding: 7bit
 Sender: linux-block-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
+On 9/16/19 7:57 AM, Jinpu Wang wrote:
+>>>> +#define _IBNBD_FILEIO  0
+>>>> +#define _IBNBD_BLOCKIO 1
+>>>> +#define _IBNBD_AUTOIO  2
+>>>>
+>>>> +enum ibnbd_io_mode {
+>>>> +     IBNBD_FILEIO = _IBNBD_FILEIO,
+>>>> +     IBNBD_BLOCKIO = _IBNBD_BLOCKIO,
+>>>> +     IBNBD_AUTOIO = _IBNBD_AUTOIO,
+>>>> +};
+>>>
+>>> Since the IBNBD_* and _IBNBD_* constants have the same numerical value,
+>>> are the former constants really necessary?
+ >>
+>> Seems we can remove _IBNBD_*.
+ >
+> Sorry, checked again,  we defined _IBNBD_* constants to show the right
+> value for def_io_mode description.
+> If we remove the _IBNBD_*, then the modinfo shows:
+> def_io_mode:By default, export devices in blockio(IBNBD_BLOCKIO) or
+> fileio(IBNBD_FILEIO) mode. (default: IBNBD_BLOCKIO (blockio))
+> instead of:
+> parm:           def_io_mode:By default, export devices in blockio(1)
+> or fileio(0) mode. (default: 1 (blockio))
 
-Christoph,
+So the user is required to enter def_io_mode as a number? Wouldn't it be 
+more friendly towards users to change that parameter from a number into 
+a string?
 
-> Do we actually have Linux users of Type 3 at all?  I think for NVMe
-> we could just trivially disable Linux support, and I suspect for SCSI
-> as well, but I'll have to defer to you on that.
+Thanks,
 
-There were several companies looking into building Linux things using
-Type 3 SCSI devices. No idea whether this happened. I definitely still
-get lots of mail from people using Type 2. Something which also really
-shouldn't exist outside of a disk array.
+Bart.
 
-For NVMe, I assume nobody has tried Type 3 given the discrepancy between
-how SCSI works and how the NVMe spec is currently written.
-
-In any case. Since Type 3 is a pretty trivial subset of Type 1, I don't
-see much benefit in actively removing it. One could argue we could
-reduce the plumbing by removing a level of indirection. However, we'll
-need the infrastructure to support the impending Type 4 as well. So my
-preference is to just leave things as-is for now.
-
--- 
-Martin K. Petersen	Oracle Linux Engineering
