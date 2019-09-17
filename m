@@ -2,154 +2,188 @@ Return-Path: <SRS0=pu/s=XM=vger.kernel.org=linux-block-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-9.8 required=3.0 tests=DKIM_SIGNED,DKIM_VALID,
-	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,
-	SPF_HELO_NONE,SPF_PASS,USER_AGENT_GIT autolearn=unavailable
-	autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-0.9 required=3.0 tests=DKIM_SIGNED,DKIM_VALID,
+	DKIM_VALID_AU,HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SPF_HELO_NONE,
+	SPF_PASS,URIBL_BLOCKED autolearn=no autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 4FEE2C4CECE
-	for <linux-block@archiver.kernel.org>; Tue, 17 Sep 2019 09:14:06 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 1101DC4CECD
+	for <linux-block@archiver.kernel.org>; Tue, 17 Sep 2019 11:39:57 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.kernel.org (Postfix) with ESMTP id 267572189D
-	for <linux-block@archiver.kernel.org>; Tue, 17 Sep 2019 09:14:06 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id CD48621670
+	for <linux-block@archiver.kernel.org>; Tue, 17 Sep 2019 11:39:56 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=pass (2048-bit key) header.d=scylladb-com.20150623.gappssmtp.com header.i=@scylladb-com.20150623.gappssmtp.com header.b="J2og3Dg/"
+	dkim=pass (2048-bit key) header.d=cloud.ionos.com header.i=@cloud.ionos.com header.b="PNuAb0Gv"
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1726720AbfIQJOF (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Tue, 17 Sep 2019 05:14:05 -0400
-Received: from mail-wm1-f65.google.com ([209.85.128.65]:36262 "EHLO
-        mail-wm1-f65.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1726843AbfIQJOE (ORCPT
+        id S1726434AbfIQLj4 (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Tue, 17 Sep 2019 07:39:56 -0400
+Received: from mail-io1-f65.google.com ([209.85.166.65]:46628 "EHLO
+        mail-io1-f65.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S1726230AbfIQLjz (ORCPT
         <rfc822;linux-block@vger.kernel.org>);
-        Tue, 17 Sep 2019 05:14:04 -0400
-Received: by mail-wm1-f65.google.com with SMTP id t3so2189435wmj.1
-        for <linux-block@vger.kernel.org>; Tue, 17 Sep 2019 02:14:02 -0700 (PDT)
+        Tue, 17 Sep 2019 07:39:55 -0400
+Received: by mail-io1-f65.google.com with SMTP id d17so6643867ios.13
+        for <linux-block@vger.kernel.org>; Tue, 17 Sep 2019 04:39:55 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=scylladb-com.20150623.gappssmtp.com; s=20150623;
-        h=from:to:cc:subject:date:message-id:mime-version
-         :content-transfer-encoding;
-        bh=J3q851HjNurFsQDQC3tlZxSdaojcsq3jsQ2H8LllUYY=;
-        b=J2og3Dg/qod5VtnEytySsQ8YyEbwaSgVGfq5v5BN26gyXBCn0RlD22jQkf+Jw9baQb
-         643ndS25feWaoLtud/m27G4C853nV0HPTo6sVPwsMbu7iT76JTFMHTlONkj1/mYqsvcR
-         1S65Is3DymHewzhUFIfrV5wy2EyjUqmncS08e5uiV/3OW0gvivggxW7acmHG6o+2iZnQ
-         iRrE2b698SDcj6INGpjtDc516y2lbKUCZ8UJ179GWEHOpvre9DR2/EoRxQP99znszoJJ
-         B6bvQB21W0R8hGuRxbaL+gg47Fc/HqhP5zW0lpNKrai0JTo7IEQGwC2hpQUyujCKoHzq
-         zvdA==
+        d=cloud.ionos.com; s=google;
+        h=mime-version:references:in-reply-to:from:date:message-id:subject:to
+         :cc;
+        bh=GM5dAw36g0uZRkNYW0MZh7KdhJ4BQOzcGzfoUekvZ7k=;
+        b=PNuAb0Gv7jvIEflNfG3Kvie1iHDGlpxJqcxAiZsQ9s5LE5fUiLI0SMQKnhASq7Hxwq
+         GbRKFZJpXPGciqw57n/p6zyBLykfJiyoFu2Higrx18OQE/fHCuCN4BEwbH3AMkut0bT5
+         URLL7/bfnSNTiWD4Gg6A7QK4IoD4N3/guDNU50bfvF551oM7r2TKiWBG5xQBdryvSJAi
+         1RESQZLbfCcFJLpL/DLyWSn70Q7bd/Axdo4LqLvXYYTzidO21/R2+frdzW1clWti4YB/
+         ToTsdpCBccxXlfXndq62GPBe1GONZGWTfYzpzWoMBPKSVajLSqpI5GiqXPJSxZT7s2SA
+         UQew==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=1e100.net; s=20161025;
-        h=x-gm-message-state:from:to:cc:subject:date:message-id:mime-version
-         :content-transfer-encoding;
-        bh=J3q851HjNurFsQDQC3tlZxSdaojcsq3jsQ2H8LllUYY=;
-        b=L+4CrTE9I/pfHTekrEZYuCcm04y5ApzhdIZlpntkxYMlUAmNbDCR8L8jJo/UQIfB1w
-         w52N3HsChYQ699PyLjqfkvk9yrZgbLRZbI+9B66szA2IYz8WzlreLmeDfcKxK92rzM30
-         y5el/9qSdJlTJA6RUkm+OAUqeug4Bi2+YTtz4sMxUGEhXVs2YB92ifVHIBaWVhDPjgBu
-         3JKYwhCI0hD8ZE0Te5yVyZMPT4l5qc/J0f5jQj4U2KiUvbk1XTCALfpKvpNO1KbyUnoI
-         CPdg7tUx8ZIYWN2Y/zjNAFghd0v4Lm7V3aI7K3Qz5k50euepLPCCaU6dyWkHuMLjjrYH
-         9nqg==
-X-Gm-Message-State: APjAAAUcFo2fOt1afi0G0hczjPwh+7CLbOnPpHSs4yXkhQui25QVHBBe
-        jfASv11zC+rfzdpTNzHkfUzF5y/yXDE=
-X-Google-Smtp-Source: APXvYqxcQxDJL4hgNO1Obo5uli3NofxH4vnmuWQtbR0GVq3vtdmlYpXAaQGx7TfY5ZFxQoXnXb9c/g==
-X-Received: by 2002:a7b:c401:: with SMTP id k1mr2555955wmi.62.1568711641291;
-        Tue, 17 Sep 2019 02:14:01 -0700 (PDT)
-Received: from avi.cloudius-systems.com (system.cloudius-systems.com. [199.203.229.89])
-        by smtp.gmail.com with ESMTPSA id y13sm4183768wrg.8.2019.09.17.02.13.59
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Tue, 17 Sep 2019 02:14:00 -0700 (PDT)
-From:   Avi Kivity <avi@scylladb.com>
-To:     Jens Axboe <axboe@kernel.dk>
-Cc:     linux-kernel@vger.kernel.org, linux-block@vger.kernel.org
-Subject: [PATCH v1] io_uring: reserve word at cqring tail+4 for the user
-Date:   Tue, 17 Sep 2019 12:13:58 +0300
-Message-Id: <20190917091358.3652-1-avi@scylladb.com>
-X-Mailer: git-send-email 2.21.0
+        h=x-gm-message-state:mime-version:references:in-reply-to:from:date
+         :message-id:subject:to:cc;
+        bh=GM5dAw36g0uZRkNYW0MZh7KdhJ4BQOzcGzfoUekvZ7k=;
+        b=SA8rL68D6mpQ9CwwdVycKtgGpcnMkGRVbc3a7oy6uAPX98onaynRPlhT6ftDhicCxz
+         Df5/euiHk4afhxkQvZtS+fnMWJCk2joyQJRP/gQ33U/qb3epmeDX1SP+d2kGvOFmB5KU
+         WwyrmalI6L+BMOTVZwhFsHJ/6lC3zoBCdd0fwiNshEe25GHn+F6oLokHyNmdR6+aNOpZ
+         TmcrX04H0szg8/DLXQx59likKr7yqM2gOw37sH6+mV71GQ2/zhKPN7AiHwr8JWQI0xNM
+         meQfBbOygpesEHH8V6CigII6ZIYBOeFcXn7wS/vxtbGttkNeoPqUa40/AJ9ve38ZTU2M
+         ClKQ==
+X-Gm-Message-State: APjAAAX1DbNXNgZznErs8rKyA2srFkxjg8Pg2ZbRe35seaML77fDdVPg
+        Bxgoupjc6+rWYMA+4vuaLZmbtUqzG9h0WkHZQa1f
+X-Google-Smtp-Source: APXvYqwjtz3gnRg8Iv1L+2X4q2YjLK6ljbEgDL7zghLihEP+Lxkt6Lv9ODzAUZ1gB1IH227EQ8B6vAmL49UxEGBLZCw=
+X-Received: by 2002:a02:a909:: with SMTP id n9mr3598934jam.57.1568720394697;
+ Tue, 17 Sep 2019 04:39:54 -0700 (PDT)
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
+References: <20190620150337.7847-1-jinpuwang@gmail.com> <20190620150337.7847-18-jinpuwang@gmail.com>
+ <bd8963e2-d186-dbd0-fe39-7f4a518f4177@acm.org> <CAHg0HuwzHnzPQAqjtYFTZb7BhzFagJ0NJ=pW=VkTqn5HML-0Vw@mail.gmail.com>
+ <5c5ff7df-2cce-ec26-7893-55911e4d8595@acm.org>
+In-Reply-To: <5c5ff7df-2cce-ec26-7893-55911e4d8595@acm.org>
+From:   Danil Kipnis <danil.kipnis@cloud.ionos.com>
+Date:   Tue, 17 Sep 2019 13:39:43 +0200
+Message-ID: <CAHg0HuwFTVsCNHbiXW20P6hQ3c-P_p5tB6dYKtOW=_euWEvLnA@mail.gmail.com>
+Subject: Re: [PATCH v4 17/25] ibnbd: client: main functionality
+To:     Bart Van Assche <bvanassche@acm.org>
+Cc:     Jack Wang <jinpuwang@gmail.com>, linux-block@vger.kernel.org,
+        linux-rdma@vger.kernel.org, Jens Axboe <axboe@kernel.dk>,
+        Christoph Hellwig <hch@infradead.org>,
+        Sagi Grimberg <sagi@grimberg.me>,
+        Jason Gunthorpe <jgg@mellanox.com>,
+        Doug Ledford <dledford@redhat.com>, rpenyaev@suse.de,
+        Jack Wang <jinpu.wang@cloud.ionos.com>,
+        Roman Pen <r.peniaev@gmail.com>
+Content-Type: text/plain; charset="UTF-8"
 Sender: linux-block-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-In some applications, a thread waits for I/O events generated by
-the kernel, and also events generated by other threads in the same
-application. Typically events from other threads are passed using
-in-memory queues that are not known to the kernel. As long as the
-threads is active, it polls for both kernel completions and
-inter-thread completions; when it is idle, it tells the other threads
-to use an I/O event to wait it up (e.g. an eventfd or a pipe) and
-then enters the kernel, waiting for such an event or an ordinary
-I/O completion.
+On Mon, Sep 16, 2019 at 6:46 PM Bart Van Assche <bvanassche@acm.org> wrote:
+>
+> On 9/16/19 7:17 AM, Danil Kipnis wrote:
+> > On Sat, Sep 14, 2019 at 1:46 AM Bart Van Assche <bvanassche@acm.org> wrote:
+> >> On 6/20/19 8:03 AM, Jack Wang wrote:
+> >>> +/*
+> >>> + * This is for closing devices when unloading the module:
+> >>> + * we might be closing a lot (>256) of devices in parallel
+> >>> + * and it is better not to use the system_wq.
+> >>> + */
+> >>> +static struct workqueue_struct *unload_wq;
+> >>
+> >> I think that a better motivation is needed for the introduction of a new
+> >> workqueue.
+>  >
+> > We didn't want to pollute the system workqueue when unmapping a big
+> > number of devices at once in parallel. Will reiterate on it.
+>
+> There are multiple system workqueues. From <linux/workqueue.h>:
+>
+> extern struct workqueue_struct *system_wq;
+> extern struct workqueue_struct *system_highpri_wq;
+> extern struct workqueue_struct *system_long_wq;
+> extern struct workqueue_struct *system_unbound_wq;
+> extern struct workqueue_struct *system_freezable_wq;
+> extern struct workqueue_struct *system_power_efficient_wq;
+> extern struct workqueue_struct *system_freezable_power_efficient_wq;
+>
+> Has it been considered to use e.g. system_long_wq?
+Will try to switch to system_long_wq, I do agree that a new wq for
+just closing devices does make an impression of an overreaction.
 
-When such a thread goes idle, it typically spins for a while to
-avoid the kernel entry/exit cost in case an event is forthcoming
-shortly. While it spins it polls both I/O completions and
-inter-thread queues.
+>
+> >> A more general question is why ibnbd needs its own queue management
+> >> while no other block driver needs this?
+> >
+> > Each IBNBD device promises to have a queue_depth (of say 512) on each
+> > of its num_cpus hardware queues. In fact we can only process a
+> > queue_depth inflights at once on the whole ibtrs session connecting a
+> > given client with a given server. Those 512 inflights (corresponding
+> > to the number of buffers reserved by the server for this particular
+> > client) have to be shared among all the devices mapped on this
+> > session. This leads to the situation, that we receive more requests
+> > than we can process at the moment. So we need to stop queues and start
+> > them again later in some fair fashion.
+>
+> Can a single CPU really sustain a queue depth of 512 commands? Is it
+> really necessary to have one hardware queue per CPU or is e.g. four
+> queues per NUMA node sufficient? Has it been considered to send the
+> number of hardware queues that the initiator wants to use and also the
+> command depth per queue during login to the target side? That would
+> allow the target side to allocate an independent set of buffers for each
+> initiator hardware queue and would allow to remove the queue management
+> at the initiator side. This might even yield better performance.
+We needed a way which would allow us to address one particular
+requirement: we'd like to be able to "enforce" that a response to an
+IO would be processed on the same CPU the IO was originally submitted
+on. In order to be able to do so we establish one rdma connection per
+cpu, each having a separate cq_vector. The administrator can then
+assign the corresponding IRQs to distinct CPUs. The server always
+replies to an IO on the same connection he received the request on. If
+the administrator did configure the /proc/irq/y/smp_affinity
+accordingly, the response sent by the server will generate interrupt
+on the same cpu, the IO was originally submitted on. The administrator
+can configure IRQs differently, for example assign a given irq
+(<->cq_vector) to a range of cpus belonging to a numa node, or
+whatever assignment is best for his use-case.
+Our transport module IBTRS establishes number of cpus connections
+between a client and a server. The user of the transport module (i.e.
+IBNBD) has no knowledge about the rdma connections, it only has a
+pointer to an abstract "session", which connects  him somehow to a
+remote host. IBNBD as a user of IBTRS creates block devices and uses a
+given "session" to send IOs from all the block devices it created for
+that session. That means IBNBD is limited in maximum number of his
+inflights toward a given remote host by the capability of the
+corresponding "session". So it needs to share the resources provided
+by the session (in our current model those resources are in fact some
+pre registered buffers on server side) among his devices.
+It is possible to extend the IBTRS API so that the user (IBNBD) could
+specify how many connections he wants to have on the session to be
+established. It is also possible to extend the ibtrs_clt_get_tag API
+(this is to get a send "permit") with a parameter specifying the
+connection, the future IO is to be send on.
+We now might have to change our communication model in IBTRS a bit in
+order to fix the potential security problem raised during the recent
+RDMA MC: https://etherpad.net/p/LPC2019_RDMA.
 
-The x86 instruction pair UMONITOR/UMWAIT allows waiting for a cache
-line to be written to. This can be used with io_uring to wait for a
-wakeup without spinning (and wasting power and slowing down the other
-hyperthread). Other threads can also wake up the waiter by doing a
-safe write to the tail word (which triggers the wakeup), but safe
-writes are slow as they require an atomic instruction. To speed up
-those wakeups, reserve a word after the tail for user writes.
-
-A thread consuming an io_uring completion queue can then use the
-following sequences:
-
-  - while busy:
-    - pick up work from the completion queue and from other threads,
-      and process it
-
-  - while idle:
-    - use UMONITOR/UMWAIT to wait on completions and notifications
-      from other threads for a short period
-    - if no work is picked up, let other threads know you will need
-      a kernel wakeup, and use io_uring_enter to wait indefinitely
-
-Signed-off-by: Avi Kivity <avi@scylladb.com>
----
- fs/io_uring.c                 | 5 +++--
- include/uapi/linux/io_uring.h | 4 ++++
- 2 files changed, 7 insertions(+), 2 deletions(-)
-
-diff --git a/fs/io_uring.c b/fs/io_uring.c
-index cfb48bd088e1..4bd7905cee1d 100644
---- a/fs/io_uring.c
-+++ b/fs/io_uring.c
-@@ -77,12 +77,13 @@
- 
- #define IORING_MAX_ENTRIES	4096
- #define IORING_MAX_FIXED_FILES	1024
- 
- struct io_uring {
--	u32 head ____cacheline_aligned_in_smp;
--	u32 tail ____cacheline_aligned_in_smp;
-+	u32 head ____cacheline_aligned;
-+	u32 tail ____cacheline_aligned;
-+	u32 reserved_for_user; // for cq ring and UMONITOR/UMWAIT (or similar) wakeups
- };
- 
- /*
-  * This data is shared with the application through the mmap at offset
-  * IORING_OFF_SQ_RING.
-diff --git a/include/uapi/linux/io_uring.h b/include/uapi/linux/io_uring.h
-index 1e1652f25cc1..1a6a826a66f3 100644
---- a/include/uapi/linux/io_uring.h
-+++ b/include/uapi/linux/io_uring.h
-@@ -103,10 +103,14 @@ struct io_sqring_offsets {
-  */
- #define IORING_SQ_NEED_WAKEUP	(1U << 0) /* needs io_uring_enter wakeup */
- 
- struct io_cqring_offsets {
- 	__u32 head;
-+	// tail is guaranteed to be aligned on a cache line, and to have the
-+	// following __u32 free for user use. This allows using e.g.
-+	// UMONITOR/UMWAIT to wait on both writes to head and writes from
-+	// other threads to the following word.
- 	__u32 tail;
- 	__u32 ring_mask;
- 	__u32 ring_entries;
- 	__u32 overflow;
- 	__u32 cqes;
--- 
-2.21.0
-
+>
+> >>> +static void msg_conf(void *priv, int errno)
+> >>> +{
+> >>> +     struct ibnbd_iu *iu = (struct ibnbd_iu *)priv;
+> >>
+> >> The kernel code I'm familiar with does not cast void pointers explicitly
+> >> into another type. Please follow that convention and leave the cast out
+> >> from the above and also from similar statements.
+> > msg_conf() is a callback which IBNBD passes down with a request to
+> > IBTRS when calling ibtrs_clt_request(). msg_conf() is called when a
+> > request is completed with a pointer to a struct defined in IBNBD. So
+> > IBTRS as transport doesn't know what's inside the private pointer
+> > which IBNBD passed down with the request, it's opaque, since struct
+> > ibnbd_iu is not visible in IBTRS. I will try to find how others avoid
+> > a cast in similar situations.
+>
+> Are you aware that the C language can cast a void pointer into a
+> non-void pointer implicitly, that means, without having to use a cast?
+Oh, I misunderstood your original comment: you suggest to just remove
+the explicit (struct ibnbd_iu *) and similar casts from void pointers.
+I think an explicit cast makes it easier for readers to follow the
+code. But it does say "Casting the return value which is a void
+pointer is redundant." at least in the "Allocating Memory" section of
+https://www.kernel.org/doc/html/v4.10/process/coding-style.html and
+seems others don't do that, at least not when declaring a variable.
+Will drop those casts.
