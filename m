@@ -2,176 +2,163 @@ Return-Path: <SRS0=pu/s=XM=vger.kernel.org=linux-block-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-9.6 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
-	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,
-	SPF_HELO_NONE,SPF_PASS,USER_AGENT_GIT autolearn=ham autolearn_force=no
-	version=3.4.0
+X-Spam-Status: No, score=-5.3 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
+	INCLUDES_PATCH,MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,USER_AGENT_SANE_1
+	autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id DAA61C49ED7
-	for <linux-block@archiver.kernel.org>; Tue, 17 Sep 2019 00:35:25 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 69CECC49ED7
+	for <linux-block@archiver.kernel.org>; Tue, 17 Sep 2019 00:50:45 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.kernel.org (Postfix) with ESMTP id A925A216C8
-	for <linux-block@archiver.kernel.org>; Tue, 17 Sep 2019 00:35:25 +0000 (UTC)
-Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (2048-bit key) header.d=wdc.com header.i=@wdc.com header.b="JSar1sGx"
+	by mail.kernel.org (Postfix) with ESMTP id 4625A20640
+	for <linux-block@archiver.kernel.org>; Tue, 17 Sep 2019 00:50:45 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1732049AbfIQAfY (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Mon, 16 Sep 2019 20:35:24 -0400
-Received: from esa1.hgst.iphmx.com ([68.232.141.245]:58995 "EHLO
-        esa1.hgst.iphmx.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1726118AbfIQAfY (ORCPT
-        <rfc822;linux-block@vger.kernel.org>);
-        Mon, 16 Sep 2019 20:35:24 -0400
-DKIM-Signature: v=1; a=rsa-sha256; c=simple/simple;
-  d=wdc.com; i=@wdc.com; q=dns/txt; s=dkim.wdc.com;
-  t=1568680521; x=1600216521;
-  h=from:to:cc:subject:date:message-id:mime-version:
-   content-transfer-encoding;
-  bh=dDesPlwTfRYJsPYxEDQmgHBtvBQy1Z+ScJltpVbUiqw=;
-  b=JSar1sGxSy8cNbq5rkM3d9cHDPt8ZoJidtYWs/kXNCxBi6QqNyLVWb7N
-   nklGHHOjhdZZkILtoEmCcI4EL7YPeJGkOKX1N0JNQ6CJ3ED2U6SF/Cxqw
-   TXJBusoJRVeLKQv5BYvAiyqTbfjGeRChCeuCdpxzybEHOhXmTF3FckYvX
-   vf/RbGfybztx7xpyutjKWB0jCbXyjcB0y/CfnSMGMUoN98s/tIOwwmSNg
-   3EufzM2uvyf1FzUSMSTiuMDh8GA7gQt4WsqnpD2/QoVtiILBT90Bxa137
-   cb30esHG55S0MYfd2rJfNdAFgs700fy6F801/BN0k6VwUYNf7h8tZVh71
-   A==;
-IronPort-SDR: orTmeoT2fvjWA0HcOp1a6z/L6Ly9d9C6rgml1Udi5kqQud7p2xWDdukY1C9HJJAnqtUf8Kvr9Y
- GKdUQ2dRabBuBkdY8Wy209tChSyDHIMNrlG+KLGlt5Uo33yND4ZecAobP1GSnDBGRXUDchEEgX
- fIzn2pEafisKAPzYT5abVsJwMSEUJsJByaBl/zS012yrrZuT+nn8Cxt/LkQ8UCsjh50e/E+5A/
- 89tWft9J7j5OvS689ZAyqUz8CUFGXCVhdHBOcLQz4dxvzMY/nkzqU2e/cZzxfsv5/ANyENGsHy
- B3U=
-X-IronPort-AV: E=Sophos;i="5.64,514,1559491200"; 
-   d="scan'208";a="225207181"
-Received: from uls-op-cesaip02.wdc.com (HELO uls-op-cesaep02.wdc.com) ([199.255.45.15])
-  by ob1.hgst.iphmx.com with ESMTP; 17 Sep 2019 08:35:21 +0800
-IronPort-SDR: KrnrE1YGqS0XhjotXq/d6pHiFev4Vdb50kRLXRdrS/wcwYqu5lcj16/4/jslNSxLkhP+HWRhHd
- PdbcSaEKKgglXXGFmuBqTHEzNlRM258JIZ3YEKYH/UsXkojFOjT7c+w5BLvbtYuHunKfLoAD2B
- H4xbJujQEYQNvNHDOg/7ZViRmligf8N8J29BHQNoGTgdxO0+HJgtoj2XVTXR1Nn5qZalP6iHe0
- ZRnNKtH+zz6ziTqsTyssWMwnlZDSpoEp/4chhyL5OBXfQ1+xLpCdwuc1brKyxgWAphSGkV04mY
- I1X3p0jC/B6ZdRpvmry9Uu7c
-Received: from uls-op-cesaip02.wdc.com ([10.248.3.37])
-  by uls-op-cesaep02.wdc.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 16 Sep 2019 17:31:58 -0700
-IronPort-SDR: lEIey1wfRnBInkbgvZZsYy13E6BOGxGJ4S23ZJpFFv4Wn5CXxqB8B0OyEkNXhc8k6iKnnohOzU
- FlWJLDDBQbmG5ZMYuRIedg7JJ55c5XRE9CWMHIz9Ri7bfXSuu+Cwt1k+T9rOb0TBznOISNPrKx
- JAC/p9doEKCapt529BSUJRC+b/xih1fMQESdB7cnx1TrQStVQ/aGI26TlOz+ZaqxsaAarvWX32
- eOj/HDgiHeczan2AA1MYxmnMZEbbjk29wIDWiOkNJKFZpVwjyqVi7nDePxOAK0It5zS65x+1Es
- 5kQ=
-WDCIronportException: Internal
-Received: from cvenusqemu.hgst.com ([10.202.66.73])
-  by uls-op-cesaip02.wdc.com with ESMTP; 16 Sep 2019 17:35:22 -0700
-From:   Chaitanya Kulkarni <chaitanya.kulkarni@wdc.com>
-To:     linux-block@vger.kernel.org
-Cc:     axboe@kernel.dk, osandov@fb.com,
-        Chaitanya Kulkarni <chaitanya.kulkarni@wdc.com>
-Subject: [PATCH] block: track per requests type merged count
-Date:   Mon, 16 Sep 2019 17:35:18 -0700
-Message-Id: <20190917003518.6219-1-chaitanya.kulkarni@wdc.com>
-X-Mailer: git-send-email 2.17.0
+        id S1732735AbfIQAuo (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Mon, 16 Sep 2019 20:50:44 -0400
+Received: from mx1.redhat.com ([209.132.183.28]:60312 "EHLO mx1.redhat.com"
+        rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
+        id S1732054AbfIQAuo (ORCPT <rfc822;linux-block@vger.kernel.org>);
+        Mon, 16 Sep 2019 20:50:44 -0400
+Received: from smtp.corp.redhat.com (int-mx05.intmail.prod.int.phx2.redhat.com [10.5.11.15])
+        (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
+        (No client certificate requested)
+        by mx1.redhat.com (Postfix) with ESMTPS id 0B0893082132;
+        Tue, 17 Sep 2019 00:50:44 +0000 (UTC)
+Received: from ming.t460p (ovpn-8-18.pek2.redhat.com [10.72.8.18])
+        by smtp.corp.redhat.com (Postfix) with ESMTPS id 44FA35D6A9;
+        Tue, 17 Sep 2019 00:50:36 +0000 (UTC)
+Date:   Tue, 17 Sep 2019 08:50:32 +0800
+From:   Ming Lei <ming.lei@redhat.com>
+To:     Yufen Yu <yuyufen@huawei.com>
+Cc:     axboe@kernel.dk, linux-block@vger.kernel.org, hch@infradead.org,
+        keith.busch@intel.com, tj@kernel.org, zhangxiaoxu5@huawei.com
+Subject: Re: [PATCH] block: fix null pointer dereference in
+ blk_mq_rq_timed_out()
+Message-ID: <20190917005030.GD6199@ming.t460p>
+References: <20190907102450.40291-1-yuyufen@huawei.com>
+ <20190912024618.GE2731@ming.t460p>
+ <b3d7b459-5f31-d473-2508-20048119c1b2@huawei.com>
+ <20190912041658.GA5020@ming.t460p>
+ <d3549c6d-ca07-efa9-af15-7cee61ce5ff2@huawei.com>
+ <20190912100755.GB9897@ming.t460p>
+ <04b485ad-90e6-7752-b74f-9694de9c22a6@huawei.com>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=UTF-8
-Content-Transfer-Encoding: 8bit
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <04b485ad-90e6-7752-b74f-9694de9c22a6@huawei.com>
+User-Agent: Mutt/1.11.3 (2019-02-01)
+X-Scanned-By: MIMEDefang 2.79 on 10.5.11.15
+X-Greylist: Sender IP whitelisted, not delayed by milter-greylist-4.5.16 (mx1.redhat.com [10.5.110.42]); Tue, 17 Sep 2019 00:50:44 +0000 (UTC)
 Sender: linux-block-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-With current debugfs block layer infrastructure, we only get the total
-merge count which includes all the requests types, but we don't get
-the per request type merge count.
+On Mon, Sep 16, 2019 at 05:27:39PM +0800, Yufen Yu wrote:
+> 
+> 
+> On 2019/9/12 18:07, Ming Lei wrote:
+> > On Thu, Sep 12, 2019 at 04:49:15PM +0800, Yufen Yu wrote:
+> > > 
+> > > On 2019/9/12 12:16, Ming Lei wrote:
+> > > > On Thu, Sep 12, 2019 at 11:29:18AM +0800, Yufen Yu wrote:
+> > > > > On 2019/9/12 10:46, Ming Lei wrote:
+> > > > > > On Sat, Sep 07, 2019 at 06:24:50PM +0800, Yufen Yu wrote:
+> > > > > > > There is a race condition between timeout check and completion for
+> > > > > > > flush request as follow:
+> > > > > > > 
+> > > > > > > timeout_work    issue flush      issue flush
+> > > > > > >                    blk_insert_flush
+> > > > > > >                                     blk_insert_flush
+> > > > > > > blk_mq_timeout_work
+> > > > > > >                    blk_kick_flush
+> > > > > > > 
+> > > > > > > blk_mq_queue_tag_busy_iter
+> > > > > > > blk_mq_check_expired(flush_rq)
+> > > > > > > 
+> > > > > > >                    __blk_mq_end_request
+> > > > > > >                   flush_end_io
+> > > > > > >                   blk_kick_flush
+> > > > > > >                   blk_rq_init(flush_rq)
+> > > > > > >                   memset(flush_rq, 0)
+> > > > > > Not see there is memset(flush_rq, 0) in block/blk-flush.c
+> > > > > Call path as follow:
+> > > > > 
+> > > > > blk_kick_flush
+> > > > >       blk_rq_init
+> > > > >           memset(rq, 0, sizeof(*rq));
+> > > > Looks I miss this one in blk_rq_init(), sorry for that.
+> > > > 
+> > > > Given there are only two users of blk_rq_init(), one simple fix could be
+> > > > not clearing queue in blk_rq_init(), something like below?
+> > > > 
+> > > > diff --git a/block/blk-core.c b/block/blk-core.c
+> > > > index 77807a5d7f9e..25e6a045c821 100644
+> > > > --- a/block/blk-core.c
+> > > > +++ b/block/blk-core.c
+> > > > @@ -107,7 +107,9 @@ EXPORT_SYMBOL_GPL(blk_queue_flag_test_and_set);
+> > > >    void blk_rq_init(struct request_queue *q, struct request *rq)
+> > > >    {
+> > > > -	memset(rq, 0, sizeof(*rq));
+> > > > +	const int offset = offsetof(struct request, q);
+> > > > +
+> > > > +	memset((void *)rq + offset, 0, sizeof(*rq) - offset);
+> > > >    	INIT_LIST_HEAD(&rq->queuelist);
+> > > >    	rq->q = q;
+> > > > diff --git a/include/linux/blkdev.h b/include/linux/blkdev.h
+> > > > index 1ac790178787..382e71b8787d 100644
+> > > > --- a/include/linux/blkdev.h
+> > > > +++ b/include/linux/blkdev.h
+> > > > @@ -130,7 +130,7 @@ enum mq_rq_state {
+> > > >     * especially blk_mq_rq_ctx_init() to take care of the added fields.
+> > > >     */
+> > > >    struct request {
+> > > > -	struct request_queue *q;
+> > > > +	struct request_queue *q;	/* Must be the 1st field */
+> > > >    	struct blk_mq_ctx *mq_ctx;
+> > > >    	struct blk_mq_hw_ctx *mq_hctx;
+> > > Not set req->q as '0' can just avoid BUG_ON for NULL pointer deference.
+> > > 
+> > > However, the root problem is that 'flush_rq' have been reused while
+> > > timeout function handle it currently. That means mq_ops->timeout() may
+> > > access old values remained by the last flush request and make the wrong
+> > > decision.
+> > > 
+> > > Take the race condition in the patch as an example.
+> > > 
+> > > blk_mq_check_expired
+> > >      blk_mq_rq_timed_out
+> > >          req->q->mq_ops->timeout  // Driver timeout handle may read old data
+> > >      refcount_dec_and_test(&rq)
+> > >      __blk_mq_free_request   // If rq have been reset has '1' in
+> > > blk_rq_init(), it will be free here.
+> > > 
+> > > So, I think we should solve this problem completely. Just like normal
+> > > request,
+> > > we can prevent flush request to call end_io when timeout handle the request.
+> > Seems it isn't specific for 'flush_rq', and it should be one generic issue
+> > for any request which implements .end_io.
+> > 
+> > For requests without defining .end_io, rq->ref is applied for protecting
+> > its lifetime. However, rq->end_io() is still called even if rq->ref doesn't
+> > drop to zero.
+> > 
+> > If the above is correct, we need to let rq->ref to cover rq->end_io().
+> 
+> We ignore the fact that we may also need to free 'rq' after calling
+> rq->end_io(),
+> such as end_clone_request(), mq_flush_data_end_io().
+> 
+> If  we let 'rq->ref' to cover rq->end_io(), 'rq->ref' have been decreased to
+> '0'
+> before calling __blk_mq_free_request(). Then, the function will never be
+> called.
+> 
+> So, I think flush request may need to be fixed individually.
 
-This patch replaces the rq_merged variable into the rq_merged array
-so that we can track the per request type merged stats.
+Thinking of this issue further, given other cases of .end_io() still
+depends on blk_mq_free_request() for freeing request, it is fine
+to just fix flush request.
 
-Instead of having one number for all the requests which are merged,
-with this patch we can get the detailed number of the merged requests
-per request type:-
 
-READ                    0  
-WRITE                   0  
-FLUSH                   0  
-DISCARD                 0  
-SECURE_ERASE            0  
-ZONE_RESET              0  
-ZONE_RESET_ALL          0  
-WRITE_ZEROES            0  
-SCSI_IN                 0  
-SCSI_OUT                0  
-DRV_IN                  0  
-DRV_OUT                 0  
-
-This is helpful in the understanding merging of the requests under
-different workloads and for the special requests such as discard which
-implements request specific merging mechanism.
-
-Signed-off-by: Chaitanya Kulkarni <chaitanya.kulkarni@wdc.com>
----
- block/blk-mq-debugfs.c | 17 +++++++++++++++--
- block/blk-mq-sched.c   |  2 +-
- block/blk-mq.h         |  2 +-
- 3 files changed, 17 insertions(+), 4 deletions(-)
-
-diff --git a/block/blk-mq-debugfs.c b/block/blk-mq-debugfs.c
-index b3f2ba483992..1e46f2cbf84e 100644
---- a/block/blk-mq-debugfs.c
-+++ b/block/blk-mq-debugfs.c
-@@ -679,8 +679,21 @@ static ssize_t ctx_dispatched_write(void *data, const char __user *buf,
- static int ctx_merged_show(void *data, struct seq_file *m)
- {
- 	struct blk_mq_ctx *ctx = data;
-+	unsigned long *rm = ctx->rq_merged;
-+
-+	seq_printf(m, "READ             %8lu\n", rm[REQ_OP_READ]);
-+	seq_printf(m, "WRITE            %8lu\n", rm[REQ_OP_WRITE]);
-+	seq_printf(m, "FLUSH            %8lu\n", rm[REQ_OP_FLUSH]);
-+	seq_printf(m, "DISCARD          %8lu\n", rm[REQ_OP_DISCARD]);
-+	seq_printf(m, "SECURE_ERASE     %8lu\n", rm[REQ_OP_SECURE_ERASE]);
-+	seq_printf(m, "ZONE_RESET       %8lu\n", rm[REQ_OP_ZONE_RESET]);
-+	seq_printf(m, "ZONE_RESET_ALL   %8lu\n", rm[REQ_OP_ZONE_RESET_ALL]);
-+	seq_printf(m, "WRITE_ZEROES     %8lu\n", rm[REQ_OP_WRITE_ZEROES]);
-+	seq_printf(m, "SCSI_IN          %8lu\n", rm[REQ_OP_SCSI_IN]);
-+	seq_printf(m, "SCSI_OUT         %8lu\n", rm[REQ_OP_SCSI_OUT]);
-+	seq_printf(m, "DRV_IN           %8lu\n", rm[REQ_OP_DRV_IN]);
-+	seq_printf(m, "DRV_OUT          %8lu\n", rm[REQ_OP_DRV_OUT]);
- 
--	seq_printf(m, "%lu\n", ctx->rq_merged);
- 	return 0;
- }
- 
-@@ -689,7 +702,7 @@ static ssize_t ctx_merged_write(void *data, const char __user *buf,
- {
- 	struct blk_mq_ctx *ctx = data;
- 
--	ctx->rq_merged = 0;
-+	memset(ctx->rq_merged, 0, sizeof(ctx->rq_merged));
- 	return count;
- }
- 
-diff --git a/block/blk-mq-sched.c b/block/blk-mq-sched.c
-index c9d183d6c499..664f8a056e96 100644
---- a/block/blk-mq-sched.c
-+++ b/block/blk-mq-sched.c
-@@ -314,7 +314,7 @@ static bool blk_mq_attempt_merge(struct request_queue *q,
- 	lockdep_assert_held(&ctx->lock);
- 
- 	if (blk_mq_bio_list_merge(q, &ctx->rq_lists[type], bio, nr_segs)) {
--		ctx->rq_merged++;
-+		ctx->rq_merged[bio_op(bio)]++;
- 		return true;
- 	}
- 
-diff --git a/block/blk-mq.h b/block/blk-mq.h
-index 32c62c64e6c2..d485dde6e090 100644
---- a/block/blk-mq.h
-+++ b/block/blk-mq.h
-@@ -27,7 +27,7 @@ struct blk_mq_ctx {
- 
- 	/* incremented at dispatch time */
- 	unsigned long		rq_dispatched[2];
--	unsigned long		rq_merged;
-+	unsigned long		rq_merged[REQ_OP_LAST];
- 
- 	/* incremented at completion time */
- 	unsigned long		____cacheline_aligned_in_smp rq_completed[2];
--- 
-2.17.0
-
+Thanks,
+Ming
