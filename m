@@ -2,213 +2,111 @@ Return-Path: <SRS0=pu/s=XM=vger.kernel.org=linux-block-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-6.8 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
-	INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS
-	autolearn=ham autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-0.9 required=3.0 tests=DKIM_SIGNED,DKIM_VALID,
+	DKIM_VALID_AU,HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SPF_HELO_NONE,
+	SPF_PASS autolearn=no autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 61C03C4CEC9
-	for <linux-block@archiver.kernel.org>; Tue, 17 Sep 2019 12:09:25 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 92735C4CEC9
+	for <linux-block@archiver.kernel.org>; Tue, 17 Sep 2019 12:28:10 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.kernel.org (Postfix) with ESMTP id 4279B21881
-	for <linux-block@archiver.kernel.org>; Tue, 17 Sep 2019 12:09:25 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id 63F7A21881
+	for <linux-block@archiver.kernel.org>; Tue, 17 Sep 2019 12:28:10 +0000 (UTC)
+Authentication-Results: mail.kernel.org;
+	dkim=pass (2048-bit key) header.d=cloud.ionos.com header.i=@cloud.ionos.com header.b="AVkaPP6M"
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1727196AbfIQMJY (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Tue, 17 Sep 2019 08:09:24 -0400
-Received: from mx1.redhat.com ([209.132.183.28]:17325 "EHLO mx1.redhat.com"
-        rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-        id S1727126AbfIQMJY (ORCPT <rfc822;linux-block@vger.kernel.org>);
-        Tue, 17 Sep 2019 08:09:24 -0400
-Received: from smtp.corp.redhat.com (int-mx04.intmail.prod.int.phx2.redhat.com [10.5.11.14])
-        (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
-        (No client certificate requested)
-        by mx1.redhat.com (Postfix) with ESMTPS id 02E0C796EE;
-        Tue, 17 Sep 2019 12:09:24 +0000 (UTC)
-Received: from localhost.localdomain (unknown [10.70.39.226])
-        by smtp.corp.redhat.com (Postfix) with ESMTP id 9A72A5D9D5;
-        Tue, 17 Sep 2019 12:09:21 +0000 (UTC)
-From:   xiubli@redhat.com
-To:     josef@toxicpanda.com, axboe@kernel.dk
-Cc:     mchristi@redhat.com, hch@infradead.org,
-        linux-block@vger.kernel.org, Xiubo Li <xiubli@redhat.com>,
-        Ming Lei <ming.lei@redhat.com>
-Subject: [PATCH v3 2/2] blk-mq: use BLK_MQ_GFP_FLAGS and memalloc_noio_save/restore instead
-Date:   Tue, 17 Sep 2019 17:39:10 +0530
-Message-Id: <20190917120910.24842-3-xiubli@redhat.com>
-In-Reply-To: <20190917120910.24842-1-xiubli@redhat.com>
-References: <20190917120910.24842-1-xiubli@redhat.com>
+        id S1727059AbfIQM2J (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Tue, 17 Sep 2019 08:28:09 -0400
+Received: from mail-wr1-f65.google.com ([209.85.221.65]:34977 "EHLO
+        mail-wr1-f65.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S1725901AbfIQM2J (ORCPT
+        <rfc822;linux-block@vger.kernel.org>);
+        Tue, 17 Sep 2019 08:28:09 -0400
+Received: by mail-wr1-f65.google.com with SMTP id v8so2984162wrt.2
+        for <linux-block@vger.kernel.org>; Tue, 17 Sep 2019 05:28:08 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=cloud.ionos.com; s=google;
+        h=mime-version:references:in-reply-to:from:date:message-id:subject:to
+         :cc;
+        bh=M6NXDdLeZOMJf3cWxByu2Fry9FRYrZl4lG8kh5/SBho=;
+        b=AVkaPP6Mpl4j71cXN8IpXyWDgUzST5dWUXU0NMDqQVHhyWAb5m7SG7EItPJQcZiRlh
+         ZPQlRxvFAVoBk9dkeAitNVMihPK4V6rhWhIBN0/ZGAyKPk1/H/u282vCwEA5edlb1X8n
+         k6qq5B0YRb0MVAMlatwPEmtwRQ2oH2sMl86msTGh1mmQydfvQLX8aAE+rO9BVwVXtorc
+         auSJ60RsRWPlQkNy7n2MaOJ7bYI77WhtKyUTTwAPa9bEMUL7i/c+x399rsQyoUksXepv
+         eAUXOrs/w85oltCckaEF6pt2m+GH3l57xduT+eOySRlcE/UjuWAUkKx0GPwwx3kJGI5p
+         IN3A==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20161025;
+        h=x-gm-message-state:mime-version:references:in-reply-to:from:date
+         :message-id:subject:to:cc;
+        bh=M6NXDdLeZOMJf3cWxByu2Fry9FRYrZl4lG8kh5/SBho=;
+        b=k6vrtNOgy88Kck+suXgzvSQjyU3vrMcikVRjiQkBSm8fRzHHA4F/JG1KuyIIeOefeg
+         +KxPleT5Os+SO2OOGBZzOCGzBkCKuSH1KvnrkcRSoSeZ/B3kNIcgEm5ufgP5dZf7GaZs
+         2HRCWvYDg8CQJ6cUy459UbaMO01YmvDEt1nyvWpSpCEN9VOYUsEueyJxBBIL6ecxTPhJ
+         tyDmFgkN7R0dAIs0b9PBS2IERT/+lgVqS1dpeyrmsq48G07VQiptKTmuaFBFQ4tvJiUz
+         cp/5c3dG9sMt9cMwa6bTzqXEHxG7gkaYrN7nNooLACHApvhGYrbEU+C79LssE9zvPpjB
+         CRYA==
+X-Gm-Message-State: APjAAAVfIiKSit6YV04ZFYG0m2hN1jIcr6oCOsjo41ktKiBElQDvLkcp
+        JkU4EPxJRYxuXjsWoRFdPYFkxFVdWpNaHBJoGWmk3g==
+X-Google-Smtp-Source: APXvYqx/40G6xULaZQt9FoNPnqJkzaL4lnpeUgH+w8N1XVGQ1YZ7NmPaQfVpLZNwcd8jKY6MwNxe2RDiB9Oo5bmaMdc=
+X-Received: by 2002:a5d:4744:: with SMTP id o4mr2762494wrs.95.1568723287328;
+ Tue, 17 Sep 2019 05:28:07 -0700 (PDT)
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
-X-Scanned-By: MIMEDefang 2.79 on 10.5.11.14
-X-Greylist: Sender IP whitelisted, not delayed by milter-greylist-4.5.16 (mx1.redhat.com [10.5.110.25]); Tue, 17 Sep 2019 12:09:24 +0000 (UTC)
+References: <20190620150337.7847-1-jinpuwang@gmail.com> <20190620150337.7847-16-jinpuwang@gmail.com>
+ <4fbad80b-f551-131e-9a5c-a24f1fa98fea@acm.org> <CAMGffEnVFHpmDCiazHFX1jwi4=p401T9goSkes3j1AttV0t1Ng@mail.gmail.com>
+ <CAMGffEmnTG4ixN1Hfy7oY93TgG3qQtF9TkpGzi=BxWm5a2i3Eg@mail.gmail.com> <a7d4b3eb-d0c7-0c9d-ce64-da37a732564a@acm.org>
+In-Reply-To: <a7d4b3eb-d0c7-0c9d-ce64-da37a732564a@acm.org>
+From:   Jinpu Wang <jinpu.wang@cloud.ionos.com>
+Date:   Tue, 17 Sep 2019 14:27:56 +0200
+Message-ID: <CAMGffE=J2-jmpTcRr14ndwHPncr9PV-NvX1mJ+M0tEne6oJD9Q@mail.gmail.com>
+Subject: Re: [PATCH v4 15/25] ibnbd: private headers with IBNBD protocol
+ structs and helpers
+To:     Bart Van Assche <bvanassche@acm.org>
+Cc:     Jack Wang <jinpuwang@gmail.com>, linux-block@vger.kernel.org,
+        linux-rdma@vger.kernel.org, Jens Axboe <axboe@kernel.dk>,
+        Christoph Hellwig <hch@infradead.org>,
+        Sagi Grimberg <sagi@grimberg.me>,
+        Jason Gunthorpe <jgg@mellanox.com>,
+        Doug Ledford <dledford@redhat.com>,
+        Danil Kipnis <danil.kipnis@cloud.ionos.com>, rpenyaev@suse.de
+Content-Type: text/plain; charset="UTF-8"
 Sender: linux-block-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-From: Xiubo Li <xiubli@redhat.com>
+On Mon, Sep 16, 2019 at 7:25 PM Bart Van Assche <bvanassche@acm.org> wrote:
+>
+> On 9/16/19 7:57 AM, Jinpu Wang wrote:
+> >>>> +#define _IBNBD_FILEIO  0
+> >>>> +#define _IBNBD_BLOCKIO 1
+> >>>> +#define _IBNBD_AUTOIO  2
+> >>>>
+> >>>> +enum ibnbd_io_mode {
+> >>>> +     IBNBD_FILEIO = _IBNBD_FILEIO,
+> >>>> +     IBNBD_BLOCKIO = _IBNBD_BLOCKIO,
+> >>>> +     IBNBD_AUTOIO = _IBNBD_AUTOIO,
+> >>>> +};
+> >>>
+> >>> Since the IBNBD_* and _IBNBD_* constants have the same numerical value,
+> >>> are the former constants really necessary?
+>  >>
+> >> Seems we can remove _IBNBD_*.
+>  >
+> > Sorry, checked again,  we defined _IBNBD_* constants to show the right
+> > value for def_io_mode description.
+> > If we remove the _IBNBD_*, then the modinfo shows:
+> > def_io_mode:By default, export devices in blockio(IBNBD_BLOCKIO) or
+> > fileio(IBNBD_FILEIO) mode. (default: IBNBD_BLOCKIO (blockio))
+> > instead of:
+> > parm:           def_io_mode:By default, export devices in blockio(1)
+> > or fileio(0) mode. (default: 1 (blockio))
+>
+> So the user is required to enter def_io_mode as a number? Wouldn't it be
+> more friendly towards users to change that parameter from a number into
+> a string?
+>
+Ok, it's a bit more code, will change to allow user to set "blockio"
+or "fileio" as string.
 
-There are at least 6 places are using the same combined GFP flags,
-switch them to one macro instead to make the code get cleaner.
-
-Signed-off-by: Xiubo Li <xiubli@redhat.com>
-Reviewed-by: Ming Lei <ming.lei@redhat.com>
----
- block/blk-mq.c | 44 ++++++++++++++++++++++++++++++++------------
- 1 file changed, 32 insertions(+), 12 deletions(-)
-
-diff --git a/block/blk-mq.c b/block/blk-mq.c
-index 9c52e4dfe132..8cdc747d5c4d 100644
---- a/block/blk-mq.c
-+++ b/block/blk-mq.c
-@@ -20,6 +20,7 @@
- #include <linux/list_sort.h>
- #include <linux/cpu.h>
- #include <linux/cache.h>
-+#include <linux/sched/mm.h>
- #include <linux/sched/sysctl.h>
- #include <linux/sched/topology.h>
- #include <linux/sched/signal.h>
-@@ -39,6 +40,8 @@
- #include "blk-mq-sched.h"
- #include "blk-rq-qos.h"
- 
-+#define BLK_MQ_GFP_FLAGS (GFP_KERNEL | __GFP_NOWARN | __GFP_NORETRY)
-+
- static void blk_mq_poll_stats_start(struct request_queue *q);
- static void blk_mq_poll_stats_fn(struct blk_stat_callback *cb);
- 
-@@ -2083,35 +2086,38 @@ struct blk_mq_tags *blk_mq_alloc_rq_map(struct blk_mq_tag_set *set,
- 					unsigned int reserved_tags)
- {
- 	struct blk_mq_tags *tags;
-+	unsigned int noio_flag;
- 	int node;
- 
- 	node = blk_mq_hw_queue_to_node(&set->map[HCTX_TYPE_DEFAULT], hctx_idx);
- 	if (node == NUMA_NO_NODE)
- 		node = set->numa_node;
- 
-+	noio_flag = memalloc_noio_save();
- 	tags = blk_mq_init_tags(nr_tags, reserved_tags, node,
- 				BLK_MQ_FLAG_TO_ALLOC_POLICY(set->flags),
--				GFP_NOIO | __GFP_NOWARN | __GFP_NORETRY);
-+				BLK_MQ_GFP_FLAGS);
- 	if (!tags)
--		return NULL;
-+		goto out;
- 
- 	tags->rqs = kcalloc_node(nr_tags, sizeof(struct request *),
--				 GFP_NOIO | __GFP_NOWARN | __GFP_NORETRY,
--				 node);
-+				 BLK_MQ_GFP_FLAGS, node);
- 	if (!tags->rqs) {
- 		blk_mq_free_tags(tags);
--		return NULL;
-+		tags = NULL;
-+		goto out;
- 	}
- 
- 	tags->static_rqs = kcalloc_node(nr_tags, sizeof(struct request *),
--					GFP_NOIO | __GFP_NOWARN | __GFP_NORETRY,
--					node);
-+					BLK_MQ_GFP_FLAGS, node);
- 	if (!tags->static_rqs) {
- 		kfree(tags->rqs);
- 		blk_mq_free_tags(tags);
--		return NULL;
-+		tags = NULL;
- 	}
- 
-+out:
-+	memalloc_noio_restore(noio_flag);
- 	return tags;
- }
- 
-@@ -2158,6 +2164,7 @@ int blk_mq_alloc_rqs(struct blk_mq_tag_set *set, struct blk_mq_tags *tags,
- 
- 	for (i = 0; i < depth; ) {
- 		int this_order = max_order;
-+		unsigned int noio_flag;
- 		struct page *page;
- 		int to_do;
- 		void *p;
-@@ -2165,9 +2172,10 @@ int blk_mq_alloc_rqs(struct blk_mq_tag_set *set, struct blk_mq_tags *tags,
- 		while (this_order && left < order_to_size(this_order - 1))
- 			this_order--;
- 
-+		noio_flag = memalloc_noio_save();
- 		do {
- 			page = alloc_pages_node(node,
--				GFP_NOIO | __GFP_NOWARN | __GFP_NORETRY | __GFP_ZERO,
-+				BLK_MQ_GFP_FLAGS | __GFP_ZERO,
- 				this_order);
- 			if (page)
- 				break;
-@@ -2176,6 +2184,7 @@ int blk_mq_alloc_rqs(struct blk_mq_tag_set *set, struct blk_mq_tags *tags,
- 			if (order_to_size(this_order) < rq_size)
- 				break;
- 		} while (1);
-+		memalloc_noio_restore(noio_flag);
- 
- 		if (!page)
- 			goto fail;
-@@ -2188,7 +2197,10 @@ int blk_mq_alloc_rqs(struct blk_mq_tag_set *set, struct blk_mq_tags *tags,
- 		 * Allow kmemleak to scan these pages as they contain pointers
- 		 * to additional allocations like via ops->init_request().
- 		 */
--		kmemleak_alloc(p, order_to_size(this_order), 1, GFP_NOIO);
-+		noio_flag = memalloc_noio_save();
-+		kmemleak_alloc(p, order_to_size(this_order), 1,
-+			       BLK_MQ_GFP_FLAGS);
-+		memalloc_noio_restore(noio_flag);
- 		entries_per_page = order_to_size(this_order) / rq_size;
- 		to_do = min(entries_per_page, depth - i);
- 		left -= to_do * rq_size;
-@@ -2333,8 +2345,10 @@ blk_mq_alloc_hctx(struct request_queue *q, struct blk_mq_tag_set *set,
- 		int node)
- {
- 	struct blk_mq_hw_ctx *hctx;
--	gfp_t gfp = GFP_NOIO | __GFP_NOWARN | __GFP_NORETRY;
-+	gfp_t gfp = BLK_MQ_GFP_FLAGS;
-+	unsigned int noio_flag;
- 
-+	noio_flag = memalloc_noio_save();
- 	hctx = kzalloc_node(blk_mq_hw_ctx_size(set), gfp, node);
- 	if (!hctx)
- 		goto fail_alloc_hctx;
-@@ -2378,6 +2392,8 @@ blk_mq_alloc_hctx(struct request_queue *q, struct blk_mq_tag_set *set,
- 	if (!hctx->fq)
- 		goto free_bitmap;
- 
-+	memalloc_noio_restore(noio_flag);
-+
- 	if (hctx->flags & BLK_MQ_F_BLOCKING)
- 		init_srcu_struct(hctx->srcu);
- 	blk_mq_hctx_kobj_init(hctx);
-@@ -2393,6 +2409,7 @@ blk_mq_alloc_hctx(struct request_queue *q, struct blk_mq_tag_set *set,
-  free_hctx:
- 	kfree(hctx);
-  fail_alloc_hctx:
-+	memalloc_noio_restore(noio_flag);
- 	return NULL;
- }
- 
-@@ -3190,11 +3207,14 @@ static bool blk_mq_elv_switch_none(struct list_head *head,
- 		struct request_queue *q)
- {
- 	struct blk_mq_qe_pair *qe;
-+	unsigned int noio_flag;
- 
- 	if (!q->elevator)
- 		return true;
- 
--	qe = kmalloc(sizeof(*qe), GFP_NOIO | __GFP_NOWARN | __GFP_NORETRY);
-+	noio_flag = memalloc_noio_save();
-+	qe = kmalloc(sizeof(*qe), BLK_MQ_GFP_FLAGS);
-+	memalloc_noio_restore(noio_flag);
- 	if (!qe)
- 		return false;
- 
--- 
-2.21.0
-
+Thanks,
+Jinpu
