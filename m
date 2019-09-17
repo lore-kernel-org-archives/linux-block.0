@@ -2,121 +2,71 @@ Return-Path: <SRS0=pu/s=XM=vger.kernel.org=linux-block-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-2.6 required=3.0 tests=DKIMWL_WL_HIGH,DKIM_SIGNED,
-	DKIM_VALID,DKIM_VALID_AU,MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,
-	USER_AGENT_SANE_1 autolearn=no autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-2.3 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
+	MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,USER_AGENT_SANE_1 autolearn=no
+	autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id EE0B1C4CECD
-	for <linux-block@archiver.kernel.org>; Tue, 17 Sep 2019 21:32:14 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 1EE9DC4CEC9
+	for <linux-block@archiver.kernel.org>; Tue, 17 Sep 2019 22:54:47 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.kernel.org (Postfix) with ESMTP id B3314214AF
-	for <linux-block@archiver.kernel.org>; Tue, 17 Sep 2019 21:32:14 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=default; t=1568755934;
-	bh=TLP3vC8rXSnAqiAPCukYCogpSW8wtn0P2LZHI1QIO60=;
-	h=Date:From:To:Cc:Subject:References:In-Reply-To:List-ID:From;
-	b=qKKm2iJUQNFtjYbk4IPMKqRCa5TvTauSGtP5eqzfj8elPuBfX6aDXSfBt1LZQ8+29
-	 X5kHDL/Qlf2aEtF8IEgvhRbFa5WDfft80Qccg2XUq6/JJUOYxkm+Jx78ah40mILmgc
-	 U8N5TalUCRB549PI+CaNfirlN9bX57mFUjITg160=
+	by mail.kernel.org (Postfix) with ESMTP id E24F521848
+	for <linux-block@archiver.kernel.org>; Tue, 17 Sep 2019 22:54:46 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1726718AbfIQVcO (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Tue, 17 Sep 2019 17:32:14 -0400
-Received: from mail-qk1-f196.google.com ([209.85.222.196]:40439 "EHLO
-        mail-qk1-f196.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1726369AbfIQVcO (ORCPT
-        <rfc822;linux-block@vger.kernel.org>);
-        Tue, 17 Sep 2019 17:32:14 -0400
-Received: by mail-qk1-f196.google.com with SMTP id y144so5677426qkb.7;
-        Tue, 17 Sep 2019 14:32:13 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20161025;
-        h=sender:date:from:to:cc:subject:message-id:references:mime-version
-         :content-disposition:in-reply-to:user-agent;
-        bh=6cdjH5M5cwq0sm332RdYEPiqfQpF2RR9LsPCpbZYDwQ=;
-        b=IHkrkyrTjqmtC97bG84hTy/5TfojbkwbxNX5Z7uREwvPtxFj/px0ZiyGIn1bJjByWB
-         x1ecC8HiuApwY5CvSfB5gDPN1az2OY0iUc+/6d+lY4u9HW0lsKcyNz76olwUJAJIVs0Y
-         3Li8WS9rLHfQw63VdijGqDhnEJvHg1itxFegJr0FsZKXldWyRaQ7tfcQVazjYi8byce4
-         WsIBOadrzh6E2Rsbv7/KqvUghALMKnW6guJ4npItSpsJzUl2Vuo1XMssafXzY4ztboOV
-         ejrg9wzd8b8zOYNZ1whxd+fhPIRYd7sO35Xlysx6IyF06TVbkLIWFYfZ4y7lY75KI+t3
-         oFUQ==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20161025;
-        h=x-gm-message-state:sender:date:from:to:cc:subject:message-id
-         :references:mime-version:content-disposition:in-reply-to:user-agent;
-        bh=6cdjH5M5cwq0sm332RdYEPiqfQpF2RR9LsPCpbZYDwQ=;
-        b=Ef+K58H3toXKYWg6c51cpMmsig+qfMe5XoIvXckjvBVqj1HflWY8ea3KFvfow52vPT
-         xgCOJ1u7YXb6KvB7WrKZFVs4frQmgYJlGLeo5rnm5TlvfMZee8MHnoiPW+nGwL3q/HYI
-         N/smtwnTmoYsfe0aREGmrDy0NJecDbLnuc5y4VKH0nx5x5q0+irENQ6lGTUJAlSWPCaP
-         186mO1ewvgVpgdZMq2yZo26gxRf1iTONlB/RuMmvMAeXcjGyuXLMcIbK9PSTo2/jfOTk
-         S/PKSPCEHQQ+P0Qaj/aJ4otGwsSeWRzuYm9UeV1BcGACbV1OncL7V0meXa9sBOjzKtkQ
-         YIhg==
-X-Gm-Message-State: APjAAAWB9dh+iaDgq0/XUGYYJdtc+IgR0R+kfptACTcZIgiqNbPNACDm
-        xSB1e3Iva16l/nFjt8TruQw=
-X-Google-Smtp-Source: APXvYqycwixHNwFOx7BoUh+it495gVkAadq75SnqbuisTQER8fPpW0/0pdgi3fY2R20GFUsedQZH+w==
-X-Received: by 2002:a37:6358:: with SMTP id x85mr655232qkb.229.1568755932462;
-        Tue, 17 Sep 2019 14:32:12 -0700 (PDT)
-Received: from localhost ([2620:10d:c091:480::642e])
-        by smtp.gmail.com with ESMTPSA id o8sm1744194qte.47.2019.09.17.14.32.11
-        (version=TLS1_2 cipher=ECDHE-RSA-AES128-GCM-SHA256 bits=128/128);
-        Tue, 17 Sep 2019 14:32:11 -0700 (PDT)
-Date:   Tue, 17 Sep 2019 14:32:09 -0700
-From:   Tejun Heo <tj@kernel.org>
-To:     Paolo Valente <paolo.valente@linaro.org>
-Cc:     Jens Axboe <axboe@kernel.dk>, linux-block@vger.kernel.org,
-        linux-kernel@vger.kernel.org, ulf.hansson@linaro.org,
-        linus.walleij@linaro.org, bfq-iosched@googlegroups.com,
-        oleksandr@natalenko.name, cgroups@vger.kernel.org,
-        Angelo Ruocco <angeloruocco90@gmail.com>
-Subject: Re: [PATCH 2/2] block, bfq: delete "bfq" prefix from cgroup filenames
-Message-ID: <20190917213209.GK3084169@devbig004.ftw2.facebook.com>
-References: <20190917165148.19146-1-paolo.valente@linaro.org>
- <20190917165148.19146-3-paolo.valente@linaro.org>
+        id S1728477AbfIQWyq (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Tue, 17 Sep 2019 18:54:46 -0400
+Received: from mx1.redhat.com ([209.132.183.28]:55684 "EHLO mx1.redhat.com"
+        rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
+        id S1726649AbfIQWyq (ORCPT <rfc822;linux-block@vger.kernel.org>);
+        Tue, 17 Sep 2019 18:54:46 -0400
+Received: from smtp.corp.redhat.com (int-mx05.intmail.prod.int.phx2.redhat.com [10.5.11.15])
+        (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
+        (No client certificate requested)
+        by mx1.redhat.com (Postfix) with ESMTPS id 03CF330820C9;
+        Tue, 17 Sep 2019 22:54:46 +0000 (UTC)
+Received: from [10.72.12.58] (ovpn-12-58.pek2.redhat.com [10.72.12.58])
+        by smtp.corp.redhat.com (Postfix) with ESMTPS id 304885D6A5;
+        Tue, 17 Sep 2019 22:54:43 +0000 (UTC)
+Subject: Re: [PATCH v3 0/2] blk-mq: Avoid memory reclaim when allocating
+To:     Jens Axboe <axboe@kernel.dk>, josef@toxicpanda.com
+Cc:     mchristi@redhat.com, hch@infradead.org, linux-block@vger.kernel.org
+References: <20190917120910.24842-1-xiubli@redhat.com>
+ <426aa779-1011-5a75-bb73-ae573c229806@kernel.dk>
+From:   Xiubo Li <xiubli@redhat.com>
+Message-ID: <eaa4fb45-3a62-839e-bdcf-5219fe1c8211@redhat.com>
+Date:   Wed, 18 Sep 2019 06:54:40 +0800
+User-Agent: Mozilla/5.0 (Windows NT 10.0; WOW64; rv:60.0) Gecko/20100101
+ Thunderbird/60.9.0
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <20190917165148.19146-3-paolo.valente@linaro.org>
-User-Agent: Mutt/1.5.21 (2010-09-15)
+In-Reply-To: <426aa779-1011-5a75-bb73-ae573c229806@kernel.dk>
+Content-Type: text/plain; charset=utf-8; format=flowed
+Content-Transfer-Encoding: 7bit
+Content-Language: en-US
+X-Scanned-By: MIMEDefang 2.79 on 10.5.11.15
+X-Greylist: Sender IP whitelisted, not delayed by milter-greylist-4.5.16 (mx1.redhat.com [10.5.110.47]); Tue, 17 Sep 2019 22:54:46 +0000 (UTC)
 Sender: linux-block-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-Hello,
-
-On Tue, Sep 17, 2019 at 06:51:48PM +0200, Paolo Valente wrote:
-> When bfq was merged into mainline, there were two I/O schedulers that
-> implemented the proportional-share policy: bfq for blk-mq and cfq for
-> legacy blk. bfq's interface files in the blkio/io controller have the
-> same names as cfq. But the cgroups interface doesn't allow two
-> entities to use the same name for their files, so for bfq we had to
-> prepend the "bfq" prefix to each of its files. However no legacy code
-> uses these modified file names. This naming also causes confusion, as,
-> e.g., in [1].
-> 
-> Now cfq has gone with legacy blk, so there is no need any longer for
-> these prefixes in (the never used) bfq names. In view of this fact, this
-> commit removes these prefixes, thereby enabling legacy code to truly
-> use the proportional share policy in blk-mq.
-
-So, I wrote the iocost switching patch and don't have a strong
-interest in whether bfq prefix should get dropped or not.  However, I
-gotta point out that flipping interface this way is way out of the
-norm.
-
-In the previous release cycle, the right thing to do was dropping the
-bfq prefix but that wasn't possible because bfq's interface wasn't
-compatible at that point and didn't made to be compatible in time.
-Non-obviously different interface with the same name is a lot worse
-than giving it a new name, so the only acceptable course of action at
-that point was keeping the bfq prefix.
-
-Now that the interface has already been published in a released
-kernel, dropping the prefix would be something extremely unusual as
-there would already be users who will be affected by the interface
-flip-flop.  We sometimes do change interfaces but I'm having a
-difficult time seeing the overriding rationales in this case.
+On 2019/9/17 22:13, Jens Axboe wrote:
+> On 9/17/19 6:09 AM, xiubli@redhat.com wrote:
+>> From: Xiubo Li <xiubli@redhat.com>
+>>
+>> Changed in V2:
+>> - Addressed the comment from Ming Lei, thanks.
+>>
+>> Changed in V3:
+>> - Switch to memalloc_noio_save/restore from Christoph's comment, thanks.
+> This now seems to be a mix of both approaches, which I don't think makes
+> sense at all. I think we should just stick to the gfp_t being passed in,
+> and defining the standard mask for init time blk-mq memory allocations.
+>
+Hmm, I might missed or misunderstand from the last thread. In this 
+thread with the save/store, the GFP_KERNEL is using instead. Maybe 
+save/store pair is not a exactly correct place or occasion to use here 
+as @Bart mentioned.
 
 Thanks.
 
--- 
-tejun
+BRs
+
