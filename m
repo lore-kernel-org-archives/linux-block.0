@@ -2,194 +2,105 @@ Return-Path: <SRS0=pu/s=XM=vger.kernel.org=linux-block-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-5.3 required=3.0 tests=DKIM_SIGNED,DKIM_VALID,
-	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,SPF_HELO_NONE,
-	SPF_PASS,USER_AGENT_SANE_1 autolearn=ham autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-5.6 required=3.0 tests=DKIMWL_WL_HIGH,DKIM_SIGNED,
+	DKIM_VALID,DKIM_VALID_AU,MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,
+	SPF_PASS,URIBL_BLOCKED,USER_AGENT_SANE_1 autolearn=ham autolearn_force=no
+	version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 66F7DC4CECD
-	for <linux-block@archiver.kernel.org>; Tue, 17 Sep 2019 15:12:56 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id E7B13C4CEC9
+	for <linux-block@archiver.kernel.org>; Tue, 17 Sep 2019 15:13:13 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.kernel.org (Postfix) with ESMTP id 2F015218AC
-	for <linux-block@archiver.kernel.org>; Tue, 17 Sep 2019 15:12:56 +0000 (UTC)
-Authentication-Results: mail.kernel.org;
-	dkim=pass (2048-bit key) header.d=scylladb-com.20150623.gappssmtp.com header.i=@scylladb-com.20150623.gappssmtp.com header.b="yh3RV8VC"
+	by mail.kernel.org (Postfix) with ESMTP id BAA1F218AC
+	for <linux-block@archiver.kernel.org>; Tue, 17 Sep 2019 15:13:13 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+	s=default; t=1568733193;
+	bh=z4CPOtHs6ihvYRKspJKvZFgoWbkRkqOf+ArxEH2TfdQ=;
+	h=Date:From:To:Cc:Subject:List-ID:From;
+	b=xB0nfLkNyMEst0Oavgvy4g+58sh6F6knllj2+5Fr3Cwqb+YyBYfHAmzAL3FfR1MtL
+	 4I1skZvcmCMvXgebFs8oA7HFwidEGkg5ExLn1tFLrIz45OsG3Yvly09fh323AFRhS/
+	 JD3d+h5urEZbDgeYK5Amc0goKs5HpX16sTmQ+nf8=
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1729128AbfIQPMz (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Tue, 17 Sep 2019 11:12:55 -0400
-Received: from mail-wm1-f66.google.com ([209.85.128.66]:34922 "EHLO
-        mail-wm1-f66.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1728712AbfIQPMz (ORCPT
+        id S1729224AbfIQPNN (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Tue, 17 Sep 2019 11:13:13 -0400
+Received: from mail-qk1-f195.google.com ([209.85.222.195]:37035 "EHLO
+        mail-qk1-f195.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S1727454AbfIQPNM (ORCPT
         <rfc822;linux-block@vger.kernel.org>);
-        Tue, 17 Sep 2019 11:12:55 -0400
-Received: by mail-wm1-f66.google.com with SMTP id y21so3664416wmi.0
-        for <linux-block@vger.kernel.org>; Tue, 17 Sep 2019 08:12:53 -0700 (PDT)
+        Tue, 17 Sep 2019 11:13:12 -0400
+Received: by mail-qk1-f195.google.com with SMTP id u184so4399043qkd.4;
+        Tue, 17 Sep 2019 08:13:11 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=scylladb-com.20150623.gappssmtp.com; s=20150623;
-        h=subject:to:cc:references:from:organization:message-id:date
-         :user-agent:mime-version:in-reply-to:content-transfer-encoding
-         :content-language;
-        bh=WJ6lflTdZgdwhLLHMAQLrUDOqDJ8VE2A6nu6iIqBmhQ=;
-        b=yh3RV8VC6TRXbPtRn+q7xsvgewnzq2SA7oJBBh229t3azLHIkZGCw8OUkUAzsEu9HY
-         lWvChiwb9wOEvxvAMDKXZSOhV7QRPe0iE9Xw3jXmrnpiyHkcdY9ITNMDeP0BKAfxJOnj
-         vdZleIH8MOQgBV0xQHm3fvRkZ0AHVpa75UxmvMDIwY5BNmkdB4xdL1gIMlbiddcoN+lY
-         n04YS8wfHGfZ3XYF7QeeL1Y8kZxTrJ0fNp4HEpAdgCxzHTQm2HFobplSfIFWXAMhUx9O
-         uL68sN42WTs4XZW0jj63D5fZBOx0tSP6FBoYwfIIHWumgOrOC8BS1JeiJ0/TIPSUVnDN
-         6QNA==
+        d=gmail.com; s=20161025;
+        h=sender:date:from:to:cc:subject:message-id:mime-version
+         :content-disposition:user-agent;
+        bh=2BszFrJE5DhvvCqO6dnoH5rt4IlU+zqhXXHVu1J4dUQ=;
+        b=BdxsZV3xdouTBb85ev20LScZzJk9sHxCTS804kLTi4P+4cxV14+mdM/5k/CTfY7KYy
+         QlIbcCNUMrm97b8uLRopqvPVyRIZWzE4h3GKMdK+b6Nxzijp/EzTlas3mw8Jc7C0q03Q
+         z0GMOTss3RH52FWcirpt0t+ETLAx/ycrt2r6PRYvRj8iyP8tB0BjGNEuMdQ5TNGKvxz/
+         HTJ5cTOptNPgmHGUkpqBjYcghQgHxfCvtUfOYAruMsjfvSNevICznZAXEw8Kv/MQLGxt
+         z8h7yk2O4Y3phH9s8yE0gpXzECURVyKfHMKJyN+dW/wo7vWayo9UMyNkA6H/5LUhqKYc
+         OKzQ==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=1e100.net; s=20161025;
-        h=x-gm-message-state:subject:to:cc:references:from:organization
-         :message-id:date:user-agent:mime-version:in-reply-to
-         :content-transfer-encoding:content-language;
-        bh=WJ6lflTdZgdwhLLHMAQLrUDOqDJ8VE2A6nu6iIqBmhQ=;
-        b=nvJ4aK4Ye5HMOHv80iKboBBMHbINAmZhEWhQvyDNmRTAqMqnoPBPZ+3j2yxMq7bSz1
-         9aXw5kEHm1GgPQYvdCVYRnCZtw1UW3L7IoeTQXKnCb1s1Wu+UwmeyaCJc2xHpxMVY8Op
-         5GE5u09EDgEsP7QqRumqXIj1nsprDc2lfdyOOm8gn6ybjmzCDaD0w4Pat65+6qIPAJPm
-         Td6YxdwgA4xKd4ApJ5EfIgm/BuAoZgCbliTq0u0YpXAO03cQA8aj1zxG9usrHFSagceG
-         rTGxC6642jFGfi0lLWDMzBIMk30Ma5ZdRohqTMx6SVHGUBEcebvvrDI8Kw7nGkc5/wJH
-         +igA==
-X-Gm-Message-State: APjAAAXmUGLKfqzTUDbpycmswamnz2RmARRRfhU8Kb6Q0wm+G4lo9+uK
-        ze7fSUITvV6iWNmArtf1Crdhcw==
-X-Google-Smtp-Source: APXvYqxysSuhmROmUzRn7VHLt/lhJ+0YJOMkjvaH+7zKo4odk80eR0lVbV8lOnpQVNFonDKrvSGFfQ==
-X-Received: by 2002:a1c:3b06:: with SMTP id i6mr4093891wma.6.1568733172559;
-        Tue, 17 Sep 2019 08:12:52 -0700 (PDT)
-Received: from [10.0.0.1] (system.cloudius-systems.com. [199.203.229.89])
-        by smtp.gmail.com with ESMTPSA id t14sm2011029wrs.6.2019.09.17.08.12.51
-        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
-        Tue, 17 Sep 2019 08:12:51 -0700 (PDT)
-Subject: Re: [PATCH v1] io_uring: reserve word at cqring tail+4 for the user
-To:     Jens Axboe <axboe@kernel.dk>
-Cc:     linux-kernel@vger.kernel.org, linux-block@vger.kernel.org
-References: <20190917091358.3652-1-avi@scylladb.com>
- <3e886e3a-458d-0fe4-68ff-5925835efb5e@kernel.dk>
-From:   Avi Kivity <avi@scylladb.com>
-Organization: ScyllaDB
-Message-ID: <9b4a780e-72af-125e-d104-4179a859d581@scylladb.com>
-Date:   Tue, 17 Sep 2019 18:12:50 +0300
-User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:68.0) Gecko/20100101
- Thunderbird/68.1.0
+        h=x-gm-message-state:sender:date:from:to:cc:subject:message-id
+         :mime-version:content-disposition:user-agent;
+        bh=2BszFrJE5DhvvCqO6dnoH5rt4IlU+zqhXXHVu1J4dUQ=;
+        b=EJNh6spvPJXb6KZaFRQ+ZVhjZXiXgmAnJVpDmVS1L+4ygo/EHeK8zpO3IwrJtxsy/6
+         tOweanzqv8zb4V+kQnIX7K9avzW39jTHEW7jBut5bZpRtOckHHquKPLBrcQoghFeAIY4
+         zf7Imjgm4HX8u/Qsn8mNYTiyJ9kiAYJcSkSkPTdDmY+VTDpGaWrjlf0AbeT0HruAexaj
+         GCeEn65m9ROxmx8RPdYLV8y5BsNvIk1/CzrQeNqkwXPF3nNr3lzHfKzgq+gb8wKqlKa9
+         3T9BUQMZn8QLh84Lb5BXNMW608SQT2BByswNkYzd8cKYhLBTueaA91veLEnO94u+eS2y
+         f55w==
+X-Gm-Message-State: APjAAAW8XGnxOxMeQkJzJl36RnlFfpJ3MIXCARDCURBuJgmDVaY9j/zS
+        eIemTDvNHJo3nlLTofjIa/Q=
+X-Google-Smtp-Source: APXvYqzbnXW2dyx9T1bmuFxvPhQjaNDo4H3H8poIc8cpF3BPdAICYHUB7s5ADRNkkXNPrDoMGqJVfA==
+X-Received: by 2002:a37:7bc7:: with SMTP id w190mr4467178qkc.215.1568733190659;
+        Tue, 17 Sep 2019 08:13:10 -0700 (PDT)
+Received: from localhost ([2620:10d:c091:480::8d29])
+        by smtp.gmail.com with ESMTPSA id r7sm1365774qkb.82.2019.09.17.08.13.09
+        (version=TLS1_2 cipher=ECDHE-RSA-AES128-GCM-SHA256 bits=128/128);
+        Tue, 17 Sep 2019 08:13:10 -0700 (PDT)
+Date:   Tue, 17 Sep 2019 08:13:08 -0700
+From:   Tejun Heo <tj@kernel.org>
+To:     Jens Axboe <axboe@kernel.dk>,
+        Paolo Valente <paolo.valente@linaro.org>
+Cc:     linux-block@vger.kernel.org, linux-kernel@vger.kernel.org,
+        cgroups@vger.kernel.org
+Subject: [PATCH 1/2] blkcg: Export blkcg_conf_prep/finish() for bfq
+Message-ID: <20190917151308.GH3084169@devbig004.ftw2.facebook.com>
 MIME-Version: 1.0
-In-Reply-To: <3e886e3a-458d-0fe4-68ff-5925835efb5e@kernel.dk>
-Content-Type: text/plain; charset=utf-8; format=flowed
-Content-Transfer-Encoding: 7bit
-Content-Language: en-US
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+User-Agent: Mutt/1.5.21 (2010-09-15)
 Sender: linux-block-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
+bfq module build is currently broken due to these two functions.  Fix
+it by export them.
 
-On 17/09/2019 17.54, Jens Axboe wrote:
-> On 9/17/19 3:13 AM, Avi Kivity wrote:
->> In some applications, a thread waits for I/O events generated by
->> the kernel, and also events generated by other threads in the same
->> application. Typically events from other threads are passed using
->> in-memory queues that are not known to the kernel. As long as the
->> threads is active, it polls for both kernel completions and
->> inter-thread completions; when it is idle, it tells the other threads
->> to use an I/O event to wait it up (e.g. an eventfd or a pipe) and
->> then enters the kernel, waiting for such an event or an ordinary
->> I/O completion.
->>
->> When such a thread goes idle, it typically spins for a while to
->> avoid the kernel entry/exit cost in case an event is forthcoming
->> shortly. While it spins it polls both I/O completions and
->> inter-thread queues.
->>
->> The x86 instruction pair UMONITOR/UMWAIT allows waiting for a cache
->> line to be written to. This can be used with io_uring to wait for a
->> wakeup without spinning (and wasting power and slowing down the other
->> hyperthread). Other threads can also wake up the waiter by doing a
->> safe write to the tail word (which triggers the wakeup), but safe
->> writes are slow as they require an atomic instruction. To speed up
->> those wakeups, reserve a word after the tail for user writes.
->>
->> A thread consuming an io_uring completion queue can then use the
->> following sequences:
->>
->>     - while busy:
->>       - pick up work from the completion queue and from other threads,
->>         and process it
->>
->>     - while idle:
->>       - use UMONITOR/UMWAIT to wait on completions and notifications
->>         from other threads for a short period
->>       - if no work is picked up, let other threads know you will need
->>         a kernel wakeup, and use io_uring_enter to wait indefinitely
-> This is cool, I like it. A few comments:
->
->> diff --git a/fs/io_uring.c b/fs/io_uring.c
->> index cfb48bd088e1..4bd7905cee1d 100644
->> --- a/fs/io_uring.c
->> +++ b/fs/io_uring.c
->> @@ -77,12 +77,13 @@
->>    
->>    #define IORING_MAX_ENTRIES	4096
->>    #define IORING_MAX_FIXED_FILES	1024
->>    
->>    struct io_uring {
->> -	u32 head ____cacheline_aligned_in_smp;
->> -	u32 tail ____cacheline_aligned_in_smp;
->> +	u32 head ____cacheline_aligned;
->> +	u32 tail ____cacheline_aligned;
->> +	u32 reserved_for_user; // for cq ring and UMONITOR/UMWAIT (or similar) wakeups
->>    };
-> Since we have that full cacheline, maybe name this one a bit more
-> appropriately as we can add others if we need it. Not a big deal.
+Signed-off-by: Tejun Heo <tj@kernel.org>
+Cc: Paolo Valente <paolo.valente@linaro.org>
+---
+ block/blk-cgroup.c |    2 ++
+ 1 file changed, 2 insertions(+)
 
-
-You mean, name it for its intended purpose of serving as a write target 
-for umonitor/umwait wakes?
-
-
-Note that the user won't see the name, and that it's only accurate for 
-an io_uring that's used for completions.
-
-
-> But definitely use /* */ style comments :-)
-
-
-Sorry, in C++-land for a while. You're lucky I didn't turn the whole 
-thing into a virtual template something.
-
-
->
->> diff --git a/include/uapi/linux/io_uring.h b/include/uapi/linux/io_uring.h
->> index 1e1652f25cc1..1a6a826a66f3 100644
->> --- a/include/uapi/linux/io_uring.h
->> +++ b/include/uapi/linux/io_uring.h
->> @@ -103,10 +103,14 @@ struct io_sqring_offsets {
->>     */
->>    #define IORING_SQ_NEED_WAKEUP	(1U << 0) /* needs io_uring_enter wakeup */
->>    
->>    struct io_cqring_offsets {
->>    	__u32 head;
->> +	// tail is guaranteed to be aligned on a cache line, and to have the
->> +	// following __u32 free for user use. This allows using e.g.
->> +	// UMONITOR/UMWAIT to wait on both writes to head and writes from
->> +	// other threads to the following word.
->>    	__u32 tail;
->>    	__u32 ring_mask;
->>    	__u32 ring_entries;
->>    	__u32 overflow;
->>    	__u32 cqes;
-> Ditto on the comments here.
-
-
-Sure.
-
-
-> Would be ideal if we could pair this with an example for liburing, a basic
-> test case would be fine. Something that shows how to use it, and verifies
-> that it works.
-
-
-I'll have to look for a machine with waitpkg for that.
-
-
-> Also, this patch is against master, it should be against for-5.4/io_iuring as
-> it won't apply there right now.
-
-
-Sure, will rebase.
-
-
+--- a/block/blk-cgroup.c
++++ b/block/blk-cgroup.c
+@@ -900,6 +900,7 @@ fail:
+ 	}
+ 	return ret;
+ }
++EXPORT_SYMBOL_GPL(blkg_conf_prep);
+ 
+ /**
+  * blkg_conf_finish - finish up per-blkg config update
+@@ -915,6 +916,7 @@ void blkg_conf_finish(struct blkg_conf_c
+ 	rcu_read_unlock();
+ 	put_disk_and_module(ctx->disk);
+ }
++EXPORT_SYMBOL_GPL(blkg_conf_finish);
+ 
+ static int blkcg_print_stat(struct seq_file *sf, void *v)
+ {
