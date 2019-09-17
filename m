@@ -2,176 +2,154 @@ Return-Path: <SRS0=pu/s=XM=vger.kernel.org=linux-block-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-8.3 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
-	INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,
-	URIBL_BLOCKED,USER_AGENT_SANE_1 autolearn=ham autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-9.8 required=3.0 tests=DKIM_SIGNED,DKIM_VALID,
+	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,
+	SPF_HELO_NONE,SPF_PASS,USER_AGENT_GIT autolearn=unavailable
+	autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 28972C4CEC9
-	for <linux-block@archiver.kernel.org>; Tue, 17 Sep 2019 07:38:32 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 4FEE2C4CECE
+	for <linux-block@archiver.kernel.org>; Tue, 17 Sep 2019 09:14:06 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.kernel.org (Postfix) with ESMTP id 0688620678
-	for <linux-block@archiver.kernel.org>; Tue, 17 Sep 2019 07:38:31 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id 267572189D
+	for <linux-block@archiver.kernel.org>; Tue, 17 Sep 2019 09:14:06 +0000 (UTC)
+Authentication-Results: mail.kernel.org;
+	dkim=pass (2048-bit key) header.d=scylladb-com.20150623.gappssmtp.com header.i=@scylladb-com.20150623.gappssmtp.com header.b="J2og3Dg/"
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S2392660AbfIQHib (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Tue, 17 Sep 2019 03:38:31 -0400
-Received: from mx1.redhat.com ([209.132.183.28]:41430 "EHLO mx1.redhat.com"
-        rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-        id S1726059AbfIQHib (ORCPT <rfc822;linux-block@vger.kernel.org>);
-        Tue, 17 Sep 2019 03:38:31 -0400
-Received: from smtp.corp.redhat.com (int-mx03.intmail.prod.int.phx2.redhat.com [10.5.11.13])
-        (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
-        (No client certificate requested)
-        by mx1.redhat.com (Postfix) with ESMTPS id 01068C08EC19;
-        Tue, 17 Sep 2019 07:38:30 +0000 (UTC)
-Received: from ming.t460p (ovpn-8-25.pek2.redhat.com [10.72.8.25])
-        by smtp.corp.redhat.com (Postfix) with ESMTPS id CE6D15F7E6;
-        Tue, 17 Sep 2019 07:38:03 +0000 (UTC)
-Date:   Tue, 17 Sep 2019 15:37:58 +0800
-From:   Ming Lei <ming.lei@redhat.com>
-To:     Yufen Yu <yuyufen@huawei.com>
-Cc:     axboe@kernel.dk, linux-block@vger.kernel.org, hch@infradead.org,
-        keith.busch@intel.com
-Subject: Re: [PATCH v2] block: fix null pointer dereference in
- blk_mq_rq_timed_out()
-Message-ID: <20190917073757.GA15374@ming.t460p>
-References: <20190917070312.711-1-yuyufen@huawei.com>
+        id S1726720AbfIQJOF (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Tue, 17 Sep 2019 05:14:05 -0400
+Received: from mail-wm1-f65.google.com ([209.85.128.65]:36262 "EHLO
+        mail-wm1-f65.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S1726843AbfIQJOE (ORCPT
+        <rfc822;linux-block@vger.kernel.org>);
+        Tue, 17 Sep 2019 05:14:04 -0400
+Received: by mail-wm1-f65.google.com with SMTP id t3so2189435wmj.1
+        for <linux-block@vger.kernel.org>; Tue, 17 Sep 2019 02:14:02 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=scylladb-com.20150623.gappssmtp.com; s=20150623;
+        h=from:to:cc:subject:date:message-id:mime-version
+         :content-transfer-encoding;
+        bh=J3q851HjNurFsQDQC3tlZxSdaojcsq3jsQ2H8LllUYY=;
+        b=J2og3Dg/qod5VtnEytySsQ8YyEbwaSgVGfq5v5BN26gyXBCn0RlD22jQkf+Jw9baQb
+         643ndS25feWaoLtud/m27G4C853nV0HPTo6sVPwsMbu7iT76JTFMHTlONkj1/mYqsvcR
+         1S65Is3DymHewzhUFIfrV5wy2EyjUqmncS08e5uiV/3OW0gvivggxW7acmHG6o+2iZnQ
+         iRrE2b698SDcj6INGpjtDc516y2lbKUCZ8UJ179GWEHOpvre9DR2/EoRxQP99znszoJJ
+         B6bvQB21W0R8hGuRxbaL+gg47Fc/HqhP5zW0lpNKrai0JTo7IEQGwC2hpQUyujCKoHzq
+         zvdA==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20161025;
+        h=x-gm-message-state:from:to:cc:subject:date:message-id:mime-version
+         :content-transfer-encoding;
+        bh=J3q851HjNurFsQDQC3tlZxSdaojcsq3jsQ2H8LllUYY=;
+        b=L+4CrTE9I/pfHTekrEZYuCcm04y5ApzhdIZlpntkxYMlUAmNbDCR8L8jJo/UQIfB1w
+         w52N3HsChYQ699PyLjqfkvk9yrZgbLRZbI+9B66szA2IYz8WzlreLmeDfcKxK92rzM30
+         y5el/9qSdJlTJA6RUkm+OAUqeug4Bi2+YTtz4sMxUGEhXVs2YB92ifVHIBaWVhDPjgBu
+         3JKYwhCI0hD8ZE0Te5yVyZMPT4l5qc/J0f5jQj4U2KiUvbk1XTCALfpKvpNO1KbyUnoI
+         CPdg7tUx8ZIYWN2Y/zjNAFghd0v4Lm7V3aI7K3Qz5k50euepLPCCaU6dyWkHuMLjjrYH
+         9nqg==
+X-Gm-Message-State: APjAAAUcFo2fOt1afi0G0hczjPwh+7CLbOnPpHSs4yXkhQui25QVHBBe
+        jfASv11zC+rfzdpTNzHkfUzF5y/yXDE=
+X-Google-Smtp-Source: APXvYqxcQxDJL4hgNO1Obo5uli3NofxH4vnmuWQtbR0GVq3vtdmlYpXAaQGx7TfY5ZFxQoXnXb9c/g==
+X-Received: by 2002:a7b:c401:: with SMTP id k1mr2555955wmi.62.1568711641291;
+        Tue, 17 Sep 2019 02:14:01 -0700 (PDT)
+Received: from avi.cloudius-systems.com (system.cloudius-systems.com. [199.203.229.89])
+        by smtp.gmail.com with ESMTPSA id y13sm4183768wrg.8.2019.09.17.02.13.59
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Tue, 17 Sep 2019 02:14:00 -0700 (PDT)
+From:   Avi Kivity <avi@scylladb.com>
+To:     Jens Axboe <axboe@kernel.dk>
+Cc:     linux-kernel@vger.kernel.org, linux-block@vger.kernel.org
+Subject: [PATCH v1] io_uring: reserve word at cqring tail+4 for the user
+Date:   Tue, 17 Sep 2019 12:13:58 +0300
+Message-Id: <20190917091358.3652-1-avi@scylladb.com>
+X-Mailer: git-send-email 2.21.0
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <20190917070312.711-1-yuyufen@huawei.com>
-User-Agent: Mutt/1.11.3 (2019-02-01)
-X-Scanned-By: MIMEDefang 2.79 on 10.5.11.13
-X-Greylist: Sender IP whitelisted, not delayed by milter-greylist-4.5.16 (mx1.redhat.com [10.5.110.31]); Tue, 17 Sep 2019 07:38:30 +0000 (UTC)
+Content-Transfer-Encoding: 8bit
 Sender: linux-block-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-On Tue, Sep 17, 2019 at 03:03:12PM +0800, Yufen Yu wrote:
-> We got a null pointer deference BUG_ON in blk_mq_rq_timed_out()
-> as following:
-> 
-> [  108.825472] BUG: kernel NULL pointer dereference, address: 0000000000000040
-> [  108.827059] PGD 0 P4D 0
-> [  108.827313] Oops: 0000 [#1] SMP PTI
-> [  108.827657] CPU: 6 PID: 198 Comm: kworker/6:1H Not tainted 5.3.0-rc8+ #431
-> [  108.829503] Workqueue: kblockd blk_mq_timeout_work
-> [  108.829913] RIP: 0010:blk_mq_check_expired+0x258/0x330
-> [  108.838191] Call Trace:
-> [  108.838406]  bt_iter+0x74/0x80
-> [  108.838665]  blk_mq_queue_tag_busy_iter+0x204/0x450
-> [  108.839074]  ? __switch_to_asm+0x34/0x70
-> [  108.839405]  ? blk_mq_stop_hw_queue+0x40/0x40
-> [  108.839823]  ? blk_mq_stop_hw_queue+0x40/0x40
-> [  108.840273]  ? syscall_return_via_sysret+0xf/0x7f
-> [  108.840732]  blk_mq_timeout_work+0x74/0x200
-> [  108.841151]  process_one_work+0x297/0x680
-> [  108.841550]  worker_thread+0x29c/0x6f0
-> [  108.841926]  ? rescuer_thread+0x580/0x580
-> [  108.842344]  kthread+0x16a/0x1a0
-> [  108.842666]  ? kthread_flush_work+0x170/0x170
-> [  108.843100]  ret_from_fork+0x35/0x40
-> 
-> The bug is caused by the race between timeout handle and completion for
-> flush request.
-> 
-> When timeout handle function blk_mq_rq_timed_out() try to read
-> 'req->q->mq_ops', the 'req' have completed and reinitiated by next
-> flush request, which would call blk_rq_init() to clear 'req' as 0.
-> 
-> After commit 12f5b93145 ("blk-mq: Remove generation seqeunce"),
-> normal requests lifetime are protected by refcount. Until 'rq->ref'
-> drop to zero, the request can really be free. Thus, these requests
-> cannot been reused before timeout handle finish.
-> 
-> However, flush request has defined .end_io and rq->end_io() is still
-> called even if 'rq->ref' doesn't drop to zero. After that, the 'flush_rq'
-> can be reused by the next flush request handle, resulting in null
-> pointer deference BUG ON.
-> 
-> We fix this problem by covering flush request with 'rq->ref'.
-> If the refcount is not zero, flush_end_io() return and wait the
-> last holder recall it. To record the request status, we add a new
-> entry 'rq_status', which will be used in flush_end_io().
-> 
-> Cc: Ming Lei <ming.lei@redhat.com>
-> Cc: Christoph Hellwig <hch@infradead.org>
-> Cc: Keith Busch <keith.busch@intel.com>
-> Signed-off-by: Yufen Yu <yuyufen@huawei.com>
-> ---
->  block/blk-flush.c | 8 ++++++++
->  block/blk-mq.c    | 7 +++++--
->  block/blk.h       | 6 ++++++
->  3 files changed, 19 insertions(+), 2 deletions(-)
-> 
-> diff --git a/block/blk-flush.c b/block/blk-flush.c
-> index aedd9320e605..f3ef6ce05c78 100644
-> --- a/block/blk-flush.c
-> +++ b/block/blk-flush.c
-> @@ -212,6 +212,14 @@ static void flush_end_io(struct request *flush_rq, blk_status_t error)
->  	struct blk_flush_queue *fq = blk_get_flush_queue(q, flush_rq->mq_ctx);
->  	struct blk_mq_hw_ctx *hctx;
->  
-> +	if (!refcount_dec_and_test(&flush_rq->ref)) {
-> +		fq->rq_status = error;
-> +		return;
-> +	}
-> +
-> +	if (fq->rq_status != BLK_STS_OK)
-> +		error = fq->rq_status;
-> +
->  	/* release the tag's ownership to the req cloned from */
->  	spin_lock_irqsave(&fq->mq_flush_lock, flags);
->  	hctx = flush_rq->mq_hctx;
-> diff --git a/block/blk-mq.c b/block/blk-mq.c
-> index 0835f4d8d42e..3d2b2c2e9cdf 100644
-> --- a/block/blk-mq.c
-> +++ b/block/blk-mq.c
-> @@ -905,9 +905,12 @@ static bool blk_mq_check_expired(struct blk_mq_hw_ctx *hctx,
->  	 */
->  	if (blk_mq_req_expired(rq, next))
->  		blk_mq_rq_timed_out(rq, reserved);
-> -	if (refcount_dec_and_test(&rq->ref))
-> -		__blk_mq_free_request(rq);
->  
-> +	if (is_flush_rq(rq, hctx)) {
-> +		rq->end_io(rq, 0);
-> +	} else if (refcount_dec_and_test(&rq->ref)) {
-> +		__blk_mq_free_request(rq);
-> +	}
+In some applications, a thread waits for I/O events generated by
+the kernel, and also events generated by other threads in the same
+application. Typically events from other threads are passed using
+in-memory queues that are not known to the kernel. As long as the
+threads is active, it polls for both kernel completions and
+inter-thread completions; when it is idle, it tells the other threads
+to use an I/O event to wait it up (e.g. an eventfd or a pipe) and
+then enters the kernel, waiting for such an event or an ordinary
+I/O completion.
 
-The above two pair of '{}' can be removed.
+When such a thread goes idle, it typically spins for a while to
+avoid the kernel entry/exit cost in case an event is forthcoming
+shortly. While it spins it polls both I/O completions and
+inter-thread queues.
 
->  	return true;
->  }
->  
-> diff --git a/block/blk.h b/block/blk.h
-> index de6b2e146d6e..128bb53622ff 100644
-> --- a/block/blk.h
-> +++ b/block/blk.h
-> @@ -30,6 +30,7 @@ struct blk_flush_queue {
->  	 */
->  	struct request		*orig_rq;
->  	spinlock_t		mq_flush_lock;
-> +	blk_status_t 		rq_status;
->  };
->  
->  extern struct kmem_cache *blk_requestq_cachep;
-> @@ -47,6 +48,11 @@ static inline void __blk_get_queue(struct request_queue *q)
->  	kobject_get(&q->kobj);
->  }
->  
-> +static inline bool
-> +is_flush_rq(struct request *req, struct blk_mq_hw_ctx *hctx) {
-> +	return hctx->fq->flush_rq == req;
-> +}
+The x86 instruction pair UMONITOR/UMWAIT allows waiting for a cache
+line to be written to. This can be used with io_uring to wait for a
+wakeup without spinning (and wasting power and slowing down the other
+hyperthread). Other threads can also wake up the waiter by doing a
+safe write to the tail word (which triggers the wakeup), but safe
+writes are slow as they require an atomic instruction. To speed up
+those wakeups, reserve a word after the tail for user writes.
 
-We usually don't put '{' at the end of function name line.
+A thread consuming an io_uring completion queue can then use the
+following sequences:
 
-Once the above patch style comments are addressed, feel free to add:
+  - while busy:
+    - pick up work from the completion queue and from other threads,
+      and process it
 
-Reviewed-by: Ming Lei <ming.lei@redhat.com>
+  - while idle:
+    - use UMONITOR/UMWAIT to wait on completions and notifications
+      from other threads for a short period
+    - if no work is picked up, let other threads know you will need
+      a kernel wakeup, and use io_uring_enter to wait indefinitely
 
+Signed-off-by: Avi Kivity <avi@scylladb.com>
+---
+ fs/io_uring.c                 | 5 +++--
+ include/uapi/linux/io_uring.h | 4 ++++
+ 2 files changed, 7 insertions(+), 2 deletions(-)
 
-thanks,
-Ming
+diff --git a/fs/io_uring.c b/fs/io_uring.c
+index cfb48bd088e1..4bd7905cee1d 100644
+--- a/fs/io_uring.c
++++ b/fs/io_uring.c
+@@ -77,12 +77,13 @@
+ 
+ #define IORING_MAX_ENTRIES	4096
+ #define IORING_MAX_FIXED_FILES	1024
+ 
+ struct io_uring {
+-	u32 head ____cacheline_aligned_in_smp;
+-	u32 tail ____cacheline_aligned_in_smp;
++	u32 head ____cacheline_aligned;
++	u32 tail ____cacheline_aligned;
++	u32 reserved_for_user; // for cq ring and UMONITOR/UMWAIT (or similar) wakeups
+ };
+ 
+ /*
+  * This data is shared with the application through the mmap at offset
+  * IORING_OFF_SQ_RING.
+diff --git a/include/uapi/linux/io_uring.h b/include/uapi/linux/io_uring.h
+index 1e1652f25cc1..1a6a826a66f3 100644
+--- a/include/uapi/linux/io_uring.h
++++ b/include/uapi/linux/io_uring.h
+@@ -103,10 +103,14 @@ struct io_sqring_offsets {
+  */
+ #define IORING_SQ_NEED_WAKEUP	(1U << 0) /* needs io_uring_enter wakeup */
+ 
+ struct io_cqring_offsets {
+ 	__u32 head;
++	// tail is guaranteed to be aligned on a cache line, and to have the
++	// following __u32 free for user use. This allows using e.g.
++	// UMONITOR/UMWAIT to wait on both writes to head and writes from
++	// other threads to the following word.
+ 	__u32 tail;
+ 	__u32 ring_mask;
+ 	__u32 ring_entries;
+ 	__u32 overflow;
+ 	__u32 cqes;
+-- 
+2.21.0
+
