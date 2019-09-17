@@ -6,101 +6,95 @@ X-Spam-Status: No, score=-2.3 required=3.0 tests=DKIM_SIGNED,DKIM_VALID,
 	HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,
 	USER_AGENT_SANE_1 autolearn=no autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 455B8C4CECD
-	for <linux-block@archiver.kernel.org>; Tue, 17 Sep 2019 19:56:23 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id D36CDC4CECD
+	for <linux-block@archiver.kernel.org>; Tue, 17 Sep 2019 20:52:25 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.kernel.org (Postfix) with ESMTP id 0D8AD214AF
-	for <linux-block@archiver.kernel.org>; Tue, 17 Sep 2019 19:56:22 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id 94A6E214AF
+	for <linux-block@archiver.kernel.org>; Tue, 17 Sep 2019 20:52:25 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=pass (2048-bit key) header.d=toxicpanda-com.20150623.gappssmtp.com header.i=@toxicpanda-com.20150623.gappssmtp.com header.b="wdBSHBFT"
+	dkim=pass (2048-bit key) header.d=kernel-dk.20150623.gappssmtp.com header.i=@kernel-dk.20150623.gappssmtp.com header.b="EskptTkG"
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1726250AbfIQT4W (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Tue, 17 Sep 2019 15:56:22 -0400
-Received: from mail-qt1-f193.google.com ([209.85.160.193]:33065 "EHLO
-        mail-qt1-f193.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1726044AbfIQT4V (ORCPT
+        id S1726663AbfIQUwY (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Tue, 17 Sep 2019 16:52:24 -0400
+Received: from mail-io1-f66.google.com ([209.85.166.66]:45367 "EHLO
+        mail-io1-f66.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S1726044AbfIQUwY (ORCPT
         <rfc822;linux-block@vger.kernel.org>);
-        Tue, 17 Sep 2019 15:56:21 -0400
-Received: by mail-qt1-f193.google.com with SMTP id r5so6032940qtd.0
-        for <linux-block@vger.kernel.org>; Tue, 17 Sep 2019 12:56:21 -0700 (PDT)
+        Tue, 17 Sep 2019 16:52:24 -0400
+Received: by mail-io1-f66.google.com with SMTP id f12so10871556iog.12
+        for <linux-block@vger.kernel.org>; Tue, 17 Sep 2019 13:52:24 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=toxicpanda-com.20150623.gappssmtp.com; s=20150623;
-        h=date:from:to:cc:subject:message-id:references:mime-version
-         :content-disposition:in-reply-to:user-agent;
-        bh=PL1mRKzXUWHREIk21ddzeksuzTaYTi6Wrm/WJnUT+DA=;
-        b=wdBSHBFTPIkxPq3x+6FibDhUOlxnom/lyb/KlSp5XixtqruDwQXR/F6/cZbVrQoPrn
-         dRzicqus/a/GQVcBfVSzycHFk8fggxsH+eXa+0onwna3KgI+IyT/8UUztGuEF3BsPfTQ
-         0qUQV7MNYjwmPKjD5oaL4ZLDQ++HzPSBcRDhfq8rlE5sUFEPzbfFJahee9NiChCWtINo
-         euaPju+Q8y0z4KSmsJSzKovEeQldexZWfnuAM3mt6xIc76LAYpoBNlEy7Z+S+SmpB+TE
-         BfG6usu3xcf3PvpPVHh90bzX9/4D1M5OsTXQkSDHu+/hjjVszkIT/vanZ9hWTxOH6NjU
-         YZhw==
+        d=kernel-dk.20150623.gappssmtp.com; s=20150623;
+        h=subject:to:cc:references:from:message-id:date:user-agent
+         :mime-version:in-reply-to:content-language:content-transfer-encoding;
+        bh=kh8aYdesv4KRJUOLLSbFjEpYaMdJ6H+WhCOXlHg9gpM=;
+        b=EskptTkGBcrUTeV4EPes5YQq/xlwfcYtAjhiVq0uJd4A4MgUetHwvdE3S553avElxZ
+         MEhoJEernui9tqP/7Mxuz1/16n8rc6vd8UnPCyOeJ/GtUDDWUoDoEZu5h2jnOxDbZiho
+         1w5ektP/sq3D+GFFYu0U88fQNzEH3DZX/Oqmx1NsaO1iR42aYGr+Gu+b4k5svkVwm7we
+         zL/YH2Q2qG3N51pIoxqA/ITqXCF0C5gysrGbDCwMA1jWiMqCgQmpWNMorMh8n8MFO0nf
+         gh8yix1ukFtoTm1Mk8RBRK7vyU/M8UMHjIjBxhxGly6PMfV/sHiN5nj3obV59wVVfCdm
+         6/KA==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=1e100.net; s=20161025;
-        h=x-gm-message-state:date:from:to:cc:subject:message-id:references
-         :mime-version:content-disposition:in-reply-to:user-agent;
-        bh=PL1mRKzXUWHREIk21ddzeksuzTaYTi6Wrm/WJnUT+DA=;
-        b=Krl7CLxooMbu62WbmDnn0zOHmY0aLWFP+oKoq3HNfqK9FfZdxl8bIkhHuObutn99DD
-         eHpHeAnaysTb3Zvb405djbR8Bh6bGG+06WWOpyYFdNKeCU/4g0iQGDhYWcVr7P5qShWh
-         9rk/aS0vZRyX50a6oFZxM17TtmEWgWeLBytD8nabRsfwRhVUngepYRPabzc+pbTlXsBX
-         2K+LqLTm/vtbrs9lW+wmLPh+k+1fOABPerwfv9wyuOgv91jTgwk9Vr8ywLSuVtxqNNZB
-         8vJRFv0uEX5E+EvodkMDLBCqefsBqmqzdGoLZdZt8BkPU36xjDSRe4S/QOZIzFn1OdNC
-         0K3w==
-X-Gm-Message-State: APjAAAU+5f0svgCmAxw+tItjz12Tyo+SaBjRZSH7aZBVsuOjPLcCBo1O
-        X1zSK9kqJ5hCasVcKBzHCCdKsp3VQzasaQ==
-X-Google-Smtp-Source: APXvYqzAcRYzD1AI2/G3bLvf1L7ZR3tE/Yxnd99j+pNPL1cYO4ZHkEo1O82DnfbXBtHErnCNC6bbDg==
-X-Received: by 2002:ac8:814:: with SMTP id u20mr617324qth.178.1568750180614;
-        Tue, 17 Sep 2019 12:56:20 -0700 (PDT)
-Received: from localhost ([107.15.81.208])
-        by smtp.gmail.com with ESMTPSA id 20sm1709735qkn.4.2019.09.17.12.56.19
+        h=x-gm-message-state:subject:to:cc:references:from:message-id:date
+         :user-agent:mime-version:in-reply-to:content-language
+         :content-transfer-encoding;
+        bh=kh8aYdesv4KRJUOLLSbFjEpYaMdJ6H+WhCOXlHg9gpM=;
+        b=eSJhrUaLLjOKCIXcfq0cgGVKAv2LA6/RTrraWRHbWeZgolFjz5eE+bFsRrQjUY5IKg
+         38N0dh/YjaaTc4UKZdmnLeq+HQ2Sxe1xr9/eWnL3Nthaa649Sy6nwS0Usyya1MA9KVY6
+         a6OxSr5kH6hXX/hjC2Qfdu0i/caf5zLj6eNQaottzhLBWvNSz2dvPx6IPSftVE8t++rQ
+         J0bdkL1Y37e7hFAak5KHWoTbmqM+6dksqwzzmZdU5pso5IEIAVooWnRYQ6Fpwm9IJw3y
+         sDvPE5Hw/FO6rdxnbmfzsX/PAy4Q+z/xmVZTUhpY8iRiAKHtHze+GjCELQ5889aCiNq9
+         UFHA==
+X-Gm-Message-State: APjAAAVopj7PYsxG93y8EutKfY8Jt3GfC6CGFaTGUguzicgXK1TKsxXZ
+        AuFYMSY1qhsiheNiTn41dY/3mB9iaIiYLw==
+X-Google-Smtp-Source: APXvYqwG6kf5AyeyJ83j1QmT00pFYinaV46i1tfXAFLlaVIh2Jq/wqRQtUhsTOwb13OWSS1sDzd/Mg==
+X-Received: by 2002:a6b:c810:: with SMTP id y16mr925996iof.75.1568753543462;
+        Tue, 17 Sep 2019 13:52:23 -0700 (PDT)
+Received: from [192.168.1.50] ([65.144.74.34])
+        by smtp.gmail.com with ESMTPSA id c11sm2982124ioi.67.2019.09.17.13.52.22
         (version=TLS1_2 cipher=ECDHE-RSA-AES128-GCM-SHA256 bits=128/128);
-        Tue, 17 Sep 2019 12:56:19 -0700 (PDT)
-Date:   Tue, 17 Sep 2019 15:56:18 -0400
-From:   Josef Bacik <josef@toxicpanda.com>
-To:     Mike Christie <mchristi@redhat.com>
-Cc:     Josef Bacik <josef@toxicpanda.com>, xiubli@redhat.com,
-        axboe@kernel.dk, linux-block@vger.kernel.org
-Subject: Re: [PATCH v4 2/2] nbd: fix possible page fault for nbd disk
-Message-ID: <20190917195617.i52mfc3pjik5p26i@MacBook-Pro-91.local>
+        Tue, 17 Sep 2019 13:52:22 -0700 (PDT)
+Subject: Re: [PATCH v4 0/2] nbd: fix possible page fault for nbd disk
+To:     xiubli@redhat.com, josef@toxicpanda.com
+Cc:     mchristi@redhat.com, linux-block@vger.kernel.org
 References: <20190917115606.13992-1-xiubli@redhat.com>
- <20190917115606.13992-3-xiubli@redhat.com>
- <5D812669.9050901@redhat.com>
- <20190917184011.74ityetkw7n3sqbs@MacBook-Pro-91.local>
- <5D813789.1050400@redhat.com>
+From:   Jens Axboe <axboe@kernel.dk>
+Message-ID: <c3d6a4bd-55ba-a3a9-577e-b98f59610cd5@kernel.dk>
+Date:   Tue, 17 Sep 2019 14:52:21 -0600
+User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:60.0) Gecko/20100101
+ Thunderbird/60.8.0
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <5D813789.1050400@redhat.com>
-User-Agent: NeoMutt/20180716
+In-Reply-To: <20190917115606.13992-1-xiubli@redhat.com>
+Content-Type: text/plain; charset=utf-8
+Content-Language: en-US
+Content-Transfer-Encoding: 7bit
 Sender: linux-block-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-On Tue, Sep 17, 2019 at 02:44:09PM -0500, Mike Christie wrote:
-> On 09/17/2019 01:40 PM, Josef Bacik wrote:
-> >>> +		nbd->destroy_complete = &destroy_complete;
-> >>
-> >> Also, without the mutex part of the v3 patch, we could race and
-> >> nbd_dev_remove could have passed the destroy_complete check already, so
-> >> below we will wait forever.
-> >>
-> > 
-> > Oh hmm you're right,
+On 9/17/19 5:56 AM, xiubli@redhat.com wrote:
+> From: Xiubo Li <xiubli@redhat.com>
 > 
-> I think I am actually wrong about that part too now :) I had forgot
-> about the idr removal under the mutex when making my original comment.
+> V3:
+> - fix the case that when the NBD_CFLAG_DESTROY_ON_DISCONNECT bit is not set.
+> - add "nbd: rename the runtime flags as NBD_RT_ prefixed"
 > 
-> If nbd_put grabs the mutex first then it will do idr_remove under the
-> mutex. If nbd_genl_connect then runs, idr_find/idr_for_each will fail
-> and we will allocate a new nbd device and NBD_DISCONNECT_REQUESTED will
-> not be set.
+> V4:
+> - Address the use after free bug from Mike's comments
+> - This has been test for 3 days, works well.
 > 
-> If nbd_genl_connect grabs the mutex first, then idr_find/idr_for_each
-> will succeed and we will set the completion. nbd_put will then grab the
-> mutex and call nbd_remove_dev and see the completion.
+> 
+> Xiubo Li (2):
+>    nbd: rename the runtime flags as NBD_RT_ prefixed
+>    nbd: fix possible page fault for nbd disk
+> 
+>   drivers/block/nbd.c | 108 +++++++++++++++++++++++++++++---------------
+>   1 file changed, 72 insertions(+), 36 deletions(-)
 
-Lol we're all wrong.  I had it in my head that complete() just did a set_bit()
-so wait_on_completion() would not wait, but it does the x->done++/x->done--
-thing, so cool we're good here.  Thanks,
+Applied for 5.4, thanks.
 
-Josef
+-- 
+Jens Axboe
+
