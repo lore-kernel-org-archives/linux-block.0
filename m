@@ -4,99 +4,95 @@ X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 X-Spam-Level: 
 X-Spam-Status: No, score=-2.6 required=3.0 tests=DKIMWL_WL_HIGH,DKIM_SIGNED,
 	DKIM_VALID,DKIM_VALID_AU,MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,
-	USER_AGENT_SANE_1 autolearn=no autolearn_force=no version=3.4.0
+	URIBL_BLOCKED,USER_AGENT_SANE_1 autolearn=no autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 44BC2C4CECD
-	for <linux-block@archiver.kernel.org>; Tue, 17 Sep 2019 15:14:17 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 96DDAC4CECD
+	for <linux-block@archiver.kernel.org>; Tue, 17 Sep 2019 15:42:08 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.kernel.org (Postfix) with ESMTP id 15B052189D
-	for <linux-block@archiver.kernel.org>; Tue, 17 Sep 2019 15:14:17 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id 645D921897
+	for <linux-block@archiver.kernel.org>; Tue, 17 Sep 2019 15:42:08 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=default; t=1568733257;
-	bh=ioSrN2QkTDCMxF1MdbFyn+rD4YWYFmUMeqjhjhXJT/g=;
+	s=default; t=1568734928;
+	bh=Cs9d1NkB4qUoDkwuZrTgkp77GLRkyvP7Xqf3CmGIlKE=;
 	h=Date:From:To:Cc:Subject:References:In-Reply-To:List-ID:From;
-	b=tFuo/Kd4FJ9x61DnvnQNbJdqIFNiA3aWqFsUX3RXuRUiLvMZAtKb8etiUVY4jmMOT
-	 2nbXxq5wc0Ya9hzfKH6nUYZDvyX7+Eg25AXNPzUBzIrdvdMqMuQ5svxiKtxtRKn6I8
-	 /ypAwqQIfy0falw5PuiVdeSA7zUWE3UmLogDK72g=
+	b=fCu/CA+YTSpDuBlAmtcB2efP141iE4OW7sC7TymH+SZ1LvRvhJItmAlkeAIjtQx1p
+	 EzPwQzwWH4GplQCSSG2d9G9iLEtVk2/EnjKzxbiaRg4jJvy2MwkYQ2oA1fqcQAEGAs
+	 5TzfZH6jZHrh+0TWJnvYdbKkotdoilcyIX6UNl28=
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1729273AbfIQPOI (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Tue, 17 Sep 2019 11:14:08 -0400
-Received: from mail-qk1-f193.google.com ([209.85.222.193]:35660 "EHLO
-        mail-qk1-f193.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1727454AbfIQPOI (ORCPT
-        <rfc822;linux-block@vger.kernel.org>);
-        Tue, 17 Sep 2019 11:14:08 -0400
-Received: by mail-qk1-f193.google.com with SMTP id w2so4413492qkf.2;
-        Tue, 17 Sep 2019 08:14:07 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20161025;
-        h=sender:date:from:to:cc:subject:message-id:references:mime-version
-         :content-disposition:in-reply-to:user-agent;
-        bh=YTPM3JqiD8c0vKHOkagGiX6LKB1z1tzStM2tYGa572U=;
-        b=ILfTRupiAjHPFgfKc0g3+FaggjSSMypDaOk8g9mybm68giM925Tcm5vCM330ksEGll
-         /L/qoHi5Xi+DhYyESQ9n0HpgfFRhX7btKH+OQKAKrJMgI/ZX1yFO146+eMG6w66/K/xi
-         6IcyOMeQnwBWCOS4bvthkeRQD4jXQ/l+7WsusUExp1oJVu1CeBzrjM/fahln4hLwH/xJ
-         2D8qJTO/4262g6ZdoggzspuKqFV21o35ZmjhbetgFD3m2YdAvgXcyvsXeTYvB5acm9jx
-         ZT6vs6dJFGUd8Mi+kmVF+mM3CjHo3K/cF5yDmdYjSudHGMpXsuYbGoHddZ8PYYaBLuFt
-         MT2A==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20161025;
-        h=x-gm-message-state:sender:date:from:to:cc:subject:message-id
-         :references:mime-version:content-disposition:in-reply-to:user-agent;
-        bh=YTPM3JqiD8c0vKHOkagGiX6LKB1z1tzStM2tYGa572U=;
-        b=RPi/DlafyriicxWhRqdCfAtvSCawfL2oKuQ/LTu+X6bgmwzK6j+tVawJB1ltD+KBKo
-         R2X9+nIRvGZ9mRFHDMjLUk2sinrxBSUzSXn2d1m7akTGWITqHOHG+BB/VSCrZok29upu
-         Tur0SdMhXeoQT9jga2GSfOYU3+vROAU0yN+fe8joj7tPWzuFIfPV3QmosGD/MKh7ON78
-         w5y+9J2bYIqzWvk0F6efRxkiNMjYwP87oNCuWz3MrLsn2wV+Yx7nWWKSZquM7OboAuLw
-         7ut1sQkPfTT7cvwmmiMpFAk44jPYoix6mvf0uWMp3U55yfARWsxajo+zG7PV7B1P1l/8
-         Skpw==
-X-Gm-Message-State: APjAAAWNuMjTw87r0uDTfcNSc9XGov9q7Dtz5iI7iWvB2JLnIerwU38p
-        6wS6hVi69pD/FBW8TaqIpa0=
-X-Google-Smtp-Source: APXvYqyboyASZsc7TMRNQ6PiKKkZ2Pf0sK4v7XZx2g5JQaJfXnSSJDx8o3pJTQ+SOzJkaaPaHoTjWw==
-X-Received: by 2002:a37:c17:: with SMTP id 23mr4178217qkm.159.1568733246654;
-        Tue, 17 Sep 2019 08:14:06 -0700 (PDT)
-Received: from localhost ([2620:10d:c091:480::8d29])
-        by smtp.gmail.com with ESMTPSA id v12sm1721049qtb.5.2019.09.17.08.14.05
-        (version=TLS1_2 cipher=ECDHE-RSA-AES128-GCM-SHA256 bits=128/128);
-        Tue, 17 Sep 2019 08:14:05 -0700 (PDT)
-Date:   Tue, 17 Sep 2019 08:14:04 -0700
-From:   Tejun Heo <tj@kernel.org>
-To:     Paolo Valente <paolo.valente@linaro.org>
-Cc:     Jens Axboe <axboe@kernel.dk>,
-        linux-block <linux-block@vger.kernel.org>,
-        linux-kernel <linux-kernel@vger.kernel.org>,
-        Ulf Hansson <ulf.hansson@linaro.org>,
-        Linus Walleij <linus.walleij@linaro.org>,
-        noreply-spamdigest via bfq-iosched 
-        <bfq-iosched@googlegroups.com>,
-        Oleksandr Natalenko <oleksandr@natalenko.name>,
-        cgroups@vger.kernel.org
-Subject: Re: [PATCH 0/1] block, bfq: remove bfq prefix from cgroups filenames
-Message-ID: <20190917151404.GJ3084169@devbig004.ftw2.facebook.com>
-References: <20190909073117.20625-1-paolo.valente@linaro.org>
- <80C56C11-DA21-4036-9006-2F459ACE9A8C@linaro.org>
- <c67c4d4b-ee56-85c1-5b94-7ae1704918b6@kernel.dk>
- <1F3898DA-C61F-4FA7-B586-F0FA0CAF5069@linaro.org>
- <20190916151643.GC3084169@devbig004.ftw2.facebook.com>
- <64329DDB-FFF4-4709-83B1-39D5E6BF6AB6@linaro.org>
- <91deff5b-4a0d-a7ef-8bb2-7e7e5dad767b@kernel.dk>
- <8766046C-485D-479E-A4D0-AD9EF2F8EF7C@linaro.org>
+        id S1729702AbfIQPmH (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Tue, 17 Sep 2019 11:42:07 -0400
+Received: from mail.kernel.org ([198.145.29.99]:60618 "EHLO mail.kernel.org"
+        rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
+        id S1729699AbfIQPmH (ORCPT <rfc822;linux-block@vger.kernel.org>);
+        Tue, 17 Sep 2019 11:42:07 -0400
+Received: from localhost (unknown [77.137.89.37])
+        (using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+        (No client certificate requested)
+        by mail.kernel.org (Postfix) with ESMTPSA id D2CB52171F;
+        Tue, 17 Sep 2019 15:42:05 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+        s=default; t=1568734926;
+        bh=Cs9d1NkB4qUoDkwuZrTgkp77GLRkyvP7Xqf3CmGIlKE=;
+        h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
+        b=niTsgqzBynMTMZ7IJhyt0HpXRowaAMQxofie64ypEQI5fNX5hLevcX664d2xTgcQa
+         MH8w8RndhWSoUa7pBrkUMYdyiua6yGiphKlLZk4rKB1Uo1SsaxqpwxmhhT4VcxGKZD
+         v26Q9NJYrgFU7dVJOVwfaowWmsRnzZxmUkKrKtw0=
+Date:   Tue, 17 Sep 2019 18:41:50 +0300
+From:   Leon Romanovsky <leon@kernel.org>
+To:     Bart Van Assche <bvanassche@acm.org>
+Cc:     Jinpu Wang <jinpu.wang@cloud.ionos.com>,
+        Jack Wang <jinpuwang@gmail.com>, linux-block@vger.kernel.org,
+        linux-rdma@vger.kernel.org, Jens Axboe <axboe@kernel.dk>,
+        Christoph Hellwig <hch@infradead.org>,
+        Sagi Grimberg <sagi@grimberg.me>,
+        Jason Gunthorpe <jgg@mellanox.com>,
+        Doug Ledford <dledford@redhat.com>,
+        Danil Kipnis <danil.kipnis@cloud.ionos.com>, rpenyaev@suse.de,
+        Roman Pen <roman.penyaev@profitbricks.com>
+Subject: Re: [PATCH v4 15/25] ibnbd: private headers with IBNBD protocol
+ structs and helpers
+Message-ID: <20190917154150.GE18203@unreal>
+References: <20190620150337.7847-1-jinpuwang@gmail.com>
+ <20190620150337.7847-16-jinpuwang@gmail.com>
+ <4fbad80b-f551-131e-9a5c-a24f1fa98fea@acm.org>
+ <CAMGffEnVFHpmDCiazHFX1jwi4=p401T9goSkes3j1AttV0t1Ng@mail.gmail.com>
+ <20190916052729.GB18203@unreal>
+ <25bd79e1-9523-8354-873a-0ff1db92659a@acm.org>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=us-ascii
 Content-Disposition: inline
-In-Reply-To: <8766046C-485D-479E-A4D0-AD9EF2F8EF7C@linaro.org>
-User-Agent: Mutt/1.5.21 (2010-09-15)
+In-Reply-To: <25bd79e1-9523-8354-873a-0ff1db92659a@acm.org>
+User-Agent: Mutt/1.12.1 (2019-06-15)
 Sender: linux-block-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-On Mon, Sep 16, 2019 at 06:45:03PM +0200, Paolo Valente wrote:
-> Tested it too. Waiting for Tejun's patch to re-submit it with mine.
+On Mon, Sep 16, 2019 at 06:45:17AM -0700, Bart Van Assche wrote:
+> On 9/15/19 10:27 PM, Leon Romanovsky wrote:
+> > On Sun, Sep 15, 2019 at 04:30:04PM +0200, Jinpu Wang wrote:
+> > > On Sat, Sep 14, 2019 at 12:10 AM Bart Van Assche <bvanassche@acm.org> wrote:
+> > > > > +/* TODO: should be configurable */
+> > > > > +#define IBTRS_PORT 1234
+> > > >
+> > > > How about converting this macro into a kernel module parameter?
+> > > Sounds good, will do.
+> >
+> > Don't rush to do it and defer it to be the last change before merging,
+> > this is controversial request which not everyone will like here.
+>
+> Hi Leon,
+>
+> If you do not agree with changing this macro into a kernel module parameter
+> please suggest an alternative.
 
-http://lkml.kernel.org/r/20190917151308.GH3084169@devbig004.ftw2.facebook.com
+I didn't review code so my answer can be not fully accurate, but opening
+some port to use this IB* seems strange from my non-sysadmin POV.
+What about using RDMA-CM, like NVMe?
 
-Thanks.
+Thanks
 
--- 
-tejun
+>
+> Thanks,
+>
+> Bart.
