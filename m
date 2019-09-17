@@ -2,101 +2,94 @@ Return-Path: <SRS0=pu/s=XM=vger.kernel.org=linux-block-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-5.3 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
-	INCLUDES_PATCH,MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,USER_AGENT_SANE_1
-	autolearn=ham autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-0.9 required=3.0 tests=DKIM_SIGNED,DKIM_VALID,
+	DKIM_VALID_AU,HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SPF_HELO_NONE,
+	SPF_PASS autolearn=no autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 65A72C4CECD
-	for <linux-block@archiver.kernel.org>; Tue, 17 Sep 2019 16:17:57 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id D3B7EC4CECD
+	for <linux-block@archiver.kernel.org>; Tue, 17 Sep 2019 16:36:22 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.kernel.org (Postfix) with ESMTP id 42DDD21881
-	for <linux-block@archiver.kernel.org>; Tue, 17 Sep 2019 16:17:57 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id A08472067B
+	for <linux-block@archiver.kernel.org>; Tue, 17 Sep 2019 16:36:22 +0000 (UTC)
+Authentication-Results: mail.kernel.org;
+	dkim=pass (2048-bit key) header.d=cloud.ionos.com header.i=@cloud.ionos.com header.b="GK/UJUra"
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1726340AbfIQQR4 (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Tue, 17 Sep 2019 12:17:56 -0400
-Received: from mail-pf1-f194.google.com ([209.85.210.194]:46592 "EHLO
-        mail-pf1-f194.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1726089AbfIQQR4 (ORCPT
+        id S1728158AbfIQQgV (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Tue, 17 Sep 2019 12:36:21 -0400
+Received: from mail-wm1-f65.google.com ([209.85.128.65]:51216 "EHLO
+        mail-wm1-f65.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S1728591AbfIQQgV (ORCPT
         <rfc822;linux-block@vger.kernel.org>);
-        Tue, 17 Sep 2019 12:17:56 -0400
-Received: by mail-pf1-f194.google.com with SMTP id q5so2430966pfg.13
-        for <linux-block@vger.kernel.org>; Tue, 17 Sep 2019 09:17:55 -0700 (PDT)
+        Tue, 17 Sep 2019 12:36:21 -0400
+Received: by mail-wm1-f65.google.com with SMTP id 7so4314339wme.1
+        for <linux-block@vger.kernel.org>; Tue, 17 Sep 2019 09:36:19 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=cloud.ionos.com; s=google;
+        h=mime-version:references:in-reply-to:from:date:message-id:subject:to
+         :cc;
+        bh=LZ5ZTEmaTIYuHEPVaWnnIRDnM1ExQsI9I+rDX1pKJz8=;
+        b=GK/UJUraSZrbI1Lrp0bAU5iDgY0SxP7ZBolbRWrNz0P64V7oibEZuEsHfPeEk7Q9rp
+         xhKWgfwpDAv9qYOVv6Lu65MVkEs9ocMl4F8rzRMcf4TAMZXseKp5mUfkpdh52L+D24fd
+         Zw3UoMsuMTG1cFp2itr1rAVedM4yrpQicL+poeScKS4ldGYiEciH3AdcO38PP7cVzQ0p
+         Mf8KYDaR+d/5Lc91n2Q5RZF3NnYoEVuQQkGAS7Sl3VZcMwR5VjQ531kNfvT/JqP3T2P/
+         DpiF1/Oeke/GK4IBiRrKuJR3aRd3fnYslFM2HN5xTwAO/PwnU3hattLWrkS+zPAbdC40
+         Ax9A==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=1e100.net; s=20161025;
-        h=x-gm-message-state:subject:to:cc:references:from:message-id:date
-         :user-agent:mime-version:in-reply-to:content-language
-         :content-transfer-encoding;
-        bh=B45kdRJCtQcQYgi3G2dh4K37FST+My1K2Jd4V8V68nE=;
-        b=lP5iZhDE5BvIvlj/pa2lkFZO9mio5IM7ThN4gjcXJrMIbHnOb2rAr6dZrctF+fk08s
-         APIR20fn0OxRFcTdZQe2MC4TVIJNO1IOfwCRA1DuRKpTwQTMDl9eSnCRF1NyiHDy8pE+
-         o+m69MUVmM2meB1zRqT0oKatrgy2fewDLinmlw8z/9HvlSmhetW38v2Lld/H2pBjr591
-         WCbAWyYd8Bju50tKFOAV3zgW1fh+XW7UC1A+PiWYa686oy+3ZS9gpEuuZQBp/nW86pyp
-         oUMnt/r0LcGWkodgc6lzEvfUuyc3u6DMCwb5HqerRQlidV/0ss+aJ1K4USOQyX2AEoGX
-         /W1w==
-X-Gm-Message-State: APjAAAUHbkKWA/m9VgM0Id3b6karWbWRPfuLS3WGENF7AI0I4huGjnuR
-        MZA59niymahcP1eA3W+H25i3C6ZN
-X-Google-Smtp-Source: APXvYqwAYsaHGAsCK0JbCuWYPvZY1AazeBhYl+zt+Oka0GR9ceNq8q2/gJ3N0s8fZgNNqiguTejvoQ==
-X-Received: by 2002:aa7:8005:: with SMTP id j5mr5183070pfi.50.1568737075582;
-        Tue, 17 Sep 2019 09:17:55 -0700 (PDT)
-Received: from desktop-bart.svl.corp.google.com ([2620:15c:2cd:202:4308:52a3:24b6:2c60])
-        by smtp.gmail.com with ESMTPSA id r30sm4008317pfl.42.2019.09.17.09.17.54
-        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
-        Tue, 17 Sep 2019 09:17:54 -0700 (PDT)
-Subject: Re: [PATCH] block: track per requests type merged count
-To:     Chaitanya Kulkarni <chaitanya.kulkarni@wdc.com>,
-        linux-block@vger.kernel.org
-Cc:     axboe@kernel.dk, osandov@fb.com
-References: <20190917003518.6219-1-chaitanya.kulkarni@wdc.com>
-From:   Bart Van Assche <bvanassche@acm.org>
-Message-ID: <2083dd3e-cca9-a44c-7852-d6a74d35b29c@acm.org>
-Date:   Tue, 17 Sep 2019 09:17:53 -0700
-User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:60.0) Gecko/20100101
- Thunderbird/60.8.0
+        h=x-gm-message-state:mime-version:references:in-reply-to:from:date
+         :message-id:subject:to:cc;
+        bh=LZ5ZTEmaTIYuHEPVaWnnIRDnM1ExQsI9I+rDX1pKJz8=;
+        b=TTAXdrGZNFIUEEjKhu22C3WrXBS9GzajDDmtnaWywTVPc+kQZr5GxasA9BMz+n2l14
+         07JztCHQErQGqi158K7gkcsNMFFNqEb5cFQhZ+Eid2wsChjU8zQze/Aaqz60n53JN2ce
+         q9Vi6wIAf0IC9UT6BKx53KE7tRcy6OIghF7pBevtq4QX48T6gbyRRPRRCySC6Hq+Ilnd
+         8xW7qesKp5RfJ6Mb6UNSnmBBG7b+gyEfxFQ7CUQQuJ2XUpP5qoEY0gH8i6cPzwYViXQB
+         7XnO2RgejVy0p4qz3c/XcKc+mmQKBcZHjNH36FcTnHUckW8lgbaGjxZvxTL6AXEXvmL+
+         lzww==
+X-Gm-Message-State: APjAAAWIs0D32amtVEKxuAKpDNkvzJl1XCAJnzKg7YXCu9vpxtRyJ1In
+        AM3nouE6rh/5Y9ElahYwUwPBffpdObMm9/VRBMlD2A==
+X-Google-Smtp-Source: APXvYqxbdK26SIM0+biFH4klJsQGXwbZHmXVpxC2DveOR4YNrg/laGGIb5lVHSsJE4/ZW9VCG2Bm4wm72MQy8yubuPw=
+X-Received: by 2002:a1c:4485:: with SMTP id r127mr4048388wma.59.1568738179087;
+ Tue, 17 Sep 2019 09:36:19 -0700 (PDT)
 MIME-Version: 1.0
-In-Reply-To: <20190917003518.6219-1-chaitanya.kulkarni@wdc.com>
-Content-Type: text/plain; charset=utf-8; format=flowed
-Content-Language: en-US
-Content-Transfer-Encoding: 7bit
+References: <20190620150337.7847-1-jinpuwang@gmail.com> <20190620150337.7847-17-jinpuwang@gmail.com>
+ <7d11d903-7826-8c1a-bef8-74ea4cf5f340@acm.org>
+In-Reply-To: <7d11d903-7826-8c1a-bef8-74ea4cf5f340@acm.org>
+From:   Jinpu Wang <jinpu.wang@cloud.ionos.com>
+Date:   Tue, 17 Sep 2019 18:36:08 +0200
+Message-ID: <CAMGffEmZdqJ2Nw1KX=DirMp4e89i-G4ut24qNSVYRy0eG=v8sg@mail.gmail.com>
+Subject: Re: [PATCH v4 16/25] ibnbd: client: private header with client
+ structs and functions
+To:     Bart Van Assche <bvanassche@acm.org>
+Cc:     Jack Wang <jinpuwang@gmail.com>, linux-block@vger.kernel.org,
+        linux-rdma@vger.kernel.org, Jens Axboe <axboe@kernel.dk>,
+        Christoph Hellwig <hch@infradead.org>,
+        Sagi Grimberg <sagi@grimberg.me>,
+        Jason Gunthorpe <jgg@mellanox.com>,
+        Doug Ledford <dledford@redhat.com>,
+        Danil Kipnis <danil.kipnis@cloud.ionos.com>, rpenyaev@suse.de
+Content-Type: text/plain; charset="UTF-8"
 Sender: linux-block-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-On 9/16/19 5:35 PM, Chaitanya Kulkarni wrote:
-> diff --git a/block/blk-mq-debugfs.c b/block/blk-mq-debugfs.c
-> index b3f2ba483992..1e46f2cbf84e 100644
-> --- a/block/blk-mq-debugfs.c
-> +++ b/block/blk-mq-debugfs.c
-> @@ -679,8 +679,21 @@ static ssize_t ctx_dispatched_write(void *data, const char __user *buf,
->   static int ctx_merged_show(void *data, struct seq_file *m)
->   {
->   	struct blk_mq_ctx *ctx = data;
-> +	unsigned long *rm = ctx->rq_merged;
-> +
-> +	seq_printf(m, "READ             %8lu\n", rm[REQ_OP_READ]);
-> +	seq_printf(m, "WRITE            %8lu\n", rm[REQ_OP_WRITE]);
-> +	seq_printf(m, "FLUSH            %8lu\n", rm[REQ_OP_FLUSH]);
-> +	seq_printf(m, "DISCARD          %8lu\n", rm[REQ_OP_DISCARD]);
-> +	seq_printf(m, "SECURE_ERASE     %8lu\n", rm[REQ_OP_SECURE_ERASE]);
-> +	seq_printf(m, "ZONE_RESET       %8lu\n", rm[REQ_OP_ZONE_RESET]);
-> +	seq_printf(m, "ZONE_RESET_ALL   %8lu\n", rm[REQ_OP_ZONE_RESET_ALL]);
-> +	seq_printf(m, "WRITE_ZEROES     %8lu\n", rm[REQ_OP_WRITE_ZEROES]);
-> +	seq_printf(m, "SCSI_IN          %8lu\n", rm[REQ_OP_SCSI_IN]);
-> +	seq_printf(m, "SCSI_OUT         %8lu\n", rm[REQ_OP_SCSI_OUT]);
-> +	seq_printf(m, "DRV_IN           %8lu\n", rm[REQ_OP_DRV_IN]);
-> +	seq_printf(m, "DRV_OUT          %8lu\n", rm[REQ_OP_DRV_OUT]);
->   
-> -	seq_printf(m, "%lu\n", ctx->rq_merged);
->   	return 0;
->   }
+On Sat, Sep 14, 2019 at 12:25 AM Bart Van Assche <bvanassche@acm.org> wrote:
+>
+> On 6/20/19 8:03 AM, Jack Wang wrote:
+> > +     char                    pathname[NAME_MAX];
+> [ ... ]
+>  > +    char                    blk_symlink_name[NAME_MAX];
+>
+> Please allocate path names dynamically instead of hard-coding the upper
+> length for a path.
+>
+> Bart.
+Hi Bart,
 
-Several request types shown above are never merged, e.g. FLUSH, 
-WRITE_ZEROES, SCSI_IN, SCSI_OUT, DRV_IN and DRV_OUT (see also 
-rq_mergeable()). Showing zero for these request types may confuse users. 
-Can the body of this function be changed into a loop that does not print 
-statistics for request types for which ctx->rq_merged[] is zero?
+ok,  will dynamically allocate the path and blk_symlink_name as you suggested.
 
-Thanks,
+Thank you
+Jinpu
 
-Bart.
-
+--
+Jack Wang
