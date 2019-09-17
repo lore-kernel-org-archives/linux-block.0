@@ -2,229 +2,176 @@ Return-Path: <SRS0=pu/s=XM=vger.kernel.org=linux-block-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-9.8 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
+X-Spam-Status: No, score=-8.3 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
 	INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,
-	URIBL_BLOCKED,USER_AGENT_GIT autolearn=ham autolearn_force=no version=3.4.0
+	URIBL_BLOCKED,USER_AGENT_SANE_1 autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 65264C4CEC9
-	for <linux-block@archiver.kernel.org>; Tue, 17 Sep 2019 06:43:27 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 28972C4CEC9
+	for <linux-block@archiver.kernel.org>; Tue, 17 Sep 2019 07:38:32 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.kernel.org (Postfix) with ESMTP id 3C1E3206C2
-	for <linux-block@archiver.kernel.org>; Tue, 17 Sep 2019 06:43:27 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id 0688620678
+	for <linux-block@archiver.kernel.org>; Tue, 17 Sep 2019 07:38:31 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1729416AbfIQGn0 (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Tue, 17 Sep 2019 02:43:26 -0400
-Received: from szxga06-in.huawei.com ([45.249.212.32]:45430 "EHLO huawei.com"
-        rhost-flags-OK-OK-OK-FAIL) by vger.kernel.org with ESMTP
-        id S1726953AbfIQGn0 (ORCPT <rfc822;linux-block@vger.kernel.org>);
-        Tue, 17 Sep 2019 02:43:26 -0400
-Received: from DGGEMS402-HUB.china.huawei.com (unknown [172.30.72.60])
-        by Forcepoint Email with ESMTP id 3444CB6FA7B2C93B4FD6;
-        Tue, 17 Sep 2019 14:43:25 +0800 (CST)
-Received: from RH5885H-V3.huawei.com (10.90.53.225) by
- DGGEMS402-HUB.china.huawei.com (10.3.19.202) with Microsoft SMTP Server id
- 14.3.439.0; Tue, 17 Sep 2019 14:43:16 +0800
-From:   Sun Ke <sunke32@huawei.com>
-To:     <sunke32@huawei.com>, <osandov@fb.com>,
-        <linux-block@vger.kernel.org>
-Subject: [PATCH blktests v2] nbd/003:add mount and clear_sock test for nbd
-Date:   Tue, 17 Sep 2019 14:49:51 +0800
-Message-ID: <1568702991-69027-1-git-send-email-sunke32@huawei.com>
-X-Mailer: git-send-email 2.7.4
+        id S2392660AbfIQHib (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Tue, 17 Sep 2019 03:38:31 -0400
+Received: from mx1.redhat.com ([209.132.183.28]:41430 "EHLO mx1.redhat.com"
+        rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
+        id S1726059AbfIQHib (ORCPT <rfc822;linux-block@vger.kernel.org>);
+        Tue, 17 Sep 2019 03:38:31 -0400
+Received: from smtp.corp.redhat.com (int-mx03.intmail.prod.int.phx2.redhat.com [10.5.11.13])
+        (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
+        (No client certificate requested)
+        by mx1.redhat.com (Postfix) with ESMTPS id 01068C08EC19;
+        Tue, 17 Sep 2019 07:38:30 +0000 (UTC)
+Received: from ming.t460p (ovpn-8-25.pek2.redhat.com [10.72.8.25])
+        by smtp.corp.redhat.com (Postfix) with ESMTPS id CE6D15F7E6;
+        Tue, 17 Sep 2019 07:38:03 +0000 (UTC)
+Date:   Tue, 17 Sep 2019 15:37:58 +0800
+From:   Ming Lei <ming.lei@redhat.com>
+To:     Yufen Yu <yuyufen@huawei.com>
+Cc:     axboe@kernel.dk, linux-block@vger.kernel.org, hch@infradead.org,
+        keith.busch@intel.com
+Subject: Re: [PATCH v2] block: fix null pointer dereference in
+ blk_mq_rq_timed_out()
+Message-ID: <20190917073757.GA15374@ming.t460p>
+References: <20190917070312.711-1-yuyufen@huawei.com>
 MIME-Version: 1.0
-Content-Type: text/plain
-X-Originating-IP: [10.90.53.225]
-X-CFilter-Loop: Reflected
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <20190917070312.711-1-yuyufen@huawei.com>
+User-Agent: Mutt/1.11.3 (2019-02-01)
+X-Scanned-By: MIMEDefang 2.79 on 10.5.11.13
+X-Greylist: Sender IP whitelisted, not delayed by milter-greylist-4.5.16 (mx1.redhat.com [10.5.110.31]); Tue, 17 Sep 2019 07:38:30 +0000 (UTC)
 Sender: linux-block-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-Add the test case to check nbd devices.This test case catches regressions
-fixed by commit 92b5c8f0063e4 "nbd: replace kill_bdev() with
-__invalidate_device() again".
+On Tue, Sep 17, 2019 at 03:03:12PM +0800, Yufen Yu wrote:
+> We got a null pointer deference BUG_ON in blk_mq_rq_timed_out()
+> as following:
+> 
+> [  108.825472] BUG: kernel NULL pointer dereference, address: 0000000000000040
+> [  108.827059] PGD 0 P4D 0
+> [  108.827313] Oops: 0000 [#1] SMP PTI
+> [  108.827657] CPU: 6 PID: 198 Comm: kworker/6:1H Not tainted 5.3.0-rc8+ #431
+> [  108.829503] Workqueue: kblockd blk_mq_timeout_work
+> [  108.829913] RIP: 0010:blk_mq_check_expired+0x258/0x330
+> [  108.838191] Call Trace:
+> [  108.838406]  bt_iter+0x74/0x80
+> [  108.838665]  blk_mq_queue_tag_busy_iter+0x204/0x450
+> [  108.839074]  ? __switch_to_asm+0x34/0x70
+> [  108.839405]  ? blk_mq_stop_hw_queue+0x40/0x40
+> [  108.839823]  ? blk_mq_stop_hw_queue+0x40/0x40
+> [  108.840273]  ? syscall_return_via_sysret+0xf/0x7f
+> [  108.840732]  blk_mq_timeout_work+0x74/0x200
+> [  108.841151]  process_one_work+0x297/0x680
+> [  108.841550]  worker_thread+0x29c/0x6f0
+> [  108.841926]  ? rescuer_thread+0x580/0x580
+> [  108.842344]  kthread+0x16a/0x1a0
+> [  108.842666]  ? kthread_flush_work+0x170/0x170
+> [  108.843100]  ret_from_fork+0x35/0x40
+> 
+> The bug is caused by the race between timeout handle and completion for
+> flush request.
+> 
+> When timeout handle function blk_mq_rq_timed_out() try to read
+> 'req->q->mq_ops', the 'req' have completed and reinitiated by next
+> flush request, which would call blk_rq_init() to clear 'req' as 0.
+> 
+> After commit 12f5b93145 ("blk-mq: Remove generation seqeunce"),
+> normal requests lifetime are protected by refcount. Until 'rq->ref'
+> drop to zero, the request can really be free. Thus, these requests
+> cannot been reused before timeout handle finish.
+> 
+> However, flush request has defined .end_io and rq->end_io() is still
+> called even if 'rq->ref' doesn't drop to zero. After that, the 'flush_rq'
+> can be reused by the next flush request handle, resulting in null
+> pointer deference BUG ON.
+> 
+> We fix this problem by covering flush request with 'rq->ref'.
+> If the refcount is not zero, flush_end_io() return and wait the
+> last holder recall it. To record the request status, we add a new
+> entry 'rq_status', which will be used in flush_end_io().
+> 
+> Cc: Ming Lei <ming.lei@redhat.com>
+> Cc: Christoph Hellwig <hch@infradead.org>
+> Cc: Keith Busch <keith.busch@intel.com>
+> Signed-off-by: Yufen Yu <yuyufen@huawei.com>
+> ---
+>  block/blk-flush.c | 8 ++++++++
+>  block/blk-mq.c    | 7 +++++--
+>  block/blk.h       | 6 ++++++
+>  3 files changed, 19 insertions(+), 2 deletions(-)
+> 
+> diff --git a/block/blk-flush.c b/block/blk-flush.c
+> index aedd9320e605..f3ef6ce05c78 100644
+> --- a/block/blk-flush.c
+> +++ b/block/blk-flush.c
+> @@ -212,6 +212,14 @@ static void flush_end_io(struct request *flush_rq, blk_status_t error)
+>  	struct blk_flush_queue *fq = blk_get_flush_queue(q, flush_rq->mq_ctx);
+>  	struct blk_mq_hw_ctx *hctx;
+>  
+> +	if (!refcount_dec_and_test(&flush_rq->ref)) {
+> +		fq->rq_status = error;
+> +		return;
+> +	}
+> +
+> +	if (fq->rq_status != BLK_STS_OK)
+> +		error = fq->rq_status;
+> +
+>  	/* release the tag's ownership to the req cloned from */
+>  	spin_lock_irqsave(&fq->mq_flush_lock, flags);
+>  	hctx = flush_rq->mq_hctx;
+> diff --git a/block/blk-mq.c b/block/blk-mq.c
+> index 0835f4d8d42e..3d2b2c2e9cdf 100644
+> --- a/block/blk-mq.c
+> +++ b/block/blk-mq.c
+> @@ -905,9 +905,12 @@ static bool blk_mq_check_expired(struct blk_mq_hw_ctx *hctx,
+>  	 */
+>  	if (blk_mq_req_expired(rq, next))
+>  		blk_mq_rq_timed_out(rq, reserved);
+> -	if (refcount_dec_and_test(&rq->ref))
+> -		__blk_mq_free_request(rq);
+>  
+> +	if (is_flush_rq(rq, hctx)) {
+> +		rq->end_io(rq, 0);
+> +	} else if (refcount_dec_and_test(&rq->ref)) {
+> +		__blk_mq_free_request(rq);
+> +	}
 
-Establish the nbd connection.Run two processes.One do mount and umount,
-anther one do clear_sock ioctl.
+The above two pair of '{}' can be removed.
 
-Signed-off-by: Sun Ke <sunke32@huawei.com>
----
- src/Makefile           |  3 ++-
- src/mount_clear_sock.c | 68 ++++++++++++++++++++++++++++++++++++++++++++++++++
- tests/nbd/003          | 66 ++++++++++++++++++++++++++++++++++++++++++++++++
- tests/nbd/003.out      |  1 +
- 4 files changed, 137 insertions(+), 1 deletion(-)
- create mode 100644 src/mount_clear_sock.c
- create mode 100644 tests/nbd/003
- create mode 100644 tests/nbd/003.out
+>  	return true;
+>  }
+>  
+> diff --git a/block/blk.h b/block/blk.h
+> index de6b2e146d6e..128bb53622ff 100644
+> --- a/block/blk.h
+> +++ b/block/blk.h
+> @@ -30,6 +30,7 @@ struct blk_flush_queue {
+>  	 */
+>  	struct request		*orig_rq;
+>  	spinlock_t		mq_flush_lock;
+> +	blk_status_t 		rq_status;
+>  };
+>  
+>  extern struct kmem_cache *blk_requestq_cachep;
+> @@ -47,6 +48,11 @@ static inline void __blk_get_queue(struct request_queue *q)
+>  	kobject_get(&q->kobj);
+>  }
+>  
+> +static inline bool
+> +is_flush_rq(struct request *req, struct blk_mq_hw_ctx *hctx) {
+> +	return hctx->fq->flush_rq == req;
+> +}
 
-diff --git a/src/Makefile b/src/Makefile
-index 917d6f4..acd7327 100644
---- a/src/Makefile
-+++ b/src/Makefile
-@@ -10,7 +10,8 @@ C_TARGETS := \
- 	sg/syzkaller1 \
- 	nbdsetsize \
- 	loop_change_fd \
--	zbdioctl
-+	zbdioctl \
-+	mount_clear_sock
- 
- CXX_TARGETS := \
- 	discontiguous-io
-diff --git a/src/mount_clear_sock.c b/src/mount_clear_sock.c
-new file mode 100644
-index 0000000..f6eef5a
---- /dev/null
-+++ b/src/mount_clear_sock.c
-@@ -0,0 +1,68 @@
-+// SPDX-License-Identifier: GPL-3.0+
-+// Copyright (C) 2019 Sun Ke
-+
-+#include <stdio.h>
-+#include <stdlib.h>
-+
-+#include <sys/types.h>
-+#include <sys/stat.h>
-+#include <fcntl.h>
-+
-+#include <linux/nbd.h>
-+#include <assert.h>
-+#include <sys/wait.h>
-+#include <unistd.h>
-+#include <string.h>
-+#include <sys/ioctl.h>
-+#include <sys/mount.h>
-+#include <linux/fs.h>
-+
-+void clear_sock(int fd)
-+{
-+	int err;
-+
-+	err = ioctl(fd, NBD_CLEAR_SOCK, 0);
-+	if (err) {
-+		perror("ioctl");
-+	}
-+}
-+
-+void mount_nbd(char *dev, char *mp, char *fs)
-+{
-+	mount(dev, mp, fs, MS_NOSUID | MS_SYNCHRONOUS, 0);
-+	umount(mp);
-+}
-+
-+int main(int argc, char **argv)
-+{
-+	if (argc != 4) {
-+		fprintf(stderr, "usage: $0 MOUNTPOINT DEV FS");
-+		return EXIT_FAILURE;
-+	}
-+
-+	char *mp = argv[1];
-+	char *dev = argv[2];
-+	char *fs = argv[3];
-+	
-+	static int fd = -1;
-+
-+	fd = open(dev, O_RDWR);
-+	if (fd < 0 ) {
-+		perror("open");
-+	}
-+
-+	if (fork() == 0) {
-+		mount_nbd(dev, mp, fs);
-+		exit(0);
-+	}
-+	if (fork() == 0) {
-+		clear_sock(fd);
-+		exit(0);
-+	}
-+	while(wait(NULL) > 0)
-+		continue;
-+	
-+	close(fd);
-+
-+	return 0;
-+}
-diff --git a/tests/nbd/003 b/tests/nbd/003
-new file mode 100644
-index 0000000..45093aa
---- /dev/null
-+++ b/tests/nbd/003
-@@ -0,0 +1,66 @@
-+#!/bin/bash
-+
-+# SPDX-License-Identifier: GPL-3.0+
-+# Copyright (C) 2019 Sun Ke
-+#
-+# Test nbd device resizing. Regression test for patch 
-+#
-+# 2b5c8f0063e4 ("nbd: replace kill_bdev() with __invalidate_device() again")
-+
-+
-+DESCRIPTION="resize a connected nbd device"
-+QUICK=1
-+
-+fs_type=ext4
-+disk_capacity=256M
-+run_cnt=1
-+
-+requires() {
-+	_have_nbd && _have_src_program mount_clear_sock
-+}
-+
-+_start_nbd_mount_server() {
-+
-+	fallocate -l $1 "${TMPDIR}/mnt_$i"
-+
-+	if [[ "$2"x = "ext4"x ]]; then
-+		mkfs.ext4 "${TMPDIR}/mnt_$i" >> "$FULL" 2>&1
-+	else
-+		mkdosfs "${TMPDIR}/mnt_$i" >> "$FULL" 2>&1
-+	fi
-+	nbd-server 800$i "${TMPDIR}/mnt_$i" >> "$FULL" 2>&1
-+
-+	mkdir -p "${TMPDIR}/$i"
-+}
-+
-+_stop_nbd_mount_server() {
-+	pkill -9 -f 800$i
-+	rm -f "${TMPDIR}/mnt_$i"
-+	rm -rf "${TMPDIR}/$i"
-+}
-+
-+test() {
-+	echo "Running ${TEST_NAME}"
-+	for ((i = 0; i < 15; i++))
-+	do
-+		_start_nbd_mount_server  $disk_capacity $fs_type
-+		nbd-client localhost 800$i /dev/nbd$i >> "$FULL" 2>&1
-+		if [[ "$?" -ne "0" ]]; then
-+			echo "nbd$i connnect failed" 
-+		fi 
-+	done
-+
-+	for ((j = 0; j < $run_cnt; j++))
-+	do
-+		for ((i = 0; i < 15; i++))
-+		do
-+			src/mount_clear_sock  "${TMPDIR}/$i" /dev/nbd$i $fs_type
-+		done
-+	done	
-+
-+	for ((i = 0; i < 15; i++))
-+	do
-+		nbd-client -d /dev/nbd$i
-+		_stop_nbd_mount_server
-+	done
-+}
-diff --git a/tests/nbd/003.out b/tests/nbd/003.out
-new file mode 100644
-index 0000000..aa340db
---- /dev/null
-+++ b/tests/nbd/003.out
-@@ -0,0 +1 @@
-+Running nbd/003
--- 
-2.13.6
+We usually don't put '{' at the end of function name line.
 
+Once the above patch style comments are addressed, feel free to add:
+
+Reviewed-by: Ming Lei <ming.lei@redhat.com>
+
+
+thanks,
+Ming
