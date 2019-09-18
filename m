@@ -2,125 +2,160 @@ Return-Path: <SRS0=kmcw=XN=vger.kernel.org=linux-block-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-2.3 required=3.0 tests=DKIM_SIGNED,DKIM_VALID,
-	HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,
-	URIBL_BLOCKED,USER_AGENT_SANE_1 autolearn=no autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-6.8 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
+	INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS
+	autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 6DECFC4CECD
-	for <linux-block@archiver.kernel.org>; Wed, 18 Sep 2019 02:01:26 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id D0130C4CECD
+	for <linux-block@archiver.kernel.org>; Wed, 18 Sep 2019 02:10:59 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.kernel.org (Postfix) with ESMTP id 39E4221881
-	for <linux-block@archiver.kernel.org>; Wed, 18 Sep 2019 02:01:26 +0000 (UTC)
-Authentication-Results: mail.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel-dk.20150623.gappssmtp.com header.i=@kernel-dk.20150623.gappssmtp.com header.b="WK6FmzdO"
+	by mail.kernel.org (Postfix) with ESMTP id AB00F214AF
+	for <linux-block@archiver.kernel.org>; Wed, 18 Sep 2019 02:10:59 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1726628AbfIRCBZ (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Tue, 17 Sep 2019 22:01:25 -0400
-Received: from mail-pg1-f194.google.com ([209.85.215.194]:36687 "EHLO
-        mail-pg1-f194.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1726622AbfIRCBZ (ORCPT
-        <rfc822;linux-block@vger.kernel.org>);
-        Tue, 17 Sep 2019 22:01:25 -0400
-Received: by mail-pg1-f194.google.com with SMTP id m29so3052084pgc.3
-        for <linux-block@vger.kernel.org>; Tue, 17 Sep 2019 19:01:24 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=kernel-dk.20150623.gappssmtp.com; s=20150623;
-        h=subject:to:cc:references:from:message-id:date:user-agent
-         :mime-version:in-reply-to:content-language:content-transfer-encoding;
-        bh=PZ/iwWlYxXMRtVtOPXlBRri4mbuf6F3coWiuomrpcXA=;
-        b=WK6FmzdOGPQRDiGiJV4re6vl0RwGgq5gWaNAOeW5Lc6MSaiu6FChClGxO2FKp1utHh
-         WbKSJAv/hFVqyRVb69S402NeJ0EMP+6zAwwMNIcYcG79m0o5OlH22lw9XNIwr+h4yMm/
-         AyP0ldbDytHVLQzkn39uveSWyxuV8szMNvJ03s2U41bjMtqPrhACwtwkRdb+Am0hllDl
-         CEvlk0Lz2UU2wNzK/xPe2NHTKHFl8YG4KfFrMDPar4FqWuhihE4qchKUwhkrL4RN3ksM
-         KKyf4EyQz7YEXcqd/X5IAXqpNe/9pJYZlGtaZwenJ4zeZWyBwneqzAP0TQr9LWrXeoVZ
-         PrJg==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20161025;
-        h=x-gm-message-state:subject:to:cc:references:from:message-id:date
-         :user-agent:mime-version:in-reply-to:content-language
-         :content-transfer-encoding;
-        bh=PZ/iwWlYxXMRtVtOPXlBRri4mbuf6F3coWiuomrpcXA=;
-        b=IK512FZscqBjWoigdtotieqaRo05witOdQo3gjtpxusAllZd2UGHSACD2YhvnVjNeh
-         xmLZO6ayMcrFA1kukmTf1tu2qdmAEwdcO0qA8wLKVbroF0fwyAzAJ5P8R+sWkqg9JHo0
-         kAlL3/z/LHuYJ3r42uYJjOzGX97BlcoYsVR6mmVm/YzB+ZW+k3+Y8QsmEAV+EppYeNHT
-         UTSaiNvbUNWDTPKKdiQgVLz5C+cwS2CgYVWvAnd6eye6bAFgAEaLtaOA/jf32xBMjdY/
-         aj+kY10TJ6ZVEiH5lCu1RqHWnFPNGRNbYVDcOMAg+3u6R1qzIc1OEn2inFbyLST5MBT+
-         /jug==
-X-Gm-Message-State: APjAAAW70IfI1bed9/8pEoOe6z3+DcJcbgpbsBs0tmFVIZ82mbd1ubQ5
-        kK0TfdMr3EpI7DaCZ/+a7bC5dYeQd6D2bA==
-X-Google-Smtp-Source: APXvYqx47p/wTcU9Rw12tmczxEEZ850D0+U7cw6giwFjzvVOONZpvxPaXcu3K24kOoPB0IhMd3hrNA==
-X-Received: by 2002:a17:90a:244f:: with SMTP id h73mr1155764pje.137.1568772083458;
-        Tue, 17 Sep 2019 19:01:23 -0700 (PDT)
-Received: from [192.168.1.188] ([66.219.217.79])
-        by smtp.gmail.com with ESMTPSA id f12sm3671390pfn.73.2019.09.17.19.01.21
-        (version=TLS1_2 cipher=ECDHE-RSA-AES128-GCM-SHA256 bits=128/128);
-        Tue, 17 Sep 2019 19:01:22 -0700 (PDT)
-Subject: Re: [GIT PULL] Block changes for 5.4
-To:     Linus Torvalds <torvalds@linux-foundation.org>
+        id S1726786AbfIRCK7 convert rfc822-to-8bit (ORCPT
+        <rfc822;linux-block@archiver.kernel.org>);
+        Tue, 17 Sep 2019 22:10:59 -0400
+Received: from smtpbgau1.qq.com ([54.206.16.166]:56006 "EHLO smtpbgau1.qq.com"
+        rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
+        id S1726677AbfIRCK6 (ORCPT <rfc822;linux-block@vger.kernel.org>);
+        Tue, 17 Sep 2019 22:10:58 -0400
+X-QQ-mid: bizesmtp18t1568772621tdfa04l9
+Received: from [192.168.142.168] (unknown [218.76.23.26])
+        by esmtp6.qq.com (ESMTP) with 
+        id ; Wed, 18 Sep 2019 10:10:20 +0800 (CST)
+X-QQ-SSF: 00400000002000R0YS90000A0000000
+X-QQ-FEAT: RUJ7g7zpdcHzhxwlCdfhn8AQ5+3eiJ9ebdvr6OgNKy8H3qV2dINV9iy7MK000
+        9+LCo+Gq6B1+DaFw0qSF5FEdHuYPPZdl21B7ABfk6Brq8laQ+lH6KFWhrLGSRqnCQRSCX4V
+        tgcc5a8EFE9QRsXBPWYyJeCtjNNqqrUefUaGrxU+5414BKvlt0NqsuCD8F8fugBtHlrto1v
+        fF00o8ln3XHbp2da1lHY8x+I2GWO3tXrpVa2d/GqKAW+dJ7JC52BGLQ4NzWo7jl+K7veS+3
+        oegWQ/dNzTBTdvKK7NCFEjGoujDeILhfF4eEgUaAS8PEJTzfwNn6uvTuhBPqJo6kXKoOVDu
+        GD4jCX0MTjV7+0clBE=
+X-QQ-GoodBg: 2
+Content-Type: text/plain;
+        charset=gb2312
+Mime-Version: 1.0 (Mac OS X Mail 12.4 \(3445.104.11\))
+Subject: Re: [PATCH v2] io_uring: IORING_OP_TIMEOUT support
+From:   Jackie Liu <liuyun01@kylinos.cn>
+In-Reply-To: <afda2462-d192-7f95-6a26-b2e604d57463@kernel.dk>
+Date:   Wed, 18 Sep 2019 10:10:19 +0800
 Cc:     "linux-block@vger.kernel.org" <linux-block@vger.kernel.org>
-References: <61b11672-f41b-9708-2486-f284a99483a8@kernel.dk>
- <CAHk-=whhKxxJ8yM1StiPcb8866PzxLBB77_d+MEA3SKY4hhjjg@mail.gmail.com>
-From:   Jens Axboe <axboe@kernel.dk>
-Message-ID: <6f98e8a4-f3cb-a700-ac1a-5a61f3c2ecde@kernel.dk>
-Date:   Tue, 17 Sep 2019 20:01:20 -0600
-User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:60.0) Gecko/20100101
- Thunderbird/60.8.0
-MIME-Version: 1.0
-In-Reply-To: <CAHk-=whhKxxJ8yM1StiPcb8866PzxLBB77_d+MEA3SKY4hhjjg@mail.gmail.com>
-Content-Type: text/plain; charset=utf-8
-Content-Language: en-US
-Content-Transfer-Encoding: 7bit
+Content-Transfer-Encoding: 8BIT
+Message-Id: <2B8F505A-4501-422C-A93D-7FBA559AE43B@kylinos.cn>
+References: <afda2462-d192-7f95-6a26-b2e604d57463@kernel.dk>
+To:     Jens Axboe <axboe@kernel.dk>
+X-Mailer: Apple Mail (2.3445.104.11)
+X-QQ-SENDSIZE: 520
+Feedback-ID: bizesmtp:kylinos.cn:qybgforeign:qybgforeign4
+X-QQ-Bgrelay: 1
 Sender: linux-block-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-On 9/17/19 6:18 PM, Linus Torvalds wrote:
-> On Mon, Sep 16, 2019 at 7:52 AM Jens Axboe <axboe@kernel.dk> wrote:
->>
->> - blk-cgroup writeback fixes (Tejun)
-> 
-> Well, that's a very short description of a pretty subtle series.
-> 
-> Honestly, I would much rather have seen this as three completely
-> separate pull requests:
-> 
->   - the writeback and cgroup stuff
-> 
->   - the core queuing changes
-> 
->   - the nvme driver updates
-> 
->   - the other driver updates
-> 
-> because right now this pull request is just a mess of completely
-> unrelated stuff that just shares a very weak common thread of "yeah,
-> it's related to block devices".
-> 
-> I've pulled this, but can you please just split driver stuff out from
-> core queue handling code that is largely independent of any particular
-> driver, and very much out from core VM writeback?
-> 
-> They really have almost nothing to do with each other, and I don't see
-> why you are randomly mixing these things up.
-> 
-> It makes it much harder to review the end result, and I think one
-> example of the weakness of this is the almost useless merge message
-> that didn't really talk much about these "fixes" (which is already not
-> really a proper description - those patches are really more like a
-> completely new way of doing certain cases of writeback, and much more
-> fundamental than just "some random fix that gets a single liner in
-> between other stuff").
 
-Point taken, I have sometimes done writeback specific branches, I guess
-they got mixed up this time since it Tejun also had blk-cgroup writeback
-changes.
+在 2019年9月18日，03:38，Jens Axboe <axboe@kernel.dk> 写道：
+> 
+> There's been a few requests for functionality similar to io_getevents()
+> and epoll_wait(), where the user can specify a timeout for waiting on
+> events. I deliberately did not add support for this through the system
+> call initially to avoid overloading the args, but I can see that the use
+> cases for this are valid.
+> 
+> This adds support for IORING_OP_TIMEOUT. If a user wants to get woken
+> when waiting for events, simply submit one of these timeout commands
+> with your wait call (or before). This ensures that the application
+> sleeping on the CQ ring waiting for events will get woken. The timeout
+> command is passed in as a pointer to a struct timespec. Timeouts are
+> relative.
+> 
+> Signed-off-by: Jens Axboe <axboe@kernel.dk>
+> 
+> ---
+> 
+> V2
+> 
+> - Ensure any timeout will result in a return to userspace from
+>  io_cqring_wait().
+> - Improve commit message
+> - Add ->file to struct io_timeout
+> - Kill separate 'kt' value, use timespec_to_kt() directly
+> 
+> diff --git a/fs/io_uring.c b/fs/io_uring.c
+> index 0dadbdbead0f..02db09b89e83 100644
+> --- a/fs/io_uring.c
+> +++ b/fs/io_uring.c
+> @@ -216,6 +216,7 @@ struct io_ring_ctx {
+> 		struct wait_queue_head	cq_wait;
+> 		struct fasync_struct	*cq_fasync;
+> 		struct eventfd_ctx	*cq_ev_fd;
+> +		atomic_t		cq_timeouts;
+> 	} ____cacheline_aligned_in_smp;
+> 
+> 	struct io_rings	*rings;
+> @@ -283,6 +284,11 @@ struct io_poll_iocb {
+> 	struct wait_queue_entry		wait;
+> };
+> 
+> +struct io_timeout {
+> +	struct file			*file;
+> +	struct hrtimer			timer;
+> +};
+> +
+> /*
+>  * NOTE! Each of the iocb union members has the file pointer
+>  * as the first entry in their struct definition. So you can
+> @@ -294,6 +300,7 @@ struct io_kiocb {
+> 		struct file		*file;
+> 		struct kiocb		rw;
+> 		struct io_poll_iocb	poll;
+> +		struct io_timeout	timeout;
+> 	};
+> 
+> 	struct sqe_submit	submit;
+> @@ -1765,6 +1772,35 @@ static int io_poll_add(struct io_kiocb *req, const struct io_uring_sqe *sqe)
+> 	return ipt.error;
+> }
+> 
+> +static enum hrtimer_restart io_timeout_fn(struct hrtimer *timer)
+> +{
+> +	struct io_kiocb *req;
+> +
+> +	req = container_of(timer, struct io_kiocb, timeout.timer);
+> +	atomic_inc(&req->ctx->cq_timeouts);
+> +	io_cqring_add_event(req->ctx, req->user_data, 0);
+> +	io_put_req(req);
+> +	return HRTIMER_NORESTART;
+> +}
+> +
+> +static int io_timeout(struct io_kiocb *req, const struct io_uring_sqe *sqe)
+> +{
+> +	struct timespec ts;
+> +
+> +	if (sqe->flags || sqe->ioprio || sqe->off || sqe->buf_index)
+> +		return -EINVAL;
+> +	if (sqe->len != 1)
+> +		return -EINVAL;
 
-We also don't have a lot of driver vs core inter-mingled churn anymore,
-which is great, so I can start doing driver branches again like.
+Should we need this?
 
-Thanks for pulling, I'll organize things separately going forward.
+if (unlikely(ctx->flags & IORING_SETUP_IOPOLL))
+	return -EINVAL;
 
--- 
-Jens Axboe
+Otherwise it will be queue by io_iopoll_req_issued.
+
+> +	if (copy_from_user(&ts, (void __user *) sqe->addr, sizeof(ts)))
+> +		return -EFAULT;
+> +
+> +	hrtimer_init(&req->timeout.timer, CLOCK_MONOTONIC, HRTIMER_MODE_REL);
+> +	req->timeout.timer.function = io_timeout_fn;
+> +	hrtimer_start(&req->timeout.timer, timespec_to_ktime(ts),
+> +			HRTIMER_MODE_REL);
+> +	return 0;
+> +}
+> +
+
+--
+BR, Jackie Liu
+
+
 
