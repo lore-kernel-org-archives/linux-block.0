@@ -2,121 +2,152 @@ Return-Path: <SRS0=kmcw=XN=vger.kernel.org=linux-block-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-2.3 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
-	MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,USER_AGENT_SANE_2 autolearn=no
-	autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-0.9 required=3.0 tests=DKIM_SIGNED,DKIM_VALID,
+	DKIM_VALID_AU,HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SPF_HELO_NONE,
+	SPF_PASS autolearn=no autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 0094EC4CEC9
-	for <linux-block@archiver.kernel.org>; Wed, 18 Sep 2019 11:25:46 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 4D1CDC4CEC4
+	for <linux-block@archiver.kernel.org>; Wed, 18 Sep 2019 12:02:31 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.kernel.org (Postfix) with ESMTP id D2211214AF
-	for <linux-block@archiver.kernel.org>; Wed, 18 Sep 2019 11:25:45 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id 204E72054F
+	for <linux-block@archiver.kernel.org>; Wed, 18 Sep 2019 12:02:31 +0000 (UTC)
+Authentication-Results: mail.kernel.org;
+	dkim=pass (2048-bit key) header.d=cloud.ionos.com header.i=@cloud.ionos.com header.b="WS5RL2Z0"
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1730029AbfIRLZo (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Wed, 18 Sep 2019 07:25:44 -0400
-Received: from smtpi.uni-freiburg.de ([132.230.2.212]:39798 "EHLO
-        smtp2.uni-freiburg.de" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1726268AbfIRLZo (ORCPT
+        id S1729616AbfIRMCa (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Wed, 18 Sep 2019 08:02:30 -0400
+Received: from mail-wr1-f65.google.com ([209.85.221.65]:43847 "EHLO
+        mail-wr1-f65.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S1726565AbfIRMCa (ORCPT
         <rfc822;linux-block@vger.kernel.org>);
-        Wed, 18 Sep 2019 07:25:44 -0400
-X-Greylist: delayed 3575 seconds by postgrey-1.27 at vger.kernel.org; Wed, 18 Sep 2019 07:25:42 EDT
-Delivery-date: Wed, 18 Sep 2019 13:25:42 +0200
-Received: from fe2.uni-freiburg.de ([132.230.2.222] helo=uni-freiburg.de) port 55426 
-        by smtp2.uni-freiburg.de with esmtp
-        ( Exim )
-        id 1iAX9u-0001wr-QV; Wed, 18 Sep 2019 12:26:02 +0200
-Received: from [132.230.8.113] (account simon.rettberg@rz.uni-freiburg.de HELO dellnichtsogutkiste)
-  by mail.uni-freiburg.de (CommuniGate Pro SMTP 6.2.12)
-  with ESMTPSA id 38824255; Wed, 18 Sep 2019 12:26:02 +0200
-Date:   Wed, 18 Sep 2019 12:26:02 +0200
-From:   Simon Rettberg <simon.rettberg@rz.uni-freiburg.de>
-To:     Ming Lei <ming.lei@redhat.com>
-Cc:     Manuel Bentele <development@manuel-bentele.de>,
-        linux-block@vger.kernel.org
-Subject: Re: [PATCH 0/5] block: loop: add file format subsystem and QCOW2
- file format driver
-Message-ID: <20190918122602.4f451fb1@dellnichtsogutkiste>
-In-Reply-To: <20190916021129.GC5162@ming.t460p>
-References: <20190823225619.15530-1-development@manuel-bentele.de>
-        <20190912022359.GD2731@ming.t460p>
-        <dc9e1697-ee11-622a-0f48-ebd65ff2a4e7@manuel-bentele.de>
-        <20190916021129.GC5162@ming.t460p>
-Organization: Rechenzentrum Uni Freiburg
-X-Mailer: Claws Mail 3.16.0 (GTK+ 2.24.32; x86_64-pc-linux-gnu)
+        Wed, 18 Sep 2019 08:02:30 -0400
+Received: by mail-wr1-f65.google.com with SMTP id q17so6590750wrx.10
+        for <linux-block@vger.kernel.org>; Wed, 18 Sep 2019 05:02:29 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=cloud.ionos.com; s=google;
+        h=mime-version:references:in-reply-to:from:date:message-id:subject:to
+         :cc;
+        bh=1S9EMCNitqnrAe9ZtMh+zE7B61LAucDMksRsfpqkqsk=;
+        b=WS5RL2Z0GVuSnGv5lEaRXOXb+g8GL8vHlQV6wb73W2te4MU/oRKjZxS495y2RUOyjZ
+         QIDaauPkIhpsaInO0SmfrMnw5rlJKzE1x4sVEY0x3AEzPI95QSUn2U6tJgxeGTcLn41C
+         o11jiQEnd7vhKSXYGuqK6PbjUA3KykcwpvsbE3A8zDFlj5PGeFtoUqwaaMQ1VK7F8QlX
+         lfXczY0cWVwYrrMaVWqK2NsKy8P2tJXe91FEdhJSxrp7R/ca6pxEX5KPampPOIKGUuAz
+         2FAF/o+6d2zgHmNCJaiN5i+K5yNHzHqagvTnF3GgXedIxAI8JsYsSHyLdWIcmbD+C0nL
+         2AKA==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20161025;
+        h=x-gm-message-state:mime-version:references:in-reply-to:from:date
+         :message-id:subject:to:cc;
+        bh=1S9EMCNitqnrAe9ZtMh+zE7B61LAucDMksRsfpqkqsk=;
+        b=dOmSlTh5JVQrmciwfY/GV30qFWcU6DM0Qn8Or5kYwLjoRng/L3LDTe5wj2Sg3kbJMq
+         PlA8/5LYG/HqYiQnPtQPG8iQyJ1ECs4Q55pIMj/7t+dRf5r9Go7sUyinql6Vkl0pFwSe
+         41Uejga7fUA8mqDT6Kz9Mrvz2LJeY8t9KDWzcOdn/WwmFn/551kYB5Mr4GuLofVcxUKk
+         ncXFRvZshTyBP3J3CSszWlqPzlB75pt6THkSUFVDHg1CVufR2ECjhgntgPvDlUalr4MQ
+         KAdxi1arpewz1ZFFYXKCW2WERoBavz5i+J2B76WqGGC9iDjdT5uFMQtvqSR0tkK6ellZ
+         9sxw==
+X-Gm-Message-State: APjAAAX04PCY/hs0e92eGbwpPU6xhRyXmjLwTflIC4gqq5jCJ62HC5+i
+        7isE6IZS6ma88ZzwnXBTi1KuGDMfZuOrHd1Sbq4IOw==
+X-Google-Smtp-Source: APXvYqzxv5eWcHvWyQeHvaamQCHqPD4Ul8vbG+Ra6SSEc1YFAs3JLeQ0zkzWe++KiEXK6V6uvKjuHruPHgCd2rei78Y=
+X-Received: by 2002:a5d:4f0d:: with SMTP id c13mr2912476wru.317.1568808147967;
+ Wed, 18 Sep 2019 05:02:27 -0700 (PDT)
 MIME-Version: 1.0
-Content-Type: text/plain; charset=US-ASCII
-Content-Transfer-Encoding: 7bit
+References: <20190620150337.7847-1-jinpuwang@gmail.com> <20190620150337.7847-18-jinpuwang@gmail.com>
+ <bd8963e2-d186-dbd0-fe39-7f4a518f4177@acm.org> <CAMGffEn6=P8bLi7SyUC19+7wbU6YEZ_5BqjR06+CBKvENw-tFg@mail.gmail.com>
+ <5a14b67d-9e32-c599-6525-7564becd526a@acm.org>
+In-Reply-To: <5a14b67d-9e32-c599-6525-7564becd526a@acm.org>
+From:   Jinpu Wang <jinpu.wang@cloud.ionos.com>
+Date:   Wed, 18 Sep 2019 14:02:16 +0200
+Message-ID: <CAMGffEkbKU10_2eoFoitkWNFLydE1MukOh9jHsQCqWr0KT9V_Q@mail.gmail.com>
+Subject: Re: [PATCH v4 17/25] ibnbd: client: main functionality
+To:     Bart Van Assche <bvanassche@acm.org>
+Cc:     Jack Wang <jinpuwang@gmail.com>, linux-block@vger.kernel.org,
+        linux-rdma@vger.kernel.org, Jens Axboe <axboe@kernel.dk>,
+        Christoph Hellwig <hch@infradead.org>,
+        Sagi Grimberg <sagi@grimberg.me>,
+        Jason Gunthorpe <jgg@mellanox.com>,
+        Doug Ledford <dledford@redhat.com>,
+        Danil Kipnis <danil.kipnis@cloud.ionos.com>, rpenyaev@suse.de,
+        Roman Pen <roman.penyaev@profitbricks.com>
+Content-Type: text/plain; charset="UTF-8"
 Sender: linux-block-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-Hi everyone,
+On Tue, Sep 17, 2019 at 6:46 PM Bart Van Assche <bvanassche@acm.org> wrote:
+>
+> On 9/17/19 6:09 AM, Jinpu Wang wrote:
+> >>> +static void ibnbd_softirq_done_fn(struct request *rq)
+> >>> +{
+> >>> +     struct ibnbd_clt_dev *dev       = rq->rq_disk->private_data;
+> >>> +     struct ibnbd_clt_session *sess  = dev->sess;
+> >>> +     struct ibnbd_iu *iu;
+> >>> +
+> >>> +     iu = blk_mq_rq_to_pdu(rq);
+> >>> +     ibnbd_put_tag(sess, iu->tag);
+> >>> +     blk_mq_end_request(rq, iu->status);
+> >>> +}
+> >>> +
+> >>> +static void msg_io_conf(void *priv, int errno)
+> >>> +{
+> >>> +     struct ibnbd_iu *iu = (struct ibnbd_iu *)priv;
+> >>> +     struct ibnbd_clt_dev *dev = iu->dev;
+> >>> +     struct request *rq = iu->rq;
+> >>> +
+> >>> +     iu->status = errno ? BLK_STS_IOERR : BLK_STS_OK;
+> >>> +
+> >>> +     if (softirq_enable) {
+> >>> +             blk_mq_complete_request(rq);
+> >>> +     } else {
+> >>> +             ibnbd_put_tag(dev->sess, iu->tag);
+> >>> +             blk_mq_end_request(rq, iu->status);
+> >>> +     }
+> >>
+> >> Block drivers must call blk_mq_complete_request() instead of
+> >> blk_mq_end_request() to complete a request after processing of the
+> >> request has been started. Calling blk_mq_end_request() to complete a
+> >> request is racy in case a timeout occurs while blk_mq_end_request() is
+> >> in progress.
+> >
+> > Could you elaborate a bit more, blk_mq_end_request is exported function and
+> > used by a lot of block drivers: scsi, dm, etc.
+> > Is there an open bug report for the problem?
+>
+> Hi Jinpu,
+>
+> There is only one blk_mq_end_request() call in the SCSI code and it's
+> inside the FC timeout handler (fc_bsg_job_timeout()). Calling
+> blk_mq_end_request() from inside a timeout handler is fine but not to
+> report to the block layer that a request has completed from outside the
+> timeout handler after a request has started.
+>
+> The device mapper calls blk_mq_complete_request() to report request
+> completion to the block layer. See also dm_complete_request().
+> blk_mq_end_request() is only called by the device mapper from inside
+> dm_softirq_done(). That last function is called from inside
+> blk_mq_complete_request() and is not called directly.
+>
+> The NVMe PCIe driver only calls blk_mq_end_request() from inside
+> nvme_complete_rq(). nvme_complete_rq() is called by the PCIe driver from
+> inside nvme_pci_complete_rq() and that last function is called from
+> inside blk_mq_complete_request().
+>
+> In other words, the SCSI core, the device mapper and the NVMe PCIe
+> driver all use blk_mq_complete_request() to report request completion to
+> the block layer from outside timeout handlers after a request has been
+> started.
+>
+> This is not a new requirement. I think that the legacy block layer
+> equivalent, blk_complete_request(), was introduced in 2006 and that
+> since then block drivers are required to call blk_complete_request() to
+> report completion of requests from outside a timeout handler after these
+> have been started.
+>
+> Bart.
 
-chiming in for clearing this up a bit.
+Thanks for the detailed explanation, I will switch to
+blk_mq_complete_request(), will also drop the
+softirq_done module parameter, not useful.
 
-> Got it, looks a good use case for compression, but not has to be
-> QCOW2.
-> 
-> > 
-> > The network boot infrastructure is based on a classical PXE network
-> > boot to load the Linux kernel and the initramfs. In the initramfs,
-> > the compressed QCOW2 image is fetched via nfs or cifs or something
-> > else. The fetched QCOW2 image is now decompressed and read in the
-> > kernel. Compared to a decompression and read in the user space,
-> > like qemu-nbd does, this approach does not need any user space
-> > process, is faster and avoids switchroot problems.  
-> 
-> This image can be compressed via xz, and fetched via wget or what
-> ever. 'xz' could have better compression ratio than qcow2, I guess.
-
-"Fetch" was probably a bit ambiguous. The image isn't downloaded, but
-mounted directly from the network (streamed?), so we can benefit from
-the per-cluster compression of qcow2, similar to squashfs but on the
-block layer. A typical image is between 3 and 10GB with qcow2
-compression, so downloading it entirely on boot to be able to
-decompress it is not feasible.
-
-> As I mentioned above, seems not necessary to introduce loop-qcow2.
-
-Yes, there are many ways to achieve this. The basic concept of network
-booting the workstations has been practiced here for almost 15 years
-now using very different approaches like plain old NFS mounts for the
-root filesystem, squashfs containers that get downloaded, or streamed
-over network. But since our requirement is a stateless system, we need
-a copy-on-write layer on top of this. In the beginnings we did this
-with unionfs and then aufs, but as these operate on the file-system
-layer they have several drawbacks and relatively high complexity
-compared to block-layer CoW. So we switched to a block-based approach
-about 4 years ago. For reasons stated before, we wanted to use some
-form of compression, as was possible with squashfs before, so after
-some experimenting, qcow2 proved to be a good fit. However, adding in
-user-space tools like qemu-nbd or xmount added too much of a
-performance penalty and initially, also some problems during the
-switchroot from initrd to the actual root file system.
-
-So the current process looks as follows: kernel + initrd are
-loaded via iPXE. initrd sets up network, mounts NFS share or connects
-to server via NBD to access the qcow2 image. Modified losetup sets up
-access to qcow2 image, either from NFS share or
-directly from /dev/nbd0. Finally, mount /dev/loop0pXX and switch to new
-root.
-
-Manuel's implementation has so far proven to be very reliable and
-brought noticeable performance improvements compared to having a user
-space process doing the qcow2 handling.
-
-So we would have really liked the idea of having his changes
-upstreamed, I think he did a very good job by designing a plugin
-infrastructure for the loop device and making the qcow2 plugin a
-separate module. We knew about the concerns of adding code for handling
-a file format in the kernel and were hoping that maybe an acceptable
-compromise would be to have his changes added to the kernel minus the
-actual qcow2 plugin, so it is mostly a refactoring of the old loop
-device that's not adding too much complexity (hopefully). But if we're
-really such an oddball use-case here that this won't possibly be of any
-interest to anybody else we will just have to go forward maintaining
-this out of tree entirely.
-
-Thanks for your time,
-Simon
+Regards,
+Jinpu
