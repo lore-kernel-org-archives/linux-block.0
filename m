@@ -2,133 +2,117 @@ Return-Path: <SRS0=kmcw=XN=vger.kernel.org=linux-block-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-2.3 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
-	MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,USER_AGENT_SANE_1 autolearn=no
-	autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-2.6 required=3.0 tests=DKIMWL_WL_HIGH,DKIM_SIGNED,
+	DKIM_VALID,DKIM_VALID_AU,MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,
+	USER_AGENT_SANE_1 autolearn=no autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id A907FC4CED0
-	for <linux-block@archiver.kernel.org>; Wed, 18 Sep 2019 15:26:45 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id D288EC4CECE
+	for <linux-block@archiver.kernel.org>; Wed, 18 Sep 2019 15:32:55 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.kernel.org (Postfix) with ESMTP id 85B1F207FC
-	for <linux-block@archiver.kernel.org>; Wed, 18 Sep 2019 15:26:45 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id A9B3A207FC
+	for <linux-block@archiver.kernel.org>; Wed, 18 Sep 2019 15:32:55 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+	s=default; t=1568820775;
+	bh=6fG+7cFY8qKmNTeE0/oK7OzO5e+bx/UyTCd8HlUszGk=;
+	h=Date:From:To:Cc:Subject:References:In-Reply-To:List-ID:From;
+	b=T9r6WJP6aveREkB7sHu3DO/oAcJ4btu/oerPsTz8aB48TTqvkHofwhRPO3+rz00hB
+	 hut2Is0JW+mVGd4P1LKwA24gMxA851AxFWI/uPpf2Lr1IVSYm1HgYq+SZsuG/8w4AK
+	 uga1KNxXoDiITLaSIyu+HMOa2AZxdhDChzLLoinE=
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S2387432AbfIRP0p (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Wed, 18 Sep 2019 11:26:45 -0400
-Received: from mail-pg1-f194.google.com ([209.85.215.194]:41609 "EHLO
-        mail-pg1-f194.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1728784AbfIRP0o (ORCPT
+        id S2387451AbfIRPcy (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Wed, 18 Sep 2019 11:32:54 -0400
+Received: from heliosphere.sirena.org.uk ([172.104.155.198]:54890 "EHLO
+        heliosphere.sirena.org.uk" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S1729640AbfIRPcy (ORCPT
         <rfc822;linux-block@vger.kernel.org>);
-        Wed, 18 Sep 2019 11:26:44 -0400
-Received: by mail-pg1-f194.google.com with SMTP id x15so34522pgg.8;
-        Wed, 18 Sep 2019 08:26:44 -0700 (PDT)
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20161025;
-        h=x-gm-message-state:subject:to:cc:references:from:message-id:date
-         :user-agent:mime-version:in-reply-to:content-language
-         :content-transfer-encoding;
-        bh=LiAWN9xORF5xFL1JkWkW/9SG66pr86a0+pRqejPd480=;
-        b=XaSZ/TWsDUgqsagB9dEfwjvTpGSvorvAV1wIHHsCCyxW64Ki/2ydr991J8yFnJt6tE
-         fewToVOs9+y1ltFdFEE6jKr5+U7NK3zm0vHWwfvTY8RFnzfV1BCmLrcj9SKqzseAvU35
-         ePR3i93NIg/J9ofEODMbYFoi798YW16IPZJTzeJ4tNEquA8qLfBrcCbiJPRd/rBjSBJV
-         D5jir5vlxFai5QVI2GPF8tSfkpNOv1eIO4OxDoaUJuno4+IiwSA1TUGL40ZIZdUT/XPu
-         6yBMrGU0hHw+ZX00Om7z8jeAVAcYP2MjvkxIOixQuWL9R99N4G14ZICkZGAFuX7tLc9x
-         byzA==
-X-Gm-Message-State: APjAAAXes3uMFJA2Ce2GwhWLqeq1TyuI2CVmDeQbXX3qnEDFuqp+CRjr
-        ev/RzTpjK0/0Xno4exvo16I=
-X-Google-Smtp-Source: APXvYqwJHAUTD10zmU3ovj2Iq95Th7CemQfRKfGZtJAD1OgQmP2ykY90nHlBMWj/MOriee05BBRKig==
-X-Received: by 2002:a63:4c5c:: with SMTP id m28mr4733884pgl.333.1568820403481;
-        Wed, 18 Sep 2019 08:26:43 -0700 (PDT)
-Received: from desktop-bart.svl.corp.google.com ([2620:15c:2cd:202:4308:52a3:24b6:2c60])
-        by smtp.gmail.com with ESMTPSA id s3sm3739294pjq.32.2019.09.18.08.26.42
-        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
-        Wed, 18 Sep 2019 08:26:42 -0700 (PDT)
-Subject: Re: [PATCH v4 15/25] ibnbd: private headers with IBNBD protocol
- structs and helpers
-To:     Jinpu Wang <jinpu.wang@cloud.ionos.com>
-Cc:     Jack Wang <jinpuwang@gmail.com>, linux-block@vger.kernel.org,
-        linux-rdma@vger.kernel.org, Jens Axboe <axboe@kernel.dk>,
-        Christoph Hellwig <hch@infradead.org>,
-        Sagi Grimberg <sagi@grimberg.me>,
-        Jason Gunthorpe <jgg@mellanox.com>,
-        Doug Ledford <dledford@redhat.com>,
-        Danil Kipnis <danil.kipnis@cloud.ionos.com>, rpenyaev@suse.de
-References: <20190620150337.7847-1-jinpuwang@gmail.com>
- <20190620150337.7847-16-jinpuwang@gmail.com>
- <4fbad80b-f551-131e-9a5c-a24f1fa98fea@acm.org>
- <CAMGffEnVFHpmDCiazHFX1jwi4=p401T9goSkes3j1AttV0t1Ng@mail.gmail.com>
- <CAMGffE=Vsbv5O7rCSq_ymA-UXPaSWT_bMfZ+AK-2f1Z=zMMtyQ@mail.gmail.com>
-From:   Bart Van Assche <bvanassche@acm.org>
-Message-ID: <66dcf1ac-53b8-aa0c-cda2-4919281500d0@acm.org>
-Date:   Wed, 18 Sep 2019 08:26:41 -0700
-User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:60.0) Gecko/20100101
- Thunderbird/60.8.0
+        Wed, 18 Sep 2019 11:32:54 -0400
+DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed;
+        d=sirena.org.uk; s=20170815-heliosphere; h=In-Reply-To:Content-Type:
+        MIME-Version:References:Message-ID:Subject:Cc:To:From:Date:Sender:Reply-To:
+        Content-Transfer-Encoding:Content-ID:Content-Description:Resent-Date:
+        Resent-From:Resent-Sender:Resent-To:Resent-Cc:Resent-Message-ID:List-Id:
+        List-Help:List-Unsubscribe:List-Subscribe:List-Post:List-Owner:List-Archive;
+         bh=6fG+7cFY8qKmNTeE0/oK7OzO5e+bx/UyTCd8HlUszGk=; b=ZzuVXWgde4+duuEB1OGFxwXyL
+        zT5zbMFJfP50QtwClsnUB+7Mvd48Bl4ixy1YiIPOVwLntpL1zltX+RHsgjOc6wv4dWoBgou8UMZZQ
+        ScL36uk7mVmpeTbMJjtwoaDJXR5hAOJ8M/NEUgx79e2ESUepbiZtd4qtYE9t6vTQWxB6E=;
+Received: from cpc102320-sgyl38-2-0-cust46.18-2.cable.virginm.net ([82.37.168.47] helo=ypsilon.sirena.org.uk)
+        by heliosphere.sirena.org.uk with esmtpsa (TLS1.3:ECDHE_RSA_AES_256_GCM_SHA384:256)
+        (Exim 4.92)
+        (envelope-from <broonie@sirena.co.uk>)
+        id 1iAbwI-0005tn-Oo; Wed, 18 Sep 2019 15:32:18 +0000
+Received: by ypsilon.sirena.org.uk (Postfix, from userid 1000)
+        id B53AB2742927; Wed, 18 Sep 2019 16:32:17 +0100 (BST)
+Date:   Wed, 18 Sep 2019 16:32:17 +0100
+From:   Mark Brown <broonie@kernel.org>
+To:     Steffen Maier <maier@linux.ibm.com>
+Cc:     "Martin K. Petersen" <martin.petersen@oracle.com>,
+        Ming Lei <tom.leiming@gmail.com>,
+        Paolo Bonzini <pbonzini@redhat.com>,
+        "James E . J . Bottomley" <jejb@linux.ibm.com>,
+        Ming Lei <ming.lei@redhat.com>,
+        Linux-Next Mailing List <linux-next@vger.kernel.org>,
+        Linux SCSI List <linux-scsi@vger.kernel.org>,
+        linux-block <linux-block@vger.kernel.org>,
+        "open list:DEVICE-MAPPER (LVM)" <dm-devel@redhat.com>,
+        linux-s390 <linux-s390@vger.kernel.org>,
+        Benjamin Block <bblock@linux.ibm.com>,
+        Heiko Carstens <heiko.carstens@de.ibm.com>,
+        Vasily Gorbik <gor@linux.ibm.com>,
+        Bart Van Assche <bvanassche@acm.org>,
+        Hannes Reinecke <hare@suse.com>, Jens Axboe <axboe@kernel.dk>,
+        "Ewan D . Milne" <emilne@redhat.com>,
+        Christoph Hellwig <hch@lst.de>,
+        Mike Snitzer <snitzer@redhat.com>
+Subject: Re: [PATCH 1/2] scsi: core: fix missing .cleanup_rq for SCSI hosts
+ without request batching
+Message-ID: <20190918153217.GN2596@sirena.co.uk>
+References: <20190807144948.28265-1-maier@linux.ibm.com>
+ <20190807144948.28265-2-maier@linux.ibm.com>
+ <CACVXFVM0tFj8CmcHON04_KjxR=QErCbUx0abJgG2W9OBb7akZA@mail.gmail.com>
+ <yq136iccsbw.fsf@oracle.com>
+ <bec80a65-9a8c-54a9-fe70-876fcbe3d592@linux.ibm.com>
 MIME-Version: 1.0
-In-Reply-To: <CAMGffE=Vsbv5O7rCSq_ymA-UXPaSWT_bMfZ+AK-2f1Z=zMMtyQ@mail.gmail.com>
-Content-Type: text/plain; charset=utf-8; format=flowed
-Content-Language: en-US
-Content-Transfer-Encoding: 7bit
+Content-Type: multipart/signed; micalg=pgp-sha512;
+        protocol="application/pgp-signature"; boundary="0NB0lE7sNnW8+0qW"
+Content-Disposition: inline
+In-Reply-To: <bec80a65-9a8c-54a9-fe70-876fcbe3d592@linux.ibm.com>
+X-Cookie: The devil finds work for idle glands.
+User-Agent: Mutt/1.10.1 (2018-07-13)
 Sender: linux-block-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-On 9/16/19 8:39 AM, Jinpu Wang wrote:
-> - Roman's pb emal address, it's no longer valid, will fix next round.
-> 
-> 
->>>
->>>> +static inline const char *ibnbd_io_mode_str(enum ibnbd_io_mode mode)
->>>> +{
->>>> +     switch (mode) {
->>>> +     case IBNBD_FILEIO:
->>>> +             return "fileio";
->>>> +     case IBNBD_BLOCKIO:
->>>> +             return "blockio";
->>>> +     case IBNBD_AUTOIO:
->>>> +             return "autoio";
->>>> +     default:
->>>> +             return "unknown";
->>>> +     }
->>>> +}
->>>> +
->>>> +static inline const char *ibnbd_access_mode_str(enum ibnbd_access_mode mode)
->>>> +{
->>>> +     switch (mode) {
->>>> +     case IBNBD_ACCESS_RO:
->>>> +             return "ro";
->>>> +     case IBNBD_ACCESS_RW:
->>>> +             return "rw";
->>>> +     case IBNBD_ACCESS_MIGRATION:
->>>> +             return "migration";
->>>> +     default:
->>>> +             return "unknown";
->>>> +     }
->>>> +}
->>>
->>> These two functions are not in the hot path and hence should not be
->>> inline functions.
->> Sounds reasonable, will remove the inline.
-> inline was added to fix the -Wunused-function warning  eg:
-> 
->    CC [M]  /<<PKGBUILDDIR>>/ibnbd/ibnbd-clt.o
-> In file included from /<<PKGBUILDDIR>>/ibnbd/ibnbd-clt.h:34,
->                   from /<<PKGBUILDDIR>>/ibnbd/ibnbd-clt.c:33:
-> /<<PKGBUILDDIR>>/ibnbd/ibnbd-proto.h:362:20: warning:
-> 'ibnbd_access_mode_str' defined but not used [-Wunused-function]
->   static const char *ibnbd_access_mode_str(enum ibnbd_access_mode mode)
->                      ^~~~~~~~~~~~~~~~~~~~~
-> /<<PKGBUILDDIR>>/ibnbd/ibnbd-proto.h:348:20: warning:
-> 'ibnbd_io_mode_str' defined but not used [-Wunused-function]
->   static const char *ibnbd_io_mode_str(enum ibnbd_io_mode mode)
-> 
-> We have to move both functions to a separate header file if we really
-> want to do it.
-> The function is simple and small, if you insist, I will do it.
 
-Please move these functions into a .c file. That will reduce the size of 
-the kernel modules and will also reduce the size of the header file.
+--0NB0lE7sNnW8+0qW
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
 
-Thanks,
+On Wed, Sep 18, 2019 at 05:09:50PM +0200, Steffen Maier wrote:
+> On 8/8/19 4:18 AM, Martin K. Petersen wrote:
 
-Bart.
+> > I'll set up an amalgamated for-next branch tomorrow.
 
+> Martin, is it possible that you re-wrote your for-next and it now no longer
+> contains a merged 5.4/scsi-postmerge with those fixes?
+> At least I cannot find the fix code in next-20190917 and it fails again for me.
+
+Well, there's no sign of a branch called postmerge in the SCSI history
+recently and I've not run into any SCSI-related conflicts so...
+
+--0NB0lE7sNnW8+0qW
+Content-Type: application/pgp-signature; name="signature.asc"
+
+-----BEGIN PGP SIGNATURE-----
+
+iQEzBAABCgAdFiEEreZoqmdXGLWf4p/qJNaLcl1Uh9AFAl2CTgAACgkQJNaLcl1U
+h9DyCQgAhI9PE5cah3tJXlfm2IgfE6DGqrY+ZgkKfYQRbESZUGGvH0C8ZHzfdF9s
+ew1oLds2WQCiwXttdV/OQrmwkkHibCqk7ZruKQJpmIDN9CmRPnO1EHunK1UFVuli
+YGsRLI1Lp/gzfAzbaoA7BihFFKukgTxrZYcH9SfERbpf/raKMrEB9HUbyFDeBBKN
+btGkV2DjeLMwQxiwQLTNDZ8NQ9oUwkaX1kGOv3CilW2qDkueaghQnMpyw05kuddR
+4F5rE8+vA4jHJssZOqsoUJiNFzc9lloTdKeUDd4tR0qgY/thaG+RA2OVgh1XR1x1
+wYZjyEIwrB4FhNOMDMiIl6jcM6uoqw==
+=63JF
+-----END PGP SIGNATURE-----
+
+--0NB0lE7sNnW8+0qW--
