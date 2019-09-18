@@ -2,114 +2,123 @@ Return-Path: <SRS0=kmcw=XN=vger.kernel.org=linux-block-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-2.6 required=3.0 tests=DKIMWL_WL_HIGH,DKIM_SIGNED,
-	DKIM_VALID,DKIM_VALID_AU,MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,
-	USER_AGENT_SANE_1 autolearn=no autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-0.9 required=3.0 tests=DKIMWL_WL_HIGH,DKIM_SIGNED,
+	DKIM_VALID,DKIM_VALID_AU,HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,
+	SPF_HELO_NONE,SPF_PASS,UNPARSEABLE_RELAY autolearn=no autolearn_force=no
+	version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 79519C4CEC9
-	for <linux-block@archiver.kernel.org>; Wed, 18 Sep 2019 15:19:55 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 58EE8C4CED0
+	for <linux-block@archiver.kernel.org>; Wed, 18 Sep 2019 15:23:34 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.kernel.org (Postfix) with ESMTP id 4A2BE21927
-	for <linux-block@archiver.kernel.org>; Wed, 18 Sep 2019 15:19:55 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=default; t=1568819995;
-	bh=x8WP2oP4JlgEfTy9voeEBqyi5z/eoUfmFxXzC2apt5M=;
-	h=Date:From:To:Cc:Subject:References:In-Reply-To:List-ID:From;
-	b=Gu0SNM1nknER4tfq4QEuVaPyee3Z7WmRxCeWx1tsY4JSMQZd8fepGOfo3VU9z+n9e
-	 T7Wg1N1XZPH0ApWjVpkOI4lEbRZm6jZD2Ui0qechlmYkq47n9KVHdy5/hXZ3g4t4mX
-	 xMRjV94FXa3eL/lQo4KyYycBU5MwtuK9+qu1xG/U=
+	by mail.kernel.org (Postfix) with ESMTP id 302D021907
+	for <linux-block@archiver.kernel.org>; Wed, 18 Sep 2019 15:23:34 +0000 (UTC)
+Authentication-Results: mail.kernel.org;
+	dkim=pass (2048-bit key) header.d=oracle.com header.i=@oracle.com header.b="nXx8GMbC"
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1727056AbfIRPTy (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Wed, 18 Sep 2019 11:19:54 -0400
-Received: from mail-qt1-f195.google.com ([209.85.160.195]:39328 "EHLO
-        mail-qt1-f195.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1726618AbfIRPTy (ORCPT
+        id S1731638AbfIRPXd (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Wed, 18 Sep 2019 11:23:33 -0400
+Received: from userp2120.oracle.com ([156.151.31.85]:38180 "EHLO
+        userp2120.oracle.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S1725899AbfIRPXc (ORCPT
         <rfc822;linux-block@vger.kernel.org>);
-        Wed, 18 Sep 2019 11:19:54 -0400
-Received: by mail-qt1-f195.google.com with SMTP id n7so186084qtb.6;
-        Wed, 18 Sep 2019 08:19:53 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20161025;
-        h=sender:date:from:to:cc:subject:message-id:references:mime-version
-         :content-disposition:in-reply-to:user-agent;
-        bh=4/ozkoPe7I7HBcRNmLxlm9zJ7nl+dZfk4PcCpSwHEE0=;
-        b=T2V++haNtE/r+StT15PyzM8Pcx6eaP5oSwCQUlyICnkOO9OKmWUetxLSpJ+zeMMVm4
-         Umui41NlalpMH08oCwjhUB8rcPoPnvb4O75FaSLSpzXsOC8AeDcEFpcwKgGoIrv8svQG
-         Rq6lvlestuw80aSnQEx6Bp8hEcJzMpt1xbUH732DypsleAg7F1jnT0gy2aTwuAuVwG5i
-         vG3D/JY8NyPMDOrlPAk9MoiOF/4w7Er3TI3dDYvtUxWooplJYAbrWZwmnWkbKkv2kZNJ
-         O9knfGLSvhfjDSDSr3jLBMun+UVHVSZO/V4bM/o9XlBnZMKtacHwgn6vG8Zd4liINg+A
-         vcKg==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20161025;
-        h=x-gm-message-state:sender:date:from:to:cc:subject:message-id
-         :references:mime-version:content-disposition:in-reply-to:user-agent;
-        bh=4/ozkoPe7I7HBcRNmLxlm9zJ7nl+dZfk4PcCpSwHEE0=;
-        b=HNj2Q43hlOubWboB/7iSXpUwuSUiU7YnnqcmaM4WzJrrPnmRKHdcgshnDCOx+zIJNQ
-         G64B9BcvWfifDNBE/VIBMCxX6AoPDoQBWLzFTNZIYWjxj4lq2Q+qRUWrWYLHqs56m2Rc
-         lRFK5yID/n3mhs9loBft6aNDuiSbCDCpi2E0P9VTQpB2/b9pkWkt6RD7jMCzIAZWeqFz
-         uFaLNOWORb1dOAjlt8WuT2lfqu5FaJ7Rt0IG5Oyq1KI+1uB7CVUHxF+dkO3iwycltt8M
-         sly5hzRww5QQW+EjDg301xc3QxpDmyMV37hfMyqfIy5cZ40pSG4WsHS7e7T6cztyjlJZ
-         jVtA==
-X-Gm-Message-State: APjAAAUDZdbQr+2ce++dwJeJIWfSpSTkqIlX2H4pZzHL6cD9xBAmL8t/
-        tmSk6vJB95k1mymHiiHkkHw=
-X-Google-Smtp-Source: APXvYqyUV3Moh52SBY0W8pItsBoyuN8/Tuoat2VePzXuwr1j0fiDdwfUdmD7qbDpiunmtNeODAgw2w==
-X-Received: by 2002:ad4:43c5:: with SMTP id o5mr3692951qvs.207.1568819992834;
-        Wed, 18 Sep 2019 08:19:52 -0700 (PDT)
-Received: from localhost ([2620:10d:c091:480::fef0])
-        by smtp.gmail.com with ESMTPSA id e6sm340551qtr.25.2019.09.18.08.19.51
-        (version=TLS1_2 cipher=ECDHE-RSA-AES128-GCM-SHA256 bits=128/128);
-        Wed, 18 Sep 2019 08:19:51 -0700 (PDT)
-Date:   Wed, 18 Sep 2019 08:19:48 -0700
-From:   Tejun Heo <tj@kernel.org>
-To:     Paolo Valente <paolo.valente@linaro.org>
-Cc:     Jens Axboe <axboe@kernel.dk>,
+        Wed, 18 Sep 2019 11:23:32 -0400
+Received: from pps.filterd (userp2120.oracle.com [127.0.0.1])
+        by userp2120.oracle.com (8.16.0.27/8.16.0.27) with SMTP id x8IFEr1N150047;
+        Wed, 18 Sep 2019 15:22:51 GMT
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=oracle.com; h=to : cc : subject :
+ from : references : date : in-reply-to : message-id : mime-version :
+ content-type; s=corp-2019-08-05;
+ bh=QP/of89H1iKlQJSJwjQxXAmLxnPt3PCrIeV/m5qNqgE=;
+ b=nXx8GMbC4L/o3mQfkXRyVvElpxXXkG2pJeE86ZX+eKYDfswZwENGjCYP0eMI3gHV/xwx
+ rv7xiC3frDk0mN2dWtIzIcEsDSkLaWyw5VSi5ljx5BsY6k9tcG85ootU1svDbRWsRqzO
+ d0XWre/wJR74pYg3YNM17FkIZC/9WvJlA/TcvISHbGxh35jZ/lovnUM62AyyEI4YdsPs
+ sIdIdEOK6NfsVuxKyU9pR2EYhvOTQsfrc2bzDMXJpkhils/p6MmCa5F2/qK3qtbTY+Ii
+ h3jo7tGb4IgexyBH0K/bdWtHSfzczGFWM1AKnAoNSWjMFrF/cut4wNCb9apfyNmy5RIn Rg== 
+Received: from aserp3020.oracle.com (aserp3020.oracle.com [141.146.126.70])
+        by userp2120.oracle.com with ESMTP id 2v385dvnrc-1
+        (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=OK);
+        Wed, 18 Sep 2019 15:22:50 +0000
+Received: from pps.filterd (aserp3020.oracle.com [127.0.0.1])
+        by aserp3020.oracle.com (8.16.0.27/8.16.0.27) with SMTP id x8IFDpWL161853;
+        Wed, 18 Sep 2019 15:22:50 GMT
+Received: from userv0121.oracle.com (userv0121.oracle.com [156.151.31.72])
+        by aserp3020.oracle.com with ESMTP id 2v37mmt1b2-1
+        (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=OK);
+        Wed, 18 Sep 2019 15:22:49 +0000
+Received: from abhmp0015.oracle.com (abhmp0015.oracle.com [141.146.116.21])
+        by userv0121.oracle.com (8.14.4/8.13.8) with ESMTP id x8IFMhWn002796;
+        Wed, 18 Sep 2019 15:22:43 GMT
+Received: from ca-mkp.ca.oracle.com (/10.159.214.123)
+        by default (Oracle Beehive Gateway v4.0)
+        with ESMTP ; Wed, 18 Sep 2019 08:22:42 -0700
+To:     Steffen Maier <maier@linux.ibm.com>
+Cc:     "Martin K. Petersen" <martin.petersen@oracle.com>,
+        Ming Lei <tom.leiming@gmail.com>,
+        Paolo Bonzini <pbonzini@redhat.com>,
+        Mark Brown <broonie@kernel.org>,
+        "James E . J . Bottomley" <jejb@linux.ibm.com>,
+        Ming Lei <ming.lei@redhat.com>,
+        Linux-Next Mailing List <linux-next@vger.kernel.org>,
+        Linux SCSI List <linux-scsi@vger.kernel.org>,
         linux-block <linux-block@vger.kernel.org>,
-        linux-kernel@vger.kernel.org, ulf.hansson@linaro.org,
-        linus.walleij@linaro.org, bfq-iosched@googlegroups.com,
-        oleksandr@natalenko.name, cgroups@vger.kernel.org,
-        Angelo Ruocco <angeloruocco90@gmail.com>
-Subject: Re: [PATCH 2/2] block, bfq: delete "bfq" prefix from cgroup filenames
-Message-ID: <20190918151948.GL3084169@devbig004.ftw2.facebook.com>
-References: <20190917165148.19146-1-paolo.valente@linaro.org>
- <20190917165148.19146-3-paolo.valente@linaro.org>
- <20190917213209.GK3084169@devbig004.ftw2.facebook.com>
- <4D39D2FA-A487-4FAD-A67E-B90750CE0BD4@linaro.org>
+        "open list\:DEVICE-MAPPER \(LVM\)" <dm-devel@redhat.com>,
+        linux-s390 <linux-s390@vger.kernel.org>,
+        Benjamin Block <bblock@linux.ibm.com>,
+        Heiko Carstens <heiko.carstens@de.ibm.com>,
+        Vasily Gorbik <gor@linux.ibm.com>,
+        Bart Van Assche <bvanassche@acm.org>,
+        Hannes Reinecke <hare@suse.com>, Jens Axboe <axboe@kernel.dk>,
+        "Ewan D . Milne" <emilne@redhat.com>,
+        Christoph Hellwig <hch@lst.de>,
+        Mike Snitzer <snitzer@redhat.com>
+Subject: Re: [PATCH 1/2] scsi: core: fix missing .cleanup_rq for SCSI hosts without request batching
+From:   "Martin K. Petersen" <martin.petersen@oracle.com>
+Organization: Oracle Corporation
+References: <20190807144948.28265-1-maier@linux.ibm.com>
+        <20190807144948.28265-2-maier@linux.ibm.com>
+        <CACVXFVM0tFj8CmcHON04_KjxR=QErCbUx0abJgG2W9OBb7akZA@mail.gmail.com>
+        <yq136iccsbw.fsf@oracle.com>
+        <bec80a65-9a8c-54a9-fe70-876fcbe3d592@linux.ibm.com>
+Date:   Wed, 18 Sep 2019 11:22:39 -0400
+In-Reply-To: <bec80a65-9a8c-54a9-fe70-876fcbe3d592@linux.ibm.com> (Steffen
+        Maier's message of "Wed, 18 Sep 2019 17:09:50 +0200")
+Message-ID: <yq1lful8w8w.fsf@oracle.com>
+User-Agent: Gnus/5.13 (Gnus v5.13) Emacs/26.1.92 (gnu/linux)
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <4D39D2FA-A487-4FAD-A67E-B90750CE0BD4@linaro.org>
-User-Agent: Mutt/1.5.21 (2010-09-15)
+Content-Type: text/plain
+X-Proofpoint-Virus-Version: vendor=nai engine=6000 definitions=9384 signatures=668685
+X-Proofpoint-Spam-Details: rule=notspam policy=default score=0 suspectscore=0 malwarescore=0
+ phishscore=0 bulkscore=0 spamscore=0 mlxscore=0 mlxlogscore=999
+ adultscore=0 classifier=spam adjust=0 reason=mlx scancount=1
+ engine=8.0.1-1908290000 definitions=main-1909180151
+X-Proofpoint-Virus-Version: vendor=nai engine=6000 definitions=9384 signatures=668685
+X-Proofpoint-Spam-Details: rule=notspam policy=default score=0 priorityscore=1501 malwarescore=0
+ suspectscore=0 phishscore=0 bulkscore=0 spamscore=0 clxscore=1015
+ lowpriorityscore=0 mlxscore=0 impostorscore=0 mlxlogscore=999 adultscore=0
+ classifier=spam adjust=0 reason=mlx scancount=1 engine=8.0.1-1908290000
+ definitions=main-1909180151
 Sender: linux-block-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-Hello,
 
-On Wed, Sep 18, 2019 at 07:18:50AM +0200, Paolo Valente wrote:
-> A solution that both fulfills userspace request and doesn't break
-> anything for hypothetical users of the current interface already made
-> it to mainline, and Linus liked it too.  It is:
+Steffen,
 
-Linus didn't like it.  The implementation was a bit nasty.  That was
-why it became a subject in the first place.
+> Martin, is it possible that you re-wrote your for-next and it now no
+> longer contains a merged 5.4/scsi-postmerge with those fixes?  At
+> least I cannot find the fix code in next-20190917 and it fails again
+> for me.
 
-> 19e9da9e86c4 ("block, bfq: add weight symlink to the bfq.weight cgroup parameter")
-> 
-> But it was then reverted on Tejun's request to do exactly what we
-> don't want do any longer now:
-> cf8929885de3 ("cgroup/bfq: revert bfq.weight symlink change")
+Yes, looks like you're right. Not sure how I managed to mess that up. I
+must have inadvertently done a reset in the wrong worktree because my
+for-next branch maintenance script only does merges.
 
-Note that the interface was wrong at the time too.
+In any case, since Linus has pulled the block tree dependencies, I'll
+rebase the postmerge branch on top of current linus/master and create a
+new for-next.
 
-> So, Jens, Tejun, can we please just revert that revert?
-
-I think presenting both io.weight and io.bfq.weight interfaces are
-probably the best course of action at this point but why does it have
-to be a symlink?  What's wrong with just creating another file with
-the same backing function?
-
-Thanks.
+Thanks for the heads-up!
 
 -- 
-tejun
+Martin K. Petersen	Oracle Linux Engineering
