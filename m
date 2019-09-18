@@ -2,139 +2,106 @@ Return-Path: <SRS0=kmcw=XN=vger.kernel.org=linux-block-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-9.8 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
-	INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,
-	USER_AGENT_GIT autolearn=unavailable autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-2.3 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
+	MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,USER_AGENT_SANE_1 autolearn=no
+	autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 549E7C4CECE
-	for <linux-block@archiver.kernel.org>; Wed, 18 Sep 2019 15:35:27 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id C2B1BC4CEC4
+	for <linux-block@archiver.kernel.org>; Wed, 18 Sep 2019 15:47:33 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.kernel.org (Postfix) with ESMTP id 2F691207FC
-	for <linux-block@archiver.kernel.org>; Wed, 18 Sep 2019 15:35:27 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id 9E1CD206C2
+	for <linux-block@archiver.kernel.org>; Wed, 18 Sep 2019 15:47:33 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1730675AbfIRPfS (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Wed, 18 Sep 2019 11:35:18 -0400
-Received: from mx0b-001b2d01.pphosted.com ([148.163.158.5]:59622 "EHLO
-        mx0a-001b2d01.pphosted.com" rhost-flags-OK-OK-OK-FAIL)
-        by vger.kernel.org with ESMTP id S1725909AbfIRPfS (ORCPT
+        id S1731763AbfIRPrd (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Wed, 18 Sep 2019 11:47:33 -0400
+Received: from mail-pg1-f193.google.com ([209.85.215.193]:34282 "EHLO
+        mail-pg1-f193.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S1728248AbfIRPrd (ORCPT
         <rfc822;linux-block@vger.kernel.org>);
-        Wed, 18 Sep 2019 11:35:18 -0400
-Received: from pps.filterd (m0098421.ppops.net [127.0.0.1])
-        by mx0a-001b2d01.pphosted.com (8.16.0.27/8.16.0.27) with SMTP id x8IFWH3A077652
-        for <linux-block@vger.kernel.org>; Wed, 18 Sep 2019 11:35:16 -0400
-Received: from e06smtp05.uk.ibm.com (e06smtp05.uk.ibm.com [195.75.94.101])
-        by mx0a-001b2d01.pphosted.com with ESMTP id 2v3nry4att-1
-        (version=TLSv1.2 cipher=AES256-GCM-SHA384 bits=256 verify=NOT)
-        for <linux-block@vger.kernel.org>; Wed, 18 Sep 2019 11:35:16 -0400
-Received: from localhost
-        by e06smtp05.uk.ibm.com with IBM ESMTP SMTP Gateway: Authorized Use Only! Violators will be prosecuted
-        for <linux-block@vger.kernel.org> from <maier@linux.ibm.com>;
-        Wed, 18 Sep 2019 16:35:14 +0100
-Received: from b06cxnps4075.portsmouth.uk.ibm.com (9.149.109.197)
-        by e06smtp05.uk.ibm.com (192.168.101.135) with IBM ESMTP SMTP Gateway: Authorized Use Only! Violators will be prosecuted;
-        (version=TLSv1/SSLv3 cipher=AES256-GCM-SHA384 bits=256/256)
-        Wed, 18 Sep 2019 16:35:08 +0100
-Received: from d06av21.portsmouth.uk.ibm.com (d06av21.portsmouth.uk.ibm.com [9.149.105.232])
-        by b06cxnps4075.portsmouth.uk.ibm.com (8.14.9/8.14.9/NCO v10.0) with ESMTP id x8IFZ7e259703518
-        (version=TLSv1/SSLv3 cipher=DHE-RSA-AES256-GCM-SHA384 bits=256 verify=OK);
-        Wed, 18 Sep 2019 15:35:07 GMT
-Received: from d06av21.portsmouth.uk.ibm.com (unknown [127.0.0.1])
-        by IMSVA (Postfix) with ESMTP id EAD8E5205A;
-        Wed, 18 Sep 2019 15:35:06 +0000 (GMT)
-Received: from tuxmaker.boeblingen.de.ibm.com (unknown [9.152.85.9])
-        by d06av21.portsmouth.uk.ibm.com (Postfix) with ESMTP id 458B352063;
-        Wed, 18 Sep 2019 15:35:06 +0000 (GMT)
-From:   Steffen Maier <maier@linux.ibm.com>
-To:     Arnd Bergmann <arnd@arndb.de>,
-        "James E . J . Bottomley" <jejb@linux.ibm.com>,
-        "Martin K . Petersen" <martin.petersen@oracle.com>,
-        Doug Gilbert <dgilbert@interlog.com>
-Cc:     linux-scsi@vger.kernel.org, linux-s390@vger.kernel.org,
-        Benjamin Block <bblock@linux.ibm.com>,
-        Heiko Carstens <heiko.carstens@de.ibm.com>,
-        Vasily Gorbik <gor@linux.ibm.com>,
-        Steffen Maier <maier@linux.ibm.com>,
-        linux-kernel@vger.kernel.org, Jens Axboe <axboe@kernel.dk>,
-        viro@zeniv.linux.org.uk, linux-fsdevel@vger.kernel.org,
-        Chaitanya Kulkarni <chaitanya.kulkarni@wdc.com>,
-        Thomas Gleixner <tglx@linutronix.de>,
-        Mauro Carvalho Chehab <mchehab+samsung@kernel.org>,
-        Omar Sandoval <osandov@fb.com>, linux-block@vger.kernel.org,
-        linux-next@vger.kernel.org, Mark Brown <broonie@kernel.org>,
-        dm-devel@redhat.com
-Subject: [PATCH] compat_ioctl: fix reimplemented SG_IO handling causing -EINVAL from sg_io()
-Date:   Wed, 18 Sep 2019 17:34:45 +0200
-X-Mailer: git-send-email 2.17.1
-X-TM-AS-GCONF: 00
-x-cbid: 19091815-0020-0000-0000-0000036E9CA7
-X-IBM-AV-DETECTION: SAVI=unused REMOTE=unused XFE=unused
-x-cbparentid: 19091815-0021-0000-0000-000021C4468C
-Message-Id: <20190918153445.1241-1-maier@linux.ibm.com>
-X-Proofpoint-Virus-Version: vendor=fsecure engine=2.50.10434:,, definitions=2019-09-18_08:,,
- signatures=0
-X-Proofpoint-Spam-Details: rule=outbound_notspam policy=outbound score=0 priorityscore=1501
- malwarescore=0 suspectscore=0 phishscore=0 bulkscore=0 spamscore=0
- clxscore=1015 lowpriorityscore=0 mlxscore=0 impostorscore=0
- mlxlogscore=999 adultscore=0 classifier=spam adjust=0 reason=mlx
- scancount=1 engine=8.0.1-1908290000 definitions=main-1909180152
+        Wed, 18 Sep 2019 11:47:33 -0400
+Received: by mail-pg1-f193.google.com with SMTP id n9so91764pgc.1;
+        Wed, 18 Sep 2019 08:47:32 -0700 (PDT)
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20161025;
+        h=x-gm-message-state:subject:to:cc:references:from:message-id:date
+         :user-agent:mime-version:in-reply-to:content-language
+         :content-transfer-encoding;
+        bh=oQqmsAX0PVIpLRoY3clwlT+EXp5od60YczfAAqPHRl8=;
+        b=kHRQ4SSvjUlG6pfi7slPOEcUCybyReQFpfCboANend8WpjwS03N9yabNBT2c+r+dQ8
+         dKOETWz8nPb8KkLFOOZCJZFYifhpQY2QtGIZU/MZeptFdUwDmSAbUOrZvdV+f5GCN+s0
+         V8nK7cwSthGGdFCRl0ZzjBL+AFC8nh5LmjGaDe7E/9FhAIBal6CRYZ35Vvat3uRZiUMx
+         fwJSizdXPOtFS0fZNeCQ+L916UNr/l1R0o7fkfm1bpIjnv/PR25/5b89sLYzxcpNMD6e
+         reu87fDWkpCJlz+WNKJ8znM6GZo3YAueQNlfh1UX7xLXQfA49TXDZQbCTHUaqnLmvt0g
+         tjZQ==
+X-Gm-Message-State: APjAAAX44u8DxCEi5gkC9qmC+MrZWDTQP7rWXRTIOcOSN31wG+6WvwSK
+        6ISoLSARBkQoEVoOpHVB2SBJQG5dMzA=
+X-Google-Smtp-Source: APXvYqz/hOIkACY30mdaUP8X1J9BLE/zihRsPDOOaRV0PaVUwQ0tC6/hxeZsJ8VQWiCIl73b3vY3pw==
+X-Received: by 2002:a17:90a:aa82:: with SMTP id l2mr4652510pjq.73.1568821652079;
+        Wed, 18 Sep 2019 08:47:32 -0700 (PDT)
+Received: from desktop-bart.svl.corp.google.com ([2620:15c:2cd:202:4308:52a3:24b6:2c60])
+        by smtp.gmail.com with ESMTPSA id 193sm8520181pfc.59.2019.09.18.08.47.30
+        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
+        Wed, 18 Sep 2019 08:47:30 -0700 (PDT)
+Subject: Re: [PATCH v4 17/25] ibnbd: client: main functionality
+To:     Danil Kipnis <danil.kipnis@cloud.ionos.com>
+Cc:     Jack Wang <jinpuwang@gmail.com>, linux-block@vger.kernel.org,
+        linux-rdma@vger.kernel.org, Jens Axboe <axboe@kernel.dk>,
+        Christoph Hellwig <hch@infradead.org>,
+        Sagi Grimberg <sagi@grimberg.me>,
+        Jason Gunthorpe <jgg@mellanox.com>,
+        Doug Ledford <dledford@redhat.com>, rpenyaev@suse.de,
+        Jack Wang <jinpu.wang@cloud.ionos.com>,
+        Roman Pen <r.peniaev@gmail.com>
+References: <20190620150337.7847-1-jinpuwang@gmail.com>
+ <20190620150337.7847-18-jinpuwang@gmail.com>
+ <bd8963e2-d186-dbd0-fe39-7f4a518f4177@acm.org>
+ <CAHg0HuwzHnzPQAqjtYFTZb7BhzFagJ0NJ=pW=VkTqn5HML-0Vw@mail.gmail.com>
+ <5c5ff7df-2cce-ec26-7893-55911e4d8595@acm.org>
+ <CAHg0HuwFTVsCNHbiXW20P6hQ3c-P_p5tB6dYKtOW=_euWEvLnA@mail.gmail.com>
+ <CAHg0HuzQOH4ZCe+v-GHu8jOYm-wUbh1fFRK75Muq+DPpQGAH8A@mail.gmail.com>
+From:   Bart Van Assche <bvanassche@acm.org>
+Message-ID: <6f677d56-82b3-a321-f338-cbf8ff4e83eb@acm.org>
+Date:   Wed, 18 Sep 2019 08:47:29 -0700
+User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:60.0) Gecko/20100101
+ Thunderbird/60.8.0
+MIME-Version: 1.0
+In-Reply-To: <CAHg0HuzQOH4ZCe+v-GHu8jOYm-wUbh1fFRK75Muq+DPpQGAH8A@mail.gmail.com>
+Content-Type: text/plain; charset=utf-8; format=flowed
+Content-Language: en-US
+Content-Transfer-Encoding: 7bit
 Sender: linux-block-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-scsi_cmd_ioctl() had hdr as on stack auto variable and called
-copy_{from,to}_user with the address operator &hdr and sizeof(hdr).
+On 9/18/19 12:14 AM, Danil Kipnis wrote:
+> I'm not familiar with dm code, but don't they need to deal with the
+> same situation: if I configure 100 logical volumes on top of a single
+> NVME drive with X hardware queues, each queue_depth deep, then each dm
+> block device would need to advertise X hardware queues in order to
+> achieve highest performance in case only this one volume is accessed,
+> while in fact those X physical queues have to be shared among all 100
+> logical volumes, if they are accessed in parallel?
 
-After the refactoring, {get,put}_sg_io_hdr() takes a pointer &hdr.
-So the copy_{from,to}_user within the new helper functions should
-just take the given pointer argument hdr and sizeof(*hdr).
+Combining multiple queues (a) into a single queue (b) that is smaller 
+than the combined source queues without sacrificing performance is 
+tricky. We already have one such implementation in the block layer core 
+and it took considerable time to get that implementation right. See e.g. 
+blk_mq_sched_mark_restart_hctx() and blk_mq_sched_restart().
 
-I saw -EINVAL from sg_io() done by /usr/lib/udev/scsi_id which could
-in turn no longer whitelist SCSI disks for devicemapper multipath.
+dm drivers are expected to return DM_MAPIO_REQUEUE or 
+DM_MAPIO_DELAY_REQUEUE if the queue (b) is full. It turned out to be 
+difficult to get this right in the dm-mpath driver and at the same time 
+to achieve good performance.
 
-Signed-off-by: Steffen Maier <maier@linux.ibm.com>
-Fixes: 4f45155c29fd ("compat_ioctl: reimplement SG_IO handling")
----
+The ibnbd driver introduces a third implementation of code that combines 
+multiple (per-cpu) queues into one queue per CPU. It is considered 
+important in the Linux kernel to avoid code duplication. Hence my 
+question whether ibnbd can reuse the block layer infrastructure for 
+sharing tag sets.
 
-Arnd, I'm not sure about the sizeof(hdr32) change in the compat part in
-put_sg_io_hdr().
+Thanks,
 
-This is for next, probably via Arnd's y2038/y2038,
-and it fixes next-20190917 for me regarding SCSI generic.
+Bart.
 
- block/scsi_ioctl.c | 6 +++---
- 1 file changed, 3 insertions(+), 3 deletions(-)
-
-diff --git a/block/scsi_ioctl.c b/block/scsi_ioctl.c
-index cbeb629ee917..650bade5ea5a 100644
---- a/block/scsi_ioctl.c
-+++ b/block/scsi_ioctl.c
-@@ -607,14 +607,14 @@ int put_sg_io_hdr(const struct sg_io_hdr *hdr, void __user *argp)
- 			.info		 = hdr->info,
- 		};
- 
--		if (copy_to_user(argp, &hdr32, sizeof(hdr)))
-+		if (copy_to_user(argp, &hdr32, sizeof(hdr32)))
- 			return -EFAULT;
- 
- 		return 0;
- 	}
- #endif
- 
--	if (copy_to_user(argp, &hdr, sizeof(hdr)))
-+	if (copy_to_user(argp, hdr, sizeof(*hdr)))
- 		return -EFAULT;
- 
- 	return 0;
-@@ -659,7 +659,7 @@ int get_sg_io_hdr(struct sg_io_hdr *hdr, const void __user *argp)
- 	}
- #endif
- 
--	if (copy_from_user(&hdr, argp, sizeof(hdr)))
-+	if (copy_from_user(hdr, argp, sizeof(*hdr)))
- 		return -EFAULT;
- 
- 	return 0;
--- 
-2.17.1
 
