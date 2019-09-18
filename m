@@ -2,95 +2,131 @@ Return-Path: <SRS0=kmcw=XN=vger.kernel.org=linux-block-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-0.8 required=3.0 tests=DKIM_SIGNED,DKIM_VALID,
-	DKIM_VALID_AU,HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SPF_HELO_NONE,
-	SPF_PASS,URIBL_BLOCKED autolearn=no autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-2.3 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
+	MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,USER_AGENT_SANE_1 autolearn=no
+	autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 010E1C4CEC4
-	for <linux-block@archiver.kernel.org>; Wed, 18 Sep 2019 12:22:33 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 92CE3C4CEC4
+	for <linux-block@archiver.kernel.org>; Wed, 18 Sep 2019 15:10:04 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.kernel.org (Postfix) with ESMTP id BB65621920
-	for <linux-block@archiver.kernel.org>; Wed, 18 Sep 2019 12:22:33 +0000 (UTC)
-Authentication-Results: mail.kernel.org;
-	dkim=pass (2048-bit key) header.d=cloud.ionos.com header.i=@cloud.ionos.com header.b="UCNZmbmD"
+	by mail.kernel.org (Postfix) with ESMTP id 735EE218AE
+	for <linux-block@archiver.kernel.org>; Wed, 18 Sep 2019 15:10:04 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1729384AbfIRMWc (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Wed, 18 Sep 2019 08:22:32 -0400
-Received: from mail-wr1-f67.google.com ([209.85.221.67]:40234 "EHLO
-        mail-wr1-f67.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1728915AbfIRMWc (ORCPT
+        id S1728079AbfIRPKD (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Wed, 18 Sep 2019 11:10:03 -0400
+Received: from mx0a-001b2d01.pphosted.com ([148.163.156.1]:44754 "EHLO
+        mx0a-001b2d01.pphosted.com" rhost-flags-OK-OK-OK-OK)
+        by vger.kernel.org with ESMTP id S1728227AbfIRPKD (ORCPT
         <rfc822;linux-block@vger.kernel.org>);
-        Wed, 18 Sep 2019 08:22:32 -0400
-Received: by mail-wr1-f67.google.com with SMTP id l3so6664288wru.7
-        for <linux-block@vger.kernel.org>; Wed, 18 Sep 2019 05:22:29 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=cloud.ionos.com; s=google;
-        h=mime-version:references:in-reply-to:from:date:message-id:subject:to
-         :cc;
-        bh=m4xmVhO4aVmWQpZQri7DsxSTEfwJAB057bj26n65Zok=;
-        b=UCNZmbmD2GDn+g+EDmNepoyb2UzByJvJPs503pqvEf0SmwF6sj6oMPkCW/9oHrEY8T
-         veuJag53n4J65fLiYAzr2Zc+pkNUY5vYlrCR+YmRszw64Fk21SMkeLM9CQadGUvxRByf
-         L+jaGnGMc7REC5ZLuZiP5FLVYp5fg6uYhwga8fDdYAE3rjSFyJ5YBHLBAuU0bS1CAdRG
-         MDEHsL6+UE4HIX/k3Go7MUouR9I21Dj9OZVdOMW7vzPhFNeZUZmuMuFVnEM1zxZJmqmp
-         aJTGDz1DCYSds3yqcv93sH3hV2vXxJ3/wKi2lgjhvgK3hp9cBQABXhhd9r+dQRqe3eEO
-         Zbdw==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20161025;
-        h=x-gm-message-state:mime-version:references:in-reply-to:from:date
-         :message-id:subject:to:cc;
-        bh=m4xmVhO4aVmWQpZQri7DsxSTEfwJAB057bj26n65Zok=;
-        b=SyP5j+bH4AfQHlT421TDiVYfVAbfainO3hmo1I2bbCGTpTaYbloK/ZNBDKlLahvjQ/
-         GLQtKTgEuA8/Xld2qLw1NSiIuJR7Ajsv7eF7WSv8NYa31f3PD6+lhyhNtY96Op7l11x2
-         UKDTwJ/SY+Iu5cWPxCJRzqjSp6H6vCccGxDAiZAHRDF43Z1F1ZA1CJcVcU7i7vDumn/o
-         1uDJPDAKUl0NGAiTMFP72hMs223vYxcG5cKlH2mon/znoQYbZRMQ+i3PG5uXkS5opDJ4
-         06+196V5/Tr+5O5vU6p+Ynz+1Quzc+Ra8p9ChMMl6NDo4zBrB3BUcdPhJC34+4R5ucYi
-         xMMw==
-X-Gm-Message-State: APjAAAXN1j6WtG/yjs8I7oYsxvR22szVOXj6EWirFA+ZUj+7wqsQsMED
-        PA/oHR+zjnZ7nqcJ1N7Z7piaHvTWhbL2v93LWBf/EA==
-X-Google-Smtp-Source: APXvYqzCUT4tP0P7kaqvmlAhxGIGeZIJobnt5M+Q2IZYU3eBvDQ/Xc2dz92RXzxIT2ujmdlLkjAl0qnVJM4HGGc88cg=
-X-Received: by 2002:adf:8444:: with SMTP id 62mr3077746wrf.202.1568809349137;
- Wed, 18 Sep 2019 05:22:29 -0700 (PDT)
+        Wed, 18 Sep 2019 11:10:03 -0400
+Received: from pps.filterd (m0098404.ppops.net [127.0.0.1])
+        by mx0a-001b2d01.pphosted.com (8.16.0.27/8.16.0.27) with SMTP id x8IF2K58119383
+        for <linux-block@vger.kernel.org>; Wed, 18 Sep 2019 11:10:02 -0400
+Received: from e06smtp07.uk.ibm.com (e06smtp07.uk.ibm.com [195.75.94.103])
+        by mx0a-001b2d01.pphosted.com with ESMTP id 2v3pqe8u0d-1
+        (version=TLSv1.2 cipher=AES256-GCM-SHA384 bits=256 verify=NOT)
+        for <linux-block@vger.kernel.org>; Wed, 18 Sep 2019 11:10:02 -0400
+Received: from localhost
+        by e06smtp07.uk.ibm.com with IBM ESMTP SMTP Gateway: Authorized Use Only! Violators will be prosecuted
+        for <linux-block@vger.kernel.org> from <maier@linux.ibm.com>;
+        Wed, 18 Sep 2019 16:09:59 +0100
+Received: from b06cxnps4076.portsmouth.uk.ibm.com (9.149.109.198)
+        by e06smtp07.uk.ibm.com (192.168.101.137) with IBM ESMTP SMTP Gateway: Authorized Use Only! Violators will be prosecuted;
+        (version=TLSv1/SSLv3 cipher=AES256-GCM-SHA384 bits=256/256)
+        Wed, 18 Sep 2019 16:09:53 +0100
+Received: from d06av23.portsmouth.uk.ibm.com (d06av23.portsmouth.uk.ibm.com [9.149.105.59])
+        by b06cxnps4076.portsmouth.uk.ibm.com (8.14.9/8.14.9/NCO v10.0) with ESMTP id x8IF9pud50724936
+        (version=TLSv1/SSLv3 cipher=DHE-RSA-AES256-GCM-SHA384 bits=256 verify=OK);
+        Wed, 18 Sep 2019 15:09:51 GMT
+Received: from d06av23.portsmouth.uk.ibm.com (unknown [127.0.0.1])
+        by IMSVA (Postfix) with ESMTP id 774F3A4040;
+        Wed, 18 Sep 2019 15:09:51 +0000 (GMT)
+Received: from d06av23.portsmouth.uk.ibm.com (unknown [127.0.0.1])
+        by IMSVA (Postfix) with ESMTP id C0E36A4055;
+        Wed, 18 Sep 2019 15:09:50 +0000 (GMT)
+Received: from oc4120165700.ibm.com (unknown [9.152.98.33])
+        by d06av23.portsmouth.uk.ibm.com (Postfix) with ESMTP;
+        Wed, 18 Sep 2019 15:09:50 +0000 (GMT)
+Subject: Re: [PATCH 1/2] scsi: core: fix missing .cleanup_rq for SCSI hosts
+ without request batching
+To:     "Martin K. Petersen" <martin.petersen@oracle.com>,
+        Ming Lei <tom.leiming@gmail.com>,
+        Paolo Bonzini <pbonzini@redhat.com>,
+        Mark Brown <broonie@kernel.org>
+Cc:     "James E . J . Bottomley" <jejb@linux.ibm.com>,
+        Ming Lei <ming.lei@redhat.com>,
+        Linux-Next Mailing List <linux-next@vger.kernel.org>,
+        Linux SCSI List <linux-scsi@vger.kernel.org>,
+        linux-block <linux-block@vger.kernel.org>,
+        "open list:DEVICE-MAPPER (LVM)" <dm-devel@redhat.com>,
+        linux-s390 <linux-s390@vger.kernel.org>,
+        Benjamin Block <bblock@linux.ibm.com>,
+        Heiko Carstens <heiko.carstens@de.ibm.com>,
+        Vasily Gorbik <gor@linux.ibm.com>,
+        Bart Van Assche <bvanassche@acm.org>,
+        Hannes Reinecke <hare@suse.com>, Jens Axboe <axboe@kernel.dk>,
+        "Ewan D . Milne" <emilne@redhat.com>,
+        Christoph Hellwig <hch@lst.de>,
+        Mike Snitzer <snitzer@redhat.com>
+References: <20190807144948.28265-1-maier@linux.ibm.com>
+ <20190807144948.28265-2-maier@linux.ibm.com>
+ <CACVXFVM0tFj8CmcHON04_KjxR=QErCbUx0abJgG2W9OBb7akZA@mail.gmail.com>
+ <yq136iccsbw.fsf@oracle.com>
+From:   Steffen Maier <maier@linux.ibm.com>
+Date:   Wed, 18 Sep 2019 17:09:50 +0200
+User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:60.0) Gecko/20100101
+ Thunderbird/60.8.0
 MIME-Version: 1.0
-References: <20190620150337.7847-1-jinpuwang@gmail.com> <20190620150337.7847-25-jinpuwang@gmail.com>
- <f9e6014b-9123-8cfb-77a2-57af953a5031@acm.org>
-In-Reply-To: <f9e6014b-9123-8cfb-77a2-57af953a5031@acm.org>
-From:   Jinpu Wang <jinpu.wang@cloud.ionos.com>
-Date:   Wed, 18 Sep 2019 14:22:18 +0200
-Message-ID: <CAMGffE=SQa54CmY+c=qqUMFFOE1zfNi4hVtcHxkZ1meWbXX9-A@mail.gmail.com>
-Subject: Re: [PATCH v4 24/25] ibnbd: a bit of documentation
-To:     Bart Van Assche <bvanassche@acm.org>
-Cc:     Jack Wang <jinpuwang@gmail.com>, linux-block@vger.kernel.org,
-        linux-rdma@vger.kernel.org, Jens Axboe <axboe@kernel.dk>,
-        Christoph Hellwig <hch@infradead.org>,
-        Sagi Grimberg <sagi@grimberg.me>,
-        Jason Gunthorpe <jgg@mellanox.com>,
-        Doug Ledford <dledford@redhat.com>,
-        Danil Kipnis <danil.kipnis@cloud.ionos.com>, rpenyaev@suse.de,
-        Roman Pen <roman.penyaev@profitbricks.com>
-Content-Type: text/plain; charset="UTF-8"
+In-Reply-To: <yq136iccsbw.fsf@oracle.com>
+Content-Type: text/plain; charset=utf-8; format=flowed
+Content-Language: en-US
+Content-Transfer-Encoding: 7bit
+X-TM-AS-GCONF: 00
+x-cbid: 19091815-0028-0000-0000-0000039F8818
+X-IBM-AV-DETECTION: SAVI=unused REMOTE=unused XFE=unused
+x-cbparentid: 19091815-0029-0000-0000-000024618C14
+Message-Id: <bec80a65-9a8c-54a9-fe70-876fcbe3d592@linux.ibm.com>
+X-Proofpoint-Virus-Version: vendor=fsecure engine=2.50.10434:,, definitions=2019-09-18_08:,,
+ signatures=0
+X-Proofpoint-Spam-Details: rule=outbound_notspam policy=outbound score=0 priorityscore=1501
+ malwarescore=0 suspectscore=0 phishscore=0 bulkscore=0 spamscore=0
+ clxscore=1011 lowpriorityscore=0 mlxscore=0 impostorscore=0
+ mlxlogscore=999 adultscore=0 classifier=spam adjust=0 reason=mlx
+ scancount=1 engine=8.0.1-1908290000 definitions=main-1909180148
 Sender: linux-block-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-On Sat, Sep 14, 2019 at 1:58 AM Bart Van Assche <bvanassche@acm.org> wrote:
->
-> On 6/20/19 8:03 AM, Jack Wang wrote:
-> > From: Roman Pen <roman.penyaev@profitbricks.com>
-> >
-> > README with description of major sysfs entries.
->
-> Please have a look at Documentation/ABI/README and follow the
-> instructions from that document.
->
-> Thanks,
->
-> Bart.
+On 8/8/19 4:18 AM, Martin K. Petersen wrote:
+> 
+> Ming,
+> 
+>>> +       .cleanup_rq     = scsi_cleanup_rq,
+>>>          .busy           = scsi_mq_lld_busy,
+>>>          .map_queues     = scsi_map_queues,
+>>>   };
+>>
+>> This one is a cross-tree thing, either scsi/5.4/scsi-queue needs to
+>> pull for-5.4/block, or do it after both land linus tree.
+> 
+> I'll set up an amalgamated for-next branch tomorrow.
 
-Thanks, will move the sysfs description to
-Documentation/ABI/testing/[sysfs-class-ibnbd-client|sysfs-block-ibnbd],
-will also move ibtrs sysfs description there.
+Martin, is it possible that you re-wrote your for-next and it now no longer 
+contains a merged 5.4/scsi-postmerge with those fixes?
+At least I cannot find the fix code in next-20190917 and it fails again for me.
 
 
-Regards,
-Jinpu
+-- 
+Mit freundlichen Gruessen / Kind regards
+Steffen Maier
+
+Linux on IBM Z Development
+
+https://www.ibm.com/privacy/us/en/
+IBM Deutschland Research & Development GmbH
+Vorsitzender des Aufsichtsrats: Matthias Hartmann
+Geschaeftsfuehrung: Dirk Wittkopp
+Sitz der Gesellschaft: Boeblingen
+Registergericht: Amtsgericht Stuttgart, HRB 243294
+
