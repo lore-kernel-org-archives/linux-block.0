@@ -2,63 +2,62 @@ Return-Path: <SRS0=kmcw=XN=vger.kernel.org=linux-block-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-0.9 required=3.0 tests=DKIM_SIGNED,DKIM_VALID,
+X-Spam-Status: No, score=-0.8 required=3.0 tests=DKIM_SIGNED,DKIM_VALID,
 	DKIM_VALID_AU,HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SPF_HELO_NONE,
-	SPF_PASS autolearn=no autolearn_force=no version=3.4.0
+	SPF_PASS,URIBL_BLOCKED autolearn=no autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 4D1CDC4CEC4
-	for <linux-block@archiver.kernel.org>; Wed, 18 Sep 2019 12:02:31 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 010E1C4CEC4
+	for <linux-block@archiver.kernel.org>; Wed, 18 Sep 2019 12:22:33 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.kernel.org (Postfix) with ESMTP id 204E72054F
-	for <linux-block@archiver.kernel.org>; Wed, 18 Sep 2019 12:02:31 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id BB65621920
+	for <linux-block@archiver.kernel.org>; Wed, 18 Sep 2019 12:22:33 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=pass (2048-bit key) header.d=cloud.ionos.com header.i=@cloud.ionos.com header.b="WS5RL2Z0"
+	dkim=pass (2048-bit key) header.d=cloud.ionos.com header.i=@cloud.ionos.com header.b="UCNZmbmD"
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1729616AbfIRMCa (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Wed, 18 Sep 2019 08:02:30 -0400
-Received: from mail-wr1-f65.google.com ([209.85.221.65]:43847 "EHLO
-        mail-wr1-f65.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1726565AbfIRMCa (ORCPT
+        id S1729384AbfIRMWc (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Wed, 18 Sep 2019 08:22:32 -0400
+Received: from mail-wr1-f67.google.com ([209.85.221.67]:40234 "EHLO
+        mail-wr1-f67.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S1728915AbfIRMWc (ORCPT
         <rfc822;linux-block@vger.kernel.org>);
-        Wed, 18 Sep 2019 08:02:30 -0400
-Received: by mail-wr1-f65.google.com with SMTP id q17so6590750wrx.10
-        for <linux-block@vger.kernel.org>; Wed, 18 Sep 2019 05:02:29 -0700 (PDT)
+        Wed, 18 Sep 2019 08:22:32 -0400
+Received: by mail-wr1-f67.google.com with SMTP id l3so6664288wru.7
+        for <linux-block@vger.kernel.org>; Wed, 18 Sep 2019 05:22:29 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=cloud.ionos.com; s=google;
         h=mime-version:references:in-reply-to:from:date:message-id:subject:to
          :cc;
-        bh=1S9EMCNitqnrAe9ZtMh+zE7B61LAucDMksRsfpqkqsk=;
-        b=WS5RL2Z0GVuSnGv5lEaRXOXb+g8GL8vHlQV6wb73W2te4MU/oRKjZxS495y2RUOyjZ
-         QIDaauPkIhpsaInO0SmfrMnw5rlJKzE1x4sVEY0x3AEzPI95QSUn2U6tJgxeGTcLn41C
-         o11jiQEnd7vhKSXYGuqK6PbjUA3KykcwpvsbE3A8zDFlj5PGeFtoUqwaaMQ1VK7F8QlX
-         lfXczY0cWVwYrrMaVWqK2NsKy8P2tJXe91FEdhJSxrp7R/ca6pxEX5KPampPOIKGUuAz
-         2FAF/o+6d2zgHmNCJaiN5i+K5yNHzHqagvTnF3GgXedIxAI8JsYsSHyLdWIcmbD+C0nL
-         2AKA==
+        bh=m4xmVhO4aVmWQpZQri7DsxSTEfwJAB057bj26n65Zok=;
+        b=UCNZmbmD2GDn+g+EDmNepoyb2UzByJvJPs503pqvEf0SmwF6sj6oMPkCW/9oHrEY8T
+         veuJag53n4J65fLiYAzr2Zc+pkNUY5vYlrCR+YmRszw64Fk21SMkeLM9CQadGUvxRByf
+         L+jaGnGMc7REC5ZLuZiP5FLVYp5fg6uYhwga8fDdYAE3rjSFyJ5YBHLBAuU0bS1CAdRG
+         MDEHsL6+UE4HIX/k3Go7MUouR9I21Dj9OZVdOMW7vzPhFNeZUZmuMuFVnEM1zxZJmqmp
+         aJTGDz1DCYSds3yqcv93sH3hV2vXxJ3/wKi2lgjhvgK3hp9cBQABXhhd9r+dQRqe3eEO
+         Zbdw==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=1e100.net; s=20161025;
         h=x-gm-message-state:mime-version:references:in-reply-to:from:date
          :message-id:subject:to:cc;
-        bh=1S9EMCNitqnrAe9ZtMh+zE7B61LAucDMksRsfpqkqsk=;
-        b=dOmSlTh5JVQrmciwfY/GV30qFWcU6DM0Qn8Or5kYwLjoRng/L3LDTe5wj2Sg3kbJMq
-         PlA8/5LYG/HqYiQnPtQPG8iQyJ1ECs4Q55pIMj/7t+dRf5r9Go7sUyinql6Vkl0pFwSe
-         41Uejga7fUA8mqDT6Kz9Mrvz2LJeY8t9KDWzcOdn/WwmFn/551kYB5Mr4GuLofVcxUKk
-         ncXFRvZshTyBP3J3CSszWlqPzlB75pt6THkSUFVDHg1CVufR2ECjhgntgPvDlUalr4MQ
-         KAdxi1arpewz1ZFFYXKCW2WERoBavz5i+J2B76WqGGC9iDjdT5uFMQtvqSR0tkK6ellZ
-         9sxw==
-X-Gm-Message-State: APjAAAX04PCY/hs0e92eGbwpPU6xhRyXmjLwTflIC4gqq5jCJ62HC5+i
-        7isE6IZS6ma88ZzwnXBTi1KuGDMfZuOrHd1Sbq4IOw==
-X-Google-Smtp-Source: APXvYqzxv5eWcHvWyQeHvaamQCHqPD4Ul8vbG+Ra6SSEc1YFAs3JLeQ0zkzWe++KiEXK6V6uvKjuHruPHgCd2rei78Y=
-X-Received: by 2002:a5d:4f0d:: with SMTP id c13mr2912476wru.317.1568808147967;
- Wed, 18 Sep 2019 05:02:27 -0700 (PDT)
+        bh=m4xmVhO4aVmWQpZQri7DsxSTEfwJAB057bj26n65Zok=;
+        b=SyP5j+bH4AfQHlT421TDiVYfVAbfainO3hmo1I2bbCGTpTaYbloK/ZNBDKlLahvjQ/
+         GLQtKTgEuA8/Xld2qLw1NSiIuJR7Ajsv7eF7WSv8NYa31f3PD6+lhyhNtY96Op7l11x2
+         UKDTwJ/SY+Iu5cWPxCJRzqjSp6H6vCccGxDAiZAHRDF43Z1F1ZA1CJcVcU7i7vDumn/o
+         1uDJPDAKUl0NGAiTMFP72hMs223vYxcG5cKlH2mon/znoQYbZRMQ+i3PG5uXkS5opDJ4
+         06+196V5/Tr+5O5vU6p+Ynz+1Quzc+Ra8p9ChMMl6NDo4zBrB3BUcdPhJC34+4R5ucYi
+         xMMw==
+X-Gm-Message-State: APjAAAXN1j6WtG/yjs8I7oYsxvR22szVOXj6EWirFA+ZUj+7wqsQsMED
+        PA/oHR+zjnZ7nqcJ1N7Z7piaHvTWhbL2v93LWBf/EA==
+X-Google-Smtp-Source: APXvYqzCUT4tP0P7kaqvmlAhxGIGeZIJobnt5M+Q2IZYU3eBvDQ/Xc2dz92RXzxIT2ujmdlLkjAl0qnVJM4HGGc88cg=
+X-Received: by 2002:adf:8444:: with SMTP id 62mr3077746wrf.202.1568809349137;
+ Wed, 18 Sep 2019 05:22:29 -0700 (PDT)
 MIME-Version: 1.0
-References: <20190620150337.7847-1-jinpuwang@gmail.com> <20190620150337.7847-18-jinpuwang@gmail.com>
- <bd8963e2-d186-dbd0-fe39-7f4a518f4177@acm.org> <CAMGffEn6=P8bLi7SyUC19+7wbU6YEZ_5BqjR06+CBKvENw-tFg@mail.gmail.com>
- <5a14b67d-9e32-c599-6525-7564becd526a@acm.org>
-In-Reply-To: <5a14b67d-9e32-c599-6525-7564becd526a@acm.org>
+References: <20190620150337.7847-1-jinpuwang@gmail.com> <20190620150337.7847-25-jinpuwang@gmail.com>
+ <f9e6014b-9123-8cfb-77a2-57af953a5031@acm.org>
+In-Reply-To: <f9e6014b-9123-8cfb-77a2-57af953a5031@acm.org>
 From:   Jinpu Wang <jinpu.wang@cloud.ionos.com>
-Date:   Wed, 18 Sep 2019 14:02:16 +0200
-Message-ID: <CAMGffEkbKU10_2eoFoitkWNFLydE1MukOh9jHsQCqWr0KT9V_Q@mail.gmail.com>
-Subject: Re: [PATCH v4 17/25] ibnbd: client: main functionality
+Date:   Wed, 18 Sep 2019 14:22:18 +0200
+Message-ID: <CAMGffE=SQa54CmY+c=qqUMFFOE1zfNi4hVtcHxkZ1meWbXX9-A@mail.gmail.com>
+Subject: Re: [PATCH v4 24/25] ibnbd: a bit of documentation
 To:     Bart Van Assche <bvanassche@acm.org>
 Cc:     Jack Wang <jinpuwang@gmail.com>, linux-block@vger.kernel.org,
         linux-rdma@vger.kernel.org, Jens Axboe <axboe@kernel.dk>,
@@ -74,80 +73,24 @@ Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-On Tue, Sep 17, 2019 at 6:46 PM Bart Van Assche <bvanassche@acm.org> wrote:
+On Sat, Sep 14, 2019 at 1:58 AM Bart Van Assche <bvanassche@acm.org> wrote:
 >
-> On 9/17/19 6:09 AM, Jinpu Wang wrote:
-> >>> +static void ibnbd_softirq_done_fn(struct request *rq)
-> >>> +{
-> >>> +     struct ibnbd_clt_dev *dev       = rq->rq_disk->private_data;
-> >>> +     struct ibnbd_clt_session *sess  = dev->sess;
-> >>> +     struct ibnbd_iu *iu;
-> >>> +
-> >>> +     iu = blk_mq_rq_to_pdu(rq);
-> >>> +     ibnbd_put_tag(sess, iu->tag);
-> >>> +     blk_mq_end_request(rq, iu->status);
-> >>> +}
-> >>> +
-> >>> +static void msg_io_conf(void *priv, int errno)
-> >>> +{
-> >>> +     struct ibnbd_iu *iu = (struct ibnbd_iu *)priv;
-> >>> +     struct ibnbd_clt_dev *dev = iu->dev;
-> >>> +     struct request *rq = iu->rq;
-> >>> +
-> >>> +     iu->status = errno ? BLK_STS_IOERR : BLK_STS_OK;
-> >>> +
-> >>> +     if (softirq_enable) {
-> >>> +             blk_mq_complete_request(rq);
-> >>> +     } else {
-> >>> +             ibnbd_put_tag(dev->sess, iu->tag);
-> >>> +             blk_mq_end_request(rq, iu->status);
-> >>> +     }
-> >>
-> >> Block drivers must call blk_mq_complete_request() instead of
-> >> blk_mq_end_request() to complete a request after processing of the
-> >> request has been started. Calling blk_mq_end_request() to complete a
-> >> request is racy in case a timeout occurs while blk_mq_end_request() is
-> >> in progress.
+> On 6/20/19 8:03 AM, Jack Wang wrote:
+> > From: Roman Pen <roman.penyaev@profitbricks.com>
 > >
-> > Could you elaborate a bit more, blk_mq_end_request is exported function and
-> > used by a lot of block drivers: scsi, dm, etc.
-> > Is there an open bug report for the problem?
+> > README with description of major sysfs entries.
 >
-> Hi Jinpu,
+> Please have a look at Documentation/ABI/README and follow the
+> instructions from that document.
 >
-> There is only one blk_mq_end_request() call in the SCSI code and it's
-> inside the FC timeout handler (fc_bsg_job_timeout()). Calling
-> blk_mq_end_request() from inside a timeout handler is fine but not to
-> report to the block layer that a request has completed from outside the
-> timeout handler after a request has started.
->
-> The device mapper calls blk_mq_complete_request() to report request
-> completion to the block layer. See also dm_complete_request().
-> blk_mq_end_request() is only called by the device mapper from inside
-> dm_softirq_done(). That last function is called from inside
-> blk_mq_complete_request() and is not called directly.
->
-> The NVMe PCIe driver only calls blk_mq_end_request() from inside
-> nvme_complete_rq(). nvme_complete_rq() is called by the PCIe driver from
-> inside nvme_pci_complete_rq() and that last function is called from
-> inside blk_mq_complete_request().
->
-> In other words, the SCSI core, the device mapper and the NVMe PCIe
-> driver all use blk_mq_complete_request() to report request completion to
-> the block layer from outside timeout handlers after a request has been
-> started.
->
-> This is not a new requirement. I think that the legacy block layer
-> equivalent, blk_complete_request(), was introduced in 2006 and that
-> since then block drivers are required to call blk_complete_request() to
-> report completion of requests from outside a timeout handler after these
-> have been started.
+> Thanks,
 >
 > Bart.
 
-Thanks for the detailed explanation, I will switch to
-blk_mq_complete_request(), will also drop the
-softirq_done module parameter, not useful.
+Thanks, will move the sysfs description to
+Documentation/ABI/testing/[sysfs-class-ibnbd-client|sysfs-block-ibnbd],
+will also move ibtrs sysfs description there.
+
 
 Regards,
 Jinpu
