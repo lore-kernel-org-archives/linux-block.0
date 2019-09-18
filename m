@@ -2,78 +2,84 @@ Return-Path: <SRS0=kmcw=XN=vger.kernel.org=linux-block-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-9.8 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
-	INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,
-	URIBL_BLOCKED,USER_AGENT_GIT autolearn=ham autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-2.3 required=3.0 tests=DKIM_SIGNED,DKIM_VALID,
+	HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,
+	USER_AGENT_SANE_1 autolearn=no autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id A684BC4CEC9
-	for <linux-block@archiver.kernel.org>; Wed, 18 Sep 2019 02:38:17 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 20982C4CEC9
+	for <linux-block@archiver.kernel.org>; Wed, 18 Sep 2019 02:41:54 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.kernel.org (Postfix) with ESMTP id 7F5B2214AF
-	for <linux-block@archiver.kernel.org>; Wed, 18 Sep 2019 02:38:17 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id E768421848
+	for <linux-block@archiver.kernel.org>; Wed, 18 Sep 2019 02:41:53 +0000 (UTC)
+Authentication-Results: mail.kernel.org;
+	dkim=pass (2048-bit key) header.d=kernel-dk.20150623.gappssmtp.com header.i=@kernel-dk.20150623.gappssmtp.com header.b="jMKJ/QVN"
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1727321AbfIRCiR (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Tue, 17 Sep 2019 22:38:17 -0400
-Received: from smtpbguseast2.qq.com ([54.204.34.130]:55475 "EHLO
-        smtpbguseast2.qq.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1727264AbfIRCiR (ORCPT
+        id S1726074AbfIRClx (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Tue, 17 Sep 2019 22:41:53 -0400
+Received: from mail-pf1-f196.google.com ([209.85.210.196]:44231 "EHLO
+        mail-pf1-f196.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S1725922AbfIRClx (ORCPT
         <rfc822;linux-block@vger.kernel.org>);
-        Tue, 17 Sep 2019 22:38:17 -0400
-X-QQ-mid: bizesmtp28t1568774274t3j1jc44
-Received: from localhost.localdomain (unknown [218.76.23.26])
-        by esmtp10.qq.com (ESMTP) with 
-        id ; Wed, 18 Sep 2019 10:37:53 +0800 (CST)
-X-QQ-SSF: 01400000002000R0YS90000A0000000
-X-QQ-FEAT: pNle6v+TNkMA1o6k1aN/rf0K/y7OwEeXrM4rpfe7u8iw8U5hyr1uMOL0ll0jz
-        yGjAQtylLjKWTj23JDYAjnbpUuPpzqzP+kEORqp1/IGzefyb2Z0sYZot37JnbSPgM5WumDt
-        o0sURkuHBboQq1+t7qdMeb+BfQe5IDot4x6Jp/TQnigriQQqte9ygbsH51U6PsMaj4p7d28
-        sR8d5GnlGCkrI96IZO1Z5AmRGVNs/Pa7J0ukr8mPVEmaO6YqXxGKDUcJ8qmzYQZ4N2852Bs
-        7JlhnCBhXWKt+/2Tj5ZTDx7HGK1nEhmNzdia2CLrQx/52cfUQXM7CR0ydYiTBTdefffs1Zt
-        HVmEHxZrzuF9iWNR5TqpHcBdTRiTw==
-X-QQ-GoodBg: 2
-From:   Jackie Liu <liuyun01@kylinos.cn>
-To:     axboe@kernel.dk
+        Tue, 17 Sep 2019 22:41:53 -0400
+Received: by mail-pf1-f196.google.com with SMTP id q21so3345022pfn.11
+        for <linux-block@vger.kernel.org>; Tue, 17 Sep 2019 19:41:52 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=kernel-dk.20150623.gappssmtp.com; s=20150623;
+        h=subject:to:cc:references:from:message-id:date:user-agent
+         :mime-version:in-reply-to:content-language:content-transfer-encoding;
+        bh=XLH+QDfucuonGTHbjiPB3QV6rBa5Rb9Ayh4on+IFuuM=;
+        b=jMKJ/QVNJeitmnq5PqC3cmngVTenmvy+LoQf/pr1gbpSdWMblWSQOumwj68MbI5vae
+         t5ZagEYLtptyuqL0f/vl/S8CK/mTl1C2nnZXwazI/vfLKhdUNsY9UOIbvieoWGzD8HVv
+         HyOw1EMY2rHcwLCgP+pFMWKm8IKseeTGArniVDsHVMNvyHjS74rDlLco5C1pX5mOgxrM
+         e0WoVsmopdRrb+1P7NUlpXMqzM5XPw77Xn8HHcZ5uObmyt3wWlyjF9dBfWmytyw5kRyX
+         6VzUK+pnQUUxOlrYV96g7ED1RoberixrhjSQYfIdMcUJxHEij7stmo//GvuJDS1Ujr9c
+         rDUQ==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20161025;
+        h=x-gm-message-state:subject:to:cc:references:from:message-id:date
+         :user-agent:mime-version:in-reply-to:content-language
+         :content-transfer-encoding;
+        bh=XLH+QDfucuonGTHbjiPB3QV6rBa5Rb9Ayh4on+IFuuM=;
+        b=RIGzpUHPmNze2zdA5A45VAphM/4jcPvb6fY8c+gERrOWkuL4yUhYspdAkqqHdpVLRi
+         CDHLbaGCp4zMHjPtSC+pkWB60bjIbLjkQQoL4AxtN6Z69tIEzOQDLMLBb80qfBy3S6w6
+         7Hh74JSJlGhQB73z5K/2YlbdXCH5OGFNRDW1ror9WRyVWec5R/0uAs/f8G7zrlYg3za0
+         vLWpI9YKW6eaLF4EZf5IcdWMz+Q0FjBu7sH2CBeh7cCHYoq/TKWI12PvJDYb9fO6N3Hw
+         AsIMO5dKjhK8CZP6/BEAjYiiL3SQJLZSsM5hLL3cYIIUOx1rm9st17+abmKzWoO8hrOg
+         JAiw==
+X-Gm-Message-State: APjAAAWGygN9pq1nwAtpqH6cUSoEZyxzOQji6IQBMopuCpVgaL7aESye
+        Gwhc/DC6k2t1iFsWfJpwl5+mM/qsueLfUw==
+X-Google-Smtp-Source: APXvYqx1jERbjRy9813h1D1lEV/HgB+Ni8p+YqWhf+s+dtC7pCa4XnpCNFATvNd3+E1kyztshcEY1A==
+X-Received: by 2002:a62:76d1:: with SMTP id r200mr1738446pfc.27.1568774511817;
+        Tue, 17 Sep 2019 19:41:51 -0700 (PDT)
+Received: from [192.168.1.188] ([66.219.217.79])
+        by smtp.gmail.com with ESMTPSA id u5sm5201472pfl.25.2019.09.17.19.41.50
+        (version=TLS1_2 cipher=ECDHE-RSA-AES128-GCM-SHA256 bits=128/128);
+        Tue, 17 Sep 2019 19:41:50 -0700 (PDT)
+Subject: Re: [PATCH RESEND 1/2] io_uring: use kmemdup instead of kmalloc and
+ memcpy
+To:     Jackie Liu <liuyun01@kylinos.cn>
 Cc:     linux-block@vger.kernel.org
-Subject: [PATCH RESEND 1/2] io_uring: use kmemdup instead of kmalloc and memcpy
-Date:   Wed, 18 Sep 2019 10:37:52 +0800
-Message-Id: <1568774273-19434-1-git-send-email-liuyun01@kylinos.cn>
-X-Mailer: git-send-email 2.7.4
-X-QQ-SENDSIZE: 520
-Feedback-ID: bizesmtp:kylinos.cn:qybgforeign:qybgforeign4
-X-QQ-Bgrelay: 1
+References: <1568774273-19434-1-git-send-email-liuyun01@kylinos.cn>
+From:   Jens Axboe <axboe@kernel.dk>
+Message-ID: <5a5c8378-72f2-5196-c421-40b1fbc4a26a@kernel.dk>
+Date:   Tue, 17 Sep 2019 20:41:49 -0600
+User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:60.0) Gecko/20100101
+ Thunderbird/60.8.0
+MIME-Version: 1.0
+In-Reply-To: <1568774273-19434-1-git-send-email-liuyun01@kylinos.cn>
+Content-Type: text/plain; charset=utf-8
+Content-Language: en-US
+Content-Transfer-Encoding: 7bit
 Sender: linux-block-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-Just clean up the code, no function changes.
+On 9/17/19 8:37 PM, Jackie Liu wrote:
+> Just clean up the code, no function changes.
 
-Signed-off-by: Jackie Liu <liuyun01@kylinos.cn>
----
- fs/io_uring.c | 4 +---
- 1 file changed, 1 insertion(+), 3 deletions(-)
+Thanks, sorry for missing these. Applied both.
 
-diff --git a/fs/io_uring.c b/fs/io_uring.c
-index 0dadbdb..42a684e 100644
---- a/fs/io_uring.c
-+++ b/fs/io_uring.c
-@@ -2098,13 +2098,11 @@ static int __io_queue_sqe(struct io_ring_ctx *ctx, struct io_kiocb *req,
- 	if (ret == -EAGAIN && !(req->flags & REQ_F_NOWAIT)) {
- 		struct io_uring_sqe *sqe_copy;
- 
--		sqe_copy = kmalloc(sizeof(*sqe_copy), GFP_KERNEL);
-+		sqe_copy = kmemdup(s->sqe, sizeof(*sqe_copy), GFP_KERNEL);
- 		if (sqe_copy) {
- 			struct async_list *list;
- 
--			memcpy(sqe_copy, s->sqe, sizeof(*sqe_copy));
- 			s->sqe = sqe_copy;
--
- 			memcpy(&req->submit, s, sizeof(*s));
- 			list = io_async_list_from_sqe(ctx, s->sqe);
- 			if (!io_add_to_prev_work(list, req)) {
 -- 
-2.7.4
-
-
+Jens Axboe
 
