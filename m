@@ -2,79 +2,127 @@ Return-Path: <SRS0=kmcw=XN=vger.kernel.org=linux-block-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-2.1 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
-	HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,
-	USER_AGENT_SANE_1 autolearn=no autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-8.3 required=3.0 tests=DKIM_SIGNED,DKIM_VALID,
+	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,
+	SPF_HELO_NONE,SPF_PASS,USER_AGENT_SANE_1 autolearn=ham autolearn_force=no
+	version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 13EE2C4CEC4
-	for <linux-block@archiver.kernel.org>; Wed, 18 Sep 2019 16:38:30 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 07040C4CEC9
+	for <linux-block@archiver.kernel.org>; Wed, 18 Sep 2019 17:18:28 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.kernel.org (Postfix) with ESMTP id D02A6218AF
-	for <linux-block@archiver.kernel.org>; Wed, 18 Sep 2019 16:38:29 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id C2A18207FC
+	for <linux-block@archiver.kernel.org>; Wed, 18 Sep 2019 17:18:27 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (2048-bit key) header.d=infradead.org header.i=@infradead.org header.b="GvilIA4p"
+	dkim=pass (2048-bit key) header.d=kernel-dk.20150623.gappssmtp.com header.i=@kernel-dk.20150623.gappssmtp.com header.b="YF2sz3N6"
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S2387637AbfIRQi3 (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Wed, 18 Sep 2019 12:38:29 -0400
-Received: from bombadil.infradead.org ([198.137.202.133]:42388 "EHLO
-        bombadil.infradead.org" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1727100AbfIRQi3 (ORCPT
+        id S1731177AbfIRRS1 (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Wed, 18 Sep 2019 13:18:27 -0400
+Received: from mail-io1-f67.google.com ([209.85.166.67]:34773 "EHLO
+        mail-io1-f67.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S1726908AbfIRRS0 (ORCPT
         <rfc822;linux-block@vger.kernel.org>);
-        Wed, 18 Sep 2019 12:38:29 -0400
-DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed;
-        d=infradead.org; s=bombadil.20170209; h=In-Reply-To:Content-Type:MIME-Version
-        :References:Message-ID:Subject:Cc:To:From:Date:Sender:Reply-To:
-        Content-Transfer-Encoding:Content-ID:Content-Description:Resent-Date:
-        Resent-From:Resent-Sender:Resent-To:Resent-Cc:Resent-Message-ID:List-Id:
-        List-Help:List-Unsubscribe:List-Subscribe:List-Post:List-Owner:List-Archive;
-         bh=ITimMHE51XTbgvvKwOn06fBbBvNL//zS0+nNhe0cDik=; b=GvilIA4pmSEDd7xNIWS5P/1E8
-        0Wymiel7VN3+nM9iSGDwcSZimB0pn02p+K223yfF6/zYMxKJvPmEzdKQjh5StiOjFUmaweFRMATHk
-        kb5AWQKQRdVBclCSngo16Q5Ypqjr34CzJIRAj8TIo5VaqBHk36hBDTN4NP58ZMx0XDuQFBTD8BsDQ
-        vgMELhHzYwCo5iRpLnh1hUCN4H/7ZqTS5eCoRirtcUUnLqzqV9ljX+00zI2d6RnbhlnOB5WipXy4x
-        A6u1rirwpvWKg90rxZWviTrrtYsytgptQ0Rli6WNJeVVn/g1vKYtR/Xu7NyccJbf5Ffe1c6lFB9xM
-        2dWOBkNXA==;
-Received: from hch by bombadil.infradead.org with local (Exim 4.92.2 #3 (Red Hat Linux))
-        id 1iAcyI-00041d-GB; Wed, 18 Sep 2019 16:38:26 +0000
-Date:   Wed, 18 Sep 2019 09:38:26 -0700
-From:   Christoph Hellwig <hch@infradead.org>
-To:     Jens Axboe <axboe@kernel.dk>
-Cc:     Christoph Hellwig <hch@infradead.org>, xiubli@redhat.com,
-        josef@toxicpanda.com, mchristi@redhat.com,
-        linux-block@vger.kernel.org
-Subject: Re: [PATCHv2 0/2] blk-mq: Avoid memory reclaim when allocating
- request map
-Message-ID: <20190918163826.GA14377@infradead.org>
-References: <20190916021631.4327-1-xiubli@redhat.com>
- <20190916090606.GA13266@infradead.org>
- <8c08e9f8-cf71-8fcc-cff3-0d92dd859a59@kernel.dk>
+        Wed, 18 Sep 2019 13:18:26 -0400
+Received: by mail-io1-f67.google.com with SMTP id q1so1088519ion.1
+        for <linux-block@vger.kernel.org>; Wed, 18 Sep 2019 10:18:26 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=kernel-dk.20150623.gappssmtp.com; s=20150623;
+        h=to:from:subject:message-id:date:user-agent:mime-version
+         :content-language:content-transfer-encoding;
+        bh=5s3r/aNw0R3KjbWBbRFywkBC6DrJ+q2Z3JO4FXfEQJw=;
+        b=YF2sz3N6aKWOU0mbVoqddlzljFOsc3SNUJdhhnO1Z/3EDG+8e/kav5WNhRbQk9DVfm
+         nr9TAGkzLQo9tjkhHWHKafyOwt/M30MLouJIsk9P8nrwnHEjhPLcaGBNG/tjFktNx6l8
+         MpeK94Uejgj6CQ85JUZh2y8noH6wn6lOj5j2OV+HwhYwusZVbTQANzvavyoSI1z6JDaW
+         qo+ypftVDy9TmhKHY2DRt041uroJ98Dwt9LZ0hY781JybsIudbpm+TvgTMwe9xZhXDQD
+         aeF2KBxaxMJKUX65TZy4xWM2+8OuO5hpchwXN61i65PR6FdviZljVhPxsIa+aUDFTdXF
+         NkMg==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20161025;
+        h=x-gm-message-state:to:from:subject:message-id:date:user-agent
+         :mime-version:content-language:content-transfer-encoding;
+        bh=5s3r/aNw0R3KjbWBbRFywkBC6DrJ+q2Z3JO4FXfEQJw=;
+        b=CwxdtroGb5PF43MsooW3KusSufS/3WkrUlBDZ+pzXRZjfxWzu2HTtXKxs+uFD82j4R
+         XRn4JXS/feSU87sSYNvZDTBK//cwWE6aWgrrhx+1R0bXBVW5kDJxi/Q2r2lgQt1gHHTT
+         cKs0B8SYymJX3B0jMpWtviTQjaixc7DNpVhGaBilYXuviw92BhB8+vo3+fnMjUh0pf/L
+         E/e2poSVbka2Xx1AllfYL/ZamdPeGwJy7hYH0nt7urx/Lb8mbEF4kww+nyp5N5Da08mF
+         350JJyc4nRdVzYRM//L4JvVZlHXy6jH3X0onBf4t25lsLxNa5JOp3Iz3kZsgwbqCrNHE
+         tD9Q==
+X-Gm-Message-State: APjAAAWfSqAIe8X6tr4jp6/u1egE7nwqKXK/OxSoLTVch8O/nCRBb1qH
+        LlCJDhR9e4Fp+Zz2N/wu6Om4i3oZYRw+bQ==
+X-Google-Smtp-Source: APXvYqyUrdQ7IkD7yhjfSlRN74o4gsG41EUSaU2jz6j4+U4jiZp8NvnZGela0PjZJUK/jkPqNkjPdQ==
+X-Received: by 2002:a02:16c5:: with SMTP id a188mr6209713jaa.106.1568827105398;
+        Wed, 18 Sep 2019 10:18:25 -0700 (PDT)
+Received: from [192.168.1.50] ([65.144.74.34])
+        by smtp.gmail.com with ESMTPSA id l186sm9756076ioa.54.2019.09.18.10.18.24
+        for <linux-block@vger.kernel.org>
+        (version=TLS1_2 cipher=ECDHE-RSA-AES128-GCM-SHA256 bits=128/128);
+        Wed, 18 Sep 2019 10:18:24 -0700 (PDT)
+To:     "linux-block@vger.kernel.org" <linux-block@vger.kernel.org>
+From:   Jens Axboe <axboe@kernel.dk>
+Subject: [PATCH] io_uring: ensure poll commands clear ->sqe
+Message-ID: <b5561328-5574-bcba-8a2f-ba2343713922@kernel.dk>
+Date:   Wed, 18 Sep 2019 11:18:23 -0600
+User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:60.0) Gecko/20100101
+ Thunderbird/60.8.0
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <8c08e9f8-cf71-8fcc-cff3-0d92dd859a59@kernel.dk>
-User-Agent: Mutt/1.12.1 (2019-06-15)
-X-SRS-Rewrite: SMTP reverse-path rewritten from <hch@infradead.org> by bombadil.infradead.org. See http://www.infradead.org/rpr.html
+Content-Type: text/plain; charset=utf-8
+Content-Language: en-US
+Content-Transfer-Encoding: 7bit
 Sender: linux-block-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-On Mon, Sep 16, 2019 at 10:52:33AM -0600, Jens Axboe wrote:
-> On 9/16/19 3:06 AM, Christoph Hellwig wrote:
-> > On Mon, Sep 16, 2019 at 07:46:29AM +0530, xiubli@redhat.com wrote:
-> >> From: Xiubo Li <xiubli@redhat.com>
-> >>
-> >> To make the patch more readable and cleaner I just split them into 2
-> >> small ones to address the issue from @Ming Lei, thanks very much.
-> > 
-> > I'd be much happier to just see memalloc_noio_save +
-> > memalloc_noio_restore calls in the right places over sprinkling even
-> > more magic GFP_NOIO arguments.
-> 
-> Ugh, I always thought those were kind of lame and band aiding around
-> places where people are too lazy to fix the path to the gfp args.
-> Or maybe areas where it's just feasible.
+If we end up getting woken in poll (due to a signal), then we may need
+to punt the poll request to an async worker. When we do that, we look up
+the list to queue at, deferefencing req->submit.sqe, however that is
+only set for requests we initially decided to queue async.
 
-The way I understood the discussion around the introduction of these
-flags is that we want to phase out GFP_NOIO and GFP_NOFS in the long
-run, given that ammending all calls is basically impossibly, while
-marking contexts is pretty easy.
+This fixes a crash with poll command usage and wakeups that need to punt
+to async context.
+
+Fixes: 54a91f3bb9b9 ("io_uring: limit parallelism of buffered writes")
+Signed-off-by: Jens Axboe <axboe@kernel.dk>
+
+---
+
+diff --git a/fs/io_uring.c b/fs/io_uring.c
+index b550f685eadd..8c28bd7792b6 100644
+--- a/fs/io_uring.c
++++ b/fs/io_uring.c
+@@ -453,16 +453,15 @@ static void __io_commit_cqring(struct io_ring_ctx *ctx)
+ static inline void io_queue_async_work(struct io_ring_ctx *ctx,
+ 				       struct io_kiocb *req)
+ {
+-	int rw;
++	int rw = 0;
+ 
+-	switch (req->submit.sqe->opcode) {
+-	case IORING_OP_WRITEV:
+-	case IORING_OP_WRITE_FIXED:
+-		rw = !(req->rw.ki_flags & IOCB_DIRECT);
+-		break;
+-	default:
+-		rw = 0;
+-		break;
++	if (req->submit.sqe) {
++		switch (req->submit.sqe->opcode) {
++		case IORING_OP_WRITEV:
++		case IORING_OP_WRITE_FIXED:
++			rw = !(req->rw.ki_flags & IOCB_DIRECT);
++			break;
++		}
+ 	}
+ 
+ 	queue_work(ctx->sqo_wq[rw], &req->work);
+@@ -1721,6 +1720,7 @@ static int io_poll_add(struct io_kiocb *req, const struct io_uring_sqe *sqe)
+ 	if (!poll->file)
+ 		return -EBADF;
+ 
++	req->submit.sqe = NULL;
+ 	INIT_WORK(&req->work, io_poll_complete_work);
+ 	events = READ_ONCE(sqe->poll_events);
+ 	poll->events = demangle_poll(events) | EPOLLERR | EPOLLHUP;
+
+-- 
+Jens Axboe
+
