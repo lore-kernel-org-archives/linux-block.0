@@ -1,84 +1,116 @@
-Return-Path: <SRS0=pu/s=XM=vger.kernel.org=linux-block-owner@kernel.org>
+Return-Path: <SRS0=kmcw=XN=vger.kernel.org=linux-block-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-2.3 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
-	MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,USER_AGENT_SANE_1 autolearn=no
-	autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-0.9 required=3.0 tests=DKIMWL_WL_HIGH,DKIM_SIGNED,
+	DKIM_VALID,DKIM_VALID_AU,HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,
+	SPF_HELO_NONE,SPF_PASS autolearn=no autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 23DD3C4CEC9
-	for <linux-block@archiver.kernel.org>; Tue, 17 Sep 2019 23:30:49 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 12A17C4CECE
+	for <linux-block@archiver.kernel.org>; Wed, 18 Sep 2019 00:18:37 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.kernel.org (Postfix) with ESMTP id F3CFA21852
-	for <linux-block@archiver.kernel.org>; Tue, 17 Sep 2019 23:30:48 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id D87DF21855
+	for <linux-block@archiver.kernel.org>; Wed, 18 Sep 2019 00:18:36 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+	s=default; t=1568765916;
+	bh=EdfxfBL+kZBfgWkSsjy/yFLC2Wi6c8NaPQpXsOIKt9w=;
+	h=References:In-Reply-To:From:Date:Subject:To:Cc:List-ID:From;
+	b=M0lf0x7yju8pmPSweVsf5OtAnKeQHeZZNk3LmHYBWUtcOI3ctzJlJo9zkJqTCKwu7
+	 fVRT9ER6wx59rACnptX8h7Uf9aPECzB5nyPlyaSrI0qhUlt6oDR9PAKUp+gAUd8wqh
+	 S5QttqF/UGR3qBPRhYYsEmTwSY4frD+lO1b+Ynas=
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1726196AbfIQXas (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Tue, 17 Sep 2019 19:30:48 -0400
-Received: from mx1.redhat.com ([209.132.183.28]:33080 "EHLO mx1.redhat.com"
-        rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-        id S1726131AbfIQXas (ORCPT <rfc822;linux-block@vger.kernel.org>);
-        Tue, 17 Sep 2019 19:30:48 -0400
-Received: from smtp.corp.redhat.com (int-mx08.intmail.prod.int.phx2.redhat.com [10.5.11.23])
-        (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
-        (No client certificate requested)
-        by mx1.redhat.com (Postfix) with ESMTPS id 20F2F10CC1EE;
-        Tue, 17 Sep 2019 23:30:48 +0000 (UTC)
-Received: from [10.72.12.58] (ovpn-12-58.pek2.redhat.com [10.72.12.58])
-        by smtp.corp.redhat.com (Postfix) with ESMTPS id 4384B19C6A;
-        Tue, 17 Sep 2019 23:30:45 +0000 (UTC)
-Subject: Re: [PATCH v3 0/2] blk-mq: Avoid memory reclaim when allocating
-To:     Jens Axboe <axboe@kernel.dk>, josef@toxicpanda.com
-Cc:     mchristi@redhat.com, hch@infradead.org, linux-block@vger.kernel.org
-References: <20190917120910.24842-1-xiubli@redhat.com>
- <426aa779-1011-5a75-bb73-ae573c229806@kernel.dk>
- <eaa4fb45-3a62-839e-bdcf-5219fe1c8211@redhat.com>
- <e7e0ed6a-be80-241c-3841-4eaaba6a9bf9@kernel.dk>
- <960dd93e-3e3f-b0f4-5be5-1f77639a1614@redhat.com>
- <380792f3-cc15-2dc2-e138-124976508978@kernel.dk>
-From:   Xiubo Li <xiubli@redhat.com>
-Message-ID: <ddc5663d-1131-9043-29ee-cb489b95752c@redhat.com>
-Date:   Wed, 18 Sep 2019 07:30:42 +0800
-User-Agent: Mozilla/5.0 (Windows NT 10.0; WOW64; rv:60.0) Gecko/20100101
- Thunderbird/60.9.0
+        id S1729032AbfIRASg (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Tue, 17 Sep 2019 20:18:36 -0400
+Received: from mail-lf1-f67.google.com ([209.85.167.67]:41781 "EHLO
+        mail-lf1-f67.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S1729003AbfIRASf (ORCPT
+        <rfc822;linux-block@vger.kernel.org>);
+        Tue, 17 Sep 2019 20:18:35 -0400
+Received: by mail-lf1-f67.google.com with SMTP id r2so4250188lfn.8
+        for <linux-block@vger.kernel.org>; Tue, 17 Sep 2019 17:18:34 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=linux-foundation.org; s=google;
+        h=mime-version:references:in-reply-to:from:date:message-id:subject:to
+         :cc;
+        bh=A+42Yi1Km6Nb0ZjJ9T/rLLTYPx+bJkhXj7oFjQEE+1E=;
+        b=SgC71Qm9BxM9eJ7jRTJcd8L1MZT6/qgew/3PmOS8QjLRrulKb8SWD7zUa+qidHqHul
+         CTHGG79RzCn74XHhmv3IlGXZTdKjE8S6dNnDFofF0gtEk0MzQqcvO5VSoT2H0ngpGvzW
+         hsMDT6dZS7AKIeUtGzXRya8sOduG4gldnLqbA=
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20161025;
+        h=x-gm-message-state:mime-version:references:in-reply-to:from:date
+         :message-id:subject:to:cc;
+        bh=A+42Yi1Km6Nb0ZjJ9T/rLLTYPx+bJkhXj7oFjQEE+1E=;
+        b=PDW7VZZgB51O6sHfIteFxcYlFICNcv2VEgpHVrvup6Qya0pKCP7GQOmuaZmel+PsHd
+         ZK5rf5MENeKi2kLMdSA9TCjR3JD6TaoJIbNrX/1jd/n3biB6Su2s9Joii0tZt7tP46JX
+         1m2A0lstuyCw8GF8n3naxDGlTuyBb/xsIoadM92Re/oHBE75KDRMC63AtXh88XuyHXXP
+         nViIVxuncEyMyaRi2osMkMyLj6JirCCXIYqOgoCy/BnMB7hku3vZx9MgI6yRHhVMqikm
+         pQNt5uD/7IWIvwRcJcP6P7iM/WInsJPLwOS/8mdKwXv9SSOPyOkBKm4rYhNNAp1YyPfM
+         qTjg==
+X-Gm-Message-State: APjAAAUveM3BXULs560rlvGBrh9M5eSNPxnifP1RlxB0gV4e+z5zs+0U
+        aqX7zRadpIcOoYVBvkPJO3v9v1rp1FU=
+X-Google-Smtp-Source: APXvYqwKqWmRAJpA/vNdBTSMJhpc8aWGZO/eFqjKTetCdyvZmgo8sv3jrG3vMrvcRfvP85sR1R4twA==
+X-Received: by 2002:a19:810:: with SMTP id 16mr482510lfi.110.1568765913292;
+        Tue, 17 Sep 2019 17:18:33 -0700 (PDT)
+Received: from mail-lf1-f43.google.com (mail-lf1-f43.google.com. [209.85.167.43])
+        by smtp.gmail.com with ESMTPSA id z30sm811776lfj.63.2019.09.17.17.18.32
+        for <linux-block@vger.kernel.org>
+        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
+        Tue, 17 Sep 2019 17:18:32 -0700 (PDT)
+Received: by mail-lf1-f43.google.com with SMTP id d17so4265223lfa.7
+        for <linux-block@vger.kernel.org>; Tue, 17 Sep 2019 17:18:32 -0700 (PDT)
+X-Received: by 2002:ac2:5a4c:: with SMTP id r12mr487659lfn.52.1568765911962;
+ Tue, 17 Sep 2019 17:18:31 -0700 (PDT)
 MIME-Version: 1.0
-In-Reply-To: <380792f3-cc15-2dc2-e138-124976508978@kernel.dk>
-Content-Type: text/plain; charset=utf-8; format=flowed
-Content-Transfer-Encoding: 7bit
-Content-Language: en-US
-X-Scanned-By: MIMEDefang 2.84 on 10.5.11.23
-X-Greylist: Sender IP whitelisted, not delayed by milter-greylist-4.6.2 (mx1.redhat.com [10.5.110.65]); Tue, 17 Sep 2019 23:30:48 +0000 (UTC)
+References: <61b11672-f41b-9708-2486-f284a99483a8@kernel.dk>
+In-Reply-To: <61b11672-f41b-9708-2486-f284a99483a8@kernel.dk>
+From:   Linus Torvalds <torvalds@linux-foundation.org>
+Date:   Tue, 17 Sep 2019 17:18:16 -0700
+X-Gmail-Original-Message-ID: <CAHk-=whhKxxJ8yM1StiPcb8866PzxLBB77_d+MEA3SKY4hhjjg@mail.gmail.com>
+Message-ID: <CAHk-=whhKxxJ8yM1StiPcb8866PzxLBB77_d+MEA3SKY4hhjjg@mail.gmail.com>
+Subject: Re: [GIT PULL] Block changes for 5.4
+To:     Jens Axboe <axboe@kernel.dk>
+Cc:     "linux-block@vger.kernel.org" <linux-block@vger.kernel.org>
+Content-Type: text/plain; charset="UTF-8"
 Sender: linux-block-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-On 2019/9/18 7:25, Jens Axboe wrote:
-> On 9/17/19 5:19 PM, Xiubo Li wrote:
->> On 2019/9/18 7:11, Jens Axboe wrote:
->>> On 9/17/19 4:54 PM, Xiubo Li wrote:
->>>> On 2019/9/17 22:13, Jens Axboe wrote:
->>>>> On 9/17/19 6:09 AM, xiubli@redhat.com wrote:
->>>>>> From: Xiubo Li <xiubli@redhat.com>
->>>>>>
->>>>>> Changed in V2:
->>>>>> - Addressed the comment from Ming Lei, thanks.
->>>>>>
->>>>>> Changed in V3:
->>>>>> - Switch to memalloc_noio_save/restore from Christoph's comment, thanks.
->>>>> This now seems to be a mix of both approaches, which I don't think makes
->>>>> sense at all. I think we should just stick to the gfp_t being passed in,
->>>>> and defining the standard mask for init time blk-mq memory allocations.
->>>>>
->>>> Hmm, I might missed or misunderstand from the last thread. In this
->>>> thread with the save/store, the GFP_KERNEL is using instead. Maybe
->>>> save/store pair is not a exactly correct place or occasion to use here
->>>> as @Bart mentioned.
->>> Just make them all gfp based please, and skip the memalloc() stuff.
->> Yeah, isn't the v2 thread needed here ?
-> It might be, I didn't look super closely at v2. I'll take a look.
+On Mon, Sep 16, 2019 at 7:52 AM Jens Axboe <axboe@kernel.dk> wrote:
+>
+> - blk-cgroup writeback fixes (Tejun)
 
-Sure :-)
+Well, that's a very short description of a pretty subtle series.
 
-BRs
+Honestly, I would much rather have seen this as three completely
+separate pull requests:
 
+ - the writeback and cgroup stuff
 
+ - the core queuing changes
+
+ - the nvme driver updates
+
+ - the other driver updates
+
+because right now this pull request is just a mess of completely
+unrelated stuff that just shares a very weak common thread of "yeah,
+it's related to block devices".
+
+I've pulled this, but can you please just split driver stuff out from
+core queue handling code that is largely independent of any particular
+driver, and very much out from core VM writeback?
+
+They really have almost nothing to do with each other, and I don't see
+why you are randomly mixing these things up.
+
+It makes it much harder to review the end result, and I think one
+example of the weakness of this is the almost useless merge message
+that didn't really talk much about these "fixes" (which is already not
+really a proper description - those patches are really more like a
+completely new way of doing certain cases of writeback, and much more
+fundamental than just "some random fix that gets a single liner in
+between other stuff").
+
+                Linus
