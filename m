@@ -2,140 +2,272 @@ Return-Path: <SRS0=kmcw=XN=vger.kernel.org=linux-block-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-0.8 required=3.0 tests=DKIM_SIGNED,DKIM_VALID,
-	HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS
-	autolearn=no autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-2.3 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
+	MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,USER_AGENT_SANE_1 autolearn=no
+	autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id AB55FC4CEC4
-	for <linux-block@archiver.kernel.org>; Wed, 18 Sep 2019 21:05:57 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 3D1AFC4CEC9
+	for <linux-block@archiver.kernel.org>; Wed, 18 Sep 2019 21:46:11 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.kernel.org (Postfix) with ESMTP id 6720820665
-	for <linux-block@archiver.kernel.org>; Wed, 18 Sep 2019 21:05:57 +0000 (UTC)
-Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (2048-bit key) header.d=wdc.com header.i=@wdc.com header.b="aZsKAXm+";
-	dkim=pass (1024-bit key) header.d=sharedspace.onmicrosoft.com header.i=@sharedspace.onmicrosoft.com header.b="beukHbs+"
+	by mail.kernel.org (Postfix) with ESMTP id 0EAD82067B
+	for <linux-block@archiver.kernel.org>; Wed, 18 Sep 2019 21:46:11 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S2387877AbfIRVF4 (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Wed, 18 Sep 2019 17:05:56 -0400
-Received: from esa3.hgst.iphmx.com ([216.71.153.141]:30012 "EHLO
-        esa3.hgst.iphmx.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S2387661AbfIRVF4 (ORCPT
+        id S2388151AbfIRVqK (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Wed, 18 Sep 2019 17:46:10 -0400
+Received: from mail-pf1-f194.google.com ([209.85.210.194]:36798 "EHLO
+        mail-pf1-f194.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S2388135AbfIRVqK (ORCPT
         <rfc822;linux-block@vger.kernel.org>);
-        Wed, 18 Sep 2019 17:05:56 -0400
-DKIM-Signature: v=1; a=rsa-sha256; c=simple/simple;
-  d=wdc.com; i=@wdc.com; q=dns/txt; s=dkim.wdc.com;
-  t=1568840754; x=1600376754;
-  h=from:to:cc:subject:date:message-id:references:
-   content-transfer-encoding:mime-version;
-  bh=4vEquAIW5Y+AfLOjUcEL5jrE61OpYJNiGoXJ+TjBU4I=;
-  b=aZsKAXm+cuyP5+IfrJYevIaNCpFgQI+GLY3h/13Cu+lgOuOBHm7aT2BG
-   3bdjcHkD0szUceRhjJbUpHuEt3yxzlbFhQxX84Yev4VVLtUt77O7bFyw9
-   8Y1YANUNIEELjlTvyNTS7VubqUB7lIGQ9KMD3/e96cNbdM1AovxxWe0px
-   YNsu3KCKOklQTR1mXWUUfIOsKB9xYyIefXuYOJoFk43y0wx8UO1gn/Qcg
-   +ZhlQG1ChBfbHB76vfQQtxkpIa+YFXHDnKsyr2CnsXoTbKiPWiqfTKVnU
-   oHSjtYRhKzVkgW9xToPqKSgvTKRfWz4hPfWsCaVmtll0jl6VsrNmZSApM
-   w==;
-IronPort-SDR: iMWbdm4AbSLL6DumkaT33jJlTNja7S9JzcxMYwoT5Ib37auSTjR0RdhytrLEMlPkx1/si5f1ow
- jmzzRy2MtMxMPVbG2rVKpxST4jHXNAMFfnE9h8TPbl8Dp2RzAy4Y2QNqQkaOwlnzRYRYtOEo/O
- ucrUF5v8O8qZlnB+KnnLD7P7cpcDOsU78YxLKjve0RLvAfa+wHMYoatOmxxt72s9yX8nrhzfjm
- GpvWjo3fgoL3DbrejRRbuVfHIPtqWaSxL+fylNDN1ij7LnXsV8sOImPAUHNzLHmbrIRZ3NMGpY
- JYw=
-X-IronPort-AV: E=Sophos;i="5.64,522,1559491200"; 
-   d="scan'208";a="123050989"
-Received: from mail-sn1nam01lp2055.outbound.protection.outlook.com (HELO NAM01-SN1-obe.outbound.protection.outlook.com) ([104.47.32.55])
-  by ob1.hgst.iphmx.com with ESMTP; 19 Sep 2019 05:05:53 +0800
-ARC-Seal: i=1; a=rsa-sha256; s=arcselector9901; d=microsoft.com; cv=none;
- b=R3cTT/glk8SQQgxKvK4hvteie05YE7nOSkUgutA1hgfFdPiq+yfG1HPIBNgokg7APn+rVZlIzE8lxsY/teZ/DO4nITQlR8BCnD6sBqYuhaSR78zknkY9cKpVASlSgAA9fFEnoqp1/1OI8KyMNd68vMwcjc9dEEu12zOKgN7DlRepb/6zuuwElqjZbG7cUS8BwCQQOVxKdPuf3KVIVhPnQCDibKgHOjkDmuhveQuQvQR1SXFADDTtJuzEp3TfrFHLH6DXXEOkNsN+v0XwYOl2ZmzAAOj5kSdhXVhDibLrIL3Kv4IRWvPbU2DbBJqtWTEb3gihAUnZEh0SlPs8XGlGIQ==
-ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com;
- s=arcselector9901;
- h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
- bh=4vEquAIW5Y+AfLOjUcEL5jrE61OpYJNiGoXJ+TjBU4I=;
- b=hAQIciaOObZrQSGjGFnXnHoBhue3tb18tGb9YQpwAnOCtNxscQtVE3I/DAg6osh7HZfYDN2FvDeKTZvl6G6SIaWoU4ZAOMZfuOtD+d3CFCsNgvpa5uf0P+dlOWj9dIodOMcUTGtNPBLp4QHdIgEAn+tLIJcFAFghTsAnWO2X7j4Y076n9qd4Q19XERSUngBjNtzgSQBBt8BA+tqWNfw+9a0MIxwghoWt4Z9bJ5gL1PETo6p/TSXwIzlzPh0jW00YnEfwrR/OwA13GzEAfXKRpoOn2SKBrHI3038aSpvVIbYv0NZXz++je0B4kHh1rgO/fuTXgF7GOqfH2As2lcG30w==
-ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass
- smtp.mailfrom=wdc.com; dmarc=pass action=none header.from=wdc.com; dkim=pass
- header.d=wdc.com; arc=none
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
- d=sharedspace.onmicrosoft.com; s=selector2-sharedspace-onmicrosoft-com;
- h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
- bh=4vEquAIW5Y+AfLOjUcEL5jrE61OpYJNiGoXJ+TjBU4I=;
- b=beukHbs+9e9bM8L3BlGYoAJ1zBkua09kE4QZ50WF0CEb2WjjETE/z8kxnQzBryU7HrnkYnwOec8M/CIMNiYjvhSQ1Gu6X1t0XTfUkcEo8K8ATh8vD19QfKc9h/DMXUC4bmyeyOdkRxGhuD3P9XjXxvc7RVEiO1a02wMXYtlXxHY=
-Received: from BYAPR04MB5749.namprd04.prod.outlook.com (20.179.58.26) by
- BYAPR04MB5750.namprd04.prod.outlook.com (20.179.58.27) with Microsoft SMTP
- Server (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
- 15.20.2263.15; Wed, 18 Sep 2019 21:05:51 +0000
-Received: from BYAPR04MB5749.namprd04.prod.outlook.com
- ([fe80::6169:680:44fc:965d]) by BYAPR04MB5749.namprd04.prod.outlook.com
- ([fe80::6169:680:44fc:965d%6]) with mapi id 15.20.2263.023; Wed, 18 Sep 2019
- 21:05:51 +0000
-From:   Chaitanya Kulkarni <Chaitanya.Kulkarni@wdc.com>
-To:     Jens Axboe <axboe@kernel.dk>,
-        "linux-block@vger.kernel.org" <linux-block@vger.kernel.org>
-CC:     "osandov@fb.com" <osandov@fb.com>,
-        "bvanassche@acm.org" <bvanassche@acm.org>
-Subject: Re: [PATCH V2 0/2] block: track per requests type merged count
-Thread-Topic: [PATCH V2 0/2] block: track per requests type merged count
-Thread-Index: AQHVbbu3jcrUtbDbWk+hQetm7bQSVQ==
-Date:   Wed, 18 Sep 2019 21:05:51 +0000
-Message-ID: <BYAPR04MB57498738C7B6982C202FC674868E0@BYAPR04MB5749.namprd04.prod.outlook.com>
-References: <20190918005454.6872-1-chaitanya.kulkarni@wdc.com>
- <369ecccb-06ca-68d0-1474-34abdc2e8851@kernel.dk>
- <BYAPR04MB57494B7D18A17A97A09C6661868E0@BYAPR04MB5749.namprd04.prod.outlook.com>
- <c7488e6b-01db-b0e9-3116-6c96374c3639@kernel.dk>
-Accept-Language: en-US
-Content-Language: en-US
-X-MS-Has-Attach: 
-X-MS-TNEF-Correlator: 
-authentication-results: spf=none (sender IP is )
- smtp.mailfrom=Chaitanya.Kulkarni@wdc.com; 
-x-originating-ip: [199.255.44.170]
-x-ms-publictraffictype: Email
-x-ms-office365-filtering-correlation-id: 6960753a-2725-4af6-3bee-08d73c7bfca3
-x-ms-office365-filtering-ht: Tenant
-x-microsoft-antispam: BCL:0;PCL:0;RULEID:(2390118)(7020095)(4652040)(8989299)(5600167)(711020)(4605104)(1401327)(4618075)(4534185)(4627221)(201703031133081)(201702281549075)(8990200)(2017052603328)(7193020);SRVR:BYAPR04MB5750;
-x-ms-traffictypediagnostic: BYAPR04MB5750:
-x-microsoft-antispam-prvs: <BYAPR04MB57505CA952940A39D50B6212868E0@BYAPR04MB5750.namprd04.prod.outlook.com>
-wdcipoutbound: EOP-TRUE
-x-ms-oob-tlc-oobclassifiers: OLM:4502;
-x-forefront-prvs: 01644DCF4A
-x-forefront-antispam-report: SFV:NSPM;SFS:(10019020)(4636009)(396003)(376002)(366004)(136003)(39860400002)(346002)(51914003)(189003)(199004)(14444005)(74316002)(4326008)(33656002)(71200400001)(256004)(66066001)(66946007)(64756008)(66476007)(14454004)(102836004)(25786009)(7696005)(476003)(2501003)(66446008)(71190400001)(66556008)(76176011)(110136005)(54906003)(6506007)(53546011)(186003)(5660300002)(486006)(99286004)(316002)(6436002)(7736002)(26005)(76116006)(3846002)(478600001)(86362001)(6246003)(4744005)(305945005)(55016002)(52536014)(2906002)(8936002)(6116002)(229853002)(8676002)(446003)(81156014)(81166006)(9686003);DIR:OUT;SFP:1102;SCL:1;SRVR:BYAPR04MB5750;H:BYAPR04MB5749.namprd04.prod.outlook.com;FPR:;SPF:None;LANG:en;PTR:InfoNoRecords;MX:1;A:1;
-x-ms-exchange-senderadcheck: 1
-x-microsoft-antispam-message-info: lkp5HAyPLndvRJPYLxZreh3CYSQ/InqTkFMPT8T5sVWxP91Y9b6J4FdNeIgzpM7iiTEnUQ4+mpD5F1C6Xzna1jUV9oy7BMhG0q4IRlEQpq0Z62bmAueVy9+W4WmKHTGcgHsAYnrMg55PXGNI611/uVFkxN3tSWIEE5/FseuVY8k62FfV4t0kPFZ+kvPC0fQ/sU6SUrrGOQIpvTVTE09eZu7mdouNAGlGJQYSALxc75K1LuIUH+ZzmZ9OEkQzzrcRh+AMTMcmOoF5Vhci6IIGo1m0xe5weMysxtePvTeFtwseIi6mtO5NDMG3G0ivIMKIcCgsRQ6gGrhFTuY7gidxTiWlP3PgBVRp01BTh3W2OlI0PjjgZZKqCkvLZ8ixlFYWR5rqvRNnYtTvCKJJDknb/pVoZHLO3jtGP6sLYqEvdqI=
-x-ms-exchange-transport-forked: True
-Content-Type: text/plain; charset="us-ascii"
-Content-Transfer-Encoding: quoted-printable
+        Wed, 18 Sep 2019 17:46:10 -0400
+Received: by mail-pf1-f194.google.com with SMTP id y22so858674pfr.3;
+        Wed, 18 Sep 2019 14:46:09 -0700 (PDT)
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20161025;
+        h=x-gm-message-state:subject:to:cc:references:from:message-id:date
+         :user-agent:mime-version:in-reply-to:content-language
+         :content-transfer-encoding;
+        bh=5ToE36TXyPvjUmT2q612I/w8lZAj5I/Vf7MAwIwtPbE=;
+        b=Zk00P3DMH0DJotVDsgwhKXiY7uHS7iO3vhBkrIE7fk/JK69SmvodlhO4btFvwsjOVc
+         CN/f2daXB5v4Msc+0l3Cwhe27NbhFWhjc+FeG5q7KWZ+Y+OMTEgmGeuJtAJRAOwlKI8X
+         CYZ89nOwEq6LqQdTMGTV+Ix3nTJG68A9JSTqD7t2nkz62O6RjpuO1W4BCbb27jIoaFzj
+         zNOQXQ1Zv1mV9IhkBsL49kKcoZWDDBTEWi3dkqh5ZTM2CgHcH0IVEMnViXnpTy/RKHIm
+         oQHwGqRNtlPxxwt5n+hXF3Qm2oMaWOeTxvnTF4+A9Jqp6qOb4dGk8Lk/QuAfApEX5xkj
+         hIVA==
+X-Gm-Message-State: APjAAAW3vrQi2MW7iARM8M62qeGdki5yJRNeyNaofDXiVHRCA7h3dlCn
+        ng9wHA3+qZAWuxnOvDoiyjM=
+X-Google-Smtp-Source: APXvYqxhwtY/fEk55nOQQgf6oaUR6FukzEdXiWq8qdn3NQKbx40i578g6LsGGlAf2vYbYksJsbxA9A==
+X-Received: by 2002:a17:90a:9a81:: with SMTP id e1mr37824pjp.95.1568843169464;
+        Wed, 18 Sep 2019 14:46:09 -0700 (PDT)
+Received: from desktop-bart.svl.corp.google.com ([2620:15c:2cd:202:4308:52a3:24b6:2c60])
+        by smtp.gmail.com with ESMTPSA id l124sm7581337pgl.54.2019.09.18.14.46.08
+        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
+        Wed, 18 Sep 2019 14:46:08 -0700 (PDT)
+Subject: Re: [PATCH v4 21/25] ibnbd: server: functionality for IO submission
+ to file or block dev
+To:     Jack Wang <jinpuwang@gmail.com>, linux-block@vger.kernel.org,
+        linux-rdma@vger.kernel.org
+Cc:     axboe@kernel.dk, hch@infradead.org, sagi@grimberg.me,
+        jgg@mellanox.com, dledford@redhat.com,
+        danil.kipnis@cloud.ionos.com, rpenyaev@suse.de,
+        Jack Wang <jinpu.wang@cloud.ionos.com>
+References: <20190620150337.7847-1-jinpuwang@gmail.com>
+ <20190620150337.7847-22-jinpuwang@gmail.com>
+From:   Bart Van Assche <bvanassche@acm.org>
+Message-ID: <d1208649-5c25-578f-967e-f7a3c9edd9ce@acm.org>
+Date:   Wed, 18 Sep 2019 14:46:07 -0700
+User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:60.0) Gecko/20100101
+ Thunderbird/60.8.0
 MIME-Version: 1.0
-X-OriginatorOrg: wdc.com
-X-MS-Exchange-CrossTenant-Network-Message-Id: 6960753a-2725-4af6-3bee-08d73c7bfca3
-X-MS-Exchange-CrossTenant-originalarrivaltime: 18 Sep 2019 21:05:51.0776
- (UTC)
-X-MS-Exchange-CrossTenant-fromentityheader: Hosted
-X-MS-Exchange-CrossTenant-id: b61c8803-16f3-4c35-9b17-6f65f441df86
-X-MS-Exchange-CrossTenant-mailboxtype: HOSTED
-X-MS-Exchange-CrossTenant-userprincipalname: HzY/g31NxENyBij1dpo0Yvwm/JW09M6Vx5yhk6VvN/9fYqVSHb1Wz943mYArsR+qiP7Bo6kK5h0J18TDGC6KTMaJggQ8wJ9eWofHtTtt5G4=
-X-MS-Exchange-Transport-CrossTenantHeadersStamped: BYAPR04MB5750
+In-Reply-To: <20190620150337.7847-22-jinpuwang@gmail.com>
+Content-Type: text/plain; charset=utf-8; format=flowed
+Content-Language: en-US
+Content-Transfer-Encoding: 7bit
 Sender: linux-block-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-On 09/18/2019 12:49 PM, Jens Axboe wrote:=0A=
-> What is this new request type that supports merging?=0A=
->=0A=
-> My point is that adding stats like this isn't free, it's a runtime cost.=
-=0A=
-> And if it's just for debugging, there better be a damn good reason for=0A=
-> why we'd want to pay this cost the 99.999% of the time where nobody is=0A=
-> looking at those counters.=0A=
->=0A=
-> So why isn't the iostat stuff good enough? There's also the option of=0A=
-> having blktrace tell you this information, it would not be hard to add a=
-=0A=
-> blktrace-stats type of tool that'll just give you the last second of=0A=
-> stats so you wouldn't have to store the data, for example.=0A=
->=0A=
-> What I'm asking for is justification for adding these stats, so far I=0A=
-> don't see any outside of perhaps convenience, it's easier to just add=0A=
-> them to blk-mq and retrieve them through debugfs.=0A=
-=0A=
-Thanks for the explanation, make sense to drop these patches and rely=0A=
-on other tools.=0A=
+On 6/20/19 8:03 AM, Jack Wang wrote:
+> +#undef pr_fmt
+> +#define pr_fmt(fmt) KBUILD_MODNAME " L" __stringify(__LINE__) ": " fmt
+
+Same comment as for a previous patch: please do not include line number 
+information in pr_fmt().
+
+> +static int ibnbd_dev_vfs_open(struct ibnbd_dev *dev, const char *path,
+> +			      fmode_t flags)
+> +{
+> +	int oflags = O_DSYNC; /* enable write-through */
+> +
+> +	if (flags & FMODE_WRITE)
+> +		oflags |= O_RDWR;
+> +	else if (flags & FMODE_READ)
+> +		oflags |= O_RDONLY;
+> +	else
+> +		return -EINVAL;
+> +
+> +	dev->file = filp_open(path, oflags, 0);
+> +	return PTR_ERR_OR_ZERO(dev->file);
+> +}
+
+Isn't the use of O_DSYNC something that should be configurable?
+
+> +struct ibnbd_dev *ibnbd_dev_open(const char *path, fmode_t flags,
+> +				 enum ibnbd_io_mode mode, struct bio_set *bs,
+> +				 ibnbd_dev_io_fn io_cb)
+> +{
+> +	struct ibnbd_dev *dev;
+> +	int ret;
+> +
+> +	dev = kzalloc(sizeof(*dev), GFP_KERNEL);
+> +	if (!dev)
+> +		return ERR_PTR(-ENOMEM);
+> +
+> +	if (mode == IBNBD_BLOCKIO) {
+> +		dev->blk_open_flags = flags;
+> +		ret = ibnbd_dev_blk_open(dev, path, dev->blk_open_flags);
+> +		if (ret)
+> +			goto err;
+> +	} else if (mode == IBNBD_FILEIO) {
+> +		dev->blk_open_flags = FMODE_READ;
+> +		ret = ibnbd_dev_blk_open(dev, path, dev->blk_open_flags);
+> +		if (ret)
+> +			goto err;
+> +
+> +		ret = ibnbd_dev_vfs_open(dev, path, flags);
+> +		if (ret)
+> +			goto blk_put;
+
+This looks really weird. Why to call ibnbd_dev_blk_open() first for file 
+I/O mode? Why to set dev->blk_open_flags to FMODE_READ in file I/O mode?
+
+> +static int ibnbd_dev_blk_submit_io(struct ibnbd_dev *dev, sector_t sector,
+> +				   void *data, size_t len, u32 bi_size,
+> +				   enum ibnbd_io_flags flags, short prio,
+> +				   void *priv)
+> +{
+> +	struct request_queue *q = bdev_get_queue(dev->bdev);
+> +	struct ibnbd_dev_blk_io *io;
+> +	struct bio *bio;
+> +
+> +	/* check if the buffer is suitable for bdev */
+> +	if (unlikely(WARN_ON(!blk_rq_aligned(q, (unsigned long)data, len))))
+> +		return -EINVAL;
+> +
+> +	/* Generate bio with pages pointing to the rdma buffer */
+> +	bio = ibnbd_bio_map_kern(q, data, dev->ibd_bio_set, len, GFP_KERNEL);
+> +	if (unlikely(IS_ERR(bio)))
+> +		return PTR_ERR(bio);
+> +
+> +	io = kmalloc(sizeof(*io), GFP_KERNEL);
+> +	if (unlikely(!io)) {
+> +		bio_put(bio);
+> +		return -ENOMEM;
+> +	}
+> +
+> +	io->dev		= dev;
+> +	io->priv	= priv;
+> +
+> +	bio->bi_end_io		= ibnbd_dev_bi_end_io;
+> +	bio->bi_private		= io;
+> +	bio->bi_opf		= ibnbd_to_bio_flags(flags);
+> +	bio->bi_iter.bi_sector	= sector;
+> +	bio->bi_iter.bi_size	= bi_size;
+> +	bio_set_prio(bio, prio);
+> +	bio_set_dev(bio, dev->bdev);
+> +
+> +	submit_bio(bio);
+> +
+> +	return 0;
+> +}
+
+Can struct bio and struct ibnbd_dev_blk_io be combined into a single 
+data structure by passing the size of the latter data structure as the 
+front_pad argument to bioset_init()?
+
+> +static void ibnbd_dev_file_submit_io_worker(struct work_struct *w)
+> +{
+> +	struct ibnbd_dev_file_io_work *dev_work;
+> +	struct file *f;
+> +	int ret, len;
+> +	loff_t off;
+> +
+> +	dev_work = container_of(w, struct ibnbd_dev_file_io_work, work);
+> +	off = dev_work->sector * ibnbd_dev_get_logical_bsize(dev_work->dev);
+> +	f = dev_work->dev->file;
+> +	len = dev_work->bi_size;
+> +
+> +	if (ibnbd_op(dev_work->flags) == IBNBD_OP_FLUSH) {
+> +		ret = ibnbd_dev_file_handle_flush(dev_work, off);
+> +		if (unlikely(ret))
+> +			goto out;
+> +	}
+> +
+> +	if (ibnbd_op(dev_work->flags) == IBNBD_OP_WRITE_SAME) {
+> +		ret = ibnbd_dev_file_handle_write_same(dev_work);
+> +		if (unlikely(ret))
+> +			goto out;
+> +	}
+> +
+> +	/* TODO Implement support for DIRECT */
+> +	if (dev_work->bi_size) {
+> +		loff_t off_tmp = off;
+> +
+> +		if (ibnbd_op(dev_work->flags) == IBNBD_OP_WRITE)
+> +			ret = kernel_write(f, dev_work->data, dev_work->bi_size,
+> +					   &off_tmp);
+> +		else
+> +			ret = kernel_read(f, dev_work->data, dev_work->bi_size,
+> +					  &off_tmp);
+> +
+> +		if (unlikely(ret < 0)) {
+> +			goto out;
+> +		} else if (unlikely(ret != dev_work->bi_size)) {
+> +			/* TODO implement support for partial completions */
+> +			ret = -EIO;
+> +			goto out;
+> +		} else {
+> +			ret = 0;
+> +		}
+> +	}
+> +
+> +	if (dev_work->flags & IBNBD_F_FUA)
+> +		ret = ibnbd_dev_file_handle_fua(dev_work, off);
+> +out:
+> +	dev_work->dev->io_cb(dev_work->priv, ret);
+> +	kfree(dev_work);
+> +}
+> +
+> +static int ibnbd_dev_file_submit_io(struct ibnbd_dev *dev, sector_t sector,
+> +				    void *data, size_t len, size_t bi_size,
+> +				    enum ibnbd_io_flags flags, void *priv)
+> +{
+> +	struct ibnbd_dev_file_io_work *w;
+> +
+> +	if (!ibnbd_flags_supported(flags)) {
+> +		pr_info_ratelimited("Unsupported I/O flags: 0x%x on device "
+> +				    "%s\n", flags, dev->name);
+> +		return -ENOTSUPP;
+> +	}
+> +
+> +	w = kmalloc(sizeof(*w), GFP_KERNEL);
+> +	if (!w)
+> +		return -ENOMEM;
+> +
+> +	w->dev		= dev;
+> +	w->priv		= priv;
+> +	w->sector	= sector;
+> +	w->data		= data;
+> +	w->len		= len;
+> +	w->bi_size	= bi_size;
+> +	w->flags	= flags;
+> +	INIT_WORK(&w->work, ibnbd_dev_file_submit_io_worker);
+> +
+> +	if (unlikely(!queue_work(fileio_wq, &w->work))) {
+> +		kfree(w);
+> +		return -EEXIST;
+> +	}
+> +
+> +	return 0;
+> +}
+
+Please use the in-kernel asynchronous I/O API instead of kernel_read() 
+and kernel_write() and remove the fileio_wq workqueue. Examples of how 
+to use call_read_iter() and call_write_iter() are available in the loop 
+driver and also in drivers/target/target_core_file.c.
+
+> +/** ibnbd_dev_init() - Initialize ibnbd_dev
+> + *
+> + * This functions initialized the ibnbd-dev component.
+> + * It has to be called 1x time before ibnbd_dev_open() is used
+> + */
+> +int ibnbd_dev_init(void);
+
+It is great so see kernel-doc headers above functions but I'm not sure 
+these should be in .h files. I think most kernel developers prefer to 
+see kernel-doc headers for functions in .c files because that makes it 
+more likely that the implementation and the documentation stay in sync.
+
+Thanks,
+
+Bart.
