@@ -2,117 +2,108 @@ Return-Path: <SRS0=Rcc/=XO=vger.kernel.org=linux-block-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-14.4 required=3.0 tests=DKIMWL_WL_MED,DKIM_SIGNED,
-	DKIM_VALID,DKIM_VALID_AU,HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,
-	MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED,
-	USER_IN_DEF_DKIM_WL autolearn=ham autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-2.3 required=3.0 tests=DKIM_SIGNED,DKIM_VALID,
+	HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,
+	USER_AGENT_SANE_1 autolearn=no autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 55EC7C3A5A6
-	for <linux-block@archiver.kernel.org>; Thu, 19 Sep 2019 16:21:27 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id E18B4C3A5A6
+	for <linux-block@archiver.kernel.org>; Thu, 19 Sep 2019 17:48:49 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.kernel.org (Postfix) with ESMTP id 1EA7621907
-	for <linux-block@archiver.kernel.org>; Thu, 19 Sep 2019 16:21:27 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id B5A9121924
+	for <linux-block@archiver.kernel.org>; Thu, 19 Sep 2019 17:48:49 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="jMp6N6eF"
+	dkim=pass (2048-bit key) header.d=kernel-dk.20150623.gappssmtp.com header.i=@kernel-dk.20150623.gappssmtp.com header.b="K8VVX19o"
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S2404248AbfISQV0 (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Thu, 19 Sep 2019 12:21:26 -0400
-Received: from mail-pf1-f195.google.com ([209.85.210.195]:39406 "EHLO
-        mail-pf1-f195.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S2404246AbfISQV0 (ORCPT
+        id S2390260AbfISRst (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Thu, 19 Sep 2019 13:48:49 -0400
+Received: from mail-io1-f65.google.com ([209.85.166.65]:46310 "EHLO
+        mail-io1-f65.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S2389433AbfISRss (ORCPT
         <rfc822;linux-block@vger.kernel.org>);
-        Thu, 19 Sep 2019 12:21:26 -0400
-Received: by mail-pf1-f195.google.com with SMTP id i1so2638440pfa.6
-        for <linux-block@vger.kernel.org>; Thu, 19 Sep 2019 09:21:26 -0700 (PDT)
+        Thu, 19 Sep 2019 13:48:48 -0400
+Received: by mail-io1-f65.google.com with SMTP id d17so9675394ios.13
+        for <linux-block@vger.kernel.org>; Thu, 19 Sep 2019 10:48:47 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=google.com; s=20161025;
-        h=mime-version:references:in-reply-to:from:date:message-id:subject:to
-         :cc;
-        bh=DLElX6prsemmI7+wc0Ol+UL4D1Wa4vwan9SjKgoiFhY=;
-        b=jMp6N6eFq6jQzuKpk6LGVgXz/S9TP47yGUWsOQsmv3xsq5S9u+jNmxuTo95dRVFNrQ
-         94RsctbWhbXCRKVIDU4V3dNX1Lm7RBMmKwruC2/HH68wJByUsD8pMEuCwvoiw7TuSLcY
-         mM44SSo5uSeSL1dqE9gscBIEMegZKliZ/hYgFPzjY4jRKUosd3wQy7ivwomcBJzLZjym
-         1oH4z09PzqslgJ1Z1DUGOl2M0vYtFhQDfcfnrzyVkZfVHJGgvjrZDSYDuVSNkQ1IbC/R
-         uCxN3R9nHOxvKTpgSuqdtFUbQZn2legL4RGJkoOlaQL0CyYazUdvXXuOTWCAdoubX35e
-         0x1g==
+        d=kernel-dk.20150623.gappssmtp.com; s=20150623;
+        h=subject:to:cc:references:from:message-id:date:user-agent
+         :mime-version:in-reply-to:content-language:content-transfer-encoding;
+        bh=iC74FDHxst+tccsETTle3rR7zrtvRzSQgS7jIMs0SKk=;
+        b=K8VVX19of7Fa2rcJGX5psG2u0F8xohovO/uB9f7qab3ZbxMpQjp9ogZYxXLsqVwxIB
+         ms8OBL23MhzE73wvlkkcPYwkUlJL23U60wI5zokEp7lm05hI8bLb2SCa9MprtYsivXQU
+         /4iAO8ae1zTwhOP2zmfXSNnwIAnfIOVpWqh6fPbCBjmqA9NAvVTRGTQFeJNQD4aDqhqx
+         Vwp6ZP8JV+zXbRDprNXGP3bJd/Hw8DE/xXZAV5PWqfXbkGbqa51iZvhHadJF95OyAh83
+         IuCh4WUH+yrE1dR3qYviM7yQ/rMiyQz5l8mmT1J4+/GrFp4Usde7MEvQffREy5oioTKs
+         DuUA==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=1e100.net; s=20161025;
-        h=x-gm-message-state:mime-version:references:in-reply-to:from:date
-         :message-id:subject:to:cc;
-        bh=DLElX6prsemmI7+wc0Ol+UL4D1Wa4vwan9SjKgoiFhY=;
-        b=brTkgBWv8wVxia9judTwJZn4RPHF/og5RG9Tsahg8DAoyUo4J+KykgfgbSMdCGDSap
-         K6qdTcIvsuqkEytSSvBnXXZx2+LgJ9pDcHFi0d+rrlTXXSAa3/6doAk+R8ezRN9a8618
-         vraaysCZ0q+ZMwe1tNE3av8U1nIQvuhahEAEFt702uvyg6hbXrsDXu893ioA7FvCEOng
-         O3234aHvefP7BtTI7AZ8YoLWGxHOBbxPV/CPZJJk85d3jlxYBVZ2VnV/GXxqOKbD0tOJ
-         YzBaT4Eh3CtnPUQ+UtGtBWgAlZwI05P1kN8ZEgG9Fso7Qm7AscE/yERg8cvBtLMMcxJJ
-         RxbA==
-X-Gm-Message-State: APjAAAUo6G57g+EGgrwAOJjN80iHlviF596su6J1bc4isK9qOnK4Bf5Z
-        im3UnwKXXiPJggNPmq7KbbpUx1rM79kAcCxIO7HXFw==
-X-Google-Smtp-Source: APXvYqwUeNlfZfuENe5/I1lSuDmwkraJfDbpWXsOUMmBZl1XGtgiqQCtbZsFABCPk+AaGAlHey/MPAnIwBQkOh7YqN8=
-X-Received: by 2002:a62:5fc1:: with SMTP id t184mr11250186pfb.84.1568910085164;
- Thu, 19 Sep 2019 09:21:25 -0700 (PDT)
-MIME-Version: 1.0
-References: <20190919135725.1287963-1-arnd@arndb.de>
-In-Reply-To: <20190919135725.1287963-1-arnd@arndb.de>
-From:   Nick Desaulniers <ndesaulniers@google.com>
-Date:   Thu, 19 Sep 2019 09:21:14 -0700
-Message-ID: <CAKwvOdn=qYoBnsXrGh8KDaFzy6WEsfp1RhoZZQUHHL4OFzx88A@mail.gmail.com>
-Subject: Re: [PATCH] block: t10-pi: fix -Wswitch warning
-To:     Arnd Bergmann <arnd@arndb.de>
-Cc:     Jens Axboe <axboe@kernel.dk>, Christoph Hellwig <hch@lst.de>,
+        h=x-gm-message-state:subject:to:cc:references:from:message-id:date
+         :user-agent:mime-version:in-reply-to:content-language
+         :content-transfer-encoding;
+        bh=iC74FDHxst+tccsETTle3rR7zrtvRzSQgS7jIMs0SKk=;
+        b=sROCXLfs7/iEbm2sbMcKEN6Te696/uJ1T2Cr+BMF8GTiINrtnQdUDh/tvMUw89Gjtx
+         ouTA0NGQK9s7CRLTMYerMvWGRbpkKBg0xnO+oZVzRhZyEsCHMouaMOuEQCORWoLnjdfA
+         wStboVH2CWNa80+anzOqdnp13v5o9EZUn8vgpGXqtVcSrEIumQ01ILfFFDLGxmuI5+O1
+         jA7HUCuFdkwFouifpzZjRFi1vkaFVsLUeKl2dTbJ+l/Vm87+dMxUGRrGsFKdwslkUX1+
+         eZziFGg8o27dXkmrTvyVOt9M0xJupqOOLpGeqeYGV85HJp3MMlKXuHb6cfbnTqvb9ZBF
+         JZCQ==
+X-Gm-Message-State: APjAAAWXlr4Ey6dsxLAtfD72z++vIlnT9rR+GsfYkSuGQ3qDaqE+2qPP
+        3Aesdnx7ofLxCoPneV1T3HAD3w==
+X-Google-Smtp-Source: APXvYqxkQMcVy/dqy9FUS/DErap8Adkqyvgw4K9DQx7F4UW0e2KGzwQyJFNQqYvQ1UleK5CHZEj8WQ==
+X-Received: by 2002:a5e:851a:: with SMTP id i26mr13106869ioj.304.1568915327323;
+        Thu, 19 Sep 2019 10:48:47 -0700 (PDT)
+Received: from [192.168.1.50] ([65.144.74.34])
+        by smtp.gmail.com with ESMTPSA id f8sm7883134ioo.27.2019.09.19.10.48.45
+        (version=TLS1_2 cipher=ECDHE-RSA-AES128-GCM-SHA256 bits=128/128);
+        Thu, 19 Sep 2019 10:48:46 -0700 (PDT)
+Subject: Re: [RFC PATCH 0/2] blk-mq I/O scheduling fixes
+To:     Hannes Reinecke <hare@suse.de>
+Cc:     linux-scsi@vger.kernel.org,
         "Martin K. Petersen" <martin.petersen@oracle.com>,
-        Max Gurtovoy <maxg@mellanox.com>,
-        Chaitanya Kulkarni <chaitanya.kulkarni@wdc.com>,
-        linux-block@vger.kernel.org, LKML <linux-kernel@vger.kernel.org>,
-        clang-built-linux <clang-built-linux@googlegroups.com>,
-        Nathan Chancellor <natechancellor@gmail.com>, kbuild-all@01.org
-Content-Type: text/plain; charset="UTF-8"
+        James Bottomley <james.bottomley@hansenpartnership.com>,
+        Christoph Hellwig <hch@lst.de>, linux-block@vger.kernel.org,
+        Hans Holmberg <hans.holmberg@wdc.com>,
+        Damien Le Moal <damien.lemoal@wdc.com>
+References: <20190919094547.67194-1-hare@suse.de>
+From:   Jens Axboe <axboe@kernel.dk>
+Message-ID: <1bde2781-9958-9bf1-2d89-8c4f9f0d8cba@kernel.dk>
+Date:   Thu, 19 Sep 2019 11:48:45 -0600
+User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:60.0) Gecko/20100101
+ Thunderbird/60.8.0
+MIME-Version: 1.0
+In-Reply-To: <20190919094547.67194-1-hare@suse.de>
+Content-Type: text/plain; charset=utf-8
+Content-Language: en-US
+Content-Transfer-Encoding: 7bit
 Sender: linux-block-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-On Thu, Sep 19, 2019 at 6:57 AM Arnd Bergmann <arnd@arndb.de> wrote:
->
-> Changing the switch() statement to symbolic constants made
-> the compiler (at least clang-9, did not check gcc) notice that
-> there is one enum value that is not handled here:
->
-> block/t10-pi.c:62:11: error: enumeration value 'T10_PI_TYPE0_PROTECTION' not handled in switch [-Werror,-Wswitch]
->
-> Add another case for the missing value and do nothing there
-> based on the assumption that the code was working correctly
-> already.
->
-> Fixes: 9b2061b1a262 ("block: use symbolic constants for t10_pi type")
-> Signed-off-by: Arnd Bergmann <arnd@arndb.de>
+On 9/19/19 3:45 AM, Hannes Reinecke wrote:
+> Hi all,
+> 
+> Damien pointed out that there are some areas in the blk-mq I/O
+> scheduling algorithm which have a distinct legacy feel to it,
+> and prohibit multiqueue I/O schedulers from working properly.
+> These two patches should clear up this situation, but as it's
+> not quite clear what the original intention of the code was
+> I'll be posting them as an RFC.
+> 
+> So as usual, comments and reviews are welcome.
+> 
+> Hannes Reinecke (2):
+>    blk-mq: fixup request re-insert in blk_mq_try_issue_list_directly()
+>    blk-mq: always call into the scheduler in blk_mq_make_request()
+> 
+>   block/blk-mq.c | 9 ++-------
+>   1 file changed, 2 insertions(+), 7 deletions(-)
 
-Reported-by: kbuild test robot <lkp@intel.com>
-https://groups.google.com/forum/#!topic/clang-built-linux/awgY7hmSCCM
-Hard to say what's the right thing to do here, there's not a lot of
-other switches on this variable.  That enum value barely even shows up
-in the kernel.  Since this is no functional change:
-Acked-by: Nick Desaulniers <ndesaulniers@google.com>
-Thanks for sending the patch.
+Not quite sure what to do with this... Did you test them at all?
+One is obviously broken and would crash the kernel, the other
+is/was a performance optimization done not that long ago.
 
-> ---
->  block/t10-pi.c | 2 ++
->  1 file changed, 2 insertions(+)
->
-> diff --git a/block/t10-pi.c b/block/t10-pi.c
-> index 0c0120a672f9..055fac923946 100644
-> --- a/block/t10-pi.c
-> +++ b/block/t10-pi.c
-> @@ -60,6 +60,8 @@ static blk_status_t t10_pi_verify(struct blk_integrity_iter *iter,
->                 __be16 csum;
->
->                 switch (type) {
-> +               case T10_PI_TYPE0_PROTECTION:
-> +                       break;
->                 case T10_PI_TYPE1_PROTECTION:
->                 case T10_PI_TYPE2_PROTECTION:
->                         if (pi->app_tag == T10_PI_APP_ESCAPE)
-> --
+Just going to ignore this series for now.
+
 -- 
-Thanks,
-~Nick Desaulniers
+Jens Axboe
+
