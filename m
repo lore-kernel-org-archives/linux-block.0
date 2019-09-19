@@ -2,92 +2,92 @@ Return-Path: <SRS0=Rcc/=XO=vger.kernel.org=linux-block-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-9.8 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
+X-Spam-Status: No, score=-8.2 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
 	INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,
-	URIBL_BLOCKED,USER_AGENT_GIT autolearn=ham autolearn_force=no version=3.4.0
+	URIBL_BLOCKED,USER_AGENT_SANE_1 autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 98211C3A5A6
-	for <linux-block@archiver.kernel.org>; Thu, 19 Sep 2019 13:57:42 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 353A1C4CEC4
+	for <linux-block@archiver.kernel.org>; Thu, 19 Sep 2019 14:19:52 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.kernel.org (Postfix) with ESMTP id 7789A21D7C
-	for <linux-block@archiver.kernel.org>; Thu, 19 Sep 2019 13:57:42 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id 086CF218AF
+	for <linux-block@archiver.kernel.org>; Thu, 19 Sep 2019 14:19:52 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1732279AbfISN5l (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Thu, 19 Sep 2019 09:57:41 -0400
-Received: from mout.kundenserver.de ([212.227.17.24]:46881 "EHLO
-        mout.kundenserver.de" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1727642AbfISN5k (ORCPT
-        <rfc822;linux-block@vger.kernel.org>);
-        Thu, 19 Sep 2019 09:57:40 -0400
-Received: from threadripper.lan ([149.172.19.189]) by mrelayeu.kundenserver.de
- (mreue106 [212.227.15.145]) with ESMTPA (Nemesis) id
- 1MgwBv-1hj3F420FB-00hMbl; Thu, 19 Sep 2019 15:57:27 +0200
-From:   Arnd Bergmann <arnd@arndb.de>
-To:     Jens Axboe <axboe@kernel.dk>
-Cc:     Arnd Bergmann <arnd@arndb.de>, Christoph Hellwig <hch@lst.de>,
+        id S2388002AbfISOTv (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Thu, 19 Sep 2019 10:19:51 -0400
+Received: from mx1.redhat.com ([209.132.183.28]:38818 "EHLO mx1.redhat.com"
+        rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
+        id S2388006AbfISOTv (ORCPT <rfc822;linux-block@vger.kernel.org>);
+        Thu, 19 Sep 2019 10:19:51 -0400
+Received: from smtp.corp.redhat.com (int-mx03.intmail.prod.int.phx2.redhat.com [10.5.11.13])
+        (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
+        (No client certificate requested)
+        by mx1.redhat.com (Postfix) with ESMTPS id 39F4260149;
+        Thu, 19 Sep 2019 14:19:51 +0000 (UTC)
+Received: from ming.t460p (ovpn-8-19.pek2.redhat.com [10.72.8.19])
+        by smtp.corp.redhat.com (Postfix) with ESMTPS id E66C66060D;
+        Thu, 19 Sep 2019 14:19:40 +0000 (UTC)
+Date:   Thu, 19 Sep 2019 22:19:36 +0800
+From:   Ming Lei <ming.lei@redhat.com>
+To:     Hannes Reinecke <hare@suse.de>
+Cc:     Jens Axboe <axboe@kernel.dk>, linux-scsi@vger.kernel.org,
         "Martin K. Petersen" <martin.petersen@oracle.com>,
-        Max Gurtovoy <maxg@mellanox.com>,
-        Chaitanya Kulkarni <chaitanya.kulkarni@wdc.com>,
-        linux-block@vger.kernel.org, linux-kernel@vger.kernel.org,
-        clang-built-linux@googlegroups.com
-Subject: [PATCH] block: t10-pi: fix -Wswitch warning
-Date:   Thu, 19 Sep 2019 15:57:19 +0200
-Message-Id: <20190919135725.1287963-1-arnd@arndb.de>
-X-Mailer: git-send-email 2.20.0
+        James Bottomley <james.bottomley@hansenpartnership.com>,
+        Christoph Hellwig <hch@lst.de>, linux-block@vger.kernel.org,
+        Hans Holmberg <hans.holmberg@wdc.com>,
+        Damien Le Moal <damien.lemoal@wdc.com>,
+        Hannes Reinecke <hare@suse.com>
+Subject: Re: [PATCH 1/2] blk-mq: fixup request re-insert in
+ blk_mq_try_issue_list_directly()
+Message-ID: <20190919141934.GA11207@ming.t460p>
+References: <20190919094547.67194-1-hare@suse.de>
+ <20190919094547.67194-2-hare@suse.de>
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
-X-Provags-ID: V03:K1:tN+XsyXJdHFnCMzPxDFyb2EBaVVp1Ivx2u5rxFBl8O1rODBEDdc
- 2hdSU18cmnE1oADZvswr6ov0IvJhK4PJ3oQytoaedrt4HErtAJstzaERKzuZLIsVTvNQDtk
- MfHohPUVH457DDV34tAXV7jci0NIoFYd8ff9+pWhQMC9cORkOyXB/FePCN+chvUfRGco8JE
- l2dmid2zR9cFKxtAi1wvw==
-X-UI-Out-Filterresults: notjunk:1;V03:K0:PpQaXfdWnT0=:y8V8FK+UtJq3wztlx/VtDA
- jj8iXXuPCb+8dqOo2iliOmpthow8uIC9XPEx+E+Himl+CVCdfdP1XhFgpZQvCtu2exravP8or
- 6MTI68uzb3UdUxN9gvUwz+mhwnDO6ih/CmfwFrXai/oJu17MXNwf42utsidpvcP90ljXebSXj
- DhQW//YvpbMGAuQZ8qxvJrMnquZmnwqXr1Y94dSd990E+4jAc2dSskPqUlQRPnGfI4McpTsO5
- qxRwuXWTBi1V5hh2wf5yzXTQuJ6tt0JbcCX1uffctTx0OAef5XdIe+hwj8s/Rk5w8OKikGsz5
- stIb76l8Vs0y5M3Do8hwDlRaG098jIAXSISlgqy16Bq8VAiUsL5N0qxKj1zrafcPVHasSbz0v
- OKuI0sloaWE6j8LHdP8uRnNLqcPs7IXBQoYK4K+NZZe8s9ytFACuItItmR29D1uDZ/gqkcYTN
- aeHj26hLt1DR8xyDBwCpf3zGNxQLy+lzkROnt+X+EOu5zfjnu0Tzo3hJamuAZ1tPee+WO0Hy0
- J2nhenYRyhUGyYYKNYqJmDj55J95j3iA3/wx5FmcL4ZY3glim165FXHu+eVfp3AchjV2DJarg
- HppSTRquBBxSRFMKQDdiyezsWhmC4u3Eqbm4eJrC99vLBdRzTNgvldrqRlL8v68qv1cY2+e2S
- 1HIIDUV9yQTqL0bju2M2H4TNqZHBzr7pGBofabq+IKg+rZMzmesVAaVBAuFfEYAxrKk2ItSG3
- 3TzoCv5I/HJgEpHbXYmwj/4b5/P+D+Y16pBsUugZJjx6llQ+FyiRT6t6jxoVgTgp9a28v1t20
- gv/ag0HjpdgKqVxN733GTt6FFmAfYkBQ95nBqz4HywIUwP2DcfR0pwDTmR3z/S6eOjDtre1lC
- BEdEHyy85AO+1+gjiQnQ==
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <20190919094547.67194-2-hare@suse.de>
+User-Agent: Mutt/1.11.3 (2019-02-01)
+X-Scanned-By: MIMEDefang 2.79 on 10.5.11.13
+X-Greylist: Sender IP whitelisted, not delayed by milter-greylist-4.5.16 (mx1.redhat.com [10.5.110.25]); Thu, 19 Sep 2019 14:19:51 +0000 (UTC)
 Sender: linux-block-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-Changing the switch() statement to symbolic constants made
-the compiler (at least clang-9, did not check gcc) notice that
-there is one enum value that is not handled here:
+On Thu, Sep 19, 2019 at 11:45:46AM +0200, Hannes Reinecke wrote:
+> From: Hannes Reinecke <hare@suse.com>
+> 
+> When blk_mq_request_issue_directly() returns BLK_STS_RESOURCE we
+> need to requeue the I/O, but adding it to the global request list
+> will mess up with the passed-in request list. So re-add the request
 
-block/t10-pi.c:62:11: error: enumeration value 'T10_PI_TYPE0_PROTECTION' not handled in switch [-Werror,-Wswitch]
+We always add request to hctx->dispatch_list after .queue_rq() returns
+BLK_STS_RESOURCE or BLK_STS_DEV_RESOURCE, so what is the messing up?
 
-Add another case for the missing value and do nothing there
-based on the assumption that the code was working correctly
-already.
+> to the original list and leave it to the caller to handle situations
+> where the list wasn't completely emptied.
+> 
+> Signed-off-by: Hannes Reinecke <hare@suse.com>
+> ---
+>  block/blk-mq.c | 3 +--
+>  1 file changed, 1 insertion(+), 2 deletions(-)
+> 
+> diff --git a/block/blk-mq.c b/block/blk-mq.c
+> index b038ec680e84..44ff3c1442a4 100644
+> --- a/block/blk-mq.c
+> +++ b/block/blk-mq.c
+> @@ -1899,8 +1899,7 @@ void blk_mq_try_issue_list_directly(struct blk_mq_hw_ctx *hctx,
+>  		if (ret != BLK_STS_OK) {
+>  			if (ret == BLK_STS_RESOURCE ||
+>  					ret == BLK_STS_DEV_RESOURCE) {
+> -				blk_mq_request_bypass_insert(rq,
+> -							list_empty(list));
+> +				list_add(list, &rq->queuelist);
 
-Fixes: 9b2061b1a262 ("block: use symbolic constants for t10_pi type")
-Signed-off-by: Arnd Bergmann <arnd@arndb.de>
----
- block/t10-pi.c | 2 ++
- 1 file changed, 2 insertions(+)
+This way may let this request(DONTPREP set) to be merged with other rq
+or bio, and potential data corruption may be caused, please see commit:
 
-diff --git a/block/t10-pi.c b/block/t10-pi.c
-index 0c0120a672f9..055fac923946 100644
---- a/block/t10-pi.c
-+++ b/block/t10-pi.c
-@@ -60,6 +60,8 @@ static blk_status_t t10_pi_verify(struct blk_integrity_iter *iter,
- 		__be16 csum;
- 
- 		switch (type) {
-+		case T10_PI_TYPE0_PROTECTION:
-+			break;
- 		case T10_PI_TYPE1_PROTECTION:
- 		case T10_PI_TYPE2_PROTECTION:
- 			if (pi->app_tag == T10_PI_APP_ESCAPE)
--- 
-2.20.0
+	c616cbee97ae blk-mq: punt failed direct issue to dispatch list
 
+
+Thanks,
+Ming
