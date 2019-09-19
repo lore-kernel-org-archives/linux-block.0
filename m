@@ -2,146 +2,98 @@ Return-Path: <SRS0=Rcc/=XO=vger.kernel.org=linux-block-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-0.9 required=3.0 tests=DKIMWL_WL_HIGH,DKIM_SIGNED,
-	DKIM_VALID,DKIM_VALID_AU,HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,
-	SPF_HELO_NONE,SPF_PASS autolearn=no autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-8.2 required=3.0 tests=DKIM_SIGNED,DKIM_VALID,
+	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,
+	SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED,USER_AGENT_SANE_1 autolearn=ham
+	autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id F0904C4CEC4
-	for <linux-block@archiver.kernel.org>; Thu, 19 Sep 2019 15:48:46 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id C6180C3A5A6
+	for <linux-block@archiver.kernel.org>; Thu, 19 Sep 2019 15:49:01 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.kernel.org (Postfix) with ESMTP id C8648208C0
-	for <linux-block@archiver.kernel.org>; Thu, 19 Sep 2019 15:48:46 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id 817DE21848
+	for <linux-block@archiver.kernel.org>; Thu, 19 Sep 2019 15:49:01 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=pass (1024-bit key) header.d=broadcom.com header.i=@broadcom.com header.b="H1uh6tTe"
+	dkim=pass (2048-bit key) header.d=kernel-dk.20150623.gappssmtp.com header.i=@kernel-dk.20150623.gappssmtp.com header.b="ZnLJExZL"
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S2391407AbfISPsq (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Thu, 19 Sep 2019 11:48:46 -0400
-Received: from mail-io1-f68.google.com ([209.85.166.68]:36411 "EHLO
-        mail-io1-f68.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S2390065AbfISPsp (ORCPT
+        id S2391409AbfISPtB (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Thu, 19 Sep 2019 11:49:01 -0400
+Received: from mail-io1-f66.google.com ([209.85.166.66]:38337 "EHLO
+        mail-io1-f66.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S2390065AbfISPtA (ORCPT
         <rfc822;linux-block@vger.kernel.org>);
-        Thu, 19 Sep 2019 11:48:45 -0400
-Received: by mail-io1-f68.google.com with SMTP id b136so8890359iof.3
-        for <linux-block@vger.kernel.org>; Thu, 19 Sep 2019 08:48:45 -0700 (PDT)
+        Thu, 19 Sep 2019 11:49:00 -0400
+Received: by mail-io1-f66.google.com with SMTP id k5so8865448iol.5
+        for <linux-block@vger.kernel.org>; Thu, 19 Sep 2019 08:48:59 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=broadcom.com; s=google;
-        h=from:references:in-reply-to:mime-version:thread-index:date
-         :message-id:subject:to:cc;
-        bh=sGuJwTkUKZTTIppFydy4dVb0dOofTQ9YNUC+RHizbW4=;
-        b=H1uh6tTeQvcqRMiDMacwkAvJybDmAwzqWhpza18jAgIg5oGePBgBU81TLXMgPleCjc
-         0LUay4sMWS/8zUKWQ0UzLm2vEhMkmSXhWu65U/dDNawYbFnPcgUTBoBpKRQdz0rNem/L
-         GfNyHnzFzR/cx2dbbHoj7s1WOEa4TDTqzd7qc=
+        d=kernel-dk.20150623.gappssmtp.com; s=20150623;
+        h=to:from:subject:message-id:date:user-agent:mime-version
+         :content-language:content-transfer-encoding;
+        bh=00so/6NStvavOkympAOpUd03xufg92UJhhksYm+0Ua0=;
+        b=ZnLJExZLsJFj9HK3PptgO3qTuXhgf+rYVbVtn25wgMr0rwfemMT4p9joiNfLLqUmA2
+         4FSZ1mkwOPZkW3y1MbMBGhTyZa75kCwTropnXFqMuP7VCb4mB2TWJKadTK8TzPbcrx6t
+         BWhwDaycX9XnD8+TdJl/iYs2AcOxaZTGJEdHYE7qyyla96IXEBTNpz42Q7FVUnw0JEw4
+         X7nuxKNtks/IyZuj1Ml+DxY7NcEhCEyh4TDw2Hpm21ZKisQI5YCdt3hVy8c5Q6Pt1ogl
+         zH3HZt7QXLK4HTZW5XGtJDnRnpJ2e7a6sf7oEeTuIwJs/YrsDjUgI4k5fNJe2pZvCrCI
+         H1RQ==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=1e100.net; s=20161025;
-        h=x-gm-message-state:from:references:in-reply-to:mime-version
-         :thread-index:date:message-id:subject:to:cc;
-        bh=sGuJwTkUKZTTIppFydy4dVb0dOofTQ9YNUC+RHizbW4=;
-        b=R9b0nkfI/PlvGJXrwIJsWK3hN+/M5tM7Bwqx88tpK0oqNZICn7fWhiUcCL7ATojqzg
-         N1og9AA7LVmbwNDJ//mqRfVv9/KuY6PczTdyf+vfpB/COQp7TcYj5sRoeu0MVJ+4WScj
-         RIErr43KxyXr8WLzgmd4jLewxv3OSfAj0HPsF8l2NG+uIbXfY08iuX7ayMhPE6V1r53/
-         3SKuaIx6kjtxNjpYwrozaiftD6gcqy5WC7zWUirFD1KFcKPQ37ujsxKJZvOsB/rcFM1F
-         H3Jfouj9U7VUJC+yF1XwVpsMSI2a4OrMt21FdVBzGH37CnUsOCXXcjijsJR3b0VgkLBJ
-         I5Ng==
-X-Gm-Message-State: APjAAAXfIbeRjVkVCmsy1Wb3n4hd7y7To1STlyqw4/2eCFlUXBhRCqbp
-        Nf3vpXVOztyvE2De8RdhHnJAVkdlFQ/lxPyzg0k7gA==
-X-Google-Smtp-Source: APXvYqzaL1CHa3QCLMAu2cD0hKlff+E6KljbvzgfOrcVWHCNl2MlYP33C8nXYgRiO/7fp3C8dpzr6DrJiTnKySnMfz0=
-X-Received: by 2002:a02:69cd:: with SMTP id e196mr13266694jac.84.1568908124519;
- Thu, 19 Sep 2019 08:48:44 -0700 (PDT)
-From:   Kashyap Desai <kashyap.desai@broadcom.com>
-References: <20190919094547.67194-1-hare@suse.de> <20190919094547.67194-3-hare@suse.de>
- <BYAPR04MB5816F1F98D8F408D23C1AF47E7890@BYAPR04MB5816.namprd04.prod.outlook.com>
- <20190919142344.GB11207@ming.t460p>
-In-Reply-To: <20190919142344.GB11207@ming.t460p>
+        h=x-gm-message-state:to:from:subject:message-id:date:user-agent
+         :mime-version:content-language:content-transfer-encoding;
+        bh=00so/6NStvavOkympAOpUd03xufg92UJhhksYm+0Ua0=;
+        b=aKmqZKPn/MgpNX1IhfXM2f9auwIoS1b+FbUS5g3KII2emGA9TwPuonWaDlZvCvDHyx
+         TFzsgGo9jYNp7XuyKDH6c8njJcxEn0S0+6D9y8dFyuYCZX5pqu3zO71k5yofMl8zapBh
+         +SqdtpK8hL5jtObC1KVhsDzLVoj2k+FzTzVk8InWX+gQ7JAMexUknL3LNjWSSI2HQXMA
+         QVd9S5pUCVsDD3CbjZF3GvJOIQRr6RnXTvV1rphg+9AxvxMm9290um3yBxETqgewGyyN
+         qnAfGfmSMsyTH6leRUn3WIr7fVges5w9U2Keh2Fg+deakz3HG1Ksn8zwqZUzi/R7yuDX
+         1osQ==
+X-Gm-Message-State: APjAAAXkwxrnWbTTvsPxXEUCYoNSi9hdWY/8uzP4xOKnIpVDEwah4dzE
+        Q+pb2yacgIc7jdPTJiLniinue0LGpyqVdw==
+X-Google-Smtp-Source: APXvYqwk0tAGt6fI0+q/P6SfvUZBs7bQtiXFlnf+2KIs1CdGVk5KQzRNEl/9PQwlq5qBHAT9XmSYgg==
+X-Received: by 2002:a02:7f49:: with SMTP id r70mr12678047jac.85.1568908137777;
+        Thu, 19 Sep 2019 08:48:57 -0700 (PDT)
+Received: from [192.168.1.50] ([65.144.74.34])
+        by smtp.gmail.com with ESMTPSA id h70sm15243974iof.48.2019.09.19.08.48.56
+        for <linux-block@vger.kernel.org>
+        (version=TLS1_2 cipher=ECDHE-RSA-AES128-GCM-SHA256 bits=128/128);
+        Thu, 19 Sep 2019 08:48:56 -0700 (PDT)
+To:     "linux-block@vger.kernel.org" <linux-block@vger.kernel.org>
+From:   Jens Axboe <axboe@kernel.dk>
+Subject: [PATCH] io_uring: use cond_resched() in sqthread
+Message-ID: <d591d8c1-fb35-8ac3-0a4f-cb3a01aba114@kernel.dk>
+Date:   Thu, 19 Sep 2019 09:48:55 -0600
+User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:60.0) Gecko/20100101
+ Thunderbird/60.8.0
 MIME-Version: 1.0
-X-Mailer: Microsoft Outlook 15.0
-Thread-Index: AQF0tjPls8xLc25lED+FK+pMiE7AYwF9UPQwAaQlFP8BKIXAuafSRYEw
-Date:   Thu, 19 Sep 2019 21:18:41 +0530
-Message-ID: <935518233f147da073414dcbcdb2abb5@mail.gmail.com>
-Subject: RE: [PATCH 2/2] blk-mq: always call into the scheduler in blk_mq_make_request()
-To:     Ming Lei <ming.lei@redhat.com>,
-        Damien Le Moal <Damien.LeMoal@wdc.com>
-Cc:     Hannes Reinecke <hare@suse.de>, Jens Axboe <axboe@kernel.dk>,
-        linux-scsi@vger.kernel.org,
-        "Martin K. Petersen" <martin.petersen@oracle.com>,
-        James Bottomley <james.bottomley@hansenpartnership.com>,
-        Christoph Hellwig <hch@lst.de>, linux-block@vger.kernel.org,
-        Hans Holmberg <Hans.Holmberg@wdc.com>,
-        Hannes Reinecke <hare@suse.com>
-Content-Type: text/plain; charset="UTF-8"
+Content-Type: text/plain; charset=utf-8
+Content-Language: en-US
+Content-Transfer-Encoding: 7bit
 Sender: linux-block-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-> > > -	} else if (plug && (q->nr_hw_queues == 1 || q->mq_ops-
-> >commit_rqs)) {
-> > > +	} else if (plug && q->mq_ops->commit_rqs) {
-> > >  		/*
-> > >  		 * Use plugging if we have a ->commit_rqs() hook as well,
-as
-> > >  		 * we know the driver uses bd->last in a smart fashion.
-> > > @@ -2020,9 +2019,6 @@ static blk_qc_t blk_mq_make_request(struct
-> request_queue *q, struct bio *bio)
-> > >  			blk_mq_try_issue_directly(data.hctx,
-same_queue_rq,
-> > >  					&cookie);
-> > >  		}
-> > > -	} else if ((q->nr_hw_queues > 1 && is_sync) || (!q->elevator &&
-> > > -			!data.hctx->dispatch_busy)) {
-> > > -		blk_mq_try_issue_directly(data.hctx, rq, &cookie);
-Hannes -
+If preempt isn't enabled in the kernel, we can run into hang issues with
+sqthread submissions. Use cond_resched() to play nice instead of
+cpu_relax(), if we end up starting the loop and not having any events
+pending for submissions.
 
-Earlier check prior to "commit 6ce3dd6eec114930cf2035a8bcb1e80477ed79a8"
-was only (q->nr_hw_queues > 1 && is_sync).
-I am not sure if check of nr_hw_queues are required or not at this place,
-but other part of check (!q->elevator && !data.hctx->dispatch_busy) to
-qualify for direct dispatch is required for higher performance.
+Signed-off-by: Jens Axboe <axboe@kernel.dk>
 
-Recent MegaRaid and MPT HBA Aero series controller is capable of doing
-~3.0 M IOPs and for such high performance using single hardware queue,
- commit 6ce3dd6eec114930cf2035a8bcb1e80477ed79a8 is very important.
+---
 
-Kashyap
+diff --git a/fs/io_uring.c b/fs/io_uring.c
+index 854dedd885fa..05a299e80159 100644
+--- a/fs/io_uring.c
++++ b/fs/io_uring.c
+@@ -2438,7 +2438,7 @@ static int io_sq_thread(void *data)
+ 			 * to sleep.
+ 			 */
+ 			if (inflight || !time_after(jiffies, timeout)) {
+-				cpu_relax();
++				cond_resched();
+ 				continue;
+ 			}
+ 
+-- 
+Jens Axboe
 
-
-> >
-> > It may be worth mentioning that blk_mq_sched_insert_request() will do
-> > a direct insert of the request using __blk_mq_insert_request(). But
-> > that insert is slightly different from what
-> > blk_mq_try_issue_directly() does with
-> > __blk_mq_issue_directly() as the request in that case is passed along
-> > to the device using queue->mq_ops->queue_rq() while
-> > __blk_mq_insert_request() will put the request in ctx->rq_lists[type].
-> >
-> > This removes the optimized case !q->elevator &&
-> > !data.hctx->dispatch_busy, but I am not sure of the actual performance
-> > impact yet. We may want to patch
-> > blk_mq_sched_insert_request() to handle that case.
->
-> The optimization did improve IOPS of single queue SCSI SSD a lot, see
->
-> commit 6ce3dd6eec114930cf2035a8bcb1e80477ed79a8
-> Author: Ming Lei <ming.lei@redhat.com>
-> Date:   Tue Jul 10 09:03:31 2018 +0800
->
->     blk-mq: issue directly if hw queue isn't busy in case of 'none'
->
->     In case of 'none' io scheduler, when hw queue isn't busy, it isn't
->     necessary to enqueue request to sw queue and dequeue it from
->     sw queue because request may be submitted to hw queue asap without
->     extra cost, meantime there shouldn't be much request in sw queue,
->     and we don't need to worry about effect on IO merge.
->
->     There are still some single hw queue SCSI HBAs(HPSA, megaraid_sas,
-...)
->     which may connect high performance devices, so 'none' is often
-required
->     for obtaining good performance.
->
->     This patch improves IOPS and decreases CPU unilization on
-megaraid_sas,
->     per Kashyap's test.
->
->
-> Thanks,
-> Ming
