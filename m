@@ -2,162 +2,145 @@ Return-Path: <SRS0=iom0=XP=vger.kernel.org=linux-block-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-9.8 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
-	INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,
-	URIBL_BLOCKED,USER_AGENT_GIT autolearn=ham autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-2.3 required=3.0 tests=DKIM_SIGNED,DKIM_VALID,
+	HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,
+	USER_AGENT_SANE_1 autolearn=no autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 9A57CC49ED7
-	for <linux-block@archiver.kernel.org>; Fri, 20 Sep 2019 11:14:13 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id F1AD2C49ED7
+	for <linux-block@archiver.kernel.org>; Fri, 20 Sep 2019 13:01:49 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.kernel.org (Postfix) with ESMTP id 76CFC20882
-	for <linux-block@archiver.kernel.org>; Fri, 20 Sep 2019 11:14:13 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id B748320665
+	for <linux-block@archiver.kernel.org>; Fri, 20 Sep 2019 13:01:49 +0000 (UTC)
+Authentication-Results: mail.kernel.org;
+	dkim=pass (2048-bit key) header.d=kernel-dk.20150623.gappssmtp.com header.i=@kernel-dk.20150623.gappssmtp.com header.b="qZWPKwMC"
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S2438162AbfITLON (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Fri, 20 Sep 2019 07:14:13 -0400
-Received: from szxga07-in.huawei.com ([45.249.212.35]:38346 "EHLO huawei.com"
-        rhost-flags-OK-OK-OK-FAIL) by vger.kernel.org with ESMTP
-        id S2438154AbfITLOM (ORCPT <rfc822;linux-block@vger.kernel.org>);
-        Fri, 20 Sep 2019 07:14:12 -0400
-Received: from DGGEMS411-HUB.china.huawei.com (unknown [172.30.72.58])
-        by Forcepoint Email with ESMTP id 967427695D64394DDBBA;
-        Fri, 20 Sep 2019 19:14:09 +0800 (CST)
-Received: from huawei.com (10.175.124.28) by DGGEMS411-HUB.china.huawei.com
- (10.3.19.211) with Microsoft SMTP Server id 14.3.439.0; Fri, 20 Sep 2019
- 19:13:59 +0800
-From:   Yufen Yu <yuyufen@huawei.com>
-To:     <axboe@kernel.dk>
-CC:     <linux-block@vger.kernel.org>, <ming.lei@redhat.com>,
-        <hch@infradead.org>, <keith.busch@intel.com>,
-        Yufen Yu <yuyufen@huawei.com>
-Subject: [PATCH v3] block: fix null pointer dereference in blk_mq_rq_timed_out()
-Date:   Fri, 20 Sep 2019 19:34:04 +0800
-Message-ID: <20190920113404.48567-1-yuyufen@huawei.com>
-X-Mailer: git-send-email 2.17.2
+        id S1726839AbfITNBt (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Fri, 20 Sep 2019 09:01:49 -0400
+Received: from mail-io1-f67.google.com ([209.85.166.67]:37486 "EHLO
+        mail-io1-f67.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S1726804AbfITNBs (ORCPT
+        <rfc822;linux-block@vger.kernel.org>);
+        Fri, 20 Sep 2019 09:01:48 -0400
+Received: by mail-io1-f67.google.com with SMTP id b19so15974430iob.4
+        for <linux-block@vger.kernel.org>; Fri, 20 Sep 2019 06:01:48 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=kernel-dk.20150623.gappssmtp.com; s=20150623;
+        h=subject:to:cc:references:from:message-id:date:user-agent
+         :mime-version:in-reply-to:content-language:content-transfer-encoding;
+        bh=juuiPG/fHEmMJPmhspavpQpcbVMdX9oagajwxn+rKyc=;
+        b=qZWPKwMCH3gBR5XUkKeK96eUgMjkwaxHzVXDKA2aJKxVmXSCuHJIw2ri5DOPV6DjIS
+         jIUoxPeIsf31sNQnsVfuh7dKiT+F3oaNdK1nyu752KsV2/5LIQ2CGTUWIlax9xWMAAtG
+         pDAvDEhmBj+D8UB256YuQp6DRXFfdPtKLDpqU7mlw73U0zaVxbQRoQw60WPW/HnBKgrW
+         eTk7JlxGQL69jSZmcGao1V1XRbMntqTIqZR0X1tU9PfQpQ9XE3btICPIrpOXPQgxY3tu
+         HjEErE+uwhGrdTCAGmkdZNFf8uH+XMsdN7B/NCimw161MUsb9qBx0aHFwOznnlwub7OL
+         48ZQ==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20161025;
+        h=x-gm-message-state:subject:to:cc:references:from:message-id:date
+         :user-agent:mime-version:in-reply-to:content-language
+         :content-transfer-encoding;
+        bh=juuiPG/fHEmMJPmhspavpQpcbVMdX9oagajwxn+rKyc=;
+        b=XgfnQkhqIBiB5nXJ7zWMLUbjHWZYgaCIVOdvZi0LPPdEP+UnW12qB4wy5HDMsJkUuI
+         re0TawEQyhR8LsyVpLt/cG2G83RlKTou5qfQWFYykDwci12bch2NXd++B1NR+VmD+8sY
+         BB5Dsc69AUiHdWonxN/Z784L888XbyQgrqO58wC3e7coNYVhBubjVtGC3/ewgJSRIie4
+         N4dtW2Wk2FhwznCLgqSuGp7J/u8Kp+2JmmG4kaRv/+2/aZ538ABBlYCMmSFnPwnCR+hY
+         cP0yCFx+k4PcjGNB6xdSo6O/x0HBK//o2S427SZkxho3tKI+5CtX3kcpNFMbSGHDBBAz
+         Iu8w==
+X-Gm-Message-State: APjAAAWwJJVLej9p6UNl3vu82v/djvA+pN6yw9UWXaXyBpqbgz9zmP7s
+        W9pmU+p98GA/XuDsQ+lVp+LjTQ==
+X-Google-Smtp-Source: APXvYqxaveHz80d5vcRRdrPgrljtLKBuxiv42GRTYkH6zeHXYQgCOOtysioFgOFFG0aG4/XYp32udg==
+X-Received: by 2002:a02:cd05:: with SMTP id g5mr9119601jaq.52.1568984507725;
+        Fri, 20 Sep 2019 06:01:47 -0700 (PDT)
+Received: from [192.168.1.50] ([65.144.74.34])
+        by smtp.gmail.com with ESMTPSA id i20sm1485833ioh.77.2019.09.20.06.01.45
+        (version=TLS1_2 cipher=ECDHE-RSA-AES128-GCM-SHA256 bits=128/128);
+        Fri, 20 Sep 2019 06:01:46 -0700 (PDT)
+Subject: Re: [sparc64] pktcdvd: setup of pktcdvd device failed
+To:     Anatoly Pugachev <matorola@gmail.com>, linux-block@vger.kernel.org
+Cc:     Sparc kernel list <sparclinux@vger.kernel.org>,
+        Linux Kernel list <linux-kernel@vger.kernel.org>
+References: <CADxRZqz_TF7jyGtbg9cVSnCGh2VzfCoRGBdCU_yE_v1cveq1Pg@mail.gmail.com>
+From:   Jens Axboe <axboe@kernel.dk>
+Message-ID: <c02d0e0c-e468-003f-6b66-8592a987cbf8@kernel.dk>
+Date:   Fri, 20 Sep 2019 07:01:45 -0600
+User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:60.0) Gecko/20100101
+ Thunderbird/60.8.0
 MIME-Version: 1.0
-Content-Type: text/plain
-X-Originating-IP: [10.175.124.28]
-X-CFilter-Loop: Reflected
+In-Reply-To: <CADxRZqz_TF7jyGtbg9cVSnCGh2VzfCoRGBdCU_yE_v1cveq1Pg@mail.gmail.com>
+Content-Type: text/plain; charset=utf-8
+Content-Language: en-US
+Content-Transfer-Encoding: 7bit
 Sender: linux-block-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-We got a null pointer deference BUG_ON in blk_mq_rq_timed_out()
-as following:
+On 9/20/19 4:27 AM, Anatoly Pugachev wrote:
+> Hello!
+> 
+> Getting the following call trace on boot on sparc64 ldom/machine with
+> current git kernel:
+> 
+> ...
+> [   13.352975] aes_sparc64: Using sparc64 aes opcodes optimized AES
+> implementation
+> [   13.428002] ------------[ cut here ]------------
+> [   13.428081] WARNING: CPU: 21 PID: 586 at
+> drivers/block/pktcdvd.c:2597 pkt_setup_dev+0x2e4/0x5a0 [pktcdvd]
+> [   13.428147] Attempt to register a non-SCSI queue
+> [   13.428184] Modules linked in: pktcdvd libdes cdrom aes_sparc64
+> n2_rng md5_sparc64 sha512_sparc64 rng_core sha256_sparc64 flash
+> sha1_sparc64 ip_tables x_tables ipv6 crc_ccitt nf_defrag_ipv6 autofs4
+> ext4 crc16 mbcache jbd2 raid10 raid456 async_raid6_recov async_memcpy
+> async_pq async_xor xor async_tx raid6_pq raid1 raid0 multipath linear
+> md_mod crc32c_sparc64
+> [   13.428452] CPU: 21 PID: 586 Comm: pktsetup Not tainted
+> 5.3.0-10169-g574cc4539762 #1234
+> [   13.428507] Call Trace:
+> [   13.428542]  [00000000004635c0] __warn+0xc0/0x100
+> [   13.428582]  [0000000000463634] warn_slowpath_fmt+0x34/0x60
+> [   13.428626]  [000000001045b244] pkt_setup_dev+0x2e4/0x5a0 [pktcdvd]
+> [   13.428674]  [000000001045ccf4] pkt_ctl_ioctl+0x94/0x220 [pktcdvd]
+> [   13.428724]  [00000000006b95c8] do_vfs_ioctl+0x628/0x6e0
+> [   13.428764]  [00000000006b96c8] ksys_ioctl+0x48/0x80
+> [   13.428803]  [00000000006b9714] sys_ioctl+0x14/0x40
+> [   13.428847]  [0000000000406294] linux_sparc_syscall+0x34/0x44
+> [   13.428890] irq event stamp: 4181
+> [   13.428924] hardirqs last  enabled at (4189): [<00000000004e0a74>]
+> console_unlock+0x634/0x6c0
+> [   13.428984] hardirqs last disabled at (4196): [<00000000004e0540>]
+> console_unlock+0x100/0x6c0
+> [   13.429048] softirqs last  enabled at (3978): [<0000000000b2e2d8>]
+> __do_softirq+0x498/0x520
+> [   13.429110] softirqs last disabled at (3967): [<000000000042cfb4>]
+> do_softirq_own_stack+0x34/0x60
+> [   13.429172] ---[ end trace 2220ca468f32967d ]---
+> [   13.430018] pktcdvd: setup of pktcdvd device failed
+> [   13.455589] des_sparc64: Using sparc64 des opcodes optimized DES
+> implementation
+> [   13.515334] camellia_sparc64: Using sparc64 camellia opcodes
+> optimized CAMELLIA implementation
+> [   13.522856] pktcdvd: setup of pktcdvd device failed
+> [   13.529327] pktcdvd: setup of pktcdvd device failed
+> [   13.532932] pktcdvd: setup of pktcdvd device failed
+> [   13.536165] pktcdvd: setup of pktcdvd device failed
+> [   13.539372] pktcdvd: setup of pktcdvd device failed
+> [   13.542834] pktcdvd: setup of pktcdvd device failed
+> [   13.546536] pktcdvd: setup of pktcdvd device failed
+> [   15.431071] XFS (dm-0): Mounting V5 Filesystem
 
-[  108.825472] BUG: kernel NULL pointer dereference, address: 0000000000000040
-[  108.827059] PGD 0 P4D 0
-[  108.827313] Oops: 0000 [#1] SMP PTI
-[  108.827657] CPU: 6 PID: 198 Comm: kworker/6:1H Not tainted 5.3.0-rc8+ #431
-[  108.829503] Workqueue: kblockd blk_mq_timeout_work
-[  108.829913] RIP: 0010:blk_mq_check_expired+0x258/0x330
-[  108.838191] Call Trace:
-[  108.838406]  bt_iter+0x74/0x80
-[  108.838665]  blk_mq_queue_tag_busy_iter+0x204/0x450
-[  108.839074]  ? __switch_to_asm+0x34/0x70
-[  108.839405]  ? blk_mq_stop_hw_queue+0x40/0x40
-[  108.839823]  ? blk_mq_stop_hw_queue+0x40/0x40
-[  108.840273]  ? syscall_return_via_sysret+0xf/0x7f
-[  108.840732]  blk_mq_timeout_work+0x74/0x200
-[  108.841151]  process_one_work+0x297/0x680
-[  108.841550]  worker_thread+0x29c/0x6f0
-[  108.841926]  ? rescuer_thread+0x580/0x580
-[  108.842344]  kthread+0x16a/0x1a0
-[  108.842666]  ? kthread_flush_work+0x170/0x170
-[  108.843100]  ret_from_fork+0x35/0x40
+Someone is running pktsetup to set up a device, at boot time. The device
+being passed in doesn't support pass-through commands.
 
-The bug is caused by the race between timeout handle and completion for
-flush request.
+I believe there are two questions here:
 
-When timeout handle function blk_mq_rq_timed_out() try to read
-'req->q->mq_ops', the 'req' have completed and reinitiated by next
-flush request, which would call blk_rq_init() to clear 'req' as 0.
+1) Why is pktsetup being called? I don't expect anyone to use pktcdvd
+   anymore.
 
-After commit 12f5b93145 ("blk-mq: Remove generation seqeunce"),
-normal requests lifetime are protected by refcount. Until 'rq->ref'
-drop to zero, the request can really be free. Thus, these requests
-cannot been reused before timeout handle finish.
+2) Given #1, what kind of device is being passed in?
 
-However, flush request has defined .end_io and rq->end_io() is still
-called even if 'rq->ref' doesn't drop to zero. After that, the 'flush_rq'
-can be reused by the next flush request handle, resulting in null
-pointer deference BUG ON.
+Do  you have some ancient funky init scripts?
 
-We fix this problem by covering flush request with 'rq->ref'.
-If the refcount is not zero, flush_end_io() return and wait the
-last holder recall it. To record the request status, we add a new
-entry 'rq_status', which will be used in flush_end_io().
-
-Cc: Christoph Hellwig <hch@infradead.org>
-Cc: Keith Busch <keith.busch@intel.com>
-Reviewed-by: Ming Lei <ming.lei@redhat.com>
-Signed-off-by: Yufen Yu <yuyufen@huawei.com>
----
- block/blk-flush.c | 8 ++++++++
- block/blk-mq.c    | 5 ++++-
- block/blk.h       | 7 +++++++
- 3 files changed, 19 insertions(+), 1 deletion(-)
-
-diff --git a/block/blk-flush.c b/block/blk-flush.c
-index aedd9320e605..f3ef6ce05c78 100644
---- a/block/blk-flush.c
-+++ b/block/blk-flush.c
-@@ -212,6 +212,14 @@ static void flush_end_io(struct request *flush_rq, blk_status_t error)
- 	struct blk_flush_queue *fq = blk_get_flush_queue(q, flush_rq->mq_ctx);
- 	struct blk_mq_hw_ctx *hctx;
- 
-+	if (!refcount_dec_and_test(&flush_rq->ref)) {
-+		fq->rq_status = error;
-+		return;
-+	}
-+
-+	if (fq->rq_status != BLK_STS_OK)
-+		error = fq->rq_status;
-+
- 	/* release the tag's ownership to the req cloned from */
- 	spin_lock_irqsave(&fq->mq_flush_lock, flags);
- 	hctx = flush_rq->mq_hctx;
-diff --git a/block/blk-mq.c b/block/blk-mq.c
-index 0835f4d8d42e..eec2ec4c79bd 100644
---- a/block/blk-mq.c
-+++ b/block/blk-mq.c
-@@ -905,7 +905,10 @@ static bool blk_mq_check_expired(struct blk_mq_hw_ctx *hctx,
- 	 */
- 	if (blk_mq_req_expired(rq, next))
- 		blk_mq_rq_timed_out(rq, reserved);
--	if (refcount_dec_and_test(&rq->ref))
-+
-+	if (is_flush_rq(rq, hctx))
-+		rq->end_io(rq, 0);
-+	else if (refcount_dec_and_test(&rq->ref))
- 		__blk_mq_free_request(rq);
- 
- 	return true;
-diff --git a/block/blk.h b/block/blk.h
-index de6b2e146d6e..d3ed80f144c6 100644
---- a/block/blk.h
-+++ b/block/blk.h
-@@ -30,6 +30,7 @@ struct blk_flush_queue {
- 	 */
- 	struct request		*orig_rq;
- 	spinlock_t		mq_flush_lock;
-+	blk_status_t 		rq_status;
- };
- 
- extern struct kmem_cache *blk_requestq_cachep;
-@@ -47,6 +48,12 @@ static inline void __blk_get_queue(struct request_queue *q)
- 	kobject_get(&q->kobj);
- }
- 
-+static inline bool
-+is_flush_rq(struct request *req, struct blk_mq_hw_ctx *hctx)
-+{
-+	return hctx->fq->flush_rq == req;
-+}
-+
- struct blk_flush_queue *blk_alloc_flush_queue(struct request_queue *q,
- 		int node, int cmd_size, gfp_t flags);
- void blk_free_flush_queue(struct blk_flush_queue *q);
 -- 
-2.17.2
+Jens Axboe
 
