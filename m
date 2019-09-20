@@ -6,55 +6,55 @@ X-Spam-Status: No, score=-5.3 required=3.0 tests=DKIM_SIGNED,DKIM_VALID,
 	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,SPF_HELO_NONE,
 	SPF_PASS,USER_AGENT_SANE_1 autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 74DE2C3A5A2
-	for <linux-block@archiver.kernel.org>; Fri, 20 Sep 2019 23:10:37 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 6DE73C4CEC9
+	for <linux-block@archiver.kernel.org>; Fri, 20 Sep 2019 23:52:13 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.kernel.org (Postfix) with ESMTP id 2962A2080F
-	for <linux-block@archiver.kernel.org>; Fri, 20 Sep 2019 23:10:37 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id 36DCD2073F
+	for <linux-block@archiver.kernel.org>; Fri, 20 Sep 2019 23:52:13 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel-dk.20150623.gappssmtp.com header.i=@kernel-dk.20150623.gappssmtp.com header.b="YmDAEANH"
+	dkim=pass (2048-bit key) header.d=kernel-dk.20150623.gappssmtp.com header.i=@kernel-dk.20150623.gappssmtp.com header.b="0T/+8RJT"
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S2407071AbfITXKg (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Fri, 20 Sep 2019 19:10:36 -0400
-Received: from mail-pl1-f195.google.com ([209.85.214.195]:38077 "EHLO
-        mail-pl1-f195.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S2407054AbfITXKg (ORCPT
+        id S2392215AbfITXwM (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Fri, 20 Sep 2019 19:52:12 -0400
+Received: from mail-pg1-f193.google.com ([209.85.215.193]:41313 "EHLO
+        mail-pg1-f193.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S2391290AbfITXwM (ORCPT
         <rfc822;linux-block@vger.kernel.org>);
-        Fri, 20 Sep 2019 19:10:36 -0400
-Received: by mail-pl1-f195.google.com with SMTP id w10so3878787plq.5
-        for <linux-block@vger.kernel.org>; Fri, 20 Sep 2019 16:10:35 -0700 (PDT)
+        Fri, 20 Sep 2019 19:52:12 -0400
+Received: by mail-pg1-f193.google.com with SMTP id s1so3605328pgv.8
+        for <linux-block@vger.kernel.org>; Fri, 20 Sep 2019 16:52:10 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=kernel-dk.20150623.gappssmtp.com; s=20150623;
         h=subject:from:to:cc:references:message-id:date:user-agent
          :mime-version:in-reply-to:content-language:content-transfer-encoding;
-        bh=teelS75FoQ0Q/2i1ntC2ci03atUEPC5q6ZB7a7OkshU=;
-        b=YmDAEANHs448JdqUnpDcINkesxeSvkEClBz/vxq037u0eBdubgy2Kzf0Mh88IHsz1C
-         lBOZlooWXwGh1b8MoUZi5RAO6dXecmhdPgGvn9Fr2LHm4O8Svyb/3Lm5GRokVNoUvWWf
-         sBOjaReK4JRm2lntljgUUm6lKJUU4YFxrIzQfpRAYDPO6xfwL1JdxZBjTwIjTOnipOX6
-         xBWPpxTvzsZStNs4lbt1qTw5pbBA8Yg8/UwqqyTR4L1imVLBL6L8AiTZUKX4fuxWU+v8
-         eCiqPEk+yVSfObrwTITSW2d7cKBHVABvxA1nlGoahAMOfSW23NKKYQV4OVtQ/DX/PXeV
-         cQ2g==
+        bh=JLx/3BB7uPu7XbckYQYM3+uGQ7yESslbdgsYklvm0CA=;
+        b=0T/+8RJTT9coQg8W38fI21EY0NF+t8InCILQe8c3Gz2yAoEM8iubl2znXRjRjcxlnC
+         6tyiXdFMxN088pNtDDaCEoBP82Pb9V9ZzF9eyu7wJNzNMGeggVU3XCP8MVHawLAtuVji
+         78vnf3M+eibHVRWhMPPxMGcvZTLw2bcFogNjNq9QRxNs3pUYeadkds12gtm3xkmZbKmX
+         yHQ+6272opWh9JCmpRHTooLEsCe9dQCpuD1VZfkXVGh1KsuhyM0sWUCCx81X0qkqck5V
+         8yfQ3bj3rMJtxx4i9XnjCzcaQXb9J6wKkOBUaYBxQ5RG1xLyRhXPxX9C4HfE1nP42xmu
+         Zj+g==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=1e100.net; s=20161025;
         h=x-gm-message-state:subject:from:to:cc:references:message-id:date
          :user-agent:mime-version:in-reply-to:content-language
          :content-transfer-encoding;
-        bh=teelS75FoQ0Q/2i1ntC2ci03atUEPC5q6ZB7a7OkshU=;
-        b=JjWGHCbPi7zrLfW8ovjkLk6gJpfVWasdKYxIlFSpgktZBjYUN8yoaYUceQCrR7T7Q4
-         YX2jn1rvRDfs7mbDcygunRLTgqjbY1HNeriQwqrXGseoI3t1vQmxe0bcb8AWF+MMknni
-         fj4djcyZLwrUFCzSj8cZ3HFq6aPWZZoMfDUlcUP5mtdJXKrVv1o2h5cqTkfY2nfT/lnw
-         NhRrBneO+8KOCwBcLmoCVrAPkz5RiSwNx08zzszt7MMdog49neW3bDPBsMeUyt+kOru5
-         tpxeaSyg/JuNNTz+zE3HW6t2ji+I+D8OD3VHKxoHynT+lXUujz05eGnFYPX88NqTWRME
-         DxKQ==
-X-Gm-Message-State: APjAAAW5CT/sF5T+V4DAOfgZMJIBfPvf4l2JejPsF3TQxhg4SunCzykh
-        n7E3g2W+SuPqsj3KnMDDpc3GEcG24fqxWg==
-X-Google-Smtp-Source: APXvYqwIfhRUh/GxHV4b+qfre8POasXqkhuVAFJqwlzUbVAVkVCykvxH3elHSHYuxfs+v/omEY6bBg==
-X-Received: by 2002:a17:902:bb84:: with SMTP id m4mr20155341pls.10.1569021034669;
-        Fri, 20 Sep 2019 16:10:34 -0700 (PDT)
+        bh=JLx/3BB7uPu7XbckYQYM3+uGQ7yESslbdgsYklvm0CA=;
+        b=nfFeEZCoz9/9AW/GqGsmf2IK6E7hOy2FaIqDnn5JS323OHBYKCsKSkpD/RtXAZOLOB
+         G9M8oBPybxyzP7xDyjr1cx+TaH9Zuqgvppokfo70CeF9QtApq8oYAdco3EeIRkQ8LHxw
+         GnR/3IanmvmnX2ZekEIH+gXiheRJJeSffSrqy6F2IXsf3L0XuzH0IKB2yKx3p6PV5oOw
+         /BOs03UVtyX6AUjBQZHJbPFQkvPSfwkvfFdIJQjSPWeE66K07384PemC9ivaZcs6tu7z
+         dM7A0bLav0d1VI6KuCMXiqIEB8PdDyJcta3k4754pfP1kUzAB8lf5wLXb9GXNAjoAtls
+         IVGg==
+X-Gm-Message-State: APjAAAXj9YvcH0PSmYcSq1Ty8YUc5lb3AulPBbJaWDyCCyXkS8uxKXJ7
+        kye1SK1oSL987Srj52f7wurhr9jnT4Kd9A==
+X-Google-Smtp-Source: APXvYqzyDXYmoTAnP19K8MN7tnvcES1smxKiWuwPPMVdTPlFNrkeMnxZLJhUojNrTdpMmcrjYFVzBQ==
+X-Received: by 2002:aa7:96f3:: with SMTP id i19mr20855019pfq.32.1569023529223;
+        Fri, 20 Sep 2019 16:52:09 -0700 (PDT)
 Received: from [192.168.1.188] ([66.219.217.79])
-        by smtp.gmail.com with ESMTPSA id z2sm4798672pfq.58.2019.09.20.16.10.33
+        by smtp.gmail.com with ESMTPSA id s7sm3021018pjr.23.2019.09.20.16.52.07
         (version=TLS1_2 cipher=ECDHE-RSA-AES128-GCM-SHA256 bits=128/128);
-        Fri, 20 Sep 2019 16:10:33 -0700 (PDT)
+        Fri, 20 Sep 2019 16:52:07 -0700 (PDT)
 Subject: Re: [PATCH] io_uring: IORING_OP_TIMEOUT support
 From:   Jens Axboe <axboe@kernel.dk>
 To:     Andres Freund <andres@anarazel.de>
@@ -64,12 +64,13 @@ References: <f0488dd6-c32b-be96-9bdc-67099f1f56f8@kernel.dk>
  <838a193a-cb83-c6d5-f251-b113e9faf9d5@kernel.dk>
  <20190920205654.2g7z6znt4r337qrt@alap3.anarazel.de>
  <bd6ee297-da1b-d82c-d776-1d75a72b35e8@kernel.dk>
-Message-ID: <dc70ab56-49c9-4110-3115-902d743e4e66@kernel.dk>
-Date:   Fri, 20 Sep 2019 17:10:31 -0600
+ <dc70ab56-49c9-4110-3115-902d743e4e66@kernel.dk>
+Message-ID: <4365c454-c54b-a5d0-d943-69d3f3a5746d@kernel.dk>
+Date:   Fri, 20 Sep 2019 17:52:06 -0600
 User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:60.0) Gecko/20100101
  Thunderbird/60.8.0
 MIME-Version: 1.0
-In-Reply-To: <bd6ee297-da1b-d82c-d776-1d75a72b35e8@kernel.dk>
+In-Reply-To: <dc70ab56-49c9-4110-3115-902d743e4e66@kernel.dk>
 Content-Type: text/plain; charset=utf-8
 Content-Language: en-US
 Content-Transfer-Encoding: 7bit
@@ -78,19 +79,24 @@ Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-On 9/20/19 3:26 PM, Jens Axboe wrote:
-> But sounds like we are in violent agreement. I'll post a new patch for
-> this soonish.
+On 9/20/19 5:10 PM, Jens Axboe wrote:
+> On 9/20/19 3:26 PM, Jens Axboe wrote:
+>> But sounds like we are in violent agreement. I'll post a new patch for
+>> this soonish.
+> 
+> How about this? You pass in number of events in sqe->off. If that amount
+> of events happen before the timer expires, then the timer is deleted and
+> the completion posted. The timeout cqe->res will be -ETIME if the timer
+> expired, and 0 if it got removed due to hitting the number of events.
+> 
+> Lightly tested, works for me.
 
-How about this? You pass in number of events in sqe->off. If that amount
-of events happen before the timer expires, then the timer is deleted and
-the completion posted. The timeout cqe->res will be -ETIME if the timer
-expired, and 0 if it got removed due to hitting the number of events.
+Found a missing increment case when I wrote up the test code. This
+one passes the test code I put in the liburing 'timeout' branch.
 
-Lightly tested, works for me.
 
 diff --git a/fs/io_uring.c b/fs/io_uring.c
-index 05a299e80159..88d4584f12cd 100644
+index 05a299e80159..3ae9489f6fc1 100644
 --- a/fs/io_uring.c
 +++ b/fs/io_uring.c
 @@ -200,6 +200,7 @@ struct io_ring_ctx {
@@ -147,7 +153,7 @@ index 05a299e80159..88d4584f12cd 100644
  	return ctx;
  }
  
-@@ -460,10 +472,40 @@ static inline void io_queue_async_work(struct io_ring_ctx *ctx,
+@@ -460,10 +472,41 @@ static inline void io_queue_async_work(struct io_ring_ctx *ctx,
  	queue_work(ctx->sqo_wq[rw], &req->work);
  }
  
@@ -157,6 +163,7 @@ index 05a299e80159..88d4584f12cd 100644
 +
 +	ret = hrtimer_try_to_cancel(&req->timeout.timer);
 +	if (ret != -1) {
++		atomic_inc(&req->ctx->cq_timeouts);
 +		list_del(&req->list);
 +		io_cqring_fill_event(req->ctx, req->user_data, 0);
 +		__io_free_req(req);
@@ -188,7 +195,7 @@ index 05a299e80159..88d4584f12cd 100644
  	__io_commit_cqring(ctx);
  
  	while ((req = io_get_deferred_req(ctx)) != NULL) {
-@@ -1765,6 +1807,60 @@ static int io_poll_add(struct io_kiocb *req, const struct io_uring_sqe *sqe)
+@@ -1765,6 +1808,60 @@ static int io_poll_add(struct io_kiocb *req, const struct io_uring_sqe *sqe)
  	return ipt.error;
  }
  
@@ -249,7 +256,7 @@ index 05a299e80159..88d4584f12cd 100644
  static int io_req_defer(struct io_ring_ctx *ctx, struct io_kiocb *req,
  			const struct io_uring_sqe *sqe)
  {
-@@ -1842,6 +1938,9 @@ static int __io_submit_sqe(struct io_ring_ctx *ctx, struct io_kiocb *req,
+@@ -1842,6 +1939,9 @@ static int __io_submit_sqe(struct io_ring_ctx *ctx, struct io_kiocb *req,
  	case IORING_OP_RECVMSG:
  		ret = io_recvmsg(req, s->sqe, force_nonblock);
  		break;
@@ -259,7 +266,7 @@ index 05a299e80159..88d4584f12cd 100644
  	default:
  		ret = -EINVAL;
  		break;
-@@ -2599,6 +2698,7 @@ static int io_cqring_wait(struct io_ring_ctx *ctx, int min_events,
+@@ -2599,6 +2699,7 @@ static int io_cqring_wait(struct io_ring_ctx *ctx, int min_events,
  			  const sigset_t __user *sig, size_t sigsz)
  {
  	struct io_rings *rings = ctx->rings;
@@ -267,7 +274,7 @@ index 05a299e80159..88d4584f12cd 100644
  	int ret;
  
  	if (io_cqring_events(rings) >= min_events)
-@@ -2617,7 +2717,15 @@ static int io_cqring_wait(struct io_ring_ctx *ctx, int min_events,
+@@ -2617,7 +2718,15 @@ static int io_cqring_wait(struct io_ring_ctx *ctx, int min_events,
  			return ret;
  	}
  
@@ -284,7 +291,7 @@ index 05a299e80159..88d4584f12cd 100644
  	restore_saved_sigmask_unless(ret == -ERESTARTSYS);
  	if (ret == -ERESTARTSYS)
  		ret = -EINTR;
-@@ -3288,6 +3396,7 @@ static void io_ring_ctx_wait_and_kill(struct io_ring_ctx *ctx)
+@@ -3288,6 +3397,7 @@ static void io_ring_ctx_wait_and_kill(struct io_ring_ctx *ctx)
  	percpu_ref_kill(&ctx->refs);
  	mutex_unlock(&ctx->uring_lock);
  
