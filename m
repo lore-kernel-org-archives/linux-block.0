@@ -2,118 +2,170 @@ Return-Path: <SRS0=iom0=XP=vger.kernel.org=linux-block-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-8.3 required=3.0 tests=DKIM_SIGNED,DKIM_VALID,
-	DKIM_VALID_AU,FREEMAIL_FORGED_FROMDOMAIN,FREEMAIL_FROM,
-	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,
-	SPF_HELO_NONE,SPF_PASS,USER_AGENT_SANE_1 autolearn=ham autolearn_force=no
-	version=3.4.0
+X-Spam-Status: No, score=-8.2 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
+	INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,
+	URIBL_BLOCKED,USER_AGENT_SANE_1 autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 33C49C4CEC9
-	for <linux-block@archiver.kernel.org>; Fri, 20 Sep 2019 06:05:16 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id A9212C49ED7
+	for <linux-block@archiver.kernel.org>; Fri, 20 Sep 2019 06:42:07 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.kernel.org (Postfix) with ESMTP id 0684B20882
-	for <linux-block@archiver.kernel.org>; Fri, 20 Sep 2019 06:05:16 +0000 (UTC)
-Authentication-Results: mail.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="EmDdv0Lz"
+	by mail.kernel.org (Postfix) with ESMTP id 7F2AB2080F
+	for <linux-block@archiver.kernel.org>; Fri, 20 Sep 2019 06:42:07 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S2408219AbfITGFJ (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Fri, 20 Sep 2019 02:05:09 -0400
-Received: from mail-wr1-f66.google.com ([209.85.221.66]:44661 "EHLO
-        mail-wr1-f66.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S2404716AbfITGFI (ORCPT
-        <rfc822;linux-block@vger.kernel.org>);
-        Fri, 20 Sep 2019 02:05:08 -0400
-Received: by mail-wr1-f66.google.com with SMTP id i18so5399965wru.11;
-        Thu, 19 Sep 2019 23:05:06 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20161025;
-        h=date:from:to:cc:subject:message-id:references:mime-version
-         :content-disposition:in-reply-to:user-agent;
-        bh=cED18m1mvjZ+niHvjAeZ+v1xJ6oH9Dol7OSVjJcLyuU=;
-        b=EmDdv0Lzck9qjY3AmMNK8VHhZlfh9YkKN0+gv6DY6FojUJnC560+vgvJ7nnaWZSUrz
-         s4cHXnPkVuduXEWZJ2pf6L/Rbje7VwoPtHY+AzUlKmeylLsbT/I5OpyLNgh9TZm0weED
-         ur3d56IgMs0pQ1X6/0R890LmIgohd5ULnBYZ7A+mpxEEIdPUvVB6J1Uz6ocIP+EOZQ1a
-         P6dKhenrIdziB4pZpv2ehc8RVlZcGIIjE2ghmLpjMRcqGDxgU2lAtqZuTejYVnq3fFi+
-         HAfSuu0/6Z+DZS77Md7dLvNFq9URNo3Tw2lFkEt/QBx1jBDTk7+SfvSXNHrWt1x9cVp+
-         Az5Q==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20161025;
-        h=x-gm-message-state:date:from:to:cc:subject:message-id:references
-         :mime-version:content-disposition:in-reply-to:user-agent;
-        bh=cED18m1mvjZ+niHvjAeZ+v1xJ6oH9Dol7OSVjJcLyuU=;
-        b=HM2zl29nIMnWJ/fDesL2XzVNFTb+sEJmPOB22RWz0c3V61CA8ZsxiXMxbNqCUCKLE5
-         BipHiPuALizQFtHRaWEzk0fTfcJrBCpebp4GAAmnwTyKfuCFfHagicBBYXIrdA+7l5mk
-         yujMSblZaiSwmJTN1U3BUWHh2EsvYRou1seygwCJx0sbn5FL9hpBfBpIdHMjnl0lFCW0
-         GMnUoCYZ+Vsgez5Zb53U5Hrom2RE7yRX5cYRaKhhA9R9vIslXgeuzh3hFZLkw+9pwrWi
-         S4iIy/029uMb2lGfIubB/hUbIm0JrtyO3dM7TaEIg2PaKlv9hPAlNdn0k7po93qK9olU
-         haww==
-X-Gm-Message-State: APjAAAUjQr33l64uJbcqt+v8z2hpHxTxMh0YQvZr2p2+V27nmp0TqwOg
-        iuvsDaHOaEtasuv/mCVHEXSkLm2rk2E=
-X-Google-Smtp-Source: APXvYqx9G70xEnXbHl9Gpjja/wrBXdZt5GW23xEsjeblfV1FMA9CU/z4o5/y77gPAMKzAPDd3jBitg==
-X-Received: by 2002:adf:e7ca:: with SMTP id e10mr5806942wrn.234.1568959505815;
-        Thu, 19 Sep 2019 23:05:05 -0700 (PDT)
-Received: from archlinux-threadripper ([2a01:4f8:222:2f1b::2])
-        by smtp.gmail.com with ESMTPSA id h125sm913513wmf.31.2019.09.19.23.05.04
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Thu, 19 Sep 2019 23:05:04 -0700 (PDT)
-Date:   Thu, 19 Sep 2019 23:05:03 -0700
-From:   Nathan Chancellor <natechancellor@gmail.com>
-To:     Arnd Bergmann <arnd@arndb.de>
-Cc:     Jens Axboe <axboe@kernel.dk>, Christoph Hellwig <hch@lst.de>,
+        id S2437360AbfITGmG (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Fri, 20 Sep 2019 02:42:06 -0400
+Received: from mx2.suse.de ([195.135.220.15]:47414 "EHLO mx1.suse.de"
+        rhost-flags-OK-OK-OK-FAIL) by vger.kernel.org with ESMTP
+        id S2437351AbfITGmG (ORCPT <rfc822;linux-block@vger.kernel.org>);
+        Fri, 20 Sep 2019 02:42:06 -0400
+X-Virus-Scanned: by amavisd-new at test-mx.suse.de
+Received: from relay2.suse.de (unknown [195.135.220.254])
+        by mx1.suse.de (Postfix) with ESMTP id 3BAC1ADD9;
+        Fri, 20 Sep 2019 06:42:03 +0000 (UTC)
+Subject: Re: [PATCH 1/2] blk-mq: fixup request re-insert in
+ blk_mq_try_issue_list_directly()
+To:     Ming Lei <ming.lei@redhat.com>
+Cc:     Jens Axboe <axboe@kernel.dk>, linux-scsi@vger.kernel.org,
         "Martin K. Petersen" <martin.petersen@oracle.com>,
-        Max Gurtovoy <maxg@mellanox.com>,
-        Chaitanya Kulkarni <chaitanya.kulkarni@wdc.com>,
-        linux-block@vger.kernel.org, linux-kernel@vger.kernel.org,
-        clang-built-linux@googlegroups.com
-Subject: Re: [PATCH] block: t10-pi: fix -Wswitch warning
-Message-ID: <20190920060503.GA130425@archlinux-threadripper>
-References: <20190919135725.1287963-1-arnd@arndb.de>
+        James Bottomley <james.bottomley@hansenpartnership.com>,
+        Christoph Hellwig <hch@lst.de>, linux-block@vger.kernel.org,
+        Hans Holmberg <hans.holmberg@wdc.com>,
+        Damien Le Moal <damien.lemoal@wdc.com>,
+        Hannes Reinecke <hare@suse.com>
+References: <20190919094547.67194-1-hare@suse.de>
+ <20190919094547.67194-2-hare@suse.de> <20190919141934.GA11207@ming.t460p>
+From:   Hannes Reinecke <hare@suse.de>
+Openpgp: preference=signencrypt
+Autocrypt: addr=hare@suse.de; prefer-encrypt=mutual; keydata=
+ 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
+ azzYF4VRJsdl+d0MCaSy8mUh
+Message-ID: <d435559e-806d-3828-e2be-9dde952d39f6@suse.de>
+Date:   Fri, 20 Sep 2019 08:42:01 +0200
+User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:60.0) Gecko/20100101
+ Thunderbird/60.7.2
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <20190919135725.1287963-1-arnd@arndb.de>
-User-Agent: Mutt/1.12.1 (2019-06-15)
+In-Reply-To: <20190919141934.GA11207@ming.t460p>
+Content-Type: text/plain; charset=utf-8
+Content-Language: en-US
+Content-Transfer-Encoding: 8bit
 Sender: linux-block-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-On Thu, Sep 19, 2019 at 03:57:19PM +0200, Arnd Bergmann wrote:
-> Changing the switch() statement to symbolic constants made
-> the compiler (at least clang-9, did not check gcc) notice that
-> there is one enum value that is not handled here:
+On 9/19/19 4:19 PM, Ming Lei wrote:
+> On Thu, Sep 19, 2019 at 11:45:46AM +0200, Hannes Reinecke wrote:
+>> From: Hannes Reinecke <hare@suse.com>
+>>
+>> When blk_mq_request_issue_directly() returns BLK_STS_RESOURCE we
+>> need to requeue the I/O, but adding it to the global request list
+>> will mess up with the passed-in request list. So re-add the request
 > 
-> block/t10-pi.c:62:11: error: enumeration value 'T10_PI_TYPE0_PROTECTION' not handled in switch [-Werror,-Wswitch]
+> We always add request to hctx->dispatch_list after .queue_rq() returns
+> BLK_STS_RESOURCE or BLK_STS_DEV_RESOURCE, so what is the messing up?
 > 
-> Add another case for the missing value and do nothing there
-> based on the assumption that the code was working correctly
-> already.
+>> to the original list and leave it to the caller to handle situations
+>> where the list wasn't completely emptied.
+>>
+>> Signed-off-by: Hannes Reinecke <hare@suse.com>
+>> ---
+>>  block/blk-mq.c | 3 +--
+>>  1 file changed, 1 insertion(+), 2 deletions(-)
+>>
+>> diff --git a/block/blk-mq.c b/block/blk-mq.c
+>> index b038ec680e84..44ff3c1442a4 100644
+>> --- a/block/blk-mq.c
+>> +++ b/block/blk-mq.c
+>> @@ -1899,8 +1899,7 @@ void blk_mq_try_issue_list_directly(struct blk_mq_hw_ctx *hctx,
+>>  		if (ret != BLK_STS_OK) {
+>>  			if (ret == BLK_STS_RESOURCE ||
+>>  					ret == BLK_STS_DEV_RESOURCE) {
+>> -				blk_mq_request_bypass_insert(rq,
+>> -							list_empty(list));
+>> +				list_add(list, &rq->queuelist);
 > 
-> Fixes: 9b2061b1a262 ("block: use symbolic constants for t10_pi type")
-> Signed-off-by: Arnd Bergmann <arnd@arndb.de>
-> ---
->  block/t10-pi.c | 2 ++
->  1 file changed, 2 insertions(+)
+> This way may let this request(DONTPREP set) to be merged with other rq
+> or bio, and potential data corruption may be caused, please see commit:
 > 
-> diff --git a/block/t10-pi.c b/block/t10-pi.c
-> index 0c0120a672f9..055fac923946 100644
-> --- a/block/t10-pi.c
-> +++ b/block/t10-pi.c
-> @@ -60,6 +60,8 @@ static blk_status_t t10_pi_verify(struct blk_integrity_iter *iter,
->  		__be16 csum;
->  
->  		switch (type) {
-> +		case T10_PI_TYPE0_PROTECTION:
-> +			break;
->  		case T10_PI_TYPE1_PROTECTION:
->  		case T10_PI_TYPE2_PROTECTION:
->  			if (pi->app_tag == T10_PI_APP_ESCAPE)
-> -- 
-> 2.20.0
+> 	c616cbee97ae blk-mq: punt failed direct issue to dispatch list
+> 
+Ok.
+What triggered this patch is this code:
 
-I didn't have the break in my local patch but I think this is more
-correct based on the description of the enums. Like Nick pointed out,
-there is no functional change because this value is not used in this
-file.
+insert:
+	if (bypass_insert)
+		return BLK_STS_RESOURCE;
 
-Reviewed-by: Nathan Chancellor <natechancellor@gmail.com>
+	blk_mq_request_bypass_insert(rq, run_queue);
+	return BLK_STS_OK;
+}
+
+static void blk_mq_try_issue_directly(struct blk_mq_hw_ctx *hctx,
+		struct request *rq, blk_qc_t *cookie)
+{
+	blk_status_t ret;
+	int srcu_idx;
+
+	might_sleep_if(hctx->flags & BLK_MQ_F_BLOCKING);
+
+	hctx_lock(hctx, &srcu_idx);
+
+	ret = __blk_mq_try_issue_directly(hctx, rq, cookie, false, true);
+	if (ret == BLK_STS_RESOURCE || ret == BLK_STS_DEV_RESOURCE)
+		blk_mq_request_bypass_insert(rq, true);
+	
+IE blk_mq_request_bypass_insert() will be called always once we hit the
+'insert' label, the only difference being the second parameter of that
+function.
+I'd rather have the sequence consolidated, preferably by calling
+blk_mq_request_bypass_insert() in one place only, and not scatter the
+calls all over the code.
+
+Cheers,
+
+Hannes
+-- 
+Dr. Hannes Reinecke		      Teamlead Storage & Networking
+hare@suse.de			                  +49 911 74053 688
+SUSE Software Solutions Germany GmbH, Maxfeldstr. 5, 90409 Nürnberg
+HRB 247165 (AG München), GF: Felix Imendörffer
