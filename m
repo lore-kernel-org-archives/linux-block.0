@@ -2,100 +2,82 @@ Return-Path: <SRS0=iom0=XP=vger.kernel.org=linux-block-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-2.2 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
-	MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED,USER_AGENT_SANE_1
-	autolearn=no autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-8.3 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
+	INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,
+	USER_AGENT_SANE_1 autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id C0FB2C4CEC9
-	for <linux-block@archiver.kernel.org>; Fri, 20 Sep 2019 15:42:34 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 39F40C3A5A2
+	for <linux-block@archiver.kernel.org>; Fri, 20 Sep 2019 16:07:09 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.kernel.org (Postfix) with ESMTP id A2D1520882
-	for <linux-block@archiver.kernel.org>; Fri, 20 Sep 2019 15:42:34 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id 0FA56206B6
+	for <linux-block@archiver.kernel.org>; Fri, 20 Sep 2019 16:07:09 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S2392136AbfITPmQ (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Fri, 20 Sep 2019 11:42:16 -0400
-Received: from mail-pl1-f196.google.com ([209.85.214.196]:37618 "EHLO
-        mail-pl1-f196.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S2391417AbfITPmQ (ORCPT
-        <rfc822;linux-block@vger.kernel.org>);
-        Fri, 20 Sep 2019 11:42:16 -0400
-Received: by mail-pl1-f196.google.com with SMTP id b10so3365512plr.4;
-        Fri, 20 Sep 2019 08:42:15 -0700 (PDT)
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20161025;
-        h=x-gm-message-state:subject:to:cc:references:from:message-id:date
-         :user-agent:mime-version:in-reply-to:content-language
-         :content-transfer-encoding;
-        bh=5k0Hu7l3DB3jRw+ooV6mnNF37HqLQwv8COStuG71sZ8=;
-        b=BZ4j9grosqv1YQIhliQUvV8SIxv7teEfhu8+opvV4qZw42ikIFXMkCHOMtyRFjJG4h
-         XTU8awVGYMvyW9uQ2DoAXHfWKW7hBqv0W0LEnQfyvoxH6VKZ1tHtvX+KgY0ZFbldXxpG
-         d0dhjG6cliqfSoKpmPIVW/xIsjWq6mz+y70liviRdQU9z4WpHOGLPvPZE7v4h8ZQVvCl
-         jfsksXis0ldzGHoDEzsl8wWgnK479Ki9ioxrHUMGwolcVZEW+2yTGfcMcw87NWKDW3hH
-         utvGINl3X5fQZ18pp0NQFqyXYcnohLK/agidh0D1lqGjBnF9GFLoW2Bm3FTkEXj+Wkjf
-         8F4w==
-X-Gm-Message-State: APjAAAUl6gz8kfCfxMJBEsgPJXKmNE9hPOUfSNCSNEAh39qH2rKs+pKa
-        dZzlI4+rwRQR9lo1T9GXvR4=
-X-Google-Smtp-Source: APXvYqwHqVTt2crG6TDYmodv+VSYzm7WIYYYgdumgCr77pq+xmF6WVqVrNNO+9zBw0dFcwe5WlXRMg==
-X-Received: by 2002:a17:902:b097:: with SMTP id p23mr18048328plr.261.1568994135216;
-        Fri, 20 Sep 2019 08:42:15 -0700 (PDT)
-Received: from desktop-bart.svl.corp.google.com ([2620:15c:2cd:202:4308:52a3:24b6:2c60])
-        by smtp.gmail.com with ESMTPSA id 7sm2630484pfi.91.2019.09.20.08.42.13
-        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
-        Fri, 20 Sep 2019 08:42:14 -0700 (PDT)
-Subject: Re: [PATCH v4 20/25] ibnbd: server: main functionality
-To:     Danil Kipnis <danil.kipnis@cloud.ionos.com>
-Cc:     Jack Wang <jinpuwang@gmail.com>, linux-block@vger.kernel.org,
-        linux-rdma@vger.kernel.org, Jens Axboe <axboe@kernel.dk>,
-        Christoph Hellwig <hch@infradead.org>,
-        Sagi Grimberg <sagi@grimberg.me>,
-        Jason Gunthorpe <jgg@mellanox.com>,
-        Doug Ledford <dledford@redhat.com>, rpenyaev@suse.de,
-        Roman Pen <roman.penyaev@profitbricks.com>,
-        Jack Wang <jinpu.wang@cloud.ionos.com>
-References: <20190620150337.7847-1-jinpuwang@gmail.com>
- <20190620150337.7847-21-jinpuwang@gmail.com>
- <5ceebb9c-b7ae-8e0c-6f07-d83e878e23d0@acm.org>
- <CAHg0Huw8Sk-ORjDaFDsTiL00nfsHru20MpNqGmWrCa_pSWuQSQ@mail.gmail.com>
-From:   Bart Van Assche <bvanassche@acm.org>
-Message-ID: <ed4555f4-fbc3-a3f5-7180-69064452e377@acm.org>
-Date:   Fri, 20 Sep 2019 08:42:12 -0700
-User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:60.0) Gecko/20100101
- Thunderbird/60.8.0
+        id S2389583AbfITQHI (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Fri, 20 Sep 2019 12:07:08 -0400
+Received: from mx1.redhat.com ([209.132.183.28]:56666 "EHLO mx1.redhat.com"
+        rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
+        id S2387662AbfITQHI (ORCPT <rfc822;linux-block@vger.kernel.org>);
+        Fri, 20 Sep 2019 12:07:08 -0400
+Received: from smtp.corp.redhat.com (int-mx01.intmail.prod.int.phx2.redhat.com [10.5.11.11])
+        (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
+        (No client certificate requested)
+        by mx1.redhat.com (Postfix) with ESMTPS id 51824315C005;
+        Fri, 20 Sep 2019 16:07:08 +0000 (UTC)
+Received: from asgard.redhat.com (ovpn-112-68.ams2.redhat.com [10.36.112.68])
+        by smtp.corp.redhat.com (Postfix) with ESMTPS id 61C7B600C6;
+        Fri, 20 Sep 2019 16:07:06 +0000 (UTC)
+Date:   Fri, 20 Sep 2019 18:06:44 +0200
+From:   Eugene Syromiatnikov <esyr@redhat.com>
+To:     linux-block@vger.kernel.org, Josef Bacik <josef@toxicpanda.com>,
+        nbd@other.debian.org
+Cc:     linux-kernel@vger.kernel.org, Jens Axboe <axboe@kernel.dk>
+Subject: [PATCH RESEND] nbd: avoid losing pointer to reallocated
+ config->socks in nbd_add_socket
+Message-ID: <20190920160644.GA15739@asgard.redhat.com>
 MIME-Version: 1.0
-In-Reply-To: <CAHg0Huw8Sk-ORjDaFDsTiL00nfsHru20MpNqGmWrCa_pSWuQSQ@mail.gmail.com>
-Content-Type: text/plain; charset=utf-8; format=flowed
-Content-Language: en-US
-Content-Transfer-Encoding: 7bit
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+User-Agent: Mutt/1.5.23 (2014-03-12)
+X-Scanned-By: MIMEDefang 2.79 on 10.5.11.11
+X-Greylist: Sender IP whitelisted, not delayed by milter-greylist-4.5.16 (mx1.redhat.com [10.5.110.41]); Fri, 20 Sep 2019 16:07:08 +0000 (UTC)
 Sender: linux-block-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-On 9/20/19 12:36 AM, Danil Kipnis wrote:
-> On Wed, Sep 18, 2019 at 7:41 PM Bart Van Assche <bvanassche@acm.org> wrote:
->> On 6/20/19 8:03 AM, Jack Wang wrote:
->>> +static int process_msg_sess_info(struct ibtrs_srv *ibtrs,
->>> +                              struct ibnbd_srv_session *srv_sess,
->>> +                              const void *msg, size_t len,
->>> +                              void *data, size_t datalen)
->>> +{
->>> +     const struct ibnbd_msg_sess_info *sess_info_msg = msg;
->>> +     struct ibnbd_msg_sess_info_rsp *rsp = data;
->>> +
->>> +     srv_sess->ver = min_t(u8, sess_info_msg->ver, IBNBD_PROTO_VER_MAJOR);
->>> +     pr_debug("Session %s using protocol version %d (client version: %d,"
->>> +              " server version: %d)\n", srv_sess->sessname,
->>> +              srv_sess->ver, sess_info_msg->ver, IBNBD_PROTO_VER_MAJOR);
->>
->> Has this patch been verified with checkpatch? I think checkpatch
->> recommends not to split literal strings.
-> 
-> Yes it does complain about our splitted strings. But it's either
-> splitted string or line over 80 chars or "Avoid line continuations in
-> quoted strings" if we use backslash on previous line. I don't know how
-> to avoid all three of them.
+In the (very unlikely) case of config->socks reallocation success
+and nsock allocation failure config->nsock will not get updated
+with the new pointer to socks array. Fix it by updating config->socks
+right after reallocation successfulness check.
 
-Checkpatch shouldn't complain about constant strings that exceed 80 
-columns. If it complains about such strings then that's a checkpatch bug.
+Fixes: 9561a7ade0c2 ("nbd: add multi-connection support")
+Signed-off-by: Eugene Syromiatnikov <esyr@redhat.com>
+Cc: stable@vger.kernel.org # 4.10+
+---
+ drivers/block/nbd.c | 4 ++--
+ 1 file changed, 2 insertions(+), 2 deletions(-)
 
-Bart.
+diff --git a/drivers/block/nbd.c b/drivers/block/nbd.c
+index a8e3815..a04c686 100644
+--- a/drivers/block/nbd.c
++++ b/drivers/block/nbd.c
+@@ -987,14 +987,14 @@ static int nbd_add_socket(struct nbd_device *nbd, unsigned long arg,
+ 		sockfd_put(sock);
+ 		return -ENOMEM;
+ 	}
++	config->socks = socks;
++
+ 	nsock = kzalloc(sizeof(struct nbd_sock), GFP_KERNEL);
+ 	if (!nsock) {
+ 		sockfd_put(sock);
+ 		return -ENOMEM;
+ 	}
+ 
+-	config->socks = socks;
+-
+ 	nsock->fallback_index = -1;
+ 	nsock->dead = false;
+ 	mutex_init(&nsock->tx_lock);
+-- 
+2.1.4
+
