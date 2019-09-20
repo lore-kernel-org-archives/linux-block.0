@@ -2,170 +2,145 @@ Return-Path: <SRS0=iom0=XP=vger.kernel.org=linux-block-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-8.2 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
-	INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,
-	URIBL_BLOCKED,USER_AGENT_SANE_1 autolearn=ham autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-0.8 required=3.0 tests=DKIM_SIGNED,DKIM_VALID,
+	DKIM_VALID_AU,HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SPF_HELO_NONE,
+	SPF_PASS,URIBL_BLOCKED autolearn=no autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id A9212C49ED7
-	for <linux-block@archiver.kernel.org>; Fri, 20 Sep 2019 06:42:07 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id D5F00C4CEC9
+	for <linux-block@archiver.kernel.org>; Fri, 20 Sep 2019 06:58:56 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.kernel.org (Postfix) with ESMTP id 7F2AB2080F
-	for <linux-block@archiver.kernel.org>; Fri, 20 Sep 2019 06:42:07 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id ACB78208C3
+	for <linux-block@archiver.kernel.org>; Fri, 20 Sep 2019 06:58:56 +0000 (UTC)
+Authentication-Results: mail.kernel.org;
+	dkim=pass (2048-bit key) header.d=linaro.org header.i=@linaro.org header.b="cA+ud2rC"
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S2437360AbfITGmG (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Fri, 20 Sep 2019 02:42:06 -0400
-Received: from mx2.suse.de ([195.135.220.15]:47414 "EHLO mx1.suse.de"
-        rhost-flags-OK-OK-OK-FAIL) by vger.kernel.org with ESMTP
-        id S2437351AbfITGmG (ORCPT <rfc822;linux-block@vger.kernel.org>);
-        Fri, 20 Sep 2019 02:42:06 -0400
-X-Virus-Scanned: by amavisd-new at test-mx.suse.de
-Received: from relay2.suse.de (unknown [195.135.220.254])
-        by mx1.suse.de (Postfix) with ESMTP id 3BAC1ADD9;
-        Fri, 20 Sep 2019 06:42:03 +0000 (UTC)
-Subject: Re: [PATCH 1/2] blk-mq: fixup request re-insert in
- blk_mq_try_issue_list_directly()
-To:     Ming Lei <ming.lei@redhat.com>
-Cc:     Jens Axboe <axboe@kernel.dk>, linux-scsi@vger.kernel.org,
-        "Martin K. Petersen" <martin.petersen@oracle.com>,
-        James Bottomley <james.bottomley@hansenpartnership.com>,
-        Christoph Hellwig <hch@lst.de>, linux-block@vger.kernel.org,
-        Hans Holmberg <hans.holmberg@wdc.com>,
-        Damien Le Moal <damien.lemoal@wdc.com>,
-        Hannes Reinecke <hare@suse.com>
-References: <20190919094547.67194-1-hare@suse.de>
- <20190919094547.67194-2-hare@suse.de> <20190919141934.GA11207@ming.t460p>
-From:   Hannes Reinecke <hare@suse.de>
-Openpgp: preference=signencrypt
-Autocrypt: addr=hare@suse.de; prefer-encrypt=mutual; keydata=
- mQINBE6KyREBEACwRN6XKClPtxPiABx5GW+Yr1snfhjzExxkTYaINHsWHlsLg13kiemsS6o7
- qrc+XP8FmhcnCOts9e2jxZxtmpB652lxRB9jZE40mcSLvYLM7S6aH0WXKn8bOqpqOGJiY2bc
- 6qz6rJuqkOx3YNuUgiAxjuoYauEl8dg4bzex3KGkGRuxzRlC8APjHlwmsr+ETxOLBfUoRNuE
- b4nUtaseMPkNDwM4L9+n9cxpGbdwX0XwKFhlQMbG3rWA3YqQYWj1erKIPpgpfM64hwsdk9zZ
- QO1krgfULH4poPQFpl2+yVeEMXtsSou915jn/51rBelXeLq+cjuK5+B/JZUXPnNDoxOG3j3V
- VSZxkxLJ8RO1YamqZZbVP6jhDQ/bLcAI3EfjVbxhw9KWrh8MxTcmyJPn3QMMEp3wpVX9nSOQ
- tzG72Up/Py67VQe0x8fqmu7R4MmddSbyqgHrab/Nu+ak6g2RRn3QHXAQ7PQUq55BDtj85hd9
- W2iBiROhkZ/R+Q14cJkWhzaThN1sZ1zsfBNW0Im8OVn/J8bQUaS0a/NhpXJWv6J1ttkX3S0c
- QUratRfX4D1viAwNgoS0Joq7xIQD+CfJTax7pPn9rT////hSqJYUoMXkEz5IcO+hptCH1HF3
- qz77aA5njEBQrDRlslUBkCZ5P+QvZgJDy0C3xRGdg6ZVXEXJOQARAQABtCpIYW5uZXMgUmVp
- bmVja2UgKFN1U0UgTGFicykgPGhhcmVAc3VzZS5kZT6JAkEEEwECACsCGwMFCRLMAwAGCwkI
- BwMCBhUIAgkKCwQWAgMBAh4BAheABQJOisquAhkBAAoJEGz4yi9OyKjPOHoQAJLeLvr6JNHx
- GPcHXaJLHQiinz2QP0/wtsT8+hE26dLzxb7hgxLafj9XlAXOG3FhGd+ySlQ5wSbbjdxNjgsq
- FIjqQ88/Lk1NfnqG5aUTPmhEF+PzkPogEV7Pm5Q17ap22VK623MPaltEba+ly6/pGOODbKBH
- ak3gqa7Gro5YCQzNU0QVtMpWyeGF7xQK76DY/atvAtuVPBJHER+RPIF7iv5J3/GFIfdrM+wS
- BubFVDOibgM7UBnpa7aohZ9RgPkzJpzECsbmbttxYaiv8+EOwark4VjvOne8dRaj50qeyJH6
- HLpBXZDJH5ZcYJPMgunghSqghgfuUsd5fHmjFr3hDb5EoqAfgiRMSDom7wLZ9TGtT6viDldv
- hfWaIOD5UhpNYxfNgH6Y102gtMmN4o2P6g3UbZK1diH13s9DA5vI2mO2krGz2c5BOBmcctE5
- iS+JWiCizOqia5Op+B/tUNye/YIXSC4oMR++Fgt30OEafB8twxydMAE3HmY+foawCpGq06yM
- vAguLzvm7f6wAPesDAO9vxRNC5y7JeN4Kytl561ciTICmBR80Pdgs/Obj2DwM6dvHquQbQrU
- Op4XtD3eGUW4qgD99DrMXqCcSXX/uay9kOG+fQBfK39jkPKZEuEV2QdpE4Pry36SUGfohSNq
- xXW+bMc6P+irTT39VWFUJMcSuQINBE6KyREBEACvEJggkGC42huFAqJcOcLqnjK83t4TVwEn
- JRisbY/VdeZIHTGtcGLqsALDzk+bEAcZapguzfp7cySzvuR6Hyq7hKEjEHAZmI/3IDc9nbdh
- EgdCiFatah0XZ/p4vp7KAelYqbv8YF/ORLylAdLh9rzLR6yHFqVaR4WL4pl4kEWwFhNSHLxe
- 55G56/dxBuoj4RrFoX3ynerXfbp4dH2KArPc0NfoamqebuGNfEQmDbtnCGE5zKcR0zvmXsRp
- qU7+caufueZyLwjTU+y5p34U4PlOO2Q7/bdaPEdXfpgvSpWk1o3H36LvkPV/PGGDCLzaNn04
- BdiiiPEHwoIjCXOAcR+4+eqM4TSwVpTn6SNgbHLjAhCwCDyggK+3qEGJph+WNtNU7uFfscSP
- k4jqlxc8P+hn9IqaMWaeX9nBEaiKffR7OKjMdtFFnBRSXiW/kOKuuRdeDjL5gWJjY+IpdafP
- KhjvUFtfSwGdrDUh3SvB5knSixE3qbxbhbNxmqDVzyzMwunFANujyyVizS31DnWC6tKzANkC
- k15CyeFC6sFFu+WpRxvC6fzQTLI5CRGAB6FAxz8Hu5rpNNZHsbYs9Vfr/BJuSUfRI/12eOCL
- IvxRPpmMOlcI4WDW3EDkzqNAXn5Onx/b0rFGFpM4GmSPriEJdBb4M4pSD6fN6Y/Jrng/Bdwk
- SQARAQABiQIlBBgBAgAPBQJOiskRAhsMBQkSzAMAAAoJEGz4yi9OyKjPgEwQAIP/gy/Xqc1q
- OpzfFScswk3CEoZWSqHxn/fZasa4IzkwhTUmukuIvRew+BzwvrTxhHcz9qQ8hX7iDPTZBcUt
- ovWPxz+3XfbGqE+q0JunlIsP4N+K/I10nyoGdoFpMFMfDnAiMUiUatHRf9Wsif/nT6oRiPNJ
- T0EbbeSyIYe+ZOMFfZBVGPqBCbe8YMI+JiZeez8L9JtegxQ6O3EMQ//1eoPJ5mv5lWXLFQfx
- f4rAcKseM8DE6xs1+1AIsSIG6H+EE3tVm+GdCkBaVAZo2VMVapx9k8RMSlW7vlGEQsHtI0FT
- c1XNOCGjaP4ITYUiOpfkh+N0nUZVRTxWnJqVPGZ2Nt7xCk7eoJWTSMWmodFlsKSgfblXVfdM
- 9qoNScM3u0b9iYYuw/ijZ7VtYXFuQdh0XMM/V6zFrLnnhNmg0pnK6hO1LUgZlrxHwLZk5X8F
- uD/0MCbPmsYUMHPuJd5dSLUFTlejVXIbKTSAMd0tDSP5Ms8Ds84z5eHreiy1ijatqRFWFJRp
- ZtWlhGRERnDH17PUXDglsOA08HCls0PHx8itYsjYCAyETlxlLApXWdVl9YVwbQpQ+i693t/Y
- PGu8jotn0++P19d3JwXW8t6TVvBIQ1dRZHx1IxGLMn+CkDJMOmHAUMWTAXX2rf5tUjas8/v2
- azzYF4VRJsdl+d0MCaSy8mUh
-Message-ID: <d435559e-806d-3828-e2be-9dde952d39f6@suse.de>
-Date:   Fri, 20 Sep 2019 08:42:01 +0200
-User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:60.0) Gecko/20100101
- Thunderbird/60.7.2
-MIME-Version: 1.0
-In-Reply-To: <20190919141934.GA11207@ming.t460p>
-Content-Type: text/plain; charset=utf-8
-Content-Language: en-US
-Content-Transfer-Encoding: 8bit
+        id S2388940AbfITG6z (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Fri, 20 Sep 2019 02:58:55 -0400
+Received: from mail-wm1-f66.google.com ([209.85.128.66]:39973 "EHLO
+        mail-wm1-f66.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S2394932AbfITG6w (ORCPT
+        <rfc822;linux-block@vger.kernel.org>);
+        Fri, 20 Sep 2019 02:58:52 -0400
+Received: by mail-wm1-f66.google.com with SMTP id b24so1069450wmj.5
+        for <linux-block@vger.kernel.org>; Thu, 19 Sep 2019 23:58:51 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=linaro.org; s=google;
+        h=mime-version:subject:from:in-reply-to:date:cc
+         :content-transfer-encoding:message-id:references:to;
+        bh=yoSKv6iKPafqA3E2EdHP7bvoi3Wx6UArkcBIy3W3JgE=;
+        b=cA+ud2rCE++WSHjLDz3AhrKm293GXSXkrwLk/s9r9iW4WBQtPmAPmvIByyMA9hh1VE
+         ug54X6TIvCVMpSwKL/UF4ne11znZGpabGzgJd38sgYHeOHcP0/2tI2pKcuG4RMOFCpWL
+         WXvdIzHkgfs83ngR0qoFEaQWT9jsT7EpNeCgUq6NtK+pK3hQCaFsuTU0gFmgEHlV/xz8
+         uTE3pJzqyTC43dkjHllvIP7kco+gOSyIEFSD0+jDyqob2BoR9aMvCmvLE/BbOHNV/7Em
+         o/QaogW/g3+Zt8xN2m1Et005rX98nd7opXkYqFNlJe1tkomlr7Oyi+mPBQBco6Acxvvf
+         NyrQ==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20161025;
+        h=x-gm-message-state:mime-version:subject:from:in-reply-to:date:cc
+         :content-transfer-encoding:message-id:references:to;
+        bh=yoSKv6iKPafqA3E2EdHP7bvoi3Wx6UArkcBIy3W3JgE=;
+        b=qJwjBnVI8fnr714Vkd0QguurilOW10Q2Z8kUOUafOy4/lHwsdeOxC9dK0WbOv7Lpsi
+         2wHNe0skrw0kLOgOrqN7Xt0TIYjqZ6ygiL1Y69KjTL4yV287w1pcJ3A4AqMeO8oPeld1
+         ta1Jw7FudDwh9PKPDy0hVrtR8Vbo0XajdHTWvdy68v8srzI4Oo78IodtVai1o0Nih6fU
+         z6JLbW6VKjWdTCCDWCoJQByUkbRwM33gW0YtUZm/y+wcs1K29gh3b1nxuikKCYPwIJtb
+         iJp4BHqZBytcVnPGT4rXManHKwNKH7GTkToKi3a86Fmt984X4eJrW6ywWXjWKLjJGQul
+         uz8A==
+X-Gm-Message-State: APjAAAWxPbWFfP0robZglSpWbuSth4ekMENQCVHvIZ8OZpCs0ws4zzi7
+        9/uhM1Uc4I3DBoilqbbj5QDEFA==
+X-Google-Smtp-Source: APXvYqxFbquKMMhkFejMJOJKNJxEm+G04tfs3QH4DRcTuXri0pbUEPHrXRiB90Cn6nrpvSihy6vgcA==
+X-Received: by 2002:a1c:f009:: with SMTP id a9mr2017817wmb.151.1568962730219;
+        Thu, 19 Sep 2019 23:58:50 -0700 (PDT)
+Received: from [192.168.0.100] (146-241-67-0.dyn.eolo.it. [146.241.67.0])
+        by smtp.gmail.com with ESMTPSA id b5sm817428wmj.18.2019.09.19.23.58.48
+        (version=TLS1_2 cipher=ECDHE-RSA-AES128-GCM-SHA256 bits=128/128);
+        Thu, 19 Sep 2019 23:58:49 -0700 (PDT)
+Content-Type: text/plain;
+        charset=us-ascii
+Mime-Version: 1.0 (Mac OS X Mail 12.4 \(3445.104.8\))
+Subject: Re: [PATCH 2/2] block, bfq: delete "bfq" prefix from cgroup filenames
+From:   Paolo Valente <paolo.valente@linaro.org>
+In-Reply-To: <4F416823-855F-4091-90B9-92253BF189FA@linaro.org>
+Date:   Fri, 20 Sep 2019 08:58:47 +0200
+Cc:     Jens Axboe <axboe@kernel.dk>,
+        linux-block <linux-block@vger.kernel.org>,
+        linux-kernel <linux-kernel@vger.kernel.org>,
+        Ulf Hansson <ulf.hansson@linaro.org>,
+        Linus Walleij <linus.walleij@linaro.org>,
+        noreply-spamdigest via bfq-iosched 
+        <bfq-iosched@googlegroups.com>,
+        Oleksandr Natalenko <oleksandr@natalenko.name>,
+        cgroups@vger.kernel.org, Angelo Ruocco <angeloruocco90@gmail.com>
+Content-Transfer-Encoding: quoted-printable
+Message-Id: <A87FEC8A-3E1A-4DC8-89F7-5FAF63CF5B47@linaro.org>
+References: <20190917165148.19146-1-paolo.valente@linaro.org>
+ <20190917165148.19146-3-paolo.valente@linaro.org>
+ <20190917213209.GK3084169@devbig004.ftw2.facebook.com>
+ <4D39D2FA-A487-4FAD-A67E-B90750CE0BD4@linaro.org>
+ <20190918151948.GL3084169@devbig004.ftw2.facebook.com>
+ <4F416823-855F-4091-90B9-92253BF189FA@linaro.org>
+To:     Tejun Heo <tj@kernel.org>
+X-Mailer: Apple Mail (2.3445.104.8)
 Sender: linux-block-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-On 9/19/19 4:19 PM, Ming Lei wrote:
-> On Thu, Sep 19, 2019 at 11:45:46AM +0200, Hannes Reinecke wrote:
->> From: Hannes Reinecke <hare@suse.com>
->>
->> When blk_mq_request_issue_directly() returns BLK_STS_RESOURCE we
->> need to requeue the I/O, but adding it to the global request list
->> will mess up with the passed-in request list. So re-add the request
-> 
-> We always add request to hctx->dispatch_list after .queue_rq() returns
-> BLK_STS_RESOURCE or BLK_STS_DEV_RESOURCE, so what is the messing up?
-> 
->> to the original list and leave it to the caller to handle situations
->> where the list wasn't completely emptied.
->>
->> Signed-off-by: Hannes Reinecke <hare@suse.com>
->> ---
->>  block/blk-mq.c | 3 +--
->>  1 file changed, 1 insertion(+), 2 deletions(-)
->>
->> diff --git a/block/blk-mq.c b/block/blk-mq.c
->> index b038ec680e84..44ff3c1442a4 100644
->> --- a/block/blk-mq.c
->> +++ b/block/blk-mq.c
->> @@ -1899,8 +1899,7 @@ void blk_mq_try_issue_list_directly(struct blk_mq_hw_ctx *hctx,
->>  		if (ret != BLK_STS_OK) {
->>  			if (ret == BLK_STS_RESOURCE ||
->>  					ret == BLK_STS_DEV_RESOURCE) {
->> -				blk_mq_request_bypass_insert(rq,
->> -							list_empty(list));
->> +				list_add(list, &rq->queuelist);
-> 
-> This way may let this request(DONTPREP set) to be merged with other rq
-> or bio, and potential data corruption may be caused, please see commit:
-> 
-> 	c616cbee97ae blk-mq: punt failed direct issue to dispatch list
-> 
-Ok.
-What triggered this patch is this code:
 
-insert:
-	if (bypass_insert)
-		return BLK_STS_RESOURCE;
 
-	blk_mq_request_bypass_insert(rq, run_queue);
-	return BLK_STS_OK;
-}
+> Il giorno 18 set 2019, alle ore 18:19, Paolo Valente =
+<paolo.valente@linaro.org> ha scritto:
+>=20
+>=20
+>=20
+>> Il giorno 18 set 2019, alle ore 17:19, Tejun Heo <tj@kernel.org> ha =
+scritto:
+>>=20
+>> Hello,
+>>=20
+>> On Wed, Sep 18, 2019 at 07:18:50AM +0200, Paolo Valente wrote:
+>>> A solution that both fulfills userspace request and doesn't break
+>>> anything for hypothetical users of the current interface already =
+made
+>>> it to mainline, and Linus liked it too.  It is:
+>>=20
+>> Linus didn't like it.  The implementation was a bit nasty.  That was
+>> why it became a subject in the first place.
+>>=20
+>>> 19e9da9e86c4 ("block, bfq: add weight symlink to the bfq.weight =
+cgroup parameter")
+>>>=20
+>>> But it was then reverted on Tejun's request to do exactly what we
+>>> don't want do any longer now:
+>>> cf8929885de3 ("cgroup/bfq: revert bfq.weight symlink change")
+>>=20
+>> Note that the interface was wrong at the time too.
+>>=20
+>>> So, Jens, Tejun, can we please just revert that revert?
+>>=20
+>> I think presenting both io.weight and io.bfq.weight interfaces are
+>> probably the best course of action at this point but why does it have
+>> to be a symlink?  What's wrong with just creating another file with
+>> the same backing function?
+>>=20
+>=20
+> I think a symlink would be much clearer for users, given the confusion
+> already caused by two names for the same parameter.  But let's hear
+> others' opinion too.
+>=20
 
-static void blk_mq_try_issue_directly(struct blk_mq_hw_ctx *hctx,
-		struct request *rq, blk_qc_t *cookie)
-{
-	blk_status_t ret;
-	int srcu_idx;
+Jens, could you express your opinion on this?  Any solution you and
+Tejun agree on is ok for me.  Also this new (fourth) possible
+implementation of this fix, provided that then it is definitely ok for
+both of you.
 
-	might_sleep_if(hctx->flags & BLK_MQ_F_BLOCKING);
+Thanks,
+Paolo
 
-	hctx_lock(hctx, &srcu_idx);
+> Thanks,
+> Paolo
+>=20
+>> Thanks.
+>>=20
+>> --=20
+>> tejun
 
-	ret = __blk_mq_try_issue_directly(hctx, rq, cookie, false, true);
-	if (ret == BLK_STS_RESOURCE || ret == BLK_STS_DEV_RESOURCE)
-		blk_mq_request_bypass_insert(rq, true);
-	
-IE blk_mq_request_bypass_insert() will be called always once we hit the
-'insert' label, the only difference being the second parameter of that
-function.
-I'd rather have the sequence consolidated, preferably by calling
-blk_mq_request_bypass_insert() in one place only, and not scatter the
-calls all over the code.
-
-Cheers,
-
-Hannes
--- 
-Dr. Hannes Reinecke		      Teamlead Storage & Networking
-hare@suse.de			                  +49 911 74053 688
-SUSE Software Solutions Germany GmbH, Maxfeldstr. 5, 90409 Nürnberg
-HRB 247165 (AG München), GF: Felix Imendörffer
