@@ -2,75 +2,77 @@ Return-Path: <SRS0=12de=XQ=vger.kernel.org=linux-block-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-5.2 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
-	MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED,
-	USER_AGENT_SANE_1 autolearn=ham autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-6.1 required=3.0 tests=DKIMWL_WL_HIGH,DKIM_SIGNED,
+	DKIM_VALID,DKIM_VALID_AU,MAILING_LIST_MULTI,MENTIONS_GIT_HOSTING,
+	SPF_HELO_NONE,SPF_PASS autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 21034C4360D
-	for <linux-block@archiver.kernel.org>; Sat, 21 Sep 2019 15:57:28 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 4AF08C4740A
+	for <linux-block@archiver.kernel.org>; Sat, 21 Sep 2019 18:15:36 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.kernel.org (Postfix) with ESMTP id F26F42086A
-	for <linux-block@archiver.kernel.org>; Sat, 21 Sep 2019 15:57:27 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id 1A92C2184C
+	for <linux-block@archiver.kernel.org>; Sat, 21 Sep 2019 18:15:36 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+	s=default; t=1569089736;
+	bh=twTGq0/ZKKaB7MuhBMbge4Oly6HGwraWRm+5aMfqSjo=;
+	h=Subject:From:In-Reply-To:References:Date:To:Cc:List-ID:From;
+	b=D12D2S/xCOZeMnOnFTfGTkeYM56Oi43d3VVqj9NEkxSbXRPemXNzkp7RSGahHhJXE
+	 R0MexBH/3nvSl8GDm6Ae5RIjS+e8SfsHsCvJPeDdesPHb6Cu38jHTIwEYqaHCf+h9w
+	 F3lY4jPB8RcHqjGxwfOm4T1QB5CnRCERhk8NHJLg=
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S2407695AbfIUP51 (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Sat, 21 Sep 2019 11:57:27 -0400
-Received: from mail-pg1-f194.google.com ([209.85.215.194]:38237 "EHLO
-        mail-pg1-f194.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S2407694AbfIUP51 (ORCPT
-        <rfc822;linux-block@vger.kernel.org>);
-        Sat, 21 Sep 2019 11:57:27 -0400
-Received: by mail-pg1-f194.google.com with SMTP id x10so5530388pgi.5
-        for <linux-block@vger.kernel.org>; Sat, 21 Sep 2019 08:57:26 -0700 (PDT)
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20161025;
-        h=x-gm-message-state:subject:to:cc:references:from:message-id:date
-         :user-agent:mime-version:in-reply-to:content-language
-         :content-transfer-encoding;
-        bh=TCZbgE46D9QIbKsU55uX/A54PynugJX4GwazsILo/cc=;
-        b=KWea4ku0hJM7JbqW331VbLKU4hzQZhRAgFiloRRGOOJJCesNgEZFsLhxJP2zf7SI9x
-         yh0oQJRpYEGx1uEau30x5GH3zNHAgDeGIsDfdN+bTBI5z5GEQkSLLr26gcOycunSfMWy
-         GJ/Gt8Ua8hL52zdLWpb03t2qEi08b+76hmFCpYgtPCCd90WUAm8LOYGxOtwAIzNQtmoD
-         /kL5a8HuOhDGeR88mQngXXbn5zGEbLzlIv9Q5Z9+NOwcbUG6Gg3Gh9MtGGhMIJw+QqN8
-         8re3VaECKLWjmNkx2bSOIvakb4mKc48+WHkytdkW9Z3tQFwjHjwkgIbWDFrK0Ncqw4ZV
-         v9dw==
-X-Gm-Message-State: APjAAAUs6fY9LlUCdWIYN/o7/SrswglXPLfETHOLky1EkR6f3RqyIAZ4
-        4zCskuNyTKhWc3/EbHARhvI=
-X-Google-Smtp-Source: APXvYqzTD3NG5y2sYt2Wi8GTzNoeKSvUZ8DD1L6dr9O5Ba3vQjbcfd+OPmAhZqa6ZN7GJQTgXdhFKA==
-X-Received: by 2002:aa7:80ca:: with SMTP id a10mr23965955pfn.96.1569081446443;
-        Sat, 21 Sep 2019 08:57:26 -0700 (PDT)
-Received: from asus.site ([2601:647:4000:a:3ff9:564e:9b:720c])
-        by smtp.gmail.com with ESMTPSA id w189sm6949067pfw.101.2019.09.21.08.57.24
-        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
-        Sat, 21 Sep 2019 08:57:25 -0700 (PDT)
-Subject: Re: [PATCH v3] block: fix null pointer dereference in
- blk_mq_rq_timed_out()
-To:     Yufen Yu <yuyufen@huawei.com>, axboe@kernel.dk
-Cc:     linux-block@vger.kernel.org, ming.lei@redhat.com,
-        hch@infradead.org, keith.busch@intel.com
-References: <20190920113404.48567-1-yuyufen@huawei.com>
-From:   Bart Van Assche <bvanassche@acm.org>
-Message-ID: <011d9eae-d4c3-db6d-355b-6780fc18b06e@acm.org>
-Date:   Sat, 21 Sep 2019 08:57:23 -0700
-User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:60.0) Gecko/20100101
- Thunderbird/60.8.0
-MIME-Version: 1.0
-In-Reply-To: <20190920113404.48567-1-yuyufen@huawei.com>
-Content-Type: text/plain; charset=utf-8; format=flowed
-Content-Language: en-US
-Content-Transfer-Encoding: 7bit
+        id S1731887AbfIUSPf (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Sat, 21 Sep 2019 14:15:35 -0400
+Received: from mail.kernel.org ([198.145.29.99]:34578 "EHLO mail.kernel.org"
+        rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
+        id S1731877AbfIUSPf (ORCPT <rfc822;linux-block@vger.kernel.org>);
+        Sat, 21 Sep 2019 14:15:35 -0400
+Subject: Re: [git pull] device mapper changes for 5.4
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+        s=default; t=1569089734;
+        bh=twTGq0/ZKKaB7MuhBMbge4Oly6HGwraWRm+5aMfqSjo=;
+        h=From:In-Reply-To:References:Date:To:Cc:From;
+        b=YcEoMAqsS/lnAtGLS4qAx1a8ZSn6qONnwvFip8p/WrxbgPEjOIghKAXHzKZuwui/S
+         Pp92pVj2sLPVfanyh+N/9+1BW9UvxdKQThBVvByVSb7t/LsfhdCwk8LIrUcq0im+1K
+         0gbhWWl7BfRbxfQo8EPryDu9pwNjx9ALOY7q0n/8=
+From:   pr-tracker-bot@kernel.org
+In-Reply-To: <20190919211923.GA16508@redhat.com>
+References: <20190919211923.GA16508@redhat.com>
+X-PR-Tracked-List-Id: <linux-block.vger.kernel.org>
+X-PR-Tracked-Message-Id: <20190919211923.GA16508@redhat.com>
+X-PR-Tracked-Remote: git://git.kernel.org/pub/scm/linux/kernel/git/device-mapper/linux-dm.git
+ tags/for-5.4/dm-changes
+X-PR-Tracked-Commit-Id: afa179eb603847494aa5061d4f501224a30dd187
+X-PR-Merge-Tree: torvalds/linux.git
+X-PR-Merge-Refname: refs/heads/master
+X-PR-Merge-Commit-Id: 3e414b5bd28f965fb39b9e9419d877df0cf3111a
+Message-Id: <156908973452.32474.7118884566596438956.pr-tracker-bot@kernel.org>
+Date:   Sat, 21 Sep 2019 18:15:34 +0000
+To:     Mike Snitzer <snitzer@redhat.com>
+Cc:     Linus Torvalds <torvalds@linux-foundation.org>,
+        dm-devel@redhat.com, linux-block@vger.kernel.org,
+        Alasdair G Kergon <agk@redhat.com>,
+        Ard Biesheuvel <ard.biesheuvel@linaro.org>,
+        "Gustavo A. R. Silva" <gustavo@embeddedor.com>,
+        Huaisheng Ye <yehs1@lenovo.com>,
+        Jaskaran Khurana <jaskarankhurana@linux.microsoft.com>,
+        Mikulas Patocka <mpatocka@redhat.com>,
+        Ming Lei <ming.lei@redhat.com>,
+        Nikos Tsironis <ntsironis@arrikto.com>,
+        ZhangXiaoxu <zhangxiaoxu5@huawei.com>,
+        Herbert Xu <herbert@gondor.apana.org.au>
 Sender: linux-block-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-On 9/20/19 4:34 AM, Yufen Yu wrote:
-> Cc: Christoph Hellwig <hch@infradead.org>
-> Cc: Keith Busch <keith.busch@intel.com>
-> Reviewed-by: Ming Lei <ming.lei@redhat.com>
-> Signed-off-by: Yufen Yu <yuyufen@huawei.com>
+The pull request you sent on Thu, 19 Sep 2019 17:19:24 -0400:
 
-Have you considered to add Fixes: and Cc: stable tags to this patch?
+> git://git.kernel.org/pub/scm/linux/kernel/git/device-mapper/linux-dm.git tags/for-5.4/dm-changes
 
-Thanks,
+has been merged into torvalds/linux.git:
+https://git.kernel.org/torvalds/c/3e414b5bd28f965fb39b9e9419d877df0cf3111a
 
-Bart.
+Thank you!
+
+-- 
+Deet-doot-dot, I am a bot.
+https://korg.wiki.kernel.org/userdoc/prtracker
