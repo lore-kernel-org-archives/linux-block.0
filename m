@@ -4,47 +4,48 @@ X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 X-Spam-Level: 
 X-Spam-Status: No, score=-10.1 required=3.0 tests=DKIMWL_WL_HIGH,DKIM_SIGNED,
 	DKIM_VALID,DKIM_VALID_AU,INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,
-	SPF_HELO_NONE,SPF_PASS,USER_AGENT_GIT autolearn=unavailable
+	SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED,USER_AGENT_GIT autolearn=unavailable
 	autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id D80CEC3A5A2
-	for <linux-block@archiver.kernel.org>; Sun, 22 Sep 2019 19:36:52 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 9B888C3A5A2
+	for <linux-block@archiver.kernel.org>; Sun, 22 Sep 2019 19:37:15 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.kernel.org (Postfix) with ESMTP id A522C206B6
-	for <linux-block@archiver.kernel.org>; Sun, 22 Sep 2019 19:36:52 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id 649B520644
+	for <linux-block@archiver.kernel.org>; Sun, 22 Sep 2019 19:37:15 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=default; t=1569181012;
-	bh=PXGyuAPnXiAbwagSHmuY/DyLAwPdHDjmxWdSWUh6/3c=;
+	s=default; t=1569181035;
+	bh=nLBmpST4CMAjbXYt20w4xU7PrLmWj0RW/y6RZSzDzaA=;
 	h=From:To:Cc:Subject:Date:In-Reply-To:References:List-ID:From;
-	b=pVk4hQOqYYvVfeBnT9D/N0eAJleN3lJtJpvyI6SW1UCGOjY+T/U3B5VFWRmpmcbQJ
-	 +HJM6yjzHTMS8oddgdRLp10M4MVADPhyMejhnKDr6TZxxXbC1WkP1Ejgf+Eh2iRza1
-	 bXzJCn4F53KixvZlL0WNOYBWNuUUk83fmwhuXMSQ=
+	b=A+Zx2HMit3FxZLUlSKUEF2tIRTijAdJ7kfCq03efzzoGF2a2MI+GwvDxBdTtWqNqI
+	 rFJ1NKRMWLiATbGNcJtp7CseIu0dmTci5PVM7xdT6eenrDJVnrAIjB5lGF6Q60iB+P
+	 eS/qebbsbET30oBIejduAarZglxRTmlGxm5xo4eg=
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S2389800AbfIVSqE (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Sun, 22 Sep 2019 14:46:04 -0400
-Received: from mail.kernel.org ([198.145.29.99]:41980 "EHLO mail.kernel.org"
+        id S2389662AbfIVSpy (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Sun, 22 Sep 2019 14:45:54 -0400
+Received: from mail.kernel.org ([198.145.29.99]:41720 "EHLO mail.kernel.org"
         rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-        id S2389732AbfIVSqD (ORCPT <rfc822;linux-block@vger.kernel.org>);
-        Sun, 22 Sep 2019 14:46:03 -0400
+        id S2389638AbfIVSpx (ORCPT <rfc822;linux-block@vger.kernel.org>);
+        Sun, 22 Sep 2019 14:45:53 -0400
 Received: from sasha-vm.mshome.net (c-73-47-72-35.hsd1.nh.comcast.net [73.47.72.35])
         (using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
         (No client certificate requested)
-        by mail.kernel.org (Postfix) with ESMTPSA id E796420665;
-        Sun, 22 Sep 2019 18:46:01 +0000 (UTC)
+        by mail.kernel.org (Postfix) with ESMTPSA id CA9D7206C2;
+        Sun, 22 Sep 2019 18:45:52 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-        s=default; t=1569177962;
-        bh=PXGyuAPnXiAbwagSHmuY/DyLAwPdHDjmxWdSWUh6/3c=;
+        s=default; t=1569177953;
+        bh=nLBmpST4CMAjbXYt20w4xU7PrLmWj0RW/y6RZSzDzaA=;
         h=From:To:Cc:Subject:Date:In-Reply-To:References:From;
-        b=a2ljBtX2+0UOL6vFWFcDiwS0B4Pf2t9Mi30IfuU5VXt3k1Bm/mwq1yfyPmPF4oziI
-         Wnxu8DMsUcTPFMAvMAH3q3w6UnWlqXXnCNTTn9QAT+1nGdTLqoBvRtGnQpWtala4ud
-         lVG1Rgn+z8Ol2Ff24Du6tTHkyYYcWRCz1CZpvy6U=
+        b=H0SbaxB2PIw6cjJsgboXFiuS2P9Bcz/E1jnj34dsr2rErVR3R5X3rqbqpchBDXCv2
+         CW3nUfvQ9JKY+7dQzwuI1bxb4SBRl8sVwnJT3CyyGbd+5Sd4kQ80kcpYz/WM7MDfi8
+         AIjFqbx8PskmT1MRAiYNuyQk7qB4H1UNLuIEoYGE=
 From:   Sasha Levin <sashal@kernel.org>
 To:     linux-kernel@vger.kernel.org, stable@vger.kernel.org
-Cc:     zhengbin <zhengbin13@huawei.com>, Jens Axboe <axboe@kernel.dk>,
-        Sasha Levin <sashal@kernel.org>, linux-block@vger.kernel.org
-Subject: [PATCH AUTOSEL 5.3 066/203] blk-mq: Fix memory leak in blk_mq_init_allocated_queue error handling
-Date:   Sun, 22 Sep 2019 14:41:32 -0400
-Message-Id: <20190922184350.30563-66-sashal@kernel.org>
+Cc:     Alessio Balsini <balsini@android.com>,
+        Jens Axboe <axboe@kernel.dk>, Sasha Levin <sashal@kernel.org>,
+        linux-block@vger.kernel.org
+Subject: [PATCH AUTOSEL 5.3 059/203] loop: Add LOOP_SET_DIRECT_IO to compat ioctl
+Date:   Sun, 22 Sep 2019 14:41:25 -0400
+Message-Id: <20190922184350.30563-59-sashal@kernel.org>
 X-Mailer: git-send-email 2.20.1
 In-Reply-To: <20190922184350.30563-1-sashal@kernel.org>
 References: <20190922184350.30563-1-sashal@kernel.org>
@@ -57,56 +58,40 @@ Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-From: zhengbin <zhengbin13@huawei.com>
+From: Alessio Balsini <balsini@android.com>
 
-[ Upstream commit 73d9c8d4c0017e21e1ff519474ceb1450484dc9a ]
+[ Upstream commit fdbe4eeeb1aac219b14f10c0ed31ae5d1123e9b8 ]
 
-If blk_mq_init_allocated_queue->elevator_init_mq fails, need to release
-the previously requested resources.
+Enabling Direct I/O with loop devices helps reducing memory usage by
+avoiding double caching.  32 bit applications running on 64 bits systems
+are currently not able to request direct I/O because is missing from the
+lo_compat_ioctl.
 
-Fixes: d34849913819 ("blk-mq-sched: allow setting of default IO scheduler")
-Signed-off-by: zhengbin <zhengbin13@huawei.com>
+This patch fixes the compatibility issue mentioned above by exporting
+LOOP_SET_DIRECT_IO as additional lo_compat_ioctl() entry.
+The input argument for this ioctl is a single long converted to a 1-bit
+boolean, so compatibility is preserved.
+
+Cc: Jens Axboe <axboe@kernel.dk>
+Signed-off-by: Alessio Balsini <balsini@android.com>
 Signed-off-by: Jens Axboe <axboe@kernel.dk>
 Signed-off-by: Sasha Levin <sashal@kernel.org>
 ---
- block/blk-mq.c | 9 ++++++---
- 1 file changed, 6 insertions(+), 3 deletions(-)
+ drivers/block/loop.c | 1 +
+ 1 file changed, 1 insertion(+)
 
-diff --git a/block/blk-mq.c b/block/blk-mq.c
-index 0835f4d8d42e7..a38ebb2a380c2 100644
---- a/block/blk-mq.c
-+++ b/block/blk-mq.c
-@@ -2841,6 +2841,8 @@ static unsigned int nr_hw_queues(struct blk_mq_tag_set *set)
- struct request_queue *blk_mq_init_allocated_queue(struct blk_mq_tag_set *set,
- 						  struct request_queue *q)
- {
-+	int ret = -ENOMEM;
-+
- 	/* mark the queue as mq asap */
- 	q->mq_ops = set->ops;
- 
-@@ -2902,17 +2904,18 @@ struct request_queue *blk_mq_init_allocated_queue(struct blk_mq_tag_set *set,
- 	blk_mq_map_swqueue(q);
- 
- 	if (!(set->flags & BLK_MQ_F_NO_SCHED)) {
--		int ret;
--
- 		ret = elevator_init_mq(q);
- 		if (ret)
--			return ERR_PTR(ret);
-+			goto err_tag_set;
- 	}
- 
- 	return q;
- 
-+err_tag_set:
-+	blk_mq_del_queue_tag_set(q);
- err_hctxs:
- 	kfree(q->queue_hw_ctx);
-+	q->nr_hw_queues = 0;
- err_sys_init:
- 	blk_mq_sysfs_deinit(q);
- err_poll:
+diff --git a/drivers/block/loop.c b/drivers/block/loop.c
+index ab7ca5989097a..1410fa8936538 100644
+--- a/drivers/block/loop.c
++++ b/drivers/block/loop.c
+@@ -1755,6 +1755,7 @@ static int lo_compat_ioctl(struct block_device *bdev, fmode_t mode,
+ 	case LOOP_SET_FD:
+ 	case LOOP_CHANGE_FD:
+ 	case LOOP_SET_BLOCK_SIZE:
++	case LOOP_SET_DIRECT_IO:
+ 		err = lo_ioctl(bdev, mode, cmd, arg);
+ 		break;
+ 	default:
 -- 
 2.20.1
 
