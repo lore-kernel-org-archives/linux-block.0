@@ -4,49 +4,47 @@ X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 X-Spam-Level: 
 X-Spam-Status: No, score=-10.1 required=3.0 tests=DKIMWL_WL_HIGH,DKIM_SIGNED,
 	DKIM_VALID,DKIM_VALID_AU,INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,
-	SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED,USER_AGENT_GIT autolearn=ham
+	SPF_HELO_NONE,SPF_PASS,USER_AGENT_GIT autolearn=unavailable
 	autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 360CDC3A5A2
-	for <linux-block@archiver.kernel.org>; Sun, 22 Sep 2019 19:31:42 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id D80CEC3A5A2
+	for <linux-block@archiver.kernel.org>; Sun, 22 Sep 2019 19:36:52 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.kernel.org (Postfix) with ESMTP id 074E3206B6
-	for <linux-block@archiver.kernel.org>; Sun, 22 Sep 2019 19:31:42 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id A522C206B6
+	for <linux-block@archiver.kernel.org>; Sun, 22 Sep 2019 19:36:52 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=default; t=1569180702;
-	bh=SSaj6SjOpAnKNqQCHy7fYhMvKgjaL7iwdNhua4vxOJw=;
+	s=default; t=1569181012;
+	bh=PXGyuAPnXiAbwagSHmuY/DyLAwPdHDjmxWdSWUh6/3c=;
 	h=From:To:Cc:Subject:Date:In-Reply-To:References:List-ID:From;
-	b=uhk73sufNSX9J8KzUq/B5xYvcIHc4LZZr8TyOvNpbjgr5yn0Yd2kjB7h8CTJlg34i
-	 BUH2k0bCeEE7KNFePKyVtnEwxf741yNhr/29wEjxDJqWVb7cjHUZq6Qwt+5BCzMluh
-	 +bBazjth2z2MGAWkiDnApHVVewoOXiUaNwHSZkNc=
+	b=pVk4hQOqYYvVfeBnT9D/N0eAJleN3lJtJpvyI6SW1UCGOjY+T/U3B5VFWRmpmcbQJ
+	 +HJM6yjzHTMS8oddgdRLp10M4MVADPhyMejhnKDr6TZxxXbC1WkP1Ejgf+Eh2iRza1
+	 bXzJCn4F53KixvZlL0WNOYBWNuUUk83fmwhuXMSQ=
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S2388709AbfIVTbl (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Sun, 22 Sep 2019 15:31:41 -0400
-Received: from mail.kernel.org ([198.145.29.99]:45706 "EHLO mail.kernel.org"
+        id S2389800AbfIVSqE (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Sun, 22 Sep 2019 14:46:04 -0400
+Received: from mail.kernel.org ([198.145.29.99]:41980 "EHLO mail.kernel.org"
         rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-        id S2388572AbfIVSsq (ORCPT <rfc822;linux-block@vger.kernel.org>);
-        Sun, 22 Sep 2019 14:48:46 -0400
+        id S2389732AbfIVSqD (ORCPT <rfc822;linux-block@vger.kernel.org>);
+        Sun, 22 Sep 2019 14:46:03 -0400
 Received: from sasha-vm.mshome.net (c-73-47-72-35.hsd1.nh.comcast.net [73.47.72.35])
         (using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
         (No client certificate requested)
-        by mail.kernel.org (Postfix) with ESMTPSA id A0C9221479;
-        Sun, 22 Sep 2019 18:48:44 +0000 (UTC)
+        by mail.kernel.org (Postfix) with ESMTPSA id E796420665;
+        Sun, 22 Sep 2019 18:46:01 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-        s=default; t=1569178125;
-        bh=SSaj6SjOpAnKNqQCHy7fYhMvKgjaL7iwdNhua4vxOJw=;
+        s=default; t=1569177962;
+        bh=PXGyuAPnXiAbwagSHmuY/DyLAwPdHDjmxWdSWUh6/3c=;
         h=From:To:Cc:Subject:Date:In-Reply-To:References:From;
-        b=vJOq3bnABPctGin9tD6xHT0t948f756sDrphNLZ62717vyLSjHO0bOy+ILFCoaVJJ
-         6gzfuacgZIVQOAMdVG/M15B6c/um0tGdiT/8uVbetjHLSAOXwixmtoNMGIh7xDErQy
-         167Yb67Bv04cbwxud2fxGUD0ICK2y+byxSl8I/do=
+        b=a2ljBtX2+0UOL6vFWFcDiwS0B4Pf2t9Mi30IfuU5VXt3k1Bm/mwq1yfyPmPF4oziI
+         Wnxu8DMsUcTPFMAvMAH3q3w6UnWlqXXnCNTTn9QAT+1nGdTLqoBvRtGnQpWtala4ud
+         lVG1Rgn+z8Ol2Ff24Du6tTHkyYYcWRCz1CZpvy6U=
 From:   Sasha Levin <sashal@kernel.org>
 To:     linux-kernel@vger.kernel.org, stable@vger.kernel.org
-Cc:     Hou Tao <houtao1@huawei.com>,
-        Pavel Begunkov <asml.silence@gmail.com>,
-        Jens Axboe <axboe@kernel.dk>, Sasha Levin <sashal@kernel.org>,
-        linux-block@vger.kernel.org
-Subject: [PATCH AUTOSEL 5.3 179/203] block: make rq sector size accessible for block stats
-Date:   Sun, 22 Sep 2019 14:43:25 -0400
-Message-Id: <20190922184350.30563-179-sashal@kernel.org>
+Cc:     zhengbin <zhengbin13@huawei.com>, Jens Axboe <axboe@kernel.dk>,
+        Sasha Levin <sashal@kernel.org>, linux-block@vger.kernel.org
+Subject: [PATCH AUTOSEL 5.3 066/203] blk-mq: Fix memory leak in blk_mq_init_allocated_queue error handling
+Date:   Sun, 22 Sep 2019 14:41:32 -0400
+Message-Id: <20190922184350.30563-66-sashal@kernel.org>
 X-Mailer: git-send-email 2.20.1
 In-Reply-To: <20190922184350.30563-1-sashal@kernel.org>
 References: <20190922184350.30563-1-sashal@kernel.org>
@@ -59,125 +57,56 @@ Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-From: Hou Tao <houtao1@huawei.com>
+From: zhengbin <zhengbin13@huawei.com>
 
-[ Upstream commit 3d24430694077313c75c6b89f618db09943621e4 ]
+[ Upstream commit 73d9c8d4c0017e21e1ff519474ceb1450484dc9a ]
 
-Currently rq->data_len will be decreased by partial completion or
-zeroed by completion, so when blk_stat_add() is invoked, data_len
-will be zero and there will never be samples in poll_cb because
-blk_mq_poll_stats_bkt() will return -1 if data_len is zero.
+If blk_mq_init_allocated_queue->elevator_init_mq fails, need to release
+the previously requested resources.
 
-We could move blk_stat_add() back to __blk_mq_complete_request(),
-but that would make the effort of trying to call ktime_get_ns()
-once in vain. Instead we can reuse throtl_size field, and use
-it for both block stats and block throttle, and adjust the
-logic in blk_mq_poll_stats_bkt() accordingly.
-
-Fixes: 4bc6339a583c ("block: move blk_stat_add() to __blk_mq_end_request()")
-Tested-by: Pavel Begunkov <asml.silence@gmail.com>
-Signed-off-by: Hou Tao <houtao1@huawei.com>
+Fixes: d34849913819 ("blk-mq-sched: allow setting of default IO scheduler")
+Signed-off-by: zhengbin <zhengbin13@huawei.com>
 Signed-off-by: Jens Axboe <axboe@kernel.dk>
 Signed-off-by: Sasha Levin <sashal@kernel.org>
 ---
- block/blk-mq.c         | 11 +++++------
- block/blk-throttle.c   |  3 ++-
- include/linux/blkdev.h | 15 ++++++++++++---
- 3 files changed, 19 insertions(+), 10 deletions(-)
+ block/blk-mq.c | 9 ++++++---
+ 1 file changed, 6 insertions(+), 3 deletions(-)
 
 diff --git a/block/blk-mq.c b/block/blk-mq.c
-index a38ebb2a380c2..9b56428cad0e7 100644
+index 0835f4d8d42e7..a38ebb2a380c2 100644
 --- a/block/blk-mq.c
 +++ b/block/blk-mq.c
-@@ -44,12 +44,12 @@ static void blk_mq_poll_stats_fn(struct blk_stat_callback *cb);
- 
- static int blk_mq_poll_stats_bkt(const struct request *rq)
+@@ -2841,6 +2841,8 @@ static unsigned int nr_hw_queues(struct blk_mq_tag_set *set)
+ struct request_queue *blk_mq_init_allocated_queue(struct blk_mq_tag_set *set,
+ 						  struct request_queue *q)
  {
--	int ddir, bytes, bucket;
-+	int ddir, sectors, bucket;
- 
- 	ddir = rq_data_dir(rq);
--	bytes = blk_rq_bytes(rq);
-+	sectors = blk_rq_stats_sectors(rq);
- 
--	bucket = ddir + 2*(ilog2(bytes) - 9);
-+	bucket = ddir + 2 * ilog2(sectors);
- 
- 	if (bucket < 0)
- 		return -1;
-@@ -330,6 +330,7 @@ static struct request *blk_mq_rq_ctx_init(struct blk_mq_alloc_data *data,
- 	else
- 		rq->start_time_ns = 0;
- 	rq->io_start_time_ns = 0;
-+	rq->stats_sectors = 0;
- 	rq->nr_phys_segments = 0;
- #if defined(CONFIG_BLK_DEV_INTEGRITY)
- 	rq->nr_integrity_segments = 0;
-@@ -673,9 +674,7 @@ void blk_mq_start_request(struct request *rq)
- 
- 	if (test_bit(QUEUE_FLAG_STATS, &q->queue_flags)) {
- 		rq->io_start_time_ns = ktime_get_ns();
--#ifdef CONFIG_BLK_DEV_THROTTLING_LOW
--		rq->throtl_size = blk_rq_sectors(rq);
--#endif
-+		rq->stats_sectors = blk_rq_sectors(rq);
- 		rq->rq_flags |= RQF_STATS;
- 		rq_qos_issue(q, rq);
- 	}
-diff --git a/block/blk-throttle.c b/block/blk-throttle.c
-index 8ab6c81532236..ee74bffe3504d 100644
---- a/block/blk-throttle.c
-+++ b/block/blk-throttle.c
-@@ -2246,7 +2246,8 @@ void blk_throtl_stat_add(struct request *rq, u64 time_ns)
- 	struct request_queue *q = rq->q;
- 	struct throtl_data *td = q->td;
- 
--	throtl_track_latency(td, rq->throtl_size, req_op(rq), time_ns >> 10);
-+	throtl_track_latency(td, blk_rq_stats_sectors(rq), req_op(rq),
-+			     time_ns >> 10);
- }
- 
- void blk_throtl_bio_endio(struct bio *bio)
-diff --git a/include/linux/blkdev.h b/include/linux/blkdev.h
-index 1ef375dafb1c1..ae51050c50949 100644
---- a/include/linux/blkdev.h
-+++ b/include/linux/blkdev.h
-@@ -202,9 +202,12 @@ struct request {
- #ifdef CONFIG_BLK_WBT
- 	unsigned short wbt_flags;
- #endif
--#ifdef CONFIG_BLK_DEV_THROTTLING_LOW
--	unsigned short throtl_size;
--#endif
-+	/*
-+	 * rq sectors used for blk stats. It has the same value
-+	 * with blk_rq_sectors(rq), except that it never be zeroed
-+	 * by completion.
-+	 */
-+	unsigned short stats_sectors;
- 
- 	/*
- 	 * Number of scatter-gather DMA addr+len pairs after
-@@ -903,6 +906,7 @@ static inline struct request_queue *bdev_get_queue(struct block_device *bdev)
-  * blk_rq_err_bytes()		: bytes left till the next error boundary
-  * blk_rq_sectors()		: sectors left in the entire request
-  * blk_rq_cur_sectors()		: sectors left in the current segment
-+ * blk_rq_stats_sectors()	: sectors of the entire request used for stats
-  */
- static inline sector_t blk_rq_pos(const struct request *rq)
- {
-@@ -931,6 +935,11 @@ static inline unsigned int blk_rq_cur_sectors(const struct request *rq)
- 	return blk_rq_cur_bytes(rq) >> SECTOR_SHIFT;
- }
- 
-+static inline unsigned int blk_rq_stats_sectors(const struct request *rq)
-+{
-+	return rq->stats_sectors;
-+}
++	int ret = -ENOMEM;
 +
- #ifdef CONFIG_BLK_DEV_ZONED
- static inline unsigned int blk_rq_zone_no(struct request *rq)
- {
+ 	/* mark the queue as mq asap */
+ 	q->mq_ops = set->ops;
+ 
+@@ -2902,17 +2904,18 @@ struct request_queue *blk_mq_init_allocated_queue(struct blk_mq_tag_set *set,
+ 	blk_mq_map_swqueue(q);
+ 
+ 	if (!(set->flags & BLK_MQ_F_NO_SCHED)) {
+-		int ret;
+-
+ 		ret = elevator_init_mq(q);
+ 		if (ret)
+-			return ERR_PTR(ret);
++			goto err_tag_set;
+ 	}
+ 
+ 	return q;
+ 
++err_tag_set:
++	blk_mq_del_queue_tag_set(q);
+ err_hctxs:
+ 	kfree(q->queue_hw_ctx);
++	q->nr_hw_queues = 0;
+ err_sys_init:
+ 	blk_mq_sysfs_deinit(q);
+ err_poll:
 -- 
 2.20.1
 
