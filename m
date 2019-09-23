@@ -2,121 +2,149 @@ Return-Path: <SRS0=JlK2=XS=vger.kernel.org=linux-block-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-2.2 required=3.0 tests=DKIM_SIGNED,DKIM_VALID,
-	HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,
-	USER_AGENT_SANE_1 autolearn=no autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-9.7 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
+	INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,
+	UNPARSEABLE_RELAY,URIBL_BLOCKED,USER_AGENT_GIT autolearn=ham
+	autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 4A637C32755
-	for <linux-block@archiver.kernel.org>; Mon, 23 Sep 2019 14:05:54 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 5ACA4C04EBF
+	for <linux-block@archiver.kernel.org>; Mon, 23 Sep 2019 14:41:08 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.kernel.org (Postfix) with ESMTP id 16C7220835
-	for <linux-block@archiver.kernel.org>; Mon, 23 Sep 2019 14:05:54 +0000 (UTC)
-Authentication-Results: mail.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel-dk.20150623.gappssmtp.com header.i=@kernel-dk.20150623.gappssmtp.com header.b="mpGjQoge"
+	by mail.kernel.org (Postfix) with ESMTP id 37EE620673
+	for <linux-block@archiver.kernel.org>; Mon, 23 Sep 2019 14:41:08 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S2407467AbfIWOFx (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Mon, 23 Sep 2019 10:05:53 -0400
-Received: from mail-io1-f67.google.com ([209.85.166.67]:43337 "EHLO
-        mail-io1-f67.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S2404990AbfIWOFx (ORCPT
+        id S2407619AbfIWOlH convert rfc822-to-8bit (ORCPT
+        <rfc822;linux-block@archiver.kernel.org>);
+        Mon, 23 Sep 2019 10:41:07 -0400
+Received: from m9a0003g.houston.softwaregrp.com ([15.124.64.68]:33221 "EHLO
+        m9a0003g.houston.softwaregrp.com" rhost-flags-OK-OK-OK-OK)
+        by vger.kernel.org with ESMTP id S2407614AbfIWOlH (ORCPT
         <rfc822;linux-block@vger.kernel.org>);
-        Mon, 23 Sep 2019 10:05:53 -0400
-Received: by mail-io1-f67.google.com with SMTP id v2so33629071iob.10
-        for <linux-block@vger.kernel.org>; Mon, 23 Sep 2019 07:05:52 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=kernel-dk.20150623.gappssmtp.com; s=20150623;
-        h=subject:to:cc:references:from:message-id:date:user-agent
-         :mime-version:in-reply-to:content-language:content-transfer-encoding;
-        bh=G7YBYmECKI/gBoDO5nAZKZwYRyMYNEVEhyIASOovv84=;
-        b=mpGjQogeI9U8AI7awnhSZdCM0EQ1pdVBMqn6L8SYnGQPh+XFlSfyuNdoRc/xkucca1
-         9tKiyJ8ceUx47+++EK3fao6hiccSS/Q5Ae/SlJpVwoS6vriRK5F1ZMIvJo5nCkZIuOYX
-         BDN32je/8OysKwqCR+2zVyBD4Zq9r51PKVKAk/yV5H1ker7sDqNI/X6DxuHpi7dYY14G
-         XLYKXijrO4jeUoLHqmEFHFvuduiYkWi8IT1MlSIl3rtm9ISKkm/fIZnrLniyfqvV/OmN
-         9enXOCiXhjHagfm838YZGixZWMrOLhlrEzPC+aydXsZJxMUDz6h9VBGF2eO0xTBXvxXv
-         88Ig==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20161025;
-        h=x-gm-message-state:subject:to:cc:references:from:message-id:date
-         :user-agent:mime-version:in-reply-to:content-language
-         :content-transfer-encoding;
-        bh=G7YBYmECKI/gBoDO5nAZKZwYRyMYNEVEhyIASOovv84=;
-        b=EFKOKUcOqgmCc1T4d1mdK1Vc/iOT15HEMqsxhAnyg/mjAP/azyG2fmYVM5xQnhZqUb
-         OS472CwT4TmbXo//FiA0ar9ltPlrNYJtw7gmIiJzMRbZ3OBfqNTEIWHQl5UyajQ7kt1B
-         F8IQKGkN5n4MkPNvL7dgjJndDvi3jp2LCBtYflqFK2aaeSEzbjafklY3T0Ot1e3zjb/w
-         mj2JN+0DLM1IVAuLtU2Dr9AKaUb6/+mP1gtN+utbOzjar6JwmuH9hbFGRzaJOyxzUKuw
-         F1SoK6HNP98G3ZAGnwPu15kV4vBemxXtFaLKm3I5NeRldNo8mDLIBzMEyUSE4gnLEBF0
-         JPQA==
-X-Gm-Message-State: APjAAAUHfz77fso4BZ6RWDYkZOou7fVH1qRgBHbcwXaUU+oByDHOx7UH
-        WNaFY0fvxcE0jAXUsQPh/CVxRGBQsj1jJw==
-X-Google-Smtp-Source: APXvYqw48H7aH8sBx7zjMV0bKT2krIn87gYu5IDwuQ6tgB32HXgm0MnB6eZM7BOC8ZsVsWGDImKpmA==
-X-Received: by 2002:a6b:ca47:: with SMTP id a68mr775391iog.110.1569247551641;
-        Mon, 23 Sep 2019 07:05:51 -0700 (PDT)
-Received: from [192.168.1.50] ([65.144.74.34])
-        by smtp.gmail.com with ESMTPSA id m11sm9196955ioq.5.2019.09.23.07.05.49
-        (version=TLS1_2 cipher=ECDHE-RSA-AES128-GCM-SHA256 bits=128/128);
-        Mon, 23 Sep 2019 07:05:50 -0700 (PDT)
-Subject: Re: [PATCH 1/1] block: add default clause for unsupported T10_PI
- types
-To:     Max Gurtovoy <maxg@mellanox.com>,
-        "Martin K. Petersen" <martin.petersen@oracle.com>
-Cc:     linux-block@vger.kernel.org, Arnd Bergmann <arnd@arndb.de>
-References: <1569103249-24018-1-git-send-email-maxg@mellanox.com>
- <6e99fefd-ff7c-e3ee-087c-ed42baa7f4f5@kernel.dk> <yq1tv955kfy.fsf@oracle.com>
- <a0505439-2bf3-3297-2e8d-5cc0b24cafee@kernel.dk>
- <423a031c-a016-96c6-97ee-fb4e49a0f247@mellanox.com>
- <ddd909c8-1309-5830-0669-371d2ae839fc@kernel.dk> <yq1o8zc5jc2.fsf@oracle.com>
- <a98735bc-3a03-0816-5fc1-abac2c6b4fc6@mellanox.com>
-From:   Jens Axboe <axboe@kernel.dk>
-Message-ID: <311f238d-6d7a-4285-5a87-ea7ff2a29e7a@kernel.dk>
-Date:   Mon, 23 Sep 2019 08:05:49 -0600
-User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:60.0) Gecko/20100101
- Thunderbird/60.8.0
-MIME-Version: 1.0
-In-Reply-To: <a98735bc-3a03-0816-5fc1-abac2c6b4fc6@mellanox.com>
-Content-Type: text/plain; charset=utf-8
+        Mon, 23 Sep 2019 10:41:07 -0400
+Received: FROM m9a0003g.houston.softwaregrp.com (15.121.0.190) BY m9a0003g.houston.softwaregrp.com WITH ESMTP;
+ Mon, 23 Sep 2019 14:40:27 +0000
+Received: from M4W0335.microfocus.com (2002:f78:1193::f78:1193) by
+ M9W0067.microfocus.com (2002:f79:be::f79:be) with Microsoft SMTP Server
+ (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_128_CBC_SHA256_P256) id
+ 15.1.1591.10; Mon, 23 Sep 2019 14:02:03 +0000
+Received: from NAM04-CO1-obe.outbound.protection.outlook.com (15.124.8.11) by
+ M4W0335.microfocus.com (15.120.17.147) with Microsoft SMTP Server
+ (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_128_CBC_SHA256_P256) id
+ 15.1.1591.10 via Frontend Transport; Mon, 23 Sep 2019 14:02:03 +0000
+ARC-Seal: i=1; a=rsa-sha256; s=arcselector9901; d=microsoft.com; cv=none;
+ b=lLvMrxLj3BVIrnYjUVilPxByCxpLTDARRt6zuXu9CnIlFkKk3RhEJGFACRcsIOmhommd3E3C1PxjZ0fXnELD9CaCGDqFNT1o8+AcOd9j2svq3H18/7gpA2bYwrXVSaaER95xIChSEJqNBp2hV9AWYhyeTk+Q//eYLerPD3h4Emb/zHl9gSnk8yiHVThaA1MzZm/VEIJ994JkaH5+0dpmPtIFmnlCuokRCARWeNyn5UtKxNYKRJjCKC8YzZ5WEZUpcXQc6kLbbcbm3Spc+rEC6ykt7617BsNeElr3GhfMRQTAmiqt5pyA6s2M2QLnILbYy30Wbw4ycoo6wJjGn24OXA==
+ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com;
+ s=arcselector9901;
+ h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
+ bh=9aSpVoW4mIFex6eK1isNgd0tXSLMGWUw7OvMpnddRq8=;
+ b=jLOr8mDcCsLdiHOcvj1ie6++kJ13N3o3jdNQER7gdakbv/CaZtH5qkhCqiDWci/+UXqXZvH+jNJEDyWNS+8hckXh27jlK55uP5hkwaa3sRRoQUAAx8k1zWBTXKn+NI58qMN6MpBE8DFB11w1gp0Z9HzrOKyU2zr75+IFdMwQ/Uwsly1CU8lXERYJy0xe+Yxiv1eCWJ6NchoOcjFlbKhlg9TNBCo/UU2nPMwdypSHLfs0IvTQZKxRU/XKR2FjdUGfRpP8tCuL6CpB0MyDKSp4D5jAQ/NpsAs/Gn+gMb4lCiaD6sQteUXLSCs7MYsOjxdaZy5zHCaFLCXSr0oWVxzoxQ==
+ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass
+ smtp.mailfrom=suse.com; dmarc=pass action=none header.from=suse.com;
+ dkim=pass header.d=suse.com; arc=none
+Received: from CH2PR18MB3349.namprd18.prod.outlook.com (52.132.245.83) by
+ CH2PR18MB3191.namprd18.prod.outlook.com (52.132.244.75) with Microsoft SMTP
+ Server (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
+ 15.20.2284.20; Mon, 23 Sep 2019 14:02:02 +0000
+Received: from CH2PR18MB3349.namprd18.prod.outlook.com
+ ([fe80::1075:2453:9278:e985]) by CH2PR18MB3349.namprd18.prod.outlook.com
+ ([fe80::1075:2453:9278:e985%5]) with mapi id 15.20.2284.023; Mon, 23 Sep 2019
+ 14:02:02 +0000
+From:   Martin Wilck <Martin.Wilck@suse.com>
+To:     Jens Axboe <axboe@kernel.dk>
+CC:     Johannes Thumshirn <jthumshirn@suse.de>,
+        Hannes Reinecke <hare@suse.de>,
+        Martin Wilck <Martin.Wilck@suse.com>,
+        "linux-block@vger.kernel.org" <linux-block@vger.kernel.org>
+Subject: [PATCH] block: drop device references in bsg_queue_rq()
+Thread-Topic: [PATCH] block: drop device references in bsg_queue_rq()
+Thread-Index: AQHVchd58urpL6Qt/0uvKjMFlb+bag==
+Date:   Mon, 23 Sep 2019 14:02:02 +0000
+Message-ID: <20190923135744.13955-1-martin.wilck@suse.com>
+Accept-Language: en-US
 Content-Language: en-US
-Content-Transfer-Encoding: 7bit
+X-MS-Has-Attach: 
+X-MS-TNEF-Correlator: 
+x-clientproxiedby: AM0PR01CA0140.eurprd01.prod.exchangelabs.com
+ (2603:10a6:208:168::45) To CH2PR18MB3349.namprd18.prod.outlook.com
+ (2603:10b6:610:28::19)
+authentication-results: spf=none (sender IP is )
+ smtp.mailfrom=Martin.Wilck@suse.com; 
+x-ms-exchange-messagesentrepresentingtype: 1
+x-mailer: git-send-email 2.23.0
+x-originating-ip: [2.203.223.119]
+x-ms-publictraffictype: Email
+x-ms-office365-filtering-correlation-id: c38d0f35-7fef-41af-05b9-08d7402e9ba9
+x-microsoft-antispam: BCL:0;PCL:0;RULEID:(2390118)(7020095)(4652040)(8989299)(4534185)(4627221)(201703031133081)(201702281549075)(8990200)(5600167)(711020)(4605104)(1401327)(2017052603328)(7193020);SRVR:CH2PR18MB3191;
+x-ms-traffictypediagnostic: CH2PR18MB3191:
+x-ms-exchange-transport-forked: True
+x-microsoft-antispam-prvs: <CH2PR18MB3191B075477AF95E1AC78A63FC850@CH2PR18MB3191.namprd18.prod.outlook.com>
+x-ms-oob-tlc-oobclassifiers: OLM:5236;
+x-forefront-prvs: 0169092318
+x-forefront-antispam-report: SFV:NSPM;SFS:(10019020)(4636009)(136003)(39860400002)(396003)(366004)(376002)(346002)(189003)(199004)(44832011)(476003)(54906003)(6486002)(6512007)(1076003)(66476007)(66556008)(66946007)(64756008)(66446008)(6916009)(7736002)(316002)(8676002)(305945005)(5660300002)(14444005)(6436002)(86362001)(81156014)(81166006)(50226002)(8936002)(4326008)(256004)(26005)(186003)(6116002)(3846002)(2906002)(102836004)(71200400001)(14454004)(66066001)(99286004)(36756003)(71190400001)(52116002)(2616005)(486006)(386003)(25786009)(478600001)(6506007);DIR:OUT;SFP:1102;SCL:1;SRVR:CH2PR18MB3191;H:CH2PR18MB3349.namprd18.prod.outlook.com;FPR:;SPF:None;LANG:en;PTR:InfoNoRecords;MX:1;A:1;
+received-spf: None (protection.outlook.com: suse.com does not designate
+ permitted sender hosts)
+x-ms-exchange-senderadcheck: 1
+x-microsoft-antispam-message-info: elKIAdeRX25as1ehHkhvYGoLC0NCCbn4/ezENfwReuxCVgvqlQeS4C7pkLAQG5JQkj7QdHYKdntoS3+L2HAvy31NM9Txpw+SmcdRKtfKVhsJxsbLQMigjRN3rYSgkU7XBOyjw0UKGJa2+reUozWVQCt5VOuT8VZ4qiasj/sUlaqfR8IEFd3QCjlJCs2skEhg3KRhTRmreZ5Dth51wf1C+4zAqOEfjaan0z4kmbE0p8LOKmWZFtMZBgiKWs1O4zl1xTAZaQxrpuEuCEcfmuTSevz4/xWJ5wNTiJToxoGjk4rSknAIROfj88MTgL2M7txUqD5tPTWSMyCSJuIJdOJmcQy4fRIhySqyKb5LMKYH7XmQlhk3Lk6XHS/QA/UyPCWU2b5WYgqrIXclN52pOIK6bpH9qEpM06dzzuYBGp4gbto=
+Content-Type: text/plain; charset="iso-8859-1"
+Content-Transfer-Encoding: 8BIT
+MIME-Version: 1.0
+X-MS-Exchange-CrossTenant-Network-Message-Id: c38d0f35-7fef-41af-05b9-08d7402e9ba9
+X-MS-Exchange-CrossTenant-originalarrivaltime: 23 Sep 2019 14:02:02.5999
+ (UTC)
+X-MS-Exchange-CrossTenant-fromentityheader: Hosted
+X-MS-Exchange-CrossTenant-id: 856b813c-16e5-49a5-85ec-6f081e13b527
+X-MS-Exchange-CrossTenant-mailboxtype: HOSTED
+X-MS-Exchange-CrossTenant-userprincipalname: uHCTe8phUPEBHVtfH0iXdWycuvj9JqqYNv+wM/JvolhQN0sOI7k2FQzdOrbQ8lz5zFkkIrA6+LJd5VrkBi8RNQ==
+X-MS-Exchange-Transport-CrossTenantHeadersStamped: CH2PR18MB3191
+X-OriginatorOrg: suse.com
 Sender: linux-block-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-On 9/22/19 3:21 PM, Max Gurtovoy wrote:
-> 
-> On 9/22/2019 8:31 PM, Martin K. Petersen wrote:
->> Jens,
->>
->>> It's effectively the same thing, I really don't think we need (or should
->>> have) a BUG/BUG_ON for this condition. Just return an error?
->>> Just include a T10_PI_TYPE0_PROTECTION case in the switch, have it log
->>> and return an error. Add a comment on how it's impossible, if need be.
->>> I don't think it has to be more complicated than that.
->> The additional case statement is inside an iterator loop which would
->> bomb for Type 0 since there is no protection buffer to iterate
->> over. We'd presumably never reach that default: case before
->> dereferencing something bad.
->>
->> t10_pi_verify() is a static function exclusively called by helpers that
->> pass in either 1 or 3 as argument. It seems kind of silly that we have
->> to jump through hoops to silence a compiler warning for this. I would
->> prefer a BUILD_BUG_ON(type == T10_PI_TYPE0_PROTECTION) at the top of the
->> function but that does not satisfy the -Wswitch logic either.
->>
->> Anyway. Enough energy wasted on this. I'm OK with either the default:
->> case or Max' if statement approach. My objection is purely
->> wrt. introducing semantically incorrect and/or unreachable code to
->> silence compiler warnings. Seems backwards.
-> 
-> I agree that enough energy wasted here :)
+From: Martin Wilck <mwilck@suse.com>
 
-Agree ;-)
+Make sure that bsg_queue_rq() calls put_device() if an error is
+encountered after get_device() was successful.
 
-> Attached some proposal to fix this warning.
-> 
-> Let me know if you want me to send it to the mailing list
+Fixes: cd2f076f1d7a ("bsg: convert to use blk-mq")
+Signed-off-by: Martin Wilck <mwilck@suse.com>
+---
+ block/bsg-lib.c | 10 ++++++----
+ 1 file changed, 6 insertions(+), 4 deletions(-)
 
-OK, fine with me, I've queued it up.
-
+diff --git a/block/bsg-lib.c b/block/bsg-lib.c
+index 785dd58..347dda1 100644
+--- a/block/bsg-lib.c
++++ b/block/bsg-lib.c
+@@ -266,6 +266,7 @@ static blk_status_t bsg_queue_rq(struct blk_mq_hw_ctx *hctx,
+ 	struct request *req = bd->rq;
+ 	struct bsg_set *bset =
+ 		container_of(q->tag_set, struct bsg_set, tag_set);
++	int sts = BLK_STS_IOERR;
+ 	int ret;
+ 
+ 	blk_mq_start_request(req);
+@@ -274,14 +275,15 @@ static blk_status_t bsg_queue_rq(struct blk_mq_hw_ctx *hctx,
+ 		return BLK_STS_IOERR;
+ 
+ 	if (!bsg_prepare_job(dev, req))
+-		return BLK_STS_IOERR;
++		goto out;
+ 
+ 	ret = bset->job_fn(blk_mq_rq_to_pdu(req));
+-	if (ret)
+-		return BLK_STS_IOERR;
++	if (!ret)
++		sts = BLK_STS_OK;
+ 
++out:
+ 	put_device(dev);
+-	return BLK_STS_OK;
++	return sts;
+ }
+ 
+ /* called right after the request is allocated for the request_queue */
 -- 
-Jens Axboe
+2.23.0
 
