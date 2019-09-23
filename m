@@ -2,186 +2,128 @@ Return-Path: <SRS0=JlK2=XS=vger.kernel.org=linux-block-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-2.2 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
-	MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED,USER_AGENT_SANE_1
-	autolearn=no autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-2.4 required=3.0 tests=DKIMWL_WL_HIGH,DKIM_SIGNED,
+	DKIM_VALID,DKIM_VALID_AU,HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,
+	SPF_HELO_NONE,SPF_PASS,UNPARSEABLE_RELAY,USER_AGENT_SANE_1 autolearn=no
+	autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 2DFDCC4CEC4
-	for <linux-block@archiver.kernel.org>; Mon, 23 Sep 2019 17:44:42 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 855A4C4CEC4
+	for <linux-block@archiver.kernel.org>; Mon, 23 Sep 2019 17:52:34 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.kernel.org (Postfix) with ESMTP id 058A820835
-	for <linux-block@archiver.kernel.org>; Mon, 23 Sep 2019 17:44:42 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id 5FE78217D9
+	for <linux-block@archiver.kernel.org>; Mon, 23 Sep 2019 17:52:34 +0000 (UTC)
+Authentication-Results: mail.kernel.org;
+	dkim=pass (2048-bit key) header.d=oracle.com header.i=@oracle.com header.b="GoJc40BH"
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S2390186AbfIWRol (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Mon, 23 Sep 2019 13:44:41 -0400
-Received: from mail-pf1-f196.google.com ([209.85.210.196]:41690 "EHLO
-        mail-pf1-f196.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S2389763AbfIWRol (ORCPT
+        id S2440232AbfIWRwd (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Mon, 23 Sep 2019 13:52:33 -0400
+Received: from aserp2120.oracle.com ([141.146.126.78]:49870 "EHLO
+        aserp2120.oracle.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S2440205AbfIWRwd (ORCPT
         <rfc822;linux-block@vger.kernel.org>);
-        Mon, 23 Sep 2019 13:44:41 -0400
-Received: by mail-pf1-f196.google.com with SMTP id q7so9546497pfh.8;
-        Mon, 23 Sep 2019 10:44:39 -0700 (PDT)
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20161025;
-        h=x-gm-message-state:subject:to:cc:references:from:message-id:date
-         :user-agent:mime-version:in-reply-to:content-language
-         :content-transfer-encoding;
-        bh=VCyFJnwaPK6qM/V+l3WbBpnXJnUTZEa6VNWv+6InCmE=;
-        b=ay8EYFyOlq+SNPm+ELbkYcMuBS4G9iSnBaL1Mh62cgbNRIZKSlmM+EkGc3U4DOSTwl
-         z7LZBxRKBpWFx6aRCuUBuxLS9khYyE9QMddm8W4riROnV57epi2CiAqxv/w8vWbtxxej
-         5eB6+AlPHd1mL8pCyWaIHd7U9FFIE0cQvP4HxcMNG86ZUKfjIxqcEwXF3vAIu0cFI4fs
-         Sq4eSFkzX8LdNn8F2dDrrtFuhT4W35/FpVDuwez2AAdLBOWux5Yw3WaIsBm4JQCcWO2z
-         QayOdF7ADv85A4TpGmXN/1TWaYtiCX0q03H1NFmdOsptXstbKahXsOeOQrBJ4cX2UDIm
-         vPEQ==
-X-Gm-Message-State: APjAAAXmf0yRvRiGN7+P6qRvp0fSblzwQoJtiWWexL1+Kva5aBElpdfW
-        1OZcPJ9/52N1JqcVnYR3Q68=
-X-Google-Smtp-Source: APXvYqxH11vRLoj01Bj1USCJlOxVD32/gEivU6HGztrjQ25nqTfl+umTsp5FRZuJGTdAjgXg63eGoA==
-X-Received: by 2002:a62:115:: with SMTP id 21mr875783pfb.110.1569260679392;
-        Mon, 23 Sep 2019 10:44:39 -0700 (PDT)
-Received: from desktop-bart.svl.corp.google.com ([2620:15c:2cd:202:4308:52a3:24b6:2c60])
-        by smtp.gmail.com with ESMTPSA id g4sm14060628pfo.33.2019.09.23.10.44.37
-        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
-        Mon, 23 Sep 2019 10:44:38 -0700 (PDT)
-Subject: Re: [PATCH v4 02/25] ibtrs: public interface header to establish RDMA
- connections
-To:     Jack Wang <jinpuwang@gmail.com>, linux-block@vger.kernel.org,
-        linux-rdma@vger.kernel.org
-Cc:     axboe@kernel.dk, hch@infradead.org, sagi@grimberg.me,
-        jgg@mellanox.com, dledford@redhat.com,
-        danil.kipnis@cloud.ionos.com, rpenyaev@suse.de,
-        Jack Wang <jinpu.wang@cloud.ionos.com>
-References: <20190620150337.7847-1-jinpuwang@gmail.com>
- <20190620150337.7847-3-jinpuwang@gmail.com>
-From:   Bart Van Assche <bvanassche@acm.org>
-Message-ID: <0607ca2d-6509-69da-4afc-0be6526b11c4@acm.org>
-Date:   Mon, 23 Sep 2019 10:44:36 -0700
-User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:60.0) Gecko/20100101
- Thunderbird/60.8.0
+        Mon, 23 Sep 2019 13:52:33 -0400
+Received: from pps.filterd (aserp2120.oracle.com [127.0.0.1])
+        by aserp2120.oracle.com (8.16.0.27/8.16.0.27) with SMTP id x8NHdF1v048664;
+        Mon, 23 Sep 2019 17:52:00 GMT
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=oracle.com; h=date : from : to :
+ subject : message-id : references : mime-version : content-type :
+ in-reply-to; s=corp-2019-08-05;
+ bh=QmIc8SyP7RM5Do/QTI4knkOCWuEHdj+zEMy3rAkq2Hc=;
+ b=GoJc40BHF6cojzLJ68q2+dWjy7haKJEAQNHgz+VZBKkwbhfh23GgssQoi7Hm9TO0h03e
+ 7OeEEY09l9G5bk2inPJ21guyqka9goM9IyOQ7xyThsddSGnrSrg9sKsfKXAl9WgnRh54
+ zRU2qH7XPqes1WXn9kSrxofHIY3YxGMe+KSf6+/UM+L5MOed813s4f4dJkMAwIYbC8GZ
+ ABZ1c/AgnuKBpRWCniRACcUBJwVI1Kkaj8kFrsrBY7FNnSC2wReeSdrypPwQYqcTPGh4
+ d0U5kFEloCKG174QEYKVaCFMAAs5bTgK6brWk/dQJqiWIIyNFMLJAbSkC4xbm8j+V3b9 Yg== 
+Received: from aserp3020.oracle.com (aserp3020.oracle.com [141.146.126.70])
+        by aserp2120.oracle.com with ESMTP id 2v5btprmrv-1
+        (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=OK);
+        Mon, 23 Sep 2019 17:52:00 +0000
+Received: from pps.filterd (aserp3020.oracle.com [127.0.0.1])
+        by aserp3020.oracle.com (8.16.0.27/8.16.0.27) with SMTP id x8NHctLO179108;
+        Mon, 23 Sep 2019 17:52:00 GMT
+Received: from aserv0121.oracle.com (aserv0121.oracle.com [141.146.126.235])
+        by aserp3020.oracle.com with ESMTP id 2v6yvpu82k-1
+        (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=OK);
+        Mon, 23 Sep 2019 17:52:00 +0000
+Received: from abhmp0022.oracle.com (abhmp0022.oracle.com [141.146.116.28])
+        by aserv0121.oracle.com (8.14.4/8.13.8) with ESMTP id x8NHpmAQ017226;
+        Mon, 23 Sep 2019 17:51:48 GMT
+Received: from localhost (/67.169.218.210)
+        by default (Oracle Beehive Gateway v4.0)
+        with ESMTP ; Mon, 23 Sep 2019 10:51:48 -0700
+Date:   Mon, 23 Sep 2019 10:51:46 -0700
+From:   "Darrick J. Wong" <darrick.wong@oracle.com>
+To:     dsterba@suse.cz, Vlastimil Babka <vbabka@suse.cz>,
+        Andrew Morton <akpm@linux-foundation.org>, linux-mm@kvack.org,
+        linux-kernel@vger.kernel.org, Christoph Lameter <cl@linux.com>,
+        Pekka Enberg <penberg@kernel.org>,
+        David Rientjes <rientjes@google.com>,
+        Ming Lei <ming.lei@redhat.com>,
+        Dave Chinner <david@fromorbit.com>,
+        Matthew Wilcox <willy@infradead.org>,
+        Christoph Hellwig <hch@lst.de>, linux-xfs@vger.kernel.org,
+        linux-fsdevel@vger.kernel.org, linux-block@vger.kernel.org,
+        James Bottomley <James.Bottomley@HansenPartnership.com>,
+        linux-btrfs@vger.kernel.org, Roman Gushchin <guro@fb.com>,
+        Johannes Weiner <hannes@cmpxchg.org>
+Subject: Re: [PATCH v2 2/2] mm, sl[aou]b: guarantee natural alignment for
+ kmalloc(power-of-two)
+Message-ID: <20190923175146.GT2229799@magnolia>
+References: <20190826111627.7505-1-vbabka@suse.cz>
+ <20190826111627.7505-3-vbabka@suse.cz>
+ <df8d1cf4-ff8f-1ee1-12fb-cfec39131b32@suse.cz>
+ <20190923171710.GN2751@twin.jikos.cz>
 MIME-Version: 1.0
-In-Reply-To: <20190620150337.7847-3-jinpuwang@gmail.com>
-Content-Type: text/plain; charset=utf-8; format=flowed
-Content-Language: en-US
-Content-Transfer-Encoding: 7bit
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <20190923171710.GN2751@twin.jikos.cz>
+User-Agent: Mutt/1.9.4 (2018-02-28)
+X-Proofpoint-Virus-Version: vendor=nai engine=6000 definitions=9389 signatures=668685
+X-Proofpoint-Spam-Details: rule=notspam policy=default score=0 suspectscore=0 malwarescore=0
+ phishscore=0 bulkscore=0 spamscore=0 mlxscore=0 mlxlogscore=999
+ adultscore=0 classifier=spam adjust=0 reason=mlx scancount=1
+ engine=8.0.1-1908290000 definitions=main-1909230157
+X-Proofpoint-Virus-Version: vendor=nai engine=6000 definitions=9389 signatures=668685
+X-Proofpoint-Spam-Details: rule=notspam policy=default score=0 priorityscore=1501 malwarescore=0
+ suspectscore=0 phishscore=0 bulkscore=0 spamscore=0 clxscore=1011
+ lowpriorityscore=0 mlxscore=0 impostorscore=0 mlxlogscore=999 adultscore=0
+ classifier=spam adjust=0 reason=mlx scancount=1 engine=8.0.1-1908290000
+ definitions=main-1909230157
 Sender: linux-block-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-On 6/20/19 8:03 AM, Jack Wang wrote:
-> From: Roman Pen <roman.penyaev@profitbricks.com>
+On Mon, Sep 23, 2019 at 07:17:10PM +0200, David Sterba wrote:
+> On Mon, Sep 23, 2019 at 06:36:32PM +0200, Vlastimil Babka wrote:
+> > So if anyone thinks this is a good idea, please express it (preferably
+> > in a formal way such as Acked-by), otherwise it seems the patch will be
+> > dropped (due to a private NACK, apparently).
+
+Oh, I didn't realize  ^^^^^^^^^^^^ that *some* of us are allowed the
+privilege of gutting a patch via private NAK without any of that open
+development discussion incovenience. <grumble>
+
+As far as XFS is concerned I merged Dave's series that checks the
+alignment of io memory allocations and falls back to vmalloc if the
+alignment won't work, because I got tired of scrolling past the endless
+discussion and bug reports and inaction spanning months.
+
+Now this private NAK stuff helps me feel vindicated for merging it
+despite my misgivings because now I can declare that "XFS will just work
+around all the stupid broken sh*t it finds in the rest of the kernel".
+
+--D
+
+> As a user of the allocator interface in filesystem, I'd like to see a
+> more generic way to address the alignment guarantees so we don't have to
+> apply workarounds like 3acd48507dc43eeeb each time we find that we
+> missed something. (Where 'missed' might be another sort of weird memory
+> corruption hard to trigger.)
 > 
-> Introduce public header which provides set of API functions to
-> establish RDMA connections from client to server machine using
-> IBTRS protocol, which manages RDMA connections for each session,
-> does multipathing and load balancing.
+> The workaround got applied because I was not sure about the timeframe of
+> merge of this patch, also to remove pressure for merge in case there are
+> more private acks and nacks to be sent. In the end I'd be fine with
+> reverting the workaround in order to use the generic code again.
 > 
-> Main functions for client (active) side:
-> 
->   ibtrs_clt_open() - Creates set of RDMA connections incapsulated
-                              ^^^                       ^^^^^^^^^^^^
-                                a?                      encapsulated?
-
->                      in IBTRS session and returns pointer on IBTRS
-                         ^^^                       ^^^       ^^
-                          a?                        a?       to an?
-> 		    session object.
-[ ... ]
-> +/**
-> + * enum ibtrs_clt_link_ev - Events about connectivity state of a client
-> + * @IBTRS_CLT_LINK_EV_RECONNECTED	Client was reconnected.
-> + * @IBTRS_CLT_LINK_EV_DISCONNECTED	Client was disconnected.
-> + */
-> +enum ibtrs_clt_link_ev {
-> +	IBTRS_CLT_LINK_EV_RECONNECTED,
-> +	IBTRS_CLT_LINK_EV_DISCONNECTED,
-> +};
-> +
-> +/**
-> + * Source and destination address of a path to be established
-> + */
-> +struct ibtrs_addr {
-> +	struct sockaddr_storage *src;
-> +	struct sockaddr_storage *dst;
-> +};
-
-Is it really useful to define a structure to hold two pointers or can 
-these two pointers also be passed as separate arguments?
-
-> +/**
-> + * ibtrs_clt_open() - Open a session to a IBTRS client
-> + * @priv:		User supplied private data.
-> + * @link_ev:		Event notification for connection state changes
-> + *	@priv:			user supplied data that was passed to
-> + *				ibtrs_clt_open()
-> + *	@ev:			Occurred event
-> + * @sessname: name of the session
-> + * @paths: Paths to be established defined by their src and dst addresses
-> + * @path_cnt: Number of elemnts in the @paths array
-> + * @port: port to be used by the IBTRS session
-> + * @pdu_sz: Size of extra payload which can be accessed after tag allocation.
-> + * @max_inflight_msg: Max. number of parallel inflight messages for the session
-> + * @max_segments: Max. number of segments per IO request
-> + * @reconnect_delay_sec: time between reconnect tries
-> + * @max_reconnect_attempts: Number of times to reconnect on error before giving
-> + *			    up, 0 for * disabled, -1 for forever
-> + *
-> + * Starts session establishment with the ibtrs_server. The function can block
-> + * up to ~2000ms until it returns.
-> + *
-> + * Return a valid pointer on success otherwise PTR_ERR.
-> + */
-> +struct ibtrs_clt *ibtrs_clt_open(void *priv, link_clt_ev_fn *link_ev,
-> +				 const char *sessname,
-> +				 const struct ibtrs_addr *paths,
-> +				 size_t path_cnt, short port,
-> +				 size_t pdu_sz, u8 reconnect_delay_sec,
-> +				 u16 max_segments,
-> +				 s16 max_reconnect_attempts);
-
-Having detailed kernel-doc headers for describing API functions is great 
-but I'm not sure a .h file is the best location for such documentation. 
-Many kernel developers keep kernel-doc headers in .c files because that 
-makes it more likely that the documentation and the implementation stay 
-in sync.
-
-> +
-> +/**
-> + * ibtrs_clt_close() - Close a session
-> + * @sess: Session handler, is freed on return
-                      ^^^^^^^
-                      handle?
-
-This sentence suggests that the handle is freed on return. I guess that 
-you meant that the session is freed upon return?
-
-> +/**
-> + * ibtrs_clt_get_tag() - allocates tag for future RDMA operation
-> + * @sess:	Current session
-> + * @con_type:	Type of connection to use with the tag
-> + * @wait:	Wait type
-> + *
-> + * Description:
-> + *    Allocates tag for the following RDMA operation.  Tag is used
-> + *    to preallocate all resources and to propagate memory pressure
-> + *    up earlier.
-> + *
-> + * Context:
-> + *    Can sleep if @wait == IBTRS_TAG_WAIT
-> + */
-> +struct ibtrs_tag *ibtrs_clt_get_tag(struct ibtrs_clt *sess,
-> +				    enum ibtrs_clt_con_type con_type,
-> +				    int wait);
-
-Since struct ibtrs_tag has another role than what is called a tag in the 
-block layer I think a better description is needed of what struct 
-ibtrs_tag actually represents.
-
-> +/*
-> + * Here goes IBTRS server API
-> + */
-
-Most software either uses the client API or the server API but not both 
-at the same time. Has it been considered to use separate header files 
-for the client and server APIs?
-
-Bart.
+> Thanks.
