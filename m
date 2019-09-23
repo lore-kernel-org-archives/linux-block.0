@@ -2,109 +2,279 @@ Return-Path: <SRS0=JlK2=XS=vger.kernel.org=linux-block-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-2.6 required=3.0 tests=DKIMWL_WL_HIGH,DKIM_SIGNED,
-	DKIM_VALID,DKIM_VALID_AU,MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,
-	USER_AGENT_SANE_1 autolearn=no autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-2.2 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
+	MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,USER_AGENT_SANE_1 autolearn=no
+	autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 6B238C4740C
-	for <linux-block@archiver.kernel.org>; Mon, 23 Sep 2019 08:35:55 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id D8354C04EBF
+	for <linux-block@archiver.kernel.org>; Mon, 23 Sep 2019 10:26:11 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.kernel.org (Postfix) with ESMTP id 41A162064A
-	for <linux-block@archiver.kernel.org>; Mon, 23 Sep 2019 08:35:55 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=default; t=1569227755;
-	bh=i8WkercoXu9v6y0Lw4lHPRJCbJVpFVXvFVfaoT05H5g=;
-	h=Date:From:To:Cc:Subject:References:In-Reply-To:List-ID:From;
-	b=BaHF5erHiJhI32O9x+ZbicfDdOtElUITpNzNbdF8mBVlAfFXkBKa0fkRvBWQkiMAS
-	 pOolm8yDNjuGkPkZm6agBuuoES4gBA8S/2RwzQO4vmRvdIJWRcKWnWxr3OzbPRlgYJ
-	 Ok/qcqYfwsc5DWZ6gJjqlVV1ncgfc+5dUR2dEJtE=
+	by mail.kernel.org (Postfix) with ESMTP id AEA1B206C2
+	for <linux-block@archiver.kernel.org>; Mon, 23 Sep 2019 10:26:11 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S2406681AbfIWIfy (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Mon, 23 Sep 2019 04:35:54 -0400
-Received: from mail-wm1-f68.google.com ([209.85.128.68]:38839 "EHLO
-        mail-wm1-f68.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S2405465AbfIWIfy (ORCPT
-        <rfc822;linux-block@vger.kernel.org>);
-        Mon, 23 Sep 2019 04:35:54 -0400
-Received: by mail-wm1-f68.google.com with SMTP id 3so8240364wmi.3;
-        Mon, 23 Sep 2019 01:35:52 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20161025;
-        h=sender:date:from:to:cc:subject:message-id:references:mime-version
-         :content-disposition:in-reply-to:user-agent;
-        bh=1B3XXUv7iZ4Dl2+6K8o3oe0tw2nlEw97b0eQ1uBbyUI=;
-        b=jFZT2Eu3VBNhyieGvh6ycdJxGmRFlHILM7r4+/YEWOpinbJkVBUI/3ODDLwjcw6WNi
-         IvTj1BDjBHdPerS1DMqTgJS8ZIsVNm/VcEkUh7JP8I1ZHBF4dHN7SkHSYApanU+tqcGj
-         2BEPLnDjgSPriAKJ4OaCh5YfNoQjBTBw5FdCkL+nMw2F8ryKNGzYxFpM2EHLLpU+4bfS
-         sd6GkqXkNbS6aZgVBnwbiyV23RMZJSlYcRuNqR36ZFS9odCsvlA8wUpY4KFJc8U/yuZD
-         jRJsx9rz9BBMTJ18EyFz/kfBBWfhXnAnQtBXvUb9tYKx+bYWazzvEPkWnrHJY4Jswewe
-         y8dA==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20161025;
-        h=x-gm-message-state:sender:date:from:to:cc:subject:message-id
-         :references:mime-version:content-disposition:in-reply-to:user-agent;
-        bh=1B3XXUv7iZ4Dl2+6K8o3oe0tw2nlEw97b0eQ1uBbyUI=;
-        b=IVc3yuVVSIt7bT4Ckj/aDk/k6l4y+fuNpBOX2l3CGR4lO2hCB2owJyD06lwKpf5opH
-         rWFn80B/CrlDUdP/q4l+8vhpSuoRtEqImSu6IWKgW0fMUXj3CrH6Ijj/lqz485R5w8pW
-         xnE1biuxvauU7zlWeH6KuXNOUcgNquv6wQguQt++/lAwgCyY3jsDlIKTirzsx5YMhN/1
-         x0QFL67KyvE8NIoD6gw5Dlxxq6G5x/7WXyvGxLo27TGC6u0wTKyk6CETuNO+CeeOl15I
-         EJVi+fLiwc9X98jv7L+/ErjvDt0nBTBCSmZR6jcsy5cJ8iMcpgVtl/NWFda92BWNVdvB
-         mBrw==
-X-Gm-Message-State: APjAAAWfhMs9mnx2HfIUbXw1dWET3IyWUIoTUK+x2QhYPG9DRdfYsU2E
-        hakLiNPQR98gDX1Vc6a+d7w=
-X-Google-Smtp-Source: APXvYqxYbW0B500odDVP3qV4RPcwp/MtiDHalNNevEpuiSyml7mPOiV6yVDQBirBdA+5mYlbaKFUJw==
-X-Received: by 2002:a05:600c:219a:: with SMTP id e26mr13433766wme.86.1569227752038;
-        Mon, 23 Sep 2019 01:35:52 -0700 (PDT)
-Received: from gmail.com (2E8B0CD5.catv.pool.telekom.hu. [46.139.12.213])
-        by smtp.gmail.com with ESMTPSA id u10sm8616394wmm.0.2019.09.23.01.35.51
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Mon, 23 Sep 2019 01:35:51 -0700 (PDT)
-Date:   Mon, 23 Sep 2019 10:35:49 +0200
-From:   Ingo Molnar <mingo@kernel.org>
-To:     Jens Axboe <axboe@kernel.dk>
-Cc:     "Pavel Begunkov (Silence)" <asml.silence@gmail.com>,
-        Ingo Molnar <mingo@redhat.com>,
+        id S1728896AbfIWK0H (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Mon, 23 Sep 2019 06:26:07 -0400
+Received: from foss.arm.com ([217.140.110.172]:40214 "EHLO foss.arm.com"
+        rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
+        id S1728126AbfIWK0H (ORCPT <rfc822;linux-block@vger.kernel.org>);
+        Mon, 23 Sep 2019 06:26:07 -0400
+Received: from usa-sjc-imap-foss1.foss.arm.com (unknown [10.121.207.14])
+        by usa-sjc-mx-foss1.foss.arm.com (Postfix) with ESMTP id BECCE142F;
+        Mon, 23 Sep 2019 03:26:06 -0700 (PDT)
+Received: from [10.1.194.37] (e113632-lin.cambridge.arm.com [10.1.194.37])
+        by usa-sjc-imap-foss1.foss.arm.com (Postfix) with ESMTPSA id 69C883F694;
+        Mon, 23 Sep 2019 03:26:05 -0700 (PDT)
+From:   Valentin Schneider <valentin.schneider@arm.com>
+Subject: Re: sched: make struct task_struct::state 32-bit
+To:     Markus Elfring <Markus.Elfring@web.de>,
+        Alexey Dobriyan <adobriyan@gmail.com>, dm-devel@redhat.com,
+        linux-block@vger.kernel.org, rcu@vger.kernel.org
+Cc:     linux-kernel@vger.kernel.org,
+        Andrea Arcangeli <aarcange@redhat.com>,
+        Ingo Molnar <mingo@redhat.com>, Jens Axboe <axboe@kernel.dk>,
         Peter Zijlstra <peterz@infradead.org>,
-        linux-block@vger.kernel.org, linux-kernel@vger.kernel.org
-Subject: Re: [PATCH v2 0/2] Optimise io_uring completion waiting
-Message-ID: <20190923083549.GA42487@gmail.com>
-References: <cover.1569139018.git.asml.silence@gmail.com>
- <a4996ae7-ac0a-447b-49b2-7e96275aad29@kernel.dk>
+        Julia Lawall <julia.lawall@lip6.fr>
+References: <a43fe392-bd6a-71f5-8611-c6b764ba56c3@arm.com>
+ <7e3e784c-e8e6-f9ba-490f-ec3bf956d96b@web.de>
+ <0c4dcb91-4830-0013-b8c6-64b9e1ce47d4@arm.com>
+Message-ID: <32d65b15-1855-e7eb-e9c4-81560fab62ea@arm.com>
+Date:   Mon, 23 Sep 2019 11:26:04 +0100
+User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:60.0) Gecko/20100101
+ Thunderbird/60.8.0
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <a4996ae7-ac0a-447b-49b2-7e96275aad29@kernel.dk>
-User-Agent: Mutt/1.10.1 (2018-07-13)
+In-Reply-To: <0c4dcb91-4830-0013-b8c6-64b9e1ce47d4@arm.com>
+Content-Type: text/plain; charset=utf-8
+Content-Language: en-US
+Content-Transfer-Encoding: 7bit
 Sender: linux-block-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-
-* Jens Axboe <axboe@kernel.dk> wrote:
-
-> On 9/22/19 2:08 AM, Pavel Begunkov (Silence) wrote:
-> > From: Pavel Begunkov <asml.silence@gmail.com>
-> > 
-> > There could be a lot of overhead within generic wait_event_*() used for
-> > waiting for large number of completions. The patchset removes much of
-> > it by using custom wait event (wait_threshold).
-> > 
-> > Synthetic test showed ~40% performance boost. (see patch 2)
+On 05/09/2019 17:52, Valentin Schneider wrote:
+> I actually got rid of the task_struct* parameter and now just match
+> against task_struct.p accesses in the function body, which has the
+> added bonus of not caring about the order of the parameters.
 > 
-> I'm fine with the io_uring side of things, but to queue this up we
-> really need Peter or Ingo to sign off on the core wakeup bits...
+> Still not there yet but making progress in the background, hope it's
+> passable entertainment to see me struggle my way there :)
 > 
-> Peter?
 
-I'm not sure an extension is needed for such a special interface, why not 
-just put a ->threshold value next to the ctx->wait field and use either 
-the regular wait_event() APIs with the proper condition, or 
-wait_event_cmd() style APIs if you absolutely need something more complex 
-to happen inside?
+Bit of hiatus on my end there. I did play around some more with Coccinelle 
+on the way to/from Plumbers. The main problems I'm facing ATM is "current"
+not being recognized as a task_struct* expression, and the need to 
+"recursively" match task_struct.state modifiers, i.e. catch both functions
+for something like:
 
-Should result in a much lower linecount and no scheduler changes. :-)
+foo(long state)
+{
+	__foo(state);
+}
 
-Thanks,
+__foo(long state)
+{
+	current->state = state;
+}
 
-	Ingo
+
+Here's where I'm at:
+---
+virtual patch
+virtual report
+
+// Match variables that represent task states
+// They can be read from / written to task_struct.state, or be compared
+// to TASK_* values
+@state_access@
+struct task_struct *p;
+// FIXME: current not recognized as task_struct*, fixhack with regexp
+identifier current =~ "^current$";
+identifier task_state =~ "^TASK_";
+identifier state_var;
+position pos;
+@@
+
+(
+  p->state & state_var@pos
+|
+  current->state & state_var@pos
+|
+  p->state | state_var@pos
+|
+  current->state | state_var@pos
+|
+  p->state < state_var@pos
+|
+  current->state < state_var@pos
+|
+  p->state > state_var@pos
+|
+  current->state > state_var@pos
+|
+  state_var@pos = p->state
+|
+  state_var@pos = current->state
+|
+  p->state == state_var@pos
+|
+  current->state == state_var@pos
+|
+  p->state != state_var@pos
+|
+  current->state != state_var@pos
+|
+// FIXME: match functions that do something with state_var underneath?
+// How to do recursive rules?
+  set_current_state(state_var@pos)
+|
+  set_special_state(state_var@pos)
+|
+  signal_pending_state(state_var@pos, p)
+|
+  signal_pending_state(state_var@pos, current)
+|
+  state_var@pos & task_state
+|
+  state_var@pos | task_state
+)
+
+// Fixup local variables
+@depends on patch && state_access@
+identifier state_var = state_access.state_var;
+@@
+(
+- long
++ int
+|
+- unsigned long
++ unsigned int
+)
+state_var;
+
+// Fixup function parameters
+@depends on patch && state_access@
+identifier fn;
+identifier state_var = state_access.state_var;
+@@
+
+fn(...,
+- long state_var
++ int state_var
+,...)
+{
+	...
+}
+
+// FIXME: find a way to squash that with the above?
+// Fixup function parameters
+@depends on patch && state_access@
+identifier fn;
+identifier state_var = state_access.state_var;
+@@
+
+fn(...,
+- unsigned long
++ unsigned int
+state_var
+,...)
+{
+	...
+}
+---
+
+This gives me the following diff on kernel/:
+
+---
+diff -u -p a/locking/mutex.c b/locking/mutex.c
+--- a/locking/mutex.c
++++ b/locking/mutex.c
+@@ -923,7 +923,7 @@ __ww_mutex_add_waiter(struct mutex_waite
+  * Lock a mutex (possibly interruptible), slowpath:
+  */
+ static __always_inline int __sched
+-__mutex_lock_common(struct mutex *lock, long state, unsigned int subclass,
++__mutex_lock_common(struct mutex *lock, int state, unsigned int subclass,
+ 		    struct lockdep_map *nest_lock, unsigned long ip,
+ 		    struct ww_acquire_ctx *ww_ctx, const bool use_ww_ctx)
+ {
+@@ -1097,14 +1097,14 @@ err_early_kill:
+ }
+ 
+ static int __sched
+-__mutex_lock(struct mutex *lock, long state, unsigned int subclass,
++__mutex_lock(struct mutex *lock, int state, unsigned int subclass,
+ 	     struct lockdep_map *nest_lock, unsigned long ip)
+ {
+ 	return __mutex_lock_common(lock, state, subclass, nest_lock, ip, NULL, false);
+ }
+ 
+ static int __sched
+-__ww_mutex_lock(struct mutex *lock, long state, unsigned int subclass,
++__ww_mutex_lock(struct mutex *lock, int state, unsigned int subclass,
+ 		struct lockdep_map *nest_lock, unsigned long ip,
+ 		struct ww_acquire_ctx *ww_ctx)
+ {
+diff -u -p a/locking/semaphore.c b/locking/semaphore.c
+--- a/locking/semaphore.c
++++ b/locking/semaphore.c
+@@ -201,7 +201,7 @@ struct semaphore_waiter {
+  * constant, and thus optimised away by the compiler.  Likewise the
+  * 'timeout' parameter for the cases without timeouts.
+  */
+-static inline int __sched __down_common(struct semaphore *sem, long state,
++static inline int __sched __down_common(struct semaphore *sem, int state,
+ 								long timeout)
+ {
+ 	struct semaphore_waiter waiter;
+diff -u -p a/freezer.c b/freezer.c
+--- a/freezer.c
++++ b/freezer.c
+@@ -64,7 +64,7 @@ bool __refrigerator(bool check_kthr_stop
+ 	/* Hmm, should we be allowed to suspend when there are realtime
+ 	   processes around? */
+ 	bool was_frozen = false;
+-	long save = current->state;
++	int save = current->state;
+ 
+ 	pr_debug("%s entered refrigerator\n", current->comm);
+ 
+diff -u -p a/sched/core.c b/sched/core.c
+--- a/sched/core.c
++++ b/sched/core.c
+@@ -1888,7 +1888,7 @@ out:
+  * smp_call_function() if an IPI is sent by the same process we are
+  * waiting to become inactive.
+  */
+-unsigned long wait_task_inactive(struct task_struct *p, long match_state)
++unsigned long wait_task_inactive(struct task_struct *p, int match_state)
+ {
+ 	int running, queued;
+ 	struct rq_flags rf;
+@@ -3185,7 +3185,7 @@ static struct rq *finish_task_switch(str
+ {
+ 	struct rq *rq = this_rq();
+ 	struct mm_struct *mm = rq->prev_mm;
+-	long prev_state;
++	int prev_state;
+ 
+ 	/*
+ 	 * The previous task will have left us with a preempt_count of 2
+@@ -5964,7 +5964,7 @@ void sched_show_task(struct task_struct
+ EXPORT_SYMBOL_GPL(sched_show_task);
+ 
+ static inline bool
+-state_filter_match(unsigned long state_filter, struct task_struct *p)
++state_filter_match(unsigned int state_filter, struct task_struct *p)
+ {
+ 	/* no filter, everything matches */
+ 	if (!state_filter)
+@@ -5985,7 +5985,7 @@ state_filter_match(unsigned long state_f
+ }
+ 
+ 
+-void show_state_filter(unsigned long state_filter)
++void show_state_filter(unsigned int state_filter)
+ {
+ 	struct task_struct *g, *p;
+ 
+---
