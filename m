@@ -6,44 +6,43 @@ X-Spam-Status: No, score=-2.2 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
 	MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,USER_AGENT_SANE_1 autolearn=no
 	autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 049E8C432C1
-	for <linux-block@archiver.kernel.org>; Mon, 23 Sep 2019 23:21:33 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id D47E4C432C1
+	for <linux-block@archiver.kernel.org>; Mon, 23 Sep 2019 23:49:59 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.kernel.org (Postfix) with ESMTP id D4B08205F4
-	for <linux-block@archiver.kernel.org>; Mon, 23 Sep 2019 23:21:32 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id A839321A4C
+	for <linux-block@archiver.kernel.org>; Mon, 23 Sep 2019 23:49:59 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S2503550AbfIWXVc (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Mon, 23 Sep 2019 19:21:32 -0400
-Received: from mail-pl1-f172.google.com ([209.85.214.172]:44753 "EHLO
-        mail-pl1-f172.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S2503544AbfIWXVc (ORCPT
+        id S2408386AbfIWXt7 (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Mon, 23 Sep 2019 19:49:59 -0400
+Received: from mail-pg1-f195.google.com ([209.85.215.195]:46515 "EHLO
+        mail-pg1-f195.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S1729276AbfIWXt7 (ORCPT
         <rfc822;linux-block@vger.kernel.org>);
-        Mon, 23 Sep 2019 19:21:32 -0400
-Received: by mail-pl1-f172.google.com with SMTP id q15so4197pll.11;
-        Mon, 23 Sep 2019 16:21:30 -0700 (PDT)
+        Mon, 23 Sep 2019 19:49:59 -0400
+Received: by mail-pg1-f195.google.com with SMTP id a3so36525pgm.13;
+        Mon, 23 Sep 2019 16:49:57 -0700 (PDT)
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=1e100.net; s=20161025;
         h=x-gm-message-state:subject:to:cc:references:from:message-id:date
          :user-agent:mime-version:in-reply-to:content-language
          :content-transfer-encoding;
-        bh=gsnjv/9E3hmWnnivSRqgLgwY2JaggRRHnlzmYVYGCAA=;
-        b=N4KZfJah0dnx/qqGNDz4euk5eXQna66SpI27nQYQXTrndAip+GQlZYcC03S4iP1q9R
-         Dq85JiphiRbQ1KTTYN45onsQl+Rli+7UIHHUaQXr9k/A224cyUsdnyqY7XiTdY2bst55
-         uSIjppPnbDVf3pcLp89oG0kLSvvGOBBaM1HJDZbRoPlUghj/HDXn1kJgmnL4dHMZuYd/
-         g2oZGwG5iG2674ndeuCmo4aENR/2KqUZSd/Hnb2C+vebXHLiPrgl7UXja35mrCbT9dQI
-         5Reg8hOrVgrHPZmyYvikpoKNzjKCfK0z3+6fAHXqj0oMxT3qAMcQcAYMYabMFRER20TU
-         IZEA==
-X-Gm-Message-State: APjAAAUWCdnT0pZZcD81BNLTePF/hsRUMqWAUTqQulHG/kvOkdvzw0aw
-        f4nbj37iA2FwDYldI+TouHk=
-X-Google-Smtp-Source: APXvYqzKnRHkGyxGjCKTbTwPL1KuJPVxEJIyI0mDYHLrrFK+ogTEou9Oj7v2XFQFPtNXGhWWXm6DMg==
-X-Received: by 2002:a17:902:868a:: with SMTP id g10mr2294834plo.235.1569280889887;
-        Mon, 23 Sep 2019 16:21:29 -0700 (PDT)
+        bh=302FuroD8y8OvcqP+8mZl8BRSarRV544xPnJHh41H7A=;
+        b=W4zgBX4cDG3dQ1uwPwXf1sj+gRMls1AW2U0X8Ygq0E24teXlT+Yp4PJMcZ3toWdy2R
+         ekQ29Lvim7IYUfhfRA922xRdMB+aW/P1Th5h4IJmkNZ5Uh0SzLkacIkRY8SYOJQjRhok
+         mEjYtDIdSC+ex5JLfE7yPOJWisoVqmv3RvOhXLWCrdJH04nTH4qgzAFdaiYobpnxYEb1
+         xfWh8SrnsEl5ExRjKIYrq1XDpUk/PbMt1/qLSUtdaeWbm0jlX8uLDelrAsaznnP1ctH0
+         TfM6q71ui56O+qXnKXlOvsCSqKrzoFy82oCOCbuJXBFJBiO6YS8krdzDY6XeSrIWmRNR
+         gYMw==
+X-Gm-Message-State: APjAAAXGzZQmPmnTiqPIBzhjmWbVBUQJXt8xNL9IxKhVZ10owvwAkG4b
+        syETq67Mn6Fc3JmBtgIwZtk=
+X-Google-Smtp-Source: APXvYqz83RUW7lXd64Uy1Zj3bTxUK/B3TP/iMieEp5Vs1HubmBqaoXOs+f1mYEPRKwujLKJDSjqoOg==
+X-Received: by 2002:a63:66c4:: with SMTP id a187mr92874pgc.85.1569282596551;
+        Mon, 23 Sep 2019 16:49:56 -0700 (PDT)
 Received: from desktop-bart.svl.corp.google.com ([2620:15c:2cd:202:4308:52a3:24b6:2c60])
-        by smtp.gmail.com with ESMTPSA id k8sm10953407pgm.14.2019.09.23.16.21.28
+        by smtp.gmail.com with ESMTPSA id r11sm23222842pgn.67.2019.09.23.16.49.54
         (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
-        Mon, 23 Sep 2019 16:21:28 -0700 (PDT)
-Subject: Re: [PATCH v4 09/25] ibtrs: server: private header with server
- structs and functions
+        Mon, 23 Sep 2019 16:49:55 -0700 (PDT)
+Subject: Re: [PATCH v4 10/25] ibtrs: server: main functionality
 To:     Jack Wang <jinpuwang@gmail.com>, linux-block@vger.kernel.org,
         linux-rdma@vger.kernel.org
 Cc:     axboe@kernel.dk, hch@infradead.org, sagi@grimberg.me,
@@ -52,14 +51,14 @@ Cc:     axboe@kernel.dk, hch@infradead.org, sagi@grimberg.me,
         Roman Pen <roman.penyaev@profitbricks.com>,
         Jack Wang <jinpu.wang@cloud.ionos.com>
 References: <20190620150337.7847-1-jinpuwang@gmail.com>
- <20190620150337.7847-10-jinpuwang@gmail.com>
+ <20190620150337.7847-11-jinpuwang@gmail.com>
 From:   Bart Van Assche <bvanassche@acm.org>
-Message-ID: <c0ca07e9-2864-b1a2-1b78-b9f1de5702c0@acm.org>
-Date:   Mon, 23 Sep 2019 16:21:27 -0700
+Message-ID: <ab36427b-a737-9544-fbe8-cd53c0780994@acm.org>
+Date:   Mon, 23 Sep 2019 16:49:53 -0700
 User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:60.0) Gecko/20100101
  Thunderbird/60.8.0
 MIME-Version: 1.0
-In-Reply-To: <20190620150337.7847-10-jinpuwang@gmail.com>
+In-Reply-To: <20190620150337.7847-11-jinpuwang@gmail.com>
 Content-Type: text/plain; charset=utf-8; format=flowed
 Content-Language: en-US
 Content-Transfer-Encoding: 7bit
@@ -69,30 +68,201 @@ List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
 On 6/20/19 8:03 AM, Jack Wang wrote:
-> +static inline const char *ibtrs_srv_state_str(enum ibtrs_srv_state state)
+> +module_param_named(max_chunk_size, max_chunk_size, int, 0444);
+> +MODULE_PARM_DESC(max_chunk_size,
+> +		 "Max size for each IO request, when change the unit is in byte"
+> +		 " (default: " __stringify(DEFAULT_MAX_CHUNK_SIZE_KB) "KB)");
+
+Where can I find the definition of DEFAULT_MAX_CHUNK_SIZE_KB?
+
+> +static char cq_affinity_list[256] = "";
+
+No empty initializers for file-scope variables please.
+
+> +	pr_info("cq_affinity_list changed to %*pbl\n",
+> +		cpumask_pr_args(&cq_affinity_mask));
+
+Should this pr_info() call perhaps be changed into pr_debug()?
+
+> +static bool __ibtrs_srv_change_state(struct ibtrs_srv_sess *sess,
+> +				     enum ibtrs_srv_state new_state)
 > +{
-> +	switch (state) {
-> +	case IBTRS_SRV_CONNECTING:
-> +		return "IBTRS_SRV_CONNECTING";
-> +	case IBTRS_SRV_CONNECTED:
-> +		return "IBTRS_SRV_CONNECTED";
-> +	case IBTRS_SRV_CLOSING:
-> +		return "IBTRS_SRV_CLOSING";
-> +	case IBTRS_SRV_CLOSED:
-> +		return "IBTRS_SRV_CLOSED";
-> +	default:
-> +		return "UNKNOWN";
+> +	enum ibtrs_srv_state old_state;
+> +	bool changed = false;
+> +
+> +	old_state = sess->state;
+> +	switch (new_state) {
+
+Please add a lockdep_assert_held() statement that checks whether calls 
+of this function are serialized properly.
+
+> +/**
+> + * rdma_write_sg() - response on successful READ request
+> + */
+> +static int rdma_write_sg(struct ibtrs_srv_op *id)
+> +{
+> +	struct ibtrs_srv_sess *sess = to_srv_sess(id->con->c.sess);
+> +	dma_addr_t dma_addr = sess->dma_addr[id->msg_id];
+> +	struct ibtrs_srv *srv = sess->srv;
+> +	struct ib_send_wr inv_wr, imm_wr;
+> +	struct ib_rdma_wr *wr = NULL;
+> +	const struct ib_send_wr *bad_wr;
+> +	enum ib_send_flags flags;
+> +	size_t sg_cnt;
+> +	int err, i, offset;
+> +	bool need_inval;
+> +	u32 rkey = 0;
+> +
+> +	sg_cnt = le16_to_cpu(id->rd_msg->sg_cnt);
+> +	need_inval = le16_to_cpu(id->rd_msg->flags) & IBTRS_MSG_NEED_INVAL_F;
+> +	if (unlikely(!sg_cnt))
+> +		return -EINVAL;
+> +
+> +	offset = 0;
+> +	for (i = 0; i < sg_cnt; i++) {
+> +		struct ib_sge *list;
+> +
+> +		wr		= &id->tx_wr[i];
+> +		list		= &id->tx_sg[i];
+> +		list->addr	= dma_addr + offset;
+> +		list->length	= le32_to_cpu(id->rd_msg->desc[i].len);
+> +
+> +		/* WR will fail with length error
+> +		 * if this is 0
+> +		 */
+> +		if (unlikely(list->length == 0)) {
+> +			ibtrs_err(sess, "Invalid RDMA-Write sg list length 0\n");
+> +			return -EINVAL;
+> +		}
+> +
+> +		list->lkey = sess->s.dev->ib_pd->local_dma_lkey;
+> +		offset += list->length;
+> +
+> +		wr->wr.wr_cqe	= &io_comp_cqe;
+> +		wr->wr.sg_list	= list;
+> +		wr->wr.num_sge	= 1;
+> +		wr->remote_addr	= le64_to_cpu(id->rd_msg->desc[i].addr);
+> +		wr->rkey	= le32_to_cpu(id->rd_msg->desc[i].key);
+> +		if (rkey == 0)
+> +			rkey = wr->rkey;
+> +		else
+> +			/* Only one key is actually used */
+> +			WARN_ON_ONCE(rkey != wr->rkey);
+> +
+> +		if (i < (sg_cnt - 1))
+> +			wr->wr.next = &id->tx_wr[i + 1].wr;
+> +		else if (need_inval)
+> +			wr->wr.next = &inv_wr;
+> +		else
+> +			wr->wr.next = &imm_wr;
+> +
+> +		wr->wr.opcode = IB_WR_RDMA_WRITE;
+> +		wr->wr.ex.imm_data = 0;
+> +		wr->wr.send_flags  = 0;
 > +	}
+> +	/*
+> +	 * From time to time we have to post signalled sends,
+> +	 * or send queue will fill up and only QP reset can help.
+> +	 */
+> +	flags = atomic_inc_return(&id->con->wr_cnt) % srv->queue_depth ?
+> +			0 : IB_SEND_SIGNALED;
+> +
+> +	if (need_inval) {
+> +		inv_wr.next = &imm_wr;
+> +		inv_wr.wr_cqe = &io_comp_cqe;
+> +		inv_wr.sg_list = NULL;
+> +		inv_wr.num_sge = 0;
+> +		inv_wr.opcode = IB_WR_SEND_WITH_INV;
+> +		inv_wr.send_flags = 0;
+> +		inv_wr.ex.invalidate_rkey = rkey;
+> +	}
+> +	imm_wr.next = NULL;
+> +	imm_wr.wr_cqe = &io_comp_cqe;
+> +	imm_wr.sg_list = NULL;
+> +	imm_wr.num_sge = 0;
+> +	imm_wr.opcode = IB_WR_RDMA_WRITE_WITH_IMM;
+> +	imm_wr.send_flags = flags;
+> +	imm_wr.ex.imm_data = cpu_to_be32(ibtrs_to_io_rsp_imm(id->msg_id,
+> +							     0, need_inval));
+> +
+> +	ib_dma_sync_single_for_device(sess->s.dev->ib_dev, dma_addr,
+> +				      offset, DMA_BIDIRECTIONAL);
+> +
+> +	err = ib_post_send(id->con->c.qp, &id->tx_wr[0].wr, &bad_wr);
+> +	if (unlikely(err))
+> +		ibtrs_err(sess,
+> +			  "Posting RDMA-Write-Request to QP failed, err: %d\n",
+> +			  err);
+> +
+> +	return err;
 > +}
 
-Since this function is not in the hot path, please move it into a .c file.
+All other RDMA server implementations use rdma_rw_ctx_init() and 
+rdma_rw_ctx_wrs(). Please use these functions in IBTRS too.
 
-> +/* See ibtrs-log.h */
-> +#define TYPES_TO_SESSNAME(obj)						\
-> +	LIST(CASE(obj, struct ibtrs_srv_sess *, s.sessname))
+> +static void ibtrs_srv_hb_err_handler(struct ibtrs_con *c, int err)
+> +{
+> +	(void)err;
+> +	close_sess(to_srv_sess(c->sess));
+> +}
 
-Please remove this macro and pass 'sessname' explicitly to logging 
-functions.
+Is the (void)err statement really necessary?
+
+> +static int ibtrs_srv_rdma_init(struct ibtrs_srv_ctx *ctx, unsigned int port)
+> +{
+> +	struct sockaddr_in6 sin = {
+> +		.sin6_family	= AF_INET6,
+> +		.sin6_addr	= IN6ADDR_ANY_INIT,
+> +		.sin6_port	= htons(port),
+> +	};
+> +	struct sockaddr_ib sib = {
+> +		.sib_family			= AF_IB,
+> +		.sib_addr.sib_subnet_prefix	= 0ULL,
+> +		.sib_addr.sib_interface_id	= 0ULL,
+> +		.sib_sid	= cpu_to_be64(RDMA_IB_IP_PS_IB | port),
+> +		.sib_sid_mask	= cpu_to_be64(0xffffffffffffffffULL),
+> +		.sib_pkey	= cpu_to_be16(0xffff),
+> +	};
+> +	struct rdma_cm_id *cm_ip, *cm_ib;
+> +	int ret;
+> +
+> +	/*
+> +	 * We accept both IPoIB and IB connections, so we need to keep
+> +	 * two cm id's, one for each socket type and port space.
+> +	 * If the cm initialization of one of the id's fails, we abort
+> +	 * everything.
+> +	 */
+> +	cm_ip = ibtrs_srv_cm_init(ctx, (struct sockaddr *)&sin, RDMA_PS_TCP);
+> +	if (unlikely(IS_ERR(cm_ip)))
+> +		return PTR_ERR(cm_ip);
+> +
+> +	cm_ib = ibtrs_srv_cm_init(ctx, (struct sockaddr *)&sib, RDMA_PS_IB);
+> +	if (unlikely(IS_ERR(cm_ib))) {
+> +		ret = PTR_ERR(cm_ib);
+> +		goto free_cm_ip;
+> +	}
+> +
+> +	ctx->cm_id_ip = cm_ip;
+> +	ctx->cm_id_ib = cm_ib;
+> +
+> +	return 0;
+> +
+> +free_cm_ip:
+> +	rdma_destroy_id(cm_ip);
+> +
+> +	return ret;
+> +}
+
+Will the above work if CONFIG_IPV6=n?
+
+> +static int __init ibtrs_server_init(void)
+> +{
+> +	int err;
+> +
+> +	if (!strlen(cq_affinity_list))
+> +		init_cq_affinity();
+
+Is the above if-test useful? Can that if-test be left out?
 
 Thanks,
 
