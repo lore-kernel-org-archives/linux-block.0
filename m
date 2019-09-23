@@ -2,78 +2,63 @@ Return-Path: <SRS0=JlK2=XS=vger.kernel.org=linux-block-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-2.2 required=3.0 tests=DKIM_SIGNED,DKIM_VALID,
-	HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,
-	USER_AGENT_SANE_1 autolearn=no autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-2.2 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
+	MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,USER_AGENT_SANE_1 autolearn=no
+	autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id E5102C88CA8
-	for <linux-block@archiver.kernel.org>; Mon, 23 Sep 2019 20:48:46 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 89850C432C1
+	for <linux-block@archiver.kernel.org>; Mon, 23 Sep 2019 21:51:49 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.kernel.org (Postfix) with ESMTP id B497A20856
-	for <linux-block@archiver.kernel.org>; Mon, 23 Sep 2019 20:48:46 +0000 (UTC)
-Authentication-Results: mail.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel-dk.20150623.gappssmtp.com header.i=@kernel-dk.20150623.gappssmtp.com header.b="GivnRW5m"
+	by mail.kernel.org (Postfix) with ESMTP id 69F3720820
+	for <linux-block@archiver.kernel.org>; Mon, 23 Sep 2019 21:51:49 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S2389077AbfIWUsp (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Mon, 23 Sep 2019 16:48:45 -0400
-Received: from mail-pg1-f193.google.com ([209.85.215.193]:37392 "EHLO
-        mail-pg1-f193.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1729108AbfIWUsp (ORCPT
+        id S2503184AbfIWVvs (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Mon, 23 Sep 2019 17:51:48 -0400
+Received: from mail-pg1-f194.google.com ([209.85.215.194]:40377 "EHLO
+        mail-pg1-f194.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S2387520AbfIWVvs (ORCPT
         <rfc822;linux-block@vger.kernel.org>);
-        Mon, 23 Sep 2019 16:48:45 -0400
-Received: by mail-pg1-f193.google.com with SMTP id c17so8672594pgg.4
-        for <linux-block@vger.kernel.org>; Mon, 23 Sep 2019 13:48:43 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=kernel-dk.20150623.gappssmtp.com; s=20150623;
-        h=subject:to:cc:references:from:message-id:date:user-agent
-         :mime-version:in-reply-to:content-language:content-transfer-encoding;
-        bh=nUgRSkoDI5HIlvd1QcYFDyolqVga7j1qtEHfJ+8gxnQ=;
-        b=GivnRW5mV4+6/svlNvgJuoze4kT8deBE3EL4DtQlUdbdSlSdqH3zrkcK585VAc2DkX
-         N8Q+YY94IdMGkrs79yTc7ghVyfPdUTB3jrxnyOC9kTm32sOYByPVQRXxbTXSaAaZo+S7
-         M4JFDJhRDy8ml1pJ7p0xevCWFJTSy1z6QclkBvh43GzVu/cnAqS4VU7nTwZ1iEE2j1JN
-         +rfWJ0BdV/+BVDF+XEuNLAJCp3+QdHj+OsiamWsnBPYHCv7/bCvL5wYAPqbJXSCETC8i
-         X9YY2Rmyv+SuYcjj1/g4cy4ooggS0ro/5+6/1U09TfqFTjAvTwM/8ZEi2b01yMSnpE8e
-         OMaQ==
+        Mon, 23 Sep 2019 17:51:48 -0400
+Received: by mail-pg1-f194.google.com with SMTP id w10so8770384pgj.7;
+        Mon, 23 Sep 2019 14:51:46 -0700 (PDT)
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=1e100.net; s=20161025;
         h=x-gm-message-state:subject:to:cc:references:from:message-id:date
          :user-agent:mime-version:in-reply-to:content-language
          :content-transfer-encoding;
-        bh=nUgRSkoDI5HIlvd1QcYFDyolqVga7j1qtEHfJ+8gxnQ=;
-        b=jojJyVUnZzm2royjqPYlA1HZTrHATRtJLlFAioNkvGoR/bgSZAS+5GTEs/7jlVYBHe
-         BPN3Sz8IFVvxJCQFmJgIrlZAAN51Fkf98w4dzIwd4jhhEAvQnDWj05fy6GjZcf2uyMB8
-         LN8PAit0MMVfOUkpgQFtefopES/ENFQ97+3KikBdmhrePDbwNDirqWCCytcOstztGWe4
-         oKgvUqg8QVQg9HzYq4ZjOxoSeUQ0ouSZIWAhnUtmRNJKgTNWyu+Fk3OEfNKeBo/8Ofoe
-         8Blz6+UrwFNwMC+H58UEt10bipItw+Lg+DYPquvsAamMK17leXPL5oBW0R371GTtylbX
-         bVDw==
-X-Gm-Message-State: APjAAAWlC+hj4zT7aYtCQ5X8XzQ3uECd89+Esw/hIjQxVTxHNaDeeSPz
-        jHdYjzNXs+H2I/dawcZN9TTFxNIm+qA2fg==
-X-Google-Smtp-Source: APXvYqw48cSQQjn+PidujI2PTC9qv93Tm8GIvX9VsJPAws6pbfuG9DkxwCiWL7PrBYLzRzUWJbrHHQ==
-X-Received: by 2002:a62:5847:: with SMTP id m68mr1649730pfb.23.1569271723341;
-        Mon, 23 Sep 2019 13:48:43 -0700 (PDT)
-Received: from [192.168.1.188] ([66.219.217.79])
-        by smtp.gmail.com with ESMTPSA id a13sm13504968pfg.10.2019.09.23.13.48.41
-        (version=TLS1_2 cipher=ECDHE-RSA-AES128-GCM-SHA256 bits=128/128);
-        Mon, 23 Sep 2019 13:48:42 -0700 (PDT)
-Subject: Re: [PATCH v2 0/2] Optimise io_uring completion waiting
-To:     Pavel Begunkov <asml.silence@gmail.com>,
-        Ingo Molnar <mingo@kernel.org>
-Cc:     Ingo Molnar <mingo@redhat.com>,
-        Peter Zijlstra <peterz@infradead.org>,
-        linux-block@vger.kernel.org, linux-kernel@vger.kernel.org
-References: <cover.1569139018.git.asml.silence@gmail.com>
- <a4996ae7-ac0a-447b-49b2-7e96275aad29@kernel.dk>
- <20190923083549.GA42487@gmail.com>
- <c15b2d54-c722-8fb4-266f-b589c1a21aa5@gmail.com>
- <df612e90-8999-0085-d2d6-4418e044e429@gmail.com>
-From:   Jens Axboe <axboe@kernel.dk>
-Message-ID: <731b2087-7786-5374-68ff-8cba42f0cd68@kernel.dk>
-Date:   Mon, 23 Sep 2019 14:48:40 -0600
+        bh=ea09ZjN1fmlsXEBEkl3FdseadDMq9uoMpI8GdwxgyT4=;
+        b=ACL1aF/ft7iNT//Hnpythx1/AU9GQC68/45MbNNnk8CNSuqrNNUqReP88tiFZ14MLm
+         Mo1v+Wy0I8avxBgo4RtcLobw9yeD7OWKJcYKcXUuDi5cBHs0a/dqgyVrAs5dmL3h8FP6
+         SxvC5DdbRcXCBQkqZ6tACtxiNVhNuY4ydl8R0+wr3A8JSQSznvsG3ja1nx6EE5F5zPrA
+         7hoA0EmgfU6WI1ArmRcTC2dwT0GAFDdG8XaoqZ7XFTfke2HiFtTaJN9r7dXvc1EiKZMa
+         1PNfcR48VbJNhy37Cnrgppwkkm+HSKkn4AiYh4GVmC8hqIzxnOOBSzRvSRaDSG8kyGcN
+         AmJg==
+X-Gm-Message-State: APjAAAXn17SbcFVUSekkL1VoMbP7oWuYSkfAHPDSRqmltaX1xBCbS4Xb
+        QREmLwT/Az2WuRElEkP2g4A=
+X-Google-Smtp-Source: APXvYqzK16cyhfKcUzdsINdWdVmiv6Yj4AXrMEHluUymgurUNS8oLf1PA2QtDdhZM1hu9+t8opwtcw==
+X-Received: by 2002:aa7:955d:: with SMTP id w29mr1949355pfq.60.1569275505820;
+        Mon, 23 Sep 2019 14:51:45 -0700 (PDT)
+Received: from desktop-bart.svl.corp.google.com ([2620:15c:2cd:202:4308:52a3:24b6:2c60])
+        by smtp.gmail.com with ESMTPSA id 196sm18690773pfz.99.2019.09.23.14.51.44
+        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
+        Mon, 23 Sep 2019 14:51:44 -0700 (PDT)
+Subject: Re: [PATCH v4 06/25] ibtrs: client: main functionality
+To:     Jack Wang <jinpuwang@gmail.com>, linux-block@vger.kernel.org,
+        linux-rdma@vger.kernel.org
+Cc:     axboe@kernel.dk, hch@infradead.org, sagi@grimberg.me,
+        jgg@mellanox.com, dledford@redhat.com,
+        danil.kipnis@cloud.ionos.com, rpenyaev@suse.de,
+        Jack Wang <jinpu.wang@cloud.ionos.com>
+References: <20190620150337.7847-1-jinpuwang@gmail.com>
+ <20190620150337.7847-7-jinpuwang@gmail.com>
+From:   Bart Van Assche <bvanassche@acm.org>
+Message-ID: <d0bc1253-4f3d-981b-97f1-e44900fffb44@acm.org>
+Date:   Mon, 23 Sep 2019 14:51:43 -0700
 User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:60.0) Gecko/20100101
  Thunderbird/60.8.0
 MIME-Version: 1.0
-In-Reply-To: <df612e90-8999-0085-d2d6-4418e044e429@gmail.com>
-Content-Type: text/plain; charset=utf-8
+In-Reply-To: <20190620150337.7847-7-jinpuwang@gmail.com>
+Content-Type: text/plain; charset=utf-8; format=flowed
 Content-Language: en-US
 Content-Transfer-Encoding: 7bit
 Sender: linux-block-owner@vger.kernel.org
@@ -81,25 +66,301 @@ Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-On 9/23/19 10:32 AM, Pavel Begunkov wrote:
-> Sorry, mixed the threads.
-> 
->>>
->>> I'm not sure an extension is needed for such a special interface, why not
->>> just put a ->threshold value next to the ctx->wait field and use either
->>> the regular wait_event() APIs with the proper condition, or
->>> wait_event_cmd() style APIs if you absolutely need something more complex
->>> to happen inside?
-> Ingo,
-> io_uring works well without this patch just using wait_event_*() with
-> proper condition, but there are performance issues with spurious
-> wakeups. Detailed description in the previous mail.
-> Am I missing something?
+On 6/20/19 8:03 AM, Jack Wang wrote:
+> +static const struct ibtrs_ib_dev_pool_ops dev_pool_ops;
+> +static struct ibtrs_ib_dev_pool dev_pool = {
+> +	.ops = &dev_pool_ops
+> +};
 
-I think we can do the same thing, just wrapping the waitqueue in a
-structure with a count in it, on the stack. Got some flight time
-coming up later today, let me try and cook up a patch.
+Can the definitions in this file be reordered such that the forward 
+declaration of dev_pool_ops can be removed?
 
--- 
-Jens Axboe
+> +static void ibtrs_rdma_error_recovery(struct ibtrs_clt_con *con);
+> +static int ibtrs_clt_rdma_cm_handler(struct rdma_cm_id *cm_id,
+> +				     struct rdma_cm_event *ev);
+> +static void ibtrs_clt_rdma_done(struct ib_cq *cq, struct ib_wc *wc);
+> +static void complete_rdma_req(struct ibtrs_clt_io_req *req, int errno,
+> +			      bool notify, bool can_wait);
+> +static int ibtrs_clt_write_req(struct ibtrs_clt_io_req *req);
+> +static int ibtrs_clt_read_req(struct ibtrs_clt_io_req *req);
 
+Please also remove these forward declarations.
+
+> +bool ibtrs_clt_sess_is_connected(const struct ibtrs_clt_sess *sess)
+> +{
+> +	return sess->state == IBTRS_CLT_CONNECTED;
+> +}
+
+Is it really useful to introduce a one line function for testing the 
+session state?
+
+> +static inline struct ibtrs_tag *
+> +__ibtrs_get_tag(struct ibtrs_clt *clt, enum ibtrs_clt_con_type con_type)
+> +{
+> +	size_t max_depth = clt->queue_depth;
+> +	struct ibtrs_tag *tag;
+> +	int cpu, bit;
+> +
+> +	cpu = get_cpu();
+> +	do {
+> +		bit = find_first_zero_bit(clt->tags_map, max_depth);
+> +		if (unlikely(bit >= max_depth)) {
+> +			put_cpu();
+> +			return NULL;
+> +		}
+> +
+> +	} while (unlikely(test_and_set_bit_lock(bit, clt->tags_map)));
+> +	put_cpu();
+> +
+> +	tag = GET_TAG(clt, bit);
+> +	WARN_ON(tag->mem_id != bit);
+> +	tag->cpu_id = cpu;
+> +	tag->con_type = con_type;
+> +
+> +	return tag;
+> +}
+
+What is the role of the get_cpu() and put_cpu() calls in this function? 
+How can it make sense to assign the cpu number to tag->cpu_id after 
+put_cpu() has been called?
+
+> +static inline void ibtrs_clt_init_req(struct ibtrs_clt_io_req *req,
+> +				      struct ibtrs_clt_sess *sess,
+> +				      ibtrs_conf_fn *conf,
+> +				      struct ibtrs_tag *tag, void *priv,
+> +				      const struct kvec *vec, size_t usr_len,
+> +				      struct scatterlist *sg, size_t sg_cnt,
+> +				      size_t data_len, int dir)
+> +{
+> +	struct iov_iter iter;
+> +	size_t len;
+> +
+> +	req->tag = tag;
+> +	req->in_use = true;
+> +	req->usr_len = usr_len;
+> +	req->data_len = data_len;
+> +	req->sglist = sg;
+> +	req->sg_cnt = sg_cnt;
+> +	req->priv = priv;
+> +	req->dir = dir;
+> +	req->con = ibtrs_tag_to_clt_con(sess, tag);
+> +	req->conf = conf;
+> +	req->need_inv = false;
+> +	req->need_inv_comp = false;
+> +	req->inv_errno = 0;
+> +
+> +	iov_iter_kvec(&iter, READ, vec, 1, usr_len);
+> +	len = _copy_from_iter(req->iu->buf, usr_len, &iter);
+> +	WARN_ON(len != usr_len);
+> +
+> +	reinit_completion(&req->inv_comp);
+> +	if (sess->stats.enable_rdma_lat)
+> +		req->start_jiffies = jiffies;
+> +}
+
+A comment that explains what "req" stands for would be welcome. Since 
+this function copies the entire payload, I assume that it is only used 
+for control messages and not for reading or writing data from a block 
+device?
+
+> +static int ibtrs_clt_failover_req(struct ibtrs_clt *clt,
+> +				  struct ibtrs_clt_io_req *fail_req)
+> +{
+> +	struct ibtrs_clt_sess *alive_sess;
+> +	struct ibtrs_clt_io_req *req;
+> +	int err = -ECONNABORTED;
+> +	struct path_it it;
+> +
+> +	do_each_path(alive_sess, clt, &it) {
+> +		if (unlikely(alive_sess->state != IBTRS_CLT_CONNECTED))
+> +			continue;
+> +		req = ibtrs_clt_get_copy_req(alive_sess, fail_req);
+> +		if (req->dir == DMA_TO_DEVICE)
+> +			err = ibtrs_clt_write_req(req);
+> +		else
+> +			err = ibtrs_clt_read_req(req);
+> +		if (unlikely(err)) {
+> +			req->in_use = false;
+> +			continue;
+> +		}
+> +		/* Success path */
+> +		ibtrs_clt_inc_failover_cnt(&alive_sess->stats);
+> +		break;
+> +	} while_each_path(&it);
+> +
+> +	return err;
+> +}
+
+Also for this function, a comment that explains the purpose of this 
+function would be welcome.
+
+> +static void fail_all_outstanding_reqs(struct ibtrs_clt_sess *sess)
+> +{
+> +	struct ibtrs_clt *clt = sess->clt;
+> +	struct ibtrs_clt_io_req *req;
+> +	int i, err;
+> +
+> +	if (!sess->reqs)
+> +		return;
+> +	for (i = 0; i < sess->queue_depth; ++i) {
+> +		req = &sess->reqs[i];
+> +		if (!req->in_use)
+> +			continue;
+> +
+> +		/*
+> +		 * Safely (without notification) complete failed request.
+> +		 * After completion this request is still usebale and can
+> +		 * be failovered to another path.
+> +		 */
+> +		complete_rdma_req(req, -ECONNABORTED, false, true);
+> +
+> +		err = ibtrs_clt_failover_req(clt, req);
+> +		if (unlikely(err))
+> +			/* Failover failed, notify anyway */
+> +			req->conf(req->priv, err);
+> +	}
+> +}
+
+What guarantees that this function does not call complete_rdma_req() 
+while complete_rdma_req() is called from the regular completion path?
+
+> +static bool __ibtrs_clt_change_state(struct ibtrs_clt_sess *sess,
+> +				     enum ibtrs_clt_state new_state)
+> +{
+> +	enum ibtrs_clt_state old_state;
+> +	bool changed = false;
+> +
+> +	old_state = sess->state;
+> +	switch (new_state) {
+
+Please use lockdep_assert_held() inside this function to verify at 
+runtime that session state changes are serialized properly.
+
+> +static enum ibtrs_clt_state ibtrs_clt_state(struct ibtrs_clt_sess *sess)
+> +{
+> +	enum ibtrs_clt_state state;
+> +
+> +	spin_lock_irq(&sess->state_wq.lock);
+> +	state = sess->state;
+> +	spin_unlock_irq(&sess->state_wq.lock);
+> +
+> +	return state;
+> +}
+
+Please remove this function and read sess->state without holding 
+state_wq.lock.
+
+> +static void ibtrs_clt_hb_err_handler(struct ibtrs_con *c, int err)
+> +{
+> +	struct ibtrs_clt_con *con;
+> +
+> +	(void)err;
+> +	con = container_of(c, typeof(*con), c);
+> +	ibtrs_rdma_error_recovery(con);
+> +}
+
+Can "(void)err" be left out?
+
+Can the declaration and assignment of 'con' be merged into a single line 
+of code?
+
+> +static int create_con(struct ibtrs_clt_sess *sess, unsigned int cid)
+> +{
+> +	struct ibtrs_clt_con *con;
+> +
+> +	con = kzalloc(sizeof(*con), GFP_KERNEL);
+> +	if (unlikely(!con))
+> +		return -ENOMEM;
+> +
+> +	/* Map first two connections to the first CPU */
+> +	con->cpu  = (cid ? cid - 1 : 0) % nr_cpu_ids;
+> +	con->c.cid = cid;
+> +	con->c.sess = &sess->s;
+> +	atomic_set(&con->io_cnt, 0);
+> +
+> +	sess->s.con[cid] = &con->c;
+> +
+> +	return 0;
+> +}
+
+The code to map a connection ID to onto a CPU occurs multiple times. Has 
+it been considered to introduce a function for that mapping? Although 
+one-line inline functions are not recommended in general, such a 
+function will also make it easier to experiment with other mapping 
+approaches, e.g. mapping hypertread siblings onto the same connection ID.
+
+> +static inline bool xchg_sessions(struct ibtrs_clt_sess __rcu **rcu_ppcpu_path,
+> +				 struct ibtrs_clt_sess *sess,
+> +				 struct ibtrs_clt_sess *next)
+> +{
+> +	struct ibtrs_clt_sess **ppcpu_path;
+> +
+> +	/* Call cmpxchg() without sparse warnings */
+> +	ppcpu_path = (typeof(ppcpu_path))rcu_ppcpu_path;
+> +	return (sess == cmpxchg(ppcpu_path, sess, next));
+> +}
+
+This looks suspicious. Has it been considered to protect changes of 
+rcu_ppcpu_path with a mutex and to protect reads with an RCU read lock?
+
+> +static void ibtrs_clt_add_path_to_arr(struct ibtrs_clt_sess *sess,
+> +				      struct ibtrs_addr *addr)
+> +{
+> +	struct ibtrs_clt *clt = sess->clt;
+> +
+> +	mutex_lock(&clt->paths_mutex);
+> +	clt->paths_num++;
+> +
+> +	/*
+> +	 * Firstly increase paths_num, wait for GP and then
+> +	 * add path to the list.  Why?  Since we add path with
+> +	 * !CONNECTED state explanation is similar to what has
+> +	 * been written in ibtrs_clt_remove_path_from_arr().
+> +	 */
+> +	synchronize_rcu();
+> +
+> +	list_add_tail_rcu(&sess->s.entry, &clt->paths_list);
+> +	mutex_unlock(&clt->paths_mutex);
+> +}
+
+synchronize_rcu() while a mutex is being held? Really?
+
+> +static void ibtrs_clt_close_work(struct work_struct *work)
+> +{
+> +	struct ibtrs_clt_sess *sess;
+> +
+> +	sess = container_of(work, struct ibtrs_clt_sess, close_work);
+> +
+> +	cancel_delayed_work_sync(&sess->reconnect_dwork);
+> +	ibtrs_clt_stop_and_destroy_conns(sess);
+> +	/*
+> +	 * Sounds stupid, huh?  No, it is not.  Consider this sequence:
+> +	 *
+> +	 *   #CPU0                              #CPU1
+> +	 *   1.  CONNECTED->RECONNECTING
+> +	 *   2.                                 RECONNECTING->CLOSING
+> +	 *   3.  queue_work(&reconnect_dwork)
+> +	 *   4.                                 queue_work(&close_work);
+> +	 *   5.  reconnect_work();              close_work();
+> +	 *
+> +	 * To avoid that case do cancel twice: before and after.
+> +	 */
+> +	cancel_delayed_work_sync(&sess->reconnect_dwork);
+> +	ibtrs_clt_change_state(sess, IBTRS_CLT_CLOSED);
+> +}
+
+The above code looks suspicious to me. I think there should be an 
+additional state change at the start of this function to prevent that 
+reconnect_dwork gets requeued after having been canceled.
+
+> +static void ibtrs_clt_dev_release(struct device *dev)
+> +{
+> +	/* Nobody plays with device references, so nop */
+> +}
+
+That comment sounds wrong. Have you reviewed all of the device driver 
+core code and checked that there is no code in there that manipulates 
+struct device refcounts? I think the code that frees struct ibtrs_clt 
+should be moved from free_clt() into the above function.
+
+Bart.
