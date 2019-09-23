@@ -5,56 +5,57 @@ X-Spam-Level:
 X-Spam-Status: No, score=-2.2 required=3.0 tests=DKIM_SIGNED,DKIM_VALID,
 	DKIM_VALID_AU,FREEMAIL_FORGED_FROMDOMAIN,FREEMAIL_FROM,
 	HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,
-	URIBL_BLOCKED,USER_AGENT_SANE_1 autolearn=no autolearn_force=no version=3.4.0
+	USER_AGENT_SANE_1 autolearn=no autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 7AE74C4CEC4
-	for <linux-block@archiver.kernel.org>; Mon, 23 Sep 2019 16:22:05 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 4A317C4CEC4
+	for <linux-block@archiver.kernel.org>; Mon, 23 Sep 2019 16:32:48 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.kernel.org (Postfix) with ESMTP id 412B320820
-	for <linux-block@archiver.kernel.org>; Mon, 23 Sep 2019 16:22:05 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id 0C72D2089F
+	for <linux-block@archiver.kernel.org>; Mon, 23 Sep 2019 16:32:48 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="e3iZYIcO"
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="uIRt2mQj"
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S2387942AbfIWQWE (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Mon, 23 Sep 2019 12:22:04 -0400
-Received: from mail-ed1-f68.google.com ([209.85.208.68]:40000 "EHLO
-        mail-ed1-f68.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S2387922AbfIWQWE (ORCPT
+        id S2387943AbfIWQcr (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Mon, 23 Sep 2019 12:32:47 -0400
+Received: from mail-ed1-f65.google.com ([209.85.208.65]:38817 "EHLO
+        mail-ed1-f65.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S2387922AbfIWQcr (ORCPT
         <rfc822;linux-block@vger.kernel.org>);
-        Mon, 23 Sep 2019 12:22:04 -0400
-Received: by mail-ed1-f68.google.com with SMTP id v38so13435351edm.7;
-        Mon, 23 Sep 2019 09:22:02 -0700 (PDT)
+        Mon, 23 Sep 2019 12:32:47 -0400
+Received: by mail-ed1-f65.google.com with SMTP id l21so8673734edr.5;
+        Mon, 23 Sep 2019 09:32:46 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=gmail.com; s=20161025;
-        h=to:cc:references:from:autocrypt:subject:message-id:date:user-agent
+        h=from:to:cc:references:autocrypt:subject:message-id:date:user-agent
          :mime-version:in-reply-to;
-        bh=XO4nluBwAnkALBMrv3geKWJHOwaVyOGozrAuQK+CJ8o=;
-        b=e3iZYIcOhhBaZHYnOvBkU+QjT3v/OKpdhlj+o9pYqUNSiT+3YaRJS8SCNH8tGzUsF9
-         kISFRkDen74CA2I/agH9PmNw+cHkWLD0Rkg9HRTrz6YdQLOXCyBFv0uMYPrt0STLO5JT
-         DwVQAujQhdmbWcw+E5n3QuRnI7iwdSycC8LlXYYnqWk7wTeqwiHP+aXrdMwdiX5WIto9
-         RLbE2fSa59MaqX09CfH0UaH83PbAyk49FEYB1tBY0wJC2UrnZGF7i6Mj0awXgmUby1qk
-         tRVb8xP/ip+HbYyLemz7CRQaGUij+tvTERJPgWW3Eo/UXL4kHZw6nwjjVizScfsnVbny
-         IR9g==
+        bh=cJX4Lq7MQipASm58rHED+Etk7MU2SLIFubzctqKqN4o=;
+        b=uIRt2mQjZtD3nKzfzXJL0smEqamnz1qs/J37yuObNEThzZvE0YZ7DIRrft1WYbomFZ
+         wQ44kb89+2IsPB0yvdHyFbfcKMz2OLct0TuvFcD9CJZU0tqXPGDEZKSRd2yCZEFZOstT
+         bzOzKps7dzp+OM8JN0f5QwJaBmo6/6Uc/h1lwholgXG2DnVPGKyNUqEHT2tNnzRFgSLE
+         27wjcm+CROD4TVLyMJk/KB0UC3izSExSVlYVWBtDm/sNz9MYtURvZMb01Hgw8WBwHPac
+         AecXwxvMInW08la4gI048WApc8oJF9IETIngVea3Ix9eBCfPh8D/gbd/JCCnorwu9oBz
+         ZWIQ==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=1e100.net; s=20161025;
-        h=x-gm-message-state:to:cc:references:from:autocrypt:subject
+        h=x-gm-message-state:from:to:cc:references:autocrypt:subject
          :message-id:date:user-agent:mime-version:in-reply-to;
-        bh=XO4nluBwAnkALBMrv3geKWJHOwaVyOGozrAuQK+CJ8o=;
-        b=GCr3lCmvHnzxoojVIyFIsNfuk6QeBxnIGJ4P9mFwWhlm4FgeC39bQARm6jPeUIHZeO
-         kED+hV9wBsSM1RG3mXPEgsOqQ7EwrIRESpGcHnalvwe4Ad6qWgI+5HA9btlyogXPMrSO
-         +mwehLLpSaFRC19DS+ikXMlvlXQu6OrZrKijuwjT/SSDqB/DET8+lNeQ1/3xnqV6gHkX
-         ro6Oi20LAVBU5/I5U6toz3clkcx6TLilX+RJdplIIyQyB33cpymSaRIb2RsyvaGwWf0k
-         DGh/oNHefPKhiD/ZG9JbmO9zbaY+QXi4gEgTM1lMZs1YgqBqqxL/QPlnQqHcbxqKCSQh
-         uSwg==
-X-Gm-Message-State: APjAAAX/QE35Hur52L40yfZTrpGCSO9Wqe/eaA4zGBBWyv3atpVw/CY0
-        w6KwaUDeNQCb9fRYnMcUFCzhpVXShI5Jpw==
-X-Google-Smtp-Source: APXvYqwJ/V4MzBFtK5lXufrWotnU3rkSZrM5pPFoOBvJWcyjnZIGDPKTsjC8309sjEvhZSv3xQKZgg==
-X-Received: by 2002:a17:907:20c4:: with SMTP id qq4mr634468ejb.161.1569255721481;
-        Mon, 23 Sep 2019 09:22:01 -0700 (PDT)
+        bh=cJX4Lq7MQipASm58rHED+Etk7MU2SLIFubzctqKqN4o=;
+        b=DDO4Cyocf4hDNSrtB0pZZ2ClDoHiF+Og8/f9nxW/Nov/KcdOrGijJDDH/ILqd9TDA0
+         dydbLlxsBHSdc82iu5q5dFQqb+pPaFKKbC9TkZzak79THiAGpDxwL72uh9IgE4CyKO3p
+         JjJbJiMuSjW/M4PL7dCMUbVyfymZoBwUW02wiCwSu/abZj0uk7OdjBP+CBt7QCA9wqU0
+         7EmrEmpkZyZbKty/24Ax6AbdxwtkjNS669KRFw16++P8fBp2oqVnJfNcRKbTl4Je7+Hk
+         +EK90zglAy6hAdUebDX6O7m4n1NH083Xp6a+BfBaEtZn6mYgHFrdwXg9226Q6Etc6i4G
+         L3dQ==
+X-Gm-Message-State: APjAAAX82gvsPav1LkRoCCHrbv5vUHURN+hk1mPWxGCM5oDLfF2986D8
+        wJQyKzreFIk9yTO0wxRrpuMqAVWcNgPP8g==
+X-Google-Smtp-Source: APXvYqzmS53TcM9tXHkdkD8gOudmZMUNpqqSgRXX5BHsovxKbZkE/ROe6wc/A+LYKSzKL7oV4SABAw==
+X-Received: by 2002:a17:907:2126:: with SMTP id qo6mr710479ejb.256.1569256365446;
+        Mon, 23 Sep 2019 09:32:45 -0700 (PDT)
 Received: from [192.168.43.245] ([91.135.68.130])
-        by smtp.gmail.com with ESMTPSA id c6sm1165992ejz.79.2019.09.23.09.21.59
+        by smtp.gmail.com with ESMTPSA id p1sm1184663ejg.10.2019.09.23.09.32.43
         (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
-        Mon, 23 Sep 2019 09:22:00 -0700 (PDT)
+        Mon, 23 Sep 2019 09:32:44 -0700 (PDT)
+From:   Pavel Begunkov <asml.silence@gmail.com>
 To:     Ingo Molnar <mingo@kernel.org>, Jens Axboe <axboe@kernel.dk>
 Cc:     Ingo Molnar <mingo@redhat.com>,
         Peter Zijlstra <peterz@infradead.org>,
@@ -62,7 +63,7 @@ Cc:     Ingo Molnar <mingo@redhat.com>,
 References: <cover.1569139018.git.asml.silence@gmail.com>
  <a4996ae7-ac0a-447b-49b2-7e96275aad29@kernel.dk>
  <20190923083549.GA42487@gmail.com>
-From:   Pavel Begunkov <asml.silence@gmail.com>
+ <c15b2d54-c722-8fb4-266f-b589c1a21aa5@gmail.com>
 Autocrypt: addr=asml.silence@gmail.com; prefer-encrypt=mutual; keydata=
  mQINBFmKBOQBEAC76ZFxLAKpDw0bKQ8CEiYJRGn8MHTUhURL02/7n1t0HkKQx2K1fCXClbps
  bdwSHrhOWdW61pmfMbDYbTj6ZvGRvhoLWfGkzujB2wjNcbNTXIoOzJEGISHaPf6E2IQx1ik9
@@ -107,109 +108,67 @@ Autocrypt: addr=asml.silence@gmail.com; prefer-encrypt=mutual; keydata=
  m3J6pjwSJY/zNwuFPs9zGEnRO4g0BUbwGdbuvDzaq6/3OJLKohr5eLXNU3JkT+3HezydWm3W
  OPhauth7W0db74Qd49HXK0xe/aPrK+Cp+kU1HRactyNtF8jZQbhMCC8vMGukZtWaAwpjWiiH bA==
 Subject: Re: [PATCH v2 0/2] Optimise io_uring completion waiting
-Message-ID: <c15b2d54-c722-8fb4-266f-b589c1a21aa5@gmail.com>
-Date:   Mon, 23 Sep 2019 19:21:51 +0300
+Message-ID: <df612e90-8999-0085-d2d6-4418e044e429@gmail.com>
+Date:   Mon, 23 Sep 2019 19:32:34 +0300
 User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:68.0) Gecko/20100101
  Thunderbird/68.1.0
 MIME-Version: 1.0
-In-Reply-To: <20190923083549.GA42487@gmail.com>
+In-Reply-To: <c15b2d54-c722-8fb4-266f-b589c1a21aa5@gmail.com>
 Content-Type: multipart/signed; micalg=pgp-sha256;
  protocol="application/pgp-signature";
- boundary="pkpadXJFgKQuTRicpNtAVkYzWf82w2hOP"
+ boundary="3B4EqaQuciegMUNCAnz5Lzg5cTwJnM1uT"
 Sender: linux-block-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
 This is an OpenPGP/MIME signed message (RFC 4880 and 3156)
---pkpadXJFgKQuTRicpNtAVkYzWf82w2hOP
-Content-Type: multipart/mixed; boundary="mLo0yNkE23QoIG5hhHeO1hC8id759wxQ7";
+--3B4EqaQuciegMUNCAnz5Lzg5cTwJnM1uT
+Content-Type: multipart/mixed; boundary="dzGye9qwqLYQx04F4ajWCDwJOPGLZdKrs";
  protected-headers="v1"
 From: Pavel Begunkov <asml.silence@gmail.com>
 To: Ingo Molnar <mingo@kernel.org>, Jens Axboe <axboe@kernel.dk>
 Cc: Ingo Molnar <mingo@redhat.com>, Peter Zijlstra <peterz@infradead.org>,
  linux-block@vger.kernel.org, linux-kernel@vger.kernel.org
-Message-ID: <c15b2d54-c722-8fb4-266f-b589c1a21aa5@gmail.com>
+Message-ID: <df612e90-8999-0085-d2d6-4418e044e429@gmail.com>
 Subject: Re: [PATCH v2 0/2] Optimise io_uring completion waiting
 References: <cover.1569139018.git.asml.silence@gmail.com>
  <a4996ae7-ac0a-447b-49b2-7e96275aad29@kernel.dk>
  <20190923083549.GA42487@gmail.com>
-In-Reply-To: <20190923083549.GA42487@gmail.com>
+ <c15b2d54-c722-8fb4-266f-b589c1a21aa5@gmail.com>
+In-Reply-To: <c15b2d54-c722-8fb4-266f-b589c1a21aa5@gmail.com>
 
---mLo0yNkE23QoIG5hhHeO1hC8id759wxQ7
+--dzGye9qwqLYQx04F4ajWCDwJOPGLZdKrs
 Content-Type: text/plain; charset=utf-8
 Content-Language: en-US
 Content-Transfer-Encoding: quoted-printable
 
-Hi, and thanks for the feedback.
+Sorry, mixed the threads.
 
-It could be done with @cond indeed, that's how it works for now.
-However, this addresses performance issues only.
-
-The problem with wait_event_*() is that, if we have a counter and are
-trying to wake up tasks after each increment, it would schedule each
-waiting task O(threshold) times just for it to spuriously check @cond
-and go back to sleep. All that overhead (memory barriers, registers
-save/load, accounting, etc) turned out to be enough for some workloads
-to slow down the system.
-
-With this specialisation it still traverses a wait list and makes
-indirect calls to the checker callback, but the list supposedly is
-fairly  small, so performance there shouldn't be a problem, at least for
-now.
-
-Regarding semantics; It should wake a task when a value passed to
-wake_up_threshold() is greater or equal then a task's threshold, that is
-specified individually for each task in wait_threshold_*().
-
-In pseudo code:
-```
-def wake_up_threshold(n, wait_queue):
-	for waiter in wait_queue:
-		waiter.wake_up_if(n >=3D waiter.threshold);
-```
-
-Any thoughts how to do it better? Ideas are very welcome.
-
-BTW, this monster is mostly a copy-paste from wait_event_*(),
-wait_bit_*(). We could try to extract some common parts from these
-three, but that's another topic.
-
-
-On 23/09/2019 11:35, Ingo Molnar wrote:
->=20
-> * Jens Axboe <axboe@kernel.dk> wrote:
->=20
->> On 9/22/19 2:08 AM, Pavel Begunkov (Silence) wrote:
->>> From: Pavel Begunkov <asml.silence@gmail.com>
->>>
->>> There could be a lot of overhead within generic wait_event_*() used f=
-or
->>> waiting for large number of completions. The patchset removes much of=
-
->>> it by using custom wait event (wait_threshold).
->>>
->>> Synthetic test showed ~40% performance boost. (see patch 2)
 >>
->> I'm fine with the io_uring side of things, but to queue this up we
->> really need Peter or Ingo to sign off on the core wakeup bits...
+>> I'm not sure an extension is needed for such a special interface, why =
+not=20
+>> just put a ->threshold value next to the ctx->wait field and use eithe=
+r=20
+>> the regular wait_event() APIs with the proper condition, or=20
+>> wait_event_cmd() style APIs if you absolutely need something more comp=
+lex=20
+>> to happen inside?
+Ingo,
+io_uring works well without this patch just using wait_event_*() with
+proper condition, but there are performance issues with spurious
+wakeups. Detailed description in the previous mail.
+Am I missing something?
+Thanks
+
+
 >>
->> Peter?
->=20
-> I'm not sure an extension is needed for such a special interface, why n=
-ot=20
-> just put a ->threshold value next to the ctx->wait field and use either=
-=20
-> the regular wait_event() APIs with the proper condition, or=20
-> wait_event_cmd() style APIs if you absolutely need something more compl=
-ex=20
-> to happen inside?
->=20
-> Should result in a much lower linecount and no scheduler changes. :-)
->=20
-> Thanks,
->=20
-> 	Ingo
+>> Should result in a much lower linecount and no scheduler changes. :-)
+>>
+>> Thanks,
+>>
+>> 	Ingo
+>>
 >=20
 
 --=20
@@ -217,28 +176,28 @@ Yours sincerely,
 Pavel Begunkov
 
 
---mLo0yNkE23QoIG5hhHeO1hC8id759wxQ7--
+--dzGye9qwqLYQx04F4ajWCDwJOPGLZdKrs--
 
---pkpadXJFgKQuTRicpNtAVkYzWf82w2hOP
+--3B4EqaQuciegMUNCAnz5Lzg5cTwJnM1uT
 Content-Type: application/pgp-signature; name="signature.asc"
 Content-Description: OpenPGP digital signature
 Content-Disposition: attachment; filename="signature.asc"
 
 -----BEGIN PGP SIGNATURE-----
 
-iQIzBAEBCAAdFiEE+6JuPTjTbx479o3OWt5b1Glr+6UFAl2I8SMACgkQWt5b1Glr
-+6XVdxAAlOxTFlkfTpBloZnEn2ptSWZu1ExTS93aEit7W8f1Qkb2LNLF2tczKX9Q
-9s0htG7oeuDWvFcnKrvGO2DR2siMpqqnGbI6sMxcLlos4FHo8lYFtVdqlj6XLbNA
-kIAQ0eMpS49EHugZnWmcD3JAvA0cjTgQzRBAmyFr9JN5fJilohA8wPVw2CqIgvgW
-H2UJiAPTx4lLr+ImrfKQLL2owLDoAokmg40SULSxTelfVvQ+fcnaFwyNsxcUkc8Z
-qKD0HFS6ukMPR5hIlFvOo057lHn16rMatB2iA3C2n93JeNMDUg5Vi+fvbPsClzOs
-oGvHLhbyvvv4BE9rLnPYI9Pm5/tcwvWYLzvrvDt5gFx1hpclrmfJ4XNlEq6J4dc8
-nsn3ixauEK4OPWK9KXAfHvbsBUl286JokAlK3TpjCzJw7pQr9RWlNgxnjWF+UFxc
-35LLt8iwDiWXgzEoIvtsdDwxL+CfRbC4CXRZJ+2wOgYgC79qGS/kBpBtNhTwMUA0
-59JMeVzS0b6oAAvv09XmqmXL2gGw+fni3Gg5Ce3ysCcwYt92sb7mxuNQgl07nBcE
-TDOpe/spgBR3+6iuLt3MuREzIul2Rl58rAoG2RJW+AE53uNaRp+UAhPJ7gOF1Aex
-Ucm9smVHRPyrK6dkoxmJqaZdpJ0OR+Tq5mIDICFfKUumzHuyewA=
-=nmJ2
+iQIzBAEBCAAdFiEE+6JuPTjTbx479o3OWt5b1Glr+6UFAl2I86IACgkQWt5b1Glr
++6XqNxAAm4KZCQh3M7BMDBgN/Rnq89kWjICkQLKXqvhV/nPSu9bsY6fCB3tj1C/V
+s1tMQXuWEynbB6iewvBr/laIENP2hqiS27NdevYzjY12amktPxru6rpQs9GafCi7
+N0Wip72JhCiaptGAmIdAair0HoWx6HQ+4WF5lMYFR2Zc8pyLIdkz+lk/xdHAs/+F
+T/viybKa9v4ZQ3T5VG/1grlCT9x71bHgOLdsMW6vAGEIdzNIMkwNr+6PxQAEAwWk
+sbjD0xezUN4e3W/RtXlhKL5hWUafciIZWavYlbM1f+llbk/TXRJPyw3qaKl7CZxA
+lfDARP566jkt5rfAA6aS4bkzpNz3zee5qdulOWsLYPLePSC5paqPJKvUpZuBhidU
+f7nx61lbsFAyI2XRN0rZDRsWaIGbtkFF0pzrFiWA8DEkrNTF2tM6MMguUcDNmRYV
+TQliaArdtycCET1QI0g3lQw3G0cZQhbbbpWbsLT3/NMDbPx6yLA6WAvP0DwQFdBi
+Jysi9akB/U9YrAXB/bAZyCMrKNpjYZWKIwMxU1s+1xhTTxcYyR6vtOlNhWr1ev0w
+CUd0DaNH57rzRY2v/07YmRafHcCDf7r1tCZ7DS6hmHp2wAP+dal2acjxfesxd6g5
+eSkSJT/2pQVnc69xciG0eC1GVP6ZnSGwAYHnZT54rhw4O1r3hD0=
+=3vGs
 -----END PGP SIGNATURE-----
 
---pkpadXJFgKQuTRicpNtAVkYzWf82w2hOP--
+--3B4EqaQuciegMUNCAnz5Lzg5cTwJnM1uT--
