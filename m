@@ -6,58 +6,60 @@ X-Spam-Status: No, score=-2.2 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
 	MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,USER_AGENT_SANE_1 autolearn=no
 	autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 89850C432C1
-	for <linux-block@archiver.kernel.org>; Mon, 23 Sep 2019 21:51:49 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 4D4BEC432C1
+	for <linux-block@archiver.kernel.org>; Mon, 23 Sep 2019 22:50:39 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.kernel.org (Postfix) with ESMTP id 69F3720820
-	for <linux-block@archiver.kernel.org>; Mon, 23 Sep 2019 21:51:49 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id 1FFFA21A4C
+	for <linux-block@archiver.kernel.org>; Mon, 23 Sep 2019 22:50:39 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S2503184AbfIWVvs (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Mon, 23 Sep 2019 17:51:48 -0400
-Received: from mail-pg1-f194.google.com ([209.85.215.194]:40377 "EHLO
-        mail-pg1-f194.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S2387520AbfIWVvs (ORCPT
+        id S2392831AbfIWWui (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Mon, 23 Sep 2019 18:50:38 -0400
+Received: from mail-pl1-f193.google.com ([209.85.214.193]:42515 "EHLO
+        mail-pl1-f193.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S2392820AbfIWWui (ORCPT
         <rfc822;linux-block@vger.kernel.org>);
-        Mon, 23 Sep 2019 17:51:48 -0400
-Received: by mail-pg1-f194.google.com with SMTP id w10so8770384pgj.7;
-        Mon, 23 Sep 2019 14:51:46 -0700 (PDT)
+        Mon, 23 Sep 2019 18:50:38 -0400
+Received: by mail-pl1-f193.google.com with SMTP id e5so7181984pls.9;
+        Mon, 23 Sep 2019 15:50:37 -0700 (PDT)
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=1e100.net; s=20161025;
         h=x-gm-message-state:subject:to:cc:references:from:message-id:date
          :user-agent:mime-version:in-reply-to:content-language
          :content-transfer-encoding;
-        bh=ea09ZjN1fmlsXEBEkl3FdseadDMq9uoMpI8GdwxgyT4=;
-        b=ACL1aF/ft7iNT//Hnpythx1/AU9GQC68/45MbNNnk8CNSuqrNNUqReP88tiFZ14MLm
-         Mo1v+Wy0I8avxBgo4RtcLobw9yeD7OWKJcYKcXUuDi5cBHs0a/dqgyVrAs5dmL3h8FP6
-         SxvC5DdbRcXCBQkqZ6tACtxiNVhNuY4ydl8R0+wr3A8JSQSznvsG3ja1nx6EE5F5zPrA
-         7hoA0EmgfU6WI1ArmRcTC2dwT0GAFDdG8XaoqZ7XFTfke2HiFtTaJN9r7dXvc1EiKZMa
-         1PNfcR48VbJNhy37Cnrgppwkkm+HSKkn4AiYh4GVmC8hqIzxnOOBSzRvSRaDSG8kyGcN
-         AmJg==
-X-Gm-Message-State: APjAAAXn17SbcFVUSekkL1VoMbP7oWuYSkfAHPDSRqmltaX1xBCbS4Xb
-        QREmLwT/Az2WuRElEkP2g4A=
-X-Google-Smtp-Source: APXvYqzK16cyhfKcUzdsINdWdVmiv6Yj4AXrMEHluUymgurUNS8oLf1PA2QtDdhZM1hu9+t8opwtcw==
-X-Received: by 2002:aa7:955d:: with SMTP id w29mr1949355pfq.60.1569275505820;
-        Mon, 23 Sep 2019 14:51:45 -0700 (PDT)
+        bh=W6HuVnC9hGr4EvSC1RPOCpcPXaGFtqvq3vf8mCR2Yqk=;
+        b=IfGo3xez6tZ4UKXMTI1tBri0PWzpMXlDLPEE1JraQsg+n/tHR35qGUuQHiysKxXfQd
+         XOV8I71sUls2RhMj7LAkSdfQVkug9EcJj7Kk2sxq2HGIc++bPcXDeikPTXYfJsiu0inm
+         VU0FVG9RyBEQYYwSK4ziDXldpp2DgQPAfAmzADwwNQbTXgX9UFbMk7jaDIOIKJoPI3Pl
+         JfxRZkxxmotgf7N08sfAwJDM4HPt2MpcUznQjpdLDjDfODTcFYEHhsC2n9sTtoc7TOfO
+         Nb7JRZc34+d+OSqR/bL/XVWiSb3Llb/tsIpE0OpxHEv5Ej/NaJW7yV5uNviIVS+oPnws
+         sO8A==
+X-Gm-Message-State: APjAAAXi/y3ZN8xW30Erzy+HynS7dIPd7mEMt0Qv9IMSUJfNFvWO0MXs
+        hEHyYM388SxF+gRETc3YcRc=
+X-Google-Smtp-Source: APXvYqz6G8OOlwcSwQLM4MDDNl0Yj6YeshqYAYUd487r4nq1wlBDF/MPz/0CM1yCEnFHpwjmpG+0Qg==
+X-Received: by 2002:a17:902:8304:: with SMTP id bd4mr2251119plb.213.1569279037226;
+        Mon, 23 Sep 2019 15:50:37 -0700 (PDT)
 Received: from desktop-bart.svl.corp.google.com ([2620:15c:2cd:202:4308:52a3:24b6:2c60])
-        by smtp.gmail.com with ESMTPSA id 196sm18690773pfz.99.2019.09.23.14.51.44
+        by smtp.gmail.com with ESMTPSA id b24sm8633857pgs.15.2019.09.23.15.50.35
         (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
-        Mon, 23 Sep 2019 14:51:44 -0700 (PDT)
-Subject: Re: [PATCH v4 06/25] ibtrs: client: main functionality
+        Mon, 23 Sep 2019 15:50:36 -0700 (PDT)
+Subject: Re: [PATCH v4 03/25] ibtrs: private headers with IBTRS protocol
+ structs and helpers
 To:     Jack Wang <jinpuwang@gmail.com>, linux-block@vger.kernel.org,
         linux-rdma@vger.kernel.org
 Cc:     axboe@kernel.dk, hch@infradead.org, sagi@grimberg.me,
         jgg@mellanox.com, dledford@redhat.com,
         danil.kipnis@cloud.ionos.com, rpenyaev@suse.de,
+        Roman Pen <roman.penyaev@profitbricks.com>,
         Jack Wang <jinpu.wang@cloud.ionos.com>
 References: <20190620150337.7847-1-jinpuwang@gmail.com>
- <20190620150337.7847-7-jinpuwang@gmail.com>
+ <20190620150337.7847-4-jinpuwang@gmail.com>
 From:   Bart Van Assche <bvanassche@acm.org>
-Message-ID: <d0bc1253-4f3d-981b-97f1-e44900fffb44@acm.org>
-Date:   Mon, 23 Sep 2019 14:51:43 -0700
+Message-ID: <7f62b16a-6e6c-ad05-46d4-05514ffaeaba@acm.org>
+Date:   Mon, 23 Sep 2019 15:50:35 -0700
 User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:60.0) Gecko/20100101
  Thunderbird/60.8.0
 MIME-Version: 1.0
-In-Reply-To: <20190620150337.7847-7-jinpuwang@gmail.com>
+In-Reply-To: <20190620150337.7847-4-jinpuwang@gmail.com>
 Content-Type: text/plain; charset=utf-8; format=flowed
 Content-Language: en-US
 Content-Transfer-Encoding: 7bit
@@ -67,300 +69,193 @@ List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
 On 6/20/19 8:03 AM, Jack Wang wrote:
-> +static const struct ibtrs_ib_dev_pool_ops dev_pool_ops;
-> +static struct ibtrs_ib_dev_pool dev_pool = {
-> +	.ops = &dev_pool_ops
+> +#define P1 )
+> +#define P2 ))
+> +#define P3 )))
+> +#define P4 ))))
+> +#define P(N) P ## N
+> +
+> +#define CAT(a, ...) PRIMITIVE_CAT(a, __VA_ARGS__)
+> +#define PRIMITIVE_CAT(a, ...) a ## __VA_ARGS__
+> +
+> +#define LIST(...)						\
+> +	__VA_ARGS__,						\
+> +	({ unknown_type(); NULL; })				\
+> +	CAT(P, COUNT_ARGS(__VA_ARGS__))				\
+> +
+> +#define EMPTY()
+> +#define DEFER(id) id EMPTY()
+> +
+> +#define _CASE(obj, type, member)				\
+> +	__builtin_choose_expr(					\
+> +	__builtin_types_compatible_p(				\
+> +		typeof(obj), type),				\
+> +		((type)obj)->member
+> +#define CASE(o, t, m) DEFER(_CASE)(o, t, m)
+> +
+> +/*
+> + * Below we define retrieving of sessname from common IBTRS types.
+> + * Client or server related types have to be defined by special
+> + * TYPES_TO_SESSNAME macro.
+> + */
+> +
+> +void unknown_type(void);
+> +
+> +#ifndef TYPES_TO_SESSNAME
+> +#define TYPES_TO_SESSNAME(...) ({ unknown_type(); NULL; })
+> +#endif
+> +
+> +#define ibtrs_prefix(obj)					\
+> +	_CASE(obj, struct ibtrs_con *,  sess->sessname),	\
+> +	_CASE(obj, struct ibtrs_sess *, sessname),		\
+> +	TYPES_TO_SESSNAME(obj)					\
+> +	))
+
+No preprocessor voodoo please. Please remove all of the above and modify 
+the logging statements such that these pass the proper name string as 
+first argument to logging macros.
+
+> +struct ibtrs_msg_conn_req {
+> +	u8		__cma_version; /* Is set to 0 by cma.c in case of
+> +					* AF_IB, do not touch that. */
+> +	u8		__ip_version;  /* On sender side that should be
+> +					* set to 0, or cma_save_ip_info()
+> +					* extract garbage and will fail. */
+> +	__le16		magic;
+> +	__le16		version;
+> +	__le16		cid;
+> +	__le16		cid_num;
+> +	__le16		recon_cnt;
+> +	uuid_t		sess_uuid;
+> +	uuid_t		paths_uuid;
+> +	u8		reserved[12];
 > +};
 
-Can the definitions in this file be reordered such that the forward 
-declaration of dev_pool_ops can be removed?
+Please remove the reserved[] array and check private_data_len in the 
+code that receives the login request.
 
-> +static void ibtrs_rdma_error_recovery(struct ibtrs_clt_con *con);
-> +static int ibtrs_clt_rdma_cm_handler(struct rdma_cm_id *cm_id,
-> +				     struct rdma_cm_event *ev);
-> +static void ibtrs_clt_rdma_done(struct ib_cq *cq, struct ib_wc *wc);
-> +static void complete_rdma_req(struct ibtrs_clt_io_req *req, int errno,
-> +			      bool notify, bool can_wait);
-> +static int ibtrs_clt_write_req(struct ibtrs_clt_io_req *req);
-> +static int ibtrs_clt_read_req(struct ibtrs_clt_io_req *req);
+> +/**
+> + * struct ibtrs_msg_conn_rsp - Server connection response to the client
+> + * @magic:	   IBTRS magic
+> + * @version:	   IBTRS protocol version
+> + * @errno:	   If rdma_accept() then 0, if rdma_reject() indicates error
+> + * @queue_depth:   max inflight messages (queue-depth) in this session
+> + * @max_io_size:   max io size server supports
+> + * @max_hdr_size:  max msg header size server supports
+> + *
+> + * NOTE: size is 56 bytes, max possible is 136 bytes, see man rdma_accept().
+> + */
+> +struct ibtrs_msg_conn_rsp {
+> +	__le16		magic;
+> +	__le16		version;
+> +	__le16		errno;
+> +	__le16		queue_depth;
+> +	__le32		max_io_size;
+> +	__le32		max_hdr_size;
+> +	u8		reserved[40];
+> +};
 
-Please also remove these forward declarations.
+Same comment here: please remove the reserved[] array and check 
+private_data_len in the code that processes this data structure.
 
-> +bool ibtrs_clt_sess_is_connected(const struct ibtrs_clt_sess *sess)
+> +static inline int sockaddr_cmp(const struct sockaddr *a,
+> +			       const struct sockaddr *b)
 > +{
-> +	return sess->state == IBTRS_CLT_CONNECTED;
-> +}
-
-Is it really useful to introduce a one line function for testing the 
-session state?
-
-> +static inline struct ibtrs_tag *
-> +__ibtrs_get_tag(struct ibtrs_clt *clt, enum ibtrs_clt_con_type con_type)
-> +{
-> +	size_t max_depth = clt->queue_depth;
-> +	struct ibtrs_tag *tag;
-> +	int cpu, bit;
-> +
-> +	cpu = get_cpu();
-> +	do {
-> +		bit = find_first_zero_bit(clt->tags_map, max_depth);
-> +		if (unlikely(bit >= max_depth)) {
-> +			put_cpu();
-> +			return NULL;
-> +		}
-> +
-> +	} while (unlikely(test_and_set_bit_lock(bit, clt->tags_map)));
-> +	put_cpu();
-> +
-> +	tag = GET_TAG(clt, bit);
-> +	WARN_ON(tag->mem_id != bit);
-> +	tag->cpu_id = cpu;
-> +	tag->con_type = con_type;
-> +
-> +	return tag;
-> +}
-
-What is the role of the get_cpu() and put_cpu() calls in this function? 
-How can it make sense to assign the cpu number to tag->cpu_id after 
-put_cpu() has been called?
-
-> +static inline void ibtrs_clt_init_req(struct ibtrs_clt_io_req *req,
-> +				      struct ibtrs_clt_sess *sess,
-> +				      ibtrs_conf_fn *conf,
-> +				      struct ibtrs_tag *tag, void *priv,
-> +				      const struct kvec *vec, size_t usr_len,
-> +				      struct scatterlist *sg, size_t sg_cnt,
-> +				      size_t data_len, int dir)
-> +{
-> +	struct iov_iter iter;
-> +	size_t len;
-> +
-> +	req->tag = tag;
-> +	req->in_use = true;
-> +	req->usr_len = usr_len;
-> +	req->data_len = data_len;
-> +	req->sglist = sg;
-> +	req->sg_cnt = sg_cnt;
-> +	req->priv = priv;
-> +	req->dir = dir;
-> +	req->con = ibtrs_tag_to_clt_con(sess, tag);
-> +	req->conf = conf;
-> +	req->need_inv = false;
-> +	req->need_inv_comp = false;
-> +	req->inv_errno = 0;
-> +
-> +	iov_iter_kvec(&iter, READ, vec, 1, usr_len);
-> +	len = _copy_from_iter(req->iu->buf, usr_len, &iter);
-> +	WARN_ON(len != usr_len);
-> +
-> +	reinit_completion(&req->inv_comp);
-> +	if (sess->stats.enable_rdma_lat)
-> +		req->start_jiffies = jiffies;
-> +}
-
-A comment that explains what "req" stands for would be welcome. Since 
-this function copies the entire payload, I assume that it is only used 
-for control messages and not for reading or writing data from a block 
-device?
-
-> +static int ibtrs_clt_failover_req(struct ibtrs_clt *clt,
-> +				  struct ibtrs_clt_io_req *fail_req)
-> +{
-> +	struct ibtrs_clt_sess *alive_sess;
-> +	struct ibtrs_clt_io_req *req;
-> +	int err = -ECONNABORTED;
-> +	struct path_it it;
-> +
-> +	do_each_path(alive_sess, clt, &it) {
-> +		if (unlikely(alive_sess->state != IBTRS_CLT_CONNECTED))
-> +			continue;
-> +		req = ibtrs_clt_get_copy_req(alive_sess, fail_req);
-> +		if (req->dir == DMA_TO_DEVICE)
-> +			err = ibtrs_clt_write_req(req);
-> +		else
-> +			err = ibtrs_clt_read_req(req);
-> +		if (unlikely(err)) {
-> +			req->in_use = false;
-> +			continue;
-> +		}
-> +		/* Success path */
-> +		ibtrs_clt_inc_failover_cnt(&alive_sess->stats);
-> +		break;
-> +	} while_each_path(&it);
-> +
-> +	return err;
-> +}
-
-Also for this function, a comment that explains the purpose of this 
-function would be welcome.
-
-> +static void fail_all_outstanding_reqs(struct ibtrs_clt_sess *sess)
-> +{
-> +	struct ibtrs_clt *clt = sess->clt;
-> +	struct ibtrs_clt_io_req *req;
-> +	int i, err;
-> +
-> +	if (!sess->reqs)
-> +		return;
-> +	for (i = 0; i < sess->queue_depth; ++i) {
-> +		req = &sess->reqs[i];
-> +		if (!req->in_use)
-> +			continue;
-> +
-> +		/*
-> +		 * Safely (without notification) complete failed request.
-> +		 * After completion this request is still usebale and can
-> +		 * be failovered to another path.
-> +		 */
-> +		complete_rdma_req(req, -ECONNABORTED, false, true);
-> +
-> +		err = ibtrs_clt_failover_req(clt, req);
-> +		if (unlikely(err))
-> +			/* Failover failed, notify anyway */
-> +			req->conf(req->priv, err);
+> +	switch (a->sa_family) {
+> +	case AF_IB:
+> +		return memcmp(&((struct sockaddr_ib *)a)->sib_addr,
+> +			      &((struct sockaddr_ib *)b)->sib_addr,
+> +			      sizeof(struct ib_addr));
+> +	case AF_INET:
+> +		return memcmp(&((struct sockaddr_in *)a)->sin_addr,
+> +			      &((struct sockaddr_in *)b)->sin_addr,
+> +			      sizeof(struct in_addr));
+> +	case AF_INET6:
+> +		return memcmp(&((struct sockaddr_in6 *)a)->sin6_addr,
+> +			      &((struct sockaddr_in6 *)b)->sin6_addr,
+> +			      sizeof(struct in6_addr));
+> +	default:
+> +		return -ENOENT;
 > +	}
 > +}
-
-What guarantees that this function does not call complete_rdma_req() 
-while complete_rdma_req() is called from the regular completion path?
-
-> +static bool __ibtrs_clt_change_state(struct ibtrs_clt_sess *sess,
-> +				     enum ibtrs_clt_state new_state)
+> +
+> +static inline int sockaddr_to_str(const struct sockaddr *addr,
+> +				   char *buf, size_t len)
 > +{
-> +	enum ibtrs_clt_state old_state;
-> +	bool changed = false;
+> +	int cnt;
 > +
-> +	old_state = sess->state;
-> +	switch (new_state) {
-
-Please use lockdep_assert_held() inside this function to verify at 
-runtime that session state changes are serialized properly.
-
-> +static enum ibtrs_clt_state ibtrs_clt_state(struct ibtrs_clt_sess *sess)
-> +{
-> +	enum ibtrs_clt_state state;
-> +
-> +	spin_lock_irq(&sess->state_wq.lock);
-> +	state = sess->state;
-> +	spin_unlock_irq(&sess->state_wq.lock);
-> +
-> +	return state;
+> +	switch (addr->sa_family) {
+> +	case AF_IB:
+> +		cnt = scnprintf(buf, len, "gid:%pI6",
+> +			&((struct sockaddr_ib *)addr)->sib_addr.sib_raw);
+> +		return cnt;
+> +	case AF_INET:
+> +		cnt = scnprintf(buf, len, "ip:%pI4",
+> +			&((struct sockaddr_in *)addr)->sin_addr);
+> +		return cnt;
+> +	case AF_INET6:
+> +		cnt = scnprintf(buf, len, "ip:%pI6c",
+> +			  &((struct sockaddr_in6 *)addr)->sin6_addr);
+> +		return cnt;
+> +	}
+> +	cnt = scnprintf(buf, len, "<invalid address family>");
+> +	pr_err("Invalid address family\n");
+> +	return cnt;
 > +}
 
-Please remove this function and read sess->state without holding 
-state_wq.lock.
+Since these functions are not in the hot path, please move these into a 
+.c file.
 
-> +static void ibtrs_clt_hb_err_handler(struct ibtrs_con *c, int err)
+> +/**
+> + * ibtrs_invalidate_flag() - returns proper flags for invalidation
+> + *
+> + * NOTE: This function is needed for compat layer, so think twice before
+> + *       rename or remove.
+> + */
+> +static inline u32 ibtrs_invalidate_flag(void)
 > +{
-> +	struct ibtrs_clt_con *con;
-> +
-> +	(void)err;
-> +	con = container_of(c, typeof(*con), c);
-> +	ibtrs_rdma_error_recovery(con);
+> +	return IBTRS_MSG_NEED_INVAL_F;
 > +}
 
-Can "(void)err" be left out?
+An inline function that does nothing else than returning a compile-time 
+constant? That does not look useful to me. How about inlining this function?
 
-Can the declaration and assignment of 'con' be merged into a single line 
-of code?
-
-> +static int create_con(struct ibtrs_clt_sess *sess, unsigned int cid)
-> +{
-> +	struct ibtrs_clt_con *con;
-> +
-> +	con = kzalloc(sizeof(*con), GFP_KERNEL);
-> +	if (unlikely(!con))
-> +		return -ENOMEM;
-> +
-> +	/* Map first two connections to the first CPU */
-> +	con->cpu  = (cid ? cid - 1 : 0) % nr_cpu_ids;
-> +	con->c.cid = cid;
-> +	con->c.sess = &sess->s;
-> +	atomic_set(&con->io_cnt, 0);
-> +
-> +	sess->s.con[cid] = &con->c;
-> +
-> +	return 0;
+> +#define STAT_STORE_FUNC(type, store, reset)				\
+> +static ssize_t store##_store(struct kobject *kobj,			\
+> +			     struct kobj_attribute *attr,		\
+> +			     const char *buf, size_t count)		\
+> +{									\
+> +	int ret = -EINVAL;						\
+> +	type *sess = container_of(kobj, type, kobj_stats);		\
+> +									\
+> +	if (sysfs_streq(buf, "1"))					\
+> +		ret = reset(&sess->stats, true);			\
+> +	else if (sysfs_streq(buf, "0"))					\
+> +		ret = reset(&sess->stats, false);			\
+> +	if (ret)							\
+> +		return ret;						\
+> +									\
+> +	return count;							\
 > +}
 
-The code to map a connection ID to onto a CPU occurs multiple times. Has 
-it been considered to introduce a function for that mapping? Although 
-one-line inline functions are not recommended in general, such a 
-function will also make it easier to experiment with other mapping 
-approaches, e.g. mapping hypertread siblings onto the same connection ID.
+The above macro concatenates the suffix "_store" to a macro argument 
+with the name 'store'. Please chose a less confusing name for the macro 
+argument. Additionally, using 'reset' for the name of an macro argument 
+that is a function that stores a value seems confusing to me. How about 
+renaming that macro argument into 'set' or 'store_value'?
 
-> +static inline bool xchg_sessions(struct ibtrs_clt_sess __rcu **rcu_ppcpu_path,
-> +				 struct ibtrs_clt_sess *sess,
-> +				 struct ibtrs_clt_sess *next)
-> +{
-> +	struct ibtrs_clt_sess **ppcpu_path;
-> +
-> +	/* Call cmpxchg() without sparse warnings */
-> +	ppcpu_path = (typeof(ppcpu_path))rcu_ppcpu_path;
-> +	return (sess == cmpxchg(ppcpu_path, sess, next));
+> +#define STAT_SHOW_FUNC(type, show, print)				\
+> +static ssize_t show##_show(struct kobject *kobj,			\
+> +			   struct kobj_attribute *attr,			\
+> +			   char *page)					\
+> +{									\
+> +	type *sess = container_of(kobj, type, kobj_stats);		\
+> +									\
+> +	return print(&sess->stats, page, PAGE_SIZE);			\
 > +}
 
-This looks suspicious. Has it been considered to protect changes of 
-rcu_ppcpu_path with a mutex and to protect reads with an RCU read lock?
+Same comment for the macro argument 'show' in the above function.
 
-> +static void ibtrs_clt_add_path_to_arr(struct ibtrs_clt_sess *sess,
-> +				      struct ibtrs_addr *addr)
-> +{
-> +	struct ibtrs_clt *clt = sess->clt;
-> +
-> +	mutex_lock(&clt->paths_mutex);
-> +	clt->paths_num++;
-> +
-> +	/*
-> +	 * Firstly increase paths_num, wait for GP and then
-> +	 * add path to the list.  Why?  Since we add path with
-> +	 * !CONNECTED state explanation is similar to what has
-> +	 * been written in ibtrs_clt_remove_path_from_arr().
-> +	 */
-> +	synchronize_rcu();
-> +
-> +	list_add_tail_rcu(&sess->s.entry, &clt->paths_list);
-> +	mutex_unlock(&clt->paths_mutex);
-> +}
-
-synchronize_rcu() while a mutex is being held? Really?
-
-> +static void ibtrs_clt_close_work(struct work_struct *work)
-> +{
-> +	struct ibtrs_clt_sess *sess;
-> +
-> +	sess = container_of(work, struct ibtrs_clt_sess, close_work);
-> +
-> +	cancel_delayed_work_sync(&sess->reconnect_dwork);
-> +	ibtrs_clt_stop_and_destroy_conns(sess);
-> +	/*
-> +	 * Sounds stupid, huh?  No, it is not.  Consider this sequence:
-> +	 *
-> +	 *   #CPU0                              #CPU1
-> +	 *   1.  CONNECTED->RECONNECTING
-> +	 *   2.                                 RECONNECTING->CLOSING
-> +	 *   3.  queue_work(&reconnect_dwork)
-> +	 *   4.                                 queue_work(&close_work);
-> +	 *   5.  reconnect_work();              close_work();
-> +	 *
-> +	 * To avoid that case do cancel twice: before and after.
-> +	 */
-> +	cancel_delayed_work_sync(&sess->reconnect_dwork);
-> +	ibtrs_clt_change_state(sess, IBTRS_CLT_CLOSED);
-> +}
-
-The above code looks suspicious to me. I think there should be an 
-additional state change at the start of this function to prevent that 
-reconnect_dwork gets requeued after having been canceled.
-
-> +static void ibtrs_clt_dev_release(struct device *dev)
-> +{
-> +	/* Nobody plays with device references, so nop */
-> +}
-
-That comment sounds wrong. Have you reviewed all of the device driver 
-core code and checked that there is no code in there that manipulates 
-struct device refcounts? I think the code that frees struct ibtrs_clt 
-should be moved from free_clt() into the above function.
+Thanks,
 
 Bart.
