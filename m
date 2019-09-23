@@ -2,74 +2,109 @@ Return-Path: <SRS0=JlK2=XS=vger.kernel.org=linux-block-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-2.0 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
-	HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,
+X-Spam-Status: No, score=-2.6 required=3.0 tests=DKIMWL_WL_HIGH,DKIM_SIGNED,
+	DKIM_VALID,DKIM_VALID_AU,MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,
 	USER_AGENT_SANE_1 autolearn=no autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id EE947C3A5A6
-	for <linux-block@archiver.kernel.org>; Mon, 23 Sep 2019 07:19:42 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 6B238C4740C
+	for <linux-block@archiver.kernel.org>; Mon, 23 Sep 2019 08:35:55 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.kernel.org (Postfix) with ESMTP id B59D220820
-	for <linux-block@archiver.kernel.org>; Mon, 23 Sep 2019 07:19:42 +0000 (UTC)
-Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (2048-bit key) header.d=infradead.org header.i=@infradead.org header.b="ghzSBv0N"
+	by mail.kernel.org (Postfix) with ESMTP id 41A162064A
+	for <linux-block@archiver.kernel.org>; Mon, 23 Sep 2019 08:35:55 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+	s=default; t=1569227755;
+	bh=i8WkercoXu9v6y0Lw4lHPRJCbJVpFVXvFVfaoT05H5g=;
+	h=Date:From:To:Cc:Subject:References:In-Reply-To:List-ID:From;
+	b=BaHF5erHiJhI32O9x+ZbicfDdOtElUITpNzNbdF8mBVlAfFXkBKa0fkRvBWQkiMAS
+	 pOolm8yDNjuGkPkZm6agBuuoES4gBA8S/2RwzQO4vmRvdIJWRcKWnWxr3OzbPRlgYJ
+	 Ok/qcqYfwsc5DWZ6gJjqlVV1ncgfc+5dUR2dEJtE=
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S2390878AbfIWHTm (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Mon, 23 Sep 2019 03:19:42 -0400
-Received: from merlin.infradead.org ([205.233.59.134]:40042 "EHLO
-        merlin.infradead.org" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1729404AbfIWHTm (ORCPT
+        id S2406681AbfIWIfy (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Mon, 23 Sep 2019 04:35:54 -0400
+Received: from mail-wm1-f68.google.com ([209.85.128.68]:38839 "EHLO
+        mail-wm1-f68.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S2405465AbfIWIfy (ORCPT
         <rfc822;linux-block@vger.kernel.org>);
-        Mon, 23 Sep 2019 03:19:42 -0400
-DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed;
-        d=infradead.org; s=merlin.20170209; h=In-Reply-To:Content-Type:MIME-Version:
-        References:Message-ID:Subject:Cc:To:From:Date:Sender:Reply-To:
-        Content-Transfer-Encoding:Content-ID:Content-Description:Resent-Date:
-        Resent-From:Resent-Sender:Resent-To:Resent-Cc:Resent-Message-ID:List-Id:
-        List-Help:List-Unsubscribe:List-Subscribe:List-Post:List-Owner:List-Archive;
-         bh=ycpk1YiwPb/Tbr+693kk82MkGbYMJrQgSJFb5bbpHPw=; b=ghzSBv0Na1HFvhyhj5bATlwqp
-        D/cF3iVNybe8tkimAk7EXEtl8I8mXPKPEHqFQYh8Mu59XuOsGVYhkn8DkcDizK/QfQBfQp8Ji+5DK
-        SrbrZKqSnYCljgtaZGfsGEkCSqNsSQDJKrTDWSmRMJdWhhrVh4gVw4zd70z8FayB12QDUYVvusyFy
-        6VMacB5ILeuiXZC4qdvV5o4Feh+sTOCBiAITTwk7hXqVx7tRSFIfklqG2s87y79Bg3rXOTr+AtU/T
-        lBK9RMlErFeZooh4CqdfmKUbEosQ+g3OGjTGK5u4CeOKhiJwwV2ABNseiEGOXnx/emVRzRSjMyHxN
-        +d6pCty/A==;
-Received: from j217100.upc-j.chello.nl ([24.132.217.100] helo=noisy.programming.kicks-ass.net)
-        by merlin.infradead.org with esmtpsa (Exim 4.92.2 #3 (Red Hat Linux))
-        id 1iCIdE-0000ui-TI; Mon, 23 Sep 2019 07:19:37 +0000
-Received: from hirez.programming.kicks-ass.net (hirez.programming.kicks-ass.net [192.168.1.225])
-        (using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
-        (Client did not present a certificate)
-        by noisy.programming.kicks-ass.net (Postfix) with ESMTPS id 931FB303DFD;
-        Mon, 23 Sep 2019 09:18:47 +0200 (CEST)
-Received: by hirez.programming.kicks-ass.net (Postfix, from userid 1000)
-        id 8EE3529E3288E; Mon, 23 Sep 2019 09:19:32 +0200 (CEST)
-Date:   Mon, 23 Sep 2019 09:19:32 +0200
-From:   Peter Zijlstra <peterz@infradead.org>
-To:     "Pavel Begunkov (Silence)" <asml.silence@gmail.com>
-Cc:     Jens Axboe <axboe@kernel.dk>, Ingo Molnar <mingo@redhat.com>,
+        Mon, 23 Sep 2019 04:35:54 -0400
+Received: by mail-wm1-f68.google.com with SMTP id 3so8240364wmi.3;
+        Mon, 23 Sep 2019 01:35:52 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=gmail.com; s=20161025;
+        h=sender:date:from:to:cc:subject:message-id:references:mime-version
+         :content-disposition:in-reply-to:user-agent;
+        bh=1B3XXUv7iZ4Dl2+6K8o3oe0tw2nlEw97b0eQ1uBbyUI=;
+        b=jFZT2Eu3VBNhyieGvh6ycdJxGmRFlHILM7r4+/YEWOpinbJkVBUI/3ODDLwjcw6WNi
+         IvTj1BDjBHdPerS1DMqTgJS8ZIsVNm/VcEkUh7JP8I1ZHBF4dHN7SkHSYApanU+tqcGj
+         2BEPLnDjgSPriAKJ4OaCh5YfNoQjBTBw5FdCkL+nMw2F8ryKNGzYxFpM2EHLLpU+4bfS
+         sd6GkqXkNbS6aZgVBnwbiyV23RMZJSlYcRuNqR36ZFS9odCsvlA8wUpY4KFJc8U/yuZD
+         jRJsx9rz9BBMTJ18EyFz/kfBBWfhXnAnQtBXvUb9tYKx+bYWazzvEPkWnrHJY4Jswewe
+         y8dA==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20161025;
+        h=x-gm-message-state:sender:date:from:to:cc:subject:message-id
+         :references:mime-version:content-disposition:in-reply-to:user-agent;
+        bh=1B3XXUv7iZ4Dl2+6K8o3oe0tw2nlEw97b0eQ1uBbyUI=;
+        b=IVc3yuVVSIt7bT4Ckj/aDk/k6l4y+fuNpBOX2l3CGR4lO2hCB2owJyD06lwKpf5opH
+         rWFn80B/CrlDUdP/q4l+8vhpSuoRtEqImSu6IWKgW0fMUXj3CrH6Ijj/lqz485R5w8pW
+         xnE1biuxvauU7zlWeH6KuXNOUcgNquv6wQguQt++/lAwgCyY3jsDlIKTirzsx5YMhN/1
+         x0QFL67KyvE8NIoD6gw5Dlxxq6G5x/7WXyvGxLo27TGC6u0wTKyk6CETuNO+CeeOl15I
+         EJVi+fLiwc9X98jv7L+/ErjvDt0nBTBCSmZR6jcsy5cJ8iMcpgVtl/NWFda92BWNVdvB
+         mBrw==
+X-Gm-Message-State: APjAAAWfhMs9mnx2HfIUbXw1dWET3IyWUIoTUK+x2QhYPG9DRdfYsU2E
+        hakLiNPQR98gDX1Vc6a+d7w=
+X-Google-Smtp-Source: APXvYqxYbW0B500odDVP3qV4RPcwp/MtiDHalNNevEpuiSyml7mPOiV6yVDQBirBdA+5mYlbaKFUJw==
+X-Received: by 2002:a05:600c:219a:: with SMTP id e26mr13433766wme.86.1569227752038;
+        Mon, 23 Sep 2019 01:35:52 -0700 (PDT)
+Received: from gmail.com (2E8B0CD5.catv.pool.telekom.hu. [46.139.12.213])
+        by smtp.gmail.com with ESMTPSA id u10sm8616394wmm.0.2019.09.23.01.35.51
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Mon, 23 Sep 2019 01:35:51 -0700 (PDT)
+Date:   Mon, 23 Sep 2019 10:35:49 +0200
+From:   Ingo Molnar <mingo@kernel.org>
+To:     Jens Axboe <axboe@kernel.dk>
+Cc:     "Pavel Begunkov (Silence)" <asml.silence@gmail.com>,
+        Ingo Molnar <mingo@redhat.com>,
+        Peter Zijlstra <peterz@infradead.org>,
         linux-block@vger.kernel.org, linux-kernel@vger.kernel.org
-Subject: Re: [PATCH v2 1/2] sched/wait: Add wait_threshold
-Message-ID: <20190923071932.GD2349@hirez.programming.kicks-ass.net>
+Subject: Re: [PATCH v2 0/2] Optimise io_uring completion waiting
+Message-ID: <20190923083549.GA42487@gmail.com>
 References: <cover.1569139018.git.asml.silence@gmail.com>
- <d99ce2f7c98d4408aea50f515bbb6b89bc7850e8.1569139018.git.asml.silence@gmail.com>
+ <a4996ae7-ac0a-447b-49b2-7e96275aad29@kernel.dk>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=us-ascii
 Content-Disposition: inline
-In-Reply-To: <d99ce2f7c98d4408aea50f515bbb6b89bc7850e8.1569139018.git.asml.silence@gmail.com>
+In-Reply-To: <a4996ae7-ac0a-447b-49b2-7e96275aad29@kernel.dk>
 User-Agent: Mutt/1.10.1 (2018-07-13)
 Sender: linux-block-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-On Sun, Sep 22, 2019 at 11:08:50AM +0300, Pavel Begunkov (Silence) wrote:
-> From: Pavel Begunkov <asml.silence@gmail.com>
+
+* Jens Axboe <axboe@kernel.dk> wrote:
+
+> On 9/22/19 2:08 AM, Pavel Begunkov (Silence) wrote:
+> > From: Pavel Begunkov <asml.silence@gmail.com>
+> > 
+> > There could be a lot of overhead within generic wait_event_*() used for
+> > waiting for large number of completions. The patchset removes much of
+> > it by using custom wait event (wait_threshold).
+> > 
+> > Synthetic test showed ~40% performance boost. (see patch 2)
 > 
-> Add wait_threshold -- a custom wait_event derivative, that waits until
-> a value is equal to or greater than the specified threshold.
+> I'm fine with the io_uring side of things, but to queue this up we
+> really need Peter or Ingo to sign off on the core wakeup bits...
+> 
+> Peter?
 
-This is quite insufficient justification for this monster... what exact
-semantics do you want?
+I'm not sure an extension is needed for such a special interface, why not 
+just put a ->threshold value next to the ctx->wait field and use either 
+the regular wait_event() APIs with the proper condition, or 
+wait_event_cmd() style APIs if you absolutely need something more complex 
+to happen inside?
 
-Why can't you do this exact same with a slightly more complicated @cond
-?
+Should result in a much lower linecount and no scheduler changes. :-)
+
+Thanks,
+
+	Ingo
