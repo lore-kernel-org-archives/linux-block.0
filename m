@@ -2,124 +2,105 @@ Return-Path: <SRS0=JlK2=XS=vger.kernel.org=linux-block-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-2.0 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
-	HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,
-	USER_AGENT_SANE_1 autolearn=no autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-9.4 required=3.0 tests=DKIM_ADSP_CUSTOM_MED,
+	DKIM_INVALID,DKIM_SIGNED,FREEMAIL_FORGED_FROMDOMAIN,FREEMAIL_FROM,
+	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,
+	SPF_HELO_NONE,SPF_PASS,USER_AGENT_GIT autolearn=ham autolearn_force=no
+	version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 0E7E5C4CECF
-	for <linux-block@archiver.kernel.org>; Mon, 23 Sep 2019 19:27:47 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 237B5C4CEC4
+	for <linux-block@archiver.kernel.org>; Mon, 23 Sep 2019 20:10:10 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.kernel.org (Postfix) with ESMTP id CFB2120B7C
-	for <linux-block@archiver.kernel.org>; Mon, 23 Sep 2019 19:27:46 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id E9A31207FD
+	for <linux-block@archiver.kernel.org>; Mon, 23 Sep 2019 20:10:09 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (2048-bit key) header.d=infradead.org header.i=@infradead.org header.b="OywFVHdH"
+	dkim=fail reason="signature verification failed" (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="njkIaQHg"
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1727848AbfIWT1q (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Mon, 23 Sep 2019 15:27:46 -0400
-Received: from bombadil.infradead.org ([198.137.202.133]:46594 "EHLO
-        bombadil.infradead.org" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1726033AbfIWT1p (ORCPT
+        id S2502462AbfIWUKJ (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Mon, 23 Sep 2019 16:10:09 -0400
+Received: from mail-io1-f67.google.com ([209.85.166.67]:41557 "EHLO
+        mail-io1-f67.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S2502454AbfIWUKI (ORCPT
         <rfc822;linux-block@vger.kernel.org>);
-        Mon, 23 Sep 2019 15:27:45 -0400
-DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed;
-        d=infradead.org; s=bombadil.20170209; h=In-Reply-To:Content-Transfer-Encoding
-        :Content-Type:MIME-Version:References:Message-ID:Subject:Cc:To:From:Date:
-        Sender:Reply-To:Content-ID:Content-Description:Resent-Date:Resent-From:
-        Resent-Sender:Resent-To:Resent-Cc:Resent-Message-ID:List-Id:List-Help:
-        List-Unsubscribe:List-Subscribe:List-Post:List-Owner:List-Archive;
-        bh=WVIoWsK1jLddXUNnNoYLXIn98UncMl2WWv8vMlp/XIk=; b=OywFVHdH1BOWczhEITQgThKZe9
-        9zDCC7HcqNpHuoK6lYmTjN3eGfXsZTTslsujszPktBq/thH2ie9UKgYC4ViVRYhO+GDpxr9PWwSJu
-        kq6nQasdPh5kZRa1G3feP8NgWjooaKidJ4ADPRnIbVq7+8srsVyt7HhPrEfp9/6lDGF/dzKTn7HPx
-        caVqvuYddK4QkPuPkWcmR1nmMkcYbBjH0C5oxhFbEKZDWH6+0BYrkkEppVIl7ApewJsjnSEu1zc7K
-        QAH3N8VDLEv7F0aAgFKDdoys9QrO/4mDzyufT4HIX+sZtN+WD5wcoIC0bkQkD90grtxZxmgkutfpf
-        erJdb5iA==;
-Received: from j217100.upc-j.chello.nl ([24.132.217.100] helo=noisy.programming.kicks-ass.net)
-        by bombadil.infradead.org with esmtpsa (Exim 4.92.2 #3 (Red Hat Linux))
-        id 1iCTzs-0006Vf-BA; Mon, 23 Sep 2019 19:27:44 +0000
-Received: from hirez.programming.kicks-ass.net (hirez.programming.kicks-ass.net [192.168.1.225])
-        (using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
-        (Client did not present a certificate)
-        by noisy.programming.kicks-ass.net (Postfix) with ESMTPS id CEFA7305E42;
-        Mon, 23 Sep 2019 21:26:56 +0200 (CEST)
-Received: by hirez.programming.kicks-ass.net (Postfix, from userid 1000)
-        id 1685820C3E177; Mon, 23 Sep 2019 21:27:42 +0200 (CEST)
-Date:   Mon, 23 Sep 2019 21:27:42 +0200
-From:   Peter Zijlstra <peterz@infradead.org>
-To:     Pavel Begunkov <asml.silence@gmail.com>
-Cc:     Jens Axboe <axboe@kernel.dk>, Ingo Molnar <mingo@redhat.com>,
-        linux-block@vger.kernel.org, linux-kernel@vger.kernel.org
-Subject: Re: [PATCH v2 1/2] sched/wait: Add wait_threshold
-Message-ID: <20190923192742.GH2369@hirez.programming.kicks-ass.net>
-References: <cover.1569139018.git.asml.silence@gmail.com>
- <d99ce2f7c98d4408aea50f515bbb6b89bc7850e8.1569139018.git.asml.silence@gmail.com>
- <20190923071932.GD2349@hirez.programming.kicks-ass.net>
- <3e359937-5b19-8a4c-4243-ba2edff68504@gmail.com>
-MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-Content-Transfer-Encoding: quoted-printable
-In-Reply-To: <3e359937-5b19-8a4c-4243-ba2edff68504@gmail.com>
-User-Agent: Mutt/1.10.1 (2018-07-13)
+        Mon, 23 Sep 2019 16:10:08 -0400
+Received: by mail-io1-f67.google.com with SMTP id r26so36584918ioh.8;
+        Mon, 23 Sep 2019 13:10:08 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=gmail.com; s=20161025;
+        h=from:to:cc:subject:date:message-id;
+        bh=O4biPIS8QtKs0W4x755+TgKPEkw6EcSzOJulQCgOdjc=;
+        b=njkIaQHgxTxbxvCQR+vWZUivpNX+akdE2x1/MQJw6UKmijwTx7tDcioLHiCWPOR1As
+         2ezrnErR4qB8uh5MPY9oEv+uSM+Yzw/FRYBhw8dUYeyi36bRn1esr9cA/moDArP0sFZO
+         LGNq6sY8q+rH4eZD8M9rBBLYCIA63O53qsuJg3l4L71c0iViJsYoVlmixUSG9VxlEIL9
+         C3EhOLUS41GYEj5FzzL8m5OW+2FjNCBFan5Rp0exvo2AFgkvJbI1M5+zlSAjo9oBDfMA
+         880tkUs8fWGcC0yy1IzZjl/jqMc0dUMUbOBiRvEH3wl02pg2sacrZ15uiGq8kAeBlwgi
+         5zHA==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20161025;
+        h=x-gm-message-state:from:to:cc:subject:date:message-id;
+        bh=O4biPIS8QtKs0W4x755+TgKPEkw6EcSzOJulQCgOdjc=;
+        b=rW2nbo+pDSkLeS5ng6kdDtZM5TuPRXOOBzLAeCX/Y/DAmsiYkvm8npK+lW3KhqGDY0
+         3m3CKFlK4HMjoSOLq6tsl05SdgZRa5jDgKVu0XmgnpdR1e/PJTYnVIAzVB9YJOmGKVQ0
+         lqBmH7nKbB30HR6vWSQWtvlcfX25h/7hC3axocJq8j5FxexmiVWJ901S1kl3F+K0Ttj8
+         3K/G1kqBS2TTrzHgyp/wB1Ij9FCyHBYMWitI7iptjnyrREW3d5/hR6+cHTtt411P3q/A
+         3yMoK/1pHhq6prgov44rCWM+wRrKtE+UWdg1Jbb7zJKSleHaDErPIkRDPzLAgTwTHzcF
+         Fz+g==
+X-Gm-Message-State: APjAAAVRYJv86ukZKq8zfgwVZjuTGGgq3QT3h658n3JjpHMwz61TWn/d
+        pjmud3VdMrDfmI6Pf2gnc3c=
+X-Google-Smtp-Source: APXvYqzRCHe8NZfJwm/rb4Y5QIs6ohRRrof7MdIT+Pa/qzCoh0RmIrYSXWnnIw9K2UCgqWwuS2kRUw==
+X-Received: by 2002:a05:6602:2244:: with SMTP id o4mr1238924ioo.107.1569269407973;
+        Mon, 23 Sep 2019 13:10:07 -0700 (PDT)
+Received: from cs-dulles.cs.umn.edu (cs-dulles.cs.umn.edu. [128.101.35.54])
+        by smtp.googlemail.com with ESMTPSA id d9sm10877889ioq.9.2019.09.23.13.10.06
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Mon, 23 Sep 2019 13:10:07 -0700 (PDT)
+From:   Navid Emamdoost <navid.emamdoost@gmail.com>
+Cc:     emamd001@umn.edu, smccaman@umn.edu, kjlu@umn.edu,
+        Navid Emamdoost <navid.emamdoost@gmail.com>,
+        Josef Bacik <josef@toxicpanda.com>,
+        Jens Axboe <axboe@kernel.dk>, linux-block@vger.kernel.org,
+        nbd@other.debian.org, linux-kernel@vger.kernel.org
+Subject: [PATCH] nbd: prevent memory leak
+Date:   Mon, 23 Sep 2019 15:09:58 -0500
+Message-Id: <20190923200959.29643-1-navid.emamdoost@gmail.com>
+X-Mailer: git-send-email 2.17.1
+To:     unlisted-recipients:; (no To-header on input)
 Sender: linux-block-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
+In nbd_add_socket when krealloc succeeds, if nsock's allocation fail the
+reallocted memory is leak. The correct behaviour should be assigning the
+reallocted memory to config->socks right after success.
 
-A: Because it messes up the order in which people normally read text.
-Q: Why is top-posting such a bad thing?
-A: Top-posting.
-Q: What is the most annoying thing in e-mail?
+Signed-off-by: Navid Emamdoost <navid.emamdoost@gmail.com>
+---
+ drivers/block/nbd.c | 5 +++--
+ 1 file changed, 3 insertions(+), 2 deletions(-)
 
-On Mon, Sep 23, 2019 at 07:37:46PM +0300, Pavel Begunkov wrote:
-> Just in case duplicating a mail from the cover-letter thread:
-
-Just because every patch should have a self contained and coherent
-Changelog.
-
-> It could be done with @cond indeed, that's how it works for now.
-> However, this addresses performance issues only.
->=20
-> The problem with wait_event_*() is that, if we have a counter and are
-> trying to wake up tasks after each increment, it would schedule each
-> waiting task O(threshold) times just for it to spuriously check @cond
-> and go back to sleep. All that overhead (memory barriers, registers
-> save/load, accounting, etc) turned out to be enough for some workloads
-> to slow down the system.
->=20
-> With this specialisation it still traverses a wait list and makes
-> indirect calls to the checker callback, but the list supposedly is
-> fairly  small, so performance there shouldn't be a problem, at least for
-> now.
->=20
-> Regarding semantics; It should wake a task when a value passed to
-> wake_up_threshold() is greater or equal then a task's threshold, that is
-> specified individually for each task in wait_threshold_*().
->=20
-> In pseudo code:
-> ```
-> def wake_up_threshold(n, wait_queue):
-> 	for waiter in wait_queue:
-> 		waiter.wake_up_if(n >=3D waiter.threshold);
-> ```
->=20
-> Any thoughts how to do it better? Ideas are very welcome.
->=20
-> BTW, this monster is mostly a copy-paste from wait_event_*(),
-> wait_bit_*(). We could try to extract some common parts from these
-> three, but that's another topic.
-
-I don't think that is another topic at all. It is a quality of
-implementation issue. We already have too many copies of all that (3).
-
-So basically you want to fudge the wake function to do the/a @cond test,
-not unlike what wait_bit already does, but differenly.
-
-I'm really rather annoyed with C for not having proper lambda functions;
-that would make all this so much easier. Anyway, let me have a poke at
-this in the morning, it's late already.
-
-Also, is anything actually using wait_queue_entry::private ? I'm
-not finding any in a hurry.
-
+diff --git a/drivers/block/nbd.c b/drivers/block/nbd.c
+index a8e3815295fe..8ae3bd2e7b30 100644
+--- a/drivers/block/nbd.c
++++ b/drivers/block/nbd.c
+@@ -987,14 +987,15 @@ static int nbd_add_socket(struct nbd_device *nbd, unsigned long arg,
+ 		sockfd_put(sock);
+ 		return -ENOMEM;
+ 	}
++
++	config->socks = socks;
++
+ 	nsock = kzalloc(sizeof(struct nbd_sock), GFP_KERNEL);
+ 	if (!nsock) {
+ 		sockfd_put(sock);
+ 		return -ENOMEM;
+ 	}
+ 
+-	config->socks = socks;
+-
+ 	nsock->fallback_index = -1;
+ 	nsock->dead = false;
+ 	mutex_init(&nsock->tx_lock);
+-- 
+2.17.1
 
