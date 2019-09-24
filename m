@@ -7,54 +7,54 @@ X-Spam-Status: No, score=-5.3 required=3.0 tests=DKIM_SIGNED,DKIM_VALID,
 	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,SPF_HELO_NONE,
 	SPF_PASS,USER_AGENT_SANE_1 autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id B07B4C432C1
-	for <linux-block@archiver.kernel.org>; Tue, 24 Sep 2019 09:22:01 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id B6004C432C1
+	for <linux-block@archiver.kernel.org>; Tue, 24 Sep 2019 09:33:24 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.kernel.org (Postfix) with ESMTP id 6ADD9214D9
-	for <linux-block@archiver.kernel.org>; Tue, 24 Sep 2019 09:22:01 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id 6F1DA2146E
+	for <linux-block@archiver.kernel.org>; Tue, 24 Sep 2019 09:33:24 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="MlXwiZKQ"
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="bnSVC199"
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S2504163AbfIXJWA (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Tue, 24 Sep 2019 05:22:00 -0400
-Received: from mail-wm1-f67.google.com ([209.85.128.67]:54282 "EHLO
-        mail-wm1-f67.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S2504078AbfIXJWA (ORCPT
+        id S2395176AbfIXJdY (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Tue, 24 Sep 2019 05:33:24 -0400
+Received: from mail-wr1-f65.google.com ([209.85.221.65]:41017 "EHLO
+        mail-wr1-f65.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S2390805AbfIXJdX (ORCPT
         <rfc822;linux-block@vger.kernel.org>);
-        Tue, 24 Sep 2019 05:22:00 -0400
-Received: by mail-wm1-f67.google.com with SMTP id p7so1333113wmp.4;
-        Tue, 24 Sep 2019 02:21:57 -0700 (PDT)
+        Tue, 24 Sep 2019 05:33:23 -0400
+Received: by mail-wr1-f65.google.com with SMTP id h7so1114940wrw.8;
+        Tue, 24 Sep 2019 02:33:19 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=gmail.com; s=20161025;
         h=to:cc:references:from:autocrypt:subject:message-id:date:user-agent
          :mime-version:in-reply-to;
-        bh=4Svmg2pNEqL0dYuavoZKpfwgMfpM01EW1kt+QBDceJE=;
-        b=MlXwiZKQikdeBvxmrJfV8Gai1mjWMgnJiETI5J2JOUbsvW9sDWu+myjEMZ81O16U7d
-         lzkZ+wOBuGJbQmu7tDADq4B7UEjTTY4XMXkbKJjtSgaGCMUhhbKtRyirF+6YGQ/uCmPt
-         cMPs6TU0noXVCTtbEAayYuuiYEmAPAdCFZOTJI/x4XOVIerm69OUcqqiG1CVRig76Dyr
-         U7+n4j6fNgQr6JGYEV1eot42yopdkULYe9jhLUOnpuWFw36a6B9H1IfrdgDbnegQu61Z
-         SMOZCLNvEhNBQMjhRmaX4zoiep76KNTmEN1jbthbi+DvkdxxBhuWS35eOIM9mxK2z7RX
-         3zcA==
+        bh=C6yH7/gGjBhKqOMW5KC8HwPnJ4drmejlx8w5NBDl5W4=;
+        b=bnSVC199YlDC8wYmEePJJvNzUHHIMEXXOTvB3FOxpe5uzgOHsOaPPwMFflcCws0GMd
+         rguZKSOJEiIMufLFyFzTWmCKHwlVX6Q9CTihCF1XX1L7cA0KCFtgQ1vTg3ZKI3YVZcNb
+         FPS9eihNt0nfhpwF7vA43+4QwtJVo+bhm/9r/92YaSSJ0URedpHnPHqpo6XAWKksJaIb
+         v5I5nJgOrvMiBg3W/fv1bN2W7kiFXbz4HxAArO+uifdhf1pLpxXzLsUMrwSw1/FB4j9B
+         dMPkf9vLk8k67maNrskglxmVI9zO8UHXq5Ij+giB0cQ1MrcoFGXz0oVhpHrQZr6gAkHW
+         b35A==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=1e100.net; s=20161025;
         h=x-gm-message-state:to:cc:references:from:autocrypt:subject
          :message-id:date:user-agent:mime-version:in-reply-to;
-        bh=4Svmg2pNEqL0dYuavoZKpfwgMfpM01EW1kt+QBDceJE=;
-        b=ZRXgl7RuGl3zk2FDRix1ltXT1L2+5i7lK+1Ux5lfc2KzNHxp13uC9wsEQKaOvIitV/
-         M4jhXXOsBU88giLwJAWcJqlCZ/Dp4Mx2kXD//3eDc0E9sJM4VIFdJ73i/z/HUP54uhNO
-         q1v3cGxFM4Izo7bB6BSCezkjHeUv1d9Cgs+tURF12m21PEXUGJG3/IGmW55uBWmTyZw2
-         qdD6MFXpZ1hE4qYOq7ZYXiechDeRz6u25lZJszrwVswutpTjPlB4pmOV4j6NU2pSMllS
-         p7Ph7XxVpUHeHF7jpY4oVtfj7Pk+lf3SoC7ZYcFEI2GuUNnekcJ+Q2ecVuV396NGL8i5
-         7OWw==
-X-Gm-Message-State: APjAAAWCln5lc7W1iGoF1U17/Z46epVOcRNjXrxKXsfr1+DC9kZfojKb
-        2jm7xgDfnSgxQ1JI/3z7jLVC3P/2FkUNKg==
-X-Google-Smtp-Source: APXvYqwASUkYuwhefE6C0dpz46PSCzveOWWztKrDI0h0mZHrKx8qLHc+PMoDXpwYAq4ylZth+IfQbw==
-X-Received: by 2002:a05:600c:291c:: with SMTP id i28mr1751140wmd.98.1569316916487;
-        Tue, 24 Sep 2019 02:21:56 -0700 (PDT)
+        bh=C6yH7/gGjBhKqOMW5KC8HwPnJ4drmejlx8w5NBDl5W4=;
+        b=IeZkEQAV4RGo6k2Y9RG0qfyTdGNqaQ7+5vzr3BG7Npg7GzAh6jCIujeAa5MZeBUcIO
+         yK00kftAp1neg/gKpkepXFX9DezJ+xXBmJv+LYmviJZoXOdxq7xzNrf/0vz3tZQv29Ux
+         WHqjrY9KCR5pnxSgA8ABbDlOOE+pPJOH8T6rgCQ7NF6FTXwoGn/jI/fG/grokbzqZyxt
+         OsTvD8l+1mXOA06kLGfGkvqLFRzo0fuqpulX8iYi04BDxWsrPkcp+pZuV9HsTqvd7iPS
+         Hou8QznjYBq3iXpGoChnDkSNu+tD3yuCHIrgBWDNwp115ZqGedGCjK2HHof0rr0B/Ba3
+         n7Xw==
+X-Gm-Message-State: APjAAAXReYcAxhmNdiiGUJuw0sLSzRT0T4fttS+a6TRsN/2S67WpJw7E
+        DWbbJWpO60ntg5zRd56Z7NCZAc2vzY1HUA==
+X-Google-Smtp-Source: APXvYqyUj08no09jND8EC7UUrse3ElPHO9PljGRmK0Riv8bJcshOgyIh0MFuVkkipnecUjvRbvCffw==
+X-Received: by 2002:a5d:5183:: with SMTP id k3mr1424427wrv.55.1569317598076;
+        Tue, 24 Sep 2019 02:33:18 -0700 (PDT)
 Received: from [192.168.1.75] ([65.39.69.237])
-        by smtp.gmail.com with ESMTPSA id z189sm1974398wmc.25.2019.09.24.02.21.55
+        by smtp.gmail.com with ESMTPSA id g185sm2994575wme.10.2019.09.24.02.33.17
         (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
-        Tue, 24 Sep 2019 02:21:55 -0700 (PDT)
+        Tue, 24 Sep 2019 02:33:17 -0700 (PDT)
 To:     Jens Axboe <axboe@kernel.dk>, Ingo Molnar <mingo@kernel.org>
 Cc:     Ingo Molnar <mingo@redhat.com>,
         Peter Zijlstra <peterz@infradead.org>,
@@ -68,6 +68,8 @@ References: <cover.1569139018.git.asml.silence@gmail.com>
  <759b9b48-1de3-1d43-3e39-9c530bfffaa0@kernel.dk>
  <43244626-9cfd-0c0b-e7a1-878363712ef3@gmail.com>
  <f2608e3d-bb4e-9984-79e8-a2ab4f855c7f@kernel.dk>
+ <b999490f-6138-b685-5472-5cd1843b747d@kernel.dk>
+ <ed37058b-ee96-7d44-1dc7-d2c48e2ac23f@kernel.dk>
 From:   Pavel Begunkov <asml.silence@gmail.com>
 Autocrypt: addr=asml.silence@gmail.com; prefer-encrypt=mutual; keydata=
  mQINBFmKBOQBEAC76ZFxLAKpDw0bKQ8CEiYJRGn8MHTUhURL02/7n1t0HkKQx2K1fCXClbps
@@ -113,29 +115,29 @@ Autocrypt: addr=asml.silence@gmail.com; prefer-encrypt=mutual; keydata=
  m3J6pjwSJY/zNwuFPs9zGEnRO4g0BUbwGdbuvDzaq6/3OJLKohr5eLXNU3JkT+3HezydWm3W
  OPhauth7W0db74Qd49HXK0xe/aPrK+Cp+kU1HRactyNtF8jZQbhMCC8vMGukZtWaAwpjWiiH bA==
 Subject: Re: [PATCH v2 0/2] Optimise io_uring completion waiting
-Message-ID: <38ea2681-dbf0-457a-dcc0-406d10e2572b@gmail.com>
-Date:   Tue, 24 Sep 2019 12:21:54 +0300
+Message-ID: <0fec66fb-4534-59f8-cd88-d8d2297779aa@gmail.com>
+Date:   Tue, 24 Sep 2019 12:33:13 +0300
 User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:68.0) Gecko/20100101
  Thunderbird/68.1.0
 MIME-Version: 1.0
-In-Reply-To: <f2608e3d-bb4e-9984-79e8-a2ab4f855c7f@kernel.dk>
+In-Reply-To: <ed37058b-ee96-7d44-1dc7-d2c48e2ac23f@kernel.dk>
 Content-Type: multipart/signed; micalg=pgp-sha256;
  protocol="application/pgp-signature";
- boundary="lpznCLlSs4WrAqwlvXfl5dExYmPCsu9vv"
+ boundary="8PEOQlqvbByxt9af5p0EE8WiixlcvoZMA"
 Sender: linux-block-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
 This is an OpenPGP/MIME signed message (RFC 4880 and 3156)
---lpznCLlSs4WrAqwlvXfl5dExYmPCsu9vv
-Content-Type: multipart/mixed; boundary="AYFSNnwktxvoAOmfPIeRB9q8WipSBL4dg";
+--8PEOQlqvbByxt9af5p0EE8WiixlcvoZMA
+Content-Type: multipart/mixed; boundary="seaUA6HPaCZDrdidUIQSqHzQzewtApgsq";
  protected-headers="v1"
 From: Pavel Begunkov <asml.silence@gmail.com>
 To: Jens Axboe <axboe@kernel.dk>, Ingo Molnar <mingo@kernel.org>
 Cc: Ingo Molnar <mingo@redhat.com>, Peter Zijlstra <peterz@infradead.org>,
  linux-block@vger.kernel.org, linux-kernel@vger.kernel.org
-Message-ID: <38ea2681-dbf0-457a-dcc0-406d10e2572b@gmail.com>
+Message-ID: <0fec66fb-4534-59f8-cd88-d8d2297779aa@gmail.com>
 Subject: Re: [PATCH v2 0/2] Optimise io_uring completion waiting
 References: <cover.1569139018.git.asml.silence@gmail.com>
  <a4996ae7-ac0a-447b-49b2-7e96275aad29@kernel.dk>
@@ -146,50 +148,89 @@ References: <cover.1569139018.git.asml.silence@gmail.com>
  <759b9b48-1de3-1d43-3e39-9c530bfffaa0@kernel.dk>
  <43244626-9cfd-0c0b-e7a1-878363712ef3@gmail.com>
  <f2608e3d-bb4e-9984-79e8-a2ab4f855c7f@kernel.dk>
-In-Reply-To: <f2608e3d-bb4e-9984-79e8-a2ab4f855c7f@kernel.dk>
+ <b999490f-6138-b685-5472-5cd1843b747d@kernel.dk>
+ <ed37058b-ee96-7d44-1dc7-d2c48e2ac23f@kernel.dk>
+In-Reply-To: <ed37058b-ee96-7d44-1dc7-d2c48e2ac23f@kernel.dk>
 
---AYFSNnwktxvoAOmfPIeRB9q8WipSBL4dg
+--seaUA6HPaCZDrdidUIQSqHzQzewtApgsq
 Content-Type: text/plain; charset=utf-8
 Content-Language: en-US
 Content-Transfer-Encoding: quoted-printable
 
-On 24/09/2019 11:02, Jens Axboe wrote:
-> On 9/24/19 1:06 AM, Pavel Begunkov wrote:
->> On 24/09/2019 02:00, Jens Axboe wrote:
->>>> I think we can do the same thing, just wrapping the waitqueue in a
->>>> structure with a count in it, on the stack. Got some flight time
->>>> coming up later today, let me try and cook up a patch.
+
+
+On 24/09/2019 11:36, Jens Axboe wrote:
+> On 9/24/19 2:27 AM, Jens Axboe wrote:
+>> On 9/24/19 2:02 AM, Jens Axboe wrote:
+>>> On 9/24/19 1:06 AM, Pavel Begunkov wrote:
+>>>> On 24/09/2019 02:00, Jens Axboe wrote:
+>>>>>> I think we can do the same thing, just wrapping the waitqueue in a=
+
+>>>>>> structure with a count in it, on the stack. Got some flight time
+>>>>>> coming up later today, let me try and cook up a patch.
+>>>>>
+>>>>> Totally untested, and sent out 5 min before departure... But someth=
+ing
+>>>>> like this.
+>>>> Hmm, reminds me my first version. Basically that's the same thing bu=
+t
+>>>> with macroses inlined. I wanted to make it reusable and self-contain=
+ed,
+>>>> though.
+>>>>
+>>>> If you don't think it could be useful in other places, sure, we coul=
+d do
+>>>> something like that. Is that so?
 >>>
->>> Totally untested, and sent out 5 min before departure... But somethin=
-g
->>> like this.
->> Hmm, reminds me my first version. Basically that's the same thing but
->> with macroses inlined. I wanted to make it reusable and self-contained=
-,
->> though.
+>>> I totally agree it could be useful in other places. Maybe formalized =
+and
+>>> used with wake_up_nr() instead of adding a new primitive? Haven't loo=
+ked
+>>> into that, I may be talking nonsense.
+>>>
+>>> In any case, I did get a chance to test it and it works for me. Here'=
+s
+>>> the "finished" version, slightly cleaned up and with a comment added
+>>> for good measure.
 >>
->> If you don't think it could be useful in other places, sure, we could =
-do
->> something like that. Is that so?
+>> Notes:
+>>
+>> This version gets the ordering right, you need exclusive waits to get
+>> fifo ordering on the waitqueue.
+>>
+>> Both versions (yours and mine) suffer from the problem of potentially
+>> waking too many. I don't think this is a real issue, as generally we
+>> don't do threaded access to the io_urings. But if you had the followin=
+g
+>> tasks wait on the cqring:
+>>
+>> [min_events =3D 32], [min_events =3D 8], [min_events =3D 8]
+>>
+>> and we reach the io_cqring_events() =3D=3D threshold, we'll wake all t=
+hree.
+>> I don't see a good solution to this, so I suspect we just live with
+>> until proven an issue. Both versions are much better than what we have=
+
+>> now.
 >=20
-> I totally agree it could be useful in other places. Maybe formalized an=
-d
-> used with wake_up_nr() instead of adding a new primitive? Haven't looke=
-d
-> into that, I may be talking nonsense.
+> Forgot an issue around signal handling, version below adds the
+> right check for that too.
 
-@nr there is about number of tasks to wake up. AFAIK doesn't solve the
-problem.
-
+It seems to be a good reason to not keep reimplementing
+"prepare_to_wait*() + wait loop" every time, but keep it in sched :)
 
 >=20
-> In any case, I did get a chance to test it and it works for me. Here's
-> the "finished" version, slightly cleaned up and with a comment added
-> for good measure.
+> Curious what your test case was for this?
+You mean a performance test case? It's briefly described in a comment
+for the second patch. That's just rewritten io_uring-bench, with
+1. a thread generating 1 request per call in a loop
+2. and the second thread waiting for ~128 events.
+Both are pinned to the same core.
+
 >=20
 >=20
 > diff --git a/fs/io_uring.c b/fs/io_uring.c
-> index ca7570aca430..14fae454cf75 100644
+> index ca7570aca430..3fbab5692f14 100644
 > --- a/fs/io_uring.c
 > +++ b/fs/io_uring.c
 > @@ -2768,6 +2768,42 @@ static int io_ring_submit(struct io_ring_ctx *ct=
@@ -261,7 +302,7 @@ x, unsigned int to_submit,
 >  	int ret;
 > =20
 >  	if (io_cqring_events(rings) >=3D min_events)
-> @@ -2795,15 +2839,16 @@ static int io_cqring_wait(struct io_ring_ctx *c=
+> @@ -2795,15 +2839,18 @@ static int io_cqring_wait(struct io_ring_ctx *c=
 tx, int min_events,
 >  			return ret;
 >  	}
@@ -281,6 +322,8 @@ tx, int min_events,
 > +		if (io_should_wake(&iowq))
 > +			break;
 > +		schedule();
+> +		if (signal_pending(current))
+> +			break;
 > +		set_current_state(TASK_INTERRUPTIBLE);
 > +	} while (1);
 > +	finish_wait(&ctx->wait, &iowq.wq);
@@ -295,28 +338,28 @@ Yours sincerely,
 Pavel Begunkov
 
 
---AYFSNnwktxvoAOmfPIeRB9q8WipSBL4dg--
+--seaUA6HPaCZDrdidUIQSqHzQzewtApgsq--
 
---lpznCLlSs4WrAqwlvXfl5dExYmPCsu9vv
+--8PEOQlqvbByxt9af5p0EE8WiixlcvoZMA
 Content-Type: application/pgp-signature; name="signature.asc"
 Content-Description: OpenPGP digital signature
 Content-Disposition: attachment; filename="signature.asc"
 
 -----BEGIN PGP SIGNATURE-----
 
-iQIzBAEBCAAdFiEE+6JuPTjTbx479o3OWt5b1Glr+6UFAl2J4DIACgkQWt5b1Glr
-+6WNLA//bv2aKPQXnFAUJhFNN41r3jG8nJEkr6M+DTwBdH7wd7VL9PgxgSZwQRQq
-JW9rkpnOj5omgn8k7GYP+KoUNRa1cLani69YXfWVmC6ZSe3RL/+9yqyY/fbMZzHD
-4Yx7chOSSV+up7wX6Vs4jw/bfz5rqnXscY7ZMLj5nopex3N2kmwfgWaetyIW8K4x
-11ijC13G2fGxpkMnGbKLDFxjnp6O25J6jWbUqIEkr0qQeXRjGqdwgguFrzT03ixm
-Z1UAfJV5oBUIkL1GImZsqh+ShffLyuW6W9YnCa4bxdR+7m/OJIbr7K5OEvBdT7dh
-6xWKEMl9My/p5PWZ145k8tNLyHYoYlXqmQyzn2DWGqkTdegY6UeEJxkhJKpT2OgU
-FS3LpXFS7SJk/dMY3SSu7IjWXuLNRGQqTWejh7K8v2xbjoSk1d752tkzxkfIshhs
-yaLuTg+XX6w9/sn/559+t7zj2tIYSI1Xtp55SuPIWFiBo40NTHEc7n471AG21Dyl
-rwhyArFclYcBf99in4D4vzyDGuSczI3opTS3v+TfqNx196A1M7E3xnN8KoLlKKOe
-+3gg9lwVqiOMtOdQchVpv0UHE9pjfspoQSoN43NIqTGLmR9UD2Ybn3zqKugRT4lU
-5dIGjcD/uh7xzDLCyvyPvw+0Iiu2QltWTR+Bs8EkBix18xhFIKw=
-=2EOm
+iQIzBAEBCAAdFiEE+6JuPTjTbx479o3OWt5b1Glr+6UFAl2J4tkACgkQWt5b1Glr
++6VYdQ/+Mx7N6LNvYiwc6C1BuUEUmj5N9HHtez7ikgVX8bPO2uQc3+PmSr9l3hHc
+eEFsuPXWR9ClMemtRaFyX47BzOaQZX/JuffN1wr8MeKd8OXeSQLK0Ymrn3bMKdTP
+RVv8ROS8Qbb9EyCjC913DiUkxNmZz+Wm45+yg40OQ0doRyo2hcWmIsVvr1YoY/Y0
+WxdRU7TKUNrD8NwST1grQLLBKg+cMKGR1XYy7SFJf+TJM3DJ5Awy2V2aqVJXx+qI
+WH0iHtReqYwTNCXEZJk5AA7KM3ukApM96Kzg8LbbL0Vjb94T2TQ8MBpQ9VfQbeT/
+H/8DMpqauWqJqlVyzsaVuNfDOlkFY2YsA2ZD+EWP3E4VfF+oYFNV/xE+SmCvjXjh
+gux59p2wJyKMAMsZrE4/1PimE4NdMehjEVSYDJZ8epl0nOzUieUzdpdZxh69Yxy7
+7eguBIDwtc942i+HYiwQmDM6czU3vk+I1/0t01Ua9RgO16+Whbfu33iSBhXdY4yc
+rQF1Dy5EyHjvKDU94jTDxB3xzUwCTbzHV6eB29Y+dGIkBGsoxf8EDTeaeKKy8O4W
+jPg/2527/e/LoM4halXbDOMIpIdVxZJykLm88MeJybgIY+b5qR5CmHygCEbqcYVr
+YW0+ds9FXcLro19WuTeU1aqkUfebclaT4bmBtDLoU7bfxATOZbY=
+=u/dF
 -----END PGP SIGNATURE-----
 
---lpznCLlSs4WrAqwlvXfl5dExYmPCsu9vv--
+--8PEOQlqvbByxt9af5p0EE8WiixlcvoZMA--
