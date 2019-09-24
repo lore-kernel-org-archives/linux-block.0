@@ -2,83 +2,68 @@ Return-Path: <SRS0=56XS=XT=vger.kernel.org=linux-block-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-2.2 required=3.0 tests=DKIM_SIGNED,DKIM_VALID,
-	HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,
-	USER_AGENT_SANE_1 autolearn=no autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-7.2 required=3.0 tests=DKIM_SIGNED,DKIM_VALID,
+	HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,MENTIONS_GIT_HOSTING,
+	SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED,USER_AGENT_SANE_1 autolearn=ham
+	autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 50514C432C1
-	for <linux-block@archiver.kernel.org>; Tue, 24 Sep 2019 10:34:29 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id E86C7C432C1
+	for <linux-block@archiver.kernel.org>; Tue, 24 Sep 2019 10:45:32 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.kernel.org (Postfix) with ESMTP id 240B020872
-	for <linux-block@archiver.kernel.org>; Tue, 24 Sep 2019 10:34:29 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id AF2392168B
+	for <linux-block@archiver.kernel.org>; Tue, 24 Sep 2019 10:45:32 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel-dk.20150623.gappssmtp.com header.i=@kernel-dk.20150623.gappssmtp.com header.b="QN0xTkk5"
+	dkim=pass (2048-bit key) header.d=kernel-dk.20150623.gappssmtp.com header.i=@kernel-dk.20150623.gappssmtp.com header.b="H0/L6W7m"
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S2405020AbfIXKe2 (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Tue, 24 Sep 2019 06:34:28 -0400
-Received: from mail-pg1-f194.google.com ([209.85.215.194]:33215 "EHLO
-        mail-pg1-f194.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S2409465AbfIXKe1 (ORCPT
+        id S2409554AbfIXKpc (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Tue, 24 Sep 2019 06:45:32 -0400
+Received: from mail-pg1-f171.google.com ([209.85.215.171]:46322 "EHLO
+        mail-pg1-f171.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S2409553AbfIXKpb (ORCPT
         <rfc822;linux-block@vger.kernel.org>);
-        Tue, 24 Sep 2019 06:34:27 -0400
-Received: by mail-pg1-f194.google.com with SMTP id i30so1104099pgl.0
-        for <linux-block@vger.kernel.org>; Tue, 24 Sep 2019 03:34:24 -0700 (PDT)
+        Tue, 24 Sep 2019 06:45:31 -0400
+Received: by mail-pg1-f171.google.com with SMTP id a3so1074749pgm.13
+        for <linux-block@vger.kernel.org>; Tue, 24 Sep 2019 03:45:31 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=kernel-dk.20150623.gappssmtp.com; s=20150623;
-        h=subject:from:to:cc:references:message-id:date:user-agent
-         :mime-version:in-reply-to:content-language:content-transfer-encoding;
-        bh=3y++5MWe+nfLT59J4EFQaaYthSHGH3KQ5ez/42aOPdc=;
-        b=QN0xTkk5/nR8L2agLUEjaJWbrf1cK1vvJFl4PJiojL+cuYVlgsVfnXG9d2rVjhlKIX
-         kpiy7ClqUnrTSZe1w4XugAmftdG6mzzopfjOs0WmwB1byRgHEIZZ2z2cQmsFxw4zqUG/
-         J3xgCKktDwgCvDrh0OQuDt5FNYzZBsuyj2cdEc4ydpJ7I+XLyhnwFiFiGeTcYFrV/2JV
-         0EbxhHZDLXxNSSW3jXfooDs3rnoy8DRw7+ieGGTFI2tBg96RkNukUj7vtwh1Nl410joB
-         phAtzN6ScbyicCsjP5w3+Tb0hLsmkJZI2TeNjxCMAP6zEYs0w9Ym00sdaT1/cg6BhwBQ
-         VUyg==
+        h=to:cc:from:subject:message-id:date:user-agent:mime-version
+         :content-language:content-transfer-encoding;
+        bh=q1G0viLU/RDlSSmlgOAiQZrcDIGZRL5YHKlCgfal0JY=;
+        b=H0/L6W7mj+4h4I2DCedWOPdjxxQ+V1sEdmSNAcdE83eSd0pzN75EU1Su6CuCyEE0X4
+         5REI/+N/yZspB/4ILgWwIBMU7YATXaRATMEEijlJTnH88zG0gMPw131AdRTzZ8W3q62r
+         8WNKQ4JZZlWehO1nmUGFK7i0JBk6m3iORJAGsS3tL0FrBF3fP2p6GCptfGqqy8BsW0F/
+         umU8qZUSIFxoBiRWYfb0pDaTznrA6BIMjlnCTc2DRYjjXu+ODzimo9lVL5h4T+wAUM0C
+         S+6tSsKfJ1BAOdXInO9kK6YnnA+9LFyEkbZwxh7a6L296Hg/TCEVIHjmjXzhgXAydfIL
+         ROhQ==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=1e100.net; s=20161025;
-        h=x-gm-message-state:subject:from:to:cc:references:message-id:date
-         :user-agent:mime-version:in-reply-to:content-language
-         :content-transfer-encoding;
-        bh=3y++5MWe+nfLT59J4EFQaaYthSHGH3KQ5ez/42aOPdc=;
-        b=ed85eUD3H66GoFXZHxG6QjD2/cNYZBdoHqol7PlfUtMfVtu2sS/a2Qj6a25lVqYEQg
-         qkqU6SoukSSRf8ejsT+KTzl45NwxJa4wqsLoAMffVU4qiEohfkE3qFKXeWKPcciD6bSf
-         0iQY1J7wv2TmbvWLnUiLLrRyB6Jz3Qa9G74cHsm1sFnfyeLIaxvk0LZvlmPHi1de0qCH
-         4qgzoOLYzLzZqOfH0uUrlaobdSAVFY6ogQBMW3CViiIAy4p0q9AbZ6n0f3H9wtNwr0/0
-         Dm0OLrCv+FwzJ46VBLh963AWzEKr1AqzuFeJhrvd517dIxn98TeyXkKWCtcjN+T+/6gY
-         ah6A==
-X-Gm-Message-State: APjAAAVQ3Lx9owEobZ5SRh5CnrWL8Y5Cev//up77+Dpq11UnDI6kZKnX
-        w2/N13vfoZ3TlIWs6M+eYyIvaos5AImrWr1E
-X-Google-Smtp-Source: APXvYqwM9nLMf57gHat2qR6cvPByEWl6hqrFgd7GudTP9BsEhIq/NHvJGBJVCRtDZNDyLjyEC3o+Pw==
-X-Received: by 2002:a63:67c2:: with SMTP id b185mr2384022pgc.436.1569321264430;
-        Tue, 24 Sep 2019 03:34:24 -0700 (PDT)
+        h=x-gm-message-state:to:cc:from:subject:message-id:date:user-agent
+         :mime-version:content-language:content-transfer-encoding;
+        bh=q1G0viLU/RDlSSmlgOAiQZrcDIGZRL5YHKlCgfal0JY=;
+        b=oQmo8MxhKHHmkSBFYo89nMwZcg9SN3kAg5iIEQOHjyI/uf2O8NvYdBzGTx2ZT/oqDW
+         97i2TnyrGAI+ZUkThK+WJkhXo9RGqxxzmpmeqCidoeJwStkhuSDsLmYNXdy0beM/IhG9
+         CT2wbpLxx1UPH/CHllqS1DsyAf1O4HoOv8YA0jOPh7Q6RZefHVLTRxiOg/bTCjv62mKX
+         94VJqL8D9bIyY8f3iFOp1ggowuSVv0lJCqEXQ2Wbbaltj1ARwiPs/VKKErqjuoDzEyfG
+         EdnzfcaBqlihfY0ONPO3NULgRwNJ2XLvJ4UHc0GiymWsHQjcczX66zYZwWhH7qbwGptj
+         IWJQ==
+X-Gm-Message-State: APjAAAXM3fMnZ08tVRUgErkf4fqAQOq40+o77jNSncXP0apAvHkXvznq
+        AmxGwj7o3xif+cgdaPNUv1zs+klacsJzbjji
+X-Google-Smtp-Source: APXvYqwsdCUVLm55EYxLVxNlpbGTfl60+k0ztWlyUrHspkjN6wi9ukFDn332eFfa0ND3IwEiZBOw4w==
+X-Received: by 2002:a17:90a:fe04:: with SMTP id ck4mr2308006pjb.74.1569321928322;
+        Tue, 24 Sep 2019 03:45:28 -0700 (PDT)
 Received: from ?IPv6:2600:380:8419:743e:a9a6:f93b:f300:79e6? ([2600:380:8419:743e:a9a6:f93b:f300:79e6])
-        by smtp.gmail.com with ESMTPSA id m2sm2387410pff.154.2019.09.24.03.34.20
+        by smtp.gmail.com with ESMTPSA id h8sm1719742pfo.64.2019.09.24.03.45.25
         (version=TLS1_2 cipher=ECDHE-RSA-AES128-GCM-SHA256 bits=128/128);
-        Tue, 24 Sep 2019 03:34:23 -0700 (PDT)
-Subject: Re: [PATCH v2 0/2] Optimise io_uring completion waiting
+        Tue, 24 Sep 2019 03:45:27 -0700 (PDT)
+To:     Linus Torvalds <torvalds@linux-foundation.org>
+Cc:     "linux-block@vger.kernel.org" <linux-block@vger.kernel.org>
 From:   Jens Axboe <axboe@kernel.dk>
-To:     Peter Zijlstra <peterz@infradead.org>
-Cc:     Pavel Begunkov <asml.silence@gmail.com>,
-        Ingo Molnar <mingo@kernel.org>, Ingo Molnar <mingo@redhat.com>,
-        linux-block@vger.kernel.org, linux-kernel@vger.kernel.org
-References: <a4996ae7-ac0a-447b-49b2-7e96275aad29@kernel.dk>
- <20190923083549.GA42487@gmail.com>
- <c15b2d54-c722-8fb4-266f-b589c1a21aa5@gmail.com>
- <df612e90-8999-0085-d2d6-4418e044e429@gmail.com>
- <731b2087-7786-5374-68ff-8cba42f0cd68@kernel.dk>
- <759b9b48-1de3-1d43-3e39-9c530bfffaa0@kernel.dk>
- <43244626-9cfd-0c0b-e7a1-878363712ef3@gmail.com>
- <f2608e3d-bb4e-9984-79e8-a2ab4f855c7f@kernel.dk>
- <b999490f-6138-b685-5472-5cd1843b747d@kernel.dk>
- <ed37058b-ee96-7d44-1dc7-d2c48e2ac23f@kernel.dk>
- <20190924094942.GN2349@hirez.programming.kicks-ass.net>
- <6f935fb9-6ebd-1df1-0cd0-69e34a16fa7e@kernel.dk>
-Message-ID: <29e6e06e-351f-c19d-ed7c-51f30c9ca887@kernel.dk>
-Date:   Tue, 24 Sep 2019 12:34:17 +0200
+Subject: [GIT PULL] Block bits for 5.4-rc1
+Message-ID: <b1a3b9fe-7e66-4275-2a84-da70a4580637@kernel.dk>
+Date:   Tue, 24 Sep 2019 12:45:23 +0200
 User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:60.0) Gecko/20100101
  Thunderbird/60.8.0
 MIME-Version: 1.0
-In-Reply-To: <6f935fb9-6ebd-1df1-0cd0-69e34a16fa7e@kernel.dk>
 Content-Type: text/plain; charset=utf-8
 Content-Language: en-US
 Content-Transfer-Encoding: 7bit
@@ -87,24 +72,70 @@ Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-On 9/24/19 4:13 AM, Jens Axboe wrote:
-> On 9/24/19 3:49 AM, Peter Zijlstra wrote:
->> On Tue, Sep 24, 2019 at 10:36:28AM +0200, Jens Axboe wrote:
->>
->>> +struct io_wait_queue {
->>> +	struct wait_queue_entry wq;
->>> +	struct io_ring_ctx *ctx;
->>> +	struct task_struct *task;
->>
->> wq.private is where the normal waitqueue stores the task pointer.
->>
->> (I'm going to rename that)
-> 
-> If you do that, then we can just base the io_uring parts on that.
+Hi Linus,
 
-Just took a quick look at it, and ran into block/kyber-iosched.c that
-actually uses the private pointer for something that isn't a task
-struct...
+Some later additions that weren't quite done for the first pull request,
+and also a few fixes that have arrived since. This pull request
+contains:
+
+- Kill silly pktcdvd warning on attempting to register a non-scsi
+  passthrough device (me)
+
+- Use symbolic constants for the block t10 protection types, and switch
+  to handling it in core rather than in the drivers (Max)
+
+- libahci platform missing node put fix (Nishka)
+
+- Small series of fixes for BFQ (Paolo)
+
+- Fix possible nbd crash (Xiubo)
+
+Please pull!
+
+
+  git://git.kernel.dk/linux-block.git tags/for-5.4/post-2019-09-24
+
+
+----------------------------------------------------------------
+Jens Axboe (1):
+      pktcdvd: remove warning on attempting to register non-passthrough dev
+
+Martin Wilck (1):
+      block: drop device references in bsg_queue_rq()
+
+Max Gurtovoy (3):
+      block: use symbolic constants for t10_pi type
+      block: centralize PI remapping logic to the block layer
+      block: t10-pi: fix -Wswitch warning
+
+Nishka Dasgupta (1):
+      ata: libahci_platform: Add of_node_put() before loop exit
+
+Paolo Valente (4):
+      block, bfq: update inject limit only after injection occurred
+      block, bfq: reduce upper bound for inject limit to max_rq_in_driver+1
+      block, bfq: increase update frequency of inject limit
+      block, bfq: push up injection only after setting service time
+
+Xiubo Li (2):
+      nbd: rename the runtime flags as NBD_RT_ prefixed
+      nbd: fix possible page fault for nbd disk
+
+ block/bfq-iosched.c            |  35 ++++++---
+ block/blk-core.c               |   7 ++
+ block/blk-integrity.c          |  11 +++
+ block/blk-mq.c                 |   6 ++
+ block/bsg-lib.c                |  10 ++-
+ block/t10-pi.c                 | 169 +++++++++++++++++++++--------------------
+ drivers/ata/libahci_platform.c |   9 ++-
+ drivers/block/nbd.c            | 108 +++++++++++++++++---------
+ drivers/block/pktcdvd.c        |   1 -
+ drivers/md/dm-integrity.c      |  10 +++
+ drivers/nvme/host/core.c       |   9 ---
+ drivers/scsi/sd.c              |   8 --
+ include/linux/blkdev.h         |   4 +
+ include/linux/t10-pi.h         |  14 ----
+ 14 files changed, 237 insertions(+), 164 deletions(-)
 
 -- 
 Jens Axboe
