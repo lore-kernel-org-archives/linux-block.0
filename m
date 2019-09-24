@@ -2,156 +2,233 @@ Return-Path: <SRS0=56XS=XT=vger.kernel.org=linux-block-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-2.3 required=3.0 tests=DKIM_SIGNED,DKIM_VALID,
-	DKIM_VALID_AU,FREEMAIL_FORGED_FROMDOMAIN,FREEMAIL_FROM,
-	HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,
-	USER_AGENT_SANE_1 autolearn=no autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-5.2 required=3.0 tests=DKIM_SIGNED,DKIM_VALID,
+	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,SPF_HELO_NONE,
+	SPF_PASS,USER_AGENT_SANE_1 autolearn=unavailable autolearn_force=no
+	version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 6E1C4C432C2
-	for <linux-block@archiver.kernel.org>; Tue, 24 Sep 2019 08:28:52 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 8786BC432C1
+	for <linux-block@archiver.kernel.org>; Tue, 24 Sep 2019 08:36:48 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.kernel.org (Postfix) with ESMTP id 43F93214D9
-	for <linux-block@archiver.kernel.org>; Tue, 24 Sep 2019 08:28:52 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id 4E50B21655
+	for <linux-block@archiver.kernel.org>; Tue, 24 Sep 2019 08:36:48 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=pass (1024-bit key) header.d=web.de header.i=@web.de header.b="hEr+GJ4R"
+	dkim=pass (2048-bit key) header.d=kernel-dk.20150623.gappssmtp.com header.i=@kernel-dk.20150623.gappssmtp.com header.b="niFXDHG/"
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S2394977AbfIXI2v (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Tue, 24 Sep 2019 04:28:51 -0400
-Received: from mout.web.de ([212.227.15.3]:56113 "EHLO mout.web.de"
-        rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-        id S2394923AbfIXI2v (ORCPT <rfc822;linux-block@vger.kernel.org>);
-        Tue, 24 Sep 2019 04:28:51 -0400
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=web.de;
-        s=dbaedf251592; t=1569313715;
-        bh=81JZBQpINSCG3/xfWngKEmRt/JYECAlDxcVtcKbD0XQ=;
-        h=X-UI-Sender-Class:Subject:To:Cc:References:From:Date:In-Reply-To;
-        b=hEr+GJ4RlK/hsMoY0C/r5GnM/nsLXtR9L9fV42Ha784ZP0Sc4t/aqOBD/fg1HZiBy
-         i1uVvlHrGPxx/zcQtXq78+Y/KD9WNz/3HPFRjacY9XR1hA/dW7mWt+92f0ke2ko63S
-         4YsFsEvHo/8F4aS94Z36l7FnvuBbDE6nCRyCijAg=
-X-UI-Sender-Class: c548c8c5-30a9-4db5-a2e7-cb6cb037b8f9
-Received: from [192.168.1.2] ([93.131.71.162]) by smtp.web.de (mrweb001
- [213.165.67.108]) with ESMTPSA (Nemesis) id 0MfYXz-1iWfm420E7-00P72Z; Tue, 24
- Sep 2019 10:28:35 +0200
-Subject: Re: sched: make struct task_struct::state 32-bit
-To:     Valentin Schneider <valentin.schneider@arm.com>,
-        Julia Lawall <julia.lawall@lip6.fr>
-Cc:     Alexey Dobriyan <adobriyan@gmail.com>, dm-devel@redhat.com,
-        linux-block@vger.kernel.org, rcu@vger.kernel.org,
-        linux-kernel@vger.kernel.org,
-        Andrea Arcangeli <aarcange@redhat.com>,
-        Ingo Molnar <mingo@redhat.com>, Jens Axboe <axboe@kernel.dk>,
-        Peter Zijlstra <peterz@infradead.org>
-References: <a43fe392-bd6a-71f5-8611-c6b764ba56c3@arm.com>
- <7e3e784c-e8e6-f9ba-490f-ec3bf956d96b@web.de>
- <0c4dcb91-4830-0013-b8c6-64b9e1ce47d4@arm.com>
- <32d65b15-1855-e7eb-e9c4-81560fab62ea@arm.com>
- <alpine.DEB.2.21.1909231228200.2272@hadrien>
- <d529c390-546e-a8a4-f475-c3ee41f97645@arm.com>
-From:   Markus Elfring <Markus.Elfring@web.de>
-Autocrypt: addr=Markus.Elfring@web.de; prefer-encrypt=mutual; keydata=
- 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 FEE=
-Message-ID: <a1491516-a701-8804-8277-75fb5247191a@web.de>
-Date:   Tue, 24 Sep 2019 10:28:33 +0200
-User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:68.0) Gecko/20100101
- Thunderbird/68.1.0
+        id S2439052AbfIXIgr (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Tue, 24 Sep 2019 04:36:47 -0400
+Received: from mail-io1-f65.google.com ([209.85.166.65]:42221 "EHLO
+        mail-io1-f65.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S2440635AbfIXIgq (ORCPT
+        <rfc822;linux-block@vger.kernel.org>);
+        Tue, 24 Sep 2019 04:36:46 -0400
+Received: by mail-io1-f65.google.com with SMTP id n197so2393865iod.9
+        for <linux-block@vger.kernel.org>; Tue, 24 Sep 2019 01:36:44 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=kernel-dk.20150623.gappssmtp.com; s=20150623;
+        h=subject:from:to:cc:references:message-id:date:user-agent
+         :mime-version:in-reply-to:content-language:content-transfer-encoding;
+        bh=MW39ZIJPkLCSSALoFZZ0RMcoDQFhuN46oWAYAG3QDA4=;
+        b=niFXDHG/G/ebTXEg6ep4fLeucIL38EfUODDxS1+dE9fXEM25WG3owJflzmajxBOkVg
+         a3B8R48JV9XKSL6dRyhWW8BYq1m7DjvobGjP3aE3W8tCV3HQq1QoKS4XHzuR9U/Pp77E
+         mG3V+Iohxpmo4NY+AkCpOGX6RJGc3VsusoKNm2olaRX8o2oQ7twyccfsY1bMO7HDFy4d
+         PNXK1How3mI4eG/b38J9BxzljuLxu0jC/OmIkP3vavMPZ55hvx14WMdmlDpXmYY3Mgme
+         RCScxLjihXDHizjySRac77zgAz/hfz9Zfsq97EQr6kz6I6qY1PVOLz2kmyTlfgVYfLzF
+         ddhQ==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20161025;
+        h=x-gm-message-state:subject:from:to:cc:references:message-id:date
+         :user-agent:mime-version:in-reply-to:content-language
+         :content-transfer-encoding;
+        bh=MW39ZIJPkLCSSALoFZZ0RMcoDQFhuN46oWAYAG3QDA4=;
+        b=iuZ3UZL1qZz/NNTuXtoX+7ENY7SGt+pIldzcvibtLja+fyDPU/BN0FP/JaCVLmV6NE
+         mtWUIDBVdGwH8E581C8+DkeOC2xt1R+G9zrJ6l291wVgVdsfyF0T8y+TnJHXSUAMZekP
+         dYSfmMXmItC2Q1bBoyiP7waVXfQJsVWr9ZPlEa4zzwppCbyIWN0nvGaKqYHmaB1OcjK+
+         5uqNEiuqwTDBhKHdrE9WijMt1DJG+EUqsEAHxBo3pYihPaGrWPktl9hEWO36ghOttAjS
+         S8HyVgwh0QAhkZ1NVvjqXE150SMC3kTXD+jUy1fuu/ndN5TR6Kucv7fIcUkpWkOhBlSm
+         v7zQ==
+X-Gm-Message-State: APjAAAWNuzOS8aQ81E8I9HxHs7qSuN+lj3Y8/P0aDqpePcxNQpxeeOyK
+        b45lXnVglyQz2iMJarWI14uefw==
+X-Google-Smtp-Source: APXvYqyYWoTKod2624IdPCpraBMYTtHYtDYtaYFlyxK/jdO8fmJBht8vCc4phhMZI2vrrdOKDxzokg==
+X-Received: by 2002:a6b:8e92:: with SMTP id q140mr2275210iod.205.1569314204092;
+        Tue, 24 Sep 2019 01:36:44 -0700 (PDT)
+Received: from [172.19.131.113] ([8.46.75.9])
+        by smtp.gmail.com with ESMTPSA id c4sm909144ioa.70.2019.09.24.01.36.36
+        (version=TLS1_2 cipher=ECDHE-RSA-AES128-GCM-SHA256 bits=128/128);
+        Tue, 24 Sep 2019 01:36:43 -0700 (PDT)
+Subject: Re: [PATCH v2 0/2] Optimise io_uring completion waiting
+From:   Jens Axboe <axboe@kernel.dk>
+To:     Pavel Begunkov <asml.silence@gmail.com>,
+        Ingo Molnar <mingo@kernel.org>
+Cc:     Ingo Molnar <mingo@redhat.com>,
+        Peter Zijlstra <peterz@infradead.org>,
+        linux-block@vger.kernel.org, linux-kernel@vger.kernel.org
+References: <cover.1569139018.git.asml.silence@gmail.com>
+ <a4996ae7-ac0a-447b-49b2-7e96275aad29@kernel.dk>
+ <20190923083549.GA42487@gmail.com>
+ <c15b2d54-c722-8fb4-266f-b589c1a21aa5@gmail.com>
+ <df612e90-8999-0085-d2d6-4418e044e429@gmail.com>
+ <731b2087-7786-5374-68ff-8cba42f0cd68@kernel.dk>
+ <759b9b48-1de3-1d43-3e39-9c530bfffaa0@kernel.dk>
+ <43244626-9cfd-0c0b-e7a1-878363712ef3@gmail.com>
+ <f2608e3d-bb4e-9984-79e8-a2ab4f855c7f@kernel.dk>
+ <b999490f-6138-b685-5472-5cd1843b747d@kernel.dk>
+Message-ID: <ed37058b-ee96-7d44-1dc7-d2c48e2ac23f@kernel.dk>
+Date:   Tue, 24 Sep 2019 10:36:28 +0200
+User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:60.0) Gecko/20100101
+ Thunderbird/60.8.0
 MIME-Version: 1.0
-In-Reply-To: <d529c390-546e-a8a4-f475-c3ee41f97645@arm.com>
+In-Reply-To: <b999490f-6138-b685-5472-5cd1843b747d@kernel.dk>
 Content-Type: text/plain; charset=utf-8
 Content-Language: en-US
-Content-Transfer-Encoding: quoted-printable
-X-Provags-ID: V03:K1:+LGehVKc09r1KuvfQbU6UtXN4wMbiGphRgKwWf6E5/pcoBay+CX
- hxQtIG/AXQEA72ofNH+z/E/IQpI5dOlGwrkTiXGvRXac9WkyaBILSc1Nm7Y6OAR1aZzZvWg
- nHknsoTJNX0ExTzcE5uNE85trDQdcAC0c4Zi+3Wh4WnEWRN1kWL+oGgg1Dsbvi+YoiGCEiN
- 8Xi5iXU/pgbViJyNEWwpg==
-X-UI-Out-Filterresults: notjunk:1;V03:K0:ndp5C+YO2XY=:bEjXmQLpbsDAKujsReYlP8
- /XjsIU2C+Ky2XLlpzdHutvatEFcllHuXSxRUC/kxW5mVs4L56PKsiWb3Vu/awYqYOSUjCiFtK
- Tn9ch+XE0/oigNL9MCWTwiVeKf/bl4s1ntlH+QK8zpEvIghww7JM9k0mLUP/MKrAgBcIJGXk6
- fFTmhQenEdXjTJjJtRE4qykb3cgp25icMONDt+BUgdfLscQDk79gZxs04A0VtoCP21oxIxYNs
- M9/mqOV9UawZUTzbd0k0GAHBRPp64+TqC8YIhXu9TXcLeBW+PFPqXCCU6kT718VIb3HthvWLr
- pcnu7HKUmXXdsvpfY0qiNtG3iOxFkdFA2FKJecfLN+VZlHVVbu1yaJ+bJlLebOfFKdwR1q3/r
- GlEDkuCt+L0BHFMgUge/73z14ZDk7KGwdJm6CykFn741DOBovrJDgDC6RiBotpTVbHtqPWj6V
- 6NoW29Efn3woO+w1Nrodwj3W7HoDLZej+GyZy6Da8Cl6/cTNegUSGny8MyAoxbCW5gaiEsTb1
- C55rPTkg/WF4UxWSzF7x3OIUL3wHCVp5oDlCA+m201nBGwmnnLZchCXqmgWJLg9I8zXafKddS
- RIiiLMh2Va39nInIuOUxk80sTu6FVl9qBr3qCqAy8V5L3QuPhkktVyioTrCVqYVSTRX+I0/mM
- LGspeNnawObv8ixw0+lwHzH3N//oWVGlZgskvghpDq8vRH0tO/+YYVjrg+prIcLfoZxeWajJi
- 0EsVGGgtOLIVAPAdh+ge5KNHqK3nxJ8lQG1VvelpOAX1YFrn/BVzG1UI1OzVqVKM4jaEN9b+b
- qXzH/7M3UTlAYS0GiP26fbg+yd/Fqf0wTsf8YcSc5pOHjyORTLwkRqcVd0r3xa/5VhFf6Yh8N
- TBayi9AAhDN1fyYMMVDhawHQzU8jy2448GMq4o8ze5kDpw6ZwkfnAHzboUSLwf64eurYTvWQG
- IkmrpazD352W9fmVxHlN+84kAdiRohhnJS9Rxp0rs21rPduut3yWyVsyA3hV3ttpfbu8V9NJf
- zF9ou78u4fguhc8JeEJOaj94oMGvFZ4hYceM/9vhku023HywU45SYPKwN1gIpgRkiYdSfZW9s
- xFIA9iaQArvMJ6HKnkb9sQ8p6CnMAsusNE+Aj4m54WGP/xTrHYIma4f60oFCs2XyX5D7oTDtX
- MA7L5LzS8o0IhUz/EW1A9YN59hv1REZcUDAt97uYZ8+H/6xx6wYnPxKfVfGQQ35r4f7GWyfDh
- vWqXuncgK1OxgPp40RuPQf91P3AKVzgbkTbNhqFhA99XjSI7T/vcRzwinywY=
+Content-Transfer-Encoding: 7bit
 Sender: linux-block-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
->>> identifier task_state =3D~ "^TASK_";
+On 9/24/19 2:27 AM, Jens Axboe wrote:
+> On 9/24/19 2:02 AM, Jens Axboe wrote:
+>> On 9/24/19 1:06 AM, Pavel Begunkov wrote:
+>>> On 24/09/2019 02:00, Jens Axboe wrote:
+>>>>> I think we can do the same thing, just wrapping the waitqueue in a
+>>>>> structure with a count in it, on the stack. Got some flight time
+>>>>> coming up later today, let me try and cook up a patch.
+>>>>
+>>>> Totally untested, and sent out 5 min before departure... But something
+>>>> like this.
+>>> Hmm, reminds me my first version. Basically that's the same thing but
+>>> with macroses inlined. I wanted to make it reusable and self-contained,
+>>> though.
+>>>
+>>> If you don't think it could be useful in other places, sure, we could do
+>>> something like that. Is that so?
 >>
->> Are there a lot of options?  You can also enumerate them in {}, ie
+>> I totally agree it could be useful in other places. Maybe formalized and
+>> used with wake_up_nr() instead of adding a new primitive? Haven't looked
+>> into that, I may be talking nonsense.
 >>
->> identifier task_state =3D {TASK_BLAH, TASK_BLAHBLAH};
->
-> Around a dozen, can be enumerated easily and is indeed probably better t=
-han
-> a regexp.
+>> In any case, I did get a chance to test it and it works for me. Here's
+>> the "finished" version, slightly cleaned up and with a comment added
+>> for good measure.
+> 
+> Notes:
+> 
+> This version gets the ordering right, you need exclusive waits to get
+> fifo ordering on the waitqueue.
+> 
+> Both versions (yours and mine) suffer from the problem of potentially
+> waking too many. I don't think this is a real issue, as generally we
+> don't do threaded access to the io_urings. But if you had the following
+> tasks wait on the cqring:
+> 
+> [min_events = 32], [min_events = 8], [min_events = 8]
+> 
+> and we reach the io_cqring_events() == threshold, we'll wake all three.
+> I don't see a good solution to this, so I suspect we just live with
+> until proven an issue. Both versions are much better than what we have
+> now.
 
-Can the application of a regular expression be more convenient
-for such an use case?
+Forgot an issue around signal handling, version below adds the
+right check for that too.
+
+Curious what your test case was for this?
 
 
->> You want to look at the definitions of called functions?
->> Coccinelle doesn't really support that,
+diff --git a/fs/io_uring.c b/fs/io_uring.c
+index ca7570aca430..3fbab5692f14 100644
+--- a/fs/io_uring.c
++++ b/fs/io_uring.c
+@@ -2768,6 +2768,42 @@ static int io_ring_submit(struct io_ring_ctx *ctx, unsigned int to_submit,
+ 	return submit;
+ }
+ 
++struct io_wait_queue {
++	struct wait_queue_entry wq;
++	struct io_ring_ctx *ctx;
++	struct task_struct *task;
++	unsigned to_wait;
++	unsigned nr_timeouts;
++};
++
++static inline bool io_should_wake(struct io_wait_queue *iowq)
++{
++	struct io_ring_ctx *ctx = iowq->ctx;
++
++	/*
++	 * Wake up if we have enough events, or if a timeout occured since we
++	 * started waiting. For timeouts, we always want to return to userspace,
++	 * regardless of event count.
++	 */
++	return io_cqring_events(ctx->rings) >= iowq->to_wait ||
++			atomic_read(&ctx->cq_timeouts) != iowq->nr_timeouts;
++}
++
++static int io_wake_function(struct wait_queue_entry *curr, unsigned int mode,
++			    int wake_flags, void *key)
++{
++	struct io_wait_queue *iowq = container_of(curr, struct io_wait_queue,
++							wq);
++
++	if (io_should_wake(iowq)) {
++		list_del_init(&curr->entry);
++		wake_up_process(iowq->task);
++		return 1;
++	}
++
++	return -1;
++}
++
+ /*
+  * Wait until events become available, if we don't already have some. The
+  * application must reap them itself, as they reside on the shared cq ring.
+@@ -2775,8 +2811,16 @@ static int io_ring_submit(struct io_ring_ctx *ctx, unsigned int to_submit,
+ static int io_cqring_wait(struct io_ring_ctx *ctx, int min_events,
+ 			  const sigset_t __user *sig, size_t sigsz)
+ {
++	struct io_wait_queue iowq = {
++		.wq = {
++			.func	= io_wake_function,
++			.entry	= LIST_HEAD_INIT(iowq.wq.entry),
++		},
++		.task		= current,
++		.ctx		= ctx,
++		.to_wait	= min_events,
++	};
+ 	struct io_rings *rings = ctx->rings;
+-	unsigned nr_timeouts;
+ 	int ret;
+ 
+ 	if (io_cqring_events(rings) >= min_events)
+@@ -2795,15 +2839,18 @@ static int io_cqring_wait(struct io_ring_ctx *ctx, int min_events,
+ 			return ret;
+ 	}
+ 
+-	nr_timeouts = atomic_read(&ctx->cq_timeouts);
+-	/*
+-	 * Return if we have enough events, or if a timeout occured since
+-	 * we started waiting. For timeouts, we always want to return to
+-	 * userspace.
+-	 */
+-	ret = wait_event_interruptible(ctx->wait,
+-				io_cqring_events(rings) >= min_events ||
+-				atomic_read(&ctx->cq_timeouts) != nr_timeouts);
++	iowq.nr_timeouts = atomic_read(&ctx->cq_timeouts);
++	prepare_to_wait_exclusive(&ctx->wait, &iowq.wq, TASK_INTERRUPTIBLE);
++	do {
++		if (io_should_wake(&iowq))
++			break;
++		schedule();
++		if (signal_pending(current))
++			break;
++		set_current_state(TASK_INTERRUPTIBLE);
++	} while (1);
++	finish_wait(&ctx->wait, &iowq.wq);
++
+ 	restore_saved_sigmask_unless(ret == -ERESTARTSYS);
+ 	if (ret == -ERESTARTSYS)
+ 		ret = -EINTR;
 
-I got an other impression.
+-- 
+Jens Axboe
 
-
->> but there are hackish ways to add that.
-
-How do you think about to discuss corresponding software development chall=
-enges?
-
-Regards,
-Markus
