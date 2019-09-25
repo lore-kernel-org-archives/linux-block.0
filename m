@@ -2,92 +2,126 @@ Return-Path: <SRS0=DCcP=XU=vger.kernel.org=linux-block-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-0.8 required=3.0 tests=DKIM_SIGNED,DKIM_VALID,
-	DKIM_VALID_AU,HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SPF_HELO_NONE,
-	SPF_PASS,URIBL_BLOCKED autolearn=no autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-5.6 required=3.0 tests=DKIMWL_WL_HIGH,DKIM_SIGNED,
+	DKIM_VALID,DKIM_VALID_AU,MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,
+	SPF_PASS,USER_AGENT_SANE_1 autolearn=unavailable autolearn_force=no
+	version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id C27BEC432C2
-	for <linux-block@archiver.kernel.org>; Wed, 25 Sep 2019 22:53:31 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 54989C432C2
+	for <linux-block@archiver.kernel.org>; Wed, 25 Sep 2019 23:02:28 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.kernel.org (Postfix) with ESMTP id 91A4320673
-	for <linux-block@archiver.kernel.org>; Wed, 25 Sep 2019 22:53:31 +0000 (UTC)
-Authentication-Results: mail.kernel.org;
-	dkim=pass (2048-bit key) header.d=cloud.ionos.com header.i=@cloud.ionos.com header.b="RcAnulDB"
+	by mail.kernel.org (Postfix) with ESMTP id 2A78F20640
+	for <linux-block@archiver.kernel.org>; Wed, 25 Sep 2019 23:02:28 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+	s=default; t=1569452548;
+	bh=aF5eWj/Bp4MAgMXMsU/tILGukQe7wEsm+krU50KJ4aM=;
+	h=Date:From:To:Cc:Subject:List-ID:From;
+	b=2IxXubNxVheoFzAJ1PMEGbp+Gg7ZZq/B4U4j1765TK18lgvwgHxxMCoYIaLULDiAZ
+	 6AFNGva8nXoFWrKkAgwtiPNH0YLxyubiDewlcFDc6+TXVZ27JGwD86rzH2YZlvtUHw
+	 5Net5Jffu+PRYl5f+a9OD58slxP5UUPQvqun8ndc=
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1729952AbfIYWxb (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Wed, 25 Sep 2019 18:53:31 -0400
-Received: from mail-io1-f65.google.com ([209.85.166.65]:42736 "EHLO
-        mail-io1-f65.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1729604AbfIYWxb (ORCPT
+        id S1727368AbfIYXCY (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Wed, 25 Sep 2019 19:02:24 -0400
+Received: from mail-qk1-f194.google.com ([209.85.222.194]:43125 "EHLO
+        mail-qk1-f194.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S1726921AbfIYXCY (ORCPT
         <rfc822;linux-block@vger.kernel.org>);
-        Wed, 25 Sep 2019 18:53:31 -0400
-Received: by mail-io1-f65.google.com with SMTP id n197so1231599iod.9
-        for <linux-block@vger.kernel.org>; Wed, 25 Sep 2019 15:53:29 -0700 (PDT)
+        Wed, 25 Sep 2019 19:02:24 -0400
+Received: by mail-qk1-f194.google.com with SMTP id h126so195627qke.10;
+        Wed, 25 Sep 2019 16:02:23 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=cloud.ionos.com; s=google;
-        h=mime-version:references:in-reply-to:from:date:message-id:subject:to
-         :cc;
-        bh=NgdVnypXV4KSvmqLrClLGHf8ETf2mlCO+2hqkwlCY7g=;
-        b=RcAnulDB3F+hSgfwPTI5JwQzfOnANj8F4GXVIQTsNo+ZuDA351WlPFblb7uamtt302
-         gDtaoeQvr/UKzOrAW6BrCHaHa2RZ20Mn4zrxBB6Xt4bFnfW3TchJ5DMGgAYstSj8wPQL
-         5XnEuSMJmsHN8lga/+JYsv2TLZjxvYU0sv/GQYHuo6+IlxL/RDC8B9Bjz/Od/9Ud/f0o
-         kORCM/n13WdQpk7fKAYKDvrg8Mlq5BydX67sl5GRk5DYu8a+6RQzwvaifP/ryLoAxRnR
-         +EhkcX1FRU6FYxj/Dux6wbKz8qivICiPCkA/xupMmhJM+fa/7XKZ/8nClqIGy6b+5sXg
-         K0tQ==
+        d=gmail.com; s=20161025;
+        h=sender:date:from:to:cc:subject:message-id:mime-version
+         :content-disposition:user-agent;
+        bh=J6xx84NYBZMzyAcWsbF/M7RN9YSA/RHntuLBn1Nqazg=;
+        b=SIfEzvpvUIu7/aCIY6SH2SkyCjOd9o0i5PqDvqyQHvE2InvTaTZQsVQCaxK5q1n/Cj
+         yumJMyFWRX5aLUZd6WU9ijwVcG7VOjbiBe83nr6b6ydDBgYuXARTJf9DFAPC08+spzNo
+         lUUQILezVaRYjlSnhG9eGY0RP1Hd2B2Vt9F8TaDReIT63toDYPKKzmTKEbTR868/tRhG
+         AlAKT1UT4L82ewB5aZ1Sz017fFwxNLGqgxsyPmzjD7ZzoHFV7NWhiDpx9tVnBa86/yP+
+         YgSGjq91jgvX1ZBsL/sJT2p9Dmg68iJXvjHCqi5Yt4gQ8UoZIivfDeKn7jA2r66/x0R5
+         ou0g==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=1e100.net; s=20161025;
-        h=x-gm-message-state:mime-version:references:in-reply-to:from:date
-         :message-id:subject:to:cc;
-        bh=NgdVnypXV4KSvmqLrClLGHf8ETf2mlCO+2hqkwlCY7g=;
-        b=CnxdYR6j0cJbHpuDcKozBIeaMoh1e6QFdKRNpa30d1eKMMUFo9qP7VydHRbuwIZGzx
-         e59ewrA9b0N6O2p4ahrm1JUOGW86x7vcibbH9fmgm7m6vRVhW2InQSLfOamtsT1zTwbR
-         yKYeQ+eOIU6VHFRDRa1ZFRBRpYG1+P38bdhl7IgBQvPCmn6GLhsnK24wkHAmIv2GVGZ4
-         mal3WrvxganidYhkaSlDNsJ1G8t7PTJ9fmsBCgp6A9Htt1gXTWXj3rMowAZcQ7Xj0mZl
-         MWvWvuDfRbkYEZrLLViovRPM4l+AuqXvV9fRfpguUkSefEejsAEyMPk7ba4DXCyUQe89
-         xDqQ==
-X-Gm-Message-State: APjAAAV6Op9K2IEokmllH5ppESDkx/RneCo7jW8TKPiWVYVrzyNh2SzW
-        roAMflme5rHHO7sGt1iahtCucmzmRhTuSqAw4VlO
-X-Google-Smtp-Source: APXvYqy7H1DLLF9NFPqCfEmk0idBJhTirLKNRbjFHMaUqXAjZoKqVPQxb+JY2UFC5+n7Q8VnzjZPYmCoYnU5oOmfByg=
-X-Received: by 2002:a6b:db0a:: with SMTP id t10mr470533ioc.300.1569452008914;
- Wed, 25 Sep 2019 15:53:28 -0700 (PDT)
+        h=x-gm-message-state:sender:date:from:to:cc:subject:message-id
+         :mime-version:content-disposition:user-agent;
+        bh=J6xx84NYBZMzyAcWsbF/M7RN9YSA/RHntuLBn1Nqazg=;
+        b=hPAp7SNGvOncwU8XdsEPoAA35NumTULvoxTqdRAyIx4/m2FizTJelAWE7Y6L0jSO0q
+         EWa5CFV3blOH3eBtHh1H6T9jC+da9qJ+XKoSq5aYsFQC7wfU5RPL/Mto58BBJ4e0U4c8
+         xPCJec/3mdfax7D/sLsRhl0mTvdqDVX0lAhdxyxF+1n86UEwen29KXcxl8RhQzbQUNFN
+         5+KN9rJRCPxNf3DgH2niORDrY4oc5uDHLKYKtaY2qHuyMXkAPw96NyXiNKkWGTvY4IPN
+         xXaAuFN0rDPHtlDStppFZ1DFAxJGTtwODzPh0tzyvsJ6ntl6l6ds5B7bzmyATTNET8ES
+         hMeg==
+X-Gm-Message-State: APjAAAWfKNdytNvl1XH6ZcOqZcupAD/LUMtK+Hl9sD2R2gZRYsxjkmYn
+        fZLKYkgHRgEyTe8iTzf92Yg=
+X-Google-Smtp-Source: APXvYqzlN0SByh/FHkgjqHVCuxYeLgWE2FPBsrHJAD9J0BHXXCNAE+h7pH/AOECmnivaxcM7ltQ9Ow==
+X-Received: by 2002:a37:ef11:: with SMTP id j17mr391810qkk.1.1569452542573;
+        Wed, 25 Sep 2019 16:02:22 -0700 (PDT)
+Received: from localhost ([2620:10d:c091:500::3:a001])
+        by smtp.gmail.com with ESMTPSA id c41sm301087qte.8.2019.09.25.16.02.20
+        (version=TLS1_2 cipher=ECDHE-RSA-AES128-GCM-SHA256 bits=128/128);
+        Wed, 25 Sep 2019 16:02:20 -0700 (PDT)
+Date:   Wed, 25 Sep 2019 16:02:07 -0700
+From:   Tejun Heo <tj@kernel.org>
+To:     Jens Axboe <axboe@kernel.dk>
+Cc:     linux-block@vger.kernel.org, linux-kernel@vger.kernel.org,
+        kernel-team@fb.com, cgroups@vger.kernel.org
+Subject: [PATCH 1/3 for-5.4/block] iocost: better trace vrate changes
+Message-ID: <20190925230207.GI2233839@devbig004.ftw2.facebook.com>
 MIME-Version: 1.0
-References: <20190620150337.7847-1-jinpuwang@gmail.com> <20190620150337.7847-7-jinpuwang@gmail.com>
- <d0bc1253-4f3d-981b-97f1-e44900fffb44@acm.org> <CAHg0HuzDGgmFKykAmBuAwJXoP1OGq-pQteS=vYMjcbp=cwu9GQ@mail.gmail.com>
- <ee692ec2-7f65-19f5-f122-fed544074f5f@acm.org> <CAHg0HuyMekqFehsU+-O_X8-1j1Bwu6rJzvuAwVV4LQs06ZJsFw@mail.gmail.com>
- <befbe2d4-d37e-0e67-3bf5-01024663082f@acm.org>
-In-Reply-To: <befbe2d4-d37e-0e67-3bf5-01024663082f@acm.org>
-From:   Danil Kipnis <danil.kipnis@cloud.ionos.com>
-Date:   Thu, 26 Sep 2019 00:53:17 +0200
-Message-ID: <CAHg0Huzuw=O2CJvUGJYO0whUE6tx34iPm7ScWRn-uRafRYp5aQ@mail.gmail.com>
-Subject: Re: [PATCH v4 06/25] ibtrs: client: main functionality
-To:     Bart Van Assche <bvanassche@acm.org>
-Cc:     Jack Wang <jinpuwang@gmail.com>, linux-block@vger.kernel.org,
-        linux-rdma@vger.kernel.org, Jens Axboe <axboe@kernel.dk>,
-        Christoph Hellwig <hch@infradead.org>,
-        Sagi Grimberg <sagi@grimberg.me>,
-        Jason Gunthorpe <jgg@mellanox.com>,
-        Doug Ledford <dledford@redhat.com>, rpenyaev@suse.de,
-        Jack Wang <jinpu.wang@cloud.ionos.com>
-Content-Type: text/plain; charset="UTF-8"
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+User-Agent: Mutt/1.5.21 (2010-09-15)
 Sender: linux-block-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-On Wed, Sep 25, 2019 at 11:08 PM Bart Van Assche <bvanassche@acm.org> wrote:
->
-> On 9/25/19 1:50 PM, Danil Kipnis wrote:
-> > On Wed, Sep 25, 2019 at 8:55 PM Bart Van Assche <bvanassche@acm.org> wrote:
-> >> There is plenty of code under drivers/base that calls get_device() and
-> >> put_device(). Are you sure that none of the code under drivers/base will
-> >> ever call get_device() and put_device() for the ibtrs client device?
-> >
-> > You mean how could multiple kernel modules share the same ibtrs
-> > session...? I really never thought that far...
->
-> I meant something else: device_register() registers struct device
-> instances in multiple lists. The driver core may decide to iterate over
-> these lists and to call get_device() / put_device() on the devices it
-> finds in these lists.
-Oh, you mean we just need stub functions for those, so that nobody
-steps on a null?
+vrate_adj tracepoint traces vrate changes; however, it does so only
+when busy_level is non-zero.  busy_level turning to zero can sometimes
+be as interesting an event.  This patch also enables vrate_adj
+tracepoint on other vrate related events - busy_level changes and
+non-zero nr_lagging.
+
+Signed-off-by: Tejun Heo <tj@kernel.org>
+---
+Hello, Jens.
+
+I've encountered vrate regulation issues while testing on a hard disk
+machine.  These are three patches to improve vrate adj visibility and
+fix the issue.
+
+Thanks.
+
+ block/blk-iocost.c |    7 ++++++-
+ 1 file changed, 6 insertions(+), 1 deletion(-)
+
+--- a/block/blk-iocost.c
++++ b/block/blk-iocost.c
+@@ -1343,7 +1343,7 @@ static void ioc_timer_fn(struct timer_li
+ 	u32 ppm_wthr = MILLION - ioc->params.qos[QOS_WPPM];
+ 	u32 missed_ppm[2], rq_wait_pct;
+ 	u64 period_vtime;
+-	int i;
++	int prev_busy_level, i;
+ 
+ 	/* how were the latencies during the period? */
+ 	ioc_lat_stat(ioc, missed_ppm, &rq_wait_pct);
+@@ -1531,6 +1531,7 @@ skip_surplus_transfers:
+ 	 * and experiencing shortages but not surpluses, we're too stingy
+ 	 * and should increase vtime rate.
+ 	 */
++	prev_busy_level = ioc->busy_level;
+ 	if (rq_wait_pct > RQ_WAIT_BUSY_PCT ||
+ 	    missed_ppm[READ] > ppm_rthr ||
+ 	    missed_ppm[WRITE] > ppm_wthr) {
+@@ -1592,6 +1593,10 @@ skip_surplus_transfers:
+ 		atomic64_set(&ioc->vtime_rate, vrate);
+ 		ioc->inuse_margin_vtime = DIV64_U64_ROUND_UP(
+ 			ioc->period_us * vrate * INUSE_MARGIN_PCT, 100);
++	} else if (ioc->busy_level != prev_busy_level || nr_lagging) {
++		trace_iocost_ioc_vrate_adj(ioc, atomic64_read(&ioc->vtime_rate),
++					   &missed_ppm, rq_wait_pct, nr_lagging,
++					   nr_shortages, nr_surpluses);
+ 	}
+ 
+ 	ioc_refresh_params(ioc, false);
