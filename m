@@ -2,188 +2,178 @@ Return-Path: <SRS0=DCcP=XU=vger.kernel.org=linux-block-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-0.8 required=3.0 tests=DKIM_SIGNED,DKIM_VALID,
-	DKIM_VALID_AU,HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SPF_HELO_NONE,
-	SPF_PASS,URIBL_BLOCKED autolearn=no autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-9.7 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
+	INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,
+	URIBL_BLOCKED,USER_AGENT_GIT autolearn=unavailable autolearn_force=no
+	version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id E30E2C432C1
-	for <linux-block@archiver.kernel.org>; Wed, 25 Sep 2019 10:20:22 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id CAD33C432C2
+	for <linux-block@archiver.kernel.org>; Wed, 25 Sep 2019 12:00:31 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.kernel.org (Postfix) with ESMTP id AD31D21D7F
-	for <linux-block@archiver.kernel.org>; Wed, 25 Sep 2019 10:20:22 +0000 (UTC)
-Authentication-Results: mail.kernel.org;
-	dkim=pass (2048-bit key) header.d=cloud.ionos.com header.i=@cloud.ionos.com header.b="DfgkPxwg"
+	by mail.kernel.org (Postfix) with ESMTP id ABA8B21D7E
+	for <linux-block@archiver.kernel.org>; Wed, 25 Sep 2019 12:00:31 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S2389405AbfIYKUW (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Wed, 25 Sep 2019 06:20:22 -0400
-Received: from mail-io1-f67.google.com ([209.85.166.67]:36721 "EHLO
-        mail-io1-f67.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1729524AbfIYKUV (ORCPT
-        <rfc822;linux-block@vger.kernel.org>);
-        Wed, 25 Sep 2019 06:20:21 -0400
-Received: by mail-io1-f67.google.com with SMTP id b136so12388574iof.3
-        for <linux-block@vger.kernel.org>; Wed, 25 Sep 2019 03:20:20 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=cloud.ionos.com; s=google;
-        h=mime-version:references:in-reply-to:from:date:message-id:subject:to
-         :cc;
-        bh=6rqFBMqfsMIpbGjDwxfXDqANibsggHAFEEva+wKNyXE=;
-        b=DfgkPxwgx6IlpUoSFjiUg4LiX/fG8wfVimfdGdpw2liTnDBWvLTGoU9C7bB/7yLTUg
-         qH2AHhlB0eaOIBKbTsEwbBl1udQuu0qGGMtjj3hkw5OnPucDQ/MdqG3vE9Wg2UvJXnyj
-         uMBI/VE3tTGNNuyqjt4K6teCYhvnLTzP9OiXW2yz5TdrbwGL/Dy8gfbR4UqxqhWf3krj
-         LVij26nEtetuReQCOJMhJGEcBXc3xiWcUU4KvuVfjTDfa8G6avGrjMnc5Hca9HVKHkyi
-         DcUxdkC2Js9Xdih/lcwem5gakt/JXv67AoSPrqQhTltTb2Ys9PAD8+IqNakIbXY9/EUH
-         0zUg==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20161025;
-        h=x-gm-message-state:mime-version:references:in-reply-to:from:date
-         :message-id:subject:to:cc;
-        bh=6rqFBMqfsMIpbGjDwxfXDqANibsggHAFEEva+wKNyXE=;
-        b=VKBBybkKiv1oynIu2XI9HP91GkXtSn3c1H6jZfWzpmUlTllruTpm17wLJGdYiWSFrz
-         pIDXccgWrZTgDwfmYYwNlOK2Gi18Zwlb0ehSiWDmstA6PxVdnOlYl0Ssps5mBQILIfMj
-         OTgBFBG1jyy+VdU0x642BlNlXqOLKQiXe01qj3t6JxeX8nJ2BTj70JRN7TNQty0iwmNq
-         LZpg0YZPoLAPbtBq53Il/6vz+sz6o/lMSKzBMefQwmNk45ksX5hDv5YDLfayq7Lyvapk
-         v1NDkEYeKliXNWWEdf0npAm5Og9rNE7Nn588UJffovnc8Xox3KoOhgm1IOZvZgG7zh9x
-         sv2g==
-X-Gm-Message-State: APjAAAWUkTrEL0MCvJqsOZUp2ZMk+FfOYmoN7IaBO4KmpRFuvNW2pdEK
-        tM5mFiObZwWmfY5YJ2VRo3dGSEqrnCgxIzEzdMxy
-X-Google-Smtp-Source: APXvYqx+RGnccnEgT58KjxdVj/nQvPItToncpQDPGd+ehxdmlkE7H+NkwxQZ4ZlFn+x0gCdOp3N6ctOidA05VbXT0YQ=
-X-Received: by 2002:a92:1508:: with SMTP id v8mr169482ilk.116.1569406820486;
- Wed, 25 Sep 2019 03:20:20 -0700 (PDT)
-MIME-Version: 1.0
-References: <20190620150337.7847-1-jinpuwang@gmail.com> <20190620150337.7847-3-jinpuwang@gmail.com>
- <0607ca2d-6509-69da-4afc-0be6526b11c4@acm.org>
-In-Reply-To: <0607ca2d-6509-69da-4afc-0be6526b11c4@acm.org>
-From:   Danil Kipnis <danil.kipnis@cloud.ionos.com>
-Date:   Wed, 25 Sep 2019 12:20:09 +0200
-Message-ID: <CAHg0HuyL2V4YqPFvSzaahGL7vHG5mKybudpxkE3hZYsLg1wM+g@mail.gmail.com>
-Subject: Re: [PATCH v4 02/25] ibtrs: public interface header to establish RDMA connections
-To:     Bart Van Assche <bvanassche@acm.org>
-Cc:     Jack Wang <jinpuwang@gmail.com>, linux-block@vger.kernel.org,
-        linux-rdma@vger.kernel.org, Jens Axboe <axboe@kernel.dk>,
+        id S2405230AbfIYMAb (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Wed, 25 Sep 2019 08:00:31 -0400
+Received: from szxga05-in.huawei.com ([45.249.212.191]:2781 "EHLO huawei.com"
+        rhost-flags-OK-OK-OK-FAIL) by vger.kernel.org with ESMTP
+        id S2405217AbfIYMAa (ORCPT <rfc822;linux-block@vger.kernel.org>);
+        Wed, 25 Sep 2019 08:00:30 -0400
+Received: from DGGEMS402-HUB.china.huawei.com (unknown [172.30.72.58])
+        by Forcepoint Email with ESMTP id D7969ECF19B030580548;
+        Wed, 25 Sep 2019 20:00:27 +0800 (CST)
+Received: from huawei.com (10.175.124.28) by DGGEMS402-HUB.china.huawei.com
+ (10.3.19.202) with Microsoft SMTP Server id 14.3.439.0; Wed, 25 Sep 2019
+ 20:00:21 +0800
+From:   Yufen Yu <yuyufen@huawei.com>
+To:     <axboe@kernel.dk>
+CC:     <linux-block@vger.kernel.org>, Yufen Yu <yuyufen@huawei.com>,
+        Ming Lei <ming.lei@redhat.com>,
         Christoph Hellwig <hch@infradead.org>,
-        Sagi Grimberg <sagi@grimberg.me>,
-        Jason Gunthorpe <jgg@mellanox.com>,
-        Doug Ledford <dledford@redhat.com>, rpenyaev@suse.de,
-        Jack Wang <jinpu.wang@cloud.ionos.com>
-Content-Type: text/plain; charset="UTF-8"
+        Keith Busch <keith.busch@intel.com>,
+        Bart Van Assche <bvanassche@acm.org>,
+        <stable@vger.kernel.org>
+Subject: [PATCH v4] block: fix null pointer dereference in blk_mq_rq_timed_out()
+Date:   Wed, 25 Sep 2019 20:20:25 +0800
+Message-ID: <20190925122025.31246-1-yuyufen@huawei.com>
+X-Mailer: git-send-email 2.17.2
+MIME-Version: 1.0
+Content-Type: text/plain
+X-Originating-IP: [10.175.124.28]
+X-CFilter-Loop: Reflected
 Sender: linux-block-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-On Mon, Sep 23, 2019 at 7:44 PM Bart Van Assche <bvanassche@acm.org> wrote:
-> > +/**
-> > + * enum ibtrs_clt_link_ev - Events about connectivity state of a client
-> > + * @IBTRS_CLT_LINK_EV_RECONNECTED    Client was reconnected.
-> > + * @IBTRS_CLT_LINK_EV_DISCONNECTED   Client was disconnected.
-> > + */
-> > +enum ibtrs_clt_link_ev {
-> > +     IBTRS_CLT_LINK_EV_RECONNECTED,
-> > +     IBTRS_CLT_LINK_EV_DISCONNECTED,
-> > +};
-> > +
-> > +/**
-> > + * Source and destination address of a path to be established
-> > + */
-> > +struct ibtrs_addr {
-> > +     struct sockaddr_storage *src;
-> > +     struct sockaddr_storage *dst;
-> > +};
->
-> Is it really useful to define a structure to hold two pointers or can
-> these two pointers also be passed as separate arguments?
-We always need both src and dst throughout ibnbd and ibtrs code and
-indeed one reason to introduce this struct is that "f(struct
-ibtrs_addr *addr, ...);" is shorter than "f(struct sockaddr_storage
-*src, struct sockaddr_storage *dst, ...);". But it also makes it
-easier to extend the address information describing one ibtrs path in
-the future.
+We got a null pointer deference BUG_ON in blk_mq_rq_timed_out()
+as following:
 
-> > +/**
-> > + * ibtrs_clt_open() - Open a session to a IBTRS client
-> > + * @priv:            User supplied private data.
-> > + * @link_ev:         Event notification for connection state changes
-> > + *   @priv:                  user supplied data that was passed to
-> > + *                           ibtrs_clt_open()
-> > + *   @ev:                    Occurred event
-> > + * @sessname: name of the session
-> > + * @paths: Paths to be established defined by their src and dst addresses
-> > + * @path_cnt: Number of elemnts in the @paths array
-> > + * @port: port to be used by the IBTRS session
-> > + * @pdu_sz: Size of extra payload which can be accessed after tag allocation.
-> > + * @max_inflight_msg: Max. number of parallel inflight messages for the session
-> > + * @max_segments: Max. number of segments per IO request
-> > + * @reconnect_delay_sec: time between reconnect tries
-> > + * @max_reconnect_attempts: Number of times to reconnect on error before giving
-> > + *                       up, 0 for * disabled, -1 for forever
-> > + *
-> > + * Starts session establishment with the ibtrs_server. The function can block
-> > + * up to ~2000ms until it returns.
-> > + *
-> > + * Return a valid pointer on success otherwise PTR_ERR.
-> > + */
-> > +struct ibtrs_clt *ibtrs_clt_open(void *priv, link_clt_ev_fn *link_ev,
-> > +                              const char *sessname,
-> > +                              const struct ibtrs_addr *paths,
-> > +                              size_t path_cnt, short port,
-> > +                              size_t pdu_sz, u8 reconnect_delay_sec,
-> > +                              u16 max_segments,
-> > +                              s16 max_reconnect_attempts);
->
-> Having detailed kernel-doc headers for describing API functions is great
-> but I'm not sure a .h file is the best location for such documentation.
-> Many kernel developers keep kernel-doc headers in .c files because that
-> makes it more likely that the documentation and the implementation stay
-> in sync.
-What is better: to move it or to only copy it to the corresponding C file?
+[  108.825472] BUG: kernel NULL pointer dereference, address: 0000000000000040
+[  108.827059] PGD 0 P4D 0
+[  108.827313] Oops: 0000 [#1] SMP PTI
+[  108.827657] CPU: 6 PID: 198 Comm: kworker/6:1H Not tainted 5.3.0-rc8+ #431
+[  108.829503] Workqueue: kblockd blk_mq_timeout_work
+[  108.829913] RIP: 0010:blk_mq_check_expired+0x258/0x330
+[  108.838191] Call Trace:
+[  108.838406]  bt_iter+0x74/0x80
+[  108.838665]  blk_mq_queue_tag_busy_iter+0x204/0x450
+[  108.839074]  ? __switch_to_asm+0x34/0x70
+[  108.839405]  ? blk_mq_stop_hw_queue+0x40/0x40
+[  108.839823]  ? blk_mq_stop_hw_queue+0x40/0x40
+[  108.840273]  ? syscall_return_via_sysret+0xf/0x7f
+[  108.840732]  blk_mq_timeout_work+0x74/0x200
+[  108.841151]  process_one_work+0x297/0x680
+[  108.841550]  worker_thread+0x29c/0x6f0
+[  108.841926]  ? rescuer_thread+0x580/0x580
+[  108.842344]  kthread+0x16a/0x1a0
+[  108.842666]  ? kthread_flush_work+0x170/0x170
+[  108.843100]  ret_from_fork+0x35/0x40
 
->
-> > +
-> > +/**
-> > + * ibtrs_clt_close() - Close a session
-> > + * @sess: Session handler, is freed on return
->                       ^^^^^^^
->                       handle?
->
-> This sentence suggests that the handle is freed on return. I guess that
-> you meant that the session is freed upon return?
-Right, will fix the wording.
+The bug is caused by the race between timeout handle and completion for
+flush request.
 
->
-> > +/**
-> > + * ibtrs_clt_get_tag() - allocates tag for future RDMA operation
-> > + * @sess:    Current session
-> > + * @con_type:        Type of connection to use with the tag
-> > + * @wait:    Wait type
-> > + *
-> > + * Description:
-> > + *    Allocates tag for the following RDMA operation.  Tag is used
-> > + *    to preallocate all resources and to propagate memory pressure
-> > + *    up earlier.
-> > + *
-> > + * Context:
-> > + *    Can sleep if @wait == IBTRS_TAG_WAIT
-> > + */
-> > +struct ibtrs_tag *ibtrs_clt_get_tag(struct ibtrs_clt *sess,
-> > +                                 enum ibtrs_clt_con_type con_type,
-> > +                                 int wait);
->
-> Since struct ibtrs_tag has another role than what is called a tag in the
-> block layer I think a better description is needed of what struct
-> ibtrs_tag actually represents.
-I think it would be better to rename it to ibtrs_permit in order to
-avoid confusion with block layer tags. Will extend the description
-also.
+When timeout handle function blk_mq_rq_timed_out() try to read
+'req->q->mq_ops', the 'req' have completed and reinitiated by next
+flush request, which would call blk_rq_init() to clear 'req' as 0.
 
-> > +/*
-> > + * Here goes IBTRS server API
-> > + */
->
-> Most software either uses the client API or the server API but not both
-> at the same time. Has it been considered to use separate header files
-> for the client and server APIs?
-I don't have any really good reason to put API of server and client
-into a single file. Except may be that the reader can see API calls
-corresponding the full sequence of request -> indication -> response
--> confirmation in one place.
+After commit 12f5b93145 ("blk-mq: Remove generation seqeunce"),
+normal requests lifetime are protected by refcount. Until 'rq->ref'
+drop to zero, the request can really be free. Thus, these requests
+cannot been reused before timeout handle finish.
+
+However, flush request has defined .end_io and rq->end_io() is still
+called even if 'rq->ref' doesn't drop to zero. After that, the 'flush_rq'
+can be reused by the next flush request handle, resulting in null
+pointer deference BUG ON.
+
+We fix this problem by covering flush request with 'rq->ref'.
+If the refcount is not zero, flush_end_io() return and wait the
+last holder recall it. To record the request status, we add a new
+entry 'rq_status', which will be used in flush_end_io().
+
+Cc: Ming Lei <ming.lei@redhat.com>
+Cc: Christoph Hellwig <hch@infradead.org>
+Cc: Keith Busch <keith.busch@intel.com>
+Cc: Bart Van Assche <bvanassche@acm.org>
+Cc: stable@vger.kernel.org # v4.18+
+Signed-off-by: Yufen Yu <yuyufen@huawei.com>
+
+-------
+v2:
+ - move rq_status from struct request to struct blk_flush_queue
+v3:
+ - remove unnecessary '{}' pair.
+v4:
+ - let spinlock to protect 'fq->rq_status'
+---
+ block/blk-flush.c | 10 ++++++++++
+ block/blk-mq.c    |  5 ++++-
+ block/blk.h       |  7 +++++++
+ 3 files changed, 21 insertions(+), 1 deletion(-)
+
+diff --git a/block/blk-flush.c b/block/blk-flush.c
+index aedd9320e605..1eec9cbe5a0a 100644
+--- a/block/blk-flush.c
++++ b/block/blk-flush.c
+@@ -214,6 +214,16 @@ static void flush_end_io(struct request *flush_rq, blk_status_t error)
+ 
+ 	/* release the tag's ownership to the req cloned from */
+ 	spin_lock_irqsave(&fq->mq_flush_lock, flags);
++
++	if (!refcount_dec_and_test(&flush_rq->ref)) {
++		fq->rq_status = error;
++		spin_unlock_irqrestore(&fq->mq_flush_lock, flags);
++		return;
++	}
++
++	if (fq->rq_status != BLK_STS_OK)
++		error = fq->rq_status;
++
+ 	hctx = flush_rq->mq_hctx;
+ 	if (!q->elevator) {
+ 		blk_mq_tag_set_rq(hctx, flush_rq->tag, fq->orig_rq);
+diff --git a/block/blk-mq.c b/block/blk-mq.c
+index 20a49be536b5..e04fa9ab5574 100644
+--- a/block/blk-mq.c
++++ b/block/blk-mq.c
+@@ -912,7 +912,10 @@ static bool blk_mq_check_expired(struct blk_mq_hw_ctx *hctx,
+ 	 */
+ 	if (blk_mq_req_expired(rq, next))
+ 		blk_mq_rq_timed_out(rq, reserved);
+-	if (refcount_dec_and_test(&rq->ref))
++
++	if (is_flush_rq(rq, hctx))
++		rq->end_io(rq, 0);
++	else if (refcount_dec_and_test(&rq->ref))
+ 		__blk_mq_free_request(rq);
+ 
+ 	return true;
+diff --git a/block/blk.h b/block/blk.h
+index ed347f7a97b1..de258e7b9db8 100644
+--- a/block/blk.h
++++ b/block/blk.h
+@@ -30,6 +30,7 @@ struct blk_flush_queue {
+ 	 */
+ 	struct request		*orig_rq;
+ 	spinlock_t		mq_flush_lock;
++	blk_status_t 		rq_status;
+ };
+ 
+ extern struct kmem_cache *blk_requestq_cachep;
+@@ -47,6 +48,12 @@ static inline void __blk_get_queue(struct request_queue *q)
+ 	kobject_get(&q->kobj);
+ }
+ 
++static inline bool
++is_flush_rq(struct request *req, struct blk_mq_hw_ctx *hctx)
++{
++	return hctx->fq->flush_rq == req;
++}
++
+ struct blk_flush_queue *blk_alloc_flush_queue(struct request_queue *q,
+ 		int node, int cmd_size, gfp_t flags);
+ void blk_free_flush_queue(struct blk_flush_queue *q);
+-- 
+2.17.2
+
