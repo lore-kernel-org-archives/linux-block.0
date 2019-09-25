@@ -2,123 +2,411 @@ Return-Path: <SRS0=DCcP=XU=vger.kernel.org=linux-block-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-2.2 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
-	MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,USER_AGENT_SANE_1 autolearn=no
-	autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-0.8 required=3.0 tests=DKIM_SIGNED,DKIM_VALID,
+	DKIM_VALID_AU,HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SPF_HELO_NONE,
+	SPF_PASS,URIBL_BLOCKED autolearn=no autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id E5ED5C432C2
-	for <linux-block@archiver.kernel.org>; Wed, 25 Sep 2019 17:08:07 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 73964C432C2
+	for <linux-block@archiver.kernel.org>; Wed, 25 Sep 2019 17:36:58 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.kernel.org (Postfix) with ESMTP id C0EDA2146E
-	for <linux-block@archiver.kernel.org>; Wed, 25 Sep 2019 17:08:07 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id 430E2207E0
+	for <linux-block@archiver.kernel.org>; Wed, 25 Sep 2019 17:36:58 +0000 (UTC)
+Authentication-Results: mail.kernel.org;
+	dkim=pass (2048-bit key) header.d=cloud.ionos.com header.i=@cloud.ionos.com header.b="PdiAzlYW"
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S2408161AbfIYRIH (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Wed, 25 Sep 2019 13:08:07 -0400
-Received: from mx009.vodafonemail.xion.oxcs.net ([153.92.174.39]:60396 "EHLO
-        mx009.vodafonemail.xion.oxcs.net" rhost-flags-OK-OK-OK-OK)
-        by vger.kernel.org with ESMTP id S2407544AbfIYRIH (ORCPT
+        id S2442977AbfIYRg5 (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Wed, 25 Sep 2019 13:36:57 -0400
+Received: from mail-io1-f65.google.com ([209.85.166.65]:45677 "EHLO
+        mail-io1-f65.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S2440165AbfIYRg5 (ORCPT
         <rfc822;linux-block@vger.kernel.org>);
-        Wed, 25 Sep 2019 13:08:07 -0400
-Received: from vsmx002.vodafonemail.xion.oxcs.net (unknown [192.168.75.192])
-        by mta-6-out.mta.xion.oxcs.net (Postfix) with ESMTP id 5D2D2605B16;
-        Wed, 25 Sep 2019 17:08:04 +0000 (UTC)
-Received: from lazy.lzy (unknown [87.157.113.162])
-        by mta-6-out.mta.xion.oxcs.net (Postfix) with ESMTPA id B4A926066CF;
-        Wed, 25 Sep 2019 17:07:47 +0000 (UTC)
-Received: from lazy.lzy (localhost [127.0.0.1])
-        by lazy.lzy (8.15.2/8.14.5) with ESMTPS id x8PH7gAS005723
-        (version=TLSv1.3 cipher=TLS_AES_256_GCM_SHA384 bits=256 verify=NO);
-        Wed, 25 Sep 2019 19:07:42 +0200
-Received: (from red@localhost)
-        by lazy.lzy (8.15.2/8.15.2/Submit) id x8PH7fiP005722;
-        Wed, 25 Sep 2019 19:07:41 +0200
-Date:   Wed, 25 Sep 2019 19:07:41 +0200
-From:   Piergiorgio Sartor <piergiorgio.sartor@nexgo.de>
-To:     Piergiorgio Sartor <piergiorgio.sartor@nexgo.de>
-Cc:     Christoph Hellwig <hch@lst.de>,
-        Alan Stern <stern@rowland.harvard.edu>,
-        Jens Axboe <axboe@kernel.dk>,
-        USB list <linux-usb@vger.kernel.org>,
-        linux-block@vger.kernel.org,
-        Kernel development list <linux-kernel@vger.kernel.org>
-Subject: Re: reeze while write on external usb 3.0 hard disk [Bug 204095]
-Message-ID: <20190925170741.GA5235@lazy.lzy>
-References: <20190817095422.GA4200@lazy.lzy>
- <Pine.LNX.4.44L0.1908191009490.1506-100000@iolanthe.rowland.org>
- <20190820072326.GD28968@lst.de>
- <20190820163722.GA2991@lazy.lzy>
- <20190826173833.GA4166@lazy.lzy>
+        Wed, 25 Sep 2019 13:36:57 -0400
+Received: by mail-io1-f65.google.com with SMTP id c25so809042iot.12
+        for <linux-block@vger.kernel.org>; Wed, 25 Sep 2019 10:36:54 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=cloud.ionos.com; s=google;
+        h=mime-version:references:in-reply-to:from:date:message-id:subject:to
+         :cc;
+        bh=/5y9OdT+mqLC4BnlP3nfsBqkYX+ZY9L/bSXBmJL8kQU=;
+        b=PdiAzlYWcA/TulEjeZ7jyyXUM1J/DPARdvXU3m/uv9jasshoHt7OXxaFBwY0fGQlZu
+         Kk5KOrnCkwfUPHWByOeHtBbGft1LMPKmMn1cOJUozXerJJurPDs/vbVbiVobNAZOHQ5e
+         aNaELDZM6RlTJUGUbfqI/VJ/MECqM2I4HIuqEdPfb5J9g0H2q2W42xtHW6Qp6EdHzRvy
+         WhJKazEeRv5qU+SazNqZUHhszNFRTp19GI4xylUFxF6iQKgobdLVeXibfnLRjxcAP1Uf
+         gZ4nYrYO34/tBkQxVc6nXOpyFM0IXNkxZVUeHP8NBTpPt61CjQ77tIKmpIQVUNTEtyhe
+         3tCA==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20161025;
+        h=x-gm-message-state:mime-version:references:in-reply-to:from:date
+         :message-id:subject:to:cc;
+        bh=/5y9OdT+mqLC4BnlP3nfsBqkYX+ZY9L/bSXBmJL8kQU=;
+        b=nbgZ8MrdQ85oJl6wV/3cfi3aPohKDFpT5sd9AZVmXVnAiYOR2cSWBX03oJ7q4e7RWk
+         iEN5dOihzFBjvduxOI137YUOl7lCjQ1AVeV49on4r6Xq9niSuZv1AmX3n4nWrb19Z+il
+         cqz3ukyJfSv6zDLeDlAOF0P/k+vzYVsY1GS6dWeEsR/W/qwUUjn1hUX1J71Fdr2kR0YX
+         9w93CCfGT68a3DqChUqxTD4FnIwzoygOSTKrzDD+VgwPDjTGrgiW7VGDs9eaSyBlTb/h
+         TZNPyL1ZosWrussDNmzQ6zb5HsyunXG6jid2XiAu1XxRo1JV5OsdjX/Ze+IBXA9sn50D
+         Oi9Q==
+X-Gm-Message-State: APjAAAXRRvihjCvI/B7frKFkIlSIK8Ef+/sOOLfzzzB5ib9EO2INhYXN
+        3bPTtNbHrKD3RwoBAeT1gY5jjFCKUENRonjkDxMU
+X-Google-Smtp-Source: APXvYqx3foS9hh/ZQI99v7xEu2DYUT0VKBiI3jamGFxxjMpR/9Zw0LpdsbH3iMvZv/pKDzFBIOGLBSDJ65xPv3NjP88=
+X-Received: by 2002:a5e:cb49:: with SMTP id h9mr466095iok.307.1569433013830;
+ Wed, 25 Sep 2019 10:36:53 -0700 (PDT)
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <20190826173833.GA4166@lazy.lzy>
-User-Agent: Mutt/1.12.1 (2019-06-15)
-X-VADE-STATUS: LEGIT
+References: <20190620150337.7847-1-jinpuwang@gmail.com> <20190620150337.7847-7-jinpuwang@gmail.com>
+ <d0bc1253-4f3d-981b-97f1-e44900fffb44@acm.org>
+In-Reply-To: <d0bc1253-4f3d-981b-97f1-e44900fffb44@acm.org>
+From:   Danil Kipnis <danil.kipnis@cloud.ionos.com>
+Date:   Wed, 25 Sep 2019 19:36:42 +0200
+Message-ID: <CAHg0HuzDGgmFKykAmBuAwJXoP1OGq-pQteS=vYMjcbp=cwu9GQ@mail.gmail.com>
+Subject: Re: [PATCH v4 06/25] ibtrs: client: main functionality
+To:     Bart Van Assche <bvanassche@acm.org>
+Cc:     Jack Wang <jinpuwang@gmail.com>, linux-block@vger.kernel.org,
+        linux-rdma@vger.kernel.org, Jens Axboe <axboe@kernel.dk>,
+        Christoph Hellwig <hch@infradead.org>,
+        Sagi Grimberg <sagi@grimberg.me>,
+        Jason Gunthorpe <jgg@mellanox.com>,
+        Doug Ledford <dledford@redhat.com>, rpenyaev@suse.de,
+        Jack Wang <jinpu.wang@cloud.ionos.com>
+Content-Type: text/plain; charset="UTF-8"
 Sender: linux-block-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-On Mon, Aug 26, 2019 at 07:38:33PM +0200, Piergiorgio Sartor wrote:
-> On Tue, Aug 20, 2019 at 06:37:22PM +0200, Piergiorgio Sartor wrote:
-> > On Tue, Aug 20, 2019 at 09:23:26AM +0200, Christoph Hellwig wrote:
-> > > On Mon, Aug 19, 2019 at 10:14:25AM -0400, Alan Stern wrote:
-> > > > Let's bring this to the attention of some more people.
-> > > > 
-> > > > It looks like the bug that was supposed to be fixed by commit
-> > > > d74ffae8b8dd ("usb-storage: Add a limitation for
-> > > > blk_queue_max_hw_sectors()"), which is part of 5.2.5, but apparently
-> > > > the bug still occurs.
-> > > 
-> > > Piergiorgio,
-> > > 
-> > > can you dump the content of max_hw_sectors_kb file for your USB storage
-> > > device and send that to this thread?
-> > 
-> > Hi all,
-> > 
-> > for both kernels, 5.1.20 (working) and 5.2.8 (not working),
-> > the content of /sys/dev/x:y/queue/max_hw_sectors_kb is 512
-> > for USB storage devices (2.0 and 3.0).
-> > 
-> > This is for the PC showing the issue.
-> > 
-> > In an other PC, which does not show the issus at the moment,
-> > the values are 120, for USB2.0, and 256, for USB3.0.
-> 
-> Hi again,
-> 
-> any news on this?
-> 
-> Is there anything I can do to help?
-> 
-> Should I report this somewhere else too?
-> 
-> Currently this is quite a huge problem for me,
-> since the only working external storage is an
-> old 1394 HDD...
+Hallo Bart,
 
-Hi all,
+On Mon, Sep 23, 2019 at 11:51 PM Bart Van Assche <bvanassche@acm.org> wrote:
+>
+> On 6/20/19 8:03 AM, Jack Wang wrote:
+> > +static const struct ibtrs_ib_dev_pool_ops dev_pool_ops;
+> > +static struct ibtrs_ib_dev_pool dev_pool = {
+> > +     .ops = &dev_pool_ops
+> > +};
+>
+> Can the definitions in this file be reordered such that the forward
+> declaration of dev_pool_ops can be removed?
+Will try to.
 
-I'm now on kernel 5.2.16, from Fedora, and still I
-see the same issue.
+> > +static void ibtrs_rdma_error_recovery(struct ibtrs_clt_con *con);
+> > +static int ibtrs_clt_rdma_cm_handler(struct rdma_cm_id *cm_id,
+> > +                                  struct rdma_cm_event *ev);
+> > +static void ibtrs_clt_rdma_done(struct ib_cq *cq, struct ib_wc *wc);
+> > +static void complete_rdma_req(struct ibtrs_clt_io_req *req, int errno,
+> > +                           bool notify, bool can_wait);
+> > +static int ibtrs_clt_write_req(struct ibtrs_clt_io_req *req);
+> > +static int ibtrs_clt_read_req(struct ibtrs_clt_io_req *req);
+>
+> Please also remove these forward declarations.
+OK
 
-I guess it is not a chipset quirk, since there
-are two involved here.
-For the USB 2.0 I've (with "lspci"):
+> > +bool ibtrs_clt_sess_is_connected(const struct ibtrs_clt_sess *sess)
+> > +{
+> > +     return sess->state == IBTRS_CLT_CONNECTED;
+> > +}
+>
+> Is it really useful to introduce a one line function for testing the
+> session state?
+No, not in that case really, thanks.
 
-USB controller: Advanced Micro Devices, Inc. [AMD/ATI] SB7x0/SB8x0/SB9x0 USB EHCI Controller (prog-if 20 [EHCI])
+> > +static inline struct ibtrs_tag *
+> > +__ibtrs_get_tag(struct ibtrs_clt *clt, enum ibtrs_clt_con_type con_type)
+> > +{
+> > +     size_t max_depth = clt->queue_depth;
+> > +     struct ibtrs_tag *tag;
+> > +     int cpu, bit;
+> > +
+> > +     cpu = get_cpu();
+> > +     do {
+> > +             bit = find_first_zero_bit(clt->tags_map, max_depth);
+> > +             if (unlikely(bit >= max_depth)) {
+> > +                     put_cpu();
+> > +                     return NULL;
+> > +             }
+> > +
+> > +     } while (unlikely(test_and_set_bit_lock(bit, clt->tags_map)));
+> > +     put_cpu();
+> > +
+> > +     tag = GET_TAG(clt, bit);
+> > +     WARN_ON(tag->mem_id != bit);
+> > +     tag->cpu_id = cpu;
+> > +     tag->con_type = con_type;
+> > +
+> > +     return tag;
+> > +}
+>
+> What is the role of the get_cpu() and put_cpu() calls in this function?
+> How can it make sense to assign the cpu number to tag->cpu_id after
+> put_cpu() has been called?
+We disable preemption while looking for a free "ibtrs_tag" (permit) in
+our tags_map. We store the cpu number the ibtrs_clt_get_tag() function
+has been originally called on in the ibtrs_tag we just found, so that
+when the user later would use this ibtrs_tag for an rdma operation
+(ibtrs_clt_request()), we would select the rdma connection with
+cq_vector corresponding to this cpu. If IRQ affinity is configured
+accordingly, this enables for an IO response to be processed on the
+same cpu the IO request was originally submitted on.
 
-For USB 3.0 I've:
+> > +static inline void ibtrs_clt_init_req(struct ibtrs_clt_io_req *req,
+> > +                                   struct ibtrs_clt_sess *sess,
+> > +                                   ibtrs_conf_fn *conf,
+> > +                                   struct ibtrs_tag *tag, void *priv,
+> > +                                   const struct kvec *vec, size_t usr_len,
+> > +                                   struct scatterlist *sg, size_t sg_cnt,
+> > +                                   size_t data_len, int dir)
+> > +{
+> > +     struct iov_iter iter;
+> > +     size_t len;
+> > +
+> > +     req->tag = tag;
+> > +     req->in_use = true;
+> > +     req->usr_len = usr_len;
+> > +     req->data_len = data_len;
+> > +     req->sglist = sg;
+> > +     req->sg_cnt = sg_cnt;
+> > +     req->priv = priv;
+> > +     req->dir = dir;
+> > +     req->con = ibtrs_tag_to_clt_con(sess, tag);
+> > +     req->conf = conf;
+> > +     req->need_inv = false;
+> > +     req->need_inv_comp = false;
+> > +     req->inv_errno = 0;
+> > +
+> > +     iov_iter_kvec(&iter, READ, vec, 1, usr_len);
+> > +     len = _copy_from_iter(req->iu->buf, usr_len, &iter);
+> > +     WARN_ON(len != usr_len);
+> > +
+> > +     reinit_completion(&req->inv_comp);
+> > +     if (sess->stats.enable_rdma_lat)
+> > +             req->start_jiffies = jiffies;
+> > +}
+>
+> A comment that explains what "req" stands for would be welcome. Since
+> this function copies the entire payload, I assume that it is only used
+> for control messages and not for reading or writing data from a block
+> device?
+Yes, we only copy control message provided by the user. Will extend
+the description.
 
-USB controller: ASMedia Technology Inc. ASM1042 SuperSpeed USB Host Controller (prog-if 30 [XHCI])
+> > +static int ibtrs_clt_failover_req(struct ibtrs_clt *clt,
+> > +                               struct ibtrs_clt_io_req *fail_req)
+> > +{
+> > +     struct ibtrs_clt_sess *alive_sess;
+> > +     struct ibtrs_clt_io_req *req;
+> > +     int err = -ECONNABORTED;
+> > +     struct path_it it;
+> > +
+> > +     do_each_path(alive_sess, clt, &it) {
+> > +             if (unlikely(alive_sess->state != IBTRS_CLT_CONNECTED))
+> > +                     continue;
+> > +             req = ibtrs_clt_get_copy_req(alive_sess, fail_req);
+> > +             if (req->dir == DMA_TO_DEVICE)
+> > +                     err = ibtrs_clt_write_req(req);
+> > +             else
+> > +                     err = ibtrs_clt_read_req(req);
+> > +             if (unlikely(err)) {
+> > +                     req->in_use = false;
+> > +                     continue;
+> > +             }
+> > +             /* Success path */
+> > +             ibtrs_clt_inc_failover_cnt(&alive_sess->stats);
+> > +             break;
+> > +     } while_each_path(&it);
+> > +
+> > +     return err;
+> > +}
+>
+> Also for this function, a comment that explains the purpose of this
+> function would be welcome.
+Will add a description to it.
 
-Any idea on how to proceed?
+>
+> > +static void fail_all_outstanding_reqs(struct ibtrs_clt_sess *sess)
+> > +{
+> > +     struct ibtrs_clt *clt = sess->clt;
+> > +     struct ibtrs_clt_io_req *req;
+> > +     int i, err;
+> > +
+> > +     if (!sess->reqs)
+> > +             return;
+> > +     for (i = 0; i < sess->queue_depth; ++i) {
+> > +             req = &sess->reqs[i];
+> > +             if (!req->in_use)
+> > +                     continue;
+> > +
+> > +             /*
+> > +              * Safely (without notification) complete failed request.
+> > +              * After completion this request is still usebale and can
+> > +              * be failovered to another path.
+> > +              */
+> > +             complete_rdma_req(req, -ECONNABORTED, false, true);
+> > +
+> > +             err = ibtrs_clt_failover_req(clt, req);
+> > +             if (unlikely(err))
+> > +                     /* Failover failed, notify anyway */
+> > +                     req->conf(req->priv, err);
+> > +     }
+> > +}
+>
+> What guarantees that this function does not call complete_rdma_req()
+> while complete_rdma_req() is called from the regular completion path?
+Before calling this function all the qps are drained in
+ibtrs_clt_stop_and_destroy_conns(...).
 
-Thanks a lot.
+> > +static bool __ibtrs_clt_change_state(struct ibtrs_clt_sess *sess,
+> > +                                  enum ibtrs_clt_state new_state)
+> > +{
+> > +     enum ibtrs_clt_state old_state;
+> > +     bool changed = false;
+> > +
+> > +     old_state = sess->state;
+> > +     switch (new_state) {
+>
+> Please use lockdep_assert_held() inside this function to verify at
+> runtime that session state changes are serialized properly.
+I haven't used lockdep_assert_held() before, will look into it.
 
-bye,
+> > +static enum ibtrs_clt_state ibtrs_clt_state(struct ibtrs_clt_sess *sess)
+> > +{
+> > +     enum ibtrs_clt_state state;
+> > +
+> > +     spin_lock_irq(&sess->state_wq.lock);
+> > +     state = sess->state;
+> > +     spin_unlock_irq(&sess->state_wq.lock);
+> > +
+> > +     return state;
+> > +}
+>
+> Please remove this function and read sess->state without holding
+> state_wq.lock.
+ok.
 
--- 
+> > +static void ibtrs_clt_hb_err_handler(struct ibtrs_con *c, int err)
+> > +{
+> > +     struct ibtrs_clt_con *con;
+> > +
+> > +     (void)err;
+> > +     con = container_of(c, typeof(*con), c);
+> > +     ibtrs_rdma_error_recovery(con);
+> > +}
+>
+> Can "(void)err" be left out?
+Yes
+> Can the declaration and assignment of 'con' be merged into a single line
+> of code?
+Yes
 
-piergiorgio
+> > +static int create_con(struct ibtrs_clt_sess *sess, unsigned int cid)
+> > +{
+> > +     struct ibtrs_clt_con *con;
+> > +
+> > +     con = kzalloc(sizeof(*con), GFP_KERNEL);
+> > +     if (unlikely(!con))
+> > +             return -ENOMEM;
+> > +
+> > +     /* Map first two connections to the first CPU */
+> > +     con->cpu  = (cid ? cid - 1 : 0) % nr_cpu_ids;
+> > +     con->c.cid = cid;
+> > +     con->c.sess = &sess->s;
+> > +     atomic_set(&con->io_cnt, 0);
+> > +
+> > +     sess->s.con[cid] = &con->c;
+> > +
+> > +     return 0;
+> > +}
+>
+> The code to map a connection ID to onto a CPU occurs multiple times. Has
+> it been considered to introduce a function for that mapping? Although
+> one-line inline functions are not recommended in general, such a
+> function will also make it easier to experiment with other mapping
+> approaches, e.g. mapping hypertread siblings onto the same connection ID.
+We have one connection for "user control messages" and as many
+connections as cpus for actual IO traffic. They all have different
+cq_vectors. This way one can experiment with any mapping by just
+setting a different smp_affinity for the IRQs corresponding to this
+cq_vectors under /proc/irq/.
+
+> > +static inline bool xchg_sessions(struct ibtrs_clt_sess __rcu **rcu_ppcpu_path,
+> > +                              struct ibtrs_clt_sess *sess,
+> > +                              struct ibtrs_clt_sess *next)
+> > +{
+> > +     struct ibtrs_clt_sess **ppcpu_path;
+> > +
+> > +     /* Call cmpxchg() without sparse warnings */
+> > +     ppcpu_path = (typeof(ppcpu_path))rcu_ppcpu_path;
+> > +     return (sess == cmpxchg(ppcpu_path, sess, next));
+> > +}
+>
+> This looks suspicious. Has it been considered to protect changes of
+> rcu_ppcpu_path with a mutex and to protect reads with an RCU read lock?
+>
+> > +static void ibtrs_clt_add_path_to_arr(struct ibtrs_clt_sess *sess,
+> > +                                   struct ibtrs_addr *addr)
+> > +{
+> > +     struct ibtrs_clt *clt = sess->clt;
+> > +
+> > +     mutex_lock(&clt->paths_mutex);
+> > +     clt->paths_num++;
+> > +
+> > +     /*
+> > +      * Firstly increase paths_num, wait for GP and then
+> > +      * add path to the list.  Why?  Since we add path with
+> > +      * !CONNECTED state explanation is similar to what has
+> > +      * been written in ibtrs_clt_remove_path_from_arr().
+> > +      */
+> > +     synchronize_rcu();
+> > +
+> > +     list_add_tail_rcu(&sess->s.entry, &clt->paths_list);
+> > +     mutex_unlock(&clt->paths_mutex);
+> > +}
+>
+> synchronize_rcu() while a mutex is being held? Really?
+The construct around our multipath implementation has been checked
+https://lkml.org/lkml/2018/5/18/659 and then validated (is "validated"
+the right word for this?): https://lkml.org/lkml/2018/5/28/2080.
+
+> > +static void ibtrs_clt_close_work(struct work_struct *work)
+> > +{
+> > +     struct ibtrs_clt_sess *sess;
+> > +
+> > +     sess = container_of(work, struct ibtrs_clt_sess, close_work);
+> > +
+> > +     cancel_delayed_work_sync(&sess->reconnect_dwork);
+> > +     ibtrs_clt_stop_and_destroy_conns(sess);
+> > +     /*
+> > +      * Sounds stupid, huh?  No, it is not.  Consider this sequence:
+> > +      *
+> > +      *   #CPU0                              #CPU1
+> > +      *   1.  CONNECTED->RECONNECTING
+> > +      *   2.                                 RECONNECTING->CLOSING
+> > +      *   3.  queue_work(&reconnect_dwork)
+> > +      *   4.                                 queue_work(&close_work);
+> > +      *   5.  reconnect_work();              close_work();
+> > +      *
+> > +      * To avoid that case do cancel twice: before and after.
+> > +      */
+> > +     cancel_delayed_work_sync(&sess->reconnect_dwork);
+> > +     ibtrs_clt_change_state(sess, IBTRS_CLT_CLOSED);
+> > +}
+>
+> The above code looks suspicious to me. I think there should be an
+> additional state change at the start of this function to prevent that
+> reconnect_dwork gets requeued after having been canceled
+Will look into it again, thanks.
+
+>
+> > +static void ibtrs_clt_dev_release(struct device *dev)
+> > +{
+> > +     /* Nobody plays with device references, so nop */
+> > +}
+>
+> That comment sounds wrong. Have you reviewed all of the device driver
+> core code and checked that there is no code in there that manipulates
+> struct device refcounts? I think the code that frees struct ibtrs_clt
+> should be moved from free_clt() into the above function.
+
+We only use the device to create an entry under /sys/class. free_clt()
+is destroying sysfs first and unregisters the device afterwards. I
+don't really see the need to free from the callback instead... Will
+make it clear in the comment.
+
+Thanks a lot,
+Danil
