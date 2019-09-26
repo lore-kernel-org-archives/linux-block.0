@@ -2,100 +2,75 @@ Return-Path: <SRS0=S7xR=XV=vger.kernel.org=linux-block-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-2.2 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
-	MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED,USER_AGENT_SANE_1
-	autolearn=no autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-5.2 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
+	INCLUDES_PATCH,MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,USER_AGENT_SANE_1
+	autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id BD82AC4360C
-	for <linux-block@archiver.kernel.org>; Thu, 26 Sep 2019 13:02:40 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 9F461C352AA
+	for <linux-block@archiver.kernel.org>; Thu, 26 Sep 2019 13:53:06 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.kernel.org (Postfix) with ESMTP id 9DDBB222C2
-	for <linux-block@archiver.kernel.org>; Thu, 26 Sep 2019 13:02:40 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id 7A96E21A4A
+	for <linux-block@archiver.kernel.org>; Thu, 26 Sep 2019 13:53:06 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1726332AbfIZNCg (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Thu, 26 Sep 2019 09:02:36 -0400
-Received: from mx2.suse.de ([195.135.220.15]:45980 "EHLO mx1.suse.de"
+        id S1727033AbfIZNxG (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Thu, 26 Sep 2019 09:53:06 -0400
+Received: from szxga07-in.huawei.com ([45.249.212.35]:48926 "EHLO huawei.com"
         rhost-flags-OK-OK-OK-FAIL) by vger.kernel.org with ESMTP
-        id S1725768AbfIZNCf (ORCPT <rfc822;linux-block@vger.kernel.org>);
-        Thu, 26 Sep 2019 09:02:35 -0400
-X-Virus-Scanned: by amavisd-new at test-mx.suse.de
-Received: from relay2.suse.de (unknown [195.135.220.254])
-        by mx1.suse.de (Postfix) with ESMTP id 1BE7CAEAE;
-        Thu, 26 Sep 2019 13:02:33 +0000 (UTC)
-Received: by ds.suse.cz (Postfix, from userid 10065)
-        id 55364DA8E5; Thu, 26 Sep 2019 15:02:52 +0200 (CEST)
-Date:   Thu, 26 Sep 2019 15:02:52 +0200
-From:   David Sterba <dsterba@suse.cz>
-To:     cl@linux.com
-Cc:     Matthew Wilcox <willy@infradead.org>,
-        "Darrick J. Wong" <darrick.wong@oracle.com>, dsterba@suse.cz,
-        Vlastimil Babka <vbabka@suse.cz>,
-        Andrew Morton <akpm@linux-foundation.org>, linux-mm@kvack.org,
-        linux-kernel@vger.kernel.org, Pekka Enberg <penberg@kernel.org>,
-        David Rientjes <rientjes@google.com>,
-        Ming Lei <ming.lei@redhat.com>,
-        Dave Chinner <david@fromorbit.com>,
-        Christoph Hellwig <hch@lst.de>, linux-xfs@vger.kernel.org,
-        linux-fsdevel@vger.kernel.org, linux-block@vger.kernel.org,
-        James Bottomley <James.Bottomley@hansenpartnership.com>,
-        linux-btrfs@vger.kernel.org, Roman Gushchin <guro@fb.com>,
-        Johannes Weiner <hannes@cmpxchg.org>
-Subject: Re: [PATCH v2 2/2] mm, sl[aou]b: guarantee natural alignment for
- kmalloc(power-of-two)
-Message-ID: <20190926130252.GP2751@twin.jikos.cz>
-Reply-To: dsterba@suse.cz
-Mail-Followup-To: dsterba@suse.cz, cl@linux.com,
-        Matthew Wilcox <willy@infradead.org>,
-        "Darrick J. Wong" <darrick.wong@oracle.com>,
-        Vlastimil Babka <vbabka@suse.cz>,
-        Andrew Morton <akpm@linux-foundation.org>, linux-mm@kvack.org,
-        linux-kernel@vger.kernel.org, Pekka Enberg <penberg@kernel.org>,
-        David Rientjes <rientjes@google.com>,
-        Ming Lei <ming.lei@redhat.com>, Dave Chinner <david@fromorbit.com>,
-        Christoph Hellwig <hch@lst.de>, linux-xfs@vger.kernel.org,
-        linux-fsdevel@vger.kernel.org, linux-block@vger.kernel.org,
-        James Bottomley <James.Bottomley@hansenpartnership.com>,
-        linux-btrfs@vger.kernel.org, Roman Gushchin <guro@fb.com>,
-        Johannes Weiner <hannes@cmpxchg.org>
-References: <20190826111627.7505-1-vbabka@suse.cz>
- <20190826111627.7505-3-vbabka@suse.cz>
- <df8d1cf4-ff8f-1ee1-12fb-cfec39131b32@suse.cz>
- <20190923171710.GN2751@twin.jikos.cz>
- <20190923175146.GT2229799@magnolia>
- <alpine.DEB.2.21.1909242045250.17661@www.lameter.com>
- <20190924205133.GK1855@bombadil.infradead.org>
- <alpine.DEB.2.21.1909242053010.17661@www.lameter.com>
+        id S1726094AbfIZNxF (ORCPT <rfc822;linux-block@vger.kernel.org>);
+        Thu, 26 Sep 2019 09:53:05 -0400
+Received: from DGGEMS412-HUB.china.huawei.com (unknown [172.30.72.60])
+        by Forcepoint Email with ESMTP id 2847842E9EEBD0B1E28C;
+        Thu, 26 Sep 2019 21:53:03 +0800 (CST)
+Received: from [127.0.0.1] (10.177.219.49) by DGGEMS412-HUB.china.huawei.com
+ (10.3.19.212) with Microsoft SMTP Server id 14.3.439.0; Thu, 26 Sep 2019
+ 21:52:57 +0800
+Subject: Re: [PATCH v4] block: fix null pointer dereference in
+ blk_mq_rq_timed_out()
+To:     Jens Axboe <axboe@kernel.dk>
+CC:     <linux-block@vger.kernel.org>, Ming Lei <ming.lei@redhat.com>,
+        "Christoph Hellwig" <hch@infradead.org>,
+        Keith Busch <keith.busch@intel.com>,
+        "Bart Van Assche" <bvanassche@acm.org>, <stable@vger.kernel.org>
+References: <20190925122025.31246-1-yuyufen@huawei.com>
+ <9fda0509-0ee5-9f9d-8a37-2d33a097d1bd@kernel.dk>
+From:   Yufen Yu <yuyufen@huawei.com>
+Message-ID: <e910ae23-2daa-1371-fc1e-16988e6e7783@huawei.com>
+Date:   Thu, 26 Sep 2019 21:52:55 +0800
+User-Agent: Mozilla/5.0 (Windows NT 6.1; WOW64; rv:52.0) Gecko/20100101
+ Thunderbird/52.2.1
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <alpine.DEB.2.21.1909242053010.17661@www.lameter.com>
-User-Agent: Mutt/1.5.23.1-rc1 (2014-03-12)
+In-Reply-To: <9fda0509-0ee5-9f9d-8a37-2d33a097d1bd@kernel.dk>
+Content-Type: text/plain; charset="utf-8"; format=flowed
+Content-Transfer-Encoding: 7bit
+Content-Language: en-US
+X-Originating-IP: [10.177.219.49]
+X-CFilter-Loop: Reflected
 Sender: linux-block-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-On Tue, Sep 24, 2019 at 08:55:02PM +0000, cl@linux.com wrote:
-> n Tue, 24 Sep 2019, Matthew Wilcox wrote:
-> 
-> > > There was a public discussion about this issue and from what I can tell
-> > > the outcome was that the allocator already provides what you want. Which
-> > > was a mechanism to misalign objects and detect these issues. This
-> > > mechanism has been in use for over a decade.
-> >
-> > You missed the important part, which was *ENABLED BY DEFAULT*.  People
-> > who are enabling a debugging option to debug their issues, should not
-> > have to first debug all the other issues that enabling that debugging
-> > option uncovers!
-> 
-> Why would you have to debug all other issues? You could put your patch on
-> top of the latest stable or distro kernel for testing.
 
-This does not work in development branches. They're based on some stable
-point but otherwise there's a lot of new code that usually has bugs and
-it's quite important be able to understand where the bug comes from.
 
-And the debugging instrumentation is there to add more sanity checks and
-canaries to catch overflows, assertions etc. If it's unreliable, then
-there's no point using it during development, IOW fix all bugs first and
-then see if there are more left after turning the debugging.
+On 2019/9/26 18:04, Jens Axboe wrote:
+> On 9/25/19 2:20 PM, Yufen Yu wrote:
+>> diff --git a/block/blk.h b/block/blk.h
+>> index ed347f7a97b1..de258e7b9db8 100644
+>> --- a/block/blk.h
+>> +++ b/block/blk.h
+>> @@ -30,6 +30,7 @@ struct blk_flush_queue {
+>>    	 */
+>>    	struct request		*orig_rq;
+>>    	spinlock_t		mq_flush_lock;
+>> +	blk_status_t 		rq_status;
+>>    };
+> Patch looks fine to me, but you should move rq_status to after the
+> flush_running_idx member of struct blk_flush_queue, since then it'll
+> fill a padding hole instead of adding new ones.
+>
+
+Thanks for you good suggestion.
+
+Thanks,
+Yufen
+
