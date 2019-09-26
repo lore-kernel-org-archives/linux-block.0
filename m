@@ -2,90 +2,72 @@ Return-Path: <SRS0=S7xR=XV=vger.kernel.org=linux-block-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-0.8 required=3.0 tests=DKIM_SIGNED,DKIM_VALID,
-	DKIM_VALID_AU,HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SPF_HELO_NONE,
-	SPF_PASS autolearn=no autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-9.8 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
+	INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,
+	USER_AGENT_GIT autolearn=unavailable autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id C5B44C47E48
-	for <linux-block@archiver.kernel.org>; Thu, 26 Sep 2019 09:17:00 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 1C234C47E48
+	for <linux-block@archiver.kernel.org>; Thu, 26 Sep 2019 09:50:22 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.kernel.org (Postfix) with ESMTP id 991B7217F4
-	for <linux-block@archiver.kernel.org>; Thu, 26 Sep 2019 09:17:00 +0000 (UTC)
-Authentication-Results: mail.kernel.org;
-	dkim=pass (2048-bit key) header.d=cloud.ionos.com header.i=@cloud.ionos.com header.b="N8NrSTeS"
+	by mail.kernel.org (Postfix) with ESMTP id EE81A222C4
+	for <linux-block@archiver.kernel.org>; Thu, 26 Sep 2019 09:50:21 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1726151AbfIZJQ7 (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Thu, 26 Sep 2019 05:16:59 -0400
-Received: from mail-io1-f68.google.com ([209.85.166.68]:46941 "EHLO
-        mail-io1-f68.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1730304AbfIZJQ7 (ORCPT
+        id S1728152AbfIZJuP (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Thu, 26 Sep 2019 05:50:15 -0400
+Received: from youngberry.canonical.com ([91.189.89.112]:49450 "EHLO
+        youngberry.canonical.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S1725980AbfIZJuP (ORCPT
         <rfc822;linux-block@vger.kernel.org>);
-        Thu, 26 Sep 2019 05:16:59 -0400
-Received: by mail-io1-f68.google.com with SMTP id c6so4501105ioo.13
-        for <linux-block@vger.kernel.org>; Thu, 26 Sep 2019 02:16:58 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=cloud.ionos.com; s=google;
-        h=mime-version:references:in-reply-to:from:date:message-id:subject:to
-         :cc;
-        bh=opU2ZI5JfOeMYpBAwSTCngXukXJ/aa9xFV3oPHd6LY0=;
-        b=N8NrSTeSaDVfcR6D7xcWuYzoTniMDLqUY1aWwjU3v0ZSgVyVrut1Q3AYJxzcKCNzD+
-         c0+MySLMF79j27EvLTHLgo5yvh8xCoOVMjXkjjH0Ad+CN5gRRenL1W6OahwMgYll5S9T
-         sKuDr+XQcoP2cuUqyZvGCGMjyQZEnC20YK/xfdCYLnIWqO5KVqdEnYANnGEGzHeG+3iP
-         yTXtY4Ia1tX3YpjICRcU6+fsqOE3rYgAlXa0HbvTXPvmG8/zqw1faZQ8NYGicNZRXWxE
-         mU8Fzsly5IuaKz3adjAkC2R1Ac2K1YczGzsPIeuo6y4NfgNpeOf7qx9Z5Q9oWXcScelN
-         OTzw==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20161025;
-        h=x-gm-message-state:mime-version:references:in-reply-to:from:date
-         :message-id:subject:to:cc;
-        bh=opU2ZI5JfOeMYpBAwSTCngXukXJ/aa9xFV3oPHd6LY0=;
-        b=SnqYHIGcA3Rk4Mom1hqXXDsadqHcdGfVDCuLxQ7+64FAp4iFS1BX7J5seGN+XVZX8h
-         qCNoVivJSADBlyUFOQeF9wLkOq6o2deyiFg/7HmUXQiZyx2kMmJMWcismKIHZODj2VXk
-         saemie37lfAjSYkl0nKL6muYGpbEi+IA86wCOKWb9TrsTvS5GIHBFhmvy8g9moE7ZCP7
-         oTZ2hd6Djw745B9BfleACFmOyK0p2lXbiNKQfxDiH/FKcKqtvXa0/10BHOUuTTwUpSlf
-         saAeUxOF86yS/9wjNCcZno6ZDyOEP+ATqhKtoUmHD55sDwOu8VOgaX1laOKMaPXhAIlA
-         jMmw==
-X-Gm-Message-State: APjAAAVPb5oct0EGHw7X8DvsohXUl+Ek/qbfiApYIJWZCCj56yrKtyZ0
-        aoez4F4Y+luXJyLwBBMuPIPvscSRCJfSbnhMufNm
-X-Google-Smtp-Source: APXvYqwIYSHBcJUQ3pMZh4YCYMydD9ttww2cVvSLVFh8Eoo4P7s3grDElbpXQD3jmw9i/t/GW2/r5TY2jZqXl35tb68=
-X-Received: by 2002:a6b:c348:: with SMTP id t69mr2503648iof.66.1569489418455;
- Thu, 26 Sep 2019 02:16:58 -0700 (PDT)
+        Thu, 26 Sep 2019 05:50:15 -0400
+Received: from 1.general.cking.uk.vpn ([10.172.193.212] helo=localhost)
+        by youngberry.canonical.com with esmtpsa (TLS1.2:ECDHE_RSA_AES_128_GCM_SHA256:128)
+        (Exim 4.86_2)
+        (envelope-from <colin.king@canonical.com>)
+        id 1iDQPc-0005BW-TY; Thu, 26 Sep 2019 09:50:12 +0000
+From:   Colin King <colin.king@canonical.com>
+To:     Jens Axboe <axboe@kernel.dk>,
+        Alexander Viro <viro@zeniv.linux.org.uk>,
+        linux-block@vger.kernel.org, linux-fsdevel@vger.kernel.org
+Cc:     kernel-janitors@vger.kernel.org, linux-kernel@vger.kernel.org
+Subject: [PATCH][next] io_uring: ensure variable ret is initialized to zero
+Date:   Thu, 26 Sep 2019 10:50:12 +0100
+Message-Id: <20190926095012.31826-1-colin.king@canonical.com>
+X-Mailer: git-send-email 2.20.1
 MIME-Version: 1.0
-References: <20190620150337.7847-1-jinpuwang@gmail.com> <20190620150337.7847-7-jinpuwang@gmail.com>
- <d0bc1253-4f3d-981b-97f1-e44900fffb44@acm.org> <CAHg0HuzDGgmFKykAmBuAwJXoP1OGq-pQteS=vYMjcbp=cwu9GQ@mail.gmail.com>
- <ee692ec2-7f65-19f5-f122-fed544074f5f@acm.org> <CAHg0HuyMekqFehsU+-O_X8-1j1Bwu6rJzvuAwVV4LQs06ZJsFw@mail.gmail.com>
- <befbe2d4-d37e-0e67-3bf5-01024663082f@acm.org> <CAHg0Huzuw=O2CJvUGJYO0whUE6tx34iPm7ScWRn-uRafRYp5aQ@mail.gmail.com>
- <aad75dc9-1503-3c32-5d69-2180d8abe3f7@acm.org>
-In-Reply-To: <aad75dc9-1503-3c32-5d69-2180d8abe3f7@acm.org>
-From:   Danil Kipnis <danil.kipnis@cloud.ionos.com>
-Date:   Thu, 26 Sep 2019 11:16:47 +0200
-Message-ID: <CAHg0HuzaSHhGHExNzoH4pcA3H40azaRZsrAHFtDRKLu-datDVw@mail.gmail.com>
-Subject: Re: [PATCH v4 06/25] ibtrs: client: main functionality
-To:     Bart Van Assche <bvanassche@acm.org>
-Cc:     Jack Wang <jinpuwang@gmail.com>, linux-block@vger.kernel.org,
-        linux-rdma@vger.kernel.org, Jens Axboe <axboe@kernel.dk>,
-        Christoph Hellwig <hch@infradead.org>,
-        Sagi Grimberg <sagi@grimberg.me>,
-        Jason Gunthorpe <jgg@mellanox.com>,
-        Doug Ledford <dledford@redhat.com>, rpenyaev@suse.de,
-        Jack Wang <jinpu.wang@cloud.ionos.com>
-Content-Type: text/plain; charset="UTF-8"
+Content-Type: text/plain; charset="utf-8"
+Content-Transfer-Encoding: 8bit
 Sender: linux-block-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-On Thu, Sep 26, 2019 at 1:21 AM Bart Van Assche <bvanassche@acm.org> wrote:
->
-> On 9/25/19 3:53 PM, Danil Kipnis wrote:
-> > Oh, you mean we just need stub functions for those, so that nobody
-> > steps on a null?
->
-> What I meant is that the memory that is backing a device must not be
-> freed until the reference count of a device has dropped to zero. If a
-> struct device is embedded in a larger structure that means signaling a
-> completion from inside the release function (ibtrs_clt_dev_release())
-> and not freeing the struct device memory (kfree(clt) in free_clt())
-> before that completion has been triggered.
+From: Colin Ian King <colin.king@canonical.com>
 
-Got it, thank you. Will move free_clt into the release function.
+In the case where sig is NULL the error variable ret is not initialized
+and may contain a garbage value on the final checks to see if ret is
+-ERESTARTSYS.  Best to initialize ret to zero before the do loop to
+ensure the ret does not accidentially contain -ERESTARTSYS before the
+loop.
+
+Addresses-Coverity: ("Uninitialized scalar variable")
+Fixes: dd671c79e40b ("io_uring: make CQ ring wakeups be more efficient")
+Signed-off-by: Colin Ian King <colin.king@canonical.com>
+---
+ fs/io_uring.c | 1 +
+ 1 file changed, 1 insertion(+)
+
+diff --git a/fs/io_uring.c b/fs/io_uring.c
+index 7b5710e3a18c..aa8ac557493c 100644
+--- a/fs/io_uring.c
++++ b/fs/io_uring.c
+@@ -2835,6 +2835,7 @@ static int io_cqring_wait(struct io_ring_ctx *ctx, int min_events,
+ 			return ret;
+ 	}
+ 
++	ret = 0;
+ 	iowq.nr_timeouts = atomic_read(&ctx->cq_timeouts);
+ 	do {
+ 		prepare_to_wait_exclusive(&ctx->wait, &iowq.wq,
+-- 
+2.20.1
+
