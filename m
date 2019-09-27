@@ -2,172 +2,144 @@ Return-Path: <SRS0=f8eR=XW=vger.kernel.org=linux-block-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-6.8 required=3.0 tests=DKIM_SIGNED,DKIM_VALID,
-	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,
-	SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED autolearn=ham autolearn_force=no
-	version=3.4.0
+X-Spam-Status: No, score=-0.8 required=3.0 tests=DKIM_SIGNED,DKIM_VALID,
+	DKIM_VALID_AU,HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SPF_HELO_NONE,
+	SPF_PASS,URIBL_BLOCKED autolearn=no autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 1D05CC4360C
-	for <linux-block@archiver.kernel.org>; Fri, 27 Sep 2019 10:45:44 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 56841C4360C
+	for <linux-block@archiver.kernel.org>; Fri, 27 Sep 2019 12:00:25 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.kernel.org (Postfix) with ESMTP id DF50120673
-	for <linux-block@archiver.kernel.org>; Fri, 27 Sep 2019 10:45:43 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id 2A5C820872
+	for <linux-block@archiver.kernel.org>; Fri, 27 Sep 2019 12:00:25 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=pass (2048-bit key) header.d=javigon-com.20150623.gappssmtp.com header.i=@javigon-com.20150623.gappssmtp.com header.b="bh9vm64J"
+	dkim=pass (2048-bit key) header.d=cloud.ionos.com header.i=@cloud.ionos.com header.b="JBx5mSIF"
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1726116AbfI0Kpn (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Fri, 27 Sep 2019 06:45:43 -0400
-Received: from mail-ed1-f65.google.com ([209.85.208.65]:41273 "EHLO
-        mail-ed1-f65.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1725946AbfI0Kpn (ORCPT
+        id S1726163AbfI0MAY (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Fri, 27 Sep 2019 08:00:24 -0400
+Received: from mail-wm1-f65.google.com ([209.85.128.65]:54398 "EHLO
+        mail-wm1-f65.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S1726087AbfI0MAY (ORCPT
         <rfc822;linux-block@vger.kernel.org>);
-        Fri, 27 Sep 2019 06:45:43 -0400
-Received: by mail-ed1-f65.google.com with SMTP id f20so1901918edv.8
-        for <linux-block@vger.kernel.org>; Fri, 27 Sep 2019 03:45:41 -0700 (PDT)
+        Fri, 27 Sep 2019 08:00:24 -0400
+Received: by mail-wm1-f65.google.com with SMTP id p7so6293697wmp.4
+        for <linux-block@vger.kernel.org>; Fri, 27 Sep 2019 05:00:22 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=javigon-com.20150623.gappssmtp.com; s=20150623;
-        h=from:message-id:mime-version:subject:date:in-reply-to:cc:to
-         :references;
-        bh=5ZfJhgjsJNNEiICb0XVlpoPBPpZmyftg4KZucrAlWHk=;
-        b=bh9vm64JLduCse0hNtHggzmENPc9mXiYhtXkR3Z15I3jVjcn6kh4VyWqQFzElCGH/d
-         oUioOd9FMNBKD7EGCNWOpqE75ZUz9698NmviaMoUYWFXomw+aEq4tSplBicJi7rzt9hu
-         GkUtzCn8s/3j5ecjWcY7M8ukYuIEQntCBaaSZ21inDrl8QMPUhm+QCLxixk7+CZR4QyR
-         JbMYszweFMhNeFcLCgKCasLZLsOVJJatTjOoVnbez1ptWvn1kAcMBoUqnAJzx8Vw+ZuO
-         17AjmSiCORz8sbYOMsKsIqylZMUXJ7L7YuK+tDuoJB0ZXPNKF2i/RpiyHoPg2SUgZ+W4
-         jjAQ==
+        d=cloud.ionos.com; s=google;
+        h=mime-version:references:in-reply-to:from:date:message-id:subject:to
+         :cc;
+        bh=7sau4xOb8dPAV6A8mONisBLMb8Kneqh/zCycDLH7kVM=;
+        b=JBx5mSIFQWc67My7BtaboyYPhlJ2ld2ZaxutYkYxsWk/2GoodnKW91vbnziHjt/6aE
+         weQgSFmAO8xjf3Y8/jne6cmlJkhKRbzKNKrbTgu5e1ECiRfgJ3sFXJLQpxlQFNT696ma
+         IGAXuZ9JcQrvNsK2R8W5QNGY8zOyGDdqk47EU1GXaY1l8DuwxYeCO8VE/ScWrbhmGlUY
+         Hm8rt5hp7u+4BpNBO50CWDvdIKT+dg0JZmtZLdDE2sbUSMZGn4gcbtEKL9kbDdqpmdqX
+         lS8/pyy0OHpXVZRyvQgnR1ZPodt61ZqbhHlGpbBjLCYagDYGNib+7D/RN4vTd0l4r/uv
+         lwJw==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=1e100.net; s=20161025;
-        h=x-gm-message-state:from:message-id:mime-version:subject:date
-         :in-reply-to:cc:to:references;
-        bh=5ZfJhgjsJNNEiICb0XVlpoPBPpZmyftg4KZucrAlWHk=;
-        b=dTIWTIoE7727fvZZ7zGbvvhIek+t4fwcOB+fL9smV6tKsiKQko8OkOXdjk8S2qh77/
-         19Po12FbLxg504tKaGkbVN7zOPOiWus+SMCmvGfjysT7RHMLfI9I7w1/GTWORcHMLhqZ
-         diFSyJjlIdAr4JOnGNFcpVid1JSCMkTfI8ZZRLxyTk0xLfnsXbhA95mJ1trwfEldkTdo
-         v7AtGXjSAAaoLsrripMk/atXckmpr3gm3NlEl5c4LUTLBG+l4kGBGhB8ZgqbnntoYesx
-         9CwlJevv+0BZLfeeL5Vfu1HxT068xPTktr6r9oBH5Fpkpvl/3Dr9CFyekSbQCheaG9Cq
-         yWQg==
-X-Gm-Message-State: APjAAAXnvaS8iJkSpV9DtEZG/G9XAsAzy5iRi3OYGPKtwkZu/pH2T8nJ
-        JKKSlqtPdhj4zkT+8LCK2YMeCQ==
-X-Google-Smtp-Source: APXvYqxFr1mpLkLsDzwgW9IPHCAtZaqdkPGns/VLpyykcUWo8LJu7VL6SViknyy3r1Wud3Zfd9RTHA==
-X-Received: by 2002:a50:d758:: with SMTP id i24mr3656967edj.246.1569581140995;
-        Fri, 27 Sep 2019 03:45:40 -0700 (PDT)
-Received: from [10.22.151.221] ([89.248.140.17])
-        by smtp.gmail.com with ESMTPSA id i53sm444881eda.33.2019.09.27.03.45.39
-        (version=TLS1_2 cipher=ECDHE-RSA-AES128-GCM-SHA256 bits=128/128);
-        Fri, 27 Sep 2019 03:45:40 -0700 (PDT)
-From:   =?utf-8?Q?Javier_Gonz=C3=A1lez?= <javier@javigon.com>
-Message-Id: <F17543BE-F182-4E28-A907-0C4925529CED@javigon.com>
-Content-Type: multipart/signed;
-        boundary="Apple-Mail=_9E9A5CF9-8C2C-4B51-8C10-39EFC67B87B3";
-        protocol="application/pgp-signature";
-        micalg=pgp-sha256
-Mime-Version: 1.0 (Mac OS X Mail 12.4 \(3445.104.11\))
-Subject: Re: [PATCH 1/2] blk-mq: respect io scheduler
-Date:   Fri, 27 Sep 2019 12:45:39 +0200
-In-Reply-To: <20190927072431.23901-2-ming.lei@redhat.com>
-Cc:     Jens Axboe <axboe@kernel.dk>, linux-block@vger.kernel.org,
-        Bart Van Assche <bvanassche@acm.org>,
-        Hannes Reinecke <hare@suse.com>,
-        Damien Le Moal <damien.lemoal@wdc.com>,
-        Dave Chinner <dchinner@redhat.com>
-To:     Ming Lei <ming.lei@redhat.com>
-References: <20190927072431.23901-1-ming.lei@redhat.com>
- <20190927072431.23901-2-ming.lei@redhat.com>
-X-Mailer: Apple Mail (2.3445.104.11)
+        h=x-gm-message-state:mime-version:references:in-reply-to:from:date
+         :message-id:subject:to:cc;
+        bh=7sau4xOb8dPAV6A8mONisBLMb8Kneqh/zCycDLH7kVM=;
+        b=rncocscGADM9KfckJveULygugbox/1t0DEZZjvIfQOJECjqFF6AX1PGpZ+MvQTT6z8
+         ryarpxX7lgACLyJUpNRw9e5RP23SU/Koi0xFj86j9erFZuv5dYFidPMkCelgA4LHyFVd
+         BGNeRq+IBNGv7LYi9auUMO1/nvfKdlUAXlkkncD3Nh97QhdZ98z8E3pT085NZT8t2omd
+         UdF/UKF6l3GnDbs+jo4ao7bn5tJGx7ERWB60oIpMWltMhHjY/lfstDsOLanixWf/X3D7
+         oRqJ86mjqYKwo/krkl/9Ny+U0C8rghsaYAVK+08jWagbOlo5QuTk8lp3gPe2CE0ywSbC
+         dLmw==
+X-Gm-Message-State: APjAAAVYtj7H8rOekQDEptyc7XFcVdJs1Rn6T+jvNrXVvKAG47oig6hM
+        OvAmZihG/vETrPNybJOAjUGrluJrm8wvG7F/eIeccg==
+X-Google-Smtp-Source: APXvYqySiV0qQ9lhK5Uto9CXxqqUPTX+RQLORdsyn9dS/8FaZXdJZDAA0Tc1FTVrOfx3oL89tccCvAvzqQ/EhQSNeB4=
+X-Received: by 2002:a1c:7dd1:: with SMTP id y200mr6611245wmc.59.1569585622131;
+ Fri, 27 Sep 2019 05:00:22 -0700 (PDT)
+MIME-Version: 1.0
+References: <20190620150337.7847-1-jinpuwang@gmail.com> <20190620150337.7847-8-jinpuwang@gmail.com>
+ <0f6ce58e-48f2-8020-f8f6-957cf464ae60@acm.org>
+In-Reply-To: <0f6ce58e-48f2-8020-f8f6-957cf464ae60@acm.org>
+From:   Jinpu Wang <jinpu.wang@cloud.ionos.com>
+Date:   Fri, 27 Sep 2019 14:00:11 +0200
+Message-ID: <CAMGffEkud6di8veG0sVfLSY4Qe+ngMvPd4YnHh1SZK9-CeZnmA@mail.gmail.com>
+Subject: Re: [PATCH v4 07/25] ibtrs: client: statistics functions
+To:     Bart Van Assche <bvanassche@acm.org>
+Cc:     Jack Wang <jinpuwang@gmail.com>, linux-block@vger.kernel.org,
+        linux-rdma@vger.kernel.org, Jens Axboe <axboe@kernel.dk>,
+        Christoph Hellwig <hch@infradead.org>,
+        Sagi Grimberg <sagi@grimberg.me>,
+        Jason Gunthorpe <jgg@mellanox.com>,
+        Doug Ledford <dledford@redhat.com>,
+        Danil Kipnis <danil.kipnis@cloud.ionos.com>, rpenyaev@suse.de
+Content-Type: text/plain; charset="UTF-8"
 Sender: linux-block-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
+On Tue, Sep 24, 2019 at 1:15 AM Bart Van Assche <bvanassche@acm.org> wrote:
+>
+> On 6/20/19 8:03 AM, Jack Wang wrote:
+> > +void ibtrs_clt_update_rdma_lat(struct ibtrs_clt_stats *stats, bool read,
+> > +                            unsigned long ms)
+> > +{
+> > +     struct ibtrs_clt_stats_pcpu *s;
+> > +     int id;
+> > +
+> > +     id = ibtrs_clt_ms_to_id(ms);
+> > +     s = this_cpu_ptr(stats->pcpu_stats);
+> > +     if (read) {
+> > +             s->rdma_lat_distr[id].read++;
+> > +             if (s->rdma_lat_max.read < ms)
+> > +                     s->rdma_lat_max.read = ms;
+> > +     } else {
+> > +             s->rdma_lat_distr[id].write++;
+> > +             if (s->rdma_lat_max.write < ms)
+> > +                     s->rdma_lat_max.write = ms;
+> > +     }
+> > +}
+>
+> Can it happen that this function is called simultaneously from thread
+> context and from interrupt context?
+This can't happen, we only call the function from complete_rdma_req, and
+complete_rdma_req is call from cq callback except fail_all_outstanding_reqs,
+cq callback context is softirq, fail_all_outstanding_reqs is process
+context, but we
+disconnect and drain_qp before call into fail_all_outstading_reqs
 
---Apple-Mail=_9E9A5CF9-8C2C-4B51-8C10-39EFC67B87B3
-Content-Transfer-Encoding: quoted-printable
-Content-Type: text/plain;
-	charset=utf-8
+>
+> > +void ibtrs_clt_update_wc_stats(struct ibtrs_clt_con *con)
+> > +{
+> > +     struct ibtrs_clt_sess *sess = to_clt_sess(con->c.sess);
+> > +     struct ibtrs_clt_stats *stats = &sess->stats;
+> > +     struct ibtrs_clt_stats_pcpu *s;
+> > +     int cpu;
+> > +
+> > +     cpu = raw_smp_processor_id();
+> > +     s = this_cpu_ptr(stats->pcpu_stats);
+> > +     s->wc_comp.cnt++;
+> > +     s->wc_comp.total_cnt++;
+> > +     if (unlikely(con->cpu != cpu)) {
+> > +             s->cpu_migr.to++;
+> > +
+> > +             /* Careful here, override s pointer */
+> > +             s = per_cpu_ptr(stats->pcpu_stats, con->cpu);
+> > +             atomic_inc(&s->cpu_migr.from);
+> > +     }
+> > +}
+>
+> Same question here.
+The function is only called from cq done callback,
+>
+> > +void ibtrs_clt_inc_failover_cnt(struct ibtrs_clt_stats *stats)
+> > +{
+> > +     struct ibtrs_clt_stats_pcpu *s;
+> > +
+> > +     s = this_cpu_ptr(stats->pcpu_stats);
+> > +     s->rdma.failover_cnt++;
+> > +}
+>
+> And here ...
+this function only call from process context.
 
-> On 27 Sep 2019, at 09.24, Ming Lei <ming.lei@redhat.com> wrote:
->=20
-> Now in case of real MQ, io scheduler may be bypassed, and not only =
-this
-> way may hurt performance for some slow MQ device, but also break zoned
-> device which depends on mq-deadline for respecting the write order in
-> one zone.
->=20
-> So don't bypass io scheduler if we have one setup.
->=20
-> This patch can double sequential write performance basically on MQ
-> scsi_debug when mq-deadline is applied.
->=20
-> Cc: Bart Van Assche <bvanassche@acm.org>
-> Cc: Hannes Reinecke <hare@suse.com>
-> Cc: Damien Le Moal <damien.lemoal@wdc.com>
-> Cc: Dave Chinner <dchinner@redhat.com>
-> Signed-off-by: Ming Lei <ming.lei@redhat.com>
-> ---
-> block/blk-mq.c | 6 ++++--
-> 1 file changed, 4 insertions(+), 2 deletions(-)
->=20
-> diff --git a/block/blk-mq.c b/block/blk-mq.c
-> index 20a49be536b5..d7aed6518e62 100644
-> --- a/block/blk-mq.c
-> +++ b/block/blk-mq.c
-> @@ -2003,6 +2003,8 @@ static blk_qc_t blk_mq_make_request(struct =
-request_queue *q, struct bio *bio)
-> 		}
->=20
-> 		blk_add_rq_to_plug(plug, rq);
-> +	} else if (q->elevator) {
-> +		blk_mq_sched_insert_request(rq, false, true, true);
-> 	} else if (plug && !blk_queue_nomerges(q)) {
-> 		/*
-> 		 * We do limited plugging. If the bio can be merged, do =
-that.
-> @@ -2026,8 +2028,8 @@ static blk_qc_t blk_mq_make_request(struct =
-request_queue *q, struct bio *bio)
-> 			blk_mq_try_issue_directly(data.hctx, =
-same_queue_rq,
-> 					&cookie);
-> 		}
-> -	} else if ((q->nr_hw_queues > 1 && is_sync) || (!q->elevator &&
-> -			!data.hctx->dispatch_busy)) {
-> +	} else if ((q->nr_hw_queues > 1 && is_sync) ||
-> +			!data.hctx->dispatch_busy) {
-> 		blk_mq_try_issue_directly(data.hctx, rq, &cookie);
-> 	} else {
-> 		blk_mq_sched_insert_request(rq, false, true, true);
-> --
-> 2.20.1
-
-
-Looks good to me. Fixes a couple issues we have seen with zoned devices =
-too.
-
-Reviewed-by: Javier Gonz=C3=A1lez <javier@javigon.com>
-
-
---Apple-Mail=_9E9A5CF9-8C2C-4B51-8C10-39EFC67B87B3
-Content-Transfer-Encoding: 7bit
-Content-Disposition: attachment;
-	filename=signature.asc
-Content-Type: application/pgp-signature;
-	name=signature.asc
-Content-Description: Message signed with OpenPGP
-
------BEGIN PGP SIGNATURE-----
-
-iQIzBAEBCAAdFiEEU1dMZpvMIkj0jATvPEYBfS0leOAFAl2N6FMACgkQPEYBfS0l
-eOABwQ//cIngw7uBAkc9bZItObl/cdXIqvFJ9f6ls3KPBqTAbQg80WhjcxdBqE1Z
-IZvaq4Ggjkr48c4tLUsLF2YdlW1pv8SPiJlUL9+DLfEqq/CH0CuGtj/QE1foPxNa
-k7P0Pb8WixnF2xG1cG/+Vk7z3K8ZS49Tlr8fd9ksBypozO21syhSJTXfWWKGMB28
-EDnW/FRdPGGg2yO83i95boPPjkSmRwfpIBn/1lCZm12oogb+U1H3wScWuK1zZbI1
-9v/Asd4Cz2qq0/lmkNwMV2Q9sju6+ze/0RKESEib2TUiMqz4EtJpARw+tXginYjg
-ZJNnq3kpvftnptGS3U62+2DG2FwCVAaerJNSozU+vh8NUIPakcX0NG7Kyp/3IjYn
-7DDkFhdyh6e3CftyvuVax7yw8g7Cu7wGBfc3uPhzK1Zj99GazKbK0SA6UEXb+Zo8
-FriOPjK1/4rPavDez9Yp+SkBlhktLAfAm4QAR+B70SF56B57uF20QDFZ7kirsgvI
-ZQGaG6zW2G3bnTd1iJOEyJ/qtJjOBMcYTwNyCeTzfOh9MQwZgnTeIQI2zSBrcaCr
-qMoWSHyuzKtTrOOypJ3gaVuz7PsGWv2itLczZoorsP2LfPeDGaSGQe/hxDu4l2oh
-IiPIrMptQJzt9KkN09F1DMg/k+jUuCpCoQUfnL5a/TaZy9x8C6Y=
-=dcA5
------END PGP SIGNATURE-----
-
---Apple-Mail=_9E9A5CF9-8C2C-4B51-8C10-39EFC67B87B3--
+>
+> Thanks,
+>
+> Bart.
+Thanks,
+Jinpu
