@@ -7,80 +7,80 @@ X-Spam-Status: No, score=-6.8 required=3.0 tests=DKIM_SIGNED,DKIM_VALID,
 	SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED autolearn=ham autolearn_force=no
 	version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id B8FB4C4360C
-	for <linux-block@archiver.kernel.org>; Fri, 27 Sep 2019 17:26:03 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 4A7D5C4360C
+	for <linux-block@archiver.kernel.org>; Fri, 27 Sep 2019 17:27:21 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.kernel.org (Postfix) with ESMTP id 685F9207FF
-	for <linux-block@archiver.kernel.org>; Fri, 27 Sep 2019 17:26:03 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id 08F93207FF
+	for <linux-block@archiver.kernel.org>; Fri, 27 Sep 2019 17:27:21 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (2048-bit key) header.d=wdc.com header.i=@wdc.com header.b="M0qeOsIR";
-	dkim=pass (1024-bit key) header.d=sharedspace.onmicrosoft.com header.i=@sharedspace.onmicrosoft.com header.b="GDxnbCyq"
+	dkim=fail reason="signature verification failed" (2048-bit key) header.d=wdc.com header.i=@wdc.com header.b="Uf7IIPmZ";
+	dkim=pass (1024-bit key) header.d=sharedspace.onmicrosoft.com header.i=@sharedspace.onmicrosoft.com header.b="Fjbwifw9"
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1727061AbfI0R0D (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Fri, 27 Sep 2019 13:26:03 -0400
-Received: from esa4.hgst.iphmx.com ([216.71.154.42]:44764 "EHLO
+        id S1726883AbfI0R1U (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Fri, 27 Sep 2019 13:27:20 -0400
+Received: from esa4.hgst.iphmx.com ([216.71.154.42]:44876 "EHLO
         esa4.hgst.iphmx.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1726027AbfI0R0C (ORCPT
+        with ESMTP id S1726676AbfI0R1U (ORCPT
         <rfc822;linux-block@vger.kernel.org>);
-        Fri, 27 Sep 2019 13:26:02 -0400
+        Fri, 27 Sep 2019 13:27:20 -0400
 DKIM-Signature: v=1; a=rsa-sha256; c=simple/simple;
   d=wdc.com; i=@wdc.com; q=dns/txt; s=dkim.wdc.com;
-  t=1569605162; x=1601141162;
+  t=1569605239; x=1601141239;
   h=from:to:cc:subject:date:message-id:references:
    content-transfer-encoding:mime-version;
-  bh=HObij8lhNStiAAL3HAubDZylVbUOxoVYLdJ2jkD9g9g=;
-  b=M0qeOsIRRAy0N+rDLEsM2EfgbCmKQGOIGPe7nUnd2LBbIBCxB0QTvrw9
-   I0/V2ZmrLhx6IhbWhlPvkWO3Jx1SM4eBhcMKmVyBOQxQKynRR1kWlrXqr
-   H9YOarQ40miuBYfqD2gZqaSHkmMEEf3FEQNBiG73OSWd3cr7F+QenDgoo
-   y/xdjewJhog355mn9JSh7KQk8v2pZZRAD4XPOA8DWq7KrlT2yNE8kbqVS
-   FhO3MvNPNrOoxSdK43TLdIl1yDNcFuIwkLi3ZtlQ7ULAstrm26J22D/Qn
-   D9z2syZku79ySgQPM9ehfGwOGMcGoxmmnqz5W7TzZJgL5VLiHXgJAVJq5
-   A==;
-IronPort-SDR: lhHbfccBTdEcA0H20bu/mn9j4IU5E4cMb34lKtx+vzGdCX7w2kDFswJtzeFJqO8giy1XwqOluN
- 1k5gzN8nQBtLQgZAC+TT0zKbJJUWV0XTw3BKSrFk+0gv3JSZ9NRCBhCkZA4Xpnzik7+kfG7U+B
- Z3cZUj+AnS2iFfJXlUZ32KRocKncJRjkQbl7WJKzzRzg2RgIz5uegDGN6Wrei2NrqUQlngvhIk
- IIvDeuyPaxFlKahlkmZ+E8EgTOFu08lEoPgUUHvUBu+uUeW5AfYYNBngs/glGzf3WIPcO4mpz+
- vvo=
+  bh=//5yS9QmXYtFwYRISUdNDorWL6ZUeu3TNTLvusD1r8g=;
+  b=Uf7IIPmZdJ8gYTYhBbR7U1eosiF7w2eApOKizC9MgjFAeJ4oBZMSYkQ6
+   KX/0nEq02dta3KwStidBDEpG/vm4hqHCwdt+ILylgvfIThfBwY6gBIP6w
+   9jh0kFpu8i3WuHmOX1Cn26IXM3voPSdMA9xSOEaPsb+ejfAEGk0+H6fTQ
+   VzAM8z6jZC1+j3iH4nqmKX5ZN/0DLvxL0PWKVbL8/zzvXJPyIgP8b982g
+   K8thNdcensl181/+io4+/ToDZhKsuIOpcb//wHv9al8Dn/lEJE29dvhwj
+   hNzYUovpEISiA4m3J1JlUIaqMJX4Z61/XwFh4QnNNEQ20zdbzHXC6OFkX
+   g==;
+IronPort-SDR: qk43hx0xc5174CTEflCGA1gRDvCD9dN5TzzPnuUZSTL6VAh0+VDxsQcGYwo9y+FRCPC+FPPXyc
+ EXsI8wv8SnY7o9pJ+SkX4rW27NbP3MTnqmk9iUrkDOeC9AbG4eHpI4oxRWtDjHQrljXdl5yX0X
+ 52Bs50tlwbKNjkn8HbwoGn7SbD7ATGDyDpFBr9v/ca2QYsUlu/wU0b2Cs9cUfUDYm1dOTULiSz
+ zBK1kfcDpaXI2Jmh1huVJCutzY1Gq8RfzHeT5S1tAakPlXNXveQqPQ6YjUizl7bteg+/XExGVD
+ Hf0=
 X-IronPort-AV: E=Sophos;i="5.64,556,1559491200"; 
-   d="scan'208";a="119289938"
-Received: from mail-dm3nam05lp2055.outbound.protection.outlook.com (HELO NAM05-DM3-obe.outbound.protection.outlook.com) ([104.47.49.55])
-  by ob1.hgst.iphmx.com with ESMTP; 28 Sep 2019 01:26:01 +0800
+   d="scan'208";a="119290015"
+Received: from mail-dm3nam05lp2050.outbound.protection.outlook.com (HELO NAM05-DM3-obe.outbound.protection.outlook.com) ([104.47.49.50])
+  by ob1.hgst.iphmx.com with ESMTP; 28 Sep 2019 01:27:18 +0800
 ARC-Seal: i=1; a=rsa-sha256; s=arcselector9901; d=microsoft.com; cv=none;
- b=gl3+vV6qq8/raetRS5Neqmrdf4hPUosyP7Ohrt9DjphU/ktKwwhRBwbDVYlYObluJJaO/oFh2VX1gnNMmDl81zbQd++AP7HUuOYH/muQJwbFgkx5bDkDu9H1rPiAb7Iy/nxwITgDxUwH5//MWQRcts5UKgq3s0J/hdnLFR66/FwKuy6soKglDSszOMsLbMPcibIsIKSSO4FE6/+D6b9AJ8yi212hFelEzl/gCpxfsiKosN0dY/jV9rmFPBAYwE4x2Tv0BxhDy10fCm6vg3mtGfSb6Uto4JqBaCITi/OvZgD5c3rv2osNTGv5PUbwYMadoYIQKIe2RVcNK0km+geGQA==
+ b=K1AyqaiYCkMGuMpyj4DNbwaSnPu6hJSyHDosQQJbJCcNZccZY2gRiLdD938drk4Rq1pOOHnhVTd+m/MnGBfEcRuXO2wXoPBxNmdY0gmY8CaVSBxB2mq7zjPCoxj/4ZdMLprcP7XkYAe6IQivH5d9sInTNVWSW0307JAxF5AxAF7+DuLGkRopDKikTYfs02oy75E/7JC49011Ktde2qL8BzHUWpdMn0xzlhY/ZspXdqI4XBUYBteJY7P78Q4t5M9tMTHpk0IrAOw/4tQtdffC5FooCf4852k8ex2KOAC3vXEjMnr9l7oEDWWPkZKg+1I8zh2IOLNBhRXqFCxU2zhUkA==
 ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com;
  s=arcselector9901;
  h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
- bh=uJNZBNbdki5ROdFHtOXeQTi05SGaNQ5n8bWH4f717ew=;
- b=WXjvOLBTVmZNbgRTBsPHt6IOFOoQhTgHF2ES69PznM/dTLZNFz9s9zmCKZCZVoVzqET7XbSn7sEWQuEYKISuPrVQVbnPmYFf6SfQ1ZSEfb0slPdiHOw2Evg4UUWhI9Ngp9f9vDS8bBbqtj5C3fafViKrA3hoWuAaJ6NNPgLYDj8NrEU+FCUdtFfbEQf9oXHhcPtCGuqhFhLxVt7UhFMgB5Xh+MMsAzeBYhKhEI+HT3oTWsRIjZ0pKLWRotYHy2BKTak+RW3QTA/ROpchiHH8EJF+QvNrHqIFSH2Gt+W8/OJ7SNGkwVnZg5IclS3iIytQpRbDVD4QsBplWl/n9Khxmw==
+ bh=gxUFSubXhoZ3V3EWmogyWpWbdvYncSyL6LKcUSs9C2c=;
+ b=gMUypyFGubV5IXDcuAeiZvFUiv0GpHymd/ei7OYBVk+qKJGCQpwxbIhf2Mu4MN8clFijJlBhBqs+wlzSFpxmg8R0H9rcclHRR4TCt+7oTVbbEC7KYW7tj7d4azQzdOrNfH0vcriRRuvzO5lxK4xdScVsmiUkTH6AO8VGnoC+qtFN0+tM4hborc1imtAkpYJfVM84yvveqUhsb7Swu905YiGtGlgutbi81FVL98uXpbUv9+a5Bx22UTZtUeq7sLUCk725UD6BcwTU7IbXLxECXCRop4vt27/XKFfrznIZ8Y9o8KiqmMLLaAHxRbpxccxbYHBa6AIrzeuNPc5XzJn6NQ==
 ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass
  smtp.mailfrom=wdc.com; dmarc=pass action=none header.from=wdc.com; dkim=pass
  header.d=wdc.com; arc=none
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
  d=sharedspace.onmicrosoft.com; s=selector2-sharedspace-onmicrosoft-com;
  h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
- bh=uJNZBNbdki5ROdFHtOXeQTi05SGaNQ5n8bWH4f717ew=;
- b=GDxnbCyqnsnoePtF6FGwhJi8VglN0ob60PGBr1WkJ2H1bZL6lpca4cheK1ibJkPXGW9PDqzpzimxq1ujFR7SYuaioqRpzL9+Vw7pz0REVDhrFhb4NZV1owt65IVE26pz/XqDKFVVkta0iddIcKxPd9zVwJsFmnpqdvqy3v8W8ZI=
+ bh=gxUFSubXhoZ3V3EWmogyWpWbdvYncSyL6LKcUSs9C2c=;
+ b=Fjbwifw9zaTc2kotVi9Ypy/JsF7ElswQmY+6Sbv8lm15xznHff6ylvNQBqFS8K1ElzbZ06yDefkem6nhH4kIhscgyGRy931ycEwOoByIqYBVu0g2ji0o7vfvhj2ae3OKI3nYfknXIKDFv1Fd1W1QN8/1ZdXqOA1G9sSIvkRatgw=
 Received: from BYAPR04MB5816.namprd04.prod.outlook.com (20.179.59.16) by
  BYAPR04MB4071.namprd04.prod.outlook.com (52.135.215.154) with Microsoft SMTP
  Server (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
- 15.20.2284.20; Fri, 27 Sep 2019 17:26:00 +0000
+ 15.20.2284.20; Fri, 27 Sep 2019 17:27:17 +0000
 Received: from BYAPR04MB5816.namprd04.prod.outlook.com
  ([fe80::9821:67e1:9799:b117]) by BYAPR04MB5816.namprd04.prod.outlook.com
  ([fe80::9821:67e1:9799:b117%3]) with mapi id 15.20.2284.028; Fri, 27 Sep 2019
- 17:26:00 +0000
+ 17:27:17 +0000
 From:   Damien Le Moal <Damien.LeMoal@wdc.com>
 To:     Ming Lei <ming.lei@redhat.com>, Jens Axboe <axboe@kernel.dk>
 CC:     "linux-block@vger.kernel.org" <linux-block@vger.kernel.org>,
         Bart Van Assche <bvanassche@acm.org>,
         Hannes Reinecke <hare@suse.com>,
         Dave Chinner <dchinner@redhat.com>
-Subject: Re: [PATCH 1/2] blk-mq: respect io scheduler
-Thread-Topic: [PATCH 1/2] blk-mq: respect io scheduler
-Thread-Index: AQHVdQSz1R5UWPhzK0WufyKE7KOizQ==
-Date:   Fri, 27 Sep 2019 17:25:59 +0000
-Message-ID: <BYAPR04MB58166A77C55B3B8667B37554E7810@BYAPR04MB5816.namprd04.prod.outlook.com>
+Subject: Re: [PATCH 2/2] blk-mq: apply normal plugging for HDD
+Thread-Topic: [PATCH 2/2] blk-mq: apply normal plugging for HDD
+Thread-Index: AQHVdQS1etuPt1XGoE+vY/xtqu3qkQ==
+Date:   Fri, 27 Sep 2019 17:27:17 +0000
+Message-ID: <BYAPR04MB58163C5CE6C700779E2FABADE7810@BYAPR04MB5816.namprd04.prod.outlook.com>
 References: <20190927072431.23901-1-ming.lei@redhat.com>
- <20190927072431.23901-2-ming.lei@redhat.com>
+ <20190927072431.23901-3-ming.lei@redhat.com>
 Accept-Language: en-US
 Content-Language: en-US
 X-MS-Has-Attach: 
@@ -89,29 +89,29 @@ authentication-results: spf=none (sender IP is )
  smtp.mailfrom=Damien.LeMoal@wdc.com; 
 x-originating-ip: [199.255.44.250]
 x-ms-publictraffictype: Email
-x-ms-office365-filtering-correlation-id: 238f637c-9a6e-43d7-8429-08d7436fc3c6
+x-ms-office365-filtering-correlation-id: f20fec8d-b95a-4c68-90aa-08d7436ff1ed
 x-ms-office365-filtering-ht: Tenant
 x-microsoft-antispam: BCL:0;PCL:0;RULEID:(2390118)(7020095)(4652040)(8989299)(5600167)(711020)(4605104)(1401327)(4618075)(4534185)(4627221)(201703031133081)(201702281549075)(8990200)(2017052603328)(7193020);SRVR:BYAPR04MB4071;
 x-ms-traffictypediagnostic: BYAPR04MB4071:
-x-microsoft-antispam-prvs: <BYAPR04MB40719DFA789C9A789A50B23AE7810@BYAPR04MB4071.namprd04.prod.outlook.com>
+x-microsoft-antispam-prvs: <BYAPR04MB4071309DC3E006E82FC6E2B5E7810@BYAPR04MB4071.namprd04.prod.outlook.com>
 wdcipoutbound: EOP-TRUE
-x-ms-oob-tlc-oobclassifiers: OLM:3044;
+x-ms-oob-tlc-oobclassifiers: OLM:454;
 x-forefront-prvs: 0173C6D4D5
 x-forefront-antispam-report: SFV:NSPM;SFS:(10019020)(4636009)(396003)(366004)(39860400002)(376002)(136003)(346002)(189003)(199004)(2906002)(66946007)(256004)(3846002)(6116002)(486006)(316002)(8936002)(52536014)(476003)(446003)(478600001)(74316002)(26005)(53546011)(7696005)(86362001)(99286004)(6506007)(71190400001)(229853002)(71200400001)(7736002)(66066001)(33656002)(5660300002)(14444005)(76176011)(186003)(14454004)(25786009)(76116006)(6246003)(4326008)(305945005)(6436002)(110136005)(54906003)(81156014)(81166006)(8676002)(55016002)(66556008)(9686003)(66446008)(102836004)(66476007)(64756008);DIR:OUT;SFP:1102;SCL:1;SRVR:BYAPR04MB4071;H:BYAPR04MB5816.namprd04.prod.outlook.com;FPR:;SPF:None;LANG:en;PTR:InfoNoRecords;MX:1;A:1;
 x-ms-exchange-senderadcheck: 1
-x-microsoft-antispam-message-info: Ys/bb0/E5fS/cjskou9eoAz1I7NKHDEyZxJlbKjaeX7iwizjzGt4bBQI248qNt3E+3v4slBn5uaFsYQiqhVhi0Yt5ZI5c7P/8bvO2J8kCt3FXA92+Im0pZZtxd2/IvfYkQ0JXZPLFjWboqcbyBOliZOgTEppcg0+3MpyKyuGngBnkWioBo/23fPeeVtn9CE3Qxi60mzdHr7dWYWCv7XD2EUV2YZaVpphy+pgAm+0NMbRZqbjHmi2HfSfiYgfLxIe4ifCTs5HBUiozgbgw3M6sVCRujvMVMp3u2CO+rjENCEAH5999qYaRubOMibXBH87om0RQ4E+vJdzvRjT+2fTkJyCZ2sj8rpbvl8Exz+g/IQalWAsY2cGSE+dpmzrh3cM2sHYtaM2sTeUnmYIjxWiK3FpN4N3s7cfAC3qWqi/21Y=
+x-microsoft-antispam-message-info: ob8HrjY2DnvyHEZZKJemhflVRCklS7RWt+Hj2b4R7XC8pUHw1j5pum1wZmtuU/wrHg5y45QRk9lhhW5nqKz2/TcFPdMTOlHWqKcHs+8nVyGvkCu50R9pVbWjheCOsY+jeBdJkzwIuBmza2cB06XoV6GyIrP4nYMj6Lx2LKVjN5bBAs/Ri0H7MKThOH87RD/7L0EHokHHWTUX/UkjXb6V0pNfiLiLzHaAzv7O/5yOJx2hgtc4rE1/CjbvIofmtdfX4kewae7SRMPJxKj586pE5odhviTDNRCtb+twA0E41YI2kc1bH2kiOpaJ/S/kvM5veAeseMkT5bzKNXVkDYl3dancKZ48RkhqzkHTCGGUYjEUU1m6tMH/bEv7JhTJ4qRaEfpAydfVlaXt8iBjSxeSeUFN94V+Cd0YORFuRA0v2/8=
 x-ms-exchange-transport-forked: True
 Content-Type: text/plain; charset="us-ascii"
 Content-Transfer-Encoding: quoted-printable
 MIME-Version: 1.0
 X-OriginatorOrg: wdc.com
-X-MS-Exchange-CrossTenant-Network-Message-Id: 238f637c-9a6e-43d7-8429-08d7436fc3c6
-X-MS-Exchange-CrossTenant-originalarrivaltime: 27 Sep 2019 17:25:59.9673
+X-MS-Exchange-CrossTenant-Network-Message-Id: f20fec8d-b95a-4c68-90aa-08d7436ff1ed
+X-MS-Exchange-CrossTenant-originalarrivaltime: 27 Sep 2019 17:27:17.3984
  (UTC)
 X-MS-Exchange-CrossTenant-fromentityheader: Hosted
 X-MS-Exchange-CrossTenant-id: b61c8803-16f3-4c35-9b17-6f65f441df86
 X-MS-Exchange-CrossTenant-mailboxtype: HOSTED
-X-MS-Exchange-CrossTenant-userprincipalname: hYMJnjWzVnVk8euXa8t3udbX5aAKfvHFVk6pek93TV25PY1Jl60IPDCKu6uAVSP1Q+k5D7RAHEgh1XM3j9NpEQ==
+X-MS-Exchange-CrossTenant-userprincipalname: qGsFNz1xWDwMbVwzKdln2PYsOB/rNwthAIkezl9S5fuREAOezudH9tDvr+KwfavRvTiWdPAbNH4kU6qhUNWIJw==
 X-MS-Exchange-Transport-CrossTenantHeadersStamped: BYAPR04MB4071
 Sender: linux-block-owner@vger.kernel.org
 Precedence: bulk
@@ -119,16 +119,9 @@ List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
 On 2019/09/27 0:25, Ming Lei wrote:=0A=
-> Now in case of real MQ, io scheduler may be bypassed, and not only this=
-=0A=
-> way may hurt performance for some slow MQ device, but also break zoned=0A=
-> device which depends on mq-deadline for respecting the write order in=0A=
-> one zone.=0A=
-> =0A=
-> So don't bypass io scheduler if we have one setup.=0A=
-> =0A=
-> This patch can double sequential write performance basically on MQ=0A=
-> scsi_debug when mq-deadline is applied.=0A=
+> Some HDD drive may expose multiple hw queue, such as MegraRaid, so=0A=
+> still apply the normal plugging for such devices because sequential IO=0A=
+> may benefit a lot from plug merging.=0A=
 > =0A=
 > Cc: Bart Van Assche <bvanassche@acm.org>=0A=
 > Cc: Hannes Reinecke <hare@suse.com>=0A=
@@ -136,43 +129,35 @@ On 2019/09/27 0:25, Ming Lei wrote:=0A=
 > Cc: Dave Chinner <dchinner@redhat.com>=0A=
 > Signed-off-by: Ming Lei <ming.lei@redhat.com>=0A=
 > ---=0A=
->  block/blk-mq.c | 6 ++++--=0A=
->  1 file changed, 4 insertions(+), 2 deletions(-)=0A=
+>  block/blk-mq.c | 6 +++++-=0A=
+>  1 file changed, 5 insertions(+), 1 deletion(-)=0A=
 > =0A=
 > diff --git a/block/blk-mq.c b/block/blk-mq.c=0A=
-> index 20a49be536b5..d7aed6518e62 100644=0A=
+> index d7aed6518e62..969dfe02fa7c 100644=0A=
 > --- a/block/blk-mq.c=0A=
 > +++ b/block/blk-mq.c=0A=
-> @@ -2003,6 +2003,8 @@ static blk_qc_t blk_mq_make_request(struct request_=
-queue *q, struct bio *bio)=0A=
->  		}=0A=
->  =0A=
->  		blk_add_rq_to_plug(plug, rq);=0A=
-> +	} else if (q->elevator) {=0A=
-> +		blk_mq_sched_insert_request(rq, false, true, true);>  	} else if (plug=
- && !blk_queue_nomerges(q)) {=0A=
+> @@ -1983,10 +1983,14 @@ static blk_qc_t blk_mq_make_request(struct reques=
+t_queue *q, struct bio *bio)=0A=
+>  		/* bypass scheduler for flush rq */=0A=
+>  		blk_insert_flush(rq);=0A=
+>  		blk_mq_run_hw_queue(data.hctx, true);=0A=
+> -	} else if (plug && (q->nr_hw_queues =3D=3D 1 || q->mq_ops->commit_rqs))=
+ {=0A=
+> +	} else if (plug && (q->nr_hw_queues =3D=3D 1 || q->mq_ops->commit_rqs |=
+|=0A=
+> +				!blk_queue_nonrot(q))) {=0A=
 >  		/*=0A=
->  		 * We do limited plugging. If the bio can be merged, do that.=0A=
-> @@ -2026,8 +2028,8 @@ static blk_qc_t blk_mq_make_request(struct request_=
-queue *q, struct bio *bio)=0A=
->  			blk_mq_try_issue_directly(data.hctx, same_queue_rq,=0A=
->  					&cookie);=0A=
->  		}=0A=
-> -	} else if ((q->nr_hw_queues > 1 && is_sync) || (!q->elevator &&=0A=
-> -			!data.hctx->dispatch_busy)) {=0A=
-> +	} else if ((q->nr_hw_queues > 1 && is_sync) ||=0A=
-> +			!data.hctx->dispatch_busy) {=0A=
->  		blk_mq_try_issue_directly(data.hctx, rq, &cookie);=0A=
->  	} else {=0A=
->  		blk_mq_sched_insert_request(rq, false, true, true);=0A=
+>  		 * Use plugging if we have a ->commit_rqs() hook as well, as=0A=
+>  		 * we know the driver uses bd->last in a smart fashion.=0A=
+> +		 *=0A=
+> +		 * Use normal plugging if this disk is slow HDD, as sequential=0A=
+> +		 * IO may benefit a lot from plug merging.=0A=
+>  		 */=0A=
+>  		unsigned int request_count =3D plug->rq_count;=0A=
+>  		struct request *last =3D NULL;=0A=
 > =0A=
 =0A=
-I think this patch should have a Cc: stable@vger.kernel.org=0A=
-This fixes a problem existing since we added deadline zone write-locking wi=
-th=0A=
-commit 5700f69178e9 ("mq-deadline: Introduce zone locking support").=0A=
-=0A=
-Otherwise:=0A=
+Cc stable needed ?=0A=
 =0A=
 Reviewed-by: Damien Le Moal <damien.lemoal@wdc.com>=0A=
 =0A=
