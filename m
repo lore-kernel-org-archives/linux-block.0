@@ -2,247 +2,185 @@ Return-Path: <SRS0=f8eR=XW=vger.kernel.org=linux-block-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-5.8 required=3.0 tests=DKIM_SIGNED,DKIM_VALID,
-	DKIM_VALID_AU,HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,
-	MENTIONS_GIT_HOSTING,SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED
-	autolearn=unavailable autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-0.8 required=3.0 tests=DKIM_SIGNED,DKIM_VALID,
+	DKIM_VALID_AU,HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SPF_HELO_NONE,
+	SPF_PASS,URIBL_BLOCKED autolearn=no autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id E27A2C352AB
-	for <linux-block@archiver.kernel.org>; Fri, 27 Sep 2019 08:56:32 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 8E7E4C352AB
+	for <linux-block@archiver.kernel.org>; Fri, 27 Sep 2019 09:05:08 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.kernel.org (Postfix) with ESMTP id A5D6A207FF
-	for <linux-block@archiver.kernel.org>; Fri, 27 Sep 2019 08:56:32 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id 65500217D7
+	for <linux-block@archiver.kernel.org>; Fri, 27 Sep 2019 09:05:08 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=pass (2048-bit key) header.d=cloud.ionos.com header.i=@cloud.ionos.com header.b="UjKJwYJr"
+	dkim=pass (1024-bit key) header.d=nxp.com header.i=@nxp.com header.b="ItwrcujW"
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1725911AbfI0I4c (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Fri, 27 Sep 2019 04:56:32 -0400
-Received: from mail-wr1-f67.google.com ([209.85.221.67]:42699 "EHLO
-        mail-wr1-f67.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1725946AbfI0I4c (ORCPT
-        <rfc822;linux-block@vger.kernel.org>);
-        Fri, 27 Sep 2019 04:56:32 -0400
-Received: by mail-wr1-f67.google.com with SMTP id n14so1765110wrw.9
-        for <linux-block@vger.kernel.org>; Fri, 27 Sep 2019 01:56:28 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=cloud.ionos.com; s=google;
-        h=mime-version:references:in-reply-to:from:date:message-id:subject:to
-         :cc;
-        bh=TfXue9T2NkQBattDkXEon2NvQgVQztlS6k0o1+O9NR0=;
-        b=UjKJwYJryZcxHCXwQqzpWtx7u991HKb7WQkoTDphhyFcp+NE6J2M5rolmd9lkRTnXN
-         C4AYPPAF8iVymbgKGXxwj1Js/d5pavwIOj5zRhLYh38nNpK4t1EwK0JmHHLubh2oGbBy
-         D4YikOeHQ0nMpPAMhWGQ8uwv7xt1TrHHLCVouCe4bcD3wMu+cJnfNKjmbZPEhTf/zYQ1
-         EYj+BITqrZK9+eqJoOk1HeSsQRutPLl1R9sApgpiF9ya4c/EK9DKa/h2amlD+XNl9eUC
-         U2rGO97uvHdABQ5+pYr/1tTIiACq9q+YdIiZhc/IDpqEGdU2ffc1OppOpgtoyMlZyESp
-         7AWA==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20161025;
-        h=x-gm-message-state:mime-version:references:in-reply-to:from:date
-         :message-id:subject:to:cc;
-        bh=TfXue9T2NkQBattDkXEon2NvQgVQztlS6k0o1+O9NR0=;
-        b=IRn/JFNnWa1E/R2S9oqMiZHrM7bKCD5Bf/zOepZBqOsLFGp4kzc8x2anlo7RQCb0Sk
-         r+reKMaYaXOf4zbEFaZIIzBRBI084SY5TqgaaQ80k8KNyNhtq5Npip4eyoMC/Dri10rn
-         EPAHwkQ82jIIFjI16G4B1wpLqoJPK1JieMYDClE1AYW9OADUY8ME3w5d3plrLO7rLNct
-         dDQEhLpzQpaShAa0+cX82EAy420alGGtbIic07B6LgW7OnplOcxvuunzczLMMFlH82JQ
-         IJJjzR0qUQXtS36Fsy/B/d6lvGzmSHHTVGwytfjLh81cZeuyKMuAnyMTVt8toShxPxzw
-         ACnA==
-X-Gm-Message-State: APjAAAWCUqO/2R1mcNoUsrR8X1yaRoEWpHKQ3+FipHc6QnQGalC3Oti9
-        /hnyLmcxS+cbEdXolBy3vWkBkEtGav0PllxZGMr5jw==
-X-Google-Smtp-Source: APXvYqxfWyaZuRbOnAwrVlspvqQMOlUGBXujPtXA5C42+fyPB1kYHoqubhTogBMEJYCXzLDa7+1kLUmFpNdgFEhvi5k=
-X-Received: by 2002:adf:d192:: with SMTP id v18mr1043108wrc.9.1569574588074;
- Fri, 27 Sep 2019 01:56:28 -0700 (PDT)
+        id S1725946AbfI0JFD (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Fri, 27 Sep 2019 05:05:03 -0400
+Received: from mail-eopbgr10077.outbound.protection.outlook.com ([40.107.1.77]:18755
+        "EHLO EUR02-HE1-obe.outbound.protection.outlook.com"
+        rhost-flags-OK-OK-OK-FAIL) by vger.kernel.org with ESMTP
+        id S1726033AbfI0JFD (ORCPT <rfc822;linux-block@vger.kernel.org>);
+        Fri, 27 Sep 2019 05:05:03 -0400
+ARC-Seal: i=1; a=rsa-sha256; s=arcselector9901; d=microsoft.com; cv=none;
+ b=XEIUi/0U9nGMZbJwvAYIpciya+0dSmjFg3vvC7kJODZEHM3/FlZ8O3BW1tgh2Ju9v/5mzzI/BmoyFXPGQituw1Y0uVbLh6l4VvJXNX6aee9hj4LLofysqK9EBWs/xW7cxOGLp7Hbph+QmCsP8Gzf0bv6swvzgLEgDdJ3fLjXFkm6A8L5rOjnRAa606K95OsYdv9iSaZkF8mqyfcmO01DA8QD9DpmFKUHHeCggZL1J7VK1oHH5+GvneNhEnQ2deXSkZlT04M6U9ZOtm9iSbj0ACHPMuTAObTCZhPwN4mgJS8PIU89biNt6akztJTgoBxS3aElhC8cm87LVXdX8q/Tpw==
+ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com;
+ s=arcselector9901;
+ h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
+ bh=4FLRDgjQ+L8j4jUJD715qF3l+SAWnSefZFtKBCqwK1c=;
+ b=aV5AGRKr3PnaPbXWfMAaDkoFKszGbYWqZwZJN2dyfVE/bj4u3ZcacKAlzbOtY/Yotswc4ZDUBDwmPBSDzJTq9I6iHtSlA0LSKH28g5KSxyG/ocxZseInVwAOeZI/x/z8fIYeA2JB1cQVSQ8BbYFcPqcOeydvRUhRiw5BLA0/MU9dWSUZlqfG21/2xuV1ZZV3ntB69P7L+9qnFQR/FtY3q2REhjjPhKRMC0HOdnzjnfZWMJKKB8EYLcc5TMJuZpDJjLAB9KF5WOHtYhmPX6eP+jd1SxrFIO6cakF6VDUFg3Yj9bO3UvtughauTiZjUaJiV+oH8ml4kGO1LNAgHNdRfA==
+ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass
+ smtp.mailfrom=nxp.com; dmarc=pass action=none header.from=nxp.com; dkim=pass
+ header.d=nxp.com; arc=none
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=nxp.com; s=selector2;
+ h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
+ bh=4FLRDgjQ+L8j4jUJD715qF3l+SAWnSefZFtKBCqwK1c=;
+ b=ItwrcujWYvYKrrbhKcurd30DHCNaANuetThYVVJohELV2shiCyeyBnzEqD7usgB3fQzOLc8hcpuq7bhZbrET3Q9QQ10oUbb1li1aHt5AarVgPixMn0yOqCrXVfT6YlX+mh11AGq/32TKypC7y2fEMB+K2D0ElyJ5oHHZIJRDqZM=
+Received: from VI1PR04MB5327.eurprd04.prod.outlook.com (20.177.52.16) by
+ VI1PR04MB4304.eurprd04.prod.outlook.com (52.134.31.159) with Microsoft SMTP
+ Server (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
+ 15.20.2284.18; Fri, 27 Sep 2019 09:04:19 +0000
+Received: from VI1PR04MB5327.eurprd04.prod.outlook.com
+ ([fe80::744a:c78e:b8:633a]) by VI1PR04MB5327.eurprd04.prod.outlook.com
+ ([fe80::744a:c78e:b8:633a%7]) with mapi id 15.20.2284.023; Fri, 27 Sep 2019
+ 09:04:19 +0000
+From:   Peter Chen <peter.chen@nxp.com>
+To:     Alan Stern <stern@rowland.harvard.edu>
+CC:     Piergiorgio Sartor <piergiorgio.sartor@nexgo.de>,
+        Christoph Hellwig <hch@lst.de>, Jens Axboe <axboe@kernel.dk>,
+        USB list <linux-usb@vger.kernel.org>,
+        "linux-block@vger.kernel.org" <linux-block@vger.kernel.org>,
+        Kernel development list <linux-kernel@vger.kernel.org>
+Subject: Re: reeze while write on external usb 3.0 hard disk [Bug 204095]
+Thread-Topic: reeze while write on external usb 3.0 hard disk [Bug 204095]
+Thread-Index: AQHVVOKTn0FJLyYmMEO6xr/XJ+YAlKcChwmAgAEfggCAAJrEAIAJfxWAgC8dUYCAABeMAIAChrqA
+Date:   Fri, 27 Sep 2019 09:04:19 +0000
+Message-ID: <20190927090640.GB2609@b29397-desktop>
+References: <20190925170741.GA5235@lazy.lzy>
+ <Pine.LNX.4.44L0.1909251429370.4444-100000@netrider.rowland.org>
+In-Reply-To: <Pine.LNX.4.44L0.1909251429370.4444-100000@netrider.rowland.org>
+Accept-Language: en-US
+Content-Language: en-US
+X-MS-Has-Attach: 
+X-MS-TNEF-Correlator: 
+authentication-results: spf=none (sender IP is )
+ smtp.mailfrom=peter.chen@nxp.com; 
+x-originating-ip: [119.31.174.66]
+x-ms-publictraffictype: Email
+x-ms-office365-filtering-correlation-id: 1a746f9d-fb12-416a-6556-08d74329ae8b
+x-ms-office365-filtering-ht: Tenant
+x-microsoft-antispam: BCL:0;PCL:0;RULEID:(2390118)(7020095)(4652040)(8989299)(5600167)(711020)(4605104)(1401327)(4618075)(4534185)(4627221)(201703031133081)(201702281549075)(8990200)(2017052603328)(7193020);SRVR:VI1PR04MB4304;
+x-ms-traffictypediagnostic: VI1PR04MB4304:
+x-microsoft-antispam-prvs: <VI1PR04MB4304371DDCCF3DB78A78DA528B810@VI1PR04MB4304.eurprd04.prod.outlook.com>
+x-ms-oob-tlc-oobclassifiers: OLM:9508;
+x-forefront-prvs: 0173C6D4D5
+x-forefront-antispam-report: SFV:NSPM;SFS:(10009020)(4636009)(7916004)(346002)(376002)(396003)(136003)(39860400002)(366004)(199004)(53754006)(189003)(81156014)(44832011)(99286004)(66556008)(66476007)(446003)(186003)(33716001)(6116002)(91956017)(486006)(76116006)(6512007)(66066001)(4326008)(305945005)(6486002)(3846002)(2906002)(66446008)(66946007)(5660300002)(8676002)(86362001)(25786009)(14444005)(11346002)(256004)(6246003)(2171002)(478600001)(7736002)(1076003)(64756008)(6436002)(229853002)(14454004)(9686003)(81166006)(102836004)(53546011)(33656002)(76176011)(6506007)(71190400001)(6916009)(316002)(476003)(8936002)(71200400001)(26005)(54906003);DIR:OUT;SFP:1101;SCL:1;SRVR:VI1PR04MB4304;H:VI1PR04MB5327.eurprd04.prod.outlook.com;FPR:;SPF:None;LANG:en;PTR:InfoNoRecords;A:1;MX:1;
+received-spf: None (protection.outlook.com: nxp.com does not designate
+ permitted sender hosts)
+x-ms-exchange-senderadcheck: 1
+x-microsoft-antispam-message-info: U3hkgkhEs7ZduIpzU9NtVkOye+s2KLUvsqM3DeIqD7H34UUF/FsU3J/MlCpQJjWk7P/oFmlpefVqWB3/PJH4pxfUfHwYVDzwkxkD1JVJKaBWViFWdsc3RKKrsodpqKEIQN4XUoxsLm2InKIGELNu0s4OPUdZaSUEmJMOMQDZDWtnm6TLAT5s6YraFNKshIICvy9ThRlYR4iqHTrH4MLrYD6j4x1RDBHGw5M8eiAvm3ACdlMvd2XS1Sd2j2ohL/mEouXj7WMEZnacslVK5tTYXWvsz3f3L0SGr49uQp6POyzwOpb4QZbk56EuOAq1S7b0UnmdNr7s1YpBMiQ+yJ3SjPAh8VQNumMslwqmPV8iRX9JFPjao4QTxzMHPrp25J546UlN1hm4Q93DLFoJ0YQucNnEyuhg0k1Yix49dPGLPjo=
+x-ms-exchange-transport-forked: True
+Content-Type: text/plain; charset="us-ascii"
+Content-ID: <372E4F8C9B643E4BA7002AF2531162B3@eurprd04.prod.outlook.com>
+Content-Transfer-Encoding: quoted-printable
 MIME-Version: 1.0
-References: <20190620150337.7847-1-jinpuwang@gmail.com> <20190620150337.7847-4-jinpuwang@gmail.com>
- <7f62b16a-6e6c-ad05-46d4-05514ffaeaba@acm.org>
-In-Reply-To: <7f62b16a-6e6c-ad05-46d4-05514ffaeaba@acm.org>
-From:   Jinpu Wang <jinpu.wang@cloud.ionos.com>
-Date:   Fri, 27 Sep 2019 10:56:17 +0200
-Message-ID: <CAMGffEmJ3_HSQ=i3Xq3v=pN75DXpDmLfQ0SS6dkv40T1q9PMhQ@mail.gmail.com>
-Subject: Re: [PATCH v4 03/25] ibtrs: private headers with IBTRS protocol
- structs and helpers
-To:     Bart Van Assche <bvanassche@acm.org>
-Cc:     Jack Wang <jinpuwang@gmail.com>, linux-block@vger.kernel.org,
-        linux-rdma@vger.kernel.org, Jens Axboe <axboe@kernel.dk>,
-        Christoph Hellwig <hch@infradead.org>,
-        Sagi Grimberg <sagi@grimberg.me>,
-        Jason Gunthorpe <jgg@mellanox.com>,
-        Doug Ledford <dledford@redhat.com>,
-        Danil Kipnis <danil.kipnis@cloud.ionos.com>, rpenyaev@suse.de,
-        Roman Pen <roman.penyaev@profitbricks.com>
-Content-Type: text/plain; charset="UTF-8"
+X-OriginatorOrg: nxp.com
+X-MS-Exchange-CrossTenant-Network-Message-Id: 1a746f9d-fb12-416a-6556-08d74329ae8b
+X-MS-Exchange-CrossTenant-originalarrivaltime: 27 Sep 2019 09:04:19.6076
+ (UTC)
+X-MS-Exchange-CrossTenant-fromentityheader: Hosted
+X-MS-Exchange-CrossTenant-id: 686ea1d3-bc2b-4c6f-a92c-d99c5c301635
+X-MS-Exchange-CrossTenant-mailboxtype: HOSTED
+X-MS-Exchange-CrossTenant-userprincipalname: w3sfPeL9S1oCn/YkOPbhoI9AliZOSo18OHH+rmpwKZRJ/ifhidvOHmjba8vxa8EkoV3BM9JenDCutNO4ywcIIA==
+X-MS-Exchange-Transport-CrossTenantHeadersStamped: VI1PR04MB4304
 Sender: linux-block-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-On Tue, Sep 24, 2019 at 12:50 AM Bart Van Assche <bvanassche@acm.org> wrote:
->
-> On 6/20/19 8:03 AM, Jack Wang wrote:
-> > +#define P1 )
-> > +#define P2 ))
-> > +#define P3 )))
-> > +#define P4 ))))
-> > +#define P(N) P ## N
-> > +
-> > +#define CAT(a, ...) PRIMITIVE_CAT(a, __VA_ARGS__)
-> > +#define PRIMITIVE_CAT(a, ...) a ## __VA_ARGS__
-> > +
-> > +#define LIST(...)                                            \
-> > +     __VA_ARGS__,                                            \
-> > +     ({ unknown_type(); NULL; })                             \
-> > +     CAT(P, COUNT_ARGS(__VA_ARGS__))                         \
-> > +
-> > +#define EMPTY()
-> > +#define DEFER(id) id EMPTY()
-> > +
-> > +#define _CASE(obj, type, member)                             \
-> > +     __builtin_choose_expr(                                  \
-> > +     __builtin_types_compatible_p(                           \
-> > +             typeof(obj), type),                             \
-> > +             ((type)obj)->member
-> > +#define CASE(o, t, m) DEFER(_CASE)(o, t, m)
-> > +
-> > +/*
-> > + * Below we define retrieving of sessname from common IBTRS types.
-> > + * Client or server related types have to be defined by special
-> > + * TYPES_TO_SESSNAME macro.
-> > + */
-> > +
-> > +void unknown_type(void);
-> > +
-> > +#ifndef TYPES_TO_SESSNAME
-> > +#define TYPES_TO_SESSNAME(...) ({ unknown_type(); NULL; })
-> > +#endif
-> > +
-> > +#define ibtrs_prefix(obj)                                    \
-> > +     _CASE(obj, struct ibtrs_con *,  sess->sessname),        \
-> > +     _CASE(obj, struct ibtrs_sess *, sessname),              \
-> > +     TYPES_TO_SESSNAME(obj)                                  \
-> > +     ))
->
-> No preprocessor voodoo please. Please remove all of the above and modify
-> the logging statements such that these pass the proper name string as
-> first argument to logging macros.
-Sure, will do.
->
-> > +struct ibtrs_msg_conn_req {
-> > +     u8              __cma_version; /* Is set to 0 by cma.c in case of
-> > +                                     * AF_IB, do not touch that. */
-> > +     u8              __ip_version;  /* On sender side that should be
-> > +                                     * set to 0, or cma_save_ip_info()
-> > +                                     * extract garbage and will fail. */
-> > +     __le16          magic;
-> > +     __le16          version;
-> > +     __le16          cid;
-> > +     __le16          cid_num;
-> > +     __le16          recon_cnt;
-> > +     uuid_t          sess_uuid;
-> > +     uuid_t          paths_uuid;
-> > +     u8              reserved[12];
-> > +};
->
-> Please remove the reserved[] array and check private_data_len in the
-> code that receives the login request.
-We already checked the private_data_len on server side, see ibtrs_rdma_connect,
-and keep some reserved fields for future seems to be common practice
-for protocol, IMO.
-Also due to the fact, we already running the code in production, we
-want to keep the protocol compatible, so future
-transition could be smooth.
->
-> > +/**
-> > + * struct ibtrs_msg_conn_rsp - Server connection response to the client
-> > + * @magic:      IBTRS magic
-> > + * @version:    IBTRS protocol version
-> > + * @errno:      If rdma_accept() then 0, if rdma_reject() indicates error
-> > + * @queue_depth:   max inflight messages (queue-depth) in this session
-> > + * @max_io_size:   max io size server supports
-> > + * @max_hdr_size:  max msg header size server supports
-> > + *
-> > + * NOTE: size is 56 bytes, max possible is 136 bytes, see man rdma_accept().
-> > + */
-> > +struct ibtrs_msg_conn_rsp {
-> > +     __le16          magic;
-> > +     __le16          version;
-> > +     __le16          errno;
-> > +     __le16          queue_depth;
-> > +     __le32          max_io_size;
-> > +     __le32          max_hdr_size;
-> > +     u8              reserved[40];
-> > +};
->
-> Same comment here: please remove the reserved[] array and check
-> private_data_len in the code that processes this data structure.
-Ditto.
->
-> > +static inline int sockaddr_cmp(const struct sockaddr *a,
-> > +                            const struct sockaddr *b)
-> > +{
-> > +     switch (a->sa_family) {
-> > +     case AF_IB:
-> > +             return memcmp(&((struct sockaddr_ib *)a)->sib_addr,
-> > +                           &((struct sockaddr_ib *)b)->sib_addr,
-> > +                           sizeof(struct ib_addr));
-> > +     case AF_INET:
-> > +             return memcmp(&((struct sockaddr_in *)a)->sin_addr,
-> > +                           &((struct sockaddr_in *)b)->sin_addr,
-> > +                           sizeof(struct in_addr));
-> > +     case AF_INET6:
-> > +             return memcmp(&((struct sockaddr_in6 *)a)->sin6_addr,
-> > +                           &((struct sockaddr_in6 *)b)->sin6_addr,
-> > +                           sizeof(struct in6_addr));
-> > +     default:
-> > +             return -ENOENT;
-> > +     }
-> > +}
-> > +
-> > +static inline int sockaddr_to_str(const struct sockaddr *addr,
-> > +                                char *buf, size_t len)
-> > +{
-> > +     int cnt;
-> > +
-> > +     switch (addr->sa_family) {
-> > +     case AF_IB:
-> > +             cnt = scnprintf(buf, len, "gid:%pI6",
-> > +                     &((struct sockaddr_ib *)addr)->sib_addr.sib_raw);
-> > +             return cnt;
-> > +     case AF_INET:
-> > +             cnt = scnprintf(buf, len, "ip:%pI4",
-> > +                     &((struct sockaddr_in *)addr)->sin_addr);
-> > +             return cnt;
-> > +     case AF_INET6:
-> > +             cnt = scnprintf(buf, len, "ip:%pI6c",
-> > +                       &((struct sockaddr_in6 *)addr)->sin6_addr);
-> > +             return cnt;
-> > +     }
-> > +     cnt = scnprintf(buf, len, "<invalid address family>");
-> > +     pr_err("Invalid address family\n");
-> > +     return cnt;
-> > +}
->
-> Since these functions are not in the hot path, please move these into a
-> .c file.
-ok.
->
-> > +/**
-> > + * ibtrs_invalidate_flag() - returns proper flags for invalidation
-> > + *
-> > + * NOTE: This function is needed for compat layer, so think twice before
-> > + *       rename or remove.
-> > + */
-> > +static inline u32 ibtrs_invalidate_flag(void)
-> > +{
-> > +     return IBTRS_MSG_NEED_INVAL_F;
-> > +}
->
-> An inline function that does nothing else than returning a compile-time
-> constant? That does not look useful to me. How about inlining this function?
-This is needed for the compact layer, we redefine some FR functions to
-use FMR for our
-ConnectX2 X3 HCA.
-https://github.com/ionos-enterprise/ibnbd/tree/master/ibtrs/compat
-It will finally fade out, but it will take time.
+On 19-09-25 14:31:58, Alan Stern wrote:
+> On Wed, 25 Sep 2019, Piergiorgio Sartor wrote:
+>=20
+> > On Mon, Aug 26, 2019 at 07:38:33PM +0200, Piergiorgio Sartor wrote:
+> > > On Tue, Aug 20, 2019 at 06:37:22PM +0200, Piergiorgio Sartor wrote:
+> > > > On Tue, Aug 20, 2019 at 09:23:26AM +0200, Christoph Hellwig wrote:
+> > > > > On Mon, Aug 19, 2019 at 10:14:25AM -0400, Alan Stern wrote:
+> > > > > > Let's bring this to the attention of some more people.
+> > > > > >=20
+> > > > > > It looks like the bug that was supposed to be fixed by commit
+> > > > > > d74ffae8b8dd ("usb-storage: Add a limitation for
+> > > > > > blk_queue_max_hw_sectors()"), which is part of 5.2.5, but appar=
+ently
+> > > > > > the bug still occurs.
+> > > > >=20
+> > > > > Piergiorgio,
+> > > > >=20
+> > > > > can you dump the content of max_hw_sectors_kb file for your USB s=
+torage
+> > > > > device and send that to this thread?
+> > > >=20
+> > > > Hi all,
+> > > >=20
+> > > > for both kernels, 5.1.20 (working) and 5.2.8 (not working),
+> > > > the content of /sys/dev/x:y/queue/max_hw_sectors_kb is 512
+> > > > for USB storage devices (2.0 and 3.0).
+> > > >=20
+> > > > This is for the PC showing the issue.
+> > > >=20
+> > > > In an other PC, which does not show the issus at the moment,
+> > > > the values are 120, for USB2.0, and 256, for USB3.0.
+> > >=20
+> > > Hi again,
+> > >=20
+> > > any news on this?
+> > >=20
+> > > Is there anything I can do to help?
+> > >=20
+> > > Should I report this somewhere else too?
+> > >=20
+> > > Currently this is quite a huge problem for me,
+> > > since the only working external storage is an
+> > > old 1394 HDD...
+> >=20
+> > Hi all,
+> >=20
+> > I'm now on kernel 5.2.16, from Fedora, and still I
+> > see the same issue.
+> >=20
+> > I guess it is not a chipset quirk, since there
+> > are two involved here.
+> > For the USB 2.0 I've (with "lspci"):
+> >=20
+> > USB controller: Advanced Micro Devices, Inc. [AMD/ATI] SB7x0/SB8x0/SB9x=
+0 USB EHCI Controller (prog-if 20 [EHCI])
+> >=20
+> > For USB 3.0 I've:
+> >=20
+> > USB controller: ASMedia Technology Inc. ASM1042 SuperSpeed USB Host Con=
+troller (prog-if 30 [XHCI])
+> >=20
+> > Any idea on how to proceed?
+> >=20
+> > Thanks a lot.
+>=20
+> One thing you can try is git bisect from 5.1.20 (or maybe just 5.1.0) =20
+> to 5.2.8.  If you can identify a particular commit which caused the
+> problem to start, that would help.
+>=20
+> Alan Stern
 
+Hi Piergiorgio,
+
+Would you please check if below patch helps?
+
+commit 449fa54d6815be8c2c1f68fa9dbbae9384a7c03e
+Author: Fugang Duan <fugang.duan@nxp.com>
+Date:   Fri Jul 19 17:26:48 2019 +0800
+
+    dma-direct: correct the physical addr in dma_direct_sync_sg_for_cpu/dev=
+ice
+       =20
+
+--=20
 
 Thanks,
-Jinpu
+Peter Chen=
