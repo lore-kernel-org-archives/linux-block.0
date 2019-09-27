@@ -7,67 +7,66 @@ X-Spam-Status: No, score=-7.2 required=3.0 tests=DKIM_SIGNED,DKIM_VALID,
 	SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED,USER_AGENT_SANE_1 autolearn=ham
 	autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 56868C4360C
-	for <linux-block@archiver.kernel.org>; Fri, 27 Sep 2019 14:55:12 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 76193C4360C
+	for <linux-block@archiver.kernel.org>; Fri, 27 Sep 2019 14:58:58 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.kernel.org (Postfix) with ESMTP id 2A65D217D9
-	for <linux-block@archiver.kernel.org>; Fri, 27 Sep 2019 14:55:12 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id 48C2521841
+	for <linux-block@archiver.kernel.org>; Fri, 27 Sep 2019 14:58:58 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel-dk.20150623.gappssmtp.com header.i=@kernel-dk.20150623.gappssmtp.com header.b="P+GTJCM/"
+	dkim=pass (2048-bit key) header.d=kernel-dk.20150623.gappssmtp.com header.i=@kernel-dk.20150623.gappssmtp.com header.b="H5f6ZAZt"
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1727349AbfI0OzL (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Fri, 27 Sep 2019 10:55:11 -0400
-Received: from mail-wr1-f50.google.com ([209.85.221.50]:42945 "EHLO
-        mail-wr1-f50.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1727213AbfI0OzL (ORCPT
+        id S1727691AbfI0O65 (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Fri, 27 Sep 2019 10:58:57 -0400
+Received: from mail-wr1-f66.google.com ([209.85.221.66]:40573 "EHLO
+        mail-wr1-f66.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S1727506AbfI0O65 (ORCPT
         <rfc822;linux-block@vger.kernel.org>);
-        Fri, 27 Sep 2019 10:55:11 -0400
-Received: by mail-wr1-f50.google.com with SMTP id n14so3197696wrw.9
-        for <linux-block@vger.kernel.org>; Fri, 27 Sep 2019 07:55:08 -0700 (PDT)
+        Fri, 27 Sep 2019 10:58:57 -0400
+Received: by mail-wr1-f66.google.com with SMTP id l3so3236738wru.7
+        for <linux-block@vger.kernel.org>; Fri, 27 Sep 2019 07:58:55 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=kernel-dk.20150623.gappssmtp.com; s=20150623;
-        h=cc:from:subject:message-id:date:user-agent:mime-version
+        h=to:cc:from:subject:message-id:date:user-agent:mime-version
          :content-language:content-transfer-encoding;
-        bh=INiwhswdfBwhnX3GfRB2/BJu62LAjQ6anoNbP7iNves=;
-        b=P+GTJCM/nckt4Tp4po9jzQjVOcffrOMLwtRxQKxsGaDEz8KnlugPnd5kM8N6KyDW0k
-         xVT9OegPIzCHoLsUlA75wTRHZs5Gp76PO00aKsKNi1EDvabX7FEbMmLBcJ5FxxtiMRph
-         6nfBVjZHwhCqMAHuMJke8N50j2n6v1FiTn35EVwplQbmLVFrmwQgBdRkKH0puDcWOuMs
-         FNCnAStBuEuNf032XqUc5FIGU76UJpqfdhyiXNweSWlAsceyj49PPyPVsLyTcD5tiDUa
-         RbJgB8phMMXCFxJ/fPySvcjfASd8iSSP4XfhQK3iXVbLDIfNv3V8L5A/T+FlfR94RYIZ
-         nvBg==
+        bh=ewYDN1PlLV89dmxzX/B1gBoOpNgLpWGO6HKqKHnjQKw=;
+        b=H5f6ZAZtyzYdtFvgaqC4otL5rT78JAjWW5wjHSc4WerhThILG5PbLiDAoU7RVB7O/G
+         5E4YSoL7RhJcVYKUB/mOChA43C9OQ3X0l18Ah643pGc5aN7P10XVipl7FyGSrtpRSP2f
+         Cdi1kQF8ETtc88Rie1thAk9GB5LyHZpAl4cm8nxrLaDNM4AbxCKby7NVEqrc4erBLkvC
+         qJkbkG4b7qEfi/hI3PG6rJy4qVvM/N6I+hJZUqgqbW9gpax2aKvm5oDpTinBcho4IcOF
+         kxRfUud3CefR9ZjgOjtOewK9F0jpVE0mWwnCcaMKf+nIJzcc1S7wSkq2lvC7FEIrwODm
+         C4pw==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=1e100.net; s=20161025;
-        h=x-gm-message-state:cc:from:subject:message-id:date:user-agent
+        h=x-gm-message-state:to:cc:from:subject:message-id:date:user-agent
          :mime-version:content-language:content-transfer-encoding;
-        bh=INiwhswdfBwhnX3GfRB2/BJu62LAjQ6anoNbP7iNves=;
-        b=XmCm0Pg24rBj5a2/ZA8YtmKr+fLeUVKHJwive81LO2dMRnPh+3CXzsBoGndYAeaFJT
-         J4PN5UHjvXlsDQKDw8t1riQpCJQQvyR4Ews0lUWvNfyLbsjiAYmnhVLnE0NZk21bkSsf
-         DDNPfj4U1d4AZIhU43Y2SB7/I6J5QXirgfAeyUT2KNLeqq4J44dyP7832GwO4F9di/Af
-         cbzLWOIZW9C5d+YQgDwsWk4lhpP36b6NFxKsdzO5TPkIgKLM5wYFZxuiVwqiOHL9SbVS
-         HVwGFkcJrXx7Q1vIiCJ4UqZXdbKMSsLlIYQdnkND0l3fypX+O1OAxOlAJRF1VUTq2fwn
-         S4Ow==
-X-Gm-Message-State: APjAAAXS89GZKvMeFcfCL6IyW76Ip8elf0zWSOgFmBIdrR706ZukgqKS
-        GD/KatqkfencAanNH5McUlDAohEdg7h1DJy9
-X-Google-Smtp-Source: APXvYqwAiTQ/cf0f2kXfZXYoZ+6a/CViKXKsnEcSHHNwTXdMBS02cirv1irOYa3APRTxso+dp1rBDw==
-X-Received: by 2002:a5d:63ca:: with SMTP id c10mr3519262wrw.314.1569596107697;
-        Fri, 27 Sep 2019 07:55:07 -0700 (PDT)
+        bh=ewYDN1PlLV89dmxzX/B1gBoOpNgLpWGO6HKqKHnjQKw=;
+        b=QV84D2IMetCVfVMXRi9nVXq7qn6LTqIbtBgxBmTPmdHhGKaUYMwR1eWAKBOexnxNEJ
+         yIdeD+j8PxhveH0R7ioIcq51AyuhSYQvhjQoSzLR2PLcZVKW8pkB71lKu3zs7sE7Ni95
+         V1rDOwfNM6cOPnroOwyhuTTuFIF0TGuCJD3X5Vh/Gp6Z13VLVONsEP647ahoKzWHajgb
+         wexaroHcB2yUFLb2FaULps2WRmJiojX6J7qI3JXKqoxp6rcde+R0qqoctdDk/9smOu+n
+         +y8RygWIlUtHESSHBKt0yv9mu7oxtQbv+NLBlOEFlz3lgf6K2LshkH0ndD19YEI+j81k
+         qFQA==
+X-Gm-Message-State: APjAAAXouj7hCfvQU78pWk9VK0mvFHZfrQE/7yxtRMsrdeqlH3qvJzhG
+        WO/o7nUHgDR4gj4sIcFM4fsj9SiaZnbJSWEc
+X-Google-Smtp-Source: APXvYqz7jzineHoMJctrRHChCZoSXlCZOfQ6tJhvKlBD8MU7CwoQGUs87w9ejOuuj2vcSSkpGXl7lg==
+X-Received: by 2002:a5d:4a84:: with SMTP id o4mr3256679wrq.165.1569596334001;
+        Fri, 27 Sep 2019 07:58:54 -0700 (PDT)
 Received: from [172.20.9.27] ([83.167.33.93])
-        by smtp.gmail.com with ESMTPSA id q192sm10514844wme.23.2019.09.27.07.55.06
+        by smtp.gmail.com with ESMTPSA id f20sm4115005wmb.6.2019.09.27.07.58.52
         (version=TLS1_2 cipher=ECDHE-RSA-AES128-GCM-SHA256 bits=128/128);
-        Fri, 27 Sep 2019 07:55:07 -0700 (PDT)
-Cc:     "linux-block@vger.kernel.org" <linux-block@vger.kernel.org>,
-        Linus Torvalds <torvalds@linux-foundation.org>
+        Fri, 27 Sep 2019 07:58:52 -0700 (PDT)
+To:     Linus Torvalds <torvalds@linux-foundation.org>
+Cc:     "linux-block@vger.kernel.org" <linux-block@vger.kernel.org>
 From:   Jens Axboe <axboe@kernel.dk>
-Subject: [GIT PULL] Final block fixes for 5.4-rc1
-Message-ID: <5a77cfd2-3e9b-3a28-1637-e33d3e4221fb@kernel.dk>
-Date:   Fri, 27 Sep 2019 16:55:06 +0200
+Subject: [GIT PULL] io_uring changes for 5.4-rc1
+Message-ID: <c4e59df0-3fbd-44c8-f696-8eb424028b7c@kernel.dk>
+Date:   Fri, 27 Sep 2019 16:58:52 +0200
 User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:60.0) Gecko/20100101
  Thunderbird/60.8.0
 MIME-Version: 1.0
 Content-Type: text/plain; charset=utf-8
 Content-Language: en-US
 Content-Transfer-Encoding: 7bit
-To:     unlisted-recipients:; (no To-header on input)
 Sender: linux-block-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
@@ -75,45 +74,31 @@ X-Mailing-List: linux-block@vger.kernel.org
 
 Hi Linus,
 
-A few fixes/changes to round off this merge window. This pull request
-contains:
+Just two things in this pull request:
 
-- Small series making some functional tweaks to blk-iocost (Tejun)
+- Improvement to the io_uring CQ ring wakeup for batched IO (me)
 
-- Elevator switch locking fix (Ming)
+- Fix wrong comparison in poll handling (yangerkun)
 
-- Kill redundant call in blk-wbt (Yufen)
-
-- Fix flush timeout handling (Yufen)
+I realize the first one is a little late in the game, but it felt
+pointless to hold it off until the next release. Went through various
+testing and reviews with Pavel and peterz.
 
 Please pull!
 
 
-  git://git.kernel.dk/linux-block.git tags/for-linus-2019-09-27
+  git://git.kernel.dk/linux-block.git tags/for-5.4/io_uring-2019-09-27
 
 
 ----------------------------------------------------------------
-Ming Lei (2):
-      blk-mq: move lockdep_assert_held() into elevator_exit
-      block: don't release queue's sysfs lock during switching elevator
+Jens Axboe (1):
+      io_uring: make CQ ring wakeups be more efficient
 
-Tejun Heo (3):
-      iocost: better trace vrate changes
-      iocost: improve nr_lagging handling
-      iocost: bump up default latency targets for hard disks
+yangerkun (1):
+      io_uring: compare cached_cq_tail with cq.head in_io_uring_poll
 
-Yufen Yu (2):
-      rq-qos: get rid of redundant wbt_update_limits()
-      block: fix null pointer dereference in blk_mq_rq_timed_out()
-
- block/blk-flush.c    | 10 ++++++++++
- block/blk-iocost.c   | 30 +++++++++++++++++++-----------
- block/blk-mq-sched.c |  2 --
- block/blk-mq.c       |  5 ++++-
- block/blk-sysfs.c    | 14 ++++----------
- block/blk.h          |  9 +++++++++
- block/elevator.c     | 31 +------------------------------
- 7 files changed, 47 insertions(+), 54 deletions(-)
+ fs/io_uring.c | 68 +++++++++++++++++++++++++++++++++++++++++++++++++----------
+ 1 file changed, 57 insertions(+), 11 deletions(-)
 
 -- 
 Jens Axboe
