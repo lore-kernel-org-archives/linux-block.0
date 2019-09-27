@@ -2,88 +2,81 @@ Return-Path: <SRS0=f8eR=XW=vger.kernel.org=linux-block-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-8.4 required=3.0 tests=DKIMWL_WL_HIGH,DKIM_SIGNED,
-	DKIM_VALID,DKIM_VALID_AU,HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,
-	MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED,
-	USER_AGENT_SANE_1 autolearn=ham autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-2.3 required=3.0 tests=DKIM_SIGNED,DKIM_VALID,
+	HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,
+	USER_AGENT_SANE_1 autolearn=no autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 02DD5C4360C
-	for <linux-block@archiver.kernel.org>; Fri, 27 Sep 2019 12:52:57 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id D97CDC4360C
+	for <linux-block@archiver.kernel.org>; Fri, 27 Sep 2019 13:01:47 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.kernel.org (Postfix) with ESMTP id BF69121850
-	for <linux-block@archiver.kernel.org>; Fri, 27 Sep 2019 12:52:56 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id A6DF8217D9
+	for <linux-block@archiver.kernel.org>; Fri, 27 Sep 2019 13:01:47 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=pass (2048-bit key) header.d=oracle.com header.i=@oracle.com header.b="Vx4fJ6zA"
+	dkim=pass (2048-bit key) header.d=kernel-dk.20150623.gappssmtp.com header.i=@kernel-dk.20150623.gappssmtp.com header.b="iLGncnXm"
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1727140AbfI0Mw4 (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Fri, 27 Sep 2019 08:52:56 -0400
-Received: from aserp2120.oracle.com ([141.146.126.78]:40496 "EHLO
-        aserp2120.oracle.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1725992AbfI0Mwz (ORCPT
+        id S1727099AbfI0NBr (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Fri, 27 Sep 2019 09:01:47 -0400
+Received: from mail-wm1-f67.google.com ([209.85.128.67]:39901 "EHLO
+        mail-wm1-f67.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S1727076AbfI0NBq (ORCPT
         <rfc822;linux-block@vger.kernel.org>);
-        Fri, 27 Sep 2019 08:52:55 -0400
-Received: from pps.filterd (aserp2120.oracle.com [127.0.0.1])
-        by aserp2120.oracle.com (8.16.0.27/8.16.0.27) with SMTP id x8RCnUiN107120;
-        Fri, 27 Sep 2019 12:52:26 GMT
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=oracle.com; h=subject : to : cc :
- references : from : message-id : date : mime-version : in-reply-to :
- content-type : content-transfer-encoding; s=corp-2019-08-05;
- bh=1vntBl8I3GTfe8XVuLqJfBQBsDIhd0OrhFvo+n9ywEg=;
- b=Vx4fJ6zAfplgEdT03YYfa/7x7kQeRst36YflOpZvojiifKLmIbzMDn/NiASX9/dt3TB+
- KHCdHPk+9I6M0+4rHu5qMpH4AE4c4V/SEjUehM4Q+6NNDI5Lcxk40Jz0Vw+0IsHbm0gH
- iTiyTGZQMerlSNNVwNY4lujYi7vDOLtcr9yMC2IE4ihPIvMXt603sMbtlX2sbZDXL7LT
- F/lPrWorp+uYra7k12XS/EqgvB2fzw1ILamuzrx7lZ3PSd1zwsllp17CCyxm2sfBx7sg
- wC32b3Gfu4zNn/UxU0Qlr6iAeALCP3Kko5XNTBBvjw841FkPjubJb+jM9QB+WE/GgCQy mw== 
-Received: from userp3030.oracle.com (userp3030.oracle.com [156.151.31.80])
-        by aserp2120.oracle.com with ESMTP id 2v5btqj1xf-1
-        (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=OK);
-        Fri, 27 Sep 2019 12:52:26 +0000
-Received: from pps.filterd (userp3030.oracle.com [127.0.0.1])
-        by userp3030.oracle.com (8.16.0.27/8.16.0.27) with SMTP id x8RCmRRJ165263;
-        Fri, 27 Sep 2019 12:52:25 GMT
-Received: from userv0121.oracle.com (userv0121.oracle.com [156.151.31.72])
-        by userp3030.oracle.com with ESMTP id 2v8yk0ae3r-1
-        (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=OK);
-        Fri, 27 Sep 2019 12:52:25 +0000
-Received: from abhmp0022.oracle.com (abhmp0022.oracle.com [141.146.116.28])
-        by userv0121.oracle.com (8.14.4/8.13.8) with ESMTP id x8RCqLNs013620;
-        Fri, 27 Sep 2019 12:52:22 GMT
-Received: from [192.168.1.14] (/180.165.87.209)
-        by default (Oracle Beehive Gateway v4.0)
-        with ESMTP ; Fri, 27 Sep 2019 05:52:21 -0700
+        Fri, 27 Sep 2019 09:01:46 -0400
+Received: by mail-wm1-f67.google.com with SMTP id v17so6071023wml.4
+        for <linux-block@vger.kernel.org>; Fri, 27 Sep 2019 06:01:43 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=kernel-dk.20150623.gappssmtp.com; s=20150623;
+        h=subject:to:cc:references:from:message-id:date:user-agent
+         :mime-version:in-reply-to:content-language:content-transfer-encoding;
+        bh=Dm0+3pJ8C7A27/ghnUCkgnZEVBR1uv4FF47ldr/VWOQ=;
+        b=iLGncnXmqTJOOg3y9rebaiWAn6ZDu2gF2WJywjPvA+s9Er3cNSkl2NEXaB0C2sw4ig
+         o0w5LHBi2Rb9XwtmRPAgzf6x66HQxEyQJTL/p7RJWfhoJJsPRA6Yqgo4l/yj3opYDJPw
+         iDwDV+wiPjW8+hF8kjetA3i8dLG8ozipmrkc2LRWVkVBBKyNvvhRuIHPTAAJJ/Y21tM1
+         va0XJpGyybKa1GpRh1gUnVFrEOoln4odwrFx5697WFKEZeMh04/765gbDU86QWEDx9wm
+         oaX7g+LntaF4RpMbyire864DuSLYIeqnsoP6WoeZJQuVjMauqGpAM3I6AAw2GKK0EK2T
+         azEg==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20161025;
+        h=x-gm-message-state:subject:to:cc:references:from:message-id:date
+         :user-agent:mime-version:in-reply-to:content-language
+         :content-transfer-encoding;
+        bh=Dm0+3pJ8C7A27/ghnUCkgnZEVBR1uv4FF47ldr/VWOQ=;
+        b=ozbIFU0aovCJK7FdQD2lhagEVRvl79hhTy8O+tbvkN2+V6lfEI5609cP1G7Kx1uEEx
+         7V9QNW7iRE3MJem3ZrV21m6GhYBY4exWVuPilvJJJmbi8e2rmT5bXooVbGth4KwG8RhH
+         ok6yiOI8VYVPdlUhdq29r/f5gj4z7xwm46zU7lmoxy8vukym9I4mq2Mqk0Zf3497mvGx
+         TUnWRMDBmhnB6ARXXTABSxe2NrRw6CC+3J+xdp2z0gjKKDetH+jZLFwkB0cnJsUXtVCm
+         LuzzCgDa3wMoCsYYLvxIZIKDAvItQm1b/Ag8+j75dJzcN1HKeIbZwW3nV+tzDz4li9fR
+         DEpQ==
+X-Gm-Message-State: APjAAAXfjR7O52oj5XuuIhRc+42JlVsbOwaVU/pFYEVNWebiB5CDJ+6D
+        BDPOCA/jOmCyU2+MnmUh0S9Orw==
+X-Google-Smtp-Source: APXvYqxVqStuH3J1VX7LXm9qXAX/EQWD21jqa3f/IOPu0N+rKDEOXvUZLFxyH1vl3bhaLsMxkd4IOw==
+X-Received: by 2002:a05:600c:252:: with SMTP id 18mr6628984wmj.4.1569589302790;
+        Fri, 27 Sep 2019 06:01:42 -0700 (PDT)
+Received: from [172.20.9.27] ([83.167.33.93])
+        by smtp.gmail.com with ESMTPSA id z189sm15558858wmc.25.2019.09.27.06.01.41
+        (version=TLS1_2 cipher=ECDHE-RSA-AES128-GCM-SHA256 bits=128/128);
+        Fri, 27 Sep 2019 06:01:42 -0700 (PDT)
 Subject: Re: [PATCH v5] block: fix null pointer dereference in
  blk_mq_rq_timed_out()
-To:     Yufen Yu <yuyufen@huawei.com>, axboe@kernel.dk
+To:     Yufen Yu <yuyufen@huawei.com>
 Cc:     linux-block@vger.kernel.org, ming.lei@redhat.com,
         hch@infradead.org, keith.busch@intel.com, bvanassche@acm.org
 References: <20190927081955.44680-1-yuyufen@huawei.com>
-From:   Bob Liu <bob.liu@oracle.com>
-Message-ID: <1bcbf8e5-3a88-0210-ef71-3c0372449461@oracle.com>
-Date:   Fri, 27 Sep 2019 20:52:15 +0800
+From:   Jens Axboe <axboe@kernel.dk>
+Message-ID: <3b195278-91cd-c10e-3d80-8423f89a3060@kernel.dk>
+Date:   Fri, 27 Sep 2019 15:01:41 +0200
 User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:60.0) Gecko/20100101
- Thunderbird/60.5.1
+ Thunderbird/60.8.0
 MIME-Version: 1.0
 In-Reply-To: <20190927081955.44680-1-yuyufen@huawei.com>
 Content-Type: text/plain; charset=utf-8
 Content-Language: en-US
 Content-Transfer-Encoding: 7bit
-X-Proofpoint-Virus-Version: vendor=nai engine=6000 definitions=9392 signatures=668685
-X-Proofpoint-Spam-Details: rule=notspam policy=default score=0 suspectscore=2 malwarescore=0
- phishscore=0 bulkscore=0 spamscore=0 mlxscore=0 mlxlogscore=999
- adultscore=0 classifier=spam adjust=0 reason=mlx scancount=1
- engine=8.0.1-1908290000 definitions=main-1909270119
-X-Proofpoint-Virus-Version: vendor=nai engine=6000 definitions=9392 signatures=668685
-X-Proofpoint-Spam-Details: rule=notspam policy=default score=0 priorityscore=1501 malwarescore=0
- suspectscore=2 phishscore=0 bulkscore=0 spamscore=0 clxscore=1011
- lowpriorityscore=0 mlxscore=0 impostorscore=0 mlxlogscore=999 adultscore=0
- classifier=spam adjust=0 reason=mlx scancount=1 engine=8.0.1-1908290000
- definitions=main-1909270119
 Sender: linux-block-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-On 9/27/19 4:19 PM, Yufen Yu wrote:
+On 9/27/19 10:19 AM, Yufen Yu wrote:
 > We got a null pointer deference BUG_ON in blk_mq_rq_timed_out()
 > as following:
 > 
@@ -129,93 +122,9 @@ On 9/27/19 4:19 PM, Yufen Yu wrote:
 > If the refcount is not zero, flush_end_io() return and wait the
 > last holder recall it. To record the request status, we add a new
 > entry 'rq_status', which will be used in flush_end_io().
-> 
-> Cc: Ming Lei <ming.lei@redhat.com>
-> Cc: Christoph Hellwig <hch@infradead.org>
-> Cc: Keith Busch <keith.busch@intel.com>
-> Cc: Bart Van Assche <bvanassche@acm.org>
-> Cc: stable@vger.kernel.org # v4.18+
-> Signed-off-by: Yufen Yu <yuyufen@huawei.com>
-> 
-> -------
-> v2:
->  - move rq_status from struct request to struct blk_flush_queue
-> v3:
->  - remove unnecessary '{}' pair.
-> v4:
->  - let spinlock to protect 'fq->rq_status'
-> v5:
->  - move rq_status after flush_running_idx member of struct blk_flush_queue
-> ---
->  block/blk-flush.c | 10 ++++++++++
->  block/blk-mq.c    |  5 ++++-
->  block/blk.h       |  7 +++++++
->  3 files changed, 21 insertions(+), 1 deletion(-)
-> 
-> diff --git a/block/blk-flush.c b/block/blk-flush.c
-> index aedd9320e605..1eec9cbe5a0a 100644
-> --- a/block/blk-flush.c
-> +++ b/block/blk-flush.c
-> @@ -214,6 +214,16 @@ static void flush_end_io(struct request *flush_rq, blk_status_t error)
->  
->  	/* release the tag's ownership to the req cloned from */
->  	spin_lock_irqsave(&fq->mq_flush_lock, flags);
-> +
-> +	if (!refcount_dec_and_test(&flush_rq->ref)) {
-> +		fq->rq_status = error;
-> +		spin_unlock_irqrestore(&fq->mq_flush_lock, flags);
-> +		return;
-> +	}
-> +
-> +	if (fq->rq_status != BLK_STS_OK)
-> +		error = fq->rq_status;
-> +
->  	hctx = flush_rq->mq_hctx;
->  	if (!q->elevator) {
->  		blk_mq_tag_set_rq(hctx, flush_rq->tag, fq->orig_rq);
-> diff --git a/block/blk-mq.c b/block/blk-mq.c
-> index 20a49be536b5..e04fa9ab5574 100644
-> --- a/block/blk-mq.c
-> +++ b/block/blk-mq.c
-> @@ -912,7 +912,10 @@ static bool blk_mq_check_expired(struct blk_mq_hw_ctx *hctx,
->  	 */
->  	if (blk_mq_req_expired(rq, next))
->  		blk_mq_rq_timed_out(rq, reserved);
-> -	if (refcount_dec_and_test(&rq->ref))
-> +
-> +	if (is_flush_rq(rq, hctx))
-> +		rq->end_io(rq, 0);
-> +	else if (refcount_dec_and_test(&rq->ref))
->  		__blk_mq_free_request(rq);
->  
->  	return true;
-> diff --git a/block/blk.h b/block/blk.h
-> index ed347f7a97b1..2d8cdafee799 100644
-> --- a/block/blk.h
-> +++ b/block/blk.h
-> @@ -19,6 +19,7 @@ struct blk_flush_queue {
->  	unsigned int		flush_queue_delayed:1;
->  	unsigned int		flush_pending_idx:1;
->  	unsigned int		flush_running_idx:1;
-> +	blk_status_t 		rq_status;
->  	unsigned long		flush_pending_since;
->  	struct list_head	flush_queue[2];
->  	struct list_head	flush_data_in_flight;
-> @@ -47,6 +48,12 @@ static inline void __blk_get_queue(struct request_queue *q)
->  	kobject_get(&q->kobj);
->  }
->  
-> +static inline bool
-> +is_flush_rq(struct request *req, struct blk_mq_hw_ctx *hctx)
-> +{
-> +	return hctx->fq->flush_rq == req;
-> +}
-> +
->  struct blk_flush_queue *blk_alloc_flush_queue(struct request_queue *q,
->  		int node, int cmd_size, gfp_t flags);
->  void blk_free_flush_queue(struct blk_flush_queue *q);
-> 
 
-Looks good to me.
-Reviewed-by: Bob Liu <bob.liu@oracle.com>
+Thanks, applied.
+
+-- 
+Jens Axboe
 
