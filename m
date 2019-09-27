@@ -2,121 +2,137 @@ Return-Path: <SRS0=f8eR=XW=vger.kernel.org=linux-block-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-13.6 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
-	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PULL_REQUEST,MAILING_LIST_MULTI,
-	MENTIONS_GIT_HOSTING,SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED,USER_AGENT_GIT
-	autolearn=ham autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-2.3 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
+	MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,USER_AGENT_SANE_1 autolearn=no
+	autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 6033FC4360C
-	for <linux-block@archiver.kernel.org>; Fri, 27 Sep 2019 17:58:05 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 1AC0FC388F3
+	for <linux-block@archiver.kernel.org>; Fri, 27 Sep 2019 18:45:43 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.kernel.org (Postfix) with ESMTP id 32BC920872
-	for <linux-block@archiver.kernel.org>; Fri, 27 Sep 2019 17:58:05 +0000 (UTC)
-Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (2048-bit key) header.d=infradead.org header.i=@infradead.org header.b="a91DWZKc"
+	by mail.kernel.org (Postfix) with ESMTP id EEFC221927
+	for <linux-block@archiver.kernel.org>; Fri, 27 Sep 2019 18:45:42 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1726385AbfI0R6E (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Fri, 27 Sep 2019 13:58:04 -0400
-Received: from bombadil.infradead.org ([198.137.202.133]:52700 "EHLO
-        bombadil.infradead.org" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1726321AbfI0R6E (ORCPT
-        <rfc822;linux-block@vger.kernel.org>);
-        Fri, 27 Sep 2019 13:58:04 -0400
-DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed;
-        d=infradead.org; s=bombadil.20170209; h=Message-Id:Date:Subject:Cc:To:From:
-        Sender:Reply-To:MIME-Version:Content-Type:Content-Transfer-Encoding:
-        Content-ID:Content-Description:Resent-Date:Resent-From:Resent-Sender:
-        Resent-To:Resent-Cc:Resent-Message-ID:In-Reply-To:References:List-Id:
-        List-Help:List-Unsubscribe:List-Subscribe:List-Post:List-Owner:List-Archive;
-         bh=mqV86Qk9ujuNkKtc+FM4/w2Ow1yHPT9HsqipeiB7mMI=; b=a91DWZKcNQ0kaF7hjxmQw0YDF
-        3+277Yz9UyEdCKaB4mNlyzCUYPFtbB10io+bc49eyROZk8GxpIC/LIhPXNkdMlMD/lwkdCKr5as5C
-        MTMA7pXjLTGwoPO3mDC/gRwEBSiRA36zWZ8VP5Zs6gXVHZBuOuQmu97CJYREtEcFrRp5ODjTgFaz+
-        l8YbyBBkFg+yfrT9uHwA+Pj2J+pBEyR29AvaE25yQwupCZC4rAWweRlw48ZdMDKYcEa2/7d7AMjGT
-        mM7+AfzwJiGBurhWDbe1ZviRaFvlBLYHH22ZzNZHGcSfEd+xYKSE5XOgtswRsffAklac/Uw7Ub80G
-        JVRFmYFEw==;
-Received: from [2600:1700:65a0:78e0:514:7862:1503:8e4d] (helo=sagi-Latitude-E7470.lbits)
-        by bombadil.infradead.org with esmtpsa (Exim 4.92.2 #3 (Red Hat Linux))
-        id 1iDuVG-0005uQ-EQ; Fri, 27 Sep 2019 17:58:02 +0000
-From:   Sagi Grimberg <sagi@grimberg.me>
-To:     Jens Axboe <axboe@kernel.dk>
-Cc:     linux-nvme@lists.infradead.org, linux-block@vger.kernel.org,
-        Christoph Hellwig <hch@lst.de>,
-        Keith Busch <keith.busch@intel.com>
-Subject: [GIT PULL] nvme fixes for kernel 5.4-rc1
-Date:   Fri, 27 Sep 2019 10:58:01 -0700
-Message-Id: <20190927175801.12900-1-sagi@grimberg.me>
-X-Mailer: git-send-email 2.17.1
+        id S1728281AbfI0Spm (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Fri, 27 Sep 2019 14:45:42 -0400
+Received: from mx.ewheeler.net ([66.155.3.69]:56438 "EHLO mx.ewheeler.net"
+        rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
+        id S1728275AbfI0Spi (ORCPT <rfc822;linux-block@vger.kernel.org>);
+        Fri, 27 Sep 2019 14:45:38 -0400
+Received: from localhost (localhost [127.0.0.1])
+        by mx.ewheeler.net (Postfix) with ESMTP id 09FCBA0692;
+        Fri, 27 Sep 2019 18:45:37 +0000 (UTC)
+X-Virus-Scanned: amavisd-new at ewheeler.net
+Received: from mx.ewheeler.net ([127.0.0.1])
+        by localhost (mx.ewheeler.net [127.0.0.1]) (amavisd-new, port 10024)
+        with LMTP id YyPqUFVX106N; Fri, 27 Sep 2019 18:45:36 +0000 (UTC)
+Received: from mx.ewheeler.net (mx.ewheeler.net [66.155.3.69])
+        (using TLSv1 with cipher DHE-RSA-AES256-SHA (256/256 bits))
+        (No client certificate requested)
+        by mx.ewheeler.net (Postfix) with ESMTPSA id EAD11A067D;
+        Fri, 27 Sep 2019 18:45:35 +0000 (UTC)
+Date:   Fri, 27 Sep 2019 18:45:33 +0000 (UTC)
+From:   Eric Wheeler <dm-devel@lists.ewheeler.net>
+X-X-Sender: lists@mx.ewheeler.net
+To:     Joe Thornber <thornber@redhat.com>
+cc:     Mike Snitzer <snitzer@redhat.com>, ejt@redhat.com,
+        Coly Li <colyli@suse.de>, dm-devel@redhat.com,
+        linux-block@vger.kernel.org, linux-bcache@vger.kernel.org,
+        lvm-devel@redhat.com, joe.thornber@gmail.com
+Subject: Re: kernel BUG at drivers/md/persistent-data/dm-space-map-disk.c:178
+ with scsi_mod.use_blk_mq=y
+In-Reply-To: <20190927083239.xy6jwbkbektwqu3h@reti>
+Message-ID: <alpine.LRH.2.11.1909271819450.20939@mx.ewheeler.net>
+References: <alpine.LRH.2.11.1909251814220.15810@mx.ewheeler.net> <20190925200138.GA20584@redhat.com> <alpine.LRH.2.11.1909261819300.15810@mx.ewheeler.net> <20190927083239.xy6jwbkbektwqu3h@reti>
+User-Agent: Alpine 2.11 (LRH 23 2013-08-11)
+MIME-Version: 1.0
+Content-Type: TEXT/PLAIN; charset=US-ASCII
 Sender: linux-block-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-Hey Jens,
+On Fri, 27 Sep 2019, Joe Thornber wrote:
 
-This set consists of various fixes and clenaups:
-- controller removal race fix from Balbir
-- quirk additions from Gabriel and Jian-Hong
-- nvme-pci power state save fix from Mario
-- Add 64bit user commands (for 64bit registers) from Marta
-- nvme-rdma/nvme-tcp fixes from Max, Mark and Me
-- Minor cleanups and nits from James, Dan and John
+> Hi Eric,
+> 
+> On Thu, Sep 26, 2019 at 06:27:09PM +0000, Eric Wheeler wrote:
+> > I pvmoved the tmeta to an SSD logical volume (dm-linear) on a non-bcache 
+> > volume and we got the same trace this morning, so while the tdata still 
+> > passes through bcache, all meta operations are direct to an SSD. This is 
+> > still using multi-queue scsi, but dm_mod.use_blk_mq=N.
+> > 
+> > Since bcache is no longer involved with metadata operations, and since 
+> > this appears to be a metadata issue, are there any other reasons to 
+> > suspect bcache?
+> 
+> Did you recreate the pool, or are you just using the existing pool but with
+> a different IO path?  If it's the latter then there could still be something
+> wrong with the metadata, introduced while bcache was in the stack.
 
-The following changes since commit d46fe2cb2dce7f5038473b5859e03f5e16b7428e:
+We did not create the pool after the initial problem, though the pool was 
+new just before the problem occurred. 
+ 
+> Would it be possible to send me a copy of the metadata device please so
+> I can double check the space maps (I presume you've run thin_check on it)?
 
-  block: drop device references in bsg_queue_rq() (2019-09-23 11:17:24 -0600)
+~]# /usr/local/bin/thin_check /dev/mapper/data-data--pool_tmeta 
+examining superblock
+TRANSACTION_ID=2347
+METADATA_FREE_BLOCKS=4145151
+examining devices tree
+examining mapping tree
+checking space map counts
 
-are available in the Git repository at:
+~]# echo $?
+0
 
-  git://git.infradead.org/nvme.git nvme-5.4 
+~]# /usr/local/bin/thin_check -V
+0.8.5
 
-for you to fetch changes up to 67b483dd03c4cd9e90e4c3943132dce514ea4e88:
+> [Assuming you're using the existing pool] Another useful experiment would be to 
+> thump_dump and then thin_restore the metadata, which will create totally fresh
+> metadata and see if you can still reproduce the issue.
 
-  nvme-rdma: fix possible use-after-free in connect timeout (2019-09-27 10:24:53 -0700)
+It didn't lockup last night, but I'll keep working to reproduce the 
+problem and let you know what we find.
 
-----------------------------------------------------------------
-Balbir Singh (1):
-      nvme-pci: Fix a race in controller removal
+Mike said it could be a race:
 
-Dan Carpenter (1):
-      nvme: fix an error code in nvme_init_subsystem()
+> The stack shows the call to sm_disk_new_block() is due to
+> dm_pool_alloc_data_block().
+> 
+> sm_disk_new_block()'s BUG_ON(ev != SM_ALLOC) indicates that somehow it is
+> getting called without the passed 'ev' being set to SM_ALLOC.  Only
+> drivers/md/persistent-dat/dm-space-map-common.c:sm_ll_mutate() sets
+> SM_ALLOC. sm_disk_new_block() is indirectly calling sm_ll_mutate()
+> 
+> sm_ll_mutate() will only return 0 if ll->save_ie() does, the ll_disk *ll
+> should be ll_disk, and so disk_ll_save_ie()'s call to dm_btree_insert()
+> returns 0 -- which simply means success.  And on success
+> sm_disk_new_block() assumes ev was set to SM_ALLOC (by sm_ll_mutate).
+> 
+> sm_ll_mutate() decided to _not_ set SM_ALLOC because either:
+> 1) ref_count wasn't set
+> or
+> 2) old was identified
+> 
+> So all said: somehow a new data block was found to already be in use.
+> _WHY_ that is the case isn't clear from this stack...
+>
+> But it does speak to the possibility of data block allocation racing
+> with other operations to the same block.  Which implies missing locking.
 
-Gabriel Craciunescu (1):
-      Added QUIRKs for ADATA XPG SX8200 Pro 512GB
+Would a spinlock on the block solve the issue?
 
-James Smart (1):
-      nvme: Add ctrl attributes for queue_count and sqsize
+Where might such a spinlock be added?
 
-Jian-Hong Pan (1):
-      nvme: Add quirk for Kingston NVME SSD running FW E8FK11.T
 
-John Pittman (1):
-      nvmet: change ppl to lpp
+--
+Eric Wheeler
 
-Keith Busch (1):
-      nvme: Move ctrl sqsize to generic space
 
-Mario Limonciello (1):
-      nvme-pci: Save PCI state before putting drive into deepest state
-
-Marta Rybczynska (1):
-      nvme: allow 64-bit results in passthru commands
-
-Max Gurtovoy (1):
-      nvme-rdma: Fix max_hw_sectors calculation
-
-Sagi Grimberg (2):
-      nvmet-tcp: remove superflous check on request sgl
-      nvme-rdma: fix possible use-after-free in connect timeout
-
-Wunderlich, Mark (1):
-      nvme-tcp: fix wrong stop condition in io_work
-
- drivers/nvme/host/core.c          | 132 ++++++++++++++++++++++++++++++++------
- drivers/nvme/host/nvme.h          |   2 +-
- drivers/nvme/host/pci.c           |  20 ++++--
- drivers/nvme/host/rdma.c          |  19 ++++--
- drivers/nvme/host/tcp.c           |   4 +-
- drivers/nvme/target/io-cmd-bdev.c |  16 ++---
- drivers/nvme/target/tcp.c         |  12 ++--
- include/uapi/linux/nvme_ioctl.h   |  23 +++++++
- 8 files changed, 177 insertions(+), 51 deletions(-)
+> 
+> Thanks,
+> 
+> - Joe
+> 
