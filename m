@@ -2,104 +2,290 @@ Return-Path: <SRS0=f8eR=XW=vger.kernel.org=linux-block-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-7.2 required=3.0 tests=DKIM_SIGNED,DKIM_VALID,
-	HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,MENTIONS_GIT_HOSTING,
-	SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED,USER_AGENT_SANE_1 autolearn=ham
-	autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-0.9 required=3.0 tests=DKIM_SIGNED,DKIM_VALID,
+	DKIM_VALID_AU,HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SPF_HELO_NONE,
+	SPF_PASS autolearn=no autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 76193C4360C
-	for <linux-block@archiver.kernel.org>; Fri, 27 Sep 2019 14:58:58 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 2DBF2C388F3
+	for <linux-block@archiver.kernel.org>; Fri, 27 Sep 2019 15:03:55 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.kernel.org (Postfix) with ESMTP id 48C2521841
-	for <linux-block@archiver.kernel.org>; Fri, 27 Sep 2019 14:58:58 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id 002B521D7B
+	for <linux-block@archiver.kernel.org>; Fri, 27 Sep 2019 15:03:54 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel-dk.20150623.gappssmtp.com header.i=@kernel-dk.20150623.gappssmtp.com header.b="H5f6ZAZt"
+	dkim=pass (2048-bit key) header.d=cloud.ionos.com header.i=@cloud.ionos.com header.b="GqMlzBdi"
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1727691AbfI0O65 (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Fri, 27 Sep 2019 10:58:57 -0400
-Received: from mail-wr1-f66.google.com ([209.85.221.66]:40573 "EHLO
-        mail-wr1-f66.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1727506AbfI0O65 (ORCPT
+        id S1727416AbfI0PDy (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Fri, 27 Sep 2019 11:03:54 -0400
+Received: from mail-wr1-f67.google.com ([209.85.221.67]:42638 "EHLO
+        mail-wr1-f67.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S1727366AbfI0PDx (ORCPT
         <rfc822;linux-block@vger.kernel.org>);
-        Fri, 27 Sep 2019 10:58:57 -0400
-Received: by mail-wr1-f66.google.com with SMTP id l3so3236738wru.7
-        for <linux-block@vger.kernel.org>; Fri, 27 Sep 2019 07:58:55 -0700 (PDT)
+        Fri, 27 Sep 2019 11:03:53 -0400
+Received: by mail-wr1-f67.google.com with SMTP id n14so3261247wrw.9
+        for <linux-block@vger.kernel.org>; Fri, 27 Sep 2019 08:03:51 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=kernel-dk.20150623.gappssmtp.com; s=20150623;
-        h=to:cc:from:subject:message-id:date:user-agent:mime-version
-         :content-language:content-transfer-encoding;
-        bh=ewYDN1PlLV89dmxzX/B1gBoOpNgLpWGO6HKqKHnjQKw=;
-        b=H5f6ZAZtyzYdtFvgaqC4otL5rT78JAjWW5wjHSc4WerhThILG5PbLiDAoU7RVB7O/G
-         5E4YSoL7RhJcVYKUB/mOChA43C9OQ3X0l18Ah643pGc5aN7P10XVipl7FyGSrtpRSP2f
-         Cdi1kQF8ETtc88Rie1thAk9GB5LyHZpAl4cm8nxrLaDNM4AbxCKby7NVEqrc4erBLkvC
-         qJkbkG4b7qEfi/hI3PG6rJy4qVvM/N6I+hJZUqgqbW9gpax2aKvm5oDpTinBcho4IcOF
-         kxRfUud3CefR9ZjgOjtOewK9F0jpVE0mWwnCcaMKf+nIJzcc1S7wSkq2lvC7FEIrwODm
-         C4pw==
+        d=cloud.ionos.com; s=google;
+        h=mime-version:references:in-reply-to:from:date:message-id:subject:to
+         :cc;
+        bh=PZJXUZpbTKKyYd5EHvVpIv+ib2O74QwuuKVZEk534NU=;
+        b=GqMlzBdi1kr9YNzF3EMhpOvvjuL4IA08nLC1303sdBPkJT3wkTsCa3Ec4GV9W5Ltx4
+         xdPdPNj38ehtyMstApRFI664FMTIEHemzpUMZexF9NEFcSX3VciDLEtSMX1ey5UnnAn4
+         CQDEnhC1FJLf1LI/9bbEI/WMkKf5afEnOLnlxjbGKM6Ot0uB/0l49VQk5kYKgfFw4m1b
+         1oAw3kDdUpYX4ofYI6k5w6VOjSLVVlJiGZm4ySZNmrZ1FViDdK7a5uqcmoVjxeqe1gwm
+         32L1EI5w3sc+25ls04H5kjqeW87t+sErEMlNHBKQu0MMpkYWGQwC+n9IzdW9w4DftgZs
+         gmaA==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=1e100.net; s=20161025;
-        h=x-gm-message-state:to:cc:from:subject:message-id:date:user-agent
-         :mime-version:content-language:content-transfer-encoding;
-        bh=ewYDN1PlLV89dmxzX/B1gBoOpNgLpWGO6HKqKHnjQKw=;
-        b=QV84D2IMetCVfVMXRi9nVXq7qn6LTqIbtBgxBmTPmdHhGKaUYMwR1eWAKBOexnxNEJ
-         yIdeD+j8PxhveH0R7ioIcq51AyuhSYQvhjQoSzLR2PLcZVKW8pkB71lKu3zs7sE7Ni95
-         V1rDOwfNM6cOPnroOwyhuTTuFIF0TGuCJD3X5Vh/Gp6Z13VLVONsEP647ahoKzWHajgb
-         wexaroHcB2yUFLb2FaULps2WRmJiojX6J7qI3JXKqoxp6rcde+R0qqoctdDk/9smOu+n
-         +y8RygWIlUtHESSHBKt0yv9mu7oxtQbv+NLBlOEFlz3lgf6K2LshkH0ndD19YEI+j81k
-         qFQA==
-X-Gm-Message-State: APjAAAXouj7hCfvQU78pWk9VK0mvFHZfrQE/7yxtRMsrdeqlH3qvJzhG
-        WO/o7nUHgDR4gj4sIcFM4fsj9SiaZnbJSWEc
-X-Google-Smtp-Source: APXvYqz7jzineHoMJctrRHChCZoSXlCZOfQ6tJhvKlBD8MU7CwoQGUs87w9ejOuuj2vcSSkpGXl7lg==
-X-Received: by 2002:a5d:4a84:: with SMTP id o4mr3256679wrq.165.1569596334001;
-        Fri, 27 Sep 2019 07:58:54 -0700 (PDT)
-Received: from [172.20.9.27] ([83.167.33.93])
-        by smtp.gmail.com with ESMTPSA id f20sm4115005wmb.6.2019.09.27.07.58.52
-        (version=TLS1_2 cipher=ECDHE-RSA-AES128-GCM-SHA256 bits=128/128);
-        Fri, 27 Sep 2019 07:58:52 -0700 (PDT)
-To:     Linus Torvalds <torvalds@linux-foundation.org>
-Cc:     "linux-block@vger.kernel.org" <linux-block@vger.kernel.org>
-From:   Jens Axboe <axboe@kernel.dk>
-Subject: [GIT PULL] io_uring changes for 5.4-rc1
-Message-ID: <c4e59df0-3fbd-44c8-f696-8eb424028b7c@kernel.dk>
-Date:   Fri, 27 Sep 2019 16:58:52 +0200
-User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:60.0) Gecko/20100101
- Thunderbird/60.8.0
+        h=x-gm-message-state:mime-version:references:in-reply-to:from:date
+         :message-id:subject:to:cc;
+        bh=PZJXUZpbTKKyYd5EHvVpIv+ib2O74QwuuKVZEk534NU=;
+        b=coChJo1O5wOOM+DBlc3/Vvpd3gmAbDbDmPfleLeWLfvPo8eyPH+B0iKXiIQ5aUD6dF
+         slWZVSihAIFBOIszQZKG2pqpYf5PSnmT7EibM/cahKDlqnGCeWGtwCBMTy5jQ+lC2qeF
+         /CvONbnALVf7cmGtmw/CDOjC65XXaimMc8jCfM1SzcP2oYqQpQoUug2ozM77ml1VBpAA
+         2eC3B7ce4eWnN+fDQ07DtU7zYyMuJn1jimltgSuiNnfUXxkanF/L8pFD64IPCtARmdNB
+         teKoWImnCEw0yzrXZIee7cqGI1UOC3CxGbrTqEBfvqZs59obon4FbuD70QgqICvGvHD/
+         JOEQ==
+X-Gm-Message-State: APjAAAUUgY2nr6DpAXKr7YxZfuJ9maI/+G6rcjzYJTnF9p4fXdAvM5tw
+        VVJgWqj3w5OQamlQcvW1qDdwQnJnNgaOnHnO7s8tow==
+X-Google-Smtp-Source: APXvYqwsr8nzUvPP6W2lnkJvVbpEGc/xYTGRobDQw7dp2pW8q4m1DTsJEY0U0mObEEwd1N2+ik20RqS0OpSVtzstasI=
+X-Received: by 2002:a1c:7dd1:: with SMTP id y200mr7264240wmc.59.1569596630577;
+ Fri, 27 Sep 2019 08:03:50 -0700 (PDT)
 MIME-Version: 1.0
-Content-Type: text/plain; charset=utf-8
-Content-Language: en-US
-Content-Transfer-Encoding: 7bit
+References: <20190620150337.7847-1-jinpuwang@gmail.com> <20190620150337.7847-11-jinpuwang@gmail.com>
+ <ab36427b-a737-9544-fbe8-cd53c0780994@acm.org>
+In-Reply-To: <ab36427b-a737-9544-fbe8-cd53c0780994@acm.org>
+From:   Jinpu Wang <jinpu.wang@cloud.ionos.com>
+Date:   Fri, 27 Sep 2019 17:03:39 +0200
+Message-ID: <CAMGffEmuY+ebhJz1iff7Cnb=qdHuhBaSs=DAKP_iKTOb2Ao2PA@mail.gmail.com>
+Subject: Re: [PATCH v4 10/25] ibtrs: server: main functionality
+To:     Bart Van Assche <bvanassche@acm.org>
+Cc:     Jack Wang <jinpuwang@gmail.com>, linux-block@vger.kernel.org,
+        linux-rdma@vger.kernel.org, Jens Axboe <axboe@kernel.dk>,
+        Christoph Hellwig <hch@infradead.org>,
+        Sagi Grimberg <sagi@grimberg.me>,
+        Jason Gunthorpe <jgg@mellanox.com>,
+        Doug Ledford <dledford@redhat.com>,
+        Danil Kipnis <danil.kipnis@cloud.ionos.com>, rpenyaev@suse.de,
+        Roman Pen <roman.penyaev@profitbricks.com>
+Content-Type: text/plain; charset="UTF-8"
 Sender: linux-block-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-Hi Linus,
+On Tue, Sep 24, 2019 at 1:49 AM Bart Van Assche <bvanassche@acm.org> wrote:
+>
+> On 6/20/19 8:03 AM, Jack Wang wrote:
+> > +module_param_named(max_chunk_size, max_chunk_size, int, 0444);
+> > +MODULE_PARM_DESC(max_chunk_size,
+> > +              "Max size for each IO request, when change the unit is in byte"
+> > +              " (default: " __stringify(DEFAULT_MAX_CHUNK_SIZE_KB) "KB)");
+>
+> Where can I find the definition of DEFAULT_MAX_CHUNK_SIZE_KB?
+oh, it's a typo, should be DEFAULT_MAX_CHUNK_SIZE.
+>
+> > +static char cq_affinity_list[256] = "";
+>
+> No empty initializers for file-scope variables please.
+Is it guaranteed by the compiler, the file-scope variables will be
+empty initialized?
+>
+> > +     pr_info("cq_affinity_list changed to %*pbl\n",
+> > +             cpumask_pr_args(&cq_affinity_mask));
+>
+> Should this pr_info() call perhaps be changed into pr_debug()?
+Because the setting could lead to performance drop, pr_info seems more
+appropriate.
 
-Just two things in this pull request:
+>
+> > +static bool __ibtrs_srv_change_state(struct ibtrs_srv_sess *sess,
+> > +                                  enum ibtrs_srv_state new_state)
+> > +{
+> > +     enum ibtrs_srv_state old_state;
+> > +     bool changed = false;
+> > +
+> > +     old_state = sess->state;
+> > +     switch (new_state) {
+>
+> Please add a lockdep_assert_held() statement that checks whether calls
+> of this function are serialized properly.
+will look into it.
+>
+> > +/**
+> > + * rdma_write_sg() - response on successful READ request
+> > + */
+> > +static int rdma_write_sg(struct ibtrs_srv_op *id)
+> > +{
+> > +     struct ibtrs_srv_sess *sess = to_srv_sess(id->con->c.sess);
+> > +     dma_addr_t dma_addr = sess->dma_addr[id->msg_id];
+> > +     struct ibtrs_srv *srv = sess->srv;
+> > +     struct ib_send_wr inv_wr, imm_wr;
+> > +     struct ib_rdma_wr *wr = NULL;
+> > +     const struct ib_send_wr *bad_wr;
+> > +     enum ib_send_flags flags;
+> > +     size_t sg_cnt;
+> > +     int err, i, offset;
+> > +     bool need_inval;
+> > +     u32 rkey = 0;
+> > +
+> > +     sg_cnt = le16_to_cpu(id->rd_msg->sg_cnt);
+> > +     need_inval = le16_to_cpu(id->rd_msg->flags) & IBTRS_MSG_NEED_INVAL_F;
+> > +     if (unlikely(!sg_cnt))
+> > +             return -EINVAL;
+> > +
+> > +     offset = 0;
+> > +     for (i = 0; i < sg_cnt; i++) {
+> > +             struct ib_sge *list;
+> > +
+> > +             wr              = &id->tx_wr[i];
+> > +             list            = &id->tx_sg[i];
+> > +             list->addr      = dma_addr + offset;
+> > +             list->length    = le32_to_cpu(id->rd_msg->desc[i].len);
+> > +
+> > +             /* WR will fail with length error
+> > +              * if this is 0
+> > +              */
+> > +             if (unlikely(list->length == 0)) {
+> > +                     ibtrs_err(sess, "Invalid RDMA-Write sg list length 0\n");
+> > +                     return -EINVAL;
+> > +             }
+> > +
+> > +             list->lkey = sess->s.dev->ib_pd->local_dma_lkey;
+> > +             offset += list->length;
+> > +
+> > +             wr->wr.wr_cqe   = &io_comp_cqe;
+> > +             wr->wr.sg_list  = list;
+> > +             wr->wr.num_sge  = 1;
+> > +             wr->remote_addr = le64_to_cpu(id->rd_msg->desc[i].addr);
+> > +             wr->rkey        = le32_to_cpu(id->rd_msg->desc[i].key);
+> > +             if (rkey == 0)
+> > +                     rkey = wr->rkey;
+> > +             else
+> > +                     /* Only one key is actually used */
+> > +                     WARN_ON_ONCE(rkey != wr->rkey);
+> > +
+> > +             if (i < (sg_cnt - 1))
+> > +                     wr->wr.next = &id->tx_wr[i + 1].wr;
+> > +             else if (need_inval)
+> > +                     wr->wr.next = &inv_wr;
+> > +             else
+> > +                     wr->wr.next = &imm_wr;
+> > +
+> > +             wr->wr.opcode = IB_WR_RDMA_WRITE;
+> > +             wr->wr.ex.imm_data = 0;
+> > +             wr->wr.send_flags  = 0;
+> > +     }
+> > +     /*
+> > +      * From time to time we have to post signalled sends,
+> > +      * or send queue will fill up and only QP reset can help.
+> > +      */
+> > +     flags = atomic_inc_return(&id->con->wr_cnt) % srv->queue_depth ?
+> > +                     0 : IB_SEND_SIGNALED;
+> > +
+> > +     if (need_inval) {
+> > +             inv_wr.next = &imm_wr;
+> > +             inv_wr.wr_cqe = &io_comp_cqe;
+> > +             inv_wr.sg_list = NULL;
+> > +             inv_wr.num_sge = 0;
+> > +             inv_wr.opcode = IB_WR_SEND_WITH_INV;
+> > +             inv_wr.send_flags = 0;
+> > +             inv_wr.ex.invalidate_rkey = rkey;
+> > +     }
+> > +     imm_wr.next = NULL;
+> > +     imm_wr.wr_cqe = &io_comp_cqe;
+> > +     imm_wr.sg_list = NULL;
+> > +     imm_wr.num_sge = 0;
+> > +     imm_wr.opcode = IB_WR_RDMA_WRITE_WITH_IMM;
+> > +     imm_wr.send_flags = flags;
+> > +     imm_wr.ex.imm_data = cpu_to_be32(ibtrs_to_io_rsp_imm(id->msg_id,
+> > +                                                          0, need_inval));
+> > +
+> > +     ib_dma_sync_single_for_device(sess->s.dev->ib_dev, dma_addr,
+> > +                                   offset, DMA_BIDIRECTIONAL);
+> > +
+> > +     err = ib_post_send(id->con->c.qp, &id->tx_wr[0].wr, &bad_wr);
+> > +     if (unlikely(err))
+> > +             ibtrs_err(sess,
+> > +                       "Posting RDMA-Write-Request to QP failed, err: %d\n",
+> > +                       err);
+> > +
+> > +     return err;
+> > +}
+>
+> All other RDMA server implementations use rdma_rw_ctx_init() and
+> rdma_rw_ctx_wrs(). Please use these functions in IBTRS too.
+rdma_rw_ctx_* api doesn't support RDMA_WRITE_WITH_IMM, and
+ibtrs mainly use RDMA_WRITE_WITH_IMM.
 
-- Improvement to the io_uring CQ ring wakeup for batched IO (me)
-
-- Fix wrong comparison in poll handling (yangerkun)
-
-I realize the first one is a little late in the game, but it felt
-pointless to hold it off until the next release. Went through various
-testing and reviews with Pavel and peterz.
-
-Please pull!
-
-
-  git://git.kernel.dk/linux-block.git tags/for-5.4/io_uring-2019-09-27
-
-
-----------------------------------------------------------------
-Jens Axboe (1):
-      io_uring: make CQ ring wakeups be more efficient
-
-yangerkun (1):
-      io_uring: compare cached_cq_tail with cq.head in_io_uring_poll
-
- fs/io_uring.c | 68 +++++++++++++++++++++++++++++++++++++++++++++++++----------
- 1 file changed, 57 insertions(+), 11 deletions(-)
-
--- 
-Jens Axboe
-
+>
+> > +static void ibtrs_srv_hb_err_handler(struct ibtrs_con *c, int err)
+> > +{
+> > +     (void)err;
+> > +     close_sess(to_srv_sess(c->sess));
+> > +}
+>
+> Is the (void)err statement really necessary?
+No, will be removed.
+>
+> > +static int ibtrs_srv_rdma_init(struct ibtrs_srv_ctx *ctx, unsigned int port)
+> > +{
+> > +     struct sockaddr_in6 sin = {
+> > +             .sin6_family    = AF_INET6,
+> > +             .sin6_addr      = IN6ADDR_ANY_INIT,
+> > +             .sin6_port      = htons(port),
+> > +     };
+> > +     struct sockaddr_ib sib = {
+> > +             .sib_family                     = AF_IB,
+> > +             .sib_addr.sib_subnet_prefix     = 0ULL,
+> > +             .sib_addr.sib_interface_id      = 0ULL,
+> > +             .sib_sid        = cpu_to_be64(RDMA_IB_IP_PS_IB | port),
+> > +             .sib_sid_mask   = cpu_to_be64(0xffffffffffffffffULL),
+> > +             .sib_pkey       = cpu_to_be16(0xffff),
+> > +     };
+> > +     struct rdma_cm_id *cm_ip, *cm_ib;
+> > +     int ret;
+> > +
+> > +     /*
+> > +      * We accept both IPoIB and IB connections, so we need to keep
+> > +      * two cm id's, one for each socket type and port space.
+> > +      * If the cm initialization of one of the id's fails, we abort
+> > +      * everything.
+> > +      */
+> > +     cm_ip = ibtrs_srv_cm_init(ctx, (struct sockaddr *)&sin, RDMA_PS_TCP);
+> > +     if (unlikely(IS_ERR(cm_ip)))
+> > +             return PTR_ERR(cm_ip);
+> > +
+> > +     cm_ib = ibtrs_srv_cm_init(ctx, (struct sockaddr *)&sib, RDMA_PS_IB);
+> > +     if (unlikely(IS_ERR(cm_ib))) {
+> > +             ret = PTR_ERR(cm_ib);
+> > +             goto free_cm_ip;
+> > +     }
+> > +
+> > +     ctx->cm_id_ip = cm_ip;
+> > +     ctx->cm_id_ib = cm_ib;
+> > +
+> > +     return 0;
+> > +
+> > +free_cm_ip:
+> > +     rdma_destroy_id(cm_ip);
+> > +
+> > +     return ret;
+> > +}
+>
+> Will the above work if CONFIG_IPV6=n?
+I tested with CONFIG_IPV6=n, it compiles.
+>
+> > +static int __init ibtrs_server_init(void)
+> > +{
+> > +     int err;
+> > +
+> > +     if (!strlen(cq_affinity_list))
+> > +             init_cq_affinity();
+>
+> Is the above if-test useful? Can that if-test be left out?
+You're right, will remove.
+>
+> Thanks,
+>
+> Bart.
+Thanks!
