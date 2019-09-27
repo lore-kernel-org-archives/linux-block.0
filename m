@@ -2,150 +2,220 @@ Return-Path: <SRS0=f8eR=XW=vger.kernel.org=linux-block-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-2.4 required=3.0 tests=DKIM_SIGNED,DKIM_VALID,
-	DKIM_VALID_AU,HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SPF_HELO_NONE,
-	SPF_PASS,USER_AGENT_SANE_1 autolearn=no autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-8.4 required=3.0 tests=DKIMWL_WL_HIGH,DKIM_SIGNED,
+	DKIM_VALID,DKIM_VALID_AU,HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,
+	MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED,
+	USER_AGENT_SANE_1 autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id CF93CC4360C
-	for <linux-block@archiver.kernel.org>; Fri, 27 Sep 2019 12:18:09 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 02DD5C4360C
+	for <linux-block@archiver.kernel.org>; Fri, 27 Sep 2019 12:52:57 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.kernel.org (Postfix) with ESMTP id A3D4C217D9
-	for <linux-block@archiver.kernel.org>; Fri, 27 Sep 2019 12:18:09 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id BF69121850
+	for <linux-block@archiver.kernel.org>; Fri, 27 Sep 2019 12:52:56 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=pass (2048-bit key) header.d=cloud.ionos.com header.i=@cloud.ionos.com header.b="HdrofhHQ"
+	dkim=pass (2048-bit key) header.d=oracle.com header.i=@oracle.com header.b="Vx4fJ6zA"
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1727393AbfI0MSJ (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Fri, 27 Sep 2019 08:18:09 -0400
-Received: from mail-ed1-f66.google.com ([209.85.208.66]:39921 "EHLO
-        mail-ed1-f66.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1725890AbfI0MSI (ORCPT
+        id S1727140AbfI0Mw4 (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Fri, 27 Sep 2019 08:52:56 -0400
+Received: from aserp2120.oracle.com ([141.146.126.78]:40496 "EHLO
+        aserp2120.oracle.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S1725992AbfI0Mwz (ORCPT
         <rfc822;linux-block@vger.kernel.org>);
-        Fri, 27 Sep 2019 08:18:08 -0400
-Received: by mail-ed1-f66.google.com with SMTP id a15so2138827edt.6
-        for <linux-block@vger.kernel.org>; Fri, 27 Sep 2019 05:18:07 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=cloud.ionos.com; s=google;
-        h=subject:from:to:cc:references:message-id:date:user-agent
-         :mime-version:in-reply-to:content-transfer-encoding:content-language;
-        bh=FKHeGQHPDqERmEIFxtVPQVkrwntjuPpxcT3RmSIpP3o=;
-        b=HdrofhHQzBPK9v8Uo6SaER6UTr3ErMkOtpIMUvNAfRk3TsOnPbuZUuyzDLpriySmte
-         SoF9tI5+/jTLLvfjl+U399goUWoufGPSSthoOvnAfh/8OD8i9WBqMC6tZsLN6LSvE5Zk
-         9m3+kreK+0+6KaLuL35SO7qZNvzuC0iexA2pE/RHotailaByQjeWaqyVI8OD2J2MYj+1
-         rik304UZpq+4QIF74Y4WXzaduvZaZUo5rxadnZY7tWJUYxnyHSvQd7k5ujOLIzXGCWcU
-         bJb4nF0aGfEDv+rasjeCEjqiEJ3Rfsef0zm8uhvdWfXKw/5JmM7WoRTMJpfrpsHDOjk9
-         8n+g==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20161025;
-        h=x-gm-message-state:subject:from:to:cc:references:message-id:date
-         :user-agent:mime-version:in-reply-to:content-transfer-encoding
-         :content-language;
-        bh=FKHeGQHPDqERmEIFxtVPQVkrwntjuPpxcT3RmSIpP3o=;
-        b=WY5r7D3PvpjOXXKxVXTlTaYnrEjxruBx9oyKlSQ8jDdMVon/x4XjmwiaDvsBujWc/O
-         LAXRN4NINqYApzlH4QJnKgJUQ4yWrJC2/jhVmUbQwl/t4d7a1N+ARm2k1so3bWb95MLx
-         jswe3W81wbPmOTk+W9JV7n0oc7NBhfk569soA/eCY2Zy0JW042DF7WGYItdx6Tsrhjsg
-         kyKz4Llt5eldZ0Nzph3wvZ7zIYKiwWEyseG+98pMrR3fJGOO6Hs6mZ/vQsXVRE6MLquO
-         wKa3ptXRiXISryYZdkafLweQnvjl2LFLpcdN5FxFfpq4p4IQFm9WZKT9appJB7Da9MKx
-         3jhQ==
-X-Gm-Message-State: APjAAAUqw0ZsKAE+UCEpnQusOgK/qoUlmIztPU5zqi/0C9QibSPtJjUc
-        lKGMSkYoxSftSjV9jD4tavs+
-X-Google-Smtp-Source: APXvYqy1JTYW4Su7MKrX0sOFsS3sjuB529ktql8CtIDV3FED1QGblp/9SVcsm2Y+sy5ezO3svyfbFw==
-X-Received: by 2002:a50:91b1:: with SMTP id g46mr3998224eda.255.1569586686552;
-        Fri, 27 Sep 2019 05:18:06 -0700 (PDT)
-Received: from ?IPv6:2a02:247f:ffff:2540:251d:77f4:c17c:46f7? ([2001:1438:4010:2540:251d:77f4:c17c:46f7])
-        by smtp.gmail.com with ESMTPSA id i7sm492490edk.42.2019.09.27.05.18.05
-        (version=TLS1_2 cipher=ECDHE-RSA-AES128-GCM-SHA256 bits=128/128);
-        Fri, 27 Sep 2019 05:18:05 -0700 (PDT)
-Subject: Re: [PATCH v4 17/25] ibnbd: client: main functionality
-From:   Danil Kipnis <danil.kipnis@cloud.ionos.com>
-To:     Roman Penyaev <r.peniaev@gmail.com>,
-        Christoph Hellwig <hch@infradead.org>
-Cc:     Bart Van Assche <bvanassche@acm.org>,
-        Jack Wang <jinpuwang@gmail.com>, linux-block@vger.kernel.org,
-        linux-rdma@vger.kernel.org, Jens Axboe <axboe@kernel.dk>,
-        Sagi Grimberg <sagi@grimberg.me>,
-        Jason Gunthorpe <jgg@mellanox.com>,
-        Doug Ledford <dledford@redhat.com>, rpenyaev@suse.de,
-        Jack Wang <jinpu.wang@cloud.ionos.com>
-References: <20190620150337.7847-1-jinpuwang@gmail.com>
- <20190620150337.7847-18-jinpuwang@gmail.com>
- <bd8963e2-d186-dbd0-fe39-7f4a518f4177@acm.org>
- <CAHg0HuwzHnzPQAqjtYFTZb7BhzFagJ0NJ=pW=VkTqn5HML-0Vw@mail.gmail.com>
- <5c5ff7df-2cce-ec26-7893-55911e4d8595@acm.org>
- <CAHg0HuwFTVsCNHbiXW20P6hQ3c-P_p5tB6dYKtOW=_euWEvLnA@mail.gmail.com>
- <CAHg0HuzQOH4ZCe+v-GHu8jOYm-wUbh1fFRK75Muq+DPpQGAH8A@mail.gmail.com>
- <6f677d56-82b3-a321-f338-cbf8ff4e83eb@acm.org>
- <CAHg0HuxvKZVjROMM7YmYJ0kOU5Y4UeE+a3V==LNkWpLFy8wqtw@mail.gmail.com>
- <CACZ9PQU6bFtnDUYtzbsmNzsNW0j1EkxgUKzUw5N5gr1ArEXZvw@mail.gmail.com>
- <e2056b1d-b428-18c7-8e22-2f37b91917c8@acm.org>
- <CACZ9PQU8=4DaSAUQ7czKdcWio2H5HB1ro-pXaY2VP9PhgTxk7g@mail.gmail.com>
- <CAHg0HuwgPXtaY3XGv0=TjPbmRRdbmOsa7fRYa+n5fGf9K0_xRg@mail.gmail.com>
-Message-ID: <b449137d-e986-4d2b-ed0a-0b931d8312e1@cloud.ionos.com>
-Date:   Fri, 27 Sep 2019 14:18:05 +0200
+        Fri, 27 Sep 2019 08:52:55 -0400
+Received: from pps.filterd (aserp2120.oracle.com [127.0.0.1])
+        by aserp2120.oracle.com (8.16.0.27/8.16.0.27) with SMTP id x8RCnUiN107120;
+        Fri, 27 Sep 2019 12:52:26 GMT
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=oracle.com; h=subject : to : cc :
+ references : from : message-id : date : mime-version : in-reply-to :
+ content-type : content-transfer-encoding; s=corp-2019-08-05;
+ bh=1vntBl8I3GTfe8XVuLqJfBQBsDIhd0OrhFvo+n9ywEg=;
+ b=Vx4fJ6zAfplgEdT03YYfa/7x7kQeRst36YflOpZvojiifKLmIbzMDn/NiASX9/dt3TB+
+ KHCdHPk+9I6M0+4rHu5qMpH4AE4c4V/SEjUehM4Q+6NNDI5Lcxk40Jz0Vw+0IsHbm0gH
+ iTiyTGZQMerlSNNVwNY4lujYi7vDOLtcr9yMC2IE4ihPIvMXt603sMbtlX2sbZDXL7LT
+ F/lPrWorp+uYra7k12XS/EqgvB2fzw1ILamuzrx7lZ3PSd1zwsllp17CCyxm2sfBx7sg
+ wC32b3Gfu4zNn/UxU0Qlr6iAeALCP3Kko5XNTBBvjw841FkPjubJb+jM9QB+WE/GgCQy mw== 
+Received: from userp3030.oracle.com (userp3030.oracle.com [156.151.31.80])
+        by aserp2120.oracle.com with ESMTP id 2v5btqj1xf-1
+        (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=OK);
+        Fri, 27 Sep 2019 12:52:26 +0000
+Received: from pps.filterd (userp3030.oracle.com [127.0.0.1])
+        by userp3030.oracle.com (8.16.0.27/8.16.0.27) with SMTP id x8RCmRRJ165263;
+        Fri, 27 Sep 2019 12:52:25 GMT
+Received: from userv0121.oracle.com (userv0121.oracle.com [156.151.31.72])
+        by userp3030.oracle.com with ESMTP id 2v8yk0ae3r-1
+        (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=OK);
+        Fri, 27 Sep 2019 12:52:25 +0000
+Received: from abhmp0022.oracle.com (abhmp0022.oracle.com [141.146.116.28])
+        by userv0121.oracle.com (8.14.4/8.13.8) with ESMTP id x8RCqLNs013620;
+        Fri, 27 Sep 2019 12:52:22 GMT
+Received: from [192.168.1.14] (/180.165.87.209)
+        by default (Oracle Beehive Gateway v4.0)
+        with ESMTP ; Fri, 27 Sep 2019 05:52:21 -0700
+Subject: Re: [PATCH v5] block: fix null pointer dereference in
+ blk_mq_rq_timed_out()
+To:     Yufen Yu <yuyufen@huawei.com>, axboe@kernel.dk
+Cc:     linux-block@vger.kernel.org, ming.lei@redhat.com,
+        hch@infradead.org, keith.busch@intel.com, bvanassche@acm.org
+References: <20190927081955.44680-1-yuyufen@huawei.com>
+From:   Bob Liu <bob.liu@oracle.com>
+Message-ID: <1bcbf8e5-3a88-0210-ef71-3c0372449461@oracle.com>
+Date:   Fri, 27 Sep 2019 20:52:15 +0800
 User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:60.0) Gecko/20100101
- Thunderbird/60.8.0
+ Thunderbird/60.5.1
 MIME-Version: 1.0
-In-Reply-To: <CAHg0HuwgPXtaY3XGv0=TjPbmRRdbmOsa7fRYa+n5fGf9K0_xRg@mail.gmail.com>
-Content-Type: text/plain; charset=utf-8; format=flowed
-Content-Transfer-Encoding: 7bit
+In-Reply-To: <20190927081955.44680-1-yuyufen@huawei.com>
+Content-Type: text/plain; charset=utf-8
 Content-Language: en-US
+Content-Transfer-Encoding: 7bit
+X-Proofpoint-Virus-Version: vendor=nai engine=6000 definitions=9392 signatures=668685
+X-Proofpoint-Spam-Details: rule=notspam policy=default score=0 suspectscore=2 malwarescore=0
+ phishscore=0 bulkscore=0 spamscore=0 mlxscore=0 mlxlogscore=999
+ adultscore=0 classifier=spam adjust=0 reason=mlx scancount=1
+ engine=8.0.1-1908290000 definitions=main-1909270119
+X-Proofpoint-Virus-Version: vendor=nai engine=6000 definitions=9392 signatures=668685
+X-Proofpoint-Spam-Details: rule=notspam policy=default score=0 priorityscore=1501 malwarescore=0
+ suspectscore=2 phishscore=0 bulkscore=0 spamscore=0 clxscore=1011
+ lowpriorityscore=0 mlxscore=0 impostorscore=0 mlxlogscore=999 adultscore=0
+ classifier=spam adjust=0 reason=mlx scancount=1 engine=8.0.1-1908290000
+ definitions=main-1909270119
 Sender: linux-block-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
+On 9/27/19 4:19 PM, Yufen Yu wrote:
+> We got a null pointer deference BUG_ON in blk_mq_rq_timed_out()
+> as following:
+> 
+> [  108.825472] BUG: kernel NULL pointer dereference, address: 0000000000000040
+> [  108.827059] PGD 0 P4D 0
+> [  108.827313] Oops: 0000 [#1] SMP PTI
+> [  108.827657] CPU: 6 PID: 198 Comm: kworker/6:1H Not tainted 5.3.0-rc8+ #431
+> [  108.829503] Workqueue: kblockd blk_mq_timeout_work
+> [  108.829913] RIP: 0010:blk_mq_check_expired+0x258/0x330
+> [  108.838191] Call Trace:
+> [  108.838406]  bt_iter+0x74/0x80
+> [  108.838665]  blk_mq_queue_tag_busy_iter+0x204/0x450
+> [  108.839074]  ? __switch_to_asm+0x34/0x70
+> [  108.839405]  ? blk_mq_stop_hw_queue+0x40/0x40
+> [  108.839823]  ? blk_mq_stop_hw_queue+0x40/0x40
+> [  108.840273]  ? syscall_return_via_sysret+0xf/0x7f
+> [  108.840732]  blk_mq_timeout_work+0x74/0x200
+> [  108.841151]  process_one_work+0x297/0x680
+> [  108.841550]  worker_thread+0x29c/0x6f0
+> [  108.841926]  ? rescuer_thread+0x580/0x580
+> [  108.842344]  kthread+0x16a/0x1a0
+> [  108.842666]  ? kthread_flush_work+0x170/0x170
+> [  108.843100]  ret_from_fork+0x35/0x40
+> 
+> The bug is caused by the race between timeout handle and completion for
+> flush request.
+> 
+> When timeout handle function blk_mq_rq_timed_out() try to read
+> 'req->q->mq_ops', the 'req' have completed and reinitiated by next
+> flush request, which would call blk_rq_init() to clear 'req' as 0.
+> 
+> After commit 12f5b93145 ("blk-mq: Remove generation seqeunce"),
+> normal requests lifetime are protected by refcount. Until 'rq->ref'
+> drop to zero, the request can really be free. Thus, these requests
+> cannot been reused before timeout handle finish.
+> 
+> However, flush request has defined .end_io and rq->end_io() is still
+> called even if 'rq->ref' doesn't drop to zero. After that, the 'flush_rq'
+> can be reused by the next flush request handle, resulting in null
+> pointer deference BUG ON.
+> 
+> We fix this problem by covering flush request with 'rq->ref'.
+> If the refcount is not zero, flush_end_io() return and wait the
+> last holder recall it. To record the request status, we add a new
+> entry 'rq_status', which will be used in flush_end_io().
+> 
+> Cc: Ming Lei <ming.lei@redhat.com>
+> Cc: Christoph Hellwig <hch@infradead.org>
+> Cc: Keith Busch <keith.busch@intel.com>
+> Cc: Bart Van Assche <bvanassche@acm.org>
+> Cc: stable@vger.kernel.org # v4.18+
+> Signed-off-by: Yufen Yu <yuyufen@huawei.com>
+> 
+> -------
+> v2:
+>  - move rq_status from struct request to struct blk_flush_queue
+> v3:
+>  - remove unnecessary '{}' pair.
+> v4:
+>  - let spinlock to protect 'fq->rq_status'
+> v5:
+>  - move rq_status after flush_running_idx member of struct blk_flush_queue
+> ---
+>  block/blk-flush.c | 10 ++++++++++
+>  block/blk-mq.c    |  5 ++++-
+>  block/blk.h       |  7 +++++++
+>  3 files changed, 21 insertions(+), 1 deletion(-)
+> 
+> diff --git a/block/blk-flush.c b/block/blk-flush.c
+> index aedd9320e605..1eec9cbe5a0a 100644
+> --- a/block/blk-flush.c
+> +++ b/block/blk-flush.c
+> @@ -214,6 +214,16 @@ static void flush_end_io(struct request *flush_rq, blk_status_t error)
+>  
+>  	/* release the tag's ownership to the req cloned from */
+>  	spin_lock_irqsave(&fq->mq_flush_lock, flags);
+> +
+> +	if (!refcount_dec_and_test(&flush_rq->ref)) {
+> +		fq->rq_status = error;
+> +		spin_unlock_irqrestore(&fq->mq_flush_lock, flags);
+> +		return;
+> +	}
+> +
+> +	if (fq->rq_status != BLK_STS_OK)
+> +		error = fq->rq_status;
+> +
+>  	hctx = flush_rq->mq_hctx;
+>  	if (!q->elevator) {
+>  		blk_mq_tag_set_rq(hctx, flush_rq->tag, fq->orig_rq);
+> diff --git a/block/blk-mq.c b/block/blk-mq.c
+> index 20a49be536b5..e04fa9ab5574 100644
+> --- a/block/blk-mq.c
+> +++ b/block/blk-mq.c
+> @@ -912,7 +912,10 @@ static bool blk_mq_check_expired(struct blk_mq_hw_ctx *hctx,
+>  	 */
+>  	if (blk_mq_req_expired(rq, next))
+>  		blk_mq_rq_timed_out(rq, reserved);
+> -	if (refcount_dec_and_test(&rq->ref))
+> +
+> +	if (is_flush_rq(rq, hctx))
+> +		rq->end_io(rq, 0);
+> +	else if (refcount_dec_and_test(&rq->ref))
+>  		__blk_mq_free_request(rq);
+>  
+>  	return true;
+> diff --git a/block/blk.h b/block/blk.h
+> index ed347f7a97b1..2d8cdafee799 100644
+> --- a/block/blk.h
+> +++ b/block/blk.h
+> @@ -19,6 +19,7 @@ struct blk_flush_queue {
+>  	unsigned int		flush_queue_delayed:1;
+>  	unsigned int		flush_pending_idx:1;
+>  	unsigned int		flush_running_idx:1;
+> +	blk_status_t 		rq_status;
+>  	unsigned long		flush_pending_since;
+>  	struct list_head	flush_queue[2];
+>  	struct list_head	flush_data_in_flight;
+> @@ -47,6 +48,12 @@ static inline void __blk_get_queue(struct request_queue *q)
+>  	kobject_get(&q->kobj);
+>  }
+>  
+> +static inline bool
+> +is_flush_rq(struct request *req, struct blk_mq_hw_ctx *hctx)
+> +{
+> +	return hctx->fq->flush_rq == req;
+> +}
+> +
+>  struct blk_flush_queue *blk_alloc_flush_queue(struct request_queue *q,
+>  		int node, int cmd_size, gfp_t flags);
+>  void blk_free_flush_queue(struct blk_flush_queue *q);
+> 
 
-On 27.09.19 11:32, Danil Kipnis wrote:
-> On Fri, Sep 27, 2019 at 10:52 AM Roman Penyaev <r.peniaev@gmail.com> wrote:
->> No, it seems this thingy is a bit different.  According to my
->> understanding patches 3 and 4 from this patchset do the
->> following: 1# split equally the whole queue depth on number
->> of hardware queues and 2# return tag number which is unique
->> host-wide (more or less similar to unique_tag, right?).
->>
->> 2# is not needed for ibtrs, and 1# can be easy done by dividing
->> queue_depth on number of hw queues on tag set allocation, e.g.
->> something like the following:
->>
->>      ...
->>      tags->nr_hw_queues = num_online_cpus();
->>      tags->queue_depth  = sess->queue_deph / tags->nr_hw_queues;
->>
->>      blk_mq_alloc_tag_set(tags);
->>
->>
->> And this trick won't work out for the performance.  ibtrs client
->> has a single resource: set of buffer chunks received from a
->> server side.  And these buffers should be dynamically distributed
->> between IO producers according to the load.  Having a hard split
->> of the whole queue depth between hw queues we can forget about a
->> dynamic load distribution, here is an example:
->>
->>     - say server shares 1024 buffer chunks for a session (do not
->>       remember what is the actual number).
->>
->>     - 1024 buffers are equally divided between hw queues, let's
->>       say 64 (number of cpus), so each queue is 16 requests depth.
->>
->>     - only several CPUs produce IO, and instead of occupying the
->>       whole "bandwidth" of a session, i.e. 1024 buffer chunks,
->>       we limit ourselves to a small queue depth of an each hw
->>       queue.
->>
->> And performance drops significantly when number of IO producers
->> is smaller than number of hw queues (CPUs), and it can be easily
->> tested and proved.
->>
->> So for this particular ibtrs case tags should be globally shared,
->> and seems (unfortunately) there is no any other similar requirements
->> for other block devices.
-> I don't see any difference between what you describe here and 100 dm
-> volumes sitting on top of a single NVME device.
-
-Hallo Christoph,
-
-am I wrong?
-
-Thank you,
-
-Danil.
+Looks good to me.
+Reviewed-by: Bob Liu <bob.liu@oracle.com>
 
