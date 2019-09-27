@@ -2,137 +2,93 @@ Return-Path: <SRS0=f8eR=XW=vger.kernel.org=linux-block-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-2.3 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
-	MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,USER_AGENT_SANE_1 autolearn=no
-	autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-2.3 required=3.0 tests=DKIM_SIGNED,DKIM_VALID,
+	HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,
+	USER_AGENT_SANE_1 autolearn=no autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 1AC0FC388F3
-	for <linux-block@archiver.kernel.org>; Fri, 27 Sep 2019 18:45:43 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 432DBC4360C
+	for <linux-block@archiver.kernel.org>; Fri, 27 Sep 2019 19:18:47 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.kernel.org (Postfix) with ESMTP id EEFC221927
-	for <linux-block@archiver.kernel.org>; Fri, 27 Sep 2019 18:45:42 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id 03E84207E0
+	for <linux-block@archiver.kernel.org>; Fri, 27 Sep 2019 19:18:46 +0000 (UTC)
+Authentication-Results: mail.kernel.org;
+	dkim=pass (2048-bit key) header.d=kernel-dk.20150623.gappssmtp.com header.i=@kernel-dk.20150623.gappssmtp.com header.b="1CSg2oZb"
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1728281AbfI0Spm (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Fri, 27 Sep 2019 14:45:42 -0400
-Received: from mx.ewheeler.net ([66.155.3.69]:56438 "EHLO mx.ewheeler.net"
-        rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-        id S1728275AbfI0Spi (ORCPT <rfc822;linux-block@vger.kernel.org>);
-        Fri, 27 Sep 2019 14:45:38 -0400
-Received: from localhost (localhost [127.0.0.1])
-        by mx.ewheeler.net (Postfix) with ESMTP id 09FCBA0692;
-        Fri, 27 Sep 2019 18:45:37 +0000 (UTC)
-X-Virus-Scanned: amavisd-new at ewheeler.net
-Received: from mx.ewheeler.net ([127.0.0.1])
-        by localhost (mx.ewheeler.net [127.0.0.1]) (amavisd-new, port 10024)
-        with LMTP id YyPqUFVX106N; Fri, 27 Sep 2019 18:45:36 +0000 (UTC)
-Received: from mx.ewheeler.net (mx.ewheeler.net [66.155.3.69])
-        (using TLSv1 with cipher DHE-RSA-AES256-SHA (256/256 bits))
-        (No client certificate requested)
-        by mx.ewheeler.net (Postfix) with ESMTPSA id EAD11A067D;
-        Fri, 27 Sep 2019 18:45:35 +0000 (UTC)
-Date:   Fri, 27 Sep 2019 18:45:33 +0000 (UTC)
-From:   Eric Wheeler <dm-devel@lists.ewheeler.net>
-X-X-Sender: lists@mx.ewheeler.net
-To:     Joe Thornber <thornber@redhat.com>
-cc:     Mike Snitzer <snitzer@redhat.com>, ejt@redhat.com,
-        Coly Li <colyli@suse.de>, dm-devel@redhat.com,
-        linux-block@vger.kernel.org, linux-bcache@vger.kernel.org,
-        lvm-devel@redhat.com, joe.thornber@gmail.com
-Subject: Re: kernel BUG at drivers/md/persistent-data/dm-space-map-disk.c:178
- with scsi_mod.use_blk_mq=y
-In-Reply-To: <20190927083239.xy6jwbkbektwqu3h@reti>
-Message-ID: <alpine.LRH.2.11.1909271819450.20939@mx.ewheeler.net>
-References: <alpine.LRH.2.11.1909251814220.15810@mx.ewheeler.net> <20190925200138.GA20584@redhat.com> <alpine.LRH.2.11.1909261819300.15810@mx.ewheeler.net> <20190927083239.xy6jwbkbektwqu3h@reti>
-User-Agent: Alpine 2.11 (LRH 23 2013-08-11)
+        id S1725790AbfI0TSq (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Fri, 27 Sep 2019 15:18:46 -0400
+Received: from mail-wm1-f68.google.com ([209.85.128.68]:55456 "EHLO
+        mail-wm1-f68.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S1725789AbfI0TSp (ORCPT
+        <rfc822;linux-block@vger.kernel.org>);
+        Fri, 27 Sep 2019 15:18:45 -0400
+Received: by mail-wm1-f68.google.com with SMTP id a6so7107340wma.5
+        for <linux-block@vger.kernel.org>; Fri, 27 Sep 2019 12:18:43 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=kernel-dk.20150623.gappssmtp.com; s=20150623;
+        h=subject:to:cc:references:from:message-id:date:user-agent
+         :mime-version:in-reply-to:content-language:content-transfer-encoding;
+        bh=ow1TJdn0wU/PNvtjCyUuemBEiSzz/wD4mCwzclK+jE4=;
+        b=1CSg2oZbMen4+lKMUxzaYn6bDfZbuRwQO6MSThdXL9uKza2KMExYFMpW43eVMdaC23
+         sEQeAd7YAYrL85AphrfaIuL2lMK2uJDWaIhlsuvOOgVLULJAfVFkLOK3zUbnpiToAvLU
+         4br1ui0eeic0KFKSMfgjLoLK/RIi6eqeLnO/QQBfAQWMystTjYjsjyi/UZzkIt0q/OFN
+         hgCBYMpphXAYONSIc0vGOwpqZJj1Syz4Z0vn6U5HHagpjVLqXlV68lH0iE4kyvi5VnJE
+         oFTHtSr8U6Yb9LGnad3pXJIuHSTp1wfMsQ8kap9XG26z2Lduu0xcvkxBr5dCwOx9EpCZ
+         URSA==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20161025;
+        h=x-gm-message-state:subject:to:cc:references:from:message-id:date
+         :user-agent:mime-version:in-reply-to:content-language
+         :content-transfer-encoding;
+        bh=ow1TJdn0wU/PNvtjCyUuemBEiSzz/wD4mCwzclK+jE4=;
+        b=R7xpGZqsEBTtvMRUBpwJTTCODr6z5H4xAk2WwmH4ZR5vSjYkYe9Md9YbbPir/31xrw
+         sHA7gsRsDlG0/V40FgSBsfSTIENjVM0h+G3y/TH0qC5dggCdoDh4On3MEklYnsYXidMS
+         x9wutDJSkJ0r+ki4zDBKaIrLiCnsjPXvSbjau3KZ3U15ieNb8QgwANHTpCSKFQd/F99C
+         sULSQUN9rrhDHY/lL4X8L8HT83RFYQSDwrL32BFY1gMxX5xLLSG4CJjWIOuFno+I5vGk
+         i98WZpJxuHxFDHael+cMGL0SG4LvFLku5NORh1FVyX3W4R20q3mdawM8GSsq6LBWGp1t
+         LWEg==
+X-Gm-Message-State: APjAAAUzYDbQh1+JG5Yb/k9nKEOfoa/2EgDFY3YiPgGUQMoT5EyWAgTf
+        kc1VvB1+Qhl/ppWQmPwCaXhwiQ==
+X-Google-Smtp-Source: APXvYqy+DB2pKLFOKCCvLDcFv/gFHFWMTek4vUq7c5TH1yiEsm1E0UXCZnuWa3GhtpxFNGyIR7VxBA==
+X-Received: by 2002:a1c:ed02:: with SMTP id l2mr8149712wmh.155.1569611922524;
+        Fri, 27 Sep 2019 12:18:42 -0700 (PDT)
+Received: from [172.20.9.27] ([83.167.33.93])
+        by smtp.gmail.com with ESMTPSA id v8sm3964262wra.79.2019.09.27.12.18.41
+        (version=TLS1_2 cipher=ECDHE-RSA-AES128-GCM-SHA256 bits=128/128);
+        Fri, 27 Sep 2019 12:18:41 -0700 (PDT)
+Subject: Re: [GIT PULL] nvme fixes for kernel 5.4-rc1
+To:     Sagi Grimberg <sagi@grimberg.me>
+Cc:     linux-nvme@lists.infradead.org, linux-block@vger.kernel.org,
+        Christoph Hellwig <hch@lst.de>,
+        Keith Busch <keith.busch@intel.com>
+References: <20190927175801.12900-1-sagi@grimberg.me>
+From:   Jens Axboe <axboe@kernel.dk>
+Message-ID: <9d599517-dd43-6f40-a605-86fe011854e5@kernel.dk>
+Date:   Fri, 27 Sep 2019 21:18:41 +0200
+User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:60.0) Gecko/20100101
+ Thunderbird/60.8.0
 MIME-Version: 1.0
-Content-Type: TEXT/PLAIN; charset=US-ASCII
+In-Reply-To: <20190927175801.12900-1-sagi@grimberg.me>
+Content-Type: text/plain; charset=utf-8
+Content-Language: en-US
+Content-Transfer-Encoding: 7bit
 Sender: linux-block-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-On Fri, 27 Sep 2019, Joe Thornber wrote:
-
-> Hi Eric,
+On 9/27/19 7:58 PM, Sagi Grimberg wrote:
+> Hey Jens,
 > 
-> On Thu, Sep 26, 2019 at 06:27:09PM +0000, Eric Wheeler wrote:
-> > I pvmoved the tmeta to an SSD logical volume (dm-linear) on a non-bcache 
-> > volume and we got the same trace this morning, so while the tdata still 
-> > passes through bcache, all meta operations are direct to an SSD. This is 
-> > still using multi-queue scsi, but dm_mod.use_blk_mq=N.
-> > 
-> > Since bcache is no longer involved with metadata operations, and since 
-> > this appears to be a metadata issue, are there any other reasons to 
-> > suspect bcache?
-> 
-> Did you recreate the pool, or are you just using the existing pool but with
-> a different IO path?  If it's the latter then there could still be something
-> wrong with the metadata, introduced while bcache was in the stack.
+> This set consists of various fixes and clenaups:
+> - controller removal race fix from Balbir
+> - quirk additions from Gabriel and Jian-Hong
+> - nvme-pci power state save fix from Mario
+> - Add 64bit user commands (for 64bit registers) from Marta
+> - nvme-rdma/nvme-tcp fixes from Max, Mark and Me
+> - Minor cleanups and nits from James, Dan and John
 
-We did not create the pool after the initial problem, though the pool was 
-new just before the problem occurred. 
- 
-> Would it be possible to send me a copy of the metadata device please so
-> I can double check the space maps (I presume you've run thin_check on it)?
+Thanks Sagi, pulled.
 
-~]# /usr/local/bin/thin_check /dev/mapper/data-data--pool_tmeta 
-examining superblock
-TRANSACTION_ID=2347
-METADATA_FREE_BLOCKS=4145151
-examining devices tree
-examining mapping tree
-checking space map counts
+-- 
+Jens Axboe
 
-~]# echo $?
-0
-
-~]# /usr/local/bin/thin_check -V
-0.8.5
-
-> [Assuming you're using the existing pool] Another useful experiment would be to 
-> thump_dump and then thin_restore the metadata, which will create totally fresh
-> metadata and see if you can still reproduce the issue.
-
-It didn't lockup last night, but I'll keep working to reproduce the 
-problem and let you know what we find.
-
-Mike said it could be a race:
-
-> The stack shows the call to sm_disk_new_block() is due to
-> dm_pool_alloc_data_block().
-> 
-> sm_disk_new_block()'s BUG_ON(ev != SM_ALLOC) indicates that somehow it is
-> getting called without the passed 'ev' being set to SM_ALLOC.  Only
-> drivers/md/persistent-dat/dm-space-map-common.c:sm_ll_mutate() sets
-> SM_ALLOC. sm_disk_new_block() is indirectly calling sm_ll_mutate()
-> 
-> sm_ll_mutate() will only return 0 if ll->save_ie() does, the ll_disk *ll
-> should be ll_disk, and so disk_ll_save_ie()'s call to dm_btree_insert()
-> returns 0 -- which simply means success.  And on success
-> sm_disk_new_block() assumes ev was set to SM_ALLOC (by sm_ll_mutate).
-> 
-> sm_ll_mutate() decided to _not_ set SM_ALLOC because either:
-> 1) ref_count wasn't set
-> or
-> 2) old was identified
-> 
-> So all said: somehow a new data block was found to already be in use.
-> _WHY_ that is the case isn't clear from this stack...
->
-> But it does speak to the possibility of data block allocation racing
-> with other operations to the same block.  Which implies missing locking.
-
-Would a spinlock on the block solve the issue?
-
-Where might such a spinlock be added?
-
-
---
-Eric Wheeler
-
-
-> 
-> Thanks,
-> 
-> - Joe
-> 
