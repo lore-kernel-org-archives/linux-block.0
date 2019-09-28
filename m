@@ -2,112 +2,116 @@ Return-Path: <SRS0=y3Aw=XX=vger.kernel.org=linux-block-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-2.3 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
-	MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,USER_AGENT_SANE_1 autolearn=no
+X-Spam-Status: No, score=-7.6 required=3.0 tests=DKIMWL_WL_HIGH,DKIM_SIGNED,
+	DKIM_VALID,DKIM_VALID_AU,MAILING_LIST_MULTI,MENTIONS_GIT_HOSTING,
+	SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED,USER_AGENT_SANE_1 autolearn=ham
 	autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 13170C388F4
-	for <linux-block@archiver.kernel.org>; Sat, 28 Sep 2019 01:12:52 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id D83A0C4360C
+	for <linux-block@archiver.kernel.org>; Sat, 28 Sep 2019 02:40:33 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.kernel.org (Postfix) with ESMTP id E341221655
-	for <linux-block@archiver.kernel.org>; Sat, 28 Sep 2019 01:12:51 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id AAA4F20869
+	for <linux-block@archiver.kernel.org>; Sat, 28 Sep 2019 02:40:33 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+	s=default; t=1569638433;
+	bh=h2njq1vJkcfwtI+56dxihbhds6Qb1mamZ+2/Z87FA/c=;
+	h=Date:From:To:Cc:Subject:References:In-Reply-To:List-ID:From;
+	b=dBsDH61S1DglLQl40JgSEfSzFmMWNzAanYTPKwQNzIg7FkVOntLn4/tUfZhKU2NNO
+	 GMgQvoxAs5myfhQFdbL9UKwir/6WyXhd7p6g84IEJtcYNJBnOx7mo4xs2QyjecnW7J
+	 NmqJNoO4gzO3NMp4HHNUcvDD0THCjpMDyE4uhvc4=
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1726408AbfI1BMv (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Fri, 27 Sep 2019 21:12:51 -0400
-Received: from gentwo.org ([3.19.106.255]:49786 "EHLO gentwo.org"
+        id S1725815AbfI1Ckc (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Fri, 27 Sep 2019 22:40:32 -0400
+Received: from mail.kernel.org ([198.145.29.99]:34202 "EHLO mail.kernel.org"
         rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-        id S1725990AbfI1BMu (ORCPT <rfc822;linux-block@vger.kernel.org>);
-        Fri, 27 Sep 2019 21:12:50 -0400
-Received: by gentwo.org (Postfix, from userid 1002)
-        id 438FF3EEC9; Sat, 28 Sep 2019 01:12:49 +0000 (UTC)
-Received: from localhost (localhost [127.0.0.1])
-        by gentwo.org (Postfix) with ESMTP id 413B93E8CB;
-        Sat, 28 Sep 2019 01:12:49 +0000 (UTC)
-Date:   Sat, 28 Sep 2019 01:12:49 +0000 (UTC)
-From:   Christopher Lameter <cl@linux.com>
-X-X-Sender: cl@www.lameter.com
-To:     Vlastimil Babka <vbabka@suse.cz>
-cc:     Andrew Morton <akpm@linux-foundation.org>,
-        David Sterba <dsterba@suse.cz>, linux-mm@kvack.org,
-        linux-kernel@vger.kernel.org, Pekka Enberg <penberg@kernel.org>,
-        David Rientjes <rientjes@google.com>,
-        Ming Lei <ming.lei@redhat.com>,
-        Dave Chinner <david@fromorbit.com>,
-        Matthew Wilcox <willy@infradead.org>,
-        "Darrick J . Wong" <darrick.wong@oracle.com>,
-        Christoph Hellwig <hch@lst.de>, linux-xfs@vger.kernel.org,
-        linux-fsdevel@vger.kernel.org, linux-block@vger.kernel.org,
-        James Bottomley <James.Bottomley@HansenPartnership.com>,
-        linux-btrfs@vger.kernel.org, Roman Gushchin <guro@fb.com>,
-        Johannes Weiner <hannes@cmpxchg.org>
-Subject: Re: [PATCH v2 2/2] mm, sl[aou]b: guarantee natural alignment for
- kmalloc(power-of-two)
-In-Reply-To: <6a28a096-0e65-c7ea-9ca9-f72d68948e10@suse.cz>
-Message-ID: <alpine.DEB.2.21.1909272251190.21341@www.lameter.com>
-References: <20190826111627.7505-1-vbabka@suse.cz> <20190826111627.7505-3-vbabka@suse.cz> <df8d1cf4-ff8f-1ee1-12fb-cfec39131b32@suse.cz> <20190923171710.GN2751@twin.jikos.cz> <alpine.DEB.2.21.1909242048020.17661@www.lameter.com>
- <20190924165425.a79a2dafbaf37828a931df2b@linux-foundation.org> <alpine.DEB.2.21.1909260005060.1508@www.lameter.com> <6a28a096-0e65-c7ea-9ca9-f72d68948e10@suse.cz>
-User-Agent: Alpine 2.21 (DEB 202 2017-01-01)
+        id S1725306AbfI1Ckc (ORCPT <rfc822;linux-block@vger.kernel.org>);
+        Fri, 27 Sep 2019 22:40:32 -0400
+Received: from sol.localdomain (c-24-5-143-220.hsd1.ca.comcast.net [24.5.143.220])
+        (using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+        (No client certificate requested)
+        by mail.kernel.org (Postfix) with ESMTPSA id 6B58820869;
+        Sat, 28 Sep 2019 02:40:31 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+        s=default; t=1569638431;
+        bh=h2njq1vJkcfwtI+56dxihbhds6Qb1mamZ+2/Z87FA/c=;
+        h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
+        b=HTifdSFmwMqxAmAk6Y+efXUCTyVezDCuUudoFxFcl+UJI4QZTNOe3k4QgD6cxIVVj
+         1RD8e2+dk1lR+DGy6qP/gV9Z4tCLIc1BPp0WIjAJEwNp9AZ/TeVcQAMZd2ZkeKpXVq
+         kwoAJd8L+FVx+cQTFDcfpiWTRvtVY55mM2CumdvE=
+Date:   Fri, 27 Sep 2019 19:40:29 -0700
+From:   Eric Biggers <ebiggers@kernel.org>
+To:     Damien Le Moal <Damien.LeMoal@wdc.com>
+Cc:     "axboe@kernel.dk" <axboe@kernel.dk>,
+        "linux-block@vger.kernel.org" <linux-block@vger.kernel.org>,
+        "linux-kernel@vger.kernel.org" <linux-kernel@vger.kernel.org>,
+        "syzkaller-bugs@googlegroups.com" <syzkaller-bugs@googlegroups.com>,
+        Ming Lei <ming.lei@redhat.com>
+Subject: Re: WARNING in blk_mq_init_sched
+Message-ID: <20190928024029.GB1079@sol.localdomain>
+Mail-Followup-To: Damien Le Moal <Damien.LeMoal@wdc.com>,
+        "axboe@kernel.dk" <axboe@kernel.dk>,
+        "linux-block@vger.kernel.org" <linux-block@vger.kernel.org>,
+        "linux-kernel@vger.kernel.org" <linux-kernel@vger.kernel.org>,
+        "syzkaller-bugs@googlegroups.com" <syzkaller-bugs@googlegroups.com>,
+        Ming Lei <ming.lei@redhat.com>
+References: <0000000000007909bf059363878e@google.com>
+ <BYAPR04MB5816244183004247FD3D1074E7870@BYAPR04MB5816.namprd04.prod.outlook.com>
+ <BYAPR04MB58169DBC0647FE4C91338844E7870@BYAPR04MB5816.namprd04.prod.outlook.com>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=US-ASCII
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <BYAPR04MB58169DBC0647FE4C91338844E7870@BYAPR04MB5816.namprd04.prod.outlook.com>
+User-Agent: Mutt/1.12.2 (2019-09-21)
 Sender: linux-block-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-On Thu, 26 Sep 2019, Vlastimil Babka wrote:
+On Wed, Sep 25, 2019 at 10:13:30PM +0000, Damien Le Moal wrote:
+> On 2019/09/25 10:56, Damien Le Moal wrote:
+> > On 2019/09/25 9:56, syzbot wrote:
+> >> Hello,
+> >>
+> >> syzbot found the following crash on:
+> >>
+> >> HEAD commit:    f7c3bf8f Merge tag 'gfs2-for-5.4' of git://git.kernel.org/..
+> >> git tree:       upstream
+> >> console output: https://syzkaller.appspot.com/x/log.txt?x=15f5baf9600000
+> >> kernel config:  https://syzkaller.appspot.com/x/.config?x=50d4af03d68a470c
+> >> dashboard link: https://syzkaller.appspot.com/bug?extid=b2c197f98f86543b69c8
+> >> compiler:       clang version 9.0.0 (/home/glider/llvm/clang  
+> >> 80fee25776c2fb61e74c1ecb1a523375c2500b69)
+> >>
+> >> Unfortunately, I don't have any reproducer for this crash yet.
+> >>
+> >> IMPORTANT: if you fix the bug, please add the following tag to the commit:
+> >> Reported-by: syzbot+b2c197f98f86543b69c8@syzkaller.appspotmail.com
+> > 
+> > Oh... When the queue is initialized and the elevator initialization done by
+> > elevator_init_mq() is executed without the queue sysfs lock held. In that step,
+> > if the elevator initialization fails, blk_mq_sched_free_requests() is called and
+> > will trip on the lockdep_assert_held(&q->sysfs_lock) check on entry. I guess
+> > that is what is causing the crash ? But I thought lockdep_assert_held() only
+> > spits out warnings...
+> > 
+> > Ming,
+> > 
+> > Your patch c48dac137a62 ("block: don't hold q->sysfs_lock in elevator_init_mq")
+> > removed the sysfs_lock use in elevator_init_mq(). With that, should we move the
+> > lockdep_assert_held(&q->sysfs_lock) call out of blk_mq_sched_free_requests() and
+> > directly call it lockdep before calling that function (that's ugly) or do you
+> > see a nice trick for handling the special case that is the first initialization ?
+> 
+> Please ignore. It looks like the gfs2 tree tested does not have commit
+> 954b4a5ce4a8 ("block: Change elevator_init_mq() to always succeed") which
+> removes the possibility of having blk_mq_sched_free_requests() being called
+> during the first elevator initialization without the sysfs lock being held.
+> 
+> So if the crash is indeed triggered by the lockdep_assert_held() call, then this
+> problem will be fixed after a rebase on 5.4-rc1.
+> 
 
-> > - It will only work for special cases like the kmalloc array
-> > without extras like metadata at the end of objects.
->
-> I don't understand what you mean here? The kmalloc caches are special
-> because they don't have metadata at the end of objects? Others do?
+No, as the report says, this occurred on commit f7c3bf8f.  Commit 954b4a5ce4a8
+("block: Change elevator_init_mq() to always succeed") was already merged then.
 
-Yes.
-
-> > - These alignments are only needed in exceptional cases but with the patch
-> > we will provide the alignment by default even if the allocating subsystem
-> > does not need it.
->
-> True. This is where we have to make the decision whether to make things
-> simpler for those that don't realize they need the alignment, and
-> whether that's worth the cost. We have evidence of those cases, and the
-> cost is currently zero in the common cases (SLAB, SLUB without debug
-> runtime-enabled).
-
-The cost is zero for a particular layout of the objects in a page using a
-particular allocator and hardware configuration.
-
-However, the layout may be different due to another allocator that prefers
-to arrange things differently (SLOB puts multiple objects of different
-types in the same page to save memory), if we need to add data to these
-objects (debugging info, new metadata about the object, maybe the memcg
-pointer, maybe other things that may come up), or other innovative
-approaches (such as putting data of different kmem caches that are
-commonly used together in the same page to improve locality).
-
-The cost is an unnecessary petrification of the data layout of the memory
-allocators.
-
-> > - We have mechanisms to detect alignment problems using debug kernels and
-> > debug options that have been available for years. These were not used for
-> > testing in these cases it seems before the patches hit mainline. Once in
-> > mainly someone ran a debug kernel and found the issue.
->
-> Debugging options are useful if you know there's a bug and you want to
-> find it. AFAIK the various bots/CIs that do e.g. randconfig, or enable
-> debug options explicitly, run those kernels in a VM, so I guess that's
-> why potential breakage due to alignment can lurk in a hw-specific driver.
-
-That is not my experience. You need to run debugging to verify that a
-patch does not cause locking problems, memory corruption etc etc. And
-upstream code is tested by various people with debugging kernels so they
-will locate the bugs that others introduce. This is usually not because
-there was a focus on a particular bug. If you have a hw specific thing
-that is not generally tested and skip the debugging tests well yes then we
-have a problem.
-
-What I have seen with developers is that they feel the debugging steps are
-unnecessary for conveniences sake. I have seen build environments that had
-proper steps for verification with a debug kernel. However, someone
-disabled them "some months ago" and "nothing happened". Then strange
-failures in production systems occur.
+- Eric
