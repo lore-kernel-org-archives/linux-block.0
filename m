@@ -2,136 +2,101 @@ Return-Path: <SRS0=9W5b=XZ=vger.kernel.org=linux-block-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-8.6 required=3.0 tests=DKIM_SIGNED,DKIM_VALID,
-	DKIM_VALID_AU,FREEMAIL_FORGED_FROMDOMAIN,FREEMAIL_FROM,
-	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,
-	SPF_HELO_NONE,SPF_PASS,USER_AGENT_SANE_1 autolearn=ham autolearn_force=no
-	version=3.4.0
+X-Spam-Status: No, score=-1.1 required=3.0 tests=DKIMWL_WL_HIGH,DKIM_SIGNED,
+	DKIM_VALID,DKIM_VALID_AU,HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,
+	SPF_HELO_NONE,SPF_PASS autolearn=no autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 9952BC388F3
-	for <linux-block@archiver.kernel.org>; Mon, 30 Sep 2019 21:21:55 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 5B466C32792
+	for <linux-block@archiver.kernel.org>; Mon, 30 Sep 2019 21:55:03 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.kernel.org (Postfix) with ESMTP id 6DFA8207FA
-	for <linux-block@archiver.kernel.org>; Mon, 30 Sep 2019 21:21:55 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id F144F20842
+	for <linux-block@archiver.kernel.org>; Mon, 30 Sep 2019 21:55:02 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="sDrqqtHC"
+	dkim=pass (1024-bit key) header.d=samsung.com header.i=@samsung.com header.b="jWhbup8u"
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1732118AbfI3VVz (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Mon, 30 Sep 2019 17:21:55 -0400
-Received: from mail-pf1-f196.google.com ([209.85.210.196]:36278 "EHLO
-        mail-pf1-f196.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1727884AbfI3VVy (ORCPT
+        id S1729482AbfI3VzC (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Mon, 30 Sep 2019 17:55:02 -0400
+Received: from mailout2.samsung.com ([203.254.224.25]:33879 "EHLO
+        mailout2.samsung.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S1726784AbfI3VzC (ORCPT
         <rfc822;linux-block@vger.kernel.org>);
-        Mon, 30 Sep 2019 17:21:54 -0400
-Received: by mail-pf1-f196.google.com with SMTP id y22so6319058pfr.3;
-        Mon, 30 Sep 2019 14:21:54 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20161025;
-        h=from:subject:to:cc:references:message-id:date:user-agent
-         :mime-version:in-reply-to:content-language:content-transfer-encoding;
-        bh=H97JuRzTawzjptZSMNylKho6vMxm73iMh4ASCWPnXgg=;
-        b=sDrqqtHCvLRw5rjgT4ECfrcTAIgkWkGA8e5ODBlso7j+D4qSIlUyYRBoH5wRYQ/REp
-         fnHFK+nemA9Rir50ieKU0/40UcLC25oakL093aGMC4EkUUCunodt/zHU34AXEB+BTTW/
-         +CMRiI/38rw4rxxzAqumdjee2h90Gw0bvkpCte451dK+lGdB9c9mGk8O7Th8dPSf0miH
-         r/ORozUT+agvVozZXjVfocor49ZLd2TapfSjbWT3hMRPi34NmVbxVp1vECMVcf2uO8xA
-         qgn0jOxtqF+bPQmzBggpTfK+cChuqjCL+5yEFz2yLVltWTsIlftnd62zrcbjbHfpTD/S
-         vVIA==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20161025;
-        h=x-gm-message-state:from:subject:to:cc:references:message-id:date
-         :user-agent:mime-version:in-reply-to:content-language
-         :content-transfer-encoding;
-        bh=H97JuRzTawzjptZSMNylKho6vMxm73iMh4ASCWPnXgg=;
-        b=Yu1EcL3PbOnMhRYzkL9p86UvENV29Tv0SyhZ+nCVSVENykb97OUXN8dtn4p8i/rH8J
-         fY3hrW8iLbcrq53UCNSV3rzlKS+XElCs3HEFlS9GxCgnly3p9rV/A65KrFGqoGeyNkl2
-         j1SK3QvD0pHPQNDBhLOL74tT/Xqw8pmgyLyCM+ATwRnKFuOANl5zilcVcw0s8WPltqjv
-         H+0do//aiRzrak3F74MuSxxHQ6tIUsYMTNwufCDKWGlJPQNnRKxPvGwA2LKCY52UA6G0
-         NYCbn4BNRqSOCo0NFvqA1+UaHOmpZ5CVRKRjyfQANLQoO+16SfMlK8spowPd3hGuMgZX
-         Mvvw==
-X-Gm-Message-State: APjAAAUKnvryAJ9j6bIDEW2nrNwXo2XF0nD+QWXfLGqFBMBxfIh7cm9q
-        8F94V/wDFQQd+yWjR3I8LPQ++Ci9Z8jU3A==
-X-Google-Smtp-Source: APXvYqy7/nPFlApe6mStEXZgM/YAlHqZ4LO8JdkvjapX1nhFQGFEmthsSKSz8H1Hx4JytcVHlRi0Rg==
-X-Received: by 2002:a17:90a:360b:: with SMTP id s11mr1038166pjb.30.1569872192133;
-        Mon, 30 Sep 2019 12:36:32 -0700 (PDT)
-Received: from [172.19.249.239] ([38.98.37.138])
-        by smtp.gmail.com with ESMTPSA id m12sm341402pjl.22.2019.09.30.12.36.21
-        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
-        Mon, 30 Sep 2019 12:36:31 -0700 (PDT)
-From:   Jes Sorensen <jes.sorensen@gmail.com>
-X-Google-Original-From: Jes Sorensen <Jes.Sorensen@gmail.com>
-Subject: Re: [PATCH v4 2/2] mdadm: Introduce new array state 'broken' for
- raid0/linear
-To:     "Guilherme G. Piccoli" <gpiccoli@canonical.com>,
-        linux-raid@vger.kernel.org
-Cc:     dm-devel@redhat.com, linux-block@vger.kernel.org,
-        jay.vosburgh@canonical.com, liu.song.a23@gmail.com,
-        nfbrown@suse.com, NeilBrown <neilb@suse.de>,
-        Song Liu <songliubraving@fb.com>
-References: <20190903194901.13524-1-gpiccoli@canonical.com>
- <20190903194901.13524-2-gpiccoli@canonical.com>
-Message-ID: <608284db-7b82-6545-74bf-7a9f1d578c2f@gmail.com>
-Date:   Mon, 30 Sep 2019 15:36:15 -0400
-User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:68.0) Gecko/20100101
- Thunderbird/68.1.0
-MIME-Version: 1.0
-In-Reply-To: <20190903194901.13524-2-gpiccoli@canonical.com>
-Content-Type: text/plain; charset=utf-8; format=flowed
-Content-Language: en-US
-Content-Transfer-Encoding: 7bit
+        Mon, 30 Sep 2019 17:55:02 -0400
+Received: from epcas2p1.samsung.com (unknown [182.195.41.53])
+        by mailout2.samsung.com (KnoxPortal) with ESMTP id 20190930215459epoutp0289726188ab80063338e8f0cdbff3ae09~JVf8pWDxT1386413864epoutp02U
+        for <linux-block@vger.kernel.org>; Mon, 30 Sep 2019 21:54:59 +0000 (GMT)
+DKIM-Filter: OpenDKIM Filter v2.11.0 mailout2.samsung.com 20190930215459epoutp0289726188ab80063338e8f0cdbff3ae09~JVf8pWDxT1386413864epoutp02U
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=samsung.com;
+        s=mail20170921; t=1569880499;
+        bh=cEfjYlLf43o9MBy1ICOhBt1tk62BX/W31Wq/TZFyDqk=;
+        h=Subject:Reply-To:From:To:CC:In-Reply-To:Date:References:From;
+        b=jWhbup8uktGCb8V5qjynsnImduqSVZbk9h27iZqn4wpePtccHDUeO64s5jBBoDMyb
+         aBHJ1U+EBAOzbGe2I10MGCWKIHQlAV3SLEJCyroPHw3j7FObgLZL176PhtgqWBHza9
+         zbRyaRkNE8gwPa/jzOF1eMXYhRHDkVLfSEYwsnZw=
+Received: from epsnrtp2.localdomain (unknown [182.195.42.163]) by
+        epcas2p1.samsung.com (KnoxPortal) with ESMTP id
+        20190930215458epcas2p165bd52422fc5de33e087b7b8708713ff~JVf750Y1l2313523135epcas2p1E;
+        Mon, 30 Sep 2019 21:54:58 +0000 (GMT)
+Received: from epsmges2p4.samsung.com (unknown [182.195.40.181]) by
+        epsnrtp2.localdomain (Postfix) with ESMTP id 46hx5Y1NgNzMqYkW; Mon, 30 Sep
+        2019 21:54:57 +0000 (GMT)
+X-AuditID: b6c32a48-415ff70000000fe3-94-5d9279b17242
+Received: from epcas2p4.samsung.com ( [182.195.41.56]) by
+        epsmges2p4.samsung.com (Symantec Messaging Gateway) with SMTP id
+        A1.6B.04067.1B9729D5; Tue,  1 Oct 2019 06:54:57 +0900 (KST)
+Mime-Version: 1.0
+Subject: Re: [PATCH 1/1] blk-mq: fill header with kernel-doc
+Reply-To: minwoo.im@samsung.com
+From:   Minwoo Im <minwoo.im@samsung.com>
+To:     =?UTF-8?B?QW5kcsOpIEFsbWVpZGE=?= <andrealmeid@collabora.com>
+CC:     "linux-block@vger.kernel.org" <linux-block@vger.kernel.org>,
+        "linux-kernel@vger.kernel.org" <linux-kernel@vger.kernel.org>,
+        "axboe@kernel.dk" <axboe@kernel.dk>,
+        "kernel@collabora.com" <kernel@collabora.com>,
+        "krisman@collabora.com" <krisman@collabora.com>,
+        Minwoo Im <minwoo.im@samsung.com>
+X-Priority: 3
+X-Content-Kind-Code: NORMAL
+In-Reply-To: <20190930194846.23141-1-andrealmeid@collabora.com>
+X-Drm-Type: N,general
+X-Msg-Generator: Mail
+X-Msg-Type: PERSONAL
+X-Reply-Demand: N
+Message-ID: <20190930215456epcms2p64c66823d97c6ffad3861e750a4145f4b@epcms2p6>
+Date:   Tue, 01 Oct 2019 06:54:56 +0900
+X-CMS-MailID: 20190930215456epcms2p64c66823d97c6ffad3861e750a4145f4b
+Content-Transfer-Encoding: quoted-printable
+Content-Type: text/plain; charset="utf-8"
+X-Sendblock-Type: AUTO_CONFIDENTIAL
+CMS-TYPE: 102P
+X-Brightmail-Tracker: H4sIAAAAAAAAA+NgFupmk+LIzCtJLcpLzFFi42LZdljTQndj5aRYgwsnuSw+zNvFYrH6bj+b
+        xeZzPawWi45eZ7HYe0vb4vKuOWwWz04fYHZg99hxdwmjx+WzpR59W1YxenzeJBfAEpVjk5Ga
+        mJJapJCal5yfkpmXbqvkHRzvHG9qZmCoa2hpYa6kkJeYm2qr5OIToOuWmQO0X0mhLDGnFCgU
+        kFhcrKRvZ1OUX1qSqpCRX1xiq5RakJJTYGhYoFecmFtcmpeul5yfa2VoYGBkClSZkJNx66dO
+        wSrmip/3LjI3MM5l7mLk5JAQMJG43byCqYuRi0NIYAejxJJbV1m7GDk4eAUEJf7uEAapERaw
+        kZjTe5oZJCwkIC/x45UBRFhT4t3uM6wgNpuAukTD1FcsILaIgIPE400vmEFGMgusY5JY8uUE
+        G8QuXokZ7U9ZIGxpie3LtzKC2JwC9hLP+j+zQ8RFJW6ufgtnvz82nxHCFpFovXcW6mZBiQc/
+        d0PFpSR2rD8AdrKEQDOjxB9niHADo8T1+eIQtrnE7/u7we7kFfCVeLhlOdh4FgFViTnbr0KN
+        dJFo7d4OVsMsoC2xbOFrsHeZgX5cv0sfYrqyxJFbLBAVfBIdh/+ywzy1Y94TJghbWeLjoUNQ
+        EyUlll96DfW4h8TWqT/ZIIHcxijx6/EG5gmMCrMQ4TwLyeJZCIsXMDKvYhRLLSjOTU8tNiow
+        QY7ZTYzghKjlsYPxwDmfQ4wCHIxKPLwTXk6MFWJNLCuuzD3EKMHBrCTCK84wIVaINyWxsiq1
+        KD++qDQntfgQoynQ/xOZpUST84HJOq8k3tDUyMzMwNLUwtTMyEJJnHcT980YIYH0xJLU7NTU
+        gtQimD4mDk6pBkZ1Y0uxe1xW+7QTUjedvF3/+cCWK3kTOOo/cZTEuE8NfNp19xVL6K5zR/dE
+        H/jm4nlPWGrLGfkMVpNlv/fnL7zyIGmRdMO6a2z7vuyfmd0TV/gj9+SWzn6vKZ9yf9YkHLTe
+        fOapqFpd5JvDm7UfsPJP3RkUElLpf3KGRV+T/iefYNV0+2DXq5eUWIozEg21mIuKEwFKbnTq
+        ngMAAA==
+DLP-Filter: Pass
+X-CFilter-Loop: Reflected
+X-CMS-RootMailID: 20190930211400epcas2p4253bdc8cc3630f87d7e955cd23fdf1f2
+References: <20190930194846.23141-1-andrealmeid@collabora.com>
+        <CGME20190930211400epcas2p4253bdc8cc3630f87d7e955cd23fdf1f2@epcms2p6>
 Sender: linux-block-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-On 9/3/19 3:49 PM, Guilherme G. Piccoli wrote:
-> Currently if a md raid0/linear array gets one or more members removed while
-> being mounted, kernel keeps showing state 'clean' in the 'array_state'
-> sysfs attribute. Despite udev signaling the member device is gone, 'mdadm'
-> cannot issue the STOP_ARRAY ioctl successfully, given the array is mounted.
-> 
-> Nothing else hints that something is wrong (except that the removed devices
-> don't show properly in the output of mdadm 'detail' command). There is no
-> other property to be checked, and if user is not performing reads/writes
-> to the array, even kernel log is quiet and doesn't give a clue about the
-> missing member.
-> 
-> This patch is the mdadm counterpart of kernel new array state 'broken'.
-> The 'broken' state mimics the state 'clean' in every aspect, being useful
-> only to distinguish if an array has some member missing. All necessary
-> paths in mdadm were changed to deal with 'broken' state, and in case the
-> tool runs in a kernel that is not updated, it'll work normally, i.e., it
-> doesn't require the 'broken' state in order to work.
-> Also, this patch changes the way the array state is showed in the 'detail'
-> command (for raid0/linear only) - now it takes the 'array_state' sysfs
-> attribute into account instead of only rely in the MD_SB_CLEAN flag.
-> 
-> Cc: Jes Sorensen <jes.sorensen@gmail.com>
-> Cc: NeilBrown <neilb@suse.de>
-> Cc: Song Liu <songliubraving@fb.com>
-> Signed-off-by: Guilherme G. Piccoli <gpiccoli@canonical.com>
-> ---
-
-Applied thanks!
-
-I fixed up one minor nit rather than having to do the merry-go-round by 
-email one more time:
-
-> diff --git a/Monitor.c b/Monitor.c
-> index 036103f..cf0610b 100644
-> --- a/Monitor.c
-> +++ b/Monitor.c
-[snip]
-
-> @@ -1116,7 +1119,8 @@ int WaitClean(char *dev, int verbose)
->   			rv = read(state_fd, buf, sizeof(buf));
->   			if (rv < 0)
->   				break;
-> -			if (sysfs_match_word(buf, clean_states) <= 4)
-> +			if (sysfs_match_word(buf, clean_states)
-> +			    < (int)ARRAY_SIZE(clean_states)-1)
-
-I moved the < up to the correct line where it belongs, and added spaces 
-") - 1)"
-
-Cheers,
-Jes
+Hi Andr=C3=A9,=0D=0A=0D=0A>=20-/*=0D=0A>=20+/**=0D=0A>=20+=20*=20blk_mq_rq_=
+from_pdu=20-=20cast=20a=20PDU=20to=20a=20request=0D=0A>=20+=20*=20=40pdu:=
+=20the=20PDU=20(protocol=20unit=20request)=20to=20be=20casted=0D=0A=0D=0AIt=
+=20makes=20sense,=20but=20it=20looks=20like=20PDU=20stands=20for=20protocol=
+=20unit=20request.=0D=0ACould=20we=20have=20it=20=22PDU(Protocol=20Data=20U=
+nit)=22=20?=0D=0A=0D=0AThanks,=0D=0A
