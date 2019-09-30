@@ -2,176 +2,134 @@ Return-Path: <SRS0=9W5b=XZ=vger.kernel.org=linux-block-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-8.5 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
-	INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,
-	USER_AGENT_SANE_1 autolearn=ham autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-2.6 required=3.0 tests=DKIM_SIGNED,DKIM_VALID,
+	DKIM_VALID_AU,FREEMAIL_FORGED_FROMDOMAIN,FREEMAIL_FROM,
+	HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,
+	USER_AGENT_SANE_1 autolearn=no autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id C7791C4360C
-	for <linux-block@archiver.kernel.org>; Mon, 30 Sep 2019 06:59:18 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 22B1CC4360C
+	for <linux-block@archiver.kernel.org>; Mon, 30 Sep 2019 07:16:39 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.kernel.org (Postfix) with ESMTP id A3D3D2196E
-	for <linux-block@archiver.kernel.org>; Mon, 30 Sep 2019 06:59:18 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id D4B5221855
+	for <linux-block@archiver.kernel.org>; Mon, 30 Sep 2019 07:16:38 +0000 (UTC)
+Authentication-Results: mail.kernel.org;
+	dkim=pass (1024-bit key) header.d=web.de header.i=@web.de header.b="gpQp/i7J"
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1729280AbfI3G7S (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Mon, 30 Sep 2019 02:59:18 -0400
-Received: from mx1.redhat.com ([209.132.183.28]:50270 "EHLO mx1.redhat.com"
+        id S1729600AbfI3HQi (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Mon, 30 Sep 2019 03:16:38 -0400
+Received: from mout.web.de ([212.227.17.11]:36777 "EHLO mout.web.de"
         rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-        id S1726761AbfI3G7S (ORCPT <rfc822;linux-block@vger.kernel.org>);
-        Mon, 30 Sep 2019 02:59:18 -0400
-Received: from smtp.corp.redhat.com (int-mx01.intmail.prod.int.phx2.redhat.com [10.5.11.11])
-        (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
-        (No client certificate requested)
-        by mx1.redhat.com (Postfix) with ESMTPS id 1ED8B18CB8ED;
-        Mon, 30 Sep 2019 06:59:17 +0000 (UTC)
-Received: from [10.72.12.58] (ovpn-12-58.pek2.redhat.com [10.72.12.58])
-        by smtp.corp.redhat.com (Postfix) with ESMTPS id 0F19F600CC;
-        Mon, 30 Sep 2019 06:59:11 +0000 (UTC)
-Subject: Re: [PATCH v4 1/2] blk-mq: Avoid memory reclaim when allocating
- request map
-To:     Damien Le Moal <Damien.LeMoal@wdc.com>,
-        "josef@toxicpanda.com" <josef@toxicpanda.com>,
-        "axboe@kernel.dk" <axboe@kernel.dk>
-Cc:     "mchristi@redhat.com" <mchristi@redhat.com>,
-        "ming.lei@redhat.com" <ming.lei@redhat.com>,
-        "linux-block@vger.kernel.org" <linux-block@vger.kernel.org>,
-        Gabriel Krisman Bertazi <krisman@linux.vnet.ibm.com>
-References: <20190930015213.8865-1-xiubli@redhat.com>
- <20190930015213.8865-2-xiubli@redhat.com>
- <BYAPR04MB58160630271A8E552F7FD5D8E7820@BYAPR04MB5816.namprd04.prod.outlook.com>
- <544c7d2a-6600-9a8a-2f75-03e1d3211912@redhat.com>
- <BYAPR04MB581605EF9377C18074099232E7820@BYAPR04MB5816.namprd04.prod.outlook.com>
-From:   Xiubo Li <xiubli@redhat.com>
-Message-ID: <9b2d0f57-71f6-bbc8-3f1e-51ce83d12c1d@redhat.com>
-Date:   Mon, 30 Sep 2019 14:59:08 +0800
-User-Agent: Mozilla/5.0 (Windows NT 10.0; WOW64; rv:60.0) Gecko/20100101
- Thunderbird/60.9.0
+        id S1729232AbfI3HQi (ORCPT <rfc822;linux-block@vger.kernel.org>);
+        Mon, 30 Sep 2019 03:16:38 -0400
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=web.de;
+        s=dbaedf251592; t=1569827791;
+        bh=gbMOVn8Fn770a2SHIGdp8mDBqRMkfvq1IBv/5EGkKTw=;
+        h=X-UI-Sender-Class:Cc:References:Subject:To:From:Date:In-Reply-To;
+        b=gpQp/i7JtZhG2At0h3YidtTwMYUP3sKmfBpCCIvpnL6M8Obx4KsNfbMiP7IcaV0wZ
+         0KS74MERJU79ZZpsn5fueTBeLGvudk9o7fXbf9d38h5Cm0D5E7eYXslAybtn1XPLfb
+         Y+QGonh9m2TW4yddSl9wJ6s+CjmcaGduTT3ol9AE=
+X-UI-Sender-Class: c548c8c5-30a9-4db5-a2e7-cb6cb037b8f9
+Received: from [192.168.1.2] ([2.244.97.105]) by smtp.web.de (mrweb101
+ [213.165.67.124]) with ESMTPSA (Nemesis) id 0MPYB3-1iAB5i2BCD-004mVD; Mon, 30
+ Sep 2019 09:16:31 +0200
+Cc:     Navid Emamdoost <emamd001@umn.edu>, Kangjie Lu <kjlu@umn.edu>,
+        Stephen McCamant <smccaman@umn.edu>,
+        Matias Bjorling <mb@lightnvm.io>, linux-kernel@vger.kernel.org,
+        kernel-janitors@vger.kernel.org
+References: <20190930023415.24171-1-navid.emamdoost@gmail.com>
+Subject: Re: [PATCH] lightnvm: prevent memory leak in nvm_bb_chunk_sense
+To:     Navid Emamdoost <navid.emamdoost@gmail.com>,
+        linux-block@vger.kernel.org
+From:   Markus Elfring <Markus.Elfring@web.de>
+Autocrypt: addr=Markus.Elfring@web.de; prefer-encrypt=mutual; keydata=
+ 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 FEE=
+Message-ID: <d44a6dca-006e-5bcc-64b4-2b62cf9a9769@web.de>
+Date:   Mon, 30 Sep 2019 09:16:30 +0200
+User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:68.0) Gecko/20100101
+ Thunderbird/68.1.1
 MIME-Version: 1.0
-In-Reply-To: <BYAPR04MB581605EF9377C18074099232E7820@BYAPR04MB5816.namprd04.prod.outlook.com>
-Content-Type: text/plain; charset=utf-8; format=flowed
-Content-Transfer-Encoding: 7bit
+In-Reply-To: <20190930023415.24171-1-navid.emamdoost@gmail.com>
+Content-Type: text/plain; charset=utf-8
 Content-Language: en-US
-X-Scanned-By: MIMEDefang 2.79 on 10.5.11.11
-X-Greylist: Sender IP whitelisted, not delayed by milter-greylist-4.6.2 (mx1.redhat.com [10.5.110.63]); Mon, 30 Sep 2019 06:59:17 +0000 (UTC)
+Content-Transfer-Encoding: quoted-printable
+X-Provags-ID: V03:K1:/BiU2QFsDIz7Z6Efh886OtMBZ/zWPmQ1Lm4VSlF3Em0WcRxdrGv
+ AHGP7N3VkVcCV7RkHksWdrJLVy3Y7g3z+cnZpCwZybt/XWpvf9tmASR1ndDIFifwMeVgu3K
+ 9sFB+1uV5t1qvok61HCZO8adqu02UR/AqsORjw7RTR7EnILVKqLcfKpApi2MSr7um73PJCq
+ 1/JGMCkBBl7YUdED2pmOQ==
+X-UI-Out-Filterresults: notjunk:1;V03:K0:FnKkHmUXkZU=:nDkQm5BUAKEvNB7iq/Q74L
+ +7YYKPEoZsuTRBt4aWO5gJXrs6S0uzs5wRasg32AbndC7pqvSO3FlC8xPCwokHiEeg+HvJHxE
+ 3WTnrUjOGfr4UzgI/E6rlfAAjSH8vQIB8g9O9kKoQwQvPBc8SY9LsWI5Jx8ZNUP1CC/70SvNB
+ /83BYGmdBZNiIDLJxSt0fMCsWsrGhgBYXX0V+0IGS51lfs2J4sBKMinWTrbFI95C3TyOVycij
+ UlxvyEgykpMf6qdXeS9Oh0KdFvVMeKOry0n9tzLrxj9gX0MEZHwJLG1QQAf1j8Kf+TPgcHeIc
+ yd7A1+G+e5PrEVG7zldpGNAIn5A1EY/ZShgRlmGXwFJIFz+0IRjKV31BouqwUoiKzchmDT7kQ
+ UA4zmC/e8LABRfrGolg4Y13xKyni9AwRxv2GwJf4n/r1IVyltQBET46uV2Yuk/I9jxaaFTpYG
+ BXeThpLcH77XJjeIQUlfMZWN23rnxhaCBfmM1KNVfITek6TUo1sIVyniwKXXSr+YoN7f1tZxp
+ CsbNRFFavRtfvIS8KoqugwNupOVJVJjEsG9DwkeK7ljvAt4oMuNwHMr1UvVsNvZ9i2av0b8Ey
+ ujrILQCJDejS0rryxxvM9nFCfErQR5QRILfpvUMhv03W3axjREsj/6Hj+g6VmEcwDy7vVdE/v
+ +rJOjLNm8RTH5hbrDZ0A+Fwryt/ZufsbLmhy+ZXInppZKj1rwbFqg9J0krfM9ECrKtvfikikj
+ bL/1UA1ROkHdn+ikHbSgFuWAfjHgIB7B+OlJWFZS4WsuwQAM6psbTbbugO/2C8uFkZatt1LEC
+ 26GxZaJJhhnLttNDInX8B0zWYc1p3CkbGiN6cnMYZBAnCdBmKKZgGIZrffSBM/GW9Ml+W4pBB
+ POdE9b/El/gtaSbT7sUlDsNQARpNGdVuENu9gz33WR++XzzMdIIC9m3yiD4Zz3eL61gp6citv
+ B63nOxNC5r7jjp/V2ByrAXZ2eJnRXjLUnzJUXFdQF/+edhSOK2Wmfp9vgTF7jH2uEnDhO3Mpo
+ aPoeqD/P3lN4gd9yNBDTF9Gp2JQ7UkAaKC9+Nj0nFbrksbfAytg5USvx98stZU7fkRAS79syc
+ ygz4G+JivRlWYxlzuws/16AEHkVXoHCMpzTVYrGsPpMZHdRPkcrYOUf2c3rCLKacMNRTvQeNk
+ 79+IdVQmop0z+bhaTz+GKjWfG28x7YOLIPIt8lwSfQozbePWOcbXLigFdXmXtT71IefwiwAH+
+ cXeQvnFXv9B7tUXTiaaAZ/Yy/vY8gKPZYqSKvL7jV27O/CgNOjejpBNyFdIw=
 Sender: linux-block-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-On 2019/9/30 14:20, Damien Le Moal wrote:
-> On 2019/09/29 22:50, Xiubo Li wrote:
->> On 2019/9/30 13:28, Damien Le Moal wrote:
->>> On 2019/09/29 18:52, xiubli@redhat.com wrote:
->>>> From: Xiubo Li <xiubli@redhat.com>
->>>>
->>>> For some storage drivers, such as the nbd, when there has new socket
->>>> connections added, it will update the hardware queue number by calling
->>>> blk_mq_update_nr_hw_queues(), in which it will freeze all the queues
->>>> first. And then tries to do the hardware queue updating stuff.
->>>>
->>>> But int blk_mq_alloc_rq_map()-->blk_mq_init_tags(), when allocating
->>>> memory for tags, it may cause the mm do the memories direct reclaiming,
->>>> since the queues has been freezed, so if needs to flush the page cache
->>>> to disk, it will stuck in generic_make_request()-->blk_queue_enter() by
->>>> waiting the queues to be unfreezed and then cause deadlock here.
->>>>
->>>> Since the memory size requested here is a small one, which will make
->>>> it not that easy to happen with a large size, but in theory this could
->>>> happen when the OS is running in pressure and out of memory.
->>>>
->>>> Gabriel Krisman Bertazi has hit the similar issue by fixing it in
->>>> commit 36e1f3d10786 ("blk-mq: Avoid memory reclaim when remapping
->>>> queues"), but might forget this part.
->>>>
->>>> Signed-off-by: Xiubo Li <xiubli@redhat.com>
->>>> CC: Gabriel Krisman Bertazi <krisman@linux.vnet.ibm.com>
->>>> Reviewed-by: Ming Lei <ming.lei@redhat.com>
->>>> ---
->>>>    block/blk-mq-tag.c | 5 +++--
->>>>    block/blk-mq-tag.h | 5 ++++-
->>>>    block/blk-mq.c     | 3 ++-
->>>>    3 files changed, 9 insertions(+), 4 deletions(-)
->>>>
->>>> diff --git a/block/blk-mq-tag.c b/block/blk-mq-tag.c
->>>> index 008388e82b5c..04ee0e4c3fa1 100644
->>>> --- a/block/blk-mq-tag.c
->>>> +++ b/block/blk-mq-tag.c
->>>> @@ -462,7 +462,8 @@ static struct blk_mq_tags *blk_mq_init_bitmap_tags(struct blk_mq_tags *tags,
->>>>    
->>>>    struct blk_mq_tags *blk_mq_init_tags(unsigned int total_tags,
->>>>    				     unsigned int reserved_tags,
->>>> -				     int node, int alloc_policy)
->>>> +				     int node, int alloc_policy,
->>>> +				     gfp_t flags)
->>>>    {
->>>>    	struct blk_mq_tags *tags;
->>>>    
->>>> @@ -471,7 +472,7 @@ struct blk_mq_tags *blk_mq_init_tags(unsigned int total_tags,
->>>>    		return NULL;
->>>>    	}
->>>>    
->>>> -	tags = kzalloc_node(sizeof(*tags), GFP_KERNEL, node);
->>>> +	tags = kzalloc_node(sizeof(*tags), flags, node);
->>>>    	if (!tags)
->>>>    		return NULL;
->>>>    
->>>> diff --git a/block/blk-mq-tag.h b/block/blk-mq-tag.h
->>>> index 61deab0b5a5a..296e0bc97126 100644
->>>> --- a/block/blk-mq-tag.h
->>>> +++ b/block/blk-mq-tag.h
->>>> @@ -22,7 +22,10 @@ struct blk_mq_tags {
->>>>    };
->>>>    
->>>>    
->>>> -extern struct blk_mq_tags *blk_mq_init_tags(unsigned int nr_tags, unsigned int reserved_tags, int node, int alloc_policy);
->>>> +extern struct blk_mq_tags *blk_mq_init_tags(unsigned int nr_tags,
->>>> +					    unsigned int reserved_tags,
->>>> +					    int node, int alloc_policy,
->>>> +					    gfp_t flags);
->>>>    extern void blk_mq_free_tags(struct blk_mq_tags *tags);
->>>>    
->>>>    extern unsigned int blk_mq_get_tag(struct blk_mq_alloc_data *data);
->>>> diff --git a/block/blk-mq.c b/block/blk-mq.c
->>>> index 240416057f28..9c52e4dfe132 100644
->>>> --- a/block/blk-mq.c
->>>> +++ b/block/blk-mq.c
->>>> @@ -2090,7 +2090,8 @@ struct blk_mq_tags *blk_mq_alloc_rq_map(struct blk_mq_tag_set *set,
->>>>    		node = set->numa_node;
->>>>    
->>>>    	tags = blk_mq_init_tags(nr_tags, reserved_tags, node,
->>>> -				BLK_MQ_FLAG_TO_ALLOC_POLICY(set->flags));
->>>> +				BLK_MQ_FLAG_TO_ALLOC_POLICY(set->flags),
->>>> +				GFP_NOIO | __GFP_NOWARN | __GFP_NORETRY);
->>> You added the gfp_t argument to blk_mq_init_tags() but you are only using that
->>> argument with a hardcoded value here. So why not simply call kzalloc_node() in
->>> that function with the flags GFP_NOIO | __GFP_NOWARN | __GFP_NORETRY ? That
->>> would avoid needing to add the "gfp_t flags" argument and still fit with your
->>> patch 2 definition of BLK_MQ_GFP_FLAGS.
->> The blk_mq_init_tags() is defined in another separate file, which I think it means to provide a common way of initializing the tags stuff, and currently in this path it needs GFP_NOIO while in others in future it may not.
-> blk_mq_alloc_rq_map() is currently the only user of blk_mq_init_tags(), so I do
-> not see the point in doing this change now. If it is needed "in the future" then
-> do it then.
->
-> I do not mind the patch going in as is, but I really think that everything can
-> be folded into your patch 2 without the addition of blk_mq_init_tags()
-> additional argument.
+> To fix this issue I moved the __free_page call before error check.
 
-Actually I do not object to folding it into patch 2 :-)
+Would the wording =E2=80=9CMove the __free_page() call before the error ch=
+eck.=E2=80=9D
+be more succinct for the change description?
 
-Just from the v2 I supposed that it would be easier to be reviewed by 
-splitting it into a separate one.
+Can the following code variant be applied at the end of this function?
 
-Thanks,
+ 	return ret ? ret : rqd.error;
 
-BRs
-
->> Thanks,
->> BRs
->>
->>
->>>>    	if (!tags)
->>>>    		return NULL;
->>>>    
->>>>
->>
->
-
+Regards,
+Markus
