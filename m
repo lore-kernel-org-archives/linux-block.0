@@ -2,96 +2,129 @@ Return-Path: <SRS0=9W5b=XZ=vger.kernel.org=linux-block-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-2.5 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
-	MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,USER_AGENT_SANE_1 autolearn=no
-	autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-10.1 required=3.0 tests=DKIM_SIGNED,DKIM_VALID,
+	DKIM_VALID_AU,FREEMAIL_FORGED_FROMDOMAIN,FREEMAIL_FROM,
+	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,
+	SPF_HELO_NONE,SPF_PASS,USER_AGENT_GIT autolearn=ham autolearn_force=no
+	version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 222D4C32792
-	for <linux-block@archiver.kernel.org>; Mon, 30 Sep 2019 20:49:18 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 16493C32792
+	for <linux-block@archiver.kernel.org>; Mon, 30 Sep 2019 20:53:35 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.kernel.org (Postfix) with ESMTP id EF5F3224FE
-	for <linux-block@archiver.kernel.org>; Mon, 30 Sep 2019 20:49:17 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id D9A51224FE
+	for <linux-block@archiver.kernel.org>; Mon, 30 Sep 2019 20:53:34 +0000 (UTC)
+Authentication-Results: mail.kernel.org;
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="kv2pXOlp"
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1729245AbfI3UtR convert rfc822-to-8bit (ORCPT
-        <rfc822;linux-block@archiver.kernel.org>);
-        Mon, 30 Sep 2019 16:49:17 -0400
-Received: from mail-pl1-f194.google.com ([209.85.214.194]:42236 "EHLO
-        mail-pl1-f194.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1727469AbfI3UtR (ORCPT
+        id S1731581AbfI3Uxe (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Mon, 30 Sep 2019 16:53:34 -0400
+Received: from mail-wr1-f65.google.com ([209.85.221.65]:40497 "EHLO
+        mail-wr1-f65.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S1727118AbfI3Uxe (ORCPT
         <rfc822;linux-block@vger.kernel.org>);
-        Mon, 30 Sep 2019 16:49:17 -0400
-Received: by mail-pl1-f194.google.com with SMTP id e5so4351458pls.9;
-        Mon, 30 Sep 2019 13:49:16 -0700 (PDT)
+        Mon, 30 Sep 2019 16:53:34 -0400
+Received: by mail-wr1-f65.google.com with SMTP id l3so12871572wru.7;
+        Mon, 30 Sep 2019 13:53:31 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=gmail.com; s=20161025;
+        h=from:to:cc:subject:date:message-id:in-reply-to:references
+         :mime-version:content-transfer-encoding;
+        bh=2bu9cH1o0BJVB5OrcwUaFnQDN3/Qtc1RkyhexAVVqx4=;
+        b=kv2pXOlpBCugCOp5kxNT6RU4VJx+nuADmtSd3uIY9Tq/kk0a9OGH6UofFKYovMfMj0
+         zePnSFNrBHEOtmetNUOFxvHMQW+2WHAvlSk6o6gV9Ag1apQD3hybdfzs2J5VgTAWszT4
+         kG/D4wglRiLRUmcnP9n8KYXoYxB9UMGElJLhdcILGwmYi3qNrg+vFT1UxlnX0CeOO+bo
+         x9gOdXmNNKgVOsgDKjq/KnlY0rhZX7cryVc28OGZUIzTKZ9CXvTGwcUOfdNhGeICmART
+         CP4pntQ2lYOTe3vvtBa50KYLAMXKw5ZLscyfBIOtD970bSMg0aB42khvPG14sqIfvLlV
+         wcXQ==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=1e100.net; s=20161025;
-        h=x-gm-message-state:subject:to:references:from:message-id:date
-         :user-agent:mime-version:in-reply-to:content-language
-         :content-transfer-encoding;
-        bh=UmfTonvoYn/sz7KFi8ddR6otlUnEOyJ4JIchPng5apk=;
-        b=tM+kEN5Q+0P1culpTLFOtBmWg2yeAiVDO9IyeMqvDlse3rsa7YGmoTHPG+PrxxjzA/
-         Qalb9ctomHYT3uNkvDIQuPPCvkYH89A8AaRPOHXIHG7ldQC932HXs4E4q7s8JYBGduKq
-         yqKUJU6Xd5HVozyWAXc99hAoJ/ft75dpnLuXhN4s8NgtCmL+fe8FzJtelJjtAxdUDd3w
-         td90e+DTLan6kRwuiMSQ1ehhE58IH7uFNAeIgdocNqo24f0s7XIXTIfL0Nd1bJm8xFAx
-         euy1OAYcgoTTc6hpw9flYSc5lzEknM+k3xwf+Fq/CSqvbsxUtWGGF6JZYxG3zqT89s1S
-         rrvw==
-X-Gm-Message-State: APjAAAXib+8zCjdcONf4A4WyJmQmgTK10ZMfN8GCAGurttF5VKZRj88c
-        aLQ3cE6YUufW4KfKwhC0jNvm9hZd
-X-Google-Smtp-Source: APXvYqzbrSXpsKliVwn/NaAkhG1dBCmQeIWrM1t1mWJH2RQEgJUdDCSsZ6p1pPQ+4rLLp3sAiSHCnw==
-X-Received: by 2002:a17:902:bd88:: with SMTP id q8mr22421320pls.288.1569873208094;
-        Mon, 30 Sep 2019 12:53:28 -0700 (PDT)
-Received: from ?IPv6:2620:15c:2c1:200:fb9c:664d:d2ad:c9b5? ([2620:15c:2c1:200:fb9c:664d:d2ad:c9b5])
-        by smtp.gmail.com with ESMTPSA id w27sm9598997pfq.32.2019.09.30.12.53.26
-        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
-        Mon, 30 Sep 2019 12:53:27 -0700 (PDT)
-Subject: Re: [PATCH v2 1/1] blk-mq: Inline request status checkers
-To:     "Pavel Begunkov (Silence)" <asml.silence@gmail.com>,
-        Jens Axboe <axboe@kernel.dk>,
-        Josef Bacik <josef@toxicpanda.com>,
-        Keith Busch <kbusch@kernel.org>,
-        Christoph Hellwig <hch@lst.de>,
-        Sagi Grimberg <sagi@grimberg.me>, linux-block@vger.kernel.org,
-        linux-kernel@vger.kernel.org, nbd@other.debian.org,
-        linux-nvme@lists.infradead.org
-References: <1cd320dad54bd78cb6721f7fe8dd2e197b9fbfa2.1569830796.git.asml.silence@gmail.com>
- <e6fc239412811140c83de906b75689530661f65d.1569872122.git.asml.silence@gmail.com>
-From:   Bart Van Assche <bvanassche@acm.org>
-Message-ID: <e4d452ad-da24-a1a9-7e2d-f9cd5d0733da@acm.org>
-Date:   Mon, 30 Sep 2019 12:53:25 -0700
-User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:60.0) Gecko/20100101
- Thunderbird/60.9.0
+        h=x-gm-message-state:from:to:cc:subject:date:message-id:in-reply-to
+         :references:mime-version:content-transfer-encoding;
+        bh=2bu9cH1o0BJVB5OrcwUaFnQDN3/Qtc1RkyhexAVVqx4=;
+        b=OYoqx648SsI1ZLfP4b8qItU7BPMgdySgKHSFzq0e7YajXvTSfTbuA9mtQJl6e100Si
+         EblmvYqYtQ0c5twfZlhO95XPfzvLLIDyB2hcjI6wWdEBmD9PUokDDQn7kngsYWtbgGBQ
+         GkhrcLf9G6/8Ma/fqv16mso5mlhvybjGlEoBUXW8TCVSs8H1gSSNFxdTnnVtap627Ncg
+         fJLevg7YWJJoXkirpErbLNaW1TApAPaetbfgPJwS6fz5Jm2lTg9jT93l/kPKbzukyIq1
+         k06gjojclJp0prEpr9XqjtlyyxY3SvknFQUBIjKJH1jeJSkk30yMYMiSDtL7N4KI36in
+         /pwA==
+X-Gm-Message-State: APjAAAUarCoZ4IcGNCIqRGUGDPRqQEdJtni6zCmhkYJz+To1KmeXK6WB
+        FuM8QV2RUDVqZyYRucz3mIB/sLcbo7I=
+X-Google-Smtp-Source: APXvYqwaVxrPgUfy7StzNR3apPF8IB6CDqSnpQNMobiPcxZb4DsGDLK7k/zF4nLBjsKYQzSSNFlRjw==
+X-Received: by 2002:adf:e791:: with SMTP id n17mr10943405wrm.388.1569869743740;
+        Mon, 30 Sep 2019 11:55:43 -0700 (PDT)
+Received: from localhost.localdomain ([109.126.142.9])
+        by smtp.gmail.com with ESMTPSA id u83sm1131184wme.0.2019.09.30.11.55.42
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Mon, 30 Sep 2019 11:55:43 -0700 (PDT)
+From:   "Pavel Begunkov (Silence)" <asml.silence@gmail.com>
+To:     Jens Axboe <axboe@kernel.dk>,
+        Christoph Hellwig <hch@infradead.org>,
+        linux-block@vger.kernel.org, linux-kernel@vger.kernel.org
+Cc:     Pavel Begunkov <asml.silence@gmail.com>
+Subject: [PATCH v2 2/2] blk-mq: Embed counters into struct mq_inflight
+Date:   Mon, 30 Sep 2019 21:55:34 +0300
+Message-Id: <6f3392cd20e00cc1d6060bada86ca3db540de585.1569868094.git.asml.silence@gmail.com>
+X-Mailer: git-send-email 2.23.0
+In-Reply-To: <cover.1569868094.git.asml.silence@gmail.com>
+References: <cover.1569868094.git.asml.silence@gmail.com>
 MIME-Version: 1.0
-In-Reply-To: <e6fc239412811140c83de906b75689530661f65d.1569872122.git.asml.silence@gmail.com>
-Content-Type: text/plain; charset=utf-8
-Content-Language: en-US
-Content-Transfer-Encoding: 8BIT
+Content-Transfer-Encoding: 8bit
 Sender: linux-block-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-On 9/30/19 12:43 PM, Pavel Begunkov (Silence) wrote:
-> @@ -282,7 +282,7 @@ static bool bt_tags_iter(struct sbitmap *bitmap, unsigned int bitnr, void *data)
->  	 * test and set the bit before assining ->rqs[].
->  	 */
->  	rq = tags->rqs[bitnr];
-> -	if (rq && blk_mq_request_started(rq))
-> +	if (rq && blk_mq_rq_state(rq) != MQ_RQ_IDLE)
->  		return iter_data->fn(rq, iter_data->data, reserved);
->  
->  	return true>
-> @@ -360,7 +360,7 @@ static bool blk_mq_tagset_count_completed_rqs(struct request *rq,
->  {
->  	unsigned *count = data;
->  
-> -	if (blk_mq_request_completed(rq))
-> +	if (blk_mq_rq_state(rq) == MQ_RQ_COMPLETE)
->  		(*count)++;
->  	return true;
->  }
+From: Pavel Begunkov <asml.silence@gmail.com>
 
-Changes like the above significantly reduce readability of the code in
-the block layer core. I don't like this. I think this patch is a step
-backwards instead of a step forwards.
+Store inflight counters immediately in struct mq_inflight.
+That's type-safer and removes extra indirection.
 
-Bart.
+Signed-off-by: Pavel Begunkov <asml.silence@gmail.com>
+---
+ block/blk-mq.c | 13 ++++++-------
+ 1 file changed, 6 insertions(+), 7 deletions(-)
+
+diff --git a/block/blk-mq.c b/block/blk-mq.c
+index 3359a0b6c398..d97181d9a3ec 100644
+--- a/block/blk-mq.c
++++ b/block/blk-mq.c
+@@ -93,7 +93,7 @@ static void blk_mq_hctx_clear_pending(struct blk_mq_hw_ctx *hctx,
+ 
+ struct mq_inflight {
+ 	struct hd_struct *part;
+-	unsigned int *inflight;
++	unsigned int inflight[2];
+ };
+ 
+ static bool blk_mq_check_inflight(struct blk_mq_hw_ctx *hctx,
+@@ -110,22 +110,21 @@ static bool blk_mq_check_inflight(struct blk_mq_hw_ctx *hctx,
+ 
+ unsigned int blk_mq_in_flight(struct request_queue *q, struct hd_struct *part)
+ {
+-	unsigned inflight[2];
+-	struct mq_inflight mi = { .part = part, .inflight = inflight, };
++	struct mq_inflight mi = { .part = part };
+ 
+-	inflight[0] = inflight[1] = 0;
+ 	blk_mq_queue_tag_busy_iter(q, blk_mq_check_inflight, &mi);
+ 
+-	return inflight[0] + inflight[1];
++	return mi.inflight[0] + mi.inflight[1];
+ }
+ 
+ void blk_mq_in_flight_rw(struct request_queue *q, struct hd_struct *part,
+ 			 unsigned int inflight[2])
+ {
+-	struct mq_inflight mi = { .part = part, .inflight = inflight, };
++	struct mq_inflight mi = { .part = part };
+ 
+-	inflight[0] = inflight[1] = 0;
+ 	blk_mq_queue_tag_busy_iter(q, blk_mq_check_inflight, &mi);
++	inflight[0] = mi.inflight[0];
++	inflight[1] = mi.inflight[1];
+ }
+ 
+ void blk_freeze_queue_start(struct request_queue *q)
+-- 
+2.23.0
 
