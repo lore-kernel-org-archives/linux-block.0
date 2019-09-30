@@ -7,41 +7,41 @@ X-Spam-Status: No, score=-10.0 required=3.0
 	SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,USER_AGENT_GIT autolearn=ham
 	autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 1DF62C35280
-	for <linux-block@archiver.kernel.org>; Mon, 30 Sep 2019 23:01:00 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 3D21FC388F3
+	for <linux-block@archiver.kernel.org>; Mon, 30 Sep 2019 23:01:01 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.kernel.org (Postfix) with ESMTP id E6EE62053B
-	for <linux-block@archiver.kernel.org>; Mon, 30 Sep 2019 23:00:59 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id 1B4B921855
+	for <linux-block@archiver.kernel.org>; Mon, 30 Sep 2019 23:01:01 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1727220AbfI3XA7 (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Mon, 30 Sep 2019 19:00:59 -0400
-Received: from mail-pf1-f196.google.com ([209.85.210.196]:37526 "EHLO
-        mail-pf1-f196.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1726789AbfI3XA7 (ORCPT
+        id S1727118AbfI3XBA (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Mon, 30 Sep 2019 19:01:00 -0400
+Received: from mail-pf1-f194.google.com ([209.85.210.194]:32839 "EHLO
+        mail-pf1-f194.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S1726789AbfI3XBA (ORCPT
         <rfc822;linux-block@vger.kernel.org>);
-        Mon, 30 Sep 2019 19:00:59 -0400
-Received: by mail-pf1-f196.google.com with SMTP id y5so6466005pfo.4
-        for <linux-block@vger.kernel.org>; Mon, 30 Sep 2019 16:00:58 -0700 (PDT)
+        Mon, 30 Sep 2019 19:01:00 -0400
+Received: by mail-pf1-f194.google.com with SMTP id q10so6475564pfl.0
+        for <linux-block@vger.kernel.org>; Mon, 30 Sep 2019 16:00:59 -0700 (PDT)
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=1e100.net; s=20161025;
         h=x-gm-message-state:from:to:cc:subject:date:message-id:in-reply-to
          :references:mime-version:content-transfer-encoding;
-        bh=344eJ05CFQcBsgTWyIrRGJ8FcbpIVlOeQYSaWb8S7Fs=;
-        b=bKylK8fghroJWf/YC5OPpbdT1wzKD4Vhr4V4MA5QtvH7wTdOmlZX2juz7ZqTiZZREQ
-         FZotCs0RMvzsy0YDlzpJ6R+XwZjEeBCRvuZsaSoTsi2Q8y0QsEs4vS0WgVt8uRYFQjVu
-         SEcWTJYr0PLSVFCfBOFd5eavIK3A+9+TDnFAEU4GJ84fitGymXs+1PBch6xn8PEyYT9j
-         cYHQ6X1LWRtEfPJV/GywDWSGMN5G0XFHqag7DfZL49Ab7FgFPCULNFh6OLtWULc0rpk8
-         3OmK9b2lfaX0qaDyT39wc+N0XVlRHlJib7Kozqbk3N7+CRYfUbCBZuUXh5NZLkAW5aYP
-         N/zg==
-X-Gm-Message-State: APjAAAUungsZxuxHkQ/wTfq27gshNmKzUEsL3Hxp1sxkv5n795F9Fkoj
-        fS7RPC+MQ6SKuuLM5+OC83s=
-X-Google-Smtp-Source: APXvYqxiLyT2ggXAqcfujMoHjPmqzifRaYLNnCY4UvOXbFr2AooHE1nYPXTTz/lYz280x627E9fGKg==
-X-Received: by 2002:a17:90a:1b48:: with SMTP id q66mr1825898pjq.79.1569884458055;
-        Mon, 30 Sep 2019 16:00:58 -0700 (PDT)
+        bh=gpSLYdxnzPeYthWjSUQJp6CR8C6RA6Ja2olEfHMV4mY=;
+        b=VGdjMsA9GeAeCr/RR0/lScAfvdbebg5haGYujteQajomfQ4ck9mgjGsGTWWU77YeQz
+         VWdxSGni5UlKnTn+KcwCdd12YxuVerzoqbpK6nX6tfTDzuzWBRn4w/z5M8fqxKnhZB3X
+         tSuLQA4zr9gGsS5YxOB3OOVrEFby0hN+1p7YdQslxLfbNrTaaa4SUj5HqUY4cjTmuais
+         SiJPKrebMEXb4lyv88cvwhduVn0506EjlN0dvsUB5gotyvOGZfcRo1bED8KRQTaZSZXB
+         SLWveSCbLvjzwH6iif7xYJUGIhd5FbGsyGD9NbXFZFPTI7oTAXmdpJihzpTT1f9fMbWK
+         YS+A==
+X-Gm-Message-State: APjAAAWu85f0WG0lViGq/B+iopNrMpMC1VMQMuQVLguXVvxhAIr83Dyq
+        CC7fxfKv0pgw4gL0x3fWqnI=
+X-Google-Smtp-Source: APXvYqyArtbqWoPb3Edyq3NEy42szDRtVUPcSsiNmLG+Xrog6jLVgkl+SbeST6GiNQr0rzuu2/9bPA==
+X-Received: by 2002:a17:90a:fe04:: with SMTP id ck4mr1917348pjb.74.1569884459379;
+        Mon, 30 Sep 2019 16:00:59 -0700 (PDT)
 Received: from desktop-bart.svl.corp.google.com ([2620:15c:2cd:202:4308:52a3:24b6:2c60])
-        by smtp.gmail.com with ESMTPSA id 74sm15071747pfy.78.2019.09.30.16.00.56
+        by smtp.gmail.com with ESMTPSA id 74sm15071747pfy.78.2019.09.30.16.00.58
         (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Mon, 30 Sep 2019 16:00:57 -0700 (PDT)
+        Mon, 30 Sep 2019 16:00:58 -0700 (PDT)
 From:   Bart Van Assche <bvanassche@acm.org>
 To:     Jens Axboe <axboe@kernel.dk>
 Cc:     linux-block@vger.kernel.org, Christoph Hellwig <hch@lst.de>,
@@ -50,9 +50,9 @@ Cc:     linux-block@vger.kernel.org, Christoph Hellwig <hch@lst.de>,
         Ming Lei <ming.lei@redhat.com>,
         Hannes Reinecke <hare@suse.com>,
         Johannes Thumshirn <jthumshirn@suse.de>
-Subject: [PATCH 2/8] block: Fix writeback throttling W=1 compiler warnings
-Date:   Mon, 30 Sep 2019 16:00:41 -0700
-Message-Id: <20190930230047.44113-3-bvanassche@acm.org>
+Subject: [PATCH 3/8] block: Remove request_queue.nr_queues
+Date:   Mon, 30 Sep 2019 16:00:42 -0700
+Message-Id: <20190930230047.44113-4-bvanassche@acm.org>
 X-Mailer: git-send-email 2.23.0.444.g18eeb5a265-goog
 In-Reply-To: <20190930230047.44113-1-bvanassche@acm.org>
 References: <20190930230047.44113-1-bvanassche@acm.org>
@@ -63,120 +63,51 @@ Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-Fix the following compiler warnings:
-
-In file included from ./include/linux/bitmap.h:9,
-                 from ./include/linux/cpumask.h:12,
-                 from ./arch/x86/include/asm/cpumask.h:5,
-                 from ./arch/x86/include/asm/msr.h:11,
-                 from ./arch/x86/include/asm/processor.h:21,
-                 from ./arch/x86/include/asm/cpufeature.h:5,
-                 from ./arch/x86/include/asm/thread_info.h:53,
-                 from ./include/linux/thread_info.h:38,
-                 from ./arch/x86/include/asm/preempt.h:7,
-                 from ./include/linux/preempt.h:78,
-                 from ./include/linux/spinlock.h:51,
-                 from ./include/linux/mmzone.h:8,
-                 from ./include/linux/gfp.h:6,
-                 from ./include/linux/mm.h:10,
-                 from ./include/linux/bvec.h:13,
-                 from ./include/linux/blk_types.h:10,
-                 from block/blk-wbt.c:23:
-In function 'strncpy',
-    inlined from 'perf_trace_wbt_stat' at ./include/trace/events/wbt.h:15:1:
-./include/linux/string.h:260:9: warning: '__builtin_strncpy' specified bound 32 equals destination size [-Wstringop-truncation]
-  return __builtin_strncpy(p, q, size);
-         ^~~~~~~~~~~~~~~~~~~~~~~~~~~~~
-In function 'strncpy',
-    inlined from 'perf_trace_wbt_lat' at ./include/trace/events/wbt.h:58:1:
-./include/linux/string.h:260:9: warning: '__builtin_strncpy' specified bound 32 equals destination size [-Wstringop-truncation]
-  return __builtin_strncpy(p, q, size);
-         ^~~~~~~~~~~~~~~~~~~~~~~~~~~~~
-In function 'strncpy',
-    inlined from 'perf_trace_wbt_step' at ./include/trace/events/wbt.h:87:1:
-./include/linux/string.h:260:9: warning: '__builtin_strncpy' specified bound 32 equals destination size [-Wstringop-truncation]
-  return __builtin_strncpy(p, q, size);
-         ^~~~~~~~~~~~~~~~~~~~~~~~~~~~~
-In function 'strncpy',
-    inlined from 'perf_trace_wbt_timer' at ./include/trace/events/wbt.h:126:1:
-./include/linux/string.h:260:9: warning: '__builtin_strncpy' specified bound 32 equals destination size [-Wstringop-truncation]
-  return __builtin_strncpy(p, q, size);
-         ^~~~~~~~~~~~~~~~~~~~~~~~~~~~~
-In function 'strncpy',
-    inlined from 'trace_event_raw_event_wbt_stat' at ./include/trace/events/wbt.h:15:1:
-./include/linux/string.h:260:9: warning: '__builtin_strncpy' specified bound 32 equals destination size [-Wstringop-truncation]
-  return __builtin_strncpy(p, q, size);
-         ^~~~~~~~~~~~~~~~~~~~~~~~~~~~~
-In function 'strncpy',
-    inlined from 'trace_event_raw_event_wbt_lat' at ./include/trace/events/wbt.h:58:1:
-./include/linux/string.h:260:9: warning: '__builtin_strncpy' specified bound 32 equals destination size [-Wstringop-truncation]
-  return __builtin_strncpy(p, q, size);
-         ^~~~~~~~~~~~~~~~~~~~~~~~~~~~~
-In function 'strncpy',
-    inlined from 'trace_event_raw_event_wbt_timer' at ./include/trace/events/wbt.h:126:1:
-./include/linux/string.h:260:9: warning: '__builtin_strncpy' specified bound 32 equals destination size [-Wstringop-truncation]
-  return __builtin_strncpy(p, q, size);
-         ^~~~~~~~~~~~~~~~~~~~~~~~~~~~~
-In function 'strncpy',
-    inlined from 'trace_event_raw_event_wbt_step' at ./include/trace/events/wbt.h:87:1:
-./include/linux/string.h:260:9: warning: '__builtin_strncpy' specified bound 32 equals destination size [-Wstringop-truncation]
-  return __builtin_strncpy(p, q, size);
-         ^~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+Commit 897bb0c7f1ea ("blk-mq: Use proper cpumask iterator"; v4.6)
+removed the last use of request_queue.nr_queues from outside
+blk_mq_init_allocate_queue(). Remove this member variable to make
+struct request_queue smaller. This patch does not change any
+functionality.
 
 Cc: Christoph Hellwig <hch@infradead.org>
 Cc: Ming Lei <ming.lei@redhat.com>
 Cc: Hannes Reinecke <hare@suse.com>
 Cc: Johannes Thumshirn <jthumshirn@suse.de>
-Fixes: e34cbd307477 ("blk-wbt: add general throttling mechanism"; v4.10).
 Signed-off-by: Bart Van Assche <bvanassche@acm.org>
 ---
- include/trace/events/wbt.h | 12 ++++++++----
- 1 file changed, 8 insertions(+), 4 deletions(-)
+ block/blk-mq.c         | 6 +++---
+ include/linux/blkdev.h | 1 -
+ 2 files changed, 3 insertions(+), 4 deletions(-)
 
-diff --git a/include/trace/events/wbt.h b/include/trace/events/wbt.h
-index b048694070e2..37342a13c9cb 100644
---- a/include/trace/events/wbt.h
-+++ b/include/trace/events/wbt.h
-@@ -33,7 +33,8 @@ TRACE_EVENT(wbt_stat,
- 	),
+diff --git a/block/blk-mq.c b/block/blk-mq.c
+index 29275f5a996f..25b8a9b44a31 100644
+--- a/block/blk-mq.c
++++ b/block/blk-mq.c
+@@ -2867,9 +2867,9 @@ struct request_queue *blk_mq_init_allocated_queue(struct blk_mq_tag_set *set,
+ 	/* init q->mq_kobj and sw queues' kobjects */
+ 	blk_mq_sysfs_init(q);
  
- 	TP_fast_assign(
--		strncpy(__entry->name, dev_name(bdi->dev), 32);
-+		strlcpy(__entry->name, dev_name(bdi->dev),
-+			ARRAY_SIZE(__entry->name));
- 		__entry->rmean		= stat[0].mean;
- 		__entry->rmin		= stat[0].min;
- 		__entry->rmax		= stat[0].max;
-@@ -67,7 +68,8 @@ TRACE_EVENT(wbt_lat,
- 	),
+-	q->nr_queues = nr_hw_queues(set);
+-	q->queue_hw_ctx = kcalloc_node(q->nr_queues, sizeof(*(q->queue_hw_ctx)),
+-						GFP_KERNEL, set->numa_node);
++	q->queue_hw_ctx = kcalloc_node(nr_hw_queues(set),
++				       sizeof(*(q->queue_hw_ctx)), GFP_KERNEL,
++				       set->numa_node);
+ 	if (!q->queue_hw_ctx)
+ 		goto err_sys_init;
  
- 	TP_fast_assign(
--		strncpy(__entry->name, dev_name(bdi->dev), 32);
-+		strlcpy(__entry->name, dev_name(bdi->dev),
-+			ARRAY_SIZE(__entry->name));
- 		__entry->lat = div_u64(lat, 1000);
- 	),
+diff --git a/include/linux/blkdev.h b/include/linux/blkdev.h
+index 6032bb740cf4..fe32e07c5e3c 100644
+--- a/include/linux/blkdev.h
++++ b/include/linux/blkdev.h
+@@ -411,7 +411,6 @@ struct request_queue {
  
-@@ -103,7 +105,8 @@ TRACE_EVENT(wbt_step,
- 	),
+ 	/* sw queues */
+ 	struct blk_mq_ctx __percpu	*queue_ctx;
+-	unsigned int		nr_queues;
  
- 	TP_fast_assign(
--		strncpy(__entry->name, dev_name(bdi->dev), 32);
-+		strlcpy(__entry->name, dev_name(bdi->dev),
-+			ARRAY_SIZE(__entry->name));
- 		__entry->msg	= msg;
- 		__entry->step	= step;
- 		__entry->window	= div_u64(window, 1000);
-@@ -138,7 +141,8 @@ TRACE_EVENT(wbt_timer,
- 	),
+ 	unsigned int		queue_depth;
  
- 	TP_fast_assign(
--		strncpy(__entry->name, dev_name(bdi->dev), 32);
-+		strlcpy(__entry->name, dev_name(bdi->dev),
-+			ARRAY_SIZE(__entry->name));
- 		__entry->status		= status;
- 		__entry->step		= step;
- 		__entry->inflight	= inflight;
 -- 
 2.23.0.444.g18eeb5a265-goog
 
