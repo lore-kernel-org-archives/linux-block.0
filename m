@@ -2,116 +2,96 @@ Return-Path: <SRS0=9W5b=XZ=vger.kernel.org=linux-block-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-10.0 required=3.0
-	tests=HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,
-	SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,USER_AGENT_GIT autolearn=unavailable
+X-Spam-Status: No, score=-2.5 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
+	MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,USER_AGENT_SANE_1 autolearn=no
 	autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id DCE4EC388F3
-	for <linux-block@archiver.kernel.org>; Mon, 30 Sep 2019 20:47:58 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 222D4C32792
+	for <linux-block@archiver.kernel.org>; Mon, 30 Sep 2019 20:49:18 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.kernel.org (Postfix) with ESMTP id B7341224FE
-	for <linux-block@archiver.kernel.org>; Mon, 30 Sep 2019 20:47:58 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id EF5F3224FE
+	for <linux-block@archiver.kernel.org>; Mon, 30 Sep 2019 20:49:17 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1729503AbfI3Urz (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Mon, 30 Sep 2019 16:47:55 -0400
-Received: from mout.kundenserver.de ([212.227.126.187]:39139 "EHLO
-        mout.kundenserver.de" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1726425AbfI3Urz (ORCPT
+        id S1729245AbfI3UtR convert rfc822-to-8bit (ORCPT
+        <rfc822;linux-block@archiver.kernel.org>);
+        Mon, 30 Sep 2019 16:49:17 -0400
+Received: from mail-pl1-f194.google.com ([209.85.214.194]:42236 "EHLO
+        mail-pl1-f194.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S1727469AbfI3UtR (ORCPT
         <rfc822;linux-block@vger.kernel.org>);
-        Mon, 30 Sep 2019 16:47:55 -0400
-Received: from threadripper.lan ([149.172.19.189]) by mrelayeu.kundenserver.de
- (mreue010 [212.227.15.129]) with ESMTPA (Nemesis) id
- 1MBUZr-1iQpiz3595-00D3fn; Mon, 30 Sep 2019 22:21:02 +0200
-From:   Arnd Bergmann <arnd@arndb.de>
-To:     Jens Axboe <axboe@kernel.dk>
-Cc:     y2038@lists.linaro.org, linux-api@vger.kernel.org,
-        Arnd Bergmann <arnd@arndb.de>,
-        Alexander Viro <viro@zeniv.linux.org.uk>,
-        =?UTF-8?q?Stefan=20B=C3=BChler?= <source@stbuehler.de>,
-        Hannes Reinecke <hare@suse.com>,
-        Jackie Liu <liuyun01@kylinos.cn>,
-        Andrew Morton <akpm@linux-foundation.org>,
-        Hristo Venev <hristo@venev.name>, linux-block@vger.kernel.org,
-        linux-fsdevel@vger.kernel.org, linux-kernel@vger.kernel.org
-Subject: [PATCH] io_uring: use __kernel_timespec in timeout ABI
-Date:   Mon, 30 Sep 2019 22:20:39 +0200
-Message-Id: <20190930202055.1748710-1-arnd@arndb.de>
-X-Mailer: git-send-email 2.20.0
+        Mon, 30 Sep 2019 16:49:17 -0400
+Received: by mail-pl1-f194.google.com with SMTP id e5so4351458pls.9;
+        Mon, 30 Sep 2019 13:49:16 -0700 (PDT)
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20161025;
+        h=x-gm-message-state:subject:to:references:from:message-id:date
+         :user-agent:mime-version:in-reply-to:content-language
+         :content-transfer-encoding;
+        bh=UmfTonvoYn/sz7KFi8ddR6otlUnEOyJ4JIchPng5apk=;
+        b=tM+kEN5Q+0P1culpTLFOtBmWg2yeAiVDO9IyeMqvDlse3rsa7YGmoTHPG+PrxxjzA/
+         Qalb9ctomHYT3uNkvDIQuPPCvkYH89A8AaRPOHXIHG7ldQC932HXs4E4q7s8JYBGduKq
+         yqKUJU6Xd5HVozyWAXc99hAoJ/ft75dpnLuXhN4s8NgtCmL+fe8FzJtelJjtAxdUDd3w
+         td90e+DTLan6kRwuiMSQ1ehhE58IH7uFNAeIgdocNqo24f0s7XIXTIfL0Nd1bJm8xFAx
+         euy1OAYcgoTTc6hpw9flYSc5lzEknM+k3xwf+Fq/CSqvbsxUtWGGF6JZYxG3zqT89s1S
+         rrvw==
+X-Gm-Message-State: APjAAAXib+8zCjdcONf4A4WyJmQmgTK10ZMfN8GCAGurttF5VKZRj88c
+        aLQ3cE6YUufW4KfKwhC0jNvm9hZd
+X-Google-Smtp-Source: APXvYqzbrSXpsKliVwn/NaAkhG1dBCmQeIWrM1t1mWJH2RQEgJUdDCSsZ6p1pPQ+4rLLp3sAiSHCnw==
+X-Received: by 2002:a17:902:bd88:: with SMTP id q8mr22421320pls.288.1569873208094;
+        Mon, 30 Sep 2019 12:53:28 -0700 (PDT)
+Received: from ?IPv6:2620:15c:2c1:200:fb9c:664d:d2ad:c9b5? ([2620:15c:2c1:200:fb9c:664d:d2ad:c9b5])
+        by smtp.gmail.com with ESMTPSA id w27sm9598997pfq.32.2019.09.30.12.53.26
+        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
+        Mon, 30 Sep 2019 12:53:27 -0700 (PDT)
+Subject: Re: [PATCH v2 1/1] blk-mq: Inline request status checkers
+To:     "Pavel Begunkov (Silence)" <asml.silence@gmail.com>,
+        Jens Axboe <axboe@kernel.dk>,
+        Josef Bacik <josef@toxicpanda.com>,
+        Keith Busch <kbusch@kernel.org>,
+        Christoph Hellwig <hch@lst.de>,
+        Sagi Grimberg <sagi@grimberg.me>, linux-block@vger.kernel.org,
+        linux-kernel@vger.kernel.org, nbd@other.debian.org,
+        linux-nvme@lists.infradead.org
+References: <1cd320dad54bd78cb6721f7fe8dd2e197b9fbfa2.1569830796.git.asml.silence@gmail.com>
+ <e6fc239412811140c83de906b75689530661f65d.1569872122.git.asml.silence@gmail.com>
+From:   Bart Van Assche <bvanassche@acm.org>
+Message-ID: <e4d452ad-da24-a1a9-7e2d-f9cd5d0733da@acm.org>
+Date:   Mon, 30 Sep 2019 12:53:25 -0700
+User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:60.0) Gecko/20100101
+ Thunderbird/60.9.0
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
-X-Provags-ID: V03:K1:mlQX66YyJ89UsdNDcTaUDMkvDllD+MCdC0jwrPAhCDuUuJh0vOk
- zZ1jwySfQ09oEHruJb93xi023HsV+efktaoKqvpmHhP68Y4byhgRSjNpgjGQ3pvTTAS7rFA
- 09K8xy6PviTkfJyCKQI2+MF+0GZfaZPB8iiYdBkkw2ex2b4niBs+M6FIX3/0Hs4nPJ2Ci+M
- QEWGo3Z0tATHhXTDBD6Rg==
-X-UI-Out-Filterresults: notjunk:1;V03:K0:NV7gpjrMSJA=:okYpni+B9mopWZLlHONDJp
- xR8Uqy/ksQ9sz7P/lCZkqV1RHmQLWxi3Zcs9hP7G23NVdti21bzURdIU8KTe8KorJ2ZE52kzA
- JUY4ayZuWOuSN7SGagfzyLt2BJzmrmf/061UoiEHcSTXXZc8d3jsNnx1elf6C7BBJ6ufxKa+7
- NGYghSmO7UImkraFvg4CGdj8OK+Gh+82IZhA60bkWtkwNjFgdEJHbvFGGH7JLYUFth9c7+sxx
- vIb7BtF+63ZinJM6CA02I1FB/BAWQ8cLxI/F6iF5Un4JPbU5306X8Xb0OyVAkRdW52z2jUwsV
- FoqciNCWCdpZgxclQ4RczL+bc0/UkJxzU0kXQX9stuMQvMoSnDVLPGoismnyM5ukkA2dqPgCK
- j0fk85HX4KT1XeREo9XqHJrPPPE5XsIlETM58guXXs7H6MOmJFepI4ouGc/CeCybxqQSJeo0r
- iHrmwdqsvXNCSoyfRKxU+MTNY0P7xASYwJVNF2XRlcQ/BV9dgDjzZs+DRVwcBFwnwuHyIwO3P
- bP46smitC23t94UHyI7EehWvWuzx6mwwhySFEkX5onBqTcveJ2NyIkgpeTzQ8u4qHu6SSuSES
- pxQLbTHA+RgF2m6mB5C0EFqCvAmtdF3qlwudBVIABDFAKnSQZ/N2Di0ufu2/aH2RffXW2Yhc2
- BeYzdWjHiLQ9BoEPmet/gFeqOPy9L2R0OxZ5ZSD7ICczYGaCZ60Emlm9iZXebCTZVUVwJgHgD
- kpv9hy/fIGz4pByWEspBJQPhyg+6nRjSCy5lUcp7S1hv2DD5M/1vUHnwY9HPN+PvKEbQM7cnX
- SXzxqb7MJoSDoOzR0TSTBVMQTcIwZJDTdVt8NzikvdQiyqkcIuxI0UytpsnLgVY1yM/GzlS1B
- s6w+hxhaCHK4Aws2hZrA==
+In-Reply-To: <e6fc239412811140c83de906b75689530661f65d.1569872122.git.asml.silence@gmail.com>
+Content-Type: text/plain; charset=utf-8
+Content-Language: en-US
+Content-Transfer-Encoding: 8BIT
 Sender: linux-block-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-All system calls use struct __kernel_timespec instead of the old struct
-timespec, but this one was just added with the old-style ABI. Change it
-now to enforce the use of __kernel_timespec, avoiding ABI confusion and
-the need for compat handlers on 32-bit architectures.
+On 9/30/19 12:43 PM, Pavel Begunkov (Silence) wrote:
+> @@ -282,7 +282,7 @@ static bool bt_tags_iter(struct sbitmap *bitmap, unsigned int bitnr, void *data)
+>  	 * test and set the bit before assining ->rqs[].
+>  	 */
+>  	rq = tags->rqs[bitnr];
+> -	if (rq && blk_mq_request_started(rq))
+> +	if (rq && blk_mq_rq_state(rq) != MQ_RQ_IDLE)
+>  		return iter_data->fn(rq, iter_data->data, reserved);
+>  
+>  	return true>
+> @@ -360,7 +360,7 @@ static bool blk_mq_tagset_count_completed_rqs(struct request *rq,
+>  {
+>  	unsigned *count = data;
+>  
+> -	if (blk_mq_request_completed(rq))
+> +	if (blk_mq_rq_state(rq) == MQ_RQ_COMPLETE)
+>  		(*count)++;
+>  	return true;
+>  }
 
-Any user space caller will have to use __kernel_timespec now, but this
-is unambiguous and works for any C library regardless of the time_t
-definition. A nicer way to specify the timeout would have been a less
-ambiguous 64-bit nanosecond value, but I suppose it's too late now to
-change that as this would impact both 32-bit and 64-bit users.
+Changes like the above significantly reduce readability of the code in
+the block layer core. I don't like this. I think this patch is a step
+backwards instead of a step forwards.
 
-Fixes: 5262f567987d ("io_uring: IORING_OP_TIMEOUT support")
-Signed-off-by: Arnd Bergmann <arnd@arndb.de>
----
- fs/io_uring.c | 8 ++++----
- 1 file changed, 4 insertions(+), 4 deletions(-)
-
-diff --git a/fs/io_uring.c b/fs/io_uring.c
-index aa8ac557493c..8a0381f1a43b 100644
---- a/fs/io_uring.c
-+++ b/fs/io_uring.c
-@@ -1892,15 +1892,15 @@ static int io_timeout(struct io_kiocb *req, const struct io_uring_sqe *sqe)
- 	unsigned count, req_dist, tail_index;
- 	struct io_ring_ctx *ctx = req->ctx;
- 	struct list_head *entry;
--	struct timespec ts;
-+	struct timespec64 ts;
- 
- 	if (unlikely(ctx->flags & IORING_SETUP_IOPOLL))
- 		return -EINVAL;
- 	if (sqe->flags || sqe->ioprio || sqe->buf_index || sqe->timeout_flags ||
- 	    sqe->len != 1)
- 		return -EINVAL;
--	if (copy_from_user(&ts, (void __user *) (unsigned long) sqe->addr,
--	    sizeof(ts)))
-+
-+	if (get_timespec64(&ts, u64_to_user_ptr(sqe->addr)))
- 		return -EFAULT;
- 
- 	/*
-@@ -1934,7 +1934,7 @@ static int io_timeout(struct io_kiocb *req, const struct io_uring_sqe *sqe)
- 
- 	hrtimer_init(&req->timeout.timer, CLOCK_MONOTONIC, HRTIMER_MODE_REL);
- 	req->timeout.timer.function = io_timeout_fn;
--	hrtimer_start(&req->timeout.timer, timespec_to_ktime(ts),
-+	hrtimer_start(&req->timeout.timer, timespec64_to_ktime(ts),
- 			HRTIMER_MODE_REL);
- 	return 0;
- }
--- 
-2.20.0
+Bart.
 
