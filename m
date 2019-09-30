@@ -2,135 +2,116 @@ Return-Path: <SRS0=9W5b=XZ=vger.kernel.org=linux-block-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-5.5 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
-	INCLUDES_PATCH,MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,USER_AGENT_SANE_1
-	autolearn=ham autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-10.0 required=3.0
+	tests=HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,
+	SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,USER_AGENT_GIT autolearn=unavailable
+	autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id BF008C32792
-	for <linux-block@archiver.kernel.org>; Mon, 30 Sep 2019 20:45:46 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id DCE4EC388F3
+	for <linux-block@archiver.kernel.org>; Mon, 30 Sep 2019 20:47:58 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.kernel.org (Postfix) with ESMTP id 9BCDF224FE
-	for <linux-block@archiver.kernel.org>; Mon, 30 Sep 2019 20:45:46 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id B7341224FE
+	for <linux-block@archiver.kernel.org>; Mon, 30 Sep 2019 20:47:58 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1730705AbfI3Upp (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Mon, 30 Sep 2019 16:45:45 -0400
-Received: from youngberry.canonical.com ([91.189.89.112]:37975 "EHLO
-        youngberry.canonical.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1729066AbfI3Upp (ORCPT
+        id S1729503AbfI3Urz (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Mon, 30 Sep 2019 16:47:55 -0400
+Received: from mout.kundenserver.de ([212.227.126.187]:39139 "EHLO
+        mout.kundenserver.de" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S1726425AbfI3Urz (ORCPT
         <rfc822;linux-block@vger.kernel.org>);
-        Mon, 30 Sep 2019 16:45:45 -0400
-Received: from mail-pl1-f198.google.com ([209.85.214.198])
-        by youngberry.canonical.com with esmtps (TLS1.2:ECDHE_RSA_AES_128_GCM_SHA256:128)
-        (Exim 4.86_2)
-        (envelope-from <gpiccoli@canonical.com>)
-        id 1iF1Ws-00057c-L6
-        for linux-block@vger.kernel.org; Mon, 30 Sep 2019 19:40:18 +0000
-Received: by mail-pl1-f198.google.com with SMTP id m8so5815483plt.14
-        for <linux-block@vger.kernel.org>; Mon, 30 Sep 2019 12:40:18 -0700 (PDT)
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20161025;
-        h=x-gm-message-state:subject:to:cc:references:from:openpgp:autocrypt
-         :message-id:date:user-agent:mime-version:in-reply-to
-         :content-language:content-transfer-encoding;
-        bh=09P9hryk4X9pxrU6lU1eu8xnMAXUu4sGNFiOeA8zkAc=;
-        b=eW+8OOWcjuHRndZ6yHOe/qFiOHGTCnqbMYJ8rg8MsslTNqnBggg0okph5z3tecQ79C
-         IcNWaQJnoAxYdLN5FklIL4BFwCRbNjua9Kw89RUpSuCb1Sh+ugENE4C/RMlOXxsgVGBV
-         0EBOwaH6U6XjeA/1uTGei0chrdJQ9wf9bnDNa+D1tF6UgOu1Q0JWjDW6VyEBTHujE5ev
-         hJdXGJ3ZcR2+g/IOeA1hAYMBVnr0RgjxCnD/2ENlTZ3tj23ZXhE6Yx0pgm58vRwVZaVM
-         jnZu94Az1WtiLBxCIgACJTlloa0L2r82YJRTX2NBYxoWeiQmlovFqpNYgozCiV34FnGP
-         kLLg==
-X-Gm-Message-State: APjAAAV2dwKH0NLX4kh7I/ZTF8nFGADbWord5NgMdZHWxWBtlB/hgFYe
-        aFRbMxZT48/XfjwAIrDoJpEx4Zvbh0Rw4rQX4fEtCl61WeKWIIkfGYstGSROTEko7SsPUwpfxGV
-        /qMfFfucRKQ05sBIhtmUTz6MshBjfi3OQYSv9XARf
-X-Received: by 2002:a17:90a:264a:: with SMTP id l68mr1039492pje.74.1569872417341;
-        Mon, 30 Sep 2019 12:40:17 -0700 (PDT)
-X-Google-Smtp-Source: APXvYqwZ8h4rNs89cKWhr/JmybSS+4c+v6Mw1oFylzJu67DnGjq96+R4Zln+w1cF96kir99q9ot53A==
-X-Received: by 2002:a17:90a:264a:: with SMTP id l68mr1039458pje.74.1569872416994;
-        Mon, 30 Sep 2019 12:40:16 -0700 (PDT)
-Received: from [192.168.1.75] (201-0-39-188.dsl.telesp.net.br. [201.0.39.188])
-        by smtp.gmail.com with ESMTPSA id o60sm373324pje.21.2019.09.30.12.40.10
-        (version=TLS1_2 cipher=ECDHE-RSA-AES128-GCM-SHA256 bits=128/128);
-        Mon, 30 Sep 2019 12:40:15 -0700 (PDT)
-Subject: Re: [PATCH v4 2/2] mdadm: Introduce new array state 'broken' for
- raid0/linear
-To:     Jes Sorensen <jes.sorensen@gmail.com>, linux-raid@vger.kernel.org
-Cc:     dm-devel@redhat.com, linux-block@vger.kernel.org,
-        jay.vosburgh@canonical.com, liu.song.a23@gmail.com,
-        nfbrown@suse.com, NeilBrown <neilb@suse.de>,
-        Song Liu <songliubraving@fb.com>
-References: <20190903194901.13524-1-gpiccoli@canonical.com>
- <20190903194901.13524-2-gpiccoli@canonical.com>
- <608284db-7b82-6545-74bf-7a9f1d578c2f@gmail.com>
-From:   "Guilherme G. Piccoli" <gpiccoli@canonical.com>
-Openpgp: preference=signencrypt
-Autocrypt: addr=gpiccoli@canonical.com; prefer-encrypt=mutual; keydata=
- mQENBFpVBxcBCADPNKmu2iNKLepiv8+Ssx7+fVR8lrL7cvakMNFPXsXk+f0Bgq9NazNKWJIn
- Qxpa1iEWTZcLS8ikjatHMECJJqWlt2YcjU5MGbH1mZh+bT3RxrJRhxONz5e5YILyNp7jX+Vh
- 30rhj3J0vdrlIhPS8/bAt5tvTb3ceWEic9mWZMsosPavsKVcLIO6iZFlzXVu2WJ9cov8eQM/
- irIgzvmFEcRyiQ4K+XUhuA0ccGwgvoJv4/GWVPJFHfMX9+dat0Ev8HQEbN/mko/bUS4Wprdv
- 7HR5tP9efSLucnsVzay0O6niZ61e5c97oUa9bdqHyApkCnGgKCpg7OZqLMM9Y3EcdMIJABEB
- AAG0LUd1aWxoZXJtZSBHLiBQaWNjb2xpIDxncGljY29saUBjYW5vbmljYWwuY29tPokBNwQT
- AQgAIQUCWmClvQIbAwULCQgHAgYVCAkKCwIEFgIDAQIeAQIXgAAKCRDOR5EF9K/7Gza3B/9d
- 5yczvEwvlh6ksYq+juyuElLvNwMFuyMPsvMfP38UslU8S3lf+ETukN1S8XVdeq9yscwtsRW/
- 4YoUwHinJGRovqy8gFlm3SAtjfdqysgJqUJwBmOtcsHkmvFXJmPPGVoH9rMCUr9s6VDPox8f
- q2W5M7XE9YpsfchS/0fMn+DenhQpV3W6pbLtuDvH/81GKrhxO8whSEkByZbbc+mqRhUSTdN3
- iMpRL0sULKPVYbVMbQEAnfJJ1LDkPqlTikAgt3peP7AaSpGs1e3pFzSEEW1VD2jIUmmDku0D
- LmTHRl4t9KpbU/H2/OPZkrm7809QovJGRAxjLLPcYOAP7DUeltveuQENBFpVBxcBCADbxD6J
- aNw/KgiSsbx5Sv8nNqO1ObTjhDR1wJw+02Bar9DGuFvx5/qs3ArSZkl8qX0X9Vhptk8rYnkn
- pfcrtPBYLoux8zmrGPA5vRgK2ItvSc0WN31YR/6nqnMfeC4CumFa/yLl26uzHJa5RYYQ47jg
- kZPehpc7IqEQ5IKy6cCKjgAkuvM1rDP1kWQ9noVhTUFr2SYVTT/WBHqUWorjhu57/OREo+Tl
- nxI1KrnmW0DbF52tYoHLt85dK10HQrV35OEFXuz0QPSNrYJT0CZHpUprkUxrupDgkM+2F5LI
- bIcaIQ4uDMWRyHpDbczQtmTke0x41AeIND3GUc+PQ4hWGp9XABEBAAGJAR8EGAEIAAkFAlpV
- BxcCGwwACgkQzkeRBfSv+xv1wwgAj39/45O3eHN5pK0XMyiRF4ihH9p1+8JVfBoSQw7AJ6oU
- 1Hoa+sZnlag/l2GTjC8dfEGNoZd3aRxqfkTrpu2TcfT6jIAsxGjnu+fUCoRNZzmjvRziw3T8
- egSPz+GbNXrTXB8g/nc9mqHPPprOiVHDSK8aGoBqkQAPZDjUtRwVx112wtaQwArT2+bDbb/Y
- Yh6gTrYoRYHo6FuQl5YsHop/fmTahpTx11IMjuh6IJQ+lvdpdfYJ6hmAZ9kiVszDF6pGFVkY
- kHWtnE2Aa5qkxnA2HoFpqFifNWn5TyvJFpyqwVhVI8XYtXyVHub/WbXLWQwSJA4OHmqU8gDl
- X18zwLgdiQ==
-Message-ID: <a7796eb4-f28f-9360-2ad2-a76d472c2e4c@canonical.com>
-Date:   Mon, 30 Sep 2019 16:40:05 -0300
-User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:60.0) Gecko/20100101
- Thunderbird/60.8.0
+        Mon, 30 Sep 2019 16:47:55 -0400
+Received: from threadripper.lan ([149.172.19.189]) by mrelayeu.kundenserver.de
+ (mreue010 [212.227.15.129]) with ESMTPA (Nemesis) id
+ 1MBUZr-1iQpiz3595-00D3fn; Mon, 30 Sep 2019 22:21:02 +0200
+From:   Arnd Bergmann <arnd@arndb.de>
+To:     Jens Axboe <axboe@kernel.dk>
+Cc:     y2038@lists.linaro.org, linux-api@vger.kernel.org,
+        Arnd Bergmann <arnd@arndb.de>,
+        Alexander Viro <viro@zeniv.linux.org.uk>,
+        =?UTF-8?q?Stefan=20B=C3=BChler?= <source@stbuehler.de>,
+        Hannes Reinecke <hare@suse.com>,
+        Jackie Liu <liuyun01@kylinos.cn>,
+        Andrew Morton <akpm@linux-foundation.org>,
+        Hristo Venev <hristo@venev.name>, linux-block@vger.kernel.org,
+        linux-fsdevel@vger.kernel.org, linux-kernel@vger.kernel.org
+Subject: [PATCH] io_uring: use __kernel_timespec in timeout ABI
+Date:   Mon, 30 Sep 2019 22:20:39 +0200
+Message-Id: <20190930202055.1748710-1-arnd@arndb.de>
+X-Mailer: git-send-email 2.20.0
 MIME-Version: 1.0
-In-Reply-To: <608284db-7b82-6545-74bf-7a9f1d578c2f@gmail.com>
-Content-Type: text/plain; charset=utf-8
-Content-Language: en-US
 Content-Transfer-Encoding: 8bit
+X-Provags-ID: V03:K1:mlQX66YyJ89UsdNDcTaUDMkvDllD+MCdC0jwrPAhCDuUuJh0vOk
+ zZ1jwySfQ09oEHruJb93xi023HsV+efktaoKqvpmHhP68Y4byhgRSjNpgjGQ3pvTTAS7rFA
+ 09K8xy6PviTkfJyCKQI2+MF+0GZfaZPB8iiYdBkkw2ex2b4niBs+M6FIX3/0Hs4nPJ2Ci+M
+ QEWGo3Z0tATHhXTDBD6Rg==
+X-UI-Out-Filterresults: notjunk:1;V03:K0:NV7gpjrMSJA=:okYpni+B9mopWZLlHONDJp
+ xR8Uqy/ksQ9sz7P/lCZkqV1RHmQLWxi3Zcs9hP7G23NVdti21bzURdIU8KTe8KorJ2ZE52kzA
+ JUY4ayZuWOuSN7SGagfzyLt2BJzmrmf/061UoiEHcSTXXZc8d3jsNnx1elf6C7BBJ6ufxKa+7
+ NGYghSmO7UImkraFvg4CGdj8OK+Gh+82IZhA60bkWtkwNjFgdEJHbvFGGH7JLYUFth9c7+sxx
+ vIb7BtF+63ZinJM6CA02I1FB/BAWQ8cLxI/F6iF5Un4JPbU5306X8Xb0OyVAkRdW52z2jUwsV
+ FoqciNCWCdpZgxclQ4RczL+bc0/UkJxzU0kXQX9stuMQvMoSnDVLPGoismnyM5ukkA2dqPgCK
+ j0fk85HX4KT1XeREo9XqHJrPPPE5XsIlETM58guXXs7H6MOmJFepI4ouGc/CeCybxqQSJeo0r
+ iHrmwdqsvXNCSoyfRKxU+MTNY0P7xASYwJVNF2XRlcQ/BV9dgDjzZs+DRVwcBFwnwuHyIwO3P
+ bP46smitC23t94UHyI7EehWvWuzx6mwwhySFEkX5onBqTcveJ2NyIkgpeTzQ8u4qHu6SSuSES
+ pxQLbTHA+RgF2m6mB5C0EFqCvAmtdF3qlwudBVIABDFAKnSQZ/N2Di0ufu2/aH2RffXW2Yhc2
+ BeYzdWjHiLQ9BoEPmet/gFeqOPy9L2R0OxZ5ZSD7ICczYGaCZ60Emlm9iZXebCTZVUVwJgHgD
+ kpv9hy/fIGz4pByWEspBJQPhyg+6nRjSCy5lUcp7S1hv2DD5M/1vUHnwY9HPN+PvKEbQM7cnX
+ SXzxqb7MJoSDoOzR0TSTBVMQTcIwZJDTdVt8NzikvdQiyqkcIuxI0UytpsnLgVY1yM/GzlS1B
+ s6w+hxhaCHK4Aws2hZrA==
 Sender: linux-block-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-On 30/09/2019 16:36, Jes Sorensen wrote:
-> [...]
-> Applied thanks!
-> 
-> I fixed up one minor nit rather than having to do the merry-go-round by
-> email one more time:
-> 
->> diff --git a/Monitor.c b/Monitor.c
->> index 036103f..cf0610b 100644
->> --- a/Monitor.c
->> +++ b/Monitor.c
-> [snip]
-> 
->> @@ -1116,7 +1119,8 @@ int WaitClean(char *dev, int verbose)
->>               rv = read(state_fd, buf, sizeof(buf));
->>               if (rv < 0)
->>                   break;
->> -            if (sysfs_match_word(buf, clean_states) <= 4)
->> +            if (sysfs_match_word(buf, clean_states)
->> +                < (int)ARRAY_SIZE(clean_states)-1)
-> 
-> I moved the < up to the correct line where it belongs, and added spaces
-> ") - 1)"
-> 
-> Cheers,
-> Jes
+All system calls use struct __kernel_timespec instead of the old struct
+timespec, but this one was just added with the old-style ABI. Change it
+now to enforce the use of __kernel_timespec, avoiding ABI confusion and
+the need for compat handlers on 32-bit architectures.
 
+Any user space caller will have to use __kernel_timespec now, but this
+is unambiguous and works for any C library regardless of the time_t
+definition. A nicer way to specify the timeout would have been a less
+ambiguous 64-bit nanosecond value, but I suppose it's too late now to
+change that as this would impact both 32-bit and 64-bit users.
 
-Thanks a lot Jes, much appreciated!
-Cheers,
+Fixes: 5262f567987d ("io_uring: IORING_OP_TIMEOUT support")
+Signed-off-by: Arnd Bergmann <arnd@arndb.de>
+---
+ fs/io_uring.c | 8 ++++----
+ 1 file changed, 4 insertions(+), 4 deletions(-)
 
+diff --git a/fs/io_uring.c b/fs/io_uring.c
+index aa8ac557493c..8a0381f1a43b 100644
+--- a/fs/io_uring.c
++++ b/fs/io_uring.c
+@@ -1892,15 +1892,15 @@ static int io_timeout(struct io_kiocb *req, const struct io_uring_sqe *sqe)
+ 	unsigned count, req_dist, tail_index;
+ 	struct io_ring_ctx *ctx = req->ctx;
+ 	struct list_head *entry;
+-	struct timespec ts;
++	struct timespec64 ts;
+ 
+ 	if (unlikely(ctx->flags & IORING_SETUP_IOPOLL))
+ 		return -EINVAL;
+ 	if (sqe->flags || sqe->ioprio || sqe->buf_index || sqe->timeout_flags ||
+ 	    sqe->len != 1)
+ 		return -EINVAL;
+-	if (copy_from_user(&ts, (void __user *) (unsigned long) sqe->addr,
+-	    sizeof(ts)))
++
++	if (get_timespec64(&ts, u64_to_user_ptr(sqe->addr)))
+ 		return -EFAULT;
+ 
+ 	/*
+@@ -1934,7 +1934,7 @@ static int io_timeout(struct io_kiocb *req, const struct io_uring_sqe *sqe)
+ 
+ 	hrtimer_init(&req->timeout.timer, CLOCK_MONOTONIC, HRTIMER_MODE_REL);
+ 	req->timeout.timer.function = io_timeout_fn;
+-	hrtimer_start(&req->timeout.timer, timespec_to_ktime(ts),
++	hrtimer_start(&req->timeout.timer, timespec64_to_ktime(ts),
+ 			HRTIMER_MODE_REL);
+ 	return 0;
+ }
+-- 
+2.20.0
 
-Guilherme
