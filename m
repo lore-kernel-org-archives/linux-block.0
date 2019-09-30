@@ -2,65 +2,70 @@ Return-Path: <SRS0=9W5b=XZ=vger.kernel.org=linux-block-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-8.6 required=3.0 tests=DKIM_SIGNED,DKIM_VALID,
+X-Spam-Status: No, score=-2.6 required=3.0 tests=DKIM_SIGNED,DKIM_VALID,
 	DKIM_VALID_AU,FREEMAIL_FORGED_FROMDOMAIN,FREEMAIL_FROM,
-	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,
-	SPF_HELO_NONE,SPF_PASS,USER_AGENT_SANE_1 autolearn=ham autolearn_force=no
-	version=3.4.0
+	HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,
+	USER_AGENT_SANE_1 autolearn=no autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 35456C32792
-	for <linux-block@archiver.kernel.org>; Mon, 30 Sep 2019 20:39:05 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 3B171C32792
+	for <linux-block@archiver.kernel.org>; Mon, 30 Sep 2019 20:39:42 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.kernel.org (Postfix) with ESMTP id EF59E22508
-	for <linux-block@archiver.kernel.org>; Mon, 30 Sep 2019 20:39:04 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id F274022508
+	for <linux-block@archiver.kernel.org>; Mon, 30 Sep 2019 20:39:41 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="sMUNKTom"
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="p5vr7sen"
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1730500AbfI3UjE (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Mon, 30 Sep 2019 16:39:04 -0400
-Received: from mail-wm1-f68.google.com ([209.85.128.68]:36194 "EHLO
-        mail-wm1-f68.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1729636AbfI3UjE (ORCPT
+        id S1732073AbfI3Uje (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Mon, 30 Sep 2019 16:39:34 -0400
+Received: from mail-wm1-f67.google.com ([209.85.128.67]:53257 "EHLO
+        mail-wm1-f67.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S1730539AbfI3Ujd (ORCPT
         <rfc822;linux-block@vger.kernel.org>);
-        Mon, 30 Sep 2019 16:39:04 -0400
-Received: by mail-wm1-f68.google.com with SMTP id m18so870558wmc.1;
-        Mon, 30 Sep 2019 13:39:01 -0700 (PDT)
+        Mon, 30 Sep 2019 16:39:33 -0400
+Received: by mail-wm1-f67.google.com with SMTP id i16so885929wmd.3;
+        Mon, 30 Sep 2019 13:39:31 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=gmail.com; s=20161025;
-        h=to:cc:references:from:autocrypt:subject:message-id:date:user-agent
+        h=subject:to:references:from:autocrypt:message-id:date:user-agent
          :mime-version:in-reply-to;
-        bh=aN7jZe7vdOWwmhl3JCTc+HLLeWrJF5XQXdUEeYV5ogM=;
-        b=sMUNKTomr8shA/5arBH/Ksp45GwqlsYYackOPmuV1awfsAt5tYrhpXcxkrx+TQAl0f
-         7enNh6Aq62WmC7Rd4CcXKhYyxjhZYbeALKnKRmkaPBT4CWolRKhRY4e5hemNsdfGP2Ry
-         kqkLAGWgSlOZ/wWyojWck0O7SoZrg1YVoXG2U60B6hSObRsyN+7/3UTowsdhkFoyk9b0
-         DpvRXNFxCLNRLjba7F9+hCDupmzhX8Z+XGp8AKOP70gcT8nBVm+4oNl5m1ud08E4EV8n
-         /P3Pp4mIHm6q3ZGrSWG+HwRSL+y6famrCLaikjneZ04qMF+i7B7MANb1QB1GbyphalfK
-         r7iA==
+        bh=LhVmXhOVEHC9tT9BG7DdK/Rr0Wh9e9NBgmSaanxTpvE=;
+        b=p5vr7senV050syAyRBDkWc+t7zjYBeGe/57nEwrQXjWpJtHsPmCFwEqp4fERG+XyXv
+         A9LGuIUJJlMzqu34IeqE8W8mc6K05XggT7mQZKt3TV5/pGTIzFbn2WBH/RCG8NtA+ARw
+         QeB44KOwq164R7Xe8OE7ZBi2Y3ECYJTkl4oVXXmottrMW04CggTzZ2nRa8pauiRn4yyl
+         nlCeMgBUNa3PmX60SnmuFKSEW4SMVpwclkLtG4xMr7DShpYMu0CDNR5vyfY5atZ+OGyD
+         Wg6Qbp5W/z+IHZxdm5b1OINFZ8FtHzrHcYtKw3ldq9kX7BdytzGnomyw3sf8yKY5+6nc
+         cBHQ==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=1e100.net; s=20161025;
-        h=x-gm-message-state:to:cc:references:from:autocrypt:subject
-         :message-id:date:user-agent:mime-version:in-reply-to;
-        bh=aN7jZe7vdOWwmhl3JCTc+HLLeWrJF5XQXdUEeYV5ogM=;
-        b=srLZsoS4CpHcfuU+xZfjwdUEOAqJsELZdgWKxwuwSSt5nfmu3tqAy2RtJgkksf+rX0
-         WxbQXCzh/XwuqMIhm7hTunWAefP/ah3Yd2qWgy6IJ79kCYYOKFDEz7SaL9kWIZm5SHLj
-         PqwN9W1SGyBnckhRSlTRSXo35h2AXdd1XqH/AU0bmGnY19gp7GjMrJS+fH7IMV/eZXO6
-         eJv5EGK0Vy6r+txRT2Z/kAFb4xdu+cKFiwVT5KCRnrbtWQFLmsNqpyU/vUZgCfgYboFd
-         FPcgzrol8Wr1Il88QgZWaWmOveXbrVmAinKx0nwcjhVcsW/RAEhswU2J9U+zS51+CGyW
-         NEzQ==
-X-Gm-Message-State: APjAAAXrGkaWzQSJR520Uwq/jx45tL7koEJCHBIJ9mRV/u4sx4TQUVqp
-        OxbC6iqgGJ0mvNRhduOGX/89uL2MFFU=
-X-Google-Smtp-Source: APXvYqyRWdUE0PPEgBVJFNhk59Na8z/sk7UHGtVvSg+ky6v+IO2ChMibvzXVgOxFk5bMxrTnkzM+mg==
-X-Received: by 2002:a1c:a6ca:: with SMTP id p193mr598686wme.103.1569872723928;
-        Mon, 30 Sep 2019 12:45:23 -0700 (PDT)
+        h=x-gm-message-state:subject:to:references:from:autocrypt:message-id
+         :date:user-agent:mime-version:in-reply-to;
+        bh=LhVmXhOVEHC9tT9BG7DdK/Rr0Wh9e9NBgmSaanxTpvE=;
+        b=CnNow0gB/paNztA1YeTUaa2lII2SONiQdiM7Knto6AiBe6bqyowFUBWBjqWtHro4Kj
+         Y7mTQXZ1nFO8/UmUFAPdajtCt16YtfcYrAD4T6KSdLvQqhf0gawRWG3KYHlR0dAcQ0cQ
+         FKL2XigJrbyWsKtoZcSFlXg0tMgDkMaqdO5iTl+HGaQu10sF9mTLh2697f335z1tmthN
+         OgeMumBM9mCMgyDstbFsHLn2vUzk9B52hNEDVLg3ChgLFAEbMOSFlPmWLJYkzPrqcoTp
+         flWc+MpCPDFNj9qrccfuFXPTqQk5UVDUDS9wl8TccvK+S42jBd6N6vJUvLWyWzrqRLcd
+         noTA==
+X-Gm-Message-State: APjAAAW3Y3HuoFhrEI4zl4iw2ew0E6y1MOKP+kN3vW8QtB62lzQDLm5J
+        O8IpWAoYXSletdyluID/Xl0i2NLo/pA=
+X-Google-Smtp-Source: APXvYqyV9Gqn+dR8/XONeLzXgsqH+eQ5ZHxrJFjFQOSPl8qzI3JBlRQjBBDk8Z4otsAN32dzi2N4Xg==
+X-Received: by 2002:a7b:cb91:: with SMTP id m17mr661542wmi.151.1569874355332;
+        Mon, 30 Sep 2019 13:12:35 -0700 (PDT)
 Received: from [192.168.43.187] ([109.126.142.9])
-        by smtp.gmail.com with ESMTPSA id d9sm16611885wrf.62.2019.09.30.12.45.22
+        by smtp.gmail.com with ESMTPSA id t6sm1054080wmf.8.2019.09.30.13.12.33
         (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
-        Mon, 30 Sep 2019 12:45:23 -0700 (PDT)
-To:     Christoph Hellwig <hch@infradead.org>
-Cc:     Jens Axboe <axboe@kernel.dk>, linux-block@vger.kernel.org,
-        linux-kernel@vger.kernel.org
+        Mon, 30 Sep 2019 13:12:34 -0700 (PDT)
+Subject: Re: [PATCH v2 1/1] blk-mq: Inline request status checkers
+To:     Bart Van Assche <bvanassche@acm.org>, Jens Axboe <axboe@kernel.dk>,
+        Josef Bacik <josef@toxicpanda.com>,
+        Keith Busch <kbusch@kernel.org>,
+        Christoph Hellwig <hch@lst.de>,
+        Sagi Grimberg <sagi@grimberg.me>, linux-block@vger.kernel.org,
+        linux-kernel@vger.kernel.org, nbd@other.debian.org,
+        linux-nvme@lists.infradead.org
 References: <1cd320dad54bd78cb6721f7fe8dd2e197b9fbfa2.1569830796.git.asml.silence@gmail.com>
- <20190930083551.GB24152@infradead.org>
+ <e6fc239412811140c83de906b75689530661f65d.1569872122.git.asml.silence@gmail.com>
+ <e4d452ad-da24-a1a9-7e2d-f9cd5d0733da@acm.org>
 From:   Pavel Begunkov <asml.silence@gmail.com>
 Autocrypt: addr=asml.silence@gmail.com; prefer-encrypt=mutual; keydata=
  mQINBFmKBOQBEAC76ZFxLAKpDw0bKQ8CEiYJRGn8MHTUhURL02/7n1t0HkKQx2K1fCXClbps
@@ -105,82 +110,72 @@ Autocrypt: addr=asml.silence@gmail.com; prefer-encrypt=mutual; keydata=
  UVMKkOCdFhutRmYp0mbv2e87IK4erwNHQRkHUkzbsuym8RVpAZbLzLPIYK/J3RTErL6Z99N2
  m3J6pjwSJY/zNwuFPs9zGEnRO4g0BUbwGdbuvDzaq6/3OJLKohr5eLXNU3JkT+3HezydWm3W
  OPhauth7W0db74Qd49HXK0xe/aPrK+Cp+kU1HRactyNtF8jZQbhMCC8vMGukZtWaAwpjWiiH bA==
-Subject: Re: [PATCH 1/1] blk-mq: Inline status checkers
-Message-ID: <16187bf2-b3ff-651c-ddb3-24e38c78dcf0@gmail.com>
-Date:   Mon, 30 Sep 2019 22:45:20 +0300
+Message-ID: <6da099e2-7e29-3c7b-7682-df86835e9e8c@gmail.com>
+Date:   Mon, 30 Sep 2019 23:12:31 +0300
 User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:68.0) Gecko/20100101
  Thunderbird/68.1.0
 MIME-Version: 1.0
-In-Reply-To: <20190930083551.GB24152@infradead.org>
+In-Reply-To: <e4d452ad-da24-a1a9-7e2d-f9cd5d0733da@acm.org>
 Content-Type: multipart/signed; micalg=pgp-sha256;
  protocol="application/pgp-signature";
- boundary="zku54IseC1yd4rl5154z91LeZWSKyMPCU"
+ boundary="giH3IsFqshXvGfS4YzqoHs9szK5RNcxbS"
 Sender: linux-block-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
 This is an OpenPGP/MIME signed message (RFC 4880 and 3156)
---zku54IseC1yd4rl5154z91LeZWSKyMPCU
-Content-Type: multipart/mixed; boundary="yazEqJC8wYDXiMEzqE5RCr1CFTGzz2QZS";
+--giH3IsFqshXvGfS4YzqoHs9szK5RNcxbS
+Content-Type: multipart/mixed; boundary="yFWnF8paxgog3cX5J4qDqtERPn2AkJH9U";
  protected-headers="v1"
 From: Pavel Begunkov <asml.silence@gmail.com>
-To: Christoph Hellwig <hch@infradead.org>
-Cc: Jens Axboe <axboe@kernel.dk>, linux-block@vger.kernel.org,
- linux-kernel@vger.kernel.org
-Message-ID: <16187bf2-b3ff-651c-ddb3-24e38c78dcf0@gmail.com>
-Subject: Re: [PATCH 1/1] blk-mq: Inline status checkers
+To: Bart Van Assche <bvanassche@acm.org>, Jens Axboe <axboe@kernel.dk>,
+ Josef Bacik <josef@toxicpanda.com>, Keith Busch <kbusch@kernel.org>,
+ Christoph Hellwig <hch@lst.de>, Sagi Grimberg <sagi@grimberg.me>,
+ linux-block@vger.kernel.org, linux-kernel@vger.kernel.org,
+ nbd@other.debian.org, linux-nvme@lists.infradead.org
+Message-ID: <6da099e2-7e29-3c7b-7682-df86835e9e8c@gmail.com>
+Subject: Re: [PATCH v2 1/1] blk-mq: Inline request status checkers
 References: <1cd320dad54bd78cb6721f7fe8dd2e197b9fbfa2.1569830796.git.asml.silence@gmail.com>
- <20190930083551.GB24152@infradead.org>
-In-Reply-To: <20190930083551.GB24152@infradead.org>
+ <e6fc239412811140c83de906b75689530661f65d.1569872122.git.asml.silence@gmail.com>
+ <e4d452ad-da24-a1a9-7e2d-f9cd5d0733da@acm.org>
+In-Reply-To: <e4d452ad-da24-a1a9-7e2d-f9cd5d0733da@acm.org>
 
---yazEqJC8wYDXiMEzqE5RCr1CFTGzz2QZS
+--yFWnF8paxgog3cX5J4qDqtERPn2AkJH9U
 Content-Type: text/plain; charset=utf-8
 Content-Language: en-US
 Content-Transfer-Encoding: quoted-printable
 
-On 30/09/2019 11:35, Christoph Hellwig wrote:
-> On Mon, Sep 30, 2019 at 11:25:49AM +0300, Pavel Begunkov (Silence) wrot=
-e:
->> From: Pavel Begunkov <asml.silence@gmail.com>
->>
->> blk_mq_request_completed() and blk_mq_request_started() are
->> short, inline it.
->>
->> Signed-off-by: Pavel Begunkov <asml.silence@gmail.com>
->> ---
->>  block/blk-mq.c         | 12 ------------
->>  block/blk-mq.h         |  9 ---------
->>  include/linux/blk-mq.h | 20 ++++++++++++++++++--
->>  3 files changed, 18 insertions(+), 23 deletions(-)
->>
->> diff --git a/block/blk-mq.c b/block/blk-mq.c
->> index 279b138a9e50..d97181d9a3ec 100644
->> --- a/block/blk-mq.c
->> +++ b/block/blk-mq.c
->> @@ -647,18 +647,6 @@ bool blk_mq_complete_request(struct request *rq)
->>  }
->>  EXPORT_SYMBOL(blk_mq_complete_request);
+On 30/09/2019 22:53, Bart Van Assche wrote:
+> On 9/30/19 12:43 PM, Pavel Begunkov (Silence) wrote:
+>> @@ -282,7 +282,7 @@ static bool bt_tags_iter(struct sbitmap *bitmap, u=
+nsigned int bitnr, void *data)
+>>  	 * test and set the bit before assining ->rqs[].
+>>  	 */
+>>  	rq =3D tags->rqs[bitnr];
+>> -	if (rq && blk_mq_request_started(rq))
+>> +	if (rq && blk_mq_rq_state(rq) !=3D MQ_RQ_IDLE)
+>>  		return iter_data->fn(rq, iter_data->data, reserved);
 >> =20
->> -int blk_mq_request_started(struct request *rq)
->> -{
->> -	return blk_mq_rq_state(rq) !=3D MQ_RQ_IDLE;
->> -}
->> -EXPORT_SYMBOL_GPL(blk_mq_request_started);
->> -
->> -int blk_mq_request_completed(struct request *rq)
->> -{
->> -	return blk_mq_rq_state(rq) =3D=3D MQ_RQ_COMPLETE;
->> -}
->> -EXPORT_SYMBOL_GPL(blk_mq_request_completed);
+>>  	return true>
+>> @@ -360,7 +360,7 @@ static bool blk_mq_tagset_count_completed_rqs(stru=
+ct request *rq,
+>>  {
+>>  	unsigned *count =3D data;
+>> =20
+>> -	if (blk_mq_request_completed(rq))
+>> +	if (blk_mq_rq_state(rq) =3D=3D MQ_RQ_COMPLETE)
+>>  		(*count)++;
+>>  	return true;
+>>  }
 >=20
-> How about just killing these helpers instead?
->=20
-I'm not sure that this is better. That's more intrusive and
-blk_mq_request_started() looks clearer than
-(blk_mq_rq_state(rq) !=3D MQ_RQ_IDLE).
+> Changes like the above significantly reduce readability of the code in
+> the block layer core. I don't like this. I think this patch is a step
+> backwards instead of a step forwards.
 
-Anyway, I've sent v2 and fine with both.
+Yep, looks too bulky.
+
+Jens, could you consider the first version?
 
 
 --=20
@@ -188,28 +183,28 @@ Yours sincerely,
 Pavel Begunkov
 
 
---yazEqJC8wYDXiMEzqE5RCr1CFTGzz2QZS--
+--yFWnF8paxgog3cX5J4qDqtERPn2AkJH9U--
 
---zku54IseC1yd4rl5154z91LeZWSKyMPCU
+--giH3IsFqshXvGfS4YzqoHs9szK5RNcxbS
 Content-Type: application/pgp-signature; name="signature.asc"
 Content-Description: OpenPGP digital signature
 Content-Disposition: attachment; filename="signature.asc"
 
 -----BEGIN PGP SIGNATURE-----
 
-iQIzBAEBCAAdFiEE+6JuPTjTbx479o3OWt5b1Glr+6UFAl2SW1UACgkQWt5b1Glr
-+6WWahAAop/MNFxScnFlkhWLrjN9LkLpexj8NwAtrPaFflOo3k1Ldz3z1UFlkSPd
-EZTcczq5SpdHJGsGoI47aSvEH8CzSU/nn9e3RAaRCoyV4CeEVk/KYJq4vqNYSeV1
-VRrBCyw0tc+Rm7vyWWFm2wX5vZaXRiPGTIPgwRLFmpMcqoEG8DphVBCVpzdDKRAI
-LI/rnt9ela0IXvUG1DlHnNtW3N9j2eMtpJHJFM9tDbKdUnuJRPrmEvH8MsjgDav9
-iLvYoUVJWQIbcRkgTnEQuptcKDhR/NY4cR4DN3UsdsB1sPm6wRn2uDfUeg5ixUZT
-oOU3YUa70adCXQ6TjUQIHaLniPFF4m2hODhtIxgY8SoQ0/sQvfcGleplXcRWqqlF
-KckUiVPnJMOLz0swgkYtf0mKqouU4MEPuL8lGx0pSwlvm05q5qsReDdnvQRyE//H
-Bua3APWQCVPTCE22lnWz3mPGEWdXQm7qc9wwRHb3jd9xl2wT6Zs8FofIOY/6txeA
-J6KcPhE7ooXuirzu6qYztnVzlKP4mr/IO9r0ib6Pc+9cL0Yggt46UsEwgLtkiVil
-j10ENgwaVQI3CzMLy3EVnHxHq7cK4/8kGfGcp0OSjtz4XdFQHTA2P/f9C50xobK9
-60b+l+Fa/z2XSxzShLu1GD3zIzreVKLqrFT7AZF1xiM7P7oJoAQ=
-=fkMW
+iQIzBAEBCAAdFiEE+6JuPTjTbx479o3OWt5b1Glr+6UFAl2SYbMACgkQWt5b1Glr
++6WvUQ//dfXUMpW57TrpOqbEeQnQQeSCHCtExjGOorPamQfnaIYf6T4v8sfs09lZ
+63atGXZQNSTQ+nFLeMDz9CxpWov6ZD8mknAa/JJ5U2gG5yHoePZ4+0SoEXV0t90D
+egyaNUbMH4jl1uOWESpdiDdLSpHBimUpyfHzxaLCYFTW2/h/Xmymwdi87NSChTZt
+PXuwPjXWY/EzR4HN1nxIy9AmRtgJwjvRhAyQyzafsGuOP+s0GAP7Q2GdCukWqo4N
+yAT3jHjrZUrQNab3uqealhlpzMgw5wlm00IccWxOqulbYoCVIJXh4oPOZr28h8Nq
+d+T9MyWION4ym2L2c0NvmLYKuxODOZvLwp/nbvX0hjrDhJ1DZjv2WE4kTIhcxDse
+sRmU9AeMjSnm4X+SCZNaQi5j3D5sICStJquGPoPi0eGSMClDgmU6vOPZQTLDi1M4
+MF+hgXCC1QeJbIsvUkoKdN1aBSkP4cGAqD593K5rXCz0+Mm+EmvRF+euEOi5ZaBn
+VdcMYqCWcbCkr/2J/RJ6blxPAHTO+VDpmLLmW1G91KcP5wmTGPj/Lf99LvuBJ1hs
+xTK6AZZ0T+gY4rdVHCKuiqmcXWoicH7Xk+hbWa65TVPCswH4xGqQ92xj1EMFke4C
+Drn3/CSkF65+dpGxBqJbw+PzST0BPGS7wweb9rUI6htVDklOJN4=
+=BwjS
 -----END PGP SIGNATURE-----
 
---zku54IseC1yd4rl5154z91LeZWSKyMPCU--
+--giH3IsFqshXvGfS4YzqoHs9szK5RNcxbS--
