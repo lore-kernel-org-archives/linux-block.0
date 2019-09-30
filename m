@@ -2,161 +2,99 @@ Return-Path: <SRS0=9W5b=XZ=vger.kernel.org=linux-block-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-5.5 required=3.0 tests=DKIM_SIGNED,DKIM_VALID,
-	HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,
-	SPF_PASS,USER_AGENT_SANE_1 autolearn=unavailable autolearn_force=no
-	version=3.4.0
+X-Spam-Status: No, score=-2.3 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
+	HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,
+	USER_AGENT_SANE_1 autolearn=no autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 757C9C4360C
-	for <linux-block@archiver.kernel.org>; Mon, 30 Sep 2019 09:32:42 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id B781FC32792
+	for <linux-block@archiver.kernel.org>; Mon, 30 Sep 2019 13:32:09 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.kernel.org (Postfix) with ESMTP id 4240C21A4A
-	for <linux-block@archiver.kernel.org>; Mon, 30 Sep 2019 09:32:42 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id 88A7B21855
+	for <linux-block@archiver.kernel.org>; Mon, 30 Sep 2019 13:32:09 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=pass (2048-bit key) header.d=shutemov-name.20150623.gappssmtp.com header.i=@shutemov-name.20150623.gappssmtp.com header.b="x91S8slw"
+	dkim=fail reason="signature verification failed" (2048-bit key) header.d=infradead.org header.i=@infradead.org header.b="GTsAp7UQ"
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1730424AbfI3Jch (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Mon, 30 Sep 2019 05:32:37 -0400
-Received: from mail-ed1-f68.google.com ([209.85.208.68]:36225 "EHLO
-        mail-ed1-f68.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1730348AbfI3Jch (ORCPT
+        id S1730266AbfI3NcI (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Mon, 30 Sep 2019 09:32:08 -0400
+Received: from bombadil.infradead.org ([198.137.202.133]:52226 "EHLO
+        bombadil.infradead.org" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S1728214AbfI3NcI (ORCPT
         <rfc822;linux-block@vger.kernel.org>);
-        Mon, 30 Sep 2019 05:32:37 -0400
-Received: by mail-ed1-f68.google.com with SMTP id h2so7996340edn.3
-        for <linux-block@vger.kernel.org>; Mon, 30 Sep 2019 02:32:35 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=shutemov-name.20150623.gappssmtp.com; s=20150623;
-        h=date:from:to:cc:subject:message-id:references:mime-version
-         :content-disposition:in-reply-to:user-agent;
-        bh=/NIG45wRzSSQZGZMC2ZYbWOSNJZUGz087s/DaB8OSlU=;
-        b=x91S8slwG0o9H8Ulvo2sIbq8o59knZIf5NKCDlSMrONoWMIkHRJFQmayDWhMzHjPwS
-         rb3qQNPx5vp56bIvPxjd/PDq9+78jmT6MgTXCEMOpxq7+NJM4baRY5tKffN9KkztKMd9
-         L4lQcDIzDwXISgWsyiY9uZxBX10dEAh6nFoWIlqh+C5Y6u3mi8B15R+BjUT+Nfyp4FHi
-         XwTgQ8n+n+YjUL7iuMoGHMeGb5w24b37TEdprFIu6/74B4KXUn4mhbdMr5nssCpt0/58
-         wKJ3gV2suDmr/gxwUYuFakGfgmjvaEoq664xxE/Sk+ujLtQpggzHh78ZiRo754VitCUp
-         gOFw==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20161025;
-        h=x-gm-message-state:date:from:to:cc:subject:message-id:references
-         :mime-version:content-disposition:in-reply-to:user-agent;
-        bh=/NIG45wRzSSQZGZMC2ZYbWOSNJZUGz087s/DaB8OSlU=;
-        b=SuB5Adf/wR8RwuidK7sgmwiM5V9moOnFW8tzdXCWyJ3nEFtsXu58FIkCMBqgT6LHRt
-         9dvufmdkEjrimWSORxD7lX0aDk4w1dTlC6AV9MzLTah9m9I//K1ivIbf2ixxmJXxSy+m
-         c9LqynH8r1aYiy6yNCMsB4X9fZ8RtEecPXnSNWlSpQ0RK0WaHMcc1vPHUQ4hDMnLaw4Q
-         n2DXdg4gFBi7+rGh6Mf39TXKvOcadrC3MuYjt46aeRlpoZa3CfBZCjiA9M7r/ZeSZ8qS
-         GfZUzUj3mvT2Il0gLMpmejW9MjxOBAmi9Z3WWSrQUJdP9XrcDIW01S3TwNR8+qsfCTqQ
-         Atpw==
-X-Gm-Message-State: APjAAAWz2Rv3qXwipkzBrzr9M6iclNzf2WtX78vGhw6CMSsM6IjoPRu4
-        NrnFBclhn9o2ahDbnMKoin8yaA==
-X-Google-Smtp-Source: APXvYqxYESSztSbQdFehvlYRwQ7ZtyQatlQP7EBvkF43mdhJrM5sORhaK1vk4DnKcR72sGXiIkij2w==
-X-Received: by 2002:a50:886d:: with SMTP id c42mr18545157edc.24.1569835955026;
-        Mon, 30 Sep 2019 02:32:35 -0700 (PDT)
-Received: from box.localdomain ([86.57.175.117])
-        by smtp.gmail.com with ESMTPSA id bq13sm1395366ejb.25.2019.09.30.02.32.34
-        (version=TLS1_2 cipher=ECDHE-RSA-AES128-GCM-SHA256 bits=128/128);
-        Mon, 30 Sep 2019 02:32:34 -0700 (PDT)
-Received: by box.localdomain (Postfix, from userid 1000)
-        id 2E70010204E; Mon, 30 Sep 2019 12:32:33 +0300 (+03)
-Date:   Mon, 30 Sep 2019 12:32:33 +0300
-From:   "Kirill A. Shutemov" <kirill@shutemov.name>
-To:     Michal Hocko <mhocko@kernel.org>
+        Mon, 30 Sep 2019 09:32:08 -0400
+DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed;
+        d=infradead.org; s=bombadil.20170209; h=In-Reply-To:Content-Type:MIME-Version
+        :References:Message-ID:Subject:Cc:To:From:Date:Sender:Reply-To:
+        Content-Transfer-Encoding:Content-ID:Content-Description:Resent-Date:
+        Resent-From:Resent-Sender:Resent-To:Resent-Cc:Resent-Message-ID:List-Id:
+        List-Help:List-Unsubscribe:List-Subscribe:List-Post:List-Owner:List-Archive;
+         bh=jwTg4fslkkXzfCclLjZOgIaOdnKQRQ6WQVeTB5C7GPs=; b=GTsAp7UQvIcIvL7TkWfOBSdUl
+        M6EGMhlYfNT8cjQLHe/X55q53qvVOm4qHmblR+q079BsjQ5IJL6GR7NCHXZopzNuDhg6Olt9GWJZf
+        TuWtjBJdrVKCPCz5dV157Ng6PX7X3d2OWKAE5dWwmbqm+fPiwDYPLZRIsGT9W7P5WF0RA/+YKwg1V
+        ZOHTI5PeaKSpRxD64+n/Vso0SEIefZGFuhgMefh1Jc8e4GkOyMi2owWOVqPMkF1L4tFxZx/S6CMm1
+        CGRE7n3xBfoaoO/5xJs2pNSfHxGZzfESSdFdPlS3AMKKj3NdKP8XJoGmGlhxMVZVMbWyoc+BXXz04
+        KjNnO/TQQ==;
+Received: from willy by bombadil.infradead.org with local (Exim 4.92.2 #3 (Red Hat Linux))
+        id 1iEvmW-0007wp-1A; Mon, 30 Sep 2019 13:32:04 +0000
+Date:   Mon, 30 Sep 2019 06:32:03 -0700
+From:   Matthew Wilcox <willy@infradead.org>
+To:     Christopher Lameter <cl@linux.com>
 Cc:     Vlastimil Babka <vbabka@suse.cz>,
-        Andrew Morton <akpm@linux-foundation.org>, linux-mm@kvack.org,
-        linux-kernel@vger.kernel.org, Christoph Lameter <cl@linux.com>,
-        Pekka Enberg <penberg@kernel.org>,
+        Andrew Morton <akpm@linux-foundation.org>,
+        David Sterba <dsterba@suse.cz>, linux-mm@kvack.org,
+        linux-kernel@vger.kernel.org, Pekka Enberg <penberg@kernel.org>,
         David Rientjes <rientjes@google.com>,
         Ming Lei <ming.lei@redhat.com>,
         Dave Chinner <david@fromorbit.com>,
-        Matthew Wilcox <willy@infradead.org>,
         "Darrick J . Wong" <darrick.wong@oracle.com>,
         Christoph Hellwig <hch@lst.de>, linux-xfs@vger.kernel.org,
         linux-fsdevel@vger.kernel.org, linux-block@vger.kernel.org,
-        James Bottomley <James.Bottomley@HansenPartnership.com>,
+        James Bottomley <James.Bottomley@hansenpartnership.com>,
         linux-btrfs@vger.kernel.org, Roman Gushchin <guro@fb.com>,
         Johannes Weiner <hannes@cmpxchg.org>
 Subject: Re: [PATCH v2 2/2] mm, sl[aou]b: guarantee natural alignment for
  kmalloc(power-of-two)
-Message-ID: <20190930093233.jlypzgmkf4pplgso@box.shutemov.name>
+Message-ID: <20190930133203.GA26804@bombadil.infradead.org>
 References: <20190826111627.7505-1-vbabka@suse.cz>
  <20190826111627.7505-3-vbabka@suse.cz>
  <df8d1cf4-ff8f-1ee1-12fb-cfec39131b32@suse.cz>
- <20190930092334.GA25306@dhcp22.suse.cz>
+ <20190923171710.GN2751@twin.jikos.cz>
+ <alpine.DEB.2.21.1909242048020.17661@www.lameter.com>
+ <20190924165425.a79a2dafbaf37828a931df2b@linux-foundation.org>
+ <alpine.DEB.2.21.1909260005060.1508@www.lameter.com>
+ <6a28a096-0e65-c7ea-9ca9-f72d68948e10@suse.cz>
+ <alpine.DEB.2.21.1909272251190.21341@www.lameter.com>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=us-ascii
 Content-Disposition: inline
-In-Reply-To: <20190930092334.GA25306@dhcp22.suse.cz>
-User-Agent: NeoMutt/20180716
+In-Reply-To: <alpine.DEB.2.21.1909272251190.21341@www.lameter.com>
+User-Agent: Mutt/1.12.1 (2019-06-15)
 Sender: linux-block-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-On Mon, Sep 30, 2019 at 11:23:34AM +0200, Michal Hocko wrote:
-> On Mon 23-09-19 18:36:32, Vlastimil Babka wrote:
-> > On 8/26/19 1:16 PM, Vlastimil Babka wrote:
-> > > In most configurations, kmalloc() happens to return naturally aligned (i.e.
-> > > aligned to the block size itself) blocks for power of two sizes. That means
-> > > some kmalloc() users might unknowingly rely on that alignment, until stuff
-> > > breaks when the kernel is built with e.g.  CONFIG_SLUB_DEBUG or CONFIG_SLOB,
-> > > and blocks stop being aligned. Then developers have to devise workaround such
-> > > as own kmem caches with specified alignment [1], which is not always practical,
-> > > as recently evidenced in [2].
-> > > 
-> > > The topic has been discussed at LSF/MM 2019 [3]. Adding a 'kmalloc_aligned()'
-> > > variant would not help with code unknowingly relying on the implicit alignment.
-> > > For slab implementations it would either require creating more kmalloc caches,
-> > > or allocate a larger size and only give back part of it. That would be
-> > > wasteful, especially with a generic alignment parameter (in contrast with a
-> > > fixed alignment to size).
-> > > 
-> > > Ideally we should provide to mm users what they need without difficult
-> > > workarounds or own reimplementations, so let's make the kmalloc() alignment to
-> > > size explicitly guaranteed for power-of-two sizes under all configurations.
-> > > What this means for the three available allocators?
-> > > 
-> > > * SLAB object layout happens to be mostly unchanged by the patch. The
-> > >   implicitly provided alignment could be compromised with CONFIG_DEBUG_SLAB due
-> > >   to redzoning, however SLAB disables redzoning for caches with alignment
-> > >   larger than unsigned long long. Practically on at least x86 this includes
-> > >   kmalloc caches as they use cache line alignment, which is larger than that.
-> > >   Still, this patch ensures alignment on all arches and cache sizes.
-> > > 
-> > > * SLUB layout is also unchanged unless redzoning is enabled through
-> > >   CONFIG_SLUB_DEBUG and boot parameter for the particular kmalloc cache. With
-> > >   this patch, explicit alignment is guaranteed with redzoning as well. This
-> > >   will result in more memory being wasted, but that should be acceptable in a
-> > >   debugging scenario.
-> > > 
-> > > * SLOB has no implicit alignment so this patch adds it explicitly for
-> > >   kmalloc(). The potential downside is increased fragmentation. While
-> > >   pathological allocation scenarios are certainly possible, in my testing,
-> > >   after booting a x86_64 kernel+userspace with virtme, around 16MB memory
-> > >   was consumed by slab pages both before and after the patch, with difference
-> > >   in the noise.
-> > > 
-> > > [1] https://lore.kernel.org/linux-btrfs/c3157c8e8e0e7588312b40c853f65c02fe6c957a.1566399731.git.christophe.leroy@c-s.fr/
-> > > [2] https://lore.kernel.org/linux-fsdevel/20190225040904.5557-1-ming.lei@redhat.com/
-> > > [3] https://lwn.net/Articles/787740/
-> > > 
-> > > Signed-off-by: Vlastimil Babka <vbabka@suse.cz>
-> > 
-> > So if anyone thinks this is a good idea, please express it (preferably
-> > in a formal way such as Acked-by), otherwise it seems the patch will be
-> > dropped (due to a private NACK, apparently).
-> 
-> Sigh.
-> 
-> An existing code to workaround the lack of alignment guarantee just show
-> that this is necessary. And there wasn't any real technical argument
-> against except for a highly theoretical optimizations/new allocator that
-> would be tight by the guarantee.
-> 
-> Therefore
-> Acked-by: Michal Hocko <mhocko@suse.com>
+On Sat, Sep 28, 2019 at 01:12:49AM +0000, Christopher Lameter wrote:
+> However, the layout may be different due to another allocator that prefers
+> to arrange things differently (SLOB puts multiple objects of different
+> types in the same page to save memory), if we need to add data to these
+> objects (debugging info, new metadata about the object, maybe the memcg
+> pointer, maybe other things that may come up), or other innovative
+> approaches (such as putting data of different kmem caches that are
+> commonly used together in the same page to improve locality).
 
-Agreed.
+If we ever do start putting objects of different sizes that are commonly
+allocated together in the same page (eg inodes & dentries), then those
+aren't going to be random kmalloc() allocation; they're going to be
+special kmem caches that can specify "I don't care about alignment".
 
-Acked-by: Kirill A. Shutemov <kirill.shutemov@linux.intel.com>
+Also, we haven't done that.  We've had a slab allocator for twenty years,
+and nobody's tried to do that.  Maybe the co-allocation would be a net
+loss (I suspect).  Or the gain is too small for the added complexity.
+Whatever way, this is a strawman.
 
--- 
- Kirill A. Shutemov
+> The cost is an unnecessary petrification of the data layout of the memory
+> allocators.
+
+Yes, it is.  And it's a cost I'm willing to pay in order to get the
+guarantee of alignment.
+
