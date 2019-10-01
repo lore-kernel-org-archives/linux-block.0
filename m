@@ -2,94 +2,105 @@ Return-Path: <SRS0=4xm9=X2=vger.kernel.org=linux-block-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-0.8 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
-	MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS autolearn=no autolearn_force=no
-	version=3.4.0
+X-Spam-Status: No, score=-3.9 required=3.0 tests=DKIM_SIGNED,DKIM_VALID,
+	DKIM_VALID_AU,HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SPF_HELO_NONE,
+	SPF_PASS,USER_AGENT_GIT autolearn=no autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id BB95DC352AA
-	for <linux-block@archiver.kernel.org>; Tue,  1 Oct 2019 18:31:51 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id E7AF3ECE587
+	for <linux-block@archiver.kernel.org>; Tue,  1 Oct 2019 19:33:34 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.kernel.org (Postfix) with ESMTP id 9FE42215EA
-	for <linux-block@archiver.kernel.org>; Tue,  1 Oct 2019 18:31:51 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id C07AA20B7C
+	for <linux-block@archiver.kernel.org>; Tue,  1 Oct 2019 19:33:34 +0000 (UTC)
+Authentication-Results: mail.kernel.org;
+	dkim=pass (2048-bit key) header.d=linaro.org header.i=@linaro.org header.b="ZPycgWvl"
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1726105AbfJASbs (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Tue, 1 Oct 2019 14:31:48 -0400
-Received: from iolanthe.rowland.org ([192.131.102.54]:49072 "HELO
-        iolanthe.rowland.org" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with SMTP id S1725848AbfJASbr (ORCPT
-        <rfc822;linux-block@vger.kernel.org>); Tue, 1 Oct 2019 14:31:47 -0400
-Received: (qmail 6459 invoked by uid 2102); 1 Oct 2019 14:31:46 -0400
-Received: from localhost (sendmail-bs@127.0.0.1)
-  by localhost with SMTP; 1 Oct 2019 14:31:46 -0400
-Date:   Tue, 1 Oct 2019 14:31:46 -0400 (EDT)
-From:   Alan Stern <stern@rowland.harvard.edu>
-X-X-Sender: stern@iolanthe.rowland.org
-To:     Steven Rostedt <rostedt@goodmis.org>
-cc:     LKML <linux-kernel@vger.kernel.org>, <linux-block@vger.kernel.org>,
-        <linux-usb@vger.kernel.org>, Jens Axboe <axboe@kernel.dk>,
-        Greg Kroah-Hartman <gregkh@linuxfoundation.org>
-Subject: Re: Lockup on USB and block devices
-In-Reply-To: <20191001134430.1f9c9c75@gandalf.local.home>
-Message-ID: <Pine.LNX.4.44L0.1910011427110.1991-100000@iolanthe.rowland.org>
+        id S1726892AbfJATdd (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Tue, 1 Oct 2019 15:33:33 -0400
+Received: from mail-wm1-f66.google.com ([209.85.128.66]:40293 "EHLO
+        mail-wm1-f66.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S1726798AbfJATdc (ORCPT
+        <rfc822;linux-block@vger.kernel.org>); Tue, 1 Oct 2019 15:33:32 -0400
+Received: by mail-wm1-f66.google.com with SMTP id b24so4467531wmj.5
+        for <linux-block@vger.kernel.org>; Tue, 01 Oct 2019 12:33:30 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=linaro.org; s=google;
+        h=from:to:cc:subject:date:message-id:mime-version
+         :content-transfer-encoding;
+        bh=JiHkBcFF9QGKSMF3hIUTLU+zid7TMdspW3045+AEJlQ=;
+        b=ZPycgWvl2h+aHUHp06XdvjewtgM29fzf/AeUg8xKzELsCUN7fqdxZ2Ko8wyH1v3OgO
+         6cbI5fFQok9nm7zF0Sdezj0f/ayPXceaD/BIC6Pfym9Zbvu1vbKqpd/5CdpS5WWgb0mM
+         JFzb7RKoBj53G4DkOlFcppmGEoOzCdAw++138O/YF6JonUrHobCbwZWZibNesC+AKZBI
+         tMDSqXbxo3j6jcvm/zRn7A+doKunH4UgdY+XNJN/+ziuhdZmBElCqkwK6ZEkx0iVmZDQ
+         wL+tn+Rjnklt9C/+ESpvIF634AiWYbN1LKE60Y3bupfg70QqCS0nSvmWM6UGX8gDDMfW
+         HjTQ==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20161025;
+        h=x-gm-message-state:from:to:cc:subject:date:message-id:mime-version
+         :content-transfer-encoding;
+        bh=JiHkBcFF9QGKSMF3hIUTLU+zid7TMdspW3045+AEJlQ=;
+        b=Vzq5bpcPw6KpH8Ocl9TdqoRAqsbXSqyRugQWHSjidnvZNGh+Goo0OubxbUH/lFsvL6
+         2Qx3Ym4YLjG3FcWfhg3Pr2NM2esonE50KYogP0LlEE+trQr040+UIctTINOxhKWFe5Xu
+         XSRnuKKHmJkJV+QHbTOXfu2+50jh8I4jef6G6JA6SFu14/BOYAbvp8GkIYzA6iPIYbkZ
+         FcpsBQDm4YW08oC6Pd2v5u8NdKXT6+46ItyNJN6sldZKak6VM1ju29ti5eKQFFjmYU/7
+         9UF4JHH5pCs/3uxi8ira2Nyeqswuk0UkuwnhyKNysnMVUcXbpa+tYwfJx7L4Tlj7F03t
+         D/CA==
+X-Gm-Message-State: APjAAAXjAZh8wUPmEWF7JAtEE1UdyUPfqWhM887ayUeIILjTnXMYjf7X
+        YlGZ7xkWMhFJa/SYA1xdXnZAqw==
+X-Google-Smtp-Source: APXvYqxbhhToG7DvbciJrZ+f1CnZFN7SXXQgCuhoWJbL33UMWWXzcjijb5Wb40Tk3V7CkQr+pFLxtg==
+X-Received: by 2002:a7b:c4c7:: with SMTP id g7mr4944750wmk.11.1569958409373;
+        Tue, 01 Oct 2019 12:33:29 -0700 (PDT)
+Received: from localhost.localdomain ([212.140.138.217])
+        by smtp.gmail.com with ESMTPSA id q15sm36967632wrg.65.2019.10.01.12.33.28
+        (version=TLS1_2 cipher=ECDHE-RSA-AES128-GCM-SHA256 bits=128/128);
+        Tue, 01 Oct 2019 12:33:28 -0700 (PDT)
+From:   Paolo Valente <paolo.valente@linaro.org>
+To:     Jens Axboe <axboe@kernel.dk>
+Cc:     linux-block@vger.kernel.org, linux-kernel@vger.kernel.org,
+        ulf.hansson@linaro.org, linus.walleij@linaro.org,
+        bfq-iosched@googlegroups.com, oleksandr@natalenko.name,
+        Tejun Heo <tj@kernel.org>, cgroups@vger.kernel.org,
+        Paolo Valente <paolo.valente@linaro.org>
+Subject: [PATCH 0/2] block, bfq: make bfq disable iocost and present a double interface
+Date:   Tue,  1 Oct 2019 20:33:14 +0100
+Message-Id: <20191001193316.3330-1-paolo.valente@linaro.org>
+X-Mailer: git-send-email 2.20.1
 MIME-Version: 1.0
-Content-Type: TEXT/PLAIN; charset=US-ASCII
+Content-Transfer-Encoding: 8bit
 Sender: linux-block-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-On Tue, 1 Oct 2019, Steven Rostedt wrote:
+Hi Jens,
 
-> Not sure who to blame, but my server locked up when upgraded (accessing
-> volume group information), and echoing in "w" into sysrq-trigger showed
-> a bit of information.
-> 
-> First, looking at my dmesg I see that my usb-storage is hung up, for
-> whatever reason. Thus, this could be the source of all issues.
-> 
-> 
-> [5434447.145737] INFO: task usb-storage:32246 blocked for more than 120 seconds.
-> [5434447.145740]       Not tainted 5.2.4-custom #4
-> 
-> (BTW, I was upgrading to my 5.2.17 kernel when this happened)
-> 
-> [5434447.145741] "echo 0 > /proc/sys/kernel/hung_task_timeout_secs" disables this message.
-> [5434447.145743] usb-storage     D    0 32246      2 0x80004000
-> [5434447.145745] Call Trace:
-> [5434447.145749]  ? __schedule+0x1e8/0x600
-> [5434447.145752]  schedule+0x29/0x90
-> [5434447.145755]  schedule_timeout+0x208/0x300
-> [5434447.145765]  ? usb_hcd_submit_urb+0xbe/0xb90 [usbcore]
-> [5434447.145773]  ? usb_alloc_urb+0x23/0x70 [usbcore]
-> [5434447.145782]  ? usb_sg_init+0x92/0x2b0 [usbcore]
-> [5434447.145791]  ? usb_hcd_submit_urb+0xbe/0xb90 [usbcore]
-> [5434447.145795]  ? __switch_to_asm+0x34/0x70
-> [5434447.145798]  wait_for_completion+0x111/0x180
-> [5434447.145800]  ? wake_up_q+0x70/0x70
-> [5434447.145809]  usb_sg_wait+0xfa/0x150 [usbcore]
-> [5434447.145814]  usb_stor_bulk_transfer_sglist.part.4+0x64/0xb0 [usb_storage]
-> [5434447.145818]  usb_stor_bulk_srb+0x49/0x80 [usb_storage]
-> [5434447.145821]  usb_stor_Bulk_transport+0x167/0x3e0 [usb_storage]
-> [5434447.145824]  ? schedule+0x29/0x90
-> [5434447.145828]  ? usb_stor_disconnect+0xb0/0xb0 [usb_storage]
-> [5434447.145832]  usb_stor_invoke_transport+0x3a/0x4e0 [usb_storage]
-> [5434447.145835]  ? wait_for_completion_interruptible+0x12d/0x1d0
-> [5434447.145837]  ? wake_up_q+0x70/0x70
-> [5434447.145841]  usb_stor_control_thread+0x1c5/0x270 [usb_storage]
-> [5434447.145845]  kthread+0x116/0x130
-> [5434447.145847]  ? kthread_create_worker_on_cpu+0x70/0x70
-> [5434447.145851]  ret_from_fork+0x35/0x40
+the first patch in this series is Tejun's patch for making BFQ disable
+io.cost. The second patch makes BFQ present both the bfq-prefixes
+parameters and non-prefixed parameters, as suggested by Tejun [1].
 
-It looks like a problem with your xHCI USB host controller.  Normally a
-usb-storage transfer would be aborted after 90 seconds.  But if the
-host controller (or its driver) isn't working right, and the abort
-never completes, you end up with a situation like this -- usb-storage
-and the higher SCSI and block layers waiting indefinitely for an event
-that won't occur.
+In the first patch I've tried to use macros not to repeat code
+twice. checkpatch complains that these macros should be enclosed in
+parentheses. I don't see how to do it. I'm willing to switch to any
+better solution.
 
-In theory, unplugging the USB mass-storage device would unblock
-everything (unless xhci-hcd is too badly wedged).  But of course, doing
-that is likely to mess up whatever you were working on.
+Thanks,
+Paolo
 
-Alan Stern
+[1] https://lkml.org/lkml/2019/9/18/736
 
+Paolo Valente (1):
+  block, bfq: present a double cgroups interface
+
+Tejun Heo (1):
+  blkcg: Make bfq disable iocost when enabled
+
+ Documentation/admin-guide/cgroup-v2.rst |   8 +-
+ Documentation/block/bfq-iosched.rst     |  40 ++--
+ block/bfq-cgroup.c                      | 260 ++++++++++++------------
+ block/bfq-iosched.c                     |  32 +++
+ block/blk-iocost.c                      |   5 +-
+ include/linux/blk-cgroup.h              |   5 +
+ kernel/cgroup/cgroup.c                  |   2 +
+ 7 files changed, 201 insertions(+), 151 deletions(-)
+
+--
+2.20.1
