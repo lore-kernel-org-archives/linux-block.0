@@ -7,49 +7,49 @@ X-Spam-Status: No, score=-10.1 required=3.0 tests=DKIMWL_WL_HIGH,DKIM_SIGNED,
 	SPF_HELO_NONE,SPF_PASS,USER_AGENT_GIT autolearn=unavailable
 	autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 171CFC352AA
-	for <linux-block@archiver.kernel.org>; Tue,  1 Oct 2019 16:58:15 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 7841EC352AA
+	for <linux-block@archiver.kernel.org>; Tue,  1 Oct 2019 17:03:18 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.kernel.org (Postfix) with ESMTP id DE14521783
-	for <linux-block@archiver.kernel.org>; Tue,  1 Oct 2019 16:58:14 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id 4C6E82086A
+	for <linux-block@archiver.kernel.org>; Tue,  1 Oct 2019 17:03:18 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=default; t=1569949094;
-	bh=oSN9Cn1zQHdh/Pl1gG+9mshtPat0ykifj8O0qi2zwvE=;
+	s=default; t=1569949398;
+	bh=pj9nPbu8OCxceS12YwPlHpb0aSqTImsM0akfpQMHB4I=;
 	h=From:To:Cc:Subject:Date:In-Reply-To:References:List-ID:From;
-	b=ucuaubpq8gnXiezXRzrRtwxCpm+z7r4BNMR5eJ6A22FBfHNh+oS+AgFqoMrV0meXP
-	 9vOW/c8dJXv1s/wT0D+Mk6BmUWzadIZFGtZwpPDMvKh5LU4RQ07Ab6JVhB1uK5IWSp
-	 JMBxBx0ANqPbFt7LN5CB0kmFoSkTWoYSzO9IvEWQ=
+	b=WDjk6sbYPtCQJXFC5W20XNLsCAc5BuS9dovYLF0dNyxRuOu3I3XNORPiv8Z9SZlWn
+	 Xan4vqq5Ptc9Lfk/DwfxQ31NKCyHxBxijUQcx5X8cChrIbqMYnCOBpalKNncKjX2k+
+	 xFw5XAaj4v3a0MNx4yoHGarTuEy+Hv7RUitwzeOA=
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1731283AbfJAQlo (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Tue, 1 Oct 2019 12:41:44 -0400
-Received: from mail.kernel.org ([198.145.29.99]:53372 "EHLO mail.kernel.org"
+        id S1728342AbfJAQjq (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Tue, 1 Oct 2019 12:39:46 -0400
+Received: from mail.kernel.org ([198.145.29.99]:50766 "EHLO mail.kernel.org"
         rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-        id S1731270AbfJAQln (ORCPT <rfc822;linux-block@vger.kernel.org>);
-        Tue, 1 Oct 2019 12:41:43 -0400
+        id S1728316AbfJAQjo (ORCPT <rfc822;linux-block@vger.kernel.org>);
+        Tue, 1 Oct 2019 12:39:44 -0400
 Received: from sasha-vm.mshome.net (c-73-47-72-35.hsd1.nh.comcast.net [73.47.72.35])
         (using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
         (No client certificate requested)
-        by mail.kernel.org (Postfix) with ESMTPSA id 787A721906;
-        Tue,  1 Oct 2019 16:41:42 +0000 (UTC)
+        by mail.kernel.org (Postfix) with ESMTPSA id A7D7C21924;
+        Tue,  1 Oct 2019 16:39:42 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-        s=default; t=1569948103;
-        bh=oSN9Cn1zQHdh/Pl1gG+9mshtPat0ykifj8O0qi2zwvE=;
+        s=default; t=1569947983;
+        bh=pj9nPbu8OCxceS12YwPlHpb0aSqTImsM0akfpQMHB4I=;
         h=From:To:Cc:Subject:Date:In-Reply-To:References:From;
-        b=iEt6lSFvBVTJeAvWxCRv7ruAH4RHbyCTjEjXZoffrDRXFf6ZiVVIM+9mzjin8fu8l
-         w0WHZXp3TjPjR2wsAcQQIa13lXKGzwuGSzdgTjJjAZWF45uESRhP9XbalU3n4Yu+1Q
-         lJR2pfg5kThcZBef0xvXg2YPc0upEH9k8AARYRyI=
+        b=CWDbhJ0u6IkW7v/133VA4CUF+J0uonSCLr58Ut5y0VwSSr37v7vWIGVlvffXfybad
+         H5xvHJexIwlMMbUenkVUbpw+DE/EMoW8Euj8HrG6P75fxZdW64OVJqrJjMQCUQHl/2
+         jyxJE/Y7mpdfTCDBz5MVQfL9AzfosXCwD/qCkXTc=
 From:   Sasha Levin <sashal@kernel.org>
 To:     linux-kernel@vger.kernel.org, stable@vger.kernel.org
 Cc:     Dongsheng Yang <dongsheng.yang@easystack.cn>,
         Ilya Dryomov <idryomov@gmail.com>,
         Sasha Levin <sashal@kernel.org>, ceph-devel@vger.kernel.org,
         linux-block@vger.kernel.org
-Subject: [PATCH AUTOSEL 5.2 14/63] rbd: fix response length parameter for encoded strings
-Date:   Tue,  1 Oct 2019 12:40:36 -0400
-Message-Id: <20191001164125.15398-14-sashal@kernel.org>
+Subject: [PATCH AUTOSEL 5.3 15/71] rbd: fix response length parameter for encoded strings
+Date:   Tue,  1 Oct 2019 12:38:25 -0400
+Message-Id: <20191001163922.14735-15-sashal@kernel.org>
 X-Mailer: git-send-email 2.20.1
-In-Reply-To: <20191001164125.15398-1-sashal@kernel.org>
-References: <20191001164125.15398-1-sashal@kernel.org>
+In-Reply-To: <20191001163922.14735-1-sashal@kernel.org>
+References: <20191001163922.14735-1-sashal@kernel.org>
 MIME-Version: 1.0
 X-stable: review
 X-Patchwork-Hint: Ignore
@@ -76,10 +76,10 @@ Signed-off-by: Sasha Levin <sashal@kernel.org>
  1 file changed, 6 insertions(+), 4 deletions(-)
 
 diff --git a/drivers/block/rbd.c b/drivers/block/rbd.c
-index e5009a34f9c26..e78794bfcbbef 100644
+index c8fb886aebd4e..69db7385c8df5 100644
 --- a/drivers/block/rbd.c
 +++ b/drivers/block/rbd.c
-@@ -4696,17 +4696,20 @@ static int rbd_dev_v2_image_size(struct rbd_device *rbd_dev)
+@@ -5669,17 +5669,20 @@ static int rbd_dev_v2_image_size(struct rbd_device *rbd_dev)
  
  static int rbd_dev_v2_object_prefix(struct rbd_device *rbd_dev)
  {
@@ -102,7 +102,7 @@ index e5009a34f9c26..e78794bfcbbef 100644
  	dout("%s: rbd_obj_method_sync returned %d\n", __func__, ret);
  	if (ret < 0)
  		goto out;
-@@ -5676,7 +5679,6 @@ static int rbd_dev_image_id(struct rbd_device *rbd_dev)
+@@ -6696,7 +6699,6 @@ static int rbd_dev_image_id(struct rbd_device *rbd_dev)
  	dout("rbd id object name is %s\n", oid.name);
  
  	/* Response will be an encoded string, which includes a length */
@@ -110,7 +110,7 @@ index e5009a34f9c26..e78794bfcbbef 100644
  	size = sizeof (__le32) + RBD_IMAGE_ID_LEN_MAX;
  	response = kzalloc(size, GFP_NOIO);
  	if (!response) {
-@@ -5688,7 +5690,7 @@ static int rbd_dev_image_id(struct rbd_device *rbd_dev)
+@@ -6708,7 +6710,7 @@ static int rbd_dev_image_id(struct rbd_device *rbd_dev)
  
  	ret = rbd_obj_method_sync(rbd_dev, &oid, &rbd_dev->header_oloc,
  				  "get_id", NULL, 0,
