@@ -2,100 +2,124 @@ Return-Path: <SRS0=4xm9=X2=vger.kernel.org=linux-block-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-0.8 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
-	MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS autolearn=no autolearn_force=no
+X-Spam-Status: No, score=-10.1 required=3.0 tests=DKIMWL_WL_HIGH,DKIM_SIGNED,
+	DKIM_VALID,DKIM_VALID_AU,INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,
+	SPF_HELO_NONE,SPF_PASS,USER_AGENT_GIT autolearn=ham autolearn_force=no
 	version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 6B140C352AA
-	for <linux-block@archiver.kernel.org>; Tue,  1 Oct 2019 16:07:41 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id A247DC352AA
+	for <linux-block@archiver.kernel.org>; Tue,  1 Oct 2019 16:40:52 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.kernel.org (Postfix) with ESMTP id 49E9A2053B
-	for <linux-block@archiver.kernel.org>; Tue,  1 Oct 2019 16:07:41 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id 7A6EA21D81
+	for <linux-block@archiver.kernel.org>; Tue,  1 Oct 2019 16:40:52 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+	s=default; t=1569948052;
+	bh=9ja428gZ4RmI6EOL72mQVEMXFQ6pN4UX4cmhs7izldg=;
+	h=From:To:Cc:Subject:Date:In-Reply-To:References:List-ID:From;
+	b=kdN4AgTFdClyJkn2B/ybDES0JvDh/NtPz8P4FMd9XcDaQLmKKIrhAuyDQBzVanoaB
+	 ajEXgi+skLUPpnDWPPc/2rPg737A/DtIpdhcxAKcEdkPuB+hAyvxZufGxHZ1OLDYiU
+	 qiKrbT6CBmi8hcJpQNmtfsJuafecCAX6sKgcYR94=
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1726327AbfJAQHg (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Tue, 1 Oct 2019 12:07:36 -0400
-Received: from mx1.redhat.com ([209.132.183.28]:38068 "EHLO mx1.redhat.com"
+        id S1730361AbfJAQkv (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Tue, 1 Oct 2019 12:40:51 -0400
+Received: from mail.kernel.org ([198.145.29.99]:52212 "EHLO mail.kernel.org"
         rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-        id S1725765AbfJAQHg (ORCPT <rfc822;linux-block@vger.kernel.org>);
-        Tue, 1 Oct 2019 12:07:36 -0400
-Received: from smtp.corp.redhat.com (int-mx03.intmail.prod.int.phx2.redhat.com [10.5.11.13])
-        (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
+        id S1726053AbfJAQku (ORCPT <rfc822;linux-block@vger.kernel.org>);
+        Tue, 1 Oct 2019 12:40:50 -0400
+Received: from sasha-vm.mshome.net (c-73-47-72-35.hsd1.nh.comcast.net [73.47.72.35])
+        (using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
         (No client certificate requested)
-        by mx1.redhat.com (Postfix) with ESMTPS id A766A306039A;
-        Tue,  1 Oct 2019 16:07:35 +0000 (UTC)
-Received: from oldenburg2.str.redhat.com (ovpn-116-165.ams2.redhat.com [10.36.116.165])
-        by smtp.corp.redhat.com (Postfix) with ESMTPS id AB34D6062B;
-        Tue,  1 Oct 2019 16:07:29 +0000 (UTC)
-From:   Florian Weimer <fweimer@redhat.com>
-To:     Arnd Bergmann <arnd@arndb.de>
-Cc:     Jens Axboe <axboe@kernel.dk>,
-        y2038 Mailman List <y2038@lists.linaro.org>,
-        Linux API <linux-api@vger.kernel.org>,
-        Alexander Viro <viro@zeniv.linux.org.uk>,
-        Stefan =?utf-8?Q?B=C3=BChler?= <source@stbuehler.de>,
-        Hannes Reinecke <hare@suse.com>,
-        Jackie Liu <liuyun01@kylinos.cn>,
-        Andrew Morton <akpm@linux-foundation.org>,
-        Hristo Venev <hristo@venev.name>,
-        linux-block <linux-block@vger.kernel.org>,
-        Linux FS-devel Mailing List <linux-fsdevel@vger.kernel.org>,
-        "linux-kernel\@vger.kernel.org" <linux-kernel@vger.kernel.org>
-Subject: Re: [PATCH] io_uring: use __kernel_timespec in timeout ABI
-References: <20190930202055.1748710-1-arnd@arndb.de>
-        <8d5d34da-e1f0-1ab5-461e-f3145e52c48a@kernel.dk>
-        <623e1d27-d3b1-3241-bfd4-eb94ce70da14@kernel.dk>
-        <CAK8P3a3AAFXNmpQwuirzM+jgEQGj9tMC_5oaSs4CfiEVGmTkZg@mail.gmail.com>
-Date:   Tue, 01 Oct 2019 18:07:27 +0200
-In-Reply-To: <CAK8P3a3AAFXNmpQwuirzM+jgEQGj9tMC_5oaSs4CfiEVGmTkZg@mail.gmail.com>
-        (Arnd Bergmann's message of "Tue, 1 Oct 2019 17:49:43 +0200")
-Message-ID: <874l0stpog.fsf@oldenburg2.str.redhat.com>
-User-Agent: Gnus/5.13 (Gnus v5.13) Emacs/26.2 (gnu/linux)
+        by mail.kernel.org (Postfix) with ESMTPSA id D293621A4C;
+        Tue,  1 Oct 2019 16:40:48 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+        s=default; t=1569948049;
+        bh=9ja428gZ4RmI6EOL72mQVEMXFQ6pN4UX4cmhs7izldg=;
+        h=From:To:Cc:Subject:Date:In-Reply-To:References:From;
+        b=WhrQhPlxyp6wbGCCnrQTe4AjV9mbdbt8QMh5Nf80R+sn36jhdXOjVC4lwb6SRHmHw
+         nuf1CV78yNkdNQdhKkyOSgRsTyq2eDVnLSzxYGvl1J9JIdelTK/NHOIwev8I/j3xdU
+         6/fruZ6jcseZMmExmgXvLmfk+Vbff/wOV3VHYpWw=
+From:   Sasha Levin <sashal@kernel.org>
+To:     linux-kernel@vger.kernel.org, stable@vger.kernel.org
+Cc:     Ming Lei <ming.lei@redhat.com>,
+        syzbot+da3b7677bb913dc1b737@syzkaller.appspotmail.com,
+        Bart Van Assche <bvanassche@acm.org>,
+        Damien Le Moal <damien.lemoal@wdc.com>,
+        Jens Axboe <axboe@kernel.dk>, Sasha Levin <sashal@kernel.org>,
+        linux-block@vger.kernel.org
+Subject: [PATCH AUTOSEL 5.3 54/71] blk-mq: move lockdep_assert_held() into elevator_exit
+Date:   Tue,  1 Oct 2019 12:39:04 -0400
+Message-Id: <20191001163922.14735-54-sashal@kernel.org>
+X-Mailer: git-send-email 2.20.1
+In-Reply-To: <20191001163922.14735-1-sashal@kernel.org>
+References: <20191001163922.14735-1-sashal@kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain
-X-Scanned-By: MIMEDefang 2.79 on 10.5.11.13
-X-Greylist: Sender IP whitelisted, not delayed by milter-greylist-4.5.16 (mx1.redhat.com [10.5.110.46]); Tue, 01 Oct 2019 16:07:36 +0000 (UTC)
+X-stable: review
+X-Patchwork-Hint: Ignore
+Content-Transfer-Encoding: 8bit
 Sender: linux-block-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-* Arnd Bergmann:
+From: Ming Lei <ming.lei@redhat.com>
 
-> On Tue, Oct 1, 2019 at 5:38 PM Jens Axboe <axboe@kernel.dk> wrote:
->>
->> On 10/1/19 8:09 AM, Jens Axboe wrote:
->> > On 9/30/19 2:20 PM, Arnd Bergmann wrote:
->> >> All system calls use struct __kernel_timespec instead of the old struct
->> >> timespec, but this one was just added with the old-style ABI. Change it
->> >> now to enforce the use of __kernel_timespec, avoiding ABI confusion and
->> >> the need for compat handlers on 32-bit architectures.
->> >>
->> >> Any user space caller will have to use __kernel_timespec now, but this
->> >> is unambiguous and works for any C library regardless of the time_t
->> >> definition. A nicer way to specify the timeout would have been a less
->> >> ambiguous 64-bit nanosecond value, but I suppose it's too late now to
->> >> change that as this would impact both 32-bit and 64-bit users.
->> >
->> > Thanks for catching that, Arnd. Applied.
->>
->> On second thought - since there appears to be no good 64-bit timespec
->> available to userspace, the alternative here is including on in liburing.
->
-> What's wrong with using __kernel_timespec? Just the name?
-> I suppose liburing could add a macro to give it a different name
-> for its users.
+[ Upstream commit 284b94be1925dbe035ce5218d8b5c197321262c7 ]
 
-Yes, mostly the name.
+Commit c48dac137a62 ("block: don't hold q->sysfs_lock in elevator_init_mq")
+removes q->sysfs_lock from elevator_init_mq(), but forgot to deal with
+lockdep_assert_held() called in blk_mq_sched_free_requests() which is
+run in failure path of elevator_init_mq().
 
-__ names are reserved for the C/C++ implementation (which does not
-include the kernel).  __kernel_timespec looks like an internal kernel
-type to the uninitiated, not a UAPI type.
+blk_mq_sched_free_requests() is called in the following 3 functions:
 
-Once we have struct timespec64 in userspace, you also end up with
-copying stuff around or introducing aliasing violations.
+	elevator_init_mq()
+	elevator_exit()
+	blk_cleanup_queue()
 
-I'm not saying those concerns are valid, but you asked what's wrong with
-it. 8-)
+In blk_cleanup_queue(), blk_mq_sched_free_requests() is followed exactly
+by 'mutex_lock(&q->sysfs_lock)'.
 
-Thanks,
-Florian
+So moving the lockdep_assert_held() from blk_mq_sched_free_requests()
+into elevator_exit() for fixing the report by syzbot.
+
+Reported-by: syzbot+da3b7677bb913dc1b737@syzkaller.appspotmail.com
+Fixed: c48dac137a62 ("block: don't hold q->sysfs_lock in elevator_init_mq")
+Reviewed-by: Bart Van Assche <bvanassche@acm.org>
+Reviewed-by: Damien Le Moal <damien.lemoal@wdc.com>
+Signed-off-by: Ming Lei <ming.lei@redhat.com>
+Signed-off-by: Jens Axboe <axboe@kernel.dk>
+Signed-off-by: Sasha Levin <sashal@kernel.org>
+---
+ block/blk-mq-sched.c | 2 --
+ block/blk.h          | 2 ++
+ 2 files changed, 2 insertions(+), 2 deletions(-)
+
+diff --git a/block/blk-mq-sched.c b/block/blk-mq-sched.c
+index c9d183d6c4999..ca22afd47b3dc 100644
+--- a/block/blk-mq-sched.c
++++ b/block/blk-mq-sched.c
+@@ -555,8 +555,6 @@ void blk_mq_sched_free_requests(struct request_queue *q)
+ 	struct blk_mq_hw_ctx *hctx;
+ 	int i;
+ 
+-	lockdep_assert_held(&q->sysfs_lock);
+-
+ 	queue_for_each_hw_ctx(q, hctx, i) {
+ 		if (hctx->sched_tags)
+ 			blk_mq_free_rqs(q->tag_set, hctx->sched_tags, i);
+diff --git a/block/blk.h b/block/blk.h
+index de6b2e146d6eb..3ce8b73bb2264 100644
+--- a/block/blk.h
++++ b/block/blk.h
+@@ -194,6 +194,8 @@ void elv_unregister_queue(struct request_queue *q);
+ static inline void elevator_exit(struct request_queue *q,
+ 		struct elevator_queue *e)
+ {
++	lockdep_assert_held(&q->sysfs_lock);
++
+ 	blk_mq_sched_free_requests(q);
+ 	__elevator_exit(q, e);
+ }
+-- 
+2.20.1
+
