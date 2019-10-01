@@ -2,444 +2,283 @@ Return-Path: <SRS0=4xm9=X2=vger.kernel.org=linux-block-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-14.9 required=3.0 tests=DKIM_SIGNED,DKIM_VALID,
-	DKIM_VALID_AU,HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,
-	MENTIONS_GIT_HOSTING,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,USER_AGENT_GIT
-	autolearn=unavailable autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-8.3 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
+	INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,
+	USER_AGENT_SANE_1 autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 47A6EECE587
-	for <linux-block@archiver.kernel.org>; Tue,  1 Oct 2019 19:33:43 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id C22D0C352AA
+	for <linux-block@archiver.kernel.org>; Tue,  1 Oct 2019 20:46:15 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.kernel.org (Postfix) with ESMTP id 07AE521855
-	for <linux-block@archiver.kernel.org>; Tue,  1 Oct 2019 19:33:43 +0000 (UTC)
-Authentication-Results: mail.kernel.org;
-	dkim=pass (2048-bit key) header.d=linaro.org header.i=@linaro.org header.b="fB+4Rxsi"
+	by mail.kernel.org (Postfix) with ESMTP id 885562168B
+	for <linux-block@archiver.kernel.org>; Tue,  1 Oct 2019 20:46:15 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1726876AbfJATdl (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Tue, 1 Oct 2019 15:33:41 -0400
-Received: from mail-wm1-f65.google.com ([209.85.128.65]:51768 "EHLO
-        mail-wm1-f65.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1726747AbfJATdf (ORCPT
-        <rfc822;linux-block@vger.kernel.org>); Tue, 1 Oct 2019 15:33:35 -0400
-Received: by mail-wm1-f65.google.com with SMTP id 7so4649407wme.1
-        for <linux-block@vger.kernel.org>; Tue, 01 Oct 2019 12:33:32 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=linaro.org; s=google;
-        h=from:to:cc:subject:date:message-id:in-reply-to:references
-         :mime-version:content-transfer-encoding;
-        bh=WzszKoFLT5NZbsdUd0WPglNj1NW4fnrsvxmRV31aUBU=;
-        b=fB+4Rxsip2rgYkAaVfwvGIDHK2K/xujvY+JTVeEQEmhUG59m7hp3vst6MoKVDlCvcI
-         cDRRM6pcb1wkVeG8TzYFrZ6GlwUMb/w5R/renXsLTyP+MhkBiHZtz7XeqlGNqwX/orwS
-         GwWYuBA2aYWAuKFw+BJfrGZj893f+kEFZFuLykvuTAcTswS9MJfHHsq2Qb7axBU+JJaD
-         y4YSjrl14Qszvdx8WVz2fl5cZt2n3defYe33ZG7zwPoKn7cXvVGDr2H/iaCsXR3UteKP
-         8wEP8yTOOSoCNxBKr3o3731RFcecfo5egA8otbAQ7JCbMRGsMHH2bK5rlNDuk8zyangZ
-         5LHQ==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20161025;
-        h=x-gm-message-state:from:to:cc:subject:date:message-id:in-reply-to
-         :references:mime-version:content-transfer-encoding;
-        bh=WzszKoFLT5NZbsdUd0WPglNj1NW4fnrsvxmRV31aUBU=;
-        b=J5VE0sVPvw/mlqojp0yMUhzjYzI5VqZdS0gFEdmZ81tF6uqCIP0+MsxXL1AQPbZGnK
-         7We/UrvNlHXnIbnao6KRtru4WfKun6KSrh4BGG9mMvERzVRiU1+a5DOqhWANzdxINMK4
-         FbUmwk8Jws73/Pn8EQs2f2fExwPYU65Ou1dB/E2EgWwx1WRe1SJorhNkzuvcogOW/TKw
-         CmLlxpW13QJ3mQgx6U8vRgzTkxY63OdMcQr/q+iDa7dEoX1yGCY19V8JToqX+CG71bGY
-         Iyj7qFQGgpPoKb6eo+Ryq5RiTy7zTCPMH10RH1iuY6lnRxuhTLZLv6LrhkgC6F1PoZbs
-         Hy2g==
-X-Gm-Message-State: APjAAAVYR0nQsEPBOQiLFg6QteSEDZ/GIgo8hlmvJ4kloiLEjwTcR5jD
-        sHXm6QZvcgK4+AoZywrHbSc45Q==
-X-Google-Smtp-Source: APXvYqyiZvluY93z+fCSecUMw35Ea67CwwoPralkN+KQwVlJiq0vjXEwkD1KpICk6TuIqWfFZVicDQ==
-X-Received: by 2002:a1c:9dc1:: with SMTP id g184mr4930236wme.77.1569958411663;
-        Tue, 01 Oct 2019 12:33:31 -0700 (PDT)
-Received: from localhost.localdomain ([212.140.138.217])
-        by smtp.gmail.com with ESMTPSA id q15sm36967632wrg.65.2019.10.01.12.33.30
-        (version=TLS1_2 cipher=ECDHE-RSA-AES128-GCM-SHA256 bits=128/128);
-        Tue, 01 Oct 2019 12:33:31 -0700 (PDT)
-From:   Paolo Valente <paolo.valente@linaro.org>
-To:     Jens Axboe <axboe@kernel.dk>
-Cc:     linux-block@vger.kernel.org, linux-kernel@vger.kernel.org,
-        ulf.hansson@linaro.org, linus.walleij@linaro.org,
-        bfq-iosched@googlegroups.com, oleksandr@natalenko.name,
-        Tejun Heo <tj@kernel.org>, cgroups@vger.kernel.org,
-        Paolo Valente <paolo.valente@linaro.org>
-Subject: [PATCH 2/2] block, bfq: present a double cgroups interface
-Date:   Tue,  1 Oct 2019 20:33:16 +0100
-Message-Id: <20191001193316.3330-3-paolo.valente@linaro.org>
-X-Mailer: git-send-email 2.20.1
-In-Reply-To: <20191001193316.3330-1-paolo.valente@linaro.org>
-References: <20191001193316.3330-1-paolo.valente@linaro.org>
+        id S1726730AbfJAUqO (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Tue, 1 Oct 2019 16:46:14 -0400
+Received: from mx0a-001b2d01.pphosted.com ([148.163.156.1]:27024 "EHLO
+        mx0a-001b2d01.pphosted.com" rhost-flags-OK-OK-OK-OK)
+        by vger.kernel.org with ESMTP id S1726462AbfJAUqO (ORCPT
+        <rfc822;linux-block@vger.kernel.org>);
+        Tue, 1 Oct 2019 16:46:14 -0400
+Received: from pps.filterd (m0098393.ppops.net [127.0.0.1])
+        by mx0a-001b2d01.pphosted.com (8.16.0.27/8.16.0.27) with SMTP id x91Kg0wl041693;
+        Tue, 1 Oct 2019 16:46:10 -0400
+Received: from pps.reinject (localhost [127.0.0.1])
+        by mx0a-001b2d01.pphosted.com with ESMTP id 2vccr3ap64-1
+        (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
+        Tue, 01 Oct 2019 16:46:10 -0400
+Received: from m0098393.ppops.net (m0098393.ppops.net [127.0.0.1])
+        by pps.reinject (8.16.0.27/8.16.0.27) with SMTP id x91KguON043788;
+        Tue, 1 Oct 2019 16:46:10 -0400
+Received: from ppma04wdc.us.ibm.com (1a.90.2fa9.ip4.static.sl-reverse.com [169.47.144.26])
+        by mx0a-001b2d01.pphosted.com with ESMTP id 2vccr3ap5k-1
+        (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
+        Tue, 01 Oct 2019 16:46:10 -0400
+Received: from pps.filterd (ppma04wdc.us.ibm.com [127.0.0.1])
+        by ppma04wdc.us.ibm.com (8.16.0.27/8.16.0.27) with SMTP id x91KivOG029201;
+        Tue, 1 Oct 2019 20:46:09 GMT
+Received: from b03cxnp08028.gho.boulder.ibm.com (b03cxnp08028.gho.boulder.ibm.com [9.17.130.20])
+        by ppma04wdc.us.ibm.com with ESMTP id 2v9y57xdcd-1
+        (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
+        Tue, 01 Oct 2019 20:46:09 +0000
+Received: from b03ledav004.gho.boulder.ibm.com (b03ledav004.gho.boulder.ibm.com [9.17.130.235])
+        by b03cxnp08028.gho.boulder.ibm.com (8.14.9/8.14.9/NCO v10.0) with ESMTP id x91Kk8Nq53019090
+        (version=TLSv1/SSLv3 cipher=DHE-RSA-AES256-GCM-SHA384 bits=256 verify=OK);
+        Tue, 1 Oct 2019 20:46:08 GMT
+Received: from b03ledav004.gho.boulder.ibm.com (unknown [127.0.0.1])
+        by IMSVA (Postfix) with ESMTP id 022007805E;
+        Tue,  1 Oct 2019 20:46:08 +0000 (GMT)
+Received: from b03ledav004.gho.boulder.ibm.com (unknown [127.0.0.1])
+        by IMSVA (Postfix) with ESMTP id D0FF27805C;
+        Tue,  1 Oct 2019 20:46:06 +0000 (GMT)
+Received: from [9.85.183.38] (unknown [9.85.183.38])
+        by b03ledav004.gho.boulder.ibm.com (Postfix) with ESMTP;
+        Tue,  1 Oct 2019 20:46:06 +0000 (GMT)
+Subject: Re: [PATCH v5 5/7] block: Delay default elevator initialization
+To:     Damien Le Moal <damien.lemoal@wdc.com>,
+        linux-block@vger.kernel.org, Jens Axboe <axboe@kernel.dk>,
+        linux-scsi@vger.kernel.org,
+        "Martin K . Petersen" <martin.petersen@oracle.com>,
+        dm-devel@redhat.com, Mike Snitzer <snitzer@redhat.com>
+Cc:     Ming Lei <ming.lei@redhat.com>,
+        Christian Borntraeger <borntraeger@de.ibm.com>
+References: <20190905095135.26026-1-damien.lemoal@wdc.com>
+ <20190905095135.26026-6-damien.lemoal@wdc.com>
+From:   Eric Farman <farman@linux.ibm.com>
+Message-ID: <9355c25f-61d7-b290-7d60-552ef4206e8c@linux.ibm.com>
+Date:   Tue, 1 Oct 2019 16:46:06 -0400
+User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:60.0) Gecko/20100101
+ Thunderbird/60.9.0
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
+In-Reply-To: <20190905095135.26026-6-damien.lemoal@wdc.com>
+Content-Type: text/plain; charset=utf-8
+Content-Language: en-US
+Content-Transfer-Encoding: 7bit
+X-TM-AS-GCONF: 00
+X-Proofpoint-Virus-Version: vendor=fsecure engine=2.50.10434:,, definitions=2019-10-01_09:,,
+ signatures=0
+X-Proofpoint-Spam-Details: rule=outbound_notspam policy=outbound score=0 priorityscore=1501
+ malwarescore=0 suspectscore=0 phishscore=0 bulkscore=0 spamscore=0
+ clxscore=1011 lowpriorityscore=0 mlxscore=0 impostorscore=0
+ mlxlogscore=999 adultscore=0 classifier=spam adjust=0 reason=mlx
+ scancount=1 engine=8.0.1-1908290000 definitions=main-1910010171
 Sender: linux-block-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-When bfq was merged into mainline, there were two I/O schedulers that
-implemented the proportional-share policy: bfq for blk-mq and cfq for
-legacy blk. bfq's interface files in the blkio/io controller have the
-same names as cfq. But the cgroups interface doesn't allow two
-entities to use the same name for their files, so for bfq we had to
-prepend the "bfq" prefix to each of its files. However no legacy code
-uses these modified file names. This naming also causes confusion, as,
-e.g., in [1].
 
-Now cfq has gone with legacy blk, so there is no need any longer for
-these prefixes in (the never used) bfq names. Yet some people may have
-started to use the current bfq interface. So, as suggested by Tejun
-Heo [2], make bfq present a double interface, one with the file names
-prepended with the "bfq" prefix, and the other one with no prefix.
 
-[1] https://github.com/systemd/systemd/issues/7057
-[2] https://lkml.org/lkml/2019/9/18/736
+On 9/5/19 5:51 AM, Damien Le Moal wrote:
+> When elevator_init_mq() is called from blk_mq_init_allocated_queue(),
+> the only information known about the device is the number of hardware
+> queues as the block device scan by the device driver is not completed
+> yet for most drivers. The device type and elevator required features
+> are not set yet, preventing to correctly select the default elevator
+> most suitable for the device.
+> 
+> This currently affects all multi-queue zoned block devices which default
+> to the "none" elevator instead of the required "mq-deadline" elevator.
+> These drives currently include host-managed SMR disks connected to a
+> smartpqi HBA and null_blk block devices with zoned mode enabled.
+> Upcoming NVMe Zoned Namespace devices will also be affected.
+> 
+> Fix this by adding the boolean elevator_init argument to
+> blk_mq_init_allocated_queue() to control the execution of
+> elevator_init_mq(). Two cases exist:
+> 1) elevator_init = false is used for calls to
+>    blk_mq_init_allocated_queue() within blk_mq_init_queue(). In this
+>    case, a call to elevator_init_mq() is added to __device_add_disk(),
+>    resulting in the delayed initialization of the queue elevator
+>    after the device driver finished probing the device information. This
+>    effectively allows elevator_init_mq() access to more information
+>    about the device.
+> 2) elevator_init = true preserves the current behavior of initializing
+>    the elevator directly from blk_mq_init_allocated_queue(). This case
+>    is used for the special request based DM devices where the device
+>    gendisk is created before the queue initialization and device
+>    information (e.g. queue limits) is already known when the queue
+>    initialization is executed.
+> 
+> Additionally, to make sure that the elevator initialization is never
+> done while requests are in-flight (there should be none when the device
+> driver calls device_add_disk()), freeze and quiesce the device request
+> queue before calling blk_mq_init_sched() in elevator_init_mq().
+> 
+> Signed-off-by: Damien Le Moal <damien.lemoal@wdc.com>
 
-Suggested-by: Tejun Heo <tj@kernel.org>
-Signed-off-by: Paolo Valente <paolo.valente@linaro.org>
----
- Documentation/block/bfq-iosched.rst |  40 +++--
- block/bfq-cgroup.c                  | 258 ++++++++++++++--------------
- 2 files changed, 153 insertions(+), 145 deletions(-)
+Coincidentally, I had been looking into a problem that is fixed in
+5.4-rc1 by this patch.  Thanks for that!
 
-diff --git a/Documentation/block/bfq-iosched.rst b/Documentation/block/bfq-iosched.rst
-index 0d237d402860..8ecd37903391 100644
---- a/Documentation/block/bfq-iosched.rst
-+++ b/Documentation/block/bfq-iosched.rst
-@@ -536,12 +536,14 @@ process.
- To get proportional sharing of bandwidth with BFQ for a given device,
- BFQ must of course be the active scheduler for that device.
- 
--Within each group directory, the names of the files associated with
--BFQ-specific cgroup parameters and stats begin with the "bfq."
--prefix. So, with cgroups-v1 or cgroups-v2, the full prefix for
--BFQ-specific files is "blkio.bfq." or "io.bfq." For example, the group
--parameter to set the weight of a group with BFQ is blkio.bfq.weight
--or io.bfq.weight.
-+The interface of the proportional-share policy implemented by BFQ
-+consists of a series of cgroup parameters. For legacy issues, each
-+parameter can be read or written, equivalently, through one of two
-+files: the first file has the same name as the parameter to
-+read/write, while the second file has that same name prepended by the
-+prefix "bfq.". For example, the two files by which to set/show the
-+weight of a group are blkio.weight and blkio.bfq.weight with
-+cgroups-v1, or io.weight and io.bfq.weight with cgroups-v2.
- 
- As for cgroups-v1 (blkio controller), the exact set of stat files
- created, and kept up-to-date by bfq, depends on whether
-@@ -550,14 +552,15 @@ the stat files documented in
- Documentation/admin-guide/cgroup-v1/blkio-controller.rst. If, instead,
- CONFIG_BFQ_CGROUP_DEBUG is not set, then bfq creates only the files::
- 
--  blkio.bfq.io_service_bytes
--  blkio.bfq.io_service_bytes_recursive
--  blkio.bfq.io_serviced
--  blkio.bfq.io_serviced_recursive
-+  blkio.io_service_bytes
-+  blkio.io_service_bytes_recursive
-+  blkio.io_serviced
-+  blkio.io_serviced_recursive
- 
--The value of CONFIG_BFQ_CGROUP_DEBUG greatly influences the maximum
--throughput sustainable with bfq, because updating the blkio.bfq.*
--stats is rather costly, especially for some of the stats enabled by
-+(plus their counterparts with also the bfq prefix). The value of
-+CONFIG_BFQ_CGROUP_DEBUG greatly influences the maximum throughput
-+sustainable with BFQ, because updating the blkio.* stats is rather
-+costly, especially for some of the stats enabled by
- CONFIG_BFQ_CGROUP_DEBUG.
- 
- Parameters to set
-@@ -565,11 +568,12 @@ Parameters to set
- 
- For each group, there is only the following parameter to set.
- 
--weight (namely blkio.bfq.weight or io.bfq-weight): the weight of the
--group inside its parent. Available values: 1..10000 (default 100). The
--linear mapping between ioprio and weights, described at the beginning
--of the tunable section, is still valid, but all weights higher than
--IOPRIO_BE_NR*10 are mapped to ioprio 0.
-+weight (namely blkio.weight/blkio.bfq.weight or
-+io.weight/io.bfq.weight): the weight of the group inside its
-+parent. Available values: 1..10000 (default 100). The linear mapping
-+between ioprio and weights, described at the beginning of the tunable
-+section, is still valid, but all weights higher than IOPRIO_BE_NR*10
-+are mapped to ioprio 0.
- 
- Recall that, if low-latency is set, then BFQ automatically raises the
- weight of the queues associated with interactive and soft real-time
-diff --git a/block/bfq-cgroup.c b/block/bfq-cgroup.c
-index decda96770f4..d3b59b731992 100644
---- a/block/bfq-cgroup.c
-+++ b/block/bfq-cgroup.c
-@@ -1211,139 +1211,143 @@ struct blkcg_policy blkcg_policy_bfq = {
- 	.pd_reset_stats_fn	= bfq_pd_reset_stats,
- };
- 
--struct cftype bfq_blkcg_legacy_files[] = {
--	{
--		.name = "bfq.weight",
--		.flags = CFTYPE_NOT_ON_ROOT,
--		.seq_show = bfq_io_show_weight_legacy,
--		.write_u64 = bfq_io_set_weight_legacy,
--	},
--	{
--		.name = "bfq.weight_device",
--		.flags = CFTYPE_NOT_ON_ROOT,
--		.seq_show = bfq_io_show_weight,
--		.write = bfq_io_set_weight,
--	},
--
--	/* statistics, covers only the tasks in the bfqg */
--	{
--		.name = "bfq.io_service_bytes",
--		.private = (unsigned long)&blkcg_policy_bfq,
--		.seq_show = blkg_print_stat_bytes,
--	},
--	{
--		.name = "bfq.io_serviced",
--		.private = (unsigned long)&blkcg_policy_bfq,
--		.seq_show = blkg_print_stat_ios,
--	},
--#ifdef CONFIG_BFQ_CGROUP_DEBUG
--	{
--		.name = "bfq.time",
--		.private = offsetof(struct bfq_group, stats.time),
--		.seq_show = bfqg_print_stat,
--	},
--	{
--		.name = "bfq.sectors",
--		.seq_show = bfqg_print_stat_sectors,
--	},
--	{
--		.name = "bfq.io_service_time",
--		.private = offsetof(struct bfq_group, stats.service_time),
--		.seq_show = bfqg_print_rwstat,
--	},
--	{
--		.name = "bfq.io_wait_time",
--		.private = offsetof(struct bfq_group, stats.wait_time),
--		.seq_show = bfqg_print_rwstat,
--	},
--	{
--		.name = "bfq.io_merged",
--		.private = offsetof(struct bfq_group, stats.merged),
--		.seq_show = bfqg_print_rwstat,
--	},
--	{
--		.name = "bfq.io_queued",
--		.private = offsetof(struct bfq_group, stats.queued),
--		.seq_show = bfqg_print_rwstat,
--	},
--#endif /* CONFIG_BFQ_CGROUP_DEBUG */
-+#define bfq_make_blkcg_legacy_files(prefix)			\
-+	{							\
-+		.name = #prefix "weight",			\
-+		.flags = CFTYPE_NOT_ON_ROOT,			\
-+		.seq_show = bfq_io_show_weight,			\
-+		.write_u64 = bfq_io_set_weight_legacy,		\
-+	},							\
-+								\
-+	/* statistics, covers only the tasks in the bfqg */	\
-+	{							\
-+		.name = #prefix "io_service_bytes",		\
-+		.private = (unsigned long)&blkcg_policy_bfq,	\
-+		.seq_show = blkg_print_stat_bytes,		\
-+	},							\
-+	{							\
-+		.name = #prefix "io_serviced",		\
-+		.private = (unsigned long)&blkcg_policy_bfq,	\
-+		.seq_show = blkg_print_stat_ios,		\
-+	},							\
-+								\
-+	/* the same statistics which cover the bfqg and its descendants */ \
-+	{							\
-+		.name = #prefix "io_service_bytes_recursive",	\
-+		.private = (unsigned long)&blkcg_policy_bfq,	\
-+		.seq_show = blkg_print_stat_bytes_recursive,	\
-+	},							\
-+	{							\
-+		.name = #prefix "io_serviced_recursive",	\
-+		.private = (unsigned long)&blkcg_policy_bfq,	\
-+		.seq_show = blkg_print_stat_ios_recursive,	\
-+	}
-+
-+#define bfq_make_blkcg_legacy_debug_files(prefix)			\
-+	{								\
-+		.name = #prefix "time",				\
-+		.private = offsetof(struct bfq_group, stats.time),	\
-+		.seq_show = bfqg_print_stat,				\
-+	},								\
-+	{								\
-+		.name = #prefix "sectors",				\
-+		.seq_show = bfqg_print_stat_sectors,			\
-+	},								\
-+	{								\
-+		.name = #prefix "io_service_time",			\
-+		.private = offsetof(struct bfq_group, stats.service_time), \
-+		.seq_show = bfqg_print_rwstat,				\
-+	},								\
-+	{								\
-+		.name = #prefix "io_wait_time",			\
-+		.private = offsetof(struct bfq_group, stats.wait_time),	\
-+		.seq_show = bfqg_print_rwstat,				\
-+	},								\
-+	{								\
-+		.name = #prefix "io_merged",				\
-+		.private = offsetof(struct bfq_group, stats.merged),	\
-+		.seq_show = bfqg_print_rwstat,				\
-+	},								\
-+	{								\
-+		.name = #prefix "io_queued",				\
-+		.private = offsetof(struct bfq_group, stats.queued),	\
-+		.seq_show = bfqg_print_rwstat,				\
-+	},								\
-+	{								\
-+		.name = #prefix "time_recursive",			\
-+		.private = offsetof(struct bfq_group, stats.time),	\
-+		.seq_show = bfqg_print_stat_recursive,			\
-+	},								\
-+	{								\
-+		.name = #prefix "sectors_recursive",			\
-+		.seq_show = bfqg_print_stat_sectors_recursive,		\
-+	},								\
-+	{								\
-+		.name = #prefix "io_service_time_recursive",		\
-+		.private = offsetof(struct bfq_group, stats.service_time), \
-+		.seq_show = bfqg_print_rwstat_recursive,		\
-+	},								\
-+	{								\
-+		.name = #prefix "io_wait_time_recursive",		\
-+		.private = offsetof(struct bfq_group, stats.wait_time),	\
-+		.seq_show = bfqg_print_rwstat_recursive,		\
-+	},								\
-+	{								\
-+		.name = #prefix "io_merged_recursive",		\
-+		.private = offsetof(struct bfq_group, stats.merged),	\
-+		.seq_show = bfqg_print_rwstat_recursive,		\
-+	},								\
-+	{								\
-+		.name = #prefix "io_queued_recursive",		\
-+		.private = offsetof(struct bfq_group, stats.queued),	\
-+		.seq_show = bfqg_print_rwstat_recursive,		\
-+	},								\
-+	{								\
-+		.name = #prefix "avg_queue_size",			\
-+		.seq_show = bfqg_print_avg_queue_size,			\
-+	},								\
-+	{								\
-+		.name = #prefix "group_wait_time",			\
-+		.private = offsetof(struct bfq_group, stats.group_wait_time), \
-+		.seq_show = bfqg_print_stat,				\
-+	},								\
-+	{								\
-+		.name = #prefix "idle_time",				\
-+		.private = offsetof(struct bfq_group, stats.idle_time),	\
-+		.seq_show = bfqg_print_stat,				\
-+	},								\
-+	{								\
-+		.name = #prefix "empty_time",				\
-+		.private = offsetof(struct bfq_group, stats.empty_time), \
-+		.seq_show = bfqg_print_stat,				\
-+	},								\
-+	{								\
-+		.name = #prefix "dequeue",				\
-+		.private = offsetof(struct bfq_group, stats.dequeue),	\
-+		.seq_show = bfqg_print_stat,				\
-+	}
- 
--	/* the same statistics which cover the bfqg and its descendants */
--	{
--		.name = "bfq.io_service_bytes_recursive",
--		.private = (unsigned long)&blkcg_policy_bfq,
--		.seq_show = blkg_print_stat_bytes_recursive,
--	},
--	{
--		.name = "bfq.io_serviced_recursive",
--		.private = (unsigned long)&blkcg_policy_bfq,
--		.seq_show = blkg_print_stat_ios_recursive,
--	},
-+struct cftype bfq_blkcg_legacy_files[] = {
-+	bfq_make_blkcg_legacy_files(bfq.),
-+	bfq_make_blkcg_legacy_files(),
- #ifdef CONFIG_BFQ_CGROUP_DEBUG
--	{
--		.name = "bfq.time_recursive",
--		.private = offsetof(struct bfq_group, stats.time),
--		.seq_show = bfqg_print_stat_recursive,
--	},
--	{
--		.name = "bfq.sectors_recursive",
--		.seq_show = bfqg_print_stat_sectors_recursive,
--	},
--	{
--		.name = "bfq.io_service_time_recursive",
--		.private = offsetof(struct bfq_group, stats.service_time),
--		.seq_show = bfqg_print_rwstat_recursive,
--	},
--	{
--		.name = "bfq.io_wait_time_recursive",
--		.private = offsetof(struct bfq_group, stats.wait_time),
--		.seq_show = bfqg_print_rwstat_recursive,
--	},
--	{
--		.name = "bfq.io_merged_recursive",
--		.private = offsetof(struct bfq_group, stats.merged),
--		.seq_show = bfqg_print_rwstat_recursive,
--	},
--	{
--		.name = "bfq.io_queued_recursive",
--		.private = offsetof(struct bfq_group, stats.queued),
--		.seq_show = bfqg_print_rwstat_recursive,
--	},
--	{
--		.name = "bfq.avg_queue_size",
--		.seq_show = bfqg_print_avg_queue_size,
--	},
--	{
--		.name = "bfq.group_wait_time",
--		.private = offsetof(struct bfq_group, stats.group_wait_time),
--		.seq_show = bfqg_print_stat,
--	},
--	{
--		.name = "bfq.idle_time",
--		.private = offsetof(struct bfq_group, stats.idle_time),
--		.seq_show = bfqg_print_stat,
--	},
--	{
--		.name = "bfq.empty_time",
--		.private = offsetof(struct bfq_group, stats.empty_time),
--		.seq_show = bfqg_print_stat,
--	},
--	{
--		.name = "bfq.dequeue",
--		.private = offsetof(struct bfq_group, stats.dequeue),
--		.seq_show = bfqg_print_stat,
--	},
--#endif	/* CONFIG_BFQ_CGROUP_DEBUG */
-+	bfq_make_blkcg_legacy_debug_files(bfq.),
-+	bfq_make_blkcg_legacy_debug_files(),
-+#endif
- 	{ }	/* terminate */
- };
- 
-+#define bfq_make_blkg_files(prefix)		\
-+	{					\
-+		.name = #prefix "weight",	\
-+		.flags = CFTYPE_NOT_ON_ROOT,	\
-+		.seq_show = bfq_io_show_weight,	\
-+		.write = bfq_io_set_weight,	\
-+	}
-+
- struct cftype bfq_blkg_files[] = {
--	{
--		.name = "bfq.weight",
--		.flags = CFTYPE_NOT_ON_ROOT,
--		.seq_show = bfq_io_show_weight,
--		.write = bfq_io_set_weight,
--	},
-+	bfq_make_blkg_files(bfq.),
-+	bfq_make_blkg_files(),
- 	{} /* terminate */
- };
- 
--- 
-2.20.1
+The problem was a delay during boot of a KVM guest with virtio-scsi
+devices (or hotplug of such a device to a guest) in recent releases,
+especially when virtio-scsi is configured as a module.  The symptoms
+look like:
 
+[    0.975315] virtio_blk virtio2: [vda] 1803060 4096-byte logical
+blocks (7.39 GB/6.88 GiB)
+[    0.977859] scsi host0: Virtio SCSI HBA
+[    0.980339] scsi 0:0:0:0: Direct-Access     QEMU     QEMU HARDDISK
+2.5+ PQ: 0 ANSI: 5
+[    0.981685]  vda:VOL1/  0XA906: vda1
+[    0.988253] alg: No test for crc32be (crc32be-vx)
+...stall...
+[   24.544920] sd 0:0:0:0: Power-on or device reset occurred
+[   24.545176] sd 0:0:0:0: Attached scsi generic sg0 type 0
+[   24.545292] sd 0:0:0:0: [sda] 385 512-byte logical blocks: (197
+kB/193 KiB)
+[   24.545368] sd 0:0:0:0: [sda] Write Protect is off
+[   24.545416] sd 0:0:0:0: [sda] Mode Sense: 63 00 00 08
+[   24.545456] sd 0:0:0:0: [sda] Write cache: enabled, read cache:
+enabled, doesn't support DPO or FUA
+[   24.547033] sd 0:0:0:0: [sda] Attached SCSI disk
+
+I debugged this down to the same behavior described/fixed back in 3.18
+by commit 17497acbdce9 ("blk-mq, percpu_ref: start q->mq_usage_counter
+in atomic mode"), and for the same reason.  The delay starts occurring
+as soon as q->q_usage_counter is converted to percpu for the one LUN tha
+twas found, while scsi_scan_channel() is still working on its loop of
+mostly non-existent devices.  Exactly when this problem started
+re-occuring is not certain to me, though I did see this problem with 5.2
+on linux-stable.
+
+When I run with a 5.3 kernel, the problem is easily reproducible.  So I
+bisected between 5.3 and 5.4-rc1, and got here.  Cherry-picking this
+patch on top of 5.3 cleans up the boot/hotplug process and removes any
+stall.  Any chance this could be cc'd to stable?  Any data someone wants
+to see behavioral changes?
+
+Thanks,
+Eric
+
+> ---
+>  block/blk-mq.c         | 12 +++++++++---
+>  block/elevator.c       |  7 +++++++
+>  block/genhd.c          |  9 +++++++++
+>  drivers/md/dm-rq.c     |  2 +-
+>  include/linux/blk-mq.h |  3 ++-
+>  5 files changed, 28 insertions(+), 5 deletions(-)
+> 
+> diff --git a/block/blk-mq.c b/block/blk-mq.c
+> index ee4caf0c0807..240416057f28 100644
+> --- a/block/blk-mq.c
+> +++ b/block/blk-mq.c
+> @@ -2689,7 +2689,11 @@ struct request_queue *blk_mq_init_queue(struct blk_mq_tag_set *set)
+>  	if (!uninit_q)
+>  		return ERR_PTR(-ENOMEM);
+>  
+> -	q = blk_mq_init_allocated_queue(set, uninit_q);
+> +	/*
+> +	 * Initialize the queue without an elevator. device_add_disk() will do
+> +	 * the initialization.
+> +	 */
+> +	q = blk_mq_init_allocated_queue(set, uninit_q, false);
+>  	if (IS_ERR(q))
+>  		blk_cleanup_queue(uninit_q);
+>  
+> @@ -2840,7 +2844,8 @@ static unsigned int nr_hw_queues(struct blk_mq_tag_set *set)
+>  }
+>  
+>  struct request_queue *blk_mq_init_allocated_queue(struct blk_mq_tag_set *set,
+> -						  struct request_queue *q)
+> +						  struct request_queue *q,
+> +						  bool elevator_init)
+>  {
+>  	/* mark the queue as mq asap */
+>  	q->mq_ops = set->ops;
+> @@ -2902,7 +2907,8 @@ struct request_queue *blk_mq_init_allocated_queue(struct blk_mq_tag_set *set,
+>  	blk_mq_add_queue_tag_set(set, q);
+>  	blk_mq_map_swqueue(q);
+>  
+> -	elevator_init_mq(q);
+> +	if (elevator_init)
+> +		elevator_init_mq(q);
+>  
+>  	return q;
+>  
+> diff --git a/block/elevator.c b/block/elevator.c
+> index 520d6b224b74..096a670d22d7 100644
+> --- a/block/elevator.c
+> +++ b/block/elevator.c
+> @@ -712,7 +712,14 @@ void elevator_init_mq(struct request_queue *q)
+>  	if (!e)
+>  		return;
+>  
+> +	blk_mq_freeze_queue(q);
+> +	blk_mq_quiesce_queue(q);
+> +
+>  	err = blk_mq_init_sched(q, e);
+> +
+> +	blk_mq_unquiesce_queue(q);
+> +	blk_mq_unfreeze_queue(q);
+> +
+>  	if (err) {
+>  		pr_warn("\"%s\" elevator initialization failed, "
+>  			"falling back to \"none\"\n", e->elevator_name);
+> diff --git a/block/genhd.c b/block/genhd.c
+> index 54f1f0d381f4..26b31fcae217 100644
+> --- a/block/genhd.c
+> +++ b/block/genhd.c
+> @@ -695,6 +695,15 @@ static void __device_add_disk(struct device *parent, struct gendisk *disk,
+>  	dev_t devt;
+>  	int retval;
+>  
+> +	/*
+> +	 * The disk queue should now be all set with enough information about
+> +	 * the device for the elevator code to pick an adequate default
+> +	 * elevator if one is needed, that is, for devices requesting queue
+> +	 * registration.
+> +	 */
+> +	if (register_queue)
+> +		elevator_init_mq(disk->queue);
+> +
+>  	/* minors == 0 indicates to use ext devt from part0 and should
+>  	 * be accompanied with EXT_DEVT flag.  Make sure all
+>  	 * parameters make sense.
+> diff --git a/drivers/md/dm-rq.c b/drivers/md/dm-rq.c
+> index 21d5c1784d0c..3f8577e2c13b 100644
+> --- a/drivers/md/dm-rq.c
+> +++ b/drivers/md/dm-rq.c
+> @@ -563,7 +563,7 @@ int dm_mq_init_request_queue(struct mapped_device *md, struct dm_table *t)
+>  	if (err)
+>  		goto out_kfree_tag_set;
+>  
+> -	q = blk_mq_init_allocated_queue(md->tag_set, md->queue);
+> +	q = blk_mq_init_allocated_queue(md->tag_set, md->queue, true);
+>  	if (IS_ERR(q)) {
+>  		err = PTR_ERR(q);
+>  		goto out_tag_set;
+> diff --git a/include/linux/blk-mq.h b/include/linux/blk-mq.h
+> index 62a3bb715899..0bf056de5cc3 100644
+> --- a/include/linux/blk-mq.h
+> +++ b/include/linux/blk-mq.h
+> @@ -248,7 +248,8 @@ enum {
+>  
+>  struct request_queue *blk_mq_init_queue(struct blk_mq_tag_set *);
+>  struct request_queue *blk_mq_init_allocated_queue(struct blk_mq_tag_set *set,
+> -						  struct request_queue *q);
+> +						  struct request_queue *q,
+> +						  bool elevator_init);
+>  struct request_queue *blk_mq_init_sq_queue(struct blk_mq_tag_set *set,
+>  						const struct blk_mq_ops *ops,
+>  						unsigned int queue_depth,
+> 
