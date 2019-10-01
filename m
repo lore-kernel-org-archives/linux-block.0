@@ -2,123 +2,141 @@ Return-Path: <SRS0=4xm9=X2=vger.kernel.org=linux-block-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-10.1 required=3.0 tests=DKIMWL_WL_HIGH,DKIM_SIGNED,
-	DKIM_VALID,DKIM_VALID_AU,INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,
-	SPF_HELO_NONE,SPF_PASS,USER_AGENT_GIT autolearn=unavailable
-	autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-6.8 required=3.0 tests=DKIM_SIGNED,DKIM_VALID,
+	DKIM_VALID_AU,FREEMAIL_FORGED_FROMDOMAIN,FREEMAIL_FROM,
+	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,
+	SPF_HELO_NONE,SPF_PASS autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 7841EC352AA
-	for <linux-block@archiver.kernel.org>; Tue,  1 Oct 2019 17:03:18 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id B4CE5C352AA
+	for <linux-block@archiver.kernel.org>; Tue,  1 Oct 2019 17:15:54 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.kernel.org (Postfix) with ESMTP id 4C6E82086A
-	for <linux-block@archiver.kernel.org>; Tue,  1 Oct 2019 17:03:18 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=default; t=1569949398;
-	bh=pj9nPbu8OCxceS12YwPlHpb0aSqTImsM0akfpQMHB4I=;
-	h=From:To:Cc:Subject:Date:In-Reply-To:References:List-ID:From;
-	b=WDjk6sbYPtCQJXFC5W20XNLsCAc5BuS9dovYLF0dNyxRuOu3I3XNORPiv8Z9SZlWn
-	 Xan4vqq5Ptc9Lfk/DwfxQ31NKCyHxBxijUQcx5X8cChrIbqMYnCOBpalKNncKjX2k+
-	 xFw5XAaj4v3a0MNx4yoHGarTuEy+Hv7RUitwzeOA=
+	by mail.kernel.org (Postfix) with ESMTP id 8667C20815
+	for <linux-block@archiver.kernel.org>; Tue,  1 Oct 2019 17:15:54 +0000 (UTC)
+Authentication-Results: mail.kernel.org;
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="FRMVxcBH"
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1728342AbfJAQjq (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Tue, 1 Oct 2019 12:39:46 -0400
-Received: from mail.kernel.org ([198.145.29.99]:50766 "EHLO mail.kernel.org"
-        rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-        id S1728316AbfJAQjo (ORCPT <rfc822;linux-block@vger.kernel.org>);
-        Tue, 1 Oct 2019 12:39:44 -0400
-Received: from sasha-vm.mshome.net (c-73-47-72-35.hsd1.nh.comcast.net [73.47.72.35])
-        (using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
-        (No client certificate requested)
-        by mail.kernel.org (Postfix) with ESMTPSA id A7D7C21924;
-        Tue,  1 Oct 2019 16:39:42 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-        s=default; t=1569947983;
-        bh=pj9nPbu8OCxceS12YwPlHpb0aSqTImsM0akfpQMHB4I=;
-        h=From:To:Cc:Subject:Date:In-Reply-To:References:From;
-        b=CWDbhJ0u6IkW7v/133VA4CUF+J0uonSCLr58Ut5y0VwSSr37v7vWIGVlvffXfybad
-         H5xvHJexIwlMMbUenkVUbpw+DE/EMoW8Euj8HrG6P75fxZdW64OVJqrJjMQCUQHl/2
-         jyxJE/Y7mpdfTCDBz5MVQfL9AzfosXCwD/qCkXTc=
-From:   Sasha Levin <sashal@kernel.org>
-To:     linux-kernel@vger.kernel.org, stable@vger.kernel.org
-Cc:     Dongsheng Yang <dongsheng.yang@easystack.cn>,
-        Ilya Dryomov <idryomov@gmail.com>,
-        Sasha Levin <sashal@kernel.org>, ceph-devel@vger.kernel.org,
-        linux-block@vger.kernel.org
-Subject: [PATCH AUTOSEL 5.3 15/71] rbd: fix response length parameter for encoded strings
-Date:   Tue,  1 Oct 2019 12:38:25 -0400
-Message-Id: <20191001163922.14735-15-sashal@kernel.org>
-X-Mailer: git-send-email 2.20.1
-In-Reply-To: <20191001163922.14735-1-sashal@kernel.org>
-References: <20191001163922.14735-1-sashal@kernel.org>
+        id S1727341AbfJARPx (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Tue, 1 Oct 2019 13:15:53 -0400
+Received: from mail-io1-f65.google.com ([209.85.166.65]:46480 "EHLO
+        mail-io1-f65.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S1726473AbfJARPx (ORCPT
+        <rfc822;linux-block@vger.kernel.org>); Tue, 1 Oct 2019 13:15:53 -0400
+Received: by mail-io1-f65.google.com with SMTP id c6so49800009ioo.13;
+        Tue, 01 Oct 2019 10:15:51 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=gmail.com; s=20161025;
+        h=mime-version:references:in-reply-to:from:date:message-id:subject:to
+         :cc;
+        bh=xu9mIUeG8Hcz0lOqfBLA1+CwCuPD3jFNmQ7iOIYU3x4=;
+        b=FRMVxcBHcd1+N35DHWMGKKjOHcKURbQ98/5g7YKFf07zDDazVS2zJVkHkjmS2CA0X7
+         kWbZrrl+jvEkxkrhNegf+buiEwcLYglZKmyEpxxebxrvIOO7l69dlNTzwB9yKeKr992C
+         ahFwsU/tbsPGZ5fiCOs+CTeKmlYZtuvCT7emqm5cTuKawgvvZLaKOzyjdk9smk+T+31J
+         n5+Gy3QnFvXSzvYq6jK4AwoUY6LWSm3C5TLt6d7dFFe0Gsoe7tBisdd52Dd9lp4Vb1HZ
+         U2tM/Y8mX8rsfCiIcoC51K65jx3b5tD4eJ1ztwY3mfO39V0vddOwSbOcWDMt8ZrXObYh
+         9yiw==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20161025;
+        h=x-gm-message-state:mime-version:references:in-reply-to:from:date
+         :message-id:subject:to:cc;
+        bh=xu9mIUeG8Hcz0lOqfBLA1+CwCuPD3jFNmQ7iOIYU3x4=;
+        b=L8/RZtufBzi4Jq0MdXROHbK0VkfnntlA0uIbQa9lK8j9Fc/Fzewqv3MyRiwR7hNpIV
+         +l56buhP7h1cGHOcbJRdmG0LsyUxaXW+SxS7weN2p9Q09RM1kYfnghOU1TJPcKDhFrJR
+         e5otFR1GPWYCbI3331ovJ7RPhAR+8ofvG5tMwcHDMgTA3wZIBcXMNop5HC6aa5vY70Xg
+         5RX4lBgY2vdE8G/sxku9xn12QSX4axRBpnYFnD1lVlcCCTtZU6+u/6CH3R8WugN0E4ds
+         rvQJbu0RazudFEz0BM6OyaHSCsNEb6QPOvj8+HTE13InwwwdwKVxBoI6fQGFm9q7sIyL
+         0yjw==
+X-Gm-Message-State: APjAAAVXuQ4PVaSpXMlB5Oq3k2ZdOxHxFla9g+2xZimvYAR0DBFuU8N1
+        J6hD8mmcBP9rwinl1VFz4/Ln3PohzOAqOvcbZezEG8M4
+X-Google-Smtp-Source: APXvYqwhVLhDPHdY3pVTIpmWCKtEk5hURjUQDpU3+51kVAPkGw4SME8F7rmmPHJ1iDSkth3/EfR+W2roF1UyG07MNbg=
+X-Received: by 2002:a02:ba12:: with SMTP id z18mr24979721jan.16.1569950151370;
+ Tue, 01 Oct 2019 10:15:51 -0700 (PDT)
 MIME-Version: 1.0
-X-stable: review
-X-Patchwork-Hint: Ignore
-Content-Transfer-Encoding: 8bit
+References: <20191001163922.14735-1-sashal@kernel.org> <20191001163922.14735-15-sashal@kernel.org>
+In-Reply-To: <20191001163922.14735-15-sashal@kernel.org>
+From:   Ilya Dryomov <idryomov@gmail.com>
+Date:   Tue, 1 Oct 2019 19:15:49 +0200
+Message-ID: <CAOi1vP-2iSHxJVOabN05+NCiSZ0DxBC9fGN=5cx98mk5RvaDZA@mail.gmail.com>
+Subject: Re: [PATCH AUTOSEL 5.3 15/71] rbd: fix response length parameter for
+ encoded strings
+To:     Sasha Levin <sashal@kernel.org>
+Cc:     LKML <linux-kernel@vger.kernel.org>, stable@vger.kernel.org,
+        Dongsheng Yang <dongsheng.yang@easystack.cn>,
+        Ceph Development <ceph-devel@vger.kernel.org>,
+        linux-block <linux-block@vger.kernel.org>
+Content-Type: text/plain; charset="UTF-8"
 Sender: linux-block-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-From: Dongsheng Yang <dongsheng.yang@easystack.cn>
+On Tue, Oct 1, 2019 at 6:39 PM Sasha Levin <sashal@kernel.org> wrote:
+>
+> From: Dongsheng Yang <dongsheng.yang@easystack.cn>
+>
+> [ Upstream commit 5435d2069503e2aa89c34a94154f4f2fa4a0c9c4 ]
+>
+> rbd_dev_image_id() allocates space for length but passes a smaller
+> value to rbd_obj_method_sync().  rbd_dev_v2_object_prefix() doesn't
+> allocate space for length.  Fix both to be consistent.
+>
+> Signed-off-by: Dongsheng Yang <dongsheng.yang@easystack.cn>
+> Reviewed-by: Ilya Dryomov <idryomov@gmail.com>
+> Signed-off-by: Ilya Dryomov <idryomov@gmail.com>
+> Signed-off-by: Sasha Levin <sashal@kernel.org>
+> ---
+>  drivers/block/rbd.c | 10 ++++++----
+>  1 file changed, 6 insertions(+), 4 deletions(-)
+>
+> diff --git a/drivers/block/rbd.c b/drivers/block/rbd.c
+> index c8fb886aebd4e..69db7385c8df5 100644
+> --- a/drivers/block/rbd.c
+> +++ b/drivers/block/rbd.c
+> @@ -5669,17 +5669,20 @@ static int rbd_dev_v2_image_size(struct rbd_device *rbd_dev)
+>
+>  static int rbd_dev_v2_object_prefix(struct rbd_device *rbd_dev)
+>  {
+> +       size_t size;
+>         void *reply_buf;
+>         int ret;
+>         void *p;
+>
+> -       reply_buf = kzalloc(RBD_OBJ_PREFIX_LEN_MAX, GFP_KERNEL);
+> +       /* Response will be an encoded string, which includes a length */
+> +       size = sizeof(__le32) + RBD_OBJ_PREFIX_LEN_MAX;
+> +       reply_buf = kzalloc(size, GFP_KERNEL);
+>         if (!reply_buf)
+>                 return -ENOMEM;
+>
+>         ret = rbd_obj_method_sync(rbd_dev, &rbd_dev->header_oid,
+>                                   &rbd_dev->header_oloc, "get_object_prefix",
+> -                                 NULL, 0, reply_buf, RBD_OBJ_PREFIX_LEN_MAX);
+> +                                 NULL, 0, reply_buf, size);
+>         dout("%s: rbd_obj_method_sync returned %d\n", __func__, ret);
+>         if (ret < 0)
+>                 goto out;
+> @@ -6696,7 +6699,6 @@ static int rbd_dev_image_id(struct rbd_device *rbd_dev)
+>         dout("rbd id object name is %s\n", oid.name);
+>
+>         /* Response will be an encoded string, which includes a length */
+> -
+>         size = sizeof (__le32) + RBD_IMAGE_ID_LEN_MAX;
+>         response = kzalloc(size, GFP_NOIO);
+>         if (!response) {
+> @@ -6708,7 +6710,7 @@ static int rbd_dev_image_id(struct rbd_device *rbd_dev)
+>
+>         ret = rbd_obj_method_sync(rbd_dev, &oid, &rbd_dev->header_oloc,
+>                                   "get_id", NULL, 0,
+> -                                 response, RBD_IMAGE_ID_LEN_MAX);
+> +                                 response, size);
+>         dout("%s: rbd_obj_method_sync returned %d\n", __func__, ret);
+>         if (ret == -ENOENT) {
+>                 image_id = kstrdup("", GFP_KERNEL);
 
-[ Upstream commit 5435d2069503e2aa89c34a94154f4f2fa4a0c9c4 ]
+Hi Sasha,
 
-rbd_dev_image_id() allocates space for length but passes a smaller
-value to rbd_obj_method_sync().  rbd_dev_v2_object_prefix() doesn't
-allocate space for length.  Fix both to be consistent.
+This patch just made things consistent, there was no bug here.  I don't
+think it should be backported.
 
-Signed-off-by: Dongsheng Yang <dongsheng.yang@easystack.cn>
-Reviewed-by: Ilya Dryomov <idryomov@gmail.com>
-Signed-off-by: Ilya Dryomov <idryomov@gmail.com>
-Signed-off-by: Sasha Levin <sashal@kernel.org>
----
- drivers/block/rbd.c | 10 ++++++----
- 1 file changed, 6 insertions(+), 4 deletions(-)
+Thanks,
 
-diff --git a/drivers/block/rbd.c b/drivers/block/rbd.c
-index c8fb886aebd4e..69db7385c8df5 100644
---- a/drivers/block/rbd.c
-+++ b/drivers/block/rbd.c
-@@ -5669,17 +5669,20 @@ static int rbd_dev_v2_image_size(struct rbd_device *rbd_dev)
- 
- static int rbd_dev_v2_object_prefix(struct rbd_device *rbd_dev)
- {
-+	size_t size;
- 	void *reply_buf;
- 	int ret;
- 	void *p;
- 
--	reply_buf = kzalloc(RBD_OBJ_PREFIX_LEN_MAX, GFP_KERNEL);
-+	/* Response will be an encoded string, which includes a length */
-+	size = sizeof(__le32) + RBD_OBJ_PREFIX_LEN_MAX;
-+	reply_buf = kzalloc(size, GFP_KERNEL);
- 	if (!reply_buf)
- 		return -ENOMEM;
- 
- 	ret = rbd_obj_method_sync(rbd_dev, &rbd_dev->header_oid,
- 				  &rbd_dev->header_oloc, "get_object_prefix",
--				  NULL, 0, reply_buf, RBD_OBJ_PREFIX_LEN_MAX);
-+				  NULL, 0, reply_buf, size);
- 	dout("%s: rbd_obj_method_sync returned %d\n", __func__, ret);
- 	if (ret < 0)
- 		goto out;
-@@ -6696,7 +6699,6 @@ static int rbd_dev_image_id(struct rbd_device *rbd_dev)
- 	dout("rbd id object name is %s\n", oid.name);
- 
- 	/* Response will be an encoded string, which includes a length */
--
- 	size = sizeof (__le32) + RBD_IMAGE_ID_LEN_MAX;
- 	response = kzalloc(size, GFP_NOIO);
- 	if (!response) {
-@@ -6708,7 +6710,7 @@ static int rbd_dev_image_id(struct rbd_device *rbd_dev)
- 
- 	ret = rbd_obj_method_sync(rbd_dev, &oid, &rbd_dev->header_oloc,
- 				  "get_id", NULL, 0,
--				  response, RBD_IMAGE_ID_LEN_MAX);
-+				  response, size);
- 	dout("%s: rbd_obj_method_sync returned %d\n", __func__, ret);
- 	if (ret == -ENOENT) {
- 		image_id = kstrdup("", GFP_KERNEL);
--- 
-2.20.1
-
+                Ilya
