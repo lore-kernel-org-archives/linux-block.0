@@ -2,134 +2,94 @@ Return-Path: <SRS0=4xm9=X2=vger.kernel.org=linux-block-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-2.3 required=3.0 tests=DKIM_SIGNED,DKIM_VALID,
-	HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,
-	USER_AGENT_SANE_1 autolearn=no autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-0.8 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
+	MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS autolearn=no autolearn_force=no
+	version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id D2C40C352AA
-	for <linux-block@archiver.kernel.org>; Tue,  1 Oct 2019 18:08:21 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id BB95DC352AA
+	for <linux-block@archiver.kernel.org>; Tue,  1 Oct 2019 18:31:51 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.kernel.org (Postfix) with ESMTP id ABA4121A4A
-	for <linux-block@archiver.kernel.org>; Tue,  1 Oct 2019 18:08:21 +0000 (UTC)
-Authentication-Results: mail.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel-dk.20150623.gappssmtp.com header.i=@kernel-dk.20150623.gappssmtp.com header.b="GARLG2Ou"
+	by mail.kernel.org (Postfix) with ESMTP id 9FE42215EA
+	for <linux-block@archiver.kernel.org>; Tue,  1 Oct 2019 18:31:51 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1729832AbfJASIV (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Tue, 1 Oct 2019 14:08:21 -0400
-Received: from mail-io1-f66.google.com ([209.85.166.66]:45327 "EHLO
-        mail-io1-f66.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1729420AbfJASIU (ORCPT
-        <rfc822;linux-block@vger.kernel.org>); Tue, 1 Oct 2019 14:08:20 -0400
-Received: by mail-io1-f66.google.com with SMTP id c25so50308254iot.12
-        for <linux-block@vger.kernel.org>; Tue, 01 Oct 2019 11:08:20 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=kernel-dk.20150623.gappssmtp.com; s=20150623;
-        h=subject:to:cc:references:from:message-id:date:user-agent
-         :mime-version:in-reply-to:content-language:content-transfer-encoding;
-        bh=+XTOX0LQOUFg1m/meFnFguM93CeUXC33Mlpt/kQ0ZE0=;
-        b=GARLG2Ouib+fEjPWYSCXvvfu3OfCRZi730mbD0+dZ186MBMZHSPxwhotmH5XCSHR8P
-         bPbRXnddKRjogEM4mAXSW2f6vOT0Q2waddY7qfzP6AtPJ5PYjJm89fP423Oa3J0DUVt3
-         4epIL2EUS0N2LO+lwKRz9mtfDHbLNCxbUurulgOghvlp+Rd9mVNrj4d+GpA+iDzzpP+x
-         tu9+IegCJllRbIlMJDlXxdybnHMYc2slMt66yvF4a+OcVvBZwP3SX4PeqaeruYAZgWVo
-         ZCwfqvGpecrHjjfKZymPt3JYUbXeKdfqMp3WKZSQd9VFvp+nEShxNlVJAMBCBwDGMp6j
-         tqQg==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20161025;
-        h=x-gm-message-state:subject:to:cc:references:from:message-id:date
-         :user-agent:mime-version:in-reply-to:content-language
-         :content-transfer-encoding;
-        bh=+XTOX0LQOUFg1m/meFnFguM93CeUXC33Mlpt/kQ0ZE0=;
-        b=E7Rgwu+2UZuMmcbnDKpgrzB5beFtnYclOJ+Z6sy1+wA81RH25w1RCp7GcKsHWiScbC
-         YnbDZ8el7Bm3kybW1OOqRwG3QYzclLz2SY50QUO3/jxaIQdKncgYrHKbhKa6ZUJ7916C
-         U7iTE30Z3jGhGxA2Epdh8HJ3eXxzPApp5GXPGMKQAAacLAaCEU7YNehWFf8N640xnNWE
-         r1rDulQO09jTLQoW6Nm8nbKSbkVPpbk11UW9MvMo8clKPBbAiTfibZvDm2Vl0PMgco1l
-         ZvNyIHM8rtjH7MrXzdiLvI15oWGkW4aq6iWaAsp5QLgNQ7T8RKs2Z5Nny7TNVjo/jtDU
-         FUPw==
-X-Gm-Message-State: APjAAAUHCtwqwo3I52PnIoxBImbCXwKXGyMJsnKdH9HPNHeP7N/8Yrfa
-        O2B/0//ONSKMaC36HatyIFkfTg==
-X-Google-Smtp-Source: APXvYqyYmHX6/zLaE9okaUhuWyOFD2Ih0X+Dl7fjQ0c7EaHsFKjqIA19qZuoFdj+AKRw1Tu3DrRmJQ==
-X-Received: by 2002:a92:5a14:: with SMTP id o20mr27872935ilb.71.1569953299642;
-        Tue, 01 Oct 2019 11:08:19 -0700 (PDT)
-Received: from [192.168.1.50] ([65.144.74.34])
-        by smtp.gmail.com with ESMTPSA id k7sm7181020iob.80.2019.10.01.11.08.18
-        (version=TLS1_2 cipher=ECDHE-RSA-AES128-GCM-SHA256 bits=128/128);
-        Tue, 01 Oct 2019 11:08:18 -0700 (PDT)
-Subject: Re: [PATCH] io_uring: use __kernel_timespec in timeout ABI
-To:     Florian Weimer <fweimer@redhat.com>, Arnd Bergmann <arnd@arndb.de>
-Cc:     y2038 Mailman List <y2038@lists.linaro.org>,
-        Linux API <linux-api@vger.kernel.org>,
-        Alexander Viro <viro@zeniv.linux.org.uk>,
-        =?UTF-8?Q?Stefan_B=c3=bchler?= <source@stbuehler.de>,
-        Hannes Reinecke <hare@suse.com>,
-        Jackie Liu <liuyun01@kylinos.cn>,
-        Andrew Morton <akpm@linux-foundation.org>,
-        Hristo Venev <hristo@venev.name>,
-        linux-block <linux-block@vger.kernel.org>,
-        Linux FS-devel Mailing List <linux-fsdevel@vger.kernel.org>,
-        "linux-kernel@vger.kernel.org" <linux-kernel@vger.kernel.org>
-References: <20190930202055.1748710-1-arnd@arndb.de>
- <8d5d34da-e1f0-1ab5-461e-f3145e52c48a@kernel.dk>
- <623e1d27-d3b1-3241-bfd4-eb94ce70da14@kernel.dk>
- <CAK8P3a3AAFXNmpQwuirzM+jgEQGj9tMC_5oaSs4CfiEVGmTkZg@mail.gmail.com>
- <874l0stpog.fsf@oldenburg2.str.redhat.com>
-From:   Jens Axboe <axboe@kernel.dk>
-Message-ID: <dc4fc8dc-0a6b-19a2-e85b-71fd1ad4c4ca@kernel.dk>
-Date:   Tue, 1 Oct 2019 12:08:16 -0600
-User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:60.0) Gecko/20100101
- Thunderbird/60.8.0
+        id S1726105AbfJASbs (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Tue, 1 Oct 2019 14:31:48 -0400
+Received: from iolanthe.rowland.org ([192.131.102.54]:49072 "HELO
+        iolanthe.rowland.org" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with SMTP id S1725848AbfJASbr (ORCPT
+        <rfc822;linux-block@vger.kernel.org>); Tue, 1 Oct 2019 14:31:47 -0400
+Received: (qmail 6459 invoked by uid 2102); 1 Oct 2019 14:31:46 -0400
+Received: from localhost (sendmail-bs@127.0.0.1)
+  by localhost with SMTP; 1 Oct 2019 14:31:46 -0400
+Date:   Tue, 1 Oct 2019 14:31:46 -0400 (EDT)
+From:   Alan Stern <stern@rowland.harvard.edu>
+X-X-Sender: stern@iolanthe.rowland.org
+To:     Steven Rostedt <rostedt@goodmis.org>
+cc:     LKML <linux-kernel@vger.kernel.org>, <linux-block@vger.kernel.org>,
+        <linux-usb@vger.kernel.org>, Jens Axboe <axboe@kernel.dk>,
+        Greg Kroah-Hartman <gregkh@linuxfoundation.org>
+Subject: Re: Lockup on USB and block devices
+In-Reply-To: <20191001134430.1f9c9c75@gandalf.local.home>
+Message-ID: <Pine.LNX.4.44L0.1910011427110.1991-100000@iolanthe.rowland.org>
 MIME-Version: 1.0
-In-Reply-To: <874l0stpog.fsf@oldenburg2.str.redhat.com>
-Content-Type: text/plain; charset=utf-8
-Content-Language: en-US
-Content-Transfer-Encoding: 7bit
+Content-Type: TEXT/PLAIN; charset=US-ASCII
 Sender: linux-block-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-On 10/1/19 10:07 AM, Florian Weimer wrote:
-> * Arnd Bergmann:
-> 
->> On Tue, Oct 1, 2019 at 5:38 PM Jens Axboe <axboe@kernel.dk> wrote:
->>>
->>> On 10/1/19 8:09 AM, Jens Axboe wrote:
->>>> On 9/30/19 2:20 PM, Arnd Bergmann wrote:
->>>>> All system calls use struct __kernel_timespec instead of the old struct
->>>>> timespec, but this one was just added with the old-style ABI. Change it
->>>>> now to enforce the use of __kernel_timespec, avoiding ABI confusion and
->>>>> the need for compat handlers on 32-bit architectures.
->>>>>
->>>>> Any user space caller will have to use __kernel_timespec now, but this
->>>>> is unambiguous and works for any C library regardless of the time_t
->>>>> definition. A nicer way to specify the timeout would have been a less
->>>>> ambiguous 64-bit nanosecond value, but I suppose it's too late now to
->>>>> change that as this would impact both 32-bit and 64-bit users.
->>>>
->>>> Thanks for catching that, Arnd. Applied.
->>>
->>> On second thought - since there appears to be no good 64-bit timespec
->>> available to userspace, the alternative here is including on in liburing.
->>
->> What's wrong with using __kernel_timespec? Just the name?
->> I suppose liburing could add a macro to give it a different name
->> for its users.
-> 
-> Yes, mostly the name.
-> 
-> __ names are reserved for the C/C++ implementation (which does not
-> include the kernel).  __kernel_timespec looks like an internal kernel
-> type to the uninitiated, not a UAPI type.
-> 
-> Once we have struct timespec64 in userspace, you also end up with
-> copying stuff around or introducing aliasing violations.
-> 
-> I'm not saying those concerns are valid, but you asked what's wrong with
-> it. 8-)
+On Tue, 1 Oct 2019, Steven Rostedt wrote:
 
-FWIW, I do agree, __kernel_timespec sounds like an internal type, not
-something apps should be using. timespec64 works a lot better for that.
-Oh well.
+> Not sure who to blame, but my server locked up when upgraded (accessing
+> volume group information), and echoing in "w" into sysrq-trigger showed
+> a bit of information.
+> 
+> First, looking at my dmesg I see that my usb-storage is hung up, for
+> whatever reason. Thus, this could be the source of all issues.
+> 
+> 
+> [5434447.145737] INFO: task usb-storage:32246 blocked for more than 120 seconds.
+> [5434447.145740]       Not tainted 5.2.4-custom #4
+> 
+> (BTW, I was upgrading to my 5.2.17 kernel when this happened)
+> 
+> [5434447.145741] "echo 0 > /proc/sys/kernel/hung_task_timeout_secs" disables this message.
+> [5434447.145743] usb-storage     D    0 32246      2 0x80004000
+> [5434447.145745] Call Trace:
+> [5434447.145749]  ? __schedule+0x1e8/0x600
+> [5434447.145752]  schedule+0x29/0x90
+> [5434447.145755]  schedule_timeout+0x208/0x300
+> [5434447.145765]  ? usb_hcd_submit_urb+0xbe/0xb90 [usbcore]
+> [5434447.145773]  ? usb_alloc_urb+0x23/0x70 [usbcore]
+> [5434447.145782]  ? usb_sg_init+0x92/0x2b0 [usbcore]
+> [5434447.145791]  ? usb_hcd_submit_urb+0xbe/0xb90 [usbcore]
+> [5434447.145795]  ? __switch_to_asm+0x34/0x70
+> [5434447.145798]  wait_for_completion+0x111/0x180
+> [5434447.145800]  ? wake_up_q+0x70/0x70
+> [5434447.145809]  usb_sg_wait+0xfa/0x150 [usbcore]
+> [5434447.145814]  usb_stor_bulk_transfer_sglist.part.4+0x64/0xb0 [usb_storage]
+> [5434447.145818]  usb_stor_bulk_srb+0x49/0x80 [usb_storage]
+> [5434447.145821]  usb_stor_Bulk_transport+0x167/0x3e0 [usb_storage]
+> [5434447.145824]  ? schedule+0x29/0x90
+> [5434447.145828]  ? usb_stor_disconnect+0xb0/0xb0 [usb_storage]
+> [5434447.145832]  usb_stor_invoke_transport+0x3a/0x4e0 [usb_storage]
+> [5434447.145835]  ? wait_for_completion_interruptible+0x12d/0x1d0
+> [5434447.145837]  ? wake_up_q+0x70/0x70
+> [5434447.145841]  usb_stor_control_thread+0x1c5/0x270 [usb_storage]
+> [5434447.145845]  kthread+0x116/0x130
+> [5434447.145847]  ? kthread_create_worker_on_cpu+0x70/0x70
+> [5434447.145851]  ret_from_fork+0x35/0x40
 
--- 
-Jens Axboe
+It looks like a problem with your xHCI USB host controller.  Normally a
+usb-storage transfer would be aborted after 90 seconds.  But if the
+host controller (or its driver) isn't working right, and the abort
+never completes, you end up with a situation like this -- usb-storage
+and the higher SCSI and block layers waiting indefinitely for an event
+that won't occur.
+
+In theory, unplugging the USB mass-storage device would unblock
+everything (unless xhci-hcd is too badly wedged).  But of course, doing
+that is likely to mess up whatever you were working on.
+
+Alan Stern
 
