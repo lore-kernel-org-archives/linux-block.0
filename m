@@ -2,63 +2,44 @@ Return-Path: <SRS0=s2CZ=X3=vger.kernel.org=linux-block-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-0.9 required=3.0 tests=DKIM_SIGNED,DKIM_VALID,
-	DKIM_VALID_AU,HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SPF_HELO_NONE,
-	SPF_PASS autolearn=no autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-2.6 required=3.0 tests=DKIMWL_WL_HIGH,DKIM_SIGNED,
+	DKIM_VALID,DKIM_VALID_AU,MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,
+	USER_AGENT_SANE_1 autolearn=no autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 4EED9ECE58A
-	for <linux-block@archiver.kernel.org>; Wed,  2 Oct 2019 15:45:19 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id EFF0EC35280
+	for <linux-block@archiver.kernel.org>; Wed,  2 Oct 2019 16:01:21 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.kernel.org (Postfix) with ESMTP id 25A1F21D82
-	for <linux-block@archiver.kernel.org>; Wed,  2 Oct 2019 15:45:19 +0000 (UTC)
-Authentication-Results: mail.kernel.org;
-	dkim=pass (2048-bit key) header.d=cloud.ionos.com header.i=@cloud.ionos.com header.b="gYoxaP2U"
+	by mail.kernel.org (Postfix) with ESMTP id C65C5222C0
+	for <linux-block@archiver.kernel.org>; Wed,  2 Oct 2019 16:01:21 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+	s=default; t=1570032081;
+	bh=98zbXrCvdXboZ6utLF9G+ewXb0o0MRQR//RXyXSOsws=;
+	h=Date:From:To:Cc:Subject:References:In-Reply-To:List-ID:From;
+	b=xnky/Qm3jalMQBGhIcprhFnb9C3u9vNUoQJEEASQHsnnIZadAMFJQTEpr7v9X0SIQ
+	 FCRhAj5v7prci5I+RQu7rvlB3E9DmRrilnqrQ4otEsk0xbiCNX8yjsRlTg1Vgwl/Ry
+	 1dq5gGzWbAB3IWjjwKEbBZukwj8rus2ohjCvwzS4=
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1725975AbfJBPpS (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Wed, 2 Oct 2019 11:45:18 -0400
-Received: from mail-wr1-f68.google.com ([209.85.221.68]:42483 "EHLO
-        mail-wr1-f68.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1727501AbfJBPpS (ORCPT
-        <rfc822;linux-block@vger.kernel.org>); Wed, 2 Oct 2019 11:45:18 -0400
-Received: by mail-wr1-f68.google.com with SMTP id n14so20212732wrw.9
-        for <linux-block@vger.kernel.org>; Wed, 02 Oct 2019 08:45:16 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=cloud.ionos.com; s=google;
-        h=mime-version:references:in-reply-to:from:date:message-id:subject:to
-         :cc;
-        bh=t5p/0tThgyItyODv7V+0TAVxGAAHOFwJFUBoHw4F5G0=;
-        b=gYoxaP2UH776VGMKgpsR/TmCJc9tGlF5ZZ75dA/fbSpuKq38JvZLL5gPWQXJqMsbhQ
-         jjTOZAJ6RIZAtcDxP98Siq4LmdJzhuGc8kGfcqXHc9LKsRJLR6/Q7oxvY+Vohkm2ieQo
-         WJJPfvBrPIzt89lTXOTBV25CpuUREwSqYXBZnazFDKl76cBYuxhoxoDKuohDOOMMGxAb
-         LmIF6x+cDIm3hfDSy65/fpyXJS57pogqTA1jI/GX4TX9aGQ5ZEg3CaK/DGoEBfv0zi1i
-         EXWNxrvMVQ6dceBuHa5DeOnQ3zb6Au9PZ+QatO56Z5o9Ynh8zMbpXYfiwReOtieePKJ1
-         kEAg==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20161025;
-        h=x-gm-message-state:mime-version:references:in-reply-to:from:date
-         :message-id:subject:to:cc;
-        bh=t5p/0tThgyItyODv7V+0TAVxGAAHOFwJFUBoHw4F5G0=;
-        b=ZSncaJgEJ5LeDV5HrVnTHwigL20U0a8HHZ2iMtHXV7/wRwsvF+QTkaVqc9SfOcfOOo
-         oo2xQAgAGRqb/WA92/SHfQ3huwLrkJtyFD0DMtiNg8JnmZbn3mcsyb4rEGcq3ezBhp9k
-         VgcM7U64b2AK82hP681ZHXpim9UJi7VgyT/tamkRdkv/uZw2aE++cLurixstbd0bfV3s
-         v6eiR0eDooJQ7PmqNYPs5XMn0WjGvz37XVaKKLODcAk4vykWi2ADtAaV+hGusdKjvI6b
-         Z5PMOzoRqRIVJNKf8cmhwra5VRXmjesSLyD0kZrtFIlg4FOf4MVCgjQ3Js3AROlFAwLd
-         H8+Q==
-X-Gm-Message-State: APjAAAXGnmcm+RGcdv7oMNQ/KgglZw+VIfsowkh14MO6PoBCNmSSS4i3
-        rIByZ+m8k4mQQMvynUWIKY5XRVTetZU6R+Aqne9w4g==
-X-Google-Smtp-Source: APXvYqz0qilpqeX88ijxeU7I/xyvTYeowmVr0R+DOax/VJOsJHJuxlfJai/yVIAL8OD1gUyL8Tm9tBzyvDoYPl+dpNQ=
-X-Received: by 2002:adf:d192:: with SMTP id v18mr3531467wrc.9.1570031115489;
- Wed, 02 Oct 2019 08:45:15 -0700 (PDT)
-MIME-Version: 1.0
-References: <20190620150337.7847-1-jinpuwang@gmail.com> <20190620150337.7847-12-jinpuwang@gmail.com>
- <8477e5d5-036b-f3b5-976b-624b811baf38@acm.org> <CAMGffE=dBo-yZVOvyjyeauEEHzHOjmgtOjGKB+GiQiSoMX7Sig@mail.gmail.com>
- <20191002154219.GG5855@unreal>
-In-Reply-To: <20191002154219.GG5855@unreal>
-From:   Jinpu Wang <jinpu.wang@cloud.ionos.com>
-Date:   Wed, 2 Oct 2019 17:45:04 +0200
-Message-ID: <CAMGffEmfOHPCEOXC8OGvq2r0S_hrbN1D5EJk0Lpvte=dd4L7Rg@mail.gmail.com>
-Subject: Re: [PATCH v4 11/25] ibtrs: server: statistics functions
-To:     Leon Romanovsky <leon@kernel.org>
+        id S1726953AbfJBQBV (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Wed, 2 Oct 2019 12:01:21 -0400
+Received: from mail.kernel.org ([198.145.29.99]:34772 "EHLO mail.kernel.org"
+        rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
+        id S1725799AbfJBQBV (ORCPT <rfc822;linux-block@vger.kernel.org>);
+        Wed, 2 Oct 2019 12:01:21 -0400
+Received: from localhost (unknown [77.137.89.37])
+        (using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+        (No client certificate requested)
+        by mail.kernel.org (Postfix) with ESMTPSA id D6A2A21D81;
+        Wed,  2 Oct 2019 16:01:18 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+        s=default; t=1570032080;
+        bh=98zbXrCvdXboZ6utLF9G+ewXb0o0MRQR//RXyXSOsws=;
+        h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
+        b=j9W+NDYGqAwNAD6EgCb7f3FpIqwv/I4RP8VNI/7AFZ15nIH/WRpF3gmAk5TBiRzmg
+         Psldqu6rZ9X1fI04nN9t0ZBTC+nEDsT54SFV+O0up5NpjqmDL+KqDtjiEnGIraacng
+         ++3VindvhrpNpTfnouEuW2je+QbaDDqfo62OIOKM=
+Date:   Wed, 2 Oct 2019 19:00:56 +0300
+From:   Leon Romanovsky <leon@kernel.org>
+To:     Jinpu Wang <jinpu.wang@cloud.ionos.com>
 Cc:     Bart Van Assche <bvanassche@acm.org>,
         Jack Wang <jinpuwang@gmail.com>, linux-block@vger.kernel.org,
         linux-rdma@vger.kernel.org, Jens Axboe <axboe@kernel.dk>,
@@ -67,50 +48,71 @@ Cc:     Bart Van Assche <bvanassche@acm.org>,
         Jason Gunthorpe <jgg@mellanox.com>,
         Doug Ledford <dledford@redhat.com>,
         Danil Kipnis <danil.kipnis@cloud.ionos.com>, rpenyaev@suse.de
-Content-Type: text/plain; charset="UTF-8"
+Subject: Re: [PATCH v4 11/25] ibtrs: server: statistics functions
+Message-ID: <20191002160056.GI5855@unreal>
+References: <20190620150337.7847-1-jinpuwang@gmail.com>
+ <20190620150337.7847-12-jinpuwang@gmail.com>
+ <8477e5d5-036b-f3b5-976b-624b811baf38@acm.org>
+ <CAMGffE=dBo-yZVOvyjyeauEEHzHOjmgtOjGKB+GiQiSoMX7Sig@mail.gmail.com>
+ <20191002154219.GG5855@unreal>
+ <CAMGffEmfOHPCEOXC8OGvq2r0S_hrbN1D5EJk0Lpvte=dd4L7Rg@mail.gmail.com>
+MIME-Version: 1.0
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <CAMGffEmfOHPCEOXC8OGvq2r0S_hrbN1D5EJk0Lpvte=dd4L7Rg@mail.gmail.com>
+User-Agent: Mutt/1.12.1 (2019-06-15)
 Sender: linux-block-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-On Wed, Oct 2, 2019 at 5:42 PM Leon Romanovsky <leon@kernel.org> wrote:
->
-> On Wed, Oct 02, 2019 at 05:15:10PM +0200, Jinpu Wang wrote:
-> > On Tue, Sep 24, 2019 at 1:56 AM Bart Van Assche <bvanassche@acm.org> wrote:
-> > >
-> > > On 6/20/19 8:03 AM, Jack Wang wrote:
-> > > > +ssize_t ibtrs_srv_stats_rdma_to_str(struct ibtrs_srv_stats *stats,
-> > > > +                                 char *page, size_t len)
-> > > > +{
-> > > > +     struct ibtrs_srv_stats_rdma_stats *r = &stats->rdma_stats;
-> > > > +     struct ibtrs_srv_sess *sess;
-> > > > +
-> > > > +     sess = container_of(stats, typeof(*sess), stats);
-> > > > +
-> > > > +     return scnprintf(page, len, "%lld %lld %lld %lld %u\n",
-> > > > +                      (s64)atomic64_read(&r->dir[READ].cnt),
-> > > > +                      (s64)atomic64_read(&r->dir[READ].size_total),
-> > > > +                      (s64)atomic64_read(&r->dir[WRITE].cnt),
-> > > > +                      (s64)atomic64_read(&r->dir[WRITE].size_total),
-> > > > +                      atomic_read(&sess->ids_inflight));
-> > > > +}
-> > >
-> > > Does this follow the sysfs one-value-per-file rule? See also
-> > > Documentation/filesystems/sysfs.txt.
-> > >
-> > > Thanks,
-> > >
-> > > Bart.
-> > It looks overkill to create one file for each value to me, and there
-> > are enough stats in sysfs contain multiple values.
->
-> Not for statistics.
-2 examples:
-cat /sys/block/nvme0n1/inflight
-       0        0
-cat /sys/block/nvme0n1/stat
- 1267566       53 85396638   927624  4790532  3076340 198306930
-19413605        0  2459788 17013620    74392        0 397606816
-6864
+On Wed, Oct 02, 2019 at 05:45:04PM +0200, Jinpu Wang wrote:
+> On Wed, Oct 2, 2019 at 5:42 PM Leon Romanovsky <leon@kernel.org> wrote:
+> >
+> > On Wed, Oct 02, 2019 at 05:15:10PM +0200, Jinpu Wang wrote:
+> > > On Tue, Sep 24, 2019 at 1:56 AM Bart Van Assche <bvanassche@acm.org> wrote:
+> > > >
+> > > > On 6/20/19 8:03 AM, Jack Wang wrote:
+> > > > > +ssize_t ibtrs_srv_stats_rdma_to_str(struct ibtrs_srv_stats *stats,
+> > > > > +                                 char *page, size_t len)
+> > > > > +{
+> > > > > +     struct ibtrs_srv_stats_rdma_stats *r = &stats->rdma_stats;
+> > > > > +     struct ibtrs_srv_sess *sess;
+> > > > > +
+> > > > > +     sess = container_of(stats, typeof(*sess), stats);
+> > > > > +
+> > > > > +     return scnprintf(page, len, "%lld %lld %lld %lld %u\n",
+> > > > > +                      (s64)atomic64_read(&r->dir[READ].cnt),
+> > > > > +                      (s64)atomic64_read(&r->dir[READ].size_total),
+> > > > > +                      (s64)atomic64_read(&r->dir[WRITE].cnt),
+> > > > > +                      (s64)atomic64_read(&r->dir[WRITE].size_total),
+> > > > > +                      atomic_read(&sess->ids_inflight));
+> > > > > +}
+> > > >
+> > > > Does this follow the sysfs one-value-per-file rule? See also
+> > > > Documentation/filesystems/sysfs.txt.
+> > > >
+> > > > Thanks,
+> > > >
+> > > > Bart.
+> > > It looks overkill to create one file for each value to me, and there
+> > > are enough stats in sysfs contain multiple values.
+> >
+> > Not for statistics.
+> 2 examples:
+> cat /sys/block/nvme0n1/inflight
+>        0        0
+> cat /sys/block/nvme0n1/stat
+>  1267566       53 85396638   927624  4790532  3076340 198306930
+> 19413605        0  2459788 17013620    74392        0 397606816
+> 6864
+
+OMG, I feel sorry for users who now should go and read code to see what
+column 3 in second row means.
+
+We respect our users, please don't do like they did.
 
 Thanks
+
+>
+> Thanks
