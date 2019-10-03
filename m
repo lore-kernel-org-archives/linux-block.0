@@ -2,108 +2,92 @@ Return-Path: <SRS0=GSyA=X4=vger.kernel.org=linux-block-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-2.6 required=3.0 tests=DKIMWL_WL_HIGH,DKIM_SIGNED,
-	DKIM_VALID,DKIM_VALID_AU,MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,
-	USER_AGENT_SANE_1 autolearn=no autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-3.8 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
+	MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS autolearn=no
+	autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id BBB48C10F14
-	for <linux-block@archiver.kernel.org>; Thu,  3 Oct 2019 17:00:28 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id C3B65C32792
+	for <linux-block@archiver.kernel.org>; Thu,  3 Oct 2019 17:06:15 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.kernel.org (Postfix) with ESMTP id 933292070B
-	for <linux-block@archiver.kernel.org>; Thu,  3 Oct 2019 17:00:28 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=default; t=1570122028;
-	bh=E1mnXerODbEXRn9aKW4A7q6u0klKrptr8tBzOAQqpeM=;
-	h=Date:From:To:Cc:Subject:References:In-Reply-To:List-ID:From;
-	b=DHUyddhBz86IF5K8gvtzGoVPCnLMKif3WW17i4bPRr8+t7nPcjSKp1tHY9f6dTNMB
-	 5/S6KqpViAICbwq9yDMu+iFUVsXvxJJ6JzdYJQmQKMWX2swtg7PbXk1hkMj83Pke8w
-	 bzZrmuCnh+N13PoZl8Y+JYd7OLeJrKWFfiRnlsAg=
+	by mail.kernel.org (Postfix) with ESMTP id A007E20673
+	for <linux-block@archiver.kernel.org>; Thu,  3 Oct 2019 17:06:15 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S2392970AbfJCRAX (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Thu, 3 Oct 2019 13:00:23 -0400
-Received: from mail-qk1-f193.google.com ([209.85.222.193]:35267 "EHLO
-        mail-qk1-f193.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S2392862AbfJCQp4 (ORCPT
-        <rfc822;linux-block@vger.kernel.org>); Thu, 3 Oct 2019 12:45:56 -0400
-Received: by mail-qk1-f193.google.com with SMTP id w2so3044902qkf.2;
-        Thu, 03 Oct 2019 09:45:55 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20161025;
-        h=sender:date:from:to:cc:subject:message-id:references:mime-version
-         :content-disposition:content-transfer-encoding:in-reply-to
-         :user-agent;
-        bh=cY7dwSAZ/LRC+V3+VuDl/u0CtvPhkHUKtwYdGP4h8tM=;
-        b=hLGF2x3mry/9VP8Cgyatm0IMsLfiswwpsqSwtwh3Z2Hay6ZNSrYP6Hl5hSyR5M48qX
-         0IPsGhDFHmzedwYhjqPSKXxSwEpjaF1SjvuJ0FK0DlG2SceDEdslkMbvqyN5w454YJEj
-         OuwD5C0GKsFxYOH/fjS9taQ1Fao+rvVL7X1AVWbbtq3PQMNMju9lJvlRQgAV3ZyrxHfz
-         Zj6wGdAz4K8h7+DjIXPxytnFabB1ZqrIkvVfNl+Es1B4BNAEYSyFz5+rL/yTVGZXslMS
-         T9YRxz1/wbsN4CzseBltb1yCaLMVpoVxf5u9viLfyDTGM5uggapI2PAJl/M2cNZb9nJB
-         +HVQ==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20161025;
-        h=x-gm-message-state:sender:date:from:to:cc:subject:message-id
-         :references:mime-version:content-disposition
-         :content-transfer-encoding:in-reply-to:user-agent;
-        bh=cY7dwSAZ/LRC+V3+VuDl/u0CtvPhkHUKtwYdGP4h8tM=;
-        b=RMHT5/h6CUgdSc/0yRyZM0s0mVbobXvyVqfA+oKKvrAeSR4Lc0r6jyTSXT7e/P0E0X
-         GlgTldK6jN0y2Nm4cbGWWnoj2QyGAKbzSpgRk+F4qd8EwDXGRbOKXoFQ5JlKOATFhxw6
-         eTlfLkKVQrOi7qtzWnJML+OR33E056u/cGwHHVZttZRvMXLTCj+XIcwA6STFxZb40Aws
-         GkMdjKMGoVsp2XXJzVXaut/uITHYfcF6ek0S0F4Bcg/WhG/9+GYKGxDcbJosxAjHKvak
-         a3T4bmzlJKp8yXajbWn5eXrTVq+a8C/cmsn4la3dKs8goeqveg7LM6SU9o/k8XKooygR
-         X2Yw==
-X-Gm-Message-State: APjAAAVPjRvcNqvwQTuBqa+J1fViD7Nf7o1OM9epKhg6SJBx5u12wJxa
-        ZQTxKnrEg93PUXGG19MHNTM=
-X-Google-Smtp-Source: APXvYqwyDNBYMAZlSJRkUJmx4zksig6ZCgUKH4qEh9uQ/wdnO/i0VrSvc1T2/bEhZTtSydu35p/6UQ==
-X-Received: by 2002:ae9:e810:: with SMTP id a16mr5237472qkg.364.1570121154872;
-        Thu, 03 Oct 2019 09:45:54 -0700 (PDT)
-Received: from localhost ([2620:10d:c091:500::3:9f72])
-        by smtp.gmail.com with ESMTPSA id c131sm1941291qke.24.2019.10.03.09.45.54
-        (version=TLS1_2 cipher=ECDHE-RSA-AES128-GCM-SHA256 bits=128/128);
-        Thu, 03 Oct 2019 09:45:54 -0700 (PDT)
-Date:   Thu, 3 Oct 2019 09:45:52 -0700
-From:   Tejun Heo <tj@kernel.org>
-To:     Michal =?iso-8859-1?Q?Koutn=FD?= <mkoutny@suse.com>
-Cc:     hannes@cmpxchg.org, clm@fb.com, dennisz@fb.com,
-        Josef Bacik <jbacik@fb.com>, kernel-team@fb.com,
-        newella@fb.com, lizefan@huawei.com, axboe@kernel.dk,
-        Paolo Valente <paolo.valente@linaro.org>,
-        Rik van Riel <riel@surriel.com>, josef@toxicpanda.com,
-        cgroups@vger.kernel.org, linux-block@vger.kernel.org,
-        linux-kernel@vger.kernel.org
-Subject: Re: [PATCH 08/10] blkcg: implement blk-iocost
-Message-ID: <20191003164552.GA3247445@devbig004.ftw2.facebook.com>
-References: <20190828220600.2527417-1-tj@kernel.org>
- <20190828220600.2527417-9-tj@kernel.org>
- <20190910125513.GA6399@blackbody.suse.cz>
- <20190910160855.GS2263813@devbig004.ftw2.facebook.com>
- <20191003145106.GC6678@blackbody.suse.cz>
+        id S2392855AbfJCRGJ (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Thu, 3 Oct 2019 13:06:09 -0400
+Received: from mga18.intel.com ([134.134.136.126]:15008 "EHLO mga18.intel.com"
+        rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
+        id S2393126AbfJCRGJ (ORCPT <rfc822;linux-block@vger.kernel.org>);
+        Thu, 3 Oct 2019 13:06:09 -0400
+X-Amp-Result: SKIPPED(no attachment in message)
+X-Amp-File-Uploaded: False
+Received: from fmsmga006.fm.intel.com ([10.253.24.20])
+  by orsmga106.jf.intel.com with ESMTP/TLS/DHE-RSA-AES256-GCM-SHA384; 03 Oct 2019 10:06:08 -0700
+X-ExtLoop1: 1
+X-IronPort-AV: E=Sophos;i="5.67,253,1566889200"; 
+   d="scan'208";a="393272209"
+Received: from orsmsx105.amr.corp.intel.com ([10.22.225.132])
+  by fmsmga006.fm.intel.com with ESMTP; 03 Oct 2019 10:06:07 -0700
+Received: from orsmsx114.amr.corp.intel.com (10.22.240.10) by
+ ORSMSX105.amr.corp.intel.com (10.22.225.132) with Microsoft SMTP Server (TLS)
+ id 14.3.439.0; Thu, 3 Oct 2019 10:06:07 -0700
+Received: from orsmsx101.amr.corp.intel.com ([169.254.8.204]) by
+ ORSMSX114.amr.corp.intel.com ([169.254.8.55]) with mapi id 14.03.0439.000;
+ Thu, 3 Oct 2019 10:06:07 -0700
+From:   "Derrick, Jonathan" <jonathan.derrick@intel.com>
+To:     "rdunlap@infradead.org" <rdunlap@infradead.org>,
+        "sbauer@plzdonthack.me" <sbauer@plzdonthack.me>
+CC:     "linux-kernel@vger.kernel.org" <linux-kernel@vger.kernel.org>,
+        "linux-block@vger.kernel.org" <linux-block@vger.kernel.org>,
+        "Rajashekar, Revanth" <revanth.rajashekar@intel.com>,
+        "axboe@kernel.dk" <axboe@kernel.dk>
+Subject: Re: [PATCH 2/2] block: sed-opal: fix sparse warning: convert __be64
+ data
+Thread-Topic: [PATCH 2/2] block: sed-opal: fix sparse warning: convert
+ __be64 data
+Thread-Index: AQHVeZGSCWgTvFsPkkSWBOzJr9STdKdJhBaAgAAXyAA=
+Date:   Thu, 3 Oct 2019 17:06:06 +0000
+Message-ID: <d091d361b0233da07f45488aae87857cb9388529.camel@intel.com>
+References: <82f70133-7242-d113-f041-9b89694685c0@infradead.org>
+         <20191003154053.GA2450@hacktheplanet>
+In-Reply-To: <20191003154053.GA2450@hacktheplanet>
+Accept-Language: en-US
+Content-Language: en-US
+X-MS-Has-Attach: 
+X-MS-TNEF-Correlator: 
+x-originating-ip: [10.232.115.165]
+Content-Type: text/plain; charset="utf-8"
+Content-ID: <90673F7865A38542AC230A2D6562171E@intel.com>
+Content-Transfer-Encoding: base64
 MIME-Version: 1.0
-Content-Type: text/plain; charset=iso-8859-1
-Content-Disposition: inline
-Content-Transfer-Encoding: 8bit
-In-Reply-To: <20191003145106.GC6678@blackbody.suse.cz>
-User-Agent: Mutt/1.5.21 (2010-09-15)
 Sender: linux-block-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-Hello,
-
-On Thu, Oct 03, 2019 at 04:51:06PM +0200, Michal Koutný wrote:
-> > Initially, I put them under block device sysfs but it was too clumsy
-> > with different config file formats and all.
-> Do you have any more details on that? In the end, it all boils down to a
-> daemon/setup utility writing into the control files and it can use
-> whatever config files it decides, can't it?
-
-Yeah, I mean, we can make any interface work.  So, there are two
-global knobs io.cost.model and io.cost.qos.  Of the tw, io.cost.model
-is okay to move under block device but the qos file gets weird because
-the content of the file is more resource control policies than device
-properties.
-
-Thanks.
-
--- 
-tejun
+T24gVGh1LCAyMDE5LTEwLTAzIGF0IDExOjQwIC0wNDAwLCBTY290dCBCYXVlciB3cm90ZToNCj4g
+T24gV2VkLCBPY3QgMDIsIDIwMTkgYXQgMDc6MjM6MTVQTSAtMDcwMCwgUmFuZHkgRHVubGFwIHdy
+b3RlOg0KPiA+IEZyb206IFJhbmR5IER1bmxhcCA8cmR1bmxhcEBpbmZyYWRlYWQub3JnPg0KPiA+
+IA0KPiA+IHNwYXJzZSB3YXJucyBhYm91dCBpbmNvcnJlY3QgdHlwZSB3aGVuIHVzaW5nIF9fYmU2
+NCBkYXRhLg0KPiA+IEl0IGlzIG5vdCBiZWluZyBjb252ZXJ0ZWQgdG8gQ1BVLWVuZGlhbiBidXQg
+aXQgc2hvdWxkIGJlLg0KPiA+IA0KPiA+IEZpeGVzIHRoZXNlIHNwYXJzZSB3YXJuaW5nczoNCj4g
+PiANCj4gPiAuLi9ibG9jay9zZWQtb3BhbC5jOjM3NToyMDogd2FybmluZzogaW5jb3JyZWN0IHR5
+cGUgaW4gYXNzaWdubWVudCAoZGlmZmVyZW50IGJhc2UgdHlwZXMpDQo+ID4gLi4vYmxvY2svc2Vk
+LW9wYWwuYzozNzU6MjA6ICAgIGV4cGVjdGVkIHVuc2lnbmVkIGxvbmcgbG9uZyBbdXNlcnR5cGVd
+IGFsaWduDQo+ID4gLi4vYmxvY2svc2VkLW9wYWwuYzozNzU6MjA6ICAgIGdvdCByZXN0cmljdGVk
+IF9fYmU2NCBjb25zdCBbdXNlcnR5cGVdIGFsaWdubWVudF9ncmFudWxhcml0eQ0KPiA+IC4uL2Js
+b2NrL3NlZC1vcGFsLmM6Mzc2OjI1OiB3YXJuaW5nOiBpbmNvcnJlY3QgdHlwZSBpbiBhc3NpZ25t
+ZW50IChkaWZmZXJlbnQgYmFzZSB0eXBlcykNCj4gPiAuLi9ibG9jay9zZWQtb3BhbC5jOjM3Njoy
+NTogICAgZXhwZWN0ZWQgdW5zaWduZWQgbG9uZyBsb25nIFt1c2VydHlwZV0gbG93ZXN0X2xiYQ0K
+PiA+IC4uL2Jsb2NrL3NlZC1vcGFsLmM6Mzc2OjI1OiAgICBnb3QgcmVzdHJpY3RlZCBfX2JlNjQg
+Y29uc3QgW3VzZXJ0eXBlXSBsb3dlc3RfYWxpZ25lZF9sYmENCj4gPiANCj4gPiBGaXhlczogNDU1
+YTdiMjM4Y2Q2ICgiYmxvY2s6IEFkZCBTZWQtb3BhbCBsaWJyYXJ5IikNCj4gPiBTaWduZWQtb2Zm
+LWJ5OiBSYW5keSBEdW5sYXAgPHJkdW5sYXBAaW5mcmFkZWFkLm9yZz4NCj4gPiBDYzogU2NvdHQg
+QmF1ZXIgPHNjb3R0LmJhdWVyQGludGVsLmNvbT4NCj4gPiBDYzogUmFmYWVsIEFudG9nbm9sbGkg
+PHJhZmFlbC5hbnRvZ25vbGxpQGludGVsLmNvbT4NCj4gPiBDYzogSmVucyBBeGJvZSA8YXhib2VA
+a2VybmVsLmRrPg0KPiA+IENjOiBsaW51eC1ibG9ja0B2Z2VyLmtlcm5lbC5vcmcNCj4gDQo+ICsg
+Sm9uIGFuZCBSZXZhbnRoLA0KPiANCj4gDQo+IFRoZXNlIGxvb2sgZmluZS4gVGhleSdyZSBjdXJy
+ZW50bHkgdW51c2VkLCBidXQgbWF5IGJlIHVzZWZ1bCBpbiB0aGUgZnV0dXJlIGZvciBzeXNmcyBv
+ciB3aGF0IGV2ZXIgZWxzZSB3ZSBhZGQgaW4uDQoNCkkgaW1hZ2luZSBtb2Rlcm4gZGV2aWNlcyB3
+aXRoIGxvZ2ljYWwvcGh5c2ljYWwgaW5kaXJlY3Rpb24gd291bGQNCnByb2JhYmx5IHJlcG9ydCBn
+cmFuPTEgYW5kIGxvd2VzdD0wIHJlZ2FyZGxlc3MuDQoNCkVpdGhlciB3YXksDQpSZXZpZXdlZC1i
+eTogSm9uIERlcnJpY2sgPGpvbmF0aGFuLmRlcnJpY2tAaW50ZWwuY29tPg0K
