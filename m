@@ -2,158 +2,89 @@ Return-Path: <SRS0=GSyA=X4=vger.kernel.org=linux-block-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-2.4 required=3.0 tests=DKIMWL_WL_HIGH,DKIM_SIGNED,
-	DKIM_VALID,DKIM_VALID_AU,HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,
-	SPF_HELO_NONE,SPF_PASS,UNPARSEABLE_RELAY,USER_AGENT_SANE_1 autolearn=no
-	autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-2.3 required=3.0 tests=DKIM_SIGNED,DKIM_VALID,
+	HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,
+	USER_AGENT_SANE_1 autolearn=no autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id B04ABC10F14
-	for <linux-block@archiver.kernel.org>; Thu,  3 Oct 2019 18:38:02 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 1FFB7C10F14
+	for <linux-block@archiver.kernel.org>; Thu,  3 Oct 2019 20:22:05 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.kernel.org (Postfix) with ESMTP id 8C28521783
-	for <linux-block@archiver.kernel.org>; Thu,  3 Oct 2019 18:38:02 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id DEA092133F
+	for <linux-block@archiver.kernel.org>; Thu,  3 Oct 2019 20:22:04 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=pass (2048-bit key) header.d=oracle.com header.i=@oracle.com header.b="nWB9znK1"
+	dkim=pass (2048-bit key) header.d=kernel-dk.20150623.gappssmtp.com header.i=@kernel-dk.20150623.gappssmtp.com header.b="vS7NvV9D"
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1731986AbfJCSiB (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Thu, 3 Oct 2019 14:38:01 -0400
-Received: from userp2120.oracle.com ([156.151.31.85]:54610 "EHLO
-        userp2120.oracle.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1729225AbfJCSiB (ORCPT
-        <rfc822;linux-block@vger.kernel.org>); Thu, 3 Oct 2019 14:38:01 -0400
-Received: from pps.filterd (userp2120.oracle.com [127.0.0.1])
-        by userp2120.oracle.com (8.16.0.27/8.16.0.27) with SMTP id x93IF1kf098731;
-        Thu, 3 Oct 2019 18:37:53 GMT
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=oracle.com; h=date : from : to : cc
- : subject : message-id : references : mime-version : content-type :
- in-reply-to; s=corp-2019-08-05;
- bh=12iqZz4Iis9svz7CFKPbY1KkfRjc2LS2izYN7PduSpQ=;
- b=nWB9znK14Zy4ElhLgIMM/J3LYdDCRCnC74RWh4oj39DnwRu3wNBOZE+w2TQ/GNpcviAB
- S3C+zLMFPmlAP3oAIvpMnpA1IT/c/QhCoUPTWgZX9JWG61GrWpxbnPZvoEKMzLIthqKC
- eMdoCedVWv4QrJBX58ioLy5Phyvvb2nJyQBg/htShLT6R7nlEyiUpZpWHZN5R7H1cz3U
- oVabBJrmOl6cLGKKCUnHiHa3cIrh9mkgroA2WcILW/C7LFqVn+bXaXSVXxUy1LmfbOC+
- 7nG/pF7PEI0RzwTzDDhjRhn82oFJQG215S6B+Y7cuAjHK6FsNG0FIflJZmweaM3K3RAV CA== 
-Received: from userp3030.oracle.com (userp3030.oracle.com [156.151.31.80])
-        by userp2120.oracle.com with ESMTP id 2va05s651r-1
-        (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=OK);
-        Thu, 03 Oct 2019 18:37:53 +0000
-Received: from pps.filterd (userp3030.oracle.com [127.0.0.1])
-        by userp3030.oracle.com (8.16.0.27/8.16.0.27) with SMTP id x93IJHbF185728;
-        Thu, 3 Oct 2019 18:37:52 GMT
-Received: from aserv0122.oracle.com (aserv0122.oracle.com [141.146.126.236])
-        by userp3030.oracle.com with ESMTP id 2vdn17w57b-1
-        (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=OK);
-        Thu, 03 Oct 2019 18:37:52 +0000
-Received: from abhmp0017.oracle.com (abhmp0017.oracle.com [141.146.116.23])
-        by aserv0122.oracle.com (8.14.4/8.14.4) with ESMTP id x93Iboia029775;
-        Thu, 3 Oct 2019 18:37:50 GMT
-Received: from localhost (/10.145.178.55)
-        by default (Oracle Beehive Gateway v4.0)
-        with ESMTP ; Thu, 03 Oct 2019 11:37:50 -0700
-Date:   Thu, 3 Oct 2019 11:37:46 -0700
-From:   "Darrick J. Wong" <darrick.wong@oracle.com>
-To:     Jens Axboe <axboe@kernel.dk>
-Cc:     Chris Mason <clm@fb.com>, Gao Xiang <hsiangkao@aol.com>,
-        Dave Chinner <david@fromorbit.com>,
-        xfs <linux-xfs@vger.kernel.org>, "tj@kernel.org" <tj@kernel.org>,
-        "linux-fsdevel@vger.kernel.org" <linux-fsdevel@vger.kernel.org>,
-        "linux-block@vger.kernel.org" <linux-block@vger.kernel.org>
-Subject: Re: [5.4-rc1, regression] wb_workfn wakeup oops (was Re: frequent
- 5.4-rc1 crash?)
-Message-ID: <20191003183746.GK13108@magnolia>
-References: <20191003015247.GI13108@magnolia>
- <20191003064022.GX16973@dread.disaster.area>
- <20191003084149.GA16347@hsiangkao-HP-ZHAN-66-Pro-G1>
- <41B90CA7-E093-48FA-BDFD-73BE7EB81FB6@fb.com>
- <32f7c7d8-59d8-7657-4dcc-3741355bf63a@kernel.dk>
+        id S1732388AbfJCUWE (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Thu, 3 Oct 2019 16:22:04 -0400
+Received: from mail-io1-f65.google.com ([209.85.166.65]:39650 "EHLO
+        mail-io1-f65.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S1728462AbfJCUWE (ORCPT
+        <rfc822;linux-block@vger.kernel.org>); Thu, 3 Oct 2019 16:22:04 -0400
+Received: by mail-io1-f65.google.com with SMTP id a1so8609495ioc.6
+        for <linux-block@vger.kernel.org>; Thu, 03 Oct 2019 13:22:03 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=kernel-dk.20150623.gappssmtp.com; s=20150623;
+        h=subject:to:cc:references:from:message-id:date:user-agent
+         :mime-version:in-reply-to:content-language:content-transfer-encoding;
+        bh=7WiJ4f6SzOGtMzESiBYziKahNzjtC5eHf7/cW0u7vRo=;
+        b=vS7NvV9D9OYLkuvCt7II7enEg4sGb3wAj+I3sIp5o4kFmqlWNbVU70/ysfI8h8cY3J
+         qrP4SdB4ZsiAQ0xQM6mv6VyA3lq7MOyYuX5Fv0Qxr4SdpiDZTJktQXnhfYRv+03o+JV7
+         7b0bTMqPO1nnWWnr+laA4xpyZ2Dk9vkuHyR69SzmtHEQes5UYEdLCl5P/Y6no9rwCQzY
+         7pg/9qjUdF3ZDhshcTtbiCSK/VFKGU/drrT2Tg5vZPg3N/yd+K8JpasxHUT5rZSWwnwm
+         /aqDOpNfheEA07AIBX8j3pcQtqyzEKJBymD0OPfV2W9ICaY5xSspm+G2CFyzDzK4IFap
+         55qA==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20161025;
+        h=x-gm-message-state:subject:to:cc:references:from:message-id:date
+         :user-agent:mime-version:in-reply-to:content-language
+         :content-transfer-encoding;
+        bh=7WiJ4f6SzOGtMzESiBYziKahNzjtC5eHf7/cW0u7vRo=;
+        b=J7TY/FDWfoYaBO5GmxdDagEQNk8f28fCOHuIp9CZCBTp+kc5EydP7ODRtBZizPRrC8
+         kh2sF0USzdPyZ6XBRsMtAiYG+w5A9SDoiTcCEYiNngR00Xve9a2Ib6aifFHYVMJCL2RX
+         28k+BN84nogZfFhJdXycPJFC0Xs5aYVh6ZGI0qEhXMw5sRRDbpgKSW1q9Zzmsdtc4W4a
+         VXCsREmPMITGS32noDGUYYko8Lkmwoz0jTGjMovssH7OVesC/qCxy30q1n69WgDxv6zB
+         MB8nu+gOsED51O1sKRIvqFD8sAMmIGj6v8kZ3jJluwUGXZXFyPgZz6IlzQInmrk03NFe
+         r5Cw==
+X-Gm-Message-State: APjAAAVAg/M77/gYhWKp8k0Vsh082QRSX1ciDWHjIc+R3JlpQMpLb+DI
+        rQb62HN6WKK6d5cSi/I4QZ/6/HVUDG2DKA==
+X-Google-Smtp-Source: APXvYqyuZfaiEVvhudwj8fPSSMbzWnn8JOvkbO8LVY3q31G+3mNsQRcG6YIyPsQm1Vd3oK9PFrpp6w==
+X-Received: by 2002:a02:cd05:: with SMTP id g5mr11297113jaq.52.1570134123075;
+        Thu, 03 Oct 2019 13:22:03 -0700 (PDT)
+Received: from ?IPv6:2620:10d:c081:1133::1057? ([2620:10d:c090:180::832a])
+        by smtp.gmail.com with ESMTPSA id f1sm1683227ile.77.2019.10.03.13.22.01
+        (version=TLS1_2 cipher=ECDHE-RSA-AES128-GCM-SHA256 bits=128/128);
+        Thu, 03 Oct 2019 13:22:02 -0700 (PDT)
+Subject: Re: [PATCH 1/2] block: sed-opal: fix sparse warning: obsolete array
+ init.
+To:     Randy Dunlap <rdunlap@infradead.org>,
+        "linux-block@vger.kernel.org" <linux-block@vger.kernel.org>,
+        LKML <linux-kernel@vger.kernel.org>
+Cc:     Jonas Rabenstein <jonas.rabenstein@studium.uni-erlangen.de>,
+        David Kozub <zub@linux.fjfi.cvut.cz>
+References: <807d7b7f-623b-75f0-baab-13b1b0c02e9d@infradead.org>
+From:   Jens Axboe <axboe@kernel.dk>
+Message-ID: <f8b4652c-4169-793c-b626-6e52e1cc0693@kernel.dk>
+Date:   Thu, 3 Oct 2019 14:22:00 -0600
+User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:60.0) Gecko/20100101
+ Thunderbird/60.8.0
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <32f7c7d8-59d8-7657-4dcc-3741355bf63a@kernel.dk>
-User-Agent: Mutt/1.9.4 (2018-02-28)
-X-Proofpoint-Virus-Version: vendor=nai engine=6000 definitions=9399 signatures=668684
-X-Proofpoint-Spam-Details: rule=notspam policy=default score=0 suspectscore=0 malwarescore=0
- phishscore=0 bulkscore=0 spamscore=0 mlxscore=0 mlxlogscore=999
- adultscore=0 classifier=spam adjust=0 reason=mlx scancount=1
- engine=8.0.1-1908290000 definitions=main-1910030152
-X-Proofpoint-Virus-Version: vendor=nai engine=6000 definitions=9399 signatures=668684
-X-Proofpoint-Spam-Details: rule=notspam policy=default score=0 priorityscore=1501 malwarescore=0
- suspectscore=0 phishscore=0 bulkscore=0 spamscore=0 clxscore=1015
- lowpriorityscore=0 mlxscore=0 impostorscore=0 mlxlogscore=999 adultscore=0
- classifier=spam adjust=0 reason=mlx scancount=1 engine=8.0.1-1908290000
- definitions=main-1910030152
+In-Reply-To: <807d7b7f-623b-75f0-baab-13b1b0c02e9d@infradead.org>
+Content-Type: text/plain; charset=utf-8
+Content-Language: en-US
+Content-Transfer-Encoding: 7bit
 Sender: linux-block-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-On Thu, Oct 03, 2019 at 08:05:42AM -0600, Jens Axboe wrote:
-> On 10/3/19 8:01 AM, Chris Mason wrote:
-> > 
-> > 
-> > On 3 Oct 2019, at 4:41, Gao Xiang wrote:
-> > 
-> >> Hi,
-> >>
-> >> On Thu, Oct 03, 2019 at 04:40:22PM +1000, Dave Chinner wrote:
-> >>> [cc linux-fsdevel, linux-block, tejun ]
-> >>>
-> >>> On Wed, Oct 02, 2019 at 06:52:47PM -0700, Darrick J. Wong wrote:
-> >>>> Hi everyone,
-> >>>>
-> >>>> Does anyone /else/ see this crash in generic/299 on a V4 filesystem
-> >>>> (tho
-> >>>> afaict V5 configs crash too) and a 5.4-rc1 kernel?  It seems to pop
-> >>>> up
-> >>>> on generic/299 though only 80% of the time.
-> >>>>
-> >>
-> >> Just a quick glance, I guess there could is a race between (complete
-> >> guess):
-> >>
-> >>
-> >>   160 static void finish_writeback_work(struct bdi_writeback *wb,
-> >>   161                                   struct wb_writeback_work *work)
-> >>   162 {
-> >>   163         struct wb_completion *done = work->done;
-> >>   164
-> >>   165         if (work->auto_free)
-> >>   166                 kfree(work);
-> >>   167         if (done && atomic_dec_and_test(&done->cnt))
-> >>
-> >>   ^^^ here
-> >>
-> >>   168                 wake_up_all(done->waitq);
-> >>   169 }
-> >>
-> >> since new wake_up_all(done->waitq); is completely on-stack,
-> >>   	if (done && atomic_dec_and_test(&done->cnt))
-> >> -		wake_up_all(&wb->bdi->wb_waitq);
-> >> +		wake_up_all(done->waitq);
-> >>   }
-> >>
-> >> which could cause use after free if on-stack wb_completion is gone...
-> >> (however previous wb->bdi is solid since it is not on-stack)
-> >>
-> >> see generic on-stack completion which takes a wait_queue spin_lock
-> >> between
-> >> test and wake_up...
-> >>
-> >> If I am wrong, ignore me, hmm...
-> > 
-> > It's a good guess ;)  Jens should have this queued up already:
-> > 
-> > https://lkml.org/lkml/2019/9/23/972
+On 10/2/19 8:23 PM, Randy Dunlap wrote:
+> From: Randy Dunlap <rdunlap@infradead.org>
 > 
-> Yes indeed, it'll go out today or tomorrow for -rc2.
+> Fix sparse warning: (missing '=')
+> ../block/sed-opal.c:133:17: warning: obsolete array initializer, use C99 syntax
 
-The patch fixes the problems I've been seeing, so:
-Tested-by: Darrick J. Wong <darrick.wong@oracle.com>
+Applied this (and 2/2, no cover letter...), thanks Randy.
 
-Thank you for taking care of this. :)
+-- 
+Jens Axboe
 
---D
-
-> -- 
-> Jens Axboe
-> 
