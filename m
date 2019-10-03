@@ -2,146 +2,105 @@ Return-Path: <SRS0=GSyA=X4=vger.kernel.org=linux-block-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-2.3 required=3.0 tests=DKIM_SIGNED,DKIM_VALID,
-	DKIM_VALID_AU,FREEMAIL_FORGED_FROMDOMAIN,FREEMAIL_FROM,
-	HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,
-	USER_AGENT_SANE_1 autolearn=no autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-2.3 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
+	MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,USER_AGENT_SANE_1 autolearn=no
+	autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id CE9D8C4CED1
-	for <linux-block@archiver.kernel.org>; Thu,  3 Oct 2019 14:40:57 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 2AF3BC32792
+	for <linux-block@archiver.kernel.org>; Thu,  3 Oct 2019 14:51:13 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.kernel.org (Postfix) with ESMTP id A5C4B21D81
-	for <linux-block@archiver.kernel.org>; Thu,  3 Oct 2019 14:40:57 +0000 (UTC)
-Authentication-Results: mail.kernel.org;
-	dkim=pass (2048-bit key) header.d=aol.com header.i=@aol.com header.b="tug04+yN"
+	by mail.kernel.org (Postfix) with ESMTP id 0868921848
+	for <linux-block@archiver.kernel.org>; Thu,  3 Oct 2019 14:51:13 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1730196AbfJCOk4 (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Thu, 3 Oct 2019 10:40:56 -0400
-Received: from sonic312-23.consmr.mail.gq1.yahoo.com ([98.137.69.204]:41722
-        "EHLO sonic312-23.consmr.mail.gq1.yahoo.com" rhost-flags-OK-OK-OK-OK)
-        by vger.kernel.org with ESMTP id S1730186AbfJCOk4 (ORCPT
-        <rfc822;linux-block@vger.kernel.org>);
-        Thu, 3 Oct 2019 10:40:56 -0400
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=aol.com; s=a2048; t=1570113655; bh=XH+kkcZacDLyMt//7aPVeZ/RoAwlnvE5gDCu5nQvVyU=; h=Date:From:To:Cc:Subject:References:In-Reply-To:From:Subject; b=tug04+yNVYvcTNcf6/BMloUpe5zpy+A168yqZIoZ9e+oVRRaoaVKQqLU1Erwiqb5APIscD+ZRiXBE+AVapeem2Imp4W4xEqfKHEtz/iZC1jUbGIWqJqy6VHt1Yvmr80CfyjHtDwcb2t7o3eHOqYN3w6H9eHQjLfTKC2K+aUB6AL/SU5gbGrd56rnn6JRzjKVnSHMCrl4DtmkkXCbgQAGAUryrhZW2AJ3OaFf1jSiGdjPC3meauPCBW1efZh/6s77cuCxDIT6ZJEevFmJ4dL65bbixc7P4KLwjpnlUGDFTxEvjq819TQBWx12fzigXigvUHIk6ZGDKk0+v+MVuGbbPg==
-X-YMail-OSG: DWxdwR4VM1laI_T7nnMyT6T4RY4Mj0UrmF1wpwElB0BN2SSzSpB1sYZGRZnJN2c
- YM_ax138Y_IIgz915r9.RzQ1y2dvGaDZ.I_gGZCb08C9XKiewFI_iPFh1WtgmdnjIcMoUi02Idk2
- DRMOglBwrZhxZsC8jxIlY5O2IDZgtmKMQQyoL7sXpChjW8PwZH_yThj7XDFQN2.0efFr5Vr7W5gl
- KgBNZ56OY7e2ayKGtWHLSJuffpqALOJ0SibjfoF6Cj86so3yfJ1xffGDKtA9gCyDJrNCmpvpXaJT
- 3s6H8H.FDeSt8f.dajG8U9w8mkvK_uwGA700_MfepZ.eRn4BZkXCD2MIm2XVpyZffxBkCYj_bfaq
- AJr0FmFEBc5KBH8vDe1bTn.iW7lGJty6N9zM4WrjdfmXq9WbpQH1Y_HpU_rvon.9o37q0DB4EfO7
- X8YwkzQeRDxniL2y4KEOPLINvgoAywA1aMy6IGrBe_L_S7STFB3hOggFtvrHXYd4VmdmSyYt4y8n
- T_hOAHdttrpjYLJu8CSUUHWTHmm1HeP.HhJYmLTx2DUup7QDWrN427wKOF6Q3z1ilsb3GXgkZ7kH
- f_th6gwH7_c9E3jZLKiqKTwOwti61rjRlPFeyBO.YnN2kJVqP6354o_bce2WT345VgL6QLW56SkO
- pWv6QQMCFdVkpkVlK63ePK.ets2cjnnsImmt.kSFcJQJ7YTXKRQ.2RIRy0LZVXs2scO1lf4Nd4E4
- 4qlqvwpe5mUYv2Tut1QvrvjE92WN753LY7U22zNgaEadHp9DZ0fuRk.usP2lDsJtP._QNGKbp2dZ
- HajiktEa6nR_OISchFSdnckPDz1mRlhWtRMtkCmm2lW7cGuiPgRq0v6qxKdPNeH5jWuaJ6crS0pk
- ChYVnj25iYKo5FQe.ye8MH.j475fQ86jhb.8BqGQbEZmbcdQXLfqc2ZWR2sWwUvmDGRFb_rV8qDV
- zclZ16mBOzwtYO7_UStIpowX6HH23HgkiF1I110gCdM05zUbteogqlanAbeUq6rfmUh0lRKYJlD_
- AfgPv1P2O4hrxin1qNgpT2I0r646hqrsvQikXGLE6YcR2Bv8b5D.OmQrJ1yW11MziClDCXtFOs5t
- umMP2j7d2zqJDXHGmW.Xi1aXACBI3oVtiel0h0koL1sJ64E4fVlP.u74aAc9FPqNLfl88OFnzQEM
- fyq6bbPG_AuNL624eUw16gXbfzx3jTHSPF665UHHlC7kGmTN.L.hEhwCnJz0phGlrU5R6zqzkbKU
- Ar4bDAGOdnTySFwz9SHHXj7pwoRc1mMsG8r8pBfLMuzY7X5qohfa5yxFUhqtrlh69RAVEE4xQ8tE
- 0iNbzBLd9_pk-
-Received: from sonic.gate.mail.ne1.yahoo.com by sonic312.consmr.mail.gq1.yahoo.com with HTTP; Thu, 3 Oct 2019 14:40:55 +0000
-Received: by smtp412.mail.gq1.yahoo.com (Oath Hermes SMTP Server) with ESMTPA ID d6c8f9c467bddad41b91e82a5a197155;
-          Thu, 03 Oct 2019 14:40:53 +0000 (UTC)
-Date:   Thu, 3 Oct 2019 22:40:46 +0800
-From:   Gao Xiang <hsiangkao@aol.com>
-To:     Chris Mason <clm@fb.com>
-Cc:     Dave Chinner <david@fromorbit.com>,
-        "Darrick J. Wong" <darrick.wong@oracle.com>,
-        xfs <linux-xfs@vger.kernel.org>, "tj@kernel.org" <tj@kernel.org>,
-        "linux-fsdevel@vger.kernel.org" <linux-fsdevel@vger.kernel.org>,
-        "linux-block@vger.kernel.org" <linux-block@vger.kernel.org>
-Subject: Re: [5.4-rc1, regression] wb_workfn wakeup oops (was Re: frequent
- 5.4-rc1 crash?)
-Message-ID: <20191003144041.GA2012@hsiangkao-HP-ZHAN-66-Pro-G1>
-References: <20191003015247.GI13108@magnolia>
- <20191003064022.GX16973@dread.disaster.area>
- <20191003084149.GA16347@hsiangkao-HP-ZHAN-66-Pro-G1>
- <41B90CA7-E093-48FA-BDFD-73BE7EB81FB6@fb.com>
+        id S1729689AbfJCOvM (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Thu, 3 Oct 2019 10:51:12 -0400
+Received: from mx2.suse.de ([195.135.220.15]:42266 "EHLO mx1.suse.de"
+        rhost-flags-OK-OK-OK-FAIL) by vger.kernel.org with ESMTP
+        id S1729373AbfJCOvM (ORCPT <rfc822;linux-block@vger.kernel.org>);
+        Thu, 3 Oct 2019 10:51:12 -0400
+X-Virus-Scanned: by amavisd-new at test-mx.suse.de
+Received: from relay2.suse.de (unknown [195.135.220.254])
+        by mx1.suse.de (Postfix) with ESMTP id EFCF6B186;
+        Thu,  3 Oct 2019 14:51:09 +0000 (UTC)
+Date:   Thu, 3 Oct 2019 16:51:06 +0200
+From:   Michal =?iso-8859-1?Q?Koutn=FD?= <mkoutny@suse.com>
+To:     Tejun Heo <tj@kernel.org>
+Cc:     hannes@cmpxchg.org, clm@fb.com, dennisz@fb.com,
+        Josef Bacik <jbacik@fb.com>, kernel-team@fb.com,
+        newella@fb.com, lizefan@huawei.com, axboe@kernel.dk,
+        Paolo Valente <paolo.valente@linaro.org>,
+        Rik van Riel <riel@surriel.com>, josef@toxicpanda.com,
+        cgroups@vger.kernel.org, linux-block@vger.kernel.org,
+        linux-kernel@vger.kernel.org
+Subject: Re: [PATCH 08/10] blkcg: implement blk-iocost
+Message-ID: <20191003145106.GC6678@blackbody.suse.cz>
+References: <20190828220600.2527417-1-tj@kernel.org>
+ <20190828220600.2527417-9-tj@kernel.org>
+ <20190910125513.GA6399@blackbody.suse.cz>
+ <20190910160855.GS2263813@devbig004.ftw2.facebook.com>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
+Content-Type: multipart/signed; micalg=pgp-sha256;
+        protocol="application/pgp-signature"; boundary="RIYY1s2vRbPFwWeW"
 Content-Disposition: inline
-In-Reply-To: <41B90CA7-E093-48FA-BDFD-73BE7EB81FB6@fb.com>
-User-Agent: Mutt/1.9.4 (2018-02-28)
+In-Reply-To: <20190910160855.GS2263813@devbig004.ftw2.facebook.com>
+User-Agent: Mutt/1.10.1 (2018-07-13)
 Sender: linux-block-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-Hi Chris,
 
-On Thu, Oct 03, 2019 at 02:01:13PM +0000, Chris Mason wrote:
-> 
-> 
-> On 3 Oct 2019, at 4:41, Gao Xiang wrote:
-> 
-> > Hi,
-> >
-> > On Thu, Oct 03, 2019 at 04:40:22PM +1000, Dave Chinner wrote:
-> >> [cc linux-fsdevel, linux-block, tejun ]
-> >>
-> >> On Wed, Oct 02, 2019 at 06:52:47PM -0700, Darrick J. Wong wrote:
-> >>> Hi everyone,
-> >>>
-> >>> Does anyone /else/ see this crash in generic/299 on a V4 filesystem 
-> >>> (tho
-> >>> afaict V5 configs crash too) and a 5.4-rc1 kernel?  It seems to pop 
-> >>> up
-> >>> on generic/299 though only 80% of the time.
-> >>>
-> >
-> > Just a quick glance, I guess there could is a race between (complete 
-> > guess):
-> >
-> >
-> >  160 static void finish_writeback_work(struct bdi_writeback *wb,
-> >  161                                   struct wb_writeback_work *work)
-> >  162 {
-> >  163         struct wb_completion *done = work->done;
-> >  164
-> >  165         if (work->auto_free)
-> >  166                 kfree(work);
-> >  167         if (done && atomic_dec_and_test(&done->cnt))
-> >
-> >  ^^^ here
-> >
-> >  168                 wake_up_all(done->waitq);
-> >  169 }
-> >
-> > since new wake_up_all(done->waitq); is completely on-stack,
-> >  	if (done && atomic_dec_and_test(&done->cnt))
-> > -		wake_up_all(&wb->bdi->wb_waitq);
-> > +		wake_up_all(done->waitq);
-> >  }
-> >
-> > which could cause use after free if on-stack wb_completion is gone...
-> > (however previous wb->bdi is solid since it is not on-stack)
-> >
-> > see generic on-stack completion which takes a wait_queue spin_lock 
-> > between
-> > test and wake_up...
-> >
-> > If I am wrong, ignore me, hmm...
-> 
-> It's a good guess ;)  Jens should have this queued up already:
-> 
-> https://lkml.org/lkml/2019/9/23/972
+--RIYY1s2vRbPFwWeW
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
 
-Oh, I didn't notice that, it's great to be already resolved. :)
+Hi (and apology for relatively late reply).
 
-It was not fully guess though, we once had a some similar
-pattern at the very early stage last year (a given IO balance
-counter, wait_queue. but completion is too heavy), which resolved
-in commit 848bd9acdcd0 last year. Therefore I'm experienced
-with such cases.
+On Tue, Sep 10, 2019 at 09:08:55AM -0700, Tejun Heo <tj@kernel.org> wrote:
+> I can implement the switching if so.
+I see the "conflict" is solved by the switching.
 
-Just saw mailing list regularly and be of some help here...
-Sorry about the noise...
+> Initially, I put them under block device sysfs but it was too clumsy
+> with different config file formats and all.
+Do you have any more details on that? In the end, it all boils down to a
+daemon/setup utility writing into the control files and it can use
+whatever config files it decides, can't it?
 
-Thanks,
-Gao Xiang
+> I think it's better to have global controller configs at the root
+> cgroup.
+I agree with the "global controller" configs, however, does it also hold
+for "global controller per-device" configs? They seem closer to the
+device than the controller. Potentially, the parameters could be used by
+some other consumers in the future. (I'm not opposing the current form,
+I just want to explore the space before an API is fixed.)
 
-> 
-> -chris
+
+> Not at all.  These are system-wide configs.  cgroup namespaces
+> shouldn't have anything which aren't in non-root cgroups.
+Thanks, I understand the cgroup namespaces are not meant to be
+transparent to their members.
+
+Michal
+
+--RIYY1s2vRbPFwWeW
+Content-Type: application/pgp-signature; name="signature.asc"
+Content-Description: Digital signature
+
+-----BEGIN PGP SIGNATURE-----
+
+iQIzBAEBCAAdFiEEEoQaUCWq8F2Id1tNia1+riC5qSgFAl2WCtEACgkQia1+riC5
+qSjb7A/+Iu+DwJIFVlA9ZTOkLBRLqBGA/Pca0wmt9zzvp+FOD10oV0eIcqC1rAt6
+RkQuosEn/7JRJ9Kk0XD/Add4ztMKQsYQMrvVTQwefwpbCudSzQ5Fc170yyo86qed
+6h40X+Y3l0NWQP5KKCNVtmboVaj7uiesPAOOzCyAgMfjvswg46vP1VxESys5DIhG
+r0WNGE6jUBrgbpYghS/lcP4DpLNVCpOqYYRiSEht+l17linh8CF/eTpeTE6idO7S
+3Aox0WMDSZ0ckuCmzFBJdR1WFh6mhd6Ij5eavtHasYsuJ/bjeDactxOua1mdpCGn
+fIpN8gAny7BFNYVmPKKtFxKaImbc4tpFu0FB+JdZeWNEKSwhY19URZk/JdTEN6c9
+u9jodAZXbCJ3jnj0M/2gAYMqR2hoW6bHYSQMj1mUy7TlWjxtKWzVdyZlNRejCp+9
+hUes/fZy2di3u93OF9czgtKEKBbgb6Q/xdHHr7mcSE+OzxKZiKKFpzM8ZYTZ70T3
+uYDo10yEJYFarwvW6JTHJYftMP5x7NQpJpFrMHEQWfOp+Vb2DwCcNtVEt9HL4OMQ
+uDCG2p6LA6MUAW1NB7n8OkI9VXk88gSG7C0r/LSinq5NXaQ0ztw+sz9wk3XOFCjq
+W4rQqKvckE/ME0N8IJCZbJUebVjhvGxFpgMgs123gDBVulQzl6U=
+=cftV
+-----END PGP SIGNATURE-----
+
+--RIYY1s2vRbPFwWeW--
