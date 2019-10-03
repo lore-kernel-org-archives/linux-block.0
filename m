@@ -6,27 +6,27 @@ X-Spam-Status: No, score=-5.3 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
 	MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,USER_AGENT_SANE_1
 	autolearn=unavailable autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id B7B43C32792
-	for <linux-block@archiver.kernel.org>; Thu,  3 Oct 2019 17:39:21 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id E6DF5C4CED1
+	for <linux-block@archiver.kernel.org>; Thu,  3 Oct 2019 17:42:06 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.kernel.org (Postfix) with ESMTP id 973FA2086A
-	for <linux-block@archiver.kernel.org>; Thu,  3 Oct 2019 17:39:21 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id C14E420830
+	for <linux-block@archiver.kernel.org>; Thu,  3 Oct 2019 17:42:06 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1731845AbfJCQBg (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Thu, 3 Oct 2019 12:01:36 -0400
-Received: from mga05.intel.com ([192.55.52.43]:32377 "EHLO mga05.intel.com"
+        id S1731021AbfJCP5q (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Thu, 3 Oct 2019 11:57:46 -0400
+Received: from mga06.intel.com ([134.134.136.31]:18870 "EHLO mga06.intel.com"
         rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-        id S1730311AbfJCQBg (ORCPT <rfc822;linux-block@vger.kernel.org>);
-        Thu, 3 Oct 2019 12:01:36 -0400
+        id S1731015AbfJCP5p (ORCPT <rfc822;linux-block@vger.kernel.org>);
+        Thu, 3 Oct 2019 11:57:45 -0400
 X-Amp-Result: SKIPPED(no attachment in message)
 X-Amp-File-Uploaded: False
 Received: from orsmga006.jf.intel.com ([10.7.209.51])
-  by fmsmga105.fm.intel.com with ESMTP/TLS/DHE-RSA-AES256-GCM-SHA384; 03 Oct 2019 09:01:19 -0700
+  by orsmga104.jf.intel.com with ESMTP/TLS/DHE-RSA-AES256-GCM-SHA384; 03 Oct 2019 08:57:45 -0700
 X-ExtLoop1: 1
 X-IronPort-AV: E=Sophos;i="5.67,253,1566889200"; 
-   d="scan'208";a="196387830"
+   d="scan'208";a="196386352"
 Received: from unknown (HELO [10.232.112.172]) ([10.232.112.172])
-  by orsmga006.jf.intel.com with ESMTP; 03 Oct 2019 09:01:18 -0700
+  by orsmga006.jf.intel.com with ESMTP; 03 Oct 2019 08:57:44 -0700
 Subject: Re: [PATCH 1/2] block: sed-opal: fix sparse warning: obsolete array
  init.
 To:     Scott Bauer <sbauer@plzdonthack.me>,
@@ -37,8 +37,8 @@ Cc:     "linux-block@vger.kernel.org" <linux-block@vger.kernel.org>,
 References: <807d7b7f-623b-75f0-baab-13b1b0c02e9d@infradead.org>
  <20191003154227.GB2450@hacktheplanet>
 From:   "Rajashekar, Revanth" <revanth.rajashekar@intel.com>
-Message-ID: <dd7ddcb5-1037-6b77-5376-9db417299566@intel.com>
-Date:   Thu, 3 Oct 2019 10:01:18 -0600
+Message-ID: <1bef5039-174d-3700-6574-daf85225ffaa@intel.com>
+Date:   Thu, 3 Oct 2019 09:57:44 -0600
 User-Agent: Mozilla/5.0 (Windows NT 10.0; WOW64; rv:60.0) Gecko/20100101
  Thunderbird/60.8.0
 MIME-Version: 1.0
@@ -72,7 +72,7 @@ On 10/3/2019 9:42 AM, Scott Bauer wrote:
 >
 > Reviewed-by: Scott Bauer <sbauer@plzdonthack.me>
 
-the patch set looks fine for me
+Looks fine to me as well
 
 Reviewed-by:  Revanth Rajashekar <revanth.rajashekar@intel.com>
 
