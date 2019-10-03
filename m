@@ -2,85 +2,108 @@ Return-Path: <SRS0=GSyA=X4=vger.kernel.org=linux-block-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-3.8 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
-	MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS autolearn=no
-	autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-2.6 required=3.0 tests=DKIMWL_WL_HIGH,DKIM_SIGNED,
+	DKIM_VALID,DKIM_VALID_AU,MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,
+	USER_AGENT_SANE_1 autolearn=no autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id A3298C10F14
-	for <linux-block@archiver.kernel.org>; Thu,  3 Oct 2019 16:56:00 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id BBB48C10F14
+	for <linux-block@archiver.kernel.org>; Thu,  3 Oct 2019 17:00:28 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.kernel.org (Postfix) with ESMTP id 7F73820673
-	for <linux-block@archiver.kernel.org>; Thu,  3 Oct 2019 16:56:00 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id 933292070B
+	for <linux-block@archiver.kernel.org>; Thu,  3 Oct 2019 17:00:28 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+	s=default; t=1570122028;
+	bh=E1mnXerODbEXRn9aKW4A7q6u0klKrptr8tBzOAQqpeM=;
+	h=Date:From:To:Cc:Subject:References:In-Reply-To:List-ID:From;
+	b=DHUyddhBz86IF5K8gvtzGoVPCnLMKif3WW17i4bPRr8+t7nPcjSKp1tHY9f6dTNMB
+	 5/S6KqpViAICbwq9yDMu+iFUVsXvxJJ6JzdYJQmQKMWX2swtg7PbXk1hkMj83Pke8w
+	 bzZrmuCnh+N13PoZl8Y+JYd7OLeJrKWFfiRnlsAg=
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S2406079AbfJCQvm (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Thu, 3 Oct 2019 12:51:42 -0400
-Received: from mga17.intel.com ([192.55.52.151]:48708 "EHLO mga17.intel.com"
-        rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-        id S2406074AbfJCQvl (ORCPT <rfc822;linux-block@vger.kernel.org>);
-        Thu, 3 Oct 2019 12:51:41 -0400
-X-Amp-Result: SKIPPED(no attachment in message)
-X-Amp-File-Uploaded: False
-Received: from orsmga006.jf.intel.com ([10.7.209.51])
-  by fmsmga107.fm.intel.com with ESMTP/TLS/DHE-RSA-AES256-GCM-SHA384; 03 Oct 2019 09:51:37 -0700
-X-ExtLoop1: 1
-X-IronPort-AV: E=Sophos;i="5.67,253,1566889200"; 
-   d="scan'208";a="196402028"
-Received: from orsmsx109.amr.corp.intel.com ([10.22.240.7])
-  by orsmga006.jf.intel.com with ESMTP; 03 Oct 2019 09:51:37 -0700
-Received: from orsmsx124.amr.corp.intel.com (10.22.240.120) by
- ORSMSX109.amr.corp.intel.com (10.22.240.7) with Microsoft SMTP Server (TLS)
- id 14.3.439.0; Thu, 3 Oct 2019 09:51:37 -0700
-Received: from orsmsx101.amr.corp.intel.com ([169.254.8.204]) by
- ORSMSX124.amr.corp.intel.com ([169.254.2.164]) with mapi id 14.03.0439.000;
- Thu, 3 Oct 2019 09:51:37 -0700
-From:   "Derrick, Jonathan" <jonathan.derrick@intel.com>
-To:     "rdunlap@infradead.org" <rdunlap@infradead.org>,
-        "linux-kernel@vger.kernel.org" <linux-kernel@vger.kernel.org>,
-        "linux-block@vger.kernel.org" <linux-block@vger.kernel.org>
-CC:     "zub@linux.fjfi.cvut.cz" <zub@linux.fjfi.cvut.cz>,
-        "jonas.rabenstein@studium.uni-erlangen.de" 
-        <jonas.rabenstein@studium.uni-erlangen.de>,
-        "axboe@kernel.dk" <axboe@kernel.dk>
-Subject: Re: [PATCH 1/2] block: sed-opal: fix sparse warning: obsolete array
- init.
-Thread-Topic: [PATCH 1/2] block: sed-opal: fix sparse warning: obsolete
- array init.
-Thread-Index: AQHVeZGOx590o4YCj0qZLXpmr8hr1adJl4GA
-Date:   Thu, 3 Oct 2019 16:51:36 +0000
-Message-ID: <dc6f05ed66c8485f647f741a1ef0c80a713b205c.camel@intel.com>
-References: <807d7b7f-623b-75f0-baab-13b1b0c02e9d@infradead.org>
-In-Reply-To: <807d7b7f-623b-75f0-baab-13b1b0c02e9d@infradead.org>
-Accept-Language: en-US
-Content-Language: en-US
-X-MS-Has-Attach: 
-X-MS-TNEF-Correlator: 
-x-originating-ip: [10.232.115.165]
-Content-Type: text/plain; charset="utf-8"
-Content-ID: <6080979DB8FF3C40A3FB842FE62BD31A@intel.com>
-Content-Transfer-Encoding: base64
+        id S2392970AbfJCRAX (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Thu, 3 Oct 2019 13:00:23 -0400
+Received: from mail-qk1-f193.google.com ([209.85.222.193]:35267 "EHLO
+        mail-qk1-f193.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S2392862AbfJCQp4 (ORCPT
+        <rfc822;linux-block@vger.kernel.org>); Thu, 3 Oct 2019 12:45:56 -0400
+Received: by mail-qk1-f193.google.com with SMTP id w2so3044902qkf.2;
+        Thu, 03 Oct 2019 09:45:55 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=gmail.com; s=20161025;
+        h=sender:date:from:to:cc:subject:message-id:references:mime-version
+         :content-disposition:content-transfer-encoding:in-reply-to
+         :user-agent;
+        bh=cY7dwSAZ/LRC+V3+VuDl/u0CtvPhkHUKtwYdGP4h8tM=;
+        b=hLGF2x3mry/9VP8Cgyatm0IMsLfiswwpsqSwtwh3Z2Hay6ZNSrYP6Hl5hSyR5M48qX
+         0IPsGhDFHmzedwYhjqPSKXxSwEpjaF1SjvuJ0FK0DlG2SceDEdslkMbvqyN5w454YJEj
+         OuwD5C0GKsFxYOH/fjS9taQ1Fao+rvVL7X1AVWbbtq3PQMNMju9lJvlRQgAV3ZyrxHfz
+         Zj6wGdAz4K8h7+DjIXPxytnFabB1ZqrIkvVfNl+Es1B4BNAEYSyFz5+rL/yTVGZXslMS
+         T9YRxz1/wbsN4CzseBltb1yCaLMVpoVxf5u9viLfyDTGM5uggapI2PAJl/M2cNZb9nJB
+         +HVQ==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20161025;
+        h=x-gm-message-state:sender:date:from:to:cc:subject:message-id
+         :references:mime-version:content-disposition
+         :content-transfer-encoding:in-reply-to:user-agent;
+        bh=cY7dwSAZ/LRC+V3+VuDl/u0CtvPhkHUKtwYdGP4h8tM=;
+        b=RMHT5/h6CUgdSc/0yRyZM0s0mVbobXvyVqfA+oKKvrAeSR4Lc0r6jyTSXT7e/P0E0X
+         GlgTldK6jN0y2Nm4cbGWWnoj2QyGAKbzSpgRk+F4qd8EwDXGRbOKXoFQ5JlKOATFhxw6
+         eTlfLkKVQrOi7qtzWnJML+OR33E056u/cGwHHVZttZRvMXLTCj+XIcwA6STFxZb40Aws
+         GkMdjKMGoVsp2XXJzVXaut/uITHYfcF6ek0S0F4Bcg/WhG/9+GYKGxDcbJosxAjHKvak
+         a3T4bmzlJKp8yXajbWn5eXrTVq+a8C/cmsn4la3dKs8goeqveg7LM6SU9o/k8XKooygR
+         X2Yw==
+X-Gm-Message-State: APjAAAVPjRvcNqvwQTuBqa+J1fViD7Nf7o1OM9epKhg6SJBx5u12wJxa
+        ZQTxKnrEg93PUXGG19MHNTM=
+X-Google-Smtp-Source: APXvYqwyDNBYMAZlSJRkUJmx4zksig6ZCgUKH4qEh9uQ/wdnO/i0VrSvc1T2/bEhZTtSydu35p/6UQ==
+X-Received: by 2002:ae9:e810:: with SMTP id a16mr5237472qkg.364.1570121154872;
+        Thu, 03 Oct 2019 09:45:54 -0700 (PDT)
+Received: from localhost ([2620:10d:c091:500::3:9f72])
+        by smtp.gmail.com with ESMTPSA id c131sm1941291qke.24.2019.10.03.09.45.54
+        (version=TLS1_2 cipher=ECDHE-RSA-AES128-GCM-SHA256 bits=128/128);
+        Thu, 03 Oct 2019 09:45:54 -0700 (PDT)
+Date:   Thu, 3 Oct 2019 09:45:52 -0700
+From:   Tejun Heo <tj@kernel.org>
+To:     Michal =?iso-8859-1?Q?Koutn=FD?= <mkoutny@suse.com>
+Cc:     hannes@cmpxchg.org, clm@fb.com, dennisz@fb.com,
+        Josef Bacik <jbacik@fb.com>, kernel-team@fb.com,
+        newella@fb.com, lizefan@huawei.com, axboe@kernel.dk,
+        Paolo Valente <paolo.valente@linaro.org>,
+        Rik van Riel <riel@surriel.com>, josef@toxicpanda.com,
+        cgroups@vger.kernel.org, linux-block@vger.kernel.org,
+        linux-kernel@vger.kernel.org
+Subject: Re: [PATCH 08/10] blkcg: implement blk-iocost
+Message-ID: <20191003164552.GA3247445@devbig004.ftw2.facebook.com>
+References: <20190828220600.2527417-1-tj@kernel.org>
+ <20190828220600.2527417-9-tj@kernel.org>
+ <20190910125513.GA6399@blackbody.suse.cz>
+ <20190910160855.GS2263813@devbig004.ftw2.facebook.com>
+ <20191003145106.GC6678@blackbody.suse.cz>
 MIME-Version: 1.0
+Content-Type: text/plain; charset=iso-8859-1
+Content-Disposition: inline
+Content-Transfer-Encoding: 8bit
+In-Reply-To: <20191003145106.GC6678@blackbody.suse.cz>
+User-Agent: Mutt/1.5.21 (2010-09-15)
 Sender: linux-block-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-T24gV2VkLCAyMDE5LTEwLTAyIGF0IDE5OjIzIC0wNzAwLCBSYW5keSBEdW5sYXAgd3JvdGU6DQo+
-IEZyb206IFJhbmR5IER1bmxhcCA8cmR1bmxhcEBpbmZyYWRlYWQub3JnPg0KPiANCj4gRml4IHNw
-YXJzZSB3YXJuaW5nOiAobWlzc2luZyAnPScpDQo+IC4uL2Jsb2NrL3NlZC1vcGFsLmM6MTMzOjE3
-OiB3YXJuaW5nOiBvYnNvbGV0ZSBhcnJheSBpbml0aWFsaXplciwgdXNlIEM5OSBzeW50YXgNCj4g
-DQo+IEZpeGVzOiBmZjkxMDY0ZWEzN2MgKCJibG9jazogc2VkLW9wYWw6IGNoZWNrIHNpemUgb2Yg
-c2hhZG93IG1iciIpDQo+IFNpZ25lZC1vZmYtYnk6IFJhbmR5IER1bmxhcCA8cmR1bmxhcEBpbmZy
-YWRlYWQub3JnPg0KPiBDYzogSmVucyBBeGJvZSA8YXhib2VAa2VybmVsLmRrPg0KPiBDYzogbGlu
-dXgtYmxvY2tAdmdlci5rZXJuZWwub3JnDQo+IENjOiBKb25hcyBSYWJlbnN0ZWluIDxqb25hcy5y
-YWJlbnN0ZWluQHN0dWRpdW0udW5pLWVybGFuZ2VuLmRlPg0KPiBDYzogRGF2aWQgS296dWIgPHp1
-YkBsaW51eC5mamZpLmN2dXQuY3o+DQo+IC0tLQ0KPiAgYmxvY2svc2VkLW9wYWwuYyB8ICAgIDIg
-Ky0NCj4gIDEgZmlsZSBjaGFuZ2VkLCAxIGluc2VydGlvbigrKSwgMSBkZWxldGlvbigtKQ0KPiAN
-Cj4gLS0tIGxueC01NC1yYzEub3JpZy9ibG9jay9zZWQtb3BhbC5jDQo+ICsrKyBsbngtNTQtcmMx
-L2Jsb2NrL3NlZC1vcGFsLmMNCj4gQEAgLTEyOSw3ICsxMjksNyBAQCBzdGF0aWMgY29uc3QgdTgg
-b3BhbHVpZFtdW09QQUxfVUlEX0xFTkdUDQo+ICAJCXsgMHgwMCwgMHgwMCwgMHgwMCwgMHgwOSwg
-MHgwMCwgMHgwMCwgMHg4NCwgMHgwMSB9LA0KPiAgDQo+ICAJLyogdGFibGVzICovDQo+IC0JW09Q
-QUxfVEFCTEVfVEFCTEVdDQo+ICsJW09QQUxfVEFCTEVfVEFCTEVdID0NCj4gIAkJeyAweDAwLCAw
-eDAwLCAweDAwLCAweDAxLCAweDAwLCAweDAwLCAweDAwLCAweDAxIH0sDQo+ICAJW09QQUxfTE9D
-S0lOR1JBTkdFX0dMT0JBTF0gPQ0KPiAgCQl7IDB4MDAsIDB4MDAsIDB4MDgsIDB4MDIsIDB4MDAs
-IDB4MDAsIDB4MDAsIDB4MDEgfSwNCj4gDQoNClJldmlld2VkLWJ5OiBKb24gRGVycmljayA8am9u
-YXRoYW4uZGVycmlja0BpbnRlbC5jb20+DQo=
+Hello,
+
+On Thu, Oct 03, 2019 at 04:51:06PM +0200, Michal Koutný wrote:
+> > Initially, I put them under block device sysfs but it was too clumsy
+> > with different config file formats and all.
+> Do you have any more details on that? In the end, it all boils down to a
+> daemon/setup utility writing into the control files and it can use
+> whatever config files it decides, can't it?
+
+Yeah, I mean, we can make any interface work.  So, there are two
+global knobs io.cost.model and io.cost.qos.  Of the tw, io.cost.model
+is okay to move under block device but the qos file gets weird because
+the content of the file is more resource control policies than device
+properties.
+
+Thanks.
+
+-- 
+tejun
