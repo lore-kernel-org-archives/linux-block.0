@@ -2,105 +2,78 @@ Return-Path: <SRS0=GSyA=X4=vger.kernel.org=linux-block-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-2.3 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
-	MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,USER_AGENT_SANE_1 autolearn=no
-	autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-5.3 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
+	MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,USER_AGENT_SANE_1
+	autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 2AF3BC32792
-	for <linux-block@archiver.kernel.org>; Thu,  3 Oct 2019 14:51:13 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 60ED3C10F14
+	for <linux-block@archiver.kernel.org>; Thu,  3 Oct 2019 16:02:34 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.kernel.org (Postfix) with ESMTP id 0868921848
-	for <linux-block@archiver.kernel.org>; Thu,  3 Oct 2019 14:51:13 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id 3D0CA215EA
+	for <linux-block@archiver.kernel.org>; Thu,  3 Oct 2019 16:02:34 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1729689AbfJCOvM (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Thu, 3 Oct 2019 10:51:12 -0400
-Received: from mx2.suse.de ([195.135.220.15]:42266 "EHLO mx1.suse.de"
-        rhost-flags-OK-OK-OK-FAIL) by vger.kernel.org with ESMTP
-        id S1729373AbfJCOvM (ORCPT <rfc822;linux-block@vger.kernel.org>);
-        Thu, 3 Oct 2019 10:51:12 -0400
-X-Virus-Scanned: by amavisd-new at test-mx.suse.de
-Received: from relay2.suse.de (unknown [195.135.220.254])
-        by mx1.suse.de (Postfix) with ESMTP id EFCF6B186;
-        Thu,  3 Oct 2019 14:51:09 +0000 (UTC)
-Date:   Thu, 3 Oct 2019 16:51:06 +0200
-From:   Michal =?iso-8859-1?Q?Koutn=FD?= <mkoutny@suse.com>
-To:     Tejun Heo <tj@kernel.org>
-Cc:     hannes@cmpxchg.org, clm@fb.com, dennisz@fb.com,
-        Josef Bacik <jbacik@fb.com>, kernel-team@fb.com,
-        newella@fb.com, lizefan@huawei.com, axboe@kernel.dk,
-        Paolo Valente <paolo.valente@linaro.org>,
-        Rik van Riel <riel@surriel.com>, josef@toxicpanda.com,
-        cgroups@vger.kernel.org, linux-block@vger.kernel.org,
-        linux-kernel@vger.kernel.org
-Subject: Re: [PATCH 08/10] blkcg: implement blk-iocost
-Message-ID: <20191003145106.GC6678@blackbody.suse.cz>
-References: <20190828220600.2527417-1-tj@kernel.org>
- <20190828220600.2527417-9-tj@kernel.org>
- <20190910125513.GA6399@blackbody.suse.cz>
- <20190910160855.GS2263813@devbig004.ftw2.facebook.com>
+        id S1730600AbfJCQCd (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Thu, 3 Oct 2019 12:02:33 -0400
+Received: from bout01.mta.xmission.com ([166.70.11.15]:49701 "EHLO
+        bout01.mta.xmission.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S1732006AbfJCQCc (ORCPT
+        <rfc822;linux-block@vger.kernel.org>); Thu, 3 Oct 2019 12:02:32 -0400
+X-Greylist: delayed 1285 seconds by postgrey-1.27 at vger.kernel.org; Thu, 03 Oct 2019 12:02:31 EDT
+Received: from mx04.mta.xmission.com ([166.70.13.214])
+        by bout01.mta.xmission.com with esmtps (TLS1.2:ECDHE_RSA_AES_128_GCM_SHA256:128)
+        (Exim 4.87)
+        (envelope-from <sbauer@plzdonthack.me>)
+        id 1iG3Ff-00086p-9O; Thu, 03 Oct 2019 09:42:47 -0600
+Received: from plesk14-shared.xmission.com ([166.70.198.161] helo=plesk14.xmission.com)
+        by mx04.mta.xmission.com with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
+        (Exim 4.87)
+        (envelope-from <sbauer@plzdonthack.me>)
+        id 1iG3FP-0007KK-Lf; Thu, 03 Oct 2019 09:42:47 -0600
+Received: from hacktheplanet (c-68-50-34-150.hsd1.in.comcast.net [68.50.34.150])
+        by plesk14.xmission.com (Postfix) with ESMTPSA id A270F126779;
+        Thu,  3 Oct 2019 15:42:28 +0000 (UTC)
+Date:   Thu, 3 Oct 2019 11:42:27 -0400
+From:   Scott Bauer <sbauer@plzdonthack.me>
+To:     Randy Dunlap <rdunlap@infradead.org>
+Cc:     "linux-block@vger.kernel.org" <linux-block@vger.kernel.org>,
+        LKML <linux-kernel@vger.kernel.org>, axboe <axboe@kernel.dk>,
+        Scott Bauer <sbauer@plzdonthack.me>,
+        jonathan.derrick@intel.com, revanth.rajashekar@intel.com
+Message-ID: <20191003154227.GB2450@hacktheplanet>
+References: <807d7b7f-623b-75f0-baab-13b1b0c02e9d@infradead.org>
 MIME-Version: 1.0
-Content-Type: multipart/signed; micalg=pgp-sha256;
-        protocol="application/pgp-signature"; boundary="RIYY1s2vRbPFwWeW"
+Content-Type: text/plain; charset=us-ascii
 Content-Disposition: inline
-In-Reply-To: <20190910160855.GS2263813@devbig004.ftw2.facebook.com>
-User-Agent: Mutt/1.10.1 (2018-07-13)
+In-Reply-To: <807d7b7f-623b-75f0-baab-13b1b0c02e9d@infradead.org>
+User-Agent: Mutt/1.9.4 (2018-02-28)
+X-XM-SPF: eid=1iG3FP-0007KK-Lf;;;mid=<20191003154227.GB2450@hacktheplanet>;;;hst=mx04.mta.xmission.com;;;ip=166.70.198.161;;;frm=sbauer@plzdonthack.me;;;spf=none
+X-SA-Exim-Connect-IP: 166.70.198.161
+X-SA-Exim-Mail-From: sbauer@plzdonthack.me
+Subject: Re: [PATCH 1/2] block: sed-opal: fix sparse warning: obsolete array
+ init.
+X-SA-Exim-Version: 4.2.1 (built Thu, 05 May 2016 13:38:54 -0600)
+X-SA-Exim-Scanned: Yes (on mx04.mta.xmission.com)
 Sender: linux-block-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
+On Wed, Oct 02, 2019 at 07:23:05PM -0700, Randy Dunlap wrote:
+> From: Randy Dunlap <rdunlap@infradead.org>
+> 
+> Fix sparse warning: (missing '=')
+> ../block/sed-opal.c:133:17: warning: obsolete array initializer, use C99 syntax
+> 
+> Fixes: ff91064ea37c ("block: sed-opal: check size of shadow mbr")
+> Signed-off-by: Randy Dunlap <rdunlap@infradead.org>
+> Cc: Jens Axboe <axboe@kernel.dk>
+> Cc: linux-block@vger.kernel.org
+> Cc: Jonas Rabenstein <jonas.rabenstein@studium.uni-erlangen.de>
+> Cc: David Kozub <zub@linux.fjfi.cvut.cz>
+> ---
 
---RIYY1s2vRbPFwWeW
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
+Un cc'd David and Jonas, +CC'd Jon and Revanth.
 
-Hi (and apology for relatively late reply).
+This looks fine to me too.
 
-On Tue, Sep 10, 2019 at 09:08:55AM -0700, Tejun Heo <tj@kernel.org> wrote:
-> I can implement the switching if so.
-I see the "conflict" is solved by the switching.
-
-> Initially, I put them under block device sysfs but it was too clumsy
-> with different config file formats and all.
-Do you have any more details on that? In the end, it all boils down to a
-daemon/setup utility writing into the control files and it can use
-whatever config files it decides, can't it?
-
-> I think it's better to have global controller configs at the root
-> cgroup.
-I agree with the "global controller" configs, however, does it also hold
-for "global controller per-device" configs? They seem closer to the
-device than the controller. Potentially, the parameters could be used by
-some other consumers in the future. (I'm not opposing the current form,
-I just want to explore the space before an API is fixed.)
-
-
-> Not at all.  These are system-wide configs.  cgroup namespaces
-> shouldn't have anything which aren't in non-root cgroups.
-Thanks, I understand the cgroup namespaces are not meant to be
-transparent to their members.
-
-Michal
-
---RIYY1s2vRbPFwWeW
-Content-Type: application/pgp-signature; name="signature.asc"
-Content-Description: Digital signature
-
------BEGIN PGP SIGNATURE-----
-
-iQIzBAEBCAAdFiEEEoQaUCWq8F2Id1tNia1+riC5qSgFAl2WCtEACgkQia1+riC5
-qSjb7A/+Iu+DwJIFVlA9ZTOkLBRLqBGA/Pca0wmt9zzvp+FOD10oV0eIcqC1rAt6
-RkQuosEn/7JRJ9Kk0XD/Add4ztMKQsYQMrvVTQwefwpbCudSzQ5Fc170yyo86qed
-6h40X+Y3l0NWQP5KKCNVtmboVaj7uiesPAOOzCyAgMfjvswg46vP1VxESys5DIhG
-r0WNGE6jUBrgbpYghS/lcP4DpLNVCpOqYYRiSEht+l17linh8CF/eTpeTE6idO7S
-3Aox0WMDSZ0ckuCmzFBJdR1WFh6mhd6Ij5eavtHasYsuJ/bjeDactxOua1mdpCGn
-fIpN8gAny7BFNYVmPKKtFxKaImbc4tpFu0FB+JdZeWNEKSwhY19URZk/JdTEN6c9
-u9jodAZXbCJ3jnj0M/2gAYMqR2hoW6bHYSQMj1mUy7TlWjxtKWzVdyZlNRejCp+9
-hUes/fZy2di3u93OF9czgtKEKBbgb6Q/xdHHr7mcSE+OzxKZiKKFpzM8ZYTZ70T3
-uYDo10yEJYFarwvW6JTHJYftMP5x7NQpJpFrMHEQWfOp+Vb2DwCcNtVEt9HL4OMQ
-uDCG2p6LA6MUAW1NB7n8OkI9VXk88gSG7C0r/LSinq5NXaQ0ztw+sz9wk3XOFCjq
-W4rQqKvckE/ME0N8IJCZbJUebVjhvGxFpgMgs123gDBVulQzl6U=
-=cftV
------END PGP SIGNATURE-----
-
---RIYY1s2vRbPFwWeW--
+Reviewed-by: Scott Bauer <sbauer@plzdonthack.me>
