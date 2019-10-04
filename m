@@ -2,299 +2,131 @@ Return-Path: <SRS0=jhC6=X5=vger.kernel.org=linux-block-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-9.8 required=3.0 tests=DKIM_SIGNED,DKIM_VALID,
-	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,
-	SPF_HELO_NONE,SPF_PASS,USER_AGENT_GIT autolearn=ham autolearn_force=no
-	version=3.4.0
+X-Spam-Status: No, score=-3.8 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
+	INCLUDES_PATCH,MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS autolearn=no
+	autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 5D464C4360C
-	for <linux-block@archiver.kernel.org>; Fri,  4 Oct 2019 16:22:36 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 415BAC4360C
+	for <linux-block@archiver.kernel.org>; Fri,  4 Oct 2019 18:17:43 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.kernel.org (Postfix) with ESMTP id 266F321D81
-	for <linux-block@archiver.kernel.org>; Fri,  4 Oct 2019 16:22:36 +0000 (UTC)
-Authentication-Results: mail.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel-dk.20150623.gappssmtp.com header.i=@kernel-dk.20150623.gappssmtp.com header.b="18Ksa2L2"
+	by mail.kernel.org (Postfix) with ESMTP id 28B95215EA
+	for <linux-block@archiver.kernel.org>; Fri,  4 Oct 2019 18:17:43 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1729506AbfJDQWf (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Fri, 4 Oct 2019 12:22:35 -0400
-Received: from mail-pf1-f194.google.com ([209.85.210.194]:43346 "EHLO
-        mail-pf1-f194.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1725932AbfJDQWf (ORCPT
-        <rfc822;linux-block@vger.kernel.org>); Fri, 4 Oct 2019 12:22:35 -0400
-Received: by mail-pf1-f194.google.com with SMTP id a2so4178320pfo.10
-        for <linux-block@vger.kernel.org>; Fri, 04 Oct 2019 09:22:35 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=kernel-dk.20150623.gappssmtp.com; s=20150623;
-        h=from:to:cc:subject:date:message-id:in-reply-to:references;
-        bh=4AUJ4p6RmGuEEEDRwYnzEqE2rDh7QFx9cSdfYOJAWTU=;
-        b=18Ksa2L2aEeTfoSeKmAvNj+d6JUqdYEEf22iP6G3/bfPgn2kdN4NYwEMUIrRL2V40v
-         U958NIrKLkK6O2hN+6OiahwuXuiJEZpyRv81rmeWamuuQJpHNbqPwe4nUrsAdB8Retfe
-         vaOvs89VGGIqcGygfSgyhEZXRL7Nw+s6e9sbIeWGJMZjYITVjVRuuapZiVYVQZdb5QYm
-         Gq9pTfLz+CvCaNdl2rLZVYkZScO5PVXq6uosC3G23AehDYBw5rRSvBdQH6IWMc1d05MW
-         XuFzfKFjYfYWDKICLdwgISAEnVb2Kmk3z/Uu1xLoQRTc8uq7gZ6FBpT0p7KS1p3emPU0
-         dcmg==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20161025;
-        h=x-gm-message-state:from:to:cc:subject:date:message-id:in-reply-to
-         :references;
-        bh=4AUJ4p6RmGuEEEDRwYnzEqE2rDh7QFx9cSdfYOJAWTU=;
-        b=lNaRRy0N9TvKe8f8TNU9oqsffvEKnyBjTfp8U0ftI1rvAq5+p784Fx++itHJ1KBXEo
-         wuBPFCeIMgPPt1Z2jpj469gILDTY928/L4ZNyU1Huwo+trlylsA3Q2iVaXelMqiyBmoI
-         P0yzE5dEBJBc57FbbSL30srmuspFJL9xc+mGEx991l0s4U7qEgModDzJrAcKp0N6ddcg
-         VVAIj+aZ5KVenk38egBKjC7r/pcyFP3O3DkOL+fjSPI8ZXFOtAglybuh7NRKftDqYx3P
-         cd7RpE7KBcMVQpFbMrofJFvEGYA09E/ovopgcoyc1FfkkAJkFgpnBM/KWudiVzcYWzw+
-         QKDQ==
-X-Gm-Message-State: APjAAAWDaubA6eRo0hZLbNbo+QcS3qI5EeL2fBB51guaz1rjSintH2i/
-        wlZgO4qPMFHADdZdgroUnfUcMMmG7DxRqg==
-X-Google-Smtp-Source: APXvYqxZoyUfpcgFOFG7Y/L2RbkiUzaEhDqPpax5qMfFg7iqe8D7k21XxOF7/p2/eg4+4Svylc1HBg==
-X-Received: by 2002:a65:6150:: with SMTP id o16mr1299354pgv.387.1570206153256;
-        Fri, 04 Oct 2019 09:22:33 -0700 (PDT)
-Received: from localhost.localdomain ([2600:380:7548:69cb:e476:ab55:1c76:9921])
-        by smtp.gmail.com with ESMTPSA id v20sm994054pgh.89.2019.10.04.09.22.31
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Fri, 04 Oct 2019 09:22:32 -0700 (PDT)
-From:   Jens Axboe <axboe@kernel.dk>
-To:     linux-block@vger.kernel.org
-Cc:     jmoyer@redhat.com, Jens Axboe <axboe@kernel.dk>
-Subject: [PATCH 2/2] io_uring: add support for IORING_REGISTER_FILES_UPDATE
-Date:   Fri,  4 Oct 2019 10:22:22 -0600
-Message-Id: <20191004162222.10390-3-axboe@kernel.dk>
-X-Mailer: git-send-email 2.17.1
-In-Reply-To: <20191004162222.10390-1-axboe@kernel.dk>
+        id S2388586AbfJDSRm (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Fri, 4 Oct 2019 14:17:42 -0400
+Received: from mx1.redhat.com ([209.132.183.28]:54918 "EHLO mx1.redhat.com"
+        rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
+        id S1730601AbfJDSRE (ORCPT <rfc822;linux-block@vger.kernel.org>);
+        Fri, 4 Oct 2019 14:17:04 -0400
+Received: from smtp.corp.redhat.com (int-mx01.intmail.prod.int.phx2.redhat.com [10.5.11.11])
+        (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
+        (No client certificate requested)
+        by mx1.redhat.com (Postfix) with ESMTPS id CCB6D3004E5B;
+        Fri,  4 Oct 2019 18:17:04 +0000 (UTC)
+Received: from segfault.boston.devel.redhat.com (segfault.boston.devel.redhat.com [10.19.60.26])
+        by smtp.corp.redhat.com (Postfix) with ESMTPS id 7477C600D1;
+        Fri,  4 Oct 2019 18:17:04 +0000 (UTC)
+From:   Jeff Moyer <jmoyer@redhat.com>
+To:     Jens Axboe <axboe@kernel.dk>
+Cc:     linux-block@vger.kernel.org
+Subject: Re: [PATCHSET v2] io_uring: support fileset add/remove/modify
 References: <20191004162222.10390-1-axboe@kernel.dk>
+X-PGP-KeyID: 1F78E1B4
+X-PGP-CertKey: F6FE 280D 8293 F72C 65FD  5A58 1FF8 A7CA 1F78 E1B4
+Date:   Fri, 04 Oct 2019 14:17:03 -0400
+In-Reply-To: <20191004162222.10390-1-axboe@kernel.dk> (Jens Axboe's message of
+        "Fri, 4 Oct 2019 10:22:20 -0600")
+Message-ID: <x49pnjcl6jk.fsf@segfault.boston.devel.redhat.com>
+User-Agent: Gnus/5.13 (Gnus v5.13) Emacs/26.1 (gnu/linux)
+MIME-Version: 1.0
+Content-Type: text/plain
+X-Scanned-By: MIMEDefang 2.79 on 10.5.11.11
+X-Greylist: Sender IP whitelisted, not delayed by milter-greylist-4.5.16 (mx1.redhat.com [10.5.110.42]); Fri, 04 Oct 2019 18:17:04 +0000 (UTC)
 Sender: linux-block-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-Allows the application to remove/replace/add files to/from a file set.
-Passes in a struct:
+Jens Axboe <axboe@kernel.dk> writes:
 
-struct io_uring_files_update {
-	__u32 offset;
-	__s32 *fds;
-};
+> Currently we only support registrering a fixed file set. If changes need
+> to be made to that set, the application must unregister the existing set
+> first, then register a new one.
+>
+> This patchset adds support for sparse file sets (patch 1), which means
+> the application can register a fileset with room for expansion. This is
+> done through having unregistered slots use fd == -1.
+>
+> On top of that, we can add IORING_REGISTER_FILES_UPDATE. This allows
+> modifying the existing file set through:
+>
+> - Replacing empty slots with valid file descriptors
+> - Replacing valid descriptors with an empty slot
+> - Modifying an existing slot, replacing a file descriptor with a new one
 
-that holds an array of fds, size of array passed in through the usual
-nr_args part of the io_uring_register() system call. The logic is as
-follows:
+I don't pretend to understand the socket code you wrote.  The io_uring
+bits look good to me.  I also added a testcase to your file-register.c
+program--diff below.  The test passes, of course.  :)
 
-1) If ->fds[i] is -1, the existing file at i + ->offset is removed from
-   the set.
-2) If ->fds[i] is a valid fd, the existing file at i + ->offset is
-   replaced with ->fds[i].
+Reviewed-by: Jeff Moyer <jmoyer@redhat.com>
 
-For case #2, is the existing file is currently empty (fd == -1), the
-new fd is simply added to the array.
+Cheers,
+Jeff
 
-Signed-off-by: Jens Axboe <axboe@kernel.dk>
----
- fs/io_uring.c                 | 168 ++++++++++++++++++++++++++++++++++
- include/uapi/linux/io_uring.h |   6 ++
- 2 files changed, 174 insertions(+)
-
-diff --git a/fs/io_uring.c b/fs/io_uring.c
-index 6d4f1394cfca..8afb0b689523 100644
---- a/fs/io_uring.c
-+++ b/fs/io_uring.c
-@@ -3155,6 +3155,171 @@ static int io_sqe_files_register(struct io_ring_ctx *ctx, void __user *arg,
- 	return ret;
+diff --git a/test/file-register.c b/test/file-register.c
+index b25f0f5..322545f 100644
+--- a/test/file-register.c
++++ b/test/file-register.c
+@@ -358,6 +358,40 @@ err:
+ 	return 1;
  }
  
-+static void io_sqe_file_unregister(struct io_ring_ctx *ctx, int index)
-+{
-+#if defined(CONFIG_UNIX)
-+	struct file *file = ctx->user_files[index];
-+	struct sock *sock = ctx->ring_sock->sk;
-+	struct sk_buff_head list, *head = &sock->sk_receive_queue;
-+	struct sk_buff *skb;
-+	int i;
-+
-+	__skb_queue_head_init(&list);
-+
-+	/*
-+	 * Find the skb that holds this file in its SCM_RIGHTS. When found,
-+	 * remove this entry and rearrange the file array.
-+	 */
-+	skb = skb_dequeue(head);
-+	while (skb) {
-+		struct scm_fp_list *fp;
-+
-+		fp = UNIXCB(skb).fp;
-+		for (i = 0; i < fp->count; i++) {
-+			int left;
-+
-+			if (fp->fp[i] != file)
-+				continue;
-+
-+			unix_notinflight(fp->user, fp->fp[i]);
-+			left = fp->count - 1 - i;
-+			if (left) {
-+				memmove(&fp->fp[i], &fp->fp[i + 1],
-+						left * sizeof(struct file *));
-+			}
-+			fp->count--;
-+			if (!fp->count) {
-+				kfree_skb(skb);
-+				skb = NULL;
-+			} else if (skb_peek(&list)) {
-+				spin_lock_irq(&head->lock);
-+				__skb_queue_tail(&list, skb);
-+				while ((skb = __skb_dequeue(&list)) != NULL)
-+					__skb_queue_tail(head, skb);
-+				spin_unlock_irq(&head->lock);
-+			}
-+			file = NULL;
-+			break;
-+		}
-+
-+		if (!file)
-+			break;
-+
-+		__skb_queue_tail(&list, skb);
-+
-+		skb = skb_dequeue(head);
-+	}
-+#else
-+	fput(ctx->user_files[index]);
-+#endif
-+}
-+
-+static int io_sqe_file_register(struct io_ring_ctx *ctx, struct file *file,
-+				int index)
-+{
-+#if defined(CONFIG_UNIX)
-+	struct sock *sock = ctx->ring_sock->sk;
-+	struct sk_buff_head *head = &sock->sk_receive_queue;
-+	struct sk_buff *skb;
-+
-+	/*
-+	 * See if we can merge this file into an existing skb SCM_RIGHTS
-+	 * file set. If there's no room, fall back to allocating a new skb
-+	 * and filling it in.
-+	 */
-+	spin_lock_irq(&head->lock);
-+	skb = skb_peek(head);
-+	if (skb) {
-+		struct scm_fp_list *fpl = UNIXCB(skb).fp;
-+
-+		if (fpl->count < SCM_MAX_FD) {
-+			__skb_unlink(skb, head);
-+			spin_unlock_irq(&head->lock);
-+			fpl->fp[fpl->count] = get_file(file);
-+			unix_inflight(fpl->user, fpl->fp[fpl->count]);
-+			fpl->count++;
-+			spin_lock_irq(&head->lock);
-+			__skb_queue_head(head, skb);
-+		} else {
-+			skb = NULL;
-+		}
-+	}
-+	spin_unlock_irq(&head->lock);
-+
-+	if (skb) {
-+		fput(file);
-+		return 0;
-+	}
-+
-+	return __io_sqe_files_scm(ctx, 1, index);
-+#else
-+	return 0;
-+#endif
-+}
-+
-+static int io_sqe_files_update(struct io_ring_ctx *ctx, void __user *arg,
-+			       unsigned nr_args)
++/*
++ * Register 0 files, but reserve space for 10.  Then add one file.
++ */
++static int test_zero(struct io_uring *ring)
 +{
 +	struct io_uring_files_update up;
-+	int fd, i, err, done;
-+	__s32 __user *fds;
++	int *files;
++	int ret;
 +
-+	if (!ctx->user_files)
-+		return -ENXIO;
-+	if (!nr_args)
-+		return -EINVAL;
-+	if (copy_from_user(&up, arg, sizeof(up)))
-+		return -EFAULT;
-+	if (up.offset + nr_args > ctx->nr_user_files)
-+		return -EINVAL;
++	files = open_files(0, 10, 0);
++	ret = io_uring_register(ring->ring_fd, IORING_REGISTER_FILES, files, 10);
++	if (ret)
++		goto err;
 +
-+	done = 0;
-+	i = up.offset;
-+	fds = (__s32 __user *) up.fds;
-+	while (nr_args) {
-+		err = 0;
-+		if (copy_from_user(&fd, &fds[done], sizeof(fd))) {
-+			err = -EFAULT;
-+			break;
-+		}
-+		if (ctx->user_files[i]) {
-+			io_sqe_file_unregister(ctx, i);
-+			ctx->user_files[i] = NULL;
-+		}
-+		if (fd != -1) {
-+			struct file *file;
-+
-+			file = fget(fd);
-+			if (!file) {
-+				err = -EBADF;
-+				break;
-+			}
-+			/*
-+			 * Don't allow io_uring instances to be registered. If
-+			 * UNIX isn't enabled, then this causes a reference
-+			 * cycle and this instance can never get freed. If UNIX
-+			 * is enabled we'll handle it just fine, but there's
-+			 * still no point in allowing a ring fd as it doesn't
-+			 * support regular read/write anyway.
-+			 */
-+			if (file->f_op == &io_uring_fops) {
-+				fput(file);
-+				err = -EBADF;
-+				break;
-+			}
-+			ctx->user_files[i] = file;
-+			err = io_sqe_file_register(ctx, file, i);
-+			if (err)
-+				break;
-+		}
-+		nr_args--;
-+		done++;
-+		i++;
++	up.fds = open_files(1, 0, 1);
++	up.offset = 0;
++	ret = io_uring_register(ring->ring_fd,
++				IORING_REGISTER_FILES_UPDATE, &up, 1);
++	if (ret != 1) {
++		printf("ret=%d, errno=%d\n", ret, errno);
++		goto err;
 +	}
 +
-+	return done ? done : err;
++	ret = io_uring_register(ring->ring_fd, IORING_UNREGISTER_FILES, NULL, 0);
++	if (ret)
++		goto err;
++
++	close_files(up.fds, 1, 1);
++	return 0;
++err:
++	close_files(up.fds, 1, 1);
++	return 1;
 +}
 +
- static int io_sq_offload_start(struct io_ring_ctx *ctx,
- 			       struct io_uring_params *p)
+ int main(int argc, char *argv[])
  {
-@@ -3969,6 +4134,9 @@ static int __io_uring_register(struct io_ring_ctx *ctx, unsigned opcode,
- 			break;
- 		ret = io_sqe_files_unregister(ctx);
- 		break;
-+	case IORING_REGISTER_FILES_UPDATE:
-+		ret = io_sqe_files_update(ctx, arg, nr_args);
-+		break;
- 	case IORING_REGISTER_EVENTFD:
- 		ret = -EINVAL;
- 		if (nr_args != 1)
-diff --git a/include/uapi/linux/io_uring.h b/include/uapi/linux/io_uring.h
-index ea57526a5b89..4f532d9c0554 100644
---- a/include/uapi/linux/io_uring.h
-+++ b/include/uapi/linux/io_uring.h
-@@ -150,5 +150,11 @@ struct io_uring_params {
- #define IORING_UNREGISTER_FILES		3
- #define IORING_REGISTER_EVENTFD		4
- #define IORING_UNREGISTER_EVENTFD	5
-+#define IORING_REGISTER_FILES_UPDATE	6
-+
-+struct io_uring_files_update {
-+	__u32 offset;
-+	__s32 *fds;
-+};
+ 	struct io_uring ring;
+@@ -426,5 +460,11 @@ int main(int argc, char *argv[])
+ 		return ret;
+ 	}
  
- #endif
--- 
-2.17.1
-
++	ret = test_zero(&ring);
++	if (ret) {
++		printf("test_zero failed\n");
++		return ret;
++	}
++
+ 	return 0;
+ }
