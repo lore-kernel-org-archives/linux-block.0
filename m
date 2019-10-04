@@ -2,104 +2,93 @@ Return-Path: <SRS0=jhC6=X5=vger.kernel.org=linux-block-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-9.8 required=3.0 tests=DKIM_SIGNED,DKIM_VALID,
-	DKIM_VALID_AU,FREEMAIL_FORGED_FROMDOMAIN,FREEMAIL_FROM,
-	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,
-	SPF_HELO_NONE,SPF_PASS,USER_AGENT_GIT autolearn=ham autolearn_force=no
-	version=3.4.0
+X-Spam-Status: No, score=-2.2 required=3.0 tests=DKIM_SIGNED,DKIM_VALID,
+	HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,
+	USER_AGENT_SANE_1 autolearn=no autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id AF33EC47404
-	for <linux-block@archiver.kernel.org>; Fri,  4 Oct 2019 14:01:17 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id EFC59C4360C
+	for <linux-block@archiver.kernel.org>; Fri,  4 Oct 2019 14:04:30 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.kernel.org (Postfix) with ESMTP id 7F55720700
-	for <linux-block@archiver.kernel.org>; Fri,  4 Oct 2019 14:01:17 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id C21BA20700
+	for <linux-block@archiver.kernel.org>; Fri,  4 Oct 2019 14:04:30 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="Lu+khzDp"
+	dkim=pass (2048-bit key) header.d=kernel-dk.20150623.gappssmtp.com header.i=@kernel-dk.20150623.gappssmtp.com header.b="xiJSchKd"
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S2388752AbfJDOBR (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Fri, 4 Oct 2019 10:01:17 -0400
-Received: from mail-wm1-f68.google.com ([209.85.128.68]:52059 "EHLO
-        mail-wm1-f68.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S2388780AbfJDOBQ (ORCPT
-        <rfc822;linux-block@vger.kernel.org>); Fri, 4 Oct 2019 10:01:16 -0400
-Received: by mail-wm1-f68.google.com with SMTP id 7so5974562wme.1;
-        Fri, 04 Oct 2019 07:01:15 -0700 (PDT)
+        id S2388438AbfJDOEa (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Fri, 4 Oct 2019 10:04:30 -0400
+Received: from mail-io1-f44.google.com ([209.85.166.44]:46470 "EHLO
+        mail-io1-f44.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S2388417AbfJDOEa (ORCPT
+        <rfc822;linux-block@vger.kernel.org>); Fri, 4 Oct 2019 10:04:30 -0400
+Received: by mail-io1-f44.google.com with SMTP id c6so13659100ioo.13
+        for <linux-block@vger.kernel.org>; Fri, 04 Oct 2019 07:04:29 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20161025;
-        h=from:to:cc:subject:date:message-id:in-reply-to:references
-         :mime-version:content-transfer-encoding;
-        bh=aeGpWqAjf5UKAuu/hp38roJW58G/zrbSBwMk3/m3txc=;
-        b=Lu+khzDpI76peiE2e5D3GSx+i1V+slX7mty3gTEQaJKAhZ7TdOD8S0tQ+bX5j6/t4Y
-         Kw7wNebIHxeI7cSg0JRc0znn6jixe4Z41bK7VlnSj8C423kByrev7P7x/f9f08g4/PaB
-         U0tY05+nfeSr8GYpZiiFywzEiv9zR6qzyIIapUtxFqsJhtZztX+IQLT/LNe3PqfIxLtL
-         tkMP4YMo4f6NsD29dt25H14ceLvJE2Mx683NWsy3zxUHNkKPpoLj1QSqZs3x/8gZvahQ
-         6rtJ2+btWvqR7wPuBa11I4IfiNUrVMWPwW3JUT3PhSZpPt4LngdVcirbTF2IypZaI6ZS
-         /CZg==
+        d=kernel-dk.20150623.gappssmtp.com; s=20150623;
+        h=subject:to:cc:references:from:message-id:date:user-agent
+         :mime-version:in-reply-to:content-language:content-transfer-encoding;
+        bh=tJ+enjiw0qTMNSwdUMz2YW7UWK/wRJo2/Axq1O5DXYk=;
+        b=xiJSchKdeSoi94+f/1x5VooggmYSkgd+2JeynPOaNao1uuFPY3STxV/NIyLQdAGXLL
+         7s0SjqBiNn2MkWL4Y4SsnGjvLlTibEZQb9VIFPDdKX9M/qtzMZ1G2yt/WWtKXpm2gvP1
+         52jEsBKRune2it9b64BpiPD5vhmwwXhjY0fvfOmoSTzjnLBMXow8aaC4WsbNOUGCGsaX
+         C8JM/8Wi3kT2JwmFOUGD7Pi0OhnI/CsjBDETi7sT77RbbgxtOgM8r6fNlpiP1y/YRxFc
+         lWlfBwJizFEmCNm3U76Czx1MmAZ5WxoDzNzdikTgvdUa/FmDXeV9YRPm6nOY9qegB6Az
+         KTpw==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=1e100.net; s=20161025;
-        h=x-gm-message-state:from:to:cc:subject:date:message-id:in-reply-to
-         :references:mime-version:content-transfer-encoding;
-        bh=aeGpWqAjf5UKAuu/hp38roJW58G/zrbSBwMk3/m3txc=;
-        b=RUWijjiJs2i/lVB/6ZRoixX7mavvy7KI5ln0FaWl6kiUBCQBJvUCV1ugDF3PaaUPtU
-         5Gunae7HENGUe3JUDXz3kY0D7CbABA/hAQ6dqUDgFgMJce+atuoCDJyHF2Q3t2Z73c4F
-         hsburT1vaL0tE9jIU1V8Dr9W9WNKcSHt9eEIwFg3oQuV8eeQNwTtMKnx2h866iN0aEIC
-         1TNNlYIkAmrd2H0kSZEWsxL87Z+tqVx7Im3DHAjbHLvAgRjnwDMdymz5MTc9vyE7zUL5
-         PhXe8KkmhZchb9DydHfz4uCKUtleVyflVAHGfhqlkI/Lkn16+gVL8D4dDiniQ+01HHae
-         MUnQ==
-X-Gm-Message-State: APjAAAW5A1hIbwn2oUNiLJd6dJlowZJ0lAzL7U5yAJ7ghfLML0tsBR7T
-        hBaAEHE73URfNhLZ2D4Dt6MxbrmJZIs=
-X-Google-Smtp-Source: APXvYqzQ49raynP76AYbRMm5tcCrZmOSCiQvbP8nEX4aIul2thLqh/MCnqVUcPJyfE6UgLjmdDbbJg==
-X-Received: by 2002:a1c:1bcf:: with SMTP id b198mr11756584wmb.0.1570197674859;
-        Fri, 04 Oct 2019 07:01:14 -0700 (PDT)
-Received: from localhost.localdomain ([109.126.135.5])
-        by smtp.gmail.com with ESMTPSA id t8sm5530753wrx.76.2019.10.04.07.01.13
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Fri, 04 Oct 2019 07:01:14 -0700 (PDT)
-From:   "Pavel Begunkov (Silence)" <asml.silence@gmail.com>
-To:     Jens Axboe <axboe@kernel.dk>, linux-block@vger.kernel.org,
-        linux-kernel@vger.kernel.org
-Cc:     Pavel Begunkov <asml.silence@gmail.com>,
-        kbuild test robot <lkp@intel.com>
-Subject: [PATCH v3] io_uring: Fix reversed nonblock flag
-Date:   Fri,  4 Oct 2019 17:01:08 +0300
-Message-Id: <9752f33f509287c77801d5e807213cff9195197a.1570197234.git.asml.silence@gmail.com>
-X-Mailer: git-send-email 2.23.0
-In-Reply-To: <eecaf117de4894b595f300b9fb567825330b2d24.1570183599.git.asml.silence@gmail.com>
+        h=x-gm-message-state:subject:to:cc:references:from:message-id:date
+         :user-agent:mime-version:in-reply-to:content-language
+         :content-transfer-encoding;
+        bh=tJ+enjiw0qTMNSwdUMz2YW7UWK/wRJo2/Axq1O5DXYk=;
+        b=KHWpMqd2Ukpm++LQWFhoOdZM4RHPia9M426mRj1to+LP9b3rJ6cmha1IeBoxZlgyPm
+         VfhVhRViaIBZ5swPaarReloth5d1zEzE4V8O3wLdP9leEQL6lyAC4OCsOjZJI2fYPljb
+         gKcUu9RTI/uhy2S0z+3Lny/sFGsAUw7dSk+Nd7QkJ537HysApjQpXhD+fWTn6yVUDBbI
+         R0j5e8qPdFAP3U5y/3OW2fLVKUWxeCdPNfjXSQ7aGzrCyPQFW26RmwrvsdfjI3rsGcM0
+         fZwFhfU9GrF8STsADxJTOLIgTQ61i1BIoQXc+ghEfFPQ7JcTmBb0uEkOW6Oq0HEp7VqW
+         sdlw==
+X-Gm-Message-State: APjAAAXIHBo8+qhWsTp4jUD00YNs/4QwCx2ALOJ1Mxi85yAEn1R7y9+b
+        ppJwdp/z5jbidu8WuKpY56/LnQ==
+X-Google-Smtp-Source: APXvYqxOx976iqiZp/CwDZh3dbMMahnxL+pKPqa0bJXnsa7TmE1KnsPXFNDLdxtpU8/0Hg6EisqK3Q==
+X-Received: by 2002:a92:d78c:: with SMTP id d12mr14803126iln.96.1570197869100;
+        Fri, 04 Oct 2019 07:04:29 -0700 (PDT)
+Received: from [192.168.1.50] ([65.144.74.34])
+        by smtp.gmail.com with ESMTPSA id o8sm3101385ild.55.2019.10.04.07.04.27
+        (version=TLS1_2 cipher=ECDHE-RSA-AES128-GCM-SHA256 bits=128/128);
+        Fri, 04 Oct 2019 07:04:28 -0700 (PDT)
+Subject: Re: [PATCH v3] io_uring: Fix reversed nonblock flag
+To:     "Pavel Begunkov (Silence)" <asml.silence@gmail.com>,
+        linux-block@vger.kernel.org, linux-kernel@vger.kernel.org
+Cc:     kbuild test robot <lkp@intel.com>
 References: <eecaf117de4894b595f300b9fb567825330b2d24.1570183599.git.asml.silence@gmail.com>
+ <9752f33f509287c77801d5e807213cff9195197a.1570197234.git.asml.silence@gmail.com>
+From:   Jens Axboe <axboe@kernel.dk>
+Message-ID: <063ca0ba-96ad-3552-50d3-7eb9f48499b6@kernel.dk>
+Date:   Fri, 4 Oct 2019 08:04:27 -0600
+User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:60.0) Gecko/20100101
+ Thunderbird/60.8.0
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
+In-Reply-To: <9752f33f509287c77801d5e807213cff9195197a.1570197234.git.asml.silence@gmail.com>
+Content-Type: text/plain; charset=utf-8
+Content-Language: en-US
+Content-Transfer-Encoding: 7bit
 Sender: linux-block-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-From: Pavel Begunkov <asml.silence@gmail.com>
+On 10/4/19 8:01 AM, Pavel Begunkov (Silence) wrote:
+> From: Pavel Begunkov <asml.silence@gmail.com>
+> 
+> io_queue_link_head() accepts @force_nonblock flag, but io_ring_submit()
+> passes something opposite.
+> 
+> v2: build error from test robot: Rebase to block-tree
+> v3: simplify with Jens suggestion
 
-io_queue_link_head() accepts @force_nonblock flag, but io_ring_submit()
-passes something opposite.
+Thanks, looks good to me. Two minor notes that I fixed up:
 
-v2: build error from test robot: Rebase to block-tree
-v3: simplify with Jens suggestion
+1) The revision history should go below the --- line
+2) I've added a Fixes tag
 
-Reported-by: kbuild test robot <lkp@intel.com>
-Signed-off-by: Pavel Begunkov <asml.silence@gmail.com>
----
- fs/io_uring.c | 2 +-
- 1 file changed, 1 insertion(+), 1 deletion(-)
-
-diff --git a/fs/io_uring.c b/fs/io_uring.c
-index c934f91c51e9..b58c3d8594d8 100644
---- a/fs/io_uring.c
-+++ b/fs/io_uring.c
-@@ -2761,7 +2761,7 @@ static int io_ring_submit(struct io_ring_ctx *ctx, unsigned int to_submit,
- 
- 	if (link)
- 		io_queue_link_head(ctx, link, &link->submit, shadow_req,
--					block_for_last);
-+					!block_for_last);
- 	if (statep)
- 		io_submit_state_end(statep);
- 
 -- 
-2.23.0
+Jens Axboe
 
