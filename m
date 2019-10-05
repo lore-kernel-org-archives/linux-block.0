@@ -2,76 +2,119 @@ Return-Path: <SRS0=Yov/=X6=vger.kernel.org=linux-block-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-5.4 required=3.0 tests=FROM_LOCAL_HEX,
-	HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,MENTIONS_GIT_HOSTING,
-	SPF_HELO_NONE,SPF_PASS autolearn=unavailable autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-0.6 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
+	HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS
+	autolearn=no autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id A868BC3E8AB
-	for <linux-block@archiver.kernel.org>; Sat,  5 Oct 2019 09:19:04 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 810A7C3E8AB
+	for <linux-block@archiver.kernel.org>; Sat,  5 Oct 2019 10:34:29 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.kernel.org (Postfix) with ESMTP id 88E78222C5
-	for <linux-block@archiver.kernel.org>; Sat,  5 Oct 2019 09:19:04 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id 1163D222C5
+	for <linux-block@archiver.kernel.org>; Sat,  5 Oct 2019 10:34:28 +0000 (UTC)
+Authentication-Results: mail.kernel.org;
+	dkim=fail reason="signature verification failed" (2048-bit key) header.d=cyberfiber.eu header.i=@cyberfiber.eu header.b="VVo/yaGt"
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1727901AbfJEJTD (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Sat, 5 Oct 2019 05:19:03 -0400
-Received: from mail-io1-f71.google.com ([209.85.166.71]:53634 "EHLO
-        mail-io1-f71.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1725862AbfJEJTD (ORCPT
-        <rfc822;linux-block@vger.kernel.org>); Sat, 5 Oct 2019 05:19:03 -0400
-Received: by mail-io1-f71.google.com with SMTP id w8so17545638iol.20
-        for <linux-block@vger.kernel.org>; Sat, 05 Oct 2019 02:19:00 -0700 (PDT)
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20161025;
-        h=x-gm-message-state:mime-version:date:in-reply-to:message-id:subject
-         :from:to;
-        bh=WHf64SvzoBNVwjzIL2+mLBT/FJ5pbE9VxiOvHeZt8EA=;
-        b=WsEhDfLsc5/O2p2Jxrsdgn7fryrnzoSLv/lx4y1o7SvvSht8ydzQnxOS7aXN6yizOL
-         oAq9Tz+AyQzt2uR2HAdcmJKofYSVUtfTX9njP9EDzr9cYO/8WFV4xCTV/7GTmNaXAD31
-         15e+z8Y1i3XdjAOV+Pb8u+kPt1tI6/Tl4gRhMmxvyV6jQ4N4NoC+HilKgPptw1KNIJId
-         GrWIjpHyo5qWIlH5TEIX8DpEks1CR0rrG5/83zLwxzQusOE/86AqvuDyPtKCcA19OQg2
-         yOERrL2cZ/CshsdyXC7lATTh9ncFTIyHFre66Had36y7QgAsqxAvf/lzITSXpuf03AQo
-         Aqxw==
-X-Gm-Message-State: APjAAAWKuwmt1A2Nf0pUOT52CqbHqf+87F6lM7TvT/24mGi1dvTVhWXv
-        1+2FSkGjegbyBXXrgVAwntt9dB7RUNZS+R8haYYNCLIREQT0
-X-Google-Smtp-Source: APXvYqz4MZuBJPFuWT2av0dlIWvrlEdd3Imp6vlXh2/IyPR1aQFBmHkuBcqhjfVQvBerP46hmQ+nyu6sLc4lgE0V8zANyLh0l4Ne
+        id S1727719AbfJEKe2 (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Sat, 5 Oct 2019 06:34:28 -0400
+Received: from filter02-out9.totaalholding.nl ([185.56.145.241]:48551 "EHLO
+        filter02-out9.totaalholding.nl" rhost-flags-OK-OK-OK-OK)
+        by vger.kernel.org with ESMTP id S1727653AbfJEKe1 (ORCPT
+        <rfc822;linux-block@vger.kernel.org>);
+        Sat, 5 Oct 2019 06:34:27 -0400
+X-Greylist: delayed 1202 seconds by postgrey-1.27 at vger.kernel.org; Sat, 05 Oct 2019 06:34:26 EDT
+Received: from www98.totaalholding.nl ([185.94.230.81])
+        by filter02.totaalholding.nl with esmtps (TLSv1.2:ECDHE-RSA-AES256-GCM-SHA384:256)
+        (Exim 4.89)
+        (envelope-from <mjbaars1977.linux-block@cyberfiber.eu>)
+        id 1iGh4w-0001hU-4c
+        for linux-block@vger.kernel.org; Sat, 05 Oct 2019 12:14:22 +0200
+DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed;
+        d=cyberfiber.eu; s=default; h=Content-Transfer-Encoding:MIME-Version:
+        Content-Type:Date:To:From:Subject:Message-ID:Sender:Reply-To:Cc:Content-ID:
+        Content-Description:Resent-Date:Resent-From:Resent-Sender:Resent-To:Resent-Cc
+        :Resent-Message-ID:In-Reply-To:References:List-Id:List-Help:List-Unsubscribe:
+        List-Subscribe:List-Post:List-Owner:List-Archive;
+        bh=Z57rBx7JXhH9fuTT9gae+DqquiC0Gs5Z6kALYw9DWj8=; b=VVo/yaGtS3top4fi7r+lw36iKm
+        u/pXojwlB7acy3t2gTe4/qS8Cun1HIpgysF4ZOLHRgHC3TU/Y7xf1eYuo0G/nUkc0A4jECj2d4Axg
+        XGNHBmcODvzJz1m93zV3Z5MvlX+JTzrDzK4Lx983CHEoer5/N2gv2BRepJQFLPSP2KadlNduPy1ce
+        c+EQheovrQg7KTfOFNrHm63PQv+lZxopaHv1XRbByfybq34AjwsycNWA8Hmqz6LCm7Ww/kM3uVlui
+        nR+8wMUXIfjVWsgIttC1ZRc6fT1SfDP/AftTLhIO/QgnBINMM+3QOCDkiiO162kL1iHh8N7z2/RxQ
+        6Tbw8zJg==;
+Received: from 134-134-146-85.ftth.glasoperator.nl ([85.146.134.134]:33856 helo=DT0E.cyberfiber.eu)
+        by www98.totaalholding.nl with esmtpsa (TLSv1.2:ECDHE-RSA-AES256-GCM-SHA384:256)
+        (Exim 4.92)
+        (envelope-from <mjbaars1977.linux-block@cyberfiber.eu>)
+        id 1iGh4v-0002aw-KW
+        for linux-block@vger.kernel.org; Sat, 05 Oct 2019 12:14:21 +0200
+Message-ID: <db5c89c3fe26e4b7ec96443ec97a05df97162889.camel@cyberfiber.eu>
+Subject: packet writing support
+From:   Mischa Baars <mjbaars1977.linux-block@cyberfiber.eu>
+To:     linux-block@vger.kernel.org
+Date:   Sat, 05 Oct 2019 12:12:53 +0200
+Content-Type: text/plain; charset="UTF-8"
+User-Agent: Evolution 3.32.4 (3.32.4-1.fc30) 
 MIME-Version: 1.0
-X-Received: by 2002:a92:9cd6:: with SMTP id x83mr20597645ill.198.1570267140493;
- Sat, 05 Oct 2019 02:19:00 -0700 (PDT)
-Date:   Sat, 05 Oct 2019 02:19:00 -0700
-In-Reply-To: <0000000000000a6fc5059423a8f9@google.com>
-X-Google-Appengine-App-Id: s~syzkaller
-X-Google-Appengine-App-Id-Alias: syzkaller
-Message-ID: <0000000000001c9bac0594264f96@google.com>
-Subject: Re: WARNING in __blk_mq_delay_run_hw_queue
-From:   syzbot <syzbot+d44e1b26ce5c3e77458d@syzkaller.appspotmail.com>
-To:     axboe@kernel.dk, bvanassche@acm.org, hare@suse.com,
-        keith.busch@intel.com, linux-block@vger.kernel.org,
-        linux-kernel@vger.kernel.org, syzkaller-bugs@googlegroups.com
-Content-Type: text/plain; charset="UTF-8"; format=flowed; delsp=yes
+Content-Transfer-Encoding: 7bit
+X-AntiAbuse: This header was added to track abuse, please include it with any abuse report
+X-AntiAbuse: Primary Hostname - www98.totaalholding.nl
+X-AntiAbuse: Original Domain - vger.kernel.org
+X-AntiAbuse: Originator/Caller UID/GID - [47 12] / [47 12]
+X-AntiAbuse: Sender Address Domain - cyberfiber.eu
+X-Get-Message-Sender-Via: www98.totaalholding.nl: authenticated_id: mjbaars1977.linux-block@cyberfiber.eu
+X-Authenticated-Sender: www98.totaalholding.nl: mjbaars1977.linux-block@cyberfiber.eu
+X-Source: 
+X-Source-Args: 
+X-Source-Dir: 
+X-Originating-IP: 185.94.230.81
+X-SpamExperts-Domain: out.totaalholding.nl
+X-SpamExperts-Username: 185.94.230.81
+Authentication-Results: totaalholding.nl; auth=pass smtp.auth=185.94.230.81@out.totaalholding.nl
+X-SpamExperts-Outgoing-Class: unsure
+X-SpamExperts-Outgoing-Evidence: Combined (0.35)
+X-Recommended-Action: accept
+X-Filter-ID: Mvzo4OR0dZXEDF/gcnlw0ezqdolHG91LK5q2HN6uCHCpSDasLI4SayDByyq9LIhVc+BsoG/GUGEQ
+ jCOlW/h+/ETNWdUk1Ol2OGx3IfrIJKywOmJyM1qr8uRnWBrbSAGDrBQRDMCPoVIktGfXqz+K77w8
+ BFityCCkxNlTi+jLDh0BcORxfCojcTOpEjtvWHp2EPqipJhAyt44yQscDkX3xzg9YkzbMy6DOYhG
+ 3MUcvhr5WSIV/ADayw0YwNNo7qOm8DjomP3d2Aqxr0VfVhf3qadxWf7PBaiEJ7Ubv24eC2q1gqil
+ FjLFGSoqbEUSByQZF+KbsVJyJvk1v2cRMLfeu+j4c2f7whGZQeSjyr0GZKei3GSvwir0OshyEkOw
+ fCYvJRLqCXwZ1lLOS3w3BIDj/vtduhq2eYJp1M6uQht/3vmQeETIza2ISn5dEgBRzdTORAwX31WV
+ Y5lWjWxuGSRuxWXf5NNoWqxwzT7YQb2bq3uDyiKr2bObCttBtO6VKDuO5YE5enyccp7RH4WQio3u
+ GdiBOWdyCfmuoHBoHDwUzk5JaKOFs8saAYDXeULHXubmmAaukvjjB3H15eqNCNu9Sik4xAm9D8KT
+ eKJT7gNACPd+5CDNPcr0lQdM2IbB/ACbUWibaRDYiV5DUOzBDXPBF0x21M1BcAkcfhoJPUHCGUEz
+ hUvEuzST3Ntq6RdKQNjg3Fqaphbql6XpICdUd9RPCrbeBZYFZNAmraKhaFOqJnBVkXMUiM+O9bkD
+ u7p24goh0Atx8uxJ0NCPHdglD3COmRDJZnz9Sdz+LdCLXuI1HDKNms8bhxfe2nIpwkiiQMh/nEw+
+ d60sEkyHnU2JFGgcgMcx91fm33g+9q6aH9nUmBOaIrvHjZWN3MKFkx7o78OJlHlGswvv8qi+FB9l
+ 7UZiHNDCk+RCzYrX/RwmwFdA76zjmFowZIJCJV4+/tSzU23RWdd9Kd/KcS2LVqa4cfDcDplUFfgo
+ YePXKinFtKQYFZhF2jAMM1dKeoL9l/FUUwpAwVIeVYJozYvRNqNh/jw9v3CouBsQyQgpDFiro4OD
+ up39Y8Gy+1Sm2Uf/sympAQhGsLrgFBHsyeQJJ8GSKhUR3Q==
+X-Report-Abuse-To: spam@filter01.totaalholding.nl
 Sender: linux-block-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-syzbot has bisected this bug to:
+Advised by the linux-next mailing list to repost this message on the linux-block mailing list:
 
-commit ed76e329d74a4b15ac0f5fd3adbd52ec0178a134
-Author: Jens Axboe <axboe@kernel.dk>
-Date:   Mon Oct 29 19:06:14 2018 +0000
+Hi,
 
-     blk-mq: abstract out queue map
+If I'm correct, packet writing support is going to be removed from the
+Linux kernel. Is there any particular reason for
+this, as far as you people know? Both DVD-writers and Blueray-writers are
+still being sold to date.
 
-bisection log:  https://syzkaller.appspot.com/x/bisect.txt?x=1558f6fb600000
-start commit:   b145b0eb Merge tag 'for-linus' of git://git.kernel.org/pub..
-git tree:       upstream
-final crash:    https://syzkaller.appspot.com/x/report.txt?x=1758f6fb600000
-console output: https://syzkaller.appspot.com/x/log.txt?x=1358f6fb600000
-kernel config:  https://syzkaller.appspot.com/x/.config?x=1ec3be9936e004f6
-dashboard link: https://syzkaller.appspot.com/bug?extid=d44e1b26ce5c3e77458d
-syz repro:      https://syzkaller.appspot.com/x/repro.syz?x=165fcefb600000
-C reproducer:   https://syzkaller.appspot.com/x/repro.c?x=162d03db600000
+I'm currently working on quite a large project. I would be dependent
+solely on USB to store my backup files, when the packet writing support
+is removed. Actually I'm quite uncomfortable with that idea, because
+USB is rewritable. Any serious attempt to do damage to my project will
+result a permanent loss of code. Personally I would do anything to keep
+packet writing support in the kernel.
 
-Reported-by: syzbot+d44e1b26ce5c3e77458d@syzkaller.appspotmail.com
-Fixes: ed76e329d74a ("blk-mq: abstract out queue map")
+I'd hoped you could remove normal floppy disc support instead. That
+seems the more logical course of action. Floppy disc drives aren't
+being sold anymore for quite some years now.
 
-For information about bisection process see: https://goo.gl/tpsmEJ#bisection
+Anybody there?
+
+Have a pleasant day,
+Mischa Baars.
+
