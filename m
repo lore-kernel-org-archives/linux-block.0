@@ -1,155 +1,136 @@
-Return-Path: <SRS0=jhC6=X5=vger.kernel.org=linux-block-owner@kernel.org>
+Return-Path: <SRS0=Yov/=X6=vger.kernel.org=linux-block-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-8.2 required=3.0 tests=DKIM_SIGNED,DKIM_VALID,
-	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,
-	SPF_HELO_NONE,SPF_PASS,USER_AGENT_SANE_1 autolearn=ham autolearn_force=no
-	version=3.4.0
+X-Spam-Status: No, score=-5.4 required=3.0 tests=FROM_LOCAL_HEX,
+	HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,MENTIONS_GIT_HOSTING,
+	SPF_HELO_NONE,SPF_PASS autolearn=unavailable autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id C5763C4360C
-	for <linux-block@archiver.kernel.org>; Fri,  4 Oct 2019 19:18:16 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id D6C36C47404
+	for <linux-block@archiver.kernel.org>; Sat,  5 Oct 2019 06:09:09 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.kernel.org (Postfix) with ESMTP id 9FC96222C0
-	for <linux-block@archiver.kernel.org>; Fri,  4 Oct 2019 19:18:16 +0000 (UTC)
-Authentication-Results: mail.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel-dk.20150623.gappssmtp.com header.i=@kernel-dk.20150623.gappssmtp.com header.b="UUjFMXlU"
+	by mail.kernel.org (Postfix) with ESMTP id 9769E222C0
+	for <linux-block@archiver.kernel.org>; Sat,  5 Oct 2019 06:09:09 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1728356AbfJDTSQ (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Fri, 4 Oct 2019 15:18:16 -0400
-Received: from mail-pf1-f194.google.com ([209.85.210.194]:39919 "EHLO
-        mail-pf1-f194.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1725932AbfJDTSP (ORCPT
-        <rfc822;linux-block@vger.kernel.org>); Fri, 4 Oct 2019 15:18:15 -0400
-Received: by mail-pf1-f194.google.com with SMTP id v4so4473358pff.6
-        for <linux-block@vger.kernel.org>; Fri, 04 Oct 2019 12:18:14 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=kernel-dk.20150623.gappssmtp.com; s=20150623;
-        h=to:from:subject:message-id:date:user-agent:mime-version
-         :content-language:content-transfer-encoding;
-        bh=mQm52KNq8N1PBtNAdz7FJMAcNHHXJOD2Ou1TSm/vQoY=;
-        b=UUjFMXlUGQlvKqrMkDehgQCQXee5UKdyVgPDGSteaTsnKqn7gxZ6dgPzFSwXJbbBKJ
-         WK+vvwLylg0nt2NFLOoYbKp4hPISU1zW1lYi4U25QDFBb61RoED5MvKkyQN2TnJZHgZI
-         hG5/+rApO6xpWwOyRUPPjvvTvvTDZLMtN99oQkiv3mNyMSqGpdyeeD1NLLyJjrt9WwdL
-         LLoMEHkxE5J44ug5v64sQt0pR8cXpTJao+IoVh10GiPQkrJ++H6eYxGkiOyhTclhft5m
-         e8mDYAV29E1qwrpC2oYUWqSdc+Aj3o90we2caq+VqExNZO6b5NqadypjEEspopWobv86
-         w8eA==
+        id S1726895AbfJEGJI (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Sat, 5 Oct 2019 02:09:08 -0400
+Received: from mail-io1-f69.google.com ([209.85.166.69]:54192 "EHLO
+        mail-io1-f69.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S1725927AbfJEGJI (ORCPT
+        <rfc822;linux-block@vger.kernel.org>); Sat, 5 Oct 2019 02:09:08 -0400
+Received: by mail-io1-f69.google.com with SMTP id w8so17042349iol.20
+        for <linux-block@vger.kernel.org>; Fri, 04 Oct 2019 23:09:07 -0700 (PDT)
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=1e100.net; s=20161025;
-        h=x-gm-message-state:to:from:subject:message-id:date:user-agent
-         :mime-version:content-language:content-transfer-encoding;
-        bh=mQm52KNq8N1PBtNAdz7FJMAcNHHXJOD2Ou1TSm/vQoY=;
-        b=g3ul6BhdfKG56yX0HO2hVqO1v4qlwItXgyty5qIXA0gNimwS5WjGYs3AyizXV+IbKT
-         Px/mpRUXJNcbgLsaJJ4gV/A6Zh/qXYNi3XqxDDm2zAkz0UFIP5JKLTyWbVdr8RT+0cl+
-         2nozjhWfyX5QdATSQDhAuDnT87h4tG+gxuvswO6NyMMB90IfGyNO8PN/Hqtw0TxWhopR
-         IoDq22pOYwD7IvFqYYSCKWctjvp/P8Phyjk6kq1JkedrBrdbmPRG/HOrBmI42ca0IgXA
-         SzzC+GYUClCWZ9gAfNzvxzg2s5gO3ZFeup6cj8YIbbeyHS8PXrJqasldnqhYmIRD7X9h
-         ckCg==
-X-Gm-Message-State: APjAAAUwdkxfKfAITIixQIM74JS5pGWiGXjRu+S4bUeMjcQt5Ijefa93
-        faiQFcDjgdXvp7ZkqnKv1SLUo2sGQcpODA==
-X-Google-Smtp-Source: APXvYqwVTvKUmG+vYORR71rkzzwyxr5bqKo+TCdVgljXCH2+nLtx6wQT1+wwvecalsYQ4lCrb85pwA==
-X-Received: by 2002:a17:90a:2464:: with SMTP id h91mr19595566pje.9.1570216692905;
-        Fri, 04 Oct 2019 12:18:12 -0700 (PDT)
-Received: from [192.168.1.188] ([66.219.217.79])
-        by smtp.gmail.com with ESMTPSA id h186sm10822156pfb.63.2019.10.04.12.18.11
-        for <linux-block@vger.kernel.org>
-        (version=TLS1_2 cipher=ECDHE-RSA-AES128-GCM-SHA256 bits=128/128);
-        Fri, 04 Oct 2019 12:18:12 -0700 (PDT)
-To:     "linux-block@vger.kernel.org" <linux-block@vger.kernel.org>
-From:   Jens Axboe <axboe@kernel.dk>
-Subject: [PATCH] io_uring: allow application controlled CQ ring size
-Message-ID: <0188a3ff-6a41-1a95-f444-2ef308a83f7a@kernel.dk>
-Date:   Fri, 4 Oct 2019 13:18:09 -0600
-User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:60.0) Gecko/20100101
- Thunderbird/60.8.0
+        h=x-gm-message-state:mime-version:date:message-id:subject:from:to;
+        bh=dkLn/xQvQAJMh5x3Vm+ElyVLpeqAPCXNqivf0CCkq/w=;
+        b=Sn6+OPl97pFLJMY3kM34VwlaB9Y7NdPDavwPMZg0VxSqQnc+RGrq/o0IQYLITVWDBS
+         RJcWDX+u/Xk87Q7O6Qu+oJTyJahBnx71vUVXI4suhnNTuBpdyo1iAPOsEWSwfz6KDaLe
+         G3IR9zUGLn+TgNFaVEdYJB2iOLiAcbNyMEpoeHcqEemNo5m8CxkxjSh4ImnyIWxe/eZ6
+         h+GHF9m225+aCMC4ZanwgbtaxslOjSLejwrhmnjrTJwr7KvzxF6JurAGSKhmvMWcqrt1
+         DifXF0Qos6YLorY/U9pE9VuGh60llnZWtrR27NWBahnjRtT35o2UE2IYT49XAe6KLzA8
+         5V1g==
+X-Gm-Message-State: APjAAAV0X3YqmjIm0eEccCTXNnd/h++JQFL1A8gVyGt7cpN8sUg60AK1
+        +S/ZmWsfekTPllLa+T2Z0NOsrumAsEAkvcdXVxq3TGaYsQJV
+X-Google-Smtp-Source: APXvYqwkd4uqkXXH/+v9h2Ickqbdng1y2sNuExip2to8BDg50vXkLdoSbh8PBZitSeQex5S/IeZeR4LiFQXC5uw1zqLXElxQZnzD
 MIME-Version: 1.0
-Content-Type: text/plain; charset=utf-8
-Content-Language: en-US
-Content-Transfer-Encoding: 7bit
+X-Received: by 2002:a05:6602:2591:: with SMTP id p17mr15902765ioo.298.1570255747573;
+ Fri, 04 Oct 2019 23:09:07 -0700 (PDT)
+Date:   Fri, 04 Oct 2019 23:09:07 -0700
+X-Google-Appengine-App-Id: s~syzkaller
+X-Google-Appengine-App-Id-Alias: syzkaller
+Message-ID: <0000000000000a6fc5059423a8f9@google.com>
+Subject: WARNING in __blk_mq_delay_run_hw_queue
+From:   syzbot <syzbot+d44e1b26ce5c3e77458d@syzkaller.appspotmail.com>
+To:     axboe@kernel.dk, linux-block@vger.kernel.org,
+        linux-kernel@vger.kernel.org, syzkaller-bugs@googlegroups.com
+Content-Type: text/plain; charset="UTF-8"; format=flowed; delsp=yes
 Sender: linux-block-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-We currently size the CQ ring as twice the SQ ring, to allow some
-flexibility in not overflowing the CQ ring. This is done because the
-SQE life time is different than that of the IO request itself, the SQE
-is consumed as soon as the kernel has seen the entry.
+Hello,
 
-Certain application don't need a huge SQ ring size, since they just
-submit IO in batches. But they may have a lot of requests pending, and
-hence need a big CQ ring to hold them all. By allowing the application
-to control the CQ ring size multiplier, we can cater to those
-applications more efficiently.
+syzbot found the following crash on:
 
-If an application wants to define its own CQ ring size, it must set
-IORING_SETUP_CQSIZE in the setup flags, and fill out
-io_uring_params->cq_entries. The value must be a power of two.
+HEAD commit:    b145b0eb Merge tag 'for-linus' of git://git.kernel.org/pub..
+git tree:       upstream
+console output: https://syzkaller.appspot.com/x/log.txt?x=146c860d600000
+kernel config:  https://syzkaller.appspot.com/x/.config?x=1ec3be9936e004f6
+dashboard link: https://syzkaller.appspot.com/bug?extid=d44e1b26ce5c3e77458d
+compiler:       gcc (GCC) 9.0.0 20181231 (experimental)
+syz repro:      https://syzkaller.appspot.com/x/repro.syz?x=165fcefb600000
+C reproducer:   https://syzkaller.appspot.com/x/repro.c?x=162d03db600000
 
-Signed-off-by: Jens Axboe <axboe@kernel.dk>
+IMPORTANT: if you fix the bug, please add the following tag to the commit:
+Reported-by: syzbot+d44e1b26ce5c3e77458d@syzkaller.appspotmail.com
+
+blk_update_request: I/O error, dev nbd0, sector 4 op 0x0:(READ) flags 0x0  
+phys_seg 2 prio class 0
+Buffer I/O error on dev nbd0, logical block 2, async page read
+Buffer I/O error on dev nbd0, logical block 3, async page read
+------------[ cut here ]------------
+WARNING: CPU: 0 PID: 2496 at include/linux/cpumask.h:137 cpu_max_bits_warn  
+include/linux/cpumask.h:137 [inline]
+WARNING: CPU: 0 PID: 2496 at include/linux/cpumask.h:137 cpumask_check  
+include/linux/cpumask.h:144 [inline]
+WARNING: CPU: 0 PID: 2496 at include/linux/cpumask.h:137 cpumask_check  
+include/linux/cpumask.h:142 [inline]
+WARNING: CPU: 0 PID: 2496 at include/linux/cpumask.h:137 cpumask_test_cpu  
+include/linux/cpumask.h:360 [inline]
+WARNING: CPU: 0 PID: 2496 at include/linux/cpumask.h:137  
+blk_mq_hctx_next_cpu block/blk-mq.c:1443 [inline]
+WARNING: CPU: 0 PID: 2496 at include/linux/cpumask.h:137  
+__blk_mq_delay_run_hw_queue+0x498/0x600 block/blk-mq.c:1479
+Kernel panic - not syncing: panic_on_warn set ...
+CPU: 0 PID: 2496 Comm: kworker/0:1H Not tainted 5.4.0-rc1+ #0
+Hardware name: Google Google Compute Engine/Google Compute Engine, BIOS  
+Google 01/01/2011
+Workqueue: kblockd blk_mq_requeue_work
+Call Trace:
+  __dump_stack lib/dump_stack.c:77 [inline]
+  dump_stack+0x172/0x1f0 lib/dump_stack.c:113
+  panic+0x2dc/0x755 kernel/panic.c:220
+  __warn.cold+0x2f/0x3c kernel/panic.c:581
+  report_bug+0x289/0x300 lib/bug.c:195
+  fixup_bug arch/x86/kernel/traps.c:179 [inline]
+  fixup_bug arch/x86/kernel/traps.c:174 [inline]
+  do_error_trap+0x11b/0x200 arch/x86/kernel/traps.c:272
+  do_invalid_op+0x37/0x50 arch/x86/kernel/traps.c:291
+  invalid_op+0x23/0x30 arch/x86/entry/entry_64.S:1028
+RIP: 0010:cpu_max_bits_warn include/linux/cpumask.h:137 [inline]
+RIP: 0010:cpumask_check include/linux/cpumask.h:144 [inline]
+RIP: 0010:cpumask_check include/linux/cpumask.h:142 [inline]
+RIP: 0010:cpumask_test_cpu include/linux/cpumask.h:360 [inline]
+RIP: 0010:blk_mq_hctx_next_cpu block/blk-mq.c:1443 [inline]
+RIP: 0010:__blk_mq_delay_run_hw_queue+0x498/0x600 block/blk-mq.c:1479
+Code: 01 00 00 41 c7 84 24 24 01 00 00 01 00 00 00 41 bd 40 00 00 00 e9 ab  
+fe ff ff 41 bd 40 00 00 00 e9 a0 fe ff ff e8 48 68 41 fe <0f> 0b e9 50 fd  
+ff ff e8 3c 68 41 fe 48 c7 c2 40 b9 c5 89 4c 89 fe
+RSP: 0018:ffff8880a3287b18 EFLAGS: 00010293
+RAX: ffff8880a32720c0 RBX: 0000000000000040 RCX: ffffffff8331a7e6
+RDX: 0000000000000000 RSI: ffffffff8331aa98 RDI: 0000000000000005
+RBP: ffff8880a3287b58 R08: ffff8880a32720c0 R09: ffffed101141a05a
+R10: ffffed101141a059 R11: ffff88808a0d02cf R12: ffff88808a0d0280
+R13: 0000000000000040 R14: ffff88808a0d03a4 R15: 0000000000000000
+  blk_mq_run_hw_queue+0x19d/0x350 block/blk-mq.c:1508
+  blk_mq_run_hw_queues+0x112/0x1a0 block/blk-mq.c:1525
+  blk_mq_requeue_work+0x502/0x780 block/blk-mq.c:775
+  process_one_work+0x9af/0x1740 kernel/workqueue.c:2269
+  worker_thread+0x98/0xe40 kernel/workqueue.c:2415
+  kthread+0x361/0x430 kernel/kthread.c:255
+  ret_from_fork+0x24/0x30 arch/x86/entry/entry_64.S:352
+Kernel Offset: disabled
+Rebooting in 86400 seconds..
+
 
 ---
+This bug is generated by a bot. It may contain errors.
+See https://goo.gl/tpsmEJ for more information about syzbot.
+syzbot engineers can be reached at syzkaller@googlegroups.com.
 
-diff --git a/fs/io_uring.c b/fs/io_uring.c
-index 8afb0b689523..bfbb7ab3c4e4 100644
---- a/fs/io_uring.c
-+++ b/fs/io_uring.c
-@@ -76,6 +76,7 @@
- #include "internal.h"
- 
- #define IORING_MAX_ENTRIES	32768
-+#define IORING_MAX_CQ_ENTRIES	(2 * IORING_MAX_ENTRIES)
- #define IORING_MAX_FIXED_FILES	1024
- 
- struct io_uring {
-@@ -3984,10 +3985,23 @@ static int io_uring_create(unsigned entries, struct io_uring_params *p)
- 	 * Use twice as many entries for the CQ ring. It's possible for the
- 	 * application to drive a higher depth than the size of the SQ ring,
- 	 * since the sqes are only used at submission time. This allows for
--	 * some flexibility in overcommitting a bit.
-+	 * some flexibility in overcommitting a bit. If the application has
-+	 * set IORING_SETUP_CQSIZE, it will have passed in the desired number
-+	 * of CQ ring entries manually.
- 	 */
- 	p->sq_entries = roundup_pow_of_two(entries);
--	p->cq_entries = 2 * p->sq_entries;
-+	if (p->flags & IORING_SETUP_CQSIZE) {
-+		/*
-+		 * If IORING_SETUP_CQSIZE is set, we do the same roundup
-+		 * to a power-of-two, if it isn't already. We do NOT impose
-+		 * any cq vs sq ring sizing.
-+		 */
-+		if (!p->cq_entries || p->cq_entries > IORING_MAX_CQ_ENTRIES)
-+			return -EINVAL;
-+		p->cq_entries = roundup_pow_of_two(p->cq_entries);
-+	} else {
-+		p->cq_entries = 2 * p->sq_entries;
-+	}
- 
- 	user = get_uid(current_user());
- 	account_mem = !capable(CAP_IPC_LOCK);
-@@ -4068,7 +4082,7 @@ static long io_uring_setup(u32 entries, struct io_uring_params __user *params)
- 	}
- 
- 	if (p.flags & ~(IORING_SETUP_IOPOLL | IORING_SETUP_SQPOLL |
--			IORING_SETUP_SQ_AFF))
-+			IORING_SETUP_SQ_AFF | IORING_SETUP_CQSIZE))
- 		return -EINVAL;
- 
- 	ret = io_uring_create(entries, &p);
-diff --git a/include/uapi/linux/io_uring.h b/include/uapi/linux/io_uring.h
-index 4f532d9c0554..e0137ea6ad79 100644
---- a/include/uapi/linux/io_uring.h
-+++ b/include/uapi/linux/io_uring.h
-@@ -50,6 +50,7 @@ struct io_uring_sqe {
- #define IORING_SETUP_IOPOLL	(1U << 0)	/* io_context is polled */
- #define IORING_SETUP_SQPOLL	(1U << 1)	/* SQ poll thread */
- #define IORING_SETUP_SQ_AFF	(1U << 2)	/* sq_thread_cpu is valid */
-+#define IORING_SETUP_CQSIZE	(1U << 3)	/* app defines CQ size */
- 
- #define IORING_OP_NOP		0
- #define IORING_OP_READV		1
-
--- 
-Jens Axboe
-
+syzbot will keep track of this bug report. See:
+https://goo.gl/tpsmEJ#status for how to communicate with syzbot.
+syzbot can test patches for this bug, for details see:
+https://goo.gl/tpsmEJ#testing-patches
