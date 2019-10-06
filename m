@@ -2,121 +2,165 @@ Return-Path: <SRS0=GTOX=X7=vger.kernel.org=linux-block-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-2.4 required=3.0 tests=DKIM_SIGNED,DKIM_VALID,
-	DKIM_VALID_AU,HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SPF_HELO_NONE,
-	SPF_PASS,USER_AGENT_SANE_2 autolearn=no autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-2.4 required=3.0 tests=DKIMWL_WL_HIGH,DKIM_SIGNED,
+	DKIM_VALID,DKIM_VALID_AU,HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,
+	SPF_HELO_NONE,SPF_PASS,UNPARSEABLE_RELAY,USER_AGENT_SANE_1 autolearn=no
+	autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 8284FC4360C
-	for <linux-block@archiver.kernel.org>; Sun,  6 Oct 2019 20:48:51 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id ACED7C4360C
+	for <linux-block@archiver.kernel.org>; Sun,  6 Oct 2019 22:32:37 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.kernel.org (Postfix) with ESMTP id 51A1120862
-	for <linux-block@archiver.kernel.org>; Sun,  6 Oct 2019 20:48:51 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id 710E520862
+	for <linux-block@archiver.kernel.org>; Sun,  6 Oct 2019 22:32:37 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="PuaBLMWZ"
+	dkim=pass (2048-bit key) header.d=oracle.com header.i=@oracle.com header.b="F9V8lkjO"
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1725953AbfJFUsu (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Sun, 6 Oct 2019 16:48:50 -0400
-Received: from us-smtp-2.mimecast.com ([207.211.31.81]:39623 "EHLO
-        us-smtp-delivery-1.mimecast.com" rhost-flags-OK-OK-OK-FAIL)
-        by vger.kernel.org with ESMTP id S1725900AbfJFUsu (ORCPT
-        <rfc822;linux-block@vger.kernel.org>);
-        Sun, 6 Oct 2019 16:48:50 -0400
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-        s=mimecast20190719; t=1570394928;
-        h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-         to:to:cc:mime-version:mime-version:content-type:content-type:
-         content-transfer-encoding:content-transfer-encoding:
-         in-reply-to:in-reply-to:references:references;
-        bh=0n5/QVFjxZJUJjSitLC3Cb0RH/iVnwERCpBFf6ATYGY=;
-        b=PuaBLMWZGo94NGxPtQWHA4mDZxrjs35EUlfl+QBv/eosD/PdyFPI2ZdgNKr9PhXH0se+0q
-        JD4s/59xOcs6M8Fo9hYMOmVqs3zbXUslsA0yb9z/TSa/9t37cg5hzUGJGM5WWo9lwsCELz
-        mp00N0ToY5MTVJt9iIYJ48PFQ5BEC54=
-Received: from mail-qt1-f198.google.com (mail-qt1-f198.google.com
- [209.85.160.198]) (Using TLS) by relay.mimecast.com with ESMTP id
- us-mta-199-hNZoIHe1ND-FlDeiSE5o8w-1; Sun, 06 Oct 2019 16:48:45 -0400
-Received: by mail-qt1-f198.google.com with SMTP id e13so13115553qto.18
-        for <linux-block@vger.kernel.org>; Sun, 06 Oct 2019 13:48:45 -0700 (PDT)
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20161025;
-        h=x-gm-message-state:message-id:subject:from:to:date:in-reply-to
-         :references:mime-version:content-transfer-encoding;
-        bh=YHi35jjYxKbkdjmm0frY18OUymXKQrESkDz2p16jXEw=;
-        b=iIaq5P0TQCy/5cn5/SK4PlGGx1xsJNXZA9DDSOFFiwqP0bZGt1e4V47AxK2PNS+SUv
-         jGL4SrQCx87SMD3aYDwe9LFHsmLqGLRsr3OM4mC/CINeDRKhfwoSMq1h/8p8NkonkfJO
-         jZKTnPX2Bk7V29YW1NhbuRwyp9/hBn4Nc+9d1TSdpMSkV7swC9O6IZfJXde9ovkpcswG
-         C/mf2lZq4Pi4dwn7gWCCReNWegEgNYiWl+XscIUENDpkgW43z7HKmbtuTBHUZzgjgpIw
-         8bXDqQk4fLAy+t40S7ALzNpqs4I5Q70Tys0N0xmQfPfWuzuca8yOoVfAbP8l7HpEJ3XP
-         bBBw==
-X-Gm-Message-State: APjAAAUpNnq0mmBnmQ5uKyy2H2PY+wKSiHEfFNoahdLuLqVqDZb+3ppg
-        0rD8fsk/TdrkSJgRoH54v13iq6KQFIDGUDlKNqXtYoOmCnwsjouYzPpRq6LQSKsadUlB3MrEYWf
-        Cc6AFTTsKq6VoRRymEjhZ54s=
-X-Received: by 2002:ac8:6696:: with SMTP id d22mr27174835qtp.21.1570394924502;
-        Sun, 06 Oct 2019 13:48:44 -0700 (PDT)
-X-Google-Smtp-Source: APXvYqw5eiRNbN0ZvkDGalLgpCh3K4cVJofIJJn2mxr7k62YnQNTAEmV1kN0lyofp5HIME0E6xxdGQ==
-X-Received: by 2002:ac8:6696:: with SMTP id d22mr27174817qtp.21.1570394924025;
-        Sun, 06 Oct 2019 13:48:44 -0700 (PDT)
-Received: from rhel7lobe ([2600:6c64:4e80:f1:aa45:cafe:5682:368f])
-        by smtp.gmail.com with ESMTPSA id y17sm7295110qtb.82.2019.10.06.13.48.42
-        (version=TLS1_2 cipher=ECDHE-RSA-AES128-GCM-SHA256 bits=128/128);
-        Sun, 06 Oct 2019 13:48:43 -0700 (PDT)
-Message-ID: <a5c5b4da389e43ac4fb6960135f634a6e2b8ee13.camel@redhat.com>
-Subject: Re: packet writing support
-From:   Laurence Oberman <loberman@redhat.com>
-To:     Mischa Baars <mjbaars1977.linux-block@cyberfiber.eu>,
-        Jens Axboe <axboe@kernel.dk>, linux-block@vger.kernel.org
-Date:   Sun, 06 Oct 2019 16:48:41 -0400
-In-Reply-To: <63a7e40795da8efc782c1985ceeb54e0d3e708b6.camel@cyberfiber.eu>
-References: <db5c89c3fe26e4b7ec96443ec97a05df97162889.camel@cyberfiber.eu>
-         <6e381f83-9a12-30d7-8f99-caaa6a608c4f@kernel.dk>
-         <63a7e40795da8efc782c1985ceeb54e0d3e708b6.camel@cyberfiber.eu>
-X-Mailer: Evolution 3.28.5 (3.28.5-2.el7)
-Mime-Version: 1.0
-X-MC-Unique: hNZoIHe1ND-FlDeiSE5o8w-1
-X-Mimecast-Spam-Score: 0
-Content-Type: text/plain; charset=UTF-8
-Content-Transfer-Encoding: quoted-printable
+        id S1726150AbfJFWax (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Sun, 6 Oct 2019 18:30:53 -0400
+Received: from aserp2120.oracle.com ([141.146.126.78]:39430 "EHLO
+        aserp2120.oracle.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S1725958AbfJFWax (ORCPT
+        <rfc822;linux-block@vger.kernel.org>); Sun, 6 Oct 2019 18:30:53 -0400
+Received: from pps.filterd (aserp2120.oracle.com [127.0.0.1])
+        by aserp2120.oracle.com (8.16.0.27/8.16.0.27) with SMTP id x96MUiNB161920;
+        Sun, 6 Oct 2019 22:30:44 GMT
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=oracle.com; h=date : from : to : cc
+ : subject : message-id : references : mime-version : content-type :
+ in-reply-to; s=corp-2019-08-05;
+ bh=oM/GyR1hBOmIFzMny+xn2QzNNTjQso5onJlUAmvUFbA=;
+ b=F9V8lkjOHar+9wUdyh7qXMborr2AvHGeXZEmlRwjOvPpK+KQDqpvZhP0P5MZ+VGdhe7z
+ eoMfg5vVGgKYklRVTm5rc6+wp+fG8cM1ytPZFZiJCXFRTirhsHDfWZxm3b3TOR1W0Aun
+ lM2MKTfhP+Pz3f+7CYkBaKX36bX9plbrytwxLJ3sTex6f2eN2EwRCeX1SelffxLnWLFa
+ Bv5GhomOVPksYeK42nGWoMcqcqkOP0q539T0nPhd0RjqkfOr0vkADlbD1pjyYXSQg/3m
+ W5ZmiWCoyKjR709vpPfAhR9PiItdgp3gHhaZedCcFLWRQSwKE8EgjaQnxow44/KD24gg vw== 
+Received: from userp3020.oracle.com (userp3020.oracle.com [156.151.31.79])
+        by aserp2120.oracle.com with ESMTP id 2vek4q3w48-1
+        (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=OK);
+        Sun, 06 Oct 2019 22:30:44 +0000
+Received: from pps.filterd (userp3020.oracle.com [127.0.0.1])
+        by userp3020.oracle.com (8.16.0.27/8.16.0.27) with SMTP id x96MRod0091857;
+        Sun, 6 Oct 2019 22:30:44 GMT
+Received: from aserv0122.oracle.com (aserv0122.oracle.com [141.146.126.236])
+        by userp3020.oracle.com with ESMTP id 2vf5aju13f-1
+        (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=OK);
+        Sun, 06 Oct 2019 22:30:43 +0000
+Received: from abhmp0015.oracle.com (abhmp0015.oracle.com [141.146.116.21])
+        by aserv0122.oracle.com (8.14.4/8.14.4) with ESMTP id x96MUeZU017103;
+        Sun, 6 Oct 2019 22:30:40 GMT
+Received: from localhost (/67.169.218.210)
+        by default (Oracle Beehive Gateway v4.0)
+        with ESMTP ; Sun, 06 Oct 2019 15:30:39 -0700
+Date:   Sun, 6 Oct 2019 15:30:41 -0700
+From:   "Darrick J. Wong" <darrick.wong@oracle.com>
+To:     Jens Axboe <axboe@kernel.dk>
+Cc:     Chris Mason <clm@fb.com>, Gao Xiang <hsiangkao@aol.com>,
+        Dave Chinner <david@fromorbit.com>,
+        xfs <linux-xfs@vger.kernel.org>, "tj@kernel.org" <tj@kernel.org>,
+        "linux-fsdevel@vger.kernel.org" <linux-fsdevel@vger.kernel.org>,
+        "linux-block@vger.kernel.org" <linux-block@vger.kernel.org>
+Subject: Re: [5.4-rc1, regression] wb_workfn wakeup oops (was Re: frequent
+ 5.4-rc1 crash?)
+Message-ID: <20191006223041.GQ13108@magnolia>
+References: <20191003015247.GI13108@magnolia>
+ <20191003064022.GX16973@dread.disaster.area>
+ <20191003084149.GA16347@hsiangkao-HP-ZHAN-66-Pro-G1>
+ <41B90CA7-E093-48FA-BDFD-73BE7EB81FB6@fb.com>
+ <32f7c7d8-59d8-7657-4dcc-3741355bf63a@kernel.dk>
+ <20191003183746.GK13108@magnolia>
+MIME-Version: 1.0
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <20191003183746.GK13108@magnolia>
+User-Agent: Mutt/1.9.4 (2018-02-28)
+X-Proofpoint-Virus-Version: vendor=nai engine=6000 definitions=9402 signatures=668684
+X-Proofpoint-Spam-Details: rule=notspam policy=default score=0 suspectscore=0 malwarescore=0
+ phishscore=0 bulkscore=0 spamscore=0 mlxscore=0 mlxlogscore=999
+ adultscore=0 classifier=spam adjust=0 reason=mlx scancount=1
+ engine=8.0.1-1908290000 definitions=main-1910060231
+X-Proofpoint-Virus-Version: vendor=nai engine=6000 definitions=9402 signatures=668684
+X-Proofpoint-Spam-Details: rule=notspam policy=default score=0 priorityscore=1501 malwarescore=0
+ suspectscore=0 phishscore=0 bulkscore=0 spamscore=0 clxscore=1015
+ lowpriorityscore=0 mlxscore=0 impostorscore=0 mlxlogscore=999 adultscore=0
+ classifier=spam adjust=0 reason=mlx scancount=1 engine=8.0.1-1908290000
+ definitions=main-1910060231
 Sender: linux-block-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-On Sun, 2019-10-06 at 10:31 +0200, Mischa Baars wrote:
-> On Sat, 2019-10-05 at 09:50 -0600, Jens Axboe wrote:
->=20
-> > It's not really a case of quid pro quo, if someone gets removed,
-> > something else can stay. I'd argue that the floppy driver is
-> > probably
-> > used by orders of magnitude more people than the packet writing
-> > code,
-> > and as such that makes it much more important to maintain.
->=20
-> I'm not into time-reversal, if that is what you mean?! I love
-> unilinear time and causal computers!
->=20
-> Regards,
-> Mischa.
->=20
+On Thu, Oct 03, 2019 at 11:37:46AM -0700, Darrick J. Wong wrote:
+> On Thu, Oct 03, 2019 at 08:05:42AM -0600, Jens Axboe wrote:
+> > On 10/3/19 8:01 AM, Chris Mason wrote:
+> > > 
+> > > 
+> > > On 3 Oct 2019, at 4:41, Gao Xiang wrote:
+> > > 
+> > >> Hi,
+> > >>
+> > >> On Thu, Oct 03, 2019 at 04:40:22PM +1000, Dave Chinner wrote:
+> > >>> [cc linux-fsdevel, linux-block, tejun ]
+> > >>>
+> > >>> On Wed, Oct 02, 2019 at 06:52:47PM -0700, Darrick J. Wong wrote:
+> > >>>> Hi everyone,
+> > >>>>
+> > >>>> Does anyone /else/ see this crash in generic/299 on a V4 filesystem
+> > >>>> (tho
+> > >>>> afaict V5 configs crash too) and a 5.4-rc1 kernel?  It seems to pop
+> > >>>> up
+> > >>>> on generic/299 though only 80% of the time.
+> > >>>>
+> > >>
+> > >> Just a quick glance, I guess there could is a race between (complete
+> > >> guess):
+> > >>
+> > >>
+> > >>   160 static void finish_writeback_work(struct bdi_writeback *wb,
+> > >>   161                                   struct wb_writeback_work *work)
+> > >>   162 {
+> > >>   163         struct wb_completion *done = work->done;
+> > >>   164
+> > >>   165         if (work->auto_free)
+> > >>   166                 kfree(work);
+> > >>   167         if (done && atomic_dec_and_test(&done->cnt))
+> > >>
+> > >>   ^^^ here
+> > >>
+> > >>   168                 wake_up_all(done->waitq);
+> > >>   169 }
+> > >>
+> > >> since new wake_up_all(done->waitq); is completely on-stack,
+> > >>   	if (done && atomic_dec_and_test(&done->cnt))
+> > >> -		wake_up_all(&wb->bdi->wb_waitq);
+> > >> +		wake_up_all(done->waitq);
+> > >>   }
+> > >>
+> > >> which could cause use after free if on-stack wb_completion is gone...
+> > >> (however previous wb->bdi is solid since it is not on-stack)
+> > >>
+> > >> see generic on-stack completion which takes a wait_queue spin_lock
+> > >> between
+> > >> test and wake_up...
+> > >>
+> > >> If I am wrong, ignore me, hmm...
+> > > 
+> > > It's a good guess ;)  Jens should have this queued up already:
+> > > 
+> > > https://lkml.org/lkml/2019/9/23/972
+> > 
+> > Yes indeed, it'll go out today or tomorrow for -rc2.
+> 
+> The patch fixes the problems I've been seeing, so:
+> Tested-by: Darrick J. Wong <darrick.wong@oracle.com>
+> 
+> Thank you for taking care of this. :)
 
-Hello Mischa
-Something is not making sense here.
-If this will not be an open source project and not released then why
-not simply snapshot the kernel as is now and go ahead.
-Maintain it yourself, issue solved. No need to harp on the packet
-writing code support anymore.
+Hmm, I don't see this patch in -rc2; did it not go out in time, or were
+there further complications?
 
-Many companies have taken a snap of the kernel to use for storage
-arrays and then made changes and did not release the entire solution as
-open source.
+--D
 
-You said
-
-"Yes, I've written the the code myself, thank you. It's prototype
-hardware and it's not intended as an open source software project. It
-is therefore not going to
-be released to the general public. When it's finished, and it isn't at
-the moment, it's hopefully going to be part of your future processors.
-"
-
-Regards
-Laurence Oberman
-
+> --D
+> 
+> > -- 
+> > Jens Axboe
+> > 
