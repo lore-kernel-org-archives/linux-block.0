@@ -2,69 +2,67 @@ Return-Path: <SRS0=HuTb=YA=vger.kernel.org=linux-block-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-9.6 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
+X-Spam-Status: No, score=-9.8 required=3.0 tests=DKIM_SIGNED,DKIM_VALID,
+	DKIM_VALID_AU,FREEMAIL_FORGED_FROMDOMAIN,FREEMAIL_FROM,
 	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,
 	SPF_HELO_NONE,SPF_PASS,USER_AGENT_GIT autolearn=ham autolearn_force=no
 	version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 66C19C47404
-	for <linux-block@archiver.kernel.org>; Mon,  7 Oct 2019 22:12:49 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 746E8C47404
+	for <linux-block@archiver.kernel.org>; Mon,  7 Oct 2019 23:19:04 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.kernel.org (Postfix) with ESMTP id 330902133F
-	for <linux-block@archiver.kernel.org>; Mon,  7 Oct 2019 22:12:49 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id 4490E206C0
+	for <linux-block@archiver.kernel.org>; Mon,  7 Oct 2019 23:19:04 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (2048-bit key) header.d=wdc.com header.i=@wdc.com header.b="DM5HY1oH"
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="HuwgjtsX"
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1729327AbfJGWMs (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Mon, 7 Oct 2019 18:12:48 -0400
-Received: from esa1.hgst.iphmx.com ([68.232.141.245]:20422 "EHLO
-        esa1.hgst.iphmx.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1728654AbfJGWMs (ORCPT
-        <rfc822;linux-block@vger.kernel.org>); Mon, 7 Oct 2019 18:12:48 -0400
-DKIM-Signature: v=1; a=rsa-sha256; c=simple/simple;
-  d=wdc.com; i=@wdc.com; q=dns/txt; s=dkim.wdc.com;
-  t=1570486368; x=1602022368;
-  h=from:to:cc:subject:date:message-id:mime-version:
-   content-transfer-encoding;
-  bh=X56rtn7IhMY93+dUIFEw1OslYrBQOThrSB6B8UVduA8=;
-  b=DM5HY1oHKS5+cEcPZT0PQihqq8lE/2D5lvFv17XX9vaDU6a5HbYn1MJj
-   m1VJfgxI/7drcfBsHBvLPp8bWEudGgO+otyoNJpJ5+tPpBjV2rzLAMG5p
-   NKoJmiVxfsAnVNeyNu9xDNiS7Pt30XA5wDn66CaHPjDJKE4OLiL2LIjcK
-   bzB03vrh68FiYsdbH0SIqCPrXy/ZSxHgVtAi++KUXj20sxEYzlQ6hTEaH
-   foPiSsvqlHR1kCetUPH6BKOByYoap+/VWJ+c6hDO/+EbZLUEFJvW9uGNc
-   HnmxFbTYiGj56D3B5YsMT+kKOtDJ/yP+F1YU2PHI8ICwKMHUa9oQxwLMm
-   A==;
-IronPort-SDR: qiX/MH66kVA+5fMzDdxdRyZBlmGafzg7R4Nfo0IHBqcn1qFZ3A6i4OvR52EZVZnijFlkPrANQS
- Cv5NXG78S8GTwx4yu0d5WnALPs3O+QbSzjXvnyfD0MgOXkHROEXDVvRXX1UHA0a5nsQwk/1Da4
- qkFJsAq0tD6LX1cxKtf9O6Gtnc/CF64LYNIGPp/A8Vh2btrwlsmhkDSHImONe83e6d17yZm9Mi
- T4f5wQzQ+rVuVttOq02Vd2cB90ak8g6nIICDetLUo0msShw9/P+tvmU2jGSOCJIXe49KZCz3V2
- YGU=
-X-IronPort-AV: E=Sophos;i="5.67,269,1566835200"; 
-   d="scan'208";a="226941498"
-Received: from h199-255-45-15.hgst.com (HELO uls-op-cesaep02.wdc.com) ([199.255.45.15])
-  by ob1.hgst.iphmx.com with ESMTP; 08 Oct 2019 06:12:47 +0800
-IronPort-SDR: 0ORtf6QIXPjKWxXBHlODxOPSoQFo2Hgy0V7clWlxN5V0HeKbngr7WhIlpICytHHYcc6uVc9SlS
- 8Z23iJSX+BJXGBQKmnRmx7GXb5OqMUEoFlc6HWwGsbaFkFKpCOxZciEUuYaipu9HX3RssZnv66
- FaaAKx+h9fayD2N6BEwtrId+8ZR+rWrJj4wzsUIErieSm0Z5Ok8uYXKROta6GvEFiMHJUfcCMS
- Dw9eWrwG4SvJXpVlHE2c35yb5mW23M4pSXXDtLNwYm2xvEa/hbkM5CUc03izpt6O96QKr0Nr2O
- t0JaEPqE54wJIr3m0C5KqK3o
-Received: from uls-op-cesaip01.wdc.com ([10.248.3.36])
-  by uls-op-cesaep02.wdc.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 07 Oct 2019 15:08:49 -0700
-IronPort-SDR: SDMJMP/8SdzF21dG9chT6MB6i5FwLk2hYcI1RfdPIJQcGjHGB/5HAuFtxM1FRms3b+7bJWySS/
- RoOeH8rEEUzeMrzLSYaIDPiNy7isuQ2Qs9BP4ezPMJQEd6kjFyHd9sVAxHVRJQLOhqsKclwr7R
- eo6f4lICNqBNypCzGSY+BrZI/KqanU2XTJTbAQ7fVJimnjBKmEBAsj2Zi7xKk5PzsVHAQYRVEa
- Ady5IFrwkfgcd8l6dR1F/kAMZjUT2h5seIJz1U7wrYoY3l7gO2PcejeJWl1FXZIDYaetCUfNde
- oAs=
-WDCIronportException: Internal
-Received: from washi.fujisawa.hgst.com ([10.149.53.254])
-  by uls-op-cesaip01.wdc.com with ESMTP; 07 Oct 2019 15:12:48 -0700
-From:   Damien Le Moal <damien.lemoal@wdc.com>
-To:     linux-block@vger.kernel.org, Jens Axboe <axboe@kernel.dk>
-Cc:     Shinichiro Kawasaki <shinichiro.kawasaki@wdc.com>
-Subject: [PATCH] block: Fix elv_support_iosched()
-Date:   Tue,  8 Oct 2019 07:12:46 +0900
-Message-Id: <20191007221246.12824-1-damien.lemoal@wdc.com>
-X-Mailer: git-send-email 2.21.0
+        id S1729502AbfJGXTD (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Mon, 7 Oct 2019 19:19:03 -0400
+Received: from mail-wr1-f65.google.com ([209.85.221.65]:46411 "EHLO
+        mail-wr1-f65.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S1729145AbfJGXTD (ORCPT
+        <rfc822;linux-block@vger.kernel.org>); Mon, 7 Oct 2019 19:19:03 -0400
+Received: by mail-wr1-f65.google.com with SMTP id o18so17124857wrv.13;
+        Mon, 07 Oct 2019 16:19:01 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=gmail.com; s=20161025;
+        h=from:to:cc:subject:date:message-id:mime-version
+         :content-transfer-encoding;
+        bh=U8fSnDMFwoBetrWXVXSxxN7Vi5ILs+0deb5nNDy4m2k=;
+        b=HuwgjtsXEQcJQJK/M1dtqh/cfARhkbuDtfb8l8GTWlkl2Bgoxb8DKBZjpNr0illqsZ
+         ClNN4wwRSCloHBei1oXhMb8O0WleRJPoycRHPojyWOiX6nJhY1TACAqIYvKuYpvkDIg3
+         WGj3gq+nklG4iqxaxClYz8/0dTYPItqw72wAeKNMBZ1GmzQmTAWe/8XOtXzfELL1MNNO
+         Qwj05jjtvLriAr2b8huaxJUcij/AzfKdIFa76K4MjpoFp1aPELIP1EwZva8gTKJPYLH3
+         o6Nw2BZ6Nw37Yh+mbM0OM1BvgSOD1qxDxFN5+qSdu2oTZBu+tbrH1JkRHksU+ddlfDc6
+         kzOQ==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20161025;
+        h=x-gm-message-state:from:to:cc:subject:date:message-id:mime-version
+         :content-transfer-encoding;
+        bh=U8fSnDMFwoBetrWXVXSxxN7Vi5ILs+0deb5nNDy4m2k=;
+        b=EAOUR4A3BWS9VjYK1QNJqzUdTioWOWTH1YDjyII+KgMnEpRmgjAGp+je1cWEIB4okg
+         royT6sL36/ZJzg2CN7f53CXBhCgT199eUFdb3CF7ddGQC9nr31z/uVs2AFfLxlrFak8X
+         uE5O3zMK7PbMLSxuhD4ZJS/tpC6aFpKzNJrMaKDxp5jjH9OAONm1YJEdKZtBw8sF5dsy
+         +BPC1z/L7fKC6zspiXp64W44d+vHBDXxcesDEK6TRPRnQDMgOHcXDA0uIzcKBlsWmYwW
+         xLKr6SR/9h8AnN7poBst3iURDyHUNAFHgnHsciVRPjsyyR9jnASYknlcOeKlxjHxv1Rd
+         KKpA==
+X-Gm-Message-State: APjAAAUKCgAh+dFzy3iPBuZoOcAtJQYyfIXX9a4gqCJzmad5KkZWF1Pr
+        C1HbLakXy6y3zde2BXBDjnelKqtO
+X-Google-Smtp-Source: APXvYqxnjQoAgteLUfyU63Eq8Mg2gEPWwfQtgKqWhbBGs1rzVcEmMc2ppDnUjNR/3iTrxjDs6MnSIw==
+X-Received: by 2002:adf:fe8b:: with SMTP id l11mr19987220wrr.23.1570490340688;
+        Mon, 07 Oct 2019 16:19:00 -0700 (PDT)
+Received: from localhost.localdomain ([109.126.133.195])
+        by smtp.gmail.com with ESMTPSA id d4sm20726435wrq.22.2019.10.07.16.18.54
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Mon, 07 Oct 2019 16:18:59 -0700 (PDT)
+From:   "Pavel Begunkov (Silence)" <asml.silence@gmail.com>
+To:     Jens Axboe <axboe@kernel.dk>, linux-block@vger.kernel.org,
+        linux-kernel@vger.kernel.org
+Cc:     Pavel Begunkov <asml.silence@gmail.com>
+Subject: [PATCH] io_uring: remove wait loop spurious wakeups
+Date:   Tue,  8 Oct 2019 02:18:42 +0300
+Message-Id: <936cd758d6c694fe1b8b9de050e24cfecdc2e60d.1570489620.git.asml.silence@gmail.com>
+X-Mailer: git-send-email 2.23.0
 MIME-Version: 1.0
 Content-Transfer-Encoding: 8bit
 Sender: linux-block-owner@vger.kernel.org
@@ -72,35 +70,75 @@ Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-A BIO based request queue does not have a tag_set, which prevent testing
-for the flag BLK_MQ_F_NO_SCHED indicating that the queue does not
-require an elevator. This leads to an incorrect initialization of a
-default elevator in some cases such as BIO based nullblk (queue_mode ==
-BIO) with zoned mode enabled as the default elevator in this case is
-mq-deadline instead of "none".
+From: Pavel Begunkov <asml.silence@gmail.com>
 
-Fix this by including the absence of a tag_set for a queue as an
-indicator that the queue should not have an elevator.
+Any changes interesting to tasks waiting in io_cqring_wait() are
+commited with io_cqring_ev_posted(). However, io_ring_drop_ctx_refs()
+also tries to do that but with no reason, that means spurious wakeups
+every io_free_req() and io_uring_enter().
 
-Reported-by: Shinichiro Kawasaki <shinichiro.kawasaki@wdc.com>
-Signed-off-by: Damien Le Moal <damien.lemoal@wdc.com>
+Just use percpu_ref_put() instead.
+
+Signed-off-by: Pavel Begunkov <asml.silence@gmail.com>
 ---
- block/elevator.c | 2 +-
- 1 file changed, 1 insertion(+), 1 deletion(-)
+ fs/io_uring.c | 16 ++++------------
+ 1 file changed, 4 insertions(+), 12 deletions(-)
 
-diff --git a/block/elevator.c b/block/elevator.c
-index 5437059c9261..995d1e67056c 100644
---- a/block/elevator.c
-+++ b/block/elevator.c
-@@ -616,7 +616,7 @@ int elevator_switch_mq(struct request_queue *q,
- 
- static inline bool elv_support_iosched(struct request_queue *q)
- {
--	if (q->tag_set && (q->tag_set->flags & BLK_MQ_F_NO_SCHED))
-+	if (!q->tag_set || (q->tag_set->flags & BLK_MQ_F_NO_SCHED))
- 		return false;
- 	return true;
+diff --git a/fs/io_uring.c b/fs/io_uring.c
+index c934f91c51e9..89d77a626063 100644
+--- a/fs/io_uring.c
++++ b/fs/io_uring.c
+@@ -591,14 +591,6 @@ static void io_cqring_add_event(struct io_ring_ctx *ctx, u64 user_data,
+ 	io_cqring_ev_posted(ctx);
  }
+ 
+-static void io_ring_drop_ctx_refs(struct io_ring_ctx *ctx, unsigned refs)
+-{
+-	percpu_ref_put_many(&ctx->refs, refs);
+-
+-	if (waitqueue_active(&ctx->wait))
+-		wake_up(&ctx->wait);
+-}
+-
+ static struct io_kiocb *io_get_req(struct io_ring_ctx *ctx,
+ 				   struct io_submit_state *state)
+ {
+@@ -646,7 +638,7 @@ static struct io_kiocb *io_get_req(struct io_ring_ctx *ctx,
+ 	req->result = 0;
+ 	return req;
+ out:
+-	io_ring_drop_ctx_refs(ctx, 1);
++	percpu_ref_put(&ctx->refs);
+ 	return NULL;
+ }
+ 
+@@ -654,7 +646,7 @@ static void io_free_req_many(struct io_ring_ctx *ctx, void **reqs, int *nr)
+ {
+ 	if (*nr) {
+ 		kmem_cache_free_bulk(req_cachep, *nr, reqs);
+-		io_ring_drop_ctx_refs(ctx, *nr);
++		percpu_ref_put_many(&ctx->refs, *nr);
+ 		*nr = 0;
+ 	}
+ }
+@@ -663,7 +655,7 @@ static void __io_free_req(struct io_kiocb *req)
+ {
+ 	if (req->file && !(req->flags & REQ_F_FIXED_FILE))
+ 		fput(req->file);
+-	io_ring_drop_ctx_refs(req->ctx, 1);
++	percpu_ref_put(&req->ctx->refs);
+ 	kmem_cache_free(req_cachep, req);
+ }
+ 
+@@ -3630,7 +3622,7 @@ SYSCALL_DEFINE6(io_uring_enter, unsigned int, fd, u32, to_submit,
+ 		}
+ 	}
+ 
+-	io_ring_drop_ctx_refs(ctx, 1);
++	percpu_ref_put(&ctx->refs);
+ out_fput:
+ 	fdput(f);
+ 	return submitted ? submitted : ret;
 -- 
-2.21.0
+2.23.0
 
