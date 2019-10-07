@@ -1,166 +1,123 @@
-Return-Path: <SRS0=GTOX=X7=vger.kernel.org=linux-block-owner@kernel.org>
+Return-Path: <SRS0=HuTb=YA=vger.kernel.org=linux-block-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-2.4 required=3.0 tests=DKIMWL_WL_HIGH,DKIM_SIGNED,
-	DKIM_VALID,DKIM_VALID_AU,HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,
-	SPF_HELO_NONE,SPF_PASS,UNPARSEABLE_RELAY,USER_AGENT_SANE_1 autolearn=no
-	autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-5.3 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
+	MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,USER_AGENT_SANE_1
+	autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id ACED7C4360C
-	for <linux-block@archiver.kernel.org>; Sun,  6 Oct 2019 22:32:37 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 64E1FC4740A
+	for <linux-block@archiver.kernel.org>; Mon,  7 Oct 2019 06:02:25 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.kernel.org (Postfix) with ESMTP id 710E520862
-	for <linux-block@archiver.kernel.org>; Sun,  6 Oct 2019 22:32:37 +0000 (UTC)
-Authentication-Results: mail.kernel.org;
-	dkim=pass (2048-bit key) header.d=oracle.com header.i=@oracle.com header.b="F9V8lkjO"
+	by mail.kernel.org (Postfix) with ESMTP id 45F43206C2
+	for <linux-block@archiver.kernel.org>; Mon,  7 Oct 2019 06:02:25 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1726150AbfJFWax (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Sun, 6 Oct 2019 18:30:53 -0400
-Received: from aserp2120.oracle.com ([141.146.126.78]:39430 "EHLO
-        aserp2120.oracle.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1725958AbfJFWax (ORCPT
-        <rfc822;linux-block@vger.kernel.org>); Sun, 6 Oct 2019 18:30:53 -0400
-Received: from pps.filterd (aserp2120.oracle.com [127.0.0.1])
-        by aserp2120.oracle.com (8.16.0.27/8.16.0.27) with SMTP id x96MUiNB161920;
-        Sun, 6 Oct 2019 22:30:44 GMT
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=oracle.com; h=date : from : to : cc
- : subject : message-id : references : mime-version : content-type :
- in-reply-to; s=corp-2019-08-05;
- bh=oM/GyR1hBOmIFzMny+xn2QzNNTjQso5onJlUAmvUFbA=;
- b=F9V8lkjOHar+9wUdyh7qXMborr2AvHGeXZEmlRwjOvPpK+KQDqpvZhP0P5MZ+VGdhe7z
- eoMfg5vVGgKYklRVTm5rc6+wp+fG8cM1ytPZFZiJCXFRTirhsHDfWZxm3b3TOR1W0Aun
- lM2MKTfhP+Pz3f+7CYkBaKX36bX9plbrytwxLJ3sTex6f2eN2EwRCeX1SelffxLnWLFa
- Bv5GhomOVPksYeK42nGWoMcqcqkOP0q539T0nPhd0RjqkfOr0vkADlbD1pjyYXSQg/3m
- W5ZmiWCoyKjR709vpPfAhR9PiItdgp3gHhaZedCcFLWRQSwKE8EgjaQnxow44/KD24gg vw== 
-Received: from userp3020.oracle.com (userp3020.oracle.com [156.151.31.79])
-        by aserp2120.oracle.com with ESMTP id 2vek4q3w48-1
-        (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=OK);
-        Sun, 06 Oct 2019 22:30:44 +0000
-Received: from pps.filterd (userp3020.oracle.com [127.0.0.1])
-        by userp3020.oracle.com (8.16.0.27/8.16.0.27) with SMTP id x96MRod0091857;
-        Sun, 6 Oct 2019 22:30:44 GMT
-Received: from aserv0122.oracle.com (aserv0122.oracle.com [141.146.126.236])
-        by userp3020.oracle.com with ESMTP id 2vf5aju13f-1
-        (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=OK);
-        Sun, 06 Oct 2019 22:30:43 +0000
-Received: from abhmp0015.oracle.com (abhmp0015.oracle.com [141.146.116.21])
-        by aserv0122.oracle.com (8.14.4/8.14.4) with ESMTP id x96MUeZU017103;
-        Sun, 6 Oct 2019 22:30:40 GMT
-Received: from localhost (/67.169.218.210)
-        by default (Oracle Beehive Gateway v4.0)
-        with ESMTP ; Sun, 06 Oct 2019 15:30:39 -0700
-Date:   Sun, 6 Oct 2019 15:30:41 -0700
-From:   "Darrick J. Wong" <darrick.wong@oracle.com>
-To:     Jens Axboe <axboe@kernel.dk>
-Cc:     Chris Mason <clm@fb.com>, Gao Xiang <hsiangkao@aol.com>,
-        Dave Chinner <david@fromorbit.com>,
-        xfs <linux-xfs@vger.kernel.org>, "tj@kernel.org" <tj@kernel.org>,
-        "linux-fsdevel@vger.kernel.org" <linux-fsdevel@vger.kernel.org>,
-        "linux-block@vger.kernel.org" <linux-block@vger.kernel.org>
-Subject: Re: [5.4-rc1, regression] wb_workfn wakeup oops (was Re: frequent
- 5.4-rc1 crash?)
-Message-ID: <20191006223041.GQ13108@magnolia>
-References: <20191003015247.GI13108@magnolia>
- <20191003064022.GX16973@dread.disaster.area>
- <20191003084149.GA16347@hsiangkao-HP-ZHAN-66-Pro-G1>
- <41B90CA7-E093-48FA-BDFD-73BE7EB81FB6@fb.com>
- <32f7c7d8-59d8-7657-4dcc-3741355bf63a@kernel.dk>
- <20191003183746.GK13108@magnolia>
+        id S1727232AbfJGGCX (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Mon, 7 Oct 2019 02:02:23 -0400
+Received: from mx2.suse.de ([195.135.220.15]:52764 "EHLO mx1.suse.de"
+        rhost-flags-OK-OK-OK-FAIL) by vger.kernel.org with ESMTP
+        id S1726889AbfJGGCX (ORCPT <rfc822;linux-block@vger.kernel.org>);
+        Mon, 7 Oct 2019 02:02:23 -0400
+X-Virus-Scanned: by amavisd-new at test-mx.suse.de
+Received: from relay2.suse.de (unknown [195.135.220.254])
+        by mx1.suse.de (Postfix) with ESMTP id 28DF6B048;
+        Mon,  7 Oct 2019 06:02:21 +0000 (UTC)
+Subject: Re: [PATCH V2 RESEND 1/5] blk-mq: add new state of
+ BLK_MQ_S_INTERNAL_STOPPED
+To:     Ming Lei <ming.lei@redhat.com>, Jens Axboe <axboe@kernel.dk>
+Cc:     linux-block@vger.kernel.org, John Garry <john.garry@huawei.com>,
+        Bart Van Assche <bvanassche@acm.org>,
+        Hannes Reinecke <hare@suse.com>,
+        Christoph Hellwig <hch@lst.de>,
+        Thomas Gleixner <tglx@linutronix.de>,
+        Keith Busch <keith.busch@intel.com>
+References: <20191006024516.19996-1-ming.lei@redhat.com>
+ <20191006024516.19996-2-ming.lei@redhat.com>
+From:   Hannes Reinecke <hare@suse.de>
+Openpgp: preference=signencrypt
+Autocrypt: addr=hare@suse.de; prefer-encrypt=mutual; keydata=
+ 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
+ azzYF4VRJsdl+d0MCaSy8mUh
+Message-ID: <831d8cee-047e-ce39-122a-e5ff3ead8bc3@suse.de>
+Date:   Mon, 7 Oct 2019 08:02:20 +0200
+User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:60.0) Gecko/20100101
+ Thunderbird/60.7.2
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <20191003183746.GK13108@magnolia>
-User-Agent: Mutt/1.9.4 (2018-02-28)
-X-Proofpoint-Virus-Version: vendor=nai engine=6000 definitions=9402 signatures=668684
-X-Proofpoint-Spam-Details: rule=notspam policy=default score=0 suspectscore=0 malwarescore=0
- phishscore=0 bulkscore=0 spamscore=0 mlxscore=0 mlxlogscore=999
- adultscore=0 classifier=spam adjust=0 reason=mlx scancount=1
- engine=8.0.1-1908290000 definitions=main-1910060231
-X-Proofpoint-Virus-Version: vendor=nai engine=6000 definitions=9402 signatures=668684
-X-Proofpoint-Spam-Details: rule=notspam policy=default score=0 priorityscore=1501 malwarescore=0
- suspectscore=0 phishscore=0 bulkscore=0 spamscore=0 clxscore=1015
- lowpriorityscore=0 mlxscore=0 impostorscore=0 mlxlogscore=999 adultscore=0
- classifier=spam adjust=0 reason=mlx scancount=1 engine=8.0.1-1908290000
- definitions=main-1910060231
+In-Reply-To: <20191006024516.19996-2-ming.lei@redhat.com>
+Content-Type: text/plain; charset=utf-8
+Content-Language: en-US
+Content-Transfer-Encoding: 8bit
 Sender: linux-block-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-On Thu, Oct 03, 2019 at 11:37:46AM -0700, Darrick J. Wong wrote:
-> On Thu, Oct 03, 2019 at 08:05:42AM -0600, Jens Axboe wrote:
-> > On 10/3/19 8:01 AM, Chris Mason wrote:
-> > > 
-> > > 
-> > > On 3 Oct 2019, at 4:41, Gao Xiang wrote:
-> > > 
-> > >> Hi,
-> > >>
-> > >> On Thu, Oct 03, 2019 at 04:40:22PM +1000, Dave Chinner wrote:
-> > >>> [cc linux-fsdevel, linux-block, tejun ]
-> > >>>
-> > >>> On Wed, Oct 02, 2019 at 06:52:47PM -0700, Darrick J. Wong wrote:
-> > >>>> Hi everyone,
-> > >>>>
-> > >>>> Does anyone /else/ see this crash in generic/299 on a V4 filesystem
-> > >>>> (tho
-> > >>>> afaict V5 configs crash too) and a 5.4-rc1 kernel?  It seems to pop
-> > >>>> up
-> > >>>> on generic/299 though only 80% of the time.
-> > >>>>
-> > >>
-> > >> Just a quick glance, I guess there could is a race between (complete
-> > >> guess):
-> > >>
-> > >>
-> > >>   160 static void finish_writeback_work(struct bdi_writeback *wb,
-> > >>   161                                   struct wb_writeback_work *work)
-> > >>   162 {
-> > >>   163         struct wb_completion *done = work->done;
-> > >>   164
-> > >>   165         if (work->auto_free)
-> > >>   166                 kfree(work);
-> > >>   167         if (done && atomic_dec_and_test(&done->cnt))
-> > >>
-> > >>   ^^^ here
-> > >>
-> > >>   168                 wake_up_all(done->waitq);
-> > >>   169 }
-> > >>
-> > >> since new wake_up_all(done->waitq); is completely on-stack,
-> > >>   	if (done && atomic_dec_and_test(&done->cnt))
-> > >> -		wake_up_all(&wb->bdi->wb_waitq);
-> > >> +		wake_up_all(done->waitq);
-> > >>   }
-> > >>
-> > >> which could cause use after free if on-stack wb_completion is gone...
-> > >> (however previous wb->bdi is solid since it is not on-stack)
-> > >>
-> > >> see generic on-stack completion which takes a wait_queue spin_lock
-> > >> between
-> > >> test and wake_up...
-> > >>
-> > >> If I am wrong, ignore me, hmm...
-> > > 
-> > > It's a good guess ;)  Jens should have this queued up already:
-> > > 
-> > > https://lkml.org/lkml/2019/9/23/972
-> > 
-> > Yes indeed, it'll go out today or tomorrow for -rc2.
+On 10/6/19 4:45 AM, Ming Lei wrote:
+> Add a new hw queue state of BLK_MQ_S_INTERNAL_STOPPED, which prepares
+> for stopping hw queue before all CPUs of this hctx become offline.
 > 
-> The patch fixes the problems I've been seeing, so:
-> Tested-by: Darrick J. Wong <darrick.wong@oracle.com>
+> We can't reuse BLK_MQ_S_STOPPED because that state can be cleared during IO
+> completion.
 > 
-> Thank you for taking care of this. :)
-
-Hmm, I don't see this patch in -rc2; did it not go out in time, or were
-there further complications?
-
---D
-
-> --D
+> Cc: Bart Van Assche <bvanassche@acm.org>
+> Cc: Hannes Reinecke <hare@suse.com>
+> Cc: Christoph Hellwig <hch@lst.de>
+> Cc: Thomas Gleixner <tglx@linutronix.de>
+> Cc: Keith Busch <keith.busch@intel.com>
+> Signed-off-by: Ming Lei <ming.lei@redhat.com>
+> ---
+>  block/blk-mq-debugfs.c | 1 +
+>  block/blk-mq.h         | 3 ++-
+>  include/linux/blk-mq.h | 3 +++
+>  3 files changed, 6 insertions(+), 1 deletion(-)
 > 
-> > -- 
-> > Jens Axboe
-> > 
+Reviewed-by: Hannes Reinecke <hare@suse.com>
+
+Cheers,
+
+Hannes
+-- 
+Dr. Hannes Reinecke		      Teamlead Storage & Networking
+hare@suse.de			                  +49 911 74053 688
+SUSE Software Solutions Germany GmbH, Maxfeldstr. 5, 90409 Nürnberg
+HRB 247165 (AG München), GF: Felix Imendörffer
