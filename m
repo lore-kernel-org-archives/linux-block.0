@@ -2,145 +2,119 @@ Return-Path: <SRS0=HuTb=YA=vger.kernel.org=linux-block-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-0.6 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
-	HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS
-	autolearn=no autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-9.8 required=3.0 tests=DKIM_SIGNED,DKIM_VALID,
+	DKIM_VALID_AU,FREEMAIL_FORGED_FROMDOMAIN,FREEMAIL_FROM,
+	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,
+	SPF_HELO_NONE,SPF_PASS,USER_AGENT_GIT autolearn=ham autolearn_force=no
+	version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 7679BC47404
-	for <linux-block@archiver.kernel.org>; Mon,  7 Oct 2019 17:33:31 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id D79A2ECE58C
+	for <linux-block@archiver.kernel.org>; Mon,  7 Oct 2019 21:17:00 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.kernel.org (Postfix) with ESMTP id 2E8D421479
-	for <linux-block@archiver.kernel.org>; Mon,  7 Oct 2019 17:33:31 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id A3A3320867
+	for <linux-block@archiver.kernel.org>; Mon,  7 Oct 2019 21:17:00 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (2048-bit key) header.d=cyberfiber.eu header.i=@cyberfiber.eu header.b="X2E2BsmP"
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="pbacVSdy"
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1728031AbfJGRda (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Mon, 7 Oct 2019 13:33:30 -0400
-Received: from filter02-out8.totaalholding.nl ([185.56.145.240]:48287 "EHLO
-        filter02-out8.totaalholding.nl" rhost-flags-OK-OK-OK-OK)
-        by vger.kernel.org with ESMTP id S1728028AbfJGRda (ORCPT
-        <rfc822;linux-block@vger.kernel.org>);
-        Mon, 7 Oct 2019 13:33:30 -0400
-Received: from www98.totaalholding.nl ([185.94.230.81])
-        by filter02.totaalholding.nl with esmtps (TLSv1.2:ECDHE-RSA-AES256-GCM-SHA384:256)
-        (Exim 4.89)
-        (envelope-from <mjbaars1977.linux-block@cyberfiber.eu>)
-        id 1iHWsx-0000xG-8n
-        for linux-block@vger.kernel.org; Mon, 07 Oct 2019 19:33:28 +0200
-DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed;
-        d=cyberfiber.eu; s=default; h=Content-Transfer-Encoding:MIME-Version:
-        Content-Type:References:In-Reply-To:Date:To:From:Subject:Message-ID:Sender:
-        Reply-To:Cc:Content-ID:Content-Description:Resent-Date:Resent-From:
-        Resent-Sender:Resent-To:Resent-Cc:Resent-Message-ID:List-Id:List-Help:
-        List-Unsubscribe:List-Subscribe:List-Post:List-Owner:List-Archive;
-        bh=NAN+GroZC2IJWAYM1b71xYvhBPHqNS1YCqxw/+/qsng=; b=X2E2BsmPVbBwD4UzLWQcSP7/gI
-        FB6f95xbroRtBA3dz7yIvK1OZN5qdRtfVuF6BbN03bjdoxGfezIDe56RW9LXJjPDl1cujn8vV2LpP
-        360a8fyQVWmy+/q+c+rwkrJGM05dLUTotcLWz+CQiiEoOngw6biqOwrCbjXQU9dgdWdfpLYifnjFj
-        3DDgC70l6JQeKwI58/wz6P2e7KjCHcWebp1qVocFyhGxAVY2KRfXk0TW4mI75k2rQgQWmuTLT3srR
-        87jrAMd0bW9SAJ2U9KFRxbRjlydAfj4z/rdxF0nLLgle4lqzg1Pzrc0v3yYcueTE65oTW9F+PLCNh
-        aYYWhgYg==;
-Received: from 134-134-146-85.ftth.glasoperator.nl ([85.146.134.134]:60756 helo=DT0E.cyberfiber.eu)
-        by www98.totaalholding.nl with esmtpsa (TLSv1.2:ECDHE-RSA-AES256-GCM-SHA384:256)
-        (Exim 4.92)
-        (envelope-from <mjbaars1977.linux-block@cyberfiber.eu>)
-        id 1iHWsx-00071e-Tc; Mon, 07 Oct 2019 19:33:27 +0200
-Message-ID: <efe205abd54fe73d10df70388098631145a72962.camel@cyberfiber.eu>
-Subject: Re: packet writing support
-From:   Mischa Baars <mjbaars1977.linux-block@cyberfiber.eu>
-To:     Jens Axboe <axboe@kernel.dk>, Bart Van Assche <bvanassche@acm.org>,
-        Hannes Reinecke <hare@suse.de>, linux-block@vger.kernel.org
-Date:   Mon, 07 Oct 2019 19:31:54 +0200
-In-Reply-To: <e507eb38-becf-b6a5-bb51-14f873aca28d@kernel.dk>
-References: <db5c89c3fe26e4b7ec96443ec97a05df97162889.camel@cyberfiber.eu>
-         <6e381f83-9a12-30d7-8f99-caaa6a608c4f@kernel.dk>
-         <a4b89c40caf62166ab7078296d73b6ae0f35adaf.camel@cyberfiber.eu>
-         <fc70b63f-3780-5654-6bc5-0f2d6115bff0@kernel.dk>
-         <6c51a5fe93cfad0f76fdbfe47caaa5f5d3f1ca88.camel@cyberfiber.eu>
-         <71a450ed-3f52-fb3a-b0fa-3a08bdc4b3f6@suse.de>
-         <977cedab873dfe0705701b3b43c621a7a516e396.camel@cyberfiber.eu>
-         <ce56abfd-f309-5471-0201-6226731fa452@suse.de>
-         <6eb30ce355f90eca126cbd2f11d359db2bbe69f1.camel@cyberfiber.eu>
-         <9596b5fe35dbab5f7804308167bb67b5e6cde52b.camel@cyberfiber.eu>
-         <844e6f57-d97d-0c2e-1493-a356cd792a8a@acm.org>
-         <62ffa873794d2d6ced83bfc2a59d172677ef815c.camel@cyberfiber.eu>
-         <e507eb38-becf-b6a5-bb51-14f873aca28d@kernel.dk>
-Content-Type: text/plain; charset="UTF-8"
-User-Agent: Evolution 3.32.4 (3.32.4-1.fc30) 
+        id S1728877AbfJGVRA (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Mon, 7 Oct 2019 17:17:00 -0400
+Received: from mail-wm1-f65.google.com ([209.85.128.65]:55009 "EHLO
+        mail-wm1-f65.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S1728330AbfJGVQ7 (ORCPT
+        <rfc822;linux-block@vger.kernel.org>); Mon, 7 Oct 2019 17:16:59 -0400
+Received: by mail-wm1-f65.google.com with SMTP id p7so919214wmp.4;
+        Mon, 07 Oct 2019 14:16:58 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=gmail.com; s=20161025;
+        h=from:to:cc:subject:date:message-id:mime-version
+         :content-transfer-encoding;
+        bh=r1Ds32p5O4ZcmTgQVgBnVXrwuxhYvcTzmMcSF3UJbRo=;
+        b=pbacVSdys0sLAittjH0pybL66qLXh6pGBO12S3ky7p4gVpkjbCMlX/rcLQGzII8A/1
+         q6wwsUbyYzohVk6/46fAIvyrXagObWvJUEQCWzNbKaCX3ubHaQba8eMQsputPLQ4xe8p
+         MzSkcNRdMaeOJKXiQu6gb8FaJRuKYZtmAQLMU/cV5I2Ac0lWGgtci7fxYNti8VrPba7I
+         bd003rqx7Wo3dq8wV6MWhU09yQU88XubqLmX59Xj3i+tRMp4glmW3mBt/PN6NgTdJfmC
+         /QRgRfgsDCPIkbSRTXOWPF0kdvudgL3J/cNQf/okrN9yVl2SeUFS1jLMpjIJlUHkdhvb
+         FI3g==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20161025;
+        h=x-gm-message-state:from:to:cc:subject:date:message-id:mime-version
+         :content-transfer-encoding;
+        bh=r1Ds32p5O4ZcmTgQVgBnVXrwuxhYvcTzmMcSF3UJbRo=;
+        b=KOXYr+woaqUi95jj2XUMhNuJZe+DNWe/IZOpTF/78Dw40vBaa6lAHkuhVqHf4SnlM/
+         0hDcGwczGvkEFXJmLNG5663SoFZ7DwCRE1iajPOiO6R2whDyjQGm1GPRYBX1YPVgxrTl
+         OqJV1Cdhl4GVWyO7lJoo6o/oI/UxWmdQAupuQAhjuSzXYV32SJBWAtbL6wr5EeDQShqp
+         5FLJKzuj1D8C2/gRwt44QAQoxFnYuzMQfKvMX93LEe2CGiZXEQ69xd8vhlgKFL76TmH3
+         mQqQgQDZNMecRfRo9+11A+Ouj0RQDkU7m4mlU611vAFyWSOp//TFVHBM/f1gZuce2BbV
+         o3kQ==
+X-Gm-Message-State: APjAAAXF6YKfQevNyc6x1g0NC3WJQwkvErE3X548gbrR1GdJJX2WGUel
+        +yUzRG2chLbtWTr+ONRMsZE=
+X-Google-Smtp-Source: APXvYqxyivR8RyXxX3tcMgK5BYcWUcd9CTctKbWKKBO62erx5rad+Y21F+bpUo63vmbXA23tsKhW7g==
+X-Received: by 2002:a05:600c:1009:: with SMTP id c9mr933903wmc.64.1570483018061;
+        Mon, 07 Oct 2019 14:16:58 -0700 (PDT)
+Received: from localhost.localdomain ([109.126.133.195])
+        by smtp.gmail.com with ESMTPSA id v8sm22227375wra.79.2019.10.07.14.16.56
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Mon, 07 Oct 2019 14:16:57 -0700 (PDT)
+From:   "Pavel Begunkov (Silence)" <asml.silence@gmail.com>
+To:     Jens Axboe <axboe@kernel.dk>, linux-block@vger.kernel.org,
+        linux-kernel@vger.kernel.org
+Cc:     Pavel Begunkov <asml.silence@gmail.com>
+Subject: [PATCH] blk-stat: Optimise blk_stat_add()
+Date:   Tue,  8 Oct 2019 00:16:51 +0300
+Message-Id: <39dd33cc6f0264b2ec2f79f1dfe21466c2180851.1570482929.git.asml.silence@gmail.com>
+X-Mailer: git-send-email 2.23.0
 MIME-Version: 1.0
-Content-Transfer-Encoding: 7bit
-X-AntiAbuse: This header was added to track abuse, please include it with any abuse report
-X-AntiAbuse: Primary Hostname - www98.totaalholding.nl
-X-AntiAbuse: Original Domain - vger.kernel.org
-X-AntiAbuse: Originator/Caller UID/GID - [47 12] / [47 12]
-X-AntiAbuse: Sender Address Domain - cyberfiber.eu
-X-Get-Message-Sender-Via: www98.totaalholding.nl: authenticated_id: mjbaars1977.linux-block@cyberfiber.eu
-X-Authenticated-Sender: www98.totaalholding.nl: mjbaars1977.linux-block@cyberfiber.eu
-X-Source: 
-X-Source-Args: 
-X-Source-Dir: 
-X-Originating-IP: 185.94.230.81
-X-SpamExperts-Domain: out.totaalholding.nl
-X-SpamExperts-Username: 185.94.230.81
-Authentication-Results: totaalholding.nl; auth=pass smtp.auth=185.94.230.81@out.totaalholding.nl
-X-SpamExperts-Outgoing-Class: ham
-X-SpamExperts-Outgoing-Evidence: Combined (0.03)
-X-Recommended-Action: accept
-X-Filter-ID: Mvzo4OR0dZXEDF/gcnlw0ezqdolHG91LK5q2HN6uCHCpSDasLI4SayDByyq9LIhV3Rac7d6TOkMp
- fEdTdnA7jkTNWdUk1Ol2OGx3IfrIJKywOmJyM1qr8uRnWBrbSAGDrBQRDMCPoVIktGfXqz+K77w8
- BFityCCkxNlTi+jLDh0BcORxfCojcTOpEjtvWHp2eQyXEPH0KOQ1cmnIW+fnHjg9YkzbMy6DOYhG
- 3MUcvhr5WSIV/ADayw0YwNNo7qOm8DjomP3d2Aqxr0VfVhf3qadxWf7PBaiEJ7Ubv24eC2q1gqil
- FjLFGSoqbEUSByQZF+KbsVJyJvk1v2cRMLfeu+j4c2f7whGZQeSjyr0GZKfGsic78ymdeM3VZEm7
- AV0/pE0L1o9YbzgtZN/a2BQSBQgqdb/JjbdVZfbc9c+Jxpt+54iyUCc8aaknZho9naJYg0bolM7B
- /rBFul0ycjYHG0NfDxtcqznH5VBUud8O4LV0JmbqROuof5+bHLNCgb4217NirEYyqwqMBGrw8ELi
- qO86tByCP69i0Qh5ndH5heRCJ7rPXZbjpKeI7vxRvveCIK/1NH5THMtlYvyHAYGOGgjdb5hy4d8/
- k+RlvkD7ATmoZ2kfng5rdXwjvpU4S+XA+ln3SmdyWNNJvR4I+Hp8ZWNeKErwtwuMGNtXyijhL/jm
- YBv9AL3pz0kEqfteKc/OXBE6o2GffRkde0GmoZ/iP9VnAwYmYPhCtjQveFc/ttqzpjogZOIQLFqr
- QNK2b8/y4JRq3UYHEt22IvIMKBSTlfO+aaj6wnK9h39sR8Y3Dzu1X2iVNki8izWZuQRxhjw0T1+z
- /gVqUXbO3Yb0X5mHnL+/FmMGCaXrQbl9a2H20+M33kiCfQIC3W4VGlLm/1IiF7I6vAoqMu7bH6bh
- 5Tn1+ApfpnfqaBDETpAVW0am1AftxOzzT/YWdmD8gywgB151uK+wsnvd2XRh79oPsqvurHLa/P4e
- zC06EoqeDuStmICc1mvxWkfhDNLhFrRgdcJncNLOj0gyfC+E+JhwuM2loN6g5fMPPHW04q0LBG3v
- ooS/KWL2TW1pyb+uOnvvAx7DvnjL6OI0XUlLzsHhA6/79TEvuGslKTrRIXcXpFg5ivY=
-X-Report-Abuse-To: spam@filter01.totaalholding.nl
+Content-Transfer-Encoding: 8bit
 Sender: linux-block-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-On Mon, 2019-10-07 at 10:19 -0600, Jens Axboe wrote:
-> On 10/7/19 10:13 AM, Mischa Baars wrote:
-> > On Mon, 2019-10-07 at 07:22 -0700, Bart Van Assche wrote:
-> > > On 2019-10-07 02:17, Mischa Baars wrote:
-> > > > On Mon, 2019-10-07 at 11:11 +0200, Mischa Baars wrote:
-> > > > > necesarry
-> > > > 
-> > > > a) If necessary I could do the maintaining, sure.
-> > > 
-> > > You may want to start with having a look at the following:
-> > > * pktcdvd: invalid opcode 0000 kernel BUG in pkt_make_request
-> > > (https://bugzilla.kernel.org/show_bug.cgi?id=201481)
-> > > * pktcdvd triggers a lock inversion complaint
-> > > (https://bugzilla.kernel.org/show_bug.cgi?id=202745)
-> > > 
-> > > Thanks,
-> > > 
-> > > Bart.
-> > 
-> > I'm unable to reproduce these findings, also I'm unable to find any
-> > executable or any manpage called pktsetup.
-> 
-> Let's put this to rest. You are not using pktcdvd in your current setup.
-> You have apparently stumbled into some cdrom/dvd related regression if
-> the burning stopped working for you, please see:
-> 
-> Documentation/admin-guide/reporting-bugs.rst
-> 
-> in the kernel tree for how to report that bug, separately. No further
-> emails are needed in this thread.
-> 
+From: Pavel Begunkov <asml.silence@gmail.com>
 
-Thanks, but I'd rather enjoy that which is gained by all this, than the fly in the ointment. At least people can't sell any cheap CD's with stolen software
-anymore :)
+blk_stat_add() calls {get,put}_cpu_ptr() in a loop, which entails
+overhead of disabling/enabling preemption. The loop is under RCU
+(i.e.short) anyway, so do get_cpu() in advance.
 
-Regards,
-Mischa.
+Signed-off-by: Pavel Begunkov <asml.silence@gmail.com>
+---
+ block/blk-stat.c | 7 ++++---
+ 1 file changed, 4 insertions(+), 3 deletions(-)
+
+diff --git a/block/blk-stat.c b/block/blk-stat.c
+index d892ad2cb938..4239954b0bce 100644
+--- a/block/blk-stat.c
++++ b/block/blk-stat.c
+@@ -75,7 +75,7 @@ void blk_stat_add(struct request *rq, u64 now)
+ 	struct request_queue *q = rq->q;
+ 	struct blk_stat_callback *cb;
+ 	struct blk_rq_stat_staging *stat;
+-	int bucket;
++	int bucket, cpu;
+ 	u64 value;
+ 
+ 	value = (now >= rq->io_start_time_ns) ? now - rq->io_start_time_ns : 0;
+@@ -83,6 +83,7 @@ void blk_stat_add(struct request *rq, u64 now)
+ 	blk_throtl_stat_add(rq, value);
+ 
+ 	rcu_read_lock();
++	cpu = get_cpu();
+ 	list_for_each_entry_rcu(cb, &q->stats->callbacks, list) {
+ 		if (!blk_stat_is_active(cb))
+ 			continue;
+@@ -91,10 +92,10 @@ void blk_stat_add(struct request *rq, u64 now)
+ 		if (bucket < 0)
+ 			continue;
+ 
+-		stat = &get_cpu_ptr(cb->cpu_stat)[bucket];
++		stat = &per_cpu_ptr(cb->cpu_stat, cpu)[bucket];
+ 		blk_rq_stat_add(stat, value);
+-		put_cpu_ptr(cb->cpu_stat);
+ 	}
++	put_cpu();
+ 	rcu_read_unlock();
+ }
+ 
+-- 
+2.23.0
 
