@@ -6,24 +6,24 @@ X-Spam-Status: No, score=-8.3 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
 	INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,
 	USER_AGENT_SANE_1 autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id B8E6FC47404
-	for <linux-block@archiver.kernel.org>; Mon,  7 Oct 2019 06:27:41 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id E343EC47404
+	for <linux-block@archiver.kernel.org>; Mon,  7 Oct 2019 06:28:37 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.kernel.org (Postfix) with ESMTP id 8E2A52084D
-	for <linux-block@archiver.kernel.org>; Mon,  7 Oct 2019 06:27:41 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id B1C552084D
+	for <linux-block@archiver.kernel.org>; Mon,  7 Oct 2019 06:28:37 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1726889AbfJGG1l (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Mon, 7 Oct 2019 02:27:41 -0400
-Received: from mx2.suse.de ([195.135.220.15]:60060 "EHLO mx1.suse.de"
+        id S1726960AbfJGG2h (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Mon, 7 Oct 2019 02:28:37 -0400
+Received: from mx2.suse.de ([195.135.220.15]:60142 "EHLO mx1.suse.de"
         rhost-flags-OK-OK-OK-FAIL) by vger.kernel.org with ESMTP
-        id S1726202AbfJGG1k (ORCPT <rfc822;linux-block@vger.kernel.org>);
-        Mon, 7 Oct 2019 02:27:40 -0400
+        id S1726202AbfJGG2g (ORCPT <rfc822;linux-block@vger.kernel.org>);
+        Mon, 7 Oct 2019 02:28:36 -0400
 X-Virus-Scanned: by amavisd-new at test-mx.suse.de
 Received: from relay2.suse.de (unknown [195.135.220.254])
-        by mx1.suse.de (Postfix) with ESMTP id B4655ABE9;
-        Mon,  7 Oct 2019 06:27:38 +0000 (UTC)
-Subject: Re: [PATCH V2 RESEND 4/5] blk-mq: re-submit IO in case that hctx is
- dead
+        by mx1.suse.de (Postfix) with ESMTP id 58B9DAFA5;
+        Mon,  7 Oct 2019 06:28:34 +0000 (UTC)
+Subject: Re: [PATCH V2 RESEND 5/5] blk-mq: handle requests dispatched from IO
+ scheduler in case that hctx is dead
 To:     Ming Lei <ming.lei@redhat.com>, Jens Axboe <axboe@kernel.dk>
 Cc:     linux-block@vger.kernel.org, John Garry <john.garry@huawei.com>,
         Bart Van Assche <bvanassche@acm.org>,
@@ -32,7 +32,7 @@ Cc:     linux-block@vger.kernel.org, John Garry <john.garry@huawei.com>,
         Thomas Gleixner <tglx@linutronix.de>,
         Keith Busch <keith.busch@intel.com>
 References: <20191006024516.19996-1-ming.lei@redhat.com>
- <20191006024516.19996-5-ming.lei@redhat.com>
+ <20191006024516.19996-6-ming.lei@redhat.com>
 From:   Hannes Reinecke <hare@suse.de>
 Openpgp: preference=signencrypt
 Autocrypt: addr=hare@suse.de; prefer-encrypt=mutual; keydata=
@@ -78,12 +78,12 @@ Autocrypt: addr=hare@suse.de; prefer-encrypt=mutual; keydata=
  ZtWlhGRERnDH17PUXDglsOA08HCls0PHx8itYsjYCAyETlxlLApXWdVl9YVwbQpQ+i693t/Y
  PGu8jotn0++P19d3JwXW8t6TVvBIQ1dRZHx1IxGLMn+CkDJMOmHAUMWTAXX2rf5tUjas8/v2
  azzYF4VRJsdl+d0MCaSy8mUh
-Message-ID: <b49232fb-83fb-b037-c259-9217e3c9f17b@suse.de>
-Date:   Mon, 7 Oct 2019 08:27:38 +0200
+Message-ID: <401259cd-062b-33f1-fe78-a7b0b5c579f4@suse.de>
+Date:   Mon, 7 Oct 2019 08:28:33 +0200
 User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:60.0) Gecko/20100101
  Thunderbird/60.7.2
 MIME-Version: 1.0
-In-Reply-To: <20191006024516.19996-5-ming.lei@redhat.com>
+In-Reply-To: <20191006024516.19996-6-ming.lei@redhat.com>
 Content-Type: text/plain; charset=utf-8
 Content-Language: en-US
 Content-Transfer-Encoding: 8bit
@@ -93,11 +93,8 @@ List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
 On 10/6/19 4:45 AM, Ming Lei wrote:
-> When all CPUs in one hctx are offline, we shouldn't run this hw queue
-> for completing request any more.
-> 
-> So steal bios from the request, and resubmit them, and finally free
-> the request in blk_mq_hctx_notify_dead().
+> If hctx becomes dead, all in-queue IO requests aimed at this hctx have to
+> be re-submitted, so cover requests queued in scheduler queue.
 > 
 > Cc: Bart Van Assche <bvanassche@acm.org>
 > Cc: Hannes Reinecke <hare@suse.com>
@@ -106,43 +103,60 @@ On 10/6/19 4:45 AM, Ming Lei wrote:
 > Cc: Keith Busch <keith.busch@intel.com>
 > Signed-off-by: Ming Lei <ming.lei@redhat.com>
 > ---
->  block/blk-mq.c | 48 +++++++++++++++++++++++++++++++++++++++++-------
->  1 file changed, 41 insertions(+), 7 deletions(-)
+>  block/blk-mq.c | 30 +++++++++++++++++++++++++-----
+>  1 file changed, 25 insertions(+), 5 deletions(-)
 > 
 > diff --git a/block/blk-mq.c b/block/blk-mq.c
-> index d991c122abf2..0b35fdbd1f17 100644
+> index 0b35fdbd1f17..94fd47cef1bc 100644
 > --- a/block/blk-mq.c
 > +++ b/block/blk-mq.c
-> @@ -2280,10 +2280,30 @@ static int blk_mq_hctx_notify_online(unsigned int cpu, struct hlist_node *node)
->  	return 0;
->  }
+> @@ -2313,6 +2313,7 @@ static int blk_mq_hctx_notify_dead(unsigned int cpu, struct hlist_node *node)
+>  	enum hctx_type type;
+>  	bool hctx_dead;
+>  	struct request *rq;
+> +	struct elevator_queue *e;
 >  
-> +static void blk_mq_resubmit_io(struct request *rq)
-> +{
-> +	struct bio_list list;
-> +	struct bio *bio;
+>  	hctx = hlist_entry_safe(node, struct blk_mq_hw_ctx, cpuhp_dead);
+>  	ctx = __blk_mq_get_ctx(hctx->queue, cpu);
+> @@ -2323,12 +2324,31 @@ static int blk_mq_hctx_notify_dead(unsigned int cpu, struct hlist_node *node)
+>  	hctx_dead = cpumask_first_and(hctx->cpumask, cpu_online_mask) >=
+>  		nr_cpu_ids;
+>  
+> -	spin_lock(&ctx->lock);
+> -	if (!list_empty(&ctx->rq_lists[type])) {
+> -		list_splice_init(&ctx->rq_lists[type], &tmp);
+> -		blk_mq_hctx_clear_pending(hctx, ctx);
+> +	e = hctx->queue->elevator;
+> +	if (!e) {
+> +		spin_lock(&ctx->lock);
+> +		if (!list_empty(&ctx->rq_lists[type])) {
+> +			list_splice_init(&ctx->rq_lists[type], &tmp);
+> +			blk_mq_hctx_clear_pending(hctx, ctx);
+> +		}
+> +		spin_unlock(&ctx->lock);
+> +	} else if (hctx_dead) {
+> +		LIST_HEAD(sched_tmp);
 > +
-> +	bio_list_init(&list);
-> +	blk_steal_bios(&list, rq);
+> +		while ((rq = e->type->ops.dispatch_request(hctx))) {
+> +			if (rq->mq_hctx != hctx)
+> +				list_add(&rq->queuelist, &sched_tmp);
+> +			else
+> +				list_add(&rq->queuelist, &tmp);
+> +		}
 > +
-> +	while (true) {
-> +		bio = bio_list_pop(&list);
-> +		if (!bio)
-> +			break;
-> +
-> +		generic_make_request(bio);
-> +	}
-> +
-> +	blk_mq_cleanup_rq(rq);
-> +	blk_mq_end_request(rq, 0);
-> +}
-> +
-Hmm. Not sure if this is a good idea.
-Shouldn't we call 'blk_mq_end_request()' before calling
-generic_make_request()?
-otherwise the cloned request might be completed before original one,
-which looks a bit dodgy to me; and might lead to quite a recursion if we
-have several dead cpus to content with ...
+> +		while (!list_empty(&sched_tmp)) {
+> +			rq = list_entry(sched_tmp.next, struct request,
+> +					queuelist);
+> +			list_del_init(&rq->queuelist);
+> +			blk_mq_sched_insert_request(rq, true, true, true);
+> +		}
+>  	}
+> -	spin_unlock(&ctx->lock);
+>  
+>  	if (list_empty(&tmp))
+>  		return 0;
+> 
+Reviewed-by: Hannes Reinecke <hare@suse.com>
 
 Cheers,
 
