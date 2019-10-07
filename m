@@ -2,119 +2,150 @@ Return-Path: <SRS0=HuTb=YA=vger.kernel.org=linux-block-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-2.3 required=3.0 tests=DKIM_SIGNED,DKIM_VALID,
-	HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,
-	USER_AGENT_SANE_1 autolearn=no autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-2.3 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
+	MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,USER_AGENT_SANE_1 autolearn=no
+	autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id C8FD5ECE58C
-	for <linux-block@archiver.kernel.org>; Mon,  7 Oct 2019 16:19:43 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id CBFC8ECE58C
+	for <linux-block@archiver.kernel.org>; Mon,  7 Oct 2019 16:49:14 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.kernel.org (Postfix) with ESMTP id 9772820673
-	for <linux-block@archiver.kernel.org>; Mon,  7 Oct 2019 16:19:43 +0000 (UTC)
-Authentication-Results: mail.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel-dk.20150623.gappssmtp.com header.i=@kernel-dk.20150623.gappssmtp.com header.b="pY9FMG4U"
+	by mail.kernel.org (Postfix) with ESMTP id A706820659
+	for <linux-block@archiver.kernel.org>; Mon,  7 Oct 2019 16:49:14 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1728059AbfJGQTn (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Mon, 7 Oct 2019 12:19:43 -0400
-Received: from mail-io1-f66.google.com ([209.85.166.66]:44469 "EHLO
-        mail-io1-f66.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1727801AbfJGQTm (ORCPT
-        <rfc822;linux-block@vger.kernel.org>); Mon, 7 Oct 2019 12:19:42 -0400
-Received: by mail-io1-f66.google.com with SMTP id w12so29788595iol.11
-        for <linux-block@vger.kernel.org>; Mon, 07 Oct 2019 09:19:42 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=kernel-dk.20150623.gappssmtp.com; s=20150623;
-        h=subject:to:references:from:message-id:date:user-agent:mime-version
-         :in-reply-to:content-language:content-transfer-encoding;
-        bh=213MsUx4Epqsw/9PAh3qE+IhOWt3M83XBYwgzY62qw8=;
-        b=pY9FMG4UGrIntco39xCEw5vo0uc88GOvorIZUOt3zxZp13hw70y+pZe7p3PuZBgmPa
-         t0W76b1db7hNPTpKsqj6zxAutfBjhtPpaiDOAGWVUUeLC25eZB+nrFPnWi6FIZYqLM8g
-         o6/DMqtyYIXeahmoUK2O5KomLooZWEwavhVssd+qyCXhmanxA4kaoEHvr6c+ceZ+y6cG
-         OjrRM8hkoudWSv+PDmtcSolt/rkVMxcoz0e/pCfhlXrMkIBSsGvbinZur8fQJrOnHhZQ
-         9zRCYOxD7XlHtjPOv2OzKTh1vxjeuu6pX8FLxky8VXtmwlLdT9TeYb9lLYKvJkc8gaoI
-         17tg==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20161025;
-        h=x-gm-message-state:subject:to:references:from:message-id:date
-         :user-agent:mime-version:in-reply-to:content-language
-         :content-transfer-encoding;
-        bh=213MsUx4Epqsw/9PAh3qE+IhOWt3M83XBYwgzY62qw8=;
-        b=V+AhNQtEC1hOLxX/UOZzhSlkGOvYHhjCmzhlQQwiI7z6YRNdVNBDlKBMI4dnAcZpz2
-         /B1I0l6ksDmztigSJ9hMXtDoRL3spYQCJyzQ/TVa9+p+0+Dl/5uCFSZvyR4z9fHrFAkC
-         STWSOenj0fOWo0XgLYcoWZFbUTQ7hSkCBS1iiwa5ikO6TckJiB7cuA1NTWIr4P73Nx+4
-         OBjdlJHZFYqR9ogzhXGlxOVu+XXutLnNjDcfOlClULtmO/y04CgOqm1OQv9vMSE8Qgk6
-         L6aj9X6koewzKvyU740JRrE83frukQ9FHlW2ogkN8nd4F05e7UVNhPOv8Pe5iscITzhh
-         yI6A==
-X-Gm-Message-State: APjAAAWutkxcZCGAQSByl4jKscI78pkGRlZfdWQqRiXFTUAymjZP5Qox
-        3ePdyM5QDmJDVdzgOkKY6LAWCFOzKRnOvw==
-X-Google-Smtp-Source: APXvYqxZtgBYcBfRXiyJm9x+fXmrC7KPfzhUoHSeRFonKOIZXKDLGc5Wj64ScRecXZ9/8Qh7pMhHVQ==
-X-Received: by 2002:a92:3a12:: with SMTP id h18mr28893199ila.124.1570465181535;
-        Mon, 07 Oct 2019 09:19:41 -0700 (PDT)
-Received: from [192.168.1.50] ([65.144.74.34])
-        by smtp.gmail.com with ESMTPSA id b3sm6346493iln.42.2019.10.07.09.19.40
-        (version=TLS1_2 cipher=ECDHE-RSA-AES128-GCM-SHA256 bits=128/128);
-        Mon, 07 Oct 2019 09:19:40 -0700 (PDT)
-Subject: Re: packet writing support
-To:     Mischa Baars <mjbaars1977.linux-block@cyberfiber.eu>,
-        Bart Van Assche <bvanassche@acm.org>,
-        Hannes Reinecke <hare@suse.de>, linux-block@vger.kernel.org
-References: <db5c89c3fe26e4b7ec96443ec97a05df97162889.camel@cyberfiber.eu>
- <6e381f83-9a12-30d7-8f99-caaa6a608c4f@kernel.dk>
- <a4b89c40caf62166ab7078296d73b6ae0f35adaf.camel@cyberfiber.eu>
- <fc70b63f-3780-5654-6bc5-0f2d6115bff0@kernel.dk>
- <6c51a5fe93cfad0f76fdbfe47caaa5f5d3f1ca88.camel@cyberfiber.eu>
- <71a450ed-3f52-fb3a-b0fa-3a08bdc4b3f6@suse.de>
- <977cedab873dfe0705701b3b43c621a7a516e396.camel@cyberfiber.eu>
- <ce56abfd-f309-5471-0201-6226731fa452@suse.de>
- <6eb30ce355f90eca126cbd2f11d359db2bbe69f1.camel@cyberfiber.eu>
- <9596b5fe35dbab5f7804308167bb67b5e6cde52b.camel@cyberfiber.eu>
- <844e6f57-d97d-0c2e-1493-a356cd792a8a@acm.org>
- <62ffa873794d2d6ced83bfc2a59d172677ef815c.camel@cyberfiber.eu>
-From:   Jens Axboe <axboe@kernel.dk>
-Message-ID: <e507eb38-becf-b6a5-bb51-14f873aca28d@kernel.dk>
-Date:   Mon, 7 Oct 2019 10:19:39 -0600
-User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:60.0) Gecko/20100101
- Thunderbird/60.8.0
+        id S1728821AbfJGQtO (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Mon, 7 Oct 2019 12:49:14 -0400
+Received: from szxga04-in.huawei.com ([45.249.212.190]:3216 "EHLO huawei.com"
+        rhost-flags-OK-OK-OK-FAIL) by vger.kernel.org with ESMTP
+        id S1728139AbfJGQtO (ORCPT <rfc822;linux-block@vger.kernel.org>);
+        Mon, 7 Oct 2019 12:49:14 -0400
+Received: from DGGEMS403-HUB.china.huawei.com (unknown [172.30.72.58])
+        by Forcepoint Email with ESMTP id 3D6758EC0CBA65ED0BCA;
+        Tue,  8 Oct 2019 00:49:11 +0800 (CST)
+Received: from [127.0.0.1] (10.202.227.179) by DGGEMS403-HUB.china.huawei.com
+ (10.3.19.203) with Microsoft SMTP Server id 14.3.439.0; Tue, 8 Oct 2019
+ 00:49:06 +0800
+Subject: Re: [PATCH V2 RESEND 3/5] blk-mq: stop to handle IO before hctx's all
+ CPUs become offline
+To:     Ming Lei <ming.lei@redhat.com>
+References: <20191006024516.19996-1-ming.lei@redhat.com>
+ <20191006024516.19996-4-ming.lei@redhat.com>
+ <047ecdf1-bd4b-6702-1add-83b902a6902f@huawei.com>
+ <20191007150416.GB1668@ming.t460p>
+CC:     Jens Axboe <axboe@kernel.dk>, <linux-block@vger.kernel.org>,
+        "Bart Van Assche" <bvanassche@acm.org>,
+        Hannes Reinecke <hare@suse.com>,
+        "Christoph Hellwig" <hch@lst.de>,
+        Thomas Gleixner <tglx@linutronix.de>,
+        Keith Busch <keith.busch@intel.com>
+From:   John Garry <john.garry@huawei.com>
+Message-ID: <ccd2cdfa-089b-adcf-f52f-1b543ee5393e@huawei.com>
+Date:   Mon, 7 Oct 2019 17:49:01 +0100
+User-Agent: Mozilla/5.0 (Windows NT 10.0; WOW64; rv:45.0) Gecko/20100101
+ Thunderbird/45.3.0
 MIME-Version: 1.0
-In-Reply-To: <62ffa873794d2d6ced83bfc2a59d172677ef815c.camel@cyberfiber.eu>
-Content-Type: text/plain; charset=utf-8
-Content-Language: en-US
+In-Reply-To: <20191007150416.GB1668@ming.t460p>
+Content-Type: text/plain; charset="windows-1252"; format=flowed
 Content-Transfer-Encoding: 7bit
+X-Originating-IP: [10.202.227.179]
+X-CFilter-Loop: Reflected
 Sender: linux-block-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-On 10/7/19 10:13 AM, Mischa Baars wrote:
-> On Mon, 2019-10-07 at 07:22 -0700, Bart Van Assche wrote:
->> On 2019-10-07 02:17, Mischa Baars wrote:
->>> On Mon, 2019-10-07 at 11:11 +0200, Mischa Baars wrote:
->>>> necesarry
->>>
->>> a) If necessary I could do the maintaining, sure.
+On 07/10/2019 16:04, Ming Lei wrote:
+> On Mon, Oct 07, 2019 at 11:23:22AM +0100, John Garry wrote:
+>> On 06/10/2019 03:45, Ming Lei wrote:
+>>> +	}
+>>> +}
+>>> +
+>>> +static int blk_mq_hctx_notify_online(unsigned int cpu, struct hlist_node *node)
+>>> +{
+>>> +	struct blk_mq_hw_ctx *hctx = hlist_entry_safe(node,
+>>> +			struct blk_mq_hw_ctx, cpuhp_online);
+>>> +	unsigned prev_cpu = -1;
+>>> +
+>>> +	while (true) {
+>>> +		unsigned next_cpu = cpumask_next_and(prev_cpu, hctx->cpumask,
+>>> +				cpu_online_mask);
+>>> +
+>>> +		if (next_cpu >= nr_cpu_ids)
+>>> +			break;
+>>> +
+>>> +		/* return if there is other online CPU on this hctx */
+>>> +		if (next_cpu != cpu)
+>>> +			return 0;
+>>> +
+>>> +		prev_cpu = next_cpu;
+>>> +	}
+>>> +
+>>> +	set_bit(BLK_MQ_S_INTERNAL_STOPPED, &hctx->state);
+>>> +	blk_mq_drain_inflight_rqs(hctx);
+>>> +
 >>
->> You may want to start with having a look at the following:
->> * pktcdvd: invalid opcode 0000 kernel BUG in pkt_make_request
->> (https://bugzilla.kernel.org/show_bug.cgi?id=201481)
->> * pktcdvd triggers a lock inversion complaint
->> (https://bugzilla.kernel.org/show_bug.cgi?id=202745)
+>> Does this do the same:
 >>
->> Thanks,
+>> {
+>> 	struct blk_mq_hw_ctx *hctx = hlist_entry_safe(node,
+>> 			struct blk_mq_hw_ctx, cpuhp_online);
+>> 	cpumask_var_t tmp;
 >>
->> Bart.
-> 
-> I'm unable to reproduce these findings, also I'm unable to find any
-> executable or any manpage called pktsetup.
+>> 	cpumask_and(tmp, hctx->cpumask, cpu_online_mask);
+>>
+>> 	/* test if there is any other cpu online in the hctx cpu mask */
+>> 	if (cpumask_any_but(tmp, cpu) < nr_cpu_ids)
+>> 		return 0;
+>>
+>> 	set_bit(BLK_MQ_S_INTERNAL_STOPPED, &hctx->state);
+>> 	blk_mq_drain_inflight_rqs(hctx);
+>>
+>> 	return 0;
+>> }
+>>
+>> If so, it's more readable and concise.
+>
+> Yes, but we have to allocate space for 'tmp', that is what this patch
+> tries to avoid,
 
-Let's put this to rest. You are not using pktcdvd in your current setup.
-You have apparently stumbled into some cdrom/dvd related regression if
-the burning stopped working for you, please see:
+Yeah, I forgot about the extra complications of the cpumask offstack 
+stuff; but it does seem rarely used...
 
-Documentation/admin-guide/reporting-bugs.rst
+There is this:
 
-in the kernel tree for how to report that bug, separately. No further
-emails are needed in this thread.
+{
+	struct blk_mq_hw_ctx *hctx = hlist_entry_safe(node,
+			struct blk_mq_hw_ctx, cpuhp_online);
 
--- 
-Jens Axboe
+	if ((cpumask_next_and(-1, hctx->cpumask, cpu_online_mask) ==
+	     cpu) &&
+	     (cpumask_next_and(cpu, hctx->cpumask, cpu_online_mask) >=
+               nr_cpu_ids)) {
+		set_bit(BLK_MQ_S_INTERNAL_STOPPED, &hctx->state);
+		blk_mq_drain_inflight_rqs(hctx);
+	}
+
+	return 0;
+}
+
+... which looks effectively the same as yours, except a bit more 
+readable (ignoring the fixable spilling of lines) to me.
+
+Thanks,
+John
+
+ > given the logic isn't too complicated.
+>
+>>
+>>
+>> BTW, You could have added my Tested-by tags...
+>
+> OK, I will add it in V3.
+>
+>
+> Thanks,
+> Ming
+>
+> .
+>
+
 
