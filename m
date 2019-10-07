@@ -6,24 +6,24 @@ X-Spam-Status: No, score=-5.3 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
 	MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,USER_AGENT_SANE_1
 	autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id A4781C4740A
-	for <linux-block@archiver.kernel.org>; Mon,  7 Oct 2019 06:06:52 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 4D6FEC47404
+	for <linux-block@archiver.kernel.org>; Mon,  7 Oct 2019 06:23:33 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.kernel.org (Postfix) with ESMTP id 81D852166E
-	for <linux-block@archiver.kernel.org>; Mon,  7 Oct 2019 06:06:52 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id 1E4E92084D
+	for <linux-block@archiver.kernel.org>; Mon,  7 Oct 2019 06:23:33 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1726969AbfJGGGv (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Mon, 7 Oct 2019 02:06:51 -0400
-Received: from mx2.suse.de ([195.135.220.15]:56470 "EHLO mx1.suse.de"
+        id S1727028AbfJGGXc (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Mon, 7 Oct 2019 02:23:32 -0400
+Received: from mx2.suse.de ([195.135.220.15]:59074 "EHLO mx1.suse.de"
         rhost-flags-OK-OK-OK-FAIL) by vger.kernel.org with ESMTP
-        id S1726889AbfJGGGv (ORCPT <rfc822;linux-block@vger.kernel.org>);
-        Mon, 7 Oct 2019 02:06:51 -0400
+        id S1727010AbfJGGXc (ORCPT <rfc822;linux-block@vger.kernel.org>);
+        Mon, 7 Oct 2019 02:23:32 -0400
 X-Virus-Scanned: by amavisd-new at test-mx.suse.de
 Received: from relay2.suse.de (unknown [195.135.220.254])
-        by mx1.suse.de (Postfix) with ESMTP id 77FA4AE1B;
-        Mon,  7 Oct 2019 06:06:49 +0000 (UTC)
-Subject: Re: [PATCH V2 RESEND 2/5] blk-mq: add blk-mq flag of
- BLK_MQ_F_NO_MANAGED_IRQ
+        by mx1.suse.de (Postfix) with ESMTP id 08AADABE9;
+        Mon,  7 Oct 2019 06:23:30 +0000 (UTC)
+Subject: Re: [PATCH V2 RESEND 3/5] blk-mq: stop to handle IO before hctx's all
+ CPUs become offline
 To:     Ming Lei <ming.lei@redhat.com>, Jens Axboe <axboe@kernel.dk>
 Cc:     linux-block@vger.kernel.org, John Garry <john.garry@huawei.com>,
         Bart Van Assche <bvanassche@acm.org>,
@@ -32,7 +32,7 @@ Cc:     linux-block@vger.kernel.org, John Garry <john.garry@huawei.com>,
         Thomas Gleixner <tglx@linutronix.de>,
         Keith Busch <keith.busch@intel.com>
 References: <20191006024516.19996-1-ming.lei@redhat.com>
- <20191006024516.19996-3-ming.lei@redhat.com>
+ <20191006024516.19996-4-ming.lei@redhat.com>
 From:   Hannes Reinecke <hare@suse.de>
 Openpgp: preference=signencrypt
 Autocrypt: addr=hare@suse.de; prefer-encrypt=mutual; keydata=
@@ -78,12 +78,12 @@ Autocrypt: addr=hare@suse.de; prefer-encrypt=mutual; keydata=
  ZtWlhGRERnDH17PUXDglsOA08HCls0PHx8itYsjYCAyETlxlLApXWdVl9YVwbQpQ+i693t/Y
  PGu8jotn0++P19d3JwXW8t6TVvBIQ1dRZHx1IxGLMn+CkDJMOmHAUMWTAXX2rf5tUjas8/v2
  azzYF4VRJsdl+d0MCaSy8mUh
-Message-ID: <345e15d2-5c99-2f14-0a34-25884dbad2b7@suse.de>
-Date:   Mon, 7 Oct 2019 08:06:48 +0200
+Message-ID: <efd6edfa-cde1-7ad3-d04f-1204770e6b42@suse.de>
+Date:   Mon, 7 Oct 2019 08:23:29 +0200
 User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:60.0) Gecko/20100101
  Thunderbird/60.7.2
 MIME-Version: 1.0
-In-Reply-To: <20191006024516.19996-3-ming.lei@redhat.com>
+In-Reply-To: <20191006024516.19996-4-ming.lei@redhat.com>
 Content-Type: text/plain; charset=utf-8
 Content-Language: en-US
 Content-Transfer-Encoding: 8bit
@@ -93,14 +93,26 @@ List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
 On 10/6/19 4:45 AM, Ming Lei wrote:
-> We will stop hw queue and wait for completion of in-flight requests
-> when one hctx is becoming dead in the following patch. This way may
-> cause dead-lock for some stacking blk-mq drivers, such as dm-rq and
-> loop.
+> Most of blk-mq drivers depend on managed IRQ's auto-affinity to setup
+> up queue mapping. Thomas mentioned the following point[1]:
 > 
-> Add blk-mq flag of BLK_MQ_F_NO_MANAGED_IRQ and mark it for dm-rq and
-> loop, so we needn't to wait for completion of in-flight requests of
-> dm-rq & loop, then the potential dead-lock can be avoided.
+> "
+>  That was the constraint of managed interrupts from the very beginning:
+> 
+>   The driver/subsystem has to quiesce the interrupt line and the associated
+>   queue _before_ it gets shutdown in CPU unplug and not fiddle with it
+>   until it's restarted by the core when the CPU is plugged in again.
+> "
+> 
+> However, current blk-mq implementation doesn't quiesce hw queue before
+> the last CPU in the hctx is shutdown. Even worse, CPUHP_BLK_MQ_DEAD is
+> one cpuhp state handled after the CPU is down, so there isn't any chance
+> to quiesce hctx for blk-mq wrt. CPU hotplug.
+> 
+> Add new cpuhp state of CPUHP_AP_BLK_MQ_ONLINE for blk-mq to stop queues
+> and wait for completion of in-flight requests.
+> 
+> [1] https://lore.kernel.org/linux-block/alpine.DEB.2.21.1904051331270.1802@nanos.tec.linutronix.de/
 > 
 > Cc: Bart Van Assche <bvanassche@acm.org>
 > Cc: Hannes Reinecke <hare@suse.com>
@@ -109,16 +121,18 @@ On 10/6/19 4:45 AM, Ming Lei wrote:
 > Cc: Keith Busch <keith.busch@intel.com>
 > Signed-off-by: Ming Lei <ming.lei@redhat.com>
 > ---
->  block/blk-mq-debugfs.c | 1 +
->  drivers/block/loop.c   | 2 +-
->  drivers/md/dm-rq.c     | 2 +-
->  include/linux/blk-mq.h | 1 +
->  4 files changed, 4 insertions(+), 2 deletions(-)
+>  block/blk-mq-tag.c         |  2 +-
+>  block/blk-mq-tag.h         |  2 ++
+>  block/blk-mq.c             | 65 ++++++++++++++++++++++++++++++++++++++
+>  include/linux/blk-mq.h     |  1 +
+>  include/linux/cpuhotplug.h |  1 +
+>  5 files changed, 70 insertions(+), 1 deletion(-)
 > 
-I would have preferred to queue this patch after the next one;
-introducing a flag which doesn't do anything is a bit odd to me.
-But anyway:
+I really don't like the zillions of 'XXX_in_flight()' helper in blk-mq;
+blk_mq_queue_inflight(), blk_mq_in_flight(), blk_mq_in_flight_rw() et al.
+Can't you implement your one on top of the already existing?
 
+Otherwise:
 Reviewed-by: Hannes Reinecke <hare@suse.com>
 
 Cheers,
