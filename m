@@ -6,24 +6,24 @@ X-Spam-Status: No, score=-5.3 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
 	MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,USER_AGENT_SANE_1
 	autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 64E1FC4740A
-	for <linux-block@archiver.kernel.org>; Mon,  7 Oct 2019 06:02:25 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id A4781C4740A
+	for <linux-block@archiver.kernel.org>; Mon,  7 Oct 2019 06:06:52 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.kernel.org (Postfix) with ESMTP id 45F43206C2
-	for <linux-block@archiver.kernel.org>; Mon,  7 Oct 2019 06:02:25 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id 81D852166E
+	for <linux-block@archiver.kernel.org>; Mon,  7 Oct 2019 06:06:52 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1727232AbfJGGCX (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Mon, 7 Oct 2019 02:02:23 -0400
-Received: from mx2.suse.de ([195.135.220.15]:52764 "EHLO mx1.suse.de"
+        id S1726969AbfJGGGv (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Mon, 7 Oct 2019 02:06:51 -0400
+Received: from mx2.suse.de ([195.135.220.15]:56470 "EHLO mx1.suse.de"
         rhost-flags-OK-OK-OK-FAIL) by vger.kernel.org with ESMTP
-        id S1726889AbfJGGCX (ORCPT <rfc822;linux-block@vger.kernel.org>);
-        Mon, 7 Oct 2019 02:02:23 -0400
+        id S1726889AbfJGGGv (ORCPT <rfc822;linux-block@vger.kernel.org>);
+        Mon, 7 Oct 2019 02:06:51 -0400
 X-Virus-Scanned: by amavisd-new at test-mx.suse.de
 Received: from relay2.suse.de (unknown [195.135.220.254])
-        by mx1.suse.de (Postfix) with ESMTP id 28DF6B048;
-        Mon,  7 Oct 2019 06:02:21 +0000 (UTC)
-Subject: Re: [PATCH V2 RESEND 1/5] blk-mq: add new state of
- BLK_MQ_S_INTERNAL_STOPPED
+        by mx1.suse.de (Postfix) with ESMTP id 77FA4AE1B;
+        Mon,  7 Oct 2019 06:06:49 +0000 (UTC)
+Subject: Re: [PATCH V2 RESEND 2/5] blk-mq: add blk-mq flag of
+ BLK_MQ_F_NO_MANAGED_IRQ
 To:     Ming Lei <ming.lei@redhat.com>, Jens Axboe <axboe@kernel.dk>
 Cc:     linux-block@vger.kernel.org, John Garry <john.garry@huawei.com>,
         Bart Van Assche <bvanassche@acm.org>,
@@ -32,7 +32,7 @@ Cc:     linux-block@vger.kernel.org, John Garry <john.garry@huawei.com>,
         Thomas Gleixner <tglx@linutronix.de>,
         Keith Busch <keith.busch@intel.com>
 References: <20191006024516.19996-1-ming.lei@redhat.com>
- <20191006024516.19996-2-ming.lei@redhat.com>
+ <20191006024516.19996-3-ming.lei@redhat.com>
 From:   Hannes Reinecke <hare@suse.de>
 Openpgp: preference=signencrypt
 Autocrypt: addr=hare@suse.de; prefer-encrypt=mutual; keydata=
@@ -78,12 +78,12 @@ Autocrypt: addr=hare@suse.de; prefer-encrypt=mutual; keydata=
  ZtWlhGRERnDH17PUXDglsOA08HCls0PHx8itYsjYCAyETlxlLApXWdVl9YVwbQpQ+i693t/Y
  PGu8jotn0++P19d3JwXW8t6TVvBIQ1dRZHx1IxGLMn+CkDJMOmHAUMWTAXX2rf5tUjas8/v2
  azzYF4VRJsdl+d0MCaSy8mUh
-Message-ID: <831d8cee-047e-ce39-122a-e5ff3ead8bc3@suse.de>
-Date:   Mon, 7 Oct 2019 08:02:20 +0200
+Message-ID: <345e15d2-5c99-2f14-0a34-25884dbad2b7@suse.de>
+Date:   Mon, 7 Oct 2019 08:06:48 +0200
 User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:60.0) Gecko/20100101
  Thunderbird/60.7.2
 MIME-Version: 1.0
-In-Reply-To: <20191006024516.19996-2-ming.lei@redhat.com>
+In-Reply-To: <20191006024516.19996-3-ming.lei@redhat.com>
 Content-Type: text/plain; charset=utf-8
 Content-Language: en-US
 Content-Transfer-Encoding: 8bit
@@ -93,11 +93,14 @@ List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
 On 10/6/19 4:45 AM, Ming Lei wrote:
-> Add a new hw queue state of BLK_MQ_S_INTERNAL_STOPPED, which prepares
-> for stopping hw queue before all CPUs of this hctx become offline.
+> We will stop hw queue and wait for completion of in-flight requests
+> when one hctx is becoming dead in the following patch. This way may
+> cause dead-lock for some stacking blk-mq drivers, such as dm-rq and
+> loop.
 > 
-> We can't reuse BLK_MQ_S_STOPPED because that state can be cleared during IO
-> completion.
+> Add blk-mq flag of BLK_MQ_F_NO_MANAGED_IRQ and mark it for dm-rq and
+> loop, so we needn't to wait for completion of in-flight requests of
+> dm-rq & loop, then the potential dead-lock can be avoided.
 > 
 > Cc: Bart Van Assche <bvanassche@acm.org>
 > Cc: Hannes Reinecke <hare@suse.com>
@@ -107,10 +110,15 @@ On 10/6/19 4:45 AM, Ming Lei wrote:
 > Signed-off-by: Ming Lei <ming.lei@redhat.com>
 > ---
 >  block/blk-mq-debugfs.c | 1 +
->  block/blk-mq.h         | 3 ++-
->  include/linux/blk-mq.h | 3 +++
->  3 files changed, 6 insertions(+), 1 deletion(-)
+>  drivers/block/loop.c   | 2 +-
+>  drivers/md/dm-rq.c     | 2 +-
+>  include/linux/blk-mq.h | 1 +
+>  4 files changed, 4 insertions(+), 2 deletions(-)
 > 
+I would have preferred to queue this patch after the next one;
+introducing a flag which doesn't do anything is a bit odd to me.
+But anyway:
+
 Reviewed-by: Hannes Reinecke <hare@suse.com>
 
 Cheers,
