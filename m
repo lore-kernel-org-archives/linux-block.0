@@ -2,114 +2,136 @@ Return-Path: <SRS0=ti8e=YB=vger.kernel.org=linux-block-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-2.3 required=3.0 tests=DKIM_SIGNED,DKIM_VALID,
-	HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,
-	USER_AGENT_SANE_1 autolearn=no autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-8.6 required=3.0 tests=DKIMWL_WL_HIGH,DKIM_SIGNED,
+	DKIM_VALID,DKIM_VALID_AU,INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,
+	SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED,USER_AGENT_SANE_1 autolearn=ham
+	autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id ACDDDC10F14
-	for <linux-block@archiver.kernel.org>; Tue,  8 Oct 2019 21:22:50 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 0ECA8C4360C
+	for <linux-block@archiver.kernel.org>; Tue,  8 Oct 2019 21:29:47 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.kernel.org (Postfix) with ESMTP id 82911218DE
-	for <linux-block@archiver.kernel.org>; Tue,  8 Oct 2019 21:22:50 +0000 (UTC)
-Authentication-Results: mail.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel-dk.20150623.gappssmtp.com header.i=@kernel-dk.20150623.gappssmtp.com header.b="cZ00oFaz"
+	by mail.kernel.org (Postfix) with ESMTP id CD4E821871
+	for <linux-block@archiver.kernel.org>; Tue,  8 Oct 2019 21:29:46 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+	s=default; t=1570570186;
+	bh=f7XVbDLpFmAD4Xl0xpwWSVizeSVRTOEy+b9x6pPH9Ss=;
+	h=Date:From:To:Cc:Subject:References:In-Reply-To:List-ID:From;
+	b=cqkZtZpEXvhHM1A/Up+AaWBC9QRV2DZK9RNhQQq0wq8HHz01pcqriCCo7bM39lOL8
+	 3eV+e0nX0IqTAiw2DoEbJV2YkNexAwTa9zukMO4ipM/ZIwg3FIg3EXC4IpDONH/kXX
+	 nl6exMPhLmnHKd9OtOH1MO+MWYx543qfYIlcrnmc=
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1731165AbfJHVWt (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Tue, 8 Oct 2019 17:22:49 -0400
-Received: from mail-pg1-f194.google.com ([209.85.215.194]:40682 "EHLO
-        mail-pg1-f194.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1730674AbfJHVWs (ORCPT
-        <rfc822;linux-block@vger.kernel.org>); Tue, 8 Oct 2019 17:22:48 -0400
-Received: by mail-pg1-f194.google.com with SMTP id d26so10996696pgl.7
-        for <linux-block@vger.kernel.org>; Tue, 08 Oct 2019 14:22:47 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=kernel-dk.20150623.gappssmtp.com; s=20150623;
-        h=subject:to:references:from:message-id:date:user-agent:mime-version
-         :in-reply-to:content-language:content-transfer-encoding;
-        bh=OG8y2yjqwcKyZ/0narkDeEHuCiN7kZU2ER/a4tyXpjE=;
-        b=cZ00oFazORyAP9YjioGS8LdNPbIVdIVSxZIsbl4iOaaEbk7CvginJ2/mcC2/hKtOEe
-         dx1qmpsmLTpAJTzJGk3avzTODwmj9xceYd0E4NJiof0QpaCTg+egKW3cDFANqKkNrj03
-         3sk3Wcv2RdfGnmDY5/1yjao+NU2iOLxsn8AIeOy0AzLJ5HrbNuaHRAV4jZBcAI1FSUd/
-         lybraYAHIi9Ld9+QYnLUgIrP/9JEhYsCOrM2s7Qe5MtnFG/GggkQoHyMJ9Y+HsQ9Qnls
-         xbYHlGbVAmaR+qKyqnK2ws5NQx966ujYvW1x4Mx0ZqdyFtbz9wCIvRdMe3Dr1IkCkOzU
-         0RSQ==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20161025;
-        h=x-gm-message-state:subject:to:references:from:message-id:date
-         :user-agent:mime-version:in-reply-to:content-language
-         :content-transfer-encoding;
-        bh=OG8y2yjqwcKyZ/0narkDeEHuCiN7kZU2ER/a4tyXpjE=;
-        b=rCL0Z1mi+F4LuW62MdPnsQRqBxisztkZcpbhs2X8VHckuMnvOd9qHmM0MjRyymDRdZ
-         IQQqs6miNTwuVqepTEbzMDdhdSZifwMIulAVV6RiC1BOjsv3Bss9+yNlPqu/ql5czJir
-         1ggjaZnuN+e1ONvvTOD/gFLZqHZd+hxa1czGu3UeE8f94Tfh/bKyCD+vDz6BPknAXtDv
-         VgYUo971tyrKTNimIcsEFWnFESozldjWV8oR9YTGfCc8pTZ7tghcLGp8xSY2Lz/NqM8+
-         ztBK4k59r25ZUTId2LP09QKWltXUKOmB+TSDvWNpKf0bpx1I6sLKYcBUUwz95efC40vm
-         I1yw==
-X-Gm-Message-State: APjAAAXDOxLKPE/Q4bU5Fs6gsi10n5E3X+XwtFwJY2i1GZ2hv20TOvA/
-        gT0inwzG98nHKucCK9gjCBX8kA==
-X-Google-Smtp-Source: APXvYqwEdHimHTD5NsKMKOHzTqFuq6gAtn676HiYi2DorhC6h2nYJCaCg4y4iFAlmNtBDPAA8k9DVg==
-X-Received: by 2002:a62:5ac3:: with SMTP id o186mr40660pfb.20.1570569766467;
-        Tue, 08 Oct 2019 14:22:46 -0700 (PDT)
-Received: from [192.168.1.188] ([66.219.217.79])
-        by smtp.gmail.com with ESMTPSA id k65sm138117pga.94.2019.10.08.14.22.44
-        (version=TLS1_2 cipher=ECDHE-RSA-AES128-GCM-SHA256 bits=128/128);
-        Tue, 08 Oct 2019 14:22:45 -0700 (PDT)
-Subject: Re: [PATCH] io_uring: remove wait loop spurious wakeups
-To:     Pavel Begunkov <asml.silence@gmail.com>,
-        linux-block@vger.kernel.org, linux-kernel@vger.kernel.org
-References: <936cd758d6c694fe1b8b9de050e24cfecdc2e60d.1570489620.git.asml.silence@gmail.com>
- <e11a0716-eb18-4ce3-9902-3247beafe65a@kernel.dk>
- <d035bb1b-e6f0-77db-a434-1761b0a7a142@gmail.com>
- <62a8a6c7-9c5b-c9a4-9c73-c77db87c6637@kernel.dk>
- <99bfb7aa-6980-fc14-32f7-a479dea63eb4@gmail.com>
-From:   Jens Axboe <axboe@kernel.dk>
-Message-ID: <a1f8de23-fcad-7252-cbd4-8f5e617056cd@kernel.dk>
-Date:   Tue, 8 Oct 2019 15:22:43 -0600
-User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:60.0) Gecko/20100101
- Thunderbird/60.8.0
+        id S1731038AbfJHV3q (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Tue, 8 Oct 2019 17:29:46 -0400
+Received: from mail.kernel.org ([198.145.29.99]:56834 "EHLO mail.kernel.org"
+        rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
+        id S1730523AbfJHV3q (ORCPT <rfc822;linux-block@vger.kernel.org>);
+        Tue, 8 Oct 2019 17:29:46 -0400
+Received: from localhost (unknown [131.107.159.163])
+        (using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+        (No client certificate requested)
+        by mail.kernel.org (Postfix) with ESMTPSA id 9D4CD21721;
+        Tue,  8 Oct 2019 21:29:44 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+        s=default; t=1570570184;
+        bh=f7XVbDLpFmAD4Xl0xpwWSVizeSVRTOEy+b9x6pPH9Ss=;
+        h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
+        b=KU55GiyhZD7rQCwbWg+1nx4bIlXF2vwAO3K23T8wnZyMeK4k6EsyGRdoXJXaRZPZg
+         IuQMXIyo/UK2UQN5K2T8RBoJ3efYWHeIJXbxAA6HqeNWCUHlnyPRvtZRajAI21oT12
+         2NvZG+fPPpQJcKxGatoGHZcpY9TYw/edOTUZ7AuQ=
+Date:   Tue, 8 Oct 2019 17:29:44 -0400
+From:   Sasha Levin <sashal@kernel.org>
+To:     Ilya Dryomov <idryomov@gmail.com>
+Cc:     LKML <linux-kernel@vger.kernel.org>, stable@vger.kernel.org,
+        Dongsheng Yang <dongsheng.yang@easystack.cn>,
+        Ceph Development <ceph-devel@vger.kernel.org>,
+        linux-block <linux-block@vger.kernel.org>
+Subject: Re: [PATCH AUTOSEL 5.3 15/71] rbd: fix response length parameter for
+ encoded strings
+Message-ID: <20191008212944.GD1396@sasha-vm>
+References: <20191001163922.14735-1-sashal@kernel.org>
+ <20191001163922.14735-15-sashal@kernel.org>
+ <CAOi1vP-2iSHxJVOabN05+NCiSZ0DxBC9fGN=5cx98mk5RvaDZA@mail.gmail.com>
 MIME-Version: 1.0
-In-Reply-To: <99bfb7aa-6980-fc14-32f7-a479dea63eb4@gmail.com>
-Content-Type: text/plain; charset=utf-8
-Content-Language: en-US
-Content-Transfer-Encoding: 7bit
+Content-Type: text/plain; charset=us-ascii; format=flowed
+Content-Disposition: inline
+In-Reply-To: <CAOi1vP-2iSHxJVOabN05+NCiSZ0DxBC9fGN=5cx98mk5RvaDZA@mail.gmail.com>
+User-Agent: Mutt/1.10.1 (2018-07-13)
 Sender: linux-block-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-On 10/8/19 2:58 PM, Pavel Begunkov wrote:
-> On 08/10/2019 20:00, Jens Axboe wrote:
->> On 10/8/19 10:43 AM, Pavel Begunkov wrote:
->>> On 08/10/2019 06:16, Jens Axboe wrote:
->>>> On 10/7/19 5:18 PM, Pavel Begunkov (Silence) wrote:
->>>>> From: Pavel Begunkov <asml.silence@gmail.com>
->>>>>
->>>>> Any changes interesting to tasks waiting in io_cqring_wait() are
->>>>> commited with io_cqring_ev_posted(). However, io_ring_drop_ctx_refs()
->>>>> also tries to do that but with no reason, that means spurious wakeups
->>>>> every io_free_req() and io_uring_enter().
->>>>>
->>>>> Just use percpu_ref_put() instead.
->>>>
->>>> Looks good, this is a leftover from when the ctx teardown used
->>>> the waitqueue as well.
->>>>
->>> BTW, is there a reason for ref-counting in struct io_kiocb? I understand
->>> the idea behind submission reference, but don't see any actual part
->>> needing it.
+On Tue, Oct 01, 2019 at 07:15:49PM +0200, Ilya Dryomov wrote:
+>On Tue, Oct 1, 2019 at 6:39 PM Sasha Levin <sashal@kernel.org> wrote:
 >>
->> In short, it's to prevent the completion running before we're done with
->> the iocb on the submission side.
-> 
-> Yep, that's what I expected. Perhaps I missed something, but what I've
-> seen following code paths all the way down, it either
-> 1. gets error / completes synchronously and then frees req locally
-> 2. or passes it further (e.g. async list) and never accesses it after
+>> From: Dongsheng Yang <dongsheng.yang@easystack.cn>
+>>
+>> [ Upstream commit 5435d2069503e2aa89c34a94154f4f2fa4a0c9c4 ]
+>>
+>> rbd_dev_image_id() allocates space for length but passes a smaller
+>> value to rbd_obj_method_sync().  rbd_dev_v2_object_prefix() doesn't
+>> allocate space for length.  Fix both to be consistent.
+>>
+>> Signed-off-by: Dongsheng Yang <dongsheng.yang@easystack.cn>
+>> Reviewed-by: Ilya Dryomov <idryomov@gmail.com>
+>> Signed-off-by: Ilya Dryomov <idryomov@gmail.com>
+>> Signed-off-by: Sasha Levin <sashal@kernel.org>
+>> ---
+>>  drivers/block/rbd.c | 10 ++++++----
+>>  1 file changed, 6 insertions(+), 4 deletions(-)
+>>
+>> diff --git a/drivers/block/rbd.c b/drivers/block/rbd.c
+>> index c8fb886aebd4e..69db7385c8df5 100644
+>> --- a/drivers/block/rbd.c
+>> +++ b/drivers/block/rbd.c
+>> @@ -5669,17 +5669,20 @@ static int rbd_dev_v2_image_size(struct rbd_device *rbd_dev)
+>>
+>>  static int rbd_dev_v2_object_prefix(struct rbd_device *rbd_dev)
+>>  {
+>> +       size_t size;
+>>         void *reply_buf;
+>>         int ret;
+>>         void *p;
+>>
+>> -       reply_buf = kzalloc(RBD_OBJ_PREFIX_LEN_MAX, GFP_KERNEL);
+>> +       /* Response will be an encoded string, which includes a length */
+>> +       size = sizeof(__le32) + RBD_OBJ_PREFIX_LEN_MAX;
+>> +       reply_buf = kzalloc(size, GFP_KERNEL);
+>>         if (!reply_buf)
+>>                 return -ENOMEM;
+>>
+>>         ret = rbd_obj_method_sync(rbd_dev, &rbd_dev->header_oid,
+>>                                   &rbd_dev->header_oloc, "get_object_prefix",
+>> -                                 NULL, 0, reply_buf, RBD_OBJ_PREFIX_LEN_MAX);
+>> +                                 NULL, 0, reply_buf, size);
+>>         dout("%s: rbd_obj_method_sync returned %d\n", __func__, ret);
+>>         if (ret < 0)
+>>                 goto out;
+>> @@ -6696,7 +6699,6 @@ static int rbd_dev_image_id(struct rbd_device *rbd_dev)
+>>         dout("rbd id object name is %s\n", oid.name);
+>>
+>>         /* Response will be an encoded string, which includes a length */
+>> -
+>>         size = sizeof (__le32) + RBD_IMAGE_ID_LEN_MAX;
+>>         response = kzalloc(size, GFP_NOIO);
+>>         if (!response) {
+>> @@ -6708,7 +6710,7 @@ static int rbd_dev_image_id(struct rbd_device *rbd_dev)
+>>
+>>         ret = rbd_obj_method_sync(rbd_dev, &oid, &rbd_dev->header_oloc,
+>>                                   "get_id", NULL, 0,
+>> -                                 response, RBD_IMAGE_ID_LEN_MAX);
+>> +                                 response, size);
+>>         dout("%s: rbd_obj_method_sync returned %d\n", __func__, ret);
+>>         if (ret == -ENOENT) {
+>>                 image_id = kstrdup("", GFP_KERNEL);
+>
+>Hi Sasha,
+>
+>This patch just made things consistent, there was no bug here.  I don't
+>think it should be backported.
 
-As soon as the IO is passed on, it can complete. In fact, it can complete
-even _before_ that call returns. That's the issue. Obviously this isn't
-true for purely polled IO, but it is true for IRQ based IO.
+I'll drop it, thanks!
 
 -- 
-Jens Axboe
-
+Thanks,
+Sasha
