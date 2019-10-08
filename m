@@ -2,69 +2,79 @@ Return-Path: <SRS0=ti8e=YB=vger.kernel.org=linux-block-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-2.3 required=3.0 tests=DKIM_SIGNED,DKIM_VALID,
+X-Spam-Status: No, score=-2.2 required=3.0 tests=DKIM_SIGNED,DKIM_VALID,
 	HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,
-	USER_AGENT_SANE_1 autolearn=no autolearn_force=no version=3.4.0
+	URIBL_BLOCKED,USER_AGENT_SANE_1 autolearn=no autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id BE90FC47404
-	for <linux-block@archiver.kernel.org>; Tue,  8 Oct 2019 03:18:00 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 986F2C47404
+	for <linux-block@archiver.kernel.org>; Tue,  8 Oct 2019 03:20:41 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.kernel.org (Postfix) with ESMTP id 84E2421721
-	for <linux-block@archiver.kernel.org>; Tue,  8 Oct 2019 03:18:00 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id 6EF4920867
+	for <linux-block@archiver.kernel.org>; Tue,  8 Oct 2019 03:20:41 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel-dk.20150623.gappssmtp.com header.i=@kernel-dk.20150623.gappssmtp.com header.b="KwXd9fN7"
+	dkim=pass (2048-bit key) header.d=kernel-dk.20150623.gappssmtp.com header.i=@kernel-dk.20150623.gappssmtp.com header.b="wFuqmJYq"
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1729876AbfJHDSA (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Mon, 7 Oct 2019 23:18:00 -0400
-Received: from mail-pf1-f196.google.com ([209.85.210.196]:37484 "EHLO
+        id S1729887AbfJHDUl (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Mon, 7 Oct 2019 23:20:41 -0400
+Received: from mail-pf1-f196.google.com ([209.85.210.196]:36511 "EHLO
         mail-pf1-f196.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1729832AbfJHDR7 (ORCPT
-        <rfc822;linux-block@vger.kernel.org>); Mon, 7 Oct 2019 23:17:59 -0400
-Received: by mail-pf1-f196.google.com with SMTP id y5so9951392pfo.4
-        for <linux-block@vger.kernel.org>; Mon, 07 Oct 2019 20:17:57 -0700 (PDT)
+        with ESMTP id S1729823AbfJHDUk (ORCPT
+        <rfc822;linux-block@vger.kernel.org>); Mon, 7 Oct 2019 23:20:40 -0400
+Received: by mail-pf1-f196.google.com with SMTP id y22so9970649pfr.3
+        for <linux-block@vger.kernel.org>; Mon, 07 Oct 2019 20:20:39 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=kernel-dk.20150623.gappssmtp.com; s=20150623;
-        h=subject:to:references:from:message-id:date:user-agent:mime-version
-         :in-reply-to:content-language:content-transfer-encoding;
-        bh=sBhKqNlCBDPkftr27P/1IjQptr0YXTqXNyc4wrCVHCs=;
-        b=KwXd9fN7sM6S4HqcH6F8Fq+m+XYPerHKPiNSvQR2F1QiQtVIQE+nIlWn6Q8PpHhho3
-         iKAX+N6dedzbUCk0rOTijgDmFBbGQtrLv6csEuCeXIQjzImHbAUoIN37aOc5gpctJxOF
-         5Yb3hQt9N8P0fH/XEiIrrHtWqRrpULXdYkgYDxM/+CbOlnP5yhRkxO94ecv+W1Wr0Nm1
-         YO7fIF7mJQ265INnz8hwnN3iqExG1g6CoqkHHHDDpjbhSQqpUSnIyQcF05FOL71TosBQ
-         prc/hZax9kJYb46OUODcifTFk/n2fFG+Isyhs4q2PZUng5eh+rzPDInIdxsDVxA18Ohu
-         T7/A==
+        h=subject:to:cc:references:from:message-id:date:user-agent
+         :mime-version:in-reply-to:content-language:content-transfer-encoding;
+        bh=hOpTDwgTjucyOYseuwafLS5BCj+XUPc6M7qUnXfBnxQ=;
+        b=wFuqmJYqLrRlrQHQ5K8l3Lk+dvl7JIhYgniYtJiHAXxg7N+TW71fgTajBO62mzEBLC
+         Yk67K1NNivk4mBd4JjT9gdORmTFXgxyHueQW4MA4RJh4u3IHd1LzTNpzr5xOAS/l062J
+         vS6xfo8FckBOdZ5EPU/6Ccv+ren2q/qfxw5bDeT4qLQE+EtyLrB7tp/8zW1elBj59UB2
+         JUZR5Jv/UrNhsfqmkQ78Af50M4OOiXTNey5ePD5scA7DRXzLRYh4zMvrnQATNW4SJ9Ql
+         s2Vst2rRIP1VYpovs7hyyF4LM28cvxdGd8r38xRa9S0jesZrNQJMfbr2eGul/JV60erm
+         Rb5w==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=1e100.net; s=20161025;
-        h=x-gm-message-state:subject:to:references:from:message-id:date
+        h=x-gm-message-state:subject:to:cc:references:from:message-id:date
          :user-agent:mime-version:in-reply-to:content-language
          :content-transfer-encoding;
-        bh=sBhKqNlCBDPkftr27P/1IjQptr0YXTqXNyc4wrCVHCs=;
-        b=D3lJWmf4JygeAFxp9EeOpLWee2duJ0hlTPaN9JemEPJ6MF3oTPtmtcXiZKRMPoIafR
-         gZIhesqQMTlwVhxJa70sIbdPbYhQPxzCD+O2Brej86NjFnXBgfLfvfxUmQ7gk56jj9p1
-         yUQ//miNDhtZ6Kig324UKvijVpYdP2pM7QKUl40bOBVT2jnqQP45eq4/8pDUlHBAgT7A
-         8TEVyQdAJd4qUom8KkRL7qDPgPYlBD/+ZVDxIj3hXu5PjNRkF7yOrgp7hQ21ddyTpOye
-         2JMtd0ENhc68pgQ99S55N9EjmZHsH2Sc7w9oaTQ4wy2hwLEs3U4GUXljg/uGEgkGBQYC
-         PaYg==
-X-Gm-Message-State: APjAAAXK4FUwby2dvl5E3R2KEMU51KMz8dx/4tqWEy9QFZtrVVm7TAqU
-        XfYAw4JO2C2nYE9jF4Dpkik4/A==
-X-Google-Smtp-Source: APXvYqyVEEx/94ZCOojqFRMZtKBTarDNA2EnBJ0TsDkKhroTKOhYv0wamthRODhio5AJVBqSSnilAg==
-X-Received: by 2002:a63:dc4c:: with SMTP id f12mr1766256pgj.29.1570504677476;
-        Mon, 07 Oct 2019 20:17:57 -0700 (PDT)
+        bh=hOpTDwgTjucyOYseuwafLS5BCj+XUPc6M7qUnXfBnxQ=;
+        b=ttm0PaLBQw+kICHtarWhLIX7t3vvRcm4kuuzFdjjNclm/PPlDXZXsiY2adXrrURqjO
+         WdVgxm0TJ+HMTE22GAxRUzCQ1ijFQsjdyqQxizxBh0dFeZkgSm8Io/hLVvhpezfZ4R6K
+         YdCchlTQfVA2aR8nacADbF0UYaM26wDp2fpJtFLw8wovro44a+ccb+dzk9A68M9qynlZ
+         t/DzaULYacIWg1IUpTo85WQvfU/LJDFr48sKDMtbh8U59Ubja0ENuzklQXqPUYweiYLR
+         RXy+2WhSAf3f/HjpR/3OYTJ7oeyin3+BLwfwjEEiQOEBspMH1DcWfwF7fy7cCQUtl+j+
+         KVXA==
+X-Gm-Message-State: APjAAAV1uTo2jQhjtD2jctwKra0Z4z1UB2oq6LCsFcFTIcI3l3uuLLY3
+        6P7YvuY/MyNDyylupYvSJS+ZVCkg2P0HJg==
+X-Google-Smtp-Source: APXvYqynScptury9jvAlSh/yIarWdlWWKHj5JE6ZAXlsr61jrwzksigutFCrPle/es17/CbWxJB6GQ==
+X-Received: by 2002:a63:5552:: with SMTP id f18mr23984019pgm.437.1570504838136;
+        Mon, 07 Oct 2019 20:20:38 -0700 (PDT)
 Received: from [192.168.1.188] ([66.219.217.79])
-        by smtp.gmail.com with ESMTPSA id 64sm19333739pfx.31.2019.10.07.20.17.55
+        by smtp.gmail.com with ESMTPSA id d22sm18909893pfq.168.2019.10.07.20.20.35
         (version=TLS1_2 cipher=ECDHE-RSA-AES128-GCM-SHA256 bits=128/128);
-        Mon, 07 Oct 2019 20:17:56 -0700 (PDT)
-Subject: Re: [PATCH] blk-stat: Optimise blk_stat_add()
-To:     "Pavel Begunkov (Silence)" <asml.silence@gmail.com>,
-        linux-block@vger.kernel.org, linux-kernel@vger.kernel.org
-References: <39dd33cc6f0264b2ec2f79f1dfe21466c2180851.1570482929.git.asml.silence@gmail.com>
+        Mon, 07 Oct 2019 20:20:36 -0700 (PDT)
+Subject: Re: [5.4-rc1, regression] wb_workfn wakeup oops (was Re: frequent
+ 5.4-rc1 crash?)
+To:     "Darrick J. Wong" <darrick.wong@oracle.com>
+Cc:     Chris Mason <clm@fb.com>, Gao Xiang <hsiangkao@aol.com>,
+        Dave Chinner <david@fromorbit.com>,
+        xfs <linux-xfs@vger.kernel.org>, "tj@kernel.org" <tj@kernel.org>,
+        "linux-fsdevel@vger.kernel.org" <linux-fsdevel@vger.kernel.org>,
+        "linux-block@vger.kernel.org" <linux-block@vger.kernel.org>
+References: <20191003015247.GI13108@magnolia>
+ <20191003064022.GX16973@dread.disaster.area>
+ <20191003084149.GA16347@hsiangkao-HP-ZHAN-66-Pro-G1>
+ <41B90CA7-E093-48FA-BDFD-73BE7EB81FB6@fb.com>
+ <32f7c7d8-59d8-7657-4dcc-3741355bf63a@kernel.dk>
+ <20191003183746.GK13108@magnolia> <20191006223041.GQ13108@magnolia>
 From:   Jens Axboe <axboe@kernel.dk>
-Message-ID: <e5df36bc-1beb-403c-8fe6-624fecc938a2@kernel.dk>
-Date:   Mon, 7 Oct 2019 21:17:54 -0600
+Message-ID: <bf8db64b-0b9b-172e-9aca-a06151dad252@kernel.dk>
+Date:   Mon, 7 Oct 2019 21:20:33 -0600
 User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:60.0) Gecko/20100101
  Thunderbird/60.8.0
 MIME-Version: 1.0
-In-Reply-To: <39dd33cc6f0264b2ec2f79f1dfe21466c2180851.1570482929.git.asml.silence@gmail.com>
+In-Reply-To: <20191006223041.GQ13108@magnolia>
 Content-Type: text/plain; charset=utf-8
 Content-Language: en-US
 Content-Transfer-Encoding: 7bit
@@ -73,14 +83,77 @@ Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-On 10/7/19 3:16 PM, Pavel Begunkov (Silence) wrote:
-> From: Pavel Begunkov <asml.silence@gmail.com>
+On 10/6/19 4:30 PM, Darrick J. Wong wrote:
+> On Thu, Oct 03, 2019 at 11:37:46AM -0700, Darrick J. Wong wrote:
+>> On Thu, Oct 03, 2019 at 08:05:42AM -0600, Jens Axboe wrote:
+>>> On 10/3/19 8:01 AM, Chris Mason wrote:
+>>>>
+>>>>
+>>>> On 3 Oct 2019, at 4:41, Gao Xiang wrote:
+>>>>
+>>>>> Hi,
+>>>>>
+>>>>> On Thu, Oct 03, 2019 at 04:40:22PM +1000, Dave Chinner wrote:
+>>>>>> [cc linux-fsdevel, linux-block, tejun ]
+>>>>>>
+>>>>>> On Wed, Oct 02, 2019 at 06:52:47PM -0700, Darrick J. Wong wrote:
+>>>>>>> Hi everyone,
+>>>>>>>
+>>>>>>> Does anyone /else/ see this crash in generic/299 on a V4 filesystem
+>>>>>>> (tho
+>>>>>>> afaict V5 configs crash too) and a 5.4-rc1 kernel?  It seems to pop
+>>>>>>> up
+>>>>>>> on generic/299 though only 80% of the time.
+>>>>>>>
+>>>>>
+>>>>> Just a quick glance, I guess there could is a race between (complete
+>>>>> guess):
+>>>>>
+>>>>>
+>>>>>    160 static void finish_writeback_work(struct bdi_writeback *wb,
+>>>>>    161                                   struct wb_writeback_work *work)
+>>>>>    162 {
+>>>>>    163         struct wb_completion *done = work->done;
+>>>>>    164
+>>>>>    165         if (work->auto_free)
+>>>>>    166                 kfree(work);
+>>>>>    167         if (done && atomic_dec_and_test(&done->cnt))
+>>>>>
+>>>>>    ^^^ here
+>>>>>
+>>>>>    168                 wake_up_all(done->waitq);
+>>>>>    169 }
+>>>>>
+>>>>> since new wake_up_all(done->waitq); is completely on-stack,
+>>>>>    	if (done && atomic_dec_and_test(&done->cnt))
+>>>>> -		wake_up_all(&wb->bdi->wb_waitq);
+>>>>> +		wake_up_all(done->waitq);
+>>>>>    }
+>>>>>
+>>>>> which could cause use after free if on-stack wb_completion is gone...
+>>>>> (however previous wb->bdi is solid since it is not on-stack)
+>>>>>
+>>>>> see generic on-stack completion which takes a wait_queue spin_lock
+>>>>> between
+>>>>> test and wake_up...
+>>>>>
+>>>>> If I am wrong, ignore me, hmm...
+>>>>
+>>>> It's a good guess ;)  Jens should have this queued up already:
+>>>>
+>>>> https://lkml.org/lkml/2019/9/23/972
+>>>
+>>> Yes indeed, it'll go out today or tomorrow for -rc2.
+>>
+>> The patch fixes the problems I've been seeing, so:
+>> Tested-by: Darrick J. Wong <darrick.wong@oracle.com>
+>>
+>> Thank you for taking care of this. :)
 > 
-> blk_stat_add() calls {get,put}_cpu_ptr() in a loop, which entails
-> overhead of disabling/enabling preemption. The loop is under RCU
-> (i.e.short) anyway, so do get_cpu() in advance.
+> Hmm, I don't see this patch in -rc2; did it not go out in time, or were
+> there further complications?
 
-Looks good, applied for 5.5.
+Andrew had it queued up, apparently my memory was bad. It's in now.
 
 -- 
 Jens Axboe
