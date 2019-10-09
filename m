@@ -4,121 +4,82 @@ X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 X-Spam-Level: 
 X-Spam-Status: No, score=-9.8 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
 	INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,
-	URIBL_BLOCKED,USER_AGENT_GIT autolearn=unavailable autolearn_force=no
-	version=3.4.0
+	URIBL_BLOCKED,USER_AGENT_GIT autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 843DBECE58C
-	for <linux-block@archiver.kernel.org>; Wed,  9 Oct 2019 19:13:33 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 4D9D3C47404
+	for <linux-block@archiver.kernel.org>; Wed,  9 Oct 2019 19:25:39 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.kernel.org (Postfix) with ESMTP id 64C90218AC
-	for <linux-block@archiver.kernel.org>; Wed,  9 Oct 2019 19:13:33 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id 21EC1206B6
+	for <linux-block@archiver.kernel.org>; Wed,  9 Oct 2019 19:25:39 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1731995AbfJITLY (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Wed, 9 Oct 2019 15:11:24 -0400
-Received: from mout.kundenserver.de ([212.227.126.134]:48089 "EHLO
-        mout.kundenserver.de" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1731986AbfJITLY (ORCPT
-        <rfc822;linux-block@vger.kernel.org>); Wed, 9 Oct 2019 15:11:24 -0400
-Received: from threadripper.lan ([149.172.19.189]) by mrelayeu.kundenserver.de
- (mreue011 [212.227.15.129]) with ESMTPA (Nemesis) id
- 1N8XgH-1i5VgB1LZh-014SRC; Wed, 09 Oct 2019 21:11:22 +0200
-From:   Arnd Bergmann <arnd@arndb.de>
-To:     Al Viro <viro@zeniv.linux.org.uk>
-Cc:     linux-kernel@vger.kernel.org, y2038@lists.linaro.org,
-        linux-fsdevel@vger.kernel.org, Arnd Bergmann <arnd@arndb.de>,
-        Jens Axboe <axboe@kernel.dk>, linux-block@vger.kernel.org
-Subject: [PATCH v6 42/43] pktcdvd: add compat_ioctl handler
-Date:   Wed,  9 Oct 2019 21:10:43 +0200
-Message-Id: <20191009191044.308087-43-arnd@arndb.de>
-X-Mailer: git-send-email 2.20.0
-In-Reply-To: <20191009190853.245077-1-arnd@arndb.de>
-References: <20191009190853.245077-1-arnd@arndb.de>
+        id S1731173AbfJITZi (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Wed, 9 Oct 2019 15:25:38 -0400
+Received: from ale.deltatee.com ([207.54.116.67]:37610 "EHLO ale.deltatee.com"
+        rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
+        id S1728804AbfJITZi (ORCPT <rfc822;linux-block@vger.kernel.org>);
+        Wed, 9 Oct 2019 15:25:38 -0400
+Received: from cgy1-donard.priv.deltatee.com ([172.16.1.31])
+        by ale.deltatee.com with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
+        (Exim 4.89)
+        (envelope-from <gunthorp@deltatee.com>)
+        id 1iIHaa-0002g9-6c; Wed, 09 Oct 2019 13:25:37 -0600
+Received: from gunthorp by cgy1-donard.priv.deltatee.com with local (Exim 4.92)
+        (envelope-from <gunthorp@deltatee.com>)
+        id 1iIHaY-0003QJ-UV; Wed, 09 Oct 2019 13:25:34 -0600
+From:   Logan Gunthorpe <logang@deltatee.com>
+To:     linux-kernel@vger.kernel.org, linux-nvme@lists.infradead.org,
+        linux-block@vger.kernel.org, linux-fsdevel@vger.kernel.org
+Cc:     Christoph Hellwig <hch@lst.de>, Sagi Grimberg <sagi@grimberg.me>,
+        Keith Busch <kbusch@kernel.org>, Jens Axboe <axboe@fb.com>,
+        Chaitanya Kulkarni <Chaitanya.Kulkarni@wdc.com>,
+        Max Gurtovoy <maxg@mellanox.com>,
+        Stephen Bates <sbates@raithlin.com>,
+        Logan Gunthorpe <logang@deltatee.com>
+Date:   Wed,  9 Oct 2019 13:25:26 -0600
+Message-Id: <20191009192530.13079-10-logang@deltatee.com>
+X-Mailer: git-send-email 2.20.1
+In-Reply-To: <20191009192530.13079-1-logang@deltatee.com>
+References: <20191009192530.13079-1-logang@deltatee.com>
 MIME-Version: 1.0
 Content-Transfer-Encoding: 8bit
-X-Provags-ID: V03:K1:93xVR2PSRzNKK3F6eEf3KloUW20yUoSchuNU1iTvhPWVCYwsH8H
- z13+p8ef1mAztjV2JdOjKqOYgaMbqp2tn3Z/Vg8IrXIlrGafn4DCxbrq/pChzzAUUHcuEV9
- RtB6cLBqK0HwCVek/0QpPj02Twg2C0IwFQBlScLKqgWIJIg8/tqbCevylU4jhp4uvGMzVBl
- 3NURu7wv2UyKvLx5eGCaQ==
-X-UI-Out-Filterresults: notjunk:1;V03:K0:/Z06bO3lT6w=:6NXRRLxYm/LA0XwBWwo6Q7
- p/KW3+sAt3EnBV6ubbtZExBdcmG9keJjb1cALDVt3+5J5dZnQNtMCpQZqSQrSXht8Ch+KQEUG
- MD2bQvKIe+STPbvBSWGqwieBm7Nb6k22/aNSgdTepdK37zcaLHlAzt6ETugYcc8i8qCuQ23vz
- QbqIM810G2lWNY8Ap3z60/POVSiooVUxgflLJ3iW/d3y2muXKmPowKXUdofL+6iQnTQ5dlXmg
- dJKsOBWOfEtAvFnUtTy5qpbgVx1UCb1x0dYR19li7QIxHQbGImIFi4sxCanHAnpvZjTgO3XRr
- lS+mJFtS4nU8uGOxE8cu06ALG8S0LQQeYCNXgIdS8+qw9i2WqSYUCmt0JRXwhh/ACr54BSerh
- hOHIW0lShwaiuv8KRezSH42mGEBA2P0tK0W8I6MPKy9a4UZjVI/q46Fcll4C3+oun5NOK8F8r
- 1HgADAwxOEctsr516d5iH4xzz/LDcZvyldyWsSEED9n7CZ7Hib4KnZNhkN4my+gFp3AySkUMs
- 9Vysmz9349cTarI7TFSsIxmLZrho7bEtMoHh0NQYpq4yWmyl1sxk0RcMpATWBX/dgXoTAmlJQ
- +br7DNaAzWs8uXFUdM5iiVhmD/dZQGeJF05wYsF33UeeuY9JyZRK44XrOIulA0ppKA799aIxY
- TrlyWvXwzLaEUVi2Gmpcr6yonfuurYg1p7+y1oi0I2K5hDIBiYRbNzbWR3PD+8Z3jnrCsT0+X
- DOM8GRXm297v4+bx+scA0bJ1R7XBVvz8IxrtzT3bwNAfxyXinOjCqZK68Ml/P0kfC/EZF8Bwt
- FvkQTEKTAA29QbZszpwY36dp9F5SUveI9RVSd/U6TyhfPb2x6mbg0h+M1etFyQdCq8Ug/HyjY
- r8LwN/SEfrpnWkDGz16Q==
+X-SA-Exim-Connect-IP: 172.16.1.31
+X-SA-Exim-Rcpt-To: linux-nvme@lists.infradead.org, linux-kernel@vger.kernel.org, linux-block@vger.kernel.org, linux-fsdevel@vger.kernel.org, hch@lst.de, sagi@grimberg.me, kbusch@kernel.org, axboe@fb.com, Chaitanya.Kulkarni@wdc.com, maxg@mellanox.com, sbates@raithlin.com, logang@deltatee.com
+X-SA-Exim-Mail-From: gunthorp@deltatee.com
+Subject: [PATCH v9 08/12] nvmet-tcp: don't check data_len in nvmet_tcp_map_data()
+X-SA-Exim-Version: 4.2.1 (built Tue, 02 Aug 2016 21:08:31 +0000)
+X-SA-Exim-Scanned: Yes (on ale.deltatee.com)
 Sender: linux-block-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-pkt_ioctl() implements the generic SCSI_IOCTL_SEND_COMMAND
-and some cdrom ioctls by forwarding to the underlying block
-device. For compat_ioctl handling, this always takes a
-roundtrip through fs/compat_ioctl.c that we should try
-to avoid, at least for the compatible commands.
+With passthru, the data_len is no longer guaranteed to be set
+for all requests. Therefore, we should not check for it to be
+non-zero. Instead check if the SGL length is zero and map
+when appropriate.
 
-CDROM_SEND_PACKET is an exception here, it requires special
-translation in compat_blkdev_driver_ioctl().
+None of the other transports check data_len which is verified
+in core code.
 
-CDROM_LAST_WRITTEN has no compat handling at the moment.
-
-Cc: Jens Axboe <axboe@kernel.dk>
-Cc: linux-block@vger.kernel.org
-Signed-off-by: Arnd Bergmann <arnd@arndb.de>
+Signed-off-by: Logan Gunthorpe <logang@deltatee.com>
+Reviewed-by: Sagi Grimberg <sagi@grimberg.me>
 ---
- drivers/block/pktcdvd.c | 25 +++++++++++++++++++++++++
- 1 file changed, 25 insertions(+)
+ drivers/nvme/target/tcp.c | 2 +-
+ 1 file changed, 1 insertion(+), 1 deletion(-)
 
-diff --git a/drivers/block/pktcdvd.c b/drivers/block/pktcdvd.c
-index 76457003f140..ee67bf929fac 100644
---- a/drivers/block/pktcdvd.c
-+++ b/drivers/block/pktcdvd.c
-@@ -2663,6 +2663,28 @@ static int pkt_ioctl(struct block_device *bdev, fmode_t mode, unsigned int cmd,
- 	return ret;
- }
+diff --git a/drivers/nvme/target/tcp.c b/drivers/nvme/target/tcp.c
+index d535080b781f..1e2d92f818ad 100644
+--- a/drivers/nvme/target/tcp.c
++++ b/drivers/nvme/target/tcp.c
+@@ -320,7 +320,7 @@ static int nvmet_tcp_map_data(struct nvmet_tcp_cmd *cmd)
+ 	struct nvme_sgl_desc *sgl = &cmd->req.cmd->common.dptr.sgl;
+ 	u32 len = le32_to_cpu(sgl->length);
  
-+#ifdef CONFIG_COMPAT
-+static int pkt_compat_ioctl(struct block_device *bdev, fmode_t mode, unsigned int cmd, unsigned long arg)
-+{
-+	switch (cmd) {
-+	/* compatible */
-+	case CDROMEJECT:
-+	case CDROMMULTISESSION:
-+	case CDROMREADTOCENTRY:
-+	case SCSI_IOCTL_SEND_COMMAND:
-+		return pkt_ioctl(bdev, mode, cmd, (unsigned long)compat_ptr(arg));
-+
-+
-+	/* FIXME: no handler so far */
-+	case CDROM_LAST_WRITTEN:
-+	/* handled in compat_blkdev_driver_ioctl */
-+	case CDROM_SEND_PACKET:
-+	default:
-+		return -ENOIOCTLCMD;
-+	}
-+}
-+#endif
-+
- static unsigned int pkt_check_events(struct gendisk *disk,
- 				     unsigned int clearing)
- {
-@@ -2684,6 +2706,9 @@ static const struct block_device_operations pktcdvd_ops = {
- 	.open =			pkt_open,
- 	.release =		pkt_close,
- 	.ioctl =		pkt_ioctl,
-+#ifdef CONFIG_COMPAT
-+	.ioctl =		pkt_compat_ioctl,
-+#endif
- 	.check_events =		pkt_check_events,
- };
+-	if (!cmd->req.data_len)
++	if (!len)
+ 		return 0;
  
+ 	if (sgl->type == ((NVME_SGL_FMT_DATA_DESC << 4) |
 -- 
-2.20.0
+2.20.1
 
