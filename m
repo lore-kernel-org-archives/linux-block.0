@@ -2,121 +2,159 @@ Return-Path: <SRS0=0s1t=YC=vger.kernel.org=linux-block-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-8.4 required=3.0 tests=DKIMWL_WL_HIGH,DKIM_SIGNED,
-	DKIM_VALID,DKIM_VALID_AU,HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,
-	MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED,
-	USER_AGENT_SANE_1 autolearn=ham autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-8.3 required=3.0 tests=DKIM_SIGNED,DKIM_VALID,
+	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,
+	SPF_HELO_NONE,SPF_PASS,USER_AGENT_SANE_1 autolearn=unavailable
+	autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 3C0F7ECE596
-	for <linux-block@archiver.kernel.org>; Wed,  9 Oct 2019 03:31:27 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id A644CECE58E
+	for <linux-block@archiver.kernel.org>; Wed,  9 Oct 2019 03:45:26 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.kernel.org (Postfix) with ESMTP id 1371920B7C
-	for <linux-block@archiver.kernel.org>; Wed,  9 Oct 2019 03:31:27 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id 680DD20B7C
+	for <linux-block@archiver.kernel.org>; Wed,  9 Oct 2019 03:45:26 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=pass (2048-bit key) header.d=oracle.com header.i=@oracle.com header.b="VQm4ZLc5"
+	dkim=pass (2048-bit key) header.d=kernel-dk.20150623.gappssmtp.com header.i=@kernel-dk.20150623.gappssmtp.com header.b="lzHc6dfn"
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1730274AbfJIDb0 (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Tue, 8 Oct 2019 23:31:26 -0400
-Received: from aserp2120.oracle.com ([141.146.126.78]:49964 "EHLO
-        aserp2120.oracle.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1726490AbfJIDb0 (ORCPT
-        <rfc822;linux-block@vger.kernel.org>); Tue, 8 Oct 2019 23:31:26 -0400
-Received: from pps.filterd (aserp2120.oracle.com [127.0.0.1])
-        by aserp2120.oracle.com (8.16.0.27/8.16.0.27) with SMTP id x993Smrk079724;
-        Wed, 9 Oct 2019 03:31:24 GMT
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=oracle.com; h=subject : to : cc :
- references : from : message-id : date : mime-version : in-reply-to :
- content-type : content-transfer-encoding; s=corp-2019-08-05;
- bh=hbxHVutXIWyFYvNKxR7qqFz5fomjnzR0pLgVn3uaI9I=;
- b=VQm4ZLc5YIC1kiJqu1oAwbMFJ609sVuTaW/ohH8LS+DOj9rDs7kopArato4dxEHj5gY8
- HQxIvI2WTKiXEV+tOtlAz2Sdrrvw9wVzGsodJdmQcQtghdlQ+Ng5BQLTHYTkgeckQstB
- uerOCEABZwBseUWxZsumSLfyPiPVfQnp7ZIpkxM/Qrq4dL8BNDrE808zIyd8grvq9qMo
- KTuoDsePck/supAqlHv0k00ZpmwNl+BlIKtLZGDtO6DKRr/qKjm1ugfMDXShz1Y8V7Gg
- Vh8THSoNbdRfeKbivqZ8qtynJyeX5NFupfs6SxNmgIiK5sGocXjDJsqEiQN8WbzmW9vk Rg== 
-Received: from aserp3020.oracle.com (aserp3020.oracle.com [141.146.126.70])
-        by aserp2120.oracle.com with ESMTP id 2vek4qh7y0-1
-        (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=OK);
-        Wed, 09 Oct 2019 03:31:24 +0000
-Received: from pps.filterd (aserp3020.oracle.com [127.0.0.1])
-        by aserp3020.oracle.com (8.16.0.27/8.16.0.27) with SMTP id x993SRf5115080;
-        Wed, 9 Oct 2019 03:31:23 GMT
-Received: from aserv0122.oracle.com (aserv0122.oracle.com [141.146.126.236])
-        by aserp3020.oracle.com with ESMTP id 2vgefbu5dp-1
-        (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=OK);
-        Wed, 09 Oct 2019 03:31:23 +0000
-Received: from abhmp0018.oracle.com (abhmp0018.oracle.com [141.146.116.24])
-        by aserv0122.oracle.com (8.14.4/8.14.4) with ESMTP id x993VMoL006129;
-        Wed, 9 Oct 2019 03:31:22 GMT
-Received: from [192.168.1.14] (/180.165.87.209)
-        by default (Oracle Beehive Gateway v4.0)
-        with ESMTP ; Tue, 08 Oct 2019 20:31:22 -0700
-Subject: Re: [PATCH V2] block: Fix elv_support_iosched()
-To:     Damien Le Moal <damien.lemoal@wdc.com>,
-        linux-block@vger.kernel.org, Jens Axboe <axboe@kernel.dk>
-Cc:     Shinichiro Kawasaki <shinichiro.kawasaki@wdc.com>
-References: <20191008223954.6084-1-damien.lemoal@wdc.com>
-From:   Bob Liu <bob.liu@oracle.com>
-Message-ID: <8a3b1a9a-ef48-0413-2e6b-96e96a265543@oracle.com>
-Date:   Wed, 9 Oct 2019 11:31:17 +0800
+        id S1729285AbfJIDpZ (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Tue, 8 Oct 2019 23:45:25 -0400
+Received: from mail-pl1-f193.google.com ([209.85.214.193]:33669 "EHLO
+        mail-pl1-f193.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S1726765AbfJIDpZ (ORCPT
+        <rfc822;linux-block@vger.kernel.org>); Tue, 8 Oct 2019 23:45:25 -0400
+Received: by mail-pl1-f193.google.com with SMTP id d22so377940pls.0
+        for <linux-block@vger.kernel.org>; Tue, 08 Oct 2019 20:45:23 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=kernel-dk.20150623.gappssmtp.com; s=20150623;
+        h=subject:to:cc:references:from:message-id:date:user-agent
+         :mime-version:in-reply-to:content-language:content-transfer-encoding;
+        bh=liff+2I181mBeYcP7vnPa93eBbGSoVxP2sz1/iUSuJA=;
+        b=lzHc6dfnxI3dTD9LV+12XsYQ1hfX4oAzzxy28wzYWGuzZM3OrIjcsVdMJsl2NCRffU
+         nWHgdMrHBTKPRwoxwzLvUhyy8+d2CPtNvSNRmbX+PAPE0Ock4jWRBw/8L7PZq6VSYJx6
+         Wv8bE4jrOsVmNqFT23UsmDV0HmsolL/P4rXtlBlF+xM0rKtomvz/At5XZpHwH2tV/p/X
+         2tPKwyTBRpPAicoHU6BbukbZuruFT9/c0DLwvVTqcGPa4gaWWoIx5Xo9vxUbogtWfuM5
+         VWd9rWEFHfhBen67fEILP6GH7uk3wS10t9Etur1Gac3M1FmL3+9NljBpx/B9grMGbZOB
+         X4bg==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20161025;
+        h=x-gm-message-state:subject:to:cc:references:from:message-id:date
+         :user-agent:mime-version:in-reply-to:content-language
+         :content-transfer-encoding;
+        bh=liff+2I181mBeYcP7vnPa93eBbGSoVxP2sz1/iUSuJA=;
+        b=cr69WjM18FOBS3+Kidk0v8ZM9nQ/Mngtd9m0LZiKJnA+SvFCfctE5ddaxnOXOnxPpK
+         EPHHvmT4dLMRLrfy+pA63/ESBSLQY2XsgthpXWVxIXTmOoeKMpqkaIe886U92kW8d9TS
+         KN5Ap/Ds1O4caUtHqlP5sYvnJn3AK5LGP4TcIU9zKfgcvDhquWNhgNLsyB5DzCe+8+pB
+         PbidyYmFj/TgifKDGy2oJV2onec1HMmg9kagP0HVIh6wlzB8IfArW6Px3AwMyx21KCZX
+         NSm4eO76hvdvEnBIefOWcwaMJCCr1g6K24U5NtOjUaZ9Qim0BtPbUZMb//v1xQ0Xa2zc
+         Liug==
+X-Gm-Message-State: APjAAAVbOiPtpYiscPUpkk6iB+qCopYmE8PUxHNQg4Y7vTvOK7mR0gcE
+        jCXVHqVEfjDkffHdKZKRNwW8189dR0gavQ==
+X-Google-Smtp-Source: APXvYqzfO/3qMUWyXK1s8QSMSKpYAi65qrIiMZYufP6UyQiC5vB5Y5+5O56CER+1kzI4YCQYOTisoQ==
+X-Received: by 2002:a17:902:8d8e:: with SMTP id v14mr1030449plo.287.1570592721944;
+        Tue, 08 Oct 2019 20:45:21 -0700 (PDT)
+Received: from [192.168.1.188] ([66.219.217.79])
+        by smtp.gmail.com with ESMTPSA id w11sm563669pfd.116.2019.10.08.20.45.19
+        (version=TLS1_2 cipher=ECDHE-RSA-AES128-GCM-SHA256 bits=128/128);
+        Tue, 08 Oct 2019 20:45:20 -0700 (PDT)
+Subject: Re: [PATCH AUTOSEL 5.3 15/71] rbd: fix response length parameter for
+ encoded strings
+To:     Sasha Levin <sashal@kernel.org>, Ilya Dryomov <idryomov@gmail.com>
+Cc:     LKML <linux-kernel@vger.kernel.org>, stable@vger.kernel.org,
+        Dongsheng Yang <dongsheng.yang@easystack.cn>,
+        Ceph Development <ceph-devel@vger.kernel.org>,
+        linux-block <linux-block@vger.kernel.org>
+References: <20191001163922.14735-1-sashal@kernel.org>
+ <20191001163922.14735-15-sashal@kernel.org>
+ <CAOi1vP-2iSHxJVOabN05+NCiSZ0DxBC9fGN=5cx98mk5RvaDZA@mail.gmail.com>
+ <20191008212944.GD1396@sasha-vm>
+From:   Jens Axboe <axboe@kernel.dk>
+Message-ID: <ecddc946-4fbf-4bb2-aac2-689135473f36@kernel.dk>
+Date:   Tue, 8 Oct 2019 21:45:18 -0600
 User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:60.0) Gecko/20100101
- Thunderbird/60.5.1
+ Thunderbird/60.8.0
 MIME-Version: 1.0
-In-Reply-To: <20191008223954.6084-1-damien.lemoal@wdc.com>
+In-Reply-To: <20191008212944.GD1396@sasha-vm>
 Content-Type: text/plain; charset=utf-8
 Content-Language: en-US
 Content-Transfer-Encoding: 7bit
-X-Proofpoint-Virus-Version: vendor=nai engine=6000 definitions=9404 signatures=668684
-X-Proofpoint-Spam-Details: rule=notspam policy=default score=0 suspectscore=0 malwarescore=0
- phishscore=0 bulkscore=0 spamscore=0 mlxscore=0 mlxlogscore=999
- adultscore=0 classifier=spam adjust=0 reason=mlx scancount=1
- engine=8.0.1-1908290000 definitions=main-1910090030
-X-Proofpoint-Virus-Version: vendor=nai engine=6000 definitions=9404 signatures=668684
-X-Proofpoint-Spam-Details: rule=notspam policy=default score=0 priorityscore=1501 malwarescore=0
- suspectscore=0 phishscore=0 bulkscore=0 spamscore=0 clxscore=1011
- lowpriorityscore=0 mlxscore=0 impostorscore=0 mlxlogscore=999 adultscore=0
- classifier=spam adjust=0 reason=mlx scancount=1 engine=8.0.1-1908290000
- definitions=main-1910090030
 Sender: linux-block-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-On 10/9/19 6:39 AM, Damien Le Moal wrote:
-> A BIO based request queue does not have a tag_set, which prevent testing
-> for the flag BLK_MQ_F_NO_SCHED indicating that the queue does not
-> require an elevator. This leads to an incorrect initialization of a
-> default elevator in some cases such as BIO based null_blk
-> (queue_mode == BIO) with zoned mode enabled as the default elevator in
-> this case is mq-deadline instead of "none".
+On 10/8/19 3:29 PM, Sasha Levin wrote:
+> On Tue, Oct 01, 2019 at 07:15:49PM +0200, Ilya Dryomov wrote:
+>> On Tue, Oct 1, 2019 at 6:39 PM Sasha Levin <sashal@kernel.org> wrote:
+>>>
+>>> From: Dongsheng Yang <dongsheng.yang@easystack.cn>
+>>>
+>>> [ Upstream commit 5435d2069503e2aa89c34a94154f4f2fa4a0c9c4 ]
+>>>
+>>> rbd_dev_image_id() allocates space for length but passes a smaller
+>>> value to rbd_obj_method_sync().  rbd_dev_v2_object_prefix() doesn't
+>>> allocate space for length.  Fix both to be consistent.
+>>>
+>>> Signed-off-by: Dongsheng Yang <dongsheng.yang@easystack.cn>
+>>> Reviewed-by: Ilya Dryomov <idryomov@gmail.com>
+>>> Signed-off-by: Ilya Dryomov <idryomov@gmail.com>
+>>> Signed-off-by: Sasha Levin <sashal@kernel.org>
+>>> ---
+>>>   drivers/block/rbd.c | 10 ++++++----
+>>>   1 file changed, 6 insertions(+), 4 deletions(-)
+>>>
+>>> diff --git a/drivers/block/rbd.c b/drivers/block/rbd.c
+>>> index c8fb886aebd4e..69db7385c8df5 100644
+>>> --- a/drivers/block/rbd.c
+>>> +++ b/drivers/block/rbd.c
+>>> @@ -5669,17 +5669,20 @@ static int rbd_dev_v2_image_size(struct rbd_device *rbd_dev)
+>>>
+>>>   static int rbd_dev_v2_object_prefix(struct rbd_device *rbd_dev)
+>>>   {
+>>> +       size_t size;
+>>>          void *reply_buf;
+>>>          int ret;
+>>>          void *p;
+>>>
+>>> -       reply_buf = kzalloc(RBD_OBJ_PREFIX_LEN_MAX, GFP_KERNEL);
+>>> +       /* Response will be an encoded string, which includes a length */
+>>> +       size = sizeof(__le32) + RBD_OBJ_PREFIX_LEN_MAX;
+>>> +       reply_buf = kzalloc(size, GFP_KERNEL);
+>>>          if (!reply_buf)
+>>>                  return -ENOMEM;
+>>>
+>>>          ret = rbd_obj_method_sync(rbd_dev, &rbd_dev->header_oid,
+>>>                                    &rbd_dev->header_oloc, "get_object_prefix",
+>>> -                                 NULL, 0, reply_buf, RBD_OBJ_PREFIX_LEN_MAX);
+>>> +                                 NULL, 0, reply_buf, size);
+>>>          dout("%s: rbd_obj_method_sync returned %d\n", __func__, ret);
+>>>          if (ret < 0)
+>>>                  goto out;
+>>> @@ -6696,7 +6699,6 @@ static int rbd_dev_image_id(struct rbd_device *rbd_dev)
+>>>          dout("rbd id object name is %s\n", oid.name);
+>>>
+>>>          /* Response will be an encoded string, which includes a length */
+>>> -
+>>>          size = sizeof (__le32) + RBD_IMAGE_ID_LEN_MAX;
+>>>          response = kzalloc(size, GFP_NOIO);
+>>>          if (!response) {
+>>> @@ -6708,7 +6710,7 @@ static int rbd_dev_image_id(struct rbd_device *rbd_dev)
+>>>
+>>>          ret = rbd_obj_method_sync(rbd_dev, &oid, &rbd_dev->header_oloc,
+>>>                                    "get_id", NULL, 0,
+>>> -                                 response, RBD_IMAGE_ID_LEN_MAX);
+>>> +                                 response, size);
+>>>          dout("%s: rbd_obj_method_sync returned %d\n", __func__, ret);
+>>>          if (ret == -ENOENT) {
+>>>                  image_id = kstrdup("", GFP_KERNEL);
+>>
+>> Hi Sasha,
+>>
+>> This patch just made things consistent, there was no bug here.  I don't
+>> think it should be backported.
 > 
-> Fix this by testing for a NULL queue mq_ops field which indicates that
-> the queue is BIO based and should not have an elevator.
-> 
-> Reported-by: Shinichiro Kawasaki <shinichiro.kawasaki@wdc.com>
-> Signed-off-by: Damien Le Moal <damien.lemoal@wdc.com>
-> ---
-> Changes from V1:
-> * Test if q->mq_ops is NULL to identify BIO based queues
-> 
->  block/elevator.c | 3 ++-
->  1 file changed, 2 insertions(+), 1 deletion(-)
-> 
-> diff --git a/block/elevator.c b/block/elevator.c
-> index 5437059c9261..076ba7308e65 100644
-> --- a/block/elevator.c
-> +++ b/block/elevator.c
-> @@ -616,7 +616,8 @@ int elevator_switch_mq(struct request_queue *q,
->  
->  static inline bool elv_support_iosched(struct request_queue *q)
->  {
-> -	if (q->tag_set && (q->tag_set->flags & BLK_MQ_F_NO_SCHED))
-> +	if (!q->mq_ops ||
-> +	    (q->tag_set && (q->tag_set->flags & BLK_MQ_F_NO_SCHED)))
->  		return false;
->  	return true;
->  }
-> 
+> I'll drop it, thanks!
 
-Looks good to me.
-Reviewed-by: Bob Liu <bob.liu@oracle.com>
+How did it even get picked up, it's not marked for stable?
+
+-- 
+Jens Axboe
 
