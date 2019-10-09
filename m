@@ -2,89 +2,123 @@ Return-Path: <SRS0=0s1t=YC=vger.kernel.org=linux-block-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-2.3 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
-	MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,USER_AGENT_SANE_1 autolearn=no
-	autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-9.8 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
+	INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,
+	URIBL_BLOCKED,USER_AGENT_GIT autolearn=unavailable autolearn_force=no
+	version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 3C072C47404
-	for <linux-block@archiver.kernel.org>; Wed,  9 Oct 2019 17:46:22 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 843DBECE58C
+	for <linux-block@archiver.kernel.org>; Wed,  9 Oct 2019 19:13:33 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.kernel.org (Postfix) with ESMTP id 0C200206BB
-	for <linux-block@archiver.kernel.org>; Wed,  9 Oct 2019 17:46:22 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id 64C90218AC
+	for <linux-block@archiver.kernel.org>; Wed,  9 Oct 2019 19:13:33 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1729883AbfJIRqV (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Wed, 9 Oct 2019 13:46:21 -0400
-Received: from mx1.redhat.com ([209.132.183.28]:1469 "EHLO mx1.redhat.com"
-        rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-        id S1728804AbfJIRqV (ORCPT <rfc822;linux-block@vger.kernel.org>);
-        Wed, 9 Oct 2019 13:46:21 -0400
-Received: from smtp.corp.redhat.com (int-mx05.intmail.prod.int.phx2.redhat.com [10.5.11.15])
-        (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
-        (No client certificate requested)
-        by mx1.redhat.com (Postfix) with ESMTPS id 694EF10A8124;
-        Wed,  9 Oct 2019 17:46:21 +0000 (UTC)
-Received: from localhost (ovpn-116-110.ams2.redhat.com [10.36.116.110])
-        by smtp.corp.redhat.com (Postfix) with ESMTP id F22CA5EE1D;
-        Wed,  9 Oct 2019 17:46:20 +0000 (UTC)
-Date:   Wed, 9 Oct 2019 18:46:19 +0100
-From:   Stefan Hajnoczi <stefanha@redhat.com>
-To:     Jens Axboe <axboe@kernel.dk>
-Cc:     linux-block@vger.kernel.org,
-        Aarushi Mehta <mehta.aaru20@gmail.com>,
-        Julia Suvorova <jusual@mail.ru>
-Subject: Re: liburing 0.2 release?
-Message-ID: <20191009174619.GJ13568@stefanha-x1.localdomain>
-References: <20191009083406.GA4327@stefanha-x1.localdomain>
- <414ccf6c-8591-a82b-9ae7-9b0f270d18e8@kernel.dk>
+        id S1731995AbfJITLY (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Wed, 9 Oct 2019 15:11:24 -0400
+Received: from mout.kundenserver.de ([212.227.126.134]:48089 "EHLO
+        mout.kundenserver.de" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S1731986AbfJITLY (ORCPT
+        <rfc822;linux-block@vger.kernel.org>); Wed, 9 Oct 2019 15:11:24 -0400
+Received: from threadripper.lan ([149.172.19.189]) by mrelayeu.kundenserver.de
+ (mreue011 [212.227.15.129]) with ESMTPA (Nemesis) id
+ 1N8XgH-1i5VgB1LZh-014SRC; Wed, 09 Oct 2019 21:11:22 +0200
+From:   Arnd Bergmann <arnd@arndb.de>
+To:     Al Viro <viro@zeniv.linux.org.uk>
+Cc:     linux-kernel@vger.kernel.org, y2038@lists.linaro.org,
+        linux-fsdevel@vger.kernel.org, Arnd Bergmann <arnd@arndb.de>,
+        Jens Axboe <axboe@kernel.dk>, linux-block@vger.kernel.org
+Subject: [PATCH v6 42/43] pktcdvd: add compat_ioctl handler
+Date:   Wed,  9 Oct 2019 21:10:43 +0200
+Message-Id: <20191009191044.308087-43-arnd@arndb.de>
+X-Mailer: git-send-email 2.20.0
+In-Reply-To: <20191009190853.245077-1-arnd@arndb.de>
+References: <20191009190853.245077-1-arnd@arndb.de>
 MIME-Version: 1.0
-Content-Type: multipart/signed; micalg=pgp-sha256;
-        protocol="application/pgp-signature"; boundary="451BZW+OUuJBCAYj"
-Content-Disposition: inline
-In-Reply-To: <414ccf6c-8591-a82b-9ae7-9b0f270d18e8@kernel.dk>
-User-Agent: Mutt/1.12.1 (2019-06-15)
-X-Scanned-By: MIMEDefang 2.79 on 10.5.11.15
-X-Greylist: Sender IP whitelisted, not delayed by milter-greylist-4.6.2 (mx1.redhat.com [10.5.110.64]); Wed, 09 Oct 2019 17:46:21 +0000 (UTC)
+Content-Transfer-Encoding: 8bit
+X-Provags-ID: V03:K1:93xVR2PSRzNKK3F6eEf3KloUW20yUoSchuNU1iTvhPWVCYwsH8H
+ z13+p8ef1mAztjV2JdOjKqOYgaMbqp2tn3Z/Vg8IrXIlrGafn4DCxbrq/pChzzAUUHcuEV9
+ RtB6cLBqK0HwCVek/0QpPj02Twg2C0IwFQBlScLKqgWIJIg8/tqbCevylU4jhp4uvGMzVBl
+ 3NURu7wv2UyKvLx5eGCaQ==
+X-UI-Out-Filterresults: notjunk:1;V03:K0:/Z06bO3lT6w=:6NXRRLxYm/LA0XwBWwo6Q7
+ p/KW3+sAt3EnBV6ubbtZExBdcmG9keJjb1cALDVt3+5J5dZnQNtMCpQZqSQrSXht8Ch+KQEUG
+ MD2bQvKIe+STPbvBSWGqwieBm7Nb6k22/aNSgdTepdK37zcaLHlAzt6ETugYcc8i8qCuQ23vz
+ QbqIM810G2lWNY8Ap3z60/POVSiooVUxgflLJ3iW/d3y2muXKmPowKXUdofL+6iQnTQ5dlXmg
+ dJKsOBWOfEtAvFnUtTy5qpbgVx1UCb1x0dYR19li7QIxHQbGImIFi4sxCanHAnpvZjTgO3XRr
+ lS+mJFtS4nU8uGOxE8cu06ALG8S0LQQeYCNXgIdS8+qw9i2WqSYUCmt0JRXwhh/ACr54BSerh
+ hOHIW0lShwaiuv8KRezSH42mGEBA2P0tK0W8I6MPKy9a4UZjVI/q46Fcll4C3+oun5NOK8F8r
+ 1HgADAwxOEctsr516d5iH4xzz/LDcZvyldyWsSEED9n7CZ7Hib4KnZNhkN4my+gFp3AySkUMs
+ 9Vysmz9349cTarI7TFSsIxmLZrho7bEtMoHh0NQYpq4yWmyl1sxk0RcMpATWBX/dgXoTAmlJQ
+ +br7DNaAzWs8uXFUdM5iiVhmD/dZQGeJF05wYsF33UeeuY9JyZRK44XrOIulA0ppKA799aIxY
+ TrlyWvXwzLaEUVi2Gmpcr6yonfuurYg1p7+y1oi0I2K5hDIBiYRbNzbWR3PD+8Z3jnrCsT0+X
+ DOM8GRXm297v4+bx+scA0bJ1R7XBVvz8IxrtzT3bwNAfxyXinOjCqZK68Ml/P0kfC/EZF8Bwt
+ FvkQTEKTAA29QbZszpwY36dp9F5SUveI9RVSd/U6TyhfPb2x6mbg0h+M1etFyQdCq8Ug/HyjY
+ r8LwN/SEfrpnWkDGz16Q==
 Sender: linux-block-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
+pkt_ioctl() implements the generic SCSI_IOCTL_SEND_COMMAND
+and some cdrom ioctls by forwarding to the underlying block
+device. For compat_ioctl handling, this always takes a
+roundtrip through fs/compat_ioctl.c that we should try
+to avoid, at least for the compatible commands.
 
---451BZW+OUuJBCAYj
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-Content-Transfer-Encoding: quoted-printable
+CDROM_SEND_PACKET is an exception here, it requires special
+translation in compat_blkdev_driver_ioctl().
 
-On Wed, Oct 09, 2019 at 05:40:16AM -0600, Jens Axboe wrote:
-> On 10/9/19 2:34 AM, Stefan Hajnoczi wrote:
-> > Hi Jens,
-> > I would like to add a liburing package to Fedora.  The liburing 0.1
-> > release was in January and there have been many changes since then.  Is
-> > now a good time for a 0.2 release?
->=20
-> I've been thinking the same. I'll need to go over the 0.1..0.2 additions
-> and ensure I'm happy with all of it (before it's set in stone), then we
-> can tag 0.2.
->=20
-> Let's aim for a 0.2 next week at the latest.
+CDROM_LAST_WRITTEN has no compat handling at the moment.
 
-Sounds great!
+Cc: Jens Axboe <axboe@kernel.dk>
+Cc: linux-block@vger.kernel.org
+Signed-off-by: Arnd Bergmann <arnd@arndb.de>
+---
+ drivers/block/pktcdvd.c | 25 +++++++++++++++++++++++++
+ 1 file changed, 25 insertions(+)
 
-Stefan
+diff --git a/drivers/block/pktcdvd.c b/drivers/block/pktcdvd.c
+index 76457003f140..ee67bf929fac 100644
+--- a/drivers/block/pktcdvd.c
++++ b/drivers/block/pktcdvd.c
+@@ -2663,6 +2663,28 @@ static int pkt_ioctl(struct block_device *bdev, fmode_t mode, unsigned int cmd,
+ 	return ret;
+ }
+ 
++#ifdef CONFIG_COMPAT
++static int pkt_compat_ioctl(struct block_device *bdev, fmode_t mode, unsigned int cmd, unsigned long arg)
++{
++	switch (cmd) {
++	/* compatible */
++	case CDROMEJECT:
++	case CDROMMULTISESSION:
++	case CDROMREADTOCENTRY:
++	case SCSI_IOCTL_SEND_COMMAND:
++		return pkt_ioctl(bdev, mode, cmd, (unsigned long)compat_ptr(arg));
++
++
++	/* FIXME: no handler so far */
++	case CDROM_LAST_WRITTEN:
++	/* handled in compat_blkdev_driver_ioctl */
++	case CDROM_SEND_PACKET:
++	default:
++		return -ENOIOCTLCMD;
++	}
++}
++#endif
++
+ static unsigned int pkt_check_events(struct gendisk *disk,
+ 				     unsigned int clearing)
+ {
+@@ -2684,6 +2706,9 @@ static const struct block_device_operations pktcdvd_ops = {
+ 	.open =			pkt_open,
+ 	.release =		pkt_close,
+ 	.ioctl =		pkt_ioctl,
++#ifdef CONFIG_COMPAT
++	.ioctl =		pkt_compat_ioctl,
++#endif
+ 	.check_events =		pkt_check_events,
+ };
+ 
+-- 
+2.20.0
 
---451BZW+OUuJBCAYj
-Content-Type: application/pgp-signature; name="signature.asc"
-
------BEGIN PGP SIGNATURE-----
-
-iQEzBAEBCAAdFiEEhpWov9P5fNqsNXdanKSrs4Grc8gFAl2eHOsACgkQnKSrs4Gr
-c8hdgwf/acCSUjyxlDBoWcV25uGVnEid1ZBCooZUllGpvitvXVlLFX3mqiXMuOpK
-6gYrudU7nTcLp75fKu5VZLRjGY9XygfSR3p9ChKQ2diUS2LV5/uA3NJ7vvqwKraY
-DdK30VPeh2DHE551ElWd/NWCddrP3yF3vfQ+KGZnXbnZPMVhZ2iDQVYTQ6VRPQqU
-vLikBkRhNbAkmwNo4WPhfJwVVkkHI655aCed/NCaI6y4CdnWvrOzxFf4NDloPnNA
-aK5xhJbUy7QJw7xlmicaTBCemHYDZccWn2pyZgZt+YT+7XOkYPlTmEcjh7ONUENO
-2c4bbiueQvJIWsruMYEDozU9FUsHyQ==
-=Xvq7
------END PGP SIGNATURE-----
-
---451BZW+OUuJBCAYj--
