@@ -7,26 +7,26 @@ X-Spam-Status: No, score=-9.8 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
 	URIBL_BLOCKED,USER_AGENT_GIT autolearn=unavailable autolearn_force=no
 	version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 3DF06ECE58D
-	for <linux-block@archiver.kernel.org>; Wed,  9 Oct 2019 19:26:20 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id B9423ECE58C
+	for <linux-block@archiver.kernel.org>; Wed,  9 Oct 2019 19:26:27 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.kernel.org (Postfix) with ESMTP id 15DF221BE5
-	for <linux-block@archiver.kernel.org>; Wed,  9 Oct 2019 19:26:20 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id 9A3F020B7C
+	for <linux-block@archiver.kernel.org>; Wed,  9 Oct 2019 19:26:27 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1732188AbfJIT0O (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Wed, 9 Oct 2019 15:26:14 -0400
-Received: from ale.deltatee.com ([207.54.116.67]:37656 "EHLO ale.deltatee.com"
+        id S1732242AbfJIT0V (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Wed, 9 Oct 2019 15:26:21 -0400
+Received: from ale.deltatee.com ([207.54.116.67]:37650 "EHLO ale.deltatee.com"
         rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-        id S1731974AbfJITZn (ORCPT <rfc822;linux-block@vger.kernel.org>);
+        id S1731957AbfJITZn (ORCPT <rfc822;linux-block@vger.kernel.org>);
         Wed, 9 Oct 2019 15:25:43 -0400
 Received: from cgy1-donard.priv.deltatee.com ([172.16.1.31])
         by ale.deltatee.com with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
         (Exim 4.89)
         (envelope-from <gunthorp@deltatee.com>)
-        id 1iIHaa-0002gD-6f; Wed, 09 Oct 2019 13:25:42 -0600
+        id 1iIHaa-0002g4-6l; Wed, 09 Oct 2019 13:25:42 -0600
 Received: from gunthorp by cgy1-donard.priv.deltatee.com with local (Exim 4.92)
         (envelope-from <gunthorp@deltatee.com>)
-        id 1iIHaZ-0003QV-B6; Wed, 09 Oct 2019 13:25:35 -0600
+        id 1iIHaY-0003Q4-DL; Wed, 09 Oct 2019 13:25:34 -0600
 From:   Logan Gunthorpe <logang@deltatee.com>
 To:     linux-kernel@vger.kernel.org, linux-nvme@lists.infradead.org,
         linux-block@vger.kernel.org, linux-fsdevel@vger.kernel.org
@@ -35,18 +35,19 @@ Cc:     Christoph Hellwig <hch@lst.de>, Sagi Grimberg <sagi@grimberg.me>,
         Chaitanya Kulkarni <Chaitanya.Kulkarni@wdc.com>,
         Max Gurtovoy <maxg@mellanox.com>,
         Stephen Bates <sbates@raithlin.com>,
-        Logan Gunthorpe <logang@deltatee.com>
-Date:   Wed,  9 Oct 2019 13:25:30 -0600
-Message-Id: <20191009192530.13079-14-logang@deltatee.com>
+        Logan Gunthorpe <logang@deltatee.com>,
+        Chaitanya Kulkarni <chaitanya.kulkarni@wdc.com>
+Date:   Wed,  9 Oct 2019 13:25:21 -0600
+Message-Id: <20191009192530.13079-5-logang@deltatee.com>
 X-Mailer: git-send-email 2.20.1
 In-Reply-To: <20191009192530.13079-1-logang@deltatee.com>
 References: <20191009192530.13079-1-logang@deltatee.com>
 MIME-Version: 1.0
 Content-Transfer-Encoding: 8bit
 X-SA-Exim-Connect-IP: 172.16.1.31
-X-SA-Exim-Rcpt-To: linux-nvme@lists.infradead.org, linux-kernel@vger.kernel.org, linux-block@vger.kernel.org, linux-fsdevel@vger.kernel.org, hch@lst.de, sagi@grimberg.me, kbusch@kernel.org, axboe@fb.com, Chaitanya.Kulkarni@wdc.com, maxg@mellanox.com, sbates@raithlin.com, logang@deltatee.com
+X-SA-Exim-Rcpt-To: linux-nvme@lists.infradead.org, linux-kernel@vger.kernel.org, linux-block@vger.kernel.org, linux-fsdevel@vger.kernel.org, hch@lst.de, sagi@grimberg.me, kbusch@kernel.org, axboe@fb.com, maxg@mellanox.com, sbates@raithlin.com, logang@deltatee.com, Chaitanya.Kulkarni@wdc.com, chaitanya.kulkarni@wdc.com
 X-SA-Exim-Mail-From: gunthorp@deltatee.com
-Subject: [PATCH v9 12/12] nvmet-passthru: support block accounting
+Subject: [PATCH v9 04/12] nvmet: make nvmet_copy_ns_identifier() non-static
 X-SA-Exim-Version: 4.2.1 (built Tue, 02 Aug 2016 21:08:31 +0000)
 X-SA-Exim-Scanned: Yes (on ale.deltatee.com)
 Sender: linux-block-owner@vger.kernel.org
@@ -54,40 +55,50 @@ Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-Support block disk accounting by setting the RQF_IO_STAT flag
-and gendisk in the request.
+This function will be needed by the upcoming passthru code.
 
-After this change, IO counts will be reflected correctly in
-/proc/diskstats for drives being used by passthru.
+Passthru will need an emulated version of identify_desclist which
+copies the eui64, uuid and nguid from the passed-thru controller into
+the request SGL.
 
+[chaitanya.kulkarni@wdc.com: this was factored out of a patch
+ originally authored by Chaitanya]
+Signed-off-by: Chaitanya Kulkarni <chaitanya.kulkarni@wdc.com>
 Signed-off-by: Logan Gunthorpe <logang@deltatee.com>
+Reviewed-by: Sagi Grimberg <sagi@grimberg.me>
 ---
- drivers/nvme/target/io-cmd-passthru.c | 5 ++++-
- 1 file changed, 4 insertions(+), 1 deletion(-)
+ drivers/nvme/target/admin-cmd.c | 4 ++--
+ drivers/nvme/target/nvmet.h     | 2 ++
+ 2 files changed, 4 insertions(+), 2 deletions(-)
 
-diff --git a/drivers/nvme/target/io-cmd-passthru.c b/drivers/nvme/target/io-cmd-passthru.c
-index c482e55f0fb8..37d06ebcbd0f 100644
---- a/drivers/nvme/target/io-cmd-passthru.c
-+++ b/drivers/nvme/target/io-cmd-passthru.c
-@@ -413,6 +413,9 @@ static struct request *nvmet_passthru_blk_make_request(struct nvmet_req *req,
- 	if (unlikely(IS_ERR(rq)))
- 		return rq;
+diff --git a/drivers/nvme/target/admin-cmd.c b/drivers/nvme/target/admin-cmd.c
+index 831a062d27cb..67b6642bb628 100644
+--- a/drivers/nvme/target/admin-cmd.c
++++ b/drivers/nvme/target/admin-cmd.c
+@@ -506,8 +506,8 @@ static void nvmet_execute_identify_nslist(struct nvmet_req *req)
+ 	nvmet_req_complete(req, status);
+ }
  
-+	if (blk_queue_io_stat(q))
-+		rq->rq_flags |= RQF_IO_STAT;
-+
- 	if (req->sg_cnt) {
- 		ret = nvmet_passthru_map_sg(req, rq);
- 		if (unlikely(ret)) {
-@@ -477,7 +480,7 @@ static void nvmet_passthru_execute_cmd(struct nvmet_req *req)
+-static u16 nvmet_copy_ns_identifier(struct nvmet_req *req, u8 type, u8 len,
+-				    void *id, off_t *off)
++u16 nvmet_copy_ns_identifier(struct nvmet_req *req, u8 type, u8 len,
++			     void *id, off_t *off)
+ {
+ 	struct nvme_ns_id_desc desc = {
+ 		.nidt = type,
+diff --git a/drivers/nvme/target/nvmet.h b/drivers/nvme/target/nvmet.h
+index 3d313a6452cc..5dfd4e0ae096 100644
+--- a/drivers/nvme/target/nvmet.h
++++ b/drivers/nvme/target/nvmet.h
+@@ -489,6 +489,8 @@ u16 nvmet_bdev_flush(struct nvmet_req *req);
+ u16 nvmet_file_flush(struct nvmet_req *req);
+ void nvmet_ns_changed(struct nvmet_subsys *subsys, u32 nsid);
  
- 	rq->end_io_data = req;
- 	if (req->sq->qid != 0) {
--		blk_execute_rq_nowait(rq->q, NULL, rq, 0,
-+		blk_execute_rq_nowait(rq->q, ns->disk, rq, 0,
- 				      nvmet_passthru_req_done);
- 	} else {
- 		req->p.rq = rq;
++u16 nvmet_copy_ns_identifier(struct nvmet_req *req, u8 type, u8 len,
++			     void *id, off_t *off);
+ static inline u32 nvmet_rw_len(struct nvmet_req *req)
+ {
+ 	return ((u32)le16_to_cpu(req->cmd->rw.length) + 1) <<
 -- 
 2.20.1
 
