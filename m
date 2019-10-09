@@ -2,127 +2,84 @@ Return-Path: <SRS0=0s1t=YC=vger.kernel.org=linux-block-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-2.3 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
-	MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,USER_AGENT_SANE_1 autolearn=no
-	autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-10.1 required=3.0 tests=DKIMWL_WL_HIGH,DKIM_SIGNED,
+	DKIM_VALID,DKIM_VALID_AU,INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,
+	SPF_HELO_NONE,SPF_PASS,USER_AGENT_GIT autolearn=ham autolearn_force=no
+	version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 4FFEFC47404
-	for <linux-block@archiver.kernel.org>; Wed,  9 Oct 2019 15:36:40 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 3EF48ECE58D
+	for <linux-block@archiver.kernel.org>; Wed,  9 Oct 2019 15:38:17 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.kernel.org (Postfix) with ESMTP id 3288C2190F
-	for <linux-block@archiver.kernel.org>; Wed,  9 Oct 2019 15:36:40 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id 043D021848
+	for <linux-block@archiver.kernel.org>; Wed,  9 Oct 2019 15:38:17 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+	s=default; t=1570635497;
+	bh=dAhvtaqSKk7/BeCp/U43sNqmrx6iFLyPfHJcY88cPXQ=;
+	h=From:To:Cc:Subject:Date:List-ID:From;
+	b=w7OMCUsN7Kk3mQnUmaYU/qDZCSeuV4l9XhkAs8NXz5GHXG9ntkhTLjF8rhmIHdf7a
+	 FhEF06zOQR1StyYCrXHVL2GLMXSvjcgnI+dtUCgLOX1imjVzWWt/zcOtfxHBs0OGTs
+	 KlILCSk1oO/GvUp3AHLgnw0LaECYNeJ26++SB4Tw=
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1731400AbfJIPgg (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Wed, 9 Oct 2019 11:36:36 -0400
-Received: from mx2.suse.de ([195.135.220.15]:36374 "EHLO mx1.suse.de"
-        rhost-flags-OK-OK-OK-FAIL) by vger.kernel.org with ESMTP
-        id S1730503AbfJIPgg (ORCPT <rfc822;linux-block@vger.kernel.org>);
-        Wed, 9 Oct 2019 11:36:36 -0400
-X-Virus-Scanned: by amavisd-new at test-mx.suse.de
-Received: from relay2.suse.de (unknown [195.135.220.254])
-        by mx1.suse.de (Postfix) with ESMTP id CA13FAD49;
-        Wed,  9 Oct 2019 15:36:33 +0000 (UTC)
-Date:   Wed, 9 Oct 2019 17:36:29 +0200
-From:   Michal =?iso-8859-1?Q?Koutn=FD?= <mkoutny@suse.com>
-To:     Tejun Heo <tj@kernel.org>
-Cc:     hannes@cmpxchg.org, clm@fb.com, dennisz@fb.com,
-        Josef Bacik <jbacik@fb.com>, kernel-team@fb.com,
-        newella@fb.com, lizefan@huawei.com, axboe@kernel.dk,
-        Paolo Valente <paolo.valente@linaro.org>,
-        Rik van Riel <riel@surriel.com>, josef@toxicpanda.com,
-        cgroups@vger.kernel.org, linux-block@vger.kernel.org,
-        linux-kernel@vger.kernel.org
-Subject: Re: [PATCH 08/10] blkcg: implement blk-iocost
-Message-ID: <20191009153629.GA5400@blackbody.suse.cz>
-References: <20190828220600.2527417-1-tj@kernel.org>
- <20190828220600.2527417-9-tj@kernel.org>
- <20190910125513.GA6399@blackbody.suse.cz>
- <20190910160855.GS2263813@devbig004.ftw2.facebook.com>
- <20191003145106.GC6678@blackbody.suse.cz>
- <20191003164552.GA3247445@devbig004.ftw2.facebook.com>
+        id S1729883AbfJIPiQ (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Wed, 9 Oct 2019 11:38:16 -0400
+Received: from mail.kernel.org ([198.145.29.99]:37616 "EHLO mail.kernel.org"
+        rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
+        id S1729865AbfJIPiQ (ORCPT <rfc822;linux-block@vger.kernel.org>);
+        Wed, 9 Oct 2019 11:38:16 -0400
+Received: from washi1.fujisawa.hgst.com (unknown [199.255.47.10])
+        (using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+        (No client certificate requested)
+        by mail.kernel.org (Postfix) with ESMTPSA id 5794B21848;
+        Wed,  9 Oct 2019 15:38:15 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+        s=default; t=1570635495;
+        bh=dAhvtaqSKk7/BeCp/U43sNqmrx6iFLyPfHJcY88cPXQ=;
+        h=From:To:Cc:Subject:Date:From;
+        b=xJBRwxnismyYsN9LAK2nDGW1YS0jThVIL6lMlt00hZzoqt9vX5N4/wMmVLPuiWbdl
+         P5OgbNGrDTpJBg8zHYT2rEXxlDLiS66SmlVBgcPQiBSQgqek2BtwZK84IrBHD46joS
+         j7giOMFD1mEUZg/ptVqRWTv5IrQXf3QZsW+LFh28=
+From:   kbusch@kernel.org
+To:     linux-block@vger.kernel.org, Jens Axboe <axboe@kernel.dk>
+Cc:     Keith Busch <kbusch@kernel.org>,
+        Chaitanya Kulkarni <chaitanya.kulkarni@wdc.com>
+Subject: [PATCH] null_blk: Fix zoned command return code
+Date:   Thu, 10 Oct 2019 00:38:13 +0900
+Message-Id: <20191009153813.4854-1-kbusch@kernel.org>
+X-Mailer: git-send-email 2.21.0
 MIME-Version: 1.0
-Content-Type: multipart/signed; micalg=pgp-sha256;
-        protocol="application/pgp-signature"; boundary="Kj7319i9nmIyA2yE"
-Content-Disposition: inline
-In-Reply-To: <20191003164552.GA3247445@devbig004.ftw2.facebook.com>
-User-Agent: Mutt/1.10.1 (2018-07-13)
+Content-Transfer-Encoding: 8bit
 Sender: linux-block-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
+From: Keith Busch <kbusch@kernel.org>
 
---Kj7319i9nmIyA2yE
-Content-Type: text/plain; charset=iso-8859-1
-Content-Disposition: inline
-Content-Transfer-Encoding: quoted-printable
+The return code from null_handle_zoned() sets the cmd->error value. Returning
+OK status when an error occured overwrites the intended cmd->error. Return the
+appropriate error code instead of setting the error in the cmd.
 
-On Thu, Oct 03, 2019 at 09:45:52AM -0700, Tejun Heo <tj@kernel.org> wrote:
-> [...] but the qos file gets weird because the content of the file is
-> more resource control policies than device properties.
-I see two facets on this -- the semantics of the QoS controls and
-storing controller parameters generally.
+Fixes: fceb5d1b19cbe626 ("null_blk: create a helper for zoned devices")
+Cc: Chaitanya Kulkarni <chaitanya.kulkarni@wdc.com>
+Signed-off-by: Keith Busch <kbusch@kernel.org>
+---
+ drivers/block/null_blk_zoned.c | 3 +--
+ 1 file changed, 1 insertion(+), 2 deletions(-)
 
-Because I'm not fully convinced using the root cgroup for the latter is
-a good idea and I don't have a better one (what about
-/sys/kernel/cgroup/?), I'd like to question the former to potentially
-postpone finding the place for its parameters :-)
+diff --git a/drivers/block/null_blk_zoned.c b/drivers/block/null_blk_zoned.c
+index eabc116832a7..3d7fdea872f8 100644
+--- a/drivers/block/null_blk_zoned.c
++++ b/drivers/block/null_blk_zoned.c
+@@ -142,8 +142,7 @@ static blk_status_t null_zone_reset(struct nullb_cmd *cmd, sector_t sector)
+ 		zone->wp = zone->start;
+ 		break;
+ 	default:
+-		cmd->error = BLK_STS_NOTSUPP;
+-		break;
++		return BLK_STS_NOTSUPP;
+ 	}
+ 	return BLK_STS_OK;
+ }
+-- 
+2.21.0
 
-
-On Wed, Aug 28, 2019 at 03:05:58PM -0700, Tejun Heo <tj@kernel.org> wrote:
-> [...]
-> Please see the top comment in blk-iocost.c and documentation for
-> more details.
-I admit I did't grasp the explanations in the cgroup-v2.rst, perhaps
-some of the explanations from blk-iocost.c would be useful there as
-well.
-
-IIUC, the controls are supposed to be abstracted and generic to express
-high-level ideas and be independent of particular details.
-Here a bunch of parameters is introduced whose tuning may become a
-complex optimization task.
-
-What is the metric that is the QoS controller striving to guarantee?
-How does it differ from the io.latency policy?
-
-
-> [...]=20
-> + * 2-2. Vrate Adjustment
-> + * [...] When this delay becomes noticeable, it's a clear
-> + * indication that the device is saturated and we lower the vrate.  This
-> + * saturation signal is fairly conservative as it only triggers when both
-> + * hardware and software queues are filled up, and is used as the default
-> + * busy signal.
-(The following paragraph is based only on na=EFve understanding of the
-block layer.) So the device's vrate is lowered, causing its vtime
-growing slower, i.e.  postponing issuing an IO later for all cgroups
-accessing the device. But what's the purpose of this? If the queues fill
-up, wouldn't be all naturally pushed back by the longer queue time
-anyway? And wouldn't slowing down the device's vtime just cause queueing
-elsewhere?
-
-Thanks,
-Michal
-
---Kj7319i9nmIyA2yE
-Content-Type: application/pgp-signature; name="signature.asc"
-Content-Description: Digital signature
-
------BEGIN PGP SIGNATURE-----
-
-iQIzBAEBCAAdFiEEEoQaUCWq8F2Id1tNia1+riC5qSgFAl2d/nUACgkQia1+riC5
-qSgceA//QDkptfj5otDY4KHhLNVykDf/CbJN9RXtXKVybJ+GMFUF0hZqur090XJ/
-OIy+rmh6WXf6HEislGKoc9UvRxko+6jxteR1ROd9b9S4tzQib1vJ8i2euw61uO8U
-PLhkmGGU7vXvMwdI07vrmfI7XnrCH7cC1gAVkZ25m7NPwDGTq55h0h9FZDhcyJWL
-PI66dmr5yJnfV6W+A/JmlzUV0s7D2h9KFiPm1wxtxQaCacsN5A54OyqMvgJ+W1WM
-5+udGwMol41ukl9VeHQEhrsx0gRFwIzP6P/zS4tGiFmxyPEGkH6o+nXSUKdOAm6I
-91Z7bCI6dFVZHAA4BXzpEpMQAQADk654H3OPhxxKrb9jtPMm+SoC7Ch87bbb0uc3
-8WfjMl4DNaEroncGCFEI/i5YfA/8hh9yRktC0SZ3KKDMm/Ne4P0PPtK25JTjRynM
-2T030Z2RGSs0EjBw4e/6mhsb4NpuQczoQ4bMKxFDj13gX2myWwxKuBz5BBfi8npl
-u/z6RDT1DVekTBHGE3tycDdwzFFZ7iXLgjJMQpQK+nyZIk3/dHqrSF0QDhz6dST4
-rLUbzAzhATbDMGIswWvl57/CloudeL9oSev6HFCNGnhL4yMp2ue0RkGG1vTaNLgy
-3VKYlosU7zWHM8sSj+3/dxLVZAaHT85veMWUjdv9l8x8jAD/snc=
-=JD5Q
------END PGP SIGNATURE-----
-
---Kj7319i9nmIyA2yE--
