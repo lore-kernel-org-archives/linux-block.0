@@ -2,159 +2,141 @@ Return-Path: <SRS0=0s1t=YC=vger.kernel.org=linux-block-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-8.3 required=3.0 tests=DKIM_SIGNED,DKIM_VALID,
-	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,
-	SPF_HELO_NONE,SPF_PASS,USER_AGENT_SANE_1 autolearn=unavailable
-	autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-3.8 required=3.0 tests=DKIM_SIGNED,DKIM_VALID,
+	DKIM_VALID_AU,FREEMAIL_FORGED_FROMDOMAIN,FREEMAIL_FROM,
+	HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,
+	SPF_PASS,URIBL_BLOCKED autolearn=no autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id A644CECE58E
-	for <linux-block@archiver.kernel.org>; Wed,  9 Oct 2019 03:45:26 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 909F2ECE58D
+	for <linux-block@archiver.kernel.org>; Wed,  9 Oct 2019 08:27:09 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.kernel.org (Postfix) with ESMTP id 680DD20B7C
-	for <linux-block@archiver.kernel.org>; Wed,  9 Oct 2019 03:45:26 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id 69379218DE
+	for <linux-block@archiver.kernel.org>; Wed,  9 Oct 2019 08:27:09 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel-dk.20150623.gappssmtp.com header.i=@kernel-dk.20150623.gappssmtp.com header.b="lzHc6dfn"
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="UhQ+YyCt"
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1729285AbfJIDpZ (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Tue, 8 Oct 2019 23:45:25 -0400
-Received: from mail-pl1-f193.google.com ([209.85.214.193]:33669 "EHLO
-        mail-pl1-f193.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1726765AbfJIDpZ (ORCPT
-        <rfc822;linux-block@vger.kernel.org>); Tue, 8 Oct 2019 23:45:25 -0400
-Received: by mail-pl1-f193.google.com with SMTP id d22so377940pls.0
-        for <linux-block@vger.kernel.org>; Tue, 08 Oct 2019 20:45:23 -0700 (PDT)
+        id S1729206AbfJII1I (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Wed, 9 Oct 2019 04:27:08 -0400
+Received: from mail-lj1-f195.google.com ([209.85.208.195]:36681 "EHLO
+        mail-lj1-f195.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S1725776AbfJII1I (ORCPT
+        <rfc822;linux-block@vger.kernel.org>); Wed, 9 Oct 2019 04:27:08 -0400
+Received: by mail-lj1-f195.google.com with SMTP id v24so1579068ljj.3;
+        Wed, 09 Oct 2019 01:27:07 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=kernel-dk.20150623.gappssmtp.com; s=20150623;
-        h=subject:to:cc:references:from:message-id:date:user-agent
-         :mime-version:in-reply-to:content-language:content-transfer-encoding;
-        bh=liff+2I181mBeYcP7vnPa93eBbGSoVxP2sz1/iUSuJA=;
-        b=lzHc6dfnxI3dTD9LV+12XsYQ1hfX4oAzzxy28wzYWGuzZM3OrIjcsVdMJsl2NCRffU
-         nWHgdMrHBTKPRwoxwzLvUhyy8+d2CPtNvSNRmbX+PAPE0Ock4jWRBw/8L7PZq6VSYJx6
-         Wv8bE4jrOsVmNqFT23UsmDV0HmsolL/P4rXtlBlF+xM0rKtomvz/At5XZpHwH2tV/p/X
-         2tPKwyTBRpPAicoHU6BbukbZuruFT9/c0DLwvVTqcGPa4gaWWoIx5Xo9vxUbogtWfuM5
-         VWd9rWEFHfhBen67fEILP6GH7uk3wS10t9Etur1Gac3M1FmL3+9NljBpx/B9grMGbZOB
-         X4bg==
+        d=gmail.com; s=20161025;
+        h=mime-version:references:in-reply-to:from:date:message-id:subject:to
+         :cc:content-transfer-encoding;
+        bh=Yfhq1E9yXZ/dYz+RVAVCb0hvNZMSRLRp5FqR0oMniw8=;
+        b=UhQ+YyCtUNwtGdm86BvN4GFLTsXupQwGs/C6jW6LXsoowPk1p8iIIACRu+tEqNtSRD
+         WoLS0J2tkE60S2ddmz7wzzvAIxfBD2dW5zVjSoB1EyLOxhVNB8ZIySMqXpouEig+qNNc
+         pWNqEIRZszJ0bsrs9dEpWgBhWFZGnJMwObIu7GArxEaU9rWh+PCv5IV+eClF4j2stKxT
+         TpK5dpsY4zF/HzBbtkCYW3IAXvrq7eWLxKjc6rR5A6e7VkvIDRDAzt4imyM9Ee+bqr7r
+         oY2+uA66UrIWklo45IZ7Xbd6dxrTBQJqO8NaBloyc4JWasUOm4xyC7cC5Iakfnh0ZQ1w
+         nvTg==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=1e100.net; s=20161025;
-        h=x-gm-message-state:subject:to:cc:references:from:message-id:date
-         :user-agent:mime-version:in-reply-to:content-language
-         :content-transfer-encoding;
-        bh=liff+2I181mBeYcP7vnPa93eBbGSoVxP2sz1/iUSuJA=;
-        b=cr69WjM18FOBS3+Kidk0v8ZM9nQ/Mngtd9m0LZiKJnA+SvFCfctE5ddaxnOXOnxPpK
-         EPHHvmT4dLMRLrfy+pA63/ESBSLQY2XsgthpXWVxIXTmOoeKMpqkaIe886U92kW8d9TS
-         KN5Ap/Ds1O4caUtHqlP5sYvnJn3AK5LGP4TcIU9zKfgcvDhquWNhgNLsyB5DzCe+8+pB
-         PbidyYmFj/TgifKDGy2oJV2onec1HMmg9kagP0HVIh6wlzB8IfArW6Px3AwMyx21KCZX
-         NSm4eO76hvdvEnBIefOWcwaMJCCr1g6K24U5NtOjUaZ9Qim0BtPbUZMb//v1xQ0Xa2zc
-         Liug==
-X-Gm-Message-State: APjAAAVbOiPtpYiscPUpkk6iB+qCopYmE8PUxHNQg4Y7vTvOK7mR0gcE
-        jCXVHqVEfjDkffHdKZKRNwW8189dR0gavQ==
-X-Google-Smtp-Source: APXvYqzfO/3qMUWyXK1s8QSMSKpYAi65qrIiMZYufP6UyQiC5vB5Y5+5O56CER+1kzI4YCQYOTisoQ==
-X-Received: by 2002:a17:902:8d8e:: with SMTP id v14mr1030449plo.287.1570592721944;
-        Tue, 08 Oct 2019 20:45:21 -0700 (PDT)
-Received: from [192.168.1.188] ([66.219.217.79])
-        by smtp.gmail.com with ESMTPSA id w11sm563669pfd.116.2019.10.08.20.45.19
-        (version=TLS1_2 cipher=ECDHE-RSA-AES128-GCM-SHA256 bits=128/128);
-        Tue, 08 Oct 2019 20:45:20 -0700 (PDT)
-Subject: Re: [PATCH AUTOSEL 5.3 15/71] rbd: fix response length parameter for
- encoded strings
-To:     Sasha Levin <sashal@kernel.org>, Ilya Dryomov <idryomov@gmail.com>
-Cc:     LKML <linux-kernel@vger.kernel.org>, stable@vger.kernel.org,
-        Dongsheng Yang <dongsheng.yang@easystack.cn>,
-        Ceph Development <ceph-devel@vger.kernel.org>,
-        linux-block <linux-block@vger.kernel.org>
-References: <20191001163922.14735-1-sashal@kernel.org>
- <20191001163922.14735-15-sashal@kernel.org>
- <CAOi1vP-2iSHxJVOabN05+NCiSZ0DxBC9fGN=5cx98mk5RvaDZA@mail.gmail.com>
- <20191008212944.GD1396@sasha-vm>
-From:   Jens Axboe <axboe@kernel.dk>
-Message-ID: <ecddc946-4fbf-4bb2-aac2-689135473f36@kernel.dk>
-Date:   Tue, 8 Oct 2019 21:45:18 -0600
-User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:60.0) Gecko/20100101
- Thunderbird/60.8.0
+        h=x-gm-message-state:mime-version:references:in-reply-to:from:date
+         :message-id:subject:to:cc:content-transfer-encoding;
+        bh=Yfhq1E9yXZ/dYz+RVAVCb0hvNZMSRLRp5FqR0oMniw8=;
+        b=aIO5uwRgEKEtiCSxxJQJZsVE2g6YxCKk7Q95dzP4XPkOUHGv+YBx52VP6wp2hx8G7O
+         WH8qx9o0QzZh5VXCBlbswsOSd+N+suar87/W5wKJVIeNHrBh3WB3Y1aNxxehQE5q0Qyq
+         JxvQiZhCIXj6AKKX/lT1eSLhvxCnZB8Pg8Hydo4/ea8IVJCHHAEUyu7bSypVmmy5ecBS
+         SS5p7nKZDToMFVmIgA8ZJ1FVTLCxr9GbYr//l7qR6JYFwt1PAPhAJo6S3DfkmqDswMRZ
+         380x100ZFMy3zzILfFGB5aZSfS5RK7O1bUVOCx1Fe3cVH8gzDwRUK1PMfYp6eVkJ5UJU
+         TqiA==
+X-Gm-Message-State: APjAAAVdx3XBYcdsA/q9nAoeqFU+dPfAL95wd9XpCVfxP5J4fn9q9tSn
+        ERcPL0p1hhSpvveeqjfbPe7JWhgEZdvAlTaB2hk=
+X-Google-Smtp-Source: APXvYqw8+QxjriCPr/LEMjTWfI6k5EvDIBoouA2L8BRkiFGC2hQfpKg8xOBM3vUWML19Rl1TqHnCykr2vjuihcEkBLg=
+X-Received: by 2002:a2e:9b8a:: with SMTP id z10mr1511882lji.66.1570609626427;
+ Wed, 09 Oct 2019 01:27:06 -0700 (PDT)
 MIME-Version: 1.0
-In-Reply-To: <20191008212944.GD1396@sasha-vm>
-Content-Type: text/plain; charset=utf-8
-Content-Language: en-US
-Content-Transfer-Encoding: 7bit
+References: <20190925122025.31246-1-yuyufen@huawei.com>
+In-Reply-To: <20190925122025.31246-1-yuyufen@huawei.com>
+From:   Jack Wang <jack.wang.usish@gmail.com>
+Date:   Wed, 9 Oct 2019 10:26:55 +0200
+Message-ID: <CA+res+QQtXD6phz=Ko-_n7eWVySrJA1kqgmMW3h3YUX+5RQ_7w@mail.gmail.com>
+Subject: Re: [PATCH v4] block: fix null pointer dereference in blk_mq_rq_timed_out()
+To:     Yufen Yu <yuyufen@huawei.com>
+Cc:     Jens Axboe <axboe@kernel.dk>, linux-block@vger.kernel.org,
+        Ming Lei <ming.lei@redhat.com>,
+        Christoph Hellwig <hch@infradead.org>,
+        Keith Busch <keith.busch@intel.com>,
+        Bart Van Assche <bvanassche@acm.org>,
+        stable <stable@vger.kernel.org>, guoqing.jiang@cloud.ionos.com,
+        jinpu.wang@cloud.ionos.com
+Content-Type: text/plain; charset="UTF-8"
+Content-Transfer-Encoding: quoted-printable
 Sender: linux-block-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-On 10/8/19 3:29 PM, Sasha Levin wrote:
-> On Tue, Oct 01, 2019 at 07:15:49PM +0200, Ilya Dryomov wrote:
->> On Tue, Oct 1, 2019 at 6:39 PM Sasha Levin <sashal@kernel.org> wrote:
->>>
->>> From: Dongsheng Yang <dongsheng.yang@easystack.cn>
->>>
->>> [ Upstream commit 5435d2069503e2aa89c34a94154f4f2fa4a0c9c4 ]
->>>
->>> rbd_dev_image_id() allocates space for length but passes a smaller
->>> value to rbd_obj_method_sync().  rbd_dev_v2_object_prefix() doesn't
->>> allocate space for length.  Fix both to be consistent.
->>>
->>> Signed-off-by: Dongsheng Yang <dongsheng.yang@easystack.cn>
->>> Reviewed-by: Ilya Dryomov <idryomov@gmail.com>
->>> Signed-off-by: Ilya Dryomov <idryomov@gmail.com>
->>> Signed-off-by: Sasha Levin <sashal@kernel.org>
->>> ---
->>>   drivers/block/rbd.c | 10 ++++++----
->>>   1 file changed, 6 insertions(+), 4 deletions(-)
->>>
->>> diff --git a/drivers/block/rbd.c b/drivers/block/rbd.c
->>> index c8fb886aebd4e..69db7385c8df5 100644
->>> --- a/drivers/block/rbd.c
->>> +++ b/drivers/block/rbd.c
->>> @@ -5669,17 +5669,20 @@ static int rbd_dev_v2_image_size(struct rbd_device *rbd_dev)
->>>
->>>   static int rbd_dev_v2_object_prefix(struct rbd_device *rbd_dev)
->>>   {
->>> +       size_t size;
->>>          void *reply_buf;
->>>          int ret;
->>>          void *p;
->>>
->>> -       reply_buf = kzalloc(RBD_OBJ_PREFIX_LEN_MAX, GFP_KERNEL);
->>> +       /* Response will be an encoded string, which includes a length */
->>> +       size = sizeof(__le32) + RBD_OBJ_PREFIX_LEN_MAX;
->>> +       reply_buf = kzalloc(size, GFP_KERNEL);
->>>          if (!reply_buf)
->>>                  return -ENOMEM;
->>>
->>>          ret = rbd_obj_method_sync(rbd_dev, &rbd_dev->header_oid,
->>>                                    &rbd_dev->header_oloc, "get_object_prefix",
->>> -                                 NULL, 0, reply_buf, RBD_OBJ_PREFIX_LEN_MAX);
->>> +                                 NULL, 0, reply_buf, size);
->>>          dout("%s: rbd_obj_method_sync returned %d\n", __func__, ret);
->>>          if (ret < 0)
->>>                  goto out;
->>> @@ -6696,7 +6699,6 @@ static int rbd_dev_image_id(struct rbd_device *rbd_dev)
->>>          dout("rbd id object name is %s\n", oid.name);
->>>
->>>          /* Response will be an encoded string, which includes a length */
->>> -
->>>          size = sizeof (__le32) + RBD_IMAGE_ID_LEN_MAX;
->>>          response = kzalloc(size, GFP_NOIO);
->>>          if (!response) {
->>> @@ -6708,7 +6710,7 @@ static int rbd_dev_image_id(struct rbd_device *rbd_dev)
->>>
->>>          ret = rbd_obj_method_sync(rbd_dev, &oid, &rbd_dev->header_oloc,
->>>                                    "get_id", NULL, 0,
->>> -                                 response, RBD_IMAGE_ID_LEN_MAX);
->>> +                                 response, size);
->>>          dout("%s: rbd_obj_method_sync returned %d\n", __func__, ret);
->>>          if (ret == -ENOENT) {
->>>                  image_id = kstrdup("", GFP_KERNEL);
->>
->> Hi Sasha,
->>
->> This patch just made things consistent, there was no bug here.  I don't
->> think it should be backported.
-> 
-> I'll drop it, thanks!
+Yufen Yu <yuyufen@huawei.com> =E4=BA=8E2019=E5=B9=B49=E6=9C=8826=E6=97=A5=
+=E5=91=A8=E5=9B=9B =E4=B8=8A=E5=8D=8811:30=E5=86=99=E9=81=93=EF=BC=9A
+>
+> We got a null pointer deference BUG_ON in blk_mq_rq_timed_out()
+> as following:
+>
+> [  108.825472] BUG: kernel NULL pointer dereference, address: 00000000000=
+00040
+> [  108.827059] PGD 0 P4D 0
+> [  108.827313] Oops: 0000 [#1] SMP PTI
+> [  108.827657] CPU: 6 PID: 198 Comm: kworker/6:1H Not tainted 5.3.0-rc8+ =
+#431
+> [  108.829503] Workqueue: kblockd blk_mq_timeout_work
+> [  108.829913] RIP: 0010:blk_mq_check_expired+0x258/0x330
+> [  108.838191] Call Trace:
+> [  108.838406]  bt_iter+0x74/0x80
+> [  108.838665]  blk_mq_queue_tag_busy_iter+0x204/0x450
+> [  108.839074]  ? __switch_to_asm+0x34/0x70
+> [  108.839405]  ? blk_mq_stop_hw_queue+0x40/0x40
+> [  108.839823]  ? blk_mq_stop_hw_queue+0x40/0x40
+> [  108.840273]  ? syscall_return_via_sysret+0xf/0x7f
+> [  108.840732]  blk_mq_timeout_work+0x74/0x200
+> [  108.841151]  process_one_work+0x297/0x680
+> [  108.841550]  worker_thread+0x29c/0x6f0
+> [  108.841926]  ? rescuer_thread+0x580/0x580
+> [  108.842344]  kthread+0x16a/0x1a0
+> [  108.842666]  ? kthread_flush_work+0x170/0x170
+> [  108.843100]  ret_from_fork+0x35/0x40
+>
+> The bug is caused by the race between timeout handle and completion for
+> flush request.
+>
+> When timeout handle function blk_mq_rq_timed_out() try to read
+> 'req->q->mq_ops', the 'req' have completed and reinitiated by next
+> flush request, which would call blk_rq_init() to clear 'req' as 0.
+>
+> After commit 12f5b93145 ("blk-mq: Remove generation seqeunce"),
+> normal requests lifetime are protected by refcount. Until 'rq->ref'
+> drop to zero, the request can really be free. Thus, these requests
+> cannot been reused before timeout handle finish.
+>
+> However, flush request has defined .end_io and rq->end_io() is still
+> called even if 'rq->ref' doesn't drop to zero. After that, the 'flush_rq'
+> can be reused by the next flush request handle, resulting in null
+> pointer deference BUG ON.
+>
+> We fix this problem by covering flush request with 'rq->ref'.
+> If the refcount is not zero, flush_end_io() return and wait the
+> last holder recall it. To record the request status, we add a new
+> entry 'rq_status', which will be used in flush_end_io().
+>
+> Cc: Ming Lei <ming.lei@redhat.com>
+> Cc: Christoph Hellwig <hch@infradead.org>
+> Cc: Keith Busch <keith.busch@intel.com>
+> Cc: Bart Van Assche <bvanassche@acm.org>
+> Cc: stable@vger.kernel.org # v4.18+
+> Signed-off-by: Yufen Yu <yuyufen@huawei.com>
+>
+Hi Yufen,
 
-How did it even get picked up, it's not marked for stable?
+Can you share your reproducer, I think the bug was there for long
+time, we hit it in kernel 4.4.
+We also need to fix it for older LTS kernel.
 
--- 
-Jens Axboe
+Do you have an idea, how should we fix it for older LTS kernel?
 
+Regards,
+Jack Wang
