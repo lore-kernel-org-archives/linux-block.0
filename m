@@ -2,78 +2,80 @@ Return-Path: <SRS0=jW7Q=YD=vger.kernel.org=linux-block-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-5.2 required=3.0 tests=DKIM_SIGNED,DKIM_VALID,
-	HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,
-	SPF_PASS,URIBL_BLOCKED,USER_AGENT_SANE_1 autolearn=ham autolearn_force=no
-	version=3.4.0
+X-Spam-Status: No, score=-2.3 required=3.0 tests=DKIM_SIGNED,DKIM_VALID,
+	HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,
+	USER_AGENT_SANE_1 autolearn=no autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id C6DE7C4360C
-	for <linux-block@archiver.kernel.org>; Thu, 10 Oct 2019 13:57:00 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 83CC0C4360C
+	for <linux-block@archiver.kernel.org>; Thu, 10 Oct 2019 15:45:19 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.kernel.org (Postfix) with ESMTP id 9A17121929
-	for <linux-block@archiver.kernel.org>; Thu, 10 Oct 2019 13:57:00 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id 5E0162196E
+	for <linux-block@archiver.kernel.org>; Thu, 10 Oct 2019 15:45:19 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=pass (2048-bit key) header.d=toxicpanda-com.20150623.gappssmtp.com header.i=@toxicpanda-com.20150623.gappssmtp.com header.b="brKX8AGH"
+	dkim=pass (2048-bit key) header.d=kernel-dk.20150623.gappssmtp.com header.i=@kernel-dk.20150623.gappssmtp.com header.b="KBjERMhY"
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1726131AbfJJN47 (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Thu, 10 Oct 2019 09:56:59 -0400
-Received: from mail-qt1-f181.google.com ([209.85.160.181]:46798 "EHLO
-        mail-qt1-f181.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1725988AbfJJN47 (ORCPT
+        id S1726393AbfJJPpS (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Thu, 10 Oct 2019 11:45:18 -0400
+Received: from mail-io1-f49.google.com ([209.85.166.49]:43523 "EHLO
+        mail-io1-f49.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S1726273AbfJJPpR (ORCPT
         <rfc822;linux-block@vger.kernel.org>);
-        Thu, 10 Oct 2019 09:56:59 -0400
-Received: by mail-qt1-f181.google.com with SMTP id u22so8765725qtq.13
-        for <linux-block@vger.kernel.org>; Thu, 10 Oct 2019 06:56:57 -0700 (PDT)
+        Thu, 10 Oct 2019 11:45:17 -0400
+Received: by mail-io1-f49.google.com with SMTP id v2so14726134iob.10
+        for <linux-block@vger.kernel.org>; Thu, 10 Oct 2019 08:45:15 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=toxicpanda-com.20150623.gappssmtp.com; s=20150623;
-        h=date:from:to:cc:subject:message-id:references:mime-version
-         :content-disposition:in-reply-to:user-agent;
-        bh=xCIpw3rx5fAU7TZxetuXrfOkSP3oSGobe1/1dnDRzEg=;
-        b=brKX8AGHf56UdvlCsUj5lynFN7p2wFZCJuBYmwXCDdSzFgAaI9gfA1q3qkzv82RA+U
-         /uHcR686GkdkDho3KfFU1yiVPVJkILyHqueQd/JI53BMEbca009zkDMC09BKHMve1Q23
-         2YG/1SSczpRDdIpP6ho66sVbAyzX6dCREa8zBTyj8rBzaWM4732J2UnyXjj9kT6I1tfl
-         bJJOU+FFB0fD0HUH3rOs2wuPU93ijXF5+QjV3IzMaMGbIC2FzLkxyGpKpSsMoVeJ4dhA
-         2qZ6ayAaDzjN/fJUPbJtw72TJoihF8m8RTZI5+NWJNRWBhfACtZkaFfOWc++vji7xq9H
-         SiXA==
+        d=kernel-dk.20150623.gappssmtp.com; s=20150623;
+        h=subject:to:cc:references:from:message-id:date:user-agent
+         :mime-version:in-reply-to:content-language:content-transfer-encoding;
+        bh=jG1vSVFd42A8VxlUnazw+9DsccU/V6NMBizBsW1Hoqc=;
+        b=KBjERMhYNuhrDthAa6DUlda3ll0Qunv8OTnKbVCR57zchuNftLkNfzHgp0zuUqPnnV
+         AEaY9nn7AMT2UFZgc4C9ZFCfMSXHoMomqU9bt4JF/aXyMH+Jmtp6Gap0Pxzd7yYEVxLn
+         FkxYIsPLVNcf4FAmfqLIzYnjbwWtRArXH5f17k6AhmeiTzQ0WVt7RUiourC2BCAvZ6C5
+         4zT1/QeiPHNckIL/CJSpQUxKErIv3MZT60UhOxeB/dTnu0sf0//0HUGcIJOFzzqMZfm+
+         p06M116OKTeYwYFv7DfTjCrpyXIOUSqxgh2Z0tKCwlLg5yFun07/V3Dlz4POoQALarSh
+         O5Gw==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=1e100.net; s=20161025;
-        h=x-gm-message-state:date:from:to:cc:subject:message-id:references
-         :mime-version:content-disposition:in-reply-to:user-agent;
-        bh=xCIpw3rx5fAU7TZxetuXrfOkSP3oSGobe1/1dnDRzEg=;
-        b=kzOap2yllBCS5n4Ro3liccq4i/Lqf+hy69tGFA0vVy/SKpCY2BYmJNLxwFVTLQSwcK
-         Xqc953vmkEsML+PqBeSvJZdR/Zz6ALyZs0n9AR6VKcOuSWXqz17yOj/9+AdHMyWkwOB/
-         t9v6F4xMUTPVeSYagnf8l2BDPlA14v9dWO+6XNB3eBl3lhZnnTH+r2LmYIZNFrTyApdf
-         YJo7tTpQOg7XlQMgnsf4NiPc11Jr7YatYtOjhiJtUo1esrYX7zsdDa3JtaE20UhY9EQl
-         EzJT0KEZaW845xIPso2osXP0OWC1kbd6MgN1MJd3tgXmn5cZkq82gf2DfriuYNGoNP5j
-         GLdQ==
-X-Gm-Message-State: APjAAAUDuwPjnQSBWNe9KQK80tzKObxMgw8xcSuZ/kMs4nD60aaE4S9D
-        n8di3Jkn0Gk+QWxz+bmhFFHsRQ==
-X-Google-Smtp-Source: APXvYqxF6jvlqWBmKjnV4d0At+yaZviJsRJz9ErCCzA10Wz8LUzxdZSHuOOstTpwT2Pj5APaz0YHHw==
-X-Received: by 2002:aed:3ec8:: with SMTP id o8mr10598501qtf.386.1570715817086;
-        Thu, 10 Oct 2019 06:56:57 -0700 (PDT)
-Received: from localhost ([2620:10d:c091:480::18ce])
-        by smtp.gmail.com with ESMTPSA id b16sm3235944qtk.65.2019.10.10.06.56.56
+        h=x-gm-message-state:subject:to:cc:references:from:message-id:date
+         :user-agent:mime-version:in-reply-to:content-language
+         :content-transfer-encoding;
+        bh=jG1vSVFd42A8VxlUnazw+9DsccU/V6NMBizBsW1Hoqc=;
+        b=TCvSABTFy4HCtGBQ/b+5gq6TFat6zC+gzrNIBRlqFi41629o5HQ+ibww5I0cmTZNrt
+         PGpQ0dF4yYZIqxgPsycYwnq0ynmCV6UNoHDhSfyAX8wtRbFeA8+Ei3t6ukmggjMWA/YD
+         gGpNRNNbylav53IBZJVfElCjyJjqQ75LvlyuFaA0BVE7y/ejrfHTA8ac2QGcOZHeKRDJ
+         WFd+zExMcMH5Dlk+cB9DDDQnD/vvi0seN+Ka9ugzejoMKwPSob+dm8jnMa3cixT2Xcjh
+         F8yxbUqRcOGEm9sDKxx4W2os0mENyvLH3Qm5e8kdB9gRBnvpG+fNQxzkF13Cob6MBGPe
+         tiPA==
+X-Gm-Message-State: APjAAAUNAXaG+HFcckRx037KhjgazB1dkkACP1BdFT7mDrouLjv0qVfC
+        7ldPQsV8v4GcGjh0GOs/3nf8DKG9tE5y1A==
+X-Google-Smtp-Source: APXvYqwyXWMo/WOt/tQW3VWICdwrtyzTIwJWjktMYeajWMnpv7EZI4T/HNRt/nCm2Oq6eNgaR0S+DA==
+X-Received: by 2002:a6b:7c09:: with SMTP id m9mr11693891iok.286.1570722314098;
+        Thu, 10 Oct 2019 08:45:14 -0700 (PDT)
+Received: from [192.168.1.159] ([65.144.74.34])
+        by smtp.gmail.com with ESMTPSA id 17sm3721769ioo.21.2019.10.10.08.45.12
         (version=TLS1_2 cipher=ECDHE-RSA-AES128-GCM-SHA256 bits=128/128);
-        Thu, 10 Oct 2019 06:56:56 -0700 (PDT)
-Date:   Thu, 10 Oct 2019 09:56:55 -0400
-From:   Josef Bacik <josef@toxicpanda.com>
-To:     xiubli@redhat.com
-Cc:     josef@toxicpanda.com, axboe@kernel.dk, mchristi@redhat.com,
-        ming.lei@redhat.com, linux-block@vger.kernel.org
+        Thu, 10 Oct 2019 08:45:13 -0700 (PDT)
 Subject: Re: [PATCH] nbd: fix possible sysfs duplicate warning
-Message-ID: <20191010135654.lvdawtrzk7df6id3@macbook-pro-91.dhcp.thefacebook.com>
+To:     xiubli@redhat.com, josef@toxicpanda.com
+Cc:     mchristi@redhat.com, ming.lei@redhat.com,
+        linux-block@vger.kernel.org
 References: <20190919061427.3990-1-xiubli@redhat.com>
+From:   Jens Axboe <axboe@kernel.dk>
+Message-ID: <8bdae3dc-f286-44ba-3348-0542be622c08@kernel.dk>
+Date:   Thu, 10 Oct 2019 09:45:12 -0600
+User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:60.0) Gecko/20100101
+ Thunderbird/60.9.0
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
 In-Reply-To: <20190919061427.3990-1-xiubli@redhat.com>
-User-Agent: NeoMutt/20180716
+Content-Type: text/plain; charset=utf-8
+Content-Language: en-US
+Content-Transfer-Encoding: 7bit
 Sender: linux-block-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-On Thu, Sep 19, 2019 at 11:44:27AM +0530, xiubli@redhat.com wrote:
+On 9/19/19 12:14 AM, xiubli@redhat.com wrote:
 > From: Xiubo Li <xiubli@redhat.com>
 > 
 > 1. nbd_put takes the mutex and drops nbd->ref to 0. It then does
@@ -89,14 +91,9 @@ On Thu, Sep 19, 2019 at 11:44:27AM +0530, xiubli@redhat.com wrote:
 > 
 > This patch will make sure all the disk add/remove stuff are done
 > by holding the nbd_index_mutex lock.
-> 
-> Signed-off-by: Xiubo Li <xiubli@redhat.com>
-> Reported-by: Mike Christie <mchristi@redhat.com>
 
-Sorry, don't know how I missed this.
+Applied, thanks.
 
-Reviewed-by: Josef Bacik <josef@toxicpanda.com>
+-- 
+Jens Axboe
 
-Thanks,
-
-Josef
