@@ -2,108 +2,96 @@ Return-Path: <SRS0=jW7Q=YD=vger.kernel.org=linux-block-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-2.3 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
-	MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,USER_AGENT_SANE_1 autolearn=no
-	autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-2.2 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
+	MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,UNPARSEABLE_RELAY,USER_AGENT_SANE_1
+	autolearn=no autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id DF9B8C10F14
-	for <linux-block@archiver.kernel.org>; Thu, 10 Oct 2019 17:57:16 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 68845C10F14
+	for <linux-block@archiver.kernel.org>; Thu, 10 Oct 2019 20:39:42 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.kernel.org (Postfix) with ESMTP id C51E421835
-	for <linux-block@archiver.kernel.org>; Thu, 10 Oct 2019 17:57:16 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id 359312190F
+	for <linux-block@archiver.kernel.org>; Thu, 10 Oct 2019 20:39:42 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1726479AbfJJR5Q (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Thu, 10 Oct 2019 13:57:16 -0400
-Received: from ale.deltatee.com ([207.54.116.67]:53342 "EHLO ale.deltatee.com"
-        rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-        id S1726323AbfJJR5Q (ORCPT <rfc822;linux-block@vger.kernel.org>);
-        Thu, 10 Oct 2019 13:57:16 -0400
-Received: from s0106ac1f6bb1ecac.cg.shawcable.net ([70.73.163.230] helo=[192.168.11.155])
-        by ale.deltatee.com with esmtpsa (TLS1.2:ECDHE_RSA_AES_128_GCM_SHA256:128)
-        (Exim 4.89)
-        (envelope-from <logang@deltatee.com>)
-        id 1iIcgF-0000Hl-4N; Thu, 10 Oct 2019 11:56:52 -0600
-To:     Christoph Hellwig <hch@lst.de>
-Cc:     linux-kernel@vger.kernel.org, linux-nvme@lists.infradead.org,
-        linux-block@vger.kernel.org, linux-fsdevel@vger.kernel.org,
-        Sagi Grimberg <sagi@grimberg.me>,
-        Keith Busch <kbusch@kernel.org>, Jens Axboe <axboe@fb.com>,
-        Chaitanya Kulkarni <Chaitanya.Kulkarni@wdc.com>,
-        Max Gurtovoy <maxg@mellanox.com>,
-        Stephen Bates <sbates@raithlin.com>
-References: <20191009192530.13079-1-logang@deltatee.com>
- <20191009192530.13079-12-logang@deltatee.com> <20191010100526.GA27209@lst.de>
-From:   Logan Gunthorpe <logang@deltatee.com>
-Message-ID: <d0b7e064-2e28-83b0-1593-405ab75d5bd2@deltatee.com>
-Date:   Thu, 10 Oct 2019 11:56:48 -0600
-User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:60.0) Gecko/20100101
- Thunderbird/60.9.0
+        id S1726666AbfJJUjl (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Thu, 10 Oct 2019 16:39:41 -0400
+Received: from bhuna.collabora.co.uk ([46.235.227.227]:54880 "EHLO
+        bhuna.collabora.co.uk" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S1726132AbfJJUjl (ORCPT
+        <rfc822;linux-block@vger.kernel.org>);
+        Thu, 10 Oct 2019 16:39:41 -0400
+Received: from [127.0.0.1] (localhost [127.0.0.1])
+        (Authenticated sender: tonyk)
+        with ESMTPSA id 12F2128D04A
+Subject: Re: [PATCH v2 1/1] blk-mq: fill header with kernel-doc
+To:     Bart Van Assche <bvanassche@acm.org>,
+        Gabriel Krisman Bertazi <krisman@collabora.com>
+Cc:     linux-block@vger.kernel.org, linux-kernel@vger.kernel.org,
+        axboe@kernel.dk, kernel@collabora.com
+References: <20191008001416.12656-1-andrealmeid@collabora.com>
+ <854l0j19go.fsf@collabora.com> <6aa48cd2-5f23-a4be-f777-d65bf755a976@acm.org>
+ <85zhibyt14.fsf@collabora.com> <86de2c88-5812-4a87-b5d8-1b7b1808d013@acm.org>
+From:   =?UTF-8?Q?Andr=c3=a9_Almeida?= <andrealmeid@collabora.com>
+Message-ID: <8e20f2c6-c165-5b5f-7497-9472913d0ba8@collabora.com>
+Date:   Thu, 10 Oct 2019 17:38:18 -0300
+User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:68.0) Gecko/20100101
+ Thunderbird/68.1.1
 MIME-Version: 1.0
-In-Reply-To: <20191010100526.GA27209@lst.de>
+In-Reply-To: <86de2c88-5812-4a87-b5d8-1b7b1808d013@acm.org>
 Content-Type: text/plain; charset=utf-8
 Content-Language: en-US
-Content-Transfer-Encoding: 7bit
-X-SA-Exim-Connect-IP: 70.73.163.230
-X-SA-Exim-Rcpt-To: sbates@raithlin.com, maxg@mellanox.com, Chaitanya.Kulkarni@wdc.com, axboe@fb.com, kbusch@kernel.org, sagi@grimberg.me, linux-fsdevel@vger.kernel.org, linux-block@vger.kernel.org, linux-nvme@lists.infradead.org, linux-kernel@vger.kernel.org, hch@lst.de
-X-SA-Exim-Mail-From: logang@deltatee.com
-Subject: Re: [PATCH v9 10/12] block: don't check blk_rq_is_passthrough() in
- blk_do_io_stat()
-X-SA-Exim-Version: 4.2.1 (built Tue, 02 Aug 2016 21:08:31 +0000)
-X-SA-Exim-Scanned: Yes (on ale.deltatee.com)
+Content-Transfer-Encoding: 8bit
 Sender: linux-block-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-Hey,
-
-Thanks for the thorough review, lots here to go through. I'll address it
-all as I have time and try to get the prep work done first, as soon as I
-can.
-
-On 2019-10-10 4:05 a.m., Christoph Hellwig wrote:
->> @@ -319,7 +319,7 @@ static struct request *blk_mq_rq_ctx_init(struct blk_mq_alloc_data *data,
->>  	rq->cmd_flags = op;
->>  	if (data->flags & BLK_MQ_REQ_PREEMPT)
->>  		rq->rq_flags |= RQF_PREEMPT;
->> -	if (blk_queue_io_stat(data->q))
->> +	if (blk_queue_io_stat(data->q) && !blk_rq_is_passthrough(rq))
->>  		rq->rq_flags |= RQF_IO_STAT;
+On 10/8/19 5:01 PM, Bart Van Assche wrote:
+> On 10/8/19 11:46 AM, Gabriel Krisman Bertazi wrote:
+>> Hmm, sorry, but I'm confused.  I'm sure I'm missing something simple,
+>> since I haven't touched this in a while, so maybe you can quickly point
+>> me in the right direction?
+>>
+>> I see blk_mq_requeue_request() being used by device drivers to retry
+>> requests that failed, but if I read the code correctly, the flushed
+>> queue seems to be moved to hctx->dispatch when the device
+>> driver returned BLK_STS_RESOURCE or BLK_STS_DEV_RESOURCE to
+>> blk_mq_dispatch_rq_list(). I thought BLK_STS_RESOURCE was returned by
+>> the driver on .queue_rq() to signal there was no more resources on the
+>> hardware to service further requests.
 > 
-> This needs a comment why we don't account passthrough requests by
-> default.  And I'm really curious about the answer, because I don't
-> know it myself.
-
-Yes, sadly, I don't know this answer either but the comment made it
-appear that someone did it deliberately. Digging into git blame suggests
-that it just evolved that way. The check was originally added in 2005
-here with blk_fs_request():
-
-commit d72d904a5367 ("[BLOCK] Update read/write block io statistics at
-completion time")
-
-blk_fs_request() evolved to become blk_rq_is_passthrough() but I suspect
-no one ever considered whether we want to account the passthru requests.
-
-So, I'll leave this restriction out and see if anyone complains.
-
-Logan
-
->>   *	a) it's attached to a gendisk, and
->>   *	b) the queue had IO stats enabled when this request was started, and
->> - *	c) it's a file system request
->> + *	c) it's a file system request (RQF_IO_STAT will not be set otherwise)
+> Hi Gabriel,
 > 
-> c) should just go away now based on your changes.
+> The simplified version of how requests are requeued as follows:
+> * A block driver calls blk_mq_requeue_request().
+> * blk_mq_requeue_request() calls blk_mq_add_to_requeue_list()
+> * blk_mq_add_to_requeue_list() executes the following code:
+>     list_add_tail(&rq->queuelist, &q->requeue_list)
+> * A block driver or the block layer core calls
+>   blk_mq_kick_requeue_list() or blk_mq_delay_kick_requeue_list(). Both
+>   functions trigger a call of blk_mq_requeue_work().
+> * blk_mq_requeue_work() processes q->requeue_list.
 > 
->>  static inline bool blk_do_io_stat(struct request *rq)
->>  {
->>  	return rq->rq_disk &&
->> -	       (rq->rq_flags & RQF_IO_STAT) &&
->> -		!blk_rq_is_passthrough(rq);
->> +	       (rq->rq_flags & RQF_IO_STAT);
+> Bart.
 > 
-> The check can be collapsed onto a single line now.
 > 
 
+Hello Bart,
 
+Seems that it's not clear for me the role of these members. Could you
+please check if those definitions make sense for you?
+
+- hctx->dispatch: This queue is used for requests that are ready to be
+dispatched to the hardware but for some reason (e.g. lack of resources,
+the hardware is to busy and can't get more requests) could not be sent
+to the hardware. As soon as the driver can send new requests, those
+queued at this list will be sent first for a more fair dispatch. Since
+those requests are at the hctx, they can't be requeued or rescheduled
+anymore.
+
+- request_queue->requeue_list: This list is used when it's not possible
+to send the request to the associated hctx. This can happen if the
+associated CPU or hctx is not available anymore. When requeueing those
+requests, it will be possible to send them to new and function queues.
+
+Thanks,
+	André
