@@ -6,67 +6,67 @@ X-Spam-Status: No, score=-2.3 required=3.0 tests=DKIM_SIGNED,DKIM_VALID,
 	HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,
 	USER_AGENT_SANE_1 autolearn=no autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 83CC0C4360C
-	for <linux-block@archiver.kernel.org>; Thu, 10 Oct 2019 15:45:19 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 957C2C10F14
+	for <linux-block@archiver.kernel.org>; Thu, 10 Oct 2019 16:10:04 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.kernel.org (Postfix) with ESMTP id 5E0162196E
-	for <linux-block@archiver.kernel.org>; Thu, 10 Oct 2019 15:45:19 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id 6205321835
+	for <linux-block@archiver.kernel.org>; Thu, 10 Oct 2019 16:10:04 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel-dk.20150623.gappssmtp.com header.i=@kernel-dk.20150623.gappssmtp.com header.b="KBjERMhY"
+	dkim=pass (2048-bit key) header.d=kernel-dk.20150623.gappssmtp.com header.i=@kernel-dk.20150623.gappssmtp.com header.b="NcletWvP"
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1726393AbfJJPpS (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Thu, 10 Oct 2019 11:45:18 -0400
-Received: from mail-io1-f49.google.com ([209.85.166.49]:43523 "EHLO
-        mail-io1-f49.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1726273AbfJJPpR (ORCPT
+        id S1726131AbfJJQKE (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Thu, 10 Oct 2019 12:10:04 -0400
+Received: from mail-io1-f66.google.com ([209.85.166.66]:45762 "EHLO
+        mail-io1-f66.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S1725901AbfJJQKD (ORCPT
         <rfc822;linux-block@vger.kernel.org>);
-        Thu, 10 Oct 2019 11:45:17 -0400
-Received: by mail-io1-f49.google.com with SMTP id v2so14726134iob.10
-        for <linux-block@vger.kernel.org>; Thu, 10 Oct 2019 08:45:15 -0700 (PDT)
+        Thu, 10 Oct 2019 12:10:03 -0400
+Received: by mail-io1-f66.google.com with SMTP id c25so14861710iot.12
+        for <linux-block@vger.kernel.org>; Thu, 10 Oct 2019 09:10:03 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=kernel-dk.20150623.gappssmtp.com; s=20150623;
         h=subject:to:cc:references:from:message-id:date:user-agent
          :mime-version:in-reply-to:content-language:content-transfer-encoding;
-        bh=jG1vSVFd42A8VxlUnazw+9DsccU/V6NMBizBsW1Hoqc=;
-        b=KBjERMhYNuhrDthAa6DUlda3ll0Qunv8OTnKbVCR57zchuNftLkNfzHgp0zuUqPnnV
-         AEaY9nn7AMT2UFZgc4C9ZFCfMSXHoMomqU9bt4JF/aXyMH+Jmtp6Gap0Pxzd7yYEVxLn
-         FkxYIsPLVNcf4FAmfqLIzYnjbwWtRArXH5f17k6AhmeiTzQ0WVt7RUiourC2BCAvZ6C5
-         4zT1/QeiPHNckIL/CJSpQUxKErIv3MZT60UhOxeB/dTnu0sf0//0HUGcIJOFzzqMZfm+
-         p06M116OKTeYwYFv7DfTjCrpyXIOUSqxgh2Z0tKCwlLg5yFun07/V3Dlz4POoQALarSh
-         O5Gw==
+        bh=VQetYcgR/x/uWcigrez5bebNM1KKPgjUfbGnnIlp6+c=;
+        b=NcletWvP+JT+Tt9yDkrs+ROvFwpxsz4P6JnZ+AqpB6blR5p4H3kXAB1f6W2GBnKnMh
+         azbvAa+N+BCuFY7OcBTahW5qxReosTgJy7FkHG3r9uEl7W06BFDitOCVNG2gIfc85FZo
+         /hgnFlmAPDF2Zf0sE5K1x3bU/XbHCB24S5BMO75aZhJtiRZJFGnWG5Vb5akZrYXRDhO3
+         QYBg2RjTIRjfcJ3ZV7u+p4C8T4BSEywztKRdaiPQb4P1NwRy3irnIBa3y6I/r9ErQGw/
+         fbNZ60qNee3Mi6sZSQ31grdw8ufa1Im2jC6yP3IlaNLKFbbfvrh397I65eshS+bT+5tb
+         7+EQ==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=1e100.net; s=20161025;
         h=x-gm-message-state:subject:to:cc:references:from:message-id:date
          :user-agent:mime-version:in-reply-to:content-language
          :content-transfer-encoding;
-        bh=jG1vSVFd42A8VxlUnazw+9DsccU/V6NMBizBsW1Hoqc=;
-        b=TCvSABTFy4HCtGBQ/b+5gq6TFat6zC+gzrNIBRlqFi41629o5HQ+ibww5I0cmTZNrt
-         PGpQ0dF4yYZIqxgPsycYwnq0ynmCV6UNoHDhSfyAX8wtRbFeA8+Ei3t6ukmggjMWA/YD
-         gGpNRNNbylav53IBZJVfElCjyJjqQ75LvlyuFaA0BVE7y/ejrfHTA8ac2QGcOZHeKRDJ
-         WFd+zExMcMH5Dlk+cB9DDDQnD/vvi0seN+Ka9ugzejoMKwPSob+dm8jnMa3cixT2Xcjh
-         F8yxbUqRcOGEm9sDKxx4W2os0mENyvLH3Qm5e8kdB9gRBnvpG+fNQxzkF13Cob6MBGPe
-         tiPA==
-X-Gm-Message-State: APjAAAUNAXaG+HFcckRx037KhjgazB1dkkACP1BdFT7mDrouLjv0qVfC
-        7ldPQsV8v4GcGjh0GOs/3nf8DKG9tE5y1A==
-X-Google-Smtp-Source: APXvYqwyXWMo/WOt/tQW3VWICdwrtyzTIwJWjktMYeajWMnpv7EZI4T/HNRt/nCm2Oq6eNgaR0S+DA==
-X-Received: by 2002:a6b:7c09:: with SMTP id m9mr11693891iok.286.1570722314098;
-        Thu, 10 Oct 2019 08:45:14 -0700 (PDT)
+        bh=VQetYcgR/x/uWcigrez5bebNM1KKPgjUfbGnnIlp6+c=;
+        b=Zy/caBGmt25d/j3sxTOZB0CPIUZR4S5MAlkrUYVwM6WMcIxlY18jv8ANfWilCJjT7k
+         YVSps+G7Xc39jHEsPa6/FeDBEhHd0CdT4oQ6KrOViGomtjriFYVGFvAH4mi3bA6CpV1H
+         SmGSSN57QQRHI+ZUwrboEMChoUobmS8UdimB/MaLhZPR7n5Yp9Z7cG9H9Mg53zVmI1PY
+         dix9+ho88xYaBNnXdsONpNo5fRmjuGFjH8Fmm7rSvUWAH9rN4awEBm7d6XlKw7tEZBi9
+         sch9NHJQTgN4exJyUtd4cCieD3l7AiXJIKjqqfqksbbJ1MX/rGsRejBWiMw/UOgI/I/V
+         dkrw==
+X-Gm-Message-State: APjAAAWr2I6sdsxN7bbrFSrPfd2mHdPGMuBqdoq092ZuJhgXhQGsDyiY
+        NSPnw2/rA6rPoMxUA/9ccHEFaFnZ6CQh4g==
+X-Google-Smtp-Source: APXvYqxIgvsD6LpH4ceUXrXJ70IqBjOP1uuU9nRMT2xdMaM4PDOc40F1rD7Gtn30G3PVTk2REikG4g==
+X-Received: by 2002:a5e:9513:: with SMTP id r19mr10860535ioj.66.1570723802721;
+        Thu, 10 Oct 2019 09:10:02 -0700 (PDT)
 Received: from [192.168.1.159] ([65.144.74.34])
-        by smtp.gmail.com with ESMTPSA id 17sm3721769ioo.21.2019.10.10.08.45.12
+        by smtp.gmail.com with ESMTPSA id 80sm4134345iou.13.2019.10.10.09.10.01
         (version=TLS1_2 cipher=ECDHE-RSA-AES128-GCM-SHA256 bits=128/128);
-        Thu, 10 Oct 2019 08:45:13 -0700 (PDT)
-Subject: Re: [PATCH] nbd: fix possible sysfs duplicate warning
-To:     xiubli@redhat.com, josef@toxicpanda.com
-Cc:     mchristi@redhat.com, ming.lei@redhat.com,
-        linux-block@vger.kernel.org
-References: <20190919061427.3990-1-xiubli@redhat.com>
+        Thu, 10 Oct 2019 09:10:01 -0700 (PDT)
+Subject: Re: [PATCH 1/2] io_uring: make the logic clearer for
+ io_sequence_defer
+To:     Jackie Liu <liuyun01@kylinos.cn>
+Cc:     linux-block@vger.kernel.org
+References: <20191009011959.2203-1-liuyun01@kylinos.cn>
 From:   Jens Axboe <axboe@kernel.dk>
-Message-ID: <8bdae3dc-f286-44ba-3348-0542be622c08@kernel.dk>
-Date:   Thu, 10 Oct 2019 09:45:12 -0600
+Message-ID: <063bc803-44b9-d1bd-7744-e7042ce6cf14@kernel.dk>
+Date:   Thu, 10 Oct 2019 10:10:00 -0600
 User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:60.0) Gecko/20100101
  Thunderbird/60.9.0
 MIME-Version: 1.0
-In-Reply-To: <20190919061427.3990-1-xiubli@redhat.com>
+In-Reply-To: <20191009011959.2203-1-liuyun01@kylinos.cn>
 Content-Type: text/plain; charset=utf-8
 Content-Language: en-US
 Content-Transfer-Encoding: 7bit
@@ -75,24 +75,11 @@ Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-On 9/19/19 12:14 AM, xiubli@redhat.com wrote:
-> From: Xiubo Li <xiubli@redhat.com>
-> 
-> 1. nbd_put takes the mutex and drops nbd->ref to 0. It then does
-> idr_remove and drops the mutex.
-> 
-> 2. nbd_genl_connect takes the mutex. idr_find/idr_for_each fails
-> to find an existing device, so it does nbd_dev_add.
-> 
-> 3. just before the nbd_put could call nbd_dev_remove or not finished
-> totally, but if nbd_dev_add try to add_disk, we can hit:
-> 
-> debugfs: Directory 'nbd1' with parent 'block' already present!
-> 
-> This patch will make sure all the disk add/remove stuff are done
-> by holding the nbd_index_mutex lock.
+On 10/8/19 7:19 PM, Jackie Liu wrote:
+> __io_get_deferred_req is used to get all defer lists, including defer_list
+> and timeout_list, but io_sequence_defer should be only cares about the sequence.
 
-Applied, thanks.
+Applied, but modified to keep commit message at 72 chars wide.
 
 -- 
 Jens Axboe
