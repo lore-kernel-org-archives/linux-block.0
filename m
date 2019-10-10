@@ -1,82 +1,87 @@
-Return-Path: <SRS0=0s1t=YC=vger.kernel.org=linux-block-owner@kernel.org>
+Return-Path: <SRS0=jW7Q=YD=vger.kernel.org=linux-block-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-5.6 required=3.0 tests=DKIMWL_WL_HIGH,DKIM_SIGNED,
-	DKIM_VALID,DKIM_VALID_AU,MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,
-	SPF_PASS,URIBL_BLOCKED,USER_AGENT_SANE_1 autolearn=unavailable
-	autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-2.3 required=3.0 tests=DKIM_SIGNED,DKIM_VALID,
+	HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,
+	USER_AGENT_SANE_1 autolearn=no autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 211E7C47404
-	for <linux-block@archiver.kernel.org>; Wed,  9 Oct 2019 22:18:35 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id E3B36C47404
+	for <linux-block@archiver.kernel.org>; Thu, 10 Oct 2019 02:59:30 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.kernel.org (Postfix) with ESMTP id E920D218AC
-	for <linux-block@archiver.kernel.org>; Wed,  9 Oct 2019 22:18:34 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=default; t=1570659515;
-	bh=Z8opOSsiiw6yi2V6o/VkdYx7/ZpiJj4Zuueg28GFZeg=;
-	h=Date:From:To:Cc:Subject:References:In-Reply-To:List-ID:From;
-	b=K+P5KJtTe/bYi0Rkucn1hEQMorINi+ea6z3YGR4i2yFaEnMmiMbCj3qCpGufEkufB
-	 9ALbpqs15drqb0lIuIO7u4kCobNe/kLaN6PQyOCsd/RB27V4XZUm8DSbuizBjI027X
-	 jIX+bS36Nw4NzBKge4bUYohR0DoZ+BUib+vSiLI8=
+	by mail.kernel.org (Postfix) with ESMTP id A53BA218AC
+	for <linux-block@archiver.kernel.org>; Thu, 10 Oct 2019 02:59:30 +0000 (UTC)
+Authentication-Results: mail.kernel.org;
+	dkim=pass (2048-bit key) header.d=kernel-dk.20150623.gappssmtp.com header.i=@kernel-dk.20150623.gappssmtp.com header.b="wGuAwrMN"
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1731134AbfJIWSb (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Wed, 9 Oct 2019 18:18:31 -0400
-Received: from mail.kernel.org ([198.145.29.99]:54106 "EHLO mail.kernel.org"
-        rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-        id S1730675AbfJIWSb (ORCPT <rfc822;linux-block@vger.kernel.org>);
-        Wed, 9 Oct 2019 18:18:31 -0400
-Received: from washi1.fujisawa.hgst.com (unknown [199.255.47.10])
-        (using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
-        (No client certificate requested)
-        by mail.kernel.org (Postfix) with ESMTPSA id A9EAB206BB;
-        Wed,  9 Oct 2019 22:18:29 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-        s=default; t=1570659511;
-        bh=Z8opOSsiiw6yi2V6o/VkdYx7/ZpiJj4Zuueg28GFZeg=;
-        h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
-        b=YRNllptcmVIvwmzccQrTA6O74wQUuBcbg5Ai42vUf1gYunJt7APnYaj2z/LEx+S/Y
-         rGmYKw1yv0uzptGkgxQnFk44EfFaOX3ILHTY/TOiz0UZmeTifFAgptYzGRLKwRgQgJ
-         ZwtMmo9coQUWEz5OsQ51E85otiNnf1pQJUOXt9oY=
-Date:   Thu, 10 Oct 2019 07:18:27 +0900
-From:   Keith Busch <kbusch@kernel.org>
-To:     Logan Gunthorpe <logang@deltatee.com>
-Cc:     linux-kernel@vger.kernel.org, linux-nvme@lists.infradead.org,
-        linux-block@vger.kernel.org, linux-fsdevel@vger.kernel.org,
-        Christoph Hellwig <hch@lst.de>,
-        Sagi Grimberg <sagi@grimberg.me>, Jens Axboe <axboe@fb.com>,
-        Chaitanya Kulkarni <Chaitanya.Kulkarni@wdc.com>,
-        Max Gurtovoy <maxg@mellanox.com>,
-        Stephen Bates <sbates@raithlin.com>
-Subject: Re: [PATCH v9 04/12] nvmet: make nvmet_copy_ns_identifier()
- non-static
-Message-ID: <20191009221827.GE3009@washi1.fujisawa.hgst.com>
-References: <20191009192530.13079-1-logang@deltatee.com>
- <20191009192530.13079-5-logang@deltatee.com>
+        id S1726689AbfJJC7a (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Wed, 9 Oct 2019 22:59:30 -0400
+Received: from mail-pf1-f194.google.com ([209.85.210.194]:34941 "EHLO
+        mail-pf1-f194.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S1726621AbfJJC73 (ORCPT
+        <rfc822;linux-block@vger.kernel.org>); Wed, 9 Oct 2019 22:59:29 -0400
+Received: by mail-pf1-f194.google.com with SMTP id 205so2933762pfw.2
+        for <linux-block@vger.kernel.org>; Wed, 09 Oct 2019 19:59:28 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=kernel-dk.20150623.gappssmtp.com; s=20150623;
+        h=subject:to:cc:references:from:message-id:date:user-agent
+         :mime-version:in-reply-to:content-language:content-transfer-encoding;
+        bh=0EaF5/8cz79JbfwGKC4mXzxVGyBZQtQs33TlYFqnjTw=;
+        b=wGuAwrMNpjH1znD2l2guQjuI8FllOXRp19mwxtrWg6ZCNNCyxE/sC9OS63ccue6Ba8
+         ezsFgcHWQ1sJmZAeIxWSKu+bxbbjJ2y3EQR3270xNACSD3xMLgqrGLA68fMcxhk0k/gZ
+         3WZy7DeiiCi9PUdjS6ILilyxBiV3kpxlbXwIk58wy5W/t2xf9PxTB5RWAtMaebyH2Gx6
+         DBkeWrBJ1Zgh9sH9LIWY3y+mml4VlVnvO/OrxF2SmYf5VFcEcJvNqD3qB7L+yes9YIFW
+         jpHq4ddpQZIQNCWPRD5XgQQ34ljKjOU3PV04dH7C+B5OGCMsfDqWvKq7uReIrlY0ODnM
+         H7dw==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20161025;
+        h=x-gm-message-state:subject:to:cc:references:from:message-id:date
+         :user-agent:mime-version:in-reply-to:content-language
+         :content-transfer-encoding;
+        bh=0EaF5/8cz79JbfwGKC4mXzxVGyBZQtQs33TlYFqnjTw=;
+        b=nokDSPKqQwWtne/oOgdYV1BAlVYvtvQlSqcH3HClIw3nj2pWyeBXU1VQi0AsGE1udD
+         RFwUubzfU63vzptWcSS+d4GgRpFau2dkUwodJfu3Xs55RS/k8rVAGRVHqxaU3KvG8C2r
+         wUop3GpTD0MQUosZdz4ZdS1MSk8mrY0zEKYghC8TyTybQsifncdw5SB3W2RXC5lV3Mk4
+         +wDf278WkkYjO0+T2px4FeWdSk7y6+7aKVipCh5Kipah5yo79RgCFa0KCE0rG8WL7zcu
+         Gf10dKL5iKD+UJQ1ixRKSvq+uSzKdNF0dKakqsuJ1TBosquTgME1YIDFw27++1bMAOaT
+         BD/w==
+X-Gm-Message-State: APjAAAWtECzhZj2D0So01MPt6NSNFA5Yy5twKY6rKTQBZf9cNE8rJSXl
+        8nFBxQBv44qiVyc7XiWoaGIuwMFIIHqsQA==
+X-Google-Smtp-Source: APXvYqx4taUiDTUexORtbmb0xJh0FJnbxarAkRXA3fwyxv7ESE6nw5rLnQ6Z64GkK7VifCJSwJMwHw==
+X-Received: by 2002:a63:fa0a:: with SMTP id y10mr7998481pgh.446.1570676368291;
+        Wed, 09 Oct 2019 19:59:28 -0700 (PDT)
+Received: from [192.168.1.188] ([66.219.217.79])
+        by smtp.gmail.com with ESMTPSA id g24sm4136519pfi.81.2019.10.09.19.59.24
+        (version=TLS1_2 cipher=ECDHE-RSA-AES128-GCM-SHA256 bits=128/128);
+        Wed, 09 Oct 2019 19:59:27 -0700 (PDT)
+Subject: Re: [PATCH] null_blk: Fix zoned command return code
+To:     kbusch@kernel.org, linux-block@vger.kernel.org
+Cc:     Chaitanya Kulkarni <chaitanya.kulkarni@wdc.com>
+References: <20191009153813.4854-1-kbusch@kernel.org>
+From:   Jens Axboe <axboe@kernel.dk>
+Message-ID: <5cde2b4f-3bd5-04b4-3356-1d65a1ca228b@kernel.dk>
+Date:   Wed, 9 Oct 2019 20:59:22 -0600
+User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:60.0) Gecko/20100101
+ Thunderbird/60.9.0
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <20191009192530.13079-5-logang@deltatee.com>
-User-Agent: Mutt/1.12.1 (2019-06-15)
+In-Reply-To: <20191009153813.4854-1-kbusch@kernel.org>
+Content-Type: text/plain; charset=utf-8
+Content-Language: en-US
+Content-Transfer-Encoding: 7bit
 Sender: linux-block-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-On Wed, Oct 09, 2019 at 01:25:21PM -0600, Logan Gunthorpe wrote:
-> This function will be needed by the upcoming passthru code.
+On 10/9/19 9:38 AM, kbusch@kernel.org wrote:
+> From: Keith Busch <kbusch@kernel.org>
 > 
-> Passthru will need an emulated version of identify_desclist which
-> copies the eui64, uuid and nguid from the passed-thru controller into
-> the request SGL.
-> 
-> [chaitanya.kulkarni@wdc.com: this was factored out of a patch
->  originally authored by Chaitanya]
-> Signed-off-by: Chaitanya Kulkarni <chaitanya.kulkarni@wdc.com>
-> Signed-off-by: Logan Gunthorpe <logang@deltatee.com>
-> Reviewed-by: Sagi Grimberg <sagi@grimberg.me>
-> ---
+> The return code from null_handle_zoned() sets the cmd->error value. Returning
+> OK status when an error occured overwrites the intended cmd->error. Return the
+> appropriate error code instead of setting the error in the cmd.
 
-Looks fine
+Applied, thanks.
 
-Reviewed-by: Keith Busch <kbusch@kernel.org>
+-- 
+Jens Axboe
+
