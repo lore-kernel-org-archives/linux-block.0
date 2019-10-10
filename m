@@ -2,63 +2,111 @@ Return-Path: <SRS0=jW7Q=YD=vger.kernel.org=linux-block-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-5.2 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
-	MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED,
-	USER_AGENT_SANE_1 autolearn=unavailable autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-7.2 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
+	MAILING_LIST_MULTI,MENTIONS_GIT_HOSTING,SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED,
+	USER_AGENT_SANE_1 autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 12F4EC10F14
-	for <linux-block@archiver.kernel.org>; Thu, 10 Oct 2019 11:07:44 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 2552DC4360C
+	for <linux-block@archiver.kernel.org>; Thu, 10 Oct 2019 11:21:52 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.kernel.org (Postfix) with ESMTP id E3549208C3
-	for <linux-block@archiver.kernel.org>; Thu, 10 Oct 2019 11:07:43 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id 043B5206B6
+	for <linux-block@archiver.kernel.org>; Thu, 10 Oct 2019 11:21:52 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1732008AbfJJLHk (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Thu, 10 Oct 2019 07:07:40 -0400
-Received: from verein.lst.de ([213.95.11.211]:57595 "EHLO verein.lst.de"
-        rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-        id S1727727AbfJJLHj (ORCPT <rfc822;linux-block@vger.kernel.org>);
-        Thu, 10 Oct 2019 07:07:39 -0400
-Received: by verein.lst.de (Postfix, from userid 2407)
-        id BF6F768C65; Thu, 10 Oct 2019 13:07:35 +0200 (CEST)
-Date:   Thu, 10 Oct 2019 13:07:35 +0200
-From:   Christoph Hellwig <hch@lst.de>
-To:     Logan Gunthorpe <logang@deltatee.com>
-Cc:     linux-kernel@vger.kernel.org, linux-nvme@lists.infradead.org,
-        linux-block@vger.kernel.org, linux-fsdevel@vger.kernel.org,
-        Christoph Hellwig <hch@lst.de>,
-        Sagi Grimberg <sagi@grimberg.me>,
-        Keith Busch <kbusch@kernel.org>, Jens Axboe <axboe@fb.com>,
-        Chaitanya Kulkarni <Chaitanya.Kulkarni@wdc.com>,
-        Max Gurtovoy <maxg@mellanox.com>,
-        Stephen Bates <sbates@raithlin.com>
-Subject: Re: [PATCH v9 08/12] nvmet-tcp: don't check data_len in
- nvmet_tcp_map_data()
-Message-ID: <20191010110735.GA28392@lst.de>
-References: <20191009192530.13079-1-logang@deltatee.com> <20191009192530.13079-10-logang@deltatee.com>
+        id S1726298AbfJJLVv (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Thu, 10 Oct 2019 07:21:51 -0400
+Received: from szxga07-in.huawei.com ([45.249.212.35]:56968 "EHLO huawei.com"
+        rhost-flags-OK-OK-OK-FAIL) by vger.kernel.org with ESMTP
+        id S1726201AbfJJLVv (ORCPT <rfc822;linux-block@vger.kernel.org>);
+        Thu, 10 Oct 2019 07:21:51 -0400
+Received: from DGGEMS407-HUB.china.huawei.com (unknown [172.30.72.59])
+        by Forcepoint Email with ESMTP id 15C6B5AB97971BB34398;
+        Thu, 10 Oct 2019 19:21:49 +0800 (CST)
+Received: from [127.0.0.1] (10.202.227.179) by DGGEMS407-HUB.china.huawei.com
+ (10.3.19.207) with Microsoft SMTP Server id 14.3.439.0; Thu, 10 Oct 2019
+ 19:21:45 +0800
+Subject: Re: [PATCH V3 0/5] blk-mq: improvement on handling IO during CPU
+ hotplug
+To:     Ming Lei <ming.lei@redhat.com>
+References: <20191008041821.2782-1-ming.lei@redhat.com>
+ <bf9687ef-4a90-73f7-3028-4c5d56c8d66b@huawei.com>
+ <549bf046-f617-4c4f-5bf1-17603cc5f832@huawei.com>
+ <20191009083930.GE10549@ming.t460p>
+ <a30f6b45-0b89-7950-1e44-240630d89264@huawei.com>
+ <20191010103016.GA22976@ming.t460p>
+CC:     Jens Axboe <axboe@kernel.dk>, <linux-block@vger.kernel.org>,
+        "Bart Van Assche" <bvanassche@acm.org>,
+        Hannes Reinecke <hare@suse.com>,
+        "Christoph Hellwig" <hch@lst.de>,
+        Thomas Gleixner <tglx@linutronix.de>,
+        Keith Busch <keith.busch@intel.com>
+From:   John Garry <john.garry@huawei.com>
+Message-ID: <41b9185d-f780-f08f-dd63-9ad02a6976d4@huawei.com>
+Date:   Thu, 10 Oct 2019 12:21:39 +0100
+User-Agent: Mozilla/5.0 (Windows NT 10.0; WOW64; rv:45.0) Gecko/20100101
+ Thunderbird/45.3.0
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <20191009192530.13079-10-logang@deltatee.com>
-User-Agent: Mutt/1.5.17 (2007-11-01)
+In-Reply-To: <20191010103016.GA22976@ming.t460p>
+Content-Type: text/plain; charset="windows-1252"; format=flowed
+Content-Transfer-Encoding: 7bit
+X-Originating-IP: [10.202.227.179]
+X-CFilter-Loop: Reflected
 Sender: linux-block-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-On Wed, Oct 09, 2019 at 01:25:26PM -0600, Logan Gunthorpe wrote:
-> With passthru, the data_len is no longer guaranteed to be set
-> for all requests. Therefore, we should not check for it to be
-> non-zero. Instead check if the SGL length is zero and map
-> when appropriate.
-> 
-> None of the other transports check data_len which is verified
-> in core code.
-> 
-> Signed-off-by: Logan Gunthorpe <logang@deltatee.com>
-> Reviewed-by: Sagi Grimberg <sagi@grimberg.me>
+On 10/10/2019 11:30, Ming Lei wrote:
+>> Yes, hisi_sas. So, right, it is single queue today on mainline, but I
+>> > manually made it multiqueue on my dev branch just to test this series.
+>> > Otherwise I could not test it for that driver.
+>> >
+>> > My dev branch is here, if interested:
+>> > https://github.com/hisilicon/kernel-dev/commits/private-topic-sas-5.4-mq
+> Your conversion shouldn't work given you do not change .can_queue in the
+> patch of 'hisi_sas_v3: multiqueue support'.
 
-I think the issue here is deeper.  Yes, this patch is correct, but
-nvmet-tcp has another use of req.data_len in
-nvmet_tcp_handle_req_failure, which looks completely bogus.  Please
-try to audit that as well and send out fixes to the list separately
-from this series, as both look like potentially serious bugs.
+Ah, I missed that, but I don't think that it will make a difference 
+really since I'm only using a single disk, so I don't think that 
+can_queue really comes into play. But....
+
+>
+> As discussed before, tags of hisilicon V3 is HBA wide. If you switch
+> to real hw queue, each hw queue has to own its independent tags.
+> However, that isn't supported by V3 hardware.
+
+I am generating the tag internally in the driver now, so that hostwide 
+tags issue should not be an issue.
+
+And, to be clear, I am not paying too much attention to performance, but 
+rather just hotplugging while running IO.
+
+An update on testing:
+I did some scripted overnight testing. The script essentially loops like 
+this:
+- online all CPUS
+- run fio binded on a limited bunch of CPUs to cover a hctx mask for 1 
+minute
+- offline those CPUs
+- wait 1 minute (> SCSI or NVMe timeout)
+- and repeat
+
+SCSI is actually quite stable, but NVMe isn't. For NVMe I am finding 
+some fio processes never dying with IOPS @ 0. I don't see any NVMe 
+timeout reported. Did you do any NVMe testing of this sort?
+
+Thanks,
+John
+
+>
+> See previous discussion:
+>
+> https://marc.info/?t=155928863000001&r=1&w=2
+>
+>
+> Thanks,
+> Ming
+>
+> .
+>
+
+
