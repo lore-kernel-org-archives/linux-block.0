@@ -2,86 +2,73 @@ Return-Path: <SRS0=jW7Q=YD=vger.kernel.org=linux-block-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-2.3 required=3.0 tests=DKIM_SIGNED,DKIM_VALID,
-	HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,
-	USER_AGENT_SANE_1 autolearn=no autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-2.3 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
+	MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,USER_AGENT_SANE_1 autolearn=no
+	autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id E3B36C47404
-	for <linux-block@archiver.kernel.org>; Thu, 10 Oct 2019 02:59:30 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id DF683C10F14
+	for <linux-block@archiver.kernel.org>; Thu, 10 Oct 2019 10:05:32 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.kernel.org (Postfix) with ESMTP id A53BA218AC
-	for <linux-block@archiver.kernel.org>; Thu, 10 Oct 2019 02:59:30 +0000 (UTC)
-Authentication-Results: mail.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel-dk.20150623.gappssmtp.com header.i=@kernel-dk.20150623.gappssmtp.com header.b="wGuAwrMN"
+	by mail.kernel.org (Postfix) with ESMTP id C049E21920
+	for <linux-block@archiver.kernel.org>; Thu, 10 Oct 2019 10:05:32 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1726689AbfJJC7a (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Wed, 9 Oct 2019 22:59:30 -0400
-Received: from mail-pf1-f194.google.com ([209.85.210.194]:34941 "EHLO
-        mail-pf1-f194.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1726621AbfJJC73 (ORCPT
-        <rfc822;linux-block@vger.kernel.org>); Wed, 9 Oct 2019 22:59:29 -0400
-Received: by mail-pf1-f194.google.com with SMTP id 205so2933762pfw.2
-        for <linux-block@vger.kernel.org>; Wed, 09 Oct 2019 19:59:28 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=kernel-dk.20150623.gappssmtp.com; s=20150623;
-        h=subject:to:cc:references:from:message-id:date:user-agent
-         :mime-version:in-reply-to:content-language:content-transfer-encoding;
-        bh=0EaF5/8cz79JbfwGKC4mXzxVGyBZQtQs33TlYFqnjTw=;
-        b=wGuAwrMNpjH1znD2l2guQjuI8FllOXRp19mwxtrWg6ZCNNCyxE/sC9OS63ccue6Ba8
-         ezsFgcHWQ1sJmZAeIxWSKu+bxbbjJ2y3EQR3270xNACSD3xMLgqrGLA68fMcxhk0k/gZ
-         3WZy7DeiiCi9PUdjS6ILilyxBiV3kpxlbXwIk58wy5W/t2xf9PxTB5RWAtMaebyH2Gx6
-         DBkeWrBJ1Zgh9sH9LIWY3y+mml4VlVnvO/OrxF2SmYf5VFcEcJvNqD3qB7L+yes9YIFW
-         jpHq4ddpQZIQNCWPRD5XgQQ34ljKjOU3PV04dH7C+B5OGCMsfDqWvKq7uReIrlY0ODnM
-         H7dw==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20161025;
-        h=x-gm-message-state:subject:to:cc:references:from:message-id:date
-         :user-agent:mime-version:in-reply-to:content-language
-         :content-transfer-encoding;
-        bh=0EaF5/8cz79JbfwGKC4mXzxVGyBZQtQs33TlYFqnjTw=;
-        b=nokDSPKqQwWtne/oOgdYV1BAlVYvtvQlSqcH3HClIw3nj2pWyeBXU1VQi0AsGE1udD
-         RFwUubzfU63vzptWcSS+d4GgRpFau2dkUwodJfu3Xs55RS/k8rVAGRVHqxaU3KvG8C2r
-         wUop3GpTD0MQUosZdz4ZdS1MSk8mrY0zEKYghC8TyTybQsifncdw5SB3W2RXC5lV3Mk4
-         +wDf278WkkYjO0+T2px4FeWdSk7y6+7aKVipCh5Kipah5yo79RgCFa0KCE0rG8WL7zcu
-         Gf10dKL5iKD+UJQ1ixRKSvq+uSzKdNF0dKakqsuJ1TBosquTgME1YIDFw27++1bMAOaT
-         BD/w==
-X-Gm-Message-State: APjAAAWtECzhZj2D0So01MPt6NSNFA5Yy5twKY6rKTQBZf9cNE8rJSXl
-        8nFBxQBv44qiVyc7XiWoaGIuwMFIIHqsQA==
-X-Google-Smtp-Source: APXvYqx4taUiDTUexORtbmb0xJh0FJnbxarAkRXA3fwyxv7ESE6nw5rLnQ6Z64GkK7VifCJSwJMwHw==
-X-Received: by 2002:a63:fa0a:: with SMTP id y10mr7998481pgh.446.1570676368291;
-        Wed, 09 Oct 2019 19:59:28 -0700 (PDT)
-Received: from [192.168.1.188] ([66.219.217.79])
-        by smtp.gmail.com with ESMTPSA id g24sm4136519pfi.81.2019.10.09.19.59.24
-        (version=TLS1_2 cipher=ECDHE-RSA-AES128-GCM-SHA256 bits=128/128);
-        Wed, 09 Oct 2019 19:59:27 -0700 (PDT)
-Subject: Re: [PATCH] null_blk: Fix zoned command return code
-To:     kbusch@kernel.org, linux-block@vger.kernel.org
-Cc:     Chaitanya Kulkarni <chaitanya.kulkarni@wdc.com>
-References: <20191009153813.4854-1-kbusch@kernel.org>
-From:   Jens Axboe <axboe@kernel.dk>
-Message-ID: <5cde2b4f-3bd5-04b4-3356-1d65a1ca228b@kernel.dk>
-Date:   Wed, 9 Oct 2019 20:59:22 -0600
-User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:60.0) Gecko/20100101
- Thunderbird/60.9.0
+        id S2387451AbfJJKFb (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Thu, 10 Oct 2019 06:05:31 -0400
+Received: from verein.lst.de ([213.95.11.211]:57353 "EHLO verein.lst.de"
+        rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
+        id S1727770AbfJJKFb (ORCPT <rfc822;linux-block@vger.kernel.org>);
+        Thu, 10 Oct 2019 06:05:31 -0400
+Received: by verein.lst.de (Postfix, from userid 2407)
+        id DE1A268C65; Thu, 10 Oct 2019 12:05:26 +0200 (CEST)
+Date:   Thu, 10 Oct 2019 12:05:26 +0200
+From:   Christoph Hellwig <hch@lst.de>
+To:     Logan Gunthorpe <logang@deltatee.com>
+Cc:     linux-kernel@vger.kernel.org, linux-nvme@lists.infradead.org,
+        linux-block@vger.kernel.org, linux-fsdevel@vger.kernel.org,
+        Christoph Hellwig <hch@lst.de>,
+        Sagi Grimberg <sagi@grimberg.me>,
+        Keith Busch <kbusch@kernel.org>, Jens Axboe <axboe@fb.com>,
+        Chaitanya Kulkarni <Chaitanya.Kulkarni@wdc.com>,
+        Max Gurtovoy <maxg@mellanox.com>,
+        Stephen Bates <sbates@raithlin.com>
+Subject: Re: [PATCH v9 10/12] block: don't check blk_rq_is_passthrough() in
+ blk_do_io_stat()
+Message-ID: <20191010100526.GA27209@lst.de>
+References: <20191009192530.13079-1-logang@deltatee.com> <20191009192530.13079-12-logang@deltatee.com>
 MIME-Version: 1.0
-In-Reply-To: <20191009153813.4854-1-kbusch@kernel.org>
-Content-Type: text/plain; charset=utf-8
-Content-Language: en-US
-Content-Transfer-Encoding: 7bit
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <20191009192530.13079-12-logang@deltatee.com>
+User-Agent: Mutt/1.5.17 (2007-11-01)
 Sender: linux-block-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-On 10/9/19 9:38 AM, kbusch@kernel.org wrote:
-> From: Keith Busch <kbusch@kernel.org>
-> 
-> The return code from null_handle_zoned() sets the cmd->error value. Returning
-> OK status when an error occured overwrites the intended cmd->error. Return the
-> appropriate error code instead of setting the error in the cmd.
+> @@ -319,7 +319,7 @@ static struct request *blk_mq_rq_ctx_init(struct blk_mq_alloc_data *data,
+>  	rq->cmd_flags = op;
+>  	if (data->flags & BLK_MQ_REQ_PREEMPT)
+>  		rq->rq_flags |= RQF_PREEMPT;
+> -	if (blk_queue_io_stat(data->q))
+> +	if (blk_queue_io_stat(data->q) && !blk_rq_is_passthrough(rq))
+>  		rq->rq_flags |= RQF_IO_STAT;
 
-Applied, thanks.
+This needs a comment why we don't account passthrough requests by
+default.  And I'm really curious about the answer, because I don't
+know it myself.
 
--- 
-Jens Axboe
+>   *	a) it's attached to a gendisk, and
+>   *	b) the queue had IO stats enabled when this request was started, and
+> - *	c) it's a file system request
+> + *	c) it's a file system request (RQF_IO_STAT will not be set otherwise)
 
+c) should just go away now based on your changes.
+
+>  static inline bool blk_do_io_stat(struct request *rq)
+>  {
+>  	return rq->rq_disk &&
+> -	       (rq->rq_flags & RQF_IO_STAT) &&
+> -		!blk_rq_is_passthrough(rq);
+> +	       (rq->rq_flags & RQF_IO_STAT);
+
+The check can be collapsed onto a single line now.
