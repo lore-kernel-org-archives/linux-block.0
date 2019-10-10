@@ -2,149 +2,108 @@ Return-Path: <SRS0=jW7Q=YD=vger.kernel.org=linux-block-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-8.4 required=3.0 tests=DKIMWL_WL_HIGH,DKIM_SIGNED,
-	DKIM_VALID,DKIM_VALID_AU,HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,
-	MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,UNPARSEABLE_RELAY,
-	USER_AGENT_SANE_1 autolearn=ham autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-2.3 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
+	MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,USER_AGENT_SANE_1 autolearn=no
+	autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id C7487C10F14
-	for <linux-block@archiver.kernel.org>; Thu, 10 Oct 2019 17:04:53 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id DF9B8C10F14
+	for <linux-block@archiver.kernel.org>; Thu, 10 Oct 2019 17:57:16 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.kernel.org (Postfix) with ESMTP id 9E1C32190F
-	for <linux-block@archiver.kernel.org>; Thu, 10 Oct 2019 17:04:53 +0000 (UTC)
-Authentication-Results: mail.kernel.org;
-	dkim=pass (2048-bit key) header.d=oracle.com header.i=@oracle.com header.b="iiu1gsn5"
+	by mail.kernel.org (Postfix) with ESMTP id C51E421835
+	for <linux-block@archiver.kernel.org>; Thu, 10 Oct 2019 17:57:16 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1726565AbfJJREx (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Thu, 10 Oct 2019 13:04:53 -0400
-Received: from userp2130.oracle.com ([156.151.31.86]:44304 "EHLO
-        userp2130.oracle.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1726007AbfJJREw (ORCPT
-        <rfc822;linux-block@vger.kernel.org>);
-        Thu, 10 Oct 2019 13:04:52 -0400
-Received: from pps.filterd (userp2130.oracle.com [127.0.0.1])
-        by userp2130.oracle.com (8.16.0.27/8.16.0.27) with SMTP id x9AGxhQb015048;
-        Thu, 10 Oct 2019 17:04:45 GMT
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=oracle.com; h=date : from : to : cc
- : subject : message-id : mime-version : content-type; s=corp-2019-08-05;
- bh=VL6R48RwqDkFrj5F5+e3HamQIy5Wl2g3BYnKqnglJVc=;
- b=iiu1gsn5A9NOsFAA80jsx0D2Sgh7GBulceiom2WLKeQdJJ8l4tR3BPz0q3ZIje2mI+E3
- 8+dd5v5QY2qiJXHVCgqhf7X2XhLl9L+OkfADj0ctYom7z4v0s2fp9PRpWPZnqPHYIbsE
- C3kp2MP2OTLrOwRmKezaTtYZ/+AEXEw6ZYhU/Z3+RqJNuOi0oVoe0SYcFbcF1ZaMNBDA
- 8VO40qYC/5RXcEh//LcRkSW0u4doDgNM7Cc36gzgNnBM+Hare3UztyGDySr+otBuyXVd
- /69fdgyZvNnTmnYYiYYzU+3xfUQCrBZvk4Usl69xRfustZbNZyL+hYsii9/bCFcxYmTg Rw== 
-Received: from aserp3020.oracle.com (aserp3020.oracle.com [141.146.126.70])
-        by userp2130.oracle.com with ESMTP id 2vejkuvhsg-1
-        (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=OK);
-        Thu, 10 Oct 2019 17:04:45 +0000
-Received: from pps.filterd (aserp3020.oracle.com [127.0.0.1])
-        by aserp3020.oracle.com (8.16.0.27/8.16.0.27) with SMTP id x9AGx6Sq102259;
-        Thu, 10 Oct 2019 17:02:44 GMT
-Received: from aserv0121.oracle.com (aserv0121.oracle.com [141.146.126.235])
-        by aserp3020.oracle.com with ESMTP id 2vhhsq1nqa-1
-        (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=OK);
-        Thu, 10 Oct 2019 17:02:44 +0000
-Received: from abhmp0003.oracle.com (abhmp0003.oracle.com [141.146.116.9])
-        by aserv0121.oracle.com (8.14.4/8.13.8) with ESMTP id x9AH2fOp011813;
-        Thu, 10 Oct 2019 17:02:43 GMT
-Received: from localhost (/67.169.218.210)
-        by default (Oracle Beehive Gateway v4.0)
-        with ESMTP ; Thu, 10 Oct 2019 10:02:40 -0700
-Date:   Thu, 10 Oct 2019 10:02:39 -0700
-From:   "Darrick J. Wong" <darrick.wong@oracle.com>
-To:     Jens Axboe <axboe@kernel.dk>, Christoph Hellwig <hch@infradead.org>
-Cc:     linux-block@vger.kernel.org,
-        linux-fsdevel <linux-fsdevel@vger.kernel.org>,
-        xfs <linux-xfs@vger.kernel.org>
-Subject: [PATCH] loop: fix no-unmap write-zeroes request behavior
-Message-ID: <20191010170239.GC13098@magnolia>
+        id S1726479AbfJJR5Q (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Thu, 10 Oct 2019 13:57:16 -0400
+Received: from ale.deltatee.com ([207.54.116.67]:53342 "EHLO ale.deltatee.com"
+        rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
+        id S1726323AbfJJR5Q (ORCPT <rfc822;linux-block@vger.kernel.org>);
+        Thu, 10 Oct 2019 13:57:16 -0400
+Received: from s0106ac1f6bb1ecac.cg.shawcable.net ([70.73.163.230] helo=[192.168.11.155])
+        by ale.deltatee.com with esmtpsa (TLS1.2:ECDHE_RSA_AES_128_GCM_SHA256:128)
+        (Exim 4.89)
+        (envelope-from <logang@deltatee.com>)
+        id 1iIcgF-0000Hl-4N; Thu, 10 Oct 2019 11:56:52 -0600
+To:     Christoph Hellwig <hch@lst.de>
+Cc:     linux-kernel@vger.kernel.org, linux-nvme@lists.infradead.org,
+        linux-block@vger.kernel.org, linux-fsdevel@vger.kernel.org,
+        Sagi Grimberg <sagi@grimberg.me>,
+        Keith Busch <kbusch@kernel.org>, Jens Axboe <axboe@fb.com>,
+        Chaitanya Kulkarni <Chaitanya.Kulkarni@wdc.com>,
+        Max Gurtovoy <maxg@mellanox.com>,
+        Stephen Bates <sbates@raithlin.com>
+References: <20191009192530.13079-1-logang@deltatee.com>
+ <20191009192530.13079-12-logang@deltatee.com> <20191010100526.GA27209@lst.de>
+From:   Logan Gunthorpe <logang@deltatee.com>
+Message-ID: <d0b7e064-2e28-83b0-1593-405ab75d5bd2@deltatee.com>
+Date:   Thu, 10 Oct 2019 11:56:48 -0600
+User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:60.0) Gecko/20100101
+ Thunderbird/60.9.0
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-User-Agent: Mutt/1.9.4 (2018-02-28)
-X-Proofpoint-Virus-Version: vendor=nai engine=6000 definitions=9405 signatures=668684
-X-Proofpoint-Spam-Details: rule=notspam policy=default score=0 suspectscore=0 malwarescore=0
- phishscore=0 bulkscore=0 spamscore=0 mlxscore=0 mlxlogscore=999
- adultscore=0 classifier=spam adjust=0 reason=mlx scancount=1
- engine=8.0.1-1908290000 definitions=main-1910100151
-X-Proofpoint-Virus-Version: vendor=nai engine=6000 definitions=9405 signatures=668684
-X-Proofpoint-Spam-Details: rule=notspam policy=default score=0 priorityscore=1501 malwarescore=0
- suspectscore=0 phishscore=0 bulkscore=0 spamscore=0 clxscore=1015
- lowpriorityscore=0 mlxscore=0 impostorscore=0 mlxlogscore=999 adultscore=0
- classifier=spam adjust=0 reason=mlx scancount=1 engine=8.0.1-1908290000
- definitions=main-1910100151
+In-Reply-To: <20191010100526.GA27209@lst.de>
+Content-Type: text/plain; charset=utf-8
+Content-Language: en-US
+Content-Transfer-Encoding: 7bit
+X-SA-Exim-Connect-IP: 70.73.163.230
+X-SA-Exim-Rcpt-To: sbates@raithlin.com, maxg@mellanox.com, Chaitanya.Kulkarni@wdc.com, axboe@fb.com, kbusch@kernel.org, sagi@grimberg.me, linux-fsdevel@vger.kernel.org, linux-block@vger.kernel.org, linux-nvme@lists.infradead.org, linux-kernel@vger.kernel.org, hch@lst.de
+X-SA-Exim-Mail-From: logang@deltatee.com
+Subject: Re: [PATCH v9 10/12] block: don't check blk_rq_is_passthrough() in
+ blk_do_io_stat()
+X-SA-Exim-Version: 4.2.1 (built Tue, 02 Aug 2016 21:08:31 +0000)
+X-SA-Exim-Scanned: Yes (on ale.deltatee.com)
 Sender: linux-block-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-From: Darrick J. Wong <darrick.wong@oracle.com>
+Hey,
 
-Currently, if the loop device receives a WRITE_ZEROES request, it asks
-the underlying filesystem to punch out the range.  This behavior is
-correct if unmapping is allowed.  However, a NOUNMAP request means that
-the caller forbids us from freeing the storage backing the range, so
-punching out the range is incorrect behavior.
+Thanks for the thorough review, lots here to go through. I'll address it
+all as I have time and try to get the prep work done first, as soon as I
+can.
 
-To satisfy a NOUNMAP | WRITE_ZEROES request, loop should ask the
-underlying filesystem to FALLOC_FL_ZERO_RANGE, which is (according to
-the fallocate documentation) required to ensure that the entire range is
-backed by real storage, which suffices for our purposes.
+On 2019-10-10 4:05 a.m., Christoph Hellwig wrote:
+>> @@ -319,7 +319,7 @@ static struct request *blk_mq_rq_ctx_init(struct blk_mq_alloc_data *data,
+>>  	rq->cmd_flags = op;
+>>  	if (data->flags & BLK_MQ_REQ_PREEMPT)
+>>  		rq->rq_flags |= RQF_PREEMPT;
+>> -	if (blk_queue_io_stat(data->q))
+>> +	if (blk_queue_io_stat(data->q) && !blk_rq_is_passthrough(rq))
+>>  		rq->rq_flags |= RQF_IO_STAT;
+> 
+> This needs a comment why we don't account passthrough requests by
+> default.  And I'm really curious about the answer, because I don't
+> know it myself.
 
-Fixes: 19372e2769179dd ("loop: implement REQ_OP_WRITE_ZEROES")
-Signed-off-by: Darrick J. Wong <darrick.wong@oracle.com>
----
- drivers/block/loop.c |   32 +++++++++++++++++++++++++++++++-
- 1 file changed, 31 insertions(+), 1 deletion(-)
+Yes, sadly, I don't know this answer either but the comment made it
+appear that someone did it deliberately. Digging into git blame suggests
+that it just evolved that way. The check was originally added in 2005
+here with blk_fs_request():
 
-diff --git a/drivers/block/loop.c b/drivers/block/loop.c
-index f6f77eaa7217..0dc981e94bf0 100644
---- a/drivers/block/loop.c
-+++ b/drivers/block/loop.c
-@@ -441,6 +441,35 @@ static int lo_discard(struct loop_device *lo, struct request *rq, loff_t pos)
- 	return ret;
- }
- 
-+static int lo_zeroout(struct loop_device *lo, struct request *rq, loff_t pos)
-+{
-+	struct file *file = lo->lo_backing_file;
-+	int mode = FALLOC_FL_ZERO_RANGE | FALLOC_FL_KEEP_SIZE;
-+	int ret;
-+
-+	/* If we're allowed to unmap the blocks, ask the fs to punch them. */
-+	if (!(rq->cmd_flags & REQ_NOUNMAP)) {
-+		ret = lo_discard(lo, rq, pos);
-+		if (!ret)
-+			return 0;
-+	}
-+
-+	/*
-+	 * Otherwise, ask the fs to zero out the blocks, which will result in
-+	 * space being allocated to the file.
-+	 */
-+	if (!file->f_op->fallocate) {
-+		ret = -EOPNOTSUPP;
-+		goto out;
-+	}
-+
-+	ret = file->f_op->fallocate(file, mode, pos, blk_rq_bytes(rq));
-+	if (unlikely(ret && ret != -EINVAL && ret != -EOPNOTSUPP))
-+		ret = -EIO;
-+ out:
-+	return ret;
-+}
-+
- static int lo_req_flush(struct loop_device *lo, struct request *rq)
- {
- 	struct file *file = lo->lo_backing_file;
-@@ -597,8 +626,9 @@ static int do_req_filebacked(struct loop_device *lo, struct request *rq)
- 	case REQ_OP_FLUSH:
- 		return lo_req_flush(lo, rq);
- 	case REQ_OP_DISCARD:
--	case REQ_OP_WRITE_ZEROES:
- 		return lo_discard(lo, rq, pos);
-+	case REQ_OP_WRITE_ZEROES:
-+		return lo_zeroout(lo, rq, pos);
- 	case REQ_OP_WRITE:
- 		if (lo->transfer)
- 			return lo_write_transfer(lo, rq, pos);
+commit d72d904a5367 ("[BLOCK] Update read/write block io statistics at
+completion time")
+
+blk_fs_request() evolved to become blk_rq_is_passthrough() but I suspect
+no one ever considered whether we want to account the passthru requests.
+
+So, I'll leave this restriction out and see if anyone complains.
+
+Logan
+
+>>   *	a) it's attached to a gendisk, and
+>>   *	b) the queue had IO stats enabled when this request was started, and
+>> - *	c) it's a file system request
+>> + *	c) it's a file system request (RQF_IO_STAT will not be set otherwise)
+> 
+> c) should just go away now based on your changes.
+> 
+>>  static inline bool blk_do_io_stat(struct request *rq)
+>>  {
+>>  	return rq->rq_disk &&
+>> -	       (rq->rq_flags & RQF_IO_STAT) &&
+>> -		!blk_rq_is_passthrough(rq);
+>> +	       (rq->rq_flags & RQF_IO_STAT);
+> 
+> The check can be collapsed onto a single line now.
+> 
+
+
