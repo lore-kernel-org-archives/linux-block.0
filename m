@@ -2,301 +2,153 @@ Return-Path: <SRS0=5xwa=YE=vger.kernel.org=linux-block-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-10.2 required=3.0
-	tests=HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,
-	MENTIONS_GIT_HOSTING,SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED,USER_AGENT_SANE_1
-	autolearn=ham autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-8.4 required=3.0 tests=DKIMWL_WL_HIGH,DKIM_SIGNED,
+	DKIM_VALID,DKIM_VALID_AU,HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,
+	MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,UNPARSEABLE_RELAY,
+	USER_AGENT_SANE_1 autolearn=unavailable autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 10EC1C47404
-	for <linux-block@archiver.kernel.org>; Fri, 11 Oct 2019 15:51:24 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 63E37C47404
+	for <linux-block@archiver.kernel.org>; Fri, 11 Oct 2019 16:05:57 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.kernel.org (Postfix) with ESMTP id D264220673
-	for <linux-block@archiver.kernel.org>; Fri, 11 Oct 2019 15:51:23 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id 3F38921E6F
+	for <linux-block@archiver.kernel.org>; Fri, 11 Oct 2019 16:05:57 +0000 (UTC)
+Authentication-Results: mail.kernel.org;
+	dkim=pass (2048-bit key) header.d=oracle.com header.i=@oracle.com header.b="Kbi3oCzH"
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1726642AbfJKPvX (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Fri, 11 Oct 2019 11:51:23 -0400
-Received: from mx1.redhat.com ([209.132.183.28]:45142 "EHLO mx1.redhat.com"
-        rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-        id S1726521AbfJKPvX (ORCPT <rfc822;linux-block@vger.kernel.org>);
-        Fri, 11 Oct 2019 11:51:23 -0400
-Received: from smtp.corp.redhat.com (int-mx07.intmail.prod.int.phx2.redhat.com [10.5.11.22])
-        (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
-        (No client certificate requested)
-        by mx1.redhat.com (Postfix) with ESMTPS id 4B7F23082DDD;
-        Fri, 11 Oct 2019 15:51:22 +0000 (UTC)
-Received: from localhost (unknown [10.36.118.109])
-        by smtp.corp.redhat.com (Postfix) with ESMTP id D0F121001B07;
-        Fri, 11 Oct 2019 15:51:21 +0000 (UTC)
-Date:   Fri, 11 Oct 2019 16:51:20 +0100
-From:   Stefan Hajnoczi <stefanha@redhat.com>
-To:     Jens Axboe <axboe@kernel.dk>
-Cc:     linux-block@vger.kernel.org
-Subject: Re: io_uring NULL pointer dereference on Linux v5.4-rc1
-Message-ID: <20191011155120.GC22727@stefanha-x1.localdomain>
-References: <20191009092302.GA5303@stefanha-x1.localdomain>
- <e9beeedf-3a06-841f-53a4-51ac4e9e13ea@kernel.dk>
- <20191009174602.GI13568@stefanha-x1.localdomain>
- <d5bbaf7c-31e4-725c-90ab-18c342e2c4eb@kernel.dk>
- <20191011084618.GA2848@stefanha-x1.localdomain>
- <c24b0ee5-361c-20da-1b7a-27aab947d4f2@kernel.dk>
+        id S1728293AbfJKQF4 (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Fri, 11 Oct 2019 12:05:56 -0400
+Received: from userp2130.oracle.com ([156.151.31.86]:45612 "EHLO
+        userp2130.oracle.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S1726910AbfJKQF4 (ORCPT
+        <rfc822;linux-block@vger.kernel.org>);
+        Fri, 11 Oct 2019 12:05:56 -0400
+Received: from pps.filterd (userp2130.oracle.com [127.0.0.1])
+        by userp2130.oracle.com (8.16.0.27/8.16.0.27) with SMTP id x9BG4k5f134580;
+        Fri, 11 Oct 2019 16:05:49 GMT
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=oracle.com; h=date : from : to : cc
+ : subject : message-id : references : mime-version : content-type :
+ in-reply-to; s=corp-2019-08-05;
+ bh=SSlpTZMvOaJILGFHqYWksiEw/n7lv08UA08VQdMxybc=;
+ b=Kbi3oCzHTZmAynqziISo/szs+Jt0cKk20JrIJJN0k5EbZ5RZt7ZPwycVTfVZrMlMK94n
+ 1z/4qRB4LPMC+KCrK8/DGAzud1kOFscFxUbqzHaoh1gl9tmygg5+bz8gz4Q3UElmzEFd
+ BI5DV//piaKowvZpQgZhGSpHI90r7AEUdGWoDasN7RZQmwO3h9fBU72X6WE2A/rE/1wN
+ pEuphJimKyirbTTpZzhTSIL1NahxbOKQeWeMz4yKShsyq97e+ON8NKn73e633sTm2Qdt
+ HqyFHKwwqbKhiuGjGi1auwdlN7O6T0gHB2u7QALLmgvCBDWh0lMaty7KH5XzxB4PRpJv qg== 
+Received: from userp3020.oracle.com (userp3020.oracle.com [156.151.31.79])
+        by userp2130.oracle.com with ESMTP id 2vejkv2q0v-1
+        (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=OK);
+        Fri, 11 Oct 2019 16:05:49 +0000
+Received: from pps.filterd (userp3020.oracle.com [127.0.0.1])
+        by userp3020.oracle.com (8.16.0.27/8.16.0.27) with SMTP id x9BG49eZ042306;
+        Fri, 11 Oct 2019 16:05:49 GMT
+Received: from aserv0121.oracle.com (aserv0121.oracle.com [141.146.126.235])
+        by userp3020.oracle.com with ESMTP id 2vj9qv6peh-1
+        (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=OK);
+        Fri, 11 Oct 2019 16:05:49 +0000
+Received: from abhmp0013.oracle.com (abhmp0013.oracle.com [141.146.116.19])
+        by aserv0121.oracle.com (8.14.4/8.13.8) with ESMTP id x9BG5lfB019222;
+        Fri, 11 Oct 2019 16:05:47 GMT
+Received: from localhost (/67.169.218.210)
+        by default (Oracle Beehive Gateway v4.0)
+        with ESMTP ; Fri, 11 Oct 2019 09:05:46 -0700
+Date:   Fri, 11 Oct 2019 09:05:45 -0700
+From:   "Darrick J. Wong" <darrick.wong@oracle.com>
+To:     Jens Axboe <axboe@kernel.dk>, Christoph Hellwig <hch@infradead.org>
+Cc:     linux-block@vger.kernel.org,
+        linux-fsdevel <linux-fsdevel@vger.kernel.org>,
+        xfs <linux-xfs@vger.kernel.org>
+Subject: [PATCH v2] loop: fix no-unmap write-zeroes request behavior
+Message-ID: <20191011160545.GD13098@magnolia>
+References: <20191010170239.GC13098@magnolia>
 MIME-Version: 1.0
-Content-Type: multipart/signed; micalg=pgp-sha256;
-        protocol="application/pgp-signature"; boundary="+nBD6E3TurpgldQp"
+Content-Type: text/plain; charset=us-ascii
 Content-Disposition: inline
-In-Reply-To: <c24b0ee5-361c-20da-1b7a-27aab947d4f2@kernel.dk>
-User-Agent: Mutt/1.12.1 (2019-06-15)
-X-Scanned-By: MIMEDefang 2.84 on 10.5.11.22
-X-Greylist: Sender IP whitelisted, not delayed by milter-greylist-4.5.16 (mx1.redhat.com [10.5.110.46]); Fri, 11 Oct 2019 15:51:22 +0000 (UTC)
+In-Reply-To: <20191010170239.GC13098@magnolia>
+User-Agent: Mutt/1.9.4 (2018-02-28)
+X-Proofpoint-Virus-Version: vendor=nai engine=6000 definitions=9406 signatures=668684
+X-Proofpoint-Spam-Details: rule=notspam policy=default score=0 suspectscore=0 malwarescore=0
+ phishscore=0 bulkscore=0 spamscore=0 mlxscore=0 mlxlogscore=999
+ adultscore=0 classifier=spam adjust=0 reason=mlx scancount=1
+ engine=8.0.1-1908290000 definitions=main-1910110145
+X-Proofpoint-Virus-Version: vendor=nai engine=6000 definitions=9406 signatures=668684
+X-Proofpoint-Spam-Details: rule=notspam policy=default score=0 priorityscore=1501 malwarescore=0
+ suspectscore=0 phishscore=0 bulkscore=0 spamscore=0 clxscore=1015
+ lowpriorityscore=0 mlxscore=0 impostorscore=0 mlxlogscore=999 adultscore=0
+ classifier=spam adjust=0 reason=mlx scancount=1 engine=8.0.1-1908290000
+ definitions=main-1910110145
 Sender: linux-block-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
+From: Darrick J. Wong <darrick.wong@oracle.com>
 
---+nBD6E3TurpgldQp
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-Content-Transfer-Encoding: quoted-printable
+Currently, if the loop device receives a WRITE_ZEROES request, it asks
+the underlying filesystem to punch out the range.  This behavior is
+correct if unmapping is allowed.  However, a NOUNMAP request means that
+the caller forbids us from freeing the storage backing the range, so
+punching out the range is incorrect behavior.
 
-On Fri, Oct 11, 2019 at 06:08:34AM -0600, Jens Axboe wrote:
-> On 10/11/19 2:46 AM, Stefan Hajnoczi wrote:
-> > On Wed, Oct 09, 2019 at 02:36:01PM -0600, Jens Axboe wrote:
-> >> On 10/9/19 11:46 AM, Stefan Hajnoczi wrote:
-> >>> On Wed, Oct 09, 2019 at 05:27:44AM -0600, Jens Axboe wrote:
-> >>>> On 10/9/19 3:23 AM, Stefan Hajnoczi wrote:
-> >>>>> I hit this NULL pointer dereference when running qemu-iotests 052 (=
-raw)
-> >>>>> on both ext4 and XFS on dm-thin/luks.  The kernel is Linux v5.4-rc1=
- but
-> >>>>> I haven't found any obvious fixes in Jens' tree, so it's likely that
-> >>>>> this bug is still present:
-> >>>>>
-> >>>>> BUG: kernel NULL pointer dereference, address: 0000000000000102
-> >>>>> #PF: supervisor read access in kernel mode
-> >>>>> #PF: error_code(0x0000) - not-present page
-> >>>>> PGD 0 P4D 0
-> >>>>> Oops: 0000 [#1] SMP PTI
-> >>>>> CPU: 2 PID: 6656 Comm: qemu-io Not tainted 5.4.0-rc1 #1
-> >>>>> Hardware name: LENOVO 20BTS1N70V/20BTS1N70V, BIOS N14ET37W (1.15 ) =
-09/06/2016
-> >>>>> RIP: 0010:__queue_work+0x1f/0x3b0
-> >>>>> Code: eb df 66 0f 1f 84 00 00 00 00 00 0f 1f 44 00 00 41 57 49 89 f=
-7 41 56 41 89 fe 41 55 41 89 fd 41 54 55 48 89 d5 53 48 83 ec 10 <f6> 86 02=
- 01 00 00 01 0f 85 bc 02 00 00 49 bc eb 83 b5 80 46 86 c8
-> >>>>> RSP: 0018:ffffbef4884bbd58 EFLAGS: 00010082
-> >>>>> RAX: 0000000000000246 RBX: 0000000000000246 RCX: 0000000000000000
-> >>>>> RDX: ffff9903901f4460 RSI: 0000000000000000 RDI: 0000000000000040
-> >>>>> RBP: ffff9903901f4460 R08: ffff9903901fb040 R09: ffff990398614700
-> >>>>> R10: 0000000000000030 R11: 0000000000000000 R12: 0000000000000000
-> >>>>> R13: 0000000000000040 R14: 0000000000000040 R15: 0000000000000000
-> >>>>> FS:  00007f7d2a4e4a80(0000) GS:ffff9903a5a80000(0000) knlGS:0000000=
-000000000
-> >>>>> CS:  0010 DS: 0000 ES: 0000 CR0: 0000000080050033
-> >>>>> CR2: 0000000000000102 CR3: 0000000203da8004 CR4: 00000000003606e0
-> >>>>> DR0: 0000000000000000 DR1: 0000000000000000 DR2: 0000000000000000
-> >>>>> DR3: 0000000000000000 DR6: 00000000fffe0ff0 DR7: 0000000000000400
-> >>>>> Call Trace:
-> >>>>>     ? __io_queue_sqe+0xa1/0x200
-> >>>>>     queue_work_on+0x36/0x40
-> >>>>>     __io_queue_sqe+0x16e/0x200
-> >>>>>     io_ring_submit+0xd2/0x230
-> >>>>>     ? percpu_ref_resurrect+0x46/0x70
-> >>>>>     ? __io_uring_register+0x207/0xa30
-> >>>>>     ? __schedule+0x286/0x700
-> >>>>>     __x64_sys_io_uring_enter+0x1a3/0x280
-> >>>>>     ? __x64_sys_io_uring_register+0x64/0xb0
-> >>>>>     do_syscall_64+0x5b/0x180
-> >>>>>     entry_SYSCALL_64_after_hwframe+0x44/0xa9
-> >>>>> RIP: 0033:0x7f7d3439f1fd
-> >>>>> Code: 00 c3 66 2e 0f 1f 84 00 00 00 00 00 90 f3 0f 1e fa 48 89 f8 4=
-8 89 f7 48 89 d6 48 89 ca 4d 89 c2 4d 89 c8 4c 8b 4c 24 08 0f 05 <48> 3d 01=
- f0 ff ff 73 01 c3 48 8b 0d 5b 8c 0c 00 f7 d8 64 89 01 48
-> >>>>> RSP: 002b:00007f7d2918d408 EFLAGS: 00000216 ORIG_RAX: 0000000000000=
-1aa
-> >>>>> RAX: ffffffffffffffda RBX: 00007f7d2918d4f0 RCX: 00007f7d3439f1fd
-> >>>>> RDX: 0000000000000000 RSI: 0000000000000001 RDI: 000000000000000a
-> >>>>> RBP: 0000000000000000 R08: 0000000000000000 R09: 0000000000000008
-> >>>>> R10: 0000000000000000 R11: 0000000000000216 R12: 00005616e3c32ab8
-> >>>>> R13: 00005616e3c32b78 R14: 00005616e3c32ab0 R15: 0000000000000001
-> >>>>> Modules linked in: fuse ccm xt_CHECKSUM xt_MASQUERADE tun bridge st=
-p llc nf_conntrack_netbios_ns nf_conntrack_broadcast xt_CT ip6t_rpfilter ip=
-6t_REJECT nf_reject_ipv6 ipt_REJECT nf_reject_ipv4 xt_conntrack ebtable_nat=
- ip6table_nat ip6table_mangle ip6table_raw ip6table_security iptable_nat nf=
-_nat iptable_mangle iptable_raw iptable_security nf_conntrack nf_defrag_ipv=
-6 nf_defrag_ipv4 ip_set nfnetlink ebtable_filter ebtables ip6table_filter i=
-p6_tables iptable_filter ip_tables sunrpc vfat fat intel_rapl_msr rmi_smbus=
- iwlmvm rmi_core intel_rapl_common x86_pkg_temp_thermal intel_powerclamp co=
-retemp mac80211 snd_hda_codec_realtek snd_hda_codec_generic snd_hda_codec_h=
-dmi kvm_intel snd_hda_intel kvm snd_intel_nhlt snd_hda_codec snd_usb_audio =
-irqbypass uvcvideo snd_hda_core snd_usbmidi_lib snd_rawmidi iTCO_wdt snd_hw=
-dep libarc4 intel_cstate cdc_ether intel_uncore videobuf2_vmalloc iwlwifi m=
-ei_wdt mei_hdcp iTCO_vendor_support snd_seq videobuf2_memops usbnet videobu=
-f2_v4l2 snd_seq_device
-> >>>>>     intel_rapl_perf pcspkr videobuf2_common joydev wmi_bmof snd_pcm=
- cfg80211 r8152 videodev intel_pch_thermal i2c_i801 mii mc thinkpad_acpi sn=
-d_timer mei_me ledtrig_audio snd lpc_ich mei soundcore rfkill binfmt_misc x=
-fs dm_thin_pool dm_persistent_data dm_bio_prison libcrc32c dm_crypt i915 i2=
-c_algo_bit drm_kms_helper drm crct10dif_pclmul crc32_pclmul crc32c_intel gh=
-ash_clmulni_intel serio_raw wmi video
-> >>>>> CR2: 0000000000000102
-> >>>>> ---[ end trace 2ac747acabe218da ]---
-> >>>>> RIP: 0010:__queue_work+0x1f/0x3b0
-> >>>>> Code: eb df 66 0f 1f 84 00 00 00 00 00 0f 1f 44 00 00 41 57 49 89 f=
-7 41 56 41 89 fe 41 55 41 89 fd 41 54 55 48 89 d5 53 48 83 ec 10 <f6> 86 02=
- 01 00 00 01 0f 85 bc 02 00 00 49 bc eb 83 b5 80 46 86 c8
-> >>>>> RSP: 0018:ffffbef4884bbd58 EFLAGS: 00010082
-> >>>>> RAX: 0000000000000246 RBX: 0000000000000246 RCX: 0000000000000000
-> >>>>> RDX: ffff9903901f4460 RSI: 0000000000000000 RDI: 0000000000000040
-> >>>>> RBP: ffff9903901f4460 R08: ffff9903901fb040 R09: ffff990398614700
-> >>>>> R10: 0000000000000030 R11: 0000000000000000 R12: 0000000000000000
-> >>>>> R13: 0000000000000040 R14: 0000000000000040 R15: 0000000000000000
-> >>>>> FS:  00007f7d2a4e4a80(0000) GS:ffff9903a5a80000(0000) knlGS:0000000=
-000000000
-> >>>>> CS:  0010 DS: 0000 ES: 0000 CR0: 0000000080050033
-> >>>>> CR2: 0000000000000102 CR3: 0000000203da8004 CR4: 00000000003606e0
-> >>>>> DR0: 0000000000000000 DR1: 0000000000000000 DR2: 0000000000000000
-> >>>>> DR3: 0000000000000000 DR6: 00000000fffe0ff0 DR7: 0000000000000400
-> >>>>>
-> >>>>> Unfortunately I don't have time to find the root cause.  What I've
-> >>>>> figured out so far is:
-> >>>>>
-> >>>>>      bool queue_work_on(int cpu, struct workqueue_struct *wq,
-> >>>>>                         struct work_struct *work)
-> >>>>>      {
-> >>>>>          bool ret =3D false;
-> >>>>>          unsigned long flags;
-> >>>>>
-> >>>>>          local_irq_save(flags);
-> >>>>>
-> >>>>>          if (!test_and_set_bit(WORK_STRUCT_PENDING_BIT, work_data_b=
-its(work))) {
-> >>>>>                                                         ~~~~~~~~~~~=
-~~~~~~~~~
-> >>>>>
-> >>>>> The address of work is 0x102 so this line causes a page fault when =
-it
-> >>>>> tries to access the data field (offset 0).
-> >>>>>
-> >>>>> The caller provided the 0x102 pointer so let's see where it comes f=
-rom:
-> >>>>>
-> >>>>>      static int __io_queue_sqe(struct io_ring_ctx *ctx, struct io_k=
-iocb *req,
-> >>>>>                                struct sqe_submit *s, bool force_non=
-block)
-> >>>>>      {
-> >>>>>          ...
-> >>>>>          if (!io_add_to_prev_work(list, req)) {
-> >>>>>              if (list)
-> >>>>>                  atomic_inc(&list->cnt);
-> >>>>>              INIT_WORK(&req->work, io_sq_wq_submit_work);
-> >>>>>              io_queue_async_work(ctx, req);
-> >>>>> 	  ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
-> >>>>>
-> >>>>> and queue_work() is called here:
-> >>>>>
-> >>>>>      static inline void io_queue_async_work(struct io_ring_ctx *ctx,
-> >>>>>                                             struct io_kiocb *req)
-> >>>>>      {
-> >>>>>          int rw =3D 0;
-> >>>>>
-> >>>>>          if (req->submit.sqe) {
-> >>>>>              switch (req->submit.sqe->opcode) {
-> >>>>>              case IORING_OP_WRITEV:
-> >>>>>              case IORING_OP_WRITE_FIXED:
-> >>>>>                  rw =3D !(req->rw.ki_flags & IOCB_DIRECT);
-> >>>>>                  break;
-> >>>>>              }
-> >>>>>          }
-> >>>>>
-> >>>>>          queue_work(ctx->sqo_wq[rw], &req->work);
-> >>>>>          ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
-> >>>>>
-> >>>>> I must be missing something though because it seems impossible to g=
-et
-> >>>>> this far if req is NULL.  INIT_WORK() would have Oopsed already.  A=
-lso,
-> >>>>> offsetof(struct io_kiocb, work) is 0xa0 according to pahole(1) so we
-> >>>>> still haven't reached the 0x102 offset from the Oops report.
-> >>>>>
-> >>>>> Any ideas?
-> >>>>
-> >>>> This is new in 5.4-rc1?
-> >>>
-> >>> I didn't hit it with 5.3, but I hit other issues so I'm not sure if t=
-his
-> >>> bug exists in older kernels.
-> >>>
-> >>>> And how are you reproducing it?
-> >>>
-> >>>     $ git clone -b io_uring https://github.com/stefanha/qemu
-> >>>     $ cd qemu
-> >>>     $ ./configure --target-list=3Dx86_64-softmmu
-> >>>     $ make -j$(nproc)
-> >>>     $ (cd tests/qemu-iotests && ./check -i io_uring 052)
-> >>>
-> >>> You can mount the file system of your choice at
-> >>> tests/qemu-iotests/scratch/ before running the test.
-> >>>
-> >>> You can view the test case at tests/qemu-iotests/052.
-> >>
-> >> Thanks, that's useful. Need to look closer into this, but seems wrong
-> >> that we're killing the workqueue for SCM_RIGHTS removal. We just need =
-to
-> >> sync it. Does this work for you?
-> >>
-> >>
-> >> diff --git a/fs/io_uring.c b/fs/io_uring.c
-> >> index 8a0381f1a43b..a8755582c688 100644
-> >> --- a/fs/io_uring.c
-> >> +++ b/fs/io_uring.c
-> >> @@ -2920,8 +2920,12 @@ static void io_finish_async(struct io_ring_ctx =
-*ctx)
-> >>   static void io_destruct_skb(struct sk_buff *skb)
-> >>   {
-> >>   	struct io_ring_ctx *ctx =3D skb->sk->sk_user_data;
-> >> +	int i;
-> >> +
-> >> +	for (i =3D 0; i < ARRAY_SIZE(ctx->sqo_wq); i++)
-> >> +		if (ctx->sqo_wq[i])
-> >> +			flush_workqueue(ctx->sqo_wq[i]);
-> >>  =20
-> >> -	io_finish_async(ctx);
-> >>   	unix_destruct_scm(skb);
-> >>   }
-> >=20
-> > I tried this patch but still hit the same NULL pointer dereference.
->=20
-> How certain are you that you booted the right kernel when you tested
-> that? Because I'm very certain that this patch will fix the issue you
-> saw.
+To satisfy a NOUNMAP | WRITE_ZEROES request, loop should ask the
+underlying filesystem to FALLOC_FL_ZERO_RANGE, which is (according to
+the fallocate documentation) required to ensure that the entire range is
+backed by real storage, which suffices for our purposes.
 
-Quite certain but I can try again.  It was Linux v5.4.0-rc1 plus your
-patch.
+Fixes: 19372e2769179dd ("loop: implement REQ_OP_WRITE_ZEROES")
+Signed-off-by: Darrick J. Wong <darrick.wong@oracle.com>
+---
+v2: reorganize a little according to hch feedback
+---
+ drivers/block/loop.c |   31 ++++++++++++++++++++++++++++++-
+ 1 file changed, 30 insertions(+), 1 deletion(-)
 
-> You can also pull:
->=20
-> git://git.kernel.dk/linux-block for-linus
->=20
-> into master and test that.
-
-Cool, I'll try this tree instead.
-
-Stefan
-
---+nBD6E3TurpgldQp
-Content-Type: application/pgp-signature; name="signature.asc"
-
------BEGIN PGP SIGNATURE-----
-
-iQEzBAEBCAAdFiEEhpWov9P5fNqsNXdanKSrs4Grc8gFAl2gpPgACgkQnKSrs4Gr
-c8jVPwf/Tj8nVxvMwWL/bIhlGKJhQpCNMYdm+o1PHuTwpMGzH2QhlooK2DSZjxdp
-Wa/2KM/exblxyLBKG1A4NJJdPAGOfpQTkeBFggwSQH5eoRhE7ZE/Mb1q6Syq84YZ
-18wXz8Efymk6l/ne31WKTz7BVRv6uRTeOBQkq4lcCw1LitfGG6UGhV6snizjnfxh
-/m0d112cgwyJ5HlIjVpjGkvsfggDCUg6VTWyT6pTb1sQzWDah6mRFEzQ1eaNfAzW
-+z8NINRVwSgLnfjYqEsAZ8wdBoXTeWgkqydm3FOTGU2KNgYeYkCsaOjynpZ7+gcC
-VWmUxCmegR3W0RBONqcFLkeEAZgKYQ==
-=Ny0T
------END PGP SIGNATURE-----
-
---+nBD6E3TurpgldQp--
+diff --git a/drivers/block/loop.c b/drivers/block/loop.c
+index f6f77eaa7217..4943d0c5c61c 100644
+--- a/drivers/block/loop.c
++++ b/drivers/block/loop.c
+@@ -441,6 +441,28 @@ static int lo_discard(struct loop_device *lo, struct request *rq, loff_t pos)
+ 	return ret;
+ }
+ 
++static int lo_zeroout(struct loop_device *lo, struct request *rq, loff_t pos)
++{
++	struct file *file = lo->lo_backing_file;
++	int mode = FALLOC_FL_ZERO_RANGE | FALLOC_FL_KEEP_SIZE;
++	int ret;
++
++	/*
++	 * Ask the fs to zero out the blocks, which is supposed to result in
++	 * space being allocated to the file.
++	 */
++	if (!file->f_op->fallocate) {
++		ret = -EOPNOTSUPP;
++		goto out;
++	}
++
++	ret = file->f_op->fallocate(file, mode, pos, blk_rq_bytes(rq));
++	if (unlikely(ret && ret != -EINVAL && ret != -EOPNOTSUPP))
++		ret = -EIO;
++ out:
++	return ret;
++}
++
+ static int lo_req_flush(struct loop_device *lo, struct request *rq)
+ {
+ 	struct file *file = lo->lo_backing_file;
+@@ -596,8 +618,15 @@ static int do_req_filebacked(struct loop_device *lo, struct request *rq)
+ 	switch (req_op(rq)) {
+ 	case REQ_OP_FLUSH:
+ 		return lo_req_flush(lo, rq);
+-	case REQ_OP_DISCARD:
+ 	case REQ_OP_WRITE_ZEROES:
++		/*
++		 * If the caller doesn't want deallocation, call zeroout to
++		 * write zeroes the range.  Otherwise, punch them out.
++		 */
++		if (rq->cmd_flags & REQ_NOUNMAP)
++			return lo_zeroout(lo, rq, pos);
++		/* fall through */
++	case REQ_OP_DISCARD:
+ 		return lo_discard(lo, rq, pos);
+ 	case REQ_OP_WRITE:
+ 		if (lo->transfer)
