@@ -2,139 +2,151 @@ Return-Path: <SRS0=5xwa=YE=vger.kernel.org=linux-block-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-5.2 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
-	MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED,
-	USER_AGENT_SANE_1 autolearn=unavailable autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-8.2 required=3.0 tests=DKIM_SIGNED,DKIM_VALID,
+	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,
+	SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED,USER_AGENT_SANE_1 autolearn=ham
+	autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 8C0FAECE58D
-	for <linux-block@archiver.kernel.org>; Fri, 11 Oct 2019 03:16:17 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id B15B5C4360C
+	for <linux-block@archiver.kernel.org>; Fri, 11 Oct 2019 03:17:24 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.kernel.org (Postfix) with ESMTP id 6912E21A4A
-	for <linux-block@archiver.kernel.org>; Fri, 11 Oct 2019 03:16:17 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id 817B32067B
+	for <linux-block@archiver.kernel.org>; Fri, 11 Oct 2019 03:17:24 +0000 (UTC)
+Authentication-Results: mail.kernel.org;
+	dkim=pass (2048-bit key) header.d=kernel-dk.20150623.gappssmtp.com header.i=@kernel-dk.20150623.gappssmtp.com header.b="tqTVWe9I"
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1726546AbfJKDQQ (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Thu, 10 Oct 2019 23:16:16 -0400
-Received: from szxga06-in.huawei.com ([45.249.212.32]:48258 "EHLO huawei.com"
-        rhost-flags-OK-OK-OK-FAIL) by vger.kernel.org with ESMTP
-        id S1726096AbfJKDQQ (ORCPT <rfc822;linux-block@vger.kernel.org>);
-        Thu, 10 Oct 2019 23:16:16 -0400
-Received: from DGGEMS413-HUB.china.huawei.com (unknown [172.30.72.60])
-        by Forcepoint Email with ESMTP id 1B18565B942655BC239C;
-        Fri, 11 Oct 2019 11:16:14 +0800 (CST)
-Received: from [127.0.0.1] (10.177.219.49) by DGGEMS413-HUB.china.huawei.com
- (10.3.19.213) with Microsoft SMTP Server id 14.3.439.0; Fri, 11 Oct 2019
- 11:16:10 +0800
-Subject: Re: [PATCH v4] block: fix null pointer dereference in
- blk_mq_rq_timed_out()
-To:     Jack Wang <jack.wang.usish@gmail.com>
-CC:     Jens Axboe <axboe@kernel.dk>, <linux-block@vger.kernel.org>,
-        Ming Lei <ming.lei@redhat.com>,
-        Christoph Hellwig <hch@infradead.org>,
-        Keith Busch <keith.busch@intel.com>,
-        Bart Van Assche <bvanassche@acm.org>,
-        stable <stable@vger.kernel.org>, <guoqing.jiang@cloud.ionos.com>,
-        <jinpu.wang@cloud.ionos.com>
-References: <20190925122025.31246-1-yuyufen@huawei.com>
- <CA+res+QQtXD6phz=Ko-_n7eWVySrJA1kqgmMW3h3YUX+5RQ_7w@mail.gmail.com>
-From:   Yufen Yu <yuyufen@huawei.com>
-Message-ID: <9f99de42-9edb-d7df-df8c-e994ada6613c@huawei.com>
-Date:   Fri, 11 Oct 2019 11:16:08 +0800
-User-Agent: Mozilla/5.0 (Windows NT 6.1; WOW64; rv:52.0) Gecko/20100101
- Thunderbird/52.2.1
+        id S1726116AbfJKDRY (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Thu, 10 Oct 2019 23:17:24 -0400
+Received: from mail-pg1-f194.google.com ([209.85.215.194]:44557 "EHLO
+        mail-pg1-f194.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S1726096AbfJKDRX (ORCPT
+        <rfc822;linux-block@vger.kernel.org>);
+        Thu, 10 Oct 2019 23:17:23 -0400
+Received: by mail-pg1-f194.google.com with SMTP id e10so935931pgd.11
+        for <linux-block@vger.kernel.org>; Thu, 10 Oct 2019 20:17:22 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=kernel-dk.20150623.gappssmtp.com; s=20150623;
+        h=subject:to:cc:references:from:message-id:date:user-agent
+         :mime-version:in-reply-to:content-language:content-transfer-encoding;
+        bh=Aqz4nekBE465eQXPB0yOaK19jNjs0/oVEbgRjBsrhm8=;
+        b=tqTVWe9IkObTQzASoKSdMjdpV8bvZrBldc/J7xR3dUZmc7lktXaHdFIfcIe/2vN7bV
+         9lsvysNJ/TlTHZFP0IaojJaqAHQ3fkKvqNb6BF9gPhud72PkWTGzs7KlB1nCt0yRq/5u
+         Esy5rAW/CLBoi7UI+82nAZlrGnUEu0A7xAC8CQ2igEnkVhOSD5wpPVKiTDJB2+fhcOUg
+         +g7eV3q+OXqVLBxgciVvQlA2KcrDNAkA2qlWNsXkNzsrmhE0bkxAnuxk0nMjL/3PNYfP
+         UgMiPTZkjL4I0Y91SWXCx8AgdrLU51hEDfEjqwyhnxOTO3wC5ilUkqTPV1/W7YE7cT2Z
+         ip6g==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20161025;
+        h=x-gm-message-state:subject:to:cc:references:from:message-id:date
+         :user-agent:mime-version:in-reply-to:content-language
+         :content-transfer-encoding;
+        bh=Aqz4nekBE465eQXPB0yOaK19jNjs0/oVEbgRjBsrhm8=;
+        b=CfJJLMPw3V2s5z2SyZNcWBMDQ6QoaGobAZKeOiBn7kPGXEsGvF/Dwg/GUewbEdnxYf
+         sRUAaQjudorNXeSULfJkQ6ZuknlUts+yHc84J/RIvDGrEZD1Sfm6oiL5nROuPjsBW5kw
+         vYBEKzzjYnOc43cRk/DunSQ8exG0USHKkeTffvtVC/CZGGvfBxYH7MzLuoRanD704xit
+         HJovib2Ts1+Yz8z5hFl3hO7NyUXnLtj7hCEv5M+70cizo1xR6W9QHcB6SwnluYfbF4BN
+         FKnBldLZnaev52KveWUEY0wgshvvQKL+/LO9wQKAZeirhIHAbaB5NA827kGd1EGj1R3E
+         imeQ==
+X-Gm-Message-State: APjAAAWkGo9H1u1gt9UV0IKpIjsyAss1WdIH36yLHTsKC3A59n9SDefZ
+        R6tYN9fBFlgUEVltaSxDv59rPkmQxkl7Bw==
+X-Google-Smtp-Source: APXvYqyHZ4CxK83kKaxWDonfQ5q0LbveJN++KViWdv6892uBG6T1UQ078Z2tOQtkvs+wzV9MmyRE2g==
+X-Received: by 2002:a17:90a:a416:: with SMTP id y22mr6697040pjp.74.1570763840981;
+        Thu, 10 Oct 2019 20:17:20 -0700 (PDT)
+Received: from [192.168.1.188] ([66.219.217.79])
+        by smtp.gmail.com with ESMTPSA id u13sm744325pgk.88.2019.10.10.20.17.18
+        (version=TLS1_2 cipher=ECDHE-RSA-AES128-GCM-SHA256 bits=128/128);
+        Thu, 10 Oct 2019 20:17:19 -0700 (PDT)
+Subject: Re: [PATCH 1/2] io_uring: make the logic clearer for
+ io_sequence_defer
+To:     Jackie Liu <liuyun01@kylinos.cn>
+Cc:     yangerkun <yangerkun@huawei.com>, linux-block@vger.kernel.org
+References: <20191009011959.2203-1-liuyun01@kylinos.cn>
+ <7af32ce6-dc8f-6683-2b99-95eefb598bff@huawei.com>
+ <597dc8a4-b9db-f0b7-21b5-12050f07e766@kernel.dk>
+ <544E51DB-7774-4DDF-A897-7A957AE2CDEB@kylinos.cn>
+From:   Jens Axboe <axboe@kernel.dk>
+Message-ID: <6e1c1450-4317-7acf-dfa0-40977de4b8ea@kernel.dk>
+Date:   Thu, 10 Oct 2019 21:17:16 -0600
+User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:60.0) Gecko/20100101
+ Thunderbird/60.9.0
 MIME-Version: 1.0
-In-Reply-To: <CA+res+QQtXD6phz=Ko-_n7eWVySrJA1kqgmMW3h3YUX+5RQ_7w@mail.gmail.com>
-Content-Type: text/plain; charset="utf-8"; format=flowed
-Content-Transfer-Encoding: 7bit
+In-Reply-To: <544E51DB-7774-4DDF-A897-7A957AE2CDEB@kylinos.cn>
+Content-Type: text/plain; charset=utf-8
 Content-Language: en-US
-X-Originating-IP: [10.177.219.49]
-X-CFilter-Loop: Reflected
+Content-Transfer-Encoding: 8bit
 Sender: linux-block-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
+On 10/10/19 9:06 PM, Jackie Liu wrote:
+> 
+> 
+>> 2019年10月11日 10:35，Jens Axboe <axboe@kernel.dk> 写道：
+>>
+>> On 10/10/19 8:24 PM, yangerkun wrote:
+>>>
+>>>
+>>> On 2019/10/9 9:19, Jackie Liu wrote:
+>>>> __io_get_deferred_req is used to get all defer lists, including defer_list
+>>>> and timeout_list, but io_sequence_defer should be only cares about the sequence.
+>>>>
+>>>> Signed-off-by: Jackie Liu <liuyun01@kylinos.cn>
+>>>> ---
+>>>>    fs/io_uring.c | 13 +++++--------
+>>>>    1 file changed, 5 insertions(+), 8 deletions(-)
+>>>>
+>>>> diff --git a/fs/io_uring.c b/fs/io_uring.c
+>>>> index 8a0381f1a43b..8ec2443eb019 100644
+>>>> --- a/fs/io_uring.c
+>>>> +++ b/fs/io_uring.c
+>>>> @@ -418,9 +418,7 @@ static struct io_ring_ctx *io_ring_ctx_alloc(struct io_uring_params *p)
+>>>>    static inline bool io_sequence_defer(struct io_ring_ctx *ctx,
+>>>>    				     struct io_kiocb *req)
+>>>>    {
+>>>> -	/* timeout requests always honor sequence */
+>>>> -	if (!(req->flags & REQ_F_TIMEOUT) &&
+>>>> -	    (req->flags & (REQ_F_IO_DRAIN|REQ_F_IO_DRAINED)) != REQ_F_IO_DRAIN)
+>>>> +	if ((req->flags & (REQ_F_IO_DRAIN|REQ_F_IO_DRAINED)) != REQ_F_IO_DRAIN)
+>>>>    		return false;
+>>>>
+>>>>    	return req->sequence != ctx->cached_cq_tail + ctx->rings->sq_dropped;
+>>>> @@ -435,12 +433,11 @@ static struct io_kiocb *__io_get_deferred_req(struct io_ring_ctx *ctx,
+>>>>    		return NULL;
+>>>>
+>>>>    	req = list_first_entry(list, struct io_kiocb, list);
+>>>> -	if (!io_sequence_defer(ctx, req)) {
+>>>> -		list_del_init(&req->list);
+>>>> -		return req;
+>>>> -	}
+>>>> +	if (!(req->flags & REQ_F_TIMEOUT) && io_sequence_defer(ctx, req))
+>>>> +		return NULL;
+>>> Hi,
+>>>
+>>> For timeout req, we should also compare the sequence to determine to
+>>> return NULL or the req. But now we will return req directly. Actually,
+>>> no need to compare req->flags with REQ_F_TIMEOUT.
+>>
+>> Yes, not sure how I missed this, the patch is broken as-is. I will kill
+>> it, cleanup can be done differently.
+> 
+> Sorry for miss it, I don't wanna change the logic, it's not my
+> original meaning.
 
+No worries, mistakes happen.
 
-On 2019/10/9 16:26, Jack Wang wrote:
->
->> We got a null pointer deference BUG_ON in blk_mq_rq_timed_out()
->> as following:
->>
->> [  108.825472] BUG: kernel NULL pointer dereference, address: 0000000000000040
->> [  108.827059] PGD 0 P4D 0
->> [  108.827313] Oops: 0000 [#1] SMP PTI
->> [  108.827657] CPU: 6 PID: 198 Comm: kworker/6:1H Not tainted 5.3.0-rc8+ #431
->> [  108.829503] Workqueue: kblockd blk_mq_timeout_work
->> [  108.829913] RIP: 0010:blk_mq_check_expired+0x258/0x330
->> [  108.838191] Call Trace:
->> [  108.838406]  bt_iter+0x74/0x80
->> [  108.838665]  blk_mq_queue_tag_busy_iter+0x204/0x450
->> [  108.839074]  ? __switch_to_asm+0x34/0x70
->> [  108.839405]  ? blk_mq_stop_hw_queue+0x40/0x40
->> [  108.839823]  ? blk_mq_stop_hw_queue+0x40/0x40
->> [  108.840273]  ? syscall_return_via_sysret+0xf/0x7f
->> [  108.840732]  blk_mq_timeout_work+0x74/0x200
->> [  108.841151]  process_one_work+0x297/0x680
->> [  108.841550]  worker_thread+0x29c/0x6f0
->> [  108.841926]  ? rescuer_thread+0x580/0x580
->> [  108.842344]  kthread+0x16a/0x1a0
->> [  108.842666]  ? kthread_flush_work+0x170/0x170
->> [  108.843100]  ret_from_fork+0x35/0x40
->>
->> The bug is caused by the race between timeout handle and completion for
->> flush request.
->>
->> When timeout handle function blk_mq_rq_timed_out() try to read
->> 'req->q->mq_ops', the 'req' have completed and reinitiated by next
->> flush request, which would call blk_rq_init() to clear 'req' as 0.
->>
->> After commit 12f5b93145 ("blk-mq: Remove generation seqeunce"),
->> normal requests lifetime are protected by refcount. Until 'rq->ref'
->> drop to zero, the request can really be free. Thus, these requests
->> cannot been reused before timeout handle finish.
->>
->> However, flush request has defined .end_io and rq->end_io() is still
->> called even if 'rq->ref' doesn't drop to zero. After that, the 'flush_rq'
->> can be reused by the next flush request handle, resulting in null
->> pointer deference BUG ON.
->>
->> We fix this problem by covering flush request with 'rq->ref'.
->> If the refcount is not zero, flush_end_io() return and wait the
->> last holder recall it. To record the request status, we add a new
->> entry 'rq_status', which will be used in flush_end_io().
->>
->> Cc: Ming Lei <ming.lei@redhat.com>
->> Cc: Christoph Hellwig <hch@infradead.org>
->> Cc: Keith Busch <keith.busch@intel.com>
->> Cc: Bart Van Assche <bvanassche@acm.org>
->> Cc: stable@vger.kernel.org # v4.18+
->> Signed-off-by: Yufen Yu <yuyufen@huawei.com>
->>
-> Hi Yufen,
->
-> Can you share your reproducer, I think the bug was there for long
-> time, we hit it in kernel 4.4.
-> We also need to fix it for older LTS kernel.
->
-> Do you have an idea, how should we fix it for older LTS kernel?
->
+> Personal opinion, timeout list should not be mixed with defer_list,
+> which makes the code more complicated and difficult to understand.
 
-I have reproduced the bug by increasing delay after doing memset()
-in blk_rq_init() and before calling blk_mq_rq_timed_out() in 
-blk_mq_check_expired().
+Not sure why you feel they are mixed? They are in separate lists, but
+they share using the sequence logic. In that respet they are really not
+that different, the sequence will trigger either one of them. Either as
+a timeout, or as a "can now be issued". Hence the code handling them is
+both shared and identical.
 
-To make sure the request will be timeout, I have also increase delay
-for flush request after blk_mq_start_request() in virtio_queue_rq() for
-my virtio disk. Then, we just issue a flush request for the disk by fio.
-The BUG_ON will be triggered.
+I do agree that the check could be cleaner, which is probably how the
+mistake in this patch happened in the first place.
 
-For LTS 4.4 or older kernel, the race between timeout handle and completion
-for normal request have not yet resolved.
-So, IMO, we should fix the bug first by merging commit 12f5b93145
-("blk-mq: Remove generation seqeunce") and its related patches.
-
-After that, this patch can also be merged.
-
-Thanks,
-Yufen
+-- 
+Jens Axboe
 
