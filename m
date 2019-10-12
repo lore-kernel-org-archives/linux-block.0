@@ -2,37 +2,37 @@ Return-Path: <SRS0=KslL=YF=vger.kernel.org=linux-block-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-10.2 required=3.0
+X-Spam-Status: No, score=-10.3 required=3.0
 	tests=HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,
-	MENTIONS_GIT_HOSTING,SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED,USER_AGENT_SANE_1
-	autolearn=ham autolearn_force=no version=3.4.0
+	MENTIONS_GIT_HOSTING,SPF_HELO_NONE,SPF_PASS,USER_AGENT_SANE_1 autolearn=ham
+	autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 87637C4360C
-	for <linux-block@archiver.kernel.org>; Sat, 12 Oct 2019 10:24:41 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id CA11AC4360C
+	for <linux-block@archiver.kernel.org>; Sat, 12 Oct 2019 16:48:36 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.kernel.org (Postfix) with ESMTP id 4E81F2087E
-	for <linux-block@archiver.kernel.org>; Sat, 12 Oct 2019 10:24:41 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id 926E520679
+	for <linux-block@archiver.kernel.org>; Sat, 12 Oct 2019 16:48:36 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1727594AbfJLKYk (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Sat, 12 Oct 2019 06:24:40 -0400
-Received: from mx1.redhat.com ([209.132.183.28]:48250 "EHLO mx1.redhat.com"
+        id S1728978AbfJLQsf (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Sat, 12 Oct 2019 12:48:35 -0400
+Received: from mx1.redhat.com ([209.132.183.28]:43982 "EHLO mx1.redhat.com"
         rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-        id S1727654AbfJLKWk (ORCPT <rfc822;linux-block@vger.kernel.org>);
-        Sat, 12 Oct 2019 06:22:40 -0400
-Received: from smtp.corp.redhat.com (int-mx05.intmail.prod.int.phx2.redhat.com [10.5.11.15])
+        id S1727115AbfJLQqf (ORCPT <rfc822;linux-block@vger.kernel.org>);
+        Sat, 12 Oct 2019 12:46:35 -0400
+Received: from smtp.corp.redhat.com (int-mx01.intmail.prod.int.phx2.redhat.com [10.5.11.11])
         (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
         (No client certificate requested)
-        by mx1.redhat.com (Postfix) with ESMTPS id B30F08980E2;
-        Sat, 12 Oct 2019 10:22:39 +0000 (UTC)
-Received: from localhost (ovpn-116-62.ams2.redhat.com [10.36.116.62])
-        by smtp.corp.redhat.com (Postfix) with ESMTP id 02B9F5D6C8;
-        Sat, 12 Oct 2019 10:22:38 +0000 (UTC)
-Date:   Sat, 12 Oct 2019 11:22:37 +0100
+        by mx1.redhat.com (Postfix) with ESMTPS id 379BCA3CD70;
+        Sat, 12 Oct 2019 16:46:35 +0000 (UTC)
+Received: from localhost (ovpn-116-56.ams2.redhat.com [10.36.116.56])
+        by smtp.corp.redhat.com (Postfix) with ESMTP id 8F0D46017E;
+        Sat, 12 Oct 2019 16:46:34 +0000 (UTC)
+Date:   Sat, 12 Oct 2019 17:46:33 +0100
 From:   Stefan Hajnoczi <stefanha@redhat.com>
 To:     Jens Axboe <axboe@kernel.dk>
 Cc:     linux-block@vger.kernel.org
 Subject: Re: io_uring NULL pointer dereference on Linux v5.4-rc1
-Message-ID: <20191012102237.GA17940@stefanha-x1.localdomain>
+Message-ID: <20191012164633.GA17917@stefanha-x1.localdomain>
 References: <20191009092302.GA5303@stefanha-x1.localdomain>
  <e9beeedf-3a06-841f-53a4-51ac4e9e13ea@kernel.dk>
  <20191009174602.GI13568@stefanha-x1.localdomain>
@@ -41,19 +41,19 @@ References: <20191009092302.GA5303@stefanha-x1.localdomain>
  <c24b0ee5-361c-20da-1b7a-27aab947d4f2@kernel.dk>
 MIME-Version: 1.0
 Content-Type: multipart/signed; micalg=pgp-sha256;
-        protocol="application/pgp-signature"; boundary="jRHKVT23PllUwdXP"
+        protocol="application/pgp-signature"; boundary="SUOF0GtieIMvvwua"
 Content-Disposition: inline
 In-Reply-To: <c24b0ee5-361c-20da-1b7a-27aab947d4f2@kernel.dk>
 User-Agent: Mutt/1.12.1 (2019-06-15)
-X-Scanned-By: MIMEDefang 2.79 on 10.5.11.15
-X-Greylist: Sender IP whitelisted, not delayed by milter-greylist-4.6.2 (mx1.redhat.com [10.5.110.67]); Sat, 12 Oct 2019 10:22:39 +0000 (UTC)
+X-Scanned-By: MIMEDefang 2.79 on 10.5.11.11
+X-Greylist: Sender IP whitelisted, not delayed by milter-greylist-4.6.2 (mx1.redhat.com [10.5.110.68]); Sat, 12 Oct 2019 16:46:35 +0000 (UTC)
 Sender: linux-block-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
 
---jRHKVT23PllUwdXP
+--SUOF0GtieIMvvwua
 Content-Type: text/plain; charset=us-ascii
 Content-Disposition: inline
 Content-Transfer-Encoding: quoted-printable
@@ -277,32 +277,28 @@ to
 >=20
 > into master and test that.
 
-Yay, that tree doesn't hit the NULL pointer dereference :).
+It was bugging me that we don't know if Linux v5.4-rc1 has a regression,
+so I merged your for-linux branch on top of Linux v5.4-rc1 as you
+suggested.
 
-I'm not sure if:
-1. I made a mistake when testing your patch.
-2. Your linux-block for-linux tree has additional fixes which are also
-   needed.
-3. Linux v5.4.0-rc1 introduced this regression.
+The test passes, so it's now certain that the fix(es) in your for-linux
+branch solve the NULL pointer dereference :).
 
-Anyway, I'll let you know if it reappears in newer kernel versions.
-
-Thanks,
 Stefan
 
---jRHKVT23PllUwdXP
+--SUOF0GtieIMvvwua
 Content-Type: application/pgp-signature; name="signature.asc"
 
 -----BEGIN PGP SIGNATURE-----
 
-iQEzBAEBCAAdFiEEhpWov9P5fNqsNXdanKSrs4Grc8gFAl2hqWsACgkQnKSrs4Gr
-c8jSbQgAu+YDgyrV9GZrazuBiZHOlwZCFr0pGmNPHAXn2dP/ca/qbqCgmAER2noS
-o+stAoAns+sjfrA1GePC9SUvvIJsK9a7gg/mLczEHqKT0nRWhUjk3hsvV7XA84Xi
-h1a8YPU6mCbWolJUKOrtVqm7Z0/ybEhSgeqyQicOY/LLu+DTnPyJfbiMO07nSxxj
-iUIZRsBU9SJiHFNBbtVM2GTGRmXjnmFcjw6er4yuf00bDZAW+8OSCDijB9NUXrs4
-STrDtGfPvl2bBuybSw16J7kBJi2ybiE3mTpKwii4qqOazDp5CwFwU6NaK8RGOvlI
-v6MSM+yrlK3Xj15j0XvwLmV+muaKVw==
-=t9TX
+iQEzBAEBCAAdFiEEhpWov9P5fNqsNXdanKSrs4Grc8gFAl2iA2YACgkQnKSrs4Gr
+c8hDxQf/ZfRTyJDKOKbVnILi//OxtpkDZBF2jT4bLfnCcXLClcBqIcJpqqPGh9A4
+19N9wvJlFD0V1E3pfnCrEmDQgzep4fPxo7nTMFP+APgHJhuG3NDM3YefCENFSc6Y
+22AK4xoJmeBRxlnESFK4nvWjtD17DDqXMTQhjasl9c2cKUvXCp+fhziyUFI8oLRO
+WDESHO2L4vdLblt57q7w/5l3FG4Y8aJnKa0+ZMxivON416GUKhHgoKnou1o54NxT
+j0bRjUdAw32dLzZPb388t4ETIqCdMOoqFawQAS91KFgPQun+tEWSdNBzsX4sr01E
+s9PXh1+qlGZufgqgHk8K0A+Go1HZvw==
+=WuVA
 -----END PGP SIGNATURE-----
 
---jRHKVT23PllUwdXP--
+--SUOF0GtieIMvvwua--
