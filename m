@@ -2,303 +2,279 @@ Return-Path: <SRS0=KslL=YF=vger.kernel.org=linux-block-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-10.3 required=3.0
-	tests=HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,
-	MENTIONS_GIT_HOSTING,SPF_HELO_NONE,SPF_PASS,USER_AGENT_SANE_1 autolearn=ham
-	autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-10.2 required=3.0 tests=DKIM_SIGNED,DKIM_VALID,
+	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,
+	MENTIONS_GIT_HOSTING,SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED,USER_AGENT_SANE_1
+	autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id CA11AC4360C
-	for <linux-block@archiver.kernel.org>; Sat, 12 Oct 2019 16:48:36 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id BEE8FC4360C
+	for <linux-block@archiver.kernel.org>; Sat, 12 Oct 2019 17:00:52 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.kernel.org (Postfix) with ESMTP id 926E520679
-	for <linux-block@archiver.kernel.org>; Sat, 12 Oct 2019 16:48:36 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id 6AE262087E
+	for <linux-block@archiver.kernel.org>; Sat, 12 Oct 2019 17:00:52 +0000 (UTC)
+Authentication-Results: mail.kernel.org;
+	dkim=pass (2048-bit key) header.d=kernel-dk.20150623.gappssmtp.com header.i=@kernel-dk.20150623.gappssmtp.com header.b="Z2/WBWrc"
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1728978AbfJLQsf (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Sat, 12 Oct 2019 12:48:35 -0400
-Received: from mx1.redhat.com ([209.132.183.28]:43982 "EHLO mx1.redhat.com"
-        rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-        id S1727115AbfJLQqf (ORCPT <rfc822;linux-block@vger.kernel.org>);
-        Sat, 12 Oct 2019 12:46:35 -0400
-Received: from smtp.corp.redhat.com (int-mx01.intmail.prod.int.phx2.redhat.com [10.5.11.11])
-        (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
-        (No client certificate requested)
-        by mx1.redhat.com (Postfix) with ESMTPS id 379BCA3CD70;
-        Sat, 12 Oct 2019 16:46:35 +0000 (UTC)
-Received: from localhost (ovpn-116-56.ams2.redhat.com [10.36.116.56])
-        by smtp.corp.redhat.com (Postfix) with ESMTP id 8F0D46017E;
-        Sat, 12 Oct 2019 16:46:34 +0000 (UTC)
-Date:   Sat, 12 Oct 2019 17:46:33 +0100
-From:   Stefan Hajnoczi <stefanha@redhat.com>
-To:     Jens Axboe <axboe@kernel.dk>
-Cc:     linux-block@vger.kernel.org
+        id S1729474AbfJLRAw (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Sat, 12 Oct 2019 13:00:52 -0400
+Received: from mail-pf1-f193.google.com ([209.85.210.193]:44701 "EHLO
+        mail-pf1-f193.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S1728338AbfJLQ6v (ORCPT
+        <rfc822;linux-block@vger.kernel.org>);
+        Sat, 12 Oct 2019 12:58:51 -0400
+Received: by mail-pf1-f193.google.com with SMTP id q21so7903194pfn.11
+        for <linux-block@vger.kernel.org>; Sat, 12 Oct 2019 09:58:49 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=kernel-dk.20150623.gappssmtp.com; s=20150623;
+        h=subject:to:cc:references:from:message-id:date:user-agent
+         :mime-version:in-reply-to:content-language:content-transfer-encoding;
+        bh=9N1z/RjgEPUARRrmX1W+xWhOylnRu5T75w28+78gCSQ=;
+        b=Z2/WBWrcm6Ww8Fqtql8Kg6MDZdg9n+LSC0Jo1uLNnSJXFGo+/q9mSCeg9R9KHFihbR
+         eI96XO78uXIakAFICOun24NMFXSdT/BHqytTx4H05hWrNu+BTJ9hmJEmlWQv7He5S0XF
+         ZGLXyMf+FVVEim0//p8xm3A9DBlC//NTo5dk0o+mpXgzXq0aVvOJfMVdGPEwNnEhPAVV
+         1sS2J640bRGzrYU8NJisBNLtFB2T/VRFSjms9Kx8OqCGeDthUp/7by6GVrXP0q3Sfjwp
+         hQWOOhIX2nlZea362THLfxx5GL+TQ/jhC9JA8jofJrQEFl9iu9enYhnp+bmo2sMf2MGv
+         9h2g==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20161025;
+        h=x-gm-message-state:subject:to:cc:references:from:message-id:date
+         :user-agent:mime-version:in-reply-to:content-language
+         :content-transfer-encoding;
+        bh=9N1z/RjgEPUARRrmX1W+xWhOylnRu5T75w28+78gCSQ=;
+        b=lgS5ekkKOeBXl7K9vyfsKYkjPhCunV3xYwvCHfK6DwYFnft40srPSH0NPg6zsDmsG2
+         qdqS0Vi6oMOTOPCCXseEYhkOlVotYx8SHVUHGBUqF0PnMlBpnk+9ITLDU5KrJXlwJZG+
+         5avGE08C4PQuGCKpzE9zGi+51CxxyhHqwZnz1PyfLqtKvi9/QuCbDAMu9EFQ3kJYjWJs
+         pQDpQZv19p2q+Qsf4ivofFtW30l5uwIfMAPTFT/Tj+/HyfzqB8Pb3lglp2wC4vqXM6he
+         Cbauuah6Orr5naHjyyq43h2eHq0/8ppMRheE9foi8a2XfE003b0v5x2heyLRhxMCES3c
+         PaJg==
+X-Gm-Message-State: APjAAAWOxGcm0yxDSBZxhT2m/YaseA27pQAUL+ruc7yy9GVSfuKlhex0
+        5/oKLDySnlqJUcT/9ESUTCh2MEa4xwUCjQ==
+X-Google-Smtp-Source: APXvYqybdYVQi0Jyeu56d8oMx1lSmtkT6CcfEZeB7cx37xEKzc+B4rq9SGe8hMzs04rehIHMz9Bysg==
+X-Received: by 2002:a17:90a:8003:: with SMTP id b3mr25017763pjn.43.1570899528650;
+        Sat, 12 Oct 2019 09:58:48 -0700 (PDT)
+Received: from [192.168.1.188] ([66.219.217.79])
+        by smtp.gmail.com with ESMTPSA id i132sm12370166pgd.47.2019.10.12.09.58.47
+        (version=TLS1_2 cipher=ECDHE-RSA-AES128-GCM-SHA256 bits=128/128);
+        Sat, 12 Oct 2019 09:58:47 -0700 (PDT)
 Subject: Re: io_uring NULL pointer dereference on Linux v5.4-rc1
-Message-ID: <20191012164633.GA17917@stefanha-x1.localdomain>
+To:     Stefan Hajnoczi <stefanha@redhat.com>
+Cc:     linux-block@vger.kernel.org
 References: <20191009092302.GA5303@stefanha-x1.localdomain>
  <e9beeedf-3a06-841f-53a4-51ac4e9e13ea@kernel.dk>
  <20191009174602.GI13568@stefanha-x1.localdomain>
  <d5bbaf7c-31e4-725c-90ab-18c342e2c4eb@kernel.dk>
  <20191011084618.GA2848@stefanha-x1.localdomain>
  <c24b0ee5-361c-20da-1b7a-27aab947d4f2@kernel.dk>
+ <20191012164633.GA17917@stefanha-x1.localdomain>
+From:   Jens Axboe <axboe@kernel.dk>
+Message-ID: <72ff43b8-48a8-9866-7fbd-10aae910e9d6@kernel.dk>
+Date:   Sat, 12 Oct 2019 10:58:45 -0600
+User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:60.0) Gecko/20100101
+ Thunderbird/60.9.0
 MIME-Version: 1.0
-Content-Type: multipart/signed; micalg=pgp-sha256;
-        protocol="application/pgp-signature"; boundary="SUOF0GtieIMvvwua"
-Content-Disposition: inline
-In-Reply-To: <c24b0ee5-361c-20da-1b7a-27aab947d4f2@kernel.dk>
-User-Agent: Mutt/1.12.1 (2019-06-15)
-X-Scanned-By: MIMEDefang 2.79 on 10.5.11.11
-X-Greylist: Sender IP whitelisted, not delayed by milter-greylist-4.6.2 (mx1.redhat.com [10.5.110.68]); Sat, 12 Oct 2019 16:46:35 +0000 (UTC)
+In-Reply-To: <20191012164633.GA17917@stefanha-x1.localdomain>
+Content-Type: text/plain; charset=windows-1252
+Content-Language: en-US
+Content-Transfer-Encoding: base64
 Sender: linux-block-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-
---SUOF0GtieIMvvwua
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-Content-Transfer-Encoding: quoted-printable
-
-On Fri, Oct 11, 2019 at 06:08:34AM -0600, Jens Axboe wrote:
-> On 10/11/19 2:46 AM, Stefan Hajnoczi wrote:
-> > On Wed, Oct 09, 2019 at 02:36:01PM -0600, Jens Axboe wrote:
-> >> On 10/9/19 11:46 AM, Stefan Hajnoczi wrote:
-> >>> On Wed, Oct 09, 2019 at 05:27:44AM -0600, Jens Axboe wrote:
-> >>>> On 10/9/19 3:23 AM, Stefan Hajnoczi wrote:
-> >>>>> I hit this NULL pointer dereference when running qemu-iotests 052 (=
-raw)
-> >>>>> on both ext4 and XFS on dm-thin/luks.  The kernel is Linux v5.4-rc1=
- but
-> >>>>> I haven't found any obvious fixes in Jens' tree, so it's likely that
-> >>>>> this bug is still present:
-> >>>>>
-> >>>>> BUG: kernel NULL pointer dereference, address: 0000000000000102
-> >>>>> #PF: supervisor read access in kernel mode
-> >>>>> #PF: error_code(0x0000) - not-present page
-> >>>>> PGD 0 P4D 0
-> >>>>> Oops: 0000 [#1] SMP PTI
-> >>>>> CPU: 2 PID: 6656 Comm: qemu-io Not tainted 5.4.0-rc1 #1
-> >>>>> Hardware name: LENOVO 20BTS1N70V/20BTS1N70V, BIOS N14ET37W (1.15 ) =
-09/06/2016
-> >>>>> RIP: 0010:__queue_work+0x1f/0x3b0
-> >>>>> Code: eb df 66 0f 1f 84 00 00 00 00 00 0f 1f 44 00 00 41 57 49 89 f=
-7 41 56 41 89 fe 41 55 41 89 fd 41 54 55 48 89 d5 53 48 83 ec 10 <f6> 86 02=
- 01 00 00 01 0f 85 bc 02 00 00 49 bc eb 83 b5 80 46 86 c8
-> >>>>> RSP: 0018:ffffbef4884bbd58 EFLAGS: 00010082
-> >>>>> RAX: 0000000000000246 RBX: 0000000000000246 RCX: 0000000000000000
-> >>>>> RDX: ffff9903901f4460 RSI: 0000000000000000 RDI: 0000000000000040
-> >>>>> RBP: ffff9903901f4460 R08: ffff9903901fb040 R09: ffff990398614700
-> >>>>> R10: 0000000000000030 R11: 0000000000000000 R12: 0000000000000000
-> >>>>> R13: 0000000000000040 R14: 0000000000000040 R15: 0000000000000000
-> >>>>> FS:  00007f7d2a4e4a80(0000) GS:ffff9903a5a80000(0000) knlGS:0000000=
-000000000
-> >>>>> CS:  0010 DS: 0000 ES: 0000 CR0: 0000000080050033
-> >>>>> CR2: 0000000000000102 CR3: 0000000203da8004 CR4: 00000000003606e0
-> >>>>> DR0: 0000000000000000 DR1: 0000000000000000 DR2: 0000000000000000
-> >>>>> DR3: 0000000000000000 DR6: 00000000fffe0ff0 DR7: 0000000000000400
-> >>>>> Call Trace:
-> >>>>>     ? __io_queue_sqe+0xa1/0x200
-> >>>>>     queue_work_on+0x36/0x40
-> >>>>>     __io_queue_sqe+0x16e/0x200
-> >>>>>     io_ring_submit+0xd2/0x230
-> >>>>>     ? percpu_ref_resurrect+0x46/0x70
-> >>>>>     ? __io_uring_register+0x207/0xa30
-> >>>>>     ? __schedule+0x286/0x700
-> >>>>>     __x64_sys_io_uring_enter+0x1a3/0x280
-> >>>>>     ? __x64_sys_io_uring_register+0x64/0xb0
-> >>>>>     do_syscall_64+0x5b/0x180
-> >>>>>     entry_SYSCALL_64_after_hwframe+0x44/0xa9
-> >>>>> RIP: 0033:0x7f7d3439f1fd
-> >>>>> Code: 00 c3 66 2e 0f 1f 84 00 00 00 00 00 90 f3 0f 1e fa 48 89 f8 4=
-8 89 f7 48 89 d6 48 89 ca 4d 89 c2 4d 89 c8 4c 8b 4c 24 08 0f 05 <48> 3d 01=
- f0 ff ff 73 01 c3 48 8b 0d 5b 8c 0c 00 f7 d8 64 89 01 48
-> >>>>> RSP: 002b:00007f7d2918d408 EFLAGS: 00000216 ORIG_RAX: 0000000000000=
-1aa
-> >>>>> RAX: ffffffffffffffda RBX: 00007f7d2918d4f0 RCX: 00007f7d3439f1fd
-> >>>>> RDX: 0000000000000000 RSI: 0000000000000001 RDI: 000000000000000a
-> >>>>> RBP: 0000000000000000 R08: 0000000000000000 R09: 0000000000000008
-> >>>>> R10: 0000000000000000 R11: 0000000000000216 R12: 00005616e3c32ab8
-> >>>>> R13: 00005616e3c32b78 R14: 00005616e3c32ab0 R15: 0000000000000001
-> >>>>> Modules linked in: fuse ccm xt_CHECKSUM xt_MASQUERADE tun bridge st=
-p llc nf_conntrack_netbios_ns nf_conntrack_broadcast xt_CT ip6t_rpfilter ip=
-6t_REJECT nf_reject_ipv6 ipt_REJECT nf_reject_ipv4 xt_conntrack ebtable_nat=
- ip6table_nat ip6table_mangle ip6table_raw ip6table_security iptable_nat nf=
-_nat iptable_mangle iptable_raw iptable_security nf_conntrack nf_defrag_ipv=
-6 nf_defrag_ipv4 ip_set nfnetlink ebtable_filter ebtables ip6table_filter i=
-p6_tables iptable_filter ip_tables sunrpc vfat fat intel_rapl_msr rmi_smbus=
- iwlmvm rmi_core intel_rapl_common x86_pkg_temp_thermal intel_powerclamp co=
-retemp mac80211 snd_hda_codec_realtek snd_hda_codec_generic snd_hda_codec_h=
-dmi kvm_intel snd_hda_intel kvm snd_intel_nhlt snd_hda_codec snd_usb_audio =
-irqbypass uvcvideo snd_hda_core snd_usbmidi_lib snd_rawmidi iTCO_wdt snd_hw=
-dep libarc4 intel_cstate cdc_ether intel_uncore videobuf2_vmalloc iwlwifi m=
-ei_wdt mei_hdcp iTCO_vendor_support snd_seq videobuf2_memops usbnet videobu=
-f2_v4l2 snd_seq_device
-> >>>>>     intel_rapl_perf pcspkr videobuf2_common joydev wmi_bmof snd_pcm=
- cfg80211 r8152 videodev intel_pch_thermal i2c_i801 mii mc thinkpad_acpi sn=
-d_timer mei_me ledtrig_audio snd lpc_ich mei soundcore rfkill binfmt_misc x=
-fs dm_thin_pool dm_persistent_data dm_bio_prison libcrc32c dm_crypt i915 i2=
-c_algo_bit drm_kms_helper drm crct10dif_pclmul crc32_pclmul crc32c_intel gh=
-ash_clmulni_intel serio_raw wmi video
-> >>>>> CR2: 0000000000000102
-> >>>>> ---[ end trace 2ac747acabe218da ]---
-> >>>>> RIP: 0010:__queue_work+0x1f/0x3b0
-> >>>>> Code: eb df 66 0f 1f 84 00 00 00 00 00 0f 1f 44 00 00 41 57 49 89 f=
-7 41 56 41 89 fe 41 55 41 89 fd 41 54 55 48 89 d5 53 48 83 ec 10 <f6> 86 02=
- 01 00 00 01 0f 85 bc 02 00 00 49 bc eb 83 b5 80 46 86 c8
-> >>>>> RSP: 0018:ffffbef4884bbd58 EFLAGS: 00010082
-> >>>>> RAX: 0000000000000246 RBX: 0000000000000246 RCX: 0000000000000000
-> >>>>> RDX: ffff9903901f4460 RSI: 0000000000000000 RDI: 0000000000000040
-> >>>>> RBP: ffff9903901f4460 R08: ffff9903901fb040 R09: ffff990398614700
-> >>>>> R10: 0000000000000030 R11: 0000000000000000 R12: 0000000000000000
-> >>>>> R13: 0000000000000040 R14: 0000000000000040 R15: 0000000000000000
-> >>>>> FS:  00007f7d2a4e4a80(0000) GS:ffff9903a5a80000(0000) knlGS:0000000=
-000000000
-> >>>>> CS:  0010 DS: 0000 ES: 0000 CR0: 0000000080050033
-> >>>>> CR2: 0000000000000102 CR3: 0000000203da8004 CR4: 00000000003606e0
-> >>>>> DR0: 0000000000000000 DR1: 0000000000000000 DR2: 0000000000000000
-> >>>>> DR3: 0000000000000000 DR6: 00000000fffe0ff0 DR7: 0000000000000400
-> >>>>>
-> >>>>> Unfortunately I don't have time to find the root cause.  What I've
-> >>>>> figured out so far is:
-> >>>>>
-> >>>>>      bool queue_work_on(int cpu, struct workqueue_struct *wq,
-> >>>>>                         struct work_struct *work)
-> >>>>>      {
-> >>>>>          bool ret =3D false;
-> >>>>>          unsigned long flags;
-> >>>>>
-> >>>>>          local_irq_save(flags);
-> >>>>>
-> >>>>>          if (!test_and_set_bit(WORK_STRUCT_PENDING_BIT, work_data_b=
-its(work))) {
-> >>>>>                                                         ~~~~~~~~~~~=
-~~~~~~~~~
-> >>>>>
-> >>>>> The address of work is 0x102 so this line causes a page fault when =
-it
-> >>>>> tries to access the data field (offset 0).
-> >>>>>
-> >>>>> The caller provided the 0x102 pointer so let's see where it comes f=
-rom:
-> >>>>>
-> >>>>>      static int __io_queue_sqe(struct io_ring_ctx *ctx, struct io_k=
-iocb *req,
-> >>>>>                                struct sqe_submit *s, bool force_non=
-block)
-> >>>>>      {
-> >>>>>          ...
-> >>>>>          if (!io_add_to_prev_work(list, req)) {
-> >>>>>              if (list)
-> >>>>>                  atomic_inc(&list->cnt);
-> >>>>>              INIT_WORK(&req->work, io_sq_wq_submit_work);
-> >>>>>              io_queue_async_work(ctx, req);
-> >>>>> 	  ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
-> >>>>>
-> >>>>> and queue_work() is called here:
-> >>>>>
-> >>>>>      static inline void io_queue_async_work(struct io_ring_ctx *ctx,
-> >>>>>                                             struct io_kiocb *req)
-> >>>>>      {
-> >>>>>          int rw =3D 0;
-> >>>>>
-> >>>>>          if (req->submit.sqe) {
-> >>>>>              switch (req->submit.sqe->opcode) {
-> >>>>>              case IORING_OP_WRITEV:
-> >>>>>              case IORING_OP_WRITE_FIXED:
-> >>>>>                  rw =3D !(req->rw.ki_flags & IOCB_DIRECT);
-> >>>>>                  break;
-> >>>>>              }
-> >>>>>          }
-> >>>>>
-> >>>>>          queue_work(ctx->sqo_wq[rw], &req->work);
-> >>>>>          ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
-> >>>>>
-> >>>>> I must be missing something though because it seems impossible to g=
-et
-> >>>>> this far if req is NULL.  INIT_WORK() would have Oopsed already.  A=
-lso,
-> >>>>> offsetof(struct io_kiocb, work) is 0xa0 according to pahole(1) so we
-> >>>>> still haven't reached the 0x102 offset from the Oops report.
-> >>>>>
-> >>>>> Any ideas?
-> >>>>
-> >>>> This is new in 5.4-rc1?
-> >>>
-> >>> I didn't hit it with 5.3, but I hit other issues so I'm not sure if t=
-his
-> >>> bug exists in older kernels.
-> >>>
-> >>>> And how are you reproducing it?
-> >>>
-> >>>     $ git clone -b io_uring https://github.com/stefanha/qemu
-> >>>     $ cd qemu
-> >>>     $ ./configure --target-list=3Dx86_64-softmmu
-> >>>     $ make -j$(nproc)
-> >>>     $ (cd tests/qemu-iotests && ./check -i io_uring 052)
-> >>>
-> >>> You can mount the file system of your choice at
-> >>> tests/qemu-iotests/scratch/ before running the test.
-> >>>
-> >>> You can view the test case at tests/qemu-iotests/052.
-> >>
-> >> Thanks, that's useful. Need to look closer into this, but seems wrong
-> >> that we're killing the workqueue for SCM_RIGHTS removal. We just need =
-to
-> >> sync it. Does this work for you?
-> >>
-> >>
-> >> diff --git a/fs/io_uring.c b/fs/io_uring.c
-> >> index 8a0381f1a43b..a8755582c688 100644
-> >> --- a/fs/io_uring.c
-> >> +++ b/fs/io_uring.c
-> >> @@ -2920,8 +2920,12 @@ static void io_finish_async(struct io_ring_ctx =
-*ctx)
-> >>   static void io_destruct_skb(struct sk_buff *skb)
-> >>   {
-> >>   	struct io_ring_ctx *ctx =3D skb->sk->sk_user_data;
-> >> +	int i;
-> >> +
-> >> +	for (i =3D 0; i < ARRAY_SIZE(ctx->sqo_wq); i++)
-> >> +		if (ctx->sqo_wq[i])
-> >> +			flush_workqueue(ctx->sqo_wq[i]);
-> >>  =20
-> >> -	io_finish_async(ctx);
-> >>   	unix_destruct_scm(skb);
-> >>   }
-> >=20
-> > I tried this patch but still hit the same NULL pointer dereference.
->=20
-> How certain are you that you booted the right kernel when you tested
-> that? Because I'm very certain that this patch will fix the issue you
-> saw.
->=20
-> You can also pull:
->=20
-> git://git.kernel.dk/linux-block for-linus
->=20
-> into master and test that.
-
-It was bugging me that we don't know if Linux v5.4-rc1 has a regression,
-so I merged your for-linux branch on top of Linux v5.4-rc1 as you
-suggested.
-
-The test passes, so it's now certain that the fix(es) in your for-linux
-branch solve the NULL pointer dereference :).
-
-Stefan
-
---SUOF0GtieIMvvwua
-Content-Type: application/pgp-signature; name="signature.asc"
-
------BEGIN PGP SIGNATURE-----
-
-iQEzBAEBCAAdFiEEhpWov9P5fNqsNXdanKSrs4Grc8gFAl2iA2YACgkQnKSrs4Gr
-c8hDxQf/ZfRTyJDKOKbVnILi//OxtpkDZBF2jT4bLfnCcXLClcBqIcJpqqPGh9A4
-19N9wvJlFD0V1E3pfnCrEmDQgzep4fPxo7nTMFP+APgHJhuG3NDM3YefCENFSc6Y
-22AK4xoJmeBRxlnESFK4nvWjtD17DDqXMTQhjasl9c2cKUvXCp+fhziyUFI8oLRO
-WDESHO2L4vdLblt57q7w/5l3FG4Y8aJnKa0+ZMxivON416GUKhHgoKnou1o54NxT
-j0bRjUdAw32dLzZPb388t4ETIqCdMOoqFawQAS91KFgPQun+tEWSdNBzsX4sr01E
-s9PXh1+qlGZufgqgHk8K0A+Go1HZvw==
-=WuVA
------END PGP SIGNATURE-----
-
---SUOF0GtieIMvvwua--
+T24gMTAvMTIvMTkgMTA6NDYgQU0sIFN0ZWZhbiBIYWpub2N6aSB3cm90ZToNCj4gT24gRnJp
+LCBPY3QgMTEsIDIwMTkgYXQgMDY6MDg6MzRBTSAtMDYwMCwgSmVucyBBeGJvZSB3cm90ZToN
+Cj4+IE9uIDEwLzExLzE5IDI6NDYgQU0sIFN0ZWZhbiBIYWpub2N6aSB3cm90ZToNCj4+PiBP
+biBXZWQsIE9jdCAwOSwgMjAxOSBhdCAwMjozNjowMVBNIC0wNjAwLCBKZW5zIEF4Ym9lIHdy
+b3RlOg0KPj4+PiBPbiAxMC85LzE5IDExOjQ2IEFNLCBTdGVmYW4gSGFqbm9jemkgd3JvdGU6
+DQo+Pj4+PiBPbiBXZWQsIE9jdCAwOSwgMjAxOSBhdCAwNToyNzo0NEFNIC0wNjAwLCBKZW5z
+IEF4Ym9lIHdyb3RlOg0KPj4+Pj4+IE9uIDEwLzkvMTkgMzoyMyBBTSwgU3RlZmFuIEhham5v
+Y3ppIHdyb3RlOg0KPj4+Pj4+PiBJIGhpdCB0aGlzIE5VTEwgcG9pbnRlciBkZXJlZmVyZW5j
+ZSB3aGVuIHJ1bm5pbmcgcWVtdS1pb3Rlc3RzIDA1MiAocmF3KQ0KPj4+Pj4+PiBvbiBib3Ro
+IGV4dDQgYW5kIFhGUyBvbiBkbS10aGluL2x1a3MuICBUaGUga2VybmVsIGlzIExpbnV4IHY1
+LjQtcmMxIGJ1dA0KPj4+Pj4+PiBJIGhhdmVuJ3QgZm91bmQgYW55IG9idmlvdXMgZml4ZXMg
+aW4gSmVucycgdHJlZSwgc28gaXQncyBsaWtlbHkgdGhhdA0KPj4+Pj4+PiB0aGlzIGJ1ZyBp
+cyBzdGlsbCBwcmVzZW50Og0KPj4+Pj4+Pg0KPj4+Pj4+PiBCVUc6IGtlcm5lbCBOVUxMIHBv
+aW50ZXIgZGVyZWZlcmVuY2UsIGFkZHJlc3M6IDAwMDAwMDAwMDAwMDAxMDINCj4+Pj4+Pj4g
+I1BGOiBzdXBlcnZpc29yIHJlYWQgYWNjZXNzIGluIGtlcm5lbCBtb2RlDQo+Pj4+Pj4+ICNQ
+RjogZXJyb3JfY29kZSgweDAwMDApIC0gbm90LXByZXNlbnQgcGFnZQ0KPj4+Pj4+PiBQR0Qg
+MCBQNEQgMA0KPj4+Pj4+PiBPb3BzOiAwMDAwIFsjMV0gU01QIFBUSQ0KPj4+Pj4+PiBDUFU6
+IDIgUElEOiA2NjU2IENvbW06IHFlbXUtaW8gTm90IHRhaW50ZWQgNS40LjAtcmMxICMxDQo+
+Pj4+Pj4+IEhhcmR3YXJlIG5hbWU6IExFTk9WTyAyMEJUUzFONzBWLzIwQlRTMU43MFYsIEJJ
+T1MgTjE0RVQzN1cgKDEuMTUgKSAwOS8wNi8yMDE2DQo+Pj4+Pj4+IFJJUDogMDAxMDpfX3F1
+ZXVlX3dvcmsrMHgxZi8weDNiMA0KPj4+Pj4+PiBDb2RlOiBlYiBkZiA2NiAwZiAxZiA4NCAw
+MCAwMCAwMCAwMCAwMCAwZiAxZiA0NCAwMCAwMCA0MSA1NyA0OSA4OSBmNyA0MSA1NiA0MSA4
+OSBmZSA0MSA1NSA0MSA4OSBmZCA0MSA1NCA1NSA0OCA4OSBkNSA1MyA0OCA4MyBlYyAxMCA8
+ZjY+IDg2IDAyIDAxIDAwIDAwIDAxIDBmIDg1IGJjIDAyIDAwIDAwIDQ5IGJjIGViIDgzIGI1
+IDgwIDQ2IDg2IGM4DQo+Pj4+Pj4+IFJTUDogMDAxODpmZmZmYmVmNDg4NGJiZDU4IEVGTEFH
+UzogMDAwMTAwODINCj4+Pj4+Pj4gUkFYOiAwMDAwMDAwMDAwMDAwMjQ2IFJCWDogMDAwMDAw
+MDAwMDAwMDI0NiBSQ1g6IDAwMDAwMDAwMDAwMDAwMDANCj4+Pj4+Pj4gUkRYOiBmZmZmOTkw
+MzkwMWY0NDYwIFJTSTogMDAwMDAwMDAwMDAwMDAwMCBSREk6IDAwMDAwMDAwMDAwMDAwNDAN
+Cj4+Pj4+Pj4gUkJQOiBmZmZmOTkwMzkwMWY0NDYwIFIwODogZmZmZjk5MDM5MDFmYjA0MCBS
+MDk6IGZmZmY5OTAzOTg2MTQ3MDANCj4+Pj4+Pj4gUjEwOiAwMDAwMDAwMDAwMDAwMDMwIFIx
+MTogMDAwMDAwMDAwMDAwMDAwMCBSMTI6IDAwMDAwMDAwMDAwMDAwMDANCj4+Pj4+Pj4gUjEz
+OiAwMDAwMDAwMDAwMDAwMDQwIFIxNDogMDAwMDAwMDAwMDAwMDA0MCBSMTU6IDAwMDAwMDAw
+MDAwMDAwMDANCj4+Pj4+Pj4gRlM6ICAwMDAwN2Y3ZDJhNGU0YTgwKDAwMDApIEdTOmZmZmY5
+OTAzYTVhODAwMDAoMDAwMCkga25sR1M6MDAwMDAwMDAwMDAwMDAwMA0KPj4+Pj4+PiBDUzog
+IDAwMTAgRFM6IDAwMDAgRVM6IDAwMDAgQ1IwOiAwMDAwMDAwMDgwMDUwMDMzDQo+Pj4+Pj4+
+IENSMjogMDAwMDAwMDAwMDAwMDEwMiBDUjM6IDAwMDAwMDAyMDNkYTgwMDQgQ1I0OiAwMDAw
+MDAwMDAwMzYwNmUwDQo+Pj4+Pj4+IERSMDogMDAwMDAwMDAwMDAwMDAwMCBEUjE6IDAwMDAw
+MDAwMDAwMDAwMDAgRFIyOiAwMDAwMDAwMDAwMDAwMDAwDQo+Pj4+Pj4+IERSMzogMDAwMDAw
+MDAwMDAwMDAwMCBEUjY6IDAwMDAwMDAwZmZmZTBmZjAgRFI3OiAwMDAwMDAwMDAwMDAwNDAw
+DQo+Pj4+Pj4+IENhbGwgVHJhY2U6DQo+Pj4+Pj4+ICAgICAgPyBfX2lvX3F1ZXVlX3NxZSsw
+eGExLzB4MjAwDQo+Pj4+Pj4+ICAgICAgcXVldWVfd29ya19vbisweDM2LzB4NDANCj4+Pj4+
+Pj4gICAgICBfX2lvX3F1ZXVlX3NxZSsweDE2ZS8weDIwMA0KPj4+Pj4+PiAgICAgIGlvX3Jp
+bmdfc3VibWl0KzB4ZDIvMHgyMzANCj4+Pj4+Pj4gICAgICA/IHBlcmNwdV9yZWZfcmVzdXJy
+ZWN0KzB4NDYvMHg3MA0KPj4+Pj4+PiAgICAgID8gX19pb191cmluZ19yZWdpc3RlcisweDIw
+Ny8weGEzMA0KPj4+Pj4+PiAgICAgID8gX19zY2hlZHVsZSsweDI4Ni8weDcwMA0KPj4+Pj4+
+PiAgICAgIF9feDY0X3N5c19pb191cmluZ19lbnRlcisweDFhMy8weDI4MA0KPj4+Pj4+PiAg
+ICAgID8gX194NjRfc3lzX2lvX3VyaW5nX3JlZ2lzdGVyKzB4NjQvMHhiMA0KPj4+Pj4+PiAg
+ICAgIGRvX3N5c2NhbGxfNjQrMHg1Yi8weDE4MA0KPj4+Pj4+PiAgICAgIGVudHJ5X1NZU0NB
+TExfNjRfYWZ0ZXJfaHdmcmFtZSsweDQ0LzB4YTkNCj4+Pj4+Pj4gUklQOiAwMDMzOjB4N2Y3
+ZDM0MzlmMWZkDQo+Pj4+Pj4+IENvZGU6IDAwIGMzIDY2IDJlIDBmIDFmIDg0IDAwIDAwIDAw
+IDAwIDAwIDkwIGYzIDBmIDFlIGZhIDQ4IDg5IGY4IDQ4IDg5IGY3IDQ4IDg5IGQ2IDQ4IDg5
+IGNhIDRkIDg5IGMyIDRkIDg5IGM4IDRjIDhiIDRjIDI0IDA4IDBmIDA1IDw0OD4gM2QgMDEg
+ZjAgZmYgZmYgNzMgMDEgYzMgNDggOGIgMGQgNWIgOGMgMGMgMDAgZjcgZDggNjQgODkgMDEg
+NDgNCj4+Pj4+Pj4gUlNQOiAwMDJiOjAwMDA3ZjdkMjkxOGQ0MDggRUZMQUdTOiAwMDAwMDIx
+NiBPUklHX1JBWDogMDAwMDAwMDAwMDAwMDFhYQ0KPj4+Pj4+PiBSQVg6IGZmZmZmZmZmZmZm
+ZmZmZGEgUkJYOiAwMDAwN2Y3ZDI5MThkNGYwIFJDWDogMDAwMDdmN2QzNDM5ZjFmZA0KPj4+
+Pj4+PiBSRFg6IDAwMDAwMDAwMDAwMDAwMDAgUlNJOiAwMDAwMDAwMDAwMDAwMDAxIFJESTog
+MDAwMDAwMDAwMDAwMDAwYQ0KPj4+Pj4+PiBSQlA6IDAwMDAwMDAwMDAwMDAwMDAgUjA4OiAw
+MDAwMDAwMDAwMDAwMDAwIFIwOTogMDAwMDAwMDAwMDAwMDAwOA0KPj4+Pj4+PiBSMTA6IDAw
+MDAwMDAwMDAwMDAwMDAgUjExOiAwMDAwMDAwMDAwMDAwMjE2IFIxMjogMDAwMDU2MTZlM2Mz
+MmFiOA0KPj4+Pj4+PiBSMTM6IDAwMDA1NjE2ZTNjMzJiNzggUjE0OiAwMDAwNTYxNmUzYzMy
+YWIwIFIxNTogMDAwMDAwMDAwMDAwMDAwMQ0KPj4+Pj4+PiBNb2R1bGVzIGxpbmtlZCBpbjog
+ZnVzZSBjY20geHRfQ0hFQ0tTVU0geHRfTUFTUVVFUkFERSB0dW4gYnJpZGdlIHN0cCBsbGMg
+bmZfY29ubnRyYWNrX25ldGJpb3NfbnMgbmZfY29ubnRyYWNrX2Jyb2FkY2FzdCB4dF9DVCBp
+cDZ0X3JwZmlsdGVyIGlwNnRfUkVKRUNUIG5mX3JlamVjdF9pcHY2IGlwdF9SRUpFQ1QgbmZf
+cmVqZWN0X2lwdjQgeHRfY29ubnRyYWNrIGVidGFibGVfbmF0IGlwNnRhYmxlX25hdCBpcDZ0
+YWJsZV9tYW5nbGUgaXA2dGFibGVfcmF3IGlwNnRhYmxlX3NlY3VyaXR5IGlwdGFibGVfbmF0
+IG5mX25hdCBpcHRhYmxlX21hbmdsZSBpcHRhYmxlX3JhdyBpcHRhYmxlX3NlY3VyaXR5IG5m
+X2Nvbm50cmFjayBuZl9kZWZyYWdfaXB2NiBuZl9kZWZyYWdfaXB2NCBpcF9zZXQgbmZuZXRs
+aW5rIGVidGFibGVfZmlsdGVyIGVidGFibGVzIGlwNnRhYmxlX2ZpbHRlciBpcDZfdGFibGVz
+IGlwdGFibGVfZmlsdGVyIGlwX3RhYmxlcyBzdW5ycGMgdmZhdCBmYXQgaW50ZWxfcmFwbF9t
+c3Igcm1pX3NtYnVzIGl3bG12bSBybWlfY29yZSBpbnRlbF9yYXBsX2NvbW1vbiB4ODZfcGtn
+X3RlbXBfdGhlcm1hbCBpbnRlbF9wb3dlcmNsYW1wIGNvcmV0ZW1wIG1hYzgwMjExIHNuZF9o
+ZGFfY29kZWNfcmVhbHRlayBzbmRfaGRhX2NvZGVjX2dlbmVyaWMgc25kX2hkYV9jb2RlY19o
+ZG1pIGt2bV9pbnRlbCBzbmRfaGRhX2ludGVsIGt2bSBzbmRfaW50ZWxfbmhsdCBzbmRfaGRh
+X2NvZGVjIHNuZF91c2JfYXVkaW8gaXJxYnlwYXNzIHV2Y3ZpZGVvIHNuZF9oZGFfY29yZSBz
+bmRfdXNibWlkaV9saWIgc25kX3Jhd21pZGkgaVRDT193ZHQgc25kX2h3ZGVwIGxpYmFyYzQg
+aW50ZWxfY3N0YXRlIGNkY19ldGhlciBpbnRlbF91bmNvcmUgdmlkZW9idWYyX3ZtYWxsb2Mg
+aXdsd2lmaSBtZWlfd2R0IG1laV9oZGNwIGlUQ09fdmVuZG9yX3N1cHBvcnQgc25kX3NlcSB2
+aWRlb2J1ZjJfbWVtb3BzIHVzYm5ldCB2aWRlb2J1ZjJfdjRsMiBzbmRfc2VxX2RldmljZQ0K
+Pj4+Pj4+PiAgICAgIGludGVsX3JhcGxfcGVyZiBwY3Nwa3IgdmlkZW9idWYyX2NvbW1vbiBq
+b3lkZXYgd21pX2Jtb2Ygc25kX3BjbSBjZmc4MDIxMSByODE1MiB2aWRlb2RldiBpbnRlbF9w
+Y2hfdGhlcm1hbCBpMmNfaTgwMSBtaWkgbWMgdGhpbmtwYWRfYWNwaSBzbmRfdGltZXIgbWVp
+X21lIGxlZHRyaWdfYXVkaW8gc25kIGxwY19pY2ggbWVpIHNvdW5kY29yZSByZmtpbGwgYmlu
+Zm10X21pc2MgeGZzIGRtX3RoaW5fcG9vbCBkbV9wZXJzaXN0ZW50X2RhdGEgZG1fYmlvX3By
+aXNvbiBsaWJjcmMzMmMgZG1fY3J5cHQgaTkxNSBpMmNfYWxnb19iaXQgZHJtX2ttc19oZWxw
+ZXIgZHJtIGNyY3QxMGRpZl9wY2xtdWwgY3JjMzJfcGNsbXVsIGNyYzMyY19pbnRlbCBnaGFz
+aF9jbG11bG5pX2ludGVsIHNlcmlvX3JhdyB3bWkgdmlkZW8NCj4+Pj4+Pj4gQ1IyOiAwMDAw
+MDAwMDAwMDAwMTAyDQo+Pj4+Pj4+IC0tLVsgZW5kIHRyYWNlIDJhYzc0N2FjYWJlMjE4ZGEg
+XS0tLQ0KPj4+Pj4+PiBSSVA6IDAwMTA6X19xdWV1ZV93b3JrKzB4MWYvMHgzYjANCj4+Pj4+
+Pj4gQ29kZTogZWIgZGYgNjYgMGYgMWYgODQgMDAgMDAgMDAgMDAgMDAgMGYgMWYgNDQgMDAg
+MDAgNDEgNTcgNDkgODkgZjcgNDEgNTYgNDEgODkgZmUgNDEgNTUgNDEgODkgZmQgNDEgNTQg
+NTUgNDggODkgZDUgNTMgNDggODMgZWMgMTAgPGY2PiA4NiAwMiAwMSAwMCAwMCAwMSAwZiA4
+NSBiYyAwMiAwMCAwMCA0OSBiYyBlYiA4MyBiNSA4MCA0NiA4NiBjOA0KPj4+Pj4+PiBSU1A6
+IDAwMTg6ZmZmZmJlZjQ4ODRiYmQ1OCBFRkxBR1M6IDAwMDEwMDgyDQo+Pj4+Pj4+IFJBWDog
+MDAwMDAwMDAwMDAwMDI0NiBSQlg6IDAwMDAwMDAwMDAwMDAyNDYgUkNYOiAwMDAwMDAwMDAw
+MDAwMDAwDQo+Pj4+Pj4+IFJEWDogZmZmZjk5MDM5MDFmNDQ2MCBSU0k6IDAwMDAwMDAwMDAw
+MDAwMDAgUkRJOiAwMDAwMDAwMDAwMDAwMDQwDQo+Pj4+Pj4+IFJCUDogZmZmZjk5MDM5MDFm
+NDQ2MCBSMDg6IGZmZmY5OTAzOTAxZmIwNDAgUjA5OiBmZmZmOTkwMzk4NjE0NzAwDQo+Pj4+
+Pj4+IFIxMDogMDAwMDAwMDAwMDAwMDAzMCBSMTE6IDAwMDAwMDAwMDAwMDAwMDAgUjEyOiAw
+MDAwMDAwMDAwMDAwMDAwDQo+Pj4+Pj4+IFIxMzogMDAwMDAwMDAwMDAwMDA0MCBSMTQ6IDAw
+MDAwMDAwMDAwMDAwNDAgUjE1OiAwMDAwMDAwMDAwMDAwMDAwDQo+Pj4+Pj4+IEZTOiAgMDAw
+MDdmN2QyYTRlNGE4MCgwMDAwKSBHUzpmZmZmOTkwM2E1YTgwMDAwKDAwMDApIGtubEdTOjAw
+MDAwMDAwMDAwMDAwMDANCj4+Pj4+Pj4gQ1M6ICAwMDEwIERTOiAwMDAwIEVTOiAwMDAwIENS
+MDogMDAwMDAwMDA4MDA1MDAzMw0KPj4+Pj4+PiBDUjI6IDAwMDAwMDAwMDAwMDAxMDIgQ1Iz
+OiAwMDAwMDAwMjAzZGE4MDA0IENSNDogMDAwMDAwMDAwMDM2MDZlMA0KPj4+Pj4+PiBEUjA6
+IDAwMDAwMDAwMDAwMDAwMDAgRFIxOiAwMDAwMDAwMDAwMDAwMDAwIERSMjogMDAwMDAwMDAw
+MDAwMDAwMA0KPj4+Pj4+PiBEUjM6IDAwMDAwMDAwMDAwMDAwMDAgRFI2OiAwMDAwMDAwMGZm
+ZmUwZmYwIERSNzogMDAwMDAwMDAwMDAwMDQwMA0KPj4+Pj4+Pg0KPj4+Pj4+PiBVbmZvcnR1
+bmF0ZWx5IEkgZG9uJ3QgaGF2ZSB0aW1lIHRvIGZpbmQgdGhlIHJvb3QgY2F1c2UuICBXaGF0
+IEkndmUNCj4+Pj4+Pj4gZmlndXJlZCBvdXQgc28gZmFyIGlzOg0KPj4+Pj4+Pg0KPj4+Pj4+
+PiAgICAgICBib29sIHF1ZXVlX3dvcmtfb24oaW50IGNwdSwgc3RydWN0IHdvcmtxdWV1ZV9z
+dHJ1Y3QgKndxLA0KPj4+Pj4+PiAgICAgICAgICAgICAgICAgICAgICAgICAgc3RydWN0IHdv
+cmtfc3RydWN0ICp3b3JrKQ0KPj4+Pj4+PiAgICAgICB7DQo+Pj4+Pj4+ICAgICAgICAgICBi
+b29sIHJldCA9IGZhbHNlOw0KPj4+Pj4+PiAgICAgICAgICAgdW5zaWduZWQgbG9uZyBmbGFn
+czsNCj4+Pj4+Pj4NCj4+Pj4+Pj4gICAgICAgICAgIGxvY2FsX2lycV9zYXZlKGZsYWdzKTsN
+Cj4+Pj4+Pj4NCj4+Pj4+Pj4gICAgICAgICAgIGlmICghdGVzdF9hbmRfc2V0X2JpdChXT1JL
+X1NUUlVDVF9QRU5ESU5HX0JJVCwgd29ya19kYXRhX2JpdHMod29yaykpKSB7DQo+Pj4+Pj4+
+ICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAg
+ICAgIH5+fn5+fn5+fn5+fn5+fn5+fn5+DQo+Pj4+Pj4+DQo+Pj4+Pj4+IFRoZSBhZGRyZXNz
+IG9mIHdvcmsgaXMgMHgxMDIgc28gdGhpcyBsaW5lIGNhdXNlcyBhIHBhZ2UgZmF1bHQgd2hl
+biBpdA0KPj4+Pj4+PiB0cmllcyB0byBhY2Nlc3MgdGhlIGRhdGEgZmllbGQgKG9mZnNldCAw
+KS4NCj4+Pj4+Pj4NCj4+Pj4+Pj4gVGhlIGNhbGxlciBwcm92aWRlZCB0aGUgMHgxMDIgcG9p
+bnRlciBzbyBsZXQncyBzZWUgd2hlcmUgaXQgY29tZXMgZnJvbToNCj4+Pj4+Pj4NCj4+Pj4+
+Pj4gICAgICAgc3RhdGljIGludCBfX2lvX3F1ZXVlX3NxZShzdHJ1Y3QgaW9fcmluZ19jdHgg
+KmN0eCwgc3RydWN0IGlvX2tpb2NiICpyZXEsDQo+Pj4+Pj4+ICAgICAgICAgICAgICAgICAg
+ICAgICAgICAgICAgICAgc3RydWN0IHNxZV9zdWJtaXQgKnMsIGJvb2wgZm9yY2Vfbm9uYmxv
+Y2spDQo+Pj4+Pj4+ICAgICAgIHsNCj4+Pj4+Pj4gICAgICAgICAgIC4uLg0KPj4+Pj4+PiAg
+ICAgICAgICAgaWYgKCFpb19hZGRfdG9fcHJldl93b3JrKGxpc3QsIHJlcSkpIHsNCj4+Pj4+
+Pj4gICAgICAgICAgICAgICBpZiAobGlzdCkNCj4+Pj4+Pj4gICAgICAgICAgICAgICAgICAg
+YXRvbWljX2luYygmbGlzdC0+Y250KTsNCj4+Pj4+Pj4gICAgICAgICAgICAgICBJTklUX1dP
+UksoJnJlcS0+d29yaywgaW9fc3Ffd3Ffc3VibWl0X3dvcmspOw0KPj4+Pj4+PiAgICAgICAg
+ICAgICAgIGlvX3F1ZXVlX2FzeW5jX3dvcmsoY3R4LCByZXEpOw0KPj4+Pj4+PiAJICB+fn5+
+fn5+fn5+fn5+fn5+fn5+fn5+fn5+fn5+fg0KPj4+Pj4+Pg0KPj4+Pj4+PiBhbmQgcXVldWVf
+d29yaygpIGlzIGNhbGxlZCBoZXJlOg0KPj4+Pj4+Pg0KPj4+Pj4+PiAgICAgICBzdGF0aWMg
+aW5saW5lIHZvaWQgaW9fcXVldWVfYXN5bmNfd29yayhzdHJ1Y3QgaW9fcmluZ19jdHggKmN0
+eCwNCj4+Pj4+Pj4gICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAg
+ICAgc3RydWN0IGlvX2tpb2NiICpyZXEpDQo+Pj4+Pj4+ICAgICAgIHsNCj4+Pj4+Pj4gICAg
+ICAgICAgIGludCBydyA9IDA7DQo+Pj4+Pj4+DQo+Pj4+Pj4+ICAgICAgICAgICBpZiAocmVx
+LT5zdWJtaXQuc3FlKSB7DQo+Pj4+Pj4+ICAgICAgICAgICAgICAgc3dpdGNoIChyZXEtPnN1
+Ym1pdC5zcWUtPm9wY29kZSkgew0KPj4+Pj4+PiAgICAgICAgICAgICAgIGNhc2UgSU9SSU5H
+X09QX1dSSVRFVjoNCj4+Pj4+Pj4gICAgICAgICAgICAgICBjYXNlIElPUklOR19PUF9XUklU
+RV9GSVhFRDoNCj4+Pj4+Pj4gICAgICAgICAgICAgICAgICAgcncgPSAhKHJlcS0+cncua2lf
+ZmxhZ3MgJiBJT0NCX0RJUkVDVCk7DQo+Pj4+Pj4+ICAgICAgICAgICAgICAgICAgIGJyZWFr
+Ow0KPj4+Pj4+PiAgICAgICAgICAgICAgIH0NCj4+Pj4+Pj4gICAgICAgICAgIH0NCj4+Pj4+
+Pj4NCj4+Pj4+Pj4gICAgICAgICAgIHF1ZXVlX3dvcmsoY3R4LT5zcW9fd3FbcnddLCAmcmVx
+LT53b3JrKTsNCj4+Pj4+Pj4gICAgICAgICAgIH5+fn5+fn5+fn5+fn5+fn5+fn5+fn5+fn5+
+fn5+fn5+fn5+fn5+fg0KPj4+Pj4+Pg0KPj4+Pj4+PiBJIG11c3QgYmUgbWlzc2luZyBzb21l
+dGhpbmcgdGhvdWdoIGJlY2F1c2UgaXQgc2VlbXMgaW1wb3NzaWJsZSB0byBnZXQNCj4+Pj4+
+Pj4gdGhpcyBmYXIgaWYgcmVxIGlzIE5VTEwuICBJTklUX1dPUksoKSB3b3VsZCBoYXZlIE9v
+cHNlZCBhbHJlYWR5LiAgQWxzbywNCj4+Pj4+Pj4gb2Zmc2V0b2Yoc3RydWN0IGlvX2tpb2Ni
+LCB3b3JrKSBpcyAweGEwIGFjY29yZGluZyB0byBwYWhvbGUoMSkgc28gd2UNCj4+Pj4+Pj4g
+c3RpbGwgaGF2ZW4ndCByZWFjaGVkIHRoZSAweDEwMiBvZmZzZXQgZnJvbSB0aGUgT29wcyBy
+ZXBvcnQuDQo+Pj4+Pj4+DQo+Pj4+Pj4+IEFueSBpZGVhcz8NCj4+Pj4+Pg0KPj4+Pj4+IFRo
+aXMgaXMgbmV3IGluIDUuNC1yYzE/DQo+Pj4+Pg0KPj4+Pj4gSSBkaWRuJ3QgaGl0IGl0IHdp
+dGggNS4zLCBidXQgSSBoaXQgb3RoZXIgaXNzdWVzIHNvIEknbSBub3Qgc3VyZSBpZiB0aGlz
+DQo+Pj4+PiBidWcgZXhpc3RzIGluIG9sZGVyIGtlcm5lbHMuDQo+Pj4+Pg0KPj4+Pj4+IEFu
+ZCBob3cgYXJlIHlvdSByZXByb2R1Y2luZyBpdD8NCj4+Pj4+DQo+Pj4+PiAgICAgICQgZ2l0
+IGNsb25lIC1iIGlvX3VyaW5nIGh0dHBzOi8vZ2l0aHViLmNvbS9zdGVmYW5oYS9xZW11DQo+
+Pj4+PiAgICAgICQgY2QgcWVtdQ0KPj4+Pj4gICAgICAkIC4vY29uZmlndXJlIC0tdGFyZ2V0
+LWxpc3Q9eDg2XzY0LXNvZnRtbXUNCj4+Pj4+ICAgICAgJCBtYWtlIC1qJChucHJvYykNCj4+
+Pj4+ICAgICAgJCAoY2QgdGVzdHMvcWVtdS1pb3Rlc3RzICYmIC4vY2hlY2sgLWkgaW9fdXJp
+bmcgMDUyKQ0KPj4+Pj4NCj4+Pj4+IFlvdSBjYW4gbW91bnQgdGhlIGZpbGUgc3lzdGVtIG9m
+IHlvdXIgY2hvaWNlIGF0DQo+Pj4+PiB0ZXN0cy9xZW11LWlvdGVzdHMvc2NyYXRjaC8gYmVm
+b3JlIHJ1bm5pbmcgdGhlIHRlc3QuDQo+Pj4+Pg0KPj4+Pj4gWW91IGNhbiB2aWV3IHRoZSB0
+ZXN0IGNhc2UgYXQgdGVzdHMvcWVtdS1pb3Rlc3RzLzA1Mi4NCj4+Pj4NCj4+Pj4gVGhhbmtz
+LCB0aGF0J3MgdXNlZnVsLiBOZWVkIHRvIGxvb2sgY2xvc2VyIGludG8gdGhpcywgYnV0IHNl
+ZW1zIHdyb25nDQo+Pj4+IHRoYXQgd2UncmUga2lsbGluZyB0aGUgd29ya3F1ZXVlIGZvciBT
+Q01fUklHSFRTIHJlbW92YWwuIFdlIGp1c3QgbmVlZCB0bw0KPj4+PiBzeW5jIGl0LiBEb2Vz
+IHRoaXMgd29yayBmb3IgeW91Pw0KPj4+Pg0KPj4+Pg0KPj4+PiBkaWZmIC0tZ2l0IGEvZnMv
+aW9fdXJpbmcuYyBiL2ZzL2lvX3VyaW5nLmMNCj4+Pj4gaW5kZXggOGEwMzgxZjFhNDNiLi5h
+ODc1NTU4MmM2ODggMTAwNjQ0DQo+Pj4+IC0tLSBhL2ZzL2lvX3VyaW5nLmMNCj4+Pj4gKysr
+IGIvZnMvaW9fdXJpbmcuYw0KPj4+PiBAQCAtMjkyMCw4ICsyOTIwLDEyIEBAIHN0YXRpYyB2
+b2lkIGlvX2ZpbmlzaF9hc3luYyhzdHJ1Y3QgaW9fcmluZ19jdHggKmN0eCkNCj4+Pj4gICAg
+c3RhdGljIHZvaWQgaW9fZGVzdHJ1Y3Rfc2tiKHN0cnVjdCBza19idWZmICpza2IpDQo+Pj4+
+ICAgIHsNCj4+Pj4gICAgCXN0cnVjdCBpb19yaW5nX2N0eCAqY3R4ID0gc2tiLT5zay0+c2tf
+dXNlcl9kYXRhOw0KPj4+PiArCWludCBpOw0KPj4+PiArDQo+Pj4+ICsJZm9yIChpID0gMDsg
+aSA8IEFSUkFZX1NJWkUoY3R4LT5zcW9fd3EpOyBpKyspDQo+Pj4+ICsJCWlmIChjdHgtPnNx
+b193cVtpXSkNCj4+Pj4gKwkJCWZsdXNoX3dvcmtxdWV1ZShjdHgtPnNxb193cVtpXSk7DQo+
+Pj4+ICAgIA0KPj4+PiAtCWlvX2ZpbmlzaF9hc3luYyhjdHgpOw0KPj4+PiAgICAJdW5peF9k
+ZXN0cnVjdF9zY20oc2tiKTsNCj4+Pj4gICAgfQ0KPj4+DQo+Pj4gSSB0cmllZCB0aGlzIHBh
+dGNoIGJ1dCBzdGlsbCBoaXQgdGhlIHNhbWUgTlVMTCBwb2ludGVyIGRlcmVmZXJlbmNlLg0K
+Pj4NCj4+IEhvdyBjZXJ0YWluIGFyZSB5b3UgdGhhdCB5b3UgYm9vdGVkIHRoZSByaWdodCBr
+ZXJuZWwgd2hlbiB5b3UgdGVzdGVkDQo+PiB0aGF0PyBCZWNhdXNlIEknbSB2ZXJ5IGNlcnRh
+aW4gdGhhdCB0aGlzIHBhdGNoIHdpbGwgZml4IHRoZSBpc3N1ZSB5b3UNCj4+IHNhdy4NCj4+
+DQo+PiBZb3UgY2FuIGFsc28gcHVsbDoNCj4+DQo+PiBnaXQ6Ly9naXQua2VybmVsLmRrL2xp
+bnV4LWJsb2NrIGZvci1saW51cw0KPj4NCj4+IGludG8gbWFzdGVyIGFuZCB0ZXN0IHRoYXQu
+DQo+IA0KPiBJdCB3YXMgYnVnZ2luZyBtZSB0aGF0IHdlIGRvbid0IGtub3cgaWYgTGludXgg
+djUuNC1yYzEgaGFzIGEgcmVncmVzc2lvbiwNCj4gc28gSSBtZXJnZWQgeW91ciBmb3ItbGlu
+dXggYnJhbmNoIG9uIHRvcCBvZiBMaW51eCB2NS40LXJjMSBhcyB5b3UNCj4gc3VnZ2VzdGVk
+Lg0KPiANCj4gVGhlIHRlc3QgcGFzc2VzLCBzbyBpdCdzIG5vdyBjZXJ0YWluIHRoYXQgdGhl
+IGZpeChlcykgaW4geW91ciBmb3ItbGludXgNCj4gYnJhbmNoIHNvbHZlIHRoZSBOVUxMIHBv
+aW50ZXIgZGVyZWZlcmVuY2UgOikuDQoNClRoYW5rcyBmb3IgZG91YmxlIGNoZWNraW5nISBJ
+dCdzIG5vdCBhIHJlY2VudCByZWdyZXNzaW9uLCBpdCdzIGJlZW4NCnRoZXJlIGEgd2hpbGUu
+IEJ1dCBpdCBkb2VzIGRlcGVuZCBvbiB0aW1pbmcgZm9yIHlvdXIgdGVzdCBjYXNlLCBzbyBt
+YXliZQ0Kd2h5IHlvdSBoYXZlbid0IHNlZW4gaXQgYmVmb3JlLiBJbiBhbnkgY2FzZSwgaXQn
+cyBmaXhlZCBpbiBMaW51cydzIHRyZWUNCm5vdy4NCg0KLS0gDQpKZW5zIEF4Ym9lDQoNCg==
