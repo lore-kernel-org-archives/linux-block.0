@@ -2,124 +2,184 @@ Return-Path: <SRS0=kJgC=YH=vger.kernel.org=linux-block-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-2.3 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
-	MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,USER_AGENT_SANE_1 autolearn=no
-	autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-3.8 required=3.0 tests=DKIM_SIGNED,DKIM_VALID,
+	DKIM_VALID_AU,FREEMAIL_FORGED_FROMDOMAIN,FREEMAIL_FROM,
+	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,SPF_HELO_NONE,
+	SPF_PASS autolearn=no autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 06808ECE587
-	for <linux-block@archiver.kernel.org>; Mon, 14 Oct 2019 08:29:23 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id A3C92ECE587
+	for <linux-block@archiver.kernel.org>; Mon, 14 Oct 2019 09:42:24 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.kernel.org (Postfix) with ESMTP id DCF62207FF
-	for <linux-block@archiver.kernel.org>; Mon, 14 Oct 2019 08:29:22 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id 7504720882
+	for <linux-block@archiver.kernel.org>; Mon, 14 Oct 2019 09:42:24 +0000 (UTC)
+Authentication-Results: mail.kernel.org;
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="QFuDEwZC"
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1730449AbfJNI3W (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Mon, 14 Oct 2019 04:29:22 -0400
-Received: from szxga07-in.huawei.com ([45.249.212.35]:45686 "EHLO huawei.com"
-        rhost-flags-OK-OK-OK-FAIL) by vger.kernel.org with ESMTP
-        id S1725936AbfJNI3W (ORCPT <rfc822;linux-block@vger.kernel.org>);
-        Mon, 14 Oct 2019 04:29:22 -0400
-Received: from DGGEMS406-HUB.china.huawei.com (unknown [172.30.72.59])
-        by Forcepoint Email with ESMTP id B914069B8A4281BD5AD2;
-        Mon, 14 Oct 2019 16:29:20 +0800 (CST)
-Received: from [127.0.0.1] (10.202.227.179) by DGGEMS406-HUB.china.huawei.com
- (10.3.19.206) with Microsoft SMTP Server id 14.3.439.0; Mon, 14 Oct 2019
- 16:29:19 +0800
-Subject: Re: [PATCH V3 0/5] blk-mq: improvement on handling IO during CPU
- hotplug
-To:     Ming Lei <tom.leiming@gmail.com>
-References: <20191008041821.2782-1-ming.lei@redhat.com>
- <bf9687ef-4a90-73f7-3028-4c5d56c8d66b@huawei.com>
- <549bf046-f617-4c4f-5bf1-17603cc5f832@huawei.com>
- <20191009083930.GE10549@ming.t460p>
- <a30f6b45-0b89-7950-1e44-240630d89264@huawei.com>
- <20191010103016.GA22976@ming.t460p>
- <41b9185d-f780-f08f-dd63-9ad02a6976d4@huawei.com>
- <2c0b5542-de7c-ff84-0aae-086cfd6075b7@huawei.com>
- <CACVXFVN2K-GYTdSwXZ2fZ9=Kgq+jXa3RCkqw+v_DcvaFBvgpew@mail.gmail.com>
- <b1a561c1-9594-cc25-dcab-bad5c342264f@huawei.com>
- <CACVXFVNGCfFrh9Q=Cmj0fWCNQiqPDwHKzrSrkZJxNpVtuyEwgw@mail.gmail.com>
-CC:     Ming Lei <ming.lei@redhat.com>, Jens Axboe <axboe@kernel.dk>,
-        linux-block <linux-block@vger.kernel.org>,
-        Bart Van Assche <bvanassche@acm.org>,
-        "Hannes Reinecke" <hare@suse.com>, Christoph Hellwig <hch@lst.de>,
-        Thomas Gleixner <tglx@linutronix.de>,
-        Keith Busch <keith.busch@intel.com>
-From:   John Garry <john.garry@huawei.com>
-Message-ID: <5a033644-721a-0f02-71eb-e6124856b5c0@huawei.com>
-Date:   Mon, 14 Oct 2019 09:29:12 +0100
-User-Agent: Mozilla/5.0 (Windows NT 10.0; WOW64; rv:45.0) Gecko/20100101
- Thunderbird/45.3.0
+        id S1731014AbfJNJmX (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Mon, 14 Oct 2019 05:42:23 -0400
+Received: from mail-lf1-f68.google.com ([209.85.167.68]:37600 "EHLO
+        mail-lf1-f68.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S1730996AbfJNJmX (ORCPT
+        <rfc822;linux-block@vger.kernel.org>);
+        Mon, 14 Oct 2019 05:42:23 -0400
+Received: by mail-lf1-f68.google.com with SMTP id w67so11322099lff.4
+        for <linux-block@vger.kernel.org>; Mon, 14 Oct 2019 02:42:21 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=gmail.com; s=20161025;
+        h=mime-version:references:in-reply-to:from:date:message-id:subject:to
+         :cc;
+        bh=X2Ua6hANCarvccUo5gZADvZkckLwm4uleN58EaH/0Kk=;
+        b=QFuDEwZCzRv1ihub1QOzASpkOsgTsUNDlhwAZ3UrKj8RVLcLzVq40zdV8N1WsS0TnA
+         0C0+W5HrrZcDFCpnN0jm1IjFraZpLIhZOa1GUryxfBvFWrmD6LUkGjb/HrPV593azd6H
+         fGirVnJI5P+sPynlKfzQegF41I43Od2iTxq6UKg/auNYv2ewCAUXu0eqSxH1+m1RN02N
+         /9Y8v8yjCHQFNTErVjOyzhmKvYld85fZ08ulfT8J6//NLkOtTa67j4dMOHCWW3o8aXRA
+         qk9Vq+cF+NtPfvldiFX3SiLyZA+2JQfhAsKJdKv2Za+5Ig9eLfa8POFiMl1EQz75C7+y
+         dIzA==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20161025;
+        h=x-gm-message-state:mime-version:references:in-reply-to:from:date
+         :message-id:subject:to:cc;
+        bh=X2Ua6hANCarvccUo5gZADvZkckLwm4uleN58EaH/0Kk=;
+        b=fthwE7AVxpIPH8qR/2aaZtKaJn+JmOYXWdvoJRb9DUE8X4htRVEocbAKLIQp6t+vRQ
+         iqsIJhllc+xRUvLYIPrbPKTZ0yQK00vHehsusN0NYV8Ghrt2YZlLmILAdH631QtHszlj
+         qXdv1uqgnJ1VtVwIznABIOidO3SB5u83Loq59KSZxAQj6ZJSdJ9ce375o7o95OlX+oKo
+         GyPB2tgXK55lmPE34ZcaHekFdLFt6XHf5lGwkkr6eJofbhnCOZFrS4RDkDay8iZg6aC4
+         08aBrpbFpinwdg67JRpPeOJAvp18AOQnH5zZRwgFGij28beaHO6lkjq+Q7WVjgPKxh59
+         Zb0A==
+X-Gm-Message-State: APjAAAX4xFtUQc44MP08I0DciSsCOpacdZTwVc1UHSyHTFLD70H6ORwn
+        LC1Go8BxXhrw/POn/We8EstUixPwr5ZEI9UnaEjvr2aO
+X-Google-Smtp-Source: APXvYqx5BRyf40CHiwguQhezyWwsG1IFJSveG/hX4xksVTSDmKRaL+d+qamCHKCJs4OlmkAd39hoErJ2w8JZ1fLIhtA=
+X-Received: by 2002:a19:48d6:: with SMTP id v205mr3827658lfa.27.1571046140766;
+ Mon, 14 Oct 2019 02:42:20 -0700 (PDT)
 MIME-Version: 1.0
-In-Reply-To: <CACVXFVNGCfFrh9Q=Cmj0fWCNQiqPDwHKzrSrkZJxNpVtuyEwgw@mail.gmail.com>
-Content-Type: text/plain; charset="utf-8"; format=flowed
-Content-Transfer-Encoding: 7bit
-X-Originating-IP: [10.202.227.179]
-X-CFilter-Loop: Reflected
+References: <20191013154245.23538-1-9erthalion6@gmail.com> <9d4f1a2d-ac8a-7884-2aaf-0b611114e159@kernel.dk>
+In-Reply-To: <9d4f1a2d-ac8a-7884-2aaf-0b611114e159@kernel.dk>
+From:   Dmitry Dolgov <9erthalion6@gmail.com>
+Date:   Mon, 14 Oct 2019 11:43:25 +0200
+Message-ID: <CA+q6zcWaYxR+kvdfQUtog_MNUbs4gNjJD7XWCAhzpmaed8-k_Q@mail.gmail.com>
+Subject: Re: [RFC v2] io_uring: add set of tracing events
+To:     Jens Axboe <axboe@kernel.dk>
+Cc:     linux-block@vger.kernel.org
+Content-Type: text/plain; charset="UTF-8"
 Sender: linux-block-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-On 14/10/2019 02:25, Ming Lei wrote:
-> On Fri, Oct 11, 2019 at 10:10 PM John Garry <john.garry@huawei.com> wrote:
->>
->> On 11/10/2019 12:55, Ming Lei wrote:
->>> On Fri, Oct 11, 2019 at 4:54 PM John Garry <john.garry@huawei.com> wrote:
->>>>
->>>> On 10/10/2019 12:21, John Garry wrote:
->>>>>
->>>>>>
->>>>>> As discussed before, tags of hisilicon V3 is HBA wide. If you switch
->>>>>> to real hw queue, each hw queue has to own its independent tags.
->>>>>> However, that isn't supported by V3 hardware.
->>>>>
->>>>> I am generating the tag internally in the driver now, so that hostwide
->>>>> tags issue should not be an issue.
->>>>>
->>>>> And, to be clear, I am not paying too much attention to performance, but
->>>>> rather just hotplugging while running IO.
->>>>>
->>>>> An update on testing:
->>>>> I did some scripted overnight testing. The script essentially loops like
->>>>> this:
->>>>> - online all CPUS
->>>>> - run fio binded on a limited bunch of CPUs to cover a hctx mask for 1
->>>>> minute
->>>>> - offline those CPUs
->>>>> - wait 1 minute (> SCSI or NVMe timeout)
->>>>> - and repeat
->>>>>
->>>>> SCSI is actually quite stable, but NVMe isn't. For NVMe I am finding
->>>>> some fio processes never dying with IOPS @ 0. I don't see any NVMe
->>>>> timeout reported. Did you do any NVMe testing of this sort?
->>>>>
->>>>
->>>> Yeah, so for NVMe, I see some sort of regression, like this:
->>>> Jobs: 1 (f=1): [_R] [0.0% done] [0KB/0KB/0KB /s] [0/0/0 iops] [eta
->>>> 1158037877d:17h:18m:22s]
->>>
->>> I can reproduce this issue, and looks there are requests in ->dispatch.
->>
->> OK, that may match with what I see:
->> - the problem occuring coincides with this callpath with
->> BLK_MQ_S_INTERNAL_STOPPED set:
+> On Sun, Oct 13, 2019 at 11:45 PM Jens Axboe <axboe@kernel.dk> wrote:
 >
-> Good catch, these requests should have been re-submitted in
-> blk_mq_hctx_notify_dead() too.
+> > diff --git a/fs/io_uring.c b/fs/io_uring.c
+> > index bfbb7ab3c4e..730f7182b2a 100644
+> > --- a/fs/io_uring.c
+> > +++ b/fs/io_uring.c
+> > @@ -71,6 +71,9 @@
+> >   #include <linux/sizes.h>
+> >   #include <linux/hugetlb.h>
+> >
+> > +#define CREATE_TRACE_POINTS
+> > +#include <trace/events/io_uring.h>
+> > +
+> >   #include <uapi/linux/io_uring.h>
+> >
+> >   #include "internal.h"
+> > @@ -483,6 +486,7 @@ static inline void io_queue_async_work(struct io_ring_ctx *ctx,
+> >               }
+> >       }
+> >
+> > +     trace_io_uring_queue_async_work(ctx, rw, req, &req->work, req->flags);
+> >       queue_work(ctx->sqo_wq[rw], &req->work);
+> >   }
+> >
+> > @@ -707,6 +711,7 @@ static void io_fail_links(struct io_kiocb *req)
+> >   {
+> >       struct io_kiocb *link;
+> >
+> > +     trace_io_uring_fail_links(req);
+> >       while (!list_empty(&req->link_list)) {
+> >               link = list_first_entry(&req->link_list, struct io_kiocb, list);
+> >               list_del(&link->list);
 >
-> Will do it in V4.
+> Doesn't look like you have completion events, which makes it hard to
+> tell which dependants got killed when failing the links. Maybe a good
+> thing to add?
 
-OK, I'll have a look at v4 and retest - it may take a while as testing 
-this is slow...
+Do you mean an event like "this dependant got killed due to failing a link".
+Yes, sounds useful.
 
-All the best,
-John
-
+> > @@ -1292,6 +1297,7 @@ static ssize_t io_import_iovec(struct io_ring_ctx *ctx, int rw,
+> >                                               iovec, iter);
+> >   #endif
+> >
+> > +     trace_io_uring_import_iovec(ctx, buf);
+> >       return import_iovec(rw, buf, sqe_len, UIO_FASTIOV, iovec, iter);
+> >   }
+> >
 >
-> Thanks,
-> Ming Lei
->
-> .
->
+> Not sure I see much merrit in this trace event.
 
+Yep. The original idea was to somehow expose the information about "not using"
+ctx->user_bufs, but after playing around with this events, I see that this one
+called more often as I thought, and probably just confusing.
 
+> > @@ -2021,6 +2027,7 @@ static int io_req_defer(struct io_ring_ctx *ctx, struct io_kiocb *req,
+> >       req->submit.sqe = sqe_copy;
+> >
+> >       INIT_WORK(&req->work, io_sq_wq_submit_work);
+> > +     trace_io_uring_defer(ctx, req, false);
+> >       list_add_tail(&req->list, &ctx->defer_list);
+> >       spin_unlock_irq(&ctx->completion_lock);
+> >       return -EIOCBQUEUED;
+> > @@ -2327,6 +2334,7 @@ static int io_req_set_file(struct io_ring_ctx *ctx, const struct sqe_submit *s,
+> >       } else {
+> >               if (s->needs_fixed_file)
+> >                       return -EBADF;
+> > +             trace_io_uring_file_get(ctx, fd);
+> >               req->file = io_file_get(state, fd);
+> >               if (unlikely(!req->file))
+> >                       return -EBADF;
+> > @@ -2357,6 +2365,8 @@ static int __io_queue_sqe(struct io_ring_ctx *ctx, struct io_kiocb *req,
+> >                               INIT_WORK(&req->work, io_sq_wq_submit_work);
+> >                               io_queue_async_work(ctx, req);
+> >                       }
+> > +                     else
+> > +                             trace_io_uring_add_to_prev(ctx, req);
+> >
+> >                       /*
+> >                        * Queued up for async execution, worker will release
+>
+> Maybe put this one in io_add_to_prev_work()? Probably just using the
+> 'ret' as part of the trace, to avoid a branch for this?
+
+I thought about this, but then there will be no pointer to the context, and it
+would be harder to figure out to what exactly this event corresponds to.
+
+On the other hand we can track down the pointer to req, and then everything
+should be clear. It involved a bit more efforts to analyze, but probably it
+acceptable. So, I will indeed it move into io_add_to_prev_work.
+
+> Failing that, the style is off a bit, should be:
+>
+>         } else {
+>                 trace_io_uring_add_to_prev(ctx, req);
+>         }
+>
+> > @@ -4194,6 +4210,9 @@ SYSCALL_DEFINE4(io_uring_register, unsigned int, fd, unsigned int, opcode,
+> >       mutex_lock(&ctx->uring_lock);
+> >       ret = __io_uring_register(ctx, opcode, arg, nr_args);
+> >       mutex_unlock(&ctx->uring_lock);
+> > +     if (ret >= 0)
+> > +             trace_io_uring_register(ctx, opcode, ctx->nr_user_files,
+> > +                                                             ctx->nr_user_bufs, ctx->cq_ev_fd != NULL);
+>
+> Just trace 'ret' as well?
+> > + * io_uring_add_to_prev - called after a request was added into a previously
+> > + *                                             submitted work
+> > + *
+> > + * @ctx:     pointer to a ring context structure
+> > + * @req:     pointer to a request, added to a previous
+> > + *
+> > + * Allows to track merged work, to figure out how oftern requests are piggy
+>
+> often
+
+Sure, will fix both typo and 'ret' tracing. Thanks for the comments!
