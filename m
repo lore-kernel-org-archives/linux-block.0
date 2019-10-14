@@ -2,184 +2,155 @@ Return-Path: <SRS0=kJgC=YH=vger.kernel.org=linux-block-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-2.6 required=3.0 tests=DKIMWL_WL_HIGH,DKIM_SIGNED,
-	DKIM_VALID,DKIM_VALID_AU,MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,
-	USER_AGENT_SANE_1 autolearn=no autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-8.4 required=3.0 tests=DKIMWL_WL_HIGH,DKIM_SIGNED,
+	DKIM_VALID,DKIM_VALID_AU,HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,
+	MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,UNPARSEABLE_RELAY,
+	USER_AGENT_SANE_1 autolearn=unavailable autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 82713ECE587
-	for <linux-block@archiver.kernel.org>; Mon, 14 Oct 2019 15:36:50 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id EC801ECE58F
+	for <linux-block@archiver.kernel.org>; Mon, 14 Oct 2019 15:52:44 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.kernel.org (Postfix) with ESMTP id 4FDF920873
-	for <linux-block@archiver.kernel.org>; Mon, 14 Oct 2019 15:36:50 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=default; t=1571067410;
-	bh=NqvBgdwSA+pMae6RvJKOrl3aiBbLsxTrb1TUYOFqgWw=;
-	h=Date:From:To:Cc:Subject:References:In-Reply-To:List-ID:From;
-	b=VHYXInNRlYb1oKiDBwyLDKYA7ffSq6NHs/kDoJ3sc6PenmG8kc4pvzd9dTxY2yZEl
-	 W3x9IQqxFvYmp10L0rO3uXlaIaw6YY0ygxbxHEfSpADdXz8w2oi3zYYhevCEQtxNPp
-	 ji0jlyz04Z5XespmLQh4M0hyLA496tstBKdMYNl0=
+	by mail.kernel.org (Postfix) with ESMTP id C71A121882
+	for <linux-block@archiver.kernel.org>; Mon, 14 Oct 2019 15:52:44 +0000 (UTC)
+Authentication-Results: mail.kernel.org;
+	dkim=pass (2048-bit key) header.d=oracle.com header.i=@oracle.com header.b="iDCeHIqR"
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1730937AbfJNPgt (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Mon, 14 Oct 2019 11:36:49 -0400
-Received: from mail-qk1-f194.google.com ([209.85.222.194]:33784 "EHLO
-        mail-qk1-f194.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1730005AbfJNPgt (ORCPT
+        id S1730036AbfJNPwn (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Mon, 14 Oct 2019 11:52:43 -0400
+Received: from userp2130.oracle.com ([156.151.31.86]:49120 "EHLO
+        userp2130.oracle.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S1726304AbfJNPwn (ORCPT
         <rfc822;linux-block@vger.kernel.org>);
-        Mon, 14 Oct 2019 11:36:49 -0400
-Received: by mail-qk1-f194.google.com with SMTP id x134so16289565qkb.0;
-        Mon, 14 Oct 2019 08:36:48 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20161025;
-        h=sender:date:from:to:cc:subject:message-id:references:mime-version
-         :content-disposition:content-transfer-encoding:in-reply-to
-         :user-agent;
-        bh=8ii9GkNQF57widzi6dRQGr51T/dzE7TsndlvaF7OsW8=;
-        b=r1TO/YMWXsi2uiW+1nZxHeJZZ6OXIRuaRETVasx1CAn06XE1RDJfK1Akh0taYLNLPH
-         JMdUrX5bmQUzVgVEv4iIHHeGkzbKaQkhzczAKS2UgPYO2t7pszXFgfrQet4Rml1jsyxs
-         AJbDw+tDMuXcaOPa6yVAWIdeBIVOwv4Ei9P9g4++4S4/UIRzupP3Hlz1JeryH5qm/7I8
-         +C4FHUYG+OPRZawTdTYsxKlh94IIfKXBthPSIjjBPSv2TPI1+7ChXXOyN0TfBUA7IZla
-         xCXkLpuG05dKVSESBXZd45ZGGBjecBoxM/E9MltjLyhoStrluNpQh1sh1oC7XQT0FcJR
-         dmZA==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20161025;
-        h=x-gm-message-state:sender:date:from:to:cc:subject:message-id
-         :references:mime-version:content-disposition
-         :content-transfer-encoding:in-reply-to:user-agent;
-        bh=8ii9GkNQF57widzi6dRQGr51T/dzE7TsndlvaF7OsW8=;
-        b=PdwYkaEJ4mztepLc1vDCVccp6GiwB7TDC4u+unfy3VMPiwmDuU2XQYp3TQ60x/BSwJ
-         hnmZTi0L8ovYQ0qoLtbV/In3X51j23zb0lNjaZV1nFVPE3RFHBlXmVlvgQR6QLD188Ri
-         lav+bDRWiQxjE9bs4Dzbg5SoEpT1qf++IdXb/MMSQO7mAmtte3tPEPOYbXMZs9YEU1Vw
-         nH+OVBD4tPurWQ6kv/fZ1vPrgMVu6bY/KOQM3S8HEQ0Pa6/HNPZ9/eHsr779x3+8p3/8
-         kAcAPaMiFAQ1fp2sTPBFLvdzY6pZB3X/VbyMs7SSb0eQA2wCCA+AyV5hwulpHrwdiHNz
-         bhFQ==
-X-Gm-Message-State: APjAAAVbW90bUzQGRgqCNRCXvS/a3Qfa2c8P424KG4rmwOGtcCn95GQn
-        8bVe9CMu26tAq9hhN33tly4=
-X-Google-Smtp-Source: APXvYqzAsrcnF+JJ/I0dg3MAHDz0lpPNCmFZN0NmQcLIo25p98r4L0YJFw/GPUXl0zTzDuogP8QvyA==
-X-Received: by 2002:a37:e50f:: with SMTP id e15mr30253159qkg.192.1571067407828;
-        Mon, 14 Oct 2019 08:36:47 -0700 (PDT)
-Received: from localhost ([2620:10d:c091:500::1:50c5])
-        by smtp.gmail.com with ESMTPSA id h68sm8292326qkf.2.2019.10.14.08.36.46
-        (version=TLS1_2 cipher=ECDHE-RSA-AES128-GCM-SHA256 bits=128/128);
-        Mon, 14 Oct 2019 08:36:46 -0700 (PDT)
-Date:   Mon, 14 Oct 2019 08:36:43 -0700
-From:   Tejun Heo <tj@kernel.org>
-To:     Michal =?iso-8859-1?Q?Koutn=FD?= <mkoutny@suse.com>
-Cc:     hannes@cmpxchg.org, clm@fb.com, dennisz@fb.com,
-        Josef Bacik <jbacik@fb.com>, kernel-team@fb.com,
-        newella@fb.com, lizefan@huawei.com, axboe@kernel.dk,
-        Paolo Valente <paolo.valente@linaro.org>,
-        Rik van Riel <riel@surriel.com>, josef@toxicpanda.com,
-        cgroups@vger.kernel.org, linux-block@vger.kernel.org,
-        linux-kernel@vger.kernel.org
-Subject: Re: [PATCH 08/10] blkcg: implement blk-iocost
-Message-ID: <20191014153643.GD18794@devbig004.ftw2.facebook.com>
-References: <20190828220600.2527417-1-tj@kernel.org>
- <20190828220600.2527417-9-tj@kernel.org>
- <20190910125513.GA6399@blackbody.suse.cz>
- <20190910160855.GS2263813@devbig004.ftw2.facebook.com>
- <20191003145106.GC6678@blackbody.suse.cz>
- <20191003164552.GA3247445@devbig004.ftw2.facebook.com>
- <20191009153629.GA5400@blackbody.suse.cz>
+        Mon, 14 Oct 2019 11:52:43 -0400
+Received: from pps.filterd (userp2130.oracle.com [127.0.0.1])
+        by userp2130.oracle.com (8.16.0.27/8.16.0.27) with SMTP id x9EFhfom170955;
+        Mon, 14 Oct 2019 15:52:37 GMT
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=oracle.com; h=date : from : to : cc
+ : subject : message-id : references : mime-version : content-type :
+ in-reply-to; s=corp-2019-08-05;
+ bh=dAqQZcCyUTuxDmQPk4AXRJLxgQPdvhFRocOEDKFgem8=;
+ b=iDCeHIqRe6RhFkBBkJtksVE3BOVkyiQxBY7e4OsSzzv9KvioAzBjmm1JGEPIQ7lljbty
+ qXUuk79MXvHPr9a2LFyD21Ayu2ucWMOtTwowiJcqYGl/U/nwQdhBvRPe62JvFVGUGX9y
+ R1vKwAL8haDxWO8EKeqkpv5kf49fQTEEo8/buMNe/Dp++Lq1YkzJh0PYIJJri1ZyEPSn
+ kvZ6M5utfu1enEwYAbTROHgGvMdpRm8e+eMJDrSmPFKw+gWbkmk3mY72RCyfhf6okJsJ
+ MUhlRbMbhh5QqwI8ZE+CxaTZ2yhT2pujfZRpjch4x7ZvJoyn8zbs3lZn5AsFQKlWrGOX gw== 
+Received: from aserp3030.oracle.com (aserp3030.oracle.com [141.146.126.71])
+        by userp2130.oracle.com with ESMTP id 2vk68u9w5s-1
+        (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=OK);
+        Mon, 14 Oct 2019 15:52:37 +0000
+Received: from pps.filterd (aserp3030.oracle.com [127.0.0.1])
+        by aserp3030.oracle.com (8.16.0.27/8.16.0.27) with SMTP id x9EFgmT1013336;
+        Mon, 14 Oct 2019 15:50:36 GMT
+Received: from aserv0121.oracle.com (aserv0121.oracle.com [141.146.126.235])
+        by aserp3030.oracle.com with ESMTP id 2vks07187d-1
+        (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=OK);
+        Mon, 14 Oct 2019 15:50:36 +0000
+Received: from abhmp0010.oracle.com (abhmp0010.oracle.com [141.146.116.16])
+        by aserv0121.oracle.com (8.14.4/8.13.8) with ESMTP id x9EFoYej007358;
+        Mon, 14 Oct 2019 15:50:34 GMT
+Received: from localhost (/67.169.218.210)
+        by default (Oracle Beehive Gateway v4.0)
+        with ESMTP ; Mon, 14 Oct 2019 15:50:34 +0000
+Date:   Mon, 14 Oct 2019 08:50:30 -0700
+From:   "Darrick J. Wong" <darrick.wong@oracle.com>
+To:     Jens Axboe <axboe@kernel.dk>, Christoph Hellwig <hch@infradead.org>
+Cc:     linux-block@vger.kernel.org,
+        linux-fsdevel <linux-fsdevel@vger.kernel.org>,
+        xfs <linux-xfs@vger.kernel.org>
+Subject: [PATCH v3] loop: fix no-unmap write-zeroes request behavior
+Message-ID: <20191014155030.GS13108@magnolia>
+References: <20191010170239.GC13098@magnolia>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=iso-8859-1
+Content-Type: text/plain; charset=us-ascii
 Content-Disposition: inline
-Content-Transfer-Encoding: 8bit
-In-Reply-To: <20191009153629.GA5400@blackbody.suse.cz>
-User-Agent: Mutt/1.5.21 (2010-09-15)
+In-Reply-To: <20191010170239.GC13098@magnolia>
+User-Agent: Mutt/1.9.4 (2018-02-28)
+X-Proofpoint-Virus-Version: vendor=nai engine=6000 definitions=9410 signatures=668684
+X-Proofpoint-Spam-Details: rule=notspam policy=default score=0 suspectscore=2 malwarescore=0
+ phishscore=0 bulkscore=0 spamscore=0 mlxscore=0 mlxlogscore=999
+ adultscore=0 classifier=spam adjust=0 reason=mlx scancount=1
+ engine=8.0.1-1908290000 definitions=main-1910140140
+X-Proofpoint-Virus-Version: vendor=nai engine=6000 definitions=9410 signatures=668684
+X-Proofpoint-Spam-Details: rule=notspam policy=default score=0 priorityscore=1501 malwarescore=0
+ suspectscore=2 phishscore=0 bulkscore=0 spamscore=0 clxscore=1015
+ lowpriorityscore=0 mlxscore=0 impostorscore=0 mlxlogscore=999 adultscore=0
+ classifier=spam adjust=0 reason=mlx scancount=1 engine=8.0.1-1908290000
+ definitions=main-1910140140
 Sender: linux-block-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-Hello,
+From: Darrick J. Wong <darrick.wong@oracle.com>
 
-On Wed, Oct 09, 2019 at 05:36:29PM +0200, Michal Koutný wrote:
-> Because I'm not fully convinced using the root cgroup for the latter is
-> a good idea and I don't have a better one (what about
-> /sys/kernel/cgroup/?), I'd like to question the former to potentially
-> postpone finding the place for its parameters :-)
+Currently, if the loop device receives a WRITE_ZEROES request, it asks
+the underlying filesystem to punch out the range.  This behavior is
+correct if unmapping is allowed.  However, a NOUNMAP request means that
+the caller doesn't want us to free the storage backing the range, so
+punching out the range is incorrect behavior.
 
-Yeah, I mean, I don't know.  If these params were useful outside
-iocost controller itself, under /sys/block would be a better place but
-it's kind tightly tied to vrate.  We likely can talk on the subject
-for a really long time probalby because there's no clearly technically
-better choice here, so...
+To satisfy a NOUNMAP | WRITE_ZEROES request, loop should ask the
+underlying filesystem to FALLOC_FL_ZERO_RANGE, which is (according to
+the fallocate documentation) required to ensure that the entire range is
+backed by real storage, which suffices for our purposes.
 
-> On Wed, Aug 28, 2019 at 03:05:58PM -0700, Tejun Heo <tj@kernel.org> wrote:
-> > [...]
-> > Please see the top comment in blk-iocost.c and documentation for
-> > more details.
-> I admit I did't grasp the explanations in the cgroup-v2.rst, perhaps
-> some of the explanations from blk-iocost.c would be useful there as
-> well.
-> 
-> IIUC, the controls are supposed to be abstracted and generic to express
-> high-level ideas and be independent of particular details.
-> Here a bunch of parameters is introduced whose tuning may become a
-> complex optimization task.
-> 
-> What is the metric that is the QoS controller striving to guarantee?
-> How does it differ from the io.latency policy?
+Fixes: 19372e2769179dd ("loop: implement REQ_OP_WRITE_ZEROES")
+Signed-off-by: Darrick J. Wong <darrick.wong@oracle.com>
+---
+v3: refactor into a single fallocate function
+v2: reorganize a little according to hch feedback
+---
+ drivers/block/loop.c |   26 ++++++++++++++++++--------
+ 1 file changed, 18 insertions(+), 8 deletions(-)
 
-Yeah, it's kinda unfortunate that it requires this many parameters but
-at least my opinion is that that's reflecting the inherent
-complexities of the underlying devices and how workloads interact with
-them.  Andy knows and can explain this a lot better than me but here's
-what's we're working on:
-
-For the cost model, the plan is to build a database of model-specific
-model parameters which are loaded during boot.  The cost model
-parameters are pretty straight forward to determine, so hopefully this
-won't be too difficult.
-
-For QoS parameters, Andy is currently working on a method to determine
-the set of parametesr which are at the edge of total work cliff -
-ie. the point where tighetning QoS params further starts reducing the
-total amount of work the device can do significantly.  This would be
-the neutral parameters to use for a given device unless there are
-overriding latency requirements, so it's likely that this can be part
-of the model-specific parameter set.
-
-We're currently deploying the controller to a lot of machines and
-gathering data to verify model accuracies and controller behaviors.
-It's working pretty well already and once the methods become more
-mature, we'll upstream them (whichever projects they end up
-belonging).
-
-
-> > [...] 
-> > + * 2-2. Vrate Adjustment
-> > + * [...] When this delay becomes noticeable, it's a clear
-> > + * indication that the device is saturated and we lower the vrate.  This
-> > + * saturation signal is fairly conservative as it only triggers when both
-> > + * hardware and software queues are filled up, and is used as the default
-> > + * busy signal.
-> (The following paragraph is based only on naïve understanding of the
-> block layer.) So the device's vrate is lowered, causing its vtime
-> growing slower, i.e.  postponing issuing an IO later for all cgroups
-> accessing the device. But what's the purpose of this? If the queues fill
-> up, wouldn't be all naturally pushed back by the longer queue time
-> anyway? And wouldn't slowing down the device's vtime just cause queueing
-> elsewhere?
-
-Nothing can issue IOs indefinitely without some of them completing and
-the total amount of work a workload can do is conjoined with the
-completion latencies.  Most IO devices have queue depth which is at
-some level reasonable given the performance characteritics of the
-device; otherwise, the device would develop a really fat pipe in it
-which can frustrate various use cases.  On top, block layer adds some
-limited amount of queueing to avoid command bubbles (2x qd, usually),
-so, while definitely not stringent in any way, the queueing is already
-regulated so that things don't get too crazy.
-
-Regulating based on qd may not be enough for latency sensitive
-synchronous workloads; however, for a lot of workloads such as reading
-file contents or copying them which have in-kernel windowing
-mechanisms, it can provide a reasonable level of protection to keep
-the effectiveness of the windowing mechanisms without sacrificing
-noticeable level of total work.
-
-Thanks.
-
--- 
-tejun
+diff --git a/drivers/block/loop.c b/drivers/block/loop.c
+index f6f77eaa7217..ef6e251857c8 100644
+--- a/drivers/block/loop.c
++++ b/drivers/block/loop.c
+@@ -417,18 +417,20 @@ static int lo_read_transfer(struct loop_device *lo, struct request *rq,
+ 	return ret;
+ }
+ 
+-static int lo_discard(struct loop_device *lo, struct request *rq, loff_t pos)
++static int lo_fallocate(struct loop_device *lo, struct request *rq, loff_t pos,
++			int mode)
+ {
+ 	/*
+-	 * We use punch hole to reclaim the free space used by the
+-	 * image a.k.a. discard. However we do not support discard if
+-	 * encryption is enabled, because it may give an attacker
+-	 * useful information.
++	 * We use fallocate to manipulate the space mappings used by the image
++	 * a.k.a. discard/zerorange. However we do not support this if
++	 * encryption is enabled, because it may give an attacker useful
++	 * information.
+ 	 */
+ 	struct file *file = lo->lo_backing_file;
+-	int mode = FALLOC_FL_PUNCH_HOLE | FALLOC_FL_KEEP_SIZE;
+ 	int ret;
+ 
++	mode |= FALLOC_FL_KEEP_SIZE;
++
+ 	if ((!file->f_op->fallocate) || lo->lo_encrypt_key_size) {
+ 		ret = -EOPNOTSUPP;
+ 		goto out;
+@@ -596,9 +598,17 @@ static int do_req_filebacked(struct loop_device *lo, struct request *rq)
+ 	switch (req_op(rq)) {
+ 	case REQ_OP_FLUSH:
+ 		return lo_req_flush(lo, rq);
+-	case REQ_OP_DISCARD:
+ 	case REQ_OP_WRITE_ZEROES:
+-		return lo_discard(lo, rq, pos);
++		/*
++		 * If the caller doesn't want deallocation, call zeroout to
++		 * write zeroes the range.  Otherwise, punch them out.
++		 */
++		return lo_fallocate(lo, rq, pos,
++			(rq->cmd_flags & REQ_NOUNMAP) ?
++				FALLOC_FL_ZERO_RANGE :
++				FALLOC_FL_PUNCH_HOLE);
++	case REQ_OP_DISCARD:
++		return lo_fallocate(lo, rq, pos, FALLOC_FL_PUNCH_HOLE);
+ 	case REQ_OP_WRITE:
+ 		if (lo->transfer)
+ 			return lo_write_transfer(lo, rq, pos);
