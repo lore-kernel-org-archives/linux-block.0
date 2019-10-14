@@ -2,442 +2,185 @@ Return-Path: <SRS0=kJgC=YH=vger.kernel.org=linux-block-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-9.8 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
-	INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,
-	URIBL_BLOCKED,USER_AGENT_GIT autolearn=unavailable autolearn_force=no
-	version=3.4.0
+X-Spam-Status: No, score=-2.2 required=3.0 tests=DKIM_SIGNED,DKIM_VALID,
+	HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,
+	URIBL_BLOCKED,USER_AGENT_SANE_1 autolearn=no autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id D79D2ECE587
-	for <linux-block@archiver.kernel.org>; Mon, 14 Oct 2019 12:21:32 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 82EA5C4CECE
+	for <linux-block@archiver.kernel.org>; Mon, 14 Oct 2019 15:01:55 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.kernel.org (Postfix) with ESMTP id BC83A21744
-	for <linux-block@archiver.kernel.org>; Mon, 14 Oct 2019 12:21:32 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id 5CF4921835
+	for <linux-block@archiver.kernel.org>; Mon, 14 Oct 2019 15:01:55 +0000 (UTC)
+Authentication-Results: mail.kernel.org;
+	dkim=pass (2048-bit key) header.d=kernel-dk.20150623.gappssmtp.com header.i=@kernel-dk.20150623.gappssmtp.com header.b="FyIKuo/n"
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1731920AbfJNMVb (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Mon, 14 Oct 2019 08:21:31 -0400
-Received: from szxga07-in.huawei.com ([45.249.212.35]:43990 "EHLO huawei.com"
-        rhost-flags-OK-OK-OK-FAIL) by vger.kernel.org with ESMTP
-        id S1730305AbfJNMVb (ORCPT <rfc822;linux-block@vger.kernel.org>);
-        Mon, 14 Oct 2019 08:21:31 -0400
-Received: from DGGEMS401-HUB.china.huawei.com (unknown [172.30.72.58])
-        by Forcepoint Email with ESMTP id 4F49752E844D1AFB089A;
-        Mon, 14 Oct 2019 20:21:28 +0800 (CST)
-Received: from huawei.com (10.90.53.225) by DGGEMS401-HUB.china.huawei.com
- (10.3.19.201) with Microsoft SMTP Server id 14.3.439.0; Mon, 14 Oct 2019
- 20:21:23 +0800
-From:   Hou Tao <houtao1@huawei.com>
-To:     <linux-block@vger.kernel.org>, <bpf@vger.kernel.org>,
-        <netdev@vger.kernel.org>, <axboe@kernel.dk>, <ast@kernel.org>
-CC:     <hare@suse.com>, <osandov@fb.com>, <ming.lei@redhat.com>,
-        <damien.lemoal@wdc.com>, <bvanassche@acm.org>,
-        <daniel@iogearbox.net>, <kafai@fb.com>, <songliubraving@fb.com>,
-        <yhs@fb.com>
-Subject: [RFC PATCH 1/2] block: add support for redirecting IO completion through eBPF
-Date:   Mon, 14 Oct 2019 20:28:32 +0800
-Message-ID: <20191014122833.64908-2-houtao1@huawei.com>
-X-Mailer: git-send-email 2.22.0
-In-Reply-To: <20191014122833.64908-1-houtao1@huawei.com>
-References: <20191014122833.64908-1-houtao1@huawei.com>
+        id S1733154AbfJNPBx (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Mon, 14 Oct 2019 11:01:53 -0400
+Received: from mail-io1-f67.google.com ([209.85.166.67]:40267 "EHLO
+        mail-io1-f67.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S1733155AbfJNPBx (ORCPT
+        <rfc822;linux-block@vger.kernel.org>);
+        Mon, 14 Oct 2019 11:01:53 -0400
+Received: by mail-io1-f67.google.com with SMTP id h144so38526506iof.7
+        for <linux-block@vger.kernel.org>; Mon, 14 Oct 2019 08:01:51 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=kernel-dk.20150623.gappssmtp.com; s=20150623;
+        h=subject:from:to:references:message-id:date:user-agent:mime-version
+         :in-reply-to:content-language:content-transfer-encoding;
+        bh=RBbFQbsMRuGkFH9TOgKa/APZMAZbJ864y+kjiYJrE1U=;
+        b=FyIKuo/nViMZB3JBD0ppimRpUjkKGlCbCtnS3RaKr5QF54lzSukRxZ1ViCzdNwtCPT
+         2XxJTF5X6x9JolYpyauRll0g5Kuypy6sRNnEMCapkXc8XmB81MTO8pdaBDRHCNwCsdEm
+         v9O93eD8EZKlKhsrZ3ZYmEtX09LJcrASkZk107sM964Zcbz5GSFb/l3lOwfaY/3wlHQE
+         31ZCtZwN1LUpafKO3dOxLel4a2JzWevqqU7+eWynbaO0AtlNZXzqxxGGI9nDkHEvL+0U
+         KS1bA1abFAjaDmrH7F/WCJhhIxc0vYtJsqOh/Jk+eTx7nl93YGQxA8Nly7kOvBynfEmr
+         5p4A==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20161025;
+        h=x-gm-message-state:subject:from:to:references:message-id:date
+         :user-agent:mime-version:in-reply-to:content-language
+         :content-transfer-encoding;
+        bh=RBbFQbsMRuGkFH9TOgKa/APZMAZbJ864y+kjiYJrE1U=;
+        b=TPaxBfwJZt9vguFx+CNxkVdGMvUZgnH3VpqcPI7SSBrzdDqzvAt/Al2LrAYwrGiGq5
+         t2JU0AuliXsY6UdGyujerpUQnl9C05iyxUsVIqi6jJ/Kb3kf5n1jTNW+8ma4phaefsL0
+         v2sTGZi0v+lZs/H+638fX/aA4oTY5tg1ZBt/+h+TksQw+m8NeosiqHEBq5llmdetmyXe
+         XBt8j0myewv3SC3eGm5KCsaVLc7nGpPxH0jF5htu8Fo+jQEIT4+hHxZt9aa1aNjP6qVm
+         tBUmI1XXY4eJpgxedAb6uY8uRZ1mTKfOhkMB0BamGQPX7271sJn1sc6gQpItG2OOdyz1
+         mmZw==
+X-Gm-Message-State: APjAAAX7Cy9OUUqcQFhqHaudd8iL+dGsYX10pLkmqok+drI3XARE4eTz
+        YgkRvc7ml8we3EkSmh+qJ2UVcw==
+X-Google-Smtp-Source: APXvYqy7R2KYT8rrTdebUklRG5eUH535i1PHVhhWSlMcKP9wtSFI8a0ITsiyPE+xbjE+BpkN1mKp8Q==
+X-Received: by 2002:a05:6602:2581:: with SMTP id p1mr17932218ioo.32.1571065310732;
+        Mon, 14 Oct 2019 08:01:50 -0700 (PDT)
+Received: from [192.168.1.159] ([65.144.74.34])
+        by smtp.gmail.com with ESMTPSA id v19sm12201951iol.24.2019.10.14.08.01.49
+        (version=TLS1_2 cipher=ECDHE-RSA-AES128-GCM-SHA256 bits=128/128);
+        Mon, 14 Oct 2019 08:01:49 -0700 (PDT)
+Subject: Re: WARNING: refcount bug in sock_wfree (2)
+From:   Jens Axboe <axboe@kernel.dk>
+To:     syzbot <syzbot+c0ba5b9e742f049a2edf@syzkaller.appspotmail.com>,
+        davem@davemloft.net, hare@suse.com, jmoyer@redhat.com,
+        linux-block@vger.kernel.org, linux-fsdevel@vger.kernel.org,
+        linux-kernel@vger.kernel.org, netdev@vger.kernel.org,
+        syzkaller-bugs@googlegroups.com, viro@zeniv.linux.org.uk
+References: <0000000000006819150594d5e956@google.com>
+ <0ba7cb74-507e-7fb5-6147-1d5fee34155f@kernel.dk>
+Message-ID: <511c839b-f261-8538-17e7-89bffc82e63a@kernel.dk>
+Date:   Mon, 14 Oct 2019 09:01:48 -0600
+User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:60.0) Gecko/20100101
+ Thunderbird/60.9.0
 MIME-Version: 1.0
-Content-Transfer-Encoding: 7BIT
-Content-Type:   text/plain; charset=US-ASCII
-X-Originating-IP: [10.90.53.225]
-X-CFilter-Loop: Reflected
+In-Reply-To: <0ba7cb74-507e-7fb5-6147-1d5fee34155f@kernel.dk>
+Content-Type: text/plain; charset=utf-8
+Content-Language: en-US
+Content-Transfer-Encoding: 7bit
 Sender: linux-block-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-For network stack, RPS, namely Receive Packet Steering, is used to
-distribute network protocol processing from hardware-interrupted CPU
-to specific CPUs and alleviating soft-irq load of the interrupted CPU.
+On 10/13/19 9:25 PM, Jens Axboe wrote:
+> On 10/13/19 8:49 PM, syzbot wrote:
+>> Hello,
+>>
+>> syzbot found the following crash on:
+>>
+>> HEAD commit:    442630f6 Add linux-next specific files for 20191008
+>> git tree:       linux-next
+>> console output: https://syzkaller.appspot.com/x/log.txt?x=158fa6bf600000
+>> kernel config:  https://syzkaller.appspot.com/x/.config?x=af1bfeef713eefdd
+>> dashboard link: https://syzkaller.appspot.com/bug?extid=c0ba5b9e742f049a2edf
+>> compiler:       gcc (GCC) 9.0.0 20181231 (experimental)
+>> syz repro:      https://syzkaller.appspot.com/x/repro.syz?x=15a861b3600000
+>> C reproducer:   https://syzkaller.appspot.com/x/repro.c?x=1769f48b600000
+>>
+>> The bug was bisected to:
+>>
+>> commit 6c080ff07363389cb4092193eb333639f0392b8c
+>> Author: Jens Axboe <axboe@kernel.dk>
+>> Date:   Thu Oct 3 14:11:03 2019 +0000
+>>
+>>        io_uring: allow sparse fixed file sets
+>>
+>> bisection log:  https://syzkaller.appspot.com/x/bisect.txt?x=1344b993600000
+>> final crash:    https://syzkaller.appspot.com/x/report.txt?x=10c4b993600000
+>> console output: https://syzkaller.appspot.com/x/log.txt?x=1744b993600000
+>>
+>> IMPORTANT: if you fix the bug, please add the following tag to the commit:
+>> Reported-by: syzbot+c0ba5b9e742f049a2edf@syzkaller.appspotmail.com
+>> Fixes: 6c080ff07363 ("io_uring: allow sparse fixed file sets")
+>>
+>> ------------[ cut here ]------------
+>> refcount_t: underflow; use-after-free.
+>> WARNING: CPU: 0 PID: 8691 at lib/refcount.c:190
+>> refcount_sub_and_test_checked lib/refcount.c:190 [inline]
+>> WARNING: CPU: 0 PID: 8691 at lib/refcount.c:190
+>> refcount_sub_and_test_checked+0x1d0/0x200 lib/refcount.c:180
+>> Kernel panic - not syncing: panic_on_warn set ...
+>> CPU: 0 PID: 8691 Comm: syz-executor322 Not tainted 5.4.0-rc2-next-20191008
+>> #0
+>> Hardware name: Google Google Compute Engine/Google Compute Engine, BIOS
+>> Google 01/01/2011
+>> Call Trace:
+>>     __dump_stack lib/dump_stack.c:77 [inline]
+>>     dump_stack+0x172/0x1f0 lib/dump_stack.c:113
+>>     panic+0x2e3/0x75c kernel/panic.c:221
+>>     __warn.cold+0x2f/0x35 kernel/panic.c:582
+>>     report_bug+0x289/0x300 lib/bug.c:195
+>>     fixup_bug arch/x86/kernel/traps.c:174 [inline]
+>>     fixup_bug arch/x86/kernel/traps.c:169 [inline]
+>>     do_error_trap+0x11b/0x200 arch/x86/kernel/traps.c:267
+>>     do_invalid_op+0x37/0x50 arch/x86/kernel/traps.c:286
+>>     invalid_op+0x23/0x30 arch/x86/entry/entry_64.S:1028
+>> RIP: 0010:refcount_sub_and_test_checked lib/refcount.c:190 [inline]
+>> RIP: 0010:refcount_sub_and_test_checked+0x1d0/0x200 lib/refcount.c:180
+>> Code: 1d b0 f0 7f 06 31 ff 89 de e8 6c d7 30 fe 84 db 75 94 e8 23 d6 30 fe
+>> 48 c7 c7 20 81 e6 87 c6 05 90 f0 7f 06 01 e8 e8 15 02 fe <0f> 0b e9 75 ff
+>> ff ff e8 04 d6 30 fe e9 6e ff ff ff 48 89 df e8 e7
+>> RSP: 0018:ffff8880a8267a28 EFLAGS: 00010282
+>> RAX: 0000000000000000 RBX: 0000000000000000 RCX: 0000000000000000
+>> RDX: 0000000000000000 RSI: ffffffff815cb676 RDI: ffffed101504cf37
+>> RBP: ffff8880a8267ac0 R08: ffff888090e363c0 R09: fffffbfff14eeb42
+>> R10: fffffbfff14eeb41 R11: ffffffff8a775a0f R12: 00000000fffffd02
+>> R13: 0000000000000001 R14: ffff8880a8267a98 R15: 0000000000000001
+>>     sock_wfree+0x10c/0x190 net/core/sock.c:1958
+>>     unix_destruct_scm+0x115/0x170 net/unix/scm.c:149
+>>     io_destruct_skb+0x62/0x80 fs/io_uring.c:2995
+>>     skb_release_head_state+0xeb/0x260 net/core/skbuff.c:652
+>>     skb_release_all+0x16/0x60 net/core/skbuff.c:663
+>>     __kfree_skb net/core/skbuff.c:679 [inline]
+>>     kfree_skb net/core/skbuff.c:697 [inline]
+>>     kfree_skb+0x101/0x3c0 net/core/skbuff.c:691
+>>     __io_sqe_files_scm+0x429/0x640 fs/io_uring.c:3049
+>>     io_sqe_files_scm fs/io_uring.c:3071 [inline]
+>>     io_sqe_files_register fs/io_uring.c:3154 [inline]
+>>     __io_uring_register+0x1f69/0x2d70 fs/io_uring.c:4152
+>>     __do_sys_io_uring_register fs/io_uring.c:4204 [inline]
+>>     __se_sys_io_uring_register fs/io_uring.c:4186 [inline]
+>>     __x64_sys_io_uring_register+0x193/0x1f0 fs/io_uring.c:4186
+>>     do_syscall_64+0xfa/0x760 arch/x86/entry/common.c:290
+>>     entry_SYSCALL_64_after_hwframe+0x49/0xbe
+>> RIP: 0033:0x440279
+>> Code: 18 89 d0 c3 66 2e 0f 1f 84 00 00 00 00 00 0f 1f 00 48 89 f8 48 89 f7
+>> 48 89 d6 48 89 ca 4d 89 c2 4d 89 c8 4c 8b 4c 24 08 0f 05 <48> 3d 01 f0 ff
+>> ff 0f 83 fb 13 fc ff c3 66 2e 0f 1f 84 00 00 00 00
+>> RSP: 002b:00007ffeeedc31e8 EFLAGS: 00000246 ORIG_RAX: 00000000000001ab
+>> RAX: ffffffffffffffda RBX: 00000000004002c8 RCX: 0000000000440279
+>> RDX: 0000000020000280 RSI: 0000000000000002 RDI: 0000000000000003
+>> RBP: 00000000006ca018 R08: 0000000000000000 R09: 00000000004002c8
+>> R10: 0000000000000001 R11: 0000000000000246 R12: 0000000000401b00
+>> R13: 0000000000401b90 R14: 0000000000000000 R15: 0000000000000000
+>> Kernel Offset: disabled
+>> Rebooting in 86400 seconds..
+> 
+> I think this will do it, but that's just from looking at the code,
+> haven't tried to reproduce anything yet.
+> 
+> I'll take a closer look tomorrow and verify.
 
-For block layer, soft-irq (for single queue device) or hard-irq
-(for multiple queue device) is used to handle IO completion, so
-RPS will be useful when the soft-irq load or the hard-irq load
-of a specific CPU is too high, or a specific CPU set is required
-to handle IO completion.
+Took a closer look, and verified that this is indeed the issue, and that
+the patch does fix it. I'm going to apply this to my for-5.5/io_uring
+branch, which is where the offending commit it queued up.
 
-Instead of setting the CPU set used for handling IO completion
-through sysfs or procfs, we can attach an eBPF program to the
-request-queue, provide some useful info (e.g., the CPU
-which submits the request) to the program, and let the program
-decides the proper CPU for IO completion handling.
-
-Signed-off-by: Hou Tao <houtao1@huawei.com>
----
- block/Makefile             |   2 +-
- block/blk-bpf.c            | 127 +++++++++++++++++++++++++++++++++++++
- block/blk-mq.c             |  22 +++++--
- block/blk-softirq.c        |  27 ++++++--
- include/linux/blkdev.h     |   3 +
- include/linux/bpf_blkdev.h |   9 +++
- include/linux/bpf_types.h  |   1 +
- include/uapi/linux/bpf.h   |   2 +
- kernel/bpf/syscall.c       |   9 +++
- 9 files changed, 190 insertions(+), 12 deletions(-)
- create mode 100644 block/blk-bpf.c
- create mode 100644 include/linux/bpf_blkdev.h
-
-diff --git a/block/Makefile b/block/Makefile
-index 9ef57ace90d4..0adb0f655e8c 100644
---- a/block/Makefile
-+++ b/block/Makefile
-@@ -9,7 +9,7 @@ obj-$(CONFIG_BLOCK) := bio.o elevator.o blk-core.o blk-sysfs.o \
- 			blk-lib.o blk-mq.o blk-mq-tag.o blk-stat.o \
- 			blk-mq-sysfs.o blk-mq-cpumap.o blk-mq-sched.o ioctl.o \
- 			genhd.o partition-generic.o ioprio.o \
--			badblocks.o partitions/ blk-rq-qos.o
-+			badblocks.o partitions/ blk-rq-qos.o blk-bpf.o
- 
- obj-$(CONFIG_BOUNCE)		+= bounce.o
- obj-$(CONFIG_BLK_SCSI_REQUEST)	+= scsi_ioctl.o
-diff --git a/block/blk-bpf.c b/block/blk-bpf.c
-new file mode 100644
-index 000000000000..d9e3b1caead4
---- /dev/null
-+++ b/block/blk-bpf.c
-@@ -0,0 +1,127 @@
-+// SPDX-License-Identifier: GPL-2.0
-+/*
-+ * Copyright (C) 2019 Hou Tao <houtao1@huawei.com>
-+ */
-+
-+#include <linux/kernel.h>
-+#include <linux/slab.h>
-+#include <linux/bpf.h>
-+#include <linux/filter.h>
-+#include <linux/fs.h>
-+#include <linux/bpf_blkdev.h>
-+#include <linux/blkdev.h>
-+
-+extern const struct file_operations def_blk_fops;
-+
-+static DEFINE_SPINLOCK(blkdev_bpf_lock);
-+
-+const struct bpf_prog_ops blkdev_prog_ops = {
-+};
-+
-+static const struct bpf_func_proto *
-+blkdev_prog_func_proto(enum bpf_func_id func_id, const struct bpf_prog *prog)
-+{
-+	switch (func_id) {
-+	case BPF_FUNC_map_lookup_elem:
-+		return &bpf_map_lookup_elem_proto;
-+	case BPF_FUNC_map_update_elem:
-+		return &bpf_map_update_elem_proto;
-+	case BPF_FUNC_map_delete_elem:
-+		return &bpf_map_delete_elem_proto;
-+	case BPF_FUNC_get_smp_processor_id:
-+		return &bpf_get_smp_processor_id_proto;
-+	case BPF_FUNC_get_numa_node_id:
-+		return &bpf_get_numa_node_id_proto;
-+	default:
-+		return NULL;
-+	}
-+}
-+
-+const struct bpf_verifier_ops blkdev_verifier_ops = {
-+	.get_func_proto = blkdev_prog_func_proto,
-+};
-+
-+static struct request_queue *blkdev_rq_by_file(struct file *filp)
-+{
-+	struct block_device *bdev;
-+
-+	if (filp->f_op != &def_blk_fops)
-+		return ERR_PTR(-EINVAL);
-+
-+	bdev = I_BDEV(filp->f_mapping->host);
-+
-+	return bdev->bd_queue;
-+}
-+
-+int blkdev_bpf_prog_attach(const union bpf_attr *attr,
-+		enum bpf_prog_type ptype, struct bpf_prog *prog)
-+{
-+	int ret = 0;
-+	struct file *filp;
-+	struct request_queue *rq;
-+
-+	filp = fget(attr->target_fd);
-+	if (!filp) {
-+		ret = -EINVAL;
-+		goto fget_err;
-+	}
-+
-+	rq = blkdev_rq_by_file(filp);
-+	if (IS_ERR(rq)) {
-+		ret = PTR_ERR(rq);
-+		goto to_rq_err;
-+	}
-+
-+	spin_lock(&blkdev_bpf_lock);
-+	if (rq->prog) {
-+		ret = -EBUSY;
-+		goto set_prog_err;
-+	}
-+
-+	rcu_assign_pointer(rq->prog, prog);
-+
-+set_prog_err:
-+	spin_unlock(&blkdev_bpf_lock);
-+to_rq_err:
-+	fput(filp);
-+fget_err:
-+	return ret;
-+}
-+
-+int blkdev_bpf_prog_detach(const union bpf_attr *attr)
-+{
-+	int ret = 0;
-+	struct file *filp;
-+	struct request_queue *rq;
-+	struct bpf_prog *old_prog;
-+
-+	filp = fget(attr->target_fd);
-+	if (!filp) {
-+		ret = -EINVAL;
-+		goto fget_err;
-+	}
-+
-+	rq = blkdev_rq_by_file(filp);
-+	if (IS_ERR(rq)) {
-+		ret = PTR_ERR(rq);
-+		goto to_rq_err;
-+	}
-+
-+	old_prog = NULL;
-+	spin_lock(&blkdev_bpf_lock);
-+	if (!rq->prog) {
-+		ret = -ENODATA;
-+		goto clr_prog_err;
-+	}
-+	rcu_swap_protected(rq->prog, old_prog, 1);
-+
-+clr_prog_err:
-+	spin_unlock(&blkdev_bpf_lock);
-+	if (old_prog)
-+		bpf_prog_put(old_prog);
-+to_rq_err:
-+	fput(filp);
-+fget_err:
-+	return ret;
-+}
-+
-diff --git a/block/blk-mq.c b/block/blk-mq.c
-index 20a49be536b5..5ac6fe6dbcd0 100644
---- a/block/blk-mq.c
-+++ b/block/blk-mq.c
-@@ -26,6 +26,7 @@
- #include <linux/delay.h>
- #include <linux/crash_dump.h>
- #include <linux/prefetch.h>
-+#include <linux/filter.h>
- 
- #include <trace/events/block.h>
- 
-@@ -584,6 +585,9 @@ static void __blk_mq_complete_request(struct request *rq)
- 	struct request_queue *q = rq->q;
- 	bool shared = false;
- 	int cpu;
-+	int ccpu;
-+	int bpf_ccpu = -1;
-+	struct bpf_prog *prog;
- 
- 	WRITE_ONCE(rq->state, MQ_RQ_COMPLETE);
- 	/*
-@@ -610,15 +614,25 @@ static void __blk_mq_complete_request(struct request *rq)
- 		return;
- 	}
- 
-+	rcu_read_lock();
-+	prog = rcu_dereference_protected(q->prog, 1);
-+	if (prog)
-+		bpf_ccpu = BPF_PROG_RUN(q->prog, NULL);
-+	rcu_read_unlock();
-+
- 	cpu = get_cpu();
--	if (!test_bit(QUEUE_FLAG_SAME_FORCE, &q->queue_flags))
--		shared = cpus_share_cache(cpu, ctx->cpu);
-+	if (bpf_ccpu < 0 || !cpu_online(bpf_ccpu)) {
-+		ccpu = ctx->cpu;
-+		if (!test_bit(QUEUE_FLAG_SAME_FORCE, &q->queue_flags))
-+			shared = cpus_share_cache(cpu, ctx->cpu);
-+	} else
-+		ccpu = bpf_ccpu;
- 
--	if (cpu != ctx->cpu && !shared && cpu_online(ctx->cpu)) {
-+	if (cpu != ccpu && !shared && cpu_online(ccpu)) {
- 		rq->csd.func = __blk_mq_complete_request_remote;
- 		rq->csd.info = rq;
- 		rq->csd.flags = 0;
--		smp_call_function_single_async(ctx->cpu, &rq->csd);
-+		smp_call_function_single_async(ccpu, &rq->csd);
- 	} else {
- 		q->mq_ops->complete(rq);
- 	}
-diff --git a/block/blk-softirq.c b/block/blk-softirq.c
-index 457d9ba3eb20..1139a5352a59 100644
---- a/block/blk-softirq.c
-+++ b/block/blk-softirq.c
-@@ -11,6 +11,7 @@
- #include <linux/cpu.h>
- #include <linux/sched.h>
- #include <linux/sched/topology.h>
-+#include <linux/filter.h>
- 
- #include "blk.h"
- 
-@@ -101,20 +102,32 @@ void __blk_complete_request(struct request *req)
- 	int cpu, ccpu = req->mq_ctx->cpu;
- 	unsigned long flags;
- 	bool shared = false;
-+	int bpf_ccpu = -1;
-+	struct bpf_prog *prog;
- 
- 	BUG_ON(!q->mq_ops->complete);
- 
--	local_irq_save(flags);
--	cpu = smp_processor_id();
-+	rcu_read_lock();
-+	prog = rcu_dereference_protected(q->prog, 1);
-+	if (prog)
-+		bpf_ccpu = BPF_PROG_RUN(q->prog, NULL);
-+	rcu_read_unlock();
- 
- 	/*
--	 * Select completion CPU
-+	 * Select completion CPU.
-+	 * If a valid CPU number is returned by eBPF program, use it directly.
- 	 */
--	if (test_bit(QUEUE_FLAG_SAME_COMP, &q->queue_flags) && ccpu != -1) {
--		if (!test_bit(QUEUE_FLAG_SAME_FORCE, &q->queue_flags))
--			shared = cpus_share_cache(cpu, ccpu);
-+	local_irq_save(flags);
-+	cpu = smp_processor_id();
-+	if (bpf_ccpu < 0 || !cpu_online(bpf_ccpu)) {
-+		if (test_bit(QUEUE_FLAG_SAME_COMP, &q->queue_flags) &&
-+			ccpu != -1) {
-+			if (!test_bit(QUEUE_FLAG_SAME_FORCE, &q->queue_flags))
-+				shared = cpus_share_cache(cpu, ccpu);
-+		} else
-+			ccpu = cpu;
- 	} else
--		ccpu = cpu;
-+		ccpu = bpf_ccpu;
- 
- 	/*
- 	 * If current CPU and requested CPU share a cache, run the softirq on
-diff --git a/include/linux/blkdev.h b/include/linux/blkdev.h
-index d9db32fb75ee..849589c3c51c 100644
---- a/include/linux/blkdev.h
-+++ b/include/linux/blkdev.h
-@@ -397,6 +397,8 @@ static inline int blkdev_reset_zones_ioctl(struct block_device *bdev,
- 
- #endif /* CONFIG_BLK_DEV_ZONED */
- 
-+struct bpf_prog;
-+
- struct request_queue {
- 	struct request		*last_merge;
- 	struct elevator_queue	*elevator;
-@@ -590,6 +592,7 @@ struct request_queue {
- 
- #define BLK_MAX_WRITE_HINTS	5
- 	u64			write_hints[BLK_MAX_WRITE_HINTS];
-+	struct bpf_prog __rcu *prog;
- };
- 
- #define QUEUE_FLAG_STOPPED	0	/* queue is stopped */
-diff --git a/include/linux/bpf_blkdev.h b/include/linux/bpf_blkdev.h
-new file mode 100644
-index 000000000000..0777428bc6e2
---- /dev/null
-+++ b/include/linux/bpf_blkdev.h
-@@ -0,0 +1,9 @@
-+/* SPDX-License-Identifier: GPL-2.0 */
-+#ifndef __BPF_BLKDEV_H__
-+#define __BPF_BLKDEV_H__
-+
-+extern int blkdev_bpf_prog_attach(const union bpf_attr *attr,
-+		enum bpf_prog_type ptype, struct bpf_prog *prog);
-+extern int blkdev_bpf_prog_detach(const union bpf_attr *attr);
-+
-+#endif /* !__BPF_BLKDEV_H__ */
-diff --git a/include/linux/bpf_types.h b/include/linux/bpf_types.h
-index 36a9c2325176..008facd336e5 100644
---- a/include/linux/bpf_types.h
-+++ b/include/linux/bpf_types.h
-@@ -38,6 +38,7 @@ BPF_PROG_TYPE(BPF_PROG_TYPE_LIRC_MODE2, lirc_mode2)
- #ifdef CONFIG_INET
- BPF_PROG_TYPE(BPF_PROG_TYPE_SK_REUSEPORT, sk_reuseport)
- #endif
-+BPF_PROG_TYPE(BPF_PROG_TYPE_BLKDEV, blkdev)
- 
- BPF_MAP_TYPE(BPF_MAP_TYPE_ARRAY, array_map_ops)
- BPF_MAP_TYPE(BPF_MAP_TYPE_PERCPU_ARRAY, percpu_array_map_ops)
-diff --git a/include/uapi/linux/bpf.h b/include/uapi/linux/bpf.h
-index 77c6be96d676..36aa35e29be2 100644
---- a/include/uapi/linux/bpf.h
-+++ b/include/uapi/linux/bpf.h
-@@ -173,6 +173,7 @@ enum bpf_prog_type {
- 	BPF_PROG_TYPE_CGROUP_SYSCTL,
- 	BPF_PROG_TYPE_RAW_TRACEPOINT_WRITABLE,
- 	BPF_PROG_TYPE_CGROUP_SOCKOPT,
-+	BPF_PROG_TYPE_BLKDEV,
- };
- 
- enum bpf_attach_type {
-@@ -199,6 +200,7 @@ enum bpf_attach_type {
- 	BPF_CGROUP_UDP6_RECVMSG,
- 	BPF_CGROUP_GETSOCKOPT,
- 	BPF_CGROUP_SETSOCKOPT,
-+	BPF_BLKDEV_IOC_CPU,
- 	__MAX_BPF_ATTACH_TYPE
- };
- 
-diff --git a/kernel/bpf/syscall.c b/kernel/bpf/syscall.c
-index 82eabd4e38ad..9724c0809f21 100644
---- a/kernel/bpf/syscall.c
-+++ b/kernel/bpf/syscall.c
-@@ -4,6 +4,7 @@
- #include <linux/bpf.h>
- #include <linux/bpf_trace.h>
- #include <linux/bpf_lirc.h>
-+#include <linux/bpf_blkdev.h>
- #include <linux/btf.h>
- #include <linux/syscalls.h>
- #include <linux/slab.h>
-@@ -1942,6 +1943,9 @@ static int bpf_prog_attach(const union bpf_attr *attr)
- 	case BPF_CGROUP_SETSOCKOPT:
- 		ptype = BPF_PROG_TYPE_CGROUP_SOCKOPT;
- 		break;
-+	case BPF_BLKDEV_IOC_CPU:
-+		ptype = BPF_PROG_TYPE_BLKDEV;
-+		break;
- 	default:
- 		return -EINVAL;
- 	}
-@@ -1966,6 +1970,9 @@ static int bpf_prog_attach(const union bpf_attr *attr)
- 	case BPF_PROG_TYPE_FLOW_DISSECTOR:
- 		ret = skb_flow_dissector_bpf_prog_attach(attr, prog);
- 		break;
-+	case BPF_PROG_TYPE_BLKDEV:
-+		ret = blkdev_bpf_prog_attach(attr, ptype, prog);
-+		break;
- 	default:
- 		ret = cgroup_bpf_prog_attach(attr, ptype, prog);
- 	}
-@@ -2029,6 +2036,8 @@ static int bpf_prog_detach(const union bpf_attr *attr)
- 	case BPF_CGROUP_SETSOCKOPT:
- 		ptype = BPF_PROG_TYPE_CGROUP_SOCKOPT;
- 		break;
-+	case BPF_BLKDEV_IOC_CPU:
-+		return blkdev_bpf_prog_detach(attr);
- 	default:
- 		return -EINVAL;
- 	}
 -- 
-2.22.0
+Jens Axboe
 
