@@ -2,117 +2,158 @@ Return-Path: <SRS0=kJgC=YH=vger.kernel.org=linux-block-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-6.8 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
-	INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,
-	URIBL_BLOCKED autolearn=ham autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-0.4 required=3.0 tests=FROM_LOCAL_HEX,
+	HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,
+	URIBL_BLOCKED autolearn=no autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 89CBDC4CECE
-	for <linux-block@archiver.kernel.org>; Mon, 14 Oct 2019 01:51:21 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 19E66ECE58C
+	for <linux-block@archiver.kernel.org>; Mon, 14 Oct 2019 02:49:20 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.kernel.org (Postfix) with ESMTP id 6C2DB207FF
-	for <linux-block@archiver.kernel.org>; Mon, 14 Oct 2019 01:51:21 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id E49802067B
+	for <linux-block@archiver.kernel.org>; Mon, 14 Oct 2019 02:49:19 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1729744AbfJNBvV (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Sun, 13 Oct 2019 21:51:21 -0400
-Received: from mx1.redhat.com ([209.132.183.28]:36902 "EHLO mx1.redhat.com"
-        rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-        id S1729730AbfJNBvU (ORCPT <rfc822;linux-block@vger.kernel.org>);
-        Sun, 13 Oct 2019 21:51:20 -0400
-Received: from smtp.corp.redhat.com (int-mx07.intmail.prod.int.phx2.redhat.com [10.5.11.22])
-        (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
-        (No client certificate requested)
-        by mx1.redhat.com (Postfix) with ESMTPS id 770BF307D90D;
-        Mon, 14 Oct 2019 01:51:20 +0000 (UTC)
-Received: from localhost (ovpn-8-17.pek2.redhat.com [10.72.8.17])
-        by smtp.corp.redhat.com (Postfix) with ESMTP id 5E7E4100EBA5;
-        Mon, 14 Oct 2019 01:51:19 +0000 (UTC)
-From:   Ming Lei <ming.lei@redhat.com>
-To:     Jens Axboe <axboe@kernel.dk>
-Cc:     linux-block@vger.kernel.org, Ming Lei <ming.lei@redhat.com>,
-        John Garry <john.garry@huawei.com>,
-        Bart Van Assche <bvanassche@acm.org>,
-        Hannes Reinecke <hare@suse.com>,
-        Christoph Hellwig <hch@lst.de>,
-        Thomas Gleixner <tglx@linutronix.de>,
-        Keith Busch <keith.busch@intel.com>
-Subject: [PATCH V4 5/5] blk-mq: handle requests dispatched from IO scheduler in case that hctx is dead
-Date:   Mon, 14 Oct 2019 09:50:43 +0800
-Message-Id: <20191014015043.25029-6-ming.lei@redhat.com>
-In-Reply-To: <20191014015043.25029-1-ming.lei@redhat.com>
-References: <20191014015043.25029-1-ming.lei@redhat.com>
+        id S1729764AbfJNCtJ (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Sun, 13 Oct 2019 22:49:09 -0400
+Received: from mail-io1-f69.google.com ([209.85.166.69]:42760 "EHLO
+        mail-io1-f69.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S1729495AbfJNCtJ (ORCPT
+        <rfc822;linux-block@vger.kernel.org>);
+        Sun, 13 Oct 2019 22:49:09 -0400
+Received: by mail-io1-f69.google.com with SMTP id w1so24677781ioj.9
+        for <linux-block@vger.kernel.org>; Sun, 13 Oct 2019 19:49:08 -0700 (PDT)
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20161025;
+        h=x-gm-message-state:mime-version:date:message-id:subject:from:to;
+        bh=9V4klit+hozv+mbRrTrN0UpLT9Ett4RqcQ2DA9o6Nvo=;
+        b=B7UjkjSRhYZ3YyGaM0A0gYGJ+HqZU+K07gAzbSaQLwwdDm1a8UBxGktIgDuJj6ZJbp
+         n5nWUoKDqyDsUbqPm/YOCZmNigKxPiWjbB6GdUl/LiItPSi4nq86NtP1BTWEYL+OD1Pg
+         O5IOcLoxMWVu8Es6bBuMynWpAXabCw7YRqFD6D8v0bmjGKAq+AgnJ2fAS49/cNe8ZqAJ
+         YEHtUbDgN+q/U13/osZuP1KpyYs9bLIrV5CrOFNY0xwvY5oOyscmPmQQPBPFftn9GD16
+         CaOmmCWeaMWuImF7/61AJls1iSUUOVsLlUEXfZq4q5ZkB8dZ/JrhUUeUI7VxQlvXAuna
+         TFfA==
+X-Gm-Message-State: APjAAAUS+Gf4O/UqPCZRQK1My9q+jhzG/6FlqhUoEqHVYTOZlF9s+AB8
+        fl36/OMGjXZP1kUAKo/vBySls0VvkV63My77avUfgPAUIFII
+X-Google-Smtp-Source: APXvYqz5uT/zj8pn24FxdfXVgsaToFpZju09zN4x5T7bBvOevF5cYViVd4CO+zGOaNNnkRSmA46DEeA2usVGaNUrbQMHcrFcwMcf
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
-X-Scanned-By: MIMEDefang 2.84 on 10.5.11.22
-X-Greylist: Sender IP whitelisted, not delayed by milter-greylist-4.5.16 (mx1.redhat.com [10.5.110.48]); Mon, 14 Oct 2019 01:51:20 +0000 (UTC)
+X-Received: by 2002:a5e:d718:: with SMTP id v24mr14423069iom.24.1571021348408;
+ Sun, 13 Oct 2019 19:49:08 -0700 (PDT)
+Date:   Sun, 13 Oct 2019 19:49:08 -0700
+X-Google-Appengine-App-Id: s~syzkaller
+X-Google-Appengine-App-Id-Alias: syzkaller
+Message-ID: <0000000000006819150594d5e956@google.com>
+Subject: WARNING: refcount bug in sock_wfree (2)
+From:   syzbot <syzbot+c0ba5b9e742f049a2edf@syzkaller.appspotmail.com>
+To:     axboe@kernel.dk, davem@davemloft.net, hare@suse.com,
+        jmoyer@redhat.com, linux-block@vger.kernel.org,
+        linux-fsdevel@vger.kernel.org, linux-kernel@vger.kernel.org,
+        netdev@vger.kernel.org, syzkaller-bugs@googlegroups.com,
+        viro@zeniv.linux.org.uk
+Content-Type: text/plain; charset="UTF-8"; format=flowed; delsp=yes
 Sender: linux-block-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-If hctx becomes dead, all in-queue IO requests aimed at this hctx have to
-be re-submitted, so cover requests queued in scheduler queue.
+Hello,
 
-Cc: John Garry <john.garry@huawei.com>
-Cc: Bart Van Assche <bvanassche@acm.org>
-Cc: Hannes Reinecke <hare@suse.com>
-Cc: Christoph Hellwig <hch@lst.de>
-Cc: Thomas Gleixner <tglx@linutronix.de>
-Cc: Keith Busch <keith.busch@intel.com>
-Reviewed-by: Hannes Reinecke <hare@suse.com>
-Signed-off-by: Ming Lei <ming.lei@redhat.com>
+syzbot found the following crash on:
+
+HEAD commit:    442630f6 Add linux-next specific files for 20191008
+git tree:       linux-next
+console output: https://syzkaller.appspot.com/x/log.txt?x=158fa6bf600000
+kernel config:  https://syzkaller.appspot.com/x/.config?x=af1bfeef713eefdd
+dashboard link: https://syzkaller.appspot.com/bug?extid=c0ba5b9e742f049a2edf
+compiler:       gcc (GCC) 9.0.0 20181231 (experimental)
+syz repro:      https://syzkaller.appspot.com/x/repro.syz?x=15a861b3600000
+C reproducer:   https://syzkaller.appspot.com/x/repro.c?x=1769f48b600000
+
+The bug was bisected to:
+
+commit 6c080ff07363389cb4092193eb333639f0392b8c
+Author: Jens Axboe <axboe@kernel.dk>
+Date:   Thu Oct 3 14:11:03 2019 +0000
+
+     io_uring: allow sparse fixed file sets
+
+bisection log:  https://syzkaller.appspot.com/x/bisect.txt?x=1344b993600000
+final crash:    https://syzkaller.appspot.com/x/report.txt?x=10c4b993600000
+console output: https://syzkaller.appspot.com/x/log.txt?x=1744b993600000
+
+IMPORTANT: if you fix the bug, please add the following tag to the commit:
+Reported-by: syzbot+c0ba5b9e742f049a2edf@syzkaller.appspotmail.com
+Fixes: 6c080ff07363 ("io_uring: allow sparse fixed file sets")
+
+------------[ cut here ]------------
+refcount_t: underflow; use-after-free.
+WARNING: CPU: 0 PID: 8691 at lib/refcount.c:190  
+refcount_sub_and_test_checked lib/refcount.c:190 [inline]
+WARNING: CPU: 0 PID: 8691 at lib/refcount.c:190  
+refcount_sub_and_test_checked+0x1d0/0x200 lib/refcount.c:180
+Kernel panic - not syncing: panic_on_warn set ...
+CPU: 0 PID: 8691 Comm: syz-executor322 Not tainted 5.4.0-rc2-next-20191008  
+#0
+Hardware name: Google Google Compute Engine/Google Compute Engine, BIOS  
+Google 01/01/2011
+Call Trace:
+  __dump_stack lib/dump_stack.c:77 [inline]
+  dump_stack+0x172/0x1f0 lib/dump_stack.c:113
+  panic+0x2e3/0x75c kernel/panic.c:221
+  __warn.cold+0x2f/0x35 kernel/panic.c:582
+  report_bug+0x289/0x300 lib/bug.c:195
+  fixup_bug arch/x86/kernel/traps.c:174 [inline]
+  fixup_bug arch/x86/kernel/traps.c:169 [inline]
+  do_error_trap+0x11b/0x200 arch/x86/kernel/traps.c:267
+  do_invalid_op+0x37/0x50 arch/x86/kernel/traps.c:286
+  invalid_op+0x23/0x30 arch/x86/entry/entry_64.S:1028
+RIP: 0010:refcount_sub_and_test_checked lib/refcount.c:190 [inline]
+RIP: 0010:refcount_sub_and_test_checked+0x1d0/0x200 lib/refcount.c:180
+Code: 1d b0 f0 7f 06 31 ff 89 de e8 6c d7 30 fe 84 db 75 94 e8 23 d6 30 fe  
+48 c7 c7 20 81 e6 87 c6 05 90 f0 7f 06 01 e8 e8 15 02 fe <0f> 0b e9 75 ff  
+ff ff e8 04 d6 30 fe e9 6e ff ff ff 48 89 df e8 e7
+RSP: 0018:ffff8880a8267a28 EFLAGS: 00010282
+RAX: 0000000000000000 RBX: 0000000000000000 RCX: 0000000000000000
+RDX: 0000000000000000 RSI: ffffffff815cb676 RDI: ffffed101504cf37
+RBP: ffff8880a8267ac0 R08: ffff888090e363c0 R09: fffffbfff14eeb42
+R10: fffffbfff14eeb41 R11: ffffffff8a775a0f R12: 00000000fffffd02
+R13: 0000000000000001 R14: ffff8880a8267a98 R15: 0000000000000001
+  sock_wfree+0x10c/0x190 net/core/sock.c:1958
+  unix_destruct_scm+0x115/0x170 net/unix/scm.c:149
+  io_destruct_skb+0x62/0x80 fs/io_uring.c:2995
+  skb_release_head_state+0xeb/0x260 net/core/skbuff.c:652
+  skb_release_all+0x16/0x60 net/core/skbuff.c:663
+  __kfree_skb net/core/skbuff.c:679 [inline]
+  kfree_skb net/core/skbuff.c:697 [inline]
+  kfree_skb+0x101/0x3c0 net/core/skbuff.c:691
+  __io_sqe_files_scm+0x429/0x640 fs/io_uring.c:3049
+  io_sqe_files_scm fs/io_uring.c:3071 [inline]
+  io_sqe_files_register fs/io_uring.c:3154 [inline]
+  __io_uring_register+0x1f69/0x2d70 fs/io_uring.c:4152
+  __do_sys_io_uring_register fs/io_uring.c:4204 [inline]
+  __se_sys_io_uring_register fs/io_uring.c:4186 [inline]
+  __x64_sys_io_uring_register+0x193/0x1f0 fs/io_uring.c:4186
+  do_syscall_64+0xfa/0x760 arch/x86/entry/common.c:290
+  entry_SYSCALL_64_after_hwframe+0x49/0xbe
+RIP: 0033:0x440279
+Code: 18 89 d0 c3 66 2e 0f 1f 84 00 00 00 00 00 0f 1f 00 48 89 f8 48 89 f7  
+48 89 d6 48 89 ca 4d 89 c2 4d 89 c8 4c 8b 4c 24 08 0f 05 <48> 3d 01 f0 ff  
+ff 0f 83 fb 13 fc ff c3 66 2e 0f 1f 84 00 00 00 00
+RSP: 002b:00007ffeeedc31e8 EFLAGS: 00000246 ORIG_RAX: 00000000000001ab
+RAX: ffffffffffffffda RBX: 00000000004002c8 RCX: 0000000000440279
+RDX: 0000000020000280 RSI: 0000000000000002 RDI: 0000000000000003
+RBP: 00000000006ca018 R08: 0000000000000000 R09: 00000000004002c8
+R10: 0000000000000001 R11: 0000000000000246 R12: 0000000000401b00
+R13: 0000000000401b90 R14: 0000000000000000 R15: 0000000000000000
+Kernel Offset: disabled
+Rebooting in 86400 seconds..
+
+
 ---
- block/blk-mq.c | 30 +++++++++++++++++++++++++-----
- 1 file changed, 25 insertions(+), 5 deletions(-)
+This bug is generated by a bot. It may contain errors.
+See https://goo.gl/tpsmEJ for more information about syzbot.
+syzbot engineers can be reached at syzkaller@googlegroups.com.
 
-diff --git a/block/blk-mq.c b/block/blk-mq.c
-index 17f0a9ef32a8..06081966549f 100644
---- a/block/blk-mq.c
-+++ b/block/blk-mq.c
-@@ -2305,6 +2305,7 @@ static int blk_mq_hctx_notify_dead(unsigned int cpu, struct hlist_node *node)
- 	enum hctx_type type;
- 	bool hctx_dead;
- 	struct request *rq;
-+	struct elevator_queue *e;
- 
- 	hctx = hlist_entry_safe(node, struct blk_mq_hw_ctx, cpuhp_dead);
- 	ctx = __blk_mq_get_ctx(hctx->queue, cpu);
-@@ -2315,12 +2316,31 @@ static int blk_mq_hctx_notify_dead(unsigned int cpu, struct hlist_node *node)
- 	hctx_dead = cpumask_first_and(hctx->cpumask, cpu_online_mask) >=
- 		nr_cpu_ids;
- 
--	spin_lock(&ctx->lock);
--	if (!list_empty(&ctx->rq_lists[type])) {
--		list_splice_init(&ctx->rq_lists[type], &tmp);
--		blk_mq_hctx_clear_pending(hctx, ctx);
-+	e = hctx->queue->elevator;
-+	if (!e) {
-+		spin_lock(&ctx->lock);
-+		if (!list_empty(&ctx->rq_lists[type])) {
-+			list_splice_init(&ctx->rq_lists[type], &tmp);
-+			blk_mq_hctx_clear_pending(hctx, ctx);
-+		}
-+		spin_unlock(&ctx->lock);
-+	} else if (hctx_dead) {
-+		LIST_HEAD(sched_tmp);
-+
-+		while ((rq = e->type->ops.dispatch_request(hctx))) {
-+			if (rq->mq_hctx != hctx)
-+				list_add(&rq->queuelist, &sched_tmp);
-+			else
-+				list_add(&rq->queuelist, &tmp);
-+		}
-+
-+		while (!list_empty(&sched_tmp)) {
-+			rq = list_entry(sched_tmp.next, struct request,
-+					queuelist);
-+			list_del_init(&rq->queuelist);
-+			blk_mq_sched_insert_request(rq, true, true, true);
-+		}
- 	}
--	spin_unlock(&ctx->lock);
- 
- 	if (!hctx_dead) {
- 		if (list_empty(&tmp))
--- 
-2.20.1
-
+syzbot will keep track of this bug report. See:
+https://goo.gl/tpsmEJ#status for how to communicate with syzbot.
+For information about bisection process see: https://goo.gl/tpsmEJ#bisection
+syzbot can test patches for this bug, for details see:
+https://goo.gl/tpsmEJ#testing-patches
