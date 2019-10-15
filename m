@@ -7,46 +7,47 @@ X-Spam-Status: No, score=-5.0 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
 	SPF_PASS,URIBL_BLOCKED,USER_AGENT_SANE_1 autolearn=ham autolearn_force=no
 	version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 5D831C10F14
-	for <linux-block@archiver.kernel.org>; Tue, 15 Oct 2019 07:56:44 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 58B9CC10F14
+	for <linux-block@archiver.kernel.org>; Tue, 15 Oct 2019 07:57:12 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.kernel.org (Postfix) with ESMTP id 3142D217F9
-	for <linux-block@archiver.kernel.org>; Tue, 15 Oct 2019 07:56:44 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id 2B2FA21835
+	for <linux-block@archiver.kernel.org>; Tue, 15 Oct 2019 07:57:12 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (2048-bit key) header.d=infradead.org header.i=@infradead.org header.b="EGq+u+ku"
+	dkim=fail reason="signature verification failed" (2048-bit key) header.d=infradead.org header.i=@infradead.org header.b="Ox5HBE8k"
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1728235AbfJOH4n (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Tue, 15 Oct 2019 03:56:43 -0400
-Received: from bombadil.infradead.org ([198.137.202.133]:35832 "EHLO
+        id S1728278AbfJOH5L (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Tue, 15 Oct 2019 03:57:11 -0400
+Received: from bombadil.infradead.org ([198.137.202.133]:37022 "EHLO
         bombadil.infradead.org" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1726549AbfJOH4n (ORCPT
+        with ESMTP id S1728236AbfJOH5L (ORCPT
         <rfc822;linux-block@vger.kernel.org>);
-        Tue, 15 Oct 2019 03:56:43 -0400
+        Tue, 15 Oct 2019 03:57:11 -0400
 DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed;
         d=infradead.org; s=bombadil.20170209; h=In-Reply-To:Content-Type:MIME-Version
         :References:Message-ID:Subject:Cc:To:From:Date:Sender:Reply-To:
         Content-Transfer-Encoding:Content-ID:Content-Description:Resent-Date:
         Resent-From:Resent-Sender:Resent-To:Resent-Cc:Resent-Message-ID:List-Id:
         List-Help:List-Unsubscribe:List-Subscribe:List-Post:List-Owner:List-Archive;
-         bh=ymW8PLy6AlYr0rfTky0vwvgncQbZOo1mnh2EotD8LFg=; b=EGq+u+kuffUZT4VyAEpYrHKwK
-        7Cih3XXcBVIP9XY10QKM+SiZhj6FtrySk7jF0MauCSH1eD3vdAMwN+AzzXadEcb3mthqM5nekAKEB
-        U0uWV0cq7EXV7kgDUvofuCzKpJ5CFybyFMhIvONda5fIC53OXx6Vg0kKef+4k0DpDYbxIkTN/ewgP
-        Z0vyFvvQlaFGC0RBOBEYqn3BQM6JAUZiRH4rHhKEw1/fqVqlhkqY40KGEBO6mXP2glL/hb54P6w6v
-        X6+scekiMrw4LJjHYHOSOBFj20JXdwgpGG5nUzy4MTSuLCMx+2fyZb1dBC6XGPoH/Y2lVVRFj1fjW
-        BZuu6Wt+g==;
+         bh=xjjxIrYZaE/ylttEZFV9FHzMxkgoLEiwDVE0qZzLRWI=; b=Ox5HBE8k7PtsJ2QHikwjXyBe7
+        3WdJL37sXCaZcqmGm+9H5JgOKI7Au9P+ify9jW9GkTlwoY5wFQFP3CUZjLX+DeKXzpLvZhrmFPqiz
+        lH6dMRfrp5HhZhOhS01TTetDiLwBHr7+Gpr6UPcquWqrm9jr2iYj21O9OaTdPozDjiCL94cZWtE/q
+        9wQatoZlqt5z2agGDkAAFOyggVSJeXGVeh17pffPn5NNtbblWD3ir3w3aPcTYpMhI4RNTkfKpsqfY
+        jk3wXV5sPVU8yPkgRE4TmpFqNdWJeYxLnVKbbBxK0PvbitlHUIiNP9Ke0uFWK7sJXVmkOaCtXplx7
+        PKJsEUizg==;
 Received: from hch by bombadil.infradead.org with local (Exim 4.92.3 #3 (Red Hat Linux))
-        id 1iKHhC-0000UJ-HJ; Tue, 15 Oct 2019 07:56:42 +0000
-Date:   Tue, 15 Oct 2019 00:56:42 -0700
+        id 1iKHhf-0000jv-3o; Tue, 15 Oct 2019 07:57:11 +0000
+Date:   Tue, 15 Oct 2019 00:57:11 -0700
 From:   Christoph Hellwig <hch@infradead.org>
 To:     Revanth Rajashekar <revanth.rajashekar@intel.com>
 Cc:     linux-block@vger.kernel.org
 Subject: Re: [PATCH] nvme: resync include/linux/nvme.h with nvmecli
-Message-ID: <20191015075642.GA32307@infradead.org>
+Message-ID: <20191015075711.GB32307@infradead.org>
 References: <20191014171607.29162-1-revanth.rajashekar@intel.com>
+ <20191015075642.GA32307@infradead.org>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=us-ascii
 Content-Disposition: inline
-In-Reply-To: <20191014171607.29162-1-revanth.rajashekar@intel.com>
+In-Reply-To: <20191015075642.GA32307@infradead.org>
 User-Agent: Mutt/1.12.1 (2019-06-15)
 X-SRS-Rewrite: SMTP reverse-path rewritten from <hch@infradead.org> by bombadil.infradead.org. See http://www.infradead.org/rpr.html
 Sender: linux-block-owner@vger.kernel.org
@@ -54,15 +55,20 @@ Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-On Mon, Oct 14, 2019 at 11:16:07AM -0600, Revanth Rajashekar wrote:
-> Update enumerations and structures in include/linux/nvme.h
-> to resync with the nvmecli.
+On Tue, Oct 15, 2019 at 12:56:42AM -0700, Christoph Hellwig wrote:
+> On Mon, Oct 14, 2019 at 11:16:07AM -0600, Revanth Rajashekar wrote:
+> > Update enumerations and structures in include/linux/nvme.h
+> > to resync with the nvmecli.
+> > 
+> > All the updates are mentioned in the ratified NVMe 1.4 spec
+> > https://nvmexpress.org/wp-content/uploads/NVM-Express-1_4-2019.06.10-Ratified.pdf
+> > 
+> > Signed-off-by: Revanth Rajashekar <revanth.rajashekar@intel.com>
 > 
-> All the updates are mentioned in the ratified NVMe 1.4 spec
-> https://nvmexpress.org/wp-content/uploads/NVM-Express-1_4-2019.06.10-Ratified.pdf
+> Looks good:
 > 
-> Signed-off-by: Revanth Rajashekar <revanth.rajashekar@intel.com>
+> Reviewed-by: Christoph Hellwig <hch@lst.de>
 
-Looks good:
+Oh. but for this to be picked up please resend it to
+linux-nvme@lists.infradead.org
 
-Reviewed-by: Christoph Hellwig <hch@lst.de>
