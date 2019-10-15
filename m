@@ -2,103 +2,67 @@ Return-Path: <SRS0=Qtc1=YI=vger.kernel.org=linux-block-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-9.6 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
-	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,
-	SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED,USER_AGENT_GIT autolearn=ham
-	autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-5.0 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
+	HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,
+	SPF_PASS,URIBL_BLOCKED,USER_AGENT_SANE_1 autolearn=ham autolearn_force=no
+	version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 08533C10F14
-	for <linux-block@archiver.kernel.org>; Tue, 15 Oct 2019 04:38:45 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 5D831C10F14
+	for <linux-block@archiver.kernel.org>; Tue, 15 Oct 2019 07:56:44 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.kernel.org (Postfix) with ESMTP id CAC1D21835
-	for <linux-block@archiver.kernel.org>; Tue, 15 Oct 2019 04:38:44 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id 3142D217F9
+	for <linux-block@archiver.kernel.org>; Tue, 15 Oct 2019 07:56:44 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (2048-bit key) header.d=wdc.com header.i=@wdc.com header.b="TupAv1Ap"
+	dkim=fail reason="signature verification failed" (2048-bit key) header.d=infradead.org header.i=@infradead.org header.b="EGq+u+ku"
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1727044AbfJOEio (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Tue, 15 Oct 2019 00:38:44 -0400
-Received: from esa1.hgst.iphmx.com ([68.232.141.245]:44625 "EHLO
-        esa1.hgst.iphmx.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1726825AbfJOEin (ORCPT
+        id S1728235AbfJOH4n (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Tue, 15 Oct 2019 03:56:43 -0400
+Received: from bombadil.infradead.org ([198.137.202.133]:35832 "EHLO
+        bombadil.infradead.org" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S1726549AbfJOH4n (ORCPT
         <rfc822;linux-block@vger.kernel.org>);
-        Tue, 15 Oct 2019 00:38:43 -0400
-DKIM-Signature: v=1; a=rsa-sha256; c=simple/simple;
-  d=wdc.com; i=@wdc.com; q=dns/txt; s=dkim.wdc.com;
-  t=1571114323; x=1602650323;
-  h=from:to:cc:subject:date:message-id:mime-version:
-   content-transfer-encoding;
-  bh=gDSqX501OhSu6g48JSoPoR2a3uxDz2ElT9166R/rHPM=;
-  b=TupAv1AppP4g4jbKNX5hPK44eVhbOUB9joUXOs3Ec443vcevqdnIsK08
-   nKalDhULf8/mAMh5+T8xq19I5qYAer4zct8q3OuV9BkowfJ3LNRQiND68
-   iasflBc66UmHL2wRZhjEwBLxNWZkC39v6KVJdyiZThmQdvLisUtVGOonT
-   drlvS/ijgzBhvDP8/5NDJBqhvh41bR2WSGdFp3ounN45N7UaGId5JoHUI
-   2jGK7PKraC5OMT5y/RrgDVXQz39rMEt8wwvJ9VgcxGojsnn7vKeDOc8LC
-   23VxRha9+aemc7vB1NuZYkyXeTLPbWt3ig46CfqanG0a352TqS2m/KT6y
-   w==;
-IronPort-SDR: GB9Ss6WaVoyV5R6AEkXHhFBrgaGzYnn7xkVGDRakccL2z9cOU6JYDeqszQ9A2OOcG3rkg5gdII
- RGhFQRi6JO2P5ehpfDqwhaCxI6PvsC9gUYCtoMkXYXbI5xRAyS4/X5+U95cUlYU7Z+xEKzQ71d
- Y4UWVMuY+DdXIrJAz+9lcxKidIQ/DlHhXJiRhn60ZL8r0BCTpiX6/b9+HAIpD2S+tfNz3MfTT1
- BpaBpXiVrxd2NEXN2sdxuuds+nhWSlPzK7bvKwsh4Yu8CZcu3mqdi5PMVL77J/R0OjBR8OdMJE
- al8=
-X-IronPort-AV: E=Sophos;i="5.67,297,1566835200"; 
-   d="scan'208";a="227591551"
-Received: from uls-op-cesaip02.wdc.com (HELO uls-op-cesaep02.wdc.com) ([199.255.45.15])
-  by ob1.hgst.iphmx.com with ESMTP; 15 Oct 2019 12:38:30 +0800
-IronPort-SDR: v25K94eaE3Rd4J97m6O1BmcjkFLwrUU3qvVpKFBaLk0Zz2rr0jfX/BSiMe4DV3twA+oZkXzcsX
- LT0GeI2ITnaIRBX9IUS2gxkYnKdNpxhNaaNxrlPp7Hl1W5T8bComaG7M3R70ULDhuxNqpF/s+5
- tt3auNf2W6F2x09uvXB5QAAmVnRBsED1/UCA6oyqh/qTBKBYVHfw+QZ9s2XnX1cLKYQ9c/pw4L
- 8Aff4rIwUz7WpEH7fSBeO5iWq7kGeFi1hovMVlUl9hcM1QtWtK8oBGrOC4VIG0F/wmtQvSy4Zi
- o95TgIiRo4HBYgFchj9PrE6H
-Received: from uls-op-cesaip02.wdc.com ([10.248.3.37])
-  by uls-op-cesaep02.wdc.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 14 Oct 2019 21:34:20 -0700
-IronPort-SDR: UPN8Ssg25fhiIzxy+9ii1rkN3BxsQUiAyhRmmcuvGmruxDrp84oOI6HkHNrtP0frtOOQCxWhqH
- qPclCmfow5hbTFflQLX18xFlwbzGPK2sFrjQcs2oED2DR4ymAdbcTUZOXcwNsQtWgS7NgVmE1D
- x7EfqdKqTQI4ckLOlHqV7IgUgZ34UrjXyH++Ln5yugT/cdnHnjULcwQ3GcnUiZszFmJCxqbEJX
- b7WLFdSV5m/VYTjmHYkzBBD33WDn1oJcB4XiBN9GHM8GR18uQuM+D3gIu1F6ZPanAYHRw4OhIU
- 9EE=
-WDCIronportException: Internal
-Received: from naota.dhcp.fujisawa.hgst.com (HELO naota.fujisawa.hgst.com) ([10.149.53.115])
-  by uls-op-cesaip02.wdc.com with ESMTP; 14 Oct 2019 21:38:30 -0700
-From:   Naohiro Aota <naohiro.aota@wdc.com>
-To:     linux-mm@kvack.org
-Cc:     linux-fsdevel@vger.kernel.org, linux-block@vger.kernel.org,
-        Andrew Morton <akpm@linux-foundation.org>,
-        Naohiro Aota <naohiro.aota@wdc.com>
-Subject: [PATCH] mm, swap: disallow swapon() on zoned block devices
-Date:   Tue, 15 Oct 2019 13:38:27 +0900
-Message-Id: <20191015043827.160444-1-naohiro.aota@wdc.com>
-X-Mailer: git-send-email 2.23.0
+        Tue, 15 Oct 2019 03:56:43 -0400
+DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed;
+        d=infradead.org; s=bombadil.20170209; h=In-Reply-To:Content-Type:MIME-Version
+        :References:Message-ID:Subject:Cc:To:From:Date:Sender:Reply-To:
+        Content-Transfer-Encoding:Content-ID:Content-Description:Resent-Date:
+        Resent-From:Resent-Sender:Resent-To:Resent-Cc:Resent-Message-ID:List-Id:
+        List-Help:List-Unsubscribe:List-Subscribe:List-Post:List-Owner:List-Archive;
+         bh=ymW8PLy6AlYr0rfTky0vwvgncQbZOo1mnh2EotD8LFg=; b=EGq+u+kuffUZT4VyAEpYrHKwK
+        7Cih3XXcBVIP9XY10QKM+SiZhj6FtrySk7jF0MauCSH1eD3vdAMwN+AzzXadEcb3mthqM5nekAKEB
+        U0uWV0cq7EXV7kgDUvofuCzKpJ5CFybyFMhIvONda5fIC53OXx6Vg0kKef+4k0DpDYbxIkTN/ewgP
+        Z0vyFvvQlaFGC0RBOBEYqn3BQM6JAUZiRH4rHhKEw1/fqVqlhkqY40KGEBO6mXP2glL/hb54P6w6v
+        X6+scekiMrw4LJjHYHOSOBFj20JXdwgpGG5nUzy4MTSuLCMx+2fyZb1dBC6XGPoH/Y2lVVRFj1fjW
+        BZuu6Wt+g==;
+Received: from hch by bombadil.infradead.org with local (Exim 4.92.3 #3 (Red Hat Linux))
+        id 1iKHhC-0000UJ-HJ; Tue, 15 Oct 2019 07:56:42 +0000
+Date:   Tue, 15 Oct 2019 00:56:42 -0700
+From:   Christoph Hellwig <hch@infradead.org>
+To:     Revanth Rajashekar <revanth.rajashekar@intel.com>
+Cc:     linux-block@vger.kernel.org
+Subject: Re: [PATCH] nvme: resync include/linux/nvme.h with nvmecli
+Message-ID: <20191015075642.GA32307@infradead.org>
+References: <20191014171607.29162-1-revanth.rajashekar@intel.com>
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <20191014171607.29162-1-revanth.rajashekar@intel.com>
+User-Agent: Mutt/1.12.1 (2019-06-15)
+X-SRS-Rewrite: SMTP reverse-path rewritten from <hch@infradead.org> by bombadil.infradead.org. See http://www.infradead.org/rpr.html
 Sender: linux-block-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-A zoned block device consists of a number of zones. Zones are
-eitherconventional and accepting random writes or sequential and
-requiringthat writes be issued in LBA order from each zone write
-pointerposition. For the write restriction, zoned block devices are
-notsuitable for a swap device. Disallow swapon on them.
+On Mon, Oct 14, 2019 at 11:16:07AM -0600, Revanth Rajashekar wrote:
+> Update enumerations and structures in include/linux/nvme.h
+> to resync with the nvmecli.
+> 
+> All the updates are mentioned in the ratified NVMe 1.4 spec
+> https://nvmexpress.org/wp-content/uploads/NVM-Express-1_4-2019.06.10-Ratified.pdf
+> 
+> Signed-off-by: Revanth Rajashekar <revanth.rajashekar@intel.com>
 
-Signed-off-by: Naohiro Aota <naohiro.aota@wdc.com>
----
- mm/swapfile.c | 2 ++
- 1 file changed, 2 insertions(+)
+Looks good:
 
-diff --git a/mm/swapfile.c b/mm/swapfile.c
-index dab43523afdd..a9da20739017 100644
---- a/mm/swapfile.c
-+++ b/mm/swapfile.c
-@@ -2887,6 +2887,8 @@ static int claim_swapfile(struct swap_info_struct *p, struct inode *inode)
- 		error = set_blocksize(p->bdev, PAGE_SIZE);
- 		if (error < 0)
- 			return error;
-+		if (blk_queue_is_zoned(p->bdev->bd_queue))
-+			return -EINVAL;
- 		p->flags |= SWP_BLKDEV;
- 	} else if (S_ISREG(inode->i_mode)) {
- 		p->bdev = inode->i_sb->s_bdev;
--- 
-2.23.0
-
+Reviewed-by: Christoph Hellwig <hch@lst.de>
