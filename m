@@ -2,164 +2,201 @@ Return-Path: <SRS0=Qtc1=YI=vger.kernel.org=linux-block-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-2.2 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
-	MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED,USER_AGENT_SANE_1
-	autolearn=no autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-5.6 required=3.0 tests=DKIMWL_WL_HIGH,DKIM_SIGNED,
+	DKIM_VALID,DKIM_VALID_AU,MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,
+	SPF_PASS,URIBL_BLOCKED,USER_AGENT_SANE_1 autolearn=ham autolearn_force=no
+	version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id C79FBECE58F
-	for <linux-block@archiver.kernel.org>; Tue, 15 Oct 2019 15:22:38 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 3CCE6ECE588
+	for <linux-block@archiver.kernel.org>; Tue, 15 Oct 2019 15:48:32 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.kernel.org (Postfix) with ESMTP id A017820640
-	for <linux-block@archiver.kernel.org>; Tue, 15 Oct 2019 15:22:38 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id 15F4D2086A
+	for <linux-block@archiver.kernel.org>; Tue, 15 Oct 2019 15:48:32 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+	s=default; t=1571154512;
+	bh=JfsvFua5FyEIyFW8ezrzFQkkYQdxhQpb+BL72cPktkc=;
+	h=Date:From:To:Cc:Subject:References:In-Reply-To:List-ID:From;
+	b=pH7O5qHn5odEhnLDqevXNBECdmPA5WVxG2cuYdd+feCEhde1JMOOS85ecPth9SwAt
+	 bQJw1c0ljogMwWp+WyU0+CuhTY+vL6AzchFs6FTjAtu5p/av2/0KNCLdHu7kEXznw+
+	 qmg8hJMHJForIKSoXqwdIW+KIXdSdSC/gGp4y/O8=
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S2387426AbfJOPWh (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Tue, 15 Oct 2019 11:22:37 -0400
-Received: from mx2.suse.de ([195.135.220.15]:34352 "EHLO mx1.suse.de"
-        rhost-flags-OK-OK-OK-FAIL) by vger.kernel.org with ESMTP
-        id S2387419AbfJOPWh (ORCPT <rfc822;linux-block@vger.kernel.org>);
-        Tue, 15 Oct 2019 11:22:37 -0400
-X-Virus-Scanned: by amavisd-new at test-mx.suse.de
-Received: from relay2.suse.de (unknown [195.135.220.254])
-        by mx1.suse.de (Postfix) with ESMTP id AED58B708;
-        Tue, 15 Oct 2019 15:22:34 +0000 (UTC)
-Subject: Re: Project idea: Swap to zoned block devices
-To:     Matthew Wilcox <willy@infradead.org>
-Cc:     Naohiro Aota <naohiro.aota@wdc.com>, linux-mm@kvack.org,
-        linux-fsdevel@vger.kernel.org, linux-block@vger.kernel.org,
-        Andrew Morton <akpm@linux-foundation.org>
-References: <20191015043827.160444-1-naohiro.aota@wdc.com>
- <20191015113548.GD32665@bombadil.infradead.org>
- <d9919d4e-4487-c0e5-c483-cebb5b8a4fc8@suse.de>
- <20191015150933.GF32665@bombadil.infradead.org>
-From:   Hannes Reinecke <hare@suse.de>
-Openpgp: preference=signencrypt
-Autocrypt: addr=hare@suse.de; prefer-encrypt=mutual; keydata=
- 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
- azzYF4VRJsdl+d0MCaSy8mUh
-Message-ID: <e4234914-9e82-820c-9898-2d5c64251834@suse.de>
-Date:   Tue, 15 Oct 2019 17:22:34 +0200
-User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:60.0) Gecko/20100101
- Thunderbird/60.7.2
+        id S1727656AbfJOPsb (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Tue, 15 Oct 2019 11:48:31 -0400
+Received: from mail-qk1-f196.google.com ([209.85.222.196]:34393 "EHLO
+        mail-qk1-f196.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S1726422AbfJOPsb (ORCPT
+        <rfc822;linux-block@vger.kernel.org>);
+        Tue, 15 Oct 2019 11:48:31 -0400
+Received: by mail-qk1-f196.google.com with SMTP id q203so19626475qke.1;
+        Tue, 15 Oct 2019 08:48:30 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=gmail.com; s=20161025;
+        h=sender:date:from:to:cc:subject:message-id:references:mime-version
+         :content-disposition:in-reply-to:user-agent;
+        bh=4UV/vP6Ak7zlZSSUsFjQtQPToq6GnlOm1PHifs316U4=;
+        b=LsoAypu+QZFDZOOMgWj57DzO9NJX1FgAGXdYolZJAF3A/bnTKstO7wULawxUrkeLnF
+         LIZALF6eFW4JRe91stBT6ts8IaIkGyHBFFDmQnJfq2yT/aAqEAZSmvDelPxyuKUqHiRE
+         VEwh2YBOJgmKRUXKRKcELaCCvsJquUZJXkI3j2Lut0LhIZ6BmmRPQ0juk5aiZifh2sKB
+         BuM8uI/lEYzA7uFjLvNJU3wOK31R6M8dqKpmvI5hACGwcYhs7HzPViT4DiEGTY1DLndY
+         CGuRlYOGOjQ4Xosg93QM8Wpixg799Rm48Zf7pRmxjbeVnB5ewpnrDMl2kKbzbTbqENgt
+         RRYg==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20161025;
+        h=x-gm-message-state:sender:date:from:to:cc:subject:message-id
+         :references:mime-version:content-disposition:in-reply-to:user-agent;
+        bh=4UV/vP6Ak7zlZSSUsFjQtQPToq6GnlOm1PHifs316U4=;
+        b=GrZalv11NN+/wA0njRs2vKNHTW1S/iJnkexzABWjDgaGK5/wpz8UAteCPPVdo5hwWs
+         sNmrGXFsZmuhi1Lav0ZwIIBLwOenUT/jMMosY7t1Kyx9KDT3H/1pcrkGbaE4FnfqFgnq
+         7pULvn10XYdvLvkqc+lTPiIxt/xKOciWM+3O1/wTKEu1owZOp1eKgV5BAF0eD2C1bsa0
+         /mG+nBTP5lOAVmlFRoFmWCKJWLlBu2i9r+lfggtDhVY9wXmJx2B6fwU8SsFIayOdknbl
+         C5L6ZFx8LOMGIaHJ+e6nHdFtmHGyjSQqjbmSCYFRZbUwBwg0XZ5sdNsUakJ176krKHkZ
+         38sw==
+X-Gm-Message-State: APjAAAW1QYFuk8MDjzbr3aYC5x8NjjKaLbU6D461vugrE7XmVEbXsZHW
+        +5rCuotivBBGHVebtEnIB/w=
+X-Google-Smtp-Source: APXvYqzK7AJnTuTyVvinEDnBafFaa0S4oM2gipW8LqP+1d6TT52IrNHq2jpxXWuOvsik/AY376SHyQ==
+X-Received: by 2002:a37:a50a:: with SMTP id o10mr35684316qke.115.1571154509896;
+        Tue, 15 Oct 2019 08:48:29 -0700 (PDT)
+Received: from localhost ([2620:10d:c091:500::3:2a53])
+        by smtp.gmail.com with ESMTPSA id p77sm10954411qke.6.2019.10.15.08.48.28
+        (version=TLS1_2 cipher=ECDHE-RSA-AES128-GCM-SHA256 bits=128/128);
+        Tue, 15 Oct 2019 08:48:29 -0700 (PDT)
+Date:   Tue, 15 Oct 2019 08:48:27 -0700
+From:   Tejun Heo <tj@kernel.org>
+To:     Julia Lawall <julia.lawall@lip6.fr>
+Cc:     Jens Axboe <axboe@kernel.dk>, kbuild-all@lists.01.org,
+        linux-kernel@vger.kernel.org, kernel-team@fb.com,
+        linux-block@vger.kernel.org
+Subject: [PATCH block/for-linus] blkcg: fix botched pd_prealloc error
+ handling in blkcg_activate_policy()
+Message-ID: <20191015154827.GK18794@devbig004.ftw2.facebook.com>
+References: <alpine.DEB.2.21.1910151232480.2818@hadrien>
 MIME-Version: 1.0
-In-Reply-To: <20191015150933.GF32665@bombadil.infradead.org>
-Content-Type: text/plain; charset=utf-8
-Content-Language: en-US
-Content-Transfer-Encoding: 8bit
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <alpine.DEB.2.21.1910151232480.2818@hadrien>
+User-Agent: Mutt/1.5.21 (2010-09-15)
 Sender: linux-block-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-On 10/15/19 5:09 PM, Matthew Wilcox wrote:
-> On Tue, Oct 15, 2019 at 03:48:47PM +0200, Hannes Reinecke wrote:
->> On 10/15/19 1:35 PM, Matthew Wilcox wrote:
->>> On Tue, Oct 15, 2019 at 01:38:27PM +0900, Naohiro Aota wrote:
->>>> A zoned block device consists of a number of zones. Zones are
->>>> either conventional and accepting random writes or sequential and
->>>> requiring that writes be issued in LBA order from each zone write
->>>> pointer position. For the write restriction, zoned block devices are
->>>> not suitable for a swap device. Disallow swapon on them.
->>>
->>> That's unfortunate.  I wonder what it would take to make the swap code be
->>> suitable for zoned devices.  It might even perform better on conventional
->>> drives since swapout would be a large linear write.  Swapin would be a
->>> fragmented, seeky set of reads, but this would seem like an excellent
->>> university project.
->>
->> The main problem I'm seeing is the eviction of pages from swap.
->> While swapin is easy (as you can do random access on reads), evict pages
->> from cache becomes extremely tricky as you can only delete entire zones.
->> So how to we mark pages within zones as being stale?
->> Or can we modify the swapin code to always swap in an entire zone and
->> discard it immediately?
-> 
-> I thought zones were too big to swap in all at once?  What's a typical
-> zone size these days?  (the answer looks very different if a zone is 1MB
-> or if it's 1GB)
-> 
-Currently things have settled at 256MB, might be increased for ZNS.
-But GB would be the upper limit I'd assume.
+While fixing ->pd_alloc_fn() bug, ab94b0382d81 ("blkcg: Fix
+->pd_alloc_fn() being called with the wrong blkcg on policy
+activation") broke the pd_prealloc error handling.
 
-> Fundamentally an allocated anonymous page has 5 states:
-> 
-> A: In memory, not written to swap (allocated)
-> B: In memory, dirty, not written to swap (app modifies page)
-> C: In memory, clean, written to swap (kernel decides to write it)
-> D: Not in memory, written to swap (kernel decides to reuse the memory)
-> E: In memory, clean, written to swap (app faults it back in for read)
-> 
-> We currently have a sixth state which is a page that has previously been
-> written to swap but has been redirtied by the app.  It will be written
-> back to the allocated location the next time it's targetted for writeout.
-> 
-> That would have to change; since we can't do random writes, pages would
-> transition from states D or E back to B.  Swapping out a page that has
-> previously been swapped will now mean appending to the tail of the swap,
-> not writing in place.
-> 
-> So the swap code will now need to keep track of which pages are still
-> in use in storage and will need to be relocated once we decide to reuse
-> the zone.  Not an insurmountable task, but not entirely trivial.
-> 
-Precisely my worries.
-However, clearing stuff is _really_ fast (you just have to reset the
-pointer which is kept in NVRAM of the device). Which might help a bit.
+* pd's were freed using kfree().  They should be freed with
+  ->pd_free_fn().
 
-> There'd be some other gunk to deal with around handling badblocks.
-> Those are currently stored in page 1, so adding new ones would be
-> a rewrite of that block.
-> 
-Bah. Can't we make that optional?
-We really only need badblocks when writing to crappy media (or NV-DIMM
-:-). Zoned devices _will_ have proper error recovery in place, so the
-only time where badblocks might be used is when the device is
-essentially dead ;-)
+* pd_prealloc could be kfree()'d and then ->pd_free_fn()'d again.
 
-Cheers,
+* When GFP_KERNEL allocation fails, pinned_blkg wasn't put.
 
-Hannes
--- 
-Dr. Hannes Reinecke		      Teamlead Storage & Networking
-hare@suse.de			                  +49 911 74053 688
-SUSE Software Solutions Germany GmbH, Maxfeldstr. 5, 90409 Nürnberg
-HRB 247165 (AG München), GF: Felix Imendörffer
+There are also a couple existing issues.
+
+* Each pd is initialized as they get allocated.  If alloc fails, the
+  policy will get freed with pd's initialized on it.
+
+* After the above partial failure, the partial pds are not freed.
+
+This patch fixes all of the above issues.
+
+Signed-off-by: Tejun Heo <tj@kernel.org>
+Reported-by: Julia Lawall <julia.lawall@lip6.fr>
+Fixes: ab94b0382d81 ("blkcg: Fix ->pd_alloc_fn() being called with the wrong blkcg on policy activation")
+---
+ block/blk-cgroup.c |   44 +++++++++++++++++++++++++++++++-------------
+ 1 file changed, 31 insertions(+), 13 deletions(-)
+
+--- a/block/blk-cgroup.c
++++ b/block/blk-cgroup.c
+@@ -1373,13 +1373,14 @@ int blkcg_activate_policy(struct request
+ retry:
+ 	spin_lock_irq(&q->queue_lock);
+ 
+-	/* blkg_list is pushed at the head, reverse walk to init parents first */
++	/* blkg_list is pushed at the head, reverse walk to allocate parents first */
+ 	list_for_each_entry_reverse(blkg, &q->blkg_list, q_node) {
+ 		struct blkg_policy_data *pd;
+ 
+ 		if (blkg->pd[pol->plid])
+ 			continue;
+ 
++		/* If prealloc matches, use it; otherwise try GFP_NOWAIT */
+ 		if (blkg == pinned_blkg) {
+ 			pd = pd_prealloc;
+ 			pd_prealloc = NULL;
+@@ -1389,6 +1390,10 @@ retry:
+ 		}
+ 
+ 		if (!pd) {
++			/*
++			 * GFP_NOWAIT failed.  Free the existing one and
++			 * prealloc for @blkg w/ GFP_KERNEL.
++			 */
+ 			if (pinned_blkg)
+ 				blkg_put(pinned_blkg);
+ 			blkg_get(blkg);
+@@ -1396,38 +1401,51 @@ retry:
+ 
+ 			spin_unlock_irq(&q->queue_lock);
+ 
+-			kfree(pd_prealloc);
++			if (pd_prealloc)
++				pol->pd_free_fn(pd_prealloc);
+ 			pd_prealloc = pol->pd_alloc_fn(GFP_KERNEL, q,
+ 						       blkg->blkcg);
+-			if (pd_prealloc) {
++			if (pd_prealloc)
+ 				goto retry;
+-			} else {
+-				ret = -ENOMEM;
+-				goto out_bypass_end;
+-			}
++			else
++				goto enomem;
+ 		}
+ 
+ 		blkg->pd[pol->plid] = pd;
+ 		pd->blkg = blkg;
+ 		pd->plid = pol->plid;
+-		if (pol->pd_init_fn)
+-			pol->pd_init_fn(pd);
+ 	}
+ 
+-	if (pinned_blkg)
+-		blkg_put(pinned_blkg);
+-	kfree(pd_prealloc);
++	/* all allocated, init in the same order */
++	if (pol->pd_init_fn)
++		list_for_each_entry_reverse(blkg, &q->blkg_list, q_node)
++			pol->pd_init_fn(blkg->pd[pol->plid]);
+ 
+ 	__set_bit(pol->plid, q->blkcg_pols);
+ 	ret = 0;
+ 
+ 	spin_unlock_irq(&q->queue_lock);
+-out_bypass_end:
++out:
+ 	if (queue_is_mq(q))
+ 		blk_mq_unfreeze_queue(q);
++	if (pinned_blkg)
++		blkg_put(pinned_blkg);
+ 	if (pd_prealloc)
+ 		pol->pd_free_fn(pd_prealloc);
+ 	return ret;
++
++enomem:
++	/* alloc failed, nothing's initialized yet, free everything */
++	spin_lock_irq(&q->queue_lock);
++	list_for_each_entry(blkg, &q->blkg_list, q_node) {
++		if (blkg->pd[pol->plid]) {
++			pol->pd_free_fn(blkg->pd[pol->plid]);
++			blkg->pd[pol->plid] = NULL;
++		}
++	}
++	spin_unlock_irq(&q->queue_lock);
++	ret = -ENOMEM;
++	goto out;
+ }
+ EXPORT_SYMBOL_GPL(blkcg_activate_policy);
+ 
