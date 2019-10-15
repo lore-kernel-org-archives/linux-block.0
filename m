@@ -2,98 +2,107 @@ Return-Path: <SRS0=Qtc1=YI=vger.kernel.org=linux-block-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-2.3 required=3.0 tests=DKIM_SIGNED,DKIM_VALID,
+X-Spam-Status: No, score=-2.1 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
 	HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,
 	USER_AGENT_SANE_1 autolearn=no autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 9FF81ECE588
-	for <linux-block@archiver.kernel.org>; Tue, 15 Oct 2019 14:52:17 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 72021C10F14
+	for <linux-block@archiver.kernel.org>; Tue, 15 Oct 2019 15:09:37 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.kernel.org (Postfix) with ESMTP id 7272D20640
-	for <linux-block@archiver.kernel.org>; Tue, 15 Oct 2019 14:52:17 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id 44D3220650
+	for <linux-block@archiver.kernel.org>; Tue, 15 Oct 2019 15:09:37 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel-dk.20150623.gappssmtp.com header.i=@kernel-dk.20150623.gappssmtp.com header.b="IZFDK2qt"
+	dkim=fail reason="signature verification failed" (2048-bit key) header.d=infradead.org header.i=@infradead.org header.b="Gc0t1DNq"
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1733150AbfJOOwQ (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Tue, 15 Oct 2019 10:52:16 -0400
-Received: from mail-io1-f67.google.com ([209.85.166.67]:44760 "EHLO
-        mail-io1-f67.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1733028AbfJOOwP (ORCPT
+        id S1733190AbfJOPJg (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Tue, 15 Oct 2019 11:09:36 -0400
+Received: from bombadil.infradead.org ([198.137.202.133]:60856 "EHLO
+        bombadil.infradead.org" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S1726523AbfJOPJg (ORCPT
         <rfc822;linux-block@vger.kernel.org>);
-        Tue, 15 Oct 2019 10:52:15 -0400
-Received: by mail-io1-f67.google.com with SMTP id w12so46435485iol.11
-        for <linux-block@vger.kernel.org>; Tue, 15 Oct 2019 07:52:14 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=kernel-dk.20150623.gappssmtp.com; s=20150623;
-        h=subject:to:cc:references:from:message-id:date:user-agent
-         :mime-version:in-reply-to:content-language:content-transfer-encoding;
-        bh=tlcKAfjO9zxaTc91HQ3HX1OXiVJLekecU1OTYhDm5ds=;
-        b=IZFDK2qtCtgL/IvDwrLM5g4txRkRdHjoCvGlGBi78/If6CaZ5nwScUKVi46bufCXJz
-         YhXc80GyYi3zbEvQH+BBg3H5JCJtPzzqQJdDKVsx0n9+mPg2+CMHdIRFkLR38ao5U5Vi
-         +f3nlK0osjGBp1huCgLFIZFKfFzI86HSGJ0BGx8kfYD3bWcKbHi2bhECfAm7ekFVJr5r
-         QQ9WX0cZ1qWrnivS6iDecF4xUKoC8udgomMqtNjIWDpK0lL4jf0xmZ56fAPIEdSBciy5
-         QuLfREwX2/xoo5owX5jVoLj5lNXwX74KExlNpyKnkocewippPUNva6bCvqc1mP3b5QpB
-         fF6w==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20161025;
-        h=x-gm-message-state:subject:to:cc:references:from:message-id:date
-         :user-agent:mime-version:in-reply-to:content-language
-         :content-transfer-encoding;
-        bh=tlcKAfjO9zxaTc91HQ3HX1OXiVJLekecU1OTYhDm5ds=;
-        b=UjIiqQjatgh7OiFTCdn4/mZ2wnWhD2oLqTpOH4rrCg2aQuB3qFkVsef/dsDrbAZflg
-         oYEKwg4QOba69gRN1trOAqjwZIL1LqxZeOHFelMkK1qgCMqYASwJKmhy+3sbQmW0nKTM
-         x91UlJWEbC+OvlLCq08Q5hYshqiRI+Q3M1emrADh2NtZiRintep3eZcxFk/S0b37+9PG
-         KsI6/HscOEHFp3pEvK0yAPvYcmAP/oSaaAD5gdkwevcmnbbMqK5vH/zy5au7pz3p6GOG
-         JlnPnqnvdnLhAM82iUw2YhrwhJ1LTrj9M7Jrkznv7PoXznjPbh3n6EI8pBGX3rOtg03Q
-         8cGg==
-X-Gm-Message-State: APjAAAVvdmaPYqlOrJS4oP2UfLSqrJD9uj4kJ3EWwKDBsbLMhCFtq8Cf
-        //NiodY8N/1wpcyq0ZwE8svzJQ==
-X-Google-Smtp-Source: APXvYqwwSS62kdbBj7gKvJMB2WnKIA3tGhwxAW0H9eeJKOGL/S4naJYSl236pOAPRUSOvXwirXOWYQ==
-X-Received: by 2002:a02:5846:: with SMTP id f67mr42423839jab.43.1571151133711;
-        Tue, 15 Oct 2019 07:52:13 -0700 (PDT)
-Received: from [192.168.1.159] ([65.144.74.34])
-        by smtp.gmail.com with ESMTPSA id r138sm19655789iod.59.2019.10.15.07.52.12
-        (version=TLS1_2 cipher=ECDHE-RSA-AES128-GCM-SHA256 bits=128/128);
-        Tue, 15 Oct 2019 07:52:12 -0700 (PDT)
-Subject: Re: [PATCH V3] io_uring: consider the overflow of sequence for
- timeout req
-To:     yangerkun <yangerkun@huawei.com>, linux-block@vger.kernel.org
-Cc:     yi.zhang@huawei.com, houtao1@huawei.com
-References: <20191015135929.30912-1-yangerkun@huawei.com>
-From:   Jens Axboe <axboe@kernel.dk>
-Message-ID: <d0561a29-14aa-c915-c99d-8bbb2f7740e0@kernel.dk>
-Date:   Tue, 15 Oct 2019 08:52:11 -0600
-User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:60.0) Gecko/20100101
- Thunderbird/60.9.0
+        Tue, 15 Oct 2019 11:09:36 -0400
+DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed;
+        d=infradead.org; s=bombadil.20170209; h=In-Reply-To:Content-Type:MIME-Version
+        :References:Message-ID:Subject:Cc:To:From:Date:Sender:Reply-To:
+        Content-Transfer-Encoding:Content-ID:Content-Description:Resent-Date:
+        Resent-From:Resent-Sender:Resent-To:Resent-Cc:Resent-Message-ID:List-Id:
+        List-Help:List-Unsubscribe:List-Subscribe:List-Post:List-Owner:List-Archive;
+         bh=BcDxNHsdLJjNZ3HrfFVCp2qVq0FOipn51EQF0RYAYXU=; b=Gc0t1DNqW5YGanCS6subr8Hr4
+        ilCDL5GiG4w8WEKSirigBGadJZ1pc6lTH5nivEEDRvc4k8OCymshG4X30N2C13+FJj3bzlanlNXZn
+        aUZSM8zZxs/JRn6TB7FKxFmXO7ObsecoUmPPBSeOdFt5aCk5WZ/iJNs1DrygwVypEuVPZrRzK452B
+        4qYI9ZOlYXRSRiWPUw+OQMMj5wfupgxj1v2FssM27dAPenQVgdzc+r4bPoFmXvHcq/FFF5AwqcjyP
+        0TNYEyoJbQiUmgBwdK3Nc6U9PMfQSOWyKAB1Gq3mnFCoqPjM/ivf2AmqXfQVSiXVjBEgYWXgNXOTP
+        4VUiLSbAw==;
+Received: from willy by bombadil.infradead.org with local (Exim 4.92.3 #3 (Red Hat Linux))
+        id 1iKOS5-00014K-7C; Tue, 15 Oct 2019 15:09:33 +0000
+Date:   Tue, 15 Oct 2019 08:09:33 -0700
+From:   Matthew Wilcox <willy@infradead.org>
+To:     Hannes Reinecke <hare@suse.de>
+Cc:     Naohiro Aota <naohiro.aota@wdc.com>, linux-mm@kvack.org,
+        linux-fsdevel@vger.kernel.org, linux-block@vger.kernel.org,
+        Andrew Morton <akpm@linux-foundation.org>
+Subject: Re: Project idea: Swap to zoned block devices
+Message-ID: <20191015150933.GF32665@bombadil.infradead.org>
+References: <20191015043827.160444-1-naohiro.aota@wdc.com>
+ <20191015113548.GD32665@bombadil.infradead.org>
+ <d9919d4e-4487-c0e5-c483-cebb5b8a4fc8@suse.de>
 MIME-Version: 1.0
-In-Reply-To: <20191015135929.30912-1-yangerkun@huawei.com>
-Content-Type: text/plain; charset=utf-8
-Content-Language: en-US
-Content-Transfer-Encoding: 7bit
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <d9919d4e-4487-c0e5-c483-cebb5b8a4fc8@suse.de>
+User-Agent: Mutt/1.12.1 (2019-06-15)
 Sender: linux-block-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-On 10/15/19 7:59 AM, yangerkun wrote:
-> Now we recalculate the sequence of timeout with 'req->sequence =
-> ctx->cached_sq_head + count - 1', judge the right place to insert
-> for timeout_list by compare the number of request we still expected for
-> completion. But we have not consider about the situation of overflow:
+On Tue, Oct 15, 2019 at 03:48:47PM +0200, Hannes Reinecke wrote:
+> On 10/15/19 1:35 PM, Matthew Wilcox wrote:
+> > On Tue, Oct 15, 2019 at 01:38:27PM +0900, Naohiro Aota wrote:
+> >> A zoned block device consists of a number of zones. Zones are
+> >> either conventional and accepting random writes or sequential and
+> >> requiring that writes be issued in LBA order from each zone write
+> >> pointer position. For the write restriction, zoned block devices are
+> >> not suitable for a swap device. Disallow swapon on them.
+> > 
+> > That's unfortunate.  I wonder what it would take to make the swap code be
+> > suitable for zoned devices.  It might even perform better on conventional
+> > drives since swapout would be a large linear write.  Swapin would be a
+> > fragmented, seeky set of reads, but this would seem like an excellent
+> > university project.
 > 
-> 1. ctx->cached_sq_head + count - 1 may overflow. And a bigger count for
-> the new timeout req can have a small req->sequence.
-> 
-> 2. cached_sq_head of now may overflow compare with before req. And it
-> will lead the timeout req with small req->sequence.
-> 
-> This overflow will lead to the misorder of timeout_list, which can lead
-> to the wrong order of the completion of timeout_list. Fix it by reuse
-> req->submit.sequence to store the count, and change the logic of
-> inserting sort in io_timeout.
+> The main problem I'm seeing is the eviction of pages from swap.
+> While swapin is easy (as you can do random access on reads), evict pages
+> from cache becomes extremely tricky as you can only delete entire zones.
+> So how to we mark pages within zones as being stale?
+> Or can we modify the swapin code to always swap in an entire zone and
+> discard it immediately?
 
-Thanks, this looks great. Applied for 5.4.
+I thought zones were too big to swap in all at once?  What's a typical
+zone size these days?  (the answer looks very different if a zone is 1MB
+or if it's 1GB)
 
--- 
-Jens Axboe
+Fundamentally an allocated anonymous page has 5 states:
 
+A: In memory, not written to swap (allocated)
+B: In memory, dirty, not written to swap (app modifies page)
+C: In memory, clean, written to swap (kernel decides to write it)
+D: Not in memory, written to swap (kernel decides to reuse the memory)
+E: In memory, clean, written to swap (app faults it back in for read)
+
+We currently have a sixth state which is a page that has previously been
+written to swap but has been redirtied by the app.  It will be written
+back to the allocated location the next time it's targetted for writeout.
+
+That would have to change; since we can't do random writes, pages would
+transition from states D or E back to B.  Swapping out a page that has
+previously been swapped will now mean appending to the tail of the swap,
+not writing in place.
+
+So the swap code will now need to keep track of which pages are still
+in use in storage and will need to be relocated once we decide to reuse
+the zone.  Not an insurmountable task, but not entirely trivial.
+
+There'd be some other gunk to deal with around handling badblocks.
+Those are currently stored in page 1, so adding new ones would be
+a rewrite of that block.
