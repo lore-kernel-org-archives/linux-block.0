@@ -2,249 +2,112 @@ Return-Path: <SRS0=Qtc1=YI=vger.kernel.org=linux-block-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-6.8 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
-	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,
-	SPF_HELO_NONE,SPF_PASS,UNWANTED_LANGUAGE_BODY,URIBL_BLOCKED,USER_AGENT_GIT
-	autolearn=ham autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-2.3 required=3.0 tests=DKIM_SIGNED,DKIM_VALID,
+	HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,
+	USER_AGENT_SANE_1 autolearn=no autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 3D2C6ECE588
-	for <linux-block@archiver.kernel.org>; Tue, 15 Oct 2019 16:04:21 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id AED77ECE588
+	for <linux-block@archiver.kernel.org>; Tue, 15 Oct 2019 16:13:45 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.kernel.org (Postfix) with ESMTP id 08059214AE
-	for <linux-block@archiver.kernel.org>; Tue, 15 Oct 2019 16:04:21 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id 8735320872
+	for <linux-block@archiver.kernel.org>; Tue, 15 Oct 2019 16:13:45 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (2048-bit key) header.d=infradead.org header.i=@infradead.org header.b="g33waoR3"
+	dkim=pass (2048-bit key) header.d=kernel-dk.20150623.gappssmtp.com header.i=@kernel-dk.20150623.gappssmtp.com header.b="o9XGBBs9"
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S2387630AbfJOQEU (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Tue, 15 Oct 2019 12:04:20 -0400
-Received: from bombadil.infradead.org ([198.137.202.133]:37184 "EHLO
-        bombadil.infradead.org" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S2387774AbfJOQEU (ORCPT
+        id S1733150AbfJOQNo (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Tue, 15 Oct 2019 12:13:44 -0400
+Received: from mail-io1-f65.google.com ([209.85.166.65]:37165 "EHLO
+        mail-io1-f65.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S1726689AbfJOQNn (ORCPT
         <rfc822;linux-block@vger.kernel.org>);
-        Tue, 15 Oct 2019 12:04:20 -0400
-DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed;
-        d=infradead.org; s=bombadil.20170209; h=Content-Transfer-Encoding:
-        MIME-Version:References:In-Reply-To:Message-Id:Date:Subject:To:From:Sender:
-        Reply-To:Cc:Content-Type:Content-ID:Content-Description:Resent-Date:
-        Resent-From:Resent-Sender:Resent-To:Resent-Cc:Resent-Message-ID:List-Id:
-        List-Help:List-Unsubscribe:List-Subscribe:List-Post:List-Owner:List-Archive;
-         bh=ynYkMUkukgdvKGE6fY1iFAs50j9h0KHeCM0CrJxjs/8=; b=g33waoR3V0AXBHaoros4VDEK6
-        HS+SU8Yd1RAQhJ87FjkDgzKLL9JYroq3WkppPlvj/zMeym+l2dqAJzxnLFHoPx4UQvPg9s3mGAGeA
-        EWvdHBZgIewY+5bWtycdmi0u/wVKV68xnkIDsPQ+A3A4ifiIcjy3BAHlQhvyCvla8ONJZIswOneui
-        XYpzK8vb81T9KKesXswXd6y297qsZNh4q5Zi6/bhIYp7x4C0VFPIIzXwV7P5GFd9C2ZvaddR6Livz
-        kGDHHY0AtR7cO7OBEu3KPQ6nalimzJku747N8LvxHUS+kRoRAgUUoZetmxYSZg90PGpxRSy9q3WpT
-        tGtGgCtww==;
-Received: from [2001:4bb8:18c:d7b:c70:4a89:bc61:3] (helo=localhost)
-        by bombadil.infradead.org with esmtpsa (Exim 4.92.3 #3 (Red Hat Linux))
-        id 1iKPJ5-0002by-Ms; Tue, 15 Oct 2019 16:04:20 +0000
-From:   Christoph Hellwig <hch@lst.de>
-To:     linux-bcache@vger.kernel.org, linux-block@vger.kernel.org
-Subject: [PATCH 2/2] bcache: don't export symbols
-Date:   Tue, 15 Oct 2019 18:04:09 +0200
-Message-Id: <20191015160409.14250-3-hch@lst.de>
-X-Mailer: git-send-email 2.20.1
-In-Reply-To: <20191015160409.14250-1-hch@lst.de>
-References: <20191015160409.14250-1-hch@lst.de>
+        Tue, 15 Oct 2019 12:13:43 -0400
+Received: by mail-io1-f65.google.com with SMTP id b19so47258780iob.4
+        for <linux-block@vger.kernel.org>; Tue, 15 Oct 2019 09:13:41 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=kernel-dk.20150623.gappssmtp.com; s=20150623;
+        h=subject:to:cc:references:from:message-id:date:user-agent
+         :mime-version:in-reply-to:content-language:content-transfer-encoding;
+        bh=7czjHeR/FYw7akeQYJ1942FO11nkZtthgVwneKW5uvk=;
+        b=o9XGBBs9WdsZoPM4Xp2XRT3UqqzpM17jhvw7ktI5q0Edsw8K2MrsOFEJoH6bMrVb45
+         k6NlaB5CIDT5y/uhk+bJHPAbIAzdNtZM3XS7ZV0bqt5sXn6osREMH6DDBKgzvCjMizNl
+         uxBMCdAlPDZSzlPBI6UHPnbQPLDOoAtLqYpFulKfCBGQFuSh0fkVttCEjdQiErfDo6PF
+         o1VuVtiCPL1M0JORafeFgSDGfqoVDBGOog5a5CPm1Pca2HQAFliP6+B2trLRWOxf0zyl
+         6SrvtmOQ9RTZiS68/6r0/pGdaazpjCHBUez6idMJOwu6Wo8dlJvSUrIcpwgfnfmfYReu
+         pdqA==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20161025;
+        h=x-gm-message-state:subject:to:cc:references:from:message-id:date
+         :user-agent:mime-version:in-reply-to:content-language
+         :content-transfer-encoding;
+        bh=7czjHeR/FYw7akeQYJ1942FO11nkZtthgVwneKW5uvk=;
+        b=ukh2O5Gk0YgjuuNBjvbY2mkjBrf9eoq3UTKfTUyAY8O2WjxI7nNqBl5CFGHwI/751q
+         ybqq04JxqKnbnl0c40Wo9JP6CW2PA6lBEzePdIrIH/px6sHBMI3wmAlxNRST1czqd3fN
+         tLceeOHoFgxxRaUmb7MgOH/bQrHWINQjaKxcbzuvfmLDUvYUMRqIHRUjrSjA6efyQ91M
+         JvL2mThYR2ZLh4Fq4a9rPu5150FatmOc8xhxajf1h7VYWOfOvfz/b8vmpK0OVsGI3I19
+         18nxEkdtf3f226gj3J7otWqDVYm9atCN+QgMGBXtV+WoBZWQkVxzFKpEVhb+Q5xt7cgS
+         bsew==
+X-Gm-Message-State: APjAAAX7z1bvFKf+e/YINKj+1s8KfUGVv6sVI/yG2ugPU2YTctFBXsp7
+        gFpNrNAa7wLe4ZoWcoprUxReRYkTRNg9Cg==
+X-Google-Smtp-Source: APXvYqyjH0HLXuoo2Q17ycX0CesZ6wuNYKJsBuQyWNrIqamUmXePJxoXgbY3yt+wO4RmNzb/2vmQTg==
+X-Received: by 2002:a6b:b54a:: with SMTP id e71mr25689901iof.132.1571156020825;
+        Tue, 15 Oct 2019 09:13:40 -0700 (PDT)
+Received: from [192.168.1.159] ([65.144.74.34])
+        by smtp.gmail.com with ESMTPSA id q3sm14539813ioi.68.2019.10.15.09.13.39
+        (version=TLS1_2 cipher=ECDHE-RSA-AES128-GCM-SHA256 bits=128/128);
+        Tue, 15 Oct 2019 09:13:39 -0700 (PDT)
+Subject: Re: [PATCH block/for-linus] blkcg: Fix multiple bugs in
+ blkcg_activate_policy()
+To:     Tejun Heo <tj@kernel.org>
+Cc:     Julia Lawall <julia.lawall@lip6.fr>, kbuild-all@lists.01.org,
+        linux-kernel@vger.kernel.org, kernel-team@fb.com,
+        linux-block@vger.kernel.org
+References: <alpine.DEB.2.21.1910151232480.2818@hadrien>
+ <20191015154827.GK18794@devbig004.ftw2.facebook.com>
+ <07cbc404-65db-b236-9ae2-558197b8cdb6@kernel.dk>
+ <20191015160347.GM18794@devbig004.ftw2.facebook.com>
+From:   Jens Axboe <axboe@kernel.dk>
+Message-ID: <8406cdae-fa26-3db5-f97d-347059cdbc16@kernel.dk>
+Date:   Tue, 15 Oct 2019 10:13:38 -0600
+User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:60.0) Gecko/20100101
+ Thunderbird/60.9.0
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
-X-SRS-Rewrite: SMTP reverse-path rewritten from <hch@infradead.org> by bombadil.infradead.org. See http://www.infradead.org/rpr.html
+In-Reply-To: <20191015160347.GM18794@devbig004.ftw2.facebook.com>
+Content-Type: text/plain; charset=utf-8
+Content-Language: en-US
+Content-Transfer-Encoding: 7bit
 Sender: linux-block-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-None of the exported bcache symbols are actually used anywhere.
+On 10/15/19 10:03 AM, Tejun Heo wrote:
+> blkcg_activate_policy() has the following bugs.
+> 
+> * cf09a8ee19ad ("blkcg: pass @q and @blkcg into
+>    blkcg_pol_alloc_pd_fn()") added @blkcg to ->pd_alloc_fn(); however,
+>    blkcg_activate_policy() ends up using pd's allocated for the root
+>    blkcg for all preallocations, so ->pd_init_fn() for non-root blkcgs
+>    can be passed in pd's which are allocated for the root blkcg.
+> 
+>    For blk-iocost, this means that ->pd_init_fn() can write beyond the
+>    end of the allocated object as it determines the length of the flex
+>    array at the end based on the blkcg's nesting level.
+> 
+> * Each pd is initialized as they get allocated.  If alloc fails, the
+>    policy will get freed with pd's initialized on it.
+> 
+> * After the above partial failure, the partial pds are not freed.
+> 
+> This patch fixes all the above issues by
+> 
+> * Restructuring blkcg_activate_policy() so that alloc and init passes
+>    are separate.  Init takes place only after all allocs succeeded and
+>    on failure all allocated pds are freed.
+> 
+> * Unifying and fixing the cleanup of the remaining pd_prealloc.
 
-Signed-off-by: Christoph Hellwig <hch@lst.de>
----
- drivers/md/bcache/bset.c    | 15 ---------------
- drivers/md/bcache/closure.c |  7 -------
- 2 files changed, 22 deletions(-)
+Great thanks, applied.
 
-diff --git a/drivers/md/bcache/bset.c b/drivers/md/bcache/bset.c
-index 08768796b543..a4bab18b2994 100644
---- a/drivers/md/bcache/bset.c
-+++ b/drivers/md/bcache/bset.c
-@@ -309,7 +309,6 @@ void bch_btree_keys_free(struct btree_keys *b)
- 	t->tree = NULL;
- 	t->data = NULL;
- }
--EXPORT_SYMBOL(bch_btree_keys_free);
- 
- int bch_btree_keys_alloc(struct btree_keys *b,
- 			 unsigned int page_order,
-@@ -342,7 +341,6 @@ int bch_btree_keys_alloc(struct btree_keys *b,
- 	bch_btree_keys_free(b);
- 	return -ENOMEM;
- }
--EXPORT_SYMBOL(bch_btree_keys_alloc);
- 
- void bch_btree_keys_init(struct btree_keys *b, const struct btree_keys_ops *ops,
- 			 bool *expensive_debug_checks)
-@@ -361,7 +359,6 @@ void bch_btree_keys_init(struct btree_keys *b, const struct btree_keys_ops *ops,
- 	 * any more.
- 	 */
- }
--EXPORT_SYMBOL(bch_btree_keys_init);
- 
- /* Binary tree stuff for auxiliary search trees */
- 
-@@ -678,7 +675,6 @@ void bch_bset_init_next(struct btree_keys *b, struct bset *i, uint64_t magic)
- 
- 	bch_bset_build_unwritten_tree(b);
- }
--EXPORT_SYMBOL(bch_bset_init_next);
- 
- /*
-  * Build auxiliary binary tree 'struct bset_tree *t', this tree is used to
-@@ -732,7 +728,6 @@ void bch_bset_build_written_tree(struct btree_keys *b)
- 	     j = inorder_next(j, t->size))
- 		make_bfloat(t, j);
- }
--EXPORT_SYMBOL(bch_bset_build_written_tree);
- 
- /* Insert */
- 
-@@ -780,7 +775,6 @@ fix_right:	do {
- 			j = j * 2 + 1;
- 		} while (j < t->size);
- }
--EXPORT_SYMBOL(bch_bset_fix_invalidated_key);
- 
- static void bch_bset_fix_lookup_table(struct btree_keys *b,
- 				      struct bset_tree *t,
-@@ -855,7 +849,6 @@ bool bch_bkey_try_merge(struct btree_keys *b, struct bkey *l, struct bkey *r)
- 
- 	return b->ops->key_merge(b, l, r);
- }
--EXPORT_SYMBOL(bch_bkey_try_merge);
- 
- void bch_bset_insert(struct btree_keys *b, struct bkey *where,
- 		     struct bkey *insert)
-@@ -875,7 +868,6 @@ void bch_bset_insert(struct btree_keys *b, struct bkey *where,
- 	bkey_copy(where, insert);
- 	bch_bset_fix_lookup_table(b, t, where);
- }
--EXPORT_SYMBOL(bch_bset_insert);
- 
- unsigned int bch_btree_insert_key(struct btree_keys *b, struct bkey *k,
- 			      struct bkey *replace_key)
-@@ -931,7 +923,6 @@ copy:	bkey_copy(m, k);
- merged:
- 	return status;
- }
--EXPORT_SYMBOL(bch_btree_insert_key);
- 
- /* Lookup */
- 
-@@ -1077,7 +1068,6 @@ struct bkey *__bch_bset_search(struct btree_keys *b, struct bset_tree *t,
- 
- 	return i.l;
- }
--EXPORT_SYMBOL(__bch_bset_search);
- 
- /* Btree iterator */
- 
-@@ -1132,7 +1122,6 @@ struct bkey *bch_btree_iter_init(struct btree_keys *b,
- {
- 	return __bch_btree_iter_init(b, iter, search, b->set);
- }
--EXPORT_SYMBOL(bch_btree_iter_init);
- 
- static inline struct bkey *__bch_btree_iter_next(struct btree_iter *iter,
- 						 btree_iter_cmp_fn *cmp)
-@@ -1165,7 +1154,6 @@ struct bkey *bch_btree_iter_next(struct btree_iter *iter)
- 	return __bch_btree_iter_next(iter, btree_iter_cmp);
- 
- }
--EXPORT_SYMBOL(bch_btree_iter_next);
- 
- struct bkey *bch_btree_iter_next_filter(struct btree_iter *iter,
- 					struct btree_keys *b, ptr_filter_fn fn)
-@@ -1196,7 +1184,6 @@ int bch_bset_sort_state_init(struct bset_sort_state *state,
- 
- 	return mempool_init_page_pool(&state->pool, 1, page_order);
- }
--EXPORT_SYMBOL(bch_bset_sort_state_init);
- 
- static void btree_mergesort(struct btree_keys *b, struct bset *out,
- 			    struct btree_iter *iter,
-@@ -1313,7 +1300,6 @@ void bch_btree_sort_partial(struct btree_keys *b, unsigned int start,
- 
- 	EBUG_ON(oldsize >= 0 && bch_count_data(b) != oldsize);
- }
--EXPORT_SYMBOL(bch_btree_sort_partial);
- 
- void bch_btree_sort_and_fix_extents(struct btree_keys *b,
- 				    struct btree_iter *iter,
-@@ -1366,7 +1352,6 @@ void bch_btree_sort_lazy(struct btree_keys *b, struct bset_sort_state *state)
- out:
- 	bch_bset_build_written_tree(b);
- }
--EXPORT_SYMBOL(bch_btree_sort_lazy);
- 
- void bch_btree_keys_stats(struct btree_keys *b, struct bset_stats *stats)
- {
-diff --git a/drivers/md/bcache/closure.c b/drivers/md/bcache/closure.c
-index c12cd809ab19..0164a1fe94a9 100644
---- a/drivers/md/bcache/closure.c
-+++ b/drivers/md/bcache/closure.c
-@@ -45,7 +45,6 @@ void closure_sub(struct closure *cl, int v)
- {
- 	closure_put_after_sub(cl, atomic_sub_return(v, &cl->remaining));
- }
--EXPORT_SYMBOL(closure_sub);
- 
- /*
-  * closure_put - decrement a closure's refcount
-@@ -54,7 +53,6 @@ void closure_put(struct closure *cl)
- {
- 	closure_put_after_sub(cl, atomic_dec_return(&cl->remaining));
- }
--EXPORT_SYMBOL(closure_put);
- 
- /*
-  * closure_wake_up - wake up all closures on a wait list, without memory barrier
-@@ -76,7 +74,6 @@ void __closure_wake_up(struct closure_waitlist *wait_list)
- 		closure_sub(cl, CLOSURE_WAITING + 1);
- 	}
- }
--EXPORT_SYMBOL(__closure_wake_up);
- 
- /**
-  * closure_wait - add a closure to a waitlist
-@@ -96,7 +93,6 @@ bool closure_wait(struct closure_waitlist *waitlist, struct closure *cl)
- 
- 	return true;
- }
--EXPORT_SYMBOL(closure_wait);
- 
- struct closure_syncer {
- 	struct task_struct	*task;
-@@ -131,7 +127,6 @@ void __sched __closure_sync(struct closure *cl)
- 
- 	__set_current_state(TASK_RUNNING);
- }
--EXPORT_SYMBOL(__closure_sync);
- 
- #ifdef CONFIG_BCACHE_CLOSURES_DEBUG
- 
-@@ -149,7 +144,6 @@ void closure_debug_create(struct closure *cl)
- 	list_add(&cl->all, &closure_list);
- 	spin_unlock_irqrestore(&closure_list_lock, flags);
- }
--EXPORT_SYMBOL(closure_debug_create);
- 
- void closure_debug_destroy(struct closure *cl)
- {
-@@ -162,7 +156,6 @@ void closure_debug_destroy(struct closure *cl)
- 	list_del(&cl->all);
- 	spin_unlock_irqrestore(&closure_list_lock, flags);
- }
--EXPORT_SYMBOL(closure_debug_destroy);
- 
- static struct dentry *closure_debug;
- 
 -- 
-2.20.1
+Jens Axboe
 
