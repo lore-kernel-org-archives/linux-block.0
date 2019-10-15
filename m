@@ -2,74 +2,94 @@ Return-Path: <SRS0=Qtc1=YI=vger.kernel.org=linux-block-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-0.8 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
-	MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS autolearn=no autolearn_force=no
+X-Spam-Status: No, score=-8.3 required=3.0 tests=DKIM_SIGNED,DKIM_VALID,
+	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,
+	SPF_HELO_NONE,SPF_PASS,USER_AGENT_SANE_1 autolearn=ham autolearn_force=no
 	version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 9E00EECE59D
-	for <linux-block@archiver.kernel.org>; Tue, 15 Oct 2019 22:33:22 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 0B44BECE58F
+	for <linux-block@archiver.kernel.org>; Tue, 15 Oct 2019 22:47:36 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.kernel.org (Postfix) with ESMTP id 70C982064B
-	for <linux-block@archiver.kernel.org>; Tue, 15 Oct 2019 22:33:22 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id D18B520873
+	for <linux-block@archiver.kernel.org>; Tue, 15 Oct 2019 22:47:35 +0000 (UTC)
+Authentication-Results: mail.kernel.org;
+	dkim=pass (2048-bit key) header.d=osandov-com.20150623.gappssmtp.com header.i=@osandov-com.20150623.gappssmtp.com header.b="x6O/M5gW"
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1732135AbfJOWdW (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Tue, 15 Oct 2019 18:33:22 -0400
-Received: from mx1.redhat.com ([209.132.183.28]:58930 "EHLO mx1.redhat.com"
-        rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-        id S1732040AbfJOWdV (ORCPT <rfc822;linux-block@vger.kernel.org>);
-        Tue, 15 Oct 2019 18:33:21 -0400
-Received: from smtp.corp.redhat.com (int-mx07.intmail.prod.int.phx2.redhat.com [10.5.11.22])
-        (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
-        (No client certificate requested)
-        by mx1.redhat.com (Postfix) with ESMTPS id 196FD10F2E82;
-        Tue, 15 Oct 2019 22:33:21 +0000 (UTC)
-Received: from warthog.procyon.org.uk (ovpn-121-84.rdu2.redhat.com [10.10.121.84])
-        by smtp.corp.redhat.com (Postfix) with ESMTP id BB0FA1001938;
-        Tue, 15 Oct 2019 22:33:17 +0000 (UTC)
-Organization: Red Hat UK Ltd. Registered Address: Red Hat UK Ltd, Amberley
-        Place, 107-111 Peascod Street, Windsor, Berkshire, SI4 1TE, United
-        Kingdom.
-        Registered in England and Wales under Company Registration No. 3798903
-From:   David Howells <dhowells@redhat.com>
-In-Reply-To: <CAHk-=whiz1sHXu8SVZKEC2dup=r5JMrftPtEt6ff9Ea8dyH8yQ@mail.gmail.com>
-References: <CAHk-=whiz1sHXu8SVZKEC2dup=r5JMrftPtEt6ff9Ea8dyH8yQ@mail.gmail.com> <157117606853.15019.15459271147790470307.stgit@warthog.procyon.org.uk> <157117608708.15019.1998141309054662114.stgit@warthog.procyon.org.uk>
-To:     Linus Torvalds <torvalds@linux-foundation.org>
-Cc:     dhowells@redhat.com, Tim Chen <tim.c.chen@linux.intel.com>,
-        Kan Liang <kan.liang@intel.com>,
-        Casey Schaufler <casey@schaufler-ca.com>,
-        Stephen Smalley <sds@tycho.nsa.gov>,
-        Greg Kroah-Hartman <gregkh@linuxfoundation.org>,
-        Nicolas Dichtel <nicolas.dichtel@6wind.com>, raven@themaw.net,
-        Christian Brauner <christian@brauner.io>,
-        keyrings@vger.kernel.org, linux-usb@vger.kernel.org,
-        linux-block <linux-block@vger.kernel.org>,
-        LSM List <linux-security-module@vger.kernel.org>,
-        linux-fsdevel <linux-fsdevel@vger.kernel.org>,
-        Linux API <linux-api@vger.kernel.org>,
-        Linux Kernel Mailing List <linux-kernel@vger.kernel.org>
-Subject: Re: [RFC PATCH 02/21] Add a prelocked wake-up
+        id S1731936AbfJOWrf (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Tue, 15 Oct 2019 18:47:35 -0400
+Received: from mail-pg1-f195.google.com ([209.85.215.195]:39729 "EHLO
+        mail-pg1-f195.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S1728835AbfJOWrf (ORCPT
+        <rfc822;linux-block@vger.kernel.org>);
+        Tue, 15 Oct 2019 18:47:35 -0400
+Received: by mail-pg1-f195.google.com with SMTP id p12so3694402pgn.6
+        for <linux-block@vger.kernel.org>; Tue, 15 Oct 2019 15:47:34 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=osandov-com.20150623.gappssmtp.com; s=20150623;
+        h=date:from:to:cc:subject:message-id:references:mime-version
+         :content-disposition:in-reply-to:user-agent;
+        bh=CwaFwQ2EZDkwnZ1oMSfepKPamjONpLIDnHXV+aBlKRQ=;
+        b=x6O/M5gWuM3Rxl+OWNoSNPCIfVaqlSHMG4L8s2ZGLgFcxAVl1woBr22d225brAcxWy
+         TR0SIHp6I4ltRjpT4p9J+s3YJA09YCSNYYJiq8vhRiayn3SKj/8sl+3CMhn+9tl/aoJO
+         vC1IzDs5xpG6e5nqGc9NQ7nsmDsc+wbOeApNM6XSZ+OkRD4HFufXizg2XdGkSyvD8jEt
+         AxBhMXGCNl6zJa5WeyeNhBBdggbCo3z7kwCSc/oBukZKnznohvcbdwzHeigP73UU4Og0
+         nReyfYflSit1Gnjak0LBb87Fz+Bqa83F23BnPQ0mCZSKiv+oqCGNVDTCooFiJEezVS/+
+         tTSw==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20161025;
+        h=x-gm-message-state:date:from:to:cc:subject:message-id:references
+         :mime-version:content-disposition:in-reply-to:user-agent;
+        bh=CwaFwQ2EZDkwnZ1oMSfepKPamjONpLIDnHXV+aBlKRQ=;
+        b=fYeQ+Z6zUWBz29X+OX13Sne5IG+v+MIhEtqzP2fzETt1Cm+mNMepTopSWZdGQfCHIT
+         CvWFQp4Qicm0/cBCYOsFz9F91mH8i6971YqI0wYgUmJhqFWdrGYbHICo5yD3OsOO8Kkm
+         gzqf/SL/CVpV3EOuP0DV/Cc+GHHS0rw1/vfNaOvwFlYch5KmwieJhaJ4rrR4MoNoq9pi
+         gEGrSpor8zS2WwrXibqDqD2PWkUiU9TZPAtQKROvpWoYCEPdzToE4DX7UzFw37Ics4qk
+         7IgKgAj4jQ5dEraSeK5oRyVOrwhVvB77Lan6g3+0hYei+VjcUFBh6hVFM/jTYiYp6k3W
+         hbMw==
+X-Gm-Message-State: APjAAAUQWe2AgDMK+fs0kpZYN00HTF68wrAbDAhnfs2LzXShlXVvo7Xm
+        QgWlve2ejq0Cv/JeXQ6Tx4nKjQ==
+X-Google-Smtp-Source: APXvYqzozZ025UvPI4mTU0oLfTheZojtnyEDGy/5CCLxeXId68aOakr2R4TR29LO197YGxdwCEIM6w==
+X-Received: by 2002:aa7:955a:: with SMTP id w26mr42408534pfq.193.1571179653572;
+        Tue, 15 Oct 2019 15:47:33 -0700 (PDT)
+Received: from vader ([2620:10d:c090:200::2:3e5e])
+        by smtp.gmail.com with ESMTPSA id 127sm20413709pfy.56.2019.10.15.15.47.32
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Tue, 15 Oct 2019 15:47:33 -0700 (PDT)
+Date:   Tue, 15 Oct 2019 15:47:32 -0700
+From:   Omar Sandoval <osandov@osandov.com>
+To:     Yi Zhang <yi.zhang@redhat.com>
+Cc:     linux-block@vger.kernel.org
+Subject: Re: [PATCH blktests] block/027: remove duplicate --group_reporting=1
+Message-ID: <20191015224732.GA450903@vader>
+References: <20190909165506.14716-1-yi.zhang@redhat.com>
 MIME-Version: 1.0
-Content-Type: text/plain; charset="us-ascii"
-Content-ID: <20273.1571178796.1@warthog.procyon.org.uk>
-Date:   Tue, 15 Oct 2019 23:33:16 +0100
-Message-ID: <20274.1571178796@warthog.procyon.org.uk>
-X-Scanned-By: MIMEDefang 2.84 on 10.5.11.22
-X-Greylist: Sender IP whitelisted, not delayed by milter-greylist-4.6.2 (mx1.redhat.com [10.5.110.66]); Tue, 15 Oct 2019 22:33:21 +0000 (UTC)
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <20190909165506.14716-1-yi.zhang@redhat.com>
+User-Agent: Mutt/1.12.2 (2019-09-21)
 Sender: linux-block-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-Linus Torvalds <torvalds@linux-foundation.org> wrote:
-
-> > Add a wakeup call for a case whereby the caller already has the waitqueue
-> > spinlock held.
+On Tue, Sep 10, 2019 at 12:55:06AM +0800, Yi Zhang wrote:
+> Signed-off-by: Yi Zhang <yi.zhang@redhat.com>
+> ---
+>  tests/block/027 | 2 +-
+>  1 file changed, 1 insertion(+), 1 deletion(-)
 > 
-> That naming is crazy.
+> diff --git a/tests/block/027 b/tests/block/027
+> index 0ff9e4c..e818bf7 100755
+> --- a/tests/block/027
+> +++ b/tests/block/027
+> @@ -56,7 +56,7 @@ scsi_debug_stress_remove() {
+>  	local num_jobs=4 runtime=12
+>  	fio --rw=randread --size=128G --direct=1 --ioengine=libaio \
+>  		--iodepth=2048 --numjobs=$num_jobs --bs=4k \
+> -		--group_reporting=1 --group_reporting=1 --runtime=$runtime \
+> +		--group_reporting=1 --runtime=$runtime \
+>  		--loops=10000 --cgroup="blktests/${TEST_NAME}" \
+>  		"${fio_jobs[@]}" > "$FULL" 2>&1 &
+>  
 
-Sorry, yeah.  This is a bit hacked together at the moment and needs some more
-tidying up.  I've had a lot of problems with performance regressions of up to
-40% from seemingly simple changes involving moving locks around - it turns out
-that the problem was that I was running with kasan enabled.
-
-David
+Thanks, applied.
