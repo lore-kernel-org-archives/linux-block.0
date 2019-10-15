@@ -2,92 +2,67 @@ Return-Path: <SRS0=Qtc1=YI=vger.kernel.org=linux-block-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-8.1 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
-	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,
-	SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED,USER_AGENT_SANE_1 autolearn=ham
-	autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-2.1 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
+	HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,
+	USER_AGENT_SANE_1 autolearn=no autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id B4023ECE58F
-	for <linux-block@archiver.kernel.org>; Tue, 15 Oct 2019 09:06:44 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id A6126C10F14
+	for <linux-block@archiver.kernel.org>; Tue, 15 Oct 2019 11:35:51 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.kernel.org (Postfix) with ESMTP id 8962C21835
-	for <linux-block@archiver.kernel.org>; Tue, 15 Oct 2019 09:06:44 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id 77ABB21928
+	for <linux-block@archiver.kernel.org>; Tue, 15 Oct 2019 11:35:51 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (2048-bit key) header.d=infradead.org header.i=@infradead.org header.b="mx7Pn28B"
+	dkim=fail reason="signature verification failed" (2048-bit key) header.d=infradead.org header.i=@infradead.org header.b="ZHcs9NvG"
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1728680AbfJOJGn (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Tue, 15 Oct 2019 05:06:43 -0400
-Received: from bombadil.infradead.org ([198.137.202.133]:35726 "EHLO
+        id S1728611AbfJOLfu (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Tue, 15 Oct 2019 07:35:50 -0400
+Received: from bombadil.infradead.org ([198.137.202.133]:35758 "EHLO
         bombadil.infradead.org" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1726343AbfJOJGn (ORCPT
+        with ESMTP id S1728061AbfJOLfu (ORCPT
         <rfc822;linux-block@vger.kernel.org>);
-        Tue, 15 Oct 2019 05:06:43 -0400
+        Tue, 15 Oct 2019 07:35:50 -0400
 DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed;
         d=infradead.org; s=bombadil.20170209; h=In-Reply-To:Content-Type:MIME-Version
         :References:Message-ID:Subject:Cc:To:From:Date:Sender:Reply-To:
         Content-Transfer-Encoding:Content-ID:Content-Description:Resent-Date:
         Resent-From:Resent-Sender:Resent-To:Resent-Cc:Resent-Message-ID:List-Id:
         List-Help:List-Unsubscribe:List-Subscribe:List-Post:List-Owner:List-Archive;
-         bh=ScswIQBKRvt0vRsU+j1tcLpW9Xtj3tO8tiUdFEtFncw=; b=mx7Pn28BaLko9nhuopP5CjmAZ
-        c0NR8SjdPO028AWHpFt8T20vSMOa59P08xerMLYBNlnq9YpxRJ+vmJAIfzjYkY2uuIeX2he2egxB2
-        noiYpHi8/QDXc6JcoyPP+pm0JUiGpDpliXqgnOY0HDZsJ3SYsjbcXWOHEEwbE7+OJ53Hu686pEMpj
-        43VaeVPWDQ06xDlYxVLIH04TtxFfz+D1vrntD1Hnz0UQPOEPiK9e1EzT4tsRZ2hAkZmM9FR5HjXwR
-        +USSticjJnYKBA4kzR61H5qkSmVHCBOqWXe2m3y+WKBxYHExW2GaA9xh4Xwyyqc6aqMfPuJDsDoqT
-        Zez0/lrzg==;
-Received: from hch by bombadil.infradead.org with local (Exim 4.92.3 #3 (Red Hat Linux))
-        id 1iKImv-0003Fs-9l; Tue, 15 Oct 2019 09:06:41 +0000
-Date:   Tue, 15 Oct 2019 02:06:41 -0700
-From:   Christoph Hellwig <hch@infradead.org>
+         bh=zPxLUku4BuRDt5+SJLEWDEFub4QOmiwDKS+8qep8Bak=; b=ZHcs9NvGWGV7QE24aroVDMFzT
+        enbdNKTsTAoSDcwBixZFb4uNCsCnqIbv1+8tmPSVDwWFaJEeL/UR0qAqdTaKaFm2qTkRY7f/HR9fG
+        5cn0JNSc2cZuOe6PU1MQ+kPr0wQnXdx8Yef0x6yStoMAQM5hmEc7++Hel1avjJPK0605o30gna1Rb
+        v8ToEKIHyQ/n7YuUPgNPvDCNZ+fHM6bhkLdcQOFXQzoR6kJPontTaLYhK9ozqj7Z4tO9n9/+/ZoHY
+        0yfevKwaeNoWRmiLyweSOvMbYWfkBHitiZuWxyF/APSIJI2lu2Bl4FRSvMIe6xK7V5N0l7sAaoMfZ
+        PuSsGLzMQ==;
+Received: from willy by bombadil.infradead.org with local (Exim 4.92.3 #3 (Red Hat Linux))
+        id 1iKL7F-0006DH-0D; Tue, 15 Oct 2019 11:35:49 +0000
+Date:   Tue, 15 Oct 2019 04:35:48 -0700
+From:   Matthew Wilcox <willy@infradead.org>
 To:     Naohiro Aota <naohiro.aota@wdc.com>
 Cc:     linux-mm@kvack.org, linux-fsdevel@vger.kernel.org,
         linux-block@vger.kernel.org,
-        Andrew Morton <akpm@linux-foundation.org>,
-        Christoph Hellwig <hch@infradead.org>
-Subject: Re: [PATCH v2] mm, swap: disallow swapon() on zoned block devices
-Message-ID: <20191015090641.GB7199@infradead.org>
+        Andrew Morton <akpm@linux-foundation.org>
+Subject: Project idea: Swap to zoned block devices
+Message-ID: <20191015113548.GD32665@bombadil.infradead.org>
 References: <20191015043827.160444-1-naohiro.aota@wdc.com>
- <20191015085814.637837-1-naohiro.aota@wdc.com>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=us-ascii
 Content-Disposition: inline
-In-Reply-To: <20191015085814.637837-1-naohiro.aota@wdc.com>
+In-Reply-To: <20191015043827.160444-1-naohiro.aota@wdc.com>
 User-Agent: Mutt/1.12.1 (2019-06-15)
-X-SRS-Rewrite: SMTP reverse-path rewritten from <hch@infradead.org> by bombadil.infradead.org. See http://www.infradead.org/rpr.html
 Sender: linux-block-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-On Tue, Oct 15, 2019 at 05:58:14PM +0900, Naohiro Aota wrote:
-> A zoned block device consists of a number of zones. Zones are either
-> conventional and accepting random writes or sequential and requiring that
-> writes be issued in LBA order from each zone write pointer position. For
-> the write restriction, zoned block devices are not suitable for a swap
-> device. Disallow swapon on them.
-> 
-> Signed-off-by: Naohiro Aota <naohiro.aota@wdc.com>
-> ---
-> v2: add comments according to Christoph's feedback, reformat chengelog.
-> ---
->  mm/swapfile.c | 8 ++++++++
->  1 file changed, 8 insertions(+)
-> 
-> diff --git a/mm/swapfile.c b/mm/swapfile.c
-> index dab43523afdd..f2c4224d1f8a 100644
-> --- a/mm/swapfile.c
-> +++ b/mm/swapfile.c
-> @@ -2887,6 +2887,14 @@ static int claim_swapfile(struct swap_info_struct *p, struct inode *inode)
->  		error = set_blocksize(p->bdev, PAGE_SIZE);
->  		if (error < 0)
->  			return error;
-> +		/*
-> +		 * Zoned block device contains zones that have
-> +		 * sequential write only restriction. For the restriction,
-> +		 * zoned block devices are not suitable for a swap device.
-> +		 * Disallow them here.
-> +		 */
-> +		if (blk_queue_is_zoned(p->bdev->bd_queue))
+On Tue, Oct 15, 2019 at 01:38:27PM +0900, Naohiro Aota wrote:
+> A zoned block device consists of a number of zones. Zones are
+> eitherconventional and accepting random writes or sequential and
+> requiringthat writes be issued in LBA order from each zone write
+> pointerposition. For the write restriction, zoned block devices are
+> notsuitable for a swap device. Disallow swapon on them.
 
-Please use up all 80 chars per line  Otherwise this looks fine:
-
-Reviewed-by: Christoph Hellwig <hch@lst.de>
+That's unfortunate.  I wonder what it would take to make the swap code be
+suitable for zoned devices.  It might even perform better on conventional
+drives since swapout would be a large linear write.  Swapin would be a
+fragmented, seeky set of reads, but this would seem like an excellent
+university project.
