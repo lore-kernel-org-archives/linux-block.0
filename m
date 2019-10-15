@@ -2,90 +2,138 @@ Return-Path: <SRS0=Qtc1=YI=vger.kernel.org=linux-block-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-0.8 required=3.0 tests=DKIMWL_WL_HIGH,DKIM_SIGNED,
-	DKIM_VALID,HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SPF_HELO_NONE,
+X-Spam-Status: No, score=-3.8 required=3.0 tests=DKIM_SIGNED,DKIM_VALID,
+	DKIM_VALID_AU,FREEMAIL_FORGED_FROMDOMAIN,FREEMAIL_FROM,
+	HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,
 	SPF_PASS,URIBL_BLOCKED autolearn=no autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 86F1DECE58F
-	for <linux-block@archiver.kernel.org>; Tue, 15 Oct 2019 20:44:00 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 979D4ECE59F
+	for <linux-block@archiver.kernel.org>; Tue, 15 Oct 2019 21:04:56 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.kernel.org (Postfix) with ESMTP id 5161520873
-	for <linux-block@archiver.kernel.org>; Tue, 15 Oct 2019 20:44:00 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=default; t=1571172240;
-	bh=9Qj8AYZCrF57ox3fBSNqCP0O0J3goZvHpDiYb87LWFA=;
-	h=Date:From:To:Cc:Subject:In-Reply-To:References:List-ID:From;
-	b=RUPkX0Y0uHFS8mr7tvQsq6UrInwug9qrAKjxJt+JzgxmzyBwMWw7K7xBffrUMBlX7
-	 l4pMYrUEyLJXFocioeupRyR+WElyrBQdaCVznuzDwJBWT2Ui4XXF6hRIR+lKVdikma
-	 NUKRSJ/+lZ5ndAjCNWuaXTs9OF95HtwRv9iDc6kQ=
+	by mail.kernel.org (Postfix) with ESMTP id 6B74820872
+	for <linux-block@archiver.kernel.org>; Tue, 15 Oct 2019 21:04:56 +0000 (UTC)
+Authentication-Results: mail.kernel.org;
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="g4tiStYd"
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1728710AbfJOUn7 (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Tue, 15 Oct 2019 16:43:59 -0400
-Received: from mail.kernel.org ([198.145.29.99]:45506 "EHLO mail.kernel.org"
-        rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-        id S1727673AbfJOUn7 (ORCPT <rfc822;linux-block@vger.kernel.org>);
-        Tue, 15 Oct 2019 16:43:59 -0400
-Received: from localhost.localdomain (c-73-231-172-41.hsd1.ca.comcast.net [73.231.172.41])
-        (using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
-        (No client certificate requested)
-        by mail.kernel.org (Postfix) with ESMTPSA id 7599320854;
-        Tue, 15 Oct 2019 20:43:57 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-        s=default; t=1571172237;
-        bh=9Qj8AYZCrF57ox3fBSNqCP0O0J3goZvHpDiYb87LWFA=;
-        h=Date:From:To:Cc:Subject:In-Reply-To:References:From;
-        b=uKCAx9yRrgOHGf17Ho7NijWIxSqW//fWkAaXM++2B9jn58qVFpRX7zcPFiLKUNm95
-         fFIDKKRdL4lJGfwTEffPuD/A6yyJtu9TlVr5pHzUOwKbFGx7jb6HWhNeutbLSkWRnS
-         g///Z862TTLWr7U4qJlq/nN5XcyZs3WYjWTkl3Fw=
-Date:   Tue, 15 Oct 2019 13:43:57 -0700
-From:   Andrew Morton <akpm@linux-foundation.org>
-To:     Christoph Hellwig <hch@infradead.org>
-Cc:     Naohiro Aota <naohiro.aota@wdc.com>, linux-mm@kvack.org,
-        linux-fsdevel@vger.kernel.org, linux-block@vger.kernel.org
-Subject: Re: [PATCH v2] mm, swap: disallow swapon() on zoned block devices
-Message-Id: <20191015134357.042f39a02ae438d961aa2aca@linux-foundation.org>
-In-Reply-To: <20191015090641.GB7199@infradead.org>
-References: <20191015043827.160444-1-naohiro.aota@wdc.com>
-        <20191015085814.637837-1-naohiro.aota@wdc.com>
-        <20191015090641.GB7199@infradead.org>
-X-Mailer: Sylpheed 3.5.1 (GTK+ 2.24.31; x86_64-pc-linux-gnu)
-Mime-Version: 1.0
-Content-Type: text/plain; charset=US-ASCII
-Content-Transfer-Encoding: 7bit
+        id S1732927AbfJOVEy (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Tue, 15 Oct 2019 17:04:54 -0400
+Received: from mail-lj1-f195.google.com ([209.85.208.195]:45347 "EHLO
+        mail-lj1-f195.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S1726665AbfJOVEy (ORCPT
+        <rfc822;linux-block@vger.kernel.org>);
+        Tue, 15 Oct 2019 17:04:54 -0400
+Received: by mail-lj1-f195.google.com with SMTP id q64so21701365ljb.12;
+        Tue, 15 Oct 2019 14:04:52 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=gmail.com; s=20161025;
+        h=mime-version:references:in-reply-to:from:date:message-id:subject:to
+         :cc;
+        bh=mMBin2EGtKSHZbpPVK+JW5J0CFqnupXSzgXwGSycYCg=;
+        b=g4tiStYdzxhvLJMQJJkXMZ03jvVudYSRL31JVqNXBqUxLCCC1KYEnThdbR5opx+Llr
+         TO+hhXXJod7TicgMuR4rglQ+1XdbbV8ZLp5BueqQOBm6yZxJC5NTLrubKUQg4UpuCo5o
+         8hRuVYLRKsy8cvl08Q/gWCHNDrTXh5fClS5uIe9dIydDJJKVoZiV0mtXYAD1pHb1tw+T
+         HOmWn+llpU6IWb17qHeiyEA5FLfcRMKucQlkptg2Mfr3swyswGYNOyi1IZgfutdye2rM
+         B9sKZEIqGwi9nWsa+4gW3KWmgjpazdViQJegrgXyllPawoQR8MwMS81V/8rOn9ASYtdu
+         c+kw==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20161025;
+        h=x-gm-message-state:mime-version:references:in-reply-to:from:date
+         :message-id:subject:to:cc;
+        bh=mMBin2EGtKSHZbpPVK+JW5J0CFqnupXSzgXwGSycYCg=;
+        b=P0MyXDDC20WFw5UheUPobKf7GyHvB3MGuOIZZvNSefkhtd47iDPXalZz2S3KJ/EvDB
+         PZrLHSUh0JTJJdP5yEuRtNRD3+NkcGwIB3OvobS3OGiM8ufDa4b+y3QlhAYJ3lVKo+wy
+         yxt+QRB6lMKGeRPJzoi0FwyIBCwNt1GtRyPgsg3MBI6OVZ5pwDZGZFZfciL88iwirLm9
+         Tu7Mgui2iB4aa7BjrLItVXiFj1jpDRB5gNQsHGxRHCpaUuXTvSytPLCiLwDLO2QqGcuM
+         qixsH5YC7HVP95o6X3r8/mmWT64h72E38YbW2xdu3U9gF8roF1J3mYqcJHLViPUmHOdc
+         I/2A==
+X-Gm-Message-State: APjAAAVTRR6s6HYT6c6MDdAF7rUoP3aTrGdMLl9GCapr3xR+3mTRVtYR
+        n3WrmVlj4wwyX/6NGX0OTUp4TKEMu8R5NIgAIqw=
+X-Google-Smtp-Source: APXvYqyKzjQVj57ZbrsbnWyBxAXURB3UtzBd39o1PwxM6oJmlYyxNnkKYqRHha7SKEoCCpKN9iKzwEjft1BCrg8uPhQ=
+X-Received: by 2002:a2e:9b12:: with SMTP id u18mr24349207lji.142.1571173491828;
+ Tue, 15 Oct 2019 14:04:51 -0700 (PDT)
+MIME-Version: 1.0
+References: <20191014122833.64908-1-houtao1@huawei.com> <20191014122833.64908-2-houtao1@huawei.com>
+In-Reply-To: <20191014122833.64908-2-houtao1@huawei.com>
+From:   Alexei Starovoitov <alexei.starovoitov@gmail.com>
+Date:   Tue, 15 Oct 2019 14:04:40 -0700
+Message-ID: <CAADnVQ+UJK41VL-epYGxrRzqL_UsC+X=J8EXEn2i8P+TPGA_jg@mail.gmail.com>
+Subject: Re: [RFC PATCH 1/2] block: add support for redirecting IO completion
+ through eBPF
+To:     Hou Tao <houtao1@huawei.com>
+Cc:     linux-block@vger.kernel.org, bpf <bpf@vger.kernel.org>,
+        Network Development <netdev@vger.kernel.org>,
+        Jens Axboe <axboe@kernel.dk>,
+        Alexei Starovoitov <ast@kernel.org>, hare@suse.com,
+        osandov@fb.com, ming.lei@redhat.com, damien.lemoal@wdc.com,
+        bvanassche <bvanassche@acm.org>,
+        Daniel Borkmann <daniel@iogearbox.net>,
+        Martin KaFai Lau <kafai@fb.com>,
+        Song Liu <songliubraving@fb.com>, Yonghong Song <yhs@fb.com>
+Content-Type: text/plain; charset="UTF-8"
 Sender: linux-block-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-On Tue, 15 Oct 2019 02:06:41 -0700 Christoph Hellwig <hch@infradead.org> wrote:
+On Mon, Oct 14, 2019 at 5:21 AM Hou Tao <houtao1@huawei.com> wrote:
+>
+> For network stack, RPS, namely Receive Packet Steering, is used to
+> distribute network protocol processing from hardware-interrupted CPU
+> to specific CPUs and alleviating soft-irq load of the interrupted CPU.
+>
+> For block layer, soft-irq (for single queue device) or hard-irq
+> (for multiple queue device) is used to handle IO completion, so
+> RPS will be useful when the soft-irq load or the hard-irq load
+> of a specific CPU is too high, or a specific CPU set is required
+> to handle IO completion.
+>
+> Instead of setting the CPU set used for handling IO completion
+> through sysfs or procfs, we can attach an eBPF program to the
+> request-queue, provide some useful info (e.g., the CPU
+> which submits the request) to the program, and let the program
+> decides the proper CPU for IO completion handling.
+>
+> Signed-off-by: Hou Tao <houtao1@huawei.com>
+...
+>
+> +       rcu_read_lock();
+> +       prog = rcu_dereference_protected(q->prog, 1);
+> +       if (prog)
+> +               bpf_ccpu = BPF_PROG_RUN(q->prog, NULL);
+> +       rcu_read_unlock();
+> +
+>         cpu = get_cpu();
+> -       if (!test_bit(QUEUE_FLAG_SAME_FORCE, &q->queue_flags))
+> -               shared = cpus_share_cache(cpu, ctx->cpu);
+> +       if (bpf_ccpu < 0 || !cpu_online(bpf_ccpu)) {
+> +               ccpu = ctx->cpu;
+> +               if (!test_bit(QUEUE_FLAG_SAME_FORCE, &q->queue_flags))
+> +                       shared = cpus_share_cache(cpu, ctx->cpu);
+> +       } else
+> +               ccpu = bpf_ccpu;
+>
+> -       if (cpu != ctx->cpu && !shared && cpu_online(ctx->cpu)) {
+> +       if (cpu != ccpu && !shared && cpu_online(ccpu)) {
+>                 rq->csd.func = __blk_mq_complete_request_remote;
+>                 rq->csd.info = rq;
+>                 rq->csd.flags = 0;
+> -               smp_call_function_single_async(ctx->cpu, &rq->csd);
+> +               smp_call_function_single_async(ccpu, &rq->csd);
 
-> > +		/*
-> > +		 * Zoned block device contains zones that have
-> > +		 * sequential write only restriction. For the restriction,
-> > +		 * zoned block devices are not suitable for a swap device.
-> > +		 * Disallow them here.
-> > +		 */
-> > +		if (blk_queue_is_zoned(p->bdev->bd_queue))
-> 
-> Please use up all 80 chars per line  Otherwise this looks fine:
+Interesting idea.
+Not sure whether such programability makes sense from
+block layer point of view.
 
-I redid the text a bit as well.
-
---- a/mm/swapfile.c~mm-swap-disallow-swapon-on-zoned-block-devices-fix
-+++ a/mm/swapfile.c
-@@ -2888,10 +2888,9 @@ static int claim_swapfile(struct swap_in
- 		if (error < 0)
- 			return error;
- 		/*
--		 * Zoned block device contains zones that have
--		 * sequential write only restriction. For the restriction,
--		 * zoned block devices are not suitable for a swap device.
--		 * Disallow them here.
-+		 * Zoned block devices contain zones that have a sequential
-+		 * write only restriction.  Hence zoned block devices are not
-+		 * suitable for swapping.  Disallow them here.
- 		 */
- 		if (blk_queue_is_zoned(p->bdev->bd_queue))
- 			return -EINVAL;
-_
-
+From bpf side having a program with NULL input context is
+a bit odd. We never had such things in the past, so this patchset
+won't work as-is.
+Also no-input means that the program choices are quite limited.
+Other than round robin and random I cannot come up with other
+cpu selection ideas.
+I suggest to do writable tracepoint here instead.
+Take a look at trace_nbd_send_request.
+BPF prog can write into 'request'.
+For your use case it will be able to write into 'bpf_ccpu' local variable.
+If you keep it as raw tracepoint and don't add the actual tracepoint
+with TP_STRUCT__entry and TP_fast_assign then it won't be abi
+and you can change it later or remove it altogether.
