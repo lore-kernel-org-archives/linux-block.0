@@ -2,124 +2,159 @@ Return-Path: <SRS0=Rbhm=YJ=vger.kernel.org=linux-block-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-2.2 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
-	MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,USER_AGENT_SANE_1 autolearn=no
+X-Spam-Status: No, score=-3.8 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
+	INCLUDES_PATCH,MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS autolearn=no
 	autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id D99A1FA372A
-	for <linux-block@archiver.kernel.org>; Wed, 16 Oct 2019 12:07:46 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 4E2E4FA372A
+	for <linux-block@archiver.kernel.org>; Wed, 16 Oct 2019 14:26:35 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.kernel.org (Postfix) with ESMTP id BB7AB20659
-	for <linux-block@archiver.kernel.org>; Wed, 16 Oct 2019 12:07:46 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id 307CA20640
+	for <linux-block@archiver.kernel.org>; Wed, 16 Oct 2019 14:26:35 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S2392808AbfJPMHq (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Wed, 16 Oct 2019 08:07:46 -0400
-Received: from mx1.redhat.com ([209.132.183.28]:33602 "EHLO mx1.redhat.com"
+        id S2394027AbfJPO0a convert rfc822-to-8bit (ORCPT
+        <rfc822;linux-block@archiver.kernel.org>);
+        Wed, 16 Oct 2019 10:26:30 -0400
+Received: from mx1.redhat.com ([209.132.183.28]:40738 "EHLO mx1.redhat.com"
         rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-        id S2392807AbfJPMHq (ORCPT <rfc822;linux-block@vger.kernel.org>);
-        Wed, 16 Oct 2019 08:07:46 -0400
-Received: from smtp.corp.redhat.com (int-mx06.intmail.prod.int.phx2.redhat.com [10.5.11.16])
+        id S2387995AbfJPO0a (ORCPT <rfc822;linux-block@vger.kernel.org>);
+        Wed, 16 Oct 2019 10:26:30 -0400
+Received: from smtp.corp.redhat.com (int-mx04.intmail.prod.int.phx2.redhat.com [10.5.11.14])
         (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
         (No client certificate requested)
-        by mx1.redhat.com (Postfix) with ESMTPS id A7F8618C4283;
-        Wed, 16 Oct 2019 12:07:45 +0000 (UTC)
-Received: from ming.t460p (ovpn-8-20.pek2.redhat.com [10.72.8.20])
-        by smtp.corp.redhat.com (Postfix) with ESMTPS id 2389F5C21F;
-        Wed, 16 Oct 2019 12:07:38 +0000 (UTC)
-Date:   Wed, 16 Oct 2019 20:07:30 +0800
-From:   Ming Lei <ming.lei@redhat.com>
-To:     John Garry <john.garry@huawei.com>
-Cc:     Jens Axboe <axboe@kernel.dk>, linux-block@vger.kernel.org,
-        Bart Van Assche <bvanassche@acm.org>,
-        Hannes Reinecke <hare@suse.com>,
-        Christoph Hellwig <hch@lst.de>,
-        Thomas Gleixner <tglx@linutronix.de>,
-        Keith Busch <keith.busch@intel.com>
-Subject: Re: [PATCH V4 0/5] blk-mq: improvement on handling IO during CPU
- hotplug
-Message-ID: <20191016120729.GB5515@ming.t460p>
-References: <20191014015043.25029-1-ming.lei@redhat.com>
- <d30420d7-74d9-4417-1bbe-8113848e74fa@huawei.com>
+        by mx1.redhat.com (Postfix) with ESMTPS id 830493086E27;
+        Wed, 16 Oct 2019 14:26:29 +0000 (UTC)
+Received: from warthog.procyon.org.uk (ovpn-121-84.rdu2.redhat.com [10.10.121.84])
+        by smtp.corp.redhat.com (Postfix) with ESMTP id 35D195D9DC;
+        Wed, 16 Oct 2019 14:26:26 +0000 (UTC)
+Organization: Red Hat UK Ltd. Registered Address: Red Hat UK Ltd, Amberley
+        Place, 107-111 Peascod Street, Windsor, Berkshire, SI4 1TE, United
+        Kingdom.
+        Registered in England and Wales under Company Registration No. 3798903
+From:   David Howells <dhowells@redhat.com>
+In-Reply-To: <CAHk-=whiz1sHXu8SVZKEC2dup=r5JMrftPtEt6ff9Ea8dyH8yQ@mail.gmail.com>
+References: <CAHk-=whiz1sHXu8SVZKEC2dup=r5JMrftPtEt6ff9Ea8dyH8yQ@mail.gmail.com> <157117606853.15019.15459271147790470307.stgit@warthog.procyon.org.uk> <157117608708.15019.1998141309054662114.stgit@warthog.procyon.org.uk>
+To:     Linus Torvalds <torvalds@linux-foundation.org>
+Cc:     dhowells@redhat.com, Tim Chen <tim.c.chen@linux.intel.com>,
+        Kan Liang <kan.liang@intel.com>,
+        Casey Schaufler <casey@schaufler-ca.com>,
+        Stephen Smalley <sds@tycho.nsa.gov>,
+        Greg Kroah-Hartman <gregkh@linuxfoundation.org>,
+        Nicolas Dichtel <nicolas.dichtel@6wind.com>, raven@themaw.net,
+        Christian Brauner <christian@brauner.io>,
+        keyrings@vger.kernel.org, linux-usb@vger.kernel.org,
+        linux-block <linux-block@vger.kernel.org>,
+        LSM List <linux-security-module@vger.kernel.org>,
+        linux-fsdevel <linux-fsdevel@vger.kernel.org>,
+        Linux API <linux-api@vger.kernel.org>,
+        Linux Kernel Mailing List <linux-kernel@vger.kernel.org>
+Subject: Re: [RFC PATCH 02/21] Add a prelocked wake-up
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <d30420d7-74d9-4417-1bbe-8113848e74fa@huawei.com>
-User-Agent: Mutt/1.11.3 (2019-02-01)
-X-Scanned-By: MIMEDefang 2.79 on 10.5.11.16
-X-Greylist: Sender IP whitelisted, not delayed by milter-greylist-4.6.2 (mx1.redhat.com [10.5.110.62]); Wed, 16 Oct 2019 12:07:45 +0000 (UTC)
+Content-Type: text/plain; charset="us-ascii"
+Content-ID: <6899.1571235985.1@warthog.procyon.org.uk>
+Content-Transfer-Encoding: 8BIT
+Date:   Wed, 16 Oct 2019 15:26:25 +0100
+Message-ID: <6900.1571235985@warthog.procyon.org.uk>
+X-Scanned-By: MIMEDefang 2.79 on 10.5.11.14
+X-Greylist: Sender IP whitelisted, not delayed by milter-greylist-4.5.16 (mx1.redhat.com [10.5.110.44]); Wed, 16 Oct 2019 14:26:30 +0000 (UTC)
 Sender: linux-block-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-On Wed, Oct 16, 2019 at 09:58:27AM +0100, John Garry wrote:
-> On 14/10/2019 02:50, Ming Lei wrote:
-> > Hi,
-> > 
-> > Thomas mentioned:
-> >     "
-> >      That was the constraint of managed interrupts from the very beginning:
-> > 
-> >       The driver/subsystem has to quiesce the interrupt line and the associated
-> >       queue _before_ it gets shutdown in CPU unplug and not fiddle with it
-> >       until it's restarted by the core when the CPU is plugged in again.
-> >     "
-> > 
-> > But no drivers or blk-mq do that before one hctx becomes dead(all
-> > CPUs for one hctx are offline), and even it is worse, blk-mq stills tries
-> > to run hw queue after hctx is dead, see blk_mq_hctx_notify_dead().
-> > 
-> > This patchset tries to address the issue by two stages:
-> > 
-> > 1) add one new cpuhp state of CPUHP_AP_BLK_MQ_ONLINE
-> > 
-> > - mark the hctx as internal stopped, and drain all in-flight requests
-> > if the hctx is going to be dead.
-> > 
-> > 2) re-submit IO in the state of CPUHP_BLK_MQ_DEAD after the hctx becomes dead
-> > 
-> > - steal bios from the request, and resubmit them via generic_make_request(),
-> > then these IO will be mapped to other live hctx for dispatch
-> > 
-> > Please comment & review, thanks!
-> > 
-> > John, I don't add your tested-by tag since V3 have some changes,
-> > and I appreciate if you may run your test on V3.
-> 
-> Hi Ming,
-> 
-> So I got around to doing some testing. The good news is that issue which we
-> were experiencing in v3 series seems to have has gone away - alot more
-> stable.
-> 
-> However, unfortunately, I did notice some SCSI timeouts:
-> 
-> 15508.615074] CPU2: shutdown
-> [15508.617778] psci: CPU2 killed.
-> [15508.651220] CPU1: shutdown
-> [15508.653924] psci: CPU1 killed.
-> [15518.406229] sas: Enter sas_scsi_recover_host busy: 63 failed: 63
-> Jobs: 1 (f=1): [R] [0.0% done] [0[15518.412239] sas: sas_scsi_find_task:
-> aborting task 0x00000000a7159744
-> KB/0KB/0KB /s] [0/0/0 iops] [eta [15518.421708] sas:
-> sas_eh_handle_sas_errors: task 0x00000000a7159744 is done
-> [15518.431266] sas: sas_scsi_find_task: aborting task 0x00000000d39731eb
-> [15518.442539] sas: sas_eh_handle_sas_errors: task 0x00000000d39731eb is
-> done
-> [15518.449407] sas: sas_scsi_find_task: aborting task 0x000000009f77c9bd
-> [15518.455899] sas: sas_eh_handle_sas_errors: task 0x000000009f77c9bd is
-> done
-> 
-> A couple of things to note:
-> - I added some debug prints in blk_mq_hctx_drain_inflight_rqs() for when
-> inflights rqs !=0, and I don't see them for this timeout
-> - 0 datarate reported from fio
-> 
-> I'll have a look...
+Btw, is there any point in __wake_up_sync_key() taking a nr_exclusive
+argument since it clears WF_SYNC if nr_exclusive != 1 and doesn't make sense
+to be >1 anyway.
 
-What is the output of the following command?
-
-(cd /sys/kernel/debug/block/$SAS_DISK && find . -type f -exec grep -aH . {} \;)
-
-Thanks,
-Ming
+David
+---
+diff --git a/include/linux/wait.h b/include/linux/wait.h
+index 3eb7cae8206c..bb7676d396cd 100644
+--- a/include/linux/wait.h
++++ b/include/linux/wait.h
+@@ -201,9 +201,9 @@ void __wake_up(struct wait_queue_head *wq_head, unsigned int mode, int nr, void
+ void __wake_up_locked_key(struct wait_queue_head *wq_head, unsigned int mode, void *key);
+ void __wake_up_locked_key_bookmark(struct wait_queue_head *wq_head,
+ 		unsigned int mode, void *key, wait_queue_entry_t *bookmark);
+-void __wake_up_sync_key(struct wait_queue_head *wq_head, unsigned int mode, int nr, void *key);
++void __wake_up_sync_key(struct wait_queue_head *wq_head, unsigned int mode, void *key);
+ void __wake_up_locked(struct wait_queue_head *wq_head, unsigned int mode, int nr);
+-void __wake_up_sync(struct wait_queue_head *wq_head, unsigned int mode, int nr);
++void __wake_up_sync(struct wait_queue_head *wq_head, unsigned int mode);
+ 
+ #define wake_up(x)			__wake_up(x, TASK_NORMAL, 1, NULL)
+ #define wake_up_nr(x, nr)		__wake_up(x, TASK_NORMAL, nr, NULL)
+@@ -214,7 +214,7 @@ void __wake_up_sync(struct wait_queue_head *wq_head, unsigned int mode, int nr);
+ #define wake_up_interruptible(x)	__wake_up(x, TASK_INTERRUPTIBLE, 1, NULL)
+ #define wake_up_interruptible_nr(x, nr)	__wake_up(x, TASK_INTERRUPTIBLE, nr, NULL)
+ #define wake_up_interruptible_all(x)	__wake_up(x, TASK_INTERRUPTIBLE, 0, NULL)
+-#define wake_up_interruptible_sync(x)	__wake_up_sync((x), TASK_INTERRUPTIBLE, 1)
++#define wake_up_interruptible_sync(x)	__wake_up_sync((x), TASK_INTERRUPTIBLE)
+ 
+ /*
+  * Wakeup macros to be used to report events to the targets.
+@@ -228,7 +228,7 @@ void __wake_up_sync(struct wait_queue_head *wq_head, unsigned int mode, int nr);
+ #define wake_up_interruptible_poll(x, m)					\
+ 	__wake_up(x, TASK_INTERRUPTIBLE, 1, poll_to_key(m))
+ #define wake_up_interruptible_sync_poll(x, m)					\
+-	__wake_up_sync_key((x), TASK_INTERRUPTIBLE, 1, poll_to_key(m))
++	__wake_up_sync_key((x), TASK_INTERRUPTIBLE, poll_to_key(m))
+ 
+ #define ___wait_cond_timeout(condition)						\
+ ({										\
+diff --git a/kernel/exit.c b/kernel/exit.c
+index a46a50d67002..a1ff25ef050e 100644
+--- a/kernel/exit.c
++++ b/kernel/exit.c
+@@ -1435,7 +1435,7 @@ static int child_wait_callback(wait_queue_entry_t *wait, unsigned mode,
+ void __wake_up_parent(struct task_struct *p, struct task_struct *parent)
+ {
+ 	__wake_up_sync_key(&parent->signal->wait_chldexit,
+-				TASK_INTERRUPTIBLE, 1, p);
++			   TASK_INTERRUPTIBLE, p);
+ }
+ 
+ static long do_wait(struct wait_opts *wo)
+diff --git a/kernel/sched/wait.c b/kernel/sched/wait.c
+index c1e566a114ca..b4b52361dab7 100644
+--- a/kernel/sched/wait.c
++++ b/kernel/sched/wait.c
+@@ -169,7 +169,6 @@ EXPORT_SYMBOL_GPL(__wake_up_locked_key_bookmark);
+  * __wake_up_sync_key - wake up threads blocked on a waitqueue.
+  * @wq_head: the waitqueue
+  * @mode: which threads
+- * @nr_exclusive: how many wake-one or wake-many threads to wake up
+  * @key: opaque value to be passed to wakeup targets
+  *
+  * The sync wakeup differs that the waker knows that it will schedule
+@@ -183,26 +182,21 @@ EXPORT_SYMBOL_GPL(__wake_up_locked_key_bookmark);
+  * accessing the task state.
+  */
+ void __wake_up_sync_key(struct wait_queue_head *wq_head, unsigned int mode,
+-			int nr_exclusive, void *key)
++			void *key)
+ {
+-	int wake_flags = 1; /* XXX WF_SYNC */
+-
+ 	if (unlikely(!wq_head))
+ 		return;
+ 
+-	if (unlikely(nr_exclusive != 1))
+-		wake_flags = 0;
+-
+-	__wake_up_common_lock(wq_head, mode, nr_exclusive, wake_flags, key);
++	__wake_up_common_lock(wq_head, mode, 1, WF_SYNC, key);
+ }
+ EXPORT_SYMBOL_GPL(__wake_up_sync_key);
+ 
+ /*
+  * __wake_up_sync - see __wake_up_sync_key()
+  */
+-void __wake_up_sync(struct wait_queue_head *wq_head, unsigned int mode, int nr_exclusive)
++void __wake_up_sync(struct wait_queue_head *wq_head, unsigned int mode)
+ {
+-	__wake_up_sync_key(wq_head, mode, nr_exclusive, NULL);
++	__wake_up_sync_key(wq_head, mode, NULL);
+ }
+ EXPORT_SYMBOL_GPL(__wake_up_sync);	/* For internal use only */
+ 
