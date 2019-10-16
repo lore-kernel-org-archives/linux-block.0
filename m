@@ -2,159 +2,237 @@ Return-Path: <SRS0=Rbhm=YJ=vger.kernel.org=linux-block-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-3.8 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
-	INCLUDES_PATCH,MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS autolearn=no
-	autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-8.2 required=3.0 tests=DKIM_SIGNED,DKIM_VALID,
+	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,
+	SPF_HELO_NONE,SPF_PASS,USER_AGENT_SANE_1 autolearn=ham autolearn_force=no
+	version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 4E2E4FA372A
-	for <linux-block@archiver.kernel.org>; Wed, 16 Oct 2019 14:26:35 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id A57C3FA3728
+	for <linux-block@archiver.kernel.org>; Wed, 16 Oct 2019 15:16:24 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.kernel.org (Postfix) with ESMTP id 307CA20640
-	for <linux-block@archiver.kernel.org>; Wed, 16 Oct 2019 14:26:35 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id 6E7BD2067D
+	for <linux-block@archiver.kernel.org>; Wed, 16 Oct 2019 15:16:24 +0000 (UTC)
+Authentication-Results: mail.kernel.org;
+	dkim=pass (2048-bit key) header.d=kernel-dk.20150623.gappssmtp.com header.i=@kernel-dk.20150623.gappssmtp.com header.b="a5ZJSPoS"
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S2394027AbfJPO0a convert rfc822-to-8bit (ORCPT
-        <rfc822;linux-block@archiver.kernel.org>);
-        Wed, 16 Oct 2019 10:26:30 -0400
-Received: from mx1.redhat.com ([209.132.183.28]:40738 "EHLO mx1.redhat.com"
-        rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-        id S2387995AbfJPO0a (ORCPT <rfc822;linux-block@vger.kernel.org>);
-        Wed, 16 Oct 2019 10:26:30 -0400
-Received: from smtp.corp.redhat.com (int-mx04.intmail.prod.int.phx2.redhat.com [10.5.11.14])
-        (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
-        (No client certificate requested)
-        by mx1.redhat.com (Postfix) with ESMTPS id 830493086E27;
-        Wed, 16 Oct 2019 14:26:29 +0000 (UTC)
-Received: from warthog.procyon.org.uk (ovpn-121-84.rdu2.redhat.com [10.10.121.84])
-        by smtp.corp.redhat.com (Postfix) with ESMTP id 35D195D9DC;
-        Wed, 16 Oct 2019 14:26:26 +0000 (UTC)
-Organization: Red Hat UK Ltd. Registered Address: Red Hat UK Ltd, Amberley
-        Place, 107-111 Peascod Street, Windsor, Berkshire, SI4 1TE, United
-        Kingdom.
-        Registered in England and Wales under Company Registration No. 3798903
-From:   David Howells <dhowells@redhat.com>
-In-Reply-To: <CAHk-=whiz1sHXu8SVZKEC2dup=r5JMrftPtEt6ff9Ea8dyH8yQ@mail.gmail.com>
-References: <CAHk-=whiz1sHXu8SVZKEC2dup=r5JMrftPtEt6ff9Ea8dyH8yQ@mail.gmail.com> <157117606853.15019.15459271147790470307.stgit@warthog.procyon.org.uk> <157117608708.15019.1998141309054662114.stgit@warthog.procyon.org.uk>
-To:     Linus Torvalds <torvalds@linux-foundation.org>
-Cc:     dhowells@redhat.com, Tim Chen <tim.c.chen@linux.intel.com>,
-        Kan Liang <kan.liang@intel.com>,
-        Casey Schaufler <casey@schaufler-ca.com>,
-        Stephen Smalley <sds@tycho.nsa.gov>,
-        Greg Kroah-Hartman <gregkh@linuxfoundation.org>,
-        Nicolas Dichtel <nicolas.dichtel@6wind.com>, raven@themaw.net,
-        Christian Brauner <christian@brauner.io>,
-        keyrings@vger.kernel.org, linux-usb@vger.kernel.org,
-        linux-block <linux-block@vger.kernel.org>,
-        LSM List <linux-security-module@vger.kernel.org>,
-        linux-fsdevel <linux-fsdevel@vger.kernel.org>,
-        Linux API <linux-api@vger.kernel.org>,
-        Linux Kernel Mailing List <linux-kernel@vger.kernel.org>
-Subject: Re: [RFC PATCH 02/21] Add a prelocked wake-up
+        id S1731907AbfJPPQY (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Wed, 16 Oct 2019 11:16:24 -0400
+Received: from mail-io1-f67.google.com ([209.85.166.67]:44360 "EHLO
+        mail-io1-f67.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S1730806AbfJPPQX (ORCPT
+        <rfc822;linux-block@vger.kernel.org>);
+        Wed, 16 Oct 2019 11:16:23 -0400
+Received: by mail-io1-f67.google.com with SMTP id w12so54224131iol.11
+        for <linux-block@vger.kernel.org>; Wed, 16 Oct 2019 08:16:21 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=kernel-dk.20150623.gappssmtp.com; s=20150623;
+        h=to:from:subject:message-id:date:user-agent:mime-version
+         :content-language:content-transfer-encoding;
+        bh=bu8W6EBBQ7Z2tnsKnB9IgioY5X883y+5LOiqkgaKAYg=;
+        b=a5ZJSPoS0HBxefeFEURXfb0cZEHwckU58yoY2TrUuAH6TJckGTx7TmK6THiYzS/Pqn
+         APBKY/POjEcFmbXWCMPONgFv+ga+AXsMDFnh+QF8hEeBOQAYkC9wX0Nj5ekED8Mbdfgk
+         Ch3m/GkBA42VxOQeD79i1qEtZOlm3Cd9ZtXtcdHFim8NknqYKZle+u37aaCdPFIOoP1E
+         VvVVLjd9+B+f1TEJ/DeZ8pCx743UXfbeHe8qSyUNWfG4l5Sr9Tvj/49D09Lm/7wgWLsu
+         gjrK9L3Z2K6H79MdhtiujRTDZ7ZyXJH2ZUBNBI66emugG1MiOAaCJAyzZMeYZRVrqxEc
+         BZDw==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20161025;
+        h=x-gm-message-state:to:from:subject:message-id:date:user-agent
+         :mime-version:content-language:content-transfer-encoding;
+        bh=bu8W6EBBQ7Z2tnsKnB9IgioY5X883y+5LOiqkgaKAYg=;
+        b=pewRYsFwfNMrMDhViWXkljzMN3Ukau6xWPzk/KzRZwe7xjwWtEqYE8BLtP/n/ertLR
+         jAlT5fsWa5QFA1Xwu63rzTaCltcZ4iQJdMQGkSTm6vVH7CW7bed2vPvExdgmqWlDfvYj
+         NyCYmAAld6qLgygk21gpgc5JIiQ1oJ6WeS8qB8MiTwYYLdxIeNtnYkhh2+njS77kvHxj
+         YN6wGQeBtEyewdTEW92BM5QfhR1A1JVVEI/hmd8VbFSp8an7+FX0YH5Z5H2lL3B/WCvQ
+         lzIo3yejJNCliH8T3ffJPQggqdt6Rwd/diD37Gg9qflyfKIW+YiQiR7JKDk2KrteRyxM
+         rTAw==
+X-Gm-Message-State: APjAAAUT5DM5EJIsQqOxOCrp4TL/5+FmjyZ0lfGzdgJ8cD7JFuXxZv/L
+        sxq9QMk1gGHeRFtKWr+EF0xA/vZWOpFMxQ==
+X-Google-Smtp-Source: APXvYqyI1zyKEmVkc0Y1DSJZEUC+p85rw4ukOL7Uhb4u+YpK58RfHKA+NQrOU5RJK6t4tU8GozkJvQ==
+X-Received: by 2002:a5d:8452:: with SMTP id w18mr2131076ior.145.1571238980419;
+        Wed, 16 Oct 2019 08:16:20 -0700 (PDT)
+Received: from [192.168.1.159] ([65.144.74.34])
+        by smtp.gmail.com with ESMTPSA id p7sm4468582ilh.10.2019.10.16.08.16.18
+        for <linux-block@vger.kernel.org>
+        (version=TLS1_2 cipher=ECDHE-RSA-AES128-GCM-SHA256 bits=128/128);
+        Wed, 16 Oct 2019 08:16:18 -0700 (PDT)
+To:     "linux-block@vger.kernel.org" <linux-block@vger.kernel.org>
+From:   Jens Axboe <axboe@kernel.dk>
+Subject: [PATCH] io_uring: add support for canceling timeout requests
+Message-ID: <0f03efc4-fa7d-cb96-bca5-64f692ae52d8@kernel.dk>
+Date:   Wed, 16 Oct 2019 09:16:18 -0600
+User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:60.0) Gecko/20100101
+ Thunderbird/60.9.0
 MIME-Version: 1.0
-Content-Type: text/plain; charset="us-ascii"
-Content-ID: <6899.1571235985.1@warthog.procyon.org.uk>
-Content-Transfer-Encoding: 8BIT
-Date:   Wed, 16 Oct 2019 15:26:25 +0100
-Message-ID: <6900.1571235985@warthog.procyon.org.uk>
-X-Scanned-By: MIMEDefang 2.79 on 10.5.11.14
-X-Greylist: Sender IP whitelisted, not delayed by milter-greylist-4.5.16 (mx1.redhat.com [10.5.110.44]); Wed, 16 Oct 2019 14:26:30 +0000 (UTC)
+Content-Type: text/plain; charset=utf-8
+Content-Language: en-US
+Content-Transfer-Encoding: 7bit
 Sender: linux-block-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-Btw, is there any point in __wake_up_sync_key() taking a nr_exclusive
-argument since it clears WF_SYNC if nr_exclusive != 1 and doesn't make sense
-to be >1 anyway.
+We might have cases where the need for a specific timeout is gone, add
+support for canceling an existing timeout operation. This works like the
+POLL_REMOVE command, where the application passes in the user_data of
+the timeout it wishes to cancel in the sqe->addr field.
 
-David
+Signed-off-by: Jens Axboe <axboe@kernel.dk>
 ---
-diff --git a/include/linux/wait.h b/include/linux/wait.h
-index 3eb7cae8206c..bb7676d396cd 100644
---- a/include/linux/wait.h
-+++ b/include/linux/wait.h
-@@ -201,9 +201,9 @@ void __wake_up(struct wait_queue_head *wq_head, unsigned int mode, int nr, void
- void __wake_up_locked_key(struct wait_queue_head *wq_head, unsigned int mode, void *key);
- void __wake_up_locked_key_bookmark(struct wait_queue_head *wq_head,
- 		unsigned int mode, void *key, wait_queue_entry_t *bookmark);
--void __wake_up_sync_key(struct wait_queue_head *wq_head, unsigned int mode, int nr, void *key);
-+void __wake_up_sync_key(struct wait_queue_head *wq_head, unsigned int mode, void *key);
- void __wake_up_locked(struct wait_queue_head *wq_head, unsigned int mode, int nr);
--void __wake_up_sync(struct wait_queue_head *wq_head, unsigned int mode, int nr);
-+void __wake_up_sync(struct wait_queue_head *wq_head, unsigned int mode);
+ fs/io_uring.c                 | 92 ++++++++++++++++++++++++++++++-----
+ include/uapi/linux/io_uring.h |  1 +
+ 2 files changed, 82 insertions(+), 11 deletions(-)
+
+diff --git a/fs/io_uring.c b/fs/io_uring.c
+index e48e0854bc1e..635856023fdf 100644
+--- a/fs/io_uring.c
++++ b/fs/io_uring.c
+@@ -1914,22 +1914,88 @@ static enum hrtimer_restart io_timeout_fn(struct hrtimer *timer)
+ 	struct io_ring_ctx *ctx;
+ 	struct io_kiocb *req;
+ 	unsigned long flags;
++	bool comp;
  
- #define wake_up(x)			__wake_up(x, TASK_NORMAL, 1, NULL)
- #define wake_up_nr(x, nr)		__wake_up(x, TASK_NORMAL, nr, NULL)
-@@ -214,7 +214,7 @@ void __wake_up_sync(struct wait_queue_head *wq_head, unsigned int mode, int nr);
- #define wake_up_interruptible(x)	__wake_up(x, TASK_INTERRUPTIBLE, 1, NULL)
- #define wake_up_interruptible_nr(x, nr)	__wake_up(x, TASK_INTERRUPTIBLE, nr, NULL)
- #define wake_up_interruptible_all(x)	__wake_up(x, TASK_INTERRUPTIBLE, 0, NULL)
--#define wake_up_interruptible_sync(x)	__wake_up_sync((x), TASK_INTERRUPTIBLE, 1)
-+#define wake_up_interruptible_sync(x)	__wake_up_sync((x), TASK_INTERRUPTIBLE)
+ 	req = container_of(timer, struct io_kiocb, timeout.timer);
+ 	ctx = req->ctx;
+ 	atomic_inc(&ctx->cq_timeouts);
+ 
+ 	spin_lock_irqsave(&ctx->completion_lock, flags);
+-	list_del(&req->list);
+-
+-	io_cqring_fill_event(ctx, req->user_data, -ETIME);
+-	io_commit_cqring(ctx);
++	/*
++	 * We could be racing with timeout deletion. If the list is empty,
++	 * then timeout lookup already found it and will be handling it.
++	 */
++	comp = !list_empty(&req->list);
++	if (comp) {
++		list_del_init(&req->list);
++		io_cqring_fill_event(ctx, req->user_data, -ETIME);
++		io_commit_cqring(ctx);
++	}
+ 	spin_unlock_irqrestore(&ctx->completion_lock, flags);
+ 
++	if (comp) {
++		io_cqring_ev_posted(ctx);
++		io_put_req(req, NULL);
++	}
++	return HRTIMER_NORESTART;
++}
++
++/*
++ * Remove or update an existing timeout command
++ */
++static int io_timeout_remove(struct io_kiocb *req,
++			     const struct io_uring_sqe *sqe)
++{
++	struct io_ring_ctx *ctx = req->ctx;
++	struct io_kiocb *treq;
++	int ret = -ENOENT;
++	__u64 user_data;
++	unsigned flags;
++
++	if (unlikely(ctx->flags & IORING_SETUP_IOPOLL))
++		return -EINVAL;
++	if (sqe->flags || sqe->ioprio || sqe->buf_index || sqe->len)
++		return -EINVAL;
++	flags = READ_ONCE(sqe->timeout_flags);
++	if (flags)
++		return -EINVAL;
++
++	user_data = READ_ONCE(sqe->addr);
++	spin_lock_irq(&ctx->completion_lock);
++	list_for_each_entry(treq, &ctx->timeout_list, list) {
++		if (user_data == treq->user_data) {
++			list_del_init(&treq->list);
++			ret = 0;
++			break;
++		}
++	}
++
++	/* didn't find timeout */
++	if (ret) {
++fill_ev:
++		io_cqring_fill_event(ctx, req->user_data, ret);
++		io_commit_cqring(ctx);
++		spin_unlock_irq(&ctx->completion_lock);
++		io_cqring_ev_posted(ctx);
++		io_put_req(req, NULL);
++		return 0;
++	}
++
++	ret = hrtimer_try_to_cancel(&treq->timeout.timer);
++	if (ret == -1) {
++		ret = -EBUSY;
++		goto fill_ev;
++	}
++
++	io_cqring_fill_event(ctx, req->user_data, 0);
++	io_cqring_fill_event(ctx, treq->user_data, -ECANCELED);
++	io_commit_cqring(ctx);
++	spin_unlock_irq(&ctx->completion_lock);
+ 	io_cqring_ev_posted(ctx);
+ 
++	io_put_req(treq, NULL);
+ 	io_put_req(req, NULL);
+-	return HRTIMER_NORESTART;
++	return 0;
+ }
+ 
+ static int io_timeout(struct io_kiocb *req, const struct io_uring_sqe *sqe)
+@@ -1952,6 +2018,13 @@ static int io_timeout(struct io_kiocb *req, const struct io_uring_sqe *sqe)
+ 	if (get_timespec64(&ts, u64_to_user_ptr(sqe->addr)))
+ 		return -EFAULT;
+ 
++	if (flags & IORING_TIMEOUT_ABS)
++		mode = HRTIMER_MODE_ABS;
++	else
++		mode = HRTIMER_MODE_REL;
++
++	hrtimer_init(&req->timeout.timer, CLOCK_MONOTONIC, mode);
++
+ 	/*
+ 	 * sqe->off holds how many events that need to occur for this
+ 	 * timeout event to be satisfied.
+@@ -1980,12 +2053,6 @@ static int io_timeout(struct io_kiocb *req, const struct io_uring_sqe *sqe)
+ 	}
+ 	list_add(&req->list, entry);
+ 	spin_unlock_irq(&ctx->completion_lock);
+-
+-	if (flags & IORING_TIMEOUT_ABS)
+-		mode = HRTIMER_MODE_ABS;
+-	else
+-		mode = HRTIMER_MODE_REL;
+-	hrtimer_init(&req->timeout.timer, CLOCK_MONOTONIC, mode);
+ 	req->timeout.timer.function = io_timeout_fn;
+ 	hrtimer_start(&req->timeout.timer, timespec64_to_ktime(ts), mode);
+ 	return 0;
+@@ -2072,6 +2139,9 @@ static int __io_submit_sqe(struct io_ring_ctx *ctx, struct io_kiocb *req,
+ 	case IORING_OP_TIMEOUT:
+ 		ret = io_timeout(req, s->sqe);
+ 		break;
++	case IORING_OP_TIMEOUT_REMOVE:
++		ret = io_timeout_remove(req, s->sqe);
++		break;
+ 	default:
+ 		ret = -EINVAL;
+ 		break;
+diff --git a/include/uapi/linux/io_uring.h b/include/uapi/linux/io_uring.h
+index b402dfee5e15..6dc5ced1c37a 100644
+--- a/include/uapi/linux/io_uring.h
++++ b/include/uapi/linux/io_uring.h
+@@ -64,6 +64,7 @@ struct io_uring_sqe {
+ #define IORING_OP_SENDMSG	9
+ #define IORING_OP_RECVMSG	10
+ #define IORING_OP_TIMEOUT	11
++#define IORING_OP_TIMEOUT_REMOVE	12
  
  /*
-  * Wakeup macros to be used to report events to the targets.
-@@ -228,7 +228,7 @@ void __wake_up_sync(struct wait_queue_head *wq_head, unsigned int mode, int nr);
- #define wake_up_interruptible_poll(x, m)					\
- 	__wake_up(x, TASK_INTERRUPTIBLE, 1, poll_to_key(m))
- #define wake_up_interruptible_sync_poll(x, m)					\
--	__wake_up_sync_key((x), TASK_INTERRUPTIBLE, 1, poll_to_key(m))
-+	__wake_up_sync_key((x), TASK_INTERRUPTIBLE, poll_to_key(m))
- 
- #define ___wait_cond_timeout(condition)						\
- ({										\
-diff --git a/kernel/exit.c b/kernel/exit.c
-index a46a50d67002..a1ff25ef050e 100644
---- a/kernel/exit.c
-+++ b/kernel/exit.c
-@@ -1435,7 +1435,7 @@ static int child_wait_callback(wait_queue_entry_t *wait, unsigned mode,
- void __wake_up_parent(struct task_struct *p, struct task_struct *parent)
- {
- 	__wake_up_sync_key(&parent->signal->wait_chldexit,
--				TASK_INTERRUPTIBLE, 1, p);
-+			   TASK_INTERRUPTIBLE, p);
- }
- 
- static long do_wait(struct wait_opts *wo)
-diff --git a/kernel/sched/wait.c b/kernel/sched/wait.c
-index c1e566a114ca..b4b52361dab7 100644
---- a/kernel/sched/wait.c
-+++ b/kernel/sched/wait.c
-@@ -169,7 +169,6 @@ EXPORT_SYMBOL_GPL(__wake_up_locked_key_bookmark);
-  * __wake_up_sync_key - wake up threads blocked on a waitqueue.
-  * @wq_head: the waitqueue
-  * @mode: which threads
-- * @nr_exclusive: how many wake-one or wake-many threads to wake up
-  * @key: opaque value to be passed to wakeup targets
-  *
-  * The sync wakeup differs that the waker knows that it will schedule
-@@ -183,26 +182,21 @@ EXPORT_SYMBOL_GPL(__wake_up_locked_key_bookmark);
-  * accessing the task state.
-  */
- void __wake_up_sync_key(struct wait_queue_head *wq_head, unsigned int mode,
--			int nr_exclusive, void *key)
-+			void *key)
- {
--	int wake_flags = 1; /* XXX WF_SYNC */
--
- 	if (unlikely(!wq_head))
- 		return;
- 
--	if (unlikely(nr_exclusive != 1))
--		wake_flags = 0;
--
--	__wake_up_common_lock(wq_head, mode, nr_exclusive, wake_flags, key);
-+	__wake_up_common_lock(wq_head, mode, 1, WF_SYNC, key);
- }
- EXPORT_SYMBOL_GPL(__wake_up_sync_key);
- 
- /*
-  * __wake_up_sync - see __wake_up_sync_key()
-  */
--void __wake_up_sync(struct wait_queue_head *wq_head, unsigned int mode, int nr_exclusive)
-+void __wake_up_sync(struct wait_queue_head *wq_head, unsigned int mode)
- {
--	__wake_up_sync_key(wq_head, mode, nr_exclusive, NULL);
-+	__wake_up_sync_key(wq_head, mode, NULL);
- }
- EXPORT_SYMBOL_GPL(__wake_up_sync);	/* For internal use only */
- 
+  * sqe->fsync_flags
+-- 
+2.17.1
+
+-- 
+Jens Axboe
+
