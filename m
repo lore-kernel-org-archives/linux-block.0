@@ -2,157 +2,308 @@ Return-Path: <SRS0=Rbhm=YJ=vger.kernel.org=linux-block-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-2.2 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
-	MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,USER_AGENT_SANE_1 autolearn=no
-	autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-8.2 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
+	INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,
+	USER_AGENT_SANE_1 autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id CD7B1FA3728
-	for <linux-block@archiver.kernel.org>; Wed, 16 Oct 2019 17:02:27 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id CBBDAFA3728
+	for <linux-block@archiver.kernel.org>; Wed, 16 Oct 2019 18:51:17 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.kernel.org (Postfix) with ESMTP id A327220663
-	for <linux-block@archiver.kernel.org>; Wed, 16 Oct 2019 17:02:27 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id A5DE620663
+	for <linux-block@archiver.kernel.org>; Wed, 16 Oct 2019 18:51:17 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S2436487AbfJPRC1 (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Wed, 16 Oct 2019 13:02:27 -0400
-Received: from mga05.intel.com ([192.55.52.43]:14328 "EHLO mga05.intel.com"
-        rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-        id S1729913AbfJPRC0 (ORCPT <rfc822;linux-block@vger.kernel.org>);
-        Wed, 16 Oct 2019 13:02:26 -0400
-X-Amp-Result: SKIPPED(no attachment in message)
-X-Amp-File-Uploaded: False
-Received: from orsmga003.jf.intel.com ([10.7.209.27])
-  by fmsmga105.fm.intel.com with ESMTP/TLS/DHE-RSA-AES256-GCM-SHA384; 16 Oct 2019 10:02:25 -0700
-X-ExtLoop1: 1
-X-IronPort-AV: E=Sophos;i="5.67,304,1566889200"; 
-   d="scan'208";a="199012720"
-Received: from schen9-desk.jf.intel.com (HELO [10.54.74.162]) ([10.54.74.162])
-  by orsmga003.jf.intel.com with ESMTP; 16 Oct 2019 10:02:25 -0700
-To:     Linus Torvalds <torvalds@linux-foundation.org>,
-        David Howells <dhowells@redhat.com>,
-        Kan Liang <kan.liang@intel.com>
-Cc:     Casey Schaufler <casey@schaufler-ca.com>,
-        Stephen Smalley <sds@tycho.nsa.gov>,
-        Greg Kroah-Hartman <gregkh@linuxfoundation.org>,
-        Nicolas Dichtel <nicolas.dichtel@6wind.com>, raven@themaw.net,
-        Christian Brauner <christian@brauner.io>,
-        keyrings@vger.kernel.org, linux-usb@vger.kernel.org,
-        linux-block <linux-block@vger.kernel.org>,
-        LSM List <linux-security-module@vger.kernel.org>,
-        linux-fsdevel <linux-fsdevel@vger.kernel.org>,
-        Linux API <linux-api@vger.kernel.org>,
-        Linux Kernel Mailing List <linux-kernel@vger.kernel.org>
-References: <157117606853.15019.15459271147790470307.stgit@warthog.procyon.org.uk>
- <157117608708.15019.1998141309054662114.stgit@warthog.procyon.org.uk>
- <CAHk-=whiz1sHXu8SVZKEC2dup=r5JMrftPtEt6ff9Ea8dyH8yQ@mail.gmail.com>
-From:   Tim Chen <tim.c.chen@linux.intel.com>
-Openpgp: preference=signencrypt
-Autocrypt: addr=tim.c.chen@linux.intel.com; prefer-encrypt=mutual; keydata=
- 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
- l50q2K/r651xphs7CGEdKi1nU0YJVbQxJQ==
-Subject: Re: [RFC PATCH 02/21] Add a prelocked wake-up
-Message-ID: <533ca3c5-1592-e59b-eafe-bc4a352a442d@linux.intel.com>
-Date:   Wed, 16 Oct 2019 10:02:24 -0700
+        id S2394341AbfJPSvR (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Wed, 16 Oct 2019 14:51:17 -0400
+Received: from mx0b-001b2d01.pphosted.com ([148.163.158.5]:7414 "EHLO
+        mx0a-001b2d01.pphosted.com" rhost-flags-OK-OK-OK-FAIL)
+        by vger.kernel.org with ESMTP id S1731889AbfJPSvQ (ORCPT
+        <rfc822;linux-block@vger.kernel.org>);
+        Wed, 16 Oct 2019 14:51:16 -0400
+Received: from pps.filterd (m0098416.ppops.net [127.0.0.1])
+        by mx0b-001b2d01.pphosted.com (8.16.0.27/8.16.0.27) with SMTP id x9GIkqFf090006;
+        Wed, 16 Oct 2019 14:51:12 -0400
+Received: from pps.reinject (localhost [127.0.0.1])
+        by mx0b-001b2d01.pphosted.com with ESMTP id 2vp8bah28h-1
+        (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
+        Wed, 16 Oct 2019 14:51:12 -0400
+Received: from m0098416.ppops.net (m0098416.ppops.net [127.0.0.1])
+        by pps.reinject (8.16.0.27/8.16.0.27) with SMTP id x9GIlWOj091588;
+        Wed, 16 Oct 2019 14:51:12 -0400
+Received: from ppma04wdc.us.ibm.com (1a.90.2fa9.ip4.static.sl-reverse.com [169.47.144.26])
+        by mx0b-001b2d01.pphosted.com with ESMTP id 2vp8bah284-1
+        (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
+        Wed, 16 Oct 2019 14:51:11 -0400
+Received: from pps.filterd (ppma04wdc.us.ibm.com [127.0.0.1])
+        by ppma04wdc.us.ibm.com (8.16.0.27/8.16.0.27) with SMTP id x9GIp3nr011605;
+        Wed, 16 Oct 2019 18:51:11 GMT
+Received: from b01cxnp23034.gho.pok.ibm.com (b01cxnp23034.gho.pok.ibm.com [9.57.198.29])
+        by ppma04wdc.us.ibm.com with ESMTP id 2vk6f7ex0w-1
+        (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
+        Wed, 16 Oct 2019 18:51:11 +0000
+Received: from b01ledav001.gho.pok.ibm.com (b01ledav001.gho.pok.ibm.com [9.57.199.106])
+        by b01cxnp23034.gho.pok.ibm.com (8.14.9/8.14.9/NCO v10.0) with ESMTP id x9GIpAqZ52166996
+        (version=TLSv1/SSLv3 cipher=DHE-RSA-AES256-GCM-SHA384 bits=256 verify=OK);
+        Wed, 16 Oct 2019 18:51:11 GMT
+Received: from b01ledav001.gho.pok.ibm.com (unknown [127.0.0.1])
+        by IMSVA (Postfix) with ESMTP id DAF4228059;
+        Wed, 16 Oct 2019 18:51:10 +0000 (GMT)
+Received: from b01ledav001.gho.pok.ibm.com (unknown [127.0.0.1])
+        by IMSVA (Postfix) with ESMTP id 95E5128064;
+        Wed, 16 Oct 2019 18:51:10 +0000 (GMT)
+Received: from [9.60.75.213] (unknown [9.60.75.213])
+        by b01ledav001.gho.pok.ibm.com (Postfix) with ESMTP;
+        Wed, 16 Oct 2019 18:51:10 +0000 (GMT)
+Subject: Re: [PATCH v5 5/7] block: Delay default elevator initialization
+From:   Eric Farman <farman@linux.ibm.com>
+To:     Damien Le Moal <damien.lemoal@wdc.com>,
+        linux-block@vger.kernel.org, Jens Axboe <axboe@kernel.dk>,
+        linux-scsi@vger.kernel.org,
+        "Martin K . Petersen" <martin.petersen@oracle.com>,
+        dm-devel@redhat.com, Mike Snitzer <snitzer@redhat.com>
+Cc:     Ming Lei <ming.lei@redhat.com>,
+        Christian Borntraeger <borntraeger@de.ibm.com>
+References: <20190905095135.26026-1-damien.lemoal@wdc.com>
+ <20190905095135.26026-6-damien.lemoal@wdc.com>
+ <9355c25f-61d7-b290-7d60-552ef4206e8c@linux.ibm.com>
+Message-ID: <f5f3a25b-19f5-bf29-2f38-f40f59860aeb@linux.ibm.com>
+Date:   Wed, 16 Oct 2019 14:51:10 -0400
 User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:60.0) Gecko/20100101
- Thunderbird/60.7.0
+ Thunderbird/60.9.0
 MIME-Version: 1.0
-In-Reply-To: <CAHk-=whiz1sHXu8SVZKEC2dup=r5JMrftPtEt6ff9Ea8dyH8yQ@mail.gmail.com>
+In-Reply-To: <9355c25f-61d7-b290-7d60-552ef4206e8c@linux.ibm.com>
 Content-Type: text/plain; charset=utf-8
 Content-Language: en-US
-Content-Transfer-Encoding: 8bit
+Content-Transfer-Encoding: 7bit
+X-TM-AS-GCONF: 00
+X-Proofpoint-Virus-Version: vendor=fsecure engine=2.50.10434:,, definitions=2019-10-16_07:,,
+ signatures=0
+X-Proofpoint-Spam-Details: rule=outbound_notspam policy=outbound score=0 priorityscore=1501
+ malwarescore=0 suspectscore=0 phishscore=0 bulkscore=0 spamscore=0
+ clxscore=1015 lowpriorityscore=0 mlxscore=0 impostorscore=0
+ mlxlogscore=999 adultscore=0 classifier=spam adjust=0 reason=mlx
+ scancount=1 engine=8.0.1-1908290000 definitions=main-1910160153
 Sender: linux-block-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-On 10/15/19 3:14 PM, Linus Torvalds wrote:
-> On Tue, Oct 15, 2019 at 2:48 PM David Howells <dhowells@redhat.com> wrote:
+
+
+On 10/1/19 4:46 PM, Eric Farman wrote:
+> 
+> 
+> On 9/5/19 5:51 AM, Damien Le Moal wrote:
+>> When elevator_init_mq() is called from blk_mq_init_allocated_queue(),
+>> the only information known about the device is the number of hardware
+>> queues as the block device scan by the device driver is not completed
+>> yet for most drivers. The device type and elevator required features
+>> are not set yet, preventing to correctly select the default elevator
+>> most suitable for the device.
 >>
->> Add a wakeup call for a case whereby the caller already has the waitqueue
->> spinlock held.
+>> This currently affects all multi-queue zoned block devices which default
+>> to the "none" elevator instead of the required "mq-deadline" elevator.
+>> These drives currently include host-managed SMR disks connected to a
+>> smartpqi HBA and null_blk block devices with zoned mode enabled.
+>> Upcoming NVMe Zoned Namespace devices will also be affected.
+>>
+>> Fix this by adding the boolean elevator_init argument to
+>> blk_mq_init_allocated_queue() to control the execution of
+>> elevator_init_mq(). Two cases exist:
+>> 1) elevator_init = false is used for calls to
+>>    blk_mq_init_allocated_queue() within blk_mq_init_queue(). In this
+>>    case, a call to elevator_init_mq() is added to __device_add_disk(),
+>>    resulting in the delayed initialization of the queue elevator
+>>    after the device driver finished probing the device information. This
+>>    effectively allows elevator_init_mq() access to more information
+>>    about the device.
+>> 2) elevator_init = true preserves the current behavior of initializing
+>>    the elevator directly from blk_mq_init_allocated_queue(). This case
+>>    is used for the special request based DM devices where the device
+>>    gendisk is created before the queue initialization and device
+>>    information (e.g. queue limits) is already known when the queue
+>>    initialization is executed.
+>>
+>> Additionally, to make sure that the elevator initialization is never
+>> done while requests are in-flight (there should be none when the device
+>> driver calls device_add_disk()), freeze and quiesce the device request
+>> queue before calling blk_mq_init_sched() in elevator_init_mq().
+>>
+>> Signed-off-by: Damien Le Moal <damien.lemoal@wdc.com>
 > 
-> That naming is crazy.
+> Coincidentally, I had been looking into a problem that is fixed in
+> 5.4-rc1 by this patch.  Thanks for that!
 > 
-> We already have helper functions like this, and they are just called
-> "wake_up_locked()".
+> The problem was a delay during boot of a KVM guest with virtio-scsi
+> devices (or hotplug of such a device to a guest) in recent releases,
+> especially when virtio-scsi is configured as a module.  The symptoms
+> look like:
 > 
-> So the "prelocked" naming is just odd. Make it be
-> wake_up_interruptible_sync_poll_locked().
+> [    0.975315] virtio_blk virtio2: [vda] 1803060 4096-byte logical
+> blocks (7.39 GB/6.88 GiB)
+> [    0.977859] scsi host0: Virtio SCSI HBA
+> [    0.980339] scsi 0:0:0:0: Direct-Access     QEMU     QEMU HARDDISK
+> 2.5+ PQ: 0 ANSI: 5
+> [    0.981685]  vda:VOL1/  0XA906: vda1
+> [    0.988253] alg: No test for crc32be (crc32be-vx)
+> ...stall...
+> [   24.544920] sd 0:0:0:0: Power-on or device reset occurred
+> [   24.545176] sd 0:0:0:0: Attached scsi generic sg0 type 0
+> [   24.545292] sd 0:0:0:0: [sda] 385 512-byte logical blocks: (197
+> kB/193 KiB)
+> [   24.545368] sd 0:0:0:0: [sda] Write Protect is off
+> [   24.545416] sd 0:0:0:0: [sda] Mode Sense: 63 00 00 08
+> [   24.545456] sd 0:0:0:0: [sda] Write cache: enabled, read cache:
+> enabled, doesn't support DPO or FUA
+> [   24.547033] sd 0:0:0:0: [sda] Attached SCSI disk
 > 
-> The helper function should likely be
-> 
->   void __wake_up_locked_sync_key(struct wait_queue_head *wq_head,
-> unsigned int mode, void *key)
->   {
->         __wake_up_common(wq_head, mode, 1, WF_SYNC, key, NULL);
->   }
->   EXPORT_SYMBOL_GPL(__wake_up_locked_sync_key);
-> 
-> to match the other naming patterns there.
-> 
-> [ Unrelated ]
-> 
-> Looking at that mess of functions, I also wonder if we should try to
-> just remove the bookmark code again. It was cute, and it was useful,
-> but I think the problem with the page lock list may have been fixed by
-> commit 9a1ea439b16b ("mm: put_and_wait_on_page_locked() while page is
-> migrated") which avoids the retry condition with
-> migrate_page_move_mapping().
-> 
-> Tim/Kan? Do you have the problematic load still?
-> 
+> I debugged this down to the same behavior described/fixed back in 3.18
+> by commit 17497acbdce9 ("blk-mq, percpu_ref: start q->mq_usage_counter
+> in atomic mode"), and for the same reason.  The delay starts occurring
+> as soon as q->q_usage_counter is converted to percpu for the one LUN tha
+> twas found, while scsi_scan_channel() is still working on its loop of
+> mostly non-existent devices.  Exactly when this problem started
+> re-occuring is not certain to me, though I did see this problem with 5.2
+> on linux-stable.
 
-Unfortunately, we do not have ready access to that problematic load
-which was run by a customer on 8 socket system.  They were not
-willing to give the workload to us, and have not responded to my
-request to rerun their load with commit 9a1ea439b16b.
+This problem started occurring reliably with kernel 4.16 because of
+commit b5b6e8c8d3b4 ("scsi: virtio_scsi: fix IO hang caused by automatic
+irq vector affinity") which forced blk-mq on for virtio-scsi devices.
 
-The commit greatly reduced migration failures with concurrent page faulting.
-And successful migrations could have prevented the big
-pile up of waiters faulting and waiting on the page, which was the
-problem the bookmark code was trying to solve.
+I'm able to reproduce the behavior (fixed by this commit) on 4.15.0, as
+well as 4.14.0 and 4.9.0, if I enable SCSI_MQ_DEFAULT in the kernel
+config.  I cannot reproduce it with 4.4.0, but didn't chase further to
+see why that was the case.
 
-So I also tend to think that the problem should have been resolved.
-But unfortunately I don't have a ready workload to confirm.
+That force_blk_mq commit went into linux-stable, so SCSI_MQ_DEFAULT need
+not be enabled on 4.14.y or 4.9.y stable branches to see the behavior
+fixed by this commit.
 
-Tim
+> 
+> When I run with a 5.3 kernel, the problem is easily reproducible.  So I
+> bisected between 5.3 and 5.4-rc1, and got here.  Cherry-picking this
+> patch on top of 5.3 cleans up the boot/hotplug process and removes any
+> stall.  Any chance this could be cc'd to stable?  
 
+Please?  Anything I can do to help with that effort?
+
+Thanks,
+Eric
+
+> Any data someone wants
+> to see behavioral changes?
+> 
+> Thanks,
+> Eric
+> 
+>> ---
+>>  block/blk-mq.c         | 12 +++++++++---
+>>  block/elevator.c       |  7 +++++++
+>>  block/genhd.c          |  9 +++++++++
+>>  drivers/md/dm-rq.c     |  2 +-
+>>  include/linux/blk-mq.h |  3 ++-
+>>  5 files changed, 28 insertions(+), 5 deletions(-)
+>>
+>> diff --git a/block/blk-mq.c b/block/blk-mq.c
+>> index ee4caf0c0807..240416057f28 100644
+>> --- a/block/blk-mq.c
+>> +++ b/block/blk-mq.c
+>> @@ -2689,7 +2689,11 @@ struct request_queue *blk_mq_init_queue(struct blk_mq_tag_set *set)
+>>  	if (!uninit_q)
+>>  		return ERR_PTR(-ENOMEM);
+>>  
+>> -	q = blk_mq_init_allocated_queue(set, uninit_q);
+>> +	/*
+>> +	 * Initialize the queue without an elevator. device_add_disk() will do
+>> +	 * the initialization.
+>> +	 */
+>> +	q = blk_mq_init_allocated_queue(set, uninit_q, false);
+>>  	if (IS_ERR(q))
+>>  		blk_cleanup_queue(uninit_q);
+>>  
+>> @@ -2840,7 +2844,8 @@ static unsigned int nr_hw_queues(struct blk_mq_tag_set *set)
+>>  }
+>>  
+>>  struct request_queue *blk_mq_init_allocated_queue(struct blk_mq_tag_set *set,
+>> -						  struct request_queue *q)
+>> +						  struct request_queue *q,
+>> +						  bool elevator_init)
+>>  {
+>>  	/* mark the queue as mq asap */
+>>  	q->mq_ops = set->ops;
+>> @@ -2902,7 +2907,8 @@ struct request_queue *blk_mq_init_allocated_queue(struct blk_mq_tag_set *set,
+>>  	blk_mq_add_queue_tag_set(set, q);
+>>  	blk_mq_map_swqueue(q);
+>>  
+>> -	elevator_init_mq(q);
+>> +	if (elevator_init)
+>> +		elevator_init_mq(q);
+>>  
+>>  	return q;
+>>  
+>> diff --git a/block/elevator.c b/block/elevator.c
+>> index 520d6b224b74..096a670d22d7 100644
+>> --- a/block/elevator.c
+>> +++ b/block/elevator.c
+>> @@ -712,7 +712,14 @@ void elevator_init_mq(struct request_queue *q)
+>>  	if (!e)
+>>  		return;
+>>  
+>> +	blk_mq_freeze_queue(q);
+>> +	blk_mq_quiesce_queue(q);
+>> +
+>>  	err = blk_mq_init_sched(q, e);
+>> +
+>> +	blk_mq_unquiesce_queue(q);
+>> +	blk_mq_unfreeze_queue(q);
+>> +
+>>  	if (err) {
+>>  		pr_warn("\"%s\" elevator initialization failed, "
+>>  			"falling back to \"none\"\n", e->elevator_name);
+>> diff --git a/block/genhd.c b/block/genhd.c
+>> index 54f1f0d381f4..26b31fcae217 100644
+>> --- a/block/genhd.c
+>> +++ b/block/genhd.c
+>> @@ -695,6 +695,15 @@ static void __device_add_disk(struct device *parent, struct gendisk *disk,
+>>  	dev_t devt;
+>>  	int retval;
+>>  
+>> +	/*
+>> +	 * The disk queue should now be all set with enough information about
+>> +	 * the device for the elevator code to pick an adequate default
+>> +	 * elevator if one is needed, that is, for devices requesting queue
+>> +	 * registration.
+>> +	 */
+>> +	if (register_queue)
+>> +		elevator_init_mq(disk->queue);
+>> +
+>>  	/* minors == 0 indicates to use ext devt from part0 and should
+>>  	 * be accompanied with EXT_DEVT flag.  Make sure all
+>>  	 * parameters make sense.
+>> diff --git a/drivers/md/dm-rq.c b/drivers/md/dm-rq.c
+>> index 21d5c1784d0c..3f8577e2c13b 100644
+>> --- a/drivers/md/dm-rq.c
+>> +++ b/drivers/md/dm-rq.c
+>> @@ -563,7 +563,7 @@ int dm_mq_init_request_queue(struct mapped_device *md, struct dm_table *t)
+>>  	if (err)
+>>  		goto out_kfree_tag_set;
+>>  
+>> -	q = blk_mq_init_allocated_queue(md->tag_set, md->queue);
+>> +	q = blk_mq_init_allocated_queue(md->tag_set, md->queue, true);
+>>  	if (IS_ERR(q)) {
+>>  		err = PTR_ERR(q);
+>>  		goto out_tag_set;
+>> diff --git a/include/linux/blk-mq.h b/include/linux/blk-mq.h
+>> index 62a3bb715899..0bf056de5cc3 100644
+>> --- a/include/linux/blk-mq.h
+>> +++ b/include/linux/blk-mq.h
+>> @@ -248,7 +248,8 @@ enum {
+>>  
+>>  struct request_queue *blk_mq_init_queue(struct blk_mq_tag_set *);
+>>  struct request_queue *blk_mq_init_allocated_queue(struct blk_mq_tag_set *set,
+>> -						  struct request_queue *q);
+>> +						  struct request_queue *q,
+>> +						  bool elevator_init);
+>>  struct request_queue *blk_mq_init_sq_queue(struct blk_mq_tag_set *set,
+>>  						const struct blk_mq_ops *ops,
+>>  						unsigned int queue_depth,
+>>
