@@ -2,141 +2,178 @@ Return-Path: <SRS0=Rbhm=YJ=vger.kernel.org=linux-block-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-2.2 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
-	MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,USER_AGENT_SANE_1 autolearn=no
-	autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-3.7 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
+	MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED
+	autolearn=no autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id ECE32FA3728
-	for <linux-block@archiver.kernel.org>; Wed, 16 Oct 2019 16:19:12 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 8598AFA3728
+	for <linux-block@archiver.kernel.org>; Wed, 16 Oct 2019 17:01:22 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.kernel.org (Postfix) with ESMTP id CC11F20663
-	for <linux-block@archiver.kernel.org>; Wed, 16 Oct 2019 16:19:12 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id 5F02F21835
+	for <linux-block@archiver.kernel.org>; Wed, 16 Oct 2019 17:01:22 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S2393171AbfJPQTM (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Wed, 16 Oct 2019 12:19:12 -0400
-Received: from szxga05-in.huawei.com ([45.249.212.191]:4225 "EHLO huawei.com"
-        rhost-flags-OK-OK-OK-FAIL) by vger.kernel.org with ESMTP
-        id S1727154AbfJPQTM (ORCPT <rfc822;linux-block@vger.kernel.org>);
-        Wed, 16 Oct 2019 12:19:12 -0400
-Received: from DGGEMS403-HUB.china.huawei.com (unknown [172.30.72.60])
-        by Forcepoint Email with ESMTP id BE32790E65EB513AF075;
-        Thu, 17 Oct 2019 00:19:08 +0800 (CST)
-Received: from [127.0.0.1] (10.202.227.179) by DGGEMS403-HUB.china.huawei.com
- (10.3.19.203) with Microsoft SMTP Server id 14.3.439.0; Thu, 17 Oct 2019
- 00:19:06 +0800
-Subject: Re: [PATCH V4 0/5] blk-mq: improvement on handling IO during CPU
- hotplug
-To:     Ming Lei <ming.lei@redhat.com>
-References: <20191014015043.25029-1-ming.lei@redhat.com>
- <d30420d7-74d9-4417-1bbe-8113848e74fa@huawei.com>
- <20191016120729.GB5515@ming.t460p>
-CC:     Jens Axboe <axboe@kernel.dk>, <linux-block@vger.kernel.org>,
-        "Bart Van Assche" <bvanassche@acm.org>,
-        Hannes Reinecke <hare@suse.com>,
-        "Christoph Hellwig" <hch@lst.de>,
-        Thomas Gleixner <tglx@linutronix.de>,
-        Keith Busch <keith.busch@intel.com>
-From:   John Garry <john.garry@huawei.com>
-Message-ID: <9dbc14ab-65cd-f7ac-384c-2dbe03575ee7@huawei.com>
-Date:   Wed, 16 Oct 2019 17:19:01 +0100
-User-Agent: Mozilla/5.0 (Windows NT 10.0; WOW64; rv:45.0) Gecko/20100101
- Thunderbird/45.3.0
+        id S2406549AbfJPRBV (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Wed, 16 Oct 2019 13:01:21 -0400
+Received: from iolanthe.rowland.org ([192.131.102.54]:42252 "HELO
+        iolanthe.rowland.org" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with SMTP id S2406297AbfJPRBV (ORCPT
+        <rfc822;linux-block@vger.kernel.org>);
+        Wed, 16 Oct 2019 13:01:21 -0400
+Received: (qmail 2878 invoked by uid 2102); 16 Oct 2019 13:01:20 -0400
+Received: from localhost (sendmail-bs@127.0.0.1)
+  by localhost with SMTP; 16 Oct 2019 13:01:20 -0400
+Date:   Wed, 16 Oct 2019 13:01:20 -0400 (EDT)
+From:   Alan Stern <stern@rowland.harvard.edu>
+X-X-Sender: stern@iolanthe.rowland.org
+To:     Piergiorgio Sartor <piergiorgio.sartor@nexgo.de>
+cc:     Christoph Hellwig <hch@lst.de>, Jens Axboe <axboe@kernel.dk>,
+        USB list <linux-usb@vger.kernel.org>,
+        <linux-block@vger.kernel.org>,
+        Kernel development list <linux-kernel@vger.kernel.org>
+Subject: Re: reeze while write on external usb 3.0 hard disk [Bug 204095]
+In-Reply-To: <20191013181116.GA3858@lazy.lzy>
+Message-ID: <Pine.LNX.4.44L0.1910161258081.1304-100000@iolanthe.rowland.org>
 MIME-Version: 1.0
-In-Reply-To: <20191016120729.GB5515@ming.t460p>
-Content-Type: text/plain; charset="windows-1252"; format=flowed
-Content-Transfer-Encoding: 7bit
-X-Originating-IP: [10.202.227.179]
-X-CFilter-Loop: Reflected
+Content-Type: TEXT/PLAIN; charset=US-ASCII
 Sender: linux-block-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-On 16/10/2019 13:07, Ming Lei wrote:
-> On Wed, Oct 16, 2019 at 09:58:27AM +0100, John Garry wrote:
->> On 14/10/2019 02:50, Ming Lei wrote:
->>> Hi,
->>>
->>> Thomas mentioned:
->>>     "
->>>      That was the constraint of managed interrupts from the very beginning:
->>>
->>>       The driver/subsystem has to quiesce the interrupt line and the associated
->>>       queue _before_ it gets shutdown in CPU unplug and not fiddle with it
->>>       until it's restarted by the core when the CPU is plugged in again.
->>>     "
->>>
->>> But no drivers or blk-mq do that before one hctx becomes dead(all
->>> CPUs for one hctx are offline), and even it is worse, blk-mq stills tries
->>> to run hw queue after hctx is dead, see blk_mq_hctx_notify_dead().
->>>
->>> This patchset tries to address the issue by two stages:
->>>
->>> 1) add one new cpuhp state of CPUHP_AP_BLK_MQ_ONLINE
->>>
->>> - mark the hctx as internal stopped, and drain all in-flight requests
->>> if the hctx is going to be dead.
->>>
->>> 2) re-submit IO in the state of CPUHP_BLK_MQ_DEAD after the hctx becomes dead
->>>
->>> - steal bios from the request, and resubmit them via generic_make_request(),
->>> then these IO will be mapped to other live hctx for dispatch
->>>
->>> Please comment & review, thanks!
->>>
->>> John, I don't add your tested-by tag since V3 have some changes,
->>> and I appreciate if you may run your test on V3.
->>
->> Hi Ming,
->>
->> So I got around to doing some testing. The good news is that issue which we
->> were experiencing in v3 series seems to have has gone away - alot more
->> stable.
->>
->> However, unfortunately, I did notice some SCSI timeouts:
->>
->> 15508.615074] CPU2: shutdown
->> [15508.617778] psci: CPU2 killed.
->> [15508.651220] CPU1: shutdown
->> [15508.653924] psci: CPU1 killed.
->> [15518.406229] sas: Enter sas_scsi_recover_host busy: 63 failed: 63
->> Jobs: 1 (f=1): [R] [0.0% done] [0[15518.412239] sas: sas_scsi_find_task:
->> aborting task 0x00000000a7159744
->> KB/0KB/0KB /s] [0/0/0 iops] [eta [15518.421708] sas:
->> sas_eh_handle_sas_errors: task 0x00000000a7159744 is done
->> [15518.431266] sas: sas_scsi_find_task: aborting task 0x00000000d39731eb
->> [15518.442539] sas: sas_eh_handle_sas_errors: task 0x00000000d39731eb is
->> done
->> [15518.449407] sas: sas_scsi_find_task: aborting task 0x000000009f77c9bd
->> [15518.455899] sas: sas_eh_handle_sas_errors: task 0x000000009f77c9bd is
->> done
->>
->> A couple of things to note:
->> - I added some debug prints in blk_mq_hctx_drain_inflight_rqs() for when
->> inflights rqs !=0, and I don't see them for this timeout
->> - 0 datarate reported from fio
->>
->> I'll have a look...
->
-> What is the output of the following command?
->
-> (cd /sys/kernel/debug/block/$SAS_DISK && find . -type f -exec grep -aH . {} \;)
-I assume that you want this run at about the time SCSI EH kicks in for 
-the timeout, right? If so, I need to find some simple sysfs entry to 
-tell me of this occurrence, to trigger the capture. Or add something. My 
-script is pretty dump.
+On Sun, 13 Oct 2019, Piergiorgio Sartor wrote:
 
-BTW, I did notice that we the dump_stack in __blk_mq_run_hw_queue() 
-pretty soon before the problem happens - maybe a clue or maybe coincidence.
+> On Mon, Sep 30, 2019 at 08:25:01PM +0200, Piergiorgio Sartor wrote:
+> > On Sun, Sep 29, 2019 at 09:01:48PM -0400, Alan Stern wrote:
+> > > On Sun, 29 Sep 2019, Piergiorgio Sartor wrote:
+> > > 
+> > > > On Wed, Sep 25, 2019 at 02:31:58PM -0400, Alan Stern wrote:
+> > > > > On Wed, 25 Sep 2019, Piergiorgio Sartor wrote:
+> > > > > 
+> > > > > > On Mon, Aug 26, 2019 at 07:38:33PM +0200, Piergiorgio Sartor wrote:
+> > > > > > > On Tue, Aug 20, 2019 at 06:37:22PM +0200, Piergiorgio Sartor wrote:
+> > > > > > > > On Tue, Aug 20, 2019 at 09:23:26AM +0200, Christoph Hellwig wrote:
+> > > > > > > > > On Mon, Aug 19, 2019 at 10:14:25AM -0400, Alan Stern wrote:
+> > > > > > > > > > Let's bring this to the attention of some more people.
+> > > > > > > > > > 
+> > > > > > > > > > It looks like the bug that was supposed to be fixed by commit
+> > > > > > > > > > d74ffae8b8dd ("usb-storage: Add a limitation for
+> > > > > > > > > > blk_queue_max_hw_sectors()"), which is part of 5.2.5, but apparently
+> > > > > > > > > > the bug still occurs.
+> > > > > > > > > 
+> > > > > > > > > Piergiorgio,
+> > > > > > > > > 
+> > > > > > > > > can you dump the content of max_hw_sectors_kb file for your USB storage
+> > > > > > > > > device and send that to this thread?
+> > > > > > > > 
+> > > > > > > > Hi all,
+> > > > > > > > 
+> > > > > > > > for both kernels, 5.1.20 (working) and 5.2.8 (not working),
+> > > > > > > > the content of /sys/dev/x:y/queue/max_hw_sectors_kb is 512
+> > > > > > > > for USB storage devices (2.0 and 3.0).
+> > > > > > > > 
+> > > > > > > > This is for the PC showing the issue.
+> > > > > > > > 
+> > > > > > > > In an other PC, which does not show the issus at the moment,
+> > > > > > > > the values are 120, for USB2.0, and 256, for USB3.0.
+> > > 
+> > > > > One thing you can try is git bisect from 5.1.20 (or maybe just 5.1.0)  
+> > > > > to 5.2.8.  If you can identify a particular commit which caused the
+> > > > > problem to start, that would help.
+> > > > 
+> > > > OK, I tried a bisect (2 days compilations...).
+> > > > Assuming I've done everything correctly (how to
+> > > > test this? How to remove the guilty patch?), this
+> > > > was the result:
+> > > > 
+> > > > 09324d32d2a0843e66652a087da6f77924358e62 is the first bad commit
+> > > > commit 09324d32d2a0843e66652a087da6f77924358e62
+> > > > Author: Christoph Hellwig <hch@lst.de>
+> > > > Date:   Tue May 21 09:01:41 2019 +0200
+> > > > 
+> > > >     block: force an unlimited segment size on queues with a virt boundary
+> > > > 
+> > > >     We currently fail to update the front/back segment size in the bio when
+> > > >     deciding to allow an otherwise gappy segement to a device with a
+> > > >     virt boundary.  The reason why this did not cause problems is that
+> > > >     devices with a virt boundary fundamentally don't use segments as we
+> > > >     know it and thus don't care.  Make that assumption formal by forcing
+> > > >     an unlimited segement size in this case.
+> > > > 
+> > > >     Fixes: f6970f83ef79 ("block: don't check if adjacent bvecs in one bio can be mergeable")
+> > > >     Signed-off-by: Christoph Hellwig <hch@lst.de>
+> > > >     Reviewed-by: Ming Lei <ming.lei@redhat.com>
+> > > >     Reviewed-by: Hannes Reinecke <hare@suse.com>
+> > > >     Signed-off-by: Jens Axboe <axboe@kernel.dk>
+> > > > 
+> > > > :040000 040000 57ba04a02f948022c0f6ba24bfa36f3b565b2440 8c925f71ce75042529c001bf244b30565d19ebf3 M      block
+> > > > 
+> > > > What to do now?
+> > > 
+> > > Here's how to verify that the bisection got a correct result.  First, 
+> > > do a git checkout of commit 09324d32d2a0, build the kernel, and make 
+> > > sure that it exhibits the problem.
+> > > 
+> > > Next, have git write out the contents of that commit in the form of a
+> > > patch (git show commit-id >patchfile), and revert it (git apply -R
+> > > patchfile).  Build the kernel from that tree, and make sure that it
+> > > does not exhibit the problem.  If it doesn't, you have definitely shown
+> > > that this commit is the cause (or at least, is _one_ of the causes).
+> > 
+> > I tried as suggested, i.e. jumping to commit
+> > 09324d32d2a0843e66652a087da6f77924358e62, testing,
+> > removing the patch, testing.
+> > The result was as expected.
+> > I was able to reproduce the issue with the commit,
+> > I was not able to reproduce it without.
+> > It seems this patch / commit is causing the problem.
+> > Directly or indirectly.
+> > 
+> > What are the next steps?
+> 
+> Hi all,
+> 
+> I tested kernel 5.3.5 (Fedora kernel-5.3.5-200.fc30.x86_64),
+> with same problematic results.
+> 
+> Again, what should be done now?
+> Could you please revert the patch?
+> 
+> Or is there something else to check?
 
-Thanks,
-John
+Here is one more thing you can try.  I have no idea whether it will 
+make any difference, but the Changelog entry for the patch you 
+identified suggests that it might help.
 
->
-> Thanks,
-> Ming
->
-> .
->
+Alan Stern
 
+
+
+Index: usb-devel/drivers/usb/storage/scsiglue.c
+===================================================================
+--- usb-devel.orig/drivers/usb/storage/scsiglue.c
++++ usb-devel/drivers/usb/storage/scsiglue.c
+@@ -68,7 +68,6 @@ static const char* host_info(struct Scsi
+ static int slave_alloc (struct scsi_device *sdev)
+ {
+ 	struct us_data *us = host_to_us(sdev->host);
+-	int maxp;
+ 
+ 	/*
+ 	 * Set the INQUIRY transfer length to 36.  We don't use any of
+@@ -78,15 +77,6 @@ static int slave_alloc (struct scsi_devi
+ 	sdev->inquiry_len = 36;
+ 
+ 	/*
+-	 * USB has unusual scatter-gather requirements: the length of each
+-	 * scatterlist element except the last must be divisible by the
+-	 * Bulk maxpacket value.  Fortunately this value is always a
+-	 * power of 2.  Inform the block layer about this requirement.
+-	 */
+-	maxp = usb_maxpacket(us->pusb_dev, us->recv_bulk_pipe, 0);
+-	blk_queue_virt_boundary(sdev->request_queue, maxp - 1);
+-
+-	/*
+ 	 * Some host controllers may have alignment requirements.
+ 	 * We'll play it safe by requiring 512-byte alignment always.
+ 	 */
 
