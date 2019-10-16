@@ -2,267 +2,161 @@ Return-Path: <SRS0=Rbhm=YJ=vger.kernel.org=linux-block-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-2.4 required=3.0 tests=DKIM_SIGNED,DKIM_VALID,
-	DKIM_VALID_AU,HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SPF_HELO_NONE,
-	SPF_PASS,USER_AGENT_SANE_1 autolearn=no autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-2.2 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
+	MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED,USER_AGENT_SANE_1
+	autolearn=no autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 3DB97ECE588
-	for <linux-block@archiver.kernel.org>; Wed, 16 Oct 2019 07:46:22 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 523CCC4360C
+	for <linux-block@archiver.kernel.org>; Wed, 16 Oct 2019 08:58:39 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.kernel.org (Postfix) with ESMTP id 0C3FA2082C
-	for <linux-block@archiver.kernel.org>; Wed, 16 Oct 2019 07:46:22 +0000 (UTC)
-Authentication-Results: mail.kernel.org;
-	dkim=pass (1024-bit key) header.d=rasmusvillemoes.dk header.i=@rasmusvillemoes.dk header.b="RU4N7tUw"
+	by mail.kernel.org (Postfix) with ESMTP id 3158A20872
+	for <linux-block@archiver.kernel.org>; Wed, 16 Oct 2019 08:58:39 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1726796AbfJPHqQ (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Wed, 16 Oct 2019 03:46:16 -0400
-Received: from mail-lf1-f67.google.com ([209.85.167.67]:41015 "EHLO
-        mail-lf1-f67.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S2391267AbfJPHqP (ORCPT
-        <rfc822;linux-block@vger.kernel.org>);
-        Wed, 16 Oct 2019 03:46:15 -0400
-Received: by mail-lf1-f67.google.com with SMTP id r2so16576859lfn.8
-        for <linux-block@vger.kernel.org>; Wed, 16 Oct 2019 00:46:14 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=rasmusvillemoes.dk; s=google;
-        h=subject:to:cc:references:from:message-id:date:user-agent
-         :mime-version:in-reply-to:content-language:content-transfer-encoding;
-        bh=QvRi7PNoggQszDfre8D+FBzcsSh0CBoNlDWz8tev6yQ=;
-        b=RU4N7tUwuMfI1VibR44SQ9yks8vKVb5eF1y46S/6t3LFTW4cFYnE80Pk+GUbw9adiY
-         7pkUda9TFfJCZh0Qnm9cHSUhUFa+fL1/80R0Qg8cq0fEMSiE/3ZYOfVy582xWOfe7GAx
-         BtuoalHwtq4x9rd3dhU0C8u0WLYIKTsURlQ7Y=
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20161025;
-        h=x-gm-message-state:subject:to:cc:references:from:message-id:date
-         :user-agent:mime-version:in-reply-to:content-language
-         :content-transfer-encoding;
-        bh=QvRi7PNoggQszDfre8D+FBzcsSh0CBoNlDWz8tev6yQ=;
-        b=nsEeoJzkz4iUY5wyn8p5N40N14g5QNArvgVF7nNStN4rOFv9VddtqCdZgqq14kxzdG
-         8cDMeqOaqvClKF9bQGf2uEFYfQ4BdaoxcnrcEvdTB7jMcVf+K/7ww/qjvexeFEO1MnGU
-         2EnixrHg6d4si7HRGy2GMqHWTdXtkyTtHtXi5qhle3JrFUHoAIZuwGguVjf+ZUX65IL4
-         CJnTyNU2E7KrPt0y+LFPf77wWwQwazLipD5gTISns7P67uYFKXxDTc28GhtD4qv3wE0Z
-         NPmTPaQsheDonfyEnDBj4980PksBYH5Yjs0ZU1cFZulORG1ZrEWVWz4JKTY4f8zDN7nc
-         KbRQ==
-X-Gm-Message-State: APjAAAUqokQsFG9iDt4A4L6qRM+3+5T+Eaib0CIk3WE9sj/QtBCo7ZfO
-        weXWmaedgFFkSi6GfqoVca34Cn9mCJ+YZySO
-X-Google-Smtp-Source: APXvYqyBmqGfoeKFBJH4OrBLDBFGebGhLmDfJwIYHLGKut9DDipI1Qyw/3UVrk5mWZI3oDJFyaWWGQ==
-X-Received: by 2002:a19:6759:: with SMTP id e25mr3829669lfj.80.1571211973028;
-        Wed, 16 Oct 2019 00:46:13 -0700 (PDT)
-Received: from [172.16.11.28] ([81.216.59.226])
-        by smtp.gmail.com with ESMTPSA id q26sm5650578lfd.53.2019.10.16.00.46.10
-        (version=TLS1_2 cipher=ECDHE-RSA-AES128-GCM-SHA256 bits=128/128);
-        Wed, 16 Oct 2019 00:46:12 -0700 (PDT)
-Subject: Re: [RFC PATCH 03/21] pipe: Use head and tail pointers for the ring,
- not cursor and length
-To:     David Howells <dhowells@redhat.com>, torvalds@linux-foundation.org
-Cc:     Casey Schaufler <casey@schaufler-ca.com>,
-        Stephen Smalley <sds@tycho.nsa.gov>,
-        Greg Kroah-Hartman <gregkh@linuxfoundation.org>,
-        nicolas.dichtel@6wind.com, raven@themaw.net,
-        Christian Brauner <christian@brauner.io>,
-        keyrings@vger.kernel.org, linux-usb@vger.kernel.org,
-        linux-block@vger.kernel.org, linux-security-module@vger.kernel.org,
-        linux-fsdevel@vger.kernel.org, linux-api@vger.kernel.org,
-        linux-kernel@vger.kernel.org
-References: <157117606853.15019.15459271147790470307.stgit@warthog.procyon.org.uk>
- <157117609543.15019.17103851546424902507.stgit@warthog.procyon.org.uk>
-From:   Rasmus Villemoes <linux@rasmusvillemoes.dk>
-Message-ID: <b8799179-d389-8005-4f6d-845febc3bb23@rasmusvillemoes.dk>
-Date:   Wed, 16 Oct 2019 09:46:10 +0200
-User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:60.0) Gecko/20100101
- Thunderbird/60.9.0
+        id S2389107AbfJPI6i (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Wed, 16 Oct 2019 04:58:38 -0400
+Received: from szxga06-in.huawei.com ([45.249.212.32]:45330 "EHLO huawei.com"
+        rhost-flags-OK-OK-OK-FAIL) by vger.kernel.org with ESMTP
+        id S2388817AbfJPI6i (ORCPT <rfc822;linux-block@vger.kernel.org>);
+        Wed, 16 Oct 2019 04:58:38 -0400
+Received: from DGGEMS403-HUB.china.huawei.com (unknown [172.30.72.58])
+        by Forcepoint Email with ESMTP id 18EE1BDB72AB2273BE37;
+        Wed, 16 Oct 2019 16:58:36 +0800 (CST)
+Received: from [127.0.0.1] (10.202.227.179) by DGGEMS403-HUB.china.huawei.com
+ (10.3.19.203) with Microsoft SMTP Server id 14.3.439.0; Wed, 16 Oct 2019
+ 16:58:33 +0800
+Subject: Re: [PATCH V4 0/5] blk-mq: improvement on handling IO during CPU
+ hotplug
+To:     Ming Lei <ming.lei@redhat.com>, Jens Axboe <axboe@kernel.dk>
+References: <20191014015043.25029-1-ming.lei@redhat.com>
+CC:     <linux-block@vger.kernel.org>,
+        Bart Van Assche <bvanassche@acm.org>,
+        Hannes Reinecke <hare@suse.com>,
+        Christoph Hellwig <hch@lst.de>,
+        "Thomas Gleixner" <tglx@linutronix.de>,
+        Keith Busch <keith.busch@intel.com>
+From:   John Garry <john.garry@huawei.com>
+Message-ID: <d30420d7-74d9-4417-1bbe-8113848e74fa@huawei.com>
+Date:   Wed, 16 Oct 2019 09:58:27 +0100
+User-Agent: Mozilla/5.0 (Windows NT 10.0; WOW64; rv:45.0) Gecko/20100101
+ Thunderbird/45.3.0
 MIME-Version: 1.0
-In-Reply-To: <157117609543.15019.17103851546424902507.stgit@warthog.procyon.org.uk>
-Content-Type: text/plain; charset=utf-8
-Content-Language: en-US
+In-Reply-To: <20191014015043.25029-1-ming.lei@redhat.com>
+Content-Type: text/plain; charset="windows-1252"; format=flowed
 Content-Transfer-Encoding: 7bit
+X-Originating-IP: [10.202.227.179]
+X-CFilter-Loop: Reflected
 Sender: linux-block-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-On 15/10/2019 23.48, David Howells wrote:
-> Convert pipes to use head and tail pointers for the buffer ring rather than
-> pointer and length as the latter requires two atomic ops to update (or a
-> combined op) whereas the former only requires one.
-> 
->  (1) The head pointer is the point at which production occurs and points to
->      the slot in which the next buffer will be placed.  This is equivalent
->      to pipe->curbuf + pipe->nrbufs.
-> 
->      The head pointer belongs to the write-side.
-> 
->  (2) The tail pointer is the point at which consumption occurs.  It points
->      to the next slot to be consumed.  This is equivalent to pipe->curbuf.
-> 
->      The tail pointer belongs to the read-side.
-> 
->  (3) head and tail are allowed to run to UINT_MAX and wrap naturally.  They
->      are only masked off when the array is being accessed, e.g.:
-> 
-> 	pipe->bufs[head & mask]
-> 
->      This means that it is not necessary to have a dead slot in the ring as
->      head == tail isn't ambiguous.
-> 
->  (4) The ring is empty if "head == tail".
-> 
->  (5) The occupancy of the ring is "head - tail".
-> 
->  (6) The number of free slots in the ring is "(tail + pipe->ring_size) -
->      head".
+On 14/10/2019 02:50, Ming Lei wrote:
+> Hi,
+>
+> Thomas mentioned:
+>     "
+>      That was the constraint of managed interrupts from the very beginning:
+>
+>       The driver/subsystem has to quiesce the interrupt line and the associated
+>       queue _before_ it gets shutdown in CPU unplug and not fiddle with it
+>       until it's restarted by the core when the CPU is plugged in again.
+>     "
+>
+> But no drivers or blk-mq do that before one hctx becomes dead(all
+> CPUs for one hctx are offline), and even it is worse, blk-mq stills tries
+> to run hw queue after hctx is dead, see blk_mq_hctx_notify_dead().
+>
+> This patchset tries to address the issue by two stages:
+>
+> 1) add one new cpuhp state of CPUHP_AP_BLK_MQ_ONLINE
+>
+> - mark the hctx as internal stopped, and drain all in-flight requests
+> if the hctx is going to be dead.
+>
+> 2) re-submit IO in the state of CPUHP_BLK_MQ_DEAD after the hctx becomes dead
+>
+> - steal bios from the request, and resubmit them via generic_make_request(),
+> then these IO will be mapped to other live hctx for dispatch
+>
+> Please comment & review, thanks!
+>
+> John, I don't add your tested-by tag since V3 have some changes,
+> and I appreciate if you may run your test on V3.
 
-Seems an odd way of writing pipe->ring_size - (head - tail) ; i.e.
-obviously #free slots is #size minus #occupancy.
+Hi Ming,
 
->  (7) The ring is full if "head >= (tail + pipe->ring_size)", which can also
->      be written as "head - tail >= pipe->ring_size".
+So I got around to doing some testing. The good news is that issue which 
+we were experiencing in v3 series seems to have has gone away - alot 
+more stable.
+
+However, unfortunately, I did notice some SCSI timeouts:
+
+15508.615074] CPU2: shutdown
+[15508.617778] psci: CPU2 killed.
+[15508.651220] CPU1: shutdown
+[15508.653924] psci: CPU1 killed.
+[15518.406229] sas: Enter sas_scsi_recover_host busy: 63 failed: 63
+Jobs: 1 (f=1): [R] [0.0% done] [0[15518.412239] sas: sas_scsi_find_task: 
+aborting task 0x00000000a7159744
+KB/0KB/0KB /s] [0/0/0 iops] [eta [15518.421708] sas: 
+sas_eh_handle_sas_errors: task 0x00000000a7159744 is done
+[15518.431266] sas: sas_scsi_find_task: aborting task 0x00000000d39731eb
+[15518.442539] sas: sas_eh_handle_sas_errors: task 0x00000000d39731eb is 
+done
+[15518.449407] sas: sas_scsi_find_task: aborting task 0x000000009f77c9bd
+[15518.455899] sas: sas_eh_handle_sas_errors: task 0x000000009f77c9bd is 
+done
+
+A couple of things to note:
+- I added some debug prints in blk_mq_hctx_drain_inflight_rqs() for when 
+inflights rqs !=0, and I don't see them for this timeout
+- 0 datarate reported from fio
+
+I'll have a look...
+
+Thanks,
+John
+
+>
+> V4:
+> 	- resubmit IOs in dispatch list in case that this hctx is dead
+>
+> V3:
+> 	- re-organize patch 2 & 3 a bit for addressing Hannes's comment
+> 	- fix patch 4 for avoiding potential deadlock, as found by Hannes
+>
+> V2:
+> 	- patch4 & patch 5 in V1 have been merged to block tree, so remove
+> 	  them
+> 	- address comments from John Garry and Minwoo
+>
+>
+>
+> Ming Lei (5):
+>   blk-mq: add new state of BLK_MQ_S_INTERNAL_STOPPED
+>   blk-mq: prepare for draining IO when hctx's all CPUs are offline
+>   blk-mq: stop to handle IO and drain IO before hctx becomes dead
+>   blk-mq: re-submit IO in case that hctx is dead
+>   blk-mq: handle requests dispatched from IO scheduler in case that hctx
+>     is dead
+>
+>  block/blk-mq-debugfs.c     |   2 +
+>  block/blk-mq-tag.c         |   2 +-
+>  block/blk-mq-tag.h         |   2 +
+>  block/blk-mq.c             | 137 ++++++++++++++++++++++++++++++++++---
+>  block/blk-mq.h             |   3 +-
+>  drivers/block/loop.c       |   2 +-
+>  drivers/md/dm-rq.c         |   2 +-
+>  include/linux/blk-mq.h     |   5 ++
+>  include/linux/cpuhotplug.h |   1 +
+>  9 files changed, 141 insertions(+), 15 deletions(-)
+>
+> Cc: John Garry <john.garry@huawei.com>
+> Cc: Bart Van Assche <bvanassche@acm.org>
+> Cc: Hannes Reinecke <hare@suse.com>
+> Cc: Christoph Hellwig <hch@lst.de>
+> Cc: Thomas Gleixner <tglx@linutronix.de>
+> Cc: Keith Busch <keith.busch@intel.com>
 >
 
-No it cannot, it _must_ be written in the latter form. Assuming
-sizeof(int)==1 for simplicity, consider ring_size = 16, tail = 240.
-Regardless whether head is 240, 241, ..., 255, 0, tail + ring_size wraps
-to 0, so the former expression states the ring is full in all cases.
 
-Better spell out somewhere that while head and tail are free-running, at
-any point in time they satisfy the invariant head - tail <= pipe_size
-(and also 0 <= head - tail, but that's a tautology for unsigned
-ints...). Then it's a matter of taste if one wants to write "full" as
-head-tail == pipe_size or head-tail >= pipe_size.
-
-> Also split pipe->buffers into pipe->ring_size (which indicates the size of the
-> ring) and pipe->max_usage (which restricts the amount of ring that write() is
-> allowed to fill).  This allows for a pipe that is both writable by the kernel
-> notification facility and by userspace, allowing plenty of ring space for
-> notifications to be added whilst preventing userspace from being able to use
-> up too much buffer space.
-
-That seems like something that should be added in a separate patch -
-adding ->max_usage and switching appropriate users of ->ring_size over,
-so it's more clear where you're using one or the other.
-
-> @@ -1949,8 +1950,12 @@ static ssize_t fuse_dev_splice_write(struct pipe_inode_info *pipe,
->  
->  	pipe_lock(pipe);
->  
-> -	bufs = kvmalloc_array(pipe->nrbufs, sizeof(struct pipe_buffer),
-> -			      GFP_KERNEL);
-> +	head = pipe->head;
-> +	tail = pipe->tail;
-> +	mask = pipe->ring_size - 1;
-> +	count = head - tail;
-> +
-> +	bufs = kvmalloc_array(count, sizeof(struct pipe_buffer), GFP_KERNEL);
->  	if (!bufs) {
->  		pipe_unlock(pipe);
->  		return -ENOMEM;
-> @@ -1958,8 +1963,8 @@ static ssize_t fuse_dev_splice_write(struct pipe_inode_info *pipe,
->  
->  	nbuf = 0;
->  	rem = 0;
-> -	for (idx = 0; idx < pipe->nrbufs && rem < len; idx++)
-> -		rem += pipe->bufs[(pipe->curbuf + idx) & (pipe->buffers - 1)].len;
-> +	for (idx = tail; idx < head && rem < len; idx++)
-> +		rem += pipe->bufs[idx & mask].len;
->  
->  	ret = -EINVAL;
->  	if (rem < len)
-> @@ -1970,16 +1975,16 @@ static ssize_t fuse_dev_splice_write(struct pipe_inode_info *pipe,
->  		struct pipe_buffer *ibuf;
->  		struct pipe_buffer *obuf;
->  
-> -		BUG_ON(nbuf >= pipe->buffers);
-> -		BUG_ON(!pipe->nrbufs);
-> -		ibuf = &pipe->bufs[pipe->curbuf];
-> +		BUG_ON(nbuf >= pipe->ring_size);
-> +		BUG_ON(tail == head);
-> +		ibuf = &pipe->bufs[tail];
-
-I don't see where tail gets masked between tail = pipe->tail; above and
-here, but I may be missing it. In any case, how about seeding head and
-tail with something like 1<<20 when creating the pipe so bugs like that
-are hit more quickly.
-
-> @@ -515,17 +525,19 @@ pipe_write(struct kiocb *iocb, struct iov_iter *from)
->  static long pipe_ioctl(struct file *filp, unsigned int cmd, unsigned long arg)
->  {
->  	struct pipe_inode_info *pipe = filp->private_data;
-> -	int count, buf, nrbufs;
-> +	int count, head, tail, mask;
->  
->  	switch (cmd) {
->  		case FIONREAD:
->  			__pipe_lock(pipe);
->  			count = 0;
-> -			buf = pipe->curbuf;
-> -			nrbufs = pipe->nrbufs;
-> -			while (--nrbufs >= 0) {
-> -				count += pipe->bufs[buf].len;
-> -				buf = (buf+1) & (pipe->buffers - 1);
-> +			head = pipe->head;
-> +			tail = pipe->tail;
-> +			mask = pipe->ring_size - 1;
-> +
-> +			while (tail < head) {
-> +				count += pipe->bufs[tail & mask].len;
-> +				tail++;
->  			}
-
-This is broken if head has wrapped but tail has not. It has to be "while
-(head - tail)" or perhaps just "while (tail != head)" or something along
-those lines.
-
-> @@ -1086,17 +1104,21 @@ static long pipe_set_size(struct pipe_inode_info *pipe, unsigned long arg)
->  	}
->  
->  	/*
-> -	 * We can shrink the pipe, if arg >= pipe->nrbufs. Since we don't
-> -	 * expect a lot of shrink+grow operations, just free and allocate
-> -	 * again like we would do for growing. If the pipe currently
-> +	 * We can shrink the pipe, if arg is greater than the ring occupancy.
-> +	 * Since we don't expect a lot of shrink+grow operations, just free and
-> +	 * allocate again like we would do for growing.  If the pipe currently
->  	 * contains more buffers than arg, then return busy.
->  	 */
-> -	if (nr_pages < pipe->nrbufs) {
-> +	mask = pipe->ring_size - 1;
-> +	head = pipe->head & mask;
-> +	tail = pipe->tail & mask;
-> +	n = pipe->head - pipe->tail;
-
-I think it's confusing to "premask" head and tail here. Can you either
-drop that (pipe_set_size should hardly be a hot path?), or perhaps call
-them something else to avoid a future reader seeing an unmasked
-bufs[head] and thinking that's a bug?
-
-> @@ -1254,9 +1290,10 @@ static ssize_t pipe_get_pages(struct iov_iter *i,
->  		   struct page **pages, size_t maxsize, unsigned maxpages,
->  		   size_t *start)
->  {
-> +	unsigned int p_tail;
-> +	unsigned int i_head;
->  	unsigned npages;
->  	size_t capacity;
-> -	int idx;
->  
->  	if (!maxsize)
->  		return 0;
-> @@ -1264,12 +1301,15 @@ static ssize_t pipe_get_pages(struct iov_iter *i,
->  	if (!sanity(i))
->  		return -EFAULT;
->  
-> -	data_start(i, &idx, start);
-> -	/* some of this one + all after this one */
-> -	npages = ((i->pipe->curbuf - idx - 1) & (i->pipe->buffers - 1)) + 1;
-> -	capacity = min(npages,maxpages) * PAGE_SIZE - *start;
-> +	data_start(i, &i_head, start);
-> +	p_tail = i->pipe->tail;
-> +	/* Amount of free space: some of this one + all after this one */
-> +	npages = (p_tail + i->pipe->ring_size) - i_head;
-
-Hm, it's not clear that this is equivalent to the old computation. Since
-it seems repeated in a few places, could it be factored to a little
-helper (before this patch) and the "some of this one + all after this
-one" comment perhaps expanded to explain what is going on?
-
-Rasmus
