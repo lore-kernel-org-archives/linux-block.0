@@ -2,65 +2,65 @@ Return-Path: <SRS0=WMYH=YK=vger.kernel.org=linux-block-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-9.8 required=3.0 tests=DKIM_SIGNED,DKIM_VALID,
+X-Spam-Status: No, score=-9.7 required=3.0 tests=DKIM_SIGNED,DKIM_VALID,
 	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,
-	SPF_HELO_NONE,SPF_PASS,USER_AGENT_GIT autolearn=ham autolearn_force=no
-	version=3.4.0
+	SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED,USER_AGENT_GIT autolearn=unavailable
+	autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 7B83FECE58D
-	for <linux-block@archiver.kernel.org>; Thu, 17 Oct 2019 21:29:12 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 77548FA3737
+	for <linux-block@archiver.kernel.org>; Thu, 17 Oct 2019 21:29:13 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.kernel.org (Postfix) with ESMTP id 3F8A821A49
-	for <linux-block@archiver.kernel.org>; Thu, 17 Oct 2019 21:29:12 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id 44C3121A49
+	for <linux-block@archiver.kernel.org>; Thu, 17 Oct 2019 21:29:13 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel-dk.20150623.gappssmtp.com header.i=@kernel-dk.20150623.gappssmtp.com header.b="fL/x/mF0"
+	dkim=pass (2048-bit key) header.d=kernel-dk.20150623.gappssmtp.com header.i=@kernel-dk.20150623.gappssmtp.com header.b="drb8GIXs"
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S2503664AbfJQV3L (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Thu, 17 Oct 2019 17:29:11 -0400
-Received: from mail-pf1-f195.google.com ([209.85.210.195]:39388 "EHLO
-        mail-pf1-f195.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S2503654AbfJQV3K (ORCPT
-        <rfc822;linux-block@vger.kernel.org>);
+        id S2503660AbfJQV3K (ORCPT <rfc822;linux-block@archiver.kernel.org>);
         Thu, 17 Oct 2019 17:29:10 -0400
-Received: by mail-pf1-f195.google.com with SMTP id v4so2440386pff.6
-        for <linux-block@vger.kernel.org>; Thu, 17 Oct 2019 14:29:10 -0700 (PDT)
+Received: from mail-pf1-f196.google.com ([209.85.210.196]:38173 "EHLO
+        mail-pf1-f196.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S2503652AbfJQV3I (ORCPT
+        <rfc822;linux-block@vger.kernel.org>);
+        Thu, 17 Oct 2019 17:29:08 -0400
+Received: by mail-pf1-f196.google.com with SMTP id h195so2444264pfe.5
+        for <linux-block@vger.kernel.org>; Thu, 17 Oct 2019 14:29:07 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=kernel-dk.20150623.gappssmtp.com; s=20150623;
         h=from:to:cc:subject:date:message-id:in-reply-to:references;
-        bh=t/7vAwNRes/OgSWHDpsbdJG9hBx8gt3i+4E5Djauy08=;
-        b=fL/x/mF0mKRLsVdh+dTKxKht0va6UZTptQijstDQ+mxE+lCA1zJctEyFbJr4ZUr+gW
-         4gapsi0HxqSDjYfpJkRzfarcajQPqxe60/hKp9nfil6uBJRunxv79YdmKYJP6oT+e+qB
-         2Otk4ugVGzFYcr6i6yqzC9VQP6W8wjQ+mUmvm5gWPV1dIp4C0fs+ejMrlQqhZ/nVtSLT
-         3M/VS7nMXGNwFPa1EYwt7GWtomVU3RoeGX5nTBwlsHy7rfB36fiPFmPTR+eIsGGq7z76
-         mT2aNP4IsQWJtUIOpxsxFyI0kj16+JfsRBf/0gzcHBuvPlu0KT+w+RWxTbWHdHfxtG6s
-         m3SQ==
+        bh=92CYtTRoYQ39d46k61SL6rtGzWXElvZP8rT1pbbx14I=;
+        b=drb8GIXsLGMmBXEwez6fklfxs4YzPgKuEtRwcZZj/pxkrrf1TdJuvM94qU90HWW3k6
+         tsjMmQ9PekHc61/M30oibRHORCDFGnxCrMU7avMUx9dndND6uNcIovXO605z4qCtD/SE
+         rHQbOrvxbPAUUe532OhbMl9X4Jf/QFdBq735dGzJRVuEiq5FgH53SmCGnR2J4Wm1aSGS
+         dw5nNouwe0WhfwLmjhnX4FSIxAQbGLbvclKixz85IRxfjD8UBbVFJwxNoCl9WuggMu/0
+         QcrwVNIWodhl0qaMjTx2mLnNbGZvoNMicRA6BJdaab9o05iARGWbb53/ZBu+nZy70+gg
+         vJRA==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=1e100.net; s=20161025;
         h=x-gm-message-state:from:to:cc:subject:date:message-id:in-reply-to
          :references;
-        bh=t/7vAwNRes/OgSWHDpsbdJG9hBx8gt3i+4E5Djauy08=;
-        b=NIgQ2M/fwCMA2bgo5Bn6n7YWJqDS0etDB5BQAZtEBO3oswZZIlQjLeSV1SFPPnld3z
-         3ONd9RItYRBeX/+dXIwy9s7/jAAKhs1v9rHiwKIdvWbM0WC8G6Q0EAhBxAMKd11mmXDE
-         9jz9aeUvDVgQFcedyHo0DJpqJWbRqjVJOU8iHktaHF3ZU5RIycgJr2nJXfwu+qXhGfhz
-         sNCLnY0yqVWVrbtpzJwce6RQ4yToz2K8o/JtpEPwYJ0FiUpLBiUF573aTUyHvcpA7dwi
-         YNxLprENJEeGIlMo3mSFaDd2LwN+ObCPsWvCDAmiJx8g0tpDIq4haI5x+MyzhhDlpaop
-         wVBQ==
-X-Gm-Message-State: APjAAAXQHEzt4SAXoRRQ2My/CItYSNzQf7vpSK7HD5luDVHsJh/oN+GV
-        0NVVlc/Jr8ZbOB5y7KAubMAh13QMfEtBog==
-X-Google-Smtp-Source: APXvYqw65pCCcLYeaf21mep1NwRzBJTCNVlFgTO5nxL3xO5V1yrj/5N6zT0zFBgarGPJ//ENeBWVpQ==
-X-Received: by 2002:a17:90a:6508:: with SMTP id i8mr6863936pjj.44.1571347749177;
-        Thu, 17 Oct 2019 14:29:09 -0700 (PDT)
+        bh=92CYtTRoYQ39d46k61SL6rtGzWXElvZP8rT1pbbx14I=;
+        b=IlCa65lC0Jb9UW+buo5k0vS8o/RHqzaasIbbi8vTyZDNkbkMFvjzIX2eP3tbNua9ZN
+         39H9h7k9sXIbO6Uxg/V6S4BKZpemT0XFWAWLghlxh6DAungMaidx87pYPO/7ord393ck
+         NgKD0R8oOWQtb1un87ZrGHEwamGg3B0MdjHg4HBb2bcazUUwVARbIm1QCQX9OIRDF2IW
+         AAOcvNgUy3o5l6syr7gXdwnqAEJGf27Huhoavam7NQlIWAJIbeNEkXTyuRhqfLGs1znI
+         AztwVQzIR/z2UQGozyVOxtbDwpuQpIDZ/BpmhXGhZlTjgfW36Jym7u3138VMEaP/erW8
+         FLGw==
+X-Gm-Message-State: APjAAAVpI4Lq5DrNY2pptsaR1RAJen1xARzfEVnZoFwwkA7nf/f7i8b+
+        Mb6DgoYbqWSb58YqVC4hZvD2iUUbku7zZQ==
+X-Google-Smtp-Source: APXvYqwm6GLu+zFMnlkzYvu+ZSQTI4qYWKTk3BDgsOmRpNYNQA9qzo5v+4MOGw8e3K+rfAcgXcbalw==
+X-Received: by 2002:a17:90a:8c14:: with SMTP id a20mr6821770pjo.77.1571347746552;
+        Thu, 17 Oct 2019 14:29:06 -0700 (PDT)
 Received: from x1.thefacebook.com ([2620:10d:c090:180::e2ce])
-        by smtp.gmail.com with ESMTPSA id w6sm4296446pfw.84.2019.10.17.14.29.06
+        by smtp.gmail.com with ESMTPSA id w6sm4296446pfw.84.2019.10.17.14.29.04
         (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Thu, 17 Oct 2019 14:29:08 -0700 (PDT)
+        Thu, 17 Oct 2019 14:29:05 -0700 (PDT)
 From:   Jens Axboe <axboe@kernel.dk>
 To:     linux-block@vger.kernel.org
 Cc:     davem@davemloft.net, netdev@vger.kernel.org,
         Jens Axboe <axboe@kernel.dk>
-Subject: [PATCH 2/3] net: add __sys_accept4_file() helper
-Date:   Thu, 17 Oct 2019 15:28:57 -0600
-Message-Id: <20191017212858.13230-3-axboe@kernel.dk>
+Subject: [PATCH 1/3] io_uring: add support for async work inheriting files table
+Date:   Thu, 17 Oct 2019 15:28:56 -0600
+Message-Id: <20191017212858.13230-2-axboe@kernel.dk>
 X-Mailer: git-send-email 2.17.1
 In-Reply-To: <20191017212858.13230-1-axboe@kernel.dk>
 References: <20191017212858.13230-1-axboe@kernel.dk>
@@ -69,157 +69,94 @@ Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-This is identical to __sys_accept4(), except it takes a struct file
-instead of an fd, and it also allows passing in extra file->f_flags
-flags. The latter is done to support masking in O_NONBLOCK without
-manipulating the original file flags.
+This is in preparation for adding opcodes that need to modify files
+in a process file table, either adding new ones or closing old ones.
 
-No functional changes in this patch.
+If an opcode needs this, it must set REQ_F_NEED_FILES in the request
+structure. If work that needs to get punted to async context have this
+set, they will grab a reference to the process file table. When the
+work is completed, the reference is dropped again.
 
-Cc: David Miller <davem@davemloft.net>
-Cc: netdev@vger.kernel.org
 Signed-off-by: Jens Axboe <axboe@kernel.dk>
 ---
- include/linux/socket.h |  3 ++
- net/socket.c           | 65 ++++++++++++++++++++++++++----------------
- 2 files changed, 44 insertions(+), 24 deletions(-)
+ fs/io_uring.c | 21 ++++++++++++++++++---
+ 1 file changed, 18 insertions(+), 3 deletions(-)
 
-diff --git a/include/linux/socket.h b/include/linux/socket.h
-index fc0bed59fc84..dd061f741bc1 100644
---- a/include/linux/socket.h
-+++ b/include/linux/socket.h
-@@ -392,6 +392,9 @@ extern int __sys_recvfrom(int fd, void __user *ubuf, size_t size,
- extern int __sys_sendto(int fd, void __user *buff, size_t len,
- 			unsigned int flags, struct sockaddr __user *addr,
- 			int addr_len);
-+extern int __sys_accept4_file(struct file *file, unsigned file_flags,
-+			struct sockaddr __user *upeer_sockaddr,
-+			 int __user *upeer_addrlen, int flags);
- extern int __sys_accept4(int fd, struct sockaddr __user *upeer_sockaddr,
- 			 int __user *upeer_addrlen, int flags);
- extern int __sys_socket(int family, int type, int protocol);
-diff --git a/net/socket.c b/net/socket.c
-index 6a9ab7a8b1d2..40ab39f6c5d8 100644
---- a/net/socket.c
-+++ b/net/socket.c
-@@ -1690,24 +1690,13 @@ SYSCALL_DEFINE2(listen, int, fd, int, backlog)
- 	return __sys_listen(fd, backlog);
- }
+diff --git a/fs/io_uring.c b/fs/io_uring.c
+index 635856023fdf..ad462237275e 100644
+--- a/fs/io_uring.c
++++ b/fs/io_uring.c
+@@ -267,10 +267,11 @@ struct io_ring_ctx {
+ struct sqe_submit {
+ 	const struct io_uring_sqe	*sqe;
+ 	unsigned short			index;
++	bool				has_user : 1;
++	bool				in_async : 1;
++	bool				needs_fixed_file : 1;
+ 	u32				sequence;
+-	bool				has_user;
+-	bool				in_async;
+-	bool				needs_fixed_file;
++	struct files_struct		*files;
+ };
  
--/*
-- *	For accept, we attempt to create a new socket, set up the link
-- *	with the client, wake up the client, then return the new
-- *	connected fd. We collect the address of the connector in kernel
-- *	space and move it to user at the very end. This is unclean because
-- *	we open the socket then return an error.
-- *
-- *	1003.1g adds the ability to recvmsg() to query connection pending
-- *	status to recvmsg. We need to add that support in a way thats
-- *	clean when we restructure accept also.
-- */
--
--int __sys_accept4(int fd, struct sockaddr __user *upeer_sockaddr,
--		  int __user *upeer_addrlen, int flags)
-+int __sys_accept4_file(struct file *file, unsigned file_flags,
-+		       struct sockaddr __user *upeer_sockaddr,
-+		       int __user *upeer_addrlen, int flags)
+ /*
+@@ -323,6 +324,7 @@ struct io_kiocb {
+ #define REQ_F_FAIL_LINK		256	/* fail rest of links */
+ #define REQ_F_SHADOW_DRAIN	512	/* link-drain shadow req */
+ #define REQ_F_TIMEOUT		1024	/* timeout request */
++#define REQ_F_NEED_FILES	2048	/* needs to assume file table */
+ 	u64			user_data;
+ 	u32			result;
+ 	u32			sequence;
+@@ -2191,6 +2193,7 @@ static inline bool io_sqe_needs_user(const struct io_uring_sqe *sqe)
+ static void io_sq_wq_submit_work(struct work_struct *work)
  {
- 	struct socket *sock, *newsock;
- 	struct file *newfile;
--	int err, len, newfd, fput_needed;
-+	int err, len, newfd;
- 	struct sockaddr_storage address;
+ 	struct io_kiocb *req = container_of(work, struct io_kiocb, work);
++	struct files_struct *old_files = NULL;
+ 	struct io_ring_ctx *ctx = req->ctx;
+ 	struct mm_struct *cur_mm = NULL;
+ 	struct async_list *async_list;
+@@ -2220,6 +2223,10 @@ static void io_sq_wq_submit_work(struct work_struct *work)
+ 				set_fs(USER_DS);
+ 			}
+ 		}
++		if (s->files && !old_files) {
++			old_files = current->files;
++			current->files = s->files;
++		}
  
- 	if (flags & ~(SOCK_CLOEXEC | SOCK_NONBLOCK))
-@@ -1716,14 +1705,14 @@ int __sys_accept4(int fd, struct sockaddr __user *upeer_sockaddr,
- 	if (SOCK_NONBLOCK != O_NONBLOCK && (flags & SOCK_NONBLOCK))
- 		flags = (flags & ~SOCK_NONBLOCK) | O_NONBLOCK;
- 
--	sock = sockfd_lookup_light(fd, &err, &fput_needed);
-+	sock = sock_from_file(file, &err);
- 	if (!sock)
- 		goto out;
- 
- 	err = -ENFILE;
- 	newsock = sock_alloc();
- 	if (!newsock)
--		goto out_put;
-+		goto out;
- 
- 	newsock->type = sock->type;
- 	newsock->ops = sock->ops;
-@@ -1738,20 +1727,21 @@ int __sys_accept4(int fd, struct sockaddr __user *upeer_sockaddr,
- 	if (unlikely(newfd < 0)) {
- 		err = newfd;
- 		sock_release(newsock);
--		goto out_put;
-+		goto out;
+ 		if (!ret) {
+ 			s->has_user = cur_mm != NULL;
+@@ -2312,6 +2319,11 @@ static void io_sq_wq_submit_work(struct work_struct *work)
+ 		unuse_mm(cur_mm);
+ 		mmput(cur_mm);
  	}
- 	newfile = sock_alloc_file(newsock, flags, sock->sk->sk_prot_creator->name);
- 	if (IS_ERR(newfile)) {
- 		err = PTR_ERR(newfile);
- 		put_unused_fd(newfd);
--		goto out_put;
-+		goto out;
- 	}
- 
- 	err = security_socket_accept(sock, newsock);
- 	if (err)
- 		goto out_fd;
- 
--	err = sock->ops->accept(sock, newsock, sock->file->f_flags, false);
-+	err = sock->ops->accept(sock, newsock, sock->file->f_flags | file_flags,
-+					false);
- 	if (err < 0)
- 		goto out_fd;
- 
-@@ -1772,15 +1762,42 @@ int __sys_accept4(int fd, struct sockaddr __user *upeer_sockaddr,
- 
- 	fd_install(newfd, newfile);
- 	err = newfd;
--
--out_put:
--	fput_light(sock->file, fput_needed);
- out:
- 	return err;
- out_fd:
- 	fput(newfile);
- 	put_unused_fd(newfd);
--	goto out_put;
-+	goto out;
-+
-+}
-+
-+/*
-+ *	For accept, we attempt to create a new socket, set up the link
-+ *	with the client, wake up the client, then return the new
-+ *	connected fd. We collect the address of the connector in kernel
-+ *	space and move it to user at the very end. This is unclean because
-+ *	we open the socket then return an error.
-+ *
-+ *	1003.1g adds the ability to recvmsg() to query connection pending
-+ *	status to recvmsg. We need to add that support in a way thats
-+ *	clean when we restructure accept also.
-+ */
-+
-+int __sys_accept4(int fd, struct sockaddr __user *upeer_sockaddr,
-+		  int __user *upeer_addrlen, int flags)
-+{
-+	int ret = -EBADF;
-+	struct fd f;
-+
-+	f = fdget(fd);
-+	if (f.file) {
-+		ret = __sys_accept4_file(f.file, 0, upeer_sockaddr,
-+						upeer_addrlen, flags);
-+		if (f.flags)
-+			fput(f.file);
++	if (old_files) {
++		struct files_struct *files = current->files;
++		current->files = old_files;
++		put_files_struct(files);
 +	}
-+
-+	return ret;
  }
  
- SYSCALL_DEFINE4(accept4, int, fd, struct sockaddr __user *, upeer_sockaddr,
+ /*
+@@ -2413,6 +2425,8 @@ static int __io_queue_sqe(struct io_ring_ctx *ctx, struct io_kiocb *req,
+ 
+ 			s->sqe = sqe_copy;
+ 			memcpy(&req->submit, s, sizeof(*s));
++			if (req->flags & REQ_F_NEED_FILES)
++				req->submit.files = get_files_struct(current);
+ 			list = io_async_list_from_sqe(ctx, s->sqe);
+ 			if (!io_add_to_prev_work(list, req)) {
+ 				if (list)
+@@ -2633,6 +2647,7 @@ static bool io_get_sqring(struct io_ring_ctx *ctx, struct sqe_submit *s)
+ 		s->index = head;
+ 		s->sqe = &ctx->sq_sqes[head];
+ 		s->sequence = ctx->cached_sq_head;
++		s->files = NULL;
+ 		ctx->cached_sq_head++;
+ 		return true;
+ 	}
 -- 
 2.17.1
 
