@@ -2,130 +2,162 @@ Return-Path: <SRS0=WMYH=YK=vger.kernel.org=linux-block-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-6.7 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
-	INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,
-	URIBL_BLOCKED autolearn=ham autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-1.1 required=3.0 tests=DKIMWL_WL_HIGH,DKIM_SIGNED,
+	DKIM_VALID,DKIM_VALID_AU,MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,
+	URIBL_BLOCKED autolearn=no autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id E6ABAECE58D
-	for <linux-block@archiver.kernel.org>; Thu, 17 Oct 2019 19:37:17 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 5F5F1FA372A
+	for <linux-block@archiver.kernel.org>; Thu, 17 Oct 2019 20:52:46 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.kernel.org (Postfix) with ESMTP id B911B20640
-	for <linux-block@archiver.kernel.org>; Thu, 17 Oct 2019 19:37:17 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id 2E9C7222BD
+	for <linux-block@archiver.kernel.org>; Thu, 17 Oct 2019 20:52:46 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+	s=default; t=1571345566;
+	bh=VVTtYjO4vtlWfWH/sK7IXK3trboSDkbsz0awpPKXjsg=;
+	h=Date:From:To:To:To:Cc:Cc:Cc:Subject:In-Reply-To:References:
+	 List-ID:From;
+	b=xA80htjksGUK+xMYplFNAL9VMOOxjqgmYA8oYtpcRaNuqTxEpMkeXqUTEvB5bf5DF
+	 Oq9+DJLV15xJ57IP21YFtUVwJ1Zm2ZD+tpA3yc699XD+Wu9s9ZGpUU67Z5WYAgsvU2
+	 Flps3p6mNDlMlT6+HyhnZuGZwYw3CSOClyvR7qHY=
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S2394049AbfJQThR (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Thu, 17 Oct 2019 15:37:17 -0400
-Received: from mx1.redhat.com ([209.132.183.28]:5549 "EHLO mx1.redhat.com"
+        id S2437709AbfJQUwp (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Thu, 17 Oct 2019 16:52:45 -0400
+Received: from mail.kernel.org ([198.145.29.99]:60046 "EHLO mail.kernel.org"
         rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-        id S1728856AbfJQThR (ORCPT <rfc822;linux-block@vger.kernel.org>);
-        Thu, 17 Oct 2019 15:37:17 -0400
-Received: from smtp.corp.redhat.com (int-mx08.intmail.prod.int.phx2.redhat.com [10.5.11.23])
-        (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
+        id S1728420AbfJQUwp (ORCPT <rfc822;linux-block@vger.kernel.org>);
+        Thu, 17 Oct 2019 16:52:45 -0400
+Received: from localhost (unknown [40.117.208.15])
+        (using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
         (No client certificate requested)
-        by mx1.redhat.com (Postfix) with ESMTPS id 73C45308FFB1;
-        Thu, 17 Oct 2019 19:37:16 +0000 (UTC)
-Received: from rt4.app.eng.rdu2.redhat.com (rt4.app.eng.rdu2.redhat.com [10.10.161.56])
-        by smtp.corp.redhat.com (Postfix) with ESMTPS id 4943C19C70;
-        Thu, 17 Oct 2019 19:37:16 +0000 (UTC)
-Received: from rt4.app.eng.rdu2.redhat.com (localhost [127.0.0.1])
-        by rt4.app.eng.rdu2.redhat.com (8.14.4/8.14.4) with ESMTP id x9HJbFjn017092;
-        Thu, 17 Oct 2019 15:37:15 -0400
-Received: (from apache@localhost)
-        by rt4.app.eng.rdu2.redhat.com (8.14.4/8.14.4/Submit) id x9HJbECL017089;
-        Thu, 17 Oct 2019 15:37:14 -0400
-From:   Red Hat Product Security <secalert@redhat.com>
-X-PGP-Public-Key: https://www.redhat.com/security/650d5882.txt
-Subject: [engineering.redhat.com #498403] Re: [PATCH v2] nbd_genl_status: null check for nla_nest_start
-Reply-To: secalert@redhat.com
-In-Reply-To: <CAEkB2ES8rc4kkPwA+okfMa9CpFoDqmt=tx8H8vHZKBCfw9L_tg@mail.gmail.com>
-References: <RT-Ticket-498403@engineering.redhat.com>
- <20190729130912.7imtg3hfnvb4lt2y@MacBook-Pro-91.local>
- <20190729164226.22632-1-navid.emamdoost@gmail.com>
- <20190910113521.GA9895@unicorn.suse.cz>
- <CAEkB2ES8rc4kkPwA+okfMa9CpFoDqmt=tx8H8vHZKBCfw9L_tg@mail.gmail.com>
-Message-ID: <rt-4.0.13-16866-1571341034-901.498403-5-0@engineering.redhat.com>
-X-RT-Loop-Prevention: engineering.redhat.com
-RT-Ticket: engineering.redhat.com #498403
-Managed-BY: RT 4.0.13 (http://www.bestpractical.com/rt/)
-RT-Originator: kbost@redhat.com
-To:     navid.emamdoost@gmail.com
-CC:     axboe@kernel.dk, emamd001@umn.edu, josef@toxicpanda.com,
-        kjlu@umn.edu, linux-block@vger.kernel.org,
-        linux-kernel@vger.kernel.org, mkubecek@suse.cz,
-        nbd@other.debian.org, smccaman@umn.edu
-MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
-Content-Type: text/plain; charset="utf-8"
-X-RT-Original-Encoding: utf-8
-Date:   Thu, 17 Oct 2019 15:37:14 -0400
-X-Scanned-By: MIMEDefang 2.84 on 10.5.11.23
-X-Greylist: Sender IP whitelisted, not delayed by milter-greylist-4.5.16 (mx1.redhat.com [10.5.110.49]); Thu, 17 Oct 2019 19:37:16 +0000 (UTC)
+        by mail.kernel.org (Postfix) with ESMTPSA id 1647521A4C;
+        Thu, 17 Oct 2019 20:52:44 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+        s=default; t=1571345564;
+        bh=VVTtYjO4vtlWfWH/sK7IXK3trboSDkbsz0awpPKXjsg=;
+        h=Date:From:To:To:To:Cc:Cc:Cc:Subject:In-Reply-To:References:From;
+        b=gEaaPRvtENNhfYDrTxYYjOONVbsyuYcQxbghu8jh7LKE7LMbnEXUj2Wox7Pfo/J9+
+         Eb4RN1D8nJ+fmsfElkP/mV1m+V9Hqx9TEdgFQ8+H2Bn+SW1956mYcZkWb4NggbOGif
+         VY1XPi5TrljoOfdsuXy60MWoy94r2qvgyFQiXytc=
+Date:   Thu, 17 Oct 2019 20:52:43 +0000
+From:   Sasha Levin <sashal@kernel.org>
+To:     Sasha Levin <sashal@kernel.org>
+To:     Jens Axboe <axboe@kernel.dk>
+To:     "linux-block@vger.kernel.org" <linux-block@vger.kernel.org>
+Cc:     Hrvoje Zeba <zeba.hrvoje@gmail.com>
+Cc:     stable@vger.kernel.org
+Cc:     stable@vger.kernel.org
+Subject: Re: [PATCH] io_uring: fix up O_NONBLOCK handling for sockets
+In-Reply-To: <f999615b-205c-49b7-b272-c4e42e45e09d@kernel.dk>
+References: <f999615b-205c-49b7-b272-c4e42e45e09d@kernel.dk>
+Message-Id: <20191017205244.1647521A4C@mail.kernel.org>
 Sender: linux-block-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-Hi Navid,
+Hi,
 
-Not sure if you meant to cc secalert@redhat.com on this. If anything is needed
-from our side please let us know!
+[This is an automated email]
 
-On Wed Oct 16 22:17:42 2019, navid.emamdoost@gmail.com wrote:
-> Hi Michal, please check v3 at
-> https://lore.kernel.org/patchwork/patch/1126650/
->
->
-> Thanks,
-> Navid.
->
-> On Tue, Sep 10, 2019 at 6:35 AM Michal Kubecek <mkubecek@suse.cz>
-> wrote:
-> >
-> > (Just stumbled upon this patch when link to it came with a CVE bug
-> report.)
-> >
-> > On Mon, Jul 29, 2019 at 11:42:26AM -0500, Navid Emamdoost wrote:
-> > > nla_nest_start may fail and return NULL. The check is inserted,
-> and
-> > > errno is selected based on other call sites within the same source
-> code.
-> > > Update: removed extra new line.
-> > >
-> > > Signed-off-by: Navid Emamdoost <navid.emamdoost@gmail.com>
-> > > Reviewed-by: Bob Liu <bob.liu@oracle.com>
-> > > ---
-> > > drivers/block/nbd.c | 5 +++++
-> > > 1 file changed, 5 insertions(+)
-> > >
-> > > diff --git a/drivers/block/nbd.c b/drivers/block/nbd.c
-> > > index 9bcde2325893..2410812d1e82 100644
-> > > --- a/drivers/block/nbd.c
-> > > +++ b/drivers/block/nbd.c
-> > > @@ -2149,6 +2149,11 @@ static int nbd_genl_status(struct sk_buff
-> *skb, struct genl_info *info)
-> > > }
-> > >
-> > > dev_list = nla_nest_start_noflag(reply,
-> NBD_ATTR_DEVICE_LIST);
-> > > + if (!dev_list) {
-> > > + ret = -EMSGSIZE;
-> > > + goto out;
-> > > + }
-> > > +
-> > > if (index == -1) {
-> > > ret = idr_for_each(&nbd_index_idr, &status_cb,
-> reply);
-> > > if (ret) {
-> >
-> > You should also call nlmsg_free(reply) when you bail out so that you
-> > don't introduce a memory leak.
-> >
-> > Michal Kubecek
->
->
->
+This commit has been processed because it contains a -stable tag.
+The stable tag indicates that it's relevant for the following trees: all
+
+The bot has tested the following trees: v5.3.6, v4.19.79, v4.14.149, v4.9.196, v4.4.196.
+
+v5.3.6: Failed to apply! Possible dependencies:
+    18d9be1a970c3 ("io_uring: add io_queue_async_work() helper")
+    4fe2c963154c3 ("io_uring: add support for link with drain")
+    5262f567987d3 ("io_uring: IORING_OP_TIMEOUT support")
+    75b28affdd6ae ("io_uring: allocate the two rings together")
+    c576666863b78 ("io_uring: optimize submit_and_wait API")
+
+v4.19.79: Failed to apply! Possible dependencies:
+    2b188cc1bb857 ("Add io_uring IO interface")
+    31b515106428b ("io_uring: allow workqueue item to handle multiple buffered requests")
+    4e21565b7fd4d ("asm-generic: add kexec_file_load system call to unistd.h")
+    5262f567987d3 ("io_uring: IORING_OP_TIMEOUT support")
+    6b06314c47e14 ("io_uring: add file set registration")
+    9a56a2323dbbd ("io_uring: use fget/fput_many() for file references")
+    c992fe2925d77 ("io_uring: add fsync support")
+    d530a402a114e ("io_uring: add prepped flag")
+    de0617e467171 ("io_uring: add support for marking commands as draining")
+    def596e9557c9 ("io_uring: support for IO polling")
+    edafccee56ff3 ("io_uring: add support for pre-mapped user IO buffers")
+
+v4.14.149: Failed to apply! Possible dependencies:
+    05c17cedf85ba ("x86: Wire up restartable sequence system call")
+    1bd21c6c21e84 ("syscalls/core: Introduce CONFIG_ARCH_HAS_SYSCALL_WRAPPER=y")
+    2b188cc1bb857 ("Add io_uring IO interface")
+    3c1c456f9b96c ("syscalls: sort syscall prototypes in include/linux/syscalls.h")
+    4ddb45db30851 ("x86/syscalls: Use COMPAT_SYSCALL_DEFINEx() macros for x86-only compat syscalls")
+    5262f567987d3 ("io_uring: IORING_OP_TIMEOUT support")
+    5ac9efa3c50d7 ("syscalls/core, syscalls/x86: Clean up compat syscall stub naming convention")
+    66f4e88cc69da ("x86/ioport: add ksys_ioperm() helper; remove in-kernel calls to sys_ioperm()")
+    7a074e96dee62 ("aio: implement io_pgetevents")
+    7c2178c1ff482 ("x86/syscalls: Use proper syscall definition for sys_ioperm()")
+    ab0d1e85bfd0c ("fs/quota: use COMPAT_SYSCALL_DEFINE for sys32_quotactl()")
+    af52201d99162 ("x86/entry: Do not special-case clone(2) in compat entry")
+    b411991e0ca88 ("x86/syscalls/32: Simplify $entry == $compat entries")
+    b51d3cdf44d5c ("x86: remove compat_sys_x86_waitpid()")
+    d53238cd51a80 ("kernel: open-code sys_rt_sigpending() in sys_sigpending()")
+    de0617e467171 ("io_uring: add support for marking commands as draining")
+    dfe64506c01e5 ("x86/syscalls: Don't pointlessly reload the system call number")
+    e145242ea0df6 ("syscalls/core, syscalls/x86: Clean up syscall stub naming convention")
+    ebeb8c82ffaf9 ("syscalls/x86: Use 'struct pt_regs' based syscall calling for IA32_EMULATION and x32")
+    fa697140f9a20 ("syscalls/x86: Use 'struct pt_regs' based syscall calling convention for 64-bit syscalls")
+
+v4.9.196: Failed to apply! Possible dependencies:
+    05c17cedf85ba ("x86: Wire up restartable sequence system call")
+    2611dc1939569 ("Remove compat_sys_getdents64()")
+    2b188cc1bb857 ("Add io_uring IO interface")
+    3a404842547c9 ("x86/entry: define _TIF_ALLWORK_MASK flags explicitly")
+    499934898fcd1 ("x86/entry/64: Use ENTRY() instead of ALIGN+GLOBAL for stub32_clone()")
+    4ddb45db30851 ("x86/syscalls: Use COMPAT_SYSCALL_DEFINEx() macros for x86-only compat syscalls")
+    5262f567987d3 ("io_uring: IORING_OP_TIMEOUT support")
+    5ac9efa3c50d7 ("syscalls/core, syscalls/x86: Clean up compat syscall stub naming convention")
+    5ea0727b163cb ("x86/syscalls: Check address limit on user-mode return")
+    66f4e88cc69da ("x86/ioport: add ksys_ioperm() helper; remove in-kernel calls to sys_ioperm()")
+    7a074e96dee62 ("aio: implement io_pgetevents")
+    7c2178c1ff482 ("x86/syscalls: Use proper syscall definition for sys_ioperm()")
+    a528d35e8bfcc ("statx: Add a system call to make enhanced file info available")
+    ab0d1e85bfd0c ("fs/quota: use COMPAT_SYSCALL_DEFINE for sys32_quotactl()")
+    af52201d99162 ("x86/entry: Do not special-case clone(2) in compat entry")
+    afb94c9e0b413 ("livepatch/x86: add TIF_PATCH_PENDING thread flag")
+    b411991e0ca88 ("x86/syscalls/32: Simplify $entry == $compat entries")
+    b51d3cdf44d5c ("x86: remove compat_sys_x86_waitpid()")
+    de0617e467171 ("io_uring: add support for marking commands as draining")
+    dfe64506c01e5 ("x86/syscalls: Don't pointlessly reload the system call number")
+    e145242ea0df6 ("syscalls/core, syscalls/x86: Clean up syscall stub naming convention")
+    ebeb8c82ffaf9 ("syscalls/x86: Use 'struct pt_regs' based syscall calling for IA32_EMULATION and x32")
+    fa697140f9a20 ("syscalls/x86: Use 'struct pt_regs' based syscall calling convention for 64-bit syscalls")
+
+v4.4.196: Failed to apply! Possible dependencies:
+    05c17cedf85ba ("x86: Wire up restartable sequence system call")
+    1e423bff959e4 ("x86/entry/64: Migrate the 64-bit syscall slow path to C")
+    2b188cc1bb857 ("Add io_uring IO interface")
+    302f5b260c322 ("x86/entry/64: Always run ptregs-using syscalls on the slow path")
+    3e65654e3db6d ("x86/syscalls: Move compat syscall entry handling into syscalltbl.sh")
+    46eabf06c04a6 ("x86/entry/64: Call all native slow-path syscalls with full pt-regs")
+    5262f567987d3 ("io_uring: IORING_OP_TIMEOUT support")
+    5ac9efa3c50d7 ("syscalls/core, syscalls/x86: Clean up compat syscall stub naming convention")
+    7a074e96dee62 ("aio: implement io_pgetevents")
+    95d97adb2bb85 ("x86/signal: Cleanup get_nr_restart_syscall()")
+    97245d00585d8 ("x86/entry: Get rid of pt_regs_to_thread_info()")
+    abfb9498ee132 ("x86/entry: Rename is_{ia32,x32}_task() to in_{ia32,x32}_syscall()")
+    c87a85177e7a7 ("x86/entry: Get rid of two-phase syscall entry work")
+    cfcbadb49dabb ("x86/syscalls: Add syscall entry qualifiers")
+    de0617e467171 ("io_uring: add support for marking commands as draining")
+    dfe64506c01e5 ("x86/syscalls: Don't pointlessly reload the system call number")
+    e145242ea0df6 ("syscalls/core, syscalls/x86: Clean up syscall stub naming convention")
+    ebeb8c82ffaf9 ("syscalls/x86: Use 'struct pt_regs' based syscall calling for IA32_EMULATION and x32")
+    fa697140f9a20 ("syscalls/x86: Use 'struct pt_regs' based syscall calling convention for 64-bit syscalls")
+    fba324744bfd2 ("x86/syscalls: Refactor syscalltbl.sh")
 
 
---
-Kat Bost
-Red Hat Product Security
+NOTE: The patch will not be queued to stable trees until it is upstream.
 
+How should we proceed with this patch?
+
+-- 
+Thanks,
+Sasha
