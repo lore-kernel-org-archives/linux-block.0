@@ -2,217 +2,114 @@ Return-Path: <SRS0=WMYH=YK=vger.kernel.org=linux-block-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-9.5 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
-	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,
-	SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED,USER_AGENT_GIT autolearn=ham
+X-Spam-Status: No, score=-2.2 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
+	MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,USER_AGENT_SANE_1 autolearn=no
 	autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 43256ECE58D
-	for <linux-block@archiver.kernel.org>; Thu, 17 Oct 2019 21:19:48 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 2E17CFA372A
+	for <linux-block@archiver.kernel.org>; Thu, 17 Oct 2019 21:26:52 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.kernel.org (Postfix) with ESMTP id 0DB3F21835
-	for <linux-block@archiver.kernel.org>; Thu, 17 Oct 2019 21:19:48 +0000 (UTC)
-Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (2048-bit key) header.d=wdc.com header.i=@wdc.com header.b="UI3G9PE/"
+	by mail.kernel.org (Postfix) with ESMTP id F0E7321D7A
+	for <linux-block@archiver.kernel.org>; Thu, 17 Oct 2019 21:26:51 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1732930AbfJQVTr (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Thu, 17 Oct 2019 17:19:47 -0400
-Received: from esa5.hgst.iphmx.com ([216.71.153.144]:26230 "EHLO
-        esa5.hgst.iphmx.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1732097AbfJQVTr (ORCPT
-        <rfc822;linux-block@vger.kernel.org>);
-        Thu, 17 Oct 2019 17:19:47 -0400
-DKIM-Signature: v=1; a=rsa-sha256; c=simple/simple;
-  d=wdc.com; i=@wdc.com; q=dns/txt; s=dkim.wdc.com;
-  t=1571347187; x=1602883187;
-  h=from:to:cc:subject:date:message-id:mime-version:
-   content-transfer-encoding;
-  bh=XQ31N7rspkIiMqzSHO9IPQLQSyakS3MI/R+iVClkynU=;
-  b=UI3G9PE/yJUrgElC634/oawnKcSezhy3B43c227dYtFn5CVe580cG/lB
-   DKuF/zuaPB4MXqk3PWX9x4Ct8nHO8wA68eNwioXPMk29vC7WfnZoc08/P
-   wbglBEqBRSgLeadkdcPNf5QRHdzrLYy0uDAq2hrs9Iif3RM+3TmvkotC9
-   p/bhjBChcfZ5zH0qjek+8yj/slwix9GlUF0o9GuTMBvRdfW1NNQW0R93g
-   +bdAxWetNt95z9Ycx3idmEcb5ISqCRM6+OS220NPyGci5sApV5BRCy6sy
-   e1IcO4ZZ4v723QFriCRRZ9I2Cl0mbmHqw4aMt5WtWYfHcesNRyDvUiUR5
-   Q==;
-IronPort-SDR: E/qlVQ5y7rU6scokDexWiJJMA1aY5FWxWzLWGcTMDhZnrsn/AytK5SyrQ2lAyUUgPxr2+ro7OK
- qfd9PtNrV50vTbl4SwccA1dDMvsE8y6y8H9FM8uZ+KQ1SFes7QUKwryjzO78tOd2a5BWjOvO/J
- F6pCVbYO8s+zZvF0pc3scr0BibYnnyi9cFGYiKzZUoAHnksapafY8oGo9fIYz79KzN1hagBqj1
- 38CQ8cqnk9rvu/AvvB73/fhaHyQzsC5eMJUn1cynlpeIkis5yFwAo9d0aDDS3J+zMCO1ZDRcZE
- SL0=
-X-IronPort-AV: E=Sophos;i="5.67,309,1566835200"; 
-   d="scan'208";a="121556847"
-Received: from uls-op-cesaip01.wdc.com (HELO uls-op-cesaep01.wdc.com) ([199.255.45.14])
-  by ob1.hgst.iphmx.com with ESMTP; 18 Oct 2019 05:19:46 +0800
-IronPort-SDR: HN9ym4J+S2qFlJXV6IadIt/LQHUe8g36+mUcANdZFBJlks8br9cP1Ea/0Sy+MX2H0UaCztf/ek
- fkJvQMxcwDTJs1Y6bNOCQzlxrwCMkLhwyp883r0Tbs8VXtCGq8wCKOg2gUo3wwAcvshcJprgXz
- 2xDCiEqk4m0D6zWKm1DZaGqKcCcrUYkyuYLQbwk7VMVSLNYwb1OPquRWFAe85DwIvbXSvUzZls
- +v0R0rpK8bQbbA9iRzCu4ggIT8jTrcF1ereV9aHEmu1pz37dVwcoSCl23uoUhQaoKTQWMBirCX
- twbnLiH638rIGga4/yJwCnMT
-Received: from uls-op-cesaip02.wdc.com ([10.248.3.37])
-  by uls-op-cesaep01.wdc.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 17 Oct 2019 14:15:24 -0700
-IronPort-SDR: RmGYtMpEtR9n5sX6n/hKxS/reGIFz5kb5St/WYqnWl0Ptj1AeC8nBv4NEdeb5ucjkJgYSj5RIE
- c7bxnsOgxSL+u3685vaW9Lv9mLr9JZscjLP8bKVTk60OIIn1bP7xHmxUB2XrsUgdbcBh26mYb8
- dltgCl0pdQkifVrSZFN10nHbgHlmIpIlQeoJT5I2a8vyCyerg8p5ON3e9DLT27s77YIVleHw6L
- OCYTtALnoR59yg5jFu3aA/KptUNpfXilK2Q087ALTv2hjqtMsciy++NRwXq/STxZDPqlf+gQUQ
- N9E=
-WDCIronportException: Internal
-Received: from cvenusqemu.hgst.com ([10.202.66.73])
-  by uls-op-cesaip02.wdc.com with ESMTP; 17 Oct 2019 14:19:46 -0700
-From:   Chaitanya Kulkarni <chaitanya.kulkarni@wdc.com>
-To:     linux-block@vger.kernel.org
-Cc:     Ajay Joshi <ajay.joshi@wdc.com>,
-        Damien Le Moal <damien.lemoal@wdc.com>,
-        =?UTF-8?q?Matias=20Bj=C3=B8rling?= <matias.bjorling@wdc.com>,
-        Chaitanya Kulkarni <chaitanya.kulkarni@wdc.com>
-Subject: [PATCH RESEND] null_blk: return fixed zoned reads > write pointer
-Date:   Thu, 17 Oct 2019 14:19:43 -0700
-Message-Id: <20191017211943.4608-1-chaitanya.kulkarni@wdc.com>
-X-Mailer: git-send-email 2.22.1
+        id S2441115AbfJQV0v (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Thu, 17 Oct 2019 17:26:51 -0400
+Received: from mx1.redhat.com ([209.132.183.28]:52576 "EHLO mx1.redhat.com"
+        rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
+        id S1729795AbfJQV0v (ORCPT <rfc822;linux-block@vger.kernel.org>);
+        Thu, 17 Oct 2019 17:26:51 -0400
+Received: from smtp.corp.redhat.com (int-mx01.intmail.prod.int.phx2.redhat.com [10.5.11.11])
+        (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
+        (No client certificate requested)
+        by mx1.redhat.com (Postfix) with ESMTPS id 9E624A3CD65;
+        Thu, 17 Oct 2019 21:26:50 +0000 (UTC)
+Received: from [10.10.125.4] (ovpn-125-4.rdu2.redhat.com [10.10.125.4])
+        by smtp.corp.redhat.com (Postfix) with ESMTP id 8121B600C8;
+        Thu, 17 Oct 2019 21:26:49 +0000 (UTC)
+Subject: Re: INFO: task hung in nbd_ioctl
+To:     "Richard W.M. Jones" <rjones@redhat.com>,
+        syzbot <syzbot+24c12fa8d218ed26011a@syzkaller.appspotmail.com>,
+        axboe@kernel.dk, josef@toxicpanda.com, linux-block@vger.kernel.org,
+        linux-kernel@vger.kernel.org, nbd@other.debian.org,
+        syzkaller-bugs@googlegroups.com
+References: <000000000000b1b1ee0593cce78f@google.com>
+ <5D93C2DD.10103@redhat.com> <20191017140330.GB25667@redhat.com>
+ <5DA88D2F.7080907@redhat.com> <20191017162829.GA3888@redhat.com>
+ <20191017163634.GD726@sol.localdomain> <20191017164908.GC3888@redhat.com>
+From:   Mike Christie <mchristi@redhat.com>
+Message-ID: <5DA8DC98.7000402@redhat.com>
+Date:   Thu, 17 Oct 2019 16:26:48 -0500
+User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:38.0) Gecko/20100101
+ Thunderbird/38.6.0
 MIME-Version: 1.0
-Content-Type: text/plain; charset=UTF-8
-Content-Transfer-Encoding: 8bit
+In-Reply-To: <20191017164908.GC3888@redhat.com>
+Content-Type: text/plain; charset=windows-1252
+Content-Transfer-Encoding: 7bit
+X-Scanned-By: MIMEDefang 2.79 on 10.5.11.11
+X-Greylist: Sender IP whitelisted, not delayed by milter-greylist-4.6.2 (mx1.redhat.com [10.5.110.68]); Thu, 17 Oct 2019 21:26:50 +0000 (UTC)
 Sender: linux-block-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-From: Ajay Joshi <ajay.joshi@wdc.com>
+On 10/17/2019 11:49 AM, Richard W.M. Jones wrote:
+> On Thu, Oct 17, 2019 at 09:36:34AM -0700, Eric Biggers wrote:
+>> On Thu, Oct 17, 2019 at 05:28:29PM +0100, Richard W.M. Jones wrote:
+>>> On Thu, Oct 17, 2019 at 10:47:59AM -0500, Mike Christie wrote:
+>>>> On 10/17/2019 09:03 AM, Richard W.M. Jones wrote:
+>>>>> On Tue, Oct 01, 2019 at 04:19:25PM -0500, Mike Christie wrote:
+>>>>>> Hey Josef and nbd list,
+>>>>>>
+>>>>>> I had a question about if there are any socket family restrictions for nbd?
+>>>>>
+>>>>> In normal circumstances, in userspace, the NBD protocol would only be
+>>>>> used over AF_UNIX or AF_INET/AF_INET6.
+>>>>>
+>>>>> There's a bit of confusion because netlink is used by nbd-client to
+>>>>> configure the NBD device, setting things like block size and timeouts
+>>>>> (instead of ioctl which is deprecated).  I think you don't mean this
+>>>>> use of netlink?
+>>>>
+>>>> I didn't. It looks like it is just a bad test.
+>>>>
+>>>> For the automated test in this thread the test created a AF_NETLINK
+>>>> socket and passed it into the NBD_SET_SOCK ioctl. That is what got used
+>>>> for the NBD_DO_IT ioctl.
+>>>>
+>>>> I was not sure if the test creator picked any old socket and it just
+>>>> happened to pick one nbd never supported, or it was trying to simulate
+>>>> sockets that did not support the shutdown method.
+>>>>
+>>>> I attached the automated test that got run (test.c).
+>>>
+>>> I'd say it sounds like a bad test, but I'm not familiar with syzkaller
+>>> nor how / from where it generates these tests.  Did someone report a
+>>> bug and then syzkaller wrote this test?
+>>
+>> It's an automatically generated fuzz test.
+>>
+>> There's rarely any such thing as a "bad" fuzz test.  If userspace
+>> can do something that causes the kernel to crash or hang, it's a
+>> kernel bug, with very few exceptions (e.g. like writing to
+>> /dev/mem).
+>>
+>> If there are cases that aren't supported, like sockets that don't
+>> support a certain function or whatever, then the code needs to check
+>> for those cases and return an error, not hang the kernel.
+> 
+> Oh I see.  In that case I agree, although I believe this is a
+> root-only API and root has a lot of ways to crash the kernel, but sure
+> it could be fixed to restrict sockets to one of:
+> 
+>  - AF_LOCAL or AF_UNIX
+>  - AF_INET or AF_INET6
+>  - AF_INET*_SDP (? no idea what this is, but it's used by nbd-client)
+> 
 
-A zoned block device maintains a write pointer within a zone, and reads
-beyond the write pointer are undefined. Fill data buffer returned above
-the write pointer with 0xFF.
+This one as for a infinniband related socket family that never made it
+upstream.
 
-Signed-off-by: Ajay Joshi <ajay.joshi@wdc.com>
-Reviewed-by: Damien Le Moal <damien.lemoal@wdc.com>
-Reviewed-by: Matias Bjørling <matias.bjorling@wdc.com>
-Signed-off-by: Chaitanya Kulkarni <chaitanya.kulkarni@wdc.com>
----
-Hi,
-
-This patch is originally posted in July :-
-https://www.spinics.net/lists/linux-block/msg42403.html.
-Resending this patch based on latest linux-block tree for-next branch.
-
--Chaitanya
----
- drivers/block/null_blk.h       |  8 ++++++++
- drivers/block/null_blk_main.c  | 26 +++++++++++++++++++++++++-
- drivers/block/null_blk_zoned.c | 21 +++++++++++++++++++--
- 3 files changed, 52 insertions(+), 3 deletions(-)
-
-diff --git a/drivers/block/null_blk.h b/drivers/block/null_blk.h
-index a235c45e22a7..93c2a3d403da 100644
---- a/drivers/block/null_blk.h
-+++ b/drivers/block/null_blk.h
-@@ -96,6 +96,8 @@ int null_zone_report(struct gendisk *disk, sector_t sector,
- blk_status_t null_handle_zoned(struct nullb_cmd *cmd,
- 				enum req_opf op, sector_t sector,
- 				sector_t nr_sectors);
-+size_t null_zone_valid_read_len(struct nullb *nullb,
-+				sector_t sector, unsigned int len);
- #else
- static inline int null_zone_init(struct nullb_device *dev)
- {
-@@ -115,5 +117,11 @@ static inline blk_status_t null_handle_zoned(struct nullb_cmd *cmd,
- {
- 	return BLK_STS_NOTSUPP;
- }
-+static inline size_t null_zone_valid_read_len(struct nullb *nullb,
-+					      sector_t sector,
-+					      unsigned int len)
-+{
-+	return len;
-+}
- #endif /* CONFIG_BLK_DEV_ZONED */
- #endif /* __NULL_BLK_H */
-diff --git a/drivers/block/null_blk_main.c b/drivers/block/null_blk_main.c
-index f5e0dffb4624..ea7a4d6b7848 100644
---- a/drivers/block/null_blk_main.c
-+++ b/drivers/block/null_blk_main.c
-@@ -1022,6 +1022,16 @@ static int copy_from_nullb(struct nullb *nullb, struct page *dest,
- 	return 0;
- }
- 
-+static void nullb_fill_pattern(struct nullb *nullb, struct page *page,
-+			       unsigned int len, unsigned int off)
-+{
-+	void *dst;
-+
-+	dst = kmap_atomic(page);
-+	memset(dst + off, 0xFF, len);
-+	kunmap_atomic(dst);
-+}
-+
- static void null_handle_discard(struct nullb *nullb, sector_t sector, size_t n)
- {
- 	size_t temp;
-@@ -1062,10 +1072,24 @@ static int null_transfer(struct nullb *nullb, struct page *page,
- 	unsigned int len, unsigned int off, bool is_write, sector_t sector,
- 	bool is_fua)
- {
-+	struct nullb_device *dev = nullb->dev;
-+	unsigned int valid_len = len;
- 	int err = 0;
- 
- 	if (!is_write) {
--		err = copy_from_nullb(nullb, page, off, sector, len);
-+		if (dev->zoned)
-+			valid_len = null_zone_valid_read_len(nullb,
-+				sector, len);
-+
-+		if (valid_len) {
-+			err = copy_from_nullb(nullb, page, off,
-+				sector, valid_len);
-+			off += valid_len;
-+			len -= valid_len;
-+		}
-+
-+		if (len)
-+			nullb_fill_pattern(nullb, page, len, off);
- 		flush_dcache_page(page);
- 	} else {
- 		flush_dcache_page(page);
-diff --git a/drivers/block/null_blk_zoned.c b/drivers/block/null_blk_zoned.c
-index eabc116832a7..e020f17dac9f 100644
---- a/drivers/block/null_blk_zoned.c
-+++ b/drivers/block/null_blk_zoned.c
-@@ -84,6 +84,24 @@ int null_zone_report(struct gendisk *disk, sector_t sector,
- 	return 0;
- }
- 
-+size_t null_zone_valid_read_len(struct nullb *nullb,
-+				sector_t sector, unsigned int len)
-+{
-+	struct nullb_device *dev = nullb->dev;
-+	struct blk_zone *zone = &dev->zones[null_zone_no(dev, sector)];
-+	unsigned int nr_sectors = len >> SECTOR_SHIFT;
-+
-+	/* Read must be below the write pointer position */
-+	if (zone->type == BLK_ZONE_TYPE_CONVENTIONAL ||
-+	    sector + nr_sectors <= zone->wp)
-+		return len;
-+
-+	if (sector > zone->wp)
-+		return 0;
-+
-+	return (zone->wp - sector) << SECTOR_SHIFT;
-+}
-+
- static blk_status_t null_zone_write(struct nullb_cmd *cmd, sector_t sector,
- 		     unsigned int nr_sectors)
- {
-@@ -121,8 +139,7 @@ static blk_status_t null_zone_write(struct nullb_cmd *cmd, sector_t sector,
- static blk_status_t null_zone_reset(struct nullb_cmd *cmd, sector_t sector)
- {
- 	struct nullb_device *dev = cmd->nq->dev;
--	unsigned int zno = null_zone_no(dev, sector);
--	struct blk_zone *zone = &dev->zones[zno];
-+	struct blk_zone *zone = &dev->zones[null_zone_no(dev, sector)];
- 	size_t i;
- 
- 	switch (req_op(cmd->rq)) {
--- 
-2.22.1
-
+It did support the shutdown callout, so I just made my patch check that
+the passed in socket support that instead of hard coding the family
+names just in case there was some user still using it.
 
