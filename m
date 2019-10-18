@@ -2,72 +2,73 @@ Return-Path: <SRS0=h0yA=YL=vger.kernel.org=linux-block-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-0.8 required=3.0 tests=DKIM_SIGNED,DKIM_VALID,
-	DKIM_VALID_AU,FREEMAIL_FORGED_FROMDOMAIN,FREEMAIL_FROM,
-	HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS
+X-Spam-Status: No, score=-2.2 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
+	MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED,USER_AGENT_SANE_1
 	autolearn=no autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 610AACA9EA1
-	for <linux-block@archiver.kernel.org>; Fri, 18 Oct 2019 08:57:57 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 9AF1BCA9EA0
+	for <linux-block@archiver.kernel.org>; Fri, 18 Oct 2019 09:37:15 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.kernel.org (Postfix) with ESMTP id 251EB21852
-	for <linux-block@archiver.kernel.org>; Fri, 18 Oct 2019 08:57:57 +0000 (UTC)
-Authentication-Results: mail.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="RKgF2qgU"
+	by mail.kernel.org (Postfix) with ESMTP id 77C2C21852
+	for <linux-block@archiver.kernel.org>; Fri, 18 Oct 2019 09:37:15 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1733304AbfJRI54 (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Fri, 18 Oct 2019 04:57:56 -0400
-Received: from mail-lj1-f180.google.com ([209.85.208.180]:40276 "EHLO
-        mail-lj1-f180.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1731444AbfJRI54 (ORCPT
-        <rfc822;linux-block@vger.kernel.org>);
-        Fri, 18 Oct 2019 04:57:56 -0400
-Received: by mail-lj1-f180.google.com with SMTP id 7so5396917ljw.7
-        for <linux-block@vger.kernel.org>; Fri, 18 Oct 2019 01:57:55 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20161025;
-        h=mime-version:references:in-reply-to:from:date:message-id:subject:to
-         :cc;
-        bh=SfNoC+F6v5ki3pqEYjfX6cOPv4RA4U+8Hk1NTS35MIw=;
-        b=RKgF2qgUS2Z4LsqD4udf23C1z/LnQvQl1y6QzWaQGSPlNmtwy36jRl5ThRCC7yIhPd
-         6mHF2WE3Ip3NGym6Rl53118PrfmQS3tTJGiW1l0gTy+8mO9TQmZdGV2+WUk1fb8riUrI
-         j4x4Tq6+7BckJO3ktJ2aB8uBIWs+aUtTk03DdVT4N9rE21dSSlM5UCCxo8Dg30c1Wk+R
-         7yq4S7/z3v3s2tsDjrFLUCrU9sl4MaP6B4VJY4gxDOMEU2KyiTptU6LIdlQKhku6oYnD
-         1G6c7QFYqR6AnFUAJYaJ4KeKTCSZ//90q+YIK9mknt8tbDiIUbh6++CL+NWrVd1u3jnH
-         F7eA==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20161025;
-        h=x-gm-message-state:mime-version:references:in-reply-to:from:date
-         :message-id:subject:to:cc;
-        bh=SfNoC+F6v5ki3pqEYjfX6cOPv4RA4U+8Hk1NTS35MIw=;
-        b=E4AkaFczV+g3hfjVY26mm+YrzK7RvKi/D9ak8SBH7hj6ZammHmy6N32ZTQ31FTf1n5
-         JKEewXXKdzghIbtFHTZS+IQmuJWPb6EvrBvVn3572Tn2sfQIveVpw+b+ZQXdMem5Vzwt
-         IZy7REvmbXK1uG8WNRVkaDm+1p3hM7ydVA5wuwqkHqpmBvSSKYiVlsA2u14AeifqEoQ0
-         B0pn2N/ej1Sbx1lInU9GZQBp7D3HnFNxB7ppHCRJIZYp+zNLSp6PHnsdHxpH0UEyMamj
-         bIkRtb69BeOCMDYFCmwGNlKuAic/x4E1ozBC8APPBqi3t42FS7RrIwgtOD0dQhCA/zQM
-         Q6yg==
-X-Gm-Message-State: APjAAAXTfFbkRNItKLqwt0/fLv8xrsCrNNMqvM/Y92mTH3+gsngh0WDm
-        lwE6mTmyNv6v9/ZlxpEoBUZDu6JIFNDxLUcvK71QpGnv
-X-Google-Smtp-Source: APXvYqxAxUdaLcpck0mXAI5BOIWKaU6jND83mdild9qiJPX+rawyzYmD6EeFrr9dLy/6e6cMcLC0Wkl5tgRs06kwXwA=
-X-Received: by 2002:a2e:81cf:: with SMTP id s15mr4686971ljg.99.1571389074589;
- Fri, 18 Oct 2019 01:57:54 -0700 (PDT)
+        id S2390634AbfJRJhO (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Fri, 18 Oct 2019 05:37:14 -0400
+Received: from mx2.suse.de ([195.135.220.15]:49912 "EHLO mx1.suse.de"
+        rhost-flags-OK-OK-OK-FAIL) by vger.kernel.org with ESMTP
+        id S1727917AbfJRJhO (ORCPT <rfc822;linux-block@vger.kernel.org>);
+        Fri, 18 Oct 2019 05:37:14 -0400
+X-Virus-Scanned: by amavisd-new at test-mx.suse.de
+Received: from relay2.suse.de (unknown [195.135.220.254])
+        by mx1.suse.de (Postfix) with ESMTP id 1D7DFB028;
+        Fri, 18 Oct 2019 09:37:13 +0000 (UTC)
+Received: by quack2.suse.cz (Postfix, from userid 1000)
+        id 354CA1E4851; Fri, 18 Oct 2019 11:37:12 +0200 (CEST)
+Date:   Fri, 18 Oct 2019 11:37:12 +0200
+From:   Jan Kara <jack@suse.cz>
+To:     linux-block@vger.kernel.org
+Cc:     Jens Axboe <axboe@kernel.dk>
+Subject: Disk size update on first open
+Message-ID: <20191018093712.GA18593@quack2.suse.cz>
 MIME-Version: 1.0
-References: <20191015170201.27131-1-9erthalion6@gmail.com> <af0fc0a7-11cc-08e6-cdfd-6b55fc208c8f@kernel.dk>
-In-Reply-To: <af0fc0a7-11cc-08e6-cdfd-6b55fc208c8f@kernel.dk>
-From:   Dmitry Dolgov <9erthalion6@gmail.com>
-Date:   Fri, 18 Oct 2019 10:59:00 +0200
-Message-ID: <CA+q6zcXjun0Vk8HLwyh7GHq=Qkm2V9OvSFQpGupQN+LDUSNfXQ@mail.gmail.com>
-Subject: Re: [RFC v3] io_uring: add set of tracing events
-To:     Jens Axboe <axboe@kernel.dk>
-Cc:     linux-block@vger.kernel.org
-Content-Type: text/plain; charset="UTF-8"
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+User-Agent: Mutt/1.10.1 (2018-07-13)
 Sender: linux-block-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-> On Fri, Oct 18, 2019 at 1:28 AM Jens Axboe <axboe@kernel.dk> wrote:
->
-> Looks good to me, I've applied it for some testing. Thanks!
+Hello,
 
-Thank you!
+I have been debugging weird failures when using encrypted DVDs (bko#194965
+for interested) but in the end it all boils down to the fact that
+__blkdev_get() updates i_size of bdev inode only of the first open. This
+seems as a sensible thing to do but there is some weird behavior resulting
+out of this for devices with removable media:
+
+1) If someone has the device (such as /dev/sr0) open while inserting the
+media, bdev size will not get updated. This results in the media being
+accessible but the device size is wrong resulting in weird and hard to
+debug failures.
+
+2) This is especially annoying when pktcdvd is in the game as pktcdvd
+device holds corresponding sr device permanently open.
+
+Upon some inspection this seems to be an issue with how check_disk_change()
+(called from sr_block_open()) interacts with __blkdev_get(). If partition
+scan is enabled, check_disk_change() will call flush_disk() which sets
+bdev->bd_invalidated. And __blkdev_get() seeing bd_invalidated will call
+rescan_partitions() which ends up updating bdev size through
+check_disk_size_change(). But without partitioning none of this happens and
+the disk size remains stale.
+
+Now it seems strange that partitioned and unpartitioned devices behave
+differently. So I'd be inclined to just unify the behavior and use
+bd_invalidated for unpartitioned devices as well. Does anyone see a problem
+with that?
+
+								Honza
+-- 
+Jan Kara <jack@suse.com>
+SUSE Labs, CR
