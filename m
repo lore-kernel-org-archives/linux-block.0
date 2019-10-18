@@ -6,71 +6,68 @@ X-Spam-Status: No, score=-2.3 required=3.0 tests=DKIM_SIGNED,DKIM_VALID,
 	HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,
 	USER_AGENT_SANE_1 autolearn=no autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 67078CA9EA4
-	for <linux-block@archiver.kernel.org>; Fri, 18 Oct 2019 14:01:26 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 7AC92CA9EA0
+	for <linux-block@archiver.kernel.org>; Fri, 18 Oct 2019 14:02:31 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.kernel.org (Postfix) with ESMTP id 3D05B20872
-	for <linux-block@archiver.kernel.org>; Fri, 18 Oct 2019 14:01:26 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id 533CD21925
+	for <linux-block@archiver.kernel.org>; Fri, 18 Oct 2019 14:02:31 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel-dk.20150623.gappssmtp.com header.i=@kernel-dk.20150623.gappssmtp.com header.b="XY5WG2UI"
+	dkim=pass (2048-bit key) header.d=kernel-dk.20150623.gappssmtp.com header.i=@kernel-dk.20150623.gappssmtp.com header.b="G4kvwCHB"
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S2393746AbfJROBZ (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Fri, 18 Oct 2019 10:01:25 -0400
-Received: from mail-pf1-f195.google.com ([209.85.210.195]:44378 "EHLO
-        mail-pf1-f195.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S2390337AbfJROBZ (ORCPT
+        id S2408668AbfJROCa (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Fri, 18 Oct 2019 10:02:30 -0400
+Received: from mail-pf1-f181.google.com ([209.85.210.181]:42797 "EHLO
+        mail-pf1-f181.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S2393984AbfJROC3 (ORCPT
         <rfc822;linux-block@vger.kernel.org>);
-        Fri, 18 Oct 2019 10:01:25 -0400
-Received: by mail-pf1-f195.google.com with SMTP id q21so3945700pfn.11
-        for <linux-block@vger.kernel.org>; Fri, 18 Oct 2019 07:01:24 -0700 (PDT)
+        Fri, 18 Oct 2019 10:02:29 -0400
+Received: by mail-pf1-f181.google.com with SMTP id q12so3956617pff.9
+        for <linux-block@vger.kernel.org>; Fri, 18 Oct 2019 07:02:29 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=kernel-dk.20150623.gappssmtp.com; s=20150623;
         h=subject:to:cc:references:from:message-id:date:user-agent
          :mime-version:in-reply-to:content-language:content-transfer-encoding;
-        bh=Hf1qVJNxJFGIEDbuKHU/SYAxW3Q+MBcdUlTEY/Ap0o4=;
-        b=XY5WG2UIaJ8O87eMvYCBtsY2FjZFIvlITUngfd+YX1v9v0JOPnSVSlHEsHotfE7I0U
-         4NrZldV5MAXNibDkPiYPE3MIDbjjFRl7J5JCtzBoHf/lGVm9jnDnDQg/z/TiGd7JBNP5
-         CErKSYSabju1x9ueVtFwnPt21CStFjgQrQKkUgvZsJ4DVNVA1jghvXOmrktNkZKXSQJX
-         OeyUjeCQRlT3qNBy0/4Opol6JYDRoqShYs3F+bfCtx2pWa5qn+nXxbi/9VT89HEz2w4g
-         UWHc8r5oQ0It1NooBVdZQ6EVsnwmzjFSUXUkD3BQN4nXDV/tpHnoDrWhiEXPMcsAgejo
-         VM3Q==
+        bh=NGjNwJ3PzCerpzbdNxY1kpAupfmBlrM6RYVOMxk2ac4=;
+        b=G4kvwCHBRzpYuAcAAqNdmHCcNUPA9NQc88SC5szKDz6S1Y3sfEbVAfU2G7U9PUrQI4
+         MPHzrULvsrDZqOhU9oPXQXIVEBUw1up/PNdTaMD5JNOEE3xHIAS/fM7hOEHrCY6xRPss
+         G+ukb02aN4N8yKWp/j5cUwJzo9i5dN9yLkLbuIEz099klqdDdCHjdzlcsPZ4tx/JjyxK
+         8QxGSR0U/g2C0QPRDM3mCTSwC+QJAX2xN2HpVNVSqczDcId8ggCZ+rG2ttN//wif4XGA
+         8ChiPZw0+GZZcBfdHOR1BVsE/daFwTY4H6DRB5FpriYQeVjooh53b5EfUVY34nIHynp2
+         RdEw==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=1e100.net; s=20161025;
         h=x-gm-message-state:subject:to:cc:references:from:message-id:date
          :user-agent:mime-version:in-reply-to:content-language
          :content-transfer-encoding;
-        bh=Hf1qVJNxJFGIEDbuKHU/SYAxW3Q+MBcdUlTEY/Ap0o4=;
-        b=PYqpN4AwkLWFrnWXXGX6jUUqCqi3c3HB3F+UOqIRztqwDb9HsrfXV1NkdA4Itnc6mW
-         liPuSiV1qy7DilKWaAdefLXEhTsdblo26glm9bmdjj+zrTJF+w8PcEHj03VjsbUUry0N
-         PdyBeJ9vwWpoiK1VfxEiX5PFrRJAF6IFkHdv8AyHUfIW/DElgxnUhm72YkkT2TGKfAxN
-         eVDzjuV32n8A8HvdJ92z3xfO0Gj5VN2RGN8dEvWZfqu5aT87AQ5EqFONLSJdnu6PIPe1
-         6MoXw6mlQB06a+JijQZeV8EhgRQycUNPDlv09ggIFLHOuI9/JSd5xV5un/X+qEmhpaIU
-         XHNg==
-X-Gm-Message-State: APjAAAXm86NP9g7XerRpXdx+9E3KP3eYVFofd8Fxl+o5yQ1XwnSWknF9
-        rHTo5Je+R02Jyo8TBFhgyvtl0w==
-X-Google-Smtp-Source: APXvYqyvXWQvv8i6cBSexk18xZE1lGg7o0uO9hnccodCg5ctN4NgikzjGLepkJCLLWCJsKq0R1lh6Q==
-X-Received: by 2002:a63:709:: with SMTP id 9mr10389888pgh.445.1571407284165;
-        Fri, 18 Oct 2019 07:01:24 -0700 (PDT)
+        bh=NGjNwJ3PzCerpzbdNxY1kpAupfmBlrM6RYVOMxk2ac4=;
+        b=OagZ/hyqSI0AG4TGJaLUC2g3KCOLf9L6hGO4ax2HyjGx9cyAwUALRLx/RTou6sdhCw
+         R1N4zY1E32Kq0y0jA4ebpqwg0z1JzR6KHkpRyrE6myzGkGCvJcgNN092Aec+fSjHs0a6
+         Skhc2HLm2de2NBdduOgEfkb+U05vtxXH8jHrG5IbO4mORxwHjMxIM4cCgP+0A1cxe6iT
+         9VgoFnHHE8jjcgO8YtORgwm35kvc+qUZH7vWiBUnQxEsqNCr9p9UEI44gKT4MjOSXUNM
+         R1CjcyCqTi537efhcTe/rZKuuREsrCCw3RpYkyffOhL/fwQHjtlpdFSR5YOj5Vql6Bir
+         lOgg==
+X-Gm-Message-State: APjAAAVvs5pXGWOIsKJofe2fKEAZG0Ec630QgqVJN4mSqDifdiKl00jC
+        ly6UsAQY2x4p3sC2ylhWTIXx7H2s1UxE/A==
+X-Google-Smtp-Source: APXvYqxuWL1O5IoGH8FqUgF6lOjKpFfkmDo9ZIR94ofWHgaUp/2fayKOubjV2Zgg886deFAf1ZlrBg==
+X-Received: by 2002:a17:90a:db4a:: with SMTP id u10mr11467037pjx.30.1571407348341;
+        Fri, 18 Oct 2019 07:02:28 -0700 (PDT)
 Received: from [192.168.1.188] ([66.219.217.79])
-        by smtp.gmail.com with ESMTPSA id x20sm10019163pfp.120.2019.10.18.07.01.22
+        by smtp.gmail.com with ESMTPSA id p9sm6378836pfn.115.2019.10.18.07.02.26
         (version=TLS1_2 cipher=ECDHE-RSA-AES128-GCM-SHA256 bits=128/128);
-        Fri, 18 Oct 2019 07:01:23 -0700 (PDT)
-Subject: Re: [PATCH 1/3] io_uring: add support for async work inheriting files
- table
-To:     Jann Horn <jannh@google.com>
-Cc:     linux-block@vger.kernel.org,
-        "David S. Miller" <davem@davemloft.net>,
-        Network Development <netdev@vger.kernel.org>
-References: <20191017212858.13230-1-axboe@kernel.dk>
- <20191017212858.13230-2-axboe@kernel.dk>
- <CAG48ez0G2y0JS9=S2KmePO3xq-5DuzgovrLFiX4TJL-G897LCA@mail.gmail.com>
+        Fri, 18 Oct 2019 07:02:27 -0700 (PDT)
+Subject: Re: [RFC v3] io_uring: add set of tracing events
+To:     Dmitry Dolgov <9erthalion6@gmail.com>
+Cc:     linux-block@vger.kernel.org
+References: <20191015170201.27131-1-9erthalion6@gmail.com>
+ <af0fc0a7-11cc-08e6-cdfd-6b55fc208c8f@kernel.dk>
+ <CA+q6zcXjun0Vk8HLwyh7GHq=Qkm2V9OvSFQpGupQN+LDUSNfXQ@mail.gmail.com>
 From:   Jens Axboe <axboe@kernel.dk>
-Message-ID: <0fb9d9a0-6251-c4bd-71b0-6e34c6a1aab8@kernel.dk>
-Date:   Fri, 18 Oct 2019 08:01:20 -0600
+Message-ID: <7c4af03e-4a03-ad85-08f1-121a65401a79@kernel.dk>
+Date:   Fri, 18 Oct 2019 08:02:25 -0600
 User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:60.0) Gecko/20100101
  Thunderbird/60.9.0
 MIME-Version: 1.0
-In-Reply-To: <CAG48ez0G2y0JS9=S2KmePO3xq-5DuzgovrLFiX4TJL-G897LCA@mail.gmail.com>
+In-Reply-To: <CA+q6zcXjun0Vk8HLwyh7GHq=Qkm2V9OvSFQpGupQN+LDUSNfXQ@mail.gmail.com>
 Content-Type: text/plain; charset=utf-8
 Content-Language: en-US
 Content-Transfer-Encoding: 7bit
@@ -79,98 +76,14 @@ Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-On 10/17/19 8:41 PM, Jann Horn wrote:
-> On Fri, Oct 18, 2019 at 4:01 AM Jens Axboe <axboe@kernel.dk> wrote:
->> This is in preparation for adding opcodes that need to modify files
->> in a process file table, either adding new ones or closing old ones.
-> 
-> Closing old ones would be tricky. Basically if you call
-> get_files_struct() while you're between an fdget()/fdput() pair (e.g.
-> from sys_io_uring_enter()), you're not allowed to use that
-> files_struct reference to replace or close existing FDs through that
-> reference. (Or more accurately, if you go through fdget() with
-> files_struct refcount 1, you must not replace/close FDs in there in
-> any way until you've passed the corresponding fdput().)
-> 
-> You can avoid that if you ensure that you never use fdget()/fdput() in
-> the relevant places, only fget()/fput().
-
-That's a good point, I didn't think the closing aspect through when
-writing that changelog. File addition is the most interesting aspect,
-obviously, and the only part that I care about in this patch set. I'll
-change the wording.
-
->> If an opcode needs this, it must set REQ_F_NEED_FILES in the request
->> structure. If work that needs to get punted to async context have this
->> set, they will grab a reference to the process file table. When the
->> work is completed, the reference is dropped again.
-> [...]
->> @@ -2220,6 +2223,10 @@ static void io_sq_wq_submit_work(struct work_struct *work)
->>                                  set_fs(USER_DS);
->>                          }
->>                  }
->> +               if (s->files && !old_files) {
->> +                       old_files = current->files;
->> +                       current->files = s->files;
->> +               }
-> 
-> AFAIK e.g. stuff like proc_fd_link() in procfs can concurrently call
-> get_files_struct() even on kernel tasks, so you should take the
-> task_lock(current) while fiddling with the ->files pointer.
-
-Fixed up, thanks!
-
-> Also, maybe I'm too tired to read this correctly, but it seems like
-> when io_sq_wq_submit_work() is processing multiple elements with
-> ->files pointers, this part will only consume a reference to the first
-> one?
-
-Like the mm, we should only have the one file table. But there's no
-reason to not handle this properly, I've amended the commit to properly
-swap so it works for any number of file tables.
-
->>                  if (!ret) {
->>                          s->has_user = cur_mm != NULL;
->> @@ -2312,6 +2319,11 @@ static void io_sq_wq_submit_work(struct work_struct *work)
->>                  unuse_mm(cur_mm);
->>                  mmput(cur_mm);
->>          }
->> +       if (old_files) {
->> +               struct files_struct *files = current->files;
->> +               current->files = old_files;
->> +               put_files_struct(files);
->> +       }
-> 
-> And then here the first files_struct reference is dropped, and the
-> rest of them leak?
-
-Fixed with the above change.
-
->> @@ -2413,6 +2425,8 @@ static int __io_queue_sqe(struct io_ring_ctx *ctx, struct io_kiocb *req,
+On 10/18/19 2:59 AM, Dmitry Dolgov wrote:
+>> On Fri, Oct 18, 2019 at 1:28 AM Jens Axboe <axboe@kernel.dk> wrote:
 >>
->>                          s->sqe = sqe_copy;
->>                          memcpy(&req->submit, s, sizeof(*s));
->> +                       if (req->flags & REQ_F_NEED_FILES)
->> +                               req->submit.files = get_files_struct(current);
+>> Looks good to me, I've applied it for some testing. Thanks!
 > 
-> Stupid question: How does this interact with sqpoll mode? In that
-> case, this function is running on a kernel thread that isn't sharing
-> the application's files_struct, right?
+> Thank you!
 
-Not a stupid question! It doesn't work with sqpoll. We need to be
-entered on behalf of the task, and we never see that with sqpoll (except
-if NEED_WAKE is set in flags).
-
-For now I'll just forbid it explicitly in io_accept(), just like we do
-for IORING_SETUP_IOPOLL.
-
-Updated patch1:
-
-http://git.kernel.dk/cgit/linux-block/commit/?h=for-5.5/io_uring-test&id=df6caac708dae8ee9a74c9016e479b02ad78d436
-
-and patch 3:
-
-http://git.kernel.dk/cgit/linux-block/commit/?h=for-5.5/io_uring-test&id=442bb35fc4f8f28c29ea220475c45babb44ee49c
+Already saved me some time in verifying some activity, so well worth it!
 
 -- 
 Jens Axboe
