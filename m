@@ -4,52 +4,52 @@ X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 X-Spam-Level: 
 X-Spam-Status: No, score=-10.1 required=3.0 tests=DKIMWL_WL_HIGH,DKIM_SIGNED,
 	DKIM_VALID,DKIM_VALID_AU,INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,
-	SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED,USER_AGENT_GIT autolearn=ham
+	SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED,USER_AGENT_GIT autolearn=unavailable
 	autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 5F53DCA9EA0
-	for <linux-block@archiver.kernel.org>; Fri, 18 Oct 2019 22:05:23 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 67FAECA9EAB
+	for <linux-block@archiver.kernel.org>; Fri, 18 Oct 2019 22:14:54 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.kernel.org (Postfix) with ESMTP id 23CAC2245D
-	for <linux-block@archiver.kernel.org>; Fri, 18 Oct 2019 22:05:23 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id 3281722499
+	for <linux-block@archiver.kernel.org>; Fri, 18 Oct 2019 22:14:54 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=default; t=1571436323;
-	bh=o8P20wrNaZNXOqJF+YTebFW1ptiMmPp0UsImFpua9LQ=;
+	s=default; t=1571436894;
+	bh=dcVigU6fDMmZoextzHaCniTrTK6eBi3KgAmY8viInsA=;
 	h=From:To:Cc:Subject:Date:In-Reply-To:References:List-ID:From;
-	b=h+GzKf4vZpnnXcNqwd62mQo+qX6Oqfl1U3S5zskTDFmIArPYvKDx+qPT+a3XAZyUL
-	 TPVSzqVu7Ir+RO9ymxkEU3YVkNlZtCi7JStXP5nEG+s0IGcRXoges56rt8NJA3Kkv5
-	 P8QpKIAPtrL+yL/xAWpVpwOHTAWZVdiveH9/f9/g=
+	b=OtFh1r5Kk+Fb+vL3bX2ZfQjF57VvhdRAJiUEOUhm5E1dKyCn1nQCcekxIiTTxKWio
+	 7/2tQvabLGsd8QC0cVxe7A0HXMUy5n+EUgR8bE6+MMgDeKBpePTrQW5wF8xHzo1lw3
+	 JYI0HGZg1WgfJPH8ggRNnKUuKxeoqo5HPCtZZiY8=
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1729563AbfJRWFW (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Fri, 18 Oct 2019 18:05:22 -0400
-Received: from mail.kernel.org ([198.145.29.99]:37098 "EHLO mail.kernel.org"
+        id S2392359AbfJRWOs (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Fri, 18 Oct 2019 18:14:48 -0400
+Received: from mail.kernel.org ([198.145.29.99]:41954 "EHLO mail.kernel.org"
         rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-        id S1729482AbfJRWFS (ORCPT <rfc822;linux-block@vger.kernel.org>);
-        Fri, 18 Oct 2019 18:05:18 -0400
+        id S2388719AbfJRWJQ (ORCPT <rfc822;linux-block@vger.kernel.org>);
+        Fri, 18 Oct 2019 18:09:16 -0400
 Received: from sasha-vm.mshome.net (c-73-47-72-35.hsd1.nh.comcast.net [73.47.72.35])
         (using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
         (No client certificate requested)
-        by mail.kernel.org (Postfix) with ESMTPSA id 647D9222D2;
-        Fri, 18 Oct 2019 22:05:16 +0000 (UTC)
+        by mail.kernel.org (Postfix) with ESMTPSA id 0BEE72246A;
+        Fri, 18 Oct 2019 22:09:14 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-        s=default; t=1571436317;
-        bh=o8P20wrNaZNXOqJF+YTebFW1ptiMmPp0UsImFpua9LQ=;
+        s=default; t=1571436556;
+        bh=dcVigU6fDMmZoextzHaCniTrTK6eBi3KgAmY8viInsA=;
         h=From:To:Cc:Subject:Date:In-Reply-To:References:From;
-        b=hOi6OKOZyAfd3fQ4xIALDojORDcMCOL+lnIB6L0+vYbAVo4atc6LMcq6bi5d32vtB
-         pkMjAZOMTzODOeRG0ILTybSJ4IGkc9j78Ts8W+PCqrob/IGCaafawGJeYBT/Ln0JQb
-         JO3bv4YPr7tao2DyAte/fAhp0gcZIKDMXZUdrZa8=
+        b=z5TSf3fEqy8DarWcxh48UXXVG1XUS5/ElpNR7Xh7idaj9R7si1WGh9hHD1ndkK0Ck
+         TJhHeMOi6Xn/oxp7QJlb8wt3tKj98969aYlo33RxEdstMKCRwy6AjMZpm4Oo75no9b
+         z/L1nKHCrGd7T5VJ+a7cSjCtd1NCoABQ+4XgqUvE=
 From:   Sasha Levin <sashal@kernel.org>
 To:     linux-kernel@vger.kernel.org, stable@vger.kernel.org
 Cc:     Xiubo Li <xiubli@redhat.com>, Mike Christie <mchristi@redhat.com>,
         Josef Bacik <josef@toxicpanda.com>,
         Jens Axboe <axboe@kernel.dk>, Sasha Levin <sashal@kernel.org>,
         linux-block@vger.kernel.org, nbd@other.debian.org
-Subject: [PATCH AUTOSEL 5.3 85/89] nbd: fix possible sysfs duplicate warning
-Date:   Fri, 18 Oct 2019 18:03:20 -0400
-Message-Id: <20191018220324.8165-85-sashal@kernel.org>
+Subject: [PATCH AUTOSEL 4.14 53/56] nbd: fix possible sysfs duplicate warning
+Date:   Fri, 18 Oct 2019 18:07:50 -0400
+Message-Id: <20191018220753.10002-53-sashal@kernel.org>
 X-Mailer: git-send-email 2.20.1
-In-Reply-To: <20191018220324.8165-1-sashal@kernel.org>
-References: <20191018220324.8165-1-sashal@kernel.org>
+In-Reply-To: <20191018220753.10002-1-sashal@kernel.org>
+References: <20191018220753.10002-1-sashal@kernel.org>
 MIME-Version: 1.0
 X-stable: review
 X-Patchwork-Hint: Ignore
@@ -87,10 +87,10 @@ Signed-off-by: Sasha Levin <sashal@kernel.org>
  1 file changed, 1 insertion(+), 1 deletion(-)
 
 diff --git a/drivers/block/nbd.c b/drivers/block/nbd.c
-index 0b727f7432f9e..bd164192045b0 100644
+index a234600849558..3e45004407963 100644
 --- a/drivers/block/nbd.c
 +++ b/drivers/block/nbd.c
-@@ -230,8 +230,8 @@ static void nbd_put(struct nbd_device *nbd)
+@@ -228,8 +228,8 @@ static void nbd_put(struct nbd_device *nbd)
  	if (refcount_dec_and_mutex_lock(&nbd->refs,
  					&nbd_index_mutex)) {
  		idr_remove(&nbd_index_idr, nbd->index);
