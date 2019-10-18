@@ -2,600 +2,237 @@ Return-Path: <SRS0=h0yA=YL=vger.kernel.org=linux-block-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-6.8 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
-	INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,
-	URIBL_BLOCKED autolearn=unavailable autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-2.2 required=3.0 tests=DKIM_SIGNED,DKIM_VALID,
+	HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,
+	URIBL_BLOCKED,USER_AGENT_SANE_1 autolearn=no autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 99CB3CA9EA0
-	for <linux-block@archiver.kernel.org>; Fri, 18 Oct 2019 16:35:21 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 02EB9CA9EA0
+	for <linux-block@archiver.kernel.org>; Fri, 18 Oct 2019 16:36:32 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.kernel.org (Postfix) with ESMTP id 61BD820659
-	for <linux-block@archiver.kernel.org>; Fri, 18 Oct 2019 16:35:21 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id C37892070B
+	for <linux-block@archiver.kernel.org>; Fri, 18 Oct 2019 16:36:31 +0000 (UTC)
+Authentication-Results: mail.kernel.org;
+	dkim=pass (2048-bit key) header.d=kernel-dk.20150623.gappssmtp.com header.i=@kernel-dk.20150623.gappssmtp.com header.b="AfR7j+fK"
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S2390103AbfJRQfQ (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Fri, 18 Oct 2019 12:35:16 -0400
-Received: from smtprelay0047.hostedemail.com ([216.40.44.47]:36329 "EHLO
-        smtprelay.hostedemail.com" rhost-flags-OK-OK-OK-FAIL)
-        by vger.kernel.org with ESMTP id S1730786AbfJRQfQ (ORCPT
+        id S2390098AbfJRQgb (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Fri, 18 Oct 2019 12:36:31 -0400
+Received: from mail-pg1-f194.google.com ([209.85.215.194]:37718 "EHLO
+        mail-pg1-f194.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S2390036AbfJRQgb (ORCPT
         <rfc822;linux-block@vger.kernel.org>);
-        Fri, 18 Oct 2019 12:35:16 -0400
-Received: from filter.hostedemail.com (clb03-v110.bra.tucows.net [216.40.38.60])
-        by smtprelay05.hostedemail.com (Postfix) with ESMTP id 626F418264E3F;
-        Fri, 18 Oct 2019 16:35:11 +0000 (UTC)
-X-Session-Marker: 6A6F6540706572636865732E636F6D
-X-HE-Tag: swim18_4a2a99c5c3b53
-X-Filterd-Recvd-Size: 18853
-Received: from XPS-9350.home (unknown [47.151.135.224])
-        (Authenticated sender: joe@perches.com)
-        by omf04.hostedemail.com (Postfix) with ESMTPA;
-        Fri, 18 Oct 2019 16:35:09 +0000 (UTC)
-Message-ID: <f31b38b9ad515a138edaecf85701b1e3db064114.camel@perches.com>
-Subject: [PATCH] kernel: convert switch/case fallthrough comments to
- fallthrough;
-From:   Joe Perches <joe@perches.com>
-To:     Linus Torvalds <torvalds@linux-foundation.org>
-Cc:     linux-audit@redhat.com, linux-kernel@vger.kernel.org,
-        netdev@vger.kernel.org, bpf@vger.kernel.org,
-        linux-security-module@vger.kernel.org,
-        kgdb-bugreport@lists.sourceforge.net, linux-pm@vger.kernel.org,
-        linux-block@vger.kernel.org
-Date:   Fri, 18 Oct 2019 09:35:08 -0700
-Content-Type: text/plain; charset="ISO-8859-1"
-User-Agent: Evolution 3.32.1-2 
+        Fri, 18 Oct 2019 12:36:31 -0400
+Received: by mail-pg1-f194.google.com with SMTP id p1so3669211pgi.4
+        for <linux-block@vger.kernel.org>; Fri, 18 Oct 2019 09:36:30 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=kernel-dk.20150623.gappssmtp.com; s=20150623;
+        h=subject:to:cc:references:from:message-id:date:user-agent
+         :mime-version:in-reply-to:content-language:content-transfer-encoding;
+        bh=rWLs6Xuc3aJC0s0delqoDli8RYMmapuhff73waYsGtY=;
+        b=AfR7j+fKA2c8DHDcxPY9fGz4gy2w1xUP0WHZe8VBKkez/uJ5S27VRq0sl/hVEpKoZO
+         yy75VizWut/ylGy9uoA/ZOrFXLK2XZOSlu/PUQxXcGH8EnIKAFdWsPXDnzos6YIw73+C
+         r4cMjEoXgC+5kT/DS6RpO+4rzGTqxcSDBu7MASCS4TTqqNBvzPW7bxWoHzvl1T2V7rxl
+         jqpcR4cF1ZzyGb9p7AJ9wLyVnnDe9TyZ8Q69BtJlrSVI4dST5kZWnJg9RVlaTXACEQhm
+         pFFykQatyhMoMtnGpunWdEkcmD4SJJzqTUMjItKXLoC7lmePJtaMwyEYMtgsk1uz4tYH
+         gX0Q==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20161025;
+        h=x-gm-message-state:subject:to:cc:references:from:message-id:date
+         :user-agent:mime-version:in-reply-to:content-language
+         :content-transfer-encoding;
+        bh=rWLs6Xuc3aJC0s0delqoDli8RYMmapuhff73waYsGtY=;
+        b=WOz09em1ftlboXFZbe8P0TiFS1yxVL25+hlE4XG1TwBjZDb+YzARV8keD4SwbMm4JF
+         1d0TMOwAmExR42PykP8zmwBl04kq0syfcb/JKyhzNZf/MpDsX8umhR8aiEM25DqPNS4E
+         6hh8Co5O5hKw03Tk0uGjwkhktXv/vzpCvP/zN+NkwXO/86ymYeN5Myo9l7t+pNKvQUnT
+         UeHPA7U2vCWErhhIW5DWm+VtQ+y+xK23eUyXaZTQ+LNzT2L1qd2nLFC2ECRaql/1qJbX
+         tAzTGwnTXKDTHDhqEgLsW6rEPs8cauElKYTk5SAwQHMIVRjS/RrDoJyGA2hxoFvzmmkM
+         EzWA==
+X-Gm-Message-State: APjAAAV6Nu6vOTPqg0SLA2VxgIKtCOYii0AWGObAtoH4G1yxnxTIV2Wm
+        PcrDoCEa8YjQqejhhoLmW4a6+g==
+X-Google-Smtp-Source: APXvYqwLWsAjNyv0O5PRoFjzmTVjhvNhmHsItJjRJYU2gj2UFw7QsUBLK7PfTTz6vvOdmQtuSdJS5g==
+X-Received: by 2002:a62:2ec5:: with SMTP id u188mr7635072pfu.252.1571416589407;
+        Fri, 18 Oct 2019 09:36:29 -0700 (PDT)
+Received: from [192.168.1.188] ([66.219.217.79])
+        by smtp.gmail.com with ESMTPSA id o64sm15326856pjb.24.2019.10.18.09.36.27
+        (version=TLS1_2 cipher=ECDHE-RSA-AES128-GCM-SHA256 bits=128/128);
+        Fri, 18 Oct 2019 09:36:28 -0700 (PDT)
+Subject: Re: [PATCH 1/3] io_uring: add support for async work inheriting files
+ table
+To:     Jann Horn <jannh@google.com>
+Cc:     linux-block@vger.kernel.org,
+        "David S. Miller" <davem@davemloft.net>,
+        Network Development <netdev@vger.kernel.org>
+References: <20191017212858.13230-1-axboe@kernel.dk>
+ <20191017212858.13230-2-axboe@kernel.dk>
+ <CAG48ez0G2y0JS9=S2KmePO3xq-5DuzgovrLFiX4TJL-G897LCA@mail.gmail.com>
+ <0fb9d9a0-6251-c4bd-71b0-6e34c6a1aab8@kernel.dk>
+ <CAG48ez181=JoYudXee0KbU0vDZ=EbxmgB7q0mmjaA0gyp6MFBQ@mail.gmail.com>
+ <a54329d5-a128-3ccd-7a12-f6cadaa20dbf@kernel.dk>
+ <CAG48ez1SDQNHjgFku4ft4qw9hdv1g6-sf7-dxuU_tJSx+ofV-w@mail.gmail.com>
+ <dbcf874d-8484-9c27-157a-c2752181acb5@kernel.dk>
+ <CAG48ez3KwaQ3DVH1VoWxFWTG2ZfCQ6M0oyv5vZqkLgY0QDEdiw@mail.gmail.com>
+ <a8fb7a1f-69c7-bf2a-b3dd-7886077d234b@kernel.dk>
+ <572f40fb-201c-99ce-b3f5-05ff9369b895@kernel.dk>
+ <CAG48ez12pteHyZasU8Smup-0Mn3BWNMCVjybd1jvXsPrJ7OmYg@mail.gmail.com>
+From:   Jens Axboe <axboe@kernel.dk>
+Message-ID: <20b44cc0-87b1-7bf8-d20e-f6131da9d130@kernel.dk>
+Date:   Fri, 18 Oct 2019 10:36:26 -0600
+User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:60.0) Gecko/20100101
+ Thunderbird/60.9.0
 MIME-Version: 1.0
+In-Reply-To: <CAG48ez12pteHyZasU8Smup-0Mn3BWNMCVjybd1jvXsPrJ7OmYg@mail.gmail.com>
+Content-Type: text/plain; charset=utf-8
+Content-Language: en-US
 Content-Transfer-Encoding: 7bit
 Sender: linux-block-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-Use the new pseudo keyword "fallthrough;" and not the
-various /* fallthrough */ style comments.
+On 10/18/19 10:20 AM, Jann Horn wrote:
+> On Fri, Oct 18, 2019 at 5:55 PM Jens Axboe <axboe@kernel.dk> wrote:
+>> On 10/18/19 9:00 AM, Jens Axboe wrote:
+>>> On 10/18/19 8:52 AM, Jann Horn wrote:
+>>>> On Fri, Oct 18, 2019 at 4:43 PM Jens Axboe <axboe@kernel.dk> wrote:
+>>>>>
+>>>>> On 10/18/19 8:40 AM, Jann Horn wrote:
+>>>>>> On Fri, Oct 18, 2019 at 4:37 PM Jens Axboe <axboe@kernel.dk> wrote:
+>>>>>>>
+>>>>>>> On 10/18/19 8:34 AM, Jann Horn wrote:
+>>>>>>>> On Fri, Oct 18, 2019 at 4:01 PM Jens Axboe <axboe@kernel.dk> wrote:
+>>>>>>>>> On 10/17/19 8:41 PM, Jann Horn wrote:
+>>>>>>>>>> On Fri, Oct 18, 2019 at 4:01 AM Jens Axboe <axboe@kernel.dk> wrote:
+>>>>>>>>>>> This is in preparation for adding opcodes that need to modify files
+>>>>>>>>>>> in a process file table, either adding new ones or closing old ones.
+>>>>>>>> [...]
+>>>>>>>>> Updated patch1:
+>>>>>>>>>
+>>>>>>>>> http://git.kernel.dk/cgit/linux-block/commit/?h=for-5.5/io_uring-test&id=df6caac708dae8ee9a74c9016e479b02ad78d436
+>>>>>>>>
+>>>>>>>> I don't understand what you're doing with old_files in there. In the
+>>>>>>>> "s->files && !old_files" branch, "current->files = s->files" happens
+>>>>>>>> without holding task_lock(), but current->files and s->files are also
+>>>>>>>> the same already at that point anyway. And what's the intent behind
+>>>>>>>> assigning stuff to old_files inside the loop? Isn't that going to
+>>>>>>>> cause the workqueue to keep a modified current->files beyond the
+>>>>>>>> runtime of the work?
+>>>>>>>
+>>>>>>> I simply forgot to remove the old block, it should only have this one:
+>>>>>>>
+>>>>>>> if (s->files && s->files != cur_files) {
+>>>>>>>             task_lock(current);
+>>>>>>>             current->files = s->files;
+>>>>>>>             task_unlock(current);
+>>>>>>>             if (cur_files)
+>>>>>>>                     put_files_struct(cur_files);
+>>>>>>>             cur_files = s->files;
+>>>>>>> }
+>>>>>>
+>>>>>> Don't you still need a put_files_struct() in the case where "s->files
+>>>>>> == cur_files"?
+>>>>>
+>>>>> I want to hold on to the files for as long as I can, to avoid unnecessary
+>>>>> shuffling of it. But I take it your worry here is that we'll be calling
+>>>>> something that manipulates ->files? Nothing should do that, unless
+>>>>> s->files is set. We didn't hide the workqueue ->files[] before this
+>>>>> change either.
+>>>>
+>>>> No, my worry is that the refcount of the files_struct is left too
+>>>> high. From what I can tell, the "do" loop in io_sq_wq_submit_work()
+>>>> iterates over multiple instances of struct sqe_submit. If there are
+>>>> two sqe_submit instances with the same ->files (each holding a
+>>>> reference from the get_files_struct() in __io_queue_sqe()), then:
+>>>>
+>>>> When processing the first sqe_submit instance, current->files and
+>>>> cur_files are set to $user_files.
+>>>> When processing the second sqe_submit instance, nothing happens
+>>>> (s->files == cur_files).
+>>>> After the loop, at the end of the function, put_files_struct() is
+>>>> called once on $user_files.
+>>>>
+>>>> So get_files_struct() has been called twice, but put_files_struct()
+>>>> has only been called once. That leaves the refcount too high, and by
+>>>> repeating this, an attacker can make the refcount wrap around and then
+>>>> cause a use-after-free.
+>>>
+>>> Ah now I see what you are getting at, yes that's clearly a bug! I wonder
+>>> how we best safely can batch the drops. We can track the number of times
+>>> we've used the same files, and do atomic_sub_and_test() in a
+>>> put_files_struct_many() type addition. But that would leave us open to
+>>> the issue you describe, where someone could maliciously overflow the
+>>> files ref count.
+>>>
+>>> Probably not worth over-optimizing, as long as we can avoid the
+>>> current->files task lock/unlock and shuffle.
+>>>
+>>> I'll update the patch.
+>>
+>> Alright, this incremental on top should do it. And full updated patch
+>> here:
+>>
+>> http://git.kernel.dk/cgit/linux-block/commit/?h=for-5.5/io_uring-test&id=40449c5a3d3b16796fa13e9469c69d62986e961c
+>>
+>> Let me know what you think.
+> 
+> Ignoring the locking elision, basically the logic is now this:
+> 
+> static void io_sq_wq_submit_work(struct work_struct *work)
+> {
+>          struct io_kiocb *req = container_of(work, struct io_kiocb, work);
+>          struct files_struct *cur_files = NULL, *old_files;
+>          [...]
+>          old_files = current->files;
+>          [...]
+>          do {
+>                  struct sqe_submit *s = &req->submit;
+>                  [...]
+>                  if (cur_files)
+>                          /* drop cur_files reference; borrow lifetime must
+>                           * end before here */
+>                          put_files_struct(cur_files);
+>                  /* move reference ownership to cur_files */
+>                  cur_files = s->files;
+>                  if (cur_files) {
+>                          task_lock(current);
+>                          /* current->files borrows reference from cur_files;
+>                           * existing borrow from previous loop ends here */
+>                          current->files = cur_files;
+>                          task_unlock(current);
+>                  }
+> 
+>                  [call __io_submit_sqe()]
+>                  [...]
+>          } while (req);
+>          [...]
+>          /* existing borrow ends here */
+>          task_lock(current);
+>          current->files = old_files;
+>          task_unlock(current);
+>          if (cur_files)
+>                  /* drop cur_files reference; borrow lifetime must
+>                   * end before here */
+>                  put_files_struct(cur_files);
+> }
+> 
+> If you run two iterations of this loop, with a first element that has
+> a ->files pointer and a second element that doesn't, then in the
+> second run through the loop, the reference to the files_struct will be
+> dropped while current->files still points to it; current->files is
+> only reset after the loop has ended. If someone accesses
+> current->files through procfs directly after that, AFAICS you'd get a
+> use-after-free.
 
-Signed-off-by: Joe Perches <joe@perches.com>
----
+Amazing how this is still broken. You are right, and it's especially
+annoying since that's exactly the case I originally talked about (not
+flipping current->files if we don't have to). I just did it wrong, so
+we'll leave a dangling pointer in ->files.
 
-This is a single patch for the kernel/ source tree,
-which would otherwise
-be sent through as separate
-patches to 19 maintainer sections.
+The by far most common case is if one sqe has a files it needs to
+attach, then others that also have files will be the same set. So I want
+to optimize for the case where we only flip current->files once when we
+see the files, and once when we're done with the loop.
 
-compilation tested only.
+Let me see if I can get this right...
 
-Done by the script in this email:
-https://lore.kernel.org/lkml/9fe980f7e28242c2835ffae34914c5f68e8268a7.camel@perches.com/
-
- kernel/auditfilter.c               | 2 +-
- kernel/bpf/cgroup.c                | 4 ++--
- kernel/bpf/verifier.c              | 4 ++--
- kernel/capability.c                | 2 +-
- kernel/compat.c                    | 6 +++---
- kernel/debug/gdbstub.c             | 6 +++---
- kernel/debug/kdb/kdb_keyboard.c    | 4 ++--
- kernel/debug/kdb/kdb_support.c     | 6 +++---
- kernel/events/core.c               | 3 +--
- kernel/futex.c                     | 4 ++--
- kernel/gcov/gcc_3_4.c              | 6 +++---
- kernel/irq/handle.c                | 3 +--
- kernel/irq/manage.c                | 5 ++---
- kernel/kallsyms.c                  | 4 ++--
- kernel/pid.c                       | 2 +-
- kernel/power/hibernate.c           | 2 +-
- kernel/power/qos.c                 | 4 ++--
- kernel/printk/printk.c             | 2 +-
- kernel/sched/core.c                | 2 +-
- kernel/sched/topology.c            | 6 +++---
- kernel/signal.c                    | 2 +-
- kernel/sys.c                       | 3 +--
- kernel/time/hrtimer.c              | 2 +-
- kernel/time/posix-timers.c         | 4 ++--
- kernel/time/tick-broadcast.c       | 2 +-
- kernel/time/timer.c                | 2 +-
- kernel/trace/blktrace.c            | 2 +-
- kernel/trace/trace_events_filter.c | 4 ++--
- 28 files changed, 47 insertions(+), 51 deletions(-)
-
-diff --git a/kernel/auditfilter.c b/kernel/auditfilter.c
-index b0126e9c0743..471cd680479d 100644
---- a/kernel/auditfilter.c
-+++ b/kernel/auditfilter.c
-@@ -674,7 +674,7 @@ static struct audit_rule_data *audit_krule_to_data(struct audit_krule *krule)
- 				data->values[i] = AUDIT_UID_UNSET;
- 				break;
- 			}
--			/* fall through - if set */
-+			fallthrough;	/* if set */
- 		default:
- 			data->values[i] = f->val;
- 		}
-diff --git a/kernel/bpf/cgroup.c b/kernel/bpf/cgroup.c
-index ddd8addcdb5c..955631f1b77d 100644
---- a/kernel/bpf/cgroup.c
-+++ b/kernel/bpf/cgroup.c
-@@ -797,7 +797,7 @@ cgroup_base_func_proto(enum bpf_func_id func_id, const struct bpf_prog *prog)
- 	case BPF_FUNC_trace_printk:
- 		if (capable(CAP_SYS_ADMIN))
- 			return bpf_get_trace_printk_proto();
--		/* fall through */
-+		fallthrough;
- 	default:
- 		return NULL;
- 	}
-@@ -1439,7 +1439,7 @@ static bool cg_sockopt_is_valid_access(int off, int size,
- 			return prog->expected_attach_type ==
- 				BPF_CGROUP_GETSOCKOPT;
- 		case offsetof(struct bpf_sockopt, optname):
--			/* fallthrough */
-+			fallthrough;
- 		case offsetof(struct bpf_sockopt, level):
- 			if (size != size_default)
- 				return false;
-diff --git a/kernel/bpf/verifier.c b/kernel/bpf/verifier.c
-index ffc3e53f5300..d2b6fd8545e2 100644
---- a/kernel/bpf/verifier.c
-+++ b/kernel/bpf/verifier.c
-@@ -2249,7 +2249,7 @@ static bool may_access_direct_pkt_data(struct bpf_verifier_env *env,
- 	case BPF_PROG_TYPE_CGROUP_SKB:
- 		if (t == BPF_WRITE)
- 			return false;
--		/* fallthrough */
-+		fallthrough;
- 
- 	/* Program types with direct read + write access go here! */
- 	case BPF_PROG_TYPE_SCHED_CLS:
-@@ -4381,7 +4381,7 @@ static int adjust_ptr_min_max_vals(struct bpf_verifier_env *env,
- 				off_reg == dst_reg ? dst : src);
- 			return -EACCES;
- 		}
--		/* fall-through */
-+		fallthrough;
- 	default:
- 		break;
- 	}
-diff --git a/kernel/capability.c b/kernel/capability.c
-index 1444f3954d75..7c59b096c98a 100644
---- a/kernel/capability.c
-+++ b/kernel/capability.c
-@@ -93,7 +93,7 @@ static int cap_validate_magic(cap_user_header_t header, unsigned *tocopy)
- 		break;
- 	case _LINUX_CAPABILITY_VERSION_2:
- 		warn_deprecated_v2();
--		/* fall through - v3 is otherwise equivalent to v2. */
-+		fallthrough;	/* v3 is otherwise equivalent to v2 */
- 	case _LINUX_CAPABILITY_VERSION_3:
- 		*tocopy = _LINUX_CAPABILITY_U32S_3;
- 		break;
-diff --git a/kernel/compat.c b/kernel/compat.c
-index a2bc1d6ceb57..d9c61f4317be 100644
---- a/kernel/compat.c
-+++ b/kernel/compat.c
-@@ -343,11 +343,11 @@ get_compat_sigset(sigset_t *set, const compat_sigset_t __user *compat)
- 		return -EFAULT;
- 	switch (_NSIG_WORDS) {
- 	case 4: set->sig[3] = v.sig[6] | (((long)v.sig[7]) << 32 );
--		/* fall through */
-+		fallthrough;
- 	case 3: set->sig[2] = v.sig[4] | (((long)v.sig[5]) << 32 );
--		/* fall through */
-+		fallthrough;
- 	case 2: set->sig[1] = v.sig[2] | (((long)v.sig[3]) << 32 );
--		/* fall through */
-+		fallthrough;
- 	case 1: set->sig[0] = v.sig[0] | (((long)v.sig[1]) << 32 );
- 	}
- #else
-diff --git a/kernel/debug/gdbstub.c b/kernel/debug/gdbstub.c
-index 4b280fc7dd67..b9d8b7248964 100644
---- a/kernel/debug/gdbstub.c
-+++ b/kernel/debug/gdbstub.c
-@@ -1033,14 +1033,14 @@ int gdb_serial_stub(struct kgdb_state *ks)
- 				return DBG_PASS_EVENT;
- 			}
- #endif
--			/* Fall through */
-+			fallthrough;
- 		case 'C': /* Exception passing */
- 			tmp = gdb_cmd_exception_pass(ks);
- 			if (tmp > 0)
- 				goto default_handle;
- 			if (tmp == 0)
- 				break;
--			/* Fall through - on tmp < 0 */
-+			fallthrough;	/* on tmp < 0 */
- 		case 'c': /* Continue packet */
- 		case 's': /* Single step packet */
- 			if (kgdb_contthread && kgdb_contthread != current) {
-@@ -1049,7 +1049,7 @@ int gdb_serial_stub(struct kgdb_state *ks)
- 				break;
- 			}
- 			dbg_activate_sw_breakpoints();
--			/* Fall through - to default processing */
-+			fallthrough;	/* to default processing */
- 		default:
- default_handle:
- 			error = kgdb_arch_handle_exception(ks->ex_vector,
-diff --git a/kernel/debug/kdb/kdb_keyboard.c b/kernel/debug/kdb/kdb_keyboard.c
-index 750497b0003a..f877a0a0d7cf 100644
---- a/kernel/debug/kdb/kdb_keyboard.c
-+++ b/kernel/debug/kdb/kdb_keyboard.c
-@@ -173,11 +173,11 @@ int kdb_get_kbd_char(void)
- 	case KT_LATIN:
- 		if (isprint(keychar))
- 			break;		/* printable characters */
--		/* fall through */
-+		fallthrough;
- 	case KT_SPEC:
- 		if (keychar == K_ENTER)
- 			break;
--		/* fall through */
-+		fallthrough;
- 	default:
- 		return -1;	/* ignore unprintables */
- 	}
-diff --git a/kernel/debug/kdb/kdb_support.c b/kernel/debug/kdb/kdb_support.c
-index b8e6306e7e13..d636506f695a 100644
---- a/kernel/debug/kdb/kdb_support.c
-+++ b/kernel/debug/kdb/kdb_support.c
-@@ -432,7 +432,7 @@ int kdb_getphysword(unsigned long *word, unsigned long addr, size_t size)
- 				*word = w8;
- 			break;
- 		}
--		/* fall through */
-+		fallthrough;
- 	default:
- 		diag = KDB_BADWIDTH;
- 		kdb_printf("kdb_getphysword: bad width %ld\n", (long) size);
-@@ -481,7 +481,7 @@ int kdb_getword(unsigned long *word, unsigned long addr, size_t size)
- 				*word = w8;
- 			break;
- 		}
--		/* fall through */
-+		fallthrough;
- 	default:
- 		diag = KDB_BADWIDTH;
- 		kdb_printf("kdb_getword: bad width %ld\n", (long) size);
-@@ -525,7 +525,7 @@ int kdb_putword(unsigned long addr, unsigned long word, size_t size)
- 			diag = kdb_putarea(addr, w8);
- 			break;
- 		}
--		/* fall through */
-+		fallthrough;
- 	default:
- 		diag = KDB_BADWIDTH;
- 		kdb_printf("kdb_putword: bad width %ld\n", (long) size);
-diff --git a/kernel/events/core.c b/kernel/events/core.c
-index 9ec0b0bfddbd..04e75b1144c5 100644
---- a/kernel/events/core.c
-+++ b/kernel/events/core.c
-@@ -9361,8 +9361,7 @@ perf_event_parse_addr_filter(struct perf_event *event, char *fstr,
- 		case IF_SRC_KERNELADDR:
- 		case IF_SRC_KERNEL:
- 			kernel = 1;
--			/* fall through */
--
-+			fallthrough;
- 		case IF_SRC_FILEADDR:
- 		case IF_SRC_FILE:
- 			if (state != IF_STATE_SOURCE)
-diff --git a/kernel/futex.c b/kernel/futex.c
-index bd18f60e4c6c..ab12b6229d2d 100644
---- a/kernel/futex.c
-+++ b/kernel/futex.c
-@@ -3639,12 +3639,12 @@ long do_futex(u32 __user *uaddr, int op, u32 val, ktime_t *timeout,
- 	switch (cmd) {
- 	case FUTEX_WAIT:
- 		val3 = FUTEX_BITSET_MATCH_ANY;
--		/* fall through */
-+		fallthrough;
- 	case FUTEX_WAIT_BITSET:
- 		return futex_wait(uaddr, flags, val, timeout, val3);
- 	case FUTEX_WAKE:
- 		val3 = FUTEX_BITSET_MATCH_ANY;
--		/* fall through */
-+		fallthrough;
- 	case FUTEX_WAKE_BITSET:
- 		return futex_wake(uaddr, flags, val, val3);
- 	case FUTEX_REQUEUE:
-diff --git a/kernel/gcov/gcc_3_4.c b/kernel/gcov/gcc_3_4.c
-index 801ee4b0b969..32fc3278166f 100644
---- a/kernel/gcov/gcc_3_4.c
-+++ b/kernel/gcov/gcc_3_4.c
-@@ -455,7 +455,7 @@ int gcov_iter_next(struct gcov_iterator *iter)
- 	case RECORD_COUNT:
- 		/* Advance to next count */
- 		iter->count++;
--		/* fall through */
-+		fallthrough;
- 	case RECORD_COUNT_LEN:
- 		if (iter->count < get_func(iter)->n_ctrs[iter->type]) {
- 			iter->record = 9;
-@@ -465,7 +465,7 @@ int gcov_iter_next(struct gcov_iterator *iter)
- 		get_type(iter)->offset += iter->count;
- 		iter->count = 0;
- 		iter->type++;
--		/* fall through */
-+		fallthrough;
- 	case RECORD_FUNCTION_CHECK:
- 		if (iter->type < iter->num_types) {
- 			iter->record = 7;
-@@ -474,7 +474,7 @@ int gcov_iter_next(struct gcov_iterator *iter)
- 		/* Advance to next function */
- 		iter->type = 0;
- 		iter->function++;
--		/* fall through */
-+		fallthrough;
- 	case RECORD_TIME_STAMP:
- 		if (iter->function < iter->info->n_functions)
- 			iter->record = 3;
-diff --git a/kernel/irq/handle.c b/kernel/irq/handle.c
-index a4ace611f47f..b38d2fd70fe1 100644
---- a/kernel/irq/handle.c
-+++ b/kernel/irq/handle.c
-@@ -165,8 +165,7 @@ irqreturn_t __handle_irq_event_percpu(struct irq_desc *desc, unsigned int *flags
- 			}
- 
- 			__irq_wake_thread(desc, action);
--
--			/* Fall through - to add to randomness */
-+			fallthrough;	/* to add to randomness */
- 		case IRQ_HANDLED:
- 			*flags |= action->flags;
- 			break;
-diff --git a/kernel/irq/manage.c b/kernel/irq/manage.c
-index 1753486b440c..baa86020f243 100644
---- a/kernel/irq/manage.c
-+++ b/kernel/irq/manage.c
-@@ -222,7 +222,7 @@ int irq_do_set_affinity(struct irq_data *data, const struct cpumask *mask,
- 	case IRQ_SET_MASK_OK:
- 	case IRQ_SET_MASK_OK_DONE:
- 		cpumask_copy(desc->irq_common_data.affinity, mask);
--		/* fall through */
-+		fallthrough;
- 	case IRQ_SET_MASK_OK_NOCOPY:
- 		irq_validate_effective_affinity(data);
- 		irq_set_thread_affinity(desc);
-@@ -792,8 +792,7 @@ int __irq_set_trigger(struct irq_desc *desc, unsigned long flags)
- 	case IRQ_SET_MASK_OK_DONE:
- 		irqd_clear(&desc->irq_data, IRQD_TRIGGER_MASK);
- 		irqd_set(&desc->irq_data, flags);
--		/* fall through */
--
-+		fallthrough;
- 	case IRQ_SET_MASK_OK_NOCOPY:
- 		flags = irqd_get_trigger_type(&desc->irq_data);
- 		irq_settings_set_trigger_mask(desc, flags);
-diff --git a/kernel/kallsyms.c b/kernel/kallsyms.c
-index 136ce049c4ad..05ce8a4d4729 100644
---- a/kernel/kallsyms.c
-+++ b/kernel/kallsyms.c
-@@ -651,11 +651,11 @@ int kallsyms_show_value(void)
- 	case 0:
- 		if (kallsyms_for_perf())
- 			return 1;
--	/* fallthrough */
-+		fallthrough;
- 	case 1:
- 		if (has_capability_noaudit(current, CAP_SYSLOG))
- 			return 1;
--	/* fallthrough */
-+		fallthrough;
- 	default:
- 		return 0;
- 	}
-diff --git a/kernel/pid.c b/kernel/pid.c
-index 0a9f2e437217..b2a005a6dea1 100644
---- a/kernel/pid.c
-+++ b/kernel/pid.c
-@@ -144,7 +144,7 @@ void free_pid(struct pid *pid)
- 			/* Handle a fork failure of the first process */
- 			WARN_ON(ns->child_reaper);
- 			ns->pid_allocated = 0;
--			/* fall through */
-+			fallthrough;
- 		case 0:
- 			schedule_work(&ns->proc_work);
- 			break;
-diff --git a/kernel/power/hibernate.c b/kernel/power/hibernate.c
-index 3c0a5a8170b0..d091dcd57557 100644
---- a/kernel/power/hibernate.c
-+++ b/kernel/power/hibernate.c
-@@ -647,7 +647,7 @@ static void power_down(void)
- 		break;
- 	case HIBERNATION_PLATFORM:
- 		hibernation_platform_enter();
--		/* Fall through */
-+		fallthrough;
- 	case HIBERNATION_SHUTDOWN:
- 		if (pm_power_off)
- 			kernel_power_off();
-diff --git a/kernel/power/qos.c b/kernel/power/qos.c
-index 9568a2fe7c11..6bf5295b2ade 100644
---- a/kernel/power/qos.c
-+++ b/kernel/power/qos.c
-@@ -236,7 +236,7 @@ int pm_qos_update_target(struct pm_qos_constraints *c, struct plist_node *node,
- 		 * changed
- 		 */
- 		plist_del(node, &c->list);
--		/* fall through */
-+		fallthrough;
- 	case PM_QOS_ADD_REQ:
- 		plist_node_init(node, new_value);
- 		plist_add(node, &c->list);
-@@ -309,7 +309,7 @@ bool pm_qos_update_flags(struct pm_qos_flags *pqf,
- 		break;
- 	case PM_QOS_UPDATE_REQ:
- 		pm_qos_flags_remove_req(pqf, req);
--		/* fall through */
-+		fallthrough;
- 	case PM_QOS_ADD_REQ:
- 		req->flags = val;
- 		INIT_LIST_HEAD(&req->node);
-diff --git a/kernel/printk/printk.c b/kernel/printk/printk.c
-index ca65327a6de8..6b3d7c68e6fe 100644
---- a/kernel/printk/printk.c
-+++ b/kernel/printk/printk.c
-@@ -1531,7 +1531,7 @@ int do_syslog(int type, char __user *buf, int len, int source)
- 	/* Read/clear last kernel messages */
- 	case SYSLOG_ACTION_READ_CLEAR:
- 		clear = true;
--		/* FALL THRU */
-+		fallthrough;
- 	/* Read last kernel messages */
- 	case SYSLOG_ACTION_READ_ALL:
- 		if (!buf || len < 0)
-diff --git a/kernel/sched/core.c b/kernel/sched/core.c
-index dd05a378631a..050b728728f4 100644
---- a/kernel/sched/core.c
-+++ b/kernel/sched/core.c
-@@ -2068,7 +2068,7 @@ static int select_fallback_rq(int cpu, struct task_struct *p)
- 				state = possible;
- 				break;
- 			}
--			/* Fall-through */
-+			fallthrough;
- 		case possible:
- 			do_set_cpus_allowed(p, cpu_possible_mask);
- 			state = fail;
-diff --git a/kernel/sched/topology.c b/kernel/sched/topology.c
-index b5667a273bf6..7d6b84e0caca 100644
---- a/kernel/sched/topology.c
-+++ b/kernel/sched/topology.c
-@@ -1224,13 +1224,13 @@ static void __free_domain_allocs(struct s_data *d, enum s_alloc what,
- 	case sa_rootdomain:
- 		if (!atomic_read(&d->rd->refcount))
- 			free_rootdomain(&d->rd->rcu);
--		/* Fall through */
-+		fallthrough;
- 	case sa_sd:
- 		free_percpu(d->sd);
--		/* Fall through */
-+		fallthrough;
- 	case sa_sd_storage:
- 		__sdt_free(cpu_map);
--		/* Fall through */
-+		fallthrough;
- 	case sa_none:
- 		break;
- 	}
-diff --git a/kernel/signal.c b/kernel/signal.c
-index c4da1ef56fdf..73bdcc1f2561 100644
---- a/kernel/signal.c
-+++ b/kernel/signal.c
-@@ -846,7 +846,7 @@ static int check_kill_permission(int sig, struct kernel_siginfo *info,
- 			 */
- 			if (!sid || sid == task_session(current))
- 				break;
--			/* fall through */
-+			fallthrough;
- 		default:
- 			return -EPERM;
- 		}
-diff --git a/kernel/sys.c b/kernel/sys.c
-index a611d1d58c7d..bad4f30e7f37 100644
---- a/kernel/sys.c
-+++ b/kernel/sys.c
-@@ -1737,8 +1737,7 @@ void getrusage(struct task_struct *p, int who, struct rusage *r)
- 
- 		if (who == RUSAGE_CHILDREN)
- 			break;
--		/* fall through */
--
-+		fallthrough;
- 	case RUSAGE_SELF:
- 		thread_group_cputime_adjusted(p, &tgutime, &tgstime);
- 		utime += tgutime;
-diff --git a/kernel/time/hrtimer.c b/kernel/time/hrtimer.c
-index 0d4dc241c0fb..8060a35682e1 100644
---- a/kernel/time/hrtimer.c
-+++ b/kernel/time/hrtimer.c
-@@ -373,7 +373,7 @@ static bool hrtimer_fixup_activate(void *addr, enum debug_obj_state state)
- 	switch (state) {
- 	case ODEBUG_STATE_ACTIVE:
- 		WARN_ON(1);
--		/* fall through */
-+		fallthrough;
- 	default:
- 		return false;
- 	}
-diff --git a/kernel/time/posix-timers.c b/kernel/time/posix-timers.c
-index 0ec5b7a1d769..6cc658391702 100644
---- a/kernel/time/posix-timers.c
-+++ b/kernel/time/posix-timers.c
-@@ -413,12 +413,12 @@ static struct pid *good_sigevent(sigevent_t * event)
- 		rtn = pid_task(pid, PIDTYPE_PID);
- 		if (!rtn || !same_thread_group(rtn, current))
- 			return NULL;
--		/* FALLTHRU */
-+		fallthrough;
- 	case SIGEV_SIGNAL:
- 	case SIGEV_THREAD:
- 		if (event->sigev_signo <= 0 || event->sigev_signo > SIGRTMAX)
- 			return NULL;
--		/* FALLTHRU */
-+		fallthrough;
- 	case SIGEV_NONE:
- 		return pid;
- 	default:
-diff --git a/kernel/time/tick-broadcast.c b/kernel/time/tick-broadcast.c
-index e51778c312f1..36d7464c8962 100644
---- a/kernel/time/tick-broadcast.c
-+++ b/kernel/time/tick-broadcast.c
-@@ -381,7 +381,7 @@ void tick_broadcast_control(enum tick_broadcast_mode mode)
- 	switch (mode) {
- 	case TICK_BROADCAST_FORCE:
- 		tick_broadcast_forced = 1;
--		/* fall through */
-+		fallthrough;
- 	case TICK_BROADCAST_ON:
- 		cpumask_set_cpu(cpu, tick_broadcast_on);
- 		if (!cpumask_test_and_set_cpu(cpu, tick_broadcast_mask)) {
-diff --git a/kernel/time/timer.c b/kernel/time/timer.c
-index 4820823515e9..6512d721ef57 100644
---- a/kernel/time/timer.c
-+++ b/kernel/time/timer.c
-@@ -653,7 +653,7 @@ static bool timer_fixup_activate(void *addr, enum debug_obj_state state)
- 
- 	case ODEBUG_STATE_ACTIVE:
- 		WARN_ON(1);
--		/* fall through */
-+		fallthrough;
- 	default:
- 		return false;
- 	}
-diff --git a/kernel/trace/blktrace.c b/kernel/trace/blktrace.c
-index 2d6e93ab0478..0a1753dc69d3 100644
---- a/kernel/trace/blktrace.c
-+++ b/kernel/trace/blktrace.c
-@@ -717,7 +717,7 @@ int blk_trace_ioctl(struct block_device *bdev, unsigned cmd, char __user *arg)
- #endif
- 	case BLKTRACESTART:
- 		start = 1;
--		/* fall through */
-+		fallthrough;
- 	case BLKTRACESTOP:
- 		ret = __blk_trace_startstop(q, start);
- 		break;
-diff --git a/kernel/trace/trace_events_filter.c b/kernel/trace/trace_events_filter.c
-index c9a74f82b14a..78b0bfc4d72e 100644
---- a/kernel/trace/trace_events_filter.c
-+++ b/kernel/trace/trace_events_filter.c
-@@ -499,7 +499,7 @@ predicate_parse(const char *str, int nr_parens, int nr_preds,
- 					ptr++;
- 					break;
- 				}
--				/* fall through */
-+				fallthrough;
- 			default:
- 				parse_error(pe, FILT_ERR_TOO_MANY_PREDS,
- 					    next - str);
-@@ -1273,7 +1273,7 @@ static int parse_pred(const char *str, void *data,
- 		switch (op) {
- 		case OP_NE:
- 			pred->not = 1;
--			/* Fall through */
-+			fallthrough;
- 		case OP_GLOB:
- 		case OP_EQ:
- 			break;
-
+-- 
+Jens Axboe
 
