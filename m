@@ -2,73 +2,176 @@ Return-Path: <SRS0=h0yA=YL=vger.kernel.org=linux-block-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-2.2 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
-	MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED,USER_AGENT_SANE_1
-	autolearn=no autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-2.3 required=3.0 tests=DKIM_SIGNED,DKIM_VALID,
+	HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,
+	USER_AGENT_SANE_1 autolearn=no autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 9AF1BCA9EA0
-	for <linux-block@archiver.kernel.org>; Fri, 18 Oct 2019 09:37:15 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 67078CA9EA4
+	for <linux-block@archiver.kernel.org>; Fri, 18 Oct 2019 14:01:26 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.kernel.org (Postfix) with ESMTP id 77C2C21852
-	for <linux-block@archiver.kernel.org>; Fri, 18 Oct 2019 09:37:15 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id 3D05B20872
+	for <linux-block@archiver.kernel.org>; Fri, 18 Oct 2019 14:01:26 +0000 (UTC)
+Authentication-Results: mail.kernel.org;
+	dkim=pass (2048-bit key) header.d=kernel-dk.20150623.gappssmtp.com header.i=@kernel-dk.20150623.gappssmtp.com header.b="XY5WG2UI"
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S2390634AbfJRJhO (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Fri, 18 Oct 2019 05:37:14 -0400
-Received: from mx2.suse.de ([195.135.220.15]:49912 "EHLO mx1.suse.de"
-        rhost-flags-OK-OK-OK-FAIL) by vger.kernel.org with ESMTP
-        id S1727917AbfJRJhO (ORCPT <rfc822;linux-block@vger.kernel.org>);
-        Fri, 18 Oct 2019 05:37:14 -0400
-X-Virus-Scanned: by amavisd-new at test-mx.suse.de
-Received: from relay2.suse.de (unknown [195.135.220.254])
-        by mx1.suse.de (Postfix) with ESMTP id 1D7DFB028;
-        Fri, 18 Oct 2019 09:37:13 +0000 (UTC)
-Received: by quack2.suse.cz (Postfix, from userid 1000)
-        id 354CA1E4851; Fri, 18 Oct 2019 11:37:12 +0200 (CEST)
-Date:   Fri, 18 Oct 2019 11:37:12 +0200
-From:   Jan Kara <jack@suse.cz>
-To:     linux-block@vger.kernel.org
-Cc:     Jens Axboe <axboe@kernel.dk>
-Subject: Disk size update on first open
-Message-ID: <20191018093712.GA18593@quack2.suse.cz>
+        id S2393746AbfJROBZ (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Fri, 18 Oct 2019 10:01:25 -0400
+Received: from mail-pf1-f195.google.com ([209.85.210.195]:44378 "EHLO
+        mail-pf1-f195.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S2390337AbfJROBZ (ORCPT
+        <rfc822;linux-block@vger.kernel.org>);
+        Fri, 18 Oct 2019 10:01:25 -0400
+Received: by mail-pf1-f195.google.com with SMTP id q21so3945700pfn.11
+        for <linux-block@vger.kernel.org>; Fri, 18 Oct 2019 07:01:24 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=kernel-dk.20150623.gappssmtp.com; s=20150623;
+        h=subject:to:cc:references:from:message-id:date:user-agent
+         :mime-version:in-reply-to:content-language:content-transfer-encoding;
+        bh=Hf1qVJNxJFGIEDbuKHU/SYAxW3Q+MBcdUlTEY/Ap0o4=;
+        b=XY5WG2UIaJ8O87eMvYCBtsY2FjZFIvlITUngfd+YX1v9v0JOPnSVSlHEsHotfE7I0U
+         4NrZldV5MAXNibDkPiYPE3MIDbjjFRl7J5JCtzBoHf/lGVm9jnDnDQg/z/TiGd7JBNP5
+         CErKSYSabju1x9ueVtFwnPt21CStFjgQrQKkUgvZsJ4DVNVA1jghvXOmrktNkZKXSQJX
+         OeyUjeCQRlT3qNBy0/4Opol6JYDRoqShYs3F+bfCtx2pWa5qn+nXxbi/9VT89HEz2w4g
+         UWHc8r5oQ0It1NooBVdZQ6EVsnwmzjFSUXUkD3BQN4nXDV/tpHnoDrWhiEXPMcsAgejo
+         VM3Q==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20161025;
+        h=x-gm-message-state:subject:to:cc:references:from:message-id:date
+         :user-agent:mime-version:in-reply-to:content-language
+         :content-transfer-encoding;
+        bh=Hf1qVJNxJFGIEDbuKHU/SYAxW3Q+MBcdUlTEY/Ap0o4=;
+        b=PYqpN4AwkLWFrnWXXGX6jUUqCqi3c3HB3F+UOqIRztqwDb9HsrfXV1NkdA4Itnc6mW
+         liPuSiV1qy7DilKWaAdefLXEhTsdblo26glm9bmdjj+zrTJF+w8PcEHj03VjsbUUry0N
+         PdyBeJ9vwWpoiK1VfxEiX5PFrRJAF6IFkHdv8AyHUfIW/DElgxnUhm72YkkT2TGKfAxN
+         eVDzjuV32n8A8HvdJ92z3xfO0Gj5VN2RGN8dEvWZfqu5aT87AQ5EqFONLSJdnu6PIPe1
+         6MoXw6mlQB06a+JijQZeV8EhgRQycUNPDlv09ggIFLHOuI9/JSd5xV5un/X+qEmhpaIU
+         XHNg==
+X-Gm-Message-State: APjAAAXm86NP9g7XerRpXdx+9E3KP3eYVFofd8Fxl+o5yQ1XwnSWknF9
+        rHTo5Je+R02Jyo8TBFhgyvtl0w==
+X-Google-Smtp-Source: APXvYqyvXWQvv8i6cBSexk18xZE1lGg7o0uO9hnccodCg5ctN4NgikzjGLepkJCLLWCJsKq0R1lh6Q==
+X-Received: by 2002:a63:709:: with SMTP id 9mr10389888pgh.445.1571407284165;
+        Fri, 18 Oct 2019 07:01:24 -0700 (PDT)
+Received: from [192.168.1.188] ([66.219.217.79])
+        by smtp.gmail.com with ESMTPSA id x20sm10019163pfp.120.2019.10.18.07.01.22
+        (version=TLS1_2 cipher=ECDHE-RSA-AES128-GCM-SHA256 bits=128/128);
+        Fri, 18 Oct 2019 07:01:23 -0700 (PDT)
+Subject: Re: [PATCH 1/3] io_uring: add support for async work inheriting files
+ table
+To:     Jann Horn <jannh@google.com>
+Cc:     linux-block@vger.kernel.org,
+        "David S. Miller" <davem@davemloft.net>,
+        Network Development <netdev@vger.kernel.org>
+References: <20191017212858.13230-1-axboe@kernel.dk>
+ <20191017212858.13230-2-axboe@kernel.dk>
+ <CAG48ez0G2y0JS9=S2KmePO3xq-5DuzgovrLFiX4TJL-G897LCA@mail.gmail.com>
+From:   Jens Axboe <axboe@kernel.dk>
+Message-ID: <0fb9d9a0-6251-c4bd-71b0-6e34c6a1aab8@kernel.dk>
+Date:   Fri, 18 Oct 2019 08:01:20 -0600
+User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:60.0) Gecko/20100101
+ Thunderbird/60.9.0
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-User-Agent: Mutt/1.10.1 (2018-07-13)
+In-Reply-To: <CAG48ez0G2y0JS9=S2KmePO3xq-5DuzgovrLFiX4TJL-G897LCA@mail.gmail.com>
+Content-Type: text/plain; charset=utf-8
+Content-Language: en-US
+Content-Transfer-Encoding: 7bit
 Sender: linux-block-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-Hello,
+On 10/17/19 8:41 PM, Jann Horn wrote:
+> On Fri, Oct 18, 2019 at 4:01 AM Jens Axboe <axboe@kernel.dk> wrote:
+>> This is in preparation for adding opcodes that need to modify files
+>> in a process file table, either adding new ones or closing old ones.
+> 
+> Closing old ones would be tricky. Basically if you call
+> get_files_struct() while you're between an fdget()/fdput() pair (e.g.
+> from sys_io_uring_enter()), you're not allowed to use that
+> files_struct reference to replace or close existing FDs through that
+> reference. (Or more accurately, if you go through fdget() with
+> files_struct refcount 1, you must not replace/close FDs in there in
+> any way until you've passed the corresponding fdput().)
+> 
+> You can avoid that if you ensure that you never use fdget()/fdput() in
+> the relevant places, only fget()/fput().
 
-I have been debugging weird failures when using encrypted DVDs (bko#194965
-for interested) but in the end it all boils down to the fact that
-__blkdev_get() updates i_size of bdev inode only of the first open. This
-seems as a sensible thing to do but there is some weird behavior resulting
-out of this for devices with removable media:
+That's a good point, I didn't think the closing aspect through when
+writing that changelog. File addition is the most interesting aspect,
+obviously, and the only part that I care about in this patch set. I'll
+change the wording.
 
-1) If someone has the device (such as /dev/sr0) open while inserting the
-media, bdev size will not get updated. This results in the media being
-accessible but the device size is wrong resulting in weird and hard to
-debug failures.
+>> If an opcode needs this, it must set REQ_F_NEED_FILES in the request
+>> structure. If work that needs to get punted to async context have this
+>> set, they will grab a reference to the process file table. When the
+>> work is completed, the reference is dropped again.
+> [...]
+>> @@ -2220,6 +2223,10 @@ static void io_sq_wq_submit_work(struct work_struct *work)
+>>                                  set_fs(USER_DS);
+>>                          }
+>>                  }
+>> +               if (s->files && !old_files) {
+>> +                       old_files = current->files;
+>> +                       current->files = s->files;
+>> +               }
+> 
+> AFAIK e.g. stuff like proc_fd_link() in procfs can concurrently call
+> get_files_struct() even on kernel tasks, so you should take the
+> task_lock(current) while fiddling with the ->files pointer.
 
-2) This is especially annoying when pktcdvd is in the game as pktcdvd
-device holds corresponding sr device permanently open.
+Fixed up, thanks!
 
-Upon some inspection this seems to be an issue with how check_disk_change()
-(called from sr_block_open()) interacts with __blkdev_get(). If partition
-scan is enabled, check_disk_change() will call flush_disk() which sets
-bdev->bd_invalidated. And __blkdev_get() seeing bd_invalidated will call
-rescan_partitions() which ends up updating bdev size through
-check_disk_size_change(). But without partitioning none of this happens and
-the disk size remains stale.
+> Also, maybe I'm too tired to read this correctly, but it seems like
+> when io_sq_wq_submit_work() is processing multiple elements with
+> ->files pointers, this part will only consume a reference to the first
+> one?
 
-Now it seems strange that partitioned and unpartitioned devices behave
-differently. So I'd be inclined to just unify the behavior and use
-bd_invalidated for unpartitioned devices as well. Does anyone see a problem
-with that?
+Like the mm, we should only have the one file table. But there's no
+reason to not handle this properly, I've amended the commit to properly
+swap so it works for any number of file tables.
 
-								Honza
+>>                  if (!ret) {
+>>                          s->has_user = cur_mm != NULL;
+>> @@ -2312,6 +2319,11 @@ static void io_sq_wq_submit_work(struct work_struct *work)
+>>                  unuse_mm(cur_mm);
+>>                  mmput(cur_mm);
+>>          }
+>> +       if (old_files) {
+>> +               struct files_struct *files = current->files;
+>> +               current->files = old_files;
+>> +               put_files_struct(files);
+>> +       }
+> 
+> And then here the first files_struct reference is dropped, and the
+> rest of them leak?
+
+Fixed with the above change.
+
+>> @@ -2413,6 +2425,8 @@ static int __io_queue_sqe(struct io_ring_ctx *ctx, struct io_kiocb *req,
+>>
+>>                          s->sqe = sqe_copy;
+>>                          memcpy(&req->submit, s, sizeof(*s));
+>> +                       if (req->flags & REQ_F_NEED_FILES)
+>> +                               req->submit.files = get_files_struct(current);
+> 
+> Stupid question: How does this interact with sqpoll mode? In that
+> case, this function is running on a kernel thread that isn't sharing
+> the application's files_struct, right?
+
+Not a stupid question! It doesn't work with sqpoll. We need to be
+entered on behalf of the task, and we never see that with sqpoll (except
+if NEED_WAKE is set in flags).
+
+For now I'll just forbid it explicitly in io_accept(), just like we do
+for IORING_SETUP_IOPOLL.
+
+Updated patch1:
+
+http://git.kernel.dk/cgit/linux-block/commit/?h=for-5.5/io_uring-test&id=df6caac708dae8ee9a74c9016e479b02ad78d436
+
+and patch 3:
+
+http://git.kernel.dk/cgit/linux-block/commit/?h=for-5.5/io_uring-test&id=442bb35fc4f8f28c29ea220475c45babb44ee49c
+
 -- 
-Jan Kara <jack@suse.com>
-SUSE Labs, CR
+Jens Axboe
+
