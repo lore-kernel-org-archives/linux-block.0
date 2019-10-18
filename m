@@ -7,49 +7,49 @@ X-Spam-Status: No, score=-10.1 required=3.0 tests=DKIMWL_WL_HIGH,DKIM_SIGNED,
 	SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED,USER_AGENT_GIT autolearn=unavailable
 	autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 67FAECA9EAB
-	for <linux-block@archiver.kernel.org>; Fri, 18 Oct 2019 22:14:54 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id A9B38CA9EA0
+	for <linux-block@archiver.kernel.org>; Fri, 18 Oct 2019 22:17:12 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.kernel.org (Postfix) with ESMTP id 3281722499
-	for <linux-block@archiver.kernel.org>; Fri, 18 Oct 2019 22:14:54 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id 7581720679
+	for <linux-block@archiver.kernel.org>; Fri, 18 Oct 2019 22:17:12 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=default; t=1571436894;
-	bh=dcVigU6fDMmZoextzHaCniTrTK6eBi3KgAmY8viInsA=;
+	s=default; t=1571437032;
+	bh=7anIju3GzbRm18JdCkJS7Bg+9lKUk0OQ3BDxqqY5L24=;
 	h=From:To:Cc:Subject:Date:In-Reply-To:References:List-ID:From;
-	b=OtFh1r5Kk+Fb+vL3bX2ZfQjF57VvhdRAJiUEOUhm5E1dKyCn1nQCcekxIiTTxKWio
-	 7/2tQvabLGsd8QC0cVxe7A0HXMUy5n+EUgR8bE6+MMgDeKBpePTrQW5wF8xHzo1lw3
-	 JYI0HGZg1WgfJPH8ggRNnKUuKxeoqo5HPCtZZiY8=
+	b=jVlA5fTxMR0bfBLOyQph3lBMeV7SelGquJNLxUZuquL6WpKA6fwIXkiji71kAQaOf
+	 eVTDjl6UODe6EOanIx/2joEvSX3AduUm1V2lJhKMuy99lAUavleO2Zhm5gLG0oMycx
+	 KFIMzhxnD0hJPlagTfwnlwXOVxXVTBEeSgdaKAdY=
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S2392359AbfJRWOs (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Fri, 18 Oct 2019 18:14:48 -0400
-Received: from mail.kernel.org ([198.145.29.99]:41954 "EHLO mail.kernel.org"
+        id S1733289AbfJRWHu (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Fri, 18 Oct 2019 18:07:50 -0400
+Received: from mail.kernel.org ([198.145.29.99]:40212 "EHLO mail.kernel.org"
         rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-        id S2388719AbfJRWJQ (ORCPT <rfc822;linux-block@vger.kernel.org>);
-        Fri, 18 Oct 2019 18:09:16 -0400
+        id S1733241AbfJRWHs (ORCPT <rfc822;linux-block@vger.kernel.org>);
+        Fri, 18 Oct 2019 18:07:48 -0400
 Received: from sasha-vm.mshome.net (c-73-47-72-35.hsd1.nh.comcast.net [73.47.72.35])
         (using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
         (No client certificate requested)
-        by mail.kernel.org (Postfix) with ESMTPSA id 0BEE72246A;
-        Fri, 18 Oct 2019 22:09:14 +0000 (UTC)
+        by mail.kernel.org (Postfix) with ESMTPSA id D95CE222D1;
+        Fri, 18 Oct 2019 22:07:46 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-        s=default; t=1571436556;
-        bh=dcVigU6fDMmZoextzHaCniTrTK6eBi3KgAmY8viInsA=;
+        s=default; t=1571436467;
+        bh=7anIju3GzbRm18JdCkJS7Bg+9lKUk0OQ3BDxqqY5L24=;
         h=From:To:Cc:Subject:Date:In-Reply-To:References:From;
-        b=z5TSf3fEqy8DarWcxh48UXXVG1XUS5/ElpNR7Xh7idaj9R7si1WGh9hHD1ndkK0Ck
-         TJhHeMOi6Xn/oxp7QJlb8wt3tKj98969aYlo33RxEdstMKCRwy6AjMZpm4Oo75no9b
-         z/L1nKHCrGd7T5VJ+a7cSjCtd1NCoABQ+4XgqUvE=
+        b=Bu2c6ZrzQNAgR6iUWOCpixSD+B04Rsv6aarfMBTMe8KLw9q7Wx2uK/MQyVraFke2I
+         UH8guMLvzeUnMb6sox1lEzGI8oKUoucXPhGlKZnPbwVMg7ikEz2U9Bvk6HlqPLRrOf
+         G9ys6yR/f1qX27nunWHK5WhWXcguntLWaS2eoS90=
 From:   Sasha Levin <sashal@kernel.org>
 To:     linux-kernel@vger.kernel.org, stable@vger.kernel.org
 Cc:     Xiubo Li <xiubli@redhat.com>, Mike Christie <mchristi@redhat.com>,
         Josef Bacik <josef@toxicpanda.com>,
         Jens Axboe <axboe@kernel.dk>, Sasha Levin <sashal@kernel.org>,
         linux-block@vger.kernel.org, nbd@other.debian.org
-Subject: [PATCH AUTOSEL 4.14 53/56] nbd: fix possible sysfs duplicate warning
-Date:   Fri, 18 Oct 2019 18:07:50 -0400
-Message-Id: <20191018220753.10002-53-sashal@kernel.org>
+Subject: [PATCH AUTOSEL 4.19 097/100] nbd: fix possible sysfs duplicate warning
+Date:   Fri, 18 Oct 2019 18:05:22 -0400
+Message-Id: <20191018220525.9042-97-sashal@kernel.org>
 X-Mailer: git-send-email 2.20.1
-In-Reply-To: <20191018220753.10002-1-sashal@kernel.org>
-References: <20191018220753.10002-1-sashal@kernel.org>
+In-Reply-To: <20191018220525.9042-1-sashal@kernel.org>
+References: <20191018220525.9042-1-sashal@kernel.org>
 MIME-Version: 1.0
 X-stable: review
 X-Patchwork-Hint: Ignore
@@ -87,7 +87,7 @@ Signed-off-by: Sasha Levin <sashal@kernel.org>
  1 file changed, 1 insertion(+), 1 deletion(-)
 
 diff --git a/drivers/block/nbd.c b/drivers/block/nbd.c
-index a234600849558..3e45004407963 100644
+index bc2fa4e85f0ca..d445195945618 100644
 --- a/drivers/block/nbd.c
 +++ b/drivers/block/nbd.c
 @@ -228,8 +228,8 @@ static void nbd_put(struct nbd_device *nbd)
