@@ -2,241 +2,93 @@ Return-Path: <SRS0=V/uB=YN=vger.kernel.org=linux-block-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-5.4 required=3.0 tests=DKIM_SIGNED,DKIM_VALID,
-	DKIM_VALID_AU,HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,
-	SPF_HELO_NONE,SPF_PASS,USER_AGENT_SANE_1 autolearn=ham autolearn_force=no
-	version=3.4.0
+X-Spam-Status: No, score=-3.6 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
+	HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,
+	USER_AGENT_GIT autolearn=no autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id A22A8CA9EA9
-	for <linux-block@archiver.kernel.org>; Sun, 20 Oct 2019 10:14:29 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id E3921CA9EAD
+	for <linux-block@archiver.kernel.org>; Sun, 20 Oct 2019 23:42:24 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.kernel.org (Postfix) with ESMTP id 6AF472190F
-	for <linux-block@archiver.kernel.org>; Sun, 20 Oct 2019 10:14:29 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id B694721928
+	for <linux-block@archiver.kernel.org>; Sun, 20 Oct 2019 23:42:24 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="ddE3dD6t"
+	dkim=fail reason="signature verification failed" (2048-bit key) header.d=wdc.com header.i=@wdc.com header.b="BMkLgXbb"
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1726016AbfJTKO2 (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Sun, 20 Oct 2019 06:14:28 -0400
-Received: from us-smtp-delivery-1.mimecast.com ([207.211.31.120]:44786 "EHLO
-        us-smtp-1.mimecast.com" rhost-flags-OK-OK-OK-FAIL) by vger.kernel.org
-        with ESMTP id S1726063AbfJTKO2 (ORCPT
+        id S1726736AbfJTXmX (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Sun, 20 Oct 2019 19:42:23 -0400
+Received: from esa5.hgst.iphmx.com ([216.71.153.144]:54880 "EHLO
+        esa5.hgst.iphmx.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S1726587AbfJTXmX (ORCPT
         <rfc822;linux-block@vger.kernel.org>);
-        Sun, 20 Oct 2019 06:14:28 -0400
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-        s=mimecast20190719; t=1571566466;
-        h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-         to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-         content-transfer-encoding:content-transfer-encoding:
-         in-reply-to:in-reply-to:references:references;
-        bh=LesbO839e3tnjUR1zN7tDDthZ2+qlDF+NaQ4SbDCDag=;
-        b=ddE3dD6t976W57/IDQBGkybPUbzSU1tNGTgs/svcHOveT9C/GkpQ0bm9SCmo3y1cZVekvv
-        /hQZDWtdzbn3KqJy8tfei4faVLLJFhCfiYcKsK8I8k4MOGoxkVJCBM8RLSoAWdSPWKlFhF
-        xqWYGSCZXhUtpxjv7ZDFEzYGs8OKGi4=
-Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
- [209.132.183.4]) (Using TLS) by relay.mimecast.com with ESMTP id
- us-mta-17-IRak0tIiPpeqXX7fI-khJA-1; Sun, 20 Oct 2019 06:14:22 -0400
-Received: from smtp.corp.redhat.com (int-mx06.intmail.prod.int.phx2.redhat.com [10.5.11.16])
-        (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
-        (No client certificate requested)
-        by mimecast-mx01.redhat.com (Postfix) with ESMTPS id EAE6C2B7;
-        Sun, 20 Oct 2019 10:14:20 +0000 (UTC)
-Received: from ming.t460p (ovpn-8-17.pek2.redhat.com [10.72.8.17])
-        by smtp.corp.redhat.com (Postfix) with ESMTPS id F3A005C240;
-        Sun, 20 Oct 2019 10:14:13 +0000 (UTC)
-Date:   Sun, 20 Oct 2019 18:14:08 +0800
-From:   Ming Lei <ming.lei@redhat.com>
-To:     John Garry <john.garry@huawei.com>
-Cc:     Jens Axboe <axboe@kernel.dk>, linux-block@vger.kernel.org,
-        Bart Van Assche <bvanassche@acm.org>,
-        Hannes Reinecke <hare@suse.com>,
-        Christoph Hellwig <hch@lst.de>,
-        Thomas Gleixner <tglx@linutronix.de>,
-        Keith Busch <keith.busch@intel.com>
-Subject: Re: [PATCH V4 0/5] blk-mq: improvement on handling IO during CPU
- hotplug
-Message-ID: <20191020101404.GA5103@ming.t460p>
-References: <20191014015043.25029-1-ming.lei@redhat.com>
- <d30420d7-74d9-4417-1bbe-8113848e74fa@huawei.com>
- <20191016120729.GB5515@ming.t460p>
- <9dbc14ab-65cd-f7ac-384c-2dbe03575ee7@huawei.com>
- <55a84ea3-647d-0a76-596c-c6c6b2fc1b75@huawei.com>
+        Sun, 20 Oct 2019 19:42:23 -0400
+DKIM-Signature: v=1; a=rsa-sha256; c=simple/simple;
+  d=wdc.com; i=@wdc.com; q=dns/txt; s=dkim.wdc.com;
+  t=1571614944; x=1603150944;
+  h=from:to:subject:date:message-id:mime-version:
+   content-transfer-encoding;
+  bh=/UNosYy4fGH3jSNC6FWo80lL59SdY8u6GGobtRzBgJg=;
+  b=BMkLgXbbjTXIGwXGUXykF98b7QbUjFIxVAqkk+p/JCzLoN0FEFq4/qQV
+   aTAic2zh7Rjshms3/6aJg1b4HSpUae9PDPaMWFfusBfUT//7bDyJ4L6JO
+   oS4NYPaMW3x3++LGI2IsPPhODywXyErIzz3+oGwpDPGH+udx2Ap/670gd
+   FRhOgiig/BLJL0IH1mwAvKy/ZsI/bfmnK6O10Mf7KL9xCUwLuBLux6Xkb
+   ofhwVLz5TGA91PtVC7JRnvJWOfEy8Gt96PakAMO1RKgbCISo8kBIthutt
+   P6cOiloXPZZ6+iFRzjZ1pzCDvUpIcrYSQRDCOIRo9euERSfNP0h95qgnI
+   w==;
+IronPort-SDR: fAgMzLOgTAGnZeBtvqFbYV7xIqFtfd1eBY7hMDkZMpV0TFS74riPiUC4Y1xQZvsV615cuevfuZ
+ T/l2V0g9BZQPb7xz0uLMomW32Scc2Mk37DOpqHQsaNB+KOzw+ky05f4X7Hq10QW+1zgnXXUXz0
+ Yrey08SYEdG5e9xdQqhqO+NRCcisc8s8Xw5jmTHg9EUQflFo+qaLaG8PhrxzQghgweSc+tN0S8
+ eqd8l7k44TZ3LZlO+lKOxdO/PgUyoQepRoSo59q9kS4b98DIXdmgJEV+0mwU4XwVDhTUXYbZHl
+ qfo=
+X-IronPort-AV: E=Sophos;i="5.67,321,1566835200"; 
+   d="scan'208";a="121710476"
+Received: from h199-255-45-14.hgst.com (HELO uls-op-cesaep01.wdc.com) ([199.255.45.14])
+  by ob1.hgst.iphmx.com with ESMTP; 21 Oct 2019 07:42:23 +0800
+IronPort-SDR: bUip0sHz1a7O/vxPsVUbReJ/WS1hixE+/f3x/KZILlHmSRstnTr8B60fvHklA2ciVE829qQX6a
+ MpB5N1StT2YnjtcBu/ZCqajJ/7OfpJWoic0dgKxdOH45SgSBvNU1g3OY2J/kQdL8yN8M8Edy+R
+ ZThn8O5giU83cZQtWkCVuXlwskxZJjJaQs5NWlFhPwj6O1KanOCt8g2rLNLtBWpQ0bxlNmi734
+ cCOQ3bS/YLSsY15fVdmYyzX5kxv7rpxTFaAFzgMyPZ3IJh4lN/dKro1e4U5hKzmlyG9KlPSX2g
+ at7hnDlBAQ7bH/ygKklEpJ4T
+Received: from uls-op-cesaip01.wdc.com ([10.248.3.36])
+  by uls-op-cesaep01.wdc.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 20 Oct 2019 16:37:57 -0700
+IronPort-SDR: 7BPY8H2q14vbAj/Dl3YTfQh2HVgKgl2aQlUUntJlOFWhwdsZ51p9+a3BmLv4iDizI3Amvl8HhE
+ J/RT5sbx6K590h5FBm7e8CrupYcQf6wrqi3xtjld2/S3uzsCuftVukkQZXTUN1fcnXBZnxp8p9
+ U+U9pXmRzOMU3x6G0gf2VZ94+SoQslVyVe0fE2z4wLf5EmkR6oRxpsFmE09SXSurTaWAaU8/k1
+ HX4Fp1W1/zIGZ4q9YNIYn4JKWXWQG/cX7ZhTG5j1LvUM9rcRKQLTlvwAqQdCAhqLIvrRjcQy70
+ Njc=
+WDCIronportException: Internal
+Received: from washi.fujisawa.hgst.com ([10.149.53.254])
+  by uls-op-cesaip01.wdc.com with ESMTP; 20 Oct 2019 16:42:22 -0700
+From:   Damien Le Moal <damien.lemoal@wdc.com>
+To:     linux-nvme@lists.infradead.org, Christoph Hellwig <hch@lst.de>,
+        Keith Busch <kbusch@kernel.org>,
+        Sagi Grimberg <sagi@grimberg.me>, linux-block@vger.kernel.org,
+        Jens Axboe <axboe@kernel.dk>
+Subject: [PATCH 0/2] Small cleanups
+Date:   Mon, 21 Oct 2019 08:42:18 +0900
+Message-Id: <20191020234220.14888-1-damien.lemoal@wdc.com>
+X-Mailer: git-send-email 2.21.0
 MIME-Version: 1.0
-In-Reply-To: <55a84ea3-647d-0a76-596c-c6c6b2fc1b75@huawei.com>
-User-Agent: Mutt/1.11.3 (2019-02-01)
-X-Scanned-By: MIMEDefang 2.79 on 10.5.11.16
-X-MC-Unique: IRak0tIiPpeqXX7fI-khJA-1
-X-Mimecast-Spam-Score: 0
-Content-Type: text/plain; charset=WINDOWS-1252
-Content-Transfer-Encoding: quoted-printable
-Content-Disposition: inline
+Content-Transfer-Encoding: 8bit
 Sender: linux-block-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-On Thu, Oct 17, 2019 at 04:40:12PM +0100, John Garry wrote:
-> On 16/10/2019 17:19, John Garry wrote:
-> > On 16/10/2019 13:07, Ming Lei wrote:
-> > > On Wed, Oct 16, 2019 at 09:58:27AM +0100, John Garry wrote:
-> > > > On 14/10/2019 02:50, Ming Lei wrote:
-> > > > > Hi,
-> > > > >=20
-> > > > > Thomas mentioned:
-> > > > >     "
-> > > > >      That was the constraint of managed interrupts from the very
-> > > > > beginning:
-> > > > >=20
-> > > > >       The driver/subsystem has to quiesce the interrupt line and =
-the
-> > > > > associated
-> > > > >       queue _before_ it gets shutdown in CPU unplug and not fiddl=
-e
-> > > > > with it
-> > > > >       until it's restarted by the core when the CPU is plugged in
-> > > > > again.
-> > > > >     "
-> > > > >=20
-> > > > > But no drivers or blk-mq do that before one hctx becomes dead(all
-> > > > > CPUs for one hctx are offline), and even it is worse, blk-mq stil=
-ls
-> > > > > tries
-> > > > > to run hw queue after hctx is dead, see blk_mq_hctx_notify_dead()=
-.
-> > > > >=20
-> > > > > This patchset tries to address the issue by two stages:
-> > > > >=20
-> > > > > 1) add one new cpuhp state of CPUHP_AP_BLK_MQ_ONLINE
-> > > > >=20
-> > > > > - mark the hctx as internal stopped, and drain all in-flight requ=
-ests
-> > > > > if the hctx is going to be dead.
-> > > > >=20
-> > > > > 2) re-submit IO in the state of CPUHP_BLK_MQ_DEAD after the hctx
-> > > > > becomes dead
-> > > > >=20
-> > > > > - steal bios from the request, and resubmit them via
-> > > > > generic_make_request(),
-> > > > > then these IO will be mapped to other live hctx for dispatch
-> > > > >=20
-> > > > > Please comment & review, thanks!
-> > > > >=20
-> > > > > John, I don't add your tested-by tag since V3 have some changes,
-> > > > > and I appreciate if you may run your test on V3.
-> > > >=20
-> > > > Hi Ming,
-> > > >=20
-> > > > So I got around to doing some testing. The good news is that issue
-> > > > which we
-> > > > were experiencing in v3 series seems to have has gone away - alot m=
-ore
-> > > > stable.
-> > > >=20
-> > > > However, unfortunately, I did notice some SCSI timeouts:
-> > > >=20
-> > > > 15508.615074] CPU2: shutdown
-> > > > [15508.617778] psci: CPU2 killed.
-> > > > [15508.651220] CPU1: shutdown
-> > > > [15508.653924] psci: CPU1 killed.
-> > > > [15518.406229] sas: Enter sas_scsi_recover_host busy: 63 failed: 63
-> > > > Jobs: 1 (f=3D1): [R] [0.0% done] [0[15518.412239] sas: sas_scsi_fin=
-d_task:
-> > > > aborting task 0x00000000a7159744
-> > > > KB/0KB/0KB /s] [0/0/0 iops] [eta [15518.421708] sas:
-> > > > sas_eh_handle_sas_errors: task 0x00000000a7159744 is done
-> > > > [15518.431266] sas: sas_scsi_find_task: aborting task 0x00000000d39=
-731eb
-> > > > [15518.442539] sas: sas_eh_handle_sas_errors: task 0x00000000d39731=
-eb is
-> > > > done
-> > > > [15518.449407] sas: sas_scsi_find_task: aborting task 0x000000009f7=
-7c9bd
-> > > > [15518.455899] sas: sas_eh_handle_sas_errors: task 0x000000009f77c9=
-bd is
-> > > > done
-> > > >=20
-> > > > A couple of things to note:
-> > > > - I added some debug prints in blk_mq_hctx_drain_inflight_rqs() for=
- when
-> > > > inflights rqs !=3D0, and I don't see them for this timeout
-> > > > - 0 datarate reported from fio
-> > > >=20
-> > > > I'll have a look...
-> > >=20
-> > > What is the output of the following command?
-> > >=20
-> > > (cd /sys/kernel/debug/block/$SAS_DISK && find . -type f -exec grep -a=
-H
-> > > . {} \;)
-> > I assume that you want this run at about the time SCSI EH kicks in for
-> > the timeout, right? If so, I need to find some simple sysfs entry to
-> > tell me of this occurrence, to trigger the capture. Or add something. M=
-y
-> > script is pretty dump.
-> >=20
-> > BTW, I did notice that we the dump_stack in __blk_mq_run_hw_queue()
-> > pretty soon before the problem happens - maybe a clue or maybe coincide=
-nce.
-> >=20
->=20
-> I finally got to capture that debugfs dump at the point the SCSI IOs
-> timeout, as attached. Let me know if any problem receiving it.
->=20
-> Here's a kernel log snippet at that point (I added some print for the
-> timeout):
->=20
-> 609] psci: CPU6 killed.
-> [  547.722217] CPU5: shutdown
-> [  547.724926] psci: CPU5 killed.
-> [  547.749951] irq_shutdown
-> [  547.752701] IRQ 800: no longer affine to CPU4
-> [  547.757265] CPU4: shutdown
-> [  547.759971] psci: CPU4 killed.
-> [  547.790348] CPU3: shutdown
-> [  547.793052] psci: CPU3 killed.
-> [  547.818330] CPU2: shutdown
-> [  547.821033] psci: CPU2 killed.
-> [  547.854285] CPU1: shutdown
-> [  547.856989] psci: CPU1 killed.
-> [  575.925307] scsi_timeout req=3D0xffff0023b0dd9c00 reserved=3D0
-> [  575.930794] scsi_timeout req=3D0xffff0023b0df2700 reserved=3D0
+This is series is a couple of cleanup patches. The first one cleans up
+the helper function nvme_block_nr() using SECTOR_SHIFT instead of the
+hard coded value 9. The second patch introduces the nvme_block_sect()
+helper to convert a device block number into a 512B sector value.
 
-From the debugfs log, 66 requests are dumped, and 63 of them has
-been submitted to device, and the other 3 is in ->dispatch list
-via requeue after timeout is handled.
+Please consider this series for kernel 5.5.
 
-You mentioned that:
+Damien Le Moal (2):
+  nvme: Cleanup nvme_block_nr()
+  nvme: Introduce nvme_block_sect()
 
-" - I added some debug prints in blk_mq_hctx_drain_inflight_rqs() for when
- inflights rqs !=3D0, and I don't see them for this timeout"
+ drivers/nvme/host/core.c | 14 +++++++-------
+ drivers/nvme/host/nvme.h | 13 ++++++++++++-
+ 2 files changed, 19 insertions(+), 8 deletions(-)
 
-There might be two reasons:
-
-1) You are still testing a multiple reply-queue device? As I
-mentioned last times, it is hard to map reply-queue into blk-mq
-hctx correctly.
-
-2) concurrent dispatch to device, which can be observed by the
-following patch.
-
-diff --git a/block/blk-mq.c b/block/blk-mq.c
-index 06081966549f..3590f6f947eb 100644
---- a/block/blk-mq.c
-+++ b/block/blk-mq.c
-@@ -679,6 +679,8 @@ void blk_mq_start_request(struct request *rq)
- {
-        struct request_queue *q =3D rq->q;
-
-+       WARN_ON_ONCE(test_bit(BLK_MQ_S_INTERNAL_STOPPED, &rq->mq_hctx->stat=
-e));
-+
-        trace_block_rq_issue(q, rq);
-
-        if (test_bit(QUEUE_FLAG_STATS, &q->queue_flags)) {
-
-However, I think it is hard to be 2#, since the current CPU is the last
-CPU in hctx->cpu_mask.
-
-
-Thanks,
-Ming
+-- 
+2.21.0
 
