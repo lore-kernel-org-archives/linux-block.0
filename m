@@ -6,53 +6,52 @@ X-Spam-Status: No, score=-9.8 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
 	INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,
 	URIBL_BLOCKED,USER_AGENT_GIT autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 9954ECA9EAF
+	by smtp.lore.kernel.org (Postfix) with ESMTP id DA39FCA9EB7
 	for <linux-block@archiver.kernel.org>; Mon, 21 Oct 2019 22:43:11 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.kernel.org (Postfix) with ESMTP id 76EAB20882
+	by mail.kernel.org (Postfix) with ESMTP id B90DA20B7C
 	for <linux-block@archiver.kernel.org>; Mon, 21 Oct 2019 22:43:11 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1730289AbfJUWnL (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        id S1727264AbfJUWnL (ORCPT <rfc822;linux-block@archiver.kernel.org>);
         Mon, 21 Oct 2019 18:43:11 -0400
-Received: from mail-pf1-f196.google.com ([209.85.210.196]:42783 "EHLO
-        mail-pf1-f196.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1727264AbfJUWnK (ORCPT
+Received: from mail-pf1-f193.google.com ([209.85.210.193]:39890 "EHLO
+        mail-pf1-f193.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S1730276AbfJUWnL (ORCPT
         <rfc822;linux-block@vger.kernel.org>);
-        Mon, 21 Oct 2019 18:43:10 -0400
-Received: by mail-pf1-f196.google.com with SMTP id q12so9324929pff.9
-        for <linux-block@vger.kernel.org>; Mon, 21 Oct 2019 15:43:10 -0700 (PDT)
+        Mon, 21 Oct 2019 18:43:11 -0400
+Received: by mail-pf1-f193.google.com with SMTP id v4so9332253pff.6
+        for <linux-block@vger.kernel.org>; Mon, 21 Oct 2019 15:43:09 -0700 (PDT)
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=1e100.net; s=20161025;
         h=x-gm-message-state:from:to:cc:subject:date:message-id:in-reply-to
          :references:mime-version:content-transfer-encoding;
-        bh=f8rxoisaPFhyyWWqrkbV3n8HS8qyHhu9JwL53xw7tZ8=;
-        b=DJC7rKhe5cKlid2pHsA78xFB1l9hHrbkXDqi44kqmnygJZrWRMi9BI6KRwKVBPoIvf
-         k2WenRTD7hYfABCayftuzBaXcz6TP7MARG1OnJP5QN4oea8kkv35BDH9SS0DdBo7ZLUz
-         7Sk66kNl0gOzwJBX5MhIM53t2W+J1wKat6NJ17+iWJ3GXvFbbjpXVvw9LjiO3LvGc3pc
-         PANdMh+U+K4ojv0kEsWU5ijXPkb9igZLQdQdsjGNXYk3QA/wlu2TPptESzWyQ4d8GWKu
-         71gYIv3+U+tM5OWzjc2Dea9lr2XsryXvHx7hCEgYbOSGV4ZwOQeu1Qs93sEU8SUpavjV
-         nP0w==
-X-Gm-Message-State: APjAAAXFB2+Q4VN3h0SLzSTIQsTUCRwseR1jH9a1h2D5+iPRy4QwYp/y
-        8rZBRPk5BMBD6AGIwuQoKgLEME66rtA=
-X-Google-Smtp-Source: APXvYqw53SLMCtaUJknOG0dec3io/QHQpVFf/7V63NydWBZgM4yVY6scnM00zdouriE+50L57E0vcQ==
-X-Received: by 2002:a17:90a:17ad:: with SMTP id q42mr634276pja.100.1571697790211;
-        Mon, 21 Oct 2019 15:43:10 -0700 (PDT)
+        bh=K03SxJG5UM5QLbF/Apnz7RCTvF9NtEiDW4IzmGypazw=;
+        b=MmLf0mRGD9CodF/T9HX6f5m4CEBXyVtZEkI/0Xxx5sJs6LG3WbV3xtw2LR1AB10viu
+         DoJPTxSdZ4sLm6XAjaPIxUD5McchzxknWMfYor+2bPV2rDazlKqYFIn/pNnW8XfkFuhE
+         zAacLVhnu/bWqj4Sc+tX9sLQKuStWdx1nyaPTR4kU/ndZRBSV4yA6JUM5DyxiV5ykJC3
+         vk4BzW1mHRnM/Trlj38u0iz3CXGK3QkD5na1S+icdzjqguAFsDpxwPyu6OqH6adGzkI/
+         ILP0Y1AYBpl5f0r/nZQqDINl4s0UmvRSJBKLsh87FwrYmu7XDXAZpy2S5jQsLKzymrbc
+         naog==
+X-Gm-Message-State: APjAAAWaD3HG280VWzQ/ZlsCWnsm8N0+CQtgZdOfPyfg7jvBCM2W9hOh
+        VdhlTcaq9vtlNGRMyWJsmhfMSqhHMd0=
+X-Google-Smtp-Source: APXvYqw+oxZDfXFKLck8hk+qGu21exc/GLYHCRDm/JguV1JgrDJ907UAZGMtnfQc+d4dRl8knQj3ig==
+X-Received: by 2002:a63:dd11:: with SMTP id t17mr266772pgg.242.1571697788920;
+        Mon, 21 Oct 2019 15:43:08 -0700 (PDT)
 Received: from desktop-bart.svl.corp.google.com ([2620:15c:2cd:202:4308:52a3:24b6:2c60])
-        by smtp.gmail.com with ESMTPSA id u9sm15944763pjb.4.2019.10.21.15.43.09
+        by smtp.gmail.com with ESMTPSA id u9sm15944763pjb.4.2019.10.21.15.43.07
         (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Mon, 21 Oct 2019 15:43:09 -0700 (PDT)
+        Mon, 21 Oct 2019 15:43:08 -0700 (PDT)
 From:   Bart Van Assche <bvanassche@acm.org>
 To:     Jens Axboe <axboe@kernel.dk>
 Cc:     linux-block@vger.kernel.org, Christoph Hellwig <hch@lst.de>,
         Bart Van Assche <bvanassche@acm.org>,
-        Keith Busch <keith.busch@intel.com>,
         Christoph Hellwig <hch@infradead.org>,
         Ming Lei <ming.lei@redhat.com>,
         Hannes Reinecke <hare@suse.com>,
         Johannes Thumshirn <jthumshirn@suse.de>
-Subject: [PATCH 3/4] block: Reduce the amount of memory required per request queue
-Date:   Mon, 21 Oct 2019 15:42:58 -0700
-Message-Id: <20191021224259.209542-4-bvanassche@acm.org>
+Subject: [PATCH 2/4] block: Fix a race between blk_poll() and blk_mq_update_nr_hw_queues()
+Date:   Mon, 21 Oct 2019 15:42:57 -0700
+Message-Id: <20191021224259.209542-3-bvanassche@acm.org>
 X-Mailer: git-send-email 2.23.0.866.gb869b98d4c-goog
 In-Reply-To: <20191021224259.209542-1-bvanassche@acm.org>
 References: <20191021224259.209542-1-bvanassche@acm.org>
@@ -63,70 +62,76 @@ Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-Instead of always allocating at least nr_cpu_ids hardware queues per request
-queue, reallocate q->queue_hw_ctx if it has to grow. This patch improves
-behavior that was introduced by commit 868f2f0b7206 ("blk-mq: dynamic h/w
-context count").
+If blk_poll() is called if no requests are in progress, it may happen that
+blk_mq_update_nr_hw_queues() modifies the data structures used by blk_poll(),
+e.g. q->queue_hw_ctx[]. Fix this race by serializing blk_poll() against
+blk_mq_update_nr_hw_queues().
 
-Cc: Keith Busch <keith.busch@intel.com>
 Cc: Christoph Hellwig <hch@infradead.org>
 Cc: Ming Lei <ming.lei@redhat.com>
 Cc: Hannes Reinecke <hare@suse.com>
 Cc: Johannes Thumshirn <jthumshirn@suse.de>
 Signed-off-by: Bart Van Assche <bvanassche@acm.org>
 ---
- block/blk-mq.c | 24 +++++++++++++++++-------
- 1 file changed, 17 insertions(+), 7 deletions(-)
+ block/blk-mq.c | 38 +++++++++++++++++++++++++-------------
+ 1 file changed, 25 insertions(+), 13 deletions(-)
 
 diff --git a/block/blk-mq.c b/block/blk-mq.c
-index ea64d951f411..86f6852130fc 100644
+index 7528678ef41f..ea64d951f411 100644
 --- a/block/blk-mq.c
 +++ b/block/blk-mq.c
-@@ -2761,6 +2761,23 @@ static void blk_mq_realloc_hw_ctxs(struct blk_mq_tag_set *set,
- 	int i, j, end;
- 	struct blk_mq_hw_ctx **hctxs = q->queue_hw_ctx;
+@@ -3439,19 +3439,7 @@ static bool blk_mq_poll_hybrid(struct request_queue *q,
+ 	return blk_mq_poll_hybrid_sleep(q, hctx, rq);
+ }
  
-+	if (q->nr_hw_queues < set->nr_hw_queues) {
-+		struct blk_mq_hw_ctx **new_hctxs;
+-/**
+- * blk_poll - poll for IO completions
+- * @q:  the queue
+- * @cookie: cookie passed back at IO submission time
+- * @spin: whether to spin for completions
+- *
+- * Description:
+- *    Poll for completions on the passed in queue. Returns number of
+- *    completed entries found. If @spin is true, then blk_poll will continue
+- *    looping until at least one completion is found, unless the task is
+- *    otherwise marked running (or we need to reschedule).
+- */
+-int blk_poll(struct request_queue *q, blk_qc_t cookie, bool spin)
++static int __blk_poll(struct request_queue *q, blk_qc_t cookie, bool spin)
+ {
+ 	struct blk_mq_hw_ctx *hctx;
+ 	long state;
+@@ -3503,6 +3491,30 @@ int blk_poll(struct request_queue *q, blk_qc_t cookie, bool spin)
+ 	__set_current_state(TASK_RUNNING);
+ 	return 0;
+ }
 +
-+		new_hctxs = kcalloc_node(set->nr_hw_queues,
-+				       sizeof(*new_hctxs), GFP_KERNEL,
-+				       set->numa_node);
-+		if (!new_hctxs)
-+			return;
-+		if (hctxs)
-+			memcpy(new_hctxs, hctxs, q->nr_hw_queues *
-+			       sizeof(*hctxs));
-+		q->queue_hw_ctx = new_hctxs;
-+		q->nr_hw_queues = set->nr_hw_queues;
-+		kfree(hctxs);
-+		hctxs = new_hctxs;
-+	}
++/**
++ * blk_poll - poll for IO completions
++ * @q:  the queue
++ * @cookie: cookie passed back at IO submission time
++ * @spin: whether to spin for completions
++ *
++ * Description:
++ *    Poll for completions on the passed in queue. Returns number of
++ *    completed entries found. If @spin is true, then blk_poll will continue
++ *    looping until at least one completion is found, unless the task is
++ *    otherwise marked running (or we need to reschedule).
++ */
++int blk_poll(struct request_queue *q, blk_qc_t cookie, bool spin)
++{
++	int ret;
 +
- 	/* protect against switching io scheduler  */
- 	mutex_lock(&q->sysfs_lock);
- 	for (i = 0; i < set->nr_hw_queues; i++) {
-@@ -2848,12 +2865,6 @@ struct request_queue *blk_mq_init_allocated_queue(struct blk_mq_tag_set *set,
- 	/* init q->mq_kobj and sw queues' kobjects */
- 	blk_mq_sysfs_init(q);
++	if (!percpu_ref_tryget(&q->q_usage_counter))
++		return 0;
++	ret = __blk_poll(q, cookie, spin);
++	blk_queue_exit(q);
++
++	return ret;
++}
+ EXPORT_SYMBOL_GPL(blk_poll);
  
--	q->queue_hw_ctx = kcalloc_node(nr_hw_queues(set),
--				       sizeof(*(q->queue_hw_ctx)), GFP_KERNEL,
--				       set->numa_node);
--	if (!q->queue_hw_ctx)
--		goto err_sys_init;
--
- 	INIT_LIST_HEAD(&q->unused_hctx_list);
- 	spin_lock_init(&q->unused_hctx_lock);
- 
-@@ -2901,7 +2912,6 @@ struct request_queue *blk_mq_init_allocated_queue(struct blk_mq_tag_set *set,
- err_hctxs:
- 	kfree(q->queue_hw_ctx);
- 	q->nr_hw_queues = 0;
--err_sys_init:
- 	blk_mq_sysfs_deinit(q);
- err_poll:
- 	blk_stat_free_callback(q->poll_cb);
+ unsigned int blk_mq_rq_cpu(struct request *rq)
 -- 
 2.23.0.866.gb869b98d4c-goog
 
