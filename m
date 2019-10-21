@@ -2,128 +2,166 @@ Return-Path: <SRS0=zBYI=YO=vger.kernel.org=linux-block-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-9.8 required=3.0 tests=DKIM_SIGNED,DKIM_VALID,
-	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,
-	SPF_HELO_NONE,SPF_PASS,USER_AGENT_GIT autolearn=ham autolearn_force=no
+X-Spam-Status: No, score=-6.9 required=3.0 tests=DKIM_SIGNED,DKIM_VALID,
+	DKIM_VALID_AU,HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,
+	SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS autolearn=ham autolearn_force=no
 	version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 1E572CA9EAF
-	for <linux-block@archiver.kernel.org>; Mon, 21 Oct 2019 19:56:38 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 8618ECA9EB7
+	for <linux-block@archiver.kernel.org>; Mon, 21 Oct 2019 21:41:48 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.kernel.org (Postfix) with ESMTP id E57C620873
-	for <linux-block@archiver.kernel.org>; Mon, 21 Oct 2019 19:56:37 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id 5BC5C20873
+	for <linux-block@archiver.kernel.org>; Mon, 21 Oct 2019 21:41:48 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=pass (2048-bit key) header.d=toxicpanda-com.20150623.gappssmtp.com header.i=@toxicpanda-com.20150623.gappssmtp.com header.b="2KVIdo4C"
+	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="EA8vKtU8"
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1729869AbfJUT4h (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Mon, 21 Oct 2019 15:56:37 -0400
-Received: from mail-qk1-f193.google.com ([209.85.222.193]:46308 "EHLO
-        mail-qk1-f193.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1726672AbfJUT4h (ORCPT
+        id S1730385AbfJUVlr (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Mon, 21 Oct 2019 17:41:47 -0400
+Received: from us-smtp-1.mimecast.com ([205.139.110.61]:38245 "EHLO
+        us-smtp-delivery-1.mimecast.com" rhost-flags-OK-OK-OK-FAIL)
+        by vger.kernel.org with ESMTP id S1729388AbfJUVlr (ORCPT
         <rfc822;linux-block@vger.kernel.org>);
-        Mon, 21 Oct 2019 15:56:37 -0400
-Received: by mail-qk1-f193.google.com with SMTP id e66so13911403qkf.13
-        for <linux-block@vger.kernel.org>; Mon, 21 Oct 2019 12:56:35 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=toxicpanda-com.20150623.gappssmtp.com; s=20150623;
-        h=from:to:subject:date:message-id:in-reply-to:references:mime-version
-         :content-transfer-encoding;
-        bh=olbMooGjFBayOK7jc5tAferY0kolRn7LFl7EO6n9+Nc=;
-        b=2KVIdo4CnFZeezRJGdUURVYAxlQipkL+U3JQu19GH2FVPmUpW8jPkgNcp3A/FaenyN
-         YpDIUISBLUO/+NfQpOynPtqRVUzgjeMb6JGpu3nAufBRVmlsqDu2Gnj1qhczeZX0IW+A
-         CvdTsJBaFh/ytGNiETeuhrPHtWaI44lFx5DD/EjujMDDu3QpoL1iDFSJIIpESUEecBMb
-         a66XPczNy+vrzshaqgkl5bSWZbiTNlSd+v3cv5tREpLsUw8/tiopaJU1VPrwDzu2hXn6
-         0p7w0wNOgxCgzaqslc3rcBA7xzbtodnvQl6D28FMZBFtrugTXGfmbzMWwSk8l0NVaT1/
-         qAlQ==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20161025;
-        h=x-gm-message-state:from:to:subject:date:message-id:in-reply-to
-         :references:mime-version:content-transfer-encoding;
-        bh=olbMooGjFBayOK7jc5tAferY0kolRn7LFl7EO6n9+Nc=;
-        b=lRHvJFmqxSp2AGXxDfkd7kzxkf8aWGCRvREFwp0Zjw5z+jQS6uziCc4OT3tdFLBu/k
-         lkpOkXiemhBcMexgYMap+4G+PKWwdPhC3yrnnpQPIQZzsvAw5Vre8oyRh4YpQXVuAKM9
-         6iMP1qmIALjFFTZhwjCVDeRAVAxgIr9ShFtH8ZYopxhMWYnug64xhBDKkirNKjlxDpGr
-         WxNoG29ehWPoUn/c6mJL3UetmtgUyRv8vINkqohxha0LTsCnjotj+ajXPutl46aiOKzz
-         y89zKgD15FauqcpM0VaM2aIkzuF2gjNk7V3AWqM8X3m7Za0qeTxiAr/QQayGD4NJlliJ
-         bDFw==
-X-Gm-Message-State: APjAAAW4ECee+D9HOmP13TNxVvc3p3+nEvMKUAXCSmj+Li6Torv9RCVs
-        9w1tpKAzp/7CAPRBAs/jxoZYtw==
-X-Google-Smtp-Source: APXvYqynVLEZMpVVt7pXNA5sBJbHLg8xYpkuKPGZrIRVUI+mw+ub3JJnSUuMdGm6zJgRfz/ULG7k2Q==
-X-Received: by 2002:a37:353:: with SMTP id 80mr23331009qkd.439.1571687794781;
-        Mon, 21 Oct 2019 12:56:34 -0700 (PDT)
-Received: from localhost ([107.15.81.208])
-        by smtp.gmail.com with ESMTPSA id d2sm7734516qkj.123.2019.10.21.12.56.33
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Mon, 21 Oct 2019 12:56:34 -0700 (PDT)
-From:   Josef Bacik <josef@toxicpanda.com>
-To:     axboe@kernel.dk, nbd@other.debian.org, linux-block@vger.kernel.org,
-        kernel-team@fb.com, mchristi@redhat.com
-Subject: [PATCH 2/2] nbd: handle racing with error'ed out commands
-Date:   Mon, 21 Oct 2019 15:56:28 -0400
-Message-Id: <20191021195628.19849-3-josef@toxicpanda.com>
-X-Mailer: git-send-email 2.21.0
-In-Reply-To: <20191021195628.19849-1-josef@toxicpanda.com>
-References: <20191021195628.19849-1-josef@toxicpanda.com>
+        Mon, 21 Oct 2019 17:41:47 -0400
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+        s=mimecast20190719; t=1571694106;
+        h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+         to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+         content-transfer-encoding:content-transfer-encoding;
+        bh=IWeM12SnjaxnROOhjKG0uzMoH/1pwew4flz84hu3l0k=;
+        b=EA8vKtU8iQd2X3J6MWu7z3azMx0YgPt7zpBAms3aKTuzXSvMutK5X7fjnJkQGkeivXxoj9
+        7qCVfB5vLcvURXKOdKaH0RyvV9DvFKYZQIoUh22j9vXdGdcyUtR+V3L9vIxRNJrJ8tFKpp
+        RCodsuiGw5rdWeFvmd0rOBGmhmR1UsE=
+Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
+ [209.132.183.4]) (Using TLS) by relay.mimecast.com with ESMTP id
+ us-mta-270-WEhns1CVOLONzpz_CDZEpg-1; Mon, 21 Oct 2019 17:41:41 -0400
+Received: from smtp.corp.redhat.com (int-mx01.intmail.prod.int.phx2.redhat.com [10.5.11.11])
+        (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
+        (No client certificate requested)
+        by mimecast-mx01.redhat.com (Postfix) with ESMTPS id 2B3CF2B6;
+        Mon, 21 Oct 2019 21:41:40 +0000 (UTC)
+Received: from rh2.redhat.com (ovpn-123-171.rdu2.redhat.com [10.10.123.171])
+        by smtp.corp.redhat.com (Postfix) with ESMTP id D2A8560126;
+        Mon, 21 Oct 2019 21:41:38 +0000 (UTC)
+From:   Mike Christie <mchristi@redhat.com>
+To:     linux-mm@kvack.org, linux-kernel@vger.kernel.org,
+        linux-scsi@vger.kernel.org, linux-fsdevel@vger.kernel.org,
+        linux-block@vger.kernel.org, martin@urbackup.org,
+        Damien.LeMoal@wdc.com
+Cc:     Mike Christie <mchristi@redhat.com>
+Subject: [PATCH] Add prctl support for controlling PF_MEMALLOC V2
+Date:   Mon, 21 Oct 2019 16:41:37 -0500
+Message-Id: <20191021214137.8172-1-mchristi@redhat.com>
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
+X-Scanned-By: MIMEDefang 2.79 on 10.5.11.11
+X-MC-Unique: WEhns1CVOLONzpz_CDZEpg-1
+X-Mimecast-Spam-Score: 0
+Content-Type: text/plain; charset=WINDOWS-1252
+Content-Transfer-Encoding: quoted-printable
 Sender: linux-block-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-We hit the following warning in production
+There are several storage drivers like dm-multipath, iscsi, tcmu-runner,
+amd nbd that have userspace components that can run in the IO path. For
+example, iscsi and nbd's userspace deamons may need to recreate a socket
+and/or send IO on it, and dm-multipath's daemon multipathd may need to
+send IO to figure out the state of paths and re-set them up.
 
-print_req_error: I/O error, dev nbd0, sector 7213934408 flags 80700
-------------[ cut here ]------------
-refcount_t: underflow; use-after-free.
-WARNING: CPU: 25 PID: 32407 at lib/refcount.c:190 refcount_sub_and_test_checked+0x53/0x60
-Workqueue: knbd-recv recv_work [nbd]
-RIP: 0010:refcount_sub_and_test_checked+0x53/0x60
-Call Trace:
- blk_mq_free_request+0xb7/0xf0
- blk_mq_complete_request+0x62/0xf0
- recv_work+0x29/0xa1 [nbd]
- process_one_work+0x1f5/0x3f0
- worker_thread+0x2d/0x3d0
- ? rescuer_thread+0x340/0x340
- kthread+0x111/0x130
- ? kthread_create_on_node+0x60/0x60
- ret_from_fork+0x1f/0x30
----[ end trace b079c3c67f98bb7c ]---
+In the kernel these drivers have access to GFP_NOIO/GFP_NOFS and the
+memalloc_*_save/restore functions to control the allocation behavior,
+but for userspace we would end up hitting a allocation that ended up
+writing data back to the same device we are trying to allocate for.
 
-This was preceded by us timing out everything and shutting down the
-sockets for the device.  The problem is we had a request in the queue at
-the same time, so we completed the request twice.  This can actually
-happen in a lot of cases, we fail to get a ref on our config, we only
-have one connection and just error out the command, etc.
+This patch allows the userspace deamon to set the PF_MEMALLOC* flags
+with prctl during their initialization so later allocations cannot
+calling back into them.
 
-Fix this by checking cmd->status in nbd_read_stat.  We only change this
-under the cmd->lock, so we are safe to check this here and see if we've
-already error'ed this command out, which would indicate that we've
-completed it as well.
-
-Signed-off-by: Josef Bacik <josef@toxicpanda.com>
+Signed-off-by: Mike Christie <mchristi@redhat.com>
 ---
- drivers/block/nbd.c | 6 ++++++
- 1 file changed, 6 insertions(+)
 
-diff --git a/drivers/block/nbd.c b/drivers/block/nbd.c
-index 8fb8913074b8..e9f5d4e476e7 100644
---- a/drivers/block/nbd.c
-+++ b/drivers/block/nbd.c
-@@ -693,6 +693,12 @@ static struct nbd_cmd *nbd_read_stat(struct nbd_device *nbd, int index)
- 		ret = -ENOENT;
- 		goto out;
- 	}
-+	if (cmd->status != BLK_STS_OK) {
-+		dev_err(disk_to_dev(nbd->disk), "Command already handled %p\n",
-+			req);
-+		ret = -ENOENT;
-+		goto out;
-+	}
- 	if (test_bit(NBD_CMD_REQUEUED, &cmd->flags)) {
- 		dev_err(disk_to_dev(nbd->disk), "Raced with timeout on req %p\n",
- 			req);
--- 
-2.21.0
+V2:
+- Use prctl instead of procfs.
+- Add support for NOFS for fuse.
+- Check permissions.
+
+ include/uapi/linux/prctl.h |  8 +++++++
+ kernel/sys.c               | 44 ++++++++++++++++++++++++++++++++++++++
+ 2 files changed, 52 insertions(+)
+
+diff --git a/include/uapi/linux/prctl.h b/include/uapi/linux/prctl.h
+index 7da1b37b27aa..6f6b3af6633a 100644
+--- a/include/uapi/linux/prctl.h
++++ b/include/uapi/linux/prctl.h
+@@ -234,4 +234,12 @@ struct prctl_mm_map {
+ #define PR_GET_TAGGED_ADDR_CTRL=09=0956
+ # define PR_TAGGED_ADDR_ENABLE=09=09(1UL << 0)
+=20
++/* Control reclaim behavior when allocating memory */
++#define PR_SET_MEMALLOC=09=09=0957
++#define PR_GET_MEMALLOC=09=09=0958
++#define PR_MEMALLOC_SET_NOIO=09=09(1UL << 0)
++#define PR_MEMALLOC_CLEAR_NOIO=09=09(1UL << 1)
++#define PR_MEMALLOC_SET_NOFS=09=09(1UL << 2)
++#define PR_MEMALLOC_CLEAR_NOFS=09=09(1UL << 3)
++
+ #endif /* _LINUX_PRCTL_H */
+diff --git a/kernel/sys.c b/kernel/sys.c
+index a611d1d58c7d..34fedc9fc7e4 100644
+--- a/kernel/sys.c
++++ b/kernel/sys.c
+@@ -2486,6 +2486,50 @@ SYSCALL_DEFINE5(prctl, int, option, unsigned long, a=
+rg2, unsigned long, arg3,
+ =09=09=09return -EINVAL;
+ =09=09error =3D GET_TAGGED_ADDR_CTRL();
+ =09=09break;
++=09case PR_SET_MEMALLOC:
++=09=09if (!capable(CAP_SYS_ADMIN))
++=09=09=09return -EPERM;
++
++=09=09if (arg3 || arg4 || arg5)
++=09=09=09return -EINVAL;
++
++=09=09switch (arg2) {
++=09=09case PR_MEMALLOC_SET_NOIO:
++=09=09=09if (current->flags & PF_MEMALLOC_NOFS)
++=09=09=09=09return -EINVAL;
++
++=09=09=09current->flags |=3D PF_MEMALLOC_NOIO;
++=09=09=09break;
++=09=09case PR_MEMALLOC_CLEAR_NOIO:
++=09=09=09current->flags &=3D ~PF_MEMALLOC_NOIO;
++=09=09=09break;
++=09=09case PR_MEMALLOC_SET_NOFS:
++=09=09=09if (current->flags & PF_MEMALLOC_NOIO)
++=09=09=09=09return -EINVAL;
++
++=09=09=09current->flags |=3D PF_MEMALLOC_NOFS;
++=09=09=09break;
++=09=09case PR_MEMALLOC_CLEAR_NOFS:
++=09=09=09current->flags &=3D ~PF_MEMALLOC_NOFS;
++=09=09=09break;
++=09=09default:
++=09=09=09return -EINVAL;
++=09=09}
++=09=09break;
++=09case PR_GET_MEMALLOC:
++=09=09if (!capable(CAP_SYS_ADMIN))
++=09=09=09return -EPERM;
++
++=09=09if (arg2 || arg3 || arg4 || arg5)
++=09=09=09return -EINVAL;
++
++=09=09if (current->flags & PF_MEMALLOC_NOIO)
++=09=09=09error =3D PR_MEMALLOC_SET_NOIO;
++=09=09else if (current->flags & PF_MEMALLOC_NOFS)
++=09=09=09error =3D PR_MEMALLOC_SET_NOFS;
++=09=09else
++=09=09=09error =3D 0;
++=09=09break;
+ =09default:
+ =09=09error =3D -EINVAL;
+ =09=09break;
+--=20
+2.20.1
 
