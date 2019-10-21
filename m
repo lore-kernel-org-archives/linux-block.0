@@ -1,159 +1,205 @@
-Return-Path: <SRS0=V/uB=YN=vger.kernel.org=linux-block-owner@kernel.org>
+Return-Path: <SRS0=zBYI=YO=vger.kernel.org=linux-block-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-9.6 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
-	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,
-	SPF_HELO_NONE,SPF_PASS,USER_AGENT_GIT autolearn=ham autolearn_force=no
-	version=3.4.0
+X-Spam-Status: No, score=-6.8 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
+	INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,
+	URIBL_BLOCKED autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 292A6CA9EA0
-	for <linux-block@archiver.kernel.org>; Sun, 20 Oct 2019 23:42:27 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id BA0BBCA9EAD
+	for <linux-block@archiver.kernel.org>; Mon, 21 Oct 2019 00:23:52 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.kernel.org (Postfix) with ESMTP id EA71621D80
-	for <linux-block@archiver.kernel.org>; Sun, 20 Oct 2019 23:42:26 +0000 (UTC)
-Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (2048-bit key) header.d=wdc.com header.i=@wdc.com header.b="Ol9T6Dk7"
+	by mail.kernel.org (Postfix) with ESMTP id 9640821929
+	for <linux-block@archiver.kernel.org>; Mon, 21 Oct 2019 00:23:52 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1726758AbfJTXm0 (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Sun, 20 Oct 2019 19:42:26 -0400
-Received: from esa5.hgst.iphmx.com ([216.71.153.144]:54880 "EHLO
-        esa5.hgst.iphmx.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1726587AbfJTXmZ (ORCPT
-        <rfc822;linux-block@vger.kernel.org>);
-        Sun, 20 Oct 2019 19:42:25 -0400
-DKIM-Signature: v=1; a=rsa-sha256; c=simple/simple;
-  d=wdc.com; i=@wdc.com; q=dns/txt; s=dkim.wdc.com;
-  t=1571614946; x=1603150946;
-  h=from:to:subject:date:message-id:in-reply-to:references:
-   mime-version:content-transfer-encoding;
-  bh=fSVJJZwvKl0netpa4sdM1YaY5nLWMEfZVkbALuqt6NI=;
-  b=Ol9T6Dk7ybYJZabjhtYliEAWrSaZwxwZ4SA89VLWZhxFHx12XACC/Ru5
-   At9bvbq4/u5fRcUQfhXYRcRufeaYc60CMPUe6IOVZG4JpPxYYxNlxhDBY
-   bbSJ+uyHU//AYOIeSXxCD4XchH10habxyasVFlgFg7EAjEo5BjHfVno7E
-   GVwz5q3fG/LMTRB+6GpuHAqrm08dBWeWWHIA/pC+mNl78uWlmk+OC2ys2
-   Out7nN6y6JetR1CzeoIj+8BOF9ayY6EVmzufUReX/SE3TFhsiDVAsm4IG
-   ByE7iSFdPASjPwiNWyW/0uL2tvUttt17+Wh918JeB7chWWh+cPOKePlB6
-   w==;
-IronPort-SDR: BO4UsbGUNgA2kU+/F3PCOlGouuPN0AB1rLo7JDnKvCGSAK1Am49o0LbA2iIvakJ+JphPC9bdup
- ZXoEKGMMsra5/RrGOknKNIi3R9+RAw1UQyh11JjDWEfcCOpt+TQmY5EUn4UmRJQFlylUdhtasQ
- S06zNpR+aofVKR55sAcV++Q9gUI1TP+dLSYARFXSWDEDDceQ8y+CqvONUKX/cr4r6OO7P0Ks93
- CoD6NQbF32xjpEO8U8SF7/MB1KPOn0FXldynrwI6gSIrWuDGy6E6BytURcLYA3xrEC9yXu5oN0
- 84I=
-X-IronPort-AV: E=Sophos;i="5.67,321,1566835200"; 
-   d="scan'208";a="121710478"
-Received: from h199-255-45-14.hgst.com (HELO uls-op-cesaep01.wdc.com) ([199.255.45.14])
-  by ob1.hgst.iphmx.com with ESMTP; 21 Oct 2019 07:42:26 +0800
-IronPort-SDR: KyeAnxZ7pT1aA8+moI9H6UO7PbfOW7nC3uDMU9/oGUK8k/7jwh2H24XhUO2UXIgoNVx5UfDT9L
- rKvX79j1qDhKf/X9uDZCjLxV/s4QYTULXjXrgSiJa0BWmPIflUMNKZUfQ/L3Nj5dg4JUrfhd0D
- ESQx2njJdpRGCWoCyaPBCnrLSo/UURtC/QovyqV+EcT903uKkivqxJj9IXqOoyDQHEYJMQkjLL
- SHGdZa5fikNYFB+8ueuyT3Wnx9NEoBDTFcpmbv4PyEN7wcr85hEhRIpqZ6MYZxNgEIRnjo+0aS
- z1hR/PyPGnF4Qs9udHRZNfKG
-Received: from uls-op-cesaip01.wdc.com ([10.248.3.36])
-  by uls-op-cesaep01.wdc.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 20 Oct 2019 16:37:59 -0700
-IronPort-SDR: Ceu8fhDANrmFJUSTsSY8AgnkZRsn6qXkvVH6juAb8/yiCz+jbBlAATUiIT2zPQz0qAWSYlUYUd
- McD+cHNzbgN5hKmA4lPPxx8mn+SSdObzDt5Ef3TDTHQAmJrPJ7Abc82h2zqHG1Hf78zXO/MG+C
- nn1XS/bK+Yf2cK0EaxuzHmm1stbX7tsddwoUqZQDGa3cee/INPhMb+mIICdXFWqsr0kE+ZpZ0m
- 8+WZADVM/DuQVn9vxX2HVsmXdaRaUWEk7TCFsxx6XaU3ZAdCAShNL+dlNqDnx1AP3q5wU8RqiW
- X+w=
-WDCIronportException: Internal
-Received: from washi.fujisawa.hgst.com ([10.149.53.254])
-  by uls-op-cesaip01.wdc.com with ESMTP; 20 Oct 2019 16:42:24 -0700
-From:   Damien Le Moal <damien.lemoal@wdc.com>
-To:     linux-nvme@lists.infradead.org, Christoph Hellwig <hch@lst.de>,
-        Keith Busch <kbusch@kernel.org>,
-        Sagi Grimberg <sagi@grimberg.me>, linux-block@vger.kernel.org,
-        Jens Axboe <axboe@kernel.dk>
-Subject: [PATCH 2/2] nvme: Introduce nvme_block_sect()
-Date:   Mon, 21 Oct 2019 08:42:20 +0900
-Message-Id: <20191020234220.14888-3-damien.lemoal@wdc.com>
-X-Mailer: git-send-email 2.21.0
-In-Reply-To: <20191020234220.14888-1-damien.lemoal@wdc.com>
-References: <20191020234220.14888-1-damien.lemoal@wdc.com>
-MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
+        id S1726597AbfJUAXv convert rfc822-to-8bit (ORCPT
+        <rfc822;linux-block@archiver.kernel.org>);
+        Sun, 20 Oct 2019 20:23:51 -0400
+Received: from smtpbgbr2.qq.com ([54.207.22.56]:46463 "EHLO smtpbgbr2.qq.com"
+        rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
+        id S1726200AbfJUAXv (ORCPT <rfc822;linux-block@vger.kernel.org>);
+        Sun, 20 Oct 2019 20:23:51 -0400
+X-QQ-mid: bizesmtp22t1571617416t3le2aei
+Received: from [192.168.142.168] (unknown [218.76.23.26])
+        by esmtp6.qq.com (ESMTP) with 
+        id ; Mon, 21 Oct 2019 08:23:35 +0800 (CST)
+X-QQ-SSF: 00400000002000S0ZT90B00A0000000
+X-QQ-FEAT: W55xVYr4Ddbj4RYADDwDUSpBgW4PkbndEs1hiYe/LZ0j/UN4/hGvc3sV+MuyT
+        jIBciI+vhI1LNCZ3hg4gKAo272PWJyk5ZX4QEaQzejd8kSHH6ZPmb8mN+K+1fo+IoDWd4BH
+        /k1W9RQgywAEgov9hrBEJTPf4/Q95J162sq7HsNmsse2KAl7YSFeyjl0catMpuIW+ZJYLbr
+        mir/vcE7VwbVDKfvV7aBegrE7QVBQU0r2s4iMDksvTz72pyKtkiAAuLOeGiuUkEs1pTrOQQ
+        wGHxdR7qwdo1WFhxWaPtpYXNOZNpvX1vVTk89HRTVqJ1xZnyUAa3Wl6CtQh8vzYPkxgD37I
+        IzWoRKUFA2uNh75QBU=
+X-QQ-GoodBg: 2
+Content-Type: text/plain;
+        charset=utf-8
+Mime-Version: 1.0 (Mac OS X Mail 13.0 \(3594.4.19\))
+Subject: Re: [PATCH] io_uring: fix up O_NONBLOCK handling for sockets
+From:   Jackie Liu <liuyun01@kylinos.cn>
+In-Reply-To: <f999615b-205c-49b7-b272-c4e42e45e09d@kernel.dk>
+Date:   Mon, 21 Oct 2019 08:23:35 +0800
+Cc:     "linux-block@vger.kernel.org" <linux-block@vger.kernel.org>,
+        Hrvoje Zeba <zeba.hrvoje@gmail.com>
+Content-Transfer-Encoding: 8BIT
+Message-Id: <BCC87FC4-164D-4A28-9C84-24FCC7969AD8@kylinos.cn>
+References: <f999615b-205c-49b7-b272-c4e42e45e09d@kernel.dk>
+To:     Jens Axboe <axboe@kernel.dk>
+X-Mailer: Apple Mail (2.3594.4.19)
+X-QQ-SENDSIZE: 520
+Feedback-ID: bizesmtp:kylinos.cn:qybgforeign:qybgforeign2
+X-QQ-Bgrelay: 1
 Sender: linux-block-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-Introduce the new helper function nvme_block_sect() to convert a device
-logical block number to a 512B sector number. Use this new helper in
-obvious places, cleaning up the code.
 
-Signed-off-by: Damien Le Moal <damien.lemoal@wdc.com>
----
- drivers/nvme/host/core.c | 14 +++++++-------
- drivers/nvme/host/nvme.h |  8 ++++++++
- 2 files changed, 15 insertions(+), 7 deletions(-)
 
-diff --git a/drivers/nvme/host/core.c b/drivers/nvme/host/core.c
-index fa7ba09dca77..1945c18d4b62 100644
---- a/drivers/nvme/host/core.c
-+++ b/drivers/nvme/host/core.c
-@@ -1647,7 +1647,7 @@ static void nvme_init_integrity(struct gendisk *disk, u16 ms, u8 pi_type)
+> 2019年10月17日 23:24，Jens Axboe <axboe@kernel.dk> 写道：
+> 
+> We've got two issues with the non-regular file handling for non-blocking
+> IO:
+> 
+> 1) We don't want to re-do a short read in full for a non-regular file,
+>   as we can't just read the data again.
+> 2) For non-regular files that don't support non-blocking IO attempts,
+>   we need to punt to async context even if the file is opened as
+>   non-blocking. Otherwise the caller always gets -EAGAIN.
+> 
+> Add two new request flags to handle these cases. One is just a cache
+> of the inode S_ISREG() status, the other tells io_uring that we always
+> need to punt this request to async context, even if REQ_F_NOWAIT is set.
+> 
+> Cc: stable@vger.kernel.org
+> Reported-by: Hrvoje Zeba <zeba.hrvoje@gmail.com>
+> Signed-off-by: Jens Axboe <axboe@kernel.dk>
+> ---
+> fs/io_uring.c | 55 +++++++++++++++++++++++++++++++++++----------------
+> 1 file changed, 38 insertions(+), 17 deletions(-)
+> 
+> diff --git a/fs/io_uring.c b/fs/io_uring.c
+> index d2cb277da2f4..a4ee5436cb61 100644
+> --- a/fs/io_uring.c
+> +++ b/fs/io_uring.c
+> @@ -322,6 +322,8 @@ struct io_kiocb {
+> #define REQ_F_FAIL_LINK		256	/* fail rest of links */
+> #define REQ_F_SHADOW_DRAIN	512	/* link-drain shadow req */
+> #define REQ_F_TIMEOUT		1024	/* timeout request */
+> +#define REQ_F_ISREG		2048	/* regular file */
+> +#define REQ_F_MUST_PUNT		4096	/* must be punted even for NONBLOCK */
+> 	u64			user_data;
+> 	u32			result;
+> 	u32			sequence;
+> @@ -914,26 +916,26 @@ static int io_iopoll_check(struct io_ring_ctx *ctx, unsigned *nr_events,
+> 	return ret;
+> }
+> 
+> -static void kiocb_end_write(struct kiocb *kiocb)
+> +static void kiocb_end_write(struct io_kiocb *req)
+> {
+> -	if (kiocb->ki_flags & IOCB_WRITE) {
+> -		struct inode *inode = file_inode(kiocb->ki_filp);
+> +	/*
+> +	 * Tell lockdep we inherited freeze protection from submission
+> +	 * thread.
+> +	 */
+> +	if (req->flags & REQ_F_ISREG) {
+> +		struct inode *inode = file_inode(req->file);
+> 
+> -		/*
+> -		 * Tell lockdep we inherited freeze protection from submission
+> -		 * thread.
+> -		 */
+> -		if (S_ISREG(inode->i_mode))
+> -			__sb_writers_acquired(inode->i_sb, SB_FREEZE_WRITE);
+> -		file_end_write(kiocb->ki_filp);
+> +		__sb_writers_acquired(inode->i_sb, SB_FREEZE_WRITE);
+> 	}
+> +	file_end_write(req->file);
+> }
+> 
+> static void io_complete_rw(struct kiocb *kiocb, long res, long res2)
+> {
+> 	struct io_kiocb *req = container_of(kiocb, struct io_kiocb, rw);
+> 
+> -	kiocb_end_write(kiocb);
+> +	if (kiocb->ki_flags & IOCB_WRITE)
+> +		kiocb_end_write(req);
+> 
+> 	if ((req->flags & REQ_F_LINK) && res != req->result)
+> 		req->flags |= REQ_F_FAIL_LINK;
+> @@ -945,7 +947,8 @@ static void io_complete_rw_iopoll(struct kiocb *kiocb, long res, long res2)
+> {
+> 	struct io_kiocb *req = container_of(kiocb, struct io_kiocb, rw);
+> 
+> -	kiocb_end_write(kiocb);
+> +	if (kiocb->ki_flags & IOCB_WRITE)
+> +		kiocb_end_write(req);
+> 
+> 	if ((req->flags & REQ_F_LINK) && res != req->result)
+> 		req->flags |= REQ_F_FAIL_LINK;
+> @@ -1059,8 +1062,17 @@ static int io_prep_rw(struct io_kiocb *req, const struct sqe_submit *s,
+> 	if (!req->file)
+> 		return -EBADF;
+> 
+> -	if (force_nonblock && !io_file_supports_async(req->file))
+> +	if (S_ISREG(file_inode(req->file)->i_mode))
+> +		req->flags |= REQ_F_ISREG;
+> +
+> +	/*
+> +	 * If the file doesn't support async, mark it as REQ_F_MUST_PUNT so
+> +	 * we know to async punt it even if it was opened O_NONBLOCK
+> +	 */
+> +	if (force_nonblock && !io_file_supports_async(req->file)) {
+> 		force_nonblock = false;
+> +		req->flags |= REQ_F_MUST_PUNT;
+> +	}
+
+Hello Jens. that is your new version.
+
++	/*
++	 * If the file doesn't support async, mark it as REQ_F_MUST_PUNT so
++	 * we know to async punt it even if it was opened O_NONBLOCK
++	 */
++	if (force_nonblock && !io_file_supports_async(req->file)) {
++		req->flags |= REQ_F_MUST_PUNT;
++		return -EAGAIN;
++	}
+
+So, if req->file don't support async, we always return EAGAIN immediately.
  
- static void nvme_set_chunk_size(struct nvme_ns *ns)
- {
--	u32 chunk_size = (((u32)ns->noiob) << (ns->lba_shift - 9));
-+	u32 chunk_size = nvme_block_sect(ns, ns->noiob);
- 	blk_queue_chunk_sectors(ns->queue, rounddown_pow_of_two(chunk_size));
- }
- 
-@@ -1684,8 +1684,7 @@ static void nvme_config_discard(struct gendisk *disk, struct nvme_ns *ns)
- 
- static void nvme_config_write_zeroes(struct gendisk *disk, struct nvme_ns *ns)
- {
--	u32 max_sectors;
--	unsigned short bs = 1 << ns->lba_shift;
-+	u64 max_blocks;
- 
- 	if (!(ns->ctrl->oncs & NVME_CTRL_ONCS_WRITE_ZEROES) ||
- 	    (ns->ctrl->quirks & NVME_QUIRK_DISABLE_WRITE_ZEROES))
-@@ -1701,11 +1700,12 @@ static void nvme_config_write_zeroes(struct gendisk *disk, struct nvme_ns *ns)
- 	 * nvme_init_identify() if available.
- 	 */
- 	if (ns->ctrl->max_hw_sectors == UINT_MAX)
--		max_sectors = ((u32)(USHRT_MAX + 1) * bs) >> 9;
-+		max_blocks = (u64)USHRT_MAX + 1;
- 	else
--		max_sectors = ((u32)(ns->ctrl->max_hw_sectors + 1) * bs) >> 9;
-+		max_blocks = ns->ctrl->max_hw_sectors + 1;
- 
--	blk_queue_max_write_zeroes_sectors(disk->queue, max_sectors);
-+	blk_queue_max_write_zeroes_sectors(disk->queue,
-+					   nvme_block_sect(ns, max_blocks));
- }
- 
- static int nvme_report_ns_ids(struct nvme_ctrl *ctrl, unsigned int nsid,
-@@ -1748,7 +1748,7 @@ static bool nvme_ns_ids_equal(struct nvme_ns_ids *a, struct nvme_ns_ids *b)
- static void nvme_update_disk_info(struct gendisk *disk,
- 		struct nvme_ns *ns, struct nvme_id_ns *id)
- {
--	sector_t capacity = le64_to_cpu(id->nsze) << (ns->lba_shift - 9);
-+	sector_t capacity = nvme_block_sect(ns, le64_to_cpu(id->nsze));
- 	unsigned short bs = 1 << ns->lba_shift;
- 	u32 atomic_bs, phys_bs, io_opt;
- 
-diff --git a/drivers/nvme/host/nvme.h b/drivers/nvme/host/nvme.h
-index a979b62ea4b2..c629a37bc778 100644
---- a/drivers/nvme/host/nvme.h
-+++ b/drivers/nvme/host/nvme.h
-@@ -427,6 +427,14 @@ static inline u64 nvme_block_nr(struct nvme_ns *ns, sector_t sector)
- 	return sector >> (ns->lba_shift - SECTOR_SHIFT);
- }
- 
-+/*
-+ * Convert a logical block number to a 512B sector number.
-+ */
-+static inline sector_t nvme_block_sect(struct nvme_ns *ns, u64 lba)
-+{
-+	return lba << (ns->lba_shift - SECTOR_SHIFT);
-+}
-+
- static inline void nvme_end_request(struct request *req, __le16 status,
- 		union nvme_result result)
- {
--- 
-2.21.0
+
+> 
+> 	kiocb->ki_pos = READ_ONCE(sqe->off);
+> 	kiocb->ki_flags = iocb_flags(kiocb->ki_filp);
+> @@ -1081,7 +1093,8 @@ static int io_prep_rw(struct io_kiocb *req, const struct sqe_submit *s,
+> 		return ret;
+> 
+> 	/* don't allow async punt if RWF_NOWAIT was requested */
+> -	if (kiocb->ki_flags & IOCB_NOWAIT)
+> +	if ((kiocb->ki_flags & IOCB_NOWAIT) ||
+> +	    (req->file->f_flags & O_NONBLOCK))
+
+I think if we return -EAGAIN immediately, and using the work queue to execute this context, 
+this is unnecessary.
+
+> 		req->flags |= REQ_F_NOWAIT;
+> 
+> 	if (force_nonblock)
+> @@ -1382,7 +1395,9 @@ static int io_read(struct io_kiocb *req, const struct sqe_submit *s,
+> 		 * need async punt anyway, so it's more efficient to do it
+> 		 * here.
+> 		 */
+> -		if (force_nonblock && ret2 > 0 && ret2 < read_size)
+> +		if (force_nonblock && !(req->flags & REQ_F_NOWAIT) &&
+> +		    (req->flags & REQ_F_ISREG) &&
+> +		    ret2 > 0 && ret2 < read_size)
+> 			ret2 = -EAGAIN;
+
+This is also unnecessary because force_nonblock is always false.
+
+--
+Jackie Liu
+
+
 
