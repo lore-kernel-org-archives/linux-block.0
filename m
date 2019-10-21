@@ -2,58 +2,60 @@ Return-Path: <SRS0=zBYI=YO=vger.kernel.org=linux-block-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-6.9 required=3.0 tests=DKIM_SIGNED,DKIM_VALID,
-	DKIM_VALID_AU,HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,
-	SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS autolearn=ham autolearn_force=no
-	version=3.4.0
+X-Spam-Status: No, score=-2.4 required=3.0 tests=DKIM_SIGNED,DKIM_VALID,
+	DKIM_VALID_AU,HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SPF_HELO_NONE,
+	SPF_PASS,USER_AGENT_SANE_1 autolearn=no autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 8618ECA9EB7
-	for <linux-block@archiver.kernel.org>; Mon, 21 Oct 2019 21:41:48 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 308A5CA9EAF
+	for <linux-block@archiver.kernel.org>; Mon, 21 Oct 2019 21:43:18 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.kernel.org (Postfix) with ESMTP id 5BC5C20873
-	for <linux-block@archiver.kernel.org>; Mon, 21 Oct 2019 21:41:48 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id EB5812084B
+	for <linux-block@archiver.kernel.org>; Mon, 21 Oct 2019 21:43:17 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="EA8vKtU8"
+	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="eI67CDaV"
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1730385AbfJUVlr (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Mon, 21 Oct 2019 17:41:47 -0400
-Received: from us-smtp-1.mimecast.com ([205.139.110.61]:38245 "EHLO
-        us-smtp-delivery-1.mimecast.com" rhost-flags-OK-OK-OK-FAIL)
-        by vger.kernel.org with ESMTP id S1729388AbfJUVlr (ORCPT
+        id S1729406AbfJUVnR (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Mon, 21 Oct 2019 17:43:17 -0400
+Received: from us-smtp-delivery-1.mimecast.com ([207.211.31.120]:56224 "EHLO
+        us-smtp-1.mimecast.com" rhost-flags-OK-OK-OK-FAIL) by vger.kernel.org
+        with ESMTP id S1727264AbfJUVnR (ORCPT
         <rfc822;linux-block@vger.kernel.org>);
-        Mon, 21 Oct 2019 17:41:47 -0400
+        Mon, 21 Oct 2019 17:43:17 -0400
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-        s=mimecast20190719; t=1571694106;
+        s=mimecast20190719; t=1571694196;
         h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-         to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-         content-transfer-encoding:content-transfer-encoding;
-        bh=IWeM12SnjaxnROOhjKG0uzMoH/1pwew4flz84hu3l0k=;
-        b=EA8vKtU8iQd2X3J6MWu7z3azMx0YgPt7zpBAms3aKTuzXSvMutK5X7fjnJkQGkeivXxoj9
-        7qCVfB5vLcvURXKOdKaH0RyvV9DvFKYZQIoUh22j9vXdGdcyUtR+V3L9vIxRNJrJ8tFKpp
-        RCodsuiGw5rdWeFvmd0rOBGmhmR1UsE=
+         to:to:cc:mime-version:mime-version:content-type:content-type:
+         content-transfer-encoding:content-transfer-encoding:
+         in-reply-to:in-reply-to:references:references;
+        bh=7TGeLaJHLQfa3EPhpXyQnizlrqhS05at+Cg3a1T6joA=;
+        b=eI67CDaVBZaKHdyjqF6rBw5ctlPjMKoH2j48Z4TcMynmlH549L4UXxMqbbkR0c/XkAzPbU
+        LWBS9oviG37PUZ45Io6OdCbW2ZcezExZe1Ri8JmUKhKLM1fd2Vdh2Zbg9PqnmPnpJZW6R8
+        MSaTAjNbZKxtWY3VfJFp5ZsaI5vm0HQ=
 Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
  [209.132.183.4]) (Using TLS) by relay.mimecast.com with ESMTP id
- us-mta-270-WEhns1CVOLONzpz_CDZEpg-1; Mon, 21 Oct 2019 17:41:41 -0400
-Received: from smtp.corp.redhat.com (int-mx01.intmail.prod.int.phx2.redhat.com [10.5.11.11])
+ us-mta-221-zdn-zzpYOuiyX0UgVCM5ug-1; Mon, 21 Oct 2019 17:43:12 -0400
+Received: from smtp.corp.redhat.com (int-mx02.intmail.prod.int.phx2.redhat.com [10.5.11.12])
         (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
         (No client certificate requested)
-        by mimecast-mx01.redhat.com (Postfix) with ESMTPS id 2B3CF2B6;
-        Mon, 21 Oct 2019 21:41:40 +0000 (UTC)
-Received: from rh2.redhat.com (ovpn-123-171.rdu2.redhat.com [10.10.123.171])
-        by smtp.corp.redhat.com (Postfix) with ESMTP id D2A8560126;
-        Mon, 21 Oct 2019 21:41:38 +0000 (UTC)
+        by mimecast-mx01.redhat.com (Postfix) with ESMTPS id 90009800D41;
+        Mon, 21 Oct 2019 21:43:11 +0000 (UTC)
+Received: from [10.10.123.171] (ovpn-123-171.rdu2.redhat.com [10.10.123.171])
+        by smtp.corp.redhat.com (Postfix) with ESMTP id BB3DD60CD0;
+        Mon, 21 Oct 2019 21:43:10 +0000 (UTC)
+Subject: Re: [PATCH 0/2] fix double completion of timed out commands
+To:     Josef Bacik <josef@toxicpanda.com>, axboe@kernel.dk,
+        nbd@other.debian.org, linux-block@vger.kernel.org,
+        kernel-team@fb.com
+References: <20191021195628.19849-1-josef@toxicpanda.com>
 From:   Mike Christie <mchristi@redhat.com>
-To:     linux-mm@kvack.org, linux-kernel@vger.kernel.org,
-        linux-scsi@vger.kernel.org, linux-fsdevel@vger.kernel.org,
-        linux-block@vger.kernel.org, martin@urbackup.org,
-        Damien.LeMoal@wdc.com
-Cc:     Mike Christie <mchristi@redhat.com>
-Subject: [PATCH] Add prctl support for controlling PF_MEMALLOC V2
-Date:   Mon, 21 Oct 2019 16:41:37 -0500
-Message-Id: <20191021214137.8172-1-mchristi@redhat.com>
+Message-ID: <5DAE266E.9020004@redhat.com>
+Date:   Mon, 21 Oct 2019 16:43:10 -0500
+User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:38.0) Gecko/20100101
+ Thunderbird/38.6.0
 MIME-Version: 1.0
-X-Scanned-By: MIMEDefang 2.79 on 10.5.11.11
-X-MC-Unique: WEhns1CVOLONzpz_CDZEpg-1
+In-Reply-To: <20191021195628.19849-1-josef@toxicpanda.com>
+X-Scanned-By: MIMEDefang 2.79 on 10.5.11.12
+X-MC-Unique: zdn-zzpYOuiyX0UgVCM5ug-1
 X-Mimecast-Spam-Score: 0
 Content-Type: text/plain; charset=WINDOWS-1252
 Content-Transfer-Encoding: quoted-printable
@@ -62,106 +64,24 @@ Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-There are several storage drivers like dm-multipath, iscsi, tcmu-runner,
-amd nbd that have userspace components that can run in the IO path. For
-example, iscsi and nbd's userspace deamons may need to recreate a socket
-and/or send IO on it, and dm-multipath's daemon multipathd may need to
-send IO to figure out the state of paths and re-set them up.
+On 10/21/2019 02:56 PM, Josef Bacik wrote:
+> We noticed a problem where NBD sometimes double completes the same reques=
+t when
+> things go wrong and we time out the request.  If the other side goes out =
+to
+> lunch but happens to reply just as we're timing out the requests we can e=
+nd up
+> with a double completion on the request.
+>=20
+> We already keep track of the command status, we just need to make sure we
+> protect all cases where we set cmd->status with the cmd->lock, which is p=
+atch
+> #1.  Patch #2 is the fix for the problem, which catches the case where we=
+ race
+> with the timeout handler and the reply handler.  Thanks,
+>=20
 
-In the kernel these drivers have access to GFP_NOIO/GFP_NOFS and the
-memalloc_*_save/restore functions to control the allocation behavior,
-but for userspace we would end up hitting a allocation that ended up
-writing data back to the same device we are trying to allocate for.
+Patches look ok and tested ok for me.
 
-This patch allows the userspace deamon to set the PF_MEMALLOC* flags
-with prctl during their initialization so later allocations cannot
-calling back into them.
-
-Signed-off-by: Mike Christie <mchristi@redhat.com>
----
-
-V2:
-- Use prctl instead of procfs.
-- Add support for NOFS for fuse.
-- Check permissions.
-
- include/uapi/linux/prctl.h |  8 +++++++
- kernel/sys.c               | 44 ++++++++++++++++++++++++++++++++++++++
- 2 files changed, 52 insertions(+)
-
-diff --git a/include/uapi/linux/prctl.h b/include/uapi/linux/prctl.h
-index 7da1b37b27aa..6f6b3af6633a 100644
---- a/include/uapi/linux/prctl.h
-+++ b/include/uapi/linux/prctl.h
-@@ -234,4 +234,12 @@ struct prctl_mm_map {
- #define PR_GET_TAGGED_ADDR_CTRL=09=0956
- # define PR_TAGGED_ADDR_ENABLE=09=09(1UL << 0)
-=20
-+/* Control reclaim behavior when allocating memory */
-+#define PR_SET_MEMALLOC=09=09=0957
-+#define PR_GET_MEMALLOC=09=09=0958
-+#define PR_MEMALLOC_SET_NOIO=09=09(1UL << 0)
-+#define PR_MEMALLOC_CLEAR_NOIO=09=09(1UL << 1)
-+#define PR_MEMALLOC_SET_NOFS=09=09(1UL << 2)
-+#define PR_MEMALLOC_CLEAR_NOFS=09=09(1UL << 3)
-+
- #endif /* _LINUX_PRCTL_H */
-diff --git a/kernel/sys.c b/kernel/sys.c
-index a611d1d58c7d..34fedc9fc7e4 100644
---- a/kernel/sys.c
-+++ b/kernel/sys.c
-@@ -2486,6 +2486,50 @@ SYSCALL_DEFINE5(prctl, int, option, unsigned long, a=
-rg2, unsigned long, arg3,
- =09=09=09return -EINVAL;
- =09=09error =3D GET_TAGGED_ADDR_CTRL();
- =09=09break;
-+=09case PR_SET_MEMALLOC:
-+=09=09if (!capable(CAP_SYS_ADMIN))
-+=09=09=09return -EPERM;
-+
-+=09=09if (arg3 || arg4 || arg5)
-+=09=09=09return -EINVAL;
-+
-+=09=09switch (arg2) {
-+=09=09case PR_MEMALLOC_SET_NOIO:
-+=09=09=09if (current->flags & PF_MEMALLOC_NOFS)
-+=09=09=09=09return -EINVAL;
-+
-+=09=09=09current->flags |=3D PF_MEMALLOC_NOIO;
-+=09=09=09break;
-+=09=09case PR_MEMALLOC_CLEAR_NOIO:
-+=09=09=09current->flags &=3D ~PF_MEMALLOC_NOIO;
-+=09=09=09break;
-+=09=09case PR_MEMALLOC_SET_NOFS:
-+=09=09=09if (current->flags & PF_MEMALLOC_NOIO)
-+=09=09=09=09return -EINVAL;
-+
-+=09=09=09current->flags |=3D PF_MEMALLOC_NOFS;
-+=09=09=09break;
-+=09=09case PR_MEMALLOC_CLEAR_NOFS:
-+=09=09=09current->flags &=3D ~PF_MEMALLOC_NOFS;
-+=09=09=09break;
-+=09=09default:
-+=09=09=09return -EINVAL;
-+=09=09}
-+=09=09break;
-+=09case PR_GET_MEMALLOC:
-+=09=09if (!capable(CAP_SYS_ADMIN))
-+=09=09=09return -EPERM;
-+
-+=09=09if (arg2 || arg3 || arg4 || arg5)
-+=09=09=09return -EINVAL;
-+
-+=09=09if (current->flags & PF_MEMALLOC_NOIO)
-+=09=09=09error =3D PR_MEMALLOC_SET_NOIO;
-+=09=09else if (current->flags & PF_MEMALLOC_NOFS)
-+=09=09=09error =3D PR_MEMALLOC_SET_NOFS;
-+=09=09else
-+=09=09=09error =3D 0;
-+=09=09break;
- =09default:
- =09=09error =3D -EINVAL;
- =09=09break;
---=20
-2.20.1
+Reviewed-by: Mike Christie <mchristi@redhat.com>
 
