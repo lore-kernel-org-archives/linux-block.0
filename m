@@ -2,88 +2,66 @@ Return-Path: <SRS0=zBYI=YO=vger.kernel.org=linux-block-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-2.3 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
-	MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,USER_AGENT_SANE_1 autolearn=no
-	autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-2.6 required=3.0 tests=DKIMWL_WL_HIGH,DKIM_SIGNED,
+	DKIM_VALID,DKIM_VALID_AU,MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,
+	USER_AGENT_SANE_1 autolearn=no autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id E7DA4CA9EAF
-	for <linux-block@archiver.kernel.org>; Mon, 21 Oct 2019 13:48:26 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id E1179CA9EAF
+	for <linux-block@archiver.kernel.org>; Mon, 21 Oct 2019 13:55:41 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.kernel.org (Postfix) with ESMTP id C66AB2053B
-	for <linux-block@archiver.kernel.org>; Mon, 21 Oct 2019 13:48:26 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id B2973214AE
+	for <linux-block@archiver.kernel.org>; Mon, 21 Oct 2019 13:55:41 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+	s=default; t=1571666141;
+	bh=9xG00Cs4w+lEsaZ67H86HMtwcgJo+NjnOqwm8alRtnA=;
+	h=Date:From:To:Cc:Subject:References:In-Reply-To:List-ID:From;
+	b=RNfgyupE5fzmErQZPcQ3KA45fwdZ11QjevvjgeOw5rWmBSikTdR3maOsBDCQyqg61
+	 KSxFjpTRGrgKQFWoe8rmH/PkimegJPtdQ6ZqHihy9sDfGv7ve3Zo1x77+zs7RF8LjI
+	 Pv2Fy9orbuF/wwfjWAOH62ixCZtwBPjzFQAjAz4U=
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1728954AbfJUNs0 convert rfc822-to-8bit (ORCPT
-        <rfc822;linux-block@archiver.kernel.org>);
-        Mon, 21 Oct 2019 09:48:26 -0400
-Received: from mail-pf1-f195.google.com ([209.85.210.195]:47009 "EHLO
-        mail-pf1-f195.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1728083AbfJUNsZ (ORCPT
-        <rfc822;linux-block@vger.kernel.org>);
-        Mon, 21 Oct 2019 09:48:25 -0400
-Received: by mail-pf1-f195.google.com with SMTP id q5so8460517pfg.13;
-        Mon, 21 Oct 2019 06:48:25 -0700 (PDT)
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20161025;
-        h=x-gm-message-state:subject:to:cc:references:from:message-id:date
-         :user-agent:mime-version:in-reply-to:content-language
-         :content-transfer-encoding;
-        bh=5Lm0hZL1wyztt3hWk0T5URQ4B1o3nLfonDMHZ9hkUMc=;
-        b=emgfxJCWOqZb8kZhrjRTxQXZFdplMN5gKA+OJGcLLss0yLMcHi68zK6RxYoC37E+S3
-         ON5i7tpgn2U/dzeqWfXVX9scx4RV/GoXTa1LPnqfnQivzZVXo6QDBUIxc2AbK6kIgzr0
-         UfczoX/cijShGfh8sS0lG+NgQ1LcHW+RR3I3mdjq1ILrq3oTLI0NE9bK+ryySVQPuIRj
-         wGj5lNU2DFJVvsu727r8TUBkqhz/M6qbzJvPG3Iiucp3VrjSQgeVbP4ejlAcgDuMh/Wm
-         w8i6cSvL+01SpmhLGnlwIyvmTnjZraHEYSa7DwlF+glx1/ggPrfiyF+fJrTh/rcsYrU9
-         0Hwg==
-X-Gm-Message-State: APjAAAWnuIXv8hMaRAB0M92/4QdIiu50HwhPGG2Kyx8Nj+rjxxaj+j1M
-        41FQdBa9ijbcbL+L6N48RVg=
-X-Google-Smtp-Source: APXvYqzL9dlx2FQCFLlR12fRlfcYHt97NCWtrpGNTj/S31/M83EEevzMhJ/jTywCZFuANFY8EXWVNA==
-X-Received: by 2002:a63:1262:: with SMTP id 34mr25905665pgs.269.1571665704647;
-        Mon, 21 Oct 2019 06:48:24 -0700 (PDT)
-Received: from ?IPv6:2601:647:4000:ce:e1dd:ac50:4a18:2864? ([2601:647:4000:ce:e1dd:ac50:4a18:2864])
-        by smtp.gmail.com with ESMTPSA id p88sm15211395pjp.22.2019.10.21.06.48.23
-        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
-        Mon, 21 Oct 2019 06:48:23 -0700 (PDT)
-Subject: Re: [RFC PATCH 1/2] block: add support for redirecting IO completion
- through eBPF
-To:     Hou Tao <houtao1@huawei.com>,
-        Alexei Starovoitov <alexei.starovoitov@gmail.com>
-Cc:     linux-block@vger.kernel.org, bpf <bpf@vger.kernel.org>,
-        Network Development <netdev@vger.kernel.org>,
-        Jens Axboe <axboe@kernel.dk>,
-        Alexei Starovoitov <ast@kernel.org>, hare@suse.com,
-        osandov@fb.com, ming.lei@redhat.com, damien.lemoal@wdc.com,
-        Daniel Borkmann <daniel@iogearbox.net>,
-        Martin KaFai Lau <kafai@fb.com>,
-        Song Liu <songliubraving@fb.com>, Yonghong Song <yhs@fb.com>
-References: <20191014122833.64908-1-houtao1@huawei.com>
- <20191014122833.64908-2-houtao1@huawei.com>
- <CAADnVQ+UJK41VL-epYGxrRzqL_UsC+X=J8EXEn2i8P+TPGA_jg@mail.gmail.com>
- <84032c64-8e5e-6ad1-63ea-57adee7a2875@huawei.com>
-From:   Bart Van Assche <bvanassche@acm.org>
-Message-ID: <737d9d3f-e72c-ac31-6b2a-997202a302bd@acm.org>
-Date:   Mon, 21 Oct 2019 06:48:17 -0700
-User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:60.0) Gecko/20100101
- Thunderbird/60.9.0
+        id S1728696AbfJUNzl (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Mon, 21 Oct 2019 09:55:41 -0400
+Received: from mail.kernel.org ([198.145.29.99]:48338 "EHLO mail.kernel.org"
+        rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
+        id S1728670AbfJUNzk (ORCPT <rfc822;linux-block@vger.kernel.org>);
+        Mon, 21 Oct 2019 09:55:40 -0400
+Received: from redsun51.ssa.fujisawa.hgst.com (unknown [199.255.47.7])
+        (using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+        (No client certificate requested)
+        by mail.kernel.org (Postfix) with ESMTPSA id 886132089C;
+        Mon, 21 Oct 2019 13:55:39 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+        s=default; t=1571666140;
+        bh=9xG00Cs4w+lEsaZ67H86HMtwcgJo+NjnOqwm8alRtnA=;
+        h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
+        b=vw9Q+Y9sI89YJagP3TtStQt+niz5HRkUke6B8aDzhDrYSyK0Fm0c5xxTm0nUE5GYY
+         hFPrt6jBEZOxFramLOjNamYkrz2W9F+QB2yJk4P9/d8kds0PzNKdj+CEYrOXDKsLqM
+         t/ze353WIiJPDmf5rXEGPlg8RDGYpAKXgShyUK+4=
+Date:   Mon, 21 Oct 2019 22:55:35 +0900
+From:   Keith Busch <kbusch@kernel.org>
+To:     Damien Le Moal <damien.lemoal@wdc.com>
+Cc:     linux-nvme@lists.infradead.org, Christoph Hellwig <hch@lst.de>,
+        Sagi Grimberg <sagi@grimberg.me>, linux-block@vger.kernel.org,
+        Jens Axboe <axboe@kernel.dk>
+Subject: Re: [PATCH 0/2 v2] Small cleanups
+Message-ID: <20191021135535.GA12633@redsun51.ssa.fujisawa.hgst.com>
+References: <20191021034004.11063-1-damien.lemoal@wdc.com>
 MIME-Version: 1.0
-In-Reply-To: <84032c64-8e5e-6ad1-63ea-57adee7a2875@huawei.com>
-Content-Type: text/plain; charset=utf-8
-Content-Language: en-US
-Content-Transfer-Encoding: 8BIT
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <20191021034004.11063-1-damien.lemoal@wdc.com>
+User-Agent: Mutt/1.12.1 (2019-06-15)
 Sender: linux-block-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-On 10/21/19 6:42 AM, Hou Tao wrote:
-> Your suggestion is much simpler, so there will be no need for adding a new
-> program type, and all things need to be done are adding a raw tracepoint,
-> moving bpf_ccpu into struct request, and letting a BPF program to modify it.
+On Mon, Oct 21, 2019 at 12:40:02PM +0900, Damien Le Moal wrote:
+> This is series is a couple of cleanup patches. The first one cleans up
+> the helper function nvme_block_nr() using SECTOR_SHIFT instead of the
+> hard coded value 9 and clarifies the helper role by renaming it to
+> nvme_sect_to_lba(). The second patch introduces the nvme_lba_to_sect()
+> helper to convert a device logical block number into a 512B sector
+> value.
 
-blk-mq already supports processing completions on the CPU that submitted
-a request so it's not clear to me why any changes in the block layer are
-being proposed for redirecting I/O completions?
-
-Thanks,
-
-Bart.
-
+Thank you, patches applied to nvme-5.5 with the reviews.
