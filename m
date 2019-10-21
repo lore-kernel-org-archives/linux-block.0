@@ -2,94 +2,82 @@ Return-Path: <SRS0=zBYI=YO=vger.kernel.org=linux-block-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-5.2 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
-	MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED,
-	USER_AGENT_SANE_1 autolearn=unavailable autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-3.8 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
+	MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,USER_AGENT_GIT autolearn=no
+	autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 491F8C47E49
-	for <linux-block@archiver.kernel.org>; Mon, 21 Oct 2019 22:52:45 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 7BFE3CA9EAF
+	for <linux-block@archiver.kernel.org>; Mon, 21 Oct 2019 22:57:30 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.kernel.org (Postfix) with ESMTP id 1E7D92089C
-	for <linux-block@archiver.kernel.org>; Mon, 21 Oct 2019 22:52:45 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id 5870E20B7C
+	for <linux-block@archiver.kernel.org>; Mon, 21 Oct 2019 22:57:30 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1730410AbfJUWwl (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Mon, 21 Oct 2019 18:52:41 -0400
-Received: from mail105.syd.optusnet.com.au ([211.29.132.249]:56174 "EHLO
-        mail105.syd.optusnet.com.au" rhost-flags-OK-OK-OK-OK)
-        by vger.kernel.org with ESMTP id S1730399AbfJUWwl (ORCPT
+        id S1730488AbfJUW53 (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Mon, 21 Oct 2019 18:57:29 -0400
+Received: from mail-pl1-f182.google.com ([209.85.214.182]:42348 "EHLO
+        mail-pl1-f182.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S1730350AbfJUW53 (ORCPT
         <rfc822;linux-block@vger.kernel.org>);
-        Mon, 21 Oct 2019 18:52:41 -0400
-Received: from dread.disaster.area (pa49-180-40-48.pa.nsw.optusnet.com.au [49.180.40.48])
-        by mail105.syd.optusnet.com.au (Postfix) with ESMTPS id 0202A363692;
-        Tue, 22 Oct 2019 09:52:35 +1100 (AEDT)
-Received: from dave by dread.disaster.area with local (Exim 4.92.3)
-        (envelope-from <david@fromorbit.com>)
-        id 1iMgXS-00074h-TR; Tue, 22 Oct 2019 09:52:34 +1100
-Date:   Tue, 22 Oct 2019 09:52:34 +1100
-From:   Dave Chinner <david@fromorbit.com>
-To:     Mike Christie <mchristi@redhat.com>
-Cc:     linux-mm@kvack.org, linux-kernel@vger.kernel.org,
-        linux-scsi@vger.kernel.org, linux-fsdevel@vger.kernel.org,
-        linux-block@vger.kernel.org, martin@urbackup.org,
-        Damien.LeMoal@wdc.com
-Subject: Re: [PATCH] Add prctl support for controlling PF_MEMALLOC V2
-Message-ID: <20191021225234.GC2642@dread.disaster.area>
-References: <20191021214137.8172-1-mchristi@redhat.com>
+        Mon, 21 Oct 2019 18:57:29 -0400
+Received: by mail-pl1-f182.google.com with SMTP id c16so3623196plz.9
+        for <linux-block@vger.kernel.org>; Mon, 21 Oct 2019 15:57:29 -0700 (PDT)
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20161025;
+        h=x-gm-message-state:from:to:cc:subject:date:message-id:mime-version
+         :content-transfer-encoding;
+        bh=5aXr3jQgX2MpSk6ZWDHNxus1OCT/PIWi9AKr3afTCps=;
+        b=GaQomgZxjTrAHNEgxBjq6iRPkyGm71p3pGOCbsEOGvQiTYXbMMfOyiB2hDO+pDIdC6
+         PMtuzvwXGU8wLSbCIxfs5kg6HrlGGvZ9uft7BVV3yuQ/JGgPKPrG8ASSiTN9qPcnUTLR
+         8oTGgMLbkzWtrA97ya32QULY0+Xn/w19CmXMTp+J/HwNyBuSnHg6Nkl4qATx0vYg42IU
+         r2Uomj1pLD/LZSSdHIX4mcfjk6H4D/ZwtJBudBi9dLlmMZzPfIf6h3h8Hrgpc7sXU4Mr
+         dBBWYUEcpXpSycruDz9mC4ii0HG6+AOEPUoPKDhp6+XJA5UldRXQNIQvHbVmL49V80M6
+         SitA==
+X-Gm-Message-State: APjAAAU8ivSweMKG2kOKYn96Try1bZ/FwP3tf+4JbnW4xi6WQlQA++1p
+        QnmPq69hjCUMtKXJ3zj1ZfD2aIc84BQ=
+X-Google-Smtp-Source: APXvYqxaOlCe63Xb6fG74RVD9/3oyRIqmouGcJKcsykq8w1i53DrscX2cpA4pLrkNgy+9bMzEh8ygA==
+X-Received: by 2002:a17:902:7c03:: with SMTP id x3mr402234pll.171.1571698648627;
+        Mon, 21 Oct 2019 15:57:28 -0700 (PDT)
+Received: from desktop-bart.svl.corp.google.com ([2620:15c:2cd:202:4308:52a3:24b6:2c60])
+        by smtp.gmail.com with ESMTPSA id x70sm255474pfd.132.2019.10.21.15.57.27
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Mon, 21 Oct 2019 15:57:27 -0700 (PDT)
+From:   Bart Van Assche <bvanassche@acm.org>
+To:     Omar Sandoval <osandov@fb.com>
+Cc:     linux-block@vger.kernel.org,
+        Johannes Thumshirn <jthumshirn@suse.de>,
+        Bart Van Assche <bvanassche@acm.org>
+Subject: [PATCH blktests 0/2] Add a test that triggers blk_mq_update_nr_hw_queues()
+Date:   Mon, 21 Oct 2019 15:57:17 -0700
+Message-Id: <20191021225719.211651-1-bvanassche@acm.org>
+X-Mailer: git-send-email 2.23.0.866.gb869b98d4c-goog
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <20191021214137.8172-1-mchristi@redhat.com>
-User-Agent: Mutt/1.10.1 (2018-07-13)
-X-Optus-CM-Score: 0
-X-Optus-CM-Analysis: v=2.2 cv=G6BsK5s5 c=1 sm=1 tr=0
-        a=y881pOMu+B+mZdf5UrsJdA==:117 a=y881pOMu+B+mZdf5UrsJdA==:17
-        a=jpOVt7BSZ2e4Z31A5e1TngXxSK0=:19 a=kj9zAlcOel0A:10 a=XobE76Q3jBoA:10
-        a=20KFwNOVAAAA:8 a=7-415B0cAAAA:8 a=rSlL4X6sGr0P-yuullEA:9
-        a=CjuIK1q_8ugA:10 a=biEYGPWJfzWAr4FL6Ov7:22
+Content-Transfer-Encoding: 8bit
 Sender: linux-block-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-On Mon, Oct 21, 2019 at 04:41:37PM -0500, Mike Christie wrote:
-> There are several storage drivers like dm-multipath, iscsi, tcmu-runner,
-> amd nbd that have userspace components that can run in the IO path. For
-> example, iscsi and nbd's userspace deamons may need to recreate a socket
-> and/or send IO on it, and dm-multipath's daemon multipathd may need to
-> send IO to figure out the state of paths and re-set them up.
-> 
-> In the kernel these drivers have access to GFP_NOIO/GFP_NOFS and the
-> memalloc_*_save/restore functions to control the allocation behavior,
-> but for userspace we would end up hitting a allocation that ended up
-> writing data back to the same device we are trying to allocate for.
+Hi Omar,
 
-I think this needs to describe the symptoms this results in. i.e.
-that this can result in deadlocking the IO path.
+This patch series includes the test that I used to verify my recently posted
+blk_mq_update_nr_hw_queues() patches. Please consider these patches for
+inclusion in the blktests repository.
 
-> This patch allows the userspace deamon to set the PF_MEMALLOC* flags
-> with prctl during their initialization so later allocations cannot
-> calling back into them.
-> 
-> Signed-off-by: Mike Christie <mchristi@redhat.com>
-> ---
+Thanks,
 
-....
-> +	case PR_SET_MEMALLOC:
-> +		if (!capable(CAP_SYS_ADMIN))
-> +			return -EPERM;
+Bart.
 
-Wouldn't CAP_SYS_RAWIO (because it's required by kernel IO path
-drivers) or CAP_SYS_RESOURCE (controlling memory allocation
-behaviour) be more appropriate here?
+Bart Van Assche (2):
+  Move and rename uptime_s()
+  Add a test that triggers blk_mq_update_nr_hw_queues()
 
-Which-ever is selected, the use should be added to the list above
-the definition of the capability in include/linux/capability.h...
-
-Otherwise looks fine to me.
-
-Cheers,
-
-Dave.
--- 
-Dave Chinner
-david@fromorbit.com
+ common/multipath-over-rdma |  9 +-----
+ common/rc                  |  9 ++++++
+ tests/block/029            | 63 ++++++++++++++++++++++++++++++++++++++
+ tests/block/029.out        |  1 +
+ tests/nvmeof-mp/rc         |  2 +-
+ tests/srp/014              |  2 +-
+ tests/srp/rc               |  2 +-
+ 7 files changed, 77 insertions(+), 11 deletions(-)
+ create mode 100755 tests/block/029
+ create mode 100644 tests/block/029.out
