@@ -2,111 +2,158 @@ Return-Path: <SRS0=zBYI=YO=vger.kernel.org=linux-block-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-8.2 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
-	INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,
-	URIBL_BLOCKED,USER_AGENT_SANE_1 autolearn=ham autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-10.3 required=3.0
+	tests=HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,
+	MENTIONS_GIT_HOSTING,SPF_HELO_NONE,SPF_PASS,USER_AGENT_SANE_1 autolearn=ham
+	autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 50A0ECA9EB5
-	for <linux-block@archiver.kernel.org>; Mon, 21 Oct 2019 09:12:59 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 356D8CA9EB5
+	for <linux-block@archiver.kernel.org>; Mon, 21 Oct 2019 09:19:30 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.kernel.org (Postfix) with ESMTP id 2A6C120873
-	for <linux-block@archiver.kernel.org>; Mon, 21 Oct 2019 09:12:59 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id 0ECAE20659
+	for <linux-block@archiver.kernel.org>; Mon, 21 Oct 2019 09:19:30 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1726847AbfJUJM6 (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Mon, 21 Oct 2019 05:12:58 -0400
-Received: from mx2.suse.de ([195.135.220.15]:42714 "EHLO mx1.suse.de"
+        id S1727140AbfJUJT3 (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Mon, 21 Oct 2019 05:19:29 -0400
+Received: from szxga04-in.huawei.com ([45.249.212.190]:4694 "EHLO huawei.com"
         rhost-flags-OK-OK-OK-FAIL) by vger.kernel.org with ESMTP
-        id S1726181AbfJUJM6 (ORCPT <rfc822;linux-block@vger.kernel.org>);
-        Mon, 21 Oct 2019 05:12:58 -0400
-X-Virus-Scanned: by amavisd-new at test-mx.suse.de
-Received: from relay2.suse.de (unknown [195.135.220.254])
-        by mx1.suse.de (Postfix) with ESMTP id A4E18B59A;
-        Mon, 21 Oct 2019 09:12:56 +0000 (UTC)
-Received: by quack2.suse.cz (Postfix, from userid 1000)
-        id 30DD71E4AA0; Mon, 21 Oct 2019 11:12:56 +0200 (CEST)
-Date:   Mon, 21 Oct 2019 11:12:56 +0200
-From:   Jan Kara <jack@suse.cz>
-To:     Guoqing Jiang <guoqing.jiang@cloud.ionos.com>
-Cc:     Jan Kara <jack@suse.cz>, Jens Axboe <axboe@kernel.dk>,
-        linux-block@vger.kernel.org
-Subject: Re: [PATCH 2/2] bdev: Refresh bdev size for disks without
- partitioning
-Message-ID: <20191021091256.GB17810@quack2.suse.cz>
-References: <20191021083132.5351-1-jack@suse.cz>
- <20191021083808.19335-2-jack@suse.cz>
- <4d58a159-e935-1200-1a71-8eb252fc5bdc@cloud.ionos.com>
+        id S1726981AbfJUJT3 (ORCPT <rfc822;linux-block@vger.kernel.org>);
+        Mon, 21 Oct 2019 05:19:29 -0400
+Received: from DGGEMS412-HUB.china.huawei.com (unknown [172.30.72.60])
+        by Forcepoint Email with ESMTP id 348E6D9C474C109B106D;
+        Mon, 21 Oct 2019 17:19:27 +0800 (CST)
+Received: from [127.0.0.1] (10.202.227.179) by DGGEMS412-HUB.china.huawei.com
+ (10.3.19.212) with Microsoft SMTP Server id 14.3.439.0; Mon, 21 Oct 2019
+ 17:19:23 +0800
+Subject: Re: [PATCH V4 0/5] blk-mq: improvement on handling IO during CPU
+ hotplug
+To:     Ming Lei <ming.lei@redhat.com>
+References: <20191014015043.25029-1-ming.lei@redhat.com>
+ <d30420d7-74d9-4417-1bbe-8113848e74fa@huawei.com>
+ <20191016120729.GB5515@ming.t460p>
+ <9dbc14ab-65cd-f7ac-384c-2dbe03575ee7@huawei.com>
+ <55a84ea3-647d-0a76-596c-c6c6b2fc1b75@huawei.com>
+ <20191020101404.GA5103@ming.t460p>
+CC:     Jens Axboe <axboe@kernel.dk>, <linux-block@vger.kernel.org>,
+        "Bart Van Assche" <bvanassche@acm.org>,
+        Hannes Reinecke <hare@suse.com>,
+        "Christoph Hellwig" <hch@lst.de>,
+        Thomas Gleixner <tglx@linutronix.de>,
+        Keith Busch <keith.busch@intel.com>
+From:   John Garry <john.garry@huawei.com>
+Message-ID: <10aac76a-26bb-bcda-c6ea-b39ca66d6740@huawei.com>
+Date:   Mon, 21 Oct 2019 10:19:18 +0100
+User-Agent: Mozilla/5.0 (Windows NT 10.0; WOW64; rv:45.0) Gecko/20100101
+ Thunderbird/45.3.0
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <4d58a159-e935-1200-1a71-8eb252fc5bdc@cloud.ionos.com>
-User-Agent: Mutt/1.10.1 (2018-07-13)
+In-Reply-To: <20191020101404.GA5103@ming.t460p>
+Content-Type: text/plain; charset="windows-1252"; format=flowed
+Content-Transfer-Encoding: 7bit
+X-Originating-IP: [10.202.227.179]
+X-CFilter-Loop: Reflected
 Sender: linux-block-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-On Mon 21-10-19 10:49:54, Guoqing Jiang wrote:
-> 
-> 
-> On 10/21/19 10:38 AM, Jan Kara wrote:
-> > Currently, block device size in not updated on second and further open
-> > for block devices where partition scan is disabled. This is particularly
-> > annoying for example for DVD drives as that means block device size does
-> > not get updated once the media is inserted into a drive if the device is
-> > already open when inserting the media. This is actually always the case
-> > for example when pktcdvd is in use.
-> > 
-> > Fix the problem by revalidating block device size on every open even for
-> > devices with partition scan disabled.
-> > 
-> > Signed-off-by: Jan Kara <jack@suse.cz>
-> > ---
-> >   fs/block_dev.c | 19 ++++++++++---------
-> >   1 file changed, 10 insertions(+), 9 deletions(-)
-> > 
-> > diff --git a/fs/block_dev.c b/fs/block_dev.c
-> > index 88c6d35ec71d..d612468ee66b 100644
-> > --- a/fs/block_dev.c
-> > +++ b/fs/block_dev.c
-> > @@ -1403,11 +1403,7 @@ static void flush_disk(struct block_device *bdev, bool kill_dirty)
-> >   		       "resized disk %s\n",
-> >   		       bdev->bd_disk ? bdev->bd_disk->disk_name : "");
-> >   	}
-> > -
-> > -	if (!bdev->bd_disk)
-> > -		return;
-> > -	if (disk_part_scan_enabled(bdev->bd_disk))
-> > -		bdev->bd_invalidated = 1;
-> > +	bdev->bd_invalidated = 1;
-> >   }
-> >   /**
-> > @@ -1514,10 +1510,15 @@ static void __blkdev_put(struct block_device *bdev, fmode_t mode, int for_part);
-> >   static void bdev_disk_changed(struct block_device *bdev, bool invalidate)
-> >   {
-> > -	if (invalidate)
-> > -		invalidate_partitions(bdev->bd_disk, bdev);
-> > -	else
-> > -		rescan_partitions(bdev->bd_disk, bdev);
-> > +	if (disk_part_scan_enabled(bdev->bd_disk)) {
-> > +		if (invalidate)
-> > +			invalidate_partitions(bdev->bd_disk, bdev);
-> > +		else
-> > +			rescan_partitions(bdev->bd_disk, bdev);
-> 
-> Maybe use the new common helper to replace above.
+On 20/10/2019 11:14, Ming Lei wrote:
+>>> ght? If so, I need to find some simple sysfs entry to
+>>> > > tell me of this occurrence, to trigger the capture. Or add something. My
+>>> > > script is pretty dump.
+>>> > >
+>>> > > BTW, I did notice that we the dump_stack in __blk_mq_run_hw_queue()
+>>> > > pretty soon before the problem happens - maybe a clue or maybe coincidence.
+>>> > >
+>> >
+>> > I finally got to capture that debugfs dump at the point the SCSI IOs
+>> > timeout, as attached. Let me know if any problem receiving it.
+>> >
+>> > Here's a kernel log snippet at that point (I added some print for the
+>> > timeout):
+>> >
+>> > 609] psci: CPU6 killed.
+>> > [  547.722217] CPU5: shutdown
+>> > [  547.724926] psci: CPU5 killed.
+>> > [  547.749951] irq_shutdown
+>> > [  547.752701] IRQ 800: no longer affine to CPU4
+>> > [  547.757265] CPU4: shutdown
+>> > [  547.759971] psci: CPU4 killed.
+>> > [  547.790348] CPU3: shutdown
+>> > [  547.793052] psci: CPU3 killed.
+>> > [  547.818330] CPU2: shutdown
+>> > [  547.821033] psci: CPU2 killed.
+>> > [  547.854285] CPU1: shutdown
+>> > [  547.856989] psci: CPU1 killed.
+>> > [  575.925307] scsi_timeout req=0xffff0023b0dd9c00 reserved=0
+>> > [  575.930794] scsi_timeout req=0xffff0023b0df2700 reserved=0
+>>From the debugfs log, 66 requests are dumped, and 63 of them has
+> been submitted to device, and the other 3 is in ->dispatch list
+> via requeue after timeout is handled.
+>
 
-What do you mean exactly? Because there's only this place that has the code
-pattern here...
+Hi Ming,
 
-								Honza
+> You mentioned that:
+>
+> " - I added some debug prints in blk_mq_hctx_drain_inflight_rqs() for when
+>  inflights rqs !=0, and I don't see them for this timeout"
+>
+> There might be two reasons:
+>
+> 1) You are still testing a multiple reply-queue device?
 
-> > +	} else {
-> > +		check_disk_size_change(bdev->bd_disk, bdev, !invalidate);
-> > +		bdev->bd_invalidated = 0;
-> > +	}
-> >   }
-> >   /*
-> 
--- 
-Jan Kara <jack@suse.com>
-SUSE Labs, CR
+As before, I am testing by exposing mutliple queues to the SCSI 
+midlayer. I had to make this change locally, as on mainline we still 
+only expose a single queue and use the internal reply queue when 
+enabling managed interrupts.
+
+As I
+> mentioned last times, it is hard to map reply-queue into blk-mq
+> hctx correctly.
+
+Here's my branch, if you want to check:
+
+https://github.com/hisilicon/kernel-dev/commits/private-topic-sas-5.4-mq-v4
+
+It's a bit messy (sorry), but you can see that the reply-queue in the 
+LLDD is removed in commit 087b95af374.
+
+I am now thinking of actually making this change to the LLDD in mainline 
+to avoid any doubt in future.
+
+>
+> 2) concurrent dispatch to device, which can be observed by the
+> following patch.
+>
+> diff --git a/block/blk-mq.c b/block/blk-mq.c
+> index 06081966549f..3590f6f947eb 100644
+> --- a/block/blk-mq.c
+> +++ b/block/blk-mq.c
+> @@ -679,6 +679,8 @@ void blk_mq_start_request(struct request *rq)
+>  {
+>         struct request_queue *q = rq->q;
+>
+> +       WARN_ON_ONCE(test_bit(BLK_MQ_S_INTERNAL_STOPPED, &rq->mq_hctx->state));
+> +
+>         trace_block_rq_issue(q, rq);
+>
+>         if (test_bit(QUEUE_FLAG_STATS, &q->queue_flags)) {
+>
+> However, I think it is hard to be 2#, since the current CPU is the last
+> CPU in hctx->cpu_mask.
+>
+
+I'll try it.
+
+Thanks as always,
+John
+
+>
+> Thanks,
+> Ming
+>
+>
+> .
+>
+
+
