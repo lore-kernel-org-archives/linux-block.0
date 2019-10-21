@@ -2,127 +2,230 @@ Return-Path: <SRS0=zBYI=YO=vger.kernel.org=linux-block-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-7.3 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
-	MAILING_LIST_MULTI,MENTIONS_GIT_HOSTING,SPF_HELO_NONE,SPF_PASS,
-	USER_AGENT_SANE_1 autolearn=ham autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-8.3 required=3.0 tests=DKIM_SIGNED,DKIM_VALID,
+	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,
+	SPF_HELO_NONE,SPF_PASS,USER_AGENT_SANE_1 autolearn=ham autolearn_force=no
+	version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 456C0CA9EAF
-	for <linux-block@archiver.kernel.org>; Mon, 21 Oct 2019 14:03:58 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 2C55BCA9EAF
+	for <linux-block@archiver.kernel.org>; Mon, 21 Oct 2019 14:26:43 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.kernel.org (Postfix) with ESMTP id 21F3B2173B
-	for <linux-block@archiver.kernel.org>; Mon, 21 Oct 2019 14:03:58 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id E1A112084B
+	for <linux-block@archiver.kernel.org>; Mon, 21 Oct 2019 14:26:42 +0000 (UTC)
+Authentication-Results: mail.kernel.org;
+	dkim=pass (2048-bit key) header.d=kernel-dk.20150623.gappssmtp.com header.i=@kernel-dk.20150623.gappssmtp.com header.b="Jdj5uHCh"
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1728551AbfJUOD5 (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Mon, 21 Oct 2019 10:03:57 -0400
-Received: from szxga04-in.huawei.com ([45.249.212.190]:4699 "EHLO huawei.com"
-        rhost-flags-OK-OK-OK-FAIL) by vger.kernel.org with ESMTP
-        id S1728263AbfJUOD5 (ORCPT <rfc822;linux-block@vger.kernel.org>);
-        Mon, 21 Oct 2019 10:03:57 -0400
-Received: from DGGEMS409-HUB.china.huawei.com (unknown [172.30.72.60])
-        by Forcepoint Email with ESMTP id B1B0F42687AA1687F40A;
-        Mon, 21 Oct 2019 22:03:05 +0800 (CST)
-Received: from [127.0.0.1] (10.202.227.179) by DGGEMS409-HUB.china.huawei.com
- (10.3.19.209) with Microsoft SMTP Server id 14.3.439.0; Mon, 21 Oct 2019
- 22:03:01 +0800
-Subject: Re: [PATCH V4 0/5] blk-mq: improvement on handling IO during CPU
- hotplug
-To:     Ming Lei <ming.lei@redhat.com>
-References: <d30420d7-74d9-4417-1bbe-8113848e74fa@huawei.com>
- <20191016120729.GB5515@ming.t460p>
- <9dbc14ab-65cd-f7ac-384c-2dbe03575ee7@huawei.com>
- <55a84ea3-647d-0a76-596c-c6c6b2fc1b75@huawei.com>
- <20191020101404.GA5103@ming.t460p>
- <10aac76a-26bb-bcda-c6ea-b39ca66d6740@huawei.com>
- <20191021093448.GA22635@ming.t460p>
- <9e6e86a5-7247-4648-9df9-61f81d2df413@huawei.com>
- <20191021102401.GB22635@ming.t460p>
- <c98c0cd5-950d-5404-eeaf-4e4ed6c86acc@huawei.com>
- <20191021125327.GA25864@ming.t460p>
-CC:     Jens Axboe <axboe@kernel.dk>, <linux-block@vger.kernel.org>,
-        "Bart Van Assche" <bvanassche@acm.org>,
-        Hannes Reinecke <hare@suse.com>,
-        "Christoph Hellwig" <hch@lst.de>,
-        Thomas Gleixner <tglx@linutronix.de>,
-        Keith Busch <keith.busch@intel.com>
-From:   John Garry <john.garry@huawei.com>
-Message-ID: <d4c8e435-b243-4734-6383-3618ad303842@huawei.com>
-Date:   Mon, 21 Oct 2019 15:02:56 +0100
-User-Agent: Mozilla/5.0 (Windows NT 10.0; WOW64; rv:45.0) Gecko/20100101
- Thunderbird/45.3.0
+        id S1727609AbfJUO0m (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Mon, 21 Oct 2019 10:26:42 -0400
+Received: from mail-pg1-f194.google.com ([209.85.215.194]:40495 "EHLO
+        mail-pg1-f194.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S1727355AbfJUO0m (ORCPT
+        <rfc822;linux-block@vger.kernel.org>);
+        Mon, 21 Oct 2019 10:26:42 -0400
+Received: by mail-pg1-f194.google.com with SMTP id 15so2573948pgt.7
+        for <linux-block@vger.kernel.org>; Mon, 21 Oct 2019 07:26:41 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=kernel-dk.20150623.gappssmtp.com; s=20150623;
+        h=subject:to:cc:references:from:message-id:date:user-agent
+         :mime-version:in-reply-to:content-language:content-transfer-encoding;
+        bh=ywxgAzIVVqF10tpSd2tL/Swx2phHTUX5X7DLFpOzlg4=;
+        b=Jdj5uHChgKaIrJ8tfnsm/2wd2rzBVeHV7a/AbVYj2W/VN1cXnGHILY3Q1XcXwDrWP1
+         HqgWVgRSAlNBM/iPtZFZnTugQiKacm6Gb5Y+cJwtqjFl2GbpO84BgPaNke/jFqamGMXB
+         AVIh/07n716UDEnLf6xQs5CDthQTYeeLqu2uiSJsPnuDorrOg/opTMm97PQB5fvL54WD
+         DZ6BU9bZn5o9s35Pq28K0wv20E4wV3tsLx4u/GfcrdP+E2MXaBQFBKksb1E90CbwUj8r
+         y0mct0WqSwS3oIHac6tt0yJD6RQgcWcA8FSyb55jzKeQBarVgM+VGFbJFJatsGxJI+fI
+         AAkA==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20161025;
+        h=x-gm-message-state:subject:to:cc:references:from:message-id:date
+         :user-agent:mime-version:in-reply-to:content-language
+         :content-transfer-encoding;
+        bh=ywxgAzIVVqF10tpSd2tL/Swx2phHTUX5X7DLFpOzlg4=;
+        b=aTl2ruw/BF+oorHa9YHXiZCZkqRfJu7blYqJW5C94BHC9ITn43uqPobyAWBE0U4Lns
+         v6Vi3xoVrCKb7HC+D8Vaamn4u3AGQYwwHL6rHS9Vy1PHMYLn9c3JGuj155QN1M+jSv9+
+         5Te7gI4TzD6JwcLyBaTYok3EGZgScRw0FJnCOCSsvDYBcgct6vCG0/v4eBTnpeTscO2D
+         OERVwbwAeIHhnmSfGagTj3FRlY5XpvUxJin5afr7zfbcS2EgYgHVw2aOAPkGDIuYBKV7
+         YtR9mrw28l3bM9dsddj6vODVu23SytKnQ9LKUe9TSmvIl/JSguBx1l6VFrzT1MiEXh1C
+         r1fQ==
+X-Gm-Message-State: APjAAAWl83mh1uxfRgxNKWtjout7PuSug+CNLSBcmtALZiJ3I5/X3DFh
+        +2biMQ3b7wfT1Rdz2YfDVzcc8Q==
+X-Google-Smtp-Source: APXvYqyyth2uzkrjOCuNHlv1fu3I2pZj4VYcICtApFf4bXhb44KBUThOLPNRwfwCCiCDdnQiLsBhqQ==
+X-Received: by 2002:a63:5d06:: with SMTP id r6mr26118573pgb.216.1571668001079;
+        Mon, 21 Oct 2019 07:26:41 -0700 (PDT)
+Received: from [192.168.1.182] ([192.40.64.15])
+        by smtp.gmail.com with ESMTPSA id p9sm15655893pfn.115.2019.10.21.07.26.39
+        (version=TLS1_2 cipher=ECDHE-RSA-AES128-GCM-SHA256 bits=128/128);
+        Mon, 21 Oct 2019 07:26:40 -0700 (PDT)
+Subject: Re: [PATCH] io_uring: fix up O_NONBLOCK handling for sockets
+To:     Jackie Liu <liuyun01@kylinos.cn>
+Cc:     "linux-block@vger.kernel.org" <linux-block@vger.kernel.org>,
+        Hrvoje Zeba <zeba.hrvoje@gmail.com>
+References: <f999615b-205c-49b7-b272-c4e42e45e09d@kernel.dk>
+ <BCC87FC4-164D-4A28-9C84-24FCC7969AD8@kylinos.cn>
+From:   Jens Axboe <axboe@kernel.dk>
+Message-ID: <d3775a8f-99bc-2940-22e8-a202fba464d3@kernel.dk>
+Date:   Mon, 21 Oct 2019 08:26:38 -0600
+User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:60.0) Gecko/20100101
+ Thunderbird/60.9.0
 MIME-Version: 1.0
-In-Reply-To: <20191021125327.GA25864@ming.t460p>
-Content-Type: text/plain; charset="windows-1252"; format=flowed
-Content-Transfer-Encoding: 7bit
-X-Originating-IP: [10.202.227.179]
-X-CFilter-Loop: Reflected
+In-Reply-To: <BCC87FC4-164D-4A28-9C84-24FCC7969AD8@kylinos.cn>
+Content-Type: text/plain; charset=utf-8
+Content-Language: en-US
+Content-Transfer-Encoding: 8bit
 Sender: linux-block-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-On 21/10/2019 13:53, Ming Lei wrote:
-> On Mon, Oct 21, 2019 at 12:49:53PM +0100, John Garry wrote:
->>>>>
->>>>
->>>> Yes, we share tags among all queues, but we generate the tag - known as IPTT
->>>> - in the LLDD now, as we can no longer use the request tag (as it is not
->>>> unique per all queues):
->>>>
->>>> https://github.com/hisilicon/kernel-dev/commit/087b95af374be6965583c1673032fb33bc8127e8#diff-f5d8fff19bc539a7387af5230d4e5771R188
->>>>
->>>> As I said, the branch is messy and I did have to fix 087b95af374.
->>>
->>> Firstly this way may waste lots of memory, especially the queue depth is
->>> big, such as, hisilicon V3's queue depth is 4096.
->>>
->>> Secondly, you have to deal with queue busy efficiently and correctly,
->>> for example, your real hw tags(IPTT) can be used up easily, and how
->>> will you handle these dispatched request?
+On 10/20/19 6:23 PM, Jackie Liu wrote:
+> 
+> 
+>> 2019年10月17日 23:24，Jens Axboe <axboe@kernel.dk> 写道：
 >>
->> I have not seen scenario of exhausted IPTT. And IPTT count is same as SCSI
->> host.can_queue, so SCSI midlayer should ensure that this does not occur.
->
-
-Hi Ming,
-
-> That check isn't correct, and each hw queue should have allowed
-> .can_queue in-flight requests.
-
-There always seems to be some confusion or disagreement on this topic.
-
-I work according to the comment in scsi_host.h:
-
-"Note: it is assumed that each hardware queue has a queue depth of
-  can_queue. In other words, the total queue depth per host
-  is nr_hw_queues * can_queue."
-
-So I set Scsi_host.can_queue = HISI_SAS_MAX_COMMANDS (=4096)
-
->
+>> We've got two issues with the non-regular file handling for non-blocking
+>> IO:
 >>
->>>
->>> Finally, you have to evaluate the performance effect, this is highly
->>> related with how to deal with out-of-IPTT.
+>> 1) We don't want to re-do a short read in full for a non-regular file,
+>>    as we can't just read the data again.
+>> 2) For non-regular files that don't support non-blocking IO attempts,
+>>    we need to punt to async context even if the file is opened as
+>>    non-blocking. Otherwise the caller always gets -EAGAIN.
 >>
->> Some figures from our previous testing:
+>> Add two new request flags to handle these cases. One is just a cache
+>> of the inode S_ISREG() status, the other tells io_uring that we always
+>> need to punt this request to async context, even if REQ_F_NOWAIT is set.
 >>
->> Managed interrupt without exposing multiple queues: 3M IOPs
->> Managed interrupt with exposing multiple queues: 2.6M IOPs
->
-> Then you see the performance regression.
+>> Cc: stable@vger.kernel.org
+>> Reported-by: Hrvoje Zeba <zeba.hrvoje@gmail.com>
+>> Signed-off-by: Jens Axboe <axboe@kernel.dk>
+>> ---
+>> fs/io_uring.c | 55 +++++++++++++++++++++++++++++++++++----------------
+>> 1 file changed, 38 insertions(+), 17 deletions(-)
+>>
+>> diff --git a/fs/io_uring.c b/fs/io_uring.c
+>> index d2cb277da2f4..a4ee5436cb61 100644
+>> --- a/fs/io_uring.c
+>> +++ b/fs/io_uring.c
+>> @@ -322,6 +322,8 @@ struct io_kiocb {
+>> #define REQ_F_FAIL_LINK		256	/* fail rest of links */
+>> #define REQ_F_SHADOW_DRAIN	512	/* link-drain shadow req */
+>> #define REQ_F_TIMEOUT		1024	/* timeout request */
+>> +#define REQ_F_ISREG		2048	/* regular file */
+>> +#define REQ_F_MUST_PUNT		4096	/* must be punted even for NONBLOCK */
+>> 	u64			user_data;
+>> 	u32			result;
+>> 	u32			sequence;
+>> @@ -914,26 +916,26 @@ static int io_iopoll_check(struct io_ring_ctx *ctx, unsigned *nr_events,
+>> 	return ret;
+>> }
+>>
+>> -static void kiocb_end_write(struct kiocb *kiocb)
+>> +static void kiocb_end_write(struct io_kiocb *req)
+>> {
+>> -	if (kiocb->ki_flags & IOCB_WRITE) {
+>> -		struct inode *inode = file_inode(kiocb->ki_filp);
+>> +	/*
+>> +	 * Tell lockdep we inherited freeze protection from submission
+>> +	 * thread.
+>> +	 */
+>> +	if (req->flags & REQ_F_ISREG) {
+>> +		struct inode *inode = file_inode(req->file);
+>>
+>> -		/*
+>> -		 * Tell lockdep we inherited freeze protection from submission
+>> -		 * thread.
+>> -		 */
+>> -		if (S_ISREG(inode->i_mode))
+>> -			__sb_writers_acquired(inode->i_sb, SB_FREEZE_WRITE);
+>> -		file_end_write(kiocb->ki_filp);
+>> +		__sb_writers_acquired(inode->i_sb, SB_FREEZE_WRITE);
+>> 	}
+>> +	file_end_write(req->file);
+>> }
+>>
+>> static void io_complete_rw(struct kiocb *kiocb, long res, long res2)
+>> {
+>> 	struct io_kiocb *req = container_of(kiocb, struct io_kiocb, rw);
+>>
+>> -	kiocb_end_write(kiocb);
+>> +	if (kiocb->ki_flags & IOCB_WRITE)
+>> +		kiocb_end_write(req);
+>>
+>> 	if ((req->flags & REQ_F_LINK) && res != req->result)
+>> 		req->flags |= REQ_F_FAIL_LINK;
+>> @@ -945,7 +947,8 @@ static void io_complete_rw_iopoll(struct kiocb *kiocb, long res, long res2)
+>> {
+>> 	struct io_kiocb *req = container_of(kiocb, struct io_kiocb, rw);
+>>
+>> -	kiocb_end_write(kiocb);
+>> +	if (kiocb->ki_flags & IOCB_WRITE)
+>> +		kiocb_end_write(req);
+>>
+>> 	if ((req->flags & REQ_F_LINK) && res != req->result)
+>> 		req->flags |= REQ_F_FAIL_LINK;
+>> @@ -1059,8 +1062,17 @@ static int io_prep_rw(struct io_kiocb *req, const struct sqe_submit *s,
+>> 	if (!req->file)
+>> 		return -EBADF;
+>>
+>> -	if (force_nonblock && !io_file_supports_async(req->file))
+>> +	if (S_ISREG(file_inode(req->file)->i_mode))
+>> +		req->flags |= REQ_F_ISREG;
+>> +
+>> +	/*
+>> +	 * If the file doesn't support async, mark it as REQ_F_MUST_PUNT so
+>> +	 * we know to async punt it even if it was opened O_NONBLOCK
+>> +	 */
+>> +	if (force_nonblock && !io_file_supports_async(req->file)) {
+>> 		force_nonblock = false;
+>> +		req->flags |= REQ_F_MUST_PUNT;
+>> +	}
+> 
+> Hello Jens. that is your new version.
+> 
+> +	/*
+> +	 * If the file doesn't support async, mark it as REQ_F_MUST_PUNT so
+> +	 * we know to async punt it even if it was opened O_NONBLOCK
+> +	 */
+> +	if (force_nonblock && !io_file_supports_async(req->file)) {
+> +		req->flags |= REQ_F_MUST_PUNT;
+> +		return -EAGAIN;
+> +	}
+> 
+> So, if req->file don't support async, we always return EAGAIN immediately.
 
-Let's discuss this when I send the patches, so we don't get sidetracked 
-on this blk-mq improvement topic.
+Right
 
-Thanks,
-John
+>> 	kiocb->ki_pos = READ_ONCE(sqe->off);
+>> 	kiocb->ki_flags = iocb_flags(kiocb->ki_filp);
+>> @@ -1081,7 +1093,8 @@ static int io_prep_rw(struct io_kiocb *req, const struct sqe_submit *s,
+>> 		return ret;
+>>
+>> 	/* don't allow async punt if RWF_NOWAIT was requested */
+>> -	if (kiocb->ki_flags & IOCB_NOWAIT)
+>> +	if ((kiocb->ki_flags & IOCB_NOWAIT) ||
+>> +	    (req->file->f_flags & O_NONBLOCK))
+> 
+> I think if we return -EAGAIN immediately, and using the work queue to execute this context,
+> this is unnecessary.
+> 
+>> 		req->flags |= REQ_F_NOWAIT;
+>>
+>> 	if (force_nonblock)
+>> @@ -1382,7 +1395,9 @@ static int io_read(struct io_kiocb *req, const struct sqe_submit *s,
+>> 		 * need async punt anyway, so it's more efficient to do it
+>> 		 * here.
+>> 		 */
+>> -		if (force_nonblock && ret2 > 0 && ret2 < read_size)
+>> +		if (force_nonblock && !(req->flags & REQ_F_NOWAIT) &&
+>> +		    (req->flags & REQ_F_ISREG) &&
+>> +		    ret2 > 0 && ret2 < read_size)
+>> 			ret2 = -EAGAIN;
+> 
+> This is also unnecessary because force_nonblock is always false.
 
->
->
-> Thanks,
-> Ming
->
->
->
+I totally agree, with the above direct return change, these aren't
+strictly necessary. But I kept them to be on the safe side.
 
+-- 
+Jens Axboe
 
