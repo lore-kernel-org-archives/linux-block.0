@@ -2,169 +2,160 @@ Return-Path: <SRS0=K2Ob=YP=vger.kernel.org=linux-block-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-8.6 required=3.0 tests=DKIMWL_WL_HIGH,DKIM_SIGNED,
-	DKIM_VALID,DKIM_VALID_AU,INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,
-	SPF_HELO_NONE,SPF_PASS,USER_AGENT_SANE_1 autolearn=unavailable
+X-Spam-Status: No, score=-7.4 required=3.0 tests=DKIM_SIGNED,DKIM_VALID,
+	DKIM_VALID_AU,HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,
+	MENTIONS_GIT_HOSTING,SPF_HELO_NONE,SPF_PASS,USER_AGENT_SANE_1 autolearn=ham
 	autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 173B2CA9EB7
-	for <linux-block@archiver.kernel.org>; Tue, 22 Oct 2019 11:24:51 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id EC0EDCA9EA0
+	for <linux-block@archiver.kernel.org>; Tue, 22 Oct 2019 13:46:00 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.kernel.org (Postfix) with ESMTP id E220C21783
-	for <linux-block@archiver.kernel.org>; Tue, 22 Oct 2019 11:24:50 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=default; t=1571743491;
-	bh=RxIvZmZ4winCrLc4Nk5sN1bnC6Gb4ZQ2WWKAzi9Pwo0=;
-	h=Date:From:To:Cc:Subject:References:In-Reply-To:List-ID:From;
-	b=2NuGBG21zlidIpOHOH+q1gW8YXRt1Nv7LqZerh8EGrw7vqIrZnz7IsqK+Gxq1RiT9
-	 RiYKlKovCXNfVJHUEffN+hjnxSurnbHg9gh2uNg3gY5I0r/3IcDcl4IIvpgZM6UN9b
-	 Tx76dhbPBa8TXtPCoiclvVSZPH6gzpoWwkZJ2pyw=
+	by mail.kernel.org (Postfix) with ESMTP id BDD14206C2
+	for <linux-block@archiver.kernel.org>; Tue, 22 Oct 2019 13:46:00 +0000 (UTC)
+Authentication-Results: mail.kernel.org;
+	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="FX1f/AFJ"
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S2388015AbfJVLYu (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Tue, 22 Oct 2019 07:24:50 -0400
-Received: from mx2.suse.de ([195.135.220.15]:60080 "EHLO mx1.suse.de"
-        rhost-flags-OK-OK-OK-FAIL) by vger.kernel.org with ESMTP
-        id S2387645AbfJVLYu (ORCPT <rfc822;linux-block@vger.kernel.org>);
-        Tue, 22 Oct 2019 07:24:50 -0400
-X-Virus-Scanned: by amavisd-new at test-mx.suse.de
-Received: from relay2.suse.de (unknown [195.135.220.254])
-        by mx1.suse.de (Postfix) with ESMTP id 55868BA3D;
-        Tue, 22 Oct 2019 11:24:47 +0000 (UTC)
-Date:   Tue, 22 Oct 2019 13:24:46 +0200
-From:   Michal Hocko <mhocko@kernel.org>
-To:     Mike Christie <mchristi@redhat.com>
-Cc:     linux-mm@kvack.org, linux-kernel@vger.kernel.org,
-        linux-scsi@vger.kernel.org, linux-fsdevel@vger.kernel.org,
-        linux-block@vger.kernel.org, martin@urbackup.org,
-        Damien.LeMoal@wdc.com
-Subject: Re: [PATCH] Add prctl support for controlling PF_MEMALLOC V2
-Message-ID: <20191022112446.GA8213@dhcp22.suse.cz>
-References: <20191021214137.8172-1-mchristi@redhat.com>
+        id S1731448AbfJVNqA (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Tue, 22 Oct 2019 09:46:00 -0400
+Received: from us-smtp-delivery-1.mimecast.com ([205.139.110.120]:49967 "EHLO
+        us-smtp-1.mimecast.com" rhost-flags-OK-OK-OK-FAIL) by vger.kernel.org
+        with ESMTP id S1730540AbfJVNqA (ORCPT
+        <rfc822;linux-block@vger.kernel.org>);
+        Tue, 22 Oct 2019 09:46:00 -0400
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+        s=mimecast20190719; t=1571751959;
+        h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+         to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+         content-transfer-encoding:content-transfer-encoding:
+         in-reply-to:in-reply-to:references:references;
+        bh=BJWF/RXrnAGHWiIm4amnbB9MqsNtuCYxqDsJ90eulEA=;
+        b=FX1f/AFJ7IIrUyHi2dSWcvu3g1u1SChPc1acbMilAMeCXxUUl/iK14XeLqR7mMZUQgZEiX
+        N6zlgnmaYUE2ieMzuyNQ280ZgK4fQLNqHNNKao8zjNuWTF3OhW180zHDizi96iitL1aG3I
+        HWRerjvsOvYOiqKTumE0BOMaR4k2Tsk=
+Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
+ [209.132.183.4]) (Using TLS) by relay.mimecast.com with ESMTP id
+ us-mta-88-Iuk4_pGGOhyuOIJHiATMMg-1; Tue, 22 Oct 2019 09:45:53 -0400
+Received: from smtp.corp.redhat.com (int-mx01.intmail.prod.int.phx2.redhat.com [10.5.11.11])
+        (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
+        (No client certificate requested)
+        by mimecast-mx01.redhat.com (Postfix) with ESMTPS id A7AAC5F0;
+        Tue, 22 Oct 2019 13:45:51 +0000 (UTC)
+Received: from ming.t460p (ovpn-8-16.pek2.redhat.com [10.72.8.16])
+        by smtp.corp.redhat.com (Postfix) with ESMTPS id AF78E6012C;
+        Tue, 22 Oct 2019 13:45:43 +0000 (UTC)
+Date:   Tue, 22 Oct 2019 21:45:39 +0800
+From:   Ming Lei <ming.lei@redhat.com>
+To:     John Garry <john.garry@huawei.com>
+Cc:     Jens Axboe <axboe@kernel.dk>, linux-block@vger.kernel.org,
+        Bart Van Assche <bvanassche@acm.org>,
+        Hannes Reinecke <hare@suse.com>,
+        Christoph Hellwig <hch@lst.de>,
+        Thomas Gleixner <tglx@linutronix.de>,
+        Keith Busch <keith.busch@intel.com>
+Subject: Re: [PATCH V4 0/5] blk-mq: improvement on handling IO during CPU
+ hotplug
+Message-ID: <20191022134537.GA13393@ming.t460p>
+References: <20191020101404.GA5103@ming.t460p>
+ <10aac76a-26bb-bcda-c6ea-b39ca66d6740@huawei.com>
+ <20191021093448.GA22635@ming.t460p>
+ <9e6e86a5-7247-4648-9df9-61f81d2df413@huawei.com>
+ <20191021102401.GB22635@ming.t460p>
+ <c98c0cd5-950d-5404-eeaf-4e4ed6c86acc@huawei.com>
+ <20191021125327.GA25864@ming.t460p>
+ <d4c8e435-b243-4734-6383-3618ad303842@huawei.com>
+ <20191022001613.GA32193@ming.t460p>
+ <4a42a062-8bca-9e03-c158-1c149986d383@huawei.com>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
+In-Reply-To: <4a42a062-8bca-9e03-c158-1c149986d383@huawei.com>
+User-Agent: Mutt/1.11.3 (2019-02-01)
+X-Scanned-By: MIMEDefang 2.79 on 10.5.11.11
+X-MC-Unique: Iuk4_pGGOhyuOIJHiATMMg-1
+X-Mimecast-Spam-Score: 0
+Content-Type: text/plain; charset=WINDOWS-1252
+Content-Transfer-Encoding: quoted-printable
 Content-Disposition: inline
-In-Reply-To: <20191021214137.8172-1-mchristi@redhat.com>
-User-Agent: Mutt/1.10.1 (2018-07-13)
 Sender: linux-block-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-On Mon 21-10-19 16:41:37, Mike Christie wrote:
-> There are several storage drivers like dm-multipath, iscsi, tcmu-runner,
-> amd nbd that have userspace components that can run in the IO path. For
-> example, iscsi and nbd's userspace deamons may need to recreate a socket
-> and/or send IO on it, and dm-multipath's daemon multipathd may need to
-> send IO to figure out the state of paths and re-set them up.
-> 
-> In the kernel these drivers have access to GFP_NOIO/GFP_NOFS and the
-> memalloc_*_save/restore functions to control the allocation behavior,
-> but for userspace we would end up hitting a allocation that ended up
-> writing data back to the same device we are trying to allocate for.
+On Tue, Oct 22, 2019 at 12:19:17PM +0100, John Garry wrote:
+> On 22/10/2019 01:16, Ming Lei wrote:
+> > On Mon, Oct 21, 2019 at 03:02:56PM +0100, John Garry wrote:
+> > > On 21/10/2019 13:53, Ming Lei wrote:
+> > > > On Mon, Oct 21, 2019 at 12:49:53PM +0100, John Garry wrote:
+> > > > > > > >=20
+> > > > > > >=20
+> > > > > > > Yes, we share tags among all queues, but we generate the tag =
+- known as IPTT
+> > > > > > > - in the LLDD now, as we can no longer use the request tag (a=
+s it is not
+> > > > > > > unique per all queues):
+> > > > > > >=20
+> > > > > > > https://github.com/hisilicon/kernel-dev/commit/087b95af374be6=
+965583c1673032fb33bc8127e8#diff-f5d8fff19bc539a7387af5230d4e5771R188
+> > > > > > >=20
+> > > > > > > As I said, the branch is messy and I did have to fix 087b95af=
+374.
+> > > > > >=20
+> > > > > > Firstly this way may waste lots of memory, especially the queue=
+ depth is
+> > > > > > big, such as, hisilicon V3's queue depth is 4096.
+> > > > > >=20
+> > > > > > Secondly, you have to deal with queue busy efficiently and corr=
+ectly,
+> > > > > > for example, your real hw tags(IPTT) can be used up easily, and=
+ how
+> > > > > > will you handle these dispatched request?
+> > > > >=20
+> > > > > I have not seen scenario of exhausted IPTT. And IPTT count is sam=
+e as SCSI
+> > > > > host.can_queue, so SCSI midlayer should ensure that this does not=
+ occur.
+> > > >=20
+> > >=20
+> > > Hi Ming,
+>=20
+> Hi Ming,
+>=20
+> > >=20
+> > > > That check isn't correct, and each hw queue should have allowed
+> > > > .can_queue in-flight requests.
+> > >=20
+> > > There always seems to be some confusion or disagreement on this topic=
+.
+> > >=20
+> > > I work according to the comment in scsi_host.h:
+> > >=20
+> > > "Note: it is assumed that each hardware queue has a queue depth of
+> > >   can_queue. In other words, the total queue depth per host
+> > >   is nr_hw_queues * can_queue."
+> > >=20
+> > > So I set Scsi_host.can_queue =3D HISI_SAS_MAX_COMMANDS (=3D4096)
+> >=20
+> > I believe all current drivers set .can_queue as single hw queue's depth=
+.
+> > If you set .can_queue as HISI_SAS_MAX_COMMANDS which is HBA's queue
+> > depth, the hisilicon sas driver will HISI_SAS_MAX_COMMANDS * nr_hw_queu=
+es
+> > in-flight requests.
+>=20
+> Yeah, but the SCSI host should still limit max IOs over all queues to
+> .can_queue:
+>=20
+> https://git.kernel.org/pub/scm/linux/kernel/git/torvalds/linux.git/tree/D=
+ocumentation/scsi/scsi_mid_low_api.txt#n1083
+>=20
 
-Which code paths are we talking about here? Any ioctl or is this a
-general syscall path? Can we mark the process in a more generic way?
-E.g. we have PF_LESS_THROTTLE (used by nfsd). It doesn't affect the
-reclaim recursion but it shows a pattern that doesn't really exhibit
-too many internals. Maybe we need PF_IO_FLUSHER or similar?
+That limit is actually from legacy single-queue era, you should see that
+I am removing it:
 
-> This patch allows the userspace deamon to set the PF_MEMALLOC* flags
-> with prctl during their initialization so later allocations cannot
-> calling back into them.
+https://lore.kernel.org/linux-scsi/20191009093241.21481-2-ming.lei@redhat.c=
+om/
 
-TBH I am not really happy to export these to the userspace. They are
-an internal implementation detail and the userspace shouldn't really
-care. So if this is really necessary then we need a very good argumnets
-and documentation to make the usage clear.
- 
-> Signed-off-by: Mike Christie <mchristi@redhat.com>
-> ---
-> 
-> V2:
-> - Use prctl instead of procfs.
-> - Add support for NOFS for fuse.
-> - Check permissions.
-> 
->  include/uapi/linux/prctl.h |  8 +++++++
->  kernel/sys.c               | 44 ++++++++++++++++++++++++++++++++++++++
->  2 files changed, 52 insertions(+)
-> 
-> diff --git a/include/uapi/linux/prctl.h b/include/uapi/linux/prctl.h
-> index 7da1b37b27aa..6f6b3af6633a 100644
-> --- a/include/uapi/linux/prctl.h
-> +++ b/include/uapi/linux/prctl.h
-> @@ -234,4 +234,12 @@ struct prctl_mm_map {
->  #define PR_GET_TAGGED_ADDR_CTRL		56
->  # define PR_TAGGED_ADDR_ENABLE		(1UL << 0)
->  
-> +/* Control reclaim behavior when allocating memory */
-> +#define PR_SET_MEMALLOC			57
-> +#define PR_GET_MEMALLOC			58
-> +#define PR_MEMALLOC_SET_NOIO		(1UL << 0)
-> +#define PR_MEMALLOC_CLEAR_NOIO		(1UL << 1)
-> +#define PR_MEMALLOC_SET_NOFS		(1UL << 2)
-> +#define PR_MEMALLOC_CLEAR_NOFS		(1UL << 3)
-> +
->  #endif /* _LINUX_PRCTL_H */
-> diff --git a/kernel/sys.c b/kernel/sys.c
-> index a611d1d58c7d..34fedc9fc7e4 100644
-> --- a/kernel/sys.c
-> +++ b/kernel/sys.c
-> @@ -2486,6 +2486,50 @@ SYSCALL_DEFINE5(prctl, int, option, unsigned long, arg2, unsigned long, arg3,
->  			return -EINVAL;
->  		error = GET_TAGGED_ADDR_CTRL();
->  		break;
-> +	case PR_SET_MEMALLOC:
-> +		if (!capable(CAP_SYS_ADMIN))
-> +			return -EPERM;
-> +
-> +		if (arg3 || arg4 || arg5)
-> +			return -EINVAL;
-> +
-> +		switch (arg2) {
-> +		case PR_MEMALLOC_SET_NOIO:
-> +			if (current->flags & PF_MEMALLOC_NOFS)
-> +				return -EINVAL;
-> +
-> +			current->flags |= PF_MEMALLOC_NOIO;
-> +			break;
-> +		case PR_MEMALLOC_CLEAR_NOIO:
-> +			current->flags &= ~PF_MEMALLOC_NOIO;
-> +			break;
-> +		case PR_MEMALLOC_SET_NOFS:
-> +			if (current->flags & PF_MEMALLOC_NOIO)
-> +				return -EINVAL;
-> +
-> +			current->flags |= PF_MEMALLOC_NOFS;
-> +			break;
-> +		case PR_MEMALLOC_CLEAR_NOFS:
-> +			current->flags &= ~PF_MEMALLOC_NOFS;
-> +			break;
-> +		default:
-> +			return -EINVAL;
-> +		}
-> +		break;
-> +	case PR_GET_MEMALLOC:
-> +		if (!capable(CAP_SYS_ADMIN))
-> +			return -EPERM;
-> +
-> +		if (arg2 || arg3 || arg4 || arg5)
-> +			return -EINVAL;
-> +
-> +		if (current->flags & PF_MEMALLOC_NOIO)
-> +			error = PR_MEMALLOC_SET_NOIO;
-> +		else if (current->flags & PF_MEMALLOC_NOFS)
-> +			error = PR_MEMALLOC_SET_NOFS;
-> +		else
-> +			error = 0;
-> +		break;
->  	default:
->  		error = -EINVAL;
->  		break;
-> -- 
-> 2.20.1
-> 
+With this change, IOPS can be improved much on some fast SCSI storage.
 
--- 
-Michal Hocko
-SUSE Labs
+
+Thanks,
+Ming
+
