@@ -2,119 +2,92 @@ Return-Path: <SRS0=K2Ob=YP=vger.kernel.org=linux-block-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-2.6 required=3.0 tests=DKIMWL_WL_HIGH,DKIM_SIGNED,
-	DKIM_VALID,DKIM_VALID_AU,MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,
-	USER_AGENT_SANE_1 autolearn=no autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-9.8 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
+	INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,
+	USER_AGENT_GIT autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id B8CB1CA9EA0
-	for <linux-block@archiver.kernel.org>; Tue, 22 Oct 2019 16:43:52 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 751F9CA9EA0
+	for <linux-block@archiver.kernel.org>; Tue, 22 Oct 2019 17:42:36 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.kernel.org (Postfix) with ESMTP id 88F4B20B7C
-	for <linux-block@archiver.kernel.org>; Tue, 22 Oct 2019 16:43:52 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=default; t=1571762632;
-	bh=1bV0+GulpH8FltBXIbwaAvs1lLSWNM1YRDbyPnQtOJ8=;
-	h=Date:From:To:Cc:Subject:References:In-Reply-To:List-ID:From;
-	b=XdvCW4cjfY5FZrIfgug4wPFZj26kb63pPJk7BdCeIK8nxyI/74rKEZan60Y/BKNKu
-	 Im0p6qsYZFEmS7rmqKDpwKyH+bsVYx8zssNu43Sh0KBDcaRAic7VaAfZeo5kdJPF3Y
-	 ZND1gWaUrKEus0SpGGKEBxZYg2q/5zMhJdVXP8s8=
+	by mail.kernel.org (Postfix) with ESMTP id 3EA7D2075A
+	for <linux-block@archiver.kernel.org>; Tue, 22 Oct 2019 17:42:36 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1731802AbfJVQnw (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Tue, 22 Oct 2019 12:43:52 -0400
-Received: from mx2.suse.de ([195.135.220.15]:49180 "EHLO mx1.suse.de"
-        rhost-flags-OK-OK-OK-FAIL) by vger.kernel.org with ESMTP
-        id S1731373AbfJVQnv (ORCPT <rfc822;linux-block@vger.kernel.org>);
-        Tue, 22 Oct 2019 12:43:51 -0400
-X-Virus-Scanned: by amavisd-new at test-mx.suse.de
-Received: from relay2.suse.de (unknown [195.135.220.254])
-        by mx1.suse.de (Postfix) with ESMTP id 1F66FB80B;
-        Tue, 22 Oct 2019 16:33:12 +0000 (UTC)
-Date:   Tue, 22 Oct 2019 18:33:10 +0200
-From:   Michal Hocko <mhocko@kernel.org>
-To:     Mike Christie <mchristi@redhat.com>
-Cc:     linux-mm@kvack.org, linux-kernel@vger.kernel.org,
-        linux-scsi@vger.kernel.org, linux-fsdevel@vger.kernel.org,
-        linux-block@vger.kernel.org, martin@urbackup.org,
-        Damien.LeMoal@wdc.com
-Subject: Re: [PATCH] Add prctl support for controlling PF_MEMALLOC V2
-Message-ID: <20191022163310.GS9379@dhcp22.suse.cz>
-References: <20191021214137.8172-1-mchristi@redhat.com>
- <20191022112446.GA8213@dhcp22.suse.cz>
- <5DAF2AA0.5030500@redhat.com>
+        id S1731488AbfJVRmf (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Tue, 22 Oct 2019 13:42:35 -0400
+Received: from bhuna.collabora.co.uk ([46.235.227.227]:52386 "EHLO
+        bhuna.collabora.co.uk" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S1727226AbfJVRmf (ORCPT
+        <rfc822;linux-block@vger.kernel.org>);
+        Tue, 22 Oct 2019 13:42:35 -0400
+Received: from turingmachine.home (unknown [IPv6:2804:431:c7f5:c26b:d711:794d:1c68:5ed3])
+        (using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+        (No client certificate requested)
+        (Authenticated sender: tonyk)
+        by bhuna.collabora.co.uk (Postfix) with ESMTPSA id 3523128DB6C;
+        Tue, 22 Oct 2019 18:42:31 +0100 (BST)
+From:   =?UTF-8?q?Andr=C3=A9=20Almeida?= <andrealmeid@collabora.com>
+To:     linux-block@vger.kernel.org, linux-kernel@vger.kernel.org
+Cc:     axboe@kernel.dk, kernel@collabora.com, krisman@collabora.com,
+        =?UTF-8?q?Andr=C3=A9=20Almeida?= <andrealmeid@collabora.com>
+Subject: [PATCH] blk-mq: remove needless goto from blk_mq_get_driver_tag
+Date:   Tue, 22 Oct 2019 14:41:08 -0300
+Message-Id: <20191022174108.15554-1-andrealmeid@collabora.com>
+X-Mailer: git-send-email 2.23.0
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <5DAF2AA0.5030500@redhat.com>
-User-Agent: Mutt/1.10.1 (2018-07-13)
+Content-Type: text/plain; charset=UTF-8
+Content-Transfer-Encoding: 8bit
 Sender: linux-block-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-On Tue 22-10-19 11:13:20, Mike Christie wrote:
-> On 10/22/2019 06:24 AM, Michal Hocko wrote:
-> > On Mon 21-10-19 16:41:37, Mike Christie wrote:
-> >> There are several storage drivers like dm-multipath, iscsi, tcmu-runner,
-> >> amd nbd that have userspace components that can run in the IO path. For
-> >> example, iscsi and nbd's userspace deamons may need to recreate a socket
-> >> and/or send IO on it, and dm-multipath's daemon multipathd may need to
-> >> send IO to figure out the state of paths and re-set them up.
-> >>
-> >> In the kernel these drivers have access to GFP_NOIO/GFP_NOFS and the
-> >> memalloc_*_save/restore functions to control the allocation behavior,
-> >> but for userspace we would end up hitting a allocation that ended up
-> >> writing data back to the same device we are trying to allocate for.
-> > 
-> > Which code paths are we talking about here? Any ioctl or is this a
-> > general syscall path? Can we mark the process in a more generic way?
-> 
-> It depends on the daemon. The common one for example are iscsi and nbd
-> need network related calls like sendmsg, recvmsg, socket, etc.
-> tcmu-runner could need the network ones and also read and write when it
-> does IO to a FS or device. dm-multipath needs the sg io ioctls.
+The only usage of the label "done" is when (rq->tag != -1) at the
+begging of the function. Rather than jumping to label, we can just
+remove this label and execute the code at the "if". Besides that,
+the code that would be executed after the label "done" is the return of
+the logical expression (rq->tag != -1) but since we are already inside
+the if, we now that this is true. Remove the label and replace the goto
+with the proper result of the label.
 
-OK, so there is not a clear kernel entry point that could be explicitly
-annotated. This would imply a per task context. This is an important
-information. And I am wondering how those usecases ever worked in the
-first place. This is not a minor detail.
+Signed-off-by: André Almeida <andrealmeid@collabora.com>
+---
+Hello,
+
+I've used `blktest` to check if this change add any regression. I have
+used `./check block` and I got the same results with and without this
+patch (a bunch of "passed" and three "not run" because of the virtual
+scsi capabilities). Please let me know if there would be a better way to
+test changes at block stack.
+
+This commit was rebase at linux-block/for-5.5/block.
+
+Thanks,
+	André
+---
+ block/blk-mq.c | 3 +--
+ 1 file changed, 1 insertion(+), 2 deletions(-)
+
+diff --git a/block/blk-mq.c b/block/blk-mq.c
+index 8538dc415499..1e067b78ab97 100644
+--- a/block/blk-mq.c
++++ b/block/blk-mq.c
+@@ -1036,7 +1036,7 @@ bool blk_mq_get_driver_tag(struct request *rq)
+ 	bool shared;
  
-> > E.g. we have PF_LESS_THROTTLE (used by nfsd). It doesn't affect the
-> > reclaim recursion but it shows a pattern that doesn't really exhibit
-> > too many internals. Maybe we need PF_IO_FLUSHER or similar?
-> 
-> I am not familiar with PF_IO_FLUSHER. If it prevents the recursion
-> problem then please send me details and I will look into it for the next
-> posting.
-
-PF_IO_FLUSHER doesn't exist. I just wanted to point out that similarly
-to PF_LESS_THROTTLE it should be a more high level per task flag rather
-than something as low level as a direct control of gfp allocation
-context. PF_LESS_THROTTLE simply tells that the task is a part of the
-reclaim process and therefore it shouldn't be a subject of a normal
-throttling - whatever that means. PF_IO_FLUSHER would mean that the user
-context is a part of the IO path and therefore there are certain reclaim
-recursion restrictions.
+ 	if (rq->tag != -1)
+-		goto done;
++		return true;
  
-> >> This patch allows the userspace deamon to set the PF_MEMALLOC* flags
-> >> with prctl during their initialization so later allocations cannot
-> >> calling back into them.
-> > 
-> > TBH I am not really happy to export these to the userspace. They are
-> > an internal implementation detail and the userspace shouldn't really
-> 
-> They care in these cases, because block/fs drivers must be able to make
-> forward progress during writes. To meet this guarantee kernel block
-> drivers use mempools and memalloc/GFP flags.
-> 
-> For these userspace components of the block/fs drivers they already do
-> things normal daemons do not to meet that guarantee like mlock their
-> memory, disable oom killer, and preallocate resources they have control
-> over. They have no control over reclaim like the kernel drivers do so
-> its easy for us to deadlock when memory gets low.
-
-OK, fair enough. How much of a control do they really need though. Is a
-single PF_IO_FLUSHER as explained above (essentially imply GPF_NOIO
-context) sufficient?
+ 	if (blk_mq_tag_is_reserved(data.hctx->sched_tags, rq->internal_tag))
+ 		data.flags |= BLK_MQ_REQ_RESERVED;
+@@ -1051,7 +1051,6 @@ bool blk_mq_get_driver_tag(struct request *rq)
+ 		data.hctx->tags->rqs[rq->tag] = rq;
+ 	}
+ 
+-done:
+ 	return rq->tag != -1;
+ }
+ 
 -- 
-Michal Hocko
-SUSE Labs
+2.23.0
+
