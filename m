@@ -2,203 +2,119 @@ Return-Path: <SRS0=PMby=YQ=vger.kernel.org=linux-block-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-8.2 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
-	INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,
-	URIBL_BLOCKED,USER_AGENT_SANE_1 autolearn=ham autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-2.4 required=3.0 tests=DKIMWL_WL_HIGH,DKIM_SIGNED,
+	DKIM_VALID,DKIM_VALID_AU,HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,
+	SPF_HELO_NONE,SPF_PASS,UNPARSEABLE_RELAY,USER_AGENT_SANE_1 autolearn=no
+	autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 9D16DCA9EB6
-	for <linux-block@archiver.kernel.org>; Wed, 23 Oct 2019 12:12:35 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 617ACCA9EB6
+	for <linux-block@archiver.kernel.org>; Wed, 23 Oct 2019 13:06:41 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.kernel.org (Postfix) with ESMTP id 7079B214B2
-	for <linux-block@archiver.kernel.org>; Wed, 23 Oct 2019 12:12:35 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id 2E9D421872
+	for <linux-block@archiver.kernel.org>; Wed, 23 Oct 2019 13:06:41 +0000 (UTC)
+Authentication-Results: mail.kernel.org;
+	dkim=pass (2048-bit key) header.d=oracle.com header.i=@oracle.com header.b="WI8R13my"
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S2391209AbfJWMMe (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Wed, 23 Oct 2019 08:12:34 -0400
-Received: from proxmox-new.maurer-it.com ([212.186.127.180]:10505 "EHLO
-        proxmox-new.maurer-it.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S2389256AbfJWMMe (ORCPT
+        id S2390775AbfJWNGk (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Wed, 23 Oct 2019 09:06:40 -0400
+Received: from userp2120.oracle.com ([156.151.31.85]:40350 "EHLO
+        userp2120.oracle.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S2390642AbfJWNGk (ORCPT
         <rfc822;linux-block@vger.kernel.org>);
-        Wed, 23 Oct 2019 08:12:34 -0400
-X-Greylist: delayed 463 seconds by postgrey-1.27 at vger.kernel.org; Wed, 23 Oct 2019 08:12:32 EDT
-Received: from proxmox-new.maurer-it.com (localhost.localdomain [127.0.0.1])
-        by proxmox-new.maurer-it.com (Proxmox) with ESMTP id 9E7FC46109;
-        Wed, 23 Oct 2019 14:04:48 +0200 (CEST)
-Date:   Wed, 23 Oct 2019 14:04:46 +0200
-From:   Wolfgang Bumiller <w.bumiller@proxmox.com>
-To:     Jens Axboe <axboe@kernel.dk>
-Cc:     linux-block@vger.kernel.org, davem@davemloft.net,
-        netdev@vger.kernel.org
-Subject: Re: [PATCH 1/3] io_uring: add support for async work inheriting
- files table
-Message-ID: <20191023120446.75oxdwom34nhe3l5@olga.proxmox.com>
-References: <20191017212858.13230-1-axboe@kernel.dk>
- <20191017212858.13230-2-axboe@kernel.dk>
+        Wed, 23 Oct 2019 09:06:40 -0400
+Received: from pps.filterd (userp2120.oracle.com [127.0.0.1])
+        by userp2120.oracle.com (8.16.0.27/8.16.0.27) with SMTP id x9NCx0Kh136480;
+        Wed, 23 Oct 2019 13:06:38 GMT
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=oracle.com; h=date : from : to : cc
+ : subject : message-id : mime-version : content-type; s=corp-2019-08-05;
+ bh=Uufi+F2i4iGe/1EsLuYEJ9D1mRissFr8zk+NN/1AJLo=;
+ b=WI8R13myYVtm4SFmekeuR8F2HvwirQD5q4BZ+w8cQ9PGwvbkQOxczZQUL404lENBj37p
+ z8UCqsiFXePLAgBGeob/J6tnWCEgOpjtYfQdaapBNxRafk5FrA+Wu1vFjuz57/ovHsLl
+ 42Qr/W4PeD5NMmV+u43nHGwtGlaVwjWqx6tZJlVVoKMBypiC1QinKdU8Ac6846Ege4Nb
+ nrDwP/6p+k62OjO5Ks7tc8zOf+qhdHbBjEncnAKptZE6TAMiz6AInn2Wo+YTdnJLpoLp
+ wADf8ST6IW0eRoSc03GEEWBZQYBYLYcVVy5m7ELgdPb+UuuLmQErL7/jvfIjBlF+gAxl dA== 
+Received: from userp3030.oracle.com (userp3030.oracle.com [156.151.31.80])
+        by userp2120.oracle.com with ESMTP id 2vqu4qw181-1
+        (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=OK);
+        Wed, 23 Oct 2019 13:06:38 +0000
+Received: from pps.filterd (userp3030.oracle.com [127.0.0.1])
+        by userp3030.oracle.com (8.16.0.27/8.16.0.27) with SMTP id x9ND4KAR126704;
+        Wed, 23 Oct 2019 13:06:38 GMT
+Received: from aserv0121.oracle.com (aserv0121.oracle.com [141.146.126.235])
+        by userp3030.oracle.com with ESMTP id 2vtjkfqqyy-1
+        (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=OK);
+        Wed, 23 Oct 2019 13:06:38 +0000
+Received: from abhmp0004.oracle.com (abhmp0004.oracle.com [141.146.116.10])
+        by aserv0121.oracle.com (8.14.4/8.13.8) with ESMTP id x9ND6aql028538;
+        Wed, 23 Oct 2019 13:06:37 GMT
+Received: from mwanda (/41.57.98.10)
+        by default (Oracle Beehive Gateway v4.0)
+        with ESMTP ; Wed, 23 Oct 2019 06:06:36 -0700
+Date:   Wed, 23 Oct 2019 16:06:24 +0300
+From:   Dan Carpenter <dan.carpenter@oracle.com>
+To:     ajay.joshi@wdc.com
+Cc:     linux-block@vger.kernel.org
+Subject: [bug report] null_blk: return fixed zoned reads > write pointer
+Message-ID: <20191023130623.GA3196@mwanda>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=us-ascii
 Content-Disposition: inline
-In-Reply-To: <20191017212858.13230-2-axboe@kernel.dk>
-User-Agent: NeoMutt/20180716
+User-Agent: Mutt/1.10.1 (2018-07-13)
+X-Proofpoint-Virus-Version: vendor=nai engine=6000 definitions=9418 signatures=668684
+X-Proofpoint-Spam-Details: rule=notspam policy=default score=0 suspectscore=1 malwarescore=0
+ phishscore=0 bulkscore=0 spamscore=0 mlxscore=0 mlxlogscore=999
+ adultscore=0 classifier=spam adjust=0 reason=mlx scancount=1
+ engine=8.0.1-1908290000 definitions=main-1910230134
+X-Proofpoint-Virus-Version: vendor=nai engine=6000 definitions=9418 signatures=668684
+X-Proofpoint-Spam-Details: rule=notspam policy=default score=0 priorityscore=1501 malwarescore=0
+ suspectscore=1 phishscore=0 bulkscore=0 spamscore=0 clxscore=1011
+ lowpriorityscore=0 mlxscore=0 impostorscore=0 mlxlogscore=999 adultscore=0
+ classifier=spam adjust=0 reason=mlx scancount=1 engine=8.0.1-1908290000
+ definitions=main-1910230134
 Sender: linux-block-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-On Thu, Oct 17, 2019 at 03:28:56PM -0600, Jens Axboe wrote:
-> This is in preparation for adding opcodes that need to modify files
-> in a process file table, either adding new ones or closing old ones.
-> 
-> If an opcode needs this, it must set REQ_F_NEED_FILES in the request
-> structure. If work that needs to get punted to async context have this
-> set, they will grab a reference to the process file table. When the
-> work is completed, the reference is dropped again.
+Hello Ajay Joshi,
 
-I think IORING_OP_SENDMSG and _RECVMSG need to set this flag due to
-SCM_RIGHTS control messages.
-Thought I'd reply here since I just now ran into the issue that I was
-getting ever-increasing wrong file descriptor numbers on pretty much
-ever "other" async recvmsg() call I did via io-uring while receiving
-file descriptors from lxc for the seccomp-notify proxy. (I'm currently
-running an ubuntu based 5.3.1 kernel)
-I ended up finding them in /proc - they show up in all kernel threads,
-eg.:
+The patch dd85b4922de1: "null_blk: return fixed zoned reads > write
+pointer" from Oct 17, 2019, leads to the following static checker
+warning:
 
-root:/root # grep Name /proc/9/status
-Name:   mm_percpu_wq
-root:/root # ls -l /proc/9/fd
-total 0
-lr-x------ 1 root root 64 Oct 23 12:00 0 -> '/proc/512 (deleted)'
-lrwx------ 1 root root 64 Oct 23 12:00 1 -> /proc/512/mem
-lr-x------ 1 root root 64 Oct 23 12:00 10 -> '/proc/11782 (deleted)'
-lrwx------ 1 root root 64 Oct 23 12:00 11 -> /proc/11782/mem
-lr-x------ 1 root root 64 Oct 23 12:00 12 -> '/proc/12210 (deleted)'
-lrwx------ 1 root root 64 Oct 23 12:00 13 -> /proc/12210/mem
-lr-x------ 1 root root 64 Oct 23 12:00 14 -> '/proc/12298 (deleted)'
-lrwx------ 1 root root 64 Oct 23 12:00 15 -> /proc/12298/mem
-lr-x------ 1 root root 64 Oct 23 12:00 16 -> '/proc/13955 (deleted)'
-lrwx------ 1 root root 64 Oct 23 12:00 17 -> /proc/13955/mem
-lr-x------ 1 root root 64 Oct 23 12:00 18 -> '/proc/13989 (deleted)'
-lrwx------ 1 root root 64 Oct 23 12:00 19 -> /proc/13989/mem
-lr-x------ 1 root root 64 Oct 23 12:00 2 -> '/proc/584 (deleted)'
-lr-x------ 1 root root 64 Oct 23 12:00 20 -> '/proc/15502 (deleted)'
-lrwx------ 1 root root 64 Oct 23 12:00 21 -> /proc/15502/mem
-lr-x------ 1 root root 64 Oct 23 12:00 22 -> '/proc/15510 (deleted)'
-lrwx------ 1 root root 64 Oct 23 12:00 23 -> /proc/15510/mem
-lr-x------ 1 root root 64 Oct 23 12:00 24 -> '/proc/17833 (deleted)'
-lrwx------ 1 root root 64 Oct 23 12:00 25 -> /proc/17833/mem
-lr-x------ 1 root root 64 Oct 23 12:00 26 -> '/proc/17836 (deleted)'
-lrwx------ 1 root root 64 Oct 23 12:00 27 -> /proc/17836/mem
-lr-x------ 1 root root 64 Oct 23 12:00 28 -> '/proc/21929 (deleted)'
-lrwx------ 1 root root 64 Oct 23 12:00 29 -> /proc/21929/mem
-lrwx------ 1 root root 64 Oct 23 12:00 3 -> /proc/584/mem
-lr-x------ 1 root root 64 Oct 23 12:00 30 -> '/proc/22214 (deleted)'
-lrwx------ 1 root root 64 Oct 23 12:00 31 -> /proc/22214/mem
-lr-x------ 1 root root 64 Oct 23 12:00 32 -> '/proc/22283 (deleted)'
-lrwx------ 1 root root 64 Oct 23 12:00 33 -> /proc/22283/mem
-lr-x------ 1 root root 64 Oct 23 12:00 34 -> '/proc/29795 (deleted)'
-lrwx------ 1 root root 64 Oct 23 12:00 35 -> /proc/29795/mem
-lr-x------ 1 root root 64 Oct 23 12:00 36 -> '/proc/30124 (deleted)'
-lrwx------ 1 root root 64 Oct 23 12:00 37 -> /proc/30124/mem
-lr-x------ 1 root root 64 Oct 23 12:00 38 -> '/proc/31016 (deleted)'
-lrwx------ 1 root root 64 Oct 23 12:00 39 -> /proc/31016/mem
-lr-x------ 1 root root 64 Oct 23 12:00 4 -> '/proc/1632 (deleted)'
-lr-x------ 1 root root 64 Oct 23 12:00 40 -> '/proc/4137 (deleted)'
-lrwx------ 1 root root 64 Oct 23 12:00 41 -> /proc/4137/mem
-lrwx------ 1 root root 64 Oct 23 12:00 5 -> /proc/1632/mem
-lr-x------ 1 root root 64 Oct 23 12:00 6 -> '/proc/3655 (deleted)'
-lrwx------ 1 root root 64 Oct 23 12:00 7 -> /proc/3655/mem
-lr-x------ 1 root root 64 Oct 23 12:00 8 -> '/proc/7075 (deleted)'
-lrwx------ 1 root root 64 Oct 23 12:00 9 -> /proc/7075/mem
-root:/root #
+	drivers/block/null_blk_zoned.c:91 null_zone_valid_read_len()
+	warn: uncapped user index 'dev->zones[null_zone_no(dev, sector)]'
 
-Those are the fds I expected to receive, and I get fd numbers
-consistently increasing with them.
-lxc sends the syscall-executing process' pidfd and its 'mem' fd via a
-socket, but instead of making it to the receiver, they end up there...
+drivers/block/null_blk_zoned.c
+    87  size_t null_zone_valid_read_len(struct nullb *nullb,
+    88                                  sector_t sector, unsigned int len)
+    89  {
+    90          struct nullb_device *dev = nullb->dev;
+    91          struct blk_zone *zone = &dev->zones[null_zone_no(dev, sector)];
+                                ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
 
-I suspect that an async sendmsg() call could potentially end up
-accessing those instead of the ones from the sender process, but I
-haven't tested it...
+    92          unsigned int nr_sectors = len >> SECTOR_SHIFT;
+    93  
+    94          /* Read must be below the write pointer position */
+    95          if (zone->type == BLK_ZONE_TYPE_CONVENTIONAL ||
+                    ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
 
-> Signed-off-by: Jens Axboe <axboe@kernel.dk>
-> ---
->  fs/io_uring.c | 21 ++++++++++++++++++---
->  1 file changed, 18 insertions(+), 3 deletions(-)
-> 
-> diff --git a/fs/io_uring.c b/fs/io_uring.c
-> index 635856023fdf..ad462237275e 100644
-> --- a/fs/io_uring.c
-> +++ b/fs/io_uring.c
-> @@ -267,10 +267,11 @@ struct io_ring_ctx {
->  struct sqe_submit {
->  	const struct io_uring_sqe	*sqe;
->  	unsigned short			index;
-> +	bool				has_user : 1;
-> +	bool				in_async : 1;
-> +	bool				needs_fixed_file : 1;
->  	u32				sequence;
-> -	bool				has_user;
-> -	bool				in_async;
-> -	bool				needs_fixed_file;
-> +	struct files_struct		*files;
->  };
->  
->  /*
-> @@ -323,6 +324,7 @@ struct io_kiocb {
->  #define REQ_F_FAIL_LINK		256	/* fail rest of links */
->  #define REQ_F_SHADOW_DRAIN	512	/* link-drain shadow req */
->  #define REQ_F_TIMEOUT		1024	/* timeout request */
-> +#define REQ_F_NEED_FILES	2048	/* needs to assume file table */
->  	u64			user_data;
->  	u32			result;
->  	u32			sequence;
-> @@ -2191,6 +2193,7 @@ static inline bool io_sqe_needs_user(const struct io_uring_sqe *sqe)
->  static void io_sq_wq_submit_work(struct work_struct *work)
->  {
->  	struct io_kiocb *req = container_of(work, struct io_kiocb, work);
-> +	struct files_struct *old_files = NULL;
->  	struct io_ring_ctx *ctx = req->ctx;
->  	struct mm_struct *cur_mm = NULL;
->  	struct async_list *async_list;
-> @@ -2220,6 +2223,10 @@ static void io_sq_wq_submit_work(struct work_struct *work)
->  				set_fs(USER_DS);
->  			}
->  		}
-> +		if (s->files && !old_files) {
-> +			old_files = current->files;
-> +			current->files = s->files;
-> +		}
->  
->  		if (!ret) {
->  			s->has_user = cur_mm != NULL;
-> @@ -2312,6 +2319,11 @@ static void io_sq_wq_submit_work(struct work_struct *work)
->  		unuse_mm(cur_mm);
->  		mmput(cur_mm);
->  	}
-> +	if (old_files) {
-> +		struct files_struct *files = current->files;
-> +		current->files = old_files;
-> +		put_files_struct(files);
-> +	}
->  }
->  
->  /*
-> @@ -2413,6 +2425,8 @@ static int __io_queue_sqe(struct io_ring_ctx *ctx, struct io_kiocb *req,
->  
->  			s->sqe = sqe_copy;
->  			memcpy(&req->submit, s, sizeof(*s));
-> +			if (req->flags & REQ_F_NEED_FILES)
-> +				req->submit.files = get_files_struct(current);
->  			list = io_async_list_from_sqe(ctx, s->sqe);
->  			if (!io_add_to_prev_work(list, req)) {
->  				if (list)
-> @@ -2633,6 +2647,7 @@ static bool io_get_sqring(struct io_ring_ctx *ctx, struct sqe_submit *s)
->  		s->index = head;
->  		s->sqe = &ctx->sq_sqes[head];
->  		s->sequence = ctx->cached_sq_head;
-> +		s->files = NULL;
->  		ctx->cached_sq_head++;
->  		return true;
->  	}
-> -- 
-> 2.17.1
+    96              sector + nr_sectors <= zone->wp)
+    97                  return len;
+    98  
+    99          if (sector > zone->wp)
+                    ^^^^^^^^^^^^^^^^^
 
+Smatch complains about "sector" being from the untrusted all the time
+and I kind of just ignore it these days.  But here it looks like we're
+checking "sector" after we already used it so that seems very suspicious.
+It feels like "sector > zone->wp" should come at the very start of the
+function.
+
+   100                  return 0;
+   101  
+   102          return (zone->wp - sector) << SECTOR_SHIFT;
+   103  }
+
+regards,
+dan carpenter
