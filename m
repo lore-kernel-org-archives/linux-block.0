@@ -2,170 +2,153 @@ Return-Path: <SRS0=PMby=YQ=vger.kernel.org=linux-block-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-2.2 required=3.0 tests=DKIM_SIGNED,DKIM_VALID,
-	HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,
-	USER_AGENT_SANE_1 autolearn=no autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-2.4 required=3.0 tests=DKIM_SIGNED,DKIM_VALID,
+	DKIM_VALID_AU,HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SPF_HELO_NONE,
+	SPF_PASS,USER_AGENT_SANE_1 autolearn=no autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 79414CA9EB6
-	for <linux-block@archiver.kernel.org>; Wed, 23 Oct 2019 14:11:34 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id B5B5DCA9EB9
+	for <linux-block@archiver.kernel.org>; Wed, 23 Oct 2019 17:27:41 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.kernel.org (Postfix) with ESMTP id 42E6A2086D
-	for <linux-block@archiver.kernel.org>; Wed, 23 Oct 2019 14:11:34 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id 8E26B21A4A
+	for <linux-block@archiver.kernel.org>; Wed, 23 Oct 2019 17:27:41 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel-dk.20150623.gappssmtp.com header.i=@kernel-dk.20150623.gappssmtp.com header.b="bRhmx0T0"
+	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="RfSt8m1g"
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S2404126AbfJWOLd (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Wed, 23 Oct 2019 10:11:33 -0400
-Received: from mail-io1-f65.google.com ([209.85.166.65]:36723 "EHLO
-        mail-io1-f65.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1732167AbfJWOLd (ORCPT
+        id S1728583AbfJWR1k (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Wed, 23 Oct 2019 13:27:40 -0400
+Received: from us-smtp-delivery-1.mimecast.com ([205.139.110.120]:26196 "EHLO
+        us-smtp-1.mimecast.com" rhost-flags-OK-OK-OK-FAIL) by vger.kernel.org
+        with ESMTP id S1729411AbfJWR1k (ORCPT
         <rfc822;linux-block@vger.kernel.org>);
-        Wed, 23 Oct 2019 10:11:33 -0400
-Received: by mail-io1-f65.google.com with SMTP id c16so5228650ioc.3
-        for <linux-block@vger.kernel.org>; Wed, 23 Oct 2019 07:11:32 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=kernel-dk.20150623.gappssmtp.com; s=20150623;
-        h=subject:to:cc:references:from:message-id:date:user-agent
-         :mime-version:in-reply-to:content-language:content-transfer-encoding;
-        bh=Ms4xJUd0YoyuB/IKqDpHAlyQHa/acS6m9rir4YmxrOw=;
-        b=bRhmx0T0ovlPciYOaEc5l3aygoNIWUpK6p+OopcegRmQs9jqca2ol2W/QkCGp5b6Ef
-         tazdqhVXDDWDahbZ8685aesbuP+oEhJetIirLUu8u+BT7xTIASzuqFk60H/uS+c6Kw7N
-         Wswh486+4SJ7RF8v/VBT2LIZCxcMbzZybyplf50IehsBvCGtoo+AuiGJroH42fzAosz9
-         5sB8iTLvQ0auObjWtxnCnXRMU3PfdC3VofsFwKoYE9R/WbzB0PeMjMXlel+xmirXm6gj
-         0bHE3wzdFTX+W3LgVPGqnuOlikkwsthcTBS5WWplPyvWzlrO0XcIEQqHqWlnjATlbLgw
-         2tYQ==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20161025;
-        h=x-gm-message-state:subject:to:cc:references:from:message-id:date
-         :user-agent:mime-version:in-reply-to:content-language
-         :content-transfer-encoding;
-        bh=Ms4xJUd0YoyuB/IKqDpHAlyQHa/acS6m9rir4YmxrOw=;
-        b=J91/eOr+URuMZ/UZNy8ZJhcKq8Kwj/jriLqzUk4H+nXd3169w+g6dB9zBcWjI+jsqA
-         J9smlo4P+0IbuQCVT5ALfwiywj09NS1/ZQo3rKIyHQ8e9oWn6S8D0hwFi6GSyAtIeAz7
-         HgLkKtu2w5CaO6OhL0W593xe80GqjDGXvXVruoGOBm4ZUw3mNo8P438xQPVvvxqRpM4I
-         yWRz2FWAii/0n6bXxVdBQgFhPPsQQnWQPwmwIhYHvrxgTODCObZ4Ftq67a+GAUymIg7O
-         mEIUIz6muOjnK609P7qJsdI1eiNfc0KtfF2eobAOUTBiEsT6KdJd+7fOavjVA7hHFZLM
-         OCzw==
-X-Gm-Message-State: APjAAAUFohj1RIbvPDF5SGLolI28T1XErxDNtWkFeOTaP3DAkUIsTzJS
-        0BdyhwBPdhwxUXrf/rmajKCDIg==
-X-Google-Smtp-Source: APXvYqy3P9pZCyajDkOFnT7a7dJLo3Bro5PeZIlLjcn+zegPQHMAfLuBH7vjSPH1p2LPuQBHPznBUw==
-X-Received: by 2002:a5e:9807:: with SMTP id s7mr1158946ioj.215.1571839891865;
-        Wed, 23 Oct 2019 07:11:31 -0700 (PDT)
-Received: from [192.168.1.159] ([65.144.74.34])
-        by smtp.gmail.com with ESMTPSA id c17sm8651919ild.31.2019.10.23.07.11.29
-        (version=TLS1_2 cipher=ECDHE-RSA-AES128-GCM-SHA256 bits=128/128);
-        Wed, 23 Oct 2019 07:11:30 -0700 (PDT)
-Subject: Re: [PATCH 1/3] io_uring: add support for async work inheriting files
- table
-To:     Wolfgang Bumiller <w.bumiller@proxmox.com>
-Cc:     linux-block@vger.kernel.org, davem@davemloft.net,
-        netdev@vger.kernel.org
-References: <20191017212858.13230-1-axboe@kernel.dk>
- <20191017212858.13230-2-axboe@kernel.dk>
- <20191023120446.75oxdwom34nhe3l5@olga.proxmox.com>
-From:   Jens Axboe <axboe@kernel.dk>
-Message-ID: <3b97233b-5d05-5efc-4173-e3a1ef177cbc@kernel.dk>
-Date:   Wed, 23 Oct 2019 08:11:29 -0600
-User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:60.0) Gecko/20100101
- Thunderbird/60.9.0
+        Wed, 23 Oct 2019 13:27:40 -0400
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+        s=mimecast20190719; t=1571851658;
+        h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+         to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+         content-transfer-encoding:content-transfer-encoding:
+         in-reply-to:in-reply-to:references:references;
+        bh=esWx43fZLzMnjouiOJwe7rGNAZqI0D7XVCwYEnxdbUA=;
+        b=RfSt8m1gOMR7uVoM6YJU/zPqWy5KWZMMkuXvMW+U4to0XCxLQTlJ0WsUZJiAN2id6N9WsO
+        Mp3K1NGQwXInPlusDaKWs5z5fkCrgIvuN/TTxbWVoBFs4a1QmIpVoWjCRNCakJ3BHpSvA6
+        BQBQ7FvFgxfAd0RMkXQjSQWSKLWLReg=
+Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
+ [209.132.183.4]) (Using TLS) by relay.mimecast.com with ESMTP id
+ us-mta-346-N1h7g-G8MRyyM5N5r7xtRg-1; Wed, 23 Oct 2019 13:27:35 -0400
+Received: from smtp.corp.redhat.com (int-mx02.intmail.prod.int.phx2.redhat.com [10.5.11.12])
+        (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
+        (No client certificate requested)
+        by mimecast-mx01.redhat.com (Postfix) with ESMTPS id 3FDBA800D49;
+        Wed, 23 Oct 2019 17:27:33 +0000 (UTC)
+Received: from [10.10.123.185] (ovpn-123-185.rdu2.redhat.com [10.10.123.185])
+        by smtp.corp.redhat.com (Postfix) with ESMTP id 4BC1760C80;
+        Wed, 23 Oct 2019 17:27:30 +0000 (UTC)
+Subject: Re: [PATCH] Add prctl support for controlling PF_MEMALLOC V2
+To:     Michal Hocko <mhocko@kernel.org>,
+        Dave Chinner <david@fromorbit.com>
+References: <20191021214137.8172-1-mchristi@redhat.com>
+ <20191022112446.GA8213@dhcp22.suse.cz> <5DAF2AA0.5030500@redhat.com>
+ <20191022163310.GS9379@dhcp22.suse.cz>
+ <20191022204344.GB2044@dread.disaster.area>
+ <20191023071146.GE754@dhcp22.suse.cz>
+Cc:     linux-mm@kvack.org, linux-kernel@vger.kernel.org,
+        linux-scsi@vger.kernel.org, linux-fsdevel@vger.kernel.org,
+        linux-block@vger.kernel.org, martin@urbackup.org,
+        Damien.LeMoal@wdc.com
+From:   Mike Christie <mchristi@redhat.com>
+Message-ID: <5DB08D81.8050300@redhat.com>
+Date:   Wed, 23 Oct 2019 12:27:29 -0500
+User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:38.0) Gecko/20100101
+ Thunderbird/38.6.0
 MIME-Version: 1.0
-In-Reply-To: <20191023120446.75oxdwom34nhe3l5@olga.proxmox.com>
-Content-Type: text/plain; charset=utf-8
-Content-Language: en-US
-Content-Transfer-Encoding: 7bit
+In-Reply-To: <20191023071146.GE754@dhcp22.suse.cz>
+X-Scanned-By: MIMEDefang 2.79 on 10.5.11.12
+X-MC-Unique: N1h7g-G8MRyyM5N5r7xtRg-1
+X-Mimecast-Spam-Score: 0
+Content-Type: text/plain; charset=UTF-8
+Content-Transfer-Encoding: quoted-printable
 Sender: linux-block-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-On 10/23/19 6:04 AM, Wolfgang Bumiller wrote:
-> On Thu, Oct 17, 2019 at 03:28:56PM -0600, Jens Axboe wrote:
->> This is in preparation for adding opcodes that need to modify files
->> in a process file table, either adding new ones or closing old ones.
+On 10/23/2019 02:11 AM, Michal Hocko wrote:
+> On Wed 23-10-19 07:43:44, Dave Chinner wrote:
+>> On Tue, Oct 22, 2019 at 06:33:10PM +0200, Michal Hocko wrote:
+>=20
+> Thanks for more clarifiation regarding PF_LESS_THROTTLE.
+>=20
+> [...]
+>>> PF_IO_FLUSHER would mean that the user
+>>> context is a part of the IO path and therefore there are certain reclai=
+m
+>>> recursion restrictions.
 >>
->> If an opcode needs this, it must set REQ_F_NEED_FILES in the request
->> structure. If work that needs to get punted to async context have this
->> set, they will grab a reference to the process file table. When the
->> work is completed, the reference is dropped again.
-> 
-> I think IORING_OP_SENDMSG and _RECVMSG need to set this flag due to
-> SCM_RIGHTS control messages.
-> Thought I'd reply here since I just now ran into the issue that I was
-> getting ever-increasing wrong file descriptor numbers on pretty much
-> ever "other" async recvmsg() call I did via io-uring while receiving
-> file descriptors from lxc for the seccomp-notify proxy. (I'm currently
-> running an ubuntu based 5.3.1 kernel)
-> I ended up finding them in /proc - they show up in all kernel threads,
-> eg.:
-> 
-> root:/root # grep Name /proc/9/status
-> Name:   mm_percpu_wq
-> root:/root # ls -l /proc/9/fd
-> total 0
-> lr-x------ 1 root root 64 Oct 23 12:00 0 -> '/proc/512 (deleted)'
-> lrwx------ 1 root root 64 Oct 23 12:00 1 -> /proc/512/mem
-> lr-x------ 1 root root 64 Oct 23 12:00 10 -> '/proc/11782 (deleted)'
-> lrwx------ 1 root root 64 Oct 23 12:00 11 -> /proc/11782/mem
-> lr-x------ 1 root root 64 Oct 23 12:00 12 -> '/proc/12210 (deleted)'
-> lrwx------ 1 root root 64 Oct 23 12:00 13 -> /proc/12210/mem
-> lr-x------ 1 root root 64 Oct 23 12:00 14 -> '/proc/12298 (deleted)'
-> lrwx------ 1 root root 64 Oct 23 12:00 15 -> /proc/12298/mem
-> lr-x------ 1 root root 64 Oct 23 12:00 16 -> '/proc/13955 (deleted)'
-> lrwx------ 1 root root 64 Oct 23 12:00 17 -> /proc/13955/mem
-> lr-x------ 1 root root 64 Oct 23 12:00 18 -> '/proc/13989 (deleted)'
-> lrwx------ 1 root root 64 Oct 23 12:00 19 -> /proc/13989/mem
-> lr-x------ 1 root root 64 Oct 23 12:00 2 -> '/proc/584 (deleted)'
-> lr-x------ 1 root root 64 Oct 23 12:00 20 -> '/proc/15502 (deleted)'
-> lrwx------ 1 root root 64 Oct 23 12:00 21 -> /proc/15502/mem
-> lr-x------ 1 root root 64 Oct 23 12:00 22 -> '/proc/15510 (deleted)'
-> lrwx------ 1 root root 64 Oct 23 12:00 23 -> /proc/15510/mem
-> lr-x------ 1 root root 64 Oct 23 12:00 24 -> '/proc/17833 (deleted)'
-> lrwx------ 1 root root 64 Oct 23 12:00 25 -> /proc/17833/mem
-> lr-x------ 1 root root 64 Oct 23 12:00 26 -> '/proc/17836 (deleted)'
-> lrwx------ 1 root root 64 Oct 23 12:00 27 -> /proc/17836/mem
-> lr-x------ 1 root root 64 Oct 23 12:00 28 -> '/proc/21929 (deleted)'
-> lrwx------ 1 root root 64 Oct 23 12:00 29 -> /proc/21929/mem
-> lrwx------ 1 root root 64 Oct 23 12:00 3 -> /proc/584/mem
-> lr-x------ 1 root root 64 Oct 23 12:00 30 -> '/proc/22214 (deleted)'
-> lrwx------ 1 root root 64 Oct 23 12:00 31 -> /proc/22214/mem
-> lr-x------ 1 root root 64 Oct 23 12:00 32 -> '/proc/22283 (deleted)'
-> lrwx------ 1 root root 64 Oct 23 12:00 33 -> /proc/22283/mem
-> lr-x------ 1 root root 64 Oct 23 12:00 34 -> '/proc/29795 (deleted)'
-> lrwx------ 1 root root 64 Oct 23 12:00 35 -> /proc/29795/mem
-> lr-x------ 1 root root 64 Oct 23 12:00 36 -> '/proc/30124 (deleted)'
-> lrwx------ 1 root root 64 Oct 23 12:00 37 -> /proc/30124/mem
-> lr-x------ 1 root root 64 Oct 23 12:00 38 -> '/proc/31016 (deleted)'
-> lrwx------ 1 root root 64 Oct 23 12:00 39 -> /proc/31016/mem
-> lr-x------ 1 root root 64 Oct 23 12:00 4 -> '/proc/1632 (deleted)'
-> lr-x------ 1 root root 64 Oct 23 12:00 40 -> '/proc/4137 (deleted)'
-> lrwx------ 1 root root 64 Oct 23 12:00 41 -> /proc/4137/mem
-> lrwx------ 1 root root 64 Oct 23 12:00 5 -> /proc/1632/mem
-> lr-x------ 1 root root 64 Oct 23 12:00 6 -> '/proc/3655 (deleted)'
-> lrwx------ 1 root root 64 Oct 23 12:00 7 -> /proc/3655/mem
-> lr-x------ 1 root root 64 Oct 23 12:00 8 -> '/proc/7075 (deleted)'
-> lrwx------ 1 root root 64 Oct 23 12:00 9 -> /proc/7075/mem
-> root:/root #
-> 
-> Those are the fds I expected to receive, and I get fd numbers
-> consistently increasing with them.
-> lxc sends the syscall-executing process' pidfd and its 'mem' fd via a
-> socket, but instead of making it to the receiver, they end up there...
-> 
-> I suspect that an async sendmsg() call could potentially end up
-> accessing those instead of the ones from the sender process, but I
-> haven't tested it...
+>> If PF_IO_FLUSHER just maps to PF_LESS_THROTTLE|PF_MEMALLOC_NOIO,
+>> then I'm not sure we need a new definition. Maybe that's the ptrace
+>> flag name, but in the kernel we don't need a PF_IO_FLUSHER process
+>> flag...
+>=20
+> Yes, the internal implementation would do something like that. I was
+> more interested in the user space visible API at this stage. Something
+> generic enough because exporting MEMALLOC flags is just a bad idea IMHO
+> (especially PF_MEMALLOC).
 
-Might "just" be a case of the sendmsg() being stuck, we can't currently
-cancel work. So if they never complete, the ring won't go away.
+Do you mean we would do something like:
 
-Actually working on a small workqueue replacement for io_uring which
-allow us to cancel things like that. It's a requirement for accept() as
-well, but also for basic read/write send/recv on sockets. So used to
-storage IO operations that complete in a finite amount of time...
+prctl()
+....
+case PF_SET_IO_FLUSHER:
+        current->flags |=3D PF_MEMALLOC_NOIO;
+....
 
-But yes, I hope with that, and the flush trick that Jann suggested, that
-we can make this 100% reliable for any type of operation.
+or are you saying we would add a new PF_IO_FLUSHER flag and then modify
+PF_MEMALLOC_NOIO uses like in current_gfp_context:
 
--- 
-Jens Axboe
+if (current->flags & (PF_MEMALLOC_NOIO | PF_IO_FLUSHER)
+      flags &=3D ~(__GFP_IO | __GFP_FS);
+
+?
+
+>=20
+>>>>>> This patch allows the userspace deamon to set the PF_MEMALLOC* flags
+>>>>>> with prctl during their initialization so later allocations cannot
+>>>>>> calling back into them.
+>>>>>
+>>>>> TBH I am not really happy to export these to the userspace. They are
+>>>>> an internal implementation detail and the userspace shouldn't really
+>>>>
+>>>> They care in these cases, because block/fs drivers must be able to mak=
+e
+>>>> forward progress during writes. To meet this guarantee kernel block
+>>>> drivers use mempools and memalloc/GFP flags.
+>>>>
+>>>> For these userspace components of the block/fs drivers they already do
+>>>> things normal daemons do not to meet that guarantee like mlock their
+>>>> memory, disable oom killer, and preallocate resources they have contro=
+l
+>>>> over. They have no control over reclaim like the kernel drivers do so
+>>>> its easy for us to deadlock when memory gets low.
+>>>
+>>> OK, fair enough. How much of a control do they really need though. Is a
+>>> single PF_IO_FLUSHER as explained above (essentially imply GPF_NOIO
+>>> context) sufficient?
+>>
+>> I think some of these usrspace processes work at the filesystem
+>> level and so really only need GFP_NOFS allocation (fuse), while
+>> others work at the block device level (iscsi, nbd) so need GFP_NOIO
+>> allocation. So there's definitely an argument for providing both...
+>=20
+> The main question is whether giving more APIs is really necessary. Is
+> there any real problem to give them only PF_IO_FLUSHER and let both
+> groups use this one? It will imply more reclaim restrictions for solely
+> FS based ones but is this a practical problem? If yes we can always add
+> PF_FS_$FOO later on.
+
+
+I am not sure. I will have to defer to general FS experts like Dave or
+Martin and Damien for the specific fuse case. There do not seem to be a
+lot of places where we check for __GFP_IO so configs with fuse and
+bcache for example are probably not a big deal. However, I am not very
+familiar with some of the other code paths in the mm layer and how FSs
+interact with them.
 
