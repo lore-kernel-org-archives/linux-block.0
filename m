@@ -2,132 +2,97 @@ Return-Path: <SRS0=PMby=YQ=vger.kernel.org=linux-block-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-0.8 required=3.0 tests=DKIM_SIGNED,DKIM_VALID,
-	DKIM_VALID_AU,HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SPF_HELO_NONE,
-	SPF_PASS,URIBL_BLOCKED autolearn=no autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-9.7 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
+	INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,
+	URIBL_BLOCKED,USER_AGENT_GIT autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id E34F6CA9EAE
-	for <linux-block@archiver.kernel.org>; Wed, 23 Oct 2019 05:44:52 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 8EC18CA9EAE
+	for <linux-block@archiver.kernel.org>; Wed, 23 Oct 2019 06:48:50 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.kernel.org (Postfix) with ESMTP id B919F2173B
-	for <linux-block@archiver.kernel.org>; Wed, 23 Oct 2019 05:44:52 +0000 (UTC)
-Authentication-Results: mail.kernel.org;
-	dkim=pass (2048-bit key) header.d=linaro.org header.i=@linaro.org header.b="IFQbUvYU"
+	by mail.kernel.org (Postfix) with ESMTP id 6AD312084C
+	for <linux-block@archiver.kernel.org>; Wed, 23 Oct 2019 06:48:50 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1731381AbfJWFow (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Wed, 23 Oct 2019 01:44:52 -0400
-Received: from mail-wm1-f66.google.com ([209.85.128.66]:39082 "EHLO
-        mail-wm1-f66.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1731026AbfJWFov (ORCPT
-        <rfc822;linux-block@vger.kernel.org>);
-        Wed, 23 Oct 2019 01:44:51 -0400
-Received: by mail-wm1-f66.google.com with SMTP id r141so8674480wme.4
-        for <linux-block@vger.kernel.org>; Tue, 22 Oct 2019 22:44:50 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=linaro.org; s=google;
-        h=mime-version:subject:from:in-reply-to:date:cc
-         :content-transfer-encoding:message-id:references:to;
-        bh=Yxvk4JK0S6fOQxsokBnmhH3TcJSOZWVYOtlV6nQoCzM=;
-        b=IFQbUvYUvIHygSN9UBfOAvTiOyAzVBISTOa5oYkQV7XmGLlGYuvqaeduwqDjZf7K/e
-         SQDZFmJeyHwpYRriWd5Nw2SSe3qrPJifJuCW0PwujfTLdYgFxe+mBVIu5EjjpfFDas4b
-         ZFsJhWPjdQVgMj7ILlz3158WwsfWdOr4KiDokAQqJZsGMG+qn5d1YC6Ub6GHPn6fRbcR
-         VjLGYvNaCMSA/huILsbMGgR/4rntEmKbyAOGT9zdGIt4ElfUIX9yDoehNxnQ1B8zRBjK
-         D3+k9tktvAsX7k0YeKEdQ8+l3k2AFN/jC7+bAXc2YX9R2y8OKdKEqb0CDJ4jAEipvBZ0
-         d9Yg==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20161025;
-        h=x-gm-message-state:mime-version:subject:from:in-reply-to:date:cc
-         :content-transfer-encoding:message-id:references:to;
-        bh=Yxvk4JK0S6fOQxsokBnmhH3TcJSOZWVYOtlV6nQoCzM=;
-        b=Nx2uOdoV0IfpFyoyaQM29GUUkR9WJ6e7MK+y3y9QBTSfVGExUpkqGQeF25cz0PHLwW
-         1Z/4GHgEZ1NEYlVL6rNL9WCqkM7EHGOz5PsUv8FivM2VkswLBC9TKv60+0yDUBN7vCT1
-         FJNg9XscRqGX2pEkg0iSNu+sUXpVv6JSWKZgeOPtPTIgAkmkTiLkoDO9xwXQsh+fZpX2
-         y403VFhYM5s1Z+elk9wkx8mtfzSYqMRADSai86QoXnJryZIfa+W9ESvZWbCzShxYj1h4
-         pympJz+9Q3FMuqjvhnp/PYnmj0UZQ20APM4uRitEZBbya4FQnQ+f/r8wS5JcvKAph7el
-         rC3w==
-X-Gm-Message-State: APjAAAX55G0QVNrwm5Kcw7rTHDsqQvjIQ1ayAQp9If+PCbCej41dBVwN
-        0ODT+ct4jGesC1YnCZmjpN99fA==
-X-Google-Smtp-Source: APXvYqxWENcAhG3ml7y69a4emJVDFc6t3DUaWlnyAPA/Dv2uJdnijYtDiaKwsMRWVlPpsLWX9yZGeA==
-X-Received: by 2002:a1c:5f42:: with SMTP id t63mr445601wmb.163.1571809489836;
-        Tue, 22 Oct 2019 22:44:49 -0700 (PDT)
-Received: from [192.168.0.102] (84-33-74-57.dyn.eolo.it. [84.33.74.57])
-        by smtp.gmail.com with ESMTPSA id 200sm14202462wme.32.2019.10.22.22.44.48
-        (version=TLS1_2 cipher=ECDHE-RSA-AES128-GCM-SHA256 bits=128/128);
-        Tue, 22 Oct 2019 22:44:49 -0700 (PDT)
-Content-Type: text/plain;
-        charset=us-ascii
-Mime-Version: 1.0 (Mac OS X Mail 12.4 \(3445.104.8\))
-Subject: Re: [PATCH 0/2] block, bfq: make bfq disable iocost and present a
- double interface
-From:   Paolo Valente <paolo.valente@linaro.org>
-In-Reply-To: <19BC0425-559E-433A-ACAD-B12FA02E20E4@linaro.org>
-Date:   Wed, 23 Oct 2019 07:44:47 +0200
-Cc:     linux-block <linux-block@vger.kernel.org>,
-        linux-kernel <linux-kernel@vger.kernel.org>,
-        Ulf Hansson <ulf.hansson@linaro.org>,
-        Linus Walleij <linus.walleij@linaro.org>,
-        noreply-spamdigest via bfq-iosched 
-        <bfq-iosched@googlegroups.com>, oleksandr@natalenko.name,
-        Tejun Heo <tj@kernel.org>, cgroups@vger.kernel.org
-Content-Transfer-Encoding: quoted-printable
-Message-Id: <94E51269-62DC-427A-A81C-3851ABC818BC@linaro.org>
-References: <20191001193316.3330-1-paolo.valente@linaro.org>
- <19BC0425-559E-433A-ACAD-B12FA02E20E4@linaro.org>
-To:     Jens Axboe <axboe@kernel.dk>
-X-Mailer: Apple Mail (2.3445.104.8)
+        id S2389356AbfJWGst (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Wed, 23 Oct 2019 02:48:49 -0400
+Received: from szxga07-in.huawei.com ([45.249.212.35]:37164 "EHLO huawei.com"
+        rhost-flags-OK-OK-OK-FAIL) by vger.kernel.org with ESMTP
+        id S2389335AbfJWGst (ORCPT <rfc822;linux-block@vger.kernel.org>);
+        Wed, 23 Oct 2019 02:48:49 -0400
+Received: from DGGEMS402-HUB.china.huawei.com (unknown [172.30.72.59])
+        by Forcepoint Email with ESMTP id A720A873D06817A3774E;
+        Wed, 23 Oct 2019 14:48:43 +0800 (CST)
+Received: from huawei.com (10.175.124.28) by DGGEMS402-HUB.china.huawei.com
+ (10.3.19.202) with Microsoft SMTP Server id 14.3.439.0; Wed, 23 Oct 2019
+ 14:48:38 +0800
+From:   "zhangyi (F)" <yi.zhang@huawei.com>
+To:     <axboe@kernel.dk>, <linux-block@vger.kernel.org>
+CC:     <yi.zhang@huawei.com>, <yangerkun@huawei.com>
+Subject: [PATCH 2/2] io_uring: correct timeout req sequence when inserting a new entry
+Date:   Wed, 23 Oct 2019 15:10:09 +0800
+Message-ID: <20191023071009.13891-2-yi.zhang@huawei.com>
+X-Mailer: git-send-email 2.17.2
+In-Reply-To: <20191023071009.13891-1-yi.zhang@huawei.com>
+References: <20191023071009.13891-1-yi.zhang@huawei.com>
+MIME-Version: 1.0
+Content-Type: text/plain
+X-Originating-IP: [10.175.124.28]
+X-CFilter-Loop: Reflected
 Sender: linux-block-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-ping
+The sequence number of the timeout req (req->sequence) indicate the
+expected completion request. Because of each timeout req consume a
+sequence number, so the sequence of each timeout req on the timeout
+list shouldn't be the same. But now, we may get the same number (also
+incorrect) if we insert a new entry before the last one, such as submit
+such two timeout reqs on a new ring instance below.
 
-> Il giorno 9 ott 2019, alle ore 16:25, Paolo Valente =
-<paolo.valente@linaro.org> ha scritto:
->=20
-> Jens, Tejun,
-> can we proceed with this double-interface solution?
->=20
-> Thanks,
-> Paolo
->=20
->> Il giorno 1 ott 2019, alle ore 21:33, Paolo Valente =
-<paolo.valente@linaro.org> ha scritto:
->>=20
->> Hi Jens,
->>=20
->> the first patch in this series is Tejun's patch for making BFQ =
-disable
->> io.cost. The second patch makes BFQ present both the bfq-prefixes
->> parameters and non-prefixed parameters, as suggested by Tejun [1].
->>=20
->> In the first patch I've tried to use macros not to repeat code
->> twice. checkpatch complains that these macros should be enclosed in
->> parentheses. I don't see how to do it. I'm willing to switch to any
->> better solution.
->>=20
->> Thanks,
->> Paolo
->>=20
->> [1] https://lkml.org/lkml/2019/9/18/736
->>=20
->> Paolo Valente (1):
->> block, bfq: present a double cgroups interface
->>=20
->> Tejun Heo (1):
->> blkcg: Make bfq disable iocost when enabled
->>=20
->> Documentation/admin-guide/cgroup-v2.rst |   8 +-
->> Documentation/block/bfq-iosched.rst     |  40 ++--
->> block/bfq-cgroup.c                      | 260 =
-++++++++++++------------
->> block/bfq-iosched.c                     |  32 +++
->> block/blk-iocost.c                      |   5 +-
->> include/linux/blk-cgroup.h              |   5 +
->> kernel/cgroup/cgroup.c                  |   2 +
->> 7 files changed, 201 insertions(+), 151 deletions(-)
->>=20
->> --
->> 2.20.1
->=20
+                    req->sequence
+ req_1 (count = 2):       2
+ req_2 (count = 1):       2
+
+Then, if we submit a nop req, req_2 will still timeout even the nop req
+finished. This patch fix this problem by adjust the sequence number of
+each reordered reqs when inserting a new entry.
+
+Signed-off-by: zhangyi (F) <yi.zhang@huawei.com>
+---
+ fs/io_uring.c | 11 ++++++++++-
+ 1 file changed, 10 insertions(+), 1 deletion(-)
+
+diff --git a/fs/io_uring.c b/fs/io_uring.c
+index e7a856392a23..4a395a7a36c1 100644
+--- a/fs/io_uring.c
++++ b/fs/io_uring.c
+@@ -1912,6 +1912,7 @@ static int io_timeout(struct io_kiocb *req, const struct io_uring_sqe *sqe)
+ 	struct io_ring_ctx *ctx = req->ctx;
+ 	struct list_head *entry;
+ 	struct timespec64 ts;
++	unsigned span = 0;
+ 
+ 	if (unlikely(ctx->flags & IORING_SETUP_IOPOLL))
+ 		return -EINVAL;
+@@ -1960,9 +1961,17 @@ static int io_timeout(struct io_kiocb *req, const struct io_uring_sqe *sqe)
+ 		if (ctx->cached_sq_head < nxt_sq_head)
+ 			tmp += UINT_MAX;
+ 
+-		if (tmp >= tmp_nxt)
++		if (tmp > tmp_nxt)
+ 			break;
++
++		/*
++		 * Sequence of reqs after the insert one and itself should
++		 * be adjusted because each timeout req consumes a slot.
++		 */
++		span++;
++		nxt->sequence++;
+ 	}
++	req->sequence -= span;
+ 	list_add(&req->list, entry);
+ 	spin_unlock_irq(&ctx->completion_lock);
+ 
+-- 
+2.17.2
 
