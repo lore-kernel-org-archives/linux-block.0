@@ -2,115 +2,253 @@ Return-Path: <SRS0=PMby=YQ=vger.kernel.org=linux-block-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-8.2 required=3.0 tests=DKIM_SIGNED,DKIM_VALID,
-	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,
-	SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED,USER_AGENT_SANE_1 autolearn=ham
-	autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-5.8 required=3.0 tests=DKIM_SIGNED,DKIM_VALID,
+	DKIM_VALID_AU,HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,
+	MENTIONS_GIT_HOSTING,SPF_HELO_NONE,SPF_PASS autolearn=ham autolearn_force=no
+	version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 805FCCA9EB9
-	for <linux-block@archiver.kernel.org>; Wed, 23 Oct 2019 19:42:06 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id D5CBFCA9EB9
+	for <linux-block@archiver.kernel.org>; Wed, 23 Oct 2019 20:17:18 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.kernel.org (Postfix) with ESMTP id 4F3F420640
-	for <linux-block@archiver.kernel.org>; Wed, 23 Oct 2019 19:42:05 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id 9B68B21872
+	for <linux-block@archiver.kernel.org>; Wed, 23 Oct 2019 20:17:18 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel-dk.20150623.gappssmtp.com header.i=@kernel-dk.20150623.gappssmtp.com header.b="QuUmadlD"
+	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="NeBw+Fky"
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1732044AbfJWTmE (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Wed, 23 Oct 2019 15:42:04 -0400
-Received: from mail-io1-f65.google.com ([209.85.166.65]:40545 "EHLO
-        mail-io1-f65.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1731949AbfJWTmE (ORCPT
+        id S2391650AbfJWURR (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Wed, 23 Oct 2019 16:17:17 -0400
+Received: from us-smtp-1.mimecast.com ([207.211.31.81]:43919 "EHLO
+        us-smtp-delivery-1.mimecast.com" rhost-flags-OK-OK-OK-FAIL)
+        by vger.kernel.org with ESMTP id S1732349AbfJWURR (ORCPT
         <rfc822;linux-block@vger.kernel.org>);
-        Wed, 23 Oct 2019 15:42:04 -0400
-Received: by mail-io1-f65.google.com with SMTP id p6so18228750iod.7
-        for <linux-block@vger.kernel.org>; Wed, 23 Oct 2019 12:42:02 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=kernel-dk.20150623.gappssmtp.com; s=20150623;
-        h=subject:to:cc:references:from:message-id:date:user-agent
-         :mime-version:in-reply-to:content-language:content-transfer-encoding;
-        bh=65DkhxjtGs3hS8ja0TxdM9S+92O9yJlpEFrNnhaV/38=;
-        b=QuUmadlDPYZuQLmQypRRMnWKuYZXnIDbZ2Ejkj6XDKl0sAvZbBizmaNkvTbYT5Hep0
-         DXG2Ywuh1dYby4Hs+grHwpK7tx4W+HrnigAnfGBrX4Ae+p7+3vXOgQ1TjOXT/bBFmP01
-         qwSCLTMFg0iwVSEe5f0qKDVXuP9pGp4zjARky9IMfuisVt47Dxo4gT1agMw/xgr0/v6n
-         8kSSeNRuyyf7xeu5wQzOQtm1V7O0phkpkSCXL9aL4A3/bbLZ/uWK2zIEkZfExbVe2qZW
-         tOB8S1kS/s2HZfp6Zp+Q5HjpaUV7iUZoqKnOBc28TBJsbYQSl65U2aBekUg6unlsmSWY
-         RGpQ==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20161025;
-        h=x-gm-message-state:subject:to:cc:references:from:message-id:date
-         :user-agent:mime-version:in-reply-to:content-language
-         :content-transfer-encoding;
-        bh=65DkhxjtGs3hS8ja0TxdM9S+92O9yJlpEFrNnhaV/38=;
-        b=g8/gL1XYlsvSOClnoQBCr+nHkhqFa6zHR85AfbpntARh0CLWzrCToP7ZBOKeW2jiDQ
-         xgtRtmXwkgEUE0PW3mfYO+GTZEOQxqvL36bibTllv4onjSO3Ea6/pfYADswSpRCbrSs9
-         dt2KAWOgvgx4f607XbVsbme4ph62sONtJvH/FVzH8VOM1XzvALvam6ZCIJ4dpkiB5TjQ
-         QOrFu59hqRrgRfwbgGQ3YLBYI4uBvgC7gcgeBmJpFLMxJf+tyOxmZjTAA9DsDTI3shOW
-         o4rAoenBXyZ5FfihWXoOkyk8DEc7FTbOyufUTzQQpSRPQhLWypSKLx7BUIDwWH8naQed
-         xc6A==
-X-Gm-Message-State: APjAAAUlwBL8Udl65+xDTLf3EPLEafIJJUVXvmhUzomooRoe1c74fVVQ
-        rLxkhL55MJo1A0ZuoBTHUU8jeIhpJFQskw==
-X-Google-Smtp-Source: APXvYqw56r0Lo9DYHLBRMngE2K25uiHBdauz1kS0hb1YrO6KNASU7wcYyGahYcTGInEWT1wSVPa5Dw==
-X-Received: by 2002:a02:7b0d:: with SMTP id q13mr10559606jac.114.1571859721456;
-        Wed, 23 Oct 2019 12:42:01 -0700 (PDT)
-Received: from [192.168.1.159] ([65.144.74.34])
-        by smtp.gmail.com with ESMTPSA id f145sm2511181ilh.48.2019.10.23.12.41.59
-        (version=TLS1_2 cipher=ECDHE-RSA-AES128-GCM-SHA256 bits=128/128);
-        Wed, 23 Oct 2019 12:42:00 -0700 (PDT)
-Subject: Re: [PATCH] io_uring: ensure cq_entries is at least equal to or
- greater than sq_entries
-To:     Jeff Moyer <jmoyer@redhat.com>, Jackie Liu <liuyun01@kylinos.cn>
-Cc:     linux-block@vger.kernel.org
-References: <1571795864-56669-1-git-send-email-liuyun01@kylinos.cn>
- <x49d0ennw1y.fsf@segfault.boston.devel.redhat.com>
-From:   Jens Axboe <axboe@kernel.dk>
-Message-ID: <e167ef28-8763-7629-fb5b-e0ef28ed8a49@kernel.dk>
-Date:   Wed, 23 Oct 2019 13:41:58 -0600
-User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:60.0) Gecko/20100101
- Thunderbird/60.9.0
+        Wed, 23 Oct 2019 16:17:17 -0400
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+        s=mimecast20190719; t=1571861835;
+        h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+         to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+         content-transfer-encoding:content-transfer-encoding;
+        bh=oeW+VmP3QU4FevcRW4lhlaqjbMpXhUTeOjj1aJjNG14=;
+        b=NeBw+Fky2sqbg3IaBtt5cXb4LZGEnKhIELwGT6pKCCQjV0evhEyx63YLdtR34QzhaSlc+o
+        ym0k+HLtlFbr6dLaw0ofxltOYulUqHFQjJziq+zu0D6UFg25Eiz7pAfyT6/sC1t377lUNY
+        TdNB1PspC+NrgK+EaLLC6kRZH58Y+3M=
+Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
+ [209.132.183.4]) (Using TLS) by relay.mimecast.com with ESMTP id
+ us-mta-193-7oQmPxgHOp-fA6EnANPl_g-1; Wed, 23 Oct 2019 16:17:13 -0400
+Received: from smtp.corp.redhat.com (int-mx05.intmail.prod.int.phx2.redhat.com [10.5.11.15])
+        (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
+        (No client certificate requested)
+        by mimecast-mx01.redhat.com (Postfix) with ESMTPS id C970E5E4;
+        Wed, 23 Oct 2019 20:17:08 +0000 (UTC)
+Received: from warthog.procyon.org.uk (ovpn-121-40.rdu2.redhat.com [10.10.121.40])
+        by smtp.corp.redhat.com (Postfix) with ESMTP id 8518C5D6D0;
+        Wed, 23 Oct 2019 20:17:05 +0000 (UTC)
+Subject: [RFC PATCH 00/10] pipe: Notification queue preparation [ver #2]
+From:   David Howells <dhowells@redhat.com>
+To:     torvalds@linux-foundation.org
+Cc:     dhowells@redhat.com, Rasmus Villemoes <linux@rasmusvillemoes.dk>,
+        Greg Kroah-Hartman <gregkh@linuxfoundation.org>,
+        Peter Zijlstra <peterz@infradead.org>,
+        nicolas.dichtel@6wind.com, raven@themaw.net,
+        Christian Brauner <christian@brauner.io>, dhowells@redhat.com,
+        keyrings@vger.kernel.org, linux-usb@vger.kernel.org,
+        linux-block@vger.kernel.org, linux-security-module@vger.kernel.org,
+        linux-fsdevel@vger.kernel.org, linux-api@vger.kernel.org,
+        linux-security-module@vger.kernel.org, linux-kernel@vger.kernel.org
+Date:   Wed, 23 Oct 2019 21:17:04 +0100
+Message-ID: <157186182463.3995.13922458878706311997.stgit@warthog.procyon.org.uk>
+User-Agent: StGit/unknown-version
 MIME-Version: 1.0
-In-Reply-To: <x49d0ennw1y.fsf@segfault.boston.devel.redhat.com>
-Content-Type: text/plain; charset=windows-1252
-Content-Language: en-US
-Content-Transfer-Encoding: 7bit
+X-Scanned-By: MIMEDefang 2.79 on 10.5.11.15
+X-MC-Unique: 7oQmPxgHOp-fA6EnANPl_g-1
+X-Mimecast-Spam-Score: 0
+Content-Type: text/plain; charset=UTF-8
+Content-Transfer-Encoding: quoted-printable
 Sender: linux-block-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-On 10/23/19 12:42 PM, Jeff Moyer wrote:
-> Jackie Liu <liuyun01@kylinos.cn> writes:
-> 
->> If cq_entries is smaller than sq_entries, it will cause a lot of overflow
->> to appear. when customizing cq_entries, at least let him be no smaller than
->> sq_entries.
->>
->> Fixes: 95d8765bd9f2 ("io_uring: allow application controlled CQ ring size")
->> Signed-off-by: Jackie Liu <liuyun01@kylinos.cn>
->> ---
->>   fs/io_uring.c | 2 +-
->>   1 file changed, 1 insertion(+), 1 deletion(-)
->>
->> diff --git a/fs/io_uring.c b/fs/io_uring.c
->> index b64cd2c..dfa9731 100644
->> --- a/fs/io_uring.c
->> +++ b/fs/io_uring.c
->> @@ -3784,7 +3784,7 @@ static int io_uring_create(unsigned entries, struct io_uring_params *p)
->>   		 * to a power-of-two, if it isn't already. We do NOT impose
->>   		 * any cq vs sq ring sizing.
->>   		 */
->> -		if (!p->cq_entries || p->cq_entries > IORING_MAX_CQ_ENTRIES)
->> +		if (p->cq_entries < p->sq_entries || p->cq_entries > IORING_MAX_CQ_ENTRIES)
-> 
-> What if they're both zero?  I think you want to keep that check.
 
-sq_entries being zero is already checked and failed at this point.
-So I think the patch looks fine from that perspective.
+Here's a set of preparatory patches for building a general notification
+queue on top of pipes.  It makes a number of significant changes:
 
-Is there really a strong reason to disallow this? Yes, it could
-cause overflows, but it's just doing what was asked for. The
-normal case is of course cq_entries being much larger than
-sq_entries.
+ (1) It removes the nr_exclusive argument from __wake_up_sync_key() as this
+     is always 1.  This prepares for step 2.
 
--- 
-Jens Axboe
+ (2) Adds wake_up_interruptible_sync_poll_locked() so that poll can be
+     woken up from a function that's holding the poll waitqueue spinlock.
+
+ (3) Change the pipe buffer ring to be managed in terms of unbounded head
+     and tail indices rather than bounded index and length.  This means
+     that reading the pipe only needs to modify one index, not two.
+
+ (4) A selection of helper functions are provided to query the state of the
+     pipe buffer, plus a couple to apply updates to the pipe indices.
+
+ (5) The pipe ring is allowed to have kernel-reserved slots.  This allows
+     many notification messages to be spliced in by the kernel without
+     allowing userspace to pin too many pages if it writes to the same
+     pipe.
+
+ (6) Advance the head and tail indices inside the pipe waitqueue lock and
+     use step 2 to poke poll without having to take the lock twice.
+
+ (7) Rearrange pipe_write() to preallocate the buffer it is going to write
+     into and then drop the spinlock.  This allows kernel notifications to
+     then be added the ring whilst it is filling the buffer it allocated.
+     The read side is stalled because the pipe mutex is still held.
+
+ (8) Don't wake up readers on a pipe if there was already data in it when
+     we added more.
+
+ (9) Don't wake up writers on a pipe if the ring wasn't full before we
+     removed a buffer.
+
+The patches can be found here also:
+
+=09http://git.kernel.org/cgit/linux/kernel/git/dhowells/linux-fs.git/log/?h=
+=3Dpipe-experimental
+
+PATCHES=09BENCHMARK=09BEST=09=09TOTAL BYTES=09AVG BYTES=09STDDEV
+=3D=3D=3D=3D=3D=3D=3D=09=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=09=3D=
+=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=09=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=
+=3D=3D=3D=3D=3D=09=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=09=3D=3D=3D=
+=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D
+-=09pipe=09=09      307457969=09    36348556755=09      302904639=09       =
+10622403
+-=09splice=09=09      287117614=09    26933658717=09      224447155=09     =
+ 160777958
+-=09vmsplice=09      435180375=09    51302964090=09      427524700=09      =
+ 19083037
+
+rm-nrx=09pipe=09=09      311091179=09    37093181356=09      309109844=09  =
+      7221622
+rm-nrx=09splice=09=09      285628049=09    27916298942=09      232635824=09=
+      158296431
+rm-nrx=09vmsplice=09      417703153=09    47570362546=09      396419687=09 =
+      33960822
+
+wakesl=09pipe=09=09      310698731=09    36772541631=09      306437846=09  =
+      8249347
+wakesl=09splice=09=09      286193726=09    28600435451=09      238336962=09=
+      141169318
+wakesl=09vmsplice=09      436175803=09    50723895824=09      422699131=09 =
+      40724240
+
+ht=09pipe=09=09      305534565=09    36426079543=09      303550662=09      =
+  5673885
+ht=09splice=09=09      243632025=09    23319439010=09      194328658=09    =
+  150479853
+ht=09vmsplice=09      432825176=09    49101781001=09      409181508=09     =
+  44102509
+
+k-rsv=09pipe=09=09      308691523=09    36652267561=09      305435563=09   =
+    12972559
+k-rsv=09splice=09=09      244793528=09    23625172865=09      196876440=09 =
+     125319143
+k-rsv=09vmsplice=09      436119082=09    49460808579=09      412173404=09  =
+     55547525
+
+r-adv-t=09pipe=09=09      310094218=09    36860182219=09      307168185=09 =
+       8081101
+r-adv-t=09splice=09=09      285527382=09    27085052687=09      225708772=
+=09      206918887
+r-adv-t=09vmsplice=09      336885948=09    40128756927=09      334406307=09=
+        5895935
+
+r-cond=09pipe=09=09      308727804=09    36635828180=09      305298568=09  =
+      9976806
+r-cond=09splice=09=09      284467568=09    28445793054=09      237048275=09=
+      200284329
+r-cond=09vmsplice=09      449679489=09    51134833848=09      426123615=09 =
+      66790875
+
+w-preal=09pipe=09=09      307416578=09    36662086426=09      305517386=09 =
+       6216663
+w-preal=09splice=09=09      282655051=09    28455249109=09      237127075=
+=09      194154549
+w-preal=09vmsplice=09      437002601=09    47832160621=09      398601338=09=
+       96513019
+
+w-redun=09pipe=09=09      307279630=09    36329750422=09      302747920=09 =
+       8913567
+w-redun=09splice=09=09      284324488=09    27327152734=09      227726272=
+=09      219735663
+w-redun=09vmsplice=09      451141971=09    51485257719=09      429043814=09=
+       51388217
+
+w-ckful=09pipe=09=09      305055247=09    36374947350=09      303124561=09 =
+       5400728
+w-ckful=09splice=09=09      281575308=09    26841554544=09      223679621=
+=09      215942886
+w-ckful=09vmsplice=09      436653588=09    47564907110=09      396374225=09=
+       82255342
+
+The patches column indicates the point in the patchset at which the benchma=
+rks
+were taken:
+
+=090=09No patches
+=09rm-nrx=09"Remove the nr_exclusive argument from __wake_up_sync_key()"
+=09wakesl=09"Add wake_up_interruptible_sync_poll_locked()"
+=09ht=09"pipe: Use head and tail pointers for the ring, not cursor and leng=
+th"
+=09k-rsv=09"pipe: Allow pipes to have kernel-reserved slots"
+=09r-adv-t=09"pipe: Advance tail pointer inside of wait spinlock in pipe_re=
+ad()"
+=09r-cond=09"pipe: Conditionalise wakeup in pipe_read()"
+=09w-preal=09"pipe: Rearrange sequence in pipe_write() to preallocate slot"
+=09w-redun=09"pipe: Remove redundant wakeup from pipe_write()"
+=09w-ckful=09"pipe: Check for ring full inside of the spinlock in pipe_writ=
+e()"
+
+Changes:
+
+ ver #2:
+
+ (*) Split the notification patches out into a separate branch.
+
+ (*) Removed the nr_exclusive parameter from __wake_up_sync_key().
+
+ (*) Renamed the locked wakeup function.
+
+ (*) Add helpers for empty, full, occupancy.
+
+ (*) Split the addition of ->max_usage out into its own patch.
+
+ (*) Fixed some bits pointed out by Rasmus Villemoes.
+
+ ver #1:
+
+ (*) Build on top of standard pipes instead of having a driver.
+
+David
+---
+David Howells (10):
+      pipe: Reduce #inclusion of pipe_fs_i.h
+      Remove the nr_exclusive argument from __wake_up_sync_key()
+      Add wake_up_interruptible_sync_poll_locked()
+      pipe: Use head and tail pointers for the ring, not cursor and length
+      pipe: Allow pipes to have kernel-reserved slots
+      pipe: Advance tail pointer inside of wait spinlock in pipe_read()
+      pipe: Conditionalise wakeup in pipe_read()
+      pipe: Rearrange sequence in pipe_write() to preallocate slot
+      pipe: Remove redundant wakeup from pipe_write()
+      pipe: Check for ring full inside of the spinlock in pipe_write()
+
+
+ fs/exec.c                  |    1=20
+ fs/fuse/dev.c              |   31 +++--
+ fs/ocfs2/aops.c            |    1=20
+ fs/pipe.c                  |  225 ++++++++++++++++++++++---------------
+ fs/splice.c                |  188 +++++++++++++++++++------------
+ include/linux/pipe_fs_i.h  |   90 ++++++++++++++-
+ include/linux/uio.h        |    4 -
+ include/linux/wait.h       |   11 +-
+ kernel/exit.c              |    2=20
+ kernel/sched/wait.c        |   37 ++++--
+ lib/iov_iter.c             |  266 +++++++++++++++++++++++++---------------=
+----
+ security/smack/smack_lsm.c |    1=20
+ 12 files changed, 541 insertions(+), 316 deletions(-)
 
