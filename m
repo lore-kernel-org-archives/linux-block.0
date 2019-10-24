@@ -2,113 +2,106 @@ Return-Path: <SRS0=pYcy=YR=vger.kernel.org=linux-block-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-9.7 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
-	INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,
-	URIBL_BLOCKED,USER_AGENT_GIT autolearn=ham autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-2.2 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
+	MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,USER_AGENT_SANE_1 autolearn=no
+	autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id DA11CCA9EAF
-	for <linux-block@archiver.kernel.org>; Thu, 24 Oct 2019 17:31:01 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 8C430CA9EAF
+	for <linux-block@archiver.kernel.org>; Thu, 24 Oct 2019 17:41:58 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.kernel.org (Postfix) with ESMTP id B0AE5205C9
-	for <linux-block@archiver.kernel.org>; Thu, 24 Oct 2019 17:31:01 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id 6AB5F205ED
+	for <linux-block@archiver.kernel.org>; Thu, 24 Oct 2019 17:41:58 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1732485AbfJXRbB (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Thu, 24 Oct 2019 13:31:01 -0400
-Received: from mx2.suse.de ([195.135.220.15]:47282 "EHLO mx1.suse.de"
-        rhost-flags-OK-OK-OK-FAIL) by vger.kernel.org with ESMTP
-        id S1729458AbfJXRbB (ORCPT <rfc822;linux-block@vger.kernel.org>);
-        Thu, 24 Oct 2019 13:31:01 -0400
-X-Virus-Scanned: by amavisd-new at test-mx.suse.de
-Received: from relay2.suse.de (unknown [195.135.220.254])
-        by mx1.suse.de (Postfix) with ESMTP id 59819B0DA;
-        Thu, 24 Oct 2019 17:30:59 +0000 (UTC)
-Received: by ds.suse.cz (Postfix, from userid 10065)
-        id 2C231DA733; Thu, 24 Oct 2019 19:31:11 +0200 (CEST)
-From:   David Sterba <dsterba@suse.com>
-To:     linux-block@vger.kernel.org
-Cc:     David Sterba <dsterba@suse.com>
-Subject: [PATCH] block: reorder bio::__bi_remaining for better packing
-Date:   Thu, 24 Oct 2019 19:31:10 +0200
-Message-Id: <dacdf91e8d1af60ce5675a87615bdf271e9a3e17.1571938064.git.dsterba@suse.com>
-X-Mailer: git-send-email 2.23.0
+        id S2389989AbfJXRl6 (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Thu, 24 Oct 2019 13:41:58 -0400
+Received: from mail-pg1-f196.google.com ([209.85.215.196]:40640 "EHLO
+        mail-pg1-f196.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S1729458AbfJXRl5 (ORCPT
+        <rfc822;linux-block@vger.kernel.org>);
+        Thu, 24 Oct 2019 13:41:57 -0400
+Received: by mail-pg1-f196.google.com with SMTP id 15so9308570pgt.7
+        for <linux-block@vger.kernel.org>; Thu, 24 Oct 2019 10:41:56 -0700 (PDT)
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20161025;
+        h=x-gm-message-state:subject:to:cc:references:from:message-id:date
+         :user-agent:mime-version:in-reply-to:content-language
+         :content-transfer-encoding;
+        bh=BMcyTj+Igo26pSD2m3juY7K786wQFq82aTRnWyvfbFw=;
+        b=rIJV6Uw7qcpW+QYIf/wa3+9mO2D/1/B16CuC3B5k20/+tW26chkp/K1hMe5DPDU9q4
+         +cbd+3zSdT3jtyWTzRJ34JDQ964d0/3sIPWAFmlyn5IUcfwOtLRWqG+4bT6fIqG9a1Oy
+         ZBazuLhlPWCOSnzFeYxEu90+YNrcxrReGjOdxQ87HW9pFfwuonaCxUsFEOeTPHf8YcxP
+         FXaDhhDVbQsHXNiyoLJzHwzelQKOCZwfz3dIN+x11cDXv6FG7CEcaWOXU6YOy5emGEcL
+         zBQkRA25rrGrG0uSAmhFMpr6zqr0NbO5wJwblMHBe+4jLTd5ZdwIG7cIiUt8y90UG/o7
+         Jnsw==
+X-Gm-Message-State: APjAAAWRZLyGp2MreNh24J8f7Tw5dY8afLN7e8CeZ7Wgdt5UoJAHWTV5
+        weRjuxBFxl5XokzVWcPVlB0=
+X-Google-Smtp-Source: APXvYqz6OBLt4IbP0YCqkc17XZjrn8PshqXWq5EYaytvDm9h0OdfCcK80OxN4khlo1zYp4xVt5d4cg==
+X-Received: by 2002:a65:6903:: with SMTP id s3mr17435247pgq.195.1571938911798;
+        Thu, 24 Oct 2019 10:41:51 -0700 (PDT)
+Received: from desktop-bart.svl.corp.google.com ([2620:15c:2cd:202:4308:52a3:24b6:2c60])
+        by smtp.gmail.com with ESMTPSA id d7sm14400119pgv.6.2019.10.24.10.41.50
+        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
+        Thu, 24 Oct 2019 10:41:50 -0700 (PDT)
+Subject: Re: [PATCH blktests 1/2] Move and rename uptime_s()
+To:     Omar Sandoval <osandov@osandov.com>
+Cc:     Omar Sandoval <osandov@fb.com>, linux-block@vger.kernel.org,
+        Johannes Thumshirn <jthumshirn@suse.de>
+References: <20191021225719.211651-1-bvanassche@acm.org>
+ <20191021225719.211651-2-bvanassche@acm.org> <20191024172741.GA137052@vader>
+From:   Bart Van Assche <bvanassche@acm.org>
+Message-ID: <931f12af-d28f-0b32-9b09-42ad206827e8@acm.org>
+Date:   Thu, 24 Oct 2019 10:41:49 -0700
+User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:60.0) Gecko/20100101
+ Thunderbird/60.9.0
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
+In-Reply-To: <20191024172741.GA137052@vader>
+Content-Type: text/plain; charset=utf-8; format=flowed
+Content-Language: en-US
+Content-Transfer-Encoding: 7bit
 Sender: linux-block-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-Simple reordering of __bi_remaining can reduce bio size by 8 bytes that
-are now wasted on padding (measured on x86_64):
+On 10/24/19 10:27 AM, Omar Sandoval wrote:
+> On Mon, Oct 21, 2019 at 03:57:18PM -0700, Bart Van Assche wrote:
+>> +# System uptime in seconds.
+>> +_uptime_s() {
+>> +	local a b
+>> +
+>> +	echo "$(</proc/uptime)" | {
+> 
+> What's wrong with cat /proc/uptime? Or even better,
+> 
+>    { read ... } < /proc/uptime
 
-struct bio {
-        struct bio *               bi_next;              /*     0     8 */
-        struct gendisk *           bi_disk;              /*     8     8 */
-        unsigned int               bi_opf;               /*    16     4 */
-        short unsigned int         bi_flags;             /*    20     2 */
-        short unsigned int         bi_ioprio;            /*    22     2 */
-        short unsigned int         bi_write_hint;        /*    24     2 */
-        blk_status_t               bi_status;            /*    26     1 */
-        u8                         bi_partno;            /*    27     1 */
+Hi Omar,
 
-        /* XXX 4 bytes hole, try to pack */
+As you probably know 'cat' triggers a fork() system call but echo 
+$(<...) not. This is a performance optimization. Input redirection would 
+also work.
 
-        struct bvec_iter   bi_iter;                      /*    32    24 */
+>> +		read -r a b && echo "$b" >/dev/null && echo "${a%%.*}";
+> 
+> What's the point of the echo "$b" here?
 
-        /* XXX last struct has 4 bytes of padding */
+That echo "$b" statement suppresses a shellcheck warning about $b not 
+being used.
 
-        atomic_t                   __bi_remaining;       /*    56     4 */
+> Seems like this could all be condensed to:
+> 
+>    { read -r s && echo "${s%%.*}" } < /proc/uptime
+> 
+> But that's more cryptic than it needs to be. Can we just do:
+> 
+>    awk '{ print int($1) }' /proc/uptime
 
-        /* XXX 4 bytes hole, try to pack */
-[...]
-        /* size: 104, cachelines: 2, members: 19 */
-        /* sum members: 96, holes: 2, sum holes: 8 */
-        /* paddings: 1, sum paddings: 4 */
-        /* last cacheline: 40 bytes */
-};
+That's a valid alternative, but an alternative that triggers a fork() 
+system call. I don't have a strong opinion about which alternative to 
+choose. Do you perhaps have a preference?
 
-Now becomes:
+Thanks,
 
-struct bio {
-        struct bio *               bi_next;              /*     0     8 */
-        struct gendisk *           bi_disk;              /*     8     8 */
-        unsigned int               bi_opf;               /*    16     4 */
-        short unsigned int         bi_flags;             /*    20     2 */
-        short unsigned int         bi_ioprio;            /*    22     2 */
-        short unsigned int         bi_write_hint;        /*    24     2 */
-        blk_status_t               bi_status;            /*    26     1 */
-        u8                         bi_partno;            /*    27     1 */
-        atomic_t                   __bi_remaining;       /*    28     4 */
-        struct bvec_iter   bi_iter;                      /*    32    24 */
+Bart.
 
-        /* XXX last struct has 4 bytes of padding */
-[...]
-        /* size: 96, cachelines: 2, members: 19 */
-        /* paddings: 1, sum paddings: 4 */
-        /* last cacheline: 32 bytes */
-};
-
-Signed-off-by: David Sterba <dsterba@suse.com>
----
- include/linux/blk_types.h | 2 +-
- 1 file changed, 1 insertion(+), 1 deletion(-)
-
-diff --git a/include/linux/blk_types.h b/include/linux/blk_types.h
-index d688b96d1d63..1e7eeec16458 100644
---- a/include/linux/blk_types.h
-+++ b/include/linux/blk_types.h
-@@ -153,10 +153,10 @@ struct bio {
- 	unsigned short		bi_write_hint;
- 	blk_status_t		bi_status;
- 	u8			bi_partno;
-+	atomic_t		__bi_remaining;
- 
- 	struct bvec_iter	bi_iter;
- 
--	atomic_t		__bi_remaining;
- 	bio_end_io_t		*bi_end_io;
- 
- 	void			*bi_private;
--- 
-2.23.0
 
