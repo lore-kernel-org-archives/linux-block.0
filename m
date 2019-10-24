@@ -2,136 +2,112 @@ Return-Path: <SRS0=pYcy=YR=vger.kernel.org=linux-block-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-8.2 required=3.0 tests=DKIM_SIGNED,DKIM_VALID,
-	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,
-	SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED,USER_AGENT_SANE_1 autolearn=ham
-	autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-5.2 required=3.0 tests=DKIM_SIGNED,DKIM_VALID,
+	HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,
+	SPF_PASS,URIBL_BLOCKED,USER_AGENT_SANE_1 autolearn=ham autolearn_force=no
+	version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id B7CA8CA9EB9
-	for <linux-block@archiver.kernel.org>; Thu, 24 Oct 2019 03:32:56 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 2E9DDCA9EB9
+	for <linux-block@archiver.kernel.org>; Thu, 24 Oct 2019 03:39:06 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.kernel.org (Postfix) with ESMTP id 8627621655
-	for <linux-block@archiver.kernel.org>; Thu, 24 Oct 2019 03:32:56 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id 0136420679
+	for <linux-block@archiver.kernel.org>; Thu, 24 Oct 2019 03:39:06 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel-dk.20150623.gappssmtp.com header.i=@kernel-dk.20150623.gappssmtp.com header.b="l5kJGcsH"
+	dkim=pass (2048-bit key) header.d=kernel-dk.20150623.gappssmtp.com header.i=@kernel-dk.20150623.gappssmtp.com header.b="T2bbeZtv"
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S2392921AbfJXDc4 (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Wed, 23 Oct 2019 23:32:56 -0400
-Received: from mail-pg1-f195.google.com ([209.85.215.195]:43440 "EHLO
-        mail-pg1-f195.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S2392892AbfJXDcz (ORCPT
+        id S2406506AbfJXDjF (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Wed, 23 Oct 2019 23:39:05 -0400
+Received: from mail-pl1-f193.google.com ([209.85.214.193]:44063 "EHLO
+        mail-pl1-f193.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S2408307AbfJXDjF (ORCPT
         <rfc822;linux-block@vger.kernel.org>);
-        Wed, 23 Oct 2019 23:32:55 -0400
-Received: by mail-pg1-f195.google.com with SMTP id l24so8418034pgh.10
-        for <linux-block@vger.kernel.org>; Wed, 23 Oct 2019 20:32:55 -0700 (PDT)
+        Wed, 23 Oct 2019 23:39:05 -0400
+Received: by mail-pl1-f193.google.com with SMTP id q15so11138962pll.11
+        for <linux-block@vger.kernel.org>; Wed, 23 Oct 2019 20:39:04 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=kernel-dk.20150623.gappssmtp.com; s=20150623;
         h=subject:to:cc:references:from:message-id:date:user-agent
          :mime-version:in-reply-to:content-language:content-transfer-encoding;
-        bh=x9yyQ2FOaYcmSfcpOJxtcwGG2Qu1XU68PHFcRqzXa3M=;
-        b=l5kJGcsHDzkhBVaQTnz47UD9J1r2EmTtlolEqaO5EjuBlCtue3iG0RvKqmtBm2YwXR
-         +8xepoTs24e/xk4M/s+f7E7+EwKKKZp/FE5YERFeXwtjz1auyqSYxDJUMg8UbLlaPFdB
-         3VffsRs0Ugwj+erGFiWCyDNCi9CJRFmgsh7fQHFjQ9wNJPwdh/k2PXzAOk0VFHWDHWu+
-         IajaTpK1/Gk7IONkVrWywQ/wiPOs4C5HohianltFhvm24sSeWfmeoRgxEk9olnOESANF
-         O6TMAkmFj5lXneRX4r7OL4lDekc3wS/p1piBZzlQcYYcdTguBhAAsN5e4jrx1Bc5YZT1
-         OK6Q==
+        bh=W8sgLGjMxM6EuY1mpsS+9Tn33OqsmcrGz0uhv99VAHA=;
+        b=T2bbeZtvsO039PfGe+EjPR125EqRdU9mKD894GYoR0zBnNNVcSR1u3DGiXZFKGUrwF
+         Q1L4mEl5u7aBDGEgAvXjkzTOXSSGhbHMY7JwyTtpuA/1lUXfeioaDSSD5DwpPF81FKT1
+         ajJMYUZOWHJQq3Czs4YHreOwy2CVWx9lD7yEqbXak5+nnWYpgJsNSp3cviar/kEx8g3A
+         JL2eoJFhv69W7IpzFJO3QBiRSBRWpD2PYo0i6gZ0SVVJGOTgtJG3panMDXQqq/fdjcQQ
+         JYHL/HihPBR2U1KB50B+TI1h2RA9YPd7A7tX1ZQWp7kanwYzwZ3TCAZYt7pKgxi2zf4H
+         C+5w==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=1e100.net; s=20161025;
         h=x-gm-message-state:subject:to:cc:references:from:message-id:date
          :user-agent:mime-version:in-reply-to:content-language
          :content-transfer-encoding;
-        bh=x9yyQ2FOaYcmSfcpOJxtcwGG2Qu1XU68PHFcRqzXa3M=;
-        b=hwSVODfEnW8Zq7TbATZFgq1FRSiI8cOB7wuV3Mwqd87Z1upyy7XuhAh/P1LmBsEcjE
-         +IucyLNhUVxfTTWJiMuKJsTzwDDQkg0ssbFoX040YFhRIeGEx+9S1Kd0gwUaJbd17pMA
-         s+Av+EQTnFrAgGynYlZQ38bvsInDSkpaj2EFh3DY4yfkNsI/OHwqOjC8y0PFPWX7x8gV
-         17MDUiPOYfjcPNOk+XHViq7MSY0IaB9uOyj2Ytuowzi+Ra6+5TTcIlvP6SOsEoA65zaI
-         kERv/CUEcij5inhpYBgBjRMajYIEXUbqV6Izi/T68SDIuVL2adz/CTLHwoWtDqPz4ZiR
-         Mphw==
-X-Gm-Message-State: APjAAAXI734h2FY1k26n4SV7+51a9insucbBXfSvoSudGbXoTPg+thcn
-        bi+rzO07djX5dWLRY9dzfPc7+Kkt0KqYSg==
-X-Google-Smtp-Source: APXvYqxbNeSTJySZFCyFfN/ef676Nbp3ELs2xUm7ue0KSYLuBZnSumm7Lik1hNs0oOuY7TDT2WmUdg==
-X-Received: by 2002:a63:c40e:: with SMTP id h14mr13966574pgd.254.1571887975017;
-        Wed, 23 Oct 2019 20:32:55 -0700 (PDT)
+        bh=W8sgLGjMxM6EuY1mpsS+9Tn33OqsmcrGz0uhv99VAHA=;
+        b=aDkw66dcK3J6IgCsv18b1sxQvUGCFb/TfmV2oWmyHps9JHwAO55+vR/tX3H//oEjMS
+         Ij66pcZhR3r33tU+zIjxuIoIGU38BLZxJ0wCqexK3tpiGXQtfHMLkSvM+qYuugOF3l7J
+         x6SReqmUeVIjfS34IOx6tZwW3+1+ybhC4QzpKAuF0FbRnNSAHKNukQF57ew/yHJJMZI0
+         eackhLYhnQ7vJcdMd/FejByWw/joSLzTqzWITg2YRjmCVOPMSr6/yG/h4wGRU/S1Bbq9
+         1D1XvvX+QNFUfIj3+Hi15SD2y7ojmAAWnxPAyYWTxnVKdZCKubTU1Q/wCE4y5is5gS25
+         kToQ==
+X-Gm-Message-State: APjAAAUzftuJRlujlYky6UVBOTpX+L40fvLwUaEYJ1TVtxgOzxmvRVxU
+        y96MSFp4OLYzL/g5Pkvd1AJ4ow==
+X-Google-Smtp-Source: APXvYqzjuWYGP5CVydefv3aAYM4Zf7GeakbWEIFeuKC0sgKLKckuazE4qo+gNK3oOsra0rup9w7uiQ==
+X-Received: by 2002:a17:902:968f:: with SMTP id n15mr13304176plp.191.1571888344349;
+        Wed, 23 Oct 2019 20:39:04 -0700 (PDT)
 Received: from [192.168.1.188] ([66.219.217.79])
-        by smtp.gmail.com with ESMTPSA id n2sm25393079pgg.77.2019.10.23.20.32.52
+        by smtp.gmail.com with ESMTPSA id b17sm9759144pfr.17.2019.10.23.20.39.01
         (version=TLS1_2 cipher=ECDHE-RSA-AES128-GCM-SHA256 bits=128/128);
-        Wed, 23 Oct 2019 20:32:54 -0700 (PDT)
-Subject: Re: [PATCH] blk-mq: remove needless goto from blk_mq_get_driver_tag
-To:     Bart Van Assche <bvanassche@acm.org>,
-        =?UTF-8?Q?Andr=c3=a9_Almeida?= <andrealmeid@collabora.com>,
-        linux-block@vger.kernel.org, linux-kernel@vger.kernel.org
-Cc:     kernel@collabora.com, krisman@collabora.com
-References: <20191022174108.15554-1-andrealmeid@collabora.com>
- <2a8a99a6-4b39-e459-988a-ba9502919044@acm.org>
+        Wed, 23 Oct 2019 20:39:03 -0700 (PDT)
+Subject: Re: [Kgdb-bugreport] [PATCH] kernel: convert switch/case fallthrough
+ comments to fallthrough;
+To:     Joe Perches <joe@perches.com>,
+        Daniel Thompson <daniel.thompson@linaro.org>
+Cc:     Linus Torvalds <torvalds@linux-foundation.org>,
+        linux-pm@vger.kernel.org, kgdb-bugreport@lists.sourceforge.net,
+        linux-kernel@vger.kernel.org, linux-block@vger.kernel.org,
+        linux-security-module@vger.kernel.org, linux-audit@redhat.com,
+        netdev@vger.kernel.org, bpf@vger.kernel.org
+References: <f31b38b9ad515a138edaecf85701b1e3db064114.camel@perches.com>
+ <20191021090909.yjyed4qodjjcioqc@holly.lan>
+ <bff0a1c4fc69b83c763ffbce42a0152e1573499a.camel@perches.com>
 From:   Jens Axboe <axboe@kernel.dk>
-Message-ID: <f3e19c37-2430-81d5-ed5b-bc15d93e93c2@kernel.dk>
-Date:   Wed, 23 Oct 2019 21:32:52 -0600
+Message-ID: <2808c960-6178-17b8-23d7-a6945987a658@kernel.dk>
+Date:   Wed, 23 Oct 2019 21:39:01 -0600
 User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:60.0) Gecko/20100101
  Thunderbird/60.9.0
 MIME-Version: 1.0
-In-Reply-To: <2a8a99a6-4b39-e459-988a-ba9502919044@acm.org>
+In-Reply-To: <bff0a1c4fc69b83c763ffbce42a0152e1573499a.camel@perches.com>
 Content-Type: text/plain; charset=utf-8
 Content-Language: en-US
-Content-Transfer-Encoding: 8bit
+Content-Transfer-Encoding: 7bit
 Sender: linux-block-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-On 10/23/19 7:34 PM, Bart Van Assche wrote:
-> On 2019-10-22 10:41, André Almeida wrote:
->> The only usage of the label "done" is when (rq->tag != -1) at the
->> begging of the function. Rather than jumping to label, we can just
->> remove this label and execute the code at the "if". Besides that,
->> the code that would be executed after the label "done" is the return of
->> the logical expression (rq->tag != -1) but since we are already inside
->> the if, we now that this is true. Remove the label and replace the goto
->> with the proper result of the label.
+On 10/23/19 12:49 PM, Joe Perches wrote:
+> On Mon, 2019-10-21 at 10:09 +0100, Daniel Thompson wrote:
+>> On Fri, Oct 18, 2019 at 09:35:08AM -0700, Joe Perches wrote:
+>>> Use the new pseudo keyword "fallthrough;" and not the
+>>> various /* fallthrough */ style comments.
+>>>
+>>> Signed-off-by: Joe Perches <joe@perches.com>
+>>> ---
+>>>
+>>> This is a single patch for the kernel/ source tree,
+>>> which would otherwise be sent through as separate
+>>> patches to 19 maintainer sections.
 >>
->> Signed-off-by: André Almeida <andrealmeid@collabora.com>
->> ---
->> Hello,
+>> For the kernel/debug/ files:
 >>
->> I've used `blktest` to check if this change add any regression. I have
->> used `./check block` and I got the same results with and without this
->> patch (a bunch of "passed" and three "not run" because of the virtual
->> scsi capabilities). Please let me know if there would be a better way to
->> test changes at block stack.
+>> Acked-by: Daniel Thompson <daniel.thompson@linaro.org>
 >>
->> This commit was rebase at linux-block/for-5.5/block.
->>
->> Thanks,
->> 	André
->> ---
->>   block/blk-mq.c | 3 +--
->>   1 file changed, 1 insertion(+), 2 deletions(-)
->>
->> diff --git a/block/blk-mq.c b/block/blk-mq.c
->> index 8538dc415499..1e067b78ab97 100644
->> --- a/block/blk-mq.c
->> +++ b/block/blk-mq.c
->> @@ -1036,7 +1036,7 @@ bool blk_mq_get_driver_tag(struct request *rq)
->>   	bool shared;
->>   
->>   	if (rq->tag != -1)
->> -		goto done;
->> +		return true;
->>   
->>   	if (blk_mq_tag_is_reserved(data.hctx->sched_tags, rq->internal_tag))
->>   		data.flags |= BLK_MQ_REQ_RESERVED;
->> @@ -1051,7 +1051,6 @@ bool blk_mq_get_driver_tag(struct request *rq)
->>   		data.hctx->tags->rqs[rq->tag] = rq;
->>   	}
->>   
->> -done:
->>   	return rq->tag != -1;
->>   }
+>> Will you be putting this in an immutable branch once you've collected
+>> enough acks?
 > 
-> Do we really need code changes like the above? I'm not aware of any text
-> in the Documentation/ directory that forbids the use of goto statements.
+> No, I expect Linus will either run the script
+> or apply this patch one day.
 
-Agree, it looks fine as-is. It's also a fast path, so I'd never get rid
-of that without looking at the generated code.
+Please coordinate and get something like this run/applied a few days
+before -rc1 to cause the least amount of needless merge issues.
 
 -- 
 Jens Axboe
