@@ -2,92 +2,81 @@ Return-Path: <SRS0=pYcy=YR=vger.kernel.org=linux-block-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-2.2 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
-	MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED,USER_AGENT_SANE_1
-	autolearn=no autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-0.8 required=3.0 tests=DKIM_SIGNED,DKIM_VALID,
+	DKIM_VALID_AU,HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SPF_HELO_NONE,
+	SPF_PASS autolearn=no autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id C6C50CA9EBB
-	for <linux-block@archiver.kernel.org>; Thu, 24 Oct 2019 10:09:03 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 27149CA9EBC
+	for <linux-block@archiver.kernel.org>; Thu, 24 Oct 2019 10:32:39 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.kernel.org (Postfix) with ESMTP id 9D06120663
-	for <linux-block@archiver.kernel.org>; Thu, 24 Oct 2019 10:09:03 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id E68C42084C
+	for <linux-block@archiver.kernel.org>; Thu, 24 Oct 2019 10:32:38 +0000 (UTC)
+Authentication-Results: mail.kernel.org;
+	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="KIlXMDOM"
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S2393242AbfJXKJC (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Thu, 24 Oct 2019 06:09:02 -0400
-Received: from www262.sakura.ne.jp ([202.181.97.72]:54102 "EHLO
-        www262.sakura.ne.jp" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S2393241AbfJXKJC (ORCPT
+        id S2438839AbfJXKch (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Thu, 24 Oct 2019 06:32:37 -0400
+Received: from us-smtp-2.mimecast.com ([205.139.110.61]:52553 "EHLO
+        us-smtp-delivery-1.mimecast.com" rhost-flags-OK-OK-OK-FAIL)
+        by vger.kernel.org with ESMTP id S2438842AbfJXKcd (ORCPT
         <rfc822;linux-block@vger.kernel.org>);
-        Thu, 24 Oct 2019 06:09:02 -0400
-Received: from fsav403.sakura.ne.jp (fsav403.sakura.ne.jp [133.242.250.102])
-        by www262.sakura.ne.jp (8.15.2/8.15.2) with ESMTP id x9OA8tth056753;
-        Thu, 24 Oct 2019 19:08:55 +0900 (JST)
-        (envelope-from penguin-kernel@I-love.SAKURA.ne.jp)
-Received: from www262.sakura.ne.jp (202.181.97.72)
- by fsav403.sakura.ne.jp (F-Secure/fsigk_smtp/550/fsav403.sakura.ne.jp);
- Thu, 24 Oct 2019 19:08:55 +0900 (JST)
-X-Virus-Status: clean(F-Secure/fsigk_smtp/550/fsav403.sakura.ne.jp)
-Received: from [192.168.1.8] (softbank126227201116.bbtec.net [126.227.201.116])
-        (authenticated bits=0)
-        by www262.sakura.ne.jp (8.15.2/8.15.2) with ESMTPSA id x9OA8n86056449
-        (version=TLSv1.2 cipher=AES256-SHA bits=256 verify=NO);
-        Thu, 24 Oct 2019 19:08:54 +0900 (JST)
-        (envelope-from penguin-kernel@I-love.SAKURA.ne.jp)
-Subject: Re: INFO: task syz-executor can't die for more than 143 seconds. (2)
-To:     axboe@kernel.dk
-References: <000000000000c52dbf05958f3f3a@google.com>
-Cc:     syzbot <syzbot+b48daca8639150bc5e73@syzkaller.appspotmail.com>,
-        linux-block@vger.kernel.org, linux-kernel@vger.kernel.org,
-        syzkaller-bugs@googlegroups.com
-From:   Tetsuo Handa <penguin-kernel@I-love.SAKURA.ne.jp>
-Message-ID: <3fbc4bb2-a03b-fbfa-4803-47a6d0075ff2@I-love.SAKURA.ne.jp>
-Date:   Thu, 24 Oct 2019 19:08:48 +0900
-User-Agent: Mozilla/5.0 (Windows NT 6.3; WOW64; rv:60.0) Gecko/20100101
- Thunderbird/60.9.0
+        Thu, 24 Oct 2019 06:32:33 -0400
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+        s=mimecast20190719; t=1571913152;
+        h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+         to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+         content-transfer-encoding:content-transfer-encoding:
+         in-reply-to:in-reply-to:references:references;
+        bh=LIKdOL11Ozx/PWJsb0Bia7eThEnrLMvgCNlbfPe+qhE=;
+        b=KIlXMDOMxKPSSAvg9kGz3sda5MqOHLHENWTns7LnTsjwebdSxKGRoLNaWyjz+ZKiMlapdy
+        ET9+jUDhssh/nyvu2t8dZ9AX9r28x9DJtvhtLC88fsX92D8kRAtL4Ma0bqqj+CP2BNn08a
+        Sr3vaii5XfMX/UDj3tx4+drhz/ejacI=
+Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
+ [209.132.183.4]) (Using TLS) by relay.mimecast.com with ESMTP id
+ us-mta-52-kf6BhbzrPzCAs2tEP3KZ1A-1; Thu, 24 Oct 2019 06:32:29 -0400
+Received: from smtp.corp.redhat.com (int-mx07.intmail.prod.int.phx2.redhat.com [10.5.11.22])
+        (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
+        (No client certificate requested)
+        by mimecast-mx01.redhat.com (Postfix) with ESMTPS id C9DA8107AD33;
+        Thu, 24 Oct 2019 10:32:26 +0000 (UTC)
+Received: from warthog.procyon.org.uk (ovpn-121-40.rdu2.redhat.com [10.10.121.40])
+        by smtp.corp.redhat.com (Postfix) with ESMTP id 14CB41001B30;
+        Thu, 24 Oct 2019 10:32:23 +0000 (UTC)
+Organization: Red Hat UK Ltd. Registered Address: Red Hat UK Ltd, Amberley
+        Place, 107-111 Peascod Street, Windsor, Berkshire, SI4 1TE, United
+        Kingdom.
+        Registered in England and Wales under Company Registration No. 3798903
+From:   David Howells <dhowells@redhat.com>
+In-Reply-To: <157186186167.3995.7568100174393739543.stgit@warthog.procyon.org.uk>
+References: <157186186167.3995.7568100174393739543.stgit@warthog.procyon.org.uk> <157186182463.3995.13922458878706311997.stgit@warthog.procyon.org.uk>
+To:     torvalds@linux-foundation.org
+Cc:     dhowells@redhat.com, Rasmus Villemoes <linux@rasmusvillemoes.dk>,
+        Greg Kroah-Hartman <gregkh@linuxfoundation.org>,
+        Peter Zijlstra <peterz@infradead.org>,
+        nicolas.dichtel@6wind.com, raven@themaw.net,
+        Christian Brauner <christian@brauner.io>,
+        keyrings@vger.kernel.org, linux-usb@vger.kernel.org,
+        linux-block@vger.kernel.org, linux-security-module@vger.kernel.org,
+        linux-fsdevel@vger.kernel.org, linux-api@vger.kernel.org,
+        linux-kernel@vger.kernel.org
+Subject: Re: [RFC PATCH 04/10] pipe: Use head and tail pointers for the ring, not cursor and length [ver #2]
 MIME-Version: 1.0
-In-Reply-To: <000000000000c52dbf05958f3f3a@google.com>
-Content-Type: text/plain; charset=utf-8
-Content-Language: en-US
-Content-Transfer-Encoding: 7bit
+Content-ID: <13193.1571913143.1@warthog.procyon.org.uk>
+Date:   Thu, 24 Oct 2019 11:32:23 +0100
+Message-ID: <13194.1571913143@warthog.procyon.org.uk>
+X-Scanned-By: MIMEDefang 2.84 on 10.5.11.22
+X-MC-Unique: kf6BhbzrPzCAs2tEP3KZ1A-1
+X-Mimecast-Spam-Score: 0
+Content-Type: text/plain; charset=WINDOWS-1252
+Content-Transfer-Encoding: quoted-printable
 Sender: linux-block-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-On 2019/10/23 16:56, syzbot wrote:
-> Hello,
-> 
-> syzbot found the following crash on:
-> 
-> HEAD commit:    c4b9850b Add linux-next specific files for 20191018
-> git tree:       linux-next
-> console output: https://syzkaller.appspot.com/x/log.txt?x=177b3ab0e00000
-> kernel config:  https://syzkaller.appspot.com/x/.config?x=c940ef12efcd1ec
-> dashboard link: https://syzkaller.appspot.com/bug?extid=b48daca8639150bc5e73
-> compiler:       gcc (GCC) 9.0.0 20181231 (experimental)
-> syz repro:      https://syzkaller.appspot.com/x/repro.syz?x=1356b8ff600000
-> C reproducer:   https://syzkaller.appspot.com/x/repro.c?x=14f48687600000
+I've pushed to git a new version that fixes an incomplete conversion in
+pipe_zero(), ports the powerpc virtio_console driver and fixes a comment in
+splice.
 
-The reproducer is trying to allocate 64TB of disk space on /dev/nullb0 using fallocate()
-but __blkdev_issue_zero_pages() cannot bail out upon SIGKILL (and therefore cannot
-terminate for minutes). Can we make it killable? I don't know what action is needed
-for undoing this loop...
-
-        while (nr_sects != 0) {
-                bio = blk_next_bio(bio, __blkdev_sectors_to_bio_pages(nr_sects),
-                                   gfp_mask);
-                bio->bi_iter.bi_sector = sector;
-                bio_set_dev(bio, bdev);
-                bio_set_op_attrs(bio, REQ_OP_WRITE, 0);
-
-                while (nr_sects != 0) {
-                        sz = min((sector_t) PAGE_SIZE, nr_sects << 9);
-                        bi_size = bio_add_page(bio, ZERO_PAGE(0), sz, 0);
-                        nr_sects -= bi_size >> 9;
-                        sector += bi_size >> 9;
-                        if (bi_size < sz)
-                                break;
-                }
-                cond_resched();
-        }
+David
 
