@@ -2,141 +2,113 @@ Return-Path: <SRS0=pYcy=YR=vger.kernel.org=linux-block-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-8.2 required=3.0 tests=DKIM_SIGNED,DKIM_VALID,
-	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,
-	SPF_HELO_NONE,SPF_PASS,USER_AGENT_SANE_1 autolearn=ham autolearn_force=no
-	version=3.4.0
+X-Spam-Status: No, score=-9.7 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
+	INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,
+	URIBL_BLOCKED,USER_AGENT_GIT autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id AE73BCA9EAF
-	for <linux-block@archiver.kernel.org>; Thu, 24 Oct 2019 17:27:44 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id DA11CCA9EAF
+	for <linux-block@archiver.kernel.org>; Thu, 24 Oct 2019 17:31:01 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.kernel.org (Postfix) with ESMTP id 7D6C4205F4
-	for <linux-block@archiver.kernel.org>; Thu, 24 Oct 2019 17:27:44 +0000 (UTC)
-Authentication-Results: mail.kernel.org;
-	dkim=pass (2048-bit key) header.d=osandov-com.20150623.gappssmtp.com header.i=@osandov-com.20150623.gappssmtp.com header.b="JDElgzDg"
+	by mail.kernel.org (Postfix) with ESMTP id B0AE5205C9
+	for <linux-block@archiver.kernel.org>; Thu, 24 Oct 2019 17:31:01 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S2394020AbfJXR1o (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Thu, 24 Oct 2019 13:27:44 -0400
-Received: from mail-pf1-f193.google.com ([209.85.210.193]:37786 "EHLO
-        mail-pf1-f193.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S2394016AbfJXR1n (ORCPT
-        <rfc822;linux-block@vger.kernel.org>);
-        Thu, 24 Oct 2019 13:27:43 -0400
-Received: by mail-pf1-f193.google.com with SMTP id y5so15557616pfo.4
-        for <linux-block@vger.kernel.org>; Thu, 24 Oct 2019 10:27:43 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=osandov-com.20150623.gappssmtp.com; s=20150623;
-        h=date:from:to:cc:subject:message-id:references:mime-version
-         :content-disposition:in-reply-to:user-agent;
-        bh=9BxP1cL6VQbmMqYHp3ibPVmUugc5Wzw3DmCG39KVxlU=;
-        b=JDElgzDgumMkvHpM6LwmgcwlnDwm1lYF/FXZh6IeuafwxGNoPnDbDdbsdLGHUR3wCS
-         usURHXYYYpyO3YLk6Q3bG3K81eVEqCydPJh0/8KJwHEqvmFIkLGSYeb6i5vkDi25UUjG
-         kYOEdYw5x5r9TBtTHsjMyy1zrXBm8DFXgBN0VgGkRuwfVDd0SSfBm2JzmsnZJRXX4uEq
-         LI6BdjAewi4FErfJ/4hCi/KOACcs6Veyqqbwlh9+VXKoNPMmnVAv2WxxQPuSjbHABocT
-         iJaS0DpbkD2tXh5jkHLMuckzGnAol6vc6ezbD/Czkq36v7uXllNuZ2IasCfFNeqLnixl
-         HnlQ==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20161025;
-        h=x-gm-message-state:date:from:to:cc:subject:message-id:references
-         :mime-version:content-disposition:in-reply-to:user-agent;
-        bh=9BxP1cL6VQbmMqYHp3ibPVmUugc5Wzw3DmCG39KVxlU=;
-        b=rR351+hw2tXldGO0FCZoRaHxwGSdUVin8O+5c2Cv5c3TLh1YaVY4/rguoRbCaab8hQ
-         DAS0gLN9FZ49WnynkcSg733QHDvPuuLWMIUYf2MW87GKyjWikQwpcaUR7BY0xNfwogGF
-         xjZWRLqci9Wd24Fu14yV5IpTXi9ghb8HLA8lznPEMYjs6fOIhbldHPOeAbuMTyvK/Hf/
-         YXdqs1ahbzT9AVAwAYubf1VnVzEjbAzJzwkZaOIFNSVwipRib1lZPxJHMy9K8jWj1UnK
-         nrhc3LucaeJKxwhk+0vBnPyCZRXO6CYInzUW28vhzuaU76h/b5K55Tn7zx+Fq2xQu0B2
-         VBvA==
-X-Gm-Message-State: APjAAAVkT2jzxrXtizcMJJFDm91oMTGr9CrXUKsqXPwNsa9D+KIxagPN
-        AzHN014wpUuBy/h/CiNuRLhyNw==
-X-Google-Smtp-Source: APXvYqxk8cc/Eyo3QSMlI4dY/nkQLzLXDXCr5R45TJEvYxtvVSeKnV4s/iNyJcKeOTDkHgv+Dj3GSw==
-X-Received: by 2002:a17:90a:a417:: with SMTP id y23mr8286434pjp.126.1571938062747;
-        Thu, 24 Oct 2019 10:27:42 -0700 (PDT)
-Received: from vader ([2601:602:8b80:8e0:e6a7:a0ff:fe0b:c9a8])
-        by smtp.gmail.com with ESMTPSA id w14sm29995486pge.56.2019.10.24.10.27.41
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Thu, 24 Oct 2019 10:27:42 -0700 (PDT)
-Date:   Thu, 24 Oct 2019 10:27:41 -0700
-From:   Omar Sandoval <osandov@osandov.com>
-To:     Bart Van Assche <bvanassche@acm.org>
-Cc:     Omar Sandoval <osandov@fb.com>, linux-block@vger.kernel.org,
-        Johannes Thumshirn <jthumshirn@suse.de>
-Subject: Re: [PATCH blktests 1/2] Move and rename uptime_s()
-Message-ID: <20191024172741.GA137052@vader>
-References: <20191021225719.211651-1-bvanassche@acm.org>
- <20191021225719.211651-2-bvanassche@acm.org>
+        id S1732485AbfJXRbB (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Thu, 24 Oct 2019 13:31:01 -0400
+Received: from mx2.suse.de ([195.135.220.15]:47282 "EHLO mx1.suse.de"
+        rhost-flags-OK-OK-OK-FAIL) by vger.kernel.org with ESMTP
+        id S1729458AbfJXRbB (ORCPT <rfc822;linux-block@vger.kernel.org>);
+        Thu, 24 Oct 2019 13:31:01 -0400
+X-Virus-Scanned: by amavisd-new at test-mx.suse.de
+Received: from relay2.suse.de (unknown [195.135.220.254])
+        by mx1.suse.de (Postfix) with ESMTP id 59819B0DA;
+        Thu, 24 Oct 2019 17:30:59 +0000 (UTC)
+Received: by ds.suse.cz (Postfix, from userid 10065)
+        id 2C231DA733; Thu, 24 Oct 2019 19:31:11 +0200 (CEST)
+From:   David Sterba <dsterba@suse.com>
+To:     linux-block@vger.kernel.org
+Cc:     David Sterba <dsterba@suse.com>
+Subject: [PATCH] block: reorder bio::__bi_remaining for better packing
+Date:   Thu, 24 Oct 2019 19:31:10 +0200
+Message-Id: <dacdf91e8d1af60ce5675a87615bdf271e9a3e17.1571938064.git.dsterba@suse.com>
+X-Mailer: git-send-email 2.23.0
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <20191021225719.211651-2-bvanassche@acm.org>
-User-Agent: Mutt/1.12.2 (2019-09-21)
+Content-Transfer-Encoding: 8bit
 Sender: linux-block-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-On Mon, Oct 21, 2019 at 03:57:18PM -0700, Bart Van Assche wrote:
-> Make it easy to use the uptime_s() function from block tests.
-> 
-> Signed-off-by: Bart Van Assche <bvanassche@acm.org>
-> ---
->  common/multipath-over-rdma | 9 +--------
->  common/rc                  | 9 +++++++++
->  tests/nvmeof-mp/rc         | 2 +-
->  tests/srp/014              | 2 +-
->  tests/srp/rc               | 2 +-
->  5 files changed, 13 insertions(+), 11 deletions(-)
-> 
-> diff --git a/common/multipath-over-rdma b/common/multipath-over-rdma
-> index 65ebb7b7f5f7..545a81e8c18e 100644
-> --- a/common/multipath-over-rdma
-> +++ b/common/multipath-over-rdma
-> @@ -129,19 +129,12 @@ held_by() {
->  	done
->  }
->  
-> -# System uptime in seconds.
-> -uptime_s() {
-> -	local a b
-> -
-> -	echo "$(</proc/uptime)" | { read -r a b && echo "${a%%.*}"; }
-> -}
-> -
->  # Sleep until either $1 seconds have elapsed or until the deadline $2 has been
->  # reached. Return 1 if and only if the deadline has been met.
->  sleep_until() {
->  	local duration=$1 deadline=$2 u
->  
-> -	u=$(uptime_s)
-> +	u=$(_uptime_s)
->  	if [ $((u + duration)) -le "$deadline" ]; then
->  		sleep "$duration"
->  	else
-> diff --git a/common/rc b/common/rc
-> index 41aee3aaa735..c00f2fe1f463 100644
-> --- a/common/rc
-> +++ b/common/rc
-> @@ -246,3 +246,12 @@ _test_dev_is_partition() {
->  _filter_xfs_io_error() {
->  	sed -e 's/^\(.*\)64\(: .*$\)/\1\2/'
->  }
-> +
-> +# System uptime in seconds.
-> +_uptime_s() {
-> +	local a b
-> +
-> +	echo "$(</proc/uptime)" | {
+Simple reordering of __bi_remaining can reduce bio size by 8 bytes that
+are now wasted on padding (measured on x86_64):
 
-What's wrong with cat /proc/uptime? Or even better,
+struct bio {
+        struct bio *               bi_next;              /*     0     8 */
+        struct gendisk *           bi_disk;              /*     8     8 */
+        unsigned int               bi_opf;               /*    16     4 */
+        short unsigned int         bi_flags;             /*    20     2 */
+        short unsigned int         bi_ioprio;            /*    22     2 */
+        short unsigned int         bi_write_hint;        /*    24     2 */
+        blk_status_t               bi_status;            /*    26     1 */
+        u8                         bi_partno;            /*    27     1 */
 
-  { read ... } < /proc/uptime
+        /* XXX 4 bytes hole, try to pack */
 
-> +		read -r a b && echo "$b" >/dev/null && echo "${a%%.*}";
+        struct bvec_iter   bi_iter;                      /*    32    24 */
 
-What's the point of the echo "$b" here? Seems like this could all be
-condensed to:
+        /* XXX last struct has 4 bytes of padding */
 
-  { read -r s && echo "${s%%.*}" } < /proc/uptime
+        atomic_t                   __bi_remaining;       /*    56     4 */
 
-But that's more cryptic than it needs to be. Can we just do:
+        /* XXX 4 bytes hole, try to pack */
+[...]
+        /* size: 104, cachelines: 2, members: 19 */
+        /* sum members: 96, holes: 2, sum holes: 8 */
+        /* paddings: 1, sum paddings: 4 */
+        /* last cacheline: 40 bytes */
+};
 
-  awk '{ print int($1) }' /proc/uptime
+Now becomes:
+
+struct bio {
+        struct bio *               bi_next;              /*     0     8 */
+        struct gendisk *           bi_disk;              /*     8     8 */
+        unsigned int               bi_opf;               /*    16     4 */
+        short unsigned int         bi_flags;             /*    20     2 */
+        short unsigned int         bi_ioprio;            /*    22     2 */
+        short unsigned int         bi_write_hint;        /*    24     2 */
+        blk_status_t               bi_status;            /*    26     1 */
+        u8                         bi_partno;            /*    27     1 */
+        atomic_t                   __bi_remaining;       /*    28     4 */
+        struct bvec_iter   bi_iter;                      /*    32    24 */
+
+        /* XXX last struct has 4 bytes of padding */
+[...]
+        /* size: 96, cachelines: 2, members: 19 */
+        /* paddings: 1, sum paddings: 4 */
+        /* last cacheline: 32 bytes */
+};
+
+Signed-off-by: David Sterba <dsterba@suse.com>
+---
+ include/linux/blk_types.h | 2 +-
+ 1 file changed, 1 insertion(+), 1 deletion(-)
+
+diff --git a/include/linux/blk_types.h b/include/linux/blk_types.h
+index d688b96d1d63..1e7eeec16458 100644
+--- a/include/linux/blk_types.h
++++ b/include/linux/blk_types.h
+@@ -153,10 +153,10 @@ struct bio {
+ 	unsigned short		bi_write_hint;
+ 	blk_status_t		bi_status;
+ 	u8			bi_partno;
++	atomic_t		__bi_remaining;
+ 
+ 	struct bvec_iter	bi_iter;
+ 
+-	atomic_t		__bi_remaining;
+ 	bio_end_io_t		*bi_end_io;
+ 
+ 	void			*bi_private;
+-- 
+2.23.0
+
