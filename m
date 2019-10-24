@@ -2,153 +2,106 @@ Return-Path: <SRS0=pYcy=YR=vger.kernel.org=linux-block-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-9.8 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
-	INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,
-	USER_AGENT_GIT autolearn=ham autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-0.9 required=3.0 tests=DKIMWL_WL_HIGH,DKIM_SIGNED,
+	DKIM_VALID,DKIM_VALID_AU,HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,
+	SPF_HELO_NONE,SPF_PASS autolearn=no autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 939CDCA9EBB
-	for <linux-block@archiver.kernel.org>; Thu, 24 Oct 2019 21:04:04 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 31BD9CA9EAF
+	for <linux-block@archiver.kernel.org>; Thu, 24 Oct 2019 21:30:13 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.kernel.org (Postfix) with ESMTP id 72B6621D71
-	for <linux-block@archiver.kernel.org>; Thu, 24 Oct 2019 21:04:04 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id 0114621A4C
+	for <linux-block@archiver.kernel.org>; Thu, 24 Oct 2019 21:30:13 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+	s=default; t=1571952613;
+	bh=e00/yHSlXvXqqf/JB2YJn64yA5+CxFA09Oq6zHURRsU=;
+	h=References:In-Reply-To:From:Date:Subject:To:Cc:List-ID:From;
+	b=zUAKMfZYpt7q94zPYGicy0rdZVianzx725CdBrAM+ssjVZ9o4jX0uHmbjkM10ZXeL
+	 YN/o7NtMrRljH/CauG+y9bCPE/xYkPhXEDvSjuZ83PdvQwYO5xfeRNbu30eM2Vm3ck
+	 HFwoPP+Ms3N+1h9TXA9PtGmbfQdzT3pUg7NOrRBs=
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1728825AbfJXVED (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Thu, 24 Oct 2019 17:04:03 -0400
-Received: from mail-pg1-f195.google.com ([209.85.215.195]:46506 "EHLO
-        mail-pg1-f195.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1726215AbfJXVED (ORCPT
+        id S1729273AbfJXVaM (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Thu, 24 Oct 2019 17:30:12 -0400
+Received: from mail-lj1-f194.google.com ([209.85.208.194]:39715 "EHLO
+        mail-lj1-f194.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S1729239AbfJXVaM (ORCPT
         <rfc822;linux-block@vger.kernel.org>);
-        Thu, 24 Oct 2019 17:04:03 -0400
-Received: by mail-pg1-f195.google.com with SMTP id f19so28959pgn.13
-        for <linux-block@vger.kernel.org>; Thu, 24 Oct 2019 14:04:02 -0700 (PDT)
+        Thu, 24 Oct 2019 17:30:12 -0400
+Received: by mail-lj1-f194.google.com with SMTP id y3so257494ljj.6
+        for <linux-block@vger.kernel.org>; Thu, 24 Oct 2019 14:30:11 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=linux-foundation.org; s=google;
+        h=mime-version:references:in-reply-to:from:date:message-id:subject:to
+         :cc;
+        bh=h5FP/voiQdxeaQU3Va8HH5cRZmi1OHTMwBKcRrrOo6E=;
+        b=G+CKE+0sNMbBuosjchwhgzz8NQwfbV/8kKBYcW1zgIA+wCHZXB0W4xnrddKNkrujly
+         nBXQf8TMFFxtwDaqAlubm1WQBu/DIP2jq0ClHTeKxpnxD8j4n3vqHGpl41RLHFrD0jXc
+         jfdzDY5G/0JxiPvAj8Pc7cihC14c7Kl2f6hiQ=
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=1e100.net; s=20161025;
-        h=x-gm-message-state:from:to:cc:subject:date:message-id:in-reply-to
-         :references:mime-version:content-transfer-encoding;
-        bh=WUzELtZ0/6O3O7y93j4oi5o6nnW4ejVR2cqHnlxjhqk=;
-        b=DFIiQgNd///C8hdOR1UesYuinnX5FWrM+ILQNcqoy+20o42ORn35Whr/ESWXvx0FMD
-         5/tJB9qNbbSSNE/ji3wAZjOVc1Z2IeFoshbLwTiJ4hZp0UJMQZAFZc5fvDcSNGqqoakq
-         2Q8HWPLSLyIZ4oR96vl1PHO4UYlFquDAbk9aNWuq0SLwpQ5hEyre2RQ2/hraKYFhQf1E
-         QOsiL/luQWe1kwDJsn8G+T6PqREwY8Ha9NsqzGBAhd1tL191Bc39RVZUpCG08j6F2XYW
-         9MzMf1i6KJZzbcV1hBji4MYjQ+PZgoeZrXV0pqDoFYQ5CId/42JjwOOraoqPl0bIqVfA
-         K6wA==
-X-Gm-Message-State: APjAAAUtTQgI0No/P1ORIkLmHjlaeJE431qG07SDJ9p+t2jm6fXKxYkC
-        gD8joLJYBiIMD+2OV3MYTTY=
-X-Google-Smtp-Source: APXvYqyHx2TreEJGpqbrJPW3URG/eYbuu+t/XBrDJa7nCz/L3SF7igj1jBo3b/bbWCoDH9G1/IzDoA==
-X-Received: by 2002:a65:49c9:: with SMTP id t9mr30681pgs.61.1571951042114;
-        Thu, 24 Oct 2019 14:04:02 -0700 (PDT)
-Received: from desktop-bart.svl.corp.google.com ([2620:15c:2cd:202:4308:52a3:24b6:2c60])
-        by smtp.gmail.com with ESMTPSA id i22sm28270127pgg.20.2019.10.24.14.04.00
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Thu, 24 Oct 2019 14:04:01 -0700 (PDT)
-From:   Bart Van Assche <bvanassche@acm.org>
-To:     Omar Sandoval <osandov@fb.com>
-Cc:     linux-block@vger.kernel.org,
-        Johannes Thumshirn <jthumshirn@suse.de>,
-        Chaitanya Kulkarni <chaitanya.kulkarni@wdc.com>,
-        Bart Van Assche <bvanassche@acm.org>
-Subject: [PATCH blktests v2 2/2] Add a test that triggers blk_mq_update_nr_hw_queues()
-Date:   Thu, 24 Oct 2019 14:03:52 -0700
-Message-Id: <20191024210352.71080-3-bvanassche@acm.org>
-X-Mailer: git-send-email 2.24.0.rc0.303.g954a862665-goog
-In-Reply-To: <20191024210352.71080-1-bvanassche@acm.org>
-References: <20191024210352.71080-1-bvanassche@acm.org>
+        h=x-gm-message-state:mime-version:references:in-reply-to:from:date
+         :message-id:subject:to:cc;
+        bh=h5FP/voiQdxeaQU3Va8HH5cRZmi1OHTMwBKcRrrOo6E=;
+        b=eQ5/6ArwSvhN+7+LPkaa4Aodb+LFjJLQFa4oZahd7i0ENrAssuJoEQJOZppEtlTl7t
+         6fcwJx5j0VqElzstYYCZNsn85r30LYVkvnjA2jfQYdWGlU5BXcaK4guYlknCAotDVV+N
+         UzwKNrqviqWwRWWeyrZuahmg1YmTmltdNdAJS4mrbVZU81tSP+nRm6D/nrd67Ewo7XXN
+         kdYja/nkrBSRFzDQyGUDaUw+JUjtZScDS+0tp9GyuAuuI6b49422YI7VUrRDEMfyBH8k
+         Qe6cedJSz0OyjlQk9pSr2M2bvFlCTUUlq/9vZXc+p64eHZ6P2ZxZexfqcQMiEIMC1lQ3
+         g7fQ==
+X-Gm-Message-State: APjAAAVH1UFUoHsli/TruLBfdSpmS38/gk+0wDSCJLJ+oSHBNhHborLY
+        iWnpI/UOtHsKGM7GAjDyMc+n67tHLMHMlA==
+X-Google-Smtp-Source: APXvYqxq5/vN7+N678A5QktrPVKXYM68eeLog9lPIHjjNm5A27WxxgJjP3jpb4laa3bc7XO7O8FzYw==
+X-Received: by 2002:a05:651c:c7:: with SMTP id 7mr4027386ljr.42.1571952610084;
+        Thu, 24 Oct 2019 14:30:10 -0700 (PDT)
+Received: from mail-lj1-f176.google.com (mail-lj1-f176.google.com. [209.85.208.176])
+        by smtp.gmail.com with ESMTPSA id 3sm1528390lfq.55.2019.10.24.14.30.08
+        for <linux-block@vger.kernel.org>
+        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
+        Thu, 24 Oct 2019 14:30:08 -0700 (PDT)
+Received: by mail-lj1-f176.google.com with SMTP id c4so225645lja.11
+        for <linux-block@vger.kernel.org>; Thu, 24 Oct 2019 14:30:08 -0700 (PDT)
+X-Received: by 2002:a05:651c:331:: with SMTP id b17mr3303284ljp.133.1571952607809;
+ Thu, 24 Oct 2019 14:30:07 -0700 (PDT)
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
+References: <157186182463.3995.13922458878706311997.stgit@warthog.procyon.org.uk>
+ <30394.1571936252@warthog.procyon.org.uk>
+In-Reply-To: <30394.1571936252@warthog.procyon.org.uk>
+From:   Linus Torvalds <torvalds@linux-foundation.org>
+Date:   Thu, 24 Oct 2019 17:29:51 -0400
+X-Gmail-Original-Message-ID: <CAHk-=wiMho2AhcTWC3-3zGK7639XL9UT=AheMXY0pxGHDACn6g@mail.gmail.com>
+Message-ID: <CAHk-=wiMho2AhcTWC3-3zGK7639XL9UT=AheMXY0pxGHDACn6g@mail.gmail.com>
+Subject: Re: [RFC PATCH 11/10] pipe: Add fsync() support [ver #2]
+To:     David Howells <dhowells@redhat.com>
+Cc:     Rasmus Villemoes <linux@rasmusvillemoes.dk>,
+        Greg Kroah-Hartman <gregkh@linuxfoundation.org>,
+        Peter Zijlstra <peterz@infradead.org>,
+        Nicolas Dichtel <nicolas.dichtel@6wind.com>, raven@themaw.net,
+        Christian Brauner <christian@brauner.io>,
+        keyrings@vger.kernel.org, linux-usb@vger.kernel.org,
+        linux-block <linux-block@vger.kernel.org>,
+        LSM List <linux-security-module@vger.kernel.org>,
+        linux-fsdevel <linux-fsdevel@vger.kernel.org>,
+        Linux API <linux-api@vger.kernel.org>,
+        Linux Kernel Mailing List <linux-kernel@vger.kernel.org>
+Content-Type: text/plain; charset="UTF-8"
 Sender: linux-block-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-Note: the newly added test script only triggers blk_mq_update_nr_hw_queues()
-for kernel versions that include commit 45919fbfe1c4 ("null_blk: Enable
-modifying 'submit_queues' after an instance has been configured").
+On Thu, Oct 24, 2019 at 12:57 PM David Howells <dhowells@redhat.com> wrote:
+>
+> pipe: Add fsync() support
+>
+> The keyrings testsuite needs the ability to wait for all the outstanding
+> notifications in the queue to have been processed so that it can then go
+> through them to find out whether the notifications it expected have been
+> emitted.
 
-Signed-off-by: Bart Van Assche <bvanassche@acm.org>
----
- tests/block/029     | 64 +++++++++++++++++++++++++++++++++++++++++++++
- tests/block/029.out |  1 +
- 2 files changed, 65 insertions(+)
- create mode 100755 tests/block/029
- create mode 100644 tests/block/029.out
+Can't you just do
 
-diff --git a/tests/block/029 b/tests/block/029
-new file mode 100755
-index 000000000000..d298bac8db5c
---- /dev/null
-+++ b/tests/block/029
-@@ -0,0 +1,64 @@
-+#!/bin/bash
-+# SPDX-License-Identifier: GPL-2.0
-+# Copyright 2019 Google LLC
-+#
-+# Trigger blk_mq_update_nr_hw_queues().
-+
-+. tests/block/rc
-+. common/null_blk
-+
-+DESCRIPTION="trigger blk_mq_update_nr_hw_queues()"
-+QUICK=1
-+
-+requires() {
-+	_have_null_blk
-+}
-+
-+# Configure one null_blk instance.
-+configure_null_blk() {
-+	local nullb0="/sys/kernel/config/nullb/nullb0"
-+
-+	mkdir "$nullb0" &&
-+	echo 0 > "$nullb0/completion_nsec" &&
-+	echo 512 > "$nullb0/blocksize" &&
-+	echo 16 > "$nullb0/size" &&
-+	echo 1 > "$nullb0/memory_backed" &&
-+	echo 1 > "$nullb0/power" &&
-+	ls -l /dev/nullb* &>>"$FULL"
-+}
-+
-+modify_nr_hw_queues() {
-+	local deadline num_cpus
-+
-+	deadline=$(($(_uptime_s) + TIMEOUT))
-+	num_cpus=$(nproc)
-+	while [ "$(_uptime_s)" -lt "$deadline" ]; do
-+		sleep .1
-+		echo 1 > /sys/kernel/config/nullb/nullb0/submit_queues
-+		sleep .1
-+		echo "$num_cpus" > /sys/kernel/config/nullb/nullb0/submit_queues
-+	done
-+}
-+
-+test() {
-+	local sq=/sys/kernel/config/nullb/nullb0/submit_queues
-+
-+	: "${TIMEOUT:=30}"
-+	_init_null_blk nr_devices=0 queue_mode=2 &&
-+	configure_null_blk
-+	if { echo 1 >$sq; } 2>/dev/null; then
-+		modify_nr_hw_queues &
-+		fio --rw=randwrite --bs=4K --loops=$((10**6)) \
-+		    --iodepth=64 --group_reporting --sync=1 --direct=1 \
-+		    --ioengine=libaio --filename="/dev/nullb0" \
-+		    --runtime="${TIMEOUT}" --name=nullb0 \
-+		    --output="${RESULTS_DIR}/block/fio-output-029.txt" \
-+		    >>"$FULL"
-+		wait
-+	else
-+		echo "Skipping test because $sq cannot be modified" >>"$FULL"
-+	fi
-+	rmdir /sys/kernel/config/nullb/nullb0
-+	_exit_null_blk
-+	echo Passed
-+}
-diff --git a/tests/block/029.out b/tests/block/029.out
-new file mode 100644
-index 000000000000..863339fb8ced
---- /dev/null
-+++ b/tests/block/029.out
-@@ -0,0 +1 @@
-+Passed
--- 
-2.24.0.rc0.303.g954a862665-goog
+    ioctl(fd, FIONREAD, &count);
 
+in a loop instead? "No paperwork. Just sprinkle some msleep() crack on
+him, and let's get out of here"
+
+               Linus
