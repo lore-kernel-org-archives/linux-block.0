@@ -2,104 +2,121 @@ Return-Path: <SRS0=pYcy=YR=vger.kernel.org=linux-block-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-6.7 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
-	INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,
-	URIBL_BLOCKED autolearn=ham autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-2.4 required=3.0 tests=DKIM_SIGNED,DKIM_VALID,
+	DKIM_VALID_AU,HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SPF_HELO_NONE,
+	SPF_PASS,USER_AGENT_SANE_1 autolearn=no autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 053B3CA9EB9
-	for <linux-block@archiver.kernel.org>; Thu, 24 Oct 2019 00:23:11 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id EC1E5CA9EB9
+	for <linux-block@archiver.kernel.org>; Thu, 24 Oct 2019 00:33:39 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.kernel.org (Postfix) with ESMTP id C91302084B
-	for <linux-block@archiver.kernel.org>; Thu, 24 Oct 2019 00:23:10 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id BB7E82084B
+	for <linux-block@archiver.kernel.org>; Thu, 24 Oct 2019 00:33:39 +0000 (UTC)
+Authentication-Results: mail.kernel.org;
+	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="jSdmqb8J"
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S2392821AbfJXAXJ convert rfc822-to-8bit (ORCPT
-        <rfc822;linux-block@archiver.kernel.org>);
-        Wed, 23 Oct 2019 20:23:09 -0400
-Received: from smtpbgau1.qq.com ([54.206.16.166]:45098 "EHLO smtpbgau1.qq.com"
-        rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-        id S2392153AbfJXAXJ (ORCPT <rfc822;linux-block@vger.kernel.org>);
-        Wed, 23 Oct 2019 20:23:09 -0400
-X-QQ-mid: bizesmtp11t1571876579tlvkv2f1
-Received: from [192.168.142.168] (unknown [218.76.23.26])
-        by esmtp6.qq.com (ESMTP) with 
-        id ; Thu, 24 Oct 2019 08:22:57 +0800 (CST)
-X-QQ-SSF: 00400000002000S0ZU90B00A0000000
-X-QQ-FEAT: XDCR4pEWrpmfMgXPpcHQCpW0d63+G0DRr6mR+IYGwajyQrHNdLd3pQp7whop3
-        YEtTEfxb/PGNAPFJ/dOfmBMOvmbygm4tVX/ek2f6sKnHwPykVdZHdu45uc+6GnBfnLSxpLK
-        X0hGlrH8VCqw1mLHal6LgV4wYggSAIHK8g15DmlMefu5Wm90yilFOmDLu0l9xzecmGxAa5N
-        jj4fH7cCRGjTnWf8vLrMn0PMteq8ySPS1kEoU5WrCkwl8/NqnjEHx7FqbTYZkv2/rcjPbw/
-        IuJ6a13hdNCW/yLjFcrGoxFnb4i/KAuH4+DDp3YK5gK9lhzh4EVr6cqhjZl5Quo8Pc0jcz3
-        M4oGNHOgi/wOgb3pDE=
-X-QQ-GoodBg: 2
-Content-Type: text/plain;
-        charset=utf-8
-Mime-Version: 1.0 (Mac OS X Mail 13.0 \(3594.4.19\))
-Subject: Re: [PATCH] io_uring: ensure cq_entries is at least equal to or
- greater than sq_entries
-From:   Jackie Liu <liuyun01@kylinos.cn>
-In-Reply-To: <e167ef28-8763-7629-fb5b-e0ef28ed8a49@kernel.dk>
-Date:   Thu, 24 Oct 2019 08:22:56 +0800
-Cc:     Jeff Moyer <jmoyer@redhat.com>, linux-block@vger.kernel.org
-Content-Transfer-Encoding: 8BIT
-Message-Id: <BB26710D-8704-4D15-9B33-080B28B7941B@kylinos.cn>
-References: <1571795864-56669-1-git-send-email-liuyun01@kylinos.cn>
- <x49d0ennw1y.fsf@segfault.boston.devel.redhat.com>
- <e167ef28-8763-7629-fb5b-e0ef28ed8a49@kernel.dk>
-To:     Jens Axboe <axboe@kernel.dk>
-X-Mailer: Apple Mail (2.3594.4.19)
-X-QQ-SENDSIZE: 520
-Feedback-ID: bizesmtp:kylinos.cn:qybgforeign:qybgforeign2
-X-QQ-Bgrelay: 1
+        id S2392153AbfJXAdj (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Wed, 23 Oct 2019 20:33:39 -0400
+Received: from us-smtp-1.mimecast.com ([205.139.110.61]:28619 "EHLO
+        us-smtp-delivery-1.mimecast.com" rhost-flags-OK-OK-OK-FAIL)
+        by vger.kernel.org with ESMTP id S2388218AbfJXAdj (ORCPT
+        <rfc822;linux-block@vger.kernel.org>);
+        Wed, 23 Oct 2019 20:33:39 -0400
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+        s=mimecast20190719; t=1571877217;
+        h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+         to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+         content-transfer-encoding:content-transfer-encoding:
+         in-reply-to:in-reply-to:references:references;
+        bh=bjt331/bC3eTRmvUqLdS/Gse6qvavmMOFrBUV4dEjjM=;
+        b=jSdmqb8JPu9EZj6cdqpYGHQWC92uEA5pryB3DQ7YgOXhTr8nINB3vlAo7+4lf/MqmptBMA
+        er8pRyCLUNPhHvUdnnySSEVUzIhke9eiS0GW94kBuGvMddz70WKDh/uxbAnThJBAhnovA4
+        /njkxR7Q9huFkRVMCExILJvGYoqHOe0=
+Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
+ [209.132.183.4]) (Using TLS) by relay.mimecast.com with ESMTP id
+ us-mta-98-7Ar9gCXeOqekbymjny_5Nw-1; Wed, 23 Oct 2019 20:33:34 -0400
+Received: from smtp.corp.redhat.com (int-mx07.intmail.prod.int.phx2.redhat.com [10.5.11.22])
+        (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
+        (No client certificate requested)
+        by mimecast-mx01.redhat.com (Postfix) with ESMTPS id 6002D1800D6B;
+        Thu, 24 Oct 2019 00:33:31 +0000 (UTC)
+Received: from ming.t460p (ovpn-8-17.pek2.redhat.com [10.72.8.17])
+        by smtp.corp.redhat.com (Postfix) with ESMTPS id 5AFAF1001B35;
+        Thu, 24 Oct 2019 00:33:24 +0000 (UTC)
+Date:   Thu, 24 Oct 2019 08:33:20 +0800
+From:   Ming Lei <ming.lei@redhat.com>
+To:     Bart Van Assche <bvanassche@acm.org>
+Cc:     Jens Axboe <axboe@kernel.dk>, linux-block@vger.kernel.org,
+        Christoph Hellwig <hch@lst.de>,
+        Christoph Hellwig <hch@infradead.org>,
+        Hannes Reinecke <hare@suse.com>,
+        Johannes Thumshirn <jthumshirn@suse.de>
+Subject: Re: [PATCH 2/4] block: Fix a race between blk_poll() and
+ blk_mq_update_nr_hw_queues()
+Message-ID: <20191024003319.GA15426@ming.t460p>
+References: <20191021224259.209542-1-bvanassche@acm.org>
+ <20191021224259.209542-3-bvanassche@acm.org>
+ <20191022094154.GB9037@ming.t460p>
+ <322f024f-6756-aa29-28ac-a17aa8499279@acm.org>
+MIME-Version: 1.0
+In-Reply-To: <322f024f-6756-aa29-28ac-a17aa8499279@acm.org>
+User-Agent: Mutt/1.11.3 (2019-02-01)
+X-Scanned-By: MIMEDefang 2.84 on 10.5.11.22
+X-MC-Unique: 7Ar9gCXeOqekbymjny_5Nw-1
+X-Mimecast-Spam-Score: 0
+Content-Type: text/plain; charset=WINDOWS-1252
+Content-Transfer-Encoding: quoted-printable
+Content-Disposition: inline
 Sender: linux-block-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
+On Wed, Oct 23, 2019 at 01:58:24PM -0700, Bart Van Assche wrote:
+> On 2019-10-22 02:41, Ming Lei wrote:
+> > On Mon, Oct 21, 2019 at 03:42:57PM -0700, Bart Van Assche wrote:
+> >> +int blk_poll(struct request_queue *q, blk_qc_t cookie, bool spin)
+> >> +{
+> >> +=09int ret;
+> >> +
+> >> +=09if (!percpu_ref_tryget(&q->q_usage_counter))
+> >> +=09=09return 0;
+> >> +=09ret =3D __blk_poll(q, cookie, spin);
+> >> +=09blk_queue_exit(q);
+> >> +
+> >> +=09return ret;
+> >> +}
+> >=20
+> > IMO, this change isn't required. Caller of blk_poll is supposed to
+> > hold refcount of the request queue, then the related hctx data structur=
+e
+> > won't go away. When the hctx is in transient state, there can't be IO
+> > to be polled, and it is safe to call into IO path.
+> >=20
+> > BTW, .poll is absolutely the fast path, we should be careful to add cod=
+e
+> > in this path.
+>=20
+> Hi Ming,
+>=20
+> I'm not sure whether all blk_poll() callers really hold a refcount on
+> the request queue.
+
+Please see __device_add_disk() which takes one extra queue ref, which
+won't be dropped until the disk is released.
+
+Meantime blkdev_get() holds gendisk reference via bdev_get_gendisk(),
+and blkdev_get() is called by blkdev_open().
+
+The above way should guarantee that the request queue won't go away
+when IO is submitted to queue via blkdev fs inode.
+
+> Anyway, I will convert this code change into a
+> comment that explains that blk_poll() callers must hold a request queue
+> reference.
+
+Good point.
 
 
-> 2019年10月24日 03:41，Jens Axboe <axboe@kernel.dk> 写道：
-> 
-> On 10/23/19 12:42 PM, Jeff Moyer wrote:
->> Jackie Liu <liuyun01@kylinos.cn> writes:
->> 
->>> If cq_entries is smaller than sq_entries, it will cause a lot of overflow
->>> to appear. when customizing cq_entries, at least let him be no smaller than
->>> sq_entries.
->>> 
->>> Fixes: 95d8765bd9f2 ("io_uring: allow application controlled CQ ring size")
->>> Signed-off-by: Jackie Liu <liuyun01@kylinos.cn>
->>> ---
->>>  fs/io_uring.c | 2 +-
->>>  1 file changed, 1 insertion(+), 1 deletion(-)
->>> 
->>> diff --git a/fs/io_uring.c b/fs/io_uring.c
->>> index b64cd2c..dfa9731 100644
->>> --- a/fs/io_uring.c
->>> +++ b/fs/io_uring.c
->>> @@ -3784,7 +3784,7 @@ static int io_uring_create(unsigned entries, struct io_uring_params *p)
->>>  		 * to a power-of-two, if it isn't already. We do NOT impose
->>>  		 * any cq vs sq ring sizing.
->>>  		 */
->>> -		if (!p->cq_entries || p->cq_entries > IORING_MAX_CQ_ENTRIES)
->>> +		if (p->cq_entries < p->sq_entries || p->cq_entries > IORING_MAX_CQ_ENTRIES)
->> 
->> What if they're both zero?  I think you want to keep that check.
-> 
-> sq_entries being zero is already checked and failed at this point.
-> So I think the patch looks fine from that perspective.
-> 
-> Is there really a strong reason to disallow this? Yes, it could
-> cause overflows, but it's just doing what was asked for. The
-> normal case is of course cq_entries being much larger than
-> sq_entries.
-> 
-
-There are actually no other stronger reasons. I think it would be better to do a
-print job in liburing, but the kernel should still make a limit. Too many overflows
-will cause less efficiency.
-
---
-Jackie Liu
-
-
+Thanks,
+Ming
 
