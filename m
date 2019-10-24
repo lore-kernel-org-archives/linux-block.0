@@ -2,81 +2,159 @@ Return-Path: <SRS0=pYcy=YR=vger.kernel.org=linux-block-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-0.8 required=3.0 tests=DKIM_SIGNED,DKIM_VALID,
-	DKIM_VALID_AU,HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SPF_HELO_NONE,
-	SPF_PASS autolearn=no autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-8.2 required=3.0 tests=DKIM_SIGNED,DKIM_VALID,
+	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,
+	SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED,USER_AGENT_SANE_1 autolearn=ham
+	autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 27149CA9EBC
-	for <linux-block@archiver.kernel.org>; Thu, 24 Oct 2019 10:32:39 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id A0E03CA9EAF
+	for <linux-block@archiver.kernel.org>; Thu, 24 Oct 2019 13:02:27 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.kernel.org (Postfix) with ESMTP id E68C42084C
-	for <linux-block@archiver.kernel.org>; Thu, 24 Oct 2019 10:32:38 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id 6E7EE2166E
+	for <linux-block@archiver.kernel.org>; Thu, 24 Oct 2019 13:02:27 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="KIlXMDOM"
+	dkim=pass (2048-bit key) header.d=kernel-dk.20150623.gappssmtp.com header.i=@kernel-dk.20150623.gappssmtp.com header.b="pjkLHdON"
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S2438839AbfJXKch (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Thu, 24 Oct 2019 06:32:37 -0400
-Received: from us-smtp-2.mimecast.com ([205.139.110.61]:52553 "EHLO
-        us-smtp-delivery-1.mimecast.com" rhost-flags-OK-OK-OK-FAIL)
-        by vger.kernel.org with ESMTP id S2438842AbfJXKcd (ORCPT
+        id S1730504AbfJXNC0 (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Thu, 24 Oct 2019 09:02:26 -0400
+Received: from mail-il1-f195.google.com ([209.85.166.195]:37470 "EHLO
+        mail-il1-f195.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S1731546AbfJXNC0 (ORCPT
         <rfc822;linux-block@vger.kernel.org>);
-        Thu, 24 Oct 2019 06:32:33 -0400
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-        s=mimecast20190719; t=1571913152;
-        h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-         to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-         content-transfer-encoding:content-transfer-encoding:
-         in-reply-to:in-reply-to:references:references;
-        bh=LIKdOL11Ozx/PWJsb0Bia7eThEnrLMvgCNlbfPe+qhE=;
-        b=KIlXMDOMxKPSSAvg9kGz3sda5MqOHLHENWTns7LnTsjwebdSxKGRoLNaWyjz+ZKiMlapdy
-        ET9+jUDhssh/nyvu2t8dZ9AX9r28x9DJtvhtLC88fsX92D8kRAtL4Ma0bqqj+CP2BNn08a
-        Sr3vaii5XfMX/UDj3tx4+drhz/ejacI=
-Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
- [209.132.183.4]) (Using TLS) by relay.mimecast.com with ESMTP id
- us-mta-52-kf6BhbzrPzCAs2tEP3KZ1A-1; Thu, 24 Oct 2019 06:32:29 -0400
-Received: from smtp.corp.redhat.com (int-mx07.intmail.prod.int.phx2.redhat.com [10.5.11.22])
-        (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
-        (No client certificate requested)
-        by mimecast-mx01.redhat.com (Postfix) with ESMTPS id C9DA8107AD33;
-        Thu, 24 Oct 2019 10:32:26 +0000 (UTC)
-Received: from warthog.procyon.org.uk (ovpn-121-40.rdu2.redhat.com [10.10.121.40])
-        by smtp.corp.redhat.com (Postfix) with ESMTP id 14CB41001B30;
-        Thu, 24 Oct 2019 10:32:23 +0000 (UTC)
-Organization: Red Hat UK Ltd. Registered Address: Red Hat UK Ltd, Amberley
-        Place, 107-111 Peascod Street, Windsor, Berkshire, SI4 1TE, United
-        Kingdom.
-        Registered in England and Wales under Company Registration No. 3798903
-From:   David Howells <dhowells@redhat.com>
-In-Reply-To: <157186186167.3995.7568100174393739543.stgit@warthog.procyon.org.uk>
-References: <157186186167.3995.7568100174393739543.stgit@warthog.procyon.org.uk> <157186182463.3995.13922458878706311997.stgit@warthog.procyon.org.uk>
-To:     torvalds@linux-foundation.org
-Cc:     dhowells@redhat.com, Rasmus Villemoes <linux@rasmusvillemoes.dk>,
-        Greg Kroah-Hartman <gregkh@linuxfoundation.org>,
-        Peter Zijlstra <peterz@infradead.org>,
-        nicolas.dichtel@6wind.com, raven@themaw.net,
-        Christian Brauner <christian@brauner.io>,
-        keyrings@vger.kernel.org, linux-usb@vger.kernel.org,
-        linux-block@vger.kernel.org, linux-security-module@vger.kernel.org,
-        linux-fsdevel@vger.kernel.org, linux-api@vger.kernel.org,
-        linux-kernel@vger.kernel.org
-Subject: Re: [RFC PATCH 04/10] pipe: Use head and tail pointers for the ring, not cursor and length [ver #2]
+        Thu, 24 Oct 2019 09:02:26 -0400
+Received: by mail-il1-f195.google.com with SMTP id v2so1843748ilq.4
+        for <linux-block@vger.kernel.org>; Thu, 24 Oct 2019 06:02:26 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=kernel-dk.20150623.gappssmtp.com; s=20150623;
+        h=subject:to:cc:references:from:message-id:date:user-agent
+         :mime-version:in-reply-to:content-language:content-transfer-encoding;
+        bh=S0NrLWZ7FXKxXP9Y8KMoYFjeiKt/AVgpthFCF/o+yug=;
+        b=pjkLHdON3i8pbCo3atAdQ1n5TfendcH+d/AHaXHQKPCh7Opti89fEvZcdR1WNKieeh
+         mBnvaHS6RdsetaZEcXrFxDo91LoWN2URTZ8dq4krjISzSjDgMMJpm2fCz6HLQkAg/0Uw
+         w8K86En1QBrrdvo8xoxIc+zZ8ZlFskLMjRh6TE9YeX5fM4vMj9sdUkZkCq6jyq3ReG/J
+         5v/IQO8Pbp2KGp34KayQkfBrlz0bOBvw+b86Z/iKY+fLo6f1O6O43G376ADUP8Zqfjv1
+         Bl4KMBwPHYYsPX+i978Bi+tMkvLQacLR/7VFiYD0rvR96yeXxQGQpToPond6XcMNAdgi
+         6Gng==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20161025;
+        h=x-gm-message-state:subject:to:cc:references:from:message-id:date
+         :user-agent:mime-version:in-reply-to:content-language
+         :content-transfer-encoding;
+        bh=S0NrLWZ7FXKxXP9Y8KMoYFjeiKt/AVgpthFCF/o+yug=;
+        b=M//0FHgSFYrnal9CVZ8P+DClmKJh+bx9sBoyY5RSIkOBnJrP1uH/nRtoJwF9p8XATa
+         veSC4sycaeAZDf8GyV18ir8DT/mwtk/im/VyjdezxsifNWpguYpylM4LPjFBzwSq4dwI
+         3xWupDD47cF3NqZjUOrLdoRDh1ajOoLhIm5aNhsSnbMk5tGSL0a6LSp4z0Wn0/lnJWcf
+         gLQCL3IRwxgWrX1ej7i++0FnX5ACNijVLToyLyxjDRnMcRYV3ZB5nH4yS2890+M66eos
+         C6PWcNTwnZoE8rLu/GSoHuXHXNA1bGRRFBGzfaPalLZmgIgPpV8a+bdnKs1mCAieU10v
+         Ft9w==
+X-Gm-Message-State: APjAAAUlHFqvU1u8ff0gMkgYM1+VgHhYCCA5F1BYX/WtVwPSjt8cvbWa
+        QlSKZt0OBZ+T17xQe7P6grGYnQ==
+X-Google-Smtp-Source: APXvYqwwIXpCa0MmS3T7qrsOlnxzziUkdefXwbG7VxG18PItE9Xe2EmCZjGvKiOb5fBaA4R72octyw==
+X-Received: by 2002:a92:1907:: with SMTP id 7mr31136861ilz.72.1571922145629;
+        Thu, 24 Oct 2019 06:02:25 -0700 (PDT)
+Received: from [192.168.1.159] ([65.144.74.34])
+        by smtp.gmail.com with ESMTPSA id t4sm77364ils.21.2019.10.24.06.02.24
+        (version=TLS1_2 cipher=ECDHE-RSA-AES128-GCM-SHA256 bits=128/128);
+        Thu, 24 Oct 2019 06:02:24 -0700 (PDT)
+Subject: Re: [PATCH] blk-mq: Fix cpu indexing error in
+ blk_mq_alloc_request_hctx()
+To:     Ming Lei <tom.leiming@gmail.com>,
+        James Smart <jsmart2021@gmail.com>
+Cc:     linux-block <linux-block@vger.kernel.org>,
+        Shagun Agrawal <shagun.agrawal@broadcom.com>,
+        Christoph Hellwig <hch@lst.de>
+References: <20191023175700.18615-1-jsmart2021@gmail.com>
+ <CACVXFVN+xXL9EJbrCPC50vOD0sG1pX1npUFSNZSNGBLyutLh0w@mail.gmail.com>
+From:   Jens Axboe <axboe@kernel.dk>
+Message-ID: <cd913d58-1b06-69df-3b4e-7d00f2d4074f@kernel.dk>
+Date:   Thu, 24 Oct 2019 07:02:23 -0600
+User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:60.0) Gecko/20100101
+ Thunderbird/60.9.0
 MIME-Version: 1.0
-Content-ID: <13193.1571913143.1@warthog.procyon.org.uk>
-Date:   Thu, 24 Oct 2019 11:32:23 +0100
-Message-ID: <13194.1571913143@warthog.procyon.org.uk>
-X-Scanned-By: MIMEDefang 2.84 on 10.5.11.22
-X-MC-Unique: kf6BhbzrPzCAs2tEP3KZ1A-1
-X-Mimecast-Spam-Score: 0
-Content-Type: text/plain; charset=WINDOWS-1252
-Content-Transfer-Encoding: quoted-printable
+In-Reply-To: <CACVXFVN+xXL9EJbrCPC50vOD0sG1pX1npUFSNZSNGBLyutLh0w@mail.gmail.com>
+Content-Type: text/plain; charset=utf-8
+Content-Language: en-US
+Content-Transfer-Encoding: 7bit
 Sender: linux-block-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-I've pushed to git a new version that fixes an incomplete conversion in
-pipe_zero(), ports the powerpc virtio_console driver and fixes a comment in
-splice.
+On 10/24/19 3:28 AM, Ming Lei wrote:
+> On Thu, Oct 24, 2019 at 4:53 PM James Smart <jsmart2021@gmail.com> wrote:
+>>
+>> During the following test scenario:
+>> - Offline a cpu
+>> - load lpfc driver, which auto-discovers NVMe devices. For a new
+>>    nvme device, the lpfc/nvme_fc transport can request up to
+>>    num_online_cpus() worth of nr_hw_queues. The target in
+>>    this case allowed at least that many of nvme queues.
+>> The system encountered the following crash:
+>>
+>>   BUG: unable to handle kernel paging request at 00003659d33953a8
+>>   ...
+>>   Workqueue: nvme-wq nvme_fc_connect_ctrl_work [nvme_fc]
+>>   RIP: 0010:blk_mq_get_request+0x21d/0x3c0
+>>   ...
+>>   Blk_mq_alloc_request_hctx+0xef/0x140
+>>   Nvme_alloc_request+0x32/0x80 [nvme_core]
+>>   __nvme_submit_sync_cmd+0x4a/0x1c0 [nvme_core]
+>>   Nvmf_connect_io_queue+0x130/0x1a0 [nvme_fabrics]
+>>   Nvme_fc_connect_io_queues+0x285/0x2b0 [nvme_fc]
+>>   Nvme_fc_create_association+0x0x8ea/0x9c0 [nvme_fc]
+>>   Nvme_fc_connect_ctrl_work+0x19/0x50 [nvme_fc]
+>>   ...
+>>
+>> There was a commit a while ago to simplify queue mapping which
+>> replaced the use of cpumask_first() by cpumask_first_and().
+>> The issue is if cpumask_first_and() does not find any _intersecting_ cpus,
+>> it return's nr_cpu_id. nr_cpu_id isn't valid for the per_cpu_ptr index
+>> which is done in __blk_mq_get_ctx().
+>>
+>> Considered reverting back to cpumask_first(), but instead followed
+>> logic in blk_mq_first_mapped_cpu() to check for nr_cpu_id before
+>> calling cpumask_first().
+>>
+>> Fixes: 20e4d8139319 ("blk-mq: simplify queue mapping & schedule with each possisble CPU")
+>> Signed-off-by: Shagun Agrawal <shagun.agrawal@broadcom.com>
+>> Signed-off-by: James Smart <jsmart2021@gmail.com>
+>> CC: Christoph Hellwig <hch@lst.de>
+>> ---
+>>   block/blk-mq.c | 2 ++
+>>   1 file changed, 2 insertions(+)
+>>
+>> diff --git a/block/blk-mq.c b/block/blk-mq.c
+>> index 8538dc415499..0b06b4ea57f1 100644
+>> --- a/block/blk-mq.c
+>> +++ b/block/blk-mq.c
+>> @@ -461,6 +461,8 @@ struct request *blk_mq_alloc_request_hctx(struct request_queue *q,
+>>                  return ERR_PTR(-EXDEV);
+>>          }
+>>          cpu = cpumask_first_and(alloc_data.hctx->cpumask, cpu_online_mask);
+>> +       if (cpu >= nr_cpu_ids)
+>> +               cpu = cpumask_first(alloc_data.hctx->cpumask);
+> 
+> The first cpu may be offline too, then kernel warning or timeout may
+> be triggered later
+> when this allocated request is dispatched.
+> 
+> To be honest, blk_mq_alloc_request_hctx() is really a weird interface,
+> given the hctx may become
+> dead just when calling into blk_mq_alloc_request_hctx().
+> 
+> Given only NVMe FC/RDMA uses this interface, could you provide some
+> background about
+> this kind of usage?
+> 
+> The normal usage is that user doesn't specify the hctx for allocating
+> request from, since blk-mq
+> can figure out which hctx is used for allocation via queue mapping.
+> Just wondering why NVMe
+> FC/RDMA can't do that way?
 
-David
+Fully agree, it'd be much nicer if that weird interface could just
+die.
+
+-- 
+Jens Axboe
 
