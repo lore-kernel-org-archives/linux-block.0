@@ -2,159 +2,82 @@ Return-Path: <SRS0=pYcy=YR=vger.kernel.org=linux-block-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-8.2 required=3.0 tests=DKIM_SIGNED,DKIM_VALID,
-	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,
-	SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED,USER_AGENT_SANE_1 autolearn=ham
-	autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-2.0 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
+	HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,
+	URIBL_BLOCKED,USER_AGENT_SANE_1 autolearn=no autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id A0E03CA9EAF
-	for <linux-block@archiver.kernel.org>; Thu, 24 Oct 2019 13:02:27 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id B5E6FCA9EAF
+	for <linux-block@archiver.kernel.org>; Thu, 24 Oct 2019 13:15:05 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.kernel.org (Postfix) with ESMTP id 6E7EE2166E
-	for <linux-block@archiver.kernel.org>; Thu, 24 Oct 2019 13:02:27 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id 834332166E
+	for <linux-block@archiver.kernel.org>; Thu, 24 Oct 2019 13:15:05 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel-dk.20150623.gappssmtp.com header.i=@kernel-dk.20150623.gappssmtp.com header.b="pjkLHdON"
+	dkim=fail reason="signature verification failed" (2048-bit key) header.d=infradead.org header.i=@infradead.org header.b="j7YKjbvj"
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1730504AbfJXNC0 (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Thu, 24 Oct 2019 09:02:26 -0400
-Received: from mail-il1-f195.google.com ([209.85.166.195]:37470 "EHLO
-        mail-il1-f195.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1731546AbfJXNC0 (ORCPT
+        id S2502459AbfJXNPA (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Thu, 24 Oct 2019 09:15:00 -0400
+Received: from bombadil.infradead.org ([198.137.202.133]:45050 "EHLO
+        bombadil.infradead.org" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S2502438AbfJXNPA (ORCPT
         <rfc822;linux-block@vger.kernel.org>);
-        Thu, 24 Oct 2019 09:02:26 -0400
-Received: by mail-il1-f195.google.com with SMTP id v2so1843748ilq.4
-        for <linux-block@vger.kernel.org>; Thu, 24 Oct 2019 06:02:26 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=kernel-dk.20150623.gappssmtp.com; s=20150623;
-        h=subject:to:cc:references:from:message-id:date:user-agent
-         :mime-version:in-reply-to:content-language:content-transfer-encoding;
-        bh=S0NrLWZ7FXKxXP9Y8KMoYFjeiKt/AVgpthFCF/o+yug=;
-        b=pjkLHdON3i8pbCo3atAdQ1n5TfendcH+d/AHaXHQKPCh7Opti89fEvZcdR1WNKieeh
-         mBnvaHS6RdsetaZEcXrFxDo91LoWN2URTZ8dq4krjISzSjDgMMJpm2fCz6HLQkAg/0Uw
-         w8K86En1QBrrdvo8xoxIc+zZ8ZlFskLMjRh6TE9YeX5fM4vMj9sdUkZkCq6jyq3ReG/J
-         5v/IQO8Pbp2KGp34KayQkfBrlz0bOBvw+b86Z/iKY+fLo6f1O6O43G376ADUP8Zqfjv1
-         Bl4KMBwPHYYsPX+i978Bi+tMkvLQacLR/7VFiYD0rvR96yeXxQGQpToPond6XcMNAdgi
-         6Gng==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20161025;
-        h=x-gm-message-state:subject:to:cc:references:from:message-id:date
-         :user-agent:mime-version:in-reply-to:content-language
-         :content-transfer-encoding;
-        bh=S0NrLWZ7FXKxXP9Y8KMoYFjeiKt/AVgpthFCF/o+yug=;
-        b=M//0FHgSFYrnal9CVZ8P+DClmKJh+bx9sBoyY5RSIkOBnJrP1uH/nRtoJwF9p8XATa
-         veSC4sycaeAZDf8GyV18ir8DT/mwtk/im/VyjdezxsifNWpguYpylM4LPjFBzwSq4dwI
-         3xWupDD47cF3NqZjUOrLdoRDh1ajOoLhIm5aNhsSnbMk5tGSL0a6LSp4z0Wn0/lnJWcf
-         gLQCL3IRwxgWrX1ej7i++0FnX5ACNijVLToyLyxjDRnMcRYV3ZB5nH4yS2890+M66eos
-         C6PWcNTwnZoE8rLu/GSoHuXHXNA1bGRRFBGzfaPalLZmgIgPpV8a+bdnKs1mCAieU10v
-         Ft9w==
-X-Gm-Message-State: APjAAAUlHFqvU1u8ff0gMkgYM1+VgHhYCCA5F1BYX/WtVwPSjt8cvbWa
-        QlSKZt0OBZ+T17xQe7P6grGYnQ==
-X-Google-Smtp-Source: APXvYqwwIXpCa0MmS3T7qrsOlnxzziUkdefXwbG7VxG18PItE9Xe2EmCZjGvKiOb5fBaA4R72octyw==
-X-Received: by 2002:a92:1907:: with SMTP id 7mr31136861ilz.72.1571922145629;
-        Thu, 24 Oct 2019 06:02:25 -0700 (PDT)
-Received: from [192.168.1.159] ([65.144.74.34])
-        by smtp.gmail.com with ESMTPSA id t4sm77364ils.21.2019.10.24.06.02.24
-        (version=TLS1_2 cipher=ECDHE-RSA-AES128-GCM-SHA256 bits=128/128);
-        Thu, 24 Oct 2019 06:02:24 -0700 (PDT)
-Subject: Re: [PATCH] blk-mq: Fix cpu indexing error in
- blk_mq_alloc_request_hctx()
-To:     Ming Lei <tom.leiming@gmail.com>,
-        James Smart <jsmart2021@gmail.com>
-Cc:     linux-block <linux-block@vger.kernel.org>,
-        Shagun Agrawal <shagun.agrawal@broadcom.com>,
-        Christoph Hellwig <hch@lst.de>
-References: <20191023175700.18615-1-jsmart2021@gmail.com>
- <CACVXFVN+xXL9EJbrCPC50vOD0sG1pX1npUFSNZSNGBLyutLh0w@mail.gmail.com>
-From:   Jens Axboe <axboe@kernel.dk>
-Message-ID: <cd913d58-1b06-69df-3b4e-7d00f2d4074f@kernel.dk>
-Date:   Thu, 24 Oct 2019 07:02:23 -0600
-User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:60.0) Gecko/20100101
- Thunderbird/60.9.0
+        Thu, 24 Oct 2019 09:15:00 -0400
+DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed;
+        d=infradead.org; s=bombadil.20170209; h=In-Reply-To:Content-Type:MIME-Version
+        :References:Message-ID:Subject:Cc:To:From:Date:Sender:Reply-To:
+        Content-Transfer-Encoding:Content-ID:Content-Description:Resent-Date:
+        Resent-From:Resent-Sender:Resent-To:Resent-Cc:Resent-Message-ID:List-Id:
+        List-Help:List-Unsubscribe:List-Subscribe:List-Post:List-Owner:List-Archive;
+         bh=Jr+KH6TpggeektbjDpZIF11RXPqlwCVR55VLMJFPOz8=; b=j7YKjbvjp/ypi4i4koJ318A42
+        d4C0/CCa01kd9EjOIu9zw0/atJE16DTEyTp45ZSWBNSWlc0g+z2PyF+/6pzkSAY3WRUdm70WN7mSz
+        6me42ElrJoWnV27r1xOSBoHPRQg+jeTOQnmVigwvcGJFgO6JkCrEqEFayteNfRbb5OLE4e8yx1BIg
+        bzrmoJ/4AaVJi0vB5CE5jYkuBHOj+j1m41vxDZc0BS7HPtIdD6fVgsSUy5igabNFG7bt7Pt1bEJ4A
+        gbX86oq8hvlyHJy0RibiCU0XNgLI3amTKX1KHXyIj1x9ony+LGASM8qFYMOp7tGg+6mAV8XNOaTik
+        deajIeL1g==;
+Received: from j217100.upc-j.chello.nl ([24.132.217.100] helo=noisy.programming.kicks-ass.net)
+        by bombadil.infradead.org with esmtpsa (Exim 4.92.3 #3 (Red Hat Linux))
+        id 1iNcx6-0005MS-Mb; Thu, 24 Oct 2019 13:14:56 +0000
+Received: from hirez.programming.kicks-ass.net (hirez.programming.kicks-ass.net [192.168.1.225])
+        (using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+        (Client did not present a certificate)
+        by noisy.programming.kicks-ass.net (Postfix) with ESMTPS id A53C3300489;
+        Thu, 24 Oct 2019 15:13:55 +0200 (CEST)
+Received: by hirez.programming.kicks-ass.net (Postfix, from userid 1000)
+        id 0CF8B2B1C8A31; Thu, 24 Oct 2019 15:14:54 +0200 (CEST)
+Date:   Thu, 24 Oct 2019 15:14:54 +0200
+From:   Peter Zijlstra <peterz@infradead.org>
+To:     David Howells <dhowells@redhat.com>
+Cc:     torvalds@linux-foundation.org,
+        Rasmus Villemoes <linux@rasmusvillemoes.dk>,
+        Greg Kroah-Hartman <gregkh@linuxfoundation.org>,
+        nicolas.dichtel@6wind.com, raven@themaw.net,
+        Christian Brauner <christian@brauner.io>,
+        keyrings@vger.kernel.org, linux-usb@vger.kernel.org,
+        linux-block@vger.kernel.org, linux-security-module@vger.kernel.org,
+        linux-fsdevel@vger.kernel.org, linux-api@vger.kernel.org,
+        linux-kernel@vger.kernel.org
+Subject: Re: [RFC PATCH 00/10] pipe: Notification queue preparation [ver #2]
+Message-ID: <20191024131454.GB4114@hirez.programming.kicks-ass.net>
+References: <157186182463.3995.13922458878706311997.stgit@warthog.procyon.org.uk>
 MIME-Version: 1.0
-In-Reply-To: <CACVXFVN+xXL9EJbrCPC50vOD0sG1pX1npUFSNZSNGBLyutLh0w@mail.gmail.com>
-Content-Type: text/plain; charset=utf-8
-Content-Language: en-US
-Content-Transfer-Encoding: 7bit
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <157186182463.3995.13922458878706311997.stgit@warthog.procyon.org.uk>
+User-Agent: Mutt/1.10.1 (2018-07-13)
 Sender: linux-block-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-On 10/24/19 3:28 AM, Ming Lei wrote:
-> On Thu, Oct 24, 2019 at 4:53 PM James Smart <jsmart2021@gmail.com> wrote:
->>
->> During the following test scenario:
->> - Offline a cpu
->> - load lpfc driver, which auto-discovers NVMe devices. For a new
->>    nvme device, the lpfc/nvme_fc transport can request up to
->>    num_online_cpus() worth of nr_hw_queues. The target in
->>    this case allowed at least that many of nvme queues.
->> The system encountered the following crash:
->>
->>   BUG: unable to handle kernel paging request at 00003659d33953a8
->>   ...
->>   Workqueue: nvme-wq nvme_fc_connect_ctrl_work [nvme_fc]
->>   RIP: 0010:blk_mq_get_request+0x21d/0x3c0
->>   ...
->>   Blk_mq_alloc_request_hctx+0xef/0x140
->>   Nvme_alloc_request+0x32/0x80 [nvme_core]
->>   __nvme_submit_sync_cmd+0x4a/0x1c0 [nvme_core]
->>   Nvmf_connect_io_queue+0x130/0x1a0 [nvme_fabrics]
->>   Nvme_fc_connect_io_queues+0x285/0x2b0 [nvme_fc]
->>   Nvme_fc_create_association+0x0x8ea/0x9c0 [nvme_fc]
->>   Nvme_fc_connect_ctrl_work+0x19/0x50 [nvme_fc]
->>   ...
->>
->> There was a commit a while ago to simplify queue mapping which
->> replaced the use of cpumask_first() by cpumask_first_and().
->> The issue is if cpumask_first_and() does not find any _intersecting_ cpus,
->> it return's nr_cpu_id. nr_cpu_id isn't valid for the per_cpu_ptr index
->> which is done in __blk_mq_get_ctx().
->>
->> Considered reverting back to cpumask_first(), but instead followed
->> logic in blk_mq_first_mapped_cpu() to check for nr_cpu_id before
->> calling cpumask_first().
->>
->> Fixes: 20e4d8139319 ("blk-mq: simplify queue mapping & schedule with each possisble CPU")
->> Signed-off-by: Shagun Agrawal <shagun.agrawal@broadcom.com>
->> Signed-off-by: James Smart <jsmart2021@gmail.com>
->> CC: Christoph Hellwig <hch@lst.de>
->> ---
->>   block/blk-mq.c | 2 ++
->>   1 file changed, 2 insertions(+)
->>
->> diff --git a/block/blk-mq.c b/block/blk-mq.c
->> index 8538dc415499..0b06b4ea57f1 100644
->> --- a/block/blk-mq.c
->> +++ b/block/blk-mq.c
->> @@ -461,6 +461,8 @@ struct request *blk_mq_alloc_request_hctx(struct request_queue *q,
->>                  return ERR_PTR(-EXDEV);
->>          }
->>          cpu = cpumask_first_and(alloc_data.hctx->cpumask, cpu_online_mask);
->> +       if (cpu >= nr_cpu_ids)
->> +               cpu = cpumask_first(alloc_data.hctx->cpumask);
-> 
-> The first cpu may be offline too, then kernel warning or timeout may
-> be triggered later
-> when this allocated request is dispatched.
-> 
-> To be honest, blk_mq_alloc_request_hctx() is really a weird interface,
-> given the hctx may become
-> dead just when calling into blk_mq_alloc_request_hctx().
-> 
-> Given only NVMe FC/RDMA uses this interface, could you provide some
-> background about
-> this kind of usage?
-> 
-> The normal usage is that user doesn't specify the hctx for allocating
-> request from, since blk-mq
-> can figure out which hctx is used for allocation via queue mapping.
-> Just wondering why NVMe
-> FC/RDMA can't do that way?
+On Wed, Oct 23, 2019 at 09:17:04PM +0100, David Howells wrote:
 
-Fully agree, it'd be much nicer if that weird interface could just
-die.
+>  (1) It removes the nr_exclusive argument from __wake_up_sync_key() as this
+>      is always 1.  This prepares for step 2.
+> 
+>  (2) Adds wake_up_interruptible_sync_poll_locked() so that poll can be
+>      woken up from a function that's holding the poll waitqueue spinlock.
 
--- 
-Jens Axboe
+>  include/linux/wait.h       |   11 +-
+>  kernel/sched/wait.c        |   37 ++++--
+> 
 
+Acked-by: Peter Zijlstra (Intel) <peterz@infradead.org>
