@@ -2,106 +2,375 @@ Return-Path: <SRS0=pYcy=YR=vger.kernel.org=linux-block-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-0.9 required=3.0 tests=DKIMWL_WL_HIGH,DKIM_SIGNED,
-	DKIM_VALID,DKIM_VALID_AU,HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,
-	SPF_HELO_NONE,SPF_PASS autolearn=no autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-5.2 required=3.0 tests=DKIM_SIGNED,DKIM_VALID,
+	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,SPF_HELO_NONE,
+	SPF_PASS,URIBL_BLOCKED,USER_AGENT_SANE_1 autolearn=ham autolearn_force=no
+	version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 31BD9CA9EAF
-	for <linux-block@archiver.kernel.org>; Thu, 24 Oct 2019 21:30:13 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id DD811CA9EAF
+	for <linux-block@archiver.kernel.org>; Thu, 24 Oct 2019 22:04:32 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.kernel.org (Postfix) with ESMTP id 0114621A4C
-	for <linux-block@archiver.kernel.org>; Thu, 24 Oct 2019 21:30:13 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=default; t=1571952613;
-	bh=e00/yHSlXvXqqf/JB2YJn64yA5+CxFA09Oq6zHURRsU=;
-	h=References:In-Reply-To:From:Date:Subject:To:Cc:List-ID:From;
-	b=zUAKMfZYpt7q94zPYGicy0rdZVianzx725CdBrAM+ssjVZ9o4jX0uHmbjkM10ZXeL
-	 YN/o7NtMrRljH/CauG+y9bCPE/xYkPhXEDvSjuZ83PdvQwYO5xfeRNbu30eM2Vm3ck
-	 HFwoPP+Ms3N+1h9TXA9PtGmbfQdzT3pUg7NOrRBs=
+	by mail.kernel.org (Postfix) with ESMTP id 9D8B121D7F
+	for <linux-block@archiver.kernel.org>; Thu, 24 Oct 2019 22:04:32 +0000 (UTC)
+Authentication-Results: mail.kernel.org;
+	dkim=pass (2048-bit key) header.d=kernel-dk.20150623.gappssmtp.com header.i=@kernel-dk.20150623.gappssmtp.com header.b="EMBzm9fX"
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1729273AbfJXVaM (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Thu, 24 Oct 2019 17:30:12 -0400
-Received: from mail-lj1-f194.google.com ([209.85.208.194]:39715 "EHLO
-        mail-lj1-f194.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1729239AbfJXVaM (ORCPT
+        id S1726605AbfJXWEb (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Thu, 24 Oct 2019 18:04:31 -0400
+Received: from mail-pg1-f196.google.com ([209.85.215.196]:39576 "EHLO
+        mail-pg1-f196.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S1726516AbfJXWEb (ORCPT
         <rfc822;linux-block@vger.kernel.org>);
-        Thu, 24 Oct 2019 17:30:12 -0400
-Received: by mail-lj1-f194.google.com with SMTP id y3so257494ljj.6
-        for <linux-block@vger.kernel.org>; Thu, 24 Oct 2019 14:30:11 -0700 (PDT)
+        Thu, 24 Oct 2019 18:04:31 -0400
+Received: by mail-pg1-f196.google.com with SMTP id p12so137516pgn.6
+        for <linux-block@vger.kernel.org>; Thu, 24 Oct 2019 15:04:30 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=linux-foundation.org; s=google;
-        h=mime-version:references:in-reply-to:from:date:message-id:subject:to
-         :cc;
-        bh=h5FP/voiQdxeaQU3Va8HH5cRZmi1OHTMwBKcRrrOo6E=;
-        b=G+CKE+0sNMbBuosjchwhgzz8NQwfbV/8kKBYcW1zgIA+wCHZXB0W4xnrddKNkrujly
-         nBXQf8TMFFxtwDaqAlubm1WQBu/DIP2jq0ClHTeKxpnxD8j4n3vqHGpl41RLHFrD0jXc
-         jfdzDY5G/0JxiPvAj8Pc7cihC14c7Kl2f6hiQ=
+        d=kernel-dk.20150623.gappssmtp.com; s=20150623;
+        h=subject:to:cc:references:from:message-id:date:user-agent
+         :mime-version:in-reply-to:content-language:content-transfer-encoding;
+        bh=mOAfuL8qzK8bfUHR6R8IbAbNq+V3yukE6A1ms8+prT4=;
+        b=EMBzm9fXVaF4JpM+VVKPuZDbQEbFp8aR9QSG/ycSVDWjoTdW6bOfrMlvpxblG4rJma
+         kyH3zs2POb0XivMAht2sMQ8hOU4Cg31voMMBnbjiCckAxiLZk10ktH5vJqu0VEyvzm7X
+         r9OHY93XSaZbrFTA90r84PIx+OsRqNT71qTrAbrYatZz7Zmv/dCrVLRDCbEiX2W1W5x0
+         TKQmsLuRzvQ7MNycNlAUdu3o1rRv2KUKNF87xq9YHAySHDluWYX4HtvkivonY5x04Idv
+         Gn7c2QW/vbdLnTjwOiceCF/ItwoB9QJnhHOhYVQHRlkO9PBNXpr1Y/vFcJUCKWoQuQ9t
+         1pcw==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=1e100.net; s=20161025;
-        h=x-gm-message-state:mime-version:references:in-reply-to:from:date
-         :message-id:subject:to:cc;
-        bh=h5FP/voiQdxeaQU3Va8HH5cRZmi1OHTMwBKcRrrOo6E=;
-        b=eQ5/6ArwSvhN+7+LPkaa4Aodb+LFjJLQFa4oZahd7i0ENrAssuJoEQJOZppEtlTl7t
-         6fcwJx5j0VqElzstYYCZNsn85r30LYVkvnjA2jfQYdWGlU5BXcaK4guYlknCAotDVV+N
-         UzwKNrqviqWwRWWeyrZuahmg1YmTmltdNdAJS4mrbVZU81tSP+nRm6D/nrd67Ewo7XXN
-         kdYja/nkrBSRFzDQyGUDaUw+JUjtZScDS+0tp9GyuAuuI6b49422YI7VUrRDEMfyBH8k
-         Qe6cedJSz0OyjlQk9pSr2M2bvFlCTUUlq/9vZXc+p64eHZ6P2ZxZexfqcQMiEIMC1lQ3
-         g7fQ==
-X-Gm-Message-State: APjAAAVH1UFUoHsli/TruLBfdSpmS38/gk+0wDSCJLJ+oSHBNhHborLY
-        iWnpI/UOtHsKGM7GAjDyMc+n67tHLMHMlA==
-X-Google-Smtp-Source: APXvYqxq5/vN7+N678A5QktrPVKXYM68eeLog9lPIHjjNm5A27WxxgJjP3jpb4laa3bc7XO7O8FzYw==
-X-Received: by 2002:a05:651c:c7:: with SMTP id 7mr4027386ljr.42.1571952610084;
-        Thu, 24 Oct 2019 14:30:10 -0700 (PDT)
-Received: from mail-lj1-f176.google.com (mail-lj1-f176.google.com. [209.85.208.176])
-        by smtp.gmail.com with ESMTPSA id 3sm1528390lfq.55.2019.10.24.14.30.08
-        for <linux-block@vger.kernel.org>
-        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
-        Thu, 24 Oct 2019 14:30:08 -0700 (PDT)
-Received: by mail-lj1-f176.google.com with SMTP id c4so225645lja.11
-        for <linux-block@vger.kernel.org>; Thu, 24 Oct 2019 14:30:08 -0700 (PDT)
-X-Received: by 2002:a05:651c:331:: with SMTP id b17mr3303284ljp.133.1571952607809;
- Thu, 24 Oct 2019 14:30:07 -0700 (PDT)
+        h=x-gm-message-state:subject:to:cc:references:from:message-id:date
+         :user-agent:mime-version:in-reply-to:content-language
+         :content-transfer-encoding;
+        bh=mOAfuL8qzK8bfUHR6R8IbAbNq+V3yukE6A1ms8+prT4=;
+        b=OzlblOL4tXUgMWfDZmLE9An7fCaLhx5xl0JVChDCJ4U+bq1gAC4DPG9UEV+vGY1bXD
+         fem4qJAlFmeKKPrxhfZR11iUEXr+Nys5r6VYNbu+3cN4GAzG/5LWKpIjEvCPAqlBgTBD
+         EQGMjXnwzWZ+qBLPAVH2jVvupx76y4pds+C8pB7fnyO4aghDi3LfL04I5P1JfJ/NmYoc
+         ntZBTHRSvtTkunFTlD8m35stqjGJVkl0guTlhcTV7aeh8MLmJk+nLBJxeZDYB3TcYjeU
+         gnxOwd3oJHg5RhOlZ1jInZMVS4hLiIzkGNBgaNUIZL49ze2TXltm4pHtwG3Sjzej0su+
+         9rXA==
+X-Gm-Message-State: APjAAAW1NCtnMjO/4XyrbfNNVEYwtgVmYVGcHTQkmgwCNX2f8nqS1zWL
+        Oy+NMOnZUenOnwdXhiViwk9bU/ca4JJWdQ==
+X-Google-Smtp-Source: APXvYqwv8JiG6f0VdK4wXcxwfpAIMQjsE7CQ5BXso8Cv5xcHiaTIXcvdyJxLGFXR4l0lzvAw2KZWkg==
+X-Received: by 2002:a63:aa45:: with SMTP id x5mr306354pgo.194.1571954669757;
+        Thu, 24 Oct 2019 15:04:29 -0700 (PDT)
+Received: from [192.168.1.188] ([66.219.217.79])
+        by smtp.gmail.com with ESMTPSA id h186sm34384095pfb.63.2019.10.24.15.04.27
+        (version=TLS1_2 cipher=ECDHE-RSA-AES128-GCM-SHA256 bits=128/128);
+        Thu, 24 Oct 2019 15:04:28 -0700 (PDT)
+Subject: Re: [PATCH 1/3] io_uring: add support for async work inheriting files
+ table
+To:     Jann Horn <jannh@google.com>
+Cc:     linux-block@vger.kernel.org,
+        "David S. Miller" <davem@davemloft.net>,
+        Network Development <netdev@vger.kernel.org>
+References: <20191017212858.13230-1-axboe@kernel.dk>
+ <0fb9d9a0-6251-c4bd-71b0-6e34c6a1aab8@kernel.dk>
+ <CAG48ez181=JoYudXee0KbU0vDZ=EbxmgB7q0mmjaA0gyp6MFBQ@mail.gmail.com>
+ <a54329d5-a128-3ccd-7a12-f6cadaa20dbf@kernel.dk>
+ <CAG48ez1SDQNHjgFku4ft4qw9hdv1g6-sf7-dxuU_tJSx+ofV-w@mail.gmail.com>
+ <dbcf874d-8484-9c27-157a-c2752181acb5@kernel.dk>
+ <CAG48ez3KwaQ3DVH1VoWxFWTG2ZfCQ6M0oyv5vZqkLgY0QDEdiw@mail.gmail.com>
+ <a8fb7a1f-69c7-bf2a-b3dd-7886077d234b@kernel.dk>
+ <572f40fb-201c-99ce-b3f5-05ff9369b895@kernel.dk>
+ <CAG48ez12pteHyZasU8Smup-0Mn3BWNMCVjybd1jvXsPrJ7OmYg@mail.gmail.com>
+ <20b44cc0-87b1-7bf8-d20e-f6131da9d130@kernel.dk>
+ <2d208fc8-7c24-bca5-3d4a-796a5a8267eb@kernel.dk>
+ <CAG48ez2ZQBVEe8yYRwWX2=TMYWsJ=tK44NM+wqiLW2AmfYEcHw@mail.gmail.com>
+ <0a3de9b2-3d3a-07b5-0e1c-515f610fbf75@kernel.dk>
+ <CAG48ez1akvnVpK3dMH4H=C2CsNGDZkDaxZEF2stGAPCnUcaa+g@mail.gmail.com>
+ <c3fb07d4-223c-8835-5c22-68367e957a4f@kernel.dk>
+ <CAG48ez0K_wtHA4DSWjz4TjohHkMTGo2pTpDVMZPQWD2gtrqZJw@mail.gmail.com>
+From:   Jens Axboe <axboe@kernel.dk>
+Message-ID: <c252182a-4d09-5e9b-112b-2dad9ef123b5@kernel.dk>
+Date:   Thu, 24 Oct 2019 16:04:25 -0600
+User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:60.0) Gecko/20100101
+ Thunderbird/60.9.0
 MIME-Version: 1.0
-References: <157186182463.3995.13922458878706311997.stgit@warthog.procyon.org.uk>
- <30394.1571936252@warthog.procyon.org.uk>
-In-Reply-To: <30394.1571936252@warthog.procyon.org.uk>
-From:   Linus Torvalds <torvalds@linux-foundation.org>
-Date:   Thu, 24 Oct 2019 17:29:51 -0400
-X-Gmail-Original-Message-ID: <CAHk-=wiMho2AhcTWC3-3zGK7639XL9UT=AheMXY0pxGHDACn6g@mail.gmail.com>
-Message-ID: <CAHk-=wiMho2AhcTWC3-3zGK7639XL9UT=AheMXY0pxGHDACn6g@mail.gmail.com>
-Subject: Re: [RFC PATCH 11/10] pipe: Add fsync() support [ver #2]
-To:     David Howells <dhowells@redhat.com>
-Cc:     Rasmus Villemoes <linux@rasmusvillemoes.dk>,
-        Greg Kroah-Hartman <gregkh@linuxfoundation.org>,
-        Peter Zijlstra <peterz@infradead.org>,
-        Nicolas Dichtel <nicolas.dichtel@6wind.com>, raven@themaw.net,
-        Christian Brauner <christian@brauner.io>,
-        keyrings@vger.kernel.org, linux-usb@vger.kernel.org,
-        linux-block <linux-block@vger.kernel.org>,
-        LSM List <linux-security-module@vger.kernel.org>,
-        linux-fsdevel <linux-fsdevel@vger.kernel.org>,
-        Linux API <linux-api@vger.kernel.org>,
-        Linux Kernel Mailing List <linux-kernel@vger.kernel.org>
-Content-Type: text/plain; charset="UTF-8"
+In-Reply-To: <CAG48ez0K_wtHA4DSWjz4TjohHkMTGo2pTpDVMZPQWD2gtrqZJw@mail.gmail.com>
+Content-Type: text/plain; charset=utf-8
+Content-Language: en-US
+Content-Transfer-Encoding: 7bit
 Sender: linux-block-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-On Thu, Oct 24, 2019 at 12:57 PM David Howells <dhowells@redhat.com> wrote:
->
-> pipe: Add fsync() support
->
-> The keyrings testsuite needs the ability to wait for all the outstanding
-> notifications in the queue to have been processed so that it can then go
-> through them to find out whether the notifications it expected have been
-> emitted.
+On 10/24/19 2:31 PM, Jann Horn wrote:
+> On Thu, Oct 24, 2019 at 9:41 PM Jens Axboe <axboe@kernel.dk> wrote:
+>> On 10/18/19 12:50 PM, Jann Horn wrote:
+>>> On Fri, Oct 18, 2019 at 8:16 PM Jens Axboe <axboe@kernel.dk> wrote:
+>>>> On 10/18/19 12:06 PM, Jann Horn wrote:
+>>>>> But actually, by the way: Is this whole files_struct thing creating a
+>>>>> reference loop? The files_struct has a reference to the uring file,
+>>>>> and the uring file has ACCEPT work that has a reference to the
+>>>>> files_struct. If the task gets killed and the accept work blocks, the
+>>>>> entire files_struct will stay alive, right?
+>>>>
+>>>> Yes, for the lifetime of the request, it does create a loop. So if the
+>>>> application goes away, I think you're right, the files_struct will stay.
+>>>> And so will the io_uring, for that matter, as we depend on the closing
+>>>> of the files to do the final reap.
+>>>>
+>>>> Hmm, not sure how best to handle that, to be honest. We need some way to
+>>>> break the loop, if the request never finishes.
+>>>
+>>> A wacky and dubious approach would be to, instead of taking a
+>>> reference to the files_struct, abuse f_op->flush() to synchronously
+>>> flush out pending requests with references to the files_struct... But
+>>> it's probably a bad idea, given that in f_op->flush(), you can't
+>>> easily tell which files_struct the close is coming from. I suppose you
+>>> could keep a list of (fdtable, fd) pairs through which ACCEPT requests
+>>> have come in and then let f_op->flush() probe whether the file
+>>> pointers are gone from them...
+>>
+>> Got back to this after finishing the io-wq stuff, which we need for the
+>> cancel.
+>>
+>> Here's an updated patch:
+>>
+>> http://git.kernel.dk/cgit/linux-block/commit/?h=for-5.5/io_uring-test&id=1ea847edc58d6a54ca53001ad0c656da57257570
+>>
+>> that seems to work for me (lightly tested), we correctly find and cancel
+>> work that is holding on to the file table.
+>>
+>> The full series sits on top of my for-5.5/io_uring-wq branch, and can be
+>> viewed here:
+>>
+>> http://git.kernel.dk/cgit/linux-block/log/?h=for-5.5/io_uring-test
+>>
+>> Let me know what you think!
+> 
+> Ah, I didn't realize that the second argument to f_op->flush is a
+> pointer to the files_struct. That's neat.
+> 
+> 
+> Security: There is no guarantee that ->flush() will run after the last
+> io_uring_enter() finishes. You can race like this, with threads A and
+> B in one process and C in another one:
+> 
+> A: sends uring fd to C via unix domain socket
+> A: starts syscall io_uring_enter(fd, ...)
+> A: calls fdget(fd), takes reference to file
+> B: starts syscall close(fd)
+> B: fd table entry is removed
+> B: f_op->flush is invoked and finds no pending transactions
+> B: syscall close() returns
+> A: continues io_uring_enter(), grabbing current->files
+> A: io_uring_enter() returns
+> A and B: exit
+> worker: use-after-free access to files_struct
+> 
+> I think the solution to this would be (unless you're fine with adding
+> some broad global read-write mutex) something like this in
+> __io_queue_sqe(), where "fd" and "f" are the variables from
+> io_uring_enter(), plumbed through the stack somehow:
+> 
+> if (req->flags & REQ_F_NEED_FILES) {
+>    rcu_read_lock();
+>    spin_lock_irq(&ctx->inflight_lock);
+>    if (fcheck(fd) == f) {
+>      list_add(&req->inflight_list,
+>        &ctx->inflight_list);
+>      req->work.files = current->files;
+>      ret = 0;
+>    } else {
+>      ret = -EBADF;
+>    }
+>    spin_unlock_irq(&ctx->inflight_lock);
+>    rcu_read_unlock();
+>    if (ret)
+>      goto put_req;
+> }
 
-Can't you just do
+First of all, thanks for the thorough look at this! We already have f
+available here, it's req->file. And we just made a copy of the sqe, so
+we have sqe->fd available as well. I fixed this up.
 
-    ioctl(fd, FIONREAD, &count);
+> Minor note: If a process uses dup() to duplicate the uring fd, then
+> closes the duplicated fd, that will cause work cancellations - but I
+> guess that's fine?
 
-in a loop instead? "No paperwork. Just sprinkle some msleep() crack on
-him, and let's get out of here"
+I don't think that's a concern.
 
-               Linus
+> Style nit: I find it a bit confusing to name both the list head and
+> the list member heads "inflight_list". Maybe name them "inflight_list"
+> and "inflight_entry", or something like that?
+
+Fixed
+
+> Correctness: Why is the wait in io_uring_flush() TASK_INTERRUPTIBLE?
+> Shouldn't it be TASK_UNINTERRUPTIBLE? If someone sends a signal to the
+> task while it's at that schedule(), it's just going to loop back
+> around and retry what it was doing already, right?
+
+Fixed
+
+> Security + Correctness: If there is more than one io_wqe, it seems to
+> me that io_uring_flush() calls io_wq_cancel_work(), which calls
+> io_wqe_cancel_work(), which may return IO_WQ_CANCEL_OK if the first
+> request it looks at is pending. In that case, io_wq_cancel_work() will
+> immediately return, and io_uring_flush() will also immediately return.
+> It looks like any other requests will continue running?
+
+Ah good point, I missed that. We need to keep looping until we get
+NOTFOUND returned. Fixed as well.
+
+Also added cancellation if the task is going away. Here's the
+incremental patch, I'll resend with the full version.
+
+
+diff --git a/fs/io_uring.c b/fs/io_uring.c
+index 43ae0e04fd09..ec9dadfa90d2 100644
+--- a/fs/io_uring.c
++++ b/fs/io_uring.c
+@@ -326,7 +326,7 @@ struct io_kiocb {
+ 	u32			result;
+ 	u32			sequence;
+ 
+-	struct list_head	inflight_list;
++	struct list_head	inflight_entry;
+ 
+ 	struct io_wq_work	work;
+ };
+@@ -688,7 +688,7 @@ static void __io_free_req(struct io_kiocb *req)
+ 		unsigned long flags;
+ 
+ 		spin_lock_irqsave(&ctx->inflight_lock, flags);
+-		list_del(&req->inflight_list);
++		list_del(&req->inflight_entry);
+ 		if (wq_has_sleeper(&ctx->inflight_wait))
+ 			wake_up(&ctx->inflight_wait);
+ 		spin_unlock_irqrestore(&ctx->inflight_lock, flags);
+@@ -2329,6 +2329,24 @@ static int io_req_set_file(struct io_ring_ctx *ctx, const struct sqe_submit *s,
+ 	return 0;
+ }
+ 
++static int io_grab_files(struct io_ring_ctx *ctx, struct io_kiocb *req,
++			 struct io_uring_sqe *sqe)
++{
++	int ret = -EBADF;
++
++	rcu_read_lock();
++	spin_lock_irq(&ctx->inflight_lock);
++	if (fcheck(sqe->fd) == req->file) {
++		list_add(&req->inflight_entry, &ctx->inflight_list);
++		req->work.files = current->files;
++		ret = 0;
++	}
++	spin_unlock_irq(&ctx->inflight_lock);
++	rcu_read_unlock();
++
++	return ret;
++}
++
+ static int __io_queue_sqe(struct io_ring_ctx *ctx, struct io_kiocb *req,
+ 			struct sqe_submit *s)
+ {
+@@ -2349,23 +2367,24 @@ static int __io_queue_sqe(struct io_ring_ctx *ctx, struct io_kiocb *req,
+ 			s->sqe = sqe_copy;
+ 			memcpy(&req->submit, s, sizeof(*s));
+ 			if (req->flags & REQ_F_NEED_FILES) {
+-				spin_lock_irq(&ctx->inflight_lock);
+-				list_add(&req->inflight_list,
+-						&ctx->inflight_list);
+-				req->work.files = current->files;
+-				spin_unlock_irq(&ctx->inflight_lock);
++				ret = io_grab_files(ctx, req, sqe_copy);
++				if (ret) {
++					kfree(sqe_copy);
++					goto err;
++				}
+ 			}
+-			io_queue_async_work(ctx, req);
+ 
+ 			/*
+ 			 * Queued up for async execution, worker will release
+ 			 * submit reference when the iocb is actually submitted.
+ 			 */
++			io_queue_async_work(ctx, req);
+ 			return 0;
+ 		}
+ 	}
+ 
+ 	/* drop submission reference */
++err:
+ 	io_put_req(req, NULL);
+ 
+ 	/* and drop final reference, if we failed */
+@@ -3768,38 +3787,51 @@ static int io_uring_release(struct inode *inode, struct file *file)
+ 	return 0;
+ }
+ 
+-static int io_uring_flush(struct file *file, void *data)
++static void io_uring_cancel_files(struct io_ring_ctx *ctx,
++				  struct files_struct *files)
+ {
+-	struct io_ring_ctx *ctx = file->private_data;
+-	enum io_wq_cancel ret;
+ 	struct io_kiocb *req;
+ 	DEFINE_WAIT(wait);
+ 
+-restart:
+-	ret = IO_WQ_CANCEL_NOTFOUND;
++	while (!list_empty_careful(&ctx->inflight_list)) {
++		enum io_wq_cancel ret = IO_WQ_CANCEL_NOTFOUND;
+ 
+-	spin_lock_irq(&ctx->inflight_lock);
+-	list_for_each_entry(req, &ctx->inflight_list, inflight_list) {
+-		if (req->work.files == data) {
+-			ret = io_wq_cancel_work(ctx->io_wq, &req->work);
+-			break;
++		spin_lock_irq(&ctx->inflight_lock);
++		list_for_each_entry(req, &ctx->inflight_list, inflight_entry) {
++			if (req->work.files == files) {
++				ret = io_wq_cancel_work(ctx->io_wq, &req->work);
++				break;
++			}
+ 		}
+-	}
+-	if (ret == IO_WQ_CANCEL_RUNNING)
+-		prepare_to_wait(&ctx->inflight_wait, &wait, TASK_INTERRUPTIBLE);
++		if (ret == IO_WQ_CANCEL_RUNNING)
++			prepare_to_wait(&ctx->inflight_wait, &wait,
++					TASK_UNINTERRUPTIBLE);
+ 
+-	spin_unlock_irq(&ctx->inflight_lock);
++		spin_unlock_irq(&ctx->inflight_lock);
+ 
+-	/*
+-	 * If it was found running, wait for one inflight request to finish.
+-	 * Retry loop after that, as it may not have been the one we were
+-	 * looking for.
+-	 */
+-	if (ret == IO_WQ_CANCEL_RUNNING) {
++		/*
++		 * We need to keep going until we get NOTFOUND. We only cancel
++		 * one work at the time.
++		 *
++		 * If we get CANCEL_RUNNING, then wait for a work to complete
++		 * before continuing.
++		 */
++		if (ret == IO_WQ_CANCEL_OK)
++			continue;
++		else if (ret != IO_WQ_CANCEL_RUNNING)
++			break;
+ 		schedule();
+-		goto restart;
+-	}
++	};
++}
+ 
++static int io_uring_flush(struct file *file, void *data)
++{
++	struct io_ring_ctx *ctx = file->private_data;
++
++	if (fatal_signal_pending(current) || (current->flags & PF_EXITING))
++		io_wq_cancel_all(ctx->io_wq);
++	else
++		io_uring_cancel_files(ctx, data);
+ 	return 0;
+ }
+ 
+
+-- 
+Jens Axboe
+
