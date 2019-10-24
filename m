@@ -7,60 +7,60 @@ X-Spam-Status: No, score=-9.7 required=3.0 tests=DKIM_SIGNED,DKIM_VALID,
 	SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED,USER_AGENT_GIT autolearn=ham
 	autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id DBE68CA9EBC
-	for <linux-block@archiver.kernel.org>; Thu, 24 Oct 2019 13:44:56 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 1AF72CA9EBB
+	for <linux-block@archiver.kernel.org>; Thu, 24 Oct 2019 13:44:57 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.kernel.org (Postfix) with ESMTP id 934952084C
+	by mail.kernel.org (Postfix) with ESMTP id DD5B521928
 	for <linux-block@archiver.kernel.org>; Thu, 24 Oct 2019 13:44:56 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel-dk.20150623.gappssmtp.com header.i=@kernel-dk.20150623.gappssmtp.com header.b="bzzqdE7w"
+	dkim=pass (2048-bit key) header.d=kernel-dk.20150623.gappssmtp.com header.i=@kernel-dk.20150623.gappssmtp.com header.b="PzStOqNn"
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S2393728AbfJXNo4 (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        id S2390244AbfJXNo4 (ORCPT <rfc822;linux-block@archiver.kernel.org>);
         Thu, 24 Oct 2019 09:44:56 -0400
-Received: from mail-io1-f68.google.com ([209.85.166.68]:34206 "EHLO
-        mail-io1-f68.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S2390244AbfJXNoz (ORCPT
+Received: from mail-il1-f194.google.com ([209.85.166.194]:35452 "EHLO
+        mail-il1-f194.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S2393632AbfJXNo4 (ORCPT
         <rfc822;linux-block@vger.kernel.org>);
-        Thu, 24 Oct 2019 09:44:55 -0400
-Received: by mail-io1-f68.google.com with SMTP id q1so29568805ion.1
-        for <linux-block@vger.kernel.org>; Thu, 24 Oct 2019 06:44:52 -0700 (PDT)
+        Thu, 24 Oct 2019 09:44:56 -0400
+Received: by mail-il1-f194.google.com with SMTP id p8so12706117ilp.2
+        for <linux-block@vger.kernel.org>; Thu, 24 Oct 2019 06:44:53 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=kernel-dk.20150623.gappssmtp.com; s=20150623;
         h=from:to:cc:subject:date:message-id:in-reply-to:references;
-        bh=RLpyBq5GCR5S++ivua56mgN2p4QukWBO613FDU/eyJE=;
-        b=bzzqdE7wolGxj0W41EIDq+XWTg0uoZcu7kzQPKAM20V4o/lGCIjJ+/b1xnjreEBIBd
-         RMwuZJhX3TpcmfQ3ATXp3Gbmlj7Q851CrTtDoYcmurS1kfEomg37pugQKclkctKwT97i
-         ZsxFAnZQaysj7Fdyq0/Pp9hCOqsmWMsnzFmWjVb6CoKRNhGH98ssY9BVjDr3hSQpuKVQ
-         7AWch9Eua8HVVQe0j7lil/SAMwhl0rb4q1JJqafsgqgdwE5lx8GuIQldCI4X3rgndSjM
-         wc1byluavx+xQB+efsIjJIg67wlk4NSxoeVpf2X0gRfAb472+SIfDcM4/yW+G+KwkiEP
-         LJQA==
+        bh=xLHTwy50dB4cOnumZ07EUVWWDhy7Y8pmKKJj4Mf+JKA=;
+        b=PzStOqNn9AKL00hUpICaNqKgc8f0Qo7jpJVe3Cizoe38OB536POW9ZZcyTNuv434yA
+         jb/4hvaSpLs9QykmfUizVK4/z7ycQ4gFJZUR4U7/8ntMg17oVe3kZtWhIXOX13+U59ik
+         vWxo1mlGrytS5KJWELLet6MRdSvK9eB/Jv7QgcrAeIKiAqJe7NFYCqKNVLAQ5AN6amen
+         CUUVr45MWvBv0BZrfwShgk2w1IJDMilGfwiFx15Nx/6Dp98Cirt/TCBfGWEqxgz7xBOM
+         IIzJdR011QQEBjLJsW/A+ySXLQUefmPgbLyyIsqGa6fj6OgZEZQihMFGf0CYqTY5E+1l
+         2Qiw==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=1e100.net; s=20161025;
         h=x-gm-message-state:from:to:cc:subject:date:message-id:in-reply-to
          :references;
-        bh=RLpyBq5GCR5S++ivua56mgN2p4QukWBO613FDU/eyJE=;
-        b=U9xv5qXjgACMEA+YVi3sDAerPwSp9LXumnNTBZtANiO/0NwqadMCDiDix9iTR3/VdJ
-         JbWMBxTr4WvsWDEMoXnGIU6+Bkl1xz8B4bYQnCvoDwO1Gb3S0WBmwCxjAe2g7WLbd3E6
-         wgROv25HfP3LR+xe37qIfcCCbo69BbNXEALJcw91ayY+hrVkZ3IjVg/CCHZoUyJ5sPja
-         zICtd2e8JAGlib+Av1w7UsAWPGAVx8OSmdwz7xQV4QEzBTfTYUOAdI1EaUS3bGgC7le7
-         fq4ZkIsbdF9cTxi99Oakoe81g8DoFQrdF05VsiP3ShP7VSZWtTuD04szNChmeXvcBkt5
-         CWIg==
-X-Gm-Message-State: APjAAAUxB/uQCKXMBUsj6WAsRQx/E7FMLbJKP3E2iVziSccsABjFsebt
-        s1gRr/90B6m0g7Am2ocwWZt3jnYTBiotTw==
-X-Google-Smtp-Source: APXvYqxzB7zf+rDYK1g+/wHEhFbZYxF/3/2+qQ/LHksILuKnQc7o2U56k32PVoOfxETzl644y/L/4g==
-X-Received: by 2002:a02:a90b:: with SMTP id n11mr14715498jam.13.1571924690764;
-        Thu, 24 Oct 2019 06:44:50 -0700 (PDT)
+        bh=xLHTwy50dB4cOnumZ07EUVWWDhy7Y8pmKKJj4Mf+JKA=;
+        b=b4l3pUdC86jn+bI1fwmykUKtTLna4VnaaaJs3SvD1TD9QGD2y7mAmUnE6j4amhn+bY
+         q3f7J2eocofj4ZjwvckQiruxDwWUsP5+i0d4KMoubWdQT6kcAZpSYk/aC6iNW+/rS0oF
+         HSNz/ME5W4cIdFG62nBbP1+9pEo1IqIWbNI4dU2VYg0GVhSG713I3w9BGWCWNQn6ozbV
+         B7UukaGXfPVBuiv8wJO6yQHXmNjwgDT0tGinpCmoogNzfSEwPDWyX2bl69LbO1C758Qf
+         vKgyGRMIyFp9WSrz0+Ajih7HTuPo9X4Lwy2DteRR8yJV6VN9D/VMgHdnovttCgF7Kyg9
+         386g==
+X-Gm-Message-State: APjAAAVk79oxsPVbJXjzx31NqxI8KQOdADtGskjdY7pKlhSqKeZhtAaR
+        05iCG+5PKjbQ2VLzbLj3rH7+xPgCc3YGVA==
+X-Google-Smtp-Source: APXvYqzMOJI1hqVjzFz6CCOEgITQPSm9g+3OvdTv/0uYeAcLUup/YWqEhaKXhDP1rR2xcbQRPd1Q3w==
+X-Received: by 2002:a92:5ac2:: with SMTP id b63mr48127091ilg.138.1571924692183;
+        Thu, 24 Oct 2019 06:44:52 -0700 (PDT)
 Received: from x1.localdomain ([65.144.74.34])
-        by smtp.gmail.com with ESMTPSA id d21sm6092243ilg.12.2019.10.24.06.44.48
+        by smtp.gmail.com with ESMTPSA id d21sm6092243ilg.12.2019.10.24.06.44.50
         (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Thu, 24 Oct 2019 06:44:49 -0700 (PDT)
+        Thu, 24 Oct 2019 06:44:51 -0700 (PDT)
 From:   Jens Axboe <axboe@kernel.dk>
 To:     linux-block@vger.kernel.org
 Cc:     tj@kernel.org, peterz@infradead.org, mingo@kernel.org,
         Jens Axboe <axboe@kernel.dk>
-Subject: [PATCH 1/2] io-wq: small threadpool implementation for io_uring
-Date:   Thu, 24 Oct 2019 07:44:38 -0600
-Message-Id: <20191024134439.28498-2-axboe@kernel.dk>
+Subject: [PATCH 2/2] io_uring: replace workqueue usage with io-wq
+Date:   Thu, 24 Oct 2019 07:44:39 -0600
+Message-Id: <20191024134439.28498-3-axboe@kernel.dk>
 X-Mailer: git-send-email 2.17.1
 In-Reply-To: <20191024134439.28498-1-axboe@kernel.dk>
 References: <20191024134439.28498-1-axboe@kernel.dk>
@@ -69,987 +69,682 @@ Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-This adds support for io-wq, a smaller and specialized thread pool
-implementation. This is meant to replace workqueues for io_uring. Among
-the reasons for this addition are:
+Drop various work-arounds we have for workqueues:
 
-- We can assign memory context smarter and more persistently if we
-  manage the life time of threads.
+- We no longer need the async_list for tracking sequential IO.
 
-- We can drop various work-arounds we have in io_uring, like the
-  async_list.
+- We don't have to maintain our own mm tracking/setting.
 
-- We can implement hashed work insertion, to manage concurrency of
-  buffered writes without needing a) an extra workqueue, or b)
-  needlessly making the concurrency of said workqueue very low
-  which hurts performance of multiple buffered file writers.
+- We don't need a separate workqueue for buffered writes. This didn't
+  even work that well to begin with, as it was suboptimal for multiple
+  buffered writers on multiple files.
 
-- We can implement cancel through signals, for cancelling
-  interruptible work like read/write (or send/recv) to/from sockets.
+- We can properly cancel pending interruptible work. This fixes
+  deadlocks with particularly socket IO, where we cannot cancel them
+  when the io_uring is closed. Hence the ring will wait forever for
+  these requests to complete, which may never happen. This is different
+  from disk IO where we know requests will complete in a finite amount
+  of time.
 
-- We need the above cancel for being able to assign and use file tables
-  from a process.
+- Due to being able to cancel work interruptible work that is already
+  running, we can implement file table support for work. We need that
+  for supporting system calls that add to a process file table.
 
-- We can implement a more thorough cancel operation in general.
-
-- We need it to move towards a syslet/threadlet model for even faster
-  async execution. For that we need to take ownership of the used
-  threads.
-
-This list is just off the top of my head. Performance should be the
-same, or better, at least that's what I've seen in my testing. io-wq
-supports basic NUMA functionality, setting up a pool per node.
-
-io-wq hooks up to the scheduler schedule in/out just like workqueue
-and uses that to drive the need for more/less workers.
+- It gets us one step closer to adding async support for any system
+  call.
 
 Signed-off-by: Jens Axboe <axboe@kernel.dk>
 ---
- fs/Kconfig            |   3 +
- fs/Makefile           |   1 +
- fs/io-wq.c            | 790 ++++++++++++++++++++++++++++++++++++++++++
- fs/io-wq.h            |  55 +++
- include/linux/sched.h |   1 +
- kernel/sched/core.c   |  16 +-
- 6 files changed, 862 insertions(+), 4 deletions(-)
- create mode 100644 fs/io-wq.c
- create mode 100644 fs/io-wq.h
+ fs/io_uring.c | 402 +++++++++++---------------------------------------
+ init/Kconfig  |   1 +
+ 2 files changed, 86 insertions(+), 317 deletions(-)
 
-diff --git a/fs/Kconfig b/fs/Kconfig
-index 2501e6f1f965..7b623e9fc1b0 100644
---- a/fs/Kconfig
-+++ b/fs/Kconfig
-@@ -322,4 +322,7 @@ source "fs/nls/Kconfig"
- source "fs/dlm/Kconfig"
- source "fs/unicode/Kconfig"
+diff --git a/fs/io_uring.c b/fs/io_uring.c
+index fa081c60a49b..de99f97d6629 100644
+--- a/fs/io_uring.c
++++ b/fs/io_uring.c
+@@ -56,7 +56,6 @@
+ #include <linux/mmu_context.h>
+ #include <linux/percpu.h>
+ #include <linux/slab.h>
+-#include <linux/workqueue.h>
+ #include <linux/kthread.h>
+ #include <linux/blkdev.h>
+ #include <linux/bvec.h>
+@@ -77,6 +76,7 @@
+ #include <uapi/linux/io_uring.h>
  
-+config IO_WQ
-+	bool
-+
- endmenu
-diff --git a/fs/Makefile b/fs/Makefile
-index 14231b4cf383..1148c555c4d3 100644
---- a/fs/Makefile
-+++ b/fs/Makefile
-@@ -32,6 +32,7 @@ obj-$(CONFIG_EVENTFD)		+= eventfd.o
- obj-$(CONFIG_USERFAULTFD)	+= userfaultfd.o
- obj-$(CONFIG_AIO)               += aio.o
- obj-$(CONFIG_IO_URING)		+= io_uring.o
-+obj-$(CONFIG_IO_WQ)		+= io-wq.o
- obj-$(CONFIG_FS_DAX)		+= dax.o
- obj-$(CONFIG_FS_ENCRYPTION)	+= crypto/
- obj-$(CONFIG_FS_VERITY)		+= verity/
-diff --git a/fs/io-wq.c b/fs/io-wq.c
-new file mode 100644
-index 000000000000..32ae5cdcb726
---- /dev/null
-+++ b/fs/io-wq.c
-@@ -0,0 +1,790 @@
-+// SPDX-License-Identifier: GPL-2.0
-+/*
-+ * Basic worker thread pool for io_uring
-+ *
-+ * Copyright (C) 2019 Jens Axboe
-+ *
-+ */
-+#include <linux/kernel.h>
-+#include <linux/init.h>
-+#include <linux/errno.h>
-+#include <linux/sched/signal.h>
-+#include <linux/mm.h>
-+#include <linux/mmu_context.h>
-+#include <linux/sched/mm.h>
-+#include <linux/percpu.h>
-+#include <linux/slab.h>
-+#include <linux/kthread.h>
-+#include <linux/rculist_nulls.h>
-+
+ #include "internal.h"
 +#include "io-wq.h"
-+
-+#define WORKER_IDLE_TIMEOUT	(5 * HZ)
-+
-+enum {
-+	IO_WORKER_F_UP		= 1,	/* up and active */
-+	IO_WORKER_F_RUNNING	= 2,	/* account as running */
-+	IO_WORKER_F_FREE	= 4,	/* worker on free list */
-+	IO_WORKER_F_EXITING	= 8,	/* worker exiting */
-+	IO_WORKER_F_FIXED	= 16,	/* static idle worker */
-+};
-+
-+enum {
-+	IO_WQ_BIT_EXIT		= 0,	/* wq exiting */
-+	IO_WQ_BIT_CANCEL	= 1,	/* cancel work on list */
-+};
-+
-+enum {
-+	IO_WQE_BIT_STALLED	= 0,	/* stalled on hash */
-+};
-+
-+/*
-+ * One for each thread in a wqe pool
-+ */
-+struct io_worker {
-+	refcount_t ref;
-+	unsigned flags;
-+	struct hlist_nulls_node nulls_node;
-+	struct task_struct *task;
-+	wait_queue_head_t wait;
-+	struct io_wqe *wqe;
-+	struct io_wq_work *cur_work;
-+
-+	struct rcu_head rcu;
-+	struct mm_struct *mm;
-+};
-+
-+struct io_wq_nulls_list {
-+	struct hlist_nulls_head head;
-+	unsigned long nulls;
-+};
-+
-+#if BITS_PER_LONG == 64
-+#define IO_WQ_HASH_ORDER	6
-+#else
-+#define IO_WQ_HASH_ORDER	5
-+#endif
-+
-+/*
-+ * Per-node worker thread pool
-+ */
-+struct io_wqe {
-+	struct {
-+		spinlock_t lock;
-+		struct list_head work_list;
-+		unsigned long state;
-+		unsigned long hash_map;
-+	} ____cacheline_aligned_in_smp;
-+
-+	int node;
-+	unsigned nr_workers;
-+	unsigned max_workers;
-+	atomic_t nr_running;
-+
-+	struct io_wq_nulls_list free_list;
-+	struct io_wq_nulls_list busy_list;
-+
-+	struct io_wq *wq;
-+};
-+
-+/*
-+ * Per io_wq state
-+  */
-+struct io_wq {
-+	struct io_wqe **wqes;
-+	unsigned long state;
-+	unsigned nr_wqes;
-+
-+	struct task_struct *manager;
-+	struct mm_struct *mm;
-+	refcount_t refs;
-+	struct completion done;
-+};
-+
-+static void io_wq_free_worker(struct rcu_head *head)
-+{
-+	struct io_worker *worker = container_of(head, struct io_worker, rcu);
-+
-+	kfree(worker);
-+}
-+
-+static bool io_worker_get(struct io_worker *worker)
-+{
-+	return refcount_inc_not_zero(&worker->ref);
-+}
-+
-+static void io_worker_release(struct io_worker *worker)
-+{
-+	if (refcount_dec_and_test(&worker->ref))
-+		wake_up_process(worker->task);
-+}
-+
-+static void io_worker_exit(struct io_worker *worker)
-+{
-+	struct io_wqe *wqe = worker->wqe;
-+	bool all_done = false;
-+
-+	/*
-+	 * If we're not at zero, someone else is holding a brief reference
-+	 * to the worker. Wait for that to go away.
-+	 */
-+	set_current_state(TASK_INTERRUPTIBLE);
-+	if (!refcount_dec_and_test(&worker->ref))
-+		schedule();
-+	__set_current_state(TASK_RUNNING);
-+
-+	preempt_disable();
-+	current->flags &= ~PF_IO_WORKER;
-+	if (worker->flags & IO_WORKER_F_RUNNING)
-+		atomic_dec(&wqe->nr_running);
-+	worker->flags = 0;
-+	preempt_enable();
-+
-+	spin_lock(&wqe->lock);
-+	hlist_nulls_del_rcu(&worker->nulls_node);
-+	wqe->nr_workers--;
-+	all_done = !wqe->nr_workers;
-+	spin_unlock(&wqe->lock);
-+
-+	/* all workers gone, wq exit can proceed */
-+	if (all_done && refcount_dec_and_test(&wqe->wq->refs))
-+		complete(&wqe->wq->done);
-+
-+	call_rcu(&worker->rcu, io_wq_free_worker);
-+}
-+
-+static void io_worker_start(struct io_wqe *wqe, struct io_worker *worker)
-+{
-+	allow_kernel_signal(SIGINT);
-+
-+	current->flags |= PF_IO_WORKER;
-+
-+	worker->flags |= (IO_WORKER_F_UP | IO_WORKER_F_RUNNING);
-+	atomic_inc(&wqe->nr_running);
-+}
-+
-+/*
-+ * Worker will start processing some work. Move it to the busy list, if
-+ * it's currently on the freelist
-+ */
-+static void __io_worker_busy(struct io_wqe *wqe, struct io_worker *worker,
-+			     struct io_wq_work *work)
-+	__must_hold(wqe->lock)
-+{
-+	if (worker->flags & IO_WORKER_F_FREE) {
-+		worker->flags &= ~IO_WORKER_F_FREE;
-+		hlist_nulls_del_init_rcu(&worker->nulls_node);
-+		hlist_nulls_add_head_rcu(&worker->nulls_node,
-+						&wqe->busy_list.head);
-+	}
-+	worker->cur_work = work;
-+}
-+
-+/*
-+ * No work, worker going to sleep. Move to freelist, and unuse mm if we
-+ * have one attached. Dropping the mm may potentially sleep, so we drop
-+ * the lock in that case and return success. Since the caller has to
-+ * retry the loop in that case (we changed task state), we don't regrab
-+ * the lock if we return success.
-+ */
-+static bool __io_worker_idle(struct io_wqe *wqe, struct io_worker *worker)
-+	__must_hold(wqe->lock)
-+	__releases(wqe->lock)
-+{
-+	if (!(worker->flags & IO_WORKER_F_FREE)) {
-+		worker->flags |= IO_WORKER_F_FREE;
-+		hlist_nulls_del_init_rcu(&worker->nulls_node);
-+		hlist_nulls_add_head_rcu(&worker->nulls_node,
-+						&wqe->free_list.head);
-+	}
-+	/*
-+	 * If we have an active mm, we need to drop the wq lock before unusing
-+	 * it. If we do, return true and let the caller retry the idle loop.
-+	 */
-+	if (worker->mm) {
-+		spin_unlock(&wqe->lock);
-+		__set_current_state(TASK_RUNNING);
-+		set_fs(KERNEL_DS);
-+		unuse_mm(worker->mm);
-+		mmput(worker->mm);
-+		worker->mm = NULL;
-+		return true;
-+	}
-+
-+	return false;
-+}
-+
-+static struct io_wq_work *io_get_next_work(struct io_wqe *wqe, unsigned *hash)
-+	__must_hold(wqe->lock)
-+{
-+	struct io_wq_work *work;
-+
-+	list_for_each_entry(work, &wqe->work_list, list) {
-+		/* not hashed, can run anytime */
-+		if (!(work->flags & IO_WQ_WORK_HASHED)) {
-+			list_del(&work->list);
-+			return work;
-+		}
-+
-+		/* hashed, can run if not already running */
-+		*hash = work->flags >> IO_WQ_HASH_SHIFT;
-+		if (!(wqe->hash_map & (1U << *hash))) {
-+			wqe->hash_map |= (1U << *hash);
-+			list_del(&work->list);
-+			return work;
-+		}
-+	}
-+
-+	return NULL;
-+}
-+
-+static void io_worker_handle_work(struct io_worker *worker)
-+	__releases(wqe->lock)
-+{
-+	struct io_wq_work *work, *old_work;
-+	struct io_wqe *wqe = worker->wqe;
-+	struct io_wq *wq = wqe->wq;
-+
-+	do {
-+		unsigned hash = -1U;
-+
-+		/*
-+		 * If we got some work, mark us as busy. If we didn't, but
-+		 * the list isn't empty, it means we stalled on hashed work.
-+		 * Mark us stalled so we don't keep looking for work when we
-+		 * can't make progress, any work completion or insertion will
-+		 * clear the stalled flag.
-+		 */
-+		work = io_get_next_work(wqe, &hash);
-+		if (work)
-+			__io_worker_busy(wqe, worker, work);
-+		else if (!list_empty(&wqe->work_list))
-+			set_bit(IO_WQE_BIT_STALLED, &wqe->state);
-+
-+		spin_unlock(&wqe->lock);
-+		if (!work)
-+			break;
-+next:
-+		if ((work->flags & IO_WQ_WORK_NEEDS_USER) && !worker->mm &&
-+		    wq->mm && mmget_not_zero(wq->mm)) {
-+			use_mm(wq->mm);
-+			set_fs(USER_DS);
-+			worker->mm = wq->mm;
-+		}
-+		if (test_bit(IO_WQ_BIT_CANCEL, &wq->state))
-+			work->flags |= IO_WQ_WORK_CANCEL;
-+		if (worker->mm)
-+			work->flags |= IO_WQ_WORK_HAS_MM;
-+
-+		old_work = work;
-+		work->func(&work);
-+
-+		spin_lock(&wqe->lock);
-+		worker->cur_work = NULL;
-+		if (hash != -1U) {
-+			wqe->hash_map &= ~(1U << hash);
-+			if (test_bit(IO_WQE_BIT_STALLED, &wqe->state))
-+				clear_bit(IO_WQE_BIT_STALLED, &wqe->state);
-+		}
-+		if (work && work != old_work) {
-+			spin_unlock(&wqe->lock);
-+			goto next;
-+		}
-+	} while (1);
-+}
-+
-+static inline bool io_wqe_run_queue(struct io_wqe *wqe)
-+{
-+	if (!list_empty_careful(&wqe->work_list) &&
-+	    !test_bit(IO_WQE_BIT_STALLED, &wqe->state))
-+		return true;
-+	return false;
-+}
-+
-+static int io_wqe_worker(void *data)
-+{
-+	struct io_worker *worker = data;
-+	struct io_wqe *wqe = worker->wqe;
-+	struct io_wq *wq = wqe->wq;
-+	DEFINE_WAIT(wait);
-+
-+	io_worker_start(wqe, worker);
-+
-+	while (!test_bit(IO_WQ_BIT_EXIT, &wq->state)) {
-+		prepare_to_wait(&worker->wait, &wait, TASK_INTERRUPTIBLE);
-+
-+		spin_lock(&wqe->lock);
-+		if (io_wqe_run_queue(wqe)) {
-+			__set_current_state(TASK_RUNNING);
-+			io_worker_handle_work(worker);
-+			continue;
-+		}
-+		/* drops the lock on success, retry */
-+		if (__io_worker_idle(wqe, worker))
-+			continue;
-+		spin_unlock(&wqe->lock);
-+		if (signal_pending(current))
-+			flush_signals(current);
-+		if (schedule_timeout(WORKER_IDLE_TIMEOUT))
-+			continue;
-+		/* timed out, exit unless we're the fixed worker */
-+		if (test_bit(IO_WQ_BIT_EXIT, &wq->state) ||
-+		    !(worker->flags & IO_WORKER_F_FIXED))
-+			break;
-+	}
-+
-+	finish_wait(&worker->wait, &wait);
-+
-+	if (test_bit(IO_WQ_BIT_EXIT, &wq->state)) {
-+		spin_lock(&wqe->lock);
-+		if (!list_empty(&wqe->work_list))
-+			io_worker_handle_work(worker);
-+		else
-+			spin_unlock(&wqe->lock);
-+	}
-+
-+	io_worker_exit(worker);
-+	return 0;
-+}
-+
-+/*
-+ * Check head of free list for an available worker. If one isn't available,
-+ * caller must wake up the wq manager to create one.
-+ */
-+static bool io_wqe_activate_free_worker(struct io_wqe *wqe)
-+	__must_hold(RCU)
-+{
-+	struct hlist_nulls_node *n;
-+	struct io_worker *worker;
-+
-+	n = rcu_dereference(hlist_nulls_first_rcu(&wqe->free_list.head));
-+	if (is_a_nulls(n))
-+		return false;
-+
-+	worker = hlist_nulls_entry(n, struct io_worker, nulls_node);
-+	if (io_worker_get(worker)) {
-+		wake_up(&worker->wait);
-+		io_worker_release(worker);
-+		return true;
-+	}
-+
-+	return false;
-+}
-+
-+/*
-+ * We need a worker. If we find a free one, we're good. If not, and we're
-+ * below the max number of workers, wake up the manager to create one.
-+ */
-+static void io_wqe_wake_worker(struct io_wqe *wqe)
-+{
-+	bool ret;
-+
-+	rcu_read_lock();
-+	ret = io_wqe_activate_free_worker(wqe);
-+	rcu_read_unlock();
-+
-+	if (!ret && wqe->nr_workers < wqe->max_workers)
-+		wake_up_process(wqe->wq->manager);
-+}
-+
-+/*
-+ * Called when a worker is scheduled in. Mark us as currently running.
-+ */
-+void io_wq_worker_running(struct task_struct *tsk)
-+{
-+	struct io_worker *worker = kthread_data(tsk);
-+	struct io_wqe *wqe = worker->wqe;
-+
-+	if (!(worker->flags & IO_WORKER_F_UP))
-+		return;
-+	if (worker->flags & IO_WORKER_F_RUNNING)
-+		return;
-+	worker->flags |= IO_WORKER_F_RUNNING;
-+	atomic_inc(&wqe->nr_running);
-+}
-+
-+/*
-+ * Called when worker is going to sleep. If there are no workers currently
-+ * running and we have work pending, wake up a free one or have the manager
-+ * set one up.
-+ */
-+void io_wq_worker_sleeping(struct task_struct *tsk)
-+{
-+	struct io_worker *worker = kthread_data(tsk);
-+	struct io_wqe *wqe = worker->wqe;
-+
-+	if (!(worker->flags & IO_WORKER_F_UP))
-+		return;
-+	if (!(worker->flags & IO_WORKER_F_RUNNING))
-+		return;
-+
-+	worker->flags &= ~IO_WORKER_F_RUNNING;
-+
-+	if (atomic_dec_and_test(&wqe->nr_running) && io_wqe_run_queue(wqe))
-+		io_wqe_wake_worker(wqe);
-+}
-+
-+static void create_io_worker(struct io_wq *wq, struct io_wqe *wqe)
-+{
-+	struct io_worker *worker;
-+
-+	worker = kcalloc_node(1, sizeof(*worker), GFP_KERNEL, wqe->node);
-+	if (!worker)
-+		return;
-+
-+	refcount_set(&worker->ref, 1);
-+	worker->nulls_node.pprev = NULL;
-+	init_waitqueue_head(&worker->wait);
-+	worker->wqe = wqe;
-+
-+	worker->task = kthread_create_on_node(io_wqe_worker, worker, wqe->node,
-+						"io_wqe_worker-%d", wqe->node);
-+	if (IS_ERR(worker->task)) {
-+		kfree(worker);
-+		return;
-+	}
-+
-+	spin_lock(&wqe->lock);
-+	hlist_nulls_add_head_rcu(&worker->nulls_node, &wqe->free_list.head);
-+	worker->flags |= IO_WORKER_F_FREE;
-+	if (!wqe->nr_workers)
-+		worker->flags |= IO_WORKER_F_FIXED;
-+	wqe->nr_workers++;
-+	spin_unlock(&wqe->lock);
-+
-+	wake_up_process(worker->task);
-+}
-+
-+static inline bool io_wqe_need_new_worker(struct io_wqe *wqe)
-+	__must_hold(wqe->lock)
-+{
-+	if (!wqe->nr_workers)
-+		return true;
-+	if (hlist_nulls_empty(&wqe->free_list.head) &&
-+	    wqe->nr_workers < wqe->max_workers && io_wqe_run_queue(wqe))
-+		return true;
-+
-+	return false;
-+}
-+
-+/*
-+ * Manager thread. Tasked with creating new workers, if we need them.
-+ */
-+static int io_wq_manager(void *data)
-+{
-+	struct io_wq *wq = data;
-+
-+	while (!kthread_should_stop()) {
-+		int i;
-+
-+		for (i = 0; i < wq->nr_wqes; i++) {
-+			struct io_wqe *wqe = wq->wqes[i];
-+			bool fork_worker = false;
-+
-+			spin_lock(&wqe->lock);
-+			fork_worker = io_wqe_need_new_worker(wqe);
-+			spin_unlock(&wqe->lock);
-+			if (fork_worker)
-+				create_io_worker(wq, wqe);
-+		}
-+		set_current_state(TASK_INTERRUPTIBLE);
-+		if (schedule_timeout(HZ))
-+			continue;
-+#ifdef IO_WQ_MANAGER_DEBUG
-+		printk("manager: now workers=%d/running=%d/work_empty=%d\n", wq->nr_workers, atomic_read(&wq->nr_running), list_empty(&wq->work_list));
-+#endif
-+	}
-+
-+	return 0;
-+}
-+
-+static void io_wqe_enqueue(struct io_wqe *wqe, struct io_wq_work *work)
-+{
-+	spin_lock(&wqe->lock);
-+	list_add_tail(&work->list, &wqe->work_list);
-+	spin_unlock(&wqe->lock);
-+
-+	if (test_bit(IO_WQE_BIT_STALLED, &wqe->state))
-+		clear_bit(IO_WQE_BIT_STALLED, &wqe->state);
-+
-+	if (!atomic_read(&wqe->nr_running))
-+		io_wqe_wake_worker(wqe);
-+}
-+
-+void io_wq_enqueue(struct io_wq *wq, struct io_wq_work *work)
-+{
-+	struct io_wqe *wqe = wq->wqes[numa_node_id()];
-+
-+	io_wqe_enqueue(wqe, work);
-+}
-+
-+/*
-+ * Enqueue work, hashed by some key. Work items that hash to the same value
-+ * will not be done in parallel. Used to limit concurrent writes, generally
-+ * hashed by inode.
-+ */
-+void io_wq_enqueue_hashed(struct io_wq *wq, struct io_wq_work *work, void *val)
-+{
-+	struct io_wqe *wqe = wq->wqes[numa_node_id()];
-+	unsigned bit;
-+
-+
-+	bit = hash_ptr(val, IO_WQ_HASH_ORDER);
-+	work->flags |= (IO_WQ_WORK_HASHED | (bit << IO_WQ_HASH_SHIFT));
-+	io_wqe_enqueue(wqe, work);
-+}
-+
-+static bool io_wqe_worker_send_sig(struct io_worker *worker, void *data)
-+{
-+	send_sig(SIGINT, worker->task, 1);
-+	return false;
-+}
-+
-+/*
-+ * Iterate the passed in list and call the specific function for each
-+ * worker that isn't exiting
-+ */
-+static bool io_wq_for_each_worker(struct io_wqe *wqe,
-+				  struct io_wq_nulls_list *list,
-+				  bool (*func)(struct io_worker *, void *),
-+				  void *data)
-+{
-+	struct hlist_nulls_node *n;
-+	struct io_worker *worker;
-+	bool ret = false;
-+
-+restart:
-+	hlist_nulls_for_each_entry_rcu(worker, n, &list->head, nulls_node) {
-+		if (io_worker_get(worker)) {
-+			ret = func(worker, data);
-+			io_worker_release(worker);
-+			if (ret)
-+				break;
-+		}
-+	}
-+	if (!ret && get_nulls_value(n) != list->nulls)
-+		goto restart;
-+	return ret;
-+}
-+
-+void io_wq_cancel_all(struct io_wq *wq)
-+{
-+	int i;
-+
-+	set_bit(IO_WQ_BIT_CANCEL, &wq->state);
-+
-+	/*
-+	 * Browse both lists, as there's a gap between handing work off
-+	 * to a worker and the worker putting itself on the busy_list
-+	 */
-+	rcu_read_lock();
-+	for (i = 0; i < wq->nr_wqes; i++) {
-+		struct io_wqe *wqe = wq->wqes[i];
-+
-+		io_wq_for_each_worker(wqe, &wqe->busy_list,
-+					io_wqe_worker_send_sig, NULL);
-+		io_wq_for_each_worker(wqe, &wqe->free_list,
-+					io_wqe_worker_send_sig, NULL);
-+	}
-+	rcu_read_unlock();
-+}
-+
-+static bool io_wq_worker_cancel(struct io_worker *worker, void *data)
-+{
-+	struct io_wq_work *work = data;
-+
-+	if (worker->cur_work == work) {
-+		send_sig(SIGINT, worker->task, 1);
-+		return true;
-+	}
-+
-+	return false;
-+}
-+
-+static enum io_wq_cancel io_wqe_cancel_work(struct io_wqe *wqe,
-+					    struct io_wq_work *cwork)
-+{
-+	struct io_wq_work *work;
-+	bool found;
-+
-+	/*
-+	 * First check pending list, if we're lucky we can just remove it
-+	 * from there. CANCEL_OK means that the work is returned as-new,
-+	 * no completion will be posted for it.
-+	 */
-+	spin_lock(&wqe->lock);
-+	list_for_each_entry(work, &wqe->work_list, list) {
-+		if (work == cwork) {
-+			list_del(&work->list);
-+			spin_unlock(&wqe->lock);
-+			return IO_WQ_CANCEL_OK;
-+		}
-+	}
-+	spin_unlock(&wqe->lock);
-+
-+	/*
-+	 * Now check if a free (going busy) or busy worker has the work
-+	 * currently running. If we find it there, we'll return CANCEL_RUNNING
-+	 * as an indication that we attempte to signal cancellation. The
-+	 * completion will run normally in this case.
-+	 */
-+	rcu_read_lock();
-+	found = io_wq_for_each_worker(wqe, &wqe->free_list, io_wq_worker_cancel,
-+					cwork);
-+	if (found)
-+		goto done;
-+
-+	found = io_wq_for_each_worker(wqe, &wqe->busy_list, io_wq_worker_cancel,
-+					cwork);
-+done:
-+	rcu_read_unlock();
-+	return found ? IO_WQ_CANCEL_RUNNING : IO_WQ_CANCEL_NOTFOUND;
-+
-+}
-+
-+enum io_wq_cancel io_wq_cancel_work(struct io_wq *wq, struct io_wq_work *cwork)
-+{
-+	enum io_wq_cancel ret = IO_WQ_CANCEL_NOTFOUND;
-+	int i;
-+
-+	for (i = 0; i < wq->nr_wqes; i++) {
-+		struct io_wqe *wqe = wq->wqes[i];
-+
-+		ret = io_wqe_cancel_work(wqe, cwork);
-+		if (ret != IO_WQ_CANCEL_NOTFOUND)
-+			break;
-+	}
-+
-+	return ret;
-+}
-+
-+struct io_wq_flush_data {
-+	struct io_wq_work work;
-+	struct completion done;
-+};
-+
-+static void io_wq_flush_func(struct io_wq_work **workptr)
-+{
-+	struct io_wq_work *work = *workptr;
-+	struct io_wq_flush_data *data;
-+
-+	data = container_of(work, struct io_wq_flush_data, work);
-+	complete(&data->done);
-+}
-+
-+/*
-+ * Doesn't wait for previously queued work to finish. When this completes,
-+ * it just means that previously queued work was started.
-+ */
-+void io_wq_flush(struct io_wq *wq)
-+{
-+	struct io_wq_flush_data data;
-+	int i;
-+
-+	for (i = 0; i < wq->nr_wqes; i++) {
-+		struct io_wqe *wqe = wq->wqes[i];
-+
-+		init_completion(&data.done);
-+		INIT_IO_WORK(&data.work, io_wq_flush_func);
-+		io_wqe_enqueue(wqe, &data.work);
-+		wait_for_completion(&data.done);
-+	}
-+}
-+
-+struct io_wq *io_wq_create(unsigned concurrency, struct mm_struct *mm)
-+{
-+	int ret = -ENOMEM, i, node;
-+	struct io_wq *wq;
-+
-+	wq = kcalloc(1, sizeof(*wq), GFP_KERNEL);
-+	if (!wq)
-+		return ERR_PTR(-ENOMEM);
-+
-+	wq->nr_wqes = num_online_nodes();
-+	wq->wqes = kcalloc(wq->nr_wqes, sizeof(struct io_wqe *), GFP_KERNEL);
-+	if (!wq->wqes) {
-+		kfree(wq);
-+		return ERR_PTR(-ENOMEM);
-+	}
-+
-+	i = 0;
-+	refcount_set(&wq->refs, wq->nr_wqes);
-+	for_each_online_node(node) {
-+		struct io_wqe *wqe;
-+
-+		wqe = kcalloc_node(1, sizeof(struct io_wqe), GFP_KERNEL, node);
-+		if (!wqe)
-+			break;
-+		wq->wqes[i] = wqe;
-+		wqe->node = node;
-+		wqe->max_workers = concurrency;
-+		wqe->node = node;
-+		wqe->wq = wq;
-+		spin_lock_init(&wqe->lock);
-+		INIT_LIST_HEAD(&wqe->work_list);
-+		INIT_HLIST_NULLS_HEAD(&wqe->free_list.head, 0);
-+		wqe->free_list.nulls = 0;
-+		INIT_HLIST_NULLS_HEAD(&wqe->busy_list.head, 1);
-+		wqe->busy_list.nulls = 1;
-+		atomic_set(&wqe->nr_running, 0);
-+
-+		i++;
-+	}
-+
-+	init_completion(&wq->done);
-+
-+	if (i != wq->nr_wqes)
-+		goto err;
-+
-+	/* caller must have already done mmgrab() on this mm */
-+	wq->mm = mm;
-+
-+	wq->manager = kthread_create(io_wq_manager, wq, "io_wq_manager");
-+	if (!IS_ERR(wq->manager)) {
-+		wake_up_process(wq->manager);
-+		return wq;
-+	}
-+
-+	ret = PTR_ERR(wq->manager);
-+	wq->manager = NULL;
-+err:
-+	complete(&wq->done);
-+	io_wq_destroy(wq);
-+	return ERR_PTR(ret);
-+}
-+
-+static bool io_wq_worker_wake(struct io_worker *worker, void *data)
-+{
-+	wake_up_process(worker->task);
-+	return false;
-+}
-+
-+void io_wq_destroy(struct io_wq *wq)
-+{
-+	int i;
-+
-+	if (wq->manager) {
-+		set_bit(IO_WQ_BIT_EXIT, &wq->state);
-+		kthread_stop(wq->manager);
-+	}
-+
-+	rcu_read_lock();
-+	for (i = 0; i < wq->nr_wqes; i++) {
-+		struct io_wqe *wqe = wq->wqes[i];
-+
-+		if (!wqe)
-+			continue;
-+		io_wq_for_each_worker(wqe, &wqe->free_list, io_wq_worker_wake,
-+						NULL);
-+		io_wq_for_each_worker(wqe, &wqe->busy_list, io_wq_worker_wake,
-+						NULL);
-+	}
-+	rcu_read_unlock();
-+
-+	wait_for_completion(&wq->done);
-+
-+	for (i = 0; i < wq->nr_wqes; i++)
-+		kfree(wq->wqes[i]);
-+	kfree(wq->wqes);
-+	kfree(wq);
-+}
-diff --git a/fs/io-wq.h b/fs/io-wq.h
-new file mode 100644
-index 000000000000..be8f22c8937b
---- /dev/null
-+++ b/fs/io-wq.h
-@@ -0,0 +1,55 @@
-+#ifndef INTERNAL_IO_WQ_H
-+#define INTERNAL_IO_WQ_H
-+
-+struct io_wq;
-+
-+enum {
-+	IO_WQ_WORK_CANCEL	= 1,
-+	IO_WQ_WORK_HAS_MM	= 2,
-+	IO_WQ_WORK_HASHED	= 4,
-+	IO_WQ_WORK_NEEDS_USER	= 8,
-+
-+	IO_WQ_HASH_SHIFT	= 24,	/* upper 8 bits are used for hash key */
-+};
-+
-+enum io_wq_cancel {
-+	IO_WQ_CANCEL_OK,	/* cancelled before started */
-+	IO_WQ_CANCEL_RUNNING,	/* found, running, and attempted cancelled */
-+	IO_WQ_CANCEL_NOTFOUND,	/* work not found */
-+};
-+
-+struct io_wq_work {
-+	struct list_head list;
-+	void (*func)(struct io_wq_work **);
-+	unsigned flags;
-+};
-+
-+#define INIT_IO_WORK(work, _func)			\
-+	do {						\
-+		(work)->func = _func;			\
-+		(work)->flags = 0;			\
-+	} while (0)					\
-+
-+struct io_wq *io_wq_create(unsigned concurrency, struct mm_struct *mm);
-+void io_wq_destroy(struct io_wq *wq);
-+
-+void io_wq_enqueue(struct io_wq *wq, struct io_wq_work *work);
-+void io_wq_enqueue_hashed(struct io_wq *wq, struct io_wq_work *work, void *val);
-+void io_wq_flush(struct io_wq *wq);
-+
-+void io_wq_cancel_all(struct io_wq *wq);
-+enum io_wq_cancel io_wq_cancel_work(struct io_wq *wq, struct io_wq_work *cwork);
-+
-+#if defined(CONFIG_IO_WQ)
-+extern void io_wq_worker_sleeping(struct task_struct *);
-+extern void io_wq_worker_running(struct task_struct *);
-+#else
-+static inline void io_wq_worker_sleeping(struct task_struct *tsk)
-+{
-+}
-+static inline void io_wq_worker_running(struct task_struct *tsk)
-+{
-+}
-+#endif
-+
-+#endif
-diff --git a/include/linux/sched.h b/include/linux/sched.h
-index 67a1d86981a9..6666e25606b7 100644
---- a/include/linux/sched.h
-+++ b/include/linux/sched.h
-@@ -1468,6 +1468,7 @@ extern struct pid *cad_pid;
- #define PF_NO_SETAFFINITY	0x04000000	/* Userland is not allowed to meddle with cpus_mask */
- #define PF_MCE_EARLY		0x08000000      /* Early kill for mce process policy */
- #define PF_MEMALLOC_NOCMA	0x10000000	/* All allocation request will have _GFP_MOVABLE cleared */
-+#define PF_IO_WORKER		0x20000000	/* Task is an IO worker */
- #define PF_FREEZER_SKIP		0x40000000	/* Freezer should not count it as freezable */
- #define PF_SUSPEND_TASK		0x80000000      /* This thread called freeze_processes() and should not be frozen */
  
-diff --git a/kernel/sched/core.c b/kernel/sched/core.c
-index dd05a378631a..a95a2f05f3b5 100644
---- a/kernel/sched/core.c
-+++ b/kernel/sched/core.c
-@@ -16,6 +16,7 @@
- #include <asm/tlb.h>
+ #define IORING_MAX_ENTRIES	32768
+ #define IORING_MAX_CQ_ENTRIES	(2 * IORING_MAX_ENTRIES)
+@@ -165,16 +165,6 @@ struct io_mapped_ubuf {
+ 	unsigned int	nr_bvecs;
+ };
  
- #include "../workqueue_internal.h"
-+#include "../../fs/io-wq.h"
- #include "../smpboot.h"
+-struct async_list {
+-	spinlock_t		lock;
+-	atomic_t		cnt;
+-	struct list_head	list;
+-
+-	struct file		*file;
+-	off_t			io_start;
+-	size_t			io_len;
+-};
+-
+ struct io_ring_ctx {
+ 	struct {
+ 		struct percpu_ref	refs;
+@@ -208,7 +198,7 @@ struct io_ring_ctx {
+ 	} ____cacheline_aligned_in_smp;
  
- #include "pelt.h"
-@@ -4103,9 +4104,12 @@ static inline void sched_submit_work(struct task_struct *tsk)
- 	 * we disable preemption to avoid it calling schedule() again
- 	 * in the possible wakeup of a kworker.
- 	 */
--	if (tsk->flags & PF_WQ_WORKER) {
-+	if (tsk->flags & (PF_WQ_WORKER | PF_IO_WORKER)) {
- 		preempt_disable();
--		wq_worker_sleeping(tsk);
-+		if (tsk->flags & PF_WQ_WORKER)
-+			wq_worker_sleeping(tsk);
-+		else
-+			io_wq_worker_sleeping(tsk);
- 		preempt_enable_no_resched();
+ 	/* IO offload */
+-	struct workqueue_struct	*sqo_wq[2];
++	struct io_wq		*io_wq;
+ 	struct task_struct	*sqo_thread;	/* if using sq thread polling */
+ 	struct mm_struct	*sqo_mm;
+ 	wait_queue_head_t	sqo_wait;
+@@ -260,8 +250,6 @@ struct io_ring_ctx {
+ 		struct list_head	cancel_list;
+ 	} ____cacheline_aligned_in_smp;
+ 
+-	struct async_list	pending_async[2];
+-
+ #if defined(CONFIG_UNIX)
+ 	struct socket		*ring_sock;
+ #endif
+@@ -332,7 +320,7 @@ struct io_kiocb {
+ 	u32			result;
+ 	u32			sequence;
+ 
+-	struct work_struct	work;
++	struct io_wq_work	work;
+ };
+ 
+ #define IO_PLUG_THRESHOLD		2
+@@ -358,7 +346,7 @@ struct io_submit_state {
+ 	unsigned int		ios_left;
+ };
+ 
+-static void io_sq_wq_submit_work(struct work_struct *work);
++static void io_wq_submit_work(struct io_wq_work **workptr);
+ static void io_cqring_fill_event(struct io_ring_ctx *ctx, u64 ki_user_data,
+ 				 long res);
+ static void __io_free_req(struct io_kiocb *req);
+@@ -390,7 +378,6 @@ static void io_ring_ctx_ref_free(struct percpu_ref *ref)
+ static struct io_ring_ctx *io_ring_ctx_alloc(struct io_uring_params *p)
+ {
+ 	struct io_ring_ctx *ctx;
+-	int i;
+ 
+ 	ctx = kzalloc(sizeof(*ctx), GFP_KERNEL);
+ 	if (!ctx)
+@@ -408,11 +395,6 @@ static struct io_ring_ctx *io_ring_ctx_alloc(struct io_uring_params *p)
+ 	init_completion(&ctx->sqo_thread_started);
+ 	mutex_init(&ctx->uring_lock);
+ 	init_waitqueue_head(&ctx->wait);
+-	for (i = 0; i < ARRAY_SIZE(ctx->pending_async); i++) {
+-		spin_lock_init(&ctx->pending_async[i].lock);
+-		INIT_LIST_HEAD(&ctx->pending_async[i].list);
+-		atomic_set(&ctx->pending_async[i].cnt, 0);
+-	}
+ 	spin_lock_init(&ctx->completion_lock);
+ 	INIT_LIST_HEAD(&ctx->poll_list);
+ 	INIT_LIST_HEAD(&ctx->cancel_list);
+@@ -477,22 +459,37 @@ static void __io_commit_cqring(struct io_ring_ctx *ctx)
+ 	}
+ }
+ 
++static inline bool io_sqe_needs_user(const struct io_uring_sqe *sqe)
++{
++	u8 opcode = READ_ONCE(sqe->opcode);
++
++	return !(opcode == IORING_OP_READ_FIXED ||
++		 opcode == IORING_OP_WRITE_FIXED);
++}
++
+ static inline void io_queue_async_work(struct io_ring_ctx *ctx,
+ 				       struct io_kiocb *req)
+ {
+-	int rw = 0;
++	bool do_hashed = false;
+ 
+ 	if (req->submit.sqe) {
+ 		switch (req->submit.sqe->opcode) {
+ 		case IORING_OP_WRITEV:
+ 		case IORING_OP_WRITE_FIXED:
+-			rw = !(req->rw.ki_flags & IOCB_DIRECT);
++			do_hashed = true;
+ 			break;
+ 		}
++		if (io_sqe_needs_user(req->submit.sqe))
++			req->work.flags |= IO_WQ_WORK_NEEDS_USER;
  	}
  
-@@ -4122,8 +4126,12 @@ static inline void sched_submit_work(struct task_struct *tsk)
- 
- static void sched_update_worker(struct task_struct *tsk)
- {
--	if (tsk->flags & PF_WQ_WORKER)
--		wq_worker_running(tsk);
-+	if (tsk->flags & (PF_WQ_WORKER | PF_IO_WORKER)) {
-+		if (tsk->flags & PF_WQ_WORKER)
-+			wq_worker_running(tsk);
-+		else
-+			io_wq_worker_running(tsk);
+-	trace_io_uring_queue_async_work(ctx, rw, req, &req->work, req->flags);
+-	queue_work(ctx->sqo_wq[rw], &req->work);
++	trace_io_uring_queue_async_work(ctx, 0, req, NULL, req->flags);
++	if (!do_hashed) {
++		io_wq_enqueue(ctx->io_wq, &req->work);
++	} else {
++		io_wq_enqueue_hashed(ctx->io_wq, &req->work,
++					file_inode(req->file));
 +	}
  }
  
- asmlinkage __visible void __sched schedule(void)
+ static void io_kill_timeout(struct io_kiocb *req)
+@@ -646,6 +643,7 @@ static struct io_kiocb *io_get_req(struct io_ring_ctx *ctx,
+ 	/* one is dropped after submission, the other at completion */
+ 	refcount_set(&req->refs, 2);
+ 	req->result = 0;
++	INIT_IO_WORK(&req->work, io_wq_submit_work);
+ 	return req;
+ out:
+ 	percpu_ref_put(&ctx->refs);
+@@ -692,12 +690,10 @@ static void io_req_link_next(struct io_kiocb *req, struct io_kiocb **nxtptr)
+ 		 * If we're in async work, we can continue processing the chain
+ 		 * in this context instead of having to queue up new async work.
+ 		 */
+-		if (nxtptr && current_work()) {
++		if (nxtptr && current_work())
+ 			*nxtptr = nxt;
+-		} else {
+-			INIT_WORK(&nxt->work, io_sq_wq_submit_work);
++		else
+ 			io_queue_async_work(req->ctx, nxt);
+-		}
+ 	}
+ }
+ 
+@@ -756,12 +752,10 @@ static void io_put_req(struct io_kiocb *req, struct io_kiocb **nxtptr)
+ 
+ 	nxt = io_put_req_find_next(req);
+ 	if (nxt) {
+-		if (nxtptr) {
++		if (nxtptr)
+ 			*nxtptr = nxt;
+-		} else {
+-			INIT_WORK(&nxt->work, io_sq_wq_submit_work);
++		else
+ 			io_queue_async_work(nxt->ctx, nxt);
+-		}
+ 	}
+ }
+ 
+@@ -1308,65 +1302,6 @@ static ssize_t io_import_iovec(struct io_ring_ctx *ctx, int rw,
+ 	return import_iovec(rw, buf, sqe_len, UIO_FASTIOV, iovec, iter);
+ }
+ 
+-static inline bool io_should_merge(struct async_list *al, struct kiocb *kiocb)
+-{
+-	if (al->file == kiocb->ki_filp) {
+-		off_t start, end;
+-
+-		/*
+-		 * Allow merging if we're anywhere in the range of the same
+-		 * page. Generally this happens for sub-page reads or writes,
+-		 * and it's beneficial to allow the first worker to bring the
+-		 * page in and the piggy backed work can then work on the
+-		 * cached page.
+-		 */
+-		start = al->io_start & PAGE_MASK;
+-		end = (al->io_start + al->io_len + PAGE_SIZE - 1) & PAGE_MASK;
+-		if (kiocb->ki_pos >= start && kiocb->ki_pos <= end)
+-			return true;
+-	}
+-
+-	al->file = NULL;
+-	return false;
+-}
+-
+-/*
+- * Make a note of the last file/offset/direction we punted to async
+- * context. We'll use this information to see if we can piggy back a
+- * sequential request onto the previous one, if it's still hasn't been
+- * completed by the async worker.
+- */
+-static void io_async_list_note(int rw, struct io_kiocb *req, size_t len)
+-{
+-	struct async_list *async_list = &req->ctx->pending_async[rw];
+-	struct kiocb *kiocb = &req->rw;
+-	struct file *filp = kiocb->ki_filp;
+-
+-	if (io_should_merge(async_list, kiocb)) {
+-		unsigned long max_bytes;
+-
+-		/* Use 8x RA size as a decent limiter for both reads/writes */
+-		max_bytes = filp->f_ra.ra_pages << (PAGE_SHIFT + 3);
+-		if (!max_bytes)
+-			max_bytes = VM_READAHEAD_PAGES << (PAGE_SHIFT + 3);
+-
+-		/* If max len are exceeded, reset the state */
+-		if (async_list->io_len + len <= max_bytes) {
+-			req->flags |= REQ_F_SEQ_PREV;
+-			async_list->io_len += len;
+-		} else {
+-			async_list->file = NULL;
+-		}
+-	}
+-
+-	/* New file? Reset state. */
+-	if (async_list->file != filp) {
+-		async_list->io_start = kiocb->ki_pos;
+-		async_list->io_len = len;
+-		async_list->file = filp;
+-	}
+-}
+-
+ /*
+  * For files that don't have ->read_iter() and ->write_iter(), handle them
+  * by looping over ->read() or ->write() manually.
+@@ -1461,13 +1396,10 @@ static int io_read(struct io_kiocb *req, const struct sqe_submit *s,
+ 		    ret2 > 0 && ret2 < read_size)
+ 			ret2 = -EAGAIN;
+ 		/* Catch -EAGAIN return for forced non-blocking submission */
+-		if (!force_nonblock || ret2 != -EAGAIN) {
++		if (!force_nonblock || ret2 != -EAGAIN)
+ 			kiocb_done(kiocb, ret2, nxt, s->in_async);
+-		} else {
+-			if (!s->in_async)
+-				io_async_list_note(READ, req, iov_count);
++		else
+ 			ret = -EAGAIN;
+-		}
+ 	}
+ 	kfree(iovec);
+ 	return ret;
+@@ -1501,11 +1433,8 @@ static int io_write(struct io_kiocb *req, const struct sqe_submit *s,
+ 	iov_count = iov_iter_count(&iter);
+ 
+ 	ret = -EAGAIN;
+-	if (force_nonblock && !(kiocb->ki_flags & IOCB_DIRECT)) {
+-		if (!s->in_async)
+-			io_async_list_note(WRITE, req, iov_count);
++	if (force_nonblock && !(kiocb->ki_flags & IOCB_DIRECT))
+ 		goto out_free;
+-	}
+ 
+ 	ret = rw_verify_area(WRITE, file, &kiocb->ki_pos, iov_count);
+ 	if (!ret) {
+@@ -1530,13 +1459,10 @@ static int io_write(struct io_kiocb *req, const struct sqe_submit *s,
+ 			ret2 = call_write_iter(file, kiocb, &iter);
+ 		else
+ 			ret2 = loop_rw_iter(WRITE, file, kiocb, &iter);
+-		if (!force_nonblock || ret2 != -EAGAIN) {
++		if (!force_nonblock || ret2 != -EAGAIN)
+ 			kiocb_done(kiocb, ret2, nxt, s->in_async);
+-		} else {
+-			if (!s->in_async)
+-				io_async_list_note(WRITE, req, iov_count);
++		else
+ 			ret = -EAGAIN;
+-		}
+ 	}
+ out_free:
+ 	kfree(iovec);
+@@ -1778,8 +1704,9 @@ static void io_poll_complete(struct io_ring_ctx *ctx, struct io_kiocb *req,
+ 	io_commit_cqring(ctx);
+ }
+ 
+-static void io_poll_complete_work(struct work_struct *work)
++static void io_poll_complete_work(struct io_wq_work **workptr)
+ {
++	struct io_wq_work *work = *workptr;
+ 	struct io_kiocb *req = container_of(work, struct io_kiocb, work);
+ 	struct io_poll_iocb *poll = &req->poll;
+ 	struct poll_table_struct pt = { ._key = poll->events };
+@@ -1878,7 +1805,7 @@ static int io_poll_add(struct io_kiocb *req, const struct io_uring_sqe *sqe)
+ 		return -EBADF;
+ 
+ 	req->submit.sqe = NULL;
+-	INIT_WORK(&req->work, io_poll_complete_work);
++	INIT_IO_WORK(&req->work, io_poll_complete_work);
+ 	events = READ_ONCE(sqe->poll_events);
+ 	poll->events = demangle_poll(events) | EPOLLERR | EPOLLHUP;
+ 
+@@ -2136,7 +2063,6 @@ static int io_req_defer(struct io_ring_ctx *ctx, struct io_kiocb *req,
+ 	memcpy(sqe_copy, sqe, sizeof(*sqe_copy));
+ 	req->submit.sqe = sqe_copy;
+ 
+-	INIT_WORK(&req->work, io_sq_wq_submit_work);
+ 	trace_io_uring_defer(ctx, req, false);
+ 	list_add_tail(&req->list, &ctx->defer_list);
+ 	spin_unlock_irq(&ctx->completion_lock);
+@@ -2222,186 +2148,52 @@ static int __io_submit_sqe(struct io_ring_ctx *ctx, struct io_kiocb *req,
+ 	return 0;
+ }
+ 
+-static struct async_list *io_async_list_from_sqe(struct io_ring_ctx *ctx,
+-						 const struct io_uring_sqe *sqe)
+-{
+-	switch (sqe->opcode) {
+-	case IORING_OP_READV:
+-	case IORING_OP_READ_FIXED:
+-		return &ctx->pending_async[READ];
+-	case IORING_OP_WRITEV:
+-	case IORING_OP_WRITE_FIXED:
+-		return &ctx->pending_async[WRITE];
+-	default:
+-		return NULL;
+-	}
+-}
+-
+-static inline bool io_sqe_needs_user(const struct io_uring_sqe *sqe)
+-{
+-	u8 opcode = READ_ONCE(sqe->opcode);
+-
+-	return !(opcode == IORING_OP_READ_FIXED ||
+-		 opcode == IORING_OP_WRITE_FIXED);
+-}
+-
+-static void io_sq_wq_submit_work(struct work_struct *work)
++static void io_wq_submit_work(struct io_wq_work **workptr)
+ {
++	struct io_wq_work *work = *workptr;
+ 	struct io_kiocb *req = container_of(work, struct io_kiocb, work);
+ 	struct io_ring_ctx *ctx = req->ctx;
+-	struct mm_struct *cur_mm = NULL;
+-	struct async_list *async_list;
+-	LIST_HEAD(req_list);
+-	mm_segment_t old_fs;
+-	int ret;
++	struct sqe_submit *s = &req->submit;
++	const struct io_uring_sqe *sqe = s->sqe;
++	struct io_kiocb *nxt = NULL;
++	int ret = 0;
+ 
+-	async_list = io_async_list_from_sqe(ctx, req->submit.sqe);
+-restart:
+-	do {
+-		struct sqe_submit *s = &req->submit;
+-		const struct io_uring_sqe *sqe = s->sqe;
+-		unsigned int flags = req->flags;
+-		struct io_kiocb *nxt = NULL;
++	/* Ensure we clear previously set non-block flag */
++	req->rw.ki_flags &= ~IOCB_NOWAIT;
+ 
+-		/* Ensure we clear previously set non-block flag */
+-		req->rw.ki_flags &= ~IOCB_NOWAIT;
++	if (work->flags & IO_WQ_WORK_CANCEL)
++		ret = -ECANCELED;
+ 
+-		ret = 0;
+-		if (io_sqe_needs_user(sqe) && !cur_mm) {
+-			if (!mmget_not_zero(ctx->sqo_mm)) {
+-				ret = -EFAULT;
+-			} else {
+-				cur_mm = ctx->sqo_mm;
+-				use_mm(cur_mm);
+-				old_fs = get_fs();
+-				set_fs(USER_DS);
+-			}
+-		}
++	if (!ret) {
++		s->has_user = (work->flags & IO_WQ_WORK_HAS_MM) != 0;
++		s->in_async = true;
++		do {
++			ret = __io_submit_sqe(ctx, req, s, &nxt, false);
++			/*
++			 * We can get EAGAIN for polled IO even though we're
++			 * forcing a sync submission from here, since we can't
++			 * wait for request slots on the block side.
++			 */
++			if (ret != -EAGAIN)
++				break;
++			cond_resched();
++		} while (1);
++	}
+ 
+-		if (!ret) {
+-			s->has_user = cur_mm != NULL;
+-			s->in_async = true;
+-			do {
+-				ret = __io_submit_sqe(ctx, req, s, &nxt, false);
+-				/*
+-				 * We can get EAGAIN for polled IO even though
+-				 * we're forcing a sync submission from here,
+-				 * since we can't wait for request slots on the
+-				 * block side.
+-				 */
+-				if (ret != -EAGAIN)
+-					break;
+-				cond_resched();
+-			} while (1);
+-		}
++	/* drop submission reference */
++	io_put_req(req, NULL);
+ 
+-		/* drop submission reference */
++	if (ret) {
++		io_cqring_add_event(ctx, sqe->user_data, ret);
+ 		io_put_req(req, NULL);
+-
+-		if (ret) {
+-			io_cqring_add_event(ctx, sqe->user_data, ret);
+-			io_put_req(req, NULL);
+-		}
+-
+-		/* async context always use a copy of the sqe */
+-		kfree(sqe);
+-
+-		/* if a dependent link is ready, do that as the next one */
+-		if (!ret && nxt) {
+-			req = nxt;
+-			continue;
+-		}
+-
+-		/* req from defer and link list needn't decrease async cnt */
+-		if (flags & (REQ_F_IO_DRAINED | REQ_F_LINK_DONE))
+-			goto out;
+-
+-		if (!async_list)
+-			break;
+-		if (!list_empty(&req_list)) {
+-			req = list_first_entry(&req_list, struct io_kiocb,
+-						list);
+-			list_del(&req->list);
+-			continue;
+-		}
+-		if (list_empty(&async_list->list))
+-			break;
+-
+-		req = NULL;
+-		spin_lock(&async_list->lock);
+-		if (list_empty(&async_list->list)) {
+-			spin_unlock(&async_list->lock);
+-			break;
+-		}
+-		list_splice_init(&async_list->list, &req_list);
+-		spin_unlock(&async_list->lock);
+-
+-		req = list_first_entry(&req_list, struct io_kiocb, list);
+-		list_del(&req->list);
+-	} while (req);
+-
+-	/*
+-	 * Rare case of racing with a submitter. If we find the count has
+-	 * dropped to zero AND we have pending work items, then restart
+-	 * the processing. This is a tiny race window.
+-	 */
+-	if (async_list) {
+-		ret = atomic_dec_return(&async_list->cnt);
+-		while (!ret && !list_empty(&async_list->list)) {
+-			spin_lock(&async_list->lock);
+-			atomic_inc(&async_list->cnt);
+-			list_splice_init(&async_list->list, &req_list);
+-			spin_unlock(&async_list->lock);
+-
+-			if (!list_empty(&req_list)) {
+-				req = list_first_entry(&req_list,
+-							struct io_kiocb, list);
+-				list_del(&req->list);
+-				goto restart;
+-			}
+-			ret = atomic_dec_return(&async_list->cnt);
+-		}
+-	}
+-
+-out:
+-	if (cur_mm) {
+-		set_fs(old_fs);
+-		unuse_mm(cur_mm);
+-		mmput(cur_mm);
+ 	}
+-}
+-
+-/*
+- * See if we can piggy back onto previously submitted work, that is still
+- * running. We currently only allow this if the new request is sequential
+- * to the previous one we punted.
+- */
+-static bool io_add_to_prev_work(struct async_list *list, struct io_kiocb *req)
+-{
+-	bool ret;
+ 
+-	if (!list)
+-		return false;
+-	if (!(req->flags & REQ_F_SEQ_PREV))
+-		return false;
+-	if (!atomic_read(&list->cnt))
+-		return false;
++	/* async context always use a copy of the sqe */
++	kfree(sqe);
+ 
+-	ret = true;
+-	spin_lock(&list->lock);
+-	list_add_tail(&req->list, &list->list);
+-	/*
+-	 * Ensure we see a simultaneous modification from io_sq_wq_submit_work()
+-	 */
+-	smp_mb();
+-	if (!atomic_read(&list->cnt)) {
+-		list_del_init(&req->list);
+-		ret = false;
+-	}
+-	spin_unlock(&list->lock);
+-
+-	trace_io_uring_add_to_prev(req, ret);
+-	return ret;
++	/* if a dependent link is ready, pass it back */
++	if (!ret && nxt)
++		*workptr = &nxt->work;
+ }
+ 
+ static bool io_op_needs_file(const struct io_uring_sqe *sqe)
+@@ -2475,17 +2267,9 @@ static int __io_queue_sqe(struct io_ring_ctx *ctx, struct io_kiocb *req,
+ 
+ 		sqe_copy = kmemdup(s->sqe, sizeof(*sqe_copy), GFP_KERNEL);
+ 		if (sqe_copy) {
+-			struct async_list *list;
+-
+ 			s->sqe = sqe_copy;
+ 			memcpy(&req->submit, s, sizeof(*s));
+-			list = io_async_list_from_sqe(ctx, s->sqe);
+-			if (!io_add_to_prev_work(list, req)) {
+-				if (list)
+-					atomic_inc(&list->cnt);
+-				INIT_WORK(&req->work, io_sq_wq_submit_work);
+-				io_queue_async_work(ctx, req);
+-			}
++			io_queue_async_work(ctx, req);
+ 
+ 			/*
+ 			 * Queued up for async execution, worker will release
+@@ -3090,15 +2874,11 @@ static void io_sq_thread_stop(struct io_ring_ctx *ctx)
+ 
+ static void io_finish_async(struct io_ring_ctx *ctx)
+ {
+-	int i;
+-
+ 	io_sq_thread_stop(ctx);
+ 
+-	for (i = 0; i < ARRAY_SIZE(ctx->sqo_wq); i++) {
+-		if (ctx->sqo_wq[i]) {
+-			destroy_workqueue(ctx->sqo_wq[i]);
+-			ctx->sqo_wq[i] = NULL;
+-		}
++	if (ctx->io_wq) {
++		io_wq_destroy(ctx->io_wq);
++		ctx->io_wq = NULL;
+ 	}
+ }
+ 
+@@ -3106,11 +2886,9 @@ static void io_finish_async(struct io_ring_ctx *ctx)
+ static void io_destruct_skb(struct sk_buff *skb)
+ {
+ 	struct io_ring_ctx *ctx = skb->sk->sk_user_data;
+-	int i;
+ 
+-	for (i = 0; i < ARRAY_SIZE(ctx->sqo_wq); i++)
+-		if (ctx->sqo_wq[i])
+-			flush_workqueue(ctx->sqo_wq[i]);
++	if (ctx->io_wq)
++		io_wq_flush(ctx->io_wq);
+ 
+ 	unix_destruct_scm(skb);
+ }
+@@ -3454,6 +3232,7 @@ static int io_sqe_files_update(struct io_ring_ctx *ctx, void __user *arg,
+ static int io_sq_offload_start(struct io_ring_ctx *ctx,
+ 			       struct io_uring_params *p)
+ {
++	unsigned concurrency;
+ 	int ret;
+ 
+ 	init_waitqueue_head(&ctx->sqo_wait);
+@@ -3497,25 +3276,10 @@ static int io_sq_offload_start(struct io_ring_ctx *ctx,
+ 		goto err;
+ 	}
+ 
+-	/* Do QD, or 2 * CPUS, whatever is smallest */
+-	ctx->sqo_wq[0] = alloc_workqueue("io_ring-wq",
+-			WQ_UNBOUND | WQ_FREEZABLE,
+-			min(ctx->sq_entries - 1, 2 * num_online_cpus()));
+-	if (!ctx->sqo_wq[0]) {
+-		ret = -ENOMEM;
+-		goto err;
+-	}
+-
+-	/*
+-	 * This is for buffered writes, where we want to limit the parallelism
+-	 * due to file locking in file systems. As "normal" buffered writes
+-	 * should parellelize on writeout quite nicely, limit us to having 2
+-	 * pending. This avoids massive contention on the inode when doing
+-	 * buffered async writes.
+-	 */
+-	ctx->sqo_wq[1] = alloc_workqueue("io_ring-write-wq",
+-						WQ_UNBOUND | WQ_FREEZABLE, 2);
+-	if (!ctx->sqo_wq[1]) {
++	/* Do QD, or 4 * CPUS, whatever is smallest */
++	concurrency = min(ctx->sq_entries, 4 * num_online_cpus());
++	ctx->io_wq = io_wq_create(concurrency, ctx->sqo_mm);
++	if (!ctx->io_wq) {
+ 		ret = -ENOMEM;
+ 		goto err;
+ 	}
+@@ -3900,6 +3664,10 @@ static void io_ring_ctx_wait_and_kill(struct io_ring_ctx *ctx)
+ 
+ 	io_kill_timeouts(ctx);
+ 	io_poll_remove_all(ctx);
++
++	if (ctx->io_wq)
++		io_wq_cancel_all(ctx->io_wq);
++
+ 	io_iopoll_reap_events(ctx);
+ 	wait_for_completion(&ctx->ctx_done);
+ 	io_ring_ctx_free(ctx);
+diff --git a/init/Kconfig b/init/Kconfig
+index b4daad2bac23..4d8d145c41d2 100644
+--- a/init/Kconfig
++++ b/init/Kconfig
+@@ -1548,6 +1548,7 @@ config AIO
+ config IO_URING
+ 	bool "Enable IO uring support" if EXPERT
+ 	select ANON_INODES
++	select IO_WQ
+ 	default y
+ 	help
+ 	  This option enables support for the io_uring interface, enabling
 -- 
 2.17.1
 
