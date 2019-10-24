@@ -2,190 +2,204 @@ Return-Path: <SRS0=pYcy=YR=vger.kernel.org=linux-block-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-2.2 required=3.0 tests=DKIM_SIGNED,DKIM_VALID,
-	HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,
-	USER_AGENT_SANE_1 autolearn=no autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-8.3 required=3.0 tests=DKIMWL_WL_MED,DKIM_SIGNED,
+	DKIM_VALID,DKIM_VALID_AU,HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,
+	SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED,USER_IN_DEF_DKIM_WL autolearn=no
+	autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id E600DCA9EAF
-	for <linux-block@archiver.kernel.org>; Thu, 24 Oct 2019 22:31:36 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 8B8CECA9EAF
+	for <linux-block@archiver.kernel.org>; Thu, 24 Oct 2019 23:13:50 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.kernel.org (Postfix) with ESMTP id B67E020578
-	for <linux-block@archiver.kernel.org>; Thu, 24 Oct 2019 22:31:36 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id 523A421A4C
+	for <linux-block@archiver.kernel.org>; Thu, 24 Oct 2019 23:13:50 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel-dk.20150623.gappssmtp.com header.i=@kernel-dk.20150623.gappssmtp.com header.b="GFe5WoCo"
+	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="SEJZ2Aok"
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1731419AbfJXWbg (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Thu, 24 Oct 2019 18:31:36 -0400
-Received: from mail-pf1-f194.google.com ([209.85.210.194]:34382 "EHLO
-        mail-pf1-f194.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1731152AbfJXWbg (ORCPT
+        id S1727114AbfJXXNt (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Thu, 24 Oct 2019 19:13:49 -0400
+Received: from mail-oi1-f194.google.com ([209.85.167.194]:33161 "EHLO
+        mail-oi1-f194.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S1726740AbfJXXNt (ORCPT
         <rfc822;linux-block@vger.kernel.org>);
-        Thu, 24 Oct 2019 18:31:36 -0400
-Received: by mail-pf1-f194.google.com with SMTP id b128so201890pfa.1
-        for <linux-block@vger.kernel.org>; Thu, 24 Oct 2019 15:31:35 -0700 (PDT)
+        Thu, 24 Oct 2019 19:13:49 -0400
+Received: by mail-oi1-f194.google.com with SMTP id a15so152694oic.0
+        for <linux-block@vger.kernel.org>; Thu, 24 Oct 2019 16:13:48 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=kernel-dk.20150623.gappssmtp.com; s=20150623;
-        h=subject:to:cc:references:from:message-id:date:user-agent
-         :mime-version:in-reply-to:content-language:content-transfer-encoding;
-        bh=LucpUKm2PlJy8L1gaoh3GeHWChu5Q7OFic+OXdVLGWY=;
-        b=GFe5WoCopRCQQTcPcP6Exxr2/6ARc1UTLeYoo9g9CHHKMz07POlt8v4+cGHY762ZgQ
-         LUGSkthsNScD5J45tGhuv88FVwSL2b0hCPhGapqoS2aeRo5WTQ5YHKZR646smZ9zSXCx
-         uxnxDYMenS15miQP/nAHQDjqOZh8Zzae/xb0I83tSJdAAlpzk7InSumwg49GnaOTa1dY
-         aea2k9GJxN1InCee+L7ZoQH1M1zX68MliQKFz/vfs+U9Nc6JiPE63svfG5WTn447EUC5
-         g+8LrcaLqQi/U/Sd/HxzCDC9O6n2rqQcTF1jEleCoZP8dx2TSXefkCbhwKLio92xMcJw
-         m/Ew==
+        d=google.com; s=20161025;
+        h=mime-version:references:in-reply-to:from:date:message-id:subject:to
+         :cc;
+        bh=+eK+5fkzYxyunCal9Tn719EPwXUpc/8mT0s2MAFKdkg=;
+        b=SEJZ2Aok3JBqRf+BoSSTatvK5FJhVAunGdBbrWajS2C3I2Ekp6awq5ULZyam+OfhWy
+         f8AqWCKMJybqXCyotKpbxUcaHGA9VSXesT4+yv4jJnKZxMOTLaPixQSaPnJXozhDovWu
+         FaHnrKVCg7MnSJx7uFqvZsTnUYSGJB37ZfgG9HA7//tJQOYIYLXHRSBKsltv9ztj//Pl
+         RI6XgMx/o0gVHSaS+jjzg1CJzSUa9guzTIUmu052Ry7THJ1BS0a+e2cJmkPQWNar3FwT
+         Dv8iJ5m0106WUTaM2jLfKrJKOJyXLZZydjUii25wFWd9J7qEFwqGoQAklTuOr6FvgJUx
+         5ayg==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=1e100.net; s=20161025;
-        h=x-gm-message-state:subject:to:cc:references:from:message-id:date
-         :user-agent:mime-version:in-reply-to:content-language
-         :content-transfer-encoding;
-        bh=LucpUKm2PlJy8L1gaoh3GeHWChu5Q7OFic+OXdVLGWY=;
-        b=Aai8DUzFjD0GmzlZ0/+4Dm52IsG9r9jSgXEkrqx6uRxTFcbZElcLn598rEq2CmQrIq
-         PSA0uA5EfZoGrJIb4jSUJ7uV6+G7xRZvWDFootXhZzH5FXDMvSZreSY/mZy5vqYvQYwh
-         XwCBWGafjDIvkgxC9AeYU0xYd26CAlhZPhg/AiTz9hQvWZ807PU3Do2Ev6UT5W9g6KwD
-         /05YR0kZu4/fkxgSsVoN3c/1E4yP3Ddlzek1thTAkiGgmRhXFEkHVK3Dj6HI/vOy/83k
-         cFaNRJi7D9RseAxHJMV2OyI0o/M1JnvxNwNR1Fhq7oot60FM7nUH4nacqs4X4ITIkld3
-         688A==
-X-Gm-Message-State: APjAAAX53WAkqHQaXTQldFXDyqq6kNvL9zpvSJrNxAAEn/JGPMeVxNyr
-        ptr1ufS1GcbpW+aOLG84IY4qPBcWl3nnUA==
-X-Google-Smtp-Source: APXvYqzNYqTmUnv2rL5f2/ot2aYcyjiTKUOcbsw+JVqpcYVKEQ/nwy6H92rw5sgvSisvxZN/I5vn0g==
-X-Received: by 2002:a63:c1:: with SMTP id 184mr434702pga.224.1571956294433;
-        Thu, 24 Oct 2019 15:31:34 -0700 (PDT)
-Received: from [192.168.1.188] ([66.219.217.79])
-        by smtp.gmail.com with ESMTPSA id h28sm23388pgn.14.2019.10.24.15.31.32
-        (version=TLS1_2 cipher=ECDHE-RSA-AES128-GCM-SHA256 bits=128/128);
-        Thu, 24 Oct 2019 15:31:33 -0700 (PDT)
-Subject: Re: [RFC 0/2] io_uring: examine request result only after completion
-To:     Bijan Mottahedeh <bijan.mottahedeh@oracle.com>
-Cc:     linux-block@vger.kernel.org
-References: <1571908688-22488-1-git-send-email-bijan.mottahedeh@oracle.com>
- <22fc1057-237b-a9b8-5a57-b7c53166a609@kernel.dk>
- <201931df-ae22-c2fc-a9c7-496ceb87dff7@oracle.com>
-From:   Jens Axboe <axboe@kernel.dk>
-Message-ID: <90c23805-4b73-4ade-1b54-dc68010b54dd@kernel.dk>
-Date:   Thu, 24 Oct 2019 16:31:31 -0600
-User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:60.0) Gecko/20100101
- Thunderbird/60.9.0
+        h=x-gm-message-state:mime-version:references:in-reply-to:from:date
+         :message-id:subject:to:cc;
+        bh=+eK+5fkzYxyunCal9Tn719EPwXUpc/8mT0s2MAFKdkg=;
+        b=XYA01o8n9qX2prC1BZDf4kNYOkYKCG9Ops1zOPnhROYwMxw6UTWl0EfsOoUzgK8Slg
+         Q9O2vH9XpkuklrqLip2U6Faiyi1uyHogbcRH/QWWtjJP5pRr01cAf6iJNkSk+aEwVTvE
+         03lJWXaSWvH1Lgot3IOTAhnCiHG3LykX4rKz9Lm1CpCC4rPCZRTAfMMRLSqDSuFulGUG
+         ZzUU7Sbibm2F0h/Ow1q8IGEqtRwt1pBhEXTvKSxa2R/YJ1Ivy4Cq76Hlxv0Y0Un53fCo
+         rWKNmXsncBhP+3VFogVZ8jslIuzPnoM+04dr/zZ4RSlh5kiTXADuJ1G/EBvKmtX84+mr
+         pcZA==
+X-Gm-Message-State: APjAAAVKrsUmdi5f/JIZVu97lCqfQ3sneeIk9qUkJK2kvdV1hFHt8fGS
+        3jGloRKLVIxiu4Q+nC/66JIjq4UXy/VFqVzI+1b92d5a
+X-Google-Smtp-Source: APXvYqwQhv0NxIDV1LDcBAWZl5QLL4CwIafH4+3vgKwAP3NGx8ZDjESC5K2cau+hQoPGajKr2X/KHYG+ZVmqyb/DgYw=
+X-Received: by 2002:aca:cd4d:: with SMTP id d74mr468386oig.157.1571958827931;
+ Thu, 24 Oct 2019 16:13:47 -0700 (PDT)
 MIME-Version: 1.0
-In-Reply-To: <201931df-ae22-c2fc-a9c7-496ceb87dff7@oracle.com>
-Content-Type: text/plain; charset=utf-8
-Content-Language: en-US
-Content-Transfer-Encoding: 7bit
+References: <20191017212858.13230-1-axboe@kernel.dk> <0fb9d9a0-6251-c4bd-71b0-6e34c6a1aab8@kernel.dk>
+ <CAG48ez181=JoYudXee0KbU0vDZ=EbxmgB7q0mmjaA0gyp6MFBQ@mail.gmail.com>
+ <a54329d5-a128-3ccd-7a12-f6cadaa20dbf@kernel.dk> <CAG48ez1SDQNHjgFku4ft4qw9hdv1g6-sf7-dxuU_tJSx+ofV-w@mail.gmail.com>
+ <dbcf874d-8484-9c27-157a-c2752181acb5@kernel.dk> <CAG48ez3KwaQ3DVH1VoWxFWTG2ZfCQ6M0oyv5vZqkLgY0QDEdiw@mail.gmail.com>
+ <a8fb7a1f-69c7-bf2a-b3dd-7886077d234b@kernel.dk> <572f40fb-201c-99ce-b3f5-05ff9369b895@kernel.dk>
+ <CAG48ez12pteHyZasU8Smup-0Mn3BWNMCVjybd1jvXsPrJ7OmYg@mail.gmail.com>
+ <20b44cc0-87b1-7bf8-d20e-f6131da9d130@kernel.dk> <2d208fc8-7c24-bca5-3d4a-796a5a8267eb@kernel.dk>
+ <CAG48ez2ZQBVEe8yYRwWX2=TMYWsJ=tK44NM+wqiLW2AmfYEcHw@mail.gmail.com>
+ <0a3de9b2-3d3a-07b5-0e1c-515f610fbf75@kernel.dk> <CAG48ez1akvnVpK3dMH4H=C2CsNGDZkDaxZEF2stGAPCnUcaa+g@mail.gmail.com>
+ <c3fb07d4-223c-8835-5c22-68367e957a4f@kernel.dk> <CAG48ez0K_wtHA4DSWjz4TjohHkMTGo2pTpDVMZPQWD2gtrqZJw@mail.gmail.com>
+ <c252182a-4d09-5e9b-112b-2dad9ef123b5@kernel.dk>
+In-Reply-To: <c252182a-4d09-5e9b-112b-2dad9ef123b5@kernel.dk>
+From:   Jann Horn <jannh@google.com>
+Date:   Fri, 25 Oct 2019 01:13:20 +0200
+Message-ID: <CAG48ez00zr2P1WCznnXmTvq+FQ4Ji8kDnuNqbeeMvOh_MhXeTg@mail.gmail.com>
+Subject: Re: [PATCH 1/3] io_uring: add support for async work inheriting files table
+To:     Jens Axboe <axboe@kernel.dk>
+Cc:     linux-block@vger.kernel.org,
+        "David S. Miller" <davem@davemloft.net>,
+        Network Development <netdev@vger.kernel.org>
+Content-Type: text/plain; charset="UTF-8"
 Sender: linux-block-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-On 10/24/19 1:18 PM, Bijan Mottahedeh wrote:
-> 
-> On 10/24/19 10:09 AM, Jens Axboe wrote:
->> On 10/24/19 3:18 AM, Bijan Mottahedeh wrote:
->>> Running an fio test consistenly crashes the kernel with the trace included
->>> below.  The root cause seems to be the code in __io_submit_sqe() that
->>> checks the result of a request for -EAGAIN in polled mode, without
->>> ensuring first that the request has completed:
->>>
->>> 	if (ctx->flags & IORING_SETUP_IOPOLL) {
->>> 		if (req->result == -EAGAIN)
->>> 			return -EAGAIN;
->> I'm a little confused, because we should be holding the submission
->> reference to the request still at this point. So how is it going away?
->> I must be missing something...
-> 
-> I don't think the submission reference is going away...
-> 
-> I *think* the problem has to do with the fact that
-> io_complete_rw_iopoll() which sets REQ_F_IOPOLL_COMPLETED is being
-> called from interrupt context in my configuration and so there is a
-> potential race between updating the request there and checking it in
-> __io_submit_sqe().
-> 
-> My first workaround was to simply poll for REQ_F_IOPOLL_COMPLETED in the
-> code snippet above:
-> 
->       if (req->result == --EAGAIN) {
-> 
->           poll for REQ_F_IOPOLL_COMPLETED
-> 
->           return -EAGAIN;
-> 
-> }
-> 
-> and that got rid of the problem.
+On Fri, Oct 25, 2019 at 12:04 AM Jens Axboe <axboe@kernel.dk> wrote:
+> On 10/24/19 2:31 PM, Jann Horn wrote:
+> > On Thu, Oct 24, 2019 at 9:41 PM Jens Axboe <axboe@kernel.dk> wrote:
+> >> On 10/18/19 12:50 PM, Jann Horn wrote:
+> >>> On Fri, Oct 18, 2019 at 8:16 PM Jens Axboe <axboe@kernel.dk> wrote:
+> >>>> On 10/18/19 12:06 PM, Jann Horn wrote:
+> >>>>> But actually, by the way: Is this whole files_struct thing creating a
+> >>>>> reference loop? The files_struct has a reference to the uring file,
+> >>>>> and the uring file has ACCEPT work that has a reference to the
+> >>>>> files_struct. If the task gets killed and the accept work blocks, the
+> >>>>> entire files_struct will stay alive, right?
+> >>>>
+> >>>> Yes, for the lifetime of the request, it does create a loop. So if the
+> >>>> application goes away, I think you're right, the files_struct will stay.
+> >>>> And so will the io_uring, for that matter, as we depend on the closing
+> >>>> of the files to do the final reap.
+> >>>>
+> >>>> Hmm, not sure how best to handle that, to be honest. We need some way to
+> >>>> break the loop, if the request never finishes.
+> >>>
+> >>> A wacky and dubious approach would be to, instead of taking a
+> >>> reference to the files_struct, abuse f_op->flush() to synchronously
+> >>> flush out pending requests with references to the files_struct... But
+> >>> it's probably a bad idea, given that in f_op->flush(), you can't
+> >>> easily tell which files_struct the close is coming from. I suppose you
+> >>> could keep a list of (fdtable, fd) pairs through which ACCEPT requests
+> >>> have come in and then let f_op->flush() probe whether the file
+> >>> pointers are gone from them...
+> >>
+> >> Got back to this after finishing the io-wq stuff, which we need for the
+> >> cancel.
+> >>
+> >> Here's an updated patch:
+> >>
+> >> http://git.kernel.dk/cgit/linux-block/commit/?h=for-5.5/io_uring-test&id=1ea847edc58d6a54ca53001ad0c656da57257570
+> >>
+> >> that seems to work for me (lightly tested), we correctly find and cancel
+> >> work that is holding on to the file table.
+> >>
+> >> The full series sits on top of my for-5.5/io_uring-wq branch, and can be
+> >> viewed here:
+> >>
+> >> http://git.kernel.dk/cgit/linux-block/log/?h=for-5.5/io_uring-test
+> >>
+> >> Let me know what you think!
+> >
+> > Ah, I didn't realize that the second argument to f_op->flush is a
+> > pointer to the files_struct. That's neat.
+> >
+> >
+> > Security: There is no guarantee that ->flush() will run after the last
+> > io_uring_enter() finishes. You can race like this, with threads A and
+> > B in one process and C in another one:
+> >
+> > A: sends uring fd to C via unix domain socket
+> > A: starts syscall io_uring_enter(fd, ...)
+> > A: calls fdget(fd), takes reference to file
+> > B: starts syscall close(fd)
+> > B: fd table entry is removed
+> > B: f_op->flush is invoked and finds no pending transactions
+> > B: syscall close() returns
+> > A: continues io_uring_enter(), grabbing current->files
+> > A: io_uring_enter() returns
+> > A and B: exit
+> > worker: use-after-free access to files_struct
+> >
+> > I think the solution to this would be (unless you're fine with adding
+> > some broad global read-write mutex) something like this in
+> > __io_queue_sqe(), where "fd" and "f" are the variables from
+> > io_uring_enter(), plumbed through the stack somehow:
+> >
+> > if (req->flags & REQ_F_NEED_FILES) {
+> >    rcu_read_lock();
+> >    spin_lock_irq(&ctx->inflight_lock);
+> >    if (fcheck(fd) == f) {
+> >      list_add(&req->inflight_list,
+> >        &ctx->inflight_list);
+> >      req->work.files = current->files;
+> >      ret = 0;
+> >    } else {
+> >      ret = -EBADF;
+> >    }
+> >    spin_unlock_irq(&ctx->inflight_lock);
+> >    rcu_read_unlock();
+> >    if (ret)
+> >      goto put_req;
+> > }
+>
+> First of all, thanks for the thorough look at this! We already have f
+> available here, it's req->file. And we just made a copy of the sqe, so
+> we have sqe->fd available as well. I fixed this up.
 
-But that will not work at all for a proper poll setup, where you don't
-trigger any IRQs... It only happens to work for this case because you're
-still triggering interrupts. But even in that case, it's not a real
-solution, but I don't think that's the argument here ;-)
+sqe->fd is the file descriptor we're doing I/O on, not the file
+descriptor of the uring file, right? Same thing for req->file. This
+check only detects whether the fd we're doing I/O on was closed, which
+is irrelevant.
 
-I see what the race is now, it's specific to IRQ driven polling. We
-really should just disallow that, to be honest, it doesn't make any
-sense. But let me think about if we can do a reasonable solution to this
-that doesn't involve adding overhead for a proper setup.
+> > Security + Correctness: If there is more than one io_wqe, it seems to
+> > me that io_uring_flush() calls io_wq_cancel_work(), which calls
+> > io_wqe_cancel_work(), which may return IO_WQ_CANCEL_OK if the first
+> > request it looks at is pending. In that case, io_wq_cancel_work() will
+> > immediately return, and io_uring_flush() will also immediately return.
+> > It looks like any other requests will continue running?
+>
+> Ah good point, I missed that. We need to keep looping until we get
+> NOTFOUND returned. Fixed as well.
+>
+> Also added cancellation if the task is going away. Here's the
+> incremental patch, I'll resend with the full version.
+[...]
+> +static int io_uring_flush(struct file *file, void *data)
+> +{
+> +       struct io_ring_ctx *ctx = file->private_data;
+> +
+> +       if (fatal_signal_pending(current) || (current->flags & PF_EXITING))
+> +               io_wq_cancel_all(ctx->io_wq);
 
->>> The request will be immediately resubmitted in io_sq_wq_submit_work(),
->>> potentially before the the fisrt submission has completed.  This creates
->>> a race where the original completion may set REQ_F_IOPOLL_COMPLETED in
->>> a freed submission request, overwriting the poisoned bits, casusing the
->>> panic below.
->>>
->>> 	do {
->>> 		ret = __io_submit_sqe(ctx, req, s, false);
->>> 		/*
->>> 		 * We can get EAGAIN for polled IO even though
->>> 		 * we're forcing a sync submission from here,
->>> 		 * since we can't wait for request slots on the
->>> 		 * block side.
->>> 		 */
->>> 		if (ret != -EAGAIN)
->>> 			break;
->>> 		cond_resched();
->>> 	} while (1);
->>>
->>> The suggested fix is to move a submitted request to the poll list
->>> unconditionally in polled mode.  The request can then be retried if
->>> necessary once the original submission has indeed completed.
->>>
->>> This bug raises an issue however since REQ_F_IOPOLL_COMPLETED is set
->>> in io_complete_rw_iopoll() from interrupt context.  NVMe polled queues
->>> however are not supposed to generate interrupts so it is not clear what
->>> is the reason for this apparent inconsitency.
->> It's because you're not running with poll queues for NVMe, hence you're
->> throwing a lot of performance away. Load nvme with poll_queues=X (or boot
->> with nvme.poll_queues=X, if built in) to have a set of separate queues
->> for polling. These don't have IRQs enabled, and it'll work much faster
->> for you.
->>
-> That's what I did in fact.  I booted with nvme.poll_queues=36 (I figured
-> 1 per core but I'm not sure what is a reasonable number).
-> 
-> I also checked that /sys/block/<nvme>/queue/io_poll = 1.
-> 
-> What's really odd is that the irq/sec numbers from mpstat and perf show
-> equivalent values with/without polling (with/without fio "hipri" option)
-> even though I can see from perf top that we are in fact polling in one
-> case. I don't if I missing a step or something is off in my config.
+Looking at io_wq_cancel_all(), this will just send a signal to the
+task without waiting for anything, right? Isn't that unsafe?
 
-Doesn't sound right. io_poll just says if polling is enabled, not if
-it's IRQ driven or not. Try this, assuming nvme0n1 is the device in
-question:
 
-# cd /sys/kernel/debug/block/nvme0n1
-# grep . hctx*/type
-hctx0/type:default
-hctx1/type:read
-hctx2/type:read
-hctx3/type:read
-hctx4/type:poll
-hctx5/type:poll
-hctx6/type:poll
-hctx7/type:poll
-
-This is just a vm I have, hence just the 8 queues. But this shows a
-proper mapping setup - 1 default queue, 3 read, and 4 poll queues.
-
-Is nvme a module on your box? Or is it built-in?
-
--- 
-Jens Axboe
-
+> +       else
+> +               io_uring_cancel_files(ctx, data);
+>         return 0;
+>  }
