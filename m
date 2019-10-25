@@ -2,73 +2,60 @@ Return-Path: <SRS0=ZVtD=YS=vger.kernel.org=linux-block-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-2.2 required=3.0 tests=DKIM_SIGNED,DKIM_VALID,
-	HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,
-	USER_AGENT_SANE_1 autolearn=no autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-5.2 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
+	INCLUDES_PATCH,MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,USER_AGENT_SANE_1
+	autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id A4655CA9EA0
-	for <linux-block@archiver.kernel.org>; Fri, 25 Oct 2019 20:37:39 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 37589CA9EA0
+	for <linux-block@archiver.kernel.org>; Fri, 25 Oct 2019 20:51:21 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.kernel.org (Postfix) with ESMTP id 72A1820659
-	for <linux-block@archiver.kernel.org>; Fri, 25 Oct 2019 20:37:39 +0000 (UTC)
-Authentication-Results: mail.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel-dk.20150623.gappssmtp.com header.i=@kernel-dk.20150623.gappssmtp.com header.b="WNZinwbn"
+	by mail.kernel.org (Postfix) with ESMTP id 117D221D7F
+	for <linux-block@archiver.kernel.org>; Fri, 25 Oct 2019 20:51:20 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1727003AbfJYUhj (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Fri, 25 Oct 2019 16:37:39 -0400
-Received: from mail-il1-f196.google.com ([209.85.166.196]:36308 "EHLO
-        mail-il1-f196.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1725825AbfJYUhi (ORCPT
+        id S1725874AbfJYUvU (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Fri, 25 Oct 2019 16:51:20 -0400
+Received: from mail-wm1-f68.google.com ([209.85.128.68]:38792 "EHLO
+        mail-wm1-f68.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S1725801AbfJYUvU (ORCPT
         <rfc822;linux-block@vger.kernel.org>);
-        Fri, 25 Oct 2019 16:37:38 -0400
-Received: by mail-il1-f196.google.com with SMTP id s75so2978299ilc.3
-        for <linux-block@vger.kernel.org>; Fri, 25 Oct 2019 13:37:38 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=kernel-dk.20150623.gappssmtp.com; s=20150623;
-        h=subject:to:cc:references:from:message-id:date:user-agent
-         :mime-version:in-reply-to:content-language:content-transfer-encoding;
-        bh=sFOHXijh8F7tyUILbQgSmtZ9TMRFJZXJfFdJlMEpFPw=;
-        b=WNZinwbnHex8EMNtR8ji0Dh852Tlp8yGQIPZGwopQsOOv7S0K3a0x+aKXrHab/az0L
-         CBXYM+H3I7QPFYpETwbLDWQdmPHvJSMkbJb2HyaZLXveRDOLU7v9AQwpVttKWxHnFEou
-         ec+O8VyYRUb38iLmJFRX+0UWgJfiVYniIknFpN9v0N4/hx8euf5wzGm0u44wKiOnEOH5
-         FYznj4oTzceVuPaPhehf/NfAUeSGngJVsLCe07hDCGDZ/ww5fWFZMDR6hqoVwaEUF6YQ
-         esEoARTsvAPSdKKbURCN9uaHKiRX9sFkXwsRRIZ25UOoMVdkfzewXcU29RwhgN/nDpNM
-         IsNg==
+        Fri, 25 Oct 2019 16:51:20 -0400
+Received: by mail-wm1-f68.google.com with SMTP id 22so3218324wms.3
+        for <linux-block@vger.kernel.org>; Fri, 25 Oct 2019 13:51:18 -0700 (PDT)
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=1e100.net; s=20161025;
         h=x-gm-message-state:subject:to:cc:references:from:message-id:date
          :user-agent:mime-version:in-reply-to:content-language
          :content-transfer-encoding;
-        bh=sFOHXijh8F7tyUILbQgSmtZ9TMRFJZXJfFdJlMEpFPw=;
-        b=HuhO549DCXzatv+8YvnE/FQYHrfKPRn2i5CnBruDqZXSZ07on91LZZgJ7lw8ClNh5G
-         hx0gM6kU0MPlJ8oqQZ3JVPy1raZZvXAADlpG14n5fsqOonV6cr/CLx46vjcDo99CRPsv
-         0YPMd+7wFrH3K6lNT6DHYZfVal24FosC3VDIJi5yLaZ7FXtFp5spZy6ftRejU9f1YyoB
-         kH0EGJBsEJVIkAzTG0OWf903ehx2beBmXadqyT5NMihq/bn0QRaaF2wSqWSgqa+6Ztdj
-         85sPIXSY1OUYYvEJW4wLlbOPcdqmNW8Nyn1yfZL1dM9FEL+B8Dq8VRXQAKRzdLeT5AII
-         090A==
-X-Gm-Message-State: APjAAAW7alcOum0fe/nyUWXN6EANl3L4Mj/cuSBHSoZArZFkKpBYxHi6
-        2q4OWYHlZADkom4QPEyNGBNr9e4gw5VH3g==
-X-Google-Smtp-Source: APXvYqxAb860qHVJ/S/BtDt5SCY75IP/zMUFwrG6/xVzIa7onloMW/63uMiyOEizoVxwCYerRRX52Q==
-X-Received: by 2002:a92:17ce:: with SMTP id 75mr6369822ilx.88.1572035857658;
-        Fri, 25 Oct 2019 13:37:37 -0700 (PDT)
-Received: from [192.168.1.159] ([65.144.74.34])
-        by smtp.gmail.com with ESMTPSA id 128sm348265iox.35.2019.10.25.13.37.35
+        bh=LHCDSwoi5zmdyjGEtOo/N1Lz2NfMg4bBAivq86GIOFE=;
+        b=rZUt5zL2NdiXGIPVrXKYocM5L26/iJf8OFKN7Ox7k7TRZAWEIlpbAnSWwlyhnty+1v
+         6yUPBle5kUWrx1Zn31yWF5SE0ilRPGKTxL86P5yuroSsYyV0L+ZPx0LQJBF0nrFEQMbb
+         xlIyWK41sbpgwPkZf8z4Zh4S29wp3xhw0nUfxwelg8+83N+gmfH6KnkP8SwFlWihpjih
+         g1zlc4Jc0fWFfOAXtvbfKyGu0s+KYbO57t12cvLDfToTsFHoXHCGBONjy4bNxaYNVXVr
+         Vd+9rxUty/6kCWfYb2jgM+pX46xPDMceZKhdfFP1TRokAAw/uZ+240cMgeGvH+CTRj9j
+         MQBA==
+X-Gm-Message-State: APjAAAVqP0STgaUlvGEQcVat0Mw6Gv50cwKKmQ5AK37OYFMERMqswf+3
+        b/B5HO91+lv+MFpxgXsoCLg=
+X-Google-Smtp-Source: APXvYqz6I/2F/hb7dO3W7xcMPMx87BvnJkeyAOYFlHNYifaPfQaL6ZK+bnDXMelVobYljM/uRZTrAQ==
+X-Received: by 2002:a05:600c:2908:: with SMTP id i8mr5428353wmd.142.1572036677907;
+        Fri, 25 Oct 2019 13:51:17 -0700 (PDT)
+Received: from ?IPv6:2600:1700:65a0:78e0:514:7862:1503:8e4d? ([2600:1700:65a0:78e0:514:7862:1503:8e4d])
+        by smtp.gmail.com with ESMTPSA id c14sm3156973wru.24.2019.10.25.13.51.16
         (version=TLS1_2 cipher=ECDHE-RSA-AES128-GCM-SHA256 bits=128/128);
-        Fri, 25 Oct 2019 13:37:36 -0700 (PDT)
-Subject: Re: [PATCH] nbd: verify socket is supported during setup
-To:     Mike Christie <mchristi@redhat.com>, nbd@other.debian.org,
-        rjones@redhat.com, ebiggers@kernel.org, josef@toxicpanda.com,
-        linux-block@vger.kernel.org
-Cc:     syzbot+24c12fa8d218ed26011a@syzkaller.appspotmail.com
-References: <20191017212734.10778-1-mchristi@redhat.com>
-From:   Jens Axboe <axboe@kernel.dk>
-Message-ID: <abf05db4-03ce-43a1-396c-a366b1d46451@kernel.dk>
-Date:   Fri, 25 Oct 2019 14:37:35 -0600
+        Fri, 25 Oct 2019 13:51:17 -0700 (PDT)
+Subject: Re: [PATCH] blk-mq: Fix cpu indexing error in
+ blk_mq_alloc_request_hctx()
+To:     James Smart <jsmart2021@gmail.com>, linux-block@vger.kernel.org
+Cc:     Shagun Agrawal <shagun.agrawal@broadcom.com>,
+        Christoph Hellwig <hch@lst.de>
+References: <20191023175700.18615-1-jsmart2021@gmail.com>
+From:   Sagi Grimberg <sagi@grimberg.me>
+Message-ID: <c0423099-f5eb-b513-3e1b-ec719d753f15@grimberg.me>
+Date:   Fri, 25 Oct 2019 13:51:14 -0700
 User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:60.0) Gecko/20100101
  Thunderbird/60.9.0
 MIME-Version: 1.0
-In-Reply-To: <20191017212734.10778-1-mchristi@redhat.com>
-Content-Type: text/plain; charset=utf-8
+In-Reply-To: <20191023175700.18615-1-jsmart2021@gmail.com>
+Content-Type: text/plain; charset=utf-8; format=flowed
 Content-Language: en-US
 Content-Transfer-Encoding: 7bit
 Sender: linux-block-owner@vger.kernel.org
@@ -76,17 +63,17 @@ Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-On 10/17/19 3:27 PM, Mike Christie wrote:
-> nbd requires socket families to support the shutdown method so the nbd
-> recv workqueue can be woken up from its sock_recvmsg call. If the socket
-> does not support the callout we will leave recv works running or get hangs
-> later when the device or module is removed.
-> 
-> This adds a check during socket connection/reconnection to make sure the
-> socket being passed in supports the needed callout.
 
-Applied, thanks Mike.
+> diff --git a/block/blk-mq.c b/block/blk-mq.c
+> index 8538dc415499..0b06b4ea57f1 100644
+> --- a/block/blk-mq.c
+> +++ b/block/blk-mq.c
+> @@ -461,6 +461,8 @@ struct request *blk_mq_alloc_request_hctx(struct request_queue *q,
+>   		return ERR_PTR(-EXDEV);
+>   	}
+>   	cpu = cpumask_first_and(alloc_data.hctx->cpumask, cpu_online_mask);
+> +	if (cpu >= nr_cpu_ids)
+> +		cpu = cpumask_first(alloc_data.hctx->cpumask);
 
--- 
-Jens Axboe
-
+I'd just drop the cpu_online_mask test, we don't care about the cpu
+being online as this request is running already.
