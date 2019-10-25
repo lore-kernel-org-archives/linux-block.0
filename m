@@ -2,65 +2,65 @@ Return-Path: <SRS0=ZVtD=YS=vger.kernel.org=linux-block-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-9.7 required=3.0 tests=DKIM_SIGNED,DKIM_VALID,
+X-Spam-Status: No, score=-9.8 required=3.0 tests=DKIM_SIGNED,DKIM_VALID,
 	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,
-	SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED,USER_AGENT_GIT autolearn=unavailable
+	SPF_HELO_NONE,SPF_PASS,USER_AGENT_GIT autolearn=unavailable
 	autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id F377FCA9EC0
-	for <linux-block@archiver.kernel.org>; Fri, 25 Oct 2019 17:31:49 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id ED656CA9EBC
+	for <linux-block@archiver.kernel.org>; Fri, 25 Oct 2019 17:31:50 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.kernel.org (Postfix) with ESMTP id C651D222C4
-	for <linux-block@archiver.kernel.org>; Fri, 25 Oct 2019 17:31:49 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id B5D02205C9
+	for <linux-block@archiver.kernel.org>; Fri, 25 Oct 2019 17:31:50 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel-dk.20150623.gappssmtp.com header.i=@kernel-dk.20150623.gappssmtp.com header.b="CGdT1qUu"
+	dkim=pass (2048-bit key) header.d=kernel-dk.20150623.gappssmtp.com header.i=@kernel-dk.20150623.gappssmtp.com header.b="By5ztQT2"
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S2502816AbfJYRbl (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        id S2502803AbfJYRbl (ORCPT <rfc822;linux-block@archiver.kernel.org>);
         Fri, 25 Oct 2019 13:31:41 -0400
-Received: from mail-io1-f68.google.com ([209.85.166.68]:37626 "EHLO
-        mail-io1-f68.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S2505880AbfJYRas (ORCPT
+Received: from mail-il1-f193.google.com ([209.85.166.193]:41280 "EHLO
+        mail-il1-f193.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S2505879AbfJYRar (ORCPT
         <rfc822;linux-block@vger.kernel.org>);
-        Fri, 25 Oct 2019 13:30:48 -0400
-Received: by mail-io1-f68.google.com with SMTP id 1so3322872iou.4
-        for <linux-block@vger.kernel.org>; Fri, 25 Oct 2019 10:30:47 -0700 (PDT)
+        Fri, 25 Oct 2019 13:30:47 -0400
+Received: by mail-il1-f193.google.com with SMTP id z10so2517452ilo.8
+        for <linux-block@vger.kernel.org>; Fri, 25 Oct 2019 10:30:46 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=kernel-dk.20150623.gappssmtp.com; s=20150623;
         h=from:to:cc:subject:date:message-id:in-reply-to:references;
-        bh=t/7vAwNRes/OgSWHDpsbdJG9hBx8gt3i+4E5Djauy08=;
-        b=CGdT1qUuvKsWPxl4sLXLPgFyVbTaw4sKniCbWUtOdSjtQxNOy7E59UEa1eUO3jdk6N
-         9dllHULVf9uLP2ouMpR54/XwyGmQ/n8wQR/2gnPQitAqZsD2p5lvS0mar/wvAdHUZ0fr
-         SwKc9yWB/CZOOiaIImo3tScDuG6yXKtvBHjzG0jDNAEXIYrXeRMChySP6DbtQrAw0EIi
-         WjB66sJgBjVwwV2GCU6VVkUqtgxdKH7AsDyM8fnv50DFXXWF6E9gwijB/lr4+IXlarI2
-         WttdiDYQ5VN63AwOlWyylp59aHxnvqVxZ+aNxWuHPlB68lVEL0JJ16xpVyzRk3T49ea8
-         QUBQ==
+        bh=X1tFIQN8hluXSAcqstDDG+VfYhLOozrIYHLT8zb816k=;
+        b=By5ztQT2DfEBZqFtiPHkmtZ4atGNrkbrt1N6371R9MFytbjn9tfjsMjYAViB01DZnT
+         Sdbk+2RIvqg/RJwUtyGVh0MDRFM54swCWhU2+CUczRRQVPqaFaTKOzPS7eCVe5SKIPX5
+         3FbnsFP+xwQcqEHf11G8RbgluF0nSPq30/UasF+1pIUBMGG/as3iVKsUlZIpolsQ34g0
+         GTeo8zbWcJ4ME29jSRBjpLkN1xyp5B8K2hrZ3CXfhE1HSZTMnzXdvqHVVAhBhQrlDjwt
+         8T1Q0rhlDkUpWREdHY1SanKlpTelXSlT85SglUjw1LTVuGI1hkLKaJLcSdhv19Niyye4
+         gcQg==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=1e100.net; s=20161025;
         h=x-gm-message-state:from:to:cc:subject:date:message-id:in-reply-to
          :references;
-        bh=t/7vAwNRes/OgSWHDpsbdJG9hBx8gt3i+4E5Djauy08=;
-        b=GBN3fRhNG29xtst2WryE0Isim33ARBLXUrczRPKT2xbs010XNbtGVmiboAIsiAWYLo
-         Pfhpbt4yBtvU8bu6K0MnaibLAoKldg+qKlJkdQNt8BbTgMdqv+k6/9ba7f/VHO2RAUnL
-         0iY2Mg74PUkf67HDiBCNKdkno/UapcVPWrb1P6RsMbD2oTE7LF2o1KHrayI/j9HkhfNC
-         SkuQJSLSQcQILn7m2A1NSonWEFVeAcQOmV1Nws92Zm18MP8xjy9/4ZKHqTf8nt2fH4ye
-         ZTKRI0ZRzBMAAUxFV1mlP0Nux151qn16JBXm9jG7kHKbLp4/tqn8Yv4aMQnC79Gt3Ne8
-         JZRg==
-X-Gm-Message-State: APjAAAXx5VCFh1ko8WjZNUUMBSv/AuH31BIP5pKmqgTDePJhkCkn8O9V
-        at9H2gAwIIKs/9KI8g5+0DxjuUD1qgYvLw==
-X-Google-Smtp-Source: APXvYqwUDgf7JyPX6HPTQqUx/qAcpASBBCIBV3bC66/ycxJrFBqB+pbO6njJJA0HY1iYHru7aPh3wA==
-X-Received: by 2002:a5d:83c1:: with SMTP id u1mr1446664ior.78.1572024646595;
-        Fri, 25 Oct 2019 10:30:46 -0700 (PDT)
+        bh=X1tFIQN8hluXSAcqstDDG+VfYhLOozrIYHLT8zb816k=;
+        b=ILYqQ/FBCel5WWquVIskTMAYPvRKvIA4JfS4vwDAF8bKtDiEXFCCmSszoZ7I2f7cjS
+         sKLUBk3q+3FRe7x0S8/x8m1Ep2G0ZPy5oxKrcKp3mIY40D3YvWeeGijpFAIDQmNrci7p
+         rE+1PQ0vmxxxgFiDuZAwP612y3DEYNx1VHldpQDMYQW5RVfhcOjbIzhD/UpR1S7aMnRS
+         FAUwEXNrMw4vRu2NCw6/r4pWi02Oe6Tq5YFXLAPa3uE5kR2+AoRGFMEH5AG23lg0ffyn
+         HwJTz8xTuyLzna2EdFMoIhPJYusGWWi2c7F1QqJqM9BAiTY2fkHS2HxESqCLnQsSxTzd
+         Vjvw==
+X-Gm-Message-State: APjAAAWRR2xTlkEKJvhibSPNqGKOhtETjRgEDf6sqbrIdzlei7HRwcaY
+        kb8WId3UH46OW42LxNKzP3r01t6Qb1aYxg==
+X-Google-Smtp-Source: APXvYqx8M6MKAd6TVEy4vcslE5xwt22GQcYvdBqfMwXsl43h2psuSIus9pfA66/b8AxrWv1ocCsBFQ==
+X-Received: by 2002:a92:1b49:: with SMTP id b70mr4263418ilb.180.1572024644907;
+        Fri, 25 Oct 2019 10:30:44 -0700 (PDT)
 Received: from x1.thefacebook.com ([65.144.74.34])
-        by smtp.gmail.com with ESMTPSA id g23sm323674ioe.73.2019.10.25.10.30.44
+        by smtp.gmail.com with ESMTPSA id g23sm323674ioe.73.2019.10.25.10.30.43
         (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Fri, 25 Oct 2019 10:30:45 -0700 (PDT)
+        Fri, 25 Oct 2019 10:30:44 -0700 (PDT)
 From:   Jens Axboe <axboe@kernel.dk>
 To:     linux-block@vger.kernel.org
 Cc:     davem@davemloft.net, netdev@vger.kernel.org, jannh@google.com,
         Jens Axboe <axboe@kernel.dk>
-Subject: [PATCH 3/4] net: add __sys_accept4_file() helper
-Date:   Fri, 25 Oct 2019 11:30:36 -0600
-Message-Id: <20191025173037.13486-4-axboe@kernel.dk>
+Subject: [PATCH 2/4] io_uring: io_uring: add support for async work inheriting files
+Date:   Fri, 25 Oct 2019 11:30:35 -0600
+Message-Id: <20191025173037.13486-3-axboe@kernel.dk>
 X-Mailer: git-send-email 2.17.1
 In-Reply-To: <20191025173037.13486-1-axboe@kernel.dk>
 References: <20191025173037.13486-1-axboe@kernel.dk>
@@ -69,157 +69,339 @@ Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-This is identical to __sys_accept4(), except it takes a struct file
-instead of an fd, and it also allows passing in extra file->f_flags
-flags. The latter is done to support masking in O_NONBLOCK without
-manipulating the original file flags.
+This is in preparation for adding opcodes that need to add new files
+in a process file table, system calls like open(2) or accept4(2).
 
-No functional changes in this patch.
+If an opcode needs this, it must set IO_WQ_WORK_NEEDS_FILES in the work
+item. If work that needs to get punted to async context have this
+set, the async worker will assume the original task file table before
+executing the work.
 
-Cc: David Miller <davem@davemloft.net>
-Cc: netdev@vger.kernel.org
+Note that opcodes that need access to the current files of an
+application cannot be done through IORING_SETUP_SQPOLL.
+
 Signed-off-by: Jens Axboe <axboe@kernel.dk>
 ---
- include/linux/socket.h |  3 ++
- net/socket.c           | 65 ++++++++++++++++++++++++++----------------
- 2 files changed, 44 insertions(+), 24 deletions(-)
+ fs/io-wq.c    |  14 ++++++
+ fs/io-wq.h    |   3 ++
+ fs/io_uring.c | 116 ++++++++++++++++++++++++++++++++++++++++++++++++--
+ 3 files changed, 129 insertions(+), 4 deletions(-)
 
-diff --git a/include/linux/socket.h b/include/linux/socket.h
-index fc0bed59fc84..dd061f741bc1 100644
---- a/include/linux/socket.h
-+++ b/include/linux/socket.h
-@@ -392,6 +392,9 @@ extern int __sys_recvfrom(int fd, void __user *ubuf, size_t size,
- extern int __sys_sendto(int fd, void __user *buff, size_t len,
- 			unsigned int flags, struct sockaddr __user *addr,
- 			int addr_len);
-+extern int __sys_accept4_file(struct file *file, unsigned file_flags,
-+			struct sockaddr __user *upeer_sockaddr,
-+			 int __user *upeer_addrlen, int flags);
- extern int __sys_accept4(int fd, struct sockaddr __user *upeer_sockaddr,
- 			 int __user *upeer_addrlen, int flags);
- extern int __sys_socket(int family, int type, int protocol);
-diff --git a/net/socket.c b/net/socket.c
-index 6a9ab7a8b1d2..40ab39f6c5d8 100644
---- a/net/socket.c
-+++ b/net/socket.c
-@@ -1690,24 +1690,13 @@ SYSCALL_DEFINE2(listen, int, fd, int, backlog)
- 	return __sys_listen(fd, backlog);
- }
+diff --git a/fs/io-wq.c b/fs/io-wq.c
+index 99ac5e338d99..134c4632c0be 100644
+--- a/fs/io-wq.c
++++ b/fs/io-wq.c
+@@ -52,6 +52,7 @@ struct io_worker {
  
--/*
-- *	For accept, we attempt to create a new socket, set up the link
-- *	with the client, wake up the client, then return the new
-- *	connected fd. We collect the address of the connector in kernel
-- *	space and move it to user at the very end. This is unclean because
-- *	we open the socket then return an error.
-- *
-- *	1003.1g adds the ability to recvmsg() to query connection pending
-- *	status to recvmsg. We need to add that support in a way thats
-- *	clean when we restructure accept also.
-- */
--
--int __sys_accept4(int fd, struct sockaddr __user *upeer_sockaddr,
--		  int __user *upeer_addrlen, int flags)
-+int __sys_accept4_file(struct file *file, unsigned file_flags,
-+		       struct sockaddr __user *upeer_sockaddr,
-+		       int __user *upeer_addrlen, int flags)
+ 	struct rcu_head rcu;
+ 	struct mm_struct *mm;
++	struct files_struct *restore_files;
+ };
+ 
+ struct io_wq_nulls_list {
+@@ -128,6 +129,12 @@ static bool __io_worker_unuse(struct io_wqe *wqe, struct io_worker *worker)
+ 	__must_hold(wqe->lock)
+ 	__releases(wqe->lock)
  {
- 	struct socket *sock, *newsock;
- 	struct file *newfile;
--	int err, len, newfd, fput_needed;
-+	int err, len, newfd;
- 	struct sockaddr_storage address;
- 
- 	if (flags & ~(SOCK_CLOEXEC | SOCK_NONBLOCK))
-@@ -1716,14 +1705,14 @@ int __sys_accept4(int fd, struct sockaddr __user *upeer_sockaddr,
- 	if (SOCK_NONBLOCK != O_NONBLOCK && (flags & SOCK_NONBLOCK))
- 		flags = (flags & ~SOCK_NONBLOCK) | O_NONBLOCK;
- 
--	sock = sockfd_lookup_light(fd, &err, &fput_needed);
-+	sock = sock_from_file(file, &err);
- 	if (!sock)
- 		goto out;
- 
- 	err = -ENFILE;
- 	newsock = sock_alloc();
- 	if (!newsock)
--		goto out_put;
-+		goto out;
- 
- 	newsock->type = sock->type;
- 	newsock->ops = sock->ops;
-@@ -1738,20 +1727,21 @@ int __sys_accept4(int fd, struct sockaddr __user *upeer_sockaddr,
- 	if (unlikely(newfd < 0)) {
- 		err = newfd;
- 		sock_release(newsock);
--		goto out_put;
-+		goto out;
- 	}
- 	newfile = sock_alloc_file(newsock, flags, sock->sk->sk_prot_creator->name);
- 	if (IS_ERR(newfile)) {
- 		err = PTR_ERR(newfile);
- 		put_unused_fd(newfd);
--		goto out_put;
-+		goto out;
- 	}
- 
- 	err = security_socket_accept(sock, newsock);
- 	if (err)
- 		goto out_fd;
- 
--	err = sock->ops->accept(sock, newsock, sock->file->f_flags, false);
-+	err = sock->ops->accept(sock, newsock, sock->file->f_flags | file_flags,
-+					false);
- 	if (err < 0)
- 		goto out_fd;
- 
-@@ -1772,15 +1762,42 @@ int __sys_accept4(int fd, struct sockaddr __user *upeer_sockaddr,
- 
- 	fd_install(newfd, newfile);
- 	err = newfd;
--
--out_put:
--	fput_light(sock->file, fput_needed);
- out:
- 	return err;
- out_fd:
- 	fput(newfile);
- 	put_unused_fd(newfd);
--	goto out_put;
-+	goto out;
-+
-+}
-+
-+/*
-+ *	For accept, we attempt to create a new socket, set up the link
-+ *	with the client, wake up the client, then return the new
-+ *	connected fd. We collect the address of the connector in kernel
-+ *	space and move it to user at the very end. This is unclean because
-+ *	we open the socket then return an error.
-+ *
-+ *	1003.1g adds the ability to recvmsg() to query connection pending
-+ *	status to recvmsg. We need to add that support in a way thats
-+ *	clean when we restructure accept also.
-+ */
-+
-+int __sys_accept4(int fd, struct sockaddr __user *upeer_sockaddr,
-+		  int __user *upeer_addrlen, int flags)
-+{
-+	int ret = -EBADF;
-+	struct fd f;
-+
-+	f = fdget(fd);
-+	if (f.file) {
-+		ret = __sys_accept4_file(f.file, 0, upeer_sockaddr,
-+						upeer_addrlen, flags);
-+		if (f.flags)
-+			fput(f.file);
++	if (current->files != worker->restore_files) {
++		task_lock(current);
++		current->files = worker->restore_files;
++		task_unlock(current);
 +	}
 +
-+	return ret;
+ 	/*
+ 	 * If we have an active mm, we need to drop the wq lock before unusing
+ 	 * it. If we do, return true and let the caller retry the idle loop.
+@@ -188,6 +195,7 @@ static void io_worker_start(struct io_wqe *wqe, struct io_worker *worker)
+ 	current->flags |= PF_IO_WORKER;
+ 
+ 	worker->flags |= (IO_WORKER_F_UP | IO_WORKER_F_RUNNING);
++	worker->restore_files = current->files;
+ 	atomic_inc(&wqe->nr_running);
  }
  
- SYSCALL_DEFINE4(accept4, int, fd, struct sockaddr __user *, upeer_sockaddr,
+@@ -278,6 +286,12 @@ static void io_worker_handle_work(struct io_worker *worker)
+ 		if (!work)
+ 			break;
+ next:
++		if ((work->flags & IO_WQ_WORK_NEEDS_FILES) &&
++		    current->files != work->files) {
++			task_lock(current);
++			current->files = work->files;
++			task_unlock(current);
++		}
+ 		if ((work->flags & IO_WQ_WORK_NEEDS_USER) && !worker->mm &&
+ 		    wq->mm && mmget_not_zero(wq->mm)) {
+ 			use_mm(wq->mm);
+diff --git a/fs/io-wq.h b/fs/io-wq.h
+index be8f22c8937b..e93f764b1fa4 100644
+--- a/fs/io-wq.h
++++ b/fs/io-wq.h
+@@ -8,6 +8,7 @@ enum {
+ 	IO_WQ_WORK_HAS_MM	= 2,
+ 	IO_WQ_WORK_HASHED	= 4,
+ 	IO_WQ_WORK_NEEDS_USER	= 8,
++	IO_WQ_WORK_NEEDS_FILES	= 16,
+ 
+ 	IO_WQ_HASH_SHIFT	= 24,	/* upper 8 bits are used for hash key */
+ };
+@@ -22,12 +23,14 @@ struct io_wq_work {
+ 	struct list_head list;
+ 	void (*func)(struct io_wq_work **);
+ 	unsigned flags;
++	struct files_struct *files;
+ };
+ 
+ #define INIT_IO_WORK(work, _func)			\
+ 	do {						\
+ 		(work)->func = _func;			\
+ 		(work)->flags = 0;			\
++		(work)->files = NULL;			\
+ 	} while (0)					\
+ 
+ struct io_wq *io_wq_create(unsigned concurrency, struct mm_struct *mm);
+diff --git a/fs/io_uring.c b/fs/io_uring.c
+index effa385ebe72..5a6f8e1dc718 100644
+--- a/fs/io_uring.c
++++ b/fs/io_uring.c
+@@ -196,6 +196,8 @@ struct io_ring_ctx {
+ 
+ 		struct list_head	defer_list;
+ 		struct list_head	timeout_list;
++
++		wait_queue_head_t	inflight_wait;
+ 	} ____cacheline_aligned_in_smp;
+ 
+ 	/* IO offload */
+@@ -250,6 +252,9 @@ struct io_ring_ctx {
+ 		 */
+ 		struct list_head	poll_list;
+ 		struct list_head	cancel_list;
++
++		spinlock_t		inflight_lock;
++		struct list_head	inflight_list;
+ 	} ____cacheline_aligned_in_smp;
+ 
+ #if defined(CONFIG_UNIX)
+@@ -259,11 +264,13 @@ struct io_ring_ctx {
+ 
+ struct sqe_submit {
+ 	const struct io_uring_sqe	*sqe;
++	struct file			*ring_file;
+ 	unsigned short			index;
+ 	bool				has_user : 1;
+ 	bool				in_async : 1;
+ 	bool				needs_fixed_file : 1;
+ 	u32				sequence;
++	int				ring_fd;
+ };
+ 
+ /*
+@@ -318,10 +325,13 @@ struct io_kiocb {
+ #define REQ_F_TIMEOUT		1024	/* timeout request */
+ #define REQ_F_ISREG		2048	/* regular file */
+ #define REQ_F_MUST_PUNT		4096	/* must be punted even for NONBLOCK */
++#define REQ_F_INFLIGHT		8192	/* on inflight list */
+ 	u64			user_data;
+ 	u32			result;
+ 	u32			sequence;
+ 
++	struct list_head	inflight_entry;
++
+ 	struct io_wq_work	work;
+ };
+ 
+@@ -402,6 +412,9 @@ static struct io_ring_ctx *io_ring_ctx_alloc(struct io_uring_params *p)
+ 	INIT_LIST_HEAD(&ctx->cancel_list);
+ 	INIT_LIST_HEAD(&ctx->defer_list);
+ 	INIT_LIST_HEAD(&ctx->timeout_list);
++	init_waitqueue_head(&ctx->inflight_wait);
++	spin_lock_init(&ctx->inflight_lock);
++	INIT_LIST_HEAD(&ctx->inflight_list);
+ 	return ctx;
+ }
+ 
+@@ -671,9 +684,20 @@ static void io_free_req_many(struct io_ring_ctx *ctx, void **reqs, int *nr)
+ 
+ static void __io_free_req(struct io_kiocb *req)
+ {
++	struct io_ring_ctx *ctx = req->ctx;
++
+ 	if (req->file && !(req->flags & REQ_F_FIXED_FILE))
+ 		fput(req->file);
+-	percpu_ref_put(&req->ctx->refs);
++	if (req->flags & REQ_F_INFLIGHT) {
++		unsigned long flags;
++
++		spin_lock_irqsave(&ctx->inflight_lock, flags);
++		list_del(&req->inflight_entry);
++		if (waitqueue_active(&ctx->inflight_wait))
++			wake_up(&ctx->inflight_wait);
++		spin_unlock_irqrestore(&ctx->inflight_lock, flags);
++	}
++	percpu_ref_put(&ctx->refs);
+ 	kmem_cache_free(req_cachep, req);
+ }
+ 
+@@ -2277,6 +2301,30 @@ static int io_req_set_file(struct io_ring_ctx *ctx, const struct sqe_submit *s,
+ 	return 0;
+ }
+ 
++static int io_grab_files(struct io_ring_ctx *ctx, struct io_kiocb *req)
++{
++	int ret = -EBADF;
++
++	rcu_read_lock();
++	spin_lock_irq(&ctx->inflight_lock);
++	/*
++	 * We use the f_ops->flush() handler to ensure that we can flush
++	 * out work accessing these files if the fd is closed. Check if
++	 * the fd has changed since we started down this path, and disallow
++	 * this operation if it has.
++	 */
++	if (fcheck(req->submit.ring_fd) == req->submit.ring_file) {
++		list_add(&req->inflight_entry, &ctx->inflight_list);
++		req->flags |= REQ_F_INFLIGHT;
++		req->work.files = current->files;
++		ret = 0;
++	}
++	spin_unlock_irq(&ctx->inflight_lock);
++	rcu_read_unlock();
++
++	return ret;
++}
++
+ static int __io_queue_sqe(struct io_ring_ctx *ctx, struct io_kiocb *req,
+ 			struct sqe_submit *s)
+ {
+@@ -2296,17 +2344,25 @@ static int __io_queue_sqe(struct io_ring_ctx *ctx, struct io_kiocb *req,
+ 		if (sqe_copy) {
+ 			s->sqe = sqe_copy;
+ 			memcpy(&req->submit, s, sizeof(*s));
+-			io_queue_async_work(ctx, req);
++			if (req->work.flags & IO_WQ_WORK_NEEDS_FILES) {
++				ret = io_grab_files(ctx, req);
++				if (ret) {
++					kfree(sqe_copy);
++					goto err;
++				}
++			}
+ 
+ 			/*
+ 			 * Queued up for async execution, worker will release
+ 			 * submit reference when the iocb is actually submitted.
+ 			 */
++			io_queue_async_work(ctx, req);
+ 			return 0;
+ 		}
+ 	}
+ 
+ 	/* drop submission reference */
++err:
+ 	io_put_req(req, NULL);
+ 
+ 	/* and drop final reference, if we failed */
+@@ -2509,6 +2565,7 @@ static bool io_get_sqring(struct io_ring_ctx *ctx, struct sqe_submit *s)
+ 
+ 	head = READ_ONCE(sq_array[head & ctx->sq_mask]);
+ 	if (head < ctx->sq_entries) {
++		s->ring_file = NULL;
+ 		s->index = head;
+ 		s->sqe = &ctx->sq_sqes[head];
+ 		s->sequence = ctx->cached_sq_head;
+@@ -2716,7 +2773,8 @@ static int io_sq_thread(void *data)
+ 	return 0;
+ }
+ 
+-static int io_ring_submit(struct io_ring_ctx *ctx, unsigned int to_submit)
++static int io_ring_submit(struct io_ring_ctx *ctx, unsigned int to_submit,
++			  struct file *ring_file, int ring_fd)
+ {
+ 	struct io_submit_state state, *statep = NULL;
+ 	struct io_kiocb *link = NULL;
+@@ -2758,9 +2816,11 @@ static int io_ring_submit(struct io_ring_ctx *ctx, unsigned int to_submit)
+ 		}
+ 
+ out:
++		s.ring_file = ring_file;
+ 		s.has_user = true;
+ 		s.in_async = false;
+ 		s.needs_fixed_file = false;
++		s.ring_fd = ring_fd;
+ 		submit++;
+ 		trace_io_uring_submit_sqe(ctx, true, false);
+ 		io_submit_sqe(ctx, &s, statep, &link);
+@@ -3722,6 +3782,53 @@ static int io_uring_release(struct inode *inode, struct file *file)
+ 	return 0;
+ }
+ 
++static void io_uring_cancel_files(struct io_ring_ctx *ctx,
++				  struct files_struct *files)
++{
++	struct io_kiocb *req;
++	DEFINE_WAIT(wait);
++
++	while (!list_empty_careful(&ctx->inflight_list)) {
++		enum io_wq_cancel ret = IO_WQ_CANCEL_NOTFOUND;
++
++		spin_lock_irq(&ctx->inflight_lock);
++		list_for_each_entry(req, &ctx->inflight_list, inflight_entry) {
++			if (req->work.files == files) {
++				ret = io_wq_cancel_work(ctx->io_wq, &req->work);
++				break;
++			}
++		}
++		if (ret == IO_WQ_CANCEL_RUNNING)
++			prepare_to_wait(&ctx->inflight_wait, &wait,
++					TASK_UNINTERRUPTIBLE);
++
++		spin_unlock_irq(&ctx->inflight_lock);
++
++		/*
++		 * We need to keep going until we get NOTFOUND. We only cancel
++		 * one work at the time.
++		 *
++		 * If we get CANCEL_RUNNING, then wait for a work to complete
++		 * before continuing.
++		 */
++		if (ret == IO_WQ_CANCEL_OK)
++			continue;
++		else if (ret != IO_WQ_CANCEL_RUNNING)
++			break;
++		schedule();
++	}
++}
++
++static int io_uring_flush(struct file *file, void *data)
++{
++	struct io_ring_ctx *ctx = file->private_data;
++
++	io_uring_cancel_files(ctx, data);
++	if (fatal_signal_pending(current) || (current->flags & PF_EXITING))
++		io_wq_cancel_all(ctx->io_wq);
++	return 0;
++}
++
+ static int io_uring_mmap(struct file *file, struct vm_area_struct *vma)
+ {
+ 	loff_t offset = (loff_t) vma->vm_pgoff << PAGE_SHIFT;
+@@ -3790,7 +3897,7 @@ SYSCALL_DEFINE6(io_uring_enter, unsigned int, fd, u32, to_submit,
+ 		to_submit = min(to_submit, ctx->sq_entries);
+ 
+ 		mutex_lock(&ctx->uring_lock);
+-		submitted = io_ring_submit(ctx, to_submit);
++		submitted = io_ring_submit(ctx, to_submit, f.file, fd);
+ 		mutex_unlock(&ctx->uring_lock);
+ 	}
+ 	if (flags & IORING_ENTER_GETEVENTS) {
+@@ -3813,6 +3920,7 @@ SYSCALL_DEFINE6(io_uring_enter, unsigned int, fd, u32, to_submit,
+ 
+ static const struct file_operations io_uring_fops = {
+ 	.release	= io_uring_release,
++	.flush		= io_uring_flush,
+ 	.mmap		= io_uring_mmap,
+ 	.poll		= io_uring_poll,
+ 	.fasync		= io_uring_fasync,
 -- 
 2.17.1
 
