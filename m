@@ -2,65 +2,60 @@ Return-Path: <SRS0=ZVtD=YS=vger.kernel.org=linux-block-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-8.1 required=3.0 tests=DKIM_SIGNED,DKIM_VALID,
+X-Spam-Status: No, score=-2.1 required=3.0 tests=DKIM_SIGNED,DKIM_VALID,
 	DKIM_VALID_AU,FREEMAIL_FORGED_FROMDOMAIN,FREEMAIL_FROM,
-	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,
-	SPF_HELO_NONE,SPF_PASS,USER_AGENT_SANE_1 autolearn=ham autolearn_force=no
-	version=3.4.0
+	HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,
+	USER_AGENT_SANE_1 autolearn=no autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id CD117CA9EA0
-	for <linux-block@archiver.kernel.org>; Fri, 25 Oct 2019 09:36:29 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id C7828CA9EA0
+	for <linux-block@archiver.kernel.org>; Fri, 25 Oct 2019 09:48:15 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.kernel.org (Postfix) with ESMTP id 96B5A21D71
-	for <linux-block@archiver.kernel.org>; Fri, 25 Oct 2019 09:36:29 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id 90F4221D7F
+	for <linux-block@archiver.kernel.org>; Fri, 25 Oct 2019 09:48:15 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="IXiaoald"
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="m5oKffUV"
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S2394341AbfJYJg3 (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Fri, 25 Oct 2019 05:36:29 -0400
-Received: from mail-wr1-f67.google.com ([209.85.221.67]:41238 "EHLO
-        mail-wr1-f67.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S2394278AbfJYJg2 (ORCPT
+        id S2392145AbfJYJsP (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Fri, 25 Oct 2019 05:48:15 -0400
+Received: from mail-wr1-f50.google.com ([209.85.221.50]:44569 "EHLO
+        mail-wr1-f50.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S2391988AbfJYJsO (ORCPT
         <rfc822;linux-block@vger.kernel.org>);
-        Fri, 25 Oct 2019 05:36:28 -0400
-Received: by mail-wr1-f67.google.com with SMTP id p4so1497759wrm.8;
-        Fri, 25 Oct 2019 02:36:25 -0700 (PDT)
+        Fri, 25 Oct 2019 05:48:14 -0400
+Received: by mail-wr1-f50.google.com with SMTP id z11so1522960wro.11;
+        Fri, 25 Oct 2019 02:48:12 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=gmail.com; s=20161025;
-        h=subject:to:references:from:autocrypt:message-id:date:user-agent
-         :mime-version:in-reply-to;
-        bh=bl2WOS2669jS0p4MM0ZtP9XkzD7cMvf/ibHDNKVuLWk=;
-        b=IXiaoaldrF6iUk12g/Y3LCoVjCI4RxHAJPOklslTv7UtWVgPxy0aost/o83pfOPyFw
-         nDUw2908sAD2OSWhlTK37/BTR4TVZIz8IOJeFuYxnSlSqgEMPmpaFhwgViSKXlvYJwHi
-         DUq40a892m/o2cDB7ixVEd7i0FT03fjKb9VQdkgF7ey3T5kdkaXIHVPBbHeG8P3zeJFu
-         rQSlrsvGzKKrxtArvk9pUiMUV8eJTnayrExznWNw8mSr6kTYYvbQc8a77CGWpZitgFtd
-         A6+5SuwhSqKhHMwD5LP5kokvGmv6iHLNzJQR/F4Bew/nsN5rbmCLufRikbFnmOECma9U
-         I2uQ==
+        h=to:from:autocrypt:subject:message-id:date:user-agent:mime-version;
+        bh=BdjaYlvumIYai6YwjSnesLOQq5Monp3ohavRaWWmlr4=;
+        b=m5oKffUVcI4bt3oVPf2ZzL7tR0R+R1/8RGYO5KmE9fmjuxu4FW4/8sHaVexIJFKHri
+         impfoZnJaAfBwymaSgyQZUeST0IZ0o8/VNl2zT5yeBYdBwmYCzw1rp9A2TUNz3vyPEOP
+         3Al2cbySJc1XhVS52W8WqW0iOhG1sdzxfvXvwloUwQBMZpeJ0+EVud3oFADIctjpTt22
+         BKhrWumX1hzqlKeh0SvZmZsIm164GXd2bPHR5vqcZTcDEbt9puDP7KdDj5fb9WsjeI0t
+         6viFY6+KfQEGfRF/bfWqPyTbjH3hEVpQo5ldcY83plbvAqpbq7DtR0rTzUgJV5UTJx+l
+         ZjWw==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=1e100.net; s=20161025;
-        h=x-gm-message-state:subject:to:references:from:autocrypt:message-id
-         :date:user-agent:mime-version:in-reply-to;
-        bh=bl2WOS2669jS0p4MM0ZtP9XkzD7cMvf/ibHDNKVuLWk=;
-        b=fHpzpfXnvL+ZcvtrC3WXwD6dJa27t5VkBOgyjSXZrLdJ63TaRrvmbwNCo9kDAq0jGQ
-         f8soefgWlNKS6gA+oV4lLqzuqn3v9MPit1ownFzkFANwx7DNOrju6Lf7EviuJnzIc4k7
-         9OENA7QhlXiebzttAhtUO2ssEGCFYNVG+BsyWJmwlRkMCifo1H0HhhPW2rZc40fP9+1G
-         uEpApcop7q7jnDXs7I/VB2unIM0cGdx7xXjiGlIX42ub3xe4Mp5yY2dWAgLxvryajJ0A
-         9603xrIU+O9ctrzIReTZVHqJ/wX+enSWyfsDFwELbh3L1Qj+nuEcAR0aT/6SBsH55AOp
-         ioNQ==
-X-Gm-Message-State: APjAAAV2RkfzEfOPaV0oAwxv8t1ZNxx8+Vf954I9UfI9HsHf0dRfOiMC
-        5tuTna4BLmoEJdmBBkHmcQHjB1Ic
-X-Google-Smtp-Source: APXvYqwUa0z/dIvO3qhLSYkp+dj9hOcmQP6zs05xxHjGoxbU0I2lzNTwfMZs/h/KIjZMlrg96lWJxw==
-X-Received: by 2002:adf:9481:: with SMTP id 1mr1759151wrr.77.1571996184787;
-        Fri, 25 Oct 2019 02:36:24 -0700 (PDT)
+        h=x-gm-message-state:to:from:autocrypt:subject:message-id:date
+         :user-agent:mime-version;
+        bh=BdjaYlvumIYai6YwjSnesLOQq5Monp3ohavRaWWmlr4=;
+        b=JlKpGieGctshR1nmk1VN9vj1AowogAdGQqcl38wNEWFC+bsSKsak8AdxwUgT2W4X8U
+         /2UFAqzeUA8/FqYMp6sA0OaMYebeXCXl0u4wIXgNrfRbh+OVCxT0gGH7BVRpfotF/f+5
+         vkD9mWsGSp0pZ14WfcrR6BvGRfBHk/tHKfWxAM59Cylqxy7wJ99PsrJaSRXVmVmxJWoX
+         YR4PB8AEubQZFqSrfuxbDpk9UWr0XkQHsv9VxXTj8taQsp6M9XS0JYjRx4glVFN3WmBk
+         DE9arlTRljYoTiEXN9YJ7eOtsjS9HnM7z7vPqrVOlbnK1ap1Hk92WnyihZ81wbbD5im1
+         9MUw==
+X-Gm-Message-State: APjAAAUN1qjxPLWYM94KSFGXOJkZQvif5MVHTNz54b0WSmasDo5LCBtI
+        NFvjUZxYJd97CIWmhQTPcsLl3rgY
+X-Google-Smtp-Source: APXvYqzOa/UYxntEPuytj3j4BhQq81JMiz2Rl8Y+XUGhLQyFVH3Xsc3Vt8uTsIfB6rBfjv6GAAoUfg==
+X-Received: by 2002:a5d:630b:: with SMTP id i11mr1974718wru.87.1571996891373;
+        Fri, 25 Oct 2019 02:48:11 -0700 (PDT)
 Received: from [192.168.43.159] ([109.126.132.16])
-        by smtp.gmail.com with ESMTPSA id d11sm1843285wrf.80.2019.10.25.02.36.23
+        by smtp.gmail.com with ESMTPSA id o11sm1474787wmh.28.2019.10.25.02.48.10
         (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
-        Fri, 25 Oct 2019 02:36:23 -0700 (PDT)
-Subject: Re: [PATCH 2/3] io_uring: Fix broken links with offloading
+        Fri, 25 Oct 2019 02:48:10 -0700 (PDT)
 To:     Jens Axboe <axboe@kernel.dk>, linux-block@vger.kernel.org,
         linux-kernel@vger.kernel.org
-References: <cover.1571991701.git.asml.silence@gmail.com>
- <bd0eaa7729e3b8b599a25167df0a4ee583da69cc.1571991701.git.asml.silence@gmail.com>
 From:   Pavel Begunkov <asml.silence@gmail.com>
 Autocrypt: addr=asml.silence@gmail.com; prefer-encrypt=mutual; keydata=
  mQINBFmKBOQBEAC76ZFxLAKpDw0bKQ8CEiYJRGn8MHTUhURL02/7n1t0HkKQx2K1fCXClbps
@@ -105,248 +100,106 @@ Autocrypt: addr=asml.silence@gmail.com; prefer-encrypt=mutual; keydata=
  UVMKkOCdFhutRmYp0mbv2e87IK4erwNHQRkHUkzbsuym8RVpAZbLzLPIYK/J3RTErL6Z99N2
  m3J6pjwSJY/zNwuFPs9zGEnRO4g0BUbwGdbuvDzaq6/3OJLKohr5eLXNU3JkT+3HezydWm3W
  OPhauth7W0db74Qd49HXK0xe/aPrK+Cp+kU1HRactyNtF8jZQbhMCC8vMGukZtWaAwpjWiiH bA==
-Message-ID: <dd88f5be-930b-53e5-c3b6-12927d6634b1@gmail.com>
-Date:   Fri, 25 Oct 2019 12:36:14 +0300
+Subject: [BUG][RFC] Miscalculated inflight counter in io_uring
+Message-ID: <bfecc5ba-274b-b2f7-52dc-8ac6e0fab352@gmail.com>
+Date:   Fri, 25 Oct 2019 12:48:07 +0300
 User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:68.0) Gecko/20100101
  Thunderbird/68.1.1
 MIME-Version: 1.0
-In-Reply-To: <bd0eaa7729e3b8b599a25167df0a4ee583da69cc.1571991701.git.asml.silence@gmail.com>
 Content-Type: multipart/signed; micalg=pgp-sha256;
  protocol="application/pgp-signature";
- boundary="mHWPEBz81cRimIQsEmEbITjOhg7CAv6pF"
+ boundary="XRQZWAm4V5oBsv6yDZAKSZB2Qieagb5W7"
 Sender: linux-block-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
 This is an OpenPGP/MIME signed message (RFC 4880 and 3156)
---mHWPEBz81cRimIQsEmEbITjOhg7CAv6pF
-Content-Type: multipart/mixed; boundary="dAxsiZJdm05bU2fyu7JGJI1vDxCHPKQ6V";
+--XRQZWAm4V5oBsv6yDZAKSZB2Qieagb5W7
+Content-Type: multipart/mixed; boundary="y8qh1m9uXyXY41YulhwBAxBDD1EhBX7gE";
  protected-headers="v1"
 From: Pavel Begunkov <asml.silence@gmail.com>
 To: Jens Axboe <axboe@kernel.dk>, linux-block@vger.kernel.org,
  linux-kernel@vger.kernel.org
-Message-ID: <dd88f5be-930b-53e5-c3b6-12927d6634b1@gmail.com>
-Subject: Re: [PATCH 2/3] io_uring: Fix broken links with offloading
-References: <cover.1571991701.git.asml.silence@gmail.com>
- <bd0eaa7729e3b8b599a25167df0a4ee583da69cc.1571991701.git.asml.silence@gmail.com>
-In-Reply-To: <bd0eaa7729e3b8b599a25167df0a4ee583da69cc.1571991701.git.asml.silence@gmail.com>
+Message-ID: <bfecc5ba-274b-b2f7-52dc-8ac6e0fab352@gmail.com>
+Subject: [BUG][RFC] Miscalculated inflight counter in io_uring
 
---dAxsiZJdm05bU2fyu7JGJI1vDxCHPKQ6V
+--y8qh1m9uXyXY41YulhwBAxBDD1EhBX7gE
 Content-Type: text/plain; charset=utf-8
 Content-Language: en-US
 Content-Transfer-Encoding: quoted-printable
 
-On 25/10/2019 12:31, Pavel Begunkov (Silence) wrote:
-> From: Pavel Begunkov <asml.silence@gmail.com>
->=20
-> io_sq_thread() processes sqes by 8 without considering links. As a
-> result, links will be randomely subdivided.
->=20
-> The easiest way to fix it is to call io_get_sqring() inside
-> io_submit_sqes() as do io_ring_submit().
->=20
-> Downsides:
-> 1. This removes optimisation of not grabbing mm_struct for fixed files
-> 2. It submitting all sqes in one go, without finer-grained sheduling
-> with cq processing.
->=20
-Is this logic with not-grabbing mm and fixed files critical?
-I want to put it back later after some cleanup.=20
+In case of IORING_SETUP_SQPOLL | IORING_SETUP_IOPOLL:
 
-> Signed-off-by: Pavel Begunkov <asml.silence@gmail.com>
-> ---
->  fs/io_uring.c | 62 +++++++++++++++++++++++++++------------------------=
+@inflight count returned by io_submit_sqes() is the number of entries
+picked up from a sqring including already completed/failed. And
+completed but not failed requests will be placed into @poll_list.
 
->  1 file changed, 33 insertions(+), 29 deletions(-)
->=20
-> diff --git a/fs/io_uring.c b/fs/io_uring.c
-> index 0e141d905a5b..949c82a40d16 100644
-> --- a/fs/io_uring.c
-> +++ b/fs/io_uring.c
-> @@ -735,6 +735,14 @@ static unsigned io_cqring_events(struct io_rings *=
-rings)
->  	return READ_ONCE(rings->cq.tail) - READ_ONCE(rings->cq.head);
->  }
-> =20
-> +static inline unsigned int io_sqring_entries(struct io_ring_ctx *ctx)
-> +{
-> +	struct io_rings *rings =3D ctx->rings;
-> +
-> +	/* make sure SQ entry isn't read before tail */
-> +	return smp_load_acquire(&rings->sq.tail) - ctx->cached_sq_head;
-> +}
-> +
->  /*
->   * Find and free completed poll iocbs
->   */
-> @@ -2560,8 +2568,8 @@ static bool io_get_sqring(struct io_ring_ctx *ctx=
-, struct sqe_submit *s)
->  	return false;
->  }
-> =20
-> -static int io_submit_sqes(struct io_ring_ctx *ctx, struct sqe_submit *=
-sqes,
-> -			  unsigned int nr, bool has_user, bool mm_fault)
-> +static int io_submit_sqes(struct io_ring_ctx *ctx, unsigned int nr,
-> +			  bool has_user, bool mm_fault)
->  {
->  	struct io_submit_state state, *statep =3D NULL;
->  	struct io_kiocb *link =3D NULL;
-> @@ -2575,6 +2583,11 @@ static int io_submit_sqes(struct io_ring_ctx *ct=
-x, struct sqe_submit *sqes,
->  	}
-> =20
->  	for (i =3D 0; i < nr; i++) {
-> +		struct sqe_submit s;
-> +
-> +		if (!io_get_sqring(ctx, &s))
-> +			break;
-> +
->  		/*
->  		 * If previous wasn't linked and we have a linked command,
->  		 * that's the end of the chain. Submit the previous link.
-> @@ -2584,9 +2597,9 @@ static int io_submit_sqes(struct io_ring_ctx *ctx=
-, struct sqe_submit *sqes,
->  			link =3D NULL;
->  			shadow_req =3D NULL;
->  		}
-> -		prev_was_link =3D (sqes[i].sqe->flags & IOSQE_IO_LINK) !=3D 0;
-> +		prev_was_link =3D (s.sqe->flags & IOSQE_IO_LINK) !=3D 0;
-> =20
-> -		if (link && (sqes[i].sqe->flags & IOSQE_IO_DRAIN)) {
-> +		if (link && (s.sqe->flags & IOSQE_IO_DRAIN)) {
->  			if (!shadow_req) {
->  				shadow_req =3D io_get_req(ctx, NULL);
->  				if (unlikely(!shadow_req))
-> @@ -2594,18 +2607,18 @@ static int io_submit_sqes(struct io_ring_ctx *c=
-tx, struct sqe_submit *sqes,
->  				shadow_req->flags |=3D (REQ_F_IO_DRAIN | REQ_F_SHADOW_DRAIN);
->  				refcount_dec(&shadow_req->refs);
->  			}
-> -			shadow_req->sequence =3D sqes[i].sequence;
-> +			shadow_req->sequence =3D s.sequence;
->  		}
-> =20
->  out:
->  		if (unlikely(mm_fault)) {
-> -			io_cqring_add_event(ctx, sqes[i].sqe->user_data,
-> +			io_cqring_add_event(ctx, s.sqe->user_data,
->  						-EFAULT);
->  		} else {
-> -			sqes[i].has_user =3D has_user;
-> -			sqes[i].needs_lock =3D true;
-> -			sqes[i].needs_fixed_file =3D true;
-> -			io_submit_sqe(ctx, &sqes[i], statep, &link);
-> +			s.has_user =3D has_user;
-> +			s.needs_lock =3D true;
-> +			s.needs_fixed_file =3D true;
-> +			io_submit_sqe(ctx, &s, statep, &link);
->  			submitted++;
->  		}
->  	}
-> @@ -2620,7 +2633,6 @@ static int io_submit_sqes(struct io_ring_ctx *ctx=
-, struct sqe_submit *sqes,
-> =20
->  static int io_sq_thread(void *data)
->  {
-> -	struct sqe_submit sqes[IO_IOPOLL_BATCH];
->  	struct io_ring_ctx *ctx =3D data;
->  	struct mm_struct *cur_mm =3D NULL;
->  	mm_segment_t old_fs;
-> @@ -2635,8 +2647,8 @@ static int io_sq_thread(void *data)
-> =20
->  	timeout =3D inflight =3D 0;
->  	while (!kthread_should_park()) {
-> -		bool all_fixed, mm_fault =3D false;
-> -		int i;
-> +		bool mm_fault =3D false;
-> +		unsigned int to_submit;
-> =20
->  		if (inflight) {
->  			unsigned nr_events =3D 0;
-> @@ -2656,7 +2668,8 @@ static int io_sq_thread(void *data)
->  				timeout =3D jiffies + ctx->sq_thread_idle;
->  		}
-> =20
-> -		if (!io_get_sqring(ctx, &sqes[0])) {
-> +		to_submit =3D io_sqring_entries(ctx);
-> +		if (!to_submit) {
->  			/*
->  			 * We're polling. If we're within the defined idle
->  			 * period, then let us spin without work before going
-> @@ -2687,7 +2700,8 @@ static int io_sq_thread(void *data)
->  			/* make sure to read SQ tail after writing flags */
->  			smp_mb();
-> =20
-> -			if (!io_get_sqring(ctx, &sqes[0])) {
-> +			to_submit =3D io_sqring_entries(ctx);
-> +			if (!to_submit) {
->  				if (kthread_should_park()) {
->  					finish_wait(&ctx->sqo_wait, &wait);
->  					break;
-> @@ -2705,19 +2719,8 @@ static int io_sq_thread(void *data)
->  			ctx->rings->sq_flags &=3D ~IORING_SQ_NEED_WAKEUP;
->  		}
-> =20
-> -		i =3D 0;
-> -		all_fixed =3D true;
-> -		do {
-> -			if (all_fixed && io_sqe_needs_user(sqes[i].sqe))
-> -				all_fixed =3D false;
-> -
-> -			i++;
-> -			if (i =3D=3D ARRAY_SIZE(sqes))
-> -				break;
-> -		} while (io_get_sqring(ctx, &sqes[i]));
-> -
->  		/* Unless all new commands are FIXED regions, grab mm */
-> -		if (!all_fixed && !cur_mm) {
-> +		if (!cur_mm) {
->  			mm_fault =3D !mmget_not_zero(ctx->sqo_mm);
->  			if (!mm_fault) {
->  				use_mm(ctx->sqo_mm);
-> @@ -2725,8 +2728,9 @@ static int io_sq_thread(void *data)
->  			}
->  		}
-> =20
-> -		inflight +=3D io_submit_sqes(ctx, sqes, i, cur_mm !=3D NULL,
-> -						mm_fault);
-> +		to_submit =3D min(to_submit, ctx->sq_entries);
-> +		inflight +=3D io_submit_sqes(ctx, to_submit, cur_mm !=3D NULL,
-> +					   mm_fault);
-> =20
->  		/* Commit SQ ring head once we've consumed all SQEs */
->  		io_commit_sqring(ctx);
->=20
+Then io_sq_thread() tries to poll @inflight events, even though failed
+won't appear in @poll_list. Thus, it will think that there are always
+something to poll (i.e. @inflight > 0)
+
+There are several issues with this:
+1. io_sq_thread won't ever sleep
+2. io_sq_thread() may be left running and actively polling even after
+user process is destroyed
+3. the same goes for mm_struct with all vmas of the user process
+TL;DR;
+awhile @inflight > 0, io_sq_thread won't put @cur_mm, so locking
+recycling of vmas used for rings' mapping, which hold refcount of
+io_uring's struct file. Thus, io_uring_release() won't be called, as
+well as kthread_{park,stop}(). That's all in case when the user process
+haven't unmapped rings.
+
+
+I'm not sure how to fix it better:
+1. try to put failed into poll_list (grabbing mutex).
+
+2. test for zero-inflight case with comparing sq and cq. something like
+```
+if (nr_polled =3D=3D 0) {
+	lock(comp_lock);
+	if (cached_cq_head =3D=3D cached_sq_tail)
+		inflight =3D 0;
+	unlock(comp_lock);
+}
+```
+But that's adds extra spinlock locking in fast-path. And that's unsafe
+to use non-cached heads/tails, as it could be maliciously changed by
+userspace.
+
+3. Do some counting of failed (probably needs atomic or synchronisation)
+
+4. something else?
+
 
 --=20
 Yours sincerely,
 Pavel Begunkov
 
 
---dAxsiZJdm05bU2fyu7JGJI1vDxCHPKQ6V--
+--y8qh1m9uXyXY41YulhwBAxBDD1EhBX7gE--
 
---mHWPEBz81cRimIQsEmEbITjOhg7CAv6pF
+--XRQZWAm4V5oBsv6yDZAKSZB2Qieagb5W7
 Content-Type: application/pgp-signature; name="signature.asc"
 Content-Description: OpenPGP digital signature
 Content-Disposition: attachment; filename="signature.asc"
 
 -----BEGIN PGP SIGNATURE-----
 
-iQIzBAEBCAAdFiEE+6JuPTjTbx479o3OWt5b1Glr+6UFAl2ywhUACgkQWt5b1Glr
-+6UXShAAsvlD9gTd60XZrIeaxjVekD4n8DwcS7+4pON7+sQLN3bz2sIuCS2igy7f
-Z2JPtveb6DLZcOeNvO/D3VEI3CwMmlIxHfkS6uccWx9J+6kP2C2ogKljMrDC9Vsj
-+Zr/afFnLxo/AULBdyLRnc7S1hJvHcH/E4YR0H1aiXRoBiRcdDnMr2kZiMgvuzmj
-TneXnZdxe35P7RQ9SAPyiYd5qrvKMKxHrGSV4Xc6Lde3+WN+/VTER3Kabbx0MdfJ
-zAYJsrN8xMtuDnx4rpFadKsD6RP7lTO1ThaGwa63/erZe/f0h5ZbAYm7kTmaXvTE
-K0Qu7LgOSPZt6u8/O+73w2S437aI7QtKmOjkz9QA7CdelRQVwKuGB4GiJuGUWrSN
-ewEQzVhb0TsM/ohkwvx7Z+s8penPRvfKPEohXa6td9HBnWFEG1/UJcVEiYbE4ExJ
-lGLNV+uv79huUmik2u64fCoLE+Ls68H2z72tFLttey6HGaIH+bJ1aDcEoT2KzyY7
-FsrbzefpWgU0sH0Jdqbi9wONq24BqWmHe0Q2K2tT/cpmxRcPjsBiuSakPuHV0yHL
-28q5DI4+PLZPl1bZK7mBO7EuO7dxTECiLlQFGMndnpYiSKPKfFRyt6jd+rgQIiZK
-kfg9yZ3xJc+2W0WRIVSmKTyWMN9UAT6RjtzH5yAjyrN8j283rWk=
-=8ZaJ
+iQIzBAEBCAAdFiEE+6JuPTjTbx479o3OWt5b1Glr+6UFAl2yxNcACgkQWt5b1Glr
++6XOexAAnDmDBk6vOk6MiMuWMw46MlfyaOANpt889WfCRXDsQXYdyOVXDYhTzDPM
+ihsl/J1OwBG4PQe0d5dUY/1GspU7GHAwLzvyp7/TJFm3WdI7TjRLv0JLieFQy1Y5
+WanZgsb6hq0wS5pZl4BkHgg75Pfw6WIrGc5klvse22kVyQXMy+uQK1NcMcWrYbpG
+oWD9H08/khA8qaK9rviHdCHUqzEzaizK/KC4WtMPSlK5fBlRerTs+S3rgQlXzOCI
+SydNmmmuQ/8s3ofYx7fGfKhIBJv+I99rDMf6Ks7OzChoaPn3vtKXp6glcHx5hG4u
+qFOc9UXlVVZwA4Ihdn53+PRrddDcpuYxbBVpEgHDQX4fH+r48a5FJKEebSAYFEgm
+6XGjgffh9MUIrXijmIFoPK8teoKh0JgR7VvEGbqobC6BDEM6Zrbx/oR5Y9KDd4R3
+VNq3O6zIDUeIVpYEpb+B3zy/RhvPdHKnzfZuHMuH+LSh1oreUZADVhMeWTxKOzWP
+aeyY2THKq3U3oPWm8+9negritEb5PP53iVDX6RmPxXL50erjOWlXgrgPvd/pbGyl
+W1pi5mjhGOtbGdTxEKqb9M0/zxZu7FA7Re4TjfKrZknQZWscx2uMsaKbSvcX/jv4
+UtWD/svY798oKKAVwgbwNVVFLilmVlz93EdCFIsqURj2KBXbGW0=
+=KG/V
 -----END PGP SIGNATURE-----
 
---mHWPEBz81cRimIQsEmEbITjOhg7CAv6pF--
+--XRQZWAm4V5oBsv6yDZAKSZB2Qieagb5W7--
