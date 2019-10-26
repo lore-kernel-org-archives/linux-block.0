@@ -2,133 +2,138 @@ Return-Path: <SRS0=tXSx=YT=vger.kernel.org=linux-block-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-7.2 required=3.0 tests=DKIM_SIGNED,DKIM_VALID,
-	HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,MENTIONS_GIT_HOSTING,
-	SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED,USER_AGENT_SANE_1 autolearn=ham
+X-Spam-Status: No, score=-10.1 required=3.0 tests=DKIMWL_WL_HIGH,DKIM_SIGNED,
+	DKIM_VALID,DKIM_VALID_AU,INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,
+	SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED,USER_AGENT_GIT autolearn=unavailable
 	autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id A6261CA9EBD
-	for <linux-block@archiver.kernel.org>; Sat, 26 Oct 2019 13:29:54 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 8C95ECA9EB9
+	for <linux-block@archiver.kernel.org>; Sat, 26 Oct 2019 13:33:00 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.kernel.org (Postfix) with ESMTP id 7B864222BD
-	for <linux-block@archiver.kernel.org>; Sat, 26 Oct 2019 13:29:54 +0000 (UTC)
-Authentication-Results: mail.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel-dk.20150623.gappssmtp.com header.i=@kernel-dk.20150623.gappssmtp.com header.b="SdzxGr5o"
+	by mail.kernel.org (Postfix) with ESMTP id 636CC2070B
+	for <linux-block@archiver.kernel.org>; Sat, 26 Oct 2019 13:33:00 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+	s=default; t=1572096780;
+	bh=vynhhrOIgD91jp8ZzJ4jb3KoxhLiUMc3HFR97hqu90M=;
+	h=From:To:Cc:Subject:Date:In-Reply-To:References:List-ID:From;
+	b=b8Domy60SvuzSeXFanjDPtajjhKG2dsv3LRJCoSusCBzsb2FxyGpmBIO+ui4VoGe4
+	 JEmXjqFCgYkzHTdtP+or9MNx3C15Unb2h88bW2+4CnWmmKGFoZr4jE1B/CZCBK8rhe
+	 9MiyyXYUyxyFhiCsyCZR+d9gAGxISNvoVpk9vxlk=
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1726554AbfJZN3w (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Sat, 26 Oct 2019 09:29:52 -0400
-Received: from mail-pf1-f195.google.com ([209.85.210.195]:44117 "EHLO
-        mail-pf1-f195.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1729150AbfJZN3w (ORCPT
-        <rfc822;linux-block@vger.kernel.org>);
-        Sat, 26 Oct 2019 09:29:52 -0400
-Received: by mail-pf1-f195.google.com with SMTP id q21so3578255pfn.11
-        for <linux-block@vger.kernel.org>; Sat, 26 Oct 2019 06:29:51 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=kernel-dk.20150623.gappssmtp.com; s=20150623;
-        h=to:cc:from:subject:message-id:date:user-agent:mime-version
-         :content-language:content-transfer-encoding;
-        bh=bjrS9aOrBY9wi/J4EynIuA8aIpJywM1n4ctnDMJ9wuo=;
-        b=SdzxGr5o6UMaGoF9GQQpxpfmKE1I2xMbeZRsFOjZWs44eomB339Vj3R5lQToUj9hLe
-         zhHMIVuz+IhrWM4+5tkI3E43KUz9l5QHbRaeKJileWWwSVXp6yhDmCjbIaMZdMfdLX5+
-         uJD27fBuuTSEctyKsh1EdGY0pL/EIXUaSyU6Zj7XdYxxJzc5waaIoxJPMnartqEYhlHf
-         Qt/oIAG9Gf7REFVJ6BAg5CLzKk5UDcd/By2uqU372BCavmw2v31AMSGLQAzaNNOKQw3G
-         D0pP7rcLN1olSpiC1zUp47iacGKMmf7CStJ+JFsv4FO8hlQd9kAHhiEpWGPPvrWamzs2
-         l2MQ==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20161025;
-        h=x-gm-message-state:to:cc:from:subject:message-id:date:user-agent
-         :mime-version:content-language:content-transfer-encoding;
-        bh=bjrS9aOrBY9wi/J4EynIuA8aIpJywM1n4ctnDMJ9wuo=;
-        b=GEoqLMQI72+S9KTEGBd2JusUMhLHKogsLCneEL6K8ZPrC3kfrCEyOrCFH06VHZB8PC
-         m8aJw2j/uhblDlogA8H5iM1ABFvhXjSJM4JGgHvfcD/7dhO+3L/5KmeDRlKbVUtmO9u5
-         /Vii5BFi4lMkw26bHtlqTU93B+pgcmh8VSdpb5m6W/lIstsIT8u8NsALQkg3yJEZrq9w
-         m+hDhCp6c8u/tXGrvonSm/YUMLJTeEVeUbMGUVRchne0dcAQ2CAzh8AMc15mSJpcM65g
-         BCXwfrasDpxmqJqGmXY1FXr+Adu3EH0KzqkfxDUrRcZoQ1NGIMtlGs07uFfXMbx8Em2z
-         WZ1g==
-X-Gm-Message-State: APjAAAXc3j1Nig7nnshmy8sY7muF8qDDE1fIJfbMQ8pkQRxkv5wKW6vI
-        vfjfKg0Q1P4hWLDOPiAVAv1ZDROzlRAI4A==
-X-Google-Smtp-Source: APXvYqwUWG0YBva0L5GirXHS0meket7yK05BkgAFvmF2JjaJRt1QBiMlUPdPdt3Rp3ByefT6ogwrVA==
-X-Received: by 2002:a17:90a:eb02:: with SMTP id j2mr10856520pjz.80.1572096589709;
-        Sat, 26 Oct 2019 06:29:49 -0700 (PDT)
-Received: from [192.168.1.188] ([66.219.217.79])
-        by smtp.gmail.com with ESMTPSA id a8sm5124758pfc.20.2019.10.26.06.29.48
-        (version=TLS1_2 cipher=ECDHE-RSA-AES128-GCM-SHA256 bits=128/128);
-        Sat, 26 Oct 2019 06:29:48 -0700 (PDT)
-To:     Linus Torvalds <torvalds@linux-foundation.org>
-Cc:     "linux-block@vger.kernel.org" <linux-block@vger.kernel.org>
-From:   Jens Axboe <axboe@kernel.dk>
-Subject: [GIT PULL] Fixes for 5.4-rc5
-Message-ID: <c62a7e99-e230-f879-12b6-934a60db346c@kernel.dk>
-Date:   Sat, 26 Oct 2019 07:29:47 -0600
-User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:60.0) Gecko/20100101
- Thunderbird/60.9.0
+        id S1727746AbfJZNSP (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Sat, 26 Oct 2019 09:18:15 -0400
+Received: from mail.kernel.org ([198.145.29.99]:39916 "EHLO mail.kernel.org"
+        rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
+        id S1726428AbfJZNSP (ORCPT <rfc822;linux-block@vger.kernel.org>);
+        Sat, 26 Oct 2019 09:18:15 -0400
+Received: from sasha-vm.mshome.net (c-73-47-72-35.hsd1.nh.comcast.net [73.47.72.35])
+        (using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+        (No client certificate requested)
+        by mail.kernel.org (Postfix) with ESMTPSA id 9FEDF222C1;
+        Sat, 26 Oct 2019 13:18:13 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+        s=default; t=1572095894;
+        bh=vynhhrOIgD91jp8ZzJ4jb3KoxhLiUMc3HFR97hqu90M=;
+        h=From:To:Cc:Subject:Date:In-Reply-To:References:From;
+        b=DvepoksP4dQYGP7wo2QWJD/xSUCe3mk0BH7nb5eMzEl7k62rHWTMevb/Qd+Rs4SqH
+         f9zfrzvq6VQ7ITQW9+iL3d5ml6mV+pFh+6s03SZQhgXM1c3xnMPjy3bs2imIwEgp1p
+         8VpSbRG6d0HwuyNhM6FCTc8qoiU/7UrXPIXqc9Lo=
+From:   Sasha Levin <sashal@kernel.org>
+To:     linux-kernel@vger.kernel.org, stable@vger.kernel.org
+Cc:     Dongsheng Yang <dongsheng.yang@easystack.cn>,
+        Ilya Dryomov <idryomov@gmail.com>,
+        Sasha Levin <sashal@kernel.org>, ceph-devel@vger.kernel.org,
+        linux-block@vger.kernel.org
+Subject: [PATCH AUTOSEL 5.3 76/99] rbd: cancel lock_dwork if the wait is interrupted
+Date:   Sat, 26 Oct 2019 09:15:37 -0400
+Message-Id: <20191026131600.2507-76-sashal@kernel.org>
+X-Mailer: git-send-email 2.20.1
+In-Reply-To: <20191026131600.2507-1-sashal@kernel.org>
+References: <20191026131600.2507-1-sashal@kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=utf-8
-Content-Language: en-US
-Content-Transfer-Encoding: 7bit
+X-stable: review
+X-Patchwork-Hint: Ignore
+Content-Transfer-Encoding: 8bit
 Sender: linux-block-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-Hi Linus,
+From: Dongsheng Yang <dongsheng.yang@easystack.cn>
 
-Here's a set of fixes that should go into this release. A bit bigger
-than usual at this point in time, mostly due to some good bug hunting
-work by Pavel that resulted in 3 io_uring fixes from him and 2 from me.
-Anyway, this pull request contains:
+[ Upstream commit 25e6be21230d3208d687dad90b6e43419013c351 ]
 
-- Revert of the submit-and-wait optimization for io_uring, it can't
-  always be done safely. It depends on commands always making progress
-  on their own, which isn't necessarily the case outside of strict file
-  IO. (me)
+There is a warning message in my test with below steps:
 
-- Series of 2 patches from me and 3 from Pavel, fixing issues with
-  shared data and sequencing for io_uring.
+  # rbd bench --io-type write --io-size 4K --io-threads 1 --io-pattern rand test &
+  # sleep 5
+  # pkill -9 rbd
+  # rbd map test &
+  # sleep 5
+  # pkill rbd
 
-- Lastly, two timeout sequence fixes for io_uring (zhangyi)
+The reason is that the rbd_add_acquire_lock() is interruptable,
+that means, when we kill the waiting on ->acquire_wait, the lock_dwork
+could be still running.
 
-- Two nbd patches fixing races (Josef)
+1. do_rbd_add()					2. lock_dwork
+rbd_add_acquire_lock()
+  - queue_delayed_work()
+						lock_dwork queued
+    - wait_for_completion_killable_timeout()  <-- kill happen
+rbd_dev_image_unlock()	<-- UNLOCKED now, nothing to do.
+rbd_dev_device_release()
+rbd_dev_image_release()
+  - ...
+						lock successed here
+     - cancel_delayed_work_sync(&rbd_dev->lock_dwork)
 
-- libahci regulator_get_optional() fix (Mark)
+Then when we reach the rbd_dev_free(), WARN_ON is triggered because
+lock_state is not RBD_LOCK_STATE_UNLOCKED.
 
-Please pull!
+To fix it, this commit make sure the lock_dwork was finished before
+calling rbd_dev_image_unlock().
 
+On the other hand, this would not happend in do_rbd_remove(), because
+after rbd mapped, lock_dwork will only be queued for IO request, and
+request will continue unless lock_dwork finished. when we call
+rbd_dev_image_unlock() in do_rbd_remove(), all requests are done.
+That means, lock_state should not be locked again after
+rbd_dev_image_unlock().
 
-  git://git.kernel.dk/linux-block.git tags/for-linus-2019-10-26
+[ Cancel lock_dwork in rbd_add_acquire_lock(), only if the wait is
+  interrupted. ]
 
+Fixes: 637cd060537d ("rbd: new exclusive lock wait/wake code")
+Signed-off-by: Dongsheng Yang <dongsheng.yang@easystack.cn>
+Reviewed-by: Ilya Dryomov <idryomov@gmail.com>
+Signed-off-by: Ilya Dryomov <idryomov@gmail.com>
+Signed-off-by: Sasha Levin <sashal@kernel.org>
+---
+ drivers/block/rbd.c | 9 ++++++---
+ 1 file changed, 6 insertions(+), 3 deletions(-)
 
-----------------------------------------------------------------
-Jens Axboe (3):
-      io_uring: revert "io_uring: optimize submit_and_wait API"
-      io_uring: used cached copies of sq->dropped and cq->overflow
-      io_uring: fix bad inflight accounting for SETUP_IOPOLL|SETUP_SQTHREAD
-
-Josef Bacik (2):
-      nbd: protect cmd->status with cmd->lock
-      nbd: handle racing with error'ed out commands
-
-Mark Brown (1):
-      ata: libahci_platform: Fix regulator_get_optional() misuse
-
-Mike Christie (1):
-      nbd: verify socket is supported during setup
-
-Pavel Begunkov (3):
-      io_uring: Fix corrupted user_data
-      io_uring: Fix broken links with offloading
-      io_uring: Fix race for sqes with userspace
-
-zhangyi (F) (2):
-      io_uring : correct timeout req sequence when waiting timeout
-      io_uring: correct timeout req sequence when inserting a new entry
-
- drivers/ata/libahci_platform.c |  38 +++-----
- drivers/block/nbd.c            |  41 ++++++--
- fs/io_uring.c                  | 207 ++++++++++++++++++++++-------------------
- 3 files changed, 161 insertions(+), 125 deletions(-)
-
+diff --git a/drivers/block/rbd.c b/drivers/block/rbd.c
+index c8fb886aebd4e..e6369b9f33873 100644
+--- a/drivers/block/rbd.c
++++ b/drivers/block/rbd.c
+@@ -6632,10 +6632,13 @@ static int rbd_add_acquire_lock(struct rbd_device *rbd_dev)
+ 	queue_delayed_work(rbd_dev->task_wq, &rbd_dev->lock_dwork, 0);
+ 	ret = wait_for_completion_killable_timeout(&rbd_dev->acquire_wait,
+ 			    ceph_timeout_jiffies(rbd_dev->opts->lock_timeout));
+-	if (ret > 0)
++	if (ret > 0) {
+ 		ret = rbd_dev->acquire_err;
+-	else if (!ret)
+-		ret = -ETIMEDOUT;
++	} else {
++		cancel_delayed_work_sync(&rbd_dev->lock_dwork);
++		if (!ret)
++			ret = -ETIMEDOUT;
++	}
+ 
+ 	if (ret) {
+ 		rbd_warn(rbd_dev, "failed to acquire exclusive lock: %ld", ret);
 -- 
-Jens Axboe
+2.20.1
 
