@@ -2,166 +2,82 @@ Return-Path: <SRS0=gXx0=YU=vger.kernel.org=linux-block-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-9.5 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
-	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,
-	SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED,USER_AGENT_GIT autolearn=unavailable
-	autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-2.0 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
+	HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,
+	USER_AGENT_SANE_1 autolearn=no autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 9C2BCCA9EBD
-	for <linux-block@archiver.kernel.org>; Sun, 27 Oct 2019 14:06:22 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id B1675CA9EBF
+	for <linux-block@archiver.kernel.org>; Sun, 27 Oct 2019 15:22:34 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.kernel.org (Postfix) with ESMTP id 7156020679
-	for <linux-block@archiver.kernel.org>; Sun, 27 Oct 2019 14:06:22 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id 86F4121850
+	for <linux-block@archiver.kernel.org>; Sun, 27 Oct 2019 15:22:34 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (2048-bit key) header.d=wdc.com header.i=@wdc.com header.b="Bx0Sr2iO"
+	dkim=fail reason="signature verification failed" (2048-bit key) header.d=infradead.org header.i=@infradead.org header.b="dUZFeTqf"
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1726736AbfJ0OGV (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Sun, 27 Oct 2019 10:06:21 -0400
-Received: from esa2.hgst.iphmx.com ([68.232.143.124]:31361 "EHLO
-        esa2.hgst.iphmx.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1726541AbfJ0OGV (ORCPT
+        id S1727210AbfJ0PWa (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Sun, 27 Oct 2019 11:22:30 -0400
+Received: from bombadil.infradead.org ([198.137.202.133]:43966 "EHLO
+        bombadil.infradead.org" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S1726682AbfJ0PWa (ORCPT
         <rfc822;linux-block@vger.kernel.org>);
-        Sun, 27 Oct 2019 10:06:21 -0400
-DKIM-Signature: v=1; a=rsa-sha256; c=simple/simple;
-  d=wdc.com; i=@wdc.com; q=dns/txt; s=dkim.wdc.com;
-  t=1572185266; x=1603721266;
-  h=from:to:cc:subject:date:message-id:in-reply-to:
-   references:mime-version:content-transfer-encoding;
-  bh=zw9z2raQuJBiKBUSRP4kpCIHnthdBqRSj5UzBl54Qzo=;
-  b=Bx0Sr2iOJmk7RrCi+JOd7bosI+7IgGQGA4P91chd1NBT+4z7TFDVkKVo
-   Pmtyo8GefKI57QC9J7imBwTcs9CGJsIsEdvTr0+gdoRrsOIWlDJ7zAOnN
-   aiwhhedJ0MDcQjA9BNLuZLCaSc9xcQ9lqqksRkUAsaRU4XnX88QtraRrj
-   z+rFVLz5znrsxjJa1SORDtC+h+h/BMXDahW5i6vg8fm4EH8APFhMGUyQ/
-   GteU/BhK8SGfqpCtDfRBnECl3/oMTkBioaSw1JcS0cooqiOSs8nTs19Gv
-   4TsP4Ilu22AzXqRBsz1iP8+KHIRobnVQ/2AYzmxBNm5ZE3LOUWZGwbS1S
-   w==;
-IronPort-SDR: Um91AUHhOhbBJ0EAP0xnFyy115b29tqYqMdM8DWPeCV85TUdgFU8TeBJW1rBDOAxOapusQv2N8
- WxWzWlwmsaP1qeFae+uzLUdLQfNODF0S4HQ+860vEhC1MH3SYJlfXswMhp+bL23x8mypXU/rdx
- v2YBpZy/MObuVVOrl0FNXfR1T5Jy8yW+77iagruSjf53Eaf2v8lYZy32xcCd7LuFIs/n04885z
- I0ma89geAkOdfvVC02atTxndQPh1O0nVY5bkWaqcDjbgGZY2bkpyS0gjFGNjuV++UZ22aCVIC/
- xFY=
-X-IronPort-AV: E=Sophos;i="5.68,236,1569254400"; 
-   d="scan'208";a="222578557"
-Received: from h199-255-45-14.hgst.com (HELO uls-op-cesaep01.wdc.com) ([199.255.45.14])
-  by ob1.hgst.iphmx.com with ESMTP; 27 Oct 2019 22:07:25 +0800
-IronPort-SDR: 71DSbeXtrpxxrFb8Kn/5rCwOAvxQpKgJ4yjHsJ0UFtvFBggBmDoFhZThNjFL+tXkXo4Knku4xb
- SOGpS2RU32Jh8g8SQXkrUqbIuv3G8BagLK9sL7x9peVMJhJbfG4aupDuu28K4FVJrvy1ljikJm
- okVhsLgmCSyFio8/YpBWWaZDOvt+vgXS+pZM1S+WvOda6aW6PAEffuhpjgJaM5kBqhzihiZ6fE
- CkrRh3vUVTpK1RgOCtkyRJVQKL6znJVSMhVH8DE6cMw29H/uMFMmIP21C16tVeyp+YevzS/9jy
- shboSCco6PPVwEc/3BJL9Eqk
-Received: from uls-op-cesaip01.wdc.com ([10.248.3.36])
-  by uls-op-cesaep01.wdc.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 27 Oct 2019 07:01:30 -0700
-IronPort-SDR: zsGaibo1ct/ZMz0zQXZesnRk7H+7gE+bmgCZApkHVlYevcV1Tj2tEfX4GZWHh4cHMc+lsEGY15
- 1JeVUeUxd6loyv6BRrQCQeD7KfeJPKYfOa51yRBlnM0AjUg/I/XmlXWdtglPlwwiE5G+8MeCv/
- i4Nq0R2+bmrCWrtZP1jHkuLL7HYDrJeabtnPfmel/ZHXPWsOPowTQnyTUeOcJfrlocDneS2fcP
- niK5oQ6QT5CvPknM1cPDuGGq5pl4msjHPlYBX1D4TUTwmPr5pO0+ertG6KTqbhDP/IQis9GTNA
- mMU=
-WDCIronportException: Internal
-Received: from washi.fujisawa.hgst.com ([10.149.53.254])
-  by uls-op-cesaip01.wdc.com with ESMTP; 27 Oct 2019 07:06:05 -0700
-From:   Damien Le Moal <damien.lemoal@wdc.com>
-To:     linux-block@vger.kernel.org, Jens Axboe <axboe@kernel.dk>,
-        linux-scsi@vger.kernel.org,
-        "Martin K . Petersen" <martin.petersen@oracle.com>,
-        dm-devel@redhat.com, Mike Snitzer <snitzer@redhat.com>
-Cc:     Ajay Joshi <ajay.joshi@wdc.com>,
-        Matias Bjorling <matias.bjorling@wdc.com>,
-        Hans Holmberg <Hans.Holmberg@wdc.com>,
-        Dmitry Fomichev <dmitry.fomichev@wdc.com>,
-        Keith Busch <kbusch@kernel.org>
-Subject: [PATCH 8/8] null_blk: add zone open, close, and finish support
-Date:   Sun, 27 Oct 2019 23:05:49 +0900
-Message-Id: <20191027140549.26272-9-damien.lemoal@wdc.com>
-X-Mailer: git-send-email 2.21.0
-In-Reply-To: <20191027140549.26272-1-damien.lemoal@wdc.com>
-References: <20191027140549.26272-1-damien.lemoal@wdc.com>
+        Sun, 27 Oct 2019 11:22:30 -0400
+DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed;
+        d=infradead.org; s=bombadil.20170209; h=In-Reply-To:Content-Type:MIME-Version
+        :References:Message-ID:Subject:Cc:To:From:Date:Sender:Reply-To:
+        Content-Transfer-Encoding:Content-ID:Content-Description:Resent-Date:
+        Resent-From:Resent-Sender:Resent-To:Resent-Cc:Resent-Message-ID:List-Id:
+        List-Help:List-Unsubscribe:List-Subscribe:List-Post:List-Owner:List-Archive;
+         bh=ABDhaHUlk58M0GS8x0OMrJzxXgr2v5RmyRmLK7Waq+g=; b=dUZFeTqfxrYApphqMY5veHBsj
+        A+RBT+sV9JAtjLVJ+WGOvwNXNw/oX5Nmdvk/AvVWpQtUikMzhdcFtLs1khOn6BULZkyos9EyCedJ5
+        hnt6JriZauG8vb9KgHx/w5MlX/0VsPY2qith2hEChaeTwdY1U4gqTqvfXNegsgqDSyxL508wE6OTp
+        rSaIg8nxkLmtsXAZhqw2s7U224aDC3inBSdoJfjj10LxclpiVy3dsmRybQQ2cjBiPNh9YfQem1O52
+        i64kZVSne/xbFmaWrYMJPXP1/NB8tION2wFu8JyUehQlS7P6++7uDvnUPpIJ80aCkyA7RRWHTg8rb
+        VpLLc/GSg==;
+Received: from hch by bombadil.infradead.org with local (Exim 4.92.3 #3 (Red Hat Linux))
+        id 1iOkN5-0005Zc-Hn; Sun, 27 Oct 2019 15:22:23 +0000
+Date:   Sun, 27 Oct 2019 08:22:23 -0700
+From:   Christoph Hellwig <hch@infradead.org>
+To:     David Howells <dhowells@redhat.com>
+Cc:     torvalds@linux-foundation.org,
+        Rasmus Villemoes <linux@rasmusvillemoes.dk>,
+        Greg Kroah-Hartman <gregkh@linuxfoundation.org>,
+        Peter Zijlstra <peterz@infradead.org>,
+        nicolas.dichtel@6wind.com, raven@themaw.net,
+        Christian Brauner <christian@brauner.io>,
+        keyrings@vger.kernel.org, linux-usb@vger.kernel.org,
+        linux-block@vger.kernel.org, linux-security-module@vger.kernel.org,
+        linux-fsdevel@vger.kernel.org, linux-api@vger.kernel.org,
+        linux-kernel@vger.kernel.org
+Subject: Re: [RFC PATCH 11/10] pipe: Add fsync() support [ver #2]
+Message-ID: <20191027152223.GA21194@infradead.org>
+References: <157186182463.3995.13922458878706311997.stgit@warthog.procyon.org.uk>
+ <30394.1571936252@warthog.procyon.org.uk>
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <30394.1571936252@warthog.procyon.org.uk>
+User-Agent: Mutt/1.12.1 (2019-06-15)
+X-SRS-Rewrite: SMTP reverse-path rewritten from <hch@infradead.org> by bombadil.infradead.org. See http://www.infradead.org/rpr.html
 Sender: linux-block-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-From: Ajay Joshi <ajay.joshi@wdc.com>
+On Thu, Oct 24, 2019 at 05:57:32PM +0100, David Howells wrote:
+> pipe: Add fsync() support
+> 
+> The keyrings testsuite needs the ability to wait for all the outstanding
+> notifications in the queue to have been processed so that it can then go
+> through them to find out whether the notifications it expected have been
+> emitted.
+> 
+> Implement fsync() support for pipes to provide this.  The tailmost buffer
+> at the point of calling is marked and fsync adds itself to the list of
+> waiters, noting the tail position to be waited for and marking the buffer
+> as no longer mergeable.  Then when the buffer is consumed, if the flag is
+> set, any matching waiters are woken up.
 
-Implement REQ_OP_ZONE_OPEN, REQ_OP_ZONE_CLOSE and REQ_OP_ZONE_FINISH
-support to allow explicit control of zone states.
-
-Contains contributions from Matias Bjorling, Hans Holmberg,
-Keith Busch and Damien Le Moal.
-
-Signed-off-by: Ajay Joshi <ajay.joshi@wdc.com>
-Signed-off-by: Matias Bjorling <matias.bjorling@wdc.com>
-Signed-off-by: Hans Holmberg <hans.holmberg@wdc.com>
-Signed-off-by: Keith Busch <kbusch@kernel.org>
-Signed-off-by: Damien Le Moal <damien.lemoal@wdc.com>
----
- drivers/block/null_blk_zoned.c | 33 ++++++++++++++++++++++++++++++---
- 1 file changed, 30 insertions(+), 3 deletions(-)
-
-diff --git a/drivers/block/null_blk_zoned.c b/drivers/block/null_blk_zoned.c
-index 4e56b17ed3ef..02f41a3bc4cb 100644
---- a/drivers/block/null_blk_zoned.c
-+++ b/drivers/block/null_blk_zoned.c
-@@ -136,13 +136,14 @@ static blk_status_t null_zone_write(struct nullb_cmd *cmd, sector_t sector,
- 	return BLK_STS_OK;
- }
- 
--static blk_status_t null_zone_reset(struct nullb_cmd *cmd, sector_t sector)
-+static blk_status_t null_zone_mgmt(struct nullb_cmd *cmd, enum req_opf op,
-+				   sector_t sector)
- {
- 	struct nullb_device *dev = cmd->nq->dev;
- 	struct blk_zone *zone = &dev->zones[null_zone_no(dev, sector)];
- 	size_t i;
- 
--	switch (req_op(cmd->rq)) {
-+	switch (op) {
- 	case REQ_OP_ZONE_RESET_ALL:
- 		for (i = 0; i < dev->nr_zones; i++) {
- 			if (zone[i].type == BLK_ZONE_TYPE_CONVENTIONAL)
-@@ -158,6 +159,29 @@ static blk_status_t null_zone_reset(struct nullb_cmd *cmd, sector_t sector)
- 		zone->cond = BLK_ZONE_COND_EMPTY;
- 		zone->wp = zone->start;
- 		break;
-+	case REQ_OP_ZONE_OPEN:
-+		if (zone->type == BLK_ZONE_TYPE_CONVENTIONAL)
-+			return BLK_STS_IOERR;
-+		if (zone->cond == BLK_ZONE_COND_FULL)
-+			return BLK_STS_IOERR;
-+
-+		zone->cond = BLK_ZONE_COND_EXP_OPEN;
-+		break;
-+	case REQ_OP_ZONE_CLOSE:
-+		if (zone->type == BLK_ZONE_TYPE_CONVENTIONAL)
-+			return BLK_STS_IOERR;
-+		if (zone->cond == BLK_ZONE_COND_FULL)
-+			return BLK_STS_IOERR;
-+
-+		zone->cond = BLK_ZONE_COND_CLOSED;
-+		break;
-+	case REQ_OP_ZONE_FINISH:
-+		if (zone->type == BLK_ZONE_TYPE_CONVENTIONAL)
-+			return BLK_STS_IOERR;
-+
-+		zone->cond = BLK_ZONE_COND_FULL;
-+		zone->wp = zone->start + zone->len;
-+		break;
- 	default:
- 		return BLK_STS_NOTSUPP;
- 	}
-@@ -172,7 +196,10 @@ blk_status_t null_handle_zoned(struct nullb_cmd *cmd, enum req_opf op,
- 		return null_zone_write(cmd, sector, nr_sectors);
- 	case REQ_OP_ZONE_RESET:
- 	case REQ_OP_ZONE_RESET_ALL:
--		return null_zone_reset(cmd, sector);
-+	case REQ_OP_ZONE_OPEN:
-+	case REQ_OP_ZONE_CLOSE:
-+	case REQ_OP_ZONE_FINISH:
-+		return null_zone_mgmt(cmd, op, sector);
- 	default:
- 		return BLK_STS_OK;
- 	}
--- 
-2.21.0
-
+I am _really_ worried about overloading fsync for this behavior.  fsync
+hasn't done anything for 50 years, and suddenly adding any action
+is not helpful.  If you can't use FIONREAD please add a new ioctls
+instead, and document it properly.
