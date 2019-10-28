@@ -2,172 +2,141 @@ Return-Path: <SRS0=tc1V=YV=vger.kernel.org=linux-block-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-5.4 required=3.0 tests=FROM_LOCAL_HEX,
-	HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,MENTIONS_GIT_HOSTING,
-	SPF_HELO_NONE,SPF_PASS autolearn=unavailable autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-3.7 required=3.0 tests=DKIM_SIGNED,DKIM_VALID,
+	HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,
+	SPF_PASS,URIBL_BLOCKED autolearn=no autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 3575EC47E49
-	for <linux-block@archiver.kernel.org>; Mon, 28 Oct 2019 07:22:13 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 7535DCA9EA0
+	for <linux-block@archiver.kernel.org>; Mon, 28 Oct 2019 07:49:24 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.kernel.org (Postfix) with ESMTP id 1159B208C0
-	for <linux-block@archiver.kernel.org>; Mon, 28 Oct 2019 07:22:13 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id 410F9208C0
+	for <linux-block@archiver.kernel.org>; Mon, 28 Oct 2019 07:49:24 +0000 (UTC)
+Authentication-Results: mail.kernel.org;
+	dkim=fail reason="signature verification failed" (2048-bit key) header.d=wdc.com header.i=@wdc.com header.b="mXbTohgR";
+	dkim=pass (1024-bit key) header.d=sharedspace.onmicrosoft.com header.i=@sharedspace.onmicrosoft.com header.b="jVXKc6qY"
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1732951AbfJ1HWJ (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Mon, 28 Oct 2019 03:22:09 -0400
-Received: from mail-io1-f71.google.com ([209.85.166.71]:44807 "EHLO
-        mail-io1-f71.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1731446AbfJ1HWJ (ORCPT
+        id S1733048AbfJ1HtX (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Mon, 28 Oct 2019 03:49:23 -0400
+Received: from esa3.hgst.iphmx.com ([216.71.153.141]:38606 "EHLO
+        esa3.hgst.iphmx.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S1729695AbfJ1HtX (ORCPT
         <rfc822;linux-block@vger.kernel.org>);
-        Mon, 28 Oct 2019 03:22:09 -0400
-Received: by mail-io1-f71.google.com with SMTP id q13so7674192iot.11
-        for <linux-block@vger.kernel.org>; Mon, 28 Oct 2019 00:22:08 -0700 (PDT)
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20161025;
-        h=x-gm-message-state:mime-version:date:message-id:subject:from:to;
-        bh=UTMie8PkzK5wS7wiHXSMYFWr16Um/IYsiISWD8xfTF8=;
-        b=KtAFbiKZQxhbGoog7mFJLkxgG1domF25JjbgGhlIRYmRYUNcjqwJM7El5G/cFyqPaz
-         Jo07yszs8QFF2sPjrvLJu+4tFDo7Q9X121+5HLTiT+3kIQ0XWMTqrpU4kPGYn0THi00Z
-         0i6ki6C5Xj/KUntZkGLnjr9gj7Wl8pKix9co2U5WIT6OthRGafbCwPEIJE8zhuYjhC9W
-         KiZODJe6gZTUxeYzUTA/aCVOntEvzbvActJa0R5GIcVXh7P10B4oiCsta4HpO0mSYDeq
-         hobEF2x+CPcx9PmL4rAt+SjkPGPodg2bUQLLW8+xNgpLqmlxmhltc5KI6cjqKSjvWXWl
-         6akg==
-X-Gm-Message-State: APjAAAV0TIBlr5gsoVQf5P3NavKhXO0aAWrlVIPCTS/EjcEatfINQfd4
-        derX8ouhz5UtwLnCVxl/XLCRUGmJFCWULySzHJx71y3nP7a2
-X-Google-Smtp-Source: APXvYqyjnPdfn3CdjHyInJVCwZZ8j26hi12GlxQnoYj74BdqdbCdpi7IjZ0jDDmXtV+Sf0ZDU8zXLudLzwnJ4P1QPrQ9A1VWDGeF
+        Mon, 28 Oct 2019 03:49:23 -0400
+DKIM-Signature: v=1; a=rsa-sha256; c=simple/simple;
+  d=wdc.com; i=@wdc.com; q=dns/txt; s=dkim.wdc.com;
+  t=1572248963; x=1603784963;
+  h=from:to:cc:subject:date:message-id:references:
+   content-transfer-encoding:mime-version;
+  bh=LYCQoOw5DhwW5Z79fqWtlxnacucitA+yEKP46BfeOr4=;
+  b=mXbTohgRipDxjxT1B+Z4iqWUD/wZVJuW5hBaPAPHPYkdrUc2KsgIVy5I
+   c38MRoW8fZmJVXMY1QnaKm2vOr6k+SMS2WwU121wF53IM4HAmdozIFOFM
+   g99XgidSvX1v+razwQ5TffzlwggDBWnWtX0nnKso5QIFXv8+Y5wYzmDIh
+   l3n4588PczUa4hdVc3GkSDj9kGAJhrS6g3XljtddNw9vYetKzbzEzMBHh
+   BhQ7CcmMYQyP2IUgTJ7yml2AmvZK0m49RxERKKWxPiDeRqQt2XXV5nlfm
+   9VhgqYlRjAkEwaRp2Ksb4LANYepchuboMgEuTNMcVf8jHL9m8QBJd1fb6
+   w==;
+IronPort-SDR: spCGvcWF4pJTfSXV7c73+uU0+uW2Rs9upAJj3Q5HsGG1N/W0Jep8kx2rZDx71TLag7vQujx0CH
+ jvcc42qVI9RBLVBasX8TgSm/gM8qDxL2xZ/wiLCZlyfruVwNngWQJBF98Ef53KXK4pmYPkKGMB
+ XyDWm66KAvTMYKTgfLj+5eKF9G7h8b3xSnptunpkwA2Ldeq/OheFzdgntRPgw78xDIH88OrVcC
+ bFURBdSJYHEdMUc2n/dPSnhA8RNk5CYooQSuP9RCT6ycIJ2995VKIfG0fDq7wSJlRGqalJcuSJ
+ +2g=
+X-IronPort-AV: E=Sophos;i="5.68,239,1569254400"; 
+   d="scan'208";a="125882894"
+Received: from mail-bl2nam02lp2057.outbound.protection.outlook.com (HELO NAM02-BL2-obe.outbound.protection.outlook.com) ([104.47.38.57])
+  by ob1.hgst.iphmx.com with ESMTP; 28 Oct 2019 15:49:22 +0800
+ARC-Seal: i=1; a=rsa-sha256; s=arcselector9901; d=microsoft.com; cv=none;
+ b=DWCeNEYU9FoSouJwcvsjK3a6a7Qt/0+fiQiLcOI0g6fxQNVASqpaLNBsuVNwvzcXvDWT50r9mfR7crnj6gxnhU5CAVk9WrpQhYcv5tQeFLMkR/gDGyVnphr234paNi3K+ZxRYnH1Alohi3FnbGi+PYsC4qxQBFajuUOFimKt1bvlDyDnOLmNysFirFx/HlsID5iso6MJ14hKZHkxWyXiEiHAfv3wepEnjOqgNuEW4slLQdSpL6gH+y0yi/93OqgJeKZlnyxJt7VQNfJZ08UwrmoAxPRpQsJ+XtbFfA+V0ySdtOk4FHH/+/Dz6t5uatItYFKxo7z8KXrzKIi4owbzFg==
+ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com;
+ s=arcselector9901;
+ h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
+ bh=LYCQoOw5DhwW5Z79fqWtlxnacucitA+yEKP46BfeOr4=;
+ b=IN2N7KIqTcWkJc4pdD09G96Bk6XS5JvSN5bXWyMKb46ogAyJXcq7A6dTmTmpeOLARbBK7NE+eu28SCdfTtphjrJVn2MUrcWtm6hYUAikb93nQep7YjEA7RIbM3Gp8PYKi5ljYWj/CYSmUHoXm9ra2RjbIoMBAieZuT1fPC6DLDR4TeIf1IGkPV5cLiTiLGZ0+Wky1gf0vJXE680ppyIj3JxuRETQm6W/xiKdc70N1qIy+fZ6EAeKaE6kU1+M5GmGT8cZ/Do7eDutZFT/Pr2in5QcjFAXQa5bQ6TiDWlx8MtteyIzcXtvQQom4DNqHTj3cjhhpBTzTxKb3l76MAyddA==
+ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass
+ smtp.mailfrom=wdc.com; dmarc=pass action=none header.from=wdc.com; dkim=pass
+ header.d=wdc.com; arc=none
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+ d=sharedspace.onmicrosoft.com; s=selector2-sharedspace-onmicrosoft-com;
+ h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
+ bh=LYCQoOw5DhwW5Z79fqWtlxnacucitA+yEKP46BfeOr4=;
+ b=jVXKc6qYyojvqJp26VlD28fzonzWTZSSZYMrM4aW/36bALAZnS6ejD+ZQRWe8sCCiFB03n1LsyvXO7A3/xamKsnD7AnoM9SvpZ5paLvXRyXSx2+/7aNzHMrAjDXCYgYOyxQm7iCluprEdQFnN4rzBhsqyZXeOlY8krGTUvraRlA=
+Received: from BYAPR04MB5749.namprd04.prod.outlook.com (20.179.57.21) by
+ BYAPR04MB4728.namprd04.prod.outlook.com (52.135.239.222) with Microsoft SMTP
+ Server (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
+ 15.20.2387.23; Mon, 28 Oct 2019 07:49:20 +0000
+Received: from BYAPR04MB5749.namprd04.prod.outlook.com
+ ([fe80::34a1:afd2:e5c1:77c7]) by BYAPR04MB5749.namprd04.prod.outlook.com
+ ([fe80::34a1:afd2:e5c1:77c7%6]) with mapi id 15.20.2387.023; Mon, 28 Oct 2019
+ 07:49:20 +0000
+From:   Chaitanya Kulkarni <Chaitanya.Kulkarni@wdc.com>
+To:     Damien Le Moal <Damien.LeMoal@wdc.com>,
+        "linux-block@vger.kernel.org" <linux-block@vger.kernel.org>,
+        Jens Axboe <axboe@kernel.dk>,
+        "linux-scsi@vger.kernel.org" <linux-scsi@vger.kernel.org>,
+        "Martin K . Petersen" <martin.petersen@oracle.com>,
+        "dm-devel@redhat.com" <dm-devel@redhat.com>,
+        Mike Snitzer <snitzer@redhat.com>
+CC:     Ajay Joshi <Ajay.Joshi@wdc.com>,
+        Matias Bjorling <Matias.Bjorling@wdc.com>,
+        Hans Holmberg <Hans.Holmberg@wdc.com>,
+        Dmitry Fomichev <Dmitry.Fomichev@wdc.com>,
+        Keith Busch <kbusch@kernel.org>
+Subject: Re: [PATCH 2/8] block: Simplify REQ_OP_ZONE_RESET_ALL handling
+Thread-Topic: [PATCH 2/8] block: Simplify REQ_OP_ZONE_RESET_ALL handling
+Thread-Index: AQHVjM+qshxVC7ah2EOUEKAVKMXumA==
+Date:   Mon, 28 Oct 2019 07:49:19 +0000
+Message-ID: <BYAPR04MB5749C25A8558C0ED9AB3EA6786660@BYAPR04MB5749.namprd04.prod.outlook.com>
+References: <20191027140549.26272-1-damien.lemoal@wdc.com>
+ <20191027140549.26272-3-damien.lemoal@wdc.com>
+Accept-Language: en-US
+Content-Language: en-US
+X-MS-Has-Attach: 
+X-MS-TNEF-Correlator: 
+authentication-results: spf=none (sender IP is )
+ smtp.mailfrom=Chaitanya.Kulkarni@wdc.com; 
+x-originating-ip: [199.255.44.172]
+x-ms-publictraffictype: Email
+x-ms-office365-filtering-ht: Tenant
+x-ms-office365-filtering-correlation-id: 6ea6f626-76af-48a5-937d-08d75b7b576e
+x-ms-traffictypediagnostic: BYAPR04MB4728:
+x-ms-exchange-transport-forked: True
+x-microsoft-antispam-prvs: <BYAPR04MB4728BAD2B681C6FEE1B2943986660@BYAPR04MB4728.namprd04.prod.outlook.com>
+wdcipoutbound: EOP-TRUE
+x-ms-oob-tlc-oobclassifiers: OLM:4502;
+x-forefront-prvs: 0204F0BDE2
+x-forefront-antispam-report: SFV:NSPM;SFS:(10019020)(4636009)(376002)(39860400002)(396003)(346002)(366004)(136003)(199004)(189003)(71190400001)(71200400001)(99286004)(186003)(7696005)(53546011)(2906002)(74316002)(256004)(476003)(5660300002)(86362001)(6506007)(486006)(8936002)(4744005)(66066001)(76176011)(8676002)(52536014)(81166006)(76116006)(81156014)(102836004)(9686003)(4326008)(66946007)(446003)(6436002)(6246003)(2501003)(66556008)(66476007)(55016002)(26005)(64756008)(316002)(54906003)(229853002)(110136005)(305945005)(7736002)(14454004)(25786009)(66446008)(3846002)(6116002)(478600001)(33656002);DIR:OUT;SFP:1102;SCL:1;SRVR:BYAPR04MB4728;H:BYAPR04MB5749.namprd04.prod.outlook.com;FPR:;SPF:None;LANG:en;PTR:InfoNoRecords;A:1;MX:1;
+x-ms-exchange-senderadcheck: 1
+x-microsoft-antispam: BCL:0;
+x-microsoft-antispam-message-info: rP2RhoK8CdyPLZWnrmCUUdknJXYeZ8JxI+uVPjnL/9BbPW6gRhU0yW7q2VAV4AWzrM5ujyA3mKPxjHnP+HXaNLaWF5uhmfeDoHL0+Kfs8H0zZgjBVCkXTC4wCDxIZaqPd7YxP0Vb/0EEhGbGVlKWugb48coUwxKLwfuGEIEZAcieruqqBI+0KaQSUW1TCNsf0x840JE2UA2S/iXnun6Gmdov5DKPnSEG8S4iXRm4RxfdabKt/v38jdbIdjwTJT/MvNfrw7R8oxEV9djtsqz7ecId6v5gDZiqFyW7SAV8gQMZMwZpONNWMEMg1Df9okM2xAYHEtb6UggxlHojg+y8BQzNgjyG6ZQGeAq+89LN2uvEzedA8bF+m8Q/qEFpbIpoby9Y3sox9gYMJIos2HRo4d6cvv063004CVuFatDXQuZetXEDSFmX+q9lwCexDVE6
+Content-Type: text/plain; charset="us-ascii"
+Content-Transfer-Encoding: quoted-printable
 MIME-Version: 1.0
-X-Received: by 2002:a5d:8d8f:: with SMTP id b15mr16379107ioj.296.1572247328016;
- Mon, 28 Oct 2019 00:22:08 -0700 (PDT)
-Date:   Mon, 28 Oct 2019 00:22:08 -0700
-X-Google-Appengine-App-Id: s~syzkaller
-X-Google-Appengine-App-Id-Alias: syzkaller
-Message-ID: <0000000000007c4f500595f35bf4@google.com>
-Subject: KASAN: use-after-free Read in io_uring_setup
-From:   syzbot <syzbot+6f03d895a6cd0d06187f@syzkaller.appspotmail.com>
-To:     axboe@kernel.dk, linux-block@vger.kernel.org,
-        linux-fsdevel@vger.kernel.org, linux-kernel@vger.kernel.org,
-        syzkaller-bugs@googlegroups.com, viro@zeniv.linux.org.uk
-Content-Type: text/plain; charset="UTF-8"; format=flowed; delsp=yes
+X-OriginatorOrg: wdc.com
+X-MS-Exchange-CrossTenant-Network-Message-Id: 6ea6f626-76af-48a5-937d-08d75b7b576e
+X-MS-Exchange-CrossTenant-originalarrivaltime: 28 Oct 2019 07:49:19.9685
+ (UTC)
+X-MS-Exchange-CrossTenant-fromentityheader: Hosted
+X-MS-Exchange-CrossTenant-id: b61c8803-16f3-4c35-9b17-6f65f441df86
+X-MS-Exchange-CrossTenant-mailboxtype: HOSTED
+X-MS-Exchange-CrossTenant-userprincipalname: XPc2A87OAkaGZCLOOY9YC4fhe8oohf3V5qJgSLFRTl1at/61XLFVix0e9UKPjem6TLsbPx/hVFes+UvFwdoMnP9SlL6aJ8JfVMNTWBGTTAI=
+X-MS-Exchange-Transport-CrossTenantHeadersStamped: BYAPR04MB4728
 Sender: linux-block-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-Hello,
-
-syzbot found the following crash on:
-
-HEAD commit:    5a1e843c Merge tag 'mips_fixes_5.4_3' of git://git.kernel...
-git tree:       upstream
-console output: https://syzkaller.appspot.com/x/log.txt?x=10e2001f600000
-kernel config:  https://syzkaller.appspot.com/x/.config?x=420126a10fdda0f1
-dashboard link: https://syzkaller.appspot.com/bug?extid=6f03d895a6cd0d06187f
-compiler:       gcc (GCC) 9.0.0 20181231 (experimental)
-syz repro:      https://syzkaller.appspot.com/x/repro.syz?x=11d4fa97600000
-
-IMPORTANT: if you fix the bug, please add the following tag to the commit:
-Reported-by: syzbot+6f03d895a6cd0d06187f@syzkaller.appspotmail.com
-
-==================================================================
-BUG: KASAN: use-after-free in io_uring_create fs/io_uring.c:3842 [inline]
-BUG: KASAN: use-after-free in io_uring_setup+0x1877/0x18c0  
-fs/io_uring.c:3881
-Read of size 8 at addr ffff888082284048 by task syz-executor.5/11342
-
-CPU: 1 PID: 11342 Comm: syz-executor.5 Not tainted 5.4.0-rc4+ #0
-Hardware name: Google Google Compute Engine/Google Compute Engine, BIOS  
-Google 01/01/2011
-Call Trace:
-  __dump_stack lib/dump_stack.c:77 [inline]
-  dump_stack+0x172/0x1f0 lib/dump_stack.c:113
-  print_address_description.constprop.0.cold+0xd4/0x30b mm/kasan/report.c:374
-  __kasan_report.cold+0x1b/0x41 mm/kasan/report.c:506
-  kasan_report+0x12/0x20 mm/kasan/common.c:634
-  __asan_report_load8_noabort+0x14/0x20 mm/kasan/generic_report.c:132
-  io_uring_create fs/io_uring.c:3842 [inline]
-  io_uring_setup+0x1877/0x18c0 fs/io_uring.c:3881
-  __do_sys_io_uring_setup fs/io_uring.c:3894 [inline]
-  __se_sys_io_uring_setup fs/io_uring.c:3891 [inline]
-  __x64_sys_io_uring_setup+0x54/0x80 fs/io_uring.c:3891
-  do_syscall_64+0xfa/0x760 arch/x86/entry/common.c:290
-  entry_SYSCALL_64_after_hwframe+0x49/0xbe
-RIP: 0033:0x459f39
-Code: ad b6 fb ff c3 66 2e 0f 1f 84 00 00 00 00 00 66 90 48 89 f8 48 89 f7  
-48 89 d6 48 89 ca 4d 89 c2 4d 89 c8 4c 8b 4c 24 08 0f 05 <48> 3d 01 f0 ff  
-ff 0f 83 7b b6 fb ff c3 66 2e 0f 1f 84 00 00 00 00
-RSP: 002b:00007f313e126c78 EFLAGS: 00000246 ORIG_RAX: 00000000000001a9
-RAX: ffffffffffffffda RBX: 0000000000000002 RCX: 0000000000459f39
-RDX: 0000000000000000 RSI: 00000000200005c0 RDI: 000000040000000e
-RBP: 000000000075bf20 R08: 0000000000000000 R09: 0000000000000000
-R10: 0000000000000000 R11: 0000000000000246 R12: 00007f313e1276d4
-R13: 00000000004c1512 R14: 00000000004d4da8 R15: 00000000ffffffff
-
-Allocated by task 11342:
-  save_stack+0x23/0x90 mm/kasan/common.c:69
-  set_track mm/kasan/common.c:77 [inline]
-  __kasan_kmalloc mm/kasan/common.c:510 [inline]
-  __kasan_kmalloc.constprop.0+0xcf/0xe0 mm/kasan/common.c:483
-  kasan_kmalloc+0x9/0x10 mm/kasan/common.c:524
-  kmem_cache_alloc_trace+0x158/0x790 mm/slab.c:3550
-  kmalloc include/linux/slab.h:556 [inline]
-  kzalloc include/linux/slab.h:690 [inline]
-  io_ring_ctx_alloc fs/io_uring.c:393 [inline]
-  io_uring_create fs/io_uring.c:3811 [inline]
-  io_uring_setup+0xec6/0x18c0 fs/io_uring.c:3881
-  __do_sys_io_uring_setup fs/io_uring.c:3894 [inline]
-  __se_sys_io_uring_setup fs/io_uring.c:3891 [inline]
-  __x64_sys_io_uring_setup+0x54/0x80 fs/io_uring.c:3891
-  do_syscall_64+0xfa/0x760 arch/x86/entry/common.c:290
-  entry_SYSCALL_64_after_hwframe+0x49/0xbe
-
-Freed by task 11335:
-  save_stack+0x23/0x90 mm/kasan/common.c:69
-  set_track mm/kasan/common.c:77 [inline]
-  kasan_set_free_info mm/kasan/common.c:332 [inline]
-  __kasan_slab_free+0x102/0x150 mm/kasan/common.c:471
-  kasan_slab_free+0xe/0x10 mm/kasan/common.c:480
-  __cache_free mm/slab.c:3425 [inline]
-  kfree+0x10a/0x2c0 mm/slab.c:3756
-  io_ring_ctx_free fs/io_uring.c:3552 [inline]
-  io_ring_ctx_wait_and_kill+0x4d7/0x6c0 fs/io_uring.c:3592
-  io_uring_release+0x42/0x50 fs/io_uring.c:3600
-  __fput+0x2ff/0x890 fs/file_table.c:280
-  ____fput+0x16/0x20 fs/file_table.c:313
-  task_work_run+0x145/0x1c0 kernel/task_work.c:113
-  tracehook_notify_resume include/linux/tracehook.h:188 [inline]
-  exit_to_usermode_loop+0x316/0x380 arch/x86/entry/common.c:163
-  prepare_exit_to_usermode arch/x86/entry/common.c:194 [inline]
-  syscall_return_slowpath arch/x86/entry/common.c:274 [inline]
-  do_syscall_64+0x65f/0x760 arch/x86/entry/common.c:300
-  entry_SYSCALL_64_after_hwframe+0x49/0xbe
-
-The buggy address belongs to the object at ffff888082284000
-  which belongs to the cache kmalloc-2k of size 2048
-The buggy address is located 72 bytes inside of
-  2048-byte region [ffff888082284000, ffff888082284800)
-The buggy address belongs to the page:
-page:ffffea000208a100 refcount:1 mapcount:0 mapping:ffff8880aa400e00  
-index:0x0
-flags: 0x1fffc0000000200(slab)
-raw: 01fffc0000000200 ffffea0002a1bc88 ffffea00023fa248 ffff8880aa400e00
-raw: 0000000000000000 ffff888082284000 0000000100000001 0000000000000000
-page dumped because: kasan: bad access detected
-
-Memory state around the buggy address:
-  ffff888082283f00: fc fc fc fc fc fc fc fc fc fc fc fc fc fc fc fc
-  ffff888082283f80: fc fc fc fc fc fc fc fc fc fc fc fc fc fc fc fc
-> ffff888082284000: fb fb fb fb fb fb fb fb fb fb fb fb fb fb fb fb
-                                               ^
-  ffff888082284080: fb fb fb fb fb fb fb fb fb fb fb fb fb fb fb fb
-  ffff888082284100: fb fb fb fb fb fb fb fb fb fb fb fb fb fb fb fb
-==================================================================
-
-
----
-This bug is generated by a bot. It may contain errors.
-See https://goo.gl/tpsmEJ for more information about syzbot.
-syzbot engineers can be reached at syzkaller@googlegroups.com.
-
-syzbot will keep track of this bug report. See:
-https://goo.gl/tpsmEJ#status for how to communicate with syzbot.
-syzbot can test patches for this bug, for details see:
-https://goo.gl/tpsmEJ#testing-patches
+The reason code for REQ_OP_RESET_ALL is kept in a different function so=0A=
+we can clearly differentiate between REQ_OP_RESET and REQ_OP_RESET_ALL=0A=
+when we add new tracepoints with blktrace framework.=0A=
+=0A=
+But if that is acceptable, then,=0A=
+=0A=
+Reviewed-by: Chaitanya Kulkarni <chaitanya.kulkarni@wdc.com>=0A=
+=0A=
+On 10/27/19 7:06 AM, Damien Le Moal wrote:=0A=
+> There is no need for the function __blkdev_reset_all_zones() as=0A=
+> REQ_OP_ZONE_RESET_ALL can be handled directly in blkdev_reset_zones()=0A=
+> bio loop with an early break from the loop. This patch removes this=0A=
+> function and modifies blkdev_reset_zones(), simplifying the code.=0A=
+> =0A=
+> Signed-off-by: Damien Le Moal<damien.lemoal@wdc.com>=0A=
+=0A=
