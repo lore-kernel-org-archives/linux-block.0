@@ -2,172 +2,128 @@ Return-Path: <SRS0=tc1V=YV=vger.kernel.org=linux-block-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-0.8 required=3.0 tests=DKIM_SIGNED,DKIM_VALID,
-	HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS
-	autolearn=no autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-2.4 required=3.0 tests=DKIMWL_WL_HIGH,DKIM_SIGNED,
+	DKIM_VALID,DKIM_VALID_AU,HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,
+	SPF_HELO_NONE,SPF_PASS,USER_AGENT_SANE_1 autolearn=no autolearn_force=no
+	version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 6C689CA9EA0
-	for <linux-block@archiver.kernel.org>; Mon, 28 Oct 2019 08:37:22 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 7C0A2CA9EA0
+	for <linux-block@archiver.kernel.org>; Mon, 28 Oct 2019 08:51:29 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.kernel.org (Postfix) with ESMTP id 2CC04214AF
-	for <linux-block@archiver.kernel.org>; Mon, 28 Oct 2019 08:37:22 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id 3A00620873
+	for <linux-block@archiver.kernel.org>; Mon, 28 Oct 2019 08:51:29 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (2048-bit key) header.d=wdc.com header.i=@wdc.com header.b="LmCVWJ5P";
-	dkim=pass (1024-bit key) header.d=sharedspace.onmicrosoft.com header.i=@sharedspace.onmicrosoft.com header.b="X0Vio+hZ"
+	dkim=pass (2048-bit key) header.d=oracle.com header.i=@oracle.com header.b="TIOdz48+"
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1731061AbfJ1IhV (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Mon, 28 Oct 2019 04:37:21 -0400
-Received: from esa4.hgst.iphmx.com ([216.71.154.42]:33110 "EHLO
-        esa4.hgst.iphmx.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1728941AbfJ1IhV (ORCPT
+        id S1732018AbfJ1Iv2 (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Mon, 28 Oct 2019 04:51:28 -0400
+Received: from userp2120.oracle.com ([156.151.31.85]:40498 "EHLO
+        userp2120.oracle.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S1731992AbfJ1Iv2 (ORCPT
         <rfc822;linux-block@vger.kernel.org>);
-        Mon, 28 Oct 2019 04:37:21 -0400
-DKIM-Signature: v=1; a=rsa-sha256; c=simple/simple;
-  d=wdc.com; i=@wdc.com; q=dns/txt; s=dkim.wdc.com;
-  t=1572251839; x=1603787839;
-  h=from:to:cc:subject:date:message-id:references:
-   content-transfer-encoding:mime-version;
-  bh=9pdK8Jr2WaWREdNkygw/hgHrgPzOcH5R3qYvjzfgex4=;
-  b=LmCVWJ5PaQ70PTnYHFeVXReQEeP9csQn0p5yTumHUmHOWyzJGvCx/+SW
-   zIYy5zhQ8c/F7DbwrFQFiCORet5EtdIjaZVfrRVxvE3b3+jESq9GYL0KM
-   e9e+OpuKUtNx82NCYR8RJdchofb25xJGEm9cfjXWA3g71OdjHVQqDnN6/
-   h4DFhLtwhc3ClnN/mBre2dYQjTw3g5vSO8UUaOlrhd+AQzzIREBXKw5Jh
-   rNA0kFDOwkC4hpJCZn9KyXTUvS1oNrBrm2xsbth8kDiUy4+hU3yDSZoBY
-   auN/rLb7OH7B665vET/E0OmQFLlJEotVxAw6DaXgMJfv7Cfa5OYWabnQ9
-   w==;
-IronPort-SDR: vP2huSyLzmL9SBOzCZwGBvjUIwsLHDqnIrgfKkXmgfod8WbgMlUXhg/pkoOKBDfrlRc18F5M3e
- v+u8Xb4irs2AtFOeMFiXy0WpHh/1rlFAA2PnFZKQ57qwMZouSRwdcZUxajqgGlJHFx07BeXm8R
- QawPMRn0Wi0lUStH7sc1ucuESYxjhjoQkvEMjQlrYwFGvuxrlCblKNd01Wg/sPEV2GZ4ibEC0f
- 7iUCCRPxIY/PfYDKjgMnfH93hjsP9wRiQJ6L/V8cyZCjkjm/cLAUc4o+3Ar8A3+6qx9iIyBz/0
- AOE=
-X-IronPort-AV: E=Sophos;i="5.68,239,1569254400"; 
-   d="scan'208";a="121475485"
-Received: from mail-sn1nam01lp2056.outbound.protection.outlook.com (HELO NAM01-SN1-obe.outbound.protection.outlook.com) ([104.47.32.56])
-  by ob1.hgst.iphmx.com with ESMTP; 28 Oct 2019 16:37:18 +0800
-ARC-Seal: i=1; a=rsa-sha256; s=arcselector9901; d=microsoft.com; cv=none;
- b=gnsti05kWVfPuTFYZrFOt7Y7lIoLoHsSgizejQcSuOmT9k8JHgTqPn8n/cBVabwkSV8NGY5kiR7181NjINN3WEXcWBQr1nfiPppp82qSQsScU9LkUh86HfOYl/GgGHds/i39Qm/WjVB06bomBrukGGYzCIyvMlNCFU9F40Inh++wsquKP7mAlHhRiuUTLwHrKQsaJXFJ0dL0b5NJIwZ1XPQ6MQZ10rT7kwqd1BcLLtTH9epu1608Z9YwbCMmVFdALmw6n6mreyAnZ0+trHuy0wRQXn74a0GqMpviRf5ViZq7vys0YVzeJypPAqdyQQQJNJmyUKJnGbukdEQrHQ1QCA==
-ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com;
- s=arcselector9901;
- h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
- bh=kF5ytKXf+nfALUb1Z+1xM6JY649ZfGyWfvaT8rmMiP4=;
- b=l5cDqiK48zkREzpHGXClgsya+k9uj7tRz6UyTmvtkx973Eix5ERc8wwwVzur1DTW9d5091sV6UmmdMGnZjrEKQ1rz4qbn4ECtQFQg9qVaFBvKmgBkotm7BKAMBIHWL1M18/Z7qfjkNV2BZhDx2WiqQhiUCpOLnih6n4Dq7aQIDNBqkIL+zoARIH1YjP1OUI09xvwBRfcX0q8PBP0DejB9+TD7R0r1c4fPG3WWaTBGO0Pptsnv/qVTD7VUF5S4lqVh/9ChREuruvhImn42N4BPrHjSswgaPb33f6N4/Zi0f9rwJ3oKjaEWObevCe3eYCXKrqVR3G0zSdn608VK3AVAw==
-ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass
- smtp.mailfrom=wdc.com; dmarc=pass action=none header.from=wdc.com; dkim=pass
- header.d=wdc.com; arc=none
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
- d=sharedspace.onmicrosoft.com; s=selector2-sharedspace-onmicrosoft-com;
- h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
- bh=kF5ytKXf+nfALUb1Z+1xM6JY649ZfGyWfvaT8rmMiP4=;
- b=X0Vio+hZrs0prmTfxfHW+fpkJJdqbvefd3hCdIFrLcUv+bJiin3v+sX5/JW3YI7xTJMlD22tGbBPComT+xeYDvdGLmqM+Fsb7yNe3zgzkA3z55fhu7ABgwlVeg23YIFGf2Zo069AYXMBG/CnQO4A/TOVpm/8DjkqUrRkkUyN7dY=
-Received: from BYAPR04MB5749.namprd04.prod.outlook.com (20.179.57.21) by
- BYAPR04MB3813.namprd04.prod.outlook.com (52.135.215.13) with Microsoft SMTP
- Server (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
- 15.20.2387.24; Mon, 28 Oct 2019 08:37:17 +0000
-Received: from BYAPR04MB5749.namprd04.prod.outlook.com
- ([fe80::34a1:afd2:e5c1:77c7]) by BYAPR04MB5749.namprd04.prod.outlook.com
- ([fe80::34a1:afd2:e5c1:77c7%6]) with mapi id 15.20.2387.023; Mon, 28 Oct 2019
- 08:37:17 +0000
-From:   Chaitanya Kulkarni <Chaitanya.Kulkarni@wdc.com>
-To:     Damien Le Moal <Damien.LeMoal@wdc.com>,
-        "linux-block@vger.kernel.org" <linux-block@vger.kernel.org>,
-        Jens Axboe <axboe@kernel.dk>,
-        "linux-scsi@vger.kernel.org" <linux-scsi@vger.kernel.org>,
-        "Martin K . Petersen" <martin.petersen@oracle.com>,
-        "dm-devel@redhat.com" <dm-devel@redhat.com>,
-        Mike Snitzer <snitzer@redhat.com>
-CC:     Ajay Joshi <Ajay.Joshi@wdc.com>,
-        Matias Bjorling <Matias.Bjorling@wdc.com>,
-        Hans Holmberg <Hans.Holmberg@wdc.com>,
-        Dmitry Fomichev <Dmitry.Fomichev@wdc.com>,
-        Keith Busch <kbusch@kernel.org>
-Subject: Re: [PATCH 2/8] block: Simplify REQ_OP_ZONE_RESET_ALL handling
-Thread-Topic: [PATCH 2/8] block: Simplify REQ_OP_ZONE_RESET_ALL handling
-Thread-Index: AQHVjM+qshxVC7ah2EOUEKAVKMXumA==
-Date:   Mon, 28 Oct 2019 08:37:17 +0000
-Message-ID: <BYAPR04MB57490F22E67DC5B172A3A9FE86660@BYAPR04MB5749.namprd04.prod.outlook.com>
-References: <20191027140549.26272-1-damien.lemoal@wdc.com>
- <20191027140549.26272-3-damien.lemoal@wdc.com>
- <BYAPR04MB5749C25A8558C0ED9AB3EA6786660@BYAPR04MB5749.namprd04.prod.outlook.com>
- <BYAPR04MB58160668CEB54919B22AC2FBE7660@BYAPR04MB5816.namprd04.prod.outlook.com>
-Accept-Language: en-US
-Content-Language: en-US
-X-MS-Has-Attach: 
-X-MS-TNEF-Correlator: 
-authentication-results: spf=none (sender IP is )
- smtp.mailfrom=Chaitanya.Kulkarni@wdc.com; 
-x-originating-ip: [199.255.44.172]
-x-ms-publictraffictype: Email
-x-ms-office365-filtering-ht: Tenant
-x-ms-office365-filtering-correlation-id: 3578688b-6dfb-4220-a1df-08d75b820ab2
-x-ms-traffictypediagnostic: BYAPR04MB3813:
-x-ms-exchange-purlcount: 1
-x-ms-exchange-transport-forked: True
-x-microsoft-antispam-prvs: <BYAPR04MB3813BB24733CC3D2A9C850B386660@BYAPR04MB3813.namprd04.prod.outlook.com>
-wdcipoutbound: EOP-TRUE
-x-ms-oob-tlc-oobclassifiers: OLM:632;
-x-forefront-prvs: 0204F0BDE2
-x-forefront-antispam-report: SFV:NSPM;SFS:(10019020)(4636009)(136003)(366004)(39860400002)(376002)(346002)(396003)(199004)(189003)(486006)(476003)(6506007)(14454004)(446003)(53546011)(966005)(7736002)(6436002)(66946007)(55016002)(9686003)(6306002)(66066001)(54906003)(76176011)(66476007)(25786009)(316002)(305945005)(45080400002)(76116006)(74316002)(110136005)(64756008)(66446008)(66556008)(478600001)(26005)(186003)(8676002)(81166006)(81156014)(8936002)(102836004)(7696005)(99286004)(33656002)(256004)(71200400001)(71190400001)(6116002)(3846002)(6246003)(86362001)(5660300002)(2906002)(4326008)(14444005)(52536014)(2501003)(229853002)(21314003);DIR:OUT;SFP:1102;SCL:1;SRVR:BYAPR04MB3813;H:BYAPR04MB5749.namprd04.prod.outlook.com;FPR:;SPF:None;LANG:en;PTR:InfoNoRecords;A:1;MX:1;
-x-ms-exchange-senderadcheck: 1
-x-microsoft-antispam: BCL:0;
-x-microsoft-antispam-message-info: MxJG7Pfm9HUStjoBxW14XdyAP90l31fy8mCVtWRDlRcAejRKcJKA7Gc7zRq4jnpU6WrsXsNOdmqsXa3+5V+N8WgLk0WEGaVG2kel5XfrcPXt40l4qAuByiPR0MpWVXiTEDGo+HkYfq/vM4GfVeSoB0Z+wAXvFnnpY1XvfFAn8VdMFq+jryY9bUlWOyEUCx3u4zsqT5I+KzQR1KnzFfsUBjiM/f3ian9aluG65zZaSBtOjVsGJIoGw56QHZf689sQTouIBCDem3M+QJmpcWJo1KHZvzRp8Uu2C5CMYYykilpFQwk+hw/j3hCP3Udg1aGBHniXJCRDyyDGAS3UnrR/ZoN/DhRpZoQb1wWtMbb90Sjhd+xJjY+w5HrhTjvsUQNdUPQKIEdemFTB8twwASGpAPbVNCxj0SZfygPPBOLO1UvvXDDZvLngkSFan1iMFrea
-Content-Type: text/plain; charset="us-ascii"
-Content-Transfer-Encoding: quoted-printable
+        Mon, 28 Oct 2019 04:51:28 -0400
+Received: from pps.filterd (userp2120.oracle.com [127.0.0.1])
+        by userp2120.oracle.com (8.16.0.27/8.16.0.27) with SMTP id x9S8iF4M025773;
+        Mon, 28 Oct 2019 08:51:20 GMT
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=oracle.com; h=subject : to : cc :
+ references : from : message-id : date : mime-version : in-reply-to :
+ content-type : content-transfer-encoding; s=corp-2019-08-05;
+ bh=9saFiIVD4K6KegoAkGcpay9swJ3gk/oMJYVDWNV8Qi4=;
+ b=TIOdz48+ewtjbEyPALjjHR+lOvRYfu1LTeJz3GVTpOz3KprrbtCwFkFqpag0MT0yBliM
+ Hu8tSGwXojbST6PIES9FZ8Y4AzXu4fwoaxK6M5uHJ5YxhK7vcAIN+NLul2XCUeFshUU3
+ yOY/MDgKQdVr9DGDtRzRPVu5aaEUb+UYQHxSk8vEmIkjxcElhRraot1ZTkt7o6su0H4d
+ P7gqHY9mir57x28yuhBduSgwnVq7MOiqOSb3IugU4ooO5Tqp8pJxn9qqswt1vP5CbI+J
+ Oa9Km8Kvhgx8PiJShmupG04TRHLNOri8CVZySO0hgs1g/UZaliTmD/rKNmZDy9D06/TT FQ== 
+Received: from aserp3030.oracle.com (aserp3030.oracle.com [141.146.126.71])
+        by userp2120.oracle.com with ESMTP id 2vvumf5cru-1
+        (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=OK);
+        Mon, 28 Oct 2019 08:51:20 +0000
+Received: from pps.filterd (aserp3030.oracle.com [127.0.0.1])
+        by aserp3030.oracle.com (8.16.0.27/8.16.0.27) with SMTP id x9S8mXgT169533;
+        Mon, 28 Oct 2019 08:51:19 GMT
+Received: from userv0122.oracle.com (userv0122.oracle.com [156.151.31.75])
+        by aserp3030.oracle.com with ESMTP id 2vwakxmkfe-1
+        (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=OK);
+        Mon, 28 Oct 2019 08:51:19 +0000
+Received: from abhmp0001.oracle.com (abhmp0001.oracle.com [141.146.116.7])
+        by userv0122.oracle.com (8.14.4/8.14.4) with ESMTP id x9S8pGSg026381;
+        Mon, 28 Oct 2019 08:51:17 GMT
+Received: from [192.168.1.13] (/114.88.246.185)
+        by default (Oracle Beehive Gateway v4.0)
+        with ESMTP ; Mon, 28 Oct 2019 01:51:16 -0700
+Subject: Re: INFO: task syz-executor can't die for more than 143 seconds. (2)
+To:     Tetsuo Handa <penguin-kernel@I-love.SAKURA.ne.jp>, axboe@kernel.dk
+Cc:     syzbot <syzbot+b48daca8639150bc5e73@syzkaller.appspotmail.com>,
+        linux-block@vger.kernel.org, linux-kernel@vger.kernel.org,
+        syzkaller-bugs@googlegroups.com
+References: <000000000000c52dbf05958f3f3a@google.com>
+ <3fbc4bb2-a03b-fbfa-4803-47a6d0075ff2@I-love.SAKURA.ne.jp>
+From:   Bob Liu <bob.liu@oracle.com>
+Message-ID: <24296ff7-4a5f-2bd9-63c7-07831f7b4d8d@oracle.com>
+Date:   Mon, 28 Oct 2019 16:51:12 +0800
+User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:60.0) Gecko/20100101
+ Thunderbird/60.5.1
 MIME-Version: 1.0
-X-OriginatorOrg: wdc.com
-X-MS-Exchange-CrossTenant-Network-Message-Id: 3578688b-6dfb-4220-a1df-08d75b820ab2
-X-MS-Exchange-CrossTenant-originalarrivaltime: 28 Oct 2019 08:37:17.8300
- (UTC)
-X-MS-Exchange-CrossTenant-fromentityheader: Hosted
-X-MS-Exchange-CrossTenant-id: b61c8803-16f3-4c35-9b17-6f65f441df86
-X-MS-Exchange-CrossTenant-mailboxtype: HOSTED
-X-MS-Exchange-CrossTenant-userprincipalname: zcL8v2F7n4I/z678V+XQ4pT2tpvrKSB/KRGbHEzkB9Ye2mwMuA84vGeLh0FTnvz2nDgkpgGZyr/Ea9CW93x+BMiNnQcZ0clqK8bMhMqzqYk=
-X-MS-Exchange-Transport-CrossTenantHeadersStamped: BYAPR04MB3813
+In-Reply-To: <3fbc4bb2-a03b-fbfa-4803-47a6d0075ff2@I-love.SAKURA.ne.jp>
+Content-Type: text/plain; charset=utf-8
+Content-Language: en-US
+Content-Transfer-Encoding: 7bit
+X-Proofpoint-Virus-Version: vendor=nai engine=6000 definitions=9423 signatures=668685
+X-Proofpoint-Spam-Details: rule=notspam policy=default score=0 suspectscore=0 malwarescore=0
+ phishscore=0 bulkscore=0 spamscore=0 mlxscore=0 mlxlogscore=997
+ adultscore=0 classifier=spam adjust=0 reason=mlx scancount=1
+ engine=8.0.1-1908290000 definitions=main-1910280087
+X-Proofpoint-Virus-Version: vendor=nai engine=6000 definitions=9423 signatures=668685
+X-Proofpoint-Spam-Details: rule=notspam policy=default score=0 priorityscore=1501 malwarescore=0
+ suspectscore=0 phishscore=0 bulkscore=0 spamscore=0 clxscore=1011
+ lowpriorityscore=0 mlxscore=0 impostorscore=0 mlxlogscore=999 adultscore=0
+ classifier=spam adjust=0 reason=mlx scancount=1 engine=8.0.1-1908290000
+ definitions=main-1910280087
 Sender: linux-block-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-On 10/28/19 12:54 AM, Damien Le Moal wrote:=0A=
-> Isn't the trace point under submit_bio() in=0A=
-> generic_make_request_checks() ? So removing the function is not a=0A=
-> problem for tracing as far as I can tell. Am I missing something ?=0A=
-=0A=
-Yes you are right, I completely missed that.=0A=
-=0A=
-Sorry I've created confusion with block_dump and tracepoint.=0A=
-=0A=
-Block trace code is fine.=0A=
-=0A=
-The block_dump code under the submit_bio() is only dumps the bios with=0A=
-the data:-=0A=
-=0A=
-=0A=
-1171                 if (unlikely(block_dump)) {=0A=
-1172                         char b[BDEVNAME_SIZE];=0A=
-1173                         printk(KERN_DEBUG "%s(%d): %s block %Lu on =0A=
-%s (%u sectors)\n",=0A=
-1174                         current->comm, task_pid_nr(current),=0A=
-1175                                 op_is_write(bio_op(bio)) ? "WRITE" =0A=
-: "READ",=0A=
-1176                                 (unsigned long =0A=
-long)bio->bi_iter.bi_sector,=0A=
-1177                                 bio_devname(bio, b), count);=0A=
-1178                 }=0A=
-=0A=
-=0A=
-I've posted patch-series [1] in the past to move that code out but it =0A=
-didn't go anywhere in anticipation of more data less requests.=0A=
-=0A=
-Since it is taking longer to have blktrace extensions RFC to move =0A=
-forward and [1] didn't go anywhere I wanted to use block_dump=0A=
-parameter in the blk-zoned.c (not an ideal situation) so that we can =0A=
-have atleast minimal debug support for the new REQ_OP_ZONE_XXX =0A=
-operations until we get block trace extensions in the kernel.=0A=
-=0A=
-Nonetheless, I'll just a send a patch on the top of this which will=0A=
-make discussion much easier.=0A=
-=0A=
-=0A=
-[1] :- =0A=
-https://lore.kernel.org/linux-block/DM6PR04MB57546ECC4CFDDB5535E3382586FB0@=
-DM6PR04MB5754.namprd04.prod.outlook.com/T/=0A=
+On 10/24/19 6:08 PM, Tetsuo Handa wrote:
+> On 2019/10/23 16:56, syzbot wrote:
+>> Hello,
+>>
+>> syzbot found the following crash on:
+>>
+>> HEAD commit:    c4b9850b Add linux-next specific files for 20191018
+>> git tree:       linux-next
+>> console output: https://urldefense.proofpoint.com/v2/url?u=https-3A__syzkaller.appspot.com_x_log.txt-3Fx-3D177b3ab0e00000&d=DwICaQ&c=RoP1YumCXCgaWHvlZYR8PZh8Bv7qIrMUB65eapI_JnE&r=1ktT0U2YS_I8Zz2o-MS1YcCAzWZ6hFGtyTgvVMGM7gI&m=wOlNeKk9puri9Fvxn8bGDrlWHd-4GPMeJ9rb2CVqXaE&s=PZfBliKlYjm16VnyPzu-3i0SgqlbByIB0iI8jVhcGuk&e= 
+>> kernel config:  https://urldefense.proofpoint.com/v2/url?u=https-3A__syzkaller.appspot.com_x_.config-3Fx-3Dc940ef12efcd1ec&d=DwICaQ&c=RoP1YumCXCgaWHvlZYR8PZh8Bv7qIrMUB65eapI_JnE&r=1ktT0U2YS_I8Zz2o-MS1YcCAzWZ6hFGtyTgvVMGM7gI&m=wOlNeKk9puri9Fvxn8bGDrlWHd-4GPMeJ9rb2CVqXaE&s=z8tV220wKFTQIJH1tSYLUl8ecAnll94C_mFVcHkuTlc&e= 
+>> dashboard link: https://urldefense.proofpoint.com/v2/url?u=https-3A__syzkaller.appspot.com_bug-3Fextid-3Db48daca8639150bc5e73&d=DwICaQ&c=RoP1YumCXCgaWHvlZYR8PZh8Bv7qIrMUB65eapI_JnE&r=1ktT0U2YS_I8Zz2o-MS1YcCAzWZ6hFGtyTgvVMGM7gI&m=wOlNeKk9puri9Fvxn8bGDrlWHd-4GPMeJ9rb2CVqXaE&s=VZ2ZdnAqEd_AkXJujidN3EgwscGpUAdsZjuObKjXN-U&e= 
+>> compiler:       gcc (GCC) 9.0.0 20181231 (experimental)
+>> syz repro:      https://urldefense.proofpoint.com/v2/url?u=https-3A__syzkaller.appspot.com_x_repro.syz-3Fx-3D1356b8ff600000&d=DwICaQ&c=RoP1YumCXCgaWHvlZYR8PZh8Bv7qIrMUB65eapI_JnE&r=1ktT0U2YS_I8Zz2o-MS1YcCAzWZ6hFGtyTgvVMGM7gI&m=wOlNeKk9puri9Fvxn8bGDrlWHd-4GPMeJ9rb2CVqXaE&s=Q_svUYj2OBYmIJXnResNzOWVUCyjRpxnpun2Cu15S9M&e= 
+>> C reproducer:   https://urldefense.proofpoint.com/v2/url?u=https-3A__syzkaller.appspot.com_x_repro.c-3Fx-3D14f48687600000&d=DwICaQ&c=RoP1YumCXCgaWHvlZYR8PZh8Bv7qIrMUB65eapI_JnE&r=1ktT0U2YS_I8Zz2o-MS1YcCAzWZ6hFGtyTgvVMGM7gI&m=wOlNeKk9puri9Fvxn8bGDrlWHd-4GPMeJ9rb2CVqXaE&s=FGZNxR7w-rU29MhJxJtno-c_wUXCJHgPC5V1YNp7h58&e= 
+> 
+> The reproducer is trying to allocate 64TB of disk space on /dev/nullb0 using fallocate()
+> but __blkdev_issue_zero_pages() cannot bail out upon SIGKILL (and therefore cannot
+> terminate for minutes). Can we make it killable? 
+
+Yeah, I think we can consider add fatal_signal_pending(current) checking in the while() loop..
+
+> I don't know what action is needed
+> for undoing this loop...
+> 
+>         while (nr_sects != 0) {
+>                 bio = blk_next_bio(bio, __blkdev_sectors_to_bio_pages(nr_sects),
+>                                    gfp_mask);
+>                 bio->bi_iter.bi_sector = sector;
+>                 bio_set_dev(bio, bdev);
+>                 bio_set_op_attrs(bio, REQ_OP_WRITE, 0);
+> 
+>                 while (nr_sects != 0) {
+>                         sz = min((sector_t) PAGE_SIZE, nr_sects << 9);
+>                         bi_size = bio_add_page(bio, ZERO_PAGE(0), sz, 0);
+>                         nr_sects -= bi_size >> 9;
+>                         sector += bi_size >> 9;
+>                         if (bi_size < sz)
+>                                 break;
+>                 }
+>                 cond_resched();
+>         }
+> 
+
