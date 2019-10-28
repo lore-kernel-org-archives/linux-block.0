@@ -2,162 +2,227 @@ Return-Path: <SRS0=tc1V=YV=vger.kernel.org=linux-block-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-2.2 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
-	MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,USER_AGENT_SANE_1 autolearn=no
-	autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-9.7 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
+	INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,
+	UNPARSEABLE_RELAY,USER_AGENT_GIT autolearn=ham autolearn_force=no
+	version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id D1C50CA9EC0
-	for <linux-block@archiver.kernel.org>; Mon, 28 Oct 2019 11:55:46 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 4740ECA9EC0
+	for <linux-block@archiver.kernel.org>; Mon, 28 Oct 2019 12:57:10 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.kernel.org (Postfix) with ESMTP id AFF67208C0
-	for <linux-block@archiver.kernel.org>; Mon, 28 Oct 2019 11:55:46 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id 0D72F21734
+	for <linux-block@archiver.kernel.org>; Mon, 28 Oct 2019 12:57:10 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S2388733AbfJ1Lzq (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Mon, 28 Oct 2019 07:55:46 -0400
-Received: from lhrrgout.huawei.com ([185.176.76.210]:2058 "EHLO huawei.com"
-        rhost-flags-OK-OK-OK-FAIL) by vger.kernel.org with ESMTP
-        id S2388732AbfJ1Lzq (ORCPT <rfc822;linux-block@vger.kernel.org>);
-        Mon, 28 Oct 2019 07:55:46 -0400
-Received: from lhreml707-cah.china.huawei.com (unknown [172.18.7.107])
-        by Forcepoint Email with ESMTP id 4D6BE4F1F13B1F491E50;
-        Mon, 28 Oct 2019 11:55:44 +0000 (GMT)
-Received: from lhreml724-chm.china.huawei.com (10.201.108.75) by
- lhreml707-cah.china.huawei.com (10.201.108.48) with Microsoft SMTP Server
- (TLS) id 14.3.408.0; Mon, 28 Oct 2019 11:55:44 +0000
-Received: from [127.0.0.1] (10.202.226.45) by lhreml724-chm.china.huawei.com
- (10.201.108.75) with Microsoft SMTP Server (version=TLS1_2,
- cipher=TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256) id 15.1.1713.5; Mon, 28 Oct
- 2019 11:55:43 +0000
-Subject: Re: [PATCH V4 0/5] blk-mq: improvement on handling IO during CPU
- hotplug
-To:     Ming Lei <ming.lei@redhat.com>
-CC:     Jens Axboe <axboe@kernel.dk>,
-        "linux-block@vger.kernel.org" <linux-block@vger.kernel.org>,
-        Bart Van Assche <bvanassche@acm.org>,
-        "Hannes Reinecke" <hare@suse.com>, Christoph Hellwig <hch@lst.de>,
-        Thomas Gleixner <tglx@linutronix.de>,
-        Keith Busch <keith.busch@intel.com>
-References: <20191014015043.25029-1-ming.lei@redhat.com>
- <d30420d7-74d9-4417-1bbe-8113848e74fa@huawei.com>
- <20191016120729.GB5515@ming.t460p>
- <9dbc14ab-65cd-f7ac-384c-2dbe03575ee7@huawei.com>
- <55a84ea3-647d-0a76-596c-c6c6b2fc1b75@huawei.com>
- <20191020101404.GA5103@ming.t460p>
- <10aac76a-26bb-bcda-c6ea-b39ca66d6740@huawei.com>
- <f1ba3d36-fef4-25c5-720c-deb5c5bd7a86@huawei.com>
- <20191028104238.GA14008@ming.t460p>
-From:   John Garry <john.garry@huawei.com>
-Message-ID: <a5e25466-c4db-c254-be37-45a9ca85851c@huawei.com>
-Date:   Mon, 28 Oct 2019 11:55:42 +0000
-User-Agent: Mozilla/5.0 (Windows NT 10.0; WOW64; rv:68.0) Gecko/20100101
- Thunderbird/68.1.2
+        id S1729174AbfJ1M5J (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Mon, 28 Oct 2019 08:57:09 -0400
+Received: from bhuna.collabora.co.uk ([46.235.227.227]:36688 "EHLO
+        bhuna.collabora.co.uk" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S1728269AbfJ1M5H (ORCPT
+        <rfc822;linux-block@vger.kernel.org>);
+        Mon, 28 Oct 2019 08:57:07 -0400
+Received: from [127.0.0.1] (localhost [127.0.0.1])
+        (Authenticated sender: tonyk)
+        with ESMTPSA id A08BD28E737
+From:   =?UTF-8?q?Andr=C3=A9=20Almeida?= <andrealmeid@collabora.com>
+To:     linux-block@vger.kernel.org, linux-kernel@vger.kernel.org
+Cc:     axboe@kernel.dk, kernel@collabora.com, krisman@collabora.com,
+        =?UTF-8?q?Andr=C3=A9=20Almeida?= <andrealmeid@collabora.com>
+Subject: [PATCH]        blk-mq: Document functions for sending request
+Date:   Mon, 28 Oct 2019 09:55:37 -0300
+Message-Id: <20191028125537.9047-1-andrealmeid@collabora.com>
+X-Mailer: git-send-email 2.23.0
 MIME-Version: 1.0
-In-Reply-To: <20191028104238.GA14008@ming.t460p>
-Content-Type: text/plain; charset="windows-1252"; format=flowed
-Content-Language: en-US
-Content-Transfer-Encoding: 7bit
-X-Originating-IP: [10.202.226.45]
-X-ClientProxiedBy: lhreml716-chm.china.huawei.com (10.201.108.67) To
- lhreml724-chm.china.huawei.com (10.201.108.75)
-X-CFilter-Loop: Reflected
+Content-Type: text/plain; charset=UTF-8
+Content-Transfer-Encoding: 8bit
 Sender: linux-block-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
->>
->> For the SCSI commands which timeout, I notice that
->> scsi_set_blocked(reason=SCSI_MLQUEUE_EH_RETRY) was called 30 seconds
->> earlier.
->>
->>   scsi_set_blocked+0x20/0xb8
->>   __scsi_queue_insert+0x40/0x90
->>   scsi_softirq_done+0x164/0x1c8
->>   __blk_mq_complete_request_remote+0x18/0x20
->>   flush_smp_call_function_queue+0xa8/0x150
->>   generic_smp_call_function_single_interrupt+0x10/0x18
->>   handle_IPI+0xec/0x1a8
->>   arch_cpu_idle+0x10/0x18
->>   do_idle+0x1d0/0x2b0
->>   cpu_startup_entry+0x24/0x40
->>   secondary_start_kernel+0x1b4/0x208
-> 
-> Could you investigate a bit the reason why timeout is triggered?
+Add or improve documentation for function regarding creating and sending
+IO requests to the hardware.
 
-Yeah, it does seem a strange coincidence that the SCSI command even 
-failed and we have to retry, since these should be uncommon events. I'll 
-check on this LLDD error.
+Signed-off-by: André Almeida <andrealmeid@collabora.com>
+---
+Hello,
 
-> 
-> Especially we suppose to drain all in-flight requests before the
-> last CPU of this hctx becomes offline, and it shouldn't be caused by
-> the hctx becoming dead, so still need you to confirm that all
-> in-flight requests are really drained in your test. 
+I did my best to describe all variations of *_run_hw_queue, although
+their names and functionally are really similar. I would be happy to get
+feedback about those functions descriptions.
 
-ok
+Those comments were tested with:
 
-Or is it still
-> possible to dispatch to LDD after BLK_MQ_S_INTERNAL_STOPPED is set?
+./scripts/kernel-doc -none block/blk-mq.c
 
-It shouldn't be. However it would seem that this IO had been dispatched 
-to the LLDD, the hctx dies, and then we attempt to requeue on that hctx.
-
-> 
-> In theory, it shouldn't be possible, given we drain in-flight request
-> on the last CPU of this hctx.
-> 
-> Or blk_mq_hctx_next_cpu() may still run WORK_CPU_UNBOUND schedule after
-> all CPUs are offline, could you add debug message in that branch?
-
-ok
-
-> 
->>
->> I also notice that the __scsi_queue_insert() call, above, seems to retry to
->> requeue the request on a dead rq in calling
->> __scsi_queue_insert()->blk_mq_requeue_requet()->__blk_mq_requeue_request(),
->> ***:
->>
->> [ 1185.235243] psci: CPU1 killed.
->> [ 1185.238610] blk_mq_hctx_notify_dead cpu1 dead
->> request_queue=0xffff0023ace24f60 (id=19)
->> [ 1185.246530] blk_mq_hctx_notify_dead cpu1 dead
->> request_queue=0xffff0023ace23f80 (id=17)
->> [ 1185.254443] blk_mq_hctx_notify_dead cpu1 dead
->> request_queue=0xffff0023ace22fa0 (id=15)
->> [ 1185.262356] blk_mq_hctx_notify_dead cpu1 dead
->> request_queue=0xffff0023ace21fc0 (id=13)***
->> [ 1185.270271] blk_mq_hctx_notify_dead cpu1 dead
->> request_queue=0xffff0023ace20fe0 (id=11)
->> [ 1185.939451] scsi_softirq_done NEEDS_RETRY rq=0xffff0023b7416000
->> [ 1185.945359] scsi_set_blocked reason=0x1057
->> [ 1185.949444] __blk_mq_requeue_request request_queue=0xffff0023ace21fc0
->> id=13 rq=0xffff0023b7416000***
->>
->> [...]
->>
->> [ 1214.903455] scsi_timeout req=0xffff0023add29000 reserved=0
->> [ 1214.908946] scsi_timeout req=0xffff0023add29300 reserved=0
->> [ 1214.914424] scsi_timeout req=0xffff0023add29600 reserved=0
->> [ 1214.919909] scsi_timeout req=0xffff0023add29900 reserved=0
->>
->> I guess that we're retrying as the SCSI failed in the LLDD for some reason.
->>
->> So could this be the problem - we're attempting to requeue on a dead request
->> queue?
-> 
-> If there are any in-flight requests originated from hctx which is going
-> to become dead, they should have been drained before CPU becomes offline.
-
-Sure, but we seem to hit a corner case here...
+Which did not returned any warning or error.
 
 Thanks,
-John
+	André
+---
+ block/blk-mq.c | 79 ++++++++++++++++++++++++++++++++++++++++++++++++--
+ 1 file changed, 77 insertions(+), 2 deletions(-)
 
-> 
-> Thanks,
-> Ming
-> 
-> .
-> 
+diff --git a/block/blk-mq.c b/block/blk-mq.c
+index 1e067b78ab97..89f3c166180d 100644
+--- a/block/blk-mq.c
++++ b/block/blk-mq.c
+@@ -1333,6 +1333,12 @@ bool blk_mq_dispatch_rq_list(struct request_queue *q, struct list_head *list,
+ 	return (queued + errors) != 0;
+ }
+ 
++/**
++ * __blk_mq_run_hw_queue - Run a hardware queue.
++ * @hctx: Pointer to the hardware queue to run.
++ *
++ * Send pending requests to the hardware.
++ */
+ static void __blk_mq_run_hw_queue(struct blk_mq_hw_ctx *hctx)
+ {
+ 	int srcu_idx;
+@@ -1430,6 +1436,15 @@ static int blk_mq_hctx_next_cpu(struct blk_mq_hw_ctx *hctx)
+ 	return next_cpu;
+ }
+ 
++/**
++ * __blk_mq_delay_run_hw_queue - Run (or schedule to run) a hardware queue.
++ * @hctx: Pointer to the hardware queue to run.
++ * @async: If we want to run the queue asynchronously.
++ * @msecs: Microseconds of delay to wait before running the queue.
++ *
++ * If !@async, try to run the queue now. Else, run the queue asynchronously and
++ * with a delay of @msecs.
++ */
+ static void __blk_mq_delay_run_hw_queue(struct blk_mq_hw_ctx *hctx, bool async,
+ 					unsigned long msecs)
+ {
+@@ -1451,12 +1466,30 @@ static void __blk_mq_delay_run_hw_queue(struct blk_mq_hw_ctx *hctx, bool async,
+ 				    msecs_to_jiffies(msecs));
+ }
+ 
++/**
++ * blk_mq_delay_run_hw_queue - Run a hardware queue asynchronously.
++ * @hctx: Pointer to the hardware queue to run.
++ * @msecs: Microseconds of delay to wait before running the queue.
++ *
++ * Run a hardware queue asynchronously with a delay of @msecs.
++ */
+ void blk_mq_delay_run_hw_queue(struct blk_mq_hw_ctx *hctx, unsigned long msecs)
+ {
+ 	__blk_mq_delay_run_hw_queue(hctx, true, msecs);
+ }
+ EXPORT_SYMBOL(blk_mq_delay_run_hw_queue);
+ 
++/**
++ * blk_mq_run_hw_queue - Start to run a hardware queue.
++ * @hctx: Pointer to the hardware queue to run.
++ * @async: If we want to run the queue asynchronously.
++ *
++ * Check if the request queue is not in a quiesced state and if there are
++ * pending requests to be sent. If this is true, run the queue to send requests
++ * to hardware.
++ *
++ * Returns: True if we could run the queue, else otherwise.
++ */
+ bool blk_mq_run_hw_queue(struct blk_mq_hw_ctx *hctx, bool async)
+ {
+ 	int srcu_idx;
+@@ -1484,6 +1517,11 @@ bool blk_mq_run_hw_queue(struct blk_mq_hw_ctx *hctx, bool async)
+ }
+ EXPORT_SYMBOL(blk_mq_run_hw_queue);
+ 
++/**
++ * blk_mq_run_hw_queue - Run all hardware queues in a request queue.
++ * @q: Pointer to the request queue to run.
++ * @async: If we want to run the queue asynchronously.
++ */
+ void blk_mq_run_hw_queues(struct request_queue *q, bool async)
+ {
+ 	struct blk_mq_hw_ctx *hctx;
+@@ -1635,7 +1673,11 @@ void __blk_mq_insert_request(struct blk_mq_hw_ctx *hctx, struct request *rq,
+ 	blk_mq_hctx_mark_pending(hctx, ctx);
+ }
+ 
+-/*
++/**
++ * blk_mq_request_bypass_insert - Insert a request at dispatch list.
++ * @rq: Pointer to request to be inserted.
++ * @run_queue: If we should run the hardware queue after inserting the request.
++ *
+  * Should only be used carefully, when the caller knows we want to
+  * bypass a potential IO scheduler on the target device.
+  */
+@@ -1838,6 +1880,17 @@ static blk_status_t __blk_mq_try_issue_directly(struct blk_mq_hw_ctx *hctx,
+ 	return BLK_STS_OK;
+ }
+ 
++/**
++ * blk_mq_try_issue_directly - Try to send a request directly to device driver.
++ * @hctx: Pointer of the associated hardware queue.
++ * @rq: Pointer to request to be sent.
++ * @cookie: Request queue cookie.
++ *
++ * If the device has enough resources to accept a new request now, send the
++ * request directly to device driver. Else, insert at hctx->dispatch queue, so
++ * we can try send it another time in the future. Requests inserted at this
++ * queue have higher priority.
++ */
+ static void blk_mq_try_issue_directly(struct blk_mq_hw_ctx *hctx,
+ 		struct request *rq, blk_qc_t *cookie)
+ {
+@@ -1915,6 +1968,22 @@ static void blk_add_rq_to_plug(struct blk_plug *plug, struct request *rq)
+ 	}
+ }
+ 
++/**
++ * blk_mq_make_request - Create and send a request to block device.
++ * @q: Request queue pointer.
++ * @bio: Bio pointer.
++ *
++ * Builds up a request structure from @q and @bio and send to the device. The
++ * request may not be queued directly to hardware if:
++ * * This request can be merged with another one
++ * * We want to place request at plug queue for possible future merging
++ * * There is an IO scheduler active at this queue
++ *
++ * It will not queue the request if there is an error with the bio, or at the
++ * request creation.
++ *
++ * Returns: Request queue cookie.
++ */
+ static blk_qc_t blk_mq_make_request(struct request_queue *q, struct bio *bio)
+ {
+ 	const int is_sync = op_is_sync(bio->bi_opf);
+@@ -1960,7 +2029,7 @@ static blk_qc_t blk_mq_make_request(struct request_queue *q, struct bio *bio)
+ 
+ 	plug = blk_mq_plug(q, bio);
+ 	if (unlikely(is_flush_fua)) {
+-		/* bypass scheduler for flush rq */
++		/* Bypass scheduler for flush requests */
+ 		blk_insert_flush(rq);
+ 		blk_mq_run_hw_queue(data.hctx, true);
+ 	} else if (plug && (q->nr_hw_queues == 1 || q->mq_ops->commit_rqs ||
+@@ -1988,6 +2057,7 @@ static blk_qc_t blk_mq_make_request(struct request_queue *q, struct bio *bio)
+ 
+ 		blk_add_rq_to_plug(plug, rq);
+ 	} else if (q->elevator) {
++		/* Insert the request at the IO scheduler queue */
+ 		blk_mq_sched_insert_request(rq, false, true, true);
+ 	} else if (plug && !blk_queue_nomerges(q)) {
+ 		/*
+@@ -2014,8 +2084,13 @@ static blk_qc_t blk_mq_make_request(struct request_queue *q, struct bio *bio)
+ 		}
+ 	} else if ((q->nr_hw_queues > 1 && is_sync) ||
+ 			!data.hctx->dispatch_busy) {
++		/*
++		 * There is no scheduler and we can try to send directly
++		 * to the hardware.
++		 */
+ 		blk_mq_try_issue_directly(data.hctx, rq, &cookie);
+ 	} else {
++		/* Default case. */
+ 		blk_mq_sched_insert_request(rq, false, true, true);
+ 	}
+ 
+-- 
+2.23.0
 
