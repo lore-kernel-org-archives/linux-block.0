@@ -2,227 +2,228 @@ Return-Path: <SRS0=tc1V=YV=vger.kernel.org=linux-block-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-9.7 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
-	INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,
-	UNPARSEABLE_RELAY,USER_AGENT_GIT autolearn=ham autolearn_force=no
-	version=3.4.0
+X-Spam-Status: No, score=-10.2 required=3.0 tests=DKIM_SIGNED,DKIM_VALID,
+	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,
+	MENTIONS_GIT_HOSTING,SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED,USER_AGENT_SANE_1
+	autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 4740ECA9EC0
-	for <linux-block@archiver.kernel.org>; Mon, 28 Oct 2019 12:57:10 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 83DC5CA9EC0
+	for <linux-block@archiver.kernel.org>; Mon, 28 Oct 2019 14:10:02 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.kernel.org (Postfix) with ESMTP id 0D72F21734
-	for <linux-block@archiver.kernel.org>; Mon, 28 Oct 2019 12:57:10 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id 4568320659
+	for <linux-block@archiver.kernel.org>; Mon, 28 Oct 2019 14:10:02 +0000 (UTC)
+Authentication-Results: mail.kernel.org;
+	dkim=pass (2048-bit key) header.d=kernel-dk.20150623.gappssmtp.com header.i=@kernel-dk.20150623.gappssmtp.com header.b="mLTX2WFg"
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1729174AbfJ1M5J (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Mon, 28 Oct 2019 08:57:09 -0400
-Received: from bhuna.collabora.co.uk ([46.235.227.227]:36688 "EHLO
-        bhuna.collabora.co.uk" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1728269AbfJ1M5H (ORCPT
+        id S1728568AbfJ1OKB (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Mon, 28 Oct 2019 10:10:01 -0400
+Received: from mail-il1-f193.google.com ([209.85.166.193]:46221 "EHLO
+        mail-il1-f193.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S1728383AbfJ1OKB (ORCPT
         <rfc822;linux-block@vger.kernel.org>);
-        Mon, 28 Oct 2019 08:57:07 -0400
-Received: from [127.0.0.1] (localhost [127.0.0.1])
-        (Authenticated sender: tonyk)
-        with ESMTPSA id A08BD28E737
-From:   =?UTF-8?q?Andr=C3=A9=20Almeida?= <andrealmeid@collabora.com>
-To:     linux-block@vger.kernel.org, linux-kernel@vger.kernel.org
-Cc:     axboe@kernel.dk, kernel@collabora.com, krisman@collabora.com,
-        =?UTF-8?q?Andr=C3=A9=20Almeida?= <andrealmeid@collabora.com>
-Subject: [PATCH]        blk-mq: Document functions for sending request
-Date:   Mon, 28 Oct 2019 09:55:37 -0300
-Message-Id: <20191028125537.9047-1-andrealmeid@collabora.com>
-X-Mailer: git-send-email 2.23.0
+        Mon, 28 Oct 2019 10:10:01 -0400
+Received: by mail-il1-f193.google.com with SMTP id m16so8259023iln.13
+        for <linux-block@vger.kernel.org>; Mon, 28 Oct 2019 07:10:00 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=kernel-dk.20150623.gappssmtp.com; s=20150623;
+        h=subject:to:references:from:message-id:date:user-agent:mime-version
+         :in-reply-to:content-language:content-transfer-encoding;
+        bh=kr5iIONmkKZJVxLZgVwCjkI7onir+j8sN/xM4cByuJ0=;
+        b=mLTX2WFgA3I8a4rG062yWLJFpkzXdtX2gl/+Cb+bSgNW+lePV51gEXQtkrnw83Kfky
+         Jci05OF2/yaVajJIiQXDf2mTYMJSOv4cENARR2PvUwQgacfZwSUpf7bBWx/SOPe0851f
+         OQZStjptb461wFrqPT+uLfuMmCrdHA4cZH0TnuMY1rOHXx4Oi6PW/22u0Mxfpk2Tsl0w
+         Ks1UmMSEDqFSm9pUXJzGgh4TYzR6CHLaUI2oFeXYq3XwyYEXHpcSwrX0uD2Ygvnxwk/j
+         GHw/xsarhG+WIsBH3wrs455v06+BV6JZo3h14P4dgnW1HrYp+0qAy6F+8QRkdDq+e/KZ
+         VDmQ==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20161025;
+        h=x-gm-message-state:subject:to:references:from:message-id:date
+         :user-agent:mime-version:in-reply-to:content-language
+         :content-transfer-encoding;
+        bh=kr5iIONmkKZJVxLZgVwCjkI7onir+j8sN/xM4cByuJ0=;
+        b=SuDd2yvK2/a6Ld8i6JJKwO7QvoelZe5geSEVBSpyYbpu8EGRGCIDD3uOVpKJeVg58J
+         Opnrw6Hg3cPyKqvUB2O6olYzueGqiISz6VZz8KVQS72c7RZB0sIWLiu0sggr4bv8SGM8
+         EH16ElS7kF9dnVrrI8JzNNV35VgiIgYdewCsP84bVjWxLisCNGxri7DvtvJY5g0LL8Ke
+         lqE/1lqtfqXUl6qcSsBQ2zE/kRG9QWfFY9MKcw9EVprsvfwaEIZHQrEd72hNYlmJ7nE3
+         iXfYuHN4Ktfxzw5A8fbjn+L/1niXoa+vdzX8fnlbk/MEm9oVcSurNHzuZAALDoAAze8b
+         ypdQ==
+X-Gm-Message-State: APjAAAXMFUaQRy0mytyiDilu5NrJI8BGpNizWN1XxTXHbpQOjV+vAxuq
+        wZF6zRDNjR4lwsthbSe5g+VEbg==
+X-Google-Smtp-Source: APXvYqyu2qmdiR4OZs+ChJ3ToBacy+uLfEdYJlGXR8GYIvKhPgHoVVNo6nCm3lSS7AjYt83yv3RrLA==
+X-Received: by 2002:a92:d643:: with SMTP id x3mr20836934ilp.203.1572271800046;
+        Mon, 28 Oct 2019 07:10:00 -0700 (PDT)
+Received: from [192.168.1.159] ([65.144.74.34])
+        by smtp.gmail.com with ESMTPSA id n3sm1660456ilm.8.2019.10.28.07.09.57
+        (version=TLS1_2 cipher=ECDHE-RSA-AES128-GCM-SHA256 bits=128/128);
+        Mon, 28 Oct 2019 07:09:58 -0700 (PDT)
+Subject: Re: KASAN: use-after-free Read in io_uring_setup
+To:     syzbot <syzbot+6f03d895a6cd0d06187f@syzkaller.appspotmail.com>,
+        linux-block@vger.kernel.org, linux-fsdevel@vger.kernel.org,
+        linux-kernel@vger.kernel.org, syzkaller-bugs@googlegroups.com,
+        viro@zeniv.linux.org.uk
+References: <0000000000007c4f500595f35bf4@google.com>
+From:   Jens Axboe <axboe@kernel.dk>
+Message-ID: <883b3cf9-1d92-a22f-e946-0936d09d36c0@kernel.dk>
+Date:   Mon, 28 Oct 2019 08:09:57 -0600
+User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:60.0) Gecko/20100101
+ Thunderbird/60.9.0
 MIME-Version: 1.0
-Content-Type: text/plain; charset=UTF-8
-Content-Transfer-Encoding: 8bit
+In-Reply-To: <0000000000007c4f500595f35bf4@google.com>
+Content-Type: text/plain; charset=utf-8
+Content-Language: en-US
+Content-Transfer-Encoding: 7bit
 Sender: linux-block-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-Add or improve documentation for function regarding creating and sending
-IO requests to the hardware.
+On 10/28/19 1:22 AM, syzbot wrote:
+> Hello,
+> 
+> syzbot found the following crash on:
+> 
+> HEAD commit:    5a1e843c Merge tag 'mips_fixes_5.4_3' of git://git.kernel...
+> git tree:       upstream
+> console output: https://syzkaller.appspot.com/x/log.txt?x=10e2001f600000
+> kernel config:  https://syzkaller.appspot.com/x/.config?x=420126a10fdda0f1
+> dashboard link: https://syzkaller.appspot.com/bug?extid=6f03d895a6cd0d06187f
+> compiler:       gcc (GCC) 9.0.0 20181231 (experimental)
+> syz repro:      https://syzkaller.appspot.com/x/repro.syz?x=11d4fa97600000
+> 
+> IMPORTANT: if you fix the bug, please add the following tag to the commit:
+> Reported-by: syzbot+6f03d895a6cd0d06187f@syzkaller.appspotmail.com
+> 
+> ==================================================================
+> BUG: KASAN: use-after-free in io_uring_create fs/io_uring.c:3842 [inline]
+> BUG: KASAN: use-after-free in io_uring_setup+0x1877/0x18c0
+> fs/io_uring.c:3881
+> Read of size 8 at addr ffff888082284048 by task syz-executor.5/11342
+> 
+> CPU: 1 PID: 11342 Comm: syz-executor.5 Not tainted 5.4.0-rc4+ #0
+> Hardware name: Google Google Compute Engine/Google Compute Engine, BIOS
+> Google 01/01/2011
+> Call Trace:
+>    __dump_stack lib/dump_stack.c:77 [inline]
+>    dump_stack+0x172/0x1f0 lib/dump_stack.c:113
+>    print_address_description.constprop.0.cold+0xd4/0x30b mm/kasan/report.c:374
+>    __kasan_report.cold+0x1b/0x41 mm/kasan/report.c:506
+>    kasan_report+0x12/0x20 mm/kasan/common.c:634
+>    __asan_report_load8_noabort+0x14/0x20 mm/kasan/generic_report.c:132
+>    io_uring_create fs/io_uring.c:3842 [inline]
+>    io_uring_setup+0x1877/0x18c0 fs/io_uring.c:3881
+>    __do_sys_io_uring_setup fs/io_uring.c:3894 [inline]
+>    __se_sys_io_uring_setup fs/io_uring.c:3891 [inline]
+>    __x64_sys_io_uring_setup+0x54/0x80 fs/io_uring.c:3891
+>    do_syscall_64+0xfa/0x760 arch/x86/entry/common.c:290
+>    entry_SYSCALL_64_after_hwframe+0x49/0xbe
+> RIP: 0033:0x459f39
+> Code: ad b6 fb ff c3 66 2e 0f 1f 84 00 00 00 00 00 66 90 48 89 f8 48 89 f7
+> 48 89 d6 48 89 ca 4d 89 c2 4d 89 c8 4c 8b 4c 24 08 0f 05 <48> 3d 01 f0 ff
+> ff 0f 83 7b b6 fb ff c3 66 2e 0f 1f 84 00 00 00 00
+> RSP: 002b:00007f313e126c78 EFLAGS: 00000246 ORIG_RAX: 00000000000001a9
+> RAX: ffffffffffffffda RBX: 0000000000000002 RCX: 0000000000459f39
+> RDX: 0000000000000000 RSI: 00000000200005c0 RDI: 000000040000000e
+> RBP: 000000000075bf20 R08: 0000000000000000 R09: 0000000000000000
+> R10: 0000000000000000 R11: 0000000000000246 R12: 00007f313e1276d4
+> R13: 00000000004c1512 R14: 00000000004d4da8 R15: 00000000ffffffff
+> 
+> Allocated by task 11342:
+>    save_stack+0x23/0x90 mm/kasan/common.c:69
+>    set_track mm/kasan/common.c:77 [inline]
+>    __kasan_kmalloc mm/kasan/common.c:510 [inline]
+>    __kasan_kmalloc.constprop.0+0xcf/0xe0 mm/kasan/common.c:483
+>    kasan_kmalloc+0x9/0x10 mm/kasan/common.c:524
+>    kmem_cache_alloc_trace+0x158/0x790 mm/slab.c:3550
+>    kmalloc include/linux/slab.h:556 [inline]
+>    kzalloc include/linux/slab.h:690 [inline]
+>    io_ring_ctx_alloc fs/io_uring.c:393 [inline]
+>    io_uring_create fs/io_uring.c:3811 [inline]
+>    io_uring_setup+0xec6/0x18c0 fs/io_uring.c:3881
+>    __do_sys_io_uring_setup fs/io_uring.c:3894 [inline]
+>    __se_sys_io_uring_setup fs/io_uring.c:3891 [inline]
+>    __x64_sys_io_uring_setup+0x54/0x80 fs/io_uring.c:3891
+>    do_syscall_64+0xfa/0x760 arch/x86/entry/common.c:290
+>    entry_SYSCALL_64_after_hwframe+0x49/0xbe
+> 
+> Freed by task 11335:
+>    save_stack+0x23/0x90 mm/kasan/common.c:69
+>    set_track mm/kasan/common.c:77 [inline]
+>    kasan_set_free_info mm/kasan/common.c:332 [inline]
+>    __kasan_slab_free+0x102/0x150 mm/kasan/common.c:471
+>    kasan_slab_free+0xe/0x10 mm/kasan/common.c:480
+>    __cache_free mm/slab.c:3425 [inline]
+>    kfree+0x10a/0x2c0 mm/slab.c:3756
+>    io_ring_ctx_free fs/io_uring.c:3552 [inline]
+>    io_ring_ctx_wait_and_kill+0x4d7/0x6c0 fs/io_uring.c:3592
+>    io_uring_release+0x42/0x50 fs/io_uring.c:3600
+>    __fput+0x2ff/0x890 fs/file_table.c:280
+>    ____fput+0x16/0x20 fs/file_table.c:313
+>    task_work_run+0x145/0x1c0 kernel/task_work.c:113
+>    tracehook_notify_resume include/linux/tracehook.h:188 [inline]
+>    exit_to_usermode_loop+0x316/0x380 arch/x86/entry/common.c:163
+>    prepare_exit_to_usermode arch/x86/entry/common.c:194 [inline]
+>    syscall_return_slowpath arch/x86/entry/common.c:274 [inline]
+>    do_syscall_64+0x65f/0x760 arch/x86/entry/common.c:300
+>    entry_SYSCALL_64_after_hwframe+0x49/0xbe
+> 
+> The buggy address belongs to the object at ffff888082284000
+>    which belongs to the cache kmalloc-2k of size 2048
+> The buggy address is located 72 bytes inside of
+>    2048-byte region [ffff888082284000, ffff888082284800)
+> The buggy address belongs to the page:
+> page:ffffea000208a100 refcount:1 mapcount:0 mapping:ffff8880aa400e00
+> index:0x0
+> flags: 0x1fffc0000000200(slab)
+> raw: 01fffc0000000200 ffffea0002a1bc88 ffffea00023fa248 ffff8880aa400e00
+> raw: 0000000000000000 ffff888082284000 0000000100000001 0000000000000000
+> page dumped because: kasan: bad access detected
+> 
+> Memory state around the buggy address:
+>    ffff888082283f00: fc fc fc fc fc fc fc fc fc fc fc fc fc fc fc fc
+>    ffff888082283f80: fc fc fc fc fc fc fc fc fc fc fc fc fc fc fc fc
+>> ffff888082284000: fb fb fb fb fb fb fb fb fb fb fb fb fb fb fb fb
+>                                                 ^
+>    ffff888082284080: fb fb fb fb fb fb fb fb fb fb fb fb fb fb fb fb
+>    ffff888082284100: fb fb fb fb fb fb fb fb fb fb fb fb fb fb fb fb
+> ==================================================================
 
-Signed-off-by: André Almeida <andrealmeid@collabora.com>
----
-Hello,
+Interesting, looks like a malicious case that attempts to close the
+fd as soon as it's installed. As a result of that, the rest of the
+setup will be done on a ring that's already torn down. The below should
+fix that.
 
-I did my best to describe all variations of *_run_hw_queue, although
-their names and functionally are really similar. I would be happy to get
-feedback about those functions descriptions.
+Totally untested, haven't tried the reproducer yet.
 
-Those comments were tested with:
 
-./scripts/kernel-doc -none block/blk-mq.c
+diff --git a/fs/io_uring.c b/fs/io_uring.c
+index ba1431046c98..749637ca9cf7 100644
+--- a/fs/io_uring.c
++++ b/fs/io_uring.c
+@@ -3821,6 +3821,12 @@ static int io_uring_create(unsigned entries, struct io_uring_params *p)
+ 	ctx->account_mem = account_mem;
+ 	ctx->user = user;
+ 
++	/*
++	 * Grab an initial reference to the ctx, so we ensure we have one
++	 * by the time the fd is installed.
++	 */
++	percpu_ref_get(&ctx->refs);
++
+ 	ret = io_allocate_scq_urings(ctx, p);
+ 	if (ret)
+ 		goto err;
+@@ -3851,8 +3857,10 @@ static int io_uring_create(unsigned entries, struct io_uring_params *p)
+ 	p->cq_off.cqes = offsetof(struct io_rings, cqes);
+ 
+ 	p->features = IORING_FEAT_SINGLE_MMAP;
++	percpu_ref_put(&ctx->refs);
+ 	return ret;
+ err:
++	percpu_ref_put(&ctx->refs);
+ 	io_ring_ctx_wait_and_kill(ctx);
+ 	return ret;
+ }
 
-Which did not returned any warning or error.
-
-Thanks,
-	André
----
- block/blk-mq.c | 79 ++++++++++++++++++++++++++++++++++++++++++++++++--
- 1 file changed, 77 insertions(+), 2 deletions(-)
-
-diff --git a/block/blk-mq.c b/block/blk-mq.c
-index 1e067b78ab97..89f3c166180d 100644
---- a/block/blk-mq.c
-+++ b/block/blk-mq.c
-@@ -1333,6 +1333,12 @@ bool blk_mq_dispatch_rq_list(struct request_queue *q, struct list_head *list,
- 	return (queued + errors) != 0;
- }
- 
-+/**
-+ * __blk_mq_run_hw_queue - Run a hardware queue.
-+ * @hctx: Pointer to the hardware queue to run.
-+ *
-+ * Send pending requests to the hardware.
-+ */
- static void __blk_mq_run_hw_queue(struct blk_mq_hw_ctx *hctx)
- {
- 	int srcu_idx;
-@@ -1430,6 +1436,15 @@ static int blk_mq_hctx_next_cpu(struct blk_mq_hw_ctx *hctx)
- 	return next_cpu;
- }
- 
-+/**
-+ * __blk_mq_delay_run_hw_queue - Run (or schedule to run) a hardware queue.
-+ * @hctx: Pointer to the hardware queue to run.
-+ * @async: If we want to run the queue asynchronously.
-+ * @msecs: Microseconds of delay to wait before running the queue.
-+ *
-+ * If !@async, try to run the queue now. Else, run the queue asynchronously and
-+ * with a delay of @msecs.
-+ */
- static void __blk_mq_delay_run_hw_queue(struct blk_mq_hw_ctx *hctx, bool async,
- 					unsigned long msecs)
- {
-@@ -1451,12 +1466,30 @@ static void __blk_mq_delay_run_hw_queue(struct blk_mq_hw_ctx *hctx, bool async,
- 				    msecs_to_jiffies(msecs));
- }
- 
-+/**
-+ * blk_mq_delay_run_hw_queue - Run a hardware queue asynchronously.
-+ * @hctx: Pointer to the hardware queue to run.
-+ * @msecs: Microseconds of delay to wait before running the queue.
-+ *
-+ * Run a hardware queue asynchronously with a delay of @msecs.
-+ */
- void blk_mq_delay_run_hw_queue(struct blk_mq_hw_ctx *hctx, unsigned long msecs)
- {
- 	__blk_mq_delay_run_hw_queue(hctx, true, msecs);
- }
- EXPORT_SYMBOL(blk_mq_delay_run_hw_queue);
- 
-+/**
-+ * blk_mq_run_hw_queue - Start to run a hardware queue.
-+ * @hctx: Pointer to the hardware queue to run.
-+ * @async: If we want to run the queue asynchronously.
-+ *
-+ * Check if the request queue is not in a quiesced state and if there are
-+ * pending requests to be sent. If this is true, run the queue to send requests
-+ * to hardware.
-+ *
-+ * Returns: True if we could run the queue, else otherwise.
-+ */
- bool blk_mq_run_hw_queue(struct blk_mq_hw_ctx *hctx, bool async)
- {
- 	int srcu_idx;
-@@ -1484,6 +1517,11 @@ bool blk_mq_run_hw_queue(struct blk_mq_hw_ctx *hctx, bool async)
- }
- EXPORT_SYMBOL(blk_mq_run_hw_queue);
- 
-+/**
-+ * blk_mq_run_hw_queue - Run all hardware queues in a request queue.
-+ * @q: Pointer to the request queue to run.
-+ * @async: If we want to run the queue asynchronously.
-+ */
- void blk_mq_run_hw_queues(struct request_queue *q, bool async)
- {
- 	struct blk_mq_hw_ctx *hctx;
-@@ -1635,7 +1673,11 @@ void __blk_mq_insert_request(struct blk_mq_hw_ctx *hctx, struct request *rq,
- 	blk_mq_hctx_mark_pending(hctx, ctx);
- }
- 
--/*
-+/**
-+ * blk_mq_request_bypass_insert - Insert a request at dispatch list.
-+ * @rq: Pointer to request to be inserted.
-+ * @run_queue: If we should run the hardware queue after inserting the request.
-+ *
-  * Should only be used carefully, when the caller knows we want to
-  * bypass a potential IO scheduler on the target device.
-  */
-@@ -1838,6 +1880,17 @@ static blk_status_t __blk_mq_try_issue_directly(struct blk_mq_hw_ctx *hctx,
- 	return BLK_STS_OK;
- }
- 
-+/**
-+ * blk_mq_try_issue_directly - Try to send a request directly to device driver.
-+ * @hctx: Pointer of the associated hardware queue.
-+ * @rq: Pointer to request to be sent.
-+ * @cookie: Request queue cookie.
-+ *
-+ * If the device has enough resources to accept a new request now, send the
-+ * request directly to device driver. Else, insert at hctx->dispatch queue, so
-+ * we can try send it another time in the future. Requests inserted at this
-+ * queue have higher priority.
-+ */
- static void blk_mq_try_issue_directly(struct blk_mq_hw_ctx *hctx,
- 		struct request *rq, blk_qc_t *cookie)
- {
-@@ -1915,6 +1968,22 @@ static void blk_add_rq_to_plug(struct blk_plug *plug, struct request *rq)
- 	}
- }
- 
-+/**
-+ * blk_mq_make_request - Create and send a request to block device.
-+ * @q: Request queue pointer.
-+ * @bio: Bio pointer.
-+ *
-+ * Builds up a request structure from @q and @bio and send to the device. The
-+ * request may not be queued directly to hardware if:
-+ * * This request can be merged with another one
-+ * * We want to place request at plug queue for possible future merging
-+ * * There is an IO scheduler active at this queue
-+ *
-+ * It will not queue the request if there is an error with the bio, or at the
-+ * request creation.
-+ *
-+ * Returns: Request queue cookie.
-+ */
- static blk_qc_t blk_mq_make_request(struct request_queue *q, struct bio *bio)
- {
- 	const int is_sync = op_is_sync(bio->bi_opf);
-@@ -1960,7 +2029,7 @@ static blk_qc_t blk_mq_make_request(struct request_queue *q, struct bio *bio)
- 
- 	plug = blk_mq_plug(q, bio);
- 	if (unlikely(is_flush_fua)) {
--		/* bypass scheduler for flush rq */
-+		/* Bypass scheduler for flush requests */
- 		blk_insert_flush(rq);
- 		blk_mq_run_hw_queue(data.hctx, true);
- 	} else if (plug && (q->nr_hw_queues == 1 || q->mq_ops->commit_rqs ||
-@@ -1988,6 +2057,7 @@ static blk_qc_t blk_mq_make_request(struct request_queue *q, struct bio *bio)
- 
- 		blk_add_rq_to_plug(plug, rq);
- 	} else if (q->elevator) {
-+		/* Insert the request at the IO scheduler queue */
- 		blk_mq_sched_insert_request(rq, false, true, true);
- 	} else if (plug && !blk_queue_nomerges(q)) {
- 		/*
-@@ -2014,8 +2084,13 @@ static blk_qc_t blk_mq_make_request(struct request_queue *q, struct bio *bio)
- 		}
- 	} else if ((q->nr_hw_queues > 1 && is_sync) ||
- 			!data.hctx->dispatch_busy) {
-+		/*
-+		 * There is no scheduler and we can try to send directly
-+		 * to the hardware.
-+		 */
- 		blk_mq_try_issue_directly(data.hctx, rq, &cookie);
- 	} else {
-+		/* Default case. */
- 		blk_mq_sched_insert_request(rq, false, true, true);
- 	}
- 
 -- 
-2.23.0
+Jens Axboe
 
