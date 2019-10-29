@@ -7,63 +7,69 @@ X-Spam-Status: No, score=-8.2 required=3.0 tests=DKIM_SIGNED,DKIM_VALID,
 	SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED,USER_AGENT_SANE_1 autolearn=ham
 	autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 84ABBCA9EAE
-	for <linux-block@archiver.kernel.org>; Tue, 29 Oct 2019 15:21:17 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 5728ACA9EAE
+	for <linux-block@archiver.kernel.org>; Tue, 29 Oct 2019 16:11:05 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.kernel.org (Postfix) with ESMTP id 4E2D3208E3
-	for <linux-block@archiver.kernel.org>; Tue, 29 Oct 2019 15:21:17 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id 2828821479
+	for <linux-block@archiver.kernel.org>; Tue, 29 Oct 2019 16:11:05 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel-dk.20150623.gappssmtp.com header.i=@kernel-dk.20150623.gappssmtp.com header.b="Mqf32fuD"
+	dkim=pass (2048-bit key) header.d=kernel-dk.20150623.gappssmtp.com header.i=@kernel-dk.20150623.gappssmtp.com header.b="wedfLyUo"
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S2389855AbfJ2PVQ (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Tue, 29 Oct 2019 11:21:16 -0400
-Received: from mail-io1-f66.google.com ([209.85.166.66]:38650 "EHLO
-        mail-io1-f66.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S2389299AbfJ2PVQ (ORCPT
+        id S2390363AbfJ2QLE (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Tue, 29 Oct 2019 12:11:04 -0400
+Received: from mail-io1-f65.google.com ([209.85.166.65]:37840 "EHLO
+        mail-io1-f65.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S2390313AbfJ2QLE (ORCPT
         <rfc822;linux-block@vger.kernel.org>);
-        Tue, 29 Oct 2019 11:21:16 -0400
-Received: by mail-io1-f66.google.com with SMTP id u8so15190828iom.5
-        for <linux-block@vger.kernel.org>; Tue, 29 Oct 2019 08:21:14 -0700 (PDT)
+        Tue, 29 Oct 2019 12:11:04 -0400
+Received: by mail-io1-f65.google.com with SMTP id 1so15399758iou.4
+        for <linux-block@vger.kernel.org>; Tue, 29 Oct 2019 09:11:03 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=kernel-dk.20150623.gappssmtp.com; s=20150623;
-        h=to:from:subject:message-id:date:user-agent:mime-version
-         :content-language:content-transfer-encoding;
-        bh=CIZByL7lenjCCuEF28p3teDdPSwZ8iJ4i512Itw9fgU=;
-        b=Mqf32fuDuDB9QwUU6iNUNk/unuSvOIKRAT2iplWgsRGQQiU0AP3DWC5rPEVZUpLNko
-         S0eiu5d2JSWvJgL3yK2DrRZhq6pXQNsy9gZgyYukfgLzwz9lfeYg5CjUo59v1el7ykhk
-         AhOKEE8VKsViSBA/9e0yH41snEjCQo9SCB5FoVdMX7wONClA5gqyZxVVdysVL4n1mC6h
-         Z6b4X3DH2BR789ilqYhFnkiAWw6aR7sYOmMqJavsEjEL+lOS+eqwRiL3h8o1Nz83FJMw
-         8y0dShX/+kFWdBw/J/Tydm2xNwph4xSnsUXMRF1qYRajepnLVLjzjzL2XjCYoEG5Ug+d
-         z00A==
+        h=subject:to:cc:references:from:message-id:date:user-agent
+         :mime-version:in-reply-to:content-language:content-transfer-encoding;
+        bh=F6ER53BgOcOjbbASqksGEOGLpbaFeVJy95CCofNvLlk=;
+        b=wedfLyUog88ghsfUG9ng4sLf1z/0VkWmVqCXwEabMblSAUIbJwdmrGPd7Ankmm1wJ2
+         MRaQY7cEyNQ704VjmmdbgVmcgQedQhFQa1iQjkdzFwl4co5Q/5AzIzh1iLGjmaU1opiI
+         QB9H3VXcCBtKOp0CP1xKiGhav1LWQ1KEEjHvhD9cLz1qqdZG4BqEOlKf++lL2LFE0ln4
+         XqILHG9eF2S4lJ7wId87UW2m8VCZ3s7J5lcQ9QFnXb+xTdDSr+2RZwKboyKFa1xUjPy6
+         BMeZi37D7mmnlqjCLFCuj3fHmkEY9ZeTWFtK2l4tHi4+81RlDOiV4b+Pr19sXKGJowcZ
+         xALw==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=1e100.net; s=20161025;
-        h=x-gm-message-state:to:from:subject:message-id:date:user-agent
-         :mime-version:content-language:content-transfer-encoding;
-        bh=CIZByL7lenjCCuEF28p3teDdPSwZ8iJ4i512Itw9fgU=;
-        b=d5kHLah9AtfBkNQAXLz/GT9wn2LFsUzDjeEhfjGjLTsVflt/Zm+kJ2Z+uz2IBN2YBd
-         o1WVCWuPH/99w+hTh4eYmXTfXuWahhrcNSRlwEeYy5o7/BFKXU9OSoKSD5aVC6x6gj5i
-         lGeOVu5dSPlIjwXMfvOCyRuCOuh3KOoArbmQiUuvzl1jGH5xhVbICZsZfAe/4sf6o0fY
-         RyEWYxO5GlYEOpfXhai5mrrFJ0y1kzOLDcvRGh6KJHEGriYrCs+XGxJbYrlhd8BUfaP+
-         TTeP5NLi8pfpBpASdB5xFD6sAcXLufgcCcz39va7b+9ViUJ6RpMyXYjDjOL19J5TTdYm
-         CPOQ==
-X-Gm-Message-State: APjAAAU3/KrEJzN2xh/MVVC/+lXTVsvBsPaQI2CnDAc6sssuLwTxGZOH
-        2JFVxqgcl4N37aMML91fmixkcRxF/I3oXA==
-X-Google-Smtp-Source: APXvYqyw0TUkSpaIjqX3KdkGKPkoPRIG4qiLJ/ROBgKMhxiEgpCHZ9j4RbkMwBwNUwSkVtwu4tJImA==
-X-Received: by 2002:a5d:8591:: with SMTP id f17mr4374825ioj.198.1572362473537;
-        Tue, 29 Oct 2019 08:21:13 -0700 (PDT)
+        h=x-gm-message-state:subject:to:cc:references:from:message-id:date
+         :user-agent:mime-version:in-reply-to:content-language
+         :content-transfer-encoding;
+        bh=F6ER53BgOcOjbbASqksGEOGLpbaFeVJy95CCofNvLlk=;
+        b=ez5FXfk9rETK/UIcE1JWyKWPLtq2dyBWQKFZtkDFzZ7fjmbApT6Sz7BIyVFXUc8MXE
+         yMkyizmUrMMcFQlx//WUhukiDiu6hjBDfdonAF5Dx+OfuExMod364FxYbS+tYBgnm6E/
+         h7mkPEOLtD+thcHATMHja2IM5bTLGT80xzKPXNJy1AC1qy5ABEREaaYf3ZJ93p11QP4z
+         1kyFYexbsxLKyKIyx2x9aow0vZxFtNqwpiZslTANN0RxtnxjtbVfyVvN664oRYjhsx0i
+         Akj9eLEtq/+/pTdwfzoqs6Z4ykFCaLq026Hh5ERv7DLKfZjiAJ0ixteVKYQu1wvgBVo3
+         Pamw==
+X-Gm-Message-State: APjAAAWTYw8Z0QN3kdo8J0FQO5vnSxspMQv7Q+2OHkin6B+MnaQfN4Y6
+        koliAph+aC6dfCntJGW4dGLpMyNvcIA2qQ==
+X-Google-Smtp-Source: APXvYqyhZskMd8k1bAZr4oT8JlZ3SnlIevkxMe0j+YZP1JrfvqIqI+ZeA56Fhi9q5xKNTv9G4Gse1A==
+X-Received: by 2002:a02:cac5:: with SMTP id f5mr23340042jap.113.1572365463018;
+        Tue, 29 Oct 2019 09:11:03 -0700 (PDT)
 Received: from [192.168.1.159] ([65.144.74.34])
-        by smtp.gmail.com with ESMTPSA id t7sm2120674ilq.72.2019.10.29.08.21.11
-        for <linux-block@vger.kernel.org>
+        by smtp.gmail.com with ESMTPSA id x17sm735843ilh.22.2019.10.29.09.11.01
         (version=TLS1_2 cipher=ECDHE-RSA-AES128-GCM-SHA256 bits=128/128);
-        Tue, 29 Oct 2019 08:21:12 -0700 (PDT)
-To:     "linux-block@vger.kernel.org" <linux-block@vger.kernel.org>
+        Tue, 29 Oct 2019 09:11:02 -0700 (PDT)
+Subject: Re: [PATCH] fs/iomap: remove redundant check in iomap_dio_rw()
+To:     Joseph Qi <joseph.qi@linux.alibaba.com>,
+        Christoph Hellwig <hch@infradead.org>,
+        "Darrick J. Wong" <darrick.wong@oracle.com>
+Cc:     linux-fsdevel@vger.kernel.org, linux-xfs@vger.kernel.org,
+        linux-block@vger.kernel.org
+References: <1572342047-99933-1-git-send-email-joseph.qi@linux.alibaba.com>
 From:   Jens Axboe <axboe@kernel.dk>
-Subject: [PATCH] io_uring: support for generic async request cancel
-Message-ID: <145702de-3aaf-c240-81fb-67926b00f482@kernel.dk>
-Date:   Tue, 29 Oct 2019 09:21:11 -0600
+Message-ID: <c373998d-9edb-8071-3440-71c41a7bb546@kernel.dk>
+Date:   Tue, 29 Oct 2019 10:11:00 -0600
 User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:60.0) Gecko/20100101
  Thunderbird/60.9.0
 MIME-Version: 1.0
+In-Reply-To: <1572342047-99933-1-git-send-email-joseph.qi@linux.alibaba.com>
 Content-Type: text/plain; charset=utf-8
 Content-Language: en-US
 Content-Transfer-Encoding: 7bit
@@ -72,228 +78,31 @@ Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-This adds support for IORING_OP_ASYNC_CANCEL, which will attempt to
-cancel requests that have been punted to async context and are now
-in-flight. This works for regular read/write requests to files, as
-long as they haven't been started yet. For socket based IO (or things
-like accept4(2)), we can cancel work that is already running as well.
+On 10/29/19 3:40 AM, Joseph Qi wrote:
+> We've already check if it is READ iov_iter, no need check again.
+> 
+> Signed-off-by: Joseph Qi <joseph.qi@linux.alibaba.com>
+> ---
+>   fs/iomap/direct-io.c | 2 +-
+>   1 file changed, 1 insertion(+), 1 deletion(-)
+> 
+> diff --git a/fs/iomap/direct-io.c b/fs/iomap/direct-io.c
+> index 1fc28c2..9712648 100644
+> --- a/fs/iomap/direct-io.c
+> +++ b/fs/iomap/direct-io.c
+> @@ -430,7 +430,7 @@ static void iomap_dio_bio_end_io(struct bio *bio)
+>   		if (pos >= dio->i_size)
+>   			goto out_free_dio;
+>   
+> -		if (iter_is_iovec(iter) && iov_iter_rw(iter) == READ)
+> +		if (iter_is_iovec(iter))
+>   			dio->flags |= IOMAP_DIO_DIRTY;
+>   	} else {
+>   		flags |= IOMAP_WRITE;
+> 
 
-To cancel a request, the sqe must have ->addr set to the user_data of
-the request it wishes to cancel. If the request is cancelled
-successfully, the original request is completed with -ECANCELED
-and the cancel request is completed with a result of 0. If the
-request was already running, the original may or may not complete
-in error. The cancel request will complete with -EALREADY for that
-case. And finally, if the request to cancel wasn't found, the cancel
-request is completed with -ENOENT.
+Reviewed-by: Jens Axboe <axboe@kernel.dk>
 
-Signed-off-by: Jens Axboe <axboe@kernel.dk>
-
----
-
-Patch is against my for-5.5/io_uring-wq series of patches. There's a
-liburing test case for this as well, test/io-cancel.c
-
- fs/io-wq.c                    |   85 ++++++++++++++++++++++++++++++++++
- fs/io-wq.h                    |    5 ++
- fs/io_uring.c                 |   44 +++++++++++++++++
- include/uapi/linux/io_uring.h |    2 
- 4 files changed, 136 insertions(+)
-
-diff --git a/fs/io-wq.c b/fs/io-wq.c
-index ced313ca1d04..c90cfb475bbf 100644
---- a/fs/io-wq.c
-+++ b/fs/io-wq.c
-@@ -643,6 +643,91 @@ void io_wq_cancel_all(struct io_wq *wq)
- 	rcu_read_unlock();
- }
- 
-+struct io_cb_cancel_data {
-+	struct io_wqe *wqe;
-+	work_cancel_fn *cancel;
-+	void *caller_data;
-+};
-+
-+static bool io_work_cancel(struct io_worker *worker, void *cancel_data)
-+{
-+	struct io_cb_cancel_data *data = cancel_data;
-+	struct io_wqe *wqe = data->wqe;
-+	bool ret = false;
-+
-+	/*
-+	 * Hold the lock to avoid ->cur_work going out of scope, caller
-+	 * may deference the passed in work.
-+	 */
-+	spin_lock_irq(&wqe->lock);
-+	if (worker->cur_work &&
-+	    data->cancel(worker->cur_work, data->caller_data)) {
-+		send_sig(SIGINT, worker->task, 1);
-+		ret = true;
-+	}
-+	spin_unlock_irq(&wqe->lock);
-+
-+	return ret;
-+}
-+
-+static enum io_wq_cancel io_wqe_cancel_cb_work(struct io_wqe *wqe,
-+					       work_cancel_fn *cancel,
-+					       void *cancel_data)
-+{
-+	struct io_cb_cancel_data data = {
-+		.wqe = wqe,
-+		.cancel = cancel,
-+		.caller_data = cancel_data,
-+	};
-+	struct io_wq_work *work;
-+	bool found = false;
-+
-+	spin_lock_irq(&wqe->lock);
-+	list_for_each_entry(work, &wqe->work_list, list) {
-+		if (cancel(work, cancel_data)) {
-+			list_del(&work->list);
-+			found = true;
-+			break;
-+		}
-+	}
-+	spin_unlock_irq(&wqe->lock);
-+
-+	if (found) {
-+		work->flags |= IO_WQ_WORK_CANCEL;
-+		work->func(&work);
-+		return IO_WQ_CANCEL_OK;
-+	}
-+
-+	rcu_read_lock();
-+	found = io_wq_for_each_worker(wqe, &wqe->free_list, io_work_cancel,
-+					&data);
-+	if (found)
-+		goto done;
-+
-+	found = io_wq_for_each_worker(wqe, &wqe->busy_list, io_work_cancel,
-+					&data);
-+done:
-+	rcu_read_unlock();
-+	return found ? IO_WQ_CANCEL_RUNNING : IO_WQ_CANCEL_NOTFOUND;
-+}
-+
-+enum io_wq_cancel io_wq_cancel_cb(struct io_wq *wq, work_cancel_fn *cancel,
-+				  void *data)
-+{
-+	enum io_wq_cancel ret = IO_WQ_CANCEL_NOTFOUND;
-+	int i;
-+
-+	for (i = 0; i < wq->nr_wqes; i++) {
-+		struct io_wqe *wqe = wq->wqes[i];
-+
-+		ret = io_wqe_cancel_cb_work(wqe, cancel, data);
-+		if (ret != IO_WQ_CANCEL_NOTFOUND)
-+			break;
-+	}
-+
-+	return ret;
-+}
-+
- static bool io_wq_worker_cancel(struct io_worker *worker, void *data)
- {
- 	struct io_wq_work *work = data;
-diff --git a/fs/io-wq.h b/fs/io-wq.h
-index e93f764b1fa4..3de192dc73fc 100644
---- a/fs/io-wq.h
-+++ b/fs/io-wq.h
-@@ -43,6 +43,11 @@ void io_wq_flush(struct io_wq *wq);
- void io_wq_cancel_all(struct io_wq *wq);
- enum io_wq_cancel io_wq_cancel_work(struct io_wq *wq, struct io_wq_work *cwork);
- 
-+typedef bool (work_cancel_fn)(struct io_wq_work *, void *);
-+
-+enum io_wq_cancel io_wq_cancel_cb(struct io_wq *wq, work_cancel_fn *cancel,
-+					void *data);
-+
- #if defined(CONFIG_IO_WQ)
- extern void io_wq_worker_sleeping(struct task_struct *);
- extern void io_wq_worker_running(struct task_struct *);
-diff --git a/fs/io_uring.c b/fs/io_uring.c
-index 7df3dd147817..400be4e87659 100644
---- a/fs/io_uring.c
-+++ b/fs/io_uring.c
-@@ -2132,6 +2132,47 @@ static int io_timeout(struct io_kiocb *req, const struct io_uring_sqe *sqe)
- 	return 0;
- }
- 
-+static bool io_cancel_cb(struct io_wq_work *work, void *data)
-+{
-+	struct io_kiocb *req = container_of(work, struct io_kiocb, work);
-+
-+	return req->user_data == (unsigned long) data;
-+}
-+
-+static int io_async_cancel(struct io_kiocb *req, const struct io_uring_sqe *sqe,
-+			   struct io_kiocb **nxt)
-+{
-+	struct io_ring_ctx *ctx = req->ctx;
-+	enum io_wq_cancel ret;
-+	void *sqe_addr;
-+
-+	if (unlikely(ctx->flags & IORING_SETUP_IOPOLL))
-+		return -EINVAL;
-+	if (sqe->flags || sqe->ioprio || sqe->off || sqe->len ||
-+	    sqe->cancel_flags)
-+		return -EINVAL;
-+
-+	sqe_addr = (void *) (unsigned long) READ_ONCE(sqe->addr);
-+	ret = io_wq_cancel_cb(ctx->io_wq, io_cancel_cb, sqe_addr);
-+	switch (ret) {
-+	case IO_WQ_CANCEL_OK:
-+		ret = 0;
-+		break;
-+	case IO_WQ_CANCEL_RUNNING:
-+		ret = -EALREADY;
-+		break;
-+	case IO_WQ_CANCEL_NOTFOUND:
-+		ret = -ENOENT;
-+		break;
-+	}
-+
-+	if (ret < 0 && (req->flags & REQ_F_LINK))
-+		req->flags |= REQ_F_FAIL_LINK;
-+	io_cqring_add_event(req->ctx, sqe->user_data, ret);
-+	io_put_req(req, nxt);
-+	return 0;
-+}
-+
- static int io_req_defer(struct io_ring_ctx *ctx, struct io_kiocb *req,
- 			const struct io_uring_sqe *sqe)
- {
-@@ -2216,6 +2257,9 @@ static int __io_submit_sqe(struct io_ring_ctx *ctx, struct io_kiocb *req,
- 	case IORING_OP_ACCEPT:
- 		ret = io_accept(req, s->sqe, nxt, force_nonblock);
- 		break;
-+	case IORING_OP_ASYNC_CANCEL:
-+		ret = io_async_cancel(req, s->sqe, nxt);
-+		break;
- 	default:
- 		ret = -EINVAL;
- 		break;
-diff --git a/include/uapi/linux/io_uring.h b/include/uapi/linux/io_uring.h
-index f82d90e617a6..6877cf8894db 100644
---- a/include/uapi/linux/io_uring.h
-+++ b/include/uapi/linux/io_uring.h
-@@ -33,6 +33,7 @@ struct io_uring_sqe {
- 		__u32		msg_flags;
- 		__u32		timeout_flags;
- 		__u32		accept_flags;
-+		__u32		cancel_flags;
- 	};
- 	__u64	user_data;	/* data to be passed back at completion time */
- 	union {
-@@ -70,6 +71,7 @@ struct io_uring_sqe {
- #define IORING_OP_TIMEOUT	11
- #define IORING_OP_TIMEOUT_REMOVE	12
- #define IORING_OP_ACCEPT	13
-+#define IORING_OP_ASYNC_CANCEL	14
- 
- /*
-  * sqe->fsync_flags
 -- 
 Jens Axboe
 
