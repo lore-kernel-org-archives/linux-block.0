@@ -2,100 +2,182 @@ Return-Path: <SRS0=FPpm=YW=vger.kernel.org=linux-block-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-9.7 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
-	INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,
-	URIBL_BLOCKED,USER_AGENT_GIT autolearn=ham autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-6.8 required=3.0 tests=DKIM_SIGNED,DKIM_VALID,
+	DKIM_VALID_AU,HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,
+	SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED autolearn=ham
+	autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id A7E29CA9EC0
-	for <linux-block@archiver.kernel.org>; Tue, 29 Oct 2019 03:17:09 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id B9FC5CA9EB9
+	for <linux-block@archiver.kernel.org>; Tue, 29 Oct 2019 04:19:17 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.kernel.org (Postfix) with ESMTP id 7541321479
-	for <linux-block@archiver.kernel.org>; Tue, 29 Oct 2019 03:17:09 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id 87D922086A
+	for <linux-block@archiver.kernel.org>; Tue, 29 Oct 2019 04:19:17 +0000 (UTC)
+Authentication-Results: mail.kernel.org;
+	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="G67KOEVC"
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1726740AbfJ2DRJ (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Mon, 28 Oct 2019 23:17:09 -0400
-Received: from smtpbgau1.qq.com ([54.206.16.166]:53524 "EHLO smtpbgau1.qq.com"
-        rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-        id S1726464AbfJ2DRI (ORCPT <rfc822;linux-block@vger.kernel.org>);
-        Mon, 28 Oct 2019 23:17:08 -0400
-X-QQ-mid: bizesmtp20t1572319013tnm21do0
-Received: from localhost.localdomain (unknown [218.76.23.26])
-        by esmtp6.qq.com (ESMTP) with 
-        id ; Tue, 29 Oct 2019 11:16:53 +0800 (CST)
-X-QQ-SSF: 01400000002000S0ZU90B00A0000000
-X-QQ-FEAT: EWlPDqVqcOf1YHSW8J2zIAG9bnVWk8lz6+GoiWoA0JXcJseJW3vstMXq8lR35
-        ImviT3+v5xrDXKgFfyOXnD1Plc7C1XeBSdIvBOu/EFzW8SNhbnPhS4BZ8zAScLDWvr8i+u0
-        eWu6R8UtQynHeF6y3z+2+qKgn/ywvLc9x28AUZ/51mvQK3TBVW/bQJNVlCk77MFhl4HK0Bm
-        bGZxYzfV+j9jOafOPkI7YqaozLqJaZqlp8HonVLC/2l+7ig2V0r+AVrT9marYltEN+wN30n
-        b+aOSyleuhzh6KMco5eVpL3zIxW8dzNqZRRAzH3jSnd3h0LT06iEDqi0fqzZhoSD2MKE5K8
-        4BN0ExLFnzEbnWGrKE=
-X-QQ-GoodBg: 2
-From:   Jackie Liu <liuyun01@kylinos.cn>
-To:     axboe@kernel.dk
-Cc:     liuyun01@kylinos.cn, linux-block@vger.kernel.org
-Subject: [PATCH] io_uring: set -EINTR directly when a signal wakes up in io_cqring_wait
-Date:   Tue, 29 Oct 2019 11:16:42 +0800
-Message-Id: <1572319002-9943-1-git-send-email-liuyun01@kylinos.cn>
-X-Mailer: git-send-email 2.7.4
-X-QQ-SENDSIZE: 520
-Feedback-ID: bizesmtp:kylinos.cn:qybgforeign:qybgforeign1
-X-QQ-Bgrelay: 1
+        id S1727966AbfJ2ETQ (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Tue, 29 Oct 2019 00:19:16 -0400
+Received: from us-smtp-delivery-1.mimecast.com ([205.139.110.120]:20335 "EHLO
+        us-smtp-1.mimecast.com" rhost-flags-OK-OK-OK-FAIL) by vger.kernel.org
+        with ESMTP id S1725830AbfJ2ETQ (ORCPT
+        <rfc822;linux-block@vger.kernel.org>);
+        Tue, 29 Oct 2019 00:19:16 -0400
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+        s=mimecast20190719; t=1572322754;
+        h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+         to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+         content-transfer-encoding:content-transfer-encoding;
+        bh=7UUNsKp0ahXbq90yT2fc6c8jvyZrWfp5MAkimJxXD30=;
+        b=G67KOEVCMwCBm91ZQevMVdFBCIasR2jDoyIrnFOW0013Y/YR/ZpgjYE3R4OUSinCt/KiJo
+        1WyWryDhkojGa3skJxHcURyrPfaiXffFMOTFoh0FbvD3SJO4QGA0gJkMkta/LWrjr8CL0D
+        ozCcmDYdqLVY3mu7pytuFTsG8TKEQ2U=
+Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
+ [209.132.183.4]) (Using TLS) by relay.mimecast.com with ESMTP id
+ us-mta-118-Na0Qk4o7OniCmMsIHD-9-g-1; Tue, 29 Oct 2019 00:19:13 -0400
+Received: from smtp.corp.redhat.com (int-mx01.intmail.prod.int.phx2.redhat.com [10.5.11.11])
+        (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
+        (No client certificate requested)
+        by mimecast-mx01.redhat.com (Postfix) with ESMTPS id F152F1800D55;
+        Tue, 29 Oct 2019 04:19:11 +0000 (UTC)
+Received: from localhost (ovpn-8-18.pek2.redhat.com [10.72.8.18])
+        by smtp.corp.redhat.com (Postfix) with ESMTP id 0C18A600C1;
+        Tue, 29 Oct 2019 04:19:08 +0000 (UTC)
+From:   Ming Lei <ming.lei@redhat.com>
+To:     Jens Axboe <axboe@kernel.dk>
+Cc:     linux-block@vger.kernel.org, Ming Lei <ming.lei@redhat.com>,
+        Coly Li <colyli@suse.de>, linux-bcache@vger.kernel.org
+Subject: [PATCH] block: optimize for small BS IO
+Date:   Tue, 29 Oct 2019 12:19:04 +0800
+Message-Id: <20191029041904.16461-1-ming.lei@redhat.com>
+MIME-Version: 1.0
+X-Scanned-By: MIMEDefang 2.79 on 10.5.11.11
+X-MC-Unique: Na0Qk4o7OniCmMsIHD-9-g-1
+X-Mimecast-Spam-Score: 0
+Content-Type: text/plain; charset=WINDOWS-1252
+Content-Transfer-Encoding: quoted-printable
 Sender: linux-block-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-We didn't use -ERESTARTSYS to tell the application layer to restart the
-system call, but instead return -EINTR. we can set -EINTR directly when
-wakeup by the signal, which can help us save an assignment operation and
-comparison operation.
+__blk_queue_split() may be a bit heavy for small BS(such as 512B, or
+4KB) IO, so introduce one flag to decide if this bio includes multiple
+page. And only consider to try splitting this bio in case that
+the multiple page flag is set.
 
-Signed-off-by: Jackie Liu <liuyun01@kylinos.cn>
+~3% - 5% IOPS improvement can be observed on io_uring test over
+null_blk(MQ), and the io_uring test code is from fio/t/io_uring.c
+
+bch_bio_map() should be the only one which doesn't use bio_add_page(),
+so force to mark bio built via bch_bio_map() as MULTI_PAGE.
+
+RAID5 has similar usage too, however the bio is really single-page bio,
+so not necessary to handle it.
+
+Cc: Coly Li <colyli@suse.de>
+Cc: linux-bcache@vger.kernel.org
+Signed-off-by: Ming Lei <ming.lei@redhat.com>
 ---
- fs/io_uring.c | 9 +++------
- 1 file changed, 3 insertions(+), 6 deletions(-)
+ block/bio.c               | 8 ++++++++
+ block/blk-merge.c         | 4 ++++
+ block/bounce.c            | 3 +++
+ drivers/md/bcache/util.c  | 2 ++
+ include/linux/blk_types.h | 1 +
+ 5 files changed, 18 insertions(+)
 
-diff --git a/fs/io_uring.c b/fs/io_uring.c
-index a30c4f6..63eee7e 100644
---- a/fs/io_uring.c
-+++ b/fs/io_uring.c
-@@ -2878,7 +2878,7 @@ static int io_cqring_wait(struct io_ring_ctx *ctx, int min_events,
- 		.to_wait	= min_events,
- 	};
- 	struct io_rings *rings = ctx->rings;
--	int ret;
-+	int ret = 0;
- 
- 	if (io_cqring_events(rings) >= min_events)
- 		return 0;
-@@ -2896,7 +2896,6 @@ static int io_cqring_wait(struct io_ring_ctx *ctx, int min_events,
- 			return ret;
- 	}
- 
--	ret = 0;
- 	iowq.nr_timeouts = atomic_read(&ctx->cq_timeouts);
- 	do {
- 		prepare_to_wait_exclusive(&ctx->wait, &iowq.wq,
-@@ -2905,15 +2904,13 @@ static int io_cqring_wait(struct io_ring_ctx *ctx, int min_events,
- 			break;
- 		schedule();
- 		if (signal_pending(current)) {
--			ret = -ERESTARTSYS;
-+			ret = -EINTR;
- 			break;
- 		}
- 	} while (1);
- 	finish_wait(&ctx->wait, &iowq.wq);
- 
--	restore_saved_sigmask_unless(ret == -ERESTARTSYS);
--	if (ret == -ERESTARTSYS)
--		ret = -EINTR;
-+	restore_saved_sigmask_unless(ret == -EINTR);
- 
- 	return READ_ONCE(rings->cq.head) == READ_ONCE(rings->cq.tail) ? ret : 0;
+diff --git a/block/bio.c b/block/bio.c
+index 8f0ed6228fc5..c288364b7cf3 100644
+--- a/block/bio.c
++++ b/block/bio.c
+@@ -583,6 +583,8 @@ void __bio_clone_fast(struct bio *bio, struct bio *bio_=
+src)
+ =09bio_set_flag(bio, BIO_CLONED);
+ =09if (bio_flagged(bio_src, BIO_THROTTLED))
+ =09=09bio_set_flag(bio, BIO_THROTTLED);
++=09if (bio_flagged(bio_src, BIO_MULTI_PAGE))
++=09=09bio_set_flag(bio, BIO_MULTI_PAGE);
+ =09bio->bi_opf =3D bio_src->bi_opf;
+ =09bio->bi_ioprio =3D bio_src->bi_ioprio;
+ =09bio->bi_write_hint =3D bio_src->bi_write_hint;
+@@ -757,6 +759,9 @@ bool __bio_try_merge_page(struct bio *bio, struct page =
+*page,
+ =09=09if (page_is_mergeable(bv, page, len, off, same_page)) {
+ =09=09=09bv->bv_len +=3D len;
+ =09=09=09bio->bi_iter.bi_size +=3D len;
++
++=09=09=09if (!*same_page)
++=09=09=09=09bio_set_flag(bio, BIO_MULTI_PAGE);
+ =09=09=09return true;
+ =09=09}
+ =09}
+@@ -789,6 +794,9 @@ void __bio_add_page(struct bio *bio, struct page *page,
+ =09bio->bi_iter.bi_size +=3D len;
+ =09bio->bi_vcnt++;
+=20
++=09if (bio->bi_vcnt >=3D 2 && !bio_flagged(bio, BIO_MULTI_PAGE))
++=09=09bio_set_flag(bio, BIO_MULTI_PAGE);
++
+ =09if (!bio_flagged(bio, BIO_WORKINGSET) && unlikely(PageWorkingset(page))=
+)
+ =09=09bio_set_flag(bio, BIO_WORKINGSET);
  }
--- 
-2.7.4
-
-
+diff --git a/block/blk-merge.c b/block/blk-merge.c
+index 48e6725b32ee..737bbec9e153 100644
+--- a/block/blk-merge.c
++++ b/block/blk-merge.c
+@@ -309,6 +309,10 @@ void __blk_queue_split(struct request_queue *q, struct=
+ bio **bio,
+ =09=09=09=09nr_segs);
+ =09=09break;
+ =09default:
++=09=09if (!bio_flagged(*bio, BIO_MULTI_PAGE)) {
++=09=09=09*nr_segs =3D 1;
++=09=09=09return;
++=09=09}
+ =09=09split =3D blk_bio_segment_split(q, *bio, &q->bio_split, nr_segs);
+ =09=09break;
+ =09}
+diff --git a/block/bounce.c b/block/bounce.c
+index f8ed677a1bf7..4b18a2accccc 100644
+--- a/block/bounce.c
++++ b/block/bounce.c
+@@ -253,6 +253,9 @@ static struct bio *bounce_clone_bio(struct bio *bio_src=
+, gfp_t gfp_mask,
+ =09bio->bi_iter.bi_sector=09=3D bio_src->bi_iter.bi_sector;
+ =09bio->bi_iter.bi_size=09=3D bio_src->bi_iter.bi_size;
+=20
++=09if (bio_flagged(bio_src, BIO_MULTI_PAGE))
++=09=09bio_set_flag(bio, BIO_MULTI_PAGE);
++
+ =09switch (bio_op(bio)) {
+ =09case REQ_OP_DISCARD:
+ =09case REQ_OP_SECURE_ERASE:
+diff --git a/drivers/md/bcache/util.c b/drivers/md/bcache/util.c
+index 62fb917f7a4f..71f5cbb6fdd6 100644
+--- a/drivers/md/bcache/util.c
++++ b/drivers/md/bcache/util.c
+@@ -253,6 +253,8 @@ start:=09=09bv->bv_len=09=3D min_t(size_t, PAGE_SIZE - =
+bv->bv_offset,
+=20
+ =09=09size -=3D bv->bv_len;
+ =09}
++
++=09bio_set_flag(bio, BIO_MULTI_PAGE);
+ }
+=20
+ /**
+diff --git a/include/linux/blk_types.h b/include/linux/blk_types.h
+index d688b96d1d63..b942399c97a0 100644
+--- a/include/linux/blk_types.h
++++ b/include/linux/blk_types.h
+@@ -222,6 +222,7 @@ enum {
+ =09=09=09=09 * of this bio. */
+ =09BIO_QUEUE_ENTERED,=09/* can use blk_queue_enter_live() */
+ =09BIO_TRACKED,=09=09/* set if bio goes through the rq_qos path */
++=09BIO_MULTI_PAGE,=09=09/* used for optimize small BS IO */
+ =09BIO_FLAG_LAST
+ };
+=20
+--=20
+2.20.1
 
