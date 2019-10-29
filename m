@@ -2,206 +2,87 @@ Return-Path: <SRS0=FPpm=YW=vger.kernel.org=linux-block-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-2.4 required=3.0 tests=DKIM_SIGNED,DKIM_VALID,
-	DKIM_VALID_AU,HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SPF_HELO_NONE,
-	SPF_PASS,URIBL_BLOCKED,USER_AGENT_SANE_1 autolearn=no autolearn_force=no
-	version=3.4.0
+X-Spam-Status: No, score=-2.3 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
+	MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,USER_AGENT_SANE_1 autolearn=no
+	autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 94023CA9EAE
-	for <linux-block@archiver.kernel.org>; Tue, 29 Oct 2019 14:21:30 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 58A16CA9EAE
+	for <linux-block@archiver.kernel.org>; Tue, 29 Oct 2019 15:09:07 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.kernel.org (Postfix) with ESMTP id 6291D20830
-	for <linux-block@archiver.kernel.org>; Tue, 29 Oct 2019 14:21:30 +0000 (UTC)
-Authentication-Results: mail.kernel.org;
-	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="NASIWj37"
+	by mail.kernel.org (Postfix) with ESMTP id 2B2A821479
+	for <linux-block@archiver.kernel.org>; Tue, 29 Oct 2019 15:09:07 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S2388595AbfJ2OV3 (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Tue, 29 Oct 2019 10:21:29 -0400
-Received: from us-smtp-2.mimecast.com ([205.139.110.61]:59885 "EHLO
-        us-smtp-delivery-1.mimecast.com" rhost-flags-OK-OK-OK-FAIL)
-        by vger.kernel.org with ESMTP id S1728306AbfJ2OV0 (ORCPT
+        id S2389880AbfJ2PJG (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Tue, 29 Oct 2019 11:09:06 -0400
+Received: from mail-pl1-f193.google.com ([209.85.214.193]:45423 "EHLO
+        mail-pl1-f193.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S2389387AbfJ2PJG (ORCPT
         <rfc822;linux-block@vger.kernel.org>);
-        Tue, 29 Oct 2019 10:21:26 -0400
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-        s=mimecast20190719; t=1572358884;
-        h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-         to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-         content-transfer-encoding:content-transfer-encoding:
-         in-reply-to:in-reply-to:references:references;
-        bh=MrvOCGdZ4ay5tV0nbJSDMXcbtM2BMHyw1OyCyP+OEdw=;
-        b=NASIWj37C4LfMA2/U1i6ma814mHnQPOD5Y6hhRoSDq5kZQZyPRcr2gF0kvWj9tr4BN++Ld
-        QiS4uTiZCcIcwwFmEW6C3CzjQlyZ2++1ZJCAfnqEsXduGU9aSSzf0Q23HM1hhLW6ll/RZx
-        BFBV/jTNpYaLzUKXB8Y6/usR4H8OjXs=
-Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
- [209.132.183.4]) (Using TLS) by relay.mimecast.com with ESMTP id
- us-mta-286-O2YrMTY-P2CdFbz9Q43vKA-1; Tue, 29 Oct 2019 10:21:21 -0400
-Received: from smtp.corp.redhat.com (int-mx04.intmail.prod.int.phx2.redhat.com [10.5.11.14])
-        (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
-        (No client certificate requested)
-        by mimecast-mx01.redhat.com (Postfix) with ESMTPS id 46A42107AD29;
-        Tue, 29 Oct 2019 14:21:20 +0000 (UTC)
-Received: from file01.intranet.prod.int.rdu2.redhat.com (file01.intranet.prod.int.rdu2.redhat.com [10.11.5.7])
-        by smtp.corp.redhat.com (Postfix) with ESMTPS id BF9545DA5B;
-        Tue, 29 Oct 2019 14:21:15 +0000 (UTC)
-Received: from file01.intranet.prod.int.rdu2.redhat.com (localhost [127.0.0.1])
-        by file01.intranet.prod.int.rdu2.redhat.com (8.14.4/8.14.4) with ESMTP id x9TELFaF028772;
-        Tue, 29 Oct 2019 10:21:15 -0400
-Received: from localhost (mpatocka@localhost)
-        by file01.intranet.prod.int.rdu2.redhat.com (8.14.4/8.14.4/Submit) with ESMTP id x9TELEH7028768;
-        Tue, 29 Oct 2019 10:21:14 -0400
-X-Authentication-Warning: file01.intranet.prod.int.rdu2.redhat.com: mpatocka owned process doing -bs
-Date:   Tue, 29 Oct 2019 10:21:14 -0400 (EDT)
-From:   Mikulas Patocka <mpatocka@redhat.com>
-X-X-Sender: mpatocka@file01.intranet.prod.int.rdu2.redhat.com
-To:     Alessio Balsini <balsini@android.com>
-cc:     Jens Axboe <axboe@kernel.dk>, Alasdair G Kergon <agk@redhat.com>,
-        elsk@google.com, dvander@google.com, dm-devel@redhat.com,
-        linux-block@vger.kernel.org, linux-kernel@vger.kernel.org,
-        kernel-team@android.com
-Subject: Re: dm-snapshot for system updates in Android
-In-Reply-To: <20191025101624.GA61225@google.com>
-Message-ID: <alpine.LRH.2.02.1910290957220.25731@file01.intranet.prod.int.rdu2.redhat.com>
-References: <20191025101624.GA61225@google.com>
-User-Agent: Alpine 2.02 (LRH 1266 2009-07-14)
+        Tue, 29 Oct 2019 11:09:06 -0400
+Received: by mail-pl1-f193.google.com with SMTP id y24so7754454plr.12;
+        Tue, 29 Oct 2019 08:09:06 -0700 (PDT)
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20161025;
+        h=x-gm-message-state:subject:to:cc:references:from:message-id:date
+         :user-agent:mime-version:in-reply-to:content-language
+         :content-transfer-encoding;
+        bh=r6yq6MQrhof3ESKyz3OnyGTPO1G7eC+XyUzxT4zpDdA=;
+        b=SGO4sJ6F3UTyYzazYC9NuM7yPCJs6s0sWM9laP9+SiSm7Byx1y+rYMfOKn3GQElEZ5
+         N0XNRQZY3LeigvrLRN6dv8fDiBLURcyKrjSbh5wJgpvAIyIa7JchZUUXx10dhJQbGdY9
+         xHSFprk4/HHF1tn2FhRSwld0t6LHAp7X2hGiSQgx+cy1D0wbQa1JFloxca22Qi5Em33E
+         PkjKBdtw/Qz2Y61Zh00i2LGj4EkUCkIbYSWhpIAQjKogbsxSJISkzhHtTGUG3xR0AA7J
+         URGpN7E8nlRUbzMgFKWkkVL73Js/kCCLZSTmlBrjZQR6sN7Ln2Fa+5rqPTG2tcinNc7z
+         cGaQ==
+X-Gm-Message-State: APjAAAWF4JAszRipw6EUuMujYuEfCsHMVfQSMsJtOjSIZUMnC0JH8dSM
+        R17G9ZZEO6IOQL+TYqcVX+JVllA98gs=
+X-Google-Smtp-Source: APXvYqxSVksMTeDjdpB8YzBm6Fzs3VMGSiTF0FxBXvv/1VAVrgZlW2rEeQ64xpfFyjgkPQXzGE5bwA==
+X-Received: by 2002:a17:902:9347:: with SMTP id g7mr4620830plp.291.1572361745028;
+        Tue, 29 Oct 2019 08:09:05 -0700 (PDT)
+Received: from desktop-bart.svl.corp.google.com ([2620:15c:2cd:202:4308:52a3:24b6:2c60])
+        by smtp.gmail.com with ESMTPSA id w26sm11345982pfj.123.2019.10.29.08.09.03
+        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
+        Tue, 29 Oct 2019 08:09:03 -0700 (PDT)
+Subject: Re: [PATCH V3] block: optimize for small block size IO
+To:     Ming Lei <ming.lei@redhat.com>, Jens Axboe <axboe@kernel.dk>
+Cc:     linux-block@vger.kernel.org, Coly Li <colyli@suse.de>,
+        Christoph Hellwig <hch@infradead.org>,
+        Keith Busch <kbusch@kernel.org>, linux-bcache@vger.kernel.org
+References: <20191029105125.12928-1-ming.lei@redhat.com>
+From:   Bart Van Assche <bvanassche@acm.org>
+Message-ID: <41c9df3e-ee79-849e-96d6-6a6b404ec23d@acm.org>
+Date:   Tue, 29 Oct 2019 08:09:02 -0700
+User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:60.0) Gecko/20100101
+ Thunderbird/60.9.0
 MIME-Version: 1.0
-X-Scanned-By: MIMEDefang 2.79 on 10.5.11.14
-X-MC-Unique: O2YrMTY-P2CdFbz9Q43vKA-1
-X-Mimecast-Spam-Score: 0
-Content-Type: TEXT/PLAIN; charset=WINDOWS-1252
-Content-Transfer-Encoding: quoted-printable
+In-Reply-To: <20191029105125.12928-1-ming.lei@redhat.com>
+Content-Type: text/plain; charset=windows-1252; format=flowed
+Content-Language: en-US
+Content-Transfer-Encoding: 7bit
 Sender: linux-block-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-Hi
+On 10/29/19 3:51 AM, Ming Lei wrote:
+> __blk_queue_split() may be a bit heavy for small block size(such as
+> 512B, or 4KB) IO, so introduce one flag to decide if this bio includes
+> multiple page. And only consider to try splitting this bio in case
+> that the multiple page flag is set.
+> 
+> ~3% - 5% IOPS improvement can be observed on io_uring test over
+> null_blk(MQ), and the io_uring test code is from fio/t/io_uring.c
+> 
+> bch_bio_map() should be the only one which doesn't use bio_add_page(),
+> so force to mark bio built via bch_bio_map() as MULTI_PAGE.
+> 
+> RAID5 has similar usage too, however the bio is really single-page bio,
+> so not necessary to handle it.
 
-On Fri, 25 Oct 2019, Alessio Balsini wrote:
+Although this patch looks fine to me, I'm concerned about the new flag. 
+That's additional state information and something that could get out of 
+sync. Has it been considered to implement this optimization by handling
+bio->bi_vcnt == 1 separately at the start of blk_bio_segment_split()?
 
-> Hello everyone!
->=20
-> I hope you will appreciate knowing that we are currently evaluating the u=
-se of
-> dm-snapshot to implement a mechanism to obtain revertible, space-efficien=
-t
-> system upgrades in Android.  More specifically, we are using
-> dm-snapshot-persistent to test the updated device after reboot, then issu=
-e a
-> merge in case of success, otherwise, destroy the snapshot.
-> This new update mechanism is still under evaluation, but its development =
-is
-> openly done in AOSP.
->=20
-> At the current stage, we have a prototype we are happy with, both in term=
-s of
-> space consumption overhead (for the COW device) and benchmarking results =
-for
-> read-write and merge operations.
->=20
-> I would be glad if you could provide some feedback on a few points that I=
- don't
-> have completely clear.
->=20
->=20
-> -- Interface stability
->=20
-> To obtain an initial, empty COW device as quick as possible, we force to =
-0 only
-> its first 32 bit (magic field). This solution looks clear from the kernel=
- code,
-> but can we rely on that for all the kernels with SNAPSHOT_DISK_VERSION =
-=3D=3D 1?
+Thanks,
 
-It will work, but, to be consistent with lvm, I suggest to overwrite the=20
-first 4k with zeroes.
-
-> Would you appreciate it if a similar statement is added as part of
-> /Documentation, making this solution more stable? Or maybe I can think of
-> adding an initialization flag to the dm-snapshot table to explicitly requ=
-est
-> the COW initialization within the kernel?
->=20
-> Another issue we are facing is to be able to know in advance what the min=
-imum
-> COW device size would be for a given update to be able to allocate the ri=
-ght
-
-This is hard to say, it depends on what the user is doing with the phone.=
-=20
-When dm-snapshot runs out of space, it invalidates the whole snapshot.=20
-You'll have to monitor the snapshot space very carefully and take action=20
-before it fills up.
-
-I suggest - run main system on the origin target and attach a snapshot=20
-that will be used for backup of the data overwritten in the origin. If the=
-=20
-updated system fails, merge the snapshot back into the origin; if the=20
-update succeeds, drop the snapshot. If the user writes too much data to=20
-the device, it would invalidate the only the snapshot (so he can't revert=
-=20
-anymore), but it would not invalidate the origin and the data would not be=
-=20
-lost.
-
-> size for the COW device in advance.  To do so, we rely on the current COW
-> structure that seems to have kept the same stable shape in the last decad=
-e, and
-> compute the total COW size by knowing the number of modified chunks. The
-> formula would be something like that:
->=20
->   table_line_bytes      =3D 64 * 2 / 8;
->   exceptions_per_chunk  =3D chunk_size_bytes / table_line_bytes;
->   total_cow_size_chunks =3D 1 + 1 + modified_chunks
->                         + modified_chunks / exceptions_per_chunk;
->=20
-> This formula seems to be valid for all the recent kernels we checked. Aga=
-in,
-> can we assume it to be valid for all the kernels for which
-> SNAPSHOT_DISK_VERSION =3D=3D 1?
-
-Yes, we don't plan to change it.
-
-> -- Alignment
->=20
-> Our approach follows the solution proposed by Mikulas [1].
-> Being the block alignment of file extents automatically managed by the
-> filesystem, using FIEMAP should have no alignment-related performance iss=
-ue.
-> But in our implementation we hit a misalignment [2] branch which leads to
-> dmwarning messages [3, 4].
->=20
-> I have a limited experience with the block layer and dm, so I'm still
-> struggling in finding the root cause for this, either in user space or ke=
-rnel
-> space.
-
-I don't know. What is the block size of the filesystem? Are all mappings=20
-aligned to this block size?
-
-> But our benchmarks seems to be good, so we were thinking as last option t=
-o
-> rate-limit or directly remove that warning from our kernels as a temporar=
-y
-> solution, but we prefer to avoid diverging from mainline. Rate-limiting i=
-s a
-> solution that would make sense also to be proposed in the list, but compl=
-etely
-> removing the warning doesn't seem the right thing to do. Maybe we are
-> benchmarking something else? What do you think?
->=20
-> Many thanks for taking the time to read this, feedbacks would be highly
-> appreciated.
->=20
-> Regards.
-> Alessio
->=20
-> [1] https://www.redhat.com/archives/dm-devel/2018-October/msg00363.html
-> [2] https://elixir.bootlin.com/linux/v5.3/source/block/blk-settings.c#L54=
-0
-> [3] https://elixir.bootlin.com/linux/v5.3/source/drivers/md/dm-table.c#L4=
-84
-> [4] https://elixir.bootlin.com/linux/v5.3/source/drivers/md/dm-table.c#L1=
-558
-
-Mikulas
-
+Bart.
