@@ -2,113 +2,92 @@ Return-Path: <SRS0=FPpm=YW=vger.kernel.org=linux-block-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-8.4 required=3.0 tests=DKIMWL_WL_HIGH,DKIM_SIGNED,
-	DKIM_VALID,DKIM_VALID_AU,HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,
-	MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,UNPARSEABLE_RELAY,
-	USER_AGENT_SANE_1 autolearn=unavailable autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-9.8 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
+	INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,
+	USER_AGENT_GIT autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 2BA94CA9EC3
-	for <linux-block@archiver.kernel.org>; Tue, 29 Oct 2019 16:15:19 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 08021CA9EC3
+	for <linux-block@archiver.kernel.org>; Tue, 29 Oct 2019 17:02:59 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.kernel.org (Postfix) with ESMTP id EDC37217F9
-	for <linux-block@archiver.kernel.org>; Tue, 29 Oct 2019 16:15:18 +0000 (UTC)
-Authentication-Results: mail.kernel.org;
-	dkim=pass (2048-bit key) header.d=oracle.com header.i=@oracle.com header.b="apxkMzZo"
+	by mail.kernel.org (Postfix) with ESMTP id D02F420656
+	for <linux-block@archiver.kernel.org>; Tue, 29 Oct 2019 17:02:58 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S2390053AbfJ2QPR (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Tue, 29 Oct 2019 12:15:17 -0400
-Received: from userp2120.oracle.com ([156.151.31.85]:56298 "EHLO
-        userp2120.oracle.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S2389902AbfJ2QPR (ORCPT
-        <rfc822;linux-block@vger.kernel.org>);
-        Tue, 29 Oct 2019 12:15:17 -0400
-Received: from pps.filterd (userp2120.oracle.com [127.0.0.1])
-        by userp2120.oracle.com (8.16.0.27/8.16.0.27) with SMTP id x9TFxJ5U033344;
-        Tue, 29 Oct 2019 16:15:00 GMT
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=oracle.com; h=date : from : to : cc
- : subject : message-id : references : mime-version : content-type :
- in-reply-to; s=corp-2019-08-05;
- bh=A1kYMmkaG5FKs/QVIwTtK+7+pOSUYwVnoIw867e/re8=;
- b=apxkMzZocVJycoJd7xxDLAGwLZw+ta+Wpupyn3WkaRjN4vPMVB6rucRJdgubvrCtJNdY
- +sui1tn/SLpc8pHESfo/VRgM26ydbuY8dpGmbRvjYp8yWOPMqUgRtU+BbDiAaQvF9gKm
- WtFgVZ/YWSdiUmRR4mlRNn3bc8MBn8BibcFQmkFKEwxdVAbdVFek104Ks3jqHlku8DXz
- eGDt9ohQ5S5FAH6mh/fprjAmcparxUmGxzDHkNccIjIhU2HiiRJd3khUyMfVcmmhaHAl
- 2ylyXlyitLvZtluyn5GniOhuiUZBNj1TFCzFeprj8vk+4v7JLZjrsWjpxoi+pzAtWDrb Mw== 
-Received: from aserp3030.oracle.com (aserp3030.oracle.com [141.146.126.71])
-        by userp2120.oracle.com with ESMTP id 2vvumff787-1
-        (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=OK);
-        Tue, 29 Oct 2019 16:15:00 +0000
-Received: from pps.filterd (aserp3030.oracle.com [127.0.0.1])
-        by aserp3030.oracle.com (8.16.0.27/8.16.0.27) with SMTP id x9TG351i064792;
-        Tue, 29 Oct 2019 16:14:59 GMT
-Received: from aserv0122.oracle.com (aserv0122.oracle.com [141.146.126.236])
-        by aserp3030.oracle.com with ESMTP id 2vxpgf7qc4-1
-        (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=OK);
-        Tue, 29 Oct 2019 16:14:59 +0000
-Received: from abhmp0012.oracle.com (abhmp0012.oracle.com [141.146.116.18])
-        by aserv0122.oracle.com (8.14.4/8.14.4) with ESMTP id x9TGEriI001291;
-        Tue, 29 Oct 2019 16:14:53 GMT
-Received: from localhost (/67.169.218.210)
-        by default (Oracle Beehive Gateway v4.0)
-        with ESMTP ; Tue, 29 Oct 2019 09:14:53 -0700
-Date:   Tue, 29 Oct 2019 09:14:52 -0700
-From:   "Darrick J. Wong" <darrick.wong@oracle.com>
-To:     Joseph Qi <joseph.qi@linux.alibaba.com>
-Cc:     Christoph Hellwig <hch@infradead.org>,
-        Jens Axboe <axboe@kernel.dk>, linux-fsdevel@vger.kernel.org,
-        linux-xfs@vger.kernel.org, linux-block@vger.kernel.org
-Subject: Re: [PATCH] fs/iomap: remove redundant check in iomap_dio_rw()
-Message-ID: <20191029161452.GC15222@magnolia>
-References: <1572342047-99933-1-git-send-email-joseph.qi@linux.alibaba.com>
+        id S2390597AbfJ2RC6 (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Tue, 29 Oct 2019 13:02:58 -0400
+Received: from szxga05-in.huawei.com ([45.249.212.191]:5220 "EHLO huawei.com"
+        rhost-flags-OK-OK-OK-FAIL) by vger.kernel.org with ESMTP
+        id S1727279AbfJ2RC6 (ORCPT <rfc822;linux-block@vger.kernel.org>);
+        Tue, 29 Oct 2019 13:02:58 -0400
+Received: from DGGEMS406-HUB.china.huawei.com (unknown [172.30.72.58])
+        by Forcepoint Email with ESMTP id A20CA818D8ED80AEB7C5;
+        Wed, 30 Oct 2019 01:02:53 +0800 (CST)
+Received: from localhost.localdomain (10.69.192.58) by
+ DGGEMS406-HUB.china.huawei.com (10.3.19.206) with Microsoft SMTP Server id
+ 14.3.439.0; Wed, 30 Oct 2019 01:02:43 +0800
+From:   John Garry <john.garry@huawei.com>
+To:     <axboe@kernel.dk>
+CC:     <linux-block@vger.kernel.org>, <linux-kernel@vger.kernel.org>,
+        John Garry <john.garry@huawei.com>
+Subject: [PATCH] blk-mq: Make blk_mq_run_hw_queue() return void
+Date:   Wed, 30 Oct 2019 00:59:30 +0800
+Message-ID: <1572368370-139412-1-git-send-email-john.garry@huawei.com>
+X-Mailer: git-send-email 2.8.1
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <1572342047-99933-1-git-send-email-joseph.qi@linux.alibaba.com>
-User-Agent: Mutt/1.9.4 (2018-02-28)
-X-Proofpoint-Virus-Version: vendor=nai engine=6000 definitions=9424 signatures=668685
-X-Proofpoint-Spam-Details: rule=notspam policy=default score=0 suspectscore=2 malwarescore=0
- phishscore=0 bulkscore=0 spamscore=0 mlxscore=0 mlxlogscore=999
- adultscore=0 classifier=spam adjust=0 reason=mlx scancount=1
- engine=8.0.1-1908290000 definitions=main-1910290145
-X-Proofpoint-Virus-Version: vendor=nai engine=6000 definitions=9424 signatures=668685
-X-Proofpoint-Spam-Details: rule=notspam policy=default score=0 priorityscore=1501 malwarescore=0
- suspectscore=2 phishscore=0 bulkscore=0 spamscore=0 clxscore=1011
- lowpriorityscore=0 mlxscore=0 impostorscore=0 mlxlogscore=999 adultscore=0
- classifier=spam adjust=0 reason=mlx scancount=1 engine=8.0.1-1908290000
- definitions=main-1910290145
+Content-Type: text/plain
+X-Originating-IP: [10.69.192.58]
+X-CFilter-Loop: Reflected
 Sender: linux-block-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-On Tue, Oct 29, 2019 at 05:40:47PM +0800, Joseph Qi wrote:
-> We've already check if it is READ iov_iter, no need check again.
-> 
-> Signed-off-by: Joseph Qi <joseph.qi@linux.alibaba.com>
+Since commit 97889f9ac24f ("blk-mq: remove synchronize_rcu() from
+blk_mq_del_queue_tag_set()"), the return value of blk_mq_run_hw_queue()
+is never checked, so make it return void, which very marginally simplifies
+the code.
 
-Applied to the iomap tree, thanks.
+Signed-off-by: John Garry <john.garry@huawei.com>
 
-Reviewed-by: Darrick J. Wong <darrick.wong@oracle.com>
+diff --git a/block/blk-mq.c b/block/blk-mq.c
+index ec791156e9cc..8daa9740929a 100644
+--- a/block/blk-mq.c
++++ b/block/blk-mq.c
+@@ -1486,7 +1486,7 @@ void blk_mq_delay_run_hw_queue(struct blk_mq_hw_ctx *hctx, unsigned long msecs)
+ }
+ EXPORT_SYMBOL(blk_mq_delay_run_hw_queue);
+ 
+-bool blk_mq_run_hw_queue(struct blk_mq_hw_ctx *hctx, bool async)
++void blk_mq_run_hw_queue(struct blk_mq_hw_ctx *hctx, bool async)
+ {
+ 	int srcu_idx;
+ 	bool need_run;
+@@ -1504,12 +1504,8 @@ bool blk_mq_run_hw_queue(struct blk_mq_hw_ctx *hctx, bool async)
+ 		blk_mq_hctx_has_pending(hctx);
+ 	hctx_unlock(hctx, srcu_idx);
+ 
+-	if (need_run) {
++	if (need_run)
+ 		__blk_mq_delay_run_hw_queue(hctx, async, 0);
+-		return true;
+-	}
+-
+-	return false;
+ }
+ EXPORT_SYMBOL(blk_mq_run_hw_queue);
+ 
+diff --git a/include/linux/blk-mq.h b/include/linux/blk-mq.h
+index 0bf056de5cc3..c963038dfb92 100644
+--- a/include/linux/blk-mq.h
++++ b/include/linux/blk-mq.h
+@@ -324,7 +324,7 @@ void blk_mq_start_stopped_hw_queues(struct request_queue *q, bool async);
+ void blk_mq_quiesce_queue(struct request_queue *q);
+ void blk_mq_unquiesce_queue(struct request_queue *q);
+ void blk_mq_delay_run_hw_queue(struct blk_mq_hw_ctx *hctx, unsigned long msecs);
+-bool blk_mq_run_hw_queue(struct blk_mq_hw_ctx *hctx, bool async);
++void blk_mq_run_hw_queue(struct blk_mq_hw_ctx *hctx, bool async);
+ void blk_mq_run_hw_queues(struct request_queue *q, bool async);
+ void blk_mq_tagset_busy_iter(struct blk_mq_tag_set *tagset,
+ 		busy_tag_iter_fn *fn, void *priv);
+-- 
+2.17.1
 
---D
-
-> ---
->  fs/iomap/direct-io.c | 2 +-
->  1 file changed, 1 insertion(+), 1 deletion(-)
-> 
-> diff --git a/fs/iomap/direct-io.c b/fs/iomap/direct-io.c
-> index 1fc28c2..9712648 100644
-> --- a/fs/iomap/direct-io.c
-> +++ b/fs/iomap/direct-io.c
-> @@ -430,7 +430,7 @@ static void iomap_dio_bio_end_io(struct bio *bio)
->  		if (pos >= dio->i_size)
->  			goto out_free_dio;
->  
-> -		if (iter_is_iovec(iter) && iov_iter_rw(iter) == READ)
-> +		if (iter_is_iovec(iter))
->  			dio->flags |= IOMAP_DIO_DIRTY;
->  	} else {
->  		flags |= IOMAP_WRITE;
-> -- 
-> 1.8.3.1
-> 
