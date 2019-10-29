@@ -2,255 +2,89 @@ Return-Path: <SRS0=FPpm=YW=vger.kernel.org=linux-block-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-2.3 required=3.0 tests=DKIM_SIGNED,DKIM_VALID,
-	HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,
-	USER_AGENT_SANE_1 autolearn=no autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-8.7 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
+	MAILING_LIST_MULTI,MENTIONS_GIT_HOSTING,SPF_HELO_NONE,SPF_PASS,
+	UNPARSEABLE_RELAY,URIBL_BLOCKED,USER_AGENT_GIT autolearn=ham
+	autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 6A704CA9EAE
-	for <linux-block@archiver.kernel.org>; Tue, 29 Oct 2019 19:53:02 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 67835CA9EAE
+	for <linux-block@archiver.kernel.org>; Tue, 29 Oct 2019 20:11:34 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.kernel.org (Postfix) with ESMTP id 2BEAA2067D
-	for <linux-block@archiver.kernel.org>; Tue, 29 Oct 2019 19:53:02 +0000 (UTC)
-Authentication-Results: mail.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel-dk.20150623.gappssmtp.com header.i=@kernel-dk.20150623.gappssmtp.com header.b="BxnkoQHI"
+	by mail.kernel.org (Postfix) with ESMTP id 3BF142067D
+	for <linux-block@archiver.kernel.org>; Tue, 29 Oct 2019 20:11:34 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1725922AbfJ2TxB (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Tue, 29 Oct 2019 15:53:01 -0400
-Received: from mail-il1-f182.google.com ([209.85.166.182]:44840 "EHLO
-        mail-il1-f182.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1725870AbfJ2TxB (ORCPT
+        id S1725830AbfJ2ULd (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Tue, 29 Oct 2019 16:11:33 -0400
+Received: from bhuna.collabora.co.uk ([46.235.227.227]:54678 "EHLO
+        bhuna.collabora.co.uk" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S1725905AbfJ2ULd (ORCPT
         <rfc822;linux-block@vger.kernel.org>);
-        Tue, 29 Oct 2019 15:53:01 -0400
-Received: by mail-il1-f182.google.com with SMTP id h5so9186818ilh.11
-        for <linux-block@vger.kernel.org>; Tue, 29 Oct 2019 12:53:00 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=kernel-dk.20150623.gappssmtp.com; s=20150623;
-        h=subject:to:cc:references:from:message-id:date:user-agent
-         :mime-version:in-reply-to:content-language:content-transfer-encoding;
-        bh=DFll6b5XSR2+mVH3UkBsPiEUvx10UhW2nPsXPtrbYrA=;
-        b=BxnkoQHIpXWVPX5ua91WHR8i+s7PDaYv67WVFdoGde2XuxEyUGZqWUS2oGqTbPrfzv
-         5fwv8CIxj8e+Livfcn8c2oCyD18LeqG3swQUI4zaqusaAgSoH77F37GHmJXRBM9U7K8i
-         jJNIRn3y9dH21b0DB2o6kKCxTgTjgxvVPHK6xYKjFjX8g8coobwNDKgpuWLpa03PdeKg
-         G2tM5THgnlC0ur8RRXz6HI+nA7Mi2XHv+0kQVpXIW6nbpxXFS5fkm1YouZNokP4RXLka
-         dfP7yw8hV5iywjDacTDSgM0tr7NASKnNQ4Do93X8s4XgGfJvXn3QWLZAPWAR4rupnzoa
-         yQ9Q==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20161025;
-        h=x-gm-message-state:subject:to:cc:references:from:message-id:date
-         :user-agent:mime-version:in-reply-to:content-language
-         :content-transfer-encoding;
-        bh=DFll6b5XSR2+mVH3UkBsPiEUvx10UhW2nPsXPtrbYrA=;
-        b=mWmR47h85GurhEqAuf3Z2rpCGZIRnlHI8tadXMhjnig3Tw5z2jabIOEsfNAExLyKTQ
-         4lbH4nYM/GGveltwzXv4YoRUZLOBMHt7JmW14ojanop4awNrNe5wUcHC5paMPNmbXTQg
-         P3biF+n1taWH70opzrxsYnDdnTgtj6oYEXmif6o9Wkk8NOpXQPwRNUaMDQrNtUtJOdAB
-         ZfZnjcQ/lFfK1rIWknMmuumiv3m3US7nxyw0s5WBmizhuUcKh7UWxh7ootHr1YbwU7a9
-         S+fQokW+RLIIhPvnBIPmvtSGqE9/EGydAyW7DWVDILdBZZMX67r9lRbG2C2oh4Ez6h2i
-         Emfg==
-X-Gm-Message-State: APjAAAU4t5KqgjlRT7CsF2yEdXEp1Y6mZ4i8YykUxcPRJdzdwFLH2Y9W
-        5XDACvyoxI1z86IMGbMNir3xXHby60VpMw==
-X-Google-Smtp-Source: APXvYqyTjm8aPBRGzwcAJDPXqOuEVqPJ/skVfz9/Bm7zS1Rnk8yMOUyoF+v/SAGagDP+YrzJDCU2Cg==
-X-Received: by 2002:a92:9e08:: with SMTP id q8mr30863413ili.108.1572378779866;
-        Tue, 29 Oct 2019 12:52:59 -0700 (PDT)
-Received: from [192.168.1.159] ([65.144.74.34])
-        by smtp.gmail.com with ESMTPSA id s28sm1442967ioa.88.2019.10.29.12.52.58
-        (version=TLS1_2 cipher=ECDHE-RSA-AES128-GCM-SHA256 bits=128/128);
-        Tue, 29 Oct 2019 12:52:58 -0700 (PDT)
-Subject: Re: [RFC 0/2] io_uring: examine request result only after completion
-To:     Bijan Mottahedeh <bijan.mottahedeh@oracle.com>
-Cc:     linux-block@vger.kernel.org
-References: <1571908688-22488-1-git-send-email-bijan.mottahedeh@oracle.com>
- <22fc1057-237b-a9b8-5a57-b7c53166a609@kernel.dk>
- <201931df-ae22-c2fc-a9c7-496ceb87dff7@oracle.com>
- <90c23805-4b73-4ade-1b54-dc68010b54dd@kernel.dk>
- <fa82e9fc-caf7-a94a-ebff-536413e9ecce@oracle.com>
- <b7abb363-d665-b46a-9fb5-d01e7a6ce4d6@kernel.dk>
- <533409a8-6907-44d8-1b90-a10ec3483c2c@kernel.dk>
- <6adb9d2d-93f1-f915-7f20-5faa34b06398@kernel.dk>
- <cdaa2942-5f27-79f8-9933-1b947646f918@oracle.com>
- <34f483d9-2a97-30c3-9937-d3596649356c@oracle.com>
- <47b38d9d-04a3-99f6-c586-e82611d21655@kernel.dk>
- <c7b599e4-cf3d-5390-f6f4-360d4435ea43@oracle.com>
- <057bb6f9-29ec-1160-a1b1-00c57b610282@kernel.dk>
- <5d79122d-afcd-9340-df67-d81e1d94dd80@oracle.com>
- <e7d6ec39-1a1b-b4da-3944-8a1492c2c37e@kernel.dk>
- <3b71fff1-5b5e-3d33-b701-c7e1b3c9d8b9@oracle.com>
-From:   Jens Axboe <axboe@kernel.dk>
-Message-ID: <e334c317-e40a-f670-1d6e-220ddff05d64@kernel.dk>
-Date:   Tue, 29 Oct 2019 13:52:57 -0600
-User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:60.0) Gecko/20100101
- Thunderbird/60.9.0
+        Tue, 29 Oct 2019 16:11:33 -0400
+Received: from [127.0.0.1] (localhost [127.0.0.1])
+        (Authenticated sender: tonyk)
+        with ESMTPSA id 9C1E8283BD1
+From:   =?UTF-8?q?Andr=C3=A9=20Almeida?= <andrealmeid@collabora.com>
+To:     linux-block@vger.kernel.org
+Cc:     osandov@fb.com, kernel@collabora.com, krisman@collabora.com,
+        =?UTF-8?q?Andr=C3=A9=20Almeida?= <andrealmeid@collabora.com>
+Subject: [PATCH blktests 0/3] Add --config argument for custom config filenames
+Date:   Tue, 29 Oct 2019 17:09:39 -0300
+Message-Id: <20191029200942.83044-1-andrealmeid@collabora.com>
+X-Mailer: git-send-email 2.23.0
 MIME-Version: 1.0
-In-Reply-To: <3b71fff1-5b5e-3d33-b701-c7e1b3c9d8b9@oracle.com>
-Content-Type: text/plain; charset=utf-8
-Content-Language: en-US
+Content-Type: text/plain; charset=UTF-8
 Content-Transfer-Encoding: 8bit
 Sender: linux-block-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-On 10/29/19 1:51 PM, Bijan Mottahedeh wrote:
-> 
-> On 10/29/19 12:46 PM, Jens Axboe wrote:
->> On 10/29/19 1:40 PM, Bijan Mottahedeh wrote:
->>> On 10/29/19 12:33 PM, Jens Axboe wrote:
->>>> On 10/29/19 1:31 PM, Bijan Mottahedeh wrote:
->>>>> On 10/29/19 12:27 PM, Jens Axboe wrote:
->>>>>> On 10/29/19 1:23 PM, Bijan Mottahedeh wrote:
->>>>>>> On 10/29/19 12:17 PM, Bijan Mottahedeh wrote:
->>>>>>>> On 10/25/19 7:21 AM, Jens Axboe wrote:
->>>>>>>>> On 10/25/19 8:18 AM, Jens Axboe wrote:
->>>>>>>>>> On 10/25/19 8:07 AM, Jens Axboe wrote:
->>>>>>>>>>> On 10/25/19 7:46 AM, Bijan Mottahedeh wrote:
->>>>>>>>>>>> On 10/24/19 3:31 PM, Jens Axboe wrote:
->>>>>>>>>>>>> On 10/24/19 1:18 PM, Bijan Mottahedeh wrote:
->>>>>>>>>>>>>> On 10/24/19 10:09 AM, Jens Axboe wrote:
->>>>>>>>>>>>>>> On 10/24/19 3:18 AM, Bijan Mottahedeh wrote:
->>>>>>>>>>>>>>>> Running an fio test consistenly crashes the kernel with the
->>>>>>>>>>>>>>>> trace included
->>>>>>>>>>>>>>>> below.  The root cause seems to be the code in
->>>>>>>>>>>>>>>> __io_submit_sqe() that
->>>>>>>>>>>>>>>> checks the result of a request for -EAGAIN in polled mode,
->>>>>>>>>>>>>>>> without
->>>>>>>>>>>>>>>> ensuring first that the request has completed:
->>>>>>>>>>>>>>>>
->>>>>>>>>>>>>>>>            if (ctx->flags & IORING_SETUP_IOPOLL) {
->>>>>>>>>>>>>>>>                if (req->result == -EAGAIN)
->>>>>>>>>>>>>>>>                    return -EAGAIN;
->>>>>>>>>>>>>>> I'm a little confused, because we should be holding the submission
->>>>>>>>>>>>>>> reference to the request still at this point. So how is it
->>>>>>>>>>>>>>> going away?
->>>>>>>>>>>>>>> I must be missing something...
->>>>>>>>>>>>>> I don't think the submission reference is going away...
->>>>>>>>>>>>>>
->>>>>>>>>>>>>> I *think* the problem has to do with the fact that
->>>>>>>>>>>>>> io_complete_rw_iopoll() which sets REQ_F_IOPOLL_COMPLETED is being
->>>>>>>>>>>>>> called from interrupt context in my configuration and so there is a
->>>>>>>>>>>>>> potential race between updating the request there and checking
->>>>>>>>>>>>>> it in
->>>>>>>>>>>>>> __io_submit_sqe().
->>>>>>>>>>>>>>
->>>>>>>>>>>>>> My first workaround was to simply poll for
->>>>>>>>>>>>>> REQ_F_IOPOLL_COMPLETED in the
->>>>>>>>>>>>>> code snippet above:
->>>>>>>>>>>>>>
->>>>>>>>>>>>>>                  if (req->result == --EAGAIN) {
->>>>>>>>>>>>>>
->>>>>>>>>>>>>>                      poll for REQ_F_IOPOLL_COMPLETED
->>>>>>>>>>>>>>
->>>>>>>>>>>>>>                      return -EAGAIN;
->>>>>>>>>>>>>>
->>>>>>>>>>>>>> }
->>>>>>>>>>>>>>
->>>>>>>>>>>>>> and that got rid of the problem.
->>>>>>>>>>>>> But that will not work at all for a proper poll setup, where you
->>>>>>>>>>>>> don't
->>>>>>>>>>>>> trigger any IRQs... It only happens to work for this case because
->>>>>>>>>>>>> you're
->>>>>>>>>>>>> still triggering interrupts. But even in that case, it's not a real
->>>>>>>>>>>>> solution, but I don't think that's the argument here ;-)
->>>>>>>>>>>> Sure.
->>>>>>>>>>>>
->>>>>>>>>>>> I'm just curious though as how it would break the poll case because
->>>>>>>>>>>> io_complete_rw_iopoll() would still be called though through polling,
->>>>>>>>>>>> REQ_F_IOPOLL_COMPLETED would be set, and so io_iopoll_complete()
->>>>>>>>>>>> should be able to reliably check req->result.
->>>>>>>>>>> It'd break the poll case because the task doing the submission is
->>>>>>>>>>> generally also the one that finds and reaps completion. Hence if you
->>>>>>>>>>> block that task just polling on that completion bit, you are
->>>>>>>>>>> preventing
->>>>>>>>>>> that very task from going and reaping completions. The condition would
->>>>>>>>>>> never become true, and you are now looping forever.
->>>>>>>>>>>
->>>>>>>>>>>> The same poll test seemed to run ok with nvme interrupts not being
->>>>>>>>>>>> triggered. Anyway, no argument that it's not needed!
->>>>>>>>>>> A few reasons why it would make progress:
->>>>>>>>>>>
->>>>>>>>>>> - You eventually trigger a timeout on the nvme side, as blk-mq
->>>>>>>>>>> finds the
->>>>>>>>>>>             request hasn't been completed by an IRQ. But that's a 30
->>>>>>>>>>> second ordeal
->>>>>>>>>>>             before that event occurs.
->>>>>>>>>>>
->>>>>>>>>>> - There was still interrupts enabled.
->>>>>>>>>>>
->>>>>>>>>>> - You have two threads, one doing submission and one doing
->>>>>>>>>>> completions.
->>>>>>>>>>>             Maybe using SQPOLL? If that's the case, then yes, it'd still
->>>>>>>>>>> work as
->>>>>>>>>>>             you have separate threads for submission and completion.
->>>>>>>>>>>
->>>>>>>>>>> For the "generic" case of just using one thread and IRQs disabled,
->>>>>>>>>>> it'd
->>>>>>>>>>> deadlock.
->>>>>>>>>>>
->>>>>>>>>>>>> I see what the race is now, it's specific to IRQ driven polling. We
->>>>>>>>>>>>> really should just disallow that, to be honest, it doesn't make any
->>>>>>>>>>>>> sense. But let me think about if we can do a reasonable solution
->>>>>>>>>>>>> to this
->>>>>>>>>>>>> that doesn't involve adding overhead for a proper setup.
->>>>>>>>>>>> It's a nonsensical config in a way and so disallowing it would make
->>>>>>>>>>>> the most sense.
->>>>>>>>>>> Definitely. The nvme driver should not set .poll() if it doesn't have
->>>>>>>>>>> non-irq poll queues. Something like this:
->>>>>>>>>> Actually, we already disable polling if we don't have specific poll
->>>>>>>>>> queues:
->>>>>>>>>>
->>>>>>>>>>                  if (set->nr_maps > HCTX_TYPE_POLL &&
->>>>>>>>>>                      set->map[HCTX_TYPE_POLL].nr_queues)
->>>>>>>>>>                          blk_queue_flag_set(QUEUE_FLAG_POLL, q);
->>>>>>>>>>
->>>>>>>>>> Did you see any timeouts in your tests? I wonder if the use-after-free
->>>>>>>>>> triggered when the timeout found the request while you had the
->>>>>>>>>> busy-spin
->>>>>>>>>> logic we discussed previously.
->>>>>>>>> Ah, but we still have fops->iopoll() set for that case. So we just won't
->>>>>>>>> poll for it, it'll get completed by IRQ. So I do think we need to handle
->>>>>>>>> this case in io_uring. I'll get back to you.
->>>>>>>>>
->>>>>>>> I ran the same test on linux-next-20191029 in polled mode and got the
->>>>>>>> same free-after-user panic:
->>>>>>>>
->>>>>>>> - I booted with nvme.poll_queues set and verified that all queues
->>>>>>>> except default where of type poll
->>>>>>>>
->>>>>>>> - I added three assertions to verify the following:
->>>>>>>>
->>>>>>>>            - nvme_timeout() is not called
->>>>>>>>
->>>>>>>>            - io_complete_rw_iopoll() is not called from interrupt context
->>>>>>>>
->>>>>>>>            - io_sq_offload_start() is not called with IORING_SETUP_SQPOLL set
->>>>>>>>
->>>>>>>> Is it possible that the race is there also in polled mode since a
->>>>>>>> request submitted by one thread could conceivably be polled for and
->>>>>>>> completed by a different thread, e.g. in
->>>>>>>> io_uring_enter()->io_iopoll_check()?
->>>>>>>>
->>>>>>>> --bijan
->>>>>>>>
->>>>>>>>
->>>>>>> I also tested my RFC again with 1 thread and with queue depths of 1 to
->>>>>>> 1024 in multiples of 8 and didn't see any hangs.
->>>>>>>
->>>>>>> Just to be clear, the busy-spin logic discussed before was only a
->>>>>>> workaround an not in the RFC.
->>>>>> What is your exact test case?
->>>>>>
->>>>> See original cover letter.  I can reproduce the failure with numjobs
->>>>> between 8 and 32.
->>>> And how many poll queues are you using?
->>>>
->>> 30
->> And how many threads/cores in the box? Trying to get a sense for how
->> many CPUs share a single poll queue, if any.
->>
-> Thread(s) per core:    2
-> Core(s) per socket:    8
-> Socket(s):             2
+Instead of just using the default config file, one may also find useful to
+specify which configuration file would like to use without editing the config
+file, like this:
 
-OK, so 2*8*2 == 32 threads, hence some threads will share a poll queue.
+$ ./check --config=tests_nvme
+...
+$ ./check -c tests_scsi
+
+This pull request solves this. This change means to be optional, in the sense
+that the default behavior should not be modified and current setups will not be
+affect by this. To check if this is true, I have done the following test:
+
+- Print the value of variables $DEVICE_ONLY, $QUICK_RUN, $TIMEOUT,
+  $RUN_ZONED_TESTS, $OUTPUT, $EXCLUDE
+  
+- Run with the following setups:
+    - with a config file in the dir
+    - without a config file in the dir
+    - configuring using command line arguments
+
+With both original code and with my changes, I validated that the values
+remained the same. Then, I used the argument --config=test_config to check that
+the values of variables are indeed changing.
+
+This patchset add this feature, update the docs and fix a minor issue with a
+command line argument. Also, I have changed "# shellcheck disable=SC1091" to
+"# shellcheck source=/dev/null", since it seems the proper way to disable this
+check according to shellcheck documentation[1].
+
+Thanks,
+André
+
+[1] https://github.com/koalaman/shellcheck/wiki/SC1090#exceptions
+
+This patch is also avaible at GitHub:
+https://github.com/osandov/blktests/pull/56
+
+André Almeida (3):
+  check: Add configuration file option
+  Documentation: Add information about `--config` argument
+  check: Make "device-only" option a valid option
+
+ Documentation/running-tests.md |  3 ++-
+ check                          | 29 ++++++++++++++++++++++++-----
+ 2 files changed, 26 insertions(+), 6 deletions(-)
 
 -- 
-Jens Axboe
+2.23.0
 
