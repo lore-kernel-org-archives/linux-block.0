@@ -7,29 +7,29 @@ X-Spam-Status: No, score=-9.7 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
 	UNPARSEABLE_RELAY,URIBL_BLOCKED,USER_AGENT_GIT autolearn=ham
 	autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 3DCACCA9EAE
-	for <linux-block@archiver.kernel.org>; Tue, 29 Oct 2019 20:11:39 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 3FFD9CA9EAE
+	for <linux-block@archiver.kernel.org>; Tue, 29 Oct 2019 20:11:41 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.kernel.org (Postfix) with ESMTP id 167B02083E
-	for <linux-block@archiver.kernel.org>; Tue, 29 Oct 2019 20:11:39 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id 1CF9D2067D
+	for <linux-block@archiver.kernel.org>; Tue, 29 Oct 2019 20:11:41 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1726225AbfJ2ULi (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Tue, 29 Oct 2019 16:11:38 -0400
-Received: from bhuna.collabora.co.uk ([46.235.227.227]:54686 "EHLO
+        id S1726070AbfJ2ULk (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Tue, 29 Oct 2019 16:11:40 -0400
+Received: from bhuna.collabora.co.uk ([46.235.227.227]:54690 "EHLO
         bhuna.collabora.co.uk" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1725905AbfJ2ULi (ORCPT
+        with ESMTP id S1725905AbfJ2ULk (ORCPT
         <rfc822;linux-block@vger.kernel.org>);
-        Tue, 29 Oct 2019 16:11:38 -0400
+        Tue, 29 Oct 2019 16:11:40 -0400
 Received: from [127.0.0.1] (localhost [127.0.0.1])
         (Authenticated sender: tonyk)
-        with ESMTPSA id ECC4028FB7E
+        with ESMTPSA id 8182128FB82
 From:   =?UTF-8?q?Andr=C3=A9=20Almeida?= <andrealmeid@collabora.com>
 To:     linux-block@vger.kernel.org
 Cc:     osandov@fb.com, kernel@collabora.com, krisman@collabora.com,
         =?UTF-8?q?Andr=C3=A9=20Almeida?= <andrealmeid@collabora.com>
-Subject: [PATCH blktests 2/3] Documentation: Add information about `--config` argument
-Date:   Tue, 29 Oct 2019 17:09:41 -0300
-Message-Id: <20191029200942.83044-3-andrealmeid@collabora.com>
+Subject: [PATCH blktests 3/3] check: Make "device-only" option a valid option
+Date:   Tue, 29 Oct 2019 17:09:42 -0300
+Message-Id: <20191029200942.83044-4-andrealmeid@collabora.com>
 X-Mailer: git-send-email 2.23.0
 In-Reply-To: <20191029200942.83044-1-andrealmeid@collabora.com>
 References: <20191029200942.83044-1-andrealmeid@collabora.com>
@@ -41,26 +41,28 @@ Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-Add information about how to use the argument `--config`.
+"--device-only" option is described at the "Usage" help message and it's
+even parsed as an option by the main code. However, since it's not a
+parameter of getopt, when trying to use it will trigger a "unrecognized
+option". Fix that to allow usage of this option.
 
 Signed-off-by: André Almeida <andrealmeid@collabora.com>
 ---
- Documentation/running-tests.md | 3 ++-
- 1 file changed, 2 insertions(+), 1 deletion(-)
+ check | 2 +-
+ 1 file changed, 1 insertion(+), 1 deletion(-)
 
-diff --git a/Documentation/running-tests.md b/Documentation/running-tests.md
-index 675dac7..d5921be 100644
---- a/Documentation/running-tests.md
-+++ b/Documentation/running-tests.md
-@@ -21,7 +21,8 @@ will run all tests in the `loop` group and the `block/002` test.
+diff --git a/check b/check
+index 936b0c3..6b4c0d0 100755
+--- a/check
++++ b/check
+@@ -653,7 +653,7 @@ Miscellaneous:
+ 	esac
+ }
  
- Test configuration goes in the `config` file at the top-level directory of the
- blktests repository. Test configuration options can also be set as environment
--variables instead of in the `config` file.
-+variables instead of in the `config` file. It is also possible to use a
-+different file for configuration, using `--config=<file_name>`.
- 
- ### Test Devices
+-if ! TEMP=$(getopt -o 'do:q::x:c:h' --long 'quick::,exclude:,output:,config:,help' -n "$0" -- "$@"); then
++if ! TEMP=$(getopt -o 'do:q::x:c:h' --long 'device-only,quick::,exclude:,output:,config:,help' -n "$0" -- "$@"); then
+ 	exit 1
+ fi
  
 -- 
 2.23.0
