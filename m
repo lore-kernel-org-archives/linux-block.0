@@ -1,97 +1,99 @@
-Return-Path: <SRS0=FPpm=YW=vger.kernel.org=linux-block-owner@kernel.org>
+Return-Path: <SRS0=yN0i=YX=vger.kernel.org=linux-block-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-9.8 required=3.0 tests=DKIM_SIGNED,DKIM_VALID,
-	DKIM_VALID_AU,FREEMAIL_FORGED_FROMDOMAIN,FREEMAIL_FROM,
-	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,
-	SPF_HELO_NONE,SPF_PASS,USER_AGENT_GIT autolearn=ham autolearn_force=no
+X-Spam-Status: No, score=-5.4 required=3.0 tests=DKIM_SIGNED,DKIM_VALID,
+	DKIM_VALID_AU,HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,
+	SPF_HELO_NONE,SPF_PASS,USER_AGENT_SANE_1 autolearn=ham autolearn_force=no
 	version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 0FC1BCA9EAE
-	for <linux-block@archiver.kernel.org>; Tue, 29 Oct 2019 22:36:10 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 699DBCA9EAE
+	for <linux-block@archiver.kernel.org>; Wed, 30 Oct 2019 00:21:44 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.kernel.org (Postfix) with ESMTP id D4EDF2087E
-	for <linux-block@archiver.kernel.org>; Tue, 29 Oct 2019 22:36:09 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id 3B84A20874
+	for <linux-block@archiver.kernel.org>; Wed, 30 Oct 2019 00:21:44 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="uCw4jKnU"
+	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="CQJbIYv/"
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1725974AbfJ2WgJ (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Tue, 29 Oct 2019 18:36:09 -0400
-Received: from mail-qk1-f193.google.com ([209.85.222.193]:41745 "EHLO
-        mail-qk1-f193.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1725840AbfJ2WgJ (ORCPT
+        id S1726527AbfJ3AVn (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Tue, 29 Oct 2019 20:21:43 -0400
+Received: from us-smtp-delivery-1.mimecast.com ([205.139.110.120]:21096 "EHLO
+        us-smtp-1.mimecast.com" rhost-flags-OK-OK-OK-FAIL) by vger.kernel.org
+        with ESMTP id S1725870AbfJ3AVn (ORCPT
         <rfc822;linux-block@vger.kernel.org>);
-        Tue, 29 Oct 2019 18:36:09 -0400
-Received: by mail-qk1-f193.google.com with SMTP id m125so597153qkd.8;
-        Tue, 29 Oct 2019 15:36:08 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20161025;
-        h=from:to:cc:subject:date:message-id:mime-version
-         :content-transfer-encoding;
-        bh=bAJA1RNDhAkbm1xO3/krIWUAY9zwBPAKxHWFAJSdUMY=;
-        b=uCw4jKnURRfwfJVwzUVthW/4p4oxCjYTxVp1YNNuyOMFS6EuZtRCFiWR5BsmhPOB0u
-         qg/UrUSKGJnODRuLeHpe8qcmCNxJbuS8l+qQlZWrd47EsAc5iSV/bt3Q/348XLydOSb+
-         13rtoDBaK7MsDyzy5mI8FyTw+JKeoOHtTTUt60x27MkPgAyNHkhwVpn6Hf3BeFKUyCAP
-         reJXOHB/pkWERSpU9kRgRlZuRd7JWj36RMs2igTybqsY2cX97Bl0t3w8OkRE0+EFtQKt
-         JQhP/qO2Y9AFSHT/8yyNcOqnKOX7MXefl9DXJPZRVLyYekAN1Pkis+9JL4O++3GU7rJX
-         agCg==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20161025;
-        h=x-gm-message-state:from:to:cc:subject:date:message-id:mime-version
-         :content-transfer-encoding;
-        bh=bAJA1RNDhAkbm1xO3/krIWUAY9zwBPAKxHWFAJSdUMY=;
-        b=KTY/FRgXBWIGgFfe4sZJ0rHqOAFo3pWjzJA/7RlEkvSg5HAqoobk6xvOPPw7AXtjtN
-         Sx77cv2tpBzvh71AEX72UfJ2aoFJaMYLRfUo+iVEl63fcBKRhe9Pv9uDLDdM/zTiX7yQ
-         apH5HUwtq/Sact16amgYiBjfbLuvFafWuGmTqxDcW0TAuA4lTzT/WjfwxrVQlEFIHJkR
-         TCYhj1Jab9iKc5MCOHa0+EoKZV0NyXnEgc6OWpD0uYBccVaOwkdtTJ5JrMd/FCthzTWS
-         ZGrh6jJaVRdOJRAHX1MO1L+Y+O4ZYfvXyWPqBJp6M4K0FpBT6BWYqUjLSAQGoBBbZ6qs
-         4H5w==
-X-Gm-Message-State: APjAAAXpMwOyzugfJpcAruqPT6z/wnpuqmHBpkbrTx7saVjv71Lt1bDm
-        JXPPMvha+UcVSU7i2htR6j8=
-X-Google-Smtp-Source: APXvYqxX3/Dih9xw7OuewPjGxo+KlUk390K7jqpAmpvsdtJR0mrxqr9Lkuzl5t8fTEdk2Sl0jWDj0g==
-X-Received: by 2002:a37:d02:: with SMTP id 2mr24922492qkn.307.1572388567956;
-        Tue, 29 Oct 2019 15:36:07 -0700 (PDT)
-Received: from GBdebian.ic.unicamp.br (wifi-177-220-85-136.wifi.ic.unicamp.br. [177.220.85.136])
-        by smtp.gmail.com with ESMTPSA id c21sm72374qtg.61.2019.10.29.15.36.04
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Tue, 29 Oct 2019 15:36:07 -0700 (PDT)
-From:   Gabriela Bittencourt <gabrielabittencourt00@gmail.com>
-To:     outreachy-kernel@googlegroups.com, axboe@kernel.dk,
-        linux-block@vger.kernel.org, linux-kernel@vger.kernel.org,
-        lkcamp@lists.libreplanetbr.org, trivial@kernel.org
-Cc:     Gabriela Bittencourt <gabrielabittencourt00@gmail.com>
-Subject: [PATCH] blk-mq: Fix typo in comment
-Date:   Tue, 29 Oct 2019 19:35:56 -0300
-Message-Id: <20191029223556.2289-1-gabrielabittencourt00@gmail.com>
-X-Mailer: git-send-email 2.20.1
+        Tue, 29 Oct 2019 20:21:43 -0400
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+        s=mimecast20190719; t=1572394902;
+        h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+         to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+         content-transfer-encoding:content-transfer-encoding:
+         in-reply-to:in-reply-to:references:references;
+        bh=sjdvnhncfNi/W+JuJj98kwA7XrsWnHo1724kW93jlUo=;
+        b=CQJbIYv/AKfGERbYwKBwfjV4g9wRnHqND4QxqIX6UIOx9U4VOuq3Ob2Kco32vkxnEtrWK4
+        8KDmxiBBj7e3a9nPAZz3HQUiJJg7/XU9ZTXMJEeZmrM8dba/rqdOs2dBLM0zjDxXylsfaz
+        6PphWQ3RgqnukIDjYkAAfDTPqnI5Ayo=
+Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
+ [209.132.183.4]) (Using TLS) by relay.mimecast.com with ESMTP id
+ us-mta-106-eKE4v4OgMmGUjrGEwm7oaw-1; Tue, 29 Oct 2019 20:21:38 -0400
+Received: from smtp.corp.redhat.com (int-mx05.intmail.prod.int.phx2.redhat.com [10.5.11.15])
+        (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
+        (No client certificate requested)
+        by mimecast-mx01.redhat.com (Postfix) with ESMTPS id 403591800D7B;
+        Wed, 30 Oct 2019 00:21:37 +0000 (UTC)
+Received: from ming.t460p (ovpn-8-20.pek2.redhat.com [10.72.8.20])
+        by smtp.corp.redhat.com (Postfix) with ESMTPS id EB53A5D6D4;
+        Wed, 30 Oct 2019 00:21:30 +0000 (UTC)
+Date:   Wed, 30 Oct 2019 08:21:26 +0800
+From:   Ming Lei <ming.lei@redhat.com>
+To:     Christoph Hellwig <hch@infradead.org>
+Cc:     Jens Axboe <axboe@kernel.dk>, linux-block@vger.kernel.org,
+        Coly Li <colyli@suse.de>, Keith Busch <kbusch@kernel.org>,
+        linux-bcache@vger.kernel.org
+Subject: Re: [PATCH V3] block: optimize for small block size IO
+Message-ID: <20191030002126.GA14423@ming.t460p>
+References: <20191029105125.12928-1-ming.lei@redhat.com>
+ <20191029110425.GA4382@infradead.org>
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
+In-Reply-To: <20191029110425.GA4382@infradead.org>
+User-Agent: Mutt/1.12.1 (2019-06-15)
+X-Scanned-By: MIMEDefang 2.79 on 10.5.11.15
+X-MC-Unique: eKE4v4OgMmGUjrGEwm7oaw-1
+X-Mimecast-Spam-Score: 0
+Content-Type: text/plain; charset=WINDOWS-1252
+Content-Transfer-Encoding: quoted-printable
+Content-Disposition: inline
 Sender: linux-block-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-Fix typo in words: 'vector' and 'query'.
+On Tue, Oct 29, 2019 at 04:04:25AM -0700, Christoph Hellwig wrote:
+> I still haven't seen an explanation why this simple thing doesn't work
+> just as well:
+>=20
+> diff --git a/block/blk-merge.c b/block/blk-merge.c
+> index 48e6725b32ee..f3073700166f 100644
+> --- a/block/blk-merge.c
+> +++ b/block/blk-merge.c
+> @@ -309,6 +309,11 @@ void __blk_queue_split(struct request_queue *q, stru=
+ct bio **bio,
+>  =09=09=09=09nr_segs);
+>  =09=09break;
+>  =09default:
+> +=09=09if ((*bio)->bi_vcnt =3D=3D 1 &&
+> +=09=09    (*bio)->bi_io_vec[0].bv_len <=3D PAGE_SIZE) {
+> +=09=09=09*nr_segs =3D 1;
+> +=09=09=09return;
+> +=09=09}
+>  =09=09split =3D blk_bio_segment_split(q, *bio, &q->bio_split, nr_segs);
+>  =09=09break;
+>  =09}
 
-Signed-off-by: Gabriela Bittencourt <gabrielabittencourt00@gmail.com>
----
- block/blk-mq-virtio.c | 2 +-
- 1 file changed, 1 insertion(+), 1 deletion(-)
+This bio(*bio) may be a fast-cloned bio from somewhere(DM, MD, ...), so the=
+ above
+check can't work sometime.
 
-diff --git a/block/blk-mq-virtio.c b/block/blk-mq-virtio.c
-index 488341628256..7b8a42c35102 100644
---- a/block/blk-mq-virtio.c
-+++ b/block/blk-mq-virtio.c
-@@ -16,7 +16,7 @@
-  * @first_vec:	first interrupt vectors to use for queues (usually 0)
-  *
-  * This function assumes the virtio device @vdev has at least as many available
-- * interrupt vetors as @set has queues.  It will then queuery the vector
-+ * interrupt vectors as @set has queues.  It will then query the vector
-  * corresponding to each queue for it's affinity mask and built queue mapping
-  * that maps a queue to the CPUs that have irq affinity for the corresponding
-  * vector.
--- 
-2.20.1
+
+thanks,
+Ming
 
