@@ -2,139 +2,138 @@ Return-Path: <SRS0=yN0i=YX=vger.kernel.org=linux-block-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-8.2 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
-	INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,
-	UNPARSEABLE_RELAY,USER_AGENT_SANE_1 autolearn=ham autolearn_force=no
-	version=3.4.0
+X-Spam-Status: No, score=-0.8 required=3.0 tests=DKIM_SIGNED,DKIM_VALID,
+	DKIM_VALID_AU,FREEMAIL_FORGED_FROMDOMAIN,FREEMAIL_FROM,
+	HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,
+	URIBL_BLOCKED autolearn=no autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id BA3D6CA9EC7
-	for <linux-block@archiver.kernel.org>; Wed, 30 Oct 2019 22:06:44 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id C4E99CA9EC7
+	for <linux-block@archiver.kernel.org>; Wed, 30 Oct 2019 22:16:10 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.kernel.org (Postfix) with ESMTP id 94CAB2083E
-	for <linux-block@archiver.kernel.org>; Wed, 30 Oct 2019 22:06:44 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id 950A620873
+	for <linux-block@archiver.kernel.org>; Wed, 30 Oct 2019 22:16:10 +0000 (UTC)
+Authentication-Results: mail.kernel.org;
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="F/WgYu38"
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1726268AbfJ3WGn (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Wed, 30 Oct 2019 18:06:43 -0400
-Received: from bhuna.collabora.co.uk ([46.235.227.227]:39642 "EHLO
-        bhuna.collabora.co.uk" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1726884AbfJ3WGn (ORCPT
+        id S1726501AbfJ3WQK (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Wed, 30 Oct 2019 18:16:10 -0400
+Received: from mail-il1-f195.google.com ([209.85.166.195]:46108 "EHLO
+        mail-il1-f195.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S1726268AbfJ3WQJ (ORCPT
         <rfc822;linux-block@vger.kernel.org>);
-        Wed, 30 Oct 2019 18:06:43 -0400
-Received: from [127.0.0.1] (localhost [127.0.0.1])
-        (Authenticated sender: tonyk)
-        with ESMTPSA id B13CC28EDAC
-Subject: Re: [PATCH blktests 1/3] check: Add configuration file option
-To:     Omar Sandoval <osandov@osandov.com>
-Cc:     linux-block@vger.kernel.org, osandov@fb.com, kernel@collabora.com,
-        krisman@collabora.com
-References: <20191029200942.83044-1-andrealmeid@collabora.com>
- <20191029200942.83044-2-andrealmeid@collabora.com>
- <20191030211652.GB326591@vader>
-From:   =?UTF-8?Q?Andr=c3=a9_Almeida?= <andrealmeid@collabora.com>
-Message-ID: <2f9f649b-31db-b774-5c41-1d5f4340881e@collabora.com>
-Date:   Wed, 30 Oct 2019 19:05:14 -0300
-User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:68.0) Gecko/20100101
- Thunderbird/68.2.0
+        Wed, 30 Oct 2019 18:16:09 -0400
+Received: by mail-il1-f195.google.com with SMTP id m16so3540408iln.13;
+        Wed, 30 Oct 2019 15:16:09 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=gmail.com; s=20161025;
+        h=mime-version:references:in-reply-to:from:date:message-id:subject:to
+         :cc;
+        bh=6aG6jaBQjykZMmoKoaVIScDbAeprHhorDd6ERUFUGTc=;
+        b=F/WgYu38dQJ2we3ACG0fFRAum6GXnziWqvKxwc8o0MXX4MEMwQjV5ERndrF8qyP56o
+         v1SGNFDy6uxA/Qt380IHl6jVwBQlM2/PcH3LoRrBS/B/d32S9STTGSiPf8zyyv0dWAG/
+         kIyzrcu1RagGogthigCxLj//XMUBsTIdMniQ1B8oZfLrdg2F/l0T3xzIkDP7PvV/D6r/
+         kGcWQCxBhCGCy/pFiwiGNyQFPrOyy1tea67MLK7UErHj9vUy4GXdkkTjdqfF2UeV4oHo
+         r2CdQkzRIUGOD0TXx1oG8704nL8dDxiPNuyeoNx0Zh654jg3a1ExuijDav1Y2jU6SLrR
+         ss8Q==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20161025;
+        h=x-gm-message-state:mime-version:references:in-reply-to:from:date
+         :message-id:subject:to:cc;
+        bh=6aG6jaBQjykZMmoKoaVIScDbAeprHhorDd6ERUFUGTc=;
+        b=GZdgG2YVsLv1tHRBDRWwOfWGdQ+GnTvUi8rY6pBZpzFf51VMCRL/wWHoUyyS2ICf1Z
+         yZLmqO9zJRKaePIAajBgb/1p73BoMmNsmSbtbK9t8yqvclLEtZ00lLFfidf+m+Jp5uW3
+         ysaSKgDtuTMflGkO4e90AgGOZNufn/AKzZ8p5Bq4cdbCZ1bvilYEcSq+sc4uOxhPRcti
+         rxmSEMiY4ZVH2O18eg/ARV98zBgUfCCin3al2BJOBvPVTO02O1AzqKdLgTmagZxQacgX
+         JBtNG2O41xZQNG51DBWVHUrXpB7v7W2n0yJ9mZkXrP8KfNd7Bi/JxEPxQIWxMEL7lcPW
+         NQPg==
+X-Gm-Message-State: APjAAAU1RrSKfItOOhsCed499ApftW2gakTY+NNfJvkD+AHLUUffM4WF
+        i8JBQBzVP9I3xCfixgl/HzbY6tdMNNraYi4+VT0=
+X-Google-Smtp-Source: APXvYqwv8oUCajfo1pOFHmNy6b86xLBgxyYuXpSl7PVowx/iM+uUjWJhp9J3RH+BSJI98acLMwAdZJwdE8J8nyDheQA=
+X-Received: by 2002:a92:8703:: with SMTP id m3mr2573584ild.131.1572473768596;
+ Wed, 30 Oct 2019 15:16:08 -0700 (PDT)
 MIME-Version: 1.0
-In-Reply-To: <20191030211652.GB326591@vader>
-Content-Type: text/plain; charset=utf-8
-Content-Language: en-US
-Content-Transfer-Encoding: 8bit
+References: <157186182463.3995.13922458878706311997.stgit@warthog.procyon.org.uk>
+ <157186186167.3995.7568100174393739543.stgit@warthog.procyon.org.uk>
+ <CAOi1vP97DMX8zweOLfBDOFstrjC78=6RgxK3PPj_mehCOSeoaw@mail.gmail.com> <4892d186-8eb0-a282-e7e6-e79958431a54@rasmusvillemoes.dk>
+In-Reply-To: <4892d186-8eb0-a282-e7e6-e79958431a54@rasmusvillemoes.dk>
+From:   Ilya Dryomov <idryomov@gmail.com>
+Date:   Wed, 30 Oct 2019 23:16:23 +0100
+Message-ID: <CAOi1vP9paV2-2_S0NgfbZDE6+5kqHXVc9xabHVC-2Ss1MmXkCg@mail.gmail.com>
+Subject: Re: [RFC PATCH 04/10] pipe: Use head and tail pointers for the ring,
+ not cursor and length [ver #2]
+To:     Rasmus Villemoes <linux@rasmusvillemoes.dk>
+Cc:     David Howells <dhowells@redhat.com>,
+        Linus Torvalds <torvalds@linux-foundation.org>,
+        Greg Kroah-Hartman <gregkh@linuxfoundation.org>,
+        Peter Zijlstra <peterz@infradead.org>,
+        nicolas.dichtel@6wind.com, raven@themaw.net,
+        Christian Brauner <christian@brauner.io>,
+        keyrings@vger.kernel.org, linux-usb@vger.kernel.org,
+        linux-block <linux-block@vger.kernel.org>,
+        linux-security-module@vger.kernel.org,
+        linux-fsdevel <linux-fsdevel@vger.kernel.org>,
+        linux-api@vger.kernel.org, LKML <linux-kernel@vger.kernel.org>
+Content-Type: text/plain; charset="UTF-8"
 Sender: linux-block-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-On 10/30/19 6:16 PM, Omar Sandoval wrote:
-> On Tue, Oct 29, 2019 at 05:09:40PM -0300, André Almeida wrote:
->> Add an option to be possible to use a different configuration file
->> rather than the default "config" file.
->>
->> Signed-off-by: André Almeida <andrealmeid@collabora.com>
->> ---
->>  check | 29 ++++++++++++++++++++++++-----
->>  1 file changed, 24 insertions(+), 5 deletions(-)
->>
->> diff --git a/check b/check
->> index 981058c..936b0c3 100755
->> --- a/check
->> +++ b/check
->> @@ -635,6 +635,9 @@ Test runs:
->>    -x, --exclude=TEST	 exclude a test (or test group) from the list of
->>  			 tests to run
->>  
->> +  -c, --config=FILE	 use FILE for loading configuration instead of
->> +			 default 'config' filename.
->> +
->>  Miscellaneous:
->>    -h, --help             display this help message and exit"
->>  
->> @@ -650,7 +653,7 @@ Miscellaneous:
->>  	esac
->>  }
->>  
->> -if ! TEMP=$(getopt -o 'do:q::x:h' --long 'quick::,exclude:,output:,help' -n "$0" -- "$@"); then
->> +if ! TEMP=$(getopt -o 'do:q::x:c:h' --long 'quick::,exclude:,output:,config:,help' -n "$0" -- "$@"); then
->>  	exit 1
->>  fi
->>  
->> @@ -659,10 +662,8 @@ unset TEMP
->>  
->>  LOGGER_PROG="$(type -P logger)" || LOGGER_PROG=true
->>  
->> -if [[ -r config ]]; then
->> -	# shellcheck disable=SC1091
->> -	. config
->> -fi
->> +# true if the default configuration file "config" should be used
->> +DEFAULT_CONFIG=true
->>  
->>  # Default configuration.
->>  : "${DEVICE_ONLY:=0}"
->> @@ -706,6 +707,17 @@ while true; do
->>  			EXCLUDE+=("$2")
->>  			shift 2
->>  			;;
->> +		'-c'|'--config')
->> +			if [[ -r "$2" ]]; then
->> +				# shellcheck source=/dev/null
->> +				. "$2"
->> +				DEFAULT_CONFIG=false
->> +			else
->> +				echo "Configuration file $2 not found!"
->> +				usage err
->> +			fi
->> +			shift 2
->> +			;;
-> 
-> If the user specifies -c multiple times, it will source each one, not
-> just the last one. Is that intentional? That might actually be a useful
-> feature, but we'd want to document it.
+On Wed, Oct 30, 2019 at 9:35 PM Rasmus Villemoes
+<linux@rasmusvillemoes.dk> wrote:
+>
+> On 30/10/2019 17.19, Ilya Dryomov wrote:
+> > On Thu, Oct 24, 2019 at 11:49 AM David Howells <dhowells@redhat.com> wrote:
+> >>  /*
+> >> - * We use a start+len construction, which provides full use of the
+> >> - * allocated memory.
+> >> - * -- Florian Coosmann (FGC)
+> >> - *
+> >> + * We use head and tail indices that aren't masked off, except at the point of
+> >> + * dereference, but rather they're allowed to wrap naturally.  This means there
+> >> + * isn't a dead spot in the buffer, provided the ring size < INT_MAX.
+> >> + * -- David Howells 2019-09-23.
+> >
+> > Hi David,
+> >
+> > Is "ring size < INT_MAX" constraint correct?
+>
+> No. As long as one always uses a[idx % size] to access the array, the
+> only requirement is that size is representable in an unsigned int. Then
+> because one also wants to do the % using simple bitmasking, that further
+> restricts one to sizes that are a power of 2, so the end result is that
+> the max size is 2^31 (aka INT_MAX+1).
 
-Hmm, good question. Actually, I wasn't thinking about that when I
-created this feature. I believe that using all the multiple `-c <file>`
-is more useful than just using the last one. I will send a v2
-documenting this behavior.
+I think the fact that indices are free running and wrap at a power of
+two already restricts you to sizes the are a power of two, independent
+of how you do masking.  If you switch to a[idx % size], size still has
+to be a power of two for things to work when idx wraps.  Consider:
 
-> 
->>  		'-h'|'--help')
->>  			usage out
->>  			;;
->> @@ -719,6 +731,13 @@ while true; do
->>  	esac
->>  done
->>  
->> +# if '-c' was not used, try to use the default config file
->> +if [[ -r config ]] && $DEFAULT_CONFIG; then
->> +	# shellcheck source=/dev/null
->> +	. config
->> +fi
->> +
->> +
->>  if [[ $QUICK_RUN -ne 0 && ! "${TIMEOUT:-}" ]]; then
->>  	_error "QUICK_RUN specified without TIMEOUT"
->>  fi
->> -- 
->> 2.23.0
->>
+  size = 6
+  head = tail = 4294967292, empty buffer
 
+  push  4294967292 % 6 = 0
+  push  4294967293 % 6 = 1
+  push  4294967294 % 6 = 2
+  push  4294967295 % 6 = 3
+  push           0 % 6 = 0  <-- expected 4, overwrote a[0]
+
+>
+> > I've never had to implement this free running indices scheme, but
+> > the way I've always visualized it is that the top bit of the index is
+> > used as a lap (as in a race) indicator, leaving 31 bits to work with
+> > (in case of unsigned ints).  Should that be
+> >
+> >   ring size <= 2^31
+> >
+> > or more precisely
+> >
+> >   ring size is a power of two <= 2^31
+>
+> Exactly. But it's kind of moot since the ring size would never be
+> allowed to grow anywhere near that.
+
+Thanks for confirming.  Even if it's kind of moot, I think it should be
+corrected to avoid confusion.
+
+                Ilya
