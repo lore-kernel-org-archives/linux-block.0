@@ -2,123 +2,98 @@ Return-Path: <SRS0=yN0i=YX=vger.kernel.org=linux-block-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-2.4 required=3.0 tests=DKIM_SIGNED,DKIM_VALID,
-	DKIM_VALID_AU,HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SPF_HELO_NONE,
-	SPF_PASS,USER_AGENT_SANE_1 autolearn=no autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-2.3 required=3.0 tests=DKIM_SIGNED,DKIM_VALID,
+	HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,
+	USER_AGENT_SANE_1 autolearn=no autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id A9A40C47E49
-	for <linux-block@archiver.kernel.org>; Wed, 30 Oct 2019 20:35:15 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 83739CA9EC5
+	for <linux-block@archiver.kernel.org>; Wed, 30 Oct 2019 20:45:16 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.kernel.org (Postfix) with ESMTP id 7E81220873
-	for <linux-block@archiver.kernel.org>; Wed, 30 Oct 2019 20:35:15 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id 510822080F
+	for <linux-block@archiver.kernel.org>; Wed, 30 Oct 2019 20:45:16 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=pass (1024-bit key) header.d=rasmusvillemoes.dk header.i=@rasmusvillemoes.dk header.b="h6STLAlg"
+	dkim=pass (2048-bit key) header.d=osandov-com.20150623.gappssmtp.com header.i=@osandov-com.20150623.gappssmtp.com header.b="bKIVKPmJ"
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1726671AbfJ3UfO (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Wed, 30 Oct 2019 16:35:14 -0400
-Received: from mail-wr1-f68.google.com ([209.85.221.68]:42638 "EHLO
-        mail-wr1-f68.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1726875AbfJ3UfO (ORCPT
+        id S1726973AbfJ3UpP (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Wed, 30 Oct 2019 16:45:15 -0400
+Received: from mail-pg1-f194.google.com ([209.85.215.194]:39218 "EHLO
+        mail-pg1-f194.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S1726892AbfJ3UpP (ORCPT
         <rfc822;linux-block@vger.kernel.org>);
-        Wed, 30 Oct 2019 16:35:14 -0400
-Received: by mail-wr1-f68.google.com with SMTP id a15so3820044wrf.9
-        for <linux-block@vger.kernel.org>; Wed, 30 Oct 2019 13:35:12 -0700 (PDT)
+        Wed, 30 Oct 2019 16:45:15 -0400
+Received: by mail-pg1-f194.google.com with SMTP id p12so2284386pgn.6
+        for <linux-block@vger.kernel.org>; Wed, 30 Oct 2019 13:45:15 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=rasmusvillemoes.dk; s=google;
-        h=subject:to:cc:references:from:message-id:date:user-agent
-         :mime-version:in-reply-to:content-language:content-transfer-encoding;
-        bh=GKB6Sx/IUizZ9IZiRwVYRZ7sZESLZmd5Upv0GbKgvpI=;
-        b=h6STLAlgZAIHahRpiOqt75+7YPhEervlfOHpzdNopczUpjoi/cznwsqOZegaIuJ4TM
-         zdwrYQypkfpFaKGT8vusv604I2nbF1GOJZlwrB9ZKBgTEBjDOpLU6TSZRH/roP8sxwT+
-         LZ6HXtPlhEH+GSsavlv45TTL5baI9xO8kN71I=
+        d=osandov-com.20150623.gappssmtp.com; s=20150623;
+        h=date:from:to:cc:subject:message-id:references:mime-version
+         :content-disposition:in-reply-to:user-agent;
+        bh=QSev49IyyyqhCaxWg6gIUEtoUNjdkCbrIKmlSFe3ZSE=;
+        b=bKIVKPmJClYoFbYjoi6+wNLTgbeJohXFEeChBb9798qjsbTUHH8Jw6xta5YImUhgsX
+         l4GO8mxwU7hle/3ViuP1veWRT+cuNOKGUdR/NqLPpQc1mo0d2FHsrhRa/MFBV9Mlqe0H
+         opAevbppluRUjcd8S9GVcuYsAUJOSf5MGJqXYeetdfAMggAlg9O8hAxmsdG4f5hAK6Ll
+         Lp7ilFZ174fnRo4tQxZGVyFYTbOVkbiaaMgyoDiDos4q2o2hSUo6z1GHk65fra5yLpt0
+         dgD8iQkQh6VhddflDHqWbtX31nSJOr6MIn/MtbwxCXFQleVGLy3DWS9Z2BLkpAxjgnu5
+         wJOg==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=1e100.net; s=20161025;
-        h=x-gm-message-state:subject:to:cc:references:from:message-id:date
-         :user-agent:mime-version:in-reply-to:content-language
-         :content-transfer-encoding;
-        bh=GKB6Sx/IUizZ9IZiRwVYRZ7sZESLZmd5Upv0GbKgvpI=;
-        b=XU0ryL84nxe+ZwUasfym0gBRt6UQXZGrVu+l1uMSSwx64CxIqRQXAkjS8Olr9AZ6nC
-         NjaVFpJBfTsrImIa64x9mH3Lx4dW4Muqlnp4xuNkJj9GJ7kcnIlD77VgvJgBq2MoxEOL
-         etAOWHO623+7+0lExQ8hqZPrTse41L2kUTCT9MiI1qbeVA0lgNCvmwOdmhpKolcGiW1E
-         LehXTTNj2oj1/Waxh7Qyfc54LKOiTWu1IZbmtrNRNwLXA3D7ZIGJlOK94AUsyHV/OJ1y
-         s3PRdItSA2FDVpaemW8ngmgKqiDu9GHbwtcsYjZcv3LMIZagoeIdeaf9x4tbF51JA49a
-         YU3g==
-X-Gm-Message-State: APjAAAX/mKzdqp5nbi3BcCLQYGJTXs7M9f8fJdo/mcQwhuLXQ1MNJ2TC
-        tdHjXDa+Pg48GIDSje+MXVvl4Q==
-X-Google-Smtp-Source: APXvYqwZ8L7WBUXKpllPra1iDKCIj9jTGodgQKb31qnM478jp8ypjhyOfCzrMdjpE9K/VYB36AzGxg==
-X-Received: by 2002:adf:d18b:: with SMTP id v11mr1782349wrc.308.1572467711910;
-        Wed, 30 Oct 2019 13:35:11 -0700 (PDT)
-Received: from [192.168.1.149] (ip-5-186-115-54.cgn.fibianet.dk. [5.186.115.54])
-        by smtp.gmail.com with ESMTPSA id a7sm1633681wrr.89.2019.10.30.13.35.10
-        (version=TLS1_2 cipher=ECDHE-RSA-AES128-GCM-SHA256 bits=128/128);
-        Wed, 30 Oct 2019 13:35:10 -0700 (PDT)
-Subject: Re: [RFC PATCH 04/10] pipe: Use head and tail pointers for the ring,
- not cursor and length [ver #2]
-To:     Ilya Dryomov <idryomov@gmail.com>,
-        David Howells <dhowells@redhat.com>
-Cc:     Linus Torvalds <torvalds@linux-foundation.org>,
-        Rasmus Villemoes <linux@rasmusvillemoes.dk>,
-        Greg Kroah-Hartman <gregkh@linuxfoundation.org>,
-        Peter Zijlstra <peterz@infradead.org>,
-        nicolas.dichtel@6wind.com, raven@themaw.net,
-        Christian Brauner <christian@brauner.io>,
-        keyrings@vger.kernel.org, linux-usb@vger.kernel.org,
-        linux-block <linux-block@vger.kernel.org>,
-        linux-security-module@vger.kernel.org,
-        linux-fsdevel <linux-fsdevel@vger.kernel.org>,
-        linux-api@vger.kernel.org, LKML <linux-kernel@vger.kernel.org>
-References: <157186182463.3995.13922458878706311997.stgit@warthog.procyon.org.uk>
- <157186186167.3995.7568100174393739543.stgit@warthog.procyon.org.uk>
- <CAOi1vP97DMX8zweOLfBDOFstrjC78=6RgxK3PPj_mehCOSeoaw@mail.gmail.com>
-From:   Rasmus Villemoes <linux@rasmusvillemoes.dk>
-Message-ID: <4892d186-8eb0-a282-e7e6-e79958431a54@rasmusvillemoes.dk>
-Date:   Wed, 30 Oct 2019 21:35:09 +0100
-User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:60.0) Gecko/20100101
- Thunderbird/60.9.0
+        h=x-gm-message-state:date:from:to:cc:subject:message-id:references
+         :mime-version:content-disposition:in-reply-to:user-agent;
+        bh=QSev49IyyyqhCaxWg6gIUEtoUNjdkCbrIKmlSFe3ZSE=;
+        b=dSUeHP+BYncij0cP/S0dGpnBohwkLVp7KrvH4oJypRrwDVH/2wcea69HE81uUUA/Np
+         1NMK/TqZeaM+gkh7Zmyh1NGLAPmAGYfgjbmpmbEKoRxrWlVB/w2QXQbOUfWVouyP2fu2
+         ZVEhiWbYsNK2DdHdm6OoTmvZCumBO/p/LnDQelJMxqcKKLgxj3CK42kI+Pv1X4Iod8qE
+         Cm3026So3hk6TKxpEZ+uD/EXYXRYCexd5pHNSbIv8Pqdsq7baRg8eH5cqvVUSDaDnfAc
+         VNOI83nYdeO+RyCCmPctjGxb7NFE/GUvePBgPx5Iu4sjY3osxzbmMfT2LUb4xWf4xfLz
+         ykvg==
+X-Gm-Message-State: APjAAAWVjaIyBfR1d3XuqTd1MAEElwwDEdo26RRYi3ZFK1jsTqIwcgnQ
+        8E/nEdu4J+Y58PPZw2h1QZ4c4g==
+X-Google-Smtp-Source: APXvYqzPH047nQHQW9jDF70+RWhnM81zotTD9CS9g7edHR7AZpvHG5wDbI+h1NE20+sVonPXvagRBA==
+X-Received: by 2002:a17:90a:1f4b:: with SMTP id y11mr1458689pjy.123.1572468314663;
+        Wed, 30 Oct 2019 13:45:14 -0700 (PDT)
+Received: from vader ([2601:602:8b80:8e0:e6a7:a0ff:fe0b:c9a8])
+        by smtp.gmail.com with ESMTPSA id o123sm836532pfg.161.2019.10.30.13.45.13
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Wed, 30 Oct 2019 13:45:14 -0700 (PDT)
+Date:   Wed, 30 Oct 2019 13:45:15 -0700
+From:   Omar Sandoval <osandov@osandov.com>
+To:     Bart Van Assche <bvanassche@acm.org>
+Cc:     Omar Sandoval <osandov@fb.com>, linux-block@vger.kernel.org,
+        Johannes Thumshirn <jthumshirn@suse.de>,
+        Chaitanya Kulkarni <chaitanya.kulkarni@wdc.com>
+Subject: Re: [PATCH blktests v2 0/2] Add a test that triggers
+ blk_mq_update_nr_hw_queues()
+Message-ID: <20191030204515.GA326591@vader>
+References: <20191024210352.71080-1-bvanassche@acm.org>
 MIME-Version: 1.0
-In-Reply-To: <CAOi1vP97DMX8zweOLfBDOFstrjC78=6RgxK3PPj_mehCOSeoaw@mail.gmail.com>
-Content-Type: text/plain; charset=utf-8
-Content-Language: en-US
-Content-Transfer-Encoding: 7bit
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <20191024210352.71080-1-bvanassche@acm.org>
+User-Agent: Mutt/1.12.2 (2019-09-21)
 Sender: linux-block-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-On 30/10/2019 17.19, Ilya Dryomov wrote:
-> On Thu, Oct 24, 2019 at 11:49 AM David Howells <dhowells@redhat.com> wrote:
->>  /*
->> - * We use a start+len construction, which provides full use of the
->> - * allocated memory.
->> - * -- Florian Coosmann (FGC)
->> - *
->> + * We use head and tail indices that aren't masked off, except at the point of
->> + * dereference, but rather they're allowed to wrap naturally.  This means there
->> + * isn't a dead spot in the buffer, provided the ring size < INT_MAX.
->> + * -- David Howells 2019-09-23.
+On Thu, Oct 24, 2019 at 02:03:50PM -0700, Bart Van Assche wrote:
+> Hi Omar,
 > 
-> Hi David,
+> This patch series includes the test that I used to verify my recently posted
+> blk_mq_update_nr_hw_queues() patches. Please consider these patches for
+> inclusion in the blktests repository.
 > 
-> Is "ring size < INT_MAX" constraint correct?
+> Thanks,
+> 
+> Bart.
+> 
+> Changes compared to v1:
+> - _uptime_s() now uses awk to read /proc/uptime.
+> - Removed subshells from tests/block/029.
+> - Changed find ... | wc -l into nproc.
+> - Skip kernel versions that do not support modifying the null_blk submit_queues
+>   attribute.
+> 
+> Bart Van Assche (2):
+>   Move and rename uptime_s()
+>   Add a test that triggers blk_mq_update_nr_hw_queues()
 
-No. As long as one always uses a[idx % size] to access the array, the
-only requirement is that size is representable in an unsigned int. Then
-because one also wants to do the % using simple bitmasking, that further
-restricts one to sizes that are a power of 2, so the end result is that
-the max size is 2^31 (aka INT_MAX+1).
-
-> I've never had to implement this free running indices scheme, but
-> the way I've always visualized it is that the top bit of the index is
-> used as a lap (as in a race) indicator, leaving 31 bits to work with
-> (in case of unsigned ints).  Should that be
-> 
->   ring size <= 2^31
-> 
-> or more precisely
-> 
->   ring size is a power of two <= 2^31
-
-Exactly. But it's kind of moot since the ring size would never be
-allowed to grow anywhere near that.
-
-Rasmus
+Thanks, Bart, applied and pushed.
