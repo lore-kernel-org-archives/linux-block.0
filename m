@@ -2,192 +2,79 @@ Return-Path: <SRS0=yN0i=YX=vger.kernel.org=linux-block-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-8.4 required=3.0 tests=DKIMWL_WL_HIGH,DKIM_SIGNED,
-	DKIM_VALID,DKIM_VALID_AU,HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,
-	MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED,
-	USER_AGENT_SANE_1 autolearn=unavailable autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-3.8 required=3.0 tests=DKIM_SIGNED,DKIM_VALID,
+	DKIM_VALID_AU,FREEMAIL_FORGED_FROMDOMAIN,FREEMAIL_FROM,
+	HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,
+	SPF_PASS,URIBL_BLOCKED autolearn=no autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 0EC70CA9EC7
-	for <linux-block@archiver.kernel.org>; Wed, 30 Oct 2019 23:05:29 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 1EF51CA9EC7
+	for <linux-block@archiver.kernel.org>; Wed, 30 Oct 2019 23:20:53 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.kernel.org (Postfix) with ESMTP id D7DE120873
-	for <linux-block@archiver.kernel.org>; Wed, 30 Oct 2019 23:05:28 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id E32D62087E
+	for <linux-block@archiver.kernel.org>; Wed, 30 Oct 2019 23:20:52 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=pass (2048-bit key) header.d=nvidia.com header.i=@nvidia.com header.b="md/zgeBc"
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="gONGGSLe"
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1727230AbfJ3XF2 (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Wed, 30 Oct 2019 19:05:28 -0400
-Received: from hqemgate14.nvidia.com ([216.228.121.143]:17582 "EHLO
-        hqemgate14.nvidia.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1727064AbfJ3XF2 (ORCPT
+        id S1726960AbfJ3XUw (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Wed, 30 Oct 2019 19:20:52 -0400
+Received: from mail-qt1-f196.google.com ([209.85.160.196]:34427 "EHLO
+        mail-qt1-f196.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S1726853AbfJ3XUw (ORCPT
         <rfc822;linux-block@vger.kernel.org>);
-        Wed, 30 Oct 2019 19:05:28 -0400
-Received: from hqpgpgate102.nvidia.com (Not Verified[216.228.121.13]) by hqemgate14.nvidia.com (using TLS: TLSv1.2, DES-CBC3-SHA)
-        id <B5dba17390001>; Wed, 30 Oct 2019 16:05:29 -0700
-Received: from hqmail.nvidia.com ([172.20.161.6])
-  by hqpgpgate102.nvidia.com (PGP Universal service);
-  Wed, 30 Oct 2019 16:05:23 -0700
-X-PGP-Universal: processed;
-        by hqpgpgate102.nvidia.com on Wed, 30 Oct 2019 16:05:23 -0700
-Received: from [10.110.48.28] (10.124.1.5) by HQMAIL107.nvidia.com
- (172.20.187.13) with Microsoft SMTP Server (TLS) id 15.0.1473.3; Wed, 30 Oct
- 2019 23:05:22 +0000
-Subject: Re: [PATCH 14/19] vfio, mm: pin_longterm_pages (FOLL_PIN) and
- put_user_page() conversion
-To:     Andrew Morton <akpm@linux-foundation.org>
-CC:     Al Viro <viro@zeniv.linux.org.uk>,
-        Alex Williamson <alex.williamson@redhat.com>,
-        Benjamin Herrenschmidt <benh@kernel.crashing.org>,
-        =?UTF-8?B?QmrDtnJuIFTDtnBlbA==?= <bjorn.topel@intel.com>,
-        Christoph Hellwig <hch@infradead.org>,
-        Dan Williams <dan.j.williams@intel.com>,
-        Daniel Vetter <daniel@ffwll.ch>,
-        Dave Chinner <david@fromorbit.com>,
-        David Airlie <airlied@linux.ie>,
-        "David S . Miller" <davem@davemloft.net>,
-        Ira Weiny <ira.weiny@intel.com>, Jan Kara <jack@suse.cz>,
-        Jason Gunthorpe <jgg@ziepe.ca>, Jens Axboe <axboe@kernel.dk>,
-        Jonathan Corbet <corbet@lwn.net>,
-        =?UTF-8?B?SsOpcsO0bWUgR2xpc3Nl?= <jglisse@redhat.com>,
-        Magnus Karlsson <magnus.karlsson@intel.com>,
-        Mauro Carvalho Chehab <mchehab@kernel.org>,
-        Michael Ellerman <mpe@ellerman.id.au>,
-        Michal Hocko <mhocko@suse.com>,
-        Mike Kravetz <mike.kravetz@oracle.com>,
-        Paul Mackerras <paulus@samba.org>,
-        Shuah Khan <shuah@kernel.org>,
-        Vlastimil Babka <vbabka@suse.cz>, <bpf@vger.kernel.org>,
-        <dri-devel@lists.freedesktop.org>, <kvm@vger.kernel.org>,
-        <linux-block@vger.kernel.org>, <linux-doc@vger.kernel.org>,
-        <linux-fsdevel@vger.kernel.org>, <linux-kselftest@vger.kernel.org>,
-        <linux-media@vger.kernel.org>, <linux-rdma@vger.kernel.org>,
-        <linuxppc-dev@lists.ozlabs.org>, <netdev@vger.kernel.org>,
-        <linux-mm@kvack.org>, LKML <linux-kernel@vger.kernel.org>
-References: <20191030224930.3990755-1-jhubbard@nvidia.com>
- <20191030224930.3990755-15-jhubbard@nvidia.com>
-From:   John Hubbard <jhubbard@nvidia.com>
-X-Nvconfidentiality: public
-Message-ID: <cfa579f0-999c-9712-494a-9d519bbc4314@nvidia.com>
-Date:   Wed, 30 Oct 2019 16:05:22 -0700
-User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:60.0) Gecko/20100101
- Thunderbird/60.8.0
+        Wed, 30 Oct 2019 19:20:52 -0400
+Received: by mail-qt1-f196.google.com with SMTP id e14so5885263qto.1;
+        Wed, 30 Oct 2019 16:20:51 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=gmail.com; s=20161025;
+        h=mime-version:references:in-reply-to:from:date:message-id:subject:to
+         :cc;
+        bh=Eq1yFNqRbX5oXHA7cRAuOcjtnHFRC37UNq/RAe1IY8M=;
+        b=gONGGSLeT+gVr1DX8wbpc78s4v4bhcEGPe0N5eKHhKbeec1MQq9MtOvWKwFEok1qc7
+         R9eeIjk1WgjCJ/pWEf4koPblNYwE5cAnQx/0WZ/gmrQUpf9X+/YIACOzl7Tj7nSqvosw
+         Of1c8qIdqv3Ma0z+Lm3icUJpZ0UXv4Y/ftEVvVhEHQbPt7+Yn8tUTqkEoZjxJ5Y1DaSd
+         MUbruIZp+k7ImIZSlEjc9+FQSu5CPWsUK4BqbH9jfXtJ2VI9yrAwTmyq2obKO0+YKmht
+         CLlBs9fZcCZ4ErEk8aoMQC6lzDak1MbMz5Qhcjp7cZzBuBsrxAe2rClG+jfAt8MDpUld
+         57vg==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20161025;
+        h=x-gm-message-state:mime-version:references:in-reply-to:from:date
+         :message-id:subject:to:cc;
+        bh=Eq1yFNqRbX5oXHA7cRAuOcjtnHFRC37UNq/RAe1IY8M=;
+        b=gP3WnmfcdtqoCO0XZaXl7jB4J8+pNPVYYaStb3n0khS1DoLpWMvttHVp63wkvIzCB6
+         VO1iFpyouplsg4EVzJYhRqLlaY0u5rHoUWbdBOuqcJjqYhi6gL7m5poZFAj6PInH9eNO
+         C7730ZAZ2jJpIbzLxbIgY+V1xmZ6+bFHzAOHivH/BqyItl6KG8HXKDKlGC51/16ktbAp
+         DVHxj5z4b4XiedErFIQnYtBL6UjVk2h/RQbB+tD8mG9IeS1Ju86mFLK5N/z+KWcIggRZ
+         MJ2UAnTRMVTS8A/APpBjZ6o+TqzRpc6RHSqmAWruS/U6rkaqRqe84e/pfehlODohvq96
+         yNsw==
+X-Gm-Message-State: APjAAAUfMR2S4k6fHs8tKkex+nyElD/PcFG+DRHfAG+TtoQSixbvKiFo
+        Sqar+xol9ZeovUCgAi//LBMdyDKsjT/EfuGl8s4=
+X-Google-Smtp-Source: APXvYqyvGeNOl87wx0ENiHy038JYbl6zzSmG1Hdz3NgWaI9PwsCQE/KXbe9y9SFlQOxvSWHxZaPjVrgafRT/xsxHP7E=
+X-Received: by 2002:ac8:6f44:: with SMTP id n4mr1296553qtv.379.1572477651197;
+ Wed, 30 Oct 2019 16:20:51 -0700 (PDT)
 MIME-Version: 1.0
-In-Reply-To: <20191030224930.3990755-15-jhubbard@nvidia.com>
-X-Originating-IP: [10.124.1.5]
-X-ClientProxiedBy: HQMAIL105.nvidia.com (172.20.187.12) To
- HQMAIL107.nvidia.com (172.20.187.13)
-Content-Type: text/plain; charset="utf-8"
-Content-Language: en-US
-Content-Transfer-Encoding: 7bit
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=nvidia.com; s=n1;
-        t=1572476729; bh=53l+EYxovXaJJmkDDYPwp5PBwN0eKGoaifL7qKM0Mds=;
-        h=X-PGP-Universal:Subject:To:CC:References:From:X-Nvconfidentiality:
-         Message-ID:Date:User-Agent:MIME-Version:In-Reply-To:
-         X-Originating-IP:X-ClientProxiedBy:Content-Type:Content-Language:
-         Content-Transfer-Encoding;
-        b=md/zgeBc2zml8TuAaTKRK2oyv1Btng0H6ozq8zn2sRJiXmTfxKbYsvkGcjK6gQS+q
-         3nPYnJq+1Eps5VG6ooIJSjGzkjOCMYIGUlSFcOJoUyjFNZ1H0vd+dWvWBSOqDkH5Uc
-         dvFo63nthImmg9iCDmU6xj0EE8b8pgUM6g95EetFKN1/r0QnPl5BygVRpoyVLlCyiH
-         iCMwhme/pZSwh1q5oOeHae8CYEOAkIwb1y6ebulV3/7WSgE5bb3SmwuYCg/xWfmbmX
-         iPDY0K1xyswztlMvQmBw8+uJFpl2scC5scONZ/nlQeN+ZcWegNbDORlz6y4lLuTxuj
-         WJ+vmX9yZfaww==
+References: <20191025070856.76761-1-hare@suse.de>
+In-Reply-To: <20191025070856.76761-1-hare@suse.de>
+From:   Song Liu <liu.song.a23@gmail.com>
+Date:   Wed, 30 Oct 2019 16:20:40 -0700
+Message-ID: <CAPhsuW5Wof-5jaP_oeEz3MeBO5w-bfVdsy0-LxT7-AJZmWyrdw@mail.gmail.com>
+Subject: Re: [PATCH] md/raid1: avoid soft lockup under high load
+To:     Hannes Reinecke <hare@suse.de>
+Cc:     Jens Axboe <axboe@kernel.dk>, Coly Li <colyli@suse.com>,
+        Neil Brown <neilb@suse.com>, linux-block@vger.kernel.org,
+        linux-raid <linux-raid@vger.kernel.org>
+Content-Type: text/plain; charset="UTF-8"
 Sender: linux-block-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-On 10/30/19 3:49 PM, John Hubbard wrote:
-> This also fixes one or two likely bugs.
+On Fri, Oct 25, 2019 at 12:25 PM Hannes Reinecke <hare@suse.de> wrote:
+>
+> As all I/O is being pushed through a kernel thread the softlockup
+> watchdog might be triggered under high load.
+>
+> Signed-off-by: Hannes Reinecke <hare@suse.de>
 
-Well, actually just one...
+Applied to md-next. Thanks!
 
-> 
-> 1. Change vfio from get_user_pages(FOLL_LONGTERM), to
-> pin_longterm_pages(), which sets both FOLL_LONGTERM and FOLL_PIN.
-> 
-> Note that this is a change in behavior, because the
-> get_user_pages_remote() call was not setting FOLL_LONGTERM, but the
-> new pin_user_pages_remote() call that replaces it, *is* setting
-> FOLL_LONGTERM. It is important to set FOLL_LONGTERM, because the
-> DMA case requires it. Please see the FOLL_PIN documentation in
-> include/linux/mm.h, and Documentation/pin_user_pages.rst for details.
-
-Correction: the above comment is stale and wrong. I wrote it before 
-getting further into the details, and the patch doesn't do this. 
-
-Instead, it keeps exactly the old behavior: pin_longterm_pages_remote()
-is careful to avoid setting FOLL_LONGTERM. Instead of setting that flag,
-it drops in a "TODO" comment nearby. :)
-
-I'll update the commit description in the next version of the series.
-
-
-thanks,
-
-John Hubbard
-NVIDIA
-
-> 
-> 2. Because all FOLL_PIN-acquired pages must be released via
-> put_user_page(), also convert the put_page() call over to
-> put_user_pages().
-> 
-> Note that this effectively changes the code's behavior in
-> vfio_iommu_type1.c: put_pfn(): it now ultimately calls
-> set_page_dirty_lock(), instead of set_page_dirty(). This is
-> probably more accurate.
-> 
-> As Christoph Hellwig put it, "set_page_dirty() is only safe if we are
-> dealing with a file backed page where we have reference on the inode it
-> hangs off." [1]
-> 
-> [1] https://lore.kernel.org/r/20190723153640.GB720@lst.de
-> 
-> Cc: Alex Williamson <alex.williamson@redhat.com>
-> Signed-off-by: John Hubbard <jhubbard@nvidia.com>
-> ---
->  drivers/vfio/vfio_iommu_type1.c | 15 +++++++--------
->  1 file changed, 7 insertions(+), 8 deletions(-)
-> 
-> diff --git a/drivers/vfio/vfio_iommu_type1.c b/drivers/vfio/vfio_iommu_type1.c
-> index d864277ea16f..795e13f3ef08 100644
-> --- a/drivers/vfio/vfio_iommu_type1.c
-> +++ b/drivers/vfio/vfio_iommu_type1.c
-> @@ -327,9 +327,8 @@ static int put_pfn(unsigned long pfn, int prot)
->  {
->  	if (!is_invalid_reserved_pfn(pfn)) {
->  		struct page *page = pfn_to_page(pfn);
-> -		if (prot & IOMMU_WRITE)
-> -			SetPageDirty(page);
-> -		put_page(page);
-> +
-> +		put_user_pages_dirty_lock(&page, 1, prot & IOMMU_WRITE);
->  		return 1;
->  	}
->  	return 0;
-> @@ -349,11 +348,11 @@ static int vaddr_get_pfn(struct mm_struct *mm, unsigned long vaddr,
->  
->  	down_read(&mm->mmap_sem);
->  	if (mm == current->mm) {
-> -		ret = get_user_pages(vaddr, 1, flags | FOLL_LONGTERM, page,
-> -				     vmas);
-> +		ret = pin_longterm_pages(vaddr, 1, flags, page, vmas);
->  	} else {
-> -		ret = get_user_pages_remote(NULL, mm, vaddr, 1, flags, page,
-> -					    vmas, NULL);
-> +		ret = pin_longterm_pages_remote(NULL, mm, vaddr, 1,
-> +						flags, page, vmas,
-> +						NULL);
->  		/*
->  		 * The lifetime of a vaddr_get_pfn() page pin is
->  		 * userspace-controlled. In the fs-dax case this could
-> @@ -363,7 +362,7 @@ static int vaddr_get_pfn(struct mm_struct *mm, unsigned long vaddr,
->  		 */
->  		if (ret > 0 && vma_is_fsdax(vmas[0])) {
->  			ret = -EOPNOTSUPP;
-> -			put_page(page[0]);
-> +			put_user_page(page[0]);
->  		}
->  	}
->  	up_read(&mm->mmap_sem);
-> 
+Song
