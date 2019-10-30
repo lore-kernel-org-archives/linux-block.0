@@ -2,126 +2,139 @@ Return-Path: <SRS0=yN0i=YX=vger.kernel.org=linux-block-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-7.3 required=3.0 tests=DKIM_SIGNED,DKIM_VALID,
-	HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,MENTIONS_GIT_HOSTING,
-	SPF_HELO_NONE,SPF_PASS,USER_AGENT_SANE_1 autolearn=ham autolearn_force=no
+X-Spam-Status: No, score=-8.2 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
+	INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,
+	UNPARSEABLE_RELAY,USER_AGENT_SANE_1 autolearn=ham autolearn_force=no
 	version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id DEC77CA9EC5
-	for <linux-block@archiver.kernel.org>; Wed, 30 Oct 2019 21:18:29 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id BA3D6CA9EC7
+	for <linux-block@archiver.kernel.org>; Wed, 30 Oct 2019 22:06:44 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.kernel.org (Postfix) with ESMTP id A46A22080F
-	for <linux-block@archiver.kernel.org>; Wed, 30 Oct 2019 21:18:29 +0000 (UTC)
-Authentication-Results: mail.kernel.org;
-	dkim=pass (2048-bit key) header.d=osandov-com.20150623.gappssmtp.com header.i=@osandov-com.20150623.gappssmtp.com header.b="y0SFNXzW"
+	by mail.kernel.org (Postfix) with ESMTP id 94CAB2083E
+	for <linux-block@archiver.kernel.org>; Wed, 30 Oct 2019 22:06:44 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1727022AbfJ3VS3 (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Wed, 30 Oct 2019 17:18:29 -0400
-Received: from mail-pg1-f193.google.com ([209.85.215.193]:43041 "EHLO
-        mail-pg1-f193.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1726261AbfJ3VS3 (ORCPT
+        id S1726268AbfJ3WGn (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Wed, 30 Oct 2019 18:06:43 -0400
+Received: from bhuna.collabora.co.uk ([46.235.227.227]:39642 "EHLO
+        bhuna.collabora.co.uk" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S1726884AbfJ3WGn (ORCPT
         <rfc822;linux-block@vger.kernel.org>);
-        Wed, 30 Oct 2019 17:18:29 -0400
-Received: by mail-pg1-f193.google.com with SMTP id l24so2341156pgh.10
-        for <linux-block@vger.kernel.org>; Wed, 30 Oct 2019 14:18:27 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=osandov-com.20150623.gappssmtp.com; s=20150623;
-        h=date:from:to:cc:subject:message-id:references:mime-version
-         :content-disposition:content-transfer-encoding:in-reply-to
-         :user-agent;
-        bh=F9rEKqChTbsig5uqWsWqhjeCF1dSr2iagjzasllozQA=;
-        b=y0SFNXzW6A0jELGwMNtJQnWX+5/43K/nZ1uMSVjLtDnFyO+Ad0zmm5XbYCpGVO2HIO
-         pk5Zs4cFRb2r1MURlc+CsGMZNajX8yDIDu3evRa9nBmHpcWsuRZbkdatoO5GJujrgFaQ
-         wDDhDWSktOMhlTJlFA7EM+4xmkJOh+yNsUoe6XmjvzeQeoVgHKUwA9RJNqApfbYCPgIt
-         ykKNpIXGqF/2Ar+/u39QLlw2l3EG9P9PEUZvYoZLIlbpTkiaAUJTNJ8c3zaeHudNTqmr
-         W88RvOi4Hb4NVyatFqhlYRZIbrBj3VpfCg/f/YI1IG052Dsn9LUIqOMSVQ1k9d8mcF7D
-         j9uA==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20161025;
-        h=x-gm-message-state:date:from:to:cc:subject:message-id:references
-         :mime-version:content-disposition:content-transfer-encoding
-         :in-reply-to:user-agent;
-        bh=F9rEKqChTbsig5uqWsWqhjeCF1dSr2iagjzasllozQA=;
-        b=Ce9D6VObhUAfvf7BSLffCOyDUa67ww4xDzXJMr0eko9LPF9CyjK5s08wd11yiqFopx
-         tl171LlGH1RGXxjZsVrvyWElDpkXHZi6DJCGDzurKTW8X4xrBsFef4q4MujaXSQm+G2V
-         WDC0cKBAkJaq/FGgX7fqcLNte0Tdk0/eMQ9x1uNXRdj0wslMHRfrt8sqOfJlOvzWUbD1
-         F0Spemq+QIlYan3jhFhwKU3gVVGirHQpVJx+wUMbSo2gI7hnUMXNRtgOVWQDkWCBe0O9
-         JFDEFPR1oPYiPCOqDBZGzxMrdYWNBuljkGx+8RiV6V3fivkbrDYHaK6tUfVAWIgK6OIN
-         c3XA==
-X-Gm-Message-State: APjAAAXPsm8irlrHGYPX4lvs+VBmXTJdb2JZYSx72BBpXbGfvXZQL6H3
-        QKnnXAQUFlsMF1KjCo9yprDnvw==
-X-Google-Smtp-Source: APXvYqyNwRKvmv5vzKqJtD/2YK1SsSOUbNtkutoxQUS86kxuF6I6xrGlzi7eVVdPW3d9jwN0aPj2HA==
-X-Received: by 2002:a63:7448:: with SMTP id e8mr1781114pgn.268.1572470306579;
-        Wed, 30 Oct 2019 14:18:26 -0700 (PDT)
-Received: from vader ([2601:602:8b80:8e0:e6a7:a0ff:fe0b:c9a8])
-        by smtp.gmail.com with ESMTPSA id l72sm4516071pjb.18.2019.10.30.14.18.25
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Wed, 30 Oct 2019 14:18:26 -0700 (PDT)
-Date:   Wed, 30 Oct 2019 14:18:25 -0700
-From:   Omar Sandoval <osandov@osandov.com>
-To:     =?iso-8859-1?Q?Andr=E9?= Almeida <andrealmeid@collabora.com>
+        Wed, 30 Oct 2019 18:06:43 -0400
+Received: from [127.0.0.1] (localhost [127.0.0.1])
+        (Authenticated sender: tonyk)
+        with ESMTPSA id B13CC28EDAC
+Subject: Re: [PATCH blktests 1/3] check: Add configuration file option
+To:     Omar Sandoval <osandov@osandov.com>
 Cc:     linux-block@vger.kernel.org, osandov@fb.com, kernel@collabora.com,
         krisman@collabora.com
-Subject: Re: [PATCH blktests 0/3] Add --config argument for custom config
- filenames
-Message-ID: <20191030211825.GC326591@vader>
 References: <20191029200942.83044-1-andrealmeid@collabora.com>
+ <20191029200942.83044-2-andrealmeid@collabora.com>
+ <20191030211652.GB326591@vader>
+From:   =?UTF-8?Q?Andr=c3=a9_Almeida?= <andrealmeid@collabora.com>
+Message-ID: <2f9f649b-31db-b774-5c41-1d5f4340881e@collabora.com>
+Date:   Wed, 30 Oct 2019 19:05:14 -0300
+User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:68.0) Gecko/20100101
+ Thunderbird/68.2.0
 MIME-Version: 1.0
-Content-Type: text/plain; charset=iso-8859-1
-Content-Disposition: inline
+In-Reply-To: <20191030211652.GB326591@vader>
+Content-Type: text/plain; charset=utf-8
+Content-Language: en-US
 Content-Transfer-Encoding: 8bit
-In-Reply-To: <20191029200942.83044-1-andrealmeid@collabora.com>
-User-Agent: Mutt/1.12.2 (2019-09-21)
 Sender: linux-block-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-On Tue, Oct 29, 2019 at 05:09:39PM -0300, AndrÈ Almeida wrote:
-> Instead of just using the default config file, one may also find useful to
-> specify which configuration file would like to use without editing the config
-> file, like this:
+On 10/30/19 6:16 PM, Omar Sandoval wrote:
+> On Tue, Oct 29, 2019 at 05:09:40PM -0300, Andr√© Almeida wrote:
+>> Add an option to be possible to use a different configuration file
+>> rather than the default "config" file.
+>>
+>> Signed-off-by: Andr√© Almeida <andrealmeid@collabora.com>
+>> ---
+>>  check | 29 ++++++++++++++++++++++++-----
+>>  1 file changed, 24 insertions(+), 5 deletions(-)
+>>
+>> diff --git a/check b/check
+>> index 981058c..936b0c3 100755
+>> --- a/check
+>> +++ b/check
+>> @@ -635,6 +635,9 @@ Test runs:
+>>    -x, --exclude=TEST	 exclude a test (or test group) from the list of
+>>  			 tests to run
+>>  
+>> +  -c, --config=FILE	 use FILE for loading configuration instead of
+>> +			 default 'config' filename.
+>> +
+>>  Miscellaneous:
+>>    -h, --help             display this help message and exit"
+>>  
+>> @@ -650,7 +653,7 @@ Miscellaneous:
+>>  	esac
+>>  }
+>>  
+>> -if ! TEMP=$(getopt -o 'do:q::x:h' --long 'quick::,exclude:,output:,help' -n "$0" -- "$@"); then
+>> +if ! TEMP=$(getopt -o 'do:q::x:c:h' --long 'quick::,exclude:,output:,config:,help' -n "$0" -- "$@"); then
+>>  	exit 1
+>>  fi
+>>  
+>> @@ -659,10 +662,8 @@ unset TEMP
+>>  
+>>  LOGGER_PROG="$(type -P logger)" || LOGGER_PROG=true
+>>  
+>> -if [[ -r config ]]; then
+>> -	# shellcheck disable=SC1091
+>> -	. config
+>> -fi
+>> +# true if the default configuration file "config" should be used
+>> +DEFAULT_CONFIG=true
+>>  
+>>  # Default configuration.
+>>  : "${DEVICE_ONLY:=0}"
+>> @@ -706,6 +707,17 @@ while true; do
+>>  			EXCLUDE+=("$2")
+>>  			shift 2
+>>  			;;
+>> +		'-c'|'--config')
+>> +			if [[ -r "$2" ]]; then
+>> +				# shellcheck source=/dev/null
+>> +				. "$2"
+>> +				DEFAULT_CONFIG=false
+>> +			else
+>> +				echo "Configuration file $2 not found!"
+>> +				usage err
+>> +			fi
+>> +			shift 2
+>> +			;;
 > 
-> $ ./check --config=tests_nvme
-> ...
-> $ ./check -c tests_scsi
-> 
-> This pull request solves this. This change means to be optional, in the sense
-> that the default behavior should not be modified and current setups will not be
-> affect by this. To check if this is true, I have done the following test:
-> 
-> - Print the value of variables $DEVICE_ONLY, $QUICK_RUN, $TIMEOUT,
->   $RUN_ZONED_TESTS, $OUTPUT, $EXCLUDE
->   
-> - Run with the following setups:
->     - with a config file in the dir
->     - without a config file in the dir
->     - configuring using command line arguments
-> 
-> With both original code and with my changes, I validated that the values
-> remained the same. Then, I used the argument --config=test_config to check that
-> the values of variables are indeed changing.
-> 
-> This patchset add this feature, update the docs and fix a minor issue with a
-> command line argument. Also, I have changed "# shellcheck disable=SC1091" to
-> "# shellcheck source=/dev/null", since it seems the proper way to disable this
-> check according to shellcheck documentation[1].
-> 
-> Thanks,
-> AndrÈ
-> 
-> [1] https://github.com/koalaman/shellcheck/wiki/SC1090#exceptions
-> 
-> This patch is also avaible at GitHub:
-> https://github.com/osandov/blktests/pull/56
-> 
-> AndrÈ Almeida (3):
->   check: Add configuration file option
->   Documentation: Add information about `--config` argument
->   check: Make "device-only" option a valid option
+> If the user specifies -c multiple times, it will source each one, not
+> just the last one. Is that intentional? That might actually be a useful
+> feature, but we'd want to document it.
 
-Patches 2 and 3 look good (although a nitpick is that patch 3 could be
-first since it's a bug fix that I could take independently of the other
-patches). I had one comment on patch 1.
+Hmm, good question. Actually, I wasn't thinking about that when I
+created this feature. I believe that using all the multiple `-c <file>`
+is more useful than just using the last one. I will send a v2
+documenting this behavior.
 
-Thanks!
+> 
+>>  		'-h'|'--help')
+>>  			usage out
+>>  			;;
+>> @@ -719,6 +731,13 @@ while true; do
+>>  	esac
+>>  done
+>>  
+>> +# if '-c' was not used, try to use the default config file
+>> +if [[ -r config ]] && $DEFAULT_CONFIG; then
+>> +	# shellcheck source=/dev/null
+>> +	. config
+>> +fi
+>> +
+>> +
+>>  if [[ $QUICK_RUN -ne 0 && ! "${TIMEOUT:-}" ]]; then
+>>  	_error "QUICK_RUN specified without TIMEOUT"
+>>  fi
+>> -- 
+>> 2.23.0
+>>
+
