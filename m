@@ -2,292 +2,129 @@ Return-Path: <SRS0=yN0i=YX=vger.kernel.org=linux-block-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-2.3 required=3.0 tests=DKIM_SIGNED,DKIM_VALID,
-	HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,
-	USER_AGENT_SANE_1 autolearn=no autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-3.8 required=3.0 tests=DKIM_SIGNED,DKIM_VALID,
+	HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,
+	SPF_PASS,URIBL_BLOCKED autolearn=no autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 53A2FCA9EAE
-	for <linux-block@archiver.kernel.org>; Wed, 30 Oct 2019 01:02:30 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 6A447CA9EAF
+	for <linux-block@archiver.kernel.org>; Wed, 30 Oct 2019 03:30:06 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.kernel.org (Postfix) with ESMTP id 10BA32086A
-	for <linux-block@archiver.kernel.org>; Wed, 30 Oct 2019 01:02:30 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id 341802087F
+	for <linux-block@archiver.kernel.org>; Wed, 30 Oct 2019 03:30:06 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel-dk.20150623.gappssmtp.com header.i=@kernel-dk.20150623.gappssmtp.com header.b="rTOpwaIh"
+	dkim=fail reason="signature verification failed" (2048-bit key) header.d=wdc.com header.i=@wdc.com header.b="CCgDjLzu";
+	dkim=pass (1024-bit key) header.d=sharedspace.onmicrosoft.com header.i=@sharedspace.onmicrosoft.com header.b="HVQhBWGK"
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1726495AbfJ3BC3 (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Tue, 29 Oct 2019 21:02:29 -0400
-Received: from mail-pg1-f170.google.com ([209.85.215.170]:42163 "EHLO
-        mail-pg1-f170.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1726094AbfJ3BC3 (ORCPT
+        id S1727114AbfJ3DaF (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Tue, 29 Oct 2019 23:30:05 -0400
+Received: from esa2.hgst.iphmx.com ([68.232.143.124]:11632 "EHLO
+        esa2.hgst.iphmx.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S1726752AbfJ3DaF (ORCPT
         <rfc822;linux-block@vger.kernel.org>);
-        Tue, 29 Oct 2019 21:02:29 -0400
-Received: by mail-pg1-f170.google.com with SMTP id f14so271177pgi.9
-        for <linux-block@vger.kernel.org>; Tue, 29 Oct 2019 18:02:28 -0700 (PDT)
+        Tue, 29 Oct 2019 23:30:05 -0400
+DKIM-Signature: v=1; a=rsa-sha256; c=simple/simple;
+  d=wdc.com; i=@wdc.com; q=dns/txt; s=dkim.wdc.com;
+  t=1572406268; x=1603942268;
+  h=from:to:subject:date:message-id:references:
+   content-transfer-encoding:mime-version;
+  bh=0ewsI2CO4L77E0s5Lk+odQ5nGn5qkNj6pJhOQG0ubJk=;
+  b=CCgDjLzuaAb7DR8mdxRHOo/hWm2DBiF5HMRAO0fRgKjjkR3CGlrhZ8Vs
+   qk5u3LB8LG6bz1pzmZeF5ALKrbszQ38Nb0o0Ai6kuShKMnVZxMs3hB/+n
+   sAZWrgKIiUHeJHNr/IzRzTej+2tXTLenvblBgSWy2ME/lwzSvRsXzMXMv
+   NXmsc0FXWSeyGKLjR8w823MiCYUSdIsHx44dXkV+K377CeRP2AvDTF0Fg
+   2XHB2G1iJguBTE+StwzO8br+GXejOL2wAAMLyQvmSpvyIwY2fzrJsOPs9
+   O9viSbqmXzpD4vgpUp6eKDsG0jikMfQ+cCjajbsQwsgl/AfvRKKpoSnjq
+   w==;
+IronPort-SDR: /xg24b6vbOPD8tF/mpDJOnXq556CTgVVsM07ZEXrnM7Zq8Yb4a+vKm0/Pkpyj6TRIs+Z6I7Ltt
+ GhK1a9g/EC93AhUK8ty7Ukz/DeqRbcylTU0rVioAQBnIx66QYurrmPhfElFiU4aesCAVHmjToA
+ DT5ifT5RGaz3Fi/5DnBKEA875MOEdo8H6he9hyQV/PqQUesmeLLPDWjmIAz3VTj+5rkPmtJrps
+ edYd889+cLPmEpIbudQ8uvId0uEcfOENHPa8Z3KDq4WFkfe2PuW10s2F0muhpUXddipgJojivl
+ Lz4=
+X-IronPort-AV: E=Sophos;i="5.68,245,1569254400"; 
+   d="scan'208";a="222786426"
+Received: from mail-bn3nam01lp2052.outbound.protection.outlook.com (HELO NAM01-BN3-obe.outbound.protection.outlook.com) ([104.47.33.52])
+  by ob1.hgst.iphmx.com with ESMTP; 30 Oct 2019 11:31:06 +0800
+ARC-Seal: i=1; a=rsa-sha256; s=arcselector9901; d=microsoft.com; cv=none;
+ b=HS0Y9dTWFtaUks/mNx945IMVsGCt4mocWvrNoSnn3rQ6x6O1DxjGBs89Uv/DRtC3vgl5xbWMUTF9rckrK9c60JdqH5D8Pm/kOw91b1NKiuzrvi9JhupfVbWhndQK70x50EswsLlR1JaFc7cpm35mUEfsSA7duCUMockn+2O98/UQDahyEirsaqIgZutuy98w8GJRnyltiJWkL9ERAlEqGDLUiixaAy/5mDfS7J97f6vIVc38oxT1SuocUtqPs0aKR/UTpVJ9KdvYGhxUNVhG0xtg9zKR6naFeaK1o62uNssh6g4910U3FTZWuGWEeR7YVy00paxqaJmUKcdlM5k8mg==
+ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com;
+ s=arcselector9901;
+ h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
+ bh=0ewsI2CO4L77E0s5Lk+odQ5nGn5qkNj6pJhOQG0ubJk=;
+ b=CD/h9SNG4knFq0fDd0gC4zZIjpMhu57a9GoO+KyABVeswHzf3Ns0Pa7/iwOrzoEoajO+6/1e+KPLzeOZ8vaMkEAqWEKTtOh8XlCKD5QrblF8ZZkSFQD6jIfcbwr88TNJcXLs2eSCZnsTX0jb6tAa6sWczlbXyUuK2b/nGjXXtcyQqRbraEypZ8k64Pi71iV8g8DegX2hZoilP9O0RNWssPR/DXNHDqgfN9ZJ6XT50oumlS6cvwqYU+gQpLSysqaC4tS6j2zbA/we4EerFkRUtLQrE8Doh0e80utJUw2RycUwukqYYt93SpqqtkR846R81J537pc98rX9IJTmhmjXzg==
+ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass
+ smtp.mailfrom=wdc.com; dmarc=pass action=none header.from=wdc.com; dkim=pass
+ header.d=wdc.com; arc=none
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=kernel-dk.20150623.gappssmtp.com; s=20150623;
-        h=from:subject:to:cc:references:message-id:date:user-agent
-         :mime-version:in-reply-to:content-language:content-transfer-encoding;
-        bh=rxQe1bTFGWNTOWZUF5fuYN19NfjCJZz8OvnKl9JcMhg=;
-        b=rTOpwaIhAORtnjf+p1gWoATEgT9QlYihowcXU5V6hEcpmuxWYIbdhtK1ub+bTNcsT2
-         gMh/tvcbBXqaiJMT/huRykXB2Am79j0kdPeFUWUjFrTpaiLrGTObUfNA3uR1gUQGUVrO
-         V1tsbCJzAwvglFecFKr2tIksHnLADGqLxaiV9YcWJhDYUIVK0/+eY7+vRwOXXK9ZfinN
-         WG94fZhh9a3p/ZYfKaioLbbbeuy0u2Ss4ZDsJQOTmq4xyLYoisFvs/ccA4r6RPqEwBBc
-         0QeVpnh2Xsqh7NG8geQ4nhwTPgKAj0QZbOA/LLNOHIdDkAmVrg40jDZ2q5Tw4tsVz2GN
-         kMUw==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20161025;
-        h=x-gm-message-state:from:subject:to:cc:references:message-id:date
-         :user-agent:mime-version:in-reply-to:content-language
-         :content-transfer-encoding;
-        bh=rxQe1bTFGWNTOWZUF5fuYN19NfjCJZz8OvnKl9JcMhg=;
-        b=NZ2pT2L4KT+MlA0CUsdlAFl5axpIhIT8QsMh7sadisilGI6d3EoNJGF64Wv2+IacIh
-         9W98slqyp0zmnkjPeDkcywJUomLUouNcGRc9+q89vurA1bzfJ25XoRFc0BZGT1377Tlb
-         y2CtusFig0Lt8uo610IprkABT78OcugHf+yDzm/cxYVSf4HZyiR7n0AXIXOsWZCWPVEQ
-         n/dcGzCd49U42yWJtQRGmnFoO+2hgpE76dK5G2zPpsgLxRGx+MM13ytcc+Uyc9QXnl8S
-         Zy39w+zjHCA7v1SieMpNYbG5xgrJH3vwOyvn6I5oBMcDtKTvgBEAqYZtwlq+uDj6QAgm
-         8Ddg==
-X-Gm-Message-State: APjAAAW8y0McYI4AkALNZRzzewcv+2gKlmTCdTi/0Sg2KXvc/rL+QYTl
-        kyIHqoZkxbX3lFJ6DEztkMHI7tbUvwIrqg==
-X-Google-Smtp-Source: APXvYqww2cV612l+p0yqxONt0vmX0pfnf8zU8uMbSij9/+v1ySbnZgNv7piKqnIy0o03KoXFFlD8Nw==
-X-Received: by 2002:a63:1513:: with SMTP id v19mr28443937pgl.11.1572397346762;
-        Tue, 29 Oct 2019 18:02:26 -0700 (PDT)
-Received: from [192.168.1.188] ([66.219.217.79])
-        by smtp.gmail.com with ESMTPSA id ck20sm290863pjb.5.2019.10.29.18.02.24
-        (version=TLS1_2 cipher=ECDHE-RSA-AES128-GCM-SHA256 bits=128/128);
-        Tue, 29 Oct 2019 18:02:25 -0700 (PDT)
-From:   Jens Axboe <axboe@kernel.dk>
-Subject: Re: [RFC 0/2] io_uring: examine request result only after completion
-To:     Bijan Mottahedeh <bijan.mottahedeh@oracle.com>
-Cc:     linux-block@vger.kernel.org
-References: <1571908688-22488-1-git-send-email-bijan.mottahedeh@oracle.com>
- <22fc1057-237b-a9b8-5a57-b7c53166a609@kernel.dk>
- <201931df-ae22-c2fc-a9c7-496ceb87dff7@oracle.com>
- <90c23805-4b73-4ade-1b54-dc68010b54dd@kernel.dk>
- <fa82e9fc-caf7-a94a-ebff-536413e9ecce@oracle.com>
- <b7abb363-d665-b46a-9fb5-d01e7a6ce4d6@kernel.dk>
- <533409a8-6907-44d8-1b90-a10ec3483c2c@kernel.dk>
- <6adb9d2d-93f1-f915-7f20-5faa34b06398@kernel.dk>
- <cdaa2942-5f27-79f8-9933-1b947646f918@oracle.com>
- <34f483d9-2a97-30c3-9937-d3596649356c@oracle.com>
- <47b38d9d-04a3-99f6-c586-e82611d21655@kernel.dk>
- <c7b599e4-cf3d-5390-f6f4-360d4435ea43@oracle.com>
- <057bb6f9-29ec-1160-a1b1-00c57b610282@kernel.dk>
- <5d79122d-afcd-9340-df67-d81e1d94dd80@oracle.com>
- <e7d6ec39-1a1b-b4da-3944-8a1492c2c37e@kernel.dk>
- <3b71fff1-5b5e-3d33-b701-c7e1b3c9d8b9@oracle.com>
- <e334c317-e40a-f670-1d6e-220ddff05d64@kernel.dk>
-Message-ID: <07d23273-09e2-1a63-3f18-4d19af298a44@kernel.dk>
-Date:   Tue, 29 Oct 2019 19:02:23 -0600
-User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:60.0) Gecko/20100101
- Thunderbird/60.9.0
-MIME-Version: 1.0
-In-Reply-To: <e334c317-e40a-f670-1d6e-220ddff05d64@kernel.dk>
-Content-Type: text/plain; charset=utf-8
+ d=sharedspace.onmicrosoft.com; s=selector2-sharedspace-onmicrosoft-com;
+ h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
+ bh=0ewsI2CO4L77E0s5Lk+odQ5nGn5qkNj6pJhOQG0ubJk=;
+ b=HVQhBWGKrn6sRHSLBfBI3JYxxFaJM1xN1XHtg5dDe54bibTZqBVEPllfjI8dhPHAJ+oSTd+7kHq2uknq2g7Qfu89YPGdCKRgueasCuLtapYeDB/rzE0Ql3p+O2vfdSurs2LI+MVzPr+60PLAT3PtK+IYFDraU4itzp4V4S69uuQ=
+Received: from BYAPR04MB5749.namprd04.prod.outlook.com (20.179.57.21) by
+ BYAPR04MB5797.namprd04.prod.outlook.com (20.179.60.11) with Microsoft SMTP
+ Server (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
+ 15.20.2387.20; Wed, 30 Oct 2019 03:30:01 +0000
+Received: from BYAPR04MB5749.namprd04.prod.outlook.com
+ ([fe80::34a1:afd2:e5c1:77c7]) by BYAPR04MB5749.namprd04.prod.outlook.com
+ ([fe80::34a1:afd2:e5c1:77c7%6]) with mapi id 15.20.2387.028; Wed, 30 Oct 2019
+ 03:30:01 +0000
+From:   Chaitanya Kulkarni <Chaitanya.Kulkarni@wdc.com>
+To:     Gabriela Bittencourt <gabrielabittencourt00@gmail.com>,
+        "outreachy-kernel@googlegroups.com" 
+        <outreachy-kernel@googlegroups.com>,
+        "axboe@kernel.dk" <axboe@kernel.dk>,
+        "linux-block@vger.kernel.org" <linux-block@vger.kernel.org>,
+        "linux-kernel@vger.kernel.org" <linux-kernel@vger.kernel.org>,
+        "lkcamp@lists.libreplanetbr.org" <lkcamp@lists.libreplanetbr.org>,
+        "trivial@kernel.org" <trivial@kernel.org>
+Subject: Re: [PATCH] blk-mq: Fix typo in comment
+Thread-Topic: [PATCH] blk-mq: Fix typo in comment
+Thread-Index: AQHVjqlGW4KUljIfGk+QSWTa5wn3Eg==
+Date:   Wed, 30 Oct 2019 03:30:00 +0000
+Message-ID: <BYAPR04MB5749EED7A988D38E7F1F977D86600@BYAPR04MB5749.namprd04.prod.outlook.com>
+References: <20191029223556.2289-1-gabrielabittencourt00@gmail.com>
+Accept-Language: en-US
 Content-Language: en-US
-Content-Transfer-Encoding: 7bit
+X-MS-Has-Attach: 
+X-MS-TNEF-Correlator: 
+authentication-results: spf=none (sender IP is )
+ smtp.mailfrom=Chaitanya.Kulkarni@wdc.com; 
+x-originating-ip: [199.255.45.62]
+x-ms-publictraffictype: Email
+x-ms-office365-filtering-ht: Tenant
+x-ms-office365-filtering-correlation-id: 5fc981a5-2ccf-4a98-a432-08d75ce97241
+x-ms-traffictypediagnostic: BYAPR04MB5797:
+x-microsoft-antispam-prvs: <BYAPR04MB57975B50D08AB8A1591FEE0A86600@BYAPR04MB5797.namprd04.prod.outlook.com>
+wdcipoutbound: EOP-TRUE
+x-ms-oob-tlc-oobclassifiers: OLM:1247;
+x-forefront-prvs: 02065A9E77
+x-forefront-antispam-report: SFV:NSPM;SFS:(10019020)(4636009)(39860400002)(376002)(396003)(136003)(346002)(366004)(199004)(189003)(76176011)(8676002)(26005)(81156014)(81166006)(6506007)(33656002)(316002)(110136005)(25786009)(53546011)(102836004)(7696005)(2501003)(256004)(186003)(7736002)(305945005)(6116002)(3846002)(2906002)(446003)(74316002)(52536014)(8936002)(5660300002)(229853002)(66066001)(486006)(9686003)(6246003)(476003)(6436002)(55016002)(66946007)(66446008)(64756008)(66556008)(2201001)(76116006)(478600001)(86362001)(558084003)(99286004)(71190400001)(71200400001)(14454004)(66476007);DIR:OUT;SFP:1102;SCL:1;SRVR:BYAPR04MB5797;H:BYAPR04MB5749.namprd04.prod.outlook.com;FPR:;SPF:None;LANG:en;PTR:InfoNoRecords;A:1;MX:3;
+x-ms-exchange-senderadcheck: 1
+x-microsoft-antispam: BCL:0;
+x-microsoft-antispam-message-info: iRq/77ohxhtMeedocznQRC8tS/Q1/i7G6WDEuj3UZ0SSCf5IKZKD3uwA9oRH2fiicgn4MnniHRw2tPsMENntzehqla70A7T8Rs/eKiH2l/x+p2yJmf64H67qMeNzTpgI3RR8CJIoI3B99vY2amvkZklnG9jPfHNn0RECBJjIQGe3OKNqfZC8R0iSPOirmPZjeegyI6R6BQXDXmwGZz5vkADvnq4ruzoms1w7/L5e/BMaE3yN9ctclS7WwgfRraIIqUDxUZJ0F3pfLMz70KL2qfN+7Ti7X0SfNhjitljpRWEOI/+Gl99oEnc7ESvE1XB9zKteTR12phwQd+I0SC3nO+dK8Y+OjR/Zf5C1iTv62NhysaBkUgyVkSQTHIZobqDnQvMJyyh7DElDIDuY/F83jkQB9wNDbtIxY+buII14bcGildGd01WcOFpD0ssbT/RQ
+x-ms-exchange-transport-forked: True
+Content-Type: text/plain; charset="us-ascii"
+Content-Transfer-Encoding: quoted-printable
+MIME-Version: 1.0
+X-OriginatorOrg: wdc.com
+X-MS-Exchange-CrossTenant-Network-Message-Id: 5fc981a5-2ccf-4a98-a432-08d75ce97241
+X-MS-Exchange-CrossTenant-originalarrivaltime: 30 Oct 2019 03:30:00.8725
+ (UTC)
+X-MS-Exchange-CrossTenant-fromentityheader: Hosted
+X-MS-Exchange-CrossTenant-id: b61c8803-16f3-4c35-9b17-6f65f441df86
+X-MS-Exchange-CrossTenant-mailboxtype: HOSTED
+X-MS-Exchange-CrossTenant-userprincipalname: H9gOnIU764qvh+3CBQ4ZTWX3DiKe5nomKjEI8UvNv2OkOBRLtmSMKRHRU/KCUMClY1VLzR2H95RlRrflgg7XPC41KhSlRmRMlABrv9WpM4E=
+X-MS-Exchange-Transport-CrossTenantHeadersStamped: BYAPR04MB5797
 Sender: linux-block-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-On 10/29/19 1:52 PM, Jens Axboe wrote:
-> On 10/29/19 1:51 PM, Bijan Mottahedeh wrote:
->>
->> On 10/29/19 12:46 PM, Jens Axboe wrote:
->>> On 10/29/19 1:40 PM, Bijan Mottahedeh wrote:
->>>> On 10/29/19 12:33 PM, Jens Axboe wrote:
->>>>> On 10/29/19 1:31 PM, Bijan Mottahedeh wrote:
->>>>>> On 10/29/19 12:27 PM, Jens Axboe wrote:
->>>>>>> On 10/29/19 1:23 PM, Bijan Mottahedeh wrote:
->>>>>>>> On 10/29/19 12:17 PM, Bijan Mottahedeh wrote:
->>>>>>>>> On 10/25/19 7:21 AM, Jens Axboe wrote:
->>>>>>>>>> On 10/25/19 8:18 AM, Jens Axboe wrote:
->>>>>>>>>>> On 10/25/19 8:07 AM, Jens Axboe wrote:
->>>>>>>>>>>> On 10/25/19 7:46 AM, Bijan Mottahedeh wrote:
->>>>>>>>>>>>> On 10/24/19 3:31 PM, Jens Axboe wrote:
->>>>>>>>>>>>>> On 10/24/19 1:18 PM, Bijan Mottahedeh wrote:
->>>>>>>>>>>>>>> On 10/24/19 10:09 AM, Jens Axboe wrote:
->>>>>>>>>>>>>>>> On 10/24/19 3:18 AM, Bijan Mottahedeh wrote:
->>>>>>>>>>>>>>>>> Running an fio test consistenly crashes the kernel with the
->>>>>>>>>>>>>>>>> trace included
->>>>>>>>>>>>>>>>> below.  The root cause seems to be the code in
->>>>>>>>>>>>>>>>> __io_submit_sqe() that
->>>>>>>>>>>>>>>>> checks the result of a request for -EAGAIN in polled mode,
->>>>>>>>>>>>>>>>> without
->>>>>>>>>>>>>>>>> ensuring first that the request has completed:
->>>>>>>>>>>>>>>>>
->>>>>>>>>>>>>>>>>             if (ctx->flags & IORING_SETUP_IOPOLL) {
->>>>>>>>>>>>>>>>>                 if (req->result == -EAGAIN)
->>>>>>>>>>>>>>>>>                     return -EAGAIN;
->>>>>>>>>>>>>>>> I'm a little confused, because we should be holding the submission
->>>>>>>>>>>>>>>> reference to the request still at this point. So how is it
->>>>>>>>>>>>>>>> going away?
->>>>>>>>>>>>>>>> I must be missing something...
->>>>>>>>>>>>>>> I don't think the submission reference is going away...
->>>>>>>>>>>>>>>
->>>>>>>>>>>>>>> I *think* the problem has to do with the fact that
->>>>>>>>>>>>>>> io_complete_rw_iopoll() which sets REQ_F_IOPOLL_COMPLETED is being
->>>>>>>>>>>>>>> called from interrupt context in my configuration and so there is a
->>>>>>>>>>>>>>> potential race between updating the request there and checking
->>>>>>>>>>>>>>> it in
->>>>>>>>>>>>>>> __io_submit_sqe().
->>>>>>>>>>>>>>>
->>>>>>>>>>>>>>> My first workaround was to simply poll for
->>>>>>>>>>>>>>> REQ_F_IOPOLL_COMPLETED in the
->>>>>>>>>>>>>>> code snippet above:
->>>>>>>>>>>>>>>
->>>>>>>>>>>>>>>                   if (req->result == --EAGAIN) {
->>>>>>>>>>>>>>>
->>>>>>>>>>>>>>>                       poll for REQ_F_IOPOLL_COMPLETED
->>>>>>>>>>>>>>>
->>>>>>>>>>>>>>>                       return -EAGAIN;
->>>>>>>>>>>>>>>
->>>>>>>>>>>>>>> }
->>>>>>>>>>>>>>>
->>>>>>>>>>>>>>> and that got rid of the problem.
->>>>>>>>>>>>>> But that will not work at all for a proper poll setup, where you
->>>>>>>>>>>>>> don't
->>>>>>>>>>>>>> trigger any IRQs... It only happens to work for this case because
->>>>>>>>>>>>>> you're
->>>>>>>>>>>>>> still triggering interrupts. But even in that case, it's not a real
->>>>>>>>>>>>>> solution, but I don't think that's the argument here ;-)
->>>>>>>>>>>>> Sure.
->>>>>>>>>>>>>
->>>>>>>>>>>>> I'm just curious though as how it would break the poll case because
->>>>>>>>>>>>> io_complete_rw_iopoll() would still be called though through polling,
->>>>>>>>>>>>> REQ_F_IOPOLL_COMPLETED would be set, and so io_iopoll_complete()
->>>>>>>>>>>>> should be able to reliably check req->result.
->>>>>>>>>>>> It'd break the poll case because the task doing the submission is
->>>>>>>>>>>> generally also the one that finds and reaps completion. Hence if you
->>>>>>>>>>>> block that task just polling on that completion bit, you are
->>>>>>>>>>>> preventing
->>>>>>>>>>>> that very task from going and reaping completions. The condition would
->>>>>>>>>>>> never become true, and you are now looping forever.
->>>>>>>>>>>>
->>>>>>>>>>>>> The same poll test seemed to run ok with nvme interrupts not being
->>>>>>>>>>>>> triggered. Anyway, no argument that it's not needed!
->>>>>>>>>>>> A few reasons why it would make progress:
->>>>>>>>>>>>
->>>>>>>>>>>> - You eventually trigger a timeout on the nvme side, as blk-mq
->>>>>>>>>>>> finds the
->>>>>>>>>>>>              request hasn't been completed by an IRQ. But that's a 30
->>>>>>>>>>>> second ordeal
->>>>>>>>>>>>              before that event occurs.
->>>>>>>>>>>>
->>>>>>>>>>>> - There was still interrupts enabled.
->>>>>>>>>>>>
->>>>>>>>>>>> - You have two threads, one doing submission and one doing
->>>>>>>>>>>> completions.
->>>>>>>>>>>>              Maybe using SQPOLL? If that's the case, then yes, it'd still
->>>>>>>>>>>> work as
->>>>>>>>>>>>              you have separate threads for submission and completion.
->>>>>>>>>>>>
->>>>>>>>>>>> For the "generic" case of just using one thread and IRQs disabled,
->>>>>>>>>>>> it'd
->>>>>>>>>>>> deadlock.
->>>>>>>>>>>>
->>>>>>>>>>>>>> I see what the race is now, it's specific to IRQ driven polling. We
->>>>>>>>>>>>>> really should just disallow that, to be honest, it doesn't make any
->>>>>>>>>>>>>> sense. But let me think about if we can do a reasonable solution
->>>>>>>>>>>>>> to this
->>>>>>>>>>>>>> that doesn't involve adding overhead for a proper setup.
->>>>>>>>>>>>> It's a nonsensical config in a way and so disallowing it would make
->>>>>>>>>>>>> the most sense.
->>>>>>>>>>>> Definitely. The nvme driver should not set .poll() if it doesn't have
->>>>>>>>>>>> non-irq poll queues. Something like this:
->>>>>>>>>>> Actually, we already disable polling if we don't have specific poll
->>>>>>>>>>> queues:
->>>>>>>>>>>
->>>>>>>>>>>                   if (set->nr_maps > HCTX_TYPE_POLL &&
->>>>>>>>>>>                       set->map[HCTX_TYPE_POLL].nr_queues)
->>>>>>>>>>>                           blk_queue_flag_set(QUEUE_FLAG_POLL, q);
->>>>>>>>>>>
->>>>>>>>>>> Did you see any timeouts in your tests? I wonder if the use-after-free
->>>>>>>>>>> triggered when the timeout found the request while you had the
->>>>>>>>>>> busy-spin
->>>>>>>>>>> logic we discussed previously.
->>>>>>>>>> Ah, but we still have fops->iopoll() set for that case. So we just won't
->>>>>>>>>> poll for it, it'll get completed by IRQ. So I do think we need to handle
->>>>>>>>>> this case in io_uring. I'll get back to you.
->>>>>>>>>>
->>>>>>>>> I ran the same test on linux-next-20191029 in polled mode and got the
->>>>>>>>> same free-after-user panic:
->>>>>>>>>
->>>>>>>>> - I booted with nvme.poll_queues set and verified that all queues
->>>>>>>>> except default where of type poll
->>>>>>>>>
->>>>>>>>> - I added three assertions to verify the following:
->>>>>>>>>
->>>>>>>>>             - nvme_timeout() is not called
->>>>>>>>>
->>>>>>>>>             - io_complete_rw_iopoll() is not called from interrupt context
->>>>>>>>>
->>>>>>>>>             - io_sq_offload_start() is not called with IORING_SETUP_SQPOLL set
->>>>>>>>>
->>>>>>>>> Is it possible that the race is there also in polled mode since a
->>>>>>>>> request submitted by one thread could conceivably be polled for and
->>>>>>>>> completed by a different thread, e.g. in
->>>>>>>>> io_uring_enter()->io_iopoll_check()?
->>>>>>>>>
->>>>>>>>> --bijan
->>>>>>>>>
->>>>>>>>>
->>>>>>>> I also tested my RFC again with 1 thread and with queue depths of 1 to
->>>>>>>> 1024 in multiples of 8 and didn't see any hangs.
->>>>>>>>
->>>>>>>> Just to be clear, the busy-spin logic discussed before was only a
->>>>>>>> workaround an not in the RFC.
->>>>>>> What is your exact test case?
->>>>>>>
->>>>>> See original cover letter.  I can reproduce the failure with numjobs
->>>>>> between 8 and 32.
->>>>> And how many poll queues are you using?
->>>>>
->>>> 30
->>> And how many threads/cores in the box? Trying to get a sense for how
->>> many CPUs share a single poll queue, if any.
->>>
->> Thread(s) per core:    2
->> Core(s) per socket:    8
->> Socket(s):             2
-> 
-> OK, so 2*8*2 == 32 threads, hence some threads will share a poll queue.
-
-OK, so I still don't quite see where the issue is. Your setup has more
-than one CPU per poll queue, and I can reproduce the issue quite easily
-here with a similar setup. Below are some things that are given:
-
-1) If we fail to submit the IO, io_complete_rw_iopoll() is ultimately
-   invoked _from_ the submission path. This means that the result is
-   readily available by the time we go and check:
-
-   if (req->result == -EAGAIN)
-
-   in __io_submit_sqe(). This is a submission time failure, not
-   something that should be happening from a completion path after the
-   IO has been submitted successfully.
-
-2) If the succeed in submitting the request, given that we have other
-   tasks polling, the request can complete any time. It can very well be
-   complete by the time we call io_iopoll_req_issued(), and this is
-   perfectly fine. We know the request isn't going away, as we're
-   holding a reference to it. kiocb has the same lifetime, as it's
-   embedded in the io_kiocb request. Note that this isn't the same
-   io_ring_ctx at all, some other task with its own io_ring_ctx just
-   happens to find our request when doing polling on the same queue
-   itself.
-
-We would definitely get in trouble if we submitted the request
-successfully, but returned -EAGAIN because we thought we didn't.
-
-In my testing, what I seem to see is double completions on the block
-layer side, and double issues. I can't quite get that to match up with
-anything...
-
-I'll keep digging, hopefully I'll get some deeper understanding of what
-exactly the issue is shortly. I was hoping I'd get that by writing my
-thoughts in this email, but alas that didn't happen yet.
-
--- 
-Jens Axboe
-
+Looks good.=0A=
+=0A=
+Reviewed-by: Chaitanya Kulkarni <chaitanya.kulkarni@wdc.com>=0A=
+=0A=
+On 10/29/2019 03:36 PM, Gabriela Bittencourt wrote:=0A=
+> Fix typo in words: 'vector' and 'query'.=0A=
+>=0A=
+> Signed-off-by: Gabriela Bittencourt<gabrielabittencourt00@gmail.com>=0A=
+=0A=
