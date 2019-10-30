@@ -2,129 +2,124 @@ Return-Path: <SRS0=yN0i=YX=vger.kernel.org=linux-block-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-5.2 required=3.0 tests=DKIM_SIGNED,DKIM_VALID,
-	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,SPF_HELO_NONE,
-	SPF_PASS,URIBL_BLOCKED,USER_AGENT_SANE_1 autolearn=unavailable
+X-Spam-Status: No, score=-10.1 required=3.0 tests=DKIMWL_WL_HIGH,DKIM_SIGNED,
+	DKIM_VALID,DKIM_VALID_AU,INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,
+	SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED,USER_AGENT_GIT autolearn=ham
 	autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id E0D08CA9EC5
-	for <linux-block@archiver.kernel.org>; Wed, 30 Oct 2019 14:41:53 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id BD189CA9EC6
+	for <linux-block@archiver.kernel.org>; Wed, 30 Oct 2019 15:56:59 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.kernel.org (Postfix) with ESMTP id B3E4720679
-	for <linux-block@archiver.kernel.org>; Wed, 30 Oct 2019 14:41:53 +0000 (UTC)
-Authentication-Results: mail.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel-dk.20150623.gappssmtp.com header.i=@kernel-dk.20150623.gappssmtp.com header.b="O0gGjKRr"
+	by mail.kernel.org (Postfix) with ESMTP id 8E2692083E
+	for <linux-block@archiver.kernel.org>; Wed, 30 Oct 2019 15:56:59 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+	s=default; t=1572451019;
+	bh=rc56oxVDzxSyspd9WL/F3AQ8LjXvk4rfeFvwFp/w1uc=;
+	h=From:To:Cc:Subject:Date:In-Reply-To:References:List-ID:From;
+	b=Frh9wDJm0OLso4rHjvtyTRNDW+NaImoD3qOxyhetAzyqM4Us3p4rrWCBvqCFAqLQ8
+	 1t7XCXrSHrGDV0eYfATnspkvpBcA21SJwxmYn7OYe2zhQenz2KW4DuP9/O2cz6RaET
+	 C7yzzZNbcAo+3mhCUaShTsPSmey68MN4FV2boVi8=
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1726246AbfJ3Olw (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Wed, 30 Oct 2019 10:41:52 -0400
-Received: from mail-il1-f194.google.com ([209.85.166.194]:43224 "EHLO
-        mail-il1-f194.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1726414AbfJ3Olv (ORCPT
-        <rfc822;linux-block@vger.kernel.org>);
-        Wed, 30 Oct 2019 10:41:51 -0400
-Received: by mail-il1-f194.google.com with SMTP id j2so209378ilc.10
-        for <linux-block@vger.kernel.org>; Wed, 30 Oct 2019 07:41:49 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=kernel-dk.20150623.gappssmtp.com; s=20150623;
-        h=subject:to:references:from:message-id:date:user-agent:mime-version
-         :in-reply-to:content-language:content-transfer-encoding;
-        bh=8M4Q/hulOLKq5QBH7SseZicRn46BDfUKYYJB1woZ9F8=;
-        b=O0gGjKRrxHys6Q2aujV+4MT2j/ZjsSYkDi9GKfTadrp+3OsaEj9MpPZeaVUYjh3jga
-         Lt/pb1YjDeKkLIc9X0ysapeDeMirJQ5DAoWssEDfb1y9SMHca7Cpner/0PwQkojLHkpx
-         N4TSDBzSztYw8kJfiT9Daj01/md5WfML34mttZWozPOAn5dmoM5foBsQXL+jEaHnmEzW
-         RhhGAMAO5fVn+TzVSsErUinwOJRVAltcO+jIVr/z2lFeIAA+i5gdvsrvJVYsoFn6iVDd
-         5t2q0XNohZr2NnrrDWO1Q8lxvwtpuTZKxxUQL9BKAIZqMKdtPXdqb1BwFUAK4RSsm2wv
-         ZkIA==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20161025;
-        h=x-gm-message-state:subject:to:references:from:message-id:date
-         :user-agent:mime-version:in-reply-to:content-language
-         :content-transfer-encoding;
-        bh=8M4Q/hulOLKq5QBH7SseZicRn46BDfUKYYJB1woZ9F8=;
-        b=WbtVMo8gtnKFVA9E27Nm3rxHuBd7LJJuAAkgnyYC6ZiDHDzTE8WBo/AO/VC38mSBl7
-         0e+YlIlfBc7KhZlXm0xbZ5iQPLGPSVBdLG+LYWTeyB/QKjX4xW8KSA0TyVqp0ZDhRxMm
-         DP4cRKQBebR4fT86KHC4UcHHvaqHsRZ889zDU2JfOJqb8LTJJ64pYNYSaaAhMrCd5Pqv
-         XmttTKQf/xZLNPtHJREjkXCfRr/DKYyXXF+dVKrPfnVAGpeZr7VaCYK/3miEyKklZycf
-         1yllq99bTEu7SF2DpLniqzWhN3jS5Z+MiYNz038xWDcOsT8MWsyD6ZuAaLeiGYAgTudK
-         Td6A==
-X-Gm-Message-State: APjAAAVsyylMwQUpdc+0Za1lcVKsDvO6FjcYdTPHk9tYuATXCqO9hJnO
-        a7Kt3s5KJ+UZF1LkuunArYhXnA==
-X-Google-Smtp-Source: APXvYqyqrROuX3U0xP+PNenNQOMYso72VKgcxfO/6ysc4+hXLZApIoNa/HRe7jHr0SUpJ9LQw4UwlQ==
-X-Received: by 2002:a92:580c:: with SMTP id m12mr389533ilb.225.1572446509207;
-        Wed, 30 Oct 2019 07:41:49 -0700 (PDT)
-Received: from [192.168.1.159] ([65.144.74.34])
-        by smtp.gmail.com with ESMTPSA id i79sm55737ild.6.2019.10.30.07.41.47
-        (version=TLS1_2 cipher=ECDHE-RSA-AES128-GCM-SHA256 bits=128/128);
-        Wed, 30 Oct 2019 07:41:48 -0700 (PDT)
-Subject: Re: BUG: unable to handle kernel paging request in io_wq_cancel_all
-To:     syzbot <syzbot+221cc24572a2fed23b6b@syzkaller.appspotmail.com>,
-        akpm@linux-foundation.org, dan.j.williams@intel.com,
-        dhowells@redhat.com, gregkh@linuxfoundation.org,
-        hannes@cmpxchg.org, joel@joelfernandes.org,
-        linux-block@vger.kernel.org, linux-fsdevel@vger.kernel.org,
-        linux-kernel@vger.kernel.org, mchehab+samsung@kernel.org,
-        mingo@redhat.com, patrick.bellasi@arm.com, rgb@redhat.com,
-        rostedt@goodmis.org, syzkaller-bugs@googlegroups.com,
-        viro@zeniv.linux.org.uk, yamada.masahiro@socionext.com
-References: <00000000000069801e05961be5fb@google.com>
-From:   Jens Axboe <axboe@kernel.dk>
-Message-ID: <0e2bc2bf-2a7a-73c5-03e2-9d08f89f0ffa@kernel.dk>
-Date:   Wed, 30 Oct 2019 08:41:46 -0600
-User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:60.0) Gecko/20100101
- Thunderbird/60.9.0
+        id S1727638AbfJ3P45 (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Wed, 30 Oct 2019 11:56:57 -0400
+Received: from mail.kernel.org ([198.145.29.99]:58524 "EHLO mail.kernel.org"
+        rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
+        id S1728929AbfJ3P45 (ORCPT <rfc822;linux-block@vger.kernel.org>);
+        Wed, 30 Oct 2019 11:56:57 -0400
+Received: from sasha-vm.mshome.net (100.50.158.77.rev.sfr.net [77.158.50.100])
+        (using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+        (No client certificate requested)
+        by mail.kernel.org (Postfix) with ESMTPSA id 6C7722067D;
+        Wed, 30 Oct 2019 15:56:54 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+        s=default; t=1572451016;
+        bh=rc56oxVDzxSyspd9WL/F3AQ8LjXvk4rfeFvwFp/w1uc=;
+        h=From:To:Cc:Subject:Date:In-Reply-To:References:From;
+        b=1Dj3LdBGdrHKehXom1s1JUeKzutH0PMEHSxYjuAU1q+ST0nq0v8LZMWvHOk//odHq
+         JtbHPch1onzmAfLxuUJAwxwk6yV3tPqZSTNeeyi9j0WANTJMd1wZSqgo14ySFUCo7i
+         a+SB/xmQzhAYmnPXe6DjzbHIVOGoVSnQ1L8/nJMU=
+From:   Sasha Levin <sashal@kernel.org>
+To:     linux-kernel@vger.kernel.org, stable@vger.kernel.org
+Cc:     Josef Bacik <josef@toxicpanda.com>,
+        Mike Christie <mchristi@redhat.com>,
+        Jens Axboe <axboe@kernel.dk>, Sasha Levin <sashal@kernel.org>,
+        linux-block@vger.kernel.org, nbd@other.debian.org
+Subject: [PATCH AUTOSEL 4.14 23/24] nbd: handle racing with error'ed out commands
+Date:   Wed, 30 Oct 2019 11:55:54 -0400
+Message-Id: <20191030155555.10494-23-sashal@kernel.org>
+X-Mailer: git-send-email 2.20.1
+In-Reply-To: <20191030155555.10494-1-sashal@kernel.org>
+References: <20191030155555.10494-1-sashal@kernel.org>
 MIME-Version: 1.0
-In-Reply-To: <00000000000069801e05961be5fb@google.com>
-Content-Type: text/plain; charset=utf-8
-Content-Language: en-US
-Content-Transfer-Encoding: 7bit
+X-stable: review
+X-Patchwork-Hint: Ignore
+Content-Transfer-Encoding: 8bit
 Sender: linux-block-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-On 10/30/19 1:44 AM, syzbot wrote:
-> syzbot has bisected this bug to:
-> 
-> commit ef0524d3654628ead811f328af0a4a2953a8310f
-> Author: Jens Axboe <axboe@kernel.dk>
-> Date:   Thu Oct 24 13:25:42 2019 +0000
-> 
->       io_uring: replace workqueue usage with io-wq
-> 
-> bisection log:  https://syzkaller.appspot.com/x/bisect.txt?x=16acf5d0e00000
-> start commit:   c57cf383 Add linux-next specific files for 20191029
-> git tree:       linux-next
-> final crash:    https://syzkaller.appspot.com/x/report.txt?x=15acf5d0e00000
-> console output: https://syzkaller.appspot.com/x/log.txt?x=11acf5d0e00000
-> kernel config:  https://syzkaller.appspot.com/x/.config?x=cb86688f30db053d
-> dashboard link: https://syzkaller.appspot.com/bug?extid=221cc24572a2fed23b6b
-> syz repro:      https://syzkaller.appspot.com/x/repro.syz?x=168671d4e00000
-> C reproducer:   https://syzkaller.appspot.com/x/repro.c?x=140f4898e00000
-> 
-> Reported-by: syzbot+221cc24572a2fed23b6b@syzkaller.appspotmail.com
-> Fixes: ef0524d36546 ("io_uring: replace workqueue usage with io-wq")
+From: Josef Bacik <josef@toxicpanda.com>
 
-Good catch, it's a case of NULL vs ERR_PTR() confusion. I'll fold in
-the below fix.
+[ Upstream commit 7ce23e8e0a9cd38338fc8316ac5772666b565ca9 ]
 
+We hit the following warning in production
 
-diff --git a/fs/io_uring.c b/fs/io_uring.c
-index af1937d66aee..76d653085987 100644
---- a/fs/io_uring.c
-+++ b/fs/io_uring.c
-@@ -3534,8 +3534,9 @@ static int io_sq_offload_start(struct io_ring_ctx *ctx,
- 	/* Do QD, or 4 * CPUS, whatever is smallest */
- 	concurrency = min(ctx->sq_entries, 4 * num_online_cpus());
- 	ctx->io_wq = io_wq_create(concurrency, ctx->sqo_mm);
--	if (!ctx->io_wq) {
--		ret = -ENOMEM;
-+	if (IS_ERR(ctx->io_wq)) {
-+		ret = PTR_ERR(ctx->io_wq);
-+		ctx->io_wq = NULL;
- 		goto err;
+print_req_error: I/O error, dev nbd0, sector 7213934408 flags 80700
+------------[ cut here ]------------
+refcount_t: underflow; use-after-free.
+WARNING: CPU: 25 PID: 32407 at lib/refcount.c:190 refcount_sub_and_test_checked+0x53/0x60
+Workqueue: knbd-recv recv_work [nbd]
+RIP: 0010:refcount_sub_and_test_checked+0x53/0x60
+Call Trace:
+ blk_mq_free_request+0xb7/0xf0
+ blk_mq_complete_request+0x62/0xf0
+ recv_work+0x29/0xa1 [nbd]
+ process_one_work+0x1f5/0x3f0
+ worker_thread+0x2d/0x3d0
+ ? rescuer_thread+0x340/0x340
+ kthread+0x111/0x130
+ ? kthread_create_on_node+0x60/0x60
+ ret_from_fork+0x1f/0x30
+---[ end trace b079c3c67f98bb7c ]---
+
+This was preceded by us timing out everything and shutting down the
+sockets for the device.  The problem is we had a request in the queue at
+the same time, so we completed the request twice.  This can actually
+happen in a lot of cases, we fail to get a ref on our config, we only
+have one connection and just error out the command, etc.
+
+Fix this by checking cmd->status in nbd_read_stat.  We only change this
+under the cmd->lock, so we are safe to check this here and see if we've
+already error'ed this command out, which would indicate that we've
+completed it as well.
+
+Reviewed-by: Mike Christie <mchristi@redhat.com>
+Signed-off-by: Josef Bacik <josef@toxicpanda.com>
+
+Signed-off-by: Jens Axboe <axboe@kernel.dk>
+Signed-off-by: Sasha Levin <sashal@kernel.org>
+---
+ drivers/block/nbd.c | 6 ++++++
+ 1 file changed, 6 insertions(+)
+
+diff --git a/drivers/block/nbd.c b/drivers/block/nbd.c
+index a234600849558..f322bb3286910 100644
+--- a/drivers/block/nbd.c
++++ b/drivers/block/nbd.c
+@@ -648,6 +648,12 @@ static struct nbd_cmd *nbd_read_stat(struct nbd_device *nbd, int index)
+ 		ret = -ENOENT;
+ 		goto out;
  	}
- 
-
++	if (cmd->status != BLK_STS_OK) {
++		dev_err(disk_to_dev(nbd->disk), "Command already handled %p\n",
++			req);
++		ret = -ENOENT;
++		goto out;
++	}
+ 	if (test_bit(NBD_CMD_REQUEUED, &cmd->flags)) {
+ 		dev_err(disk_to_dev(nbd->disk), "Raced with timeout on req %p\n",
+ 			req);
 -- 
-Jens Axboe
+2.20.1
 
