@@ -2,101 +2,83 @@ Return-Path: <SRS0=yN0i=YX=vger.kernel.org=linux-block-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-9.8 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
-	INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,
-	UNPARSEABLE_RELAY,USER_AGENT_GIT autolearn=ham autolearn_force=no
-	version=3.4.0
+X-Spam-Status: No, score=-0.4 required=3.0 tests=FROM_LOCAL_HEX,
+	HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,
+	URIBL_BLOCKED autolearn=no autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 2EF0FCA9EC0
-	for <linux-block@archiver.kernel.org>; Wed, 30 Oct 2019 07:16:34 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 6C0B3CA9EAF
+	for <linux-block@archiver.kernel.org>; Wed, 30 Oct 2019 07:44:02 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.kernel.org (Postfix) with ESMTP id F2BFE2087E
-	for <linux-block@archiver.kernel.org>; Wed, 30 Oct 2019 07:16:33 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id 49AFF2087E
+	for <linux-block@archiver.kernel.org>; Wed, 30 Oct 2019 07:44:02 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1725855AbfJ3HQd (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Wed, 30 Oct 2019 03:16:33 -0400
-Received: from out30-45.freemail.mail.aliyun.com ([115.124.30.45]:38238 "EHLO
-        out30-45.freemail.mail.aliyun.com" rhost-flags-OK-OK-OK-OK)
-        by vger.kernel.org with ESMTP id S1726116AbfJ3HQd (ORCPT
+        id S1726020AbfJ3HoB (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Wed, 30 Oct 2019 03:44:01 -0400
+Received: from mail-io1-f70.google.com ([209.85.166.70]:47854 "EHLO
+        mail-io1-f70.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S1725822AbfJ3HoB (ORCPT
         <rfc822;linux-block@vger.kernel.org>);
-        Wed, 30 Oct 2019 03:16:33 -0400
-X-Alimail-AntiSpam: AC=PASS;BC=-1|-1;BR=01201311R131e4;CH=green;DM=||false|;FP=0|-1|-1|-1|0|-1|-1|-1;HT=e01e04423;MF=joseph.qi@linux.alibaba.com;NM=1;PH=DS;RN=2;SR=0;TI=SMTPD_---0TggefMe_1572419790;
-Received: from localhost(mailfrom:joseph.qi@linux.alibaba.com fp:SMTPD_---0TggefMe_1572419790)
-          by smtp.aliyun-inc.com(127.0.0.1);
-          Wed, 30 Oct 2019 15:16:30 +0800
-From:   Joseph Qi <joseph.qi@linux.alibaba.com>
-To:     Jens Axboe <axboe@kernel.dk>
-Cc:     linux-block@vger.kernel.org
-Subject: [PATCH] liburing/test: fix build errors
-Date:   Wed, 30 Oct 2019 15:16:30 +0800
-Message-Id: <1572419790-96807-1-git-send-email-joseph.qi@linux.alibaba.com>
-X-Mailer: git-send-email 1.8.3.1
+        Wed, 30 Oct 2019 03:44:01 -0400
+Received: by mail-io1-f70.google.com with SMTP id r84so1196859ior.14
+        for <linux-block@vger.kernel.org>; Wed, 30 Oct 2019 00:44:01 -0700 (PDT)
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20161025;
+        h=x-gm-message-state:mime-version:date:in-reply-to:message-id:subject
+         :from:to;
+        bh=dxnBOmtjfHc78Shusa2+2C/dwRTd+Y9TDOU+bAXew3I=;
+        b=W58CuVXAbfveYfImYx4xkU6qlzoj8XNX3GmLCp80zNAuH11g3whFximRh9XbX3MiOz
+         e6QllhVB3nmR4lAzGFRTK+5mC0QSeRi1k4kfivGizQtMhOOIsqr4Q+i5Zgd0W7FpojCe
+         +61NfVmLzZ4LJqno7/sB/eZqttP0GaBeEVLaLc+Z9I83WRnvoz//Ay+/UvPzP/BlM0z2
+         ll5HfxvYNCsN0LZxMK7PqOUSpXQOd+3O4irm0x/8f/HQm3H3+LpmsftXGPVnK+z18QgA
+         86khvLZ+E7w+LFmLtJ+A3CpT1zfYPLZyOirofWRNSZO5ppandBdOcRTop7pNXvN7rv5C
+         ANgQ==
+X-Gm-Message-State: APjAAAVHmBxiSBU1e7bkI4iIJNqLnyp29c63nGYpHhSFO9zjCl8Ttuz0
+        JzAYn59lpk39jF5MtISRSXDg9OEtL9vSEFbDa4xKwSyUmo7u
+X-Google-Smtp-Source: APXvYqzGVHBXNanN7A1gB3Pu8U6dJQ1xC84jP6Pgwkt0UEP1XoERs3CsFZrP1t2i7TE5nit9eB6qSkADskBzJ+BxPwORRiMLm+9o
 MIME-Version: 1.0
-Content-Type: text/plain; charset=UTF-8
-Content-Transfer-Encoding: 8bit
+X-Received: by 2002:a92:99ca:: with SMTP id t71mr16932987ilk.61.1572421440730;
+ Wed, 30 Oct 2019 00:44:00 -0700 (PDT)
+Date:   Wed, 30 Oct 2019 00:44:00 -0700
+In-Reply-To: <000000000000c6fb2a05961a0dd8@google.com>
+X-Google-Appengine-App-Id: s~syzkaller
+X-Google-Appengine-App-Id-Alias: syzkaller
+Message-ID: <00000000000069801e05961be5fb@google.com>
+Subject: Re: BUG: unable to handle kernel paging request in io_wq_cancel_all
+From:   syzbot <syzbot+221cc24572a2fed23b6b@syzkaller.appspotmail.com>
+To:     akpm@linux-foundation.org, axboe@kernel.dk,
+        dan.j.williams@intel.com, dhowells@redhat.com,
+        gregkh@linuxfoundation.org, hannes@cmpxchg.org,
+        joel@joelfernandes.org, linux-block@vger.kernel.org,
+        linux-fsdevel@vger.kernel.org, linux-kernel@vger.kernel.org,
+        mchehab+samsung@kernel.org, mingo@redhat.com,
+        patrick.bellasi@arm.com, rgb@redhat.com, rostedt@goodmis.org,
+        syzkaller-bugs@googlegroups.com, viro@zeniv.linux.org.uk,
+        yamada.masahiro@socionext.com
+Content-Type: text/plain; charset="UTF-8"; format=flowed; delsp=yes
 Sender: linux-block-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-Fix the following errors when make:
-  error: ‘for’ loop initial declarations are only allowed in C99 mode
-  error: redeclaration of ‘i’ with no linkage
+syzbot has bisected this bug to:
 
-Signed-off-by: Joseph Qi <joseph.qi@linux.alibaba.com>
----
- test/232c93d07b74-test.c | 7 +++++--
- test/defer.c             | 4 ++--
- 2 files changed, 7 insertions(+), 4 deletions(-)
+commit ef0524d3654628ead811f328af0a4a2953a8310f
+Author: Jens Axboe <axboe@kernel.dk>
+Date:   Thu Oct 24 13:25:42 2019 +0000
 
-diff --git a/test/232c93d07b74-test.c b/test/232c93d07b74-test.c
-index b321668..c398de6 100644
---- a/test/232c93d07b74-test.c
-+++ b/test/232c93d07b74-test.c
-@@ -132,7 +132,9 @@ static void *rcv(void *arg)
- 				if (cqe->res < 0)
- 					assert(cqe->res == -EAGAIN);
- 				else {
--					for (int i = 0; i < cqe->res; i++) {
-+					int i;
-+
-+					for (i = 0; i < cqe->res; i++) {
- 						if (buff[i] != expected_byte) {
- 							fprintf(stderr,
- 								"Received %d, wanted %d\n",
-@@ -208,8 +210,9 @@ static void *snd(void *arg)
- 
- 	while (!done && bytes_written != 33) {
- 		char buff[SEND_BUFF_SIZE];
-+		int i;
- 
--		for (int i = 0; i < SEND_BUFF_SIZE; i++)
-+		for (i = 0; i < SEND_BUFF_SIZE; i++)
- 			buff[i] = i + bytes_written;
- 
- 		struct iovec iov;
-diff --git a/test/defer.c b/test/defer.c
-index db0d904..f103a65 100644
---- a/test/defer.c
-+++ b/test/defer.c
-@@ -92,7 +92,7 @@ static int test_cancelled_userdata(struct io_uring *ring)
- 	if (wait_cqes(&ctx))
- 		goto err;
- 
--	for (int i = 0; i < nr; i++) {
-+	for (i = 0; i < nr; i++) {
- 		if (i != ctx.cqes[i].user_data) {
- 			printf("invalid user data\n");
- 			goto err;
-@@ -126,7 +126,7 @@ static int test_thread_link_cancel(struct io_uring *ring)
- 	if (wait_cqes(&ctx))
- 		goto err;
- 
--	for (int i = 0; i < nr; i++) {
-+	for (i = 0; i < nr; i++) {
- 		bool fail = false;
- 
- 		if (i == 0)
--- 
-1.8.3.1
+     io_uring: replace workqueue usage with io-wq
 
+bisection log:  https://syzkaller.appspot.com/x/bisect.txt?x=16acf5d0e00000
+start commit:   c57cf383 Add linux-next specific files for 20191029
+git tree:       linux-next
+final crash:    https://syzkaller.appspot.com/x/report.txt?x=15acf5d0e00000
+console output: https://syzkaller.appspot.com/x/log.txt?x=11acf5d0e00000
+kernel config:  https://syzkaller.appspot.com/x/.config?x=cb86688f30db053d
+dashboard link: https://syzkaller.appspot.com/bug?extid=221cc24572a2fed23b6b
+syz repro:      https://syzkaller.appspot.com/x/repro.syz?x=168671d4e00000
+C reproducer:   https://syzkaller.appspot.com/x/repro.c?x=140f4898e00000
+
+Reported-by: syzbot+221cc24572a2fed23b6b@syzkaller.appspotmail.com
+Fixes: ef0524d36546 ("io_uring: replace workqueue usage with io-wq")
+
+For information about bisection process see: https://goo.gl/tpsmEJ#bisection
