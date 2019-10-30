@@ -4,49 +4,50 @@ X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 X-Spam-Level: 
 X-Spam-Status: No, score=-10.1 required=3.0 tests=DKIMWL_WL_HIGH,DKIM_SIGNED,
 	DKIM_VALID,DKIM_VALID_AU,INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,
-	SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED,USER_AGENT_GIT autolearn=ham
+	SPF_HELO_NONE,SPF_PASS,USER_AGENT_GIT autolearn=unavailable
 	autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id BD189CA9EC6
-	for <linux-block@archiver.kernel.org>; Wed, 30 Oct 2019 15:56:59 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 02E9BCA9EC5
+	for <linux-block@archiver.kernel.org>; Wed, 30 Oct 2019 15:59:40 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.kernel.org (Postfix) with ESMTP id 8E2692083E
-	for <linux-block@archiver.kernel.org>; Wed, 30 Oct 2019 15:56:59 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id C42A7217D9
+	for <linux-block@archiver.kernel.org>; Wed, 30 Oct 2019 15:59:39 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=default; t=1572451019;
-	bh=rc56oxVDzxSyspd9WL/F3AQ8LjXvk4rfeFvwFp/w1uc=;
+	s=default; t=1572451179;
+	bh=1fsxAptcHjRbaUtNupDgJEBnnb6rWnIiTS9hB/14wZ0=;
 	h=From:To:Cc:Subject:Date:In-Reply-To:References:List-ID:From;
-	b=Frh9wDJm0OLso4rHjvtyTRNDW+NaImoD3qOxyhetAzyqM4Us3p4rrWCBvqCFAqLQ8
-	 1t7XCXrSHrGDV0eYfATnspkvpBcA21SJwxmYn7OYe2zhQenz2KW4DuP9/O2cz6RaET
-	 C7yzzZNbcAo+3mhCUaShTsPSmey68MN4FV2boVi8=
+	b=rBB7/jAgVxPcNRzkhGcKimys40qY83hUoRgi9wnVlx4BQQsVz1ZP0MVa/8Nqw6eAL
+	 4DhyxLbyFdRHLEZvz4J2RrFpKqa4wSQ4JOuWUCm7UTwobz4u4XY9TOwwQmRiPw9UO+
+	 zrl3Baj+Tyon25E3dj+unTk90sXYTL+rY+HnSHCc=
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1727638AbfJ3P45 (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Wed, 30 Oct 2019 11:56:57 -0400
-Received: from mail.kernel.org ([198.145.29.99]:58524 "EHLO mail.kernel.org"
+        id S1728941AbfJ3P47 (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Wed, 30 Oct 2019 11:56:59 -0400
+Received: from mail.kernel.org ([198.145.29.99]:58576 "EHLO mail.kernel.org"
         rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-        id S1728929AbfJ3P45 (ORCPT <rfc822;linux-block@vger.kernel.org>);
-        Wed, 30 Oct 2019 11:56:57 -0400
+        id S1728938AbfJ3P47 (ORCPT <rfc822;linux-block@vger.kernel.org>);
+        Wed, 30 Oct 2019 11:56:59 -0400
 Received: from sasha-vm.mshome.net (100.50.158.77.rev.sfr.net [77.158.50.100])
         (using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
         (No client certificate requested)
-        by mail.kernel.org (Postfix) with ESMTPSA id 6C7722067D;
-        Wed, 30 Oct 2019 15:56:54 +0000 (UTC)
+        by mail.kernel.org (Postfix) with ESMTPSA id AED042080F;
+        Wed, 30 Oct 2019 15:56:56 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-        s=default; t=1572451016;
-        bh=rc56oxVDzxSyspd9WL/F3AQ8LjXvk4rfeFvwFp/w1uc=;
+        s=default; t=1572451018;
+        bh=1fsxAptcHjRbaUtNupDgJEBnnb6rWnIiTS9hB/14wZ0=;
         h=From:To:Cc:Subject:Date:In-Reply-To:References:From;
-        b=1Dj3LdBGdrHKehXom1s1JUeKzutH0PMEHSxYjuAU1q+ST0nq0v8LZMWvHOk//odHq
-         JtbHPch1onzmAfLxuUJAwxwk6yV3tPqZSTNeeyi9j0WANTJMd1wZSqgo14ySFUCo7i
-         a+SB/xmQzhAYmnPXe6DjzbHIVOGoVSnQ1L8/nJMU=
+        b=j4sfqIP7q5w04rwCDXgg1TrMZM0C5Ey8buAAuV6Xj3wEAlgiDV0cP+TJOgJcVw4LA
+         5mVWuwXlzcR4N5LqA6YB6bGJgE1MoKlHYeETLbnL74XOauaKQ9edw8wm2U9eSKaVuk
+         ChW+9ULY1jyXMRJQXQUbBFoTxOmp/TB7K4UJAHPs=
 From:   Sasha Levin <sashal@kernel.org>
 To:     linux-kernel@vger.kernel.org, stable@vger.kernel.org
-Cc:     Josef Bacik <josef@toxicpanda.com>,
-        Mike Christie <mchristi@redhat.com>,
+Cc:     Mike Christie <mchristi@redhat.com>,
+        syzbot+24c12fa8d218ed26011a@syzkaller.appspotmail.com,
+        "Richard W . M . Jones" <rjones@redhat.com>,
         Jens Axboe <axboe@kernel.dk>, Sasha Levin <sashal@kernel.org>,
         linux-block@vger.kernel.org, nbd@other.debian.org
-Subject: [PATCH AUTOSEL 4.14 23/24] nbd: handle racing with error'ed out commands
-Date:   Wed, 30 Oct 2019 11:55:54 -0400
-Message-Id: <20191030155555.10494-23-sashal@kernel.org>
+Subject: [PATCH AUTOSEL 4.14 24/24] nbd: verify socket is supported during setup
+Date:   Wed, 30 Oct 2019 11:55:55 -0400
+Message-Id: <20191030155555.10494-24-sashal@kernel.org>
 X-Mailer: git-send-email 2.20.1
 In-Reply-To: <20191030155555.10494-1-sashal@kernel.org>
 References: <20191030155555.10494-1-sashal@kernel.org>
@@ -59,67 +60,76 @@ Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-From: Josef Bacik <josef@toxicpanda.com>
+From: Mike Christie <mchristi@redhat.com>
 
-[ Upstream commit 7ce23e8e0a9cd38338fc8316ac5772666b565ca9 ]
+[ Upstream commit cf1b2326b734896734c6e167e41766f9cee7686a ]
 
-We hit the following warning in production
+nbd requires socket families to support the shutdown method so the nbd
+recv workqueue can be woken up from its sock_recvmsg call. If the socket
+does not support the callout we will leave recv works running or get hangs
+later when the device or module is removed.
 
-print_req_error: I/O error, dev nbd0, sector 7213934408 flags 80700
-------------[ cut here ]------------
-refcount_t: underflow; use-after-free.
-WARNING: CPU: 25 PID: 32407 at lib/refcount.c:190 refcount_sub_and_test_checked+0x53/0x60
-Workqueue: knbd-recv recv_work [nbd]
-RIP: 0010:refcount_sub_and_test_checked+0x53/0x60
-Call Trace:
- blk_mq_free_request+0xb7/0xf0
- blk_mq_complete_request+0x62/0xf0
- recv_work+0x29/0xa1 [nbd]
- process_one_work+0x1f5/0x3f0
- worker_thread+0x2d/0x3d0
- ? rescuer_thread+0x340/0x340
- kthread+0x111/0x130
- ? kthread_create_on_node+0x60/0x60
- ret_from_fork+0x1f/0x30
----[ end trace b079c3c67f98bb7c ]---
+This adds a check during socket connection/reconnection to make sure the
+socket being passed in supports the needed callout.
 
-This was preceded by us timing out everything and shutting down the
-sockets for the device.  The problem is we had a request in the queue at
-the same time, so we completed the request twice.  This can actually
-happen in a lot of cases, we fail to get a ref on our config, we only
-have one connection and just error out the command, etc.
-
-Fix this by checking cmd->status in nbd_read_stat.  We only change this
-under the cmd->lock, so we are safe to check this here and see if we've
-already error'ed this command out, which would indicate that we've
-completed it as well.
-
-Reviewed-by: Mike Christie <mchristi@redhat.com>
-Signed-off-by: Josef Bacik <josef@toxicpanda.com>
-
+Reported-by: syzbot+24c12fa8d218ed26011a@syzkaller.appspotmail.com
+Fixes: e9e006f5fcf2 ("nbd: fix max number of supported devs")
+Tested-by: Richard W.M. Jones <rjones@redhat.com>
+Signed-off-by: Mike Christie <mchristi@redhat.com>
 Signed-off-by: Jens Axboe <axboe@kernel.dk>
 Signed-off-by: Sasha Levin <sashal@kernel.org>
 ---
- drivers/block/nbd.c | 6 ++++++
- 1 file changed, 6 insertions(+)
+ drivers/block/nbd.c | 23 +++++++++++++++++++++--
+ 1 file changed, 21 insertions(+), 2 deletions(-)
 
 diff --git a/drivers/block/nbd.c b/drivers/block/nbd.c
-index a234600849558..f322bb3286910 100644
+index f322bb3286910..2fef2efa9051f 100644
 --- a/drivers/block/nbd.c
 +++ b/drivers/block/nbd.c
-@@ -648,6 +648,12 @@ static struct nbd_cmd *nbd_read_stat(struct nbd_device *nbd, int index)
- 		ret = -ENOENT;
- 		goto out;
- 	}
-+	if (cmd->status != BLK_STS_OK) {
-+		dev_err(disk_to_dev(nbd->disk), "Command already handled %p\n",
-+			req);
-+		ret = -ENOENT;
-+		goto out;
+@@ -918,6 +918,25 @@ static blk_status_t nbd_queue_rq(struct blk_mq_hw_ctx *hctx,
+ 	return ret;
+ }
+ 
++static struct socket *nbd_get_socket(struct nbd_device *nbd, unsigned long fd,
++				     int *err)
++{
++	struct socket *sock;
++
++	*err = 0;
++	sock = sockfd_lookup(fd, err);
++	if (!sock)
++		return NULL;
++
++	if (sock->ops->shutdown == sock_no_shutdown) {
++		dev_err(disk_to_dev(nbd->disk), "Unsupported socket: shutdown callout must be supported.\n");
++		*err = -EINVAL;
++		return NULL;
 +	}
- 	if (test_bit(NBD_CMD_REQUEUED, &cmd->flags)) {
- 		dev_err(disk_to_dev(nbd->disk), "Raced with timeout on req %p\n",
- 			req);
++
++	return sock;
++}
++
+ static int nbd_add_socket(struct nbd_device *nbd, unsigned long arg,
+ 			  bool netlink)
+ {
+@@ -927,7 +946,7 @@ static int nbd_add_socket(struct nbd_device *nbd, unsigned long arg,
+ 	struct nbd_sock *nsock;
+ 	int err;
+ 
+-	sock = sockfd_lookup(arg, &err);
++	sock = nbd_get_socket(nbd, arg, &err);
+ 	if (!sock)
+ 		return err;
+ 
+@@ -979,7 +998,7 @@ static int nbd_reconnect_socket(struct nbd_device *nbd, unsigned long arg)
+ 	int i;
+ 	int err;
+ 
+-	sock = sockfd_lookup(arg, &err);
++	sock = nbd_get_socket(nbd, arg, &err);
+ 	if (!sock)
+ 		return err;
+ 
 -- 
 2.20.1
 
