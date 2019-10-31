@@ -6,79 +6,126 @@ X-Spam-Status: No, score=-2.3 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
 	MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,USER_AGENT_SANE_1 autolearn=no
 	autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 34AF0CA9ECE
-	for <linux-block@archiver.kernel.org>; Thu, 31 Oct 2019 20:51:24 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 57E16CA9ECE
+	for <linux-block@archiver.kernel.org>; Thu, 31 Oct 2019 21:10:06 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.kernel.org (Postfix) with ESMTP id 0A00E2086D
-	for <linux-block@archiver.kernel.org>; Thu, 31 Oct 2019 20:51:24 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id 36A90208C0
+	for <linux-block@archiver.kernel.org>; Thu, 31 Oct 2019 21:10:06 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1728135AbfJaUvX (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Thu, 31 Oct 2019 16:51:23 -0400
-Received: from outgoing-auth-1.mit.edu ([18.9.28.11]:36363 "EHLO
-        outgoing.mit.edu" rhost-flags-OK-OK-OK-FAIL) by vger.kernel.org
-        with ESMTP id S1727511AbfJaUvX (ORCPT
-        <rfc822;linux-block@vger.kernel.org>);
-        Thu, 31 Oct 2019 16:51:23 -0400
-Received: from callcc.thunk.org (guestnat-104-133-0-98.corp.google.com [104.133.0.98] (may be forged))
-        (authenticated bits=0)
-        (User authenticated as tytso@ATHENA.MIT.EDU)
-        by outgoing.mit.edu (8.14.7/8.12.4) with ESMTP id x9VKojQo005383
-        (version=TLSv1/SSLv3 cipher=DHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
-        Thu, 31 Oct 2019 16:50:46 -0400
-Received: by callcc.thunk.org (Postfix, from userid 15806)
-        id 11FEB420456; Thu, 31 Oct 2019 16:50:45 -0400 (EDT)
-Date:   Thu, 31 Oct 2019 16:50:45 -0400
-From:   "Theodore Y. Ts'o" <tytso@mit.edu>
-To:     Christoph Hellwig <hch@infradead.org>
-Cc:     Satya Tangirala <satyat@google.com>, linux-block@vger.kernel.org,
-        linux-scsi@vger.kernel.org, linux-fscrypt@vger.kernel.org,
-        linux-fsdevel@vger.kernel.org,
-        linux-f2fs-devel@lists.sourceforge.net,
-        Barani Muthukumaran <bmuthuku@qti.qualcomm.com>,
-        Kuohong Wang <kuohong.wang@mediatek.com>,
-        Kim Boojin <boojin.kim@samsung.com>
-Subject: Re: [PATCH v5 3/9] block: blk-crypto for Inline Encryption
-Message-ID: <20191031205045.GG16197@mit.edu>
-References: <20191028072032.6911-1-satyat@google.com>
- <20191028072032.6911-4-satyat@google.com>
- <20191031175713.GA23601@infradead.org>
+        id S1729859AbfJaVJ7 (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Thu, 31 Oct 2019 17:09:59 -0400
+Received: from mga01.intel.com ([192.55.52.88]:43170 "EHLO mga01.intel.com"
+        rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
+        id S1727957AbfJaVJ6 (ORCPT <rfc822;linux-block@vger.kernel.org>);
+        Thu, 31 Oct 2019 17:09:58 -0400
+X-Amp-Result: UNKNOWN
+X-Amp-Original-Verdict: FILE UNKNOWN
+X-Amp-File-Uploaded: False
+Received: from orsmga005.jf.intel.com ([10.7.209.41])
+  by fmsmga101.fm.intel.com with ESMTP/TLS/DHE-RSA-AES256-GCM-SHA384; 31 Oct 2019 14:09:57 -0700
+X-ExtLoop1: 1
+X-IronPort-AV: E=Sophos;i="5.68,253,1569308400"; 
+   d="scan'208";a="375376881"
+Received: from iweiny-desk2.sc.intel.com ([10.3.52.157])
+  by orsmga005.jf.intel.com with ESMTP; 31 Oct 2019 14:09:55 -0700
+Date:   Thu, 31 Oct 2019 14:09:55 -0700
+From:   Ira Weiny <ira.weiny@intel.com>
+To:     John Hubbard <jhubbard@nvidia.com>
+Cc:     Andrew Morton <akpm@linux-foundation.org>,
+        Al Viro <viro@zeniv.linux.org.uk>,
+        Alex Williamson <alex.williamson@redhat.com>,
+        Benjamin Herrenschmidt <benh@kernel.crashing.org>,
+        =?iso-8859-1?Q?Bj=F6rn_T=F6pel?= <bjorn.topel@intel.com>,
+        Christoph Hellwig <hch@infradead.org>,
+        Dan Williams <dan.j.williams@intel.com>,
+        Daniel Vetter <daniel@ffwll.ch>,
+        Dave Chinner <david@fromorbit.com>,
+        David Airlie <airlied@linux.ie>,
+        "David S . Miller" <davem@davemloft.net>, Jan Kara <jack@suse.cz>,
+        Jason Gunthorpe <jgg@ziepe.ca>, Jens Axboe <axboe@kernel.dk>,
+        Jonathan Corbet <corbet@lwn.net>,
+        =?iso-8859-1?B?Suly9G1l?= Glisse <jglisse@redhat.com>,
+        Magnus Karlsson <magnus.karlsson@intel.com>,
+        Mauro Carvalho Chehab <mchehab@kernel.org>,
+        Michael Ellerman <mpe@ellerman.id.au>,
+        Michal Hocko <mhocko@suse.com>,
+        Mike Kravetz <mike.kravetz@oracle.com>,
+        Paul Mackerras <paulus@samba.org>,
+        Shuah Khan <shuah@kernel.org>,
+        Vlastimil Babka <vbabka@suse.cz>, bpf@vger.kernel.org,
+        dri-devel@lists.freedesktop.org, kvm@vger.kernel.org,
+        linux-block@vger.kernel.org, linux-doc@vger.kernel.org,
+        linux-fsdevel@vger.kernel.org, linux-kselftest@vger.kernel.org,
+        linux-media@vger.kernel.org, linux-rdma@vger.kernel.org,
+        linuxppc-dev@lists.ozlabs.org, netdev@vger.kernel.org,
+        linux-mm@kvack.org, LKML <linux-kernel@vger.kernel.org>,
+        Christoph Hellwig <hch@lst.de>,
+        "Aneesh Kumar K . V" <aneesh.kumar@linux.ibm.com>
+Subject: Re: [PATCH 02/19] mm/gup: factor out duplicate code from four
+ routines
+Message-ID: <20191031210954.GE14771@iweiny-DESK2.sc.intel.com>
+References: <20191030224930.3990755-1-jhubbard@nvidia.com>
+ <20191030224930.3990755-3-jhubbard@nvidia.com>
+ <20191031183549.GC14771@iweiny-DESK2.sc.intel.com>
+ <75b557f7-24b2-740c-2640-2f914d131600@nvidia.com>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=us-ascii
 Content-Disposition: inline
-In-Reply-To: <20191031175713.GA23601@infradead.org>
-User-Agent: Mutt/1.10.1 (2018-07-13)
+In-Reply-To: <75b557f7-24b2-740c-2640-2f914d131600@nvidia.com>
+User-Agent: Mutt/1.11.1 (2018-12-01)
 Sender: linux-block-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-On Thu, Oct 31, 2019 at 10:57:13AM -0700, Christoph Hellwig wrote:
-> On Mon, Oct 28, 2019 at 12:20:26AM -0700, Satya Tangirala wrote:
-> > We introduce blk-crypto, which manages programming keyslots for struct
-> > bios. With blk-crypto, filesystems only need to call bio_crypt_set_ctx with
-> > the encryption key, algorithm and data_unit_num; they don't have to worry
-> > about getting a keyslot for each encryption context, as blk-crypto handles
-> > that. Blk-crypto also makes it possible for layered devices like device
-> > mapper to make use of inline encryption hardware.
+On Thu, Oct 31, 2019 at 11:43:37AM -0700, John Hubbard wrote:
+> On 10/31/19 11:35 AM, Ira Weiny wrote:
+> > On Wed, Oct 30, 2019 at 03:49:13PM -0700, John Hubbard wrote:
+> ...
+> >> +
+> >> +static void __remove_refs_from_head(struct page *page, int refs)
+> >> +{
+> >> +	/* Do a get_page() first, in case refs == page->_refcount */
+> >> +	get_page(page);
+> >> +	page_ref_sub(page, refs);
+> >> +	put_page(page);
+> >> +}
 > > 
-> > Blk-crypto delegates crypto operations to inline encryption hardware when
-> > available, and also contains a software fallback to the kernel crypto API.
-> > For more details, refer to Documentation/block/inline-encryption.rst.
+> > I wonder if this is better implemented as "put_compound_head()"?  To match the
+> > try_get_compound_head() call below?
 > 
-> Can you explain why we need this software fallback that basically just
-> duplicates logic already in fscrypt?  As far as I can tell this fallback
-> logic actually is more code than the actual inline encryption, and nasty
-> code at that, e.g. the whole crypt_iter thing.
+> Hi Ira,
+> 
+> Good idea, I'll rename it to that.
+> 
+> > 
+> >> +
+> >> +static int __huge_pt_done(struct page *head, int nr_recorded_pages, int *nr)
+> >> +{
+> >> +	*nr += nr_recorded_pages;
+> >> +	SetPageReferenced(head);
+> >> +	return 1;
+> > 
+> > When will this return anything but 1?
+> > 
+> 
+> Never, but it saves a line at all four call sites, by having it return like that.
+> 
+> I could see how maybe people would prefer to just have it be a void function,
+> and return 1 directly at the call sites. Since this was a lower line count I
+> thought maybe it would be slightly better, but it's hard to say really.
 
-One of the reasons I really want this is so I (as an upstream
-maintainer of ext4 and fscrypt) can test the new code paths using
-xfstests on GCE, without needing special pre-release hardware that has
-the ICE support.
+It is a NIT perhaps but I feel like the signature of a function should stand on
+it's own.  What this does is mix the meaning of this function with those
+calling it.  Which IMO is not good style.
 
-Yeah, I could probably get one of those dev boards internally at
-Google, but they're a pain in the tuckus to use, and I'd much rather
-be able to have my normal test infrastructure using gce-xfstests and
-kvm-xfstests be able to test inline-crypto.  So in terms of CI
-testing, having the blk-crypto is really going to be helpful.
+We can see what others say.
 
-						- Ted
+Ira
+
+> 
+> thanks,
+> 
+> John Hubbard
+> NVIDIA
+> 
