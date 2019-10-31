@@ -2,100 +2,100 @@ Return-Path: <SRS0=XfYF=YY=vger.kernel.org=linux-block-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-0.8 required=3.0 tests=DKIM_SIGNED,DKIM_VALID,
-	DKIM_VALID_AU,FREEMAIL_FORGED_FROMDOMAIN,FREEMAIL_FROM,
-	HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS
+X-Spam-Status: No, score=-3.8 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
+	MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED,USER_AGENT_GIT
 	autolearn=no autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id A3B27CA9ECB
-	for <linux-block@archiver.kernel.org>; Thu, 31 Oct 2019 15:57:44 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 6CFFCCA9ECB
+	for <linux-block@archiver.kernel.org>; Thu, 31 Oct 2019 16:10:33 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.kernel.org (Postfix) with ESMTP id 78F042087F
-	for <linux-block@archiver.kernel.org>; Thu, 31 Oct 2019 15:57:44 +0000 (UTC)
-Authentication-Results: mail.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="r2LAcakq"
+	by mail.kernel.org (Postfix) with ESMTP id 41D2520873
+	for <linux-block@archiver.kernel.org>; Thu, 31 Oct 2019 16:10:33 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1728503AbfJaP5j (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Thu, 31 Oct 2019 11:57:39 -0400
-Received: from mail-il1-f193.google.com ([209.85.166.193]:39213 "EHLO
-        mail-il1-f193.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1727593AbfJaP5j (ORCPT
-        <rfc822;linux-block@vger.kernel.org>);
-        Thu, 31 Oct 2019 11:57:39 -0400
-Received: by mail-il1-f193.google.com with SMTP id f201so181615ilh.6;
-        Thu, 31 Oct 2019 08:57:37 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20161025;
-        h=mime-version:references:in-reply-to:from:date:message-id:subject:to
-         :cc;
-        bh=5fMqgxCz9YeELky5sdMvqRGe8oe8TryFm0ddjx2jFJ8=;
-        b=r2LAcakqEaUTEWVB42o7netz4E9VSlpCiF1h3M4FyqmZMW8hARpE28IicCl+YOx7cK
-         wIYdFj49qzwuextspvTS4pX+SXfjLIQH5ePcrW24wrFI2FLPYPUJWlXcZK5vfQUYH0vM
-         LDVsW0NrfZXiJiuQa2lgvWH+vqp5PLuOBFuN8dfnoxXb2ChS8BlOoPnJ44oH3vCkeE9r
-         e7EaZZse7IDcGaylRdktf7O2XJMiLmms8LvvHOLxS4oGNFpEZb+kY2i5x5SAxqU2Otni
-         sHQPudwD1eG2lPICtrGXqx1E0CmeCqZbtDV3Yd397iWEVLyCsSkk9zsjZIBQpoEfEhlU
-         fUHg==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20161025;
-        h=x-gm-message-state:mime-version:references:in-reply-to:from:date
-         :message-id:subject:to:cc;
-        bh=5fMqgxCz9YeELky5sdMvqRGe8oe8TryFm0ddjx2jFJ8=;
-        b=tYJhUQYiPRhWk8CfaGeWA3C5WNuKjTxAuxGp2qT3xpch3eF6+rCKblZviMmMWG1iBk
-         MuvxK3faCpJ+QfaXjW2FAXDz0gM8ueRVGujVMMsDwK8P0YlYKKfJM9gMWQSvbQo35JSn
-         iQh1u8a6juw9opcB5NN642tlHdM4NQpp21QkLETaDaSVIWIQgzTjabJI965EmV/D/v6H
-         CLHZEs5WFxB4VWd5LuysjnqTibuHL6NGLoxRgM8TQL4W1eAQlHjg4NsjQOfUG/GSnzJA
-         64PBJLCNUUWW/wJqprnV5m65hZtmb6f/EwzZPiR0rqHvEIHtSDyfSgJOjgzY+V75jWzJ
-         Vbwg==
-X-Gm-Message-State: APjAAAUpnn9DIRCzU8vhxC8K2Fk8DXI1JWSCdQ9TAPn8hxEm07AYse8d
-        nHy42b5LFHhwGJ7JNi+yMjRocNiCMQS6AVz6iHA=
-X-Google-Smtp-Source: APXvYqxDzIvxdrtfoc1J6pHr6V7TIkjAtYww+JMfs2+Z9EUun1ZsfTWDhGu6aMUtGhRbc9znef8AcsrZINaCIzSjCbQ=
-X-Received: by 2002:a92:b656:: with SMTP id s83mr6910636ili.282.1572537457279;
- Thu, 31 Oct 2019 08:57:37 -0700 (PDT)
-MIME-Version: 1.0
-References: <157186182463.3995.13922458878706311997.stgit@warthog.procyon.org.uk>
- <157186186167.3995.7568100174393739543.stgit@warthog.procyon.org.uk>
- <CAOi1vP97DMX8zweOLfBDOFstrjC78=6RgxK3PPj_mehCOSeoaw@mail.gmail.com>
- <4892d186-8eb0-a282-e7e6-e79958431a54@rasmusvillemoes.dk> <16620.1572534687@warthog.procyon.org.uk>
-In-Reply-To: <16620.1572534687@warthog.procyon.org.uk>
-From:   Ilya Dryomov <idryomov@gmail.com>
-Date:   Thu, 31 Oct 2019 16:57:53 +0100
-Message-ID: <CAOi1vP9GAmy5NXJisrDssspoRcc+UHum+cyBsJTMNTjz_jieoQ@mail.gmail.com>
-Subject: Re: [RFC PATCH 04/10] pipe: Use head and tail pointers for the ring,
- not cursor and length [ver #2]
-To:     David Howells <dhowells@redhat.com>
-Cc:     Rasmus Villemoes <linux@rasmusvillemoes.dk>,
-        Linus Torvalds <torvalds@linux-foundation.org>,
-        Greg Kroah-Hartman <gregkh@linuxfoundation.org>,
-        Peter Zijlstra <peterz@infradead.org>,
-        nicolas.dichtel@6wind.com, raven@themaw.net,
-        Christian Brauner <christian@brauner.io>,
-        keyrings@vger.kernel.org, linux-usb@vger.kernel.org,
-        linux-block <linux-block@vger.kernel.org>,
-        linux-security-module@vger.kernel.org,
-        linux-fsdevel <linux-fsdevel@vger.kernel.org>,
-        linux-api@vger.kernel.org, LKML <linux-kernel@vger.kernel.org>
-Content-Type: text/plain; charset="UTF-8"
+        id S1727715AbfJaQKc (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Thu, 31 Oct 2019 12:10:32 -0400
+Received: from mga02.intel.com ([134.134.136.20]:11861 "EHLO mga02.intel.com"
+        rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
+        id S1726540AbfJaQKc (ORCPT <rfc822;linux-block@vger.kernel.org>);
+        Thu, 31 Oct 2019 12:10:32 -0400
+X-Amp-Result: SKIPPED(no attachment in message)
+X-Amp-File-Uploaded: False
+Received: from orsmga007.jf.intel.com ([10.7.209.58])
+  by orsmga101.jf.intel.com with ESMTP/TLS/DHE-RSA-AES256-GCM-SHA384; 31 Oct 2019 09:10:31 -0700
+X-ExtLoop1: 1
+X-IronPort-AV: E=Sophos;i="5.68,252,1569308400"; 
+   d="scan'208";a="190675591"
+Received: from revanth.lm.intel.com ([10.232.116.91])
+  by orsmga007.jf.intel.com with ESMTP; 31 Oct 2019 09:10:31 -0700
+From:   Revanth Rajashekar <revanth.rajashekar@intel.com>
+To:     <linux-block@vger.kernel.org>
+Cc:     Jonathan Derrick <jonathan.derrick@intel.com>,
+        Scott Bauer <sbauer@plzdonthack.me>,
+        Jonas Rabenstine <jonas.rabenstein@studium.uni-erlangen.de>,
+        David Kozub <zub@linux.fjfi.cvut.cz>,
+        Jens Axboe <axboe@kernel.dk>
+Subject: [PATCH v3 0/3] block: sed-opal: Generic Read/Write Opal Tables
+Date:   Thu, 31 Oct 2019 10:13:19 -0600
+Message-Id: <20191031161322.16624-1-revanth.rajashekar@intel.com>
+X-Mailer: git-send-email 2.17.1
 Sender: linux-block-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-On Thu, Oct 31, 2019 at 4:11 PM David Howells <dhowells@redhat.com> wrote:
->
-> How about:
->
->  * We use head and tail indices that aren't masked off, except at the
->  * point of dereference, but rather they're allowed to wrap naturally.
->  * This means there isn't a dead spot in the buffer, provided the ring
->  * size is a power of two and <= 2^31.
+This series of patches aims at extending SED Opal support:
+1. Generalizing write data to any opal table
+2. Add an IOCTL for reading/writing any Opal Table with Admin-1 authority
+3. Introduce Opal Datastore UID, which can be accessed using above ioctl
 
-To me "provided" reads like this thing works without a dead spot or
-with a dead spot, depending on whether the condition is met.  I would
-say:
+Datastore feature described in:
+https://trustedcomputinggroup.org/wp-content/uploads/TCG_Storage-Opal_Feature_Set-Additional_DataStore_Tables_v1_00_r1_00_Final.pdf
 
->  * This means there isn't a dead spot in the buffer, but the ring
->  * size has to be a power of two and <= 2^31.
+Opal Application Note:
+https://trustedcomputinggroup.org/wp-content/uploads/TCG_Storage_Opal_SSC_Application_Note_1-00_1-00-Final.pdf
 
-Thanks,
+This feature has been successfully tested on OPAL Datastore and MBR table using
+internal tools with an Intel SSD and an Intel Optane.
 
-                Ilya
+Changes from v2:
+	1. Drop a patch which exposes UIDs in UAPI.
+	2. Fix coding styles wherever required based on LKML feedbacks.
+	3. Eliminate a few redundant assignments in the code.
+	4. Add a break under copy_from_user error condition in
+           generic_table_write_data func.
+	5. A few refactoring/cleanups in both the patches.
+	6. Introduce a new patch which introduces Opal Datastore table UID.
+
+Changes from v1:
+	1. Fix the spelling mistake in the commit message.
+	2. Introduce a length check condition before Copy To User in
+           opal_read_table function to facilitate user with easy debugging.
+	3. Introduce switch cases in the opal_generic_read_write_table ioctl
+           function.
+	4. Move read/write table opal_step to discrete functions to reduce the
+           load on the ioctl function.
+	5. Introduce 'opal table operations' enumeration in uapi.
+	6. Remove tabs before the #defines in opal_read_write_table structure
+           to improve the code readability.
+	7. Drop a patch which exposes UIDs in UAPI.
+	8. Eliminate a few redundant assignments in the code.
+	9. Add a break under copy_from_user error condition in
+           generic_table_write_data func.
+	10. A few refactoring/cleanups in both the patches
+	11. Introduce a new patch which introduces Opal Datastore table UID.
+
+
+Revanth Rajashekar (3):
+  block: sed-opal: Generalizing write data to any opal table
+  block: sed-opal: Add support to read/write opal tables generically
+  block: sed-opal: Introduce Opal Datastore UID
+
+ block/opal_proto.h            |   2 +-
+ block/sed-opal.c              | 312 +++++++++++++++++++++++++++-------
+ include/linux/sed-opal.h      |   1 +
+ include/uapi/linux/sed-opal.h |  20 +++
+ 4 files changed, 270 insertions(+), 65 deletions(-)
+
+-- 
+2.17.1
+
