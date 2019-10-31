@@ -2,129 +2,213 @@ Return-Path: <SRS0=XfYF=YY=vger.kernel.org=linux-block-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-8.2 required=3.0 tests=DKIM_SIGNED,DKIM_VALID,
-	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,
-	SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED,USER_AGENT_SANE_1 autolearn=ham
-	autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-3.8 required=3.0 tests=DKIMWL_WL_HIGH,DKIM_SIGNED,
+	DKIM_VALID,DKIM_VALID_AU,FSL_HELO_FAKE,INCLUDES_PATCH,MAILING_LIST_MULTI,
+	SPF_HELO_NONE,SPF_PASS,USER_AGENT_SANE_1 autolearn=no autolearn_force=no
+	version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id F2B46CA9ECB
-	for <linux-block@archiver.kernel.org>; Thu, 31 Oct 2019 19:30:21 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 569E6CA9ECB
+	for <linux-block@archiver.kernel.org>; Thu, 31 Oct 2019 20:21:31 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.kernel.org (Postfix) with ESMTP id C5D1D208E3
-	for <linux-block@archiver.kernel.org>; Thu, 31 Oct 2019 19:30:21 +0000 (UTC)
-Authentication-Results: mail.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel-dk.20150623.gappssmtp.com header.i=@kernel-dk.20150623.gappssmtp.com header.b="cnJ75Phx"
+	by mail.kernel.org (Postfix) with ESMTP id 1A5F721734
+	for <linux-block@archiver.kernel.org>; Thu, 31 Oct 2019 20:21:31 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+	s=default; t=1572553291;
+	bh=BSyRUPaH+mXAK4zJdVucB6akTWJfcAfLI9dB8KMYki8=;
+	h=Date:From:To:Cc:Subject:References:In-Reply-To:List-ID:From;
+	b=h7cR76qtMCcYJAXcL7hzn3PhvM7H8JOlwPAdvTWT0738O4vgFzs5q7RVoooA9yfxg
+	 UnoyeLB2PBwY1Fqesypd6Eg64wOA3pLtVDGJGong41x1tLzZby+AEXDKPgmLq9pO7J
+	 xE81J8+iBwdVmjtYUglMHfcXQq+OTNbQBz1V0B9g=
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1729627AbfJaTaV (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Thu, 31 Oct 2019 15:30:21 -0400
-Received: from mail-io1-f67.google.com ([209.85.166.67]:40926 "EHLO
-        mail-io1-f67.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1726940AbfJaTaU (ORCPT
-        <rfc822;linux-block@vger.kernel.org>);
-        Thu, 31 Oct 2019 15:30:20 -0400
-Received: by mail-io1-f67.google.com with SMTP id p6so8072295iod.7
-        for <linux-block@vger.kernel.org>; Thu, 31 Oct 2019 12:30:20 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=kernel-dk.20150623.gappssmtp.com; s=20150623;
-        h=subject:from:to:references:message-id:date:user-agent:mime-version
-         :in-reply-to:content-language:content-transfer-encoding;
-        bh=5CaFlXjtkuWrqgObk1xIFzdL468BAaElg04+Ot6PxZY=;
-        b=cnJ75Phxa94kDFKMeodveaEb6dSA8BSCWSR3btI4oKmF1D7j2hiM6pxpsza6RHPngF
-         /pnjS5RzUUXoxtHaNJ+knYm4HVm9m7XP6MZNuTB0Ky7wnj2InxNjuskMw3DNmq3Fr2AU
-         TsSV/TRc+2LOGeHa2Lkeo8MPpPF0Tbae6k2S8LwH/9+dZzKvaEysMTGONwqm28lbKtP7
-         wPoNa3IMWxQAkTLwQ7DQV3LiNR8sgIgbzNrJ0BhScEymRNb2K/JoNYy/8iypASdEpPIt
-         W/mXrilrYZHGgazV0bp0yDUw1uzJ7/qHHvYwewrDclbdeP1HXTFJkMKXybekgoeLOgt0
-         tRrw==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20161025;
-        h=x-gm-message-state:subject:from:to:references:message-id:date
-         :user-agent:mime-version:in-reply-to:content-language
-         :content-transfer-encoding;
-        bh=5CaFlXjtkuWrqgObk1xIFzdL468BAaElg04+Ot6PxZY=;
-        b=akN0FiWY653Cd5AlCfCJqk/TWBlIhpHvJlECCeJe8mgk+u8fkNbatfqIGvjxqfB0wo
-         OqnqxUMflMu6c9HJ34UTPBwggmYVps6+o2AnUhmQqk+GfT88G6FPGqIZGVGF5N0UsPyq
-         3snwgu7+PA9Rm+6XyniZtUHiamjtUPgKUqS4xvhSafupg4ukbp8XXS4eUADmVbKP5B25
-         MZwE8b8Oc7PcVPcfMh2l5d4amoNnEDHQe9lGFEIx3I+wqqrE8A5gW+Iuca5qe96rQzBL
-         2besjsGdD+/seVxVwOhFvmjOKAZ3P8igMea3PEMqSioy8TBnSbXWqJ4Ev1cGFakH12vp
-         wN5g==
-X-Gm-Message-State: APjAAAWjAGm3DxaB3s1pTG8LHURw1EpDhXOkely+duSvQ8Kca/vK5iKJ
-        MGPfexkf+J6YFEkU1iIzZlFRJp/zUZO9Yw==
-X-Google-Smtp-Source: APXvYqz6d0/5QKsPZLekkIbIa0FqohAazvtWQQG2gSk1poMS9o7Y2c1jYXIJiZshkSY9n3DLbv+/Nw==
-X-Received: by 2002:a6b:6106:: with SMTP id v6mr6832147iob.79.1572550219625;
-        Thu, 31 Oct 2019 12:30:19 -0700 (PDT)
-Received: from [192.168.1.159] ([65.144.74.34])
-        by smtp.gmail.com with ESMTPSA id x17sm681319ilh.22.2019.10.31.12.30.18
-        for <linux-block@vger.kernel.org>
-        (version=TLS1_2 cipher=ECDHE-RSA-AES128-GCM-SHA256 bits=128/128);
-        Thu, 31 Oct 2019 12:30:18 -0700 (PDT)
-Subject: Re: [PATCH] block: retry blk_rq_map_user_iov() on failure
-From:   Jens Axboe <axboe@kernel.dk>
-To:     "linux-block@vger.kernel.org" <linux-block@vger.kernel.org>
-References: <c8718f10-0442-de4f-edfc-ecc6fe28b768@kernel.dk>
-Message-ID: <fec5226c-d13b-a7ef-cb3a-217b26a1aa22@kernel.dk>
-Date:   Thu, 31 Oct 2019 13:30:17 -0600
-User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:60.0) Gecko/20100101
- Thunderbird/60.9.0
+        id S1728298AbfJaUVa (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Thu, 31 Oct 2019 16:21:30 -0400
+Received: from mail.kernel.org ([198.145.29.99]:37012 "EHLO mail.kernel.org"
+        rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
+        id S1726741AbfJaUVa (ORCPT <rfc822;linux-block@vger.kernel.org>);
+        Thu, 31 Oct 2019 16:21:30 -0400
+Received: from gmail.com (unknown [104.132.1.77])
+        (using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+        (No client certificate requested)
+        by mail.kernel.org (Postfix) with ESMTPSA id 743B620679;
+        Thu, 31 Oct 2019 20:21:28 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+        s=default; t=1572553288;
+        bh=BSyRUPaH+mXAK4zJdVucB6akTWJfcAfLI9dB8KMYki8=;
+        h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
+        b=PWsoWa+PQSYr3Krtph+vU2ZTnBmlcdobMyhqQkJBrFDxgk6xryiH1XIPmFbBt2bNu
+         aLRYswaCrpoRrfp/NfM0bq8Vo3BBd5DPCx3d6Q6EFc7dq6ZaKpkMRz7iC4kZJ1KV4U
+         Gbu+hxesaGzUn0a0sny2EY8oX/U4c0axderSrYps=
+Date:   Thu, 31 Oct 2019 13:21:26 -0700
+From:   Eric Biggers <ebiggers@kernel.org>
+To:     Christoph Hellwig <hch@infradead.org>
+Cc:     Satya Tangirala <satyat@google.com>, linux-scsi@vger.kernel.org,
+        Kim Boojin <boojin.kim@samsung.com>,
+        Kuohong Wang <kuohong.wang@mediatek.com>,
+        Barani Muthukumaran <bmuthuku@qti.qualcomm.com>,
+        linux-f2fs-devel@lists.sourceforge.net,
+        linux-block@vger.kernel.org, linux-fscrypt@vger.kernel.org,
+        linux-fsdevel@vger.kernel.org
+Subject: Re: [PATCH v5 7/9] fscrypt: add inline encryption support
+Message-ID: <20191031202125.GA111219@gmail.com>
+Mail-Followup-To: Christoph Hellwig <hch@infradead.org>,
+        Satya Tangirala <satyat@google.com>, linux-scsi@vger.kernel.org,
+        Kim Boojin <boojin.kim@samsung.com>,
+        Kuohong Wang <kuohong.wang@mediatek.com>,
+        Barani Muthukumaran <bmuthuku@qti.qualcomm.com>,
+        linux-f2fs-devel@lists.sourceforge.net, linux-block@vger.kernel.org,
+        linux-fscrypt@vger.kernel.org, linux-fsdevel@vger.kernel.org
+References: <20191028072032.6911-1-satyat@google.com>
+ <20191028072032.6911-8-satyat@google.com>
+ <20191031183217.GF23601@infradead.org>
 MIME-Version: 1.0
-In-Reply-To: <c8718f10-0442-de4f-edfc-ecc6fe28b768@kernel.dk>
-Content-Type: text/plain; charset=utf-8
-Content-Language: en-US
-Content-Transfer-Encoding: 7bit
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <20191031183217.GF23601@infradead.org>
+User-Agent: Mutt/1.10.1 (2018-07-13)
 Sender: linux-block-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-On 10/31/19 1:26 PM, Jens Axboe wrote:
-> We ran into an issue in production where reading an NVMe drive log
-> randomly fails. The request is a big one, 1056K, and the application
-> (nvme-cli) nicely aligns the buffer. This means the kernel will attempt
-> to map the pages in for zero-copy DMA, but we ultimately fail adding
-> enough pages to the request to satisfy the size requirement as we ran
-> out of segments supported by the hardware.
+Hi Christoph, thanks for reviewing this.
+
+On Thu, Oct 31, 2019 at 11:32:17AM -0700, Christoph Hellwig wrote:
+> > diff --git a/fs/crypto/bio.c b/fs/crypto/bio.c
+> > index 1f4b8a277060..956798debf71 100644
+> > --- a/fs/crypto/bio.c
+> > +++ b/fs/crypto/bio.c
+> > @@ -46,26 +46,38 @@ int fscrypt_zeroout_range(const struct inode *inode, pgoff_t lblk,
+> >  {
+> >  	const unsigned int blockbits = inode->i_blkbits;
+> >  	const unsigned int blocksize = 1 << blockbits;
+> > +	const bool inlinecrypt = fscrypt_inode_uses_inline_crypto(inode);
+> >  	struct page *ciphertext_page;
+> >  	struct bio *bio;
+> >  	int ret, err = 0;
+> >  
+> > -	ciphertext_page = fscrypt_alloc_bounce_page(GFP_NOWAIT);
+> > -	if (!ciphertext_page)
+> > -		return -ENOMEM;
+> > +	if (inlinecrypt) {
+> > +		ciphertext_page = ZERO_PAGE(0);
+> > +	} else {
+> > +		ciphertext_page = fscrypt_alloc_bounce_page(GFP_NOWAIT);
+> > +		if (!ciphertext_page)
+> > +			return -ENOMEM;
 > 
-> If we fail a user map that attempts to map pages in directly, retry with
-> copy == true set.
+> I think you just want to split this into two functions for the
+> inline crypto vs not cases.
 > 
-> Signed-off-by: Jens Axboe <axboe@kernel.dk>
+> > @@ -391,6 +450,16 @@ struct fscrypt_master_key {
+> >  	 */
+> >  	struct crypto_skcipher	*mk_iv_ino_lblk_64_tfms[__FSCRYPT_MODE_MAX + 1];
+> >  
+> > +#ifdef CONFIG_FS_ENCRYPTION_INLINE_CRYPT
+> > +	/* Raw keys for IV_INO_LBLK_64 policies, allocated on-demand */
+> > +	u8			*mk_iv_ino_lblk_64_raw_keys[__FSCRYPT_MODE_MAX + 1];
+> > +
+> > +	/* The data unit size being used for inline encryption */
+> > +	unsigned int		mk_data_unit_size;
+> > +
+> > +	/* The filesystem's block device */
+> > +	struct block_device	*mk_bdev;
+> 
+> File systems (including f2fs) can have multiple underlying block
+> devices.  
 
-I did actually add comments to this, but apparently sent out the version
-without comments... Current one below, only difference is the addition
-of the comment explaining why we retry.
+Yes, this is a bug: it causes the key to be evicted from only one device.
+
+I'm thinking this might point to deeper problems with the inline encryption API
+exposed to filesystems being too difficult to use correctly.  We might want to
+move to something like:
 
 
-diff --git a/block/blk-map.c b/block/blk-map.c
-index 3a62e471d81b..4ca7c5db7d78 100644
---- a/block/blk-map.c
-+++ b/block/blk-map.c
-@@ -137,6 +137,7 @@ int blk_rq_map_user_iov(struct request_queue *q, struct request *rq,
- 	else if (queue_virt_boundary(q))
- 		copy = queue_virt_boundary(q) & iov_iter_gap_alignment(iter);
- 
-+retry:
- 	i = *iter;
- 	do {
- 		ret =__blk_rq_map_user_iov(rq, map_data, &i, gfp_mask, copy);
-@@ -154,6 +155,18 @@ int blk_rq_map_user_iov(struct request_queue *q, struct request *rq,
- 	__blk_rq_unmap_user(bio);
- fail:
- 	rq->bio = NULL;
-+	/*
-+	 * If we fail and we're in direct map mode, retry once with copying
-+	 * enabled instead. This can fix the case where userspace wants to
-+	 * do a large IO, but fails because the application memory is
-+	 * fragmented and we end up exceeding the number of segments for the
-+	 * request. With a copy == true retry, we aren't at the mercy of
-+	 * application memory layout.
-+	 */
-+	if (ret && !copy) {
-+		copy = true;
-+		goto retry;
-+	}
- 	return ret;
- }
- EXPORT_SYMBOL(blk_rq_map_user_iov);
+struct blk_crypto_key_handle *
+blk_crypto_prepare_key(struct request_queue *q, const u8 *raw_key,
+                       enum blk_crypto_mode_num crypto_mode, unsigned int data_unit_size);
 
--- 
-Jens Axboe
+int bio_crypt_set_ctx(struct bio *bio, struct blk_crypto_key_handle *h,
+		      u64 dun, gfp_t gfp_mask);
 
+void blk_crypto_destroy_key(struct blk_crypto_key_handle *h);
+
+
+Each handle would associate a raw_key, mode, and data_unit_size with a specific
+keyslot_manager, which would allocate/evict a keyslot as needed for I/O.
+blk_crypto_destroy_key() would both evict the keyslot and free the key.
+
+For each key, multi-device filesystems would then need to allocate a handle for
+each device.  This would force them to handle key eviction correctly.
+
+Satya, any thoughts on this?
+
+> 
+> > +{
+> > +	const struct inode *inode = ci->ci_inode;
+> > +	struct super_block *sb = inode->i_sb;
+> > +
+> > +	/* The file must need contents encryption, not filenames encryption */
+> > +	if (!S_ISREG(inode->i_mode))
+> > +		return false;
+> 
+> But that isn't really what the check checks for..
+
+This is how fscrypt has always worked.  The type of encryption to do is
+determined as follows:
+
+S_ISREG() => contents encryption
+S_ISDIR() || S_ISLNK() => filenames encryption
+
+See e.g. select_encryption_mode(), and similar checks elsewhere in
+fs/{crypto,ext4,f2fs}/.
+
+Do you have a suggestion to make it clearer?
+
+> 
+> > +	/* The filesystem must be mounted with -o inlinecrypt */
+> > +	if (!sb->s_cop->inline_crypt_enabled ||
+> > +	    !sb->s_cop->inline_crypt_enabled(sb))
+> > +		return false;
+> 
+> So please add a SB_* flag for that option instead of the weird
+> indirection.
+
+IMO it's not really "weird" given that the point of the fscrypt_operations is to
+expose filesystem-specific stuff to fs/crypto/.  But yes, using one of the SB_*
+bits would make it simpler, so if people are fine with that we'll do that.
+
+> 
+> > +/**
+> > + * fscrypt_inode_uses_inline_crypto - test whether an inode uses inline encryption
+> 
+> This adds an overly long line.  This happens many more times in the
+> patch.
+
+checkpatch reports 4 overly long lines in the patch, 3 of which are the first
+line of kerneldoc comments.  For some reason I thought those are recommended to
+be one line even if it exceeds 80 characters, but maybe I'm mistaken.
+
+> 
+> Btw, I'm not happy about the 8-byte IV assumptions everywhere here.
+> That really should be a parameter, not hardcoded.
+
+To be clear, the 8-byte IV assumption doesn't really come from fs/crypto/, but
+rather in what the blk-crypto API provides.  If blk-crypto were to provide
+longer IV support, fs/crypto/ would pretty easily be able to make use of it.
+
+(And if IVs >= 24 bytes were supported and we added AES-128-CBC-ESSIV and
+Adiantum support to blk-crypto.c, then inline encryption would be able to do
+everything that the existing filesystem-layer contents encryption can do.)
+
+Do you have anything in mind for how to make the API support longer IVs in a
+clean way?  Are you thinking of something like:
+
+	#define BLK_CRYPTO_MAX_DUN_SIZE	24
+
+	u8 dun[BLK_CRYPTO_MAX_DUN_SIZE];
+	int dun_size;
+
+We do have to perform arithmetic operations on it, so a byte array would make it
+ugly and slower, but it should be possible...
+
+- Eric
