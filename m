@@ -2,140 +2,114 @@ Return-Path: <SRS0=XfYF=YY=vger.kernel.org=linux-block-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-2.4 required=3.0 tests=DKIMWL_WL_HIGH,DKIM_SIGNED,
-	DKIM_VALID,DKIM_VALID_AU,HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,
-	SPF_HELO_NONE,SPF_PASS,USER_AGENT_SANE_1 autolearn=no autolearn_force=no
+X-Spam-Status: No, score=-8.3 required=3.0 tests=DKIM_SIGNED,DKIM_VALID,
+	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,
+	SPF_HELO_NONE,SPF_PASS,USER_AGENT_SANE_1 autolearn=ham autolearn_force=no
 	version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 6CE9BC47E49
-	for <linux-block@archiver.kernel.org>; Thu, 31 Oct 2019 18:43:43 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 55B32CA9ECB
+	for <linux-block@archiver.kernel.org>; Thu, 31 Oct 2019 19:26:18 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.kernel.org (Postfix) with ESMTP id 44A6A208C0
-	for <linux-block@archiver.kernel.org>; Thu, 31 Oct 2019 18:43:43 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id 227D7208E3
+	for <linux-block@archiver.kernel.org>; Thu, 31 Oct 2019 19:26:18 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=pass (2048-bit key) header.d=nvidia.com header.i=@nvidia.com header.b="ItGdt9jP"
+	dkim=pass (2048-bit key) header.d=kernel-dk.20150623.gappssmtp.com header.i=@kernel-dk.20150623.gappssmtp.com header.b="y4ZgLZNn"
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1729431AbfJaSnm (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Thu, 31 Oct 2019 14:43:42 -0400
-Received: from hqemgate16.nvidia.com ([216.228.121.65]:9937 "EHLO
-        hqemgate16.nvidia.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1729304AbfJaSnm (ORCPT
+        id S1729508AbfJaT0R (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Thu, 31 Oct 2019 15:26:17 -0400
+Received: from mail-io1-f65.google.com ([209.85.166.65]:34036 "EHLO
+        mail-io1-f65.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S1729347AbfJaT0R (ORCPT
         <rfc822;linux-block@vger.kernel.org>);
-        Thu, 31 Oct 2019 14:43:42 -0400
-Received: from hqpgpgate101.nvidia.com (Not Verified[216.228.121.13]) by hqemgate16.nvidia.com (using TLS: TLSv1.2, DES-CBC3-SHA)
-        id <B5dbb2b600000>; Thu, 31 Oct 2019 11:43:44 -0700
-Received: from hqmail.nvidia.com ([172.20.161.6])
-  by hqpgpgate101.nvidia.com (PGP Universal service);
-  Thu, 31 Oct 2019 11:43:38 -0700
-X-PGP-Universal: processed;
-        by hqpgpgate101.nvidia.com on Thu, 31 Oct 2019 11:43:38 -0700
-Received: from [10.110.48.28] (10.124.1.5) by HQMAIL107.nvidia.com
- (172.20.187.13) with Microsoft SMTP Server (TLS) id 15.0.1473.3; Thu, 31 Oct
- 2019 18:43:37 +0000
-Subject: Re: [PATCH 02/19] mm/gup: factor out duplicate code from four
- routines
-To:     Ira Weiny <ira.weiny@intel.com>
-CC:     Andrew Morton <akpm@linux-foundation.org>,
-        Al Viro <viro@zeniv.linux.org.uk>,
-        Alex Williamson <alex.williamson@redhat.com>,
-        Benjamin Herrenschmidt <benh@kernel.crashing.org>,
-        =?UTF-8?B?QmrDtnJuIFTDtnBlbA==?= <bjorn.topel@intel.com>,
-        Christoph Hellwig <hch@infradead.org>,
-        Dan Williams <dan.j.williams@intel.com>,
-        Daniel Vetter <daniel@ffwll.ch>,
-        Dave Chinner <david@fromorbit.com>,
-        David Airlie <airlied@linux.ie>,
-        "David S . Miller" <davem@davemloft.net>, Jan Kara <jack@suse.cz>,
-        Jason Gunthorpe <jgg@ziepe.ca>, Jens Axboe <axboe@kernel.dk>,
-        Jonathan Corbet <corbet@lwn.net>,
-        =?UTF-8?B?SsOpcsO0bWUgR2xpc3Nl?= <jglisse@redhat.com>,
-        Magnus Karlsson <magnus.karlsson@intel.com>,
-        Mauro Carvalho Chehab <mchehab@kernel.org>,
-        Michael Ellerman <mpe@ellerman.id.au>,
-        Michal Hocko <mhocko@suse.com>,
-        Mike Kravetz <mike.kravetz@oracle.com>,
-        Paul Mackerras <paulus@samba.org>,
-        Shuah Khan <shuah@kernel.org>,
-        Vlastimil Babka <vbabka@suse.cz>, <bpf@vger.kernel.org>,
-        <dri-devel@lists.freedesktop.org>, <kvm@vger.kernel.org>,
-        <linux-block@vger.kernel.org>, <linux-doc@vger.kernel.org>,
-        <linux-fsdevel@vger.kernel.org>, <linux-kselftest@vger.kernel.org>,
-        <linux-media@vger.kernel.org>, <linux-rdma@vger.kernel.org>,
-        <linuxppc-dev@lists.ozlabs.org>, <netdev@vger.kernel.org>,
-        <linux-mm@kvack.org>, LKML <linux-kernel@vger.kernel.org>,
-        Christoph Hellwig <hch@lst.de>,
-        "Aneesh Kumar K . V" <aneesh.kumar@linux.ibm.com>
-References: <20191030224930.3990755-1-jhubbard@nvidia.com>
- <20191030224930.3990755-3-jhubbard@nvidia.com>
- <20191031183549.GC14771@iweiny-DESK2.sc.intel.com>
-From:   John Hubbard <jhubbard@nvidia.com>
-X-Nvconfidentiality: public
-Message-ID: <75b557f7-24b2-740c-2640-2f914d131600@nvidia.com>
-Date:   Thu, 31 Oct 2019 11:43:37 -0700
+        Thu, 31 Oct 2019 15:26:17 -0400
+Received: by mail-io1-f65.google.com with SMTP id q1so8083481ion.1
+        for <linux-block@vger.kernel.org>; Thu, 31 Oct 2019 12:26:15 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=kernel-dk.20150623.gappssmtp.com; s=20150623;
+        h=to:from:subject:message-id:date:user-agent:mime-version
+         :content-language:content-transfer-encoding;
+        bh=uvDSudnf++R38H03QSiZmnEARzqynQJw1auoPiRbamA=;
+        b=y4ZgLZNnoP6Hb/siovc6/li+katPBSabT4hkxgPuZW4WP0XAnm7vrO9bDyfbOBb7qB
+         OJbZ8lik29xJiuXKQVUmODH146wvFrl/csuXcYre7uoq7asOe9qfp2DQwPZpOJYfT1+w
+         2Zep9rY77lklxsj/+aPlV9B0woXKgwU0viPnzHs9h2+T9aLtZIHIx+NgqnRTWJC7xyxw
+         u5z4bcNOG74KaRSrNt8rHRCgDmrFuNvs8U7TBrPLpb8e8rqzg2a4g8epo8Wb/kSmsxJT
+         ZQ6A0Kwxzx5Zmo8cFYnaF8VaN8bGOkHuj71T2avYnHxR/oXAZ71qR00DP3HcykO43kRa
+         Qjvg==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20161025;
+        h=x-gm-message-state:to:from:subject:message-id:date:user-agent
+         :mime-version:content-language:content-transfer-encoding;
+        bh=uvDSudnf++R38H03QSiZmnEARzqynQJw1auoPiRbamA=;
+        b=tkQcLQcvwguz707ttYOiLh5zfgbhrqjUUJusZ674Pxb1g9uLfBxBd2zT1sZlqPITuO
+         ntPiRXAeG71yuQYsvXE7oqLRJ1rhHGEuGfq4MtseODVbjRouM2XeFbHVU53C1UJJC4zA
+         9d3CgMpTbqicdg7GuMlxBgad78zMyxArf9F2P3zCneW4cXmZPrjPVOv/IFg6ZoiwVni4
+         GY0tZa7FBxh6tfi3JkMnKKDwXibW6ogbWz3WtzQ+4I2MWsOLR/Q89mTlAsS8anG8WCIM
+         Njd0qa9ppo9mrlPlKs40u3CiarFioyusvDuSD4ehzTmX0l81g+JYlTOYyggBA94H+wHq
+         /txQ==
+X-Gm-Message-State: APjAAAWR3DyiixIxvE+eBQ8IBqwNCByyL5905Y7K4aUyDKxToav14yPu
+        ONMVbqy7HdG9qUhD9lYucq5esh8+ag8D6A==
+X-Google-Smtp-Source: APXvYqzLnSg61C6uiTa3v4w9hEaoUVyR9yCBj8ua34xMfxP0w0WCWByNzfsJF32Vuv0vbd6mJ9VU8Q==
+X-Received: by 2002:a6b:38c5:: with SMTP id f188mr6726528ioa.235.1572549974504;
+        Thu, 31 Oct 2019 12:26:14 -0700 (PDT)
+Received: from ?IPv6:2620:10d:c081:1133::1088? ([2620:10d:c090:180::f3f5])
+        by smtp.gmail.com with ESMTPSA id s16sm715261ilp.37.2019.10.31.12.26.12
+        for <linux-block@vger.kernel.org>
+        (version=TLS1_2 cipher=ECDHE-RSA-AES128-GCM-SHA256 bits=128/128);
+        Thu, 31 Oct 2019 12:26:13 -0700 (PDT)
+To:     "linux-block@vger.kernel.org" <linux-block@vger.kernel.org>
+From:   Jens Axboe <axboe@kernel.dk>
+Subject: [PATCH] block: retry blk_rq_map_user_iov() on failure
+Message-ID: <c8718f10-0442-de4f-edfc-ecc6fe28b768@kernel.dk>
+Date:   Thu, 31 Oct 2019 13:26:11 -0600
 User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:60.0) Gecko/20100101
- Thunderbird/60.8.0
+ Thunderbird/60.9.0
 MIME-Version: 1.0
-In-Reply-To: <20191031183549.GC14771@iweiny-DESK2.sc.intel.com>
-X-Originating-IP: [10.124.1.5]
-X-ClientProxiedBy: HQMAIL101.nvidia.com (172.20.187.10) To
- HQMAIL107.nvidia.com (172.20.187.13)
-Content-Type: text/plain; charset="utf-8"
+Content-Type: text/plain; charset=utf-8
 Content-Language: en-US
 Content-Transfer-Encoding: 7bit
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=nvidia.com; s=n1;
-        t=1572547424; bh=tVTQ7w70LzXRWNozMw5pcweYnGaSw6wKS7taKOoMvgQ=;
-        h=X-PGP-Universal:Subject:To:CC:References:From:X-Nvconfidentiality:
-         Message-ID:Date:User-Agent:MIME-Version:In-Reply-To:
-         X-Originating-IP:X-ClientProxiedBy:Content-Type:Content-Language:
-         Content-Transfer-Encoding;
-        b=ItGdt9jPwuaxZEwBZAmOs6QRw3y1ekRCXIkAk884e9fffuoHSkMv3IXuQ7vsU8mJ+
-         6sn7OAiE4sod/01pqRwiHcd242kDvH4VxxD334MsuTzmzdN+z2Tf4SkqA4hAm5RUgb
-         DQz3BJUfTbN/krdQz9Fy07dfiumXVmkiVCv2liRNNsMOm+vluNn2/EZjBIhVCKbXA7
-         WVHpKyr4oMIxF6v1Zhp2z85oNzL7rjapLTslb3D5k7UtqTOOxnqps/GxGVAfXIr7tc
-         /ZNTHbsdctd0KY29GLOk6czDGwBpbgAriROyniZOORRqIrKjgDjOEDFf1BfnHlTH/3
-         EDGo/Nn1OpOQw==
 Sender: linux-block-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-On 10/31/19 11:35 AM, Ira Weiny wrote:
-> On Wed, Oct 30, 2019 at 03:49:13PM -0700, John Hubbard wrote:
-...
->> +
->> +static void __remove_refs_from_head(struct page *page, int refs)
->> +{
->> +	/* Do a get_page() first, in case refs == page->_refcount */
->> +	get_page(page);
->> +	page_ref_sub(page, refs);
->> +	put_page(page);
->> +}
-> 
-> I wonder if this is better implemented as "put_compound_head()"?  To match the
-> try_get_compound_head() call below?
+We ran into an issue in production where reading an NVMe drive log
+randomly fails. The request is a big one, 1056K, and the application
+(nvme-cli) nicely aligns the buffer. This means the kernel will attempt
+to map the pages in for zero-copy DMA, but we ultimately fail adding
+enough pages to the request to satisfy the size requirement as we ran
+out of segments supported by the hardware.
 
-Hi Ira,
+If we fail a user map that attempts to map pages in directly, retry with
+copy == true set.
 
-Good idea, I'll rename it to that.
+Signed-off-by: Jens Axboe <axboe@kernel.dk>
 
-> 
->> +
->> +static int __huge_pt_done(struct page *head, int nr_recorded_pages, int *nr)
->> +{
->> +	*nr += nr_recorded_pages;
->> +	SetPageReferenced(head);
->> +	return 1;
-> 
-> When will this return anything but 1?
-> 
+---
 
-Never, but it saves a line at all four call sites, by having it return like that.
+diff --git a/block/blk-map.c b/block/blk-map.c
+index db9373bd31ac..2dc5286baec6 100644
+--- a/block/blk-map.c
++++ b/block/blk-map.c
+@@ -131,6 +131,7 @@ int blk_rq_map_user_iov(struct request_queue *q, struct request *rq,
+ 	else if (queue_virt_boundary(q))
+ 		copy = queue_virt_boundary(q) & iov_iter_gap_alignment(iter);
+ 
++retry:
+ 	i = *iter;
+ 	do {
+ 		ret =__blk_rq_map_user_iov(rq, map_data, &i, gfp_mask, copy);
+@@ -148,6 +149,10 @@ int blk_rq_map_user_iov(struct request_queue *q, struct request *rq,
+ 	__blk_rq_unmap_user(bio);
+ fail:
+ 	rq->bio = NULL;
++	if (ret && !copy) {
++		copy = true;
++		goto retry;
++	}
+ 	return ret;
+ }
+ EXPORT_SYMBOL(blk_rq_map_user_iov);
 
-I could see how maybe people would prefer to just have it be a void function,
-and return 1 directly at the call sites. Since this was a lower line count I
-thought maybe it would be slightly better, but it's hard to say really.
+-- 
+Jens Axboe
 
-thanks,
-
-John Hubbard
-NVIDIA
