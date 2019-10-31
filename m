@@ -1,80 +1,107 @@
-Return-Path: <SRS0=yN0i=YX=vger.kernel.org=linux-block-owner@kernel.org>
+Return-Path: <SRS0=XfYF=YY=vger.kernel.org=linux-block-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-3.8 required=3.0 tests=DKIM_SIGNED,DKIM_VALID,
-	DKIM_VALID_AU,FREEMAIL_FORGED_FROMDOMAIN,FREEMAIL_FROM,
-	HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,
-	SPF_PASS,URIBL_BLOCKED autolearn=no autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-2.4 required=3.0 tests=DKIM_SIGNED,DKIM_VALID,
+	DKIM_VALID_AU,HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SPF_HELO_NONE,
+	SPF_PASS,USER_AGENT_SANE_1 autolearn=no autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 1EF51CA9EC7
-	for <linux-block@archiver.kernel.org>; Wed, 30 Oct 2019 23:20:53 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 547E7CA9EC9
+	for <linux-block@archiver.kernel.org>; Thu, 31 Oct 2019 01:33:43 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.kernel.org (Postfix) with ESMTP id E32D62087E
-	for <linux-block@archiver.kernel.org>; Wed, 30 Oct 2019 23:20:52 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id 2748820856
+	for <linux-block@archiver.kernel.org>; Thu, 31 Oct 2019 01:33:43 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="gONGGSLe"
+	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="YkJ7rDaL"
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1726960AbfJ3XUw (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Wed, 30 Oct 2019 19:20:52 -0400
-Received: from mail-qt1-f196.google.com ([209.85.160.196]:34427 "EHLO
-        mail-qt1-f196.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1726853AbfJ3XUw (ORCPT
+        id S1726765AbfJaBdm (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Wed, 30 Oct 2019 21:33:42 -0400
+Received: from us-smtp-delivery-1.mimecast.com ([205.139.110.120]:33532 "EHLO
+        us-smtp-1.mimecast.com" rhost-flags-OK-OK-OK-FAIL) by vger.kernel.org
+        with ESMTP id S1726760AbfJaBdl (ORCPT
         <rfc822;linux-block@vger.kernel.org>);
-        Wed, 30 Oct 2019 19:20:52 -0400
-Received: by mail-qt1-f196.google.com with SMTP id e14so5885263qto.1;
-        Wed, 30 Oct 2019 16:20:51 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20161025;
-        h=mime-version:references:in-reply-to:from:date:message-id:subject:to
-         :cc;
-        bh=Eq1yFNqRbX5oXHA7cRAuOcjtnHFRC37UNq/RAe1IY8M=;
-        b=gONGGSLeT+gVr1DX8wbpc78s4v4bhcEGPe0N5eKHhKbeec1MQq9MtOvWKwFEok1qc7
-         R9eeIjk1WgjCJ/pWEf4koPblNYwE5cAnQx/0WZ/gmrQUpf9X+/YIACOzl7Tj7nSqvosw
-         Of1c8qIdqv3Ma0z+Lm3icUJpZ0UXv4Y/ftEVvVhEHQbPt7+Yn8tUTqkEoZjxJ5Y1DaSd
-         MUbruIZp+k7ImIZSlEjc9+FQSu5CPWsUK4BqbH9jfXtJ2VI9yrAwTmyq2obKO0+YKmht
-         CLlBs9fZcCZ4ErEk8aoMQC6lzDak1MbMz5Qhcjp7cZzBuBsrxAe2rClG+jfAt8MDpUld
-         57vg==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20161025;
-        h=x-gm-message-state:mime-version:references:in-reply-to:from:date
-         :message-id:subject:to:cc;
-        bh=Eq1yFNqRbX5oXHA7cRAuOcjtnHFRC37UNq/RAe1IY8M=;
-        b=gP3WnmfcdtqoCO0XZaXl7jB4J8+pNPVYYaStb3n0khS1DoLpWMvttHVp63wkvIzCB6
-         VO1iFpyouplsg4EVzJYhRqLlaY0u5rHoUWbdBOuqcJjqYhi6gL7m5poZFAj6PInH9eNO
-         C7730ZAZ2jJpIbzLxbIgY+V1xmZ6+bFHzAOHivH/BqyItl6KG8HXKDKlGC51/16ktbAp
-         DVHxj5z4b4XiedErFIQnYtBL6UjVk2h/RQbB+tD8mG9IeS1Ju86mFLK5N/z+KWcIggRZ
-         MJ2UAnTRMVTS8A/APpBjZ6o+TqzRpc6RHSqmAWruS/U6rkaqRqe84e/pfehlODohvq96
-         yNsw==
-X-Gm-Message-State: APjAAAUfMR2S4k6fHs8tKkex+nyElD/PcFG+DRHfAG+TtoQSixbvKiFo
-        Sqar+xol9ZeovUCgAi//LBMdyDKsjT/EfuGl8s4=
-X-Google-Smtp-Source: APXvYqyvGeNOl87wx0ENiHy038JYbl6zzSmG1Hdz3NgWaI9PwsCQE/KXbe9y9SFlQOxvSWHxZaPjVrgafRT/xsxHP7E=
-X-Received: by 2002:ac8:6f44:: with SMTP id n4mr1296553qtv.379.1572477651197;
- Wed, 30 Oct 2019 16:20:51 -0700 (PDT)
+        Wed, 30 Oct 2019 21:33:41 -0400
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+        s=mimecast20190719; t=1572485620;
+        h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+         to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+         content-transfer-encoding:content-transfer-encoding:
+         in-reply-to:in-reply-to:references:references;
+        bh=JOT5e0E88zWIKcVI9/G9U554lO8BRI016yaiVp/NwTw=;
+        b=YkJ7rDaL2xARgAAApFtXXgaknKALf0FaP3UBZ9m6uRDyPgc7M2dJXM7MUMqGv7fi9F4Vm9
+        3xenDwXKzolq4qyctur6+LFNSs0huTbg3siV/8MMJdlOu4w4NNRka6wUY1ppq29UVzNexP
+        TPBjegQHt8yQ4/PuMaM8CS8h1axTJo4=
+Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
+ [209.132.183.4]) (Using TLS) by relay.mimecast.com with ESMTP id
+ us-mta-150-bJNIYacrMKifuaSjoJlzqw-1; Wed, 30 Oct 2019 21:33:37 -0400
+Received: from smtp.corp.redhat.com (int-mx02.intmail.prod.int.phx2.redhat.com [10.5.11.12])
+        (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
+        (No client certificate requested)
+        by mimecast-mx01.redhat.com (Postfix) with ESMTPS id 01CEA800D49;
+        Thu, 31 Oct 2019 01:33:36 +0000 (UTC)
+Received: from ming.t460p (ovpn-8-21.pek2.redhat.com [10.72.8.21])
+        by smtp.corp.redhat.com (Postfix) with ESMTPS id 304A460BE0;
+        Thu, 31 Oct 2019 01:33:29 +0000 (UTC)
+Date:   Thu, 31 Oct 2019 09:33:25 +0800
+From:   Ming Lei <ming.lei@redhat.com>
+To:     Christoph Hellwig <hch@infradead.org>
+Cc:     Jens Axboe <axboe@kernel.dk>, linux-block@vger.kernel.org,
+        Coly Li <colyli@suse.de>, Keith Busch <kbusch@kernel.org>,
+        linux-bcache@vger.kernel.org
+Subject: Re: [PATCH V3] block: optimize for small block size IO
+Message-ID: <20191031013325.GA12309@ming.t460p>
+References: <20191029105125.12928-1-ming.lei@redhat.com>
+ <20191029110425.GA4382@infradead.org>
+ <20191030002126.GA14423@ming.t460p>
+ <20191030135426.GA24655@infradead.org>
 MIME-Version: 1.0
-References: <20191025070856.76761-1-hare@suse.de>
-In-Reply-To: <20191025070856.76761-1-hare@suse.de>
-From:   Song Liu <liu.song.a23@gmail.com>
-Date:   Wed, 30 Oct 2019 16:20:40 -0700
-Message-ID: <CAPhsuW5Wof-5jaP_oeEz3MeBO5w-bfVdsy0-LxT7-AJZmWyrdw@mail.gmail.com>
-Subject: Re: [PATCH] md/raid1: avoid soft lockup under high load
-To:     Hannes Reinecke <hare@suse.de>
-Cc:     Jens Axboe <axboe@kernel.dk>, Coly Li <colyli@suse.com>,
-        Neil Brown <neilb@suse.com>, linux-block@vger.kernel.org,
-        linux-raid <linux-raid@vger.kernel.org>
-Content-Type: text/plain; charset="UTF-8"
+In-Reply-To: <20191030135426.GA24655@infradead.org>
+User-Agent: Mutt/1.12.1 (2019-06-15)
+X-Scanned-By: MIMEDefang 2.79 on 10.5.11.12
+X-MC-Unique: bJNIYacrMKifuaSjoJlzqw-1
+X-Mimecast-Spam-Score: 0
+Content-Type: text/plain; charset=UTF-8
+Content-Transfer-Encoding: quoted-printable
+Content-Disposition: inline
 Sender: linux-block-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-On Fri, Oct 25, 2019 at 12:25 PM Hannes Reinecke <hare@suse.de> wrote:
->
-> As all I/O is being pushed through a kernel thread the softlockup
-> watchdog might be triggered under high load.
->
-> Signed-off-by: Hannes Reinecke <hare@suse.de>
+On Wed, Oct 30, 2019 at 06:54:26AM -0700, Christoph Hellwig wrote:
+> On Wed, Oct 30, 2019 at 08:21:26AM +0800, Ming Lei wrote:
+> > > +=09=09if ((*bio)->bi_vcnt =3D=3D 1 &&
+> > > +=09=09    (*bio)->bi_io_vec[0].bv_len <=3D PAGE_SIZE) {
+> > > +=09=09=09*nr_segs =3D 1;
+> > > +=09=09=09return;
+> > > +=09=09}
+> > >  =09=09split =3D blk_bio_segment_split(q, *bio, &q->bio_split, nr_seg=
+s);
+> > >  =09=09break;
+> > >  =09}
+> >=20
+> > This bio(*bio) may be a fast-cloned bio from somewhere(DM, MD, ...), so=
+ the above
+> > check can't work sometime.
+>=20
+> Please explain how it doesn't work.  In the worse case it will give us
+> a false negastive, that is we don't take the fast path when in theory
+> we could, but then again fast clone=D1=95 bios will have so much overhead
+> that it should not matter.
 
-Applied to md-next. Thanks!
+In theory, we shouldn't use fast clone bio's .bi_vcnt, so far it is
+zero, in future fast clone bio's bi_vcnt might be used for other purpose.
 
-Song
+Also this bio may not a fast cloned bio, but it has been splitted(such
+as one 4k bio, and its front 512 byte is splitted out). It depends on
+if the remained bio needs to be splitted again. In reality, looks it
+won't be possible.
+
+In short, the above way is like a hack, but it should work in reality.
+
+I am fine with that, if comment of this usage is added.
+
+
+Thanks,
+Ming
+
