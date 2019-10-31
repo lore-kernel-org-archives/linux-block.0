@@ -2,68 +2,71 @@ Return-Path: <SRS0=XfYF=YY=vger.kernel.org=linux-block-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-8.3 required=3.0 tests=DKIM_SIGNED,DKIM_VALID,
+X-Spam-Status: No, score=-8.2 required=3.0 tests=DKIM_SIGNED,DKIM_VALID,
 	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,
-	SPF_HELO_NONE,SPF_PASS,USER_AGENT_SANE_1 autolearn=ham autolearn_force=no
-	version=3.4.0
+	SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED,USER_AGENT_SANE_1 autolearn=ham
+	autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 55B32CA9ECB
-	for <linux-block@archiver.kernel.org>; Thu, 31 Oct 2019 19:26:18 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id F2B46CA9ECB
+	for <linux-block@archiver.kernel.org>; Thu, 31 Oct 2019 19:30:21 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.kernel.org (Postfix) with ESMTP id 227D7208E3
-	for <linux-block@archiver.kernel.org>; Thu, 31 Oct 2019 19:26:18 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id C5D1D208E3
+	for <linux-block@archiver.kernel.org>; Thu, 31 Oct 2019 19:30:21 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel-dk.20150623.gappssmtp.com header.i=@kernel-dk.20150623.gappssmtp.com header.b="y4ZgLZNn"
+	dkim=pass (2048-bit key) header.d=kernel-dk.20150623.gappssmtp.com header.i=@kernel-dk.20150623.gappssmtp.com header.b="cnJ75Phx"
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1729508AbfJaT0R (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Thu, 31 Oct 2019 15:26:17 -0400
-Received: from mail-io1-f65.google.com ([209.85.166.65]:34036 "EHLO
-        mail-io1-f65.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1729347AbfJaT0R (ORCPT
+        id S1729627AbfJaTaV (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Thu, 31 Oct 2019 15:30:21 -0400
+Received: from mail-io1-f67.google.com ([209.85.166.67]:40926 "EHLO
+        mail-io1-f67.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S1726940AbfJaTaU (ORCPT
         <rfc822;linux-block@vger.kernel.org>);
-        Thu, 31 Oct 2019 15:26:17 -0400
-Received: by mail-io1-f65.google.com with SMTP id q1so8083481ion.1
-        for <linux-block@vger.kernel.org>; Thu, 31 Oct 2019 12:26:15 -0700 (PDT)
+        Thu, 31 Oct 2019 15:30:20 -0400
+Received: by mail-io1-f67.google.com with SMTP id p6so8072295iod.7
+        for <linux-block@vger.kernel.org>; Thu, 31 Oct 2019 12:30:20 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=kernel-dk.20150623.gappssmtp.com; s=20150623;
-        h=to:from:subject:message-id:date:user-agent:mime-version
-         :content-language:content-transfer-encoding;
-        bh=uvDSudnf++R38H03QSiZmnEARzqynQJw1auoPiRbamA=;
-        b=y4ZgLZNnoP6Hb/siovc6/li+katPBSabT4hkxgPuZW4WP0XAnm7vrO9bDyfbOBb7qB
-         OJbZ8lik29xJiuXKQVUmODH146wvFrl/csuXcYre7uoq7asOe9qfp2DQwPZpOJYfT1+w
-         2Zep9rY77lklxsj/+aPlV9B0woXKgwU0viPnzHs9h2+T9aLtZIHIx+NgqnRTWJC7xyxw
-         u5z4bcNOG74KaRSrNt8rHRCgDmrFuNvs8U7TBrPLpb8e8rqzg2a4g8epo8Wb/kSmsxJT
-         ZQ6A0Kwxzx5Zmo8cFYnaF8VaN8bGOkHuj71T2avYnHxR/oXAZ71qR00DP3HcykO43kRa
-         Qjvg==
+        h=subject:from:to:references:message-id:date:user-agent:mime-version
+         :in-reply-to:content-language:content-transfer-encoding;
+        bh=5CaFlXjtkuWrqgObk1xIFzdL468BAaElg04+Ot6PxZY=;
+        b=cnJ75Phxa94kDFKMeodveaEb6dSA8BSCWSR3btI4oKmF1D7j2hiM6pxpsza6RHPngF
+         /pnjS5RzUUXoxtHaNJ+knYm4HVm9m7XP6MZNuTB0Ky7wnj2InxNjuskMw3DNmq3Fr2AU
+         TsSV/TRc+2LOGeHa2Lkeo8MPpPF0Tbae6k2S8LwH/9+dZzKvaEysMTGONwqm28lbKtP7
+         wPoNa3IMWxQAkTLwQ7DQV3LiNR8sgIgbzNrJ0BhScEymRNb2K/JoNYy/8iypASdEpPIt
+         W/mXrilrYZHGgazV0bp0yDUw1uzJ7/qHHvYwewrDclbdeP1HXTFJkMKXybekgoeLOgt0
+         tRrw==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=1e100.net; s=20161025;
-        h=x-gm-message-state:to:from:subject:message-id:date:user-agent
-         :mime-version:content-language:content-transfer-encoding;
-        bh=uvDSudnf++R38H03QSiZmnEARzqynQJw1auoPiRbamA=;
-        b=tkQcLQcvwguz707ttYOiLh5zfgbhrqjUUJusZ674Pxb1g9uLfBxBd2zT1sZlqPITuO
-         ntPiRXAeG71yuQYsvXE7oqLRJ1rhHGEuGfq4MtseODVbjRouM2XeFbHVU53C1UJJC4zA
-         9d3CgMpTbqicdg7GuMlxBgad78zMyxArf9F2P3zCneW4cXmZPrjPVOv/IFg6ZoiwVni4
-         GY0tZa7FBxh6tfi3JkMnKKDwXibW6ogbWz3WtzQ+4I2MWsOLR/Q89mTlAsS8anG8WCIM
-         Njd0qa9ppo9mrlPlKs40u3CiarFioyusvDuSD4ehzTmX0l81g+JYlTOYyggBA94H+wHq
-         /txQ==
-X-Gm-Message-State: APjAAAWR3DyiixIxvE+eBQ8IBqwNCByyL5905Y7K4aUyDKxToav14yPu
-        ONMVbqy7HdG9qUhD9lYucq5esh8+ag8D6A==
-X-Google-Smtp-Source: APXvYqzLnSg61C6uiTa3v4w9hEaoUVyR9yCBj8ua34xMfxP0w0WCWByNzfsJF32Vuv0vbd6mJ9VU8Q==
-X-Received: by 2002:a6b:38c5:: with SMTP id f188mr6726528ioa.235.1572549974504;
-        Thu, 31 Oct 2019 12:26:14 -0700 (PDT)
-Received: from ?IPv6:2620:10d:c081:1133::1088? ([2620:10d:c090:180::f3f5])
-        by smtp.gmail.com with ESMTPSA id s16sm715261ilp.37.2019.10.31.12.26.12
+        h=x-gm-message-state:subject:from:to:references:message-id:date
+         :user-agent:mime-version:in-reply-to:content-language
+         :content-transfer-encoding;
+        bh=5CaFlXjtkuWrqgObk1xIFzdL468BAaElg04+Ot6PxZY=;
+        b=akN0FiWY653Cd5AlCfCJqk/TWBlIhpHvJlECCeJe8mgk+u8fkNbatfqIGvjxqfB0wo
+         OqnqxUMflMu6c9HJ34UTPBwggmYVps6+o2AnUhmQqk+GfT88G6FPGqIZGVGF5N0UsPyq
+         3snwgu7+PA9Rm+6XyniZtUHiamjtUPgKUqS4xvhSafupg4ukbp8XXS4eUADmVbKP5B25
+         MZwE8b8Oc7PcVPcfMh2l5d4amoNnEDHQe9lGFEIx3I+wqqrE8A5gW+Iuca5qe96rQzBL
+         2besjsGdD+/seVxVwOhFvmjOKAZ3P8igMea3PEMqSioy8TBnSbXWqJ4Ev1cGFakH12vp
+         wN5g==
+X-Gm-Message-State: APjAAAWjAGm3DxaB3s1pTG8LHURw1EpDhXOkely+duSvQ8Kca/vK5iKJ
+        MGPfexkf+J6YFEkU1iIzZlFRJp/zUZO9Yw==
+X-Google-Smtp-Source: APXvYqz6d0/5QKsPZLekkIbIa0FqohAazvtWQQG2gSk1poMS9o7Y2c1jYXIJiZshkSY9n3DLbv+/Nw==
+X-Received: by 2002:a6b:6106:: with SMTP id v6mr6832147iob.79.1572550219625;
+        Thu, 31 Oct 2019 12:30:19 -0700 (PDT)
+Received: from [192.168.1.159] ([65.144.74.34])
+        by smtp.gmail.com with ESMTPSA id x17sm681319ilh.22.2019.10.31.12.30.18
         for <linux-block@vger.kernel.org>
         (version=TLS1_2 cipher=ECDHE-RSA-AES128-GCM-SHA256 bits=128/128);
-        Thu, 31 Oct 2019 12:26:13 -0700 (PDT)
-To:     "linux-block@vger.kernel.org" <linux-block@vger.kernel.org>
+        Thu, 31 Oct 2019 12:30:18 -0700 (PDT)
+Subject: Re: [PATCH] block: retry blk_rq_map_user_iov() on failure
 From:   Jens Axboe <axboe@kernel.dk>
-Subject: [PATCH] block: retry blk_rq_map_user_iov() on failure
-Message-ID: <c8718f10-0442-de4f-edfc-ecc6fe28b768@kernel.dk>
-Date:   Thu, 31 Oct 2019 13:26:11 -0600
+To:     "linux-block@vger.kernel.org" <linux-block@vger.kernel.org>
+References: <c8718f10-0442-de4f-edfc-ecc6fe28b768@kernel.dk>
+Message-ID: <fec5226c-d13b-a7ef-cb3a-217b26a1aa22@kernel.dk>
+Date:   Thu, 31 Oct 2019 13:30:17 -0600
 User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:60.0) Gecko/20100101
  Thunderbird/60.9.0
 MIME-Version: 1.0
+In-Reply-To: <c8718f10-0442-de4f-edfc-ecc6fe28b768@kernel.dk>
 Content-Type: text/plain; charset=utf-8
 Content-Language: en-US
 Content-Transfer-Encoding: 7bit
@@ -72,25 +75,29 @@ Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-We ran into an issue in production where reading an NVMe drive log
-randomly fails. The request is a big one, 1056K, and the application
-(nvme-cli) nicely aligns the buffer. This means the kernel will attempt
-to map the pages in for zero-copy DMA, but we ultimately fail adding
-enough pages to the request to satisfy the size requirement as we ran
-out of segments supported by the hardware.
+On 10/31/19 1:26 PM, Jens Axboe wrote:
+> We ran into an issue in production where reading an NVMe drive log
+> randomly fails. The request is a big one, 1056K, and the application
+> (nvme-cli) nicely aligns the buffer. This means the kernel will attempt
+> to map the pages in for zero-copy DMA, but we ultimately fail adding
+> enough pages to the request to satisfy the size requirement as we ran
+> out of segments supported by the hardware.
+> 
+> If we fail a user map that attempts to map pages in directly, retry with
+> copy == true set.
+> 
+> Signed-off-by: Jens Axboe <axboe@kernel.dk>
 
-If we fail a user map that attempts to map pages in directly, retry with
-copy == true set.
+I did actually add comments to this, but apparently sent out the version
+without comments... Current one below, only difference is the addition
+of the comment explaining why we retry.
 
-Signed-off-by: Jens Axboe <axboe@kernel.dk>
-
----
 
 diff --git a/block/blk-map.c b/block/blk-map.c
-index db9373bd31ac..2dc5286baec6 100644
+index 3a62e471d81b..4ca7c5db7d78 100644
 --- a/block/blk-map.c
 +++ b/block/blk-map.c
-@@ -131,6 +131,7 @@ int blk_rq_map_user_iov(struct request_queue *q, struct request *rq,
+@@ -137,6 +137,7 @@ int blk_rq_map_user_iov(struct request_queue *q, struct request *rq,
  	else if (queue_virt_boundary(q))
  		copy = queue_virt_boundary(q) & iov_iter_gap_alignment(iter);
  
@@ -98,10 +105,18 @@ index db9373bd31ac..2dc5286baec6 100644
  	i = *iter;
  	do {
  		ret =__blk_rq_map_user_iov(rq, map_data, &i, gfp_mask, copy);
-@@ -148,6 +149,10 @@ int blk_rq_map_user_iov(struct request_queue *q, struct request *rq,
+@@ -154,6 +155,18 @@ int blk_rq_map_user_iov(struct request_queue *q, struct request *rq,
  	__blk_rq_unmap_user(bio);
  fail:
  	rq->bio = NULL;
++	/*
++	 * If we fail and we're in direct map mode, retry once with copying
++	 * enabled instead. This can fix the case where userspace wants to
++	 * do a large IO, but fails because the application memory is
++	 * fragmented and we end up exceeding the number of segments for the
++	 * request. With a copy == true retry, we aren't at the mercy of
++	 * application memory layout.
++	 */
 +	if (ret && !copy) {
 +		copy = true;
 +		goto retry;
