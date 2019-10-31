@@ -2,88 +2,91 @@ Return-Path: <SRS0=XfYF=YY=vger.kernel.org=linux-block-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-2.3 required=3.0 tests=DKIM_SIGNED,DKIM_VALID,
-	HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,
-	USER_AGENT_SANE_1 autolearn=no autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-0.8 required=3.0 tests=DKIM_SIGNED,DKIM_VALID,
+	DKIM_VALID_AU,HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SPF_HELO_NONE,
+	SPF_PASS,URIBL_BLOCKED autolearn=no autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id A6075CA9EC3
-	for <linux-block@archiver.kernel.org>; Thu, 31 Oct 2019 12:57:10 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 8746CCA9ECE
+	for <linux-block@archiver.kernel.org>; Thu, 31 Oct 2019 14:58:07 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.kernel.org (Postfix) with ESMTP id 6D5C320656
-	for <linux-block@archiver.kernel.org>; Thu, 31 Oct 2019 12:57:10 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id 5CF402086D
+	for <linux-block@archiver.kernel.org>; Thu, 31 Oct 2019 14:58:07 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel-dk.20150623.gappssmtp.com header.i=@kernel-dk.20150623.gappssmtp.com header.b="iEFkJ7oB"
+	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="e4fwxynf"
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1726642AbfJaM5J (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Thu, 31 Oct 2019 08:57:09 -0400
-Received: from mail-il1-f195.google.com ([209.85.166.195]:43720 "EHLO
-        mail-il1-f195.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1726506AbfJaM5J (ORCPT
+        id S1727969AbfJaO6D (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Thu, 31 Oct 2019 10:58:03 -0400
+Received: from us-smtp-2.mimecast.com ([205.139.110.61]:51421 "EHLO
+        us-smtp-delivery-1.mimecast.com" rhost-flags-OK-OK-OK-FAIL)
+        by vger.kernel.org with ESMTP id S1728032AbfJaO6D (ORCPT
         <rfc822;linux-block@vger.kernel.org>);
-        Thu, 31 Oct 2019 08:57:09 -0400
-Received: by mail-il1-f195.google.com with SMTP id j2so3149481ilc.10
-        for <linux-block@vger.kernel.org>; Thu, 31 Oct 2019 05:57:09 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=kernel-dk.20150623.gappssmtp.com; s=20150623;
-        h=subject:to:cc:references:from:message-id:date:user-agent
-         :mime-version:in-reply-to:content-language:content-transfer-encoding;
-        bh=HFMClpqTeJP46m822zm9nFLSwcrgj9uvV5/DrfBRnPs=;
-        b=iEFkJ7oBRKTnH86pHzYP8n/pBPhjBfJYlldEsYn/rIGVWHnhgpxN9Caj2RqNP+Q9+v
-         /SsATlGRTx/Px6pZJL43nAcCe89USwlXPU+5W45WA+Haw1O2APUVr1TBsFo1kfQThhnf
-         m0nVawNTVYWxCd4jjbc12V1Vya3LiftKcRzhUzZmxoE/8g1BCcrGF4ZhGsg4Oie75lw9
-         JZJal9dMagDpaZUgnKqUDvRkmYQQ0EgBIXmHD53leDI77do78FYlp5HAF5lGoqqcYmrC
-         FZxsLPufmfOMu0dkVYHP7TBqJCWqlouul9OvP4+rvYTz9u+JrMVpskCCa2OztwL6Hm99
-         FnZQ==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20161025;
-        h=x-gm-message-state:subject:to:cc:references:from:message-id:date
-         :user-agent:mime-version:in-reply-to:content-language
-         :content-transfer-encoding;
-        bh=HFMClpqTeJP46m822zm9nFLSwcrgj9uvV5/DrfBRnPs=;
-        b=jnRGYc+GC6QLl2EaHnnODXXmlX3O+QxOOgY/hGCgLo8ZHjxXOTEy1fUqmi3miR54J2
-         dXCaKcN4rAjyM8xYhRjgZdkQu/NfkI1E2FbMjUPL5VbEzDW7FXd4UTd8mooi88pgasie
-         vCBqTRScbBVkpeMqbpPuXv04EuSEfwCfcCE/m0GCRd1KXtUg5vwY9BtJBS57wCDu8BZq
-         OviR8XNQbrNZfagRLlTggPJyez53xIT+RChOYKFJVvOqL5yEQ+KZxeUHYbD/KAzrYqJ0
-         L+QjXPRH2UisSdfBzBWJeSmXHXaOXSclllLvRt6kvTKvyB5IuFi0dEICDonc1tD11jYO
-         F0bw==
-X-Gm-Message-State: APjAAAVTEH6KQRlA8X9nmUXdBsY3/LjcQcgH+ezmzIZORLWkBEWkPMrQ
-        lD8ncGFnX89JSRG117a0w+2O7w==
-X-Google-Smtp-Source: APXvYqy6YWgbIHTOYJsUJwrnjXnKqoqGCOzyA33ICwDU+p8YPyAoCA9Am/KjbwjsFlBj73v8w/Qhkw==
-X-Received: by 2002:a92:8c1c:: with SMTP id o28mr5805925ild.34.1572526628820;
-        Thu, 31 Oct 2019 05:57:08 -0700 (PDT)
-Received: from [192.168.1.159] ([65.144.74.34])
-        by smtp.gmail.com with ESMTPSA id l64sm508754ilh.2.2019.10.31.05.57.07
-        (version=TLS1_2 cipher=ECDHE-RSA-AES128-GCM-SHA256 bits=128/128);
-        Thu, 31 Oct 2019 05:57:07 -0700 (PDT)
-Subject: Re: [PATCH] io_uring: signedness bug in io_async_cancel()
-To:     Dan Carpenter <dan.carpenter@oracle.com>
-Cc:     linux-fsdevel@vger.kernel.org, linux-block@vger.kernel.org,
-        kernel-janitors@vger.kernel.org
-References: <20191031105547.GC26612@mwanda>
-From:   Jens Axboe <axboe@kernel.dk>
-Message-ID: <a697c16b-92bb-52a3-e2e8-5f24d75f580d@kernel.dk>
-Date:   Thu, 31 Oct 2019 06:57:06 -0600
-User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:60.0) Gecko/20100101
- Thunderbird/60.9.0
+        Thu, 31 Oct 2019 10:58:03 -0400
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+        s=mimecast20190719; t=1572533880;
+        h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+         to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+         content-transfer-encoding:content-transfer-encoding:
+         in-reply-to:in-reply-to:references:references;
+        bh=cjgEzJVzo2lJMUc77CuSCNztlH8vIEi00dABVngX7OE=;
+        b=e4fwxynfN873ScbRWNY4kSCMFyB4tGHkp5i+shBPRx4TjNbYt7BGodHzmrZap7CiT8PL/A
+        eGGl1Je386gfzMmRxfOeh2ZZCgd1C6RmobgC9pqGaLk2MM9zv5PhV8/Wr+gMynRCGSuFqw
+        tNDdOHs184es5DZfkOCAT7jPAd1h3mU=
+Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
+ [209.132.183.4]) (Using TLS) by relay.mimecast.com with ESMTP id
+ us-mta-216-_BdLQb6yOlu3p54wnvo9Pg-1; Thu, 31 Oct 2019 10:57:56 -0400
+Received: from smtp.corp.redhat.com (int-mx05.intmail.prod.int.phx2.redhat.com [10.5.11.15])
+        (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
+        (No client certificate requested)
+        by mimecast-mx01.redhat.com (Postfix) with ESMTPS id 92BE11800D6B;
+        Thu, 31 Oct 2019 14:57:54 +0000 (UTC)
+Received: from warthog.procyon.org.uk (ovpn-121-40.rdu2.redhat.com [10.10.121.40])
+        by smtp.corp.redhat.com (Postfix) with ESMTP id E40665D6D6;
+        Thu, 31 Oct 2019 14:57:51 +0000 (UTC)
+Organization: Red Hat UK Ltd. Registered Address: Red Hat UK Ltd, Amberley
+        Place, 107-111 Peascod Street, Windsor, Berkshire, SI4 1TE, United
+        Kingdom.
+        Registered in England and Wales under Company Registration No. 3798903
+From:   David Howells <dhowells@redhat.com>
+In-Reply-To: <CAHk-=wh7cf3ANq-G9MmwSQiUK2d-=083C0HV_8hTGe2Mb4X7JA@mail.gmail.com>
+References: <CAHk-=wh7cf3ANq-G9MmwSQiUK2d-=083C0HV_8hTGe2Mb4X7JA@mail.gmail.com> <157186182463.3995.13922458878706311997.stgit@warthog.procyon.org.uk> <157186186167.3995.7568100174393739543.stgit@warthog.procyon.org.uk>
+To:     Linus Torvalds <torvalds@linux-foundation.org>
+Cc:     dhowells@redhat.com, Rasmus Villemoes <linux@rasmusvillemoes.dk>,
+        Greg Kroah-Hartman <gregkh@linuxfoundation.org>,
+        Peter Zijlstra <peterz@infradead.org>,
+        Nicolas Dichtel <nicolas.dichtel@6wind.com>, raven@themaw.net,
+        Christian Brauner <christian@brauner.io>,
+        keyrings@vger.kernel.org, linux-usb@vger.kernel.org,
+        linux-block <linux-block@vger.kernel.org>,
+        LSM List <linux-security-module@vger.kernel.org>,
+        linux-fsdevel <linux-fsdevel@vger.kernel.org>,
+        Linux API <linux-api@vger.kernel.org>,
+        Linux Kernel Mailing List <linux-kernel@vger.kernel.org>
+Subject: Re: [RFC PATCH 04/10] pipe: Use head and tail pointers for the ring, not cursor and length [ver #2]
 MIME-Version: 1.0
-In-Reply-To: <20191031105547.GC26612@mwanda>
-Content-Type: text/plain; charset=utf-8
-Content-Language: en-US
-Content-Transfer-Encoding: 7bit
+Content-ID: <24074.1572533871.1@warthog.procyon.org.uk>
+Date:   Thu, 31 Oct 2019 14:57:51 +0000
+Message-ID: <24075.1572533871@warthog.procyon.org.uk>
+X-Scanned-By: MIMEDefang 2.79 on 10.5.11.15
+X-MC-Unique: _BdLQb6yOlu3p54wnvo9Pg-1
+X-Mimecast-Spam-Score: 0
+Content-Type: text/plain; charset=WINDOWS-1252
+Content-Transfer-Encoding: quoted-printable
 Sender: linux-block-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-On 10/31/19 4:55 AM, Dan Carpenter wrote:
-> The problem is that this enum is unsigned, and we do use "ret" for the
-> enum values, but we also use it for negative error codes.  If it's not
-> signed then it causes a problem in the error handling.
+Linus Torvalds <torvalds@linux-foundation.org> wrote:
 
-I noticed this one the other day, merged in a fix for it then. Not
-an issue in the current tree, though linux-next may still have the
-older one.
+> It's shorter and more obvious to just write
+>=20
+>    pipe->head =3D head;
+>=20
+> than it is to write
+>=20
+>    pipe_commit_write(pipe, head);
 
--- 
-Jens Axboe
+But easier to find the latter.  But whatever.
+
+David
 
