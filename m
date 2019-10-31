@@ -6,50 +6,50 @@ X-Spam-Status: No, score=-0.8 required=3.0 tests=DKIM_SIGNED,DKIM_VALID,
 	DKIM_VALID_AU,HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SPF_HELO_NONE,
 	SPF_PASS,URIBL_BLOCKED autolearn=no autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 8E8BACA9ECB
-	for <linux-block@archiver.kernel.org>; Thu, 31 Oct 2019 15:13:27 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 7A508C47E49
+	for <linux-block@archiver.kernel.org>; Thu, 31 Oct 2019 15:16:09 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.kernel.org (Postfix) with ESMTP id 59DD22087F
-	for <linux-block@archiver.kernel.org>; Thu, 31 Oct 2019 15:13:27 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id 4E78421734
+	for <linux-block@archiver.kernel.org>; Thu, 31 Oct 2019 15:16:09 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="eTisoTQL"
+	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="adzTcULU"
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1728109AbfJaPN0 (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Thu, 31 Oct 2019 11:13:26 -0400
-Received: from us-smtp-2.mimecast.com ([207.211.31.81]:26110 "EHLO
+        id S1727715AbfJaPQH (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Thu, 31 Oct 2019 11:16:07 -0400
+Received: from us-smtp-1.mimecast.com ([207.211.31.81]:59235 "EHLO
         us-smtp-delivery-1.mimecast.com" rhost-flags-OK-OK-OK-FAIL)
-        by vger.kernel.org with ESMTP id S1727962AbfJaPN0 (ORCPT
+        by vger.kernel.org with ESMTP id S1727669AbfJaPQE (ORCPT
         <rfc822;linux-block@vger.kernel.org>);
-        Thu, 31 Oct 2019 11:13:26 -0400
+        Thu, 31 Oct 2019 11:16:04 -0400
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-        s=mimecast20190719; t=1572534805;
+        s=mimecast20190719; t=1572534963;
         h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
          to:to:cc:cc:mime-version:mime-version:content-type:content-type:
          content-transfer-encoding:content-transfer-encoding:
          in-reply-to:in-reply-to:references:references;
-        bh=FNwFRZjnDpMMCUFzfJOSVzkAkD/c1c7Ojt9o9rhUq2Y=;
-        b=eTisoTQLr5iStvNrpLpqaYPe2y5YzdvVpdoNVUAZHcB8GQw7qHmMzdGmj1/Nnd+8Brlg6r
-        bgDhkeGG+3GXa5bjzRAAVCR2c4R7LEmlYvxg+8A7MS+N8lYR7AdVUC/NDCUhc2B0CVEIJR
-        /A9fUlEWbOIn/+fkFgiOC2vQbxYp1vQ=
+        bh=zC2mY0mLUqkQzl10meI2dQTcqCAQks3OLoAJrTsT3pg=;
+        b=adzTcULULFJy8UcTe4yayYjVO6GidCQ7OQbxa57ibWr9JLlEP+ePDMRYzUW3mi3+VgISKy
+        /xFnGeLG/yFKZ5F9958e/V7wD7sZLOvjx+GP5o/Nsi824j+5D1eciBNAFRU32OAruv9vEr
+        0XeQU3e10feMJ4Vi8Y61HcBqAZGfR+o=
 Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
  [209.132.183.4]) (Using TLS) by relay.mimecast.com with ESMTP id
- us-mta-37-jD0V8FpeNOqkFxE4eETZKg-1; Thu, 31 Oct 2019 11:13:22 -0400
-Received: from smtp.corp.redhat.com (int-mx04.intmail.prod.int.phx2.redhat.com [10.5.11.14])
+ us-mta-253-FXImFqDnP-q7fXpZhf4T8w-1; Thu, 31 Oct 2019 11:16:00 -0400
+Received: from smtp.corp.redhat.com (int-mx07.intmail.prod.int.phx2.redhat.com [10.5.11.22])
         (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
         (No client certificate requested)
-        by mimecast-mx01.redhat.com (Postfix) with ESMTPS id 839B11800D6B;
-        Thu, 31 Oct 2019 15:13:20 +0000 (UTC)
+        by mimecast-mx01.redhat.com (Postfix) with ESMTPS id E87491800D6B;
+        Thu, 31 Oct 2019 15:15:57 +0000 (UTC)
 Received: from warthog.procyon.org.uk (ovpn-121-40.rdu2.redhat.com [10.10.121.40])
-        by smtp.corp.redhat.com (Postfix) with ESMTP id 97A915DA7D;
-        Thu, 31 Oct 2019 15:13:16 +0000 (UTC)
+        by smtp.corp.redhat.com (Postfix) with ESMTP id AA8681001920;
+        Thu, 31 Oct 2019 15:15:54 +0000 (UTC)
 Organization: Red Hat UK Ltd. Registered Address: Red Hat UK Ltd, Amberley
         Place, 107-111 Peascod Street, Windsor, Berkshire, SI4 1TE, United
         Kingdom.
         Registered in England and Wales under Company Registration No. 3798903
 From:   David Howells <dhowells@redhat.com>
-In-Reply-To: <20191027152223.GA21194@infradead.org>
-References: <20191027152223.GA21194@infradead.org> <157186182463.3995.13922458878706311997.stgit@warthog.procyon.org.uk> <30394.1571936252@warthog.procyon.org.uk>
-To:     Christoph Hellwig <hch@infradead.org>
+In-Reply-To: <c6e044cc-5596-90b7-4418-6ad7009d6d79@yandex-team.ru>
+References: <c6e044cc-5596-90b7-4418-6ad7009d6d79@yandex-team.ru> <157186182463.3995.13922458878706311997.stgit@warthog.procyon.org.uk> <30394.1571936252@warthog.procyon.org.uk>
+To:     Konstantin Khlebnikov <khlebnikov@yandex-team.ru>
 Cc:     dhowells@redhat.com, torvalds@linux-foundation.org,
         Rasmus Villemoes <linux@rasmusvillemoes.dk>,
         Greg Kroah-Hartman <gregkh@linuxfoundation.org>,
@@ -62,11 +62,11 @@ Cc:     dhowells@redhat.com, torvalds@linux-foundation.org,
         linux-kernel@vger.kernel.org
 Subject: Re: [RFC PATCH 11/10] pipe: Add fsync() support [ver #2]
 MIME-Version: 1.0
-Content-ID: <17041.1572534796.1@warthog.procyon.org.uk>
-Date:   Thu, 31 Oct 2019 15:13:16 +0000
-Message-ID: <17042.1572534796@warthog.procyon.org.uk>
-X-Scanned-By: MIMEDefang 2.79 on 10.5.11.14
-X-MC-Unique: jD0V8FpeNOqkFxE4eETZKg-1
+Content-ID: <17310.1572534953.1@warthog.procyon.org.uk>
+Date:   Thu, 31 Oct 2019 15:15:53 +0000
+Message-ID: <17311.1572534953@warthog.procyon.org.uk>
+X-Scanned-By: MIMEDefang 2.84 on 10.5.11.22
+X-MC-Unique: FXImFqDnP-q7fXpZhf4T8w-1
 X-Mimecast-Spam-Score: 0
 Content-Type: text/plain; charset=WINDOWS-1252
 Content-Transfer-Encoding: quoted-printable
@@ -75,14 +75,16 @@ Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-Christoph Hellwig <hch@infradead.org> wrote:
+Konstantin Khlebnikov <khlebnikov@yandex-team.ru> wrote:
 
-> I am _really_ worried about overloading fsync for this behavior.  fsync
-> hasn't done anything for 50 years, and suddenly adding any action
-> is not helpful.  If you can't use FIONREAD please add a new ioctls
-> instead, and document it properly.
+> Similar synchronization is required for reusing memory after vmsplice()?
+> I don't see other way how sender could safely change these pages.
 
-Okay.
+Sounds like a point - if you have multiple parallel contributors to the pip=
+e
+via vmsplice(), then FIONREAD is of no use.  To use use FIONREAD, you have =
+to
+let the pipe become empty before you can be sure.
 
 David
 
