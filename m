@@ -2,80 +2,138 @@ Return-Path: <SRS0=XfYF=YY=vger.kernel.org=linux-block-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-2.1 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
-	HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,
-	USER_AGENT_SANE_1 autolearn=no autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-2.4 required=3.0 tests=DKIMWL_WL_HIGH,DKIM_SIGNED,
+	DKIM_VALID,DKIM_VALID_AU,HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,
+	SPF_HELO_NONE,SPF_PASS,USER_AGENT_SANE_1 autolearn=no autolearn_force=no
+	version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 55F48CA9ECE
-	for <linux-block@archiver.kernel.org>; Thu, 31 Oct 2019 21:22:40 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 3E57FCA9ECF
+	for <linux-block@archiver.kernel.org>; Thu, 31 Oct 2019 22:01:15 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.kernel.org (Postfix) with ESMTP id 1F772208C0
-	for <linux-block@archiver.kernel.org>; Thu, 31 Oct 2019 21:22:40 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id 0FC1B20862
+	for <linux-block@archiver.kernel.org>; Thu, 31 Oct 2019 22:01:14 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (2048-bit key) header.d=infradead.org header.i=@infradead.org header.b="X2NyMyJF"
+	dkim=pass (2048-bit key) header.d=nvidia.com header.i=@nvidia.com header.b="ikqeCXUq"
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1729910AbfJaVWi (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Thu, 31 Oct 2019 17:22:38 -0400
-Received: from bombadil.infradead.org ([198.137.202.133]:55154 "EHLO
-        bombadil.infradead.org" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1726680AbfJaVWi (ORCPT
+        id S1728455AbfJaWBO (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Thu, 31 Oct 2019 18:01:14 -0400
+Received: from hqemgate14.nvidia.com ([216.228.121.143]:14553 "EHLO
+        hqemgate14.nvidia.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S1728345AbfJaWBN (ORCPT
         <rfc822;linux-block@vger.kernel.org>);
-        Thu, 31 Oct 2019 17:22:38 -0400
-DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed;
-        d=infradead.org; s=bombadil.20170209; h=In-Reply-To:Content-Type:MIME-Version
-        :References:Message-ID:Subject:Cc:To:From:Date:Sender:Reply-To:
-        Content-Transfer-Encoding:Content-ID:Content-Description:Resent-Date:
-        Resent-From:Resent-Sender:Resent-To:Resent-Cc:Resent-Message-ID:List-Id:
-        List-Help:List-Unsubscribe:List-Subscribe:List-Post:List-Owner:List-Archive;
-         bh=Vp+FXiDesIme9wZKEonBbY9EF/rmcc94oNJSVeB9Mnc=; b=X2NyMyJFykqbqzPbcpTyDRKbd
-        BQ/j4YYDfZ+K17wIdlSnJWeMlmiwSCq9IMkXKUsUWN8Djbc19Zfhk+hIp7ZaVzlxBuLOGvbM7mtvD
-        tdEuc2FEBLmOuRWXJW6ZqH7y/c0RNVVyx1fdanwkc0bf32knjKWhBgJhMskumnn4+48nVaeGOTn5Z
-        Dz/c9saizy3IesFxr79it6vaiPCO38unEJK2Q48dPTaXVBxYTsN1JT29cogNarc3E4PHjH+0XHVS8
-        wWix7xAS4JPhoqwv52QEQeoJ7XXluWPUny9K66o/qzd3n+iMFMDrWD33Gb0XpdR2PIr58Dp8mqtSI
-        X2izGODzg==;
-Received: from hch by bombadil.infradead.org with local (Exim 4.92.3 #3 (Red Hat Linux))
-        id 1iQHtq-0008OR-Uf; Thu, 31 Oct 2019 21:22:34 +0000
-Date:   Thu, 31 Oct 2019 14:22:34 -0700
-From:   Christoph Hellwig <hch@infradead.org>
-To:     "Theodore Y. Ts'o" <tytso@mit.edu>
-Cc:     Christoph Hellwig <hch@infradead.org>,
-        Satya Tangirala <satyat@google.com>,
-        linux-block@vger.kernel.org, linux-scsi@vger.kernel.org,
-        linux-fscrypt@vger.kernel.org, linux-fsdevel@vger.kernel.org,
-        linux-f2fs-devel@lists.sourceforge.net,
-        Barani Muthukumaran <bmuthuku@qti.qualcomm.com>,
-        Kuohong Wang <kuohong.wang@mediatek.com>,
-        Kim Boojin <boojin.kim@samsung.com>
-Subject: Re: [PATCH v5 3/9] block: blk-crypto for Inline Encryption
-Message-ID: <20191031212234.GA32262@infradead.org>
-References: <20191028072032.6911-1-satyat@google.com>
- <20191028072032.6911-4-satyat@google.com>
- <20191031175713.GA23601@infradead.org>
- <20191031205045.GG16197@mit.edu>
+        Thu, 31 Oct 2019 18:01:13 -0400
+Received: from hqpgpgate102.nvidia.com (Not Verified[216.228.121.13]) by hqemgate14.nvidia.com (using TLS: TLSv1.2, DES-CBC3-SHA)
+        id <B5dbb59aa0000>; Thu, 31 Oct 2019 15:01:14 -0700
+Received: from hqmail.nvidia.com ([172.20.161.6])
+  by hqpgpgate102.nvidia.com (PGP Universal service);
+  Thu, 31 Oct 2019 15:01:08 -0700
+X-PGP-Universal: processed;
+        by hqpgpgate102.nvidia.com on Thu, 31 Oct 2019 15:01:08 -0700
+Received: from [10.110.48.28] (10.124.1.5) by HQMAIL107.nvidia.com
+ (172.20.187.13) with Microsoft SMTP Server (TLS) id 15.0.1473.3; Thu, 31 Oct
+ 2019 22:01:07 +0000
+Subject: Re: [PATCH 02/19] mm/gup: factor out duplicate code from four
+ routines
+To:     Ira Weiny <ira.weiny@intel.com>
+CC:     Andrew Morton <akpm@linux-foundation.org>,
+        Al Viro <viro@zeniv.linux.org.uk>,
+        Alex Williamson <alex.williamson@redhat.com>,
+        Benjamin Herrenschmidt <benh@kernel.crashing.org>,
+        =?UTF-8?B?QmrDtnJuIFTDtnBlbA==?= <bjorn.topel@intel.com>,
+        Christoph Hellwig <hch@infradead.org>,
+        Dan Williams <dan.j.williams@intel.com>,
+        Daniel Vetter <daniel@ffwll.ch>,
+        Dave Chinner <david@fromorbit.com>,
+        David Airlie <airlied@linux.ie>,
+        "David S . Miller" <davem@davemloft.net>, Jan Kara <jack@suse.cz>,
+        Jason Gunthorpe <jgg@ziepe.ca>, Jens Axboe <axboe@kernel.dk>,
+        Jonathan Corbet <corbet@lwn.net>,
+        =?UTF-8?B?SsOpcsO0bWUgR2xpc3Nl?= <jglisse@redhat.com>,
+        Magnus Karlsson <magnus.karlsson@intel.com>,
+        Mauro Carvalho Chehab <mchehab@kernel.org>,
+        Michael Ellerman <mpe@ellerman.id.au>,
+        Michal Hocko <mhocko@suse.com>,
+        Mike Kravetz <mike.kravetz@oracle.com>,
+        Paul Mackerras <paulus@samba.org>,
+        Shuah Khan <shuah@kernel.org>,
+        Vlastimil Babka <vbabka@suse.cz>, <bpf@vger.kernel.org>,
+        <dri-devel@lists.freedesktop.org>, <kvm@vger.kernel.org>,
+        <linux-block@vger.kernel.org>, <linux-doc@vger.kernel.org>,
+        <linux-fsdevel@vger.kernel.org>, <linux-kselftest@vger.kernel.org>,
+        <linux-media@vger.kernel.org>, <linux-rdma@vger.kernel.org>,
+        <linuxppc-dev@lists.ozlabs.org>, <netdev@vger.kernel.org>,
+        <linux-mm@kvack.org>, LKML <linux-kernel@vger.kernel.org>,
+        Christoph Hellwig <hch@lst.de>,
+        "Aneesh Kumar K . V" <aneesh.kumar@linux.ibm.com>
+References: <20191030224930.3990755-1-jhubbard@nvidia.com>
+ <20191030224930.3990755-3-jhubbard@nvidia.com>
+ <20191031183549.GC14771@iweiny-DESK2.sc.intel.com>
+ <75b557f7-24b2-740c-2640-2f914d131600@nvidia.com>
+ <20191031210954.GE14771@iweiny-DESK2.sc.intel.com>
+X-Nvconfidentiality: public
+From:   John Hubbard <jhubbard@nvidia.com>
+Message-ID: <5cb84804-be12-82e8-11d8-7e593fd05619@nvidia.com>
+Date:   Thu, 31 Oct 2019 15:01:07 -0700
+User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:60.0) Gecko/20100101
+ Thunderbird/60.8.0
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <20191031205045.GG16197@mit.edu>
-User-Agent: Mutt/1.12.1 (2019-06-15)
-X-SRS-Rewrite: SMTP reverse-path rewritten from <hch@infradead.org> by bombadil.infradead.org. See http://www.infradead.org/rpr.html
+In-Reply-To: <20191031210954.GE14771@iweiny-DESK2.sc.intel.com>
+X-Originating-IP: [10.124.1.5]
+X-ClientProxiedBy: HQMAIL105.nvidia.com (172.20.187.12) To
+ HQMAIL107.nvidia.com (172.20.187.13)
+Content-Type: text/plain; charset="utf-8"
+Content-Language: en-US
+Content-Transfer-Encoding: 7bit
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=nvidia.com; s=n1;
+        t=1572559274; bh=St3Rf/REgq/1do28NhYtGJF/+ie61nX3HJRKUe+Kv+8=;
+        h=X-PGP-Universal:Subject:To:CC:References:X-Nvconfidentiality:From:
+         Message-ID:Date:User-Agent:MIME-Version:In-Reply-To:
+         X-Originating-IP:X-ClientProxiedBy:Content-Type:Content-Language:
+         Content-Transfer-Encoding;
+        b=ikqeCXUqsTwoQB5CbB+62UgGOxuiKLZDrBsuVMEaD9IjjDxXb09OkVp8xOPRF5wct
+         ee5DhXFx3ncNZEuTcZeSOQivxIJokuWUNeY+2vtv3ZOkk1HWJjkj1h2EH0AXlwb+WX
+         k+12VWYeIpYnIAMc/9Jx/3qdPSGK+huRjsgTXXwezXTbb/FzDozYDlQdAsy+QX8f3z
+         guPaB2LcynNr/sr3xHEr7wV68E214NkgY5BRukBI2Kt+YqGU/HP5jxWqLsbWsS/eGt
+         xEDw4hf53LcGHOIM9YJEHjAqS/wG8o7OePI2ydIId+OliMRlMyINElUiwkTZonGlbb
+         If9KlbJQJnB+Q==
 Sender: linux-block-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-On Thu, Oct 31, 2019 at 04:50:45PM -0400, Theodore Y. Ts'o wrote:
-> One of the reasons I really want this is so I (as an upstream
-> maintainer of ext4 and fscrypt) can test the new code paths using
-> xfstests on GCE, without needing special pre-release hardware that has
-> the ICE support.
+On 10/31/19 2:09 PM, Ira Weiny wrote:
+> On Thu, Oct 31, 2019 at 11:43:37AM -0700, John Hubbard wrote:
+>> On 10/31/19 11:35 AM, Ira Weiny wrote:
+>>> On Wed, Oct 30, 2019 at 03:49:13PM -0700, John Hubbard wrote:
+>> ...
+>>>> +
+>>>> +static int __huge_pt_done(struct page *head, int nr_recorded_pages, int *nr)
+>>>> +{
+>>>> +	*nr += nr_recorded_pages;
+>>>> +	SetPageReferenced(head);
+>>>> +	return 1;
+>>>
+>>> When will this return anything but 1?
+>>>
+>>
+>> Never, but it saves a line at all four call sites, by having it return like that.
+>>
+>> I could see how maybe people would prefer to just have it be a void function,
+>> and return 1 directly at the call sites. Since this was a lower line count I
+>> thought maybe it would be slightly better, but it's hard to say really.
 > 
-> Yeah, I could probably get one of those dev boards internally at
-> Google, but they're a pain in the tuckus to use, and I'd much rather
-> be able to have my normal test infrastructure using gce-xfstests and
-> kvm-xfstests be able to test inline-crypto.  So in terms of CI
-> testing, having the blk-crypto is really going to be helpful.
+> It is a NIT perhaps but I feel like the signature of a function should stand on
+> it's own.  What this does is mix the meaning of this function with those
+> calling it.  Which IMO is not good style.
+> 
+> We can see what others say.
+> 
 
-Implementing the support in qemu or a special device mapper mode
-seems like a much better idea for that use case over carrying the
-code in the block layer and severely bloating the per-I/O data
-structure.
+Sure. I'll plan on changing it to a void return type, then, unless someone else
+pipes up.
+
+
+thanks,
+
+John Hubbard
+NVIDIA
