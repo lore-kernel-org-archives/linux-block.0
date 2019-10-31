@@ -2,141 +2,97 @@ Return-Path: <SRS0=XfYF=YY=vger.kernel.org=linux-block-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-3.9 required=3.0 tests=DKIM_SIGNED,DKIM_VALID,
-	DKIM_VALID_AU,HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,
-	SPF_HELO_NONE,SPF_PASS autolearn=no autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-5.6 required=3.0 tests=DKIMWL_WL_HIGH,DKIM_SIGNED,
+	DKIM_VALID,DKIM_VALID_AU,MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,
+	SPF_PASS,USER_AGENT_SANE_1 autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 90996CA9ECF
-	for <linux-block@archiver.kernel.org>; Thu, 31 Oct 2019 16:38:22 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 55E82CA9ECB
+	for <linux-block@archiver.kernel.org>; Thu, 31 Oct 2019 16:50:27 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.kernel.org (Postfix) with ESMTP id 629E8208E3
-	for <linux-block@archiver.kernel.org>; Thu, 31 Oct 2019 16:38:22 +0000 (UTC)
-Authentication-Results: mail.kernel.org;
-	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="h5BTChE2"
+	by mail.kernel.org (Postfix) with ESMTP id 1FC9D20873
+	for <linux-block@archiver.kernel.org>; Thu, 31 Oct 2019 16:50:27 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+	s=default; t=1572540627;
+	bh=bav111T7Ts/MW3KRk8o4XHIuPpAPtZ1cDzJEEAwCZlE=;
+	h=Date:From:To:Cc:Subject:References:In-Reply-To:List-ID:From;
+	b=KKLy/OuJKeYSUSQ3+OdACbY2FiZZhfOHLacoJEK1c17W2JwNBexJrKWId5sR1u/v6
+	 iM2xtjLw3u3Fsb4osXn3rmqq9tUqfSlAT1CTJPaQokKIV/gUiVZMnjptTTJHTSG35a
+	 7Jl5zFduuCI9hR/iRZb0P3qkegD6JZY1SOUbKZW4=
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1728604AbfJaQiV (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Thu, 31 Oct 2019 12:38:21 -0400
-Received: from us-smtp-delivery-1.mimecast.com ([205.139.110.120]:47231 "EHLO
-        us-smtp-1.mimecast.com" rhost-flags-OK-OK-OK-FAIL) by vger.kernel.org
-        with ESMTP id S1728599AbfJaQiR (ORCPT
+        id S1728673AbfJaQu0 (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Thu, 31 Oct 2019 12:50:26 -0400
+Received: from mail-qt1-f196.google.com ([209.85.160.196]:37976 "EHLO
+        mail-qt1-f196.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S1727715AbfJaQu0 (ORCPT
         <rfc822;linux-block@vger.kernel.org>);
-        Thu, 31 Oct 2019 12:38:17 -0400
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-        s=mimecast20190719; t=1572539896;
-        h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-         to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-         content-transfer-encoding:content-transfer-encoding:
-         in-reply-to:in-reply-to:references:references;
-        bh=mxgLr4gqIZKHqSVNNAtea7HdJZYdiBMzARcL7j6XY2g=;
-        b=h5BTChE289sI+KXEVqXtpz0KrFvty9/B+inTU5HmlAS/7MRHkHTM1/S7uTtWqo41iy43oN
-        BSfSDd9BB4n1yyDnundvocBfhrHZKFbsRH7GWx+m4XvvgL71C/OCPPJkP4j04KZMZZRc03
-        BZKTV+ZGDkniPkx5q5bigKXvTDpPUq0=
-Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
- [209.132.183.4]) (Using TLS) by relay.mimecast.com with ESMTP id
- us-mta-120-OBNcKO5IPbCsAav66unpNg-1; Thu, 31 Oct 2019 12:38:11 -0400
-Received: from smtp.corp.redhat.com (int-mx08.intmail.prod.int.phx2.redhat.com [10.5.11.23])
-        (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
-        (No client certificate requested)
-        by mimecast-mx01.redhat.com (Postfix) with ESMTPS id D80461800D55;
-        Thu, 31 Oct 2019 16:38:08 +0000 (UTC)
-Received: from warthog.procyon.org.uk (ovpn-121-40.rdu2.redhat.com [10.10.121.40])
-        by smtp.corp.redhat.com (Postfix) with ESMTP id A573219C5B;
-        Thu, 31 Oct 2019 16:38:05 +0000 (UTC)
-Organization: Red Hat UK Ltd. Registered Address: Red Hat UK Ltd, Amberley
-        Place, 107-111 Peascod Street, Windsor, Berkshire, SI4 1TE, United
-        Kingdom.
-        Registered in England and Wales under Company Registration No. 3798903
-From:   David Howells <dhowells@redhat.com>
-In-Reply-To: <fe167a90-1503-7ca2-4150-eeffd5cb1378@yandex-team.ru>
-References: <fe167a90-1503-7ca2-4150-eeffd5cb1378@yandex-team.ru> <157186182463.3995.13922458878706311997.stgit@warthog.procyon.org.uk> <157186189069.3995.10292601951655075484.stgit@warthog.procyon.org.uk>
-To:     Konstantin Khlebnikov <khlebnikov@yandex-team.ru>
-Cc:     dhowells@redhat.com, torvalds@linux-foundation.org,
-        Rasmus Villemoes <linux@rasmusvillemoes.dk>,
-        Greg Kroah-Hartman <gregkh@linuxfoundation.org>,
-        Peter Zijlstra <peterz@infradead.org>,
-        nicolas.dichtel@6wind.com, raven@themaw.net,
-        Christian Brauner <christian@brauner.io>,
-        keyrings@vger.kernel.org, linux-usb@vger.kernel.org,
-        linux-block@vger.kernel.org, linux-security-module@vger.kernel.org,
-        linux-fsdevel@vger.kernel.org, linux-api@vger.kernel.org,
-        linux-kernel@vger.kernel.org
-Subject: Re: [RFC PATCH 07/10] pipe: Conditionalise wakeup in pipe_read() [ver #2]
+        Thu, 31 Oct 2019 12:50:26 -0400
+Received: by mail-qt1-f196.google.com with SMTP id t26so9435559qtr.5;
+        Thu, 31 Oct 2019 09:50:25 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=gmail.com; s=20161025;
+        h=sender:date:from:to:cc:subject:message-id:references:mime-version
+         :content-disposition:in-reply-to:user-agent;
+        bh=OLaOpRAjfrbacph10qr6xdAhMPmVu1fR+AKVwIeHENE=;
+        b=kEgxMwwRbZzxEVyKWXizq7cW+YwENZDem7Gqpa2Gy1RZwd/e3m9sD3Jd5SdMEBZMmJ
+         TcozJ04JWaN3ODGNDMAoCgrZrhXQGFVyqotHzCHWIAjK06BtKaHd8ZS5wBV0G5aqJzU/
+         /Jw/gcR2hr+SQsI/fFsGsIXl7qWrDS6rgIgUBeenySZPvWKFyiD4Y3vNyp9lP/RmgEcK
+         9S/SJczxVr/7HhlWmxzH/jHwKgf6Y3NKLhwy8LZq9VdQ+hwdM3I6Jw0mxsB1ntyysnkU
+         TlaT/hE1qGfrQqm2gZWTLLCEH0aFFEchLuc2FTcyhVNOmQgSWn7di2HFzdJ3DZGjYppy
+         XvvA==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20161025;
+        h=x-gm-message-state:sender:date:from:to:cc:subject:message-id
+         :references:mime-version:content-disposition:in-reply-to:user-agent;
+        bh=OLaOpRAjfrbacph10qr6xdAhMPmVu1fR+AKVwIeHENE=;
+        b=bGZBclznMB0r62b3plHKVPpcaqKdPq0B385usytdJcCywLbPK5ErG0EZdhg+xLrRmO
+         3joMsRug1DllQu4jmvh71VXkHFWpqA81IRzuCvnOqmbDaZvesB7tEqIntqKXO/oF66OY
+         GmTd7bqtb0uM19HPL/6Y7y1afaB/yq0dkfp3aORknnEk3aCICzqCZMfru7ToBAtuoZJ0
+         sAKgvfkxzT0dTr0IDspatWe6fk6geFmOjDQgWKfuVkNz5sUK/EPFXRyJq6c1zGY2Z8VA
+         WmsLULqhvySiU80rG85woPCX5VZdoLaJd2KqvuvddfkHYgSqGAUfzApxALsoxlVk6Caz
+         Co8A==
+X-Gm-Message-State: APjAAAUKXnmTv/vfsYZlPG6arndjM0zaUvgPcO9auSeXRx5LxrwoEcBG
+        PXzVfzW4FMDGwVVHft2bjWm0wkbQ
+X-Google-Smtp-Source: APXvYqy8TB1c4Rpru49Qaq9QK03ijg1GplyOlvawK8eI65aLKQPSRzEse7c7fIE5r2DOAVG6rVB0AQ==
+X-Received: by 2002:aed:2392:: with SMTP id j18mr6468841qtc.296.1572540624862;
+        Thu, 31 Oct 2019 09:50:24 -0700 (PDT)
+Received: from localhost ([2620:10d:c091:500::314e])
+        by smtp.gmail.com with ESMTPSA id f131sm469553qkb.99.2019.10.31.09.50.23
+        (version=TLS1_2 cipher=ECDHE-RSA-AES128-GCM-SHA256 bits=128/128);
+        Thu, 31 Oct 2019 09:50:23 -0700 (PDT)
+Date:   Thu, 31 Oct 2019 09:50:19 -0700
+From:   Tejun Heo <tj@kernel.org>
+To:     Dan Carpenter <dan.carpenter@oracle.com>
+Cc:     Jens Axboe <axboe@kernel.dk>, linux-block@vger.kernel.org,
+        linux-kernel@vger.kernel.org, kernel-janitors@vger.kernel.org
+Subject: Re: [PATCH] iocost: don't nest spin_lock_irq in ioc_weight_write()
+Message-ID: <20191031165019.GL3622521@devbig004.ftw2.facebook.com>
+References: <20191031105341.GA26612@mwanda>
 MIME-Version: 1.0
-Content-ID: <3164.1572539884.1@warthog.procyon.org.uk>
-Date:   Thu, 31 Oct 2019 16:38:04 +0000
-Message-ID: <3165.1572539884@warthog.procyon.org.uk>
-X-Scanned-By: MIMEDefang 2.84 on 10.5.11.23
-X-MC-Unique: OBNcKO5IPbCsAav66unpNg-1
-X-Mimecast-Spam-Score: 0
-Content-Type: text/plain; charset=WINDOWS-1252
-Content-Transfer-Encoding: quoted-printable
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <20191031105341.GA26612@mwanda>
+User-Agent: Mutt/1.5.21 (2010-09-15)
 Sender: linux-block-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-Okay, attached is a change that might give you what you want.  I tried my
-pipe-bench program (see cover note) with perf.  The output of the program w=
-ith
-the patch applied was:
+On Thu, Oct 31, 2019 at 01:53:41PM +0300, Dan Carpenter wrote:
+> This code causes a static analysis warning:
+> 
+>     block/blk-iocost.c:2113 ioc_weight_write() error: double lock 'irq'
+> 
+> We disable IRQs in blkg_conf_prep() and re-enable them in
+> blkg_conf_finish().  IRQ disable/enable should not be nested because
+> that means the IRQs will be enabled at the first unlock instead of the
+> second one.
+> 
+> Fixes: 7caa47151ab2 ("blkcg: implement blk-iocost")
+> Signed-off-by: Dan Carpenter <dan.carpenter@oracle.com>
 
--       pipe                  305127298     36262221772       302185181    =
-     7887690
+Acked-by: Tejun Heo <tj@kernel.org>
 
-The output of perf with the patch applied:
+Thanks.
 
-        239,943.92 msec task-clock                #    1.997 CPUs utilized
-            17,728      context-switches          #   73.884 M/sec
-               124      cpu-migrations            #    0.517 M/sec
-             9,330      page-faults               #   38.884 M/sec
-   885,107,207,365      cycles                    # 3688822.793 GHz
- 1,386,873,499,490      instructions              #    1.57  insn per cycle
-   311,037,372,339      branches                  # 1296296921.931 M/sec
-        33,467,827      branch-misses             #    0.01% of all branche=
-s
-
-And without:
-
-        239,891.87 msec task-clock                #    1.997 CPUs utilized
-            22,187      context-switches          #   92.488 M/sec
-               133      cpu-migrations            #    0.554 M/sec
-             9,334      page-faults               #   38.909 M/sec
-   884,906,976,128      cycles                    # 3688787.725 GHz
- 1,391,986,932,265      instructions              #    1.57  insn per cycle
-   311,394,686,857      branches                  # 1298067400.849 M/sec
-        30,242,823      branch-misses             #    0.01% of all branche=
-s
-
-So it did make something like a 20% reduction in context switches.
-
-David
----
-diff --git a/fs/pipe.c b/fs/pipe.c
-index e3d5f7a39123..5167921edd73 100644
---- a/fs/pipe.c
-+++ b/fs/pipe.c
-@@ -276,7 +276,7 @@ pipe_read(struct kiocb *iocb, struct iov_iter *to)
- =09size_t total_len =3D iov_iter_count(to);
- =09struct file *filp =3D iocb->ki_filp;
- =09struct pipe_inode_info *pipe =3D filp->private_data;
--=09int do_wakeup;
-+=09int do_wakeup, wake;
- =09ssize_t ret;
-
- =09/* Null read succeeds. */
-@@ -329,11 +329,12 @@ pipe_read(struct kiocb *iocb, struct iov_iter *to)
- =09=09=09=09tail++;
- =09=09=09=09pipe->tail =3D tail;
- =09=09=09=09do_wakeup =3D 1;
--=09=09=09=09if (head - (tail - 1) =3D=3D pipe->max_usage)
-+=09=09=09=09wake =3D head - (tail - 1) =3D=3D pipe->max_usage / 2;
-+=09=09=09=09if (wake)
- =09=09=09=09=09wake_up_interruptible_sync_poll_locked(
- =09=09=09=09=09=09&pipe->wait, EPOLLOUT | EPOLLWRNORM);
- =09=09=09=09spin_unlock_irq(&pipe->wait.lock);
--=09=09=09=09if (head - (tail - 1) =3D=3D pipe->max_usage)
-+=09=09=09=09if (wake)
- =09=09=09=09=09kill_fasync(&pipe->fasync_writers, SIGIO, POLL_OUT);
- =09=09=09}
- =09=09=09total_len -=3D chars;
-
+-- 
+tejun
