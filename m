@@ -2,106 +2,154 @@ Return-Path: <SRS0=XfYF=YY=vger.kernel.org=linux-block-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-2.4 required=3.0 tests=DKIM_SIGNED,DKIM_VALID,
-	DKIM_VALID_AU,HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SPF_HELO_NONE,
-	SPF_PASS,USER_AGENT_SANE_1 autolearn=no autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-8.4 required=3.0 tests=DKIMWL_WL_HIGH,DKIM_SIGNED,
+	DKIM_VALID,DKIM_VALID_AU,HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,
+	MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,UNPARSEABLE_RELAY,
+	USER_AGENT_SANE_1 autolearn=unavailable autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 547E7CA9EC9
-	for <linux-block@archiver.kernel.org>; Thu, 31 Oct 2019 01:33:43 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 207FFCA9ECB
+	for <linux-block@archiver.kernel.org>; Thu, 31 Oct 2019 03:30:06 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.kernel.org (Postfix) with ESMTP id 2748820856
-	for <linux-block@archiver.kernel.org>; Thu, 31 Oct 2019 01:33:43 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id EBF322087E
+	for <linux-block@archiver.kernel.org>; Thu, 31 Oct 2019 03:30:05 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="YkJ7rDaL"
+	dkim=pass (2048-bit key) header.d=oracle.com header.i=@oracle.com header.b="MGKb6w0a"
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1726765AbfJaBdm (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Wed, 30 Oct 2019 21:33:42 -0400
-Received: from us-smtp-delivery-1.mimecast.com ([205.139.110.120]:33532 "EHLO
-        us-smtp-1.mimecast.com" rhost-flags-OK-OK-OK-FAIL) by vger.kernel.org
-        with ESMTP id S1726760AbfJaBdl (ORCPT
+        id S1726527AbfJaDaE (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Wed, 30 Oct 2019 23:30:04 -0400
+Received: from userp2130.oracle.com ([156.151.31.86]:49450 "EHLO
+        userp2130.oracle.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S1726336AbfJaDaE (ORCPT
         <rfc822;linux-block@vger.kernel.org>);
-        Wed, 30 Oct 2019 21:33:41 -0400
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-        s=mimecast20190719; t=1572485620;
-        h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-         to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-         content-transfer-encoding:content-transfer-encoding:
-         in-reply-to:in-reply-to:references:references;
-        bh=JOT5e0E88zWIKcVI9/G9U554lO8BRI016yaiVp/NwTw=;
-        b=YkJ7rDaL2xARgAAApFtXXgaknKALf0FaP3UBZ9m6uRDyPgc7M2dJXM7MUMqGv7fi9F4Vm9
-        3xenDwXKzolq4qyctur6+LFNSs0huTbg3siV/8MMJdlOu4w4NNRka6wUY1ppq29UVzNexP
-        TPBjegQHt8yQ4/PuMaM8CS8h1axTJo4=
-Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
- [209.132.183.4]) (Using TLS) by relay.mimecast.com with ESMTP id
- us-mta-150-bJNIYacrMKifuaSjoJlzqw-1; Wed, 30 Oct 2019 21:33:37 -0400
-Received: from smtp.corp.redhat.com (int-mx02.intmail.prod.int.phx2.redhat.com [10.5.11.12])
-        (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
-        (No client certificate requested)
-        by mimecast-mx01.redhat.com (Postfix) with ESMTPS id 01CEA800D49;
-        Thu, 31 Oct 2019 01:33:36 +0000 (UTC)
-Received: from ming.t460p (ovpn-8-21.pek2.redhat.com [10.72.8.21])
-        by smtp.corp.redhat.com (Postfix) with ESMTPS id 304A460BE0;
-        Thu, 31 Oct 2019 01:33:29 +0000 (UTC)
-Date:   Thu, 31 Oct 2019 09:33:25 +0800
-From:   Ming Lei <ming.lei@redhat.com>
-To:     Christoph Hellwig <hch@infradead.org>
-Cc:     Jens Axboe <axboe@kernel.dk>, linux-block@vger.kernel.org,
-        Coly Li <colyli@suse.de>, Keith Busch <kbusch@kernel.org>,
-        linux-bcache@vger.kernel.org
-Subject: Re: [PATCH V3] block: optimize for small block size IO
-Message-ID: <20191031013325.GA12309@ming.t460p>
-References: <20191029105125.12928-1-ming.lei@redhat.com>
- <20191029110425.GA4382@infradead.org>
- <20191030002126.GA14423@ming.t460p>
- <20191030135426.GA24655@infradead.org>
+        Wed, 30 Oct 2019 23:30:04 -0400
+Received: from pps.filterd (userp2130.oracle.com [127.0.0.1])
+        by userp2130.oracle.com (8.16.0.27/8.16.0.27) with SMTP id x9V3TCaR024791;
+        Thu, 31 Oct 2019 03:29:51 GMT
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=oracle.com; h=date : from : to : cc
+ : subject : message-id : mime-version : content-type; s=corp-2019-08-05;
+ bh=XDUxscILsJ13tPTDg3J62ds2i/L80cksUFSZ1N7K4OQ=;
+ b=MGKb6w0an2ZK4Jt9N4Zo6+jDTSUaP3qxwplSI55jx0Vs49EEqIAmJWu9JHJPqCoWNquf
+ jepFpe3XcpLjMZ0GoEyGOq3ZPB2DQjpkfYiaGBAfj0l9Fa9ESFf71gYOt7gI6BFudbjt
+ /42BV7CEJiT4HBD1QpM74/fiXbvmbmwFBhXbzlexHnHc43hqZ316n1Z2ZhadsN0UIGxZ
+ toV3elyEcegfSM2Q1eUZp55vuPCcQUVq3PGqKxF+uJ6GMeK9PdlmCnDRql3QU+SwKeed
+ 9rJ7n/X9tnPxetRUpl08UlS2lseoP+psXwfjbeump163UyZ1Pv1xF6ar+bhfytNVX8ig IA== 
+Received: from aserp3030.oracle.com (aserp3030.oracle.com [141.146.126.71])
+        by userp2130.oracle.com with ESMTP id 2vxwhfr77n-1
+        (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=OK);
+        Thu, 31 Oct 2019 03:29:50 +0000
+Received: from pps.filterd (aserp3030.oracle.com [127.0.0.1])
+        by aserp3030.oracle.com (8.16.0.27/8.16.0.27) with SMTP id x9V3Nr20125950;
+        Thu, 31 Oct 2019 03:29:50 GMT
+Received: from aserv0122.oracle.com (aserv0122.oracle.com [141.146.126.236])
+        by aserp3030.oracle.com with ESMTP id 2vykw0h5km-1
+        (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=OK);
+        Thu, 31 Oct 2019 03:29:50 +0000
+Received: from abhmp0022.oracle.com (abhmp0022.oracle.com [141.146.116.28])
+        by aserv0122.oracle.com (8.14.4/8.14.4) with ESMTP id x9V3TnFu021188;
+        Thu, 31 Oct 2019 03:29:49 GMT
+Received: from localhost (/67.169.218.210)
+        by default (Oracle Beehive Gateway v4.0)
+        with ESMTP ; Wed, 30 Oct 2019 20:29:49 -0700
+Date:   Wed, 30 Oct 2019 20:29:48 -0700
+From:   "Darrick J. Wong" <darrick.wong@oracle.com>
+To:     Jens Axboe <axboe@kernel.dk>, Christoph Hellwig <hch@infradead.org>
+Cc:     linux-block@vger.kernel.org,
+        linux-fsdevel <linux-fsdevel@vger.kernel.org>,
+        xfs <linux-xfs@vger.kernel.org>
+Subject: [PATCH v4] loop: fix no-unmap write-zeroes request behavior
+Message-ID: <20191031032948.GA15212@magnolia>
 MIME-Version: 1.0
-In-Reply-To: <20191030135426.GA24655@infradead.org>
-User-Agent: Mutt/1.12.1 (2019-06-15)
-X-Scanned-By: MIMEDefang 2.79 on 10.5.11.12
-X-MC-Unique: bJNIYacrMKifuaSjoJlzqw-1
-X-Mimecast-Spam-Score: 0
-Content-Type: text/plain; charset=UTF-8
-Content-Transfer-Encoding: quoted-printable
+Content-Type: text/plain; charset=us-ascii
 Content-Disposition: inline
+User-Agent: Mutt/1.9.4 (2018-02-28)
+X-Proofpoint-Virus-Version: vendor=nai engine=6000 definitions=9426 signatures=668685
+X-Proofpoint-Spam-Details: rule=notspam policy=default score=0 suspectscore=2 malwarescore=0
+ phishscore=0 bulkscore=0 spamscore=0 mlxscore=0 mlxlogscore=999
+ adultscore=0 classifier=spam adjust=0 reason=mlx scancount=1
+ engine=8.0.1-1908290000 definitions=main-1910310031
+X-Proofpoint-Virus-Version: vendor=nai engine=6000 definitions=9426 signatures=668685
+X-Proofpoint-Spam-Details: rule=notspam policy=default score=0 priorityscore=1501 malwarescore=0
+ suspectscore=2 phishscore=0 bulkscore=0 spamscore=0 clxscore=1015
+ lowpriorityscore=0 mlxscore=0 impostorscore=0 mlxlogscore=999 adultscore=0
+ classifier=spam adjust=0 reason=mlx scancount=1 engine=8.0.1-1908290000
+ definitions=main-1910310032
 Sender: linux-block-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-On Wed, Oct 30, 2019 at 06:54:26AM -0700, Christoph Hellwig wrote:
-> On Wed, Oct 30, 2019 at 08:21:26AM +0800, Ming Lei wrote:
-> > > +=09=09if ((*bio)->bi_vcnt =3D=3D 1 &&
-> > > +=09=09    (*bio)->bi_io_vec[0].bv_len <=3D PAGE_SIZE) {
-> > > +=09=09=09*nr_segs =3D 1;
-> > > +=09=09=09return;
-> > > +=09=09}
-> > >  =09=09split =3D blk_bio_segment_split(q, *bio, &q->bio_split, nr_seg=
-s);
-> > >  =09=09break;
-> > >  =09}
-> >=20
-> > This bio(*bio) may be a fast-cloned bio from somewhere(DM, MD, ...), so=
- the above
-> > check can't work sometime.
->=20
-> Please explain how it doesn't work.  In the worse case it will give us
-> a false negastive, that is we don't take the fast path when in theory
-> we could, but then again fast clone=D1=95 bios will have so much overhead
-> that it should not matter.
+From: Darrick J. Wong <darrick.wong@oracle.com>
 
-In theory, we shouldn't use fast clone bio's .bi_vcnt, so far it is
-zero, in future fast clone bio's bi_vcnt might be used for other purpose.
+Currently, if the loop device receives a WRITE_ZEROES request, it asks
+the underlying filesystem to punch out the range.  This behavior is
+correct if unmapping is allowed.  However, a NOUNMAP request means that
+the caller doesn't want us to free the storage backing the range, so
+punching out the range is incorrect behavior.
 
-Also this bio may not a fast cloned bio, but it has been splitted(such
-as one 4k bio, and its front 512 byte is splitted out). It depends on
-if the remained bio needs to be splitted again. In reality, looks it
-won't be possible.
+To satisfy a NOUNMAP | WRITE_ZEROES request, loop should ask the
+underlying filesystem to FALLOC_FL_ZERO_RANGE, which is (according to
+the fallocate documentation) required to ensure that the entire range is
+backed by real storage, which suffices for our purposes.
 
-In short, the above way is like a hack, but it should work in reality.
+Fixes: 19372e2769179dd ("loop: implement REQ_OP_WRITE_ZEROES")
+Signed-off-by: Darrick J. Wong <darrick.wong@oracle.com>
+Reviewed-by: Christoph Hellwig <hch@lst.de>
+---
+v4: add review tags
+v3: refactor into a single fallocate function
+v2: reorganize a little according to hch feedback
+---
+ drivers/block/loop.c |   26 ++++++++++++++++++--------
+ 1 file changed, 18 insertions(+), 8 deletions(-)
 
-I am fine with that, if comment of this usage is added.
-
-
-Thanks,
-Ming
-
+diff --git a/drivers/block/loop.c b/drivers/block/loop.c
+index f6f77eaa7217..ef6e251857c8 100644
+--- a/drivers/block/loop.c
++++ b/drivers/block/loop.c
+@@ -417,18 +417,20 @@ static int lo_read_transfer(struct loop_device *lo, struct request *rq,
+ 	return ret;
+ }
+ 
+-static int lo_discard(struct loop_device *lo, struct request *rq, loff_t pos)
++static int lo_fallocate(struct loop_device *lo, struct request *rq, loff_t pos,
++			int mode)
+ {
+ 	/*
+-	 * We use punch hole to reclaim the free space used by the
+-	 * image a.k.a. discard. However we do not support discard if
+-	 * encryption is enabled, because it may give an attacker
+-	 * useful information.
++	 * We use fallocate to manipulate the space mappings used by the image
++	 * a.k.a. discard/zerorange. However we do not support this if
++	 * encryption is enabled, because it may give an attacker useful
++	 * information.
+ 	 */
+ 	struct file *file = lo->lo_backing_file;
+-	int mode = FALLOC_FL_PUNCH_HOLE | FALLOC_FL_KEEP_SIZE;
+ 	int ret;
+ 
++	mode |= FALLOC_FL_KEEP_SIZE;
++
+ 	if ((!file->f_op->fallocate) || lo->lo_encrypt_key_size) {
+ 		ret = -EOPNOTSUPP;
+ 		goto out;
+@@ -596,9 +598,17 @@ static int do_req_filebacked(struct loop_device *lo, struct request *rq)
+ 	switch (req_op(rq)) {
+ 	case REQ_OP_FLUSH:
+ 		return lo_req_flush(lo, rq);
+-	case REQ_OP_DISCARD:
+ 	case REQ_OP_WRITE_ZEROES:
+-		return lo_discard(lo, rq, pos);
++		/*
++		 * If the caller doesn't want deallocation, call zeroout to
++		 * write zeroes the range.  Otherwise, punch them out.
++		 */
++		return lo_fallocate(lo, rq, pos,
++			(rq->cmd_flags & REQ_NOUNMAP) ?
++				FALLOC_FL_ZERO_RANGE :
++				FALLOC_FL_PUNCH_HOLE);
++	case REQ_OP_DISCARD:
++		return lo_fallocate(lo, rq, pos, FALLOC_FL_PUNCH_HOLE);
+ 	case REQ_OP_WRITE:
+ 		if (lo->transfer)
+ 			return lo_write_transfer(lo, rq, pos);
