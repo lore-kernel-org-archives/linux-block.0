@@ -2,106 +2,88 @@ Return-Path: <SRS0=XfYF=YY=vger.kernel.org=linux-block-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-8.4 required=3.0 tests=DKIMWL_WL_HIGH,DKIM_SIGNED,
-	DKIM_VALID,DKIM_VALID_AU,HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,
-	MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,UNPARSEABLE_RELAY,
-	USER_AGENT_SANE_1 autolearn=ham autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-2.3 required=3.0 tests=DKIM_SIGNED,DKIM_VALID,
+	HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,
+	USER_AGENT_SANE_1 autolearn=no autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 8E3A7CA9EC3
-	for <linux-block@archiver.kernel.org>; Thu, 31 Oct 2019 10:55:58 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id A6075CA9EC3
+	for <linux-block@archiver.kernel.org>; Thu, 31 Oct 2019 12:57:10 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.kernel.org (Postfix) with ESMTP id 653352087F
-	for <linux-block@archiver.kernel.org>; Thu, 31 Oct 2019 10:55:58 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id 6D5C320656
+	for <linux-block@archiver.kernel.org>; Thu, 31 Oct 2019 12:57:10 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=pass (2048-bit key) header.d=oracle.com header.i=@oracle.com header.b="rNyrMxAD"
+	dkim=pass (2048-bit key) header.d=kernel-dk.20150623.gappssmtp.com header.i=@kernel-dk.20150623.gappssmtp.com header.b="iEFkJ7oB"
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1726892AbfJaKz5 (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Thu, 31 Oct 2019 06:55:57 -0400
-Received: from userp2130.oracle.com ([156.151.31.86]:35394 "EHLO
-        userp2130.oracle.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1726864AbfJaKz5 (ORCPT
+        id S1726642AbfJaM5J (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Thu, 31 Oct 2019 08:57:09 -0400
+Received: from mail-il1-f195.google.com ([209.85.166.195]:43720 "EHLO
+        mail-il1-f195.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S1726506AbfJaM5J (ORCPT
         <rfc822;linux-block@vger.kernel.org>);
-        Thu, 31 Oct 2019 06:55:57 -0400
-Received: from pps.filterd (userp2130.oracle.com [127.0.0.1])
-        by userp2130.oracle.com (8.16.0.27/8.16.0.27) with SMTP id x9VAsNb4192100;
-        Thu, 31 Oct 2019 10:55:55 GMT
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=oracle.com; h=date : from : to : cc
- : subject : message-id : mime-version : content-type; s=corp-2019-08-05;
- bh=tm+ynhomfiVzszaGXuALO61BT3GqIPJ1petNTHqSuA4=;
- b=rNyrMxADWHmk/W0nX15kbwSzDYNeeFUpT7c0LDL4KRxvxXAKnWhBYVSkNaGWSYaOMD8A
- gWpq121IvjGexVQMbY3iYBnho72bcrbhR8bBXaR1fB6yLbwi57sh+FprEZyFLjvvyOSQ
- nmTEyRFX47RfI8krXyHu+T1XBIWYpUFvJQYG92XzGtqEyzfolVHk40XkO0CEfpEtR5RN
- WY9ZNE99zZRnkfUVT0Nx2OWmtqEeL/XcTU4BJoXkz3RZj/JSVSQAoEtmcWHe47vTWU+w
- lbA9u3uhzQbJGpYPBBK+qJrn8HjqTEEvXYtkdcK5Lqdml/YX6732lO1H3VUwbPxx+9nY HQ== 
-Received: from userp3030.oracle.com (userp3030.oracle.com [156.151.31.80])
-        by userp2130.oracle.com with ESMTP id 2vxwhftcag-1
-        (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=OK);
-        Thu, 31 Oct 2019 10:55:55 +0000
-Received: from pps.filterd (userp3030.oracle.com [127.0.0.1])
-        by userp3030.oracle.com (8.16.0.27/8.16.0.27) with SMTP id x9VAqlgh047316;
-        Thu, 31 Oct 2019 10:55:54 GMT
-Received: from aserv0122.oracle.com (aserv0122.oracle.com [141.146.126.236])
-        by userp3030.oracle.com with ESMTP id 2vyqpdvky1-1
-        (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=OK);
-        Thu, 31 Oct 2019 10:55:54 +0000
-Received: from abhmp0014.oracle.com (abhmp0014.oracle.com [141.146.116.20])
-        by aserv0122.oracle.com (8.14.4/8.14.4) with ESMTP id x9VAtrJH014719;
-        Thu, 31 Oct 2019 10:55:53 GMT
-Received: from mwanda (/41.57.98.10)
-        by default (Oracle Beehive Gateway v4.0)
-        with ESMTP ; Thu, 31 Oct 2019 03:55:53 -0700
-Date:   Thu, 31 Oct 2019 13:55:47 +0300
-From:   Dan Carpenter <dan.carpenter@oracle.com>
-To:     Jens Axboe <axboe@kernel.dk>
+        Thu, 31 Oct 2019 08:57:09 -0400
+Received: by mail-il1-f195.google.com with SMTP id j2so3149481ilc.10
+        for <linux-block@vger.kernel.org>; Thu, 31 Oct 2019 05:57:09 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=kernel-dk.20150623.gappssmtp.com; s=20150623;
+        h=subject:to:cc:references:from:message-id:date:user-agent
+         :mime-version:in-reply-to:content-language:content-transfer-encoding;
+        bh=HFMClpqTeJP46m822zm9nFLSwcrgj9uvV5/DrfBRnPs=;
+        b=iEFkJ7oBRKTnH86pHzYP8n/pBPhjBfJYlldEsYn/rIGVWHnhgpxN9Caj2RqNP+Q9+v
+         /SsATlGRTx/Px6pZJL43nAcCe89USwlXPU+5W45WA+Haw1O2APUVr1TBsFo1kfQThhnf
+         m0nVawNTVYWxCd4jjbc12V1Vya3LiftKcRzhUzZmxoE/8g1BCcrGF4ZhGsg4Oie75lw9
+         JZJal9dMagDpaZUgnKqUDvRkmYQQ0EgBIXmHD53leDI77do78FYlp5HAF5lGoqqcYmrC
+         FZxsLPufmfOMu0dkVYHP7TBqJCWqlouul9OvP4+rvYTz9u+JrMVpskCCa2OztwL6Hm99
+         FnZQ==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20161025;
+        h=x-gm-message-state:subject:to:cc:references:from:message-id:date
+         :user-agent:mime-version:in-reply-to:content-language
+         :content-transfer-encoding;
+        bh=HFMClpqTeJP46m822zm9nFLSwcrgj9uvV5/DrfBRnPs=;
+        b=jnRGYc+GC6QLl2EaHnnODXXmlX3O+QxOOgY/hGCgLo8ZHjxXOTEy1fUqmi3miR54J2
+         dXCaKcN4rAjyM8xYhRjgZdkQu/NfkI1E2FbMjUPL5VbEzDW7FXd4UTd8mooi88pgasie
+         vCBqTRScbBVkpeMqbpPuXv04EuSEfwCfcCE/m0GCRd1KXtUg5vwY9BtJBS57wCDu8BZq
+         OviR8XNQbrNZfagRLlTggPJyez53xIT+RChOYKFJVvOqL5yEQ+KZxeUHYbD/KAzrYqJ0
+         L+QjXPRH2UisSdfBzBWJeSmXHXaOXSclllLvRt6kvTKvyB5IuFi0dEICDonc1tD11jYO
+         F0bw==
+X-Gm-Message-State: APjAAAVTEH6KQRlA8X9nmUXdBsY3/LjcQcgH+ezmzIZORLWkBEWkPMrQ
+        lD8ncGFnX89JSRG117a0w+2O7w==
+X-Google-Smtp-Source: APXvYqy6YWgbIHTOYJsUJwrnjXnKqoqGCOzyA33ICwDU+p8YPyAoCA9Am/KjbwjsFlBj73v8w/Qhkw==
+X-Received: by 2002:a92:8c1c:: with SMTP id o28mr5805925ild.34.1572526628820;
+        Thu, 31 Oct 2019 05:57:08 -0700 (PDT)
+Received: from [192.168.1.159] ([65.144.74.34])
+        by smtp.gmail.com with ESMTPSA id l64sm508754ilh.2.2019.10.31.05.57.07
+        (version=TLS1_2 cipher=ECDHE-RSA-AES128-GCM-SHA256 bits=128/128);
+        Thu, 31 Oct 2019 05:57:07 -0700 (PDT)
+Subject: Re: [PATCH] io_uring: signedness bug in io_async_cancel()
+To:     Dan Carpenter <dan.carpenter@oracle.com>
 Cc:     linux-fsdevel@vger.kernel.org, linux-block@vger.kernel.org,
         kernel-janitors@vger.kernel.org
-Subject: [PATCH] io_uring: signedness bug in io_async_cancel()
-Message-ID: <20191031105547.GC26612@mwanda>
+References: <20191031105547.GC26612@mwanda>
+From:   Jens Axboe <axboe@kernel.dk>
+Message-ID: <a697c16b-92bb-52a3-e2e8-5f24d75f580d@kernel.dk>
+Date:   Thu, 31 Oct 2019 06:57:06 -0600
+User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:60.0) Gecko/20100101
+ Thunderbird/60.9.0
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-X-Mailer: git-send-email haha only kidding
-User-Agent: Mutt/1.10.1 (2018-07-13)
-X-Proofpoint-Virus-Version: vendor=nai engine=6000 definitions=9426 signatures=668685
-X-Proofpoint-Spam-Details: rule=notspam policy=default score=0 suspectscore=0 malwarescore=0
- phishscore=0 bulkscore=0 spamscore=0 mlxscore=0 mlxlogscore=999
- adultscore=0 classifier=spam adjust=0 reason=mlx scancount=1
- engine=8.0.1-1908290000 definitions=main-1910310111
-X-Proofpoint-Virus-Version: vendor=nai engine=6000 definitions=9426 signatures=668685
-X-Proofpoint-Spam-Details: rule=notspam policy=default score=0 priorityscore=1501 malwarescore=0
- suspectscore=0 phishscore=0 bulkscore=0 spamscore=0 clxscore=1015
- lowpriorityscore=0 mlxscore=0 impostorscore=0 mlxlogscore=999 adultscore=0
- classifier=spam adjust=0 reason=mlx scancount=1 engine=8.0.1-1908290000
- definitions=main-1910310111
+In-Reply-To: <20191031105547.GC26612@mwanda>
+Content-Type: text/plain; charset=utf-8
+Content-Language: en-US
+Content-Transfer-Encoding: 7bit
 Sender: linux-block-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-The problem is that this enum is unsigned, and we do use "ret" for the
-enum values, but we also use it for negative error codes.  If it's not
-signed then it causes a problem in the error handling.
+On 10/31/19 4:55 AM, Dan Carpenter wrote:
+> The problem is that this enum is unsigned, and we do use "ret" for the
+> enum values, but we also use it for negative error codes.  If it's not
+> signed then it causes a problem in the error handling.
 
-Fixes: 6ec62e598211 ("io_uring: support for generic async request cancel")
-Signed-off-by: Dan Carpenter <dan.carpenter@oracle.com>
----
- fs/io_uring.c | 2 +-
- 1 file changed, 1 insertion(+), 1 deletion(-)
+I noticed this one the other day, merged in a fix for it then. Not
+an issue in the current tree, though linux-next may still have the
+older one.
 
-diff --git a/fs/io_uring.c b/fs/io_uring.c
-index c4cdfe16cba7..9dcbde233657 100644
---- a/fs/io_uring.c
-+++ b/fs/io_uring.c
-@@ -2144,8 +2144,8 @@ static int io_async_cancel(struct io_kiocb *req, const struct io_uring_sqe *sqe,
- 			   struct io_kiocb **nxt)
- {
- 	struct io_ring_ctx *ctx = req->ctx;
--	enum io_wq_cancel ret;
- 	void *sqe_addr;
-+	int ret;
- 
- 	if (unlikely(ctx->flags & IORING_SETUP_IOPOLL))
- 		return -EINVAL;
 -- 
-2.20.1
+Jens Axboe
 
