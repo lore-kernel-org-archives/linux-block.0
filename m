@@ -2,113 +2,129 @@ Return-Path: <SRS0=SIFN=YZ=vger.kernel.org=linux-block-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-6.9 required=3.0 tests=DKIM_SIGNED,DKIM_VALID,
-	DKIM_VALID_AU,HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,
-	SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS autolearn=ham autolearn_force=no
-	version=3.4.0
+X-Spam-Status: No, score=-2.3 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
+	MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,USER_AGENT_SANE_1 autolearn=no
+	autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id C2555CA9ECF
-	for <linux-block@archiver.kernel.org>; Fri,  1 Nov 2019 15:39:15 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id C087ECA9ECF
+	for <linux-block@archiver.kernel.org>; Fri,  1 Nov 2019 16:15:55 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.kernel.org (Postfix) with ESMTP id 91C4221835
-	for <linux-block@archiver.kernel.org>; Fri,  1 Nov 2019 15:39:15 +0000 (UTC)
-Authentication-Results: mail.kernel.org;
-	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="JpQi41Xt"
+	by mail.kernel.org (Postfix) with ESMTP id 9E10121835
+	for <linux-block@archiver.kernel.org>; Fri,  1 Nov 2019 16:15:55 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1728788AbfKAPjO (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Fri, 1 Nov 2019 11:39:14 -0400
-Received: from us-smtp-delivery-1.mimecast.com ([205.139.110.120]:26232 "EHLO
-        us-smtp-1.mimecast.com" rhost-flags-OK-OK-OK-FAIL) by vger.kernel.org
-        with ESMTP id S1727100AbfKAPjO (ORCPT
-        <rfc822;linux-block@vger.kernel.org>); Fri, 1 Nov 2019 11:39:14 -0400
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-        s=mimecast20190719; t=1572622753;
-        h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-         to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-         content-transfer-encoding:content-transfer-encoding:
-         in-reply-to:in-reply-to:references:references;
-        bh=hHv6A+h/Dq+ReB2buZXJaNywCF6LwXpddH9bma5MoT0=;
-        b=JpQi41XtIjXk13n+kVPeh1xTklckwATC/cyhm1kw3UfJDMLdJ7+E37s8rLlcpmGTGb1eWj
-        35ed93jPF0B7+JzO79g9nAREYA/xHYNbDb4lyBxNkZEu1vmpDEbHFeZeEtCzjKGR5ZqbN1
-        jQ694sINfsMrXHzGJQrf0f+xjM8zSf0=
-Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
- [209.132.183.4]) (Using TLS) by relay.mimecast.com with ESMTP id
- us-mta-228-tkS-tnEbNJuwIoKMtCvYvg-1; Fri, 01 Nov 2019 11:39:09 -0400
-Received: from smtp.corp.redhat.com (int-mx06.intmail.prod.int.phx2.redhat.com [10.5.11.16])
-        (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
-        (No client certificate requested)
-        by mimecast-mx01.redhat.com (Postfix) with ESMTPS id E60BD1800D67;
-        Fri,  1 Nov 2019 15:39:07 +0000 (UTC)
-Received: from segfault.boston.devel.redhat.com (segfault.boston.devel.redhat.com [10.19.60.26])
-        by smtp.corp.redhat.com (Postfix) with ESMTPS id 3FFA85C3FD;
-        Fri,  1 Nov 2019 15:39:07 +0000 (UTC)
-From:   Jeff Moyer <jmoyer@redhat.com>
-To:     Dan Carpenter <dan.carpenter@oracle.com>
-Cc:     Jens Axboe <axboe@kernel.dk>, Tejun Heo <tj@kernel.org>,
-        linux-block@vger.kernel.org, linux-kernel@vger.kernel.org,
-        kernel-janitors@vger.kernel.org
-Subject: Re: [PATCH] iocost: don't nest spin_lock_irq in ioc_weight_write()
-References: <20191031105341.GA26612@mwanda>
-X-PGP-KeyID: 1F78E1B4
-X-PGP-CertKey: F6FE 280D 8293 F72C 65FD  5A58 1FF8 A7CA 1F78 E1B4
-Date:   Fri, 01 Nov 2019 11:39:06 -0400
-In-Reply-To: <20191031105341.GA26612@mwanda> (Dan Carpenter's message of "Thu,
-        31 Oct 2019 13:53:41 +0300")
-Message-ID: <x49d0ebd2sl.fsf@segfault.boston.devel.redhat.com>
-User-Agent: Gnus/5.13 (Gnus v5.13) Emacs/26.1 (gnu/linux)
+        id S1727770AbfKAQPz (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Fri, 1 Nov 2019 12:15:55 -0400
+Received: from mx2.suse.de ([195.135.220.15]:38324 "EHLO mx1.suse.de"
+        rhost-flags-OK-OK-OK-FAIL) by vger.kernel.org with ESMTP
+        id S1726949AbfKAQPy (ORCPT <rfc822;linux-block@vger.kernel.org>);
+        Fri, 1 Nov 2019 12:15:54 -0400
+X-Virus-Scanned: by amavisd-new at test-mx.suse.de
+Received: from relay2.suse.de (unknown [195.135.220.254])
+        by mx1.suse.de (Postfix) with ESMTP id 0E53BB533;
+        Fri,  1 Nov 2019 16:15:51 +0000 (UTC)
+Date:   Fri, 1 Nov 2019 17:15:06 +0100
+From:   Michal =?iso-8859-1?Q?Koutn=FD?= <mkoutny@suse.com>
+To:     Tejun Heo <tj@kernel.org>
+Cc:     hannes@cmpxchg.org, clm@fb.com, dennisz@fb.com,
+        Josef Bacik <jbacik@fb.com>, kernel-team@fb.com,
+        newella@fb.com, lizefan@huawei.com, axboe@kernel.dk,
+        Paolo Valente <paolo.valente@linaro.org>,
+        Rik van Riel <riel@surriel.com>, josef@toxicpanda.com,
+        cgroups@vger.kernel.org, linux-block@vger.kernel.org,
+        linux-kernel@vger.kernel.org
+Subject: Re: [PATCH 08/10] blkcg: implement blk-iocost
+Message-ID: <20191101161506.GA28212@blackbody.suse.cz>
+References: <20190828220600.2527417-1-tj@kernel.org>
+ <20190828220600.2527417-9-tj@kernel.org>
+ <20190910125513.GA6399@blackbody.suse.cz>
+ <20190910160855.GS2263813@devbig004.ftw2.facebook.com>
+ <20191003145106.GC6678@blackbody.suse.cz>
+ <20191003164552.GA3247445@devbig004.ftw2.facebook.com>
+ <20191009153629.GA5400@blackbody.suse.cz>
+ <20191014153643.GD18794@devbig004.ftw2.facebook.com>
 MIME-Version: 1.0
-X-Scanned-By: MIMEDefang 2.79 on 10.5.11.16
-X-MC-Unique: tkS-tnEbNJuwIoKMtCvYvg-1
-X-Mimecast-Spam-Score: 0
-Content-Type: text/plain; charset=WINDOWS-1252
-Content-Transfer-Encoding: quoted-printable
+Content-Type: multipart/signed; micalg=pgp-sha256;
+        protocol="application/pgp-signature"; boundary="bg08WKrSYDhXBjb5"
+Content-Disposition: inline
+In-Reply-To: <20191014153643.GD18794@devbig004.ftw2.facebook.com>
+User-Agent: Mutt/1.10.1 (2018-07-13)
 Sender: linux-block-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-Dan Carpenter <dan.carpenter@oracle.com> writes:
 
-> This code causes a static analysis warning:
->
->     block/blk-iocost.c:2113 ioc_weight_write() error: double lock 'irq'
->
-> We disable IRQs in blkg_conf_prep() and re-enable them in
-> blkg_conf_finish().  IRQ disable/enable should not be nested because
-> that means the IRQs will be enabled at the first unlock instead of the
-> second one.
+--bg08WKrSYDhXBjb5
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+Content-Transfer-Encoding: quoted-printable
 
-Can you please also add a comment stating that irqs were disabled in
-blkg_conf_prep?  Otherwise future readers will surely be scratching
-their heads trying to figure out why we do things two different ways in
-the same function.
+Hello
 
-Thanks!
-Jeff
+(I realize it's likely late for the remark but I'd like to bring it up
+anyway.)
 
->
-> Fixes: 7caa47151ab2 ("blkcg: implement blk-iocost")
-> Signed-off-by: Dan Carpenter <dan.carpenter@oracle.com>
-> ---
->  block/blk-iocost.c | 4 ++--
->  1 file changed, 2 insertions(+), 2 deletions(-)
->
-> diff --git a/block/blk-iocost.c b/block/blk-iocost.c
-> index 2a3db80c1dce..a7ed434eae03 100644
-> --- a/block/blk-iocost.c
-> +++ b/block/blk-iocost.c
-> @@ -2110,10 +2110,10 @@ static ssize_t ioc_weight_write(struct kernfs_ope=
-n_file *of, char *buf,
->  =09=09=09goto einval;
->  =09}
-> =20
-> -=09spin_lock_irq(&iocg->ioc->lock);
-> +=09spin_lock(&iocg->ioc->lock);
->  =09iocg->cfg_weight =3D v;
->  =09weight_updated(iocg);
-> -=09spin_unlock_irq(&iocg->ioc->lock);
-> +=09spin_unlock(&iocg->ioc->lock);
-> =20
->  =09blkg_conf_finish(&ctx);
->  =09return nbytes;
+On Mon, Oct 14, 2019 at 08:36:43AM -0700, Tejun Heo <tj@kernel.org> wrote:
+> We likely can talk on the subject
+> for a really long time probalby because there's no clearly technically
+> better choice here, so...
+I agree with you that functionally the two options are equal and also
+=66rom configuration POV they seem both sensible.
 
+I checked where BFQ stores its per-device parameters and its under the
+sysfs directory of given device's iosched directory. So from the user
+perspective it'd be more consistent if all similar tunables resided
+under that location.
+
+(OTOH, I admit I'm not that familiar with block layer internals to
+identify the overlap between IO scheduler and IO controller.)
+
+> Yeah, it's kinda unfortunate that it requires this many parameters but
+> at least my opinion is that that's reflecting the inherent
+> complexities of the underlying devices and how workloads interact with
+> them.
+After I learnt about the existence of BFQ tunables, I'm no longer
+concerned by the complexity of the parameter space.
+
+Thanks for the explanations of QoS purpose.
+
+> For QoS parameters, Andy is currently working on a method to determine
+> the set of parametesr which are at the edge of total work cliff -
+> ie. the point where tighetning QoS params further starts reducing the
+> total amount of work the device can do significantly.
+The QoS description in the Documentation/ describes the interpretation
+of the individual parameters, however, this purpose and how it works was
+not clear to be from that. I think the QoS policy would deserve similar
+description in the Documentation/.
+
+> Nothing can issue IOs indefinitely without some of them completing and
+> the total amount of work a workload can do is conjoined with the
+> completion latencies. [...]
+I may reply to this point later. However, if that provably works, I'm
+likely missing something in my understanding, so that'd be irrelevant.
+
+Cheers,
+Michal
+
+--bg08WKrSYDhXBjb5
+Content-Type: application/pgp-signature; name="signature.asc"
+Content-Description: Digital signature
+
+-----BEGIN PGP SIGNATURE-----
+
+iQIzBAEBCAAdFiEEEoQaUCWq8F2Id1tNia1+riC5qSgFAl28WgQACgkQia1+riC5
+qShQKA/7BT64RM/e1xU73WG0TsdQ1By8FWwkm/pwmasQzFiWE2gbCKdVx7FOdoR7
+m1cyKkl1tWef4uJGy788zwruYfliudpgN4juB0qDBMXfX+FIMOcIkbfbsXYf7qSy
+S3iIUP5p0sidWswOeK/fEwXKDEDzmZGqxqHiRiLYyoXE1gGsf6wH2HCy+S5fOC8K
+EEiCk3c4EzG2cX6gQa1nuhXIYhGASZXpVGwfyFi9O6cYZmzuEyj26k2YjnZsmWp9
+i8uqcOrTOCYV36nP5YJyfKKhfx0UlpGKFk90z9LGagKEhbD2Ht3xgYugJJCrem4C
+OS7tJWWWaycZ/uli5InGk5X/lGMp514FY1ARNyA0/HavLI5eqTDkvf2b2EP+yoRH
+bwnPh/YeYyPjMQJ+ONfdV1iC5pGIYsGC20jOQz4QY9QRkjbKwMLLacYHoCSDIRxg
+BLgwf35pxzXJfxQc8iEdoSz1Ii6yKOZGDN+5C4yUV/1qDSG4j4DvAfY+71oc34is
+HvZBattBqurPSH8f4DMg9zB6KaU/JAWrg0m/sUxDXSbu3pit7R/L/PVP+Kljhsf5
+vmQf6n3e4wcU93S7hCCLPA0CWMQLgn/PIgDBKUIJP6eP6CAV4NKkK7xY/ZjViduI
+DlKBVs30QYjqG4xx5oZCyzmiA7Q96q3vMtzR6tevrTD6tSyf08g=
+=0UBH
+-----END PGP SIGNATURE-----
+
+--bg08WKrSYDhXBjb5--
