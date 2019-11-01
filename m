@@ -2,55 +2,75 @@ Return-Path: <SRS0=SIFN=YZ=vger.kernel.org=linux-block-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-3.9 required=3.0 tests=DKIM_SIGNED,DKIM_VALID,
-	DKIM_VALID_AU,HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,
-	SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED autolearn=no autolearn_force=no
-	version=3.4.0
+X-Spam-Status: No, score=-0.9 required=3.0 tests=DKIMWL_WL_HIGH,DKIM_SIGNED,
+	DKIM_VALID,DKIM_VALID_AU,HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,
+	SPF_HELO_NONE,SPF_PASS autolearn=no autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 47264CA9ED1
-	for <linux-block@archiver.kernel.org>; Fri,  1 Nov 2019 22:05:42 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id CAACCCA9ECF
+	for <linux-block@archiver.kernel.org>; Fri,  1 Nov 2019 22:12:57 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.kernel.org (Postfix) with ESMTP id 1A843217D9
-	for <linux-block@archiver.kernel.org>; Fri,  1 Nov 2019 22:05:42 +0000 (UTC)
-Authentication-Results: mail.kernel.org;
-	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="CxRV7R5w"
+	by mail.kernel.org (Postfix) with ESMTP id 9D68C21897
+	for <linux-block@archiver.kernel.org>; Fri,  1 Nov 2019 22:12:57 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+	s=default; t=1572646377;
+	bh=R3zHF33lXpbXV7nnsIRwzSf5C2VJ9cDXB6diPjhN9b0=;
+	h=References:In-Reply-To:From:Date:Subject:To:Cc:List-ID:From;
+	b=Ch6dE+nc8yMgbytezpO588YiblLJHdWTAIZUvDCQO6N7M82V+iudg2WhRpJBqmskk
+	 JBKcARPl8x+qiNgBdgxE73wQrREdjRl85S4Pt+/SmxqUVETu5WJLtOm5z1deZxOk7M
+	 5BPr5y5j6RPLLAoRo7bc8DOLox6VI9M50jyqrYUc=
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1726985AbfKAWFh (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Fri, 1 Nov 2019 18:05:37 -0400
-Received: from us-smtp-delivery-1.mimecast.com ([207.211.31.120]:60623 "EHLO
-        us-smtp-1.mimecast.com" rhost-flags-OK-OK-OK-FAIL) by vger.kernel.org
-        with ESMTP id S1726710AbfKAWFh (ORCPT
-        <rfc822;linux-block@vger.kernel.org>); Fri, 1 Nov 2019 18:05:37 -0400
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-        s=mimecast20190719; t=1572645935;
-        h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-         to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-         content-transfer-encoding:content-transfer-encoding:
-         in-reply-to:in-reply-to:references:references;
-        bh=E8+rrZXvUsqeBEaW/X2CqD+QnPOx373OWvmJOxsDZMI=;
-        b=CxRV7R5w1tFCKwkn2VITDPE7KNHlgmKWuJ+JSo/antl9wFd7qtfaTorApkuE4BvjGY04AK
-        1Au6fQEBqqkE12C6PbksYWE6cT9VYqxfbGjUJNy76jULFBjsRI6RY3qO5RtM6rz1b4YDDV
-        lQ7bf1rX3pPXUweE5tFk/E5c2/cjVcA=
-Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
- [209.132.183.4]) (Using TLS) by relay.mimecast.com with ESMTP id
- us-mta-395-UyQR-pJ3NNi_-Rohn9Habw-1; Fri, 01 Nov 2019 18:05:32 -0400
-Received: from smtp.corp.redhat.com (int-mx03.intmail.prod.int.phx2.redhat.com [10.5.11.13])
-        (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
-        (No client certificate requested)
-        by mimecast-mx01.redhat.com (Postfix) with ESMTPS id 2B3CA1005500;
-        Fri,  1 Nov 2019 22:05:30 +0000 (UTC)
-Received: from warthog.procyon.org.uk (ovpn-121-40.rdu2.redhat.com [10.10.121.40])
-        by smtp.corp.redhat.com (Postfix) with ESMTP id 220DF60878;
-        Fri,  1 Nov 2019 22:05:26 +0000 (UTC)
-Organization: Red Hat UK Ltd. Registered Address: Red Hat UK Ltd, Amberley
-        Place, 107-111 Peascod Street, Windsor, Berkshire, SI4 1TE, United
-        Kingdom.
-        Registered in England and Wales under Company Registration No. 3798903
-From:   David Howells <dhowells@redhat.com>
-In-Reply-To: <CAHk-=wjqx4j2vqg-tAwthNP1gcAcj1x4B7sq6Npbi8QJTUMd-A@mail.gmail.com>
-References: <CAHk-=wjqx4j2vqg-tAwthNP1gcAcj1x4B7sq6Npbi8QJTUMd-A@mail.gmail.com> <157262963995.13142.5568934007158044624.stgit@warthog.procyon.org.uk>
-To:     Linus Torvalds <torvalds@linux-foundation.org>
-Cc:     dhowells@redhat.com, Rasmus Villemoes <linux@rasmusvillemoes.dk>,
+        id S1728137AbfKAWMx (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Fri, 1 Nov 2019 18:12:53 -0400
+Received: from mail-lj1-f194.google.com ([209.85.208.194]:37105 "EHLO
+        mail-lj1-f194.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S1727270AbfKAWMo (ORCPT
+        <rfc822;linux-block@vger.kernel.org>); Fri, 1 Nov 2019 18:12:44 -0400
+Received: by mail-lj1-f194.google.com with SMTP id v2so11695179lji.4
+        for <linux-block@vger.kernel.org>; Fri, 01 Nov 2019 15:12:43 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=linux-foundation.org; s=google;
+        h=mime-version:references:in-reply-to:from:date:message-id:subject:to
+         :cc;
+        bh=sgYt+P3xDWHpqkCDVDLjgLKgMrsRwGebg6HQkCjAc5w=;
+        b=O3mYYvlU9vmiWCuVM7D5zeynWjET9sBTNe2UP3ZA3GeXbBriHFMqoPk2kJgyTgcAeI
+         BstBtBLU16kkJaWSMcP9+57VaYHHgUIqojJCqULremk/l27m2Dlyko2Sd9hhC3Y74UKd
+         ZPG4og+yRVtEHOd/O+5D/qMCxYtxUKUSxHi24=
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20161025;
+        h=x-gm-message-state:mime-version:references:in-reply-to:from:date
+         :message-id:subject:to:cc;
+        bh=sgYt+P3xDWHpqkCDVDLjgLKgMrsRwGebg6HQkCjAc5w=;
+        b=Sv9oyyuzAx7w6913aignzqCcGf3oHw/mfn8TdxkBeId/Wxsd/iyl+ojHCpXVnZBkby
+         JJkFMl9CWwe/KVMsKMHPxkPNx7PyOQGTZVRnNeLtc5glec0Nqisml6QnC8QyOv7minCW
+         pEwvoRaZdu0zbz2T1IcH568Su8ejAlNrMpNpX9g0YK5Q4UZkAarqy7LvdVUGVzWP8zJj
+         qN9X2jrXqXb/hwPHkXFpfRhMhNECio3C+153umgKZDyaI8v36XMf9MiJP4M473ykGDXn
+         lQIAZA6jMn1EEaLoROeQ5Ac6UqUHd5pWbYTjTrDZvATr1X/QnTcrfETWFpgb9xJSDPiK
+         4DXg==
+X-Gm-Message-State: APjAAAWtmCoDvbd0+XFEYybeQEJg7/ltnANkpPAkauheYSst4ewPB3AN
+        /qGMT5JwhBTf4ETDEymXzwhfVLSHPFY=
+X-Google-Smtp-Source: APXvYqydAU1WxGb4r86WMgLzrL9qRdd2aoUBeSLJzmgTLBh5RlTh+a2l06igJQihe7HzzJSus++Qvg==
+X-Received: by 2002:a2e:6817:: with SMTP id c23mr9541624lja.91.1572646362695;
+        Fri, 01 Nov 2019 15:12:42 -0700 (PDT)
+Received: from mail-lf1-f45.google.com (mail-lf1-f45.google.com. [209.85.167.45])
+        by smtp.gmail.com with ESMTPSA id t4sm2771024lji.40.2019.11.01.15.12.40
+        for <linux-block@vger.kernel.org>
+        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
+        Fri, 01 Nov 2019 15:12:40 -0700 (PDT)
+Received: by mail-lf1-f45.google.com with SMTP id b20so8256771lfp.4
+        for <linux-block@vger.kernel.org>; Fri, 01 Nov 2019 15:12:40 -0700 (PDT)
+X-Received: by 2002:a19:6f0e:: with SMTP id k14mr8678681lfc.79.1572646359613;
+ Fri, 01 Nov 2019 15:12:39 -0700 (PDT)
+MIME-Version: 1.0
+References: <157262963995.13142.5568934007158044624.stgit@warthog.procyon.org.uk>
+ <CAHk-=wjqx4j2vqg-tAwthNP1gcAcj1x4B7sq6Npbi8QJTUMd-A@mail.gmail.com> <13964.1572645926@warthog.procyon.org.uk>
+In-Reply-To: <13964.1572645926@warthog.procyon.org.uk>
+From:   Linus Torvalds <torvalds@linux-foundation.org>
+Date:   Fri, 1 Nov 2019 15:12:23 -0700
+X-Gmail-Original-Message-ID: <CAHk-=wg_Fb-WdcD-cbJjwZaPCNK4WZ+Ak4KTSDhopD-_=+t=9Q@mail.gmail.com>
+Message-ID: <CAHk-=wg_Fb-WdcD-cbJjwZaPCNK4WZ+Ak4KTSDhopD-_=+t=9Q@mail.gmail.com>
+Subject: Re: [RFC PATCH 00/11] pipe: Notification queue preparation [ver #3]
+To:     David Howells <dhowells@redhat.com>
+Cc:     Rasmus Villemoes <linux@rasmusvillemoes.dk>,
         Greg Kroah-Hartman <gregkh@linuxfoundation.org>,
         Peter Zijlstra <peterz@infradead.org>,
         Nicolas Dichtel <nicolas.dichtel@6wind.com>, raven@themaw.net,
@@ -61,103 +81,22 @@ Cc:     dhowells@redhat.com, Rasmus Villemoes <linux@rasmusvillemoes.dk>,
         linux-fsdevel <linux-fsdevel@vger.kernel.org>,
         Linux API <linux-api@vger.kernel.org>,
         Linux Kernel Mailing List <linux-kernel@vger.kernel.org>
-Subject: Re: [RFC PATCH 00/11] pipe: Notification queue preparation [ver #3]
-MIME-Version: 1.0
-Content-ID: <13963.1572645926.1@warthog.procyon.org.uk>
-Date:   Fri, 01 Nov 2019 22:05:26 +0000
-Message-ID: <13964.1572645926@warthog.procyon.org.uk>
-X-Scanned-By: MIMEDefang 2.79 on 10.5.11.13
-X-MC-Unique: UyQR-pJ3NNi_-Rohn9Habw-1
-X-Mimecast-Spam-Score: 0
-Content-Type: text/plain; charset=WINDOWS-1252
-Content-Transfer-Encoding: quoted-printable
+Content-Type: text/plain; charset="UTF-8"
 Sender: linux-block-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-Linus Torvalds <torvalds@linux-foundation.org> wrote:
+On Fri, Nov 1, 2019 at 3:05 PM David Howells <dhowells@redhat.com> wrote:
+>
+> Changing those to non-sync:
 
-> Side note: we have a couple of cases where I don't think we should use
-> the "sync" version at all.
->=20
-> Both pipe_read() and pipe_write() have that
->=20
->         if (do_wakeup) {
->                 wake_up_interruptible_sync_poll(&pipe->wait, ...
->=20
-> code at the end, outside the loop. But those two wake-ups aren't
-> actually synchronous.
+Your benchmark seems very insensitive to just about any changes.
 
-Changing those to non-sync:
+I suspect it is because you only test throughput. Latency is what the
+pipe wakeup has been optimized for, and which tends to be much more
+sensitive to other changes too (eg locking).
 
-BENCHMARK       BEST            TOTAL BYTES     AVG BYTES       STDDEV
-=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D =3D=3D=3D=3D=3D=3D=3D=3D=3D=
-=3D=3D=3D=3D=3D=3D =3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D =3D=3D=3D=
-=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D =3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=
-=3D=3D=3D
-pipe                  305816126     36255936983       302132808         888=
-0788
-splice                282402106     27102249370       225852078       21003=
-3443
-vmsplice              440022611     48896995196       407474959        5990=
-6438
+That said, I'm not convinced a latency test would show much either.
 
-Changing the others in pipe_read() and pipe_write() too:
-
-pipe                  305609682     36285967942       302383066         741=
-5744
-splice                282475690     27891475073       232428958       20168=
-7522
-vmsplice              451458280     51949421503       432911845        3492=
-5242
-
-The cumulative patch is attached below.  I'm not sure how well this should
-make a difference with my benchmark programs since each thread can run on i=
-ts
-own CPU.
-
-David
----
-diff --git a/fs/pipe.c b/fs/pipe.c
-index 9cd5cbef9552..c5e3765465f0 100644
---- a/fs/pipe.c
-+++ b/fs/pipe.c
-@@ -332,7 +332,7 @@ pipe_read(struct kiocb *iocb, struct iov_iter *to)
- =09=09=09=09do_wakeup =3D 1;
- =09=09=09=09wake =3D head - (tail - 1) =3D=3D pipe->max_usage / 2;
- =09=09=09=09if (wake)
--=09=09=09=09=09wake_up_interruptible_sync_poll_locked(
-+=09=09=09=09=09wake_up_locked_poll(
- =09=09=09=09=09=09&pipe->wait, EPOLLOUT | EPOLLWRNORM);
- =09=09=09=09spin_unlock_irq(&pipe->wait.lock);
- =09=09=09=09if (wake)
-@@ -371,7 +371,7 @@ pipe_read(struct kiocb *iocb, struct iov_iter *to)
-=20
- =09/* Signal writers asynchronously that there is more room. */
- =09if (do_wakeup) {
--=09=09wake_up_interruptible_sync_poll(&pipe->wait, EPOLLOUT | EPOLLWRNORM)=
-;
-+=09=09wake_up_interruptible_poll(&pipe->wait, EPOLLOUT | EPOLLWRNORM);
- =09=09kill_fasync(&pipe->fasync_writers, SIGIO, POLL_OUT);
- =09}
- =09if (ret > 0)
-@@ -477,7 +477,7 @@ pipe_write(struct kiocb *iocb, struct iov_iter *from)
- =09=09=09 * syscall merging.
- =09=09=09 * FIXME! Is this really true?
- =09=09=09 */
--=09=09=09wake_up_interruptible_sync_poll_locked(
-+=09=09=09wake_up_locked_poll(
- =09=09=09=09&pipe->wait, EPOLLIN | EPOLLRDNORM);
-=20
- =09=09=09spin_unlock_irq(&pipe->wait.lock);
-@@ -531,7 +531,7 @@ pipe_write(struct kiocb *iocb, struct iov_iter *from)
- out:
- =09__pipe_unlock(pipe);
- =09if (do_wakeup) {
--=09=09wake_up_interruptible_sync_poll(&pipe->wait, EPOLLIN | EPOLLRDNORM);
-+=09=09wake_up_interruptible_poll(&pipe->wait, EPOLLIN | EPOLLRDNORM);
- =09=09kill_fasync(&pipe->fasync_readers, SIGIO, POLL_IN);
- =09}
- =09if (ret > 0 && sb_start_write_trylock(file_inode(filp)->i_sb)) {
-
+               Linus
