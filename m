@@ -2,106 +2,116 @@ Return-Path: <SRS0=rsSL=Y2=vger.kernel.org=linux-block-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-2.3 required=3.0 tests=DKIM_SIGNED,DKIM_VALID,
-	HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,
-	USER_AGENT_SANE_1 autolearn=no autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-0.9 required=3.0 tests=DKIMWL_WL_HIGH,DKIM_SIGNED,
+	DKIM_VALID,DKIM_VALID_AU,HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,
+	SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED autolearn=no autolearn_force=no
+	version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id C8C1ECA9EC7
-	for <linux-block@archiver.kernel.org>; Sat,  2 Nov 2019 15:57:45 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id EF06ECA9EC7
+	for <linux-block@archiver.kernel.org>; Sat,  2 Nov 2019 18:54:00 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.kernel.org (Postfix) with ESMTP id 9531B217D9
-	for <linux-block@archiver.kernel.org>; Sat,  2 Nov 2019 15:57:45 +0000 (UTC)
-Authentication-Results: mail.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel-dk.20150623.gappssmtp.com header.i=@kernel-dk.20150623.gappssmtp.com header.b="W3YaSOz5"
+	by mail.kernel.org (Postfix) with ESMTP id CCDAA20862
+	for <linux-block@archiver.kernel.org>; Sat,  2 Nov 2019 18:54:00 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+	s=default; t=1572720840;
+	bh=EiUQFbd4eCzqoWiWRCkqn8pp6zL45XyarvpaXrgunXs=;
+	h=References:In-Reply-To:From:Date:Subject:To:Cc:List-ID:From;
+	b=GLr1eq89iayqI+lLcKSp0GC+hejZNdPXnf9vm2fbegZAwz93/u/gZOBGPkvJVq7rg
+	 ZyONxA9n3S/RUwVoeAMuSFiK20MI4j7byiu4dzexk0izY/1u117bmaEYYIvNVtOQvz
+	 HY8Wi1KpnIlSwRdTkoobl89h/mCJC6zWCpaKcY6M=
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1726861AbfKBP5p (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Sat, 2 Nov 2019 11:57:45 -0400
-Received: from mail-pl1-f193.google.com ([209.85.214.193]:40919 "EHLO
-        mail-pl1-f193.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1726454AbfKBP5o (ORCPT
-        <rfc822;linux-block@vger.kernel.org>); Sat, 2 Nov 2019 11:57:44 -0400
-Received: by mail-pl1-f193.google.com with SMTP id e3so3538608plt.7
-        for <linux-block@vger.kernel.org>; Sat, 02 Nov 2019 08:57:42 -0700 (PDT)
+        id S1726757AbfKBSyA (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Sat, 2 Nov 2019 14:54:00 -0400
+Received: from mail-lf1-f66.google.com ([209.85.167.66]:42503 "EHLO
+        mail-lf1-f66.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S1726523AbfKBSx7 (ORCPT
+        <rfc822;linux-block@vger.kernel.org>); Sat, 2 Nov 2019 14:53:59 -0400
+Received: by mail-lf1-f66.google.com with SMTP id z12so9440397lfj.9
+        for <linux-block@vger.kernel.org>; Sat, 02 Nov 2019 11:53:58 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=kernel-dk.20150623.gappssmtp.com; s=20150623;
-        h=subject:from:to:cc:references:message-id:date:user-agent
-         :mime-version:in-reply-to:content-language:content-transfer-encoding;
-        bh=+sc/3lbYLeRenCxlNeVetpPhU0U1h6NbKPzKtjXF1xg=;
-        b=W3YaSOz56DnskZPJBq/ceIlltaMa473BoohT5/C7ndNW7GwIcyNRn2iK2N+jtmUXon
-         GThgnkwd8qqG2XlsoCMiUyuuwOk39AquoxCsuFnjgMae16aIoFPaayO3KQ9VEsdF80eO
-         x65cDv2ocgvtrJCHLlcY0PVBGMNpPoBZv5LJOA+pFAmpwbdXII6wYLjcRhZGa7G7ydoD
-         neaNGPtMy2/97A7OelOTEiHmGXhElMFMBdvEjZHw0P8bAntjxcTOnHsBFQ3Q+DTqezHt
-         zjR3K0L1CqbK7tyPs3keWP3HyQCPKW1i7qkbz5SQ+agMvxkhY/tpHJNDKFEUuOnOM8B7
-         1uXA==
+        d=linux-foundation.org; s=google;
+        h=mime-version:references:in-reply-to:from:date:message-id:subject:to
+         :cc;
+        bh=UFZsrTxHj8UNSOV0MW3iX+ZNPh241BxYI9RJCfbRj4I=;
+        b=fwWi36Cjm33TVpJsMKyyeNJuPa+EzO/w2jcz8N5ivZnB2LBgFElTwve7u7JUY1CQlk
+         LBP3NYhj8mwMGDKFLZC3aAKJjtxEeb837zFLkONBVlInZ3n9BYz2CiSK5BYhQEqMplN+
+         cxbruKuD+a9IFTjckV4CYWfQYTCffHao0G3wg=
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=1e100.net; s=20161025;
-        h=x-gm-message-state:subject:from:to:cc:references:message-id:date
-         :user-agent:mime-version:in-reply-to:content-language
-         :content-transfer-encoding;
-        bh=+sc/3lbYLeRenCxlNeVetpPhU0U1h6NbKPzKtjXF1xg=;
-        b=KP5pv+Qh06G962pPkILmOyXyBraMTCKQhPvPbcda5UUSaLaVm0madVkLpMbc4dS3ar
-         1SUqNnRMck8f0ORPM08whtOo4EKcUWkxJJRMdrc/eZjQRKiskv1aVQ+x7KdAF2lcVffq
-         qO5xh91XrA7/tcrSpgjNXsVNVTpKByGvvlvutncjgX8x2tFYT0jJ6+13O6/yMllsqa37
-         vVOOA8177XgFvmhQ79VS3gxJ4mx2vMjQae+Z4gB7dXVpDUYxrYpoEbaJ3Vw3qSTKLCOy
-         bsRWpQ+Nw4l0Kaji5BdnNjBThI9nPGmCrvirTFW0dZEK1qF+MYBphqS7dNw9Jpm0Fyks
-         F2xA==
-X-Gm-Message-State: APjAAAUjZX14qKTcSmmtSkpsz0NiAtY8GE99j51+yvkW4WJdvotnSbQP
-        ZWI6dG2iPY+3obEY3pGaowoBiw==
-X-Google-Smtp-Source: APXvYqyM9FW4+I6/9d5E/0oi+0SWnnzLrFfkeR/FYBEmdE4eZm5uOzS6FvGruylnK9L2OQimmxn0Ag==
-X-Received: by 2002:a17:902:a9c1:: with SMTP id b1mr10782827plr.227.1572710262325;
-        Sat, 02 Nov 2019 08:57:42 -0700 (PDT)
-Received: from [192.168.1.188] ([66.219.217.79])
-        by smtp.gmail.com with ESMTPSA id 6sm11015721pfz.156.2019.11.02.08.57.39
-        (version=TLS1_2 cipher=ECDHE-RSA-AES128-GCM-SHA256 bits=128/128);
-        Sat, 02 Nov 2019 08:57:41 -0700 (PDT)
-Subject: Re: [PATCH V4] block: optimize for small block size IO
-From:   Jens Axboe <axboe@kernel.dk>
-To:     Ming Lei <ming.lei@redhat.com>
-Cc:     linux-block@vger.kernel.org, Coly Li <colyli@suse.de>,
-        Christoph Hellwig <hch@infradead.org>,
-        Keith Busch <kbusch@kernel.org>, linux-bcache@vger.kernel.org
-References: <20191102072911.24817-1-ming.lei@redhat.com>
- <606b9117-1fb6-780b-8fb1-001c06768a2e@kernel.dk>
-Message-ID: <36786e85-fd19-0631-4acf-c9bf9468d4e1@kernel.dk>
-Date:   Sat, 2 Nov 2019 09:57:38 -0600
-User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:60.0) Gecko/20100101
- Thunderbird/60.9.0
+        h=x-gm-message-state:mime-version:references:in-reply-to:from:date
+         :message-id:subject:to:cc;
+        bh=UFZsrTxHj8UNSOV0MW3iX+ZNPh241BxYI9RJCfbRj4I=;
+        b=CEa4naHZIf7TTYkhNaawXyJWb0E/uxG0kmuCqi/sM+TaffF0gtXUg6HHN/vgINHaUf
+         VQqxkFYwdKGzIvzTWnDHuid1s2VTO8slo0ArOFh5jtnsfFtOAGlrdRYwflB+wZxHX5Yx
+         ZgjtV7KHw70ZbjrTx2ky66cJ/bUeLhxQU1Cq3GIJBfckK1jorVtoB1U80/wzeTOZkaoM
+         AETdvUHQXFmTKnizQ3WIWnIyidlvqq3M8bFqzCrdd1POVQRr9t1ZE2XoSvmCqhx/Rytd
+         X+5O2rBNcbZ37r9ABQ2RsO0SMg2ndwng5+8D6AY/qD4yTh+EJY8jHetXuaubQe/kESb7
+         hQKw==
+X-Gm-Message-State: APjAAAUp+S6C45o9aIMwSPoXLjBWBMQsfhBQjx84wL9ehYLpLkVjeaUF
+        CEmOGXPz/vWkWi2dGCIWsj1PJQwdkVE=
+X-Google-Smtp-Source: APXvYqwfTVP7mU6pA7xsfuu6Ek2GgRnEo379c6CdMknjNd+CPBcNF1XoKeDzT2GzKHVJ4UDxc4BgnA==
+X-Received: by 2002:ac2:508b:: with SMTP id f11mr11188008lfm.116.1572720837244;
+        Sat, 02 Nov 2019 11:53:57 -0700 (PDT)
+Received: from mail-lf1-f53.google.com (mail-lf1-f53.google.com. [209.85.167.53])
+        by smtp.gmail.com with ESMTPSA id r75sm4421293lff.93.2019.11.02.11.53.54
+        for <linux-block@vger.kernel.org>
+        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
+        Sat, 02 Nov 2019 11:53:54 -0700 (PDT)
+Received: by mail-lf1-f53.google.com with SMTP id j5so9431635lfh.10
+        for <linux-block@vger.kernel.org>; Sat, 02 Nov 2019 11:53:54 -0700 (PDT)
+X-Received: by 2002:ac2:4c86:: with SMTP id d6mr11465241lfl.106.1572720834124;
+ Sat, 02 Nov 2019 11:53:54 -0700 (PDT)
 MIME-Version: 1.0
-In-Reply-To: <606b9117-1fb6-780b-8fb1-001c06768a2e@kernel.dk>
-Content-Type: text/plain; charset=windows-1252
-Content-Language: en-US
-Content-Transfer-Encoding: 7bit
+References: <157186182463.3995.13922458878706311997.stgit@warthog.procyon.org.uk>
+ <30394.1571936252@warthog.procyon.org.uk> <c6e044cc-5596-90b7-4418-6ad7009d6d79@yandex-team.ru>
+ <17311.1572534953@warthog.procyon.org.uk>
+In-Reply-To: <17311.1572534953@warthog.procyon.org.uk>
+From:   Linus Torvalds <torvalds@linux-foundation.org>
+Date:   Sat, 2 Nov 2019 11:53:38 -0700
+X-Gmail-Original-Message-ID: <CAHk-=wg_X_7JSYT-a3qHrzvuWGMyffDWtQ4n7adBp_fe5w0BsA@mail.gmail.com>
+Message-ID: <CAHk-=wg_X_7JSYT-a3qHrzvuWGMyffDWtQ4n7adBp_fe5w0BsA@mail.gmail.com>
+Subject: Re: [RFC PATCH 11/10] pipe: Add fsync() support [ver #2]
+To:     David Howells <dhowells@redhat.com>
+Cc:     Konstantin Khlebnikov <khlebnikov@yandex-team.ru>,
+        Rasmus Villemoes <linux@rasmusvillemoes.dk>,
+        Greg Kroah-Hartman <gregkh@linuxfoundation.org>,
+        Peter Zijlstra <peterz@infradead.org>,
+        Nicolas Dichtel <nicolas.dichtel@6wind.com>, raven@themaw.net,
+        Christian Brauner <christian@brauner.io>,
+        keyrings@vger.kernel.org, linux-usb@vger.kernel.org,
+        linux-block <linux-block@vger.kernel.org>,
+        LSM List <linux-security-module@vger.kernel.org>,
+        linux-fsdevel <linux-fsdevel@vger.kernel.org>,
+        Linux API <linux-api@vger.kernel.org>,
+        Linux Kernel Mailing List <linux-kernel@vger.kernel.org>
+Content-Type: text/plain; charset="UTF-8"
 Sender: linux-block-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-On 11/2/19 8:03 AM, Jens Axboe wrote:
-> On 11/2/19 1:29 AM, Ming Lei wrote:
->> __blk_queue_split() may be a bit heavy for small block size(such as
->> 512B, or 4KB) IO, so introduce one flag to decide if this bio includes
->> multiple page. And only consider to try splitting this bio in case
->> that the multiple page flag is set.
->>
->> ~3% - 5% IOPS improvement can be observed on io_uring test over
->> null_blk(MQ), and the io_uring test code is from fio/t/io_uring.c
->>
->> bch_bio_map() should be the only one which doesn't use bio_add_page(),
->> so force to mark bio built via bch_bio_map() as MULTI_PAGE.
->>
->> RAID5 has similar usage too, however the bio is really single-page bio,
->> so not necessary to handle it.
-> 
-> Thanks Ming, applied.
+On Thu, Oct 31, 2019 at 8:16 AM David Howells <dhowells@redhat.com> wrote:
+>
+> Konstantin Khlebnikov <khlebnikov@yandex-team.ru> wrote:
+>
+> > Similar synchronization is required for reusing memory after vmsplice()?
+> > I don't see other way how sender could safely change these pages.
+>
+> Sounds like a point - if you have multiple parallel contributors to the pipe
+> via vmsplice(), then FIONREAD is of no use.  To use use FIONREAD, you have to
+> let the pipe become empty before you can be sure.
 
-Actually, I took a closer look at this. I thought the BIO_MAP_USER
-overload would be ok, but that seems potentially fragile and so does
-the fact that we need to now maintain an extra state for multipage.
-Any serious objections to just doing the somewhat hacky bio->bi_vcnt
-check? With a comment I think that's more acceptable, and it doesn't
-rely on maintaining extra state. Particularly the latter is a big
-win, imho.
+Well, the rules for vmsplice is simply to not change the source pages.
+It's zero-copy, after all.
 
--- 
-Jens Axboe
+If you want to change the source pages, you need to just use write() instead.
 
+That said, even then the right model isn't fsync(). If you really want
+to have something like "notify me when this buffer has been used", it
+should be some kind of sequence count thing, not a "wait for empty".
+
+Which might be useful in theory, but would be something quite
+different (and honestly, I wouldn't expect it to find all that
+widespread use)
+
+             Linus
