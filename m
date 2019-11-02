@@ -2,58 +2,56 @@ Return-Path: <SRS0=rsSL=Y2=vger.kernel.org=linux-block-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-6.8 required=3.0 tests=DKIM_SIGNED,DKIM_VALID,
+X-Spam-Status: No, score=-6.9 required=3.0 tests=DKIM_SIGNED,DKIM_VALID,
 	DKIM_VALID_AU,HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,
-	SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED autolearn=ham
-	autolearn_force=no version=3.4.0
+	SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS autolearn=unavailable autolearn_force=no
+	version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 57E6CCA9EC7
-	for <linux-block@archiver.kernel.org>; Sat,  2 Nov 2019 07:29:27 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 93B4DCA9ED0
+	for <linux-block@archiver.kernel.org>; Sat,  2 Nov 2019 08:02:29 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.kernel.org (Postfix) with ESMTP id 2500C204FD
-	for <linux-block@archiver.kernel.org>; Sat,  2 Nov 2019 07:29:27 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id 6ACF420862
+	for <linux-block@archiver.kernel.org>; Sat,  2 Nov 2019 08:02:29 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="DvTvVLKr"
+	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="IJKpeI1e"
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1726080AbfKBH30 (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Sat, 2 Nov 2019 03:29:26 -0400
-Received: from us-smtp-2.mimecast.com ([205.139.110.61]:50232 "EHLO
+        id S1727304AbfKBIC3 (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Sat, 2 Nov 2019 04:02:29 -0400
+Received: from us-smtp-2.mimecast.com ([205.139.110.61]:59078 "EHLO
         us-smtp-delivery-1.mimecast.com" rhost-flags-OK-OK-OK-FAIL)
-        by vger.kernel.org with ESMTP id S1726044AbfKBH3Z (ORCPT
+        by vger.kernel.org with ESMTP id S1726044AbfKBIC2 (ORCPT
         <rfc822;linux-block@vger.kernel.org>);
-        Sat, 2 Nov 2019 03:29:25 -0400
+        Sat, 2 Nov 2019 04:02:28 -0400
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-        s=mimecast20190719; t=1572679764;
+        s=mimecast20190719; t=1572681747;
         h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
          to:to:cc:cc:mime-version:mime-version:content-type:content-type:
          content-transfer-encoding:content-transfer-encoding;
-        bh=A9cwAS22Zfye3HXHjRA4zltKe67K3yHMt5uOAr3t5kc=;
-        b=DvTvVLKrIREy25tEXt5e0ms/pkmTrba1GH1xjniYkPTAT6q1X4rqg0fdKpsBp86sbbnydT
-        Z9OQjNy7XvDtx3kKnA+KEw6qpNLiUNoDHpZeKhGKLO+avJNi71rb9UZXJ8B3YXW6Piw+3i
-        LRxbi3HXn/Vhok29lGo5QK0enpgp30Q=
+        bh=TMCEdevrU7bRW4SpQI8SBdcaxtFmL8hYAWppn4dTBQk=;
+        b=IJKpeI1esUkNb9CKEBjUIGSWKeqmA8Z4DAIz5HNpBcu9mfcAmdeytQe5mVbvHrOuR+CECf
+        QWt2ad268lwOFYCe/dUK8CafKwFkw8FiuWNMsMELgEhsAlEIGz6nlXnJDBj+CgiYWmSVz+
+        /II5F07L/USyaXLLPjI99iytwC9KWUE=
 Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
  [209.132.183.4]) (Using TLS) by relay.mimecast.com with ESMTP id
- us-mta-246-k4eDnI7OO7eKA-GKA201nQ-1; Sat, 02 Nov 2019 03:29:20 -0400
-Received: from smtp.corp.redhat.com (int-mx08.intmail.prod.int.phx2.redhat.com [10.5.11.23])
+ us-mta-320-59gF5HU6MkCHvpqSePO3zQ-1; Sat, 02 Nov 2019 04:02:24 -0400
+Received: from smtp.corp.redhat.com (int-mx05.intmail.prod.int.phx2.redhat.com [10.5.11.15])
         (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
         (No client certificate requested)
-        by mimecast-mx01.redhat.com (Postfix) with ESMTPS id AD1E58017E0;
-        Sat,  2 Nov 2019 07:29:19 +0000 (UTC)
+        by mimecast-mx01.redhat.com (Postfix) with ESMTPS id 70AFD107ACC0;
+        Sat,  2 Nov 2019 08:02:23 +0000 (UTC)
 Received: from localhost (ovpn-8-18.pek2.redhat.com [10.72.8.18])
-        by smtp.corp.redhat.com (Postfix) with ESMTP id C1D7A26569;
-        Sat,  2 Nov 2019 07:29:15 +0000 (UTC)
+        by smtp.corp.redhat.com (Postfix) with ESMTP id 09B0B5D6D8;
+        Sat,  2 Nov 2019 08:02:19 +0000 (UTC)
 From:   Ming Lei <ming.lei@redhat.com>
 To:     Jens Axboe <axboe@kernel.dk>
 Cc:     linux-block@vger.kernel.org, Ming Lei <ming.lei@redhat.com>,
-        Coly Li <colyli@suse.de>,
-        Christoph Hellwig <hch@infradead.org>,
-        Keith Busch <kbusch@kernel.org>, linux-bcache@vger.kernel.org
-Subject: [PATCH V4] block: optimize for small block size IO
-Date:   Sat,  2 Nov 2019 15:29:11 +0800
-Message-Id: <20191102072911.24817-1-ming.lei@redhat.com>
+        stable@vger.kernel.org
+Subject: [PATCH] blk-mq: avoid sysfs buffer overflow by too many CPU cores
+Date:   Sat,  2 Nov 2019 16:02:15 +0800
+Message-Id: <20191102080215.20223-1-ming.lei@redhat.com>
 MIME-Version: 1.0
-X-Scanned-By: MIMEDefang 2.84 on 10.5.11.23
-X-MC-Unique: k4eDnI7OO7eKA-GKA201nQ-1
+X-Scanned-By: MIMEDefang 2.79 on 10.5.11.15
+X-MC-Unique: 59gF5HU6MkCHvpqSePO3zQ-1
 X-Mimecast-Spam-Score: 0
 Content-Type: text/plain; charset=WINDOWS-1252
 Content-Transfer-Encoding: quoted-printable
@@ -62,144 +60,60 @@ Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-__blk_queue_split() may be a bit heavy for small block size(such as
-512B, or 4KB) IO, so introduce one flag to decide if this bio includes
-multiple page. And only consider to try splitting this bio in case
-that the multiple page flag is set.
+It is reported that sysfs buffer overflow can be triggered in case
+of too many CPU cores(>841 on 4K PAGE_SIZE) when showing CPUs of
+hctx via /sys/block/$DEV/mq/$N/cpu_list.
 
-~3% - 5% IOPS improvement can be observed on io_uring test over
-null_blk(MQ), and the io_uring test code is from fio/t/io_uring.c
+So use snprintf for avoiding the potential buffer overflow.
 
-bch_bio_map() should be the only one which doesn't use bio_add_page(),
-so force to mark bio built via bch_bio_map() as MULTI_PAGE.
+This version doesn't change the attribute format, and simply stop
+to show CPU number if the buffer is to be overflow.
 
-RAID5 has similar usage too, however the bio is really single-page bio,
-so not necessary to handle it.
-
-Cc: Coly Li <colyli@suse.de>
-Cc: Christoph Hellwig <hch@infradead.org>
-Cc: Keith Busch <kbusch@kernel.org>
-Cc: linux-bcache@vger.kernel.org
-Acked-by: Coly Li <colyli@suse.de>
+Cc: stable@vger.kernel.org
+Fixes: 676141e48af7("blk-mq: don't dump CPU -> hw queue map on driver load"=
+)
 Signed-off-by: Ming Lei <ming.lei@redhat.com>
 ---
-V4:
-=09- patch style chnage as suggested by Jens
-V3:
-=09- simplify check in __bio_add_page() as suggested by Christoph
-V2:
-=09- share bit flag with passthrough IO
-=09- deal with adding multipage in one bio_add_page()
+ block/blk-mq-sysfs.c | 15 ++++++++++-----
+ 1 file changed, 10 insertions(+), 5 deletions(-)
 
- block/bio.c               | 9 +++++++++
- block/blk-merge.c         | 8 +++++++-
- block/bounce.c            | 3 +++
- drivers/md/bcache/util.c  | 2 ++
- include/linux/blk_types.h | 3 +++
- 5 files changed, 24 insertions(+), 1 deletion(-)
-
-diff --git a/block/bio.c b/block/bio.c
-index 8f0ed6228fc5..eeb81679689b 100644
---- a/block/bio.c
-+++ b/block/bio.c
-@@ -583,6 +583,8 @@ void __bio_clone_fast(struct bio *bio, struct bio *bio_=
-src)
- =09bio_set_flag(bio, BIO_CLONED);
- =09if (bio_flagged(bio_src, BIO_THROTTLED))
- =09=09bio_set_flag(bio, BIO_THROTTLED);
-+=09if (bio_flagged(bio_src, BIO_MULTI_PAGE))
-+=09=09bio_set_flag(bio, BIO_MULTI_PAGE);
- =09bio->bi_opf =3D bio_src->bi_opf;
- =09bio->bi_ioprio =3D bio_src->bi_ioprio;
- =09bio->bi_write_hint =3D bio_src->bi_write_hint;
-@@ -757,6 +759,9 @@ bool __bio_try_merge_page(struct bio *bio, struct page =
-*page,
- =09=09if (page_is_mergeable(bv, page, len, off, same_page)) {
- =09=09=09bv->bv_len +=3D len;
- =09=09=09bio->bi_iter.bi_size +=3D len;
-+
-+=09=09=09if (!*same_page)
-+=09=09=09=09bio_set_flag(bio, BIO_MULTI_PAGE);
- =09=09=09return true;
- =09=09}
- =09}
-@@ -789,6 +794,10 @@ void __bio_add_page(struct bio *bio, struct page *page=
-,
- =09bio->bi_iter.bi_size +=3D len;
- =09bio->bi_vcnt++;
+diff --git a/block/blk-mq-sysfs.c b/block/blk-mq-sysfs.c
+index a0d3ce30fa08..68996ef1d339 100644
+--- a/block/blk-mq-sysfs.c
++++ b/block/blk-mq-sysfs.c
+@@ -166,20 +166,25 @@ static ssize_t blk_mq_hw_sysfs_nr_reserved_tags_show(=
+struct blk_mq_hw_ctx *hctx,
 =20
-+=09if (!bio_flagged(bio, BIO_MULTI_PAGE) && (bio->bi_vcnt >=3D 2 ||
-+=09=09=09=09bv->bv_len > PAGE_SIZE))
-+=09=09bio_set_flag(bio, BIO_MULTI_PAGE);
+ static ssize_t blk_mq_hw_sysfs_cpus_show(struct blk_mq_hw_ctx *hctx, char =
+*page)
+ {
++=09const size_t size =3D PAGE_SIZE - 1;
+ =09unsigned int i, first =3D 1;
+-=09ssize_t ret =3D 0;
++=09int ret =3D 0, pos =3D 0;
+=20
+ =09for_each_cpu(i, hctx->cpumask) {
+ =09=09if (first)
+-=09=09=09ret +=3D sprintf(ret + page, "%u", i);
++=09=09=09ret =3D snprintf(pos + page, size - pos, "%u", i);
+ =09=09else
+-=09=09=09ret +=3D sprintf(ret + page, ", %u", i);
++=09=09=09ret =3D snprintf(pos + page, size - pos, ", %u", i);
 +
- =09if (!bio_flagged(bio, BIO_WORKINGSET) && unlikely(PageWorkingset(page))=
-)
- =09=09bio_set_flag(bio, BIO_WORKINGSET);
- }
-diff --git a/block/blk-merge.c b/block/blk-merge.c
-index 48e6725b32ee..b0670711dc54 100644
---- a/block/blk-merge.c
-+++ b/block/blk-merge.c
-@@ -309,7 +309,13 @@ void __blk_queue_split(struct request_queue *q, struct=
- bio **bio,
- =09=09=09=09nr_segs);
- =09=09break;
- =09default:
--=09=09split =3D blk_bio_segment_split(q, *bio, &q->bio_split, nr_segs);
-+=09=09if (!bio_flagged(*bio, BIO_MULTI_PAGE)) {
-+=09=09=09*nr_segs =3D 1;
-+=09=09=09split =3D NULL;
-+=09=09} else {
-+=09=09=09split =3D blk_bio_segment_split(q, *bio, &q->bio_split,
-+=09=09=09=09=09nr_segs);
-+=09=09}
- =09=09break;
++=09=09if (ret >=3D size - pos)
++=09=09=09break;
+=20
+ =09=09first =3D 0;
++=09=09pos +=3D ret;
  =09}
 =20
-diff --git a/block/bounce.c b/block/bounce.c
-index f8ed677a1bf7..4b18a2accccc 100644
---- a/block/bounce.c
-+++ b/block/bounce.c
-@@ -253,6 +253,9 @@ static struct bio *bounce_clone_bio(struct bio *bio_src=
-, gfp_t gfp_mask,
- =09bio->bi_iter.bi_sector=09=3D bio_src->bi_iter.bi_sector;
- =09bio->bi_iter.bi_size=09=3D bio_src->bi_iter.bi_size;
-=20
-+=09if (bio_flagged(bio_src, BIO_MULTI_PAGE))
-+=09=09bio_set_flag(bio, BIO_MULTI_PAGE);
-+
- =09switch (bio_op(bio)) {
- =09case REQ_OP_DISCARD:
- =09case REQ_OP_SECURE_ERASE:
-diff --git a/drivers/md/bcache/util.c b/drivers/md/bcache/util.c
-index 62fb917f7a4f..71f5cbb6fdd6 100644
---- a/drivers/md/bcache/util.c
-+++ b/drivers/md/bcache/util.c
-@@ -253,6 +253,8 @@ start:=09=09bv->bv_len=09=3D min_t(size_t, PAGE_SIZE - =
-bv->bv_offset,
-=20
- =09=09size -=3D bv->bv_len;
- =09}
-+
-+=09bio_set_flag(bio, BIO_MULTI_PAGE);
+-=09ret +=3D sprintf(ret + page, "\n");
+-=09return ret;
++=09ret =3D snprintf(pos + page, size - pos, "\n");
++=09return pos + ret;
  }
 =20
- /**
-diff --git a/include/linux/blk_types.h b/include/linux/blk_types.h
-index d688b96d1d63..10b9a3539716 100644
---- a/include/linux/blk_types.h
-+++ b/include/linux/blk_types.h
-@@ -220,6 +220,9 @@ enum {
- =09=09=09=09 * throttling rules. Don't do it again. */
- =09BIO_TRACE_COMPLETION,=09/* bio_endio() should trace the final completio=
-n
- =09=09=09=09 * of this bio. */
-+=09BIO_MULTI_PAGE =3D BIO_USER_MAPPED,
-+=09=09=09=09/* used for optimize small BS IO from FS, so
-+=09=09=09=09 * share the bit flag with passthrough IO */
- =09BIO_QUEUE_ENTERED,=09/* can use blk_queue_enter_live() */
- =09BIO_TRACKED,=09=09/* set if bio goes through the rq_qos path */
- =09BIO_FLAG_LAST
+ static struct blk_mq_hw_ctx_sysfs_entry blk_mq_hw_sysfs_nr_tags =3D {
 --=20
 2.20.1
 
