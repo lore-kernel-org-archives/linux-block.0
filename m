@@ -2,104 +2,96 @@ Return-Path: <SRS0=rsSL=Y2=vger.kernel.org=linux-block-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-8.2 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
-	INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,
-	URIBL_BLOCKED,USER_AGENT_SANE_1 autolearn=ham autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-2.3 required=3.0 tests=DKIM_SIGNED,DKIM_VALID,
+	HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,
+	USER_AGENT_SANE_1 autolearn=no autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id D6759CA9EC7
-	for <linux-block@archiver.kernel.org>; Sat,  2 Nov 2019 11:01:56 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 9305BCA9EC7
+	for <linux-block@archiver.kernel.org>; Sat,  2 Nov 2019 14:03:47 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.kernel.org (Postfix) with ESMTP id A37B320862
-	for <linux-block@archiver.kernel.org>; Sat,  2 Nov 2019 11:01:56 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id 5FC5B2080F
+	for <linux-block@archiver.kernel.org>; Sat,  2 Nov 2019 14:03:47 +0000 (UTC)
+Authentication-Results: mail.kernel.org;
+	dkim=pass (2048-bit key) header.d=kernel-dk.20150623.gappssmtp.com header.i=@kernel-dk.20150623.gappssmtp.com header.b="TRgUnVcB"
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1726396AbfKBLBz (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Sat, 2 Nov 2019 07:01:55 -0400
-Received: from mga18.intel.com ([134.134.136.126]:24973 "EHLO mga18.intel.com"
-        rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-        id S1726163AbfKBLBz (ORCPT <rfc822;linux-block@vger.kernel.org>);
-        Sat, 2 Nov 2019 07:01:55 -0400
-X-Amp-Result: SKIPPED(no attachment in message)
-X-Amp-File-Uploaded: False
-Received: from fmsmga003.fm.intel.com ([10.253.24.29])
-  by orsmga106.jf.intel.com with ESMTP/TLS/DHE-RSA-AES256-GCM-SHA384; 02 Nov 2019 04:01:53 -0700
-X-ExtLoop1: 1
-X-IronPort-AV: E=Sophos;i="5.68,259,1569308400"; 
-   d="scan'208";a="206632673"
-Received: from mohseni-mobl2.ger.corp.intel.com (HELO btopel-mobl.ger.intel.com) ([10.252.42.93])
-  by FMSMGA003.fm.intel.com with ESMTP; 02 Nov 2019 04:01:44 -0700
-Subject: Re: [PATCH 11/19] net/xdp: set FOLL_PIN via pin_user_pages()
-To:     John Hubbard <jhubbard@nvidia.com>,
-        Andrew Morton <akpm@linux-foundation.org>
-Cc:     Al Viro <viro@zeniv.linux.org.uk>,
-        Alex Williamson <alex.williamson@redhat.com>,
-        Benjamin Herrenschmidt <benh@kernel.crashing.org>,
+        id S1726440AbfKBODq (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Sat, 2 Nov 2019 10:03:46 -0400
+Received: from mail-pg1-f193.google.com ([209.85.215.193]:45019 "EHLO
+        mail-pg1-f193.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S1726380AbfKBODq (ORCPT
+        <rfc822;linux-block@vger.kernel.org>); Sat, 2 Nov 2019 10:03:46 -0400
+Received: by mail-pg1-f193.google.com with SMTP id e10so8218185pgd.11
+        for <linux-block@vger.kernel.org>; Sat, 02 Nov 2019 07:03:45 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=kernel-dk.20150623.gappssmtp.com; s=20150623;
+        h=subject:to:cc:references:from:message-id:date:user-agent
+         :mime-version:in-reply-to:content-language:content-transfer-encoding;
+        bh=rtuDPqJZ0XL0I3niBJJ+k2E1GedQ1MMy4bRevHQ+bw4=;
+        b=TRgUnVcByAkYuvAlQNyPJkaDxxox1KYzIF5hquLLmn0AzhQt8aFInkbMxUqlURVXiB
+         9QU50KrAmHGHmTDL2tmOXlQb86gQ8unGF489aAc1bnZiHQO++EHlyIys5M3tf0eQW9+S
+         gg1W4vqdPvVdaWzmfeQ440jYVaDjpPXZg1yOKdsWpoEedXp/TNJt7FA5ldPmWon+k/XW
+         AVtsx8+ydQQGGUia1foFd5z5v2GNXn1TjrQKrKvuG+IgqthJA0asa59G72PtTabQpuZS
+         fkQZn/uW1mjGIFz/k+Lkvy3z1+ZXGXUEjy7troJE0PnxRbIL4ZUCFFIhPwkvQGiYkQEy
+         CaCw==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20161025;
+        h=x-gm-message-state:subject:to:cc:references:from:message-id:date
+         :user-agent:mime-version:in-reply-to:content-language
+         :content-transfer-encoding;
+        bh=rtuDPqJZ0XL0I3niBJJ+k2E1GedQ1MMy4bRevHQ+bw4=;
+        b=Fei0BJibHXy0NUmdbEWaruk6Z1Jw8IWInrsq0X11U9+p30yD958X6P3WcTRZ4j4rD8
+         b4VtAcRqYHr9nP8id3OYrRNGmuY4VxcoxlZ9/Sd02sEGmW+HtPw6yjxiPagFXbGH/uqb
+         XGIqTpMP173/sArqQrPChBTumeDgVp/TyV0ghczU/UdrHI2+1w1ofVTrPleLe/KJcLbn
+         E1Ilua7fH28L0+dSrp1KnT9M0sEGdGKKMf0NL11Yin28GAsrkxEZzsCmbvY+lTEE80RW
+         J8WwTXMtwqlaiV1tgnij1ZvW9ESF8G4tiGXnsTruZcB29ApmTDeHCby4zdrdnV8PORKR
+         FRgA==
+X-Gm-Message-State: APjAAAUs7a3WyPFv5D3K5haPXUuN+DFx182uF+qKXe9gUK4mmtUbsBns
+        2d/twoyZZf5PmjwvflLEXSOvew==
+X-Google-Smtp-Source: APXvYqzAGyaSRBGFZuWmHK1zrMVvhmAYfeg6v+AAzMTYsYhCLLu7ILJkm2DMFJVLiC4rb8ZjP2u+9g==
+X-Received: by 2002:a65:6290:: with SMTP id f16mr20439011pgv.40.1572703425334;
+        Sat, 02 Nov 2019 07:03:45 -0700 (PDT)
+Received: from [192.168.1.188] ([66.219.217.79])
+        by smtp.gmail.com with ESMTPSA id x20sm9174065pfa.186.2019.11.02.07.03.43
+        (version=TLS1_2 cipher=ECDHE-RSA-AES128-GCM-SHA256 bits=128/128);
+        Sat, 02 Nov 2019 07:03:44 -0700 (PDT)
+Subject: Re: [PATCH V4] block: optimize for small block size IO
+To:     Ming Lei <ming.lei@redhat.com>
+Cc:     linux-block@vger.kernel.org, Coly Li <colyli@suse.de>,
         Christoph Hellwig <hch@infradead.org>,
-        Dan Williams <dan.j.williams@intel.com>,
-        Daniel Vetter <daniel@ffwll.ch>,
-        Dave Chinner <david@fromorbit.com>,
-        David Airlie <airlied@linux.ie>,
-        "David S . Miller" <davem@davemloft.net>,
-        Ira Weiny <ira.weiny@intel.com>, Jan Kara <jack@suse.cz>,
-        Jason Gunthorpe <jgg@ziepe.ca>, Jens Axboe <axboe@kernel.dk>,
-        Jonathan Corbet <corbet@lwn.net>,
-        =?UTF-8?B?SsOpcsO0bWUgR2xpc3Nl?= <jglisse@redhat.com>,
-        Magnus Karlsson <magnus.karlsson@intel.com>,
-        Mauro Carvalho Chehab <mchehab@kernel.org>,
-        Michael Ellerman <mpe@ellerman.id.au>,
-        Michal Hocko <mhocko@suse.com>,
-        Mike Kravetz <mike.kravetz@oracle.com>,
-        Paul Mackerras <paulus@samba.org>,
-        Shuah Khan <shuah@kernel.org>,
-        Vlastimil Babka <vbabka@suse.cz>, bpf@vger.kernel.org,
-        dri-devel@lists.freedesktop.org, kvm@vger.kernel.org,
-        linux-block@vger.kernel.org, linux-doc@vger.kernel.org,
-        linux-fsdevel@vger.kernel.org, linux-kselftest@vger.kernel.org,
-        linux-media@vger.kernel.org, linux-rdma@vger.kernel.org,
-        linuxppc-dev@lists.ozlabs.org, netdev@vger.kernel.org,
-        linux-mm@kvack.org, LKML <linux-kernel@vger.kernel.org>
-References: <20191030224930.3990755-1-jhubbard@nvidia.com>
- <20191030224930.3990755-12-jhubbard@nvidia.com>
-From:   =?UTF-8?B?QmrDtnJuIFTDtnBlbA==?= <bjorn.topel@intel.com>
-Message-ID: <67cd4960-bc17-9603-8d4d-b7b2f68bb373@intel.com>
-Date:   Sat, 2 Nov 2019 12:01:43 +0100
-User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:68.0) Gecko/20100101
- Thunderbird/68.1.2
+        Keith Busch <kbusch@kernel.org>, linux-bcache@vger.kernel.org
+References: <20191102072911.24817-1-ming.lei@redhat.com>
+From:   Jens Axboe <axboe@kernel.dk>
+Message-ID: <606b9117-1fb6-780b-8fb1-001c06768a2e@kernel.dk>
+Date:   Sat, 2 Nov 2019 08:03:42 -0600
+User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:60.0) Gecko/20100101
+ Thunderbird/60.9.0
 MIME-Version: 1.0
-In-Reply-To: <20191030224930.3990755-12-jhubbard@nvidia.com>
-Content-Type: text/plain; charset=utf-8; format=flowed
+In-Reply-To: <20191102072911.24817-1-ming.lei@redhat.com>
+Content-Type: text/plain; charset=windows-1252
 Content-Language: en-US
-Content-Transfer-Encoding: 8bit
+Content-Transfer-Encoding: 7bit
 Sender: linux-block-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-On 2019-10-30 23:49, John Hubbard wrote:
-> Convert net/xdp to use the new pin_longterm_pages() call, which sets
-> FOLL_PIN. Setting FOLL_PIN is now required for code that requires
-> tracking of pinned pages.
+On 11/2/19 1:29 AM, Ming Lei wrote:
+> __blk_queue_split() may be a bit heavy for small block size(such as
+> 512B, or 4KB) IO, so introduce one flag to decide if this bio includes
+> multiple page. And only consider to try splitting this bio in case
+> that the multiple page flag is set.
 > 
-> Signed-off-by: John Hubbard <jhubbard@nvidia.com>
+> ~3% - 5% IOPS improvement can be observed on io_uring test over
+> null_blk(MQ), and the io_uring test code is from fio/t/io_uring.c
+> 
+> bch_bio_map() should be the only one which doesn't use bio_add_page(),
+> so force to mark bio built via bch_bio_map() as MULTI_PAGE.
+> 
+> RAID5 has similar usage too, however the bio is really single-page bio,
+> so not necessary to handle it.
 
-Acked-by: Björn Töpel <bjorn.topel@intel.com>
+Thanks Ming, applied.
 
-> ---
->   net/xdp/xdp_umem.c | 4 ++--
->   1 file changed, 2 insertions(+), 2 deletions(-)
-> 
-> diff --git a/net/xdp/xdp_umem.c b/net/xdp/xdp_umem.c
-> index 16d5f353163a..4d56dfb1139a 100644
-> --- a/net/xdp/xdp_umem.c
-> +++ b/net/xdp/xdp_umem.c
-> @@ -285,8 +285,8 @@ static int xdp_umem_pin_pages(struct xdp_umem *umem)
->   		return -ENOMEM;
->   
->   	down_read(&current->mm->mmap_sem);
-> -	npgs = get_user_pages(umem->address, umem->npgs,
-> -			      gup_flags | FOLL_LONGTERM, &umem->pgs[0], NULL);
-> +	npgs = pin_longterm_pages(umem->address, umem->npgs, gup_flags,
-> +				  &umem->pgs[0], NULL);
->   	up_read(&current->mm->mmap_sem);
->   
->   	if (npgs != umem->npgs) {
-> 
+-- 
+Jens Axboe
+
