@@ -2,74 +2,65 @@ Return-Path: <SRS0=rsSL=Y2=vger.kernel.org=linux-block-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-0.9 required=3.0 tests=DKIMWL_WL_HIGH,DKIM_SIGNED,
-	DKIM_VALID,DKIM_VALID_AU,HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,
-	SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED autolearn=no autolearn_force=no
-	version=3.4.0
+X-Spam-Status: No, score=-0.8 required=3.0 tests=DKIM_SIGNED,DKIM_VALID,
+	HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,
+	URIBL_BLOCKED autolearn=no autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 39BC8CA9EC7
-	for <linux-block@archiver.kernel.org>; Sat,  2 Nov 2019 22:10:50 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 6B5F0CA9ED2
+	for <linux-block@archiver.kernel.org>; Sat,  2 Nov 2019 22:30:57 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.kernel.org (Postfix) with ESMTP id 0BC532084D
-	for <linux-block@archiver.kernel.org>; Sat,  2 Nov 2019 22:10:50 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=default; t=1572732650;
-	bh=uWJi/MwEfcXtvMshsyfTyXUwqGP5JBPovIygjDprHms=;
-	h=References:In-Reply-To:From:Date:Subject:To:Cc:List-ID:From;
-	b=2BQEXd4pLdBHqtM7cEWJrE5KwdxelWUNzdthW/Ym2oSOMTiwxILxOBLwz1S6txLcz
-	 ACZHhXxiFbqy9PBB3NbWqujcxOHiG3YdNlCQ2dEF0QOat3PxiAEJeNjbp8lixdrurM
-	 q8aFfjymte6UbZJhmZUoT3D9YA7W3sq5K7lRbh0U=
+	by mail.kernel.org (Postfix) with ESMTP id 3FB6320862
+	for <linux-block@archiver.kernel.org>; Sat,  2 Nov 2019 22:30:57 +0000 (UTC)
+Authentication-Results: mail.kernel.org;
+	dkim=pass (2048-bit key) header.d=amacapital-net.20150623.gappssmtp.com header.i=@amacapital-net.20150623.gappssmtp.com header.b="CkSX5kc/"
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1727198AbfKBWKt (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Sat, 2 Nov 2019 18:10:49 -0400
-Received: from mail-lj1-f196.google.com ([209.85.208.196]:37987 "EHLO
-        mail-lj1-f196.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1726675AbfKBWKt (ORCPT
-        <rfc822;linux-block@vger.kernel.org>); Sat, 2 Nov 2019 18:10:49 -0400
-Received: by mail-lj1-f196.google.com with SMTP id y23so13299722ljc.5
-        for <linux-block@vger.kernel.org>; Sat, 02 Nov 2019 15:10:47 -0700 (PDT)
+        id S1727270AbfKBWax (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Sat, 2 Nov 2019 18:30:53 -0400
+Received: from mail-pf1-f195.google.com ([209.85.210.195]:37293 "EHLO
+        mail-pf1-f195.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S1726907AbfKBWaw (ORCPT
+        <rfc822;linux-block@vger.kernel.org>); Sat, 2 Nov 2019 18:30:52 -0400
+Received: by mail-pf1-f195.google.com with SMTP id p24so2972479pfn.4
+        for <linux-block@vger.kernel.org>; Sat, 02 Nov 2019 15:30:52 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=linux-foundation.org; s=google;
-        h=mime-version:references:in-reply-to:from:date:message-id:subject:to
-         :cc:content-transfer-encoding;
-        bh=vTCI0qHuBsBb0Kz5RbeswHqlSoPusOsIRcj6s1CCCCU=;
-        b=XRll/5vMVkjx89KHnpq6WWB0oHHUpEHdiN6O6XIbNfDvJpLq9nAHdnvBRo0qcYtdlV
-         dDebt2KT4z/UoQ3oT2Pk6vWaFBXKSztN5uuRAQNTvGwr3g3jPPeee0pGSv+auGk2TkT9
-         /FiIqnPnAFsk6ubf5wFePKPpQhSpZfg8GPgik=
+        d=amacapital-net.20150623.gappssmtp.com; s=20150623;
+        h=content-transfer-encoding:from:mime-version:subject:date:message-id
+         :references:cc:in-reply-to:to;
+        bh=xB2VFGUZyiF2VFPR++wvNyybS4M2ews4nSbm+M32oPk=;
+        b=CkSX5kc/xSP4pt89qT83QwNwQ7pjcK33im2ZlbhbYQXnvP8/g2zNUH0NSVCIYSeeSq
+         j3Y5a76YdXpv39h+TCcl7eR3A2Zaq4m0LwZhwfjaSqxtIx+DoyS9Y8N34jYCjLZlOcpU
+         OacyhB7MI78+ikrdnLdb5UldAwtetjPopJeULyZutottZOgK28zSZK4tt8sPv8dzOYcJ
+         3h7oi0dTnHFvGd06RvAeCEs8oTRUkjWHbmdWP2/HCclucDdQa0KYua0Tf2SOsOmv0L2c
+         fwG5fQAv5NM6nNXrVTQh5NPv3OEq1btThojafBbfJ0IOFz01EE/XwSfA7caDXfwTSgL3
+         TBwQ==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=1e100.net; s=20161025;
-        h=x-gm-message-state:mime-version:references:in-reply-to:from:date
-         :message-id:subject:to:cc:content-transfer-encoding;
-        bh=vTCI0qHuBsBb0Kz5RbeswHqlSoPusOsIRcj6s1CCCCU=;
-        b=eCAXLMkYokjWO4Tf8ax17KmaGjYEX8/L3HqrK9EEw5QKY55tUUO9dEIrGQceOJa9Vt
-         dqola05RxolSMeTg2ZOCAZPeWlFLAdq3RH+K1VgJ66Aneb50uC5jg2B7yLMSlWxris3y
-         MMNLySP7tIIEW+6/7z2+Cjf2fvyvLMsbXNo0OiqIstRtf6Uh4A3M/e7+m/cKMsrrFRjO
-         4t4gfuy8IoLxw1IwNyXIcoOSIOUrto5stdeeQlDi+w96z1sl3VE3Sa+8ACijXyvAi/HB
-         Wf4wynt2zSORiYAWJI0ttku3TXgVqlS5K25Ucqrb5uYNpqVvFDGH3W3PPvx0LxRiND9L
-         sFEA==
-X-Gm-Message-State: APjAAAW4LFqSvnWKesLKJFKt5UlenvuwoRK/SR/9AW4ZNneTCLO+86qj
-        NnOe8DYtqOvn5sL3sD+7ikaRn02pCiY=
-X-Google-Smtp-Source: APXvYqxXFcp8umd2blHJbNQZJefGszqjmgAOKhYrhWN6STH80mUBcZlpNQPlazRwAEwNpPY7hd1xjA==
-X-Received: by 2002:a2e:2a42:: with SMTP id q63mr7770160ljq.180.1572732646836;
-        Sat, 02 Nov 2019 15:10:46 -0700 (PDT)
-Received: from mail-lj1-f170.google.com (mail-lj1-f170.google.com. [209.85.208.170])
-        by smtp.gmail.com with ESMTPSA id q15sm4152470lfb.84.2019.11.02.15.10.46
-        for <linux-block@vger.kernel.org>
+        h=x-gm-message-state:content-transfer-encoding:from:mime-version
+         :subject:date:message-id:references:cc:in-reply-to:to;
+        bh=xB2VFGUZyiF2VFPR++wvNyybS4M2ews4nSbm+M32oPk=;
+        b=TEcuXk4O05mI0UfmaiTOTZKxVX/HBvBebuRP9cdOofAmgOZASHWybnttit1kEB6URl
+         vehlSIQpOEOENjLkQk+MXsQ4vJpk1KVR3nrEfkhFPelxKH4R2443of8eRXj9WFMquh+c
+         dc9+RcmpQwWDGq/0ABQjOPIKaY0Y0k8dpN4JRzwcdbsaH8RDHY8REEbn39cC68Fgy5N+
+         JmZ2GtsgLh8gpn6+Fuf7HcYmRlGne/H5sM184KfwQu6tvetHmyN/bcMxERTSwnwSUUPY
+         jp6L7z0C1hYuYq2mH5kEgS6hs6i1mB9v/cHYjXGuPNVJkNDxEmya8wk56zxziyfLzZs9
+         +01g==
+X-Gm-Message-State: APjAAAUWbw/ammT3+Bpx1cgieesvytRSIfSgAv5l9OL+I5YwgoRw7wIs
+        o78DTUlxWiXYID2HpxANesrIDA==
+X-Google-Smtp-Source: APXvYqzDRQiggB/0IWOZncaQ86RpbPc/jYJAjFDxSvO1yjd56TQhdj02MFsX+oGquyWY0UEfcJYLwg==
+X-Received: by 2002:a63:cf46:: with SMTP id b6mr21945917pgj.90.1572733851860;
+        Sat, 02 Nov 2019 15:30:51 -0700 (PDT)
+Received: from ?IPv6:2600:1010:b067:e6ce:10dd:e058:94b7:feca? ([2600:1010:b067:e6ce:10dd:e058:94b7:feca])
+        by smtp.gmail.com with ESMTPSA id e17sm9438491pgg.5.2019.11.02.15.30.50
         (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
-        Sat, 02 Nov 2019 15:10:46 -0700 (PDT)
-Received: by mail-lj1-f170.google.com with SMTP id n5so2686031ljc.9
-        for <linux-block@vger.kernel.org>; Sat, 02 Nov 2019 15:10:46 -0700 (PDT)
-X-Received: by 2002:a2e:3e18:: with SMTP id l24mr13611187lja.48.1572732239632;
- Sat, 02 Nov 2019 15:03:59 -0700 (PDT)
-MIME-Version: 1.0
-References: <25886.1572723272@warthog.procyon.org.uk> <CC3328CC-2F05-461E-AAC3-8DEBAB1BA162@amacapital.net>
-In-Reply-To: <CC3328CC-2F05-461E-AAC3-8DEBAB1BA162@amacapital.net>
-From:   Linus Torvalds <torvalds@linux-foundation.org>
-Date:   Sat, 2 Nov 2019 15:03:43 -0700
-X-Gmail-Original-Message-ID: <CAHk-=wj1BLz6s9cG9Ptk4ULxrTy=MkF7ZH=HF67d7M5HL1fd_A@mail.gmail.com>
-Message-ID: <CAHk-=wj1BLz6s9cG9Ptk4ULxrTy=MkF7ZH=HF67d7M5HL1fd_A@mail.gmail.com>
+        Sat, 02 Nov 2019 15:30:50 -0700 (PDT)
+Content-Type: text/plain; charset=utf-8
+Content-Transfer-Encoding: quoted-printable
+From:   Andy Lutomirski <luto@amacapital.net>
+Mime-Version: 1.0 (1.0)
 Subject: Re: [RFC PATCH 11/10] pipe: Add fsync() support [ver #2]
-To:     Andy Lutomirski <luto@amacapital.net>
+Date:   Sat, 2 Nov 2019 15:30:49 -0700
+Message-Id: <E590C3AF-1D09-4927-B83F-DD0A6A148B6D@amacapital.net>
+References: <CAHk-=wj1BLz6s9cG9Ptk4ULxrTy=MkF7ZH=HF67d7M5HL1fd_A@mail.gmail.com>
 Cc:     David Howells <dhowells@redhat.com>,
         Konstantin Khlebnikov <khlebnikov@yandex-team.ru>,
         Rasmus Villemoes <linux@rasmusvillemoes.dk>,
@@ -83,25 +74,33 @@ Cc:     David Howells <dhowells@redhat.com>,
         linux-fsdevel <linux-fsdevel@vger.kernel.org>,
         Linux API <linux-api@vger.kernel.org>,
         Linux Kernel Mailing List <linux-kernel@vger.kernel.org>
-Content-Type: text/plain; charset="UTF-8"
-Content-Transfer-Encoding: quoted-printable
+In-Reply-To: <CAHk-=wj1BLz6s9cG9Ptk4ULxrTy=MkF7ZH=HF67d7M5HL1fd_A@mail.gmail.com>
+To:     Linus Torvalds <torvalds@linux-foundation.org>
+X-Mailer: iPhone Mail (17A878)
 Sender: linux-block-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-On Sat, Nov 2, 2019 at 1:31 PM Andy Lutomirski <luto@amacapital.net> wrote:
->
-> Add in the fact that it=E2=80=99s not obvious that vmsplice *can* be used=
- correctly, and I=E2=80=99m wondering if we should just remove it or make i=
-t just do write() under the hood.
 
-Sure it can. Just don't modify the data you vmsplice. It's really that simp=
-le.
 
-That said, if we don't have any actual users, then we should look at
-removing it (maybe turning it into "write()" as you say). Not because
-it's hard to use, but simply because it probably doesn't have that
-many uses.
+> On Nov 2, 2019, at 3:04 PM, Linus Torvalds <torvalds@linux-foundation.org>=
+ wrote:
+>=20
+> =EF=BB=BFOn Sat, Nov 2, 2019 at 1:31 PM Andy Lutomirski <luto@amacapital.n=
+et> wrote:
+>>=20
+>> Add in the fact that it=E2=80=99s not obvious that vmsplice *can* be used=
+ correctly, and I=E2=80=99m wondering if we should just remove it or make it=
+ just do write() under the hood.
+>=20
+> Sure it can. Just don't modify the data you vmsplice. It's really that sim=
+ple.
 
-               Linus
+So you allocate memory, vmsplice, and munmap() without reusing it?  Just pla=
+in free() won=E2=80=99t be good enough. I suspect the TLB overhead will make=
+ this a loss in most workloads?
+
+Or maybe you vmsplice from a read-only mapping of a file that you know no on=
+e modifies?  This could be useful, but you can just splice() from the file d=
+irectly.=
