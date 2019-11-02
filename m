@@ -7,68 +7,67 @@ X-Spam-Status: No, score=-0.9 required=3.0 tests=DKIMWL_WL_HIGH,DKIM_SIGNED,
 	SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED autolearn=no autolearn_force=no
 	version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id D97ECCA9EC7
-	for <linux-block@archiver.kernel.org>; Sat,  2 Nov 2019 22:09:31 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 39BC8CA9EC7
+	for <linux-block@archiver.kernel.org>; Sat,  2 Nov 2019 22:10:50 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.kernel.org (Postfix) with ESMTP id AEAF421783
-	for <linux-block@archiver.kernel.org>; Sat,  2 Nov 2019 22:09:31 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id 0BC532084D
+	for <linux-block@archiver.kernel.org>; Sat,  2 Nov 2019 22:10:50 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=default; t=1572732571;
-	bh=M91BK//G0AGxiPTVbAufD9sXjzn7Sec8N7JlW6FjSq0=;
+	s=default; t=1572732650;
+	bh=uWJi/MwEfcXtvMshsyfTyXUwqGP5JBPovIygjDprHms=;
 	h=References:In-Reply-To:From:Date:Subject:To:Cc:List-ID:From;
-	b=pHGpRSZYlI6dh5xZxoQtmZe42QoTMd5VwpYmwTeHMbi2xTsRugBaLPpXzc8MbnrwX
-	 bbT0yKKe/AgeXhWA+bCndCUraEo/wRdbBd5wjWPqKMYztq3JtNI1Ku1toV4BN2YJp6
-	 1Diy4j5oxqUxkMhWwAyb4BzyJa6BQHBiN8Eg56Hk=
+	b=2BQEXd4pLdBHqtM7cEWJrE5KwdxelWUNzdthW/Ym2oSOMTiwxILxOBLwz1S6txLcz
+	 ACZHhXxiFbqy9PBB3NbWqujcxOHiG3YdNlCQ2dEF0QOat3PxiAEJeNjbp8lixdrurM
+	 q8aFfjymte6UbZJhmZUoT3D9YA7W3sq5K7lRbh0U=
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1727130AbfKBWJb (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Sat, 2 Nov 2019 18:09:31 -0400
-Received: from mail-lj1-f195.google.com ([209.85.208.195]:46942 "EHLO
-        mail-lj1-f195.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1726762AbfKBWJa (ORCPT
-        <rfc822;linux-block@vger.kernel.org>); Sat, 2 Nov 2019 18:09:30 -0400
-Received: by mail-lj1-f195.google.com with SMTP id e9so395430ljp.13
-        for <linux-block@vger.kernel.org>; Sat, 02 Nov 2019 15:09:29 -0700 (PDT)
+        id S1727198AbfKBWKt (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Sat, 2 Nov 2019 18:10:49 -0400
+Received: from mail-lj1-f196.google.com ([209.85.208.196]:37987 "EHLO
+        mail-lj1-f196.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S1726675AbfKBWKt (ORCPT
+        <rfc822;linux-block@vger.kernel.org>); Sat, 2 Nov 2019 18:10:49 -0400
+Received: by mail-lj1-f196.google.com with SMTP id y23so13299722ljc.5
+        for <linux-block@vger.kernel.org>; Sat, 02 Nov 2019 15:10:47 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=linux-foundation.org; s=google;
         h=mime-version:references:in-reply-to:from:date:message-id:subject:to
          :cc:content-transfer-encoding;
-        bh=w/G6EKdeKHyA10XyqtoNEQBxMdg61j9NrYNZ+OC/8O0=;
-        b=fiTiutJMMhzHoUatnMj/i0xks6LRSmy0r7/BRz4Oo2NzE6YmtOVVD9WTTp3vp/4Ftl
-         susZvLuDrEDv2Y0EisfAoYbNX8c8ba0GWiLrv658sEXczCmotmacJTxLnXp7ikF2o1OS
-         tH5KGMhlSFlbvPUr5HFJ0KdvbB3vKmi6HfEto=
+        bh=vTCI0qHuBsBb0Kz5RbeswHqlSoPusOsIRcj6s1CCCCU=;
+        b=XRll/5vMVkjx89KHnpq6WWB0oHHUpEHdiN6O6XIbNfDvJpLq9nAHdnvBRo0qcYtdlV
+         dDebt2KT4z/UoQ3oT2Pk6vWaFBXKSztN5uuRAQNTvGwr3g3jPPeee0pGSv+auGk2TkT9
+         /FiIqnPnAFsk6ubf5wFePKPpQhSpZfg8GPgik=
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=1e100.net; s=20161025;
         h=x-gm-message-state:mime-version:references:in-reply-to:from:date
          :message-id:subject:to:cc:content-transfer-encoding;
-        bh=w/G6EKdeKHyA10XyqtoNEQBxMdg61j9NrYNZ+OC/8O0=;
-        b=d3B4yaS8Qoe1L3nuanBZQUzH8mDNZpweN5SY4lxYHY+I28fu7ZCNw5ginuKNNzMiVy
-         j7cAZNWZTf6GnF9co5x6d2asBV57S5lyAC92+gtGfjTG6kjSkYeTjrlPC/zRAo4q+LN6
-         Bg+6v3ggopC4etHowAV4KUrvZCrBhBuFi0MAb4AskijJBkw3gMYOpgKEBAMdIS4KfdLC
-         Y8ZbmFVFTv6PO5cSxlV+UfW0YEWAAKHIMSRZhqONCQ+0bVZb3KLXt3d9zP0Bn7GeaOiV
-         TMAVAN+pnHtgEvWuCfJkzpdAIBogGxd9zW5mQP7yXm2yhjO2dqgRrOJBJmSc9badqcrp
-         R2xg==
-X-Gm-Message-State: APjAAAUpI+wmcOZ8c8Ybz7UKahV3uaeFlZArSslqcoxFgQTT8AvB91MR
-        9CZehZyG5DY+A01nGC1AC8Mii0UORz8=
-X-Google-Smtp-Source: APXvYqwZAZXOq/EkAlbjz9HXh5NFRdQlHZ1WCoPAn90uL3SlTo/LRVfNBvhIJmv0VgIoRvY7Ha0pTQ==
-X-Received: by 2002:a2e:94c4:: with SMTP id r4mr13491247ljh.34.1572732568377;
-        Sat, 02 Nov 2019 15:09:28 -0700 (PDT)
-Received: from mail-lf1-f43.google.com (mail-lf1-f43.google.com. [209.85.167.43])
-        by smtp.gmail.com with ESMTPSA id q8sm3801866lfd.53.2019.11.02.15.09.25
+        bh=vTCI0qHuBsBb0Kz5RbeswHqlSoPusOsIRcj6s1CCCCU=;
+        b=eCAXLMkYokjWO4Tf8ax17KmaGjYEX8/L3HqrK9EEw5QKY55tUUO9dEIrGQceOJa9Vt
+         dqola05RxolSMeTg2ZOCAZPeWlFLAdq3RH+K1VgJ66Aneb50uC5jg2B7yLMSlWxris3y
+         MMNLySP7tIIEW+6/7z2+Cjf2fvyvLMsbXNo0OiqIstRtf6Uh4A3M/e7+m/cKMsrrFRjO
+         4t4gfuy8IoLxw1IwNyXIcoOSIOUrto5stdeeQlDi+w96z1sl3VE3Sa+8ACijXyvAi/HB
+         Wf4wynt2zSORiYAWJI0ttku3TXgVqlS5K25Ucqrb5uYNpqVvFDGH3W3PPvx0LxRiND9L
+         sFEA==
+X-Gm-Message-State: APjAAAW4LFqSvnWKesLKJFKt5UlenvuwoRK/SR/9AW4ZNneTCLO+86qj
+        NnOe8DYtqOvn5sL3sD+7ikaRn02pCiY=
+X-Google-Smtp-Source: APXvYqxXFcp8umd2blHJbNQZJefGszqjmgAOKhYrhWN6STH80mUBcZlpNQPlazRwAEwNpPY7hd1xjA==
+X-Received: by 2002:a2e:2a42:: with SMTP id q63mr7770160ljq.180.1572732646836;
+        Sat, 02 Nov 2019 15:10:46 -0700 (PDT)
+Received: from mail-lj1-f170.google.com (mail-lj1-f170.google.com. [209.85.208.170])
+        by smtp.gmail.com with ESMTPSA id q15sm4152470lfb.84.2019.11.02.15.10.46
         for <linux-block@vger.kernel.org>
         (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
-        Sat, 02 Nov 2019 15:09:26 -0700 (PDT)
-Received: by mail-lf1-f43.google.com with SMTP id j5so9583286lfh.10
-        for <linux-block@vger.kernel.org>; Sat, 02 Nov 2019 15:09:25 -0700 (PDT)
-X-Received: by 2002:a19:6f0e:: with SMTP id k14mr11937953lfc.79.1572732565288;
- Sat, 02 Nov 2019 15:09:25 -0700 (PDT)
+        Sat, 02 Nov 2019 15:10:46 -0700 (PDT)
+Received: by mail-lj1-f170.google.com with SMTP id n5so2686031ljc.9
+        for <linux-block@vger.kernel.org>; Sat, 02 Nov 2019 15:10:46 -0700 (PDT)
+X-Received: by 2002:a2e:3e18:: with SMTP id l24mr13611187lja.48.1572732239632;
+ Sat, 02 Nov 2019 15:03:59 -0700 (PDT)
 MIME-Version: 1.0
 References: <25886.1572723272@warthog.procyon.org.uk> <CC3328CC-2F05-461E-AAC3-8DEBAB1BA162@amacapital.net>
- <CAHk-=wj1BLz6s9cG9Ptk4ULxrTy=MkF7ZH=HF67d7M5HL1fd_A@mail.gmail.com>
-In-Reply-To: <CAHk-=wj1BLz6s9cG9Ptk4ULxrTy=MkF7ZH=HF67d7M5HL1fd_A@mail.gmail.com>
+In-Reply-To: <CC3328CC-2F05-461E-AAC3-8DEBAB1BA162@amacapital.net>
 From:   Linus Torvalds <torvalds@linux-foundation.org>
-Date:   Sat, 2 Nov 2019 15:09:09 -0700
-X-Gmail-Original-Message-ID: <CAHk-=wiNJYdEcomZKaD034S==-gEXg_V3JpW+DpKXFi5fJuruw@mail.gmail.com>
-Message-ID: <CAHk-=wiNJYdEcomZKaD034S==-gEXg_V3JpW+DpKXFi5fJuruw@mail.gmail.com>
+Date:   Sat, 2 Nov 2019 15:03:43 -0700
+X-Gmail-Original-Message-ID: <CAHk-=wj1BLz6s9cG9Ptk4ULxrTy=MkF7ZH=HF67d7M5HL1fd_A@mail.gmail.com>
+Message-ID: <CAHk-=wj1BLz6s9cG9Ptk4ULxrTy=MkF7ZH=HF67d7M5HL1fd_A@mail.gmail.com>
 Subject: Re: [RFC PATCH 11/10] pipe: Add fsync() support [ver #2]
 To:     Andy Lutomirski <luto@amacapital.net>
 Cc:     David Howells <dhowells@redhat.com>,
@@ -91,29 +90,18 @@ Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-On Sat, Nov 2, 2019 at 3:03 PM Linus Torvalds
-<torvalds@linux-foundation.org> wrote:
+On Sat, Nov 2, 2019 at 1:31 PM Andy Lutomirski <luto@amacapital.net> wrote:
 >
-> On Sat, Nov 2, 2019 at 1:31 PM Andy Lutomirski <luto@amacapital.net> wrot=
-e:
-> >
-> > Add in the fact that it=E2=80=99s not obvious that vmsplice *can* be us=
-ed correctly, and I=E2=80=99m wondering if we should just remove it or make=
- it just do write() under the hood.
->
-> Sure it can. Just don't modify the data you vmsplice. It's really that si=
-mple.
->
-> That said, if we don't have any actual users, then we should look at
-> removing it (maybe turning it into "write()" as you say). Not because
-> it's hard to use, but simply because it probably doesn't have that
-> many uses.
+> Add in the fact that it=E2=80=99s not obvious that vmsplice *can* be used=
+ correctly, and I=E2=80=99m wondering if we should just remove it or make i=
+t just do write() under the hood.
 
-Looking at debian code search, there are _some_ uses (including
-openssl and fuse):
+Sure it can. Just don't modify the data you vmsplice. It's really that simp=
+le.
 
-  https://codesearch.debian.net/search?q=3D%3D+vmsplice%28&literal=3D1
+That said, if we don't have any actual users, then we should look at
+removing it (maybe turning it into "write()" as you say). Not because
+it's hard to use, but simply because it probably doesn't have that
+many uses.
 
-but I didn't check any more closely what they do.
-
-             Linus
+               Linus
