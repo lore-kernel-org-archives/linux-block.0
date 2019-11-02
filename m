@@ -2,118 +2,204 @@ Return-Path: <SRS0=rsSL=Y2=vger.kernel.org=linux-block-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-2.3 required=3.0 tests=DKIM_SIGNED,DKIM_VALID,
-	HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,
-	USER_AGENT_SANE_1 autolearn=no autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-6.8 required=3.0 tests=DKIM_SIGNED,DKIM_VALID,
+	DKIM_VALID_AU,HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,
+	SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED autolearn=ham
+	autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id E3F65CA9ED1
-	for <linux-block@archiver.kernel.org>; Sat,  2 Nov 2019 03:01:43 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 57E6CCA9EC7
+	for <linux-block@archiver.kernel.org>; Sat,  2 Nov 2019 07:29:27 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.kernel.org (Postfix) with ESMTP id B9FB1208CB
-	for <linux-block@archiver.kernel.org>; Sat,  2 Nov 2019 03:01:43 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id 2500C204FD
+	for <linux-block@archiver.kernel.org>; Sat,  2 Nov 2019 07:29:27 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel-dk.20150623.gappssmtp.com header.i=@kernel-dk.20150623.gappssmtp.com header.b="h+MfaCg9"
+	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="DvTvVLKr"
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1728036AbfKBDBm (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Fri, 1 Nov 2019 23:01:42 -0400
-Received: from mail-pl1-f193.google.com ([209.85.214.193]:38281 "EHLO
-        mail-pl1-f193.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1728017AbfKBDBl (ORCPT
-        <rfc822;linux-block@vger.kernel.org>); Fri, 1 Nov 2019 23:01:41 -0400
-Received: by mail-pl1-f193.google.com with SMTP id w8so5143137plq.5
-        for <linux-block@vger.kernel.org>; Fri, 01 Nov 2019 20:01:41 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=kernel-dk.20150623.gappssmtp.com; s=20150623;
-        h=subject:to:cc:references:from:message-id:date:user-agent
-         :mime-version:in-reply-to:content-language:content-transfer-encoding;
-        bh=7NwBt9a6SQW1gZdGthoi1MUCZhj7J0hx7vs90QD7LPE=;
-        b=h+MfaCg927dhNpvl0H8VQw4r4ERYDqOec6spoW7SUz+tWBjXj/3hJEGDBjiAiT7AMC
-         IpnssFR1q2ahJkigI3Q2WIP8yfKNUHX5rJSoYCOE2YM4cLLxEsukdWowKlt/XgRLmEXw
-         tM//7cnLLFna2Rap3Y/iE9ddHqoql79nqwFqfwDSPFHuDEkhOk0CXYGG9PJ6K4odzqvh
-         WNLsPi9glnK7esFp1SHef7ClH/9U4ifHthMwo6pbj+nxKMXzBSsQ9F54l3eQueyvQMKs
-         jfAH3AxDNKLAoBCdm2Z8pIEKNdu1P0UooEOekRrpVxr1wlJ85b2eNgT8abOCDd3I1KlU
-         otzQ==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20161025;
-        h=x-gm-message-state:subject:to:cc:references:from:message-id:date
-         :user-agent:mime-version:in-reply-to:content-language
-         :content-transfer-encoding;
-        bh=7NwBt9a6SQW1gZdGthoi1MUCZhj7J0hx7vs90QD7LPE=;
-        b=gviaVYB9JDt6+2ej+Evh1LUDhYBNiEvGNUYMxyYUPoGtBoICToecjMEqqt6YeIuITl
-         Da4lNdIswWUYa6ZPLp67oO6E5Gf5ThxYuUr+Qb4/lt0tTB+uDYgOBfEdMuSKNabLnU8A
-         mICmFllB1NDCqhVUj6W1iY5bMcALrJ8WdFO3CJhjCWRf739AsBICoHOxpKpI1+/76Cue
-         3dzTdHHkz23CnHRND5Mk2pAD+S1wMEZFdpku4QYg9DJc3rFMR1NfwRNhEYPbf0l/vDJs
-         IqDoVtCWTnxzjvB/34TG9I/tCxhPUp3o4TJzQIh3ooO0yt2Osgo7PConYB2GOmrMHngm
-         z7lg==
-X-Gm-Message-State: APjAAAX/xS+n4QmPTVqPuqT7qvzupktRCIc7QaDoQUkEgeXWNrMpZdkR
-        EEROsFcji40gwEs3zutXHyt5LA==
-X-Google-Smtp-Source: APXvYqz3du8Nu9k+fUXmP6mr2iwTN2aAu0IEqPhw0GrrVGm8ADdK4T5H+F5WeWr42XXK+Dzp6tSURg==
-X-Received: by 2002:a17:902:8d8a:: with SMTP id v10mr16010030plo.32.1572663700720;
-        Fri, 01 Nov 2019 20:01:40 -0700 (PDT)
-Received: from [192.168.1.188] ([66.219.217.79])
-        by smtp.gmail.com with ESMTPSA id q6sm8368926pgn.44.2019.11.01.20.01.37
-        (version=TLS1_2 cipher=ECDHE-RSA-AES128-GCM-SHA256 bits=128/128);
-        Fri, 01 Nov 2019 20:01:39 -0700 (PDT)
-Subject: Re: [PATCH 0/8] Zone management commands support
-To:     Damien Le Moal <damien.lemoal@wdc.com>,
-        linux-block@vger.kernel.org, linux-scsi@vger.kernel.org,
-        "Martin K . Petersen" <martin.petersen@oracle.com>,
-        dm-devel@redhat.com, Mike Snitzer <snitzer@redhat.com>
-Cc:     Ajay Joshi <ajay.joshi@wdc.com>,
-        Matias Bjorling <matias.bjorling@wdc.com>,
-        Hans Holmberg <Hans.Holmberg@wdc.com>,
-        Dmitry Fomichev <dmitry.fomichev@wdc.com>,
-        Keith Busch <kbusch@kernel.org>
-References: <20191027140549.26272-1-damien.lemoal@wdc.com>
-From:   Jens Axboe <axboe@kernel.dk>
-Message-ID: <926948c1-d9a0-4156-4639-bbac1d0ba10b@kernel.dk>
-Date:   Fri, 1 Nov 2019 21:01:36 -0600
-User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:60.0) Gecko/20100101
- Thunderbird/60.9.0
+        id S1726080AbfKBH30 (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Sat, 2 Nov 2019 03:29:26 -0400
+Received: from us-smtp-2.mimecast.com ([205.139.110.61]:50232 "EHLO
+        us-smtp-delivery-1.mimecast.com" rhost-flags-OK-OK-OK-FAIL)
+        by vger.kernel.org with ESMTP id S1726044AbfKBH3Z (ORCPT
+        <rfc822;linux-block@vger.kernel.org>);
+        Sat, 2 Nov 2019 03:29:25 -0400
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+        s=mimecast20190719; t=1572679764;
+        h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+         to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+         content-transfer-encoding:content-transfer-encoding;
+        bh=A9cwAS22Zfye3HXHjRA4zltKe67K3yHMt5uOAr3t5kc=;
+        b=DvTvVLKrIREy25tEXt5e0ms/pkmTrba1GH1xjniYkPTAT6q1X4rqg0fdKpsBp86sbbnydT
+        Z9OQjNy7XvDtx3kKnA+KEw6qpNLiUNoDHpZeKhGKLO+avJNi71rb9UZXJ8B3YXW6Piw+3i
+        LRxbi3HXn/Vhok29lGo5QK0enpgp30Q=
+Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
+ [209.132.183.4]) (Using TLS) by relay.mimecast.com with ESMTP id
+ us-mta-246-k4eDnI7OO7eKA-GKA201nQ-1; Sat, 02 Nov 2019 03:29:20 -0400
+Received: from smtp.corp.redhat.com (int-mx08.intmail.prod.int.phx2.redhat.com [10.5.11.23])
+        (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
+        (No client certificate requested)
+        by mimecast-mx01.redhat.com (Postfix) with ESMTPS id AD1E58017E0;
+        Sat,  2 Nov 2019 07:29:19 +0000 (UTC)
+Received: from localhost (ovpn-8-18.pek2.redhat.com [10.72.8.18])
+        by smtp.corp.redhat.com (Postfix) with ESMTP id C1D7A26569;
+        Sat,  2 Nov 2019 07:29:15 +0000 (UTC)
+From:   Ming Lei <ming.lei@redhat.com>
+To:     Jens Axboe <axboe@kernel.dk>
+Cc:     linux-block@vger.kernel.org, Ming Lei <ming.lei@redhat.com>,
+        Coly Li <colyli@suse.de>,
+        Christoph Hellwig <hch@infradead.org>,
+        Keith Busch <kbusch@kernel.org>, linux-bcache@vger.kernel.org
+Subject: [PATCH V4] block: optimize for small block size IO
+Date:   Sat,  2 Nov 2019 15:29:11 +0800
+Message-Id: <20191102072911.24817-1-ming.lei@redhat.com>
 MIME-Version: 1.0
-In-Reply-To: <20191027140549.26272-1-damien.lemoal@wdc.com>
-Content-Type: text/plain; charset=utf-8
-Content-Language: en-US
-Content-Transfer-Encoding: 7bit
+X-Scanned-By: MIMEDefang 2.84 on 10.5.11.23
+X-MC-Unique: k4eDnI7OO7eKA-GKA201nQ-1
+X-Mimecast-Spam-Score: 0
+Content-Type: text/plain; charset=WINDOWS-1252
+Content-Transfer-Encoding: quoted-printable
 Sender: linux-block-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-On 10/27/19 8:05 AM, Damien Le Moal wrote:
-> This series implements a few improvements and cleanups to zone block
-> device zone reset operations with the first three patches.
-> 
-> The remaining of the series patches introduce zone open, close and
-> finish support, allowing users of zoned block devices to explicitly
-> control the condition (state) of zones.
-> 
-> While these operations are not stricktly necessary for the correct
-> operation of zoned block devices, the open and close operations can
-> improve performance for some device implementations of the ZBC and ZAC
-> standards under write workloads. The finish zone operation, which
-> transition a zone to the full state, can also be useful to protect a
-> zone data by preventing further zone writes.
-> 
-> These operations are implemented by introducing the new
-> REQ_OP_ZONE_OPEN, REQ_OP_ZONE_CLOSE and REQ_OP_ZONE_FINISH request codes
-> and the function blkdev_zone_mgmt() to issue these requests. This new
-> function also replaces the former blkdev_reset_zones() function to reset
-> zones write pointer.
-> 
-> The new ioctls BLKOPENZONE, BLKCLOSEZONE and BLKFINISHZONE are also
-> defined to allow applications to issue these new requests without
-> resorting to a device passthrough interface (e.g. SG_IO).
-> 
-> Support for these operations is added to the SCSI sd driver, to the dm
-> infrastructure (dm-linear and dm-flakey targets) and to the null_blk
-> driver.
+__blk_queue_split() may be a bit heavy for small block size(such as
+512B, or 4KB) IO, so introduce one flag to decide if this bio includes
+multiple page. And only consider to try splitting this bio in case
+that the multiple page flag is set.
 
-Can patch 3 go in separately, doesn't look like we need it in this
-series?
+~3% - 5% IOPS improvement can be observed on io_uring test over
+null_blk(MQ), and the io_uring test code is from fio/t/io_uring.c
 
-Also need the DM folks to review/sign off on patch 7. Mike?
+bch_bio_map() should be the only one which doesn't use bio_add_page(),
+so force to mark bio built via bch_bio_map() as MULTI_PAGE.
 
--- 
-Jens Axboe
+RAID5 has similar usage too, however the bio is really single-page bio,
+so not necessary to handle it.
+
+Cc: Coly Li <colyli@suse.de>
+Cc: Christoph Hellwig <hch@infradead.org>
+Cc: Keith Busch <kbusch@kernel.org>
+Cc: linux-bcache@vger.kernel.org
+Acked-by: Coly Li <colyli@suse.de>
+Signed-off-by: Ming Lei <ming.lei@redhat.com>
+---
+V4:
+=09- patch style chnage as suggested by Jens
+V3:
+=09- simplify check in __bio_add_page() as suggested by Christoph
+V2:
+=09- share bit flag with passthrough IO
+=09- deal with adding multipage in one bio_add_page()
+
+ block/bio.c               | 9 +++++++++
+ block/blk-merge.c         | 8 +++++++-
+ block/bounce.c            | 3 +++
+ drivers/md/bcache/util.c  | 2 ++
+ include/linux/blk_types.h | 3 +++
+ 5 files changed, 24 insertions(+), 1 deletion(-)
+
+diff --git a/block/bio.c b/block/bio.c
+index 8f0ed6228fc5..eeb81679689b 100644
+--- a/block/bio.c
++++ b/block/bio.c
+@@ -583,6 +583,8 @@ void __bio_clone_fast(struct bio *bio, struct bio *bio_=
+src)
+ =09bio_set_flag(bio, BIO_CLONED);
+ =09if (bio_flagged(bio_src, BIO_THROTTLED))
+ =09=09bio_set_flag(bio, BIO_THROTTLED);
++=09if (bio_flagged(bio_src, BIO_MULTI_PAGE))
++=09=09bio_set_flag(bio, BIO_MULTI_PAGE);
+ =09bio->bi_opf =3D bio_src->bi_opf;
+ =09bio->bi_ioprio =3D bio_src->bi_ioprio;
+ =09bio->bi_write_hint =3D bio_src->bi_write_hint;
+@@ -757,6 +759,9 @@ bool __bio_try_merge_page(struct bio *bio, struct page =
+*page,
+ =09=09if (page_is_mergeable(bv, page, len, off, same_page)) {
+ =09=09=09bv->bv_len +=3D len;
+ =09=09=09bio->bi_iter.bi_size +=3D len;
++
++=09=09=09if (!*same_page)
++=09=09=09=09bio_set_flag(bio, BIO_MULTI_PAGE);
+ =09=09=09return true;
+ =09=09}
+ =09}
+@@ -789,6 +794,10 @@ void __bio_add_page(struct bio *bio, struct page *page=
+,
+ =09bio->bi_iter.bi_size +=3D len;
+ =09bio->bi_vcnt++;
+=20
++=09if (!bio_flagged(bio, BIO_MULTI_PAGE) && (bio->bi_vcnt >=3D 2 ||
++=09=09=09=09bv->bv_len > PAGE_SIZE))
++=09=09bio_set_flag(bio, BIO_MULTI_PAGE);
++
+ =09if (!bio_flagged(bio, BIO_WORKINGSET) && unlikely(PageWorkingset(page))=
+)
+ =09=09bio_set_flag(bio, BIO_WORKINGSET);
+ }
+diff --git a/block/blk-merge.c b/block/blk-merge.c
+index 48e6725b32ee..b0670711dc54 100644
+--- a/block/blk-merge.c
++++ b/block/blk-merge.c
+@@ -309,7 +309,13 @@ void __blk_queue_split(struct request_queue *q, struct=
+ bio **bio,
+ =09=09=09=09nr_segs);
+ =09=09break;
+ =09default:
+-=09=09split =3D blk_bio_segment_split(q, *bio, &q->bio_split, nr_segs);
++=09=09if (!bio_flagged(*bio, BIO_MULTI_PAGE)) {
++=09=09=09*nr_segs =3D 1;
++=09=09=09split =3D NULL;
++=09=09} else {
++=09=09=09split =3D blk_bio_segment_split(q, *bio, &q->bio_split,
++=09=09=09=09=09nr_segs);
++=09=09}
+ =09=09break;
+ =09}
+=20
+diff --git a/block/bounce.c b/block/bounce.c
+index f8ed677a1bf7..4b18a2accccc 100644
+--- a/block/bounce.c
++++ b/block/bounce.c
+@@ -253,6 +253,9 @@ static struct bio *bounce_clone_bio(struct bio *bio_src=
+, gfp_t gfp_mask,
+ =09bio->bi_iter.bi_sector=09=3D bio_src->bi_iter.bi_sector;
+ =09bio->bi_iter.bi_size=09=3D bio_src->bi_iter.bi_size;
+=20
++=09if (bio_flagged(bio_src, BIO_MULTI_PAGE))
++=09=09bio_set_flag(bio, BIO_MULTI_PAGE);
++
+ =09switch (bio_op(bio)) {
+ =09case REQ_OP_DISCARD:
+ =09case REQ_OP_SECURE_ERASE:
+diff --git a/drivers/md/bcache/util.c b/drivers/md/bcache/util.c
+index 62fb917f7a4f..71f5cbb6fdd6 100644
+--- a/drivers/md/bcache/util.c
++++ b/drivers/md/bcache/util.c
+@@ -253,6 +253,8 @@ start:=09=09bv->bv_len=09=3D min_t(size_t, PAGE_SIZE - =
+bv->bv_offset,
+=20
+ =09=09size -=3D bv->bv_len;
+ =09}
++
++=09bio_set_flag(bio, BIO_MULTI_PAGE);
+ }
+=20
+ /**
+diff --git a/include/linux/blk_types.h b/include/linux/blk_types.h
+index d688b96d1d63..10b9a3539716 100644
+--- a/include/linux/blk_types.h
++++ b/include/linux/blk_types.h
+@@ -220,6 +220,9 @@ enum {
+ =09=09=09=09 * throttling rules. Don't do it again. */
+ =09BIO_TRACE_COMPLETION,=09/* bio_endio() should trace the final completio=
+n
+ =09=09=09=09 * of this bio. */
++=09BIO_MULTI_PAGE =3D BIO_USER_MAPPED,
++=09=09=09=09/* used for optimize small BS IO from FS, so
++=09=09=09=09 * share the bit flag with passthrough IO */
+ =09BIO_QUEUE_ENTERED,=09/* can use blk_queue_enter_live() */
+ =09BIO_TRACKED,=09=09/* set if bio goes through the rq_qos path */
+ =09BIO_FLAG_LAST
+--=20
+2.20.1
 
