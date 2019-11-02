@@ -1,102 +1,106 @@
-Return-Path: <SRS0=SIFN=YZ=vger.kernel.org=linux-block-owner@kernel.org>
+Return-Path: <SRS0=rsSL=Y2=vger.kernel.org=linux-block-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
 X-Spam-Status: No, score=-0.9 required=3.0 tests=DKIMWL_WL_HIGH,DKIM_SIGNED,
 	DKIM_VALID,DKIM_VALID_AU,HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,
-	SPF_HELO_NONE,SPF_PASS autolearn=no autolearn_force=no version=3.4.0
+	SPF_HELO_NONE,SPF_PASS,UNPARSEABLE_RELAY autolearn=no autolearn_force=no
+	version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id CAACCCA9ECF
-	for <linux-block@archiver.kernel.org>; Fri,  1 Nov 2019 22:12:57 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 37A64CA9ECF
+	for <linux-block@archiver.kernel.org>; Sat,  2 Nov 2019 00:42:43 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.kernel.org (Postfix) with ESMTP id 9D68C21897
-	for <linux-block@archiver.kernel.org>; Fri,  1 Nov 2019 22:12:57 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=default; t=1572646377;
-	bh=R3zHF33lXpbXV7nnsIRwzSf5C2VJ9cDXB6diPjhN9b0=;
-	h=References:In-Reply-To:From:Date:Subject:To:Cc:List-ID:From;
-	b=Ch6dE+nc8yMgbytezpO588YiblLJHdWTAIZUvDCQO6N7M82V+iudg2WhRpJBqmskk
-	 JBKcARPl8x+qiNgBdgxE73wQrREdjRl85S4Pt+/SmxqUVETu5WJLtOm5z1deZxOk7M
-	 5BPr5y5j6RPLLAoRo7bc8DOLox6VI9M50jyqrYUc=
+	by mail.kernel.org (Postfix) with ESMTP id 0A87921855
+	for <linux-block@archiver.kernel.org>; Sat,  2 Nov 2019 00:42:43 +0000 (UTC)
+Authentication-Results: mail.kernel.org;
+	dkim=pass (2048-bit key) header.d=oracle.com header.i=@oracle.com header.b="S8Vj9IUI"
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1728137AbfKAWMx (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Fri, 1 Nov 2019 18:12:53 -0400
-Received: from mail-lj1-f194.google.com ([209.85.208.194]:37105 "EHLO
-        mail-lj1-f194.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1727270AbfKAWMo (ORCPT
-        <rfc822;linux-block@vger.kernel.org>); Fri, 1 Nov 2019 18:12:44 -0400
-Received: by mail-lj1-f194.google.com with SMTP id v2so11695179lji.4
-        for <linux-block@vger.kernel.org>; Fri, 01 Nov 2019 15:12:43 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=linux-foundation.org; s=google;
-        h=mime-version:references:in-reply-to:from:date:message-id:subject:to
-         :cc;
-        bh=sgYt+P3xDWHpqkCDVDLjgLKgMrsRwGebg6HQkCjAc5w=;
-        b=O3mYYvlU9vmiWCuVM7D5zeynWjET9sBTNe2UP3ZA3GeXbBriHFMqoPk2kJgyTgcAeI
-         BstBtBLU16kkJaWSMcP9+57VaYHHgUIqojJCqULremk/l27m2Dlyko2Sd9hhC3Y74UKd
-         ZPG4og+yRVtEHOd/O+5D/qMCxYtxUKUSxHi24=
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20161025;
-        h=x-gm-message-state:mime-version:references:in-reply-to:from:date
-         :message-id:subject:to:cc;
-        bh=sgYt+P3xDWHpqkCDVDLjgLKgMrsRwGebg6HQkCjAc5w=;
-        b=Sv9oyyuzAx7w6913aignzqCcGf3oHw/mfn8TdxkBeId/Wxsd/iyl+ojHCpXVnZBkby
-         JJkFMl9CWwe/KVMsKMHPxkPNx7PyOQGTZVRnNeLtc5glec0Nqisml6QnC8QyOv7minCW
-         pEwvoRaZdu0zbz2T1IcH568Su8ejAlNrMpNpX9g0YK5Q4UZkAarqy7LvdVUGVzWP8zJj
-         qN9X2jrXqXb/hwPHkXFpfRhMhNECio3C+153umgKZDyaI8v36XMf9MiJP4M473ykGDXn
-         lQIAZA6jMn1EEaLoROeQ5Ac6UqUHd5pWbYTjTrDZvATr1X/QnTcrfETWFpgb9xJSDPiK
-         4DXg==
-X-Gm-Message-State: APjAAAWtmCoDvbd0+XFEYybeQEJg7/ltnANkpPAkauheYSst4ewPB3AN
-        /qGMT5JwhBTf4ETDEymXzwhfVLSHPFY=
-X-Google-Smtp-Source: APXvYqydAU1WxGb4r86WMgLzrL9qRdd2aoUBeSLJzmgTLBh5RlTh+a2l06igJQihe7HzzJSus++Qvg==
-X-Received: by 2002:a2e:6817:: with SMTP id c23mr9541624lja.91.1572646362695;
-        Fri, 01 Nov 2019 15:12:42 -0700 (PDT)
-Received: from mail-lf1-f45.google.com (mail-lf1-f45.google.com. [209.85.167.45])
-        by smtp.gmail.com with ESMTPSA id t4sm2771024lji.40.2019.11.01.15.12.40
-        for <linux-block@vger.kernel.org>
-        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
-        Fri, 01 Nov 2019 15:12:40 -0700 (PDT)
-Received: by mail-lf1-f45.google.com with SMTP id b20so8256771lfp.4
-        for <linux-block@vger.kernel.org>; Fri, 01 Nov 2019 15:12:40 -0700 (PDT)
-X-Received: by 2002:a19:6f0e:: with SMTP id k14mr8678681lfc.79.1572646359613;
- Fri, 01 Nov 2019 15:12:39 -0700 (PDT)
+        id S1727003AbfKBAmm (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Fri, 1 Nov 2019 20:42:42 -0400
+Received: from userp2120.oracle.com ([156.151.31.85]:41584 "EHLO
+        userp2120.oracle.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S1726932AbfKBAmm (ORCPT
+        <rfc822;linux-block@vger.kernel.org>); Fri, 1 Nov 2019 20:42:42 -0400
+Received: from pps.filterd (userp2120.oracle.com [127.0.0.1])
+        by userp2120.oracle.com (8.16.0.27/8.16.0.27) with SMTP id xA20dTF3004856;
+        Sat, 2 Nov 2019 00:42:27 GMT
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=oracle.com; h=to : cc : subject :
+ from : references : date : in-reply-to : message-id : mime-version :
+ content-type; s=corp-2019-08-05;
+ bh=t3d7xeWdGyMMWUSqoY0kLd/hJVMSXOD6Uv9p01WX4iI=;
+ b=S8Vj9IUI4I9+CsKPuldTRe5YJIddBMrpCoO7+B3OUYqeQor9mfmbCoLnngEV8W4roQrJ
+ F2J+v9WB9ao99v16gIwl8lbp9uyM6CLSAerqtKIN+63SosYuwghSro6sIGUBX8AOHdiu
+ aNjR2dluJ1E5K9MTz6LSTTZic8Qraxax3HxjUEXmkc3Ldw5CHHYm64eE3Ttp4+6JWOgx
+ rkBGD23B3Q3soiq8LOANbu1jRyArKfe4+yySuIABR0qOqb7PVtKUO1+QvoSgw6SmuZsb
+ b3w1AY1zwoNEfBIvECkWzeCOn5IrZHxenoeybQN4WGUqHu5F3rLIKtY/aB6GIEeh+l7N Rw== 
+Received: from aserp3020.oracle.com (aserp3020.oracle.com [141.146.126.70])
+        by userp2120.oracle.com with ESMTP id 2vxwhg4hyx-1
+        (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=OK);
+        Sat, 02 Nov 2019 00:42:26 +0000
+Received: from pps.filterd (aserp3020.oracle.com [127.0.0.1])
+        by aserp3020.oracle.com (8.16.0.27/8.16.0.27) with SMTP id xA20biEM186416;
+        Sat, 2 Nov 2019 00:42:26 GMT
+Received: from userv0122.oracle.com (userv0122.oracle.com [156.151.31.75])
+        by aserp3020.oracle.com with ESMTP id 2w0rusg813-1
+        (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=OK);
+        Sat, 02 Nov 2019 00:42:25 +0000
+Received: from abhmp0014.oracle.com (abhmp0014.oracle.com [141.146.116.20])
+        by userv0122.oracle.com (8.14.4/8.14.4) with ESMTP id xA20gNBC029418;
+        Sat, 2 Nov 2019 00:42:24 GMT
+Received: from ca-mkp.ca.oracle.com (/10.159.214.123)
+        by default (Oracle Beehive Gateway v4.0)
+        with ESMTP ; Fri, 01 Nov 2019 17:42:23 -0700
+To:     Damien Le Moal <damien.lemoal@wdc.com>
+Cc:     linux-block@vger.kernel.org, Jens Axboe <axboe@kernel.dk>,
+        linux-scsi@vger.kernel.org,
+        "Martin K . Petersen" <martin.petersen@oracle.com>,
+        dm-devel@redhat.com, Mike Snitzer <snitzer@redhat.com>,
+        Ajay Joshi <ajay.joshi@wdc.com>,
+        Matias Bjorling <matias.bjorling@wdc.com>,
+        Hans Holmberg <Hans.Holmberg@wdc.com>,
+        Dmitry Fomichev <dmitry.fomichev@wdc.com>,
+        Keith Busch <kbusch@kernel.org>
+Subject: Re: [PATCH 3/8] scsi: sd_zbc: Fix sd_zbc_complete()
+From:   "Martin K. Petersen" <martin.petersen@oracle.com>
+Organization: Oracle Corporation
+References: <20191027140549.26272-1-damien.lemoal@wdc.com>
+        <20191027140549.26272-4-damien.lemoal@wdc.com>
+Date:   Fri, 01 Nov 2019 20:42:19 -0400
+In-Reply-To: <20191027140549.26272-4-damien.lemoal@wdc.com> (Damien Le Moal's
+        message of "Sun, 27 Oct 2019 23:05:44 +0900")
+Message-ID: <yq1k18j5ct0.fsf@oracle.com>
+User-Agent: Gnus/5.13 (Gnus v5.13) Emacs/26.1.92 (gnu/linux)
 MIME-Version: 1.0
-References: <157262963995.13142.5568934007158044624.stgit@warthog.procyon.org.uk>
- <CAHk-=wjqx4j2vqg-tAwthNP1gcAcj1x4B7sq6Npbi8QJTUMd-A@mail.gmail.com> <13964.1572645926@warthog.procyon.org.uk>
-In-Reply-To: <13964.1572645926@warthog.procyon.org.uk>
-From:   Linus Torvalds <torvalds@linux-foundation.org>
-Date:   Fri, 1 Nov 2019 15:12:23 -0700
-X-Gmail-Original-Message-ID: <CAHk-=wg_Fb-WdcD-cbJjwZaPCNK4WZ+Ak4KTSDhopD-_=+t=9Q@mail.gmail.com>
-Message-ID: <CAHk-=wg_Fb-WdcD-cbJjwZaPCNK4WZ+Ak4KTSDhopD-_=+t=9Q@mail.gmail.com>
-Subject: Re: [RFC PATCH 00/11] pipe: Notification queue preparation [ver #3]
-To:     David Howells <dhowells@redhat.com>
-Cc:     Rasmus Villemoes <linux@rasmusvillemoes.dk>,
-        Greg Kroah-Hartman <gregkh@linuxfoundation.org>,
-        Peter Zijlstra <peterz@infradead.org>,
-        Nicolas Dichtel <nicolas.dichtel@6wind.com>, raven@themaw.net,
-        Christian Brauner <christian@brauner.io>,
-        keyrings@vger.kernel.org, linux-usb@vger.kernel.org,
-        linux-block <linux-block@vger.kernel.org>,
-        LSM List <linux-security-module@vger.kernel.org>,
-        linux-fsdevel <linux-fsdevel@vger.kernel.org>,
-        Linux API <linux-api@vger.kernel.org>,
-        Linux Kernel Mailing List <linux-kernel@vger.kernel.org>
-Content-Type: text/plain; charset="UTF-8"
+Content-Type: text/plain
+X-Proofpoint-Virus-Version: vendor=nai engine=6000 definitions=9428 signatures=668685
+X-Proofpoint-Spam-Details: rule=notspam policy=default score=0 suspectscore=0 malwarescore=0
+ phishscore=0 bulkscore=0 spamscore=0 mlxscore=0 mlxlogscore=914
+ adultscore=0 classifier=spam adjust=0 reason=mlx scancount=1
+ engine=8.0.1-1908290000 definitions=main-1911020001
+X-Proofpoint-Virus-Version: vendor=nai engine=6000 definitions=9428 signatures=668685
+X-Proofpoint-Spam-Details: rule=notspam policy=default score=0 priorityscore=1501 malwarescore=0
+ suspectscore=0 phishscore=0 bulkscore=0 spamscore=0 clxscore=1011
+ lowpriorityscore=0 mlxscore=0 impostorscore=0 mlxlogscore=995 adultscore=0
+ classifier=spam adjust=0 reason=mlx scancount=1 engine=8.0.1-1908290000
+ definitions=main-1911020001
 Sender: linux-block-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-On Fri, Nov 1, 2019 at 3:05 PM David Howells <dhowells@redhat.com> wrote:
+
+Damien,
+
+> The ILLEGAL REQUEST/INVALID FIELD IN CDB error generated by an attempt
+> to reset a conventional zone does not apply to the reset write pointer
+> command with the ALL bit set, that is, to REQ_OP_ZONE_RESET_ALL
+> requests. Fix sd_zbc_complete() to be quiet only in the case of
+> REQ_OP_ZONE_RESET, excluding REQ_OP_ZONE_RESET_ALL.
 >
-> Changing those to non-sync:
+> Since REQ_OP_ZONE_RESET is the only request handled by
+> sd_zbc_complete(), also simplify the code using a simple if statement.
 
-Your benchmark seems very insensitive to just about any changes.
+Reviewed-by: Martin K. Petersen <martin.petersen@oracle.com>
 
-I suspect it is because you only test throughput. Latency is what the
-pipe wakeup has been optimized for, and which tends to be much more
-sensitive to other changes too (eg locking).
-
-That said, I'm not convinced a latency test would show much either.
-
-               Linus
+-- 
+Martin K. Petersen	Oracle Linux Engineering
