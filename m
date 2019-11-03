@@ -2,283 +2,175 @@ Return-Path: <SRS0=L9ug=Y3=vger.kernel.org=linux-block-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-9.8 required=3.0 tests=DKIMWL_WL_HIGH,DKIM_SIGNED,
-	DKIM_VALID,DKIM_VALID_AU,HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,
-	MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED,
-	USER_AGENT_GIT autolearn=unavailable autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-0.8 required=3.0 tests=DKIM_SIGNED,DKIM_VALID,
+	HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS
+	autolearn=no autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id B22BECA9ED2
-	for <linux-block@archiver.kernel.org>; Sun,  3 Nov 2019 21:21:33 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 7BD58C47E49
+	for <linux-block@archiver.kernel.org>; Sun,  3 Nov 2019 23:41:22 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.kernel.org (Postfix) with ESMTP id 8644521A4A
-	for <linux-block@archiver.kernel.org>; Sun,  3 Nov 2019 21:21:33 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id 4ED32222C5
+	for <linux-block@archiver.kernel.org>; Sun,  3 Nov 2019 23:41:22 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=pass (2048-bit key) header.d=nvidia.com header.i=@nvidia.com header.b="QLZo4I75"
+	dkim=fail reason="signature verification failed" (2048-bit key) header.d=wdc.com header.i=@wdc.com header.b="P6C93TEv";
+	dkim=pass (1024-bit key) header.d=sharedspace.onmicrosoft.com header.i=@sharedspace.onmicrosoft.com header.b="F35nGXR5"
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1728728AbfKCVVL (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Sun, 3 Nov 2019 16:21:11 -0500
-Received: from hqemgate16.nvidia.com ([216.228.121.65]:10563 "EHLO
-        hqemgate16.nvidia.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1728243AbfKCVSS (ORCPT
-        <rfc822;linux-block@vger.kernel.org>); Sun, 3 Nov 2019 16:18:18 -0500
-Received: from hqpgpgate101.nvidia.com (Not Verified[216.228.121.13]) by hqemgate16.nvidia.com (using TLS: TLSv1.2, DES-CBC3-SHA)
-        id <B5dbf441f0000>; Sun, 03 Nov 2019 13:18:23 -0800
-Received: from hqmail.nvidia.com ([172.20.161.6])
-  by hqpgpgate101.nvidia.com (PGP Universal service);
-  Sun, 03 Nov 2019 13:18:16 -0800
-X-PGP-Universal: processed;
-        by hqpgpgate101.nvidia.com on Sun, 03 Nov 2019 13:18:16 -0800
-Received: from HQMAIL101.nvidia.com (172.20.187.10) by HQMAIL107.nvidia.com
- (172.20.187.13) with Microsoft SMTP Server (TLS) id 15.0.1473.3; Sun, 3 Nov
- 2019 21:18:16 +0000
-Received: from hqnvemgw01.nvidia.com (172.20.150.20) by HQMAIL101.nvidia.com
- (172.20.187.10) with Microsoft SMTP Server (TLS) id 15.0.1473.3 via Frontend
- Transport; Sun, 3 Nov 2019 21:18:16 +0000
-Received: from blueforge.nvidia.com (Not Verified[10.110.48.28]) by hqnvemgw01.nvidia.com with Trustwave SEG (v7,5,8,10121)
-        id <B5dbf44180000>; Sun, 03 Nov 2019 13:18:16 -0800
-From:   John Hubbard <jhubbard@nvidia.com>
-To:     Andrew Morton <akpm@linux-foundation.org>
-CC:     Al Viro <viro@zeniv.linux.org.uk>,
-        Alex Williamson <alex.williamson@redhat.com>,
-        Benjamin Herrenschmidt <benh@kernel.crashing.org>,
-        =?UTF-8?q?Bj=C3=B6rn=20T=C3=B6pel?= <bjorn.topel@intel.com>,
-        Christoph Hellwig <hch@infradead.org>,
-        Dan Williams <dan.j.williams@intel.com>,
-        Daniel Vetter <daniel@ffwll.ch>,
-        Dave Chinner <david@fromorbit.com>,
-        David Airlie <airlied@linux.ie>,
-        "David S . Miller" <davem@davemloft.net>,
-        Ira Weiny <ira.weiny@intel.com>, Jan Kara <jack@suse.cz>,
-        Jason Gunthorpe <jgg@ziepe.ca>, Jens Axboe <axboe@kernel.dk>,
-        Jonathan Corbet <corbet@lwn.net>,
-        =?UTF-8?q?J=C3=A9r=C3=B4me=20Glisse?= <jglisse@redhat.com>,
-        Magnus Karlsson <magnus.karlsson@intel.com>,
-        Mauro Carvalho Chehab <mchehab@kernel.org>,
-        Michael Ellerman <mpe@ellerman.id.au>,
-        Michal Hocko <mhocko@suse.com>,
-        Mike Kravetz <mike.kravetz@oracle.com>,
-        Paul Mackerras <paulus@samba.org>,
-        Shuah Khan <shuah@kernel.org>,
-        Vlastimil Babka <vbabka@suse.cz>, <bpf@vger.kernel.org>,
-        <dri-devel@lists.freedesktop.org>, <kvm@vger.kernel.org>,
-        <linux-block@vger.kernel.org>, <linux-doc@vger.kernel.org>,
-        <linux-fsdevel@vger.kernel.org>, <linux-kselftest@vger.kernel.org>,
-        <linux-media@vger.kernel.org>, <linux-rdma@vger.kernel.org>,
-        <linuxppc-dev@lists.ozlabs.org>, <netdev@vger.kernel.org>,
-        <linux-mm@kvack.org>, LKML <linux-kernel@vger.kernel.org>,
-        John Hubbard <jhubbard@nvidia.com>
-Subject: [PATCH v2 07/18] infiniband: set FOLL_PIN, FOLL_LONGTERM via pin_longterm_pages*()
-Date:   Sun, 3 Nov 2019 13:18:02 -0800
-Message-ID: <20191103211813.213227-8-jhubbard@nvidia.com>
-X-Mailer: git-send-email 2.23.0
-In-Reply-To: <20191103211813.213227-1-jhubbard@nvidia.com>
-References: <20191103211813.213227-1-jhubbard@nvidia.com>
-MIME-Version: 1.0
-X-NVConfidentiality: public
+        id S1728241AbfKCXlV (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Sun, 3 Nov 2019 18:41:21 -0500
+Received: from esa6.hgst.iphmx.com ([216.71.154.45]:64478 "EHLO
+        esa6.hgst.iphmx.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S1728100AbfKCXlV (ORCPT
+        <rfc822;linux-block@vger.kernel.org>); Sun, 3 Nov 2019 18:41:21 -0500
+DKIM-Signature: v=1; a=rsa-sha256; c=simple/simple;
+  d=wdc.com; i=@wdc.com; q=dns/txt; s=dkim.wdc.com;
+  t=1572824480; x=1604360480;
+  h=from:to:cc:subject:date:message-id:references:
+   content-transfer-encoding:mime-version;
+  bh=FjbMQJA+PDaoGe1ecwD7f+W6g1PYMWWc8dgTsvNMU6I=;
+  b=P6C93TEva8R94+JKqvojHR5vzENDUiuVuHxoT3dU4EnP1cle6AcVN3mO
+   LC5MrJTCb4P1uIYMnhIvDU6tIpBrNDRzUswDKXWhqxbzKdqj+SQs5wqvR
+   h5sLAGO/jPGHdBT6QsrwaDB+UaGR431k3pkqQW99QjJd4ogZkEpVEAQtI
+   V+Q4fwx0pdQK3dFtCwj8YNWkkF0dOH4YknfXSzrKXAXzObMtMdzUB5DWO
+   GOUssSz7pkMIlox3ZEb7Ww22/fg/c23leE/5Pg2DO7SX52mZ48AheXlEs
+   4icQCbI48/V95LY/PpA83oFheprgtnQCjfFfTG3ViRSOdIWVN7SmY+HhQ
+   Q==;
+IronPort-SDR: 3RA3metdOtbRAnQPpBez5/glnU7eC9ZYTCaImobvQtRz1ziPNnvGGMEskqMRL07Tkx0rqyrEYz
+ SsuTFatMW7TZzyfWBMtXcmJeFjoJKI26GcRIPknpj5v9KmI+f/qULA4RGDoH+RpeBkUs3/58Po
+ uZpG3oxXVDWEQTYRWXH64Oi1hZgs2OPOmU5hXlTnRjYAY+xKLiSYfbK3/fvQvui6iuYnPz+Ju/
+ MCPcmyZ0TeEpBhN2pxwFvJskxonjcoEGEnXxMgkGQew8/fbT/WMZyBcOda/c2W97S6NCZ5Rx/b
+ GW0=
+X-IronPort-AV: E=Sophos;i="5.68,265,1569254400"; 
+   d="scan'208";a="123601446"
+Received: from mail-sn1nam01lp2050.outbound.protection.outlook.com (HELO NAM01-SN1-obe.outbound.protection.outlook.com) ([104.47.32.50])
+  by ob1.hgst.iphmx.com with ESMTP; 04 Nov 2019 07:41:12 +0800
+ARC-Seal: i=1; a=rsa-sha256; s=arcselector9901; d=microsoft.com; cv=none;
+ b=R3FfZiUEwR0ikCYf1/fB/Ur7sM09YP4F1yR2ZinEkcn2q2y1RMtlfQ0Y1n39OZOReADne1ChvfWOWW1ff/fhdnJqyB5OVn8/TD1hq5UNIAdNV/bJS2NIe27BcKBojSiJgxNc3auC1g8+688xuTYHRyJQ1LaTa34es59u7vm6bqv7Q6W+TlDXd0G+csVsZGjptd7FyKjl5SYjrEW9dqZRRA2/eJyZH4ODOJQrcXuWjfckVpTTZ27mbNvU56RgrTF6oddEnhygZQ62x9rgfnqOY1to8aaIiKYSGh5VSHRAbekstS7RVKzFOCD6Qp1gyTOvRePMKJJI9DIUPWVRcQshTA==
+ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com;
+ s=arcselector9901;
+ h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
+ bh=FjbMQJA+PDaoGe1ecwD7f+W6g1PYMWWc8dgTsvNMU6I=;
+ b=Da5Aw1UFci6rzsPdmTLmQohBPn7hrBvn22R0RJoxIugADW+kACC31T/jjmMlJouTaF6hRrtO2NcVMtDe/vUz1Ep0qdH20keSw5CN3oaR1a0yU+7fCDsKLJb0GVaqBSoLuQJe2PVg4CIuGsdUaZOakSSoB8w84n5RDHqjt8QlvffS1uxwLWnoj3horifTU6FFxO5NNEXn44t8DUKEAKoPPcAp3AXC7G52cXyFSvZ4ieGsyMPKvhSnqtuDkwHB4h9NjNDwqFFIVaqOLM7m+urgbAD+Z2VAUHeu/99pHBHJTdpwq0ABSZgwzFFxS01T4FiSHjebqk0BjWhkieRF8f3DEg==
+ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass
+ smtp.mailfrom=wdc.com; dmarc=pass action=none header.from=wdc.com; dkim=pass
+ header.d=wdc.com; arc=none
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+ d=sharedspace.onmicrosoft.com; s=selector2-sharedspace-onmicrosoft-com;
+ h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
+ bh=FjbMQJA+PDaoGe1ecwD7f+W6g1PYMWWc8dgTsvNMU6I=;
+ b=F35nGXR5QBrAfdxTQAwazlN4Q6DKGmNTmyjPlvGBe5uRS+ytEX7hru3BBIpI+a+e45lpucGMsFY7/mgIGB952SXJ1yA2XoCPfxmW73QqRGV5vJVbRbWWPEgk5xuOxg5QuW1qVFNC85AaWQ/KjLbfVkzy9gWRY2PkuDOYwyBGUGU=
+Received: from BYAPR04MB5816.namprd04.prod.outlook.com (20.179.59.16) by
+ BYAPR04MB5734.namprd04.prod.outlook.com (20.179.57.141) with Microsoft SMTP
+ Server (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
+ 15.20.2408.24; Sun, 3 Nov 2019 23:41:11 +0000
+Received: from BYAPR04MB5816.namprd04.prod.outlook.com
+ ([fe80::4176:5eda:76a2:3c40]) by BYAPR04MB5816.namprd04.prod.outlook.com
+ ([fe80::4176:5eda:76a2:3c40%7]) with mapi id 15.20.2408.024; Sun, 3 Nov 2019
+ 23:41:11 +0000
+From:   Damien Le Moal <Damien.LeMoal@wdc.com>
+To:     Jens Axboe <axboe@kernel.dk>,
+        "linux-block@vger.kernel.org" <linux-block@vger.kernel.org>,
+        "linux-scsi@vger.kernel.org" <linux-scsi@vger.kernel.org>,
+        "Martin K . Petersen" <martin.petersen@oracle.com>,
+        "dm-devel@redhat.com" <dm-devel@redhat.com>,
+        Mike Snitzer <snitzer@redhat.com>
+CC:     Ajay Joshi <Ajay.Joshi@wdc.com>,
+        Matias Bjorling <Matias.Bjorling@wdc.com>,
+        Hans Holmberg <Hans.Holmberg@wdc.com>,
+        Dmitry Fomichev <Dmitry.Fomichev@wdc.com>,
+        Keith Busch <kbusch@kernel.org>
+Subject: Re: [PATCH 0/8] Zone management commands support
+Thread-Topic: [PATCH 0/8] Zone management commands support
+Thread-Index: AQHVjM+oAfCMB+wY1ka3IBKYRZIZ0Q==
+Date:   Sun, 3 Nov 2019 23:41:10 +0000
+Message-ID: <BYAPR04MB5816539DCBED2D2C93254D36E77C0@BYAPR04MB5816.namprd04.prod.outlook.com>
+References: <20191027140549.26272-1-damien.lemoal@wdc.com>
+ <926948c1-d9a0-4156-4639-bbac1d0ba10b@kernel.dk>
+Accept-Language: en-US
+Content-Language: en-US
+X-MS-Has-Attach: 
+X-MS-TNEF-Correlator: 
+authentication-results: spf=none (sender IP is )
+ smtp.mailfrom=Damien.LeMoal@wdc.com; 
+x-originating-ip: [129.253.182.57]
+x-ms-publictraffictype: Email
+x-ms-office365-filtering-ht: Tenant
+x-ms-office365-filtering-correlation-id: a88d0958-bd26-4d7e-b958-08d760b74e98
+x-ms-traffictypediagnostic: BYAPR04MB5734:
+x-ms-exchange-transport-forked: True
+x-microsoft-antispam-prvs: <BYAPR04MB573452863D7844CA4245D21DE77C0@BYAPR04MB5734.namprd04.prod.outlook.com>
+wdcipoutbound: EOP-TRUE
+x-ms-oob-tlc-oobclassifiers: OLM:6430;
+x-forefront-prvs: 0210479ED8
+x-forefront-antispam-report: SFV:NSPM;SFS:(10019020)(4636009)(376002)(346002)(396003)(366004)(136003)(39860400002)(189003)(199004)(3846002)(186003)(86362001)(25786009)(14444005)(6116002)(256004)(2201001)(99286004)(81166006)(2906002)(9686003)(305945005)(486006)(66446008)(66556008)(66476007)(476003)(64756008)(66946007)(33656002)(8936002)(76116006)(26005)(52536014)(4326008)(5660300002)(8676002)(81156014)(74316002)(446003)(6246003)(6506007)(7696005)(76176011)(2501003)(66066001)(316002)(110136005)(14454004)(54906003)(71200400001)(229853002)(71190400001)(102836004)(6436002)(478600001)(7736002)(55016002)(53546011);DIR:OUT;SFP:1102;SCL:1;SRVR:BYAPR04MB5734;H:BYAPR04MB5816.namprd04.prod.outlook.com;FPR:;SPF:None;LANG:en;PTR:InfoNoRecords;MX:1;A:1;
+x-ms-exchange-senderadcheck: 1
+x-microsoft-antispam: BCL:0;
+x-microsoft-antispam-message-info: eOzYf57toL1AKGCDZx++mIWl7VMjC/ZgcK5/bZtLQ9oCKJMHWpiFbqYc/mUwywpIHosKzKzaYWJKa83J1nTgNL2BNqkNtZ7vIGmZ3GEDg2jgr3UY51gbxguXRldTbEBEW5RyXSGpC/HT/3xlS3bRo7djhMTZj9wRvyrsS4dBnLsCPXoN9r193AsJhqOvc2eD08BovH6exUnTkstkHJY5Sdn3/zaoxvkccNoO3zKCwWMLjyNzMm9jx0VNQi+LDsHCPa46wG+57gpdhFbTkxSqbRgN9q6odvZFMdRmbpG0avN4eczSpg4G5QjzYjOLSWbwQSUe6yJmYkxkt0oMljbpbH9z+XySF+QllfVNnX14enRI0QpLoVRiRbT9NDk7fnb/Tajet90uQc/NdASDQTtHEKn3y/7MymEzI3/Wg2QQtwp3W7I7H2p0VaXTskPo29gn
+Content-Type: text/plain; charset="us-ascii"
 Content-Transfer-Encoding: quoted-printable
-Content-Type: text/plain
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=nvidia.com; s=n1;
-        t=1572815903; bh=q5eBvxC1C1PTwlbM8+ph/cSmourLvxGkHvyzzyTytVY=;
-        h=X-PGP-Universal:From:To:CC:Subject:Date:Message-ID:X-Mailer:
-         In-Reply-To:References:MIME-Version:X-NVConfidentiality:
-         Content-Transfer-Encoding:Content-Type;
-        b=QLZo4I75fQbU6x5SpUwhO8h8SsKUtRLOKJdI3V62uxuAy7pO1Gkel03ilx+XywV3X
-         ybgfMhso8zS2aRMAjtEFwz9dJ40E4oBvysR+G/BLQmgdbObHUJXOpsOaqImlrMrSz+
-         ukshjiVbipqCRRpMLuDIzBTwP3RtehQ9A2/CyH+hgI+iVATGuCJHES45noXAL8Bpcu
-         VwgVjDjvndiTfNRlscSQCEU5nHRTxK75HTjFkX9AinkIpPIR96OHlrYN1CIAR3SWUd
-         qE90/gKvqZfbQ8tzggAUGZbY/gfVoeYGzuVKirkUme8A3ATMCc8HzWuB/nk83/Qfqk
-         jSXtqtn+h9KFA==
+MIME-Version: 1.0
+X-OriginatorOrg: wdc.com
+X-MS-Exchange-CrossTenant-Network-Message-Id: a88d0958-bd26-4d7e-b958-08d760b74e98
+X-MS-Exchange-CrossTenant-originalarrivaltime: 03 Nov 2019 23:41:10.7099
+ (UTC)
+X-MS-Exchange-CrossTenant-fromentityheader: Hosted
+X-MS-Exchange-CrossTenant-id: b61c8803-16f3-4c35-9b17-6f65f441df86
+X-MS-Exchange-CrossTenant-mailboxtype: HOSTED
+X-MS-Exchange-CrossTenant-userprincipalname: 7Ijp9lkpOM5w+1pqWaDL1i+EX2fnRSsxfdicJk18jQVvihj6bN6kpCR+bx/naevzyCPgZxzudncBy31lw0t4Pw==
+X-MS-Exchange-Transport-CrossTenantHeadersStamped: BYAPR04MB5734
 Sender: linux-block-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-Convert infiniband to use the new wrapper calls, and stop
-explicitly setting FOLL_LONGTERM at the call sites.
-
-The new pin_longterm_*() calls replace get_user_pages*()
-calls, and set both FOLL_LONGTERM and a new FOLL_PIN
-flag. The FOLL_PIN flag requires that the caller must
-return the pages via put_user_page*() calls, but
-infiniband was already doing that as part of an earlier
-commit.
-
-Reviewed-by: Ira Weiny <ira.weiny@intel.com>
-Signed-off-by: John Hubbard <jhubbard@nvidia.com>
----
- drivers/infiniband/core/umem.c              |  5 ++---
- drivers/infiniband/core/umem_odp.c          | 10 +++++-----
- drivers/infiniband/hw/hfi1/user_pages.c     |  4 ++--
- drivers/infiniband/hw/mthca/mthca_memfree.c |  3 +--
- drivers/infiniband/hw/qib/qib_user_pages.c  |  8 ++++----
- drivers/infiniband/hw/qib/qib_user_sdma.c   |  2 +-
- drivers/infiniband/hw/usnic/usnic_uiom.c    |  9 ++++-----
- drivers/infiniband/sw/siw/siw_mem.c         |  5 ++---
- 8 files changed, 21 insertions(+), 25 deletions(-)
-
-diff --git a/drivers/infiniband/core/umem.c b/drivers/infiniband/core/umem.=
-c
-index 24244a2f68cc..c5a78d3e674b 100644
---- a/drivers/infiniband/core/umem.c
-+++ b/drivers/infiniband/core/umem.c
-@@ -272,11 +272,10 @@ struct ib_umem *ib_umem_get(struct ib_udata *udata, u=
-nsigned long addr,
-=20
- 	while (npages) {
- 		down_read(&mm->mmap_sem);
--		ret =3D get_user_pages(cur_base,
-+		ret =3D pin_longterm_pages(cur_base,
- 				     min_t(unsigned long, npages,
- 					   PAGE_SIZE / sizeof (struct page *)),
--				     gup_flags | FOLL_LONGTERM,
--				     page_list, NULL);
-+				     gup_flags, page_list, NULL);
- 		if (ret < 0) {
- 			up_read(&mm->mmap_sem);
- 			goto umem_release;
-diff --git a/drivers/infiniband/core/umem_odp.c b/drivers/infiniband/core/u=
-mem_odp.c
-index 163ff7ba92b7..a38b67b83db5 100644
---- a/drivers/infiniband/core/umem_odp.c
-+++ b/drivers/infiniband/core/umem_odp.c
-@@ -534,7 +534,7 @@ static int ib_umem_odp_map_dma_single_page(
- 	} else if (umem_odp->page_list[page_index] =3D=3D page) {
- 		umem_odp->dma_list[page_index] |=3D access_mask;
- 	} else {
--		pr_err("error: got different pages in IB device and from get_user_pages.=
- IB device page: %p, gup page: %p\n",
-+		pr_err("error: got different pages in IB device and from pin_longterm_pa=
-ges. IB device page: %p, gup page: %p\n",
- 		       umem_odp->page_list[page_index], page);
- 		/* Better remove the mapping now, to prevent any further
- 		 * damage. */
-@@ -639,11 +639,11 @@ int ib_umem_odp_map_dma_pages(struct ib_umem_odp *ume=
-m_odp, u64 user_virt,
- 		/*
- 		 * Note: this might result in redundent page getting. We can
- 		 * avoid this by checking dma_list to be 0 before calling
--		 * get_user_pages. However, this make the code much more
--		 * complex (and doesn't gain us much performance in most use
--		 * cases).
-+		 * pin_longterm_pages. However, this makes the code much
-+		 * more complex (and doesn't gain us much performance in most
-+		 * use cases).
- 		 */
--		npages =3D get_user_pages_remote(owning_process, owning_mm,
-+		npages =3D pin_longterm_pages_remote(owning_process, owning_mm,
- 				user_virt, gup_num_pages,
- 				flags, local_page_list, NULL, NULL);
- 		up_read(&owning_mm->mmap_sem);
-diff --git a/drivers/infiniband/hw/hfi1/user_pages.c b/drivers/infiniband/h=
-w/hfi1/user_pages.c
-index 469acb961fbd..9b55b0a73e29 100644
---- a/drivers/infiniband/hw/hfi1/user_pages.c
-+++ b/drivers/infiniband/hw/hfi1/user_pages.c
-@@ -104,9 +104,9 @@ int hfi1_acquire_user_pages(struct mm_struct *mm, unsig=
-ned long vaddr, size_t np
- 			    bool writable, struct page **pages)
- {
- 	int ret;
--	unsigned int gup_flags =3D FOLL_LONGTERM | (writable ? FOLL_WRITE : 0);
-+	unsigned int gup_flags =3D (writable ? FOLL_WRITE : 0);
-=20
--	ret =3D get_user_pages_fast(vaddr, npages, gup_flags, pages);
-+	ret =3D pin_longterm_pages_fast(vaddr, npages, gup_flags, pages);
- 	if (ret < 0)
- 		return ret;
-=20
-diff --git a/drivers/infiniband/hw/mthca/mthca_memfree.c b/drivers/infiniba=
-nd/hw/mthca/mthca_memfree.c
-index edccfd6e178f..beec7e4b8a96 100644
---- a/drivers/infiniband/hw/mthca/mthca_memfree.c
-+++ b/drivers/infiniband/hw/mthca/mthca_memfree.c
-@@ -472,8 +472,7 @@ int mthca_map_user_db(struct mthca_dev *dev, struct mth=
-ca_uar *uar,
- 		goto out;
- 	}
-=20
--	ret =3D get_user_pages_fast(uaddr & PAGE_MASK, 1,
--				  FOLL_WRITE | FOLL_LONGTERM, pages);
-+	ret =3D pin_longterm_pages_fast(uaddr & PAGE_MASK, 1, FOLL_WRITE, pages);
- 	if (ret < 0)
- 		goto out;
-=20
-diff --git a/drivers/infiniband/hw/qib/qib_user_pages.c b/drivers/infiniban=
-d/hw/qib/qib_user_pages.c
-index 6bf764e41891..684a14e14d9b 100644
---- a/drivers/infiniband/hw/qib/qib_user_pages.c
-+++ b/drivers/infiniband/hw/qib/qib_user_pages.c
-@@ -108,10 +108,10 @@ int qib_get_user_pages(unsigned long start_page, size=
-_t num_pages,
-=20
- 	down_read(&current->mm->mmap_sem);
- 	for (got =3D 0; got < num_pages; got +=3D ret) {
--		ret =3D get_user_pages(start_page + got * PAGE_SIZE,
--				     num_pages - got,
--				     FOLL_LONGTERM | FOLL_WRITE | FOLL_FORCE,
--				     p + got, NULL);
-+		ret =3D pin_longterm_pages(start_page + got * PAGE_SIZE,
-+					 num_pages - got,
-+					 FOLL_WRITE | FOLL_FORCE,
-+					 p + got, NULL);
- 		if (ret < 0) {
- 			up_read(&current->mm->mmap_sem);
- 			goto bail_release;
-diff --git a/drivers/infiniband/hw/qib/qib_user_sdma.c b/drivers/infiniband=
-/hw/qib/qib_user_sdma.c
-index 05190edc2611..fd86a9d19370 100644
---- a/drivers/infiniband/hw/qib/qib_user_sdma.c
-+++ b/drivers/infiniband/hw/qib/qib_user_sdma.c
-@@ -670,7 +670,7 @@ static int qib_user_sdma_pin_pages(const struct qib_dev=
-data *dd,
- 		else
- 			j =3D npages;
-=20
--		ret =3D get_user_pages_fast(addr, j, FOLL_LONGTERM, pages);
-+		ret =3D pin_longterm_pages_fast(addr, j, 0, pages);
- 		if (ret !=3D j) {
- 			i =3D 0;
- 			j =3D ret;
-diff --git a/drivers/infiniband/hw/usnic/usnic_uiom.c b/drivers/infiniband/=
-hw/usnic/usnic_uiom.c
-index 62e6ffa9ad78..6b90ca1c3771 100644
---- a/drivers/infiniband/hw/usnic/usnic_uiom.c
-+++ b/drivers/infiniband/hw/usnic/usnic_uiom.c
-@@ -141,11 +141,10 @@ static int usnic_uiom_get_pages(unsigned long addr, s=
-ize_t size, int writable,
- 	ret =3D 0;
-=20
- 	while (npages) {
--		ret =3D get_user_pages(cur_base,
--				     min_t(unsigned long, npages,
--				     PAGE_SIZE / sizeof(struct page *)),
--				     gup_flags | FOLL_LONGTERM,
--				     page_list, NULL);
-+		ret =3D pin_longterm_pages(cur_base,
-+					 min_t(unsigned long, npages,
-+					     PAGE_SIZE / sizeof(struct page *)),
-+					 gup_flags, page_list, NULL);
-=20
- 		if (ret < 0)
- 			goto out;
-diff --git a/drivers/infiniband/sw/siw/siw_mem.c b/drivers/infiniband/sw/si=
-w/siw_mem.c
-index e99983f07663..20e663d7ada8 100644
---- a/drivers/infiniband/sw/siw/siw_mem.c
-+++ b/drivers/infiniband/sw/siw/siw_mem.c
-@@ -426,9 +426,8 @@ struct siw_umem *siw_umem_get(u64 start, u64 len, bool =
-writable)
- 		while (nents) {
- 			struct page **plist =3D &umem->page_chunk[i].plist[got];
-=20
--			rv =3D get_user_pages(first_page_va, nents,
--					    foll_flags | FOLL_LONGTERM,
--					    plist, NULL);
-+			rv =3D pin_longterm_pages(first_page_va, nents,
-+						foll_flags, plist, NULL);
- 			if (rv < 0)
- 				goto out_sem_up;
-=20
---=20
-2.23.0
-
+On 2019/11/02 4:01, Jens Axboe wrote:=0A=
+> On 10/27/19 8:05 AM, Damien Le Moal wrote:=0A=
+>> This series implements a few improvements and cleanups to zone block=0A=
+>> device zone reset operations with the first three patches.=0A=
+>>=0A=
+>> The remaining of the series patches introduce zone open, close and=0A=
+>> finish support, allowing users of zoned block devices to explicitly=0A=
+>> control the condition (state) of zones.=0A=
+>>=0A=
+>> While these operations are not stricktly necessary for the correct=0A=
+>> operation of zoned block devices, the open and close operations can=0A=
+>> improve performance for some device implementations of the ZBC and ZAC=
+=0A=
+>> standards under write workloads. The finish zone operation, which=0A=
+>> transition a zone to the full state, can also be useful to protect a=0A=
+>> zone data by preventing further zone writes.=0A=
+>>=0A=
+>> These operations are implemented by introducing the new=0A=
+>> REQ_OP_ZONE_OPEN, REQ_OP_ZONE_CLOSE and REQ_OP_ZONE_FINISH request codes=
+=0A=
+>> and the function blkdev_zone_mgmt() to issue these requests. This new=0A=
+>> function also replaces the former blkdev_reset_zones() function to reset=
+=0A=
+>> zones write pointer.=0A=
+>>=0A=
+>> The new ioctls BLKOPENZONE, BLKCLOSEZONE and BLKFINISHZONE are also=0A=
+>> defined to allow applications to issue these new requests without=0A=
+>> resorting to a device passthrough interface (e.g. SG_IO).=0A=
+>>=0A=
+>> Support for these operations is added to the SCSI sd driver, to the dm=
+=0A=
+>> infrastructure (dm-linear and dm-flakey targets) and to the null_blk=0A=
+>> driver.=0A=
+> =0A=
+> Can patch 3 go in separately, doesn't look like we need it in this=0A=
+> series?=0A=
+=0A=
+Yes, I think it can go in now in 5.4-rc if Martin is willing to take it.=0A=
+That will create a small conflict in your tree for patch 6 though.=0A=
+=0A=
+Martin,=0A=
+=0A=
+Can you take patch 3 now ?=0A=
+=0A=
+> =0A=
+> Also need the DM folks to review/sign off on patch 7. Mike?=0A=
+> =0A=
+=0A=
+=0A=
+-- =0A=
+Damien Le Moal=0A=
+Western Digital Research=0A=
