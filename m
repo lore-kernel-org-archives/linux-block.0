@@ -2,112 +2,127 @@ Return-Path: <SRS0=59TO=Y4=vger.kernel.org=linux-block-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-8.3 required=3.0 tests=DKIMWL_WL_HIGH,DKIM_SIGNED,
-	DKIM_VALID,DKIM_VALID_AU,HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,
-	MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,UNPARSEABLE_RELAY,
-	USER_AGENT_SANE_1 autolearn=ham autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-5.4 required=3.0 tests=FROM_LOCAL_HEX,
+	HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,MENTIONS_GIT_HOSTING,
+	SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED autolearn=unavailable autolearn_force=no
+	version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 4E45CCA9EA0
-	for <linux-block@archiver.kernel.org>; Mon,  4 Nov 2019 10:18:31 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id ECBA4CA9EA0
+	for <linux-block@archiver.kernel.org>; Mon,  4 Nov 2019 11:29:13 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.kernel.org (Postfix) with ESMTP id 20BED21929
-	for <linux-block@archiver.kernel.org>; Mon,  4 Nov 2019 10:18:31 +0000 (UTC)
-Authentication-Results: mail.kernel.org;
-	dkim=pass (2048-bit key) header.d=oracle.com header.i=@oracle.com header.b="ACMDSvzQ"
+	by mail.kernel.org (Postfix) with ESMTP id CDD25222C1
+	for <linux-block@archiver.kernel.org>; Mon,  4 Nov 2019 11:29:13 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1727236AbfKDKSa (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Mon, 4 Nov 2019 05:18:30 -0500
-Received: from userp2130.oracle.com ([156.151.31.86]:58830 "EHLO
-        userp2130.oracle.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1726633AbfKDKSa (ORCPT
-        <rfc822;linux-block@vger.kernel.org>); Mon, 4 Nov 2019 05:18:30 -0500
-Received: from pps.filterd (userp2130.oracle.com [127.0.0.1])
-        by userp2130.oracle.com (8.16.0.27/8.16.0.27) with SMTP id xA4A8Geg180234;
-        Mon, 4 Nov 2019 10:18:21 GMT
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=oracle.com; h=date : from : to : cc
- : subject : message-id : mime-version : content-type : in-reply-to;
- s=corp-2019-08-05; bh=n4z6yY3cjmuea5DEJWf/55zw6urF7hHTqiKHjMTvZmI=;
- b=ACMDSvzQ7F42D+/QznGerfRA5g/qmKY/Ss2aYWGsxNzcgk7Bw6A4ryooByiHaXCtRqW9
- QndKOQGQ3k3+nR4Ac31PFa1QPXDuaD7q0FvSVsZ/sXHP4LEDX6Veq+3KZ5jCg+qojghv
- XT3oxjiKkTnCv86ShKARfAOhlBvfj8IQXdDeBBJPmGabm4qZfvRWcLamWudKluTlS7QB
- acVMcACAgilO+uNML5R63guKok2XVidOH5b91uHqkKW27JUlBUD9qlY07d4Am9ecPG3C
- wCcF99SYNp5TV+qlAnjmnA8Kl+HpnMGq93xAzVtU1BSF7CLswk7cGr/Ep2dr26KefLc+ TQ== 
-Received: from userp3030.oracle.com (userp3030.oracle.com [156.151.31.80])
-        by userp2130.oracle.com with ESMTP id 2w117tpamk-1
-        (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=OK);
-        Mon, 04 Nov 2019 10:18:21 +0000
-Received: from pps.filterd (userp3030.oracle.com [127.0.0.1])
-        by userp3030.oracle.com (8.16.0.27/8.16.0.27) with SMTP id xA4A7cMO177113;
-        Mon, 4 Nov 2019 10:18:21 GMT
-Received: from userv0121.oracle.com (userv0121.oracle.com [156.151.31.72])
-        by userp3030.oracle.com with ESMTP id 2w1k8ughp9-1
-        (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=OK);
-        Mon, 04 Nov 2019 10:18:20 +0000
-Received: from abhmp0003.oracle.com (abhmp0003.oracle.com [141.146.116.9])
-        by userv0121.oracle.com (8.14.4/8.13.8) with ESMTP id xA4AIIo3015795;
-        Mon, 4 Nov 2019 10:18:18 GMT
-Received: from mwanda (/41.57.98.10)
-        by default (Oracle Beehive Gateway v4.0)
-        with ESMTP ; Mon, 04 Nov 2019 02:18:18 -0800
-Date:   Mon, 4 Nov 2019 13:18:11 +0300
-From:   Dan Carpenter <dan.carpenter@oracle.com>
-To:     Jens Axboe <axboe@kernel.dk>, Jeff Moyer <jmoyer@redhat.com>
-Cc:     linux-block@vger.kernel.org, linux-kernel@vger.kernel.org,
-        kernel-janitors@vger.kernel.org
-Subject: [PATCH] iocost: add a comment about locking in ioc_weight_write()
-Message-ID: <20191104101811.GA20821@mwanda>
+        id S1728648AbfKDL3K (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Mon, 4 Nov 2019 06:29:10 -0500
+Received: from mail-io1-f72.google.com ([209.85.166.72]:38813 "EHLO
+        mail-io1-f72.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S1727782AbfKDL3K (ORCPT
+        <rfc822;linux-block@vger.kernel.org>); Mon, 4 Nov 2019 06:29:10 -0500
+Received: by mail-io1-f72.google.com with SMTP id c2so12925178ioc.5
+        for <linux-block@vger.kernel.org>; Mon, 04 Nov 2019 03:29:08 -0800 (PST)
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20161025;
+        h=x-gm-message-state:mime-version:date:message-id:subject:from:to;
+        bh=RIm6RUmV98ceI6JpEEZxU6F8gTuyxH9inbdlIYhEiEE=;
+        b=RD+q4S6yvBY23JxKXTw0J6cS94dhL2qe8j5RNMmu63kmRPywenx5Hx4AARhdZ2oq/J
+         dy8Eh75igeME2ApqORCYCNpYoHRiSgT6D4KMXavkWcGc10aij1/b9lQ8H50Nybhf6G9L
+         wTCUvxoWhQ+wRHbEx2J0n10Ynaav7Fgrbla1ky1BibMVMWujdEFI5rrhjD0rq+8DYO+V
+         J/MQAwY0T+3PZUWesb3VdDZJll8yMsJK7Uq8wfn4npLWrlhZsAMT3dgPmWpNlmvyNS93
+         W6k3LJFdXDFinpydiYcNaBTV5+KqtlHMvZ/PtmTEX6PxFCQOfKa5tkxC1odEYYDsYlzY
+         Okug==
+X-Gm-Message-State: APjAAAW77x5rsFkUdmBpSMuHlCVwyDpUX9V8XdJGullG4oLBXGwJuzC7
+        f68ZsqQLbsTZIXdDzGhma1E5m/OuGfHFnA4MFocDT1QsU4TN
+X-Google-Smtp-Source: APXvYqxuMRooZI5EVRwo9a2FtTxWSKBlbUNC3S+1y488ojt53I2BesR3VcyVnHGw27gL3vdrKMwKKXrA0YrYbfmYif4c1ZYsljLJ
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <x49d0ebd2sl.fsf@segfault.boston.devel.redhat.com>
-X-Mailer: git-send-email haha only kidding
-User-Agent: Mutt/1.10.1 (2018-07-13)
-X-Proofpoint-Virus-Version: vendor=nai engine=6000 definitions=9430 signatures=668685
-X-Proofpoint-Spam-Details: rule=notspam policy=default score=0 suspectscore=0 malwarescore=0
- phishscore=0 bulkscore=0 spamscore=0 mlxscore=0 mlxlogscore=999
- adultscore=0 classifier=spam adjust=0 reason=mlx scancount=1
- engine=8.0.1-1908290000 definitions=main-1911040101
-X-Proofpoint-Virus-Version: vendor=nai engine=6000 definitions=9430 signatures=668685
-X-Proofpoint-Spam-Details: rule=notspam policy=default score=0 priorityscore=1501 malwarescore=0
- suspectscore=0 phishscore=0 bulkscore=0 spamscore=0 clxscore=1011
- lowpriorityscore=0 mlxscore=0 impostorscore=0 mlxlogscore=999 adultscore=0
- classifier=spam adjust=0 reason=mlx scancount=1 engine=8.0.1-1908290000
- definitions=main-1911040101
+X-Received: by 2002:a02:9f8b:: with SMTP id a11mr1433768jam.10.1572866947906;
+ Mon, 04 Nov 2019 03:29:07 -0800 (PST)
+Date:   Mon, 04 Nov 2019 03:29:07 -0800
+X-Google-Appengine-App-Id: s~syzkaller
+X-Google-Appengine-App-Id-Alias: syzkaller
+Message-ID: <000000000000b587670596839fab@google.com>
+Subject: KCSAN: data-race in process_srcu / synchronize_srcu
+From:   syzbot <syzbot+08f3e9d26e5541e1ecf2@syzkaller.appspotmail.com>
+To:     axboe@kernel.dk, elver@google.com, justin@coraid.com,
+        linux-block@vger.kernel.org, linux-kernel@vger.kernel.org,
+        syzkaller-bugs@googlegroups.com
+Content-Type: text/plain; charset="UTF-8"; format=flowed; delsp=yes
 Sender: linux-block-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-It wasn't very clear that blkg_conf_prep() disables IRQ and that they
-are enabled in blkg_conf_finish() so this patch adds a comment about it.
+Hello,
 
-Signed-off-by: Dan Carpenter <dan.carpenter@oracle.com>
+syzbot found the following crash on:
+
+HEAD commit:    05f22368 x86, kcsan: Enable KCSAN for x86
+git tree:       https://github.com/google/ktsan.git kcsan
+console output: https://syzkaller.appspot.com/x/log.txt?x=17ade7ef600000
+kernel config:  https://syzkaller.appspot.com/x/.config?x=87d111955f40591f
+dashboard link: https://syzkaller.appspot.com/bug?extid=08f3e9d26e5541e1ecf2
+compiler:       gcc (GCC) 9.0.0 20181231 (experimental)
+
+Unfortunately, I don't have any reproducer for this crash yet.
+
+IMPORTANT: if you fix the bug, please add the following tag to the commit:
+Reported-by: syzbot+08f3e9d26e5541e1ecf2@syzkaller.appspotmail.com
+
+==================================================================
+BUG: KCSAN: data-race in process_srcu / synchronize_srcu
+
+write to 0xffffffff8604e8a0 of 8 bytes by task 17 on cpu 1:
+  srcu_gp_end kernel/rcu/srcutree.c:533 [inline]
+  srcu_advance_state kernel/rcu/srcutree.c:1146 [inline]
+  process_srcu+0x207/0x780 kernel/rcu/srcutree.c:1237
+  process_one_work+0x3d4/0x890 kernel/workqueue.c:2269
+  worker_thread+0xa0/0x800 kernel/workqueue.c:2415
+  kthread+0x1d4/0x200 drivers/block/aoe/aoecmd.c:1253
+  ret_from_fork+0x1f/0x30 arch/x86/entry/entry_64.S:352
+
+read to 0xffffffff8604e8a0 of 8 bytes by task 12515 on cpu 0:
+  srcu_might_be_idle kernel/rcu/srcutree.c:784 [inline]
+  synchronize_srcu+0x107/0x214 kernel/rcu/srcutree.c:996
+  fsnotify_connector_destroy_workfn+0x63/0xb0 fs/notify/mark.c:164
+  process_one_work+0x3d4/0x890 kernel/workqueue.c:2269
+  worker_thread+0xa0/0x800 kernel/workqueue.c:2415
+  kthread+0x1d4/0x200 drivers/block/aoe/aoecmd.c:1253
+  ret_from_fork+0x1f/0x30 arch/x86/entry/entry_64.S:352
+
+Reported by Kernel Concurrency Sanitizer on:
+CPU: 0 PID: 12515 Comm: kworker/u4:8 Not tainted 5.4.0-rc3+ #0
+Hardware name: Google Google Compute Engine/Google Compute Engine, BIOS  
+Google 01/01/2011
+Workqueue: events_unbound fsnotify_connector_destroy_workfn
+==================================================================
+Kernel panic - not syncing: panic_on_warn set ...
+CPU: 0 PID: 12515 Comm: kworker/u4:8 Not tainted 5.4.0-rc3+ #0
+Hardware name: Google Google Compute Engine/Google Compute Engine, BIOS  
+Google 01/01/2011
+Workqueue: events_unbound fsnotify_connector_destroy_workfn
+Call Trace:
+  __dump_stack lib/dump_stack.c:77 [inline]
+  dump_stack+0xf5/0x159 lib/dump_stack.c:113
+  panic+0x210/0x640 kernel/panic.c:221
+  kcsan_report.cold+0xc/0x10 kernel/kcsan/report.c:302
+  __kcsan_setup_watchpoint+0x32e/0x4a0 kernel/kcsan/core.c:411
+  __tsan_read8 kernel/kcsan/kcsan.c:36 [inline]
+  __tsan_read8+0x2c/0x30 kernel/kcsan/kcsan.c:36
+  srcu_might_be_idle kernel/rcu/srcutree.c:784 [inline]
+  synchronize_srcu+0x107/0x214 kernel/rcu/srcutree.c:996
+  fsnotify_connector_destroy_workfn+0x63/0xb0 fs/notify/mark.c:164
+  process_one_work+0x3d4/0x890 kernel/workqueue.c:2269
+  worker_thread+0xa0/0x800 kernel/workqueue.c:2415
+  kthread+0x1d4/0x200 drivers/block/aoe/aoecmd.c:1253
+  ret_from_fork+0x1f/0x30 arch/x86/entry/entry_64.S:352
+Kernel Offset: disabled
+Rebooting in 86400 seconds..
+
+
 ---
-I don't know if it's too late to fold this in with the previous patch?
+This bug is generated by a bot. It may contain errors.
+See https://goo.gl/tpsmEJ for more information about syzbot.
+syzbot engineers can be reached at syzkaller@googlegroups.com.
 
- block/blk-iocost.c | 2 ++
- 1 file changed, 2 insertions(+)
-
-diff --git a/block/blk-iocost.c b/block/blk-iocost.c
-index a7ed434eae03..c5a8703ca6aa 100644
---- a/block/blk-iocost.c
-+++ b/block/blk-iocost.c
-@@ -2095,6 +2095,7 @@ static ssize_t ioc_weight_write(struct kernfs_open_file *of, char *buf,
- 		return nbytes;
- 	}
- 
-+	/* blkg_conf_prep() takes the q->queue_lock and disables IRQs */
- 	ret = blkg_conf_prep(blkcg, &blkcg_policy_iocost, buf, &ctx);
- 	if (ret)
- 		return ret;
-@@ -2115,6 +2116,7 @@ static ssize_t ioc_weight_write(struct kernfs_open_file *of, char *buf,
- 	weight_updated(iocg);
- 	spin_unlock(&iocg->ioc->lock);
- 
-+	/* blkg_conf_finish() unlocks the q->queue_lock and enables IRQs */
- 	blkg_conf_finish(&ctx);
- 	return nbytes;
- 
--- 
-2.20.1
-
+syzbot will keep track of this bug report. See:
+https://goo.gl/tpsmEJ#status for how to communicate with syzbot.
