@@ -4,76 +4,72 @@ X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 X-Spam-Level: 
 X-Spam-Status: No, score=-8.3 required=3.0 tests=DKIMWL_WL_HIGH,DKIM_SIGNED,
 	DKIM_VALID,DKIM_VALID_AU,HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,
-	MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED,
+	MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,UNPARSEABLE_RELAY,
 	USER_AGENT_SANE_1 autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id D3E62CA9EA0
-	for <linux-block@archiver.kernel.org>; Mon,  4 Nov 2019 10:09:19 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 4E45CCA9EA0
+	for <linux-block@archiver.kernel.org>; Mon,  4 Nov 2019 10:18:31 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.kernel.org (Postfix) with ESMTP id 977B5217F4
-	for <linux-block@archiver.kernel.org>; Mon,  4 Nov 2019 10:09:19 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id 20BED21929
+	for <linux-block@archiver.kernel.org>; Mon,  4 Nov 2019 10:18:31 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=pass (2048-bit key) header.d=oracle.com header.i=@oracle.com header.b="KaZDn1Id"
+	dkim=pass (2048-bit key) header.d=oracle.com header.i=@oracle.com header.b="ACMDSvzQ"
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1726633AbfKDKJS (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Mon, 4 Nov 2019 05:09:18 -0500
-Received: from userp2120.oracle.com ([156.151.31.85]:48080 "EHLO
-        userp2120.oracle.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1726526AbfKDKJS (ORCPT
-        <rfc822;linux-block@vger.kernel.org>); Mon, 4 Nov 2019 05:09:18 -0500
-Received: from pps.filterd (userp2120.oracle.com [127.0.0.1])
-        by userp2120.oracle.com (8.16.0.27/8.16.0.27) with SMTP id xA4A895B154440;
-        Mon, 4 Nov 2019 10:09:12 GMT
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=oracle.com; h=subject : to : cc :
- references : from : message-id : date : mime-version : in-reply-to :
- content-type : content-transfer-encoding; s=corp-2019-08-05;
- bh=xtrXNlecFH2TLIOMFvgOVgexRvyQb2ELoQsKBZ/PqcI=;
- b=KaZDn1IdWpRIdPOohM2dyv+/h6BOkNhK860/3S95hNaf2rpViHGaMewi/5GaAPb6dNcz
- GmwEv09ZQBoCaKnaIiJgRxkmylSZjyUQH0100AGt8AoZTZU0Tv2zWxYwGRhgEcFjKltu
- 6u5A/Zz357qwPXqeGMigbRTtb+XfhPVinkWUe+S8EjS46jrn86/SHd8DrZlcqW0cwsSR
- Q2ts2njDn7Sf9mVmSK3fjzHq1UJ5lB1CgTEeZRVpgeWhnhYXeyZE38G0QFbiRVMnfPJP
- 9TSIZiHel6dYfyVohr34kfB0+15PrTsjk+89TlMErKFUkj/mqCMtetvkuQPcSdMZvuF0 hg== 
-Received: from aserp3030.oracle.com (aserp3030.oracle.com [141.146.126.71])
-        by userp2120.oracle.com with ESMTP id 2w12eqx2uc-1
+        id S1727236AbfKDKSa (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Mon, 4 Nov 2019 05:18:30 -0500
+Received: from userp2130.oracle.com ([156.151.31.86]:58830 "EHLO
+        userp2130.oracle.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S1726633AbfKDKSa (ORCPT
+        <rfc822;linux-block@vger.kernel.org>); Mon, 4 Nov 2019 05:18:30 -0500
+Received: from pps.filterd (userp2130.oracle.com [127.0.0.1])
+        by userp2130.oracle.com (8.16.0.27/8.16.0.27) with SMTP id xA4A8Geg180234;
+        Mon, 4 Nov 2019 10:18:21 GMT
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=oracle.com; h=date : from : to : cc
+ : subject : message-id : mime-version : content-type : in-reply-to;
+ s=corp-2019-08-05; bh=n4z6yY3cjmuea5DEJWf/55zw6urF7hHTqiKHjMTvZmI=;
+ b=ACMDSvzQ7F42D+/QznGerfRA5g/qmKY/Ss2aYWGsxNzcgk7Bw6A4ryooByiHaXCtRqW9
+ QndKOQGQ3k3+nR4Ac31PFa1QPXDuaD7q0FvSVsZ/sXHP4LEDX6Veq+3KZ5jCg+qojghv
+ XT3oxjiKkTnCv86ShKARfAOhlBvfj8IQXdDeBBJPmGabm4qZfvRWcLamWudKluTlS7QB
+ acVMcACAgilO+uNML5R63guKok2XVidOH5b91uHqkKW27JUlBUD9qlY07d4Am9ecPG3C
+ wCcF99SYNp5TV+qlAnjmnA8Kl+HpnMGq93xAzVtU1BSF7CLswk7cGr/Ep2dr26KefLc+ TQ== 
+Received: from userp3030.oracle.com (userp3030.oracle.com [156.151.31.80])
+        by userp2130.oracle.com with ESMTP id 2w117tpamk-1
         (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=OK);
-        Mon, 04 Nov 2019 10:09:11 +0000
-Received: from pps.filterd (aserp3030.oracle.com [127.0.0.1])
-        by aserp3030.oracle.com (8.16.0.27/8.16.0.27) with SMTP id xA4A7VEj079111;
-        Mon, 4 Nov 2019 10:09:11 GMT
+        Mon, 04 Nov 2019 10:18:21 +0000
+Received: from pps.filterd (userp3030.oracle.com [127.0.0.1])
+        by userp3030.oracle.com (8.16.0.27/8.16.0.27) with SMTP id xA4A7cMO177113;
+        Mon, 4 Nov 2019 10:18:21 GMT
 Received: from userv0121.oracle.com (userv0121.oracle.com [156.151.31.72])
-        by aserp3030.oracle.com with ESMTP id 2w1kxm3u5a-1
+        by userp3030.oracle.com with ESMTP id 2w1k8ughp9-1
         (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=OK);
-        Mon, 04 Nov 2019 10:09:10 +0000
-Received: from abhmp0021.oracle.com (abhmp0021.oracle.com [141.146.116.27])
-        by userv0121.oracle.com (8.14.4/8.13.8) with ESMTP id xA4A98tc009323;
-        Mon, 4 Nov 2019 10:09:08 GMT
-Received: from [192.168.1.14] (/114.88.246.185)
+        Mon, 04 Nov 2019 10:18:20 +0000
+Received: from abhmp0003.oracle.com (abhmp0003.oracle.com [141.146.116.9])
+        by userv0121.oracle.com (8.14.4/8.13.8) with ESMTP id xA4AIIo3015795;
+        Mon, 4 Nov 2019 10:18:18 GMT
+Received: from mwanda (/41.57.98.10)
         by default (Oracle Beehive Gateway v4.0)
-        with ESMTP ; Mon, 04 Nov 2019 02:09:07 -0800
-Subject: Re: [RFC] io_uring: stop only support read/write for ctx with
- IORING_SETUP_IOPOLL
-To:     yangerkun <yangerkun@huawei.com>, axboe@kernel.dk,
-        linux-block@vger.kernel.org
-Cc:     houtao1@huawei.com, yi.zhang@huawei.com
-References: <20191104085608.44816-1-yangerkun@huawei.com>
-From:   Bob Liu <bob.liu@oracle.com>
-Message-ID: <a01cc299-69e7-daa2-6894-1c60aaa64e67@oracle.com>
-Date:   Mon, 4 Nov 2019 18:09:02 +0800
-User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:60.0) Gecko/20100101
- Thunderbird/60.5.1
+        with ESMTP ; Mon, 04 Nov 2019 02:18:18 -0800
+Date:   Mon, 4 Nov 2019 13:18:11 +0300
+From:   Dan Carpenter <dan.carpenter@oracle.com>
+To:     Jens Axboe <axboe@kernel.dk>, Jeff Moyer <jmoyer@redhat.com>
+Cc:     linux-block@vger.kernel.org, linux-kernel@vger.kernel.org,
+        kernel-janitors@vger.kernel.org
+Subject: [PATCH] iocost: add a comment about locking in ioc_weight_write()
+Message-ID: <20191104101811.GA20821@mwanda>
 MIME-Version: 1.0
-In-Reply-To: <20191104085608.44816-1-yangerkun@huawei.com>
-Content-Type: text/plain; charset=utf-8
-Content-Language: en-US
-Content-Transfer-Encoding: 7bit
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <x49d0ebd2sl.fsf@segfault.boston.devel.redhat.com>
+X-Mailer: git-send-email haha only kidding
+User-Agent: Mutt/1.10.1 (2018-07-13)
 X-Proofpoint-Virus-Version: vendor=nai engine=6000 definitions=9430 signatures=668685
-X-Proofpoint-Spam-Details: rule=notspam policy=default score=0 suspectscore=2 malwarescore=0
+X-Proofpoint-Spam-Details: rule=notspam policy=default score=0 suspectscore=0 malwarescore=0
  phishscore=0 bulkscore=0 spamscore=0 mlxscore=0 mlxlogscore=999
  adultscore=0 classifier=spam adjust=0 reason=mlx scancount=1
  engine=8.0.1-1908290000 definitions=main-1911040101
 X-Proofpoint-Virus-Version: vendor=nai engine=6000 definitions=9430 signatures=668685
 X-Proofpoint-Spam-Details: rule=notspam policy=default score=0 priorityscore=1501 malwarescore=0
- suspectscore=2 phishscore=0 bulkscore=0 spamscore=0 clxscore=1011
+ suspectscore=0 phishscore=0 bulkscore=0 spamscore=0 clxscore=1011
  lowpriorityscore=0 mlxscore=0 impostorscore=0 mlxlogscore=999 adultscore=0
  classifier=spam adjust=0 reason=mlx scancount=1 engine=8.0.1-1908290000
  definitions=main-1911040101
@@ -82,160 +78,36 @@ Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-On 11/4/19 4:56 PM, yangerkun wrote:
-> There is no problem to support other type request for the ctx with
-> IORING_SETUP_IOPOLL. 
+It wasn't very clear that blkg_conf_prep() disables IRQ and that they
+are enabled in blkg_conf_finish() so this patch adds a comment about it.
 
-Could you describe the benefit of doing this?
+Signed-off-by: Dan Carpenter <dan.carpenter@oracle.com>
+---
+I don't know if it's too late to fold this in with the previous patch?
 
-> What we should do is just insert read/write
-> requests to poll list, and protect cqes with comopletion_lock in
-> io_iopoll_complete since other requests now can be completed as the same
-> time while we do io_iopoll_complete.
-> 
-> Signed-off-by: yangerkun <yangerkun@huawei.com>
-> ---
->  fs/io_uring.c | 29 +++++++++--------------------
->  1 file changed, 9 insertions(+), 20 deletions(-)
-> 
-> diff --git a/fs/io_uring.c b/fs/io_uring.c
-> index f9a38998f2fc..8bf52d9a2c55 100644
-> --- a/fs/io_uring.c
-> +++ b/fs/io_uring.c
-> @@ -753,9 +753,11 @@ static void io_iopoll_complete(struct io_ring_ctx *ctx, unsigned int *nr_events,
->  {
->  	void *reqs[IO_IOPOLL_BATCH];
->  	struct io_kiocb *req;
-> +	unsigned long flags;
->  	int to_free;
->  
->  	to_free = 0;
-> +	spin_lock_irqsave(&ctx->completion_lock, flags);
->  	while (!list_empty(done)) {
->  		req = list_first_entry(done, struct io_kiocb, list);
->  		list_del(&req->list);
-> @@ -781,6 +783,7 @@ static void io_iopoll_complete(struct io_ring_ctx *ctx, unsigned int *nr_events,
->  	}
->  
->  	io_commit_cqring(ctx);
-> +	spin_unlock_irqrestore(&ctx->completion_lock, flags);
->  	io_free_req_many(ctx, reqs, &to_free);
->  }
->  
-> @@ -1517,9 +1520,6 @@ static int io_nop(struct io_kiocb *req, u64 user_data)
->  	struct io_ring_ctx *ctx = req->ctx;
->  	long err = 0;
->  
-> -	if (unlikely(ctx->flags & IORING_SETUP_IOPOLL))
-> -		return -EINVAL;
-> -
->  	io_cqring_add_event(ctx, user_data, err);
->  	io_put_req(req);
->  	return 0;
-> @@ -1527,13 +1527,9 @@ static int io_nop(struct io_kiocb *req, u64 user_data)
->  
->  static int io_prep_fsync(struct io_kiocb *req, const struct io_uring_sqe *sqe)
->  {
-> -	struct io_ring_ctx *ctx = req->ctx;
-> -
->  	if (!req->file)
->  		return -EBADF;
->  
-> -	if (unlikely(ctx->flags & IORING_SETUP_IOPOLL))
-> -		return -EINVAL;
->  	if (unlikely(sqe->addr || sqe->ioprio || sqe->buf_index))
->  		return -EINVAL;
->  
-> @@ -1574,14 +1570,11 @@ static int io_fsync(struct io_kiocb *req, const struct io_uring_sqe *sqe,
->  
->  static int io_prep_sfr(struct io_kiocb *req, const struct io_uring_sqe *sqe)
->  {
-> -	struct io_ring_ctx *ctx = req->ctx;
->  	int ret = 0;
->  
->  	if (!req->file)
->  		return -EBADF;
->  
-> -	if (unlikely(ctx->flags & IORING_SETUP_IOPOLL))
-> -		return -EINVAL;
->  	if (unlikely(sqe->addr || sqe->ioprio || sqe->buf_index))
->  		return -EINVAL;
->  
-> @@ -1627,9 +1620,6 @@ static int io_send_recvmsg(struct io_kiocb *req, const struct io_uring_sqe *sqe,
->  	struct socket *sock;
->  	int ret;
->  
-> -	if (unlikely(req->ctx->flags & IORING_SETUP_IOPOLL))
-> -		return -EINVAL;
-> -
->  	sock = sock_from_file(req->file, &ret);
->  	if (sock) {
->  		struct user_msghdr __user *msg;
-> @@ -1712,8 +1702,6 @@ static int io_poll_remove(struct io_kiocb *req, const struct io_uring_sqe *sqe)
->  	struct io_kiocb *poll_req, *next;
->  	int ret = -ENOENT;
->  
-> -	if (unlikely(req->ctx->flags & IORING_SETUP_IOPOLL))
-> -		return -EINVAL;
->  	if (sqe->ioprio || sqe->off || sqe->len || sqe->buf_index ||
->  	    sqe->poll_events)
->  		return -EINVAL;
-> @@ -1833,8 +1821,6 @@ static int io_poll_add(struct io_kiocb *req, const struct io_uring_sqe *sqe)
->  	__poll_t mask;
->  	u16 events;
->  
-> -	if (unlikely(req->ctx->flags & IORING_SETUP_IOPOLL))
-> -		return -EINVAL;
->  	if (sqe->addr || sqe->ioprio || sqe->off || sqe->len || sqe->buf_index)
->  		return -EINVAL;
->  	if (!poll->file)
-> @@ -1932,8 +1918,6 @@ static int io_timeout(struct io_kiocb *req, const struct io_uring_sqe *sqe)
->  	struct timespec64 ts;
->  	unsigned span = 0;
->  
-> -	if (unlikely(ctx->flags & IORING_SETUP_IOPOLL))
-> -		return -EINVAL;
->  	if (sqe->flags || sqe->ioprio || sqe->buf_index || sqe->timeout_flags ||
->  	    sqe->len != 1)
->  		return -EINVAL;
-> @@ -2032,6 +2016,7 @@ static int __io_submit_sqe(struct io_ring_ctx *ctx, struct io_kiocb *req,
->  			   const struct sqe_submit *s, bool force_nonblock)
->  {
->  	int ret, opcode;
-> +	bool poll = false;
->  
->  	req->user_data = READ_ONCE(s->sqe->user_data);
->  
-> @@ -2046,17 +2031,21 @@ static int __io_submit_sqe(struct io_ring_ctx *ctx, struct io_kiocb *req,
->  	case IORING_OP_READV:
->  		if (unlikely(s->sqe->buf_index))
->  			return -EINVAL;
-> +		poll = true;
->  		ret = io_read(req, s, force_nonblock);
->  		break;
->  	case IORING_OP_WRITEV:
->  		if (unlikely(s->sqe->buf_index))
->  			return -EINVAL;
-> +		poll = true;
->  		ret = io_write(req, s, force_nonblock);
->  		break;
->  	case IORING_OP_READ_FIXED:
-> +		poll = true;
->  		ret = io_read(req, s, force_nonblock);
->  		break;
->  	case IORING_OP_WRITE_FIXED:
-> +		poll = true;
->  		ret = io_write(req, s, force_nonblock);
->  		break;
->  	case IORING_OP_FSYNC:
-> @@ -2088,7 +2077,7 @@ static int __io_submit_sqe(struct io_ring_ctx *ctx, struct io_kiocb *req,
->  	if (ret)
->  		return ret;
->  
-> -	if (ctx->flags & IORING_SETUP_IOPOLL) {
-> +	if ((ctx->flags & IORING_SETUP_IOPOLL) && poll) {
->  		if (req->result == -EAGAIN)
->  			return -EAGAIN;
->  
-> 
+ block/blk-iocost.c | 2 ++
+ 1 file changed, 2 insertions(+)
+
+diff --git a/block/blk-iocost.c b/block/blk-iocost.c
+index a7ed434eae03..c5a8703ca6aa 100644
+--- a/block/blk-iocost.c
++++ b/block/blk-iocost.c
+@@ -2095,6 +2095,7 @@ static ssize_t ioc_weight_write(struct kernfs_open_file *of, char *buf,
+ 		return nbytes;
+ 	}
+ 
++	/* blkg_conf_prep() takes the q->queue_lock and disables IRQs */
+ 	ret = blkg_conf_prep(blkcg, &blkcg_policy_iocost, buf, &ctx);
+ 	if (ret)
+ 		return ret;
+@@ -2115,6 +2116,7 @@ static ssize_t ioc_weight_write(struct kernfs_open_file *of, char *buf,
+ 	weight_updated(iocg);
+ 	spin_unlock(&iocg->ioc->lock);
+ 
++	/* blkg_conf_finish() unlocks the q->queue_lock and enables IRQs */
+ 	blkg_conf_finish(&ctx);
+ 	return nbytes;
+ 
+-- 
+2.20.1
 
