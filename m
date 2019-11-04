@@ -2,73 +2,73 @@ Return-Path: <SRS0=59TO=Y4=vger.kernel.org=linux-block-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-2.2 required=3.0 tests=DKIM_SIGNED,DKIM_VALID,
-	HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,
-	USER_AGENT_SANE_1 autolearn=no autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-7.2 required=3.0 tests=DKIM_SIGNED,DKIM_VALID,
+	HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,MENTIONS_GIT_HOSTING,
+	SPF_HELO_NONE,SPF_PASS,USER_AGENT_SANE_1 autolearn=ham autolearn_force=no
+	version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id B14EFCA9EB5
-	for <linux-block@archiver.kernel.org>; Mon,  4 Nov 2019 14:01:41 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 80617CA9EB5
+	for <linux-block@archiver.kernel.org>; Mon,  4 Nov 2019 14:07:04 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.kernel.org (Postfix) with ESMTP id 7C5E721D71
-	for <linux-block@archiver.kernel.org>; Mon,  4 Nov 2019 14:01:41 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id 501D9218BA
+	for <linux-block@archiver.kernel.org>; Mon,  4 Nov 2019 14:07:04 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel-dk.20150623.gappssmtp.com header.i=@kernel-dk.20150623.gappssmtp.com header.b="wHvf49pw"
+	dkim=pass (2048-bit key) header.d=kernel-dk.20150623.gappssmtp.com header.i=@kernel-dk.20150623.gappssmtp.com header.b="S55ZBFGw"
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1727913AbfKDOBk (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Mon, 4 Nov 2019 09:01:40 -0500
-Received: from mail-io1-f66.google.com ([209.85.166.66]:41848 "EHLO
-        mail-io1-f66.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1727891AbfKDOBk (ORCPT
-        <rfc822;linux-block@vger.kernel.org>); Mon, 4 Nov 2019 09:01:40 -0500
-Received: by mail-io1-f66.google.com with SMTP id r144so18503276iod.8
-        for <linux-block@vger.kernel.org>; Mon, 04 Nov 2019 06:01:40 -0800 (PST)
+        id S1727998AbfKDOHD (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Mon, 4 Nov 2019 09:07:03 -0500
+Received: from mail-io1-f65.google.com ([209.85.166.65]:40714 "EHLO
+        mail-io1-f65.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S1727891AbfKDOHD (ORCPT
+        <rfc822;linux-block@vger.kernel.org>); Mon, 4 Nov 2019 09:07:03 -0500
+Received: by mail-io1-f65.google.com with SMTP id p6so18536420iod.7
+        for <linux-block@vger.kernel.org>; Mon, 04 Nov 2019 06:07:03 -0800 (PST)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=kernel-dk.20150623.gappssmtp.com; s=20150623;
         h=subject:to:cc:references:from:message-id:date:user-agent
          :mime-version:in-reply-to:content-language:content-transfer-encoding;
-        bh=Sif2sVDBigk80VOSIbDHJQK/86lz3qMxwcMcFfuFv4w=;
-        b=wHvf49pwwMQ+3Nw/A2K/DGAGMblywBCF3YNSbrBMaU4cXZdOTcf16ZarePd66qSAWr
-         XWhUo4+y5K1G3brNPLuRHWabRdMSqH+gRtQiczLwY0jP47Jv+zysx3vmEJUKjTNc6F4q
-         PBPy4+HRW5pjssbHz/G+zZOjLENWpWqe4vTZ34jb6MvWYr7NahMG8j1YqUG2L82tcEd5
-         V/9cR7ZB3UEkmncVq8zh/444G1HMlIfneHkA472VUgMm5Io2WjsLt+rhlMZrf7ZvQVx7
-         FhSqXWkvnAPJPg0k7wNt6/5CnMp055EMJiGnG1VotG+6nWA2CnmJUMCwHbUZ+4Eu+uWN
-         +57w==
+        bh=pAdyc+2ZHTphCpX/I5PaO1scsGv1OveQdawA4MGnLXI=;
+        b=S55ZBFGwJzbCQUQQfJQOPoK4egNhV0DlIvASZEnuoUWRUM/B9EMxrUU5Dxy8+PHkrf
+         qMlR4SwFyMP6MbXEB50PW+EsXdJwpwpJAQY/r1xNw95wnq7QC/K1EvRqnKtbjN95BFAZ
+         fUyU0mwTh0AwspFT0cpdLWyzYHzmcllnR6lURkLmhCstUHikUR1rnEt07tZlwUyUMSoo
+         PWFkJuGj7vmUnVGiPB061jwwGGzjLKlToJD0JYBo22qgZRqAUjC98Vg7my0uxVh7kmv7
+         9hQ6LPrj1A/fep1vfNhHEleBcl6pZoBKX91hFhoOq2971czOcy2S22We89c57o0PyOkv
+         L9Aw==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=1e100.net; s=20161025;
         h=x-gm-message-state:subject:to:cc:references:from:message-id:date
          :user-agent:mime-version:in-reply-to:content-language
          :content-transfer-encoding;
-        bh=Sif2sVDBigk80VOSIbDHJQK/86lz3qMxwcMcFfuFv4w=;
-        b=FYAuQnQSqCispOuMsr2TybGMchdkIcDIQCMDBZwHyGFOtZMpv/QovvMeNNT7b9ZXAt
-         /oKskIJ1DmhmEEfHeC0OSUwj5lWEXcA4AC4k168cjnxnt5tCG6is9CIMfpM3Vbqn/RgC
-         haTz9hP58PkS3r+4ZPs4fQIMVddMfhWKG/F+MVLcLiOz7tfW7yz+zsI61JyI138Hj83G
-         kL5m7lc928kmMB/q8lQJycrxwL2I0rdkoyN9dgHWFZrVvSTxmuU7RXt0fY3Jp2icIoZJ
-         e4ch+IxWL0W2Pxw6k8834BCpOH03vBrfBLBfYzUqT1AadpLuywnqssBVqCUMdaFKeapZ
-         PKVA==
-X-Gm-Message-State: APjAAAW6QztCfcTMXKFbILvArlpiXrmse1FWnjK3wRPsoHKDOJYex5An
-        b6DAQL7vY0JH9hhJ9C3l1dESDQ==
-X-Google-Smtp-Source: APXvYqzO0Qfj1MwL0EJ18S1x2n5g1OAke6Tbw6rrr0nOCfXLWdagq5vk6PnvWEzmCJC0eXBO2t9lOw==
-X-Received: by 2002:a5d:9808:: with SMTP id a8mr18329322iol.2.1572876099702;
-        Mon, 04 Nov 2019 06:01:39 -0800 (PST)
+        bh=pAdyc+2ZHTphCpX/I5PaO1scsGv1OveQdawA4MGnLXI=;
+        b=eTtrq2k5CT7JQpBsBi2zDFzln5YBA6u2KMr159VOiRRBpryyY21KXop8zSQ8ht/szx
+         iDxF8yrNCk6kP32PR+tXl0JXZ03skEzR031458ZaRbWmKh/pqGXufKhFhFLfnvJ1H0Jz
+         T5jFeLLaIGQzXFmIapslmz97gEzAYosqFxd4sClqlvYRMGXin1VhdFkjmozOdyoVMdaw
+         GhFtEahggmzuLaVTRxsPYaUChkukka5uzHul0oPabv42iuugmUYhPjrotKnqMdgoUSny
+         M1Hy/oblnPH6si6X6XIyV5+/ODTSJ7K3qizlO72wayB8N6ep00VDCx/YppPlWOReOU+L
+         so5g==
+X-Gm-Message-State: APjAAAUFVizAVrit9GHISSJiWAA0V1YsXxkWIf3LnEdwGbzIGQODJwlZ
+        fuzYzZAfYQ3rSNciljO/wveUlw==
+X-Google-Smtp-Source: APXvYqxDMPLWveYYUSQi1IVguvU2t8V+/z76VitMMbwxzDMqXzRdmescjt1vkfd5wwP8JXtf/WNQmQ==
+X-Received: by 2002:a5e:c010:: with SMTP id u16mr15243968iol.275.1572876422722;
+        Mon, 04 Nov 2019 06:07:02 -0800 (PST)
 Received: from [192.168.1.159] ([65.144.74.34])
-        by smtp.gmail.com with ESMTPSA id p19sm2444483ili.56.2019.11.04.06.01.38
+        by smtp.gmail.com with ESMTPSA id b18sm1520604ioj.28.2019.11.04.06.07.01
         (version=TLS1_2 cipher=ECDHE-RSA-AES128-GCM-SHA256 bits=128/128);
-        Mon, 04 Nov 2019 06:01:38 -0800 (PST)
-Subject: Re: [RFC] io_uring: stop only support read/write for ctx with
- IORING_SETUP_IOPOLL
-To:     yangerkun <yangerkun@huawei.com>, Bob Liu <bob.liu@oracle.com>,
-        linux-block@vger.kernel.org
-Cc:     houtao1@huawei.com, yi.zhang@huawei.com
-References: <20191104085608.44816-1-yangerkun@huawei.com>
- <a01cc299-69e7-daa2-6894-1c60aaa64e67@oracle.com>
- <3fd0dee1-52d6-4ea8-53d8-2c88b7fedce6@huawei.com>
+        Mon, 04 Nov 2019 06:07:01 -0800 (PST)
+Subject: Re: [PATCH liburing 3/3] spec: Fedora RPM cleanups
+To:     Stefan Hajnoczi <stefanha@redhat.com>
+Cc:     Aarushi Mehta <mehta.aaru20@gmail.com>,
+        linux-block@vger.kernel.org, Julia Suvorova <jusual@redhat.com>,
+        Jeff Moyer <jmoyer@redhat.com>
+References: <20191104120532.32839-1-stefanha@redhat.com>
+ <20191104120532.32839-4-stefanha@redhat.com>
 From:   Jens Axboe <axboe@kernel.dk>
-Message-ID: <50de6a43-fc11-aada-40e6-f3fee6523d49@kernel.dk>
-Date:   Mon, 4 Nov 2019 07:01:37 -0700
+Message-ID: <91fbe88c-5574-847e-12f0-992710bbb544@kernel.dk>
+Date:   Mon, 4 Nov 2019 07:07:00 -0700
 User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:60.0) Gecko/20100101
  Thunderbird/60.9.0
 MIME-Version: 1.0
-In-Reply-To: <3fd0dee1-52d6-4ea8-53d8-2c88b7fedce6@huawei.com>
+In-Reply-To: <20191104120532.32839-4-stefanha@redhat.com>
 Content-Type: text/plain; charset=utf-8
 Content-Language: en-US
 Content-Transfer-Encoding: 7bit
@@ -77,53 +77,53 @@ Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-On 11/4/19 4:46 AM, yangerkun wrote:
+On 11/4/19 5:05 AM, Stefan Hajnoczi wrote:
+> From: Jeff Moyer <jmoyer@redhat.com>
 > 
+> Cole Robinson and Fabio Valenti made a number of suggestions for the
+> .spec file:
+> https://bugzilla.redhat.com/show_bug.cgi?id=1766157
 > 
-> On 2019/11/4 18:09, Bob Liu wrote:
->> On 11/4/19 4:56 PM, yangerkun wrote:
->>> There is no problem to support other type request for the ctx with
->>> IORING_SETUP_IOPOLL.
->>
->> Could you describe the benefit of doing this?
+>   * Release should be Release: 1%{?dist} so the .fcXX bits get appended to the version string
+>   * Source: should be a pointer to the upstream URL that hosts the release. In this case I think it should be https://github.com/axboe/liburing/archive/%{name}-%{version}.tar.gz#%{name}-%{name}-%{version}.tar.gz, the ending weirdness is due to github renaming the archive strangely. You might need to pass '-n %{name}-%{name}-%{version}' to %setup/%autosetup to tell it what the extracted archive name is
+>   * The %defattr lines should be removed: https://pagure.io/packaging-committee/issue/77
+>   * The Group: lines should be removed
+>   * All the BuildRoot and RPM_BUILD_ROOT lines should be removed. %clean should be removed
+>   * The ./configure line should be replaced with just %configure
+>   * The 'make' call should be %make_build
+>   * The 'make install' call should be %make_install
+>   * The %pre and %post sections can be entirely removed, ldconfig is done automatically: https://fedoraproject.org/wiki/Changes/Removing_ldconfig_scriptlets
+>   * The devel package 'Requires: liburing' should instead be: Requires: %{name} = %{version}-%{release}
+>   * The devel package should also have Requires: pkgconfig
+>   * I think all the %attr usage can be entirely removed, unless they are doing something that the build system isn't doing.
+>   * The Provides: liburing.so.1 shouldn't be necessary, I'm pretty sure RPM automatically adds annotations like this
+>   * Replace %setup with %autosetup, which will automatically apply any listed Patch: in the spec if anything is backported in the future. It's a small maintenace optimization
 > 
-> Hi,
-> 
-> I am trying to replace libaio with io_uring in InnoDB/MariaDB(which
-> build on xfs/nvme). And in order to simulate the timeout mechanism
-> like io_getevents, firstly, to use the poll function of io_uring's fd
-> has been selected and it really did work. But while trying to enable
-> IORING_SETUP_IOPOLL since xfs has iopoll function interface, the
-> mechanism will fail since io_uring_poll does check the cq.head between
-> cached_cq_tail, which will not update until we call io_uring_enter and
-> do the poll. So, instead, I decide to use timeout requests in
-> io_uring but will return -EINVAL since we enable IORING_SETUP_IOPOLL
-> at the same time. I think this combination is a normal scene so as
-> the other combination descibed in this patch. I am not sure does it a
-> good solution for this problem, and maybe there exists some better way.
+> These changes work on Fedora 31 and openSUSE Leap 15.1.  Therefore they
+> are likely to work on other rpm-based distributions too.
 
-I think we can support timeouts pretty easily with SETUP_IOPOLL, but we
-can't mix and match everything. Pretty sure I've written at length about
-that before, but the tldr is that for purely polled commands, we won't
-have an IRQ event. That's the case for nvme if it's misconfigured, but
-for an optimal setup where nvme is loaded with poll queues, there will
-never be an interrupt for the command. This means that we can never wait
-in io_cqring_wait(), we must always call the iopoll poller, because if
-we wait we might very well be waiting for events that will never happen
-unless we actively poll for them.
+This looks like a spec file changelog. Nothing wrong with that, but it
+should be no wider than 72 characters to avoid making git log look like
+a mess. Normally I'd just fix that up, but another comment below.
 
-This could be supported if we accounted requests, but I don't want to
-add that kind of overhead. Same with the lock+irqdisable you had to add
-for this, it's not acceptable overhead.
+> -URL: http://git.kernel.dk/cgit/liburing/
+> +URL: http://brick.kernel.dk/snaps/%{name}-%{version}.tar.gz
+> +BuildRequires: gcc
 
-Sounds like you just need timeout support for polling? If so, then that
-is supportable as we know that these events will trigger an async event
-when they happen. Either that, or it triggers when we poll for
-completions. So it's safe to support, and we can definitely do that.
+I enabled snapshots in cgit, so maybe we can just point at those?
+Something like:
 
-But don't mix polled IO with "normal" IO, it just won't work without
-extra additions that I'm not willing to pay the cost of.
+URL: https://git.kernel.dk/cgit/liburing/snapshot/%{name}-%{version}.tar.gz
 
+Yes, and there's also https now, finally got that enabled on kernel.dk
+after running that site for more than two decades.
+
+>   %changelog
+> +* Thu Oct 31 2019 Jeff Moyer <jmoyer@redhat.com> - 0.2-1
+> +- Initial fedora package.
+> +
+
+Maybe keep this distro agnostic?
 
 -- 
 Jens Axboe
