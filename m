@@ -2,234 +2,106 @@ Return-Path: <SRS0=59TO=Y4=vger.kernel.org=linux-block-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-8.2 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
-	INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,
-	URIBL_BLOCKED,USER_AGENT_SANE_1 autolearn=ham autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-6.8 required=3.0 tests=DKIM_SIGNED,DKIM_VALID,
+	DKIM_VALID_AU,HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,
+	SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS autolearn=ham autolearn_force=no
+	version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id AF963CA9EA0
-	for <linux-block@archiver.kernel.org>; Mon,  4 Nov 2019 11:46:42 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id EE057CA9EA0
+	for <linux-block@archiver.kernel.org>; Mon,  4 Nov 2019 11:59:39 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.kernel.org (Postfix) with ESMTP id 82A4F21D7F
-	for <linux-block@archiver.kernel.org>; Mon,  4 Nov 2019 11:46:42 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id BB83D21D7F
+	for <linux-block@archiver.kernel.org>; Mon,  4 Nov 2019 11:59:39 +0000 (UTC)
+Authentication-Results: mail.kernel.org;
+	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="bD7OxtAO"
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1727320AbfKDLqm (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Mon, 4 Nov 2019 06:46:42 -0500
-Received: from szxga06-in.huawei.com ([45.249.212.32]:40052 "EHLO huawei.com"
-        rhost-flags-OK-OK-OK-FAIL) by vger.kernel.org with ESMTP
-        id S1726526AbfKDLql (ORCPT <rfc822;linux-block@vger.kernel.org>);
-        Mon, 4 Nov 2019 06:46:41 -0500
-Received: from DGGEMS406-HUB.china.huawei.com (unknown [172.30.72.58])
-        by Forcepoint Email with ESMTP id 04D2911319F6B9EDF8A4;
-        Mon,  4 Nov 2019 19:46:40 +0800 (CST)
-Received: from [127.0.0.1] (10.133.210.141) by DGGEMS406-HUB.china.huawei.com
- (10.3.19.206) with Microsoft SMTP Server id 14.3.439.0; Mon, 4 Nov 2019
- 19:46:33 +0800
-Subject: Re: [RFC] io_uring: stop only support read/write for ctx with
- IORING_SETUP_IOPOLL
-To:     Bob Liu <bob.liu@oracle.com>, <axboe@kernel.dk>,
-        <linux-block@vger.kernel.org>
-CC:     <houtao1@huawei.com>, <yi.zhang@huawei.com>
-References: <20191104085608.44816-1-yangerkun@huawei.com>
- <a01cc299-69e7-daa2-6894-1c60aaa64e67@oracle.com>
-From:   yangerkun <yangerkun@huawei.com>
-Message-ID: <3fd0dee1-52d6-4ea8-53d8-2c88b7fedce6@huawei.com>
-Date:   Mon, 4 Nov 2019 19:46:32 +0800
-User-Agent: Mozilla/5.0 (Windows NT 10.0; WOW64; rv:60.0) Gecko/20100101
- Thunderbird/60.7.0
+        id S1728346AbfKDL7j (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Mon, 4 Nov 2019 06:59:39 -0500
+Received: from us-smtp-delivery-1.mimecast.com ([207.211.31.120]:53449 "EHLO
+        us-smtp-1.mimecast.com" rhost-flags-OK-OK-OK-FAIL) by vger.kernel.org
+        with ESMTP id S1727663AbfKDL7j (ORCPT
+        <rfc822;linux-block@vger.kernel.org>); Mon, 4 Nov 2019 06:59:39 -0500
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+        s=mimecast20190719; t=1572868778;
+        h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+         to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+         content-transfer-encoding:content-transfer-encoding:
+         in-reply-to:in-reply-to:references:references;
+        bh=b/s3YEvh2xEz6f1xfLOfcSC2xtpmsXL9FCggxTE73dE=;
+        b=bD7OxtAOHJ8nqQsSxGqmTbHu9mmiSSde3c9W9d1xdn/bRR1aabFqvWgwV8IRdvtd8mrdoM
+        AZnh8JSGWjU10JarFaEi3HxXF/xCIvmrGeQD7lkwo2J9bpW/enmvO76lETgtAOs0Qgkwee
+        b2WhLKz39rtW6Oe1aar4s6637ZEwSos=
+Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
+ [209.132.183.4]) (Using TLS) by relay.mimecast.com with ESMTP id
+ us-mta-417-wGlYFAqDPFWTCF1rJvLJaQ-1; Mon, 04 Nov 2019 06:59:35 -0500
+Received: from smtp.corp.redhat.com (int-mx02.intmail.prod.int.phx2.redhat.com [10.5.11.12])
+        (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
+        (No client certificate requested)
+        by mimecast-mx01.redhat.com (Postfix) with ESMTPS id EBA6E1005500;
+        Mon,  4 Nov 2019 11:59:33 +0000 (UTC)
+Received: from segfault.boston.devel.redhat.com (unknown [10.19.60.26])
+        by smtp.corp.redhat.com (Postfix) with ESMTPS id 51BF560C88;
+        Mon,  4 Nov 2019 11:59:33 +0000 (UTC)
+From:   Jeff Moyer <jmoyer@redhat.com>
+To:     Dan Carpenter <dan.carpenter@oracle.com>
+Cc:     Jens Axboe <axboe@kernel.dk>, linux-block@vger.kernel.org,
+        linux-kernel@vger.kernel.org, kernel-janitors@vger.kernel.org
+Subject: Re: [PATCH] iocost: add a comment about locking in ioc_weight_write()
+References: <20191104101811.GA20821@mwanda>
+X-PGP-KeyID: 1F78E1B4
+X-PGP-CertKey: F6FE 280D 8293 F72C 65FD  5A58 1FF8 A7CA 1F78 E1B4
+Date:   Mon, 04 Nov 2019 06:59:32 -0500
+In-Reply-To: <20191104101811.GA20821@mwanda> (Dan Carpenter's message of "Mon,
+        4 Nov 2019 13:18:11 +0300")
+Message-ID: <x491runq2cb.fsf@segfault.boston.devel.redhat.com>
+User-Agent: Gnus/5.13 (Gnus v5.13) Emacs/26.1 (gnu/linux)
 MIME-Version: 1.0
-In-Reply-To: <a01cc299-69e7-daa2-6894-1c60aaa64e67@oracle.com>
-Content-Type: text/plain; charset="utf-8"; format=flowed
-Content-Language: en-US
-Content-Transfer-Encoding: 7bit
-X-Originating-IP: [10.133.210.141]
-X-CFilter-Loop: Reflected
+X-Scanned-By: MIMEDefang 2.79 on 10.5.11.12
+X-MC-Unique: wGlYFAqDPFWTCF1rJvLJaQ-1
+X-Mimecast-Spam-Score: 0
+Content-Type: text/plain; charset=WINDOWS-1252
+Content-Transfer-Encoding: quoted-printable
 Sender: linux-block-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
+Dan Carpenter <dan.carpenter@oracle.com> writes:
 
+> It wasn't very clear that blkg_conf_prep() disables IRQ and that they
+> are enabled in blkg_conf_finish() so this patch adds a comment about it.
+>
+> Signed-off-by: Dan Carpenter <dan.carpenter@oracle.com>
 
-On 2019/11/4 18:09, Bob Liu wrote:
-> On 11/4/19 4:56 PM, yangerkun wrote:
->> There is no problem to support other type request for the ctx with
->> IORING_SETUP_IOPOLL.
-> 
-> Could you describe the benefit of doing this?
+Reviewed-by: Jeff Moyer <jmoyer@redhat.com>
 
-Hi,
+Thanks, Dan!
 
-I am trying to replace libaio with io_uring in InnoDB/MariaDB(which
-build on xfs/nvme). And in order to simulate the timeout mechanism
-like io_getevents, firstly, to use the poll function of io_uring's fd 
-has been selected and it really did work. But while trying to enable
-IORING_SETUP_IOPOLL since xfs has iopoll function interface, the
-mechanism will fail since io_uring_poll does check the cq.head between
-cached_cq_tail, which will not update until we call io_uring_enter and
-do the poll. So, instead, I decide to use timeout requests in
-io_uring but will return -EINVAL since we enable IORING_SETUP_IOPOLL
-at the same time. I think this combination is a normal scene so as
-the other combination descibed in this patch. I am not sure does it a
-good solution for this problem, and maybe there exists some better way.
-
-Thanks,
-Kun.
-
-
-
-> 
->> What we should do is just insert read/write
->> requests to poll list, and protect cqes with comopletion_lock in
->> io_iopoll_complete since other requests now can be completed as the same
->> time while we do io_iopoll_complete.
->>
->> Signed-off-by: yangerkun <yangerkun@huawei.com>
->> ---
->>   fs/io_uring.c | 29 +++++++++--------------------
->>   1 file changed, 9 insertions(+), 20 deletions(-)
->>
->> diff --git a/fs/io_uring.c b/fs/io_uring.c
->> index f9a38998f2fc..8bf52d9a2c55 100644
->> --- a/fs/io_uring.c
->> +++ b/fs/io_uring.c
->> @@ -753,9 +753,11 @@ static void io_iopoll_complete(struct io_ring_ctx *ctx, unsigned int *nr_events,
->>   {
->>   	void *reqs[IO_IOPOLL_BATCH];
->>   	struct io_kiocb *req;
->> +	unsigned long flags;
->>   	int to_free;
->>   
->>   	to_free = 0;
->> +	spin_lock_irqsave(&ctx->completion_lock, flags);
->>   	while (!list_empty(done)) {
->>   		req = list_first_entry(done, struct io_kiocb, list);
->>   		list_del(&req->list);
->> @@ -781,6 +783,7 @@ static void io_iopoll_complete(struct io_ring_ctx *ctx, unsigned int *nr_events,
->>   	}
->>   
->>   	io_commit_cqring(ctx);
->> +	spin_unlock_irqrestore(&ctx->completion_lock, flags);
->>   	io_free_req_many(ctx, reqs, &to_free);
->>   }
->>   
->> @@ -1517,9 +1520,6 @@ static int io_nop(struct io_kiocb *req, u64 user_data)
->>   	struct io_ring_ctx *ctx = req->ctx;
->>   	long err = 0;
->>   
->> -	if (unlikely(ctx->flags & IORING_SETUP_IOPOLL))
->> -		return -EINVAL;
->> -
->>   	io_cqring_add_event(ctx, user_data, err);
->>   	io_put_req(req);
->>   	return 0;
->> @@ -1527,13 +1527,9 @@ static int io_nop(struct io_kiocb *req, u64 user_data)
->>   
->>   static int io_prep_fsync(struct io_kiocb *req, const struct io_uring_sqe *sqe)
->>   {
->> -	struct io_ring_ctx *ctx = req->ctx;
->> -
->>   	if (!req->file)
->>   		return -EBADF;
->>   
->> -	if (unlikely(ctx->flags & IORING_SETUP_IOPOLL))
->> -		return -EINVAL;
->>   	if (unlikely(sqe->addr || sqe->ioprio || sqe->buf_index))
->>   		return -EINVAL;
->>   
->> @@ -1574,14 +1570,11 @@ static int io_fsync(struct io_kiocb *req, const struct io_uring_sqe *sqe,
->>   
->>   static int io_prep_sfr(struct io_kiocb *req, const struct io_uring_sqe *sqe)
->>   {
->> -	struct io_ring_ctx *ctx = req->ctx;
->>   	int ret = 0;
->>   
->>   	if (!req->file)
->>   		return -EBADF;
->>   
->> -	if (unlikely(ctx->flags & IORING_SETUP_IOPOLL))
->> -		return -EINVAL;
->>   	if (unlikely(sqe->addr || sqe->ioprio || sqe->buf_index))
->>   		return -EINVAL;
->>   
->> @@ -1627,9 +1620,6 @@ static int io_send_recvmsg(struct io_kiocb *req, const struct io_uring_sqe *sqe,
->>   	struct socket *sock;
->>   	int ret;
->>   
->> -	if (unlikely(req->ctx->flags & IORING_SETUP_IOPOLL))
->> -		return -EINVAL;
->> -
->>   	sock = sock_from_file(req->file, &ret);
->>   	if (sock) {
->>   		struct user_msghdr __user *msg;
->> @@ -1712,8 +1702,6 @@ static int io_poll_remove(struct io_kiocb *req, const struct io_uring_sqe *sqe)
->>   	struct io_kiocb *poll_req, *next;
->>   	int ret = -ENOENT;
->>   
->> -	if (unlikely(req->ctx->flags & IORING_SETUP_IOPOLL))
->> -		return -EINVAL;
->>   	if (sqe->ioprio || sqe->off || sqe->len || sqe->buf_index ||
->>   	    sqe->poll_events)
->>   		return -EINVAL;
->> @@ -1833,8 +1821,6 @@ static int io_poll_add(struct io_kiocb *req, const struct io_uring_sqe *sqe)
->>   	__poll_t mask;
->>   	u16 events;
->>   
->> -	if (unlikely(req->ctx->flags & IORING_SETUP_IOPOLL))
->> -		return -EINVAL;
->>   	if (sqe->addr || sqe->ioprio || sqe->off || sqe->len || sqe->buf_index)
->>   		return -EINVAL;
->>   	if (!poll->file)
->> @@ -1932,8 +1918,6 @@ static int io_timeout(struct io_kiocb *req, const struct io_uring_sqe *sqe)
->>   	struct timespec64 ts;
->>   	unsigned span = 0;
->>   
->> -	if (unlikely(ctx->flags & IORING_SETUP_IOPOLL))
->> -		return -EINVAL;
->>   	if (sqe->flags || sqe->ioprio || sqe->buf_index || sqe->timeout_flags ||
->>   	    sqe->len != 1)
->>   		return -EINVAL;
->> @@ -2032,6 +2016,7 @@ static int __io_submit_sqe(struct io_ring_ctx *ctx, struct io_kiocb *req,
->>   			   const struct sqe_submit *s, bool force_nonblock)
->>   {
->>   	int ret, opcode;
->> +	bool poll = false;
->>   
->>   	req->user_data = READ_ONCE(s->sqe->user_data);
->>   
->> @@ -2046,17 +2031,21 @@ static int __io_submit_sqe(struct io_ring_ctx *ctx, struct io_kiocb *req,
->>   	case IORING_OP_READV:
->>   		if (unlikely(s->sqe->buf_index))
->>   			return -EINVAL;
->> +		poll = true;
->>   		ret = io_read(req, s, force_nonblock);
->>   		break;
->>   	case IORING_OP_WRITEV:
->>   		if (unlikely(s->sqe->buf_index))
->>   			return -EINVAL;
->> +		poll = true;
->>   		ret = io_write(req, s, force_nonblock);
->>   		break;
->>   	case IORING_OP_READ_FIXED:
->> +		poll = true;
->>   		ret = io_read(req, s, force_nonblock);
->>   		break;
->>   	case IORING_OP_WRITE_FIXED:
->> +		poll = true;
->>   		ret = io_write(req, s, force_nonblock);
->>   		break;
->>   	case IORING_OP_FSYNC:
->> @@ -2088,7 +2077,7 @@ static int __io_submit_sqe(struct io_ring_ctx *ctx, struct io_kiocb *req,
->>   	if (ret)
->>   		return ret;
->>   
->> -	if (ctx->flags & IORING_SETUP_IOPOLL) {
->> +	if ((ctx->flags & IORING_SETUP_IOPOLL) && poll) {
->>   		if (req->result == -EAGAIN)
->>   			return -EAGAIN;
->>   
->>
-> 
-> 
-> .
-> 
+> ---
+> I don't know if it's too late to fold this in with the previous patch?
+>
+>  block/blk-iocost.c | 2 ++
+>  1 file changed, 2 insertions(+)
+>
+> diff --git a/block/blk-iocost.c b/block/blk-iocost.c
+> index a7ed434eae03..c5a8703ca6aa 100644
+> --- a/block/blk-iocost.c
+> +++ b/block/blk-iocost.c
+> @@ -2095,6 +2095,7 @@ static ssize_t ioc_weight_write(struct kernfs_open_=
+file *of, char *buf,
+>  =09=09return nbytes;
+>  =09}
+> =20
+> +=09/* blkg_conf_prep() takes the q->queue_lock and disables IRQs */
+>  =09ret =3D blkg_conf_prep(blkcg, &blkcg_policy_iocost, buf, &ctx);
+>  =09if (ret)
+>  =09=09return ret;
+> @@ -2115,6 +2116,7 @@ static ssize_t ioc_weight_write(struct kernfs_open_=
+file *of, char *buf,
+>  =09weight_updated(iocg);
+>  =09spin_unlock(&iocg->ioc->lock);
+> =20
+> +=09/* blkg_conf_finish() unlocks the q->queue_lock and enables IRQs */
+>  =09blkg_conf_finish(&ctx);
+>  =09return nbytes;
 
