@@ -2,123 +2,93 @@ Return-Path: <SRS0=59TO=Y4=vger.kernel.org=linux-block-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-2.4 required=3.0 tests=DKIMWL_WL_HIGH,DKIM_SIGNED,
-	DKIM_VALID,DKIM_VALID_AU,HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,
-	SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED,USER_AGENT_SANE_1 autolearn=no
-	autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-5.6 required=3.0 tests=DKIMWL_WL_HIGH,DKIM_SIGNED,
+	DKIM_VALID,DKIM_VALID_AU,INCLUDES_PATCH,MAILING_LIST_MULTI,SPF_HELO_NONE,
+	SPF_PASS,USER_AGENT_SANE_1 autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 7F3AACA9ED4
-	for <linux-block@archiver.kernel.org>; Mon,  4 Nov 2019 19:20:47 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 971F8CA9EB5
+	for <linux-block@archiver.kernel.org>; Mon,  4 Nov 2019 19:30:10 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.kernel.org (Postfix) with ESMTP id 59760214D9
-	for <linux-block@archiver.kernel.org>; Mon,  4 Nov 2019 19:20:47 +0000 (UTC)
-Authentication-Results: mail.kernel.org;
-	dkim=pass (2048-bit key) header.d=nvidia.com header.i=@nvidia.com header.b="RSIwXbFs"
+	by mail.kernel.org (Postfix) with ESMTP id 5D75D2089C
+	for <linux-block@archiver.kernel.org>; Mon,  4 Nov 2019 19:30:10 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+	s=default; t=1572895810;
+	bh=KIm1BXETWm0K9qnZYKk9XVNAw+iay6pmiy3HTzZD4zk=;
+	h=Date:From:To:Cc:Subject:References:In-Reply-To:List-ID:From;
+	b=HsxDZx1CsLGX0D/PaocqF5QKo0F172zrMe8gfWZBQFLa3EBO1/brQ2oR6Ra943FaZ
+	 osq4HOZFs7kI6GV+K2ER3xQ0zBrd0mz/iReIUMHO+NLdpdpL/wDDIl/d3sfrwC4mNK
+	 XeKUlXjwBe1/QSI7Sqx5xgH0+Hhb2b5NhW6x/yRI=
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1728568AbfKDTUk (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Mon, 4 Nov 2019 14:20:40 -0500
-Received: from hqemgate14.nvidia.com ([216.228.121.143]:1272 "EHLO
-        hqemgate14.nvidia.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1728409AbfKDTUk (ORCPT
-        <rfc822;linux-block@vger.kernel.org>); Mon, 4 Nov 2019 14:20:40 -0500
-Received: from hqpgpgate102.nvidia.com (Not Verified[216.228.121.13]) by hqemgate14.nvidia.com (using TLS: TLSv1.2, DES-CBC3-SHA)
-        id <B5dc07a0d0000>; Mon, 04 Nov 2019 11:20:45 -0800
-Received: from hqmail.nvidia.com ([172.20.161.6])
-  by hqpgpgate102.nvidia.com (PGP Universal service);
-  Mon, 04 Nov 2019 11:20:39 -0800
-X-PGP-Universal: processed;
-        by hqpgpgate102.nvidia.com on Mon, 04 Nov 2019 11:20:39 -0800
-Received: from [10.110.48.28] (10.124.1.5) by HQMAIL107.nvidia.com
- (172.20.187.13) with Microsoft SMTP Server (TLS) id 15.0.1473.3; Mon, 4 Nov
- 2019 19:20:38 +0000
-Subject: Re: [PATCH 09/19] drm/via: set FOLL_PIN via pin_user_pages_fast()
-To:     Ira Weiny <ira.weiny@intel.com>,
-        Andrew Morton <akpm@linux-foundation.org>,
-        Al Viro <viro@zeniv.linux.org.uk>,
-        Alex Williamson <alex.williamson@redhat.com>,
-        Benjamin Herrenschmidt <benh@kernel.crashing.org>,
-        =?UTF-8?B?QmrDtnJuIFTDtnBlbA==?= <bjorn.topel@intel.com>,
-        Christoph Hellwig <hch@infradead.org>,
-        Dan Williams <dan.j.williams@intel.com>,
-        Dave Chinner <david@fromorbit.com>,
-        David Airlie <airlied@linux.ie>,
-        "David S . Miller" <davem@davemloft.net>, Jan Kara <jack@suse.cz>,
-        Jason Gunthorpe <jgg@ziepe.ca>, Jens Axboe <axboe@kernel.dk>,
-        Jonathan Corbet <corbet@lwn.net>,
-        =?UTF-8?B?SsOpcsO0bWUgR2xpc3Nl?= <jglisse@redhat.com>,
-        Magnus Karlsson <magnus.karlsson@intel.com>,
-        Mauro Carvalho Chehab <mchehab@kernel.org>,
-        Michael Ellerman <mpe@ellerman.id.au>,
-        Michal Hocko <mhocko@suse.com>,
-        Mike Kravetz <mike.kravetz@oracle.com>,
-        Paul Mackerras <paulus@samba.org>,
-        Shuah Khan <shuah@kernel.org>,
-        Vlastimil Babka <vbabka@suse.cz>, <bpf@vger.kernel.org>,
-        <dri-devel@lists.freedesktop.org>, <kvm@vger.kernel.org>,
-        <linux-block@vger.kernel.org>, <linux-doc@vger.kernel.org>,
-        <linux-fsdevel@vger.kernel.org>, <linux-kselftest@vger.kernel.org>,
-        <linux-media@vger.kernel.org>, <linux-rdma@vger.kernel.org>,
-        <linuxppc-dev@lists.ozlabs.org>, <netdev@vger.kernel.org>,
-        <linux-mm@kvack.org>, LKML <linux-kernel@vger.kernel.org>
-References: <20191030224930.3990755-1-jhubbard@nvidia.com>
- <20191030224930.3990755-10-jhubbard@nvidia.com>
- <20191031233628.GI14771@iweiny-DESK2.sc.intel.com>
- <20191104181055.GP10326@phenom.ffwll.local>
-X-Nvconfidentiality: public
-From:   John Hubbard <jhubbard@nvidia.com>
-Message-ID: <48d22c77-c313-59ff-4847-bc9a9813b8a7@nvidia.com>
-Date:   Mon, 4 Nov 2019 11:20:38 -0800
-User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:60.0) Gecko/20100101
- Thunderbird/60.8.0
+        id S1728268AbfKDTaJ (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Mon, 4 Nov 2019 14:30:09 -0500
+Received: from mail.kernel.org ([198.145.29.99]:53570 "EHLO mail.kernel.org"
+        rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
+        id S1728174AbfKDTaJ (ORCPT <rfc822;linux-block@vger.kernel.org>);
+        Mon, 4 Nov 2019 14:30:09 -0500
+Received: from redsun51.ssa.fujisawa.hgst.com (unknown [199.255.47.7])
+        (using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+        (No client certificate requested)
+        by mail.kernel.org (Postfix) with ESMTPSA id 9691920869;
+        Mon,  4 Nov 2019 19:30:08 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+        s=default; t=1572895809;
+        bh=KIm1BXETWm0K9qnZYKk9XVNAw+iay6pmiy3HTzZD4zk=;
+        h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
+        b=jJtKxYGYdCKkcADCiq6ra3B8eoJ2FRTapsMdQf+SGouZcXJWwm3jpduutTYciKyP8
+         ZZ/mjJRK31EWhgX+xaZjAdL+W/CcjEN0FszrZbSFqm2M/D+dkL6xWuMuEGNINESHyU
+         nq77Q7O+S1hblW9tVH69pOzPHCJpHa8P1fm6VQ5Y=
+Date:   Tue, 5 Nov 2019 04:30:02 +0900
+From:   Keith Busch <kbusch@kernel.org>
+To:     Christoph Hellwig <hch@lst.de>
+Cc:     axboe@kernel.dk, ming.lei@redhat.com, linux-block@vger.kernel.org
+Subject: Re: [PATCH] block: avoid blk_bio_segment_split for small I/O
+ operations
+Message-ID: <20191104193002.GA21075@redsun51.ssa.fujisawa.hgst.com>
+References: <20191104180543.23123-1-hch@lst.de>
 MIME-Version: 1.0
-In-Reply-To: <20191104181055.GP10326@phenom.ffwll.local>
-X-Originating-IP: [10.124.1.5]
-X-ClientProxiedBy: HQMAIL111.nvidia.com (172.20.187.18) To
- HQMAIL107.nvidia.com (172.20.187.13)
-Content-Type: text/plain; charset="utf-8"
-Content-Language: en-US
-Content-Transfer-Encoding: 7bit
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=nvidia.com; s=n1;
-        t=1572895245; bh=EB1gpI7uMEMtuW6gqSsThU4ex+aDzj2XSFqSPP65uaQ=;
-        h=X-PGP-Universal:Subject:To:References:X-Nvconfidentiality:From:
-         Message-ID:Date:User-Agent:MIME-Version:In-Reply-To:
-         X-Originating-IP:X-ClientProxiedBy:Content-Type:Content-Language:
-         Content-Transfer-Encoding;
-        b=RSIwXbFsNa3f/kTT6RqCBQLIY2aWqQWAD7FlV+0bWeNT3hEciNmSZuNvV8pRpiJ60
-         e0uuS+69VcqG5oSf1sUWyzF8VcAyrTkMNNj6cdJS8AAil4vorCfa5P65SfRcv9q+8W
-         ozPTc/Fbb2bfj8cusatLemt7LHz5SiJ0UgONgHLAjPrqgZGNa3lTKALNJJ+BVOOS2G
-         swfgIWoBY2ZTyveZdj73jKp2eTRQ1+8Juf5FFDph3sRYNFXeKwps7p0UPOflB7r3qQ
-         0n1vN231W3z0bEfLz8HLukYIiIePPvBbH2GdVFu8NRMpfQ7l8VNrixKxs7UGVoyxrS
-         ECmh2kltaw5mA==
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <20191104180543.23123-1-hch@lst.de>
+User-Agent: Mutt/1.12.1 (2019-06-15)
 Sender: linux-block-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-On 11/4/19 10:10 AM, Daniel Vetter wrote:
-> On Thu, Oct 31, 2019 at 04:36:28PM -0700, Ira Weiny wrote:
->> On Wed, Oct 30, 2019 at 03:49:20PM -0700, John Hubbard wrote:
->>> Convert drm/via to use the new pin_user_pages_fast() call, which sets
->>> FOLL_PIN. Setting FOLL_PIN is now required for code that requires
->>> tracking of pinned pages, and therefore for any code that calls
->>> put_user_page().
->>>
->>
->> Reviewed-by: Ira Weiny <ira.weiny@intel.com>
-> 
-> No one's touching the via driver anymore, so feel free to merge this
-> through whatever tree suits best (aka I'll drop this on the floor and
-> forget about it now).
-> 
-> Acked-by: Daniel Vetter <daniel.vetter@ffwll.ch>
-> 
+On Mon, Nov 04, 2019 at 10:05:43AM -0800, Christoph Hellwig wrote:
+> diff --git a/block/blk-merge.c b/block/blk-merge.c
+> index 48e6725b32ee..06eb38357b41 100644
+> --- a/block/blk-merge.c
+> +++ b/block/blk-merge.c
+> @@ -293,7 +293,7 @@ static struct bio *blk_bio_segment_split(struct request_queue *q,
+>  void __blk_queue_split(struct request_queue *q, struct bio **bio,
+>  		unsigned int *nr_segs)
+>  {
+> -	struct bio *split;
+> +	struct bio *split = NULL;
+>  
+>  	switch (bio_op(*bio)) {
+>  	case REQ_OP_DISCARD:
+> @@ -309,6 +309,19 @@ void __blk_queue_split(struct request_queue *q, struct bio **bio,
+>  				nr_segs);
+>  		break;
+>  	default:
+> +		/*
+> +		 * All drivers must accept single-segments bios that are <=
+> +		 * PAGE_SIZE.  This is a quick and dirty check that relies on
+> +		 * the fact that bi_io_vec[0] is always valid if a bio has data.
+> +		 * The check might lead to occasional false negatives when bios
+> +		 * are cloned, but compared to the performance impact of cloned
+> +		 * bios themselves the loop below doesn't matter anyway.
+> +		 */
+> +		if ((*bio)->bi_vcnt == 1 &&
+> +		    (*bio)->bi_io_vec[0].bv_len <= PAGE_SIZE) {
+> +			*nr_segs = 1;
+> +			break;
+> +		}
+>  		split = blk_bio_segment_split(q, *bio, &q->bio_split, nr_segs);
+>  		break;
+>  	}
 
-OK, great. Yes, in fact, I'm hoping Andrew can just push the whole series
-in through the mm tree, because that would allow it to be done in one 
-shot, in 5.5
-
-
-thanks,
-
-John Hubbard
-NVIDIA
+If the device advertises a chunk boundary and this small IO happens to
+cross it, skipping the split is going to harm performance.
