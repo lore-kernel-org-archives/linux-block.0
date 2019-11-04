@@ -2,171 +2,89 @@ Return-Path: <SRS0=59TO=Y4=vger.kernel.org=linux-block-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-8.0 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
-	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,
-	SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED,USER_AGENT_SANE_1 autolearn=unavailable
-	autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-2.3 required=3.0 tests=DKIM_SIGNED,DKIM_VALID,
+	DKIM_VALID_AU,FREEMAIL_FORGED_FROMDOMAIN,FREEMAIL_FROM,
+	HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,
+	USER_AGENT_SANE_1 autolearn=no autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id C58B9CA9EB5
-	for <linux-block@archiver.kernel.org>; Mon,  4 Nov 2019 18:11:08 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id EB45BCA9EB5
+	for <linux-block@archiver.kernel.org>; Mon,  4 Nov 2019 18:14:07 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.kernel.org (Postfix) with ESMTP id 902912084D
-	for <linux-block@archiver.kernel.org>; Mon,  4 Nov 2019 18:11:08 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id C5F86214D9
+	for <linux-block@archiver.kernel.org>; Mon,  4 Nov 2019 18:14:07 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (1024-bit key) header.d=ffwll.ch header.i=@ffwll.ch header.b="RPIdhIou"
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="bbBev0z0"
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1729312AbfKDSLC (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Mon, 4 Nov 2019 13:11:02 -0500
-Received: from mail-wr1-f66.google.com ([209.85.221.66]:34008 "EHLO
-        mail-wr1-f66.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1728322AbfKDSLC (ORCPT
-        <rfc822;linux-block@vger.kernel.org>); Mon, 4 Nov 2019 13:11:02 -0500
-Received: by mail-wr1-f66.google.com with SMTP id e6so16380496wrw.1
-        for <linux-block@vger.kernel.org>; Mon, 04 Nov 2019 10:10:59 -0800 (PST)
+        id S1729704AbfKDSOH (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Mon, 4 Nov 2019 13:14:07 -0500
+Received: from mail-qk1-f196.google.com ([209.85.222.196]:40761 "EHLO
+        mail-qk1-f196.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S1728800AbfKDSOG (ORCPT
+        <rfc822;linux-block@vger.kernel.org>); Mon, 4 Nov 2019 13:14:06 -0500
+Received: by mail-qk1-f196.google.com with SMTP id a18so899320qkk.7;
+        Mon, 04 Nov 2019 10:14:06 -0800 (PST)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=ffwll.ch; s=google;
-        h=sender:date:from:to:cc:subject:message-id:mail-followup-to
-         :references:mime-version:content-disposition:in-reply-to:user-agent;
-        bh=j2dTn7Wj7MGJZeGgFXPtBogE4qg0BoOVrIkL6wJedbU=;
-        b=RPIdhIouR3j/Ac7neKFnGVsgwJtt56byt4O2813ik4ObcxN+6tPIIPEpIvd4bHdCQy
-         xfCULaOlOfNgr9pPNLunatyY1TT5oMd7MopfAimYN7Fzif9xA431/mZ6rvrz1NeweKf9
-         nhCRlvw6Mqd6dfgcS8I0AQ1BearSl/gQZ3yck=
+        d=gmail.com; s=20161025;
+        h=date:from:to:cc:subject:message-id:references:mime-version
+         :content-disposition:in-reply-to:user-agent;
+        bh=CESSF5qn5Qy1BsK9cSv3ooZQ0bXf2ohjxEDHCQYKAtY=;
+        b=bbBev0z0ZJgRVN64Ta4O0Y630R1T16xvmTzoDGJvanMDytqaW2ks41pi5XDQQv6ckh
+         aFzDgqJRv6pLLvw4LQ0ef33lMYuol/kkthFp6ZTOjJxjZMO7VLdEZfG47Ojcdnw4mUqx
+         vC19/O4cWztFDNNdIkolaFVMk4m1dyNOTrk8BY5KKTbW3gewkagEypksMSyMzHMc3VTM
+         2VJSFTpQZbmuY9BTAfzi5GOPaARQa/iY6DHgiIdtix0xL5OXWSOQmHOpyB9kst/g2aWz
+         1ENLCgKbv8Fki4yKuch06VgArWZlGqAv4KZroYec0DxHWTgZb99eIQleTR0eJVSLa42o
+         p9Zw==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=1e100.net; s=20161025;
-        h=x-gm-message-state:sender:date:from:to:cc:subject:message-id
-         :mail-followup-to:references:mime-version:content-disposition
-         :in-reply-to:user-agent;
-        bh=j2dTn7Wj7MGJZeGgFXPtBogE4qg0BoOVrIkL6wJedbU=;
-        b=Qirz0UYc7Ik6lTpvhrCFNgrh4MqQZ/5Jz85GJs0juLLQuWkuRpqKVltf8cmsvJptxp
-         ZF4AOUoWlyC692ldurRUVtRD2LF5RuBmNSDyMI99geVP+MYD4LjA3wrLBcCsRL6OytJ8
-         w6HdN6FusGixMimPW2FKxMt22mQqOpKk/Ypx5pcV1sZLTWaR8jXWdoKFmh2RpUbizVL1
-         3fZ9JJIomyardhJuoM4OQmpanR4o+jo4S3Xv8tK/bkquNpUn0brKMmTgedQy5Me6Pz7O
-         wAQGNpV7f6YHd/fmLShML8wLK90NnFOunMMjQ7765JqZ+OoGk0x3kADRtMh/DUVt0Peh
-         ztuQ==
-X-Gm-Message-State: APjAAAW8QTzhPg2CTBvBBJyWgD6h7tG70ZH7MNZmtsA6QQPaJEBv7d8m
-        K9rCQx8lFlmaQnTi3AorP5Wklg==
-X-Google-Smtp-Source: APXvYqwKkCPGo7mLK0jIbZGuRHh4x9upKlx8LPQBL5XTz+fwA202HVPHUNfjQCRnXVzy4o6JxOqyww==
-X-Received: by 2002:a5d:448a:: with SMTP id j10mr25997024wrq.79.1572891058912;
-        Mon, 04 Nov 2019 10:10:58 -0800 (PST)
-Received: from phenom.ffwll.local (212-51-149-96.fiber7.init7.net. [212.51.149.96])
-        by smtp.gmail.com with ESMTPSA id f13sm17508153wrq.96.2019.11.04.10.10.57
+        h=x-gm-message-state:date:from:to:cc:subject:message-id:references
+         :mime-version:content-disposition:in-reply-to:user-agent;
+        bh=CESSF5qn5Qy1BsK9cSv3ooZQ0bXf2ohjxEDHCQYKAtY=;
+        b=hZRjdiTcFYX4Bh6THTTXlV3M0cnGBtafH1f1QY/ttusWzCQO6WKLcenATf8A7EpJOC
+         0Q5uf6/nUTM9BMvncCXatvOKK2OOOnn+H4U2X34puUhAPhxVy5OY/oRZ6OxkzAJu60qT
+         KZAmcM9Ok9GizB7lfiH1eFP9YHU53FszkjzKpQy38QofyRiKKPlWDGqlarastz/rEfBS
+         4GrDsABK5XvL9Pv1dh78XZQEa1OXZ2uoEdzxE9f49yiVjSupPl7ErA+UTvIgSrn/ldPh
+         ISbe3pGTRl4QPliqnc7Vtkukm3ecDpl5ON6x8kIVAIxPw9R7JQFTfTq5OwBkqbduv2eH
+         hW1Q==
+X-Gm-Message-State: APjAAAV9NMNJFTj/AMf5bh4vvwY/f9vZUz1UWI/9q/luYwDt47ktwxK9
+        O1OLdk4I6hU8/Uj3+Fp7R6gh9ak=
+X-Google-Smtp-Source: APXvYqxUaKEF4+SNjFWN9SPMlt/WM8ySSX7s6Z5IiCYRUwP2UY0BGwuamZ0ntDOPQlEs6solywT93g==
+X-Received: by 2002:a37:4f0a:: with SMTP id d10mr17943522qkb.286.1572891245747;
+        Mon, 04 Nov 2019 10:14:05 -0800 (PST)
+Received: from kmo-pixel ([65.183.151.50])
+        by smtp.gmail.com with ESMTPSA id a3sm8515824qkf.76.2019.11.04.10.14.04
         (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Mon, 04 Nov 2019 10:10:57 -0800 (PST)
-Date:   Mon, 4 Nov 2019 19:10:55 +0100
-From:   Daniel Vetter <daniel@ffwll.ch>
-To:     Ira Weiny <ira.weiny@intel.com>
-Cc:     John Hubbard <jhubbard@nvidia.com>,
-        Andrew Morton <akpm@linux-foundation.org>,
-        Al Viro <viro@zeniv.linux.org.uk>,
-        Alex Williamson <alex.williamson@redhat.com>,
-        Benjamin Herrenschmidt <benh@kernel.crashing.org>,
-        =?iso-8859-1?Q?Bj=F6rn_T=F6pel?= <bjorn.topel@intel.com>,
+        Mon, 04 Nov 2019 10:14:05 -0800 (PST)
+Date:   Mon, 4 Nov 2019 13:14:03 -0500
+From:   Kent Overstreet <kent.overstreet@gmail.com>
+To:     Ming Lei <ming.lei@redhat.com>
+Cc:     Jens Axboe <axboe@kernel.dk>, linux-block@vger.kernel.org,
+        Coly Li <colyli@suse.de>,
         Christoph Hellwig <hch@infradead.org>,
-        Dan Williams <dan.j.williams@intel.com>,
-        Daniel Vetter <daniel@ffwll.ch>,
-        Dave Chinner <david@fromorbit.com>,
-        David Airlie <airlied@linux.ie>,
-        "David S . Miller" <davem@davemloft.net>, Jan Kara <jack@suse.cz>,
-        Jason Gunthorpe <jgg@ziepe.ca>, Jens Axboe <axboe@kernel.dk>,
-        Jonathan Corbet <corbet@lwn.net>,
-        =?iso-8859-1?B?Suly9G1l?= Glisse <jglisse@redhat.com>,
-        Magnus Karlsson <magnus.karlsson@intel.com>,
-        Mauro Carvalho Chehab <mchehab@kernel.org>,
-        Michael Ellerman <mpe@ellerman.id.au>,
-        Michal Hocko <mhocko@suse.com>,
-        Mike Kravetz <mike.kravetz@oracle.com>,
-        Paul Mackerras <paulus@samba.org>,
-        Shuah Khan <shuah@kernel.org>,
-        Vlastimil Babka <vbabka@suse.cz>, bpf@vger.kernel.org,
-        dri-devel@lists.freedesktop.org, kvm@vger.kernel.org,
-        linux-block@vger.kernel.org, linux-doc@vger.kernel.org,
-        linux-fsdevel@vger.kernel.org, linux-kselftest@vger.kernel.org,
-        linux-media@vger.kernel.org, linux-rdma@vger.kernel.org,
-        linuxppc-dev@lists.ozlabs.org, netdev@vger.kernel.org,
-        linux-mm@kvack.org, LKML <linux-kernel@vger.kernel.org>
-Subject: Re: [PATCH 09/19] drm/via: set FOLL_PIN via pin_user_pages_fast()
-Message-ID: <20191104181055.GP10326@phenom.ffwll.local>
-Mail-Followup-To: Ira Weiny <ira.weiny@intel.com>,
-        John Hubbard <jhubbard@nvidia.com>,
-        Andrew Morton <akpm@linux-foundation.org>,
-        Al Viro <viro@zeniv.linux.org.uk>,
-        Alex Williamson <alex.williamson@redhat.com>,
-        Benjamin Herrenschmidt <benh@kernel.crashing.org>,
-        =?iso-8859-1?Q?Bj=F6rn_T=F6pel?= <bjorn.topel@intel.com>,
-        Christoph Hellwig <hch@infradead.org>,
-        Dan Williams <dan.j.williams@intel.com>,
-        Dave Chinner <david@fromorbit.com>, David Airlie <airlied@linux.ie>,
-        "David S . Miller" <davem@davemloft.net>, Jan Kara <jack@suse.cz>,
-        Jason Gunthorpe <jgg@ziepe.ca>, Jens Axboe <axboe@kernel.dk>,
-        Jonathan Corbet <corbet@lwn.net>,
-        =?iso-8859-1?B?Suly9G1l?= Glisse <jglisse@redhat.com>,
-        Magnus Karlsson <magnus.karlsson@intel.com>,
-        Mauro Carvalho Chehab <mchehab@kernel.org>,
-        Michael Ellerman <mpe@ellerman.id.au>,
-        Michal Hocko <mhocko@suse.com>,
-        Mike Kravetz <mike.kravetz@oracle.com>,
-        Paul Mackerras <paulus@samba.org>, Shuah Khan <shuah@kernel.org>,
-        Vlastimil Babka <vbabka@suse.cz>, bpf@vger.kernel.org,
-        dri-devel@lists.freedesktop.org, kvm@vger.kernel.org,
-        linux-block@vger.kernel.org, linux-doc@vger.kernel.org,
-        linux-fsdevel@vger.kernel.org, linux-kselftest@vger.kernel.org,
-        linux-media@vger.kernel.org, linux-rdma@vger.kernel.org,
-        linuxppc-dev@lists.ozlabs.org, netdev@vger.kernel.org,
-        linux-mm@kvack.org, LKML <linux-kernel@vger.kernel.org>
-References: <20191030224930.3990755-1-jhubbard@nvidia.com>
- <20191030224930.3990755-10-jhubbard@nvidia.com>
- <20191031233628.GI14771@iweiny-DESK2.sc.intel.com>
+        Keith Busch <kbusch@kernel.org>, linux-bcache@vger.kernel.org
+Subject: Re: [PATCH V4] block: optimize for small block size IO
+Message-ID: <20191104181403.GA8984@kmo-pixel>
+References: <20191102072911.24817-1-ming.lei@redhat.com>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=us-ascii
 Content-Disposition: inline
-In-Reply-To: <20191031233628.GI14771@iweiny-DESK2.sc.intel.com>
-X-Operating-System: Linux phenom 5.2.0-3-amd64 
-User-Agent: Mutt/1.10.1 (2018-07-13)
+In-Reply-To: <20191102072911.24817-1-ming.lei@redhat.com>
+User-Agent: Mutt/1.12.2 (2019-09-21)
 Sender: linux-block-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-On Thu, Oct 31, 2019 at 04:36:28PM -0700, Ira Weiny wrote:
-> On Wed, Oct 30, 2019 at 03:49:20PM -0700, John Hubbard wrote:
-> > Convert drm/via to use the new pin_user_pages_fast() call, which sets
-> > FOLL_PIN. Setting FOLL_PIN is now required for code that requires
-> > tracking of pinned pages, and therefore for any code that calls
-> > put_user_page().
-> > 
-> 
-> Reviewed-by: Ira Weiny <ira.weiny@intel.com>
+On Sat, Nov 02, 2019 at 03:29:11PM +0800, Ming Lei wrote:
+> __blk_queue_split() may be a bit heavy for small block size(such as
+> 512B, or 4KB) IO, so introduce one flag to decide if this bio includes
+> multiple page. And only consider to try splitting this bio in case
+> that the multiple page flag is set.
 
-No one's touching the via driver anymore, so feel free to merge this
-through whatever tree suits best (aka I'll drop this on the floor and
-forget about it now).
+So, back in the day I had an alternative approach in mind: get rid of
+blk_queue_split entirely, by pushing splitting down to the request layer - when
+we map the bio/request to sgl, just have it map as much as will fit in the sgl
+and if it doesn't entirely fit bump bi_remaining and leave it on the request
+queue.
 
-Acked-by: Daniel Vetter <daniel.vetter@ffwll.ch>
-
-> 
-> > Signed-off-by: John Hubbard <jhubbard@nvidia.com>
-> > ---
-> >  drivers/gpu/drm/via/via_dmablit.c | 2 +-
-> >  1 file changed, 1 insertion(+), 1 deletion(-)
-> > 
-> > diff --git a/drivers/gpu/drm/via/via_dmablit.c b/drivers/gpu/drm/via/via_dmablit.c
-> > index 3db000aacd26..37c5e572993a 100644
-> > --- a/drivers/gpu/drm/via/via_dmablit.c
-> > +++ b/drivers/gpu/drm/via/via_dmablit.c
-> > @@ -239,7 +239,7 @@ via_lock_all_dma_pages(drm_via_sg_info_t *vsg,  drm_via_dmablit_t *xfer)
-> >  	vsg->pages = vzalloc(array_size(sizeof(struct page *), vsg->num_pages));
-> >  	if (NULL == vsg->pages)
-> >  		return -ENOMEM;
-> > -	ret = get_user_pages_fast((unsigned long)xfer->mem_addr,
-> > +	ret = pin_user_pages_fast((unsigned long)xfer->mem_addr,
-> >  			vsg->num_pages,
-> >  			vsg->direction == DMA_FROM_DEVICE ? FOLL_WRITE : 0,
-> >  			vsg->pages);
-> > -- 
-> > 2.23.0
-> > 
-
--- 
-Daniel Vetter
-Software Engineer, Intel Corporation
-http://blog.ffwll.ch
+This would mean there'd be no need for counting segments at all, and would cut a
+fair amount of code out of the io path.
