@@ -2,133 +2,98 @@ Return-Path: <SRS0=59TO=Y4=vger.kernel.org=linux-block-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-8.3 required=3.0 tests=DKIM_SIGNED,DKIM_VALID,
-	DKIM_VALID_AU,HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,
-	SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,USER_AGENT_SANE_1 autolearn=unavailable
+X-Spam-Status: No, score=-9.5 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
+	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,
+	SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED,USER_AGENT_GIT autolearn=ham
 	autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 6848FCA9EB5
-	for <linux-block@archiver.kernel.org>; Mon,  4 Nov 2019 17:45:02 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 70047CA9EB5
+	for <linux-block@archiver.kernel.org>; Mon,  4 Nov 2019 18:05:47 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.kernel.org (Postfix) with ESMTP id 3AD31214D8
-	for <linux-block@archiver.kernel.org>; Mon,  4 Nov 2019 17:45:02 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id 4180D20869
+	for <linux-block@archiver.kernel.org>; Mon,  4 Nov 2019 18:05:47 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="ZN2NiQ3r"
+	dkim=fail reason="signature verification failed" (2048-bit key) header.d=infradead.org header.i=@infradead.org header.b="tQ6m7FUB"
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1728346AbfKDRpB (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Mon, 4 Nov 2019 12:45:01 -0500
-Received: from us-smtp-delivery-1.mimecast.com ([205.139.110.120]:40251 "EHLO
-        us-smtp-1.mimecast.com" rhost-flags-OK-OK-OK-FAIL) by vger.kernel.org
-        with ESMTP id S1728778AbfKDRpB (ORCPT
-        <rfc822;linux-block@vger.kernel.org>); Mon, 4 Nov 2019 12:45:01 -0500
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-        s=mimecast20190719; t=1572889500;
-        h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-         to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-         content-transfer-encoding:content-transfer-encoding:
-         in-reply-to:in-reply-to:references:references;
-        bh=YOrYp+dHNK++F3TdjbhwlDZUdTKuNCY8bLNbrJapJJQ=;
-        b=ZN2NiQ3rqfZx8iq/tcB47dII+1zdUZU6gUqQ4N8Z0uxbTlfsiZIkqz6vF1vrIrxOICEcO1
-        zXPYT73zyFDZ8egp7B9jlBNEp2PrQ2Fwmpat2lNWT0Yr8vtU7gIo2gYEhwFHA8E1WV4z2H
-        zB6SnQ6/dYsdwm16bO7XCMOS7zXdP1Q=
-Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
- [209.132.183.4]) (Using TLS) by relay.mimecast.com with ESMTP id
- us-mta-426-fsjodwpeO-WySaLYuw_60g-1; Mon, 04 Nov 2019 12:44:56 -0500
-Received: from smtp.corp.redhat.com (int-mx01.intmail.prod.int.phx2.redhat.com [10.5.11.11])
-        (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
-        (No client certificate requested)
-        by mimecast-mx01.redhat.com (Postfix) with ESMTPS id E3BE31005500;
-        Mon,  4 Nov 2019 17:44:52 +0000 (UTC)
-Received: from redhat.com (unknown [10.20.6.178])
-        by smtp.corp.redhat.com (Postfix) with ESMTPS id 7484E600C4;
-        Mon,  4 Nov 2019 17:44:47 +0000 (UTC)
-Date:   Mon, 4 Nov 2019 12:44:45 -0500
-From:   Jerome Glisse <jglisse@redhat.com>
-To:     John Hubbard <jhubbard@nvidia.com>
-Cc:     Andrew Morton <akpm@linux-foundation.org>,
-        Al Viro <viro@zeniv.linux.org.uk>,
-        Alex Williamson <alex.williamson@redhat.com>,
-        Benjamin Herrenschmidt <benh@kernel.crashing.org>,
-        =?iso-8859-1?Q?Bj=F6rn_T=F6pel?= <bjorn.topel@intel.com>,
-        Christoph Hellwig <hch@infradead.org>,
-        Dan Williams <dan.j.williams@intel.com>,
-        Daniel Vetter <daniel@ffwll.ch>,
-        Dave Chinner <david@fromorbit.com>,
-        David Airlie <airlied@linux.ie>,
-        "David S . Miller" <davem@davemloft.net>,
-        Ira Weiny <ira.weiny@intel.com>, Jan Kara <jack@suse.cz>,
-        Jason Gunthorpe <jgg@ziepe.ca>, Jens Axboe <axboe@kernel.dk>,
-        Jonathan Corbet <corbet@lwn.net>,
-        Magnus Karlsson <magnus.karlsson@intel.com>,
-        Mauro Carvalho Chehab <mchehab@kernel.org>,
-        Michael Ellerman <mpe@ellerman.id.au>,
-        Michal Hocko <mhocko@suse.com>,
-        Mike Kravetz <mike.kravetz@oracle.com>,
-        Paul Mackerras <paulus@samba.org>,
-        Shuah Khan <shuah@kernel.org>,
-        Vlastimil Babka <vbabka@suse.cz>, bpf@vger.kernel.org,
-        dri-devel@lists.freedesktop.org, kvm@vger.kernel.org,
-        linux-block@vger.kernel.org, linux-doc@vger.kernel.org,
-        linux-fsdevel@vger.kernel.org, linux-kselftest@vger.kernel.org,
-        linux-media@vger.kernel.org, linux-rdma@vger.kernel.org,
-        linuxppc-dev@lists.ozlabs.org, netdev@vger.kernel.org,
-        linux-mm@kvack.org, LKML <linux-kernel@vger.kernel.org>
-Subject: Re: [PATCH v2 09/18] drm/via: set FOLL_PIN via pin_user_pages_fast()
-Message-ID: <20191104174445.GF5134@redhat.com>
-References: <20191103211813.213227-1-jhubbard@nvidia.com>
- <20191103211813.213227-10-jhubbard@nvidia.com>
+        id S1728174AbfKDSFq (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Mon, 4 Nov 2019 13:05:46 -0500
+Received: from bombadil.infradead.org ([198.137.202.133]:43500 "EHLO
+        bombadil.infradead.org" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S1728012AbfKDSFq (ORCPT
+        <rfc822;linux-block@vger.kernel.org>); Mon, 4 Nov 2019 13:05:46 -0500
+DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed;
+        d=infradead.org; s=bombadil.20170209; h=Content-Transfer-Encoding:
+        MIME-Version:Message-Id:Date:Subject:To:From:Sender:Reply-To:Cc:Content-Type:
+        Content-ID:Content-Description:Resent-Date:Resent-From:Resent-Sender:
+        Resent-To:Resent-Cc:Resent-Message-ID:In-Reply-To:References:List-Id:
+        List-Help:List-Unsubscribe:List-Subscribe:List-Post:List-Owner:List-Archive;
+         bh=Gl9OD8N/vzZCZwIDUWRQmBpbqhHaLlmVwIO5ueiska0=; b=tQ6m7FUBmPJAoJIwVmlHQmiEw
+        cXMzXuO+gcu9KOyb3l86M9Ar0ZVvdWi/cJTecta9nHnFKsAVbVotFb4fJVOHi76essm6c5y+T3oTg
+        MkfiqW6WdjQtsCepWCZBTIxEsSku91wKLIPXlEh7lBBkvScqJLHkyG3LxBpFAQY0uiBc/09vhDycx
+        BWTuGqM1oyRAbd7j1lBECgFZK1rFKBJ17eP5X1gGEDFP15ZwRvOE4XOZ04cfiw31U08FfXjGX9WMJ
+        /u5qpWxZE2eKrDggoxkeKtjKqzSVFDHnsYVwasj2N1KkPWjvKIZXFUsAgCPDPAFVbgIeOSE6xD3xQ
+        dwZSUt17w==;
+Received: from [216.240.19.104] (helo=localhost)
+        by bombadil.infradead.org with esmtpsa (Exim 4.92.3 #3 (Red Hat Linux))
+        id 1iRgjZ-0004VH-Es; Mon, 04 Nov 2019 18:05:45 +0000
+From:   Christoph Hellwig <hch@lst.de>
+To:     axboe@kernel.dk, ming.lei@redhat.com, linux-block@vger.kernel.org
+Subject: [PATCH] block: avoid blk_bio_segment_split for small I/O operations
+Date:   Mon,  4 Nov 2019 10:05:43 -0800
+Message-Id: <20191104180543.23123-1-hch@lst.de>
+X-Mailer: git-send-email 2.20.1
 MIME-Version: 1.0
-In-Reply-To: <20191103211813.213227-10-jhubbard@nvidia.com>
-User-Agent: Mutt/1.12.1 (2019-06-15)
-X-Scanned-By: MIMEDefang 2.79 on 10.5.11.11
-X-MC-Unique: fsjodwpeO-WySaLYuw_60g-1
-X-Mimecast-Spam-Score: 0
-Content-Type: text/plain; charset=WINDOWS-1252
-Content-Transfer-Encoding: quoted-printable
-Content-Disposition: inline
+Content-Transfer-Encoding: 8bit
+X-SRS-Rewrite: SMTP reverse-path rewritten from <hch@infradead.org> by bombadil.infradead.org. See http://www.infradead.org/rpr.html
 Sender: linux-block-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-On Sun, Nov 03, 2019 at 01:18:04PM -0800, John Hubbard wrote:
-> Convert drm/via to use the new pin_user_pages_fast() call, which sets
-> FOLL_PIN. Setting FOLL_PIN is now required for code that requires
-> tracking of pinned pages, and therefore for any code that calls
-> put_user_page().
->=20
-> Reviewed-by: Ira Weiny <ira.weiny@intel.com>
-> Signed-off-by: John Hubbard <jhubbard@nvidia.com>
+__blk_queue_split() adds significant overhead for small I/O operations.
+Add a shortcut to avoid it for cases where we know we never need to
+split.
 
-Please be more explicit that via_dmablit.c is already using put_user_page()
-as i am expecting that any conversion to pin_user_pages*() must be pair wit=
-h
-a put_user_page(). I find above commit message bit unclear from that POV.
+Based on a patch from Ming Lei.
 
-Reviewed-by: J=E9r=F4me Glisse <jglisse@redhat.com>
+Signed-off-by: Christoph Hellwig <hch@lst.de>
+---
+ block/blk-merge.c | 15 ++++++++++++++-
+ 1 file changed, 14 insertions(+), 1 deletion(-)
 
-
-> ---
->  drivers/gpu/drm/via/via_dmablit.c | 2 +-
->  1 file changed, 1 insertion(+), 1 deletion(-)
->=20
-> diff --git a/drivers/gpu/drm/via/via_dmablit.c b/drivers/gpu/drm/via/via_=
-dmablit.c
-> index 3db000aacd26..37c5e572993a 100644
-> --- a/drivers/gpu/drm/via/via_dmablit.c
-> +++ b/drivers/gpu/drm/via/via_dmablit.c
-> @@ -239,7 +239,7 @@ via_lock_all_dma_pages(drm_via_sg_info_t *vsg,  drm_v=
-ia_dmablit_t *xfer)
->  =09vsg->pages =3D vzalloc(array_size(sizeof(struct page *), vsg->num_pag=
-es));
->  =09if (NULL =3D=3D vsg->pages)
->  =09=09return -ENOMEM;
-> -=09ret =3D get_user_pages_fast((unsigned long)xfer->mem_addr,
-> +=09ret =3D pin_user_pages_fast((unsigned long)xfer->mem_addr,
->  =09=09=09vsg->num_pages,
->  =09=09=09vsg->direction =3D=3D DMA_FROM_DEVICE ? FOLL_WRITE : 0,
->  =09=09=09vsg->pages);
-> --=20
-> 2.23.0
->=20
+diff --git a/block/blk-merge.c b/block/blk-merge.c
+index 48e6725b32ee..06eb38357b41 100644
+--- a/block/blk-merge.c
++++ b/block/blk-merge.c
+@@ -293,7 +293,7 @@ static struct bio *blk_bio_segment_split(struct request_queue *q,
+ void __blk_queue_split(struct request_queue *q, struct bio **bio,
+ 		unsigned int *nr_segs)
+ {
+-	struct bio *split;
++	struct bio *split = NULL;
+ 
+ 	switch (bio_op(*bio)) {
+ 	case REQ_OP_DISCARD:
+@@ -309,6 +309,19 @@ void __blk_queue_split(struct request_queue *q, struct bio **bio,
+ 				nr_segs);
+ 		break;
+ 	default:
++		/*
++		 * All drivers must accept single-segments bios that are <=
++		 * PAGE_SIZE.  This is a quick and dirty check that relies on
++		 * the fact that bi_io_vec[0] is always valid if a bio has data.
++		 * The check might lead to occasional false negatives when bios
++		 * are cloned, but compared to the performance impact of cloned
++		 * bios themselves the loop below doesn't matter anyway.
++		 */
++		if ((*bio)->bi_vcnt == 1 &&
++		    (*bio)->bi_io_vec[0].bv_len <= PAGE_SIZE) {
++			*nr_segs = 1;
++			break;
++		}
+ 		split = blk_bio_segment_split(q, *bio, &q->bio_split, nr_segs);
+ 		break;
+ 	}
+-- 
+2.20.1
 
