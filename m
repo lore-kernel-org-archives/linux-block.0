@@ -2,159 +2,149 @@ Return-Path: <SRS0=uUnX=Y5=vger.kernel.org=linux-block-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-2.4 required=3.0 tests=DKIMWL_WL_HIGH,DKIM_SIGNED,
-	DKIM_VALID,DKIM_VALID_AU,HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,
-	SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED,USER_AGENT_SANE_1 autolearn=no
+X-Spam-Status: No, score=-22.4 required=3.0 tests=DKIMWL_WL_MED,DKIM_SIGNED,
+	DKIM_VALID,DKIM_VALID_AU,HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,
+	MAILING_LIST_MULTI,MENTIONS_GIT_HOSTING,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,
+	URIBL_BLOCKED,USER_AGENT_GIT,USER_IN_DEF_DKIM_WL autolearn=ham
 	autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 2BA4DC5DF61
-	for <linux-block@archiver.kernel.org>; Tue,  5 Nov 2019 18:16:32 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 31B84C5DF60
+	for <linux-block@archiver.kernel.org>; Tue,  5 Nov 2019 18:28:39 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.kernel.org (Postfix) with ESMTP id 07068214D8
-	for <linux-block@archiver.kernel.org>; Tue,  5 Nov 2019 18:16:32 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id 06436214D8
+	for <linux-block@archiver.kernel.org>; Tue,  5 Nov 2019 18:28:39 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=pass (2048-bit key) header.d=nvidia.com header.i=@nvidia.com header.b="ZSBhPlkU"
+	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="vPxN2a9e"
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S2390592AbfKESQb (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Tue, 5 Nov 2019 13:16:31 -0500
-Received: from hqemgate14.nvidia.com ([216.228.121.143]:11085 "EHLO
-        hqemgate14.nvidia.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S2390476AbfKESQb (ORCPT
-        <rfc822;linux-block@vger.kernel.org>); Tue, 5 Nov 2019 13:16:31 -0500
-Received: from hqpgpgate101.nvidia.com (Not Verified[216.228.121.13]) by hqemgate14.nvidia.com (using TLS: TLSv1.2, DES-CBC3-SHA)
-        id <B5dc1bc810000>; Tue, 05 Nov 2019 10:16:33 -0800
-Received: from hqmail.nvidia.com ([172.20.161.6])
-  by hqpgpgate101.nvidia.com (PGP Universal service);
-  Tue, 05 Nov 2019 10:16:27 -0800
-X-PGP-Universal: processed;
-        by hqpgpgate101.nvidia.com on Tue, 05 Nov 2019 10:16:27 -0800
-Received: from [10.110.48.28] (10.124.1.5) by HQMAIL107.nvidia.com
- (172.20.187.13) with Microsoft SMTP Server (TLS) id 15.0.1473.3; Tue, 5 Nov
- 2019 18:16:25 +0000
-Subject: Re: [PATCH 09/19] drm/via: set FOLL_PIN via pin_user_pages_fast()
-To:     Ira Weiny <ira.weiny@intel.com>,
-        Andrew Morton <akpm@linux-foundation.org>,
-        Al Viro <viro@zeniv.linux.org.uk>,
-        Alex Williamson <alex.williamson@redhat.com>,
-        Benjamin Herrenschmidt <benh@kernel.crashing.org>,
-        =?UTF-8?B?QmrDtnJuIFTDtnBlbA==?= <bjorn.topel@intel.com>,
-        Christoph Hellwig <hch@infradead.org>,
-        Dan Williams <dan.j.williams@intel.com>,
-        Dave Chinner <david@fromorbit.com>,
-        David Airlie <airlied@linux.ie>,
-        "David S . Miller" <davem@davemloft.net>, Jan Kara <jack@suse.cz>,
-        Jason Gunthorpe <jgg@ziepe.ca>, Jens Axboe <axboe@kernel.dk>,
-        Jonathan Corbet <corbet@lwn.net>,
-        =?UTF-8?B?SsOpcsO0bWUgR2xpc3Nl?= <jglisse@redhat.com>,
-        Magnus Karlsson <magnus.karlsson@intel.com>,
-        Mauro Carvalho Chehab <mchehab@kernel.org>,
-        Michael Ellerman <mpe@ellerman.id.au>,
-        Michal Hocko <mhocko@suse.com>,
-        Mike Kravetz <mike.kravetz@oracle.com>,
-        Paul Mackerras <paulus@samba.org>,
-        Shuah Khan <shuah@kernel.org>,
-        Vlastimil Babka <vbabka@suse.cz>, <bpf@vger.kernel.org>,
-        <dri-devel@lists.freedesktop.org>, <kvm@vger.kernel.org>,
-        <linux-block@vger.kernel.org>, <linux-doc@vger.kernel.org>,
-        <linux-fsdevel@vger.kernel.org>, <linux-kselftest@vger.kernel.org>,
-        <linux-media@vger.kernel.org>, <linux-rdma@vger.kernel.org>,
-        <linuxppc-dev@lists.ozlabs.org>, <netdev@vger.kernel.org>,
-        <linux-mm@kvack.org>, LKML <linux-kernel@vger.kernel.org>
-References: <20191030224930.3990755-1-jhubbard@nvidia.com>
- <20191030224930.3990755-10-jhubbard@nvidia.com>
- <20191031233628.GI14771@iweiny-DESK2.sc.intel.com>
- <20191104181055.GP10326@phenom.ffwll.local>
- <48d22c77-c313-59ff-4847-bc9a9813b8a7@nvidia.com>
- <20191105094936.GZ10326@phenom.ffwll.local>
-From:   John Hubbard <jhubbard@nvidia.com>
-X-Nvconfidentiality: public
-Message-ID: <9b9637f4-34e0-a665-a9c8-8fd59ff71063@nvidia.com>
-Date:   Tue, 5 Nov 2019 10:16:25 -0800
-User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:60.0) Gecko/20100101
- Thunderbird/60.8.0
-MIME-Version: 1.0
-In-Reply-To: <20191105094936.GZ10326@phenom.ffwll.local>
-X-Originating-IP: [10.124.1.5]
-X-ClientProxiedBy: HQMAIL105.nvidia.com (172.20.187.12) To
- HQMAIL107.nvidia.com (172.20.187.13)
-Content-Type: text/plain; charset="utf-8"
-Content-Language: en-US
-Content-Transfer-Encoding: 7bit
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=nvidia.com; s=n1;
-        t=1572977793; bh=R0RxaBiDFTq2JKu4s4y6dD52czu96JnYA/nMzL9A6aE=;
-        h=X-PGP-Universal:Subject:To:References:From:X-Nvconfidentiality:
-         Message-ID:Date:User-Agent:MIME-Version:In-Reply-To:
-         X-Originating-IP:X-ClientProxiedBy:Content-Type:Content-Language:
-         Content-Transfer-Encoding;
-        b=ZSBhPlkU00U2SId5ohXT4qfb7S3CRfF2QxUJyZ0MYASa23SxluEpDZf1THjnsB9k6
-         3RTrsq64bDaJH6/fLXRNFkXaPhRm5A6gkx6RZdlDie0bGzD/RBx0po9cAdeDcz/1hI
-         lKGfT57a8xEYWihKfruZKPu2iv+9HpU34riNOb6hU1aeKe+Fw0TM0CdzQuEAMyVnn3
-         zPBLdfbRqsxHTlb9Dt1LPnE+4oLXwLOgCALb/FxR0bVQqL9MMuMnHnx6cwBXcGJC2q
-         423PWzhyAI/MHMUhEHpOr+pguDR21zYFt0jsH+WX73ZsVIDhQ9aKqbWLguXDJ6ZEPH
-         qkWctNU3sUmkw==
+        id S2390668AbfKES2i (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Tue, 5 Nov 2019 13:28:38 -0500
+Received: from mail-qt1-f202.google.com ([209.85.160.202]:34056 "EHLO
+        mail-qt1-f202.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S2389724AbfKES2i (ORCPT
+        <rfc822;linux-block@vger.kernel.org>); Tue, 5 Nov 2019 13:28:38 -0500
+Received: by mail-qt1-f202.google.com with SMTP id u26so23331169qtq.1
+        for <linux-block@vger.kernel.org>; Tue, 05 Nov 2019 10:28:36 -0800 (PST)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=google.com; s=20161025;
+        h=date:message-id:mime-version:subject:from:to:cc;
+        bh=wgxjvwX6+cnB3A8RMM5lxB/OlF4KhSWsamiPqNj2U6w=;
+        b=vPxN2a9eb5x/Kf9/TWrUXR40il0raZDiN6LYAMVyDiDfjpf7s9xXS6bjE5/awxsuoy
+         0q1m5Zb8UvHXS6AiO3q0DRqBZT21rMVwU80N064o5cR+O0LTltXWOTW6KWnDg6PzLmHb
+         9M1FDkcKNGd4va1a96WGR8KkuNh54njhXe7jlzCokkcBEA+WXz3ori13j//Kq+ltDpEN
+         seY173tKGH4fj+4kOxr/zl/3VnAdEcGpqai8VOCJLmWbOUj4Y1MH2s/elBVlj92QhMKX
+         CRGRDyk5VgA1XMd5XFM8hjSqA1lFfraXvc5TeTIXEEbBNjacO726/dEGWgneMJa9+qcG
+         1vGA==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20161025;
+        h=x-gm-message-state:date:message-id:mime-version:subject:from:to:cc;
+        bh=wgxjvwX6+cnB3A8RMM5lxB/OlF4KhSWsamiPqNj2U6w=;
+        b=ShSDxFh+gNjnWxmw0tXTZ9D1K9D4oqjzWuLcGKFUD6vpH457Qd9HnhN+OfEAX3GVGI
+         OtVYSUDv+QaGs1cBw74oSF5aYlBG0dntQonlddAOjTJHF6oAd7I8yk3M9q4JdWJKYbfl
+         RKgym0au+7Zr7TLSYBwHFoeYwEIMkS7qwqQ3Kgu6XtqTtyNiTRd08WETWExMxXeBCZeb
+         S7/CuZbGrdXPIKOnnHmAt9tvNEV0XgArxPIMjW7apRsZl0nmWAPUu4VJZQR8a+mz7chp
+         KeyFMbAhOODS0iQEbRCg3MQRh7+Uae3UNBWAl5p+JoectLRBMW2HCzy8F9Vu4uPcGeSN
+         5PrA==
+X-Gm-Message-State: APjAAAVALHTdIG9ivpJgrBImb/NJNKKOjUSCHUmpMjM0WBOAAMqjDrIp
+        r6tirLvAE8j9Ah16aL2bgkk/pD67gg==
+X-Google-Smtp-Source: APXvYqzTpHCaI8bTtovq6RT1gOrzAFSaWFSHvNTuvzdVkIjREWwMwBmhqgfZhpxg2SpG0OZOyHCv1UTJ7g==
+X-Received: by 2002:a37:9d44:: with SMTP id g65mr27690527qke.302.1572978515493;
+ Tue, 05 Nov 2019 10:28:35 -0800 (PST)
+Date:   Tue,  5 Nov 2019 19:27:47 +0100
+Message-Id: <20191105182746.217864-1-elver@google.com>
+Mime-Version: 1.0
+X-Mailer: git-send-email 2.24.0.rc1.363.gb1bccd3e3d-goog
+Subject: [PATCH] blk-wbt: Fix data race and avoid possible false sharing
+From:   Marco Elver <elver@google.com>
+To:     elver@google.com
+Cc:     axboe@kernel.dk, linux-block@vger.kernel.org,
+        linux-kernel@vger.kernel.org,
+        syzbot+ba8947364367f96fe16b@syzkaller.appspotmail.com
+Content-Type: text/plain; charset="UTF-8"
 Sender: linux-block-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-On 11/5/19 1:49 AM, Daniel Vetter wrote:
-> On Mon, Nov 04, 2019 at 11:20:38AM -0800, John Hubbard wrote:
->> On 11/4/19 10:10 AM, Daniel Vetter wrote:
->>> On Thu, Oct 31, 2019 at 04:36:28PM -0700, Ira Weiny wrote:
->>>> On Wed, Oct 30, 2019 at 03:49:20PM -0700, John Hubbard wrote:
->>>>> Convert drm/via to use the new pin_user_pages_fast() call, which sets
->>>>> FOLL_PIN. Setting FOLL_PIN is now required for code that requires
->>>>> tracking of pinned pages, and therefore for any code that calls
->>>>> put_user_page().
->>>>>
->>>>
->>>> Reviewed-by: Ira Weiny <ira.weiny@intel.com>
->>>
->>> No one's touching the via driver anymore, so feel free to merge this
->>> through whatever tree suits best (aka I'll drop this on the floor and
->>> forget about it now).
->>>
->>> Acked-by: Daniel Vetter <daniel.vetter@ffwll.ch>
->>>
->>
->> OK, great. Yes, in fact, I'm hoping Andrew can just push the whole series
->> in through the mm tree, because that would allow it to be done in one 
->> shot, in 5.5
-> 
-> btw is there more? We should have a bunch more userptr stuff in various
-> drivers, so was really surprised that drm/via is the only thing in your
-> series.
+The pattern here is to avoid possible false sharing. However, due to
+compiler optimizations the code may simply collapse to the write if we
+omit READ_ONCE/WRITE_ONCE:
+https://github.com/google/ktsan/wiki/READ_ONCE-and-WRITE_ONCE#it-may-improve-performance
 
+==================================================================
+BUG: KCSAN: data-race in wbt_wait / wbt_wait
 
-There is more, but:
+read to 0xffff88821aa6d140 of 8 bytes by task 10372 on cpu 1:
+ wb_timestamp block/blk-wbt.c:88 [inline]
+ wb_timestamp block/blk-wbt.c:83 [inline]
+ wbt_wait+0x1f9/0x250 block/blk-wbt.c:587
+ __rq_qos_throttle+0x47/0x70 block/blk-rq-qos.c:72
+ rq_qos_throttle block/blk-rq-qos.h:185 [inline]
+ blk_mq_make_request+0x29c/0xf60 block/blk-mq.c:1971
+ generic_make_request block/blk-core.c:1064 [inline]
+ generic_make_request+0x196/0x740 block/blk-core.c:1006
+ submit_bio+0x96/0x3c0 block/blk-core.c:1190
+ submit_bh_wbc+0x40f/0x460 fs/buffer.c:3095
+ submit_bh fs/buffer.c:3101 [inline]
+ __bread_slow fs/buffer.c:1177 [inline]
+ __bread_gfp+0xe7/0x1e0 fs/buffer.c:1359
+ sb_bread include/linux/buffer_head.h:307 [inline]
+ fat__get_entry+0x35e/0x4f0 fs/fat/dir.c:100
+ fat_get_entry fs/fat/dir.c:128 [inline]
+ fat_get_short_entry+0x103/0x200 fs/fat/dir.c:877
+ fat_subdirs+0x6b/0x110 fs/fat/dir.c:943
+ fat_read_root fs/fat/inode.c:1416 [inline]
+ fat_fill_super+0x1552/0x1f50 fs/fat/inode.c:1862
+ vfat_fill_super+0x3b/0x50 fs/fat/namei_vfat.c:1050
+ mount_bdev+0x262/0x2d0 fs/super.c:1415
+ vfat_mount+0x3e/0x60 fs/fat/namei_vfat.c:1057
 
-1) Fortunately, the opt-in nature of FOLL_PIN allows converting a few call
-sites at a time. And so this patchset limits itself to converting the bare
-minimum required to get started, which is: 
+write to 0xffff88821aa6d140 of 8 bytes by task 10375 on cpu 0:
+ wb_timestamp block/blk-wbt.c:89 [inline]
+ wb_timestamp block/blk-wbt.c:83 [inline]
+ wbt_wait+0x21e/0x250 block/blk-wbt.c:587
+ __rq_qos_throttle+0x47/0x70 block/blk-rq-qos.c:72
+ rq_qos_throttle block/blk-rq-qos.h:185 [inline]
+ blk_mq_make_request+0x29c/0xf60 block/blk-mq.c:1971
+ generic_make_request block/blk-core.c:1064 [inline]
+ generic_make_request+0x196/0x740 block/blk-core.c:1006
+ submit_bio+0x96/0x3c0 block/blk-core.c:1190
+ mpage_bio_submit fs/mpage.c:66 [inline]
+ mpage_readpages+0x36c/0x3c0 fs/mpage.c:410
+ blkdev_readpages+0x36/0x50 fs/block_dev.c:620
+ read_pages+0xa2/0x2d0 mm/readahead.c:126
+ __do_page_cache_readahead+0x353/0x390 mm/readahead.c:212
+ force_page_cache_readahead+0x13a/0x1f0 mm/readahead.c:243
+ page_cache_sync_readahead+0x1cf/0x1e0 mm/readahead.c:522
+ generic_file_buffered_read mm/filemap.c:2050 [inline]
+ generic_file_read_iter+0xeb6/0x1440 mm/filemap.c:2323
+ blkdev_read_iter+0xb2/0xe0 fs/block_dev.c:2010
 
-    a) calls sites that have already been converted to put_user_page(), 
-       and
+Reported by Kernel Concurrency Sanitizer on:
+CPU: 0 PID: 10375 Comm: blkid Not tainted 5.4.0-rc3+ #0
+Hardware name: Google Google Compute Engine/Google Compute Engine, BIOS Google 01/01/2011
+==================================================================
 
-    b) call sites that set FOLL_LONGTERM.
+Reported-by: syzbot+ba8947364367f96fe16b@syzkaller.appspotmail.com
+Signed-off-by: Marco Elver <elver@google.com>
+---
+ block/blk-wbt.c | 4 ++--
+ 1 file changed, 2 insertions(+), 2 deletions(-)
 
-So yes, follow-up patches will be required. This is not everything.
-In fact, if I can fix this series up quickly enough that it makes it into
-mmotm soon-ish, then there may be time to get some follow-patches on top
-of it, in time for 5.5.
+diff --git a/block/blk-wbt.c b/block/blk-wbt.c
+index 8641ba9793c5..ce281a9007a6 100644
+--- a/block/blk-wbt.c
++++ b/block/blk-wbt.c
+@@ -85,8 +85,8 @@ static void wb_timestamp(struct rq_wb *rwb, unsigned long *var)
+ 	if (rwb_enabled(rwb)) {
+ 		const unsigned long cur = jiffies;
+ 
+-		if (cur != *var)
+-			*var = cur;
++		if (cur != READ_ONCE(*var))
++			WRITE_ONCE(*var, cur);
+ 	}
+ }
+ 
+-- 
+2.24.0.rc1.363.gb1bccd3e3d-goog
 
-
-2) If I recall correctly, Jerome and maybe others are working to remove
-as many get_user_pages() callers from drm as possible, and instead use
-a non-pinned page approach, with mmu notifiers instead.  I'm not sure of
-the exact status of that work, but I see that etnaviv, amdgpu, i915, and
-radeon still call gup() in linux-next.
-
-Anyway, some of those call sites will disappear. Although I'd expect a 
-few to remain, because I doubt the simpler GPUs can support page faulting.
-
-
-
-thanks,
-
-John Hubbard
-NVIDIA
