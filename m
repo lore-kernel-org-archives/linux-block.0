@@ -2,162 +2,179 @@ Return-Path: <SRS0=uUnX=Y5=vger.kernel.org=linux-block-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-5.3 required=3.0 tests=DKIM_SIGNED,DKIM_VALID,
-	DKIM_VALID_AU,HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,
-	SPF_HELO_NONE,SPF_PASS,USER_AGENT_SANE_1 autolearn=unavailable
-	autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-2.2 required=3.0 tests=DKIM_SIGNED,DKIM_VALID,
+	HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,
+	USER_AGENT_SANE_1 autolearn=no autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 5813BC47E49
-	for <linux-block@archiver.kernel.org>; Tue,  5 Nov 2019 02:32:49 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id CFE61CA9ED3
+	for <linux-block@archiver.kernel.org>; Tue,  5 Nov 2019 02:38:49 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.kernel.org (Postfix) with ESMTP id 2E3FE21928
-	for <linux-block@archiver.kernel.org>; Tue,  5 Nov 2019 02:32:49 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id 97B69217F5
+	for <linux-block@archiver.kernel.org>; Tue,  5 Nov 2019 02:38:49 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=pass (2048-bit key) header.d=ziepe.ca header.i=@ziepe.ca header.b="RrEUUprS"
+	dkim=pass (2048-bit key) header.d=kernel-dk.20150623.gappssmtp.com header.i=@kernel-dk.20150623.gappssmtp.com header.b="PQu7v4TJ"
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1730424AbfKECci (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Mon, 4 Nov 2019 21:32:38 -0500
-Received: from mail-qt1-f195.google.com ([209.85.160.195]:43985 "EHLO
-        mail-qt1-f195.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1730207AbfKECci (ORCPT
-        <rfc822;linux-block@vger.kernel.org>); Mon, 4 Nov 2019 21:32:38 -0500
-Received: by mail-qt1-f195.google.com with SMTP id l24so8928507qtp.10
-        for <linux-block@vger.kernel.org>; Mon, 04 Nov 2019 18:32:37 -0800 (PST)
+        id S1730095AbfKECit (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Mon, 4 Nov 2019 21:38:49 -0500
+Received: from mail-pg1-f195.google.com ([209.85.215.195]:43100 "EHLO
+        mail-pg1-f195.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S1729717AbfKECis (ORCPT
+        <rfc822;linux-block@vger.kernel.org>); Mon, 4 Nov 2019 21:38:48 -0500
+Received: by mail-pg1-f195.google.com with SMTP id l24so12913612pgh.10
+        for <linux-block@vger.kernel.org>; Mon, 04 Nov 2019 18:38:47 -0800 (PST)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=ziepe.ca; s=google;
-        h=date:from:to:cc:subject:message-id:references:mime-version
-         :content-disposition:in-reply-to:user-agent;
-        bh=4urm9i82HUz7ctZoqeaJ+eDwbY+Le9I8/NmP0pY1rnA=;
-        b=RrEUUprScGGCs1P3lOuGj4a5RoiWbVbfDZ4+HpgRvyTXCYVlJAXQB+MYamRZtedVHY
-         f5+sxNxk2K5wkp7PjMMeD8HJWFAJHo3RtLYXlCrUl00LuH1GNIO+43+qB9VoRPGoMtd2
-         MhxxJSrVmcyNdw2dcAOft+ieDHmjkqcbx3xo51HlgztpG3sVxpkHZVlG9m+fgORfqdhb
-         XySrfwIPRDIjnSUQNZ9F7DSfvHrKSEQZxN/D+pZKoiFoN1H+0mMnDQ/zYc1NegbKO5Qw
-         fR/889wgnwS9AagFL4h4X1w9N0H+8w+Cg8HTo2zBy3ABWuxHxMoo0KJgJWvcNzShW5B1
-         QLlQ==
+        d=kernel-dk.20150623.gappssmtp.com; s=20150623;
+        h=subject:to:cc:references:from:message-id:date:user-agent
+         :mime-version:in-reply-to:content-language:content-transfer-encoding;
+        bh=PMK3bi1BZwSHPTMfPiTgmL2umGEqO55gEHSQ6R5QvWw=;
+        b=PQu7v4TJnkBlWpreoDe1b7hJbTh+s7I4/5X7sDk6e8Ws6elmQ8OWaZYZB5t6cDkBDi
+         phSmdp72MA68Z9x97W+laEPgOqiEnBtHBb8BN6uuv0pXf2M1nigp3l1gEhPQXUerJJrO
+         5v64UerWx1qKXungkC5hAxxlgfMm2ws/8edQlPrhdLc+OVi598gfXzt4/AifQFUTFeFP
+         yMbwVsumQtHJd4O4YvyzKaKQCznHC91nfYb+bBh5CFysfe2UHjyq9atqlxe8lqw4cuci
+         6oQROrzoJGGjQekZpnT6pkvQoVL2cthN/JdoARLpj5r9QPBmQ9FBhg4LH/oLCBGfLtnK
+         sbNA==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=1e100.net; s=20161025;
-        h=x-gm-message-state:date:from:to:cc:subject:message-id:references
-         :mime-version:content-disposition:in-reply-to:user-agent;
-        bh=4urm9i82HUz7ctZoqeaJ+eDwbY+Le9I8/NmP0pY1rnA=;
-        b=NfgDpECCx1CpCMsazjOcImdO9Vfi7dr4cVkIFcOUMcXpvlw9hpep34i9IaTWcRQjJX
-         yKLXJXGsTTpuylcHJMSLgjbZVned89zt0lkBTJF4EYBlpdP79bC3JWZFmRAn2agss74k
-         JyklPicKQSBV8z90WoDGaXBh6qL2NPAxaDOZHZ3NqrnsYA07gpirTZVNYRZ8lj+OzA/W
-         zJUElYPGRQrs8hpne7kKdgSMFyMSeX0KpwcjkGkSU7lRQPj89L4Npxkf0C/3QuWjqDGL
-         Ep8S1Bmff4C8WNq6hPLyD8SdUzuX3fhZZeP/HMXwGZkiIM7dZ9FF/EkhZonbvtwTQ799
-         1ftg==
-X-Gm-Message-State: APjAAAXqM1U2N8KLhe7NS5+OqAd8hH+7OEN/xnZLgqc6cUlpzQi+bJ7L
-        BwnuyRe8CCuHqhyHDKVFED7aZA==
-X-Google-Smtp-Source: APXvYqzymmufBg1PiSWGxkk4f7LXgsvyOrzTuuRBB+uFmwh9UO+iQP682ubsI0h94l7eDVroneUqZg==
-X-Received: by 2002:a0c:9838:: with SMTP id c53mr25556531qvd.250.1572921156814;
-        Mon, 04 Nov 2019 18:32:36 -0800 (PST)
-Received: from ziepe.ca (hlfxns017vw-142-162-113-180.dhcp-dynamic.fibreop.ns.bellaliant.net. [142.162.113.180])
-        by smtp.gmail.com with ESMTPSA id t65sm8907102qkh.23.2019.11.04.18.32.36
-        (version=TLS1_2 cipher=ECDHE-RSA-CHACHA20-POLY1305 bits=256/256);
-        Mon, 04 Nov 2019 18:32:36 -0800 (PST)
-Received: from jgg by mlx.ziepe.ca with local (Exim 4.90_1)
-        (envelope-from <jgg@ziepe.ca>)
-        id 1iRoe3-0002uH-K9; Mon, 04 Nov 2019 22:32:35 -0400
-Date:   Mon, 4 Nov 2019 22:32:35 -0400
-From:   Jason Gunthorpe <jgg@ziepe.ca>
-To:     John Hubbard <jhubbard@nvidia.com>
-Cc:     Andrew Morton <akpm@linux-foundation.org>,
-        Al Viro <viro@zeniv.linux.org.uk>,
-        Alex Williamson <alex.williamson@redhat.com>,
-        Benjamin Herrenschmidt <benh@kernel.crashing.org>,
-        =?utf-8?B?QmrDtnJuIFTDtnBlbA==?= <bjorn.topel@intel.com>,
-        Christoph Hellwig <hch@infradead.org>,
-        Dan Williams <dan.j.williams@intel.com>,
-        Daniel Vetter <daniel@ffwll.ch>,
-        Dave Chinner <david@fromorbit.com>,
-        David Airlie <airlied@linux.ie>,
-        "David S . Miller" <davem@davemloft.net>,
-        Ira Weiny <ira.weiny@intel.com>, Jan Kara <jack@suse.cz>,
-        Jens Axboe <axboe@kernel.dk>, Jonathan Corbet <corbet@lwn.net>,
-        =?utf-8?B?SsOpcsO0bWU=?= Glisse <jglisse@redhat.com>,
-        Magnus Karlsson <magnus.karlsson@intel.com>,
-        Mauro Carvalho Chehab <mchehab@kernel.org>,
-        Michael Ellerman <mpe@ellerman.id.au>,
-        Michal Hocko <mhocko@suse.com>,
-        Mike Kravetz <mike.kravetz@oracle.com>,
-        Paul Mackerras <paulus@samba.org>,
-        Shuah Khan <shuah@kernel.org>,
-        Vlastimil Babka <vbabka@suse.cz>, bpf@vger.kernel.org,
-        dri-devel@lists.freedesktop.org, kvm@vger.kernel.org,
-        linux-block@vger.kernel.org, linux-doc@vger.kernel.org,
-        linux-fsdevel@vger.kernel.org, linux-kselftest@vger.kernel.org,
-        linux-media@vger.kernel.org, linux-rdma@vger.kernel.org,
-        linuxppc-dev@lists.ozlabs.org, netdev@vger.kernel.org,
-        linux-mm@kvack.org, LKML <linux-kernel@vger.kernel.org>
-Subject: Re: [PATCH v2 07/18] infiniband: set FOLL_PIN, FOLL_LONGTERM via
- pin_longterm_pages*()
-Message-ID: <20191105023235.GA11093@ziepe.ca>
-References: <20191103211813.213227-1-jhubbard@nvidia.com>
- <20191103211813.213227-8-jhubbard@nvidia.com>
- <20191104203346.GF30938@ziepe.ca>
- <578c1760-7221-4961-9f7d-c07c22e5c259@nvidia.com>
- <20191104205738.GH30938@ziepe.ca>
- <1560fa00-0c2b-0f3b-091c-d628f021ce09@nvidia.com>
+        h=x-gm-message-state:subject:to:cc:references:from:message-id:date
+         :user-agent:mime-version:in-reply-to:content-language
+         :content-transfer-encoding;
+        bh=PMK3bi1BZwSHPTMfPiTgmL2umGEqO55gEHSQ6R5QvWw=;
+        b=oEC8z0AcYc4WHwfNiWPBF1WgGDNv7GpcrL2PU/5/ylq3/hnryXxdUDA21xlQnvvVln
+         9T2qTTyXe1P3WeLSNLDGQiNorAlAjznr+V7rCZrGJicTxZC1OhoNDuBFv63s0iVnXa7G
+         /bu47C4Rnun6+8tBbGToeV4HeBYF26+ixtxEGvfrC3nlLh8hMEUr1ehziW2vw7VEQyMu
+         t4i5IlLTE7f1JldyfTkIz+JrGNKpOd/NW37HM3+bbJHBvsACLqLLP9Pof6gONfb9ZYMq
+         snUUMI0CTYefgSTtpBbFjdC9a2vrKolvCSf9PnHM7q7F26S2DMqYOI4LahZgUICDMKLf
+         k4+A==
+X-Gm-Message-State: APjAAAUCklrImGmvTdf/M9CFZGbNNAtoykzaGLzypDlI+YgpqjGFNiRK
+        tDrFHsApX6TfAjj+lA80X1bpWw==
+X-Google-Smtp-Source: APXvYqzOcl56ztezL2RO7k3ubRNucNqZ0E9Cbk0gzBGoM6fJSZ64zolNNySNX6x+bUC+gAr6gtRRJQ==
+X-Received: by 2002:a62:ea0b:: with SMTP id t11mr19210363pfh.182.1572921526479;
+        Mon, 04 Nov 2019 18:38:46 -0800 (PST)
+Received: from [192.168.1.188] ([66.219.217.79])
+        by smtp.gmail.com with ESMTPSA id g6sm10121077pfh.125.2019.11.04.18.38.44
+        (version=TLS1_2 cipher=ECDHE-RSA-AES128-GCM-SHA256 bits=128/128);
+        Mon, 04 Nov 2019 18:38:45 -0800 (PST)
+Subject: Re: [PATCH V4] block: optimize for small block size IO
+To:     Kent Overstreet <kent.overstreet@gmail.com>,
+        Ming Lei <ming.lei@redhat.com>
+Cc:     Christoph Hellwig <hch@infradead.org>, linux-block@vger.kernel.org,
+        Coly Li <colyli@suse.de>, Keith Busch <kbusch@kernel.org>,
+        linux-bcache@vger.kernel.org
+References: <20191102072911.24817-1-ming.lei@redhat.com>
+ <20191104181403.GA8984@kmo-pixel> <20191104181541.GA21116@infradead.org>
+ <20191104181742.GC8984@kmo-pixel>
+ <f7fab4e0-58e4-76e4-a503-bb535b2a3da6@kernel.dk>
+ <20191104184217.GD8984@kmo-pixel> <20191105011135.GD11436@ming.t460p>
+ <20191105021130.GB18564@moria.home.lan> <20191105022046.GF11436@ming.t460p>
+ <20191105023002.GC18564@moria.home.lan>
+From:   Jens Axboe <axboe@kernel.dk>
+Message-ID: <c41fd177-21e7-7e36-960f-fb1f7808f3e2@kernel.dk>
+Date:   Mon, 4 Nov 2019 19:38:42 -0700
+User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:60.0) Gecko/20100101
+ Thunderbird/60.9.0
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <1560fa00-0c2b-0f3b-091c-d628f021ce09@nvidia.com>
-User-Agent: Mutt/1.9.4 (2018-02-28)
+In-Reply-To: <20191105023002.GC18564@moria.home.lan>
+Content-Type: text/plain; charset=utf-8
+Content-Language: en-US
+Content-Transfer-Encoding: 7bit
 Sender: linux-block-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-On Mon, Nov 04, 2019 at 02:03:43PM -0800, John Hubbard wrote:
-> On 11/4/19 12:57 PM, Jason Gunthorpe wrote:
-> > On Mon, Nov 04, 2019 at 12:48:13PM -0800, John Hubbard wrote:
-> >> On 11/4/19 12:33 PM, Jason Gunthorpe wrote:
-> >> ...
-> >>>> diff --git a/drivers/infiniband/core/umem.c b/drivers/infiniband/core/umem.c
-> >>>> index 24244a2f68cc..c5a78d3e674b 100644
-> >>>> +++ b/drivers/infiniband/core/umem.c
-> >>>> @@ -272,11 +272,10 @@ struct ib_umem *ib_umem_get(struct ib_udata *udata, unsigned long addr,
-> >>>>  
-> >>>>  	while (npages) {
-> >>>>  		down_read(&mm->mmap_sem);
-> >>>> -		ret = get_user_pages(cur_base,
-> >>>> +		ret = pin_longterm_pages(cur_base,
-> >>>>  				     min_t(unsigned long, npages,
-> >>>>  					   PAGE_SIZE / sizeof (struct page *)),
-> >>>> -				     gup_flags | FOLL_LONGTERM,
-> >>>> -				     page_list, NULL);
-> >>>> +				     gup_flags, page_list, NULL);
-> >>>
-> >>> FWIW, this one should be converted to fast as well, I think we finally
-> >>> got rid of all the blockers for that?
-> >>>
-> >>
-> >> I'm not aware of any blockers on the gup.c end, anyway. The only broken thing we
-> >> have there is "gup remote + FOLL_LONGTERM". But we can do "gup fast + LONGTERM". 
-> > 
-> > I mean the use of the mmap_sem here is finally in a way where we can
-> > just delete the mmap_sem and use _fast
-> >  
-> > ie, AFAIK there is no need for the mmap_sem to be held during
-> > ib_umem_add_sg_table()
-> > 
-> > This should probably be a standalone patch however
-> > 
+On 11/4/19 7:30 PM, Kent Overstreet wrote:
+> On Tue, Nov 05, 2019 at 10:20:46AM +0800, Ming Lei wrote:
+>> On Mon, Nov 04, 2019 at 09:11:30PM -0500, Kent Overstreet wrote:
+>>> On Tue, Nov 05, 2019 at 09:11:35AM +0800, Ming Lei wrote:
+>>>> On Mon, Nov 04, 2019 at 01:42:17PM -0500, Kent Overstreet wrote:
+>>>>> On Mon, Nov 04, 2019 at 11:23:42AM -0700, Jens Axboe wrote:
+>>>>>> On 11/4/19 11:17 AM, Kent Overstreet wrote:
+>>>>>>> On Mon, Nov 04, 2019 at 10:15:41AM -0800, Christoph Hellwig wrote:
+>>>>>>>> On Mon, Nov 04, 2019 at 01:14:03PM -0500, Kent Overstreet wrote:
+>>>>>>>>> On Sat, Nov 02, 2019 at 03:29:11PM +0800, Ming Lei wrote:
+>>>>>>>>>> __blk_queue_split() may be a bit heavy for small block size(such as
+>>>>>>>>>> 512B, or 4KB) IO, so introduce one flag to decide if this bio includes
+>>>>>>>>>> multiple page. And only consider to try splitting this bio in case
+>>>>>>>>>> that the multiple page flag is set.
+>>>>>>>>>
+>>>>>>>>> So, back in the day I had an alternative approach in mind: get rid of
+>>>>>>>>> blk_queue_split entirely, by pushing splitting down to the request layer - when
+>>>>>>>>> we map the bio/request to sgl, just have it map as much as will fit in the sgl
+>>>>>>>>> and if it doesn't entirely fit bump bi_remaining and leave it on the request
+>>>>>>>>> queue.
+>>>>>>>>>
+>>>>>>>>> This would mean there'd be no need for counting segments at all, and would cut a
+>>>>>>>>> fair amount of code out of the io path.
+>>>>>>>>
+>>>>>>>> I thought about that to, but it will take a lot more effort.  Mostly
+>>>>>>>> because md/dm heavily rely on splitting as well.  I still think it is
+>>>>>>>> worthwhile, it will just take a significant amount of time and we
+>>>>>>>> should have the quick improvement now.
+>>>>>>>
+>>>>>>> We can do it one driver at a time - driver sets a flag to disable
+>>>>>>> blk_queue_split(). Obvious one to do first would be nvme since that's where it
+>>>>>>> shows up the most.
+>>>>>>>
+>>>>>>> And md/md do splitting internally, but I'm not so sure they need
+>>>>>>> blk_queue_split().
+>>>>>>
+>>>>>> I'm a big proponent of doing something like that instead, but it is a
+>>>>>> lot of work. I absolutely hate the splitting we're doing now, even
+>>>>>> though the original "let's work as hard as we add add page time to get
+>>>>>> things right" was pretty abysmal as well.
+>>>>>
+>>>>> Last I looked I don't think it was going to be that bad, just needed a bit of
+>>>>> finesse. We just need to be able to partially process a request in e.g.
+>>>>> nvme_map_data(), and blk_rq_map_sg() needs to be modified to only map as much as
+>>>>> will fit instead of popping an assertion.
+>>>>
+>>>> I think it may not be doable.
+>>>>
+>>>> blk_rq_map_sg() is called by drivers and has to work on single request, however
+>>>> more requests have to be involved if we delay the splitting to blk_rq_map_sg().
+>>>> Cause splitting means that two bios can't be submitted in single IO request.
+>>>
+>>> Of course it's doable, do I have to show you how?
+>>
+>> No, you don't have to, could you just point out where my above words is wrong?
 > 
-> Yes. Oh, actually I guess the patch flow should be: change to 
-> get_user_pages_fast() and remove the mmap_sem calls, as one patch. And then change 
-> to pin_longterm_pages_fast() as the next patch. Otherwise, the internal fallback
-> from _fast to slow gup would attempt to take the mmap_sem (again) in the same
-> thread, which is not good. :)
+> blk_rq_map_sg() _currently_ works on a single request, but as I said
+> from the start that this would involve changing it to only process as
+> much of a request as would fit on an sglist.
 > 
-> Or just defer the change until after this series. Either way is fine, let me
-> know if you prefer one over the other.
+> Drivers will have to be modified, but the changes to driver code
+> should be pretty easy. What will be slightly trickier will be changing
+> blk-mq to handle requests that are only partially completed; that will
+> be harder than it would have been before blk-mq, since the old request
+> queue code used to handle partially completed requests - not much work
+> would have to be done that code.
 > 
-> The patch itself is trivial, but runtime testing to gain confidence that
-> it's solid is much harder. Is there a stress test you would recommend for that?
-> (I'm not promising I can quickly run it yet--my local IB setup is still nascent 
-> at best.)
+> I'm not very familiar with the blk-mq code, so Jens would be better
+> qualified to say how best to change that code. The basic idea would
+> probably be the same as how bios how have a refcount - bi_remaining -
+> to track splits/completions. If requests (in blk-mq land) don't have
+> such a refcount (they don't appear to), it will have to be added.
+> 
+>  From a quick glance, blk_mq_complete_request() is where the refcount
+>  put will have to be added. I haven't found where requests are popped
+>  off the request queue in blk-mq land yet - the code will have to be
+>  changed to only do that once the request has been fully mapped and
+>  submitted by the driver.
 
-If you make a patch we can probably get it tested, it is something
-we should do I keep forgetting about.
+This is where my knee jerk at the initial "partial completions" and
+"should be trivial" start to kick in. I don't think they are necessarily
+hard, but they aren't free either. And you'd need to be paying that
+atomic_dec cost for every IO. Maybe that's cheaper than the work we
+currently have to do, maybe not... If it's a clear win, then it'd be an
+interesting path to pursue. But we probably won't have that answer until
+at least a hacky version is done as proof of concept.
 
-Jason
+On the upside, it'd simplify things to just have the mapping in one
+place, when the request is setup. Though until all drivers do that
+(which I worry will be never), then we'd be stuck with both. Maybe
+that's a bit to pessimistic, should be easier now since we just have
+blk-mq.
+
+-- 
+Jens Axboe
+
