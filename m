@@ -2,121 +2,113 @@ Return-Path: <SRS0=uUnX=Y5=vger.kernel.org=linux-block-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-2.6 required=3.0 tests=DKIMWL_WL_HIGH,DKIM_SIGNED,
-	DKIM_VALID,DKIM_VALID_AU,MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,
+X-Spam-Status: No, score=-2.3 required=3.0 tests=DKIM_SIGNED,DKIM_VALID,
+	DKIM_VALID_AU,FREEMAIL_FORGED_FROMDOMAIN,FREEMAIL_FROM,
+	HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,
 	USER_AGENT_SANE_1 autolearn=no autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 66208C47E49
-	for <linux-block@archiver.kernel.org>; Tue,  5 Nov 2019 03:12:27 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id A6066CA9ED3
+	for <linux-block@archiver.kernel.org>; Tue,  5 Nov 2019 03:14:22 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.kernel.org (Postfix) with ESMTP id 3D3B521882
-	for <linux-block@archiver.kernel.org>; Tue,  5 Nov 2019 03:12:27 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=default; t=1572923547;
-	bh=hCqiCSjlrDhL5SGAV3AMEdP6Wu47sW0wJnkXEfvsLDA=;
-	h=Date:From:To:Cc:Subject:References:In-Reply-To:List-ID:From;
-	b=p61YZgJ1a59U+SFxH/fvkRsf8Od49BgWI7CUUngfCVGdbpKshoC1jI+jxQHP2+3dz
-	 DUxJhYPdhI2goYxfPls82Dlet0GW4nZ/w6RvsS9DCbUinZTEtyOaJv0aGyk/bFtXQg
-	 oZvHEEBYQKVE0SLAW/FmRRcFP7WM3N3jgGyVt3o0=
+	by mail.kernel.org (Postfix) with ESMTP id 79109206B8
+	for <linux-block@archiver.kernel.org>; Tue,  5 Nov 2019 03:14:22 +0000 (UTC)
+Authentication-Results: mail.kernel.org;
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="bN2pynle"
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1729655AbfKEDM0 (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Mon, 4 Nov 2019 22:12:26 -0500
-Received: from mail.kernel.org ([198.145.29.99]:36692 "EHLO mail.kernel.org"
-        rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-        id S1729543AbfKEDMZ (ORCPT <rfc822;linux-block@vger.kernel.org>);
-        Mon, 4 Nov 2019 22:12:25 -0500
-Received: from sol.localdomain (c-24-5-143-220.hsd1.ca.comcast.net [24.5.143.220])
-        (using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
-        (No client certificate requested)
-        by mail.kernel.org (Postfix) with ESMTPSA id 55C0D206B8;
-        Tue,  5 Nov 2019 03:12:24 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-        s=default; t=1572923544;
-        bh=hCqiCSjlrDhL5SGAV3AMEdP6Wu47sW0wJnkXEfvsLDA=;
-        h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
-        b=ri2wHRty9kxlKC9gQp5N8RoTQPWUoA55ALYg1PirNxKLDJn3ZgT/m/zKOqgfEIUqm
-         Ua2KFn6GvKBaanq+gHvxNHv86uoy/TSVumd9fbUnuZNJrrygfaLQn9RVQTUVh3s+Tu
-         TNbhm3BZI6egc58lOzR1Oc8dCl+b9DOCQFLY3J+w=
-Date:   Mon, 4 Nov 2019 19:12:22 -0800
-From:   Eric Biggers <ebiggers@kernel.org>
-To:     Christoph Hellwig <hch@infradead.org>
-Cc:     Satya Tangirala <satyat@google.com>, linux-scsi@vger.kernel.org,
-        Kim Boojin <boojin.kim@samsung.com>,
-        Kuohong Wang <kuohong.wang@mediatek.com>,
-        Barani Muthukumaran <bmuthuku@qti.qualcomm.com>,
-        linux-f2fs-devel@lists.sourceforge.net,
-        linux-block@vger.kernel.org, linux-fscrypt@vger.kernel.org,
-        linux-fsdevel@vger.kernel.org
-Subject: Re: [PATCH v5 7/9] fscrypt: add inline encryption support
-Message-ID: <20191105031222.GE692@sol.localdomain>
-Mail-Followup-To: Christoph Hellwig <hch@infradead.org>,
-        Satya Tangirala <satyat@google.com>, linux-scsi@vger.kernel.org,
-        Kim Boojin <boojin.kim@samsung.com>,
-        Kuohong Wang <kuohong.wang@mediatek.com>,
-        Barani Muthukumaran <bmuthuku@qti.qualcomm.com>,
-        linux-f2fs-devel@lists.sourceforge.net, linux-block@vger.kernel.org,
-        linux-fscrypt@vger.kernel.org, linux-fsdevel@vger.kernel.org
-References: <20191028072032.6911-1-satyat@google.com>
- <20191028072032.6911-8-satyat@google.com>
- <20191031183217.GF23601@infradead.org>
- <20191031202125.GA111219@gmail.com>
- <20191031212103.GA6244@infradead.org>
+        id S2387436AbfKEDOW (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Mon, 4 Nov 2019 22:14:22 -0500
+Received: from mail-qk1-f193.google.com ([209.85.222.193]:40510 "EHLO
+        mail-qk1-f193.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S2387412AbfKEDOV (ORCPT
+        <rfc822;linux-block@vger.kernel.org>); Mon, 4 Nov 2019 22:14:21 -0500
+Received: by mail-qk1-f193.google.com with SMTP id a18so2220135qkk.7;
+        Mon, 04 Nov 2019 19:14:21 -0800 (PST)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=gmail.com; s=20161025;
+        h=date:from:to:cc:subject:message-id:references:mime-version
+         :content-disposition:in-reply-to:user-agent;
+        bh=pgfGmkFIweedbyHt5v4lKizRPqq/wqU9L9J1WIBR5W8=;
+        b=bN2pynleNMfgcb9JsWq/qzJqU9KVFSg11FMWOm6EwVg3kzzR5sNmSKx9uKePQwDryr
+         e0UES0IgfgE04hjSRDhGZ9t/iVl51SMgzyNVAuzw01hAXy2ijbCNT6omKwQ5qcaV5iLL
+         nO/tXTEQzWE4oV20v+HpDxyS+/PeTrOxz55LxoR2X/s47FacxDh9MCIzoculxBv55izV
+         lCoqho63Z1+j7QBvnkrRn5a/WNxg42ptQzW6525/mGQe6QHgkUomBfz1PSeueRqy1soA
+         Ns0en9PV01SWzI+hbRElpOLH9ueKXL9yxxChA68PNnuGB35kaX8r+9Rqrskd3qZjlnaP
+         VLbA==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20161025;
+        h=x-gm-message-state:date:from:to:cc:subject:message-id:references
+         :mime-version:content-disposition:in-reply-to:user-agent;
+        bh=pgfGmkFIweedbyHt5v4lKizRPqq/wqU9L9J1WIBR5W8=;
+        b=nODEiDk2FR4sPfjNUSATTGW87OB5vtloWq/pQ1HA7Nmq8rqeVlk7GynWyY1/KiSmoy
+         xy25AqRIm2+TGXffLD+xg2hxRGhOeuex89eSR5FeSFac9QdltS57amMwtBj+7yuJmXSj
+         uzBtX4POT2HiK8gXpIOVstbS211xuS3APg5lxgXr0QYOnz6uXYNl9OYFmRwrj9QwDvV3
+         ciA5eceuj6+ECY+yopntmY+CwzcKRqQyyEmK3598WnMT6mSR6vbMDNZexhtXsv4pPm6V
+         HaDCqglljnTNv2Y4a52JmItQCiH418kq5+ZA31gpUoeSeDVlLDY3xulTJXm6IkPZe0X8
+         9nxA==
+X-Gm-Message-State: APjAAAVf6MwL89fgTN3zfEWzs2e5Yh90Zi/qAd5quIZ4UB588YDfu40R
+        VI2CSeNclLBFsUSQ4eVJ7bHH7S0gJw==
+X-Google-Smtp-Source: APXvYqz2cJ2KlnY5ngk9PlILvEun3tUdzEcjHoydnhabyUHHItxmJVjAqD1DHR26yah7fe7aKpLXfg==
+X-Received: by 2002:a37:684b:: with SMTP id d72mr10846753qkc.314.1572923660511;
+        Mon, 04 Nov 2019 19:14:20 -0800 (PST)
+Received: from moria.home.lan ([2601:19b:c500:a1:7285:c2ff:fed5:c918])
+        by smtp.gmail.com with ESMTPSA id h20sm2253328qtr.59.2019.11.04.19.14.19
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Mon, 04 Nov 2019 19:14:19 -0800 (PST)
+Date:   Mon, 4 Nov 2019 22:14:17 -0500
+From:   Kent Overstreet <kent.overstreet@gmail.com>
+To:     Jens Axboe <axboe@kernel.dk>
+Cc:     Ming Lei <ming.lei@redhat.com>,
+        Christoph Hellwig <hch@infradead.org>,
+        linux-block@vger.kernel.org, Coly Li <colyli@suse.de>,
+        Keith Busch <kbusch@kernel.org>, linux-bcache@vger.kernel.org
+Subject: Re: [PATCH V4] block: optimize for small block size IO
+Message-ID: <20191105031417.GA5872@moria.home.lan>
+References: <20191104181403.GA8984@kmo-pixel>
+ <20191104181541.GA21116@infradead.org>
+ <20191104181742.GC8984@kmo-pixel>
+ <f7fab4e0-58e4-76e4-a503-bb535b2a3da6@kernel.dk>
+ <20191104184217.GD8984@kmo-pixel>
+ <20191105011135.GD11436@ming.t460p>
+ <20191105021130.GB18564@moria.home.lan>
+ <20191105022046.GF11436@ming.t460p>
+ <20191105023002.GC18564@moria.home.lan>
+ <c41fd177-21e7-7e36-960f-fb1f7808f3e2@kernel.dk>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=us-ascii
 Content-Disposition: inline
-In-Reply-To: <20191031212103.GA6244@infradead.org>
+In-Reply-To: <c41fd177-21e7-7e36-960f-fb1f7808f3e2@kernel.dk>
 User-Agent: Mutt/1.12.2 (2019-09-21)
 Sender: linux-block-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-On Thu, Oct 31, 2019 at 02:21:03PM -0700, Christoph Hellwig wrote:
-> > > 
-> > > Btw, I'm not happy about the 8-byte IV assumptions everywhere here.
-> > > That really should be a parameter, not hardcoded.
-> > 
-> > To be clear, the 8-byte IV assumption doesn't really come from fs/crypto/, but
-> > rather in what the blk-crypto API provides.  If blk-crypto were to provide
-> > longer IV support, fs/crypto/ would pretty easily be able to make use of it.
+On Mon, Nov 04, 2019 at 07:38:42PM -0700, Jens Axboe wrote:
+> This is where my knee jerk at the initial "partial completions" and
+> "should be trivial" start to kick in. I don't think they are necessarily
+> hard, but they aren't free either. And you'd need to be paying that
+> atomic_dec cost for every IO.
+
+No need - you added the code to avoid that atomic dec for bi_remaining in the
+common case, the same approach will work here.
+
+> currently have to do, maybe not... If it's a clear win, then it'd be an
+> interesting path to pursue. But we probably won't have that answer until
+> at least a hacky version is done as proof of concept.
 > 
-> That's what I meant - we hardcode the value in fscrypt.  Instead we need
-> to expose the size from blk-crypt and check for it.
-> 
-> > 
-> > (And if IVs >= 24 bytes were supported and we added AES-128-CBC-ESSIV and
-> > Adiantum support to blk-crypto.c, then inline encryption would be able to do
-> > everything that the existing filesystem-layer contents encryption can do.)
-> > 
-> > Do you have anything in mind for how to make the API support longer IVs in a
-> > clean way?  Are you thinking of something like:
-> > 
-> > 	#define BLK_CRYPTO_MAX_DUN_SIZE	24
-> > 
-> > 	u8 dun[BLK_CRYPTO_MAX_DUN_SIZE];
-> > 	int dun_size;
-> > 
-> > We do have to perform arithmetic operations on it, so a byte array would make it
-> > ugly and slower, but it should be possible...
-> 
-> Well, we could make it an array of u64s, which means we can do all the
-> useful arithmetics on components on one of them.  But I see the point,
-> this adds significant complexity for no real short term gain, and we
-> should probably postponed it until needed.  Maybe just document the
-> assumptions a little better.
+> On the upside, it'd simplify things to just have the mapping in one
+> place, when the request is setup. Though until all drivers do that
+> (which I worry will be never), then we'd be stuck with both. Maybe
+> that's a bit to pessimistic, should be easier now since we just have
+> blk-mq.
 
-Just in case it's not obvious to anyone, I should also mention that being
-limited to specifying a 64-bit DUN doesn't prevent hardware that accepts a
-longer IV (e.g. 128 bits) from being used.  It would just be a matter of
-zero-padding the IV in the driver rather than in hardware.
+blk_rq_map_sg isn't called from _that_ many places, I suspect once it's figured
+out for one driver the rest won't be that bad.
 
-The actual limitation we're talking about here is in the range of IVs that can
-be specified.  A 64-bit DUN only allows the first 64 bits of the IV to be
-nonzero.  That works for fscrypt in all cases except DIRECT_KEY policies, and it
-would work for dm-crypt using the usual dm-crypt IV generator (plain64).
+And even if some drivers remain unconverted, I personally _much_ prefer this
+approach to more special case fast paths, and I bet this approach will be faster
+anyways.
 
-But for inline encryption to be compatible with DIRECT_KEY fscrypt policies or
-with certain other dm-crypt IV generators, we'd need the ability to specify more
-IV bits.
-
-- Eric
+Also - regarding driver allocating of the sglists, I think most high performance
+drivers preallocate a pool of sglists that are all sized to what the device is
+capable of.
