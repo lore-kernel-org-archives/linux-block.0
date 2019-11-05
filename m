@@ -2,159 +2,101 @@ Return-Path: <SRS0=uUnX=Y5=vger.kernel.org=linux-block-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-2.0 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
-	HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,
-	URIBL_BLOCKED,USER_AGENT_SANE_1 autolearn=no autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-0.8 required=3.0 tests=DKIM_SIGNED,DKIM_VALID,
+	DKIM_VALID_AU,HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SPF_HELO_NONE,
+	SPF_PASS autolearn=no autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 6DE9EFA374F
-	for <linux-block@archiver.kernel.org>; Tue,  5 Nov 2019 09:49:44 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id D65E3C17460
+	for <linux-block@archiver.kernel.org>; Tue,  5 Nov 2019 13:09:54 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.kernel.org (Postfix) with ESMTP id 3E749217F5
-	for <linux-block@archiver.kernel.org>; Tue,  5 Nov 2019 09:49:44 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id A96FA21928
+	for <linux-block@archiver.kernel.org>; Tue,  5 Nov 2019 13:09:54 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (1024-bit key) header.d=ffwll.ch header.i=@ffwll.ch header.b="KE3dP9Kv"
+	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="Yl6uyvJB"
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S2387702AbfKEJtn (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Tue, 5 Nov 2019 04:49:43 -0500
-Received: from mail-wm1-f65.google.com ([209.85.128.65]:55841 "EHLO
-        mail-wm1-f65.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1730711AbfKEJtm (ORCPT
-        <rfc822;linux-block@vger.kernel.org>); Tue, 5 Nov 2019 04:49:42 -0500
-Received: by mail-wm1-f65.google.com with SMTP id m17so10811530wmi.5
-        for <linux-block@vger.kernel.org>; Tue, 05 Nov 2019 01:49:40 -0800 (PST)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=ffwll.ch; s=google;
-        h=sender:date:from:to:cc:subject:message-id:mail-followup-to
-         :references:mime-version:content-disposition:in-reply-to:user-agent;
-        bh=oRi35sDRRYSuldGaopElz5IjGs2HKuOAcqpcVoq2wdY=;
-        b=KE3dP9KvcLUq0hJbOhSYMXJr4Z1Cuc2Vc3sYtj3A588K1AxiPBhNRv2jLPVvg3HpiB
-         asO9jGRsCrrAGrGXQuynbnaqIOtPdku/48txDbkC3jyEv0zbAYA99l9MmTsEF4lXmu4c
-         UlGTi/e9P81uVhAoSbMh6OU7HFW5tO869wbeU=
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20161025;
-        h=x-gm-message-state:sender:date:from:to:cc:subject:message-id
-         :mail-followup-to:references:mime-version:content-disposition
-         :in-reply-to:user-agent;
-        bh=oRi35sDRRYSuldGaopElz5IjGs2HKuOAcqpcVoq2wdY=;
-        b=bmgoYElAgUosQRNb2c3kaPJ+U4Ef9iQdP279jocH5u+Mad7RTkOuRpD8M8gP5iQERS
-         7aGpW82huZpD4wa33EoqE2q/ozDEMUsbbXZm/2gK86xxfvds3xeRIC0Xd9JHNNS6bhkc
-         +CzKsZkpFXF59GQZTfIblcMj66scLTI1SStFEb1ukeEw6fZ6CYeTYJZMEjs16Zl0r2iu
-         9FqGQAw30fSfrdGiVoKArlP/5g+fGlJOWUIxU0qltJw+faaT785JcA1trK9yIkwhw6C9
-         MyFD9zwo0EH0kNUs9/7Mn+TZMmgCfScgDvnBhfLPd4xDPOtIDtSiEkg4t7qA2e2yLYKR
-         QWrg==
-X-Gm-Message-State: APjAAAXAPXvtUOlhwTMjwJlGUg8s0nmygFLACZxjK654iujH4S333cWK
-        8MuFzNB4QAUYGIqlCa2o8X9PtQ==
-X-Google-Smtp-Source: APXvYqy+m+ZJ5zxOn/Dji3l65qB+TEfMmH5EiR/oP/iFPjGmYGokusjpTK+YoOlM7MNeuKLe8vHIRQ==
-X-Received: by 2002:a7b:c925:: with SMTP id h5mr3591415wml.115.1572947379914;
-        Tue, 05 Nov 2019 01:49:39 -0800 (PST)
-Received: from phenom.ffwll.local (212-51-149-96.fiber7.init7.net. [212.51.149.96])
-        by smtp.gmail.com with ESMTPSA id j19sm25704277wre.0.2019.11.05.01.49.38
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Tue, 05 Nov 2019 01:49:39 -0800 (PST)
-Date:   Tue, 5 Nov 2019 10:49:36 +0100
-From:   Daniel Vetter <daniel@ffwll.ch>
-To:     John Hubbard <jhubbard@nvidia.com>
-Cc:     Ira Weiny <ira.weiny@intel.com>,
-        Andrew Morton <akpm@linux-foundation.org>,
-        Al Viro <viro@zeniv.linux.org.uk>,
-        Alex Williamson <alex.williamson@redhat.com>,
-        Benjamin Herrenschmidt <benh@kernel.crashing.org>,
-        =?iso-8859-1?Q?Bj=F6rn_T=F6pel?= <bjorn.topel@intel.com>,
-        Christoph Hellwig <hch@infradead.org>,
-        Dan Williams <dan.j.williams@intel.com>,
-        Dave Chinner <david@fromorbit.com>,
-        David Airlie <airlied@linux.ie>,
-        "David S . Miller" <davem@davemloft.net>, Jan Kara <jack@suse.cz>,
-        Jason Gunthorpe <jgg@ziepe.ca>, Jens Axboe <axboe@kernel.dk>,
-        Jonathan Corbet <corbet@lwn.net>,
-        =?iso-8859-1?B?Suly9G1l?= Glisse <jglisse@redhat.com>,
-        Magnus Karlsson <magnus.karlsson@intel.com>,
-        Mauro Carvalho Chehab <mchehab@kernel.org>,
-        Michael Ellerman <mpe@ellerman.id.au>,
-        Michal Hocko <mhocko@suse.com>,
-        Mike Kravetz <mike.kravetz@oracle.com>,
-        Paul Mackerras <paulus@samba.org>,
-        Shuah Khan <shuah@kernel.org>,
-        Vlastimil Babka <vbabka@suse.cz>, bpf@vger.kernel.org,
-        dri-devel@lists.freedesktop.org, kvm@vger.kernel.org,
-        linux-block@vger.kernel.org, linux-doc@vger.kernel.org,
-        linux-fsdevel@vger.kernel.org, linux-kselftest@vger.kernel.org,
-        linux-media@vger.kernel.org, linux-rdma@vger.kernel.org,
-        linuxppc-dev@lists.ozlabs.org, netdev@vger.kernel.org,
-        linux-mm@kvack.org, LKML <linux-kernel@vger.kernel.org>
-Subject: Re: [PATCH 09/19] drm/via: set FOLL_PIN via pin_user_pages_fast()
-Message-ID: <20191105094936.GZ10326@phenom.ffwll.local>
-Mail-Followup-To: John Hubbard <jhubbard@nvidia.com>,
-        Ira Weiny <ira.weiny@intel.com>,
-        Andrew Morton <akpm@linux-foundation.org>,
-        Al Viro <viro@zeniv.linux.org.uk>,
-        Alex Williamson <alex.williamson@redhat.com>,
-        Benjamin Herrenschmidt <benh@kernel.crashing.org>,
-        =?iso-8859-1?Q?Bj=F6rn_T=F6pel?= <bjorn.topel@intel.com>,
-        Christoph Hellwig <hch@infradead.org>,
-        Dan Williams <dan.j.williams@intel.com>,
-        Dave Chinner <david@fromorbit.com>, David Airlie <airlied@linux.ie>,
-        "David S . Miller" <davem@davemloft.net>, Jan Kara <jack@suse.cz>,
-        Jason Gunthorpe <jgg@ziepe.ca>, Jens Axboe <axboe@kernel.dk>,
-        Jonathan Corbet <corbet@lwn.net>,
-        =?iso-8859-1?B?Suly9G1l?= Glisse <jglisse@redhat.com>,
-        Magnus Karlsson <magnus.karlsson@intel.com>,
-        Mauro Carvalho Chehab <mchehab@kernel.org>,
-        Michael Ellerman <mpe@ellerman.id.au>,
-        Michal Hocko <mhocko@suse.com>,
-        Mike Kravetz <mike.kravetz@oracle.com>,
-        Paul Mackerras <paulus@samba.org>, Shuah Khan <shuah@kernel.org>,
-        Vlastimil Babka <vbabka@suse.cz>, bpf@vger.kernel.org,
-        dri-devel@lists.freedesktop.org, kvm@vger.kernel.org,
-        linux-block@vger.kernel.org, linux-doc@vger.kernel.org,
-        linux-fsdevel@vger.kernel.org, linux-kselftest@vger.kernel.org,
-        linux-media@vger.kernel.org, linux-rdma@vger.kernel.org,
-        linuxppc-dev@lists.ozlabs.org, netdev@vger.kernel.org,
-        linux-mm@kvack.org, LKML <linux-kernel@vger.kernel.org>
-References: <20191030224930.3990755-1-jhubbard@nvidia.com>
- <20191030224930.3990755-10-jhubbard@nvidia.com>
- <20191031233628.GI14771@iweiny-DESK2.sc.intel.com>
- <20191104181055.GP10326@phenom.ffwll.local>
- <48d22c77-c313-59ff-4847-bc9a9813b8a7@nvidia.com>
+        id S2388428AbfKENJx (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Tue, 5 Nov 2019 08:09:53 -0500
+Received: from us-smtp-delivery-1.mimecast.com ([205.139.110.120]:51033 "EHLO
+        us-smtp-1.mimecast.com" rhost-flags-OK-OK-OK-FAIL) by vger.kernel.org
+        with ESMTP id S2388008AbfKENJx (ORCPT
+        <rfc822;linux-block@vger.kernel.org>); Tue, 5 Nov 2019 08:09:53 -0500
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+        s=mimecast20190719; t=1572959392;
+        h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+         to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+         content-transfer-encoding:content-transfer-encoding:
+         in-reply-to:in-reply-to:references:references;
+        bh=wsuwC0t0v7m4AvGasFs0fl2Hj3Em1xgbuROOym1LkXo=;
+        b=Yl6uyvJBWlxWgDkg7M00BfQk691q6V9cZZsv8INQsK52tXPtL1+EoT9mqK9TYpzENWG7Y2
+        dFBEz/wfdupukgMh9qb5lsGX66gBqRYLqrCUshLcAWC2t5j+ugUZYHE/APvgM4nQ8a0zrj
+        YfhjdcYUPxdnwVNbdXnOqFLNenGx8gE=
+Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
+ [209.132.183.4]) (Using TLS) by relay.mimecast.com with ESMTP id
+ us-mta-16-CxyEWPogNkq-rnkgTOsw1w-1; Tue, 05 Nov 2019 08:09:47 -0500
+Received: from smtp.corp.redhat.com (int-mx05.intmail.prod.int.phx2.redhat.com [10.5.11.15])
+        (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
+        (No client certificate requested)
+        by mimecast-mx01.redhat.com (Postfix) with ESMTPS id D5A14800C73;
+        Tue,  5 Nov 2019 13:09:45 +0000 (UTC)
+Received: from segfault.boston.devel.redhat.com (unknown [10.19.60.26])
+        by smtp.corp.redhat.com (Postfix) with ESMTPS id 124EB5D726;
+        Tue,  5 Nov 2019 13:09:39 +0000 (UTC)
+From:   Jeff Moyer <jmoyer@redhat.com>
+To:     Stefan Hajnoczi <stefanha@redhat.com>
+Cc:     Jens Axboe <axboe@kernel.dk>, Julia Suvorova <jusual@redhat.com>,
+        Aarushi Mehta <mehta.aaru20@gmail.com>,
+        linux-block@vger.kernel.org
+Subject: Re: [PATCH liburing v3 0/3] Fedora 31 RPM improvements
+References: <20191105073917.62557-1-stefanha@redhat.com>
+X-PGP-KeyID: 1F78E1B4
+X-PGP-CertKey: F6FE 280D 8293 F72C 65FD  5A58 1FF8 A7CA 1F78 E1B4
+Date:   Tue, 05 Nov 2019 08:09:38 -0500
+In-Reply-To: <20191105073917.62557-1-stefanha@redhat.com> (Stefan Hajnoczi's
+        message of "Tue, 5 Nov 2019 08:39:14 +0100")
+Message-ID: <x494kzibhbh.fsf@segfault.boston.devel.redhat.com>
+User-Agent: Gnus/5.13 (Gnus v5.13) Emacs/26.1 (gnu/linux)
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <48d22c77-c313-59ff-4847-bc9a9813b8a7@nvidia.com>
-X-Operating-System: Linux phenom 5.2.0-3-amd64 
-User-Agent: Mutt/1.10.1 (2018-07-13)
+X-Scanned-By: MIMEDefang 2.79 on 10.5.11.15
+X-MC-Unique: CxyEWPogNkq-rnkgTOsw1w-1
+X-Mimecast-Spam-Score: 0
+Content-Type: text/plain; charset=WINDOWS-1252
+Content-Transfer-Encoding: quoted-printable
 Sender: linux-block-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-On Mon, Nov 04, 2019 at 11:20:38AM -0800, John Hubbard wrote:
-> On 11/4/19 10:10 AM, Daniel Vetter wrote:
-> > On Thu, Oct 31, 2019 at 04:36:28PM -0700, Ira Weiny wrote:
-> >> On Wed, Oct 30, 2019 at 03:49:20PM -0700, John Hubbard wrote:
-> >>> Convert drm/via to use the new pin_user_pages_fast() call, which sets
-> >>> FOLL_PIN. Setting FOLL_PIN is now required for code that requires
-> >>> tracking of pinned pages, and therefore for any code that calls
-> >>> put_user_page().
-> >>>
-> >>
-> >> Reviewed-by: Ira Weiny <ira.weiny@intel.com>
-> > 
-> > No one's touching the via driver anymore, so feel free to merge this
-> > through whatever tree suits best (aka I'll drop this on the floor and
-> > forget about it now).
-> > 
-> > Acked-by: Daniel Vetter <daniel.vetter@ffwll.ch>
-> > 
-> 
-> OK, great. Yes, in fact, I'm hoping Andrew can just push the whole series
-> in through the mm tree, because that would allow it to be done in one 
-> shot, in 5.5
+Stefan Hajnoczi <stefanha@redhat.com> writes:
 
-btw is there more? We should have a bunch more userptr stuff in various
-drivers, so was really surprised that drm/via is the only thing in your
-series.
--Daniel
--- 
-Daniel Vetter
-Software Engineer, Intel Corporation
-http://blog.ffwll.ch
+> v3:
+>  * Remember to commit my changes ;-).  The changelog now contains user-vi=
+sible
+>    changes in 0.2 and the https git.kernel.dk URL.
+>
+> v2:
+>  * Wrap commit description to 72 characters
+>  * Put user-visible changes into 0.2 RPM changelog
+>  * Use https git.kernel.dk URL for tar.gz
+>
+> Jeff Moyer and I have been working on RPMs for liburing.  This patch seri=
+es
+> contains fixes required to build Fedora 31 RPMs.
+>
+> I have also tested on openSUSE Leap 15.1 to verify that these changes wor=
+k on
+> other rpm-based distros.
+>
+> Jeff Moyer (1):
+>   spec: Fedora RPM cleanups
+>
+> Stefan Hajnoczi (2):
+>   spec: update RPM version number to 0.2
+>   Makefile: add missing .pc dependency on .spec file
+>
+>  Makefile      |  2 +-
+>  liburing.spec | 59 ++++++++++++++++++++++++++-------------------------
+>  2 files changed, 31 insertions(+), 30 deletions(-)
+
+For the series:
+Acked-by: Jeff Moyer <jmoyer@redhat.com>
+
