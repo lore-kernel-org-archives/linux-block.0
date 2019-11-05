@@ -2,96 +2,93 @@ Return-Path: <SRS0=uUnX=Y5=vger.kernel.org=linux-block-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-2.2 required=3.0 tests=DKIM_SIGNED,DKIM_VALID,
+X-Spam-Status: No, score=-2.0 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
 	HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,
-	URIBL_BLOCKED,USER_AGENT_SANE_1 autolearn=no autolearn_force=no version=3.4.0
+	USER_AGENT_SANE_1 autolearn=no autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 2A3D5C5DF60
-	for <linux-block@archiver.kernel.org>; Tue,  5 Nov 2019 15:29:49 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id A58BEC5DF63
+	for <linux-block@archiver.kernel.org>; Tue,  5 Nov 2019 15:40:00 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.kernel.org (Postfix) with ESMTP id F2CC6214B2
-	for <linux-block@archiver.kernel.org>; Tue,  5 Nov 2019 15:29:48 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id 7C9AB21929
+	for <linux-block@archiver.kernel.org>; Tue,  5 Nov 2019 15:40:00 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel-dk.20150623.gappssmtp.com header.i=@kernel-dk.20150623.gappssmtp.com header.b="YpRQq1TC"
+	dkim=fail reason="signature verification failed" (2048-bit key) header.d=infradead.org header.i=@infradead.org header.b="Ocp9xiaK"
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S2389908AbfKEP3s (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Tue, 5 Nov 2019 10:29:48 -0500
-Received: from mail-il1-f195.google.com ([209.85.166.195]:45465 "EHLO
-        mail-il1-f195.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S2389884AbfKEP3s (ORCPT
-        <rfc822;linux-block@vger.kernel.org>); Tue, 5 Nov 2019 10:29:48 -0500
-Received: by mail-il1-f195.google.com with SMTP id o18so6398388ils.12
-        for <linux-block@vger.kernel.org>; Tue, 05 Nov 2019 07:29:48 -0800 (PST)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=kernel-dk.20150623.gappssmtp.com; s=20150623;
-        h=subject:to:cc:references:from:message-id:date:user-agent
-         :mime-version:in-reply-to:content-language:content-transfer-encoding;
-        bh=D4kluc2UXLt7ANBxIooFAqYy9BjH/ti0RahbVIn0oeo=;
-        b=YpRQq1TCYCgfBqjO6PSF4y+KQPnwQDYjJU1cXd+HSurrkHZ1BvdsDGpYxQK2bfZPbw
-         JU60cVnVBgbPJILowJyTVOKJ1l6EaXRU8XOBGnuZl5H+kwbmo3TDk5Yewhj9eEdkSp4F
-         CHGPigHm0dJ90Q1OE1GiJfKMyBrTIAP3TsSs2arOjefTbxj9KiQPkbq0c8I2zn6JLg06
-         akiyAmUoQ1CTQ0rY7j2UFKyUAA/3s04XvjkgZ/RZ6e+S4BPs8fRv2WuUoqfUlY1j4/A/
-         IIGvqBEb9RChPC9reFEiGtGyRdfn+WHDKCuhhJ73A1JT1BWEOzYdevgUVlyFllt7NDW3
-         dIRA==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20161025;
-        h=x-gm-message-state:subject:to:cc:references:from:message-id:date
-         :user-agent:mime-version:in-reply-to:content-language
-         :content-transfer-encoding;
-        bh=D4kluc2UXLt7ANBxIooFAqYy9BjH/ti0RahbVIn0oeo=;
-        b=ZIUy18dVHgJOOmRGFWO/grx5MLm6EDcfsBUbcaALYKuZwGJho0jLgvHuaMCSFrTzNM
-         nMh204negUsno4gB8H+sPj7oE97lLrV1qg8aDiN2RvnwfBB0Ne37n9QJaJPjnEm8jXZa
-         IgmJsi44Q2LPjbwB9pYGwaJqka0szJWvPcJiAzG+xdMRdpQDP9QdBBikE3EOffzXMkJd
-         VjWwckkizTF7r6lGUCaChFTYcOuD7pJlJLv7Uenvk0O0KC8Ij4a88dCsrEwFZiWhI+dE
-         AP89W7zFPEWAIVn0BskNqsYT2za3Y/byZD+Gd1/aTKE7vNfACzLi21U4e1BfQbqVut4R
-         06lA==
-X-Gm-Message-State: APjAAAU4JguS/khveLDRSslM9dYFj+TH4DESKQvqSKt44VeMqM45vd42
-        m/1dr84pKxXLMNJRPXpP/GQlGkSTiAU=
-X-Google-Smtp-Source: APXvYqyxNXYvYkjX4d6jtXU+SOwJFYAnvCxcJQdbfjna9iU/xEsYNvsBgSf0gg1r3KDyrOI5GH29Dg==
-X-Received: by 2002:a92:490f:: with SMTP id w15mr33928006ila.187.1572967787212;
-        Tue, 05 Nov 2019 07:29:47 -0800 (PST)
-Received: from [192.168.1.159] ([65.144.74.34])
-        by smtp.gmail.com with ESMTPSA id j87sm2915731ild.82.2019.11.05.07.29.45
-        (version=TLS1_2 cipher=ECDHE-RSA-AES128-GCM-SHA256 bits=128/128);
-        Tue, 05 Nov 2019 07:29:46 -0800 (PST)
-Subject: Re: [PATCH liburing v3 0/3] Fedora 31 RPM improvements
-To:     Jeff Moyer <jmoyer@redhat.com>
-Cc:     Stefan Hajnoczi <stefanha@redhat.com>,
-        Julia Suvorova <jusual@redhat.com>,
-        Aarushi Mehta <mehta.aaru20@gmail.com>,
-        linux-block@vger.kernel.org
-References: <20191105073917.62557-1-stefanha@redhat.com>
- <x494kzibhbh.fsf@segfault.boston.devel.redhat.com>
- <a039c944-f282-f9cd-6ddf-6ffb49228f17@kernel.dk>
- <x49o8xq9wm1.fsf@segfault.boston.devel.redhat.com>
-From:   Jens Axboe <axboe@kernel.dk>
-Message-ID: <45975f14-2687-ffc7-28ee-a3cd1167823c@kernel.dk>
-Date:   Tue, 5 Nov 2019 08:29:45 -0700
-User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:60.0) Gecko/20100101
- Thunderbird/60.9.0
+        id S1731074AbfKEPj7 (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Tue, 5 Nov 2019 10:39:59 -0500
+Received: from bombadil.infradead.org ([198.137.202.133]:48538 "EHLO
+        bombadil.infradead.org" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S1727889AbfKEPj6 (ORCPT
+        <rfc822;linux-block@vger.kernel.org>); Tue, 5 Nov 2019 10:39:58 -0500
+DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed;
+        d=infradead.org; s=bombadil.20170209; h=In-Reply-To:Content-Type:MIME-Version
+        :References:Message-ID:Subject:To:From:Date:Sender:Reply-To:Cc:
+        Content-Transfer-Encoding:Content-ID:Content-Description:Resent-Date:
+        Resent-From:Resent-Sender:Resent-To:Resent-Cc:Resent-Message-ID:List-Id:
+        List-Help:List-Unsubscribe:List-Subscribe:List-Post:List-Owner:List-Archive;
+         bh=XQdcZ/rCMxPfhUJE8nbWkRrJsdxA+Vm56qg50/+E1Cw=; b=Ocp9xiaKzYOCoNB+oT3sxZPTQ
+        GZZmpeZz1Pkbx3hL5igN2A9nnxgJeh5ZX0h0RFq6u88ua22HGxw6tlKR923/wrmQM4d9cJFXkqmXz
+        7p6KUsYbiy3UTrhyHmOUjEl4g1vqoBwf3i4ju5z28ZkYAEfqGXc4DjckNzm91NOiLwHOAtuFuuhfP
+        /u+IK73URb7cxkeIV7/gM5hFZ3aGu6h+2cn2G7ik8OqisFdebxIl9EiPUqch0yc5uCTcNG4K9OCbX
+        VW4f/V+e6xpqbfC64GJBGkXaIedjYx1UzWAGjYoerE2gtLIaBhKqYngoD0iVUT+cjBXJ4SKNeqg0x
+        wuaWM8E5g==;
+Received: from hch by bombadil.infradead.org with local (Exim 4.92.3 #3 (Red Hat Linux))
+        id 1iS0w1-0000HC-RP; Tue, 05 Nov 2019 15:39:57 +0000
+Date:   Tue, 5 Nov 2019 07:39:57 -0800
+From:   Christoph Hellwig <hch@infradead.org>
+To:     Christoph Hellwig <hch@infradead.org>,
+        "Theodore Y. Ts'o" <tytso@mit.edu>, linux-block@vger.kernel.org,
+        linux-scsi@vger.kernel.org, Kim Boojin <boojin.kim@samsung.com>,
+        Kuohong Wang <kuohong.wang@mediatek.com>,
+        Barani Muthukumaran <bmuthuku@qti.qualcomm.com>,
+        Satya Tangirala <satyat@google.com>,
+        linux-fscrypt@vger.kernel.org, linux-fsdevel@vger.kernel.org,
+        linux-f2fs-devel@lists.sourceforge.net
+Subject: Re: [PATCH v5 3/9] block: blk-crypto for Inline Encryption
+Message-ID: <20191105153957.GA29320@infradead.org>
+References: <20191028072032.6911-1-satyat@google.com>
+ <20191028072032.6911-4-satyat@google.com>
+ <20191031175713.GA23601@infradead.org>
+ <20191031205045.GG16197@mit.edu>
+ <20191031212234.GA32262@infradead.org>
+ <20191105015411.GB692@sol.localdomain>
 MIME-Version: 1.0
-In-Reply-To: <x49o8xq9wm1.fsf@segfault.boston.devel.redhat.com>
-Content-Type: text/plain; charset=windows-1252
-Content-Language: en-US
-Content-Transfer-Encoding: 7bit
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <20191105015411.GB692@sol.localdomain>
+User-Agent: Mutt/1.12.1 (2019-06-15)
+X-SRS-Rewrite: SMTP reverse-path rewritten from <hch@infradead.org> by bombadil.infradead.org. See http://www.infradead.org/rpr.html
 Sender: linux-block-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-On 11/5/19 8:22 AM, Jeff Moyer wrote:
-> Jens Axboe <axboe@kernel.dk> writes:
-> 
->> On 11/5/19 6:09 AM, Jeff Moyer wrote:
->>> Acked-by: Jeff Moyer<jmoyer@redhat.com>
->>
->> Patch 3 is attributed to you, but not signed off by you. Can
->> I add your SOB to it?
-> 
-> Yes.
+On Mon, Nov 04, 2019 at 06:01:17PM -0800, Eric Biggers wrote:
+> I think that "Severely bloating the per-I/O data structure" is an exaggeration,
+> since that it's only 32 bytes, and it isn't in struct bio directly but rather in
+> struct bio_crypt_ctx...
 
-Great, done
+Yes, and none of that is needed for the real inline crypto.  And I think
+we can further reduce the overhead of bio_crypt_ctx once we have the
+basiscs sorted out.  If we want to gain more traction we need to reduce
+the I/O to a minimum.
 
--- 
-Jens Axboe
+> In any case, Satya, it might be a good idea to reorganize this patchset so that
+> it first adds all logic that's needed for "real" inline encryption support
+> (including the needed parts of blk-crypto.c), then adds the crypto API fallback
+> as a separate patch.  That would separate the concerns more cleanly and make the
+> patchset easier to review, and make it easier to make the fallback
+> de-configurable or even remove it entirely if that turns out to be needed.
 
+Yes, that is a good idea.  Not just in terms of patch, but also in terms
+of code organization.  The current structure is pretty weird with 3
+files that are mostly tighly integrated, except that one also has the
+software implementations.  So what I think we need at a minimum is:
+
+ - reoranizize that we have say block/blk-crypt.c for all the inline
+   crypto infrastructure, and block/blk-crypy-sw.c for the actual
+   software crypto implementation.
+ - remove all the fields only needed for software crypto from
+   bio_crypt_ctx, and instead clone the bio into a bioset with the
+   additional fields only when we use the software implementation, so
+   that there is no overhead for the hardware path.
