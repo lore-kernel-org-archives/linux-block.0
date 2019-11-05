@@ -2,188 +2,158 @@ Return-Path: <SRS0=uUnX=Y5=vger.kernel.org=linux-block-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-5.4 required=3.0 tests=DKIMWL_WL_HIGH,DKIM_SIGNED,
-	DKIM_VALID,DKIM_VALID_AU,HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,
-	MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,USER_AGENT_SANE_1
-	autolearn=unavailable autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-8.2 required=3.0 tests=DKIM_SIGNED,DKIM_VALID,
+	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,
+	SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED,USER_AGENT_SANE_1 autolearn=unavailable
+	autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 066ADC5DF60
-	for <linux-block@archiver.kernel.org>; Tue,  5 Nov 2019 19:00:19 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id CBB8BC5DF62
+	for <linux-block@archiver.kernel.org>; Tue,  5 Nov 2019 20:53:36 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.kernel.org (Postfix) with ESMTP id D177420869
-	for <linux-block@archiver.kernel.org>; Tue,  5 Nov 2019 19:00:18 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id 8D0D921A49
+	for <linux-block@archiver.kernel.org>; Tue,  5 Nov 2019 20:53:36 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=pass (2048-bit key) header.d=nvidia.com header.i=@nvidia.com header.b="BS0Skgz5"
+	dkim=pass (2048-bit key) header.d=kernel-dk.20150623.gappssmtp.com header.i=@kernel-dk.20150623.gappssmtp.com header.b="ScuyfvPT"
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S2390651AbfKETAL (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Tue, 5 Nov 2019 14:00:11 -0500
-Received: from hqemgate15.nvidia.com ([216.228.121.64]:13342 "EHLO
-        hqemgate15.nvidia.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S2390404AbfKETAL (ORCPT
-        <rfc822;linux-block@vger.kernel.org>); Tue, 5 Nov 2019 14:00:11 -0500
-Received: from hqpgpgate102.nvidia.com (Not Verified[216.228.121.13]) by hqemgate15.nvidia.com (using TLS: TLSv1.2, DES-CBC3-SHA)
-        id <B5dc1c6bc0000>; Tue, 05 Nov 2019 11:00:12 -0800
-Received: from hqmail.nvidia.com ([172.20.161.6])
-  by hqpgpgate102.nvidia.com (PGP Universal service);
-  Tue, 05 Nov 2019 11:00:07 -0800
-X-PGP-Universal: processed;
-        by hqpgpgate102.nvidia.com on Tue, 05 Nov 2019 11:00:07 -0800
-Received: from [10.110.48.28] (10.124.1.5) by HQMAIL107.nvidia.com
- (172.20.187.13) with Microsoft SMTP Server (TLS) id 15.0.1473.3; Tue, 5 Nov
- 2019 19:00:07 +0000
-Subject: Re: [PATCH v2 05/18] mm/gup: introduce pin_user_pages*() and FOLL_PIN
-To:     Mike Rapoport <rppt@kernel.org>
-CC:     Andrew Morton <akpm@linux-foundation.org>,
-        Al Viro <viro@zeniv.linux.org.uk>,
-        Alex Williamson <alex.williamson@redhat.com>,
-        Benjamin Herrenschmidt <benh@kernel.crashing.org>,
-        =?UTF-8?B?QmrDtnJuIFTDtnBlbA==?= <bjorn.topel@intel.com>,
-        Christoph Hellwig <hch@infradead.org>,
-        Dan Williams <dan.j.williams@intel.com>,
-        Daniel Vetter <daniel@ffwll.ch>,
-        Dave Chinner <david@fromorbit.com>,
-        David Airlie <airlied@linux.ie>,
-        "David S . Miller" <davem@davemloft.net>,
-        Ira Weiny <ira.weiny@intel.com>, Jan Kara <jack@suse.cz>,
-        Jason Gunthorpe <jgg@ziepe.ca>, Jens Axboe <axboe@kernel.dk>,
-        Jonathan Corbet <corbet@lwn.net>,
-        =?UTF-8?B?SsOpcsO0bWUgR2xpc3Nl?= <jglisse@redhat.com>,
-        Magnus Karlsson <magnus.karlsson@intel.com>,
-        Mauro Carvalho Chehab <mchehab@kernel.org>,
-        Michael Ellerman <mpe@ellerman.id.au>,
-        Michal Hocko <mhocko@suse.com>,
-        Mike Kravetz <mike.kravetz@oracle.com>,
-        Paul Mackerras <paulus@samba.org>,
-        Shuah Khan <shuah@kernel.org>,
-        Vlastimil Babka <vbabka@suse.cz>, <bpf@vger.kernel.org>,
-        <dri-devel@lists.freedesktop.org>, <kvm@vger.kernel.org>,
-        <linux-block@vger.kernel.org>, <linux-doc@vger.kernel.org>,
-        <linux-fsdevel@vger.kernel.org>, <linux-kselftest@vger.kernel.org>,
-        <linux-media@vger.kernel.org>, <linux-rdma@vger.kernel.org>,
-        <linuxppc-dev@lists.ozlabs.org>, <netdev@vger.kernel.org>,
-        <linux-mm@kvack.org>, LKML <linux-kernel@vger.kernel.org>
-References: <20191103211813.213227-1-jhubbard@nvidia.com>
- <20191103211813.213227-6-jhubbard@nvidia.com>
- <20191105131032.GG25005@rapoport-lnx>
-X-Nvconfidentiality: public
-From:   John Hubbard <jhubbard@nvidia.com>
-Message-ID: <9ac948a4-59bf-2427-2007-e460aad2848a@nvidia.com>
-Date:   Tue, 5 Nov 2019 11:00:06 -0800
+        id S1729760AbfKEUxg (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Tue, 5 Nov 2019 15:53:36 -0500
+Received: from mail-io1-f66.google.com ([209.85.166.66]:39200 "EHLO
+        mail-io1-f66.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S1725806AbfKEUxf (ORCPT
+        <rfc822;linux-block@vger.kernel.org>); Tue, 5 Nov 2019 15:53:35 -0500
+Received: by mail-io1-f66.google.com with SMTP id k1so12429161ioj.6
+        for <linux-block@vger.kernel.org>; Tue, 05 Nov 2019 12:53:34 -0800 (PST)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=kernel-dk.20150623.gappssmtp.com; s=20150623;
+        h=to:from:subject:message-id:date:user-agent:mime-version
+         :content-language:content-transfer-encoding;
+        bh=GX8VV76n/Cb3lM3k70PhfXKFIkmdW/TeRcKURAsaHlw=;
+        b=ScuyfvPTaSN1xVRBpsrrtjrMqwYRqle2w2tYTQRMGPGX5Nxz4uF/XtSQdU8dU8joQx
+         pqssF6kFb+/sEdCkNeyPyL8KGUwMsj3Av7eOEdvYLQ0SwL8S74IgX059A4PWjv1iY9FQ
+         ZfPDno48w69hMIpa+tpSWhYFD2o9jxlrfjh5Ju/2uzMBvmWJNdQ/mKLMNXOxXGETsWZc
+         3EDWAgVn+LQbvf1j42FFYMBtI/2tiCF315XX4hiJy2dDu9zig2p7buzDOBN8xYgrqGLG
+         e1QUhzG0NxB39d8GlbWvbyMiBaGiK4rEepmbMP4VeDaSc6EWIp9hpSnTz0jx/mk2FNYF
+         CNPA==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20161025;
+        h=x-gm-message-state:to:from:subject:message-id:date:user-agent
+         :mime-version:content-language:content-transfer-encoding;
+        bh=GX8VV76n/Cb3lM3k70PhfXKFIkmdW/TeRcKURAsaHlw=;
+        b=EHQo0W9J94mqb3W4eQRh5iC/iCR0gpMWID8lw1+cnyKOlGXO87WRNvzFRvllgtG5Ld
+         4iqOFHMGp4XmzIf/Ey7GhragoCRD5Kj9rJmlygBaKb8Vgoz3Me/K2S45dfMDq6AtPqD7
+         oEsn6YfrdeRnJrjThWF/f/NR84ip5iQ6hMEjbffTz66fzyO75AJVQPGEyNiLMVVb++j/
+         Nw/zRJlejbYtVPHi6XwIpeQJbHcEKV2sE5NODH8/SLnhzTpyGBDc4rcdoc7gHoPUlPEK
+         tJoVMGx/Z4j4k3oYBpWsaSiNJusK0TkhuhVQgEOzNN4YW1GPDiopaX6/Wu626UNtSHqG
+         ZkLw==
+X-Gm-Message-State: APjAAAX/l6E5PtbWr/1eqHV6Cpi7KNKloExT4+4ZFtqlvzJcsWEqGlgm
+        i+y8RSkqRIHrYOXRxF/uckw7Gg==
+X-Google-Smtp-Source: APXvYqwKFIvjRDoPT/jRFT+LFKlzBWFPrAFgVrwjTxtcAvKOBqZH+U7EeFxirk0ykFB02Fok5Tpe1g==
+X-Received: by 2002:a5d:9a0c:: with SMTP id s12mr2007675iol.41.1572987213589;
+        Tue, 05 Nov 2019 12:53:33 -0800 (PST)
+Received: from [192.168.1.159] ([65.144.74.34])
+        by smtp.gmail.com with ESMTPSA id n16sm137928ioh.15.2019.11.05.12.53.32
+        (version=TLS1_2 cipher=ECDHE-RSA-AES128-GCM-SHA256 bits=128/128);
+        Tue, 05 Nov 2019 12:53:32 -0800 (PST)
+To:     "linux-block@vger.kernel.org" <linux-block@vger.kernel.org>,
+        io-uring@vger.kernel.org
+From:   Jens Axboe <axboe@kernel.dk>
+Subject: [PATCH] io-wq: use proper nesting IRQ disabling spinlocks for cancel
+Message-ID: <294dec15-76ac-7475-eba5-0d06c9dc403e@kernel.dk>
+Date:   Tue, 5 Nov 2019 13:53:31 -0700
 User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:60.0) Gecko/20100101
- Thunderbird/60.8.0
+ Thunderbird/60.9.0
 MIME-Version: 1.0
-In-Reply-To: <20191105131032.GG25005@rapoport-lnx>
-X-Originating-IP: [10.124.1.5]
-X-ClientProxiedBy: HQMAIL105.nvidia.com (172.20.187.12) To
- HQMAIL107.nvidia.com (172.20.187.13)
-Content-Type: text/plain; charset="utf-8"
+Content-Type: text/plain; charset=utf-8
 Content-Language: en-US
 Content-Transfer-Encoding: 7bit
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=nvidia.com; s=n1;
-        t=1572980412; bh=ojXJL7Jf2vtMqYP0b7gLz2fp+ItJt4NPdkhylbujo04=;
-        h=X-PGP-Universal:Subject:To:CC:References:X-Nvconfidentiality:From:
-         Message-ID:Date:User-Agent:MIME-Version:In-Reply-To:
-         X-Originating-IP:X-ClientProxiedBy:Content-Type:Content-Language:
-         Content-Transfer-Encoding;
-        b=BS0Skgz5RbNv7FRT3SjRhdwpwr0ecQ8AOgMazMsduNtoC93TjDB3sb+UV4BVm8kS1
-         e2YIxx2R9GvEAZtEOkrlW3cAbcdFl/wyRSANMj//120w5PZgTkX7MC1O13jzRSXm0k
-         KFRmKs+Z0OYFmlbRMapMiylU4RVjtXOt6K/rgWvnwLDQgPciqV1nCOSRX3qgMUJrsh
-         MPxa2/es4pKZhwzhaTFebsG3i4fLxzYnNXRQBChEYKYp2xONV3pwMnS3x1UJtQUm9p
-         dbWIIJyjFTTd1aKcwIBzPf2GKUh34tHy3QJ9j5720Clm3FqPmta2g3ZZa8fKcxJoAO
-         rGK6L5pnX3YOQ==
 Sender: linux-block-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-On 11/5/19 5:10 AM, Mike Rapoport wrote:
-...
->> ---
->>  Documentation/vm/index.rst          |   1 +
->>  Documentation/vm/pin_user_pages.rst | 212 ++++++++++++++++++++++
-> 
-> I think it belongs to Documentation/core-api.
+We don't know what context we'll be called in for cancel, it could very
+well be with IRQs disabled already. Use the IRQ saving variants of the
+locking primitives.
 
-Done:
+Signed-off-by: Jens Axboe <axboe@kernel.dk>
 
-diff --git a/Documentation/core-api/index.rst b/Documentation/core-api/index.rst
-index ab0eae1c153a..413f7d7c8642 100644
---- a/Documentation/core-api/index.rst
-+++ b/Documentation/core-api/index.rst
-@@ -31,6 +31,7 @@ Core utilities
-    generic-radix-tree
-    memory-allocation
-    mm-api
-+   pin_user_pages
-    gfp_mask-from-fs-io
-    timekeeping
-    boot-time-mm
+---
 
+diff --git a/fs/io-wq.c b/fs/io-wq.c
+index 3bbab2c58695..ba40a7ee31c3 100644
+--- a/fs/io-wq.c
++++ b/fs/io-wq.c
+@@ -642,19 +642,20 @@ static bool io_work_cancel(struct io_worker *worker, void *cancel_data)
+ {
+ 	struct io_cb_cancel_data *data = cancel_data;
+ 	struct io_wqe *wqe = data->wqe;
++	unsigned long flags;
+ 	bool ret = false;
+ 
+ 	/*
+ 	 * Hold the lock to avoid ->cur_work going out of scope, caller
+ 	 * may deference the passed in work.
+ 	 */
+-	spin_lock_irq(&wqe->lock);
++	spin_lock_irqsave(&wqe->lock, flags);
+ 	if (worker->cur_work &&
+ 	    data->cancel(worker->cur_work, data->caller_data)) {
+ 		send_sig(SIGINT, worker->task, 1);
+ 		ret = true;
+ 	}
+-	spin_unlock_irq(&wqe->lock);
++	spin_unlock_irqrestore(&wqe->lock, flags);
+ 
+ 	return ret;
+ }
+@@ -669,9 +670,10 @@ static enum io_wq_cancel io_wqe_cancel_cb_work(struct io_wqe *wqe,
+ 		.caller_data = cancel_data,
+ 	};
+ 	struct io_wq_work *work;
++	unsigned long flags;
+ 	bool found = false;
+ 
+-	spin_lock_irq(&wqe->lock);
++	spin_lock_irqsave(&wqe->lock, flags);
+ 	list_for_each_entry(work, &wqe->work_list, list) {
+ 		if (cancel(work, cancel_data)) {
+ 			list_del(&work->list);
+@@ -679,7 +681,7 @@ static enum io_wq_cancel io_wqe_cancel_cb_work(struct io_wqe *wqe,
+ 			break;
+ 		}
+ 	}
+-	spin_unlock_irq(&wqe->lock);
++	spin_unlock_irqrestore(&wqe->lock, flags);
+ 
+ 	if (found) {
+ 		work->flags |= IO_WQ_WORK_CANCEL;
+@@ -733,6 +735,7 @@ static enum io_wq_cancel io_wqe_cancel_work(struct io_wqe *wqe,
+ 					    struct io_wq_work *cwork)
+ {
+ 	struct io_wq_work *work;
++	unsigned long flags;
+ 	bool found = false;
+ 
+ 	cwork->flags |= IO_WQ_WORK_CANCEL;
+@@ -742,7 +745,7 @@ static enum io_wq_cancel io_wqe_cancel_work(struct io_wqe *wqe,
+ 	 * from there. CANCEL_OK means that the work is returned as-new,
+ 	 * no completion will be posted for it.
+ 	 */
+-	spin_lock_irq(&wqe->lock);
++	spin_lock_irqsave(&wqe->lock, flags);
+ 	list_for_each_entry(work, &wqe->work_list, list) {
+ 		if (work == cwork) {
+ 			list_del(&work->list);
+@@ -750,7 +753,7 @@ static enum io_wq_cancel io_wqe_cancel_work(struct io_wqe *wqe,
+ 			break;
+ 		}
+ 	}
+-	spin_unlock_irq(&wqe->lock);
++	spin_unlock_irqrestore(&wqe->lock, flags);
+ 
+ 	if (found) {
+ 		work->flags |= IO_WQ_WORK_CANCEL;
 
-...
->> diff --git a/Documentation/vm/pin_user_pages.rst b/Documentation/vm/pin_user_pages.rst
->> new file mode 100644
->> index 000000000000..3910f49ca98c
->> --- /dev/null
->> +++ b/Documentation/vm/pin_user_pages.rst
->> @@ -0,0 +1,212 @@
->> +.. SPDX-License-Identifier: GPL-2.0
->> +
->> +====================================================
->> +pin_user_pages() and related calls
->> +====================================================
-> 
-> I know this is too much to ask, but having pin_user_pages() a part of more
-> general GUP description would be really great :)
-> 
+-- 
+Jens Axboe
 
-Yes, definitely. But until I saw the reaction to the pin_user_pages() API
-family, I didn't want to write too much--it could have all been tossed out
-in favor of a whole different API. But now that we've had some initial
-reviews, I'm much more confident in being able to write about the larger 
-API set.
-
-So yes, I'll put that on my pending list.
-
-
-...
->> +This document describes the following functions: ::
->> +
->> + pin_user_pages
->> + pin_user_pages_fast
->> + pin_user_pages_remote
->> +
->> + pin_longterm_pages
->> + pin_longterm_pages_fast
->> + pin_longterm_pages_remote
->> +
->> +Basic description of FOLL_PIN
->> +=============================
->> +
->> +A new flag for get_user_pages ("gup") has been added: FOLL_PIN. FOLL_PIN has
-> 
-> Consider reading this after, say, half a year ;-)
-> 
-
-OK, OK. I knew when I wrote that that it was not going to stay new forever, but
-somehow failed to write the right thing anyway. :) 
-
-Here's a revised set of paragraphs:
-
-Basic description of FOLL_PIN
-=============================
-
-FOLL_PIN and FOLL_LONGTERM are flags that can be passed to the get_user_pages*()
-("gup") family of functions. FOLL_PIN has significant interactions and
-interdependencies with FOLL_LONGTERM, so both are covered here.
-
-Both FOLL_PIN and FOLL_LONGTERM are internal to gup, meaning that neither
-FOLL_PIN nor FOLL_LONGTERM should not appear at the gup call sites. This allows
-the associated wrapper functions  (pin_user_pages() and others) to set the
-correct combination of these flags, and to check for problems as well.
-
-
-thanks,
-
-John Hubbard
-NVIDIA
