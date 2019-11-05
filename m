@@ -2,89 +2,245 @@ Return-Path: <SRS0=uUnX=Y5=vger.kernel.org=linux-block-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-5.3 required=3.0 tests=DKIM_SIGNED,DKIM_VALID,
-	DKIM_VALID_AU,HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SIGNED_OFF_BY,
-	URIBL_BLOCKED,USER_AGENT_SANE_1 autolearn=ham autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-9.7 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
+	INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,
+	UNPARSEABLE_RELAY,URIBL_BLOCKED,USER_AGENT_GIT autolearn=ham
+	autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 196C5C5DF60
-	for <linux-block@archiver.kernel.org>; Tue,  5 Nov 2019 16:34:28 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 86B3DC5DF60
+	for <linux-block@archiver.kernel.org>; Tue,  5 Nov 2019 17:55:46 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.kernel.org (Postfix) with ESMTP id CB5F0217F5
-	for <linux-block@archiver.kernel.org>; Tue,  5 Nov 2019 16:34:27 +0000 (UTC)
-Authentication-Results: mail.kernel.org;
-	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="BxiuqjGn"
+	by mail.kernel.org (Postfix) with ESMTP id 579D421882
+	for <linux-block@archiver.kernel.org>; Tue,  5 Nov 2019 17:55:46 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S2390156AbfKEQe1 (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Tue, 5 Nov 2019 11:34:27 -0500
-Received: from us-smtp-delivery-1.mimecast.com ([205.139.110.120]:24936 "EHLO
-        us-smtp-1.mimecast.com" rhost-flags-OK-OK-OK-FAIL) by vger.kernel.org
-        with ESMTP id S2390153AbfKEQe0 (ORCPT
-        <rfc822;linux-block@vger.kernel.org>); Tue, 5 Nov 2019 11:34:26 -0500
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-        s=mimecast20190719; t=1572971666;
-        h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-         to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-         content-transfer-encoding:content-transfer-encoding:
-         in-reply-to:in-reply-to:references:references;
-        bh=jGQmqLeCoIMOYixwDK5EhAaP0PYA9BAL3PEV/L6zzKs=;
-        b=BxiuqjGnLf/leXnOk9kBn5jjXG8Up5w8TkQeUNj08SsUTk+ZnB3Id+zdsKuu5ZuhCfklQq
-        YMbekQPSHXfkc5UcYho2ijhYwIfuqWcR5lSWCocyQaNAF7YmSKLoCg+hI2Yt2bUVeU8Hrk
-        S1eepNuTd7++jsBfnZQwQhv+yuEpIW4=
-Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
- [209.132.183.4]) (Using TLS) by relay.mimecast.com with ESMTP id
- us-mta-318-SmT2toR1OVufYcXOGEJNbw-1; Tue, 05 Nov 2019 11:34:24 -0500
-Received: from smtp.corp.redhat.com (int-mx02.intmail.prod.int.phx2.redhat.com [10.5.11.12])
-        (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
-        (No client certificate requested)
-        by mimecast-mx01.redhat.com (Postfix) with ESMTPS id CE1901005500;
-        Tue,  5 Nov 2019 16:34:22 +0000 (UTC)
-Received: from localhost (unknown [10.18.25.174])
-        by smtp.corp.redhat.com (Postfix) with ESMTPS id 7E37460CC0;
-        Tue,  5 Nov 2019 16:34:22 +0000 (UTC)
-Date:   Tue, 5 Nov 2019 11:34:21 -0500
-From:   Mike Snitzer <snitzer@redhat.com>
-To:     Damien Le Moal <damien.lemoal@wdc.com>
-Cc:     linux-block@vger.kernel.org, Jens Axboe <axboe@kernel.dk>,
-        linux-scsi@vger.kernel.org,
-        "Martin K . Petersen" <martin.petersen@oracle.com>,
-        dm-devel@redhat.com, Ajay Joshi <ajay.joshi@wdc.com>,
-        Matias Bjorling <matias.bjorling@wdc.com>,
-        Hans Holmberg <Hans.Holmberg@wdc.com>,
-        Dmitry Fomichev <dmitry.fomichev@wdc.com>,
-        Keith Busch <kbusch@kernel.org>
-Subject: Re: [PATCH 7/8] dm: add zone open, close and finish support
-Message-ID: <20191105163421.GA22009@redhat.com>
-References: <20191027140549.26272-1-damien.lemoal@wdc.com>
- <20191027140549.26272-8-damien.lemoal@wdc.com>
+        id S2390520AbfKERzp (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Tue, 5 Nov 2019 12:55:45 -0500
+Received: from bhuna.collabora.co.uk ([46.235.227.227]:50866 "EHLO
+        bhuna.collabora.co.uk" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S2390398AbfKERzp (ORCPT
+        <rfc822;linux-block@vger.kernel.org>); Tue, 5 Nov 2019 12:55:45 -0500
+Received: from [127.0.0.1] (localhost [127.0.0.1])
+        (Authenticated sender: tonyk)
+        with ESMTPSA id 6A2B528F76D
+From:   =?UTF-8?q?Andr=C3=A9=20Almeida?= <andrealmeid@collabora.com>
+To:     linux-block@vger.kernel.org, linux-kernel@vger.kernel.org
+Cc:     axboe@kernel.dk, kernel@collabora.com, krisman@collabora.com,
+        =?UTF-8?q?Andr=C3=A9=20Almeida?= <andrealmeid@collabora.com>
+Subject: [PATCH v3] blk-mq: Document functions for sending request
+Date:   Tue,  5 Nov 2019 14:53:37 -0300
+Message-Id: <20191105175337.20426-1-andrealmeid@collabora.com>
+X-Mailer: git-send-email 2.23.0
 MIME-Version: 1.0
-In-Reply-To: <20191027140549.26272-8-damien.lemoal@wdc.com>
-User-Agent: Mutt/1.5.21 (2010-09-15)
-X-Scanned-By: MIMEDefang 2.79 on 10.5.11.12
-X-MC-Unique: SmT2toR1OVufYcXOGEJNbw-1
-X-Mimecast-Spam-Score: 0
-Content-Type: text/plain; charset=WINDOWS-1252
-Content-Transfer-Encoding: quoted-printable
-Content-Disposition: inline
+Content-Type: text/plain; charset=UTF-8
+Content-Transfer-Encoding: 8bit
 Sender: linux-block-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-On Sun, Oct 27 2019 at 10:05am -0400,
-Damien Le Moal <damien.lemoal@wdc.com> wrote:
+Add and improve documentation for function regarding creating and sending
+IO requests to the hardware.
 
-> From: Ajay Joshi <ajay.joshi@wdc.com>
->=20
-> Implement REQ_OP_ZONE_OPEN, REQ_OP_ZONE_CLOSE and REQ_OP_ZONE_FINISH
-> support to allow explicit control of zone states.
->=20
-> Contains contributions from Matias Bjorling, Hans Holmberg and
-> Damien Le Moal.
->=20
-> Signed-off-by: Ajay Joshi <ajay.joshi@wdc.com>
-> Signed-off-by: Matias Bjorling <matias.bjorling@wdc.com>
-> Signed-off-by: Hans Holmberg <hans.holmberg@wdc.com>
-> Signed-off-by: Damien Le Moal <damien.lemoal@wdc.com>
+Signed-off-by: André Almeida <andrealmeid@collabora.com>
+---
+Hello,
 
-Acked-by: Mike Snitzer <snitzer@redhat.com>
+I did my best to describe all variations of *_run_hw_queue, although
+their names and functionally are really similar. I would be happy to get
+feedback about those functions descriptions.
+
+Those comments were tested with:
+
+./scripts/kernel-doc -none block/blk-mq.c
+
+Which did not returned any warning or error.
+
+Thanks,
+	André
+
+Changes since v2:
+- Update blk_mq_run_hw_queue() from bool to void type
+
+Changes since v1:
+- Add documentation for blk_mq_start_request()
+---
+ block/blk-mq.c | 85 ++++++++++++++++++++++++++++++++++++++++++++++++--
+ 1 file changed, 83 insertions(+), 2 deletions(-)
+
+diff --git a/block/blk-mq.c b/block/blk-mq.c
+index 5c9adcaa27ac..ba7ffd47fb98 100644
+--- a/block/blk-mq.c
++++ b/block/blk-mq.c
+@@ -647,6 +647,14 @@ bool blk_mq_complete_request(struct request *rq)
+ }
+ EXPORT_SYMBOL(blk_mq_complete_request);
+ 
++/**
++ * blk_mq_start_request - Start processing a request
++ * @rq: Pointer to request to be started
++ *
++ * Function used by device drivers to notify the block layer that a request
++ * is going to be processed now, so blk layer can do proper initializations
++ * such as starting the timeout timer.
++ */
+ void blk_mq_start_request(struct request *rq)
+ {
+ 	struct request_queue *q = rq->q;
+@@ -1333,6 +1341,12 @@ bool blk_mq_dispatch_rq_list(struct request_queue *q, struct list_head *list,
+ 	return (queued + errors) != 0;
+ }
+ 
++/**
++ * __blk_mq_run_hw_queue - Run a hardware queue.
++ * @hctx: Pointer to the hardware queue to run.
++ *
++ * Send pending requests to the hardware.
++ */
+ static void __blk_mq_run_hw_queue(struct blk_mq_hw_ctx *hctx)
+ {
+ 	int srcu_idx;
+@@ -1430,6 +1444,15 @@ static int blk_mq_hctx_next_cpu(struct blk_mq_hw_ctx *hctx)
+ 	return next_cpu;
+ }
+ 
++/**
++ * __blk_mq_delay_run_hw_queue - Run (or schedule to run) a hardware queue.
++ * @hctx: Pointer to the hardware queue to run.
++ * @async: If we want to run the queue asynchronously.
++ * @msecs: Microseconds of delay to wait before running the queue.
++ *
++ * If !@async, try to run the queue now. Else, run the queue asynchronously and
++ * with a delay of @msecs.
++ */
+ static void __blk_mq_delay_run_hw_queue(struct blk_mq_hw_ctx *hctx, bool async,
+ 					unsigned long msecs)
+ {
+@@ -1451,12 +1474,28 @@ static void __blk_mq_delay_run_hw_queue(struct blk_mq_hw_ctx *hctx, bool async,
+ 				    msecs_to_jiffies(msecs));
+ }
+ 
++/**
++ * blk_mq_delay_run_hw_queue - Run a hardware queue asynchronously.
++ * @hctx: Pointer to the hardware queue to run.
++ * @msecs: Microseconds of delay to wait before running the queue.
++ *
++ * Run a hardware queue asynchronously with a delay of @msecs.
++ */
+ void blk_mq_delay_run_hw_queue(struct blk_mq_hw_ctx *hctx, unsigned long msecs)
+ {
+ 	__blk_mq_delay_run_hw_queue(hctx, true, msecs);
+ }
+ EXPORT_SYMBOL(blk_mq_delay_run_hw_queue);
+ 
++/**
++ * blk_mq_run_hw_queue - Start to run a hardware queue.
++ * @hctx: Pointer to the hardware queue to run.
++ * @async: If we want to run the queue asynchronously.
++ *
++ * Check if the request queue is not in a quiesced state and if there are
++ * pending requests to be sent. If this is true, run the queue to send requests
++ * to hardware.
++ */
+ void blk_mq_run_hw_queue(struct blk_mq_hw_ctx *hctx, bool async)
+ {
+ 	int srcu_idx;
+@@ -1480,6 +1519,11 @@ void blk_mq_run_hw_queue(struct blk_mq_hw_ctx *hctx, bool async)
+ }
+ EXPORT_SYMBOL(blk_mq_run_hw_queue);
+ 
++/**
++ * blk_mq_run_hw_queue - Run all hardware queues in a request queue.
++ * @q: Pointer to the request queue to run.
++ * @async: If we want to run the queue asynchronously.
++ */
+ void blk_mq_run_hw_queues(struct request_queue *q, bool async)
+ {
+ 	struct blk_mq_hw_ctx *hctx;
+@@ -1631,7 +1675,11 @@ void __blk_mq_insert_request(struct blk_mq_hw_ctx *hctx, struct request *rq,
+ 	blk_mq_hctx_mark_pending(hctx, ctx);
+ }
+ 
+-/*
++/**
++ * blk_mq_request_bypass_insert - Insert a request at dispatch list.
++ * @rq: Pointer to request to be inserted.
++ * @run_queue: If we should run the hardware queue after inserting the request.
++ *
+  * Should only be used carefully, when the caller knows we want to
+  * bypass a potential IO scheduler on the target device.
+  */
+@@ -1834,6 +1882,17 @@ static blk_status_t __blk_mq_try_issue_directly(struct blk_mq_hw_ctx *hctx,
+ 	return BLK_STS_OK;
+ }
+ 
++/**
++ * blk_mq_try_issue_directly - Try to send a request directly to device driver.
++ * @hctx: Pointer of the associated hardware queue.
++ * @rq: Pointer to request to be sent.
++ * @cookie: Request queue cookie.
++ *
++ * If the device has enough resources to accept a new request now, send the
++ * request directly to device driver. Else, insert at hctx->dispatch queue, so
++ * we can try send it another time in the future. Requests inserted at this
++ * queue have higher priority.
++ */
+ static void blk_mq_try_issue_directly(struct blk_mq_hw_ctx *hctx,
+ 		struct request *rq, blk_qc_t *cookie)
+ {
+@@ -1911,6 +1970,22 @@ static void blk_add_rq_to_plug(struct blk_plug *plug, struct request *rq)
+ 	}
+ }
+ 
++/**
++ * blk_mq_make_request - Create and send a request to block device.
++ * @q: Request queue pointer.
++ * @bio: Bio pointer.
++ *
++ * Builds up a request structure from @q and @bio and send to the device. The
++ * request may not be queued directly to hardware if:
++ * * This request can be merged with another one
++ * * We want to place request at plug queue for possible future merging
++ * * There is an IO scheduler active at this queue
++ *
++ * It will not queue the request if there is an error with the bio, or at the
++ * request creation.
++ *
++ * Returns: Request queue cookie.
++ */
+ static blk_qc_t blk_mq_make_request(struct request_queue *q, struct bio *bio)
+ {
+ 	const int is_sync = op_is_sync(bio->bi_opf);
+@@ -1956,7 +2031,7 @@ static blk_qc_t blk_mq_make_request(struct request_queue *q, struct bio *bio)
+ 
+ 	plug = blk_mq_plug(q, bio);
+ 	if (unlikely(is_flush_fua)) {
+-		/* bypass scheduler for flush rq */
++		/* Bypass scheduler for flush requests */
+ 		blk_insert_flush(rq);
+ 		blk_mq_run_hw_queue(data.hctx, true);
+ 	} else if (plug && (q->nr_hw_queues == 1 || q->mq_ops->commit_rqs ||
+@@ -1984,6 +2059,7 @@ static blk_qc_t blk_mq_make_request(struct request_queue *q, struct bio *bio)
+ 
+ 		blk_add_rq_to_plug(plug, rq);
+ 	} else if (q->elevator) {
++		/* Insert the request at the IO scheduler queue */
+ 		blk_mq_sched_insert_request(rq, false, true, true);
+ 	} else if (plug && !blk_queue_nomerges(q)) {
+ 		/*
+@@ -2010,8 +2086,13 @@ static blk_qc_t blk_mq_make_request(struct request_queue *q, struct bio *bio)
+ 		}
+ 	} else if ((q->nr_hw_queues > 1 && is_sync) ||
+ 			!data.hctx->dispatch_busy) {
++		/*
++		 * There is no scheduler and we can try to send directly
++		 * to the hardware.
++		 */
+ 		blk_mq_try_issue_directly(data.hctx, rq, &cookie);
+ 	} else {
++		/* Default case. */
+ 		blk_mq_sched_insert_request(rq, false, true, true);
+ 	}
+ 
+-- 
+2.23.0
 
