@@ -2,169 +2,121 @@ Return-Path: <SRS0=uUnX=Y5=vger.kernel.org=linux-block-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-2.2 required=3.0 tests=DKIM_SIGNED,DKIM_VALID,
-	HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,
+X-Spam-Status: No, score=-2.6 required=3.0 tests=DKIMWL_WL_HIGH,DKIM_SIGNED,
+	DKIM_VALID,DKIM_VALID_AU,MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,
 	USER_AGENT_SANE_1 autolearn=no autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id F0220CA9ED3
-	for <linux-block@archiver.kernel.org>; Tue,  5 Nov 2019 02:49:54 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 66208C47E49
+	for <linux-block@archiver.kernel.org>; Tue,  5 Nov 2019 03:12:27 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.kernel.org (Postfix) with ESMTP id BCB6921D71
-	for <linux-block@archiver.kernel.org>; Tue,  5 Nov 2019 02:49:54 +0000 (UTC)
-Authentication-Results: mail.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel-dk.20150623.gappssmtp.com header.i=@kernel-dk.20150623.gappssmtp.com header.b="d2tsn7Ao"
+	by mail.kernel.org (Postfix) with ESMTP id 3D3B521882
+	for <linux-block@archiver.kernel.org>; Tue,  5 Nov 2019 03:12:27 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+	s=default; t=1572923547;
+	bh=hCqiCSjlrDhL5SGAV3AMEdP6Wu47sW0wJnkXEfvsLDA=;
+	h=Date:From:To:Cc:Subject:References:In-Reply-To:List-ID:From;
+	b=p61YZgJ1a59U+SFxH/fvkRsf8Od49BgWI7CUUngfCVGdbpKshoC1jI+jxQHP2+3dz
+	 DUxJhYPdhI2goYxfPls82Dlet0GW4nZ/w6RvsS9DCbUinZTEtyOaJv0aGyk/bFtXQg
+	 oZvHEEBYQKVE0SLAW/FmRRcFP7WM3N3jgGyVt3o0=
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1729959AbfKECty (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Mon, 4 Nov 2019 21:49:54 -0500
-Received: from mail-pl1-f194.google.com ([209.85.214.194]:35794 "EHLO
-        mail-pl1-f194.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1727861AbfKECtx (ORCPT
-        <rfc822;linux-block@vger.kernel.org>); Mon, 4 Nov 2019 21:49:53 -0500
-Received: by mail-pl1-f194.google.com with SMTP id x6so8635204pln.2
-        for <linux-block@vger.kernel.org>; Mon, 04 Nov 2019 18:49:53 -0800 (PST)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=kernel-dk.20150623.gappssmtp.com; s=20150623;
-        h=subject:to:cc:references:from:message-id:date:user-agent
-         :mime-version:in-reply-to:content-language:content-transfer-encoding;
-        bh=T49R0h9T5fPg5hmMAjB311o5ZFPr6cvr6rmnaojgAKw=;
-        b=d2tsn7Ao9KNemJ3MfMilEPAD7mzTnp42v2EVljOGcCUXUElErCUI8kIrJuJGNeGxtv
-         AbYo0w4BaRWxpOJqUhZWje8w13RMmmOZ9b86SlB2GLcpd6l025BeGshwaMk0O/TlHLjc
-         X1rJGS2nYPzOPGHC+iQihHc/lCImP6VgVfGTnnklcQhhTZb4SmoLc/iedDqee4Q4OjxU
-         WLSr1orcuedTPpo+s3PbOE73be9bB6BSnbOK50u6ppJPyBqX7rmVciTKYCZz7ySlK4Xo
-         Y8khaE/Tn6u1j1DpvLComiH2AGaRW0Z9HqlYkONQ/foc1W4it4IF4HHDftlYGdQGXNC2
-         9CWQ==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20161025;
-        h=x-gm-message-state:subject:to:cc:references:from:message-id:date
-         :user-agent:mime-version:in-reply-to:content-language
-         :content-transfer-encoding;
-        bh=T49R0h9T5fPg5hmMAjB311o5ZFPr6cvr6rmnaojgAKw=;
-        b=KH8DVpviC88nVjQDyj4BHqgfFhfKtVOaPdv6K7FLuNnvJvF0U0IoPPuH3HSxUZLNkx
-         wsdrg2kzosfzq0dBPVXLZbWbGzSRs7qgjl3fF9VDT/9EbpiX6MXXMMcvfkErxuuXmIsd
-         alxBnE8McpK+x82rWJEkSBXhLcMrbLHx8wG57lh+p7zVTTzEH5fqhLyFTvb3pqatRzb6
-         obWhMP5YoNidJ09jMsTWwu3lsYvtV7ZGcktBIi6J+V9SnNmTE9OJmegpl5NnOa03tnn8
-         KMTy+Aol5Nmkc7FWhKrdUIfN7iKx5D765kq4km9qKFlHp0mB72lp62cuTi3Ds5D2cKA9
-         jqQw==
-X-Gm-Message-State: APjAAAW17tfX98sUtWfzNWKL+zHg0Q3++OfDxWtfXwTuouN7EcTWF0yh
-        tFEqyxUcM/sDOTQ2MeqVKfy6eA==
-X-Google-Smtp-Source: APXvYqx10sVrPPaUPWgS50ISuZzeLRJ7t1GyYI+51RBRb+WAEgCV1RgvpS2lDGS320UYTJNev5mbag==
-X-Received: by 2002:a17:902:9045:: with SMTP id w5mr31131847plz.304.1572922192940;
-        Mon, 04 Nov 2019 18:49:52 -0800 (PST)
-Received: from [192.168.1.188] ([66.219.217.79])
-        by smtp.gmail.com with ESMTPSA id z18sm21667662pgv.90.2019.11.04.18.49.50
-        (version=TLS1_2 cipher=ECDHE-RSA-AES128-GCM-SHA256 bits=128/128);
-        Mon, 04 Nov 2019 18:49:52 -0800 (PST)
-Subject: Re: [PATCH V4] block: optimize for small block size IO
-To:     Ming Lei <ming.lei@redhat.com>,
-        Kent Overstreet <kent.overstreet@gmail.com>
-Cc:     Christoph Hellwig <hch@infradead.org>, linux-block@vger.kernel.org,
-        Coly Li <colyli@suse.de>, Keith Busch <kbusch@kernel.org>,
-        linux-bcache@vger.kernel.org
-References: <20191102072911.24817-1-ming.lei@redhat.com>
- <20191104181403.GA8984@kmo-pixel> <20191104181541.GA21116@infradead.org>
- <20191104181742.GC8984@kmo-pixel>
- <f7fab4e0-58e4-76e4-a503-bb535b2a3da6@kernel.dk>
- <20191104184217.GD8984@kmo-pixel> <20191105011135.GD11436@ming.t460p>
- <20191105021130.GB18564@moria.home.lan> <20191105022046.GF11436@ming.t460p>
- <20191105023002.GC18564@moria.home.lan> <20191105024641.GG11436@ming.t460p>
-From:   Jens Axboe <axboe@kernel.dk>
-Message-ID: <06fc1a0c-8c8b-e7ab-f343-3861db737776@kernel.dk>
-Date:   Mon, 4 Nov 2019 19:49:49 -0700
-User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:60.0) Gecko/20100101
- Thunderbird/60.9.0
+        id S1729655AbfKEDM0 (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Mon, 4 Nov 2019 22:12:26 -0500
+Received: from mail.kernel.org ([198.145.29.99]:36692 "EHLO mail.kernel.org"
+        rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
+        id S1729543AbfKEDMZ (ORCPT <rfc822;linux-block@vger.kernel.org>);
+        Mon, 4 Nov 2019 22:12:25 -0500
+Received: from sol.localdomain (c-24-5-143-220.hsd1.ca.comcast.net [24.5.143.220])
+        (using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+        (No client certificate requested)
+        by mail.kernel.org (Postfix) with ESMTPSA id 55C0D206B8;
+        Tue,  5 Nov 2019 03:12:24 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+        s=default; t=1572923544;
+        bh=hCqiCSjlrDhL5SGAV3AMEdP6Wu47sW0wJnkXEfvsLDA=;
+        h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
+        b=ri2wHRty9kxlKC9gQp5N8RoTQPWUoA55ALYg1PirNxKLDJn3ZgT/m/zKOqgfEIUqm
+         Ua2KFn6GvKBaanq+gHvxNHv86uoy/TSVumd9fbUnuZNJrrygfaLQn9RVQTUVh3s+Tu
+         TNbhm3BZI6egc58lOzR1Oc8dCl+b9DOCQFLY3J+w=
+Date:   Mon, 4 Nov 2019 19:12:22 -0800
+From:   Eric Biggers <ebiggers@kernel.org>
+To:     Christoph Hellwig <hch@infradead.org>
+Cc:     Satya Tangirala <satyat@google.com>, linux-scsi@vger.kernel.org,
+        Kim Boojin <boojin.kim@samsung.com>,
+        Kuohong Wang <kuohong.wang@mediatek.com>,
+        Barani Muthukumaran <bmuthuku@qti.qualcomm.com>,
+        linux-f2fs-devel@lists.sourceforge.net,
+        linux-block@vger.kernel.org, linux-fscrypt@vger.kernel.org,
+        linux-fsdevel@vger.kernel.org
+Subject: Re: [PATCH v5 7/9] fscrypt: add inline encryption support
+Message-ID: <20191105031222.GE692@sol.localdomain>
+Mail-Followup-To: Christoph Hellwig <hch@infradead.org>,
+        Satya Tangirala <satyat@google.com>, linux-scsi@vger.kernel.org,
+        Kim Boojin <boojin.kim@samsung.com>,
+        Kuohong Wang <kuohong.wang@mediatek.com>,
+        Barani Muthukumaran <bmuthuku@qti.qualcomm.com>,
+        linux-f2fs-devel@lists.sourceforge.net, linux-block@vger.kernel.org,
+        linux-fscrypt@vger.kernel.org, linux-fsdevel@vger.kernel.org
+References: <20191028072032.6911-1-satyat@google.com>
+ <20191028072032.6911-8-satyat@google.com>
+ <20191031183217.GF23601@infradead.org>
+ <20191031202125.GA111219@gmail.com>
+ <20191031212103.GA6244@infradead.org>
 MIME-Version: 1.0
-In-Reply-To: <20191105024641.GG11436@ming.t460p>
-Content-Type: text/plain; charset=windows-1252
-Content-Language: en-US
-Content-Transfer-Encoding: 7bit
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <20191031212103.GA6244@infradead.org>
+User-Agent: Mutt/1.12.2 (2019-09-21)
 Sender: linux-block-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-On 11/4/19 7:46 PM, Ming Lei wrote:
-> On Mon, Nov 04, 2019 at 09:30:02PM -0500, Kent Overstreet wrote:
->> On Tue, Nov 05, 2019 at 10:20:46AM +0800, Ming Lei wrote:
->>> On Mon, Nov 04, 2019 at 09:11:30PM -0500, Kent Overstreet wrote:
->>>> On Tue, Nov 05, 2019 at 09:11:35AM +0800, Ming Lei wrote:
->>>>> On Mon, Nov 04, 2019 at 01:42:17PM -0500, Kent Overstreet wrote:
->>>>>> On Mon, Nov 04, 2019 at 11:23:42AM -0700, Jens Axboe wrote:
->>>>>>> On 11/4/19 11:17 AM, Kent Overstreet wrote:
->>>>>>>> On Mon, Nov 04, 2019 at 10:15:41AM -0800, Christoph Hellwig wrote:
->>>>>>>>> On Mon, Nov 04, 2019 at 01:14:03PM -0500, Kent Overstreet wrote:
->>>>>>>>>> On Sat, Nov 02, 2019 at 03:29:11PM +0800, Ming Lei wrote:
->>>>>>>>>>> __blk_queue_split() may be a bit heavy for small block size(such as
->>>>>>>>>>> 512B, or 4KB) IO, so introduce one flag to decide if this bio includes
->>>>>>>>>>> multiple page. And only consider to try splitting this bio in case
->>>>>>>>>>> that the multiple page flag is set.
->>>>>>>>>>
->>>>>>>>>> So, back in the day I had an alternative approach in mind: get rid of
->>>>>>>>>> blk_queue_split entirely, by pushing splitting down to the request layer - when
->>>>>>>>>> we map the bio/request to sgl, just have it map as much as will fit in the sgl
->>>>>>>>>> and if it doesn't entirely fit bump bi_remaining and leave it on the request
->>>>>>>>>> queue.
->>>>>>>>>>
->>>>>>>>>> This would mean there'd be no need for counting segments at all, and would cut a
->>>>>>>>>> fair amount of code out of the io path.
->>>>>>>>>
->>>>>>>>> I thought about that to, but it will take a lot more effort.  Mostly
->>>>>>>>> because md/dm heavily rely on splitting as well.  I still think it is
->>>>>>>>> worthwhile, it will just take a significant amount of time and we
->>>>>>>>> should have the quick improvement now.
->>>>>>>>
->>>>>>>> We can do it one driver at a time - driver sets a flag to disable
->>>>>>>> blk_queue_split(). Obvious one to do first would be nvme since that's where it
->>>>>>>> shows up the most.
->>>>>>>>
->>>>>>>> And md/md do splitting internally, but I'm not so sure they need
->>>>>>>> blk_queue_split().
->>>>>>>
->>>>>>> I'm a big proponent of doing something like that instead, but it is a
->>>>>>> lot of work. I absolutely hate the splitting we're doing now, even
->>>>>>> though the original "let's work as hard as we add add page time to get
->>>>>>> things right" was pretty abysmal as well.
->>>>>>
->>>>>> Last I looked I don't think it was going to be that bad, just needed a bit of
->>>>>> finesse. We just need to be able to partially process a request in e.g.
->>>>>> nvme_map_data(), and blk_rq_map_sg() needs to be modified to only map as much as
->>>>>> will fit instead of popping an assertion.
->>>>>
->>>>> I think it may not be doable.
->>>>>
->>>>> blk_rq_map_sg() is called by drivers and has to work on single request, however
->>>>> more requests have to be involved if we delay the splitting to blk_rq_map_sg().
->>>>> Cause splitting means that two bios can't be submitted in single IO request.
->>>>
->>>> Of course it's doable, do I have to show you how?
->>>
->>> No, you don't have to, could you just point out where my above words is wrong?
->>
->> blk_rq_map_sg() _currently_ works on a single request, but as I said from the
->> start that this would involve changing it to only process as much of a request
->> as would fit on an sglist.
+On Thu, Oct 31, 2019 at 02:21:03PM -0700, Christoph Hellwig wrote:
+> > > 
+> > > Btw, I'm not happy about the 8-byte IV assumptions everywhere here.
+> > > That really should be a parameter, not hardcoded.
+> > 
+> > To be clear, the 8-byte IV assumption doesn't really come from fs/crypto/, but
+> > rather in what the blk-crypto API provides.  If blk-crypto were to provide
+> > longer IV support, fs/crypto/ would pretty easily be able to make use of it.
 > 
->> Drivers will have to be modified, but the changes to driver code should be
->> pretty easy. What will be slightly trickier will be changing blk-mq to handle
->> requests that are only partially completed; that will be harder than it would
->> have been before blk-mq, since the old request queue code used to handle
->> partially completed requests - not much work would have to be done that code.
+> That's what I meant - we hardcode the value in fscrypt.  Instead we need
+> to expose the size from blk-crypt and check for it.
 > 
-> Looks you are suggesting partial request completion.
+> > 
+> > (And if IVs >= 24 bytes were supported and we added AES-128-CBC-ESSIV and
+> > Adiantum support to blk-crypto.c, then inline encryption would be able to do
+> > everything that the existing filesystem-layer contents encryption can do.)
+> > 
+> > Do you have anything in mind for how to make the API support longer IVs in a
+> > clean way?  Are you thinking of something like:
+> > 
+> > 	#define BLK_CRYPTO_MAX_DUN_SIZE	24
+> > 
+> > 	u8 dun[BLK_CRYPTO_MAX_DUN_SIZE];
+> > 	int dun_size;
+> > 
+> > We do have to perform arithmetic operations on it, so a byte array would make it
+> > ugly and slower, but it should be possible...
 > 
-> Then the biggest effect could be in performance, this change will cause the
-> whole FS bio is handled part by part serially, instead of submitting all
-> splitted bios(part) concurrently.
-> 
-> So sounds you are suggesting to fix one performance issue by causing new perf
-> issue, is that doable?
+> Well, we could make it an array of u64s, which means we can do all the
+> useful arithmetics on components on one of them.  But I see the point,
+> this adds significant complexity for no real short term gain, and we
+> should probably postponed it until needed.  Maybe just document the
+> assumptions a little better.
 
-It does seem like a rat hole of sorts. Because then you start adding code to
-guesstimate how big the request could roughly be, and if you miss a bit,
-you get a request that's tiny in between the normal sized ones.
+Just in case it's not obvious to anyone, I should also mention that being
+limited to specifying a 64-bit DUN doesn't prevent hardware that accepts a
+longer IV (e.g. 128 bits) from being used.  It would just be a matter of
+zero-padding the IV in the driver rather than in hardware.
 
-Or you'd clone, and then you could still have them inflight in parallel.
-But then you're paying the cost of that...
+The actual limitation we're talking about here is in the range of IVs that can
+be specified.  A 64-bit DUN only allows the first 64 bits of the IV to be
+nonzero.  That works for fscrypt in all cases except DIRECT_KEY policies, and it
+would work for dm-crypt using the usual dm-crypt IV generator (plain64).
 
--- 
-Jens Axboe
+But for inline encryption to be compatible with DIRECT_KEY fscrypt policies or
+with certain other dm-crypt IV generators, we'd need the ability to specify more
+IV bits.
 
+- Eric
