@@ -7,60 +7,60 @@ X-Spam-Status: No, score=-9.8 required=3.0 tests=DKIM_SIGNED,DKIM_VALID,
 	SPF_HELO_NONE,SPF_PASS,USER_AGENT_GIT autolearn=ham autolearn_force=no
 	version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id C4B21C5DF60
-	for <linux-block@archiver.kernel.org>; Tue,  5 Nov 2019 21:13:22 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 0BB16C5DF60
+	for <linux-block@archiver.kernel.org>; Tue,  5 Nov 2019 21:13:26 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.kernel.org (Postfix) with ESMTP id 7EB4A21882
-	for <linux-block@archiver.kernel.org>; Tue,  5 Nov 2019 21:13:22 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id B3AAD2087E
+	for <linux-block@archiver.kernel.org>; Tue,  5 Nov 2019 21:13:25 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel-dk.20150623.gappssmtp.com header.i=@kernel-dk.20150623.gappssmtp.com header.b="avbqEbl0"
+	dkim=pass (2048-bit key) header.d=kernel-dk.20150623.gappssmtp.com header.i=@kernel-dk.20150623.gappssmtp.com header.b="txv6rmu4"
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1729687AbfKEVNW (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Tue, 5 Nov 2019 16:13:22 -0500
-Received: from mail-io1-f67.google.com ([209.85.166.67]:35082 "EHLO
-        mail-io1-f67.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1725806AbfKEVNV (ORCPT
-        <rfc822;linux-block@vger.kernel.org>); Tue, 5 Nov 2019 16:13:21 -0500
-Received: by mail-io1-f67.google.com with SMTP id x21so8662640iol.2
-        for <linux-block@vger.kernel.org>; Tue, 05 Nov 2019 13:13:21 -0800 (PST)
+        id S1729750AbfKEVNZ (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Tue, 5 Nov 2019 16:13:25 -0500
+Received: from mail-il1-f194.google.com ([209.85.166.194]:40560 "EHLO
+        mail-il1-f194.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S1729656AbfKEVNZ (ORCPT
+        <rfc822;linux-block@vger.kernel.org>); Tue, 5 Nov 2019 16:13:25 -0500
+Received: by mail-il1-f194.google.com with SMTP id d83so19608509ilk.7
+        for <linux-block@vger.kernel.org>; Tue, 05 Nov 2019 13:13:23 -0800 (PST)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=kernel-dk.20150623.gappssmtp.com; s=20150623;
         h=from:to:cc:subject:date:message-id:in-reply-to:references
          :mime-version:content-transfer-encoding;
-        bh=qUMS8Qn700vmmSoXXoZh9YE+RW4pg8n+Ecs4VFmGZAc=;
-        b=avbqEbl0Yzgb5fANBahGPEfbMrIHtU9rAGSSDtlnVLE/K8ahbObiTCndgxBZ3t+vf8
-         nMLa+krvbUqgQCOuswoRSnZHxZHY1fceIC2pKlsBy1G9nMxgjDDCeYanX1JJOk7STucL
-         BI1g27AzA5KUz0KO/ZUAPLfwtbb3cBldPrA/T9hfOFaR3oiSl9FMNJlpIUfNBt0pmIIk
-         m8QaUYzQdYq6mVBt8ucS169UtFJnCWDttruKYfy73a6ahk3mh//ix8INFHk6JsMUsmFt
-         9YMph6m8cjWZYUYJhhJnJc2o/pKL4gh1Hqs0Mkanaym2XqxLUndTQaj6bK/6NhddCvjX
-         MCKA==
+        bh=6UJP+IIcwA8kqmzs8u/aFw5EKlSS0EbAD+bT9j1YNOg=;
+        b=txv6rmu48fLCVc3nxeC8cGVLCM4Z5VwagjSGMMFMkp+TSm/PohF+mhzrpHc/gCtHCd
+         23bUZb9XWfnWb+svvIEeOMiCGSwkGARNLuli85FNAW4VepE21YRWyPpEYlkj7OoaWEKz
+         S6P8Tk5e3A2ugRQp3UMPxCkBTXBOP4/cIbrST+00f7XzS2NrOF8GtNf8hdIUMa8lrvmW
+         g0ANR1j5qFkeKtXIq+IWNTS3JMhSfRP6HnwzPMozQafhEvUIFk7Cs/IRz81cr0436P79
+         pOSMpfbojsWM7fuurr+RyLMBWb6DT/tfCJ8hLbDdncchWNS4TsUQxPLiU/4XXYAvpUxx
+         OrOA==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=1e100.net; s=20161025;
         h=x-gm-message-state:from:to:cc:subject:date:message-id:in-reply-to
          :references:mime-version:content-transfer-encoding;
-        bh=qUMS8Qn700vmmSoXXoZh9YE+RW4pg8n+Ecs4VFmGZAc=;
-        b=d9HvdhvlK6wUa3v5u720F3sHL/u/j4v/TmSRSPKKK31r7sZqax3z5WPpAUJlgIVXbw
-         e0KtzT4xrTEgq+Tszv06cQd4XTphxil+lJ8tSiUvmW5NMqPF2ARgTHJ9zVy1SheT6vp+
-         V7QvVKViugdkOJAWgnCIQ2XBsDbblBEhZJzOY6XmgWgSyUK/9TWkBZORNMPfQaWSHXyh
-         1UaiXouGPkALubNOGUL5ylm3AjzC8povEpCxZCvqDJPkQAQmo51pj26osL/Ar1wD7Uc+
-         9dydh/T4w6xFL7bdqX0wN4nNPH6kSVH7mB8JoBP6SjCptjxS8UCqOZCpMTzc/xtN33m6
-         r61A==
-X-Gm-Message-State: APjAAAXHc4jM2HIAQh6krNBMH+uYb6w5iRkhzJv7RMZyaOUfSSDka1d0
-        Y8jOIfConYs6j1lkGeVY3y/S+Q==
-X-Google-Smtp-Source: APXvYqw90Y7/vscMMf37F8yIV3cUSaJHPGEH+QG7RW1kPc+VbsO9On6RbVSVhPc9/Uwqo9rvbmUm6w==
-X-Received: by 2002:a05:6638:68f:: with SMTP id i15mr15588773jab.37.1572988401025;
-        Tue, 05 Nov 2019 13:13:21 -0800 (PST)
+        bh=6UJP+IIcwA8kqmzs8u/aFw5EKlSS0EbAD+bT9j1YNOg=;
+        b=R8MPzLI+PexofUCUgBeA7jDBR8l0+Ui1OroDbCNd2dDvOJDrXQVKXtbCYzGJBOhhTj
+         mSHf/dEXS8syClObzxkPdEQx8+eAQhcPVXr3tkHFpN7rbbOiL+siaUNKLTNxOnzmrkH1
+         P2c+OrDuOxhxPq1Wc0ap5M/j85l0Ip2nImDXth4P33PnJPhZD1Cv49It1pH8kBm/tduS
+         6Rf99fHDW0y/SoD3AKYTwZNgQlHnLTWqDEHIbiQIMbwv1npizpCnQRoZrL14wQA71sCL
+         0Br3z5XU+3Z0AGMdbMgg+2wlLDCIW8kH4IP7nX+tuMuL05JmE68GZSR1Xj8N4ZaA0dok
+         zgjg==
+X-Gm-Message-State: APjAAAXcD8iu/XzudjiLumoVYbz2asKKq71fjZZ7LPWtgBxd88BDJZ2k
+        Pc2IwZnBiUgAu3umWbPJfhy8dg==
+X-Google-Smtp-Source: APXvYqy4EuomBZ/a0svnjKYtvf3IvAisPgDb0qHU80+ZAobKoI2FuomOdmbGVRzdC3FmveRK4IFQOw==
+X-Received: by 2002:a92:5d8d:: with SMTP id e13mr36438395ilg.32.1572988402872;
+        Tue, 05 Nov 2019 13:13:22 -0800 (PST)
 Received: from x1.localdomain ([65.144.74.34])
-        by smtp.gmail.com with ESMTPSA id q69sm3065721ilb.4.2019.11.05.13.13.19
+        by smtp.gmail.com with ESMTPSA id q69sm3065721ilb.4.2019.11.05.13.13.21
         (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Tue, 05 Nov 2019 13:13:20 -0800 (PST)
+        Tue, 05 Nov 2019 13:13:21 -0800 (PST)
 From:   Jens Axboe <axboe@kernel.dk>
 To:     io-uring@vger.kernel.org, linux-block@vger.kernel.org
 Cc:     zeba.hrvoje@gmail.com, asml.silence@gmail.com, liuyun01@kylinos.cn,
         Jens Axboe <axboe@kernel.dk>
-Subject: [PATCH 1/2] io_uring: abstract out io_async_cancel_one() helper
-Date:   Tue,  5 Nov 2019 14:11:30 -0700
-Message-Id: <20191105211130.6130-2-axboe@kernel.dk>
+Subject: [PATCH 2/2] io_uring: add support for linked SQE timeouts
+Date:   Tue,  5 Nov 2019 14:11:31 -0700
+Message-Id: <20191105211130.6130-3-axboe@kernel.dk>
 X-Mailer: git-send-email 2.24.0
 In-Reply-To: <20191105211130.6130-1-axboe@kernel.dk>
 References: <20191105211130.6130-1-axboe@kernel.dk>
@@ -71,69 +71,284 @@ Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-We're going to need this helper in a future patch, so move it out
-of io_async_cancel() and into its own separate function.
+While we have support for generic timeouts, we don't have a way to tie
+a timeout to a specific SQE. The generic timeouts simply trigger wakeups
+on the CQ ring.
 
-No functional changes in this patch.
+This adds support for IORING_OP_LINK_TIMEOUT. This command is only valid
+as a link to a previous command. The timeout specific can be either
+relative or absolute, following the same rules as IORING_OP_TIMEOUT. If
+the timeout triggers before the dependent command completes, it will
+attempt to cancel that command. Likewise, if the dependent command
+completes before the timeout triggers, it will cancel the timeout.
 
 Signed-off-by: Jens Axboe <axboe@kernel.dk>
 ---
- fs/io_uring.c | 31 ++++++++++++++++++++-----------
- 1 file changed, 20 insertions(+), 11 deletions(-)
+ fs/io_uring.c                 | 172 ++++++++++++++++++++++++++++++++--
+ include/uapi/linux/io_uring.h |   1 +
+ 2 files changed, 167 insertions(+), 6 deletions(-)
 
 diff --git a/fs/io_uring.c b/fs/io_uring.c
-index 7813bc7d5b61..a71c84808dd0 100644
+index a71c84808dd0..d4ff3e49a78c 100644
 --- a/fs/io_uring.c
 +++ b/fs/io_uring.c
-@@ -2142,21 +2142,11 @@ static bool io_cancel_cb(struct io_wq_work *work, void *data)
- 	return req->user_data == (unsigned long) data;
+@@ -336,6 +336,7 @@ struct io_kiocb {
+ #define REQ_F_ISREG		2048	/* regular file */
+ #define REQ_F_MUST_PUNT		4096	/* must be punted even for NONBLOCK */
+ #define REQ_F_INFLIGHT		8192	/* on inflight list */
++#define REQ_F_LINK_TIMEOUT	16384	/* has linked timeout */
+ 	u64			user_data;
+ 	u32			result;
+ 	u32			sequence;
+@@ -372,6 +373,7 @@ static void io_wq_submit_work(struct io_wq_work **workptr);
+ static void io_cqring_fill_event(struct io_ring_ctx *ctx, u64 ki_user_data,
+ 				 long res);
+ static void __io_free_req(struct io_kiocb *req);
++static void io_put_req(struct io_kiocb *req, struct io_kiocb **nxtptr);
+ 
+ static struct kmem_cache *req_cachep;
+ 
+@@ -713,9 +715,35 @@ static void __io_free_req(struct io_kiocb *req)
+ 	kmem_cache_free(req_cachep, req);
  }
  
--static int io_async_cancel(struct io_kiocb *req, const struct io_uring_sqe *sqe,
--			   struct io_kiocb **nxt)
-+static int io_async_cancel_one(struct io_ring_ctx *ctx, void *sqe_addr)
++static void io_link_cancel_timeout(struct io_ring_ctx *ctx,
++				   struct io_kiocb *req)
++{
++	int ret;
++
++	ret = hrtimer_try_to_cancel(&req->timeout.timer);
++	if (ret != -1) {
++		io_cqring_fill_event(ctx, req->user_data, -ECANCELED);
++		io_commit_cqring(ctx);
++		req->flags &= ~REQ_F_LINK;
++		__io_free_req(req);
++	}
++}
++
+ static void io_req_link_next(struct io_kiocb *req, struct io_kiocb **nxtptr)
  {
--	struct io_ring_ctx *ctx = req->ctx;
- 	enum io_wq_cancel cancel_ret;
--	void *sqe_addr;
- 	int ret = 0;
++	struct io_ring_ctx *ctx = req->ctx;
+ 	struct io_kiocb *nxt;
++	bool is_timeout_link;
++	unsigned long flags;
++
++	/*
++	 * If this is a timeout link, we could be racing with the timeout
++	 * timer. Grab the completion lock for this case to protect against
++	 * that.
++	 */
++	is_timeout_link = (req->flags & REQ_F_LINK_TIMEOUT);
++	if (is_timeout_link)
++		spin_lock_irqsave(&ctx->completion_lock, flags);
  
--	if (unlikely(ctx->flags & IORING_SETUP_IOPOLL))
--		return -EINVAL;
--	if (sqe->flags || sqe->ioprio || sqe->off || sqe->len ||
--	    sqe->cancel_flags)
--		return -EINVAL;
--
--	sqe_addr = (void *) (unsigned long) READ_ONCE(sqe->addr);
- 	cancel_ret = io_wq_cancel_cb(ctx->io_wq, io_cancel_cb, sqe_addr);
- 	switch (cancel_ret) {
- 	case IO_WQ_CANCEL_OK:
-@@ -2170,6 +2160,25 @@ static int io_async_cancel(struct io_kiocb *req, const struct io_uring_sqe *sqe,
- 		break;
+ 	/*
+ 	 * The list should never be empty when we are called here. But could
+@@ -723,7 +751,7 @@ static void io_req_link_next(struct io_kiocb *req, struct io_kiocb **nxtptr)
+ 	 * safe side.
+ 	 */
+ 	nxt = list_first_entry_or_null(&req->link_list, struct io_kiocb, list);
+-	if (nxt) {
++	while (nxt) {
+ 		list_del(&nxt->list);
+ 		if (!list_empty(&req->link_list)) {
+ 			INIT_LIST_HEAD(&nxt->link_list);
+@@ -736,10 +764,24 @@ static void io_req_link_next(struct io_kiocb *req, struct io_kiocb **nxtptr)
+ 		 * If we're in async work, we can continue processing the chain
+ 		 * in this context instead of having to queue up new async work.
+ 		 */
+-		if (nxtptr && current_work())
++		if (is_timeout_link) {
++			io_link_cancel_timeout(ctx, nxt);
++
++			/* we dropped this link, get next */
++			nxt = list_first_entry_or_null(&req->link_list,
++							struct io_kiocb, list);
++		} else if (nxtptr && current_work()) {
+ 			*nxtptr = nxt;
+-		else
++			nxt = NULL;
++		} else {
+ 			io_queue_async_work(req->ctx, nxt);
++			nxt = NULL;
++		}
++	}
++
++	if (is_timeout_link) {
++		spin_unlock_irqrestore(&ctx->completion_lock, flags);
++		io_cqring_ev_posted(ctx);
  	}
+ }
  
+@@ -748,16 +790,30 @@ static void io_req_link_next(struct io_kiocb *req, struct io_kiocb **nxtptr)
+  */
+ static void io_fail_links(struct io_kiocb *req)
+ {
++	struct io_ring_ctx *ctx = req->ctx;
+ 	struct io_kiocb *link;
++	unsigned long flags;
++
++	spin_lock_irqsave(&ctx->completion_lock, flags);
+ 
+ 	while (!list_empty(&req->link_list)) {
+ 		link = list_first_entry(&req->link_list, struct io_kiocb, list);
+-		list_del(&link->list);
++		list_del_init(&link->list);
+ 
+ 		trace_io_uring_fail_link(req, link);
+-		io_cqring_add_event(req->ctx, link->user_data, -ECANCELED);
+-		__io_free_req(link);
++
++		if ((req->flags & REQ_F_LINK_TIMEOUT) &&
++		    link->submit.sqe->opcode == IORING_OP_LINK_TIMEOUT) {
++			io_link_cancel_timeout(ctx, link);
++		} else {
++			io_cqring_fill_event(ctx, link->user_data, -ECANCELED);
++			__io_free_req(link);
++		}
+ 	}
++
++	io_commit_cqring(ctx);
++	spin_unlock_irqrestore(&ctx->completion_lock, flags);
++	io_cqring_ev_posted(ctx);
+ }
+ 
+ static void io_free_req(struct io_kiocb *req, struct io_kiocb **nxt)
+@@ -2434,11 +2490,111 @@ static int io_grab_files(struct io_ring_ctx *ctx, struct io_kiocb *req)
+ 	return ret;
+ }
+ 
++static enum hrtimer_restart io_link_timeout_fn(struct hrtimer *timer)
++{
++	struct io_kiocb *req = container_of(timer, struct io_kiocb,
++						timeout.timer);
++	struct io_ring_ctx *ctx = req->ctx;
++	struct io_kiocb *prev = NULL;
++	unsigned long flags;
++	int ret = -ETIME;
++
++	spin_lock_irqsave(&ctx->completion_lock, flags);
++
++	/*
++	 * We don't expect the list to be empty, that will only happen if we
++	 * race with the completion of the linked work.
++	 */
++	if (!list_empty(&req->list)) {
++		prev = list_entry(req->list.prev, struct io_kiocb, link_list);
++		list_del_init(&req->list);
++	}
++
++	spin_unlock_irqrestore(&ctx->completion_lock, flags);
++
++	if (prev)
++		ret = io_async_cancel_one(ctx, (void *) prev->user_data);
++
++	io_cqring_add_event(ctx, req->user_data, ret);
++	io_put_req(req, NULL);
++	return HRTIMER_NORESTART;
++}
++
++static int io_queue_linked_timeout(struct io_kiocb *req, struct io_kiocb *nxt)
++{
++	const struct io_uring_sqe *sqe = nxt->submit.sqe;
++	enum hrtimer_mode mode;
++	struct timespec64 ts;
++	int ret = -EINVAL;
++
++	if (sqe->flags || sqe->ioprio || sqe->buf_index || sqe->len != 1)
++		goto err;
++	if (sqe->timeout_flags & ~IORING_TIMEOUT_ABS)
++		goto err;
++	if (get_timespec64(&ts, u64_to_user_ptr(sqe->addr))) {
++		ret = -EFAULT;
++		goto err;
++	}
++
++	req->flags |= REQ_F_LINK_TIMEOUT;
++
++	if (sqe->flags & IORING_TIMEOUT_ABS)
++		mode = HRTIMER_MODE_ABS;
++	else
++		mode = HRTIMER_MODE_REL;
++	hrtimer_init(&nxt->timeout.timer, CLOCK_MONOTONIC, mode);
++	nxt->timeout.timer.function = io_link_timeout_fn;
++	hrtimer_start(&nxt->timeout.timer, timespec64_to_ktime(ts), mode);
++	ret = 0;
++err:
++	/* drop submission reference */
++	io_put_req(nxt, NULL);
++
++	if (ret) {
++		struct io_ring_ctx *ctx = req->ctx;
++
++		/*
++		 * Break the link and fail linked timeout, parent will get
++		 * failed by the regular submission path.
++		 */
++		list_del(&nxt->list);
++		io_cqring_fill_event(ctx, nxt->user_data, ret);
++		trace_io_uring_fail_link(req, nxt);
++		io_commit_cqring(ctx);
++		io_put_req(nxt, NULL);
++		ret = -ECANCELED;
++	}
++
 +	return ret;
 +}
 +
-+static int io_async_cancel(struct io_kiocb *req, const struct io_uring_sqe *sqe,
-+			   struct io_kiocb **nxt)
++static inline struct io_kiocb *io_get_linked_timeout(struct io_kiocb *req)
 +{
-+	struct io_ring_ctx *ctx = req->ctx;
-+	void *sqe_addr;
-+	int ret;
++	struct io_kiocb *nxt;
 +
-+	if (unlikely(ctx->flags & IORING_SETUP_IOPOLL))
-+		return -EINVAL;
-+	if (sqe->flags || sqe->ioprio || sqe->off || sqe->len ||
-+	    sqe->cancel_flags)
-+		return -EINVAL;
++	if (!(req->flags & REQ_F_LINK))
++		return NULL;
 +
-+	sqe_addr = (void *) (unsigned long) READ_ONCE(sqe->addr);
-+	ret = io_async_cancel_one(ctx, sqe_addr);
++	nxt = list_first_entry_or_null(&req->link_list, struct io_kiocb, list);
++	if (nxt && nxt->submit.sqe->opcode == IORING_OP_LINK_TIMEOUT)
++		return nxt;
 +
- 	if (ret < 0 && (req->flags & REQ_F_LINK))
- 		req->flags |= REQ_F_FAIL_LINK;
- 	io_cqring_add_event(req->ctx, sqe->user_data, ret);
++	return NULL;
++}
++
+ static int __io_queue_sqe(struct io_ring_ctx *ctx, struct io_kiocb *req,
+ 			struct sqe_submit *s)
+ {
++	struct io_kiocb *nxt;
+ 	int ret;
+ 
++	nxt = io_get_linked_timeout(req);
++	if (unlikely(nxt)) {
++		ret = io_queue_linked_timeout(req, nxt);
++		if (ret)
++			goto err;
++	}
++
+ 	ret = __io_submit_sqe(ctx, req, s, NULL, true);
+ 
+ 	/*
+@@ -2603,6 +2759,10 @@ static void io_submit_sqe(struct io_ring_ctx *ctx, struct sqe_submit *s,
+ 		memcpy(&req->submit, s, sizeof(*s));
+ 		INIT_LIST_HEAD(&req->link_list);
+ 		*link = req;
++	} else if (READ_ONCE(s->sqe->opcode) == IORING_OP_LINK_TIMEOUT) {
++		/* Only valid as a linked SQE */
++		ret = -EINVAL;
++		goto err_req;
+ 	} else {
+ 		io_queue_sqe(ctx, req, s);
+ 	}
+diff --git a/include/uapi/linux/io_uring.h b/include/uapi/linux/io_uring.h
+index 6877cf8894db..f1a118b01d18 100644
+--- a/include/uapi/linux/io_uring.h
++++ b/include/uapi/linux/io_uring.h
+@@ -72,6 +72,7 @@ struct io_uring_sqe {
+ #define IORING_OP_TIMEOUT_REMOVE	12
+ #define IORING_OP_ACCEPT	13
+ #define IORING_OP_ASYNC_CANCEL	14
++#define IORING_OP_LINK_TIMEOUT	15
+ 
+ /*
+  * sqe->fsync_flags
 -- 
 2.24.0
 
