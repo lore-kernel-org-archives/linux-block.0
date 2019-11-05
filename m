@@ -2,117 +2,137 @@ Return-Path: <SRS0=uUnX=Y5=vger.kernel.org=linux-block-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-2.6 required=3.0 tests=DKIMWL_WL_HIGH,DKIM_SIGNED,
-	DKIM_VALID,DKIM_VALID_AU,MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,
-	USER_AGENT_SANE_1 autolearn=no autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-2.4 required=3.0 tests=DKIM_SIGNED,DKIM_VALID,
+	DKIM_VALID_AU,HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SPF_HELO_NONE,
+	SPF_PASS,USER_AGENT_SANE_1 autolearn=no autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 344B7CA9ED3
-	for <linux-block@archiver.kernel.org>; Tue,  5 Nov 2019 01:03:19 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 584E5CA9ED3
+	for <linux-block@archiver.kernel.org>; Tue,  5 Nov 2019 01:11:54 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.kernel.org (Postfix) with ESMTP id 075EB20848
-	for <linux-block@archiver.kernel.org>; Tue,  5 Nov 2019 01:03:19 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=default; t=1572915799;
-	bh=4Jmct+axA8jAkXluFcFQI+uLkQTpqnvf/DA6hb5ReCI=;
-	h=Date:From:To:Cc:Subject:References:In-Reply-To:List-ID:From;
-	b=yw5PVMI9IsEARahMh9c/yPUilMso7iVxu1G8jRQodb7wR0PTtDknF+lOWeL7DWhU2
-	 S5rOCf8TbCJru0afGzynsqA8lT7tQmbCIaJWJLw5synR7M6eBesy9I69a715wS9Twq
-	 nMfq9T1Yiljlt1yDGt/X6+jdsSuMJ8EsIb8Vlemo=
+	by mail.kernel.org (Postfix) with ESMTP id 1EF372067D
+	for <linux-block@archiver.kernel.org>; Tue,  5 Nov 2019 01:11:54 +0000 (UTC)
+Authentication-Results: mail.kernel.org;
+	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="SNj+46ge"
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1729526AbfKEBDS (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Mon, 4 Nov 2019 20:03:18 -0500
-Received: from mail.kernel.org ([198.145.29.99]:54846 "EHLO mail.kernel.org"
-        rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-        id S1728761AbfKEBDS (ORCPT <rfc822;linux-block@vger.kernel.org>);
-        Mon, 4 Nov 2019 20:03:18 -0500
-Received: from sol.localdomain (c-24-5-143-220.hsd1.ca.comcast.net [24.5.143.220])
-        (using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+        id S1729687AbfKEBLx (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Mon, 4 Nov 2019 20:11:53 -0500
+Received: from us-smtp-delivery-1.mimecast.com ([207.211.31.120]:43483 "EHLO
+        us-smtp-1.mimecast.com" rhost-flags-OK-OK-OK-FAIL) by vger.kernel.org
+        with ESMTP id S1728602AbfKEBLx (ORCPT
+        <rfc822;linux-block@vger.kernel.org>); Mon, 4 Nov 2019 20:11:53 -0500
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+        s=mimecast20190719; t=1572916311;
+        h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+         to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+         content-transfer-encoding:content-transfer-encoding:
+         in-reply-to:in-reply-to:references:references;
+        bh=ZJe8fnu93omXpyoBWk022HUHNt3UGJEFAf/mhPLalP4=;
+        b=SNj+46geEESJBaRcEH1AQX0A4EQ/IegH1ALvgdTwbqv5NHGJd2QeiZ8+iLYY6Sk8FkAXCE
+        4Kgwd2nHMz5t66Qu3AyBtFF5F6Yp6G3ezz0PFFeljhjwkLBFpT0wn2Bbf/4fs8E6Aze3zF
+        D2T4428w0q0ICTycE4GHzfz/2vWeXsA=
+Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
+ [209.132.183.4]) (Using TLS) by relay.mimecast.com with ESMTP id
+ us-mta-71-Ngv6wU6gMdGFjBk7FarjfA-1; Mon, 04 Nov 2019 20:11:48 -0500
+Received: from smtp.corp.redhat.com (int-mx03.intmail.prod.int.phx2.redhat.com [10.5.11.13])
+        (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
         (No client certificate requested)
-        by mail.kernel.org (Postfix) with ESMTPSA id C60232067D;
-        Tue,  5 Nov 2019 01:03:16 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-        s=default; t=1572915797;
-        bh=4Jmct+axA8jAkXluFcFQI+uLkQTpqnvf/DA6hb5ReCI=;
-        h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
-        b=nnl5cMFG8BKuRG8ENOvinMxVE3HupXrzgoCoDukHlYgCMGI8K0oFkbfYfvj8iwGMZ
-         BzncIGhzlSd8Tq4p78mCz6fMFe+r9sH1z08KjMRUBKDvvQhIRWVYb/8d92xKHoIJYQ
-         zdX4RS+7YST5kTD4rUt+3j18FC1y0Lf5NWHcquyk=
-Date:   Mon, 4 Nov 2019 17:03:15 -0800
-From:   Eric Biggers <ebiggers@kernel.org>
-To:     Christoph Hellwig <hch@infradead.org>
-Cc:     Satya Tangirala <satyat@google.com>, linux-scsi@vger.kernel.org,
-        Kim Boojin <boojin.kim@samsung.com>,
-        Kuohong Wang <kuohong.wang@mediatek.com>,
-        Barani Muthukumaran <bmuthuku@qti.qualcomm.com>,
-        linux-f2fs-devel@lists.sourceforge.net,
-        linux-block@vger.kernel.org, linux-fscrypt@vger.kernel.org,
-        linux-fsdevel@vger.kernel.org
-Subject: Re: [PATCH v5 7/9] fscrypt: add inline encryption support
-Message-ID: <20191105010315.GA692@sol.localdomain>
-Mail-Followup-To: Christoph Hellwig <hch@infradead.org>,
-        Satya Tangirala <satyat@google.com>, linux-scsi@vger.kernel.org,
-        Kim Boojin <boojin.kim@samsung.com>,
-        Kuohong Wang <kuohong.wang@mediatek.com>,
-        Barani Muthukumaran <bmuthuku@qti.qualcomm.com>,
-        linux-f2fs-devel@lists.sourceforge.net, linux-block@vger.kernel.org,
-        linux-fscrypt@vger.kernel.org, linux-fsdevel@vger.kernel.org
-References: <20191028072032.6911-1-satyat@google.com>
- <20191028072032.6911-8-satyat@google.com>
- <20191031183217.GF23601@infradead.org>
- <20191031202125.GA111219@gmail.com>
- <20191031212103.GA6244@infradead.org>
- <20191031222500.GB111219@gmail.com>
- <20191105001554.GA24056@infradead.org>
+        by mimecast-mx01.redhat.com (Postfix) with ESMTPS id 4AD6E107ACC2;
+        Tue,  5 Nov 2019 01:11:47 +0000 (UTC)
+Received: from ming.t460p (ovpn-8-20.pek2.redhat.com [10.72.8.20])
+        by smtp.corp.redhat.com (Postfix) with ESMTPS id 9AAAF608A5;
+        Tue,  5 Nov 2019 01:11:40 +0000 (UTC)
+Date:   Tue, 5 Nov 2019 09:11:35 +0800
+From:   Ming Lei <ming.lei@redhat.com>
+To:     Kent Overstreet <kent.overstreet@gmail.com>
+Cc:     Jens Axboe <axboe@kernel.dk>,
+        Christoph Hellwig <hch@infradead.org>,
+        linux-block@vger.kernel.org, Coly Li <colyli@suse.de>,
+        Keith Busch <kbusch@kernel.org>, linux-bcache@vger.kernel.org
+Subject: Re: [PATCH V4] block: optimize for small block size IO
+Message-ID: <20191105011135.GD11436@ming.t460p>
+References: <20191102072911.24817-1-ming.lei@redhat.com>
+ <20191104181403.GA8984@kmo-pixel>
+ <20191104181541.GA21116@infradead.org>
+ <20191104181742.GC8984@kmo-pixel>
+ <f7fab4e0-58e4-76e4-a503-bb535b2a3da6@kernel.dk>
+ <20191104184217.GD8984@kmo-pixel>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
+In-Reply-To: <20191104184217.GD8984@kmo-pixel>
+User-Agent: Mutt/1.12.1 (2019-06-15)
+X-Scanned-By: MIMEDefang 2.79 on 10.5.11.13
+X-MC-Unique: Ngv6wU6gMdGFjBk7FarjfA-1
+X-Mimecast-Spam-Score: 0
+Content-Type: text/plain; charset=WINDOWS-1252
+Content-Transfer-Encoding: quoted-printable
 Content-Disposition: inline
-In-Reply-To: <20191105001554.GA24056@infradead.org>
-User-Agent: Mutt/1.12.2 (2019-09-21)
 Sender: linux-block-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-On Mon, Nov 04, 2019 at 04:15:54PM -0800, Christoph Hellwig wrote:
-> > I don't think combining these things is a good idea because it would restrict
-> > the use of inline encryption to filesystems that allow IV_INO_LBLK_64 encryption
-> > policies, i.e. filesystems that have stable inode numbers, 32-bit inodes, and
-> > 32-bit file logical block numbers.
-> > 
-> > The on-disk format (i.e. the type of encryption policy chosen) and the
-> > implementation (inline or filesystem-layer crypto) are really two separate
-> > things.  This was one of the changes in v4 => v5 of this patchset; these two
-> > things used to be conflated but now they are separate.  Now you can use inline
-> > encryption with the existing fscrypt policies too.
-> > 
-> > We could use two separate SB_* flags, like SB_INLINE_CRYPT and
-> > SB_IV_INO_LBLK_64_SUPPORT.
-> 
-> Yes, I think that is a good idea.
-> 
-> > However, the ->has_stable_inodes() and
-> > ->get_ino_and_lblk_bits() methods are nice because they separate the filesystem
-> > properties from the question of "is this encryption policy supported".
-> > Declaring the filesystem properties is easier to do because it doesn't require
-> > any fscrypt-specific knowledge.  Also, fs/crypto/ could use these properties in
-> > different ways in the future, e.g. if another IV generation scheme is added.
-> 
-> I don't really like writing up method boilerplates for something that
-> is a simple boolean flag.
+On Mon, Nov 04, 2019 at 01:42:17PM -0500, Kent Overstreet wrote:
+> On Mon, Nov 04, 2019 at 11:23:42AM -0700, Jens Axboe wrote:
+> > On 11/4/19 11:17 AM, Kent Overstreet wrote:
+> > > On Mon, Nov 04, 2019 at 10:15:41AM -0800, Christoph Hellwig wrote:
+> > >> On Mon, Nov 04, 2019 at 01:14:03PM -0500, Kent Overstreet wrote:
+> > >>> On Sat, Nov 02, 2019 at 03:29:11PM +0800, Ming Lei wrote:
+> > >>>> __blk_queue_split() may be a bit heavy for small block size(such a=
+s
+> > >>>> 512B, or 4KB) IO, so introduce one flag to decide if this bio incl=
+udes
+> > >>>> multiple page. And only consider to try splitting this bio in case
+> > >>>> that the multiple page flag is set.
+> > >>>
+> > >>> So, back in the day I had an alternative approach in mind: get rid =
+of
+> > >>> blk_queue_split entirely, by pushing splitting down to the request =
+layer - when
+> > >>> we map the bio/request to sgl, just have it map as much as will fit=
+ in the sgl
+> > >>> and if it doesn't entirely fit bump bi_remaining and leave it on th=
+e request
+> > >>> queue.
+> > >>>
+> > >>> This would mean there'd be no need for counting segments at all, an=
+d would cut a
+> > >>> fair amount of code out of the io path.
+> > >>
+> > >> I thought about that to, but it will take a lot more effort.  Mostly
+> > >> because md/dm heavily rely on splitting as well.  I still think it i=
+s
+> > >> worthwhile, it will just take a significant amount of time and we
+> > >> should have the quick improvement now.
+> > >=20
+> > > We can do it one driver at a time - driver sets a flag to disable
+> > > blk_queue_split(). Obvious one to do first would be nvme since that's=
+ where it
+> > > shows up the most.
+> > >=20
+> > > And md/md do splitting internally, but I'm not so sure they need
+> > > blk_queue_split().
+> >=20
+> > I'm a big proponent of doing something like that instead, but it is a
+> > lot of work. I absolutely hate the splitting we're doing now, even
+> > though the original "let's work as hard as we add add page time to get
+> > things right" was pretty abysmal as well.
+>=20
+> Last I looked I don't think it was going to be that bad, just needed a bi=
+t of
+> finesse. We just need to be able to partially process a request in e.g.
+> nvme_map_data(), and blk_rq_map_sg() needs to be modified to only map as =
+much as
+> will fit instead of popping an assertion.
 
-fs/crypto/ uses ->has_stable_inodes() and ->get_ino_and_lblk_bits() to print an
-appropriate error message.  If we changed it to a simple flag we'd have to print
-a less useful error message.  Also, people are basically guaranteed to not
-understand what "SB_IV_INO_LBLK_64_SUPPORT" means exactly, and are likely to
-copy-and-paste it incorrectly when adding fscrypt support to a new filesystem.
-Also it would make it more difficult to add other fscrypt IV generation schemes
-in the future as we'd then need to add another sb flag (e.g. SB_IV_INO_LBLK_128)
-and make filesystem-specific changes, rather than change fs/crypto/ only.
+I think it may not be doable.
 
-So personally I'd prefer to keep ->has_stable_inodes() and
-->get_ino_and_lblk_bits() for now.
+blk_rq_map_sg() is called by drivers and has to work on single request, how=
+ever
+more requests have to be involved if we delay the splitting to blk_rq_map_s=
+g().
+Cause splitting means that two bios can't be submitted in single IO request=
+.
 
-Replacing ->inline_crypt_enabled() with SB_INLINE_CRYPT makes much more sense
-though.
 
-- Eric
+Thanks,
+Ming
+
