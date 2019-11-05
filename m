@@ -2,206 +2,101 @@ Return-Path: <SRS0=uUnX=Y5=vger.kernel.org=linux-block-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-2.4 required=3.0 tests=DKIM_SIGNED,DKIM_VALID,
-	DKIM_VALID_AU,HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SPF_HELO_NONE,
-	SPF_PASS,USER_AGENT_SANE_1 autolearn=no autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-0.8 required=3.0 tests=DKIMWL_WL_HIGH,DKIM_SIGNED,
+	DKIM_VALID,DKIM_VALID_AU,HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,
+	SPF_HELO_NONE,SPF_PASS,UNPARSEABLE_RELAY autolearn=no autolearn_force=no
+	version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 85449CA9ED3
-	for <linux-block@archiver.kernel.org>; Tue,  5 Nov 2019 03:34:57 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 38CB0CA9EC7
+	for <linux-block@archiver.kernel.org>; Tue,  5 Nov 2019 04:53:37 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.kernel.org (Postfix) with ESMTP id 5289D20818
-	for <linux-block@archiver.kernel.org>; Tue,  5 Nov 2019 03:34:57 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id 0385D2053B
+	for <linux-block@archiver.kernel.org>; Tue,  5 Nov 2019 04:53:37 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="MR1SH1t6"
+	dkim=pass (2048-bit key) header.d=oracle.com header.i=@oracle.com header.b="OzMwMq5D"
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1730188AbfKEDe4 (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Mon, 4 Nov 2019 22:34:56 -0500
-Received: from us-smtp-delivery-1.mimecast.com ([207.211.31.120]:40416 "EHLO
-        us-smtp-1.mimecast.com" rhost-flags-OK-OK-OK-FAIL) by vger.kernel.org
-        with ESMTP id S1728910AbfKEDe4 (ORCPT
-        <rfc822;linux-block@vger.kernel.org>); Mon, 4 Nov 2019 22:34:56 -0500
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-        s=mimecast20190719; t=1572924895;
-        h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-         to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-         content-transfer-encoding:content-transfer-encoding:
-         in-reply-to:in-reply-to:references:references;
-        bh=Hsr0KNuZO/WePyH6FKz+kA+0NZ/Wshn8/p6mobwaFMg=;
-        b=MR1SH1t6ikYCZ8aovwUaqngwGi1niv79MyzDclT63GQ1K/RBKDo5VuwR4EjHBXepPGWOt0
-        P5PPka9NHz0qSdM35eFwuJKULgtnMsDhjyEAk/6IeOYeDSXAc/A6MstHTnRuQPwmuJGr2P
-        bhuUpAEV9VLN8OI/qIZV/l4uNU1fSPI=
-Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
- [209.132.183.4]) (Using TLS) by relay.mimecast.com with ESMTP id
- us-mta-237-F8u0TWxlMOezz6E19BnV3A-1; Mon, 04 Nov 2019 22:34:49 -0500
-Received: from smtp.corp.redhat.com (int-mx04.intmail.prod.int.phx2.redhat.com [10.5.11.14])
-        (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
-        (No client certificate requested)
-        by mimecast-mx01.redhat.com (Postfix) with ESMTPS id EF1EA1005500;
-        Tue,  5 Nov 2019 03:34:47 +0000 (UTC)
-Received: from ming.t460p (ovpn-8-20.pek2.redhat.com [10.72.8.20])
-        by smtp.corp.redhat.com (Postfix) with ESMTPS id 20C195D9CD;
-        Tue,  5 Nov 2019 03:34:40 +0000 (UTC)
-Date:   Tue, 5 Nov 2019 11:34:36 +0800
-From:   Ming Lei <ming.lei@redhat.com>
-To:     Jens Axboe <axboe@kernel.dk>
-Cc:     Kent Overstreet <kent.overstreet@gmail.com>,
-        Christoph Hellwig <hch@infradead.org>,
-        linux-block@vger.kernel.org, Coly Li <colyli@suse.de>,
-        Keith Busch <kbusch@kernel.org>, linux-bcache@vger.kernel.org
-Subject: Re: [PATCH V4] block: optimize for small block size IO
-Message-ID: <20191105033436.GH11436@ming.t460p>
-References: <20191104181541.GA21116@infradead.org>
- <20191104181742.GC8984@kmo-pixel>
- <f7fab4e0-58e4-76e4-a503-bb535b2a3da6@kernel.dk>
- <20191104184217.GD8984@kmo-pixel>
- <20191105011135.GD11436@ming.t460p>
- <20191105021130.GB18564@moria.home.lan>
- <20191105022046.GF11436@ming.t460p>
- <20191105023002.GC18564@moria.home.lan>
- <20191105024641.GG11436@ming.t460p>
- <06fc1a0c-8c8b-e7ab-f343-3861db737776@kernel.dk>
+        id S1730192AbfKEExg (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Mon, 4 Nov 2019 23:53:36 -0500
+Received: from userp2130.oracle.com ([156.151.31.86]:40882 "EHLO
+        userp2130.oracle.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S1726141AbfKEExg (ORCPT
+        <rfc822;linux-block@vger.kernel.org>); Mon, 4 Nov 2019 23:53:36 -0500
+Received: from pps.filterd (userp2130.oracle.com [127.0.0.1])
+        by userp2130.oracle.com (8.16.0.27/8.16.0.27) with SMTP id xA54ixCY093512;
+        Tue, 5 Nov 2019 04:53:23 GMT
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=oracle.com; h=to : cc : subject :
+ from : references : date : in-reply-to : message-id : mime-version :
+ content-type; s=corp-2019-08-05;
+ bh=5Pt/1ojmRXmtj7laImA8AqGWZoPJv2DVrFeuf+TbR7Q=;
+ b=OzMwMq5DLr13W95GKA4ENWQZrxi853voZBiHfnj71yRgbzuJYr9Y9P7Teu5KH9s6vSP8
+ mc9JwglFNrkxwAf8mxLd76y6jpsdpN1HnKDY0aW6kGJfP6GldmD+7Z9Pz+4a+6FY7ESO
+ pI6QXyiiCzJ1uoczidlbveLUkwDcRx7nRI8zy8baGvUXPc06xUXJi6vJhcdiOyxabEnJ
+ Mbl5DoafRgsuChORj5aIB71G6eTweDQb2TAebRedq2yBvUmfw6WwBSysjZCce86wHWJm
+ 2az8K+Jd3n4jPDn5YJ8eZhBjE1OnAn9w7drp4BwaUiUdQ26boipN4V1gF/B+syH3tXq/ mg== 
+Received: from userp3020.oracle.com (userp3020.oracle.com [156.151.31.79])
+        by userp2130.oracle.com with ESMTP id 2w117tukgm-1
+        (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=OK);
+        Tue, 05 Nov 2019 04:53:23 +0000
+Received: from pps.filterd (userp3020.oracle.com [127.0.0.1])
+        by userp3020.oracle.com (8.16.0.27/8.16.0.27) with SMTP id xA54muD8150900;
+        Tue, 5 Nov 2019 04:51:22 GMT
+Received: from userv0122.oracle.com (userv0122.oracle.com [156.151.31.75])
+        by userp3020.oracle.com with ESMTP id 2w3160jtvj-1
+        (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=OK);
+        Tue, 05 Nov 2019 04:51:22 +0000
+Received: from abhmp0019.oracle.com (abhmp0019.oracle.com [141.146.116.25])
+        by userv0122.oracle.com (8.14.4/8.14.4) with ESMTP id xA54pJn5029549;
+        Tue, 5 Nov 2019 04:51:21 GMT
+Received: from ca-mkp.ca.oracle.com (/10.159.214.123)
+        by default (Oracle Beehive Gateway v4.0)
+        with ESMTP ; Mon, 04 Nov 2019 20:51:19 -0800
+To:     Damien Le Moal <Damien.LeMoal@wdc.com>
+Cc:     Jens Axboe <axboe@kernel.dk>,
+        "linux-block\@vger.kernel.org" <linux-block@vger.kernel.org>,
+        "linux-scsi\@vger.kernel.org" <linux-scsi@vger.kernel.org>,
+        "Martin K . Petersen" <martin.petersen@oracle.com>,
+        "dm-devel\@redhat.com" <dm-devel@redhat.com>,
+        Mike Snitzer <snitzer@redhat.com>,
+        Ajay Joshi <Ajay.Joshi@wdc.com>,
+        Matias Bjorling <Matias.Bjorling@wdc.com>,
+        Hans Holmberg <Hans.Holmberg@wdc.com>,
+        Dmitry Fomichev <Dmitry.Fomichev@wdc.com>,
+        Keith Busch <kbusch@kernel.org>
+Subject: Re: [PATCH 0/8] Zone management commands support
+From:   "Martin K. Petersen" <martin.petersen@oracle.com>
+Organization: Oracle Corporation
+References: <20191027140549.26272-1-damien.lemoal@wdc.com>
+        <926948c1-d9a0-4156-4639-bbac1d0ba10b@kernel.dk>
+        <BYAPR04MB5816539DCBED2D2C93254D36E77C0@BYAPR04MB5816.namprd04.prod.outlook.com>
+Date:   Mon, 04 Nov 2019 23:51:16 -0500
+In-Reply-To: <BYAPR04MB5816539DCBED2D2C93254D36E77C0@BYAPR04MB5816.namprd04.prod.outlook.com>
+        (Damien Le Moal's message of "Sun, 3 Nov 2019 23:41:10 +0000")
+Message-ID: <yq1r22n3ozf.fsf@oracle.com>
+User-Agent: Gnus/5.13 (Gnus v5.13) Emacs/26.1.92 (gnu/linux)
 MIME-Version: 1.0
-In-Reply-To: <06fc1a0c-8c8b-e7ab-f343-3861db737776@kernel.dk>
-User-Agent: Mutt/1.12.1 (2019-06-15)
-X-Scanned-By: MIMEDefang 2.79 on 10.5.11.14
-X-MC-Unique: F8u0TWxlMOezz6E19BnV3A-1
-X-Mimecast-Spam-Score: 0
-Content-Type: text/plain; charset=WINDOWS-1252
-Content-Transfer-Encoding: quoted-printable
-Content-Disposition: inline
+Content-Type: text/plain
+X-Proofpoint-Virus-Version: vendor=nai engine=6000 definitions=9431 signatures=668685
+X-Proofpoint-Spam-Details: rule=notspam policy=default score=0 suspectscore=0 malwarescore=0
+ phishscore=0 bulkscore=0 spamscore=0 mlxscore=0 mlxlogscore=741
+ adultscore=0 classifier=spam adjust=0 reason=mlx scancount=1
+ engine=8.0.1-1908290000 definitions=main-1911050037
+X-Proofpoint-Virus-Version: vendor=nai engine=6000 definitions=9431 signatures=668685
+X-Proofpoint-Spam-Details: rule=notspam policy=default score=0 priorityscore=1501 malwarescore=0
+ suspectscore=0 phishscore=0 bulkscore=0 spamscore=0 clxscore=1015
+ lowpriorityscore=0 mlxscore=0 impostorscore=0 mlxlogscore=828 adultscore=0
+ classifier=spam adjust=0 reason=mlx scancount=1 engine=8.0.1-1908290000
+ definitions=main-1911050037
 Sender: linux-block-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-On Mon, Nov 04, 2019 at 07:49:49PM -0700, Jens Axboe wrote:
-> On 11/4/19 7:46 PM, Ming Lei wrote:
-> > On Mon, Nov 04, 2019 at 09:30:02PM -0500, Kent Overstreet wrote:
-> >> On Tue, Nov 05, 2019 at 10:20:46AM +0800, Ming Lei wrote:
-> >>> On Mon, Nov 04, 2019 at 09:11:30PM -0500, Kent Overstreet wrote:
-> >>>> On Tue, Nov 05, 2019 at 09:11:35AM +0800, Ming Lei wrote:
-> >>>>> On Mon, Nov 04, 2019 at 01:42:17PM -0500, Kent Overstreet wrote:
-> >>>>>> On Mon, Nov 04, 2019 at 11:23:42AM -0700, Jens Axboe wrote:
-> >>>>>>> On 11/4/19 11:17 AM, Kent Overstreet wrote:
-> >>>>>>>> On Mon, Nov 04, 2019 at 10:15:41AM -0800, Christoph Hellwig wrot=
-e:
-> >>>>>>>>> On Mon, Nov 04, 2019 at 01:14:03PM -0500, Kent Overstreet wrote=
-:
-> >>>>>>>>>> On Sat, Nov 02, 2019 at 03:29:11PM +0800, Ming Lei wrote:
-> >>>>>>>>>>> __blk_queue_split() may be a bit heavy for small block size(s=
-uch as
-> >>>>>>>>>>> 512B, or 4KB) IO, so introduce one flag to decide if this bio=
- includes
-> >>>>>>>>>>> multiple page. And only consider to try splitting this bio in=
- case
-> >>>>>>>>>>> that the multiple page flag is set.
-> >>>>>>>>>>
-> >>>>>>>>>> So, back in the day I had an alternative approach in mind: get=
- rid of
-> >>>>>>>>>> blk_queue_split entirely, by pushing splitting down to the req=
-uest layer - when
-> >>>>>>>>>> we map the bio/request to sgl, just have it map as much as wil=
-l fit in the sgl
-> >>>>>>>>>> and if it doesn't entirely fit bump bi_remaining and leave it =
-on the request
-> >>>>>>>>>> queue.
-> >>>>>>>>>>
-> >>>>>>>>>> This would mean there'd be no need for counting segments at al=
-l, and would cut a
-> >>>>>>>>>> fair amount of code out of the io path.
-> >>>>>>>>>
-> >>>>>>>>> I thought about that to, but it will take a lot more effort.  M=
-ostly
-> >>>>>>>>> because md/dm heavily rely on splitting as well.  I still think=
- it is
-> >>>>>>>>> worthwhile, it will just take a significant amount of time and =
-we
-> >>>>>>>>> should have the quick improvement now.
-> >>>>>>>>
-> >>>>>>>> We can do it one driver at a time - driver sets a flag to disabl=
-e
-> >>>>>>>> blk_queue_split(). Obvious one to do first would be nvme since t=
-hat's where it
-> >>>>>>>> shows up the most.
-> >>>>>>>>
-> >>>>>>>> And md/md do splitting internally, but I'm not so sure they need
-> >>>>>>>> blk_queue_split().
-> >>>>>>>
-> >>>>>>> I'm a big proponent of doing something like that instead, but it =
-is a
-> >>>>>>> lot of work. I absolutely hate the splitting we're doing now, eve=
-n
-> >>>>>>> though the original "let's work as hard as we add add page time t=
-o get
-> >>>>>>> things right" was pretty abysmal as well.
-> >>>>>>
-> >>>>>> Last I looked I don't think it was going to be that bad, just need=
-ed a bit of
-> >>>>>> finesse. We just need to be able to partially process a request in=
- e.g.
-> >>>>>> nvme_map_data(), and blk_rq_map_sg() needs to be modified to only =
-map as much as
-> >>>>>> will fit instead of popping an assertion.
-> >>>>>
-> >>>>> I think it may not be doable.
-> >>>>>
-> >>>>> blk_rq_map_sg() is called by drivers and has to work on single requ=
-est, however
-> >>>>> more requests have to be involved if we delay the splitting to blk_=
-rq_map_sg().
-> >>>>> Cause splitting means that two bios can't be submitted in single IO=
- request.
-> >>>>
-> >>>> Of course it's doable, do I have to show you how?
-> >>>
-> >>> No, you don't have to, could you just point out where my above words =
-is wrong?
-> >>
-> >> blk_rq_map_sg() _currently_ works on a single request, but as I said f=
-rom the
-> >> start that this would involve changing it to only process as much of a=
- request
-> >> as would fit on an sglist.
-> >=20
-> >> Drivers will have to be modified, but the changes to driver code shoul=
-d be
-> >> pretty easy. What will be slightly trickier will be changing blk-mq to=
- handle
-> >> requests that are only partially completed; that will be harder than i=
-t would
-> >> have been before blk-mq, since the old request queue code used to hand=
-le
-> >> partially completed requests - not much work would have to be done tha=
-t code.
-> >=20
-> > Looks you are suggesting partial request completion.
-> >=20
-> > Then the biggest effect could be in performance, this change will cause=
- the
-> > whole FS bio is handled part by part serially, instead of submitting al=
-l
-> > splitted bios(part) concurrently.
-> >=20
-> > So sounds you are suggesting to fix one performance issue by causing ne=
-w perf
-> > issue, is that doable?
->=20
-> It does seem like a rat hole of sorts. Because then you start adding code=
- to
-> guesstimate how big the request could roughly be, and if you miss a bit,
-> you get a request that's tiny in between the normal sized ones.
->=20
-> Or you'd clone, and then you could still have them inflight in parallel.
-> But then you're paying the cost of that...
 
-However, IO latency is often much longer than latency of bio fast clone,
-which is just one fix-sized slab allocation, mostly should hit cache.
+Damien,
 
-I understand the current issue should be the cost of blk_queue_split() in
-case of no splitting is required. blk_bio_segment_split() has been
-simple enough, looks we need to investigate why it is so slow since
-it shouldn't be such in-efficient.
+> Can you take patch 3 now ?
 
-Thanks,
-Ming
+Yep. Applied to 5.4/scsi-fixes.
 
+-- 
+Martin K. Petersen	Oracle Linux Engineering
