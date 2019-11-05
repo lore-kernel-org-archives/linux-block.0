@@ -2,122 +2,131 @@ Return-Path: <SRS0=uUnX=Y5=vger.kernel.org=linux-block-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-2.6 required=3.0 tests=DKIMWL_WL_HIGH,DKIM_SIGNED,
-	DKIM_VALID,DKIM_VALID_AU,MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,
+X-Spam-Status: No, score=-2.3 required=3.0 tests=DKIM_SIGNED,DKIM_VALID,
+	DKIM_VALID_AU,FREEMAIL_FORGED_FROMDOMAIN,FREEMAIL_FROM,
+	HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,
 	USER_AGENT_SANE_1 autolearn=no autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 6321BCA9ED6
-	for <linux-block@archiver.kernel.org>; Tue,  5 Nov 2019 02:01:22 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 924CDCA9ED3
+	for <linux-block@archiver.kernel.org>; Tue,  5 Nov 2019 02:11:36 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.kernel.org (Postfix) with ESMTP id 3425D217F5
-	for <linux-block@archiver.kernel.org>; Tue,  5 Nov 2019 02:01:22 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=default; t=1572919282;
-	bh=CtYzEOLUJiJVw7LkU0ikWGBxXmc2ytwbSO6nB3S0oOQ=;
-	h=Date:From:To:Cc:Subject:References:In-Reply-To:List-ID:From;
-	b=Q2L2xnZ7jSxzX9955vkdO4fs+wBkzI0dRntjK+jgcIWukwujcgGVj6R1FfU+zSA4f
-	 8nVxInTl6GbsYiqPAs3Yn+GiF7uy2sogvIT1Pf4ZF3pgX1G0VyKKlCGWB8H9qCpuxT
-	 4J50jzH7aNuOKq+BJSyrrQbMoHmSqflrSiJN4KK4=
+	by mail.kernel.org (Postfix) with ESMTP id 5E5EC217F5
+	for <linux-block@archiver.kernel.org>; Tue,  5 Nov 2019 02:11:36 +0000 (UTC)
+Authentication-Results: mail.kernel.org;
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="VJZT7qBE"
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1729597AbfKECBV (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Mon, 4 Nov 2019 21:01:21 -0500
-Received: from mail.kernel.org ([198.145.29.99]:47146 "EHLO mail.kernel.org"
-        rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-        id S1729428AbfKECBV (ORCPT <rfc822;linux-block@vger.kernel.org>);
-        Mon, 4 Nov 2019 21:01:21 -0500
-Received: from sol.localdomain (c-24-5-143-220.hsd1.ca.comcast.net [24.5.143.220])
-        (using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
-        (No client certificate requested)
-        by mail.kernel.org (Postfix) with ESMTPSA id 2ED04214D9;
-        Tue,  5 Nov 2019 02:01:19 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-        s=default; t=1572919279;
-        bh=CtYzEOLUJiJVw7LkU0ikWGBxXmc2ytwbSO6nB3S0oOQ=;
-        h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
-        b=b/LIMVC7ijyBb7xmYOfvkI9tl8E1YcrM/cjAWP8uE09ctUtNTqIy5xr+keK3nXmER
-         a2oCO2mbOYu1sVyde0YD9M9X7Vc+NCTbtiEs5LFzVl7NuCwKtdX1Bo811XRYGa11AX
-         8gUS2AAwnzBpNglST9wgGDyDkUkPi0Pmskgn5b34=
-Date:   Mon, 4 Nov 2019 18:01:17 -0800
-From:   Eric Biggers <ebiggers@kernel.org>
-To:     Christoph Hellwig <hch@infradead.org>
-Cc:     "Theodore Y. Ts'o" <tytso@mit.edu>, linux-block@vger.kernel.org,
-        linux-scsi@vger.kernel.org, Kim Boojin <boojin.kim@samsung.com>,
-        Kuohong Wang <kuohong.wang@mediatek.com>,
-        Barani Muthukumaran <bmuthuku@qti.qualcomm.com>,
-        Satya Tangirala <satyat@google.com>,
-        linux-fscrypt@vger.kernel.org, linux-fsdevel@vger.kernel.org,
-        linux-f2fs-devel@lists.sourceforge.net
-Subject: Re: [PATCH v5 3/9] block: blk-crypto for Inline Encryption
-Message-ID: <20191105015411.GB692@sol.localdomain>
-Mail-Followup-To: Christoph Hellwig <hch@infradead.org>,
-        "Theodore Y. Ts'o" <tytso@mit.edu>, linux-block@vger.kernel.org,
-        linux-scsi@vger.kernel.org, Kim Boojin <boojin.kim@samsung.com>,
-        Kuohong Wang <kuohong.wang@mediatek.com>,
-        Barani Muthukumaran <bmuthuku@qti.qualcomm.com>,
-        Satya Tangirala <satyat@google.com>, linux-fscrypt@vger.kernel.org,
-        linux-fsdevel@vger.kernel.org,
-        linux-f2fs-devel@lists.sourceforge.net
-References: <20191028072032.6911-1-satyat@google.com>
- <20191028072032.6911-4-satyat@google.com>
- <20191031175713.GA23601@infradead.org>
- <20191031205045.GG16197@mit.edu>
- <20191031212234.GA32262@infradead.org>
+        id S1729524AbfKECLf (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Mon, 4 Nov 2019 21:11:35 -0500
+Received: from mail-qt1-f196.google.com ([209.85.160.196]:46222 "EHLO
+        mail-qt1-f196.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S1728987AbfKECLf (ORCPT
+        <rfc822;linux-block@vger.kernel.org>); Mon, 4 Nov 2019 21:11:35 -0500
+Received: by mail-qt1-f196.google.com with SMTP id u22so27126600qtq.13;
+        Mon, 04 Nov 2019 18:11:35 -0800 (PST)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=gmail.com; s=20161025;
+        h=date:from:to:cc:subject:message-id:references:mime-version
+         :content-disposition:in-reply-to:user-agent;
+        bh=W0+7k1DRafJ+r2YfPcqo1EdMvigU/iVfY/W/noJefnI=;
+        b=VJZT7qBEe0DMw1OYRW8Nbq7dkKMRGPSE+deEt5uexE8da96FsaX3djNlEquJFmw4zz
+         Rm33SODNu8MpxIA2lRQB2IaHO3hk0FrSlTCZJHv1talWB+jWlhB3VJcklrm4fbDxO9ig
+         4dLOFvIPnMr2BjXbrK4u2ivTvAzvVilCKlBg1qeJgFLy+H37xi216SxmUvbjg0FmXjYo
+         AGwBnw3k/Y58TPzfFBXq3l31WjtR9d3MoSIz/Nw6X1A8byaSbGp79MMgFkuPQsVzhrYy
+         PqPFYAQ83wZ/+2p9BLhkYFu380iMG8r8m93yUwtj7KaXWx2AcAaLlihEQhQBHZRMKQJs
+         SseQ==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20161025;
+        h=x-gm-message-state:date:from:to:cc:subject:message-id:references
+         :mime-version:content-disposition:in-reply-to:user-agent;
+        bh=W0+7k1DRafJ+r2YfPcqo1EdMvigU/iVfY/W/noJefnI=;
+        b=sYji6e8qp2bMql+ezSeOtAU0+msicRGT4MMhecHr/Lth3o0HFqNcrEXSiVlDKfBqHv
+         RZLsvxVJgGW/0Qm2EhVelZGCBra1MNbtmqkuEOcIpjuGiWH2F2BIQEiO8cy2fvLFnFdR
+         3N4UlNKVrl4rncluAjjqEpRVJQzyAEZ4lxocGqYcmsKrQjYnIJxwhl3O7mp3sWuaXYpj
+         cmmPcPvWzMY2IwHz0wS8Q0r5yjz4x7fbukTE9Ykqcncn5lsAKAFylgxHLxZj1a/ZDvMj
+         4oP4GRjW4NnFdxKBXbzg1gVUx9Xtwr+4ZONEMAg1EzQp6+2M9IvgzBB7omtXh42MmWOP
+         qgJA==
+X-Gm-Message-State: APjAAAVoucxMO/blHTDifN88rpJTxZPmdrzayQdQEJvqmw+3ZRy5KGZ3
+        9H4h99F7j2d4xbngAwyRlg==
+X-Google-Smtp-Source: APXvYqyAHboqhEcn3AO/tqBd4xAJPyzUQF6B/TNyR/OU2id4uWSEPC5Q/L/Cp+4kXW79nZcRKjuR/A==
+X-Received: by 2002:ac8:89c:: with SMTP id v28mr15558195qth.156.1572919894330;
+        Mon, 04 Nov 2019 18:11:34 -0800 (PST)
+Received: from moria.home.lan ([2601:19b:c500:a1:7285:c2ff:fed5:c918])
+        by smtp.gmail.com with ESMTPSA id 189sm9896682qki.10.2019.11.04.18.11.32
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Mon, 04 Nov 2019 18:11:32 -0800 (PST)
+Date:   Mon, 4 Nov 2019 21:11:30 -0500
+From:   Kent Overstreet <kent.overstreet@gmail.com>
+To:     Ming Lei <ming.lei@redhat.com>
+Cc:     Jens Axboe <axboe@kernel.dk>,
+        Christoph Hellwig <hch@infradead.org>,
+        linux-block@vger.kernel.org, Coly Li <colyli@suse.de>,
+        Keith Busch <kbusch@kernel.org>, linux-bcache@vger.kernel.org
+Subject: Re: [PATCH V4] block: optimize for small block size IO
+Message-ID: <20191105021130.GB18564@moria.home.lan>
+References: <20191102072911.24817-1-ming.lei@redhat.com>
+ <20191104181403.GA8984@kmo-pixel>
+ <20191104181541.GA21116@infradead.org>
+ <20191104181742.GC8984@kmo-pixel>
+ <f7fab4e0-58e4-76e4-a503-bb535b2a3da6@kernel.dk>
+ <20191104184217.GD8984@kmo-pixel>
+ <20191105011135.GD11436@ming.t460p>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=us-ascii
 Content-Disposition: inline
-In-Reply-To: <20191031212234.GA32262@infradead.org>
-User-Agent: Mutt/1.12.2 (2019-09-21)
+In-Reply-To: <20191105011135.GD11436@ming.t460p>
+User-Agent: Mutt/1.10.1 (2018-07-13)
 Sender: linux-block-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-On Thu, Oct 31, 2019 at 02:22:34PM -0700, Christoph Hellwig wrote:
-> On Thu, Oct 31, 2019 at 04:50:45PM -0400, Theodore Y. Ts'o wrote:
-> > One of the reasons I really want this is so I (as an upstream
-> > maintainer of ext4 and fscrypt) can test the new code paths using
-> > xfstests on GCE, without needing special pre-release hardware that has
-> > the ICE support.
+On Tue, Nov 05, 2019 at 09:11:35AM +0800, Ming Lei wrote:
+> On Mon, Nov 04, 2019 at 01:42:17PM -0500, Kent Overstreet wrote:
+> > On Mon, Nov 04, 2019 at 11:23:42AM -0700, Jens Axboe wrote:
+> > > On 11/4/19 11:17 AM, Kent Overstreet wrote:
+> > > > On Mon, Nov 04, 2019 at 10:15:41AM -0800, Christoph Hellwig wrote:
+> > > >> On Mon, Nov 04, 2019 at 01:14:03PM -0500, Kent Overstreet wrote:
+> > > >>> On Sat, Nov 02, 2019 at 03:29:11PM +0800, Ming Lei wrote:
+> > > >>>> __blk_queue_split() may be a bit heavy for small block size(such as
+> > > >>>> 512B, or 4KB) IO, so introduce one flag to decide if this bio includes
+> > > >>>> multiple page. And only consider to try splitting this bio in case
+> > > >>>> that the multiple page flag is set.
+> > > >>>
+> > > >>> So, back in the day I had an alternative approach in mind: get rid of
+> > > >>> blk_queue_split entirely, by pushing splitting down to the request layer - when
+> > > >>> we map the bio/request to sgl, just have it map as much as will fit in the sgl
+> > > >>> and if it doesn't entirely fit bump bi_remaining and leave it on the request
+> > > >>> queue.
+> > > >>>
+> > > >>> This would mean there'd be no need for counting segments at all, and would cut a
+> > > >>> fair amount of code out of the io path.
+> > > >>
+> > > >> I thought about that to, but it will take a lot more effort.  Mostly
+> > > >> because md/dm heavily rely on splitting as well.  I still think it is
+> > > >> worthwhile, it will just take a significant amount of time and we
+> > > >> should have the quick improvement now.
+> > > > 
+> > > > We can do it one driver at a time - driver sets a flag to disable
+> > > > blk_queue_split(). Obvious one to do first would be nvme since that's where it
+> > > > shows up the most.
+> > > > 
+> > > > And md/md do splitting internally, but I'm not so sure they need
+> > > > blk_queue_split().
+> > > 
+> > > I'm a big proponent of doing something like that instead, but it is a
+> > > lot of work. I absolutely hate the splitting we're doing now, even
+> > > though the original "let's work as hard as we add add page time to get
+> > > things right" was pretty abysmal as well.
 > > 
-> > Yeah, I could probably get one of those dev boards internally at
-> > Google, but they're a pain in the tuckus to use, and I'd much rather
-> > be able to have my normal test infrastructure using gce-xfstests and
-> > kvm-xfstests be able to test inline-crypto.  So in terms of CI
-> > testing, having the blk-crypto is really going to be helpful.
+> > Last I looked I don't think it was going to be that bad, just needed a bit of
+> > finesse. We just need to be able to partially process a request in e.g.
+> > nvme_map_data(), and blk_rq_map_sg() needs to be modified to only map as much as
+> > will fit instead of popping an assertion.
 > 
-> Implementing the support in qemu or a special device mapper mode
-> seems like a much better idea for that use case over carrying the
-> code in the block layer and severely bloating the per-I/O data
-> structure.
+> I think it may not be doable.
 > 
+> blk_rq_map_sg() is called by drivers and has to work on single request, however
+> more requests have to be involved if we delay the splitting to blk_rq_map_sg().
+> Cause splitting means that two bios can't be submitted in single IO request.
 
-QEMU doesn't support UFS, but even if it did and we added the UFS v2.1 crypto
-support, it would preclude testing with anything other than a custom QEMU VM or
-a system with real inline encryption hardware.  gce-xfstests wouldn't work.  So
-it would be much harder to test inline encrypted I/O, so e.g. in practice it
-wouldn't be tested as part of the regular ext4 regression testing.
-
-The advantages of blk-crypto over a device mapper target like "dm-inlinecrypt"
-are (a) blk-crypto is much easier for userspace to use, and (b) blk-crypto
-allows upper layers to simply use inline encryption rather than have to
-implement encryption twice, once manually and once with inline encryption.
-
-It's true that as of this patchset, the only user of this stuff (fscrypt) still
-implements both I/O paths anyway.  But that's something that could change later
-once blk-crypto is ready for it, with longer IV support, O(1) keyslot lookups,
-and a way to configure whether hardware is used or not.  Satya is already
-looking into longer IV support, and I have a proposal for making the keyslot
-lookups O(1) using a hash table.
-
-I think that "Severely bloating the per-I/O data structure" is an exaggeration,
-since that it's only 32 bytes, and it isn't in struct bio directly but rather in
-struct bio_crypt_ctx...
-
-In any case, Satya, it might be a good idea to reorganize this patchset so that
-it first adds all logic that's needed for "real" inline encryption support
-(including the needed parts of blk-crypto.c), then adds the crypto API fallback
-as a separate patch.  That would separate the concerns more cleanly and make the
-patchset easier to review, and make it easier to make the fallback
-de-configurable or even remove it entirely if that turns out to be needed.
-
-- Eric
+Of course it's doable, do I have to show you how?
