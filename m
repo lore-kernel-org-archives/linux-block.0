@@ -2,141 +2,89 @@ Return-Path: <SRS0=uUnX=Y5=vger.kernel.org=linux-block-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-5.6 required=3.0 tests=DKIMWL_WL_HIGH,DKIM_SIGNED,
-	DKIM_VALID,DKIM_VALID_AU,MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,
-	SPF_PASS,USER_AGENT_SANE_1 autolearn=ham autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-5.3 required=3.0 tests=DKIM_SIGNED,DKIM_VALID,
+	DKIM_VALID_AU,HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SIGNED_OFF_BY,
+	URIBL_BLOCKED,USER_AGENT_SANE_1 autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 34517C5DF60
-	for <linux-block@archiver.kernel.org>; Tue,  5 Nov 2019 16:09:58 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 196C5C5DF60
+	for <linux-block@archiver.kernel.org>; Tue,  5 Nov 2019 16:34:28 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.kernel.org (Postfix) with ESMTP id 06408214B2
-	for <linux-block@archiver.kernel.org>; Tue,  5 Nov 2019 16:09:58 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=default; t=1572970198;
-	bh=T/OKgYFDc2/Ya87q3rObzjD5Y8PLugEqs/l86EobogI=;
-	h=Date:From:To:Cc:Subject:List-ID:From;
-	b=jdXVR+vnvLCMuyNWjq8rLuiiLoY8UOF+a4hTNxiT3XVv6MVAEYaKcX+T8hIlHiKSW
-	 HvZ5Qqb9fpGHuWpcOJpBVVwjseAtNXKBKLCsQzAuxlx0KJ0wJMDr6hf6iguGJK7MF7
-	 mzr8KjCKR3WlKtIE8as/h4ZCQ/uppKPqK8zslh6c=
+	by mail.kernel.org (Postfix) with ESMTP id CB5F0217F5
+	for <linux-block@archiver.kernel.org>; Tue,  5 Nov 2019 16:34:27 +0000 (UTC)
+Authentication-Results: mail.kernel.org;
+	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="BxiuqjGn"
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S2390035AbfKEQJ5 (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Tue, 5 Nov 2019 11:09:57 -0500
-Received: from mail-qk1-f193.google.com ([209.85.222.193]:39448 "EHLO
-        mail-qk1-f193.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S2389907AbfKEQJ5 (ORCPT
-        <rfc822;linux-block@vger.kernel.org>); Tue, 5 Nov 2019 11:09:57 -0500
-Received: by mail-qk1-f193.google.com with SMTP id 15so21612942qkh.6;
-        Tue, 05 Nov 2019 08:09:56 -0800 (PST)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20161025;
-        h=sender:date:from:to:cc:subject:message-id:mime-version
-         :content-disposition:user-agent;
-        bh=me3lESL1ggtumWsSVDttQmUrbEo7485lmzzekY64N38=;
-        b=tPrZdHjJcV0IzlK9UurrMNrUsqfSlMSqpZQhPr+KB57uDynjOd2cTm7wzPG77+mtk+
-         hLy4rIuS5QDPxR2XJOLho/ugr6NpnXyf0z2qcsyEs1KXsWE9iEwSbsL5HK0pA0vxrdRX
-         RBmf7MvgZoeS34lShwgpJj4mMhwED4aY97WiHDCa09wdQQw3dEbBYj1qurBcXocQ253p
-         NOj/Fk6JB7X5eax98zJ3qHft9JtWqDZD4pM4D8np4axWPcwEM7cjLQ/Z8FzI96R6rpFz
-         2xv70RhmHogmpE1IRKYvm5C6SePm7MjU72MVcm51XYWQSpWchtuiI+mDMKCXRc9E8u76
-         4/YQ==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20161025;
-        h=x-gm-message-state:sender:date:from:to:cc:subject:message-id
-         :mime-version:content-disposition:user-agent;
-        bh=me3lESL1ggtumWsSVDttQmUrbEo7485lmzzekY64N38=;
-        b=KpHRn3rZ/zMv16JjZdT0yR6w8hqcq/VlHKUtlX06P9UWC2zwfUIdSofBle0SGwRwOf
-         8VW0JozIrgMk4/XugmHraM6DXcS0a7V4ybpBN7zORuLWdfOrfv110fI4bS7Zw92fk5/F
-         sORYFI9INa0wxRQwTRUdQXbbXno/QLgUTMzSzYQYYPYPRI8gR+FtsQV/lPfVYsZWoy4Y
-         6d3dQKH2L6p1bxVToiWxzDTuiZmQtuilg23rZOE40+K52rzCppoojGMQGbxI2fJJ0UiZ
-         rAJHxCuwKqFXOZ3bd2z65WalJRkX3LUxUgY8b51zNcydj0mH+f3cbvnQJFmluc5Rg0MT
-         HQrA==
-X-Gm-Message-State: APjAAAVkQ9okXWt1LYTEZ51SgAYDxMF3tUByfrLans5KFH9yqAxF6Naa
-        fiNc2v6ieSjusS0rZ3eOdIkm7xmA
-X-Google-Smtp-Source: APXvYqzLB/L7Dj+A7FHR7I7t9gslk7a7ssseyWvo6BBPcRa35boS1fXIjPGUdSu+UaCEGKaUJHUgAg==
-X-Received: by 2002:a05:620a:a85:: with SMTP id v5mr11569535qkg.471.1572970195651;
-        Tue, 05 Nov 2019 08:09:55 -0800 (PST)
-Received: from localhost ([2620:10d:c091:500::2:bc42])
-        by smtp.gmail.com with ESMTPSA id o2sm10936208qkf.68.2019.11.05.08.09.54
-        (version=TLS1_2 cipher=ECDHE-RSA-AES128-GCM-SHA256 bits=128/128);
-        Tue, 05 Nov 2019 08:09:55 -0800 (PST)
-Date:   Tue, 5 Nov 2019 08:09:51 -0800
-From:   Tejun Heo <tj@kernel.org>
-To:     Jens Axboe <axboe@kernel.dk>
-Cc:     Roman Gushchin <guro@fb.com>, linux-block@vger.kernel.org,
-        cgroups@vger.kernel.org, linux-kernel@vger.kernel.org,
-        kernel-team@fb.com, Josef Bacik <jbacik@fb.com>
-Subject: [PATCH block/for-5.4-fixes] blkcg: make blkcg_print_stat() print
- stats only for online blkgs
-Message-ID: <20191105160951.GS3622521@devbig004.ftw2.facebook.com>
+        id S2390156AbfKEQe1 (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Tue, 5 Nov 2019 11:34:27 -0500
+Received: from us-smtp-delivery-1.mimecast.com ([205.139.110.120]:24936 "EHLO
+        us-smtp-1.mimecast.com" rhost-flags-OK-OK-OK-FAIL) by vger.kernel.org
+        with ESMTP id S2390153AbfKEQe0 (ORCPT
+        <rfc822;linux-block@vger.kernel.org>); Tue, 5 Nov 2019 11:34:26 -0500
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+        s=mimecast20190719; t=1572971666;
+        h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+         to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+         content-transfer-encoding:content-transfer-encoding:
+         in-reply-to:in-reply-to:references:references;
+        bh=jGQmqLeCoIMOYixwDK5EhAaP0PYA9BAL3PEV/L6zzKs=;
+        b=BxiuqjGnLf/leXnOk9kBn5jjXG8Up5w8TkQeUNj08SsUTk+ZnB3Id+zdsKuu5ZuhCfklQq
+        YMbekQPSHXfkc5UcYho2ijhYwIfuqWcR5lSWCocyQaNAF7YmSKLoCg+hI2Yt2bUVeU8Hrk
+        S1eepNuTd7++jsBfnZQwQhv+yuEpIW4=
+Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
+ [209.132.183.4]) (Using TLS) by relay.mimecast.com with ESMTP id
+ us-mta-318-SmT2toR1OVufYcXOGEJNbw-1; Tue, 05 Nov 2019 11:34:24 -0500
+Received: from smtp.corp.redhat.com (int-mx02.intmail.prod.int.phx2.redhat.com [10.5.11.12])
+        (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
+        (No client certificate requested)
+        by mimecast-mx01.redhat.com (Postfix) with ESMTPS id CE1901005500;
+        Tue,  5 Nov 2019 16:34:22 +0000 (UTC)
+Received: from localhost (unknown [10.18.25.174])
+        by smtp.corp.redhat.com (Postfix) with ESMTPS id 7E37460CC0;
+        Tue,  5 Nov 2019 16:34:22 +0000 (UTC)
+Date:   Tue, 5 Nov 2019 11:34:21 -0500
+From:   Mike Snitzer <snitzer@redhat.com>
+To:     Damien Le Moal <damien.lemoal@wdc.com>
+Cc:     linux-block@vger.kernel.org, Jens Axboe <axboe@kernel.dk>,
+        linux-scsi@vger.kernel.org,
+        "Martin K . Petersen" <martin.petersen@oracle.com>,
+        dm-devel@redhat.com, Ajay Joshi <ajay.joshi@wdc.com>,
+        Matias Bjorling <matias.bjorling@wdc.com>,
+        Hans Holmberg <Hans.Holmberg@wdc.com>,
+        Dmitry Fomichev <dmitry.fomichev@wdc.com>,
+        Keith Busch <kbusch@kernel.org>
+Subject: Re: [PATCH 7/8] dm: add zone open, close and finish support
+Message-ID: <20191105163421.GA22009@redhat.com>
+References: <20191027140549.26272-1-damien.lemoal@wdc.com>
+ <20191027140549.26272-8-damien.lemoal@wdc.com>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
+In-Reply-To: <20191027140549.26272-8-damien.lemoal@wdc.com>
 User-Agent: Mutt/1.5.21 (2010-09-15)
+X-Scanned-By: MIMEDefang 2.79 on 10.5.11.12
+X-MC-Unique: SmT2toR1OVufYcXOGEJNbw-1
+X-Mimecast-Spam-Score: 0
+Content-Type: text/plain; charset=WINDOWS-1252
+Content-Transfer-Encoding: quoted-printable
+Content-Disposition: inline
 Sender: linux-block-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-blkcg_print_stat() iterates blkgs under RCU and doesn't test whether
-the blkg is online.  This can call into pd_stat_fn() on a pd which is
-still being initialized leading to an oops.
+On Sun, Oct 27 2019 at 10:05am -0400,
+Damien Le Moal <damien.lemoal@wdc.com> wrote:
 
-The heaviest operation - recursively summing up rwstat counters - is
-already done while holding the queue_lock.  Expand queue_lock to cover
-the other operations and skip the blkg if it isn't online yet.  The
-online state is protected by both blkcg and queue locks, so this
-guarantees that only online blkgs are processed.
+> From: Ajay Joshi <ajay.joshi@wdc.com>
+>=20
+> Implement REQ_OP_ZONE_OPEN, REQ_OP_ZONE_CLOSE and REQ_OP_ZONE_FINISH
+> support to allow explicit control of zone states.
+>=20
+> Contains contributions from Matias Bjorling, Hans Holmberg and
+> Damien Le Moal.
+>=20
+> Signed-off-by: Ajay Joshi <ajay.joshi@wdc.com>
+> Signed-off-by: Matias Bjorling <matias.bjorling@wdc.com>
+> Signed-off-by: Hans Holmberg <hans.holmberg@wdc.com>
+> Signed-off-by: Damien Le Moal <damien.lemoal@wdc.com>
 
-Signed-off-by: Tejun Heo <tj@kernel.org>
-Reported-by: Roman Gushchin <guro@fb.com>
-Cc: Josef Bacik <jbacik@fb.com>
-Fixes: 903d23f0a354 ("blk-cgroup: allow controllers to output their own stats")
-Cc: stable@vger.kernel.org # v4.19+
----
- block/blk-cgroup.c |   13 ++++++++-----
- 1 file changed, 8 insertions(+), 5 deletions(-)
+Acked-by: Mike Snitzer <snitzer@redhat.com>
 
---- a/block/blk-cgroup.c
-+++ b/block/blk-cgroup.c
-@@ -934,9 +934,14 @@ static int blkcg_print_stat(struct seq_f
- 		int i;
- 		bool has_stats = false;
- 
-+		spin_lock_irq(&blkg->q->queue_lock);
-+
-+		if (!blkg->online)
-+			goto skip;
-+
- 		dname = blkg_dev_name(blkg);
- 		if (!dname)
--			continue;
-+			goto skip;
- 
- 		/*
- 		 * Hooray string manipulation, count is the size written NOT
-@@ -946,8 +951,6 @@ static int blkcg_print_stat(struct seq_f
- 		 */
- 		off += scnprintf(buf+off, size-off, "%s ", dname);
- 
--		spin_lock_irq(&blkg->q->queue_lock);
--
- 		blkg_rwstat_recursive_sum(blkg, NULL,
- 				offsetof(struct blkcg_gq, stat_bytes), &rwstat);
- 		rbytes = rwstat.cnt[BLKG_RWSTAT_READ];
-@@ -960,8 +963,6 @@ static int blkcg_print_stat(struct seq_f
- 		wios = rwstat.cnt[BLKG_RWSTAT_WRITE];
- 		dios = rwstat.cnt[BLKG_RWSTAT_DISCARD];
- 
--		spin_unlock_irq(&blkg->q->queue_lock);
--
- 		if (rbytes || wbytes || rios || wios) {
- 			has_stats = true;
- 			off += scnprintf(buf+off, size-off,
-@@ -999,6 +1000,8 @@ static int blkcg_print_stat(struct seq_f
- 				seq_commit(sf, -1);
- 			}
- 		}
-+	skip:
-+		spin_unlock_irq(&blkg->q->queue_lock);
- 	}
- 
- 	rcu_read_unlock();
