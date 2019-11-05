@@ -2,145 +2,149 @@ Return-Path: <SRS0=uUnX=Y5=vger.kernel.org=linux-block-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-8.2 required=3.0 tests=DKIM_SIGNED,DKIM_VALID,
+X-Spam-Status: No, score=-9.8 required=3.0 tests=DKIM_SIGNED,DKIM_VALID,
+	DKIM_VALID_AU,FREEMAIL_FORGED_FROMDOMAIN,FREEMAIL_FROM,
 	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,
-	SPF_HELO_NONE,SPF_PASS,USER_AGENT_SANE_1 autolearn=ham autolearn_force=no
-	version=3.4.0
+	SPF_HELO_NONE,SPF_PASS,USER_AGENT_GIT autolearn=unavailable
+	autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id C3362C5DF60
-	for <linux-block@archiver.kernel.org>; Tue,  5 Nov 2019 22:23:14 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 6D4B2C5DF61
+	for <linux-block@archiver.kernel.org>; Tue,  5 Nov 2019 23:05:32 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.kernel.org (Postfix) with ESMTP id 809D32087E
-	for <linux-block@archiver.kernel.org>; Tue,  5 Nov 2019 22:23:14 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id 1443121D6C
+	for <linux-block@archiver.kernel.org>; Tue,  5 Nov 2019 23:05:32 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel-dk.20150623.gappssmtp.com header.i=@kernel-dk.20150623.gappssmtp.com header.b="Bgi11lEu"
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="vgyoaa7J"
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1730362AbfKEWXO (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Tue, 5 Nov 2019 17:23:14 -0500
-Received: from mail-pf1-f178.google.com ([209.85.210.178]:41337 "EHLO
-        mail-pf1-f178.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1729680AbfKEWXN (ORCPT
-        <rfc822;linux-block@vger.kernel.org>); Tue, 5 Nov 2019 17:23:13 -0500
-Received: by mail-pf1-f178.google.com with SMTP id p26so17076805pfq.8
-        for <linux-block@vger.kernel.org>; Tue, 05 Nov 2019 14:23:13 -0800 (PST)
+        id S1730512AbfKEXFb (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Tue, 5 Nov 2019 18:05:31 -0500
+Received: from mail-wm1-f66.google.com ([209.85.128.66]:37765 "EHLO
+        mail-wm1-f66.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S1728515AbfKEXFb (ORCPT
+        <rfc822;linux-block@vger.kernel.org>); Tue, 5 Nov 2019 18:05:31 -0500
+Received: by mail-wm1-f66.google.com with SMTP id q130so1227225wme.2;
+        Tue, 05 Nov 2019 15:05:29 -0800 (PST)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=kernel-dk.20150623.gappssmtp.com; s=20150623;
-        h=cc:from:subject:message-id:date:user-agent:mime-version
-         :content-language:content-transfer-encoding;
-        bh=TVLm4ruVrX8m9Bhwx5HW6bMmrVvPWmbb8Gqhs5MfeNs=;
-        b=Bgi11lEuEOS+w9rsnGfF77p4I75nfBpRYsFnZnrqL6sqHdBID1krIKgFOu/TgrCI24
-         tcwQId6MCv69QykHqZmtGi5fX1HTVlDjGccoU7SLJQnP7+exjgfJjM5jgIgdJDgC/8gp
-         xE8HqgBWLgjfISvOtJPXLUY1Je9X+zRM6d34ifBhkfH+is2B/a1CPs+p5RN3/lUKUudw
-         RIG5QqyacodeChrPtIrSDwhEabduk83M6cdxExq74X7Y3yjOTIbJk367YH1pxsAtS+BD
-         Jto2RZayMj9c+wk4/kNptWuaLhRYgETDoNchRRcNKg7LWdD4QbjiM+4nFZ6IHq6nHgWT
-         topQ==
+        d=gmail.com; s=20161025;
+        h=from:to:subject:date:message-id:in-reply-to:references:mime-version
+         :content-transfer-encoding;
+        bh=K4HSlR1svrgFdOVbEL5IMlVxcn9RvX0EQvAJKCf+mao=;
+        b=vgyoaa7JayR4PIKIgFbd98uvjj33uMDx4kfaJyb5sV8rbxf+FuLfPQtDhTkQ+axE3X
+         z4vdjTopwuRFh57a1Q0kqMRtEd+FuhD1aLVDwpcbUwn2AnbgeOOdysP7PFbB4tCPGa53
+         WVDBBQqL0yHqF15q2DDNigAhBeAnPKty72GqHrA1A4mvyA9fwjJtMQrbBzs53Z5mbJ58
+         Ohb9+qY2mI81i56J6bHdN6mgrj9tCAZVf6xC02PDj6IZjx/Br0DrgVtVfkjC3jN3M+Ja
+         4AYLc0Eupw8N0PSJ0WD0LzpDpLpTBO1oR11wkvIBrSjWDzc+zdLswnY3Rab/N9WQcG0t
+         LEGQ==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=1e100.net; s=20161025;
-        h=x-gm-message-state:cc:from:subject:message-id:date:user-agent
-         :mime-version:content-language:content-transfer-encoding;
-        bh=TVLm4ruVrX8m9Bhwx5HW6bMmrVvPWmbb8Gqhs5MfeNs=;
-        b=So+cJ7r3NypQZtMxdhI4RP+KiwT943Vk3QES7oEdJ8g1dem87XgbJZOUcpRjYteTxZ
-         oaF1IgdQ4RNOuo3HJbZWaBxUuqLahnlIkXTo9J6Vs8ijn2bJ9kR9kvZQkdqwxtgtYWYJ
-         t91brGrKOFY6dwBIoyWmMA48H6QT5k7SwdoeLFGOXE48ZUJ9ym2cgYNLdU6unkhI//OJ
-         vMz2Sxp0P6+sqeqaO0Y9cnEUsiBp4P3oDWtKWOAiw//Ig076+KlZwIkfiWFOJ2448D3K
-         rCHI5hJx7Aek64nzz43LUBkzzfwuArb2/rFti54AFQiGlbKTdCu5wO9Anu0vbH9Rx6IV
-         no1w==
-X-Gm-Message-State: APjAAAXfrUy7UsRoK0kesyTgDQDeNk8ziAOPCpM7i32P2hIYDXceWRHg
-        3wHjzFih2hoV/vFsBm4vpUpbJw==
-X-Google-Smtp-Source: APXvYqyx8Op2DRbHgtWfoPFe/S38sygF+vsfA/uCiFpgEbnFBFeC7Ee9Y8l96iMMyBn8UzL9XAqBIQ==
-X-Received: by 2002:a62:2942:: with SMTP id p63mr33610614pfp.110.1572992592827;
-        Tue, 05 Nov 2019 14:23:12 -0800 (PST)
-Received: from [192.168.1.188] ([66.219.217.79])
-        by smtp.gmail.com with ESMTPSA id z23sm20163625pgu.16.2019.11.05.14.23.11
-        (version=TLS1_2 cipher=ECDHE-RSA-AES128-GCM-SHA256 bits=128/128);
-        Tue, 05 Nov 2019 14:23:11 -0800 (PST)
-Cc:     "linux-block@vger.kernel.org" <linux-block@vger.kernel.org>,
-        io-uring@vger.kernel.org
-From:   Jens Axboe <axboe@kernel.dk>
-Subject: [PATCH] io_uring: enable optimized link handling for
- IORING_OP_POLL_ADD
-Message-ID: <615f6b1e-a8a3-1a9d-16b6-a3145a767b51@kernel.dk>
-Date:   Tue, 5 Nov 2019 15:23:09 -0700
-User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:60.0) Gecko/20100101
- Thunderbird/60.9.0
+        h=x-gm-message-state:from:to:subject:date:message-id:in-reply-to
+         :references:mime-version:content-transfer-encoding;
+        bh=K4HSlR1svrgFdOVbEL5IMlVxcn9RvX0EQvAJKCf+mao=;
+        b=iLDPVi1HY1I3bZEyzdKdPe6/vuAITIC/XwN78c93seqnVNBA9qllqtTBC4KdFFsOUE
+         FQcSyaHZpq/mUY9S9/xcxCa3lRpWswvKZu0Uj3IOpfMO6RHOHlVJF1RZz1lfiGJdskGe
+         2fCRyKukqpj0SQD4dHLjweus4ix9wpBzgK0vLgUf/Ncc5xlr/X8xz859VuaU1aIwcnnE
+         /Cw2r5+Rr30qV0f1iabmwLuHpsQdu5rakucqiD+Q/Z6Busp7vAyCDVlYFg/5k2k3FkUN
+         gx204st5XvfiXXGSJBQJvBdsWXv1tjov8OjEPQ6OAwJd9zjsgcU0GP8cOv/6uBaFplvs
+         +COA==
+X-Gm-Message-State: APjAAAV6jG8y1QSLuSKivPL6bc21rG9/oqeyDLgT4pntbyfqLQk9L+lO
+        2TG+sjcrGd1OG08A+tnRcyQ=
+X-Google-Smtp-Source: APXvYqxw1JGo7f/Pa83tGSFcGvadlSS5VcQFLclbIwgkQ0Mx2FJcjZMNq+UsCxpn9t6rt01fMy9FEw==
+X-Received: by 2002:a05:600c:3cf:: with SMTP id z15mr1208530wmd.76.1572995128729;
+        Tue, 05 Nov 2019 15:05:28 -0800 (PST)
+Received: from localhost.localdomain ([109.126.129.81])
+        by smtp.gmail.com with ESMTPSA id x8sm15579658wrm.7.2019.11.05.15.05.27
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Tue, 05 Nov 2019 15:05:28 -0800 (PST)
+From:   Pavel Begunkov <asml.silence@gmail.com>
+To:     Jens Axboe <axboe@kernel.dk>, io-uring@vger.kernel.org,
+        linux-block@vger.kernel.org
+Subject: [PATCH 1/3] io_uring: allocate io_kiocb upfront
+Date:   Wed,  6 Nov 2019 02:04:43 +0300
+Message-Id: <d2bac0d2571d3cb15b415f81068dd0f0649b08f2.1572993994.git.asml.silence@gmail.com>
+X-Mailer: git-send-email 2.23.0
+In-Reply-To: <cover.1572993994.git.asml.silence@gmail.com>
+References: <cover.1572993994.git.asml.silence@gmail.com>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=utf-8
-Content-Language: en-US
-Content-Transfer-Encoding: 7bit
-To:     unlisted-recipients:; (no To-header on input)
+Content-Transfer-Encoding: 8bit
 Sender: linux-block-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-As introduced by commit:
+Preparation patch.
+Make io_submit_sqes() to allocate io_kiocb, and then pass it further.
+Another difference is that it's allocated before we get an sqe.
 
-ba816ad61fdf ("io_uring: run dependent links inline if possible")
-
-enable inline dependent link running for poll commands.
-io_poll_complete_work() is the most important change, as it allows a
-linked sequence of { POLL, READ } (for example) to proceed inline
-instead of needing to get punted to another async context. The
-submission side only potentially matters for sqthread, but may as well
-include that bit.
-
-Signed-off-by: Jens Axboe <axboe@kernel.dk>
-
+Signed-off-by: Pavel Begunkov <asml.silence@gmail.com>
 ---
+ fs/io_uring.c | 25 ++++++++++++-------------
+ 1 file changed, 12 insertions(+), 13 deletions(-)
 
 diff --git a/fs/io_uring.c b/fs/io_uring.c
-index d4ff3e49a78c..d074f3f04a63 100644
+index 82c2da99cb5c..920ad731db01 100644
 --- a/fs/io_uring.c
 +++ b/fs/io_uring.c
-@@ -1862,6 +1862,7 @@ static void io_poll_complete_work(struct io_wq_work **workptr)
- 	struct io_poll_iocb *poll = &req->poll;
- 	struct poll_table_struct pt = { ._key = poll->events };
- 	struct io_ring_ctx *ctx = req->ctx;
-+	struct io_kiocb *nxt = NULL;
- 	__poll_t mask = 0;
+@@ -2538,30 +2538,23 @@ static int io_queue_link_head(struct io_ring_ctx *ctx, struct io_kiocb *req,
  
- 	if (work->flags & IO_WQ_WORK_CANCEL)
-@@ -1888,7 +1889,10 @@ static void io_poll_complete_work(struct io_wq_work **workptr)
- 	spin_unlock_irq(&ctx->completion_lock);
+ #define SQE_VALID_FLAGS	(IOSQE_FIXED_FILE|IOSQE_IO_DRAIN|IOSQE_IO_LINK)
  
- 	io_cqring_ev_posted(ctx);
--	io_put_req(req, NULL);
-+
-+	io_put_req(req, &nxt);
-+	if (nxt)
-+		*workptr = &nxt->work;
- }
- 
- static int io_poll_wake(struct wait_queue_entry *wait, unsigned mode, int sync,
-@@ -1942,7 +1946,8 @@ static void io_poll_queue_proc(struct file *file, struct wait_queue_head *head,
- 	add_wait_queue(head, &pt->req->poll.wait);
- }
- 
--static int io_poll_add(struct io_kiocb *req, const struct io_uring_sqe *sqe)
-+static int io_poll_add(struct io_kiocb *req, const struct io_uring_sqe *sqe,
-+		       struct io_kiocb **nxt)
+-static void io_submit_sqe(struct io_ring_ctx *ctx, struct sqe_submit *s,
+-			  struct io_submit_state *state, struct io_kiocb **link)
++static void io_submit_sqe(struct io_ring_ctx *ctx, struct io_kiocb *req,
++			  struct sqe_submit *s, struct io_submit_state *state,
++			  struct io_kiocb **link)
  {
- 	struct io_poll_iocb *poll = &req->poll;
- 	struct io_ring_ctx *ctx = req->ctx;
-@@ -2005,7 +2010,7 @@ static int io_poll_add(struct io_kiocb *req, const struct io_uring_sqe *sqe)
+ 	struct io_uring_sqe *sqe_copy;
+-	struct io_kiocb *req;
+ 	int ret;
  
- 	if (mask) {
- 		io_cqring_ev_posted(ctx);
--		io_put_req(req, NULL);
-+		io_put_req(req, nxt);
+ 	/* enforce forwards compatibility on users */
+ 	if (unlikely(s->sqe->flags & ~SQE_VALID_FLAGS)) {
+ 		ret = -EINVAL;
+-		goto err;
+-	}
+-
+-	req = io_get_req(ctx, state);
+-	if (unlikely(!req)) {
+-		ret = -EAGAIN;
+-		goto err;
++		goto err_req;
  	}
- 	return ipt.error;
- }
-@@ -2303,7 +2308,7 @@ static int __io_submit_sqe(struct io_ring_ctx *ctx, struct io_kiocb *req,
- 		ret = io_fsync(req, s->sqe, nxt, force_nonblock);
- 		break;
- 	case IORING_OP_POLL_ADD:
--		ret = io_poll_add(req, s->sqe);
-+		ret = io_poll_add(req, s->sqe, nxt);
- 		break;
- 	case IORING_OP_POLL_REMOVE:
- 		ret = io_poll_remove(req, s->sqe);
-
+ 
+ 	ret = io_req_set_file(ctx, s, state, req);
+ 	if (unlikely(ret)) {
+ err_req:
+ 		io_free_req(req, NULL);
+-err:
+ 		io_cqring_add_event(ctx, s->sqe->user_data, ret);
+ 		return;
+ 	}
+@@ -2697,9 +2690,15 @@ static int io_submit_sqes(struct io_ring_ctx *ctx, unsigned int nr,
+ 
+ 	for (i = 0; i < nr; i++) {
+ 		struct sqe_submit s;
++		struct io_kiocb *req;
+ 
+-		if (!io_get_sqring(ctx, &s))
++		req = io_get_req(ctx, statep);
++		if (unlikely(!req))
+ 			break;
++		if (!io_get_sqring(ctx, &s)) {
++			__io_free_req(req);
++			break;
++		}
+ 
+ 		if (io_sqe_needs_user(s.sqe) && !*mm) {
+ 			mm_fault = mm_fault || !mmget_not_zero(ctx->sqo_mm);
+@@ -2727,7 +2726,7 @@ static int io_submit_sqes(struct io_ring_ctx *ctx, unsigned int nr,
+ 		s.in_async = async;
+ 		s.needs_fixed_file = async;
+ 		trace_io_uring_submit_sqe(ctx, s.sqe->user_data, true, async);
+-		io_submit_sqe(ctx, &s, statep, &link);
++		io_submit_sqe(ctx, req, &s, statep, &link);
+ 		submitted++;
+ 
+ 		/*
 -- 
-Jens Axboe
+2.23.0
 
