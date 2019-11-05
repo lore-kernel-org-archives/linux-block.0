@@ -2,245 +2,159 @@ Return-Path: <SRS0=uUnX=Y5=vger.kernel.org=linux-block-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-9.7 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
-	INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,
-	UNPARSEABLE_RELAY,URIBL_BLOCKED,USER_AGENT_GIT autolearn=ham
+X-Spam-Status: No, score=-2.4 required=3.0 tests=DKIMWL_WL_HIGH,DKIM_SIGNED,
+	DKIM_VALID,DKIM_VALID_AU,HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,
+	SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED,USER_AGENT_SANE_1 autolearn=no
 	autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 86B3DC5DF60
-	for <linux-block@archiver.kernel.org>; Tue,  5 Nov 2019 17:55:46 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 2BA4DC5DF61
+	for <linux-block@archiver.kernel.org>; Tue,  5 Nov 2019 18:16:32 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.kernel.org (Postfix) with ESMTP id 579D421882
-	for <linux-block@archiver.kernel.org>; Tue,  5 Nov 2019 17:55:46 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id 07068214D8
+	for <linux-block@archiver.kernel.org>; Tue,  5 Nov 2019 18:16:32 +0000 (UTC)
+Authentication-Results: mail.kernel.org;
+	dkim=pass (2048-bit key) header.d=nvidia.com header.i=@nvidia.com header.b="ZSBhPlkU"
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S2390520AbfKERzp (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Tue, 5 Nov 2019 12:55:45 -0500
-Received: from bhuna.collabora.co.uk ([46.235.227.227]:50866 "EHLO
-        bhuna.collabora.co.uk" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S2390398AbfKERzp (ORCPT
-        <rfc822;linux-block@vger.kernel.org>); Tue, 5 Nov 2019 12:55:45 -0500
-Received: from [127.0.0.1] (localhost [127.0.0.1])
-        (Authenticated sender: tonyk)
-        with ESMTPSA id 6A2B528F76D
-From:   =?UTF-8?q?Andr=C3=A9=20Almeida?= <andrealmeid@collabora.com>
-To:     linux-block@vger.kernel.org, linux-kernel@vger.kernel.org
-Cc:     axboe@kernel.dk, kernel@collabora.com, krisman@collabora.com,
-        =?UTF-8?q?Andr=C3=A9=20Almeida?= <andrealmeid@collabora.com>
-Subject: [PATCH v3] blk-mq: Document functions for sending request
-Date:   Tue,  5 Nov 2019 14:53:37 -0300
-Message-Id: <20191105175337.20426-1-andrealmeid@collabora.com>
-X-Mailer: git-send-email 2.23.0
+        id S2390592AbfKESQb (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Tue, 5 Nov 2019 13:16:31 -0500
+Received: from hqemgate14.nvidia.com ([216.228.121.143]:11085 "EHLO
+        hqemgate14.nvidia.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S2390476AbfKESQb (ORCPT
+        <rfc822;linux-block@vger.kernel.org>); Tue, 5 Nov 2019 13:16:31 -0500
+Received: from hqpgpgate101.nvidia.com (Not Verified[216.228.121.13]) by hqemgate14.nvidia.com (using TLS: TLSv1.2, DES-CBC3-SHA)
+        id <B5dc1bc810000>; Tue, 05 Nov 2019 10:16:33 -0800
+Received: from hqmail.nvidia.com ([172.20.161.6])
+  by hqpgpgate101.nvidia.com (PGP Universal service);
+  Tue, 05 Nov 2019 10:16:27 -0800
+X-PGP-Universal: processed;
+        by hqpgpgate101.nvidia.com on Tue, 05 Nov 2019 10:16:27 -0800
+Received: from [10.110.48.28] (10.124.1.5) by HQMAIL107.nvidia.com
+ (172.20.187.13) with Microsoft SMTP Server (TLS) id 15.0.1473.3; Tue, 5 Nov
+ 2019 18:16:25 +0000
+Subject: Re: [PATCH 09/19] drm/via: set FOLL_PIN via pin_user_pages_fast()
+To:     Ira Weiny <ira.weiny@intel.com>,
+        Andrew Morton <akpm@linux-foundation.org>,
+        Al Viro <viro@zeniv.linux.org.uk>,
+        Alex Williamson <alex.williamson@redhat.com>,
+        Benjamin Herrenschmidt <benh@kernel.crashing.org>,
+        =?UTF-8?B?QmrDtnJuIFTDtnBlbA==?= <bjorn.topel@intel.com>,
+        Christoph Hellwig <hch@infradead.org>,
+        Dan Williams <dan.j.williams@intel.com>,
+        Dave Chinner <david@fromorbit.com>,
+        David Airlie <airlied@linux.ie>,
+        "David S . Miller" <davem@davemloft.net>, Jan Kara <jack@suse.cz>,
+        Jason Gunthorpe <jgg@ziepe.ca>, Jens Axboe <axboe@kernel.dk>,
+        Jonathan Corbet <corbet@lwn.net>,
+        =?UTF-8?B?SsOpcsO0bWUgR2xpc3Nl?= <jglisse@redhat.com>,
+        Magnus Karlsson <magnus.karlsson@intel.com>,
+        Mauro Carvalho Chehab <mchehab@kernel.org>,
+        Michael Ellerman <mpe@ellerman.id.au>,
+        Michal Hocko <mhocko@suse.com>,
+        Mike Kravetz <mike.kravetz@oracle.com>,
+        Paul Mackerras <paulus@samba.org>,
+        Shuah Khan <shuah@kernel.org>,
+        Vlastimil Babka <vbabka@suse.cz>, <bpf@vger.kernel.org>,
+        <dri-devel@lists.freedesktop.org>, <kvm@vger.kernel.org>,
+        <linux-block@vger.kernel.org>, <linux-doc@vger.kernel.org>,
+        <linux-fsdevel@vger.kernel.org>, <linux-kselftest@vger.kernel.org>,
+        <linux-media@vger.kernel.org>, <linux-rdma@vger.kernel.org>,
+        <linuxppc-dev@lists.ozlabs.org>, <netdev@vger.kernel.org>,
+        <linux-mm@kvack.org>, LKML <linux-kernel@vger.kernel.org>
+References: <20191030224930.3990755-1-jhubbard@nvidia.com>
+ <20191030224930.3990755-10-jhubbard@nvidia.com>
+ <20191031233628.GI14771@iweiny-DESK2.sc.intel.com>
+ <20191104181055.GP10326@phenom.ffwll.local>
+ <48d22c77-c313-59ff-4847-bc9a9813b8a7@nvidia.com>
+ <20191105094936.GZ10326@phenom.ffwll.local>
+From:   John Hubbard <jhubbard@nvidia.com>
+X-Nvconfidentiality: public
+Message-ID: <9b9637f4-34e0-a665-a9c8-8fd59ff71063@nvidia.com>
+Date:   Tue, 5 Nov 2019 10:16:25 -0800
+User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:60.0) Gecko/20100101
+ Thunderbird/60.8.0
 MIME-Version: 1.0
-Content-Type: text/plain; charset=UTF-8
-Content-Transfer-Encoding: 8bit
+In-Reply-To: <20191105094936.GZ10326@phenom.ffwll.local>
+X-Originating-IP: [10.124.1.5]
+X-ClientProxiedBy: HQMAIL105.nvidia.com (172.20.187.12) To
+ HQMAIL107.nvidia.com (172.20.187.13)
+Content-Type: text/plain; charset="utf-8"
+Content-Language: en-US
+Content-Transfer-Encoding: 7bit
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=nvidia.com; s=n1;
+        t=1572977793; bh=R0RxaBiDFTq2JKu4s4y6dD52czu96JnYA/nMzL9A6aE=;
+        h=X-PGP-Universal:Subject:To:References:From:X-Nvconfidentiality:
+         Message-ID:Date:User-Agent:MIME-Version:In-Reply-To:
+         X-Originating-IP:X-ClientProxiedBy:Content-Type:Content-Language:
+         Content-Transfer-Encoding;
+        b=ZSBhPlkU00U2SId5ohXT4qfb7S3CRfF2QxUJyZ0MYASa23SxluEpDZf1THjnsB9k6
+         3RTrsq64bDaJH6/fLXRNFkXaPhRm5A6gkx6RZdlDie0bGzD/RBx0po9cAdeDcz/1hI
+         lKGfT57a8xEYWihKfruZKPu2iv+9HpU34riNOb6hU1aeKe+Fw0TM0CdzQuEAMyVnn3
+         zPBLdfbRqsxHTlb9Dt1LPnE+4oLXwLOgCALb/FxR0bVQqL9MMuMnHnx6cwBXcGJC2q
+         423PWzhyAI/MHMUhEHpOr+pguDR21zYFt0jsH+WX73ZsVIDhQ9aKqbWLguXDJ6ZEPH
+         qkWctNU3sUmkw==
 Sender: linux-block-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-Add and improve documentation for function regarding creating and sending
-IO requests to the hardware.
+On 11/5/19 1:49 AM, Daniel Vetter wrote:
+> On Mon, Nov 04, 2019 at 11:20:38AM -0800, John Hubbard wrote:
+>> On 11/4/19 10:10 AM, Daniel Vetter wrote:
+>>> On Thu, Oct 31, 2019 at 04:36:28PM -0700, Ira Weiny wrote:
+>>>> On Wed, Oct 30, 2019 at 03:49:20PM -0700, John Hubbard wrote:
+>>>>> Convert drm/via to use the new pin_user_pages_fast() call, which sets
+>>>>> FOLL_PIN. Setting FOLL_PIN is now required for code that requires
+>>>>> tracking of pinned pages, and therefore for any code that calls
+>>>>> put_user_page().
+>>>>>
+>>>>
+>>>> Reviewed-by: Ira Weiny <ira.weiny@intel.com>
+>>>
+>>> No one's touching the via driver anymore, so feel free to merge this
+>>> through whatever tree suits best (aka I'll drop this on the floor and
+>>> forget about it now).
+>>>
+>>> Acked-by: Daniel Vetter <daniel.vetter@ffwll.ch>
+>>>
+>>
+>> OK, great. Yes, in fact, I'm hoping Andrew can just push the whole series
+>> in through the mm tree, because that would allow it to be done in one 
+>> shot, in 5.5
+> 
+> btw is there more? We should have a bunch more userptr stuff in various
+> drivers, so was really surprised that drm/via is the only thing in your
+> series.
 
-Signed-off-by: André Almeida <andrealmeid@collabora.com>
----
-Hello,
 
-I did my best to describe all variations of *_run_hw_queue, although
-their names and functionally are really similar. I would be happy to get
-feedback about those functions descriptions.
+There is more, but:
 
-Those comments were tested with:
+1) Fortunately, the opt-in nature of FOLL_PIN allows converting a few call
+sites at a time. And so this patchset limits itself to converting the bare
+minimum required to get started, which is: 
 
-./scripts/kernel-doc -none block/blk-mq.c
+    a) calls sites that have already been converted to put_user_page(), 
+       and
 
-Which did not returned any warning or error.
+    b) call sites that set FOLL_LONGTERM.
 
-Thanks,
-	André
+So yes, follow-up patches will be required. This is not everything.
+In fact, if I can fix this series up quickly enough that it makes it into
+mmotm soon-ish, then there may be time to get some follow-patches on top
+of it, in time for 5.5.
 
-Changes since v2:
-- Update blk_mq_run_hw_queue() from bool to void type
 
-Changes since v1:
-- Add documentation for blk_mq_start_request()
----
- block/blk-mq.c | 85 ++++++++++++++++++++++++++++++++++++++++++++++++--
- 1 file changed, 83 insertions(+), 2 deletions(-)
+2) If I recall correctly, Jerome and maybe others are working to remove
+as many get_user_pages() callers from drm as possible, and instead use
+a non-pinned page approach, with mmu notifiers instead.  I'm not sure of
+the exact status of that work, but I see that etnaviv, amdgpu, i915, and
+radeon still call gup() in linux-next.
 
-diff --git a/block/blk-mq.c b/block/blk-mq.c
-index 5c9adcaa27ac..ba7ffd47fb98 100644
---- a/block/blk-mq.c
-+++ b/block/blk-mq.c
-@@ -647,6 +647,14 @@ bool blk_mq_complete_request(struct request *rq)
- }
- EXPORT_SYMBOL(blk_mq_complete_request);
- 
-+/**
-+ * blk_mq_start_request - Start processing a request
-+ * @rq: Pointer to request to be started
-+ *
-+ * Function used by device drivers to notify the block layer that a request
-+ * is going to be processed now, so blk layer can do proper initializations
-+ * such as starting the timeout timer.
-+ */
- void blk_mq_start_request(struct request *rq)
- {
- 	struct request_queue *q = rq->q;
-@@ -1333,6 +1341,12 @@ bool blk_mq_dispatch_rq_list(struct request_queue *q, struct list_head *list,
- 	return (queued + errors) != 0;
- }
- 
-+/**
-+ * __blk_mq_run_hw_queue - Run a hardware queue.
-+ * @hctx: Pointer to the hardware queue to run.
-+ *
-+ * Send pending requests to the hardware.
-+ */
- static void __blk_mq_run_hw_queue(struct blk_mq_hw_ctx *hctx)
- {
- 	int srcu_idx;
-@@ -1430,6 +1444,15 @@ static int blk_mq_hctx_next_cpu(struct blk_mq_hw_ctx *hctx)
- 	return next_cpu;
- }
- 
-+/**
-+ * __blk_mq_delay_run_hw_queue - Run (or schedule to run) a hardware queue.
-+ * @hctx: Pointer to the hardware queue to run.
-+ * @async: If we want to run the queue asynchronously.
-+ * @msecs: Microseconds of delay to wait before running the queue.
-+ *
-+ * If !@async, try to run the queue now. Else, run the queue asynchronously and
-+ * with a delay of @msecs.
-+ */
- static void __blk_mq_delay_run_hw_queue(struct blk_mq_hw_ctx *hctx, bool async,
- 					unsigned long msecs)
- {
-@@ -1451,12 +1474,28 @@ static void __blk_mq_delay_run_hw_queue(struct blk_mq_hw_ctx *hctx, bool async,
- 				    msecs_to_jiffies(msecs));
- }
- 
-+/**
-+ * blk_mq_delay_run_hw_queue - Run a hardware queue asynchronously.
-+ * @hctx: Pointer to the hardware queue to run.
-+ * @msecs: Microseconds of delay to wait before running the queue.
-+ *
-+ * Run a hardware queue asynchronously with a delay of @msecs.
-+ */
- void blk_mq_delay_run_hw_queue(struct blk_mq_hw_ctx *hctx, unsigned long msecs)
- {
- 	__blk_mq_delay_run_hw_queue(hctx, true, msecs);
- }
- EXPORT_SYMBOL(blk_mq_delay_run_hw_queue);
- 
-+/**
-+ * blk_mq_run_hw_queue - Start to run a hardware queue.
-+ * @hctx: Pointer to the hardware queue to run.
-+ * @async: If we want to run the queue asynchronously.
-+ *
-+ * Check if the request queue is not in a quiesced state and if there are
-+ * pending requests to be sent. If this is true, run the queue to send requests
-+ * to hardware.
-+ */
- void blk_mq_run_hw_queue(struct blk_mq_hw_ctx *hctx, bool async)
- {
- 	int srcu_idx;
-@@ -1480,6 +1519,11 @@ void blk_mq_run_hw_queue(struct blk_mq_hw_ctx *hctx, bool async)
- }
- EXPORT_SYMBOL(blk_mq_run_hw_queue);
- 
-+/**
-+ * blk_mq_run_hw_queue - Run all hardware queues in a request queue.
-+ * @q: Pointer to the request queue to run.
-+ * @async: If we want to run the queue asynchronously.
-+ */
- void blk_mq_run_hw_queues(struct request_queue *q, bool async)
- {
- 	struct blk_mq_hw_ctx *hctx;
-@@ -1631,7 +1675,11 @@ void __blk_mq_insert_request(struct blk_mq_hw_ctx *hctx, struct request *rq,
- 	blk_mq_hctx_mark_pending(hctx, ctx);
- }
- 
--/*
-+/**
-+ * blk_mq_request_bypass_insert - Insert a request at dispatch list.
-+ * @rq: Pointer to request to be inserted.
-+ * @run_queue: If we should run the hardware queue after inserting the request.
-+ *
-  * Should only be used carefully, when the caller knows we want to
-  * bypass a potential IO scheduler on the target device.
-  */
-@@ -1834,6 +1882,17 @@ static blk_status_t __blk_mq_try_issue_directly(struct blk_mq_hw_ctx *hctx,
- 	return BLK_STS_OK;
- }
- 
-+/**
-+ * blk_mq_try_issue_directly - Try to send a request directly to device driver.
-+ * @hctx: Pointer of the associated hardware queue.
-+ * @rq: Pointer to request to be sent.
-+ * @cookie: Request queue cookie.
-+ *
-+ * If the device has enough resources to accept a new request now, send the
-+ * request directly to device driver. Else, insert at hctx->dispatch queue, so
-+ * we can try send it another time in the future. Requests inserted at this
-+ * queue have higher priority.
-+ */
- static void blk_mq_try_issue_directly(struct blk_mq_hw_ctx *hctx,
- 		struct request *rq, blk_qc_t *cookie)
- {
-@@ -1911,6 +1970,22 @@ static void blk_add_rq_to_plug(struct blk_plug *plug, struct request *rq)
- 	}
- }
- 
-+/**
-+ * blk_mq_make_request - Create and send a request to block device.
-+ * @q: Request queue pointer.
-+ * @bio: Bio pointer.
-+ *
-+ * Builds up a request structure from @q and @bio and send to the device. The
-+ * request may not be queued directly to hardware if:
-+ * * This request can be merged with another one
-+ * * We want to place request at plug queue for possible future merging
-+ * * There is an IO scheduler active at this queue
-+ *
-+ * It will not queue the request if there is an error with the bio, or at the
-+ * request creation.
-+ *
-+ * Returns: Request queue cookie.
-+ */
- static blk_qc_t blk_mq_make_request(struct request_queue *q, struct bio *bio)
- {
- 	const int is_sync = op_is_sync(bio->bi_opf);
-@@ -1956,7 +2031,7 @@ static blk_qc_t blk_mq_make_request(struct request_queue *q, struct bio *bio)
- 
- 	plug = blk_mq_plug(q, bio);
- 	if (unlikely(is_flush_fua)) {
--		/* bypass scheduler for flush rq */
-+		/* Bypass scheduler for flush requests */
- 		blk_insert_flush(rq);
- 		blk_mq_run_hw_queue(data.hctx, true);
- 	} else if (plug && (q->nr_hw_queues == 1 || q->mq_ops->commit_rqs ||
-@@ -1984,6 +2059,7 @@ static blk_qc_t blk_mq_make_request(struct request_queue *q, struct bio *bio)
- 
- 		blk_add_rq_to_plug(plug, rq);
- 	} else if (q->elevator) {
-+		/* Insert the request at the IO scheduler queue */
- 		blk_mq_sched_insert_request(rq, false, true, true);
- 	} else if (plug && !blk_queue_nomerges(q)) {
- 		/*
-@@ -2010,8 +2086,13 @@ static blk_qc_t blk_mq_make_request(struct request_queue *q, struct bio *bio)
- 		}
- 	} else if ((q->nr_hw_queues > 1 && is_sync) ||
- 			!data.hctx->dispatch_busy) {
-+		/*
-+		 * There is no scheduler and we can try to send directly
-+		 * to the hardware.
-+		 */
- 		blk_mq_try_issue_directly(data.hctx, rq, &cookie);
- 	} else {
-+		/* Default case. */
- 		blk_mq_sched_insert_request(rq, false, true, true);
- 	}
- 
--- 
-2.23.0
+Anyway, some of those call sites will disappear. Although I'd expect a 
+few to remain, because I doubt the simpler GPUs can support page faulting.
 
+
+
+thanks,
+
+John Hubbard
+NVIDIA
