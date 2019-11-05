@@ -2,99 +2,117 @@ Return-Path: <SRS0=uUnX=Y5=vger.kernel.org=linux-block-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-2.4 required=3.0 tests=DKIM_SIGNED,DKIM_VALID,
-	DKIM_VALID_AU,HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SPF_HELO_NONE,
-	SPF_PASS,USER_AGENT_SANE_1 autolearn=no autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-2.6 required=3.0 tests=DKIMWL_WL_HIGH,DKIM_SIGNED,
+	DKIM_VALID,DKIM_VALID_AU,MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,
+	USER_AGENT_SANE_1 autolearn=no autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id D28A7CA9ED3
-	for <linux-block@archiver.kernel.org>; Tue,  5 Nov 2019 00:44:26 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 344B7CA9ED3
+	for <linux-block@archiver.kernel.org>; Tue,  5 Nov 2019 01:03:19 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.kernel.org (Postfix) with ESMTP id A5B6B2080F
-	for <linux-block@archiver.kernel.org>; Tue,  5 Nov 2019 00:44:26 +0000 (UTC)
-Authentication-Results: mail.kernel.org;
-	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="GVfnB1Kw"
+	by mail.kernel.org (Postfix) with ESMTP id 075EB20848
+	for <linux-block@archiver.kernel.org>; Tue,  5 Nov 2019 01:03:19 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+	s=default; t=1572915799;
+	bh=4Jmct+axA8jAkXluFcFQI+uLkQTpqnvf/DA6hb5ReCI=;
+	h=Date:From:To:Cc:Subject:References:In-Reply-To:List-ID:From;
+	b=yw5PVMI9IsEARahMh9c/yPUilMso7iVxu1G8jRQodb7wR0PTtDknF+lOWeL7DWhU2
+	 S5rOCf8TbCJru0afGzynsqA8lT7tQmbCIaJWJLw5synR7M6eBesy9I69a715wS9Twq
+	 nMfq9T1Yiljlt1yDGt/X6+jdsSuMJ8EsIb8Vlemo=
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1729739AbfKEAo0 (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Mon, 4 Nov 2019 19:44:26 -0500
-Received: from us-smtp-1.mimecast.com ([205.139.110.61]:60982 "EHLO
-        us-smtp-delivery-1.mimecast.com" rhost-flags-OK-OK-OK-FAIL)
-        by vger.kernel.org with ESMTP id S1729737AbfKEAo0 (ORCPT
-        <rfc822;linux-block@vger.kernel.org>);
-        Mon, 4 Nov 2019 19:44:26 -0500
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-        s=mimecast20190719; t=1572914664;
-        h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-         to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-         content-transfer-encoding:content-transfer-encoding:
-         in-reply-to:in-reply-to:references:references;
-        bh=yQozK6kPmp1GKGc6BgECaeXe8YlQmJidrw/YnronthU=;
-        b=GVfnB1KwjgqWKfEY+C9QCPItJxeiTluZugiPcMUBTHgTE9kceAz2YhTUJGr9LcHi/z4n/5
-        jQLKaco+aIJlEAJdvgeDqnloGj/VGaB+AJ4M+91beeklaevYUvnt6LAXl+s9XJFGFVxKKO
-        7gua5ZeHocoZRZIFH8oNYlq+IbsG24Y=
-Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
- [209.132.183.4]) (Using TLS) by relay.mimecast.com with ESMTP id
- us-mta-370-tBIldPGvPNCTXREjnZ7Eow-1; Mon, 04 Nov 2019 19:44:16 -0500
-Received: from smtp.corp.redhat.com (int-mx03.intmail.prod.int.phx2.redhat.com [10.5.11.13])
-        (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
+        id S1729526AbfKEBDS (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Mon, 4 Nov 2019 20:03:18 -0500
+Received: from mail.kernel.org ([198.145.29.99]:54846 "EHLO mail.kernel.org"
+        rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
+        id S1728761AbfKEBDS (ORCPT <rfc822;linux-block@vger.kernel.org>);
+        Mon, 4 Nov 2019 20:03:18 -0500
+Received: from sol.localdomain (c-24-5-143-220.hsd1.ca.comcast.net [24.5.143.220])
+        (using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
         (No client certificate requested)
-        by mimecast-mx01.redhat.com (Postfix) with ESMTPS id 86BBE107ACC2;
-        Tue,  5 Nov 2019 00:44:14 +0000 (UTC)
-Received: from ming.t460p (ovpn-8-20.pek2.redhat.com [10.72.8.20])
-        by smtp.corp.redhat.com (Postfix) with ESMTPS id F36FB608A5;
-        Tue,  5 Nov 2019 00:44:07 +0000 (UTC)
-Date:   Tue, 5 Nov 2019 08:44:02 +0800
-From:   Ming Lei <ming.lei@redhat.com>
-To:     Kent Overstreet <kent.overstreet@gmail.com>
-Cc:     Jens Axboe <axboe@kernel.dk>, linux-block@vger.kernel.org,
-        Coly Li <colyli@suse.de>,
-        Christoph Hellwig <hch@infradead.org>,
-        Keith Busch <kbusch@kernel.org>, linux-bcache@vger.kernel.org
-Subject: Re: [PATCH V4] block: optimize for small block size IO
-Message-ID: <20191105004402.GB11436@ming.t460p>
-References: <20191102072911.24817-1-ming.lei@redhat.com>
- <20191104181403.GA8984@kmo-pixel>
+        by mail.kernel.org (Postfix) with ESMTPSA id C60232067D;
+        Tue,  5 Nov 2019 01:03:16 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+        s=default; t=1572915797;
+        bh=4Jmct+axA8jAkXluFcFQI+uLkQTpqnvf/DA6hb5ReCI=;
+        h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
+        b=nnl5cMFG8BKuRG8ENOvinMxVE3HupXrzgoCoDukHlYgCMGI8K0oFkbfYfvj8iwGMZ
+         BzncIGhzlSd8Tq4p78mCz6fMFe+r9sH1z08KjMRUBKDvvQhIRWVYb/8d92xKHoIJYQ
+         zdX4RS+7YST5kTD4rUt+3j18FC1y0Lf5NWHcquyk=
+Date:   Mon, 4 Nov 2019 17:03:15 -0800
+From:   Eric Biggers <ebiggers@kernel.org>
+To:     Christoph Hellwig <hch@infradead.org>
+Cc:     Satya Tangirala <satyat@google.com>, linux-scsi@vger.kernel.org,
+        Kim Boojin <boojin.kim@samsung.com>,
+        Kuohong Wang <kuohong.wang@mediatek.com>,
+        Barani Muthukumaran <bmuthuku@qti.qualcomm.com>,
+        linux-f2fs-devel@lists.sourceforge.net,
+        linux-block@vger.kernel.org, linux-fscrypt@vger.kernel.org,
+        linux-fsdevel@vger.kernel.org
+Subject: Re: [PATCH v5 7/9] fscrypt: add inline encryption support
+Message-ID: <20191105010315.GA692@sol.localdomain>
+Mail-Followup-To: Christoph Hellwig <hch@infradead.org>,
+        Satya Tangirala <satyat@google.com>, linux-scsi@vger.kernel.org,
+        Kim Boojin <boojin.kim@samsung.com>,
+        Kuohong Wang <kuohong.wang@mediatek.com>,
+        Barani Muthukumaran <bmuthuku@qti.qualcomm.com>,
+        linux-f2fs-devel@lists.sourceforge.net, linux-block@vger.kernel.org,
+        linux-fscrypt@vger.kernel.org, linux-fsdevel@vger.kernel.org
+References: <20191028072032.6911-1-satyat@google.com>
+ <20191028072032.6911-8-satyat@google.com>
+ <20191031183217.GF23601@infradead.org>
+ <20191031202125.GA111219@gmail.com>
+ <20191031212103.GA6244@infradead.org>
+ <20191031222500.GB111219@gmail.com>
+ <20191105001554.GA24056@infradead.org>
 MIME-Version: 1.0
-In-Reply-To: <20191104181403.GA8984@kmo-pixel>
-User-Agent: Mutt/1.12.1 (2019-06-15)
-X-Scanned-By: MIMEDefang 2.79 on 10.5.11.13
-X-MC-Unique: tBIldPGvPNCTXREjnZ7Eow-1
-X-Mimecast-Spam-Score: 0
-Content-Type: text/plain; charset=WINDOWS-1252
-Content-Transfer-Encoding: quoted-printable
+Content-Type: text/plain; charset=us-ascii
 Content-Disposition: inline
+In-Reply-To: <20191105001554.GA24056@infradead.org>
+User-Agent: Mutt/1.12.2 (2019-09-21)
 Sender: linux-block-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-On Mon, Nov 04, 2019 at 01:14:03PM -0500, Kent Overstreet wrote:
-> On Sat, Nov 02, 2019 at 03:29:11PM +0800, Ming Lei wrote:
-> > __blk_queue_split() may be a bit heavy for small block size(such as
-> > 512B, or 4KB) IO, so introduce one flag to decide if this bio includes
-> > multiple page. And only consider to try splitting this bio in case
-> > that the multiple page flag is set.
->=20
-> So, back in the day I had an alternative approach in mind: get rid of
-> blk_queue_split entirely, by pushing splitting down to the request layer =
-- when
-> we map the bio/request to sgl, just have it map as much as will fit in th=
-e sgl
-> and if it doesn't entirely fit bump bi_remaining and leave it on the requ=
-est
-> queue.
+On Mon, Nov 04, 2019 at 04:15:54PM -0800, Christoph Hellwig wrote:
+> > I don't think combining these things is a good idea because it would restrict
+> > the use of inline encryption to filesystems that allow IV_INO_LBLK_64 encryption
+> > policies, i.e. filesystems that have stable inode numbers, 32-bit inodes, and
+> > 32-bit file logical block numbers.
+> > 
+> > The on-disk format (i.e. the type of encryption policy chosen) and the
+> > implementation (inline or filesystem-layer crypto) are really two separate
+> > things.  This was one of the changes in v4 => v5 of this patchset; these two
+> > things used to be conflated but now they are separate.  Now you can use inline
+> > encryption with the existing fscrypt policies too.
+> > 
+> > We could use two separate SB_* flags, like SB_INLINE_CRYPT and
+> > SB_IV_INO_LBLK_64_SUPPORT.
+> 
+> Yes, I think that is a good idea.
+> 
+> > However, the ->has_stable_inodes() and
+> > ->get_ino_and_lblk_bits() methods are nice because they separate the filesystem
+> > properties from the question of "is this encryption policy supported".
+> > Declaring the filesystem properties is easier to do because it doesn't require
+> > any fscrypt-specific knowledge.  Also, fs/crypto/ could use these properties in
+> > different ways in the future, e.g. if another IV generation scheme is added.
+> 
+> I don't really like writing up method boilerplates for something that
+> is a simple boolean flag.
 
-Many drivers don't need sgl via blk_rq_map_sg(), but still need to split bi=
-o.
+fs/crypto/ uses ->has_stable_inodes() and ->get_ino_and_lblk_bits() to print an
+appropriate error message.  If we changed it to a simple flag we'd have to print
+a less useful error message.  Also, people are basically guaranteed to not
+understand what "SB_IV_INO_LBLK_64_SUPPORT" means exactly, and are likely to
+copy-and-paste it incorrectly when adding fscrypt support to a new filesystem.
+Also it would make it more difficult to add other fscrypt IV generation schemes
+in the future as we'd then need to add another sb flag (e.g. SB_IV_INO_LBLK_128)
+and make filesystem-specific changes, rather than change fs/crypto/ only.
 
->=20
-> This would mean there'd be no need for counting segments at all, and woul=
-d cut a
-> fair amount of code out of the io path.
+So personally I'd prefer to keep ->has_stable_inodes() and
+->get_ino_and_lblk_bits() for now.
 
-No counting segments involved in this small block size case, the handling
-in blk_bio_segment_split() should be simple enough, still not understand
-why IOPS drop is observable.
+Replacing ->inline_crypt_enabled() with SB_INLINE_CRYPT makes much more sense
+though.
 
-Thanks,
-Ming
-
+- Eric
