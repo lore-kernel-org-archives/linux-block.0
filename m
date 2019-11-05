@@ -2,93 +2,110 @@ Return-Path: <SRS0=uUnX=Y5=vger.kernel.org=linux-block-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-2.0 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
-	HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,
-	USER_AGENT_SANE_1 autolearn=no autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-0.8 required=3.0 tests=DKIM_SIGNED,DKIM_VALID,
+	DKIM_VALID_AU,HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SPF_HELO_NONE,
+	SPF_PASS autolearn=no autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id A58BEC5DF63
-	for <linux-block@archiver.kernel.org>; Tue,  5 Nov 2019 15:40:00 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id B11A5C5DF61
+	for <linux-block@archiver.kernel.org>; Tue,  5 Nov 2019 16:03:11 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.kernel.org (Postfix) with ESMTP id 7C9AB21929
-	for <linux-block@archiver.kernel.org>; Tue,  5 Nov 2019 15:40:00 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id 87AA721A4A
+	for <linux-block@archiver.kernel.org>; Tue,  5 Nov 2019 16:03:11 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (2048-bit key) header.d=infradead.org header.i=@infradead.org header.b="Ocp9xiaK"
+	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="DAxnbXOe"
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1731074AbfKEPj7 (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Tue, 5 Nov 2019 10:39:59 -0500
-Received: from bombadil.infradead.org ([198.137.202.133]:48538 "EHLO
-        bombadil.infradead.org" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1727889AbfKEPj6 (ORCPT
-        <rfc822;linux-block@vger.kernel.org>); Tue, 5 Nov 2019 10:39:58 -0500
-DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed;
-        d=infradead.org; s=bombadil.20170209; h=In-Reply-To:Content-Type:MIME-Version
-        :References:Message-ID:Subject:To:From:Date:Sender:Reply-To:Cc:
-        Content-Transfer-Encoding:Content-ID:Content-Description:Resent-Date:
-        Resent-From:Resent-Sender:Resent-To:Resent-Cc:Resent-Message-ID:List-Id:
-        List-Help:List-Unsubscribe:List-Subscribe:List-Post:List-Owner:List-Archive;
-         bh=XQdcZ/rCMxPfhUJE8nbWkRrJsdxA+Vm56qg50/+E1Cw=; b=Ocp9xiaKzYOCoNB+oT3sxZPTQ
-        GZZmpeZz1Pkbx3hL5igN2A9nnxgJeh5ZX0h0RFq6u88ua22HGxw6tlKR923/wrmQM4d9cJFXkqmXz
-        7p6KUsYbiy3UTrhyHmOUjEl4g1vqoBwf3i4ju5z28ZkYAEfqGXc4DjckNzm91NOiLwHOAtuFuuhfP
-        /u+IK73URb7cxkeIV7/gM5hFZ3aGu6h+2cn2G7ik8OqisFdebxIl9EiPUqch0yc5uCTcNG4K9OCbX
-        VW4f/V+e6xpqbfC64GJBGkXaIedjYx1UzWAGjYoerE2gtLIaBhKqYngoD0iVUT+cjBXJ4SKNeqg0x
-        wuaWM8E5g==;
-Received: from hch by bombadil.infradead.org with local (Exim 4.92.3 #3 (Red Hat Linux))
-        id 1iS0w1-0000HC-RP; Tue, 05 Nov 2019 15:39:57 +0000
-Date:   Tue, 5 Nov 2019 07:39:57 -0800
-From:   Christoph Hellwig <hch@infradead.org>
-To:     Christoph Hellwig <hch@infradead.org>,
-        "Theodore Y. Ts'o" <tytso@mit.edu>, linux-block@vger.kernel.org,
-        linux-scsi@vger.kernel.org, Kim Boojin <boojin.kim@samsung.com>,
-        Kuohong Wang <kuohong.wang@mediatek.com>,
-        Barani Muthukumaran <bmuthuku@qti.qualcomm.com>,
-        Satya Tangirala <satyat@google.com>,
-        linux-fscrypt@vger.kernel.org, linux-fsdevel@vger.kernel.org,
-        linux-f2fs-devel@lists.sourceforge.net
-Subject: Re: [PATCH v5 3/9] block: blk-crypto for Inline Encryption
-Message-ID: <20191105153957.GA29320@infradead.org>
-References: <20191028072032.6911-1-satyat@google.com>
- <20191028072032.6911-4-satyat@google.com>
- <20191031175713.GA23601@infradead.org>
- <20191031205045.GG16197@mit.edu>
- <20191031212234.GA32262@infradead.org>
- <20191105015411.GB692@sol.localdomain>
+        id S2390001AbfKEQDK (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Tue, 5 Nov 2019 11:03:10 -0500
+Received: from us-smtp-1.mimecast.com ([205.139.110.61]:23341 "EHLO
+        us-smtp-delivery-1.mimecast.com" rhost-flags-OK-OK-OK-FAIL)
+        by vger.kernel.org with ESMTP id S2389966AbfKEQDJ (ORCPT
+        <rfc822;linux-block@vger.kernel.org>);
+        Tue, 5 Nov 2019 11:03:09 -0500
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+        s=mimecast20190719; t=1572969788;
+        h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+         to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+         content-transfer-encoding:content-transfer-encoding:
+         in-reply-to:in-reply-to:references:references;
+        bh=pLj9LlV805f/L7J5FbyPXxXB07oTibsiCCSGb45ogQg=;
+        b=DAxnbXOel7GR/PEe2t6Mrv+03Xuzy/G2FGswsUfLa3WuDKMrcLU58JE3w5zv0Q9mvuNpPY
+        I1VMJVfrzlKq4LH4UyFmZKsbkrhlnt52r9X2+0oUwwfFrHC4TmVAq484vO9YuFSB3J2CDA
+        meGCgBaj17ZWJu0UuOPTyX1me2I6xBY=
+Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
+ [209.132.183.4]) (Using TLS) by relay.mimecast.com with ESMTP id
+ us-mta-350-9SUU8LceOXeOLaVGd4SGTA-1; Tue, 05 Nov 2019 11:03:06 -0500
+Received: from smtp.corp.redhat.com (int-mx08.intmail.prod.int.phx2.redhat.com [10.5.11.23])
+        (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
+        (No client certificate requested)
+        by mimecast-mx01.redhat.com (Postfix) with ESMTPS id B43698017DD;
+        Tue,  5 Nov 2019 16:03:03 +0000 (UTC)
+Received: from warthog.procyon.org.uk (ovpn-120-254.rdu2.redhat.com [10.10.120.254])
+        by smtp.corp.redhat.com (Postfix) with ESMTP id 980C81FA;
+        Tue,  5 Nov 2019 16:03:00 +0000 (UTC)
+Organization: Red Hat UK Ltd. Registered Address: Red Hat UK Ltd, Amberley
+        Place, 107-111 Peascod Street, Windsor, Berkshire, SI4 1TE, United
+        Kingdom.
+        Registered in England and Wales under Company Registration No. 3798903
+From:   David Howells <dhowells@redhat.com>
+In-Reply-To: <157262963995.13142.5568934007158044624.stgit@warthog.procyon.org.uk>
+References: <157262963995.13142.5568934007158044624.stgit@warthog.procyon.org.uk>
+To:     torvalds@linux-foundation.org, viro@zeniv.linux.org.uk
+Cc:     dhowells@redhat.com, Rasmus Villemoes <linux@rasmusvillemoes.dk>,
+        Greg Kroah-Hartman <gregkh@linuxfoundation.org>,
+        Peter Zijlstra <peterz@infradead.org>,
+        nicolas.dichtel@6wind.com, raven@themaw.net,
+        Christian Brauner <christian@brauner.io>,
+        keyrings@vger.kernel.org, linux-usb@vger.kernel.org,
+        linux-block@vger.kernel.org, linux-security-module@vger.kernel.org,
+        linux-fsdevel@vger.kernel.org, linux-api@vger.kernel.org,
+        linux-kernel@vger.kernel.org
+Subject: Details on the UAPI of implementing notifications on pipes
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <20191105015411.GB692@sol.localdomain>
-User-Agent: Mutt/1.12.1 (2019-06-15)
-X-SRS-Rewrite: SMTP reverse-path rewritten from <hch@infradead.org> by bombadil.infradead.org. See http://www.infradead.org/rpr.html
+Content-ID: <18579.1572969779.1@warthog.procyon.org.uk>
+Date:   Tue, 05 Nov 2019 16:02:59 +0000
+Message-ID: <18580.1572969779@warthog.procyon.org.uk>
+X-Scanned-By: MIMEDefang 2.84 on 10.5.11.23
+X-MC-Unique: 9SUU8LceOXeOLaVGd4SGTA-1
+X-Mimecast-Spam-Score: 0
+Content-Type: text/plain; charset=WINDOWS-1252
+Content-Transfer-Encoding: quoted-printable
 Sender: linux-block-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-On Mon, Nov 04, 2019 at 06:01:17PM -0800, Eric Biggers wrote:
-> I think that "Severely bloating the per-I/O data structure" is an exaggeration,
-> since that it's only 32 bytes, and it isn't in struct bio directly but rather in
-> struct bio_crypt_ctx...
+So to implement notifications on top of pipes, I've hacked it together a bi=
+t
+in the following ways:
 
-Yes, and none of that is needed for the real inline crypto.  And I think
-we can further reduce the overhead of bio_crypt_ctx once we have the
-basiscs sorted out.  If we want to gain more traction we need to reduce
-the I/O to a minimum.
+ (1) I'm passing O_TMPFILE to the pipe2() system call to indicate that you
+     want a notifications pipe.  This prohibits splice and co. from being
+     called on it as I don't want to have to try to fix iov_iter_revert() t=
+o
+     handle kernel notifications being intermixed with splices.
 
-> In any case, Satya, it might be a good idea to reorganize this patchset so that
-> it first adds all logic that's needed for "real" inline encryption support
-> (including the needed parts of blk-crypto.c), then adds the crypto API fallback
-> as a separate patch.  That would separate the concerns more cleanly and make the
-> patchset easier to review, and make it easier to make the fallback
-> de-configurable or even remove it entirely if that turns out to be needed.
+     The choice of O_TMPFILE was just for convenience, but it needs to be
+     something different.  I could, for instance, add a constant,
+     O_NOTIFICATION_PIPE with the same *value* as O_TMPFILE.  I don't think
+     it's likely that it will make sense to use O_TMPFILE with a pipe, but =
+I
+     also don't want to eat up another O_* constant just for this.
 
-Yes, that is a good idea.  Not just in terms of patch, but also in terms
-of code organization.  The current structure is pretty weird with 3
-files that are mostly tighly integrated, except that one also has the
-software implementations.  So what I think we need at a minimum is:
+     Unfortunately, pipe2() doesn't have any other arguments into from whic=
+h I
+     can steal a bit.
 
- - reoranizize that we have say block/blk-crypt.c for all the inline
-   crypto infrastructure, and block/blk-crypy-sw.c for the actual
-   software crypto implementation.
- - remove all the fields only needed for software crypto from
-   bio_crypt_ctx, and instead clone the bio into a bioset with the
-   additional fields only when we use the software implementation, so
-   that there is no overhead for the hardware path.
+ (2) I've added a pair of ioctls to configure the notifications bits.  They=
+'re
+     ioctls as I just reused the ioctl code from my devmisc driver.  Should=
+ I
+     use fcntl() instead, such as is done for F_SETPIPE_SZ?
+
+     The ioctls do two things: set the ring size to a number of slots (so
+     similarish to F_SETPIPE_SZ) and set filters.
+
+Any thoughts on how better to represent these bits?
+
+Thanks,
+David
+
