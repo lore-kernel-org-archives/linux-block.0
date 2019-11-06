@@ -2,118 +2,88 @@ Return-Path: <SRS0=NI9l=Y6=vger.kernel.org=linux-block-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-2.2 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
-	MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,USER_AGENT_SANE_1 autolearn=no
-	autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-0.8 required=3.0 tests=DKIM_SIGNED,DKIM_VALID,
+	DKIM_VALID_AU,HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SPF_HELO_NONE,
+	SPF_PASS,URIBL_BLOCKED autolearn=no autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id B1577C5DF62
-	for <linux-block@archiver.kernel.org>; Wed,  6 Nov 2019 12:01:05 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 6E2A0C5DF62
+	for <linux-block@archiver.kernel.org>; Wed,  6 Nov 2019 12:55:27 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.kernel.org (Postfix) with ESMTP id 8605C217F4
-	for <linux-block@archiver.kernel.org>; Wed,  6 Nov 2019 12:01:05 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id 32A5C21848
+	for <linux-block@archiver.kernel.org>; Wed,  6 Nov 2019 12:55:27 +0000 (UTC)
+Authentication-Results: mail.kernel.org;
+	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="OQAVOZAM"
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1729671AbfKFMBF (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Wed, 6 Nov 2019 07:01:05 -0500
-Received: from szxga06-in.huawei.com ([45.249.212.32]:48964 "EHLO huawei.com"
-        rhost-flags-OK-OK-OK-FAIL) by vger.kernel.org with ESMTP
-        id S1729659AbfKFMBE (ORCPT <rfc822;linux-block@vger.kernel.org>);
-        Wed, 6 Nov 2019 07:01:04 -0500
-Received: from DGGEMS413-HUB.china.huawei.com (unknown [172.30.72.58])
-        by Forcepoint Email with ESMTP id 4D3B354F2F99509B1C5B;
-        Wed,  6 Nov 2019 20:01:03 +0800 (CST)
-Received: from [127.0.0.1] (10.133.210.141) by DGGEMS413-HUB.china.huawei.com
- (10.3.19.213) with Microsoft SMTP Server id 14.3.439.0; Wed, 6 Nov 2019
- 20:00:56 +0800
-Subject: Re: [RFC] io_uring: stop only support read/write for ctx with
- IORING_SETUP_IOPOLL
-To:     Jens Axboe <axboe@kernel.dk>, Bob Liu <bob.liu@oracle.com>,
-        <linux-block@vger.kernel.org>
-CC:     <houtao1@huawei.com>, <yi.zhang@huawei.com>
-References: <20191104085608.44816-1-yangerkun@huawei.com>
- <a01cc299-69e7-daa2-6894-1c60aaa64e67@oracle.com>
- <3fd0dee1-52d6-4ea8-53d8-2c88b7fedce6@huawei.com>
- <50de6a43-fc11-aada-40e6-f3fee6523d49@kernel.dk>
-From:   yangerkun <yangerkun@huawei.com>
-Message-ID: <aedaf337-ab16-b16e-fe49-d2511fb5f5ea@huawei.com>
-Date:   Wed, 6 Nov 2019 20:00:55 +0800
-User-Agent: Mozilla/5.0 (Windows NT 10.0; WOW64; rv:60.0) Gecko/20100101
- Thunderbird/60.7.0
+        id S1728371AbfKFMz0 (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Wed, 6 Nov 2019 07:55:26 -0500
+Received: from us-smtp-1.mimecast.com ([205.139.110.61]:44273 "EHLO
+        us-smtp-delivery-1.mimecast.com" rhost-flags-OK-OK-OK-FAIL)
+        by vger.kernel.org with ESMTP id S1728140AbfKFMz0 (ORCPT
+        <rfc822;linux-block@vger.kernel.org>);
+        Wed, 6 Nov 2019 07:55:26 -0500
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+        s=mimecast20190719; t=1573044925;
+        h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+         to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+         content-transfer-encoding:content-transfer-encoding:
+         in-reply-to:in-reply-to:references:references;
+        bh=8PJdBWwQBLSLtcUQy+9zKMbCYQP7SYoOr1q4q0d5OCc=;
+        b=OQAVOZAM+OO8r+vJUnSQbMMOrRqX6G+HIF5shhWP9oOAyWBClsdSq1Rf0SAfUCU+AJoN6H
+        6hPrLpcFCbi1a8bQU3YdCkfg8O4yvy9ziXPsp/vDRZF0m8SBwU9/J/a+xN6ug1wS9Iot08
+        nqap/jEDN89VqqJBif967P5ichZG8zk=
+Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
+ [209.132.183.4]) (Using TLS) by relay.mimecast.com with ESMTP id
+ us-mta-118-sl0KgZnxNLW9IYq1JSM7Xg-1; Wed, 06 Nov 2019 07:55:23 -0500
+Received: from smtp.corp.redhat.com (int-mx07.intmail.prod.int.phx2.redhat.com [10.5.11.22])
+        (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
+        (No client certificate requested)
+        by mimecast-mx01.redhat.com (Postfix) with ESMTPS id 995FC107ACC3;
+        Wed,  6 Nov 2019 12:55:22 +0000 (UTC)
+Received: from segfault.boston.devel.redhat.com (unknown [10.19.60.26])
+        by smtp.corp.redhat.com (Postfix) with ESMTPS id 013D71001B35;
+        Wed,  6 Nov 2019 12:55:21 +0000 (UTC)
+From:   Jeff Moyer <jmoyer@redhat.com>
+To:     Jan Kara <jack@suse.cz>
+Cc:     linux-block@vger.kernel.org, mgorman@suse.de, hare@suse.de,
+        Jens Axboe <axboe@kernel.dk>
+Subject: Re: elevator= kernel argument for recent kernels
+References: <20191106105340.GE16085@quack2.suse.cz>
+X-PGP-KeyID: 1F78E1B4
+X-PGP-CertKey: F6FE 280D 8293 F72C 65FD  5A58 1FF8 A7CA 1F78 E1B4
+Date:   Wed, 06 Nov 2019 07:55:20 -0500
+In-Reply-To: <20191106105340.GE16085@quack2.suse.cz> (Jan Kara's message of
+        "Wed, 6 Nov 2019 11:53:40 +0100")
+Message-ID: <x49h83hnozr.fsf@segfault.boston.devel.redhat.com>
+User-Agent: Gnus/5.13 (Gnus v5.13) Emacs/26.1 (gnu/linux)
 MIME-Version: 1.0
-In-Reply-To: <50de6a43-fc11-aada-40e6-f3fee6523d49@kernel.dk>
-Content-Type: text/plain; charset="utf-8"; format=flowed
-Content-Language: en-US
-Content-Transfer-Encoding: 7bit
-X-Originating-IP: [10.133.210.141]
-X-CFilter-Loop: Reflected
+X-Scanned-By: MIMEDefang 2.84 on 10.5.11.22
+X-MC-Unique: sl0KgZnxNLW9IYq1JSM7Xg-1
+X-Mimecast-Spam-Score: 0
+Content-Type: text/plain; charset=WINDOWS-1252
+Content-Transfer-Encoding: quoted-printable
 Sender: linux-block-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
+Jan Kara <jack@suse.cz> writes:
 
+> Hello,
+>
+> with transition to blk-mq, the elevator=3D kernel argument was removed. I
+> understand the reasons for its removal but still I think this may come as=
+ a
+> surprise to some users since that argument has been there for ages and
+> although distributions generally transition to setting appropriate elevat=
+or
+> by udev rules, there are still people that use that argument with older
+> kernels and there are quite a few advices on the Internet to use it. So
+> shouldn't we at least warn loudly if someone uses elevator=3D argument on
+> kernels that don't support it and redirect people to sysfs? Something lik=
+e
+> the attached patch? What do people think?
 
-On 2019/11/4 22:01, Jens Axboe wrote:
-> On 11/4/19 4:46 AM, yangerkun wrote:
->>
->>
->> On 2019/11/4 18:09, Bob Liu wrote:
->>> On 11/4/19 4:56 PM, yangerkun wrote:
->>>> There is no problem to support other type request for the ctx with
->>>> IORING_SETUP_IOPOLL.
->>>
->>> Could you describe the benefit of doing this?
->>
->> Hi,
->>
->> I am trying to replace libaio with io_uring in InnoDB/MariaDB(which
->> build on xfs/nvme). And in order to simulate the timeout mechanism
->> like io_getevents, firstly, to use the poll function of io_uring's fd
->> has been selected and it really did work. But while trying to enable
->> IORING_SETUP_IOPOLL since xfs has iopoll function interface, the
->> mechanism will fail since io_uring_poll does check the cq.head between
->> cached_cq_tail, which will not update until we call io_uring_enter and
->> do the poll. So, instead, I decide to use timeout requests in
->> io_uring but will return -EINVAL since we enable IORING_SETUP_IOPOLL
->> at the same time. I think this combination is a normal scene so as
->> the other combination descibed in this patch. I am not sure does it a
->> good solution for this problem, and maybe there exists some better way.
-> 
-> I think we can support timeouts pretty easily with SETUP_IOPOLL, but we
-> can't mix and match everything. Pretty sure I've written at length about
-> that before, but the tldr is that for purely polled commands, we won't
-> have an IRQ event. That's the case for nvme if it's misconfigured, but
-> for an optimal setup where nvme is loaded with poll queues, there will
-> never be an interrupt for the command. This means that we can never wait
-> in io_cqring_wait(), we must always call the iopoll poller, because if
-> we wait we might very well be waiting for events that will never happen
-> unless we actively poll for them.
-> 
-> This could be supported if we accounted requests, but I don't want to
-> add that kind of overhead. Same with the lock+irqdisable you had to add
-> for this, it's not acceptable overhead.
-> 
-> Sounds like you just need timeout support for polling? If so, then that
+That's fine with me.
 
-Hi,
-
-Yeah, the thing I need add is the timeout support for polling.
-
-> is supportable as we know that these events will trigger an async event
-> when they happen. Either that, or it triggers when we poll for
-> completions. So it's safe to support, and we can definitely do that.
-
-I am a little confuse. What you describe is once enable SETUP_IOPOLL
-and there is a async call of io_timeout_fn, we should not call
-io_cqring_fill_event directly, but leave io_iopoll_check to do this?
-Or, the parallel running for io_iopoll_check may trigger some problem
-since they can going to io_cqring_fill_event.
-
-Thanks,
-Kun.
-
-> 
-> But don't mix polled IO with "normal" IO, it just won't work without
-> extra additions that I'm not willing to pay the cost of.
-> 
-> 
+Reviewed-by: Jeff Moyer <jmoyer@redhat.com>
 
