@@ -2,211 +2,319 @@ Return-Path: <SRS0=NI9l=Y6=vger.kernel.org=linux-block-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-9.5 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
-	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,
-	SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED,USER_AGENT_GIT autolearn=ham
-	autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-5.2 required=3.0 tests=DKIM_SIGNED,DKIM_VALID,
+	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,SPF_HELO_NONE,
+	SPF_PASS,USER_AGENT_SANE_1 autolearn=unavailable autolearn_force=no
+	version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 8B1ECC5DF63
-	for <linux-block@archiver.kernel.org>; Wed,  6 Nov 2019 15:14:54 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id CDE43C5DF65
+	for <linux-block@archiver.kernel.org>; Wed,  6 Nov 2019 16:22:04 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.kernel.org (Postfix) with ESMTP id 5FC1B217F5
-	for <linux-block@archiver.kernel.org>; Wed,  6 Nov 2019 15:14:54 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id A2EBD217F5
+	for <linux-block@archiver.kernel.org>; Wed,  6 Nov 2019 16:22:04 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (2048-bit key) header.d=infradead.org header.i=@infradead.org header.b="jOL2gRUM"
+	dkim=pass (2048-bit key) header.d=kernel-dk.20150623.gappssmtp.com header.i=@kernel-dk.20150623.gappssmtp.com header.b="Kde3RP9E"
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1731937AbfKFPOy (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Wed, 6 Nov 2019 10:14:54 -0500
-Received: from bombadil.infradead.org ([198.137.202.133]:60404 "EHLO
-        bombadil.infradead.org" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1731914AbfKFPOx (ORCPT
-        <rfc822;linux-block@vger.kernel.org>); Wed, 6 Nov 2019 10:14:53 -0500
-DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed;
-        d=infradead.org; s=bombadil.20170209; h=Content-Transfer-Encoding:
-        MIME-Version:References:In-Reply-To:Message-Id:Date:Subject:Cc:To:From:Sender
-        :Reply-To:Content-Type:Content-ID:Content-Description:Resent-Date:Resent-From
-        :Resent-Sender:Resent-To:Resent-Cc:Resent-Message-ID:List-Id:List-Help:
-        List-Unsubscribe:List-Subscribe:List-Post:List-Owner:List-Archive;
-        bh=/qZbo+ooYaazNGEUJTCw6EJUXj6b0NCilyX5lzIwB7Y=; b=jOL2gRUM+Et01wHsFbKsYLg4rg
-        cHjnrgFL5dDprg1Nlwu3E5vfBZmBnQQy4KOiY/eT+kex7nCDFJSMYo7pC517+CPK1yFCgqbJxrrMG
-        9E2KQBXLZbVFPahRdublPOEU2RQ6KS3aLcoXBtzxdJzqxkJDEc+E9rF8he+uljLVkuAthL1GPbRL6
-        ImMKl8uKRkzgIvMQCL6xiRD3fSUdXWbtupX7uMJZMl2aJT6HPArobCTjVh+/5zMd3O1MhlrgZRjlf
-        ifPToMwdtjmdSfZffQR11OFc1LMOaFttn2kDxY0hgz+rLyAOMi0XOAPz/n+nqtoTlLpqFs89/dGNt
-        +jMmeeMQ==;
-Received: from [88.128.80.117] (helo=localhost)
-        by bombadil.infradead.org with esmtpsa (Exim 4.92.3 #3 (Red Hat Linux))
-        id 1iSN1I-0005G3-GN; Wed, 06 Nov 2019 15:14:52 +0000
-From:   Christoph Hellwig <hch@lst.de>
-To:     Jens Axboe <axboe@kernel.dk>, Jan Kara <jack@suse.cz>
-Cc:     linux-block@vger.kernel.org, linux-s390@vger.kernel.org
-Subject: [PATCH 5/5] block: remove (__)blkdev_reread_part as an exported API
-Date:   Wed,  6 Nov 2019 16:14:39 +0100
-Message-Id: <20191106151439.30056-6-hch@lst.de>
-X-Mailer: git-send-email 2.20.1
-In-Reply-To: <20191106151439.30056-1-hch@lst.de>
-References: <20191106151439.30056-1-hch@lst.de>
+        id S1728462AbfKFQWD (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Wed, 6 Nov 2019 11:22:03 -0500
+Received: from mail-il1-f195.google.com ([209.85.166.195]:38597 "EHLO
+        mail-il1-f195.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S1732214AbfKFQWC (ORCPT
+        <rfc822;linux-block@vger.kernel.org>); Wed, 6 Nov 2019 11:22:02 -0500
+Received: by mail-il1-f195.google.com with SMTP id y5so22317237ilb.5
+        for <linux-block@vger.kernel.org>; Wed, 06 Nov 2019 08:22:00 -0800 (PST)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=kernel-dk.20150623.gappssmtp.com; s=20150623;
+        h=to:from:subject:message-id:date:user-agent:mime-version
+         :content-language:content-transfer-encoding;
+        bh=I7oCtuvQ+huXOioWiibHe04+fosNs1b1RQFbFch5Qho=;
+        b=Kde3RP9EtO47isbDDqIw/t0RG+RO5j3mCcMK2G81YFMIAqfMRxSFBPNJUmVhigoB2T
+         +0loJnip0UMVnvxvkypFLcppOjGQChHkr75p8otM4cvQ1/2sERqs9lZTIweQgNZIMajx
+         CklZ2M3W/jWMOKtYbeiuLhQo5qOYrJuUaoWdfqlktpgs0lfvAKRt2JhV2sBjM6tdLhxF
+         BqXLj8elmby2VH9U8ZyOOnumge7N20ycAzix/JHKj9zMO3B+wj/dHNojMum8/q6oXbs6
+         VgqR1zddL73jGImhMAJEqF0tTRlrqjaGQHu8CdxpTHJ3sOZDxrcJSSwYWquli3ULaz7n
+         alvg==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20161025;
+        h=x-gm-message-state:to:from:subject:message-id:date:user-agent
+         :mime-version:content-language:content-transfer-encoding;
+        bh=I7oCtuvQ+huXOioWiibHe04+fosNs1b1RQFbFch5Qho=;
+        b=ogNxlLx+/L4FBRPbhK9cNErqJReiPgqAaDCDeEHYzPlz6oER+QihnY4XEy/AgfUWMr
+         DnDd8j95D7NvEygY/7LzuxSCC6exNvZATpqFLQvz1ITV9IOrzB2X9DyExNnEQ0XYTWZs
+         xMqeuKbHIHIMuH4NhRKvo12afpiF/3EzD/JudyflsRkydRLFXUMT3LHJPginr2w/2k6i
+         hbDeeLMsYKEAydOcyf+waHsQrWMtfSm/C8W1bEknxqMa2rvZAHXbrCtV++qwdhCl6g6O
+         G6QK6pcdy5gGixY1t0ucDGASQSjLRPRWgabMflJegh9VbVuLniboHk8x8Ep5HxD/X5Jh
+         EHyg==
+X-Gm-Message-State: APjAAAWdRfyp29GZh0X4pbnwfnASz88kitb+vIPhEtJ+XTxoMDgGxQju
+        HLbrQUvxZf+adIMtNyfrpNjjK3VOXGo=
+X-Google-Smtp-Source: APXvYqw96Ih7tq2xCUfiye1nG3ubI3uVsVTlNNyxqNSUyNxv6Y0xTA59+iiZhGRrenI8WD5xVVv+3g==
+X-Received: by 2002:a05:6e02:c29:: with SMTP id q9mr3510873ilg.7.1573057319220;
+        Wed, 06 Nov 2019 08:21:59 -0800 (PST)
+Received: from [192.168.1.159] ([65.144.74.34])
+        by smtp.gmail.com with ESMTPSA id h6sm1861263ilr.7.2019.11.06.08.21.58
+        (version=TLS1_2 cipher=ECDHE-RSA-AES128-GCM-SHA256 bits=128/128);
+        Wed, 06 Nov 2019 08:21:58 -0800 (PST)
+To:     io-uring@vger.kernel.org,
+        "linux-block@vger.kernel.org" <linux-block@vger.kernel.org>
+From:   Jens Axboe <axboe@kernel.dk>
+Subject: [RFC] io_uring CQ ring backpressure
+Message-ID: <37d8ba3d-27c7-7636-0343-23ec56e4bee7@kernel.dk>
+Date:   Wed, 6 Nov 2019 09:21:57 -0700
+User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:60.0) Gecko/20100101
+ Thunderbird/60.9.0
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
-X-SRS-Rewrite: SMTP reverse-path rewritten from <hch@infradead.org> by bombadil.infradead.org. See http://www.infradead.org/rpr.html
+Content-Type: text/plain; charset=utf-8
+Content-Language: en-US
+Content-Transfer-Encoding: 7bit
 Sender: linux-block-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-In general drivers should never mess with partition tables directly.
-Unfortunately s390 and loop do for somewhat historic reasons, but they
-can use bdev_disk_changed directly instead when we export it as they
-satisfy the sanity checks we have in __blkdev_reread_part.
+Currently we drop completion events, if the CQ ring is full. That's fine
+for requests with bounded completion times, but it may make it harder to
+use io_uring with networked IO where request completion times are
+generally unbounded. Or with POLL, for example, which is also unbounded.
 
-Signed-off-by: Christoph Hellwig <hch@lst.de>
+This patch adds IORING_SETUP_CQ_NODROP, which changes the behavior a bit
+for CQ ring overflows. First of all, it doesn't overflow the ring, it
+simply stores backlog of completions that we weren't able to put into
+the CQ ring. To prevent the backlog from growing indefinitely, if the
+backlog is non-empty, we apply back pressure on IO submissions. Any
+attempt to submit new IO with a non-empty backlog will get an -EBUSY
+return from the kernel.
+
+I think that makes for a pretty sane API in terms of how the application
+can handle it. With CQ_NODROP enabled, we'll never drop a completion
+event (well unless we're totally out of memory...), but we'll also not
+allow submissions with a completion backlog.
+
 ---
- block/ioctl.c                   | 35 +++++----------------------------
- drivers/block/loop.c            | 13 +++++++-----
- drivers/s390/block/dasd_genhd.c |  4 +++-
- fs/block_dev.c                  |  7 +++++++
- include/linux/fs.h              |  2 --
- 5 files changed, 23 insertions(+), 38 deletions(-)
 
-diff --git a/block/ioctl.c b/block/ioctl.c
-index 52380c337078..2ed907ef0f01 100644
---- a/block/ioctl.c
-+++ b/block/ioctl.c
-@@ -155,46 +155,21 @@ static int blkpg_ioctl(struct block_device *bdev, struct blkpg_ioctl_arg __user
+diff --git a/fs/io_uring.c b/fs/io_uring.c
+index b647cdf0312c..12e9fe2479f4 100644
+--- a/fs/io_uring.c
++++ b/fs/io_uring.c
+@@ -207,6 +207,7 @@ struct io_ring_ctx {
+ 
+ 		struct list_head	defer_list;
+ 		struct list_head	timeout_list;
++		struct list_head	cq_overflow_list;
+ 
+ 		wait_queue_head_t	inflight_wait;
+ 	} ____cacheline_aligned_in_smp;
+@@ -414,6 +415,7 @@ static struct io_ring_ctx *io_ring_ctx_alloc(struct io_uring_params *p)
+ 
+ 	ctx->flags = p->flags;
+ 	init_waitqueue_head(&ctx->cq_wait);
++	INIT_LIST_HEAD(&ctx->cq_overflow_list);
+ 	init_completion(&ctx->ctx_done);
+ 	init_completion(&ctx->sqo_thread_started);
+ 	mutex_init(&ctx->uring_lock);
+@@ -588,6 +590,77 @@ static struct io_uring_cqe *io_get_cqring(struct io_ring_ctx *ctx)
+ 	return &rings->cqes[tail & ctx->cq_mask];
+ }
+ 
++static void io_cqring_ev_posted(struct io_ring_ctx *ctx)
++{
++	if (waitqueue_active(&ctx->wait))
++		wake_up(&ctx->wait);
++	if (waitqueue_active(&ctx->sqo_wait))
++		wake_up(&ctx->sqo_wait);
++	if (ctx->cq_ev_fd)
++		eventfd_signal(ctx->cq_ev_fd, 1);
++}
++
++struct cqe_drop {
++	struct list_head list;
++	u64 user_data;
++	s32 res;
++};
++
++static void io_cqring_overflow_flush(struct io_ring_ctx *ctx)
++{
++	struct io_rings *rings = ctx->rings;
++	struct io_uring_cqe *cqe;
++	struct cqe_drop *drop;
++	unsigned long flags;
++
++	if (list_empty_careful(&ctx->cq_overflow_list))
++		return;
++	if (ctx->cached_cq_tail - READ_ONCE(rings->cq.head) ==
++	    rings->cq_ring_entries)
++		return;
++
++	spin_lock_irqsave(&ctx->completion_lock, flags);
++
++	while (!list_empty(&ctx->cq_overflow_list)) {
++		drop = list_first_entry(&ctx->cq_overflow_list, struct cqe_drop,
++						list);
++		cqe = io_get_cqring(ctx);
++		if (!cqe)
++			break;
++		list_del(&drop->list);
++		WRITE_ONCE(cqe->user_data, drop->user_data);
++		WRITE_ONCE(cqe->res, drop->res);
++		WRITE_ONCE(cqe->flags, 0);
++		kfree(drop);
++	}
++
++	io_commit_cqring(ctx);
++	spin_unlock_irqrestore(&ctx->completion_lock, flags);
++	io_cqring_ev_posted(ctx);
++}
++
++static void io_cqring_overflow(struct io_ring_ctx *ctx, u64 ki_user_data,
++			       long res)
++	__must_hold(&ctx->completion_lock)
++{
++	struct cqe_drop *drop;
++
++	if (!(ctx->flags & IORING_SETUP_CQ_NODROP)) {
++log_overflow:
++		WRITE_ONCE(ctx->rings->cq_overflow,
++				atomic_inc_return(&ctx->cached_cq_overflow));
++		return;
++	}
++
++	drop = kmalloc(sizeof(*drop), GFP_ATOMIC);
++	if (!drop)
++		goto log_overflow;
++
++	drop->user_data = ki_user_data;
++	drop->res = res;
++	list_add_tail(&drop->list, &ctx->cq_overflow_list);
++}
++
+ static void io_cqring_fill_event(struct io_ring_ctx *ctx, u64 ki_user_data,
+ 				 long res)
+ {
+@@ -601,26 +674,15 @@ static void io_cqring_fill_event(struct io_ring_ctx *ctx, u64 ki_user_data,
+ 	 * the ring.
+ 	 */
+ 	cqe = io_get_cqring(ctx);
+-	if (cqe) {
++	if (likely(cqe)) {
+ 		WRITE_ONCE(cqe->user_data, ki_user_data);
+ 		WRITE_ONCE(cqe->res, res);
+ 		WRITE_ONCE(cqe->flags, 0);
+ 	} else {
+-		WRITE_ONCE(ctx->rings->cq_overflow,
+-				atomic_inc_return(&ctx->cached_cq_overflow));
++		io_cqring_overflow(ctx, ki_user_data, res);
  	}
  }
  
--/*
-- * This is an exported API for the block driver, and will not
-- * acquire bd_mutex. This API should be used in case that
-- * caller has held bd_mutex already.
-- */
--int __blkdev_reread_part(struct block_device *bdev)
-+static int blkdev_reread_part(struct block_device *bdev)
- {
-+	int ret;
-+
- 	if (!disk_part_scan_enabled(bdev->bd_disk) || bdev != bdev->bd_contains)
- 		return -EINVAL;
- 	if (!capable(CAP_SYS_ADMIN))
- 		return -EACCES;
- 
--	lockdep_assert_held(&bdev->bd_mutex);
--
--	return bdev_disk_changed(bdev, false);
--}
--EXPORT_SYMBOL(__blkdev_reread_part);
--
--/*
-- * This is an exported API for the block driver, and will
-- * try to acquire bd_mutex. If bd_mutex has been held already
-- * in current context, please call __blkdev_reread_part().
-- *
-- * Make sure the held locks in current context aren't required
-- * in open()/close() handler and I/O path for avoiding ABBA deadlock:
-- * - bd_mutex is held before calling block driver's open/close
-- *   handler
-- * - reading partition table may submit I/O to the block device
-- */
--int blkdev_reread_part(struct block_device *bdev)
+-static void io_cqring_ev_posted(struct io_ring_ctx *ctx)
 -{
--	int res;
+-	if (waitqueue_active(&ctx->wait))
+-		wake_up(&ctx->wait);
+-	if (waitqueue_active(&ctx->sqo_wait))
+-		wake_up(&ctx->sqo_wait);
+-	if (ctx->cq_ev_fd)
+-		eventfd_signal(ctx->cq_ev_fd, 1);
+-}
 -
- 	mutex_lock(&bdev->bd_mutex);
--	res = __blkdev_reread_part(bdev);
-+	ret = bdev_disk_changed(bdev, false);
- 	mutex_unlock(&bdev->bd_mutex);
- 
--	return res;
-+	return ret;
- }
--EXPORT_SYMBOL(blkdev_reread_part);
- 
- static int blk_ioctl_discard(struct block_device *bdev, fmode_t mode,
- 		unsigned long arg, unsigned long flags)
-diff --git a/drivers/block/loop.c b/drivers/block/loop.c
-index f6f77eaa7217..64b16abee280 100644
---- a/drivers/block/loop.c
-+++ b/drivers/block/loop.c
-@@ -630,7 +630,9 @@ static void loop_reread_partitions(struct loop_device *lo,
+ static void io_cqring_add_event(struct io_ring_ctx *ctx, u64 user_data,
+ 				long res)
  {
- 	int rc;
+@@ -859,8 +921,13 @@ static void io_put_req(struct io_kiocb *req, struct io_kiocb **nxtptr)
+ 	}
+ }
  
--	rc = blkdev_reread_part(bdev);
-+	mutex_lock(&bdev->bd_mutex);
-+	rc = bdev_disk_changed(bdev, false);
-+	mutex_unlock(&bdev->bd_mutex);
- 	if (rc)
- 		pr_warn("%s: partition scan of loop%d (%s) failed (rc=%d)\n",
- 			__func__, lo->lo_number, lo->lo_file_name, rc);
-@@ -1154,10 +1156,11 @@ static int __loop_clr_fd(struct loop_device *lo, bool release)
- 		 * must be at least one and it can only become zero when the
- 		 * current holder is released.
+-static unsigned io_cqring_events(struct io_rings *rings)
++static unsigned io_cqring_events(struct io_ring_ctx *ctx)
+ {
++	struct io_rings *rings = ctx->rings;
++
++	if (ctx->flags & IORING_SETUP_CQ_NODROP)
++		io_cqring_overflow_flush(ctx);
++
+ 	/* See comment at the top of this file */
+ 	smp_rmb();
+ 	return READ_ONCE(rings->cq.tail) - READ_ONCE(rings->cq.head);
+@@ -1016,7 +1083,7 @@ static int __io_iopoll_check(struct io_ring_ctx *ctx, unsigned *nr_events,
+ 		 * If we do, we can potentially be spinning for commands that
+ 		 * already triggered a CQE (eg in error).
  		 */
--		if (release)
--			err = __blkdev_reread_part(bdev);
--		else
--			err = blkdev_reread_part(bdev);
-+		if (!release)
-+			mutex_lock(&bdev->bd_mutex);
-+		err = bdev_disk_changed(bdev, false);
-+		if (!release)
-+			mutex_unlock(&bdev->bd_mutex);
- 		if (err)
- 			pr_warn("%s: partition scan of loop%d failed (rc=%d)\n",
- 				__func__, lo_number, err);
-diff --git a/drivers/s390/block/dasd_genhd.c b/drivers/s390/block/dasd_genhd.c
-index 5542d9eadfe0..7d079154f849 100644
---- a/drivers/s390/block/dasd_genhd.c
-+++ b/drivers/s390/block/dasd_genhd.c
-@@ -116,7 +116,9 @@ int dasd_scan_partitions(struct dasd_block *block)
- 		return -ENODEV;
+-		if (io_cqring_events(ctx->rings))
++		if (io_cqring_events(ctx))
+ 			break;
+ 
+ 		/*
+@@ -2873,6 +2940,10 @@ static int io_submit_sqes(struct io_ring_ctx *ctx, unsigned int nr,
+ 	int i, submitted = 0;
+ 	bool mm_fault = false;
+ 
++	if ((ctx->flags & IORING_SETUP_CQ_NODROP) &&
++	    !list_empty(&ctx->cq_overflow_list))
++		return -EBUSY;
++
+ 	if (nr > IO_PLUG_THRESHOLD) {
+ 		io_submit_state_start(&state, ctx, nr);
+ 		statep = &state;
+@@ -2952,6 +3023,7 @@ static int io_sq_thread(void *data)
+ 	timeout = inflight = 0;
+ 	while (!kthread_should_park()) {
+ 		unsigned int to_submit;
++		int ret;
+ 
+ 		if (inflight) {
+ 			unsigned nr_events = 0;
+@@ -3036,8 +3108,10 @@ static int io_sq_thread(void *data)
+ 		}
+ 
+ 		to_submit = min(to_submit, ctx->sq_entries);
+-		inflight += io_submit_sqes(ctx, to_submit, NULL, -1, &cur_mm,
+-					   true);
++		ret = io_submit_sqes(ctx, to_submit, NULL, -1, &cur_mm, true);
++		if (ret < 0)
++			continue;
++		inflight += ret;
+ 
+ 		/* Commit SQ ring head once we've consumed all SQEs */
+ 		io_commit_sqring(ctx);
+@@ -3070,7 +3144,7 @@ static inline bool io_should_wake(struct io_wait_queue *iowq)
+ 	 * started waiting. For timeouts, we always want to return to userspace,
+ 	 * regardless of event count.
+ 	 */
+-	return io_cqring_events(ctx->rings) >= iowq->to_wait ||
++	return io_cqring_events(ctx) >= iowq->to_wait ||
+ 			atomic_read(&ctx->cq_timeouts) != iowq->nr_timeouts;
+ }
+ 
+@@ -3105,7 +3179,7 @@ static int io_cqring_wait(struct io_ring_ctx *ctx, int min_events,
+ 	struct io_rings *rings = ctx->rings;
+ 	int ret = 0;
+ 
+-	if (io_cqring_events(rings) >= min_events)
++	if (io_cqring_events(ctx) >= min_events)
+ 		return 0;
+ 
+ 	if (sig) {
+@@ -4406,7 +4480,8 @@ static long io_uring_setup(u32 entries, struct io_uring_params __user *params)
  	}
  
--	rc = blkdev_reread_part(bdev);
-+	mutex_lock(&bdev->bd_mutex);
-+	rc = bdev_disk_changed(bdev, false);
-+	mutex_unlock(&bdev->bd_mutex);
- 	if (rc)
- 		DBF_DEV_EVENT(DBF_ERR, block->base,
- 				"scan partitions error, rc %d", rc);
-diff --git a/fs/block_dev.c b/fs/block_dev.c
-index ae16466a67f7..9558a2f064b1 100644
---- a/fs/block_dev.c
-+++ b/fs/block_dev.c
-@@ -1513,6 +1513,8 @@ int bdev_disk_changed(struct block_device *bdev, bool invalidate)
- 	struct gendisk *disk = bdev->bd_disk;
- 	int ret;
+ 	if (p.flags & ~(IORING_SETUP_IOPOLL | IORING_SETUP_SQPOLL |
+-			IORING_SETUP_SQ_AFF | IORING_SETUP_CQSIZE))
++			IORING_SETUP_SQ_AFF | IORING_SETUP_CQSIZE |
++			IORING_SETUP_CQ_NODROP))
+ 		return -EINVAL;
  
-+	lockdep_assert_held(&bdev->bd_mutex);
-+
- rescan:
- 	ret = blk_drop_partitions(disk, bdev);
- 	if (ret)
-@@ -1540,6 +1542,11 @@ int bdev_disk_changed(struct block_device *bdev, bool invalidate)
+ 	ret = io_uring_create(entries, &p);
+diff --git a/include/uapi/linux/io_uring.h b/include/uapi/linux/io_uring.h
+index f1a118b01d18..3d8517eb376e 100644
+--- a/include/uapi/linux/io_uring.h
++++ b/include/uapi/linux/io_uring.h
+@@ -56,6 +56,7 @@ struct io_uring_sqe {
+ #define IORING_SETUP_SQPOLL	(1U << 1)	/* SQ poll thread */
+ #define IORING_SETUP_SQ_AFF	(1U << 2)	/* sq_thread_cpu is valid */
+ #define IORING_SETUP_CQSIZE	(1U << 3)	/* app defines CQ size */
++#define IORING_SETUP_CQ_NODROP	(1U << 4)	/* no CQ drops */
  
- 	return ret;
- }
-+/*
-+ * Only exported for for loop and dasd for historic reasons.  Don't use in new
-+ * code!
-+ */
-+EXPORT_SYMBOL_GPL(bdev_disk_changed);
- 
- /*
-  * bd_mutex locking:
-diff --git a/include/linux/fs.h b/include/linux/fs.h
-index d233dd661df7..ae6c5c37f3ae 100644
---- a/include/linux/fs.h
-+++ b/include/linux/fs.h
-@@ -2632,8 +2632,6 @@ extern void bd_finish_claiming(struct block_device *bdev,
- extern void bd_abort_claiming(struct block_device *bdev,
- 			      struct block_device *whole, void *holder);
- extern void blkdev_put(struct block_device *bdev, fmode_t mode);
--extern int __blkdev_reread_part(struct block_device *bdev);
--extern int blkdev_reread_part(struct block_device *bdev);
- 
- #ifdef CONFIG_SYSFS
- extern int bd_link_disk_holder(struct block_device *bdev, struct gendisk *disk);
+ #define IORING_OP_NOP		0
+ #define IORING_OP_READV		1
+
 -- 
-2.20.1
+Jens Axboe
 
