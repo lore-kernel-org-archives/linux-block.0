@@ -2,168 +2,127 @@ Return-Path: <SRS0=NI9l=Y6=vger.kernel.org=linux-block-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-2.2 required=3.0 tests=DKIM_SIGNED,DKIM_VALID,
-	HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,
-	URIBL_BLOCKED,USER_AGENT_SANE_1 autolearn=no autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-9.1 required=3.0 tests=DKIMWL_WL_HIGH,DKIM_SIGNED,
+	DKIM_VALID,DKIM_VALID_AU,MAILING_LIST_MULTI,MENTIONS_GIT_HOSTING,
+	SPF_HELO_NONE,SPF_PASS,USER_AGENT_GIT autolearn=unavailable
+	autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 7E3D4C5DF65
-	for <linux-block@archiver.kernel.org>; Wed,  6 Nov 2019 21:56:49 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 07230C5DF63
+	for <linux-block@archiver.kernel.org>; Wed,  6 Nov 2019 21:58:49 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.kernel.org (Postfix) with ESMTP id 42D9120869
-	for <linux-block@archiver.kernel.org>; Wed,  6 Nov 2019 21:56:49 +0000 (UTC)
-Authentication-Results: mail.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel-dk.20150623.gappssmtp.com header.i=@kernel-dk.20150623.gappssmtp.com header.b="xMwFzRVW"
+	by mail.kernel.org (Postfix) with ESMTP id CD50C21848
+	for <linux-block@archiver.kernel.org>; Wed,  6 Nov 2019 21:58:48 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+	s=default; t=1573077528;
+	bh=Mxwtcew3Fms4rQMMctntWnAF1HLuRaVCC7k4pUeo1RQ=;
+	h=From:To:Cc:Subject:Date:List-ID:From;
+	b=Wwfv98rwR6ncrn7NpqiV26XnYAJGmI0zGrS00dLiwLhm4uzX8H3lkXjfrqW6F/Ddq
+	 y7uUzketAepHni3mqO2EaEnyhITylYpyDesp0Q5ebxqd1mkAw/8U2qMdAVxOOPMTIE
+	 HGTVkTqDE9JmYr69rgF4E7LAaCROpAItcBH8rjpY=
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1726798AbfKFV4s (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Wed, 6 Nov 2019 16:56:48 -0500
-Received: from mail-io1-f65.google.com ([209.85.166.65]:32787 "EHLO
-        mail-io1-f65.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1726912AbfKFV4s (ORCPT
-        <rfc822;linux-block@vger.kernel.org>); Wed, 6 Nov 2019 16:56:48 -0500
-Received: by mail-io1-f65.google.com with SMTP id j13so16826ioe.0
-        for <linux-block@vger.kernel.org>; Wed, 06 Nov 2019 13:56:47 -0800 (PST)
+        id S1727126AbfKFV6o (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Wed, 6 Nov 2019 16:58:44 -0500
+Received: from mail-qv1-f50.google.com ([209.85.219.50]:40828 "EHLO
+        mail-qv1-f50.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S1726779AbfKFV6o (ORCPT
+        <rfc822;linux-block@vger.kernel.org>); Wed, 6 Nov 2019 16:58:44 -0500
+Received: by mail-qv1-f50.google.com with SMTP id r8so2107258qvq.7;
+        Wed, 06 Nov 2019 13:58:43 -0800 (PST)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=kernel-dk.20150623.gappssmtp.com; s=20150623;
-        h=subject:to:cc:references:from:message-id:date:user-agent
-         :mime-version:in-reply-to:content-language:content-transfer-encoding;
-        bh=jXRWNlhoZUV4NmBgsVoU1Xpd9lxr/fc4e/t6ZKErYuQ=;
-        b=xMwFzRVWYx+pqfN8D4VBRXdAqY++dTQ9f0aqeE4HR4rkf56V86WNi6IKLMxBhI2HIL
-         rups+e8lFH6uGEIExalGXDqHHF//biM3jFC1LF+M8F3Z/WHnG79ab7DuVD7CSVgAyGL2
-         TCA4WgaG0VT6KdlP8Nr9AyMc/g5eQICRgpFb8eoXqZdM2vHJJM8LqilCrAgv57RtcgVf
-         zY+WEAw4OnB41NdzfjoMOQ688Ngtc03Knh/LuUD4A6qOf/zKX/iwfpqrhm74LBw41FGa
-         84lZdqooXvnn+NY41IwVihkXh8Chj4OAFU4D+UCROwg8L78DDrTrdhYH9+UENoz900eH
-         ufbw==
+        d=gmail.com; s=20161025;
+        h=sender:from:to:cc:subject:date:message-id;
+        bh=F/vADG/hnX91+J7ThLwtAYWMOuLxbrgnZjiawQ6+D0Y=;
+        b=q2VSHe3BIF6UMDNGvfoCyruwPT+QTt7bIiqj/Y/OpXbDSN0H/U6rXx/s4A9GuWg6nf
+         px5rMM7KojYnyD9UkV5rleMeAiTaArnzKPjm55t/uKy9bToVgsHZukBqS1WD72CIFBFZ
+         zit7QP2NUwWuasFdJ09cPZjAYFv58s3yI9g6800mPgTIYB9BMUv0zz3EIuXlxFjoc0wL
+         kqierf07zxhTkBXeUfX/pV0sD84YyyNrlB5QceyrGZGEa/pCMeYEySW/g9XZ3skC5+Rc
+         Bs+2hGyrGuzAVsC82EL3/TMXo27JW6qboUrG9R/FURdupwEbwBrM3F1Rk/5tOvZ6SBPo
+         iO9g==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=1e100.net; s=20161025;
-        h=x-gm-message-state:subject:to:cc:references:from:message-id:date
-         :user-agent:mime-version:in-reply-to:content-language
-         :content-transfer-encoding;
-        bh=jXRWNlhoZUV4NmBgsVoU1Xpd9lxr/fc4e/t6ZKErYuQ=;
-        b=AAeUxmxJuVK4UYkDzJCUW5TjP+1FIg1/k42nWrLJ0hKJPeRuG/7e2bMCAYik0/j7de
-         dwZH6dI7d1gZyDgTrfYJmhcJrfFQn1oeThpZGKRsSphj7eBpDdqzZdO+CB8uX58f6JyB
-         6D7h72gsbBPTCcvW53Xb+hGRA7t0F4ZpVf39DMX/Q/1nDHg0C4lsXT5xTcL8soWB3Uf2
-         CX5LX3lt9hi0VAGyp3Anok1QDXF4ckxpV9EdJoPY8wGwk5aqgW7NGqfAb6pXQDOy1YAo
-         vAhctsZcmPjjbKQWaHApavZ3WXlpswmQMRW/G6x/xg3Lbc72XjgJnTTKb8mtsUimoz9R
-         w3gg==
-X-Gm-Message-State: APjAAAWnESH2ExemfevGW5kyH10RbqBf8r1NihrQ69pEgPztitqnIFV0
-        oLPyyY6PWoEZ3S7WiC+qioho3qYgcbU=
-X-Google-Smtp-Source: APXvYqxAa5QzGWtFs3ZXti5IGobSR+Z1LPfu7NOwjOZDcqFimG8k1T2+NwRVHDha8JzQqAgIc9h/Mg==
-X-Received: by 2002:a5d:83d7:: with SMTP id u23mr26957726ior.27.1573077405883;
-        Wed, 06 Nov 2019 13:56:45 -0800 (PST)
-Received: from [192.168.1.159] ([65.144.74.34])
-        by smtp.gmail.com with ESMTPSA id f145sm3554210ilh.48.2019.11.06.13.56.44
+        h=x-gm-message-state:sender:from:to:cc:subject:date:message-id;
+        bh=F/vADG/hnX91+J7ThLwtAYWMOuLxbrgnZjiawQ6+D0Y=;
+        b=s0aAT/rW1rmjo8nBnROZh+vmsXdq7HI3d/DCa/uiO6AQwRij45dwUV04B+AvtIfFGg
+         bTqfkv+fYEqYd+hBYkuoJlOwy9RUUaelBhNZTdyx/P49vrmcGcg9t0qTjoHbObs1sc41
+         4WKBaR8U9W0GOM7oeQ9m6a9UVtJGQr8RXJFW96qGjDnIeE0AI0psTtpQU0HMfK/FtqFs
+         xjsI22suzO4BckUWv1sQADaShWhXGnnChBDKbOj73MwQjtkuazOEepL6EzFQ5VuV3n4m
+         3Iap2DOulWuqaMOjFdmdCA31I0owX+ex4lgE5qOTs7CXn6vlHyoFxsOZ80bK9gRCt8Zw
+         wnaA==
+X-Gm-Message-State: APjAAAXQrFT0r6gmf9JYFqRR7jD1ZtxgFiOsKTQOxHuILun4ZPlTPkGy
+        pqFF+u0Lm+sviJHCe6RGf7M=
+X-Google-Smtp-Source: APXvYqxrMPg4Z1ID2aAtKRJ/2VO6lSXUOrIfr4+JG1hAyxaDQXKT9M/OwslLW6ju5e1jnz+6lYZV7A==
+X-Received: by 2002:ad4:42a8:: with SMTP id e8mr54771qvr.217.1573077523072;
+        Wed, 06 Nov 2019 13:58:43 -0800 (PST)
+Received: from localhost ([2620:10d:c091:500::5bd1])
+        by smtp.gmail.com with ESMTPSA id w69sm86741qkb.26.2019.11.06.13.58.42
         (version=TLS1_2 cipher=ECDHE-RSA-AES128-GCM-SHA256 bits=128/128);
-        Wed, 06 Nov 2019 13:56:45 -0800 (PST)
-Subject: Re: [RFC] io_uring CQ ring backpressure
-To:     Pavel Begunkov <asml.silence@gmail.com>,
-        Jann Horn <jannh@google.com>
-Cc:     io-uring@vger.kernel.org,
-        "linux-block@vger.kernel.org" <linux-block@vger.kernel.org>
-References: <37d8ba3d-27c7-7636-0343-23ec56e4bee7@kernel.dk>
- <CAG48ez1_91Lk73sdpp1SiufOQShdP2zX6g9gMLW46gAvMioKOA@mail.gmail.com>
- <c01e91d3-0f20-00e9-e2c6-e4148f667fb6@kernel.dk>
- <7878d52d-d4bb-28e5-e8dc-87b2f0721b56@kernel.dk>
- <5b9e1953-0e32-150d-f607-39025bd1f034@gmail.com>
-From:   Jens Axboe <axboe@kernel.dk>
-Message-ID: <f98432cc-4e7f-9e95-8f76-d13f6a106ce1@kernel.dk>
-Date:   Wed, 6 Nov 2019 14:56:43 -0700
-User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:60.0) Gecko/20100101
- Thunderbird/60.9.0
-MIME-Version: 1.0
-In-Reply-To: <5b9e1953-0e32-150d-f607-39025bd1f034@gmail.com>
-Content-Type: text/plain; charset=utf-8
-Content-Language: en-US
-Content-Transfer-Encoding: 7bit
+        Wed, 06 Nov 2019 13:58:42 -0800 (PST)
+From:   Tejun Heo <tj@kernel.org>
+To:     axboe@kernel.dk
+Cc:     cgroups@vger.kernel.org, linux-block@vger.kernel.org,
+        linux-kernel@vger.kernel.org, lizefan@huawei.com,
+        hannes@cmpxchg.org, kernel-team@fb.com
+Subject: [PATCHSET block/for-next] blk-cgroup: use cgroup rstat for IO stats
+Date:   Wed,  6 Nov 2019 13:58:33 -0800
+Message-Id: <20191106215838.3973497-1-tj@kernel.org>
+X-Mailer: git-send-email 2.17.1
 Sender: linux-block-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-On 11/6/19 2:54 PM, Pavel Begunkov wrote:
-> On 07/11/2019 00:31, Jens Axboe wrote:
->> On 11/6/19 1:08 PM, Jens Axboe wrote:
->>> On 11/6/19 12:51 PM, Jann Horn wrote:
->>>> On Wed, Nov 6, 2019 at 5:23 PM Jens Axboe <axboe@kernel.dk> wrote:
->>>>> Currently we drop completion events, if the CQ ring is full. That's fine
->>>>> for requests with bounded completion times, but it may make it harder to
->>>>> use io_uring with networked IO where request completion times are
->>>>> generally unbounded. Or with POLL, for example, which is also unbounded.
->>>>>
->>>>> This patch adds IORING_SETUP_CQ_NODROP, which changes the behavior a bit
->>>>> for CQ ring overflows. First of all, it doesn't overflow the ring, it
->>>>> simply stores backlog of completions that we weren't able to put into
->>>>> the CQ ring. To prevent the backlog from growing indefinitely, if the
->>>>> backlog is non-empty, we apply back pressure on IO submissions. Any
->>>>> attempt to submit new IO with a non-empty backlog will get an -EBUSY
->>>>> return from the kernel.
->>>>>
->>>>> I think that makes for a pretty sane API in terms of how the application
->>>>> can handle it. With CQ_NODROP enabled, we'll never drop a completion
->>>>> event (well unless we're totally out of memory...), but we'll also not
->>>>> allow submissions with a completion backlog.
->>>> [...]
->>>>> +static void io_cqring_overflow(struct io_ring_ctx *ctx, u64 ki_user_data,
->>>>> +                              long res)
->>>>> +       __must_hold(&ctx->completion_lock)
->>>>> +{
->>>>> +       struct cqe_drop *drop;
->>>>> +
->>>>> +       if (!(ctx->flags & IORING_SETUP_CQ_NODROP)) {
->>>>> +log_overflow:
->>>>> +               WRITE_ONCE(ctx->rings->cq_overflow,
->>>>> +                               atomic_inc_return(&ctx->cached_cq_overflow));
->>>>> +               return;
->>>>> +       }
->>>>> +
->>>>> +       drop = kmalloc(sizeof(*drop), GFP_ATOMIC);
->>>>> +       if (!drop)
->>>>> +               goto log_overflow;
->>>>> +
->>>>> +       drop->user_data = ki_user_data;
->>>>> +       drop->res = res;
->>>>> +       list_add_tail(&drop->list, &ctx->cq_overflow_list);
->>>>> +}
->>>>
->>>> This could potentially consume moderately large amounts of atomic
->>>> memory quickly and without any guarantee that the memory will be freed
->>>> anytime soon, right? That seems moderately bad. Is there no way to
->>>> e.g. pre-reserve memory for completion events, or something like that?
->>>
->>> As soon as there's even one entry in that backlog, the ring won't accept
->>> anymore new IO. So I don't think it's a huge concern. If we pre-reserve,
->>> we haven't really made much progress in making sure we don't drop events,
->>> and we'll be tying up that memory all the time.
->>>
->>> The alternative, as Pavel also mentioned, is to re-use the io_kiocb
->>> for this. But that'll tie up more memory, and it's a bit tricky with
->>> the life times. Just because the request has completed doesn't mean
->>> that someone isn't still holding a reference to it, and who knows
->>> what they will do.
->>
->> OK, I took a stab at it, here's a brain dump of the "complications"
->>
->> 1) Some places now use __io_free_req() to drop both references, if we
->>     know we haven't issued a request yet. Needs double drop, not a big
->>     deal.
->> 2) Some ordering changes between io_put_req() and the fill/add event
->>     logic. Again not a huge deal, easy to spot.
->> 3) We have one failure case that does not have a request, exactly because
->>     we failed to allocate one. Don't look at that part in the below patch,
->>     I think what we should do here is just reserve a request for that case.
->>     It won't help with the submission, but it'll get it logged correctly
->>     for the overflow backlog. Any new submission can't proceed with that
->>     request in the overflow backlog anyway, so we need just the one.
->>     Not super pretty, but at least we can keep this out of the fast path,
->>     as the only one that will free this request is the overflow flush
->>     path.
->>
-> 
-> 2 (maybe partially) and 3 will hopefully be solved by the patchset
-> removing passing sqe_submit. I'll resend it in a minute.
+Hello,
 
-Please do, it'll definitely make a few things easier. Then I'll base the
-cleanup/prep patch on top of that, and then the backpressure patch.
+blk-cgroup IO stats currently use blkg_rwstat which unforutnately
+requires walking all descendants recursively on read.  On systems with
+a large number of cgroups (dead or alive), this can make each stat
+read a substantially expensive operation.
 
--- 
-Jens Axboe
+This patch updates blk-cgroup to use cgroup rstat which makes stat
+reading O(# descendants which have been active since last reading)
+instead of O(# descendants).
+
+ 0001-bfq-iosched-stop-using-blkg-stat_bytes-and-stat_ios.patch
+ 0002-blk-throtl-stop-using-blkg-stat_bytes-and-stat_ios.patch
+ 0003-blk-cgroup-remove-now-unused-blkg_print_stat_-bytes-.patch
+ 0004-blk-cgroup-reimplement-basic-IO-stats-using-cgroup-r.patch
+ 0005-blk-cgroup-separate-out-blkg_rwstat-under-CONFIG_BLK.patch
+
+0001-0002 make bfq-iosched and blk-throtl use their own blkg_rwstat to
+track basic IO stats on cgroup1 instead of sharing blk-cgroup core's.
+0003 is a follow-up cleanup.
+
+0004 switches blk-cgroup to cgroup rstat.
+
+0005 moves blkg_rwstat to its own files and gate it under a config
+option as it's now only used by blk-throtl and bfq-iosched.
+
+The patchset is on top of
+
+  for-next/block 257855f86aa2 ("Merge branch 'for-5.4/block' into for-next")
++ [1] blkcg: make blkcg_print_stat() print stats only for online blkgs
+
+and also available in the following git branch.
+
+ git://git.kernel.org/pub/scm/linux/kernel/git/tj/cgroup.git review-blkcg-rstat
+
+Thanks.
+
+ block/Kconfig              |    4 
+ block/Kconfig.iosched      |    1 
+ block/Makefile             |    1 
+ block/bfq-cgroup.c         |   37 +++--
+ block/bfq-iosched.c        |    4 
+ block/bfq-iosched.h        |    6 
+ block/blk-cgroup-rwstat.c  |  129 +++++++++++++++++++
+ block/blk-cgroup-rwstat.h  |  149 ++++++++++++++++++++++
+ block/blk-cgroup.c         |  304 ++++++++++++++-------------------------------
+ block/blk-throttle.c       |   71 +++++++++-
+ include/linux/blk-cgroup.h |  198 +++++------------------------
+ 11 files changed, 517 insertions(+), 387 deletions(-)
+
+--
+tejun
+
+[1] http://lkml.kernel.org/r/20191105160951.GS3622521@devbig004.ftw2.facebook.com
 
