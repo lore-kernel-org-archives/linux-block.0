@@ -4,68 +4,69 @@ X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 X-Spam-Level: 
 X-Spam-Status: No, score=-10.1 required=3.0 tests=DKIMWL_WL_HIGH,DKIM_SIGNED,
 	DKIM_VALID,DKIM_VALID_AU,INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,
-	SPF_HELO_NONE,SPF_PASS,USER_AGENT_GIT autolearn=unavailable
+	SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED,USER_AGENT_GIT autolearn=unavailable
 	autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id E75C6C5DF63
-	for <linux-block@archiver.kernel.org>; Wed,  6 Nov 2019 21:59:05 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id EFA12C5DF64
+	for <linux-block@archiver.kernel.org>; Wed,  6 Nov 2019 21:59:06 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.kernel.org (Postfix) with ESMTP id B8B33218AE
-	for <linux-block@archiver.kernel.org>; Wed,  6 Nov 2019 21:59:05 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id B71BB218AE
+	for <linux-block@archiver.kernel.org>; Wed,  6 Nov 2019 21:59:06 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=default; t=1573077545;
-	bh=T72Vt30SUtV9b7DsgOuAjMoo8qZeFa2/DrjEc7CWsYA=;
+	s=default; t=1573077546;
+	bh=Y+wKaFqTQInMt7Z/wN2Ye+5JQeNPQsWbe/dczaNc6z8=;
 	h=From:To:Cc:Subject:Date:In-Reply-To:References:List-ID:From;
-	b=iUewNsL9NAWkZMmyw33o8dtp6IEbCBwRNrqDCVhXfJtYHH26e//uBuGvvcykgguJs
-	 isbrtxGAsEbd1lqheJ9sn5/ijpK4aFLrEuBofbu6CDmNryZ2mOaQmL2N2XO7eht0x3
-	 EQ1tklix4rBQUdkQY/EfI86NMVlvCB7fR7Sv2s+Q=
+	b=myP6xQG+s34Xpe2VNKwh5P9ofPKWO6Z0Zlf3aSm3k+aT0GXL3vt6MYuMSNqZX8JNp
+	 8VYTHWwtUaf41Z8cTffy9MPidhMJ2ZFb1AywEB4AgzgclGHHXDZeyaW2wIs5EXL8E4
+	 FSUP+EQJPx+XQaZcaZC10ryGhjdWIB0MozOd5/S0=
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1732423AbfKFV6u (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Wed, 6 Nov 2019 16:58:50 -0500
-Received: from mail-qt1-f193.google.com ([209.85.160.193]:44979 "EHLO
-        mail-qt1-f193.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1732156AbfKFV6t (ORCPT
-        <rfc822;linux-block@vger.kernel.org>); Wed, 6 Nov 2019 16:58:49 -0500
-Received: by mail-qt1-f193.google.com with SMTP id o11so20617qtr.11;
-        Wed, 06 Nov 2019 13:58:48 -0800 (PST)
+        id S1728096AbfKFV6s (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Wed, 6 Nov 2019 16:58:48 -0500
+Received: from mail-qv1-f68.google.com ([209.85.219.68]:33499 "EHLO
+        mail-qv1-f68.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S1726779AbfKFV6r (ORCPT
+        <rfc822;linux-block@vger.kernel.org>); Wed, 6 Nov 2019 16:58:47 -0500
+Received: by mail-qv1-f68.google.com with SMTP id x14so8554qvu.0;
+        Wed, 06 Nov 2019 13:58:45 -0800 (PST)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=gmail.com; s=20161025;
         h=sender:from:to:cc:subject:date:message-id:in-reply-to:references;
-        bh=SCorZkPJP9TGXujGHT7jjDnVUj1sFVQI/cg2WsPyUwQ=;
-        b=O6u3QL+pWqJ27s+9Qlg6Ls4d/hivEDiry+YmAEebwOq0HAth8LCImFLsCGflFQhMxP
-         JPNwH/gdlL4PIslS1JrSBX1m8LqYlCnEY+qL+LY71V17cdjaz80gaFT4Bpoixkz6Igjy
-         aiwdEBX56IE6oNxlpRJJLI0JLRXyJoPPHvgJV7g1z0x4pd4KsRH3EC9q+fx+RXplCFDG
-         VaMDS9AWRV9YjY8W+Ih5eKph4DpX8vqU8kf5ryf5ta8Ix4HlWUEYKTLGT7c+/4u0/dS6
-         bLrPduUyEtv0p+NC7Yz0Wrcix42r09BcSzCXrz7Hu71a+PYBPtZbw5kHC3PPudWRBlDA
-         oAhQ==
+        bh=EFOQyzdAOh5pEDm3B2vzWLhCGVBA0+rQSqnEuctv7O0=;
+        b=Ynz07Cl5SmX1TE4Epf8q/jv9lH089hlEJY0miVQ9vSft2oj+rd5RJibmO7ZXmjOqzQ
+         2fh0dIhDWxS3Z1YJg1kH6pbk/6ZlGyp3G3K2CpX2uXCNWnCKYNTYoiEGvtQRMWc0/oH/
+         8Skfs09VCYS3jO8s46Qu/PaVMvJVIqL9SZx3Z5+J829cRAPzblHEQ19II41EflqAnsQr
+         zqCLD+acTa9Z+y0XorBCmxSYmPyTblzc7NwEGvrRjMoWyTQ3JZl7j1tt3IWF96WQA4Dj
+         L0aat3FqyO4WgfvKr0/42bLHeTHEH2Nj5q7kmGrTU7BXX55XwkLrBzB/1viwYLd5GeYz
+         CZlg==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=1e100.net; s=20161025;
         h=x-gm-message-state:sender:from:to:cc:subject:date:message-id
          :in-reply-to:references;
-        bh=SCorZkPJP9TGXujGHT7jjDnVUj1sFVQI/cg2WsPyUwQ=;
-        b=LOOXfVuhDETU/GZqK2fCMnoPap/x/B+VtYXGZXE5t1Qe6w7eXZCdno1cImxMbE/jkN
-         PGtUXa1PdkpRenIjyKdoCzZdgP7fdVHPCeVYcHKMzJeAoJHvZpHDuXBLW9mcbKcq3pNL
-         6Cb9ibuMpfC2sPxYaxppBMr8ObTPt2KHFHWsxYc6dAliXxrfni3S6Mx/+PQzBhl/Ukap
-         bnLIdbX4na8y8v/4W9KhEGmPzdUoeYjg4xhg+3FIdaclg5f1cT/v0e5dqFQWycS1NkMz
-         XbQ5dM1yWlL+OyweF8NSSRZLknCOI/TuTFg3tzFz1ddNRlV2YFZlzHFilfo6QdXrkzHv
-         YL4Q==
-X-Gm-Message-State: APjAAAUdybtTcGqi4m4FBp2q/Dnv3UEJ4wSC4q0dwLxqkMCg2rZYkvk7
-        Lap+O9cSvsIyx3zm74rNS90=
-X-Google-Smtp-Source: APXvYqwFDsVmuewko/pZ72OMIKO9NdcI2o4RGW5iInddgdJKdV9+XZkER7gbgYkseDLDi59FS6cEYQ==
-X-Received: by 2002:ac8:2d19:: with SMTP id n25mr262090qta.144.1573077527943;
-        Wed, 06 Nov 2019 13:58:47 -0800 (PST)
+        bh=EFOQyzdAOh5pEDm3B2vzWLhCGVBA0+rQSqnEuctv7O0=;
+        b=jdxtM+DsfUnFxe1/HtMQuqOmLALOJqim8v2m9KAjFWhDcNcKn/rJiIwufiJAyzc4mf
+         LHS5+ID9AoDaRo13GhQkxljLqCKKRLsRWjQ2Rs3v89/7TvuV68rSe9yBcUfafQHpKr1Q
+         m5UWI9fzUIDjpsjrGHTL1nEho27oZmg4bgSLV0edwpxa2jkMn5cRactY+5HzyBBGzWoR
+         3HhdUcsLiEf7Jz8nojldjDUqje8p/s6lOigiFKLGITL5RpFsWWX4eBw+Zpw3IMWvfUZO
+         JWsNdF+DCEBbWFki7odFyYstjZnKciuyG2hoxs6we6mmtvh6lXuK8d/p0HPishYS6onG
+         keUg==
+X-Gm-Message-State: APjAAAXipeWzOfbdDWw74yyYXlbywSV0xXfll/MM2ktYA4tgV+uMv75U
+        CYtd2pmQnttoe4ICLhwAt+g=
+X-Google-Smtp-Source: APXvYqxfBtq4Tm6ATpcuzjdzRJQ5M9Kcso8SyYZZACt6qKDA3tZ5GV1x5BEE0KkeGju4d73TYyA5NA==
+X-Received: by 2002:ad4:4106:: with SMTP id i6mr62770qvp.175.1573077525072;
+        Wed, 06 Nov 2019 13:58:45 -0800 (PST)
 Received: from localhost ([2620:10d:c091:500::5bd1])
-        by smtp.gmail.com with ESMTPSA id x39sm147919qth.92.2019.11.06.13.58.46
+        by smtp.gmail.com with ESMTPSA id o1sm111141qtb.82.2019.11.06.13.58.44
         (version=TLS1_2 cipher=ECDHE-RSA-AES128-GCM-SHA256 bits=128/128);
-        Wed, 06 Nov 2019 13:58:46 -0800 (PST)
+        Wed, 06 Nov 2019 13:58:44 -0800 (PST)
 From:   Tejun Heo <tj@kernel.org>
 To:     axboe@kernel.dk
 Cc:     cgroups@vger.kernel.org, linux-block@vger.kernel.org,
         linux-kernel@vger.kernel.org, lizefan@huawei.com,
-        hannes@cmpxchg.org, kernel-team@fb.com, Tejun Heo <tj@kernel.org>
-Subject: [PATCH 2/5] blk-throtl: stop using blkg->stat_bytes and ->stat_ios
-Date:   Wed,  6 Nov 2019 13:58:35 -0800
-Message-Id: <20191106215838.3973497-3-tj@kernel.org>
+        hannes@cmpxchg.org, kernel-team@fb.com, Tejun Heo <tj@kernel.org>,
+        Paolo Valente <paolo.valente@linaro.org>
+Subject: [PATCH 1/5] bfq-iosched: stop using blkg->stat_bytes and ->stat_ios
+Date:   Wed,  6 Nov 2019 13:58:34 -0800
+Message-Id: <20191106215838.3973497-2-tj@kernel.org>
 X-Mailer: git-send-email 2.17.1
 In-Reply-To: <20191106215838.3973497-1-tj@kernel.org>
 References: <20191106215838.3973497-1-tj@kernel.org>
@@ -74,151 +75,155 @@ Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-When used on cgroup1, blk-throtl uses the blkg->stat_bytes and
-->stat_ios from blk-cgroup core to populate four stat knobs.
-blk-cgroup core is moving away from blkg_rwstat to improve scalability
-and won't be able to support this usage.
+When used on cgroup1, bfq uses the blkg->stat_bytes and ->stat_ios
+from blk-cgroup core to populate six stat knobs.  blk-cgroup core is
+moving away from blkg_rwstat to improve scalability and won't be able
+to support this usage.
 
-It isn't like the sharing gains all that much.  Let's break them out
-to dedicated rwstat counters which are updated when on cgroup1.
+It isn't like the sharing gains all that much.  Let's break it out to
+dedicated rwstat counters which are updated when on cgroup1.
 
 Signed-off-by: Tejun Heo <tj@kernel.org>
+Cc: Paolo Valente <paolo.valente@linaro.org>
 ---
- block/blk-throttle.c | 70 ++++++++++++++++++++++++++++++++++++++------
- 1 file changed, 61 insertions(+), 9 deletions(-)
+ block/bfq-cgroup.c  | 37 ++++++++++++++++++++++++++-----------
+ block/bfq-iosched.c |  4 ++++
+ block/bfq-iosched.h |  4 ++++
+ 3 files changed, 34 insertions(+), 11 deletions(-)
 
-diff --git a/block/blk-throttle.c b/block/blk-throttle.c
-index 0445c998c377..6ac5b5d56170 100644
---- a/block/blk-throttle.c
-+++ b/block/blk-throttle.c
-@@ -176,6 +176,9 @@ struct throtl_grp {
- 	unsigned int bio_cnt; /* total bios */
- 	unsigned int bad_bio_cnt; /* bios exceeding latency threshold */
- 	unsigned long bio_cnt_reset_time;
-+
-+	struct blkg_rwstat stat_bytes;
-+	struct blkg_rwstat stat_ios;
- };
- 
- /* We measure latency for request size from <= 4k to >= 1M */
-@@ -489,6 +492,12 @@ static struct blkg_policy_data *throtl_pd_alloc(gfp_t gfp,
- 	if (!tg)
- 		return NULL;
- 
-+	if (blkg_rwstat_init(&tg->stat_bytes, gfp))
-+		goto err_free_tg;
-+
-+	if (blkg_rwstat_init(&tg->stat_ios, gfp))
-+		goto err_exit_stat_bytes;
-+
- 	throtl_service_queue_init(&tg->service_queue);
- 
- 	for (rw = READ; rw <= WRITE; rw++) {
-@@ -513,6 +522,12 @@ static struct blkg_policy_data *throtl_pd_alloc(gfp_t gfp,
- 	tg->idletime_threshold_conf = DFL_IDLE_THRESHOLD;
- 
- 	return &tg->pd;
-+
-+err_exit_stat_bytes:
-+	blkg_rwstat_exit(&tg->stat_bytes);
-+err_free_tg:
-+	kfree(tg);
-+	return NULL;
+diff --git a/block/bfq-cgroup.c b/block/bfq-cgroup.c
+index 86a607cf19a1..c3093fde2e26 100644
+--- a/block/bfq-cgroup.c
++++ b/block/bfq-cgroup.c
+@@ -347,6 +347,14 @@ void bfqg_and_blkg_put(struct bfq_group *bfqg)
+ 	bfqg_put(bfqg);
  }
  
- static void throtl_pd_init(struct blkg_policy_data *pd)
-@@ -611,6 +626,8 @@ static void throtl_pd_free(struct blkg_policy_data *pd)
- 	struct throtl_grp *tg = pd_to_tg(pd);
++void bfqg_stats_update_legacy_io(struct request_queue *q, struct request *rq)
++{
++	struct bfq_group *bfqg = blkg_to_bfqg(rq->bio->bi_blkg);
++
++	blkg_rwstat_add(&bfqg->stats.bytes, rq->cmd_flags, blk_rq_bytes(rq));
++	blkg_rwstat_add(&bfqg->stats.ios, rq->cmd_flags, 1);
++}
++
+ /* @stats = 0 */
+ static void bfqg_stats_reset(struct bfqg_stats *stats)
+ {
+@@ -431,6 +439,8 @@ void bfq_init_entity(struct bfq_entity *entity, struct bfq_group *bfqg)
  
- 	del_timer_sync(&tg->service_queue.pending_timer);
-+	blkg_rwstat_exit(&tg->stat_bytes);
-+	blkg_rwstat_exit(&tg->stat_ios);
- 	kfree(tg);
+ static void bfqg_stats_exit(struct bfqg_stats *stats)
+ {
++	blkg_rwstat_exit(&stats->bytes);
++	blkg_rwstat_exit(&stats->ios);
+ #ifdef CONFIG_BFQ_CGROUP_DEBUG
+ 	blkg_rwstat_exit(&stats->merged);
+ 	blkg_rwstat_exit(&stats->service_time);
+@@ -448,6 +458,10 @@ static void bfqg_stats_exit(struct bfqg_stats *stats)
+ 
+ static int bfqg_stats_init(struct bfqg_stats *stats, gfp_t gfp)
+ {
++	if (blkg_rwstat_init(&stats->bytes, gfp) ||
++	    blkg_rwstat_init(&stats->ios, gfp))
++		return -ENOMEM;
++
+ #ifdef CONFIG_BFQ_CGROUP_DEBUG
+ 	if (blkg_rwstat_init(&stats->merged, gfp) ||
+ 	    blkg_rwstat_init(&stats->service_time, gfp) ||
+@@ -1125,7 +1139,8 @@ static int bfqg_print_rwstat_recursive(struct seq_file *sf, void *v)
+ static u64 bfqg_prfill_sectors(struct seq_file *sf, struct blkg_policy_data *pd,
+ 			       int off)
+ {
+-	u64 sum = blkg_rwstat_total(&pd->blkg->stat_bytes);
++	struct bfq_group *bfqg = blkg_to_bfqg(pd->blkg);
++	u64 sum = blkg_rwstat_total(&bfqg->stats.bytes);
+ 
+ 	return __blkg_prfill_u64(sf, pd, sum >> 9);
  }
+@@ -1142,8 +1157,8 @@ static u64 bfqg_prfill_sectors_recursive(struct seq_file *sf,
+ {
+ 	struct blkg_rwstat_sample tmp;
  
-@@ -1464,6 +1481,32 @@ static ssize_t tg_set_conf_uint(struct kernfs_open_file *of,
- 	return tg_set_conf(of, buf, nbytes, off, false);
- }
+-	blkg_rwstat_recursive_sum(pd->blkg, NULL,
+-			offsetof(struct blkcg_gq, stat_bytes), &tmp);
++	blkg_rwstat_recursive_sum(pd->blkg, &blkcg_policy_bfq,
++			offsetof(struct bfq_group, stats.bytes), &tmp);
  
-+static int tg_print_rwstat(struct seq_file *sf, void *v)
-+{
-+	blkcg_print_blkgs(sf, css_to_blkcg(seq_css(sf)),
-+			  blkg_prfill_rwstat, &blkcg_policy_throtl,
-+			  seq_cft(sf)->private, true);
-+	return 0;
-+}
-+
-+static u64 tg_prfill_rwstat_recursive(struct seq_file *sf,
-+				      struct blkg_policy_data *pd, int off)
-+{
-+	struct blkg_rwstat_sample sum;
-+
-+	blkg_rwstat_recursive_sum(pd_to_blkg(pd), &blkcg_policy_throtl, off,
-+				  &sum);
-+	return __blkg_prfill_rwstat(sf, pd, &sum);
-+}
-+
-+static int tg_print_rwstat_recursive(struct seq_file *sf, void *v)
-+{
-+	blkcg_print_blkgs(sf, css_to_blkcg(seq_css(sf)),
-+			  tg_prfill_rwstat_recursive, &blkcg_policy_throtl,
-+			  seq_cft(sf)->private, true);
-+	return 0;
-+}
-+
- static struct cftype throtl_legacy_files[] = {
+ 	return __blkg_prfill_u64(sf, pd,
+ 		(tmp.cnt[BLKG_RWSTAT_READ] + tmp.cnt[BLKG_RWSTAT_WRITE]) >> 9);
+@@ -1226,13 +1241,13 @@ struct cftype bfq_blkcg_legacy_files[] = {
+ 	/* statistics, covers only the tasks in the bfqg */
  	{
- 		.name = "throttle.read_bps_device",
-@@ -1491,23 +1534,23 @@ static struct cftype throtl_legacy_files[] = {
- 	},
- 	{
- 		.name = "throttle.io_service_bytes",
--		.private = (unsigned long)&blkcg_policy_throtl,
+ 		.name = "bfq.io_service_bytes",
+-		.private = (unsigned long)&blkcg_policy_bfq,
 -		.seq_show = blkg_print_stat_bytes,
-+		.private = offsetof(struct throtl_grp, stat_bytes),
-+		.seq_show = tg_print_rwstat,
++		.private = offsetof(struct bfq_group, stats.bytes),
++		.seq_show = bfqg_print_rwstat,
  	},
  	{
- 		.name = "throttle.io_service_bytes_recursive",
--		.private = (unsigned long)&blkcg_policy_throtl,
--		.seq_show = blkg_print_stat_bytes_recursive,
-+		.private = offsetof(struct throtl_grp, stat_bytes),
-+		.seq_show = tg_print_rwstat_recursive,
- 	},
- 	{
- 		.name = "throttle.io_serviced",
--		.private = (unsigned long)&blkcg_policy_throtl,
+ 		.name = "bfq.io_serviced",
+-		.private = (unsigned long)&blkcg_policy_bfq,
 -		.seq_show = blkg_print_stat_ios,
-+		.private = offsetof(struct throtl_grp, stat_ios),
-+		.seq_show = tg_print_rwstat,
++		.private = offsetof(struct bfq_group, stats.ios),
++		.seq_show = bfqg_print_rwstat,
+ 	},
+ #ifdef CONFIG_BFQ_CGROUP_DEBUG
+ 	{
+@@ -1269,13 +1284,13 @@ struct cftype bfq_blkcg_legacy_files[] = {
+ 	/* the same statistics which cover the bfqg and its descendants */
+ 	{
+ 		.name = "bfq.io_service_bytes_recursive",
+-		.private = (unsigned long)&blkcg_policy_bfq,
+-		.seq_show = blkg_print_stat_bytes_recursive,
++		.private = offsetof(struct bfq_group, stats.bytes),
++		.seq_show = bfqg_print_rwstat_recursive,
  	},
  	{
- 		.name = "throttle.io_serviced_recursive",
--		.private = (unsigned long)&blkcg_policy_throtl,
+ 		.name = "bfq.io_serviced_recursive",
+-		.private = (unsigned long)&blkcg_policy_bfq,
 -		.seq_show = blkg_print_stat_ios_recursive,
-+		.private = offsetof(struct throtl_grp, stat_ios),
-+		.seq_show = tg_print_rwstat_recursive,
++		.private = offsetof(struct bfq_group, stats.ios),
++		.seq_show = bfqg_print_rwstat_recursive,
  	},
- 	{ }	/* terminate */
+ #ifdef CONFIG_BFQ_CGROUP_DEBUG
+ 	{
+diff --git a/block/bfq-iosched.c b/block/bfq-iosched.c
+index b33be928d164..4629f5580d46 100644
+--- a/block/bfq-iosched.c
++++ b/block/bfq-iosched.c
+@@ -5450,6 +5450,10 @@ static void bfq_insert_request(struct blk_mq_hw_ctx *hctx, struct request *rq,
+ 	bool idle_timer_disabled = false;
+ 	unsigned int cmd_flags;
+ 
++#ifdef CONFIG_BFQ_GROUP_IOSCHED
++	if (!cgroup_subsys_on_dfl(io_cgrp_subsys) && rq->bio)
++		bfqg_stats_update_legacy_io(q, rq);
++#endif
+ 	spin_lock_irq(&bfqd->lock);
+ 	if (blk_mq_sched_try_insert_merge(q, rq)) {
+ 		spin_unlock_irq(&bfqd->lock);
+diff --git a/block/bfq-iosched.h b/block/bfq-iosched.h
+index 5d1a519640f6..2676c06218f1 100644
+--- a/block/bfq-iosched.h
++++ b/block/bfq-iosched.h
+@@ -809,6 +809,9 @@ struct bfq_stat {
  };
-@@ -2127,7 +2170,16 @@ bool blk_throtl_bio(struct request_queue *q, struct blkcg_gq *blkg,
- 	WARN_ON_ONCE(!rcu_read_lock_held());
  
- 	/* see throtl_charge_bio() */
--	if (bio_flagged(bio, BIO_THROTTLED) || !tg->has_rules[rw])
-+	if (bio_flagged(bio, BIO_THROTTLED))
-+		goto out;
-+
-+	if (!cgroup_subsys_on_dfl(io_cgrp_subsys)) {
-+		blkg_rwstat_add(&tg->stat_bytes, bio->bi_opf,
-+				bio->bi_iter.bi_size);
-+		blkg_rwstat_add(&tg->stat_ios, bio->bi_opf, 1);
-+	}
-+
-+	if (!tg->has_rules[rw])
- 		goto out;
+ struct bfqg_stats {
++	/* basic stats */
++	struct blkg_rwstat		bytes;
++	struct blkg_rwstat		ios;
+ #ifdef CONFIG_BFQ_CGROUP_DEBUG
+ 	/* number of ios merged */
+ 	struct blkg_rwstat		merged;
+@@ -956,6 +959,7 @@ void bfq_put_async_queues(struct bfq_data *bfqd, struct bfq_group *bfqg);
  
- 	spin_lock_irq(&q->queue_lock);
+ /* ---------------- cgroups-support interface ---------------- */
+ 
++void bfqg_stats_update_legacy_io(struct request_queue *q, struct request *rq);
+ void bfqg_stats_update_io_add(struct bfq_group *bfqg, struct bfq_queue *bfqq,
+ 			      unsigned int op);
+ void bfqg_stats_update_io_remove(struct bfq_group *bfqg, unsigned int op);
 -- 
 2.17.1
 
