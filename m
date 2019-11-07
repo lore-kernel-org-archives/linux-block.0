@@ -2,136 +2,315 @@ Return-Path: <SRS0=Ukdl=Y7=vger.kernel.org=linux-block-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-5.2 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
-	MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED,
-	USER_AGENT_SANE_1 autolearn=ham autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-5.9 required=3.0 tests=DKIM_SIGNED,DKIM_VALID,
+	DKIM_VALID_AU,HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,
+	MENTIONS_GIT_HOSTING,SPF_HELO_NONE,SPF_PASS autolearn=unavailable
+	autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id BA673C5DF61
-	for <linux-block@archiver.kernel.org>; Thu,  7 Nov 2019 13:27:44 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 1F27EFC6195
+	for <linux-block@archiver.kernel.org>; Thu,  7 Nov 2019 13:35:30 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.kernel.org (Postfix) with ESMTP id 850EA2178F
-	for <linux-block@archiver.kernel.org>; Thu,  7 Nov 2019 13:27:44 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id DF9BF2075C
+	for <linux-block@archiver.kernel.org>; Thu,  7 Nov 2019 13:35:29 +0000 (UTC)
+Authentication-Results: mail.kernel.org;
+	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="BYDXMzvx"
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1727858AbfKGN1n (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Thu, 7 Nov 2019 08:27:43 -0500
-Received: from mx0a-001b2d01.pphosted.com ([148.163.156.1]:39430 "EHLO
-        mx0a-001b2d01.pphosted.com" rhost-flags-OK-OK-OK-OK)
-        by vger.kernel.org with ESMTP id S1730958AbfKGN1n (ORCPT
-        <rfc822;linux-block@vger.kernel.org>);
-        Thu, 7 Nov 2019 08:27:43 -0500
-Received: from pps.filterd (m0098393.ppops.net [127.0.0.1])
-        by mx0a-001b2d01.pphosted.com (8.16.0.27/8.16.0.27) with SMTP id xA7DOhph130544
-        for <linux-block@vger.kernel.org>; Thu, 7 Nov 2019 08:27:42 -0500
-Received: from e06smtp05.uk.ibm.com (e06smtp05.uk.ibm.com [195.75.94.101])
-        by mx0a-001b2d01.pphosted.com with ESMTP id 2w4kkd1uw7-1
-        (version=TLSv1.2 cipher=AES256-GCM-SHA384 bits=256 verify=NOT)
-        for <linux-block@vger.kernel.org>; Thu, 07 Nov 2019 08:27:42 -0500
-Received: from localhost
-        by e06smtp05.uk.ibm.com with IBM ESMTP SMTP Gateway: Authorized Use Only! Violators will be prosecuted
-        for <linux-block@vger.kernel.org> from <sth@linux.ibm.com>;
-        Thu, 7 Nov 2019 13:27:38 -0000
-Received: from b06cxnps3074.portsmouth.uk.ibm.com (9.149.109.194)
-        by e06smtp05.uk.ibm.com (192.168.101.135) with IBM ESMTP SMTP Gateway: Authorized Use Only! Violators will be prosecuted;
-        (version=TLSv1/SSLv3 cipher=AES256-GCM-SHA384 bits=256/256)
-        Thu, 7 Nov 2019 13:27:35 -0000
-Received: from d06av21.portsmouth.uk.ibm.com (d06av21.portsmouth.uk.ibm.com [9.149.105.232])
-        by b06cxnps3074.portsmouth.uk.ibm.com (8.14.9/8.14.9/NCO v10.0) with ESMTP id xA7DRYd027066500
-        (version=TLSv1/SSLv3 cipher=DHE-RSA-AES256-GCM-SHA384 bits=256 verify=OK);
-        Thu, 7 Nov 2019 13:27:34 GMT
-Received: from d06av21.portsmouth.uk.ibm.com (unknown [127.0.0.1])
-        by IMSVA (Postfix) with ESMTP id BA3B65204E;
-        Thu,  7 Nov 2019 13:27:34 +0000 (GMT)
-Received: from [9.152.212.95] (unknown [9.152.212.95])
-        by d06av21.portsmouth.uk.ibm.com (Postfix) with ESMTP id 8694352050;
-        Thu,  7 Nov 2019 13:27:34 +0000 (GMT)
-Subject: Re: [PATCH 5/5] block: remove (__)blkdev_reread_part as an exported
- API
-To:     Christoph Hellwig <hch@lst.de>, Jens Axboe <axboe@kernel.dk>,
-        Jan Kara <jack@suse.cz>
-Cc:     linux-block@vger.kernel.org, linux-s390@vger.kernel.org
-References: <20191106151439.30056-1-hch@lst.de>
- <20191106151439.30056-6-hch@lst.de>
-From:   Stefan Haberland <sth@linux.ibm.com>
-Openpgp: preference=signencrypt
-Autocrypt: addr=sth@linux.ibm.com; keydata=
- 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
- cH4TNHyhiR0KAbxE8qKx3Jc=
-Date:   Thu, 7 Nov 2019 14:27:34 +0100
-User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:60.0) Gecko/20100101
- Thunderbird/60.9.0
+        id S2388456AbfKGNf3 (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Thu, 7 Nov 2019 08:35:29 -0500
+Received: from us-smtp-delivery-1.mimecast.com ([205.139.110.120]:53470 "EHLO
+        us-smtp-1.mimecast.com" rhost-flags-OK-OK-OK-FAIL) by vger.kernel.org
+        with ESMTP id S2388428AbfKGNf3 (ORCPT
+        <rfc822;linux-block@vger.kernel.org>); Thu, 7 Nov 2019 08:35:29 -0500
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+        s=mimecast20190719; t=1573133727;
+        h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+         to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+         content-transfer-encoding:content-transfer-encoding;
+        bh=iwZ876V7tzoSqORegIaOnw8FP0vXTiWZKEpvV8lcU5c=;
+        b=BYDXMzvxHyaZmbX7A0k5DUkhdx75LSum4CpSs5xntduoKJBIzWv5p2dno/LGa0Rcp0Ucoa
+        4zWS6rfO+KwiXeh1AKAHVtAFVQM1VuEzjfXdZbT1/5LXuuvxDsU4Ku3iBUd2I/WG8yufBR
+        KTbD3uX5qzhyZnx93iCfRjpxrET4c7E=
+Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
+ [209.132.183.4]) (Using TLS) by relay.mimecast.com with ESMTP id
+ us-mta-98-La97UjRAOm-X80uwH0h8xg-1; Thu, 07 Nov 2019 08:35:23 -0500
+Received: from smtp.corp.redhat.com (int-mx02.intmail.prod.int.phx2.redhat.com [10.5.11.12])
+        (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
+        (No client certificate requested)
+        by mimecast-mx01.redhat.com (Postfix) with ESMTPS id 575D41800D7A;
+        Thu,  7 Nov 2019 13:35:21 +0000 (UTC)
+Received: from warthog.procyon.org.uk (ovpn-120-254.rdu2.redhat.com [10.10.120.254])
+        by smtp.corp.redhat.com (Postfix) with ESMTP id 0B13360C88;
+        Thu,  7 Nov 2019 13:35:17 +0000 (UTC)
+Subject: [RFC PATCH 00/14] pipe: Keyrings,
+ Block and USB notifications [ver #2]
+From:   David Howells <dhowells@redhat.com>
+To:     torvalds@linux-foundation.org
+Cc:     dhowells@redhat.com,
+        Greg Kroah-Hartman <gregkh@linuxfoundation.org>,
+        Casey Schaufler <casey@schaufler-ca.com>,
+        Stephen Smalley <sds@tycho.nsa.gov>, nicolas.dichtel@6wind.com,
+        raven@themaw.net, Christian Brauner <christian@brauner.io>,
+        dhowells@redhat.com, keyrings@vger.kernel.org,
+        linux-usb@vger.kernel.org, linux-block@vger.kernel.org,
+        linux-security-module@vger.kernel.org,
+        linux-fsdevel@vger.kernel.org, linux-api@vger.kernel.org,
+        linux-security-module@vger.kernel.org, linux-kernel@vger.kernel.org
+Date:   Thu, 07 Nov 2019 13:35:17 +0000
+Message-ID: <157313371694.29677.15388731274912671071.stgit@warthog.procyon.org.uk>
+User-Agent: StGit/unknown-version
 MIME-Version: 1.0
-In-Reply-To: <20191106151439.30056-6-hch@lst.de>
-Content-Type: text/plain; charset=utf-8
-Content-Transfer-Encoding: 7bit
-Content-Language: en-US
-X-TM-AS-GCONF: 00
-x-cbid: 19110713-0020-0000-0000-000003836BD4
-X-IBM-AV-DETECTION: SAVI=unused REMOTE=unused XFE=unused
-x-cbparentid: 19110713-0021-0000-0000-000021D9A026
-Message-Id: <64b9c358-1815-520b-04ed-3844e2c53c36@linux.ibm.com>
-X-Proofpoint-Virus-Version: vendor=fsecure engine=2.50.10434:,, definitions=2019-11-07_04:,,
- signatures=0
-X-Proofpoint-Spam-Details: rule=outbound_notspam policy=outbound score=0 priorityscore=1501
- malwarescore=0 suspectscore=0 phishscore=0 bulkscore=0 spamscore=0
- clxscore=1015 lowpriorityscore=0 mlxscore=0 impostorscore=0
- mlxlogscore=826 adultscore=0 classifier=spam adjust=0 reason=mlx
- scancount=1 engine=8.0.1-1910280000 definitions=main-1911070135
+X-Scanned-By: MIMEDefang 2.79 on 10.5.11.12
+X-MC-Unique: La97UjRAOm-X80uwH0h8xg-1
+X-Mimecast-Spam-Score: 0
+Content-Type: text/plain; charset=UTF-8
+Content-Transfer-Encoding: quoted-printable
 Sender: linux-block-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-On 06.11.19 16:14, Christoph Hellwig wrote:
-> In general drivers should never mess with partition tables directly.
-> Unfortunately s390 and loop do for somewhat historic reasons, but they
-> can use bdev_disk_changed directly instead when we export it as they
-> satisfy the sanity checks we have in __blkdev_reread_part.
->
-> Signed-off-by: Christoph Hellwig <hch@lst.de>
 
-Hi,
+Here's a set of patches to add a general notification queue concept and to
+add event sources such as:
 
-tested (the whole patchset) with DASD on s390 and for the DASD part:
+ (1) Keys/keyrings, such as linking and unlinking keys and changing their
+     attributes.
 
-Reviewed-by: Stefan Haberland <sth@linux.ibm.com>
+ (2) General device events (single common queue) including:
+
+     - Block layer events, such as device errors
+
+     - USB subsystem events, such as device attach/remove, device reset,
+       device errors.
+
+I have patches for adding superblock and mount topology watches also,
+though those are not in this set as there are other dependencies.
+
+LSM hooks are included:
+
+ (1) A set of hooks are provided that allow an LSM to rule on whether or
+     not a watch may be set.  Each of these hooks takes a different
+     "watched object" parameter, so they're not really shareable.  The LSM
+     should use current's credentials.  [Wanted by SELinux & Smack]
+
+ (2) A hook is provided to allow an LSM to rule on whether or not a
+     particular message may be posted to a particular queue.  This is given
+     the credentials from the event generator (which may be the system) and
+     the watch setter.  [Wanted by Smack]
+
+I've provided SELinux and Smack with implementations of some of these hooks=
+.
+
+
+Design decisions:
+
+ (1) The notification queue is built on top of a standard pipe.  Messages
+     are effectively spliced in.  The pipe is opened with a special flag:
+
+=09pipe2(fds, O_NOTIFICATION_PIPE);
+
+     The special flag has the same value as O_EXCL (which doesn't seem like
+     it will ever be applicable in this context)[?].  It is given up front
+     to make it a lot easier to prohibit splice and co. from accessing the
+     pipe.
+
+     [?] Should this be done some other way?  I'd rather not use up a new
+     O_* flag if I can avoid it - should I add a pipe3() system call
+     instead?
+
+     The pipe is then configured::
+
+=09ioctl(fds[1], IOC_WATCH_QUEUE_SET_SIZE, queue_depth);
+=09ioctl(fds[1], IOC_WATCH_QUEUE_SET_FILTER, &filter);
+
+     Messages are then read out of the pipe using read().
+
+ (2) It should be possible to allow write() to insert data into the
+     notification pipes too, but this is currently disabled as the kernel
+     has to be able to insert messages into the pipe *without* holding
+     pipe->mutex and the code to make this work needs careful auditing.
+
+ (3) sendfile(), splice() and vmsplice() are disabled on notification pipes
+     because of the pipe->mutex issue and also because they sometimes want
+     to revert what they just did - but one or more notification messages
+     might've been interleaved in the ring.
+
+ (4) The kernel inserts messages with the wait queue spinlock held.  This
+     means that pipe_read() and pipe_write() have to take the spinlock to
+     update the queue pointers.
+
+ (5) Records in the buffer are binary, typed and have a length so that they
+     can be of varying size.
+
+     This allows multiple heterogeneous sources to share a common buffer;
+     there are 16 million types available, of which I've used just a few,
+     so there is scope for others to be used.  Tags may be specified when a
+     watchpoint is created to help distinguish the sources.
+
+ (6) Records are filterable as types have up to 256 subtypes that can be
+     individually filtered.  Other filtration is also available.
+
+ (7) Notification pipes don't interfere with each other; each may be bound
+     to a different set of watches.  Any particular notification will be
+     copied to all the queues that are currently watching for it - and only
+     those that are watching for it.
+
+ (8) When recording a notification, the kernel will not sleep, but will
+     rather mark a queue as having lost a message if there's insufficient
+     space.  read() will fabricate a loss notification message at an
+     appropriate point later.
+
+ (9) The notification pipe is created and then watchpoints are attached to
+     it, using one of:
+
+=09keyctl_watch_key(KEY_SPEC_SESSION_KEYRING, fds[1], 0x01);
+=09watch_devices(fds[1], 0x02, 0);
+
+     where in both cases, fd indicates the queue and the number after is a
+     tag between 0 and 255.
+
+(10) Watches are removed if either the notification pipe is destroyed or
+     the watched object is destroyed.  In the latter case, a message will
+     be generated indicating the enforced watch removal.
+
+
+Things I want to avoid:
+
+ (1) Introducing features that make the core VFS dependent on the network
+     stack or networking namespaces (ie. usage of netlink).
+
+ (2) Dumping all this stuff into dmesg and having a daemon that sits there
+     parsing the output and distributing it as this then puts the
+     responsibility for security into userspace and makes handling
+     namespaces tricky.  Further, dmesg might not exist or might be
+     inaccessible inside a container.
+
+ (3) Letting users see events they shouldn't be able to see.
+
+
+Testing and manpages:
+
+ (*) The keyutils tree has a pipe-watch branch that has keyctl commands for
+     making use of notifications.  Proposed manual pages can also be found
+     on this branch, though a couple of them really need to go to the main
+     manpages repository instead.
+
+     If the kernel supports the watching of keys, then running "make test"
+     on that branch will cause the testing infrastructure to spawn a
+     monitoring process on the side that monitors a notifications pipe for
+     all the key/keyring changes induced by the tests and they'll all be
+     checked off to make sure they happened.
+
+=09https://git.kernel.org/pub/scm/linux/kernel/git/dhowells/keyutils.git/lo=
+g/?h=3Dpipe-watch
+
+The kernel patches can also be found here:
+
+=09https://git.kernel.org/pub/scm/linux/kernel/git/dhowells/linux-fs.git/lo=
+g/?h=3Dnotifications-pipe-core
+
+Changes:
+
+ ver #2:
+
+ (*) Declare O_NOTIFICATION_PIPE to use and switch it to be the same value
+     as O_EXCL rather then O_TMPFILE (the latter is a bit nasty in its
+     implementation).
+
+ ver #1:
+
+ (*) Build on top of standard pipes instead of having a driver.
+
+David
+---
+David Howells (14):
+      uapi: General notification queue definitions
+      security: Add hooks to rule on setting a watch
+      security: Add a hook for the point of notification insertion
+      pipe: Add O_NOTIFICATION_PIPE
+      pipe: Add general notification queue support
+      keys: Add a notification facility
+      Add sample notification program
+      pipe: Allow buffers to be marked read-whole-or-error for notification=
+s
+      pipe: Add notification lossage handling
+      Add a general, global device notification watch list
+      block: Add block layer notifications
+      usb: Add USB subsystem notifications
+      selinux: Implement the watch_key security hook
+      smack: Implement the watch_key and post_notification hooks
+
+
+ Documentation/ioctl/ioctl-number.rst        |    1=20
+ Documentation/security/keys/core.rst        |   58 ++
+ Documentation/watch_queue.rst               |  385 ++++++++++++++++
+ arch/alpha/kernel/syscalls/syscall.tbl      |    1=20
+ arch/arm/tools/syscall.tbl                  |    1=20
+ arch/arm64/include/asm/unistd.h             |    2=20
+ arch/arm64/include/asm/unistd32.h           |    2=20
+ arch/ia64/kernel/syscalls/syscall.tbl       |    1=20
+ arch/m68k/kernel/syscalls/syscall.tbl       |    1=20
+ arch/microblaze/kernel/syscalls/syscall.tbl |    1=20
+ arch/mips/kernel/syscalls/syscall_n32.tbl   |    1=20
+ arch/mips/kernel/syscalls/syscall_n64.tbl   |    1=20
+ arch/mips/kernel/syscalls/syscall_o32.tbl   |    1=20
+ arch/parisc/kernel/syscalls/syscall.tbl     |    1=20
+ arch/powerpc/kernel/syscalls/syscall.tbl    |    1=20
+ arch/s390/kernel/syscalls/syscall.tbl       |    1=20
+ arch/sh/kernel/syscalls/syscall.tbl         |    1=20
+ arch/sparc/kernel/syscalls/syscall.tbl      |    1=20
+ arch/x86/entry/syscalls/syscall_32.tbl      |    1=20
+ arch/x86/entry/syscalls/syscall_64.tbl      |    1=20
+ arch/xtensa/kernel/syscalls/syscall.tbl     |    1=20
+ block/Kconfig                               |    9=20
+ block/blk-core.c                            |   29 +
+ drivers/base/Kconfig                        |    9=20
+ drivers/base/Makefile                       |    1=20
+ drivers/base/watch.c                        |   90 ++++
+ drivers/usb/core/Kconfig                    |    9=20
+ drivers/usb/core/devio.c                    |   47 ++
+ drivers/usb/core/hub.c                      |    4=20
+ fs/pipe.c                                   |  229 ++++++---
+ fs/splice.c                                 |   12=20
+ include/linux/blkdev.h                      |   15 +
+ include/linux/device.h                      |    7=20
+ include/linux/key.h                         |    3=20
+ include/linux/lsm_audit.h                   |    1=20
+ include/linux/lsm_hooks.h                   |   38 ++
+ include/linux/pipe_fs_i.h                   |   27 +
+ include/linux/security.h                    |   32 +
+ include/linux/syscalls.h                    |    1=20
+ include/linux/usb.h                         |   18 +
+ include/linux/watch_queue.h                 |  127 +++++
+ include/uapi/asm-generic/unistd.h           |    4=20
+ include/uapi/linux/keyctl.h                 |    2=20
+ include/uapi/linux/watch_queue.h            |  158 ++++++
+ init/Kconfig                                |   12=20
+ kernel/Makefile                             |    1=20
+ kernel/sys_ni.c                             |    1=20
+ kernel/watch_queue.c                        |  658 +++++++++++++++++++++++=
+++++
+ samples/Kconfig                             |    7=20
+ samples/Makefile                            |    1=20
+ samples/watch_queue/Makefile                |    7=20
+ samples/watch_queue/watch_test.c            |  251 ++++++++++
+ security/keys/Kconfig                       |    9=20
+ security/keys/compat.c                      |    3=20
+ security/keys/gc.c                          |    5=20
+ security/keys/internal.h                    |   30 +
+ security/keys/key.c                         |   38 +-
+ security/keys/keyctl.c                      |   99 ++++
+ security/keys/keyring.c                     |   20 +
+ security/keys/request_key.c                 |    4=20
+ security/security.c                         |   23 +
+ security/selinux/hooks.c                    |   14 +
+ security/smack/smack_lsm.c                  |   82 +++
+ 63 files changed, 2492 insertions(+), 109 deletions(-)
+ create mode 100644 Documentation/watch_queue.rst
+ create mode 100644 drivers/base/watch.c
+ create mode 100644 include/linux/watch_queue.h
+ create mode 100644 include/uapi/linux/watch_queue.h
+ create mode 100644 kernel/watch_queue.c
+ create mode 100644 samples/watch_queue/Makefile
+ create mode 100644 samples/watch_queue/watch_test.c
 
