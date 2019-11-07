@@ -2,117 +2,109 @@ Return-Path: <SRS0=Ukdl=Y7=vger.kernel.org=linux-block-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-2.3 required=3.0 tests=DKIM_SIGNED,DKIM_VALID,
+X-Spam-Status: No, score=-3.8 required=3.0 tests=DKIM_SIGNED,DKIM_VALID,
 	HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,
-	USER_AGENT_SANE_1 autolearn=no autolearn_force=no version=3.4.0
+	USER_AGENT_GIT autolearn=no autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id E8E10C5DF60
-	for <linux-block@archiver.kernel.org>; Thu,  7 Nov 2019 13:40:23 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 7E54EC5DF60
+	for <linux-block@archiver.kernel.org>; Thu,  7 Nov 2019 16:00:51 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.kernel.org (Postfix) with ESMTP id BF8B6218AE
-	for <linux-block@archiver.kernel.org>; Thu,  7 Nov 2019 13:40:23 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id 4F397222C2
+	for <linux-block@archiver.kernel.org>; Thu,  7 Nov 2019 16:00:51 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel-dk.20150623.gappssmtp.com header.i=@kernel-dk.20150623.gappssmtp.com header.b="wH3+KwrC"
+	dkim=pass (2048-bit key) header.d=kernel-dk.20150623.gappssmtp.com header.i=@kernel-dk.20150623.gappssmtp.com header.b="cW07Huvu"
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1727858AbfKGNkX (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Thu, 7 Nov 2019 08:40:23 -0500
-Received: from mail-pl1-f193.google.com ([209.85.214.193]:34965 "EHLO
-        mail-pl1-f193.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1726754AbfKGNkX (ORCPT
-        <rfc822;linux-block@vger.kernel.org>); Thu, 7 Nov 2019 08:40:23 -0500
-Received: by mail-pl1-f193.google.com with SMTP id s10so1496953plp.2
-        for <linux-block@vger.kernel.org>; Thu, 07 Nov 2019 05:40:22 -0800 (PST)
+        id S1730342AbfKGQAu (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Thu, 7 Nov 2019 11:00:50 -0500
+Received: from mail-il1-f176.google.com ([209.85.166.176]:33974 "EHLO
+        mail-il1-f176.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S1730057AbfKGQAu (ORCPT
+        <rfc822;linux-block@vger.kernel.org>); Thu, 7 Nov 2019 11:00:50 -0500
+Received: by mail-il1-f176.google.com with SMTP id p6so2278960ilp.1
+        for <linux-block@vger.kernel.org>; Thu, 07 Nov 2019 08:00:48 -0800 (PST)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=kernel-dk.20150623.gappssmtp.com; s=20150623;
-        h=subject:to:cc:references:from:message-id:date:user-agent
-         :mime-version:in-reply-to:content-language:content-transfer-encoding;
-        bh=4jwWug07MWOkr2qYik00IBFcec60QuuQYmHGTX5Nfvk=;
-        b=wH3+KwrCqWpVGRfSTjUUlZGDGoRu3adOrQELxMAsfC0X9zWnU8LI+X1FuqtcenJ4Ih
-         ApOt9YzExOdEtVt0WETR9+3OLChFDUMl1LZI+euhn9v8WCIwMuGajNwzNMn1ubzGN1PL
-         qa2KCx5JuVeMyLOtAYijCYZcULRT4B7BSW6XVSedKLRrNYqCx9cJ6N5DrbG5nao4ugWk
-         TOF92HaAS5mQT4e5ayyDObQmRrwqAuYnlze5K1sMZjF29VMn0/v3kFMG586GC58NZF5y
-         cmTIkoMk9VL+es1FsKZ4EAu9aDtR3KlHYouPP3AxnOyReUTF972b7PjNZU0+JBkkI3Lo
-         cSsg==
+        h=from:to:cc:subject:date:message-id:mime-version
+         :content-transfer-encoding;
+        bh=hWiaoxJzJr6AurYYp7FjIq/mWHaDg/ddtYufF1Rigrs=;
+        b=cW07HuvuTNBCjd1dw+r4nhfKUYZFMAUscTgjvFNpgsR4tlvMnxh5tpIiirfT+32c1r
+         U5cDlLXS+xCBuvpEUWuzJcEgPNztW3KKsPxpXiqINXIiC8idVUFz4Ouf/qn+DLjbZy9v
+         VYKtPApPORJF1wRm8F4u+Ivx5ChD0OgjZl7tlnq+FY9Rc59VgL/QWVImXAD/1s23anw8
+         v/+mEGc7Dktzxr3TwJz9L1mdPCGyELYGX4ADgZkDy7RH+KDiiQFGAcwPoXN7loiLHPCt
+         qdST6ZzikfhhLXVKDt0DrWVhY61zYJ47DuTBC9OMeYnAW42KZ3e+g8Oix7Ip1XvtTqtZ
+         eeHA==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=1e100.net; s=20161025;
-        h=x-gm-message-state:subject:to:cc:references:from:message-id:date
-         :user-agent:mime-version:in-reply-to:content-language
+        h=x-gm-message-state:from:to:cc:subject:date:message-id:mime-version
          :content-transfer-encoding;
-        bh=4jwWug07MWOkr2qYik00IBFcec60QuuQYmHGTX5Nfvk=;
-        b=UysWumdOaKGim44G8nxcj0aYAfdX/xB79VUua6cFwf2AmoZPYmCt51fAoMT4NhMI7z
-         NuWVKDbazF8hn3RLUkUxfBt7anEYkRVIS0RDF2uIy8OxJ9OGtWLHdoNFIaOBRpCRnvkJ
-         1zhqAD7xtyriEExk6fxqOH5mw8cIPc+tlykOM+aihx3NPwBxhqnWA1Afm66o9p0DAxwS
-         kP0c5xaUqGSTll+qAuNUn8jAIbw33NYREbXmchT1kv8IRtTet8ZHYioW4HJ25jjNRBAk
-         SKYFDxBfd72wil8Z7qhDlMKU48k/yp63W1hO9mD94lJCBBNiTSkvUozWXl7KAjpcVU/h
-         G8FA==
-X-Gm-Message-State: APjAAAXRK21e9Y7kWD9WxPn0AQNFTrUUFLIASs0/O2hUgaArZOhLa1my
-        I3W8NXP4gwPnWVvBIp7EO8UQqQ==
-X-Google-Smtp-Source: APXvYqxUqwziIRejg0VlHTo/IjAZ8qKz+Umil4abg66UwevSjmyaJOge6jJD9qFWjmRFk+eqOImpbg==
-X-Received: by 2002:a17:902:47:: with SMTP id 65mr3722636pla.94.1573134021445;
-        Thu, 07 Nov 2019 05:40:21 -0800 (PST)
-Received: from [192.168.1.188] ([66.219.217.79])
-        by smtp.gmail.com with ESMTPSA id r11sm2255570pjp.14.2019.11.07.05.40.18
-        (version=TLS1_2 cipher=ECDHE-RSA-AES128-GCM-SHA256 bits=128/128);
-        Thu, 07 Nov 2019 05:40:20 -0800 (PST)
-Subject: Re: [PATCH 0/8] Zone management commands support
-To:     Damien Le Moal <damien.lemoal@wdc.com>,
-        linux-block@vger.kernel.org, linux-scsi@vger.kernel.org,
-        "Martin K . Petersen" <martin.petersen@oracle.com>,
-        dm-devel@redhat.com, Mike Snitzer <snitzer@redhat.com>
-Cc:     Ajay Joshi <ajay.joshi@wdc.com>,
-        Matias Bjorling <matias.bjorling@wdc.com>,
-        Hans Holmberg <Hans.Holmberg@wdc.com>,
-        Dmitry Fomichev <dmitry.fomichev@wdc.com>,
-        Keith Busch <kbusch@kernel.org>
-References: <20191027140549.26272-1-damien.lemoal@wdc.com>
+        bh=hWiaoxJzJr6AurYYp7FjIq/mWHaDg/ddtYufF1Rigrs=;
+        b=QuLckOm9LkvNupFUCj7OE9hdd0bRLCBoBPlX6ApJIIfrJrlHfT5BMB7d7Dzu3nOiIA
+         CtvWiJ9Jd1n710BRNo3H5rYtGJZG2BTovrNcMeuWn4+bY6jLhdvDMSnJtrOI2vGEopsl
+         u/LBXpyxY6sVffwjERQ9zniyP+3HLM6O/kKRXZ49nOsR3ixV+unZX6aQdxocv5I11ySO
+         S1HnZbmre5SV5S446udZFUCjazLIMq0u9QLEwyP+FFum7LL7k4ZCwWFnTTeBg896fydM
+         TImlDwAEm0zWV1u1Z312onTCAjA++9JCGcBI+MHT6Fzg6ZcYN1h4tdH3v7kTr+pV5nCX
+         lZWA==
+X-Gm-Message-State: APjAAAVEwjoQMZykdr46YAuiDNn58DosK916r/dyTglZYW7LScp3iGQm
+        3CJhIk/lH2JxoBvUNmrHWbkctA==
+X-Google-Smtp-Source: APXvYqz+Vm4tBA37hhSWQC4GGytsxsYORfBP/94O7A3ETJXnXvD6mGP7Q/Ubg4Ka6iUhFJA7k773bg==
+X-Received: by 2002:a92:ad12:: with SMTP id w18mr5541669ilh.230.1573142447882;
+        Thu, 07 Nov 2019 08:00:47 -0800 (PST)
+Received: from x1.localdomain ([65.144.74.34])
+        by smtp.gmail.com with ESMTPSA id v130sm210438iod.32.2019.11.07.08.00.46
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Thu, 07 Nov 2019 08:00:47 -0800 (PST)
 From:   Jens Axboe <axboe@kernel.dk>
-Message-ID: <31755ade-ae21-8842-05c0-47017cea7e29@kernel.dk>
-Date:   Thu, 7 Nov 2019 06:40:16 -0700
-User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:60.0) Gecko/20100101
- Thunderbird/60.9.0
+To:     io-uring@vger.kernel.org
+Cc:     linux-block@vger.kernel.org, asml.silence@gmail.com,
+        jannh@google.com
+Subject: [PATCHSET v3 0/3] io_uring CQ ring backpressure
+Date:   Thu,  7 Nov 2019 09:00:40 -0700
+Message-Id: <20191107160043.31725-1-axboe@kernel.dk>
+X-Mailer: git-send-email 2.24.0
 MIME-Version: 1.0
-In-Reply-To: <20191027140549.26272-1-damien.lemoal@wdc.com>
-Content-Type: text/plain; charset=utf-8
-Content-Language: en-US
-Content-Transfer-Encoding: 7bit
+Content-Transfer-Encoding: 8bit
 Sender: linux-block-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-On 10/27/19 8:05 AM, Damien Le Moal wrote:
-> This series implements a few improvements and cleanups to zone block
-> device zone reset operations with the first three patches.
-> 
-> The remaining of the series patches introduce zone open, close and
-> finish support, allowing users of zoned block devices to explicitly
-> control the condition (state) of zones.
-> 
-> While these operations are not stricktly necessary for the correct
-> operation of zoned block devices, the open and close operations can
-> improve performance for some device implementations of the ZBC and ZAC
-> standards under write workloads. The finish zone operation, which
-> transition a zone to the full state, can also be useful to protect a
-> zone data by preventing further zone writes.
-> 
-> These operations are implemented by introducing the new
-> REQ_OP_ZONE_OPEN, REQ_OP_ZONE_CLOSE and REQ_OP_ZONE_FINISH request codes
-> and the function blkdev_zone_mgmt() to issue these requests. This new
-> function also replaces the former blkdev_reset_zones() function to reset
-> zones write pointer.
-> 
-> The new ioctls BLKOPENZONE, BLKCLOSEZONE and BLKFINISHZONE are also
-> defined to allow applications to issue these new requests without
-> resorting to a device passthrough interface (e.g. SG_IO).
-> 
-> Support for these operations is added to the SCSI sd driver, to the dm
-> infrastructure (dm-linear and dm-flakey targets) and to the null_blk
-> driver.
+Currently we drop completion events, if the CQ ring is full. That's fine
+for requests with bounded completion times, but it may make it harder to
+use io_uring with networked IO where request completion times are
+generally unbounded. Or with POLL, for example, which is also unbounded.
 
-Applied for 5.5, thanks. I've got the last sd patch pending, the conflict
-is rather ugly. I'll setup a post branch for drivers with this in, once
-the dependent fix has landed in Linus's tree.
+This patch adds IORING_SETUP_CQ_NODROP, which changes the behavior a bit
+for CQ ring overflows. First of all, it doesn't overflow the ring, it
+simply stores backlog of completions that we weren't able to put into
+the CQ ring. To prevent the backlog from growing indefinitely, if the
+backlog is non-empty, we apply back pressure on IO submissions. Any
+attempt to submit new IO with a non-empty backlog will get an -EBUSY
+return from the kernel.
+
+I think that makes for a pretty sane API in terms of how the application
+can handle it. With CQ_NODROP enabled, we'll never drop a completion
+event, but we'll also not allow submissions with a completion backlog.
+
+Changes since v2:
+
+- Add io_double_put_req() helper for the cases where we need to drop both
+  the submit and complete reference. We didn't need this before as we
+  could just free the request unconditionally, but we don't know if that's
+  the case anymore if add/fill grabs a reference to it.
+- Fix linked request dropping.
+
+Changes since v1:
+
+- Drop the cqe_drop structure and allocation, simply use the io_kiocb
+  for the overflow backlog
+- Rebase on top of Pavel's series which made this cleaner
+- Add prep patch for the fill/add CQ handler changes
+
+ fs/io_uring.c                 | 209 +++++++++++++++++++++++-----------
+ include/uapi/linux/io_uring.h |   1 +
+ 2 files changed, 143 insertions(+), 67 deletions(-)
 
 -- 
 Jens Axboe
+
 
