@@ -2,556 +2,143 @@ Return-Path: <SRS0=Ukdl=Y7=vger.kernel.org=linux-block-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-9.8 required=3.0 tests=DKIM_SIGNED,DKIM_VALID,
-	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,
-	SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED,USER_AGENT_GIT autolearn=unavailable
-	autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-0.9 required=3.0 tests=DKIM_SIGNED,DKIM_VALID,
+	DKIM_VALID_AU,HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SPF_HELO_NONE,
+	SPF_PASS autolearn=no autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 7E6DAC5DF61
-	for <linux-block@archiver.kernel.org>; Thu,  7 Nov 2019 18:29:32 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 2B561C43331
+	for <linux-block@archiver.kernel.org>; Thu,  7 Nov 2019 18:48:54 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.kernel.org (Postfix) with ESMTP id 42F10218AE
-	for <linux-block@archiver.kernel.org>; Thu,  7 Nov 2019 18:29:32 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id 0278A2084C
+	for <linux-block@archiver.kernel.org>; Thu,  7 Nov 2019 18:48:54 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel-dk.20150623.gappssmtp.com header.i=@kernel-dk.20150623.gappssmtp.com header.b="RQh4yxO+"
+	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="IzWCw6Jo"
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1728300AbfKGS3b (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Thu, 7 Nov 2019 13:29:31 -0500
-Received: from mail-il1-f196.google.com ([209.85.166.196]:37845 "EHLO
-        mail-il1-f196.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1728322AbfKGS3b (ORCPT
-        <rfc822;linux-block@vger.kernel.org>); Thu, 7 Nov 2019 13:29:31 -0500
-Received: by mail-il1-f196.google.com with SMTP id s5so2726307iln.4
-        for <linux-block@vger.kernel.org>; Thu, 07 Nov 2019 10:29:29 -0800 (PST)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=kernel-dk.20150623.gappssmtp.com; s=20150623;
-        h=from:to:cc:subject:date:message-id:in-reply-to:references
-         :mime-version:content-transfer-encoding;
-        bh=3mIpShIh/AqpfvUwiIQCsObLKPQqpScWhbkwquQTgcw=;
-        b=RQh4yxO+dKPoDVPLPDXoA0zf4MZ70NuTL1wFXG+hckmVghy9jW7gCJnYIo+WM98a77
-         NxXxPwk5JVITrqlqtNZ7p0OtKqZ4miFUMjIDQQwu42QUX0aGRh+saP6at5q+n/91tZDk
-         vXyJNjsknK595LFz6/WheKotkkILviyKcQvzbIo2a2cSXknkXpf75TABkRiYt7JrSSHc
-         jeqPX1YbmwlRBZvvZAUPVx49+aSywfioUqwL77KwuXXbndgZO7lDVhj+v244+1L8sLlJ
-         i6dQu+uiGa98aYM8eG5A6POihKNh0IuqSVReDIX8ROTa8LrsP/DTxAqoQZGj/lMd4k31
-         KZAw==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20161025;
-        h=x-gm-message-state:from:to:cc:subject:date:message-id:in-reply-to
-         :references:mime-version:content-transfer-encoding;
-        bh=3mIpShIh/AqpfvUwiIQCsObLKPQqpScWhbkwquQTgcw=;
-        b=rbuF+QKqZLNKzt9syaxBS/p11wugFRyx6vPU0WUBB+GICA3COxbB1GbyGQynz99Ezc
-         5VaBxqPW2XVqpQMfJWOE01819A70i3pyYY0ZkgpLibrWrjfC4WzSfKCUGK+K6snkrZus
-         9hXUjX6c5Mn1/xoQhlsH++ozXitZ6BJYrip7aNZIqOuvXnmLjz7X4JL831EKXwlka28s
-         Uielr/4fg5qRRw7RBwNLVa0IJ85hzi+shhO7y1vE3YgkMN8JmWZfMQjZ7LgZTXfh9VRd
-         O3VK/5ml1IcF1+ei7RBwAAI+f5j78payFqaOBStl5Urhhm2DPOOzOjKPwnswsz+xM7+7
-         FGxA==
-X-Gm-Message-State: APjAAAWjd+EqvWfjtBFHo32WAp8ouQvD5b/gBohAyAa+GCrdgWHWZlER
-        3EXR94SvUN8qKFEVWe181OzYLcWtedA=
-X-Google-Smtp-Source: APXvYqwUdLL2brhJat8mk5zZ8T7oYh3q0zH66otrPIIJM52M6/vhM8hs0GhvQMPkH3+XqPVu58856A==
-X-Received: by 2002:a92:7ece:: with SMTP id q75mr6432321ill.164.1573151368503;
-        Thu, 07 Nov 2019 10:29:28 -0800 (PST)
-Received: from x1.localdomain ([65.144.74.34])
-        by smtp.gmail.com with ESMTPSA id p6sm243727iog.55.2019.11.07.10.29.27
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Thu, 07 Nov 2019 10:29:27 -0800 (PST)
-From:   Jens Axboe <axboe@kernel.dk>
-To:     io-uring@vger.kernel.org
-Cc:     linux-block@vger.kernel.org, Jens Axboe <axboe@kernel.dk>
-Subject: [PATCH 2/3] io_wq: add support for bounded vs unbunded work
-Date:   Thu,  7 Nov 2019 11:29:19 -0700
-Message-Id: <20191107182920.21196-3-axboe@kernel.dk>
-X-Mailer: git-send-email 2.24.0
-In-Reply-To: <20191107182920.21196-1-axboe@kernel.dk>
-References: <20191107182920.21196-1-axboe@kernel.dk>
+        id S1726976AbfKGSsw (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Thu, 7 Nov 2019 13:48:52 -0500
+Received: from us-smtp-delivery-1.mimecast.com ([205.139.110.120]:44075 "EHLO
+        us-smtp-1.mimecast.com" rhost-flags-OK-OK-OK-FAIL) by vger.kernel.org
+        with ESMTP id S1726616AbfKGSsv (ORCPT
+        <rfc822;linux-block@vger.kernel.org>); Thu, 7 Nov 2019 13:48:51 -0500
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+        s=mimecast20190719; t=1573152530;
+        h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+         to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+         content-transfer-encoding:content-transfer-encoding:
+         in-reply-to:in-reply-to:references:references;
+        bh=UHB0JrKl2/lgoy546a6o5x0iXWhc257PTYUJn/4Bje0=;
+        b=IzWCw6Joj6xY0pxmrt8uf+HitdTf1u5HxPuCNhyPwd+atj0HVEEvvcfqnXDHJq5Q3iMUs1
+        mYP8gP15+qfCHcfUawOYCNJ0A6HvzQWv3FpQSZZ40HpBK69B913VawjCUjhMl+9oEoazo5
+        wcoHY8T3eYEVFyOIQYvdO6F58R4aLKc=
+Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
+ [209.132.183.4]) (Using TLS) by relay.mimecast.com with ESMTP id
+ us-mta-270-B9RjU769P3eP409e546QHA-1; Thu, 07 Nov 2019 13:48:44 -0500
+Received: from smtp.corp.redhat.com (int-mx01.intmail.prod.int.phx2.redhat.com [10.5.11.11])
+        (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
+        (No client certificate requested)
+        by mimecast-mx01.redhat.com (Postfix) with ESMTPS id 70429800C61;
+        Thu,  7 Nov 2019 18:48:41 +0000 (UTC)
+Received: from warthog.procyon.org.uk (ovpn-120-254.rdu2.redhat.com [10.10.120.254])
+        by smtp.corp.redhat.com (Postfix) with ESMTP id 54380600D3;
+        Thu,  7 Nov 2019 18:48:38 +0000 (UTC)
+Organization: Red Hat UK Ltd. Registered Address: Red Hat UK Ltd, Amberley
+        Place, 107-111 Peascod Street, Windsor, Berkshire, SI4 1TE, United
+        Kingdom.
+        Registered in England and Wales under Company Registration No. 3798903
+From:   David Howells <dhowells@redhat.com>
+In-Reply-To: <CALCETrUka9KaOKFbNKUXcA6XvoFxiXPftctSHtN4DL35Cay61w@mail.gmail.com>
+References: <CALCETrUka9KaOKFbNKUXcA6XvoFxiXPftctSHtN4DL35Cay61w@mail.gmail.com> <157313371694.29677.15388731274912671071.stgit@warthog.procyon.org.uk> <157313375678.29677.15875689548927466028.stgit@warthog.procyon.org.uk>
+To:     Andy Lutomirski <luto@kernel.org>
+Cc:     dhowells@redhat.com,
+        Linus Torvalds <torvalds@linux-foundation.org>,
+        Greg Kroah-Hartman <gregkh@linuxfoundation.org>,
+        Casey Schaufler <casey@schaufler-ca.com>,
+        Stephen Smalley <sds@tycho.nsa.gov>,
+        Nicolas Dichtel <nicolas.dichtel@6wind.com>, raven@themaw.net,
+        Christian Brauner <christian@brauner.io>,
+        keyrings@vger.kernel.org, USB list <linux-usb@vger.kernel.org>,
+        linux-block <linux-block@vger.kernel.org>,
+        LSM List <linux-security-module@vger.kernel.org>,
+        Linux FS Devel <linux-fsdevel@vger.kernel.org>,
+        Linux API <linux-api@vger.kernel.org>,
+        LKML <linux-kernel@vger.kernel.org>
+Subject: Re: [RFC PATCH 04/14] pipe: Add O_NOTIFICATION_PIPE [ver #2]
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
+Content-ID: <6963.1573152517.1@warthog.procyon.org.uk>
+Date:   Thu, 07 Nov 2019 18:48:37 +0000
+Message-ID: <6964.1573152517@warthog.procyon.org.uk>
+X-Scanned-By: MIMEDefang 2.79 on 10.5.11.11
+X-MC-Unique: B9RjU769P3eP409e546QHA-1
+X-Mimecast-Spam-Score: 0
+Content-Type: text/plain; charset=WINDOWS-1252
+Content-Transfer-Encoding: quoted-printable
 Sender: linux-block-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-io_uring supports request types that basically have two different
-lifetimes:
+Andy Lutomirski <luto@kernel.org> wrote:
 
-1) Bounded completion time. These are requests like disk reads or writes,
-   which we know will finish in a finite amount of time.
-2) Unbounded completion time. These are generally networked IO, where we
-   have no idea how long they will take to complete. Another example is
-   POLL commands.
+> > Add an O_NOTIFICATION_PIPE flag that can be passed to pipe2() to indica=
+te
+> > that the pipe being created is going to be used for notifications.  Thi=
+s
+> > suppresses the use of splice(), vmsplice(), tee() and sendfile() on the
+> > pipe as calling iov_iter_revert() on a pipe when a kernel notification
+> > message has been inserted into the middle of a multi-buffer splice will=
+ be
+> > messy.
+>
+> How messy?
 
-This patch provides support for io-wq to handle these differently, so we
-don't starve bounded requests by tying up workers for too long. In this
-patch, io_uring passes in bounded and unbounded counts, but doesn't
-utilize them yet.
+Well, iov_iter_revert() on a pipe iterator simply walks backwards along the
+ring discarding the last N contiguous slots (where N is normally the number=
+ of
+slots that were filled by whatever operation is being reverted).
 
-Signed-off-by: Jens Axboe <axboe@kernel.dk>
----
- fs/io-wq.c    | 242 ++++++++++++++++++++++++++++++++++----------------
- fs/io-wq.h    |   4 +-
- fs/io_uring.c |   8 +-
- 3 files changed, 170 insertions(+), 84 deletions(-)
+However, unless the code that transfers stuff into the pipe takes the spinl=
+ock
+spinlock and disables softirqs for the duration of its ring filling, what w=
+ere
+N contiguous slots may now have kernel notifications interspersed - even if=
+ it
+has been holding the pipe mutex.
 
-diff --git a/fs/io-wq.c b/fs/io-wq.c
-index 9b375009a553..2c9705f0a25d 100644
---- a/fs/io-wq.c
-+++ b/fs/io-wq.c
-@@ -27,6 +27,7 @@ enum {
- 	IO_WORKER_F_FREE	= 4,	/* worker on free list */
- 	IO_WORKER_F_EXITING	= 8,	/* worker exiting */
- 	IO_WORKER_F_FIXED	= 16,	/* static idle worker */
-+	IO_WORKER_F_BOUND	= 32,	/* is doing bounded work */
- };
- 
- enum {
-@@ -66,6 +67,17 @@ struct io_wq_nulls_list {
- #define IO_WQ_HASH_ORDER	5
- #endif
- 
-+struct io_wqe_acct {
-+	unsigned nr_workers;
-+	unsigned max_workers;
-+	atomic_t nr_running;
-+};
-+
-+enum {
-+	IO_WQ_ACCT_BOUND,
-+	IO_WQ_ACCT_UNBOUND,
-+};
-+
- /*
-  * Per-node worker thread pool
-  */
-@@ -78,9 +90,7 @@ struct io_wqe {
- 	} ____cacheline_aligned_in_smp;
- 
- 	int node;
--	unsigned nr_workers;
--	unsigned max_workers;
--	atomic_t nr_running;
-+	struct io_wqe_acct acct[2];
- 
- 	struct io_wq_nulls_list free_list;
- 	struct io_wq_nulls_list busy_list;
-@@ -152,10 +162,29 @@ static bool __io_worker_unuse(struct io_wqe *wqe, struct io_worker *worker)
- 	return dropped_lock;
- }
- 
-+static inline struct io_wqe_acct *io_work_get_acct(struct io_wqe *wqe,
-+						   struct io_wq_work *work)
-+{
-+	if (work->flags & IO_WQ_WORK_UNBOUND)
-+		return &wqe->acct[IO_WQ_ACCT_UNBOUND];
-+
-+	return &wqe->acct[IO_WQ_ACCT_BOUND];
-+}
-+
-+static inline struct io_wqe_acct *io_wqe_get_acct(struct io_wqe *wqe,
-+						  struct io_worker *worker)
-+{
-+	if (worker->flags & IO_WORKER_F_BOUND)
-+		return &wqe->acct[IO_WQ_ACCT_BOUND];
-+
-+	return &wqe->acct[IO_WQ_ACCT_UNBOUND];
-+}
-+
- static void io_worker_exit(struct io_worker *worker)
- {
- 	struct io_wqe *wqe = worker->wqe;
--	bool all_done = false;
-+	struct io_wqe_acct *acct = io_wqe_get_acct(wqe, worker);
-+	unsigned nr_workers;
- 
- 	/*
- 	 * If we're not at zero, someone else is holding a brief reference
-@@ -169,7 +198,7 @@ static void io_worker_exit(struct io_worker *worker)
- 	preempt_disable();
- 	current->flags &= ~PF_IO_WORKER;
- 	if (worker->flags & IO_WORKER_F_RUNNING)
--		atomic_dec(&wqe->nr_running);
-+		atomic_dec(&acct->nr_running);
- 	worker->flags = 0;
- 	preempt_enable();
- 
-@@ -179,17 +208,82 @@ static void io_worker_exit(struct io_worker *worker)
- 		__release(&wqe->lock);
- 		spin_lock_irq(&wqe->lock);
- 	}
--	wqe->nr_workers--;
--	all_done = !wqe->nr_workers;
-+	acct->nr_workers--;
-+	nr_workers = wqe->acct[IO_WQ_ACCT_BOUND].nr_workers +
-+			wqe->acct[IO_WQ_ACCT_UNBOUND].nr_workers;
- 	spin_unlock_irq(&wqe->lock);
- 
- 	/* all workers gone, wq exit can proceed */
--	if (all_done && refcount_dec_and_test(&wqe->wq->refs))
-+	if (!nr_workers && refcount_dec_and_test(&wqe->wq->refs))
- 		complete(&wqe->wq->done);
- 
- 	kfree_rcu(worker, rcu);
- }
- 
-+static inline bool io_wqe_run_queue(struct io_wqe *wqe)
-+	__must_hold(wqe->lock)
-+{
-+	if (!list_empty(&wqe->work_list) && !(wqe->flags & IO_WQE_FLAG_STALLED))
-+		return true;
-+	return false;
-+}
-+
-+/*
-+ * Check head of free list for an available worker. If one isn't available,
-+ * caller must wake up the wq manager to create one.
-+ */
-+static bool io_wqe_activate_free_worker(struct io_wqe *wqe)
-+	__must_hold(RCU)
-+{
-+	struct hlist_nulls_node *n;
-+	struct io_worker *worker;
-+
-+	n = rcu_dereference(hlist_nulls_first_rcu(&wqe->free_list.head));
-+	if (is_a_nulls(n))
-+		return false;
-+
-+	worker = hlist_nulls_entry(n, struct io_worker, nulls_node);
-+	if (io_worker_get(worker)) {
-+		wake_up(&worker->wait);
-+		io_worker_release(worker);
-+		return true;
-+	}
-+
-+	return false;
-+}
-+
-+/*
-+ * We need a worker. If we find a free one, we're good. If not, and we're
-+ * below the max number of workers, wake up the manager to create one.
-+ */
-+static void io_wqe_wake_worker(struct io_wqe *wqe, struct io_wqe_acct *acct)
-+{
-+	bool ret;
-+
-+	rcu_read_lock();
-+	ret = io_wqe_activate_free_worker(wqe);
-+	rcu_read_unlock();
-+
-+	if (!ret && acct->nr_workers < acct->max_workers)
-+		wake_up_process(wqe->wq->manager);
-+}
-+
-+static void io_wqe_inc_running(struct io_wqe *wqe, struct io_worker *worker)
-+{
-+	struct io_wqe_acct *acct = io_wqe_get_acct(wqe, worker);
-+
-+	atomic_inc(&acct->nr_running);
-+}
-+
-+static void io_wqe_dec_running(struct io_wqe *wqe, struct io_worker *worker)
-+	__must_hold(wqe->lock)
-+{
-+	struct io_wqe_acct *acct = io_wqe_get_acct(wqe, worker);
-+
-+	if (atomic_dec_and_test(&acct->nr_running) && io_wqe_run_queue(wqe))
-+		io_wqe_wake_worker(wqe, acct);
-+}
-+
- static void io_worker_start(struct io_wqe *wqe, struct io_worker *worker)
- {
- 	allow_kernel_signal(SIGINT);
-@@ -198,7 +292,7 @@ static void io_worker_start(struct io_wqe *wqe, struct io_worker *worker)
- 
- 	worker->flags |= (IO_WORKER_F_UP | IO_WORKER_F_RUNNING);
- 	worker->restore_files = current->files;
--	atomic_inc(&wqe->nr_running);
-+	io_wqe_inc_running(wqe, worker);
- }
- 
- /*
-@@ -209,6 +303,8 @@ static void __io_worker_busy(struct io_wqe *wqe, struct io_worker *worker,
- 			     struct io_wq_work *work)
- 	__must_hold(wqe->lock)
- {
-+	bool worker_bound, work_bound;
-+
- 	if (worker->flags & IO_WORKER_F_FREE) {
- 		worker->flags &= ~IO_WORKER_F_FREE;
- 		hlist_nulls_del_init_rcu(&worker->nulls_node);
-@@ -216,6 +312,26 @@ static void __io_worker_busy(struct io_wqe *wqe, struct io_worker *worker,
- 						&wqe->busy_list.head);
- 	}
- 	worker->cur_work = work;
-+
-+	/*
-+	 * If worker is moving from bound to unbound (or vice versa), then
-+	 * ensure we update the running accounting.
-+	 */
-+	 worker_bound = (worker->flags & IO_WORKER_F_BOUND) != 0;
-+	 work_bound = (work->flags & IO_WQ_WORK_UNBOUND) == 0;
-+	 if (worker_bound != work_bound) {
-+		io_wqe_dec_running(wqe, worker);
-+		if (work_bound) {
-+			worker->flags |= IO_WORKER_F_BOUND;
-+			wqe->acct[IO_WQ_ACCT_UNBOUND].nr_workers--;
-+			wqe->acct[IO_WQ_ACCT_BOUND].nr_workers++;
-+		} else {
-+			worker->flags &= ~IO_WORKER_F_BOUND;
-+			wqe->acct[IO_WQ_ACCT_UNBOUND].nr_workers++;
-+			wqe->acct[IO_WQ_ACCT_BOUND].nr_workers--;
-+		}
-+		io_wqe_inc_running(wqe, worker);
-+	 }
- }
- 
- /*
-@@ -335,14 +451,6 @@ static void io_worker_handle_work(struct io_worker *worker)
- 	} while (1);
- }
- 
--static inline bool io_wqe_run_queue(struct io_wqe *wqe)
--	__must_hold(wqe->lock)
--{
--	if (!list_empty(&wqe->work_list) && !(wqe->flags & IO_WQE_FLAG_STALLED))
--		return true;
--	return false;
--}
--
- static int io_wqe_worker(void *data)
- {
- 	struct io_worker *worker = data;
-@@ -391,46 +499,6 @@ static int io_wqe_worker(void *data)
- 	return 0;
- }
- 
--/*
-- * Check head of free list for an available worker. If one isn't available,
-- * caller must wake up the wq manager to create one.
-- */
--static bool io_wqe_activate_free_worker(struct io_wqe *wqe)
--	__must_hold(RCU)
--{
--	struct hlist_nulls_node *n;
--	struct io_worker *worker;
--
--	n = rcu_dereference(hlist_nulls_first_rcu(&wqe->free_list.head));
--	if (is_a_nulls(n))
--		return false;
--
--	worker = hlist_nulls_entry(n, struct io_worker, nulls_node);
--	if (io_worker_get(worker)) {
--		wake_up(&worker->wait);
--		io_worker_release(worker);
--		return true;
--	}
--
--	return false;
--}
--
--/*
-- * We need a worker. If we find a free one, we're good. If not, and we're
-- * below the max number of workers, wake up the manager to create one.
-- */
--static void io_wqe_wake_worker(struct io_wqe *wqe)
--{
--	bool ret;
--
--	rcu_read_lock();
--	ret = io_wqe_activate_free_worker(wqe);
--	rcu_read_unlock();
--
--	if (!ret && wqe->nr_workers < wqe->max_workers)
--		wake_up_process(wqe->wq->manager);
--}
--
- /*
-  * Called when a worker is scheduled in. Mark us as currently running.
-  */
-@@ -444,7 +512,7 @@ void io_wq_worker_running(struct task_struct *tsk)
- 	if (worker->flags & IO_WORKER_F_RUNNING)
- 		return;
- 	worker->flags |= IO_WORKER_F_RUNNING;
--	atomic_inc(&wqe->nr_running);
-+	io_wqe_inc_running(wqe, worker);
- }
- 
- /*
-@@ -465,13 +533,13 @@ void io_wq_worker_sleeping(struct task_struct *tsk)
- 	worker->flags &= ~IO_WORKER_F_RUNNING;
- 
- 	spin_lock_irq(&wqe->lock);
--	if (atomic_dec_and_test(&wqe->nr_running) && io_wqe_run_queue(wqe))
--		io_wqe_wake_worker(wqe);
-+	io_wqe_dec_running(wqe, worker);
- 	spin_unlock_irq(&wqe->lock);
- }
- 
--static void create_io_worker(struct io_wq *wq, struct io_wqe *wqe)
-+static void create_io_worker(struct io_wq *wq, struct io_wqe *wqe, int index)
- {
-+	struct io_wqe_acct *acct =&wqe->acct[index];
- 	struct io_worker *worker;
- 
- 	worker = kcalloc_node(1, sizeof(*worker), GFP_KERNEL, wqe->node);
-@@ -493,24 +561,28 @@ static void create_io_worker(struct io_wq *wq, struct io_wqe *wqe)
- 	spin_lock_irq(&wqe->lock);
- 	hlist_nulls_add_head_rcu(&worker->nulls_node, &wqe->free_list.head);
- 	worker->flags |= IO_WORKER_F_FREE;
--	if (!wqe->nr_workers)
-+	if (index == IO_WQ_ACCT_BOUND)
-+		worker->flags |= IO_WORKER_F_BOUND;
-+	if (!acct->nr_workers && (worker->flags & IO_WORKER_F_BOUND))
- 		worker->flags |= IO_WORKER_F_FIXED;
--	wqe->nr_workers++;
-+	acct->nr_workers++;
- 	spin_unlock_irq(&wqe->lock);
- 
- 	wake_up_process(worker->task);
- }
- 
--static inline bool io_wqe_need_new_worker(struct io_wqe *wqe)
-+static inline bool io_wqe_need_worker(struct io_wqe *wqe, int index)
- 	__must_hold(wqe->lock)
- {
--	if (!wqe->nr_workers)
--		return true;
--	if (hlist_nulls_empty(&wqe->free_list.head) &&
--	    wqe->nr_workers < wqe->max_workers && io_wqe_run_queue(wqe))
--		return true;
-+	struct io_wqe_acct *acct = &wqe->acct[index];
- 
--	return false;
-+	/* always ensure we have one bounded worker */
-+	if (index == IO_WQ_ACCT_BOUND && !acct->nr_workers)
-+		return true;
-+	/* if we have available workers or no work, no need */
-+	if (!hlist_nulls_empty(&wqe->free_list.head) || !io_wqe_run_queue(wqe))
-+		return false;
-+	return acct->nr_workers < acct->max_workers;
- }
- 
- /*
-@@ -525,13 +597,18 @@ static int io_wq_manager(void *data)
- 
- 		for (i = 0; i < wq->nr_wqes; i++) {
- 			struct io_wqe *wqe = wq->wqes[i];
--			bool fork_worker = false;
-+			bool fork_worker[2] = { false, false };
- 
- 			spin_lock_irq(&wqe->lock);
--			fork_worker = io_wqe_need_new_worker(wqe);
-+			if (io_wqe_need_worker(wqe, IO_WQ_ACCT_BOUND))
-+				fork_worker[IO_WQ_ACCT_BOUND] = true;
-+			if (io_wqe_need_worker(wqe, IO_WQ_ACCT_UNBOUND))
-+				fork_worker[IO_WQ_ACCT_UNBOUND] = true;
- 			spin_unlock_irq(&wqe->lock);
--			if (fork_worker)
--				create_io_worker(wq, wqe);
-+			if (fork_worker[IO_WQ_ACCT_BOUND])
-+				create_io_worker(wq, wqe, IO_WQ_ACCT_BOUND);
-+			if (fork_worker[IO_WQ_ACCT_UNBOUND])
-+				create_io_worker(wq, wqe, IO_WQ_ACCT_UNBOUND);
- 		}
- 		set_current_state(TASK_INTERRUPTIBLE);
- 		schedule_timeout(HZ);
-@@ -542,15 +619,19 @@ static int io_wq_manager(void *data)
- 
- static void io_wqe_enqueue(struct io_wqe *wqe, struct io_wq_work *work)
- {
-+	struct io_wqe_acct *acct;
- 	unsigned long flags;
- 
-+	/* Do this before queueing work, as work could finish anytime */
-+	acct = io_work_get_acct(wqe, work);
-+
- 	spin_lock_irqsave(&wqe->lock, flags);
- 	list_add_tail(&work->list, &wqe->work_list);
- 	wqe->flags &= ~IO_WQE_FLAG_STALLED;
- 	spin_unlock_irqrestore(&wqe->lock, flags);
- 
--	if (!atomic_read(&wqe->nr_running))
--		io_wqe_wake_worker(wqe);
-+	if (!atomic_read(&acct->nr_running))
-+		io_wqe_wake_worker(wqe, acct);
- }
- 
- void io_wq_enqueue(struct io_wq *wq, struct io_wq_work *work)
-@@ -828,7 +909,8 @@ void io_wq_flush(struct io_wq *wq)
- 	}
- }
- 
--struct io_wq *io_wq_create(unsigned concurrency, struct mm_struct *mm)
-+struct io_wq *io_wq_create(unsigned bounded, unsigned unbounded,
-+			   struct mm_struct *mm)
- {
- 	int ret = -ENOMEM, i, node;
- 	struct io_wq *wq;
-@@ -854,7 +936,10 @@ struct io_wq *io_wq_create(unsigned concurrency, struct mm_struct *mm)
- 			break;
- 		wq->wqes[i] = wqe;
- 		wqe->node = node;
--		wqe->max_workers = concurrency;
-+		wqe->acct[IO_WQ_ACCT_BOUND].max_workers = bounded;
-+		atomic_set(&wqe->acct[IO_WQ_ACCT_BOUND].nr_running, 0);
-+		wqe->acct[IO_WQ_ACCT_UNBOUND].max_workers = unbounded;
-+		atomic_set(&wqe->acct[IO_WQ_ACCT_UNBOUND].nr_running, 0);
- 		wqe->node = node;
- 		wqe->wq = wq;
- 		spin_lock_init(&wqe->lock);
-@@ -863,7 +948,6 @@ struct io_wq *io_wq_create(unsigned concurrency, struct mm_struct *mm)
- 		wqe->free_list.nulls = 0;
- 		INIT_HLIST_NULLS_HEAD(&wqe->busy_list.head, 1);
- 		wqe->busy_list.nulls = 1;
--		atomic_set(&wqe->nr_running, 0);
- 
- 		i++;
- 	}
-diff --git a/fs/io-wq.h b/fs/io-wq.h
-index 3de192dc73fc..affd215f247f 100644
---- a/fs/io-wq.h
-+++ b/fs/io-wq.h
-@@ -9,6 +9,7 @@ enum {
- 	IO_WQ_WORK_HASHED	= 4,
- 	IO_WQ_WORK_NEEDS_USER	= 8,
- 	IO_WQ_WORK_NEEDS_FILES	= 16,
-+	IO_WQ_WORK_UNBOUND	= 32,
- 
- 	IO_WQ_HASH_SHIFT	= 24,	/* upper 8 bits are used for hash key */
- };
-@@ -33,7 +34,8 @@ struct io_wq_work {
- 		(work)->files = NULL;			\
- 	} while (0)					\
- 
--struct io_wq *io_wq_create(unsigned concurrency, struct mm_struct *mm);
-+struct io_wq *io_wq_create(unsigned bounded, unsigned unbounded,
-+				struct mm_struct *mm);
- void io_wq_destroy(struct io_wq *wq);
- 
- void io_wq_enqueue(struct io_wq *wq, struct io_wq_work *work);
-diff --git a/fs/io_uring.c b/fs/io_uring.c
-index ff0f79a57f7b..c48b891b962f 100644
---- a/fs/io_uring.c
-+++ b/fs/io_uring.c
-@@ -3689,7 +3689,7 @@ static int io_sqe_files_update(struct io_ring_ctx *ctx, void __user *arg,
- static int io_sq_offload_start(struct io_ring_ctx *ctx,
- 			       struct io_uring_params *p)
- {
--	unsigned concurrency;
-+	unsigned bounded;
- 	int ret;
- 
- 	init_waitqueue_head(&ctx->sqo_wait);
-@@ -3733,9 +3733,9 @@ static int io_sq_offload_start(struct io_ring_ctx *ctx,
- 		goto err;
- 	}
- 
--	/* Do QD, or 4 * CPUS, whatever is smallest */
--	concurrency = min(ctx->sq_entries, 4 * num_online_cpus());
--	ctx->io_wq = io_wq_create(concurrency, ctx->sqo_mm);
-+	/* Do QD, or 2 * CPUS, whatever is smallest */
-+	bounded = min(ctx->sq_entries, 2 * num_online_cpus());
-+	ctx->io_wq = io_wq_create(bounded, ctx->cq_entries, ctx->sqo_mm);
- 	if (IS_ERR(ctx->io_wq)) {
- 		ret = PTR_ERR(ctx->io_wq);
- 		ctx->io_wq = NULL;
--- 
-2.24.0
+So, now what do you do?  You have to free up just the buffers relevant to t=
+he
+iterator and then you can either compact down the ring to free up the space=
+ or
+you can leave null slots and let the read side clean them up, thereby
+reducing the capacity of the pipe temporarily.
+
+Either way, iov_iter_revert() gets more complex and has to hold the spinloc=
+k.
+
+And if you don't take the spinlock whilst you're reverting, more notificati=
+ons
+can come in to make your life more interesting.
+
+There's also a problem with splicing out from a notification pipe that the
+messages are scribed onto preallocated buffers, but now the buffers need
+refcounts and, in any case, are of limited quantity.
+
+> And is there some way to make it impossible for this to happen?
+
+Yes.  That's what I'm doing by declaring the pipe to be unspliceable up fro=
+nt.
+
+> Adding a new flag to pipe2() to avoid messy kernel code seems
+> like a poor tradeoff.
+
+By far the easiest place to check whether a pipe can be spliced to is in
+get_pipe_info().  That's checking the file anyway.  After that, you can't m=
+ake
+the check until the pipe is locked.
+
+Furthermore, if it's not done upfront, the change to the pipe might happen
+during a splicing operation that's residing in pipe_wait()... which drops t=
+he
+pipe mutex.
+
+David
 
