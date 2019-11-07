@@ -2,143 +2,178 @@ Return-Path: <SRS0=Ukdl=Y7=vger.kernel.org=linux-block-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-0.9 required=3.0 tests=DKIM_SIGNED,DKIM_VALID,
-	DKIM_VALID_AU,HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SPF_HELO_NONE,
-	SPF_PASS autolearn=no autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-8.6 required=3.0 tests=DKIMWL_WL_HIGH,DKIM_SIGNED,
+	DKIM_VALID,DKIM_VALID_AU,INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,
+	SPF_HELO_NONE,SPF_PASS,USER_AGENT_SANE_1 autolearn=unavailable
+	autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 2B561C43331
-	for <linux-block@archiver.kernel.org>; Thu,  7 Nov 2019 18:48:54 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id A4DEFC5DF61
+	for <linux-block@archiver.kernel.org>; Thu,  7 Nov 2019 19:05:08 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.kernel.org (Postfix) with ESMTP id 0278A2084C
-	for <linux-block@archiver.kernel.org>; Thu,  7 Nov 2019 18:48:54 +0000 (UTC)
-Authentication-Results: mail.kernel.org;
-	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="IzWCw6Jo"
+	by mail.kernel.org (Postfix) with ESMTP id 7EC712085B
+	for <linux-block@archiver.kernel.org>; Thu,  7 Nov 2019 19:05:08 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+	s=default; t=1573153508;
+	bh=MhnpgA7Kq4kbS8LrDMHw1jC0IlfelzPYlfzzoAJqYf0=;
+	h=Date:From:To:Cc:Subject:References:In-Reply-To:List-ID:From;
+	b=NTr58avhFuhZj+dmugmAyZ3OAi496k7ZG1tPjEd5QpbJPhMQxFAPFZliU67txCYOY
+	 kPb7ByTlZVwgE+nDJjmbmuhkytJ4x9iHVqwruZFBm7IGbK7XxMpfOH6OVHqBqKrlCN
+	 eRmrBIx66nca2xtY6auU94a1n8PK5Wj+CvMYGBbs=
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1726976AbfKGSsw (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Thu, 7 Nov 2019 13:48:52 -0500
-Received: from us-smtp-delivery-1.mimecast.com ([205.139.110.120]:44075 "EHLO
-        us-smtp-1.mimecast.com" rhost-flags-OK-OK-OK-FAIL) by vger.kernel.org
-        with ESMTP id S1726616AbfKGSsv (ORCPT
-        <rfc822;linux-block@vger.kernel.org>); Thu, 7 Nov 2019 13:48:51 -0500
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-        s=mimecast20190719; t=1573152530;
-        h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-         to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-         content-transfer-encoding:content-transfer-encoding:
-         in-reply-to:in-reply-to:references:references;
-        bh=UHB0JrKl2/lgoy546a6o5x0iXWhc257PTYUJn/4Bje0=;
-        b=IzWCw6Joj6xY0pxmrt8uf+HitdTf1u5HxPuCNhyPwd+atj0HVEEvvcfqnXDHJq5Q3iMUs1
-        mYP8gP15+qfCHcfUawOYCNJ0A6HvzQWv3FpQSZZ40HpBK69B913VawjCUjhMl+9oEoazo5
-        wcoHY8T3eYEVFyOIQYvdO6F58R4aLKc=
-Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
- [209.132.183.4]) (Using TLS) by relay.mimecast.com with ESMTP id
- us-mta-270-B9RjU769P3eP409e546QHA-1; Thu, 07 Nov 2019 13:48:44 -0500
-Received: from smtp.corp.redhat.com (int-mx01.intmail.prod.int.phx2.redhat.com [10.5.11.11])
-        (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
-        (No client certificate requested)
-        by mimecast-mx01.redhat.com (Postfix) with ESMTPS id 70429800C61;
-        Thu,  7 Nov 2019 18:48:41 +0000 (UTC)
-Received: from warthog.procyon.org.uk (ovpn-120-254.rdu2.redhat.com [10.10.120.254])
-        by smtp.corp.redhat.com (Postfix) with ESMTP id 54380600D3;
-        Thu,  7 Nov 2019 18:48:38 +0000 (UTC)
-Organization: Red Hat UK Ltd. Registered Address: Red Hat UK Ltd, Amberley
-        Place, 107-111 Peascod Street, Windsor, Berkshire, SI4 1TE, United
-        Kingdom.
-        Registered in England and Wales under Company Registration No. 3798903
-From:   David Howells <dhowells@redhat.com>
-In-Reply-To: <CALCETrUka9KaOKFbNKUXcA6XvoFxiXPftctSHtN4DL35Cay61w@mail.gmail.com>
-References: <CALCETrUka9KaOKFbNKUXcA6XvoFxiXPftctSHtN4DL35Cay61w@mail.gmail.com> <157313371694.29677.15388731274912671071.stgit@warthog.procyon.org.uk> <157313375678.29677.15875689548927466028.stgit@warthog.procyon.org.uk>
-To:     Andy Lutomirski <luto@kernel.org>
-Cc:     dhowells@redhat.com,
-        Linus Torvalds <torvalds@linux-foundation.org>,
-        Greg Kroah-Hartman <gregkh@linuxfoundation.org>,
-        Casey Schaufler <casey@schaufler-ca.com>,
-        Stephen Smalley <sds@tycho.nsa.gov>,
-        Nicolas Dichtel <nicolas.dichtel@6wind.com>, raven@themaw.net,
-        Christian Brauner <christian@brauner.io>,
-        keyrings@vger.kernel.org, USB list <linux-usb@vger.kernel.org>,
-        linux-block <linux-block@vger.kernel.org>,
-        LSM List <linux-security-module@vger.kernel.org>,
-        Linux FS Devel <linux-fsdevel@vger.kernel.org>,
-        Linux API <linux-api@vger.kernel.org>,
-        LKML <linux-kernel@vger.kernel.org>
-Subject: Re: [RFC PATCH 04/14] pipe: Add O_NOTIFICATION_PIPE [ver #2]
+        id S1728373AbfKGTFE (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Thu, 7 Nov 2019 14:05:04 -0500
+Received: from mail-qk1-f195.google.com ([209.85.222.195]:33453 "EHLO
+        mail-qk1-f195.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S1730178AbfKGTFE (ORCPT
+        <rfc822;linux-block@vger.kernel.org>); Thu, 7 Nov 2019 14:05:04 -0500
+Received: by mail-qk1-f195.google.com with SMTP id 71so3026442qkl.0;
+        Thu, 07 Nov 2019 11:05:03 -0800 (PST)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=gmail.com; s=20161025;
+        h=sender:date:from:to:cc:subject:message-id:references:mime-version
+         :content-disposition:in-reply-to:user-agent;
+        bh=D2aZYGhhhD0fueEZXuZZtBxsPvMYXcl+9GQ42VL43KI=;
+        b=QMrL5nCAR853//4IbtMGC+V9cyv4Cci7a5ZLezHlo8P+sBwSZ7sdElMR64J11gVzVy
+         +jwOVFRlQ856q0LydViBktS8UwVaYvjFOE8Hshwk2Kg7vFAvvi4cycqMZn6M4UAWCAOk
+         PeT1uWVTEy/ffwMqLCnEsdpXLFwX2HCynQx+JcUjU+LUgFlomDNbysXZjfEQjPhC59zw
+         O2XpzH5to18sUHc//d8yst74RbREs30kLGGRa/MLmBzkn8XRbti2wLANRh0SLmW0ZnAY
+         IQNiOZe+U5oyogrSXJDnBlKz0bgOZnAV3g17MmtlrW7o0HwvJmZA2ABKMPy4EkCZv3fy
+         jLpA==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20161025;
+        h=x-gm-message-state:sender:date:from:to:cc:subject:message-id
+         :references:mime-version:content-disposition:in-reply-to:user-agent;
+        bh=D2aZYGhhhD0fueEZXuZZtBxsPvMYXcl+9GQ42VL43KI=;
+        b=PK5hs8P2lyeP0ENI0SJmWxb0lSmVUlD2kOy7ThllAhp4CJSkQMGX2fXsW+O6a+8E2f
+         7Zg1I9qSpbd0JXrAZhgZR03iCXILa4Lxr4D4ec+wFtEKh4vZhbUbytiHME/6ilD/9/2B
+         IGAVH1vmNAPbng0sKfmlAXbDiMXGowClvX+N8VX+4FxROJP9s8mhxPH5kxQXKhkQ9+xP
+         QIvPyknFDLAgcLJQual4cqzepl4r+T9yZA1KVz2BYMqg1klF5wSvoSnHpU2ksPkuUq3n
+         n3WgLWfV7t1WArgjUrjULui1W4MQfiFcxW5v83pNX1l5ohDI83l/jpKoLatXrwxMXvKm
+         1v1Q==
+X-Gm-Message-State: APjAAAWFgCxEJHle384Ak6iCZeqgiJympf0iesSWBH7oy2r8pecQoyPA
+        fjHI/lMa5qw6HWHLdyAlUJk=
+X-Google-Smtp-Source: APXvYqzl96Q5hW2MM5DuIR0U3yR8pKDS3P3ZF244FehkB7rIAWEa59eSpL/t9gsb+/nHA8O5jAi9gg==
+X-Received: by 2002:a37:4654:: with SMTP id t81mr4466141qka.0.1573153502452;
+        Thu, 07 Nov 2019 11:05:02 -0800 (PST)
+Received: from localhost ([2620:10d:c091:500::2:3f13])
+        by smtp.gmail.com with ESMTPSA id b2sm1834935qtc.21.2019.11.07.11.05.01
+        (version=TLS1_2 cipher=ECDHE-RSA-AES128-GCM-SHA256 bits=128/128);
+        Thu, 07 Nov 2019 11:05:01 -0800 (PST)
+Date:   Thu, 7 Nov 2019 11:04:59 -0800
+From:   Tejun Heo <tj@kernel.org>
+To:     axboe@kernel.dk
+Cc:     cgroups@vger.kernel.org, linux-block@vger.kernel.org,
+        linux-kernel@vger.kernel.org, lizefan@huawei.com,
+        hannes@cmpxchg.org, kernel-team@fb.com
+Subject: [PATCH 0.5/5] bfq-iosched: relocate bfqg_*rwstat*() helpers
+Message-ID: <20191107190459.GA3622521@devbig004.ftw2.facebook.com>
+References: <20191106215838.3973497-1-tj@kernel.org>
 MIME-Version: 1.0
-Content-ID: <6963.1573152517.1@warthog.procyon.org.uk>
-Date:   Thu, 07 Nov 2019 18:48:37 +0000
-Message-ID: <6964.1573152517@warthog.procyon.org.uk>
-X-Scanned-By: MIMEDefang 2.79 on 10.5.11.11
-X-MC-Unique: B9RjU769P3eP409e546QHA-1
-X-Mimecast-Spam-Score: 0
-Content-Type: text/plain; charset=WINDOWS-1252
-Content-Transfer-Encoding: quoted-printable
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <20191106215838.3973497-1-tj@kernel.org>
+User-Agent: Mutt/1.5.21 (2010-09-15)
 Sender: linux-block-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-Andy Lutomirski <luto@kernel.org> wrote:
+From a7b9100d72d75a1472bed130b6edd271b734776f Mon Sep 17 00:00:00 2001
+From: Tejun Heo <tj@kernel.org>
+Date: Thu, 7 Nov 2019 11:01:19 -0800
 
-> > Add an O_NOTIFICATION_PIPE flag that can be passed to pipe2() to indica=
-te
-> > that the pipe being created is going to be used for notifications.  Thi=
-s
-> > suppresses the use of splice(), vmsplice(), tee() and sendfile() on the
-> > pipe as calling iov_iter_revert() on a pipe when a kernel notification
-> > message has been inserted into the middle of a multi-buffer splice will=
- be
-> > messy.
->
-> How messy?
+Collect them right under #ifdef CONFIG_BFQ_CGROUP_DEBUG.  The next
+patch will use them from !DEBUG path and this makes it easy to move
+them out of the ifdef block.
 
-Well, iov_iter_revert() on a pipe iterator simply walks backwards along the
-ring discarding the last N contiguous slots (where N is normally the number=
- of
-slots that were filled by whatever operation is being reverted).
+This is pure code reorganization.
 
-However, unless the code that transfers stuff into the pipe takes the spinl=
-ock
-spinlock and disables softirqs for the duration of its ring filling, what w=
-ere
-N contiguous slots may now have kernel notifications interspersed - even if=
- it
-has been holding the pipe mutex.
+Signed-off-by: Tejun Heo <tj@kernel.org>
+---
+Jens, this is an extra patch to help fixing the build bug when
+!CONFIG_BFQ_CGROUP_DEBUG.  The git tree has been updated accordingly.
+Please let me know if you want the whole series reposted.
 
-So, now what do you do?  You have to free up just the buffers relevant to t=
-he
-iterator and then you can either compact down the ring to free up the space=
- or
-you can leave null slots and let the read side clean them up, thereby
-reducing the capacity of the pipe temporarily.
+Thanks.
 
-Either way, iov_iter_revert() gets more complex and has to hold the spinloc=
-k.
+ block/bfq-cgroup.c | 46 +++++++++++++++++++++++-----------------------
+ 1 file changed, 23 insertions(+), 23 deletions(-)
 
-And if you don't take the spinlock whilst you're reverting, more notificati=
-ons
-can come in to make your life more interesting.
-
-There's also a problem with splicing out from a notification pipe that the
-messages are scribed onto preallocated buffers, but now the buffers need
-refcounts and, in any case, are of limited quantity.
-
-> And is there some way to make it impossible for this to happen?
-
-Yes.  That's what I'm doing by declaring the pipe to be unspliceable up fro=
-nt.
-
-> Adding a new flag to pipe2() to avoid messy kernel code seems
-> like a poor tradeoff.
-
-By far the easiest place to check whether a pipe can be spliced to is in
-get_pipe_info().  That's checking the file anyway.  After that, you can't m=
-ake
-the check until the pipe is locked.
-
-Furthermore, if it's not done upfront, the change to the pipe might happen
-during a splicing operation that's residing in pipe_wait()... which drops t=
-he
-pipe mutex.
-
-David
-
+diff --git a/block/bfq-cgroup.c b/block/bfq-cgroup.c
+index 86a607cf19a1..d4755d4ad009 100644
+--- a/block/bfq-cgroup.c
++++ b/block/bfq-cgroup.c
+@@ -1058,17 +1058,34 @@ static ssize_t bfq_io_set_weight(struct kernfs_open_file *of,
+ }
+ 
+ #ifdef CONFIG_BFQ_CGROUP_DEBUG
+-static int bfqg_print_stat(struct seq_file *sf, void *v)
++static int bfqg_print_rwstat(struct seq_file *sf, void *v)
+ {
+-	blkcg_print_blkgs(sf, css_to_blkcg(seq_css(sf)), blkg_prfill_stat,
+-			  &blkcg_policy_bfq, seq_cft(sf)->private, false);
++	blkcg_print_blkgs(sf, css_to_blkcg(seq_css(sf)), blkg_prfill_rwstat,
++			  &blkcg_policy_bfq, seq_cft(sf)->private, true);
+ 	return 0;
+ }
+ 
+-static int bfqg_print_rwstat(struct seq_file *sf, void *v)
++static u64 bfqg_prfill_rwstat_recursive(struct seq_file *sf,
++					struct blkg_policy_data *pd, int off)
+ {
+-	blkcg_print_blkgs(sf, css_to_blkcg(seq_css(sf)), blkg_prfill_rwstat,
+-			  &blkcg_policy_bfq, seq_cft(sf)->private, true);
++	struct blkg_rwstat_sample sum;
++
++	blkg_rwstat_recursive_sum(pd_to_blkg(pd), &blkcg_policy_bfq, off, &sum);
++	return __blkg_prfill_rwstat(sf, pd, &sum);
++}
++
++static int bfqg_print_rwstat_recursive(struct seq_file *sf, void *v)
++{
++	blkcg_print_blkgs(sf, css_to_blkcg(seq_css(sf)),
++			  bfqg_prfill_rwstat_recursive, &blkcg_policy_bfq,
++			  seq_cft(sf)->private, true);
++	return 0;
++}
++
++static int bfqg_print_stat(struct seq_file *sf, void *v)
++{
++	blkcg_print_blkgs(sf, css_to_blkcg(seq_css(sf)), blkg_prfill_stat,
++			  &blkcg_policy_bfq, seq_cft(sf)->private, false);
+ 	return 0;
+ }
+ 
+@@ -1097,15 +1114,6 @@ static u64 bfqg_prfill_stat_recursive(struct seq_file *sf,
+ 	return __blkg_prfill_u64(sf, pd, sum);
+ }
+ 
+-static u64 bfqg_prfill_rwstat_recursive(struct seq_file *sf,
+-					struct blkg_policy_data *pd, int off)
+-{
+-	struct blkg_rwstat_sample sum;
+-
+-	blkg_rwstat_recursive_sum(pd_to_blkg(pd), &blkcg_policy_bfq, off, &sum);
+-	return __blkg_prfill_rwstat(sf, pd, &sum);
+-}
+-
+ static int bfqg_print_stat_recursive(struct seq_file *sf, void *v)
+ {
+ 	blkcg_print_blkgs(sf, css_to_blkcg(seq_css(sf)),
+@@ -1114,14 +1122,6 @@ static int bfqg_print_stat_recursive(struct seq_file *sf, void *v)
+ 	return 0;
+ }
+ 
+-static int bfqg_print_rwstat_recursive(struct seq_file *sf, void *v)
+-{
+-	blkcg_print_blkgs(sf, css_to_blkcg(seq_css(sf)),
+-			  bfqg_prfill_rwstat_recursive, &blkcg_policy_bfq,
+-			  seq_cft(sf)->private, true);
+-	return 0;
+-}
+-
+ static u64 bfqg_prfill_sectors(struct seq_file *sf, struct blkg_policy_data *pd,
+ 			       int off)
+ {
+-- 
+2.17.1
