@@ -2,165 +2,122 @@ Return-Path: <SRS0=Ukdl=Y7=vger.kernel.org=linux-block-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-10.1 required=3.0 tests=DKIMWL_WL_HIGH,DKIM_SIGNED,
-	DKIM_VALID,DKIM_VALID_AU,INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,
-	SPF_HELO_NONE,SPF_PASS,USER_AGENT_GIT autolearn=unavailable
+X-Spam-Status: No, score=-7.3 required=3.0 tests=DKIM_SIGNED,DKIM_VALID,
+	HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,MENTIONS_GIT_HOSTING,
+	SPF_HELO_NONE,SPF_PASS,USER_AGENT_SANE_1 autolearn=unavailable
 	autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 8304EFC6195
-	for <linux-block@archiver.kernel.org>; Thu,  7 Nov 2019 19:18:36 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id A5D42C43331
+	for <linux-block@archiver.kernel.org>; Thu,  7 Nov 2019 19:28:53 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.kernel.org (Postfix) with ESMTP id 5CD3D21D79
-	for <linux-block@archiver.kernel.org>; Thu,  7 Nov 2019 19:18:36 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=default; t=1573154316;
-	bh=3Bz9VvvLHSDC0nF6OZnxtcFm0XjlWZt0GHsDH4fIBRo=;
-	h=From:To:Cc:Subject:Date:In-Reply-To:References:List-ID:From;
-	b=uFSkyUVCHLjBL+Mna48wr3VDg2mImNaejXOJK3d76if2LP7e4+n/nzS9Tjyu1G/Xt
-	 eWafq2imtfdUhRnC5DR7btTHMKdIR6kYZV4pXugPxQHak1pgGrHySfJS1AYdqAsfbK
-	 iZQSTLSGDdEbNAT8e1AqCENHtowaWdo8yqK4MGMw=
+	by mail.kernel.org (Postfix) with ESMTP id 7E5F821D79
+	for <linux-block@archiver.kernel.org>; Thu,  7 Nov 2019 19:28:53 +0000 (UTC)
+Authentication-Results: mail.kernel.org;
+	dkim=pass (2048-bit key) header.d=kernel-dk.20150623.gappssmtp.com header.i=@kernel-dk.20150623.gappssmtp.com header.b="pVKXsw6i"
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1726295AbfKGTSM (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Thu, 7 Nov 2019 14:18:12 -0500
-Received: from mail-qt1-f196.google.com ([209.85.160.196]:33834 "EHLO
-        mail-qt1-f196.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1725497AbfKGTSL (ORCPT
-        <rfc822;linux-block@vger.kernel.org>); Thu, 7 Nov 2019 14:18:11 -0500
-Received: by mail-qt1-f196.google.com with SMTP id c25so2975518qtq.1;
-        Thu, 07 Nov 2019 11:18:10 -0800 (PST)
+        id S1726054AbfKGT2w (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Thu, 7 Nov 2019 14:28:52 -0500
+Received: from mail-io1-f66.google.com ([209.85.166.66]:45243 "EHLO
+        mail-io1-f66.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S1726888AbfKGT2w (ORCPT
+        <rfc822;linux-block@vger.kernel.org>); Thu, 7 Nov 2019 14:28:52 -0500
+Received: by mail-io1-f66.google.com with SMTP id v17so2508333iol.12
+        for <linux-block@vger.kernel.org>; Thu, 07 Nov 2019 11:28:49 -0800 (PST)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20161025;
-        h=sender:from:to:cc:subject:date:message-id:in-reply-to:references;
-        bh=znlRTNHoKykO2PNyEazvN0YZ+bFmJkjSeLacwzzLw1A=;
-        b=tjG1KjgaTrTGNnprsl2NxFJreLf/OjzVAt0A6QrnOxpwd0AHDEMI0Y26C72AY7F2MU
-         zKhDevIrcosd7yDgfQEfu6gx1ezxW3hiCHBjwwp9Hg0BRg9qmf3F7twiyESf28ieVBfz
-         M6EI3Yf4APy4CwFNOVkRfDMUUl876WTZNb9ueC3SyuC9KGpuY7sQJhS63dcc/tdTJa/q
-         vBv7EwAjxDKFuZtzStKbDkhBcy2q7W9qsFpmBNRh+coxxeF6GMqItIdziVMN/1NLCRjC
-         62tsHMUPgDU/e7x/ylQf7TzBAIcsOzKWB51wQp9jtbQjsS/lrgAT5PZYce/5/6+wojid
-         Y5Gw==
+        d=kernel-dk.20150623.gappssmtp.com; s=20150623;
+        h=subject:to:cc:references:from:message-id:date:user-agent
+         :mime-version:in-reply-to:content-language:content-transfer-encoding;
+        bh=LsQBOGT7wlBeTtd5DGVJ1cAFGBGmgxUQGz4CBk4TLCk=;
+        b=pVKXsw6iTlJ2Rzs/YUhd1cSagr7G85BPX4jvG88avd78mLhxpwKSuSup+KefjXgIzd
+         D99eKJyFKqrIcZz8kgmmwl8B7bGRqu8tHo6szfdV1XbTdJ6NW7Daw49AkY/gMmuKncRn
+         t5QMRH81Y3OOOXlCBRJRI8iZUCYzpSb4T3mleVCNGWEdUdF1GzrTwDjUe9aEUSneQL4B
+         uGtLuJbyPxquXYAPyeyX8vY0Bgl/FCPAwmmQGAHRZObaR2TK/+SlD7+smuzdVvztSDN1
+         xpINYOf1vFWkuiS8IiRdmGwfG3W5cTmNRSeHvQH6W7ubVPkL/J0BJfpWgkDHYxjfInUl
+         uxNQ==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=1e100.net; s=20161025;
-        h=x-gm-message-state:sender:from:to:cc:subject:date:message-id
-         :in-reply-to:references;
-        bh=znlRTNHoKykO2PNyEazvN0YZ+bFmJkjSeLacwzzLw1A=;
-        b=slo9XBJxkfqSzM5BphDcd4mj/iADqaupOMxpQ9VhQVxRe45A+JOAnJvITJ65JN8V30
-         bsGPHESccnNfM2IjaMb30yfTePj9Lkyle3wWVijIldQh06ok6sqq7Vd/yx1OtwujvuSa
-         X/q4GPEq/UgYaXQkD6QCPUCGcjaTdfox1Hp8jKeuZA0RbK7sAg8+UHVwu4aCAMCFVi9s
-         PKARqpYtmaR7oZvwsGc4LNTbo0/nPUPeW2DDHvKAb6BkoH2w6zMiF+MeovohJ3ZzZSxB
-         wfAl/flpE02uKOQ7sDhJ5rluCymVVLBlwS8dVprAThvNaFIhO4ufPU4viKrIYyZbX6wf
-         VCFQ==
-X-Gm-Message-State: APjAAAUGqfPLYJxDrO4ZV2J/1ll479ZsvCiDpdNfrzOUfjYtqlW1aY7D
-        Gv6KhxfzO48sHDCntrRQ0vk=
-X-Google-Smtp-Source: APXvYqxr5bVBbF246UZewTgmCA6ffw+w2tBv0vJNSbEB5Y+O60muyD2EofKG0zvGXSxg1TGWfudM7A==
-X-Received: by 2002:ac8:7216:: with SMTP id a22mr5692998qtp.187.1573154290213;
-        Thu, 07 Nov 2019 11:18:10 -0800 (PST)
-Received: from localhost ([2620:10d:c091:500::2:3f13])
-        by smtp.gmail.com with ESMTPSA id w20sm1395361qkj.87.2019.11.07.11.18.09
+        h=x-gm-message-state:subject:to:cc:references:from:message-id:date
+         :user-agent:mime-version:in-reply-to:content-language
+         :content-transfer-encoding;
+        bh=LsQBOGT7wlBeTtd5DGVJ1cAFGBGmgxUQGz4CBk4TLCk=;
+        b=f6p5qBlXyGVhiw709/fik9AnyXzWFIM426iaiLAgg8dD6r5W2Al5T6fY1EQdMgb5vF
+         OvemZVa6CsDoHL+V0WuhL2K4epGVzPfXrVDH5U1MIFPW0tBxn5/tF2FUL0lvJqqbm1GW
+         2TqhjIPH7Cl/ENRcYgVOVxiVpQQKqJ51U/RksMrirfpoD0jaJ4DndxOi9pcnhlRTi+GH
+         0CWs26OkykxeQ1PyWPJVYw+TAUksHJJG4QbJQFZK0q1R9B9CXUXB9hJqF+SeM4+/Y5r0
+         zqmDJeenmqCg0OcQ1eYBGVxO9DY6yRMzFG1GTZXhYCJ9J8uN2725gFl5wjT6Ce/+OHH7
+         nOCw==
+X-Gm-Message-State: APjAAAXO4TlKgvCw9Snj0CrPCZ6+7JMLVaqWcGHAj33Hh1cIVwFVkD1z
+        XoiqplTSjrgWKLbVQJ8D9ZqqGg==
+X-Google-Smtp-Source: APXvYqytRM2OaAe3ZSxiJMqKi+CwRvtOJTQx6oa467TEQdWnroU8YHYetutKqI3f0YDuqGs+xrjF2A==
+X-Received: by 2002:a02:c9d2:: with SMTP id c18mr5844902jap.108.1573154929192;
+        Thu, 07 Nov 2019 11:28:49 -0800 (PST)
+Received: from [192.168.1.159] ([65.144.74.34])
+        by smtp.gmail.com with ESMTPSA id r25sm437420ilb.16.2019.11.07.11.28.47
         (version=TLS1_2 cipher=ECDHE-RSA-AES128-GCM-SHA256 bits=128/128);
-        Thu, 07 Nov 2019 11:18:09 -0800 (PST)
-From:   Tejun Heo <tj@kernel.org>
-To:     axboe@kernel.dk
+        Thu, 07 Nov 2019 11:28:48 -0800 (PST)
+Subject: Re: [PATCHSET v2 block/for-next] blk-cgroup: use cgroup rstat for IO
+ stats
+To:     Tejun Heo <tj@kernel.org>
 Cc:     cgroups@vger.kernel.org, linux-block@vger.kernel.org,
         linux-kernel@vger.kernel.org, lizefan@huawei.com,
-        hannes@cmpxchg.org, kernel-team@fb.com, Tejun Heo <tj@kernel.org>
-Subject: [PATCH 1/6] bfq-iosched: relocate bfqg_*rwstat*() helpers
-Date:   Thu,  7 Nov 2019 11:17:59 -0800
-Message-Id: <20191107191804.3735303-2-tj@kernel.org>
-X-Mailer: git-send-email 2.17.1
-In-Reply-To: <20191107191804.3735303-1-tj@kernel.org>
+        hannes@cmpxchg.org, kernel-team@fb.com
 References: <20191107191804.3735303-1-tj@kernel.org>
+From:   Jens Axboe <axboe@kernel.dk>
+Message-ID: <2a6dd76b-6063-92b9-7b20-97f69bb4b344@kernel.dk>
+Date:   Thu, 7 Nov 2019 12:28:47 -0700
+User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:60.0) Gecko/20100101
+ Thunderbird/60.9.0
+MIME-Version: 1.0
+In-Reply-To: <20191107191804.3735303-1-tj@kernel.org>
+Content-Type: text/plain; charset=utf-8
+Content-Language: en-US
+Content-Transfer-Encoding: 7bit
 Sender: linux-block-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-Collect them right under #ifdef CONFIG_BFQ_CGROUP_DEBUG.  The next
-patch will use them from !DEBUG path and this makes it easy to move
-them out of the ifdef block.
+On 11/7/19 12:17 PM, Tejun Heo wrote:
+> Hello,
+> 
+> v2: Build fix when !DEBUG.
+> 
+> blk-cgroup IO stats currently use blkg_rwstat which unforutnately
+> requires walking all descendants recursively on read.  On systems with
+> a large number of cgroups (dead or alive), this can make each stat
+> read a substantially expensive operation.
+> 
+> This patch updates blk-cgroup to use cgroup rstat which makes stat
+> reading O(# descendants which have been active since last reading)
+> instead of O(# descendants).
+> 
+>   0001-bfq-iosched-relocate-bfqg_-rwstat-helpers.patch
+>   0002-bfq-iosched-stop-using-blkg-stat_bytes-and-stat_ios.patch
+>   0003-blk-throtl-stop-using-blkg-stat_bytes-and-stat_ios.patch
+>   0004-blk-cgroup-remove-now-unused-blkg_print_stat_-bytes-.patch
+>   0005-blk-cgroup-reimplement-basic-IO-stats-using-cgroup-r.patch
+>   0006-blk-cgroup-separate-out-blkg_rwstat-under-CONFIG_BLK.patch
+> 
+> 0001-0003 make bfq-iosched and blk-throtl use their own blkg_rwstat to
+> track basic IO stats on cgroup1 instead of sharing blk-cgroup core's.
+> 0004 is a follow-up cleanup.
+> 
+> 0005 switches blk-cgroup to cgroup rstat.
+> 
+> 0006 moves blkg_rwstat to its own files and gate it under a config
+> option as it's now only used by blk-throtl and bfq-iosched.
+> 
+> The patchset is on top of
+> 
+>    block/for-next  40afbe18b03a ("Merge branch 'for-5.5/drivers-post' into for-next")
+> + block/for-linus b0814361a25c ("blkcg: make blkcg_print_stat() print stats only for online blkgs")
+> 
+> and also available in the following git branch.
+> 
+>   git://git.kernel.org/pub/scm/linux/kernel/git/tj/cgroup.git review-blkcg-rstat
 
-This is pure code reorganization.
+Thanks, applied!
 
-Signed-off-by: Tejun Heo <tj@kernel.org>
----
- block/bfq-cgroup.c | 46 +++++++++++++++++++++++-----------------------
- 1 file changed, 23 insertions(+), 23 deletions(-)
-
-diff --git a/block/bfq-cgroup.c b/block/bfq-cgroup.c
-index 86a607cf19a1..d4755d4ad009 100644
---- a/block/bfq-cgroup.c
-+++ b/block/bfq-cgroup.c
-@@ -1058,17 +1058,34 @@ static ssize_t bfq_io_set_weight(struct kernfs_open_file *of,
- }
- 
- #ifdef CONFIG_BFQ_CGROUP_DEBUG
--static int bfqg_print_stat(struct seq_file *sf, void *v)
-+static int bfqg_print_rwstat(struct seq_file *sf, void *v)
- {
--	blkcg_print_blkgs(sf, css_to_blkcg(seq_css(sf)), blkg_prfill_stat,
--			  &blkcg_policy_bfq, seq_cft(sf)->private, false);
-+	blkcg_print_blkgs(sf, css_to_blkcg(seq_css(sf)), blkg_prfill_rwstat,
-+			  &blkcg_policy_bfq, seq_cft(sf)->private, true);
- 	return 0;
- }
- 
--static int bfqg_print_rwstat(struct seq_file *sf, void *v)
-+static u64 bfqg_prfill_rwstat_recursive(struct seq_file *sf,
-+					struct blkg_policy_data *pd, int off)
- {
--	blkcg_print_blkgs(sf, css_to_blkcg(seq_css(sf)), blkg_prfill_rwstat,
--			  &blkcg_policy_bfq, seq_cft(sf)->private, true);
-+	struct blkg_rwstat_sample sum;
-+
-+	blkg_rwstat_recursive_sum(pd_to_blkg(pd), &blkcg_policy_bfq, off, &sum);
-+	return __blkg_prfill_rwstat(sf, pd, &sum);
-+}
-+
-+static int bfqg_print_rwstat_recursive(struct seq_file *sf, void *v)
-+{
-+	blkcg_print_blkgs(sf, css_to_blkcg(seq_css(sf)),
-+			  bfqg_prfill_rwstat_recursive, &blkcg_policy_bfq,
-+			  seq_cft(sf)->private, true);
-+	return 0;
-+}
-+
-+static int bfqg_print_stat(struct seq_file *sf, void *v)
-+{
-+	blkcg_print_blkgs(sf, css_to_blkcg(seq_css(sf)), blkg_prfill_stat,
-+			  &blkcg_policy_bfq, seq_cft(sf)->private, false);
- 	return 0;
- }
- 
-@@ -1097,15 +1114,6 @@ static u64 bfqg_prfill_stat_recursive(struct seq_file *sf,
- 	return __blkg_prfill_u64(sf, pd, sum);
- }
- 
--static u64 bfqg_prfill_rwstat_recursive(struct seq_file *sf,
--					struct blkg_policy_data *pd, int off)
--{
--	struct blkg_rwstat_sample sum;
--
--	blkg_rwstat_recursive_sum(pd_to_blkg(pd), &blkcg_policy_bfq, off, &sum);
--	return __blkg_prfill_rwstat(sf, pd, &sum);
--}
--
- static int bfqg_print_stat_recursive(struct seq_file *sf, void *v)
- {
- 	blkcg_print_blkgs(sf, css_to_blkcg(seq_css(sf)),
-@@ -1114,14 +1122,6 @@ static int bfqg_print_stat_recursive(struct seq_file *sf, void *v)
- 	return 0;
- }
- 
--static int bfqg_print_rwstat_recursive(struct seq_file *sf, void *v)
--{
--	blkcg_print_blkgs(sf, css_to_blkcg(seq_css(sf)),
--			  bfqg_prfill_rwstat_recursive, &blkcg_policy_bfq,
--			  seq_cft(sf)->private, true);
--	return 0;
--}
--
- static u64 bfqg_prfill_sectors(struct seq_file *sf, struct blkg_policy_data *pd,
- 			       int off)
- {
 -- 
-2.17.1
+Jens Axboe
 
