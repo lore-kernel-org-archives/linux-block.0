@@ -2,224 +2,117 @@ Return-Path: <SRS0=Ukdl=Y7=vger.kernel.org=linux-block-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-6.8 required=3.0 tests=DKIM_SIGNED,DKIM_VALID,
-	DKIM_VALID_AU,HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,
-	SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED autolearn=ham
-	autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-2.3 required=3.0 tests=DKIM_SIGNED,DKIM_VALID,
+	HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,
+	USER_AGENT_SANE_1 autolearn=no autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id A2F80C5DF61
-	for <linux-block@archiver.kernel.org>; Thu,  7 Nov 2019 13:37:41 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id E8E10C5DF60
+	for <linux-block@archiver.kernel.org>; Thu,  7 Nov 2019 13:40:23 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.kernel.org (Postfix) with ESMTP id 6F640218AE
-	for <linux-block@archiver.kernel.org>; Thu,  7 Nov 2019 13:37:41 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id BF8B6218AE
+	for <linux-block@archiver.kernel.org>; Thu,  7 Nov 2019 13:40:23 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="SVQVZ3S5"
+	dkim=pass (2048-bit key) header.d=kernel-dk.20150623.gappssmtp.com header.i=@kernel-dk.20150623.gappssmtp.com header.b="wH3+KwrC"
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S2389323AbfKGNhk (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Thu, 7 Nov 2019 08:37:40 -0500
-Received: from us-smtp-delivery-1.mimecast.com ([205.139.110.120]:38354 "EHLO
-        us-smtp-1.mimecast.com" rhost-flags-OK-OK-OK-FAIL) by vger.kernel.org
-        with ESMTP id S2389320AbfKGNhk (ORCPT
-        <rfc822;linux-block@vger.kernel.org>); Thu, 7 Nov 2019 08:37:40 -0500
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-        s=mimecast20190719; t=1573133859;
-        h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-         to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-         content-transfer-encoding:content-transfer-encoding:
-         in-reply-to:in-reply-to:references:references;
-        bh=vModMaExKzPyatIlo+9SWLkezhO2DwCfI4t3f2wYBPY=;
-        b=SVQVZ3S5zplDonhGHexKvkHD5FIhPr6RB8dZeIYQp66I/UJ2XuQkpirNQwA7A/ncFA9ZWO
-        hXBMamjk+vw1HDNAPI/fzY3o1f9dr5TM1nvumykxftK3l3n3nFjZWybWBZ2F/SGCpwTqep
-        8LE5CaUTnttS5l8vmhvv18sRXdbuhcI=
-Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
- [209.132.183.4]) (Using TLS) by relay.mimecast.com with ESMTP id
- us-mta-364-_HSEua-AM3KNXwOf-qBRAA-1; Thu, 07 Nov 2019 08:37:36 -0500
-Received: from smtp.corp.redhat.com (int-mx08.intmail.prod.int.phx2.redhat.com [10.5.11.23])
-        (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
-        (No client certificate requested)
-        by mimecast-mx01.redhat.com (Postfix) with ESMTPS id 28349107ACC3;
-        Thu,  7 Nov 2019 13:37:34 +0000 (UTC)
-Received: from warthog.procyon.org.uk (ovpn-120-254.rdu2.redhat.com [10.10.120.254])
-        by smtp.corp.redhat.com (Postfix) with ESMTP id 3746A194B2;
-        Thu,  7 Nov 2019 13:37:31 +0000 (UTC)
-Organization: Red Hat UK Ltd. Registered Address: Red Hat UK Ltd, Amberley
- Place, 107-111 Peascod Street, Windsor, Berkshire, SI4 1TE, United
- Kingdom.
- Registered in England and Wales under Company Registration No. 3798903
-Subject: [RFC PATCH 14/14] smack: Implement the watch_key and
- post_notification hooks [ver #2]
-From:   David Howells <dhowells@redhat.com>
-To:     torvalds@linux-foundation.org
-Cc:     dhowells@redhat.com,
-        Greg Kroah-Hartman <gregkh@linuxfoundation.org>,
-        Casey Schaufler <casey@schaufler-ca.com>,
-        Stephen Smalley <sds@tycho.nsa.gov>, nicolas.dichtel@6wind.com,
-        raven@themaw.net, Christian Brauner <christian@brauner.io>,
-        dhowells@redhat.com, keyrings@vger.kernel.org,
-        linux-usb@vger.kernel.org, linux-block@vger.kernel.org,
-        linux-security-module@vger.kernel.org,
-        linux-fsdevel@vger.kernel.org, linux-api@vger.kernel.org,
-        linux-security-module@vger.kernel.org, linux-kernel@vger.kernel.org
-Date:   Thu, 07 Nov 2019 13:37:30 +0000
-Message-ID: <157313385046.29677.1508444632181965475.stgit@warthog.procyon.org.uk>
-In-Reply-To: <157313371694.29677.15388731274912671071.stgit@warthog.procyon.org.uk>
-References: <157313371694.29677.15388731274912671071.stgit@warthog.procyon.org.uk>
-User-Agent: StGit/unknown-version
+        id S1727858AbfKGNkX (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Thu, 7 Nov 2019 08:40:23 -0500
+Received: from mail-pl1-f193.google.com ([209.85.214.193]:34965 "EHLO
+        mail-pl1-f193.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S1726754AbfKGNkX (ORCPT
+        <rfc822;linux-block@vger.kernel.org>); Thu, 7 Nov 2019 08:40:23 -0500
+Received: by mail-pl1-f193.google.com with SMTP id s10so1496953plp.2
+        for <linux-block@vger.kernel.org>; Thu, 07 Nov 2019 05:40:22 -0800 (PST)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=kernel-dk.20150623.gappssmtp.com; s=20150623;
+        h=subject:to:cc:references:from:message-id:date:user-agent
+         :mime-version:in-reply-to:content-language:content-transfer-encoding;
+        bh=4jwWug07MWOkr2qYik00IBFcec60QuuQYmHGTX5Nfvk=;
+        b=wH3+KwrCqWpVGRfSTjUUlZGDGoRu3adOrQELxMAsfC0X9zWnU8LI+X1FuqtcenJ4Ih
+         ApOt9YzExOdEtVt0WETR9+3OLChFDUMl1LZI+euhn9v8WCIwMuGajNwzNMn1ubzGN1PL
+         qa2KCx5JuVeMyLOtAYijCYZcULRT4B7BSW6XVSedKLRrNYqCx9cJ6N5DrbG5nao4ugWk
+         TOF92HaAS5mQT4e5ayyDObQmRrwqAuYnlze5K1sMZjF29VMn0/v3kFMG586GC58NZF5y
+         cmTIkoMk9VL+es1FsKZ4EAu9aDtR3KlHYouPP3AxnOyReUTF972b7PjNZU0+JBkkI3Lo
+         cSsg==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20161025;
+        h=x-gm-message-state:subject:to:cc:references:from:message-id:date
+         :user-agent:mime-version:in-reply-to:content-language
+         :content-transfer-encoding;
+        bh=4jwWug07MWOkr2qYik00IBFcec60QuuQYmHGTX5Nfvk=;
+        b=UysWumdOaKGim44G8nxcj0aYAfdX/xB79VUua6cFwf2AmoZPYmCt51fAoMT4NhMI7z
+         NuWVKDbazF8hn3RLUkUxfBt7anEYkRVIS0RDF2uIy8OxJ9OGtWLHdoNFIaOBRpCRnvkJ
+         1zhqAD7xtyriEExk6fxqOH5mw8cIPc+tlykOM+aihx3NPwBxhqnWA1Afm66o9p0DAxwS
+         kP0c5xaUqGSTll+qAuNUn8jAIbw33NYREbXmchT1kv8IRtTet8ZHYioW4HJ25jjNRBAk
+         SKYFDxBfd72wil8Z7qhDlMKU48k/yp63W1hO9mD94lJCBBNiTSkvUozWXl7KAjpcVU/h
+         G8FA==
+X-Gm-Message-State: APjAAAXRK21e9Y7kWD9WxPn0AQNFTrUUFLIASs0/O2hUgaArZOhLa1my
+        I3W8NXP4gwPnWVvBIp7EO8UQqQ==
+X-Google-Smtp-Source: APXvYqxUqwziIRejg0VlHTo/IjAZ8qKz+Umil4abg66UwevSjmyaJOge6jJD9qFWjmRFk+eqOImpbg==
+X-Received: by 2002:a17:902:47:: with SMTP id 65mr3722636pla.94.1573134021445;
+        Thu, 07 Nov 2019 05:40:21 -0800 (PST)
+Received: from [192.168.1.188] ([66.219.217.79])
+        by smtp.gmail.com with ESMTPSA id r11sm2255570pjp.14.2019.11.07.05.40.18
+        (version=TLS1_2 cipher=ECDHE-RSA-AES128-GCM-SHA256 bits=128/128);
+        Thu, 07 Nov 2019 05:40:20 -0800 (PST)
+Subject: Re: [PATCH 0/8] Zone management commands support
+To:     Damien Le Moal <damien.lemoal@wdc.com>,
+        linux-block@vger.kernel.org, linux-scsi@vger.kernel.org,
+        "Martin K . Petersen" <martin.petersen@oracle.com>,
+        dm-devel@redhat.com, Mike Snitzer <snitzer@redhat.com>
+Cc:     Ajay Joshi <ajay.joshi@wdc.com>,
+        Matias Bjorling <matias.bjorling@wdc.com>,
+        Hans Holmberg <Hans.Holmberg@wdc.com>,
+        Dmitry Fomichev <dmitry.fomichev@wdc.com>,
+        Keith Busch <kbusch@kernel.org>
+References: <20191027140549.26272-1-damien.lemoal@wdc.com>
+From:   Jens Axboe <axboe@kernel.dk>
+Message-ID: <31755ade-ae21-8842-05c0-47017cea7e29@kernel.dk>
+Date:   Thu, 7 Nov 2019 06:40:16 -0700
+User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:60.0) Gecko/20100101
+ Thunderbird/60.9.0
 MIME-Version: 1.0
-X-Scanned-By: MIMEDefang 2.84 on 10.5.11.23
-X-MC-Unique: _HSEua-AM3KNXwOf-qBRAA-1
-X-Mimecast-Spam-Score: 0
-Content-Type: text/plain; charset=UTF-8
-Content-Transfer-Encoding: quoted-printable
+In-Reply-To: <20191027140549.26272-1-damien.lemoal@wdc.com>
+Content-Type: text/plain; charset=utf-8
+Content-Language: en-US
+Content-Transfer-Encoding: 7bit
 Sender: linux-block-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-Implement the watch_key security hook in Smack to make sure that a key
-grants the caller Read permission in order to set a watch on a key.
+On 10/27/19 8:05 AM, Damien Le Moal wrote:
+> This series implements a few improvements and cleanups to zone block
+> device zone reset operations with the first three patches.
+> 
+> The remaining of the series patches introduce zone open, close and
+> finish support, allowing users of zoned block devices to explicitly
+> control the condition (state) of zones.
+> 
+> While these operations are not stricktly necessary for the correct
+> operation of zoned block devices, the open and close operations can
+> improve performance for some device implementations of the ZBC and ZAC
+> standards under write workloads. The finish zone operation, which
+> transition a zone to the full state, can also be useful to protect a
+> zone data by preventing further zone writes.
+> 
+> These operations are implemented by introducing the new
+> REQ_OP_ZONE_OPEN, REQ_OP_ZONE_CLOSE and REQ_OP_ZONE_FINISH request codes
+> and the function blkdev_zone_mgmt() to issue these requests. This new
+> function also replaces the former blkdev_reset_zones() function to reset
+> zones write pointer.
+> 
+> The new ioctls BLKOPENZONE, BLKCLOSEZONE and BLKFINISHZONE are also
+> defined to allow applications to issue these new requests without
+> resorting to a device passthrough interface (e.g. SG_IO).
+> 
+> Support for these operations is added to the SCSI sd driver, to the dm
+> infrastructure (dm-linear and dm-flakey targets) and to the null_blk
+> driver.
 
-Also implement the post_notification security hook to make sure that the
-notification source is granted Write permission by the watch queue.
+Applied for 5.5, thanks. I've got the last sd patch pending, the conflict
+is rather ugly. I'll setup a post branch for drivers with this in, once
+the dependent fix has landed in Linus's tree.
 
-For the moment, the watch_devices security hook is left unimplemented as
-it's not obvious what the object should be since the queue is global and
-didn't previously exist.
-
-Signed-off-by: David Howells <dhowells@redhat.com>
-Acked-by: Casey Schaufler <casey@schaufler-ca.com>
----
-
- include/linux/lsm_audit.h  |    1 +
- security/smack/smack_lsm.c |   82 ++++++++++++++++++++++++++++++++++++++++=
-+++-
- 2 files changed, 82 insertions(+), 1 deletion(-)
-
-diff --git a/include/linux/lsm_audit.h b/include/linux/lsm_audit.h
-index 915330abf6e5..734d67889826 100644
---- a/include/linux/lsm_audit.h
-+++ b/include/linux/lsm_audit.h
-@@ -74,6 +74,7 @@ struct common_audit_data {
- #define LSM_AUDIT_DATA_FILE=0912
- #define LSM_AUDIT_DATA_IBPKEY=0913
- #define LSM_AUDIT_DATA_IBENDPORT 14
-+#define LSM_AUDIT_DATA_NOTIFICATION 15
- =09union =09{
- =09=09struct path path;
- =09=09struct dentry *dentry;
-diff --git a/security/smack/smack_lsm.c b/security/smack/smack_lsm.c
-index ecea41ce919b..71b6f37d49c1 100644
---- a/security/smack/smack_lsm.c
-+++ b/security/smack/smack_lsm.c
-@@ -4273,7 +4273,7 @@ static int smack_key_permission(key_ref_t key_ref,
- =09if (tkp =3D=3D NULL)
- =09=09return -EACCES;
-=20
--=09if (smack_privileged_cred(CAP_MAC_OVERRIDE, cred))
-+=09if (smack_privileged(CAP_MAC_OVERRIDE))
- =09=09return 0;
-=20
- #ifdef CONFIG_AUDIT
-@@ -4319,8 +4319,81 @@ static int smack_key_getsecurity(struct key *key, ch=
-ar **_buffer)
- =09return length;
- }
-=20
-+
-+#ifdef CONFIG_KEY_NOTIFICATIONS
-+/**
-+ * smack_watch_key - Smack access to watch a key for notifications.
-+ * @key: The key to be watched
-+ *
-+ * Return 0 if the @watch->cred has permission to read from the key object=
- and
-+ * an error otherwise.
-+ */
-+static int smack_watch_key(struct key *key)
-+{
-+=09struct smk_audit_info ad;
-+=09struct smack_known *tkp =3D smk_of_current();
-+=09int rc;
-+
-+=09if (key =3D=3D NULL)
-+=09=09return -EINVAL;
-+=09/*
-+=09 * If the key hasn't been initialized give it access so that
-+=09 * it may do so.
-+=09 */
-+=09if (key->security =3D=3D NULL)
-+=09=09return 0;
-+=09/*
-+=09 * This should not occur
-+=09 */
-+=09if (tkp =3D=3D NULL)
-+=09=09return -EACCES;
-+
-+=09if (smack_privileged_cred(CAP_MAC_OVERRIDE, current_cred()))
-+=09=09return 0;
-+
-+#ifdef CONFIG_AUDIT
-+=09smk_ad_init(&ad, __func__, LSM_AUDIT_DATA_KEY);
-+=09ad.a.u.key_struct.key =3D key->serial;
-+=09ad.a.u.key_struct.key_desc =3D key->description;
-+#endif
-+=09rc =3D smk_access(tkp, key->security, MAY_READ, &ad);
-+=09rc =3D smk_bu_note("key watch", tkp, key->security, MAY_READ, rc);
-+=09return rc;
-+}
-+#endif /* CONFIG_KEY_NOTIFICATIONS */
- #endif /* CONFIG_KEYS */
-=20
-+#ifdef CONFIG_WATCH_QUEUE
-+/**
-+ * smack_post_notification - Smack access to post a notification to a queu=
-e
-+ * @w_cred: The credentials of the watcher.
-+ * @cred: The credentials of the event source (may be NULL).
-+ * @n: The notification message to be posted.
-+ */
-+static int smack_post_notification(const struct cred *w_cred,
-+=09=09=09=09   const struct cred *cred,
-+=09=09=09=09   struct watch_notification *n)
-+{
-+=09struct smk_audit_info ad;
-+=09struct smack_known *subj, *obj;
-+=09int rc;
-+
-+=09/* Always let maintenance notifications through. */
-+=09if (n->type =3D=3D WATCH_TYPE_META)
-+=09=09return 0;
-+
-+=09if (!cred)
-+=09=09return 0;
-+=09subj =3D smk_of_task(smack_cred(cred));
-+=09obj =3D smk_of_task(smack_cred(w_cred));
-+
-+=09smk_ad_init(&ad, __func__, LSM_AUDIT_DATA_NOTIFICATION);
-+=09rc =3D smk_access(subj, obj, MAY_WRITE, &ad);
-+=09rc =3D smk_bu_note("notification", subj, obj, MAY_WRITE, rc);
-+=09return rc;
-+}
-+#endif /* CONFIG_WATCH_QUEUE */
-+
- /*
-  * Smack Audit hooks
-  *
-@@ -4709,8 +4782,15 @@ static struct security_hook_list smack_hooks[] __lsm=
-_ro_after_init =3D {
- =09LSM_HOOK_INIT(key_free, smack_key_free),
- =09LSM_HOOK_INIT(key_permission, smack_key_permission),
- =09LSM_HOOK_INIT(key_getsecurity, smack_key_getsecurity),
-+#ifdef CONFIG_KEY_NOTIFICATIONS
-+=09LSM_HOOK_INIT(watch_key, smack_watch_key),
-+#endif
- #endif /* CONFIG_KEYS */
-=20
-+#ifdef CONFIG_WATCH_QUEUE
-+=09LSM_HOOK_INIT(post_notification, smack_post_notification),
-+#endif
-+
-  /* Audit hooks */
- #ifdef CONFIG_AUDIT
- =09LSM_HOOK_INIT(audit_rule_init, smack_audit_rule_init),
+-- 
+Jens Axboe
 
