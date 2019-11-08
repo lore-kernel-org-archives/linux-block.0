@@ -2,186 +2,124 @@ Return-Path: <SRS0=T+5Q=ZA=vger.kernel.org=linux-block-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-8.3 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
-	INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,
-	USER_AGENT_SANE_1 autolearn=ham autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-10.1 required=3.0 tests=DKIMWL_WL_HIGH,DKIM_SIGNED,
+	DKIM_VALID,DKIM_VALID_AU,INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,
+	SPF_HELO_NONE,SPF_PASS,USER_AGENT_GIT autolearn=unavailable
+	autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 2A1FFFA372C
-	for <linux-block@archiver.kernel.org>; Fri,  8 Nov 2019 11:53:40 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 8689CC5DF60
+	for <linux-block@archiver.kernel.org>; Fri,  8 Nov 2019 11:56:39 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.kernel.org (Postfix) with ESMTP id 0ABA621D6C
-	for <linux-block@archiver.kernel.org>; Fri,  8 Nov 2019 11:53:40 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id 5E76D21924
+	for <linux-block@archiver.kernel.org>; Fri,  8 Nov 2019 11:56:39 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+	s=default; t=1573214199;
+	bh=XTKduqN7mHhES6KQ6cLQz/6SZSC+gMKdX1Jkj9OtVMY=;
+	h=From:To:Cc:Subject:Date:In-Reply-To:References:List-ID:From;
+	b=OFBgqy83hnNyMTpmL4G4GXz2bV0h1tYj2Eg5ptlWhPPagZkbymTY82/nRDVMOscB1
+	 VC5DNdp5nY12ReFaTAOrMjfY1cBUEnHxm282r7JN6VQ6VS36M6TByk418YtFCfzZ8k
+	 oCYd94MeDlxVFx+0jYlWwGbI1N5xtzs9mtBnqAyw=
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S2389905AbfKHLxg (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Fri, 8 Nov 2019 06:53:36 -0500
-Received: from www262.sakura.ne.jp ([202.181.97.72]:56883 "EHLO
-        www262.sakura.ne.jp" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S2391394AbfKHLqj (ORCPT
-        <rfc822;linux-block@vger.kernel.org>); Fri, 8 Nov 2019 06:46:39 -0500
-Received: from fsav110.sakura.ne.jp (fsav110.sakura.ne.jp [27.133.134.237])
-        by www262.sakura.ne.jp (8.15.2/8.15.2) with ESMTP id xA8BfQTc062503;
-        Fri, 8 Nov 2019 20:41:26 +0900 (JST)
-        (envelope-from penguin-kernel@i-love.sakura.ne.jp)
-Received: from www262.sakura.ne.jp (202.181.97.72)
- by fsav110.sakura.ne.jp (F-Secure/fsigk_smtp/550/fsav110.sakura.ne.jp);
- Fri, 08 Nov 2019 20:41:26 +0900 (JST)
-X-Virus-Status: clean(F-Secure/fsigk_smtp/550/fsav110.sakura.ne.jp)
-Received: from [192.168.1.9] (softbank126227191088.bbtec.net [126.227.191.88])
-        (authenticated bits=0)
-        by www262.sakura.ne.jp (8.15.2/8.15.2) with ESMTPSA id xA8BfKEh062452
-        (version=TLSv1.2 cipher=AES256-SHA bits=256 verify=NO);
-        Fri, 8 Nov 2019 20:41:26 +0900 (JST)
-        (envelope-from penguin-kernel@i-love.sakura.ne.jp)
-Subject: [PATCH] block: Bail out iteration functions upon SIGKILL.
-To:     Bob Liu <bob.liu@oracle.com>, axboe@kernel.dk
-Cc:     linux-block@vger.kernel.org
-References: <000000000000c52dbf05958f3f3a@google.com>
- <3fbc4bb2-a03b-fbfa-4803-47a6d0075ff2@I-love.SAKURA.ne.jp>
- <24296ff7-4a5f-2bd9-63c7-07831f7b4d8d@oracle.com>
-From:   Tetsuo Handa <penguin-kernel@i-love.sakura.ne.jp>
-Message-ID: <8fde32da-d5e5-11b7-9ed7-e3aa5b003647@i-love.sakura.ne.jp>
-Date:   Fri, 8 Nov 2019 20:41:22 +0900
-User-Agent: Mozilla/5.0 (Windows NT 6.3; WOW64; rv:60.0) Gecko/20100101
- Thunderbird/60.9.0
+        id S2391207AbfKHL4e (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Fri, 8 Nov 2019 06:56:34 -0500
+Received: from mail.kernel.org ([198.145.29.99]:60868 "EHLO mail.kernel.org"
+        rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
+        id S2391118AbfKHLpb (ORCPT <rfc822;linux-block@vger.kernel.org>);
+        Fri, 8 Nov 2019 06:45:31 -0500
+Received: from sasha-vm.mshome.net (c-73-47-72-35.hsd1.nh.comcast.net [73.47.72.35])
+        (using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+        (No client certificate requested)
+        by mail.kernel.org (Postfix) with ESMTPSA id 3336420656;
+        Fri,  8 Nov 2019 11:45:29 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+        s=default; t=1573213529;
+        bh=XTKduqN7mHhES6KQ6cLQz/6SZSC+gMKdX1Jkj9OtVMY=;
+        h=From:To:Cc:Subject:Date:In-Reply-To:References:From;
+        b=fONEfXwEV0k/vgGBCkT4buTUB6s0TKz/IfaZI+hQvY//esZH4rWs2ebJxD6ABUDQp
+         KRPpu7YhEvYy2i/jbfZNbuNMYIN/Ss8wlq6/cBJ0lrX8f0uSHgCaiHTLqkvGcSMENk
+         J7ASqj/PE8ef5ax51uy3+TQmQI3q6LHJvTHoELLM=
+From:   Sasha Levin <sashal@kernel.org>
+To:     linux-kernel@vger.kernel.org, stable@vger.kernel.org
+Cc:     Paolo Valente <paolo.valente@linaro.org>,
+        Jens Axboe <axboe@kernel.dk>, Sasha Levin <sashal@kernel.org>,
+        linux-block@vger.kernel.org
+Subject: [PATCH AUTOSEL 4.14 093/103] blok, bfq: do not plug I/O if all queues are weight-raised
+Date:   Fri,  8 Nov 2019 06:42:58 -0500
+Message-Id: <20191108114310.14363-93-sashal@kernel.org>
+X-Mailer: git-send-email 2.20.1
+In-Reply-To: <20191108114310.14363-1-sashal@kernel.org>
+References: <20191108114310.14363-1-sashal@kernel.org>
 MIME-Version: 1.0
-In-Reply-To: <24296ff7-4a5f-2bd9-63c7-07831f7b4d8d@oracle.com>
-Content-Type: text/plain; charset=utf-8
-Content-Language: en-US
-Content-Transfer-Encoding: 7bit
+X-stable: review
+X-Patchwork-Hint: Ignore
+Content-Transfer-Encoding: 8bit
 Sender: linux-block-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-syzbot found that a thread can stall for minutes inside fallocate()
-after that thread was killed by SIGKILL [1]. While trying to allocate
-64TB of disk space using fallocate() is legal, delaying termination of
-killed thread for minutes is bad. Thus, allow iteration functions in
-block/blk-lib.c to be killable.
+From: Paolo Valente <paolo.valente@linaro.org>
 
-[1] https://syzkaller.appspot.com/bug?id=9386d051e11e09973d5a4cf79af5e8cedf79386d
+[ Upstream commit c8765de0adfcaaf4ffb2d951e07444f00ffa9453 ]
 
-Signed-off-by: Tetsuo Handa <penguin-kernel@I-love.SAKURA.ne.jp>
-Reported-by: syzbot <syzbot+b48daca8639150bc5e73@syzkaller.appspotmail.com>
+To reduce latency for interactive and soft real-time applications, bfq
+privileges the bfq_queues containing the I/O of these
+applications. These privileged queues, referred-to as weight-raised
+queues, get a much higher share of the device throughput
+w.r.t. non-privileged queues. To preserve this higher share, the I/O
+of any non-weight-raised queue must be plugged whenever a sync
+weight-raised queue, while being served, remains temporarily empty. To
+attain this goal, bfq simply plugs any I/O (from any queue), if a sync
+weight-raised queue remains empty while in service.
+
+Unfortunately, this plugging typically lowers throughput with random
+I/O, on devices with internal queueing (because it reduces the filling
+level of the internal queues of the device).
+
+This commit addresses this issue by restricting the cases where
+plugging is performed: if a sync weight-raised queue remains empty
+while in service, then I/O plugging is performed only if some of the
+active bfq_queues are *not* weight-raised (which is actually the only
+circumstance where plugging is needed to preserve the higher share of
+the throughput of weight-raised queues). This restriction proved able
+to boost throughput in really many use cases needing only maximum
+throughput.
+
+Signed-off-by: Paolo Valente <paolo.valente@linaro.org>
+Signed-off-by: Jens Axboe <axboe@kernel.dk>
+Signed-off-by: Sasha Levin <sashal@kernel.org>
 ---
- block/blk-lib.c | 44 ++++++++++++++++++++++++++++++++++++++++----
- 1 file changed, 40 insertions(+), 4 deletions(-)
+ block/bfq-iosched.c | 10 ++++++++--
+ 1 file changed, 8 insertions(+), 2 deletions(-)
 
-diff --git a/block/blk-lib.c b/block/blk-lib.c
-index 5f2c429..6ca7cae 100644
---- a/block/blk-lib.c
-+++ b/block/blk-lib.c
-@@ -7,9 +7,22 @@
- #include <linux/bio.h>
- #include <linux/blkdev.h>
- #include <linux/scatterlist.h>
-+#include <linux/sched/signal.h>
+diff --git a/block/bfq-iosched.c b/block/bfq-iosched.c
+index e65b0da1007b4..93863c6173e66 100644
+--- a/block/bfq-iosched.c
++++ b/block/bfq-iosched.c
+@@ -3314,7 +3314,12 @@ static bool bfq_bfqq_may_idle(struct bfq_queue *bfqq)
+ 	 * whether bfqq is being weight-raised, because
+ 	 * bfq_symmetric_scenario() does not take into account also
+ 	 * weight-raised queues (see comments on
+-	 * bfq_weights_tree_add()).
++	 * bfq_weights_tree_add()). In particular, if bfqq is being
++	 * weight-raised, it is important to idle only if there are
++	 * other, non-weight-raised queues that may steal throughput
++	 * to bfqq. Actually, we should be even more precise, and
++	 * differentiate between interactive weight raising and
++	 * soft real-time weight raising.
+ 	 *
+ 	 * As a side note, it is worth considering that the above
+ 	 * device-idling countermeasures may however fail in the
+@@ -3326,7 +3331,8 @@ static bool bfq_bfqq_may_idle(struct bfq_queue *bfqq)
+ 	 * to let requests be served in the desired order until all
+ 	 * the requests already queued in the device have been served.
+ 	 */
+-	asymmetric_scenario = bfqq->wr_coeff > 1 ||
++	asymmetric_scenario = (bfqq->wr_coeff > 1 &&
++			       bfqd->wr_busy_queues < bfqd->busy_queues) ||
+ 		!bfq_symmetric_scenario(bfqd);
  
- #include "blk.h"
- 
-+static int blk_should_abort(struct bio *bio)
-+{
-+	int ret;
-+
-+	cond_resched();
-+	if (!fatal_signal_pending(current))
-+		return 0;
-+	ret = submit_bio_wait(bio);
-+	bio_put(bio);
-+	return ret ? ret : -EINTR;
-+}
-+
- struct bio *blk_next_bio(struct bio *bio, unsigned int nr_pages, gfp_t gfp)
- {
- 	struct bio *new = bio_alloc(gfp, nr_pages);
-@@ -55,6 +68,7 @@ int __blkdev_issue_discard(struct block_device *bdev, sector_t sector,
- 		return -EINVAL;
- 
- 	while (nr_sects) {
-+		int ret;
- 		sector_t req_sects = min_t(sector_t, nr_sects,
- 				bio_allowed_max_sectors(q));
- 
-@@ -75,7 +89,11 @@ int __blkdev_issue_discard(struct block_device *bdev, sector_t sector,
- 		 * us to schedule out to avoid softlocking if preempt
- 		 * is disabled.
- 		 */
--		cond_resched();
-+		ret = blk_should_abort(bio);
-+		if (ret) {
-+			*biop = NULL;
-+			return ret;
-+		}
- 	}
- 
- 	*biop = bio;
-@@ -154,6 +172,8 @@ static int __blkdev_issue_write_same(struct block_device *bdev, sector_t sector,
- 	max_write_same_sectors = bio_allowed_max_sectors(q);
- 
- 	while (nr_sects) {
-+		int ret;
-+
- 		bio = blk_next_bio(bio, 1, gfp_mask);
- 		bio->bi_iter.bi_sector = sector;
- 		bio_set_dev(bio, bdev);
-@@ -171,7 +191,11 @@ static int __blkdev_issue_write_same(struct block_device *bdev, sector_t sector,
- 			bio->bi_iter.bi_size = nr_sects << 9;
- 			nr_sects = 0;
- 		}
--		cond_resched();
-+		ret = blk_should_abort(bio);
-+		if (ret) {
-+			*biop = NULL;
-+			return ret;
-+		}
- 	}
- 
- 	*biop = bio;
-@@ -230,6 +254,8 @@ static int __blkdev_issue_write_zeroes(struct block_device *bdev,
- 		return -EOPNOTSUPP;
- 
- 	while (nr_sects) {
-+		int ret;
-+
- 		bio = blk_next_bio(bio, 0, gfp_mask);
- 		bio->bi_iter.bi_sector = sector;
- 		bio_set_dev(bio, bdev);
-@@ -245,7 +271,11 @@ static int __blkdev_issue_write_zeroes(struct block_device *bdev,
- 			bio->bi_iter.bi_size = nr_sects << 9;
- 			nr_sects = 0;
- 		}
--		cond_resched();
-+		ret = blk_should_abort(bio);
-+		if (ret) {
-+			*biop = NULL;
-+			return ret;
-+		}
- 	}
- 
- 	*biop = bio;
-@@ -281,6 +311,8 @@ static int __blkdev_issue_zero_pages(struct block_device *bdev,
- 		return -EPERM;
- 
- 	while (nr_sects != 0) {
-+		int ret;
-+
- 		bio = blk_next_bio(bio, __blkdev_sectors_to_bio_pages(nr_sects),
- 				   gfp_mask);
- 		bio->bi_iter.bi_sector = sector;
-@@ -295,7 +327,11 @@ static int __blkdev_issue_zero_pages(struct block_device *bdev,
- 			if (bi_size < sz)
- 				break;
- 		}
--		cond_resched();
-+		ret = blk_should_abort(bio);
-+		if (ret) {
-+			*biop = NULL;
-+			return ret;
-+		}
- 	}
- 
- 	*biop = bio;
+ 	/*
 -- 
-1.8.3.1
-
+2.20.1
 
