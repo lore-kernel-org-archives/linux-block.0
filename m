@@ -2,85 +2,75 @@ Return-Path: <SRS0=T+5Q=ZA=vger.kernel.org=linux-block-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-5.4 required=3.0 tests=DKIM_SIGNED,DKIM_VALID,
-	DKIM_VALID_AU,HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SIGNED_OFF_BY,
-	SPF_HELO_NONE,SPF_PASS,USER_AGENT_SANE_1 autolearn=unavailable
+X-Spam-Status: No, score=-2.3 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
+	MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,USER_AGENT_SANE_1 autolearn=no
 	autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 195C9FC6195
-	for <linux-block@archiver.kernel.org>; Fri,  8 Nov 2019 15:16:48 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 0295AFC6195
+	for <linux-block@archiver.kernel.org>; Fri,  8 Nov 2019 16:26:47 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.kernel.org (Postfix) with ESMTP id D2BA5206C3
-	for <linux-block@archiver.kernel.org>; Fri,  8 Nov 2019 15:16:47 +0000 (UTC)
-Authentication-Results: mail.kernel.org;
-	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="Jf4bIEZB"
+	by mail.kernel.org (Postfix) with ESMTP id D7813206C3
+	for <linux-block@archiver.kernel.org>; Fri,  8 Nov 2019 16:26:46 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1727256AbfKHPQ1 (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Fri, 8 Nov 2019 10:16:27 -0500
-Received: from us-smtp-delivery-1.mimecast.com ([207.211.31.120]:37358 "EHLO
-        us-smtp-1.mimecast.com" rhost-flags-OK-OK-OK-FAIL) by vger.kernel.org
-        with ESMTP id S1727221AbfKHPQ0 (ORCPT
-        <rfc822;linux-block@vger.kernel.org>); Fri, 8 Nov 2019 10:16:26 -0500
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-        s=mimecast20190719; t=1573226185;
-        h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-         to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-         content-transfer-encoding:content-transfer-encoding:
-         in-reply-to:in-reply-to:references:references;
-        bh=sdJq9GCWEigvvKAEhdiMe0zWBDjEkdIA0zDjk+u6lhw=;
-        b=Jf4bIEZB8V71oqtqwtfWFT4J3GYMwgH7QXdbjWMLojMIdV2ZINRwXVNVaiVuStGgUfUi83
-        /iW7eJS6S9jS/ymkMXiOsJTXGZiA3KZof9HRl9DPCCPRxpg4Q3v7X4aK4Q0N83H5lffaLz
-        qwNIeExYBSWPJ9kvInRoHi1gCYHZqWU=
-Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
- [209.132.183.4]) (Using TLS) by relay.mimecast.com with ESMTP id
- us-mta-289-fhtsWwYyNlO4PtBrYovQIw-1; Fri, 08 Nov 2019 10:16:22 -0500
-Received: from smtp.corp.redhat.com (int-mx04.intmail.prod.int.phx2.redhat.com [10.5.11.14])
-        (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
-        (No client certificate requested)
-        by mimecast-mx01.redhat.com (Postfix) with ESMTPS id DC70B180496F;
-        Fri,  8 Nov 2019 15:16:20 +0000 (UTC)
-Received: from localhost (unknown [10.18.25.174])
-        by smtp.corp.redhat.com (Postfix) with ESMTPS id B27485DA7F;
-        Fri,  8 Nov 2019 15:16:17 +0000 (UTC)
-Date:   Fri, 8 Nov 2019 10:16:16 -0500
-From:   Mike Snitzer <snitzer@redhat.com>
-To:     Damien Le Moal <damien.lemoal@wdc.com>
-Cc:     linux-block@vger.kernel.org, Jens Axboe <axboe@kernel.dk>,
-        linux-scsi@vger.kernel.org,
-        "Martin K . Petersen" <martin.petersen@oracle.com>,
-        dm-devel@redhat.com, linux-f2fs-devel@lists.sourceforge.net,
-        Jaegeuk Kim <jaegeuk@kernel.org>, Chao Yu <yuchao0@huawei.com>
-Subject: Re: [PATCH 9/9] block: rework zone reporting
-Message-ID: <20191108151616.GA8047@redhat.com>
-References: <20191108015702.233102-1-damien.lemoal@wdc.com>
- <20191108015702.233102-10-damien.lemoal@wdc.com>
+        id S1726095AbfKHQ0m (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Fri, 8 Nov 2019 11:26:42 -0500
+Received: from mail-pg1-f193.google.com ([209.85.215.193]:38816 "EHLO
+        mail-pg1-f193.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S1726039AbfKHQ0m (ORCPT
+        <rfc822;linux-block@vger.kernel.org>); Fri, 8 Nov 2019 11:26:42 -0500
+Received: by mail-pg1-f193.google.com with SMTP id 15so4277904pgh.5;
+        Fri, 08 Nov 2019 08:26:42 -0800 (PST)
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20161025;
+        h=x-gm-message-state:subject:to:cc:references:from:message-id:date
+         :user-agent:mime-version:in-reply-to:content-language
+         :content-transfer-encoding;
+        bh=AMGqQPW5u5MrdIldnP75x+wA0d9NwehFp+ze/wZzvWE=;
+        b=MZIy55JuZUMqOJXENjfpPT6uUN8gBe+T8wBYH9CEx/KuPu38QK9xzb/r3PyaQG/o9B
+         8XaZNfKyJDhR79x7QxptmzbOnl4A0kIr3ohFDjNk4jKPvQQpQI4M2vnbcTi1zuGcdswj
+         8lAutcDyOEyrhrMqRQbvaKetyTcGuPZkF4aect/xIFJfXKiO2KSM95qnu1DphxKW1dGv
+         QGkKWAMxuA9qJo7f5Cgjym5VLSK8qvtjxXKa4jhtnN4f8ZFPeVhJC0o/GCs2pqNQDxso
+         YjhiNPpXr9gVXI1XOMLxNSih3VdeuRMucXB+T4TosFjHrs7qDCOoHSCgkuV5U6/OXqDF
+         WIyA==
+X-Gm-Message-State: APjAAAU0Ru5AeMd7VzDpwXP5OflQih7MnyfYIMpdCDMt5xEkbuSMxdBB
+        r3JDRbdfWRh0m8NgvN9/asMGPZDnBPo=
+X-Google-Smtp-Source: APXvYqyKmlJlSY+CASCaWKhKS5PL0Lv/x9h+stTx90jRkfLqj8LRoT0EDluBYwwIRUOqdaUYy29DJA==
+X-Received: by 2002:a17:90a:9741:: with SMTP id i1mr14891484pjw.41.1573230401560;
+        Fri, 08 Nov 2019 08:26:41 -0800 (PST)
+Received: from desktop-bart.svl.corp.google.com ([2620:15c:2cd:202:4308:52a3:24b6:2c60])
+        by smtp.gmail.com with ESMTPSA id p5sm5665161pgb.14.2019.11.08.08.26.40
+        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
+        Fri, 08 Nov 2019 08:26:40 -0800 (PST)
+Subject: Re: [PATCH] block: drbd: remove a stay unlock in
+ __drbd_send_protocol()
+To:     Dan Carpenter <dan.carpenter@oracle.com>,
+        Philipp Reisner <philipp.reisner@linbit.com>
+Cc:     Lars Ellenberg <lars.ellenberg@linbit.com>,
+        Jens Axboe <axboe@kernel.dk>, drbd-dev@tron.linbit.com,
+        linux-block@vger.kernel.org, linux-kernel@vger.kernel.org,
+        kernel-janitors@vger.kernel.org
+References: <20191107074847.GA11695@mwanda>
+From:   Bart Van Assche <bvanassche@acm.org>
+Message-ID: <3a2d491f-3d24-3673-07f3-f601d5fafc97@acm.org>
+Date:   Fri, 8 Nov 2019 08:26:39 -0800
+User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:60.0) Gecko/20100101
+ Thunderbird/60.9.0
 MIME-Version: 1.0
-In-Reply-To: <20191108015702.233102-10-damien.lemoal@wdc.com>
-User-Agent: Mutt/1.5.21 (2010-09-15)
-X-Scanned-By: MIMEDefang 2.79 on 10.5.11.14
-X-MC-Unique: fhtsWwYyNlO4PtBrYovQIw-1
-X-Mimecast-Spam-Score: 0
-Content-Type: text/plain; charset=WINDOWS-1252
-Content-Transfer-Encoding: quoted-printable
-Content-Disposition: inline
+In-Reply-To: <20191107074847.GA11695@mwanda>
+Content-Type: text/plain; charset=utf-8; format=flowed
+Content-Language: en-US
+Content-Transfer-Encoding: 7bit
 Sender: linux-block-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-On Thu, Nov 07 2019 at  8:57pm -0500,
-Damien Le Moal <damien.lemoal@wdc.com> wrote:
+On 11/6/19 11:48 PM, Dan Carpenter wrote:
+> There are two callers of this function and they both unlock the mutex so
+> this ends up being a double unlock.
 
-> From: Christoph Hellwig <hch@lst.de>
->=20
-> Avoid the need to allocate a potentially large array of struct blk_zone
-> in the block layer by switching the ->report_zones method interface to
-> a callback model. Now the caller simply supplies a callback that is
-> executed on each reported zone, and private data for it.
->=20
-> Signed-off-by: Christoph Hellwig <hch@lst.de>
-> Signed-off-by: Shin'ichiro Kawasaki <shinichiro.kawasaki@wdc.com>
-> Signed-off-by: Damien Le Moal <damien.lemoal@wdc.com>
+Is there a typo in the patch subject (stay -> stray)?
 
-Reviewed-by: Mike Snitzer <snitzer@redhat.com>
+Thanks,
 
+Bart.
