@@ -2,232 +2,132 @@ Return-Path: <SRS0=T+5Q=ZA=vger.kernel.org=linux-block-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-6.9 required=3.0 tests=DKIM_SIGNED,DKIM_VALID,
-	DKIM_VALID_AU,HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,
-	SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS autolearn=unavailable autolearn_force=no
+X-Spam-Status: No, score=-8.6 required=3.0 tests=DKIMWL_WL_HIGH,DKIM_SIGNED,
+	DKIM_VALID,DKIM_VALID_AU,INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,
+	SPF_HELO_NONE,SPF_PASS,USER_AGENT_SANE_1 autolearn=ham autolearn_force=no
 	version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id A9582C5DF60
-	for <linux-block@archiver.kernel.org>; Fri,  8 Nov 2019 19:23:59 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 557C1C5DF60
+	for <linux-block@archiver.kernel.org>; Fri,  8 Nov 2019 20:18:39 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.kernel.org (Postfix) with ESMTP id 7381A2067B
-	for <linux-block@archiver.kernel.org>; Fri,  8 Nov 2019 19:23:59 +0000 (UTC)
-Authentication-Results: mail.kernel.org;
-	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="ixqLj5/q"
+	by mail.kernel.org (Postfix) with ESMTP id 286E520869
+	for <linux-block@archiver.kernel.org>; Fri,  8 Nov 2019 20:18:39 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+	s=default; t=1573244319;
+	bh=a+R4g29R2UbOVQWfyew74Q7TVM9SFOElMwHN9udX3To=;
+	h=Date:From:To:Cc:Subject:List-ID:From;
+	b=IF4g6VABVt9w/1iSUTd+cSBV3sTeVL1rp+Cu8zBx8+Y4VsMtXrcUJsC9MuDH4XwUg
+	 DxCCsICXMxKNtnZWeLNyOt/WaRHDnJTBpubcCgDJXtWM/OhLknnQinZnf6TiogdwZU
+	 1ivbbXSsVCQaR97MtY7nNB99hOUg0zlMn5p1cnPQ=
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S2389271AbfKHTX6 (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Fri, 8 Nov 2019 14:23:58 -0500
-Received: from us-smtp-delivery-1.mimecast.com ([207.211.31.120]:46511 "EHLO
-        us-smtp-1.mimecast.com" rhost-flags-OK-OK-OK-FAIL) by vger.kernel.org
-        with ESMTP id S1732379AbfKHSxc (ORCPT
-        <rfc822;linux-block@vger.kernel.org>); Fri, 8 Nov 2019 13:53:32 -0500
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-        s=mimecast20190719; t=1573239211;
-        h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-         to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-         content-transfer-encoding:content-transfer-encoding;
-        bh=9FwgetzyW8P48cGLGqGtD4GfxfTRlJoRiG4n2Dado8Y=;
-        b=ixqLj5/qZDjREgmFuroudJ1XpJJThA7TmnfmjNiz/xXh0D5/QaD8nmFy3+UxkfB05PebK8
-        4V7uYVbTuhfhpbR+9T2I29gTw3mIakBVJAROwWFQXv2UaGUtRlIbsOxuh+BPQ0z6bVV4jy
-        I5ul+Cx5+KjskUkgnJ9q5bBA0jM3bw4=
-Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
- [209.132.183.4]) (Using TLS) by relay.mimecast.com with ESMTP id
- us-mta-225-RDOnMV84OlO0Y-tz_4aX-A-1; Fri, 08 Nov 2019 13:53:28 -0500
-Received: from smtp.corp.redhat.com (int-mx01.intmail.prod.int.phx2.redhat.com [10.5.11.11])
-        (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
-        (No client certificate requested)
-        by mimecast-mx01.redhat.com (Postfix) with ESMTPS id 5C2C88017E0;
-        Fri,  8 Nov 2019 18:53:26 +0000 (UTC)
-Received: from rh2.redhat.com (ovpn-125-42.rdu2.redhat.com [10.10.125.42])
-        by smtp.corp.redhat.com (Postfix) with ESMTP id CF6A1600C9;
-        Fri,  8 Nov 2019 18:53:24 +0000 (UTC)
-From:   Mike Christie <mchristi@redhat.com>
-To:     mhocko@kernel.org, david@fromorbit.com, linux-mm@kvack.org,
-        linux-kernel@vger.kernel.org, linux-scsi@vger.kernel.org,
-        linux-fsdevel@vger.kernel.org, linux-block@vger.kernel.org,
-        martin@urbackup.org, Damien.LeMoal@wdc.com
-Cc:     Mike Christie <mchristi@redhat.com>
-Subject: [PATCH] Add prctl support for controlling mem reclaim V3
-Date:   Fri,  8 Nov 2019 12:53:19 -0600
-Message-Id: <20191108185319.9326-1-mchristi@redhat.com>
+        id S1727768AbfKHUSi (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Fri, 8 Nov 2019 15:18:38 -0500
+Received: from mail-qv1-f66.google.com ([209.85.219.66]:40015 "EHLO
+        mail-qv1-f66.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S1727168AbfKHUSi (ORCPT
+        <rfc822;linux-block@vger.kernel.org>); Fri, 8 Nov 2019 15:18:38 -0500
+Received: by mail-qv1-f66.google.com with SMTP id i3so2525801qvv.7;
+        Fri, 08 Nov 2019 12:18:36 -0800 (PST)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=gmail.com; s=20161025;
+        h=sender:date:from:to:cc:subject:message-id:mime-version
+         :content-disposition:user-agent;
+        bh=mmHw+HY13PqaN29edxW0jwM2upsZtKFfvy8blwuk5EA=;
+        b=F/5JnOvRGR/owkxb4DztW+n7zGs189sEAWV39eXQk4xzNvkpizwtMmcepgldOnsXFs
+         qDFk5wXMcC8oWq3/SZyeKhKf7ORtoyQppwrN1ZUPPhIfRFMxiwnkf3BhbAVqhgVgye4E
+         GC0Y9LKpCNhnogVndaF7C1N5xjW0q4rvEqNjTKmCTYuV7zFnBCLtuuYlbQCIY4zCt0vK
+         Vjry24hVxg+/3uHsGWWdGZwVxpJJlQhYy/6ZCVMtl409wgagTAVlIGMMmKknR8kquCPu
+         EM0d9NnGEo6neLMdgHRI5PuhwaHt3qoHlOZQAyBiD7BxCNRTxy7iLhnvgpGO2Ps5A4VN
+         u9aA==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20161025;
+        h=x-gm-message-state:sender:date:from:to:cc:subject:message-id
+         :mime-version:content-disposition:user-agent;
+        bh=mmHw+HY13PqaN29edxW0jwM2upsZtKFfvy8blwuk5EA=;
+        b=joSJFhl1jadaYXGYxtvfz1YE7KvfbVAkyy9944m/krnMMOTEoq9iA3zptS05e6MS7E
+         yCiqJkapHuwYNtoQySI/AhIiWv+j4MHW214UTTqltf6C7sJsqJOqNXa0IpC+FBS207f3
+         BU+NhiWwKsy+ckwa4oQEh+OkxdE2msKNQA8o0lSGDNo5+sQxq6t9/mxN38pELyeRIlEe
+         KyOoNeABHxiMw87rGdy2rl6V+TT81kAtRNFI9w91aFfUKdMrUo+NVrcj+qdqU8PrH8ud
+         nIj0xdetoAxR9iQE6D5V00qWrecViuRR7FJle4lz/yqi7qOJ6Y+ThcHiMWtltXLKi4Dv
+         8AZw==
+X-Gm-Message-State: APjAAAUmSnHmojx0OKdpNMbRrD5nijuzWL0ai+LkQgBvNrA6wXi7h8Wf
+        pgocrAGJBqgLRrng075+bvRb40eO
+X-Google-Smtp-Source: APXvYqzHAramOoIzArIz/hiJ4LYuXFm+d83auENadtdOGznr2Ex3AST9b0WFgXmCLrK9+Mr+fvtX5w==
+X-Received: by 2002:a05:6214:852:: with SMTP id dg18mr11442997qvb.8.1573244315130;
+        Fri, 08 Nov 2019 12:18:35 -0800 (PST)
+Received: from localhost ([2620:10d:c091:500::1:a811])
+        by smtp.gmail.com with ESMTPSA id l62sm3514612qkc.9.2019.11.08.12.18.33
+        (version=TLS1_2 cipher=ECDHE-RSA-AES128-GCM-SHA256 bits=128/128);
+        Fri, 08 Nov 2019 12:18:33 -0800 (PST)
+Date:   Fri, 8 Nov 2019 12:18:29 -0800
+From:   Tejun Heo <tj@kernel.org>
+To:     Jens Axboe <axboe@kernel.dk>
+Cc:     linux-block@vger.kernel.org, cgroups@vger.kernel.org,
+        kernel-team@fb.com, Li Zefan <lizefan@huawei.com>,
+        Johannes Weiner <hannes@cmpxchg.org>, Jan Kara <jack@suse.cz>,
+        Konstantin Khlebnikov <khlebnikov@yandex-team.ru>,
+        Dennis Zhou <dennis@kernel.org>
+Subject: [PATCH block/for-linus] cgroup,writeback: don't switch wbs
+ immediately on dead wbs if the memcg is dead
+Message-ID: <20191108201829.GA3728460@devbig004.ftw2.facebook.com>
 MIME-Version: 1.0
-X-Scanned-By: MIMEDefang 2.79 on 10.5.11.11
-X-MC-Unique: RDOnMV84OlO0Y-tz_4aX-A-1
-X-Mimecast-Spam-Score: 0
-Content-Type: text/plain; charset=WINDOWS-1252
-Content-Transfer-Encoding: quoted-printable
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+User-Agent: Mutt/1.5.21 (2010-09-15)
 Sender: linux-block-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-There are several storage drivers like dm-multipath, iscsi, tcmu-runner,
-amd nbd that have userspace components that can run in the IO path. For
-example, iscsi and nbd's userspace deamons may need to recreate a socket
-and/or send IO on it, and dm-multipath's daemon multipathd may need to
-send SG IO or read/write IO to figure out the state of paths and re-set
-them up.
+cgroup writeback tries to refresh the associated wb immediately if the
+current wb is dead.  This is to avoid keeping issuing IOs on the stale
+wb after memcg - blkcg association has changed (ie. when blkcg got
+disabled / enabled higher up in the hierarchy).
 
-In the kernel these drivers have access to GFP_NOIO/GFP_NOFS and the
-memalloc_*_save/restore functions to control the allocation behavior,
-but for userspace we would end up hitting an allocation that ended up
-writing data back to the same device we are trying to allocate for.
-The device is then in a state of deadlock, because to execute IO the
-device needs to allocate memory, but to allocate memory the memory
-layers want execute IO to the device.
+Unfortunately, the logic gets triggered spuriously on inodes which are
+associated with dead cgroups.  When the logic is triggered on dead
+cgroups, the attempt fails only after doing quite a bit of work
+allocating and initializing a new wb.
 
-Here is an example with nbd using a local userspace daemon that performs
-network IO to a remote server. We are using XFS on top of the nbd device,
-but it can happen with any FS or other modules layered on top of the nbd
-device that can write out data to free memory.  Here a nbd daemon helper
-thread, msgr-worker-1, is performing a write/sendmsg on a socket to execute
-a request. This kicks off a reclaim operation which results in a WRITE to
-the nbd device and the nbd thread calling back into the mm layer.
+While c3aab9a0bd91 ("mm/filemap.c: don't initiate writeback if mapping
+has no dirty pages") alleviated the issue significantly as it now only
+triggers when the inode has dirty pages.  However, the condition can
+still be triggered before the inode is switched to a different cgroup
+and the logic simply doesn't make sense.
 
-[ 1626.609191] msgr-worker-1   D    0  1026      1 0x00004000
-[ 1626.609193] Call Trace:
-[ 1626.609195]  ? __schedule+0x29b/0x630
-[ 1626.609197]  ? wait_for_completion+0xe0/0x170
-[ 1626.609198]  schedule+0x30/0xb0
-[ 1626.609200]  schedule_timeout+0x1f6/0x2f0
-[ 1626.609202]  ? blk_finish_plug+0x21/0x2e
-[ 1626.609204]  ? _xfs_buf_ioapply+0x2e6/0x410
-[ 1626.609206]  ? wait_for_completion+0xe0/0x170
-[ 1626.609208]  wait_for_completion+0x108/0x170
-[ 1626.609210]  ? wake_up_q+0x70/0x70
-[ 1626.609212]  ? __xfs_buf_submit+0x12e/0x250
-[ 1626.609214]  ? xfs_bwrite+0x25/0x60
-[ 1626.609215]  xfs_buf_iowait+0x22/0xf0
-[ 1626.609218]  __xfs_buf_submit+0x12e/0x250
-[ 1626.609220]  xfs_bwrite+0x25/0x60
-[ 1626.609222]  xfs_reclaim_inode+0x2e8/0x310
-[ 1626.609224]  xfs_reclaim_inodes_ag+0x1b6/0x300
-[ 1626.609227]  xfs_reclaim_inodes_nr+0x31/0x40
-[ 1626.609228]  super_cache_scan+0x152/0x1a0
-[ 1626.609231]  do_shrink_slab+0x12c/0x2d0
-[ 1626.609233]  shrink_slab+0x9c/0x2a0
-[ 1626.609235]  shrink_node+0xd7/0x470
-[ 1626.609237]  do_try_to_free_pages+0xbf/0x380
-[ 1626.609240]  try_to_free_pages+0xd9/0x1f0
-[ 1626.609245]  __alloc_pages_slowpath+0x3a4/0xd30
-[ 1626.609251]  ? ___slab_alloc+0x238/0x560
-[ 1626.609254]  __alloc_pages_nodemask+0x30c/0x350
-[ 1626.609259]  skb_page_frag_refill+0x97/0xd0
-[ 1626.609274]  sk_page_frag_refill+0x1d/0x80
-[ 1626.609279]  tcp_sendmsg_locked+0x2bb/0xdd0
-[ 1626.609304]  tcp_sendmsg+0x27/0x40
-[ 1626.609307]  sock_sendmsg+0x54/0x60
-[ 1626.609308]  ___sys_sendmsg+0x29f/0x320
-[ 1626.609313]  ? sock_poll+0x66/0xb0
-[ 1626.609318]  ? ep_item_poll.isra.15+0x40/0xc0
-[ 1626.609320]  ? ep_send_events_proc+0xe6/0x230
-[ 1626.609322]  ? hrtimer_try_to_cancel+0x54/0xf0
-[ 1626.609324]  ? ep_read_events_proc+0xc0/0xc0
-[ 1626.609326]  ? _raw_write_unlock_irq+0xa/0x20
-[ 1626.609327]  ? ep_scan_ready_list.constprop.19+0x218/0x230
-[ 1626.609329]  ? __hrtimer_init+0xb0/0xb0
-[ 1626.609331]  ? _raw_spin_unlock_irq+0xa/0x20
-[ 1626.609334]  ? ep_poll+0x26c/0x4a0
-[ 1626.609337]  ? tcp_tsq_write.part.54+0xa0/0xa0
-[ 1626.609339]  ? release_sock+0x43/0x90
-[ 1626.609341]  ? _raw_spin_unlock_bh+0xa/0x20
-[ 1626.609342]  __sys_sendmsg+0x47/0x80
-[ 1626.609347]  do_syscall_64+0x5f/0x1c0
-[ 1626.609349]  ? prepare_exit_to_usermode+0x75/0xa0
-[ 1626.609351]  entry_SYSCALL_64_after_hwframe+0x44/0xa9
+Skip the immediate switching if the associated memcg is dying.
 
-This patch adds a new prctl command that daemons can use after they have
-done their initial setup, and before they start to do allocations that
-are in the IO path. It sets the PF_MEMALLOC_NOIO and PF_LESS_THROTTLE
-flags so both userspace block and FS threads can use it to avoid the
-allocation recursion and try to prevent from being throttled while
-writing out data to free up memory.
+This is a simplified version of the following two patches:
 
-Signed-off-by: Mike Christie <mchristi@redhat.com>
+ * https://lore.kernel.org/linux-mm/20190513183053.GA73423@dennisz-mbp/
+ * http://lkml.kernel.org/r/156355839560.2063.5265687291430814589.stgit@buzz
+
+Signed-off-by: Tejun Heo <tj@kernel.org>
+Cc: Dennis Zhou <dennis@kernel.org>
+Cc: Konstantin Khlebnikov <khlebnikov@yandex-team.ru>
+Fixes: e8a7abf5a5bd ("writeback: disassociate inodes from dying bdi_writebacks")
 ---
-V3=20
-- Drop NOFS, set PF_LESS_THROTTLE and rename prctl flag to reflect it
-is more general and can support both FS and block devices. Both fuse
-and block device daemons, nbd and tcmu-runner, have been tested to
-confirm the more restrictive PF_MEMALLOC_NOIO also works for fuse.
+ fs/fs-writeback.c |    9 ++++++---
+ 1 file changed, 6 insertions(+), 3 deletions(-)
 
-- Use CAP_SYS_RESOURCE instead of admin.
-
-V2:
-- Use prctl instead of procfs.
-- Add support for NOFS for fuse.
-- Check permissions.
-
-
- include/uapi/linux/capability.h |  1 +
- include/uapi/linux/prctl.h      |  4 ++++
- kernel/sys.c                    | 26 ++++++++++++++++++++++++++
- 3 files changed, 31 insertions(+)
-
-diff --git a/include/uapi/linux/capability.h b/include/uapi/linux/capabilit=
-y.h
-index 240fdb9a60f6..272dc69fa080 100644
---- a/include/uapi/linux/capability.h
-+++ b/include/uapi/linux/capability.h
-@@ -301,6 +301,7 @@ struct vfs_ns_cap_data {
- /* Allow more than 64hz interrupts from the real-time clock */
- /* Override max number of consoles on console allocation */
- /* Override max number of keymaps */
-+/* Control memory reclaim behavior */
-=20
- #define CAP_SYS_RESOURCE     24
-=20
-diff --git a/include/uapi/linux/prctl.h b/include/uapi/linux/prctl.h
-index 7da1b37b27aa..07b4f8131e36 100644
---- a/include/uapi/linux/prctl.h
-+++ b/include/uapi/linux/prctl.h
-@@ -234,4 +234,8 @@ struct prctl_mm_map {
- #define PR_GET_TAGGED_ADDR_CTRL=09=0956
- # define PR_TAGGED_ADDR_ENABLE=09=09(1UL << 0)
-=20
-+/* Control reclaim behavior when allocating memory */
-+#define PR_SET_IO_FLUSHER=09=0957
-+#define PR_GET_IO_FLUSHER=09=0958
-+
- #endif /* _LINUX_PRCTL_H */
-diff --git a/kernel/sys.c b/kernel/sys.c
-index a611d1d58c7d..08c6b682fa99 100644
---- a/kernel/sys.c
-+++ b/kernel/sys.c
-@@ -2486,6 +2486,32 @@ SYSCALL_DEFINE5(prctl, int, option, unsigned long, a=
-rg2, unsigned long, arg3,
- =09=09=09return -EINVAL;
- =09=09error =3D GET_TAGGED_ADDR_CTRL();
- =09=09break;
-+=09case PR_SET_IO_FLUSHER:
-+=09=09if (!capable(CAP_SYS_RESOURCE))
-+=09=09=09return -EPERM;
-+
-+=09=09if (arg3 || arg4 || arg5)
-+=09=09=09return -EINVAL;
-+
-+=09=09if (arg2 =3D=3D 1)
-+=09=09=09current->flags |=3D PF_MEMALLOC_NOIO | PF_LESS_THROTTLE;
-+=09=09else if (!arg2)
-+=09=09=09current->flags &=3D ~(PF_MEMALLOC_NOIO | PF_LESS_THROTTLE);
-+=09=09else
-+=09=09=09return -EINVAL;
-+=09=09break;
-+=09case PR_GET_IO_FLUSHER:
-+=09=09if (!capable(CAP_SYS_RESOURCE))
-+=09=09=09return -EPERM;
-+
-+=09=09if (arg2 || arg3 || arg4 || arg5)
-+=09=09=09return -EINVAL;
-+
-+=09=09if (current->flags & (PF_MEMALLOC_NOIO | PF_LESS_THROTTLE))
-+=09=09=09error =3D 1;
-+=09=09else
-+=09=09=09error =3D 0;
-+=09=09break;
- =09default:
- =09=09error =3D -EINVAL;
- =09=09break;
---=20
-2.20.1
-
+diff --git a/fs/fs-writeback.c b/fs/fs-writeback.c
+index 8461a6322039..335607b8c5c0 100644
+--- a/fs/fs-writeback.c
++++ b/fs/fs-writeback.c
+@@ -576,10 +576,13 @@ void wbc_attach_and_unlock_inode(struct writeback_control *wbc,
+ 	spin_unlock(&inode->i_lock);
+ 
+ 	/*
+-	 * A dying wb indicates that the memcg-blkcg mapping has changed
+-	 * and a new wb is already serving the memcg.  Switch immediately.
++	 * A dying wb indicates that either the blkcg associated with the
++	 * memcg changed or the associated memcg is dying.  In the first
++	 * case, a replacement wb should already be available and we should
++	 * refresh the wb immediately.  In the second case, trying to
++	 * refresh will keep failing.
+ 	 */
+-	if (unlikely(wb_dying(wbc->wb)))
++	if (unlikely(wb_dying(wbc->wb) && !css_is_dying(wbc->wb->memcg_css)))
+ 		inode_switch_wbs(inode, wbc->wb_id);
+ }
+ EXPORT_SYMBOL_GPL(wbc_attach_and_unlock_inode);
