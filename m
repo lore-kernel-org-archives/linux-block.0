@@ -2,76 +2,83 @@ Return-Path: <SRS0=T+5Q=ZA=vger.kernel.org=linux-block-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-8.6 required=3.0 tests=DKIMWL_WL_HIGH,DKIM_SIGNED,
-	DKIM_VALID,DKIM_VALID_AU,INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,
-	SPF_HELO_NONE,SPF_PASS,USER_AGENT_SANE_1 autolearn=ham autolearn_force=no
-	version=3.4.0
+X-Spam-Status: No, score=-2.3 required=3.0 tests=DKIM_SIGNED,DKIM_VALID,
+	HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,
+	USER_AGENT_SANE_1 autolearn=no autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 11220FC6197
-	for <linux-block@archiver.kernel.org>; Fri,  8 Nov 2019 20:34:00 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 1A76FFC6197
+	for <linux-block@archiver.kernel.org>; Fri,  8 Nov 2019 20:38:09 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.kernel.org (Postfix) with ESMTP id D5EC02178F
-	for <linux-block@archiver.kernel.org>; Fri,  8 Nov 2019 20:33:59 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=default; t=1573245239;
-	bh=ufrU0JmIHTVNV8C9mnwwzDMOFUUS009+MsIifIowNJs=;
-	h=Date:From:To:Cc:Subject:References:In-Reply-To:List-ID:From;
-	b=dRNkauCGSbqsn5vrprRd9ZiwNALnna5NDx0PDfqSe9+Po9EEWnGXyLwwV4snwPWTo
-	 vQ0M8sapO0PvsLHxMvSOkqVgjBcq+AzbCUVMxLfC5G1KkBywPuM0drrvz1QaubTzC+
-	 oGKvI87be4qotoJr5Stz99QFCTim+VezR76H64Rs=
+	by mail.kernel.org (Postfix) with ESMTP id DFEB920674
+	for <linux-block@archiver.kernel.org>; Fri,  8 Nov 2019 20:38:08 +0000 (UTC)
+Authentication-Results: mail.kernel.org;
+	dkim=pass (2048-bit key) header.d=kernel-dk.20150623.gappssmtp.com header.i=@kernel-dk.20150623.gappssmtp.com header.b="ZzSf2ZaN"
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1728266AbfKHUd7 (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Fri, 8 Nov 2019 15:33:59 -0500
-Received: from mail-qk1-f193.google.com ([209.85.222.193]:44051 "EHLO
-        mail-qk1-f193.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1726121AbfKHUd7 (ORCPT
-        <rfc822;linux-block@vger.kernel.org>); Fri, 8 Nov 2019 15:33:59 -0500
-Received: by mail-qk1-f193.google.com with SMTP id m16so6442825qki.11;
-        Fri, 08 Nov 2019 12:33:58 -0800 (PST)
+        id S1731528AbfKHUiI (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Fri, 8 Nov 2019 15:38:08 -0500
+Received: from mail-il1-f193.google.com ([209.85.166.193]:42069 "EHLO
+        mail-il1-f193.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S1732358AbfKHUiD (ORCPT
+        <rfc822;linux-block@vger.kernel.org>); Fri, 8 Nov 2019 15:38:03 -0500
+Received: by mail-il1-f193.google.com with SMTP id n18so6272293ilt.9
+        for <linux-block@vger.kernel.org>; Fri, 08 Nov 2019 12:38:02 -0800 (PST)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=kernel-dk.20150623.gappssmtp.com; s=20150623;
+        h=subject:to:cc:references:from:message-id:date:user-agent
+         :mime-version:in-reply-to:content-language:content-transfer-encoding;
+        bh=JEl7MHfooVnkdLi8v3TIezCImYnxmfOnxwApEqq8ixc=;
+        b=ZzSf2ZaN48hhIn2FY9lEQ2ehFsQOk+G25WsmzmrcO2nKBGJR6l8Gl9TEEBIyI6IkE3
+         dWEi6T24mXOR4/DpTp4qqtf5ubHfiYruO/UuPBiYynu6RC6h8PZ8nErFrJVOeYm4IvN4
+         1jE8XW1akm+SfADBwg71RD7+eOcKr60dk6AXSDpBBquEY4QUQvE0Kul3cPRXKnh3Su31
+         n++1XSSqHdGppxoI8+kZWhuobBk4CC35VRbJM28EIQnqD+gooU1sQ4OTqFRAjzGQ4DwW
+         wPVM0w3id2ZLcr/oDjn7gcmdLFcrAJXpb8QT85RGp8P7DCT8f2/ip9dACHe1BOuFVzKb
+         Xp1w==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=1e100.net; s=20161025;
-        h=x-gm-message-state:date:from:to:cc:subject:message-id:references
-         :mime-version:content-disposition:in-reply-to:user-agent;
-        bh=1KDdGme2UpEFnmAhINmNhjFi/nc2G5wHiD2TrUpJv34=;
-        b=CunJdFg4BYDI2EEsdh5lxRmT8tBGpq/UrMt4JyZwzmKPhYvlNlUMTQ8HbaxqvapN6F
-         CDzClYV4sux3Hr69yN6fT8BQRHPERwDBm0VyUUqj7xVURP00jHwIDnmS1jmbNcanJBZr
-         R0f1UsK1rctLjHDTiI4Vza8N3r7Qm/oQvAtc7EdGhgau3x87AM9cCsr9OgfRMbIKwfVp
-         cRNSLWhJsjMjtSVSSqwIu81VlbOm6r3DyZuAdEaBN6PMzURJ/HmcVoTOgMOPxch/fhPV
-         upox07Xc+yASjEGBQp2x4q2dDRJXApT5SstGsr0nsg7wvR1jTb5gpo1mqzJw9KPdsuHO
-         zR/g==
-X-Gm-Message-State: APjAAAVLEuJWRCBRWVcGn3ueDj4yzU/1v0+/7/dsdulx7jHdnV1J7fBX
-        dgO8oc3XsB0ccTdVZC+AtMY=
-X-Google-Smtp-Source: APXvYqxqREgxuQljP90fvsWT+oy5Bd9idOzRJPHjiJXxA/cs0GRieMlRAKmjcPrpKDrr1n2JBBdcxA==
-X-Received: by 2002:a37:72c3:: with SMTP id n186mr11217923qkc.166.1573245238017;
-        Fri, 08 Nov 2019 12:33:58 -0800 (PST)
-Received: from dennisz-mbp ([2620:10d:c091:500::1:ac97])
-        by smtp.gmail.com with ESMTPSA id x64sm3263515qkd.88.2019.11.08.12.33.56
+        h=x-gm-message-state:subject:to:cc:references:from:message-id:date
+         :user-agent:mime-version:in-reply-to:content-language
+         :content-transfer-encoding;
+        bh=JEl7MHfooVnkdLi8v3TIezCImYnxmfOnxwApEqq8ixc=;
+        b=uCfpdQvneD0+86RDXNHBlV6AAHvlB8swtmz19h/uNUe3p6C7ojm/YAI8zVcSgkyIYp
+         b0EOR9l0LGcbqzE1HVnMe18QF4IIJf4Bf59uqlhAGI3ZqDbdNBqtipMjw0ed8NZN2Myt
+         TcfU2gg/K15MBumGRjFp90NEJoczeyp4xdhC7prp45MqdRLQ+xLJUyAKwzYiGK4DnfKX
+         /MqcDo1YbSRX1txzd0GSIrNVzMH94lkb2ArcGScF5mbTLoEuI96kWiMA+SEo6TS6WHDT
+         5b+2RwXgbS7YybdkjbgGtxRXf+GEye+ZjzdRlBy+gu3VlwHduWjCTFS2sYqdZdT39q7U
+         JACg==
+X-Gm-Message-State: APjAAAWOuVV1axoXSEG2Ta+rN/s/j7/JUfDVDez9HTDaxwIJRYAVre4Y
+        ZEW/xyE5VBxPJGE4sXkaj4rtCw==
+X-Google-Smtp-Source: APXvYqwJyAVK0n/v7Zq4zCD+dYuwbfMcOLBEiB0PWi+ezOf1pDT8KJoFXIJeKROs7oQdoFi8XMTQBw==
+X-Received: by 2002:a92:1d08:: with SMTP id d8mr15079003ild.262.1573245481639;
+        Fri, 08 Nov 2019 12:38:01 -0800 (PST)
+Received: from [192.168.1.159] ([65.144.74.34])
+        by smtp.gmail.com with ESMTPSA id x18sm552819iob.70.2019.11.08.12.37.59
         (version=TLS1_2 cipher=ECDHE-RSA-AES128-GCM-SHA256 bits=128/128);
-        Fri, 08 Nov 2019 12:33:57 -0800 (PST)
-Date:   Fri, 8 Nov 2019 15:33:55 -0500
-From:   Dennis Zhou <dennis@kernel.org>
+        Fri, 08 Nov 2019 12:38:00 -0800 (PST)
+Subject: Re: [PATCH block/for-linus] cgroup,writeback: don't switch wbs
+ immediately on dead wbs if the memcg is dead
 To:     Tejun Heo <tj@kernel.org>
-Cc:     Jens Axboe <axboe@kernel.dk>, linux-block@vger.kernel.org,
-        cgroups@vger.kernel.org, kernel-team@fb.com,
-        Li Zefan <lizefan@huawei.com>,
+Cc:     linux-block@vger.kernel.org, cgroups@vger.kernel.org,
+        kernel-team@fb.com, Li Zefan <lizefan@huawei.com>,
         Johannes Weiner <hannes@cmpxchg.org>, Jan Kara <jack@suse.cz>,
         Konstantin Khlebnikov <khlebnikov@yandex-team.ru>,
         Dennis Zhou <dennis@kernel.org>
-Subject: Re: [PATCH block/for-linus] cgroup,writeback: don't switch wbs
- immediately on dead wbs if the memcg is dead
-Message-ID: <20191108203355.GA54333@dennisz-mbp>
 References: <20191108201829.GA3728460@devbig004.ftw2.facebook.com>
+From:   Jens Axboe <axboe@kernel.dk>
+Message-ID: <8efb0b3d-0b61-462e-d7f7-b66685fb5733@kernel.dk>
+Date:   Fri, 8 Nov 2019 13:37:58 -0700
+User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:60.0) Gecko/20100101
+ Thunderbird/60.9.0
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
 In-Reply-To: <20191108201829.GA3728460@devbig004.ftw2.facebook.com>
-User-Agent: Mutt/1.10.1 (2018-07-13)
+Content-Type: text/plain; charset=utf-8
+Content-Language: en-US
+Content-Transfer-Encoding: 7bit
 Sender: linux-block-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-On Fri, Nov 08, 2019 at 12:18:29PM -0800, Tejun Heo wrote:
+On 11/8/19 1:18 PM, Tejun Heo wrote:
 > cgroup writeback tries to refresh the associated wb immediately if the
 > current wb is dead.  This is to avoid keeping issuing IOs on the stale
 > wb after memcg - blkcg association has changed (ie. when blkcg got
@@ -92,40 +99,11 @@ On Fri, Nov 08, 2019 at 12:18:29PM -0800, Tejun Heo wrote:
 > 
 > This is a simplified version of the following two patches:
 > 
->  * https://lore.kernel.org/linux-mm/20190513183053.GA73423@dennisz-mbp/
->  * http://lkml.kernel.org/r/156355839560.2063.5265687291430814589.stgit@buzz
-> 
-> Signed-off-by: Tejun Heo <tj@kernel.org>
-> Cc: Dennis Zhou <dennis@kernel.org>
-> Cc: Konstantin Khlebnikov <khlebnikov@yandex-team.ru>
-> Fixes: e8a7abf5a5bd ("writeback: disassociate inodes from dying bdi_writebacks")
-> ---
->  fs/fs-writeback.c |    9 ++++++---
->  1 file changed, 6 insertions(+), 3 deletions(-)
-> 
-> diff --git a/fs/fs-writeback.c b/fs/fs-writeback.c
-> index 8461a6322039..335607b8c5c0 100644
-> --- a/fs/fs-writeback.c
-> +++ b/fs/fs-writeback.c
-> @@ -576,10 +576,13 @@ void wbc_attach_and_unlock_inode(struct writeback_control *wbc,
->  	spin_unlock(&inode->i_lock);
->  
->  	/*
-> -	 * A dying wb indicates that the memcg-blkcg mapping has changed
-> -	 * and a new wb is already serving the memcg.  Switch immediately.
-> +	 * A dying wb indicates that either the blkcg associated with the
-> +	 * memcg changed or the associated memcg is dying.  In the first
-> +	 * case, a replacement wb should already be available and we should
-> +	 * refresh the wb immediately.  In the second case, trying to
-> +	 * refresh will keep failing.
->  	 */
-> -	if (unlikely(wb_dying(wbc->wb)))
-> +	if (unlikely(wb_dying(wbc->wb) && !css_is_dying(wbc->wb->memcg_css)))
->  		inode_switch_wbs(inode, wbc->wb_id);
->  }
->  EXPORT_SYMBOL_GPL(wbc_attach_and_unlock_inode);
+>   * https://lore.kernel.org/linux-mm/20190513183053.GA73423@dennisz-mbp/
+>   * http://lkml.kernel.org/r/156355839560.2063.5265687291430814589.stgit@buzz
 
-Acked-by: Dennis Zhou <dennis@kernel.org>
+Applied for 5.4, thanks.
 
-Thanks,
-Dennis
+-- 
+Jens Axboe
+
