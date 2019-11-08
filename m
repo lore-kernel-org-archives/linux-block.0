@@ -2,124 +2,122 @@ Return-Path: <SRS0=T+5Q=ZA=vger.kernel.org=linux-block-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-10.1 required=3.0 tests=DKIMWL_WL_HIGH,DKIM_SIGNED,
-	DKIM_VALID,DKIM_VALID_AU,INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,
-	SPF_HELO_NONE,SPF_PASS,USER_AGENT_GIT autolearn=ham autolearn_force=no
-	version=3.4.0
+X-Spam-Status: No, score=-2.4 required=3.0 tests=DKIM_SIGNED,DKIM_VALID,
+	DKIM_VALID_AU,HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SPF_HELO_NONE,
+	SPF_PASS,USER_AGENT_SANE_1 autolearn=no autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id C647FFA372C
-	for <linux-block@archiver.kernel.org>; Fri,  8 Nov 2019 12:03:26 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 33487FA372C
+	for <linux-block@archiver.kernel.org>; Fri,  8 Nov 2019 12:31:57 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.kernel.org (Postfix) with ESMTP id 9DF5D2085B
-	for <linux-block@archiver.kernel.org>; Fri,  8 Nov 2019 12:03:26 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=default; t=1573214606;
-	bh=g6zAEREEgLTWT7LnJikRiT6qbd4YDdqTAfzWJ67n6H4=;
-	h=From:To:Cc:Subject:Date:In-Reply-To:References:List-ID:From;
-	b=UEf0dJIBbPtiQDX2g84GjfnRk4UsRL4vasHebn/M1vemppqZWY8eMzs/5ASH9I+ym
-	 Kbg5+EpL7Cv7Hq3NK+n4beBC03H06ehoxBmRINouenRKWRsoMVrrhKiKjMoSbQvDpr
-	 rVpF2yZgDdwGMXetN6BaIW350wfKZiiuOrhlghwc=
+	by mail.kernel.org (Postfix) with ESMTP id 06AFE222C9
+	for <linux-block@archiver.kernel.org>; Fri,  8 Nov 2019 12:31:56 +0000 (UTC)
+Authentication-Results: mail.kernel.org;
+	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="Pk3X2dXu"
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S2390141AbfKHMDZ (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Fri, 8 Nov 2019 07:03:25 -0500
-Received: from mail.kernel.org ([198.145.29.99]:56864 "EHLO mail.kernel.org"
-        rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-        id S1732734AbfKHLmo (ORCPT <rfc822;linux-block@vger.kernel.org>);
-        Fri, 8 Nov 2019 06:42:44 -0500
-Received: from sasha-vm.mshome.net (c-73-47-72-35.hsd1.nh.comcast.net [73.47.72.35])
-        (using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+        id S1725970AbfKHMb4 (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Fri, 8 Nov 2019 07:31:56 -0500
+Received: from us-smtp-delivery-1.mimecast.com ([207.211.31.120]:30373 "EHLO
+        us-smtp-1.mimecast.com" rhost-flags-OK-OK-OK-FAIL) by vger.kernel.org
+        with ESMTP id S1725933AbfKHMbz (ORCPT
+        <rfc822;linux-block@vger.kernel.org>); Fri, 8 Nov 2019 07:31:55 -0500
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+        s=mimecast20190719; t=1573216314;
+        h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+         to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+         content-transfer-encoding:content-transfer-encoding:
+         in-reply-to:in-reply-to:references:references;
+        bh=vMJWjmHAn9oXmduAqxbr7ld97ARES8e+B/CT4q03C/U=;
+        b=Pk3X2dXuQsrYnVohOyyATVZq4LL+KpF/o2zcgCU6/6KWXCBYFHOBPYHilMsRJ5/KSGtsqZ
+        2I/xbcq/PCFNoIIUMfxU4V8JiZwGl96ePB7vEegFt1J5Cp8cnJ9GTc8bCRMAjQzgupkvBR
+        e6nYkz1hURUnUCiymmd38cXNxvVt/Yg=
+Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
+ [209.132.183.4]) (Using TLS) by relay.mimecast.com with ESMTP id
+ us-mta-351-w8K278-eNPCBfHYDXkJI7g-1; Fri, 08 Nov 2019 07:31:50 -0500
+Received: from smtp.corp.redhat.com (int-mx07.intmail.prod.int.phx2.redhat.com [10.5.11.22])
+        (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
         (No client certificate requested)
-        by mail.kernel.org (Postfix) with ESMTPSA id A15A222466;
-        Fri,  8 Nov 2019 11:42:42 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-        s=default; t=1573213363;
-        bh=g6zAEREEgLTWT7LnJikRiT6qbd4YDdqTAfzWJ67n6H4=;
-        h=From:To:Cc:Subject:Date:In-Reply-To:References:From;
-        b=e2PYmMOXRIQSOp1GrRRe6GlgP+4Zr6+OsEll+fwsQvH7GM5t3N3Uvvm6umH2VaaN4
-         RWoQZa3XVhTnxEijmjhK11TOePDUpCn3Sk1M8FpocgWFK0EKssFWQxeQjBiFerIja8
-         XkvpQODooYhCeDUjayVZxXEVn9lNgwctcPVTd+S0=
-From:   Sasha Levin <sashal@kernel.org>
-To:     linux-kernel@vger.kernel.org, stable@vger.kernel.org
-Cc:     Paolo Valente <paolo.valente@linaro.org>,
-        Jens Axboe <axboe@kernel.dk>, Sasha Levin <sashal@kernel.org>,
-        linux-block@vger.kernel.org
-Subject: [PATCH AUTOSEL 4.19 191/205] blok, bfq: do not plug I/O if all queues are weight-raised
-Date:   Fri,  8 Nov 2019 06:37:38 -0500
-Message-Id: <20191108113752.12502-191-sashal@kernel.org>
-X-Mailer: git-send-email 2.20.1
-In-Reply-To: <20191108113752.12502-1-sashal@kernel.org>
-References: <20191108113752.12502-1-sashal@kernel.org>
+        by mimecast-mx01.redhat.com (Postfix) with ESMTPS id 86A11107ACC3;
+        Fri,  8 Nov 2019 12:31:48 +0000 (UTC)
+Received: from file01.intranet.prod.int.rdu2.redhat.com (file01.intranet.prod.int.rdu2.redhat.com [10.11.5.7])
+        by smtp.corp.redhat.com (Postfix) with ESMTPS id BEFA31001902;
+        Fri,  8 Nov 2019 12:31:45 +0000 (UTC)
+Received: from file01.intranet.prod.int.rdu2.redhat.com (localhost [127.0.0.1])
+        by file01.intranet.prod.int.rdu2.redhat.com (8.14.4/8.14.4) with ESMTP id xA8CVjPD004476;
+        Fri, 8 Nov 2019 07:31:45 -0500
+Received: from localhost (mpatocka@localhost)
+        by file01.intranet.prod.int.rdu2.redhat.com (8.14.4/8.14.4/Submit) with ESMTP id xA8CViNb004472;
+        Fri, 8 Nov 2019 07:31:44 -0500
+X-Authentication-Warning: file01.intranet.prod.int.rdu2.redhat.com: mpatocka owned process doing -bs
+Date:   Fri, 8 Nov 2019 07:31:44 -0500 (EST)
+From:   Mikulas Patocka <mpatocka@redhat.com>
+X-X-Sender: mpatocka@file01.intranet.prod.int.rdu2.redhat.com
+To:     Alessio Balsini <balsini@android.com>
+cc:     Jens Axboe <axboe@kernel.dk>, Alasdair G Kergon <agk@redhat.com>,
+        elsk@google.com, dvander@google.com, dm-devel@redhat.com,
+        linux-block@vger.kernel.org, linux-kernel@vger.kernel.org,
+        kernel-team@android.com
+Subject: Re: dm-snapshot for system updates in Android
+In-Reply-To: <20191104164900.GA10934@google.com>
+Message-ID: <alpine.LRH.2.02.1911080723130.3392@file01.intranet.prod.int.rdu2.redhat.com>
+References: <20191025101624.GA61225@google.com> <alpine.LRH.2.02.1910290957220.25731@file01.intranet.prod.int.rdu2.redhat.com> <20191104164900.GA10934@google.com>
+User-Agent: Alpine 2.02 (LRH 1266 2009-07-14)
 MIME-Version: 1.0
-X-stable: review
-X-Patchwork-Hint: Ignore
-Content-Transfer-Encoding: 8bit
+X-Scanned-By: MIMEDefang 2.84 on 10.5.11.22
+X-MC-Unique: w8K278-eNPCBfHYDXkJI7g-1
+X-Mimecast-Spam-Score: 0
+Content-Type: TEXT/PLAIN; charset=WINDOWS-1252
+Content-Transfer-Encoding: quoted-printable
 Sender: linux-block-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-From: Paolo Valente <paolo.valente@linaro.org>
 
-[ Upstream commit c8765de0adfcaaf4ffb2d951e07444f00ffa9453 ]
 
-To reduce latency for interactive and soft real-time applications, bfq
-privileges the bfq_queues containing the I/O of these
-applications. These privileged queues, referred-to as weight-raised
-queues, get a much higher share of the device throughput
-w.r.t. non-privileged queues. To preserve this higher share, the I/O
-of any non-weight-raised queue must be plugged whenever a sync
-weight-raised queue, while being served, remains temporarily empty. To
-attain this goal, bfq simply plugs any I/O (from any queue), if a sync
-weight-raised queue remains empty while in service.
+On Mon, 4 Nov 2019, Alessio Balsini wrote:
 
-Unfortunately, this plugging typically lowers throughput with random
-I/O, on devices with internal queueing (because it reduces the filling
-level of the internal queues of the device).
+> > > -- Alignment
+> > >=20
+> > > Our approach follows the solution proposed by Mikulas [1].
+> > > Being the block alignment of file extents automatically managed by th=
+e
+> > > filesystem, using FIEMAP should have no alignment-related performance=
+ issue.
+> > > But in our implementation we hit a misalignment [2] branch which lead=
+s to
+> > > dmwarning messages [3, 4].
+> > >=20
+> > > I have a limited experience with the block layer and dm, so I'm still
+> > > struggling in finding the root cause for this, either in user space o=
+r kernel
+> > > space.
+> >=20
+> > I don't know. What is the block size of the filesystem? Are all mapping=
+s=20
+> > aligned to this block size?
+>=20
+> Here follows a just generated warning coming from a Pixel 4 kernel (4.14)=
+:
+>=20
+> [ 3093.443808] device-mapper: table: 253:16: adding target device dm-15
+> caused an alignment inconsistency: physical_block_size=3D4096,
+> logical_block_size=3D4096, alignment_offset=3D61440, start=3D0
+>=20
+> Does this contain all the info you asked for?
 
-This commit addresses this issue by restricting the cases where
-plugging is performed: if a sync weight-raised queue remains empty
-while in service, then I/O plugging is performed only if some of the
-active bfq_queues are *not* weight-raised (which is actually the only
-circumstance where plugging is needed to preserve the higher share of
-the throughput of weight-raised queues). This restriction proved able
-to boost throughput in really many use cases needing only maximum
-throughput.
+Look at the function blk_stack_limits - it has various checks that make it=
+=20
+return -1. Insert some debugging printk's there and find out which check=20
+made the function return -1.
 
-Signed-off-by: Paolo Valente <paolo.valente@linaro.org>
-Signed-off-by: Jens Axboe <axboe@kernel.dk>
-Signed-off-by: Sasha Levin <sashal@kernel.org>
----
- block/bfq-iosched.c | 10 ++++++++--
- 1 file changed, 8 insertions(+), 2 deletions(-)
+Based on this, we can find out which of the limits triggered the error=20
+message.
 
-diff --git a/block/bfq-iosched.c b/block/bfq-iosched.c
-index 35ddaa820737c..66b1ebc21ce4f 100644
---- a/block/bfq-iosched.c
-+++ b/block/bfq-iosched.c
-@@ -3593,7 +3593,12 @@ static bool bfq_better_to_idle(struct bfq_queue *bfqq)
- 	 * whether bfqq is being weight-raised, because
- 	 * bfq_symmetric_scenario() does not take into account also
- 	 * weight-raised queues (see comments on
--	 * bfq_weights_tree_add()).
-+	 * bfq_weights_tree_add()). In particular, if bfqq is being
-+	 * weight-raised, it is important to idle only if there are
-+	 * other, non-weight-raised queues that may steal throughput
-+	 * to bfqq. Actually, we should be even more precise, and
-+	 * differentiate between interactive weight raising and
-+	 * soft real-time weight raising.
- 	 *
- 	 * As a side note, it is worth considering that the above
- 	 * device-idling countermeasures may however fail in the
-@@ -3605,7 +3610,8 @@ static bool bfq_better_to_idle(struct bfq_queue *bfqq)
- 	 * to let requests be served in the desired order until all
- 	 * the requests already queued in the device have been served.
- 	 */
--	asymmetric_scenario = bfqq->wr_coeff > 1 ||
-+	asymmetric_scenario = (bfqq->wr_coeff > 1 &&
-+			       bfqd->wr_busy_queues < bfqd->busy_queues) ||
- 		!bfq_symmetric_scenario(bfqd);
- 
- 	/*
--- 
-2.20.1
+> I started investigating this issue, but since we didn't notice any
+> performance degradation, I prioritized other things. I'll be hopefully
+> able to get back to this warning in the next months.
+> Please let me know if I can help you with that or if you need additional
+> information.
+
+Mikulas
 
