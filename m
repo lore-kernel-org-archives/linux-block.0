@@ -2,130 +2,99 @@ Return-Path: <SRS0=T+5Q=ZA=vger.kernel.org=linux-block-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-2.3 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
-	MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,USER_AGENT_SANE_1 autolearn=no
-	autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-9.8 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
+	INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,
+	USER_AGENT_GIT autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 1B319C17440
-	for <linux-block@archiver.kernel.org>; Fri,  8 Nov 2019 23:05:56 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id BEE0AC17441
+	for <linux-block@archiver.kernel.org>; Fri,  8 Nov 2019 23:09:52 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.kernel.org (Postfix) with ESMTP id E80FD215EA
-	for <linux-block@archiver.kernel.org>; Fri,  8 Nov 2019 23:05:55 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id 8DF8D20865
+	for <linux-block@archiver.kernel.org>; Fri,  8 Nov 2019 23:09:52 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1727001AbfKHXFz (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Fri, 8 Nov 2019 18:05:55 -0500
-Received: from vsmx011.vodafonemail.xion.oxcs.net ([153.92.174.89]:54594 "EHLO
-        vsmx011.vodafonemail.xion.oxcs.net" rhost-flags-OK-OK-OK-OK)
-        by vger.kernel.org with ESMTP id S1726095AbfKHXFz (ORCPT
-        <rfc822;linux-block@vger.kernel.org>);
-        Fri, 8 Nov 2019 18:05:55 -0500
-Received: from vsmx003.vodafonemail.xion.oxcs.net (unknown [192.168.75.197])
-        by mta-5-out.mta.xion.oxcs.net (Postfix) with ESMTP id DF76959D3F7;
-        Fri,  8 Nov 2019 23:05:52 +0000 (UTC)
-Received: from lazy.lzy (unknown [93.212.126.195])
-        by mta-7-out.mta.xion.oxcs.net (Postfix) with ESMTPA id 6EF28534352;
-        Fri,  8 Nov 2019 23:05:38 +0000 (UTC)
-Received: from lazy.lzy (localhost [127.0.0.1])
-        by lazy.lzy (8.15.2/8.14.5) with ESMTPS id xA8N5b6n012018
-        (version=TLSv1.3 cipher=TLS_AES_256_GCM_SHA384 bits=256 verify=NO);
-        Sat, 9 Nov 2019 00:05:37 +0100
-Received: (from red@localhost)
-        by lazy.lzy (8.15.2/8.15.2/Submit) id xA8N5aYW012017;
-        Sat, 9 Nov 2019 00:05:36 +0100
-Date:   Sat, 9 Nov 2019 00:05:36 +0100
-From:   Piergiorgio Sartor <piergiorgio.sartor@nexgo.de>
-To:     Alan Stern <stern@rowland.harvard.edu>
-Cc:     Piergiorgio Sartor <piergiorgio.sartor@nexgo.de>,
-        Christoph Hellwig <hch@lst.de>, Jens Axboe <axboe@kernel.dk>,
-        USB list <linux-usb@vger.kernel.org>,
-        linux-block@vger.kernel.org,
-        Kernel development list <linux-kernel@vger.kernel.org>
-Subject: Re: reeze while write on external usb 3.0 hard disk [Bug 204095]
-Message-ID: <20191108230536.GA11931@lazy.lzy>
-References: <20191017175306.GA3014@lazy.lzy>
- <Pine.LNX.4.44L0.1910171522200.18407-100000@netrider.rowland.org>
-MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <Pine.LNX.4.44L0.1910171522200.18407-100000@netrider.rowland.org>
-User-Agent: Mutt/1.12.1 (2019-06-15)
-X-VADE-STATUS: LEGIT
+        id S1726307AbfKHXJw (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Fri, 8 Nov 2019 18:09:52 -0500
+Received: from mga09.intel.com ([134.134.136.24]:14359 "EHLO mga09.intel.com"
+        rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
+        id S1726231AbfKHXJw (ORCPT <rfc822;linux-block@vger.kernel.org>);
+        Fri, 8 Nov 2019 18:09:52 -0500
+X-Amp-Result: SKIPPED(no attachment in message)
+X-Amp-File-Uploaded: False
+Received: from orsmga007.jf.intel.com ([10.7.209.58])
+  by orsmga102.jf.intel.com with ESMTP/TLS/DHE-RSA-AES256-GCM-SHA384; 08 Nov 2019 15:09:51 -0800
+X-ExtLoop1: 1
+X-IronPort-AV: E=Sophos;i="5.68,283,1569308400"; 
+   d="scan'208";a="193327493"
+Received: from unknown (HELO revanth.lm.intel.com) ([10.232.116.114])
+  by orsmga007.jf.intel.com with ESMTP; 08 Nov 2019 15:09:50 -0800
+From:   Revanth Rajashekar <revanth.rajashekar@intel.com>
+To:     <linux-block@vger.kernel.org>
+Cc:     Scott Bauer <sbauer@plzdonthack.me>,
+        Jonathan Derrick <jonathan.derrick@intel.com>,
+        Jens Axboe <axboe@kernel.dk>,
+        Revanth Rajashekar <revanth.rajashekar@intel.com>
+Subject: [PATCH] block: sed-opal: Introduce SUM_SET_LIST parameter and append it using 'add_token_u64'
+Date:   Fri,  8 Nov 2019 16:09:04 -0700
+Message-Id: <20191108230904.7932-1-revanth.rajashekar@intel.com>
+X-Mailer: git-send-email 2.17.1
 Sender: linux-block-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-On Thu, Oct 17, 2019 at 03:23:34PM -0400, Alan Stern wrote:
-> On Thu, 17 Oct 2019, Piergiorgio Sartor wrote:
-> 
-> > > Here is one more thing you can try.  I have no idea whether it will 
-> > > make any difference, but the Changelog entry for the patch you 
-> > > identified suggests that it might help.
-> > > 
-> > > Alan Stern
-> > > 
-> > > 
-> > > 
-> > > Index: usb-devel/drivers/usb/storage/scsiglue.c
-> > > ===================================================================
-> > > --- usb-devel.orig/drivers/usb/storage/scsiglue.c
-> > > +++ usb-devel/drivers/usb/storage/scsiglue.c
-> > > @@ -68,7 +68,6 @@ static const char* host_info(struct Scsi
-> > >  static int slave_alloc (struct scsi_device *sdev)
-> > >  {
-> > >  	struct us_data *us = host_to_us(sdev->host);
-> > > -	int maxp;
-> > >  
-> > >  	/*
-> > >  	 * Set the INQUIRY transfer length to 36.  We don't use any of
-> > > @@ -78,15 +77,6 @@ static int slave_alloc (struct scsi_devi
-> > >  	sdev->inquiry_len = 36;
-> > >  
-> > >  	/*
-> > > -	 * USB has unusual scatter-gather requirements: the length of each
-> > > -	 * scatterlist element except the last must be divisible by the
-> > > -	 * Bulk maxpacket value.  Fortunately this value is always a
-> > > -	 * power of 2.  Inform the block layer about this requirement.
-> > > -	 */
-> > > -	maxp = usb_maxpacket(us->pusb_dev, us->recv_bulk_pipe, 0);
-> > > -	blk_queue_virt_boundary(sdev->request_queue, maxp - 1);
-> > > -
-> > > -	/*
-> > >  	 * Some host controllers may have alignment requirements.
-> > >  	 * We'll play it safe by requiring 512-byte alignment always.
-> > >  	 */
-> > 
-> > Hi,
-> > 
-> > I tested the patch.
-> > 
-> > Assumming I did everything properly, add patch,
-> > test, issue not showing up, remove patch, re-test,
-> > issue present.
-> > 
-> > It seems this patch you provide solves the issue.
-> > 
-> > Thanks a lot for the support and the solution.
-> > 
-> > I guess now this patch will be integrated into
-> > mainline sometimes.
-> > Please let me know, in this thread or directly, in
-> > which kernel it will be available.
-> 
-> I'm busy for the next few days, but I will submit the patch next week.
+In function 'activate_lsp', rather than hard-coding the
+short atom header(0x83), we need to let the function
+'add_short_atom_header' append the header based on the
+parameter being appended.
 
-Hi again,
+The paramete has been defined in Section 3.1.2.1 of
+https://trustedcomputinggroup.org/wp-content/uploads/TCG_Storage-Opal_Feature_Set_Single_User_Mode_v1-00_r1-00-Final.pdf
 
-this message to let you know I tested
-kernel 5.3.9 (always from Fedora), to
-which Greg Kroah-Hartman added your
-patch, and everything seems to work
-fine, no problems detected so far.
+Signed-off-by: Revanth Rajashekar <revanth.rajashekar@intel.com>
+---
+ block/opal_proto.h | 4 ++++
+ block/sed-opal.c   | 6 +-----
+ 2 files changed, 5 insertions(+), 5 deletions(-)
 
-Thanks,
-
-bye,
-
+diff --git a/block/opal_proto.h b/block/opal_proto.h
+index 736e67c3e7c5..325cbba2465f 100644
+--- a/block/opal_proto.h
++++ b/block/opal_proto.h
+@@ -205,6 +205,10 @@ enum opal_lockingstate {
+ 	OPAL_LOCKING_LOCKED = 0x03,
+ };
+ 
++enum opal_parameter {
++	OPAL_SUM_SET_LIST = 0x060000,
++};
++
+ /* Packets derived from:
+  * TCG_Storage_Architecture_Core_Spec_v2.01_r1.00
+  * Secion: 3.2.3 ComPackets, Packets & Subpackets
+diff --git a/block/sed-opal.c b/block/sed-opal.c
+index b2cacc9ddd11..880cc57a5f6b 100644
+--- a/block/sed-opal.c
++++ b/block/sed-opal.c
+@@ -1886,7 +1886,6 @@ static int activate_lsp(struct opal_dev *dev, void *data)
+ {
+ 	struct opal_lr_act *opal_act = data;
+ 	u8 user_lr[OPAL_UID_LENGTH];
+-	u8 uint_3 = 0x83;
+ 	int err, i;
+ 
+ 	err = cmd_start(dev, opaluid[OPAL_LOCKINGSP_UID],
+@@ -1899,10 +1898,7 @@ static int activate_lsp(struct opal_dev *dev, void *data)
+ 			return err;
+ 
+ 		add_token_u8(&err, dev, OPAL_STARTNAME);
+-		add_token_u8(&err, dev, uint_3);
+-		add_token_u8(&err, dev, 6);
+-		add_token_u8(&err, dev, 0);
+-		add_token_u8(&err, dev, 0);
++		add_token_u64(&err, dev, OPAL_SUM_SET_LIST);
+ 
+ 		add_token_u8(&err, dev, OPAL_STARTLIST);
+ 		add_token_bytestring(&err, dev, user_lr, OPAL_UID_LENGTH);
 -- 
+2.17.1
 
-piergiorgio
