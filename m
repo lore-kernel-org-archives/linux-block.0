@@ -2,124 +2,134 @@ Return-Path: <SRS0=T+5Q=ZA=vger.kernel.org=linux-block-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-7.3 required=3.0 tests=DKIM_SIGNED,DKIM_VALID,
-	HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,MENTIONS_GIT_HOSTING,
-	SPF_HELO_NONE,SPF_PASS,USER_AGENT_SANE_1 autolearn=ham autolearn_force=no
+X-Spam-Status: No, score=-9.6 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
+	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,
+	SPF_HELO_NONE,SPF_PASS,USER_AGENT_GIT autolearn=ham autolearn_force=no
 	version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 3F30AC17441
-	for <linux-block@archiver.kernel.org>; Fri,  8 Nov 2019 23:23:36 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id C4DECC17440
+	for <linux-block@archiver.kernel.org>; Fri,  8 Nov 2019 23:38:27 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.kernel.org (Postfix) with ESMTP id 0E6ED215EA
-	for <linux-block@archiver.kernel.org>; Fri,  8 Nov 2019 23:23:36 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id 9B5BF215EA
+	for <linux-block@archiver.kernel.org>; Fri,  8 Nov 2019 23:38:27 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel-dk.20150623.gappssmtp.com header.i=@kernel-dk.20150623.gappssmtp.com header.b="f+rDNgTM"
+	dkim=fail reason="signature verification failed" (2048-bit key) header.d=wdc.com header.i=@wdc.com header.b="EH7Hd4Z+"
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1726462AbfKHXXf (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Fri, 8 Nov 2019 18:23:35 -0500
-Received: from mail-pl1-f193.google.com ([209.85.214.193]:42570 "EHLO
-        mail-pl1-f193.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1726227AbfKHXXf (ORCPT
-        <rfc822;linux-block@vger.kernel.org>); Fri, 8 Nov 2019 18:23:35 -0500
-Received: by mail-pl1-f193.google.com with SMTP id j12so4841171plt.9
-        for <linux-block@vger.kernel.org>; Fri, 08 Nov 2019 15:23:34 -0800 (PST)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=kernel-dk.20150623.gappssmtp.com; s=20150623;
-        h=to:cc:from:subject:message-id:date:user-agent:mime-version
-         :content-language:content-transfer-encoding;
-        bh=K7xQonolaC0yja0MNzkg7NiJ7wFj/oZWASuxgG6iYsM=;
-        b=f+rDNgTMoW1DGnikJc+7/e4f5nkGohJRUnZK/7/LBVG0fNxs4slYgRACRml9cI4KC1
-         Sa0tdfhnYGbzvJbsPWzIIBeEY0nFlYF+T1D3QlRFYx9OaBGWsIlUta27CeDSYOvsGURt
-         cO44RcR3de+bqa5atS/+35stEYHcwIz2DfxSFCrRX+gSD/JBAQowoAyfUrjRNGfyYRCH
-         qy7yzwo1qjlYeLYwrKZx2fedRQb+3nyLBcKgDkg3JyOx+jSHnquRl/QeKEByL6o+iobC
-         hGGYPyX8GHj5gx7Tcge6fb5KST5ECfEFXvMUJmjdlZng6ZXQBtlCjAoB0wlIyUvhYMNi
-         IqUg==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20161025;
-        h=x-gm-message-state:to:cc:from:subject:message-id:date:user-agent
-         :mime-version:content-language:content-transfer-encoding;
-        bh=K7xQonolaC0yja0MNzkg7NiJ7wFj/oZWASuxgG6iYsM=;
-        b=sWc+mv2iWq82GKn9HVw9JuSfswmAEH9vqB+2TFFHFfISUqOTfRe1S20Z+rz2uyQbX4
-         2B1tdmFvlyut8vrZ2GFdEaDYMp6vffrLQgZdnEIA7FMNOJXzQsjjxm0x+Jp5Faaqkbd6
-         aqgl4tAxlbhPP7avem1xRK80zdp9nJUZLWp7FO1EcpOpkroCCqn4MRNw2+NGJWZDVsvr
-         QOv0ycQy24haFo7Xiie51ZBVDNWWwPWCCkxJK7QRaIU11MmgKjpP5NH+5H5cP0zZI7xH
-         29EAq1LCVEFhPQoyZHru4RFAN6VmKJe0BtL70SWFk2DG93IRxolCKnqJgQzuHX2gLl+I
-         TnwA==
-X-Gm-Message-State: APjAAAXbE3uIshlAWJRgEwKfZvbSa7+BZGiSukKCBWOVhZlFMgKTIoCX
-        0WhrVk0NL/TT1viGoxK45bXczlkktRM=
-X-Google-Smtp-Source: APXvYqyz0pQqHqee4t1GYG+8X4B2poLMrx17gSqh+4PS8K1cx/CWoR8QkBPSHXgLP13XnV8IMV77+g==
-X-Received: by 2002:a17:902:122:: with SMTP id 31mr9780880plb.257.1573255413903;
-        Fri, 08 Nov 2019 15:23:33 -0800 (PST)
-Received: from [192.168.1.188] ([66.219.217.79])
-        by smtp.gmail.com with ESMTPSA id v17sm7531175pfc.41.2019.11.08.15.23.31
-        (version=TLS1_2 cipher=ECDHE-RSA-AES128-GCM-SHA256 bits=128/128);
-        Fri, 08 Nov 2019 15:23:32 -0800 (PST)
-To:     Linus Torvalds <torvalds@linux-foundation.org>
-Cc:     "linux-block@vger.kernel.org" <linux-block@vger.kernel.org>
-From:   Jens Axboe <axboe@kernel.dk>
-Subject: [GIT PULL] Block fixes for 5.4-rc7
-Message-ID: <81051323-ef16-30a4-805b-029e2358fbac@kernel.dk>
-Date:   Fri, 8 Nov 2019 16:23:29 -0700
-User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:60.0) Gecko/20100101
- Thunderbird/60.9.0
+        id S1726670AbfKHXi0 (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Fri, 8 Nov 2019 18:38:26 -0500
+Received: from esa2.hgst.iphmx.com ([68.232.143.124]:45942 "EHLO
+        esa2.hgst.iphmx.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S1726231AbfKHXi0 (ORCPT
+        <rfc822;linux-block@vger.kernel.org>); Fri, 8 Nov 2019 18:38:26 -0500
+DKIM-Signature: v=1; a=rsa-sha256; c=simple/simple;
+  d=wdc.com; i=@wdc.com; q=dns/txt; s=dkim.wdc.com;
+  t=1573256327; x=1604792327;
+  h=from:to:cc:subject:date:message-id:mime-version:
+   content-transfer-encoding;
+  bh=z6jXcAoAVxEv3Xj+PfN1AdixiFHMQqQQP0u6ygOmyk4=;
+  b=EH7Hd4Z+ka5rltGWmp4W/zbqjbuzcVghaBXb7RH3qtL+0hvrQu+pEXUM
+   ATt9u67eDQ0jkKO6C4HIMWhmpznZy5tROUnJt56qNHc3CHyHiVPJNeHQ+
+   baMyciHS1Bo5IVIoc7hphGzrCy4ck+6J8k9E8fe2ZwrH+b3Dsenv0Jg2c
+   17eX0fei1JeR1tZWBnJTSNkAAeNfiN0yrxUWrlk0AvKhWx3JbUYeGGnGF
+   tduRfmmGoeShY/Dd1ltKWTicGSqFJ6e4bJuMW4yPhvpZI5HCQYF1DKUfB
+   inlFnwd5/RMbTWTir1I1GwNuPLlzx/gsl1y9CmuepVcXxh32RzhxIpN4J
+   Q==;
+IronPort-SDR: Ge7eO9DCE+Lw1fOfog2VIbuqK6lH8D6tiI8qR8aGOhOT9maytwx2T4hW5N1USvsobG9Tj9BtBT
+ slnIoWSSt5vE1YVkc7TRopIYVSDb3zGiKWxwdl1eWNLoUg/4I3/bwxODu3c3QRdZeog/35Kb0Y
+ j1dk+Q5zVkdVkfsp+TYZQuyKNSM1OceG6QECkEH97NrWMSePAh1DqbpihFGEttuV6Dw++haCv1
+ riJxfo6fcLwKNwYX54G3mvn89B+v91T6Vx2GQd0pgp3XwMAJckcl7//MItj5lwyxvM2/BHeXAR
+ CN8=
+X-IronPort-AV: E=Sophos;i="5.68,283,1569254400"; 
+   d="scan'208";a="223767037"
+Received: from uls-op-cesaip02.wdc.com (HELO uls-op-cesaep02.wdc.com) ([199.255.45.15])
+  by ob1.hgst.iphmx.com with ESMTP; 09 Nov 2019 07:38:41 +0800
+IronPort-SDR: mErifeLVoVoXE1XU9EezJcw4TmgREu8xXzt9ayjpXAW5fGjt3RdxgdIPckHSc9TgirbzXdrVJU
+ 3xWvmSkG4wK7j7W/DbXZcHXf1rpBEYGIOuu1pVWkP7qIVqR9S2B8i3KoFjykCyyTdY3nBcjacB
+ CjEtQx1jaTcS5BZDJwey1a2cQBWJUkX47YAHecW1yOxMyuYC8xsy5dkJnTe21qz6hiyGk7cSgp
+ ueaubKbJqIJ85dr/G2ik7unbWyO1LC96cUyBYSlod3JjWVK2Njzd7QGh18DQ6hkSXZk0SCkq3y
+ I1wR6eoT5QLpn4LzdYRI9QdI
+Received: from uls-op-cesaip01.wdc.com ([10.248.3.36])
+  by uls-op-cesaep02.wdc.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 08 Nov 2019 15:33:30 -0800
+IronPort-SDR: ZZW2JbaK6I6i/yffH195K3LB8f8F+GtgWFdFj9glndUo8OQP+g7a8qL4yYRRzLEkHoEFBMfrEk
+ Cqm76M7rglI9P7OVyUwY+ofipwKT9h0CrAbF5sBG4aFHQEu4GrQDlquV1Smy18/yR+8zPJRuFY
+ 7KnIfuAAtH1AZ5FB+VIAnCfMb2aAOvF8HBDMfSGwBgrkahwtgv4W2lVD13WPTfkSjXQydT9UaM
+ nLHsYpImeRUMDdU9edoskX7WQDApGqdMnfzjsal2vNV7IXgogYdK+sbVMWi9I7LnawiQ8+ywxq
+ GFY=
+WDCIronportException: Internal
+Received: from iouring.labspan.wdc.com (HELO iouring.sc.wdc.com) ([10.6.138.107])
+  by uls-op-cesaip01.wdc.com with ESMTP; 08 Nov 2019 15:38:22 -0800
+From:   Chaitanya Kulkarni <chaitanya.kulkarni@wdc.com>
+To:     linux-block@vger.kernel.org
+Cc:     damien.lemoal@wdc.com,
+        Chaitanya Kulkarni <chaitanya.kulkarni@wdc.com>
+Subject: [PATCH] block: allow zone_mgmt_ops to bail out on SIGKILL
+Date:   Fri,  8 Nov 2019 15:38:20 -0800
+Message-Id: <20191108233820.4325-1-chaitanya.kulkarni@wdc.com>
+X-Mailer: git-send-email 2.22.1
 MIME-Version: 1.0
-Content-Type: text/plain; charset=utf-8
-Content-Language: en-US
-Content-Transfer-Encoding: 7bit
+Content-Transfer-Encoding: 8bit
 Sender: linux-block-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-Hi Linus,
+This patch is on the similar concept which is posted earlier:-
+https://marc.info/?l=linux-block&m=157321402002207&w=2.
 
-Here's a small collection of fixes that should go into this release.
-This pull request contains:
+This allows zone-mgmt ops to handle SIGKILL.
 
-- Two NVMe device removal crash fixes, and a compat fixup for for an
-  ioctl that was introduced in this release (Anton, Charles, Max - via
-  Keith)
+Signed-off-by: Chaitanya Kulkarni <chaitanya.kulkarni@wdc.com>
+---
 
-- Missing error path mutex unlock for drbd (Dan)
+In case someone is interested here is the test on null blk with
+added prints for zoneid.
 
-- cgroup writeback fixup on dead memcg (Tejun)
+Without this patch :-
 
-- blkcg online stats print fix (Tejun)
+# blkzone reset -o 0 -c 1000 /dev/nullb0 
+^C^C^C^C^C^C^C^C^C^C^C^C^C^C^C
 
-Please pull!
+[  174.115065] null_blk: null_zone_mgmt 163 zoneid 993
+[  174.125071] null_blk: null_zone_mgmt 163 zoneid 994
+[  174.135076] null_blk: null_zone_mgmt 163 zoneid 995
+[  174.145082] null_blk: null_zone_mgmt 163 zoneid 996
+[  174.155087] null_blk: null_zone_mgmt 163 zoneid 997
+[  174.165091] null_blk: null_zone_mgmt 163 zoneid 998
+[  174.175096] null_blk: null_zone_mgmt 163 zoneid 999
 
+With this patch :-
+ # blkzone reset -o 0 -c 1000 /dev/nullb0
+^C
 
-  git://git.kernel.dk/linux-block.git tags/for-linus-2019-11-08
+[  211.889379] null_blk: null_zone_mgmt 163 zoneid 191
+[  211.899420] null_blk: null_zone_mgmt 163 zoneid 192
+[  211.909424] null_blk: null_zone_mgmt 163 zoneid 193
 
+---
+ block/blk-zoned.c | 3 +++
+ 1 file changed, 3 insertions(+)
 
-----------------------------------------------------------------
-Anton Eidelman (1):
-      nvme-multipath: fix crash in nvme_mpath_clear_ctrl_paths
-
-Charles Machalow (1):
-      nvme: change nvme_passthru_cmd64 to explicitly mark rsvd
-
-Dan Carpenter (1):
-      block: drbd: remove a stray unlock in __drbd_send_protocol()
-
-Jens Axboe (1):
-      Merge branch 'nvme-5.4-rc7' of git://git.infradead.org/nvme into for-linus
-
-Max Gurtovoy (1):
-      nvme-rdma: fix a segmentation fault during module unload
-
-Tejun Heo (2):
-      blkcg: make blkcg_print_stat() print stats only for online blkgs
-      cgroup,writeback: don't switch wbs immediately on dead wbs if the memcg is dead
-
- block/blk-cgroup.c              | 13 ++++++++-----
- drivers/block/drbd/drbd_main.c  |  1 -
- drivers/nvme/host/multipath.c   |  2 ++
- drivers/nvme/host/rdma.c        |  8 ++++++++
- fs/fs-writeback.c               |  9 ++++++---
- include/uapi/linux/nvme_ioctl.h |  1 +
- 6 files changed, 25 insertions(+), 9 deletions(-)
-
+diff --git a/block/blk-zoned.c b/block/blk-zoned.c
+index 481eaf7d04d4..07ff2b75e6d7 100644
+--- a/block/blk-zoned.c
++++ b/block/blk-zoned.c
+@@ -17,6 +17,7 @@
+ #include <linux/mm.h>
+ #include <linux/vmalloc.h>
+ #include <linux/sched/mm.h>
++#include <linux/sched/signal.h>
+ 
+ #include "blk.h"
+ 
+@@ -287,6 +288,8 @@ int blkdev_zone_mgmt(struct block_device *bdev, enum req_opf op,
+ 
+ 		/* This may take a while, so be nice to others */
+ 		cond_resched();
++		if (fatal_signal_pending(current))
++			break;
+ 	}
+ 
+ 	ret = submit_bio_wait(bio);
 -- 
-Jens Axboe
+2.22.1
 
