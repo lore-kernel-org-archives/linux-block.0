@@ -2,430 +2,213 @@ Return-Path: <SRS0=T+5Q=ZA=vger.kernel.org=linux-block-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-6.8 required=3.0 tests=DKIM_SIGNED,DKIM_VALID,
-	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,
-	SPF_HELO_NONE,SPF_PASS autolearn=unavailable autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-2.2 required=3.0 tests=DKIM_SIGNED,DKIM_VALID,
+	DKIM_VALID_AU,FREEMAIL_FORGED_FROMDOMAIN,FREEMAIL_FROM,
+	HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,
+	USER_AGENT_SANE_1 autolearn=no autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 1C8B8FC6194
-	for <linux-block@archiver.kernel.org>; Fri,  8 Nov 2019 07:28:20 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id B5E9EC5DF60
+	for <linux-block@archiver.kernel.org>; Fri,  8 Nov 2019 09:27:03 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.kernel.org (Postfix) with ESMTP id D1C6820869
-	for <linux-block@archiver.kernel.org>; Fri,  8 Nov 2019 07:28:19 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id 8BEF62178F
+	for <linux-block@archiver.kernel.org>; Fri,  8 Nov 2019 09:27:03 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (2048-bit key) header.d=wdc.com header.i=@wdc.com header.b="nmwKgN4e";
-	dkim=pass (1024-bit key) header.d=sharedspace.onmicrosoft.com header.i=@sharedspace.onmicrosoft.com header.b="PLesGg+G"
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="OAn0cbvE"
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1728513AbfKHH2T (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Fri, 8 Nov 2019 02:28:19 -0500
-Received: from esa6.hgst.iphmx.com ([216.71.154.45]:30497 "EHLO
-        esa6.hgst.iphmx.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1725900AbfKHH2S (ORCPT
-        <rfc822;linux-block@vger.kernel.org>); Fri, 8 Nov 2019 02:28:18 -0500
-DKIM-Signature: v=1; a=rsa-sha256; c=simple/simple;
-  d=wdc.com; i=@wdc.com; q=dns/txt; s=dkim.wdc.com;
-  t=1573198098; x=1604734098;
-  h=from:to:subject:date:message-id:references:
-   content-transfer-encoding:mime-version;
-  bh=AlWzrJvZTn61uYjf2p05KR9Javiuy/gUyexLq4pxunA=;
-  b=nmwKgN4ea8sqv06mZXOwF90DgF/z6VvLdY1PKCWSjViMrueexY5JdBlh
-   /ZFYd1DEBcxpPvjFOwCZE1B6/VkL6A3WjgK/E2Hw3cjB2ygVeNkvfbLQT
-   lkI4ZCx+TQKu6j5nM7Q8DtSMV8f5JW7QMF4PsWe5MC5mhvSANodHz5NH7
-   dZzTHLqa9KBlMTiY58cY4kYFjeD/9koLvUxOZLOW/R6O31hvcQna3/gyF
-   lUZjCCeUPcXCw38U/vosuY1AcehkyhJSgXoG0/ekuFPcybucLamayv/aJ
-   y4ggQMaH+1AVDPH3fpQQx2ZBhruoNut0vHz7VEni7bsWJpRNBpffh2pi9
-   Q==;
-IronPort-SDR: Lk5I/pExm5TYSdyPitSOXqHTvkLvI/OMrCA2Zd39EWIRb6JtCznKCkLRLF3I7gs+Y4UgsYsa04
- 8EjsqIqD7jwTEk69FHaLIqNA5ZvOUz1ZGU+pCOHuSFgpuMzqsgItEo3RqNyCSs7DMW4X4PVQYx
- 4eRgyxsbbNMnk+KR9DV5N2hWyLtbuqbe8p6sVByRDF0IVSyi3NY8Sxgyf2UZXCFYFpX9pnTZ6Z
- WwwHeEArhcbdTyxC6NWTRU2Os6Bx0/RVHpHyo9/TJKS9IaUeceZbq+cBnWEHhBVlxx+Ihsebl+
- kz8=
-X-IronPort-AV: E=Sophos;i="5.68,280,1569254400"; 
-   d="scan'208";a="124065165"
-Received: from mail-dm3nam03lp2055.outbound.protection.outlook.com (HELO NAM03-DM3-obe.outbound.protection.outlook.com) ([104.47.41.55])
-  by ob1.hgst.iphmx.com with ESMTP; 08 Nov 2019 15:28:16 +0800
-ARC-Seal: i=1; a=rsa-sha256; s=arcselector9901; d=microsoft.com; cv=none;
- b=abR7v2BcJFpTRsbU81mPHz5tns7TxSxTiHnLT0gBMEqHRzd/RRB0kojyibNwXnTtN2Z7xyTB/b5rD3cl6HEtp1ay0+3VDViR44fPjJIKRPKJRndKsMRoxymdv8OlvbSYEeXJre8chyyg1xH/9oJxY268qjNrwRgJlooy8ARKx2tflYb2tkzzCfw3CnYEqDxqzAjXk4ykQAxRRzmZzttLuQJ4OyKMeVsn0NNYwTPjWn7E4Kp+iwEbCdlEnF0UqPCk2HBXbDGJiUprzN8ihxtkEXQ21wbEK/FYi43FVHCZGNUDqHVfUupN1s3tHEA4X3c5889332MAT4sBMiBr6NjlqQ==
-ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com;
- s=arcselector9901;
- h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
- bh=Ss2V/ER9g5yWzQ3tVvAFSh5TWnyddYtuHm3g9hxM/DY=;
- b=lVwV2/rPLddhTzlqezOVUKNURPmxVGOe6KR4nZsDT77kuqsHOk7qkiGX1YoVPnfR6j/zTbtdRTgXp+0ZYnk+2BQzWmXku4pE4kmQP/gcHyWtnSLYkRCuKQnbzmem4+/LDZoGVnCtuatMHTJrN2MRZ5E8X/54eOsXDnowxOmPzgipNtXwiUHM2VCRQ4pFN8RFiOFJQdxUajvvGe8nGpLGtWYvIjGryKaPu4hzgZFwQPZ1aYdSb2RBsKncPLdAZn+pVeFG0QtEI0Ew6zzvE/ftTdLxrdhJhNuCsVLDSEldCYjFCyuGlw+xnq+otbCTU5J0JU1oUYelGNs8L0UTMBShdQ==
-ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass
- smtp.mailfrom=wdc.com; dmarc=pass action=none header.from=wdc.com; dkim=pass
- header.d=wdc.com; arc=none
+        id S1730614AbfKHJ1D (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Fri, 8 Nov 2019 04:27:03 -0500
+Received: from mail-wr1-f66.google.com ([209.85.221.66]:43891 "EHLO
+        mail-wr1-f66.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S1726987AbfKHJ1C (ORCPT
+        <rfc822;linux-block@vger.kernel.org>); Fri, 8 Nov 2019 04:27:02 -0500
+Received: by mail-wr1-f66.google.com with SMTP id n1so6147898wra.10;
+        Fri, 08 Nov 2019 01:27:00 -0800 (PST)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
- d=sharedspace.onmicrosoft.com; s=selector2-sharedspace-onmicrosoft-com;
- h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
- bh=Ss2V/ER9g5yWzQ3tVvAFSh5TWnyddYtuHm3g9hxM/DY=;
- b=PLesGg+GUzwRAPgVPSoNvJHRMxmEttMkPYuskJZY8DNlD6Tod3xkpc/J8yNzeLzzJ0ifSTe6qJWlLF7OJSiMk3hU07Tg35gCtJuQYwOf7hfTY2pwFSmdPZD6ooDCQ8wd/zGxJ1FEZauxCt1YD98XCjM97Qns8lJFIJx+NPGFDkA=
-Received: from BYAPR04MB5816.namprd04.prod.outlook.com (20.179.59.16) by
- BYAPR04MB5206.namprd04.prod.outlook.com (20.178.51.142) with Microsoft SMTP
- Server (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
- 15.20.2408.24; Fri, 8 Nov 2019 07:28:15 +0000
-Received: from BYAPR04MB5816.namprd04.prod.outlook.com
- ([fe80::4176:5eda:76a2:3c40]) by BYAPR04MB5816.namprd04.prod.outlook.com
- ([fe80::4176:5eda:76a2:3c40%7]) with mapi id 15.20.2430.023; Fri, 8 Nov 2019
- 07:28:15 +0000
-From:   Damien Le Moal <Damien.LeMoal@wdc.com>
-To:     Hannes Reinecke <hare@suse.de>,
-        "linux-block@vger.kernel.org" <linux-block@vger.kernel.org>,
-        Jens Axboe <axboe@kernel.dk>,
-        "linux-scsi@vger.kernel.org" <linux-scsi@vger.kernel.org>,
-        "Martin K . Petersen" <martin.petersen@oracle.com>,
-        "dm-devel@redhat.com" <dm-devel@redhat.com>,
-        Mike Snitzer <snitzer@redhat.com>,
-        "linux-f2fs-devel@lists.sourceforge.net" 
-        <linux-f2fs-devel@lists.sourceforge.net>,
-        Jaegeuk Kim <jaegeuk@kernel.org>, Chao Yu <yuchao0@huawei.com>
-Subject: Re: [PATCH 4/9] block: Remove partition support for zoned block
- devices
-Thread-Topic: [PATCH 4/9] block: Remove partition support for zoned block
- devices
-Thread-Index: AQHVldfeu12TZig53UG+k8UT5XvAMg==
-Date:   Fri, 8 Nov 2019 07:28:15 +0000
-Message-ID: <BYAPR04MB58161069E47E24E188FC91EEE77B0@BYAPR04MB5816.namprd04.prod.outlook.com>
-References: <20191108015702.233102-1-damien.lemoal@wdc.com>
- <20191108015702.233102-5-damien.lemoal@wdc.com>
- <160bfb8f-2793-af74-df2b-5f30ae9383db@suse.de>
-Accept-Language: en-US
-Content-Language: en-US
-X-MS-Has-Attach: 
-X-MS-TNEF-Correlator: 
-authentication-results: spf=none (sender IP is )
- smtp.mailfrom=Damien.LeMoal@wdc.com; 
-x-originating-ip: [199.255.47.8]
-x-ms-publictraffictype: Email
-x-ms-office365-filtering-ht: Tenant
-x-ms-office365-filtering-correlation-id: e99cd6f5-594e-440a-aa7a-08d7641d384b
-x-ms-traffictypediagnostic: BYAPR04MB5206:
-x-microsoft-antispam-prvs: <BYAPR04MB5206934BE7B4CC3B14741168E77B0@BYAPR04MB5206.namprd04.prod.outlook.com>
-wdcipoutbound: EOP-TRUE
-x-ms-oob-tlc-oobclassifiers: OLM:5797;
-x-forefront-prvs: 0215D7173F
-x-forefront-antispam-report: SFV:NSPM;SFS:(10019020)(4636009)(136003)(376002)(39860400002)(366004)(396003)(346002)(199004)(189003)(478600001)(33656002)(66066001)(2501003)(316002)(25786009)(110136005)(52536014)(3846002)(6116002)(5660300002)(99286004)(14454004)(14444005)(256004)(102836004)(66556008)(64756008)(66446008)(2906002)(81166006)(486006)(91956017)(76116006)(71200400001)(71190400001)(66946007)(8676002)(66476007)(8936002)(9686003)(7416002)(55016002)(74316002)(446003)(305945005)(476003)(7736002)(229853002)(186003)(6246003)(6506007)(53546011)(26005)(6436002)(86362001)(76176011)(7696005)(81156014)(921003)(1121003);DIR:OUT;SFP:1102;SCL:1;SRVR:BYAPR04MB5206;H:BYAPR04MB5816.namprd04.prod.outlook.com;FPR:;SPF:None;LANG:en;PTR:InfoNoRecords;A:1;MX:1;
-x-ms-exchange-senderadcheck: 1
-x-microsoft-antispam: BCL:0;
-x-microsoft-antispam-message-info: przTLT6j71kTy6kg6TYhYq7/cVr+hH4MWhqTdsCbcUnADj6hyYr76PAbX7dy9t7ZSFfwPzpj0g6L4mHy3QyEJWW0e+CSUQ3fTSwn31SLnH4iK0XnjNU6n54eapNmypX+YGT8lQA6YoeT40l2bbRxuChFYk0XAcHcPOeQfrW6zLhoKStroHoOZ0pvbR5isondF026kb9FZ+T0SDC/EBxpxBZX+qypYSMVavk6I4OnwMw7dDbWLw+EiWnzVrgld/q2k32PAcgSQ8zTvPUT/0/LwbM+D4ZL31XrPDeZ3+9OHtFv0/aU+EJqIiEzIok6uTccsW8qAly8zwmE3OcVAssicJ918ySoLDgPMYiI85obPS9453zyJ/RM1otHs6a4X3xfQvYZBY+AS7rok2GHDBD5CcPmsyW/CUSj6ZwuJ+sM3oJMu2NwMybkHTFm7/98jV9j
-x-ms-exchange-transport-forked: True
-Content-Type: text/plain; charset="us-ascii"
-Content-Transfer-Encoding: quoted-printable
+        d=gmail.com; s=20161025;
+        h=subject:to:cc:references:from:autocrypt:message-id:date:user-agent
+         :mime-version:in-reply-to;
+        bh=m03gajIgnnSxrHaZI5eCxVy5L0LCjFb/1pEgbHPjJ8I=;
+        b=OAn0cbvEWE4q7jfq05halPFTPChvv6cGVBEmrmCWCJVuwMG12VsMenL+uXYi55a+O6
+         ia0dzyeL7OLPWop5yPDuPRXoAUsy+SzpsmOdR15m0KY6opjHXFdBEtijby4WeeJANfmM
+         nhKu8/93/TtTFBG4zjJqunwwZihFM+209qOkTkWLZ9BNbIAWVgv3FpcPlUesy8L3REgc
+         ADLHh7kwmjUCvxsc7ROF2ogMOD4KXsIx85IPktYl1WFV4z6EhTg9b87pJaIfJb5VK8Zk
+         FD0XO3AxxYF1bJvyi8DA7FZp13S/hSs0HLodOOvvYogZPfuvf5SKAr0K5j48LesAW4Y9
+         B37A==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20161025;
+        h=x-gm-message-state:subject:to:cc:references:from:autocrypt
+         :message-id:date:user-agent:mime-version:in-reply-to;
+        bh=m03gajIgnnSxrHaZI5eCxVy5L0LCjFb/1pEgbHPjJ8I=;
+        b=izbccZhOw+SLLIsxtTRQpBztpU5OWPM2uFZRPw8n0QYb6/LeyPrnj8+qyQBh133Fs2
+         IDaK8q0OCOb3GxomjyICvU9fHa1SpQ5Y1G1Ymu+WNG29UwPGe7v93d6tJC+2MdBpjAef
+         www/3ew9N499hwNq+dejdS4Uj0uZiORQAgXnUouN8xOoe5xrCD2oe8fBmShKgOGdfUdV
+         NY3Ro7Ud7aD7KZwZQ18rnYQieXiC+hVk+aHfN3FjnFNBWEIjFj6gJFOqMxyR0V1Vrbef
+         FL9vVb2Nimy4UjGVgtX/OUVQm0LoWVmYXl1d6My06DGPsWkjA8x71B4fbYygniYn7onk
+         HCUA==
+X-Gm-Message-State: APjAAAXXOuCJIgjwFpu3lI2bkrnyi1vPs1Zz7NAKajhFrDZtnBG0cQt3
+        KGfH6AQ6jvA3q1aPHnN340E=
+X-Google-Smtp-Source: APXvYqz7fSeJUbVf6rm5B/H3CS97DvdqiY8YDYUJY9ESquRxuMChPkAlnSyK1GZSSKmkrPGU2eivcg==
+X-Received: by 2002:a5d:54c4:: with SMTP id x4mr7483330wrv.247.1573205219355;
+        Fri, 08 Nov 2019 01:26:59 -0800 (PST)
+Received: from [192.168.43.59] ([109.126.142.81])
+        by smtp.gmail.com with ESMTPSA id k125sm5997640wmf.2.2019.11.08.01.26.57
+        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
+        Fri, 08 Nov 2019 01:26:58 -0800 (PST)
+Subject: Re: [PATCHSET v3 0/3] io_uring CQ ring backpressure
+To:     Jens Axboe <axboe@kernel.dk>, io-uring@vger.kernel.org
+Cc:     linux-block@vger.kernel.org, jannh@google.com
+References: <20191107160043.31725-1-axboe@kernel.dk>
+From:   Pavel Begunkov <asml.silence@gmail.com>
+Autocrypt: addr=asml.silence@gmail.com; prefer-encrypt=mutual; keydata=
+ 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 bA==
+Message-ID: <410c13fd-121f-2ac8-1ce2-4f8d567383cc@gmail.com>
+Date:   Fri, 8 Nov 2019 12:26:41 +0300
+User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:68.0) Gecko/20100101
+ Thunderbird/68.2.0
 MIME-Version: 1.0
-X-OriginatorOrg: wdc.com
-X-MS-Exchange-CrossTenant-Network-Message-Id: e99cd6f5-594e-440a-aa7a-08d7641d384b
-X-MS-Exchange-CrossTenant-originalarrivaltime: 08 Nov 2019 07:28:15.6057
- (UTC)
-X-MS-Exchange-CrossTenant-fromentityheader: Hosted
-X-MS-Exchange-CrossTenant-id: b61c8803-16f3-4c35-9b17-6f65f441df86
-X-MS-Exchange-CrossTenant-mailboxtype: HOSTED
-X-MS-Exchange-CrossTenant-userprincipalname: DFudmtEauViss3XiZE/rfHREgGgagVqhL4ZRQPo8fVwNDNyRh2dC2jnbR9m0eL8fskDMK9sj6oU+eSCSdQJn2A==
-X-MS-Exchange-Transport-CrossTenantHeadersStamped: BYAPR04MB5206
+In-Reply-To: <20191107160043.31725-1-axboe@kernel.dk>
+Content-Type: multipart/signed; micalg=pgp-sha256;
+ protocol="application/pgp-signature";
+ boundary="OETAsnTeCY7PCu33ZuyAYP2JJdkHGLbJ4"
 Sender: linux-block-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-On 2019/11/08 16:17, Hannes Reinecke wrote:=0A=
-> On 11/8/19 2:56 AM, Damien Le Moal wrote:=0A=
->> No known partitioning tool supports zoned block devices, especially the=
-=0A=
->> host managed flavor with strong sequential write constraints.=0A=
->> Furthermore, there are also no known user nor use cases for partitioned=
-=0A=
->> zoned block devices.=0A=
->>=0A=
->> This patch removes partition device creation for zoned block devices,=0A=
->> which allows simplifying the processing of zone commands for zoned=0A=
->> block devices. A warning is added if a partition table is found on the=
-=0A=
->> device.=0A=
->>=0A=
->> For report zones operations no zone sector information remapping is=0A=
->> necessary anymore, simplifying the code. Of note is that remapping of=0A=
->> zone reports for DM targets is still necessary as done by=0A=
->> dm_remap_zone_report().=0A=
->>=0A=
->> Similarly, remaping of a zone reset bio is not necessary anymore.=0A=
->> Testing for the applicability of the zone reset all request also becomes=
-=0A=
->> simpler and only needs to check that the number of sectors of the=0A=
->> requested zone range is equal to the disk capacity.=0A=
->>=0A=
->> Signed-off-by: Damien Le Moal <damien.lemoal@wdc.com>=0A=
->> ---=0A=
->>  block/blk-core.c          |  6 +---=0A=
->>  block/blk-zoned.c         | 62 ++++++--------------------------=0A=
->>  block/partition-generic.c | 74 +++++----------------------------------=
-=0A=
->>  drivers/md/dm.c           |  3 --=0A=
->>  4 files changed, 21 insertions(+), 124 deletions(-)=0A=
->>=0A=
->> diff --git a/block/blk-core.c b/block/blk-core.c=0A=
->> index 3306a3c5bed6..df6b70476187 100644=0A=
->> --- a/block/blk-core.c=0A=
->> +++ b/block/blk-core.c=0A=
->> @@ -851,11 +851,7 @@ static inline int blk_partition_remap(struct bio *b=
-io)=0A=
->>  	if (unlikely(bio_check_ro(bio, p)))=0A=
->>  		goto out;=0A=
->>  =0A=
->> -	/*=0A=
->> -	 * Zone management bios do not have a sector count but they do have=0A=
->> -	 * a start sector filled out and need to be remapped.=0A=
->> -	 */=0A=
->> -	if (bio_sectors(bio) || op_is_zone_mgmt(bio_op(bio))) {=0A=
->> +	if (bio_sectors(bio)) {=0A=
->>  		if (bio_check_eod(bio, part_nr_sects_read(p)))=0A=
->>  			goto out;=0A=
->>  		bio->bi_iter.bi_sector +=3D p->start_sect;=0A=
->> diff --git a/block/blk-zoned.c b/block/blk-zoned.c=0A=
->> index ea4e086ba00e..ae665e490858 100644=0A=
->> --- a/block/blk-zoned.c=0A=
->> +++ b/block/blk-zoned.c=0A=
->> @@ -93,32 +93,10 @@ unsigned int blkdev_nr_zones(struct block_device *bd=
-ev)=0A=
->>  	if (!blk_queue_is_zoned(q))=0A=
->>  		return 0;=0A=
->>  =0A=
->> -	return __blkdev_nr_zones(q, bdev->bd_part->nr_sects);=0A=
->> +	return __blkdev_nr_zones(q, get_capacity(bdev->bd_disk));=0A=
->>  }=0A=
->>  EXPORT_SYMBOL_GPL(blkdev_nr_zones);=0A=
->>  =0A=
->> -/*=0A=
->> - * Check that a zone report belongs to this partition, and if yes, fix =
-its start=0A=
->> - * sector and write pointer and return true. Return false otherwise.=0A=
->> - */=0A=
->> -static bool blkdev_report_zone(struct block_device *bdev, struct blk_zo=
-ne *rep)=0A=
->> -{=0A=
->> -	sector_t offset =3D get_start_sect(bdev);=0A=
->> -=0A=
->> -	if (rep->start < offset)=0A=
->> -		return false;=0A=
->> -=0A=
->> -	rep->start -=3D offset;=0A=
->> -	if (rep->start + rep->len > bdev->bd_part->nr_sects)=0A=
->> -		return false;=0A=
->> -=0A=
->> -	if (rep->type =3D=3D BLK_ZONE_TYPE_CONVENTIONAL)=0A=
->> -		rep->wp =3D rep->start + rep->len;=0A=
->> -	else=0A=
->> -		rep->wp -=3D offset;=0A=
->> -	return true;=0A=
->> -}=0A=
->> -=0A=
->>  /**=0A=
->>   * blkdev_report_zones - Get zones information=0A=
->>   * @bdev:	Target block device=0A=
->> @@ -140,8 +118,7 @@ int blkdev_report_zones(struct block_device *bdev, s=
-ector_t sector,=0A=
->>  {=0A=
->>  	struct request_queue *q =3D bdev_get_queue(bdev);=0A=
->>  	struct gendisk *disk =3D bdev->bd_disk;=0A=
->> -	unsigned int i, nrz;=0A=
->> -	int ret;=0A=
->> +	sector_t capacity =3D get_capacity(disk);=0A=
->>  =0A=
->>  	if (!blk_queue_is_zoned(q))=0A=
->>  		return -EOPNOTSUPP;=0A=
->> @@ -154,27 +131,14 @@ int blkdev_report_zones(struct block_device *bdev,=
- sector_t sector,=0A=
->>  	if (WARN_ON_ONCE(!disk->fops->report_zones))=0A=
->>  		return -EOPNOTSUPP;=0A=
->>  =0A=
->> -	if (!*nr_zones || sector >=3D bdev->bd_part->nr_sects) {=0A=
->> +	if (!*nr_zones || sector >=3D capacity) {=0A=
->>  		*nr_zones =3D 0;=0A=
->>  		return 0;=0A=
->>  	}=0A=
->>  =0A=
->> -	nrz =3D min(*nr_zones,=0A=
->> -		  __blkdev_nr_zones(q, bdev->bd_part->nr_sects - sector));=0A=
->> -	ret =3D disk->fops->report_zones(disk, get_start_sect(bdev) + sector,=
-=0A=
->> -				       zones, &nrz);=0A=
->> -	if (ret)=0A=
->> -		return ret;=0A=
->> +	*nr_zones =3D min(*nr_zones, __blkdev_nr_zones(q, capacity - sector));=
-=0A=
->>  =0A=
->> -	for (i =3D 0; i < nrz; i++) {=0A=
->> -		if (!blkdev_report_zone(bdev, zones))=0A=
->> -			break;=0A=
->> -		zones++;=0A=
->> -	}=0A=
->> -=0A=
->> -	*nr_zones =3D i;=0A=
->> -=0A=
->> -	return 0;=0A=
->> +	return disk->fops->report_zones(disk, sector, zones, nr_zones);=0A=
->>  }=0A=
->>  EXPORT_SYMBOL_GPL(blkdev_report_zones);=0A=
->>  =0A=
->> @@ -185,15 +149,11 @@ static inline bool blkdev_allow_reset_all_zones(st=
-ruct block_device *bdev,=0A=
->>  	if (!blk_queue_zone_resetall(bdev_get_queue(bdev)))=0A=
->>  		return false;=0A=
->>  =0A=
->> -	if (sector || nr_sectors !=3D part_nr_sects_read(bdev->bd_part))=0A=
->> -		return false;=0A=
->>  	/*=0A=
->> -	 * REQ_OP_ZONE_RESET_ALL can be executed only if the block device is=
-=0A=
->> -	 * the entire disk, that is, if the blocks device start offset is 0 an=
-d=0A=
->> -	 * its capacity is the same as the entire disk.=0A=
->> +	 * REQ_OP_ZONE_RESET_ALL can be executed only if the number of sectors=
-=0A=
->> +	 * of the applicable zone range is the entire disk.=0A=
->>  	 */=0A=
->> -	return get_start_sect(bdev) =3D=3D 0 &&=0A=
->> -	       part_nr_sects_read(bdev->bd_part) =3D=3D get_capacity(bdev->bd_=
-disk);=0A=
->> +	return !sector && nr_sectors =3D=3D get_capacity(bdev->bd_disk);=0A=
->>  }=0A=
->>  =0A=
->>  /**=0A=
->> @@ -218,6 +178,7 @@ int blkdev_zone_mgmt(struct block_device *bdev, enum=
- req_opf op,=0A=
->>  {=0A=
->>  	struct request_queue *q =3D bdev_get_queue(bdev);=0A=
->>  	sector_t zone_sectors =3D blk_queue_zone_sectors(q);=0A=
->> +	sector_t capacity =3D get_capacity(bdev->bd_disk);=0A=
->>  	sector_t end_sector =3D sector + nr_sectors;=0A=
->>  	struct bio *bio =3D NULL;=0A=
->>  	int ret;=0A=
->> @@ -231,7 +192,7 @@ int blkdev_zone_mgmt(struct block_device *bdev, enum=
- req_opf op,=0A=
->>  	if (!op_is_zone_mgmt(op))=0A=
->>  		return -EOPNOTSUPP;=0A=
->>  =0A=
->> -	if (!nr_sectors || end_sector > bdev->bd_part->nr_sects)=0A=
->> +	if (!nr_sectors || end_sector > capacity)=0A=
->>  		/* Out of range */=0A=
->>  		return -EINVAL;=0A=
->>  =0A=
->> @@ -239,8 +200,7 @@ int blkdev_zone_mgmt(struct block_device *bdev, enum=
- req_opf op,=0A=
->>  	if (sector & (zone_sectors - 1))=0A=
->>  		return -EINVAL;=0A=
->>  =0A=
->> -	if ((nr_sectors & (zone_sectors - 1)) &&=0A=
->> -	    end_sector !=3D bdev->bd_part->nr_sects)=0A=
->> +	if ((nr_sectors & (zone_sectors - 1)) && end_sector !=3D capacity)=0A=
->>  		return -EINVAL;=0A=
->>  =0A=
->>  	while (sector < end_sector) {=0A=
->> diff --git a/block/partition-generic.c b/block/partition-generic.c=0A=
->> index aee643ce13d1..31bff3fb28af 100644=0A=
->> --- a/block/partition-generic.c=0A=
->> +++ b/block/partition-generic.c=0A=
->> @@ -459,56 +459,6 @@ static int drop_partitions(struct gendisk *disk, st=
-ruct block_device *bdev)=0A=
->>  	return 0;=0A=
->>  }=0A=
->>  =0A=
->> -static bool part_zone_aligned(struct gendisk *disk,=0A=
->> -			      struct block_device *bdev,=0A=
->> -			      sector_t from, sector_t size)=0A=
->> -{=0A=
->> -	unsigned int zone_sectors =3D bdev_zone_sectors(bdev);=0A=
->> -=0A=
->> -	/*=0A=
->> -	 * If this function is called, then the disk is a zoned block device=
-=0A=
->> -	 * (host-aware or host-managed). This can be detected even if the=0A=
->> -	 * zoned block device support is disabled (CONFIG_BLK_DEV_ZONED not=0A=
->> -	 * set). In this case, however, only host-aware devices will be seen=
-=0A=
->> -	 * as a block device is not created for host-managed devices. Without=
-=0A=
->> -	 * zoned block device support, host-aware drives can still be used as=
-=0A=
->> -	 * regular block devices (no zone operation) and their zone size will=
-=0A=
->> -	 * be reported as 0. Allow this case.=0A=
->> -	 */=0A=
->> -	if (!zone_sectors)=0A=
->> -		return true;=0A=
->> -=0A=
->> -	/*=0A=
->> -	 * Check partition start and size alignement. If the drive has a=0A=
->> -	 * smaller last runt zone, ignore it and allow the partition to=0A=
->> -	 * use it. Check the zone size too: it should be a power of 2 number=
-=0A=
->> -	 * of sectors.=0A=
->> -	 */=0A=
->> -	if (WARN_ON_ONCE(!is_power_of_2(zone_sectors))) {=0A=
->> -		u32 rem;=0A=
->> -=0A=
->> -		div_u64_rem(from, zone_sectors, &rem);=0A=
->> -		if (rem)=0A=
->> -			return false;=0A=
->> -		if ((from + size) < get_capacity(disk)) {=0A=
->> -			div_u64_rem(size, zone_sectors, &rem);=0A=
->> -			if (rem)=0A=
->> -				return false;=0A=
->> -		}=0A=
->> -=0A=
->> -	} else {=0A=
->> -=0A=
->> -		if (from & (zone_sectors - 1))=0A=
->> -			return false;=0A=
->> -		if ((from + size) < get_capacity(disk) &&=0A=
->> -		    (size & (zone_sectors - 1)))=0A=
->> -			return false;=0A=
->> -=0A=
->> -	}=0A=
->> -=0A=
->> -	return true;=0A=
->> -}=0A=
->> -=0A=
->>  int rescan_partitions(struct gendisk *disk, struct block_device *bdev)=
-=0A=
->>  {=0A=
->>  	struct parsed_partitions *state =3D NULL;=0A=
->> @@ -544,6 +494,14 @@ int rescan_partitions(struct gendisk *disk, struct =
-block_device *bdev)=0A=
->>  		}=0A=
->>  		return -EIO;=0A=
->>  	}=0A=
->> +=0A=
->> +	/* Partitions are not supported on zoned block devices */=0A=
->> +	if (bdev_is_zoned(bdev)) {=0A=
->> +		pr_warn("%s: ignoring partition table on zoned block device\n",=0A=
->> +			disk->disk_name);=0A=
->> +		goto out;=0A=
->> +	}=0A=
->> +=0A=
->>  	/*=0A=
->>  	 * If any partition code tried to read beyond EOD, try=0A=
->>  	 * unlocking native capacity even if partition table is=0A=
-> =0A=
-> While I do applaud removing special cases for zoned devices, we do have=
-=0A=
-> the GENHD_FL_NO_PART_SCAN for precisely this use case.=0A=
-> Any particular reason why this isn't being used, nor even set?=0A=
-=0A=
-If we set the flag, indeed partitions will be ignored, which is exactly=0A=
-what we want. But that also means that there will be no warning message=0A=
-whatsoever in the very unlikely case of a user using an SMR disk with=0A=
-partitions. I fully agree with you that we should set this flag, but I=0A=
-decided against it initially to have the "partition table ignored"=0A=
-warning printed for now.=0A=
-=0A=
-If, as I expect, there are no screams coming from the field/users, we=0A=
-can then safely add the flag and remove some more code (the test and=0A=
-pr_warn call in rescan_partitions()).=0A=
-=0A=
-> =0A=
-> Cheers,=0A=
-> =0A=
-> Hannes=0A=
-> =0A=
-=0A=
-=0A=
--- =0A=
-Damien Le Moal=0A=
-Western Digital Research=0A=
+This is an OpenPGP/MIME signed message (RFC 4880 and 3156)
+--OETAsnTeCY7PCu33ZuyAYP2JJdkHGLbJ4
+Content-Type: multipart/mixed; boundary="6DbDmnLNymPchV1COzXcUy4nyniry6gFi";
+ protected-headers="v1"
+From: Pavel Begunkov <asml.silence@gmail.com>
+To: Jens Axboe <axboe@kernel.dk>, io-uring@vger.kernel.org
+Cc: linux-block@vger.kernel.org, jannh@google.com
+Message-ID: <410c13fd-121f-2ac8-1ce2-4f8d567383cc@gmail.com>
+Subject: Re: [PATCHSET v3 0/3] io_uring CQ ring backpressure
+References: <20191107160043.31725-1-axboe@kernel.dk>
+In-Reply-To: <20191107160043.31725-1-axboe@kernel.dk>
+
+--6DbDmnLNymPchV1COzXcUy4nyniry6gFi
+Content-Type: text/plain; charset=utf-8
+Content-Language: en-US
+Content-Transfer-Encoding: quoted-printable
+
+On 07/11/2019 19:00, Jens Axboe wrote:
+> Currently we drop completion events, if the CQ ring is full. That's fin=
+e
+> for requests with bounded completion times, but it may make it harder t=
+o
+> use io_uring with networked IO where request completion times are
+> generally unbounded. Or with POLL, for example, which is also unbounded=
+=2E
+>=20
+> This patch adds IORING_SETUP_CQ_NODROP, which changes the behavior a bi=
+t
+> for CQ ring overflows. First of all, it doesn't overflow the ring, it
+> simply stores backlog of completions that we weren't able to put into
+> the CQ ring. To prevent the backlog from growing indefinitely, if the
+> backlog is non-empty, we apply back pressure on IO submissions. Any
+> attempt to submit new IO with a non-empty backlog will get an -EBUSY
+> return from the kernel.
+>=20
+> I think that makes for a pretty sane API in terms of how the applicatio=
+n
+> can handle it. With CQ_NODROP enabled, we'll never drop a completion
+> event, but we'll also not allow submissions with a completion backlog.
+>=20
+Looks good to me
+Reviewed-by: Pavel Begunkov <asml.silence@gmail.com>
+
+
+> Changes since v2:
+>=20
+> - Add io_double_put_req() helper for the cases where we need to drop bo=
+th
+>   the submit and complete reference. We didn't need this before as we
+>   could just free the request unconditionally, but we don't know if tha=
+t's
+>   the case anymore if add/fill grabs a reference to it.
+> - Fix linked request dropping.
+>=20
+> Changes since v1:
+>=20
+> - Drop the cqe_drop structure and allocation, simply use the io_kiocb
+>   for the overflow backlog
+> - Rebase on top of Pavel's series which made this cleaner
+> - Add prep patch for the fill/add CQ handler changes
+>=20
+>  fs/io_uring.c                 | 209 +++++++++++++++++++++++-----------=
+
+>  include/uapi/linux/io_uring.h |   1 +
+>  2 files changed, 143 insertions(+), 67 deletions(-)
+>=20
+
+--=20
+Pavel Begunkov
+
+
+--6DbDmnLNymPchV1COzXcUy4nyniry6gFi--
+
+--OETAsnTeCY7PCu33ZuyAYP2JJdkHGLbJ4
+Content-Type: application/pgp-signature; name="signature.asc"
+Content-Description: OpenPGP digital signature
+Content-Disposition: attachment; filename="signature.asc"
+
+-----BEGIN PGP SIGNATURE-----
+
+iQIzBAEBCAAdFiEE+6JuPTjTbx479o3OWt5b1Glr+6UFAl3FNNYACgkQWt5b1Glr
++6UzDA//YDq4aRFdRTeFjxJKXLP8zpADt8VkyuaUmUbaoahP3h6kYAGfmwD9uSZk
+sKaZsCMGgmPP1v4WZWFfwTxdGwf1466VHfgv92rkM0hG95Yg+XjMzKUL6OPFZaIA
+DT7s5v7kBNidDRCoVOm3NSytcV+OIA7GJuLosRp3LekMKfSngMqC0IClXDugRBi/
+2QhU34z5uy03mxx0jbFrG/llSUKZWm7e4mv958VA4OIJ3mg4wIXkViXE2wnQAevJ
+wHN6d9Yt8mf4TiCnqnVZ+W9hWFPjzpgaF/uPILh37wiNPciX0kNWaP8pj/C9OPQg
+uT/TTndA40fFtkSPiVAaMXi0rDvqDPzsQSHObCweIDb+6zJzM8i/gTwvAJZy+HmR
+2ANCm+3U7Ct2ICr8GtDRa7T97AospqjereV9wHpnEDzo+Z0nGaSPPBxX/uJpM94s
+fINiufSHwXeArnktiwUVus5cFtKg8Zv0ZU396fqvaXHmatp9+gIRmcbdgbOxBbAx
+hVB/rIicjP7pJm9pOfTT4hOEIiKaL2yt1cUdB3YUWhFrAkEREZH8hxykX0mzJgzF
+p0m5M90klbuzlNEIjzkoAu/oP4MMq+QHxdu1gbNsNsM7Yq5Tq8jlzuhW680MTZv+
+tYvpIBSni2lyyath3kkdGZQUrKXDVneZ9iwGmeS7PPIQ3oEvwKo=
+=A4nC
+-----END PGP SIGNATURE-----
+
+--OETAsnTeCY7PCu33ZuyAYP2JJdkHGLbJ4--
