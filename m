@@ -2,122 +2,93 @@ Return-Path: <SRS0=T+5Q=ZA=vger.kernel.org=linux-block-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-2.4 required=3.0 tests=DKIM_SIGNED,DKIM_VALID,
-	DKIM_VALID_AU,HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SPF_HELO_NONE,
-	SPF_PASS,USER_AGENT_SANE_1 autolearn=no autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-2.3 required=3.0 tests=DKIM_SIGNED,DKIM_VALID,
+	HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,
+	USER_AGENT_SANE_1 autolearn=no autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 33487FA372C
-	for <linux-block@archiver.kernel.org>; Fri,  8 Nov 2019 12:31:57 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 175A5FC6195
+	for <linux-block@archiver.kernel.org>; Fri,  8 Nov 2019 13:54:50 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.kernel.org (Postfix) with ESMTP id 06AFE222C9
-	for <linux-block@archiver.kernel.org>; Fri,  8 Nov 2019 12:31:56 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id D4ABA21924
+	for <linux-block@archiver.kernel.org>; Fri,  8 Nov 2019 13:54:49 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="Pk3X2dXu"
+	dkim=pass (2048-bit key) header.d=kernel-dk.20150623.gappssmtp.com header.i=@kernel-dk.20150623.gappssmtp.com header.b="SlnJ0kzD"
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1725970AbfKHMb4 (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Fri, 8 Nov 2019 07:31:56 -0500
-Received: from us-smtp-delivery-1.mimecast.com ([207.211.31.120]:30373 "EHLO
-        us-smtp-1.mimecast.com" rhost-flags-OK-OK-OK-FAIL) by vger.kernel.org
-        with ESMTP id S1725933AbfKHMbz (ORCPT
-        <rfc822;linux-block@vger.kernel.org>); Fri, 8 Nov 2019 07:31:55 -0500
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-        s=mimecast20190719; t=1573216314;
-        h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-         to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-         content-transfer-encoding:content-transfer-encoding:
-         in-reply-to:in-reply-to:references:references;
-        bh=vMJWjmHAn9oXmduAqxbr7ld97ARES8e+B/CT4q03C/U=;
-        b=Pk3X2dXuQsrYnVohOyyATVZq4LL+KpF/o2zcgCU6/6KWXCBYFHOBPYHilMsRJ5/KSGtsqZ
-        2I/xbcq/PCFNoIIUMfxU4V8JiZwGl96ePB7vEegFt1J5Cp8cnJ9GTc8bCRMAjQzgupkvBR
-        e6nYkz1hURUnUCiymmd38cXNxvVt/Yg=
-Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
- [209.132.183.4]) (Using TLS) by relay.mimecast.com with ESMTP id
- us-mta-351-w8K278-eNPCBfHYDXkJI7g-1; Fri, 08 Nov 2019 07:31:50 -0500
-Received: from smtp.corp.redhat.com (int-mx07.intmail.prod.int.phx2.redhat.com [10.5.11.22])
-        (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
-        (No client certificate requested)
-        by mimecast-mx01.redhat.com (Postfix) with ESMTPS id 86A11107ACC3;
-        Fri,  8 Nov 2019 12:31:48 +0000 (UTC)
-Received: from file01.intranet.prod.int.rdu2.redhat.com (file01.intranet.prod.int.rdu2.redhat.com [10.11.5.7])
-        by smtp.corp.redhat.com (Postfix) with ESMTPS id BEFA31001902;
-        Fri,  8 Nov 2019 12:31:45 +0000 (UTC)
-Received: from file01.intranet.prod.int.rdu2.redhat.com (localhost [127.0.0.1])
-        by file01.intranet.prod.int.rdu2.redhat.com (8.14.4/8.14.4) with ESMTP id xA8CVjPD004476;
-        Fri, 8 Nov 2019 07:31:45 -0500
-Received: from localhost (mpatocka@localhost)
-        by file01.intranet.prod.int.rdu2.redhat.com (8.14.4/8.14.4/Submit) with ESMTP id xA8CViNb004472;
-        Fri, 8 Nov 2019 07:31:44 -0500
-X-Authentication-Warning: file01.intranet.prod.int.rdu2.redhat.com: mpatocka owned process doing -bs
-Date:   Fri, 8 Nov 2019 07:31:44 -0500 (EST)
-From:   Mikulas Patocka <mpatocka@redhat.com>
-X-X-Sender: mpatocka@file01.intranet.prod.int.rdu2.redhat.com
-To:     Alessio Balsini <balsini@android.com>
-cc:     Jens Axboe <axboe@kernel.dk>, Alasdair G Kergon <agk@redhat.com>,
-        elsk@google.com, dvander@google.com, dm-devel@redhat.com,
-        linux-block@vger.kernel.org, linux-kernel@vger.kernel.org,
-        kernel-team@android.com
-Subject: Re: dm-snapshot for system updates in Android
-In-Reply-To: <20191104164900.GA10934@google.com>
-Message-ID: <alpine.LRH.2.02.1911080723130.3392@file01.intranet.prod.int.rdu2.redhat.com>
-References: <20191025101624.GA61225@google.com> <alpine.LRH.2.02.1910290957220.25731@file01.intranet.prod.int.rdu2.redhat.com> <20191104164900.GA10934@google.com>
-User-Agent: Alpine 2.02 (LRH 1266 2009-07-14)
+        id S1727046AbfKHNys (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Fri, 8 Nov 2019 08:54:48 -0500
+Received: from mail-io1-f66.google.com ([209.85.166.66]:37161 "EHLO
+        mail-io1-f66.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S1726888AbfKHNys (ORCPT
+        <rfc822;linux-block@vger.kernel.org>); Fri, 8 Nov 2019 08:54:48 -0500
+Received: by mail-io1-f66.google.com with SMTP id 1so6439678iou.4
+        for <linux-block@vger.kernel.org>; Fri, 08 Nov 2019 05:54:46 -0800 (PST)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=kernel-dk.20150623.gappssmtp.com; s=20150623;
+        h=subject:to:cc:references:from:message-id:date:user-agent
+         :mime-version:in-reply-to:content-language:content-transfer-encoding;
+        bh=qhj0pYG/xfb9ZXayAFQZBmgKNwxw6I0CpoVt3iCpB1E=;
+        b=SlnJ0kzDnF+zUVdem+qMS9wPqFOmE4StE78W5pCkwNeQbv3pcDv/6wbvF9Wzsyej6a
+         mVp7dDiaYBiGAGozWrA6DxU2eqJdpfSno8KXt6N44vL8mUfNvXdzzYobLagSEhGYPhrs
+         mzyYec6kzQhLmNdjY3HpzPswzummUVIV45W7ewSXze6ksqYRjkIb1DF+8/l6g8hTmj2v
+         fIX6tTXrTKWoCMPy1kBumphFKsg9wM5PQsZUGEbNAeOy7ZCati+IAS6/F2UO+ZcMlhPY
+         PGiFXKKj/j2YC08ktmwhITccWfmu87EX9XndOE3MVtY2nXzWQpsFSPja6+o5cvtUHFrd
+         VSzQ==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20161025;
+        h=x-gm-message-state:subject:to:cc:references:from:message-id:date
+         :user-agent:mime-version:in-reply-to:content-language
+         :content-transfer-encoding;
+        bh=qhj0pYG/xfb9ZXayAFQZBmgKNwxw6I0CpoVt3iCpB1E=;
+        b=YsQqQCVyDws7O1CgD7KTnYlpak+cgNtR1e2AMON3ZT3vidsYMwEAnVsPQblqhJG/dD
+         j60NK0ztAxGKoITWz326Yzu6MPevP8HpBXMvaWox5qNxxpolJ5spQnC2v57st8/Td1dT
+         NTbMdGuWAJrmxz4SoHFJ+fWSeS+rCnHUIYBmR2nTIdJAYgypJMp3tMl/GcQhut34Kpqw
+         iTYTr8CuvmS3pufqcjNRoZ4gf5Z1Mnb7Ekw3fWseFJn3S1oZC1TSn5VDFTVAdeYFKbXD
+         xXWstIC84fq3N1f2kZ8BLFr6RD6wS5bHS6afjIJsy4cvPjnxytx3LBUz2W3oyyhWi+eR
+         ZkKw==
+X-Gm-Message-State: APjAAAXF0Js36ggD0HJrtU+LN1ieNFy0n2ulZT/EJJHiyzeDMBskcp6X
+        X2MZp+7Fq+i4ALGZkZax+Tre1Q==
+X-Google-Smtp-Source: APXvYqxT7wKu6Rb3KLuV8PJsLUA7DGTaBKo+K+FqKHR5/THatlVz8nZOFOdzmcrdjerSlYdgOa+70A==
+X-Received: by 2002:a05:6602:198:: with SMTP id m24mr9909819ioo.34.1573221285861;
+        Fri, 08 Nov 2019 05:54:45 -0800 (PST)
+Received: from [192.168.1.159] ([65.144.74.34])
+        by smtp.gmail.com with ESMTPSA id p19sm776620ili.56.2019.11.08.05.54.44
+        (version=TLS1_2 cipher=ECDHE-RSA-AES128-GCM-SHA256 bits=128/128);
+        Fri, 08 Nov 2019 05:54:45 -0800 (PST)
+Subject: Re: [PATCH] block: drbd: remove a stay unlock in
+ __drbd_send_protocol()
+To:     Philipp Reisner <philipp.reisner@linbit.com>,
+        Dan Carpenter <dan.carpenter@oracle.com>
+Cc:     Lars Ellenberg <lars.ellenberg@linbit.com>,
+        drbd-dev@lists.linbit.com, linux-block@vger.kernel.org,
+        linux-kernel@vger.kernel.org, kernel-janitors@vger.kernel.org
+References: <20191107074847.GA11695@mwanda> <6906816.cRlsrm7Sor@fat-tyre>
+From:   Jens Axboe <axboe@kernel.dk>
+Message-ID: <17fea9d1-39f8-1d91-5509-5f520009b9c9@kernel.dk>
+Date:   Fri, 8 Nov 2019 06:54:43 -0700
+User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:60.0) Gecko/20100101
+ Thunderbird/60.9.0
 MIME-Version: 1.0
-X-Scanned-By: MIMEDefang 2.84 on 10.5.11.22
-X-MC-Unique: w8K278-eNPCBfHYDXkJI7g-1
-X-Mimecast-Spam-Score: 0
-Content-Type: TEXT/PLAIN; charset=WINDOWS-1252
-Content-Transfer-Encoding: quoted-printable
+In-Reply-To: <6906816.cRlsrm7Sor@fat-tyre>
+Content-Type: text/plain; charset=utf-8
+Content-Language: en-US
+Content-Transfer-Encoding: 7bit
 Sender: linux-block-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
+On 11/8/19 3:46 AM, Philipp Reisner wrote:
+> Hi Dan,
+> 
+> yes, your patch it obviously correct. The comment you are
+> referring to is badly worded. We will remove it.
+> 
+> Jens,
+> 
+> are you taking this patch as it is?
 
+Yep, I'll queue it up.
 
-On Mon, 4 Nov 2019, Alessio Balsini wrote:
-
-> > > -- Alignment
-> > >=20
-> > > Our approach follows the solution proposed by Mikulas [1].
-> > > Being the block alignment of file extents automatically managed by th=
-e
-> > > filesystem, using FIEMAP should have no alignment-related performance=
- issue.
-> > > But in our implementation we hit a misalignment [2] branch which lead=
-s to
-> > > dmwarning messages [3, 4].
-> > >=20
-> > > I have a limited experience with the block layer and dm, so I'm still
-> > > struggling in finding the root cause for this, either in user space o=
-r kernel
-> > > space.
-> >=20
-> > I don't know. What is the block size of the filesystem? Are all mapping=
-s=20
-> > aligned to this block size?
->=20
-> Here follows a just generated warning coming from a Pixel 4 kernel (4.14)=
-:
->=20
-> [ 3093.443808] device-mapper: table: 253:16: adding target device dm-15
-> caused an alignment inconsistency: physical_block_size=3D4096,
-> logical_block_size=3D4096, alignment_offset=3D61440, start=3D0
->=20
-> Does this contain all the info you asked for?
-
-Look at the function blk_stack_limits - it has various checks that make it=
-=20
-return -1. Insert some debugging printk's there and find out which check=20
-made the function return -1.
-
-Based on this, we can find out which of the limits triggered the error=20
-message.
-
-> I started investigating this issue, but since we didn't notice any
-> performance degradation, I prioritized other things. I'll be hopefully
-> able to get back to this warning in the next months.
-> Please let me know if I can help you with that or if you need additional
-> information.
-
-Mikulas
+-- 
+Jens Axboe
 
