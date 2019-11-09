@@ -2,91 +2,72 @@ Return-Path: <SRS0=JpzN=ZB=vger.kernel.org=linux-block-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-2.3 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
-	MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,USER_AGENT_SANE_1 autolearn=no
-	autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-8.2 required=3.0 tests=DKIM_SIGNED,DKIM_VALID,
+	DKIM_VALID_AU,FREEMAIL_FORGED_FROMDOMAIN,FREEMAIL_FROM,
+	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,
+	SPF_HELO_NONE,SPF_PASS,USER_AGENT_SANE_1 autolearn=ham autolearn_force=no
+	version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id AF80AC17440
-	for <linux-block@archiver.kernel.org>; Sat,  9 Nov 2019 03:02:30 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id D6226C17440
+	for <linux-block@archiver.kernel.org>; Sat,  9 Nov 2019 12:25:08 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.kernel.org (Postfix) with ESMTP id 8AEEA214DA
-	for <linux-block@archiver.kernel.org>; Sat,  9 Nov 2019 03:02:30 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id AD52B21924
+	for <linux-block@archiver.kernel.org>; Sat,  9 Nov 2019 12:25:08 +0000 (UTC)
+Authentication-Results: mail.kernel.org;
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="cLVOZsdZ"
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1725895AbfKIDCa (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Fri, 8 Nov 2019 22:02:30 -0500
-Received: from mail-pl1-f193.google.com ([209.85.214.193]:40349 "EHLO
-        mail-pl1-f193.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1725884AbfKIDC3 (ORCPT
-        <rfc822;linux-block@vger.kernel.org>); Fri, 8 Nov 2019 22:02:29 -0500
-Received: by mail-pl1-f193.google.com with SMTP id e3so5140062plt.7;
-        Fri, 08 Nov 2019 19:02:29 -0800 (PST)
+        id S1726530AbfKIMZI (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Sat, 9 Nov 2019 07:25:08 -0500
+Received: from mail-lj1-f195.google.com ([209.85.208.195]:46218 "EHLO
+        mail-lj1-f195.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S1726296AbfKIMZH (ORCPT
+        <rfc822;linux-block@vger.kernel.org>); Sat, 9 Nov 2019 07:25:07 -0500
+Received: by mail-lj1-f195.google.com with SMTP id e9so8933825ljp.13;
+        Sat, 09 Nov 2019 04:25:05 -0800 (PST)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=gmail.com; s=20161025;
+        h=subject:to:cc:references:from:message-id:date:user-agent
+         :mime-version:in-reply-to:content-language:content-transfer-encoding;
+        bh=cqZWDexuhPPuiGCF/N9j/OA63pBQXUccM1dtWhxED8s=;
+        b=cLVOZsdZuw0Lyfp6gL7weqVy3YWnrOLlR1/zqhpKJROEIcLyhZgE+4HVInU3uyzGLs
+         enXoCIlHdvN5PHBq4hFfGvlJWJTM0My0NeHNqx1CFCQnr69Axxq0z8980pUIgiKBt24S
+         d3Bn+qvDIp/pfGDt7PpwqAy4KgCoCZPUagJCVVhhRfpIW9rnXX718EWGSjB0Sxl8VtxH
+         AYd9vL3sGZHmz+m9yAHCzyE5r68K3ko9cFiHrxN8NyTeAeQA69TCzPr/uiiUmedwnHWO
+         TRpIWfxMeyVS8y4DatiCNMsWIViXEAPvgNzQEkQIyFTtZoyTKPOu4qMStf3s5BFeCFeS
+         mdng==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=1e100.net; s=20161025;
-        h=x-gm-message-state:subject:to:references:from:autocrypt:message-id
-         :date:user-agent:mime-version:in-reply-to:content-language
+        h=x-gm-message-state:subject:to:cc:references:from:message-id:date
+         :user-agent:mime-version:in-reply-to:content-language
          :content-transfer-encoding;
-        bh=Q9w9/CL3tvrcZwNSUDDdOh70mNMnFLTdHmVRbGH/fsQ=;
-        b=RhkDx30JD54fYQo9hP8I2p1pTObKb63mZVBQBWqpUxZUL/9hzxk97nBljGD0tAAAN3
-         2jKcOpyi71U7i0KEh6INLZ73cCGICF1H7Fb+M6GWNZ4LE8RFulhX8R1Tn0zODqLC6b6n
-         b9OujTqi7eTHKE3f22ftHVEzmvez3PIhyhke4IR9A+dLN3OVtR0Fbo9KOrbD9YAeByTe
-         aPcJ3YOXeaMRVD/dAK9zLSDIv9/3b9jC5hiiKw8uVpsz1dIN1ZOPNLgq5xqcsFQuL6lE
-         exe6I+dmMJVOJC3yUhPQNFhGoh5oabAs2czDm3CQv4aSagmE8QQmecdTfcE3D8k7F1ew
-         QAJg==
-X-Gm-Message-State: APjAAAUKgBIOSh+tv9mb8I+dgwmtPc6YoN0yNMKbgGNmhWZ+SzkNAkiL
-        64fXCaPQiInkr0niho7A+t0=
-X-Google-Smtp-Source: APXvYqznA2/Hflt4r+QC31lnQ7K+Dgy87EIN0nH4QqGDSy7xTZp2MWCmVVsOPoz64ej9OUuavrLuaw==
-X-Received: by 2002:a17:902:b482:: with SMTP id y2mr5337175plr.128.1573268548891;
-        Fri, 08 Nov 2019 19:02:28 -0800 (PST)
-Received: from localhost.localdomain ([2601:647:4000:a8:64c1:7f03:d411:a61])
-        by smtp.gmail.com with ESMTPSA id d8sm6983723pfo.47.2019.11.08.19.02.27
-        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
-        Fri, 08 Nov 2019 19:02:28 -0800 (PST)
-Subject: Re: [dm-devel] [PATCH 8/9] scsi: sd_zbc: Cleanup
- sd_zbc_alloc_report_buffer()
-To:     Damien Le Moal <Damien.LeMoal@wdc.com>,
-        "linux-block@vger.kernel.org" <linux-block@vger.kernel.org>,
-        Jens Axboe <axboe@kernel.dk>,
-        "linux-scsi@vger.kernel.org" <linux-scsi@vger.kernel.org>,
-        "Martin K . Petersen" <martin.petersen@oracle.com>,
-        "dm-devel@redhat.com" <dm-devel@redhat.com>,
-        Mike Snitzer <snitzer@redhat.com>,
-        "linux-f2fs-devel@lists.sourceforge.net" 
-        <linux-f2fs-devel@lists.sourceforge.net>,
-        Jaegeuk Kim <jaegeuk@kernel.org>, Chao Yu <yuchao0@huawei.com>
-References: <20191108015702.233102-1-damien.lemoal@wdc.com>
- <20191108015702.233102-9-damien.lemoal@wdc.com>
- <6a1e0a08-d65c-b075-9bac-23519e9e91c3@acm.org>
- <BYAPR04MB5816C442BE08F9973C2CDF15E77A0@BYAPR04MB5816.namprd04.prod.outlook.com>
-From:   Bart Van Assche <bvanassche@acm.org>
-Autocrypt: addr=bvanassche@acm.org; prefer-encrypt=mutual; keydata=
- mQENBFSOu4oBCADcRWxVUvkkvRmmwTwIjIJvZOu6wNm+dz5AF4z0FHW2KNZL3oheO3P8UZWr
- LQOrCfRcK8e/sIs2Y2D3Lg/SL7qqbMehGEYcJptu6mKkywBfoYbtBkVoJ/jQsi2H0vBiiCOy
- fmxMHIPcYxaJdXxrOG2UO4B60Y/BzE6OrPDT44w4cZA9DH5xialliWU447Bts8TJNa3lZKS1
- AvW1ZklbvJfAJJAwzDih35LxU2fcWbmhPa7EO2DCv/LM1B10GBB/oQB5kvlq4aA2PSIWkqz4
- 3SI5kCPSsygD6wKnbRsvNn2mIACva6VHdm62A7xel5dJRfpQjXj2snd1F/YNoNc66UUTABEB
- AAG0JEJhcnQgVmFuIEFzc2NoZSA8YnZhbmFzc2NoZUBhY20ub3JnPokBOQQTAQIAIwUCVI67
- igIbAwcLCQgHAwIBBhUIAgkKCwQWAgMBAh4BAheAAAoJEHFcPTXFzhAJ8QkH/1AdXblKL65M
- Y1Zk1bYKnkAb4a98LxCPm/pJBilvci6boefwlBDZ2NZuuYWYgyrehMB5H+q+Kq4P0IBbTqTa
- jTPAANn62A6jwJ0FnCn6YaM9TZQjM1F7LoDX3v+oAkaoXuq0dQ4hnxQNu792bi6QyVdZUvKc
- macVFVgfK9n04mL7RzjO3f+X4midKt/s+G+IPr4DGlrq+WH27eDbpUR3aYRk8EgbgGKvQFdD
- CEBFJi+5ZKOArmJVBSk21RHDpqyz6Vit3rjep7c1SN8s7NhVi9cjkKmMDM7KYhXkWc10lKx2
- RTkFI30rkDm4U+JpdAd2+tP3tjGf9AyGGinpzE2XY1K5AQ0EVI67igEIAKiSyd0nECrgz+H5
- PcFDGYQpGDMTl8MOPCKw/F3diXPuj2eql4xSbAdbUCJzk2ETif5s3twT2ER8cUTEVOaCEUY3
- eOiaFgQ+nGLx4BXqqGewikPJCe+UBjFnH1m2/IFn4T9jPZkV8xlkKmDUqMK5EV9n3eQLkn5g
- lco+FepTtmbkSCCjd91EfThVbNYpVQ5ZjdBCXN66CKyJDMJ85HVr5rmXG/nqriTh6cv1l1Js
- T7AFvvPjUPknS6d+BETMhTkbGzoyS+sywEsQAgA+BMCxBH4LvUmHYhpS+W6CiZ3ZMxjO8Hgc
- ++w1mLeRUvda3i4/U8wDT3SWuHcB3DWlcppECLkAEQEAAYkBHwQYAQIACQUCVI67igIbDAAK
- CRBxXD01xc4QCZ4dB/0QrnEasxjM0PGeXK5hcZMT9Eo998alUfn5XU0RQDYdwp6/kMEXMdmT
- oH0F0xB3SQ8WVSXA9rrc4EBvZruWQ+5/zjVrhhfUAx12CzL4oQ9Ro2k45daYaonKTANYG22y
- //x8dLe2Fv1By4SKGhmzwH87uXxbTJAUxiWIi1np0z3/RDnoVyfmfbbL1DY7zf2hYXLLzsJR
- mSsED/1nlJ9Oq5fALdNEPgDyPUerqHxcmIub+pF0AzJoYHK5punqpqfGmqPbjxrJLPJfHVKy
- goMj5DlBMoYqEgpbwdUYkH6QdizJJCur4icy8GUNbisFYABeoJ91pnD4IGei3MTdvINSZI5e
-Message-ID: <639eae70-bb57-0c49-0ae9-aed8d33df271@acm.org>
-Date:   Fri, 8 Nov 2019 19:02:26 -0800
-User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:68.0) Gecko/20100101
- Thunderbird/68.2.0
+        bh=cqZWDexuhPPuiGCF/N9j/OA63pBQXUccM1dtWhxED8s=;
+        b=gPDa0eN08RRQuIlQMmw6eVeDZ2BKpCW+0KG4DhzAVUDQ7JCureifwOssb5Ysu35T+W
+         F5erl+pMCMiMSiHpabdAMh6fHk3sT1q+9ncHfrnCBHm/R/5NFpmSzxlxM298EmMnHu//
+         /L6fGaIRyDv4Y77v3iClKaVv0n6L39hNq5kSqsee3gvcq+rE1XTv0IqgYqrNv7a/elMr
+         YDeQQ/2BtV8//elxHtac4sOJJSljWT3e9qlnBub4RXChJbGhnc+dNjXMS6ibPyjPYbjn
+         kdbxVIapwNSo1B0f5ch1NKiyq03Qoq9IdLWjZd0D1edsskeLUtW4DGNwPkTTg5qx6M0f
+         1d7Q==
+X-Gm-Message-State: APjAAAWOLwVQErBQELxLd29e7jvCqKyWW7GMjgIqFWjq6dAY4WzHDYA7
+        2eG4JhstrEXnj/Ws/j6FN60=
+X-Google-Smtp-Source: APXvYqzm6lQaDL8GCHjpR2Ze9j/wVnAfHcfD50s+ZHQGbSTaI/6f1stKkEdmYD8euEsGgOr8AAgYpg==
+X-Received: by 2002:a2e:9151:: with SMTP id q17mr5304795ljg.156.1573302304417;
+        Sat, 09 Nov 2019 04:25:04 -0800 (PST)
+Received: from [172.31.190.83] ([86.57.146.226])
+        by smtp.gmail.com with ESMTPSA id u5sm4274436ljg.68.2019.11.09.04.25.03
+        (version=TLS1_2 cipher=ECDHE-RSA-AES128-GCM-SHA256 bits=128/128);
+        Sat, 09 Nov 2019 04:25:03 -0800 (PST)
+Subject: Re: [PATCH 3/3] io_uring: add support for backlogged CQ ring
+To:     Jens Axboe <axboe@kernel.dk>, io-uring@vger.kernel.org
+Cc:     linux-block@vger.kernel.org, jannh@google.com
+References: <20191107160043.31725-1-axboe@kernel.dk>
+ <20191107160043.31725-4-axboe@kernel.dk>
+From:   Pavel Begunkov <asml.silence@gmail.com>
+Message-ID: <e9469ed1-dec0-c8ee-ee0a-5e81ee10d1bc@gmail.com>
+Date:   Sat, 9 Nov 2019 15:25:02 +0300
+User-Agent: Mozilla/5.0 (Windows NT 10.0; WOW64; rv:60.0) Gecko/20100101
+ Thunderbird/60.9.0
 MIME-Version: 1.0
-In-Reply-To: <BYAPR04MB5816C442BE08F9973C2CDF15E77A0@BYAPR04MB5816.namprd04.prod.outlook.com>
+In-Reply-To: <20191107160043.31725-4-axboe@kernel.dk>
 Content-Type: text/plain; charset=utf-8
 Content-Language: en-US
 Content-Transfer-Encoding: 7bit
@@ -95,51 +76,224 @@ Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-On 2019-11-08 18:54, Damien Le Moal wrote:
-> On 2019/11/09 4:06, Bart Van Assche wrote:
->> On 11/7/19 5:57 PM, Damien Le Moal wrote:
->>> -	buf = vzalloc(bufsize);
->>> -	if (buf)
->>> -		*buflen = bufsize;
->>> +	while (bufsize >= SECTOR_SIZE) {
->>> +		buf = vzalloc(bufsize);
->>> +		if (buf) {
->>> +			*buflen = bufsize;
->>> +			return buf;
->>> +		}
->>> +		bufsize >>= 1;
->>> +	}
->>
->> Hi Damien,
->>
->> Has it been considered to pass the __GFP_NORETRY flag to this vzalloc() 
->> call?
+On 11/7/2019 7:00 PM, Jens Axboe wrote:
+> Currently we drop completion events, if the CQ ring is full. That's fine
+> for requests with bounded completion times, but it may make it harder to
+> use io_uring with networked IO where request completion times are
+> generally unbounded. Or with POLL, for example, which is also unbounded.
 > 
-> Do you mean using
+> This patch adds IORING_SETUP_CQ_NODROP, which changes the behavior a bit
+> for CQ ring overflows. First of all, it doesn't overflow the ring, it
+> simply stores a backlog of completions that we weren't able to put into
+> the CQ ring. To prevent the backlog from growing indefinitely, if the
+> backlog is non-empty, we apply back pressure on IO submissions. Any
+> attempt to submit new IO with a non-empty backlog will get an -EBUSY
+> return from the kernel. This is a signal to the application that it has
+> backlogged CQ events, and that it must reap those before being allowed
+> to submit more IO.>
+> Signed-off-by: Jens Axboe <axboe@kernel.dk>
+> ---
+>  fs/io_uring.c                 | 103 ++++++++++++++++++++++++++++------
+>  include/uapi/linux/io_uring.h |   1 +
+>  2 files changed, 87 insertions(+), 17 deletions(-)
 > 
-> __vmalloc(bufsize,
-> 	  GFP_KERNEL | __GFP_ZERO | __GFP_NORETRY, PAGE_KERNEL);
+> diff --git a/fs/io_uring.c b/fs/io_uring.c
+> index f69d9794ce17..ff0f79a57f7b 100644
+> --- a/fs/io_uring.c
+> +++ b/fs/io_uring.c
+> @@ -207,6 +207,7 @@ struct io_ring_ctx {
+>  
+>  		struct list_head	defer_list;
+>  		struct list_head	timeout_list;
+> +		struct list_head	cq_overflow_list;
+>  
+>  		wait_queue_head_t	inflight_wait;
+>  	} ____cacheline_aligned_in_smp;
+> @@ -414,6 +415,7 @@ static struct io_ring_ctx *io_ring_ctx_alloc(struct io_uring_params *p)
+>  
+>  	ctx->flags = p->flags;
+>  	init_waitqueue_head(&ctx->cq_wait);
+> +	INIT_LIST_HEAD(&ctx->cq_overflow_list);
+>  	init_completion(&ctx->ctx_done);
+>  	init_completion(&ctx->sqo_thread_started);
+>  	mutex_init(&ctx->uring_lock);
+> @@ -588,6 +590,72 @@ static struct io_uring_cqe *io_get_cqring(struct io_ring_ctx *ctx)
+>  	return &rings->cqes[tail & ctx->cq_mask];
+>  }
+>  
+> +static void io_cqring_ev_posted(struct io_ring_ctx *ctx)
+> +{
+> +	if (waitqueue_active(&ctx->wait))
+> +		wake_up(&ctx->wait);
+> +	if (waitqueue_active(&ctx->sqo_wait))
+> +		wake_up(&ctx->sqo_wait);
+> +	if (ctx->cq_ev_fd)
+> +		eventfd_signal(ctx->cq_ev_fd, 1);
+> +}
+> +
+> +static void io_cqring_overflow_flush(struct io_ring_ctx *ctx, bool force)
+> +{
+> +	struct io_rings *rings = ctx->rings;
+> +	struct io_uring_cqe *cqe;
+> +	struct io_kiocb *req;
+> +	unsigned long flags;
+> +	LIST_HEAD(list);
+> +
+> +	if (list_empty_careful(&ctx->cq_overflow_list))
+> +		return;
+> +	if (ctx->cached_cq_tail - READ_ONCE(rings->cq.head) ==
+> +	    rings->cq_ring_entries)
+> +		return;
+> +
+> +	spin_lock_irqsave(&ctx->completion_lock, flags);
+> +
+> +	while (!list_empty(&ctx->cq_overflow_list)) {
+> +		cqe = io_get_cqring(ctx);
+> +		if (!cqe && !force)
+> +			break;> +
+> +		req = list_first_entry(&ctx->cq_overflow_list, struct io_kiocb,
+> +						list);
+> +		list_move(&req->list, &list);
+> +		if (cqe) {
+> +			WRITE_ONCE(cqe->user_data, req->user_data);
+> +			WRITE_ONCE(cqe->res, req->result);
+> +			WRITE_ONCE(cqe->flags, 0);
+> +		}
+
+Hmm, second thought. We should account overflow here.
+
+> +	}
+> +
+> +	io_commit_cqring(ctx);
+> +	spin_unlock_irqrestore(&ctx->completion_lock, flags);
+> +	io_cqring_ev_posted(ctx);
+> +
+> +	while (!list_empty(&list)) {
+> +		req = list_first_entry(&list, struct io_kiocb, list);
+> +		list_del(&req->list);
+> +		io_put_req(req, NULL);
+> +	}
+> +}
+> +
+> +static void io_cqring_overflow(struct io_ring_ctx *ctx, struct io_kiocb *req,
+> +			       long res)
+> +	__must_hold(&ctx->completion_lock)
+> +{
+> +	if (!(ctx->flags & IORING_SETUP_CQ_NODROP)) {
+> +		WRITE_ONCE(ctx->rings->cq_overflow,
+> +				atomic_inc_return(&ctx->cached_cq_overflow));
+> +	} else {
+> +		refcount_inc(&req->refs);
+> +		req->result = res;
+> +		list_add_tail(&req->list, &ctx->cq_overflow_list);
+> +	}
+> +}
+> +
+>  static void io_cqring_fill_event(struct io_kiocb *req, long res)
+>  {
+>  	struct io_ring_ctx *ctx = req->ctx;
+> @@ -601,26 +669,15 @@ static void io_cqring_fill_event(struct io_kiocb *req, long res)
+>  	 * the ring.
+>  	 */
+>  	cqe = io_get_cqring(ctx);
+> -	if (cqe) {
+> +	if (likely(cqe)) {
+>  		WRITE_ONCE(cqe->user_data, req->user_data);
+>  		WRITE_ONCE(cqe->res, res);
+>  		WRITE_ONCE(cqe->flags, 0);
+>  	} else {
+> -		WRITE_ONCE(ctx->rings->cq_overflow,
+> -				atomic_inc_return(&ctx->cached_cq_overflow));
+> +		io_cqring_overflow(ctx, req, res);
+>  	}
+>  }
+>  
+> -static void io_cqring_ev_posted(struct io_ring_ctx *ctx)
+> -{
+> -	if (waitqueue_active(&ctx->wait))
+> -		wake_up(&ctx->wait);
+> -	if (waitqueue_active(&ctx->sqo_wait))
+> -		wake_up(&ctx->sqo_wait);
+> -	if (ctx->cq_ev_fd)
+> -		eventfd_signal(ctx->cq_ev_fd, 1);
+> -}
+> -
+>  static void io_cqring_add_event(struct io_kiocb *req, long res)
+>  {
+>  	struct io_ring_ctx *ctx = req->ctx;
+> @@ -877,6 +934,9 @@ static unsigned io_cqring_events(struct io_ring_ctx *ctx)
+>  {
+>  	struct io_rings *rings = ctx->rings;
+>  
+> +	if (ctx->flags & IORING_SETUP_CQ_NODROP)
+> +		io_cqring_overflow_flush(ctx, false);
+> +
+>  	/* See comment at the top of this file */
+>  	smp_rmb();
+>  	return READ_ONCE(rings->cq.tail) - READ_ONCE(rings->cq.head);
+> @@ -2876,6 +2936,10 @@ static int io_submit_sqes(struct io_ring_ctx *ctx, unsigned int nr,
+>  	int i, submitted = 0;
+>  	bool mm_fault = false;
+>  
+> +	if ((ctx->flags & IORING_SETUP_CQ_NODROP) &&
+> +	    !list_empty(&ctx->cq_overflow_list))
+> +		return -EBUSY;
+> +
+>  	if (nr > IO_PLUG_THRESHOLD) {
+>  		io_submit_state_start(&state, ctx, nr);
+>  		statep = &state;
+> @@ -2967,6 +3031,7 @@ static int io_sq_thread(void *data)
+>  	timeout = inflight = 0;
+>  	while (!kthread_should_park()) {
+>  		unsigned int to_submit;
+> +		int ret;
+>  
+>  		if (inflight) {
+>  			unsigned nr_events = 0;
+> @@ -3051,8 +3116,9 @@ static int io_sq_thread(void *data)
+>  		}
+>  
+>  		to_submit = min(to_submit, ctx->sq_entries);
+> -		inflight += io_submit_sqes(ctx, to_submit, NULL, -1, &cur_mm,
+> -					   true);
+> +		ret = io_submit_sqes(ctx, to_submit, NULL, -1, &cur_mm, true);
+> +		if (ret > 0)
+> +			inflight += ret;
+>  	}
+>  
+>  	set_fs(old_fs);
+> @@ -4116,8 +4182,10 @@ static int io_uring_flush(struct file *file, void *data)
+>  	struct io_ring_ctx *ctx = file->private_data;
+>  
+>  	io_uring_cancel_files(ctx, data);
+> -	if (fatal_signal_pending(current) || (current->flags & PF_EXITING))
+> +	if (fatal_signal_pending(current) || (current->flags & PF_EXITING)) {
+> +		io_cqring_overflow_flush(ctx, true);
+>  		io_wq_cancel_all(ctx->io_wq);
+> +	}
+>  	return 0;
+>  }
+>  
+> @@ -4418,7 +4486,8 @@ static long io_uring_setup(u32 entries, struct io_uring_params __user *params)
+>  	}
+>  
+>  	if (p.flags & ~(IORING_SETUP_IOPOLL | IORING_SETUP_SQPOLL |
+> -			IORING_SETUP_SQ_AFF | IORING_SETUP_CQSIZE))
+> +			IORING_SETUP_SQ_AFF | IORING_SETUP_CQSIZE |
+> +			IORING_SETUP_CQ_NODROP))
+>  		return -EINVAL;
+>  
+>  	ret = io_uring_create(entries, &p);
+> diff --git a/include/uapi/linux/io_uring.h b/include/uapi/linux/io_uring.h
+> index f1a118b01d18..3d8517eb376e 100644
+> --- a/include/uapi/linux/io_uring.h
+> +++ b/include/uapi/linux/io_uring.h
+> @@ -56,6 +56,7 @@ struct io_uring_sqe {
+>  #define IORING_SETUP_SQPOLL	(1U << 1)	/* SQ poll thread */
+>  #define IORING_SETUP_SQ_AFF	(1U << 2)	/* sq_thread_cpu is valid */
+>  #define IORING_SETUP_CQSIZE	(1U << 3)	/* app defines CQ size */
+> +#define IORING_SETUP_CQ_NODROP	(1U << 4)	/* no CQ drops */
+>  
+>  #define IORING_OP_NOP		0
+>  #define IORING_OP_READV		1
 > 
-> instead of vzalloc() ? (since we cannot pass GFP flags to vzalloc()...)
-> 
-> Note that this is called with GFP_NOIO set for the caller context in the
-> case of revalidate zones, and default to GFP_KERNEL for
-> blkdev_report_zones() unless the caller also tweaks the context memalloc
-> flags.
-
-Hi Damien,
-
-Yes, that's what I meant. The following comment from mm/util.c explains
-why __GFP_RETRY should be used if it is OK for an allocation to fail:
-
-/*
- * We want to attempt a large physically contiguous block first because
- * it is less likely to fragment multiple larger blocks and therefore
- * contribute to a long term fragmentation less than vmalloc fallback.
- * However make sure that larger requests are not too disruptive - no
- * OOM killer and no allocation failure warnings as we have a fallback.
- */
-
-Thanks,
-
-Bart.
