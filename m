@@ -2,78 +2,108 @@ Return-Path: <SRS0=JPMG=ZC=vger.kernel.org=linux-block-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-0.4 required=3.0 tests=FROM_LOCAL_HEX,
+X-Spam-Status: No, score=-2.2 required=3.0 tests=DKIM_SIGNED,DKIM_VALID,
 	HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,
-	URIBL_BLOCKED autolearn=no autolearn_force=no version=3.4.0
+	URIBL_BLOCKED,USER_AGENT_SANE_1 autolearn=no autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 7F6A1C43331
-	for <linux-block@archiver.kernel.org>; Sun, 10 Nov 2019 11:49:05 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id B6D3BC17442
+	for <linux-block@archiver.kernel.org>; Sun, 10 Nov 2019 15:46:13 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.kernel.org (Postfix) with ESMTP id 5F6DE21655
-	for <linux-block@archiver.kernel.org>; Sun, 10 Nov 2019 11:49:05 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id 8AD8920854
+	for <linux-block@archiver.kernel.org>; Sun, 10 Nov 2019 15:46:13 +0000 (UTC)
+Authentication-Results: mail.kernel.org;
+	dkim=pass (2048-bit key) header.d=kernel-dk.20150623.gappssmtp.com header.i=@kernel-dk.20150623.gappssmtp.com header.b="iT76+jqd"
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1726857AbfKJLtE (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Sun, 10 Nov 2019 06:49:04 -0500
-Received: from mail-il1-f200.google.com ([209.85.166.200]:55080 "EHLO
-        mail-il1-f200.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1726684AbfKJLtD (ORCPT
+        id S1726893AbfKJPqM (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Sun, 10 Nov 2019 10:46:12 -0500
+Received: from mail-pg1-f195.google.com ([209.85.215.195]:44425 "EHLO
+        mail-pg1-f195.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S1726723AbfKJPqM (ORCPT
         <rfc822;linux-block@vger.kernel.org>);
-        Sun, 10 Nov 2019 06:49:03 -0500
-Received: by mail-il1-f200.google.com with SMTP id t67so13678533ill.21
-        for <linux-block@vger.kernel.org>; Sun, 10 Nov 2019 03:49:01 -0800 (PST)
+        Sun, 10 Nov 2019 10:46:12 -0500
+Received: by mail-pg1-f195.google.com with SMTP id f19so7533889pgk.11
+        for <linux-block@vger.kernel.org>; Sun, 10 Nov 2019 07:46:10 -0800 (PST)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=kernel-dk.20150623.gappssmtp.com; s=20150623;
+        h=subject:to:references:from:message-id:date:user-agent:mime-version
+         :in-reply-to:content-language:content-transfer-encoding;
+        bh=2GQxyegm0e037btzeEVrHaTSoeZSraQmKEF2HPtcINM=;
+        b=iT76+jqdNNWdjCQpvuTo3yccQOGR0HF+Vv8uFc80bOjg5+6/QCNi9N4XCDxrlmtZQZ
+         jTDXAvm6Ni5EyKsKAO64wIdHFKHZfVHypp/Akr4g0KVcgTuC1g+F2b1RAQsbzb9j20LF
+         iOybYFb60Cb2ex2uQ8h6ecwW9fS8Yumwkr8OArCiwjoT/GP6QXb7TYFGn9of+RMjRwmL
+         Z7tIFtXCBDI4bs0FHdfquiMmEJdYS1kbWI9beyWOK93RQa9p5Ifj+b3wARLX2xhL/hXQ
+         //Wv7q/9XFN8ofBdUy24esQtUFUCQq7sadQtnaxWYlIqrdP341tJ1WUFT/u2T8Fk8Uni
+         QCoA==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=1e100.net; s=20161025;
-        h=x-gm-message-state:mime-version:date:in-reply-to:message-id:subject
-         :from:to;
-        bh=muS40/M+U7unS7Nwdhba7+0opY/I2Z2pZGBBgPUq8C0=;
-        b=SM9W4ri+TrRAR/2Vm1zZjpKmtaAQARuKrBsSA5LnZr9TYVBPTSDMrnOcmObURfxDDm
-         oCN6nh0BO9imIOLOtlMtxnBKL2g+MmztUvBxAhQ7uoOUo40Pguk6v2QABi1f14vxbZ3U
-         Ls2tEhCiDMedCxb7Q25TRmnQWB8ziNcPObdYtDKuPx9at3l/mgyOYz6EBZRih+QEcBFa
-         gHWTqCQ7mk4HyutCSRbyNkHdV0/9bg7Kl8phvtFQSMvJva0Z5uhg/23aL7tZhCHS1l0d
-         C4qhwCYBdh0u/RtYSICsElZCHMVFhOdvSPRWjFkb54sIRPVa2yONPI5zr97/HlGnoJYy
-         gq8Q==
-X-Gm-Message-State: APjAAAUBxa/wnKx+InnW3fdXFgmq5sS0b6CiiL7Oas9CAcNlx1xLoNZL
-        KsmEo9fmyhTC4cvtypt1Zy0C6dn29YMsf6YJR9ZIqZz138AG
-X-Google-Smtp-Source: APXvYqwG7iOuXUzrPn9C7IQw34I7LSwhAIRpMFyONIfQ9Z8ZWhdhx/QqVwYg/S2UFNW58oOzV3uQTeJdrwTJ/Pza/72hGbJAuyfE
-MIME-Version: 1.0
-X-Received: by 2002:a92:16d4:: with SMTP id 81mr24840022ilw.198.1573386541143;
- Sun, 10 Nov 2019 03:49:01 -0800 (PST)
-Date:   Sun, 10 Nov 2019 03:49:01 -0800
-In-Reply-To: <0000000000003659ef0596fa4cae@google.com>
-X-Google-Appengine-App-Id: s~syzkaller
-X-Google-Appengine-App-Id-Alias: syzkaller
-Message-ID: <000000000000e11df90596fc9955@google.com>
+        h=x-gm-message-state:subject:to:references:from:message-id:date
+         :user-agent:mime-version:in-reply-to:content-language
+         :content-transfer-encoding;
+        bh=2GQxyegm0e037btzeEVrHaTSoeZSraQmKEF2HPtcINM=;
+        b=llCRoDtJC9ETJV9+auDIqWpru1TdbHXoHHUWa9vNW9G74Mja4+A//5YVPcRRrrsbTJ
+         nQaOwfyevoNNwqE013A4NKw1h7Gai7aoSZUIwZOi9z64fXxVMTp0H7yK+l38rTSncanE
+         0fiBdCxzlzxqAFDKrvJ1Xtlc4+2J7gHqJ1IMqBhmTWiR8kxxBG85XsodmL2sBj+fzaNj
+         GItekQP0M8KmohYfZmVFUnqtkWv/GF6bmt10HjFJNC89KOM9L42KBNn+Snal+Fi+hPG7
+         EjibJkZmQ2ItREbFM4NYFUsAo/arv0dI0cXmRzfDO5TZsrOIx9iqCES8Khc2a9a0SI/q
+         9xbw==
+X-Gm-Message-State: APjAAAUSPzbizrWbyBFQpW24VIoUd/CgJSuDVssUKvkxO4FRulUbKZGv
+        UF6jp3tjrWr4bol8cc6vgp+wsh6pwkY=
+X-Google-Smtp-Source: APXvYqxavNec6jVy0ssikQL5rcqDsZqRzOK/WiO6T6ozJAH7dR1eaCKDtNe/a15zS8npgO7vYxaorA==
+X-Received: by 2002:aa7:9295:: with SMTP id j21mr7289159pfa.50.1573400769979;
+        Sun, 10 Nov 2019 07:46:09 -0800 (PST)
+Received: from [192.168.1.188] ([66.219.217.79])
+        by smtp.gmail.com with ESMTPSA id j126sm13804259pfg.4.2019.11.10.07.46.07
+        (version=TLS1_2 cipher=ECDHE-RSA-AES128-GCM-SHA256 bits=128/128);
+        Sun, 10 Nov 2019 07:46:08 -0800 (PST)
 Subject: Re: KASAN: invalid-free in io_sqe_files_unregister
-From:   syzbot <syzbot+3254bc44113ae1e331ee@syzkaller.appspotmail.com>
-To:     axboe@kernel.dk, io-uring@vger.kernel.org,
-        linux-block@vger.kernel.org, linux-fsdevel@vger.kernel.org,
-        linux-kernel@vger.kernel.org, syzkaller-bugs@googlegroups.com,
-        viro@zeniv.linux.org.uk
-Content-Type: text/plain; charset="UTF-8"; format=flowed; delsp=yes
+To:     syzbot <syzbot+3254bc44113ae1e331ee@syzkaller.appspotmail.com>,
+        io-uring@vger.kernel.org, linux-block@vger.kernel.org,
+        linux-fsdevel@vger.kernel.org, linux-kernel@vger.kernel.org,
+        syzkaller-bugs@googlegroups.com, viro@zeniv.linux.org.uk
+References: <000000000000e11df90596fc9955@google.com>
+From:   Jens Axboe <axboe@kernel.dk>
+Message-ID: <e3ed8352-23ca-246d-088c-878f9da82c76@kernel.dk>
+Date:   Sun, 10 Nov 2019 08:46:06 -0700
+User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:60.0) Gecko/20100101
+ Thunderbird/60.9.0
+MIME-Version: 1.0
+In-Reply-To: <000000000000e11df90596fc9955@google.com>
+Content-Type: text/plain; charset=utf-8
+Content-Language: en-US
+Content-Transfer-Encoding: 7bit
 Sender: linux-block-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-syzbot has bisected this bug to:
+On 11/10/19 4:49 AM, syzbot wrote:
+> syzbot has bisected this bug to:
+> 
+> commit 65e19f54d29cd8559ce60cfd0d751bef7afbdc5c
+> Author: Jens Axboe <axboe@kernel.dk>
+> Date:   Sat Oct 26 13:20:21 2019 +0000
+> 
+>       io_uring: support for larger fixed file sets
+> 
+> bisection log:  https://syzkaller.appspot.com/x/bisect.txt?x=154f483ce00000
+> start commit:   5591cf00 Add linux-next specific files for 20191108
+> git tree:       linux-next
+> final crash:    https://syzkaller.appspot.com/x/report.txt?x=174f483ce00000
+> console output: https://syzkaller.appspot.com/x/log.txt?x=134f483ce00000
+> kernel config:  https://syzkaller.appspot.com/x/.config?x=e1036c6ef52866f9
+> dashboard link: https://syzkaller.appspot.com/bug?extid=3254bc44113ae1e331ee
+> syz repro:      https://syzkaller.appspot.com/x/repro.syz?x=116bb33ae00000
+> C reproducer:   https://syzkaller.appspot.com/x/repro.c?x=173f133ae00000
+> 
+> Reported-by: syzbot+3254bc44113ae1e331ee@syzkaller.appspotmail.com
+> Fixes: 65e19f54d29c ("io_uring: support for larger fixed file sets")
+> 
+> For information about bisection process see: https://goo.gl/tpsmEJ#bisection
 
-commit 65e19f54d29cd8559ce60cfd0d751bef7afbdc5c
-Author: Jens Axboe <axboe@kernel.dk>
-Date:   Sat Oct 26 13:20:21 2019 +0000
+Thanks, I queued up a fix:
 
-     io_uring: support for larger fixed file sets
+https://git.kernel.dk/cgit/linux-block/commit/?h=for-5.5/io_uring&id=fc2a85cb02efd7bdbd09ea5d2d9847937da7bff7
 
-bisection log:  https://syzkaller.appspot.com/x/bisect.txt?x=154f483ce00000
-start commit:   5591cf00 Add linux-next specific files for 20191108
-git tree:       linux-next
-final crash:    https://syzkaller.appspot.com/x/report.txt?x=174f483ce00000
-console output: https://syzkaller.appspot.com/x/log.txt?x=134f483ce00000
-kernel config:  https://syzkaller.appspot.com/x/.config?x=e1036c6ef52866f9
-dashboard link: https://syzkaller.appspot.com/bug?extid=3254bc44113ae1e331ee
-syz repro:      https://syzkaller.appspot.com/x/repro.syz?x=116bb33ae00000
-C reproducer:   https://syzkaller.appspot.com/x/repro.c?x=173f133ae00000
+-- 
+Jens Axboe
 
-Reported-by: syzbot+3254bc44113ae1e331ee@syzkaller.appspotmail.com
-Fixes: 65e19f54d29c ("io_uring: support for larger fixed file sets")
-
-For information about bisection process see: https://goo.gl/tpsmEJ#bisection
