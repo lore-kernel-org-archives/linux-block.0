@@ -2,131 +2,104 @@ Return-Path: <SRS0=2XXV=ZD=vger.kernel.org=linux-block-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-3.9 required=3.0 tests=DKIMWL_WL_HIGH,DKIM_SIGNED,
-	DKIM_VALID,DKIM_VALID_AU,HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,
-	SPF_HELO_NONE,SPF_PASS,USER_AGENT_GIT autolearn=no autolearn_force=no
+X-Spam-Status: No, score=-9.6 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
+	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,
+	SPF_HELO_NONE,SPF_PASS,USER_AGENT_GIT autolearn=ham autolearn_force=no
 	version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 398F0C43331
-	for <linux-block@archiver.kernel.org>; Mon, 11 Nov 2019 19:01:53 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id A41A1C43331
+	for <linux-block@archiver.kernel.org>; Mon, 11 Nov 2019 20:06:39 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.kernel.org (Postfix) with ESMTP id 0E6122245B
-	for <linux-block@archiver.kernel.org>; Mon, 11 Nov 2019 19:01:53 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id 6C3192184C
+	for <linux-block@archiver.kernel.org>; Mon, 11 Nov 2019 20:06:39 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=pass (1024-bit key) header.d=chromium.org header.i=@chromium.org header.b="TJG431fn"
+	dkim=fail reason="signature verification failed" (2048-bit key) header.d=wdc.com header.i=@wdc.com header.b="Zpj69B1x"
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1728969AbfKKTBw (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Mon, 11 Nov 2019 14:01:52 -0500
-Received: from mail-pg1-f193.google.com ([209.85.215.193]:35883 "EHLO
-        mail-pg1-f193.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1729241AbfKKSun (ORCPT
+        id S1726979AbfKKUGi (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Mon, 11 Nov 2019 15:06:38 -0500
+Received: from esa1.hgst.iphmx.com ([68.232.141.245]:28439 "EHLO
+        esa1.hgst.iphmx.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S1726845AbfKKUGi (ORCPT
         <rfc822;linux-block@vger.kernel.org>);
-        Mon, 11 Nov 2019 13:50:43 -0500
-Received: by mail-pg1-f193.google.com with SMTP id k13so10003168pgh.3
-        for <linux-block@vger.kernel.org>; Mon, 11 Nov 2019 10:50:42 -0800 (PST)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=chromium.org; s=google;
-        h=from:to:cc:subject:date:message-id:mime-version
-         :content-transfer-encoding;
-        bh=SqHuH+O1ZtrNaMwGovrIH7hD1eYbuecwgYp3TILG6e4=;
-        b=TJG431fn1FQazvBV6Wgeh1D1wZrDk14udOcQWLRSZYNozaF4BCdB3j2A0utl5FXPFt
-         NgTBU+vR/As+hZEKwnhqOjqj+szVkfsP89rSv7JbOcPAdAv1yAmmE5/QW3sJq4JAEBpZ
-         2kqULMCOeTgNBVUSkKn4qxCkgV0hofZMUgKCk=
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20161025;
-        h=x-gm-message-state:from:to:cc:subject:date:message-id:mime-version
-         :content-transfer-encoding;
-        bh=SqHuH+O1ZtrNaMwGovrIH7hD1eYbuecwgYp3TILG6e4=;
-        b=WPn+K9hcpNtSbcoy/yk1ITC52vuSTa6A8RgfL9XNp6lIlda5sGTDDuaDMaHJ+7Aki8
-         A2puyWsO9pJX20xnCbDH3dj6XDz8J9BZKQlyfpQmVMxw2awRQHR2+WTopA0Ge4oTlNxi
-         tEgUdc28t1HzHg5lC9YXn0KqP/EyM0RQS/mErL/Orbtuwe65VBZWWSnlVIzBXQxZ4T6j
-         NI4B8HTFVd0jlC1o5jqP3hzINh11nf3MAe1NRl8Is13C89Og4Bxe85/dd1YmMKgFS+Ax
-         UkXF1+3Y8OMulQ23lwqat3MeBbxlXvqz4TVp1O5JJPPSGTi6kiQJ5FfACoS1e6OV+Fov
-         SzrQ==
-X-Gm-Message-State: APjAAAUX0uhHuZ+B7jxLiKbuHnDiZXEMkimPfnv4l/BEZn7lu2RjQcFr
-        8RNd4vFvyVWpNEgbytuT0OY05A==
-X-Google-Smtp-Source: APXvYqzgUhSewfB+4TJd+kX8NbecYhFiDmQoSYio8sWbACFZFKCrIXhdmbochMPYaHa6i8+pBxCOyg==
-X-Received: by 2002:aa7:9189:: with SMTP id x9mr4439687pfa.41.1573498242139;
-        Mon, 11 Nov 2019 10:50:42 -0800 (PST)
-Received: from evgreen2.mtv.corp.google.com ([2620:15c:202:201:ffda:7716:9afc:1301])
-        by smtp.gmail.com with ESMTPSA id v63sm15220971pfb.181.2019.11.11.10.50.40
-        (version=TLS1_2 cipher=ECDHE-RSA-AES128-SHA bits=128/128);
-        Mon, 11 Nov 2019 10:50:41 -0800 (PST)
-From:   Evan Green <evgreen@chromium.org>
-To:     Jens Axboe <axboe@kernel.dk>,
-        Martin K Petersen <martin.petersen@oracle.com>
-Cc:     Gwendal Grignou <gwendal@chromium.org>,
-        Ming Lei <ming.lei@redhat.com>,
-        "Darrick J . Wong" <darrick.wong@oracle.com>,
-        Alexis Savery <asavery@chromium.org>,
-        Douglas Anderson <dianders@chromium.org>,
-        Bart Van Assche <bvanassche@acm.org>,
-        Evan Green <evgreen@chromium.org>, linux-block@vger.kernel.org,
-        linux-kernel@vger.kernel.org
-Subject: [PATCH v6 0/2] loop: Better discard for block devices
-Date:   Mon, 11 Nov 2019 10:50:28 -0800
-Message-Id: <20191111185030.215451-1-evgreen@chromium.org>
-X-Mailer: git-send-email 2.21.0
+        Mon, 11 Nov 2019 15:06:38 -0500
+DKIM-Signature: v=1; a=rsa-sha256; c=simple/simple;
+  d=wdc.com; i=@wdc.com; q=dns/txt; s=dkim.wdc.com;
+  t=1573502798; x=1605038798;
+  h=from:to:cc:subject:date:message-id:mime-version:
+   content-transfer-encoding;
+  bh=44eknWJyDEPhKc2xiOjlO9fkpUOHY6ARx+9XVvvmia4=;
+  b=Zpj69B1x5hOI6SVFPCDOo2JbeLqsIwnsSqtaosAhC3jwKd6xpVYmV/x8
+   Yfhdb/0t2mQH1qK4asDOLkWEhIYxdmHYda2A76EeIMTwj64jthXgUMvah
+   PXTYQgUVvSm1ooHZCK9JGT7lNQGXL6FkzsDiOVCy5GjRYdfXiRUTZSBly
+   Agy4/p/GxLphJSkEyWdnXLD5RqkPwIDBaSiqGJ9ElQIvoLiUOKAtGXwWv
+   4P/nK1p17GXS0jyUxW9cV1j1ybkwwgwTQzsPqyQbHrOfrdwQD1UycR1RF
+   r0J0T143mofCekmc2YKvRFcLGIuNQk+Gem5IQBrpW/kceDVLOmiNFtDsQ
+   g==;
+IronPort-SDR: v1YYr8JpppbLtrj/uKWuUOD42yY/4kiOZZ5/nKxc0hbBdNL5xoAVZvZuBVDt1ClSeTOFDisalw
+ mxiNpOHrjrqAz0OF02x324/eXo0CCSFnYCXFz6s4u+y+4TMW62tN4ATKxIS2rhUpaIztPVaWq1
+ /5K8GWVPEjAy7HCbHURcsJ7YP8j1hN6a8RAZBK5pIFk4dl4uw58ntJ2Ao5mMYvtquUqibuh5UZ
+ FUEU5gJGZE1CMMN0K9vn1oYXQjtBaLb15R50PlDni91ZlIbpxL31+4USsZXnxxZxCYfbhJoq59
+ PXE=
+X-IronPort-AV: E=Sophos;i="5.68,293,1569254400"; 
+   d="scan'208";a="229987721"
+Received: from uls-op-cesaip02.wdc.com (HELO uls-op-cesaep02.wdc.com) ([199.255.45.15])
+  by ob1.hgst.iphmx.com with ESMTP; 12 Nov 2019 04:06:19 +0800
+IronPort-SDR: xZrSfT0uG4bhEWesn748A89y7nhvB1ILuY2rsWzCWlSFrmo1IYR2LSrgTF6g2tSoFMar0UWx56
+ 4PbmsmO1NzIaSm+AX8pNz7jzm6vmVpASKL/RRsLIeFlmpTBqp0oLtK74zA/dhXybDiyM6dTMS7
+ KI24UUFy154fu47MSLkkz9X89FP13zIjSV8Oz6Bwkn94Pj12TLwFfHokOcEtsfQVB0a53sCXXJ
+ DeY9/gXk+NaiDKw2YApi6n3vlL3OaLMM1TqwPA9zDaxrbFDitGkGZXkEJGw4hjVy8Hwfz6hlS+
+ 7uNFP542029QiTWcoHrzG4BU
+Received: from uls-op-cesaip01.wdc.com ([10.248.3.36])
+  by uls-op-cesaep02.wdc.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 11 Nov 2019 12:01:22 -0800
+IronPort-SDR: wlDLW//PQwC1HTcgghn00C1M68A7LP53O32yx/HIGQh4M2b/yyBzBN5pTX6zZ+9mdh0aOn1v85
+ Dta9WmV83KC9fefyvaBMgNnuPuY7TZbGH6Z2Q04ovtBXiDKah/h72RnYHeYE4Nkwh//nCqzCqJ
+ pkuW/SEPx7rCMItdj24vqo9nmT7hMyUxpTmKfYJxzfEHrfSlYrxzT8AF0KKztY0D//9pkh6nAd
+ lMCXGjurm5d7aSItsIciIfpe8hncqCZxQJT3MVzhzkBdYA4UYFxGua+nX7e3IzpafLKNb7Xyci
+ oro=
+WDCIronportException: Internal
+Received: from ioprio.labspan.wdc.com (HELO ioprio.sc.wdc.com) ([10.6.139.89])
+  by uls-op-cesaip01.wdc.com with ESMTP; 11 Nov 2019 12:06:19 -0800
+From:   Chaitanya Kulkarni <chaitanya.kulkarni@wdc.com>
+To:     linux-block@vger.kernel.org
+Cc:     axboe@kernel.dk, Chaitanya Kulkarni <chaitanya.kulkarni@wdc.com>
+Subject: [PATCH] io_uring: fix compilation warning
+Date:   Mon, 11 Nov 2019 11:02:28 -0800
+Message-Id: <1573498948-27573-1-git-send-email-chaitanya.kulkarni@wdc.com>
+X-Mailer: git-send-email 1.8.3.1
 MIME-Version: 1.0
+Content-Type: text/plain; charset=UTF-8
 Content-Transfer-Encoding: 8bit
 Sender: linux-block-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-This series addresses some errors seen when using the loop
-device directly backed by a block device. The first change plumbs
-out the correct error message, and the second change prevents the
-error from occurring in many cases.
+This patch fixes following compilation warning :-
 
-The errors look like this:
-[   90.880875] print_req_error: I/O error, dev loop5, sector 0
+fs/io_uring.c: In function ‘io_uring_cancel_files’:
+fs/io_uring.c:4280:25: warning: unused variable ‘cancel_req’
+[-Wunused-variable]
+  struct io_kiocb *req, *cancel_req;
+                           ^~~~~~~~~~
+Fixes: 93ef402a2272 ("io_uring: don't do flush cancel under inflight_lock")
+Signed-off-by: Chaitanya Kulkarni <chaitanya.kulkarni@wdc.com>
+---
+ fs/io_uring.c | 2 +-
+ 1 file changed, 1 insertion(+), 1 deletion(-)
 
-The errors occur when trying to do a discard or write zeroes operation
-on a loop device backed by a block device that does not support write zeroes.
-Firstly, the error itself is incorrectly reported as I/O error, but is
-actually EOPNOTSUPP. The first patch plumbs out EOPNOTSUPP to properly
-report the error.
-
-The second patch prevents these errors from occurring by mirroring the
-zeroing capabilities of the underlying block device into the loop device.
-Before this change, discard was always reported as being supported, and
-the loop device simply turns around and does an fallocate operation on the
-backing device. After this change, backing block devices that do support
-zeroing will continue to work as before, and continue to get all the
-benefits of doing that. Backing devices that do not support zeroing will
-fail earlier, avoiding hitting the loop device at all and ultimately
-avoiding this error in the logs.
-
-I can also confirm that this fixes test block/003 in the blktests, when
-running blktests on a loop device backed by a block device.
-
-Darrick, I see you've got a related change in linux-next. I'm not sure what
-the status of that is, so I didn't base my latest spin on top of yours.
-
-Changes in v6:
-- Updated tags
-
-Changes in v5:
-- Don't mirror discard if lo_encrypt_key_size is non-zero (Gwendal)
-
-Changes in v4:
-- Mirror blkdev's write_zeroes into loopdev's discard_sectors.
-
-Changes in v3:
-- Updated tags
-- Updated commit description
-
-Changes in v2:
-- Unnested error if statement (Bart)
-
-Evan Green (2):
-  loop: Report EOPNOTSUPP properly
-  loop: Better discard support for block devices
-
- drivers/block/loop.c | 66 +++++++++++++++++++++++++++++---------------
- 1 file changed, 44 insertions(+), 22 deletions(-)
-
+diff --git a/fs/io_uring.c b/fs/io_uring.c
+index 283c1ba..55f3dfe 100644
+--- a/fs/io_uring.c
++++ b/fs/io_uring.c
+@@ -4277,7 +4277,7 @@ static int io_uring_release(struct inode *inode, struct file *file)
+ static void io_uring_cancel_files(struct io_ring_ctx *ctx,
+ 				  struct files_struct *files)
+ {
+-	struct io_kiocb *req, *cancel_req;
++	struct io_kiocb *req;
+ 	DEFINE_WAIT(wait);
+ 
+ 	while (!list_empty_careful(&ctx->inflight_list)) {
 -- 
-2.21.0
+1.8.3.1
 
