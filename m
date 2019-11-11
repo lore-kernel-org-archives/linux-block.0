@@ -2,255 +2,239 @@ Return-Path: <SRS0=2XXV=ZD=vger.kernel.org=linux-block-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-0.8 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
-	MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS autolearn=no autolearn_force=no
-	version=3.4.0
+X-Spam-Status: No, score=-8.6 required=3.0 tests=DKIMWL_WL_HIGH,DKIM_SIGNED,
+	DKIM_VALID,DKIM_VALID_AU,INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,
+	SPF_HELO_NONE,SPF_PASS,USER_AGENT_SANE_1 autolearn=unavailable
+	autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id C5F40C43331
-	for <linux-block@archiver.kernel.org>; Mon, 11 Nov 2019 09:28:52 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 83677C17441
+	for <linux-block@archiver.kernel.org>; Mon, 11 Nov 2019 09:32:32 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.kernel.org (Postfix) with ESMTP id 974772075C
-	for <linux-block@archiver.kernel.org>; Mon, 11 Nov 2019 09:28:52 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id 4FC5C20869
+	for <linux-block@archiver.kernel.org>; Mon, 11 Nov 2019 09:32:32 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+	s=default; t=1573464752;
+	bh=6kZnh4xohKvnhS11RTmA8D1b23bqzOH5KKHIMcAgi4c=;
+	h=Date:From:To:Cc:Subject:References:In-Reply-To:List-ID:From;
+	b=EvRvck9gKLofvarjizH2zbHDs0yIi+EttUDQp2yQyFlvw6yBQG9xU0KEQZDJ89Qiy
+	 A6cOXuWhNgY9kBYPMkvLC8oJ3H7duncArX3Ti58lyf4O9+xP6x77lvOZXP5H5453xi
+	 ApnELqh5wd6ubWw72SreTORK1N8lhsvIjGI9xBh4=
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1726824AbfKKJ2w (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Mon, 11 Nov 2019 04:28:52 -0500
-Received: from mout.kundenserver.de ([217.72.192.74]:50149 "EHLO
-        mout.kundenserver.de" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1726823AbfKKJ2v (ORCPT
-        <rfc822;linux-block@vger.kernel.org>);
-        Mon, 11 Nov 2019 04:28:51 -0500
-Received: from mail-qk1-f174.google.com ([209.85.222.174]) by
- mrelayeu.kundenserver.de (mreue108 [212.227.15.145]) with ESMTPSA (Nemesis)
- id 1M5wY1-1iWa2V3SiR-007R0n; Mon, 11 Nov 2019 10:28:49 +0100
-Received: by mail-qk1-f174.google.com with SMTP id 15so10575809qkh.6;
-        Mon, 11 Nov 2019 01:28:48 -0800 (PST)
-X-Gm-Message-State: APjAAAVwD8dC+4GN/GFLwBWbdd8HutqZPCzHtzLfX5Bh6xqp/F1fpg2W
-        EULLDsCXWqriL7UV/6pxfv39+6pBnO+dBWLwXdA=
-X-Google-Smtp-Source: APXvYqwSu9lgfUBDF0nm5OtSH0s90suFF6U6hyuHCymJtgyPoF0wodDyO+XeG82Hd3hh9gp5e0Ri92Us7MzrxXcNFWY=
-X-Received: by 2002:a05:620a:a0e:: with SMTP id i14mr9083164qka.3.1573464527336;
- Mon, 11 Nov 2019 01:28:47 -0800 (PST)
+        id S1726829AbfKKJcb (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Mon, 11 Nov 2019 04:32:31 -0500
+Received: from mx2.suse.de ([195.135.220.15]:35362 "EHLO mx1.suse.de"
+        rhost-flags-OK-OK-OK-FAIL) by vger.kernel.org with ESMTP
+        id S1726768AbfKKJcb (ORCPT <rfc822;linux-block@vger.kernel.org>);
+        Mon, 11 Nov 2019 04:32:31 -0500
+X-Virus-Scanned: by amavisd-new at test-mx.suse.de
+Received: from relay2.suse.de (unknown [195.135.220.254])
+        by mx1.suse.de (Postfix) with ESMTP id DC194B5ED;
+        Mon, 11 Nov 2019 09:32:27 +0000 (UTC)
+Date:   Mon, 11 Nov 2019 10:32:26 +0100
+From:   Michal Hocko <mhocko@kernel.org>
+To:     Mike Christie <mchristi@redhat.com>
+Cc:     david@fromorbit.com, linux-mm@kvack.org,
+        linux-kernel@vger.kernel.org, linux-scsi@vger.kernel.org,
+        linux-fsdevel@vger.kernel.org, linux-block@vger.kernel.org,
+        martin@urbackup.org, Damien.LeMoal@wdc.com,
+        linux-api@vger.kernel.org
+Subject: Re: [PATCH] Add prctl support for controlling mem reclaim V3
+Message-ID: <20191111093226.GC1396@dhcp22.suse.cz>
+References: <20191108185319.9326-1-mchristi@redhat.com>
 MIME-Version: 1.0
-References: <cover.1573456283.git.baolin.wang@linaro.org>
-In-Reply-To: <cover.1573456283.git.baolin.wang@linaro.org>
-From:   Arnd Bergmann <arnd@arndb.de>
-Date:   Mon, 11 Nov 2019 10:28:30 +0100
-X-Gmail-Original-Message-ID: <CAK8P3a1we9D5C2NOBww=cW-4L1PT3t0NnDRmknLwiLm652TmKg@mail.gmail.com>
-Message-ID: <CAK8P3a1we9D5C2NOBww=cW-4L1PT3t0NnDRmknLwiLm652TmKg@mail.gmail.com>
-Subject: Re: [PATCH v6 0/4] Add MMC software queue support
-To:     Baolin Wang <baolin.wang@linaro.org>
-Cc:     Adrian Hunter <adrian.hunter@intel.com>,
-        Ulf Hansson <ulf.hansson@linaro.org>, asutoshd@codeaurora.org,
-        Orson Zhai <orsonzhai@gmail.com>,
-        Lyra Zhang <zhang.lyra@gmail.com>,
-        Linus Walleij <linus.walleij@linaro.org>,
-        Vincent Guittot <vincent.guittot@linaro.org>,
-        baolin.wang7@gmail.com, linux-mmc <linux-mmc@vger.kernel.org>,
-        "linux-kernel@vger.kernel.org" <linux-kernel@vger.kernel.org>,
-        Hannes Reinecke <hare@suse.com>,
-        linux-block <linux-block@vger.kernel.org>
-Content-Type: text/plain; charset="UTF-8"
-X-Provags-ID: V03:K1:NlmBSiEUcJdUp+oONEBeZKwIJlNQNohnkpRONpwp95+rgwaRFxR
- DLHHG0cPDGRDd3FngkKns5Bl01wyLBARZ57tYrLrqbbdbFbQmLBLpHlWQC5SG4WFEJZFTEm
- SQhQ6b26vKjVfyBpn42oMJ184hNdaUeghrItCRzHGHAZEli4XT2Lz2x426fa9UJXXaFQ/BR
- xteH+vzD5YxXNB9JQDZ0g==
-X-UI-Out-Filterresults: notjunk:1;V03:K0:e1qDkpaWia4=:PGv/l0hvWS2wIlyAKoXPEG
- k+r6DT3klBoQCgzXNmU648JQirHfptvCKrCjrXNsDzv6dP45CxcmXnff2neV+CJX715KpaNnM
- pQprNGuajq+e5zJhXpt3uRY+jSnpe3+xTKT7NFvcEasOs/P4gtDr8GvSWBEDnK7jmF4HgiGma
- cr7uUqZrRT8dDki9QqoX8P5Mewq+wAFF2An8o7F4/8PZERD5bW2USpNOPkl8CmcaOlKRhqRaP
- wlgfCnv9P5dluLTs9Q+BBN/eO1RMl2UAP5ouvmanowvO9ngXIjeaW+bQ1ulPJ6fhVSJjPV6fX
- e97CiY0rJq3o6iUgvmv/93DLPcGqcHSl/WUCUU1QOWgZMJDFB1+iwPsTjLd1uCpQE2bhPVdTw
- CICDl+tgFC2L/4kZ55G2CVlrJlrNa7qgSn15ckR0Ra/4FfbTzCRwddNtmiJqteC6gv/4/1nU+
- b9s/o2xpxTjUIDLjR/jRj0/oqoBr9/ROykNXxlVP0/YM+kvZrTeuLYfAeSvcqKlp583olYkOj
- YGkMVtDQA2f9MapiarwkaMT/eqhfAdyc6g3DOU1A85ug5WLR6Exmc54CBiA3MuAJpPJo4xg4M
- mbmC4iANc+s4yxSG4yGoGQ08wUYo+LfbDjFGsEoowxmIGourVH6oMPmj8eJLiDKvL3YmbzP+3
- 0mSZR6lVSUJhRnkKB7hpwIm+48mNccXjz2jbi9l5Z5P8gWvk3iZ2Id/PI/xGqX/LmbQg2pyRI
- u/C7oiZDC+fVD6i9yaJgoxPcfDXjKiKa55Q5axC/2fBsssag3bX6WAxTFKMDZhhkEL/91WfKt
- PPcIFaX3vRqMUNsZgSHhdnaiW9pTl74u53TEVuOQuckPoJ/JMLQ/JCGra+war5k8pQKMaPGCZ
- Hg0RfwMsdKh4UCgjrn/Q==
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <20191108185319.9326-1-mchristi@redhat.com>
+User-Agent: Mutt/1.10.1 (2018-07-13)
 Sender: linux-block-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-On Mon, Nov 11, 2019 at 8:35 AM Baolin Wang <baolin.wang@linaro.org> wrote:
->
-> Hi All,
->
-> Now the MMC read/write stack will always wait for previous request is
-> completed by mmc_blk_rw_wait(), before sending a new request to hardware,
-> or queue a work to complete request, that will bring context switching
-> overhead, especially for high I/O per second rates, to affect the IO
-> performance.
+[Cc linux-api]
 
-Hi Baolin,
+On Fri 08-11-19 12:53:19, Mike Christie wrote:
+> There are several storage drivers like dm-multipath, iscsi, tcmu-runner,
+> amd nbd that have userspace components that can run in the IO path. For
+> example, iscsi and nbd's userspace deamons may need to recreate a socket
+> and/or send IO on it, and dm-multipath's daemon multipathd may need to
+> send SG IO or read/write IO to figure out the state of paths and re-set
+> them up.
+> 
+> In the kernel these drivers have access to GFP_NOIO/GFP_NOFS and the
+> memalloc_*_save/restore functions to control the allocation behavior,
+> but for userspace we would end up hitting an allocation that ended up
+> writing data back to the same device we are trying to allocate for.
+> The device is then in a state of deadlock, because to execute IO the
+> device needs to allocate memory, but to allocate memory the memory
+> layers want execute IO to the device.
+> 
+> Here is an example with nbd using a local userspace daemon that performs
+> network IO to a remote server. We are using XFS on top of the nbd device,
+> but it can happen with any FS or other modules layered on top of the nbd
+> device that can write out data to free memory.  Here a nbd daemon helper
+> thread, msgr-worker-1, is performing a write/sendmsg on a socket to execute
+> a request. This kicks off a reclaim operation which results in a WRITE to
+> the nbd device and the nbd thread calling back into the mm layer.
+> 
+> [ 1626.609191] msgr-worker-1   D    0  1026      1 0x00004000
+> [ 1626.609193] Call Trace:
+> [ 1626.609195]  ? __schedule+0x29b/0x630
+> [ 1626.609197]  ? wait_for_completion+0xe0/0x170
+> [ 1626.609198]  schedule+0x30/0xb0
+> [ 1626.609200]  schedule_timeout+0x1f6/0x2f0
+> [ 1626.609202]  ? blk_finish_plug+0x21/0x2e
+> [ 1626.609204]  ? _xfs_buf_ioapply+0x2e6/0x410
+> [ 1626.609206]  ? wait_for_completion+0xe0/0x170
+> [ 1626.609208]  wait_for_completion+0x108/0x170
+> [ 1626.609210]  ? wake_up_q+0x70/0x70
+> [ 1626.609212]  ? __xfs_buf_submit+0x12e/0x250
+> [ 1626.609214]  ? xfs_bwrite+0x25/0x60
+> [ 1626.609215]  xfs_buf_iowait+0x22/0xf0
+> [ 1626.609218]  __xfs_buf_submit+0x12e/0x250
+> [ 1626.609220]  xfs_bwrite+0x25/0x60
+> [ 1626.609222]  xfs_reclaim_inode+0x2e8/0x310
+> [ 1626.609224]  xfs_reclaim_inodes_ag+0x1b6/0x300
+> [ 1626.609227]  xfs_reclaim_inodes_nr+0x31/0x40
+> [ 1626.609228]  super_cache_scan+0x152/0x1a0
+> [ 1626.609231]  do_shrink_slab+0x12c/0x2d0
+> [ 1626.609233]  shrink_slab+0x9c/0x2a0
+> [ 1626.609235]  shrink_node+0xd7/0x470
+> [ 1626.609237]  do_try_to_free_pages+0xbf/0x380
+> [ 1626.609240]  try_to_free_pages+0xd9/0x1f0
+> [ 1626.609245]  __alloc_pages_slowpath+0x3a4/0xd30
+> [ 1626.609251]  ? ___slab_alloc+0x238/0x560
+> [ 1626.609254]  __alloc_pages_nodemask+0x30c/0x350
+> [ 1626.609259]  skb_page_frag_refill+0x97/0xd0
+> [ 1626.609274]  sk_page_frag_refill+0x1d/0x80
+> [ 1626.609279]  tcp_sendmsg_locked+0x2bb/0xdd0
+> [ 1626.609304]  tcp_sendmsg+0x27/0x40
+> [ 1626.609307]  sock_sendmsg+0x54/0x60
+> [ 1626.609308]  ___sys_sendmsg+0x29f/0x320
+> [ 1626.609313]  ? sock_poll+0x66/0xb0
+> [ 1626.609318]  ? ep_item_poll.isra.15+0x40/0xc0
+> [ 1626.609320]  ? ep_send_events_proc+0xe6/0x230
+> [ 1626.609322]  ? hrtimer_try_to_cancel+0x54/0xf0
+> [ 1626.609324]  ? ep_read_events_proc+0xc0/0xc0
+> [ 1626.609326]  ? _raw_write_unlock_irq+0xa/0x20
+> [ 1626.609327]  ? ep_scan_ready_list.constprop.19+0x218/0x230
+> [ 1626.609329]  ? __hrtimer_init+0xb0/0xb0
+> [ 1626.609331]  ? _raw_spin_unlock_irq+0xa/0x20
+> [ 1626.609334]  ? ep_poll+0x26c/0x4a0
+> [ 1626.609337]  ? tcp_tsq_write.part.54+0xa0/0xa0
+> [ 1626.609339]  ? release_sock+0x43/0x90
+> [ 1626.609341]  ? _raw_spin_unlock_bh+0xa/0x20
+> [ 1626.609342]  __sys_sendmsg+0x47/0x80
+> [ 1626.609347]  do_syscall_64+0x5f/0x1c0
+> [ 1626.609349]  ? prepare_exit_to_usermode+0x75/0xa0
+> [ 1626.609351]  entry_SYSCALL_64_after_hwframe+0x44/0xa9
+> 
+> This patch adds a new prctl command that daemons can use after they have
+> done their initial setup, and before they start to do allocations that
+> are in the IO path. It sets the PF_MEMALLOC_NOIO and PF_LESS_THROTTLE
+> flags so both userspace block and FS threads can use it to avoid the
+> allocation recursion and try to prevent from being throttled while
+> writing out data to free up memory.
+> 
+> Signed-off-by: Mike Christie <mchristi@redhat.com>
 
-I had a chance to discuss your changes and what other improvements
-can be done to the way mmc-blk works with Hannes Reinecke during the ELC
-conference. He had some good suggestions. Adding him and the linux-block
-mailing list to Cc to make sure I'm correctly representing this.
+OK, this looks much better then explicitly exposing NOIO/NOFS to the
+userspace. Restricting to CAP_SYS_RESOURCE makes sense as well but I am
+not really an expert in that direction.
 
-- For the queue_depth of a non-queuing block device, you indeed need to
-  leave it at e.g. 32 or 64 rather than 1 or 2, as you do now (I was wrong
-  here originally, but just confirmed that). The queue depth is just used to
-  ensure there is room for reordering and merging, as you also noticed.
+So for the proposed semantic this makes sense
+Acked-by: Michal Hocko <mhocko@suse.com>
 
-- Removing all the context switches and workqueues from the data submission
-  path is also the right idea. As you found, there is still a workqueue inside
-  of blk_mq that is used because it may get called from atomic context but
-  the submission may get blocked in __mmc_claim_host(). This really
-  needs to be changed as well, but not in the way I originally suggested:
-  As Hannes suggested, the host interrrupt handler should always use
-  request_threaded_irq() to have its own process context, and then pass a
-  flag to blk_mq to say that we never need another workqueue there.
+Please do not forget to add a man page update.
 
-- With that change in place calling a blocking __mmc_claim_host() is
-  still a problem, so there should still be a nonblocking mmc_try_claim_host()
-  for the submission path, leading to a BLK_STS_DEV_RESOURCE (?)
-  return code from mmc_mq_queue_rq(). Basically mmc_mq_queue_rq()
-  should always return right away, either after having queued the next I/O
-  or with an error, but not waiting for the device in any way.
+Keeping the rest of the email for the new CC
 
-- For the packed requests, there is apparently a very simple way to implement
-  that without a software queue: mmc_mq_queue_rq() is allowed to look at
-  and dequeue all requests that are currently part of the request_queue,
-  so it should take out as many as it wants to submit at once and send
-  them all down to the driver together, avoiding the need for any further
-  round-trips to blk_mq or maintaining a queue in mmc.
+> ---
+> V3 
+> - Drop NOFS, set PF_LESS_THROTTLE and rename prctl flag to reflect it
+> is more general and can support both FS and block devices. Both fuse
+> and block device daemons, nbd and tcmu-runner, have been tested to
+> confirm the more restrictive PF_MEMALLOC_NOIO also works for fuse.
+> 
+> - Use CAP_SYS_RESOURCE instead of admin.
+> 
+> V2:
+> - Use prctl instead of procfs.
+> - Add support for NOFS for fuse.
+> - Check permissions.
+> 
+> 
+>  include/uapi/linux/capability.h |  1 +
+>  include/uapi/linux/prctl.h      |  4 ++++
+>  kernel/sys.c                    | 26 ++++++++++++++++++++++++++
+>  3 files changed, 31 insertions(+)
+> 
+> diff --git a/include/uapi/linux/capability.h b/include/uapi/linux/capability.h
+> index 240fdb9a60f6..272dc69fa080 100644
+> --- a/include/uapi/linux/capability.h
+> +++ b/include/uapi/linux/capability.h
+> @@ -301,6 +301,7 @@ struct vfs_ns_cap_data {
+>  /* Allow more than 64hz interrupts from the real-time clock */
+>  /* Override max number of consoles on console allocation */
+>  /* Override max number of keymaps */
+> +/* Control memory reclaim behavior */
+>  
+>  #define CAP_SYS_RESOURCE     24
+>  
+> diff --git a/include/uapi/linux/prctl.h b/include/uapi/linux/prctl.h
+> index 7da1b37b27aa..07b4f8131e36 100644
+> --- a/include/uapi/linux/prctl.h
+> +++ b/include/uapi/linux/prctl.h
+> @@ -234,4 +234,8 @@ struct prctl_mm_map {
+>  #define PR_GET_TAGGED_ADDR_CTRL		56
+>  # define PR_TAGGED_ADDR_ENABLE		(1UL << 0)
+>  
+> +/* Control reclaim behavior when allocating memory */
+> +#define PR_SET_IO_FLUSHER		57
+> +#define PR_GET_IO_FLUSHER		58
+> +
+>  #endif /* _LINUX_PRCTL_H */
+> diff --git a/kernel/sys.c b/kernel/sys.c
+> index a611d1d58c7d..08c6b682fa99 100644
+> --- a/kernel/sys.c
+> +++ b/kernel/sys.c
+> @@ -2486,6 +2486,32 @@ SYSCALL_DEFINE5(prctl, int, option, unsigned long, arg2, unsigned long, arg3,
+>  			return -EINVAL;
+>  		error = GET_TAGGED_ADDR_CTRL();
+>  		break;
+> +	case PR_SET_IO_FLUSHER:
+> +		if (!capable(CAP_SYS_RESOURCE))
+> +			return -EPERM;
+> +
+> +		if (arg3 || arg4 || arg5)
+> +			return -EINVAL;
+> +
+> +		if (arg2 == 1)
+> +			current->flags |= PF_MEMALLOC_NOIO | PF_LESS_THROTTLE;
+> +		else if (!arg2)
+> +			current->flags &= ~(PF_MEMALLOC_NOIO | PF_LESS_THROTTLE);
+> +		else
+> +			return -EINVAL;
+> +		break;
+> +	case PR_GET_IO_FLUSHER:
+> +		if (!capable(CAP_SYS_RESOURCE))
+> +			return -EPERM;
+> +
+> +		if (arg2 || arg3 || arg4 || arg5)
+> +			return -EINVAL;
+> +
+> +		if (current->flags & (PF_MEMALLOC_NOIO | PF_LESS_THROTTLE))
+> +			error = 1;
+> +		else
+> +			error = 0;
+> +		break;
+>  	default:
+>  		error = -EINVAL;
+>  		break;
+> -- 
+> 2.20.1
+> 
 
-- The DMA management (bounce buffer, map, unmap) that is currently
-  done in mmc_blk_mq_issue_rq() should ideally be done in the
-  init_request()/exit_request()  (?) callbacks from mmc_mq_ops so this
-  can be done asynchronously, out of the critical timing path for the
-  submission. With this, there won't be any need for a software queue.
-
-Hannes,
-
-Let me know if I misunderstood any of the above, or if I missed any
-additional points.
-
-       Arnd
-
-> Thus this patch set will introduce the MMC software command queue support
-> based on command queue engine's interfaces, and set the queue depth as 32
-> to allow more requests can be be prepared, merged and inserted into IO
-> scheduler, but we only allow 2 requests in flight, that is enough to let
-> the irq handler always trigger the next request without a context switch,
-> as well as avoiding a long latency.
->
-> Moreover we can expand the MMC software queue interface to support
-> MMC packed request or packed command instead of adding new interfaces,
-> according to previosus discussion.
->
-> Below are some comparison data with fio tool. The fio command I used
-> is like below with changing the '--rw' parameter and enabling the direct
-> IO flag to measure the actual hardware transfer speed in 4K block size.
->
-> ./fio --filename=/dev/mmcblk0p30 --direct=1 --iodepth=20 --rw=read --bs=4K --size=1G --group_reporting --numjobs=20 --name=test_read
->
-> My eMMC card working at HS400 Enhanced strobe mode:
-> [    2.229856] mmc0: new HS400 Enhanced strobe MMC card at address 0001
-> [    2.237566] mmcblk0: mmc0:0001 HBG4a2 29.1 GiB
-> [    2.242621] mmcblk0boot0: mmc0:0001 HBG4a2 partition 1 4.00 MiB
-> [    2.249110] mmcblk0boot1: mmc0:0001 HBG4a2 partition 2 4.00 MiB
-> [    2.255307] mmcblk0rpmb: mmc0:0001 HBG4a2 partition 3 4.00 MiB, chardev (248:0)
->
-> 1. Without MMC software queue
-> I tested 5 times for each case and output a average speed.
->
-> 1) Sequential read:
-> Speed: 59.4MiB/s, 63.4MiB/s, 57.5MiB/s, 57.2MiB/s, 60.8MiB/s
-> Average speed: 59.66MiB/s
->
-> 2) Random read:
-> Speed: 26.9MiB/s, 26.9MiB/s, 27.1MiB/s, 27.1MiB/s, 27.2MiB/s
-> Average speed: 27.04MiB/s
->
-> 3) Sequential write:
-> Speed: 71.6MiB/s, 72.5MiB/s, 72.2MiB/s, 64.6MiB/s, 67.5MiB/s
-> Average speed: 69.68MiB/s
->
-> 4) Random write:
-> Speed: 36.3MiB/s, 35.4MiB/s, 38.6MiB/s, 34MiB/s, 35.5MiB/s
-> Average speed: 35.96MiB/s
->
-> 2. With MMC software queue
-> I tested 5 times for each case and output a average speed.
->
-> 1) Sequential read:
-> Speed: 59.2MiB/s, 60.4MiB/s, 63.6MiB/s, 60.3MiB/s, 59.9MiB/s
-> Average speed: 60.68MiB/s
->
-> 2) Random read:
-> Speed: 31.3MiB/s, 31.4MiB/s, 31.5MiB/s, 31.3MiB/s, 31.3MiB/s
-> Average speed: 31.36MiB/s
->
-> 3) Sequential write:
-> Speed: 71MiB/s, 71.8MiB/s, 72.3MiB/s, 72.2MiB/s, 71MiB/s
-> Average speed: 71.66MiB/s
->
-> 4) Random write:
-> Speed: 68.9MiB/s, 68.7MiB/s, 68.8MiB/s, 68.6MiB/s, 68.8MiB/s
-> Average speed: 68.76MiB/s
->
-> Form above data, we can see the MMC software queue can help to improve some
-> performance obviously for random read and write, though no obvious improvement
-> for sequential read and write.
->
-> Any comments are welcome. Thanks a lot.
->
-> Hi Ulf,
->
-> This patch set was pending for a while, and I've tested it several times and
-> have not found any recessions. Hope this patch set can be merged into v5.5
-> if no objection from you, since I still have some patches introducing the
-> packed request depend on the mmc software queue as we talked before.
-> Thanks a lot.
->
-> Changes from v5:
->  - Modify the condition of defering to complete request suggested by Adrian.
->
-> Changes from v4:
->  - Add a seperate patch to introduce a variable to defer to complete
->  data requests for some host drivers, when using host software queue.
->
-> Changes from v3:
->  - Use host software queue instead of sqhci.
->  - Fix random config building issue.
->  - Change queue depth to 32, but still only allow 2 requests in flight.
->  - Update the testing data.
->
-> Changes from v2:
->  - Remove reference to 'struct cqhci_host' and 'struct cqhci_slot',
->  instead adding 'struct sqhci_host', which is only used by software queue.
->
-> Changes from v1:
->  - Add request_done ops for sdhci_ops.
->  - Replace virtual command queue with software queue for functions and
->  variables.
->  - Rename the software queue file and add sqhci.h header file.
->
-> Baolin Wang (4):
->   mmc: Add MMC host software queue support
->   mmc: host: sdhci: Add request_done ops for struct sdhci_ops
->   mmc: host: sdhci-sprd: Add software queue support
->   mmc: host: sdhci: Add a variable to defer to complete requests if
->     needed
->
->  drivers/mmc/core/block.c      |   61 ++++++++
->  drivers/mmc/core/mmc.c        |   13 +-
->  drivers/mmc/core/queue.c      |   33 +++-
->  drivers/mmc/host/Kconfig      |    8 +
->  drivers/mmc/host/Makefile     |    1 +
->  drivers/mmc/host/mmc_hsq.c    |  344 +++++++++++++++++++++++++++++++++++++++++
->  drivers/mmc/host/mmc_hsq.h    |   30 ++++
->  drivers/mmc/host/sdhci-sprd.c |   26 ++++
->  drivers/mmc/host/sdhci.c      |   14 +-
->  drivers/mmc/host/sdhci.h      |    3 +
->  include/linux/mmc/host.h      |    3 +
->  11 files changed, 523 insertions(+), 13 deletions(-)
->  create mode 100644 drivers/mmc/host/mmc_hsq.c
->  create mode 100644 drivers/mmc/host/mmc_hsq.h
->
-> --
-> 1.7.9.5
->
+-- 
+Michal Hocko
+SUSE Labs
