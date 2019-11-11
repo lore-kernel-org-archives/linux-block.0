@@ -2,55 +2,81 @@ Return-Path: <SRS0=2XXV=ZD=vger.kernel.org=linux-block-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-2.3 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
-	MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,USER_AGENT_SANE_1 autolearn=no
-	autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-5.1 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
+	HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,
+	SPF_PASS,USER_AGENT_SANE_1 autolearn=unavailable autolearn_force=no
+	version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id CFC36C43331
-	for <linux-block@archiver.kernel.org>; Mon, 11 Nov 2019 10:22:07 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id EF7C3C43331
+	for <linux-block@archiver.kernel.org>; Mon, 11 Nov 2019 10:22:59 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.kernel.org (Postfix) with ESMTP id AB97620674
-	for <linux-block@archiver.kernel.org>; Mon, 11 Nov 2019 10:22:07 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id A45F7214DB
+	for <linux-block@archiver.kernel.org>; Mon, 11 Nov 2019 10:22:59 +0000 (UTC)
+Authentication-Results: mail.kernel.org;
+	dkim=fail reason="signature verification failed" (2048-bit key) header.d=infradead.org header.i=@infradead.org header.b="jWDUAfwS"
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1726791AbfKKKWH (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Mon, 11 Nov 2019 05:22:07 -0500
-Received: from verein.lst.de ([213.95.11.211]:48568 "EHLO verein.lst.de"
-        rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-        id S1726768AbfKKKWH (ORCPT <rfc822;linux-block@vger.kernel.org>);
-        Mon, 11 Nov 2019 05:22:07 -0500
-Received: by verein.lst.de (Postfix, from userid 2407)
-        id 17E2E68BE1; Mon, 11 Nov 2019 11:22:00 +0100 (CET)
-Date:   Mon, 11 Nov 2019 11:21:59 +0100
-From:   Christoph Hellwig <hch@lst.de>
-To:     Ming Lei <ming.lei@redhat.com>
-Cc:     Jens Axboe <axboe@kernel.dk>, linux-block@vger.kernel.org,
-        Christoph Hellwig <hch@lst.de>
-Subject: Re: [RFC PATCH 2/2] block: split bio if the only bvec's length is
- > SZ_4K
-Message-ID: <20191111102159.GA12709@lst.de>
-References: <20191108101528.31735-1-ming.lei@redhat.com> <20191108101528.31735-3-ming.lei@redhat.com>
+        id S1726804AbfKKKW7 (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Mon, 11 Nov 2019 05:22:59 -0500
+Received: from bombadil.infradead.org ([198.137.202.133]:58938 "EHLO
+        bombadil.infradead.org" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S1726768AbfKKKW7 (ORCPT
+        <rfc822;linux-block@vger.kernel.org>);
+        Mon, 11 Nov 2019 05:22:59 -0500
+DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed;
+        d=infradead.org; s=bombadil.20170209; h=In-Reply-To:Content-Type:MIME-Version
+        :References:Message-ID:Subject:Cc:To:From:Date:Sender:Reply-To:
+        Content-Transfer-Encoding:Content-ID:Content-Description:Resent-Date:
+        Resent-From:Resent-Sender:Resent-To:Resent-Cc:Resent-Message-ID:List-Id:
+        List-Help:List-Unsubscribe:List-Subscribe:List-Post:List-Owner:List-Archive;
+         bh=rsrc0hw15XFvUS1BF0cnd7QBR4nqLE43XWK8jb8pnzE=; b=jWDUAfwSsKiB0sckHhneGHYAj
+        9OnETJBBXAfFSPzpdDJfeXV4WXPcmqdi5e1wBm5Szpjelrjnp8kPWC+XJwclLLzwj30ej4PaaImBm
+        LiSV0zVnyKhPDlPe1CArH8J65tsP+xgbDrjRzdVr6+SQR2fJQjKunQG34NuP0GmwngqietPNezzvG
+        scrPh0QEEe/Oc3tUIzAI0ojgTOOVvlcheInxaeMlTu27Fk6/APNgKpwiA3omvAtl31JvjNL3KFmxR
+        oXnih/xP1XUO2YMOKlYG15xKFJwiUuTAvzKg5jbtdlQE07t1+TtOS8w0XaRa4g+yVyGCaQPB/nJ/X
+        mRYp6VdZw==;
+Received: from hch by bombadil.infradead.org with local (Exim 4.92.3 #3 (Red Hat Linux))
+        id 1iU6qW-0000gA-Fm; Mon, 11 Nov 2019 10:22:56 +0000
+Date:   Mon, 11 Nov 2019 02:22:55 -0800
+From:   Christoph Hellwig <hch@infradead.org>
+To:     Damien Le Moal <damien.lemoal@wdc.com>
+Cc:     linux-block@vger.kernel.org, Jens Axboe <axboe@kernel.dk>,
+        linux-scsi@vger.kernel.org,
+        "Martin K . Petersen" <martin.petersen@oracle.com>,
+        dm-devel@redhat.com, Mike Snitzer <snitzer@redhat.com>,
+        linux-f2fs-devel@lists.sourceforge.net,
+        Jaegeuk Kim <jaegeuk@kernel.org>, Chao Yu <yuchao0@huawei.com>
+Subject: Re: [PATCH v2 8/9] scsi: sd_zbc: Cleanup sd_zbc_alloc_report_buffer()
+Message-ID: <20191111102255.GB727@infradead.org>
+References: <20191111023930.638129-1-damien.lemoal@wdc.com>
+ <20191111023930.638129-9-damien.lemoal@wdc.com>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=us-ascii
 Content-Disposition: inline
-In-Reply-To: <20191108101528.31735-3-ming.lei@redhat.com>
-User-Agent: Mutt/1.5.17 (2007-11-01)
+In-Reply-To: <20191111023930.638129-9-damien.lemoal@wdc.com>
+User-Agent: Mutt/1.12.1 (2019-06-15)
+X-SRS-Rewrite: SMTP reverse-path rewritten from <hch@infradead.org> by bombadil.infradead.org. See http://www.infradead.org/rpr.html
 Sender: linux-block-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-On Fri, Nov 08, 2019 at 06:15:28PM +0800, Ming Lei wrote:
-> 64K PAGE_SIZE is popular on ARM64 or other ARCHs, and 64K has been big
-> enough to break some devices probably, so change the logic to split bio
-> if the only bvec's length is > SZ_4K instead of PAGE_SIZE.
+On Mon, Nov 11, 2019 at 11:39:29AM +0900, Damien Le Moal wrote:
+> There is no need to arbitrarily limit the size of a report zone to the
+> number of zones defined by SD_ZBC_REPORT_MAX_ZONES. Rather, simply
+> calculate the report buffer size needed for the requested number of
+> zones without exceeding the device total number of zones. This buffer
+> size limitation to the hardware maximum transfer size and page mapping
+> capabilities is kept unchanged. Starting with this initial buffer size,
+> the allocation is optimized by iterating over decreasing buffer size
+> until the allocation succeeds (each iteration is allowed to fail fast
+> using the __GFP_NORETRY flag). This ensures forward progress for zone
+> reports and avoids failures of zones revalidation under memory pressure.
+> 
+> While at it, also replace the hard coded 512 B sector size with the
+> SECTOR_SIZE macro.
+> 
+> Signed-off-by: Damien Le Moal <damien.lemoal@wdc.com>
 
-I don't think this makes sense as-is given that blk_queue_max_hw_sectors,
-blk_queue_max_segment_size and co all check for a minimum of PAGE_SIZE
-and warn otherwise, and blk_bio_segment_split uses PAGE_SIZE for
-its short cut as well. So I don't think this has been a problem in
-practice, and if it was this patch is not enough.
+Looks fine even with the __vmalloc usage:
 
-So either we leave things as is, or we need to do a real audit for
-code using PAGE_SIZE as the minimum I/O granularity and replace it
-everywhere a well as updating the documentation.  Which might be a good
-thing given that variable sized limits are weird.
+Reviewed-by: Christoph Hellwig <hch@lst.de>
