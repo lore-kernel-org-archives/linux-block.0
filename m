@@ -7,65 +7,65 @@ X-Spam-Status: No, score=-9.6 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
 	SPF_HELO_NONE,SPF_PASS,USER_AGENT_GIT autolearn=ham autolearn_force=no
 	version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id CAE9EC43331
-	for <linux-block@archiver.kernel.org>; Mon, 11 Nov 2019 21:18:51 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 69AC6C43331
+	for <linux-block@archiver.kernel.org>; Mon, 11 Nov 2019 21:18:53 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.kernel.org (Postfix) with ESMTP id 9D179214E0
-	for <linux-block@archiver.kernel.org>; Mon, 11 Nov 2019 21:18:51 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id 3FFB9214E0
+	for <linux-block@archiver.kernel.org>; Mon, 11 Nov 2019 21:18:53 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (2048-bit key) header.d=wdc.com header.i=@wdc.com header.b="pzEy6M6x"
+	dkim=fail reason="signature verification failed" (2048-bit key) header.d=wdc.com header.i=@wdc.com header.b="J5Wx6VHl"
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1726939AbfKKVSv (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Mon, 11 Nov 2019 16:18:51 -0500
+        id S1727108AbfKKVSw (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Mon, 11 Nov 2019 16:18:52 -0500
 Received: from esa6.hgst.iphmx.com ([216.71.154.45]:34080 "EHLO
         esa6.hgst.iphmx.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1727022AbfKKVSu (ORCPT
+        with ESMTP id S1727022AbfKKVSw (ORCPT
         <rfc822;linux-block@vger.kernel.org>);
-        Mon, 11 Nov 2019 16:18:50 -0500
+        Mon, 11 Nov 2019 16:18:52 -0500
 DKIM-Signature: v=1; a=rsa-sha256; c=simple/simple;
   d=wdc.com; i=@wdc.com; q=dns/txt; s=dkim.wdc.com;
-  t=1573507131; x=1605043131;
+  t=1573507133; x=1605043133;
   h=from:to:cc:subject:date:message-id:in-reply-to:
    references:mime-version:content-transfer-encoding;
-  bh=K5sKMPgeIksrSAClxnZaXEp6l+eXrTOJWDsMHZAwG2U=;
-  b=pzEy6M6xCL6WUy85bS079/okEH77P2KAViS+KUrvmV5XHWl9p2+dAqBT
-   YnzTLAhKgSeO8jBviNEiyKmGOM4T+KqfCLGkK8QEBG4KyONN5eZB6A3Fq
-   2WXiti9Sc91MkaNxAAw6r8u9yBYwDmn/zw26v0kmmbCxJX2o2brtZtJQ/
-   vYu2qxFLDADKwCePl3xyQvfgwo/JmhHZewCrMXrn4/b15fmKPn3+pftAd
-   0TtmmC6mmFaSKCUkWdk43GYMcGoWDl+4zBDsM/1JH1Kcp7D+EQ1jTYz1j
-   ftlGGmBPBM+rSOK/Hu1OwTfhANWQxFOJ/rWFGdHgMbN85uOk3M+CET7Z9
-   Q==;
-IronPort-SDR: IsfUjFd+2I1Lo6WSILui88LInM9AKm22l4PuHbH9I+1Bfld3+BN9NISGL8cC8I5eXjwDgZvkti
- WVinmggOGPmhgbsFcVDcfx/ZdqsCfvDyWcSlr65rBYtR6K+DLvDX2KMyFId3rNSjdt81jETTcV
- 99sTeEXLQ3Gd65d7QKPCfAJcnqnq+9l3GtRYM4CW8xq9nr0JGl7R/LnxxiKHxvPq5UTTCV8hFn
- QbIzzoG8pk922KUquo1//c4Zl63j7fUunJAvkZuJiG/w+46YVk9GT0pJHTICioaLEHne7W+3cB
- iG8=
+  bh=I0Au4ydjiedNzQQKsqqRTc1ReUvzEDkcVQjLVZRbLj8=;
+  b=J5Wx6VHl48CDfdf/sIfLLikap7iXPRgv4jSUmN9Y/YI39gTnuaQUir+Z
+   tCzR/gpaUHgsViXF1Jh7jJ3J2VlG39Ne1oMpjYTX/uZlBS1CnTGhtuBST
+   gb44bGS8ocaqBRl9OIFnMy0hvCh9un6LHJHju8GSgzAwJs45+DALvcj8B
+   mKf4GdDIyFvYsG4R6pnPagmU8qZ5Cw5n7+KdVpvivQZ3aWvVF5CMgvvNZ
+   Pt6cxiXLNNniU31oKfq50JHTOs7aBnb2R8X3l1ROTesDBhk+h4e/yqJ3Q
+   TgAl7A4X+0qs+wrs0bQBoc5HFrmgyYiEuZmzZKfWnSIrQpGmWOXpNiL3X
+   A==;
+IronPort-SDR: CihNmio72bqYx5xf9uuOwbU827vqcD1ublvTF+SfU0AHCAmTTxZbm1bxTl50jpzyOSml7Zexus
+ Ypl3f4GRKy3lg1c1eJa4hvpbMOb8LI4nML0f9hiYve9Ozmzh9AoDB72a+v/odaZSvoMw7ZDMiw
+ eBkkX4qVRAHglLlrL3FVcNYPzFJNfxPUrTXlIchxAT67nO1rbGIxBiI5n88E9nc4iSgcCmvXoZ
+ 5ufcXXQcQvAMNhUaebkt35QQn7KPTWcSD+RozVoBOlW+FQ6pBs2ZcLCw7bjPzFkunWgCAp/RUQ
+ bnU=
 X-IronPort-AV: E=Sophos;i="5.68,293,1569254400"; 
-   d="scan'208";a="124300388"
+   d="scan'208";a="124300391"
 Received: from uls-op-cesaip02.wdc.com (HELO uls-op-cesaep02.wdc.com) ([199.255.45.15])
-  by ob1.hgst.iphmx.com with ESMTP; 12 Nov 2019 05:18:51 +0800
-IronPort-SDR: 0Ndm6eClZTgLT8pnQ0lOjesYFhCHnWWeWqiDKVE5v7LEldPs4B7fQ1gfGJPfMsDe3fhhYh8KCp
- odTBMM5McnXfU3gBQkMUXgHKMzdSf7b/MZdUGqeHlyimi3HE+OuTncD/jkdrg2vMNPo5H9RPdX
- RmIBgg6sk16cvt6aekG23fTIkZZ4gR5kZAC7CNtxQqqhnS50xu5WqPu2fae2bt8VRzM6Of/Tdh
- n20M944su5uI4Q6R5hafvWsTf7Re1PWywQ19n1DVkz0kGYsNpr9US0dcHW1PUzMuWxtY8YD1LF
- ntIqgpW2Tx/LyBfm9QdFKnsL
+  by ob1.hgst.iphmx.com with ESMTP; 12 Nov 2019 05:18:53 +0800
+IronPort-SDR: /PBW8RulWETRRffyIvWvF8kyt15VgRUowXg8wiPJwVVxQnyxYDLIKdPpRAZJsS6ax2a4EPJOdf
+ YSKBndXqo6+ONnSb697unVR2BrFxiNk1QDJ7afI4QKT8ZL3FWqwCMwyENwoXQEzLIkNoGuLMWM
+ zgqBknexoSjCyCuc4nst7hmkqyMplm1DAQ7m4uz6MDYakJ9dtqRHDUXP859rz4fdvXA1y7rXUO
+ aSczEJzDwhEADfl48j3s9RV4G1TuWsiGBlKIEjtTfa+83FVW4Opk1iRZkCl5NPJen9qQxVxzQh
+ pVJIUxDphO1Ym/eKGJjKbI78
 Received: from uls-op-cesaip01.wdc.com ([10.248.3.36])
-  by uls-op-cesaep02.wdc.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 11 Nov 2019 13:13:53 -0800
-IronPort-SDR: agk6nxup0px58bsnkczWP7eVxry/DRbNRjwVirABMjIb+ol8Qr+47s92xpDaUuuyBFJMzZ35/Y
- JMS3usZek3Q3Ka/lxgHbwRfKnF/vBpzqDRu3TPUaCsxfFj4eahtVcHpQlsPv8ATFHpr/auCdy7
- YJU+pKMbpa95clieg2S1bQwsMznoM3ar/jf/jpjxz1QvDQ4cDjFO7ObDGAcfdu6l9e2YWY9KWp
- 3ypUcEI3xmvJnMiMgR4TqCRBToJpb0gcJMR7CLy+OnqEbJhiP0Am9ldK9faPk+QN8bLnOX2Ugb
- rlE=
+  by uls-op-cesaep02.wdc.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 11 Nov 2019 13:13:55 -0800
+IronPort-SDR: hxvmqW1SUcvkll+hfxyHX5om+ykb9m2YLJ4U9KQMhRfDUDNEptUIEdbjYMx6nlp8byqqwYftGv
+ PbYm+/Yyl2bI8LB7m6b+qqCK0+6ITIPgTZmF8bwsYY9O5FUd8asw5WDcvx7eEEgHK0BrYQRhB+
+ Xk4um2BdHjTeoDp/ycIxiBO1NXHnwIzUAsQASvWDU+A5ke0K9lAfRzn7dYwPieWC6DXghfG8ah
+ nKIVXbrXaVjrxcpzKc0qqtfN5ejgz2pq+VrLo4wl+FmCdDpleTS4qMfy0F4w/LWhdPLeBenOfG
+ MGA=
 WDCIronportException: Internal
 Received: from iouring.labspan.wdc.com (HELO iouring.sc.wdc.com) ([10.6.138.107])
-  by uls-op-cesaip01.wdc.com with ESMTP; 11 Nov 2019 13:18:50 -0800
+  by uls-op-cesaip01.wdc.com with ESMTP; 11 Nov 2019 13:18:52 -0800
 From:   Chaitanya Kulkarni <chaitanya.kulkarni@wdc.com>
 To:     linux-block@vger.kernel.org
 Cc:     axboe@kernel.dk, damien.lemoal@wdc.com,
         Chaitanya Kulkarni <chaitanya.kulkarni@wdc.com>
-Subject: [PATCH V2 1/2] block: export blk_should_abort()
-Date:   Mon, 11 Nov 2019 13:18:43 -0800
-Message-Id: <20191111211844.5922-2-chaitanya.kulkarni@wdc.com>
+Subject: [PATCH V2 2/2] block: allow zone_mgmt_ops to bail out on SIGKILL
+Date:   Mon, 11 Nov 2019 13:18:44 -0800
+Message-Id: <20191111211844.5922-3-chaitanya.kulkarni@wdc.com>
 X-Mailer: git-send-email 2.22.1
 In-Reply-To: <20191111211844.5922-1-chaitanya.kulkarni@wdc.com>
 References: <20191111211844.5922-1-chaitanya.kulkarni@wdc.com>
@@ -76,48 +76,37 @@ Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-This patch exports blk_should_abort() function to avoid dulicate code.
+This patch is on the similar concept which is posted earlier:-
+https://marc.info/?l=linux-block&m=157321402002207&w=2.
+
+This allows zone-mgmt ops to handle SIGKILL.
 
 Signed-off-by: Chaitanya Kulkarni <chaitanya.kulkarni@wdc.com>
 ---
- block/blk-lib.c | 3 ++-
- block/blk.h     | 2 ++
- 2 files changed, 4 insertions(+), 1 deletion(-)
+ block/blk-zoned.c | 5 ++++-
+ 1 file changed, 4 insertions(+), 1 deletion(-)
 
-diff --git a/block/blk-lib.c b/block/blk-lib.c
-index 6ca7cae62876..c0afddb2a67b 100644
---- a/block/blk-lib.c
-+++ b/block/blk-lib.c
-@@ -11,7 +11,7 @@
+diff --git a/block/blk-zoned.c b/block/blk-zoned.c
+index 481eaf7d04d4..8f0f740d89e8 100644
+--- a/block/blk-zoned.c
++++ b/block/blk-zoned.c
+@@ -286,12 +286,15 @@ int blkdev_zone_mgmt(struct block_device *bdev, enum req_opf op,
+ 		sector += zone_sectors;
  
- #include "blk.h"
+ 		/* This may take a while, so be nice to others */
+-		cond_resched();
++		ret = blk_should_abort(bio);
++		if (ret)
++			goto out;
+ 	}
  
--static int blk_should_abort(struct bio *bio)
-+int blk_should_abort(struct bio *bio)
- {
- 	int ret;
- 
-@@ -22,6 +22,7 @@ static int blk_should_abort(struct bio *bio)
+ 	ret = submit_bio_wait(bio);
  	bio_put(bio);
- 	return ret ? ret : -EINTR;
- }
-+EXPORT_SYMBOL(blk_should_abort);
  
- struct bio *blk_next_bio(struct bio *bio, unsigned int nr_pages, gfp_t gfp)
- {
-diff --git a/block/blk.h b/block/blk.h
-index 2bea40180b6f..63fa4694d333 100644
---- a/block/blk.h
-+++ b/block/blk.h
-@@ -297,6 +297,8 @@ static inline struct io_context *create_io_context(gfp_t gfp_mask, int node)
- 	return current->io_context;
++out:
+ 	return ret;
  }
- 
-+int blk_should_abort(struct bio *bio);
-+
- /*
-  * Internal throttling interface
-  */
+ EXPORT_SYMBOL_GPL(blkdev_zone_mgmt);
 -- 
 2.22.1
 
