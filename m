@@ -2,160 +2,253 @@ Return-Path: <SRS0=0oGL=ZE=vger.kernel.org=linux-block-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-9.9 required=3.0 tests=DKIMWL_WL_HIGH,DKIM_SIGNED,
-	DKIM_VALID,DKIM_VALID_AU,HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,
-	MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED,
-	USER_AGENT_GIT autolearn=unavailable autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-6.9 required=3.0 tests=DKIM_SIGNED,DKIM_VALID,
+	DKIM_VALID_AU,HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,
+	SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS autolearn=unavailable autolearn_force=no
+	version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 03A3FC17447
-	for <linux-block@archiver.kernel.org>; Tue, 12 Nov 2019 00:11:38 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 134EDC17441
+	for <linux-block@archiver.kernel.org>; Tue, 12 Nov 2019 00:19:23 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.kernel.org (Postfix) with ESMTP id CB21320840
-	for <linux-block@archiver.kernel.org>; Tue, 12 Nov 2019 00:11:37 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id D7B1720840
+	for <linux-block@archiver.kernel.org>; Tue, 12 Nov 2019 00:19:22 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=pass (2048-bit key) header.d=nvidia.com header.i=@nvidia.com header.b="GkDH7li9"
+	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="W9q/BaCe"
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1726995AbfKLAHN (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Mon, 11 Nov 2019 19:07:13 -0500
-Received: from hqemgate16.nvidia.com ([216.228.121.65]:3257 "EHLO
-        hqemgate16.nvidia.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1726902AbfKLAHM (ORCPT
+        id S1727063AbfKLATT (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Mon, 11 Nov 2019 19:19:19 -0500
+Received: from us-smtp-delivery-1.mimecast.com ([207.211.31.120]:44015 "EHLO
+        us-smtp-1.mimecast.com" rhost-flags-OK-OK-OK-FAIL) by vger.kernel.org
+        with ESMTP id S1726978AbfKLATR (ORCPT
         <rfc822;linux-block@vger.kernel.org>);
-        Mon, 11 Nov 2019 19:07:12 -0500
-Received: from hqpgpgate101.nvidia.com (Not Verified[216.228.121.13]) by hqemgate16.nvidia.com (using TLS: TLSv1.2, DES-CBC3-SHA)
-        id <B5dc9f7730001>; Mon, 11 Nov 2019 16:06:11 -0800
-Received: from hqmail.nvidia.com ([172.20.161.6])
-  by hqpgpgate101.nvidia.com (PGP Universal service);
-  Mon, 11 Nov 2019 16:07:07 -0800
-X-PGP-Universal: processed;
-        by hqpgpgate101.nvidia.com on Mon, 11 Nov 2019 16:07:07 -0800
-Received: from HQMAIL105.nvidia.com (172.20.187.12) by HQMAIL101.nvidia.com
- (172.20.187.10) with Microsoft SMTP Server (TLS) id 15.0.1473.3; Tue, 12 Nov
- 2019 00:07:07 +0000
-Received: from rnnvemgw01.nvidia.com (10.128.109.123) by HQMAIL105.nvidia.com
- (172.20.187.12) with Microsoft SMTP Server (TLS) id 15.0.1473.3 via Frontend
- Transport; Tue, 12 Nov 2019 00:07:06 +0000
-Received: from blueforge.nvidia.com (Not Verified[10.110.48.28]) by rnnvemgw01.nvidia.com with Trustwave SEG (v7,5,8,10121)
-        id <B5dc9f7a90000>; Mon, 11 Nov 2019 16:07:06 -0800
-From:   John Hubbard <jhubbard@nvidia.com>
-To:     Andrew Morton <akpm@linux-foundation.org>
-CC:     Al Viro <viro@zeniv.linux.org.uk>,
-        Alex Williamson <alex.williamson@redhat.com>,
-        Benjamin Herrenschmidt <benh@kernel.crashing.org>,
-        =?UTF-8?q?Bj=C3=B6rn=20T=C3=B6pel?= <bjorn.topel@intel.com>,
-        Christoph Hellwig <hch@infradead.org>,
-        Dan Williams <dan.j.williams@intel.com>,
-        Daniel Vetter <daniel@ffwll.ch>,
-        Dave Chinner <david@fromorbit.com>,
-        David Airlie <airlied@linux.ie>,
-        "David S . Miller" <davem@davemloft.net>,
-        Ira Weiny <ira.weiny@intel.com>, Jan Kara <jack@suse.cz>,
-        Jason Gunthorpe <jgg@ziepe.ca>, Jens Axboe <axboe@kernel.dk>,
-        Jonathan Corbet <corbet@lwn.net>,
-        =?UTF-8?q?J=C3=A9r=C3=B4me=20Glisse?= <jglisse@redhat.com>,
-        Magnus Karlsson <magnus.karlsson@intel.com>,
-        Mauro Carvalho Chehab <mchehab@kernel.org>,
-        Michael Ellerman <mpe@ellerman.id.au>,
+        Mon, 11 Nov 2019 19:19:17 -0500
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+        s=mimecast20190719; t=1573517955;
+        h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+         to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+         content-transfer-encoding:content-transfer-encoding;
+        bh=4Qp+qAWnA86YTq8ORascu57Z8nk2SYkcadQHnIe57pg=;
+        b=W9q/BaCee8xgeiXgeJr0rCsUo45s4KqHFXKvgF1tsET+fvhXjr0B7A5HUXcFGjKoshl2TK
+        iXtSOOt1mZdJ9iU0mTZjoKq1/k9FpbWPLvXPHpH/zPHPPmdzQGgCFAorMySuNcxzSzMNNy
+        yxJRgGG8arpCGA9gXbkzeTErgm7insM=
+Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
+ [209.132.183.4]) (Using TLS) by relay.mimecast.com with ESMTP id
+ us-mta-183-3uhtm5eUN8qa7yP-FZ0psw-1; Mon, 11 Nov 2019 19:19:05 -0500
+Received: from smtp.corp.redhat.com (int-mx07.intmail.prod.int.phx2.redhat.com [10.5.11.22])
+        (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
+        (No client certificate requested)
+        by mimecast-mx01.redhat.com (Postfix) with ESMTPS id 30225800C72;
+        Tue, 12 Nov 2019 00:19:03 +0000 (UTC)
+Received: from rh2.redhat.com (ovpn-123-234.rdu2.redhat.com [10.10.123.234])
+        by smtp.corp.redhat.com (Postfix) with ESMTP id 4351210027B6;
+        Tue, 12 Nov 2019 00:19:01 +0000 (UTC)
+From:   Mike Christie <mchristi@redhat.com>
+To:     linux-api@vger.kernel.org, idryomov@gmail.com, mhocko@kernel.org,
+        david@fromorbit.com, linux-mm@kvack.org,
+        linux-kernel@vger.kernel.org, linux-scsi@vger.kernel.org,
+        linux-fsdevel@vger.kernel.org, linux-block@vger.kernel.org,
+        martin@urbackup.org, Damien.LeMoal@wdc.com
+Cc:     Mike Christie <mchristi@redhat.com>,
         Michal Hocko <mhocko@suse.com>,
-        Mike Kravetz <mike.kravetz@oracle.com>,
-        Paul Mackerras <paulus@samba.org>,
-        Shuah Khan <shuah@kernel.org>,
-        Vlastimil Babka <vbabka@suse.cz>, <bpf@vger.kernel.org>,
-        <dri-devel@lists.freedesktop.org>, <kvm@vger.kernel.org>,
-        <linux-block@vger.kernel.org>, <linux-doc@vger.kernel.org>,
-        <linux-fsdevel@vger.kernel.org>, <linux-kselftest@vger.kernel.org>,
-        <linux-media@vger.kernel.org>, <linux-rdma@vger.kernel.org>,
-        <linuxppc-dev@lists.ozlabs.org>, <netdev@vger.kernel.org>,
-        <linux-mm@kvack.org>, LKML <linux-kernel@vger.kernel.org>,
-        John Hubbard <jhubbard@nvidia.com>
-Subject: [PATCH v3 03/23] mm/gup: move try_get_compound_head() to top, fix minor issues
-Date:   Mon, 11 Nov 2019 16:06:40 -0800
-Message-ID: <20191112000700.3455038-4-jhubbard@nvidia.com>
-X-Mailer: git-send-email 2.24.0
-In-Reply-To: <20191112000700.3455038-1-jhubbard@nvidia.com>
-References: <20191112000700.3455038-1-jhubbard@nvidia.com>
+        Masato Suzuki <masato.suzuki@wdc.com>,
+        Damien Le Moal <damien.lemoal@wdc.com>
+Subject: [PATCH] Add prctl support for controlling mem reclaim V4
+Date:   Mon, 11 Nov 2019 18:19:00 -0600
+Message-Id: <20191112001900.9206-1-mchristi@redhat.com>
 MIME-Version: 1.0
-X-NVConfidentiality: public
+X-Scanned-By: MIMEDefang 2.84 on 10.5.11.22
+X-MC-Unique: 3uhtm5eUN8qa7yP-FZ0psw-1
+X-Mimecast-Spam-Score: 0
+Content-Type: text/plain; charset=WINDOWS-1252
 Content-Transfer-Encoding: quoted-printable
-Content-Type: text/plain
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=nvidia.com; s=n1;
-        t=1573517171; bh=5vGfYGjp3s6bW36xq9/Bb46iugaNKE7HlOm7HXQ5wWg=;
-        h=X-PGP-Universal:From:To:CC:Subject:Date:Message-ID:X-Mailer:
-         In-Reply-To:References:MIME-Version:X-NVConfidentiality:
-         Content-Transfer-Encoding:Content-Type;
-        b=GkDH7li9lP7A/uMpxLR/P9FNhMq8JTTMAN0SWpbrJSFjXGyR/2s9DlCPum2PGa7jS
-         5drAJ2N47vT5h8NKUbzJDgy+l4lgeEnj4eGWzvzqlIlYp5/bn++aheJOdFNX7wAfGI
-         JFW0BhIXxLq2jL3t1c2FtH1mVrBDrEARcO31SdbgzvbdMembdb9e6J0rVv0+jswL2Q
-         m9MWfxq3HHmN1Dge0LLpO6W3G+XeMFrpoGnRwBReM/8tedKtKrqPaeNLNp5pGfn99+
-         Rf4dT9miWLuHEHaykyiWZaS9DgnEPoNCck1Vo5IUhU1r8GP2qmo/PaOTok7Cj6p+9F
-         d9k7VvHI1voLg==
 Sender: linux-block-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-An upcoming patch uses try_get_compound_head() more widely,
-so move it to the top of gup.c.
+There are several storage drivers like dm-multipath, iscsi, tcmu-runner,
+amd nbd that have userspace components that can run in the IO path. For
+example, iscsi and nbd's userspace deamons may need to recreate a socket
+and/or send IO on it, and dm-multipath's daemon multipathd may need to
+send SG IO or read/write IO to figure out the state of paths and re-set
+them up.
 
-Also fix a tiny spelling error and a checkpatch.pl warning.
+In the kernel these drivers have access to GFP_NOIO/GFP_NOFS and the
+memalloc_*_save/restore functions to control the allocation behavior,
+but for userspace we would end up hitting an allocation that ended up
+writing data back to the same device we are trying to allocate for.
+The device is then in a state of deadlock, because to execute IO the
+device needs to allocate memory, but to allocate memory the memory
+layers want execute IO to the device.
 
-Signed-off-by: John Hubbard <jhubbard@nvidia.com>
+Here is an example with nbd using a local userspace daemon that performs
+network IO to a remote server. We are using XFS on top of the nbd device,
+but it can happen with any FS or other modules layered on top of the nbd
+device that can write out data to free memory.  Here a nbd daemon helper
+thread, msgr-worker-1, is performing a write/sendmsg on a socket to execute
+a request. This kicks off a reclaim operation which results in a WRITE to
+the nbd device and the nbd thread calling back into the mm layer.
+
+[ 1626.609191] msgr-worker-1   D    0  1026      1 0x00004000
+[ 1626.609193] Call Trace:
+[ 1626.609195]  ? __schedule+0x29b/0x630
+[ 1626.609197]  ? wait_for_completion+0xe0/0x170
+[ 1626.609198]  schedule+0x30/0xb0
+[ 1626.609200]  schedule_timeout+0x1f6/0x2f0
+[ 1626.609202]  ? blk_finish_plug+0x21/0x2e
+[ 1626.609204]  ? _xfs_buf_ioapply+0x2e6/0x410
+[ 1626.609206]  ? wait_for_completion+0xe0/0x170
+[ 1626.609208]  wait_for_completion+0x108/0x170
+[ 1626.609210]  ? wake_up_q+0x70/0x70
+[ 1626.609212]  ? __xfs_buf_submit+0x12e/0x250
+[ 1626.609214]  ? xfs_bwrite+0x25/0x60
+[ 1626.609215]  xfs_buf_iowait+0x22/0xf0
+[ 1626.609218]  __xfs_buf_submit+0x12e/0x250
+[ 1626.609220]  xfs_bwrite+0x25/0x60
+[ 1626.609222]  xfs_reclaim_inode+0x2e8/0x310
+[ 1626.609224]  xfs_reclaim_inodes_ag+0x1b6/0x300
+[ 1626.609227]  xfs_reclaim_inodes_nr+0x31/0x40
+[ 1626.609228]  super_cache_scan+0x152/0x1a0
+[ 1626.609231]  do_shrink_slab+0x12c/0x2d0
+[ 1626.609233]  shrink_slab+0x9c/0x2a0
+[ 1626.609235]  shrink_node+0xd7/0x470
+[ 1626.609237]  do_try_to_free_pages+0xbf/0x380
+[ 1626.609240]  try_to_free_pages+0xd9/0x1f0
+[ 1626.609245]  __alloc_pages_slowpath+0x3a4/0xd30
+[ 1626.609251]  ? ___slab_alloc+0x238/0x560
+[ 1626.609254]  __alloc_pages_nodemask+0x30c/0x350
+[ 1626.609259]  skb_page_frag_refill+0x97/0xd0
+[ 1626.609274]  sk_page_frag_refill+0x1d/0x80
+[ 1626.609279]  tcp_sendmsg_locked+0x2bb/0xdd0
+[ 1626.609304]  tcp_sendmsg+0x27/0x40
+[ 1626.609307]  sock_sendmsg+0x54/0x60
+[ 1626.609308]  ___sys_sendmsg+0x29f/0x320
+[ 1626.609313]  ? sock_poll+0x66/0xb0
+[ 1626.609318]  ? ep_item_poll.isra.15+0x40/0xc0
+[ 1626.609320]  ? ep_send_events_proc+0xe6/0x230
+[ 1626.609322]  ? hrtimer_try_to_cancel+0x54/0xf0
+[ 1626.609324]  ? ep_read_events_proc+0xc0/0xc0
+[ 1626.609326]  ? _raw_write_unlock_irq+0xa/0x20
+[ 1626.609327]  ? ep_scan_ready_list.constprop.19+0x218/0x230
+[ 1626.609329]  ? __hrtimer_init+0xb0/0xb0
+[ 1626.609331]  ? _raw_spin_unlock_irq+0xa/0x20
+[ 1626.609334]  ? ep_poll+0x26c/0x4a0
+[ 1626.609337]  ? tcp_tsq_write.part.54+0xa0/0xa0
+[ 1626.609339]  ? release_sock+0x43/0x90
+[ 1626.609341]  ? _raw_spin_unlock_bh+0xa/0x20
+[ 1626.609342]  __sys_sendmsg+0x47/0x80
+[ 1626.609347]  do_syscall_64+0x5f/0x1c0
+[ 1626.609349]  ? prepare_exit_to_usermode+0x75/0xa0
+[ 1626.609351]  entry_SYSCALL_64_after_hwframe+0x44/0xa9
+
+This patch adds a new prctl command that daemons can use after they have
+done their initial setup, and before they start to do allocations that
+are in the IO path. It sets the PF_MEMALLOC_NOIO and PF_LESS_THROTTLE
+flags so both userspace block and FS threads can use it to avoid the
+allocation recursion and try to prevent from being throttled while
+writing out data to free up memory.
+
+Signed-off-by: Mike Christie <mchristi@redhat.com>
+Acked-by: Michal Hocko <mhocko@suse.com>
+Tested-by: Masato Suzuki <masato.suzuki@wdc.com>
+Reviewed-by: Damien Le Moal <damien.lemoal@wdc.com>
+
 ---
- mm/gup.c | 29 +++++++++++++++--------------
- 1 file changed, 15 insertions(+), 14 deletions(-)
 
-diff --git a/mm/gup.c b/mm/gup.c
-index 199da99e8ffc..933524de6249 100644
---- a/mm/gup.c
-+++ b/mm/gup.c
-@@ -29,6 +29,21 @@ struct follow_page_context {
- 	unsigned int page_mask;
- };
+V4:
+- Fix PR_GET_IO_FLUSHER check to match SET.
+
+V3:
+- Drop NOFS, set PF_LESS_THROTTLE and rename prctl flag to reflect it
+is more general and can support both FS and block devices. Both fuse
+and block device daemons, nbd and tcmu-runner, have been tested to
+confirm the more restrictive PF_MEMALLOC_NOIO also works for fuse.
+
+- Use CAP_SYS_RESOURCE instead of admin.
+
+V2:
+- Use prctl instead of procfs.
+- Add support for NOFS for fuse.
+- Check permissions.
+
+
+ include/uapi/linux/capability.h |  1 +
+ include/uapi/linux/prctl.h      |  4 ++++
+ kernel/sys.c                    | 25 +++++++++++++++++++++++++
+ 3 files changed, 30 insertions(+)
+
+diff --git a/include/uapi/linux/capability.h b/include/uapi/linux/capabilit=
+y.h
+index 240fdb9a60f6..272dc69fa080 100644
+--- a/include/uapi/linux/capability.h
++++ b/include/uapi/linux/capability.h
+@@ -301,6 +301,7 @@ struct vfs_ns_cap_data {
+ /* Allow more than 64hz interrupts from the real-time clock */
+ /* Override max number of consoles on console allocation */
+ /* Override max number of keymaps */
++/* Control memory reclaim behavior */
 =20
-+/*
-+ * Return the compound head page with ref appropriately incremented,
-+ * or NULL if that failed.
-+ */
-+static inline struct page *try_get_compound_head(struct page *page, int re=
-fs)
-+{
-+	struct page *head =3D compound_head(page);
+ #define CAP_SYS_RESOURCE     24
+=20
+diff --git a/include/uapi/linux/prctl.h b/include/uapi/linux/prctl.h
+index 7da1b37b27aa..07b4f8131e36 100644
+--- a/include/uapi/linux/prctl.h
++++ b/include/uapi/linux/prctl.h
+@@ -234,4 +234,8 @@ struct prctl_mm_map {
+ #define PR_GET_TAGGED_ADDR_CTRL=09=0956
+ # define PR_TAGGED_ADDR_ENABLE=09=09(1UL << 0)
+=20
++/* Control reclaim behavior when allocating memory */
++#define PR_SET_IO_FLUSHER=09=0957
++#define PR_GET_IO_FLUSHER=09=0958
 +
-+	if (WARN_ON_ONCE(page_ref_count(head) < 0))
-+		return NULL;
-+	if (unlikely(!page_cache_add_speculative(head, refs)))
-+		return NULL;
-+	return head;
-+}
-+
- /**
-  * put_user_pages_dirty_lock() - release and optionally dirty gup-pinned p=
-ages
-  * @pages:  array of pages to be maybe marked dirty, and definitely releas=
-ed.
-@@ -1793,20 +1808,6 @@ static void __maybe_unused undo_dev_pagemap(int *nr,=
- int nr_start,
- 	}
+ #endif /* _LINUX_PRCTL_H */
+diff --git a/kernel/sys.c b/kernel/sys.c
+index a611d1d58c7d..c1a360370d09 100644
+--- a/kernel/sys.c
++++ b/kernel/sys.c
+@@ -2259,6 +2259,8 @@ int __weak arch_prctl_spec_ctrl_set(struct task_struc=
+t *t, unsigned long which,
+ =09return -EINVAL;
  }
 =20
--/*
-- * Return the compund head page with ref appropriately incremented,
-- * or NULL if that failed.
-- */
--static inline struct page *try_get_compound_head(struct page *page, int re=
-fs)
--{
--	struct page *head =3D compound_head(page);
--	if (WARN_ON_ONCE(page_ref_count(head) < 0))
--		return NULL;
--	if (unlikely(!page_cache_add_speculative(head, refs)))
--		return NULL;
--	return head;
--}
--
- #ifdef CONFIG_ARCH_HAS_PTE_SPECIAL
- static int gup_pte_range(pmd_t pmd, unsigned long addr, unsigned long end,
- 			 unsigned int flags, struct page **pages, int *nr)
++#define PR_IO_FLUSHER (PF_MEMALLOC_NOIO | PF_LESS_THROTTLE)
++
+ SYSCALL_DEFINE5(prctl, int, option, unsigned long, arg2, unsigned long, ar=
+g3,
+ =09=09unsigned long, arg4, unsigned long, arg5)
+ {
+@@ -2486,6 +2488,29 @@ SYSCALL_DEFINE5(prctl, int, option, unsigned long, a=
+rg2, unsigned long, arg3,
+ =09=09=09return -EINVAL;
+ =09=09error =3D GET_TAGGED_ADDR_CTRL();
+ =09=09break;
++=09case PR_SET_IO_FLUSHER:
++=09=09if (!capable(CAP_SYS_RESOURCE))
++=09=09=09return -EPERM;
++
++=09=09if (arg3 || arg4 || arg5)
++=09=09=09return -EINVAL;
++
++=09=09if (arg2 =3D=3D 1)
++=09=09=09current->flags |=3D PR_IO_FLUSHER;
++=09=09else if (!arg2)
++=09=09=09current->flags &=3D ~PR_IO_FLUSHER;
++=09=09else
++=09=09=09return -EINVAL;
++=09=09break;
++=09case PR_GET_IO_FLUSHER:
++=09=09if (!capable(CAP_SYS_RESOURCE))
++=09=09=09return -EPERM;
++
++=09=09if (arg2 || arg3 || arg4 || arg5)
++=09=09=09return -EINVAL;
++
++=09=09error =3D (current->flags & PR_IO_FLUSHER) =3D=3D PR_IO_FLUSHER;
++=09=09break;
+ =09default:
+ =09=09error =3D -EINVAL;
+ =09=09break;
 --=20
-2.24.0
+2.20.1
 
