@@ -4,39 +4,39 @@ X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 X-Spam-Level: 
 X-Spam-Status: No, score=-9.9 required=3.0 tests=DKIMWL_WL_HIGH,DKIM_SIGNED,
 	DKIM_VALID,DKIM_VALID_AU,HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,
-	MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED,
-	USER_AGENT_GIT autolearn=unavailable autolearn_force=no version=3.4.0
+	MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,USER_AGENT_GIT
+	autolearn=unavailable autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 8BF7EC43331
-	for <linux-block@archiver.kernel.org>; Tue, 12 Nov 2019 00:11:23 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 6CE93C43331
+	for <linux-block@archiver.kernel.org>; Tue, 12 Nov 2019 00:11:25 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.kernel.org (Postfix) with ESMTP id 536EC2184C
-	for <linux-block@archiver.kernel.org>; Tue, 12 Nov 2019 00:11:23 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id 39AEA20840
+	for <linux-block@archiver.kernel.org>; Tue, 12 Nov 2019 00:11:25 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=pass (2048-bit key) header.d=nvidia.com header.i=@nvidia.com header.b="BrEsyttE"
+	dkim=pass (2048-bit key) header.d=nvidia.com header.i=@nvidia.com header.b="KhLyNKkC"
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1727109AbfKLALL (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Mon, 11 Nov 2019 19:11:11 -0500
-Received: from hqemgate16.nvidia.com ([216.228.121.65]:3253 "EHLO
-        hqemgate16.nvidia.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1726910AbfKLAHN (ORCPT
-        <rfc822;linux-block@vger.kernel.org>);
+        id S1727126AbfKLAHN (ORCPT <rfc822;linux-block@archiver.kernel.org>);
         Mon, 11 Nov 2019 19:07:13 -0500
-Received: from hqpgpgate102.nvidia.com (Not Verified[216.228.121.13]) by hqemgate16.nvidia.com (using TLS: TLSv1.2, DES-CBC3-SHA)
-        id <B5dc9f7720000>; Mon, 11 Nov 2019 16:06:10 -0800
+Received: from hqemgate14.nvidia.com ([216.228.121.143]:10606 "EHLO
+        hqemgate14.nvidia.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S1726952AbfKLAHM (ORCPT
+        <rfc822;linux-block@vger.kernel.org>);
+        Mon, 11 Nov 2019 19:07:12 -0500
+Received: from hqpgpgate101.nvidia.com (Not Verified[216.228.121.13]) by hqemgate14.nvidia.com (using TLS: TLSv1.2, DES-CBC3-SHA)
+        id <B5dc9f7b10000>; Mon, 11 Nov 2019 16:07:13 -0800
 Received: from hqmail.nvidia.com ([172.20.161.6])
-  by hqpgpgate102.nvidia.com (PGP Universal service);
-  Mon, 11 Nov 2019 16:07:06 -0800
+  by hqpgpgate101.nvidia.com (PGP Universal service);
+  Mon, 11 Nov 2019 16:07:11 -0800
 X-PGP-Universal: processed;
-        by hqpgpgate102.nvidia.com on Mon, 11 Nov 2019 16:07:06 -0800
-Received: from HQMAIL107.nvidia.com (172.20.187.13) by HQMAIL107.nvidia.com
- (172.20.187.13) with Microsoft SMTP Server (TLS) id 15.0.1473.3; Tue, 12 Nov
- 2019 00:07:05 +0000
-Received: from rnnvemgw01.nvidia.com (10.128.109.123) by HQMAIL107.nvidia.com
- (172.20.187.13) with Microsoft SMTP Server (TLS) id 15.0.1473.3 via Frontend
- Transport; Tue, 12 Nov 2019 00:07:05 +0000
+        by hqpgpgate101.nvidia.com on Mon, 11 Nov 2019 16:07:11 -0800
+Received: from HQMAIL109.nvidia.com (172.20.187.15) by HQMAIL111.nvidia.com
+ (172.20.187.18) with Microsoft SMTP Server (TLS) id 15.0.1473.3; Tue, 12 Nov
+ 2019 00:07:10 +0000
+Received: from rnnvemgw01.nvidia.com (10.128.109.123) by HQMAIL109.nvidia.com
+ (172.20.187.15) with Microsoft SMTP Server (TLS) id 15.0.1473.3 via Frontend
+ Transport; Tue, 12 Nov 2019 00:07:09 +0000
 Received: from blueforge.nvidia.com (Not Verified[10.110.48.28]) by rnnvemgw01.nvidia.com with Trustwave SEG (v7,5,8,10121)
-        id <B5dc9f7a70008>; Mon, 11 Nov 2019 16:07:05 -0800
+        id <B5dc9f7ac0001>; Mon, 11 Nov 2019 16:07:09 -0800
 From:   John Hubbard <jhubbard@nvidia.com>
 To:     Andrew Morton <akpm@linux-foundation.org>
 CC:     Al Viro <viro@zeniv.linux.org.uk>,
@@ -67,246 +67,83 @@ CC:     Al Viro <viro@zeniv.linux.org.uk>,
         <linux-media@vger.kernel.org>, <linux-rdma@vger.kernel.org>,
         <linuxppc-dev@lists.ozlabs.org>, <netdev@vger.kernel.org>,
         <linux-mm@kvack.org>, LKML <linux-kernel@vger.kernel.org>,
-        John Hubbard <jhubbard@nvidia.com>,
-        Christoph Hellwig <hch@lst.de>,
-        "Aneesh Kumar K . V" <aneesh.kumar@linux.ibm.com>
-Subject: [PATCH v3 02/23] mm/gup: factor out duplicate code from four routines
-Date:   Mon, 11 Nov 2019 16:06:39 -0800
-Message-ID: <20191112000700.3455038-3-jhubbard@nvidia.com>
+        John Hubbard <jhubbard@nvidia.com>
+Subject: [PATCH v3 06/23] IB/umem: use get_user_pages_fast() to pin DMA pages
+Date:   Mon, 11 Nov 2019 16:06:43 -0800
+Message-ID: <20191112000700.3455038-7-jhubbard@nvidia.com>
 X-Mailer: git-send-email 2.24.0
 In-Reply-To: <20191112000700.3455038-1-jhubbard@nvidia.com>
 References: <20191112000700.3455038-1-jhubbard@nvidia.com>
 MIME-Version: 1.0
 X-NVConfidentiality: public
-Content-Type: text/plain; charset="UTF-8"
 Content-Transfer-Encoding: quoted-printable
+Content-Type: text/plain
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=nvidia.com; s=n1;
-        t=1573517170; bh=kJfdBwtxV0Xf/7sPEfLRjg5QuIfiLXYo87o9tgl9dSA=;
+        t=1573517233; bh=PPNQFWxgYbSBG60Oh3uZy3iaVFj8VG12aJVlvrNgBtA=;
         h=X-PGP-Universal:From:To:CC:Subject:Date:Message-ID:X-Mailer:
          In-Reply-To:References:MIME-Version:X-NVConfidentiality:
-         Content-Type:Content-Transfer-Encoding;
-        b=BrEsyttE6RAmwKB2dP7t/hBES/LaE75S+oPLzu5r7Y/kro8+cn3Newv+8jmhnecuh
-         M8pIqjj1obr+Rk//EYouq3SWQOmaPTVaz/JRvgWyHkvjTy13z1nMPs1kDmMbzyjy4i
-         B2DtnxHMFX/uC7ck8Y+TAzvF3XL88SsmUr7NyzOGpy0u7RUKqOUw8eOx5DcCuBfGqG
-         sotzZd7RDCoVqxqBS/corUzcJ6EVGB7oX93vLKNtalUTMugHKtxPEADexZRDM+fkzO
-         BcA7dsCfwX4C8fZC3v4YoCmiwJmXmqAvlc0PzjO8cVkU+tfPIs2yiWH/W+Fuvfe7k0
-         LC9kAMJdb6nyA==
+         Content-Transfer-Encoding:Content-Type;
+        b=KhLyNKkCzhj34VhXuUGSIyHKFQpNlddwQKTMNRSggrE3w/lk5jSmv2ZPbZbufxy2D
+         DwaHNn9deLnwb+9S3bnPYQt2Y8a3N/x+xRd7lyCZjJtBVXS48USN4LyP/T0wSL31A9
+         PHqCuFVCls1I4InDR/rmL4jQ59eW6S2dzy1GP6jDulz/TY3IS2beeDr/v5uOBQkkt8
+         cgTue/HPtPzjoomkooCtsjx52sbOSGnuwdu4CRFlEX4ieAvkNbohjJOFrY+GPgctFC
+         eybfSvcxdSFjY5MlzuusMY1vIOFT2942rU66o5rV0txugAXwkPygIU4TkcCtTuqA4d
+         LT2EnhJx44zxw==
 Sender: linux-block-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-There are four locations in gup.c that have a fair amount of code
-duplication. This means that changing one requires making the same
-changes in four places, not to mention reading the same code four
-times, and wondering if there are subtle differences.
+And get rid of the mmap_sem calls, as part of that. Note
+that get_user_pages_fast() will, if necessary, fall back to
+__gup_longterm_unlocked(), which takes the mmap_sem as needed.
 
-Factor out the common code into static functions, thus reducing the
-overall line count and the code's complexity.
-
-Also, take the opportunity to slightly improve the efficiency of the
-error cases, by doing a mass subtraction of the refcount, surrounded
-by get_page()/put_page().
-
-Also, further simplify (slightly), by waiting until the the successful
-end of each routine, to increment *nr.
-
-Reviewed-by: J=C3=A9r=C3=B4me Glisse <jglisse@redhat.com>
-Cc: Ira Weiny <ira.weiny@intel.com>
-Cc: Christoph Hellwig <hch@lst.de>
-Cc: Aneesh Kumar K.V <aneesh.kumar@linux.ibm.com>
+Reviewed-by: Ira Weiny <ira.weiny@intel.com>
+Cc: Jason Gunthorpe <jgg@ziepe.ca>
 Signed-off-by: John Hubbard <jhubbard@nvidia.com>
 ---
- mm/gup.c | 104 ++++++++++++++++++++++++-------------------------------
- 1 file changed, 45 insertions(+), 59 deletions(-)
+ drivers/infiniband/core/umem.c | 17 ++++++-----------
+ 1 file changed, 6 insertions(+), 11 deletions(-)
 
-diff --git a/mm/gup.c b/mm/gup.c
-index 85caf76b3012..199da99e8ffc 100644
---- a/mm/gup.c
-+++ b/mm/gup.c
-@@ -1969,6 +1969,34 @@ static int __gup_device_huge_pud(pud_t pud, pud_t *p=
-udp, unsigned long addr,
- }
- #endif
+diff --git a/drivers/infiniband/core/umem.c b/drivers/infiniband/core/umem.=
+c
+index 24244a2f68cc..3d664a2539eb 100644
+--- a/drivers/infiniband/core/umem.c
++++ b/drivers/infiniband/core/umem.c
+@@ -271,16 +271,13 @@ struct ib_umem *ib_umem_get(struct ib_udata *udata, u=
+nsigned long addr,
+ 	sg =3D umem->sg_head.sgl;
 =20
-+static int __record_subpages(struct page *page, unsigned long addr,
-+			     unsigned long end, struct page **pages, int nr)
-+{
-+	int nr_recorded_pages =3D 0;
-+
-+	do {
-+		pages[nr] =3D page;
-+		nr++;
-+		page++;
-+		nr_recorded_pages++;
-+	} while (addr +=3D PAGE_SIZE, addr !=3D end);
-+	return nr_recorded_pages;
-+}
-+
-+static void put_compound_head(struct page *page, int refs)
-+{
-+	/* Do a get_page() first, in case refs =3D=3D page->_refcount */
-+	get_page(page);
-+	page_ref_sub(page, refs);
-+	put_page(page);
-+}
-+
-+static void __huge_pt_done(struct page *head, int nr_recorded_pages, int *=
-nr)
-+{
-+	*nr +=3D nr_recorded_pages;
-+	SetPageReferenced(head);
-+}
-+
- #ifdef CONFIG_ARCH_HAS_HUGEPD
- static unsigned long hugepte_addr_end(unsigned long addr, unsigned long en=
-d,
- 				      unsigned long sz)
-@@ -1998,33 +2026,20 @@ static int gup_hugepte(pte_t *ptep, unsigned long s=
-z, unsigned long addr,
- 	/* hugepages are never "special" */
- 	VM_BUG_ON(!pfn_valid(pte_pfn(pte)));
+ 	while (npages) {
+-		down_read(&mm->mmap_sem);
+-		ret =3D get_user_pages(cur_base,
+-				     min_t(unsigned long, npages,
+-					   PAGE_SIZE / sizeof (struct page *)),
+-				     gup_flags | FOLL_LONGTERM,
+-				     page_list, NULL);
+-		if (ret < 0) {
+-			up_read(&mm->mmap_sem);
++		ret =3D get_user_pages_fast(cur_base,
++					  min_t(unsigned long, npages,
++						PAGE_SIZE /
++						sizeof(struct page *)),
++					  gup_flags | FOLL_LONGTERM, page_list);
++		if (ret < 0)
+ 			goto umem_release;
+-		}
 =20
--	refs =3D 0;
- 	head =3D pte_page(pte);
+ 		cur_base +=3D ret * PAGE_SIZE;
+ 		npages   -=3D ret;
+@@ -288,8 +285,6 @@ struct ib_umem *ib_umem_get(struct ib_udata *udata, uns=
+igned long addr,
+ 		sg =3D ib_umem_add_sg_table(sg, page_list, ret,
+ 			dma_get_max_seg_size(context->device->dma_device),
+ 			&umem->sg_nents);
 -
- 	page =3D head + ((addr & (sz-1)) >> PAGE_SHIFT);
--	do {
--		VM_BUG_ON(compound_head(page) !=3D head);
--		pages[*nr] =3D page;
--		(*nr)++;
--		page++;
--		refs++;
--	} while (addr +=3D PAGE_SIZE, addr !=3D end);
-+	refs =3D __record_subpages(page, addr, end, pages, *nr);
-=20
- 	head =3D try_get_compound_head(head, refs);
--	if (!head) {
--		*nr -=3D refs;
-+	if (!head)
- 		return 0;
--	}
-=20
- 	if (unlikely(pte_val(pte) !=3D pte_val(*ptep))) {
--		/* Could be optimized better */
--		*nr -=3D refs;
--		while (refs--)
--			put_page(head);
-+		put_compound_head(head, refs);
- 		return 0;
+-		up_read(&mm->mmap_sem);
  	}
 =20
--	SetPageReferenced(head);
-+	__huge_pt_done(head, refs, nr);
- 	return 1;
- }
-=20
-@@ -2071,29 +2086,19 @@ static int gup_huge_pmd(pmd_t orig, pmd_t *pmdp, un=
-signed long addr,
- 					     pages, nr);
- 	}
-=20
--	refs =3D 0;
- 	page =3D pmd_page(orig) + ((addr & ~PMD_MASK) >> PAGE_SHIFT);
--	do {
--		pages[*nr] =3D page;
--		(*nr)++;
--		page++;
--		refs++;
--	} while (addr +=3D PAGE_SIZE, addr !=3D end);
-+	refs =3D __record_subpages(page, addr, end, pages, *nr);
-=20
- 	head =3D try_get_compound_head(pmd_page(orig), refs);
--	if (!head) {
--		*nr -=3D refs;
-+	if (!head)
- 		return 0;
--	}
-=20
- 	if (unlikely(pmd_val(orig) !=3D pmd_val(*pmdp))) {
--		*nr -=3D refs;
--		while (refs--)
--			put_page(head);
-+		put_compound_head(head, refs);
- 		return 0;
- 	}
-=20
--	SetPageReferenced(head);
-+	__huge_pt_done(head, refs, nr);
- 	return 1;
- }
-=20
-@@ -2114,29 +2119,19 @@ static int gup_huge_pud(pud_t orig, pud_t *pudp, un=
-signed long addr,
- 					     pages, nr);
- 	}
-=20
--	refs =3D 0;
- 	page =3D pud_page(orig) + ((addr & ~PUD_MASK) >> PAGE_SHIFT);
--	do {
--		pages[*nr] =3D page;
--		(*nr)++;
--		page++;
--		refs++;
--	} while (addr +=3D PAGE_SIZE, addr !=3D end);
-+	refs =3D __record_subpages(page, addr, end, pages, *nr);
-=20
- 	head =3D try_get_compound_head(pud_page(orig), refs);
--	if (!head) {
--		*nr -=3D refs;
-+	if (!head)
- 		return 0;
--	}
-=20
- 	if (unlikely(pud_val(orig) !=3D pud_val(*pudp))) {
--		*nr -=3D refs;
--		while (refs--)
--			put_page(head);
-+		put_compound_head(head, refs);
- 		return 0;
- 	}
-=20
--	SetPageReferenced(head);
-+	__huge_pt_done(head, refs, nr);
- 	return 1;
- }
-=20
-@@ -2151,29 +2146,20 @@ static int gup_huge_pgd(pgd_t orig, pgd_t *pgdp, un=
-signed long addr,
- 		return 0;
-=20
- 	BUILD_BUG_ON(pgd_devmap(orig));
--	refs =3D 0;
-+
- 	page =3D pgd_page(orig) + ((addr & ~PGDIR_MASK) >> PAGE_SHIFT);
--	do {
--		pages[*nr] =3D page;
--		(*nr)++;
--		page++;
--		refs++;
--	} while (addr +=3D PAGE_SIZE, addr !=3D end);
-+	refs =3D __record_subpages(page, addr, end, pages, *nr);
-=20
- 	head =3D try_get_compound_head(pgd_page(orig), refs);
--	if (!head) {
--		*nr -=3D refs;
-+	if (!head)
- 		return 0;
--	}
-=20
- 	if (unlikely(pgd_val(orig) !=3D pgd_val(*pgdp))) {
--		*nr -=3D refs;
--		while (refs--)
--			put_page(head);
-+		put_compound_head(head, refs);
- 		return 0;
- 	}
-=20
--	SetPageReferenced(head);
-+	__huge_pt_done(head, refs, nr);
- 	return 1;
- }
-=20
+ 	sg_mark_end(sg);
 --=20
 2.24.0
 
