@@ -6,61 +6,62 @@ X-Spam-Status: No, score=-0.8 required=3.0 tests=DKIM_SIGNED,DKIM_VALID,
 	HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,
 	URIBL_BLOCKED autolearn=no autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id D2AF9C43331
-	for <linux-block@archiver.kernel.org>; Tue, 12 Nov 2019 22:46:03 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 71B07C17448
+	for <linux-block@archiver.kernel.org>; Tue, 12 Nov 2019 23:15:15 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.kernel.org (Postfix) with ESMTP id 9FC992196E
-	for <linux-block@archiver.kernel.org>; Tue, 12 Nov 2019 22:46:03 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id 4A03B214E0
+	for <linux-block@archiver.kernel.org>; Tue, 12 Nov 2019 23:15:15 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=pass (2048-bit key) header.d=intel-com.20150623.gappssmtp.com header.i=@intel-com.20150623.gappssmtp.com header.b="g+shynx9"
+	dkim=pass (2048-bit key) header.d=intel-com.20150623.gappssmtp.com header.i=@intel-com.20150623.gappssmtp.com header.b="xlO/3o/F"
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1726977AbfKLWqD (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Tue, 12 Nov 2019 17:46:03 -0500
-Received: from mail-oi1-f195.google.com ([209.85.167.195]:45477 "EHLO
+        id S1727183AbfKLXPO (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Tue, 12 Nov 2019 18:15:14 -0500
+Received: from mail-oi1-f195.google.com ([209.85.167.195]:40210 "EHLO
         mail-oi1-f195.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1726970AbfKLWqC (ORCPT
+        with ESMTP id S1726953AbfKLXPK (ORCPT
         <rfc822;linux-block@vger.kernel.org>);
-        Tue, 12 Nov 2019 17:46:02 -0500
-Received: by mail-oi1-f195.google.com with SMTP id 14so10442317oir.12
-        for <linux-block@vger.kernel.org>; Tue, 12 Nov 2019 14:46:02 -0800 (PST)
+        Tue, 12 Nov 2019 18:15:10 -0500
+Received: by mail-oi1-f195.google.com with SMTP id 22so20677oip.7
+        for <linux-block@vger.kernel.org>; Tue, 12 Nov 2019 15:15:10 -0800 (PST)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=intel-com.20150623.gappssmtp.com; s=20150623;
         h=mime-version:references:in-reply-to:from:date:message-id:subject:to
          :cc;
-        bh=7VZux41I9l8WsaFw4dnSKoQ+DL1POYbdTwXxPgsqOD8=;
-        b=g+shynx9wA4O7/ZPSOmOhvhdFUBcChFyBb7EYzal20VNZRr14tSC8CEEu8RhYVOSKP
-         ujUV0PqIhIH36zKviPook+HnkIHuRG88nmkcJhEvO3dJXo36vkvTp3d/Rv5+wpQSmOnU
-         bQU0r/Fslk/8pH+0JUylPowC6D4ZnT5PrmHiZ30JXUbKpZ1rMZQ7kmT50jl8KfJoHp7m
-         VvEK+ooBIm3vYED6+FUL9oFvr5SRhfXOEafMoAbLZrqHGNUi1aW7WiDjR5Rr2M+YKo5Q
-         1bTGao6fq7ZjCHqOdYHjYnxFv2rb5XbPoQBWE0A1WALsbQq7HL4C3F5HipXsfgbDt8Vf
-         nWjw==
+        bh=Ahg4ogj/xxSIi3Tz2dndpoesa0PkRLQ36VHrjNwVguE=;
+        b=xlO/3o/FAhmPzmX5yHbU6ZNuHn4V9nHbloPGHpZqsb+DPkTsTeMinCTT3P2xrA0A3t
+         XjX5crvs+XLSDSgcai6PZWx41nUjrksNl4jkRdGfTQpb6e1yLtFehh/VkrzYDg6mpqa6
+         nIua0PamDKkJ2o4Dp1t2Oe3HiXMlIx7Jxg8UopWGV46jcBHLtzfhKxYanb2GfMvC3xgc
+         V252jaKpAjhpDskcu/pPNVnV9ekVH+4FC/dXONxMnvQ71JXMw8m5ltg2SL6haNirS3nS
+         2zfdpmAUDtoGxjGX0JdEV3chYwlXK5G60EaIDM8oX92yL7sroQqX5o/Sf8CBMjZV3ums
+         ZwPA==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=1e100.net; s=20161025;
         h=x-gm-message-state:mime-version:references:in-reply-to:from:date
          :message-id:subject:to:cc;
-        bh=7VZux41I9l8WsaFw4dnSKoQ+DL1POYbdTwXxPgsqOD8=;
-        b=cE8gOueCbWKsZZ9ubYtGX4e+NDMOh2iCjHdUh0mZmdl7J9Q8a3QZE/Oq8FJiSKf/mo
-         0uyBqVHRvf4zoadIu9l+zFI+BXKn7q7dWUXsIU1yficuHKE5GTvCad+G6Q0W/BAG+xRi
-         Z14lsrdD2Qnv2AKMTkip1jrtZ9wveOQaVu4zJzSvijqfmZ+AyEJHt/GmX3MYz8v/+ad3
-         y4tCx8VimMA3XR0Hwzu78J0JBwr69QhDO4OX3xgiY5pxkUQPis7WRi/41rSDzUEnR2zj
-         MK81TRVOcRZItlLEw2IfRSPuC6IUT/OrvQdqlb1+51N7V/U3NdcGRvS+vLQAqm5hFUPO
-         kRkA==
-X-Gm-Message-State: APjAAAUajQjfdTK4ggnb81K5pYNZJW9xbw75EPOH5wOiAVIsRkXC9uRQ
-        zj5bpGe3Wj25WeowGhJbc58kkrabRUED47vj7TD8gQ==
-X-Google-Smtp-Source: APXvYqwYMdEjXlo/ZXkQ25Q7OqLij5wE38qfmFx+c4Kh6ETnZQ80hOGe2SgdovvfY1Nwmo4LDa9vLeLDcR91Ofxlyck=
-X-Received: by 2002:aca:ea57:: with SMTP id i84mr83905oih.73.1573598761920;
- Tue, 12 Nov 2019 14:46:01 -0800 (PST)
+        bh=Ahg4ogj/xxSIi3Tz2dndpoesa0PkRLQ36VHrjNwVguE=;
+        b=ebyB9Ae1WvQaoYkqog4GEopYU3q5o8LRpQ0znGVigWh5y99XoAwycGWF0N9/qt/W2o
+         loq8fMKRCOW2foFA/k1+dqoyOvvUA3GUMQu5+xXbK8vsGQyWrJmNrZpfaurdIa4piPQe
+         7q+aHOmtMuRnktARa4bTlY21ULHX+hS+doy7iFhJEZmIP6RKz+j8Jb5ceJhcJDg7BP5J
+         lS9/96rw/d//1n9Wd/pjJNTMO/8/kZ3AV2xWXX8R4P1Ofl4qvh9CU38rKIP0Y7eOSGAU
+         jOpQSWWdL01SvM7V8/o1bjX5cQy76+Lp059xH8l9B8RHp0dwWx8hu03t35r2GHBeEAIk
+         XBDw==
+X-Gm-Message-State: APjAAAWpRGAn7XjCJmkn88McQdLLpS3mt32z3A59LSrD9rFUEnUuRIZ5
+        Nb31+qtR9xf4A/MDTQKLf8a+pIEcgwaI1HzFFi1JGw==
+X-Google-Smtp-Source: APXvYqw0y1/AL1ibfnKpdRZPCFvNtcNTDnagWkblsIboSxBlSGgp0qhR7HkhIvJGPGFUg8U4pz3vKkN+eKromPrOJOY=
+X-Received: by 2002:aca:ad52:: with SMTP id w79mr178668oie.149.1573600509804;
+ Tue, 12 Nov 2019 15:15:09 -0800 (PST)
 MIME-Version: 1.0
 References: <20191112000700.3455038-1-jhubbard@nvidia.com> <20191112000700.3455038-9-jhubbard@nvidia.com>
- <20191112204338.GE5584@ziepe.ca> <0db36e86-b779-01af-77e7-469af2a2e19c@nvidia.com>
-In-Reply-To: <0db36e86-b779-01af-77e7-469af2a2e19c@nvidia.com>
+ <CAPcyv4hgKEqoxeQJH9R=YiZosvazj308Kk7jJA1NLxJkNenDcQ@mail.gmail.com>
+ <471e513c-833f-2f8b-60db-5d9c56a8f766@nvidia.com> <CAPcyv4it5fxU71uXFHW_WAAXBw4suQvwWTjX0Wru8xKFoz_dbw@mail.gmail.com>
+ <729a16cb-3947-c7cb-c57f-6c917d240665@nvidia.com>
+In-Reply-To: <729a16cb-3947-c7cb-c57f-6c917d240665@nvidia.com>
 From:   Dan Williams <dan.j.williams@intel.com>
-Date:   Tue, 12 Nov 2019 14:45:51 -0800
-Message-ID: <CAPcyv4hAEgw6ySNS+EFRS4yNRVGz9A3Fu1vOk=XtpjYC64kQJw@mail.gmail.com>
+Date:   Tue, 12 Nov 2019 15:14:58 -0800
+Message-ID: <CAPcyv4gUe__09cnAh3jeFogJH=sGm9U+8axRq_kCASkdbLfNbQ@mail.gmail.com>
 Subject: Re: [PATCH v3 08/23] vfio, mm: fix get_user_pages_remote() and FOLL_LONGTERM
 To:     John Hubbard <jhubbard@nvidia.com>
-Cc:     Jason Gunthorpe <jgg@ziepe.ca>,
-        Andrew Morton <akpm@linux-foundation.org>,
+Cc:     Andrew Morton <akpm@linux-foundation.org>,
         Al Viro <viro@zeniv.linux.org.uk>,
         Alex Williamson <alex.williamson@redhat.com>,
         Benjamin Herrenschmidt <benh@kernel.crashing.org>,
@@ -71,7 +72,8 @@ Cc:     Jason Gunthorpe <jgg@ziepe.ca>,
         David Airlie <airlied@linux.ie>,
         "David S . Miller" <davem@davemloft.net>,
         Ira Weiny <ira.weiny@intel.com>, Jan Kara <jack@suse.cz>,
-        Jens Axboe <axboe@kernel.dk>, Jonathan Corbet <corbet@lwn.net>,
+        Jason Gunthorpe <jgg@ziepe.ca>, Jens Axboe <axboe@kernel.dk>,
+        Jonathan Corbet <corbet@lwn.net>,
         =?UTF-8?B?SsOpcsO0bWUgR2xpc3Nl?= <jglisse@redhat.com>,
         Magnus Karlsson <magnus.karlsson@intel.com>,
         Mauro Carvalho Chehab <mchehab@kernel.org>,
@@ -91,38 +93,70 @@ Cc:     Jason Gunthorpe <jgg@ziepe.ca>,
         linux-rdma <linux-rdma@vger.kernel.org>,
         linuxppc-dev <linuxppc-dev@lists.ozlabs.org>,
         Netdev <netdev@vger.kernel.org>, Linux MM <linux-mm@kvack.org>,
-        LKML <linux-kernel@vger.kernel.org>
+        LKML <linux-kernel@vger.kernel.org>,
+        "Aneesh Kumar K.V" <aneesh.kumar@linux.ibm.com>
 Content-Type: text/plain; charset="UTF-8"
 Sender: linux-block-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-On Tue, Nov 12, 2019 at 2:43 PM John Hubbard <jhubbard@nvidia.com> wrote:
+On Tue, Nov 12, 2019 at 3:08 PM John Hubbard <jhubbard@nvidia.com> wrote:
 >
-> On 11/12/19 12:43 PM, Jason Gunthorpe wrote:
+> On 11/12/19 2:43 PM, Dan Williams wrote:
 > ...
-> >> -            }
-> >> +    ret = get_user_pages_remote(NULL, mm, vaddr, 1, flags | FOLL_LONGTERM,
-> >> +                                page, vmas, NULL);
-> >> +    /*
-> >> +     * The lifetime of a vaddr_get_pfn() page pin is
-> >> +     * userspace-controlled. In the fs-dax case this could
-> >> +     * lead to indefinite stalls in filesystem operations.
-> >> +     * Disallow attempts to pin fs-dax pages via this
-> >> +     * interface.
-> >> +     */
-> >> +    if (ret > 0 && vma_is_fsdax(vmas[0])) {
-> >> +            ret = -EOPNOTSUPP;
-> >> +            put_page(page[0]);
-> >>      }
+> > Ah, sorry. This was the first time I had looked at this series and
+> > jumped in without reading the background.
 > >
-> > AFAIK this chunk is redundant now as it is some hack to emulate
-> > FOLL_LONGTERM? So vmas can be deleted too.
+> > Your patch as is looks ok, I assume you've removed the FOLL_LONGTERM
+> > warning in get_user_pages_remote in another patch?
+> >
 >
-> Let me first make sure I understand what Dan has in mind for the vma
-> checking, in the other thread...
+> Actually, I haven't gone quite that far. Actually this patch is the last
+> change to that function. Therefore, at the end of this patchset,
+> get_user_pages_remote() ends up with this check in it which
+> is a less-restrictive version of the warning:
+>
+>         /*
+>          * Current FOLL_LONGTERM behavior is incompatible with
+>          * FAULT_FLAG_ALLOW_RETRY because of the FS DAX check requirement on
+>          * vmas. However, this only comes up if locked is set, and there are
+>          * callers that do request FOLL_LONGTERM, but do not set locked. So,
+>          * allow what we can.
+>          */
+>         if (gup_flags & FOLL_LONGTERM) {
+>                 if (WARN_ON_ONCE(locked))
+>                         return -EINVAL;
+>         }
+>
+> Is that OK, or did you want to go further (possibly in a follow-up
+> patchset, as I'm hoping to get this one in soon)?
 
-It's not redundant relative to upstream which does not do anything the
-FOLL_LONGTERM in the gup-slow path... but I have not looked at patches
-1-7 to see if something there made it redundant.
+That looks ok. Something to maybe push down into the core in a future
+cleanup, but not something that needs to be done now.
+
+> ...
+> >>> I think check_vma_flags() should do the ((FOLL_LONGTERM | FOLL_GET) &&
+> >>> vma_is_fsdax()) check and that would also remove the need for
+> >>> __gup_longterm_locked.
+> >>>
+> >>
+> >> Good idea, but there is still the call to check_and_migrate_cma_pages(),
+> >> inside __gup_longterm_locked().  So it's a little more involved and
+> >> we can't trivially delete __gup_longterm_locked() yet, right?
+> >
+> > [ add Aneesh ]
+> >
+> > Yes, you're right. I had overlooked that had snuck in there. That to
+> > me similarly needs to be pushed down into the core with its own FOLL
+> > flag, or it needs to be an explicit fixup that each caller does after
+> > get_user_pages. The fact that migration silently happens as a side
+> > effect of gup is too magical for my taste.
+> >
+>
+> Yes. It's an intrusive side effect that is surprising, and not in a
+> "happy surprise" way. :) .   Fixing up the CMA pages by splitting that
+> functionality into separate function calls sounds like an improvement
+> worth exploring.
+
+Right, future work.
