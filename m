@@ -2,282 +2,806 @@ Return-Path: <SRS0=0oGL=ZE=vger.kernel.org=linux-block-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-6.8 required=3.0 tests=DKIM_SIGNED,DKIM_VALID,
-	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,
-	SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED autolearn=ham autolearn_force=no
-	version=3.4.0
+X-Spam-Status: No, score=-8.6 required=3.0 tests=DKIMWL_WL_HIGH,DKIM_SIGNED,
+	DKIM_VALID,DKIM_VALID_AU,INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,
+	SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED,USER_AGENT_SANE_1 autolearn=unavailable
+	autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 28770C43331
-	for <linux-block@archiver.kernel.org>; Tue, 12 Nov 2019 04:05:46 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 2F355C43331
+	for <linux-block@archiver.kernel.org>; Tue, 12 Nov 2019 06:51:30 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.kernel.org (Postfix) with ESMTP id D429820840
-	for <linux-block@archiver.kernel.org>; Tue, 12 Nov 2019 04:05:45 +0000 (UTC)
-Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (2048-bit key) header.d=wdc.com header.i=@wdc.com header.b="Vfe9qI97";
-	dkim=pass (1024-bit key) header.d=sharedspace.onmicrosoft.com header.i=@sharedspace.onmicrosoft.com header.b="jqtPAv5a"
+	by mail.kernel.org (Postfix) with ESMTP id CFEEA2196E
+	for <linux-block@archiver.kernel.org>; Tue, 12 Nov 2019 06:51:29 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+	s=default; t=1573541490;
+	bh=Xrd0YnKaYbVVFQLPrYOT47qBaf64xGATzmWkzzpLmiA=;
+	h=Date:From:To:Cc:Subject:References:In-Reply-To:List-ID:From;
+	b=VJ1ml5tUYZf15Be5Mk5wdav3+UKbg7dOTNRHgH+htBX2BYpGrXNzh1YAQZtQ31WA2
+	 lCbVBnolNmqaMuuGmVWJXej55rCGTkmeDPreu4lwDxEEjKyjp+ukqc6Pr6Y8W6SVBy
+	 c+1pxGn3ezUkefO/35lLoPHAwTd4eUq4aR6bUKT0=
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1726932AbfKLEFp (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Mon, 11 Nov 2019 23:05:45 -0500
-Received: from esa6.hgst.iphmx.com ([216.71.154.45]:39345 "EHLO
-        esa6.hgst.iphmx.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1726927AbfKLEFp (ORCPT
-        <rfc822;linux-block@vger.kernel.org>);
-        Mon, 11 Nov 2019 23:05:45 -0500
-DKIM-Signature: v=1; a=rsa-sha256; c=simple/simple;
-  d=wdc.com; i=@wdc.com; q=dns/txt; s=dkim.wdc.com;
-  t=1573531545; x=1605067545;
-  h=from:to:cc:subject:date:message-id:references:
-   content-transfer-encoding:mime-version;
-  bh=h3OlXAWKdZYGTCLCQQRRIuQ/5CtSORQZHnuAPzJ0pR0=;
-  b=Vfe9qI97M8lmrXnJbrHtgcKkrVEJTbiFvXA6asbQ9TM91ooILav8K1Lg
-   j0M2EvKGbIRD9aUH7PTgxAz5zEaq4W2tWIZCXnertT7HZ7xCqnvO2/jXK
-   SzV4/DN9fzO+7FIxM6QtPuqjN5rM6zJO6FXf+lE+AgHi3xMeiakjenMXK
-   EI5i60rB/dxshfJe8tpQYvX/nx0f7FNJ7ICc/Qd0v7P3nDadG52XOAAIw
-   cx0eL0wRB3ObWLD+DJEhYqdBA+J6fZQMhgBJY9QJV+IFsjOrg6J4S1CPc
-   3tmtX/fx04TLsNrqdX/qyGyOBe4gResB3jkzxkuRM4BqpbfdMRILf4bNo
-   w==;
-IronPort-SDR: TPC7BAdRqhp79F2XHR2YtRNw9gLP7xm5Rj7fEuij1E+SK0o6ic9W1x7Y+C+/o5WA5Zxlh54H1I
- aqjP6e7K5oz13/syHfoEm6Ux6XNVfipgoXuN7Ks2iiDM078Ox45rpNiCbqSFY87fAtoqxJvLlm
- JoI9TE0cFvJloHcafO3xnAjfYINkYXuJAaB0bjfFA/TQDG3j8XzMVLeJ4BDKfoh1clW2umT78a
- k8+E3wiW4jDdNxMcIM/gQ0hL10WWZxemkUwYZy2H/ry0EQ85VKmjE3QUqChEaRqkimTxHPBf7d
- GjM=
-X-IronPort-AV: E=Sophos;i="5.68,295,1569254400"; 
-   d="scan'208";a="124326515"
-Received: from mail-cys01nam02lp2055.outbound.protection.outlook.com (HELO NAM02-CY1-obe.outbound.protection.outlook.com) ([104.47.37.55])
-  by ob1.hgst.iphmx.com with ESMTP; 12 Nov 2019 12:05:44 +0800
-ARC-Seal: i=1; a=rsa-sha256; s=arcselector9901; d=microsoft.com; cv=none;
- b=CFVQmaVbnzA2JScYkmPcLqvpE+mYt4Yj26bxX7Q7nRExfyGXtrvETAKTzVG1WgX0XCVFBjsORQcthmdDizTLPXEXW/i+lmXz4FdisL9JYVLvrn0rBNknRTEL7iyrUsfqOkty4SnEFw/oaC2XUR7zHC7n3JF+5ipYx8MGYPp9PLZQ2b8o1jvEdb6Yrl06dAUcxPpIwebUoCd1WlA0mINaHikBIKhGNK3kf7PCkH2YGfFrHk2IRd5osSvDR6ZSKzKDL/rcr/LHEDdp/EOg/tX0+sLflWqYlbgGYBMZFNm1x7RA6EDl4BakquRmJOlbH3nQZwYMlVDLxxmMWX6I90SI8A==
-ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com;
- s=arcselector9901;
- h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
- bh=cbHtRgXJNPPh1Tgi2OvQj4WLJzuAqnxT+d30Y8lO4wo=;
- b=NO/OtCZEQG9umcR9GWx08z4BCgZx6kxcD9iag8UvfNAPJFVI3GxlKq7vUj1d36afh8+ru+wTTWoNefjWqqZP8wil2barI4pnsMDZScw76RZ1qCxRLjPDtc7Kx7n75bs1xJr2KCXhK9ryZjONwR9Sxdcfyc1vfrYb7yg9yB/+3l+7GgtWOYsHW1pBzAoEr/5fA+aBiDkvu1g6Vij1DxALwgTyVJ3zihNbFBI7A6OEckFy0LzVjgJzN5UrQM6cWtYekaPy4Cq4GwPWpCTOv0iWKSo2qT1OOHY0LggFkT/T+pYEM/cBAQhjeLTgYSu1J4B/r+dy3PnlVbPFRQvyBFONBQ==
-ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass
- smtp.mailfrom=wdc.com; dmarc=pass action=none header.from=wdc.com; dkim=pass
- header.d=wdc.com; arc=none
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
- d=sharedspace.onmicrosoft.com; s=selector2-sharedspace-onmicrosoft-com;
- h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
- bh=cbHtRgXJNPPh1Tgi2OvQj4WLJzuAqnxT+d30Y8lO4wo=;
- b=jqtPAv5acND8nTncx/+wnAcL5G8Mhzj4Gz87je7cNbUx0ihlBD+8DCfccO0VpF+STzWB1WXbFQMcpMKNmCOrx4C5OSHUdBKIrQE8hSWliLpjovV9CUmG1m2ya3hPUpW3xIukh2uGbvCduJql60bEzrXo4qrCkqKm/p/4iL2VXak=
-Received: from BYAPR04MB5816.namprd04.prod.outlook.com (20.179.59.16) by
- BYAPR04MB5367.namprd04.prod.outlook.com (20.178.50.217) with Microsoft SMTP
- Server (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
- 15.20.2430.24; Tue, 12 Nov 2019 04:05:42 +0000
-Received: from BYAPR04MB5816.namprd04.prod.outlook.com
- ([fe80::4176:5eda:76a2:3c40]) by BYAPR04MB5816.namprd04.prod.outlook.com
- ([fe80::4176:5eda:76a2:3c40%7]) with mapi id 15.20.2430.027; Tue, 12 Nov 2019
- 04:05:42 +0000
-From:   Damien Le Moal <Damien.LeMoal@wdc.com>
-To:     Tetsuo Handa <penguin-kernel@i-love.sakura.ne.jp>,
-        Bob Liu <bob.liu@oracle.com>,
-        "axboe@kernel.dk" <axboe@kernel.dk>
-CC:     "linux-block@vger.kernel.org" <linux-block@vger.kernel.org>
-Subject: Re: [PATCH] block: Bail out iteration functions upon SIGKILL.
-Thread-Topic: [PATCH] block: Bail out iteration functions upon SIGKILL.
-Thread-Index: AQHVlis75ysrnBQ8Tkec+aEy36lA2g==
-Date:   Tue, 12 Nov 2019 04:05:41 +0000
-Message-ID: <BYAPR04MB58165EC2C792CE26AAAF361FE7770@BYAPR04MB5816.namprd04.prod.outlook.com>
-References: <000000000000c52dbf05958f3f3a@google.com>
- <3fbc4bb2-a03b-fbfa-4803-47a6d0075ff2@I-love.SAKURA.ne.jp>
- <24296ff7-4a5f-2bd9-63c7-07831f7b4d8d@oracle.com>
- <8fde32da-d5e5-11b7-9ed7-e3aa5b003647@i-love.sakura.ne.jp>
-Accept-Language: en-US
-Content-Language: en-US
-X-MS-Has-Attach: 
-X-MS-TNEF-Correlator: 
-authentication-results: spf=none (sender IP is )
- smtp.mailfrom=Damien.LeMoal@wdc.com; 
-x-originating-ip: [199.255.47.8]
-x-ms-publictraffictype: Email
-x-ms-office365-filtering-ht: Tenant
-x-ms-office365-filtering-correlation-id: 3b783c7f-e7df-453a-f87d-08d7672595e8
-x-ms-traffictypediagnostic: BYAPR04MB5367:
-x-ms-exchange-purlcount: 1
-x-microsoft-antispam-prvs: <BYAPR04MB53678B8F971056C23BFB6395E7770@BYAPR04MB5367.namprd04.prod.outlook.com>
-wdcipoutbound: EOP-TRUE
-x-ms-oob-tlc-oobclassifiers: OLM:8882;
-x-forefront-prvs: 021975AE46
-x-forefront-antispam-report: SFV:NSPM;SFS:(10001)(10019020)(4636009)(136003)(366004)(376002)(396003)(346002)(39860400002)(189003)(199004)(71190400001)(6246003)(66066001)(99286004)(53546011)(6506007)(86362001)(26005)(478600001)(110136005)(71200400001)(966005)(186003)(316002)(33656002)(2906002)(6116002)(2501003)(6436002)(102836004)(9686003)(3846002)(55016002)(74316002)(6306002)(7736002)(305945005)(66556008)(66476007)(64756008)(66946007)(486006)(229853002)(476003)(52536014)(76116006)(8676002)(25786009)(81156014)(8936002)(66446008)(81166006)(91956017)(4326008)(14454004)(14444005)(256004)(76176011)(7696005)(446003)(5660300002)(99710200001);DIR:OUT;SFP:1102;SCL:1;SRVR:BYAPR04MB5367;H:BYAPR04MB5816.namprd04.prod.outlook.com;FPR:;SPF:None;LANG:en;PTR:InfoNoRecords;MX:1;A:1;
-x-ms-exchange-senderadcheck: 1
-x-microsoft-antispam: BCL:0;
-x-microsoft-antispam-message-info: ahQp8FnBeW/KfrzO21B/afoOe2gMPsDxg6HJwAYOEDbEJkgODkciNz3OyRdVj3GA3+eP5hWc46mK3D0QkYNf+gdGK4SqWsDCWAsRQ/2EGvdq2RDakfVXu2RpmnpGJkJIza2v7ikbp6TEkP25+9m2GAc2nt1M+7isO4x70FzG0mzXIeuv+0nqJ+gaAbT3mUoBIugn9M0HyCOCaqic4aWo7p6TV2Mc64kttEPUQ4wbHx7n4inbFtLt4g2NZe/wkKL45b4/4O2vIX4/GS+ssgsXj3voiydMQacuByAxydkSwYQIeh6a3SELzxuw58e9rSi/B9Dkr2weawQTjcB08nS3r/smBuH3RlgzFetHbw40+JWCaFkPXGh6n3dohTSsDdNATCJskO6Z3H2XTvL/u5aTO04wjjz1WaHASR9pKkopVV4+1iAsIN72dY9iGkdNcZmfzuHeuhBpVeFBwQXYu8KnOUKSJ6wTVibCEwUgw01afYOWIFD6ux+RFPnOUVgvG9azjTbRJKQCAHIAWZDk1Z2u1wFb4uFJnyT6xMZD4nmf3zM=
-x-ms-exchange-transport-forked: True
-Content-Type: text/plain; charset="us-ascii"
-Content-Transfer-Encoding: quoted-printable
+        id S1727020AbfKLGvU (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Tue, 12 Nov 2019 01:51:20 -0500
+Received: from mail.kernel.org ([198.145.29.99]:50172 "EHLO mail.kernel.org"
+        rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
+        id S1725775AbfKLGvT (ORCPT <rfc822;linux-block@vger.kernel.org>);
+        Tue, 12 Nov 2019 01:51:19 -0500
+Received: from rapoport-lnx (unknown [195.57.117.247])
+        (using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+        (No client certificate requested)
+        by mail.kernel.org (Postfix) with ESMTPSA id 123CD2084F;
+        Tue, 12 Nov 2019 06:51:08 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+        s=default; t=1573541477;
+        bh=Xrd0YnKaYbVVFQLPrYOT47qBaf64xGATzmWkzzpLmiA=;
+        h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
+        b=B8jDkQZ6Yaop7bTCojs7RpRcs7qzAYkt7UQtAShffH1VroOthzb0lxXZ+Uqi9E2C9
+         L+fU7mWBQog4EI8R3urhYTrKWVhcrv1YybqFVDmiAVLKq35FK2BQV3cS+FpmDp9EJt
+         Prf9mTDXl8/QHBhyteLCU6UJyRMnvTcnUn7JMsuk=
+Date:   Tue, 12 Nov 2019 07:51:05 +0100
+From:   Mike Rapoport <rppt@kernel.org>
+To:     John Hubbard <jhubbard@nvidia.com>
+Cc:     Andrew Morton <akpm@linux-foundation.org>,
+        Al Viro <viro@zeniv.linux.org.uk>,
+        Alex Williamson <alex.williamson@redhat.com>,
+        Benjamin Herrenschmidt <benh@kernel.crashing.org>,
+        =?iso-8859-1?Q?Bj=F6rn_T=F6pel?= <bjorn.topel@intel.com>,
+        Christoph Hellwig <hch@infradead.org>,
+        Dan Williams <dan.j.williams@intel.com>,
+        Daniel Vetter <daniel@ffwll.ch>,
+        Dave Chinner <david@fromorbit.com>,
+        David Airlie <airlied@linux.ie>,
+        "David S . Miller" <davem@davemloft.net>,
+        Ira Weiny <ira.weiny@intel.com>, Jan Kara <jack@suse.cz>,
+        Jason Gunthorpe <jgg@ziepe.ca>, Jens Axboe <axboe@kernel.dk>,
+        Jonathan Corbet <corbet@lwn.net>,
+        =?iso-8859-1?B?Suly9G1l?= Glisse <jglisse@redhat.com>,
+        Magnus Karlsson <magnus.karlsson@intel.com>,
+        Mauro Carvalho Chehab <mchehab@kernel.org>,
+        Michael Ellerman <mpe@ellerman.id.au>,
+        Michal Hocko <mhocko@suse.com>,
+        Mike Kravetz <mike.kravetz@oracle.com>,
+        Paul Mackerras <paulus@samba.org>,
+        Shuah Khan <shuah@kernel.org>,
+        Vlastimil Babka <vbabka@suse.cz>, bpf@vger.kernel.org,
+        dri-devel@lists.freedesktop.org, kvm@vger.kernel.org,
+        linux-block@vger.kernel.org, linux-doc@vger.kernel.org,
+        linux-fsdevel@vger.kernel.org, linux-kselftest@vger.kernel.org,
+        linux-media@vger.kernel.org, linux-rdma@vger.kernel.org,
+        linuxppc-dev@lists.ozlabs.org, netdev@vger.kernel.org,
+        linux-mm@kvack.org, LKML <linux-kernel@vger.kernel.org>
+Subject: Re: [PATCH v3 09/23] mm/gup: introduce pin_user_pages*() and FOLL_PIN
+Message-ID: <20191112065103.GA1209@rapoport-lnx>
+References: <20191112000700.3455038-1-jhubbard@nvidia.com>
+ <20191112000700.3455038-10-jhubbard@nvidia.com>
 MIME-Version: 1.0
-X-OriginatorOrg: wdc.com
-X-MS-Exchange-CrossTenant-Network-Message-Id: 3b783c7f-e7df-453a-f87d-08d7672595e8
-X-MS-Exchange-CrossTenant-originalarrivaltime: 12 Nov 2019 04:05:41.8840
- (UTC)
-X-MS-Exchange-CrossTenant-fromentityheader: Hosted
-X-MS-Exchange-CrossTenant-id: b61c8803-16f3-4c35-9b17-6f65f441df86
-X-MS-Exchange-CrossTenant-mailboxtype: HOSTED
-X-MS-Exchange-CrossTenant-userprincipalname: J9O8KzClfS6YqNetQaiA6ptlsL7e/VCYx6I6VUBNzPJn2Ouol6lGdCGw4vO/xtK9HTyQNy5ed0yYao7k/E6iig==
-X-MS-Exchange-Transport-CrossTenantHeadersStamped: BYAPR04MB5367
+Content-Type: text/plain; charset=iso-8859-1
+Content-Disposition: inline
+Content-Transfer-Encoding: 8bit
+In-Reply-To: <20191112000700.3455038-10-jhubbard@nvidia.com>
+User-Agent: Mutt/1.5.24 (2015-08-30)
 Sender: linux-block-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-On 2019/11/08 20:54, Tetsuo Handa wrote:=0A=
-> syzbot found that a thread can stall for minutes inside fallocate()=0A=
-> after that thread was killed by SIGKILL [1]. While trying to allocate=0A=
-> 64TB of disk space using fallocate() is legal, delaying termination of=0A=
-> killed thread for minutes is bad. Thus, allow iteration functions in=0A=
-> block/blk-lib.c to be killable.=0A=
-> =0A=
-> [1] https://syzkaller.appspot.com/bug?id=3D9386d051e11e09973d5a4cf79af5e8=
-cedf79386d=0A=
-> =0A=
-> Signed-off-by: Tetsuo Handa <penguin-kernel@I-love.SAKURA.ne.jp>=0A=
-> Reported-by: syzbot <syzbot+b48daca8639150bc5e73@syzkaller.appspotmail.co=
-m>=0A=
-> ---=0A=
->  block/blk-lib.c | 44 ++++++++++++++++++++++++++++++++++++++++----=0A=
->  1 file changed, 40 insertions(+), 4 deletions(-)=0A=
-> =0A=
-> diff --git a/block/blk-lib.c b/block/blk-lib.c=0A=
-> index 5f2c429..6ca7cae 100644=0A=
-> --- a/block/blk-lib.c=0A=
-> +++ b/block/blk-lib.c=0A=
-> @@ -7,9 +7,22 @@=0A=
->  #include <linux/bio.h>=0A=
->  #include <linux/blkdev.h>=0A=
->  #include <linux/scatterlist.h>=0A=
-> +#include <linux/sched/signal.h>=0A=
->  =0A=
->  #include "blk.h"=0A=
->  =0A=
-> +static int blk_should_abort(struct bio *bio)=0A=
-> +{=0A=
-> +	int ret;=0A=
-> +=0A=
-> +	cond_resched();=0A=
-> +	if (!fatal_signal_pending(current))=0A=
-> +		return 0;=0A=
-> +	ret =3D submit_bio_wait(bio);=0A=
-=0A=
-This will change the behavior of __blkdev_issue_discard() to a sync IO=0A=
-execution instead of the current async execution since submit_bio_wait()=0A=
-call is the responsibility of the caller (e.g. blkdev_issue_discard()).=0A=
-Have you checked if users of __blkdev_issue_discard() are OK with that ?=0A=
-f2fs, ext4, xfs, dm and nvme use this function.=0A=
-=0A=
-Looking at f2fs, this does not look like it is going to work as expected=0A=
-since the bio setup, including end_io callback, is done after this=0A=
-function is called and a regular submit_bio() execution is being used.=0A=
-=0A=
-> +	bio_put(bio);=0A=
-> +	return ret ? ret : -EINTR;=0A=
-> +}=0A=
-> +=0A=
->  struct bio *blk_next_bio(struct bio *bio, unsigned int nr_pages, gfp_t g=
-fp)=0A=
->  {=0A=
->  	struct bio *new =3D bio_alloc(gfp, nr_pages);=0A=
-> @@ -55,6 +68,7 @@ int __blkdev_issue_discard(struct block_device *bdev, s=
-ector_t sector,=0A=
->  		return -EINVAL;=0A=
->  =0A=
->  	while (nr_sects) {=0A=
-> +		int ret;=0A=
-=0A=
-Please add a white line after the declaration similarly to your change=0A=
-in __blkdev_issue_write_same() and __blkdev_issue_zero_pages().=0A=
-=0A=
->  		sector_t req_sects =3D min_t(sector_t, nr_sects,=0A=
->  				bio_allowed_max_sectors(q));=0A=
->  =0A=
-> @@ -75,7 +89,11 @@ int __blkdev_issue_discard(struct block_device *bdev, =
-sector_t sector,=0A=
->  		 * us to schedule out to avoid softlocking if preempt=0A=
->  		 * is disabled.=0A=
->  		 */=0A=
-> -		cond_resched();=0A=
-> +		ret =3D blk_should_abort(bio);=0A=
-> +		if (ret) {=0A=
-> +			*biop =3D NULL;=0A=
-> +			return ret;=0A=
-> +		}=0A=
->  	}=0A=
->  =0A=
->  	*biop =3D bio;=0A=
-> @@ -154,6 +172,8 @@ static int __blkdev_issue_write_same(struct block_dev=
-ice *bdev, sector_t sector,=0A=
->  	max_write_same_sectors =3D bio_allowed_max_sectors(q);=0A=
->  =0A=
->  	while (nr_sects) {=0A=
-> +		int ret;=0A=
-> +=0A=
->  		bio =3D blk_next_bio(bio, 1, gfp_mask);=0A=
->  		bio->bi_iter.bi_sector =3D sector;=0A=
->  		bio_set_dev(bio, bdev);=0A=
-> @@ -171,7 +191,11 @@ static int __blkdev_issue_write_same(struct block_de=
-vice *bdev, sector_t sector,=0A=
->  			bio->bi_iter.bi_size =3D nr_sects << 9;=0A=
->  			nr_sects =3D 0;=0A=
->  		}=0A=
-> -		cond_resched();=0A=
-> +		ret =3D blk_should_abort(bio);=0A=
-> +		if (ret) {=0A=
-> +			*biop =3D NULL;=0A=
-> +			return ret;=0A=
-> +		}=0A=
->  	}=0A=
->  =0A=
->  	*biop =3D bio;=0A=
-> @@ -230,6 +254,8 @@ static int __blkdev_issue_write_zeroes(struct block_d=
-evice *bdev,=0A=
->  		return -EOPNOTSUPP;=0A=
->  =0A=
->  	while (nr_sects) {=0A=
-> +		int ret;=0A=
-> +=0A=
->  		bio =3D blk_next_bio(bio, 0, gfp_mask);=0A=
->  		bio->bi_iter.bi_sector =3D sector;=0A=
->  		bio_set_dev(bio, bdev);=0A=
-> @@ -245,7 +271,11 @@ static int __blkdev_issue_write_zeroes(struct block_=
-device *bdev,=0A=
->  			bio->bi_iter.bi_size =3D nr_sects << 9;=0A=
->  			nr_sects =3D 0;=0A=
->  		}=0A=
-> -		cond_resched();=0A=
-> +		ret =3D blk_should_abort(bio);=0A=
-> +		if (ret) {=0A=
-> +			*biop =3D NULL;=0A=
-> +			return ret;=0A=
-> +		}=0A=
->  	}=0A=
->  =0A=
->  	*biop =3D bio;=0A=
-> @@ -281,6 +311,8 @@ static int __blkdev_issue_zero_pages(struct block_dev=
-ice *bdev,=0A=
->  		return -EPERM;=0A=
->  =0A=
->  	while (nr_sects !=3D 0) {=0A=
-> +		int ret;=0A=
-> +=0A=
->  		bio =3D blk_next_bio(bio, __blkdev_sectors_to_bio_pages(nr_sects),=0A=
->  				   gfp_mask);=0A=
->  		bio->bi_iter.bi_sector =3D sector;=0A=
-> @@ -295,7 +327,11 @@ static int __blkdev_issue_zero_pages(struct block_de=
-vice *bdev,=0A=
->  			if (bi_size < sz)=0A=
->  				break;=0A=
->  		}=0A=
-> -		cond_resched();=0A=
-> +		ret =3D blk_should_abort(bio);=0A=
-> +		if (ret) {=0A=
-> +			*biop =3D NULL;=0A=
-> +			return ret;=0A=
-> +		}=0A=
->  	}=0A=
->  =0A=
->  	*biop =3D bio;=0A=
-> =0A=
-=0A=
-=0A=
--- =0A=
-Damien Le Moal=0A=
-Western Digital Research=0A=
+On Mon, Nov 11, 2019 at 04:06:46PM -0800, John Hubbard wrote:
+> Introduce pin_user_pages*() variations of get_user_pages*() calls,
+> and also pin_longterm_pages*() variations.
+> 
+> These variants all set FOLL_PIN, which is also introduced, and
+> thoroughly documented.
+> 
+> The pin_longterm*() variants also set FOLL_LONGTERM, in addition
+> to FOLL_PIN:
+> 
+>     pin_user_pages()
+>     pin_user_pages_remote()
+>     pin_user_pages_fast()
+> 
+>     pin_longterm_pages()
+>     pin_longterm_pages_remote()
+>     pin_longterm_pages_fast()
+> 
+> All pages that are pinned via the above calls, must be unpinned via
+> put_user_page().
+> 
+> The underlying rules are:
+> 
+> * These are gup-internal flags, so the call sites should not directly
+> set FOLL_PIN nor FOLL_LONGTERM. That behavior is enforced with
+> assertions, for the new FOLL_PIN flag. However, for the pre-existing
+> FOLL_LONGTERM flag, which has some call sites that still directly
+> set FOLL_LONGTERM, there is no assertion yet.
+> 
+> * Call sites that want to indicate that they are going to do DirectIO
+>   ("DIO") or something with similar characteristics, should call a
+>   get_user_pages()-like wrapper call that sets FOLL_PIN. These wrappers
+>   will:
+>         * Start with "pin_user_pages" instead of "get_user_pages". That
+>           makes it easy to find and audit the call sites.
+>         * Set FOLL_PIN
+> 
+> * For pages that are received via FOLL_PIN, those pages must be returned
+>   via put_user_page().
+> 
+> Thanks to Jan Kara and Vlastimil Babka for explaining the 4 cases
+> in this documentation. (I've reworded it and expanded upon it.)
+> 
+> Reviewed-by: Jérôme Glisse <jglisse@redhat.com>
+> Cc: Mike Rapoport <rppt@kernel.org>
+> Cc: Jonathan Corbet <corbet@lwn.net>
+> Cc: Ira Weiny <ira.weiny@intel.com>
+> Signed-off-by: John Hubbard <jhubbard@nvidia.com>
+> ---
+
+Reviewed-by: Mike Rapoport <rppt@linux.ibm.com>  # Documentation
+
+>  Documentation/core-api/index.rst          |   1 +
+>  Documentation/core-api/pin_user_pages.rst | 218 ++++++++++++++++++
+>  include/linux/mm.h                        |  62 +++++-
+>  mm/gup.c                                  | 260 ++++++++++++++++++++--
+>  4 files changed, 514 insertions(+), 27 deletions(-)
+>  create mode 100644 Documentation/core-api/pin_user_pages.rst
+> 
+> diff --git a/Documentation/core-api/index.rst b/Documentation/core-api/index.rst
+> index ab0eae1c153a..413f7d7c8642 100644
+> --- a/Documentation/core-api/index.rst
+> +++ b/Documentation/core-api/index.rst
+> @@ -31,6 +31,7 @@ Core utilities
+>     generic-radix-tree
+>     memory-allocation
+>     mm-api
+> +   pin_user_pages
+>     gfp_mask-from-fs-io
+>     timekeeping
+>     boot-time-mm
+> diff --git a/Documentation/core-api/pin_user_pages.rst b/Documentation/core-api/pin_user_pages.rst
+> new file mode 100644
+> index 000000000000..ce819e709435
+> --- /dev/null
+> +++ b/Documentation/core-api/pin_user_pages.rst
+> @@ -0,0 +1,218 @@
+> +.. SPDX-License-Identifier: GPL-2.0
+> +
+> +====================================================
+> +pin_user_pages() and related calls
+> +====================================================
+> +
+> +.. contents:: :local:
+> +
+> +Overview
+> +========
+> +
+> +This document describes the following functions: ::
+> +
+> + pin_user_pages
+> + pin_user_pages_fast
+> + pin_user_pages_remote
+> +
+> + pin_longterm_pages
+> + pin_longterm_pages_fast
+> + pin_longterm_pages_remote
+> +
+> +Basic description of FOLL_PIN
+> +=============================
+> +
+> +FOLL_PIN and FOLL_LONGTERM are flags that can be passed to the get_user_pages*()
+> +("gup") family of functions. FOLL_PIN has significant interactions and
+> +interdependencies with FOLL_LONGTERM, so both are covered here.
+> +
+> +Both FOLL_PIN and FOLL_LONGTERM are internal to gup, meaning that neither
+> +FOLL_PIN nor FOLL_LONGTERM should not appear at the gup call sites. This allows
+> +the associated wrapper functions  (pin_user_pages() and others) to set the
+> +correct combination of these flags, and to check for problems as well.
+> +
+> +FOLL_PIN and FOLL_GET are mutually exclusive for a given gup call. However,
+> +multiple threads and call sites are free to pin the same struct pages, via both
+> +FOLL_PIN and FOLL_GET. It's just the call site that needs to choose one or the
+> +other, not the struct page(s).
+> +
+> +The FOLL_PIN implementation is nearly the same as FOLL_GET, except that FOLL_PIN
+> +uses a different reference counting technique.
+> +
+> +FOLL_PIN is a prerequisite to FOLL_LONGTGERM. Another way of saying that is,
+> +FOLL_LONGTERM is a specific case, more restrictive case of FOLL_PIN.
+> +
+> +Which flags are set by each wrapper
+> +===================================
+> +
+> +Only FOLL_PIN and FOLL_LONGTERM are covered here. These flags are added to
+> +whatever flags the caller provides::
+> +
+> + Function                    gup flags (FOLL_PIN or FOLL_LONGTERM only)
+> + --------                    ------------------------------------------
+> + pin_user_pages              FOLL_PIN
+> + pin_user_pages_fast         FOLL_PIN
+> + pin_user_pages_remote       FOLL_PIN
+> +
+> + pin_longterm_pages          FOLL_PIN | FOLL_LONGTERM
+> + pin_longterm_pages_fast     FOLL_PIN | FOLL_LONGTERM
+> + pin_longterm_pages_remote   FOLL_PIN | FOLL_LONGTERM
+> +
+> +Tracking dma-pinned pages
+> +=========================
+> +
+> +Some of the key design constraints, and solutions, for tracking dma-pinned
+> +pages:
+> +
+> +* An actual reference count, per struct page, is required. This is because
+> +  multiple processes may pin and unpin a page.
+> +
+> +* False positives (reporting that a page is dma-pinned, when in fact it is not)
+> +  are acceptable, but false negatives are not.
+> +
+> +* struct page may not be increased in size for this, and all fields are already
+> +  used.
+> +
+> +* Given the above, we can overload the page->_refcount field by using, sort of,
+> +  the upper bits in that field for a dma-pinned count. "Sort of", means that,
+> +  rather than dividing page->_refcount into bit fields, we simple add a medium-
+> +  large value (GUP_PIN_COUNTING_BIAS, initially chosen to be 1024: 10 bits) to
+> +  page->_refcount. This provides fuzzy behavior: if a page has get_page() called
+> +  on it 1024 times, then it will appear to have a single dma-pinned count.
+> +  And again, that's acceptable.
+> +
+> +This also leads to limitations: there are only 31-10==21 bits available for a
+> +counter that increments 10 bits at a time.
+> +
+> +TODO: for 1GB and larger huge pages, this is cutting it close. That's because
+> +when pin_user_pages() follows such pages, it increments the head page by "1"
+> +(where "1" used to mean "+1" for get_user_pages(), but now means "+1024" for
+> +pin_user_pages()) for each tail page. So if you have a 1GB huge page:
+> +
+> +* There are 256K (18 bits) worth of 4 KB tail pages.
+> +* There are 21 bits available to count up via GUP_PIN_COUNTING_BIAS (that is,
+> +  10 bits at a time)
+> +* There are 21 - 18 == 3 bits available to count. Except that there aren't,
+> +  because you need to allow for a few normal get_page() calls on the head page,
+> +  as well. Fortunately, the approach of using addition, rather than "hard"
+> +  bitfields, within page->_refcount, allows for sharing these bits gracefully.
+> +  But we're still looking at about 8 references.
+> +
+> +This, however, is a missing feature more than anything else, because it's easily
+> +solved by addressing an obvious inefficiency in the original get_user_pages()
+> +approach of retrieving pages: stop treating all the pages as if they were
+> +PAGE_SIZE. Retrieve huge pages as huge pages. The callers need to be aware of
+> +this, so some work is required. Once that's in place, this limitation mostly
+> +disappears from view, because there will be ample refcounting range available.
+> +
+> +* Callers must specifically request "dma-pinned tracking of pages". In other
+> +  words, just calling get_user_pages() will not suffice; a new set of functions,
+> +  pin_user_page() and related, must be used.
+> +
+> +FOLL_PIN, FOLL_GET, FOLL_LONGTERM: when to use which flags
+> +==========================================================
+> +
+> +Thanks to Jan Kara, Vlastimil Babka and several other -mm people, for describing
+> +these categories:
+> +
+> +CASE 1: Direct IO (DIO)
+> +-----------------------
+> +There are GUP references to pages that are serving
+> +as DIO buffers. These buffers are needed for a relatively short time (so they
+> +are not "long term"). No special synchronization with page_mkclean() or
+> +munmap() is provided. Therefore, flags to set at the call site are: ::
+> +
+> +    FOLL_PIN
+> +
+> +...but rather than setting FOLL_PIN directly, call sites should use one of
+> +the pin_user_pages*() routines that set FOLL_PIN.
+> +
+> +CASE 2: RDMA
+> +------------
+> +There are GUP references to pages that are serving as DMA
+> +buffers. These buffers are needed for a long time ("long term"). No special
+> +synchronization with page_mkclean() or munmap() is provided. Therefore, flags
+> +to set at the call site are: ::
+> +
+> +    FOLL_PIN | FOLL_LONGTERM
+> +
+> +NOTE: Some pages, such as DAX pages, cannot be pinned with longterm pins. That's
+> +because DAX pages do not have a separate page cache, and so "pinning" implies
+> +locking down file system blocks, which is not (yet) supported in that way.
+> +
+> +CASE 3: Hardware with page faulting support
+> +-------------------------------------------
+> +Here, a well-written driver doesn't normally need to pin pages at all. However,
+> +if the driver does choose to do so, it can register MMU notifiers for the range,
+> +and will be called back upon invalidation. Either way (avoiding page pinning, or
+> +using MMU notifiers to unpin upon request), there is proper synchronization with
+> +both filesystem and mm (page_mkclean(), munmap(), etc).
+> +
+> +Therefore, neither flag needs to be set.
+> +
+> +In this case, ideally, neither get_user_pages() nor pin_user_pages() should be
+> +called. Instead, the software should be written so that it does not pin pages.
+> +This allows mm and filesystems to operate more efficiently and reliably.
+> +
+> +CASE 4: Pinning for struct page manipulation only
+> +-------------------------------------------------
+> +Here, normal GUP calls are sufficient, so neither flag needs to be set.
+> +
+> +page_dma_pinned(): the whole point of pinning
+> +=============================================
+> +
+> +The whole point of marking pages as "DMA-pinned" or "gup-pinned" is to be able
+> +to query, "is this page DMA-pinned?" That allows code such as page_mkclean()
+> +(and file system writeback code in general) to make informed decisions about
+> +what to do when a page cannot be unmapped due to such pins.
+> +
+> +What to do in those cases is the subject of a years-long series of discussions
+> +and debates (see the References at the end of this document). It's a TODO item
+> +here: fill in the details once that's worked out. Meanwhile, it's safe to say
+> +that having this available: ::
+> +
+> +        static inline bool page_dma_pinned(struct page *page)
+> +
+> +...is a prerequisite to solving the long-running gup+DMA problem.
+> +
+> +Another way of thinking about FOLL_GET, FOLL_PIN, and FOLL_LONGTERM
+> +===================================================================
+> +
+> +Another way of thinking about these flags is as a progression of restrictions:
+> +FOLL_GET is for struct page manipulation, without affecting the data that the
+> +struct page refers to. FOLL_PIN is a *replacement* for FOLL_GET, and is for
+> +short term pins on pages whose data *will* get accessed. As such, FOLL_PIN is
+> +a "more severe" form of pinning. And finally, FOLL_LONGTERM is an even more
+> +restrictive case that has FOLL_PIN as a prerequisite: this is for pages that
+> +will be pinned longterm, and whose data will be accessed.
+> +
+> +Unit testing
+> +============
+> +This file::
+> +
+> + tools/testing/selftests/vm/gup_benchmark.c
+> +
+> +has the following new calls to exercise the new pin*() wrapper functions:
+> +
+> +* PIN_FAST_BENCHMARK (./gup_benchmark -a)
+> +* PIN_LONGTERM_BENCHMARK (./gup_benchmark -a)
+> +* PIN_BENCHMARK (./gup_benchmark -a)
+> +
+> +You can monitor how many total dma-pinned pages have been acquired and released
+> +since the system was booted, via two new /proc/vmstat entries: ::
+> +
+> +    /proc/vmstat/nr_foll_pin_requested
+> +    /proc/vmstat/nr_foll_pin_requested
+> +
+> +Those are both going to show zero, unless CONFIG_DEBUG_VM is set. This is
+> +because there is a noticeable performance drop in put_user_page(), when they
+> +are activated.
+> +
+> +References
+> +==========
+> +
+> +* `Some slow progress on get_user_pages() (Apr 2, 2019) <https://lwn.net/Articles/784574/>`_
+> +* `DMA and get_user_pages() (LPC: Dec 12, 2018) <https://lwn.net/Articles/774411/>`_
+> +* `The trouble with get_user_pages() (Apr 30, 2018) <https://lwn.net/Articles/753027/>`_
+> +
+> +John Hubbard, October, 2019
+> diff --git a/include/linux/mm.h b/include/linux/mm.h
+> index 96228376139c..11e0086d64a4 100644
+> --- a/include/linux/mm.h
+> +++ b/include/linux/mm.h
+> @@ -1542,9 +1542,23 @@ long get_user_pages_remote(struct task_struct *tsk, struct mm_struct *mm,
+>  			    unsigned long start, unsigned long nr_pages,
+>  			    unsigned int gup_flags, struct page **pages,
+>  			    struct vm_area_struct **vmas, int *locked);
+> +long pin_user_pages_remote(struct task_struct *tsk, struct mm_struct *mm,
+> +			   unsigned long start, unsigned long nr_pages,
+> +			   unsigned int gup_flags, struct page **pages,
+> +			   struct vm_area_struct **vmas, int *locked);
+> +long pin_longterm_pages_remote(struct task_struct *tsk, struct mm_struct *mm,
+> +			       unsigned long start, unsigned long nr_pages,
+> +			       unsigned int gup_flags, struct page **pages,
+> +			       struct vm_area_struct **vmas, int *locked);
+>  long get_user_pages(unsigned long start, unsigned long nr_pages,
+>  			    unsigned int gup_flags, struct page **pages,
+>  			    struct vm_area_struct **vmas);
+> +long pin_user_pages(unsigned long start, unsigned long nr_pages,
+> +		    unsigned int gup_flags, struct page **pages,
+> +		    struct vm_area_struct **vmas);
+> +long pin_longterm_pages(unsigned long start, unsigned long nr_pages,
+> +			unsigned int gup_flags, struct page **pages,
+> +			struct vm_area_struct **vmas);
+>  long get_user_pages_locked(unsigned long start, unsigned long nr_pages,
+>  		    unsigned int gup_flags, struct page **pages, int *locked);
+>  long get_user_pages_unlocked(unsigned long start, unsigned long nr_pages,
+> @@ -1552,6 +1566,10 @@ long get_user_pages_unlocked(unsigned long start, unsigned long nr_pages,
+>  
+>  int get_user_pages_fast(unsigned long start, int nr_pages,
+>  			unsigned int gup_flags, struct page **pages);
+> +int pin_user_pages_fast(unsigned long start, int nr_pages,
+> +			unsigned int gup_flags, struct page **pages);
+> +int pin_longterm_pages_fast(unsigned long start, int nr_pages,
+> +			    unsigned int gup_flags, struct page **pages);
+>  
+>  int account_locked_vm(struct mm_struct *mm, unsigned long pages, bool inc);
+>  int __account_locked_vm(struct mm_struct *mm, unsigned long pages, bool inc,
+> @@ -2610,13 +2628,15 @@ struct page *follow_page(struct vm_area_struct *vma, unsigned long address,
+>  #define FOLL_ANON	0x8000	/* don't do file mappings */
+>  #define FOLL_LONGTERM	0x10000	/* mapping lifetime is indefinite: see below */
+>  #define FOLL_SPLIT_PMD	0x20000	/* split huge pmd before returning */
+> +#define FOLL_PIN	0x40000	/* pages must be released via put_user_page() */
+>  
+>  /*
+> - * NOTE on FOLL_LONGTERM:
+> + * FOLL_PIN and FOLL_LONGTERM may be used in various combinations with each
+> + * other. Here is what they mean, and how to use them:
+>   *
+>   * FOLL_LONGTERM indicates that the page will be held for an indefinite time
+> - * period _often_ under userspace control.  This is contrasted with
+> - * iov_iter_get_pages() where usages which are transient.
+> + * period _often_ under userspace control.  This is in contrast to
+> + * iov_iter_get_pages(), where usages which are transient.
+>   *
+>   * FIXME: For pages which are part of a filesystem, mappings are subject to the
+>   * lifetime enforced by the filesystem and we need guarantees that longterm
+> @@ -2631,11 +2651,41 @@ struct page *follow_page(struct vm_area_struct *vma, unsigned long address,
+>   * Currently only get_user_pages() and get_user_pages_fast() support this flag
+>   * and calls to get_user_pages_[un]locked are specifically not allowed.  This
+>   * is due to an incompatibility with the FS DAX check and
+> - * FAULT_FLAG_ALLOW_RETRY
+> + * FAULT_FLAG_ALLOW_RETRY.
+>   *
+> - * In the CMA case: longterm pins in a CMA region would unnecessarily fragment
+> - * that region.  And so CMA attempts to migrate the page before pinning when
+> + * In the CMA case: long term pins in a CMA region would unnecessarily fragment
+> + * that region.  And so, CMA attempts to migrate the page before pinning, when
+>   * FOLL_LONGTERM is specified.
+> + *
+> + * FOLL_PIN indicates that a special kind of tracking (not just page->_refcount,
+> + * but an additional pin counting system) will be invoked. This is intended for
+> + * anything that gets a page reference and then touches page data (for example,
+> + * Direct IO). This lets the filesystem know that some non-file-system entity is
+> + * potentially changing the pages' data. In contrast to FOLL_GET (whose pages
+> + * are released via put_page()), FOLL_PIN pages must be released, ultimately, by
+> + * a call to put_user_page().
+> + *
+> + * FOLL_PIN is similar to FOLL_GET: both of these pin pages. They use different
+> + * and separate refcounting mechanisms, however, and that means that each has
+> + * its own acquire and release mechanisms:
+> + *
+> + *     FOLL_GET: get_user_pages*() to acquire, and put_page() to release.
+> + *
+> + *     FOLL_PIN: pin_user_pages*() or pin_longterm_pages*() to acquire, and
+> + *               put_user_pages to release.
+> + *
+> + * FOLL_PIN and FOLL_GET are mutually exclusive for a given function call.
+> + * (The underlying pages may experience both FOLL_GET-based and FOLL_PIN-based
+> + * calls applied to them, and that's perfectly OK. This is a constraint on the
+> + * callers, not on the pages.)
+> + *
+> + * FOLL_PIN and FOLL_LONGTERM should be set internally by the pin_user_page*()
+> + * and pin_longterm_*() APIs, never directly by the caller. That's in order to
+> + * help avoid mismatches when releasing pages: get_user_pages*() pages must be
+> + * released via put_page(), while pin_user_pages*() pages must be released via
+> + * put_user_page().
+> + *
+> + * Please see Documentation/vm/pin_user_pages.rst for more information.
+>   */
+>  
+>  static inline int vm_fault_to_errno(vm_fault_t vm_fault, int foll_flags)
+> diff --git a/mm/gup.c b/mm/gup.c
+> index cfe6dc5fc343..ea31810da828 100644
+> --- a/mm/gup.c
+> +++ b/mm/gup.c
+> @@ -194,6 +194,10 @@ static struct page *follow_page_pte(struct vm_area_struct *vma,
+>  	spinlock_t *ptl;
+>  	pte_t *ptep, pte;
+>  
+> +	/* FOLL_GET and FOLL_PIN are mutually exclusive. */
+> +	if (WARN_ON_ONCE((flags & (FOLL_PIN | FOLL_GET)) ==
+> +			 (FOLL_PIN | FOLL_GET)))
+> +		return ERR_PTR(-EINVAL);
+>  retry:
+>  	if (unlikely(pmd_bad(*pmd)))
+>  		return no_page_table(vma, flags);
+> @@ -805,7 +809,7 @@ static long __get_user_pages(struct task_struct *tsk, struct mm_struct *mm,
+>  
+>  	start = untagged_addr(start);
+>  
+> -	VM_BUG_ON(!!pages != !!(gup_flags & FOLL_GET));
+> +	VM_BUG_ON(!!pages != !!(gup_flags & (FOLL_GET | FOLL_PIN)));
+>  
+>  	/*
+>  	 * If FOLL_FORCE is set then do not force a full fault as the hinting
+> @@ -1029,7 +1033,16 @@ static __always_inline long __get_user_pages_locked(struct task_struct *tsk,
+>  		BUG_ON(*locked != 1);
+>  	}
+>  
+> -	if (pages)
+> +	/*
+> +	 * FOLL_PIN and FOLL_GET are mutually exclusive. Traditional behavior
+> +	 * is to set FOLL_GET if the caller wants pages[] filled in (but has
+> +	 * carelessly failed to specify FOLL_GET), so keep doing that, but only
+> +	 * for FOLL_GET, not for the newer FOLL_PIN.
+> +	 *
+> +	 * FOLL_PIN always expects pages to be non-null, but no need to assert
+> +	 * that here, as any failures will be obvious enough.
+> +	 */
+> +	if (pages && !(flags & FOLL_PIN))
+>  		flags |= FOLL_GET;
+>  
+>  	pages_done = 0;
+> @@ -1166,6 +1179,14 @@ long get_user_pages_remote(struct task_struct *tsk, struct mm_struct *mm,
+>  		unsigned int gup_flags, struct page **pages,
+>  		struct vm_area_struct **vmas, int *locked)
+>  {
+> +	/*
+> +	 * FOLL_PIN must only be set internally by the pin_user_page*() and
+> +	 * pin_longterm_*() APIs, never directly by the caller, so enforce that
+> +	 * with an assertion:
+> +	 */
+> +	if (WARN_ON_ONCE(gup_flags & FOLL_PIN))
+> +		return -EINVAL;
+> +
+>  	/*
+>  	 * Current FOLL_LONGTERM behavior is incompatible with
+>  	 * FAULT_FLAG_ALLOW_RETRY because of the FS DAX check requirement on
+> @@ -1626,6 +1647,14 @@ long get_user_pages(unsigned long start, unsigned long nr_pages,
+>  		unsigned int gup_flags, struct page **pages,
+>  		struct vm_area_struct **vmas)
+>  {
+> +	/*
+> +	 * FOLL_PIN must only be set internally by the pin_user_page*() and
+> +	 * pin_longterm_*() APIs, never directly by the caller, so enforce that
+> +	 * with an assertion:
+> +	 */
+> +	if (WARN_ON_ONCE(gup_flags & FOLL_PIN))
+> +		return -EINVAL;
+> +
+>  	return __gup_longterm_locked(current, current->mm, start, nr_pages,
+>  				     pages, vmas, gup_flags | FOLL_TOUCH);
+>  }
+> @@ -2377,29 +2406,14 @@ static int __gup_longterm_unlocked(unsigned long start, int nr_pages,
+>  	return ret;
+>  }
+>  
+> -/**
+> - * get_user_pages_fast() - pin user pages in memory
+> - * @start:	starting user address
+> - * @nr_pages:	number of pages from start to pin
+> - * @gup_flags:	flags modifying pin behaviour
+> - * @pages:	array that receives pointers to the pages pinned.
+> - *		Should be at least nr_pages long.
+> - *
+> - * Attempt to pin user pages in memory without taking mm->mmap_sem.
+> - * If not successful, it will fall back to taking the lock and
+> - * calling get_user_pages().
+> - *
+> - * Returns number of pages pinned. This may be fewer than the number
+> - * requested. If nr_pages is 0 or negative, returns 0. If no pages
+> - * were pinned, returns -errno.
+> - */
+> -int get_user_pages_fast(unsigned long start, int nr_pages,
+> -			unsigned int gup_flags, struct page **pages)
+> +static int internal_get_user_pages_fast(unsigned long start, int nr_pages,
+> +					unsigned int gup_flags,
+> +					struct page **pages)
+>  {
+>  	unsigned long addr, len, end;
+>  	int nr = 0, ret = 0;
+>  
+> -	if (WARN_ON_ONCE(gup_flags & ~(FOLL_WRITE | FOLL_LONGTERM)))
+> +	if (WARN_ON_ONCE(gup_flags & ~(FOLL_WRITE | FOLL_LONGTERM | FOLL_PIN)))
+>  		return -EINVAL;
+>  
+>  	start = untagged_addr(start) & PAGE_MASK;
+> @@ -2439,4 +2453,208 @@ int get_user_pages_fast(unsigned long start, int nr_pages,
+>  
+>  	return ret;
+>  }
+> +
+> +/**
+> + * get_user_pages_fast() - pin user pages in memory
+> + * @start:	starting user address
+> + * @nr_pages:	number of pages from start to pin
+> + * @gup_flags:	flags modifying pin behaviour
+> + * @pages:	array that receives pointers to the pages pinned.
+> + *		Should be at least nr_pages long.
+> + *
+> + * Attempt to pin user pages in memory without taking mm->mmap_sem.
+> + * If not successful, it will fall back to taking the lock and
+> + * calling get_user_pages().
+> + *
+> + * Returns number of pages pinned. This may be fewer than the number requested.
+> + * If nr_pages is 0 or negative, returns 0. If no pages were pinned, returns
+> + * -errno.
+> + */
+> +int get_user_pages_fast(unsigned long start, int nr_pages,
+> +			unsigned int gup_flags, struct page **pages)
+> +{
+> +	/*
+> +	 * FOLL_PIN must only be set internally by the pin_user_page*() and
+> +	 * pin_longterm_*() APIs, never directly by the caller, so enforce that:
+> +	 */
+> +	if (WARN_ON_ONCE(gup_flags & FOLL_PIN))
+> +		return -EINVAL;
+> +
+> +	return internal_get_user_pages_fast(start, nr_pages, gup_flags, pages);
+> +}
+>  EXPORT_SYMBOL_GPL(get_user_pages_fast);
+> +
+> +/**
+> + * pin_user_pages_fast() - pin user pages in memory without taking locks
+> + *
+> + * Nearly the same as get_user_pages_fast(), except that FOLL_PIN is set. See
+> + * get_user_pages_fast() for documentation on the function arguments, because
+> + * the arguments here are identical.
+> + *
+> + * FOLL_PIN means that the pages must be released via put_user_page(). Please
+> + * see Documentation/vm/pin_user_pages.rst for further details.
+> + *
+> + * This is intended for Case 1 (DIO) in Documentation/vm/pin_user_pages.rst. It
+> + * is NOT intended for Case 2 (RDMA: long-term pins).
+> + */
+> +int pin_user_pages_fast(unsigned long start, int nr_pages,
+> +			unsigned int gup_flags, struct page **pages)
+> +{
+> +	/* FOLL_GET and FOLL_PIN are mutually exclusive. */
+> +	if (WARN_ON_ONCE(gup_flags & FOLL_GET))
+> +		return -EINVAL;
+> +
+> +	gup_flags |= FOLL_PIN;
+> +	return internal_get_user_pages_fast(start, nr_pages, gup_flags, pages);
+> +}
+> +EXPORT_SYMBOL_GPL(pin_user_pages_fast);
+> +
+> +/**
+> + * pin_longterm_pages_fast() - pin user pages in memory without taking locks
+> + *
+> + * Nearly the same as get_user_pages_fast(), except that FOLL_PIN and
+> + * FOLL_LONGTERM are set. See get_user_pages_fast() for documentation on the
+> + * function arguments, because the arguments here are identical.
+> + *
+> + * FOLL_PIN means that the pages must be released via put_user_page(). Please
+> + * see Documentation/vm/pin_user_pages.rst for further details.
+> + *
+> + * FOLL_LONGTERM means that the pages are being pinned for "long term" use,
+> + * typically by a non-CPU device, and we cannot be sure that waiting for a
+> + * pinned page to become unpin will be effective.
+> + *
+> + * This is intended for Case 2 (RDMA: long-term pins) of the FOLL_PIN
+> + * documentation.
+> + */
+> +int pin_longterm_pages_fast(unsigned long start, int nr_pages,
+> +			    unsigned int gup_flags, struct page **pages)
+> +{
+> +	/* FOLL_GET and FOLL_PIN are mutually exclusive. */
+> +	if (WARN_ON_ONCE(gup_flags & FOLL_GET))
+> +		return -EINVAL;
+> +
+> +	gup_flags |= (FOLL_PIN | FOLL_LONGTERM);
+> +	return internal_get_user_pages_fast(start, nr_pages, gup_flags, pages);
+> +}
+> +EXPORT_SYMBOL_GPL(pin_longterm_pages_fast);
+> +
+> +/**
+> + * pin_user_pages_remote() - pin pages of a remote process (task != current)
+> + *
+> + * Nearly the same as get_user_pages_remote(), except that FOLL_PIN is set. See
+> + * get_user_pages_remote() for documentation on the function arguments, because
+> + * the arguments here are identical.
+> + *
+> + * FOLL_PIN means that the pages must be released via put_user_page(). Please
+> + * see Documentation/vm/pin_user_pages.rst for details.
+> + *
+> + * This is intended for Case 1 (DIO) in Documentation/vm/pin_user_pages.rst. It
+> + * is NOT intended for Case 2 (RDMA: long-term pins).
+> + */
+> +long pin_user_pages_remote(struct task_struct *tsk, struct mm_struct *mm,
+> +			   unsigned long start, unsigned long nr_pages,
+> +			   unsigned int gup_flags, struct page **pages,
+> +			   struct vm_area_struct **vmas, int *locked)
+> +{
+> +	/* FOLL_GET and FOLL_PIN are mutually exclusive. */
+> +	if (WARN_ON_ONCE(gup_flags & FOLL_GET))
+> +		return -EINVAL;
+> +
+> +	gup_flags |= FOLL_TOUCH | FOLL_REMOTE | FOLL_PIN;
+> +
+> +	return __get_user_pages_locked(tsk, mm, start, nr_pages, pages, vmas,
+> +				       locked, gup_flags);
+> +}
+> +EXPORT_SYMBOL(pin_user_pages_remote);
+> +
+> +/**
+> + * pin_longterm_pages_remote() - pin pages of a remote process (task != current)
+> + *
+> + * Nearly the same as get_user_pages_remote(), but note that FOLL_TOUCH is not
+> + * set, and FOLL_PIN and FOLL_LONGTERM are set. See get_user_pages_remote() for
+> + * documentation on the function arguments, because the arguments here are
+> + * identical.
+> + *
+> + * FOLL_PIN means that the pages must be released via put_user_page(). Please
+> + * see Documentation/vm/pin_user_pages.rst for further details.
+> + *
+> + * FOLL_LONGTERM means that the pages are being pinned for "long term" use,
+> + * typically by a non-CPU device, and we cannot be sure that waiting for a
+> + * pinned page to become unpin will be effective.
+> + *
+> + * This is intended for Case 2 (RDMA: long-term pins) in
+> + * Documentation/vm/pin_user_pages.rst.
+> + */
+> +long pin_longterm_pages_remote(struct task_struct *tsk, struct mm_struct *mm,
+> +			       unsigned long start, unsigned long nr_pages,
+> +			       unsigned int gup_flags, struct page **pages,
+> +			       struct vm_area_struct **vmas, int *locked)
+> +{
+> +	/* FOLL_GET and FOLL_PIN are mutually exclusive. */
+> +	if (WARN_ON_ONCE(gup_flags & FOLL_GET))
+> +		return -EINVAL;
+> +
+> +	gup_flags |= FOLL_LONGTERM | FOLL_REMOTE | FOLL_PIN;
+> +
+> +	return __get_user_pages_locked(tsk, mm, start, nr_pages, pages, vmas,
+> +				       locked, gup_flags);
+> +}
+> +EXPORT_SYMBOL(pin_longterm_pages_remote);
+> +
+> +/**
+> + * pin_user_pages() - pin user pages in memory for use by other devices
+> + *
+> + * Nearly the same as get_user_pages(), except that FOLL_TOUCH is not set, and
+> + * FOLL_PIN is set.
+> + *
+> + * FOLL_PIN means that the pages must be released via put_user_page(). Please
+> + * see Documentation/vm/pin_user_pages.rst for details.
+> + *
+> + * This is intended for Case 1 (DIO) in Documentation/vm/pin_user_pages.rst. It
+> + * is NOT intended for Case 2 (RDMA: long-term pins).
+> + */
+> +long pin_user_pages(unsigned long start, unsigned long nr_pages,
+> +		    unsigned int gup_flags, struct page **pages,
+> +		    struct vm_area_struct **vmas)
+> +{
+> +	/* FOLL_GET and FOLL_PIN are mutually exclusive. */
+> +	if (WARN_ON_ONCE(gup_flags & FOLL_GET))
+> +		return -EINVAL;
+> +
+> +	gup_flags |= FOLL_PIN;
+> +	return __gup_longterm_locked(current, current->mm, start, nr_pages,
+> +				     pages, vmas, gup_flags);
+> +}
+> +EXPORT_SYMBOL(pin_user_pages);
+> +
+> +/**
+> + * pin_longterm_pages() - pin user pages in memory for long-term use (RDMA,
+> + * typically)
+> + *
+> + * Nearly the same as get_user_pages(), except that FOLL_PIN and FOLL_LONGTERM
+> + * are set. See get_user_pages_fast() for documentation on the function
+> + * arguments, because the arguments here are identical.
+> + *
+> + * FOLL_PIN means that the pages must be released via put_user_page(). Please
+> + * see Documentation/vm/pin_user_pages.rst for further details.
+> + *
+> + * FOLL_LONGTERM means that the pages are being pinned for "long term" use,
+> + * typically by a non-CPU device, and we cannot be sure that waiting for a
+> + * pinned page to become unpin will be effective.
+> + *
+> + * This is intended for Case 2 (RDMA: long-term pins) in
+> + * Documentation/vm/pin_user_pages.rst.
+> + */
+> +long pin_longterm_pages(unsigned long start, unsigned long nr_pages,
+> +			unsigned int gup_flags, struct page **pages,
+> +			struct vm_area_struct **vmas)
+> +{
+> +	/* FOLL_GET and FOLL_PIN are mutually exclusive. */
+> +	if (WARN_ON_ONCE(gup_flags & FOLL_GET))
+> +		return -EINVAL;
+> +
+> +	gup_flags |= FOLL_PIN | FOLL_LONGTERM;
+> +	return __gup_longterm_locked(current, current->mm, start, nr_pages,
+> +				     pages, vmas, gup_flags);
+> +}
+> +EXPORT_SYMBOL(pin_longterm_pages);
+> -- 
+> 2.24.0
+> 
+
+-- 
+Sincerely yours,
+Mike.
