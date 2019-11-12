@@ -2,253 +2,152 @@ Return-Path: <SRS0=0oGL=ZE=vger.kernel.org=linux-block-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-6.9 required=3.0 tests=DKIM_SIGNED,DKIM_VALID,
-	DKIM_VALID_AU,HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,
-	SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS autolearn=unavailable autolearn_force=no
-	version=3.4.0
+X-Spam-Status: No, score=-2.4 required=3.0 tests=DKIMWL_WL_HIGH,DKIM_SIGNED,
+	DKIM_VALID,DKIM_VALID_AU,HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,
+	SPF_HELO_NONE,SPF_PASS,UNPARSEABLE_RELAY,USER_AGENT_SANE_1 autolearn=no
+	autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 134EDC17441
-	for <linux-block@archiver.kernel.org>; Tue, 12 Nov 2019 00:19:23 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 223DEC43331
+	for <linux-block@archiver.kernel.org>; Tue, 12 Nov 2019 01:33:03 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.kernel.org (Postfix) with ESMTP id D7B1720840
-	for <linux-block@archiver.kernel.org>; Tue, 12 Nov 2019 00:19:22 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id E134F2184C
+	for <linux-block@archiver.kernel.org>; Tue, 12 Nov 2019 01:33:02 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="W9q/BaCe"
+	dkim=pass (2048-bit key) header.d=oracle.com header.i=@oracle.com header.b="YI4bOiO6"
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1727063AbfKLATT (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Mon, 11 Nov 2019 19:19:19 -0500
-Received: from us-smtp-delivery-1.mimecast.com ([207.211.31.120]:44015 "EHLO
-        us-smtp-1.mimecast.com" rhost-flags-OK-OK-OK-FAIL) by vger.kernel.org
-        with ESMTP id S1726978AbfKLATR (ORCPT
+        id S1726958AbfKLBc7 (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Mon, 11 Nov 2019 20:32:59 -0500
+Received: from userp2120.oracle.com ([156.151.31.85]:56108 "EHLO
+        userp2120.oracle.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S1726932AbfKLBc7 (ORCPT
         <rfc822;linux-block@vger.kernel.org>);
-        Mon, 11 Nov 2019 19:19:17 -0500
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-        s=mimecast20190719; t=1573517955;
-        h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-         to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-         content-transfer-encoding:content-transfer-encoding;
-        bh=4Qp+qAWnA86YTq8ORascu57Z8nk2SYkcadQHnIe57pg=;
-        b=W9q/BaCee8xgeiXgeJr0rCsUo45s4KqHFXKvgF1tsET+fvhXjr0B7A5HUXcFGjKoshl2TK
-        iXtSOOt1mZdJ9iU0mTZjoKq1/k9FpbWPLvXPHpH/zPHPPmdzQGgCFAorMySuNcxzSzMNNy
-        yxJRgGG8arpCGA9gXbkzeTErgm7insM=
-Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
- [209.132.183.4]) (Using TLS) by relay.mimecast.com with ESMTP id
- us-mta-183-3uhtm5eUN8qa7yP-FZ0psw-1; Mon, 11 Nov 2019 19:19:05 -0500
-Received: from smtp.corp.redhat.com (int-mx07.intmail.prod.int.phx2.redhat.com [10.5.11.22])
-        (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
-        (No client certificate requested)
-        by mimecast-mx01.redhat.com (Postfix) with ESMTPS id 30225800C72;
-        Tue, 12 Nov 2019 00:19:03 +0000 (UTC)
-Received: from rh2.redhat.com (ovpn-123-234.rdu2.redhat.com [10.10.123.234])
-        by smtp.corp.redhat.com (Postfix) with ESMTP id 4351210027B6;
-        Tue, 12 Nov 2019 00:19:01 +0000 (UTC)
-From:   Mike Christie <mchristi@redhat.com>
-To:     linux-api@vger.kernel.org, idryomov@gmail.com, mhocko@kernel.org,
-        david@fromorbit.com, linux-mm@kvack.org,
-        linux-kernel@vger.kernel.org, linux-scsi@vger.kernel.org,
-        linux-fsdevel@vger.kernel.org, linux-block@vger.kernel.org,
-        martin@urbackup.org, Damien.LeMoal@wdc.com
-Cc:     Mike Christie <mchristi@redhat.com>,
-        Michal Hocko <mhocko@suse.com>,
-        Masato Suzuki <masato.suzuki@wdc.com>,
-        Damien Le Moal <damien.lemoal@wdc.com>
-Subject: [PATCH] Add prctl support for controlling mem reclaim V4
-Date:   Mon, 11 Nov 2019 18:19:00 -0600
-Message-Id: <20191112001900.9206-1-mchristi@redhat.com>
+        Mon, 11 Nov 2019 20:32:59 -0500
+Received: from pps.filterd (userp2120.oracle.com [127.0.0.1])
+        by userp2120.oracle.com (8.16.0.27/8.16.0.27) with SMTP id xAC1JjIO173779;
+        Tue, 12 Nov 2019 01:32:53 GMT
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=oracle.com; h=date : from : to : cc
+ : subject : message-id : references : mime-version : content-type :
+ in-reply-to; s=corp-2019-08-05;
+ bh=fTgWHJSuJxj4enhVwv1L7tLVXaaO+logj3ywjSrwRZE=;
+ b=YI4bOiO6wN/W0dLV/r2UFrXiihHcnxfijh6AQ2sY61eElle1gLkkMpqnaP3h6C7sNgbb
+ 39Gci5pqtewehUM0KDV9nq4wIBMOk8Zoua1fugmIGuCyJOJoobPfrZ9kcPrxlZPeiXES
+ bpBwdTRIvf71hNpV3bMXvkqxUI/oAWh41IgVnCxRhpH98s6V5NTS6yM5ToO4Ue42FTSf
+ ekwx1++VNGQtObYn0UA4n/x0ZT0VSLZ7F5KE4CCMU8D1f8BrRqyHPH4utO1mOzcIxNVd
+ noeE538ZGGK39SvlaeNu1gQLJ1G5bZ93VB9iRJFhbSYfYfVXsugwGvjv9ijc7kMHmosN Lg== 
+Received: from userp3030.oracle.com (userp3030.oracle.com [156.151.31.80])
+        by userp2120.oracle.com with ESMTP id 2w5p3qhhqg-1
+        (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=OK);
+        Tue, 12 Nov 2019 01:32:52 +0000
+Received: from pps.filterd (userp3030.oracle.com [127.0.0.1])
+        by userp3030.oracle.com (8.16.0.27/8.16.0.27) with SMTP id xAC1IKOp113548;
+        Tue, 12 Nov 2019 01:32:52 GMT
+Received: from userv0121.oracle.com (userv0121.oracle.com [156.151.31.72])
+        by userp3030.oracle.com with ESMTP id 2w66wmya5r-1
+        (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=OK);
+        Tue, 12 Nov 2019 01:32:52 +0000
+Received: from abhmp0022.oracle.com (abhmp0022.oracle.com [141.146.116.28])
+        by userv0121.oracle.com (8.14.4/8.13.8) with ESMTP id xAC1WoSg007351;
+        Tue, 12 Nov 2019 01:32:51 GMT
+Received: from localhost (/67.169.218.210)
+        by default (Oracle Beehive Gateway v4.0)
+        with ESMTP ; Tue, 12 Nov 2019 01:32:50 +0000
+Date:   Mon, 11 Nov 2019 17:32:49 -0800
+From:   "Darrick J. Wong" <darrick.wong@oracle.com>
+To:     Evan Green <evgreen@chromium.org>
+Cc:     Jens Axboe <axboe@kernel.dk>,
+        Martin K Petersen <martin.petersen@oracle.com>,
+        Gwendal Grignou <gwendal@chromium.org>,
+        Ming Lei <ming.lei@redhat.com>,
+        Alexis Savery <asavery@chromium.org>,
+        Douglas Anderson <dianders@chromium.org>,
+        Bart Van Assche <bvanassche@acm.org>,
+        linux-block@vger.kernel.org, linux-kernel@vger.kernel.org
+Subject: Re: [PATCH v6 0/2] loop: Better discard for block devices
+Message-ID: <20191112013249.GD6235@magnolia>
+References: <20191111185030.215451-1-evgreen@chromium.org>
 MIME-Version: 1.0
-X-Scanned-By: MIMEDefang 2.84 on 10.5.11.22
-X-MC-Unique: 3uhtm5eUN8qa7yP-FZ0psw-1
-X-Mimecast-Spam-Score: 0
-Content-Type: text/plain; charset=WINDOWS-1252
-Content-Transfer-Encoding: quoted-printable
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <20191111185030.215451-1-evgreen@chromium.org>
+User-Agent: Mutt/1.9.4 (2018-02-28)
+X-Proofpoint-Virus-Version: vendor=nai engine=6000 definitions=9438 signatures=668685
+X-Proofpoint-Spam-Details: rule=notspam policy=default score=0 suspectscore=0 malwarescore=0
+ phishscore=0 bulkscore=0 spamscore=0 mlxscore=0 mlxlogscore=999
+ adultscore=0 classifier=spam adjust=0 reason=mlx scancount=1
+ engine=8.0.1-1910280000 definitions=main-1911120009
+X-Proofpoint-Virus-Version: vendor=nai engine=6000 definitions=9438 signatures=668685
+X-Proofpoint-Spam-Details: rule=notspam policy=default score=0 priorityscore=1501 malwarescore=0
+ suspectscore=0 phishscore=0 bulkscore=0 spamscore=0 clxscore=1011
+ lowpriorityscore=0 mlxscore=0 impostorscore=0 mlxlogscore=999 adultscore=0
+ classifier=spam adjust=0 reason=mlx scancount=1 engine=8.0.1-1910280000
+ definitions=main-1911120009
 Sender: linux-block-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-There are several storage drivers like dm-multipath, iscsi, tcmu-runner,
-amd nbd that have userspace components that can run in the IO path. For
-example, iscsi and nbd's userspace deamons may need to recreate a socket
-and/or send IO on it, and dm-multipath's daemon multipathd may need to
-send SG IO or read/write IO to figure out the state of paths and re-set
-them up.
+On Mon, Nov 11, 2019 at 10:50:28AM -0800, Evan Green wrote:
+> This series addresses some errors seen when using the loop
+> device directly backed by a block device. The first change plumbs
+> out the correct error message, and the second change prevents the
+> error from occurring in many cases.
+> 
+> The errors look like this:
+> [   90.880875] print_req_error: I/O error, dev loop5, sector 0
+> 
+> The errors occur when trying to do a discard or write zeroes operation
+> on a loop device backed by a block device that does not support write zeroes.
+> Firstly, the error itself is incorrectly reported as I/O error, but is
+> actually EOPNOTSUPP. The first patch plumbs out EOPNOTSUPP to properly
+> report the error.
+> 
+> The second patch prevents these errors from occurring by mirroring the
+> zeroing capabilities of the underlying block device into the loop device.
+> Before this change, discard was always reported as being supported, and
+> the loop device simply turns around and does an fallocate operation on the
+> backing device. After this change, backing block devices that do support
+> zeroing will continue to work as before, and continue to get all the
+> benefits of doing that. Backing devices that do not support zeroing will
+> fail earlier, avoiding hitting the loop device at all and ultimately
+> avoiding this error in the logs.
+> 
+> I can also confirm that this fixes test block/003 in the blktests, when
+> running blktests on a loop device backed by a block device.
+> 
+> Darrick, I see you've got a related change in linux-next. I'm not sure what
+> the status of that is, so I didn't base my latest spin on top of yours.
 
-In the kernel these drivers have access to GFP_NOIO/GFP_NOFS and the
-memalloc_*_save/restore functions to control the allocation behavior,
-but for userspace we would end up hitting an allocation that ended up
-writing data back to the same device we are trying to allocate for.
-The device is then in a state of deadlock, because to execute IO the
-device needs to allocate memory, but to allocate memory the memory
-layers want execute IO to the device.
+AFAIK the patch you reference changes NOUNMAP requests to use
+FALLOC_FL_ZERO_RANGE and is queued for 5.5, which means patch #2 will
+clash with it.  It sort of looks like patch #2 reimplements the patch
+that Jens already pulled for 5.5, so you probably want to rebase this
+series atop his for-next tree.... but you should really ask Jens.
 
-Here is an example with nbd using a local userspace daemon that performs
-network IO to a remote server. We are using XFS on top of the nbd device,
-but it can happen with any FS or other modules layered on top of the nbd
-device that can write out data to free memory.  Here a nbd daemon helper
-thread, msgr-worker-1, is performing a write/sendmsg on a socket to execute
-a request. This kicks off a reclaim operation which results in a WRITE to
-the nbd device and the nbd thread calling back into the mm layer.
+--D
 
-[ 1626.609191] msgr-worker-1   D    0  1026      1 0x00004000
-[ 1626.609193] Call Trace:
-[ 1626.609195]  ? __schedule+0x29b/0x630
-[ 1626.609197]  ? wait_for_completion+0xe0/0x170
-[ 1626.609198]  schedule+0x30/0xb0
-[ 1626.609200]  schedule_timeout+0x1f6/0x2f0
-[ 1626.609202]  ? blk_finish_plug+0x21/0x2e
-[ 1626.609204]  ? _xfs_buf_ioapply+0x2e6/0x410
-[ 1626.609206]  ? wait_for_completion+0xe0/0x170
-[ 1626.609208]  wait_for_completion+0x108/0x170
-[ 1626.609210]  ? wake_up_q+0x70/0x70
-[ 1626.609212]  ? __xfs_buf_submit+0x12e/0x250
-[ 1626.609214]  ? xfs_bwrite+0x25/0x60
-[ 1626.609215]  xfs_buf_iowait+0x22/0xf0
-[ 1626.609218]  __xfs_buf_submit+0x12e/0x250
-[ 1626.609220]  xfs_bwrite+0x25/0x60
-[ 1626.609222]  xfs_reclaim_inode+0x2e8/0x310
-[ 1626.609224]  xfs_reclaim_inodes_ag+0x1b6/0x300
-[ 1626.609227]  xfs_reclaim_inodes_nr+0x31/0x40
-[ 1626.609228]  super_cache_scan+0x152/0x1a0
-[ 1626.609231]  do_shrink_slab+0x12c/0x2d0
-[ 1626.609233]  shrink_slab+0x9c/0x2a0
-[ 1626.609235]  shrink_node+0xd7/0x470
-[ 1626.609237]  do_try_to_free_pages+0xbf/0x380
-[ 1626.609240]  try_to_free_pages+0xd9/0x1f0
-[ 1626.609245]  __alloc_pages_slowpath+0x3a4/0xd30
-[ 1626.609251]  ? ___slab_alloc+0x238/0x560
-[ 1626.609254]  __alloc_pages_nodemask+0x30c/0x350
-[ 1626.609259]  skb_page_frag_refill+0x97/0xd0
-[ 1626.609274]  sk_page_frag_refill+0x1d/0x80
-[ 1626.609279]  tcp_sendmsg_locked+0x2bb/0xdd0
-[ 1626.609304]  tcp_sendmsg+0x27/0x40
-[ 1626.609307]  sock_sendmsg+0x54/0x60
-[ 1626.609308]  ___sys_sendmsg+0x29f/0x320
-[ 1626.609313]  ? sock_poll+0x66/0xb0
-[ 1626.609318]  ? ep_item_poll.isra.15+0x40/0xc0
-[ 1626.609320]  ? ep_send_events_proc+0xe6/0x230
-[ 1626.609322]  ? hrtimer_try_to_cancel+0x54/0xf0
-[ 1626.609324]  ? ep_read_events_proc+0xc0/0xc0
-[ 1626.609326]  ? _raw_write_unlock_irq+0xa/0x20
-[ 1626.609327]  ? ep_scan_ready_list.constprop.19+0x218/0x230
-[ 1626.609329]  ? __hrtimer_init+0xb0/0xb0
-[ 1626.609331]  ? _raw_spin_unlock_irq+0xa/0x20
-[ 1626.609334]  ? ep_poll+0x26c/0x4a0
-[ 1626.609337]  ? tcp_tsq_write.part.54+0xa0/0xa0
-[ 1626.609339]  ? release_sock+0x43/0x90
-[ 1626.609341]  ? _raw_spin_unlock_bh+0xa/0x20
-[ 1626.609342]  __sys_sendmsg+0x47/0x80
-[ 1626.609347]  do_syscall_64+0x5f/0x1c0
-[ 1626.609349]  ? prepare_exit_to_usermode+0x75/0xa0
-[ 1626.609351]  entry_SYSCALL_64_after_hwframe+0x44/0xa9
-
-This patch adds a new prctl command that daemons can use after they have
-done their initial setup, and before they start to do allocations that
-are in the IO path. It sets the PF_MEMALLOC_NOIO and PF_LESS_THROTTLE
-flags so both userspace block and FS threads can use it to avoid the
-allocation recursion and try to prevent from being throttled while
-writing out data to free up memory.
-
-Signed-off-by: Mike Christie <mchristi@redhat.com>
-Acked-by: Michal Hocko <mhocko@suse.com>
-Tested-by: Masato Suzuki <masato.suzuki@wdc.com>
-Reviewed-by: Damien Le Moal <damien.lemoal@wdc.com>
-
----
-
-V4:
-- Fix PR_GET_IO_FLUSHER check to match SET.
-
-V3:
-- Drop NOFS, set PF_LESS_THROTTLE and rename prctl flag to reflect it
-is more general and can support both FS and block devices. Both fuse
-and block device daemons, nbd and tcmu-runner, have been tested to
-confirm the more restrictive PF_MEMALLOC_NOIO also works for fuse.
-
-- Use CAP_SYS_RESOURCE instead of admin.
-
-V2:
-- Use prctl instead of procfs.
-- Add support for NOFS for fuse.
-- Check permissions.
-
-
- include/uapi/linux/capability.h |  1 +
- include/uapi/linux/prctl.h      |  4 ++++
- kernel/sys.c                    | 25 +++++++++++++++++++++++++
- 3 files changed, 30 insertions(+)
-
-diff --git a/include/uapi/linux/capability.h b/include/uapi/linux/capabilit=
-y.h
-index 240fdb9a60f6..272dc69fa080 100644
---- a/include/uapi/linux/capability.h
-+++ b/include/uapi/linux/capability.h
-@@ -301,6 +301,7 @@ struct vfs_ns_cap_data {
- /* Allow more than 64hz interrupts from the real-time clock */
- /* Override max number of consoles on console allocation */
- /* Override max number of keymaps */
-+/* Control memory reclaim behavior */
-=20
- #define CAP_SYS_RESOURCE     24
-=20
-diff --git a/include/uapi/linux/prctl.h b/include/uapi/linux/prctl.h
-index 7da1b37b27aa..07b4f8131e36 100644
---- a/include/uapi/linux/prctl.h
-+++ b/include/uapi/linux/prctl.h
-@@ -234,4 +234,8 @@ struct prctl_mm_map {
- #define PR_GET_TAGGED_ADDR_CTRL=09=0956
- # define PR_TAGGED_ADDR_ENABLE=09=09(1UL << 0)
-=20
-+/* Control reclaim behavior when allocating memory */
-+#define PR_SET_IO_FLUSHER=09=0957
-+#define PR_GET_IO_FLUSHER=09=0958
-+
- #endif /* _LINUX_PRCTL_H */
-diff --git a/kernel/sys.c b/kernel/sys.c
-index a611d1d58c7d..c1a360370d09 100644
---- a/kernel/sys.c
-+++ b/kernel/sys.c
-@@ -2259,6 +2259,8 @@ int __weak arch_prctl_spec_ctrl_set(struct task_struc=
-t *t, unsigned long which,
- =09return -EINVAL;
- }
-=20
-+#define PR_IO_FLUSHER (PF_MEMALLOC_NOIO | PF_LESS_THROTTLE)
-+
- SYSCALL_DEFINE5(prctl, int, option, unsigned long, arg2, unsigned long, ar=
-g3,
- =09=09unsigned long, arg4, unsigned long, arg5)
- {
-@@ -2486,6 +2488,29 @@ SYSCALL_DEFINE5(prctl, int, option, unsigned long, a=
-rg2, unsigned long, arg3,
- =09=09=09return -EINVAL;
- =09=09error =3D GET_TAGGED_ADDR_CTRL();
- =09=09break;
-+=09case PR_SET_IO_FLUSHER:
-+=09=09if (!capable(CAP_SYS_RESOURCE))
-+=09=09=09return -EPERM;
-+
-+=09=09if (arg3 || arg4 || arg5)
-+=09=09=09return -EINVAL;
-+
-+=09=09if (arg2 =3D=3D 1)
-+=09=09=09current->flags |=3D PR_IO_FLUSHER;
-+=09=09else if (!arg2)
-+=09=09=09current->flags &=3D ~PR_IO_FLUSHER;
-+=09=09else
-+=09=09=09return -EINVAL;
-+=09=09break;
-+=09case PR_GET_IO_FLUSHER:
-+=09=09if (!capable(CAP_SYS_RESOURCE))
-+=09=09=09return -EPERM;
-+
-+=09=09if (arg2 || arg3 || arg4 || arg5)
-+=09=09=09return -EINVAL;
-+
-+=09=09error =3D (current->flags & PR_IO_FLUSHER) =3D=3D PR_IO_FLUSHER;
-+=09=09break;
- =09default:
- =09=09error =3D -EINVAL;
- =09=09break;
---=20
-2.20.1
-
+> Changes in v6:
+> - Updated tags
+> 
+> Changes in v5:
+> - Don't mirror discard if lo_encrypt_key_size is non-zero (Gwendal)
+> 
+> Changes in v4:
+> - Mirror blkdev's write_zeroes into loopdev's discard_sectors.
+> 
+> Changes in v3:
+> - Updated tags
+> - Updated commit description
+> 
+> Changes in v2:
+> - Unnested error if statement (Bart)
+> 
+> Evan Green (2):
+>   loop: Report EOPNOTSUPP properly
+>   loop: Better discard support for block devices
+> 
+>  drivers/block/loop.c | 66 +++++++++++++++++++++++++++++---------------
+>  1 file changed, 44 insertions(+), 22 deletions(-)
+> 
+> -- 
+> 2.21.0
+> 
