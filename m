@@ -2,104 +2,60 @@ Return-Path: <SRS0=BCjA=ZF=vger.kernel.org=linux-block-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-5.6 required=3.0 tests=DKIMWL_WL_HIGH,DKIM_SIGNED,
-	DKIM_VALID,DKIM_VALID_AU,INCLUDES_PATCH,MAILING_LIST_MULTI,SPF_HELO_NONE,
-	SPF_PASS,USER_AGENT_SANE_1 autolearn=unavailable autolearn_force=no
-	version=3.4.0
+X-Spam-Status: No, score=-3.8 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
+	MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,USER_AGENT_GIT autolearn=no
+	autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 3A362C432C3
-	for <linux-block@archiver.kernel.org>; Wed, 13 Nov 2019 16:36:49 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 73CC5C432C3
+	for <linux-block@archiver.kernel.org>; Wed, 13 Nov 2019 17:30:46 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.kernel.org (Postfix) with ESMTP id 492D12051A
-	for <linux-block@archiver.kernel.org>; Wed, 13 Nov 2019 16:36:47 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=default; t=1573663007;
-	bh=AHvxaYr7QHBBz6Ju6UKlC5cR5AHg3r7WkSlfqYpYktI=;
-	h=Date:From:To:Cc:Subject:References:In-Reply-To:List-ID:From;
-	b=ZQ0M1UqOWTt2wVjCsjNDh3iPadamV/CsmBip4PSQDeUYydoKcBSL6rqkXeCdOkQw4
-	 jmVcf7pz+KCSWIQT4Z2sRGN8S54/lWj97610ussDg49Sg23uA26u92VwzuqkpopUw5
-	 93Au2tr/5mfPrfgu9tkGpLFlfwZTaT3/poLjU8aQ=
+	by mail.kernel.org (Postfix) with ESMTP id 0D92D206DA
+	for <linux-block@archiver.kernel.org>; Wed, 13 Nov 2019 17:30:46 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1727460AbfKMQfF (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Wed, 13 Nov 2019 11:35:05 -0500
-Received: from mail-qk1-f196.google.com ([209.85.222.196]:40739 "EHLO
-        mail-qk1-f196.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1726410AbfKMQfE (ORCPT
-        <rfc822;linux-block@vger.kernel.org>);
-        Wed, 13 Nov 2019 11:35:04 -0500
-Received: by mail-qk1-f196.google.com with SMTP id z16so2273178qkg.7;
-        Wed, 13 Nov 2019 08:35:04 -0800 (PST)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20161025;
-        h=sender:date:from:to:cc:subject:message-id:references:mime-version
-         :content-disposition:in-reply-to:user-agent;
-        bh=xw70SBRGAaKGorTOjyeR6fitBzy2xSe0xSXfhKyCYgw=;
-        b=kj0MzPKjmxb6LkA5WODTubivaZMgIS8X26k0mzw6XP2i9yAcO04LIN9rVGgnfQmd6/
-         f9TaOH9Bf4CAOxWZjNlkJlSKJHIJtWIhZyhkTC9be9KPdifLHL6H/Z7SR0kmc+/fz4Mw
-         gga/oVwgGWwO6D4OfREV7QKGHXfKeu0IqA4GP7+h7VF/bKhv3p8NB6gS5XbWF4e1wod8
-         chadrZd0U5tDrlWH3PWu+UBlzxeeVZ1d9PHmrR3fW9Wae1erjTeS66w0U0kxGhj2kqln
-         0GHonYrvpvuOr9yHqFfjd1MKb7WZZan/VB5u1SZNjqrr/LC9Vculiqq24sz9vT+IAyRG
-         ckvw==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20161025;
-        h=x-gm-message-state:sender:date:from:to:cc:subject:message-id
-         :references:mime-version:content-disposition:in-reply-to:user-agent;
-        bh=xw70SBRGAaKGorTOjyeR6fitBzy2xSe0xSXfhKyCYgw=;
-        b=cTud0RQCwjpoWJKN14Ig2arfd+n520XrBv+JQA3l+E4H6QFPJimbRYNaJwO6b4h3/6
-         FaKau37mg8omb8jbNVF3qRkXjD4pkHXsMZExmGS6q/2A4I9CQOB6VUlFGX+7dVoEKFKq
-         gwQXurzLxdql3Dvu5YTYHYDt7oBaWYI2w8nYxj/ZaCAUIpQcmapZ/JG/vGVA1fMbYXbk
-         nwU7MWUlVvIdSxSz89qtAmk2QHirLL+xsLqHCycS+B7QzBdblNGhYWeS75MAu1ZOwqlF
-         rP662w4YShR76hctnqcTFCqLmZ0BjgIZ3xtKaUJeWnHd2c0EWHocF63w0Mnu0NEyAmyY
-         07WQ==
-X-Gm-Message-State: APjAAAVRJj5Vb7b6rC6XU0hQgcngqIca4BcSczItXQy0We++YTI+uS+1
-        YYmk31S1LMEUpZ0PMaMkCV8=
-X-Google-Smtp-Source: APXvYqykNYpe6UzqswVm0KftnXRPm84RMllxQFqx5nmhaks2To3+wsDwa4AeQmJxVovj1vsjhFyGWg==
-X-Received: by 2002:ae9:c10c:: with SMTP id z12mr3241761qki.411.1573662903573;
-        Wed, 13 Nov 2019 08:35:03 -0800 (PST)
-Received: from localhost ([2620:10d:c091:500::2:69f2])
-        by smtp.gmail.com with ESMTPSA id x11sm1542637qtk.93.2019.11.13.08.35.02
-        (version=TLS1_2 cipher=ECDHE-RSA-AES128-GCM-SHA256 bits=128/128);
-        Wed, 13 Nov 2019 08:35:02 -0800 (PST)
-Date:   Wed, 13 Nov 2019 08:35:01 -0800
-From:   Tejun Heo <tj@kernel.org>
-To:     Faiz Abbas <faiz_abbas@ti.com>
-Cc:     axboe@kernel.dk, cgroups@vger.kernel.org,
-        linux-block@vger.kernel.org, linux-kernel@vger.kernel.org,
-        lizefan@huawei.com, hannes@cmpxchg.org, kernel-team@fb.com,
-        Dan Schatzberg <dschatzberg@fb.com>, Daniel Xu <dlxu@fb.com>
-Subject: Re: [PATCH 5/6] blk-cgroup: reimplement basic IO stats using cgroup
- rstat
-Message-ID: <20191113163501.GI4163745@devbig004.ftw2.facebook.com>
-References: <20191107191804.3735303-1-tj@kernel.org>
- <20191107191804.3735303-6-tj@kernel.org>
- <cd3ebcee-6819-a09b-aeba-de6817f32cde@ti.com>
+        id S1726519AbfKMRap (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Wed, 13 Nov 2019 12:30:45 -0500
+Received: from szxga06-in.huawei.com ([45.249.212.32]:54152 "EHLO huawei.com"
+        rhost-flags-OK-OK-OK-FAIL) by vger.kernel.org with ESMTP
+        id S1726443AbfKMRap (ORCPT <rfc822;linux-block@vger.kernel.org>);
+        Wed, 13 Nov 2019 12:30:45 -0500
+Received: from DGGEMS404-HUB.china.huawei.com (unknown [172.30.72.60])
+        by Forcepoint Email with ESMTP id DC7CA7D6366D8098886D;
+        Thu, 14 Nov 2019 01:30:42 +0800 (CST)
+Received: from localhost.localdomain (10.69.192.58) by
+ DGGEMS404-HUB.china.huawei.com (10.3.19.204) with Microsoft SMTP Server id
+ 14.3.439.0; Thu, 14 Nov 2019 01:30:36 +0800
+From:   John Garry <john.garry@huawei.com>
+To:     <axboe@kernel.dk>
+CC:     <linux-block@vger.kernel.org>, <linux-kernel@vger.kernel.org>,
+        John Garry <john.garry@huawei.com>
+Subject: [PATCH 0/2] blk-mq/sbitmap: Delete some unused functions
+Date:   Thu, 14 Nov 2019 01:27:20 +0800
+Message-ID: <1573666042-176756-1-git-send-email-john.garry@huawei.com>
+X-Mailer: git-send-email 2.8.1
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <cd3ebcee-6819-a09b-aeba-de6817f32cde@ti.com>
-User-Agent: Mutt/1.5.21 (2010-09-15)
+Content-Type: text/plain
+X-Originating-IP: [10.69.192.58]
+X-CFilter-Loop: Reflected
 Sender: linux-block-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-Hello,
+Function blk_mq_can_queue() never seemed to ever have been referenced, so
+delete it and any other now-unused callees.
 
-Can you please see whether the following patch fixes the issue?
+John Garry (2):
+  blk-mq: Delete blk_mq_has_free_tags() and blk_mq_can_queue()
+  sbitmap: Delete sbitmap_any_bit_clear()
 
-Thanks.
+ block/blk-mq-tag.c      |  8 --------
+ block/blk-mq-tag.h      |  1 -
+ block/blk-mq.c          |  6 ------
+ include/linux/blk-mq.h  |  1 -
+ include/linux/sbitmap.h |  9 ---------
+ lib/sbitmap.c           | 17 -----------------
+ 6 files changed, 42 deletions(-)
 
-diff --git a/include/linux/blk-cgroup.h b/include/linux/blk-cgroup.h
-index 48a66738143d..19394c77ed99 100644
---- a/include/linux/blk-cgroup.h
-+++ b/include/linux/blk-cgroup.h
-@@ -626,7 +626,8 @@ static inline bool blkcg_bio_issue_check(struct request_queue *q,
- 		bis->cur.ios[rwd]++;
- 
- 		u64_stats_update_end(&bis->sync);
--		cgroup_rstat_updated(blkg->blkcg->css.cgroup, cpu);
-+		if (cgroup_subsys_on_dfl(io_cgrp_subsys))
-+			cgroup_rstat_updated(blkg->blkcg->css.cgroup, cpu);
- 		put_cpu();
- 	}
- 
+-- 
+2.17.1
+
