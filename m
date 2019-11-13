@@ -2,185 +2,185 @@ Return-Path: <SRS0=BCjA=ZF=vger.kernel.org=linux-block-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-8.3 required=3.0 tests=DKIM_SIGNED,DKIM_VALID,
+X-Spam-Status: No, score=-6.8 required=3.0 tests=DKIM_SIGNED,DKIM_VALID,
 	DKIM_VALID_AU,HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,
-	SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,USER_AGENT_SANE_1 autolearn=unavailable
-	autolearn_force=no version=3.4.0
+	SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS autolearn=unavailable autolearn_force=no
+	version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 53E6FC1744B
-	for <linux-block@archiver.kernel.org>; Wed, 13 Nov 2019 13:02:10 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id B6262C43331
+	for <linux-block@archiver.kernel.org>; Wed, 13 Nov 2019 13:02:35 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.kernel.org (Postfix) with ESMTP id 2C3FE22467
-	for <linux-block@archiver.kernel.org>; Wed, 13 Nov 2019 13:02:10 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id 87D6A222D0
+	for <linux-block@archiver.kernel.org>; Wed, 13 Nov 2019 13:02:35 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=pass (2048-bit key) header.d=ziepe.ca header.i=@ziepe.ca header.b="nx3682LY"
+	dkim=pass (1024-bit key) header.d=natalenko.name header.i=@natalenko.name header.b="KflpJlhU"
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1727336AbfKMNCI (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Wed, 13 Nov 2019 08:02:08 -0500
-Received: from mail-qt1-f196.google.com ([209.85.160.196]:46628 "EHLO
-        mail-qt1-f196.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1727329AbfKMNCH (ORCPT
+        id S1727112AbfKMNCf (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Wed, 13 Nov 2019 08:02:35 -0500
+Received: from vulcan.natalenko.name ([104.207.131.136]:39748 "EHLO
+        vulcan.natalenko.name" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S1727073AbfKMNCe (ORCPT
         <rfc822;linux-block@vger.kernel.org>);
-        Wed, 13 Nov 2019 08:02:07 -0500
-Received: by mail-qt1-f196.google.com with SMTP id r20so2403544qtp.13
-        for <linux-block@vger.kernel.org>; Wed, 13 Nov 2019 05:02:04 -0800 (PST)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=ziepe.ca; s=google;
-        h=date:from:to:cc:subject:message-id:references:mime-version
-         :content-disposition:in-reply-to:user-agent;
-        bh=oMayMeIif+74vqoR9Hg244XFAjXhPl1nedXCyPx66Cc=;
-        b=nx3682LY4M40wGJ/sVGEu1B6oRowx3yCQZUXaDyQPZ8wp2PPM1JbbnvXpnwJ+1w7kN
-         lveYAqZtu6ZiCNE2GeOgCzqCbaPveYJh+bEnyDI89VRNGCHDXS9A7L5ZDDa96GF+3bm0
-         VmapuAT4FqF5vTUEuSGlcRA+NIY79GOrBmWnh2u551hGbiYfLURBD9nS87LvoXBLbrK0
-         o1TB/3BSIGkHlZVczCO3ubOoj5u0dVQwEYLzu7svoxCzx/+RmvcCH+ACjaNBf3sl94Zf
-         NRZR8twQGuvzHtghZ4nzQu/TUj0hyyqfJ3dXa+O6cdFNGC6w6BZNjOabe9aQdvwtecNu
-         AUCw==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20161025;
-        h=x-gm-message-state:date:from:to:cc:subject:message-id:references
-         :mime-version:content-disposition:in-reply-to:user-agent;
-        bh=oMayMeIif+74vqoR9Hg244XFAjXhPl1nedXCyPx66Cc=;
-        b=rI9ql1rf2wldZr/GEFoNF3GlTrSiygt0kxZNX3NgloZXxu+quNLZ470H4UZE4n2gVS
-         K3O/igLKCLv+JgSB9ZYydx+Kdjhr8nuML+3H1kFXIYCbkbDCjUcTQXCHBC9u7N8ZYyUI
-         +ggGOzz/egWJKL2cV9lCERSv8Pw0Hs+VKojGI2kRe+zV1qW8OuqnfReEFPmdAPe1Bh6H
-         JwI2629A7jDL5g1u+kB9n2e/RS08r0NedfPp9J/6GMcM5VhOd93nJsBYuBVAqP4oeWF+
-         510euw/33VzfnbbY2gPyff3m7Q1nG5gOtaLyxwzzRJU8ov6UueXMRuzvDb+tmM7gShlc
-         UXMw==
-X-Gm-Message-State: APjAAAXYXLu7v8lFTig+J+BlzV3vde2veN6mDgI1SosgQ+uJqHHRmigd
-        EBFchQGVGRkAN8Dr4HdH0Tb6bT1AfhQ=
-X-Google-Smtp-Source: APXvYqwGbusmGQAfGHn3CXk2dU2JO4knhTY4prDGLzmyu8apMpc1WOd3WOgt9K6JkDyAWe/3c1LxDA==
-X-Received: by 2002:ac8:724f:: with SMTP id l15mr2476006qtp.234.1573650124104;
-        Wed, 13 Nov 2019 05:02:04 -0800 (PST)
-Received: from ziepe.ca (hlfxns017vw-142-162-113-180.dhcp-dynamic.fibreop.ns.bellaliant.net. [142.162.113.180])
-        by smtp.gmail.com with ESMTPSA id 187sm918223qkk.103.2019.11.13.05.02.03
-        (version=TLS1_2 cipher=ECDHE-RSA-CHACHA20-POLY1305 bits=256/256);
-        Wed, 13 Nov 2019 05:02:03 -0800 (PST)
-Received: from jgg by mlx.ziepe.ca with local (Exim 4.90_1)
-        (envelope-from <jgg@ziepe.ca>)
-        id 1iUsHa-000767-Jc; Wed, 13 Nov 2019 09:02:02 -0400
-Date:   Wed, 13 Nov 2019 09:02:02 -0400
-From:   Jason Gunthorpe <jgg@ziepe.ca>
-To:     John Hubbard <jhubbard@nvidia.com>
-Cc:     Andrew Morton <akpm@linux-foundation.org>,
-        Al Viro <viro@zeniv.linux.org.uk>,
-        Alex Williamson <alex.williamson@redhat.com>,
-        Benjamin Herrenschmidt <benh@kernel.crashing.org>,
-        =?utf-8?B?QmrDtnJuIFTDtnBlbA==?= <bjorn.topel@intel.com>,
-        Christoph Hellwig <hch@infradead.org>,
-        Dan Williams <dan.j.williams@intel.com>,
-        Daniel Vetter <daniel@ffwll.ch>,
-        Dave Chinner <david@fromorbit.com>,
-        David Airlie <airlied@linux.ie>,
-        "David S . Miller" <davem@davemloft.net>,
-        Ira Weiny <ira.weiny@intel.com>, Jan Kara <jack@suse.cz>,
-        Jens Axboe <axboe@kernel.dk>, Jonathan Corbet <corbet@lwn.net>,
-        =?utf-8?B?SsOpcsO0bWU=?= Glisse <jglisse@redhat.com>,
-        Magnus Karlsson <magnus.karlsson@intel.com>,
-        Mauro Carvalho Chehab <mchehab@kernel.org>,
-        Michael Ellerman <mpe@ellerman.id.au>,
-        Michal Hocko <mhocko@suse.com>,
-        Mike Kravetz <mike.kravetz@oracle.com>,
-        Paul Mackerras <paulus@samba.org>,
-        Shuah Khan <shuah@kernel.org>,
-        Vlastimil Babka <vbabka@suse.cz>, bpf@vger.kernel.org,
-        dri-devel@lists.freedesktop.org, kvm@vger.kernel.org,
-        linux-block@vger.kernel.org, linux-doc@vger.kernel.org,
-        linux-fsdevel@vger.kernel.org, linux-kselftest@vger.kernel.org,
-        linux-media@vger.kernel.org, linux-rdma@vger.kernel.org,
-        linuxppc-dev@lists.ozlabs.org, netdev@vger.kernel.org,
-        linux-mm@kvack.org, LKML <linux-kernel@vger.kernel.org>
-Subject: Re: [PATCH v4 08/23] vfio, mm: fix get_user_pages_remote() and
- FOLL_LONGTERM
-Message-ID: <20191113130202.GA26068@ziepe.ca>
-References: <20191113042710.3997854-1-jhubbard@nvidia.com>
- <20191113042710.3997854-9-jhubbard@nvidia.com>
+        Wed, 13 Nov 2019 08:02:34 -0500
+X-Greylist: delayed 310 seconds by postgrey-1.27 at vger.kernel.org; Wed, 13 Nov 2019 08:02:33 EST
+Received: from mail.natalenko.name (vulcan.natalenko.name [IPv6:fe80::5400:ff:fe0c:dfa0])
+        (using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+        (No client certificate requested)
+        by vulcan.natalenko.name (Postfix) with ESMTPSA id 3DA9F628C1D;
+        Wed, 13 Nov 2019 13:57:19 +0100 (CET)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=natalenko.name;
+        s=dkim-20170712; t=1573649839;
+        h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+         to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+         content-transfer-encoding:content-transfer-encoding:
+         in-reply-to:in-reply-to:references:references;
+        bh=5lJHmk092HI/n/t3HGbtqhY5NJJ/zYeiYOZoPfSWoV8=;
+        b=KflpJlhUhEVlin+lNNHQWX1kTlF4c1gNrPhtrV2UqmrK1UcmXVlG2RYGtHWbje5+kkNlwy
+        h/aTjcodHZEpUULAbfWhbcb/TBRdAB35NNB66MvZQDpCIAufvyGAcweYUFPWk68ULOSyXU
+        oCWqgAA4vFV0FXjE4ISYmMmPPrWmbg0=
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <20191113042710.3997854-9-jhubbard@nvidia.com>
-User-Agent: Mutt/1.9.4 (2018-02-28)
+Content-Type: text/plain; charset=US-ASCII;
+ format=flowed
+Content-Transfer-Encoding: 7bit
+Date:   Wed, 13 Nov 2019 13:57:19 +0100
+From:   Oleksandr Natalenko <oleksandr@natalenko.name>
+To:     Paolo Valente <paolo.valente@linaro.org>
+Cc:     Jens Axboe <axboe@kernel.dk>, linux-block@vger.kernel.org,
+        linux-kernel@vger.kernel.org, ulf.hansson@linaro.org,
+        linus.walleij@linaro.org, bfq-iosched@googlegroups.com,
+        Chris Evich <cevich@redhat.com>,
+        Patrick Dung <patdung100@gmail.com>,
+        Thorsten Schubert <tschubert@bafh.org>
+Subject: Re: [PATCH BUGFIX] block, bfq: deschedule empty bfq_queues not
+ referred by any process
+In-Reply-To: <20191112074856.40433-1-paolo.valente@linaro.org>
+References: <20191112074856.40433-1-paolo.valente@linaro.org>
+User-Agent: Roundcube Webmail/1.4.0
+Message-ID: <bb393dcaa426786e0963cf0e70f0b062@natalenko.name>
+X-Sender: oleksandr@natalenko.name
 Sender: linux-block-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-On Tue, Nov 12, 2019 at 08:26:55PM -0800, John Hubbard wrote:
-> As it says in the updated comment in gup.c: current FOLL_LONGTERM
-> behavior is incompatible with FAULT_FLAG_ALLOW_RETRY because of the
-> FS DAX check requirement on vmas.
-> 
-> However, the corresponding restriction in get_user_pages_remote() was
-> slightly stricter than is actually required: it forbade all
-> FOLL_LONGTERM callers, but we can actually allow FOLL_LONGTERM callers
-> that do not set the "locked" arg.
-> 
-> Update the code and comments accordingly, and update the VFIO caller
-> to take advantage of this, fixing a bug as a result: the VFIO caller
-> is logically a FOLL_LONGTERM user.
-> 
-> Also, remove an unnessary pair of calls that were releasing and
-> reacquiring the mmap_sem. There is no need to avoid holding mmap_sem
-> just in order to call page_to_pfn().
-> 
-> Also, move the DAX check ("if a VMA is DAX, don't allow long term
-> pinning") from the VFIO call site, all the way into the internals
-> of get_user_pages_remote() and __gup_longterm_locked(). That is:
-> get_user_pages_remote() calls __gup_longterm_locked(), which in turn
-> calls check_dax_vmas(). It's lightly explained in the comments as well.
-> 
-> Thanks to Jason Gunthorpe for pointing out a clean way to fix this,
-> and to Dan Williams for helping clarify the DAX refactoring.
-> 
-> Suggested-by: Jason Gunthorpe <jgg@ziepe.ca>
-> Cc: Dan Williams <dan.j.williams@intel.com>
-> Cc: Jerome Glisse <jglisse@redhat.com>
-> Cc: Ira Weiny <ira.weiny@intel.com>
-> Signed-off-by: John Hubbard <jhubbard@nvidia.com>
->  drivers/vfio/vfio_iommu_type1.c | 25 ++-----------------------
->  mm/gup.c                        | 27 ++++++++++++++++++++++-----
->  2 files changed, 24 insertions(+), 28 deletions(-)
-> 
-> diff --git a/drivers/vfio/vfio_iommu_type1.c b/drivers/vfio/vfio_iommu_type1.c
-> index d864277ea16f..7301b710c9a4 100644
-> +++ b/drivers/vfio/vfio_iommu_type1.c
-> @@ -340,7 +340,6 @@ static int vaddr_get_pfn(struct mm_struct *mm, unsigned long vaddr,
->  {
->  	struct page *page[1];
->  	struct vm_area_struct *vma;
-> -	struct vm_area_struct *vmas[1];
->  	unsigned int flags = 0;
->  	int ret;
->  
-> @@ -348,33 +347,13 @@ static int vaddr_get_pfn(struct mm_struct *mm, unsigned long vaddr,
->  		flags |= FOLL_WRITE;
->  
->  	down_read(&mm->mmap_sem);
-> -	if (mm == current->mm) {
-> -		ret = get_user_pages(vaddr, 1, flags | FOLL_LONGTERM, page,
-> -				     vmas);
-> -	} else {
-> -		ret = get_user_pages_remote(NULL, mm, vaddr, 1, flags, page,
-> -					    vmas, NULL);
-> -		/*
-> -		 * The lifetime of a vaddr_get_pfn() page pin is
-> -		 * userspace-controlled. In the fs-dax case this could
-> -		 * lead to indefinite stalls in filesystem operations.
-> -		 * Disallow attempts to pin fs-dax pages via this
-> -		 * interface.
-> -		 */
-> -		if (ret > 0 && vma_is_fsdax(vmas[0])) {
-> -			ret = -EOPNOTSUPP;
-> -			put_page(page[0]);
-> -		}
-> -	}
-> -	up_read(&mm->mmap_sem);
-> -
-> +	ret = get_user_pages_remote(NULL, mm, vaddr, 1, flags | FOLL_LONGTERM,
-> +				    page, NULL, NULL);
->  	if (ret == 1) {
->  		*pfn = page_to_pfn(page[0]);
->  		return 0;
+Hi.
 
-Mind the return with the lock held this needs some goto unwind
+On 12.11.2019 08:48, Paolo Valente wrote:
+> Since commit 3726112ec731 ("block, bfq: re-schedule empty queues if
+> they deserve I/O plugging"), to prevent the service guarantees of a
+> bfq_queue from being violated, the bfq_queue may be left busy, i.e.,
+> scheduled for service, even if empty (see comments in
+> __bfq_bfqq_expire() for details). But, if no process will send
+> requests to the bfq_queue any longer, then there is no point in
+> keeping the bfq_queue scheduled for service.
+> 
+> In addition, keeping the bfq_queue scheduled for service, but with no
+> process reference any longer, may cause the bfq_queue to be freed when
+> descheduled from service. But this is assumed to never happen, and
+> causes a UAF if it happens. This, in turn, caused crashes [1, 2].
+> 
+> This commit fixes this issue by descheduling an empty bfq_queue when
+> it remains with not process reference.
+> 
+> [1] https://bugzilla.redhat.com/show_bug.cgi?id=1767539
+> [2] https://bugzilla.kernel.org/show_bug.cgi?id=205447
+> 
+> Fixes: 3726112ec731 ("block, bfq: re-schedule empty queues if they
+> deserve I/O plugging")
+> Reported-by: Chris Evich <cevich@redhat.com>
+> Reported-by: Patrick Dung <patdung100@gmail.com>
+> Reported-by: Thorsten Schubert <tschubert@bafh.org>
+> Signed-off-by: Paolo Valente <paolo.valente@linaro.org>
+> ---
+>  block/bfq-iosched.c | 31 +++++++++++++++++++++++++------
+>  1 file changed, 25 insertions(+), 6 deletions(-)
+> 
+> diff --git a/block/bfq-iosched.c b/block/bfq-iosched.c
+> index 0319d6339822..ba68627f7740 100644
+> --- a/block/bfq-iosched.c
+> +++ b/block/bfq-iosched.c
+> @@ -2713,6 +2713,27 @@ static void bfq_bfqq_save_state(struct bfq_queue 
+> *bfqq)
+>  	}
+>  }
+> 
+> +
+> +static
+> +void bfq_release_process_ref(struct bfq_data *bfqd, struct bfq_queue 
+> *bfqq)
+> +{
+> +	/*
+> +	 * To prevent bfqq's service guarantees from being violated,
+> +	 * bfqq may be left busy, i.e., queued for service, even if
+> +	 * empty (see comments in __bfq_bfqq_expire() for
+> +	 * details). But, if no process will send requests to bfqq any
+> +	 * longer, then there is no point in keeping bfqq queued for
+> +	 * service. In addition, keeping bfqq queued for service, but
+> +	 * with no process ref any longer, may have caused bfqq to be
+> +	 * freed when dequeued from service. But this is assumed to
+> +	 * never happen.
+> +	 */
+> +	if (bfq_bfqq_busy(bfqq) && RB_EMPTY_ROOT(&bfqq->sort_list))
+> +		bfq_del_bfqq_busy(bfqd, bfqq, false);
+> +
+> +	bfq_put_queue(bfqq);
+> +}
+> +
+>  static void
+>  bfq_merge_bfqqs(struct bfq_data *bfqd, struct bfq_io_cq *bic,
+>  		struct bfq_queue *bfqq, struct bfq_queue *new_bfqq)
+> @@ -2783,8 +2804,7 @@ bfq_merge_bfqqs(struct bfq_data *bfqd, struct
+> bfq_io_cq *bic,
+>  	 */
+>  	new_bfqq->pid = -1;
+>  	bfqq->bic = NULL;
+> -	/* release process reference to bfqq */
+> -	bfq_put_queue(bfqq);
+> +	bfq_release_process_ref(bfqd, bfqq);
+>  }
+> 
+>  static bool bfq_allow_bio_merge(struct request_queue *q, struct 
+> request *rq,
+> @@ -4899,7 +4919,7 @@ static void bfq_exit_bfqq(struct bfq_data *bfqd,
+> struct bfq_queue *bfqq)
+> 
+>  	bfq_put_cooperator(bfqq);
+> 
+> -	bfq_put_queue(bfqq); /* release process reference */
+> +	bfq_release_process_ref(bfqd, bfqq);
+>  }
+> 
+>  static void bfq_exit_icq_bfqq(struct bfq_io_cq *bic, bool is_sync)
+> @@ -5001,8 +5021,7 @@ static void bfq_check_ioprio_change(struct
+> bfq_io_cq *bic, struct bio *bio)
+> 
+>  	bfqq = bic_to_bfqq(bic, false);
+>  	if (bfqq) {
+> -		/* release process reference on this queue */
+> -		bfq_put_queue(bfqq);
+> +		bfq_release_process_ref(bfqd, bfqq);
+>  		bfqq = bfq_get_queue(bfqd, bio, BLK_RW_ASYNC, bic);
+>  		bic_set_bfqq(bic, bfqq, false);
+>  	}
+> @@ -5963,7 +5982,7 @@ bfq_split_bfqq(struct bfq_io_cq *bic, struct
+> bfq_queue *bfqq)
+> 
+>  	bfq_put_cooperator(bfqq);
+> 
+> -	bfq_put_queue(bfqq);
+> +	bfq_release_process_ref(bfqq->bfqd, bfqq);
+>  	return NULL;
+>  }
 
-Jason
+I'm not sure if I see things right, but this commit along with v5.3.11 
+kernel causes almost all boots to hang (for instance, on mounting the 
+FS). Once the scheduler is changed to something else than BFQ (I set the 
+I/O scheduler early via udev rule), multiple reboots go just fine.
+
+Is this commit also applicable to 5.3 kernels? Or I'm testing a dumb 
+thing?
+
+Thanks.
+
+-- 
+   Oleksandr Natalenko (post-factum)
