@@ -7,36 +7,36 @@ X-Spam-Status: No, score=-9.9 required=3.0 tests=DKIMWL_WL_HIGH,DKIM_SIGNED,
 	MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,USER_AGENT_GIT
 	autolearn=unavailable autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 29EDCC1744A
-	for <linux-block@archiver.kernel.org>; Wed, 13 Nov 2019 04:31:27 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id AEE3BC17447
+	for <linux-block@archiver.kernel.org>; Wed, 13 Nov 2019 04:31:28 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.kernel.org (Postfix) with ESMTP id 011AD2245A
-	for <linux-block@archiver.kernel.org>; Wed, 13 Nov 2019 04:31:27 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id 7C4E32245C
+	for <linux-block@archiver.kernel.org>; Wed, 13 Nov 2019 04:31:28 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=pass (2048-bit key) header.d=nvidia.com header.i=@nvidia.com header.b="XdT+9xtN"
+	dkim=pass (2048-bit key) header.d=nvidia.com header.i=@nvidia.com header.b="EogAWVN9"
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1727898AbfKMEbO (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Tue, 12 Nov 2019 23:31:14 -0500
-Received: from hqemgate16.nvidia.com ([216.228.121.65]:3956 "EHLO
-        hqemgate16.nvidia.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1727189AbfKME1Q (ORCPT
+        id S1727295AbfKME1Q (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Tue, 12 Nov 2019 23:27:16 -0500
+Received: from hqemgate15.nvidia.com ([216.228.121.64]:13653 "EHLO
+        hqemgate15.nvidia.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S1727001AbfKME1Q (ORCPT
         <rfc822;linux-block@vger.kernel.org>);
         Tue, 12 Nov 2019 23:27:16 -0500
-Received: from hqpgpgate102.nvidia.com (Not Verified[216.228.121.13]) by hqemgate16.nvidia.com (using TLS: TLSv1.2, DES-CBC3-SHA)
-        id <B5dcb85ea0003>; Tue, 12 Nov 2019 20:26:18 -0800
+Received: from hqpgpgate102.nvidia.com (Not Verified[216.228.121.13]) by hqemgate15.nvidia.com (using TLS: TLSv1.2, DES-CBC3-SHA)
+        id <B5dcb86200002>; Tue, 12 Nov 2019 20:27:12 -0800
 Received: from hqmail.nvidia.com ([172.20.161.6])
   by hqpgpgate102.nvidia.com (PGP Universal service);
-  Tue, 12 Nov 2019 20:27:14 -0800
+  Tue, 12 Nov 2019 20:27:13 -0800
 X-PGP-Universal: processed;
-        by hqpgpgate102.nvidia.com on Tue, 12 Nov 2019 20:27:14 -0800
+        by hqpgpgate102.nvidia.com on Tue, 12 Nov 2019 20:27:13 -0800
 Received: from HQMAIL109.nvidia.com (172.20.187.15) by HQMAIL105.nvidia.com
  (172.20.187.12) with Microsoft SMTP Server (TLS) id 15.0.1473.3; Wed, 13 Nov
- 2019 04:27:13 +0000
+ 2019 04:27:12 +0000
 Received: from hqnvemgw03.nvidia.com (10.124.88.68) by HQMAIL109.nvidia.com
  (172.20.187.15) with Microsoft SMTP Server (TLS) id 15.0.1473.3 via Frontend
- Transport; Wed, 13 Nov 2019 04:27:13 +0000
+ Transport; Wed, 13 Nov 2019 04:27:12 +0000
 Received: from blueforge.nvidia.com (Not Verified[10.110.48.28]) by hqnvemgw03.nvidia.com with Trustwave SEG (v7,5,8,10121)
-        id <B5dcb86210005>; Tue, 12 Nov 2019 20:27:13 -0800
+        id <B5dcb86200004>; Tue, 12 Nov 2019 20:27:12 -0800
 From:   John Hubbard <jhubbard@nvidia.com>
 To:     Andrew Morton <akpm@linux-foundation.org>
 CC:     Al Viro <viro@zeniv.linux.org.uk>,
@@ -68,9 +68,9 @@ CC:     Al Viro <viro@zeniv.linux.org.uk>,
         <linuxppc-dev@lists.ozlabs.org>, <netdev@vger.kernel.org>,
         <linux-mm@kvack.org>, LKML <linux-kernel@vger.kernel.org>,
         John Hubbard <jhubbard@nvidia.com>
-Subject: [PATCH v4 19/23] powerpc: book3s64: convert to pin_longterm_pages() and put_user_page()
-Date:   Tue, 12 Nov 2019 20:27:06 -0800
-Message-ID: <20191113042710.3997854-20-jhubbard@nvidia.com>
+Subject: [PATCH v4 08/23] vfio, mm: fix get_user_pages_remote() and FOLL_LONGTERM
+Date:   Tue, 12 Nov 2019 20:26:55 -0800
+Message-ID: <20191113042710.3997854-9-jhubbard@nvidia.com>
 X-Mailer: git-send-email 2.24.0
 In-Reply-To: <20191113042710.3997854-1-jhubbard@nvidia.com>
 References: <20191113042710.3997854-1-jhubbard@nvidia.com>
@@ -79,90 +79,156 @@ X-NVConfidentiality: public
 Content-Transfer-Encoding: quoted-printable
 Content-Type: text/plain
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=nvidia.com; s=n1;
-        t=1573619178; bh=jP0+G7EUrJzRbss/H6wqbMhvj/DAmG+WrBPGAFIWqJ8=;
+        t=1573619232; bh=0cowaOO6KitGFGMnJNwN3YLhZSQBgszQDobj6JSTgxM=;
         h=X-PGP-Universal:From:To:CC:Subject:Date:Message-ID:X-Mailer:
          In-Reply-To:References:MIME-Version:X-NVConfidentiality:
          Content-Transfer-Encoding:Content-Type;
-        b=XdT+9xtNgQ1XHKD+Ac7dyAYaM8yJJoUfb+7ysHR4ZchEmOg8iGZ3OAYhhHQBi/Kbx
-         UltPHZY9SFVfUJjeMZwf4R1aOCsKKLD1du/k7QznDkCr42xziGVH6hiHpJ7tRz9qzC
-         Yz6AwUWWS3DBM3hsBO5bNhYB1KGOiSZm7sFvl0rLjrb1Av2GbfUxoIFgNnjnBxozni
-         AYAi0jjIgUv8xQkbkzVbW/kpGs42hmNEzXbHglfB8yYeMV2SHe/v3hW3K+sX+DUiqj
-         i6mDziB1Vy5Pr1o65Egq6j/c0CeZMBouTG4wBzUOxwvIkyqPxzpZrrACOnkABDSMNW
-         PG72/FqvOdGmg==
+        b=EogAWVN9paP8N3pkbHvMzZjJ5gehKpeKWuou63lRw8FeGutg9NEVWBv94w4jqNJRm
+         sP7yh5Bwkvnr/0TV5Z3e4j2dVGNmkogCcZln9kBLTSn9K0Oatp17+fcUcgsQGWsoWS
+         IQl4a29AdwCbuc6xwcuhEu0vLJBbAArYTj6Wgw/ctGtRunEkjQ1pp7yxU7RrPP8lAR
+         ABIaJ442Nhe8X7aHS9oHrcdxj6Z+rnSYflHxLJlLvgfFfztOMoj3tAMYX87B6jHFAT
+         enxruNoT6/HUARpGfH/xCQlRketyioirDSfuiT/+GuSVFs4zl6mmoqJ5FcNaEb+aYL
+         nMBW9JOSK/Ebg==
 Sender: linux-block-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-1. Convert from get_user_pages(FOLL_LONGTERM) to pin_longterm_pages().
+As it says in the updated comment in gup.c: current FOLL_LONGTERM
+behavior is incompatible with FAULT_FLAG_ALLOW_RETRY because of the
+FS DAX check requirement on vmas.
 
-2. As required by pin_user_pages(), release these pages via
-put_user_page(). In this case, do so via put_user_pages_dirty_lock().
+However, the corresponding restriction in get_user_pages_remote() was
+slightly stricter than is actually required: it forbade all
+FOLL_LONGTERM callers, but we can actually allow FOLL_LONGTERM callers
+that do not set the "locked" arg.
 
-That has the side effect of calling set_page_dirty_lock(), instead
-of set_page_dirty(). This is probably more accurate.
+Update the code and comments accordingly, and update the VFIO caller
+to take advantage of this, fixing a bug as a result: the VFIO caller
+is logically a FOLL_LONGTERM user.
 
-As Christoph Hellwig put it, "set_page_dirty() is only safe if we are
-dealing with a file backed page where we have reference on the inode it
-hangs off." [1]
+Also, remove an unnessary pair of calls that were releasing and
+reacquiring the mmap_sem. There is no need to avoid holding mmap_sem
+just in order to call page_to_pfn().
 
-3. Release each page in mem->hpages[] (instead of mem->hpas[]), because
-that is the array that pin_longterm_pages() filled in. This is more
-accurate and should be a little safer from a maintenance point of
-view.
+Also, move the DAX check ("if a VMA is DAX, don't allow long term
+pinning") from the VFIO call site, all the way into the internals
+of get_user_pages_remote() and __gup_longterm_locked(). That is:
+get_user_pages_remote() calls __gup_longterm_locked(), which in turn
+calls check_dax_vmas(). It's lightly explained in the comments as well.
 
-[1] https://lore.kernel.org/r/20190723153640.GB720@lst.de
+Thanks to Jason Gunthorpe for pointing out a clean way to fix this,
+and to Dan Williams for helping clarify the DAX refactoring.
 
+Suggested-by: Jason Gunthorpe <jgg@ziepe.ca>
+Cc: Dan Williams <dan.j.williams@intel.com>
+Cc: Jerome Glisse <jglisse@redhat.com>
+Cc: Ira Weiny <ira.weiny@intel.com>
 Signed-off-by: John Hubbard <jhubbard@nvidia.com>
 ---
- arch/powerpc/mm/book3s64/iommu_api.c | 15 ++++++---------
- 1 file changed, 6 insertions(+), 9 deletions(-)
+ drivers/vfio/vfio_iommu_type1.c | 25 ++-----------------------
+ mm/gup.c                        | 27 ++++++++++++++++++++++-----
+ 2 files changed, 24 insertions(+), 28 deletions(-)
 
-diff --git a/arch/powerpc/mm/book3s64/iommu_api.c b/arch/powerpc/mm/book3s6=
-4/iommu_api.c
-index 56cc84520577..69d79cb50d47 100644
---- a/arch/powerpc/mm/book3s64/iommu_api.c
-+++ b/arch/powerpc/mm/book3s64/iommu_api.c
-@@ -103,9 +103,8 @@ static long mm_iommu_do_alloc(struct mm_struct *mm, uns=
-igned long ua,
- 	for (entry =3D 0; entry < entries; entry +=3D chunk) {
- 		unsigned long n =3D min(entries - entry, chunk);
+diff --git a/drivers/vfio/vfio_iommu_type1.c b/drivers/vfio/vfio_iommu_type=
+1.c
+index d864277ea16f..7301b710c9a4 100644
+--- a/drivers/vfio/vfio_iommu_type1.c
++++ b/drivers/vfio/vfio_iommu_type1.c
+@@ -340,7 +340,6 @@ static int vaddr_get_pfn(struct mm_struct *mm, unsigned=
+ long vaddr,
+ {
+ 	struct page *page[1];
+ 	struct vm_area_struct *vma;
+-	struct vm_area_struct *vmas[1];
+ 	unsigned int flags =3D 0;
+ 	int ret;
 =20
--		ret =3D get_user_pages(ua + (entry << PAGE_SHIFT), n,
--				FOLL_WRITE | FOLL_LONGTERM,
--				mem->hpages + entry, NULL);
-+		ret =3D pin_longterm_pages(ua + (entry << PAGE_SHIFT), n,
-+					 FOLL_WRITE, mem->hpages + entry, NULL);
- 		if (ret =3D=3D n) {
- 			pinned +=3D n;
- 			continue;
-@@ -167,9 +166,8 @@ static long mm_iommu_do_alloc(struct mm_struct *mm, uns=
-igned long ua,
- 	return 0;
+@@ -348,33 +347,13 @@ static int vaddr_get_pfn(struct mm_struct *mm, unsign=
+ed long vaddr,
+ 		flags |=3D FOLL_WRITE;
 =20
- free_exit:
--	/* free the reference taken */
--	for (i =3D 0; i < pinned; i++)
--		put_page(mem->hpages[i]);
-+	/* free the references taken */
-+	put_user_pages(mem->hpages, pinned);
-=20
- 	vfree(mem->hpas);
- 	kfree(mem);
-@@ -212,10 +210,9 @@ static void mm_iommu_unpin(struct mm_iommu_table_group=
-_mem_t *mem)
- 		if (!page)
- 			continue;
-=20
--		if (mem->hpas[i] & MM_IOMMU_TABLE_GROUP_PAGE_DIRTY)
--			SetPageDirty(page);
-+		put_user_pages_dirty_lock(&mem->hpages[i], 1,
-+					  MM_IOMMU_TABLE_GROUP_PAGE_DIRTY);
-=20
--		put_page(page);
- 		mem->hpas[i] =3D 0;
+ 	down_read(&mm->mmap_sem);
+-	if (mm =3D=3D current->mm) {
+-		ret =3D get_user_pages(vaddr, 1, flags | FOLL_LONGTERM, page,
+-				     vmas);
+-	} else {
+-		ret =3D get_user_pages_remote(NULL, mm, vaddr, 1, flags, page,
+-					    vmas, NULL);
+-		/*
+-		 * The lifetime of a vaddr_get_pfn() page pin is
+-		 * userspace-controlled. In the fs-dax case this could
+-		 * lead to indefinite stalls in filesystem operations.
+-		 * Disallow attempts to pin fs-dax pages via this
+-		 * interface.
+-		 */
+-		if (ret > 0 && vma_is_fsdax(vmas[0])) {
+-			ret =3D -EOPNOTSUPP;
+-			put_page(page[0]);
+-		}
+-	}
+-	up_read(&mm->mmap_sem);
+-
++	ret =3D get_user_pages_remote(NULL, mm, vaddr, 1, flags | FOLL_LONGTERM,
++				    page, NULL, NULL);
+ 	if (ret =3D=3D 1) {
+ 		*pfn =3D page_to_pfn(page[0]);
+ 		return 0;
  	}
- }
+=20
+-	down_read(&mm->mmap_sem);
+-
+ 	vaddr =3D untagged_addr(vaddr);
+=20
+ 	vma =3D find_vma_intersection(mm, vaddr, vaddr + 1);
+diff --git a/mm/gup.c b/mm/gup.c
+index 933524de6249..83702b2e86c8 100644
+--- a/mm/gup.c
++++ b/mm/gup.c
+@@ -29,6 +29,13 @@ struct follow_page_context {
+ 	unsigned int page_mask;
+ };
+=20
++static __always_inline long __gup_longterm_locked(struct task_struct *tsk,
++						  struct mm_struct *mm,
++						  unsigned long start,
++						  unsigned long nr_pages,
++						  struct page **pages,
++						  struct vm_area_struct **vmas,
++						  unsigned int flags);
+ /*
+  * Return the compound head page with ref appropriately incremented,
+  * or NULL if that failed.
+@@ -1167,13 +1174,23 @@ long get_user_pages_remote(struct task_struct *tsk,=
+ struct mm_struct *mm,
+ 		struct vm_area_struct **vmas, int *locked)
+ {
+ 	/*
+-	 * FIXME: Current FOLL_LONGTERM behavior is incompatible with
++	 * Parts of FOLL_LONGTERM behavior are incompatible with
+ 	 * FAULT_FLAG_ALLOW_RETRY because of the FS DAX check requirement on
+-	 * vmas.  As there are no users of this flag in this call we simply
+-	 * disallow this option for now.
++	 * vmas. However, this only comes up if locked is set, and there are
++	 * callers that do request FOLL_LONGTERM, but do not set locked. So,
++	 * allow what we can.
+ 	 */
+-	if (WARN_ON_ONCE(gup_flags & FOLL_LONGTERM))
+-		return -EINVAL;
++	if (gup_flags & FOLL_LONGTERM) {
++		if (WARN_ON_ONCE(locked))
++			return -EINVAL;
++		/*
++		 * This will check the vmas (even if our vmas arg is NULL)
++		 * and return -ENOTSUPP if DAX isn't allowed in this case:
++		 */
++		return __gup_longterm_locked(tsk, mm, start, nr_pages, pages,
++					     vmas, gup_flags | FOLL_TOUCH |
++					     FOLL_REMOTE);
++	}
+=20
+ 	return __get_user_pages_locked(tsk, mm, start, nr_pages, pages, vmas,
+ 				       locked,
 --=20
 2.24.0
 
