@@ -4,69 +4,81 @@ X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 X-Spam-Level: 
 X-Spam-Status: No, score=-2.2 required=3.0 tests=DKIM_SIGNED,DKIM_VALID,
 	HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,
-	USER_AGENT_SANE_1 autolearn=no autolearn_force=no version=3.4.0
+	URIBL_BLOCKED,USER_AGENT_SANE_1 autolearn=no autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 7D5EDC432C3
-	for <linux-block@archiver.kernel.org>; Wed, 13 Nov 2019 22:43:30 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id E87B2C432C3
+	for <linux-block@archiver.kernel.org>; Wed, 13 Nov 2019 22:46:43 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.kernel.org (Postfix) with ESMTP id 5FAE92063A
-	for <linux-block@archiver.kernel.org>; Wed, 13 Nov 2019 22:43:31 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id CDA642063A
+	for <linux-block@archiver.kernel.org>; Wed, 13 Nov 2019 22:46:44 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel-dk.20150623.gappssmtp.com header.i=@kernel-dk.20150623.gappssmtp.com header.b="G8ncn3oa"
+	dkim=pass (2048-bit key) header.d=kernel-dk.20150623.gappssmtp.com header.i=@kernel-dk.20150623.gappssmtp.com header.b="fd+FP+ka"
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1726251AbfKMWn3 (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Wed, 13 Nov 2019 17:43:29 -0500
-Received: from mail-pg1-f196.google.com ([209.85.215.196]:43403 "EHLO
-        mail-pg1-f196.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1726489AbfKMWn3 (ORCPT
+        id S1726338AbfKMWqn (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Wed, 13 Nov 2019 17:46:43 -0500
+Received: from mail-pf1-f195.google.com ([209.85.210.195]:34762 "EHLO
+        mail-pf1-f195.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S1726251AbfKMWqn (ORCPT
         <rfc822;linux-block@vger.kernel.org>);
-        Wed, 13 Nov 2019 17:43:29 -0500
-Received: by mail-pg1-f196.google.com with SMTP id l24so2279268pgh.10
-        for <linux-block@vger.kernel.org>; Wed, 13 Nov 2019 14:43:28 -0800 (PST)
+        Wed, 13 Nov 2019 17:46:43 -0500
+Received: by mail-pf1-f195.google.com with SMTP id n13so2672600pff.1
+        for <linux-block@vger.kernel.org>; Wed, 13 Nov 2019 14:46:41 -0800 (PST)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=kernel-dk.20150623.gappssmtp.com; s=20150623;
         h=subject:to:cc:references:from:message-id:date:user-agent
          :mime-version:in-reply-to:content-language:content-transfer-encoding;
-        bh=BVWBmGhtDERtyI6f1PiSnPgkQq5kazk5WOyktt38THo=;
-        b=G8ncn3oasagIyak0VBBLkjzbWfFemIt+6VJDeOZ/IQZ6uWDVADWm5+50NWya6OfXbS
-         aMHuqq3bOsBP52kIM/60TzODUQ3UlP+xEEk+WHVLNlT8E4Gd8HaN9PYvdJizaEiOMYYi
-         AheAEbn5av+s9LxQ+zfsb0lPzCoBDB//Q2SGnteTrxwimZ9XmvY6fBHCRktFXCsV+AU3
-         yNq4cFDL7klVOoKYE78i5zC7Q0yxG5Ozg7diTClZsSYHTvOWjNE94EYUzWA4UjD5EhS2
-         O+0QEvRlI+qZpeNYHDQj+Xbm1sPR1gDXfqZpsAWX3NQDes6tebUtvYer6SvdEPwDX/Mg
-         ZqnQ==
+        bh=gbZCSwDYFj658984dBBc49SXiSwvrurgg24kQZJ6lFY=;
+        b=fd+FP+kaxoSwrip2+b5Fxa/rzbSp5GGswoJOIgceEu0KmZo2a+RyMB85R4A8Dvwx35
+         Dx413diQ2oQUo3LaPTFUDalSdf1Fmk0IVUCNkje1AkzpKU26d4ir291SI74KHfOr+yqX
+         viyo73Ib4Hod+og3pqvlwDjfUrWaTFIwnsOzzV4iOydv5Zl9X9gzBj2HzAO8ZlUdNkE6
+         Xs9RAUEcKet9YwBxfPy9OF3AqnNZT5Dc1kERxZGM6Ehcqohbwa6osRWMR08OYs0/1KDc
+         Jp671fnbIZKLocWcJpyIsPIr3cvy4vN2De9HsOrSh9Zq5lh0tiYWAYsewSennd0eVaS1
+         oI1A==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=1e100.net; s=20161025;
         h=x-gm-message-state:subject:to:cc:references:from:message-id:date
          :user-agent:mime-version:in-reply-to:content-language
          :content-transfer-encoding;
-        bh=BVWBmGhtDERtyI6f1PiSnPgkQq5kazk5WOyktt38THo=;
-        b=MHX78vHa+Nnbg+xSSsiqzQycUIRTmogv4kaHYD+4TEWo24i1WW8+Bbn9SzZ3S2rzej
-         Gl8ANG7j+M6g/v36KYW8yAF/xPb1tHgxPV5TyDVoqeZmHIt4Fjhq4RW9Gi1DfegrgZzU
-         uR4W1r5rAZt8SYDgDZtR60CWFGouIC+Fu8P/4NXKE6+rffZAgvPQM7xPYiOEYuVqGOOH
-         vO2e8RdoDGo743IyH+uOV3+69jNvKbpEFRMFpuHVP5uB3RB3cbtsnUoQEft+PCqRmUlK
-         N6dLh+K6XRDDl1WydNGACTwPnU0XXd0U2wmyoBeV85Vamv0g7agI5q3sMPcK2jS62336
-         jn3w==
-X-Gm-Message-State: APjAAAVKtjad8WQcHFecA1HJ2CFI1zQxxNkT55dU7JLok0J+o3/Xrccx
-        0acnFhcPFv8pNeiAgTtE9YWB7Q0vV4E=
-X-Google-Smtp-Source: APXvYqzwhKQF4u390IbtLmhPZ2FdfvZUI459bhfTgyDpl0PehT0Kl4sVaQ8imrq07SOJ9YdasEh6og==
-X-Received: by 2002:a17:90a:6d27:: with SMTP id z36mr8286844pjj.38.1573685007597;
-        Wed, 13 Nov 2019 14:43:27 -0800 (PST)
+        bh=gbZCSwDYFj658984dBBc49SXiSwvrurgg24kQZJ6lFY=;
+        b=dE3ahoIHdEYZSGH99v3Dj3DejZZusi97hLR4PSpePPSRhI5B3vpI7uFDXIQQvndvZF
+         liXXIDgR1p+jr9lUoC5KPzhDLEy/460fsZRRTfOU/qtQDKQFMogyaxdw6XA6yR5ZQG6r
+         ukqSZDgdtfnC0xZKaR+SL9VksCAn/PH/5NFRJBbOe5z+e6YXTxRVbNEFp13DDnlODzta
+         mKf6GAyyo59vouuWVDoDLjgqY88AI0tKV49yN9M29fX1diidAn9o64Xns0/xZyVMiZCO
+         6g2rO3t4R1Z4H4VH+Y6lG7fAJNAUuRykeRMkZYOpqaPLNYWCcaRAaKxN55MvCB96aqh3
+         ZzHg==
+X-Gm-Message-State: APjAAAX50mLeqU47au6MjaSJq7HQ1sSDOF1wlgNuifoFV7lzmLEx0VWG
+        S9g/sTNnKzoaoZP/IonJnBAn2w==
+X-Google-Smtp-Source: APXvYqxZ+RguZpVb/kuBox86s39GRqt54LRO8R8B8gFUzQ7R9ksUKg7BQlYiSEYEST795AfMqH1KNA==
+X-Received: by 2002:a17:90a:fc85:: with SMTP id ci5mr8428092pjb.17.1573685200779;
+        Wed, 13 Nov 2019 14:46:40 -0800 (PST)
 Received: from [192.168.1.182] ([66.219.217.79])
-        by smtp.gmail.com with ESMTPSA id v16sm6352542pje.1.2019.11.13.14.43.25
+        by smtp.gmail.com with ESMTPSA id v10sm3465583pgr.37.2019.11.13.14.46.38
         (version=TLS1_2 cipher=ECDHE-RSA-AES128-GCM-SHA256 bits=128/128);
-        Wed, 13 Nov 2019 14:43:26 -0800 (PST)
-Subject: Re: [PATCH v2 00/12] bcache patches for Linux v5.5
-To:     Coly Li <colyli@suse.de>
-Cc:     linux-bcache@vger.kernel.org, linux-block@vger.kernel.org
-References: <20191113080326.69989-1-colyli@suse.de>
+        Wed, 13 Nov 2019 14:46:39 -0800 (PST)
+Subject: Re: [PATCH BUGFIX] block, bfq: deschedule empty bfq_queues not
+ referred by any process
+To:     Paolo Valente <paolo.valente@linaro.org>,
+        Oleksandr Natalenko <oleksandr@natalenko.name>
+Cc:     linux-block <linux-block@vger.kernel.org>,
+        linux-kernel <linux-kernel@vger.kernel.org>,
+        Ulf Hansson <ulf.hansson@linaro.org>, linus.walleij@linaro.org,
+        bfq-iosched@googlegroups.com, Chris Evich <cevich@redhat.com>,
+        Patrick Dung <patdung100@gmail.com>,
+        Thorsten Schubert <tschubert@bafh.org>
+References: <20191112074856.40433-1-paolo.valente@linaro.org>
+ <bb393dcaa426786e0963cf0e70f0b062@natalenko.name>
+ <2FB3736A-693E-44B9-9D1F-39AE0D016644@linaro.org>
+ <65fc0bffbcb2296d121b3d5a79108e76@natalenko.name>
+ <5773ff54421ccf179ef57d96e19ef042@natalenko.name>
+ <69B451DE-B04B-4E0E-9464-826C4A7619AD@linaro.org>
 From:   Jens Axboe <axboe@kernel.dk>
-Message-ID: <201ace1c-78ba-89d6-74a0-55a254802e27@kernel.dk>
-Date:   Wed, 13 Nov 2019 15:43:24 -0700
+Message-ID: <8f77fb4e-a49b-4ddc-8756-e08b030dd7e4@kernel.dk>
+Date:   Wed, 13 Nov 2019 15:46:37 -0700
 User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:60.0) Gecko/20100101
  Thunderbird/60.9.0
 MIME-Version: 1.0
-In-Reply-To: <20191113080326.69989-1-colyli@suse.de>
-Content-Type: text/plain; charset=utf-8
+In-Reply-To: <69B451DE-B04B-4E0E-9464-826C4A7619AD@linaro.org>
+Content-Type: text/plain; charset=windows-1252
 Content-Language: en-US
 Content-Transfer-Encoding: 7bit
 Sender: linux-block-owner@vger.kernel.org
@@ -74,20 +86,26 @@ Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-On 11/13/19 1:03 AM, Coly Li wrote:
-> Hi Jens,
+On 11/13/19 10:42 AM, Paolo Valente wrote:
 > 
-> The second submit adds two missed patches from Christoph Hellwig.
 > 
-> This is the patches for Linux v5.5. The patches have been testing for
-> a while during my current development, they are ready to be merged.
+>> Il giorno 13 nov 2019, alle ore 16:01, Oleksandr Natalenko <oleksandr@natalenko.name> ha scritto:
+>>
+>> On 13.11.2019 15:25, Oleksandr Natalenko wrote:
+>>> I didn't try to switch schedulers, but what I see now is once the
+>>> system is able to boot with BFQ, the I/O can still hang on I/O burst
+>>> (which for me happens to happen during VM reboot).
+>>> This may also not hang forever, but just slow down considerably. I've
+>>> noticed this inside a KVM VM, not on a real HW.
+>>
+>> Possible call traces:
 > 
-> There are still other patches under testing, I will submit to you in
-> later runs if I feel they are solid enough in my testing.
+> Ok, you may have given me enough information, thank you very much.
 > 
-> Thanks for taking care of this.
+> Could you please apply the attached (compressed) patch on top of my
+> offending patch?  For review purposes, here is the simple change:
 
-Applied, thanks.
+FWIW, I dropped the previous patch.
 
 -- 
 Jens Axboe
