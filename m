@@ -7,47 +7,47 @@ X-Spam-Status: No, score=-10.1 required=3.0 tests=DKIMWL_WL_HIGH,DKIM_SIGNED,
 	SPF_HELO_NONE,SPF_PASS,USER_AGENT_GIT autolearn=unavailable
 	autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id D5A79C43331
-	for <linux-block@archiver.kernel.org>; Wed, 13 Nov 2019 02:19:17 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 1A41CC17448
+	for <linux-block@archiver.kernel.org>; Wed, 13 Nov 2019 02:19:19 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.kernel.org (Postfix) with ESMTP id A420C222C1
-	for <linux-block@archiver.kernel.org>; Wed, 13 Nov 2019 02:19:17 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id E469D222CA
+	for <linux-block@archiver.kernel.org>; Wed, 13 Nov 2019 02:19:18 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=default; t=1573611557;
-	bh=84uaRIPv5X8QlnjzO78ZiN4sPge0T8QMfyyMtrZ2xiM=;
+	s=default; t=1573611559;
+	bh=m5hJaHVZrLSf1mJK7b9kB9bQlJxzbNzPsHf/khSsGYc=;
 	h=From:To:Cc:Subject:Date:In-Reply-To:References:List-ID:From;
-	b=oMnJQhV6Kx+jfsUIkBdIR627LhSA5EDuvE7gXfCV7R/ziQSy9b64yLNGh3UwwOjLY
-	 0Iiu16Q7f9EuILYilen2xdQZ88drG5k+qTVCGkGfwvY1KVVVCS7FxPamG4NYdN5vkH
-	 KtYqmd2uOQbbiEmgHi2YCmvFwSFnwlTA+ehhKgeU=
+	b=lMWYASxbQWBswUGFj9byrNdaGdqOWDy8Om4jbUct3KSEBBL79OenoAiBFG+9aSKxu
+	 bEQPz336e1qaog7/+Z08ohEDoPbaJ3rDsKIEuFJOZIG6gb1Z61GKqZC9FyeCkNhZB1
+	 39GA+mw8Jz92jfZwX12Q85Ym4ZFjleY9H7D6O7Wg=
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1729076AbfKMBzV (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        id S1729072AbfKMBzV (ORCPT <rfc822;linux-block@archiver.kernel.org>);
         Tue, 12 Nov 2019 20:55:21 -0500
-Received: from mail.kernel.org ([198.145.29.99]:46902 "EHLO mail.kernel.org"
+Received: from mail.kernel.org ([198.145.29.99]:46868 "EHLO mail.kernel.org"
         rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-        id S1728176AbfKMBzV (ORCPT <rfc822;linux-block@vger.kernel.org>);
-        Tue, 12 Nov 2019 20:55:21 -0500
+        id S1728192AbfKMBzU (ORCPT <rfc822;linux-block@vger.kernel.org>);
+        Tue, 12 Nov 2019 20:55:20 -0500
 Received: from sasha-vm.mshome.net (c-73-47-72-35.hsd1.nh.comcast.net [73.47.72.35])
         (using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
         (No client certificate requested)
-        by mail.kernel.org (Postfix) with ESMTPSA id E7C21222D3;
-        Wed, 13 Nov 2019 01:55:19 +0000 (UTC)
+        by mail.kernel.org (Postfix) with ESMTPSA id AF7C522459;
+        Wed, 13 Nov 2019 01:55:18 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-        s=default; t=1573610120;
-        bh=84uaRIPv5X8QlnjzO78ZiN4sPge0T8QMfyyMtrZ2xiM=;
+        s=default; t=1573610119;
+        bh=m5hJaHVZrLSf1mJK7b9kB9bQlJxzbNzPsHf/khSsGYc=;
         h=From:To:Cc:Subject:Date:In-Reply-To:References:From;
-        b=Q5wJmubxEpB+tNULJnuEZ4FCvsQOZJKKzxGsYvN2IMHiWokj7CY1NXKaqRMNn3q7V
-         0KpDTyYOVJfugSw35bN4oswOJUzQhc3ecW6DIn5wDp8Xtoi9SnDyClGexIpXnUXv3D
-         N8x0H+WvfcETweo6iYlhyHl2BcUzhmSZjErgBUcI=
+        b=tknK1Y175UjN4Bp6DkunMod6WVv5KmGe/ZCsxGjoSr5HlXjvZWupQtAntXc0VM3/w
+         PynHgwI5KApOh8nZaoVsIqXyQEtJXNmSFlsoVQzEK1cAPF5NBcF/1vC5bXic1gcTsB
+         CFf3DOFKca/aS0dTDu4kn4NLlpf1hWYWO4Q+PrHM=
 From:   Sasha Levin <sashal@kernel.org>
 To:     linux-kernel@vger.kernel.org, stable@vger.kernel.org
-Cc:     Zhoujie Wu <zjwu@marvell.com>,
-        =?UTF-8?q?Javier=20Gonz=C3=A1lez?= <javier@cnexlabs.com>,
+Cc:     Wei Yongjun <weiyongjun1@huawei.com>,
+        Hans Holmberg <hans.holmberg@cnexlabs.com>,
         =?UTF-8?q?Matias=20Bj=C3=B8rling?= <mb@lightnvm.io>,
         Jens Axboe <axboe@kernel.dk>, Sasha Levin <sashal@kernel.org>,
         linux-block@vger.kernel.org
-Subject: [PATCH AUTOSEL 4.19 175/209] lightnvm: pblk: consider max hw sectors supported for max_write_pgs
-Date:   Tue, 12 Nov 2019 20:49:51 -0500
-Message-Id: <20191113015025.9685-175-sashal@kernel.org>
+Subject: [PATCH AUTOSEL 4.19 174/209] lightnvm: pblk: fix error handling of pblk_lines_init()
+Date:   Tue, 12 Nov 2019 20:49:50 -0500
+Message-Id: <20191113015025.9685-174-sashal@kernel.org>
 X-Mailer: git-send-email 2.20.1
 In-Reply-To: <20191113015025.9685-1-sashal@kernel.org>
 References: <20191113015025.9685-1-sashal@kernel.org>
@@ -61,43 +61,37 @@ Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-From: Zhoujie Wu <zjwu@marvell.com>
+From: Wei Yongjun <weiyongjun1@huawei.com>
 
-[ Upstream commit 8a57fc3823d08edb1661a06d9e0a8c2365ac561e ]
+[ Upstream commit a70985f83c625a5eaf618be81621e5e4521a66c6 ]
 
-When do GC, the number of read/write sectors are determined
-by max_write_pgs(see gc_rq preparation in pblk_gc_line_prepare_ws).
+In the too many bad blocks error handling case, we should release all
+the allocated resources, otherwise it will cause memory leak.
 
-Due to max_write_pgs doesn't consider max hw sectors
-supported by nvme controller(128K), which leads to GC
-tries to read 64 * 4K in one command, and see below error
-caused by pblk_bio_map_addr in function pblk_submit_read_gc.
-
-[ 2923.005376] pblk: could not add page to bio
-[ 2923.005377] pblk: could not allocate GC bio (18446744073709551604)
-
-Signed-off-by: Zhoujie Wu <zjwu@marvell.com>
-Reviewed-by: Javier González <javier@cnexlabs.com>
+Fixes: 2deeefc02dff ("lightnvm: pblk: fail gracefully on line alloc. failure")
+Signed-off-by: Wei Yongjun <weiyongjun1@huawei.com>
+Reviewed-by: Hans Holmberg <hans.holmberg@cnexlabs.com>
 Signed-off-by: Matias Bjørling <mb@lightnvm.io>
 Signed-off-by: Jens Axboe <axboe@kernel.dk>
 Signed-off-by: Sasha Levin <sashal@kernel.org>
 ---
- drivers/lightnvm/pblk-init.c | 2 ++
- 1 file changed, 2 insertions(+)
+ drivers/lightnvm/pblk-init.c | 3 ++-
+ 1 file changed, 2 insertions(+), 1 deletion(-)
 
 diff --git a/drivers/lightnvm/pblk-init.c b/drivers/lightnvm/pblk-init.c
-index 91fd2b291db91..88b632787abd6 100644
+index dc32274881b2f..91fd2b291db91 100644
 --- a/drivers/lightnvm/pblk-init.c
 +++ b/drivers/lightnvm/pblk-init.c
-@@ -375,6 +375,8 @@ static int pblk_core_init(struct pblk *pblk)
- 	pblk->min_write_pgs = geo->ws_opt;
- 	max_write_ppas = pblk->min_write_pgs * geo->all_luns;
- 	pblk->max_write_pgs = min_t(int, max_write_ppas, NVM_MAX_VLBA);
-+	pblk->max_write_pgs = min_t(int, pblk->max_write_pgs,
-+		queue_max_hw_sectors(dev->q) / (geo->csecs >> SECTOR_SHIFT));
- 	pblk_set_sec_per_write(pblk, pblk->min_write_pgs);
+@@ -1084,7 +1084,8 @@ static int pblk_lines_init(struct pblk *pblk)
  
- 	if (pblk->max_write_pgs > PBLK_MAX_REQ_ADDRS) {
+ 	if (!nr_free_chks) {
+ 		pblk_err(pblk, "too many bad blocks prevent for sane instance\n");
+-		return -EINTR;
++		ret = -EINTR;
++		goto fail_free_lines;
+ 	}
+ 
+ 	pblk_set_provision(pblk, nr_free_chks);
 -- 
 2.20.1
 
