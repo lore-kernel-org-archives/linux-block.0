@@ -7,36 +7,36 @@ X-Spam-Status: No, score=-9.9 required=3.0 tests=DKIMWL_WL_HIGH,DKIM_SIGNED,
 	MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,USER_AGENT_GIT
 	autolearn=unavailable autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 7E812C1744E
+	by smtp.lore.kernel.org (Postfix) with ESMTP id F036FC17459
 	for <linux-block@archiver.kernel.org>; Wed, 13 Nov 2019 04:28:49 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.kernel.org (Postfix) with ESMTP id 56C4D2245B
+	by mail.kernel.org (Postfix) with ESMTP id C15CA2245A
 	for <linux-block@archiver.kernel.org>; Wed, 13 Nov 2019 04:28:49 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=pass (2048-bit key) header.d=nvidia.com header.i=@nvidia.com header.b="GHa9fsK9"
+	dkim=pass (2048-bit key) header.d=nvidia.com header.i=@nvidia.com header.b="Oefu4Qxr"
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1727773AbfKME2k (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Tue, 12 Nov 2019 23:28:40 -0500
-Received: from hqemgate14.nvidia.com ([216.228.121.143]:18636 "EHLO
-        hqemgate14.nvidia.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1727774AbfKME1Y (ORCPT
+        id S1727791AbfKME1Y (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Tue, 12 Nov 2019 23:27:24 -0500
+Received: from hqemgate15.nvidia.com ([216.228.121.64]:13790 "EHLO
+        hqemgate15.nvidia.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S1727755AbfKME1Y (ORCPT
         <rfc822;linux-block@vger.kernel.org>);
         Tue, 12 Nov 2019 23:27:24 -0500
-Received: from hqpgpgate101.nvidia.com (Not Verified[216.228.121.13]) by hqemgate14.nvidia.com (using TLS: TLSv1.2, DES-CBC3-SHA)
-        id <B5dcb86240004>; Tue, 12 Nov 2019 20:27:16 -0800
+Received: from hqpgpgate101.nvidia.com (Not Verified[216.228.121.13]) by hqemgate15.nvidia.com (using TLS: TLSv1.2, DES-CBC3-SHA)
+        id <B5dcb86240000>; Tue, 12 Nov 2019 20:27:16 -0800
 Received: from hqmail.nvidia.com ([172.20.161.6])
   by hqpgpgate101.nvidia.com (PGP Universal service);
-  Tue, 12 Nov 2019 20:27:13 -0800
+  Tue, 12 Nov 2019 20:27:16 -0800
 X-PGP-Universal: processed;
-        by hqpgpgate101.nvidia.com on Tue, 12 Nov 2019 20:27:13 -0800
-Received: from HQMAIL109.nvidia.com (172.20.187.15) by HQMAIL111.nvidia.com
- (172.20.187.18) with Microsoft SMTP Server (TLS) id 15.0.1473.3; Wed, 13 Nov
- 2019 04:27:13 +0000
+        by hqpgpgate101.nvidia.com on Tue, 12 Nov 2019 20:27:16 -0800
+Received: from HQMAIL109.nvidia.com (172.20.187.15) by HQMAIL101.nvidia.com
+ (172.20.187.10) with Microsoft SMTP Server (TLS) id 15.0.1473.3; Wed, 13 Nov
+ 2019 04:27:12 +0000
 Received: from hqnvemgw03.nvidia.com (10.124.88.68) by HQMAIL109.nvidia.com
  (172.20.187.15) with Microsoft SMTP Server (TLS) id 15.0.1473.3 via Frontend
- Transport; Wed, 13 Nov 2019 04:27:13 +0000
+ Transport; Wed, 13 Nov 2019 04:27:12 +0000
 Received: from blueforge.nvidia.com (Not Verified[10.110.48.28]) by hqnvemgw03.nvidia.com with Trustwave SEG (v7,5,8,10121)
-        id <B5dcb86210000>; Tue, 12 Nov 2019 20:27:13 -0800
+        id <B5dcb86200002>; Tue, 12 Nov 2019 20:27:12 -0800
 From:   John Hubbard <jhubbard@nvidia.com>
 To:     Andrew Morton <akpm@linux-foundation.org>
 CC:     Al Viro <viro@zeniv.linux.org.uk>,
@@ -54,12 +54,11 @@ CC:     Al Viro <viro@zeniv.linux.org.uk>,
         Jonathan Corbet <corbet@lwn.net>,
         =?UTF-8?q?J=C3=A9r=C3=B4me=20Glisse?= <jglisse@redhat.com>,
         Magnus Karlsson <magnus.karlsson@intel.com>,
-        Mauro Carvalho Chehab <mchehab@kernel.org>,
+        "Mauro Carvalho Chehab" <mchehab@kernel.org>,
         Michael Ellerman <mpe@ellerman.id.au>,
         Michal Hocko <mhocko@suse.com>,
         Mike Kravetz <mike.kravetz@oracle.com>,
-        Paul Mackerras <paulus@samba.org>,
-        Shuah Khan <shuah@kernel.org>,
+        "Paul Mackerras" <paulus@samba.org>, Shuah Khan <shuah@kernel.org>,
         Vlastimil Babka <vbabka@suse.cz>, <bpf@vger.kernel.org>,
         <dri-devel@lists.freedesktop.org>, <kvm@vger.kernel.org>,
         <linux-block@vger.kernel.org>, <linux-doc@vger.kernel.org>,
@@ -67,10 +66,11 @@ CC:     Al Viro <viro@zeniv.linux.org.uk>,
         <linux-media@vger.kernel.org>, <linux-rdma@vger.kernel.org>,
         <linuxppc-dev@lists.ozlabs.org>, <netdev@vger.kernel.org>,
         <linux-mm@kvack.org>, LKML <linux-kernel@vger.kernel.org>,
-        John Hubbard <jhubbard@nvidia.com>
-Subject: [PATCH v4 14/23] fs/io_uring: set FOLL_PIN via pin_user_pages()
-Date:   Tue, 12 Nov 2019 20:27:01 -0800
-Message-ID: <20191113042710.3997854-15-jhubbard@nvidia.com>
+        John Hubbard <jhubbard@nvidia.com>,
+        "Jason Gunthorpe" <jgg@mellanox.com>
+Subject: [PATCH v4 06/23] IB/umem: use get_user_pages_fast() to pin DMA pages
+Date:   Tue, 12 Nov 2019 20:26:53 -0800
+Message-ID: <20191113042710.3997854-7-jhubbard@nvidia.com>
 X-Mailer: git-send-email 2.24.0
 In-Reply-To: <20191113042710.3997854-1-jhubbard@nvidia.com>
 References: <20191113042710.3997854-1-jhubbard@nvidia.com>
@@ -79,56 +79,71 @@ X-NVConfidentiality: public
 Content-Transfer-Encoding: quoted-printable
 Content-Type: text/plain
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=nvidia.com; s=n1;
-        t=1573619236; bh=JGzVxjkq7RUQ8oMNLIEnYl2kvvauj6PckGww94CdhYA=;
+        t=1573619236; bh=yfY59FEzCJLU6Ev5Ha1oxCyEt547L9Ku0BnikujLehw=;
         h=X-PGP-Universal:From:To:CC:Subject:Date:Message-ID:X-Mailer:
          In-Reply-To:References:MIME-Version:X-NVConfidentiality:
          Content-Transfer-Encoding:Content-Type;
-        b=GHa9fsK9TSDIAyfVOzhJeoufp0+d9CX7Yv/yB1J0pjTgLxgWkdnhMAQAWtMQ0/9wK
-         sfWSLL9T2KKjuyYDZb/8vT33ffruQONOcERMBbKRxlMlfaXBTDhg4+1eLSqX0YkX+v
-         POStYqa9ZNqiJX2X0iUkmLAjlDFBQkMto0r3+R45waV8CXY3MGFV8OM2tn9OOazjDV
-         NxtAXcXR9IiQSLNY5URAmmERg3vcCDZsfSqr5LUonEqmYCgM2iVfSor+4PSgRgDMiN
-         HtyeCkkHD82mwX8mpbs0OtBse40b8K4t2i9/j9B9TiUluVon2UUl2Iez6b0D3sBRXF
-         C9oXYqhl2Cr6w==
+        b=Oefu4QxrHoO0kNGZ6RM3kN6GOCF1uvImt6G47o7WM+tEZrfvAfzPFgyO+JXvSYG7c
+         O47Pgoj7ZZPSNuerwOkv4CSkMfEhOtm6vb1dfWG6cL9iOCqc9k0rGFvgous55Is9xG
+         lHyGxVr1SvtGNL7JYR1zBSibc6MgGJQ0yi84ExpbYH8R9qzAS/byqeaX3mhCZWGKMR
+         ADv+j3xeoivErWC4LSEdu1YMMrstWOTL3HynPZJiU2LUHKLXQHZGg00Btsvg+2Dtp5
+         rF5Nv1q7x4Mcbk/O3Rz5zJrzLF+apqHFbVvc4bBiG9D+UZaLl37QBE5OAzDWh5XcFQ
+         bYZ5ljEbuLDyw==
 Sender: linux-block-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-Convert fs/io_uring to use the new pin_user_pages() call, which sets
-FOLL_PIN. Setting FOLL_PIN is now required for code that requires
-tracking of pinned pages, and therefore for any code that calls
-put_user_page().
+And get rid of the mmap_sem calls, as part of that. Note
+that get_user_pages_fast() will, if necessary, fall back to
+__gup_longterm_unlocked(), which takes the mmap_sem as needed.
 
-In partial anticipation of this work, the io_uring code was already
-calling put_user_page() instead of put_page(). Therefore, in order to
-convert from the get_user_pages()/put_page() model, to the
-pin_user_pages()/put_user_page() model, the only change required
-here is to change get_user_pages() to pin_longterm_pages().
-
+Reviewed-by: Jason Gunthorpe <jgg@mellanox.com>
 Reviewed-by: Ira Weiny <ira.weiny@intel.com>
-Reviewed-by: Jens Axboe <axboe@kernel.dk>
 Signed-off-by: John Hubbard <jhubbard@nvidia.com>
 ---
- fs/io_uring.c | 5 ++---
- 1 file changed, 2 insertions(+), 3 deletions(-)
+ drivers/infiniband/core/umem.c | 17 ++++++-----------
+ 1 file changed, 6 insertions(+), 11 deletions(-)
 
-diff --git a/fs/io_uring.c b/fs/io_uring.c
-index f9a38998f2fc..0f307f2c7cac 100644
---- a/fs/io_uring.c
-+++ b/fs/io_uring.c
-@@ -3433,9 +3433,8 @@ static int io_sqe_buffer_register(struct io_ring_ctx =
-*ctx, void __user *arg,
+diff --git a/drivers/infiniband/core/umem.c b/drivers/infiniband/core/umem.=
+c
+index 24244a2f68cc..3d664a2539eb 100644
+--- a/drivers/infiniband/core/umem.c
++++ b/drivers/infiniband/core/umem.c
+@@ -271,16 +271,13 @@ struct ib_umem *ib_umem_get(struct ib_udata *udata, u=
+nsigned long addr,
+ 	sg =3D umem->sg_head.sgl;
 =20
- 		ret =3D 0;
- 		down_read(&current->mm->mmap_sem);
--		pret =3D get_user_pages(ubuf, nr_pages,
--				      FOLL_WRITE | FOLL_LONGTERM,
--				      pages, vmas);
-+		pret =3D pin_longterm_pages(ubuf, nr_pages, FOLL_WRITE, pages,
-+					  vmas);
- 		if (pret =3D=3D nr_pages) {
- 			/* don't support file backed memory */
- 			for (j =3D 0; j < nr_pages; j++) {
+ 	while (npages) {
+-		down_read(&mm->mmap_sem);
+-		ret =3D get_user_pages(cur_base,
+-				     min_t(unsigned long, npages,
+-					   PAGE_SIZE / sizeof (struct page *)),
+-				     gup_flags | FOLL_LONGTERM,
+-				     page_list, NULL);
+-		if (ret < 0) {
+-			up_read(&mm->mmap_sem);
++		ret =3D get_user_pages_fast(cur_base,
++					  min_t(unsigned long, npages,
++						PAGE_SIZE /
++						sizeof(struct page *)),
++					  gup_flags | FOLL_LONGTERM, page_list);
++		if (ret < 0)
+ 			goto umem_release;
+-		}
+=20
+ 		cur_base +=3D ret * PAGE_SIZE;
+ 		npages   -=3D ret;
+@@ -288,8 +285,6 @@ struct ib_umem *ib_umem_get(struct ib_udata *udata, uns=
+igned long addr,
+ 		sg =3D ib_umem_add_sg_table(sg, page_list, ret,
+ 			dma_get_max_seg_size(context->device->dma_device),
+ 			&umem->sg_nents);
+-
+-		up_read(&mm->mmap_sem);
+ 	}
+=20
+ 	sg_mark_end(sg);
 --=20
 2.24.0
 
