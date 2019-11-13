@@ -2,95 +2,129 @@ Return-Path: <SRS0=BCjA=ZF=vger.kernel.org=linux-block-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-5.6 required=3.0 tests=DKIMWL_WL_HIGH,DKIM_SIGNED,
-	DKIM_VALID,DKIM_VALID_AU,MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,
-	SPF_PASS,USER_AGENT_SANE_1 autolearn=ham autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-2.2 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
+	MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,USER_AGENT_SANE_1 autolearn=no
+	autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 687DAC432C3
-	for <linux-block@archiver.kernel.org>; Wed, 13 Nov 2019 16:20:50 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 8B708C432C3
+	for <linux-block@archiver.kernel.org>; Wed, 13 Nov 2019 16:21:24 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.kernel.org (Postfix) with ESMTP id 32ADD2084F
-	for <linux-block@archiver.kernel.org>; Wed, 13 Nov 2019 16:20:50 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=default; t=1573662050;
-	bh=3ptigakXu87dguPwJfwVTlJiYjq/e9zI1NG6M1FBq+U=;
-	h=Date:From:To:Cc:Subject:References:In-Reply-To:List-ID:From;
-	b=UAlQLMOcgWOFtY33UW88RwTKjAEvx9OvhyQU8qp1M/VXVFlHnBDkVCVLu64og+qco
-	 YgOBVP5ytQITG2fUScc4804eQ3jBPMPk2/SsE1yNCocCEMq/kbiXAqHreqodgazHeK
-	 3iF6GZGlSmvn5bmnccujUyI0iJKMC0giGQZvKK2s=
+	by mail.kernel.org (Postfix) with ESMTP id 6A131222C6
+	for <linux-block@archiver.kernel.org>; Wed, 13 Nov 2019 16:21:24 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1728240AbfKMQUt (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Wed, 13 Nov 2019 11:20:49 -0500
-Received: from mail-qk1-f194.google.com ([209.85.222.194]:33874 "EHLO
-        mail-qk1-f194.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1726363AbfKMQUt (ORCPT
-        <rfc822;linux-block@vger.kernel.org>);
-        Wed, 13 Nov 2019 11:20:49 -0500
-Received: by mail-qk1-f194.google.com with SMTP id 205so2258774qkk.1;
-        Wed, 13 Nov 2019 08:20:48 -0800 (PST)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20161025;
-        h=sender:date:from:to:cc:subject:message-id:references:mime-version
-         :content-disposition:in-reply-to:user-agent;
-        bh=BgjpAWhUsNd321xRdgYc+Qsl4mTKgPBuEJhT5kvzP4c=;
-        b=PPgZ/DfOQB2NdizWDHzrIuVUEf8lBy5hSeDWmvmPCeyUkUklrL10lTD5KA6FChpjJk
-         kPksEM7ZmApk1toieecuIDOk7KFS1fhjpApBmNvVSZzFjkvJVAQ31AuFO8iULfoM4UtH
-         gYn9GmcrpKv0N74kANWg4byXvPDpLaWpHNPXCHxXNXCPiSnuJPONT3M9dRh7npXlX/S2
-         l5VMxmzbf0PGS35IDtk8OvtUdhVOl7cQ0NHtyRBXPI9nkdcSN6ePYPphtWkLcAuWQs7I
-         iHZ8e5FmgdP8ExQg/4+tAZfBJIZSf/ki5R8vx4YdqR0CkEwBw86wNSYUmtD4Tj23jFKt
-         RjKQ==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20161025;
-        h=x-gm-message-state:sender:date:from:to:cc:subject:message-id
-         :references:mime-version:content-disposition:in-reply-to:user-agent;
-        bh=BgjpAWhUsNd321xRdgYc+Qsl4mTKgPBuEJhT5kvzP4c=;
-        b=rOFXIrwE+G/cKR9p6UKkZeADwp50qA6JBfPx4J8w/+yStztRK3bYKPJm6rHAUVm62p
-         JPxq0F0JWuWFnRgmhpkzNV3O8wdQYRRPqKdu+DTlyuIccORrhvmJoM3AolxtcZrBMkAT
-         nRDmTh89i2AodRQ2olkSoFKccemWgz4zqOZGyxqAGl07KPEVkY2nKQC94nJxzhDtpwR5
-         iVAF4cfuDX3bnm1/ELfG9QstO97S/p3u9VyyaJDbMw6ZO0oYWcf7dh1ZjSmTALpYGI1v
-         PGryjdRAVqQ8R1StT6l4dBsmVNdzuf1pe/TAsKwTZGKe6JH4HP1zBGMGjRlCDfe+3O2l
-         CgMA==
-X-Gm-Message-State: APjAAAUAqSedTDgPLGFlKta4Az8rLlhuurHyGbdeXCOjRd6AYk3oSoRk
-        Bt7pIyxROTM2q6/ggWKLq7s=
-X-Google-Smtp-Source: APXvYqwAYh9N8uNHYxxAjGuaXY45395Am/9P7k3KMvmn4xfHfq+KlMAQkHWozUCPX54oGMDPFlzMiA==
-X-Received: by 2002:a37:a7c6:: with SMTP id q189mr3022192qke.469.1573662048230;
-        Wed, 13 Nov 2019 08:20:48 -0800 (PST)
-Received: from localhost ([2620:10d:c091:500::2:69f2])
-        by smtp.gmail.com with ESMTPSA id k3sm1112686qkj.119.2019.11.13.08.20.47
-        (version=TLS1_2 cipher=ECDHE-RSA-AES128-GCM-SHA256 bits=128/128);
-        Wed, 13 Nov 2019 08:20:47 -0800 (PST)
-Date:   Wed, 13 Nov 2019 08:20:45 -0800
-From:   Tejun Heo <tj@kernel.org>
-To:     Jiufei Xue <jiufei.xue@linux.alibaba.com>
-Cc:     axboe@kernel.dk, cgroups@vger.kernel.org,
-        linux-block@vger.kernel.org, joseph.qi@linux.alibaba.com
-Subject: Re: [PATCH] iocost: check active_list of all the ancestors in
- iocg_activate()
-Message-ID: <20191113162045.GH4163745@devbig004.ftw2.facebook.com>
-References: <1573629691-6619-1-git-send-email-jiufei.xue@linux.alibaba.com>
+        id S1726363AbfKMQVY (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Wed, 13 Nov 2019 11:21:24 -0500
+Received: from lhrrgout.huawei.com ([185.176.76.210]:2095 "EHLO huawei.com"
+        rhost-flags-OK-OK-OK-FAIL) by vger.kernel.org with ESMTP
+        id S1726098AbfKMQVX (ORCPT <rfc822;linux-block@vger.kernel.org>);
+        Wed, 13 Nov 2019 11:21:23 -0500
+Received: from LHREML711-CAH.china.huawei.com (unknown [172.18.7.107])
+        by Forcepoint Email with ESMTP id 3C5CE5A3F24822F087FD;
+        Wed, 13 Nov 2019 16:21:22 +0000 (GMT)
+Received: from lhreml724-chm.china.huawei.com (10.201.108.75) by
+ LHREML711-CAH.china.huawei.com (10.201.108.34) with Microsoft SMTP Server
+ (TLS) id 14.3.408.0; Wed, 13 Nov 2019 16:21:21 +0000
+Received: from [127.0.0.1] (10.202.226.46) by lhreml724-chm.china.huawei.com
+ (10.201.108.75) with Microsoft SMTP Server (version=TLS1_2,
+ cipher=TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256) id 15.1.1713.5; Wed, 13 Nov
+ 2019 16:21:21 +0000
+Subject: Re: [PATCH RFC 3/5] blk-mq: Facilitate a shared tags per tagset
+To:     Hannes Reinecke <hare@suse.de>,
+        "axboe@kernel.dk" <axboe@kernel.dk>,
+        "jejb@linux.ibm.com" <jejb@linux.ibm.com>,
+        "martin.petersen@oracle.com" <martin.petersen@oracle.com>
+CC:     "linux-block@vger.kernel.org" <linux-block@vger.kernel.org>,
+        "linux-kernel@vger.kernel.org" <linux-kernel@vger.kernel.org>,
+        "linux-scsi@vger.kernel.org" <linux-scsi@vger.kernel.org>,
+        "ming.lei@redhat.com" <ming.lei@redhat.com>,
+        "hare@suse.com" <hare@suse.com>,
+        "bvanassche@acm.org" <bvanassche@acm.org>,
+        "chenxiang (M)" <chenxiang66@hisilicon.com>
+References: <1573652209-163505-1-git-send-email-john.garry@huawei.com>
+ <1573652209-163505-4-git-send-email-john.garry@huawei.com>
+ <32880159-86e8-5c48-1532-181fdea0df96@suse.de>
+ <2cbf591c-8284-8499-7804-e7078cf274d2@huawei.com>
+ <02056612-a958-7b05-3c54-bb2fa69bc493@suse.de>
+From:   John Garry <john.garry@huawei.com>
+Message-ID: <ace95bc5-7b89-9ed3-be89-8139f977984b@huawei.com>
+Date:   Wed, 13 Nov 2019 16:21:20 +0000
+User-Agent: Mozilla/5.0 (Windows NT 10.0; WOW64; rv:68.0) Gecko/20100101
+ Thunderbird/68.1.2
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <1573629691-6619-1-git-send-email-jiufei.xue@linux.alibaba.com>
-User-Agent: Mutt/1.5.21 (2010-09-15)
+In-Reply-To: <02056612-a958-7b05-3c54-bb2fa69bc493@suse.de>
+Content-Type: text/plain; charset="utf-8"; format=flowed
+Content-Language: en-US
+Content-Transfer-Encoding: 8bit
+X-Originating-IP: [10.202.226.46]
+X-ClientProxiedBy: lhreml713-chm.china.huawei.com (10.201.108.64) To
+ lhreml724-chm.china.huawei.com (10.201.108.75)
+X-CFilter-Loop: Reflected
 Sender: linux-block-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-On Wed, Nov 13, 2019 at 03:21:31PM +0800, Jiufei Xue wrote:
-> There is a bug that checking the same active_list over and over again
-> in iocg_activate(). The intention of the code was checking whether all
-> the ancestors and self have already been activated. So fix it.
+On 13/11/2019 15:38, Hannes Reinecke wrote:
+>>>> -        if (clear_ctx_on_error)
+>>>> -            data->ctx = NULL;
+>>>> -        blk_queue_exit(q);
+>>>> -        return NULL;
+>>>> +    if (data->hctx->shared_tags) {
+>>>> +        shared_tag = blk_mq_get_shared_tag(data);
+>>>> +        if (shared_tag == BLK_MQ_TAG_FAIL)
+>>>> +            goto err_shared_tag;
+>>>>        }
+>>>>    -    rq = blk_mq_rq_ctx_init(data, tag, data->cmd_flags,
+>>>> alloc_time_ns);
+>>>> +    tag = blk_mq_get_tag(data);
+>>>> +    if (tag == BLK_MQ_TAG_FAIL)
+>>>> +        goto err_tag;
+>>>> +
+>>>> +    rq = blk_mq_rq_ctx_init(data, tag, shared_tag, data->cmd_flags,
+>>>> alloc_time_ns);
+>>>>        if (!op_is_flush(data->cmd_flags)) {
+>>>>            rq->elv.icq = NULL;
+>>>>            if (e && e->type->ops.prepare_request) {
+>> Hi Hannes,
+>>
+>>> Why do you need to keep a parallel tag accounting between 'normal' and
+>>> 'shared' tags here?
+>>> Isn't is sufficient to get a shared tag only, and us that in lieo of the
+>>> 'real' one?
+>> In theory, yes. Just the 'shared' tag should be adequate.
+>>
+>> A problem I see with this approach is that we lose the identity of which
+>> tags are allocated for each hctx. As an example for this, consider
+>> blk_mq_queue_tag_busy_iter(), which iterates the bits for each hctx.
+>> Now, if you're just using shared tags only, that wouldn't work.
+>>
+>> Consider blk_mq_can_queue() as another example - this tells us if a hctx
+>> has any bits unset, while with only using shared tags it would tell if
+>> any bits unset over all queues, and this change in semantics could break
+>> things. At a glance, function __blk_mq_tag_idle() looks problematic also.
+>>
+>> And this is where it becomes messy to implement.
+>>
+
+Hi Hannes,
+
+> Oh, my. Indeed, that's correct.
+
+The tags could be kept in sync like this:
+
+shared_tag = blk_mq_get_tag(shared_tagset);
+if (shared_tag != -1)
+	sbitmap_set(hctx->tags, shared_tag);
+
+But that's obviously not ideal.
+
 > 
-> Signed-off-by: Jiufei Xue <jiufei.xue@linux.alibaba.com>
+> But then we don't really care _which_ shared tag is assigned; so
+> wouldn't be we better off by just having an atomic counter here?
+> Cache locality will be blown anyway ...
+The atomic counter would solve the issuing more than Scsi_host.can_queue 
+to the LLDD, but we still need a unique tag, which is what the shared 
+tag is.
 
-Fixes: 7caa47151ab2 ("blkcg: implement blk-iocost")
-Acked-by: Tejun Heo <tj@kernel.org>
-
-Jens, can you please apply this patch?
-
-Thans.
-
--- 
-tejun
+Thanks,
+John
