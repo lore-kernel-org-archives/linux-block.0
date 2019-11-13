@@ -2,95 +2,209 @@ Return-Path: <SRS0=BCjA=ZF=vger.kernel.org=linux-block-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-0.6 required=3.0 tests=DKIM_SIGNED,DKIM_VALID,
-	DKIM_VALID_AU,FREEMAIL_FORGED_FROMDOMAIN,FREEMAIL_FROM,
-	HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS
-	autolearn=no autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-2.0 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
+	HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,
+	USER_AGENT_SANE_1 autolearn=no autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 2BEC2C43331
-	for <linux-block@archiver.kernel.org>; Wed, 13 Nov 2019 11:20:45 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 90E74C1744A
+	for <linux-block@archiver.kernel.org>; Wed, 13 Nov 2019 11:43:18 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.kernel.org (Postfix) with ESMTP id DCF1921783
-	for <linux-block@archiver.kernel.org>; Wed, 13 Nov 2019 11:20:44 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id 6145E22467
+	for <linux-block@archiver.kernel.org>; Wed, 13 Nov 2019 11:43:18 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="NIUP6HJ7"
+	dkim=fail reason="signature verification failed" (1024-bit key) header.d=ffwll.ch header.i=@ffwll.ch header.b="C0Dbe7TC"
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1727495AbfKMLUo (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Wed, 13 Nov 2019 06:20:44 -0500
-Received: from mail-io1-f51.google.com ([209.85.166.51]:44118 "EHLO
-        mail-io1-f51.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1727171AbfKMLUo (ORCPT
+        id S1727818AbfKMLnR (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Wed, 13 Nov 2019 06:43:17 -0500
+Received: from mail-wr1-f67.google.com ([209.85.221.67]:43945 "EHLO
+        mail-wr1-f67.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S1726339AbfKMLnR (ORCPT
         <rfc822;linux-block@vger.kernel.org>);
-        Wed, 13 Nov 2019 06:20:44 -0500
-Received: by mail-io1-f51.google.com with SMTP id j20so2067697ioo.11;
-        Wed, 13 Nov 2019 03:20:43 -0800 (PST)
+        Wed, 13 Nov 2019 06:43:17 -0500
+Received: by mail-wr1-f67.google.com with SMTP id n1so1961497wra.10
+        for <linux-block@vger.kernel.org>; Wed, 13 Nov 2019 03:43:15 -0800 (PST)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20161025;
-        h=mime-version:references:in-reply-to:from:date:message-id:subject:to
-         :cc:content-transfer-encoding;
-        bh=E4UUTk/t8uEes636KBwiMf4uCLpW7SUwTukCuJGV2gQ=;
-        b=NIUP6HJ7cZn6VNtTHqEup48z6htdvYdviXFeI9rrFeZQUOA8atO2mZ87YJBOhpOJ1O
-         Lt5nD8Tab2jacC6s/bVARkIzfu8E68Yk0h3H3Hpe7WfLyh0DnSGtGuto11j6TnwPU8/X
-         ngLvnF1gbtZ1C1DSFoRcIpSqEEtAgtScXVtB5SSwuHVnRCaOpXMSIjBnRzpGAimp3PqC
-         Z3IMCedoAHGVYhBrADI4yqdUPoXGFPV+bTXJAUHpqT29qi7YIxGNxqpwP+vqiNenNzv8
-         KgtG/JyDoleXuoGEbg3e5sWF9+PADJm6WrVGZW1nDp5tZG9zL6SZYzHo5JjUX0z2146d
-         jtmw==
+        d=ffwll.ch; s=google;
+        h=sender:date:from:to:cc:subject:message-id:mail-followup-to
+         :references:mime-version:content-disposition:in-reply-to:user-agent;
+        bh=NWmx5zlrVzI636UV5zn7jwNNYyPpT2kzazOSeqZFCPQ=;
+        b=C0Dbe7TCduZqSim4I/9b7E74bGQO34GH/iKoO+dE+3EHLfWv1lLPGbvorBCoaRGMDb
+         48v7HTSQHP1LaVgvLNGy/yOxyJTlvTeKuq2CZR/Q7GIgmnQIbkvYhHi8TV/Ec+0WSA8P
+         awH+k+k5IQBNK5RO6uqKbJl7dFmz19ED4sy2I=
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=1e100.net; s=20161025;
-        h=x-gm-message-state:mime-version:references:in-reply-to:from:date
-         :message-id:subject:to:cc:content-transfer-encoding;
-        bh=E4UUTk/t8uEes636KBwiMf4uCLpW7SUwTukCuJGV2gQ=;
-        b=ESiGRWzDhRZYBARpLLB3h9zSc7hvU1EUZN219gWJ7YKjUpjGEWDtjm37/OW4X1i5t5
-         JlrzLbPm2djWtmuUoHg8OUbsYAuiFlsmLkHspvuUFHeT213iUhdkZ6yc1xjaPOWWrVG6
-         IXxNYdtANEfuDYLxgTz46/nE8gqM7rhOkhWVDj2Zb7NpJ9moYX4iRVCCyGbsIQfpX1+s
-         BplmjWiLLwilmcs0TBOhF2XfORTrwk3YAyE3h2GiiYPwIg3yaUcADob03t+Il/QomE8S
-         CHfXQ8s23t6X5q/GsbAast2DxM09hRX1TYI3YqysvzdsRO8+EL383z/Yji24Ua1LSOGp
-         KsxQ==
-X-Gm-Message-State: APjAAAV25/7mO/+HBX8Ta8lHAIcnRD82qzVjqcxpzJcV3TuRv1/NCPqy
-        auUQeaOwarhuyeT7HAjZY68zcKW5pqyq2XYvPWd72X+u
-X-Google-Smtp-Source: APXvYqyzAwG7kNXP0VtaM+bOtHh6R0X5bYvj2ZKk/LsHWL2cUgxqWt5N8Raq/rtmN9BzipVCDmD8oCvvzpW5z4O6g4c=
-X-Received: by 2002:a02:9f95:: with SMTP id a21mr2464235jam.16.1573644043378;
- Wed, 13 Nov 2019 03:20:43 -0800 (PST)
-MIME-Version: 1.0
-References: <20191113013529.GA64000@TonyMac-Alibaba>
-In-Reply-To: <20191113013529.GA64000@TonyMac-Alibaba>
-From:   Ilya Dryomov <idryomov@gmail.com>
-Date:   Wed, 13 Nov 2019 12:21:10 +0100
-Message-ID: <CAOi1vP98n4coOhc79Q+t63sCGvLmpXCwEYf8yuME+ST2K1HDsw@mail.gmail.com>
-Subject: Re: 'current_state' is uninitialized in rbd_object_map_update_finish()
-To:     Tony Lu <tonylu@linux.alibaba.com>
-Cc:     linux-block <linux-block@vger.kernel.org>,
+        h=x-gm-message-state:sender:date:from:to:cc:subject:message-id
+         :mail-followup-to:references:mime-version:content-disposition
+         :in-reply-to:user-agent;
+        bh=NWmx5zlrVzI636UV5zn7jwNNYyPpT2kzazOSeqZFCPQ=;
+        b=jof95ZB5iV62Ym3ATLZMYCy5NsnxYKK2NTfuUu9+CgZMd6xTJgGQ+LUeBFqpNW74Gr
+         Hbj9ah16/KKwIF6/qWx27Cz+BmPOlmbtHhDfgq7wEeSRDH5Cs7DJDEmp1VuxMfa4X2WI
+         IPrbZF175iBUMHL8xrywz/qAXCNbeJfw9VTsbmt9+2+l9KmRkjKKG0aeZ92o8xbbUvGe
+         OyaCKAovfKSeFG+d5G7QM+lezxav8mfMAm6VN8jdMkwC2dF6uIQHBXL3mBpUuQnWGGDz
+         TNrSvBdBSmmoUd5pFxhAdIVzOH13wsDlcXE4OkeQWZxvozWfEpHDxLA1rHHIZlpms0IR
+         ywcQ==
+X-Gm-Message-State: APjAAAWq/KzV4Fipcq3R0jdVrPTMz2D8ur1v0xqt1TgLTsW9YgbBnbvx
+        oTxocMU5SZ4lns7tVtiBY0vtwg==
+X-Google-Smtp-Source: APXvYqw4ALVmGTh9KFISsJCvLVpFEzXuyu2WMWEkcAdM7khXUlUWKA93QR1nKFP8k/o5YdLFIE0ItA==
+X-Received: by 2002:a5d:50ce:: with SMTP id f14mr2625324wrt.219.1573645394576;
+        Wed, 13 Nov 2019 03:43:14 -0800 (PST)
+Received: from phenom.ffwll.local (212-51-149-96.fiber7.init7.net. [212.51.149.96])
+        by smtp.gmail.com with ESMTPSA id w4sm2544060wrs.1.2019.11.13.03.43.12
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Wed, 13 Nov 2019 03:43:13 -0800 (PST)
+Date:   Wed, 13 Nov 2019 12:43:11 +0100
+From:   Daniel Vetter <daniel@ffwll.ch>
+To:     Jan Kara <jack@suse.cz>
+Cc:     John Hubbard <jhubbard@nvidia.com>,
+        Daniel Vetter <daniel@ffwll.ch>,
+        Jason Gunthorpe <jgg@ziepe.ca>,
+        Andrew Morton <akpm@linux-foundation.org>,
+        Al Viro <viro@zeniv.linux.org.uk>,
+        Alex Williamson <alex.williamson@redhat.com>,
+        Benjamin Herrenschmidt <benh@kernel.crashing.org>,
+        =?iso-8859-1?Q?Bj=F6rn_T=F6pel?= <bjorn.topel@intel.com>,
+        Christoph Hellwig <hch@infradead.org>,
+        Dan Williams <dan.j.williams@intel.com>,
+        Dave Chinner <david@fromorbit.com>,
+        David Airlie <airlied@linux.ie>,
+        "David S . Miller" <davem@davemloft.net>,
+        Ira Weiny <ira.weiny@intel.com>, Jens Axboe <axboe@kernel.dk>,
+        Jonathan Corbet <corbet@lwn.net>,
+        =?iso-8859-1?B?Suly9G1l?= Glisse <jglisse@redhat.com>,
+        Magnus Karlsson <magnus.karlsson@intel.com>,
+        Mauro Carvalho Chehab <mchehab@kernel.org>,
+        Michael Ellerman <mpe@ellerman.id.au>,
+        Michal Hocko <mhocko@suse.com>,
+        Mike Kravetz <mike.kravetz@oracle.com>,
+        Paul Mackerras <paulus@samba.org>,
+        Shuah Khan <shuah@kernel.org>,
+        Vlastimil Babka <vbabka@suse.cz>, bpf <bpf@vger.kernel.org>,
+        dri-devel <dri-devel@lists.freedesktop.org>, kvm@vger.kernel.org,
+        linux-block@vger.kernel.org,
+        Linux Doc Mailing List <linux-doc@vger.kernel.org>,
+        linux-fsdevel@vger.kernel.org,
+        "open list:KERNEL SELFTEST FRAMEWORK" 
+        <linux-kselftest@vger.kernel.org>,
+        "open list:DMA BUFFER SHARING FRAMEWORK" 
+        <linux-media@vger.kernel.org>, linux-rdma@vger.kernel.org,
+        linuxppc-dev <linuxppc-dev@lists.ozlabs.org>,
+        netdev <netdev@vger.kernel.org>, Linux MM <linux-mm@kvack.org>,
         LKML <linux-kernel@vger.kernel.org>
-Content-Type: text/plain; charset="UTF-8"
-Content-Transfer-Encoding: quoted-printable
+Subject: Re: [PATCH v3 00/23] mm/gup: track dma-pinned pages: FOLL_PIN,
+ FOLL_LONGTERM
+Message-ID: <20191113114311.GP23790@phenom.ffwll.local>
+Mail-Followup-To: Jan Kara <jack@suse.cz>,
+        John Hubbard <jhubbard@nvidia.com>, Jason Gunthorpe <jgg@ziepe.ca>,
+        Andrew Morton <akpm@linux-foundation.org>,
+        Al Viro <viro@zeniv.linux.org.uk>,
+        Alex Williamson <alex.williamson@redhat.com>,
+        Benjamin Herrenschmidt <benh@kernel.crashing.org>,
+        =?iso-8859-1?Q?Bj=F6rn_T=F6pel?= <bjorn.topel@intel.com>,
+        Christoph Hellwig <hch@infradead.org>,
+        Dan Williams <dan.j.williams@intel.com>,
+        Dave Chinner <david@fromorbit.com>, David Airlie <airlied@linux.ie>,
+        "David S . Miller" <davem@davemloft.net>,
+        Ira Weiny <ira.weiny@intel.com>, Jens Axboe <axboe@kernel.dk>,
+        Jonathan Corbet <corbet@lwn.net>,
+        =?iso-8859-1?B?Suly9G1l?= Glisse <jglisse@redhat.com>,
+        Magnus Karlsson <magnus.karlsson@intel.com>,
+        Mauro Carvalho Chehab <mchehab@kernel.org>,
+        Michael Ellerman <mpe@ellerman.id.au>,
+        Michal Hocko <mhocko@suse.com>,
+        Mike Kravetz <mike.kravetz@oracle.com>,
+        Paul Mackerras <paulus@samba.org>, Shuah Khan <shuah@kernel.org>,
+        Vlastimil Babka <vbabka@suse.cz>, bpf <bpf@vger.kernel.org>,
+        dri-devel <dri-devel@lists.freedesktop.org>, kvm@vger.kernel.org,
+        linux-block@vger.kernel.org,
+        Linux Doc Mailing List <linux-doc@vger.kernel.org>,
+        linux-fsdevel@vger.kernel.org,
+        "open list:KERNEL SELFTEST FRAMEWORK" <linux-kselftest@vger.kernel.org>,
+        "open list:DMA BUFFER SHARING FRAMEWORK" <linux-media@vger.kernel.org>,
+        linux-rdma@vger.kernel.org,
+        linuxppc-dev <linuxppc-dev@lists.ozlabs.org>,
+        netdev <netdev@vger.kernel.org>, Linux MM <linux-mm@kvack.org>,
+        LKML <linux-kernel@vger.kernel.org>
+References: <20191112000700.3455038-1-jhubbard@nvidia.com>
+ <20191112203802.GD5584@ziepe.ca>
+ <02fa935c-3469-b766-b691-5660084b60b9@nvidia.com>
+ <CAKMK7uHvk+ti00mCCF2006U003w1dofFg9nSfmZ4bS2Z2pEDNQ@mail.gmail.com>
+ <7b671bf9-4d94-f2cc-8453-863acd5a1115@nvidia.com>
+ <20191113101210.GD6367@quack2.suse.cz>
+MIME-Version: 1.0
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <20191113101210.GD6367@quack2.suse.cz>
+X-Operating-System: Linux phenom 5.2.0-3-amd64 
+User-Agent: Mutt/1.12.2 (2019-09-21)
 Sender: linux-block-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-On Wed, Nov 13, 2019 at 2:35 AM Tony Lu <tonylu@linux.alibaba.com> wrote:
->
-> Hello,
->
-> There is a warning during compiling driver rbd for uninitialized
-> 'current state' in rbd_object_map_update_finish():
->
-> drivers/block/rbd.c: In function 'rbd_object_map_callback':
-> drivers/block/rbd.c:2122:21: warning: =E2=80=98current_state=E2=80=99 may=
- be used uninitialized in this function [-Wmaybe-uninitialized]
->       (current_state =3D=3D OBJECT_EXISTS && state =3D=3D OBJECT_EXISTS_C=
-LEAN))
->
-> drivers/block/rbd.c:2090:23: note: =E2=80=98current_state=E2=80=99 was de=
-clared here
->   u8 state, new_state, current_state;
->                        ^~~~~~~~~~~~~
+On Wed, Nov 13, 2019 at 11:12:10AM +0100, Jan Kara wrote:
+> On Wed 13-11-19 01:02:02, John Hubbard wrote:
+> > On 11/13/19 12:22 AM, Daniel Vetter wrote:
+> > ...
+> > > > > Why are we doing this? I think things got confused here someplace, as
+> > > > 
+> > > > 
+> > > > Because:
+> > > > 
+> > > > a) These need put_page() calls,  and
+> > > > 
+> > > > b) there is no put_pages() call, but there is a release_pages() call that
+> > > > is, arguably, what put_pages() would be.
+> > > > 
+> > > > 
+> > > > > the comment still says:
+> > > > > 
+> > > > > /**
+> > > > >   * put_user_page() - release a gup-pinned page
+> > > > >   * @page:            pointer to page to be released
+> > > > >   *
+> > > > >   * Pages that were pinned via get_user_pages*() must be released via
+> > > > >   * either put_user_page(), or one of the put_user_pages*() routines
+> > > > >   * below.
+> > > > 
+> > > > 
+> > > > Ohhh, I missed those comments. They need to all be changed over to
+> > > > say "pages that were pinned via pin_user_pages*() or
+> > > > pin_longterm_pages*() must be released via put_user_page*()."
+> > > > 
+> > > > The get_user_pages*() pages must still be released via put_page.
+> > > > 
+> > > > The churn is due to a fairly significant change in strategy, whis
+> > > > is: instead of changing all get_user_pages*() sites to call
+> > > > put_user_page(), change selected sites to call pin_user_pages*() or
+> > > > pin_longterm_pages*(), plus put_user_page().
+> > > 
+> > > Can't we call this unpin_user_page then, for some symmetry? Or is that
+> > > even more churn?
+> > > 
+> > > Looking from afar the naming here seems really confusing.
+> > 
+> > 
+> > That look from afar is valuable, because I'm too close to the problem to see
+> > how the naming looks. :)
+> > 
+> > unpin_user_page() sounds symmetrical. It's true that it would cause more
+> > churn (which is why I started off with a proposal that avoids changing the
+> > names of put_user_page*() APIs). But OTOH, the amount of churn is proportional
+> > to the change in direction here, and it's really only 10 or 20 lines changed,
+> > in the end.
+> > 
+> > So I'm open to changing to that naming. It would be nice to hear what others
+> > prefer, too...
+> 
+> FWIW I'd find unpin_user_page() also better than put_user_page() as a
+> counterpart to pin_user_pages().
 
-Hi Tony,
-
-It looks like this warning was also reported by kbuild, on gcc 6.3 and
-7.4.  It's bogus, I'll send a patch to silence it.
-
-Thanks,
-
-                Ilya
+One more point from afar on pin/unpin: We use that a lot in graphics for
+permanently pinned graphics buffer objects. Which really only should be
+used for scanout. So at least graphics folks should have an appropriate
+mindset and try to make sure we don't overuse this stuff.
+-Daniel
+-- 
+Daniel Vetter
+Software Engineer, Intel Corporation
+http://blog.ffwll.ch
