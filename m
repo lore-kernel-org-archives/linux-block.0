@@ -2,78 +2,84 @@ Return-Path: <SRS0=BCjA=ZF=vger.kernel.org=linux-block-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-0.4 required=3.0 tests=FROM_LOCAL_HEX,
+X-Spam-Status: No, score=-2.2 required=3.0 tests=DKIM_SIGNED,DKIM_VALID,
 	HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,
-	URIBL_BLOCKED autolearn=no autolearn_force=no version=3.4.0
+	USER_AGENT_SANE_1 autolearn=no autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id CA35FC43141
-	for <linux-block@archiver.kernel.org>; Wed, 13 Nov 2019 19:29:02 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id C4C27C432C3
+	for <linux-block@archiver.kernel.org>; Wed, 13 Nov 2019 19:51:17 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.kernel.org (Postfix) with ESMTP id 2EFE2206D7
-	for <linux-block@archiver.kernel.org>; Wed, 13 Nov 2019 19:29:03 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id 4521A206D8
+	for <linux-block@archiver.kernel.org>; Wed, 13 Nov 2019 19:51:18 +0000 (UTC)
+Authentication-Results: mail.kernel.org;
+	dkim=pass (2048-bit key) header.d=kernel-dk.20150623.gappssmtp.com header.i=@kernel-dk.20150623.gappssmtp.com header.b="I5W72ILq"
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1726434AbfKMT3B (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Wed, 13 Nov 2019 14:29:01 -0500
-Received: from mail-il1-f198.google.com ([209.85.166.198]:41744 "EHLO
-        mail-il1-f198.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1726557AbfKMT3B (ORCPT
+        id S1726363AbfKMTvQ (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Wed, 13 Nov 2019 14:51:16 -0500
+Received: from mail-il1-f178.google.com ([209.85.166.178]:33768 "EHLO
+        mail-il1-f178.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S1726120AbfKMTvQ (ORCPT
         <rfc822;linux-block@vger.kernel.org>);
-        Wed, 13 Nov 2019 14:29:01 -0500
-Received: by mail-il1-f198.google.com with SMTP id o185so2758263ila.8
-        for <linux-block@vger.kernel.org>; Wed, 13 Nov 2019 11:29:01 -0800 (PST)
+        Wed, 13 Nov 2019 14:51:16 -0500
+Received: by mail-il1-f178.google.com with SMTP id m5so2967047ilq.0
+        for <linux-block@vger.kernel.org>; Wed, 13 Nov 2019 11:51:15 -0800 (PST)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=kernel-dk.20150623.gappssmtp.com; s=20150623;
+        h=subject:to:cc:references:from:message-id:date:user-agent
+         :mime-version:in-reply-to:content-language:content-transfer-encoding;
+        bh=ef1f/PdCcKzFdmtEAurRHSiBIp69Vea7tsZwHU00GvQ=;
+        b=I5W72ILq7hyu89Z/dlDetrs/gEtASA3i8vwvHBwNFY4h8AJDoyn2wuYwXfUyI64VAO
+         ORJrP4Kp6ySoHO9Iwitau/q9pP3HAOib5Yvi2SCDzS2LKK0Gx9jFdLBtsRwDzdq5svFI
+         YXTEC53jWG3Bv9zp7UnvovIJUOUir6FXd7iSNVjCzW6l/U/ypGLBeww58RLW7SoOWK5E
+         hsKNTzNznULhFlVDucl9xm6/VgauSy9q5LB1ckBG1q6B4l9+CznxhF/A+HyL6mgI8A4J
+         18Z0qwZkJNnrqlmugjZ8wwxudP0JYxMGFmarjVk7Mp56QkfhBOxKv4jbAK1Om2avrMGI
+         ET6Q==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=1e100.net; s=20161025;
-        h=x-gm-message-state:mime-version:date:in-reply-to:message-id:subject
-         :from:to;
-        bh=Vq9AmQFAWjANpkLSXn1UHJxF9GMEPoT07hbuuO8TH2k=;
-        b=jhfLrOfLHJp0lnYKxFLOgwDWrG0fWcsJkmeuADNWYSQEBr+lDZ2eUZ18+zo9bGWhJ6
-         3AQwXJf3dINdRMeonF4p5C9xUnKSGGc1o3j88dmKm81M0h1eatwm4L5FUSnlPEu0Xc5p
-         BGblrjmACryvetj2mH2WyjO9F3j0ufYjY29czloriokCL8E5bS340QBI89thWIiVeh48
-         u3vR+wEf9KQ3SIcBKQ+Kdjw2Mb0HwUZ/VKpG1IrFLZWr7Rmd/f7jSb/yrZv+d06Gh7so
-         YdZl1iTnJ7f/Hq/R8hTW2YhDkzQAdlFbiW4o0uCclx1cMfDp8AVlNwaJX/3gV0VYhHYb
-         fvRQ==
-X-Gm-Message-State: APjAAAVgKHcE5tvdb0Om3K/bltDIfBUWQ/jv6ifxs2HfahDuIcLT6x8x
-        0Fs+b5wQ/bxIpjQ71AHkCfsNOVSpd5KuJ097apK5TxhCLIXs
-X-Google-Smtp-Source: APXvYqxYJ6dFAWRGXWIFkalwkp6O7/N3QafXX2n/eN0sV1s7imfVqRwzdni678vR3BjKeJq+wc64m4DR6PP6wl4S1UDWQ9YBHiIf
+        h=x-gm-message-state:subject:to:cc:references:from:message-id:date
+         :user-agent:mime-version:in-reply-to:content-language
+         :content-transfer-encoding;
+        bh=ef1f/PdCcKzFdmtEAurRHSiBIp69Vea7tsZwHU00GvQ=;
+        b=k8yHKSX2GSqSPUYDV+14Zxx+7x2/QEa4/SfbQCNYk49Deqhc+y77lYbVRPensj4QTm
+         MKkKlUSpgiVSRM9Nn5Dj0SPREPG0j8AOTfzC/qhRe6IFUqJGVMXAo7oHXk5dDtvV0Z8P
+         VZzqPNOjBUWNQKRA5XkqlDLNBfXMJ3Z9HXipL6PyU6WAihbz5uPXDle14jHoDeklNqiF
+         B4T7FFjmIpbGnxS+1UBlXNYFhja0PkhiG9Ny5u4szLWa6Ssa9auT0apgnl95wfdRc6Jd
+         hcyn3XKkvOOvendzUd/YL2vrR2/y8+q/fNytUeew3VW84Yeqc7XGiJH4vYhcowxE7tin
+         EsHQ==
+X-Gm-Message-State: APjAAAWp0UA5WXGau3+NNOMnNjsDKJvExbRuOWwdiqgLkmHYrRnpBKA4
+        fjbkd7BDcac8RKWv3M9UlsX72g==
+X-Google-Smtp-Source: APXvYqzCQgYFZqroQI2tVwbNNw1V4/Sb+rbJqPRVd83F1uKeb6xzpf/drlH1jtgSSp6EyhQbiCUGWA==
+X-Received: by 2002:a92:d746:: with SMTP id e6mr5810296ilq.111.1573674674654;
+        Wed, 13 Nov 2019 11:51:14 -0800 (PST)
+Received: from [192.168.1.163] ([65.144.74.34])
+        by smtp.gmail.com with ESMTPSA id a11sm422678ilb.72.2019.11.13.11.51.13
+        (version=TLS1_2 cipher=ECDHE-RSA-AES128-GCM-SHA256 bits=128/128);
+        Wed, 13 Nov 2019 11:51:13 -0800 (PST)
+Subject: Re: [PATCH 0/2] blk-mq/sbitmap: Delete some unused functions
+To:     John Garry <john.garry@huawei.com>
+Cc:     linux-block@vger.kernel.org, linux-kernel@vger.kernel.org
+References: <1573666042-176756-1-git-send-email-john.garry@huawei.com>
+From:   Jens Axboe <axboe@kernel.dk>
+Message-ID: <d2a1502d-5af3-cfaf-f4c3-a8cffffc5aed@kernel.dk>
+Date:   Wed, 13 Nov 2019 12:51:12 -0700
+User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:60.0) Gecko/20100101
+ Thunderbird/60.9.0
 MIME-Version: 1.0
-X-Received: by 2002:a02:58c8:: with SMTP id f191mr4260216jab.94.1573673340590;
- Wed, 13 Nov 2019 11:29:00 -0800 (PST)
-Date:   Wed, 13 Nov 2019 11:29:00 -0800
-In-Reply-To: <000000000000af7e9805973c6356@google.com>
-X-Google-Appengine-App-Id: s~syzkaller
-X-Google-Appengine-App-Id-Alias: syzkaller
-Message-ID: <00000000000075646805973f60b5@google.com>
-Subject: Re: general protection fault in io_commit_cqring
-From:   syzbot <syzbot+21147d79607d724bd6f3@syzkaller.appspotmail.com>
-To:     axboe@kernel.dk, io-uring@vger.kernel.org,
-        linux-block@vger.kernel.org, linux-fsdevel@vger.kernel.org,
-        linux-kernel@vger.kernel.org, syzkaller-bugs@googlegroups.com,
-        viro@zeniv.linux.org.uk
-Content-Type: text/plain; charset="UTF-8"; format=flowed; delsp=yes
+In-Reply-To: <1573666042-176756-1-git-send-email-john.garry@huawei.com>
+Content-Type: text/plain; charset=utf-8
+Content-Language: en-US
+Content-Transfer-Encoding: 7bit
 Sender: linux-block-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-syzbot has bisected this bug to:
+On 11/13/19 10:27 AM, John Garry wrote:
+> Function blk_mq_can_queue() never seemed to ever have been referenced, so
+> delete it and any other now-unused callees.
 
-commit 1d7bb1d50fb4dc141c7431cc21fdd24ffcc83c76
-Author: Jens Axboe <axboe@kernel.dk>
-Date:   Wed Nov 6 18:31:17 2019 +0000
+Great, I like killing dead code. Applied for 5.5, thanks.
 
-     io_uring: add support for backlogged CQ ring
+-- 
+Jens Axboe
 
-bisection log:  https://syzkaller.appspot.com/x/bisect.txt?x=16a49802e00000
-start commit:   4e8f108c Add linux-next specific files for 20191113
-git tree:       linux-next
-final crash:    https://syzkaller.appspot.com/x/report.txt?x=15a49802e00000
-console output: https://syzkaller.appspot.com/x/log.txt?x=11a49802e00000
-kernel config:  https://syzkaller.appspot.com/x/.config?x=ace1bcdd76242fd2
-dashboard link: https://syzkaller.appspot.com/bug?extid=21147d79607d724bd6f3
-syz repro:      https://syzkaller.appspot.com/x/repro.syz?x=1649e706e00000
-C reproducer:   https://syzkaller.appspot.com/x/repro.c?x=11397f72e00000
-
-Reported-by: syzbot+21147d79607d724bd6f3@syzkaller.appspotmail.com
-Fixes: 1d7bb1d50fb4 ("io_uring: add support for backlogged CQ ring")
-
-For information about bisection process see: https://goo.gl/tpsmEJ#bisection
