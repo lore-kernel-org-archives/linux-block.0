@@ -2,179 +2,172 @@ Return-Path: <SRS0=BCjA=ZF=vger.kernel.org=linux-block-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-5.2 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
-	MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,USER_AGENT_SANE_1
-	autolearn=ham autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-9.8 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
+	INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,
+	USER_AGENT_GIT autolearn=unavailable autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 9AB1AC43331
-	for <linux-block@archiver.kernel.org>; Wed, 13 Nov 2019 14:57:40 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 01D62C43331
+	for <linux-block@archiver.kernel.org>; Wed, 13 Nov 2019 15:00:24 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.kernel.org (Postfix) with ESMTP id 7517C222C9
-	for <linux-block@archiver.kernel.org>; Wed, 13 Nov 2019 14:57:40 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id D58F3222D0
+	for <linux-block@archiver.kernel.org>; Wed, 13 Nov 2019 15:00:23 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1727751AbfKMO5j (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Wed, 13 Nov 2019 09:57:39 -0500
-Received: from lhrrgout.huawei.com ([185.176.76.210]:2094 "EHLO huawei.com"
-        rhost-flags-OK-OK-OK-FAIL) by vger.kernel.org with ESMTP
-        id S1726251AbfKMO5j (ORCPT <rfc822;linux-block@vger.kernel.org>);
-        Wed, 13 Nov 2019 09:57:39 -0500
-Received: from lhreml701-cah.china.huawei.com (unknown [172.18.7.108])
-        by Forcepoint Email with ESMTP id 3EBB479D1242E9871B03;
-        Wed, 13 Nov 2019 14:57:37 +0000 (GMT)
-Received: from lhreml724-chm.china.huawei.com (10.201.108.75) by
- lhreml701-cah.china.huawei.com (10.201.108.42) with Microsoft SMTP Server
- (TLS) id 14.3.408.0; Wed, 13 Nov 2019 14:57:35 +0000
-Received: from [127.0.0.1] (10.202.226.46) by lhreml724-chm.china.huawei.com
- (10.201.108.75) with Microsoft SMTP Server (version=TLS1_2,
- cipher=TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256) id 15.1.1713.5; Wed, 13 Nov
- 2019 14:57:35 +0000
-Subject: Re: [PATCH RFC 3/5] blk-mq: Facilitate a shared tags per tagset
-To:     Hannes Reinecke <hare@suse.de>,
-        "axboe@kernel.dk" <axboe@kernel.dk>,
-        "jejb@linux.ibm.com" <jejb@linux.ibm.com>,
-        "martin.petersen@oracle.com" <martin.petersen@oracle.com>
-CC:     "linux-block@vger.kernel.org" <linux-block@vger.kernel.org>,
-        "linux-kernel@vger.kernel.org" <linux-kernel@vger.kernel.org>,
-        "linux-scsi@vger.kernel.org" <linux-scsi@vger.kernel.org>,
-        "ming.lei@redhat.com" <ming.lei@redhat.com>,
-        "hare@suse.com" <hare@suse.com>,
-        "bvanassche@acm.org" <bvanassche@acm.org>,
-        "chenxiang (M)" <chenxiang66@hisilicon.com>
-References: <1573652209-163505-1-git-send-email-john.garry@huawei.com>
- <1573652209-163505-4-git-send-email-john.garry@huawei.com>
- <32880159-86e8-5c48-1532-181fdea0df96@suse.de>
-From:   John Garry <john.garry@huawei.com>
-Message-ID: <2cbf591c-8284-8499-7804-e7078cf274d2@huawei.com>
-Date:   Wed, 13 Nov 2019 14:57:33 +0000
-User-Agent: Mozilla/5.0 (Windows NT 10.0; WOW64; rv:68.0) Gecko/20100101
- Thunderbird/68.1.2
-MIME-Version: 1.0
-In-Reply-To: <32880159-86e8-5c48-1532-181fdea0df96@suse.de>
-Content-Type: text/plain; charset="utf-8"; format=flowed
-Content-Language: en-US
-Content-Transfer-Encoding: 7bit
-X-Originating-IP: [10.202.226.46]
-X-ClientProxiedBy: lhreml713-chm.china.huawei.com (10.201.108.64) To
- lhreml724-chm.china.huawei.com (10.201.108.75)
-X-CFilter-Loop: Reflected
+        id S1727680AbfKMPAX (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Wed, 13 Nov 2019 10:00:23 -0500
+Received: from alexa-out-blr-02.qualcomm.com ([103.229.18.198]:9071 "EHLO
+        alexa-out-blr-02.qualcomm.com" rhost-flags-OK-OK-OK-OK)
+        by vger.kernel.org with ESMTP id S1727550AbfKMPAX (ORCPT
+        <rfc822;linux-block@vger.kernel.org>);
+        Wed, 13 Nov 2019 10:00:23 -0500
+X-Greylist: delayed 367 seconds by postgrey-1.27 at vger.kernel.org; Wed, 13 Nov 2019 10:00:20 EST
+Received: from ironmsg02-blr.qualcomm.com ([10.86.208.131])
+  by alexa-out-blr-02.qualcomm.com with ESMTP/TLS/AES256-SHA; 13 Nov 2019 20:24:11 +0530
+IronPort-SDR: nfwpYCTyb7jxhcWPk9Ne0HbimTn/ODm9c8uNO+x6e3J3vbaHqZukz4/HwYpt9DKetcVEWNOpz7
+ Dkl9dC467EA5myn3hqhpNN3cj0kPqonoros1JDbNqPuKtLkyJY1wW6+KoY3nan53T1TWM7nR3c
+ V3uRDvl9YtxMMQtP4RTsgrwEgYobNSuUWAVwzQXeYjglfM0JtBpxxMA42Rxvpdijs1rmk7hAck
+ pQRLuAKqxd9kzhPJPFIgQG4EEWyHsSpT5xJR3q04wFVKK94IJcivXtB/Dkj+4UCal19ySk7g79
+ Yq9nLb/2SU60+FOCeLdhU21T
+Received: from c-ppvk-linux.qualcomm.com ([10.206.24.34])
+  by ironmsg02-blr.qualcomm.com with ESMTP; 13 Nov 2019 20:23:55 +0530
+Received: by c-ppvk-linux.qualcomm.com (Postfix, from userid 2304101)
+        id 288D4496F; Wed, 13 Nov 2019 20:23:54 +0530 (IST)
+From:   Pradeep P V K <ppvk@codeaurora.org>
+To:     stummala@codeaurora.org, sayalil@codeaurora.org,
+        rampraka@codeaurora.org, vbadigan@codeaurora.org, axboe@kernel.dk,
+        paolo.valente@linaro.org
+Cc:     linux-block@vger.kernel.org, linux-kernel@vger.kernel.org,
+        Pradeep P V K <ppvk@codeaurora.org>
+Subject: [PATCH v1] block, bfq: set default slice_idle to zero for SSDs
+Date:   Wed, 13 Nov 2019 20:23:20 +0530
+Message-Id: <1573656800-14815-1-git-send-email-ppvk@codeaurora.org>
+X-Mailer: git-send-email 1.9.1
 Sender: linux-block-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-On 13/11/2019 14:06, Hannes Reinecke wrote:
-> On 11/13/19 2:36 PM, John Garry wrote:
->> Some SCSI HBAs (such as HPSA, megaraid, mpt3sas, hisi_sas_v3 ..) support
->> multiple reply queues with single hostwide tags.
->>
->> In addition, these drivers want to use interrupt assignment in
->> pci_alloc_irq_vectors(PCI_IRQ_AFFINITY). However, as discussed in [0],
->> CPU hotplug may cause in-flight IO completion to not be serviced when an
->> interrupt is shutdown.
->>
->> To solve that problem, Ming's patchset to drain hctx's should ensure no
->> IOs are missed in-flight [1].
->>
->> However, to take advantage of that patchset, we need to map the HBA HW
->> queues to blk mq hctx's; to do that, we need to expose the HBA HW queues.
->>
->> In making that transition, the per-SCSI command request tags are no
->> longer unique per Scsi host - they are just unique per hctx. As such, the
->> HBA LLDD would have to generate this tag internally, which has a certain
->> performance overhead.
->>
->> However another problem is that blk mq assumes the host may accept
->> (Scsi_host.can_queue * #hw queue) commands. In [2], we removed the Scsi
->> host busy counter, which would stop the LLDD being sent more than
->> .can_queue commands; however, we should still ensure that the block layer
->> does not issue more than .can_queue commands to the Scsi host.
->>
->> To solve this problem, introduce a shared tags per blk_mq_tag_set, which
->> may be requested when allocating the tagset.
->>
->> New flag BLK_MQ_F_TAG_HCTX_SHARED should be set when requesting the
->> tagset.
->>
->> This is based on work originally from Ming Lei in [3].
->>
->> [0] https://lore.kernel.org/linux-block/alpine.DEB.2.21.1904051331270.1802@nanos.tec.linutronix.de/
->> [1] https://lore.kernel.org/linux-block/20191014015043.25029-1-ming.lei@redhat.com/
->> [2] https://lore.kernel.org/linux-scsi/20191025065855.6309-1-ming.lei@redhat.com/
->> [3] https://lore.kernel.org/linux-block/20190531022801.10003-1-ming.lei@redhat.com/
->>
->> Signed-off-by: John Garry <john.garry@huawei.com>
->> ---
->>   block/blk-core.c       |  1 +
->>   block/blk-flush.c      |  2 +
->>   block/blk-mq-debugfs.c |  2 +-
->>   block/blk-mq-tag.c     | 85 ++++++++++++++++++++++++++++++++++++++++++
->>   block/blk-mq-tag.h     |  1 +
->>   block/blk-mq.c         | 61 +++++++++++++++++++++++++-----
->>   block/blk-mq.h         |  9 +++++
->>   include/linux/blk-mq.h |  3 ++
->>   include/linux/blkdev.h |  1 +
->>   9 files changed, 155 insertions(+), 10 deletions(-)
->>
-> [ .. ]
->> @@ -396,15 +398,17 @@ static struct request *blk_mq_get_request(struct request_queue *q,
->>   		blk_mq_tag_busy(data->hctx);
->>   	}
->>   
->> -	tag = blk_mq_get_tag(data);
->> -	if (tag == BLK_MQ_TAG_FAIL) {
->> -		if (clear_ctx_on_error)
->> -			data->ctx = NULL;
->> -		blk_queue_exit(q);
->> -		return NULL;
->> +	if (data->hctx->shared_tags) {
->> +		shared_tag = blk_mq_get_shared_tag(data);
->> +		if (shared_tag == BLK_MQ_TAG_FAIL)
->> +			goto err_shared_tag;
->>   	}
->>   
->> -	rq = blk_mq_rq_ctx_init(data, tag, data->cmd_flags, alloc_time_ns);
->> +	tag = blk_mq_get_tag(data);
->> +	if (tag == BLK_MQ_TAG_FAIL)
->> +		goto err_tag;
->> +
->> +	rq = blk_mq_rq_ctx_init(data, tag, shared_tag, data->cmd_flags, alloc_time_ns);
->>   	if (!op_is_flush(data->cmd_flags)) {
->>   		rq->elv.icq = NULL;
->>   		if (e && e->type->ops.prepare_request) {
+With default 8ms as a slice idle time, we seen few time bounded
+applications(sensors) on v4.19 kernel are getting timedout during
+multimedia tests (audio, video playbacks etc) with Reboots and
+leading to crash. The timeout configured for these applications
+(sensors) are 20sec.
 
-Hi Hannes,
+In crash dumps, we seen few synchronous requests from sensors/other
+applications were in their bfq_queues for more than 12-20sec.
 
-> Why do you need to keep a parallel tag accounting between 'normal' and
-> 'shared' tags here?
-> Isn't is sufficient to get a shared tag only, and us that in lieo of the
-> 'real' one?
+Idling due to anticipation of future near-by IO requests and wait on
+completion of submitted requests, will effect in choosing the next
+bfq-queue and its scheduling. There by it effecting some time bounded
+applications.
 
-In theory, yes. Just the 'shared' tag should be adequate.
+After making the slice idle to zero, we didn't seen any crash during
+our 72hrs of testing and also it increases the IO throughput.
 
-A problem I see with this approach is that we lose the identity of which 
-tags are allocated for each hctx. As an example for this, consider 
-blk_mq_queue_tag_busy_iter(), which iterates the bits for each hctx. 
-Now, if you're just using shared tags only, that wouldn't work.
+Following FIO benchmark results were taken on a local SSD run:
 
-Consider blk_mq_can_queue() as another example - this tells us if a hctx 
-has any bits unset, while with only using shared tags it would tell if 
-any bits unset over all queues, and this change in semantics could break 
-things. At a glance, function __blk_mq_tag_idle() looks problematic also.
+RandomReads that were taken on v4.19 kernel:
 
-And this is where it becomes messy to implement.
+ Idling   iops    avg-lat(us)    stddev       bw
+ ----------------------------------------------------
+ On       4136    1189.07        17221.65    16.9MB/s
+ Off      7246     670.11        1054.76     29.7MB/s
 
-> 
-> I would love to combine both,
+    fio --name=temp --size=5G --time_based --ioengine=sync \
+	--randrepeat=0 --direct=1 --invalidate=1 --verify=0 \
+	--verify_fatal=0 --rw=randread --blocksize=4k \
+	--group_reporting=1 --directory=/data --runtime=10 \
+	--iodepth=64 --numjobs=5
 
-Same here...
+Following code changes were made based on [1],[2] and [3].
 
-  as then we can easily do a reverse mapping
-> by using the 'tag' value to lookup the command itself, and can possibly
-> do the 'scsi_cmd_priv' trick of embedding the LLDD-specific parts within
-> the command. With this split we'll be wasting quite some memory there,
-> as the possible 'tag' values are actually nr_hw_queues * shared_tags.
+[1] https://lkml.org/lkml/2018/11/1/1285
+[2] Commit 41c0126b3f22 ("block: Make CFQ default to IOPS mode on
+    SSDs")
+[3] Commit 0bb979472a74 ("cfq-iosched: fix the setting of IOPS mode on
+    SSDs")
 
-Yeah, understood. That's just a trade-off I saw.
+Signed-off-by: Pradeep P V K <ppvk@codeaurora.org>
+---
+ Documentation/block/bfq-iosched.rst |  7 ++++---
+ block/bfq-iosched.c                 | 13 +++++++++++++
+ block/elevator.c                    |  2 ++
+ include/linux/elevator.h            |  1 +
+ 4 files changed, 20 insertions(+), 3 deletions(-)
 
-Thanks,
-John
+diff --git a/Documentation/block/bfq-iosched.rst b/Documentation/block/bfq-iosched.rst
+index 0d237d4..244f4ca 100644
+--- a/Documentation/block/bfq-iosched.rst
++++ b/Documentation/block/bfq-iosched.rst
+@@ -329,9 +329,10 @@ slice_idle
+ 
+ This parameter specifies how long BFQ should idle for next I/O
+ request, when certain sync BFQ queues become empty. By default
+-slice_idle is a non-zero value. Idling has a double purpose: boosting
+-throughput and making sure that the desired throughput distribution is
+-respected (see the description of how BFQ works, and, if needed, the
++slice_idle is a non-zero value for rotational devices.
++Idling has a double purpose: boosting throughput and making
++sure that the desired throughput distribution is respected
++(see the description of how BFQ works, and, if needed, the
+ papers referred there).
+ 
+ As for throughput, idling can be very helpful on highly seeky media
+diff --git a/block/bfq-iosched.c b/block/bfq-iosched.c
+index 0319d63..9c994d1 100644
+--- a/block/bfq-iosched.c
++++ b/block/bfq-iosched.c
+@@ -6514,6 +6514,18 @@ static int bfq_init_queue(struct request_queue *q, struct elevator_type *e)
+ 	return -ENOMEM;
+ }
+ 
++static void bfq_registered_queue(struct request_queue *q)
++{
++	struct elevator_queue *e = q->elevator;
++	struct bfq_data *bfqd = e->elevator_data;
++
++	/*
++	 * Default to IOPS mode with no idling for SSDs
++	 */
++	if (blk_queue_nonrot(q))
++		bfqd->bfq_slice_idle = 0;
++}
++
+ static void bfq_slab_kill(void)
+ {
+ 	kmem_cache_destroy(bfq_pool);
+@@ -6761,6 +6773,7 @@ static ssize_t bfq_low_latency_store(struct elevator_queue *e,
+ 		.init_hctx		= bfq_init_hctx,
+ 		.init_sched		= bfq_init_queue,
+ 		.exit_sched		= bfq_exit_queue,
++		.elevator_registered_fn = bfq_registered_queue,
+ 	},
+ 
+ 	.icq_size =		sizeof(struct bfq_io_cq),
+diff --git a/block/elevator.c b/block/elevator.c
+index 076ba73..b882d25 100644
+--- a/block/elevator.c
++++ b/block/elevator.c
+@@ -504,6 +504,8 @@ int elv_register_queue(struct request_queue *q, bool uevent)
+ 			kobject_uevent(&e->kobj, KOBJ_ADD);
+ 
+ 		e->registered = 1;
++		if (e->type->ops.elevator_registered_fn)
++			e->type->ops.elevator_registered_fn(q);
+ 	}
+ 	return error;
+ }
+diff --git a/include/linux/elevator.h b/include/linux/elevator.h
+index 901bda3..23dcc35 100644
+--- a/include/linux/elevator.h
++++ b/include/linux/elevator.h
+@@ -50,6 +50,7 @@ struct elevator_mq_ops {
+ 	struct request *(*next_request)(struct request_queue *, struct request *);
+ 	void (*init_icq)(struct io_cq *);
+ 	void (*exit_icq)(struct io_cq *);
++	void (*elevator_registered_fn)(struct request_queue *q);
+ };
+ 
+ #define ELV_NAME_MAX	(16)
+-- 
+1.9.1
+
