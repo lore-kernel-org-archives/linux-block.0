@@ -2,237 +2,177 @@ Return-Path: <SRS0=BCjA=ZF=vger.kernel.org=linux-block-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-7.0 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
-	INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,
-	UNWANTED_LANGUAGE_BODY,USER_AGENT_GIT autolearn=ham autolearn_force=no
-	version=3.4.0
+X-Spam-Status: No, score=-0.8 required=3.0 tests=DKIM_SIGNED,DKIM_VALID,
+	DKIM_VALID_AU,HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SPF_HELO_NONE,
+	SPF_PASS autolearn=no autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id D9AB8C43331
-	for <linux-block@archiver.kernel.org>; Wed, 13 Nov 2019 08:06:12 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 7A226C17442
+	for <linux-block@archiver.kernel.org>; Wed, 13 Nov 2019 08:22:53 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.kernel.org (Postfix) with ESMTP id BA065222D0
-	for <linux-block@archiver.kernel.org>; Wed, 13 Nov 2019 08:06:12 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id 53D252245C
+	for <linux-block@archiver.kernel.org>; Wed, 13 Nov 2019 08:22:53 +0000 (UTC)
+Authentication-Results: mail.kernel.org;
+	dkim=pass (1024-bit key) header.d=ffwll.ch header.i=@ffwll.ch header.b="A+5ZDAwm"
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1726598AbfKMIGM (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Wed, 13 Nov 2019 03:06:12 -0500
-Received: from mx2.suse.de ([195.135.220.15]:53656 "EHLO mx1.suse.de"
-        rhost-flags-OK-OK-OK-FAIL) by vger.kernel.org with ESMTP
-        id S1726613AbfKMIGM (ORCPT <rfc822;linux-block@vger.kernel.org>);
-        Wed, 13 Nov 2019 03:06:12 -0500
-X-Virus-Scanned: by amavisd-new at test-mx.suse.de
-Received: from relay2.suse.de (unknown [195.135.220.254])
-        by mx1.suse.de (Postfix) with ESMTP id 608E5AC44;
-        Wed, 13 Nov 2019 08:06:10 +0000 (UTC)
-From:   Coly Li <colyli@suse.de>
-To:     axboe@kernel.dk
-Cc:     linux-bcache@vger.kernel.org, linux-block@vger.kernel.org,
-        Christoph Hellwig <hch@lst.de>, Coly Li <colyli@suse.de>
-Subject: [PATCH 12/12] bcache: don't export symbols
-Date:   Wed, 13 Nov 2019 16:03:26 +0800
-Message-Id: <20191113080326.69989-13-colyli@suse.de>
-X-Mailer: git-send-email 2.16.4
-In-Reply-To: <20191113080326.69989-1-colyli@suse.de>
-References: <20191113080326.69989-1-colyli@suse.de>
+        id S1727337AbfKMIWu (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Wed, 13 Nov 2019 03:22:50 -0500
+Received: from mail-oi1-f195.google.com ([209.85.167.195]:37916 "EHLO
+        mail-oi1-f195.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S1727316AbfKMIWt (ORCPT
+        <rfc822;linux-block@vger.kernel.org>);
+        Wed, 13 Nov 2019 03:22:49 -0500
+Received: by mail-oi1-f195.google.com with SMTP id a14so1021071oid.5
+        for <linux-block@vger.kernel.org>; Wed, 13 Nov 2019 00:22:48 -0800 (PST)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=ffwll.ch; s=google;
+        h=mime-version:references:in-reply-to:from:date:message-id:subject:to
+         :cc;
+        bh=9ayY6gCXrrA3VgRAyrp2bK0EyrP0ektptyzgRBWzw5I=;
+        b=A+5ZDAwm0sisXEXV26bplYhx0LMI9tSEqcz5XKqugaaiNBsieQDhWSu2ezHIxsk3ok
+         PapqJ40EqXbuXexGXvb3dctMfbGHjaFuYDAai4pvCrk3ttwW8fkWJFMlnWK5Sh3WDfzP
+         au9tTKQUHDCal3qSVw21r18Mu3ZTlLggTEjdE=
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20161025;
+        h=x-gm-message-state:mime-version:references:in-reply-to:from:date
+         :message-id:subject:to:cc;
+        bh=9ayY6gCXrrA3VgRAyrp2bK0EyrP0ektptyzgRBWzw5I=;
+        b=TBv3WVEKjB5wYODRV/+Johs9hpeacHlPvQBarUoHNNs4Xmo4Ns1fYt4ZK+zQeLW8CY
+         p6igHybk86f2FnMu8p/LczxciZ0m3sotXs99vPGOtt5peODtlCttvPLlMyjP2waWGFjW
+         GYqMUOlhtomq+GQThExocFvlMjUT84IvgZfhEQWvpc4MaIdp/ZQA4RKdtkf47Aqq+ZVw
+         S8bE1dkADBC2Evxe9g4OfpbpsqAtoc4Qzrd1AQi8Xl/72a3h3pEeUJVJGvqn/Z5H57QZ
+         RqF8QS1imIpB7ZRKLvvdJnjwIbG4Zi+1BbTIFEFkgkEatZEhS7yteeH/Bx1nvjkCz17p
+         XSTw==
+X-Gm-Message-State: APjAAAVqPEskqG/ciIjOwS0zf/JNdngD5Qip2pjFp2bfgd/gbAmuh0m3
+        FbDuvW4Wki7cYlYXycw212B0GbQzxb9vHecT/RWoiA==
+X-Google-Smtp-Source: APXvYqxfSdLpxppf1Yvj8Pnz7e2iZsxyqjYKBICjfkF8MEX8zkGbqRRzZo57EW2FfCAXfyKFCc6JsAljOesoFoCv0a8=
+X-Received: by 2002:a05:6808:4cf:: with SMTP id a15mr1806257oie.132.1573633368138;
+ Wed, 13 Nov 2019 00:22:48 -0800 (PST)
+MIME-Version: 1.0
+References: <20191112000700.3455038-1-jhubbard@nvidia.com> <20191112203802.GD5584@ziepe.ca>
+ <02fa935c-3469-b766-b691-5660084b60b9@nvidia.com>
+In-Reply-To: <02fa935c-3469-b766-b691-5660084b60b9@nvidia.com>
+From:   Daniel Vetter <daniel@ffwll.ch>
+Date:   Wed, 13 Nov 2019 09:22:36 +0100
+Message-ID: <CAKMK7uHvk+ti00mCCF2006U003w1dofFg9nSfmZ4bS2Z2pEDNQ@mail.gmail.com>
+Subject: Re: [PATCH v3 00/23] mm/gup: track dma-pinned pages: FOLL_PIN, FOLL_LONGTERM
+To:     John Hubbard <jhubbard@nvidia.com>
+Cc:     Jason Gunthorpe <jgg@ziepe.ca>,
+        Andrew Morton <akpm@linux-foundation.org>,
+        Al Viro <viro@zeniv.linux.org.uk>,
+        Alex Williamson <alex.williamson@redhat.com>,
+        Benjamin Herrenschmidt <benh@kernel.crashing.org>,
+        =?UTF-8?B?QmrDtnJuIFTDtnBlbA==?= <bjorn.topel@intel.com>,
+        Christoph Hellwig <hch@infradead.org>,
+        Dan Williams <dan.j.williams@intel.com>,
+        Dave Chinner <david@fromorbit.com>,
+        David Airlie <airlied@linux.ie>,
+        "David S . Miller" <davem@davemloft.net>,
+        Ira Weiny <ira.weiny@intel.com>, Jan Kara <jack@suse.cz>,
+        Jens Axboe <axboe@kernel.dk>, Jonathan Corbet <corbet@lwn.net>,
+        =?UTF-8?B?SsOpcsO0bWUgR2xpc3Nl?= <jglisse@redhat.com>,
+        Magnus Karlsson <magnus.karlsson@intel.com>,
+        Mauro Carvalho Chehab <mchehab@kernel.org>,
+        Michael Ellerman <mpe@ellerman.id.au>,
+        Michal Hocko <mhocko@suse.com>,
+        Mike Kravetz <mike.kravetz@oracle.com>,
+        Paul Mackerras <paulus@samba.org>,
+        Shuah Khan <shuah@kernel.org>,
+        Vlastimil Babka <vbabka@suse.cz>, bpf <bpf@vger.kernel.org>,
+        dri-devel <dri-devel@lists.freedesktop.org>, kvm@vger.kernel.org,
+        linux-block@vger.kernel.org,
+        Linux Doc Mailing List <linux-doc@vger.kernel.org>,
+        linux-fsdevel@vger.kernel.org,
+        "open list:KERNEL SELFTEST FRAMEWORK" 
+        <linux-kselftest@vger.kernel.org>,
+        "open list:DMA BUFFER SHARING FRAMEWORK" 
+        <linux-media@vger.kernel.org>, linux-rdma@vger.kernel.org,
+        linuxppc-dev <linuxppc-dev@lists.ozlabs.org>,
+        netdev <netdev@vger.kernel.org>, Linux MM <linux-mm@kvack.org>,
+        LKML <linux-kernel@vger.kernel.org>
+Content-Type: text/plain; charset="UTF-8"
 Sender: linux-block-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-From: Christoph Hellwig <hch@lst.de>
+On Tue, Nov 12, 2019 at 10:10 PM John Hubbard <jhubbard@nvidia.com> wrote:
+>
+> On 11/12/19 12:38 PM, Jason Gunthorpe wrote:
+> > On Mon, Nov 11, 2019 at 04:06:37PM -0800, John Hubbard wrote:
+> >> Hi,
+> >>
+> >> The cover letter is long, so the more important stuff is first:
+> >>
+> >> * Jason, if you or someone could look at the the VFIO cleanup (patch 8)
+> >>   and conversion to FOLL_PIN (patch 18), to make sure it's use of
+> >>   remote and longterm gup matches what we discussed during the review
+> >>   of v2, I'd appreciate it.
+> >>
+> >> * Also for Jason and IB: as noted below, in patch 11, I am (too?) boldly
+> >>   converting from put_user_pages() to release_pages().
+> >
+> > Why are we doing this? I think things got confused here someplace, as
+>
+>
+> Because:
+>
+> a) These need put_page() calls,  and
+>
+> b) there is no put_pages() call, but there is a release_pages() call that
+> is, arguably, what put_pages() would be.
+>
+>
+> > the comment still says:
+> >
+> > /**
+> >  * put_user_page() - release a gup-pinned page
+> >  * @page:            pointer to page to be released
+> >  *
+> >  * Pages that were pinned via get_user_pages*() must be released via
+> >  * either put_user_page(), or one of the put_user_pages*() routines
+> >  * below.
+>
+>
+> Ohhh, I missed those comments. They need to all be changed over to
+> say "pages that were pinned via pin_user_pages*() or
+> pin_longterm_pages*() must be released via put_user_page*()."
+>
+> The get_user_pages*() pages must still be released via put_page.
+>
+> The churn is due to a fairly significant change in strategy, whis
+> is: instead of changing all get_user_pages*() sites to call
+> put_user_page(), change selected sites to call pin_user_pages*() or
+> pin_longterm_pages*(), plus put_user_page().
 
-None of the exported bcache symbols are actually used anywhere.
+Can't we call this unpin_user_page then, for some symmetry? Or is that
+even more churn?
 
-Signed-off-by: Christoph Hellwig <hch@lst.de>
-Signed-off-by: Coly Li <colyli@suse.de>
----
- drivers/md/bcache/bset.c    | 15 ---------------
- drivers/md/bcache/closure.c |  7 -------
- 2 files changed, 22 deletions(-)
+Looking from afar the naming here seems really confusing.
+-Daniel
 
-diff --git a/drivers/md/bcache/bset.c b/drivers/md/bcache/bset.c
-index f37a429f093d..cffcdc9feefb 100644
---- a/drivers/md/bcache/bset.c
-+++ b/drivers/md/bcache/bset.c
-@@ -311,7 +311,6 @@ void bch_btree_keys_free(struct btree_keys *b)
- 	t->tree = NULL;
- 	t->data = NULL;
- }
--EXPORT_SYMBOL(bch_btree_keys_free);
- 
- int bch_btree_keys_alloc(struct btree_keys *b,
- 			 unsigned int page_order,
-@@ -344,7 +343,6 @@ int bch_btree_keys_alloc(struct btree_keys *b,
- 	bch_btree_keys_free(b);
- 	return -ENOMEM;
- }
--EXPORT_SYMBOL(bch_btree_keys_alloc);
- 
- void bch_btree_keys_init(struct btree_keys *b, const struct btree_keys_ops *ops,
- 			 bool *expensive_debug_checks)
-@@ -363,7 +361,6 @@ void bch_btree_keys_init(struct btree_keys *b, const struct btree_keys_ops *ops,
- 	 * any more.
- 	 */
- }
--EXPORT_SYMBOL(bch_btree_keys_init);
- 
- /* Binary tree stuff for auxiliary search trees */
- 
-@@ -680,7 +677,6 @@ void bch_bset_init_next(struct btree_keys *b, struct bset *i, uint64_t magic)
- 
- 	bch_bset_build_unwritten_tree(b);
- }
--EXPORT_SYMBOL(bch_bset_init_next);
- 
- /*
-  * Build auxiliary binary tree 'struct bset_tree *t', this tree is used to
-@@ -734,7 +730,6 @@ void bch_bset_build_written_tree(struct btree_keys *b)
- 	     j = inorder_next(j, t->size))
- 		make_bfloat(t, j);
- }
--EXPORT_SYMBOL(bch_bset_build_written_tree);
- 
- /* Insert */
- 
-@@ -782,7 +777,6 @@ fix_right:	do {
- 			j = j * 2 + 1;
- 		} while (j < t->size);
- }
--EXPORT_SYMBOL(bch_bset_fix_invalidated_key);
- 
- static void bch_bset_fix_lookup_table(struct btree_keys *b,
- 				      struct bset_tree *t,
-@@ -857,7 +851,6 @@ bool bch_bkey_try_merge(struct btree_keys *b, struct bkey *l, struct bkey *r)
- 
- 	return b->ops->key_merge(b, l, r);
- }
--EXPORT_SYMBOL(bch_bkey_try_merge);
- 
- void bch_bset_insert(struct btree_keys *b, struct bkey *where,
- 		     struct bkey *insert)
-@@ -877,7 +870,6 @@ void bch_bset_insert(struct btree_keys *b, struct bkey *where,
- 	bkey_copy(where, insert);
- 	bch_bset_fix_lookup_table(b, t, where);
- }
--EXPORT_SYMBOL(bch_bset_insert);
- 
- unsigned int bch_btree_insert_key(struct btree_keys *b, struct bkey *k,
- 			      struct bkey *replace_key)
-@@ -933,7 +925,6 @@ copy:	bkey_copy(m, k);
- merged:
- 	return status;
- }
--EXPORT_SYMBOL(bch_btree_insert_key);
- 
- /* Lookup */
- 
-@@ -1079,7 +1070,6 @@ struct bkey *__bch_bset_search(struct btree_keys *b, struct bset_tree *t,
- 
- 	return i.l;
- }
--EXPORT_SYMBOL(__bch_bset_search);
- 
- /* Btree iterator */
- 
-@@ -1134,7 +1124,6 @@ struct bkey *bch_btree_iter_init(struct btree_keys *b,
- {
- 	return __bch_btree_iter_init(b, iter, search, b->set);
- }
--EXPORT_SYMBOL(bch_btree_iter_init);
- 
- static inline struct bkey *__bch_btree_iter_next(struct btree_iter *iter,
- 						 btree_iter_cmp_fn *cmp)
-@@ -1167,7 +1156,6 @@ struct bkey *bch_btree_iter_next(struct btree_iter *iter)
- 	return __bch_btree_iter_next(iter, btree_iter_cmp);
- 
- }
--EXPORT_SYMBOL(bch_btree_iter_next);
- 
- struct bkey *bch_btree_iter_next_filter(struct btree_iter *iter,
- 					struct btree_keys *b, ptr_filter_fn fn)
-@@ -1198,7 +1186,6 @@ int bch_bset_sort_state_init(struct bset_sort_state *state,
- 
- 	return mempool_init_page_pool(&state->pool, 1, page_order);
- }
--EXPORT_SYMBOL(bch_bset_sort_state_init);
- 
- static void btree_mergesort(struct btree_keys *b, struct bset *out,
- 			    struct btree_iter *iter,
-@@ -1315,7 +1302,6 @@ void bch_btree_sort_partial(struct btree_keys *b, unsigned int start,
- 
- 	EBUG_ON(oldsize >= 0 && bch_count_data(b) != oldsize);
- }
--EXPORT_SYMBOL(bch_btree_sort_partial);
- 
- void bch_btree_sort_and_fix_extents(struct btree_keys *b,
- 				    struct btree_iter *iter,
-@@ -1368,7 +1354,6 @@ void bch_btree_sort_lazy(struct btree_keys *b, struct bset_sort_state *state)
- out:
- 	bch_bset_build_written_tree(b);
- }
--EXPORT_SYMBOL(bch_btree_sort_lazy);
- 
- void bch_btree_keys_stats(struct btree_keys *b, struct bset_stats *stats)
- {
-diff --git a/drivers/md/bcache/closure.c b/drivers/md/bcache/closure.c
-index c12cd809ab19..0164a1fe94a9 100644
---- a/drivers/md/bcache/closure.c
-+++ b/drivers/md/bcache/closure.c
-@@ -45,7 +45,6 @@ void closure_sub(struct closure *cl, int v)
- {
- 	closure_put_after_sub(cl, atomic_sub_return(v, &cl->remaining));
- }
--EXPORT_SYMBOL(closure_sub);
- 
- /*
-  * closure_put - decrement a closure's refcount
-@@ -54,7 +53,6 @@ void closure_put(struct closure *cl)
- {
- 	closure_put_after_sub(cl, atomic_dec_return(&cl->remaining));
- }
--EXPORT_SYMBOL(closure_put);
- 
- /*
-  * closure_wake_up - wake up all closures on a wait list, without memory barrier
-@@ -76,7 +74,6 @@ void __closure_wake_up(struct closure_waitlist *wait_list)
- 		closure_sub(cl, CLOSURE_WAITING + 1);
- 	}
- }
--EXPORT_SYMBOL(__closure_wake_up);
- 
- /**
-  * closure_wait - add a closure to a waitlist
-@@ -96,7 +93,6 @@ bool closure_wait(struct closure_waitlist *waitlist, struct closure *cl)
- 
- 	return true;
- }
--EXPORT_SYMBOL(closure_wait);
- 
- struct closure_syncer {
- 	struct task_struct	*task;
-@@ -131,7 +127,6 @@ void __sched __closure_sync(struct closure *cl)
- 
- 	__set_current_state(TASK_RUNNING);
- }
--EXPORT_SYMBOL(__closure_sync);
- 
- #ifdef CONFIG_BCACHE_CLOSURES_DEBUG
- 
-@@ -149,7 +144,6 @@ void closure_debug_create(struct closure *cl)
- 	list_add(&cl->all, &closure_list);
- 	spin_unlock_irqrestore(&closure_list_lock, flags);
- }
--EXPORT_SYMBOL(closure_debug_create);
- 
- void closure_debug_destroy(struct closure *cl)
- {
-@@ -162,7 +156,6 @@ void closure_debug_destroy(struct closure *cl)
- 	list_del(&cl->all);
- 	spin_unlock_irqrestore(&closure_list_lock, flags);
- }
--EXPORT_SYMBOL(closure_debug_destroy);
- 
- static struct dentry *closure_debug;
- 
+> That allows incrementally converting the kernel over to using the
+> new pin APIs, without taking on the huge risk of a big one-shot
+> conversion.
+>
+> So, I've ended up with one place that actually needs to get reverted
+> back to get_user_pages(), and that's the IB ODP code.
+>
+> >
+> > I feel like if put_user_pages() is not the correct way to undo
+> > get_user_pages() then it needs to be deleted.
+> >
+>
+> Yes, you're right. I'll fix the put_user_page comments() as described.
+>
+>
+> thanks,
+>
+> John Hubbard
+> NVIDIA
+
+
+
 -- 
-2.16.4
-
+Daniel Vetter
+Software Engineer, Intel Corporation
++41 (0) 79 365 57 48 - http://blog.ffwll.ch
