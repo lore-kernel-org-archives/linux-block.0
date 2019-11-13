@@ -7,47 +7,47 @@ X-Spam-Status: No, score=-10.1 required=3.0 tests=DKIMWL_WL_HIGH,DKIM_SIGNED,
 	SPF_HELO_NONE,SPF_PASS,USER_AGENT_GIT autolearn=unavailable
 	autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 1A41CC17448
-	for <linux-block@archiver.kernel.org>; Wed, 13 Nov 2019 02:19:19 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id CEB1CC17440
+	for <linux-block@archiver.kernel.org>; Wed, 13 Nov 2019 02:19:25 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.kernel.org (Postfix) with ESMTP id E469D222CA
-	for <linux-block@archiver.kernel.org>; Wed, 13 Nov 2019 02:19:18 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id A31ED2084E
+	for <linux-block@archiver.kernel.org>; Wed, 13 Nov 2019 02:19:25 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=default; t=1573611559;
-	bh=m5hJaHVZrLSf1mJK7b9kB9bQlJxzbNzPsHf/khSsGYc=;
+	s=default; t=1573611565;
+	bh=I/hN7bioODU5zQWOx0AH4pWxYq6n0Y2wxs/LWEPYvns=;
 	h=From:To:Cc:Subject:Date:In-Reply-To:References:List-ID:From;
-	b=lMWYASxbQWBswUGFj9byrNdaGdqOWDy8Om4jbUct3KSEBBL79OenoAiBFG+9aSKxu
-	 bEQPz336e1qaog7/+Z08ohEDoPbaJ3rDsKIEuFJOZIG6gb1Z61GKqZC9FyeCkNhZB1
-	 39GA+mw8Jz92jfZwX12Q85Ym4ZFjleY9H7D6O7Wg=
+	b=csxgPJ2ZFyOcLgYzku0zs7rVzVPOdzE6ur2eX15+5gCsKYlpXOaCLOIYLxFyYzMyi
+	 +CmC9mNE/zP7MujTh1+9VUeP9l49i5RdxSIF5p/mgfaWUcutylfoj1qUDuoVfb+rda
+	 t/FcHVl7XATI7F2IFfwtOrysUx7KAb4y6d8E0jh8=
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1729072AbfKMBzV (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Tue, 12 Nov 2019 20:55:21 -0500
-Received: from mail.kernel.org ([198.145.29.99]:46868 "EHLO mail.kernel.org"
+        id S1729065AbfKMBzS (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Tue, 12 Nov 2019 20:55:18 -0500
+Received: from mail.kernel.org ([198.145.29.99]:46790 "EHLO mail.kernel.org"
         rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-        id S1728192AbfKMBzU (ORCPT <rfc822;linux-block@vger.kernel.org>);
-        Tue, 12 Nov 2019 20:55:20 -0500
+        id S1729060AbfKMBzR (ORCPT <rfc822;linux-block@vger.kernel.org>);
+        Tue, 12 Nov 2019 20:55:17 -0500
 Received: from sasha-vm.mshome.net (c-73-47-72-35.hsd1.nh.comcast.net [73.47.72.35])
         (using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
         (No client certificate requested)
-        by mail.kernel.org (Postfix) with ESMTPSA id AF7C522459;
-        Wed, 13 Nov 2019 01:55:18 +0000 (UTC)
+        by mail.kernel.org (Postfix) with ESMTPSA id 43C70204EC;
+        Wed, 13 Nov 2019 01:55:16 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-        s=default; t=1573610119;
-        bh=m5hJaHVZrLSf1mJK7b9kB9bQlJxzbNzPsHf/khSsGYc=;
+        s=default; t=1573610117;
+        bh=I/hN7bioODU5zQWOx0AH4pWxYq6n0Y2wxs/LWEPYvns=;
         h=From:To:Cc:Subject:Date:In-Reply-To:References:From;
-        b=tknK1Y175UjN4Bp6DkunMod6WVv5KmGe/ZCsxGjoSr5HlXjvZWupQtAntXc0VM3/w
-         PynHgwI5KApOh8nZaoVsIqXyQEtJXNmSFlsoVQzEK1cAPF5NBcF/1vC5bXic1gcTsB
-         CFf3DOFKca/aS0dTDu4kn4NLlpf1hWYWO4Q+PrHM=
+        b=js7SRVYBpotuyGpXgiE/BVxpcpD9ngdcX9oEV0PcG7TfONC7GWlSlps4jT9BbHX1x
+         a1Mjzld0+ax/kpdw2hTu9oKG6ZbtOTi2/ZK1XsIAmg/oO+kQxBULPrZQRQBPMOcz5n
+         0K6ZTpgOcl8ehDZp5wgQzomS4JBXqy9geem82Jxs=
 From:   Sasha Levin <sashal@kernel.org>
 To:     linux-kernel@vger.kernel.org, stable@vger.kernel.org
-Cc:     Wei Yongjun <weiyongjun1@huawei.com>,
-        Hans Holmberg <hans.holmberg@cnexlabs.com>,
+Cc:     =?UTF-8?q?Javier=20Gonz=C3=A1lez?= <javier@javigon.com>,
+        =?UTF-8?q?Javier=20Gonz=C3=A1lez?= <javier@cnexlabs.com>,
         =?UTF-8?q?Matias=20Bj=C3=B8rling?= <mb@lightnvm.io>,
         Jens Axboe <axboe@kernel.dk>, Sasha Levin <sashal@kernel.org>,
         linux-block@vger.kernel.org
-Subject: [PATCH AUTOSEL 4.19 174/209] lightnvm: pblk: fix error handling of pblk_lines_init()
-Date:   Tue, 12 Nov 2019 20:49:50 -0500
-Message-Id: <20191113015025.9685-174-sashal@kernel.org>
+Subject: [PATCH AUTOSEL 4.19 172/209] lightnvm: pblk: guarantee mw_cunits on read buffer
+Date:   Tue, 12 Nov 2019 20:49:48 -0500
+Message-Id: <20191113015025.9685-172-sashal@kernel.org>
 X-Mailer: git-send-email 2.20.1
 In-Reply-To: <20191113015025.9685-1-sashal@kernel.org>
 References: <20191113015025.9685-1-sashal@kernel.org>
@@ -61,16 +61,29 @@ Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-From: Wei Yongjun <weiyongjun1@huawei.com>
+From: Javier González <javier@javigon.com>
 
-[ Upstream commit a70985f83c625a5eaf618be81621e5e4521a66c6 ]
+[ Upstream commit d672d92d9c433c365fd6cdb4da1c02562b5f1178 ]
 
-In the too many bad blocks error handling case, we should release all
-the allocated resources, otherwise it will cause memory leak.
+OCSSD 2.0 defines the amount of data that the host must buffer per chunk
+to guarantee reads through the geometry field mw_cunits. This value is
+the base that pblk uses to determine the size of its read buffer.
+Currently, this size is set to be the closes power-of-2 to mw_cunits
+times the number of parallel units available to the pblk instance for
+each open line (currently one). When an entry (4KB) is put in the
+buffer, the L2P table points to it. As the buffer wraps up, the L2P is
+updated to point to addresses on the device, thus guaranteeing mw_cunits
+at a chunk level.
 
-Fixes: 2deeefc02dff ("lightnvm: pblk: fail gracefully on line alloc. failure")
-Signed-off-by: Wei Yongjun <weiyongjun1@huawei.com>
-Reviewed-by: Hans Holmberg <hans.holmberg@cnexlabs.com>
+However, given that pblk cannot write to the device under ws_min
+(normally ws_opt), there might be a window in which the buffer starts
+wrapping up and updating L2P entries before the mw_cunits value in a
+chunk has been surpassed.
+
+In order not to violate the mw_cunits constrain in this case, account
+for ws_opt on the read buffer creation.
+
+Signed-off-by: Javier González <javier@cnexlabs.com>
 Signed-off-by: Matias Bjørling <mb@lightnvm.io>
 Signed-off-by: Jens Axboe <axboe@kernel.dk>
 Signed-off-by: Sasha Levin <sashal@kernel.org>
@@ -79,19 +92,19 @@ Signed-off-by: Sasha Levin <sashal@kernel.org>
  1 file changed, 2 insertions(+), 1 deletion(-)
 
 diff --git a/drivers/lightnvm/pblk-init.c b/drivers/lightnvm/pblk-init.c
-index dc32274881b2f..91fd2b291db91 100644
+index 145922589b0c6..dc32274881b2f 100644
 --- a/drivers/lightnvm/pblk-init.c
 +++ b/drivers/lightnvm/pblk-init.c
-@@ -1084,7 +1084,8 @@ static int pblk_lines_init(struct pblk *pblk)
+@@ -181,7 +181,8 @@ static int pblk_rwb_init(struct pblk *pblk)
+ 	unsigned int power_size, power_seg_sz;
+ 	int pgs_in_buffer;
  
- 	if (!nr_free_chks) {
- 		pblk_err(pblk, "too many bad blocks prevent for sane instance\n");
--		return -EINTR;
-+		ret = -EINTR;
-+		goto fail_free_lines;
- 	}
+-	pgs_in_buffer = max(geo->mw_cunits, geo->ws_opt) * geo->all_luns;
++	pgs_in_buffer = (max(geo->mw_cunits, geo->ws_opt) + geo->ws_opt)
++								* geo->all_luns;
  
- 	pblk_set_provision(pblk, nr_free_chks);
+ 	if (write_buffer_size && (write_buffer_size > pgs_in_buffer))
+ 		buffer_size = write_buffer_size;
 -- 
 2.20.1
 
