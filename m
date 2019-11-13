@@ -5,38 +5,38 @@ X-Spam-Level:
 X-Spam-Status: No, score=-9.9 required=3.0 tests=DKIMWL_WL_HIGH,DKIM_SIGNED,
 	DKIM_VALID,DKIM_VALID_AU,HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,
 	MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,USER_AGENT_GIT
-	autolearn=unavailable autolearn_force=no version=3.4.0
+	autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id EF744C17449
-	for <linux-block@archiver.kernel.org>; Wed, 13 Nov 2019 04:27:16 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 841C9C43331
+	for <linux-block@archiver.kernel.org>; Wed, 13 Nov 2019 04:27:22 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.kernel.org (Postfix) with ESMTP id C7CD92245C
-	for <linux-block@archiver.kernel.org>; Wed, 13 Nov 2019 04:27:16 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id 38DAB22466
+	for <linux-block@archiver.kernel.org>; Wed, 13 Nov 2019 04:27:22 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=pass (2048-bit key) header.d=nvidia.com header.i=@nvidia.com header.b="pj6M3Paz"
+	dkim=pass (2048-bit key) header.d=nvidia.com header.i=@nvidia.com header.b="GngBZrY3"
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1727211AbfKME1Q (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Tue, 12 Nov 2019 23:27:16 -0500
-Received: from hqemgate15.nvidia.com ([216.228.121.64]:13623 "EHLO
-        hqemgate15.nvidia.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1726995AbfKME1P (ORCPT
+        id S1727642AbfKME1U (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Tue, 12 Nov 2019 23:27:20 -0500
+Received: from hqemgate14.nvidia.com ([216.228.121.143]:18574 "EHLO
+        hqemgate14.nvidia.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S1727344AbfKME1T (ORCPT
         <rfc822;linux-block@vger.kernel.org>);
-        Tue, 12 Nov 2019 23:27:15 -0500
-Received: from hqpgpgate102.nvidia.com (Not Verified[216.228.121.13]) by hqemgate15.nvidia.com (using TLS: TLSv1.2, DES-CBC3-SHA)
-        id <B5dcb86200000>; Tue, 12 Nov 2019 20:27:12 -0800
+        Tue, 12 Nov 2019 23:27:19 -0500
+Received: from hqpgpgate101.nvidia.com (Not Verified[216.228.121.13]) by hqemgate14.nvidia.com (using TLS: TLSv1.2, DES-CBC3-SHA)
+        id <B5dcb86250000>; Tue, 12 Nov 2019 20:27:17 -0800
 Received: from hqmail.nvidia.com ([172.20.161.6])
-  by hqpgpgate102.nvidia.com (PGP Universal service);
-  Tue, 12 Nov 2019 20:27:12 -0800
+  by hqpgpgate101.nvidia.com (PGP Universal service);
+  Tue, 12 Nov 2019 20:27:14 -0800
 X-PGP-Universal: processed;
-        by hqpgpgate102.nvidia.com on Tue, 12 Nov 2019 20:27:12 -0800
-Received: from HQMAIL101.nvidia.com (172.20.187.10) by HQMAIL105.nvidia.com
- (172.20.187.12) with Microsoft SMTP Server (TLS) id 15.0.1473.3; Wed, 13 Nov
- 2019 04:27:12 +0000
-Received: from hqnvemgw03.nvidia.com (10.124.88.68) by HQMAIL101.nvidia.com
- (172.20.187.10) with Microsoft SMTP Server (TLS) id 15.0.1473.3 via Frontend
- Transport; Wed, 13 Nov 2019 04:27:12 +0000
+        by hqpgpgate101.nvidia.com on Tue, 12 Nov 2019 20:27:14 -0800
+Received: from HQMAIL107.nvidia.com (172.20.187.13) by HQMAIL107.nvidia.com
+ (172.20.187.13) with Microsoft SMTP Server (TLS) id 15.0.1473.3; Wed, 13 Nov
+ 2019 04:27:13 +0000
+Received: from hqnvemgw03.nvidia.com (10.124.88.68) by HQMAIL107.nvidia.com
+ (172.20.187.13) with Microsoft SMTP Server (TLS) id 15.0.1473.3 via Frontend
+ Transport; Wed, 13 Nov 2019 04:27:13 +0000
 Received: from blueforge.nvidia.com (Not Verified[10.110.48.28]) by hqnvemgw03.nvidia.com with Trustwave SEG (v7,5,8,10121)
-        id <B5dcb86200000>; Tue, 12 Nov 2019 20:27:12 -0800
+        id <B5dcb86210007>; Tue, 12 Nov 2019 20:27:13 -0800
 From:   John Hubbard <jhubbard@nvidia.com>
 To:     Andrew Morton <akpm@linux-foundation.org>
 CC:     Al Viro <viro@zeniv.linux.org.uk>,
@@ -68,200 +68,238 @@ CC:     Al Viro <viro@zeniv.linux.org.uk>,
         <linuxppc-dev@lists.ozlabs.org>, <netdev@vger.kernel.org>,
         <linux-mm@kvack.org>, LKML <linux-kernel@vger.kernel.org>,
         John Hubbard <jhubbard@nvidia.com>
-Subject: [PATCH v4 04/23] mm: devmap: refactor 1-based refcounting for ZONE_DEVICE pages
-Date:   Tue, 12 Nov 2019 20:26:51 -0800
-Message-ID: <20191113042710.3997854-5-jhubbard@nvidia.com>
+Subject: [PATCH v4 21/23] mm/gup_benchmark: support pin_user_pages() and related calls
+Date:   Tue, 12 Nov 2019 20:27:08 -0800
+Message-ID: <20191113042710.3997854-22-jhubbard@nvidia.com>
 X-Mailer: git-send-email 2.24.0
 In-Reply-To: <20191113042710.3997854-1-jhubbard@nvidia.com>
 References: <20191113042710.3997854-1-jhubbard@nvidia.com>
 MIME-Version: 1.0
 X-NVConfidentiality: public
-Content-Type: text/plain; charset="UTF-8"
 Content-Transfer-Encoding: quoted-printable
+Content-Type: text/plain
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=nvidia.com; s=n1;
-        t=1573619232; bh=eh5PKTqFnv3H2C1oWk46Hm4jlzYBaiSiPR2xbAo8/Xk=;
+        t=1573619237; bh=qDCGllxYSTERl727bBBMP3MdnPP+9frqWZ2/7CRJeGs=;
         h=X-PGP-Universal:From:To:CC:Subject:Date:Message-ID:X-Mailer:
          In-Reply-To:References:MIME-Version:X-NVConfidentiality:
-         Content-Type:Content-Transfer-Encoding;
-        b=pj6M3Paz4Jb8s/zkr4xbcn7V9rw85SFVXQf2t/30nSh5HeFhZtiu6L2TDkY9LXdBk
-         qmFAmsMXW8K9aqONmx5rzpgcKrp7KyoDoxEcKWWeF72f2hFzO1rgnvWA62qGpVpJpw
-         Fji+h0aQkFAXAMnKj3pPlPYU48JG4GZyXfD/6m7PagtSohgBgvIQp6tKddm+C3WJk9
-         XcFpVY0yWtBnkeMgSj0/b7hydd7pek7qPo7vhnlFkZz0SUdf+MdspBaUtaMwS2wKLd
-         hFWYy6ySeXIEnL5hOSCfBW1tz3UyYdy4KyiOziT+U/tvErynTern5gpDgfTipG7fZf
-         A69nwyNvr8ktQ==
+         Content-Transfer-Encoding:Content-Type;
+        b=GngBZrY3L0I1MEQkNJkLis3/3dvW1B9ha9d0we70Rd7Grw3nJ1Q2QY5ZaDBWZgewK
+         0GukNlCdpY6HNaw8qg4TLwK39SxSwex7JNYD7x9mRJpvoAl4X/kXbrIdaT9dEARUWt
+         ICi1c5fNpZZDNdMBAWasGwsX8tJ8iyDLv6kPhG4wbYYYsFOX1MZB16OlDwWmEs1KL3
+         4okvL/DgkXfwsTikpS24t0N84abwF4foLM+UAplyHqIoY24AcnW5EiVaTEK54VW5VR
+         eIK501CIa6GOFqQu23XX27mPYlmhOJ6Z48bOyNVBpn/LQhLsQ8aXvYHtobA6iJZFbx
+         QcVkpxhaefo5Q==
 Sender: linux-block-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-An upcoming patch changes and complicates the refcounting and
-especially the "put page" aspects of it. In order to keep
-everything clean, refactor the devmap page release routines:
+Up until now, gup_benchmark supported testing of the
+following kernel functions:
 
-* Rename put_devmap_managed_page() to page_is_devmap_managed(),
-  and limit the functionality to "read only": return a bool,
-  with no side effects.
+* get_user_pages(): via the '-U' command line option
+* get_user_pages_longterm(): via the '-L' command line option
+* get_user_pages_fast(): as the default (no options required)
 
-* Add a new routine, put_devmap_managed_page(), to handle checking
-  what kind of page it is, and what kind of refcount handling it
-  requires.
+Add test coverage for the new corresponding pin_*() functions:
 
-* Rename __put_devmap_managed_page() to free_devmap_managed_page(),
-  and limit the functionality to unconditionally freeing a devmap
-  page.
+* pin_user_pages(): via the '-c' command line option
+* pin_longterm_pages(): via the '-b' command line option
+* pin_user_pages_fast(): via the '-a' command line option
 
-This is originally based on a separate patch by Ira Weiny, which
-applied to an early version of the put_user_page() experiments.
-Since then, J=C3=A9r=C3=B4me Glisse suggested the refactoring described abo=
-ve.
+Also, add an option for clarity: '-u' for what is now (still) the
+default choice: get_user_pages_fast().
 
-Suggested-by: J=C3=A9r=C3=B4me Glisse <jglisse@redhat.com>
-Signed-off-by: Ira Weiny <ira.weiny@intel.com>
+Also, for the three commands that set FOLL_PIN, verify that the pages
+really are dma-pinned, via the new is_dma_pinned() routine.
+Those commands are:
+
+    PIN_FAST_BENCHMARK     : calls pin_user_pages_fast()
+    PIN_LONGTERM_BENCHMARK : calls pin_longterm_pages()
+    PIN_BENCHMARK          : calls pin_user_pages()
+
+In between the calls to pin_*() and put_user_pages(),
+check each page: if page_dma_pinned() returns false, then
+WARN and return.
+
+Do this outside of the benchmark timestamps, so that it doesn't
+affect reported times.
+
 Signed-off-by: John Hubbard <jhubbard@nvidia.com>
 ---
- include/linux/mm.h | 27 ++++++++++++++++---
- mm/memremap.c      | 67 ++++++++++++++++++++--------------------------
- 2 files changed, 53 insertions(+), 41 deletions(-)
+ mm/gup_benchmark.c                         | 73 ++++++++++++++++++++--
+ tools/testing/selftests/vm/gup_benchmark.c | 23 ++++++-
+ 2 files changed, 90 insertions(+), 6 deletions(-)
 
-diff --git a/include/linux/mm.h b/include/linux/mm.h
-index a2adf95b3f9c..96228376139c 100644
---- a/include/linux/mm.h
-+++ b/include/linux/mm.h
-@@ -967,9 +967,10 @@ static inline bool is_zone_device_page(const struct pa=
-ge *page)
- #endif
+diff --git a/mm/gup_benchmark.c b/mm/gup_benchmark.c
+index 7fc44d25eca7..8f980d91dbf5 100644
+--- a/mm/gup_benchmark.c
++++ b/mm/gup_benchmark.c
+@@ -8,6 +8,9 @@
+ #define GUP_FAST_BENCHMARK	_IOWR('g', 1, struct gup_benchmark)
+ #define GUP_LONGTERM_BENCHMARK	_IOWR('g', 2, struct gup_benchmark)
+ #define GUP_BENCHMARK		_IOWR('g', 3, struct gup_benchmark)
++#define PIN_FAST_BENCHMARK	_IOWR('g', 4, struct gup_benchmark)
++#define PIN_LONGTERM_BENCHMARK	_IOWR('g', 5, struct gup_benchmark)
++#define PIN_BENCHMARK		_IOWR('g', 6, struct gup_benchmark)
 =20
- #ifdef CONFIG_DEV_PAGEMAP_OPS
--void __put_devmap_managed_page(struct page *page);
-+void free_devmap_managed_page(struct page *page);
- DECLARE_STATIC_KEY_FALSE(devmap_managed_key);
--static inline bool put_devmap_managed_page(struct page *page)
-+
-+static inline bool page_is_devmap_managed(struct page *page)
- {
- 	if (!static_branch_unlikely(&devmap_managed_key))
- 		return false;
-@@ -978,7 +979,6 @@ static inline bool put_devmap_managed_page(struct page =
-*page)
- 	switch (page->pgmap->type) {
- 	case MEMORY_DEVICE_PRIVATE:
- 	case MEMORY_DEVICE_FS_DAX:
--		__put_devmap_managed_page(page);
- 		return true;
- 	default:
- 		break;
-@@ -986,6 +986,27 @@ static inline bool put_devmap_managed_page(struct page=
- *page)
- 	return false;
- }
+ struct gup_benchmark {
+ 	__u64 get_delta_usec;
+@@ -19,6 +22,44 @@ struct gup_benchmark {
+ 	__u64 expansion[10];	/* For future use */
+ };
 =20
-+static inline bool put_devmap_managed_page(struct page *page)
++static void put_back_pages(int cmd, struct page **pages, unsigned long nr_=
+pages)
 +{
-+	bool is_devmap =3D page_is_devmap_managed(page);
++	int i;
 +
-+	if (is_devmap) {
-+		int count =3D page_ref_dec_return(page);
++	switch (cmd) {
++	case GUP_FAST_BENCHMARK:
++	case GUP_LONGTERM_BENCHMARK:
++	case GUP_BENCHMARK:
++		for (i =3D 0; i < nr_pages; i++)
++			put_page(pages[i]);
++		break;
 +
-+		/*
-+		 * devmap page refcounts are 1-based, rather than 0-based: if
-+		 * refcount is 1, then the page is free and the refcount is
-+		 * stable because nobody holds a reference on the page.
-+		 */
-+		if (count =3D=3D 1)
-+			free_devmap_managed_page(page);
-+		else if (!count)
-+			__put_page(page);
++	case PIN_FAST_BENCHMARK:
++	case PIN_LONGTERM_BENCHMARK:
++	case PIN_BENCHMARK:
++		put_user_pages(pages, nr_pages);
++		break;
 +	}
-+
-+	return is_devmap;
 +}
 +
- #else /* CONFIG_DEV_PAGEMAP_OPS */
- static inline bool put_devmap_managed_page(struct page *page)
- {
-diff --git a/mm/memremap.c b/mm/memremap.c
-index 03ccbdfeb697..bc7e2a27d025 100644
---- a/mm/memremap.c
-+++ b/mm/memremap.c
-@@ -410,48 +410,39 @@ struct dev_pagemap *get_dev_pagemap(unsigned long pfn=
-,
- EXPORT_SYMBOL_GPL(get_dev_pagemap);
-=20
- #ifdef CONFIG_DEV_PAGEMAP_OPS
--void __put_devmap_managed_page(struct page *page)
-+void free_devmap_managed_page(struct page *page)
- {
--	int count =3D page_ref_dec_return(page);
-+	/* Clear Active bit in case of parallel mark_page_accessed */
-+	__ClearPageActive(page);
-+	__ClearPageWaiters(page);
++static void verify_dma_pinned(int cmd, struct page **pages,
++			      unsigned long nr_pages)
++{
++	int i;
 +
-+	mem_cgroup_uncharge(page);
++	switch (cmd) {
++	case PIN_FAST_BENCHMARK:
++	case PIN_LONGTERM_BENCHMARK:
++	case PIN_BENCHMARK:
++		for (i =3D 0; i < nr_pages; i++) {
++			if (WARN(!page_dma_pinned(pages[i]),
++				 "pages[%d] is NOT dma-pinned\n", i))
++				break;
++		}
++		break;
++	}
++}
++
+ static int __gup_benchmark_ioctl(unsigned int cmd,
+ 		struct gup_benchmark *gup)
+ {
+@@ -65,6 +106,18 @@ static int __gup_benchmark_ioctl(unsigned int cmd,
+ 			nr =3D get_user_pages(addr, nr, gup->flags, pages + i,
+ 					    NULL);
+ 			break;
++		case PIN_FAST_BENCHMARK:
++			nr =3D pin_user_pages_fast(addr, nr, gup->flags,
++						 pages + i);
++			break;
++		case PIN_LONGTERM_BENCHMARK:
++			nr =3D pin_longterm_pages(addr, nr, gup->flags, pages + i,
++						NULL);
++			break;
++		case PIN_BENCHMARK:
++			nr =3D pin_user_pages(addr, nr, gup->flags, pages + i,
++					    NULL);
++			break;
+ 		default:
+ 			return -1;
+ 		}
+@@ -75,15 +128,22 @@ static int __gup_benchmark_ioctl(unsigned int cmd,
+ 	}
+ 	end_time =3D ktime_get();
 =20
- 	/*
--	 * If refcount is 1 then page is freed and refcount is stable as nobody
--	 * holds a reference on the page.
-+	 * When a device_private page is freed, the page->mapping field
-+	 * may still contain a (stale) mapping value. For example, the
-+	 * lower bits of page->mapping may still identify the page as
-+	 * an anonymous page. Ultimately, this entire field is just
-+	 * stale and wrong, and it will cause errors if not cleared.
-+	 * One example is:
-+	 *
-+	 *  migrate_vma_pages()
-+	 *    migrate_vma_insert_page()
-+	 *      page_add_new_anon_rmap()
-+	 *        __page_set_anon_rmap()
-+	 *          ...checks page->mapping, via PageAnon(page) call,
-+	 *            and incorrectly concludes that the page is an
-+	 *            anonymous page. Therefore, it incorrectly,
-+	 *            silently fails to set up the new anon rmap.
-+	 *
-+	 * For other types of ZONE_DEVICE pages, migration is either
-+	 * handled differently or not done at all, so there is no need
-+	 * to clear page->mapping.
- 	 */
--	if (count =3D=3D 1) {
--		/* Clear Active bit in case of parallel mark_page_accessed */
--		__ClearPageActive(page);
--		__ClearPageWaiters(page);
--
--		mem_cgroup_uncharge(page);
--
--		/*
--		 * When a device_private page is freed, the page->mapping field
--		 * may still contain a (stale) mapping value. For example, the
--		 * lower bits of page->mapping may still identify the page as
--		 * an anonymous page. Ultimately, this entire field is just
--		 * stale and wrong, and it will cause errors if not cleared.
--		 * One example is:
--		 *
--		 *  migrate_vma_pages()
--		 *    migrate_vma_insert_page()
--		 *      page_add_new_anon_rmap()
--		 *        __page_set_anon_rmap()
--		 *          ...checks page->mapping, via PageAnon(page) call,
--		 *            and incorrectly concludes that the page is an
--		 *            anonymous page. Therefore, it incorrectly,
--		 *            silently fails to set up the new anon rmap.
--		 *
--		 * For other types of ZONE_DEVICE pages, migration is either
--		 * handled differently or not done at all, so there is no need
--		 * to clear page->mapping.
--		 */
--		if (is_device_private_page(page))
--			page->mapping =3D NULL;
-+	if (is_device_private_page(page))
-+		page->mapping =3D NULL;
++	/* Shifting the meaning of nr_pages: now it is actual number pinned: */
++	nr_pages =3D i;
++
+ 	gup->get_delta_usec =3D ktime_us_delta(end_time, start_time);
+ 	gup->size =3D addr - gup->addr;
 =20
--		page->pgmap->ops->page_free(page);
--	} else if (!count)
--		__put_page(page);
-+	page->pgmap->ops->page_free(page);
- }
--EXPORT_SYMBOL(__put_devmap_managed_page);
-+EXPORT_SYMBOL(free_devmap_managed_page);
- #endif /* CONFIG_DEV_PAGEMAP_OPS */
++	/*
++	 * Take an un-benchmark-timed moment to verify DMA pinned
++	 * state: print a warning if any non-dma-pinned pages are found:
++	 */
++	verify_dma_pinned(cmd, pages, nr_pages);
++
+ 	start_time =3D ktime_get();
+-	for (i =3D 0; i < nr_pages; i++) {
+-		if (!pages[i])
+-			break;
+-		put_page(pages[i]);
+-	}
++
++	put_back_pages(cmd, pages, nr_pages);
++
+ 	end_time =3D ktime_get();
+ 	gup->put_delta_usec =3D ktime_us_delta(end_time, start_time);
+=20
+@@ -101,6 +161,9 @@ static long gup_benchmark_ioctl(struct file *filep, uns=
+igned int cmd,
+ 	case GUP_FAST_BENCHMARK:
+ 	case GUP_LONGTERM_BENCHMARK:
+ 	case GUP_BENCHMARK:
++	case PIN_FAST_BENCHMARK:
++	case PIN_LONGTERM_BENCHMARK:
++	case PIN_BENCHMARK:
+ 		break;
+ 	default:
+ 		return -EINVAL;
+diff --git a/tools/testing/selftests/vm/gup_benchmark.c b/tools/testing/sel=
+ftests/vm/gup_benchmark.c
+index 389327e9b30a..03928e47a86f 100644
+--- a/tools/testing/selftests/vm/gup_benchmark.c
++++ b/tools/testing/selftests/vm/gup_benchmark.c
+@@ -18,6 +18,15 @@
+ #define GUP_LONGTERM_BENCHMARK	_IOWR('g', 2, struct gup_benchmark)
+ #define GUP_BENCHMARK		_IOWR('g', 3, struct gup_benchmark)
+=20
++/*
++ * Similar to above, but use FOLL_PIN instead of FOLL_GET. This is done
++ * by calling pin_user_pages_fast(), pin_longterm_pages(), and pin_user_pa=
+ges(),
++ * respectively.
++ */
++#define PIN_FAST_BENCHMARK	_IOWR('g', 4, struct gup_benchmark)
++#define PIN_LONGTERM_BENCHMARK	_IOWR('g', 5, struct gup_benchmark)
++#define PIN_BENCHMARK		_IOWR('g', 6, struct gup_benchmark)
++
+ /* Just the flags we need, copied from mm.h: */
+ #define FOLL_WRITE	0x01	/* check pte is writable */
+=20
+@@ -40,8 +49,17 @@ int main(int argc, char **argv)
+ 	char *file =3D "/dev/zero";
+ 	char *p;
+=20
+-	while ((opt =3D getopt(argc, argv, "m:r:n:f:tTLUwSH")) !=3D -1) {
++	while ((opt =3D getopt(argc, argv, "m:r:n:f:abctTLUuwSH")) !=3D -1) {
+ 		switch (opt) {
++		case 'a':
++			cmd =3D PIN_FAST_BENCHMARK;
++			break;
++		case 'b':
++			cmd =3D PIN_LONGTERM_BENCHMARK;
++			break;
++		case 'c':
++			cmd =3D PIN_BENCHMARK;
++			break;
+ 		case 'm':
+ 			size =3D atoi(optarg) * MB;
+ 			break;
+@@ -63,6 +81,9 @@ int main(int argc, char **argv)
+ 		case 'U':
+ 			cmd =3D GUP_BENCHMARK;
+ 			break;
++		case 'u':
++			cmd =3D GUP_FAST_BENCHMARK;
++			break;
+ 		case 'w':
+ 			write =3D 1;
+ 			break;
 --=20
 2.24.0
 
