@@ -2,159 +2,125 @@ Return-Path: <SRS0=BCjA=ZF=vger.kernel.org=linux-block-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-2.4 required=3.0 tests=DKIMWL_WL_HIGH,DKIM_SIGNED,
-	DKIM_VALID,DKIM_VALID_AU,HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,
-	SPF_HELO_NONE,SPF_PASS,USER_AGENT_SANE_1 autolearn=no autolearn_force=no
-	version=3.4.0
+X-Spam-Status: No, score=-2.3 required=3.0 tests=DKIM_SIGNED,DKIM_VALID,
+	HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,
+	USER_AGENT_SANE_1 autolearn=no autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 9F6C1C43331
-	for <linux-block@archiver.kernel.org>; Wed, 13 Nov 2019 02:09:21 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id F2A29C17441
+	for <linux-block@archiver.kernel.org>; Wed, 13 Nov 2019 02:16:47 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.kernel.org (Postfix) with ESMTP id 77073206B6
-	for <linux-block@archiver.kernel.org>; Wed, 13 Nov 2019 02:09:21 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id CA6ED204FD
+	for <linux-block@archiver.kernel.org>; Wed, 13 Nov 2019 02:16:47 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=pass (2048-bit key) header.d=nvidia.com header.i=@nvidia.com header.b="RV5dPXEX"
+	dkim=pass (2048-bit key) header.d=kernel-dk.20150623.gappssmtp.com header.i=@kernel-dk.20150623.gappssmtp.com header.b="J1GKzxf5"
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1728477AbfKMCJM (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Tue, 12 Nov 2019 21:09:12 -0500
-Received: from hqemgate15.nvidia.com ([216.228.121.64]:7386 "EHLO
-        hqemgate15.nvidia.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1728220AbfKMCJL (ORCPT
+        id S1730106AbfKMCQq (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Tue, 12 Nov 2019 21:16:46 -0500
+Received: from mail-pg1-f193.google.com ([209.85.215.193]:41502 "EHLO
+        mail-pg1-f193.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S1730171AbfKMCQo (ORCPT
         <rfc822;linux-block@vger.kernel.org>);
-        Tue, 12 Nov 2019 21:09:11 -0500
-Received: from hqpgpgate102.nvidia.com (Not Verified[216.228.121.13]) by hqemgate15.nvidia.com (using TLS: TLSv1.2, DES-CBC3-SHA)
-        id <B5dcb65c50002>; Tue, 12 Nov 2019 18:09:09 -0800
-Received: from hqmail.nvidia.com ([172.20.161.6])
-  by hqpgpgate102.nvidia.com (PGP Universal service);
-  Tue, 12 Nov 2019 18:09:09 -0800
-X-PGP-Universal: processed;
-        by hqpgpgate102.nvidia.com on Tue, 12 Nov 2019 18:09:09 -0800
-Received: from [10.110.48.28] (10.124.1.5) by HQMAIL107.nvidia.com
- (172.20.187.13) with Microsoft SMTP Server (TLS) id 15.0.1473.3; Wed, 13 Nov
- 2019 02:09:09 +0000
-Subject: Re: [PATCH v3 08/23] vfio, mm: fix get_user_pages_remote() and
- FOLL_LONGTERM
-To:     Dan Williams <dan.j.williams@intel.com>
-CC:     Jason Gunthorpe <jgg@ziepe.ca>,
-        Andrew Morton <akpm@linux-foundation.org>,
-        Al Viro <viro@zeniv.linux.org.uk>,
-        Alex Williamson <alex.williamson@redhat.com>,
-        Benjamin Herrenschmidt <benh@kernel.crashing.org>,
-        =?UTF-8?B?QmrDtnJuIFTDtnBlbA==?= <bjorn.topel@intel.com>,
-        Christoph Hellwig <hch@infradead.org>,
-        Daniel Vetter <daniel@ffwll.ch>,
-        Dave Chinner <david@fromorbit.com>,
-        David Airlie <airlied@linux.ie>,
-        "David S . Miller" <davem@davemloft.net>,
-        Ira Weiny <ira.weiny@intel.com>, Jan Kara <jack@suse.cz>,
-        Jens Axboe <axboe@kernel.dk>, Jonathan Corbet <corbet@lwn.net>,
-        =?UTF-8?B?SsOpcsO0bWUgR2xpc3Nl?= <jglisse@redhat.com>,
-        Magnus Karlsson <magnus.karlsson@intel.com>,
-        Mauro Carvalho Chehab <mchehab@kernel.org>,
-        Michael Ellerman <mpe@ellerman.id.au>,
-        Michal Hocko <mhocko@suse.com>,
-        Mike Kravetz <mike.kravetz@oracle.com>,
-        Paul Mackerras <paulus@samba.org>,
-        Shuah Khan <shuah@kernel.org>,
-        Vlastimil Babka <vbabka@suse.cz>, <bpf@vger.kernel.org>,
-        Maling list - DRI developers 
-        <dri-devel@lists.freedesktop.org>, KVM list <kvm@vger.kernel.org>,
-        <linux-block@vger.kernel.org>,
-        Linux Doc Mailing List <linux-doc@vger.kernel.org>,
-        linux-fsdevel <linux-fsdevel@vger.kernel.org>,
-        <linux-kselftest@vger.kernel.org>,
-        "Linux-media@vger.kernel.org" <linux-media@vger.kernel.org>,
-        linux-rdma <linux-rdma@vger.kernel.org>,
-        linuxppc-dev <linuxppc-dev@lists.ozlabs.org>,
-        Netdev <netdev@vger.kernel.org>, Linux MM <linux-mm@kvack.org>,
-        LKML <linux-kernel@vger.kernel.org>
-References: <20191112000700.3455038-1-jhubbard@nvidia.com>
- <20191112000700.3455038-9-jhubbard@nvidia.com>
- <20191112204338.GE5584@ziepe.ca>
- <0db36e86-b779-01af-77e7-469af2a2e19c@nvidia.com>
- <CAPcyv4hAEgw6ySNS+EFRS4yNRVGz9A3Fu1vOk=XtpjYC64kQJw@mail.gmail.com>
- <20191112234250.GA19615@ziepe.ca>
- <CAPcyv4hwFKmsQpp04rS6diCmZwGtbnriCjfY2ofWV485qT9kzg@mail.gmail.com>
- <28355eb0-4ee5-3418-b430-59302d15b478@nvidia.com>
- <CAPcyv4hdYZ__3+KJHh+0uX--f-U=pLiZfdO0JDhyBE-nZ=i4FQ@mail.gmail.com>
-From:   John Hubbard <jhubbard@nvidia.com>
-X-Nvconfidentiality: public
-Message-ID: <c6f035f5-8290-2bc0-a645-d63e3a47f588@nvidia.com>
-Date:   Tue, 12 Nov 2019 18:09:08 -0800
+        Tue, 12 Nov 2019 21:16:44 -0500
+Received: by mail-pg1-f193.google.com with SMTP id h4so311111pgv.8
+        for <linux-block@vger.kernel.org>; Tue, 12 Nov 2019 18:16:43 -0800 (PST)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=kernel-dk.20150623.gappssmtp.com; s=20150623;
+        h=subject:to:references:from:message-id:date:user-agent:mime-version
+         :in-reply-to:content-language:content-transfer-encoding;
+        bh=c7pgGUOErKCone57ckbGDS/eeyPemc6EIW0Fbaye1l4=;
+        b=J1GKzxf5D4PNxbYKxDELs3k7YlYHe/IgHvU8Etzan0v3SuwtZ62rEm1vWFQAXFTWqg
+         q5GbIvG6C/Bi2hnba2PXWn2pywiaPhAqj19zLVeHVpUB/w+bJn62gzb9mmaePzydVmxv
+         XAYZZFMdQ6jMS+xxsqXiz430ptjXzzatWh97FtCiIUx8TWg2NGykQo3WcHtCfcJrMFcr
+         eqAqztK9aojc6IvhkKDL8UM7ckfiwhqjgW7yUs9sNKNCQts2WY/qf/Y56U6wCuW8N3t0
+         HTWIy5X+Nktu52sYBB0Vz/LfvTjVsXzxChLk+jf8NXDEItN26y685XWjFOthOBTTeLzq
+         6W0Q==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20161025;
+        h=x-gm-message-state:subject:to:references:from:message-id:date
+         :user-agent:mime-version:in-reply-to:content-language
+         :content-transfer-encoding;
+        bh=c7pgGUOErKCone57ckbGDS/eeyPemc6EIW0Fbaye1l4=;
+        b=YjhqY8XoAocYnvLH+KZVZRokhgc/DohPGzRmeKrGussi6WY6UonXxECG+Ngpy3QF8g
+         Qy+xAK7MqiG0WsS+xSVWl6IE5T0e02xrhPs+GN33HsIPWh9ek3XuPMddOv0p/6li/5k1
+         G5RTpyUOwjmWH6stwe0J6Giifz/LoCV+iHt53JZ5HMC5v0DEMtIrGRx253DdZ2XRHYii
+         uS50U/qijNsK9Kp0GlDbMnoBiA2E6uAgl9kCDblpC2dRz/+ukW/5+JYBuz+R3GJ3RKmU
+         xJ/4kS8kv2agIYMaGEHPDAnqjKNFlweBZnt4nyHsEzU+UX0zNL3vB2okfXETmZ1FbWwo
+         4ZRA==
+X-Gm-Message-State: APjAAAX2WMdcLATfh4fHA59zKQtwyrsRgc7qZe1X9PqJQdE2JGEl6XY4
+        RjBwK+nsMjH3p9w/N7NsKadHeg==
+X-Google-Smtp-Source: APXvYqycpY+BSOLB53HT4o8SEWzgzYFea+fu4bX8JbhALJ60LxNdAWEQSjGNGVeVl5dehnnO9BWleQ==
+X-Received: by 2002:a17:90a:a114:: with SMTP id s20mr1410230pjp.44.1573611402828;
+        Tue, 12 Nov 2019 18:16:42 -0800 (PST)
+Received: from [192.168.1.182] ([66.219.217.79])
+        by smtp.gmail.com with ESMTPSA id e17sm303534pfh.121.2019.11.12.18.16.40
+        (version=TLS1_2 cipher=ECDHE-RSA-AES128-GCM-SHA256 bits=128/128);
+        Tue, 12 Nov 2019 18:16:41 -0800 (PST)
+Subject: Re: [PATCH v2 0/9] Zoned block device enhancements and zone report
+ rework
+To:     Damien Le Moal <damien.lemoal@wdc.com>,
+        linux-block@vger.kernel.org, linux-scsi@vger.kernel.org,
+        "Martin K . Petersen" <martin.petersen@oracle.com>,
+        dm-devel@redhat.com, Mike Snitzer <snitzer@redhat.com>,
+        linux-f2fs-devel@lists.sourceforge.net,
+        Jaegeuk Kim <jaegeuk@kernel.org>, Chao Yu <yuchao0@huawei.com>
+References: <20191111023930.638129-1-damien.lemoal@wdc.com>
+From:   Jens Axboe <axboe@kernel.dk>
+Message-ID: <a0c1c1bf-d6e5-8be1-ed99-6bfed3483d1d@kernel.dk>
+Date:   Tue, 12 Nov 2019 19:16:39 -0700
 User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:60.0) Gecko/20100101
- Thunderbird/60.8.0
+ Thunderbird/60.9.0
 MIME-Version: 1.0
-In-Reply-To: <CAPcyv4hdYZ__3+KJHh+0uX--f-U=pLiZfdO0JDhyBE-nZ=i4FQ@mail.gmail.com>
-X-Originating-IP: [10.124.1.5]
-X-ClientProxiedBy: HQMAIL101.nvidia.com (172.20.187.10) To
- HQMAIL107.nvidia.com (172.20.187.13)
-Content-Type: text/plain; charset="utf-8"
+In-Reply-To: <20191111023930.638129-1-damien.lemoal@wdc.com>
+Content-Type: text/plain; charset=utf-8
 Content-Language: en-US
 Content-Transfer-Encoding: 7bit
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=nvidia.com; s=n1;
-        t=1573610949; bh=B6pkyHmGh6yhjKCidrVzgID/vhDeCAvfXP4nK4Pk4sU=;
-        h=X-PGP-Universal:Subject:To:CC:References:From:X-Nvconfidentiality:
-         Message-ID:Date:User-Agent:MIME-Version:In-Reply-To:
-         X-Originating-IP:X-ClientProxiedBy:Content-Type:Content-Language:
-         Content-Transfer-Encoding;
-        b=RV5dPXEXGk2wPs6itxn+ysd+tryNIcHtFe7cNPEDa6fUJR+mqhDFmpWJh1cxUznfM
-         u/dSVfFdxe/eLLU3UZJsFyG0KQve3tMf4SbX/eLAZ3PsvXvDC9d9Vo1jj5Z6rn0Yor
-         1EXyMK0mBMr99qCD9+AZ++P4gO+L3VPJHPXksjDueAgSTRvM0AvLDqBIchBRO93HWN
-         flXai7XrgmMwanL4FueloUnCWoIRpUo5voQGwqOd0jdXOidJNNwAYlQZLipkiht6xZ
-         1PIwF7tPrWLfM+J/GXeR6mCfSxY22FrqYpx7yQ6peaaRvxPNUSU6UqLCTPNv27OnhW
-         6xjI9w2mLclog==
 Sender: linux-block-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-On 11/12/19 5:35 PM, Dan Williams wrote:
-> On Tue, Nov 12, 2019 at 5:08 PM John Hubbard <jhubbard@nvidia.com> wrote:
->>
->> On 11/12/19 4:58 PM, Dan Williams wrote:
->> ...
->>>>> It's not redundant relative to upstream which does not do anything the
->>>>> FOLL_LONGTERM in the gup-slow path... but I have not looked at patches
->>>>> 1-7 to see if something there made it redundant.
->>>>
->>>> Oh, the hunk John had below for get_user_pages_remote() also needs to
->>>> call __gup_longterm_locked() when FOLL_LONGTERM is specified, then
->>>> that calls check_dax_vmas() which duplicates the vma_is_fsdax() check
->>>> above.
->>>
->>> Oh true, good eye. It is redundant if it does additionally call
->>> __gup_longterm_locked(), and it needs to do that otherwises it undoes
->>> the CMA migration magic that Aneesh added.
->>>
->>
->> OK. So just to be clear, I'll be removing this from the patch:
->>
->>         /*
->>          * The lifetime of a vaddr_get_pfn() page pin is
->>          * userspace-controlled. In the fs-dax case this could
->>          * lead to indefinite stalls in filesystem operations.
->>          * Disallow attempts to pin fs-dax pages via this
->>          * interface.
->>          */
->>         if (ret > 0 && vma_is_fsdax(vmas[0])) {
->>                 ret = -EOPNOTSUPP;
->>                 put_page(page[0]);
->>         }
->>
->> (and the declaration of "vmas", as well).
+On 11/10/19 6:39 PM, Damien Le Moal wrote:
+> This series of patches introduces changes to zoned block device handling
+> code with the intent to simplify the code while optimizing run-time
+> operation, particularly in the area of zone reporting.
 > 
-> ...and add a call to __gup_longterm_locked internal to
-> get_user_pages_remote(), right?
+> The first patch lifts the device zone check code out of the sd driver
+> and reimplements these zone checks generically as part of
+> blk_revalidate_disk_zones(). This avoids zoned block device drivers to
+> have to implement these checks. The second patch simplifies this
+> function code for the !zoned case.
 > 
+> The third patch is a small cleanup of zone report processing in
+> preparation for the fourth patch which removes support for partitions
+> on zoned block devices. As mentioned in that patch commit message, none
+> of the known partitioning tools support zoned devices and there are no
+> known use case in the field of SMR disks being used with partitions.
+> Dropping partition supports allows to significantly simplify the code
+> for zone report as zone sector values remapping becomes unnecessary.
+> 
+> Patch 5 to 6 are small cleanups and fixes of the null_blk driver zoned
+> mode.
+> 
+> The prep patch 7 optimizes zone report buffer allocation for the SCSI
+> sd driver. Finally, patch 8 introduces a new interface for report zones
+> handling using a callback function executed per zone reported by the
+> device. This allows avoiding the need to allocate large arrays of
+> blk_zone structures for the execution of zone reports. This can
+> significantly reduce memory usage and pressure on the memory management
+> system while significantly simplify the code all over.
+> 
+> Overall, this series not only reduces significantly the code size, it
+> also improves run-time memory usage for zone report execution.
+> 
+> This series applies cleanly on the for-next block tree on top of the
+> zone management operation series. It may however create a conflict with
+> Christoph's reqork of disk size revalidation. Please consider this
+> series for inclusion in the 5.5 kernel.
 
-Yes, and thanks for double-checking. I think I got a little dizzy following
-the call stack there. :)  And now I see that this also affects the
-implementation of pin_longterm_pages_remote(), because that will need the
-same logic that get_user_pages_remote() has. 
+We're taking branching to new levels... I created for-5.5/zoned for this,
+which is for-5.5/block + for-5.5/drivers + for-5.5/drivers-post combined.
+The latter is a branch with the SCSI dependencies from Martin pulled in.
 
-
-
-thanks,
 -- 
-John Hubbard
-NVIDIA
+Jens Axboe
+
