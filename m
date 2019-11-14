@@ -2,150 +2,135 @@ Return-Path: <SRS0=aEt0=ZG=vger.kernel.org=linux-block-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-2.2 required=3.0 tests=DKIM_SIGNED,DKIM_VALID,
-	HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,
-	USER_AGENT_SANE_1 autolearn=no autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-9.8 required=3.0 tests=DKIM_SIGNED,DKIM_VALID,
+	DKIM_VALID_AU,HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,
+	SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,USER_AGENT_GIT autolearn=ham
+	autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id DF70DC432C3
-	for <linux-block@archiver.kernel.org>; Thu, 14 Nov 2019 22:38:37 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 703C9C432C3
+	for <linux-block@archiver.kernel.org>; Thu, 14 Nov 2019 22:51:38 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.kernel.org (Postfix) with ESMTP id AC09E20715
-	for <linux-block@archiver.kernel.org>; Thu, 14 Nov 2019 22:38:37 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id 45C5020706
+	for <linux-block@archiver.kernel.org>; Thu, 14 Nov 2019 22:51:38 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel-dk.20150623.gappssmtp.com header.i=@kernel-dk.20150623.gappssmtp.com header.b="esgM0imz"
+	dkim=pass (1024-bit key) header.d=linuxonhyperv.com header.i=@linuxonhyperv.com header.b="EF0AF64K"
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1726613AbfKNWhw (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Thu, 14 Nov 2019 17:37:52 -0500
-Received: from mail-pg1-f194.google.com ([209.85.215.194]:39968 "EHLO
-        mail-pg1-f194.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1726319AbfKNWhv (ORCPT
+        id S1726881AbfKNWvh (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Thu, 14 Nov 2019 17:51:37 -0500
+Received: from linux.microsoft.com ([13.77.154.182]:57734 "EHLO
+        linux.microsoft.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S1726319AbfKNWvh (ORCPT
         <rfc822;linux-block@vger.kernel.org>);
-        Thu, 14 Nov 2019 17:37:51 -0500
-Received: by mail-pg1-f194.google.com with SMTP id 15so4697537pgt.7
-        for <linux-block@vger.kernel.org>; Thu, 14 Nov 2019 14:37:51 -0800 (PST)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=kernel-dk.20150623.gappssmtp.com; s=20150623;
-        h=subject:to:cc:references:from:message-id:date:user-agent
-         :mime-version:in-reply-to:content-language:content-transfer-encoding;
-        bh=WHEKuRwdwFuaBKUDx31x4muu+MSJwHXWEO9GkaCswBE=;
-        b=esgM0imzInnpYjllAU7+ABcJ/xWVzy+Z06dmrfdpTH3pKyibZ51cI9HIOGuAU+PyUg
-         S9OOoGAEk7ze4ld2VSLXd2K5tZjarHv6YYQpsYeMecxvIp7vdib6T+49m/92ipUdeQW8
-         9EBDzQ2h7f2mUMbqgQbXnYizs6GItlZ7eR8lFzDnz8cq6V52TskhC9BWyXJm8/ojNyYQ
-         30bDW8FyFo/eLCTm4mnQPfNUi3hy0++kLaQ57KTWEKbU99suPDctA5CuYjM6Pj7ROnZe
-         +erwM4i+u3PJ7MsYzyZmSJUofZu1En5kArwjjfna2CROB+7KXaLo0rfMxvSKLyJ4Chr9
-         Ef1Q==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20161025;
-        h=x-gm-message-state:subject:to:cc:references:from:message-id:date
-         :user-agent:mime-version:in-reply-to:content-language
-         :content-transfer-encoding;
-        bh=WHEKuRwdwFuaBKUDx31x4muu+MSJwHXWEO9GkaCswBE=;
-        b=qWHAXyTsLuSPFjuCWcabH2SYBYf3LPSYTl1sD4b6g9NwL+x401ULvcRCTkVviP3ZZB
-         TIMolZ2b+kMexknaJRJQaO4bS9XfSr3kgdSUNBhduZzp1PsYNKeG9J7IYOPOzWBXYR6d
-         L38YJlRoaaYpyCzYx/gIV4eajW8n0GkbVy4O0jsJ4HsobVkpEfboV/J44dbKOX23WgZr
-         mtiO3Iky/gGIa9P2J+HYQXUSvIiSqwd6rlqKJj31AgaOJRP9G+WSNTdABETjS4CHlDoO
-         LuwlQUCalA+52mO2HX1YxbCaEtIjoHhTpK9ZgSIVI3D36GQPwOrDIjcou+04Q7Oipa4x
-         C/XA==
-X-Gm-Message-State: APjAAAWkHGxSSzg02/6KcILw1zMNPYKLAHiJsWvsYbzWmIP2I0NP9AIc
-        YT0RXUU2xKIEWxNcme/f9PZGOQ==
-X-Google-Smtp-Source: APXvYqyr24GR4ZhsgU6PexCPatC0ERgkJRa5rZIq6gsr6UtAG4c/9nwdhOy8OxvgyD/+ejCteFdsrw==
-X-Received: by 2002:a17:90a:de4:: with SMTP id 91mr15732947pjv.113.1573771070487;
-        Thu, 14 Nov 2019 14:37:50 -0800 (PST)
-Received: from ?IPv6:2600:380:755f:544d:7096:f49a:6c51:d149? ([2600:380:755f:544d:7096:f49a:6c51:d149])
-        by smtp.gmail.com with ESMTPSA id e17sm8020947pfh.121.2019.11.14.14.37.47
-        (version=TLS1_2 cipher=ECDHE-RSA-AES128-GCM-SHA256 bits=128/128);
-        Thu, 14 Nov 2019 14:37:49 -0800 (PST)
-Subject: Re: [PATCHSET 0/2] io_uring support for linked timeouts
-To:     Pavel Begunkov <asml.silence@gmail.com>, io-uring@vger.kernel.org,
-        linux-block@vger.kernel.org
-Cc:     zeba.hrvoje@gmail.com, liuyun01@kylinos.cn
-References: <20191105211130.6130-1-axboe@kernel.dk>
- <4566889a-7e12-9bfd-b2a1-716d8b934684@gmail.com>
-From:   Jens Axboe <axboe@kernel.dk>
-Message-ID: <9b6cd06b-cd6c-d7e5-157b-32c1e2e9ceac@kernel.dk>
-Date:   Thu, 14 Nov 2019 15:37:45 -0700
-User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:60.0) Gecko/20100101
- Thunderbird/60.9.0
+        Thu, 14 Nov 2019 17:51:37 -0500
+Received: by linux.microsoft.com (Postfix, from userid 1004)
+        id 60F1420BCFAD; Thu, 14 Nov 2019 14:51:36 -0800 (PST)
+DKIM-Filter: OpenDKIM Filter v2.11.0 linux.microsoft.com 60F1420BCFAD
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=linuxonhyperv.com;
+        s=default; t=1573771896;
+        bh=WV644kJDTY/IDY2jipf0kW2lG8VT+H0spEuwz+hRcI0=;
+        h=From:To:Cc:Subject:Date:From;
+        b=EF0AF64K51Fm2myP0Se+Akzj+OVPw4Kxst3CpZ+l5+pC4D5Gfm0kJwXZWQv0i7j9P
+         2tsKMR55kxEgeAs7wDXb7CWoULeZlBxdMV6gh2m17DXLoN1+tmFbD4bEoGSwjfuc0L
+         bZ4xUEm7O3sRGxmkWFO3jGRVppNIL3x0SIrkAGWc=
+From:   longli@linuxonhyperv.com
+To:     Jens Axboe <axboe@kernel.dk>, Ming Lei <ming.lei@redhat.com>,
+        Sagi Grimberg <sagi@grimberg.me>,
+        Keith Busch <keith.busch@intel.com>,
+        Bart Van Assche <bvanassche@acm.org>,
+        Damien Le Moal <damien.lemoal@wdc.com>,
+        linux-block@vger.kernel.org, linux-kernel@vger.kernel.org
+Cc:     Long Li <longli@microsoft.com>
+Subject: [PATCH] blk-mq: avoid repeatedly scheduling the same work to run hardware queue
+Date:   Thu, 14 Nov 2019 14:51:24 -0800
+Message-Id: <1573771884-38879-1-git-send-email-longli@linuxonhyperv.com>
+X-Mailer: git-send-email 1.8.3.1
 MIME-Version: 1.0
-In-Reply-To: <4566889a-7e12-9bfd-b2a1-716d8b934684@gmail.com>
-Content-Type: text/plain; charset=utf-8
-Content-Language: en-US
-Content-Transfer-Encoding: 7bit
+Content-Type: text/plain; charset=UTF-8
+Content-Transfer-Encoding: 8bit
 Sender: linux-block-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-On 11/14/19 2:24 PM, Pavel Begunkov wrote:
-> On 06/11/2019 00:11, Jens Axboe wrote:
->> Anyway, this is support for IORING_OP_LINK_TIMEOUT. Unlike the timeouts
->> we have now that work on purely the CQ ring, these timeouts are
->> specifically tied to a specific command. They are meant to be used to
->> auto-cancel a request, if it hasn't finished in X amount of time. The
->> way to use then is to setup your command as you usually would, but then
->> mark is IOSQE_IO_LINK and add an IORING_OP_LINK_TIMEOUT right after it.
->> That's how linked commands work to begin with. The main difference here
->> is that links are normally only started once the dependent request
->> completes, but for IORING_OP_LINK_TIMEOUT they are armed as soon as we
->> start the dependent request.
->>
->> If the dependent request finishes before the linked timeout, the timeout
->> is canceled. If the timeout finishes before the dependent request, the
->> dependent request is attempted canceled.
->>
->> IORING_OP_LINK_TIMEOUT is setup just like IORING_OP_TIMEOUT in terms
->> of passing in the timespec associated with it.
->>
->> I added a bunch of test cases to liburing, currently residing in a
->> link-timeout branch. View them here:
->>
-> 
-> Finally got to this patch. I think, find it adding too many edge cases
-> and it isn't integrated consistently into what we have now. I would love
-> to hear your vision, but I'd try to implement them in such a way, that it
-> doesn't need to modify the framework, at least for some particular case.
-> In other words, as opcodes could have been added from the outside with a
-> function table.
+From: Long Li <longli@microsoft.com>
 
-I agree, it could do with a bit of cleanup. Incrementals would be
-appreciated!
+SCSI layer calls blk_mq_run_hw_queues() in scsi_end_request(), for every
+completed I/O. blk_mq_run_hw_queues() in turn schedules some works to run
+the hardware queues.
 
-> Also, it's not so consistent with the userspace API as well.
-> 
-> 1. If we specified drain for the timeout, should its start be delayed
-> until then? I would prefer so.
->
-> E.g. send_msg + drained linked_timeout, which would set a timeout from the
-> start of the send.
+The actual work is queued by mod_delayed_work_on(), it turns out the cost of
+this function is high on locking and CPU usage, when the I/O workload has
+high queue depth. Most of these calls are not necessary since the queue is
+already scheduled to run, and has not run yet.
 
-What cases would that apply to, what would the timeout even do in this
-case? The point of the linked timeout is to abort the previous command.
-Maybe I'm not following what you mean here.
+This patch tries to solve this problem by avoiding scheduling work when it's
+already scheduled.
 
-> 2. Why it could be only the second one in a link? May we want to cancel
-> from a certain point?
-> e.g. "op1 -> op2 -> timeout -> op3" cancels op2 and op3
+Benchmark results:
+The following tests are run on a RAM backed virtual disk on Hyper-V, with 8
+FIO jobs with 4k random read I/O. The test numbers are for IOPS.
 
-Logically it need not be the second, it just has to follow another
-request. Is there a bug there?
+queue_depth	pre-patch	after-patch	improvement
+16		190k		190k		0%
+64		235k		240k		2%
+256		180k		256k		42%
+1024		156k		250k		60%
 
-> 3. It's a bit strange, that the timeout affects a request from the left,
-> and after as an consequence cancels everything on the right (i.e. chain).
-> Could we place it in the head? So it would affect all requests on the right
-> from it.
+Signed-off-by: Long Li <longli@microsoft.com>
+---
+ block/blk-mq.c         | 12 ++++++++++++
+ include/linux/blk-mq.h |  1 +
+ 2 files changed, 13 insertions(+)
 
-But that's how links work, though. If you keep linking, then everything
-that depends on X will fail, if X itself isn't succesful.
-
-> 4. I'd prefer to handle it as a new generic command and setting a timer
-> in __io_submit_sqe().
-> 
-> I believe we can do it more gracefully, and at the same moment giving
-> more freedom to the user. What do you think?
-
-I just think we need to make sure the ground rules are sane. I'm going
-to write a few test cases to make sure we do the right thing.
-
+diff --git a/block/blk-mq.c b/block/blk-mq.c
+index ec791156e9cc..a882bd65167a 100644
+--- a/block/blk-mq.c
++++ b/block/blk-mq.c
+@@ -1476,6 +1476,16 @@ static void __blk_mq_delay_run_hw_queue(struct blk_mq_hw_ctx *hctx, bool async,
+ 		put_cpu();
+ 	}
+ 
++	/*
++	 * Queue a work to run queue. If this is a non-delay run and the
++	 * work is already scheduled, avoid scheduling the same work again.
++	 */
++	if (!msecs) {
++		if (test_bit(BLK_MQ_S_WORK_QUEUED, &hctx->state))
++			return;
++		set_bit(BLK_MQ_S_WORK_QUEUED, &hctx->state);
++	}
++
+ 	kblockd_mod_delayed_work_on(blk_mq_hctx_next_cpu(hctx), &hctx->run_work,
+ 				    msecs_to_jiffies(msecs));
+ }
+@@ -1561,6 +1571,7 @@ void blk_mq_stop_hw_queue(struct blk_mq_hw_ctx *hctx)
+ 	cancel_delayed_work(&hctx->run_work);
+ 
+ 	set_bit(BLK_MQ_S_STOPPED, &hctx->state);
++	clear_bit(BLK_MQ_S_WORK_QUEUED, &hctx->state);
+ }
+ EXPORT_SYMBOL(blk_mq_stop_hw_queue);
+ 
+@@ -1626,6 +1637,7 @@ static void blk_mq_run_work_fn(struct work_struct *work)
+ 	struct blk_mq_hw_ctx *hctx;
+ 
+ 	hctx = container_of(work, struct blk_mq_hw_ctx, run_work.work);
++	clear_bit(BLK_MQ_S_WORK_QUEUED, &hctx->state);
+ 
+ 	/*
+ 	 * If we are stopped, don't run the queue.
+diff --git a/include/linux/blk-mq.h b/include/linux/blk-mq.h
+index 0bf056de5cc3..98269d3fd141 100644
+--- a/include/linux/blk-mq.h
++++ b/include/linux/blk-mq.h
+@@ -234,6 +234,7 @@ enum {
+ 	BLK_MQ_S_STOPPED	= 0,
+ 	BLK_MQ_S_TAG_ACTIVE	= 1,
+ 	BLK_MQ_S_SCHED_RESTART	= 2,
++	BLK_MQ_S_WORK_QUEUED	= 3,
+ 
+ 	BLK_MQ_MAX_DEPTH	= 10240,
+ 
 -- 
-Jens Axboe
+2.20.1
 
