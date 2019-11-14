@@ -7,42 +7,43 @@ X-Spam-Status: No, score=-9.5 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
 	SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED,USER_AGENT_GIT autolearn=ham
 	autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id BC453C432C3
-	for <linux-block@archiver.kernel.org>; Thu, 14 Nov 2019 14:34:52 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id B1F63C432C3
+	for <linux-block@archiver.kernel.org>; Thu, 14 Nov 2019 14:34:55 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.kernel.org (Postfix) with ESMTP id 94F7420709
-	for <linux-block@archiver.kernel.org>; Thu, 14 Nov 2019 14:34:52 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id 87F0A20709
+	for <linux-block@archiver.kernel.org>; Thu, 14 Nov 2019 14:34:55 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (2048-bit key) header.d=infradead.org header.i=@infradead.org header.b="AHLN1wTo"
+	dkim=fail reason="signature verification failed" (2048-bit key) header.d=infradead.org header.i=@infradead.org header.b="u3xIPxkm"
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1726598AbfKNOew (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Thu, 14 Nov 2019 09:34:52 -0500
-Received: from bombadil.infradead.org ([198.137.202.133]:38548 "EHLO
+        id S1726605AbfKNOez (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Thu, 14 Nov 2019 09:34:55 -0500
+Received: from bombadil.infradead.org ([198.137.202.133]:38566 "EHLO
         bombadil.infradead.org" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1726214AbfKNOew (ORCPT
+        with ESMTP id S1726214AbfKNOey (ORCPT
         <rfc822;linux-block@vger.kernel.org>);
-        Thu, 14 Nov 2019 09:34:52 -0500
+        Thu, 14 Nov 2019 09:34:54 -0500
 DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed;
         d=infradead.org; s=bombadil.20170209; h=Content-Transfer-Encoding:
         MIME-Version:References:In-Reply-To:Message-Id:Date:Subject:Cc:To:From:Sender
         :Reply-To:Content-Type:Content-ID:Content-Description:Resent-Date:Resent-From
         :Resent-Sender:Resent-To:Resent-Cc:Resent-Message-ID:List-Id:List-Help:
         List-Unsubscribe:List-Subscribe:List-Post:List-Owner:List-Archive;
-        bh=smMIf5d5Q5aKw/SzyUzCMvGHgO1WCyubOuxyXylTzIg=; b=AHLN1wTobfiankSBhemFuo0+Ul
-        hmb0DECVuJ9EuC1gpdzZVcJRJxJJSULEYQt4aFbJnxTR2DiVWCUiw2fmIcIHtx4AbZyoyqdOYZTle
-        lgDhOp31NyzCiBXohJOmI1mD1ELdwgStUXP6EHyyLp9QN0LiInOdZB5ywvOORVwUkXUthTGk637zQ
-        +xic6QEYk/gmBAzwm5jti9CgihJ9XjMhTtXiPE6yZu6FWOxnVB54fcUemYwsND1fqt4x9ccuAG/rq
-        u6z+F1QXhOEGsNVuIRZyRqySlAINSZGReFFpay5tv5+4aaO5q6N3fk2768+rPNlcofaKZFpVBXewp
-        p0k81OyA==;
+        bh=+97M8q/DzVxkSwZO0CoMlnFjgCzRSA/777Cpn7hubd0=; b=u3xIPxkm5T+hxMUrf3pEe+tQ2j
+        P34+wcNpbN/bWtm97MBi82YYbCK4c8gxTBliGQiRG78bD2A/q3bHukAv5nHvMEaF4liE7EgqjEBM9
+        amLffTW6Y49dmjPpX0ID4su1QIs0UDdD6dXU7tuGGNaCua/9Hp43crRbKGrbggFjgSBomTWMWtqV+
+        rjiVCPi5bXRH4y744deStEo1TJCJpOKg9SLk7g3/IrAdBZrmn7yK8H27K8uXvgbXR5JsE1BCbcwow
+        tbaugv5aOo37KNMetUJq9leu/BeRqul21qvrpQL99Ol9AcFVCLnLWeBxk4K8EIFWvejuE9H2Dp7Ix
+        cQnJ0MGg==;
 Received: from [2001:4bb8:180:3806:c70:4a89:bc61:6] (helo=localhost)
         by bombadil.infradead.org with esmtpsa (Exim 4.92.3 #3 (Red Hat Linux))
-        id 1iVGCw-0004kH-Tt; Thu, 14 Nov 2019 14:34:51 +0000
+        id 1iVGCz-0004ke-EP; Thu, 14 Nov 2019 14:34:53 +0000
 From:   Christoph Hellwig <hch@lst.de>
 To:     Jens Axboe <axboe@kernel.dk>, Jan Kara <jack@suse.cz>
-Cc:     linux-block@vger.kernel.org, linux-s390@vger.kernel.org
-Subject: [PATCH 4/7] block: fix bdev_disk_changed for non-partitioned devices
-Date:   Thu, 14 Nov 2019 15:34:35 +0100
-Message-Id: <20191114143438.14681-5-hch@lst.de>
+Cc:     linux-block@vger.kernel.org, linux-s390@vger.kernel.org,
+        Stefan Haberland <sth@linux.ibm.com>
+Subject: [PATCH 5/7] block: remove (__)blkdev_reread_part as an exported API
+Date:   Thu, 14 Nov 2019 15:34:36 +0100
+Message-Id: <20191114143438.14681-6-hch@lst.de>
 X-Mailer: git-send-email 2.20.1
 In-Reply-To: <20191114143438.14681-1-hch@lst.de>
 References: <20191114143438.14681-1-hch@lst.de>
@@ -54,132 +55,162 @@ Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-We still have to set the capacity to 0 if invalidating or call
-revalidate_disk if not even if the disk has no partitions.  Fix
-that by merging rescan_partitions into bdev_disk_changed and just
-stubbing out blk_add_partitions and blk_drop_partitions for
-non-partitioned devices.
+In general drivers should never mess with partition tables directly.
+Unfortunately s390 and loop do for somewhat historic reasons, but they
+can use bdev_disk_changed directly instead when we export it as they
+satisfy the sanity checks we have in __blkdev_reread_part.
 
 Signed-off-by: Christoph Hellwig <hch@lst.de>
+Reviewed-by: Stefan Haberland <sth@linux.ibm.com>	[dasd]
 Reviewed-by: Jan Kara <jack@suse.cz>
 ---
- block/ioctl.c             |  6 ++----
- block/partition-generic.c |  5 +++++
- fs/block_dev.c            | 27 ++++++++-------------------
- include/linux/genhd.h     |  1 +
- 4 files changed, 16 insertions(+), 23 deletions(-)
+ block/ioctl.c                   | 35 +++++----------------------------
+ drivers/block/loop.c            | 13 +++++++-----
+ drivers/s390/block/dasd_genhd.c |  4 +++-
+ fs/block_dev.c                  |  7 +++++++
+ include/linux/fs.h              |  2 --
+ 5 files changed, 23 insertions(+), 38 deletions(-)
 
 diff --git a/block/ioctl.c b/block/ioctl.c
-index f6576a6d5778..5ccd9f016594 100644
+index 5ccd9f016594..7ac8a66c9787 100644
 --- a/block/ioctl.c
 +++ b/block/ioctl.c
-@@ -162,16 +162,14 @@ static int blkpg_ioctl(struct block_device *bdev, struct blkpg_ioctl_arg __user
-  */
- int __blkdev_reread_part(struct block_device *bdev)
+@@ -155,46 +155,21 @@ static int blkpg_ioctl(struct block_device *bdev, struct blkpg_ioctl_arg __user
+ 	}
+ }
+ 
+-/*
+- * This is an exported API for the block driver, and will not
+- * acquire bd_mutex. This API should be used in case that
+- * caller has held bd_mutex already.
+- */
+-int __blkdev_reread_part(struct block_device *bdev)
++static int blkdev_reread_part(struct block_device *bdev)
  {
--	struct gendisk *disk = bdev->bd_disk;
--
--	if (!disk_part_scan_enabled(disk) || bdev != bdev->bd_contains)
-+	if (!disk_part_scan_enabled(bdev->bd_disk) || bdev != bdev->bd_contains)
++	int ret;
++
+ 	if (!disk_part_scan_enabled(bdev->bd_disk) || bdev != bdev->bd_contains)
  		return -EINVAL;
  	if (!capable(CAP_SYS_ADMIN))
  		return -EACCES;
  
- 	lockdep_assert_held(&bdev->bd_mutex);
- 
--	return rescan_partitions(disk, bdev, false);
-+	return bdev_disk_changed(bdev, false);
- }
- EXPORT_SYMBOL(__blkdev_reread_part);
- 
-diff --git a/block/partition-generic.c b/block/partition-generic.c
-index 2cbc23f6032c..61487421a319 100644
---- a/block/partition-generic.c
-+++ b/block/partition-generic.c
-@@ -445,6 +445,8 @@ int blk_drop_partitions(struct gendisk *disk, struct block_device *bdev)
- 	struct hd_struct *part;
- 	int res;
- 
-+	if (!disk_part_scan_enabled(disk))
-+		return 0;
- 	if (bdev->bd_part_count || bdev->bd_super)
- 		return -EBUSY;
- 	res = invalidate_partition(disk, 0);
-@@ -514,6 +516,9 @@ int blk_add_partitions(struct gendisk *disk, struct block_device *bdev)
- 	struct parsed_partitions *state;
- 	int ret = -EAGAIN, p, highest;
- 
-+	if (!disk_part_scan_enabled(disk))
-+		return 0;
-+
- 	state = check_partition(disk, bdev);
- 	if (!state)
- 		return 0;
-diff --git a/fs/block_dev.c b/fs/block_dev.c
-index f0710085e1f1..ae16466a67f7 100644
---- a/fs/block_dev.c
-+++ b/fs/block_dev.c
-@@ -1508,9 +1508,9 @@ EXPORT_SYMBOL(bd_set_size);
- 
- static void __blkdev_put(struct block_device *bdev, fmode_t mode, int for_part);
- 
--static int rescan_partitions(struct gendisk *disk, struct block_device *bdev,
--		bool invalidate)
-+int bdev_disk_changed(struct block_device *bdev, bool invalidate)
- {
-+	struct gendisk *disk = bdev->bd_disk;
- 	int ret;
- 
- rescan:
-@@ -1526,30 +1526,19 @@ static int rescan_partitions(struct gendisk *disk, struct block_device *bdev,
- 	check_disk_size_change(disk, bdev, !invalidate);
- 	bdev->bd_invalidated = 0;
- 
--	if (!get_capacity(disk)) {
-+	if (get_capacity(disk)) {
-+		ret = blk_add_partitions(disk, bdev);
-+		if (ret == -EAGAIN)
-+			goto rescan;
-+	} else {
- 		/*
- 		 * Tell userspace that the media / partition table may have
- 		 * changed.
- 		 */
- 		kobject_uevent(&disk_to_dev(disk)->kobj, KOBJ_CHANGE);
--		return 0;
- 	}
--	
--	ret = blk_add_partitions(disk, bdev);
--	if (ret == -EAGAIN)
--		goto rescan;
--	return ret;
--}
- 
+-	lockdep_assert_held(&bdev->bd_mutex);
 -
--static void bdev_disk_changed(struct block_device *bdev, bool invalidate)
+-	return bdev_disk_changed(bdev, false);
+-}
+-EXPORT_SYMBOL(__blkdev_reread_part);
+-
+-/*
+- * This is an exported API for the block driver, and will
+- * try to acquire bd_mutex. If bd_mutex has been held already
+- * in current context, please call __blkdev_reread_part().
+- *
+- * Make sure the held locks in current context aren't required
+- * in open()/close() handler and I/O path for avoiding ABBA deadlock:
+- * - bd_mutex is held before calling block driver's open/close
+- *   handler
+- * - reading partition table may submit I/O to the block device
+- */
+-int blkdev_reread_part(struct block_device *bdev)
 -{
--	if (disk_part_scan_enabled(bdev->bd_disk)) {
--		rescan_partitions(bdev->bd_disk, bdev, invalidate);
--	} else {
--		check_disk_size_change(bdev->bd_disk, bdev, !invalidate);
--		bdev->bd_invalidated = 0;
--	}
+-	int res;
+-
+ 	mutex_lock(&bdev->bd_mutex);
+-	res = __blkdev_reread_part(bdev);
++	ret = bdev_disk_changed(bdev, false);
+ 	mutex_unlock(&bdev->bd_mutex);
+ 
+-	return res;
 +	return ret;
  }
+-EXPORT_SYMBOL(blkdev_reread_part);
+ 
+ static int blk_ioctl_discard(struct block_device *bdev, fmode_t mode,
+ 		unsigned long arg, unsigned long flags)
+diff --git a/drivers/block/loop.c b/drivers/block/loop.c
+index ef6e251857c8..739b372a5112 100644
+--- a/drivers/block/loop.c
++++ b/drivers/block/loop.c
+@@ -640,7 +640,9 @@ static void loop_reread_partitions(struct loop_device *lo,
+ {
+ 	int rc;
+ 
+-	rc = blkdev_reread_part(bdev);
++	mutex_lock(&bdev->bd_mutex);
++	rc = bdev_disk_changed(bdev, false);
++	mutex_unlock(&bdev->bd_mutex);
+ 	if (rc)
+ 		pr_warn("%s: partition scan of loop%d (%s) failed (rc=%d)\n",
+ 			__func__, lo->lo_number, lo->lo_file_name, rc);
+@@ -1164,10 +1166,11 @@ static int __loop_clr_fd(struct loop_device *lo, bool release)
+ 		 * must be at least one and it can only become zero when the
+ 		 * current holder is released.
+ 		 */
+-		if (release)
+-			err = __blkdev_reread_part(bdev);
+-		else
+-			err = blkdev_reread_part(bdev);
++		if (!release)
++			mutex_lock(&bdev->bd_mutex);
++		err = bdev_disk_changed(bdev, false);
++		if (!release)
++			mutex_unlock(&bdev->bd_mutex);
+ 		if (err)
+ 			pr_warn("%s: partition scan of loop%d failed (rc=%d)\n",
+ 				__func__, lo_number, err);
+diff --git a/drivers/s390/block/dasd_genhd.c b/drivers/s390/block/dasd_genhd.c
+index 5542d9eadfe0..7d079154f849 100644
+--- a/drivers/s390/block/dasd_genhd.c
++++ b/drivers/s390/block/dasd_genhd.c
+@@ -116,7 +116,9 @@ int dasd_scan_partitions(struct dasd_block *block)
+ 		return -ENODEV;
+ 	}
+ 
+-	rc = blkdev_reread_part(bdev);
++	mutex_lock(&bdev->bd_mutex);
++	rc = bdev_disk_changed(bdev, false);
++	mutex_unlock(&bdev->bd_mutex);
+ 	if (rc)
+ 		DBF_DEV_EVENT(DBF_ERR, block->base,
+ 				"scan partitions error, rc %d", rc);
+diff --git a/fs/block_dev.c b/fs/block_dev.c
+index ae16466a67f7..9558a2f064b1 100644
+--- a/fs/block_dev.c
++++ b/fs/block_dev.c
+@@ -1513,6 +1513,8 @@ int bdev_disk_changed(struct block_device *bdev, bool invalidate)
+ 	struct gendisk *disk = bdev->bd_disk;
+ 	int ret;
+ 
++	lockdep_assert_held(&bdev->bd_mutex);
++
+ rescan:
+ 	ret = blk_drop_partitions(disk, bdev);
+ 	if (ret)
+@@ -1540,6 +1542,11 @@ int bdev_disk_changed(struct block_device *bdev, bool invalidate)
+ 
+ 	return ret;
+ }
++/*
++ * Only exported for for loop and dasd for historic reasons.  Don't use in new
++ * code!
++ */
++EXPORT_SYMBOL_GPL(bdev_disk_changed);
  
  /*
-diff --git a/include/linux/genhd.h b/include/linux/genhd.h
-index f5cffbf63abf..8bb63027e4d6 100644
---- a/include/linux/genhd.h
-+++ b/include/linux/genhd.h
-@@ -621,6 +621,7 @@ extern void blk_invalidate_devt(dev_t devt);
- extern dev_t blk_lookup_devt(const char *name, int partno);
- extern char *disk_name (struct gendisk *hd, int partno, char *buf);
+  * bd_mutex locking:
+diff --git a/include/linux/fs.h b/include/linux/fs.h
+index d233dd661df7..ae6c5c37f3ae 100644
+--- a/include/linux/fs.h
++++ b/include/linux/fs.h
+@@ -2632,8 +2632,6 @@ extern void bd_finish_claiming(struct block_device *bdev,
+ extern void bd_abort_claiming(struct block_device *bdev,
+ 			      struct block_device *whole, void *holder);
+ extern void blkdev_put(struct block_device *bdev, fmode_t mode);
+-extern int __blkdev_reread_part(struct block_device *bdev);
+-extern int blkdev_reread_part(struct block_device *bdev);
  
-+int bdev_disk_changed(struct block_device *bdev, bool invalidate);
- int blk_add_partitions(struct gendisk *disk, struct block_device *bdev);
- int blk_drop_partitions(struct gendisk *disk, struct block_device *bdev);
- extern int disk_expand_part_tbl(struct gendisk *disk, int target);
+ #ifdef CONFIG_SYSFS
+ extern int bd_link_disk_holder(struct block_device *bdev, struct gendisk *disk);
 -- 
 2.20.1
 
