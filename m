@@ -2,98 +2,106 @@ Return-Path: <SRS0=aEt0=ZG=vger.kernel.org=linux-block-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-9.8 required=3.0 tests=DKIMWL_WL_HIGH,DKIM_SIGNED,
-	DKIM_VALID,DKIM_VALID_AU,HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,
-	MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,UNPARSEABLE_RELAY,
-	USER_AGENT_GIT autolearn=ham autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-0.8 required=3.0 tests=DKIMWL_WL_HIGH,DKIM_SIGNED,
+	DKIM_VALID,DKIM_VALID_AU,HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,
+	SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED autolearn=no autolearn_force=no
+	version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 27E06C432C3
-	for <linux-block@archiver.kernel.org>; Thu, 14 Nov 2019 23:04:40 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 82B0CC432C3
+	for <linux-block@archiver.kernel.org>; Thu, 14 Nov 2019 23:19:47 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.kernel.org (Postfix) with ESMTP id B6ED120723
-	for <linux-block@archiver.kernel.org>; Thu, 14 Nov 2019 23:04:39 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id 5AD45206F0
+	for <linux-block@archiver.kernel.org>; Thu, 14 Nov 2019 23:19:47 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=pass (2048-bit key) header.d=oracle.com header.i=@oracle.com header.b="ZieNfmMr"
+	dkim=pass (1024-bit key) header.d=chromium.org header.i=@chromium.org header.b="ev1bBGx7"
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1726996AbfKNXEj (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Thu, 14 Nov 2019 18:04:39 -0500
-Received: from userp2130.oracle.com ([156.151.31.86]:53160 "EHLO
-        userp2130.oracle.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1726319AbfKNXEj (ORCPT
+        id S1727148AbfKNXTo (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Thu, 14 Nov 2019 18:19:44 -0500
+Received: from mail-lf1-f66.google.com ([209.85.167.66]:38499 "EHLO
+        mail-lf1-f66.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S1727112AbfKNXTo (ORCPT
         <rfc822;linux-block@vger.kernel.org>);
-        Thu, 14 Nov 2019 18:04:39 -0500
-Received: from pps.filterd (userp2130.oracle.com [127.0.0.1])
-        by userp2130.oracle.com (8.16.0.27/8.16.0.27) with SMTP id xAEMxEjQ130753
-        for <linux-block@vger.kernel.org>; Thu, 14 Nov 2019 23:04:37 GMT
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=oracle.com; h=from : to : cc :
- subject : date : message-id; s=corp-2019-08-05;
- bh=6LFVCzWmyzovXI/WdCa9c8G3q0BMWglxC6+Ttli5gmU=;
- b=ZieNfmMrUVL02s36XvkimJX10U0MtWVNnD2eVqJ8wZRfT+F8zadRLSwlgImUWqp6OLgK
- JfqlM8z9BEHUILbNl2DUAEKq6Y/6SeguM/6zznsGlbe3AOLpHLdqi8jTJ68OGozHfXq0
- Aesh9UZeY2/cxiW56rILvjRWE8t6cfOj7M5yHDnO6nq7KfgFIgOrdw4F2netv42ZUlKK
- EL4Ur5T/rYyCCji5+ufWqK18/8Gsgp6z2zLUCoFJKZjOMCs+A5nYjwUwity5Sunk5h+c
- o6qQgq9G0ZrDdYyRx7ttN6whI5pGY61BXS+TP6lTcmLBEdO65pXLgNQi3YvArbrtfWRq HQ== 
-Received: from userp3030.oracle.com (userp3030.oracle.com [156.151.31.80])
-        by userp2130.oracle.com with ESMTP id 2w9fayg8dc-1
-        (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=OK)
-        for <linux-block@vger.kernel.org>; Thu, 14 Nov 2019 23:04:37 +0000
-Received: from pps.filterd (userp3030.oracle.com [127.0.0.1])
-        by userp3030.oracle.com (8.16.0.27/8.16.0.27) with SMTP id xAEMwqJZ102782
-        for <linux-block@vger.kernel.org>; Thu, 14 Nov 2019 23:02:37 GMT
-Received: from aserv0122.oracle.com (aserv0122.oracle.com [141.146.126.236])
-        by userp3030.oracle.com with ESMTP id 2w9fatanuj-1
-        (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=OK)
-        for <linux-block@vger.kernel.org>; Thu, 14 Nov 2019 23:02:37 +0000
-Received: from abhmp0016.oracle.com (abhmp0016.oracle.com [141.146.116.22])
-        by aserv0122.oracle.com (8.14.4/8.14.4) with ESMTP id xAEN2apx018865
-        for <linux-block@vger.kernel.org>; Thu, 14 Nov 2019 23:02:36 GMT
-Received: from jubi-laptop.us.oracle.com (/10.211.46.104)
-        by default (Oracle Beehive Gateway v4.0)
-        with ESMTP ; Thu, 14 Nov 2019 15:02:36 -0800
-From:   Junxiao Bi <junxiao.bi@oracle.com>
-To:     linux-block@vger.kernel.org
-Cc:     junxiao.bi@oracle.com
-Subject: [PATCH] block-mq: ratelimit the warning log
-Date:   Thu, 14 Nov 2019 15:02:33 -0800
-Message-Id: <20191114230233.3582-1-junxiao.bi@oracle.com>
-X-Mailer: git-send-email 2.17.1
-X-Proofpoint-Virus-Version: vendor=nai engine=6000 definitions=9441 signatures=668685
-X-Proofpoint-Spam-Details: rule=notspam policy=default score=0 suspectscore=1 malwarescore=0
- phishscore=0 bulkscore=0 spamscore=0 mlxscore=0 mlxlogscore=962
- adultscore=0 classifier=spam adjust=0 reason=mlx scancount=1
- engine=8.0.1-1911140000 definitions=main-1911140187
-X-Proofpoint-Virus-Version: vendor=nai engine=6000 definitions=9441 signatures=668685
-X-Proofpoint-Spam-Details: rule=notspam policy=default score=0 suspectscore=1 malwarescore=0
- phishscore=0 bulkscore=0 spamscore=0 mlxscore=0 mlxlogscore=999
- adultscore=0 classifier=spam adjust=0 reason=mlx scancount=1
- engine=8.0.1-1911140000 definitions=main-1911140187
+        Thu, 14 Nov 2019 18:19:44 -0500
+Received: by mail-lf1-f66.google.com with SMTP id q28so6473857lfa.5
+        for <linux-block@vger.kernel.org>; Thu, 14 Nov 2019 15:19:42 -0800 (PST)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=chromium.org; s=google;
+        h=mime-version:references:in-reply-to:from:date:message-id:subject:to
+         :cc;
+        bh=ICrO0QRstvenGdVeXDhZbaKDYu3NwTrJocm24+ZpLeM=;
+        b=ev1bBGx7lLlrnl26b7rac/GdwfVDNkM6VDvIUf7VBtsxoiUazG/I7hXMGRVkH4s9Zr
+         5n1Q/xO5/Ub03hzKELw/qorFGTCAcInMY/IBmyOxe45PHOoaJixrg1e5WMT5xWskDhnR
+         F0c0xW4ygk84ZQZhlsONe5gHFlDxIFEJ6FKYQ=
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20161025;
+        h=x-gm-message-state:mime-version:references:in-reply-to:from:date
+         :message-id:subject:to:cc;
+        bh=ICrO0QRstvenGdVeXDhZbaKDYu3NwTrJocm24+ZpLeM=;
+        b=BM8DGddQua1gqobWkWWhMlyiUipKVTmL+SwgwDcEQakY2C5XWusZ+YuKUWEG7hiokQ
+         Ndl/BRnzwabpohWY5WaGRd6Oq8dqKdFecPHbMKlfNf40ghStHoJs48w/rXRr0aiNl8aD
+         8BamVKeN6VZyhGLh3jkFmQvVAgTJXXphyc7hrgnFMWbY7Ge+beGkqF4kfoIqwEcEV5f6
+         4vHJlNSfp1q/MEtTlwro2FBhHmKGIvlURwsB1YOJyvAVp/KTkyxWOJoBQrP7USU5ONWG
+         dxtuGB6BEntaYr5uFWNarNazlPEL2OYnjgHRnOlDBdJ6YGNkfxYVPGM/ddpNz0Ccd0tj
+         B9Ug==
+X-Gm-Message-State: APjAAAUuSIxtI4Ocu2rQBd1fofZPob6g4/XIAjLCz72FVbbkt1nCy9Ny
+        oa0Ech1mOOyRBFFvN9+61eM8Px90qZ0=
+X-Google-Smtp-Source: APXvYqypeqYi5iM08EQ8iz8LFuXX6wotueILFMvwLwKEqhXj+9dufd+X3eJlAhHl3ZZmzCvpSrx1tg==
+X-Received: by 2002:a19:895:: with SMTP id 143mr8733135lfi.158.1573773581645;
+        Thu, 14 Nov 2019 15:19:41 -0800 (PST)
+Received: from mail-lf1-f43.google.com (mail-lf1-f43.google.com. [209.85.167.43])
+        by smtp.gmail.com with ESMTPSA id n8sm3361160lfe.31.2019.11.14.15.19.40
+        for <linux-block@vger.kernel.org>
+        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
+        Thu, 14 Nov 2019 15:19:40 -0800 (PST)
+Received: by mail-lf1-f43.google.com with SMTP id j14so6454731lfb.8
+        for <linux-block@vger.kernel.org>; Thu, 14 Nov 2019 15:19:40 -0800 (PST)
+X-Received: by 2002:a05:6512:21c:: with SMTP id a28mr8857425lfo.79.1573773578349;
+ Thu, 14 Nov 2019 15:19:38 -0800 (PST)
+MIME-Version: 1.0
+References: <20191111185030.215451-1-evgreen@chromium.org> <20191111185030.215451-2-evgreen@chromium.org>
+ <20191112083208.GA1848@infradead.org> <CAE=gft4=3ysHxWBVjfOsGVRHcORP3XcbSxd3hQ+YtJhMTPNgKg@mail.gmail.com>
+In-Reply-To: <CAE=gft4=3ysHxWBVjfOsGVRHcORP3XcbSxd3hQ+YtJhMTPNgKg@mail.gmail.com>
+From:   Evan Green <evgreen@chromium.org>
+Date:   Thu, 14 Nov 2019 15:19:02 -0800
+X-Gmail-Original-Message-ID: <CAE=gft6-dOUztUDHQUKDbw=ghdyXfbVD49nax5PiGJmWpAKhVg@mail.gmail.com>
+Message-ID: <CAE=gft6-dOUztUDHQUKDbw=ghdyXfbVD49nax5PiGJmWpAKhVg@mail.gmail.com>
+Subject: Re: [PATCH v6 1/2] loop: Report EOPNOTSUPP properly
+To:     Christoph Hellwig <hch@infradead.org>
+Cc:     Jens Axboe <axboe@kernel.dk>,
+        Martin K Petersen <martin.petersen@oracle.com>,
+        Gwendal Grignou <gwendal@chromium.org>,
+        Ming Lei <ming.lei@redhat.com>,
+        "Darrick J . Wong" <darrick.wong@oracle.com>,
+        Alexis Savery <asavery@chromium.org>,
+        Douglas Anderson <dianders@chromium.org>,
+        Bart Van Assche <bvanassche@acm.org>,
+        Chaitanya Kulkarni <chaitanya.kulkarni@wdc.com>,
+        linux-block <linux-block@vger.kernel.org>,
+        LKML <linux-kernel@vger.kernel.org>
+Content-Type: text/plain; charset="UTF-8"
 Sender: linux-block-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-When doing cpu online/offlile, sometimes this warning will be triggered,
-it's harmless, io will be dispatched. But sometimes it warns too much and
-even stall the whole system, so ratelimit it.
+On Tue, Nov 12, 2019 at 11:09 AM Evan Green <evgreen@chromium.org> wrote:
+>
+> On Tue, Nov 12, 2019 at 12:32 AM Christoph Hellwig <hch@infradead.org> wrote:
+> >
+> > On Mon, Nov 11, 2019 at 10:50:29AM -0800, Evan Green wrote:
+> > > -             if (cmd->ret < 0)
+> > > +             if (cmd->ret == -EOPNOTSUPP)
+> > > +                     ret = BLK_STS_NOTSUPP;
+> > > +             else if (cmd->ret < 0)
+> > >                       ret = BLK_STS_IOERR;
+> >
+> > This really should use errno_to_blk_status.  Same for the other hunk.
+>
+> Seems reasonable, I can switch to that.
 
-Signed-off-by: Junxiao Bi <junxiao.bi@oracle.com>
----
- block/blk-mq.c | 2 +-
- 1 file changed, 1 insertion(+), 1 deletion(-)
+Oh wait, the other hunk doesn't deal with blk_status_t at all. Before,
+it just translated any errno into -EIO. Now, it translates almost any
+errno to -EIO (the almost being EOPNOTSUPP).
 
-diff --git a/block/blk-mq.c b/block/blk-mq.c
-index ec791156e9cc..846f5d26c523 100644
---- a/block/blk-mq.c
-+++ b/block/blk-mq.c
-@@ -1384,7 +1384,7 @@ static void __blk_mq_run_hw_queue(struct blk_mq_hw_ctx *hctx)
- 	 *   handle dispatched requests to this hctx
- 	 */
- 	if (!cpumask_test_cpu(raw_smp_processor_id(), hctx->cpumask) &&
--		cpu_online(hctx->next_cpu)) {
-+		cpu_online(hctx->next_cpu) && printk_ratelimit()) {
- 		printk(KERN_WARNING "run queue from wrong CPU %d, hctx %s\n",
- 			raw_smp_processor_id(),
- 			cpumask_empty(hctx->cpumask) ? "inactive": "active");
--- 
-2.17.1
-
+So I'll change just the first hunk you pointed out.
+-Evan
