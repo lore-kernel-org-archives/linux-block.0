@@ -2,118 +2,97 @@ Return-Path: <SRS0=aEt0=ZG=vger.kernel.org=linux-block-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-8.2 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
-	INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,
-	URIBL_BLOCKED,USER_AGENT_SANE_1 autolearn=ham autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-5.2 required=3.0 tests=DKIM_SIGNED,DKIM_VALID,
+	HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,
+	SPF_PASS,USER_AGENT_SANE_1 autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id D8475C43141
-	for <linux-block@archiver.kernel.org>; Thu, 14 Nov 2019 18:19:48 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 4EA81C432C3
+	for <linux-block@archiver.kernel.org>; Thu, 14 Nov 2019 20:57:16 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.kernel.org (Postfix) with ESMTP id BEA3020727
-	for <linux-block@archiver.kernel.org>; Thu, 14 Nov 2019 18:19:48 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id 2094A2071B
+	for <linux-block@archiver.kernel.org>; Thu, 14 Nov 2019 20:57:16 +0000 (UTC)
+Authentication-Results: mail.kernel.org;
+	dkim=pass (2048-bit key) header.d=kernel-dk.20150623.gappssmtp.com header.i=@kernel-dk.20150623.gappssmtp.com header.b="JXthpDS2"
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1726901AbfKNSTr (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Thu, 14 Nov 2019 13:19:47 -0500
-Received: from mga17.intel.com ([192.55.52.151]:26366 "EHLO mga17.intel.com"
-        rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-        id S1726767AbfKNSTr (ORCPT <rfc822;linux-block@vger.kernel.org>);
-        Thu, 14 Nov 2019 13:19:47 -0500
-X-Amp-Result: SKIPPED(no attachment in message)
-X-Amp-File-Uploaded: False
-Received: from fmsmga002.fm.intel.com ([10.253.24.26])
-  by fmsmga107.fm.intel.com with ESMTP/TLS/DHE-RSA-AES256-GCM-SHA384; 14 Nov 2019 10:19:46 -0800
-X-ExtLoop1: 1
-X-IronPort-AV: E=Sophos;i="5.68,304,1569308400"; 
-   d="scan'208";a="235773099"
-Received: from unknown (HELO [10.232.115.130]) ([10.232.115.130])
-  by fmsmga002.fm.intel.com with ESMTP; 14 Nov 2019 10:19:46 -0800
-Subject: Re: [PATCH] block: sed-opal: Introduce SUM_SET_LIST parameter and
- append it using 'add_token_u64'
-To:     Jens Axboe <axboe@kernel.dk>, linux-block@vger.kernel.org
-Cc:     Scott Bauer <sbauer@plzdonthack.me>,
-        Jonathan Derrick <jonathan.derrick@intel.com>
-References: <20191108230904.7932-1-revanth.rajashekar@intel.com>
- <e1bd6f75-b352-1ff8-af73-1ed9de04cff5@intel.com>
- <63cfa17b-28df-ac52-30ac-d5d6bd93a116@kernel.dk>
-From:   "Rajashekar, Revanth" <revanth.rajashekar@intel.com>
-Message-ID: <c469d505-fa61-85d7-0e9a-2d45fed1e7b6@intel.com>
-Date:   Thu, 14 Nov 2019 11:19:45 -0700
-User-Agent: Mozilla/5.0 (Windows NT 10.0; WOW64; rv:60.0) Gecko/20100101
+        id S1726640AbfKNU5P (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Thu, 14 Nov 2019 15:57:15 -0500
+Received: from mail-io1-f67.google.com ([209.85.166.67]:33132 "EHLO
+        mail-io1-f67.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S1726567AbfKNU5P (ORCPT
+        <rfc822;linux-block@vger.kernel.org>);
+        Thu, 14 Nov 2019 15:57:15 -0500
+Received: by mail-io1-f67.google.com with SMTP id j13so8448266ioe.0
+        for <linux-block@vger.kernel.org>; Thu, 14 Nov 2019 12:57:13 -0800 (PST)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=kernel-dk.20150623.gappssmtp.com; s=20150623;
+        h=subject:to:cc:references:from:message-id:date:user-agent
+         :mime-version:in-reply-to:content-language:content-transfer-encoding;
+        bh=+zRyTXSqsn14PHcbRVeqya++muSJS/9tbPO2TQmYKyI=;
+        b=JXthpDS2Apo9bS0yseA7zp9cQw9BxxKl98mjs8tYCAgoOE4ohNuBJLekoHzyc743rY
+         4IkJz78r92cUaMzbva9yPNFGwfk4K9GseDXO4VFknvUyZAFHHKWwazXA+d6w1uEbL5ve
+         BbYnJTsWAHNlK3hHjq1F9BZ6x6T8YLDBtXx2hAU5q/E68FIqwZ/L51u+hp1ka0hvhfLC
+         OHKKKQT+Ew9UuECOdPsVsflaR2mWIZYjmXitwmP0aBZ4rEgEQclcPFshMzKyTQrjHg6W
+         UONoKPO+Rhs31wA2jBrleq64lpOQ3gUzxMhlp0pqUKR7ba84Joms5gIvk31xyua1cY1o
+         MRNg==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20161025;
+        h=x-gm-message-state:subject:to:cc:references:from:message-id:date
+         :user-agent:mime-version:in-reply-to:content-language
+         :content-transfer-encoding;
+        bh=+zRyTXSqsn14PHcbRVeqya++muSJS/9tbPO2TQmYKyI=;
+        b=qVtXNZj+QeQpIVsyhgh+YFbVzVCiRwkocOaQg4HMhNe5r0jAAeWYWi1N+ICsawJdh2
+         i1bvzbHwajsdxrkD6U2Xy3BkleFGh9mzJoNdyJ3oBD9a3Er2Ec1uL+johqZdatCoEczC
+         6vyuZOOWRdarK0HcoqmDpUQMBvP5k191Q6i27KJX+lD8SrDOD/21ksEzNPPhpOuDj6+i
+         AuOurA5VIKhHJydb6MetFGyJYOgRGF2Ua9JX7Jopo778+9k8aM0Z0v75EaaOPyL4aljh
+         T8iaFoKfmIitljaovKEOQyoAbnMc6A9DvMgnw20/ERSFeCCUx1UnRD+OlkHV1kq4xiMi
+         hvng==
+X-Gm-Message-State: APjAAAVtfZXlzImOVdSGQwVVyuwfJ8wmbrTAUl5On563wuo591QX4Mb9
+        uaA9tlc8WZkli8TZPwmzE+Km4tAYorc=
+X-Google-Smtp-Source: APXvYqza24GgqwgSnIzFlA6lqAbdIACAyJMIKBue2pGr3gGh6xt7XisuDUJ1ildp0zfFEJ21CmzsJA==
+X-Received: by 2002:a02:742a:: with SMTP id o42mr9402201jac.24.1573765032948;
+        Thu, 14 Nov 2019 12:57:12 -0800 (PST)
+Received: from [192.168.1.159] ([65.144.74.34])
+        by smtp.gmail.com with ESMTPSA id q144sm654621iod.64.2019.11.14.12.57.11
+        (version=TLS1_2 cipher=ECDHE-RSA-AES128-GCM-SHA256 bits=128/128);
+        Thu, 14 Nov 2019 12:57:12 -0800 (PST)
+Subject: Re: [PATCH] iocost: check active_list of all the ancestors in
+ iocg_activate()
+To:     Tejun Heo <tj@kernel.org>,
+        Jiufei Xue <jiufei.xue@linux.alibaba.com>
+Cc:     cgroups@vger.kernel.org, linux-block@vger.kernel.org,
+        joseph.qi@linux.alibaba.com
+References: <1573629691-6619-1-git-send-email-jiufei.xue@linux.alibaba.com>
+ <20191113162045.GH4163745@devbig004.ftw2.facebook.com>
+From:   Jens Axboe <axboe@kernel.dk>
+Message-ID: <e07d068c-5b30-6327-d8df-1be42bcf943a@kernel.dk>
+Date:   Thu, 14 Nov 2019 13:57:10 -0700
+User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:60.0) Gecko/20100101
  Thunderbird/60.9.0
 MIME-Version: 1.0
-In-Reply-To: <63cfa17b-28df-ac52-30ac-d5d6bd93a116@kernel.dk>
+In-Reply-To: <20191113162045.GH4163745@devbig004.ftw2.facebook.com>
 Content-Type: text/plain; charset=utf-8
-Content-Transfer-Encoding: 7bit
 Content-Language: en-US
+Content-Transfer-Encoding: 7bit
 Sender: linux-block-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-
-On 11/14/2019 10:28 AM, Jens Axboe wrote:
-> On 11/14/19 9:14 AM, Rajashekar, Revanth wrote:
->> Hi,
+On 11/13/19 9:20 AM, Tejun Heo wrote:
+> On Wed, Nov 13, 2019 at 03:21:31PM +0800, Jiufei Xue wrote:
+>> There is a bug that checking the same active_list over and over again
+>> in iocg_activate(). The intention of the code was checking whether all
+>> the ancestors and self have already been activated. So fix it.
 >>
->> On 11/8/2019 4:09 PM, Revanth Rajashekar wrote:
->>> In function 'activate_lsp', rather than hard-coding the
->>> short atom header(0x83), we need to let the function
->>> 'add_short_atom_header' append the header based on the
->>> parameter being appended.
->>>
->>> The paramete has been defined in Section 3.1.2.1 of
->>> https://trustedcomputinggroup.org/wp-content/uploads/TCG_Storage-Opal_Feature_Set_Single_User_Mode_v1-00_r1-00-Final.pdf
->>>
->>> Signed-off-by: Revanth Rajashekar <revanth.rajashekar@intel.com>
->>> ---
->>>   block/opal_proto.h | 4 ++++
->>>   block/sed-opal.c   | 6 +-----
->>>   2 files changed, 5 insertions(+), 5 deletions(-)
->>>
->>> diff --git a/block/opal_proto.h b/block/opal_proto.h
->>> index 736e67c3e7c5..325cbba2465f 100644
->>> --- a/block/opal_proto.h
->>> +++ b/block/opal_proto.h
->>> @@ -205,6 +205,10 @@ enum opal_lockingstate {
->>>   	OPAL_LOCKING_LOCKED = 0x03,
->>>   };
->>>   
->>> +enum opal_parameter {
->>> +	OPAL_SUM_SET_LIST = 0x060000,
->>> +};
->>> +
->>>   /* Packets derived from:
->>>    * TCG_Storage_Architecture_Core_Spec_v2.01_r1.00
->>>    * Secion: 3.2.3 ComPackets, Packets & Subpackets
->>> diff --git a/block/sed-opal.c b/block/sed-opal.c
->>> index b2cacc9ddd11..880cc57a5f6b 100644
->>> --- a/block/sed-opal.c
->>> +++ b/block/sed-opal.c
->>> @@ -1886,7 +1886,6 @@ static int activate_lsp(struct opal_dev *dev, void *data)
->>>   {
->>>   	struct opal_lr_act *opal_act = data;
->>>   	u8 user_lr[OPAL_UID_LENGTH];
->>> -	u8 uint_3 = 0x83;
->>>   	int err, i;
->>>   
->>>   	err = cmd_start(dev, opaluid[OPAL_LOCKINGSP_UID],
->>> @@ -1899,10 +1898,7 @@ static int activate_lsp(struct opal_dev *dev, void *data)
->>>   			return err;
->>>   
->>>   		add_token_u8(&err, dev, OPAL_STARTNAME);
->>> -		add_token_u8(&err, dev, uint_3);
->>> -		add_token_u8(&err, dev, 6);
->>> -		add_token_u8(&err, dev, 0);
->>> -		add_token_u8(&err, dev, 0);
->>> +		add_token_u64(&err, dev, OPAL_SUM_SET_LIST);
->>>   
->>>   		add_token_u8(&err, dev, OPAL_STARTLIST);
->>>   		add_token_bytestring(&err, dev, user_lr, OPAL_UID_LENGTH);
->> Kind remainder to review this patch and throw your comments if any :)
-> I'll be happy to queue it up for 5.5, but Scott/Jonathan should
-> review/ack it first.
+>> Signed-off-by: Jiufei Xue <jiufei.xue@linux.alibaba.com>
+> 
+> Fixes: 7caa47151ab2 ("blkcg: implement blk-iocost")
+> Acked-by: Tejun Heo <tj@kernel.org>
+> 
+> Jens, can you please apply this patch?
 
-Sure.
+Applied for 5.4, thanks.
 
-Thank you :)
+-- 
+Jens Axboe
 
