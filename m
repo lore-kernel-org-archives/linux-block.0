@@ -2,217 +2,98 @@ Return-Path: <SRS0=aEt0=ZG=vger.kernel.org=linux-block-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-8.2 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
-	INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,
-	URIBL_BLOCKED,USER_AGENT_SANE_1 autolearn=ham autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-2.2 required=3.0 tests=DKIM_SIGNED,DKIM_VALID,
+	HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,
+	USER_AGENT_SANE_1 autolearn=no autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 67E6FC432C3
-	for <linux-block@archiver.kernel.org>; Thu, 14 Nov 2019 13:29:01 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id ABE77C43141
+	for <linux-block@archiver.kernel.org>; Thu, 14 Nov 2019 14:02:16 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.kernel.org (Postfix) with ESMTP id 468FA206DC
-	for <linux-block@archiver.kernel.org>; Thu, 14 Nov 2019 13:29:00 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id 824CF20706
+	for <linux-block@archiver.kernel.org>; Thu, 14 Nov 2019 14:02:16 +0000 (UTC)
+Authentication-Results: mail.kernel.org;
+	dkim=pass (2048-bit key) header.d=kernel-dk.20150623.gappssmtp.com header.i=@kernel-dk.20150623.gappssmtp.com header.b="jh5A1Idf"
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1726214AbfKNN27 (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Thu, 14 Nov 2019 08:28:59 -0500
-Received: from mx2.suse.de ([195.135.220.15]:52830 "EHLO mx1.suse.de"
-        rhost-flags-OK-OK-OK-FAIL) by vger.kernel.org with ESMTP
-        id S1726139AbfKNN27 (ORCPT <rfc822;linux-block@vger.kernel.org>);
-        Thu, 14 Nov 2019 08:28:59 -0500
-X-Virus-Scanned: by amavisd-new at test-mx.suse.de
-Received: from relay2.suse.de (unknown [195.135.220.254])
-        by mx1.suse.de (Postfix) with ESMTP id 63694AD6B;
-        Thu, 14 Nov 2019 13:28:56 +0000 (UTC)
-Received: by quack2.suse.cz (Postfix, from userid 1000)
-        id 21E491E4331; Thu, 14 Nov 2019 14:28:52 +0100 (CET)
-Date:   Thu, 14 Nov 2019 14:28:52 +0100
-From:   Jan Kara <jack@suse.cz>
-To:     Christoph Hellwig <hch@lst.de>
-Cc:     Jens Axboe <axboe@kernel.dk>, Jan Kara <jack@suse.cz>,
-        linux-block@vger.kernel.org, linux-s390@vger.kernel.org
-Subject: Re: [PATCH 3/5] block: move rescan_partitions to fs/block_dev.c
-Message-ID: <20191114132852.GH28486@quack2.suse.cz>
-References: <20191106151439.30056-1-hch@lst.de>
- <20191106151439.30056-4-hch@lst.de>
+        id S1726410AbfKNOCP (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Thu, 14 Nov 2019 09:02:15 -0500
+Received: from mail-il1-f193.google.com ([209.85.166.193]:34972 "EHLO
+        mail-il1-f193.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S1726628AbfKNOCP (ORCPT
+        <rfc822;linux-block@vger.kernel.org>);
+        Thu, 14 Nov 2019 09:02:15 -0500
+Received: by mail-il1-f193.google.com with SMTP id z12so5427531ilp.2
+        for <linux-block@vger.kernel.org>; Thu, 14 Nov 2019 06:02:13 -0800 (PST)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=kernel-dk.20150623.gappssmtp.com; s=20150623;
+        h=subject:to:cc:references:from:message-id:date:user-agent
+         :mime-version:in-reply-to:content-language:content-transfer-encoding;
+        bh=bP5aXB8esLf+y2oPdRoL7DXfw8H9Z3reP0YO4Q66KYg=;
+        b=jh5A1Idf07c0NAsTHdQbxlD787iR6mr4Egm6bbN3LUvEQfCLuRYp7pQkOFNwgXQmdK
+         zYbD33Weq+ack2utVVd1J6X8gaiZBpJQqAMcCKekxzHEpiaB8YNzQo0Ufol49oqkkcv/
+         MqDhL87ETyMwVbSdfNpjvC9N7jsraVPyfMthlnCOjw9SibZhE4IReGIn/NJ2ottzGHR4
+         7cZ0guUZrIdL61SKo0NJdDvSYjmyonhaNwl+z78IgPCAjUWWJ1L2RMtmNTkd6mJBsF4w
+         NfXU6T61DZZHq6HMoV/jtYR8rO5byHSsrfROVCJqTuFszu4osV/cHUduNV/tT0P2usOf
+         9dNg==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20161025;
+        h=x-gm-message-state:subject:to:cc:references:from:message-id:date
+         :user-agent:mime-version:in-reply-to:content-language
+         :content-transfer-encoding;
+        bh=bP5aXB8esLf+y2oPdRoL7DXfw8H9Z3reP0YO4Q66KYg=;
+        b=U9LKez2mM1RtNrgK+LIV7UR9nbU4OVLeq9jV1WveEnNafjVCawPnOZZvcBLAjWHhzI
+         VkQFs5qx3iGmVX+F0qUGBs9yOsevI/H60DRZddITRt/0S7VdazQaZgDf5NC9K8wkDhY8
+         qMTXCQJLoDEi5HUQvKqZfVF5EZRGO0WCFsYf933a//cF9X0zvIGzfJKPwb+ViCgtR+e2
+         CChDfIdnwqvj2GN/FmG0RNpG7srqbTmfof8N6IKLUtnWvT18sbhaf72sloBhf5XNqgBC
+         oqHxDF8bWGND+ncfAR+sJ+AmPIu3VTiIGOiLCglw9Eh0PE8Hb4FLNsOD7p20XFb6bfLw
+         V+ig==
+X-Gm-Message-State: APjAAAXIWJyXBATTyYtx6XKI/SVEqs20yccCWZoR8jn6qnEUzNYVkd0t
+        bI8Hr2e54DikhwC9CXNdQH3ExQ==
+X-Google-Smtp-Source: APXvYqy8HzMQ4UKCQ+x395DraufXkyG+JEoM6NQeEfSh3Gi5bmEBQC8iw+GCAqFfkC1DYTmcCTmrGg==
+X-Received: by 2002:a92:1793:: with SMTP id 19mr10106214ilx.3.1573740133053;
+        Thu, 14 Nov 2019 06:02:13 -0800 (PST)
+Received: from [192.168.1.159] ([65.144.74.34])
+        by smtp.gmail.com with ESMTPSA id f21sm724409ill.57.2019.11.14.06.02.09
+        (version=TLS1_2 cipher=ECDHE-RSA-AES128-GCM-SHA256 bits=128/128);
+        Thu, 14 Nov 2019 06:02:11 -0800 (PST)
+Subject: Re: [PATCH BUGFIX V2 0/1] block, bfq: deschedule empty bfq_queues not
+ referred by any process
+To:     Paolo Valente <paolo.valente@linaro.org>
+Cc:     linux-block@vger.kernel.org, linux-kernel@vger.kernel.org,
+        ulf.hansson@linaro.org, linus.walleij@linaro.org,
+        bfq-iosched@googlegroups.com, oleksandr@natalenko.name,
+        tschubert@bafh.org, patdung100@gmail.com, cevich@redhat.com
+References: <20191114093311.47877-1-paolo.valente@linaro.org>
+From:   Jens Axboe <axboe@kernel.dk>
+Message-ID: <0cb0a853-e036-9884-5681-f4617de5c662@kernel.dk>
+Date:   Thu, 14 Nov 2019 07:02:09 -0700
+User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:60.0) Gecko/20100101
+ Thunderbird/60.9.0
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <20191106151439.30056-4-hch@lst.de>
-User-Agent: Mutt/1.10.1 (2018-07-13)
+In-Reply-To: <20191114093311.47877-1-paolo.valente@linaro.org>
+Content-Type: text/plain; charset=utf-8
+Content-Language: en-US
+Content-Transfer-Encoding: 7bit
 Sender: linux-block-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-On Wed 06-11-19 16:14:37, Christoph Hellwig wrote:
-> Large parts of rescan_partitions aren't about partitions, and
-> moving it to block_dev.c will allow for some further cleanups by
-> merging it into its only caller.
+On 11/14/19 2:33 AM, Paolo Valente wrote:
+> Hi Jens,
+> change from V1: added check to correctly work only on bfq-queues
+> scheduled for service, and not on in-service bfq-queues (it makes no
+> sense, and it creates inconsistencies, to deschedule an in-service
+> bfq-queue).
 > 
-> Signed-off-by: Christoph Hellwig <hch@lst.de>
+> Differently from V1, which was still under test when I submitted it,
+> this version has already been tested, by those who reported V1's
+> failures.
 
-Looks good to me. You can add:
+I'm a bit miffed that you'd send out a patch for an issue, this late
+in the cycle, and then it not being tested at all. That's not very
+confidence inspiring. I have applied this one, just letting you know
+that that is not acceptable at all.
 
-Reviewed-by: Jan Kara <jack@suse.cz>
-
-								Honza
-
-> ---
->  block/partition-generic.c | 37 ++-----------------------------------
->  fs/block_dev.c            | 38 ++++++++++++++++++++++++++++++++++++--
->  include/linux/fs.h        |  2 --
->  include/linux/genhd.h     |  4 ++--
->  4 files changed, 40 insertions(+), 41 deletions(-)
-> 
-> diff --git a/block/partition-generic.c b/block/partition-generic.c
-> index eae9daa8a523..7a6e406ac490 100644
-> --- a/block/partition-generic.c
-> +++ b/block/partition-generic.c
-> @@ -439,7 +439,7 @@ static bool disk_unlock_native_capacity(struct gendisk *disk)
->  	}
->  }
->  
-> -static int drop_partitions(struct gendisk *disk, struct block_device *bdev)
-> +int blk_drop_partitions(struct gendisk *disk, struct block_device *bdev)
->  {
->  	struct disk_part_iter piter;
->  	struct hd_struct *part;
-> @@ -573,7 +573,7 @@ static bool blk_add_partition(struct gendisk *disk, struct block_device *bdev,
->  	return true;
->  }
->  
-> -static int blk_add_partitions(struct gendisk *disk, struct block_device *bdev)
-> +int blk_add_partitions(struct gendisk *disk, struct block_device *bdev)
->  {
->  	struct parsed_partitions *state;
->  	int ret = -EAGAIN, p, highest;
-> @@ -632,39 +632,6 @@ static int blk_add_partitions(struct gendisk *disk, struct block_device *bdev)
->  	return ret;
->  }
->  
-> -int rescan_partitions(struct gendisk *disk, struct block_device *bdev,
-> -		bool invalidate)
-> -{
-> -	int ret;
-> -
-> -rescan:
-> -	ret = drop_partitions(disk, bdev);
-> -	if (ret)
-> -		return ret;
-> -
-> -	if (invalidate)
-> -		set_capacity(disk, 0);
-> -	else if (disk->fops->revalidate_disk)
-> -		disk->fops->revalidate_disk(disk);
-> -
-> -	check_disk_size_change(disk, bdev, !invalidate);
-> -	bdev->bd_invalidated = 0;
-> -
-> -	if (!get_capacity(disk)) {
-> -		/*
-> -		 * Tell userspace that the media / partition table may have
-> -		 * changed.
-> -		 */
-> -		kobject_uevent(&disk_to_dev(disk)->kobj, KOBJ_CHANGE);
-> -		return 0;
-> -	}
-> -	
-> -	ret = blk_add_partitions(disk, bdev);
-> -	if (ret == -EAGAIN)
-> -		goto rescan;
-> -	return ret;
-> -}
-> -
->  unsigned char *read_dev_sector(struct block_device *bdev, sector_t n, Sector *p)
->  {
->  	struct address_space *mapping = bdev->bd_inode->i_mapping;
-> diff --git a/fs/block_dev.c b/fs/block_dev.c
-> index 0af62b76d031..f0710085e1f1 100644
-> --- a/fs/block_dev.c
-> +++ b/fs/block_dev.c
-> @@ -1416,8 +1416,8 @@ static void flush_disk(struct block_device *bdev, bool kill_dirty)
->   * and adjusts it if it differs. When shrinking the bdev size, its all caches
->   * are freed.
->   */
-> -void check_disk_size_change(struct gendisk *disk, struct block_device *bdev,
-> -		bool verbose)
-> +static void check_disk_size_change(struct gendisk *disk,
-> +		struct block_device *bdev, bool verbose)
->  {
->  	loff_t disk_size, bdev_size;
->  
-> @@ -1508,6 +1508,40 @@ EXPORT_SYMBOL(bd_set_size);
->  
->  static void __blkdev_put(struct block_device *bdev, fmode_t mode, int for_part);
->  
-> +static int rescan_partitions(struct gendisk *disk, struct block_device *bdev,
-> +		bool invalidate)
-> +{
-> +	int ret;
-> +
-> +rescan:
-> +	ret = blk_drop_partitions(disk, bdev);
-> +	if (ret)
-> +		return ret;
-> +
-> +	if (invalidate)
-> +		set_capacity(disk, 0);
-> +	else if (disk->fops->revalidate_disk)
-> +		disk->fops->revalidate_disk(disk);
-> +
-> +	check_disk_size_change(disk, bdev, !invalidate);
-> +	bdev->bd_invalidated = 0;
-> +
-> +	if (!get_capacity(disk)) {
-> +		/*
-> +		 * Tell userspace that the media / partition table may have
-> +		 * changed.
-> +		 */
-> +		kobject_uevent(&disk_to_dev(disk)->kobj, KOBJ_CHANGE);
-> +		return 0;
-> +	}
-> +	
-> +	ret = blk_add_partitions(disk, bdev);
-> +	if (ret == -EAGAIN)
-> +		goto rescan;
-> +	return ret;
-> +}
-> +
-> +
->  static void bdev_disk_changed(struct block_device *bdev, bool invalidate)
->  {
->  	if (disk_part_scan_enabled(bdev->bd_disk)) {
-> diff --git a/include/linux/fs.h b/include/linux/fs.h
-> index e0d909d35763..d233dd661df7 100644
-> --- a/include/linux/fs.h
-> +++ b/include/linux/fs.h
-> @@ -2703,8 +2703,6 @@ extern void make_bad_inode(struct inode *);
->  extern bool is_bad_inode(struct inode *);
->  
->  #ifdef CONFIG_BLOCK
-> -extern void check_disk_size_change(struct gendisk *disk,
-> -		struct block_device *bdev, bool verbose);
->  extern int revalidate_disk(struct gendisk *);
->  extern int check_disk_change(struct block_device *);
->  extern int __invalidate_device(struct block_device *, bool);
-> diff --git a/include/linux/genhd.h b/include/linux/genhd.h
-> index fd7774e64f0b..f5cffbf63abf 100644
-> --- a/include/linux/genhd.h
-> +++ b/include/linux/genhd.h
-> @@ -621,9 +621,9 @@ extern void blk_invalidate_devt(dev_t devt);
->  extern dev_t blk_lookup_devt(const char *name, int partno);
->  extern char *disk_name (struct gendisk *hd, int partno, char *buf);
->  
-> +int blk_add_partitions(struct gendisk *disk, struct block_device *bdev);
-> +int blk_drop_partitions(struct gendisk *disk, struct block_device *bdev);
->  extern int disk_expand_part_tbl(struct gendisk *disk, int target);
-> -int rescan_partitions(struct gendisk *disk, struct block_device *bdev,
-> -		bool invalidate);
->  extern struct hd_struct * __must_check add_partition(struct gendisk *disk,
->  						     int partno, sector_t start,
->  						     sector_t len, int flags,
-> -- 
-> 2.20.1
-> 
 -- 
-Jan Kara <jack@suse.com>
-SUSE Labs, CR
+Jens Axboe
+
