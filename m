@@ -2,107 +2,190 @@ Return-Path: <SRS0=aEt0=ZG=vger.kernel.org=linux-block-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-2.2 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
-	MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,USER_AGENT_SANE_1 autolearn=no
+X-Spam-Status: No, score=-5.3 required=3.0 tests=DKIM_SIGNED,DKIM_VALID,
+	DKIM_VALID_AU,HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,
+	SPF_HELO_NONE,SPF_PASS,USER_AGENT_SANE_1 autolearn=unavailable
 	autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 948BEC43141
-	for <linux-block@archiver.kernel.org>; Thu, 14 Nov 2019 09:41:59 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id A956CC43141
+	for <linux-block@archiver.kernel.org>; Thu, 14 Nov 2019 11:32:25 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.kernel.org (Postfix) with ESMTP id 758CA206D6
-	for <linux-block@archiver.kernel.org>; Thu, 14 Nov 2019 09:41:59 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id 83C1C206E6
+	for <linux-block@archiver.kernel.org>; Thu, 14 Nov 2019 11:32:25 +0000 (UTC)
+Authentication-Results: mail.kernel.org;
+	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="FF70Oc4h"
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1726202AbfKNJlz (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Thu, 14 Nov 2019 04:41:55 -0500
-Received: from lhrrgout.huawei.com ([185.176.76.210]:2098 "EHLO huawei.com"
-        rhost-flags-OK-OK-OK-FAIL) by vger.kernel.org with ESMTP
-        id S1726106AbfKNJlz (ORCPT <rfc822;linux-block@vger.kernel.org>);
-        Thu, 14 Nov 2019 04:41:55 -0500
-Received: from lhreml703-cah.china.huawei.com (unknown [172.18.7.107])
-        by Forcepoint Email with ESMTP id 8836451502569967E717;
-        Thu, 14 Nov 2019 09:41:53 +0000 (GMT)
-Received: from lhreml724-chm.china.huawei.com (10.201.108.75) by
- lhreml703-cah.china.huawei.com (10.201.108.44) with Microsoft SMTP Server
- (TLS) id 14.3.408.0; Thu, 14 Nov 2019 09:41:53 +0000
-Received: from [127.0.0.1] (10.202.226.46) by lhreml724-chm.china.huawei.com
- (10.201.108.75) with Microsoft SMTP Server (version=TLS1_2,
- cipher=TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256) id 15.1.1713.5; Thu, 14 Nov
- 2019 09:41:53 +0000
-Subject: Re: [PATCH RFC 3/5] blk-mq: Facilitate a shared tags per tagset
-To:     Hannes Reinecke <hare@suse.de>,
-        "axboe@kernel.dk" <axboe@kernel.dk>,
-        "jejb@linux.ibm.com" <jejb@linux.ibm.com>,
-        "martin.petersen@oracle.com" <martin.petersen@oracle.com>
-CC:     "linux-block@vger.kernel.org" <linux-block@vger.kernel.org>,
-        "linux-kernel@vger.kernel.org" <linux-kernel@vger.kernel.org>,
-        "linux-scsi@vger.kernel.org" <linux-scsi@vger.kernel.org>,
-        "ming.lei@redhat.com" <ming.lei@redhat.com>,
-        "hare@suse.com" <hare@suse.com>,
-        "bvanassche@acm.org" <bvanassche@acm.org>,
-        "chenxiang (M)" <chenxiang66@hisilicon.com>
-References: <1573652209-163505-1-git-send-email-john.garry@huawei.com>
- <1573652209-163505-4-git-send-email-john.garry@huawei.com>
- <32880159-86e8-5c48-1532-181fdea0df96@suse.de>
- <2cbf591c-8284-8499-7804-e7078cf274d2@huawei.com>
- <02056612-a958-7b05-3c54-bb2fa69bc493@suse.de>
- <ace95bc5-7b89-9ed3-be89-8139f977984b@huawei.com>
- <42b0bcd9-f147-76eb-dfce-270f77bca818@suse.de>
-From:   John Garry <john.garry@huawei.com>
-Message-ID: <89cd1985-39c7-2965-d25b-2ee2c183d057@huawei.com>
-Date:   Thu, 14 Nov 2019 09:41:51 +0000
-User-Agent: Mozilla/5.0 (Windows NT 10.0; WOW64; rv:68.0) Gecko/20100101
- Thunderbird/68.1.2
+        id S1726796AbfKNLcY (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Thu, 14 Nov 2019 06:32:24 -0500
+Received: from us-smtp-delivery-1.mimecast.com ([205.139.110.120]:40481 "EHLO
+        us-smtp-1.mimecast.com" rhost-flags-OK-OK-OK-FAIL) by vger.kernel.org
+        with ESMTP id S1726767AbfKNLcY (ORCPT
+        <rfc822;linux-block@vger.kernel.org>);
+        Thu, 14 Nov 2019 06:32:24 -0500
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+        s=mimecast20190719; t=1573731143;
+        h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+         to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+         content-transfer-encoding:content-transfer-encoding;
+        bh=ydfF/6rph5aw0S+dXQ7vAdmn1cldyijsWjA+3qHaIds=;
+        b=FF70Oc4hEF3xKikQlCqbWTTmntnVPs6Ioez5mPEqLUOoh5XFzvEmMr/tlhpfaqnZQ/9l1C
+        sqrL2nAaVBOl6aDJeywoAqvsualCyOK+O2cr5ED//6obRXVsEKXz+yqd9DHqeZH86cwE02
+        XQ410Qhxj2RY8u3uF7+Jk8sNhqw7OoU=
+Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
+ [209.132.183.4]) (Using TLS) by relay.mimecast.com with ESMTP id
+ us-mta-432-SvsZNX8EO-qCTEECn5opRQ-1; Thu, 14 Nov 2019 06:32:20 -0500
+Received: from smtp.corp.redhat.com (int-mx05.intmail.prod.int.phx2.redhat.com [10.5.11.15])
+        (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
+        (No client certificate requested)
+        by mimecast-mx01.redhat.com (Postfix) with ESMTPS id 929F0190743E;
+        Thu, 14 Nov 2019 11:32:18 +0000 (UTC)
+Received: from ming.t460p (ovpn-8-24.pek2.redhat.com [10.72.8.24])
+        by smtp.corp.redhat.com (Postfix) with ESMTPS id EBDAA77645;
+        Thu, 14 Nov 2019 11:31:57 +0000 (UTC)
+Date:   Thu, 14 Nov 2019 19:31:53 +0800
+From:   Ming Lei <ming.lei@redhat.com>
+To:     linux-block@vger.kernel.org, linux-fsdevel@vger.kernel.org,
+        linux-xfs@vger.kernel.org, linux-kernel@vger.kernel.org
+Cc:     Jeff Moyer <jmoyer@redhat.com>, Dave Chinner <dchinner@redhat.com>,
+        Eric Sandeen <sandeen@redhat.com>,
+        Christoph Hellwig <hch@lst.de>, Jens Axboe <axboe@kernel.dk>,
+        Ingo Molnar <mingo@redhat.com>,
+        Peter Zijlstra <peterz@infradead.org>,
+        Tejun Heo <tj@kernel.org>
+Subject: single aio thread is migrated crazily by scheduler
+Message-ID: <20191114113153.GB4213@ming.t460p>
 MIME-Version: 1.0
-In-Reply-To: <42b0bcd9-f147-76eb-dfce-270f77bca818@suse.de>
-Content-Type: text/plain; charset="utf-8"; format=flowed
-Content-Language: en-US
-Content-Transfer-Encoding: 8bit
-X-Originating-IP: [10.202.226.46]
-X-ClientProxiedBy: lhreml713-chm.china.huawei.com (10.201.108.64) To
- lhreml724-chm.china.huawei.com (10.201.108.75)
-X-CFilter-Loop: Reflected
+User-Agent: Mutt/1.12.1 (2019-06-15)
+X-Scanned-By: MIMEDefang 2.79 on 10.5.11.15
+X-MC-Unique: SvsZNX8EO-qCTEECn5opRQ-1
+X-Mimecast-Spam-Score: 0
+Content-Type: text/plain; charset=WINDOWS-1252
+Content-Transfer-Encoding: quoted-printable
+Content-Disposition: inline
 Sender: linux-block-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-On 13/11/2019 18:38, Hannes Reinecke wrote:
->> Hi Hannes,
->>
->>> Oh, my. Indeed, that's correct.
->>
->> The tags could be kept in sync like this:
->>
->> shared_tag = blk_mq_get_tag(shared_tagset);
->> if (shared_tag != -1)
->>      sbitmap_set(hctx->tags, shared_tag);
->>
->> But that's obviously not ideal.
->>
-> Actually, I _do_ prefer keeping both in sync.
-> We might want to check if the 'normal' tag is set (typically it would 
-> not, but then, who knows ...)
-> The beauty here is that both 'shared' and 'normal' tag are in sync, so 
-> if a driver would be wanting to use the tag as index into a command 
-> array it can do so without any surprises.
-> 
-> Why do you think it's not ideal?
+Hi Guys,
 
-A few points:
-- Getting a bit from one tagset and then setting it in another tagset is 
-a bit clunky.
-- There may be an atomicity of the getting the shared tag bit and 
-setting the hctx tag bit - I don't think that there is.
-- Consider that sometimes we may want to check if there is space on a hw 
-queue - checking the hctx tags is not really proper any longer, as 
-typically there would always be space on hctx, but not always the shared 
-tags. We did delete blk_mq_can_queue() yesterday, which would be an 
-example of that. Need to check if there are others.
+It is found that single AIO thread is migrated crazely by scheduler, and
+the migrate period can be < 10ms. Follows the test a):
 
-Having said all that, the obvious advantage is performance gain, can 
-still use request.tag and so maybe less intrusive changes.
+=09- run single job fio[1] for 30 seconds:
+=09./xfs_complete 512
+=09
+=09- observe fio io thread migration via bcc trace[2], and the migration
+=09times can reach 5k ~ 10K in above test. In this test, CPU utilization
+=09is 30~40% on the CPU running fio IO thread.
+=09
+=09- after applying the debug patch[3] to queue XFS completion work on
+=09other CPU(not current CPU), the above crazy fio IO thread migration
+=09can't be observed.
 
-I'll have a look at the implementation. The devil is mostly in the detail...
+And the similar result can be observed in the following test b) too:
+
+=09- set sched parameters:
+=09=09sysctl kernel.sched_min_granularity_ns=3D10000000
+=09=09sysctl kernel.sched_wakeup_granularity_ns=3D15000000
+=09
+=09=09which is usually done by 'tuned-adm profile network-throughput'
+=09
+=09- run single job fio aio[1] for 30 seconds:
+=09  ./xfs_complete 4k=20
+=09
+=09- observe fio io thread migration[2], and similar crazy migration
+=09can be observed too. In this test, CPU utilization is close to 100%
+=09on the CPU for running fio IO thread
+=09
+=09- the debug patch[3] still makes a big difference on this test wrt.
+=09fio IO thread migration.
+
+For test b), I thought that load balance may be triggered when
+single fio IO thread takes the CPU by ~100%, meantime XFS's queue_work()
+schedules WQ worker thread on the current CPU, since all other CPUs
+are idle. When the fio IO thread is migrated to new CPU, the same steps
+can be repeated again.
+
+But for test a), I have no idea why fio IO thread is still migrated so
+frequently since the CPU isn't saturated at all.
+
+IMO, it is normal for user to saturate aio thread, since this way may
+save context switch.
+
+Guys, any idea on the crazy aio thread migration?
+
+BTW, the tests are run on latest linus tree(5.4-rc7) in KVM guest, and the
+fio test is created for simulating one real performance report which is
+proved to be caused by frequent aio submission thread migration.
+
+
+[1] xfs_complete: one fio script for running single job overwrite aio on XF=
+S
+#!/bin/bash
+
+BS=3D$1
+NJOBS=3D1
+QD=3D128
+DIR=3D/mnt/xfs
+BATCH=3D1
+VERIFY=3D"sha3-512"
+
+sysctl kernel.sched_wakeup_granularity_ns
+sysctl kernel.sched_min_granularity_ns
+
+rmmod scsi_debug;modprobe scsi_debug dev_size_mb=3D6144 ndelay=3D41000 dix=
+=3D1 dif=3D2
+DEV=3D`ls -d /sys/bus/pseudo/drivers/scsi_debug/adapter*/host*/target*/*/bl=
+ock/* | head -1 | xargs basename`
+DEV=3D"/dev/"$DEV
+
+mkfs.xfs -f $DEV
+[ ! -d $DIR ] && mkdir -p $DIR
+mount $DEV $DIR
+
+fio --readwrite=3Drandwrite --filesize=3D5g \
+    --overwrite=3D1 \
+    --filename=3D$DIR/fiofile \
+    --runtime=3D30s --time_based \
+    --ioengine=3Dlibaio --direct=3D1 --bs=3D4k --iodepth=3D$QD \
+    --iodepth_batch_submit=3D$BATCH \
+    --iodepth_batch_complete_min=3D$BATCH \
+    --numjobs=3D$NJOBS \
+    --verify=3D$VERIFY \
+    --name=3D/hana/fsperf/foo
+
+umount $DEV
+rmmod scsi_debug
+
+
+[2] observe fio migration via bcc trace:
+/usr/share/bcc/tools/trace -C -t  't:sched:sched_migrate_task "%s/%d cpu %d=
+->%d", args->comm,args->pid,args->orig_cpu,args->dest_cpu' | grep fio=20
+
+[3] test patch for queuing xfs completetion on other CPU
+
+diff --git a/fs/iomap/direct-io.c b/fs/iomap/direct-io.c
+index 1fc28c2da279..bdc007a57706 100644
+--- a/fs/iomap/direct-io.c
++++ b/fs/iomap/direct-io.c
+@@ -158,9 +158,14 @@ static void iomap_dio_bio_end_io(struct bio *bio)
+ =09=09=09blk_wake_io_task(waiter);
+ =09=09} else if (dio->flags & IOMAP_DIO_WRITE) {
+ =09=09=09struct inode *inode =3D file_inode(dio->iocb->ki_filp);
++=09=09=09unsigned cpu =3D cpumask_next(smp_processor_id(),
++=09=09=09=09=09cpu_online_mask);
++
++=09=09=09if (cpu >=3D nr_cpu_ids)
++=09=09=09=09cpu =3D 0;
+=20
+ =09=09=09INIT_WORK(&dio->aio.work, iomap_dio_complete_work);
+-=09=09=09queue_work(inode->i_sb->s_dio_done_wq, &dio->aio.work);
++=09=09=09queue_work_on(cpu, inode->i_sb->s_dio_done_wq, &dio->aio.work);
+ =09=09} else {
+ =09=09=09iomap_dio_complete_work(&dio->aio.work);
+ =09=09}
 
 Thanks,
-John
+Ming
+
