@@ -2,213 +2,51 @@ Return-Path: <SRS0=aEt0=ZG=vger.kernel.org=linux-block-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-8.2 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
-	INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,
-	URIBL_BLOCKED,USER_AGENT_SANE_1 autolearn=ham autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-2.2 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
+	MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,USER_AGENT_SANE_1 autolearn=no
+	autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 25848C432C3
-	for <linux-block@archiver.kernel.org>; Thu, 14 Nov 2019 14:24:09 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 29A51C432C3
+	for <linux-block@archiver.kernel.org>; Thu, 14 Nov 2019 14:31:32 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.kernel.org (Postfix) with ESMTP id 035D8206D5
-	for <linux-block@archiver.kernel.org>; Thu, 14 Nov 2019 14:24:09 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id 07B4B20706
+	for <linux-block@archiver.kernel.org>; Thu, 14 Nov 2019 14:31:32 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1726533AbfKNOYI (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Thu, 14 Nov 2019 09:24:08 -0500
-Received: from mx2.suse.de ([195.135.220.15]:51100 "EHLO mx1.suse.de"
-        rhost-flags-OK-OK-OK-FAIL) by vger.kernel.org with ESMTP
-        id S1726491AbfKNOYI (ORCPT <rfc822;linux-block@vger.kernel.org>);
-        Thu, 14 Nov 2019 09:24:08 -0500
-X-Virus-Scanned: by amavisd-new at test-mx.suse.de
-Received: from relay2.suse.de (unknown [195.135.220.254])
-        by mx1.suse.de (Postfix) with ESMTP id 012D8B31E;
-        Thu, 14 Nov 2019 14:24:05 +0000 (UTC)
-Received: by quack2.suse.cz (Postfix, from userid 1000)
-        id B0BB01E4331; Thu, 14 Nov 2019 15:24:05 +0100 (CET)
-Date:   Thu, 14 Nov 2019 15:24:05 +0100
-From:   Jan Kara <jack@suse.cz>
-To:     Christoph Hellwig <hch@lst.de>
-Cc:     Jens Axboe <axboe@kernel.dk>, Jan Kara <jack@suse.cz>,
+        id S1726307AbfKNObb (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Thu, 14 Nov 2019 09:31:31 -0500
+Received: from verein.lst.de ([213.95.11.211]:39901 "EHLO verein.lst.de"
+        rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
+        id S1726214AbfKNObb (ORCPT <rfc822;linux-block@vger.kernel.org>);
+        Thu, 14 Nov 2019 09:31:31 -0500
+Received: by verein.lst.de (Postfix, from userid 2407)
+        id 667B668B05; Thu, 14 Nov 2019 15:31:28 +0100 (CET)
+Date:   Thu, 14 Nov 2019 15:31:28 +0100
+From:   Christoph Hellwig <hch@lst.de>
+To:     Jan Kara <jack@suse.cz>
+Cc:     Christoph Hellwig <hch@lst.de>, Jens Axboe <axboe@kernel.dk>,
         linux-block@vger.kernel.org, linux-s390@vger.kernel.org
-Subject: Re: [PATCH 5/5] block: remove (__)blkdev_reread_part as an exported
- API
-Message-ID: <20191114142405.GJ28486@quack2.suse.cz>
-References: <20191106151439.30056-1-hch@lst.de>
- <20191106151439.30056-6-hch@lst.de>
+Subject: Re: [PATCH 4/5] block: fix bdev_disk_changed for non-partitioned
+ devices
+Message-ID: <20191114143128.GA1591@lst.de>
+References: <20191106151439.30056-1-hch@lst.de> <20191106151439.30056-5-hch@lst.de> <20191114140716.GI28486@quack2.suse.cz>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=us-ascii
 Content-Disposition: inline
-In-Reply-To: <20191106151439.30056-6-hch@lst.de>
-User-Agent: Mutt/1.10.1 (2018-07-13)
+In-Reply-To: <20191114140716.GI28486@quack2.suse.cz>
+User-Agent: Mutt/1.5.17 (2007-11-01)
 Sender: linux-block-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-On Wed 06-11-19 16:14:39, Christoph Hellwig wrote:
-> In general drivers should never mess with partition tables directly.
-> Unfortunately s390 and loop do for somewhat historic reasons, but they
-> can use bdev_disk_changed directly instead when we export it as they
-> satisfy the sanity checks we have in __blkdev_reread_part.
-> 
-> Signed-off-by: Christoph Hellwig <hch@lst.de>
+On Thu, Nov 14, 2019 at 03:07:16PM +0100, Jan Kara wrote:
+> I'd just note that e.g. drivers/scsi/sr.c or drivers/scsi/sd.c already call
+> revalidate_disk() on device open so it seems a bit stupid to call it again
+> just a bit later. But that's not really a new thing, this patch just makes
+> it universal.
 
-Looks good to me. You can add:
-
-Reviewed-by: Jan Kara <jack@suse.cz>
-
-								Honza
-
-> ---
->  block/ioctl.c                   | 35 +++++----------------------------
->  drivers/block/loop.c            | 13 +++++++-----
->  drivers/s390/block/dasd_genhd.c |  4 +++-
->  fs/block_dev.c                  |  7 +++++++
->  include/linux/fs.h              |  2 --
->  5 files changed, 23 insertions(+), 38 deletions(-)
-> 
-> diff --git a/block/ioctl.c b/block/ioctl.c
-> index 52380c337078..2ed907ef0f01 100644
-> --- a/block/ioctl.c
-> +++ b/block/ioctl.c
-> @@ -155,46 +155,21 @@ static int blkpg_ioctl(struct block_device *bdev, struct blkpg_ioctl_arg __user
->  	}
->  }
->  
-> -/*
-> - * This is an exported API for the block driver, and will not
-> - * acquire bd_mutex. This API should be used in case that
-> - * caller has held bd_mutex already.
-> - */
-> -int __blkdev_reread_part(struct block_device *bdev)
-> +static int blkdev_reread_part(struct block_device *bdev)
->  {
-> +	int ret;
-> +
->  	if (!disk_part_scan_enabled(bdev->bd_disk) || bdev != bdev->bd_contains)
->  		return -EINVAL;
->  	if (!capable(CAP_SYS_ADMIN))
->  		return -EACCES;
->  
-> -	lockdep_assert_held(&bdev->bd_mutex);
-> -
-> -	return bdev_disk_changed(bdev, false);
-> -}
-> -EXPORT_SYMBOL(__blkdev_reread_part);
-> -
-> -/*
-> - * This is an exported API for the block driver, and will
-> - * try to acquire bd_mutex. If bd_mutex has been held already
-> - * in current context, please call __blkdev_reread_part().
-> - *
-> - * Make sure the held locks in current context aren't required
-> - * in open()/close() handler and I/O path for avoiding ABBA deadlock:
-> - * - bd_mutex is held before calling block driver's open/close
-> - *   handler
-> - * - reading partition table may submit I/O to the block device
-> - */
-> -int blkdev_reread_part(struct block_device *bdev)
-> -{
-> -	int res;
-> -
->  	mutex_lock(&bdev->bd_mutex);
-> -	res = __blkdev_reread_part(bdev);
-> +	ret = bdev_disk_changed(bdev, false);
->  	mutex_unlock(&bdev->bd_mutex);
->  
-> -	return res;
-> +	return ret;
->  }
-> -EXPORT_SYMBOL(blkdev_reread_part);
->  
->  static int blk_ioctl_discard(struct block_device *bdev, fmode_t mode,
->  		unsigned long arg, unsigned long flags)
-> diff --git a/drivers/block/loop.c b/drivers/block/loop.c
-> index f6f77eaa7217..64b16abee280 100644
-> --- a/drivers/block/loop.c
-> +++ b/drivers/block/loop.c
-> @@ -630,7 +630,9 @@ static void loop_reread_partitions(struct loop_device *lo,
->  {
->  	int rc;
->  
-> -	rc = blkdev_reread_part(bdev);
-> +	mutex_lock(&bdev->bd_mutex);
-> +	rc = bdev_disk_changed(bdev, false);
-> +	mutex_unlock(&bdev->bd_mutex);
->  	if (rc)
->  		pr_warn("%s: partition scan of loop%d (%s) failed (rc=%d)\n",
->  			__func__, lo->lo_number, lo->lo_file_name, rc);
-> @@ -1154,10 +1156,11 @@ static int __loop_clr_fd(struct loop_device *lo, bool release)
->  		 * must be at least one and it can only become zero when the
->  		 * current holder is released.
->  		 */
-> -		if (release)
-> -			err = __blkdev_reread_part(bdev);
-> -		else
-> -			err = blkdev_reread_part(bdev);
-> +		if (!release)
-> +			mutex_lock(&bdev->bd_mutex);
-> +		err = bdev_disk_changed(bdev, false);
-> +		if (!release)
-> +			mutex_unlock(&bdev->bd_mutex);
->  		if (err)
->  			pr_warn("%s: partition scan of loop%d failed (rc=%d)\n",
->  				__func__, lo_number, err);
-> diff --git a/drivers/s390/block/dasd_genhd.c b/drivers/s390/block/dasd_genhd.c
-> index 5542d9eadfe0..7d079154f849 100644
-> --- a/drivers/s390/block/dasd_genhd.c
-> +++ b/drivers/s390/block/dasd_genhd.c
-> @@ -116,7 +116,9 @@ int dasd_scan_partitions(struct dasd_block *block)
->  		return -ENODEV;
->  	}
->  
-> -	rc = blkdev_reread_part(bdev);
-> +	mutex_lock(&bdev->bd_mutex);
-> +	rc = bdev_disk_changed(bdev, false);
-> +	mutex_unlock(&bdev->bd_mutex);
->  	if (rc)
->  		DBF_DEV_EVENT(DBF_ERR, block->base,
->  				"scan partitions error, rc %d", rc);
-> diff --git a/fs/block_dev.c b/fs/block_dev.c
-> index ae16466a67f7..9558a2f064b1 100644
-> --- a/fs/block_dev.c
-> +++ b/fs/block_dev.c
-> @@ -1513,6 +1513,8 @@ int bdev_disk_changed(struct block_device *bdev, bool invalidate)
->  	struct gendisk *disk = bdev->bd_disk;
->  	int ret;
->  
-> +	lockdep_assert_held(&bdev->bd_mutex);
-> +
->  rescan:
->  	ret = blk_drop_partitions(disk, bdev);
->  	if (ret)
-> @@ -1540,6 +1542,11 @@ int bdev_disk_changed(struct block_device *bdev, bool invalidate)
->  
->  	return ret;
->  }
-> +/*
-> + * Only exported for for loop and dasd for historic reasons.  Don't use in new
-> + * code!
-> + */
-> +EXPORT_SYMBOL_GPL(bdev_disk_changed);
->  
->  /*
->   * bd_mutex locking:
-> diff --git a/include/linux/fs.h b/include/linux/fs.h
-> index d233dd661df7..ae6c5c37f3ae 100644
-> --- a/include/linux/fs.h
-> +++ b/include/linux/fs.h
-> @@ -2632,8 +2632,6 @@ extern void bd_finish_claiming(struct block_device *bdev,
->  extern void bd_abort_claiming(struct block_device *bdev,
->  			      struct block_device *whole, void *holder);
->  extern void blkdev_put(struct block_device *bdev, fmode_t mode);
-> -extern int __blkdev_reread_part(struct block_device *bdev);
-> -extern int blkdev_reread_part(struct block_device *bdev);
->  
->  #ifdef CONFIG_SYSFS
->  extern int bd_link_disk_holder(struct block_device *bdev, struct gendisk *disk);
-> -- 
-> 2.20.1
-> 
--- 
-Jan Kara <jack@suse.com>
-SUSE Labs, CR
+That whole area is a bit of a mess, including how the whole
+->revalidate_disk callback works, and how we have a complicated events
+mechanism, but then also md as the only remaining user of the legacy
+->media_changed method.  I have a few idea on how to sort some of that
+out, but it's going to take a while.
