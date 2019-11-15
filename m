@@ -2,129 +2,162 @@ Return-Path: <SRS0=zNjm=ZH=vger.kernel.org=linux-block-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-8.2 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
-	INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,
-	URIBL_BLOCKED,USER_AGENT_SANE_1 autolearn=ham autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-8.4 required=3.0 tests=DKIMWL_WL_MED,DKIM_SIGNED,
+	DKIM_VALID,DKIM_VALID_AU,HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,
+	SPF_HELO_NONE,SPF_PASS,USER_IN_DEF_DKIM_WL autolearn=no autolearn_force=no
+	version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 86484C432C3
-	for <linux-block@archiver.kernel.org>; Fri, 15 Nov 2019 10:09:18 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 594D3C432C3
+	for <linux-block@archiver.kernel.org>; Fri, 15 Nov 2019 10:16:38 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.kernel.org (Postfix) with ESMTP id 671C32073A
-	for <linux-block@archiver.kernel.org>; Fri, 15 Nov 2019 10:09:18 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id 2D3BB20718
+	for <linux-block@archiver.kernel.org>; Fri, 15 Nov 2019 10:16:38 +0000 (UTC)
+Authentication-Results: mail.kernel.org;
+	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="sueVgHED"
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1727022AbfKOKJR (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Fri, 15 Nov 2019 05:09:17 -0500
-Received: from mx2.suse.de ([195.135.220.15]:47856 "EHLO mx1.suse.de"
-        rhost-flags-OK-OK-OK-FAIL) by vger.kernel.org with ESMTP
-        id S1727089AbfKOKJR (ORCPT <rfc822;linux-block@vger.kernel.org>);
-        Fri, 15 Nov 2019 05:09:17 -0500
-X-Virus-Scanned: by amavisd-new at test-mx.suse.de
-Received: from relay2.suse.de (unknown [195.135.220.254])
-        by mx1.suse.de (Postfix) with ESMTP id 24160B022;
-        Fri, 15 Nov 2019 10:09:15 +0000 (UTC)
-Subject: Re: [PATCH 7/7] block: move setting bd_invalidated from flush_disk to
- check_disk_change
-To:     Christoph Hellwig <hch@lst.de>, Jens Axboe <axboe@kernel.dk>,
-        Jan Kara <jack@suse.cz>
-Cc:     linux-block@vger.kernel.org, linux-s390@vger.kernel.org
-References: <20191114143438.14681-1-hch@lst.de>
- <20191114143438.14681-8-hch@lst.de>
-From:   Hannes Reinecke <hare@suse.de>
-Openpgp: preference=signencrypt
-Autocrypt: addr=hare@suse.de; prefer-encrypt=mutual; keydata=
- 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
- azzYF4VRJsdl+d0MCaSy8mUh
-Message-ID: <118ce019-45ce-138c-afe2-5793c33ea0c9@suse.de>
-Date:   Fri, 15 Nov 2019 11:09:14 +0100
-User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:60.0) Gecko/20100101
- Thunderbird/60.7.2
+        id S1727337AbfKOKQh (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Fri, 15 Nov 2019 05:16:37 -0500
+Received: from mail-wr1-f65.google.com ([209.85.221.65]:39065 "EHLO
+        mail-wr1-f65.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S1727238AbfKOKQh (ORCPT
+        <rfc822;linux-block@vger.kernel.org>);
+        Fri, 15 Nov 2019 05:16:37 -0500
+Received: by mail-wr1-f65.google.com with SMTP id l7so10334005wrp.6
+        for <linux-block@vger.kernel.org>; Fri, 15 Nov 2019 02:16:35 -0800 (PST)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=google.com; s=20161025;
+        h=mime-version:from:date:message-id:subject:to:cc
+         :content-transfer-encoding;
+        bh=UN/KKW49IR1fjweJi4DwDBTp0myHxSUme7tkQjd1asw=;
+        b=sueVgHEDR5E7HoEFlt3W2GQVHgE8JF1am7lSR4Lb0yWnblNbWNEysUubJVZohLCYQh
+         Z0XiAakChpuo5Iu3SNf6AIZiZb6C0Ibcm4zcQzsLWmZI0Arf24BWUWIOybXqDP4jt7BG
+         tS2rHKBclp6/UYIVlg8k2rpg3Zg1xikzweWEutb4ZBnnzgBOD5C3zwL71l9nTUH9NZoy
+         hZwYQKqOTmwHuCVM2ZC+P6+09srw2tHokSFBcPX3SQcftk/8eGFvM2t1mPh+N3q3Zc1r
+         yg30J2I3pjkVZejebWW0abYW0eMCXwafspliJw3mX49P8EbnF8qj3X2ax3BG2qXeH9pD
+         OUNw==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20161025;
+        h=x-gm-message-state:mime-version:from:date:message-id:subject:to:cc
+         :content-transfer-encoding;
+        bh=UN/KKW49IR1fjweJi4DwDBTp0myHxSUme7tkQjd1asw=;
+        b=sRlwpo9TT9E8ULg7qv7a7X7IkvGRLu1Bbp07ufY3SoHL60IusID3q7NJWd5GNicS/L
+         jFgYFshMUV6kQLwCKGmAFORJ0T8tkDrGvckdDwmODKH/RFAFQ/6Z5uOhjMAIVno4l6r8
+         30Oj19EIen1chgDm1cxuJi/rB/ChLFUmqGXzDEhfObO7PrcPz8Pl8oOx/KUv1wVWG/kJ
+         RQ6xPCFGRU57508qK7t9U2Vf0WNn67wFVqTfkhyIFRe6y14XtPw0TJK23RMt6MSXAUsT
+         +bZGnuimUa/tNU54ODguTW7DGuTl3cnADVABL6cM+9Afbf3ROBOHPz2l7X/HGM4VyPc8
+         1DGw==
+X-Gm-Message-State: APjAAAWZHuWuifveSp4Y1iZCnqZr8HPowy8zrBs8vcDQLItjshsE/1R9
+        czbp10S6IcyY7dTDoQlFd8CtCHEsn99wNluIf2c8iw==
+X-Google-Smtp-Source: APXvYqzsH0eRzv0KNVDR/piRe0sbxJV4KaBlzEahU8bed2kGsDm/vh3pGu2+Vcf1pYYtSJ74IBy8eJk2hSVjrlrdZBY=
+X-Received: by 2002:adf:e911:: with SMTP id f17mr11223558wrm.300.1573812994685;
+ Fri, 15 Nov 2019 02:16:34 -0800 (PST)
 MIME-Version: 1.0
-In-Reply-To: <20191114143438.14681-8-hch@lst.de>
-Content-Type: text/plain; charset=utf-8
-Content-Language: en-US
-Content-Transfer-Encoding: 8bit
+From:   Alexander Potapenko <glider@google.com>
+Date:   Fri, 15 Nov 2019 11:16:23 +0100
+Message-ID: <CAG_fn=VBHmBgqLi35tD27NRLH2tEZLH=Y+rTfZ3rKNz9ipG+jQ@mail.gmail.com>
+Subject: null_handle_cmd() doesn't initialize data when reading
+To:     Jens Axboe <axboe@kernel.dk>
+Cc:     linux-block@vger.kernel.org, Willem de Bruijn <willemb@google.com>,
+        Dmitriy Vyukov <dvyukov@google.com>
+Content-Type: text/plain; charset="UTF-8"
+Content-Transfer-Encoding: quoted-printable
 Sender: linux-block-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-On 11/14/19 3:34 PM, Christoph Hellwig wrote:
-> The only other caller of flush_disk instantly clears the flag, so don't
-> bother setting it there.
-> 
-> Signed-off-by: Christoph Hellwig <hch@lst.de>
-> ---
->  fs/block_dev.c | 2 +-
->  1 file changed, 1 insertion(+), 1 deletion(-)
-> 
-> diff --git a/fs/block_dev.c b/fs/block_dev.c
-> index ee63c2732fa2..f60739b5a24f 100644
-> --- a/fs/block_dev.c
-> +++ b/fs/block_dev.c
-> @@ -1403,7 +1403,6 @@ static void flush_disk(struct block_device *bdev, bool kill_dirty)
->  		       "resized disk %s\n",
->  		       bdev->bd_disk ? bdev->bd_disk->disk_name : "");
->  	}
-> -	bdev->bd_invalidated = 1;
->  }
->  
->  /**
-> @@ -1491,6 +1490,7 @@ int check_disk_change(struct block_device *bdev)
->  		return 0;
->  
->  	flush_disk(bdev, true);
-> +	bdev->bd_invalidated = 1;
->  	if (bdops->revalidate_disk)
->  		bdops->revalidate_disk(bdev->bd_disk);
->  	return 1;
-> 
-Reviewed-by: Hannes Reinecke <hare@suse.de>
+Hi Jens,
 
-Cheers,
+I'm debugging an issue in nullb driver reported by KMSAN at QEMU startup.
+There are numerous reports like the one below when checking nullb for
+different partition types.
+Basically, read_dev_sector() allocates a cache page which is then
+wrapped into a bio and passed to the device driver, but never
+initialized.
 
-Hannes
--- 
-Dr. Hannes Reinecke		      Teamlead Storage & Networking
-hare@suse.de			                  +49 911 74053 688
-SUSE Software Solutions Germany GmbH, Maxfeldstr. 5, 90409 Nürnberg
-HRB 247165 (AG München), GF: Felix Imendörffer
+I've tracked the problem down to a call to null_handle_cmd(cmd,
+/*sector*/0, /*nr_sectors*/8, /*op*/0).
+Turns out all the if-branches in this function are skipped, so neither
+of null_handle_throttled(), null_handle_flush(),
+null_handle_badblocks(), null_handle_memory_backed(),
+null_handle_zoned() is executed, and we proceed directly to
+nullb_complete_cmd().
+
+As a result, the pages read from the nullb device are never
+initialized, at least at boot time.
+How can we fix this?
+
+This bug may also have something to do with
+https://groups.google.com/d/topic/syzkaller-bugs/d0fmiL9Vi9k/discussion.
+
+KMSAN report follows:
+ =3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=
+=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=
+=3D=3D=3D=3D
+ BUG: KMSAN: uninit-value in[<      none      >]
+adfspart_check_ICS+0xd08/0x1040 block/partitions/acorn.c:365
+ Call Trace:
+ [<     inline     >] __dump_stack lib/dump_stack.c:77
+ [<      none      >] dump_stack+0x196/0x1f0 lib/dump_stack.c:113
+ [<      none      >] kmsan_report+0x127/0x220 mm/kmsan/kmsan_report.c:108
+ [<      none      >] __msan_warning+0x73/0xe0 mm/kmsan/kmsan_instr.c:245
+ [<      none      >] adfspart_check_ICS+0xd08/0x1040
+block/partitions/acorn.c:365
+ [<      none      >] check_partition+0x58c/0xc20 block/partitions/check.c:=
+167
+ [<      none      >] rescan_partitions+0x39b/0x1ff0
+block/partition-generic.c:531
+ [<      none      >] __blkdev_get+0x14f1/0x2440 fs/block_dev.c:1600
+ [<      none      >] blkdev_get+0x237/0x6a0 fs/block_dev.c:1708
+ [<     inline     >] register_disk block/genhd.c:655
+ [<      none      >] __device_add_disk+0x1612/0x20f0 block/genhd.c:745
+ [<      none      >] device_add_disk+0x90/0xa0 block/genhd.c:763
+ [<     inline     >] add_disk ./include/linux/genhd.h:429
+ [<     inline     >] null_gendisk_register drivers/block/null_blk_main.c:1=
+547
+ [<      none      >] null_add_dev+0x34c7/0x3b30
+drivers/block/null_blk_main.c:1718
+...
+ Uninit was created at:
+ [<      none      >] kmsan_save_stack_with_flags+0x3f/0x90 mm/kmsan/kmsan.=
+c:151
+ [<     inline     >] kmsan_internal_alloc_meta_for_pages
+mm/kmsan/kmsan_shadow.c:362
+ [<      none      >] kmsan_alloc_page+0x14e/0x360 mm/kmsan/kmsan_shadow.c:=
+391
+ [<      none      >] __alloc_pages_nodemask+0x594e/0x6050 mm/page_alloc.c:=
+4796
+ [<     inline     >] __alloc_pages ./include/linux/gfp.h:475
+ [<     inline     >] alloc_page_interleave mm/mempolicy.c:2058
+ [<      none      >] alloc_pages_current+0x2e7/0x990 mm/mempolicy.c:2186
+ [<     inline     >] alloc_pages ./include/linux/gfp.h:511
+ [<      none      >] __page_cache_alloc+0x95/0x310 mm/filemap.c:981
+ [<      none      >] do_read_cache_page+0x4d5/0x1520 mm/filemap.c:2788
+ [<      none      >] read_cache_page+0xf3/0x110 mm/filemap.c:2896
+ [<     inline     >] read_mapping_page ./include/linux/pagemap.h:396
+ [<      none      >] read_dev_sector+0xd6/0x390 block/partition-generic.c:=
+668
+ [<     inline     >] read_part_sector block/partitions/check.h:38
+ [<      none      >] adfspart_check_ICS+0x117/0x1040
+block/partitions/acorn.c:361
+ [<      none      >] check_partition+0x58c/0xc20 block/partitions/check.c:=
+167
+ [<      none      >] rescan_partitions+0x39b/0x1ff0
+block/partition-generic.c:531
+ [<      none      >] __blkdev_get+0x14f1/0x2440 fs/block_dev.c:1600
+ [<      none      >] blkdev_get+0x237/0x6a0 fs/block_dev.c:1708
+ [<     inline     >] register_disk block/genhd.c:655
+=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=
+=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D
+
+Thanks,
+Alexander Potapenko
+Software Engineer
+
+Google Germany GmbH
+Erika-Mann-Stra=C3=9Fe, 33
+80636 M=C3=BCnchen
+
+Gesch=C3=A4ftsf=C3=BChrer: Paul Manicle, Halimah DeLaine Prado
+Registergericht und -nummer: Hamburg, HRB 86891
+Sitz der Gesellschaft: Hamburg
