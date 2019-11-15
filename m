@@ -2,74 +2,55 @@ Return-Path: <SRS0=zNjm=ZH=vger.kernel.org=linux-block-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-2.2 required=3.0 tests=DKIM_SIGNED,DKIM_VALID,
-	DKIM_VALID_AU,FREEMAIL_FORGED_FROMDOMAIN,FREEMAIL_FROM,
-	HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,
-	USER_AGENT_SANE_1 autolearn=no autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-2.3 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
+	MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,USER_AGENT_SANE_1 autolearn=no
+	autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 7C4DAC43215
-	for <linux-block@archiver.kernel.org>; Fri, 15 Nov 2019 09:40:07 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 022CBC43141
+	for <linux-block@archiver.kernel.org>; Fri, 15 Nov 2019 10:05:47 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.kernel.org (Postfix) with ESMTP id 555E22073B
-	for <linux-block@archiver.kernel.org>; Fri, 15 Nov 2019 09:40:07 +0000 (UTC)
-Authentication-Results: mail.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="fAxgTl8j"
+	by mail.kernel.org (Postfix) with ESMTP id DA31F2075E
+	for <linux-block@archiver.kernel.org>; Fri, 15 Nov 2019 10:05:46 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1727089AbfKOJkG (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Fri, 15 Nov 2019 04:40:06 -0500
-Received: from mail-lj1-f170.google.com ([209.85.208.170]:44371 "EHLO
-        mail-lj1-f170.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1726930AbfKOJkG (ORCPT
+        id S1727192AbfKOKFp (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Fri, 15 Nov 2019 05:05:45 -0500
+Received: from www262.sakura.ne.jp ([202.181.97.72]:58593 "EHLO
+        www262.sakura.ne.jp" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S1726983AbfKOKFp (ORCPT
         <rfc822;linux-block@vger.kernel.org>);
-        Fri, 15 Nov 2019 04:40:06 -0500
-Received: by mail-lj1-f170.google.com with SMTP id g3so9952669ljl.11;
-        Fri, 15 Nov 2019 01:40:04 -0800 (PST)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20161025;
-        h=subject:to:cc:references:from:message-id:date:user-agent
-         :mime-version:in-reply-to:content-language:content-transfer-encoding;
-        bh=I2bY8wt44U8gioXslAWPn4SYSC87I8ddc2E8Vr5B1O8=;
-        b=fAxgTl8jg0+RgGouq+X0RuB/Qa2RIj07JqtPgIjxKUGEYy41OUalLRSGLdVmG4p6CE
-         YbHB189zeZoc36pTjUMQzzh2zOKvbPy5KFrGKHz7NQ9+/vH36VrNc4ayKqyzn0Onvjuu
-         5vvnjG5Bx0XXM5p/kVFC7W7Oc1maaDZTgji4bqhPs14vJCF0FaZrIl+u8tJBbigiN5tq
-         1yVXrHsG5Myiy29XyLsC4d2XVBlPq2degCiBMch4Lh0uGAJ+P8pRCbNVOJVrOIyF5hWh
-         /32HHjpm5wo8RwHTjc2XOB1n5D41AU+wNCgxqdU+NvWFBZxLqi5xVqt6SGsrl+1kJeP/
-         S0fw==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20161025;
-        h=x-gm-message-state:subject:to:cc:references:from:message-id:date
-         :user-agent:mime-version:in-reply-to:content-language
-         :content-transfer-encoding;
-        bh=I2bY8wt44U8gioXslAWPn4SYSC87I8ddc2E8Vr5B1O8=;
-        b=GweTl3rbCbXvBXA+raQZ1pgdc6j32YmeyzUtbuuZAsESDrssywHTnGKdRSaeKLBbFK
-         nmIZfO32YThIY8QCMrmIq+XpKO1vKOt3lE8rLY2mDs215GuMzdvifm6++ErJCZblnjOD
-         815ZiEJjkRPsl980R9l811wf1onv35+Qwtsyw5PSDsVint8tk+7MacerMaaBTKCT2K4Q
-         eU8CQcAtau19DLkLWi3mE3sstWTelibi0l5rNsv7rxTnA1ilY6fVDM13hAV4ZOKjlv8u
-         9B4FOujdfkZhWhOnFxKBmJqMUjM+/9KHPidhDT0w2lFfi9ABa5spnoWW9VImIz1OGz8U
-         jSYQ==
-X-Gm-Message-State: APjAAAVqTVIDBs/YvfGZdj3Cjl8beKh/bCRRM20driZGhjpejW3R5vEe
-        p9oRGF0vy8n6vd72dFYe1aiwiRju
-X-Google-Smtp-Source: APXvYqwE4izGIZu2wzmyollnmujJrbxz6DyP9k1peKUm0dMaerDS582LkgreFOefXzIt/g1EnlTW7Q==
-X-Received: by 2002:a2e:9f4c:: with SMTP id v12mr1645813ljk.167.1573810804047;
-        Fri, 15 Nov 2019 01:40:04 -0800 (PST)
-Received: from [172.31.190.83] ([86.57.146.226])
-        by smtp.gmail.com with ESMTPSA id b80sm4162838lfg.49.2019.11.15.01.40.02
-        (version=TLS1_2 cipher=ECDHE-RSA-AES128-GCM-SHA256 bits=128/128);
-        Fri, 15 Nov 2019 01:40:03 -0800 (PST)
-Subject: Re: [PATCHSET 0/2] io_uring support for linked timeouts
-To:     Jens Axboe <axboe@kernel.dk>, io-uring@vger.kernel.org,
-        linux-block@vger.kernel.org
-Cc:     zeba.hrvoje@gmail.com, liuyun01@kylinos.cn
-References: <20191105211130.6130-1-axboe@kernel.dk>
- <4566889a-7e12-9bfd-b2a1-716d8b934684@gmail.com>
- <9b6cd06b-cd6c-d7e5-157b-32c1e2e9ceac@kernel.dk>
-From:   Pavel Begunkov <asml.silence@gmail.com>
-Message-ID: <3c0ef10d-9524-e2e2-abf2-e1b0bcee9223@gmail.com>
-Date:   Fri, 15 Nov 2019 12:40:02 +0300
-User-Agent: Mozilla/5.0 (Windows NT 10.0; WOW64; rv:60.0) Gecko/20100101
+        Fri, 15 Nov 2019 05:05:45 -0500
+Received: from fsav404.sakura.ne.jp (fsav404.sakura.ne.jp [133.242.250.103])
+        by www262.sakura.ne.jp (8.15.2/8.15.2) with ESMTP id xAFA5btj032359;
+        Fri, 15 Nov 2019 19:05:37 +0900 (JST)
+        (envelope-from penguin-kernel@i-love.sakura.ne.jp)
+Received: from www262.sakura.ne.jp (202.181.97.72)
+ by fsav404.sakura.ne.jp (F-Secure/fsigk_smtp/550/fsav404.sakura.ne.jp);
+ Fri, 15 Nov 2019 19:05:37 +0900 (JST)
+X-Virus-Status: clean(F-Secure/fsigk_smtp/550/fsav404.sakura.ne.jp)
+Received: from [192.168.1.9] (softbank126040052248.bbtec.net [126.40.52.248])
+        (authenticated bits=0)
+        by www262.sakura.ne.jp (8.15.2/8.15.2) with ESMTPSA id xAFA5b39032356
+        (version=TLSv1.2 cipher=AES256-SHA bits=256 verify=NO);
+        Fri, 15 Nov 2019 19:05:37 +0900 (JST)
+        (envelope-from penguin-kernel@i-love.sakura.ne.jp)
+Subject: Re: [PATCH] block: Bail out iteration functions upon SIGKILL.
+To:     Damien Le Moal <Damien.LeMoal@wdc.com>
+Cc:     Bob Liu <bob.liu@oracle.com>, "axboe@kernel.dk" <axboe@kernel.dk>,
+        "linux-block@vger.kernel.org" <linux-block@vger.kernel.org>
+References: <000000000000c52dbf05958f3f3a@google.com>
+ <3fbc4bb2-a03b-fbfa-4803-47a6d0075ff2@I-love.SAKURA.ne.jp>
+ <24296ff7-4a5f-2bd9-63c7-07831f7b4d8d@oracle.com>
+ <8fde32da-d5e5-11b7-9ed7-e3aa5b003647@i-love.sakura.ne.jp>
+ <BYAPR04MB58165EC2C792CE26AAAF361FE7770@BYAPR04MB5816.namprd04.prod.outlook.com>
+ <272e3542-72ab-12ff-636b-722a68a2589c@i-love.sakura.ne.jp>
+ <BYAPR04MB5816D18E6F6633030265B06EE7760@BYAPR04MB5816.namprd04.prod.outlook.com>
+From:   Tetsuo Handa <penguin-kernel@i-love.sakura.ne.jp>
+Message-ID: <74a7ed17-0e2b-976c-0000-2774a1a10585@i-love.sakura.ne.jp>
+Date:   Fri, 15 Nov 2019 19:05:32 +0900
+User-Agent: Mozilla/5.0 (Windows NT 6.3; WOW64; rv:60.0) Gecko/20100101
  Thunderbird/60.9.1
 MIME-Version: 1.0
-In-Reply-To: <9b6cd06b-cd6c-d7e5-157b-32c1e2e9ceac@kernel.dk>
+In-Reply-To: <BYAPR04MB5816D18E6F6633030265B06EE7760@BYAPR04MB5816.namprd04.prod.outlook.com>
 Content-Type: text/plain; charset=utf-8
 Content-Language: en-US
 Content-Transfer-Encoding: 7bit
@@ -78,80 +59,114 @@ Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
->> Finally got to this patch. I think, find it adding too many edge cases
->> and it isn't integrated consistently into what we have now. I would love
->> to hear your vision, but I'd try to implement them in such a way, that it
->> doesn't need to modify the framework, at least for some particular case.
->> In other words, as opcodes could have been added from the outside with a
->> function table.
-> 
-> I agree, it could do with a bit of cleanup. Incrementals would be
-> appreciated!
-> 
->> Also, it's not so consistent with the userspace API as well.
+On 2019/11/13 10:54, Damien Le Moal wrote:
+> On 2019/11/12 23:48, Tetsuo Handa wrote:
+> [...]
+>>>> +static int blk_should_abort(struct bio *bio)
+>>>> +{
+>>>> +	int ret;
+>>>> +
+>>>> +	cond_resched();
+>>>> +	if (!fatal_signal_pending(current))
+>>>> +		return 0;
+>>>> +	ret = submit_bio_wait(bio);
+>>>
+>>> This will change the behavior of __blkdev_issue_discard() to a sync IO
+>>> execution instead of the current async execution since submit_bio_wait()
+>>> call is the responsibility of the caller (e.g. blkdev_issue_discard()).
+>>> Have you checked if users of __blkdev_issue_discard() are OK with that ?
+>>> f2fs, ext4, xfs, dm and nvme use this function.
 >>
->> 1. If we specified drain for the timeout, should its start be delayed
->> until then? I would prefer so.
+>> I'm not sure...
 >>
->> E.g. send_msg + drained linked_timeout, which would set a timeout from the
->> start of the send.
-> 
-> What cases would that apply to, what would the timeout even do in this
-> case? The point of the linked timeout is to abort the previous command.
-> Maybe I'm not following what you mean here.
-> 
-Hmm, got it a bit wrong with defer. io_queue_link_head() can defer it
-without setting timeout. However, it seems that io_wq_submit_work()
-won't set a timer, as it uses __io_submit_sqe(), but not
-__io_queue_sqe(), which handles all this with linked timeouts.
-
-Indeed, maybe it be, that you wanted to place it in __io_submit_sqe?
-
->> 2. Why it could be only the second one in a link? May we want to cancel
->> from a certain point?
->> e.g. "op1 -> op2 -> timeout -> op3" cancels op2 and op3
-> 
-> Logically it need not be the second, it just has to follow another
-> request. Is there a bug there?
-> 
-__io_queue_sqe looks only for the second one in a link. Other linked
-timeouts will be ignored, if I get the code right.
-
-Also linking may (or __may not__) be an issue. As you remember, the head
-is linked through link_list, and all following with list.
-i.e. req_head.link_list <-> req.list <-> req.list <-> req.list
-
-free_req() (last time I saw it), expects that timeout's previous request
-is linked with link_list. If a timeout can fire in the middle of a link
-(during execution), this could be not the case. But it depends on when
-we set an timeout.
-
-BTW, personally I'd link them all through link_list. E.g. may get rid of
-splicing in free_req(). I'll try to make it later.
-
->> 3. It's a bit strange, that the timeout affects a request from the left,
->> and after as an consequence cancels everything on the right (i.e. chain).
->> Could we place it in the head? So it would affect all requests on the right
->> from it.
-> 
-> But that's how links work, though. If you keep linking, then everything
-> that depends on X will fail, if X itself isn't succesful.
-> 
-Right. That's about what userspace API would be saner. To place timeout
-on the left of a request, or on the right, with the same resulting effect.
-
-Let put this question away until the others are clear.
-
->> 4. I'd prefer to handle it as a new generic command and setting a timer
->> in __io_submit_sqe().
+>>>
+>>> Looking at f2fs, this does not look like it is going to work as expected
+>>> since the bio setup, including end_io callback, is done after this
+>>> function is called and a regular submit_bio() execution is being used.
 >>
->> I believe we can do it more gracefully, and at the same moment giving
->> more freedom to the user. What do you think?
+>> Then, just breaking the iteration like below?
+>> nvmet_bdev_execute_write_zeroes() ignores -EINTR if "*biop = bio;" is done. Is that no problem?
+>>
+>> --- a/block/blk-lib.c
+>> +++ b/block/blk-lib.c
+>> @@ -7,6 +7,7 @@
+>>  #include <linux/bio.h>
+>>  #include <linux/blkdev.h>
+>>  #include <linux/scatterlist.h>
+>> +#include <linux/sched/signal.h>
+>>  
+>>  #include "blk.h"
+>>  
+>> @@ -30,6 +31,7 @@ int __blkdev_issue_discard(struct block_device *bdev, sector_t sector,
+>>  	struct bio *bio = *biop;
+>>  	unsigned int op;
+>>  	sector_t bs_mask;
+>> +	int ret = 0;
+>>  
+>>  	if (!q)
+>>  		return -ENXIO;
+>> @@ -76,10 +78,14 @@ int __blkdev_issue_discard(struct block_device *bdev, sector_t sector,
+>>  		 * is disabled.
+>>  		 */
+>>  		cond_resched();
+>> +		if (fatal_signal_pending(current)) {
+>> +			ret = -EINTR;
+>> +			break;
+>> +		}
+>>  	}
+>>  
+>>  	*biop = bio;
+>> -	return 0;
+>> +	return ret;
 > 
-> I just think we need to make sure the ground rules are sane. I'm going
-> to write a few test cases to make sure we do the right thing.
+> This will leak a bio as blkdev_issue_discard() executes the bio only in
+> the case "if (!ret && bio)". So that does not work as is, unless all
+> callers of __blkdev_issue_discard() are also changed. Same problem for
+> the other __blkdev_issue_xxx() functions.
 > 
+> Looking more into this, if an error is returned here, no bio should be
+> returned and we need to make sure that all started bios are also
+> completed. So your helper blk_should_abort() did the right thing calling
+> submit_bio_wait(). However, I Think it would be better to fail
+> immediately the current loop bio instead of executing it and then
+> reporting the -EINTR error, unconditionally, regardless of what the
+> started bios completion status is.
+> 
+> This could be done with the help of a function like this, very similar
+> to submit_bio_wait().
+> 
+> void bio_chain_end_wait(struct bio *bio)
+> {
+> 	DECLARE_COMPLETION_ONSTACK_MAP(done, bio->bi_disk->lockdep_map);
+> 
+> 	bio->bi_private = &done;
+> 	bio->bi_end_io = submit_bio_wait_endio;
+> 	bio->bi_opf |= REQ_SYNC;
+> 	bio_endio(bio);
+> 	wait_for_completion_io(&done);
+> }
+> 
+> And then your helper function becomes something like this:
+> 
+> static int blk_should_abort(struct bio *bio)
+> {
+> 	int ret;
+> 
+> 	cond_resched();
+> 	if (!fatal_signal_pending(current))
+> 		return 0;
+> 
+> 	if (bio_flagged(bio, BIO_CHAIN))
+> 		bio_chain_end_wait(bio);
 
--- 
-Pavel Begunkov
+I don't know about block layer, but I feel this is bad because bio_put()
+will be called without submit_bio_wait() when bio_flagged() == false.
+Who calls submit_bio_wait() if bio_flagged() == false ?
 
+> 	bio_put(bio);
+> 
+> 	return -EINTR;
+> }
+> 
+> Thoughts ?
+> 
