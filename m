@@ -2,151 +2,156 @@ Return-Path: <SRS0=zNjm=ZH=vger.kernel.org=linux-block-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-2.2 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
-	MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED,USER_AGENT_SANE_1
-	autolearn=no autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-2.2 required=3.0 tests=DKIM_SIGNED,DKIM_VALID,
+	DKIM_VALID_AU,FREEMAIL_FORGED_FROMDOMAIN,FREEMAIL_FROM,
+	HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,
+	USER_AGENT_SANE_1 autolearn=no autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id C79E1C432C3
-	for <linux-block@archiver.kernel.org>; Fri, 15 Nov 2019 07:29:40 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 7C4DAC43215
+	for <linux-block@archiver.kernel.org>; Fri, 15 Nov 2019 09:40:07 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.kernel.org (Postfix) with ESMTP id 99AC32073B
-	for <linux-block@archiver.kernel.org>; Fri, 15 Nov 2019 07:29:40 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id 555E22073B
+	for <linux-block@archiver.kernel.org>; Fri, 15 Nov 2019 09:40:07 +0000 (UTC)
+Authentication-Results: mail.kernel.org;
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="fAxgTl8j"
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1727186AbfKOH3k (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Fri, 15 Nov 2019 02:29:40 -0500
-Received: from mx2.suse.de ([195.135.220.15]:51820 "EHLO mx1.suse.de"
-        rhost-flags-OK-OK-OK-FAIL) by vger.kernel.org with ESMTP
-        id S1726444AbfKOH3j (ORCPT <rfc822;linux-block@vger.kernel.org>);
-        Fri, 15 Nov 2019 02:29:39 -0500
-X-Virus-Scanned: by amavisd-new at test-mx.suse.de
-Received: from relay2.suse.de (unknown [195.135.220.254])
-        by mx1.suse.de (Postfix) with ESMTP id C6613AD05;
-        Fri, 15 Nov 2019 07:29:36 +0000 (UTC)
-Subject: Re: [PATCH RFC 3/5] blk-mq: Facilitate a shared tags per tagset
-To:     Bart Van Assche <bvanassche@acm.org>,
-        John Garry <john.garry@huawei.com>,
-        "axboe@kernel.dk" <axboe@kernel.dk>,
-        "jejb@linux.ibm.com" <jejb@linux.ibm.com>,
-        "martin.petersen@oracle.com" <martin.petersen@oracle.com>
-Cc:     "linux-block@vger.kernel.org" <linux-block@vger.kernel.org>,
-        "linux-kernel@vger.kernel.org" <linux-kernel@vger.kernel.org>,
-        "linux-scsi@vger.kernel.org" <linux-scsi@vger.kernel.org>,
-        "ming.lei@redhat.com" <ming.lei@redhat.com>,
-        "hare@suse.com" <hare@suse.com>,
-        "chenxiang (M)" <chenxiang66@hisilicon.com>
-References: <1573652209-163505-1-git-send-email-john.garry@huawei.com>
- <1573652209-163505-4-git-send-email-john.garry@huawei.com>
- <32880159-86e8-5c48-1532-181fdea0df96@suse.de>
- <2cbf591c-8284-8499-7804-e7078cf274d2@huawei.com>
- <02056612-a958-7b05-3c54-bb2fa69bc493@suse.de>
- <ace95bc5-7b89-9ed3-be89-8139f977984b@huawei.com>
- <42b0bcd9-f147-76eb-dfce-270f77bca818@suse.de>
- <89cd1985-39c7-2965-d25b-2ee2c183d057@huawei.com>
- <c34c0ce2-40a8-e4fc-3366-1f7b906da5a3@acm.org>
-From:   Hannes Reinecke <hare@suse.de>
-Openpgp: preference=signencrypt
-Autocrypt: addr=hare@suse.de; prefer-encrypt=mutual; keydata=
- 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
- azzYF4VRJsdl+d0MCaSy8mUh
-Message-ID: <3cda2c0a-1b09-afd3-e0d2-28f7587a085c@suse.de>
-Date:   Fri, 15 Nov 2019 08:29:36 +0100
-User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:60.0) Gecko/20100101
- Thunderbird/60.7.2
+        id S1727089AbfKOJkG (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Fri, 15 Nov 2019 04:40:06 -0500
+Received: from mail-lj1-f170.google.com ([209.85.208.170]:44371 "EHLO
+        mail-lj1-f170.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S1726930AbfKOJkG (ORCPT
+        <rfc822;linux-block@vger.kernel.org>);
+        Fri, 15 Nov 2019 04:40:06 -0500
+Received: by mail-lj1-f170.google.com with SMTP id g3so9952669ljl.11;
+        Fri, 15 Nov 2019 01:40:04 -0800 (PST)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=gmail.com; s=20161025;
+        h=subject:to:cc:references:from:message-id:date:user-agent
+         :mime-version:in-reply-to:content-language:content-transfer-encoding;
+        bh=I2bY8wt44U8gioXslAWPn4SYSC87I8ddc2E8Vr5B1O8=;
+        b=fAxgTl8jg0+RgGouq+X0RuB/Qa2RIj07JqtPgIjxKUGEYy41OUalLRSGLdVmG4p6CE
+         YbHB189zeZoc36pTjUMQzzh2zOKvbPy5KFrGKHz7NQ9+/vH36VrNc4ayKqyzn0Onvjuu
+         5vvnjG5Bx0XXM5p/kVFC7W7Oc1maaDZTgji4bqhPs14vJCF0FaZrIl+u8tJBbigiN5tq
+         1yVXrHsG5Myiy29XyLsC4d2XVBlPq2degCiBMch4Lh0uGAJ+P8pRCbNVOJVrOIyF5hWh
+         /32HHjpm5wo8RwHTjc2XOB1n5D41AU+wNCgxqdU+NvWFBZxLqi5xVqt6SGsrl+1kJeP/
+         S0fw==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20161025;
+        h=x-gm-message-state:subject:to:cc:references:from:message-id:date
+         :user-agent:mime-version:in-reply-to:content-language
+         :content-transfer-encoding;
+        bh=I2bY8wt44U8gioXslAWPn4SYSC87I8ddc2E8Vr5B1O8=;
+        b=GweTl3rbCbXvBXA+raQZ1pgdc6j32YmeyzUtbuuZAsESDrssywHTnGKdRSaeKLBbFK
+         nmIZfO32YThIY8QCMrmIq+XpKO1vKOt3lE8rLY2mDs215GuMzdvifm6++ErJCZblnjOD
+         815ZiEJjkRPsl980R9l811wf1onv35+Qwtsyw5PSDsVint8tk+7MacerMaaBTKCT2K4Q
+         eU8CQcAtau19DLkLWi3mE3sstWTelibi0l5rNsv7rxTnA1ilY6fVDM13hAV4ZOKjlv8u
+         9B4FOujdfkZhWhOnFxKBmJqMUjM+/9KHPidhDT0w2lFfi9ABa5spnoWW9VImIz1OGz8U
+         jSYQ==
+X-Gm-Message-State: APjAAAVqTVIDBs/YvfGZdj3Cjl8beKh/bCRRM20driZGhjpejW3R5vEe
+        p9oRGF0vy8n6vd72dFYe1aiwiRju
+X-Google-Smtp-Source: APXvYqwE4izGIZu2wzmyollnmujJrbxz6DyP9k1peKUm0dMaerDS582LkgreFOefXzIt/g1EnlTW7Q==
+X-Received: by 2002:a2e:9f4c:: with SMTP id v12mr1645813ljk.167.1573810804047;
+        Fri, 15 Nov 2019 01:40:04 -0800 (PST)
+Received: from [172.31.190.83] ([86.57.146.226])
+        by smtp.gmail.com with ESMTPSA id b80sm4162838lfg.49.2019.11.15.01.40.02
+        (version=TLS1_2 cipher=ECDHE-RSA-AES128-GCM-SHA256 bits=128/128);
+        Fri, 15 Nov 2019 01:40:03 -0800 (PST)
+Subject: Re: [PATCHSET 0/2] io_uring support for linked timeouts
+To:     Jens Axboe <axboe@kernel.dk>, io-uring@vger.kernel.org,
+        linux-block@vger.kernel.org
+Cc:     zeba.hrvoje@gmail.com, liuyun01@kylinos.cn
+References: <20191105211130.6130-1-axboe@kernel.dk>
+ <4566889a-7e12-9bfd-b2a1-716d8b934684@gmail.com>
+ <9b6cd06b-cd6c-d7e5-157b-32c1e2e9ceac@kernel.dk>
+From:   Pavel Begunkov <asml.silence@gmail.com>
+Message-ID: <3c0ef10d-9524-e2e2-abf2-e1b0bcee9223@gmail.com>
+Date:   Fri, 15 Nov 2019 12:40:02 +0300
+User-Agent: Mozilla/5.0 (Windows NT 10.0; WOW64; rv:60.0) Gecko/20100101
+ Thunderbird/60.9.1
 MIME-Version: 1.0
-In-Reply-To: <c34c0ce2-40a8-e4fc-3366-1f7b906da5a3@acm.org>
+In-Reply-To: <9b6cd06b-cd6c-d7e5-157b-32c1e2e9ceac@kernel.dk>
 Content-Type: text/plain; charset=utf-8
 Content-Language: en-US
-Content-Transfer-Encoding: 8bit
+Content-Transfer-Encoding: 7bit
 Sender: linux-block-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-On 11/15/19 6:30 AM, Bart Van Assche wrote:
-> On 11/14/19 1:41 AM, John Garry wrote:
->> On 13/11/2019 18:38, Hannes Reinecke wrote:
->>>> Hi Hannes,
->>>>
->>>>> Oh, my. Indeed, that's correct.
->>>>
->>>> The tags could be kept in sync like this:
->>>>
->>>> shared_tag = blk_mq_get_tag(shared_tagset);
->>>> if (shared_tag != -1)
->>>>      sbitmap_set(hctx->tags, shared_tag);
->>>>
->>>> But that's obviously not ideal.
->>>>
->>> Actually, I _do_ prefer keeping both in sync.
->>> We might want to check if the 'normal' tag is set (typically it would not, but then, who knows ...)
->>> The beauty here is that both 'shared' and 'normal' tag are in sync, so if a driver would be wanting to use the tag as index into a command array it can do so without any surprises.
->>>
->>> Why do you think it's not ideal?
->>
->> A few points:
->> - Getting a bit from one tagset and then setting it in another tagset is a bit clunky.
->> - There may be an atomicity of the getting the shared tag bit and setting the hctx tag bit - I don't think that there is.
->> - Consider that sometimes we may want to check if there is space on a hw queue - checking the hctx tags is not really proper any longer, as typically there would always be space on hctx, but not always the shared tags. We did delete blk_mq_can_queue() yesterday, which
->> would be an example of that. Need to check if there are others.
->>
->> Having said all that, the obvious advantage is performance gain, can still use request.tag and so maybe less intrusive changes.
->>
->> I'll have a look at the implementation. The devil is mostly in the detail...
+>> Finally got to this patch. I think, find it adding too many edge cases
+>> and it isn't integrated consistently into what we have now. I would love
+>> to hear your vision, but I'd try to implement them in such a way, that it
+>> doesn't need to modify the framework, at least for some particular case.
+>> In other words, as opcodes could have been added from the outside with a
+>> function table.
 > 
-> Wouldn't that approach trigger a deadlock if it is attempted to allocate the last
-> tag from two different hardware queues? How about sharing tag sets across hardware
-> queues, e.g. like in the (totally untested) patch below?
+> I agree, it could do with a bit of cleanup. Incrementals would be
+> appreciated!
 > 
-Why should it?
-The shared tag map determines which tag should be allocated in the
-per-hctx map, and as the former is a strict superset of all hctx maps
-the bit _has_ to be free in the hctx map.
+>> Also, it's not so consistent with the userspace API as well.
+>>
+>> 1. If we specified drain for the timeout, should its start be delayed
+>> until then? I would prefer so.
+>>
+>> E.g. send_msg + drained linked_timeout, which would set a timeout from the
+>> start of the send.
+> 
+> What cases would that apply to, what would the timeout even do in this
+> case? The point of the linked timeout is to abort the previous command.
+> Maybe I'm not following what you mean here.
+> 
+Hmm, got it a bit wrong with defer. io_queue_link_head() can defer it
+without setting timeout. However, it seems that io_wq_submit_work()
+won't set a timer, as it uses __io_submit_sqe(), but not
+__io_queue_sqe(), which handles all this with linked timeouts.
 
-Cheers,
+Indeed, maybe it be, that you wanted to place it in __io_submit_sqe?
 
-Hannes
+>> 2. Why it could be only the second one in a link? May we want to cancel
+>> from a certain point?
+>> e.g. "op1 -> op2 -> timeout -> op3" cancels op2 and op3
+> 
+> Logically it need not be the second, it just has to follow another
+> request. Is there a bug there?
+> 
+__io_queue_sqe looks only for the second one in a link. Other linked
+timeouts will be ignored, if I get the code right.
+
+Also linking may (or __may not__) be an issue. As you remember, the head
+is linked through link_list, and all following with list.
+i.e. req_head.link_list <-> req.list <-> req.list <-> req.list
+
+free_req() (last time I saw it), expects that timeout's previous request
+is linked with link_list. If a timeout can fire in the middle of a link
+(during execution), this could be not the case. But it depends on when
+we set an timeout.
+
+BTW, personally I'd link them all through link_list. E.g. may get rid of
+splicing in free_req(). I'll try to make it later.
+
+>> 3. It's a bit strange, that the timeout affects a request from the left,
+>> and after as an consequence cancels everything on the right (i.e. chain).
+>> Could we place it in the head? So it would affect all requests on the right
+>> from it.
+> 
+> But that's how links work, though. If you keep linking, then everything
+> that depends on X will fail, if X itself isn't succesful.
+> 
+Right. That's about what userspace API would be saner. To place timeout
+on the left of a request, or on the right, with the same resulting effect.
+
+Let put this question away until the others are clear.
+
+>> 4. I'd prefer to handle it as a new generic command and setting a timer
+>> in __io_submit_sqe().
+>>
+>> I believe we can do it more gracefully, and at the same moment giving
+>> more freedom to the user. What do you think?
+> 
+> I just think we need to make sure the ground rules are sane. I'm going
+> to write a few test cases to make sure we do the right thing.
+> 
+
 -- 
-Dr. Hannes Reinecke		      Teamlead Storage & Networking
-hare@suse.de			                  +49 911 74053 688
-SUSE Software Solutions Germany GmbH, Maxfeldstr. 5, 90409 Nürnberg
-HRB 247165 (AG München), GF: Felix Imendörffer
+Pavel Begunkov
+
