@@ -2,33 +2,34 @@ Return-Path: <SRS0=zNjm=ZH=vger.kernel.org=linux-block-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-5.2 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
-	MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED,
-	USER_AGENT_SANE_1 autolearn=ham autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-5.3 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
+	MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,USER_AGENT_SANE_1
+	autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 0E153C432C3
-	for <linux-block@archiver.kernel.org>; Fri, 15 Nov 2019 10:07:53 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id D8221C432C3
+	for <linux-block@archiver.kernel.org>; Fri, 15 Nov 2019 10:08:26 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.kernel.org (Postfix) with ESMTP id E28262073A
-	for <linux-block@archiver.kernel.org>; Fri, 15 Nov 2019 10:07:52 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id B63962077B
+	for <linux-block@archiver.kernel.org>; Fri, 15 Nov 2019 10:08:26 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1727142AbfKOKHw (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Fri, 15 Nov 2019 05:07:52 -0500
-Received: from mx2.suse.de ([195.135.220.15]:47418 "EHLO mx1.suse.de"
+        id S1727032AbfKOKIZ (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Fri, 15 Nov 2019 05:08:25 -0500
+Received: from mx2.suse.de ([195.135.220.15]:47648 "EHLO mx1.suse.de"
         rhost-flags-OK-OK-OK-FAIL) by vger.kernel.org with ESMTP
-        id S1727036AbfKOKHw (ORCPT <rfc822;linux-block@vger.kernel.org>);
-        Fri, 15 Nov 2019 05:07:52 -0500
+        id S1727065AbfKOKIY (ORCPT <rfc822;linux-block@vger.kernel.org>);
+        Fri, 15 Nov 2019 05:08:24 -0500
 X-Virus-Scanned: by amavisd-new at test-mx.suse.de
 Received: from relay2.suse.de (unknown [195.135.220.254])
-        by mx1.suse.de (Postfix) with ESMTP id A8AA9B229;
-        Fri, 15 Nov 2019 10:07:49 +0000 (UTC)
-Subject: Re: [PATCH 4/7] block: fix bdev_disk_changed for non-partitioned
- devices
+        by mx1.suse.de (Postfix) with ESMTP id 38708B229;
+        Fri, 15 Nov 2019 10:08:22 +0000 (UTC)
+Subject: Re: [PATCH 5/7] block: remove (__)blkdev_reread_part as an exported
+ API
 To:     Christoph Hellwig <hch@lst.de>, Jens Axboe <axboe@kernel.dk>,
         Jan Kara <jack@suse.cz>
-Cc:     linux-block@vger.kernel.org, linux-s390@vger.kernel.org
+Cc:     linux-block@vger.kernel.org, linux-s390@vger.kernel.org,
+        Stefan Haberland <sth@linux.ibm.com>
 References: <20191114143438.14681-1-hch@lst.de>
- <20191114143438.14681-5-hch@lst.de>
+ <20191114143438.14681-6-hch@lst.de>
 From:   Hannes Reinecke <hare@suse.de>
 Openpgp: preference=signencrypt
 Autocrypt: addr=hare@suse.de; prefer-encrypt=mutual; keydata=
@@ -74,12 +75,12 @@ Autocrypt: addr=hare@suse.de; prefer-encrypt=mutual; keydata=
  ZtWlhGRERnDH17PUXDglsOA08HCls0PHx8itYsjYCAyETlxlLApXWdVl9YVwbQpQ+i693t/Y
  PGu8jotn0++P19d3JwXW8t6TVvBIQ1dRZHx1IxGLMn+CkDJMOmHAUMWTAXX2rf5tUjas8/v2
  azzYF4VRJsdl+d0MCaSy8mUh
-Message-ID: <74109dd8-3fa8-73d9-d663-32fce14c409d@suse.de>
-Date:   Fri, 15 Nov 2019 11:07:49 +0100
+Message-ID: <01ea27d7-9b0d-2001-843e-bbb06b610f83@suse.de>
+Date:   Fri, 15 Nov 2019 11:08:21 +0100
 User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:60.0) Gecko/20100101
  Thunderbird/60.7.2
 MIME-Version: 1.0
-In-Reply-To: <20191114143438.14681-5-hch@lst.de>
+In-Reply-To: <20191114143438.14681-6-hch@lst.de>
 Content-Type: text/plain; charset=utf-8
 Content-Language: en-US
 Content-Transfer-Encoding: 8bit
@@ -89,20 +90,21 @@ List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
 On 11/14/19 3:34 PM, Christoph Hellwig wrote:
-> We still have to set the capacity to 0 if invalidating or call
-> revalidate_disk if not even if the disk has no partitions.  Fix
-> that by merging rescan_partitions into bdev_disk_changed and just
-> stubbing out blk_add_partitions and blk_drop_partitions for
-> non-partitioned devices.
+> In general drivers should never mess with partition tables directly.
+> Unfortunately s390 and loop do for somewhat historic reasons, but they
+> can use bdev_disk_changed directly instead when we export it as they
+> satisfy the sanity checks we have in __blkdev_reread_part.
 > 
 > Signed-off-by: Christoph Hellwig <hch@lst.de>
+> Reviewed-by: Stefan Haberland <sth@linux.ibm.com>	[dasd]
 > Reviewed-by: Jan Kara <jack@suse.cz>
 > ---
->  block/ioctl.c             |  6 ++----
->  block/partition-generic.c |  5 +++++
->  fs/block_dev.c            | 27 ++++++++-------------------
->  include/linux/genhd.h     |  1 +
->  4 files changed, 16 insertions(+), 23 deletions(-)
+>  block/ioctl.c                   | 35 +++++----------------------------
+>  drivers/block/loop.c            | 13 +++++++-----
+>  drivers/s390/block/dasd_genhd.c |  4 +++-
+>  fs/block_dev.c                  |  7 +++++++
+>  include/linux/fs.h              |  2 --
+>  5 files changed, 23 insertions(+), 38 deletions(-)
 > 
 Reviewed-by: Hannes Reinecke <hare@suse.de>
 
