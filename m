@@ -2,259 +2,428 @@ Return-Path: <SRS0=zNjm=ZH=vger.kernel.org=linux-block-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-2.2 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
-	MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED,USER_AGENT_SANE_1
-	autolearn=no autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-5.3 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
+	INCLUDES_PATCH,MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,USER_AGENT_SANE_1
+	autolearn=unavailable autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 2079CC432C3
-	for <linux-block@archiver.kernel.org>; Fri, 15 Nov 2019 04:56:46 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id BDE3CC432C3
+	for <linux-block@archiver.kernel.org>; Fri, 15 Nov 2019 05:30:17 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.kernel.org (Postfix) with ESMTP id EC9C12072A
-	for <linux-block@archiver.kernel.org>; Fri, 15 Nov 2019 04:56:45 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id 90A482072D
+	for <linux-block@archiver.kernel.org>; Fri, 15 Nov 2019 05:30:17 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1726755AbfKOE4p (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Thu, 14 Nov 2019 23:56:45 -0500
-Received: from mail105.syd.optusnet.com.au ([211.29.132.249]:54470 "EHLO
-        mail105.syd.optusnet.com.au" rhost-flags-OK-OK-OK-OK)
-        by vger.kernel.org with ESMTP id S1726549AbfKOE4p (ORCPT
+        id S1727344AbfKOFaL convert rfc822-to-8bit (ORCPT
+        <rfc822;linux-block@archiver.kernel.org>);
+        Fri, 15 Nov 2019 00:30:11 -0500
+Received: from mail-pg1-f194.google.com ([209.85.215.194]:36320 "EHLO
+        mail-pg1-f194.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S1727334AbfKOFaK (ORCPT
         <rfc822;linux-block@vger.kernel.org>);
-        Thu, 14 Nov 2019 23:56:45 -0500
-Received: from dread.disaster.area (pa49-181-255-80.pa.nsw.optusnet.com.au [49.181.255.80])
-        by mail105.syd.optusnet.com.au (Postfix) with ESMTPS id 757C63A126C;
-        Fri, 15 Nov 2019 15:56:36 +1100 (AEDT)
-Received: from dave by dread.disaster.area with local (Exim 4.92.3)
-        (envelope-from <david@fromorbit.com>)
-        id 1iVTes-000703-KI; Fri, 15 Nov 2019 15:56:34 +1100
-Date:   Fri, 15 Nov 2019 15:56:34 +1100
-From:   Dave Chinner <david@fromorbit.com>
-To:     Ming Lei <ming.lei@redhat.com>
-Cc:     linux-block@vger.kernel.org, linux-fsdevel@vger.kernel.org,
-        linux-xfs@vger.kernel.org, linux-kernel@vger.kernel.org,
-        Jeff Moyer <jmoyer@redhat.com>,
-        Dave Chinner <dchinner@redhat.com>,
-        Eric Sandeen <sandeen@redhat.com>,
-        Christoph Hellwig <hch@lst.de>, Jens Axboe <axboe@kernel.dk>,
-        Ingo Molnar <mingo@redhat.com>,
-        Peter Zijlstra <peterz@infradead.org>,
-        Tejun Heo <tj@kernel.org>
-Subject: Re: single aio thread is migrated crazily by scheduler
-Message-ID: <20191115045634.GN4614@dread.disaster.area>
-References: <20191114113153.GB4213@ming.t460p>
- <20191114235415.GL4614@dread.disaster.area>
- <20191115010824.GC4847@ming.t460p>
+        Fri, 15 Nov 2019 00:30:10 -0500
+Received: by mail-pg1-f194.google.com with SMTP id k13so5275044pgh.3;
+        Thu, 14 Nov 2019 21:30:08 -0800 (PST)
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20161025;
+        h=x-gm-message-state:subject:to:cc:references:from:message-id:date
+         :user-agent:mime-version:in-reply-to:content-language
+         :content-transfer-encoding;
+        bh=3PwQNFgZYE7Xh0BKs+9unAnIULPVCb51GWIcfMGfUVw=;
+        b=EmiYC+YHfhMxvhS0SV9aQx4ypRHpoalPpof0rJRC96svN1/uwoAbtQIyTeh+YqAhVB
+         t/5pvpfuv9vTWe1BhMWgONKKLSM9DbK7NSjB9KZqJISQc1gkpUQV8oW1Tfk4F72y7QoL
+         h8NhfLOpN2mJZ325tZgOX3isOvTlSwXExo7xQRDZnotTgrX+HuLIcKdHd1a0aPPN9MmY
+         K2MIAZN5hs+prmzKYREMIrhLAo8aiKW4kqSSZRYTo5V5mVZiCkdOHsDiWfxoJ1VJlLtx
+         LYy7O2eJIc6SJGiXwzS1qeC3L9MUL24l4+q2s4DtPSeYS0JurEw8424qVaDTkdPDksiu
+         MHNA==
+X-Gm-Message-State: APjAAAU3hnX+1gpsf2/4Ai+WjFwjpL+ZflGfZEyukJ4WP9a9ujd8XWo6
+        UyTRsm3hgE0D4KR2mYXJJ34=
+X-Google-Smtp-Source: APXvYqxtL5V4TLoYcoAL0wT929R8hvEYKQ+9iZTuu2DtvglDu6/I6cztOO16UjnN8LNp7iCCqBkbvw==
+X-Received: by 2002:a17:90b:300c:: with SMTP id hg12mr17526965pjb.75.1573795807930;
+        Thu, 14 Nov 2019 21:30:07 -0800 (PST)
+Received: from ?IPv6:2601:647:4000:a8:5ff4:69e:fa0f:e8ac? ([2601:647:4000:a8:5ff4:69e:fa0f:e8ac])
+        by smtp.gmail.com with ESMTPSA id z7sm10240645pfr.165.2019.11.14.21.30.06
+        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
+        Thu, 14 Nov 2019 21:30:06 -0800 (PST)
+Subject: Re: [PATCH RFC 3/5] blk-mq: Facilitate a shared tags per tagset
+To:     John Garry <john.garry@huawei.com>, Hannes Reinecke <hare@suse.de>,
+        "axboe@kernel.dk" <axboe@kernel.dk>,
+        "jejb@linux.ibm.com" <jejb@linux.ibm.com>,
+        "martin.petersen@oracle.com" <martin.petersen@oracle.com>
+Cc:     "linux-block@vger.kernel.org" <linux-block@vger.kernel.org>,
+        "linux-kernel@vger.kernel.org" <linux-kernel@vger.kernel.org>,
+        "linux-scsi@vger.kernel.org" <linux-scsi@vger.kernel.org>,
+        "ming.lei@redhat.com" <ming.lei@redhat.com>,
+        "hare@suse.com" <hare@suse.com>,
+        "chenxiang (M)" <chenxiang66@hisilicon.com>
+References: <1573652209-163505-1-git-send-email-john.garry@huawei.com>
+ <1573652209-163505-4-git-send-email-john.garry@huawei.com>
+ <32880159-86e8-5c48-1532-181fdea0df96@suse.de>
+ <2cbf591c-8284-8499-7804-e7078cf274d2@huawei.com>
+ <02056612-a958-7b05-3c54-bb2fa69bc493@suse.de>
+ <ace95bc5-7b89-9ed3-be89-8139f977984b@huawei.com>
+ <42b0bcd9-f147-76eb-dfce-270f77bca818@suse.de>
+ <89cd1985-39c7-2965-d25b-2ee2c183d057@huawei.com>
+From:   Bart Van Assche <bvanassche@acm.org>
+Message-ID: <c34c0ce2-40a8-e4fc-3366-1f7b906da5a3@acm.org>
+Date:   Thu, 14 Nov 2019 21:30:04 -0800
+User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:60.0) Gecko/20100101
+ Thunderbird/60.9.0
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <20191115010824.GC4847@ming.t460p>
-User-Agent: Mutt/1.10.1 (2018-07-13)
-X-Optus-CM-Score: 0
-X-Optus-CM-Analysis: v=2.2 cv=D+Q3ErZj c=1 sm=1 tr=0
-        a=XqaD5fcB6dAc7xyKljs8OA==:117 a=XqaD5fcB6dAc7xyKljs8OA==:17
-        a=jpOVt7BSZ2e4Z31A5e1TngXxSK0=:19 a=kj9zAlcOel0A:10 a=MeAgGD-zjQ4A:10
-        a=7-415B0cAAAA:8 a=YA4SRm3-OJPy1tlrI5wA:9 a=Aj6MW7hUX1EADMvn:21
-        a=IWKxPDfHLwVYwAi0:21 a=CjuIK1q_8ugA:10 a=biEYGPWJfzWAr4FL6Ov7:22
+In-Reply-To: <89cd1985-39c7-2965-d25b-2ee2c183d057@huawei.com>
+Content-Type: text/plain; charset=utf-8
+Content-Language: en-US
+Content-Transfer-Encoding: 8BIT
 Sender: linux-block-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-On Fri, Nov 15, 2019 at 09:08:24AM +0800, Ming Lei wrote:
-> Hi Dave,
+On 11/14/19 1:41 AM, John Garry wrote:
+> On 13/11/2019 18:38, Hannes Reinecke wrote:
+>>> Hi Hannes,
+>>>
+>>>> Oh, my. Indeed, that's correct.
+>>>
+>>> The tags could be kept in sync like this:
+>>>
+>>> shared_tag = blk_mq_get_tag(shared_tagset);
+>>> if (shared_tag != -1)
+>>>      sbitmap_set(hctx->tags, shared_tag);
+>>>
+>>> But that's obviously not ideal.
+>>>
+>> Actually, I _do_ prefer keeping both in sync.
+>> We might want to check if the 'normal' tag is set (typically it would not, but then, who knows ...)
+>> The beauty here is that both 'shared' and 'normal' tag are in sync, so if a driver would be wanting to use the tag as index into a command array it can do so without any surprises.
+>>
+>> Why do you think it's not ideal?
 > 
-> On Fri, Nov 15, 2019 at 10:54:15AM +1100, Dave Chinner wrote:
-> > On Thu, Nov 14, 2019 at 07:31:53PM +0800, Ming Lei wrote:
-> > > Hi Guys,
-> > > 
-> > > It is found that single AIO thread is migrated crazely by scheduler, and
-> > > the migrate period can be < 10ms. Follows the test a):
-> > > 
-> > > 	- run single job fio[1] for 30 seconds:
-> > > 	./xfs_complete 512
-> > > 	
-> > > 	- observe fio io thread migration via bcc trace[2], and the migration
-> > > 	times can reach 5k ~ 10K in above test. In this test, CPU utilization
-> > > 	is 30~40% on the CPU running fio IO thread.
-> > 
-> > Using the default scheduler tunings:
-> > 
-> > kernel.sched_wakeup_granularity_ns = 4000000
-> > kernel.sched_min_granularity_ns = 3000000
-> > 
-> > I'm not seeing any migrations at all on a 16p x86-64 box. Even with
-> > the tunings you suggest:
-> > 
-> > 	sysctl kernel.sched_min_granularity_ns=10000000
-> > 	sysctl kernel.sched_wakeup_granularity_ns=15000000
-> > 
-> > There are no migrations at all.
+> A few points:
+> - Getting a bit from one tagset and then setting it in another tagset is a bit clunky.
+> - There may be an atomicity of the getting the shared tag bit and setting the hctx tag bit - I don't think that there is.
+> - Consider that sometimes we may want to check if there is space on a hw queue - checking the hctx tags is not really proper any longer, as typically there would always be space on hctx, but not always the shared tags. We did delete blk_mq_can_queue() yesterday, which
+> would be an example of that. Need to check if there are others.
 > 
-> Looks I forget to pass $BS to the fio command line in the script posted,
-> please try the following script again and run './xfs_complete 512' first.
-
-So I ran 4kB IOs instead of 512 byte IOs. Shouldn't make any
-difference, really - it'll still be CPU bound...
-
-<snip script>
-
-> In my test just done, the migration count is 12K in 30s fio running.
-> Sometimes the number can be quite less, but most of times, the number
-> is very big(> 5k).
-
-With my iomap-dio-overwrite patch and 512 byte IOs:
-
-$ sudo trace-cmd show |grep sched_migrate_task |wc -l
-112
-$ sudo trace-cmd show |grep sched_migrate_task |grep fio |wc -l
-22
-
-Without the iomap-dio-overwrite patch:
-
-$ sudo trace-cmd show |grep sched_migrate_task |wc -l
-99
-$ sudo trace-cmd show |grep sched_migrate_task |grep fio |wc -l
-9
-$
-
-There are -less- migrations when using the workqueue for everything.
-But it's so low in either case that it's just noise.
-
-Performance is identical for the two patches...
-
-> > > BTW, the tests are run on latest linus tree(5.4-rc7) in KVM guest, and the
-> > > fio test is created for simulating one real performance report which is
-> > > proved to be caused by frequent aio submission thread migration.
-> > 
-> > What is the underlying hardware? I'm running in a 16p KVM guest on a
-> > 16p/32t x86-64 using 5.4-rc7, and I don't observe any significant
-> > CPU migration occurring at all from your test workload.
+> Having said all that, the obvious advantage is performance gain, can still use request.tag and so maybe less intrusive changes.
 > 
-> It is a KVM guest, which is running on my Lenova T460p Fedora 29 laptop,
-> and the host kernel is 5.2.18-100.fc29.x86_64, follows the guest info:
+> I'll have a look at the implementation. The devil is mostly in the detail...
 
-Ok, so what are all the custom distro kernel tunings that userspace
-does for the kernel?
+Wouldn't that approach trigger a deadlock if it is attempted to allocate the last
+tag from two different hardware queues? How about sharing tag sets across hardware
+queues, e.g. like in the (totally untested) patch below?
 
-> [root@ktest-01 ~]# lscpu
-> Architecture:        x86_64
-> CPU op-mode(s):      32-bit, 64-bit
-> Byte Order:          Little Endian
-> CPU(s):              8
-> On-line CPU(s) list: 0-7
-> Thread(s) per core:  1
-> Core(s) per socket:  4
-> Socket(s):           2
-> NUMA node(s):        2
+Thanks,
 
-Curious. You've configured it as two CPU sockets. If you make it a
-single socket, do your delay problems go away?  The snippet of trace
-output you showed indicated it bouncing around CPUs on a single node
-(cpus 0-3), so maybe it has something to do with way the scheduler
-is interacting with non-zero NUMA distances...
+Bart.
 
-> Vendor ID:           GenuineIntel
-> CPU family:          6
-> Model:               94
-> Model name:          Intel(R) Core(TM) i7-6820HQ CPU @ 2.70GHz
-> Stepping:            3
-> CPU MHz:             2712.000
-> BogoMIPS:            5424.00
-> Virtualization:      VT-x
-> Hypervisor vendor:   KVM
-> Virtualization type: full
-> L1d cache:           32K
-> L1i cache:           32K
-> L2 cache:            4096K
-> L3 cache:            16384K
-> NUMA node0 CPU(s):   0-3
-> NUMA node1 CPU(s):   4-7
-> Flags:               fpu vme de pse tsc msr pae mce cx8 apic sep mtrr pge mca cmov pat pse36 clflush mmxp
+diff --git a/block/blk-mq-debugfs.c b/block/blk-mq-debugfs.c
+index b3f2ba483992..3678e95ec947 100644
+--- a/block/blk-mq-debugfs.c
++++ b/block/blk-mq-debugfs.c
+@@ -211,8 +211,6 @@ static const struct blk_mq_debugfs_attr blk_mq_debugfs_queue_attrs[] = {
+ #define HCTX_STATE_NAME(name) [BLK_MQ_S_##name] = #name
+ static const char *const hctx_state_name[] = {
+ 	HCTX_STATE_NAME(STOPPED),
+-	HCTX_STATE_NAME(TAG_ACTIVE),
+-	HCTX_STATE_NAME(SCHED_RESTART),
+ };
+ #undef HCTX_STATE_NAME
 
-That seems like a very minimal set of CPU flags - looks like you are
-not actually passing the actual host CPU capabilities through to the
-guest. That means it will be doing the slowest, most generic
-spectre/meltdown mitigations, right?
+diff --git a/block/blk-mq-sched.c b/block/blk-mq-sched.c
+index ca22afd47b3d..6262584dca09 100644
+--- a/block/blk-mq-sched.c
++++ b/block/blk-mq-sched.c
+@@ -64,18 +64,18 @@ void blk_mq_sched_assign_ioc(struct request *rq)
+  */
+ void blk_mq_sched_mark_restart_hctx(struct blk_mq_hw_ctx *hctx)
+ {
+-	if (test_bit(BLK_MQ_S_SCHED_RESTART, &hctx->state))
++	if (test_bit(BLK_MQ_T_SCHED_RESTART, &hctx->tags->state))
+ 		return;
 
-Also, shouldn't lscpu be telling us all the CPU bug mitigations in
-place?
+-	set_bit(BLK_MQ_S_SCHED_RESTART, &hctx->state);
++	set_bit(BLK_MQ_T_SCHED_RESTART, &hctx->tags->state);
+ }
+ EXPORT_SYMBOL_GPL(blk_mq_sched_mark_restart_hctx);
 
-From my test system:
+ void blk_mq_sched_restart(struct blk_mq_hw_ctx *hctx)
+ {
+-	if (!test_bit(BLK_MQ_S_SCHED_RESTART, &hctx->state))
++	if (!test_bit(BLK_MQ_T_SCHED_RESTART, &hctx->tags->state))
+ 		return;
+-	clear_bit(BLK_MQ_S_SCHED_RESTART, &hctx->state);
++	clear_bit(BLK_MQ_T_SCHED_RESTART, &hctx->tags->state);
 
-Architecture:                    x86_64
-CPU op-mode(s):                  32-bit, 64-bit
-Byte Order:                      Little Endian
-Address sizes:                   40 bits physical, 48 bits virtual
-CPU(s):                          16
-On-line CPU(s) list:             0-15
-Thread(s) per core:              1
-Core(s) per socket:              1
-Socket(s):                       16
-NUMA node(s):                    1
-Vendor ID:                       GenuineIntel
-CPU family:                      6
-Model:                           45
-Model name:                      Intel(R) Xeon(R) CPU E5-4620 0 @ 2.20GHz
-Stepping:                        7
-CPU MHz:                         2199.998
-BogoMIPS:                        4399.99
-Virtualization:                  VT-x
-Hypervisor vendor:               KVM
-Virtualization type:             full
-L1d cache:                       512 KiB
-L1i cache:                       512 KiB
-L2 cache:                        64 MiB
-L3 cache:                        256 MiB
-NUMA node0 CPU(s):               0-15
-Vulnerability L1tf:              Mitigation; PTE Inversion; VMX flush not necessary, SMT disabled
-Vulnerability Mds:               Mitigation; Clear CPU buffers; SMT Host state unknown
-Vulnerability Meltdown:          Vulnerable
-Vulnerability Spec store bypass: Mitigation; Speculative Store Bypass disabled via prctl and seccomp
-Vulnerability Spectre v1:        Mitigation; usercopy/swapgs barriers and __user pointer sanitization
-Vulnerability Spectre v2:        Vulnerable, IBPB: disabled, STIBP: disabled
-Flags:                           fpu vme de pse tsc msr pae mce cx8 apic sep mtrr pge mca cmov pat pse36 clflush mmx fxsr sse sse2 ss syscall nx pdpe1gb rdtscp l
-                                 m constant_tsc arch_perfmon rep_good nopl xtopology cpuid tsc_known_freq pni pclmulqdq vmx ssse3 cx16 pcid sse4_1 sse4_2 x2apic 
-                                 popcnt tsc_deadline_timer aes xsave avx hypervisor lahf_lm cpuid_fault ssbd ibrs ibpb stibp tpr_shadow vnmi flexpriority ept vpi
-                                 d tsc_adjust xsaveopt arat umip md_clear arch_capabilities
+ 	blk_mq_run_hw_queue(hctx, true);
+ }
+@@ -479,12 +479,15 @@ static int blk_mq_sched_alloc_tags(struct request_queue *q,
+ /* called in queue's release handler, tagset has gone away */
+ static void blk_mq_sched_tags_teardown(struct request_queue *q)
+ {
++	struct blk_mq_tags *sched_tags = NULL;
+ 	struct blk_mq_hw_ctx *hctx;
+ 	int i;
 
-So, to rule out that it has something to do with kernel config,
-I just ran up a kernel built with your config.gz, and the problem
-does not manifest. The only difference was a few drivers I needed to
-boot my test VMs, and I was previously not using paravirt spinlocks.
+ 	queue_for_each_hw_ctx(q, hctx, i) {
+-		if (hctx->sched_tags) {
++		if (hctx->sched_tags != sched_tags) {
+ 			blk_mq_free_rq_map(hctx->sched_tags);
++			if (!sched_tags)
++				sched_tags = hctx->sched_tags;
+ 			hctx->sched_tags = NULL;
+ 		}
+ 	}
+@@ -512,6 +515,10 @@ int blk_mq_init_sched(struct request_queue *q, struct elevator_type *e)
+ 				   BLKDEV_MAX_RQ);
 
-So, I still can't reproduce the problem. Indeed, the workload gets
-nowhere near single CPU bound with your config - it's using half the
-CPU for the same performance:
+ 	queue_for_each_hw_ctx(q, hctx, i) {
++		if (i > 0 && q->tag_set->share_tags) {
++			hctx->sched_tags = q->queue_hw_ctx[0]->sched_tags;
++			continue;
++		}
+ 		ret = blk_mq_sched_alloc_tags(q, hctx, i);
+ 		if (ret)
+ 			goto err;
+@@ -556,8 +563,11 @@ void blk_mq_sched_free_requests(struct request_queue *q)
+ 	int i;
 
-%Cpu2  : 19.8 us, 28.2 sy,  0.0 ni,  0.0 id, 52.0 wa,  0.0 hi,  0.0 %si,  0.0 st
+ 	queue_for_each_hw_ctx(q, hctx, i) {
+-		if (hctx->sched_tags)
++		if (hctx->sched_tags) {
+ 			blk_mq_free_rqs(q->tag_set, hctx->sched_tags, i);
++			if (q->tag_set->share_tags)
++				break;
++		}
+ 	}
+ }
 
-Basically, it's spending half it's time waiting on IO. If I wind the
-delay down to 1000ns:
+diff --git a/block/blk-mq-sched.h b/block/blk-mq-sched.h
+index 126021fc3a11..15174a646468 100644
+--- a/block/blk-mq-sched.h
++++ b/block/blk-mq-sched.h
+@@ -82,7 +82,7 @@ static inline bool blk_mq_sched_has_work(struct blk_mq_hw_ctx *hctx)
 
-%Cpu1  : 42.2 us, 42.2 sy,  0.0 ni,  0.0 id,  0.0 wa,  0.0 hi, 15.6 %si,  0.0 st
+ static inline bool blk_mq_sched_needs_restart(struct blk_mq_hw_ctx *hctx)
+ {
+-	return test_bit(BLK_MQ_S_SCHED_RESTART, &hctx->state);
++	return test_bit(BLK_MQ_T_SCHED_RESTART, &hctx->tags->state);
+ }
 
-it spends an awful lot of time in soft-interrupt, but is back to
-being CPU bound.
+ #endif
+diff --git a/block/blk-mq-tag.c b/block/blk-mq-tag.c
+index 586c9d6e904a..770fe2324230 100644
+--- a/block/blk-mq-tag.c
++++ b/block/blk-mq-tag.c
+@@ -23,8 +23,8 @@
+  */
+ bool __blk_mq_tag_busy(struct blk_mq_hw_ctx *hctx)
+ {
+-	if (!test_bit(BLK_MQ_S_TAG_ACTIVE, &hctx->state) &&
+-	    !test_and_set_bit(BLK_MQ_S_TAG_ACTIVE, &hctx->state))
++	if (!test_bit(BLK_MQ_T_ACTIVE, &hctx->tags->state) &&
++	    !test_and_set_bit(BLK_MQ_T_ACTIVE, &hctx->tags->state))
+ 		atomic_inc(&hctx->tags->active_queues);
 
-Despite this, I still don't see any significant amount of task
-migration. In fact, I see a lot less with your kernel config that I
-do with my original kernel config, because the CPU load was far
-lower.
+ 	return true;
+@@ -48,7 +48,7 @@ void __blk_mq_tag_idle(struct blk_mq_hw_ctx *hctx)
+ {
+ 	struct blk_mq_tags *tags = hctx->tags;
 
-> Just run a quick test several times after applying the above patch, and looks it
-> does make a big difference in test './xfs_complete 512' wrt. fio io thread migration.
+-	if (!test_and_clear_bit(BLK_MQ_S_TAG_ACTIVE, &hctx->state))
++	if (!test_and_clear_bit(BLK_MQ_T_ACTIVE, &hctx->tags->state))
+ 		return;
 
-There's something very different about your system, and it doesn't
-appear to be a result of the kernel code itself. I think you're
-going to have to do all the testing at the moment, Ming, because
-it's clear that my test systems do not show up the problems even
-when using the same kernel config as you do...
+ 	atomic_dec(&tags->active_queues);
+@@ -67,7 +67,7 @@ static inline bool hctx_may_queue(struct blk_mq_hw_ctx *hctx,
 
-If you reconfig you kvm setup to pass all the native host side cpu
-flags through to the guest, does the problem go away? I think adding
-"-cpu host" to your qemu command line will do that...
+ 	if (!hctx || !(hctx->flags & BLK_MQ_F_TAG_SHARED))
+ 		return true;
+-	if (!test_bit(BLK_MQ_S_TAG_ACTIVE, &hctx->state))
++	if (!test_bit(BLK_MQ_T_ACTIVE, &hctx->tags->state))
+ 		return true;
 
-Cheers,
+ 	/*
+@@ -220,7 +220,7 @@ static bool bt_iter(struct sbitmap *bitmap, unsigned int bitnr, void *data)
+ 	 * We can hit rq == NULL here, because the tagging functions
+ 	 * test and set the bit before assigning ->rqs[].
+ 	 */
+-	if (rq && rq->q == hctx->queue)
++	if (rq && rq->q == hctx->queue && rq->mq_hctx == hctx)
+ 		return iter_data->fn(hctx, rq, iter_data->data, reserved);
+ 	return true;
+ }
+@@ -341,8 +341,11 @@ void blk_mq_tagset_busy_iter(struct blk_mq_tag_set *tagset,
+ 	int i;
 
-Dave.
--- 
-Dave Chinner
-david@fromorbit.com
+ 	for (i = 0; i < tagset->nr_hw_queues; i++) {
+-		if (tagset->tags && tagset->tags[i])
++		if (tagset->tags && tagset->tags[i]) {
+ 			blk_mq_all_tag_busy_iter(tagset->tags[i], fn, priv);
++			if (tagset->share_tags)
++				break;
++		}
+ 	}
+ }
+ EXPORT_SYMBOL(blk_mq_tagset_busy_iter);
+diff --git a/block/blk-mq-tag.h b/block/blk-mq-tag.h
+index d0c10d043891..f75fa936b090 100644
+--- a/block/blk-mq-tag.h
++++ b/block/blk-mq-tag.h
+@@ -4,6 +4,11 @@
+
+ #include "blk-mq.h"
+
++enum {
++	BLK_MQ_T_ACTIVE		= 1,
++	BLK_MQ_T_SCHED_RESTART	= 2,
++};
++
+ /*
+  * Tag address space map.
+  */
+@@ -11,6 +16,11 @@ struct blk_mq_tags {
+ 	unsigned int nr_tags;
+ 	unsigned int nr_reserved_tags;
+
++	/**
++	 * @state: BLK_MQ_T_* flags. Defines the state of the hw
++	 * queue (active, scheduled to restart).
++	 */
++	unsigned long	state;
+ 	atomic_t active_queues;
+
+ 	struct sbitmap_queue bitmap_tags;
+diff --git a/block/blk-mq.c b/block/blk-mq.c
+index fec4b82ff91c..81d4d6a96098 100644
+--- a/block/blk-mq.c
++++ b/block/blk-mq.c
+@@ -2404,6 +2404,12 @@ static bool __blk_mq_alloc_rq_map(struct blk_mq_tag_set *set, int hctx_idx)
+ {
+ 	int ret = 0;
+
++	if (hctx_idx > 0 && set->share_tags) {
++		WARN_ON_ONCE(!set->tags[0]);
++		set->tags[hctx_idx] = set->tags[0];
++		return 0;
++	}
++
+ 	set->tags[hctx_idx] = blk_mq_alloc_rq_map(set, hctx_idx,
+ 					set->queue_depth, set->reserved_tags);
+ 	if (!set->tags[hctx_idx])
+@@ -2423,8 +2429,10 @@ static void blk_mq_free_map_and_requests(struct blk_mq_tag_set *set,
+ 					 unsigned int hctx_idx)
+ {
+ 	if (set->tags && set->tags[hctx_idx]) {
+-		blk_mq_free_rqs(set, set->tags[hctx_idx], hctx_idx);
+-		blk_mq_free_rq_map(set->tags[hctx_idx]);
++		if (hctx_idx == 0 || !set->share_tags) {
++			blk_mq_free_rqs(set, set->tags[hctx_idx], hctx_idx);
++			blk_mq_free_rq_map(set->tags[hctx_idx]);
++		}
+ 		set->tags[hctx_idx] = NULL;
+ 	}
+ }
+@@ -2568,7 +2576,7 @@ static void blk_mq_del_queue_tag_set(struct request_queue *q)
+
+ 	mutex_lock(&set->tag_list_lock);
+ 	list_del_rcu(&q->tag_set_list);
+-	if (list_is_singular(&set->tag_list)) {
++	if (list_is_singular(&set->tag_list) && !set->share_tags) {
+ 		/* just transitioned to unshared */
+ 		set->flags &= ~BLK_MQ_F_TAG_SHARED;
+ 		/* update existing queue */
+@@ -2586,7 +2594,7 @@ static void blk_mq_add_queue_tag_set(struct blk_mq_tag_set *set,
+ 	/*
+ 	 * Check to see if we're transitioning to shared (from 1 to 2 queues).
+ 	 */
+-	if (!list_empty(&set->tag_list) &&
++	if ((!list_empty(&set->tag_list) || set->share_tags) &&
+ 	    !(set->flags & BLK_MQ_F_TAG_SHARED)) {
+ 		set->flags |= BLK_MQ_F_TAG_SHARED;
+ 		/* update existing queue */
+@@ -2911,15 +2919,21 @@ static int __blk_mq_alloc_rq_maps(struct blk_mq_tag_set *set)
+ {
+ 	int i;
+
+-	for (i = 0; i < set->nr_hw_queues; i++)
+-		if (!__blk_mq_alloc_rq_map(set, i))
++	for (i = 0; i < set->nr_hw_queues; i++) {
++		if (i > 0 && set->share_tags) {
++			set->tags[i] = set->tags[0];
++		} else if (!__blk_mq_alloc_rq_map(set, i))
+ 			goto out_unwind;
++	}
+
+ 	return 0;
+
+ out_unwind:
+-	while (--i >= 0)
++	while (--i >= 0) {
++		if (i > 0 && set->share_tags)
++			continue;
+ 		blk_mq_free_rq_map(set->tags[i]);
++	}
+
+ 	return -ENOMEM;
+ }
+@@ -3016,6 +3030,10 @@ static int blk_mq_realloc_tag_set_tags(struct blk_mq_tag_set *set,
+  * May fail with EINVAL for various error conditions. May adjust the
+  * requested depth down, if it's too large. In that case, the set
+  * value will be stored in set->queue_depth.
++ *
++ * @set: tag set for which to allocate tags.
++ * @share_tags: If true, allocate a single set of tags and share it across
++ *	hardware queues.
+  */
+ int blk_mq_alloc_tag_set(struct blk_mq_tag_set *set)
+ {
+@@ -3137,6 +3155,12 @@ int blk_mq_update_nr_requests(struct request_queue *q, unsigned int nr)
+ 	queue_for_each_hw_ctx(q, hctx, i) {
+ 		if (!hctx->tags)
+ 			continue;
++		if (i > 0 && set->share_tags) {
++			hctx->tags[i] = hctx->tags[0];
++			if (hctx->sched_tags)
++				hctx->sched_tags[i] = hctx->sched_tags[0];
++			continue;
++		}
+ 		/*
+ 		 * If we're using an MQ scheduler, just update the scheduler
+ 		 * queue depth. This is similar to what the old code would do.
+diff --git a/include/linux/blk-mq.h b/include/linux/blk-mq.h
+index 11cfd6470b1a..dd5517476314 100644
+--- a/include/linux/blk-mq.h
++++ b/include/linux/blk-mq.h
+@@ -224,10 +224,13 @@ enum hctx_type {
+  * @numa_node:	   NUMA node the storage adapter has been connected to.
+  * @timeout:	   Request processing timeout in jiffies.
+  * @flags:	   Zero or more BLK_MQ_F_* flags.
++ * @share_tags:	   Whether or not to share one tag set across hardware queues.
+  * @driver_data:   Pointer to data owned by the block driver that created this
+  *		   tag set.
+- * @tags:	   Tag sets. One tag set per hardware queue. Has @nr_hw_queues
+- *		   elements.
++ * @tags:	   Array of tag set pointers. Has @nr_hw_queues elements. If
++ *		   share_tags has not been set, all tag set pointers are
++ *		   different. If share_tags has been set, all tag_set pointers
++ *		   are identical.
+  * @tag_list_lock: Serializes tag_list accesses.
+  * @tag_list:	   List of the request queues that use this tag set. See also
+  *		   request_queue.tag_set_list.
+@@ -243,6 +246,7 @@ struct blk_mq_tag_set {
+ 	int			numa_node;
+ 	unsigned int		timeout;
+ 	unsigned int		flags;
++	bool			share_tags;
+ 	void			*driver_data;
+
+ 	struct blk_mq_tags	**tags;
+@@ -394,8 +398,6 @@ enum {
+ 	BLK_MQ_F_ALLOC_POLICY_BITS = 1,
+
+ 	BLK_MQ_S_STOPPED	= 0,
+-	BLK_MQ_S_TAG_ACTIVE	= 1,
+-	BLK_MQ_S_SCHED_RESTART	= 2,
+
+ 	BLK_MQ_MAX_DEPTH	= 10240,
+
+
