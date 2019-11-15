@@ -6,47 +6,47 @@ X-Spam-Status: No, score=-9.8 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
 	INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,
 	URIBL_BLOCKED,USER_AGENT_GIT autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 0E2A7C43215
-	for <linux-block@archiver.kernel.org>; Fri, 15 Nov 2019 17:07:23 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id E52A5C432C3
+	for <linux-block@archiver.kernel.org>; Fri, 15 Nov 2019 17:07:25 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.kernel.org (Postfix) with ESMTP id DCA5520728
-	for <linux-block@archiver.kernel.org>; Fri, 15 Nov 2019 17:07:22 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id BEC142072A
+	for <linux-block@archiver.kernel.org>; Fri, 15 Nov 2019 17:07:25 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1727552AbfKORHW (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Fri, 15 Nov 2019 12:07:22 -0500
-Received: from mail-pl1-f169.google.com ([209.85.214.169]:43264 "EHLO
-        mail-pl1-f169.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1727528AbfKORHW (ORCPT
+        id S1727559AbfKORHZ (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Fri, 15 Nov 2019 12:07:25 -0500
+Received: from mail-pl1-f195.google.com ([209.85.214.195]:46959 "EHLO
+        mail-pl1-f195.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S1727528AbfKORHZ (ORCPT
         <rfc822;linux-block@vger.kernel.org>);
-        Fri, 15 Nov 2019 12:07:22 -0500
-Received: by mail-pl1-f169.google.com with SMTP id a18so5058697plm.10
-        for <linux-block@vger.kernel.org>; Fri, 15 Nov 2019 09:07:21 -0800 (PST)
+        Fri, 15 Nov 2019 12:07:25 -0500
+Received: by mail-pl1-f195.google.com with SMTP id l4so5054223plt.13
+        for <linux-block@vger.kernel.org>; Fri, 15 Nov 2019 09:07:23 -0800 (PST)
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=1e100.net; s=20161025;
         h=x-gm-message-state:from:to:cc:subject:date:message-id:in-reply-to
          :references:mime-version:content-transfer-encoding;
-        bh=1EYBFDT7Yxn9EjoXkexEuSV1/U3eX7W64+vi+cOaK3o=;
-        b=RU53n+lC8QD0C0C0pUxlROkzobnez5jdrAWM2yasmpzMghvmvOsniNQ3OEbQ2q+GfN
-         NxTcHNsn8t2DZ6Kv6/4hwuhaQJakuNwp1SNUvECraJLn+4QY3kkViiaNYJssl+K76qXr
-         ZEeCeVoigOqjOPMQr5c71W3wiqry+YKJ3cjenlKhE2c/RrgswVv5l3VZG9VYiBfgWNy+
-         yAN4cioDEX0ZQDG19F72gIGGPJkVkcGhdWhEkm91Fbogg1WFQSZCYoeDJ8lX3hGUx7Cu
-         DD7hgkjjXej74hhPgJOVaOyab8LXzzTIFk+8v00E2Dhv3myyQv6ntAKMt3dIaU2vNabV
-         8TuA==
-X-Gm-Message-State: APjAAAVsms1CTTyfhDinQF4/B5Xo7cZfiOIlJFa/9e9qdRvRpnQro0af
-        NOZGW7BqxxV4PlxnNjq5c1LPw+rZ
-X-Google-Smtp-Source: APXvYqxOSvLLP1IEFERAI+pkuPs53GSHWY92wy9ztmoV8KdCIuIjJx6hKfhwcWBGYp4tBpvYtSEG3A==
-X-Received: by 2002:a17:902:9689:: with SMTP id n9mr16445323plp.222.1573837641218;
-        Fri, 15 Nov 2019 09:07:21 -0800 (PST)
+        bh=fZuM0OMnnuVK635Locm2PXONrFxTzuYB2o0guTYaPaU=;
+        b=fwV4fxa5exluNqZ/+IxCLBA6kvTPOH9cpYZ7sENx32GgolOZ7i+2bUOun2TgHWGeDw
+         Q0rFAr6qbI202OmoUIUOPZCEMeaaVMrNBKFgZzPTAg8zc52i8Et9DP/4xTwtwnnmSeiP
+         1bMC88qW+U+3H8qZRZZwk8cECQBTlJZOJxAW45B/f0ZwZSVUco9BY2cKVsdKklckC6oG
+         u88NrsykB2e/1a9mLxQRqjrecW1Lg+q/f3zXfl/Lbn0uT9Dr/kt9THJHPht5g10kgrWB
+         amemVrycUKmN/60Os22Uo9NOOd6umEU/5L4MndtV9Qgq/yGEpLTnsF5RMruI0T9Ump7u
+         y1ww==
+X-Gm-Message-State: APjAAAVoDv7IzrekRXPPRIg90a9/G5a82e+ISXAUunUmxAMTspc18+Ao
+        /iww5YPDZxpYvWvKolXChu4ATPt4
+X-Google-Smtp-Source: APXvYqw/qC1jbnkzdA4Qr/DOwC47G7nZBAbl1YDb90u8B3mMRSIF2oOaEV/RjFOTKp03Y+ETBFJSuw==
+X-Received: by 2002:a17:902:be14:: with SMTP id r20mr15543734pls.297.1573837642930;
+        Fri, 15 Nov 2019 09:07:22 -0800 (PST)
 Received: from desktop-bart.svl.corp.google.com ([2620:15c:2cd:202:4308:52a3:24b6:2c60])
-        by smtp.gmail.com with ESMTPSA id m7sm2364793pfb.153.2019.11.15.09.07.19
+        by smtp.gmail.com with ESMTPSA id m7sm2364793pfb.153.2019.11.15.09.07.21
         (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Fri, 15 Nov 2019 09:07:20 -0800 (PST)
+        Fri, 15 Nov 2019 09:07:21 -0800 (PST)
 From:   Bart Van Assche <bvanassche@acm.org>
 To:     Omar Sandoval <osandov@fb.com>
 Cc:     linux-block@vger.kernel.org, Bart Van Assche <bvanassche@acm.org>
-Subject: [PATCH blktests 1/4] common/multipath-over-rdma: Fix expand_ipv6_addr()
-Date:   Fri, 15 Nov 2019 09:07:08 -0800
-Message-Id: <20191115170711.232741-2-bvanassche@acm.org>
+Subject: [PATCH blktests 2/4] common/multipath-over-rdma: Rename two functions
+Date:   Fri, 15 Nov 2019 09:07:09 -0800
+Message-Id: <20191115170711.232741-3-bvanassche@acm.org>
 X-Mailer: git-send-email 2.24.0.432.g9d3f5f5b63-goog
 In-Reply-To: <20191115170711.232741-1-bvanassche@acm.org>
 References: <20191115170711.232741-1-bvanassche@acm.org>
@@ -57,25 +57,51 @@ Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-For IPv6 address ::1, instead of returning
-0:0000:0000:0000:0000:0000:0000:0000:0001, return
-0000:0000:0000:0000:0000:0000:0000:0001.
+Since the meaning of this functions will change, make sure that the
+function name will match the new meaning.
 
 Signed-off-by: Bart Van Assche <bvanassche@acm.org>
 ---
- common/multipath-over-rdma | 2 +-
- 1 file changed, 1 insertion(+), 1 deletion(-)
+ common/multipath-over-rdma | 8 ++++----
+ 1 file changed, 4 insertions(+), 4 deletions(-)
 
 diff --git a/common/multipath-over-rdma b/common/multipath-over-rdma
-index 545a81e8c18e..15f296ef2ab7 100644
+index 15f296ef2ab7..9f645f759d2d 100644
 --- a/common/multipath-over-rdma
 +++ b/common/multipath-over-rdma
-@@ -61,7 +61,7 @@ get_ipv4_addr() {
- 
- # Convert e.g. ::1 into 0000:0000:0000:0000:0000:0000:0000:0001.
- expand_ipv6_addr() {
--	awk -F : 'BEGIN{left=1} { for(i=1;i<=NF;i++) { a=substr("0000", 1+length($i)) $i; if ($i == "") left=0; else if (left) pre = pre ":" a; else suf = suf ":" a }; mid=substr(":0000:0000:0000:0000:0000:0000:0000:0000", (pre!="")+length(pre)+length(suf)); print substr(pre,2) mid suf}'
-+	awk -F : '{ left=1; for(i=1;i<=NF;i++) { a=substr("0000", 1+length($i)) $i; if ($i == "") left=0; else if (left) pre = pre ":" a; else suf = suf ":" a }; mid=substr("0000:0000:0000:0000:0000:0000:0000:0000", (pre=="")+length(pre)+length(suf)); print substr(pre,2) mid suf}'
+@@ -409,7 +409,7 @@ has_rdma_rxe() {
  }
  
- get_ipv6_addr() {
+ # Load the rdma_rxe kernel module and associate it with all network interfaces.
+-start_rdma_rxe() {
++start_soft_rdma() {
+ 	{
+ 		modprobe rdma_rxe || return $?
+ 		(
+@@ -425,7 +425,7 @@ start_rdma_rxe() {
+ 
+ # Dissociate the rdma_rxe kernel module from all network interfaces and unload
+ # the rdma_rxe kernel module.
+-stop_rdma_rxe() {
++stop_soft_rdma() {
+ 	(
+ 		cd /sys/class/net &&
+ 			for i in *; do
+@@ -608,7 +608,7 @@ unload_null_blk() {
+ }
+ 
+ setup_rdma() {
+-	start_rdma_rxe
++	start_soft_rdma
+ 	(
+ 		echo "RDMA interfaces:"
+ 		cd /sys/class/infiniband &&
+@@ -627,7 +627,7 @@ teardown_uncond() {
+ 	killall -9 multipathd >&/dev/null
+ 	rm -f /etc/multipath.conf
+ 	stop_target
+-	stop_rdma_rxe
++	stop_soft_rdma
+ 	unload_null_blk
+ }
+ 
