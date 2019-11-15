@@ -6,29 +6,28 @@ X-Spam-Status: No, score=-5.2 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
 	MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED,
 	USER_AGENT_SANE_1 autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 967A0C33C9B
-	for <linux-block@archiver.kernel.org>; Fri, 15 Nov 2019 10:05:59 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 1BDD9C43141
+	for <linux-block@archiver.kernel.org>; Fri, 15 Nov 2019 10:06:23 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.kernel.org (Postfix) with ESMTP id 7A98F2073B
-	for <linux-block@archiver.kernel.org>; Fri, 15 Nov 2019 10:05:59 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id F372F20748
+	for <linux-block@archiver.kernel.org>; Fri, 15 Nov 2019 10:06:22 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1727762AbfKOKF6 (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Fri, 15 Nov 2019 05:05:58 -0500
-Received: from mx2.suse.de ([195.135.220.15]:44636 "EHLO mx1.suse.de"
+        id S1727836AbfKOKGW (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Fri, 15 Nov 2019 05:06:22 -0500
+Received: from mx2.suse.de ([195.135.220.15]:45910 "EHLO mx1.suse.de"
         rhost-flags-OK-OK-OK-FAIL) by vger.kernel.org with ESMTP
-        id S1727729AbfKOKF5 (ORCPT <rfc822;linux-block@vger.kernel.org>);
-        Fri, 15 Nov 2019 05:05:57 -0500
+        id S1727761AbfKOKGV (ORCPT <rfc822;linux-block@vger.kernel.org>);
+        Fri, 15 Nov 2019 05:06:21 -0500
 X-Virus-Scanned: by amavisd-new at test-mx.suse.de
 Received: from relay2.suse.de (unknown [195.135.220.254])
-        by mx1.suse.de (Postfix) with ESMTP id E7211B22C;
-        Fri, 15 Nov 2019 10:05:54 +0000 (UTC)
-Subject: Re: [PATCH 2/7] block: merge invalidate_partitions into
- rescan_partitions
+        by mx1.suse.de (Postfix) with ESMTP id 341C6B46D;
+        Fri, 15 Nov 2019 10:06:19 +0000 (UTC)
+Subject: Re: [PATCH 3/7] block: move rescan_partitions to fs/block_dev.c
 To:     Christoph Hellwig <hch@lst.de>, Jens Axboe <axboe@kernel.dk>,
         Jan Kara <jack@suse.cz>
 Cc:     linux-block@vger.kernel.org, linux-s390@vger.kernel.org
 References: <20191114143438.14681-1-hch@lst.de>
- <20191114143438.14681-3-hch@lst.de>
+ <20191114143438.14681-4-hch@lst.de>
 From:   Hannes Reinecke <hare@suse.de>
 Openpgp: preference=signencrypt
 Autocrypt: addr=hare@suse.de; prefer-encrypt=mutual; keydata=
@@ -74,12 +73,12 @@ Autocrypt: addr=hare@suse.de; prefer-encrypt=mutual; keydata=
  ZtWlhGRERnDH17PUXDglsOA08HCls0PHx8itYsjYCAyETlxlLApXWdVl9YVwbQpQ+i693t/Y
  PGu8jotn0++P19d3JwXW8t6TVvBIQ1dRZHx1IxGLMn+CkDJMOmHAUMWTAXX2rf5tUjas8/v2
  azzYF4VRJsdl+d0MCaSy8mUh
-Message-ID: <15ec0586-550b-2e98-d750-66f16b4f6bad@suse.de>
-Date:   Fri, 15 Nov 2019 11:05:54 +0100
+Message-ID: <eb60ac31-bd20-0969-8796-414eb6e6f570@suse.de>
+Date:   Fri, 15 Nov 2019 11:06:18 +0100
 User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:60.0) Gecko/20100101
  Thunderbird/60.7.2
 MIME-Version: 1.0
-In-Reply-To: <20191114143438.14681-3-hch@lst.de>
+In-Reply-To: <20191114143438.14681-4-hch@lst.de>
 Content-Type: text/plain; charset=utf-8
 Content-Language: en-US
 Content-Transfer-Encoding: 8bit
@@ -89,20 +88,18 @@ List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
 On 11/14/19 3:34 PM, Christoph Hellwig wrote:
-> A lot of the logic in invalidate_partitions and rescan_partitions is
-> shared.  Merge the two functions to simplify things.  There is a small
-> behavior change in that we now send the kevent change notice also if we
-> were not invalidating but no partitions were found, which seems like
-> the right thing to do.
+> Large parts of rescan_partitions aren't about partitions, and
+> moving it to block_dev.c will allow for some further cleanups by
+> merging it into its only caller.
 > 
 > Signed-off-by: Christoph Hellwig <hch@lst.de>
 > Reviewed-by: Jan Kara <jack@suse.cz>
 > ---
->  block/ioctl.c             |  2 +-
->  block/partition-generic.c | 38 ++++++++++++++------------------------
->  fs/block_dev.c            |  5 +----
+>  block/partition-generic.c | 37 ++-----------------------------------
+>  fs/block_dev.c            | 38 ++++++++++++++++++++++++++++++++++++--
+>  include/linux/fs.h        |  2 --
 >  include/linux/genhd.h     |  4 ++--
->  4 files changed, 18 insertions(+), 31 deletions(-)
+>  4 files changed, 40 insertions(+), 41 deletions(-)
 > 
 Reviewed-by: Hannes Reinecke <hare@suse.de>
 
