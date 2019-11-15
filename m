@@ -2,135 +2,98 @@ Return-Path: <SRS0=zNjm=ZH=vger.kernel.org=linux-block-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-5.3 required=3.0 tests=DKIM_SIGNED,DKIM_VALID,
-	DKIM_VALID_AU,HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SIGNED_OFF_BY,
-	SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED,USER_AGENT_SANE_1 autolearn=ham
-	autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-2.4 required=3.0 tests=DKIM_SIGNED,DKIM_VALID,
+	DKIM_VALID_AU,HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SPF_HELO_NONE,
+	SPF_PASS,USER_AGENT_SANE_1 autolearn=no autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 12942C432C3
-	for <linux-block@archiver.kernel.org>; Fri, 15 Nov 2019 14:09:31 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id C622DC432C3
+	for <linux-block@archiver.kernel.org>; Fri, 15 Nov 2019 14:16:32 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.kernel.org (Postfix) with ESMTP id D5D3120733
-	for <linux-block@archiver.kernel.org>; Fri, 15 Nov 2019 14:09:30 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id 9C6E920730
+	for <linux-block@archiver.kernel.org>; Fri, 15 Nov 2019 14:16:32 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=pass (2048-bit key) header.d=ziepe.ca header.i=@ziepe.ca header.b="BFBIgmkk"
+	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="f9fmLOj8"
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1727472AbfKOOJa (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Fri, 15 Nov 2019 09:09:30 -0500
-Received: from mail-qk1-f193.google.com ([209.85.222.193]:35488 "EHLO
-        mail-qk1-f193.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1727599AbfKOOJ3 (ORCPT
+        id S1727487AbfKOOQb (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Fri, 15 Nov 2019 09:16:31 -0500
+Received: from us-smtp-1.mimecast.com ([205.139.110.61]:41789 "EHLO
+        us-smtp-delivery-1.mimecast.com" rhost-flags-OK-OK-OK-FAIL)
+        by vger.kernel.org with ESMTP id S1727420AbfKOOQb (ORCPT
         <rfc822;linux-block@vger.kernel.org>);
-        Fri, 15 Nov 2019 09:09:29 -0500
-Received: by mail-qk1-f193.google.com with SMTP id i19so8176677qki.2
-        for <linux-block@vger.kernel.org>; Fri, 15 Nov 2019 06:09:29 -0800 (PST)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=ziepe.ca; s=google;
-        h=date:from:to:cc:subject:message-id:references:mime-version
-         :content-disposition:in-reply-to:user-agent;
-        bh=01834Iuy8wrTkyETdgSEfcddUW82cA+Rc6Zt+MvTCwg=;
-        b=BFBIgmkk8QkntrHNjJLsvCL1a0ZURlA5X/gmLb4n3VPRP5m3aB6scRcD2DMxTLAV9P
-         UaMtjJH/lJaxRT3MaYZLNwy8cw9D1M5/6iAxnqhClJH46gGawBEotmmVwz9bc8u3IFV9
-         a3v4lMSNKHekmvWmxSCO3xS9GuPfrTZZ9gfrHLPlSSz+de3k9e1mbvTuAMlgMSg1inD0
-         htevxD4Ti62AfDMDE+osEpAwbIBY+1VPeWYkc7W/CwzYOFcM3WvoA9tt0pcZZGXm+LdO
-         O8XKMS5WarP50UJ1uTIL/tvlJnyEoGG2Ukx7eqBCtFPfW9ti43J0cbZRwFC28FPxF58w
-         Wt7Q==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20161025;
-        h=x-gm-message-state:date:from:to:cc:subject:message-id:references
-         :mime-version:content-disposition:in-reply-to:user-agent;
-        bh=01834Iuy8wrTkyETdgSEfcddUW82cA+Rc6Zt+MvTCwg=;
-        b=QwUv44/EHqtodBh5slNkE/crAqsH4kOJYOVGPVIRcCG8bvd1T0X7Y9Hk9mw7iQ/j28
-         uR/HSzX4Jllhor89t6FJJAvVAMiHO98TuNIWRmnN9HEDmkYRdfKvS9kEVDya96WtCizC
-         WP3zeJH7EwEawt31TRvMxBEKqyJKCAxqY62sos2pyeDRgOsTWR8ywgkYLk0hoS7cEino
-         uOVv9NVzf2f1UnlyDYHw58LIdcO+FHiFPpagpCH+oo7Zm5N5nvB/Ww3IAglyznJpElqV
-         YiFODMdywtCgbVlqL0rypNy9Fdt3kskzykfZqcj0TxZrMJOe5dXFQyRZRF1Z52AE60ht
-         7E7Q==
-X-Gm-Message-State: APjAAAXvFUjIMgsHLW16u0GZn1S9mGiYEt9wvCBSq/wMoc0NUnZy3c3F
-        VOxfoFvsyM6FwlvFOSAoMT2Mag==
-X-Google-Smtp-Source: APXvYqySuuQ0WzAKMm3kXEkiDMguUlgyvE6K/2D67jOtzEpRUEwGr7GFZW94ehFUiDC6Dq2Nm3hHug==
-X-Received: by 2002:a37:76c6:: with SMTP id r189mr11712734qkc.303.1573826968699;
-        Fri, 15 Nov 2019 06:09:28 -0800 (PST)
-Received: from ziepe.ca (hlfxns017vw-142-162-113-180.dhcp-dynamic.fibreop.ns.bellaliant.net. [142.162.113.180])
-        by smtp.gmail.com with ESMTPSA id m65sm4836053qte.54.2019.11.15.06.09.28
-        (version=TLS1_2 cipher=ECDHE-RSA-CHACHA20-POLY1305 bits=256/256);
-        Fri, 15 Nov 2019 06:09:28 -0800 (PST)
-Received: from jgg by mlx.ziepe.ca with local (Exim 4.90_1)
-        (envelope-from <jgg@ziepe.ca>)
-        id 1iVcHv-0002xw-Lj; Fri, 15 Nov 2019 10:09:27 -0400
-Date:   Fri, 15 Nov 2019 10:09:27 -0400
-From:   Jason Gunthorpe <jgg@ziepe.ca>
-To:     John Hubbard <jhubbard@nvidia.com>
-Cc:     Andrew Morton <akpm@linux-foundation.org>,
-        Al Viro <viro@zeniv.linux.org.uk>,
-        Alex Williamson <alex.williamson@redhat.com>,
-        Benjamin Herrenschmidt <benh@kernel.crashing.org>,
-        =?utf-8?B?QmrDtnJuIFTDtnBlbA==?= <bjorn.topel@intel.com>,
-        Christoph Hellwig <hch@infradead.org>,
-        Dan Williams <dan.j.williams@intel.com>,
-        Daniel Vetter <daniel@ffwll.ch>,
-        Dave Chinner <david@fromorbit.com>,
-        David Airlie <airlied@linux.ie>,
-        "David S . Miller" <davem@davemloft.net>,
-        Ira Weiny <ira.weiny@intel.com>, Jan Kara <jack@suse.cz>,
-        Jens Axboe <axboe@kernel.dk>, Jonathan Corbet <corbet@lwn.net>,
-        =?utf-8?B?SsOpcsO0bWU=?= Glisse <jglisse@redhat.com>,
-        Magnus Karlsson <magnus.karlsson@intel.com>,
-        Mauro Carvalho Chehab <mchehab@kernel.org>,
-        Michael Ellerman <mpe@ellerman.id.au>,
-        Michal Hocko <mhocko@suse.com>,
-        Mike Kravetz <mike.kravetz@oracle.com>,
-        Paul Mackerras <paulus@samba.org>,
-        Shuah Khan <shuah@kernel.org>,
-        Vlastimil Babka <vbabka@suse.cz>, bpf@vger.kernel.org,
-        dri-devel@lists.freedesktop.org, kvm@vger.kernel.org,
-        linux-block@vger.kernel.org, linux-doc@vger.kernel.org,
-        linux-fsdevel@vger.kernel.org, linux-kselftest@vger.kernel.org,
-        linux-media@vger.kernel.org, linux-rdma@vger.kernel.org,
-        linuxppc-dev@lists.ozlabs.org, netdev@vger.kernel.org,
-        linux-mm@kvack.org, LKML <linux-kernel@vger.kernel.org>
-Subject: Re: [PATCH v5 12/24] IB/{core,hw,umem}: set FOLL_PIN via
- pin_user_pages*(), fix up ODP
-Message-ID: <20191115140927.GB4055@ziepe.ca>
-References: <20191115055340.1825745-1-jhubbard@nvidia.com>
- <20191115055340.1825745-13-jhubbard@nvidia.com>
+        Fri, 15 Nov 2019 09:16:31 -0500
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+        s=mimecast20190719; t=1573827390;
+        h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+         to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+         content-transfer-encoding:content-transfer-encoding:
+         in-reply-to:in-reply-to:references:references;
+        bh=z2e5+UW0tK//TE2S4dwCVwmhkXMhlbynSTZrZr8XjC8=;
+        b=f9fmLOj849oGO5RY3gyI6+jDur069CStUbWj97SQowmKCMj8xh6FAn8sihUo/dMULBVkVF
+        uBkpmaOJwLEW4ryxwaS3qsHoZgQrWDERFEBZiR2AgI+BwXbsacBotn4kAjvaWKdZOA5Soa
+        OTN8iJB60Vb2ogC7Sq0p/BgtBdP1lM0=
+Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
+ [209.132.183.4]) (Using TLS) by relay.mimecast.com with ESMTP id
+ us-mta-396-J0vUecp5NuK4wnoKV_yKsw-1; Fri, 15 Nov 2019 09:16:29 -0500
+Received: from smtp.corp.redhat.com (int-mx01.intmail.prod.int.phx2.redhat.com [10.5.11.11])
+        (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
+        (No client certificate requested)
+        by mimecast-mx01.redhat.com (Postfix) with ESMTPS id 40F3E102C86E;
+        Fri, 15 Nov 2019 14:16:27 +0000 (UTC)
+Received: from ming.t460p (ovpn-8-16.pek2.redhat.com [10.72.8.16])
+        by smtp.corp.redhat.com (Postfix) with ESMTPS id B5C157BF99;
+        Fri, 15 Nov 2019 14:16:15 +0000 (UTC)
+Date:   Fri, 15 Nov 2019 22:16:10 +0800
+From:   Ming Lei <ming.lei@redhat.com>
+To:     Peter Zijlstra <peterz@infradead.org>
+Cc:     linux-block@vger.kernel.org, linux-fsdevel@vger.kernel.org,
+        linux-xfs@vger.kernel.org, linux-kernel@vger.kernel.org,
+        Jeff Moyer <jmoyer@redhat.com>,
+        Dave Chinner <dchinner@redhat.com>,
+        Eric Sandeen <sandeen@redhat.com>,
+        Christoph Hellwig <hch@lst.de>, Jens Axboe <axboe@kernel.dk>,
+        Ingo Molnar <mingo@redhat.com>, Tejun Heo <tj@kernel.org>
+Subject: Re: single aio thread is migrated crazily by scheduler
+Message-ID: <20191115141610.GA3283@ming.t460p>
+References: <20191114113153.GB4213@ming.t460p>
+ <20191114131434.GQ4114@hirez.programming.kicks-ass.net>
+ <20191115000925.GB4847@ming.t460p>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
+In-Reply-To: <20191115000925.GB4847@ming.t460p>
+User-Agent: Mutt/1.12.1 (2019-06-15)
+X-Scanned-By: MIMEDefang 2.79 on 10.5.11.11
+X-MC-Unique: J0vUecp5NuK4wnoKV_yKsw-1
+X-Mimecast-Spam-Score: 0
+Content-Type: text/plain; charset=WINDOWS-1252
+Content-Transfer-Encoding: quoted-printable
 Content-Disposition: inline
-In-Reply-To: <20191115055340.1825745-13-jhubbard@nvidia.com>
-User-Agent: Mutt/1.9.4 (2018-02-28)
 Sender: linux-block-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-On Thu, Nov 14, 2019 at 09:53:28PM -0800, John Hubbard wrote:
-> Convert infiniband to use the new pin_user_pages*() calls.
-> 
-> Also, revert earlier changes to Infiniband ODP that had it using
-> put_user_page(). ODP is "Case 3" in
-> Documentation/core-api/pin_user_pages.rst, which is to say, normal
-> get_user_pages() and put_page() is the API to use there.
-> 
-> The new pin_user_pages*() calls replace corresponding get_user_pages*()
-> calls, and set the FOLL_PIN flag. The FOLL_PIN flag requires that the
-> caller must return the pages via put_user_page*() calls, but infiniband
-> was already doing that as part of an earlier commit.
-> 
-> Signed-off-by: John Hubbard <jhubbard@nvidia.com>
-> ---
->  drivers/infiniband/core/umem.c              |  2 +-
->  drivers/infiniband/core/umem_odp.c          | 13 ++++++-------
->  drivers/infiniband/hw/hfi1/user_pages.c     |  2 +-
->  drivers/infiniband/hw/mthca/mthca_memfree.c |  2 +-
->  drivers/infiniband/hw/qib/qib_user_pages.c  |  2 +-
->  drivers/infiniband/hw/qib/qib_user_sdma.c   |  2 +-
->  drivers/infiniband/hw/usnic/usnic_uiom.c    |  2 +-
->  drivers/infiniband/sw/siw/siw_mem.c         |  2 +-
->  8 files changed, 13 insertions(+), 14 deletions(-)
+On Fri, Nov 15, 2019 at 08:09:25AM +0800, Ming Lei wrote:
+> On Thu, Nov 14, 2019 at 02:14:34PM +0100, Peter Zijlstra wrote:
+> > On Thu, Nov 14, 2019 at 07:31:53PM +0800, Ming Lei wrote:
+> > > Hi Guys,
+> > >=20
+> > > It is found that single AIO thread is migrated crazely by scheduler, =
+and
+> > > the migrate period can be < 10ms. Follows the test a):
+> >=20
+> > What does crazy mean? Does it cycle through the L3 mask?
+> >=20
+>=20
+> The single thread AIO thread is migrated in several milliseconds once.
 
-Ok
+Today I found the migrate rate of single fio IO thread can reach
+11~12K/sec when I run './xfs_complete 512' on another real machine
+(single numa node, 8 cores).
 
-Reviewed-by: Jason Gunthorpe <jgg@mellanox.com>
+And the number is very close to IOPS of the test, that said the fio
+IO thread can be migrated once just when completing one IO on the
+scsi_debug device.
 
-Jason
+
+Thanks,
+Ming
+
