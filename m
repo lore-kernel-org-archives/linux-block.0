@@ -2,149 +2,225 @@ Return-Path: <SRS0=zNjm=ZH=vger.kernel.org=linux-block-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-2.3 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
-	MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,USER_AGENT_SANE_1 autolearn=no
-	autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-8.2 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
+	INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,
+	URIBL_BLOCKED,USER_AGENT_SANE_1 autolearn=unavailable autolearn_force=no
+	version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id C2282C432C3
-	for <linux-block@archiver.kernel.org>; Fri, 15 Nov 2019 17:57:59 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 4E2C8C432C3
+	for <linux-block@archiver.kernel.org>; Fri, 15 Nov 2019 18:06:35 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.kernel.org (Postfix) with ESMTP id 9761720715
-	for <linux-block@archiver.kernel.org>; Fri, 15 Nov 2019 17:57:59 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id 2C8F62073A
+	for <linux-block@archiver.kernel.org>; Fri, 15 Nov 2019 18:06:35 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1725907AbfKOR56 (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Fri, 15 Nov 2019 12:57:58 -0500
-Received: from mail-pf1-f193.google.com ([209.85.210.193]:36652 "EHLO
-        mail-pf1-f193.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1725848AbfKOR56 (ORCPT
-        <rfc822;linux-block@vger.kernel.org>);
-        Fri, 15 Nov 2019 12:57:58 -0500
-Received: by mail-pf1-f193.google.com with SMTP id b19so7055395pfd.3;
-        Fri, 15 Nov 2019 09:57:58 -0800 (PST)
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20161025;
-        h=x-gm-message-state:subject:to:cc:references:from:message-id:date
-         :user-agent:mime-version:in-reply-to:content-language
-         :content-transfer-encoding;
-        bh=B6Y8nCk4GqPfyHCxLLDXlASZUcgn3emZcmfGWLSrGmM=;
-        b=lCWP02IMv7HOTaZ25mLJ6UKuo0kFN3s/iRz3x9LEUcHcUbRuLHfLCJjtuhxws3lYba
-         IUU/SlZ4eS6d/zaTwcrFJB30snDwJ/MwJgRoQ/rQHlwuat7phe1yGqive2NXlKIf0G/0
-         h7pBkeVy+IN9y72l86oer4IOpl1YNQVCaA7miKlReThDCo6GRbSSCR1llKW6qsbPuwlr
-         lfJGmnSNIIOrVzu3O2AmATcX3LW5+DNGAl9Yfyj/hMbE2EXvkhCpgUJ7qHkE5t8lZagf
-         WYsFOhOv+gA7rWJjZx5po4UAieIV5Ir/d9x24n2VQUkzBxkBtOzt7ualZ5djr/hS/FkJ
-         6j/w==
-X-Gm-Message-State: APjAAAWhln/8yi64l2LyLZthRCwjeGqdeTFxIzdYjjFD3yDZ5jx5zO0e
-        w8sdgE8Zkyu2FAkkEsr9SmMU8ZnC
-X-Google-Smtp-Source: APXvYqytNmXO//DAI9VlyznRtxH/qpKCqnI+WYF+1HAsgH/w1iuw6khbMWSOv2pmzaNj2CFS719FeQ==
-X-Received: by 2002:aa7:9d09:: with SMTP id k9mr18692804pfp.154.1573840677719;
-        Fri, 15 Nov 2019 09:57:57 -0800 (PST)
-Received: from desktop-bart.svl.corp.google.com ([2620:15c:2cd:202:4308:52a3:24b6:2c60])
-        by smtp.gmail.com with ESMTPSA id b9sm12051008pfp.77.2019.11.15.09.57.55
-        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
-        Fri, 15 Nov 2019 09:57:56 -0800 (PST)
-Subject: Re: [PATCH RFC 3/5] blk-mq: Facilitate a shared tags per tagset
-To:     John Garry <john.garry@huawei.com>, Hannes Reinecke <hare@suse.de>,
-        "axboe@kernel.dk" <axboe@kernel.dk>,
-        "jejb@linux.ibm.com" <jejb@linux.ibm.com>,
-        "martin.petersen@oracle.com" <martin.petersen@oracle.com>
-Cc:     "linux-block@vger.kernel.org" <linux-block@vger.kernel.org>,
-        "linux-kernel@vger.kernel.org" <linux-kernel@vger.kernel.org>,
-        "linux-scsi@vger.kernel.org" <linux-scsi@vger.kernel.org>,
-        "ming.lei@redhat.com" <ming.lei@redhat.com>,
-        "hare@suse.com" <hare@suse.com>,
-        "chenxiang (M)" <chenxiang66@hisilicon.com>
-References: <1573652209-163505-1-git-send-email-john.garry@huawei.com>
- <1573652209-163505-4-git-send-email-john.garry@huawei.com>
- <32880159-86e8-5c48-1532-181fdea0df96@suse.de>
- <2cbf591c-8284-8499-7804-e7078cf274d2@huawei.com>
- <02056612-a958-7b05-3c54-bb2fa69bc493@suse.de>
- <ace95bc5-7b89-9ed3-be89-8139f977984b@huawei.com>
- <42b0bcd9-f147-76eb-dfce-270f77bca818@suse.de>
- <89cd1985-39c7-2965-d25b-2ee2c183d057@huawei.com>
- <c34c0ce2-40a8-e4fc-3366-1f7b906da5a3@acm.org>
- <8e7bd2cb-1035-13ba-05db-d8e12c61df1f@huawei.com>
-From:   Bart Van Assche <bvanassche@acm.org>
-Message-ID: <6b85f172-695c-4757-3794-455b8d55e015@acm.org>
-Date:   Fri, 15 Nov 2019 09:57:55 -0800
-User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:60.0) Gecko/20100101
- Thunderbird/60.9.0
+        id S1726323AbfKOSGe (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Fri, 15 Nov 2019 13:06:34 -0500
+Received: from mga05.intel.com ([192.55.52.43]:12098 "EHLO mga05.intel.com"
+        rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
+        id S1726131AbfKOSGe (ORCPT <rfc822;linux-block@vger.kernel.org>);
+        Fri, 15 Nov 2019 13:06:34 -0500
+X-Amp-Result: UNKNOWN
+X-Amp-Original-Verdict: FILE UNKNOWN
+X-Amp-File-Uploaded: False
+Received: from fmsmga008.fm.intel.com ([10.253.24.58])
+  by fmsmga105.fm.intel.com with ESMTP/TLS/DHE-RSA-AES256-GCM-SHA384; 15 Nov 2019 10:06:33 -0800
+X-ExtLoop1: 1
+X-IronPort-AV: E=Sophos;i="5.68,309,1569308400"; 
+   d="scan'208";a="203454343"
+Received: from iweiny-desk2.sc.intel.com ([10.3.52.157])
+  by fmsmga008.fm.intel.com with ESMTP; 15 Nov 2019 10:06:32 -0800
+Date:   Fri, 15 Nov 2019 10:06:32 -0800
+From:   Ira Weiny <ira.weiny@intel.com>
+To:     John Hubbard <jhubbard@nvidia.com>
+Cc:     Andrew Morton <akpm@linux-foundation.org>,
+        Al Viro <viro@zeniv.linux.org.uk>,
+        Alex Williamson <alex.williamson@redhat.com>,
+        Benjamin Herrenschmidt <benh@kernel.crashing.org>,
+        =?iso-8859-1?Q?Bj=F6rn_T=F6pel?= <bjorn.topel@intel.com>,
+        Christoph Hellwig <hch@infradead.org>,
+        Dan Williams <dan.j.williams@intel.com>,
+        Daniel Vetter <daniel@ffwll.ch>,
+        Dave Chinner <david@fromorbit.com>,
+        David Airlie <airlied@linux.ie>,
+        "David S . Miller" <davem@davemloft.net>, Jan Kara <jack@suse.cz>,
+        Jason Gunthorpe <jgg@ziepe.ca>, Jens Axboe <axboe@kernel.dk>,
+        Jonathan Corbet <corbet@lwn.net>,
+        =?iso-8859-1?B?Suly9G1l?= Glisse <jglisse@redhat.com>,
+        Magnus Karlsson <magnus.karlsson@intel.com>,
+        Mauro Carvalho Chehab <mchehab@kernel.org>,
+        Michael Ellerman <mpe@ellerman.id.au>,
+        Michal Hocko <mhocko@suse.com>,
+        Mike Kravetz <mike.kravetz@oracle.com>,
+        Paul Mackerras <paulus@samba.org>,
+        Shuah Khan <shuah@kernel.org>,
+        Vlastimil Babka <vbabka@suse.cz>, bpf@vger.kernel.org,
+        dri-devel@lists.freedesktop.org, kvm@vger.kernel.org,
+        linux-block@vger.kernel.org, linux-doc@vger.kernel.org,
+        linux-fsdevel@vger.kernel.org, linux-kselftest@vger.kernel.org,
+        linux-media@vger.kernel.org, linux-rdma@vger.kernel.org,
+        linuxppc-dev@lists.ozlabs.org, netdev@vger.kernel.org,
+        linux-mm@kvack.org, LKML <linux-kernel@vger.kernel.org>
+Subject: Re: [PATCH v5 09/24] vfio, mm: fix get_user_pages_remote() and
+ FOLL_LONGTERM
+Message-ID: <20191115180631.GA23832@iweiny-DESK2.sc.intel.com>
+References: <20191115055340.1825745-1-jhubbard@nvidia.com>
+ <20191115055340.1825745-10-jhubbard@nvidia.com>
 MIME-Version: 1.0
-In-Reply-To: <8e7bd2cb-1035-13ba-05db-d8e12c61df1f@huawei.com>
-Content-Type: text/plain; charset=utf-8; format=flowed
-Content-Language: en-US
-Content-Transfer-Encoding: 8bit
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <20191115055340.1825745-10-jhubbard@nvidia.com>
+User-Agent: Mutt/1.11.1 (2018-12-01)
 Sender: linux-block-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-On 11/15/19 2:24 AM, John Garry wrote:
-> Bart Van Assche wrote:
-> > How about sharing tag sets across hardware
-> > queues, e.g. like in the (totally untested) patch below?
+On Thu, Nov 14, 2019 at 09:53:25PM -0800, John Hubbard wrote:
+> As it says in the updated comment in gup.c: current FOLL_LONGTERM
+> behavior is incompatible with FAULT_FLAG_ALLOW_RETRY because of the
+> FS DAX check requirement on vmas.
 > 
-> So this is similar in principle what Ming Lei came up with here:
-> https://lore.kernel.org/linux-block/20190531022801.10003-1-ming.lei@redhat.com/ 
+> However, the corresponding restriction in get_user_pages_remote() was
+> slightly stricter than is actually required: it forbade all
+> FOLL_LONGTERM callers, but we can actually allow FOLL_LONGTERM callers
+> that do not set the "locked" arg.
 > 
-> However your implementation looks neater, which is good.
+> Update the code and comments accordingly, and update the VFIO caller
+> to take advantage of this, fixing a bug as a result: the VFIO caller
+> is logically a FOLL_LONGTERM user.
 > 
-> My concern with this approach is that we can't differentiate which tags 
-> are allocated for which hctx, and sometimes we need to know that.
+> Also, remove an unnessary pair of calls that were releasing and
+> reacquiring the mmap_sem. There is no need to avoid holding mmap_sem
+> just in order to call page_to_pfn().
 > 
-> An example here was blk_mq_queue_tag_busy_iter(), which iterates the 
-> bits for each hctx. This would just be broken by that change, unless we 
-> record which bits are associated with each hctx.
-
-I disagree. In bt_iter() I added " && rq->mq_hctx == hctx" such that 
-blk_mq_queue_tag_busy_iter() only calls the callback function for 
-matching (hctx, rq) pairs.
-
-> Another example was __blk_mq_tag_idle(), which looks problematic.
-
-Please elaborate.
-
-> For debugfs, when we examine 
-> /sys/kernel/debug/block/.../hctxX/tags_bitmap, wouldn't that be the tags 
-> for all hctx (hctx0)?
+> Also, move the DAX check ("if a VMA is DAX, don't allow long term
+> pinning") from the VFIO call site, all the way into the internals
+> of get_user_pages_remote() and __gup_longterm_locked(). That is:
+> get_user_pages_remote() calls __gup_longterm_locked(), which in turn
+> calls check_dax_vmas(). It's lightly explained in the comments as well.
 > 
-> For debugging reasons, I would say we want to know which tags are 
-> allocated for a specific hctx, as this is tightly related to the 
-> requests for that hctx.
-
-That is an open issue in the patch I posted and something that needs to 
-be addressed. One way to address this is to change the 
-sbitmap_bitmap_show() calls into calls to a function that only shows 
-those bits for which rq->mq_hctx == hctx.
-
->> @@ -341,8 +341,11 @@ void blk_mq_tagset_busy_iter(struct 
->> blk_mq_tag_set *tagset,
->>       int i;
->>
->>       for (i = 0; i < tagset->nr_hw_queues; i++) {
->> -        if (tagset->tags && tagset->tags[i])
->> +        if (tagset->tags && tagset->tags[i]) {
->>               blk_mq_all_tag_busy_iter(tagset->tags[i], fn, priv);
+> Thanks to Jason Gunthorpe for pointing out a clean way to fix this,
+> and to Dan Williams for helping clarify the DAX refactoring.
 > 
-> As I mentioned earlier, wouldn't this iterate over all tags for all 
-> hctx's, when we just want the tags for hctx[i]?
-> 
-> Thanks,
-> John
-> 
-> [Not trimming reply for future reference]
-> 
->> +            if (tagset->share_tags)
->> +                break;
->> +        }
->>       }
->>   }
->>   EXPORT_SYMBOL(blk_mq_tagset_busy_iter);
+> Suggested-by: Jason Gunthorpe <jgg@ziepe.ca>
+> Cc: Dan Williams <dan.j.williams@intel.com>
+> Cc: Jerome Glisse <jglisse@redhat.com>
+> Cc: Ira Weiny <ira.weiny@intel.com>
 
-Since blk_mq_tagset_busy_iter() loops over all hardware queues all what 
-is changed is the order in which requests are examined. I am not aware 
-of any block driver that calls blk_mq_tagset_busy_iter() and that 
-depends on the order of the requests passed to the callback function.
+Reviewed-by: Ira Weiny <ira.weiny@intel.com>
 
-Thanks,
-
-Bart.
+> Signed-off-by: John Hubbard <jhubbard@nvidia.com>
+> ---
+>  drivers/vfio/vfio_iommu_type1.c | 30 +++++-------------------------
+>  mm/gup.c                        | 27 ++++++++++++++++++++++-----
+>  2 files changed, 27 insertions(+), 30 deletions(-)
+> 
+> diff --git a/drivers/vfio/vfio_iommu_type1.c b/drivers/vfio/vfio_iommu_type1.c
+> index d864277ea16f..c7a111ad9975 100644
+> --- a/drivers/vfio/vfio_iommu_type1.c
+> +++ b/drivers/vfio/vfio_iommu_type1.c
+> @@ -340,7 +340,6 @@ static int vaddr_get_pfn(struct mm_struct *mm, unsigned long vaddr,
+>  {
+>  	struct page *page[1];
+>  	struct vm_area_struct *vma;
+> -	struct vm_area_struct *vmas[1];
+>  	unsigned int flags = 0;
+>  	int ret;
+>  
+> @@ -348,33 +347,14 @@ static int vaddr_get_pfn(struct mm_struct *mm, unsigned long vaddr,
+>  		flags |= FOLL_WRITE;
+>  
+>  	down_read(&mm->mmap_sem);
+> -	if (mm == current->mm) {
+> -		ret = get_user_pages(vaddr, 1, flags | FOLL_LONGTERM, page,
+> -				     vmas);
+> -	} else {
+> -		ret = get_user_pages_remote(NULL, mm, vaddr, 1, flags, page,
+> -					    vmas, NULL);
+> -		/*
+> -		 * The lifetime of a vaddr_get_pfn() page pin is
+> -		 * userspace-controlled. In the fs-dax case this could
+> -		 * lead to indefinite stalls in filesystem operations.
+> -		 * Disallow attempts to pin fs-dax pages via this
+> -		 * interface.
+> -		 */
+> -		if (ret > 0 && vma_is_fsdax(vmas[0])) {
+> -			ret = -EOPNOTSUPP;
+> -			put_page(page[0]);
+> -		}
+> -	}
+> -	up_read(&mm->mmap_sem);
+> -
+> +	ret = get_user_pages_remote(NULL, mm, vaddr, 1, flags | FOLL_LONGTERM,
+> +				    page, NULL, NULL);
+>  	if (ret == 1) {
+>  		*pfn = page_to_pfn(page[0]);
+> -		return 0;
+> +		ret = 0;
+> +		goto done;
+>  	}
+>  
+> -	down_read(&mm->mmap_sem);
+> -
+>  	vaddr = untagged_addr(vaddr);
+>  
+>  	vma = find_vma_intersection(mm, vaddr, vaddr + 1);
+> @@ -384,7 +364,7 @@ static int vaddr_get_pfn(struct mm_struct *mm, unsigned long vaddr,
+>  		if (is_invalid_reserved_pfn(*pfn))
+>  			ret = 0;
+>  	}
+> -
+> +done:
+>  	up_read(&mm->mmap_sem);
+>  	return ret;
+>  }
+> diff --git a/mm/gup.c b/mm/gup.c
+> index b859bd4da4d7..6cf613bfe7dc 100644
+> --- a/mm/gup.c
+> +++ b/mm/gup.c
+> @@ -29,6 +29,13 @@ struct follow_page_context {
+>  	unsigned int page_mask;
+>  };
+>  
+> +static __always_inline long __gup_longterm_locked(struct task_struct *tsk,
+> +						  struct mm_struct *mm,
+> +						  unsigned long start,
+> +						  unsigned long nr_pages,
+> +						  struct page **pages,
+> +						  struct vm_area_struct **vmas,
+> +						  unsigned int flags);
+>  /*
+>   * Return the compound head page with ref appropriately incremented,
+>   * or NULL if that failed.
+> @@ -1167,13 +1174,23 @@ long get_user_pages_remote(struct task_struct *tsk, struct mm_struct *mm,
+>  		struct vm_area_struct **vmas, int *locked)
+>  {
+>  	/*
+> -	 * FIXME: Current FOLL_LONGTERM behavior is incompatible with
+> +	 * Parts of FOLL_LONGTERM behavior are incompatible with
+>  	 * FAULT_FLAG_ALLOW_RETRY because of the FS DAX check requirement on
+> -	 * vmas.  As there are no users of this flag in this call we simply
+> -	 * disallow this option for now.
+> +	 * vmas. However, this only comes up if locked is set, and there are
+> +	 * callers that do request FOLL_LONGTERM, but do not set locked. So,
+> +	 * allow what we can.
+>  	 */
+> -	if (WARN_ON_ONCE(gup_flags & FOLL_LONGTERM))
+> -		return -EINVAL;
+> +	if (gup_flags & FOLL_LONGTERM) {
+> +		if (WARN_ON_ONCE(locked))
+> +			return -EINVAL;
+> +		/*
+> +		 * This will check the vmas (even if our vmas arg is NULL)
+> +		 * and return -ENOTSUPP if DAX isn't allowed in this case:
+> +		 */
+> +		return __gup_longterm_locked(tsk, mm, start, nr_pages, pages,
+> +					     vmas, gup_flags | FOLL_TOUCH |
+> +					     FOLL_REMOTE);
+> +	}
+>  
+>  	return __get_user_pages_locked(tsk, mm, start, nr_pages, pages, vmas,
+>  				       locked,
+> -- 
+> 2.24.0
+> 
