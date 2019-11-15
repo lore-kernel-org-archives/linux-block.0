@@ -2,231 +2,259 @@ Return-Path: <SRS0=zNjm=ZH=vger.kernel.org=linux-block-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-6.7 required=3.0 tests=DKIM_SIGNED,DKIM_VALID,
-	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,
-	SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED autolearn=ham autolearn_force=no
-	version=3.4.0
+X-Spam-Status: No, score=-2.2 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
+	MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED,USER_AGENT_SANE_1
+	autolearn=no autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 1C03FC432C3
-	for <linux-block@archiver.kernel.org>; Fri, 15 Nov 2019 02:13:34 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 2079CC432C3
+	for <linux-block@archiver.kernel.org>; Fri, 15 Nov 2019 04:56:46 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.kernel.org (Postfix) with ESMTP id CD207206D6
-	for <linux-block@archiver.kernel.org>; Fri, 15 Nov 2019 02:13:33 +0000 (UTC)
-Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (2048-bit key) header.d=wdc.com header.i=@wdc.com header.b="a0nc/dg7";
-	dkim=pass (1024-bit key) header.d=sharedspace.onmicrosoft.com header.i=@sharedspace.onmicrosoft.com header.b="CGRvGb3+"
+	by mail.kernel.org (Postfix) with ESMTP id EC9C12072A
+	for <linux-block@archiver.kernel.org>; Fri, 15 Nov 2019 04:56:45 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1727279AbfKOCNd (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Thu, 14 Nov 2019 21:13:33 -0500
-Received: from esa5.hgst.iphmx.com ([216.71.153.144]:30896 "EHLO
-        esa5.hgst.iphmx.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1727053AbfKOCNd (ORCPT
+        id S1726755AbfKOE4p (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Thu, 14 Nov 2019 23:56:45 -0500
+Received: from mail105.syd.optusnet.com.au ([211.29.132.249]:54470 "EHLO
+        mail105.syd.optusnet.com.au" rhost-flags-OK-OK-OK-OK)
+        by vger.kernel.org with ESMTP id S1726549AbfKOE4p (ORCPT
         <rfc822;linux-block@vger.kernel.org>);
-        Thu, 14 Nov 2019 21:13:33 -0500
-DKIM-Signature: v=1; a=rsa-sha256; c=simple/simple;
-  d=wdc.com; i=@wdc.com; q=dns/txt; s=dkim.wdc.com;
-  t=1573784013; x=1605320013;
-  h=from:to:cc:subject:date:message-id:references:
-   content-transfer-encoding:mime-version;
-  bh=yiuVgiPzSlQrNY+uHBTuH7/ln0QaFiTuTWj/EANPpVQ=;
-  b=a0nc/dg70Oy3ohA6NAfANHvIsqK+gGAjwpEu+1B4e8DRcf01rSPOXtaD
-   S6Mi3phXT/6fnEw8mt9xGSkeNFIMHLbKVvH/iCnfhjvHY0smiy8wJI8pA
-   SiJSgG5OuqwKsH8UDalFSVge3esr1TE4C/tztBeQjpU38sHovqPNA03+d
-   iEqhPpViBS+ftZqSfrydnIkeD1c94RiEw9R2voK73UgrhuwTLpvqQlgI+
-   5yZK04Ndq+yq7kZMRf4lZ6D7C7NWBG2kXHPKnVuLy1bDKh5/7/ABhfbsO
-   xHOf7EJ8Lcgxu1dVyO22aH4Eh6tkhOVrfa1VYkuUd322LxYILVAvME/Dh
-   A==;
-IronPort-SDR: dwN4GaUF89rzVtLm9mPFjYW4OYKTOmG8pdU9MpNFiUmLxYBf1QcmMQ3ANPrP9H5u2LrGsqMJiO
- VwXkWI5vuz8rkAhqYxPQkAYy322nKmkt0mG/ZoaXNkeAwJOY27b+7MVfB5UgKXZ9aeTgsVNeDq
- moMpDNCBR6L7yT9kP6jxR/ZsN9BQdUHB7r5ZNvFdr+5Rclwh5JR3TZJ6+ouTIyVUmmi54yjgAy
- qqeZbXYQP230BgrawlQH6vF2D78pqgz2zpoP7SWC4MQzb28/vhmfh05h69IrwrFNw/vhFHUBbz
- gEM=
-X-IronPort-AV: E=Sophos;i="5.68,306,1569254400"; 
-   d="scan'208";a="123837943"
-Received: from mail-sn1nam04lp2058.outbound.protection.outlook.com (HELO NAM04-SN1-obe.outbound.protection.outlook.com) ([104.47.44.58])
-  by ob1.hgst.iphmx.com with ESMTP; 15 Nov 2019 10:13:32 +0800
-ARC-Seal: i=1; a=rsa-sha256; s=arcselector9901; d=microsoft.com; cv=none;
- b=mpkrnlAEv3GHWXuNzohCDqVItvpjh7XYIDcddUU7ZSXYN8hOcEUqgf7PNC/1N9JHIw08ngEEghjH9JGi0oKo1d2Ce3yiojZT1LXaVLx8qrCd8lMDkveAMCpcPrKazBNNjbIm4GNqPWJisLvzDgdHpkYkS9AlHezHVwzu4AN8W2R73qfCYjNS3PFxm274ZFFKhMFKDpXduJ9tGabPEZhOueC7OS2ennHjLspnrsJs4GqOwuj8mTQS2HlltwkpqxdtOIdUL6TeobU2V9Lajr81t2UHKiQqxHM3f/RENtfeW0M2ZLadBXgs6lC9D6TEaJChUJDHZ/lwvIWLNUpNgy6Qsg==
-ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com;
- s=arcselector9901;
- h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
- bh=fucLoAmBfsr9nCESF9UsSwdKZylW0bCrrR2xq7b185o=;
- b=ALpvhNekJSExKyvb+xPmeuNj2/icKpf5zqVevhYvkHxqJTsDqKwCIy5VGxJY9lNKifbH748AynzzcRnnW/UHZoKv6uRSDOOVK/NsHA8ada+fOL35FkOwR4xhZ7nDN4uaBN2h43Q5pH9UigayeFxU8UBBiPtGnjMK6A1g64netCUzhmiqoFy3JL8VcHcYDpPN8GiZ1ni8HzApIyK+SijTYmzdS9XU/U+JCSOan7+OWOuGdH7G3AekkYezudmfDLWsR2bj32pYrs6EiZz4BXUk5Bq+blyS8oATBYCQCsS6eIMIEi4kDcfOAOye8w6bUzeSHfs2X4XnHsxtGyj/fM5uqg==
-ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass
- smtp.mailfrom=wdc.com; dmarc=pass action=none header.from=wdc.com; dkim=pass
- header.d=wdc.com; arc=none
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
- d=sharedspace.onmicrosoft.com; s=selector2-sharedspace-onmicrosoft-com;
- h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
- bh=fucLoAmBfsr9nCESF9UsSwdKZylW0bCrrR2xq7b185o=;
- b=CGRvGb3+mSgda3rgDyEsRMJ+V4UsNPTbziYz0hXCP5ETYaL6Dr+2Be/lwAE345dwe3yr1D9Bsg69DobDbQgNa6ZT53sTsuVwBqBLyReMKvu6JYhgnquYpZpZzxf10smHlEW/y5KPg6NiwFe+15fciuPm1tX2OUtQMbg/Lo91+Gg=
-Received: from BYAPR04MB5816.namprd04.prod.outlook.com (20.179.59.16) by
- BYAPR04MB5974.namprd04.prod.outlook.com (20.178.235.93) with Microsoft SMTP
- Server (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
- 15.20.2451.26; Fri, 15 Nov 2019 02:13:29 +0000
-Received: from BYAPR04MB5816.namprd04.prod.outlook.com
- ([fe80::4176:5eda:76a2:3c40]) by BYAPR04MB5816.namprd04.prod.outlook.com
- ([fe80::4176:5eda:76a2:3c40%7]) with mapi id 15.20.2430.028; Fri, 15 Nov 2019
- 02:13:29 +0000
-From:   Damien Le Moal <Damien.LeMoal@wdc.com>
-To:     "longli@linuxonhyperv.com" <longli@linuxonhyperv.com>,
-        Jens Axboe <axboe@kernel.dk>, Ming Lei <ming.lei@redhat.com>,
-        Sagi Grimberg <sagi@grimberg.me>,
-        Keith Busch <keith.busch@intel.com>,
-        Bart Van Assche <bvanassche@acm.org>,
-        "linux-block@vger.kernel.org" <linux-block@vger.kernel.org>,
-        "linux-kernel@vger.kernel.org" <linux-kernel@vger.kernel.org>
-CC:     Long Li <longli@microsoft.com>
-Subject: Re: [PATCH] blk-mq: avoid repeatedly scheduling the same work to run
- hardware queue
-Thread-Topic: [PATCH] blk-mq: avoid repeatedly scheduling the same work to run
- hardware queue
-Thread-Index: AQHVmz4UK1WchWvq4UCn2IWDjskncw==
-Date:   Fri, 15 Nov 2019 02:13:29 +0000
-Message-ID: <BYAPR04MB5816F14C06B4D2AC71A2FED9E7700@BYAPR04MB5816.namprd04.prod.outlook.com>
-References: <1573771884-38879-1-git-send-email-longli@linuxonhyperv.com>
-Accept-Language: en-US
-Content-Language: en-US
-X-MS-Has-Attach: 
-X-MS-TNEF-Correlator: 
-authentication-results: spf=none (sender IP is )
- smtp.mailfrom=Damien.LeMoal@wdc.com; 
-x-originating-ip: [199.255.47.8]
-x-ms-publictraffictype: Email
-x-ms-office365-filtering-ht: Tenant
-x-ms-office365-filtering-correlation-id: bafb6dc4-8660-4e25-081d-08d769716829
-x-ms-traffictypediagnostic: BYAPR04MB5974:
-x-microsoft-antispam-prvs: <BYAPR04MB5974DB3A78954894502C0849E7700@BYAPR04MB5974.namprd04.prod.outlook.com>
-wdcipoutbound: EOP-TRUE
-x-ms-oob-tlc-oobclassifiers: OLM:8273;
-x-forefront-prvs: 02229A4115
-x-forefront-antispam-report: SFV:NSPM;SFS:(10019020)(4636009)(366004)(396003)(376002)(136003)(346002)(39860400002)(189003)(199004)(7736002)(476003)(99286004)(305945005)(478600001)(74316002)(6116002)(3846002)(66066001)(14454004)(256004)(14444005)(5660300002)(110136005)(446003)(486006)(71190400001)(71200400001)(81156014)(66476007)(81166006)(52536014)(102836004)(76176011)(2501003)(8936002)(6436002)(66946007)(7696005)(66446008)(2906002)(25786009)(316002)(2201001)(66556008)(33656002)(64756008)(186003)(86362001)(4326008)(53546011)(9686003)(8676002)(229853002)(26005)(6506007)(91956017)(76116006)(6246003)(55016002);DIR:OUT;SFP:1102;SCL:1;SRVR:BYAPR04MB5974;H:BYAPR04MB5816.namprd04.prod.outlook.com;FPR:;SPF:None;LANG:en;PTR:InfoNoRecords;MX:1;A:1;
-x-ms-exchange-senderadcheck: 1
-x-microsoft-antispam: BCL:0;
-x-microsoft-antispam-message-info: KnVEiu6DInZ4OnO7VdcIY7/WXAxAGvQOHznZ6e1AuiLidQodIc1hAnKE7L55VW+MB6o//sgGEtwSA0AyCvz2dXFvgICnrhKO8PxSYh/67B4PJKpesZPlRTLHhUguPbI8ncPKomBAvn940KBLGV/3ss++BiXHpiowOBNLMtbr+KFGvwnqzLU/8VJRvz+16SONc7ZZ1pE4xE+RlKBToArnYrtmMC0GQFPNmH7548LCvb97Z2Mj6BWnu7dQN6NoX6vhazyR+uYac6qp8o/EZ/8GEhfdz8GDzj0U8Fr74hwh3xSfXHe1LaGZLdvgbIS0neWRsAJIHy4UTWjILEReT1pSOJlbOynr022WfP/lYFSoIJ+4/xMVR32laxzkXM7QvYpc40ymI/zSzHqqgVMMntVxuCrCtqp3ruavtQcrSiiMnPQMZatufVshgchexKM/ExSO
-x-ms-exchange-transport-forked: True
-Content-Type: text/plain; charset="us-ascii"
-Content-Transfer-Encoding: quoted-printable
+        Thu, 14 Nov 2019 23:56:45 -0500
+Received: from dread.disaster.area (pa49-181-255-80.pa.nsw.optusnet.com.au [49.181.255.80])
+        by mail105.syd.optusnet.com.au (Postfix) with ESMTPS id 757C63A126C;
+        Fri, 15 Nov 2019 15:56:36 +1100 (AEDT)
+Received: from dave by dread.disaster.area with local (Exim 4.92.3)
+        (envelope-from <david@fromorbit.com>)
+        id 1iVTes-000703-KI; Fri, 15 Nov 2019 15:56:34 +1100
+Date:   Fri, 15 Nov 2019 15:56:34 +1100
+From:   Dave Chinner <david@fromorbit.com>
+To:     Ming Lei <ming.lei@redhat.com>
+Cc:     linux-block@vger.kernel.org, linux-fsdevel@vger.kernel.org,
+        linux-xfs@vger.kernel.org, linux-kernel@vger.kernel.org,
+        Jeff Moyer <jmoyer@redhat.com>,
+        Dave Chinner <dchinner@redhat.com>,
+        Eric Sandeen <sandeen@redhat.com>,
+        Christoph Hellwig <hch@lst.de>, Jens Axboe <axboe@kernel.dk>,
+        Ingo Molnar <mingo@redhat.com>,
+        Peter Zijlstra <peterz@infradead.org>,
+        Tejun Heo <tj@kernel.org>
+Subject: Re: single aio thread is migrated crazily by scheduler
+Message-ID: <20191115045634.GN4614@dread.disaster.area>
+References: <20191114113153.GB4213@ming.t460p>
+ <20191114235415.GL4614@dread.disaster.area>
+ <20191115010824.GC4847@ming.t460p>
 MIME-Version: 1.0
-X-OriginatorOrg: wdc.com
-X-MS-Exchange-CrossTenant-Network-Message-Id: bafb6dc4-8660-4e25-081d-08d769716829
-X-MS-Exchange-CrossTenant-originalarrivaltime: 15 Nov 2019 02:13:29.3786
- (UTC)
-X-MS-Exchange-CrossTenant-fromentityheader: Hosted
-X-MS-Exchange-CrossTenant-id: b61c8803-16f3-4c35-9b17-6f65f441df86
-X-MS-Exchange-CrossTenant-mailboxtype: HOSTED
-X-MS-Exchange-CrossTenant-userprincipalname: ic5bE31D4GgPvBECGFTeERh53um1M6rPdWarx7oeoiegXrnHXeuyqOKRWnzJQ8eR5xNjdNZ3BrqaJ+we/hJ8zQ==
-X-MS-Exchange-Transport-CrossTenantHeadersStamped: BYAPR04MB5974
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <20191115010824.GC4847@ming.t460p>
+User-Agent: Mutt/1.10.1 (2018-07-13)
+X-Optus-CM-Score: 0
+X-Optus-CM-Analysis: v=2.2 cv=D+Q3ErZj c=1 sm=1 tr=0
+        a=XqaD5fcB6dAc7xyKljs8OA==:117 a=XqaD5fcB6dAc7xyKljs8OA==:17
+        a=jpOVt7BSZ2e4Z31A5e1TngXxSK0=:19 a=kj9zAlcOel0A:10 a=MeAgGD-zjQ4A:10
+        a=7-415B0cAAAA:8 a=YA4SRm3-OJPy1tlrI5wA:9 a=Aj6MW7hUX1EADMvn:21
+        a=IWKxPDfHLwVYwAi0:21 a=CjuIK1q_8ugA:10 a=biEYGPWJfzWAr4FL6Ov7:22
 Sender: linux-block-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-On 2019/11/15 7:51, longli@linuxonhyperv.com wrote:=0A=
-> From: Long Li <longli@microsoft.com>=0A=
-> =0A=
-> SCSI layer calls blk_mq_run_hw_queues() in scsi_end_request(), for every=
-=0A=
-> completed I/O. blk_mq_run_hw_queues() in turn schedules some works to run=
-=0A=
-> the hardware queues.=0A=
-> =0A=
-> The actual work is queued by mod_delayed_work_on(), it turns out the cost=
- of=0A=
-> this function is high on locking and CPU usage, when the I/O workload has=
-=0A=
-> high queue depth. Most of these calls are not necessary since the queue i=
-s=0A=
-> already scheduled to run, and has not run yet.=0A=
-> =0A=
-> This patch tries to solve this problem by avoiding scheduling work when i=
-t's=0A=
-> already scheduled.=0A=
-> =0A=
-> Benchmark results:=0A=
-> The following tests are run on a RAM backed virtual disk on Hyper-V, with=
- 8=0A=
-> FIO jobs with 4k random read I/O. The test numbers are for IOPS.=0A=
-> =0A=
-> queue_depth	pre-patch	after-patch	improvement=0A=
-> 16		190k		190k		0%=0A=
-> 64		235k		240k		2%=0A=
-> 256		180k		256k		42%=0A=
-> 1024		156k		250k		60%=0A=
-> =0A=
-> Signed-off-by: Long Li <longli@microsoft.com>=0A=
-> ---=0A=
->  block/blk-mq.c         | 12 ++++++++++++=0A=
->  include/linux/blk-mq.h |  1 +=0A=
->  2 files changed, 13 insertions(+)=0A=
-> =0A=
-> diff --git a/block/blk-mq.c b/block/blk-mq.c=0A=
-> index ec791156e9cc..a882bd65167a 100644=0A=
-> --- a/block/blk-mq.c=0A=
-> +++ b/block/blk-mq.c=0A=
-> @@ -1476,6 +1476,16 @@ static void __blk_mq_delay_run_hw_queue(struct blk=
-_mq_hw_ctx *hctx, bool async,=0A=
->  		put_cpu();=0A=
->  	}=0A=
->  =0A=
-> +	/*=0A=
-> +	 * Queue a work to run queue. If this is a non-delay run and the=0A=
-> +	 * work is already scheduled, avoid scheduling the same work again.=0A=
-> +	 */=0A=
-> +	if (!msecs) {=0A=
-> +		if (test_bit(BLK_MQ_S_WORK_QUEUED, &hctx->state))=0A=
-> +			return;=0A=
-=0A=
-With this change, if the kblockd work is already scheduled with a delay,=0A=
-then the current no-delay run request will incur a delay because=0A=
-kblockd_mod_delayed_work_on() is not called, implying that=0A=
-__queue_delayed_work() does not execute __queue_work() as mandated by=0A=
-the 0 delay. The work is *not* started immediately.=0A=
-=0A=
-While your results show improvements of IOPS at high queue depth,=0A=
-doesn't this change degrade IOPS and especially latency at low queue depth =
-?=0A=
-=0A=
-> +		set_bit(BLK_MQ_S_WORK_QUEUED, &hctx->state);=0A=
-> +	}=0A=
-> +=0A=
->  	kblockd_mod_delayed_work_on(blk_mq_hctx_next_cpu(hctx), &hctx->run_work=
-,=0A=
->  				    msecs_to_jiffies(msecs));=0A=
->  }=0A=
-> @@ -1561,6 +1571,7 @@ void blk_mq_stop_hw_queue(struct blk_mq_hw_ctx *hct=
-x)=0A=
->  	cancel_delayed_work(&hctx->run_work);=0A=
->  =0A=
->  	set_bit(BLK_MQ_S_STOPPED, &hctx->state);=0A=
-> +	clear_bit(BLK_MQ_S_WORK_QUEUED, &hctx->state);=0A=
->  }=0A=
->  EXPORT_SYMBOL(blk_mq_stop_hw_queue);=0A=
->  =0A=
-> @@ -1626,6 +1637,7 @@ static void blk_mq_run_work_fn(struct work_struct *=
-work)=0A=
->  	struct blk_mq_hw_ctx *hctx;=0A=
->  =0A=
->  	hctx =3D container_of(work, struct blk_mq_hw_ctx, run_work.work);=0A=
-> +	clear_bit(BLK_MQ_S_WORK_QUEUED, &hctx->state);=0A=
->  =0A=
->  	/*=0A=
->  	 * If we are stopped, don't run the queue.=0A=
-> diff --git a/include/linux/blk-mq.h b/include/linux/blk-mq.h=0A=
-> index 0bf056de5cc3..98269d3fd141 100644=0A=
-> --- a/include/linux/blk-mq.h=0A=
-> +++ b/include/linux/blk-mq.h=0A=
-> @@ -234,6 +234,7 @@ enum {=0A=
->  	BLK_MQ_S_STOPPED	=3D 0,=0A=
->  	BLK_MQ_S_TAG_ACTIVE	=3D 1,=0A=
->  	BLK_MQ_S_SCHED_RESTART	=3D 2,=0A=
-> +	BLK_MQ_S_WORK_QUEUED	=3D 3,=0A=
->  =0A=
->  	BLK_MQ_MAX_DEPTH	=3D 10240,=0A=
->  =0A=
-> =0A=
-=0A=
-=0A=
--- =0A=
-Damien Le Moal=0A=
-Western Digital Research=0A=
+On Fri, Nov 15, 2019 at 09:08:24AM +0800, Ming Lei wrote:
+> Hi Dave,
+> 
+> On Fri, Nov 15, 2019 at 10:54:15AM +1100, Dave Chinner wrote:
+> > On Thu, Nov 14, 2019 at 07:31:53PM +0800, Ming Lei wrote:
+> > > Hi Guys,
+> > > 
+> > > It is found that single AIO thread is migrated crazely by scheduler, and
+> > > the migrate period can be < 10ms. Follows the test a):
+> > > 
+> > > 	- run single job fio[1] for 30 seconds:
+> > > 	./xfs_complete 512
+> > > 	
+> > > 	- observe fio io thread migration via bcc trace[2], and the migration
+> > > 	times can reach 5k ~ 10K in above test. In this test, CPU utilization
+> > > 	is 30~40% on the CPU running fio IO thread.
+> > 
+> > Using the default scheduler tunings:
+> > 
+> > kernel.sched_wakeup_granularity_ns = 4000000
+> > kernel.sched_min_granularity_ns = 3000000
+> > 
+> > I'm not seeing any migrations at all on a 16p x86-64 box. Even with
+> > the tunings you suggest:
+> > 
+> > 	sysctl kernel.sched_min_granularity_ns=10000000
+> > 	sysctl kernel.sched_wakeup_granularity_ns=15000000
+> > 
+> > There are no migrations at all.
+> 
+> Looks I forget to pass $BS to the fio command line in the script posted,
+> please try the following script again and run './xfs_complete 512' first.
+
+So I ran 4kB IOs instead of 512 byte IOs. Shouldn't make any
+difference, really - it'll still be CPU bound...
+
+<snip script>
+
+> In my test just done, the migration count is 12K in 30s fio running.
+> Sometimes the number can be quite less, but most of times, the number
+> is very big(> 5k).
+
+With my iomap-dio-overwrite patch and 512 byte IOs:
+
+$ sudo trace-cmd show |grep sched_migrate_task |wc -l
+112
+$ sudo trace-cmd show |grep sched_migrate_task |grep fio |wc -l
+22
+
+Without the iomap-dio-overwrite patch:
+
+$ sudo trace-cmd show |grep sched_migrate_task |wc -l
+99
+$ sudo trace-cmd show |grep sched_migrate_task |grep fio |wc -l
+9
+$
+
+There are -less- migrations when using the workqueue for everything.
+But it's so low in either case that it's just noise.
+
+Performance is identical for the two patches...
+
+> > > BTW, the tests are run on latest linus tree(5.4-rc7) in KVM guest, and the
+> > > fio test is created for simulating one real performance report which is
+> > > proved to be caused by frequent aio submission thread migration.
+> > 
+> > What is the underlying hardware? I'm running in a 16p KVM guest on a
+> > 16p/32t x86-64 using 5.4-rc7, and I don't observe any significant
+> > CPU migration occurring at all from your test workload.
+> 
+> It is a KVM guest, which is running on my Lenova T460p Fedora 29 laptop,
+> and the host kernel is 5.2.18-100.fc29.x86_64, follows the guest info:
+
+Ok, so what are all the custom distro kernel tunings that userspace
+does for the kernel?
+
+> [root@ktest-01 ~]# lscpu
+> Architecture:        x86_64
+> CPU op-mode(s):      32-bit, 64-bit
+> Byte Order:          Little Endian
+> CPU(s):              8
+> On-line CPU(s) list: 0-7
+> Thread(s) per core:  1
+> Core(s) per socket:  4
+> Socket(s):           2
+> NUMA node(s):        2
+
+Curious. You've configured it as two CPU sockets. If you make it a
+single socket, do your delay problems go away?  The snippet of trace
+output you showed indicated it bouncing around CPUs on a single node
+(cpus 0-3), so maybe it has something to do with way the scheduler
+is interacting with non-zero NUMA distances...
+
+> Vendor ID:           GenuineIntel
+> CPU family:          6
+> Model:               94
+> Model name:          Intel(R) Core(TM) i7-6820HQ CPU @ 2.70GHz
+> Stepping:            3
+> CPU MHz:             2712.000
+> BogoMIPS:            5424.00
+> Virtualization:      VT-x
+> Hypervisor vendor:   KVM
+> Virtualization type: full
+> L1d cache:           32K
+> L1i cache:           32K
+> L2 cache:            4096K
+> L3 cache:            16384K
+> NUMA node0 CPU(s):   0-3
+> NUMA node1 CPU(s):   4-7
+> Flags:               fpu vme de pse tsc msr pae mce cx8 apic sep mtrr pge mca cmov pat pse36 clflush mmxp
+
+That seems like a very minimal set of CPU flags - looks like you are
+not actually passing the actual host CPU capabilities through to the
+guest. That means it will be doing the slowest, most generic
+spectre/meltdown mitigations, right?
+
+Also, shouldn't lscpu be telling us all the CPU bug mitigations in
+place?
+
+From my test system:
+
+Architecture:                    x86_64
+CPU op-mode(s):                  32-bit, 64-bit
+Byte Order:                      Little Endian
+Address sizes:                   40 bits physical, 48 bits virtual
+CPU(s):                          16
+On-line CPU(s) list:             0-15
+Thread(s) per core:              1
+Core(s) per socket:              1
+Socket(s):                       16
+NUMA node(s):                    1
+Vendor ID:                       GenuineIntel
+CPU family:                      6
+Model:                           45
+Model name:                      Intel(R) Xeon(R) CPU E5-4620 0 @ 2.20GHz
+Stepping:                        7
+CPU MHz:                         2199.998
+BogoMIPS:                        4399.99
+Virtualization:                  VT-x
+Hypervisor vendor:               KVM
+Virtualization type:             full
+L1d cache:                       512 KiB
+L1i cache:                       512 KiB
+L2 cache:                        64 MiB
+L3 cache:                        256 MiB
+NUMA node0 CPU(s):               0-15
+Vulnerability L1tf:              Mitigation; PTE Inversion; VMX flush not necessary, SMT disabled
+Vulnerability Mds:               Mitigation; Clear CPU buffers; SMT Host state unknown
+Vulnerability Meltdown:          Vulnerable
+Vulnerability Spec store bypass: Mitigation; Speculative Store Bypass disabled via prctl and seccomp
+Vulnerability Spectre v1:        Mitigation; usercopy/swapgs barriers and __user pointer sanitization
+Vulnerability Spectre v2:        Vulnerable, IBPB: disabled, STIBP: disabled
+Flags:                           fpu vme de pse tsc msr pae mce cx8 apic sep mtrr pge mca cmov pat pse36 clflush mmx fxsr sse sse2 ss syscall nx pdpe1gb rdtscp l
+                                 m constant_tsc arch_perfmon rep_good nopl xtopology cpuid tsc_known_freq pni pclmulqdq vmx ssse3 cx16 pcid sse4_1 sse4_2 x2apic 
+                                 popcnt tsc_deadline_timer aes xsave avx hypervisor lahf_lm cpuid_fault ssbd ibrs ibpb stibp tpr_shadow vnmi flexpriority ept vpi
+                                 d tsc_adjust xsaveopt arat umip md_clear arch_capabilities
+
+So, to rule out that it has something to do with kernel config,
+I just ran up a kernel built with your config.gz, and the problem
+does not manifest. The only difference was a few drivers I needed to
+boot my test VMs, and I was previously not using paravirt spinlocks.
+
+So, I still can't reproduce the problem. Indeed, the workload gets
+nowhere near single CPU bound with your config - it's using half the
+CPU for the same performance:
+
+%Cpu2  : 19.8 us, 28.2 sy,  0.0 ni,  0.0 id, 52.0 wa,  0.0 hi,  0.0 %si,  0.0 st
+
+Basically, it's spending half it's time waiting on IO. If I wind the
+delay down to 1000ns:
+
+%Cpu1  : 42.2 us, 42.2 sy,  0.0 ni,  0.0 id,  0.0 wa,  0.0 hi, 15.6 %si,  0.0 st
+
+it spends an awful lot of time in soft-interrupt, but is back to
+being CPU bound.
+
+Despite this, I still don't see any significant amount of task
+migration. In fact, I see a lot less with your kernel config that I
+do with my original kernel config, because the CPU load was far
+lower.
+
+> Just run a quick test several times after applying the above patch, and looks it
+> does make a big difference in test './xfs_complete 512' wrt. fio io thread migration.
+
+There's something very different about your system, and it doesn't
+appear to be a result of the kernel code itself. I think you're
+going to have to do all the testing at the moment, Ming, because
+it's clear that my test systems do not show up the problems even
+when using the same kernel config as you do...
+
+If you reconfig you kvm setup to pass all the native host side cpu
+flags through to the guest, does the problem go away? I think adding
+"-cpu host" to your qemu command line will do that...
+
+Cheers,
+
+Dave.
+-- 
+Dave Chinner
+david@fromorbit.com
