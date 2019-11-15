@@ -2,204 +2,145 @@ Return-Path: <SRS0=zNjm=ZH=vger.kernel.org=linux-block-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-0.8 required=3.0 tests=DKIM_SIGNED,DKIM_VALID,
-	DKIM_VALID_AU,HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SPF_HELO_NONE,
-	SPF_PASS,URIBL_BLOCKED autolearn=no autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-5.3 required=3.0 tests=DKIM_SIGNED,DKIM_VALID,
+	DKIM_VALID_AU,HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SIGNED_OFF_BY,
+	SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED,USER_AGENT_SANE_1 autolearn=unavailable
+	autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 5468AC43215
-	for <linux-block@archiver.kernel.org>; Fri, 15 Nov 2019 13:29:05 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id ED6B0C432C3
+	for <linux-block@archiver.kernel.org>; Fri, 15 Nov 2019 14:08:47 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.kernel.org (Postfix) with ESMTP id 2E8A4206CC
-	for <linux-block@archiver.kernel.org>; Fri, 15 Nov 2019 13:29:05 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id BECA02073B
+	for <linux-block@archiver.kernel.org>; Fri, 15 Nov 2019 14:08:47 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="flnZk33o"
+	dkim=pass (2048-bit key) header.d=ziepe.ca header.i=@ziepe.ca header.b="i+UlYqHp"
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1727514AbfKON3E (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Fri, 15 Nov 2019 08:29:04 -0500
-Received: from us-smtp-delivery-1.mimecast.com ([205.139.110.120]:29178 "EHLO
-        us-smtp-1.mimecast.com" rhost-flags-OK-OK-OK-FAIL) by vger.kernel.org
-        with ESMTP id S1727399AbfKON3D (ORCPT
+        id S1727485AbfKOOIq (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Fri, 15 Nov 2019 09:08:46 -0500
+Received: from mail-qt1-f195.google.com ([209.85.160.195]:43728 "EHLO
+        mail-qt1-f195.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S1727637AbfKOOIq (ORCPT
         <rfc822;linux-block@vger.kernel.org>);
-        Fri, 15 Nov 2019 08:29:03 -0500
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-        s=mimecast20190719; t=1573824542;
-        h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-         to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-         content-transfer-encoding:content-transfer-encoding:
-         in-reply-to:in-reply-to:references:references;
-        bh=Mks2DjWdpnukmwwEXVk82toAm3agWoayoydTXhkFsfg=;
-        b=flnZk33ocQ28HZ4XDL3qAGJ72dDwRt496HveaZUWJ6MUYUP9sUPhz179yxFxQbmbQNeVYp
-        xXi7UNXLrDxpeRYujxgpvPsrmM5ZWGXkajdGa4kqUD8Adg1tZnG9ADspoSMW6Zx5Hsxl0P
-        MQHD5J9aVF5k7wWhBqGeDTNswLMR79Q=
-Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
- [209.132.183.4]) (Using TLS) by relay.mimecast.com with ESMTP id
- us-mta-278-HPOfJgVkOrK1lyjxuhbP-w-1; Fri, 15 Nov 2019 08:28:58 -0500
-Received: from smtp.corp.redhat.com (int-mx04.intmail.prod.int.phx2.redhat.com [10.5.11.14])
-        (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
-        (No client certificate requested)
-        by mimecast-mx01.redhat.com (Postfix) with ESMTPS id 5E6BA18B5F8A;
-        Fri, 15 Nov 2019 13:28:56 +0000 (UTC)
-Received: from warthog.procyon.org.uk (ovpn-120-161.rdu2.redhat.com [10.10.120.161])
-        by smtp.corp.redhat.com (Postfix) with ESMTP id E61D95F900;
-        Fri, 15 Nov 2019 13:28:52 +0000 (UTC)
-Organization: Red Hat UK Ltd. Registered Address: Red Hat UK Ltd, Amberley
-        Place, 107-111 Peascod Street, Windsor, Berkshire, SI4 1TE, United
-        Kingdom.
-        Registered in England and Wales under Company Registration No. 3798903
-From:   David Howells <dhowells@redhat.com>
-In-Reply-To: <20191110031348.GE29418@shao2-debian>
-References: <20191110031348.GE29418@shao2-debian>
-To:     kernel test robot <lkp@intel.com>
-Cc:     dhowells@redhat.com, torvalds@linux-foundation.org,
-        Rasmus Villemoes <linux@rasmusvillemoes.dk>,
-        Greg Kroah-Hartman <gregkh@linuxfoundation.org>,
-        Peter Zijlstra <peterz@infradead.org>,
-        nicolas.dichtel@6wind.com, raven@themaw.net,
-        Christian Brauner <christian@brauner.io>,
-        keyrings@vger.kernel.org, linux-usb@vger.kernel.org,
-        linux-block@vger.kernel.org, linux-security-module@vger.kernel.org,
-        linux-fsdevel@vger.kernel.org, linux-api@vger.kernel.org,
-        linux-kernel@vger.kernel.org, lkp@lists.01.org
-Subject: Re: [pipe] d60337eff1: BUG:kernel_NULL_pointer_dereference,address
+        Fri, 15 Nov 2019 09:08:46 -0500
+Received: by mail-qt1-f195.google.com with SMTP id j5so9485303qtn.10
+        for <linux-block@vger.kernel.org>; Fri, 15 Nov 2019 06:08:44 -0800 (PST)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=ziepe.ca; s=google;
+        h=date:from:to:cc:subject:message-id:references:mime-version
+         :content-disposition:in-reply-to:user-agent;
+        bh=8ZGdiHZxf3ZHqX3I8ydxFdLkSWkpE5WrCI0dICjPpHU=;
+        b=i+UlYqHpSoy9hrCL3gQPMJUhUw3RKIgDls07tcBvdNTrD4jl5OTOMJfNN1MASvpOc/
+         n/RUaDL07zMYWDhclWHPDZnaqTZ6YdpZfzuTyA+HrehI2Ydc75hfkUNiRgV5KLUhGbZ5
+         hwJR6j62hBrGSzy1DyO8h1zN9TlzptjO0LEx4CpgETqR3CBgJNCsKnZKRcbg5KwHic/q
+         pEIdohRRBLTVk18YHW5Vi8NX67r/lGgj0cpRlIJEz6SaDVQBInMFNoQa60kFdiQzPjma
+         xgI2yhuOWu+cTXk9NFpI3of3yS1+C6h76JgFDhrvoDw5piCzGcHI/ud3iOPSS57DuCxF
+         BfMw==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20161025;
+        h=x-gm-message-state:date:from:to:cc:subject:message-id:references
+         :mime-version:content-disposition:in-reply-to:user-agent;
+        bh=8ZGdiHZxf3ZHqX3I8ydxFdLkSWkpE5WrCI0dICjPpHU=;
+        b=knUoGq7fMsXvCc6+6zw8/zw+UVPqmYusHvPMRYNphawEKEAwUuH305cuPHwmI/RNTc
+         TdsnEbKHIRUofcOS/dOKAnmiqGZVenPJc9jc8z1oSp+uTl48+OxhS8mz7fDJ2j3JqXs+
+         d6MLEAjMJXCLa+IPYTMGtd0Gj8fNMiE2xw8xzggE7xPN3E7lO7qG4RKDKXT1fue563Mo
+         daKCluj89NIhb3NUfa/N/uQnyeYewCj5qrKaDsh96EX6FMdkXVfjg8pmt+lopl1mFbWu
+         Ml2+HfSZtxnp3xvrx8hOE/RyKQR/qJySdwgKOO5lsCR/GLe0YjBEJZsP75z1FKEf8c+T
+         blEw==
+X-Gm-Message-State: APjAAAVgTnXnHXojsRdX9lJcbmqRYTuMARDdW5blT/0ojv+ac9y4+db2
+        XJ81SZaFWnxZ1iQBEdFSEad6RA==
+X-Google-Smtp-Source: APXvYqyXZJAB3M+2SHRriOZec9Rfd1hMhPGpVi3+hL/5cz80ckTUMXVgMRzWDvTX6XEGdZam3s9/QQ==
+X-Received: by 2002:ac8:661a:: with SMTP id c26mr13620771qtp.317.1573826923526;
+        Fri, 15 Nov 2019 06:08:43 -0800 (PST)
+Received: from ziepe.ca (hlfxns017vw-142-162-113-180.dhcp-dynamic.fibreop.ns.bellaliant.net. [142.162.113.180])
+        by smtp.gmail.com with ESMTPSA id s21sm5382292qtc.12.2019.11.15.06.08.42
+        (version=TLS1_2 cipher=ECDHE-RSA-CHACHA20-POLY1305 bits=256/256);
+        Fri, 15 Nov 2019 06:08:42 -0800 (PST)
+Received: from jgg by mlx.ziepe.ca with local (Exim 4.90_1)
+        (envelope-from <jgg@ziepe.ca>)
+        id 1iVcHC-0002xg-A8; Fri, 15 Nov 2019 10:08:42 -0400
+Date:   Fri, 15 Nov 2019 10:08:42 -0400
+From:   Jason Gunthorpe <jgg@ziepe.ca>
+To:     John Hubbard <jhubbard@nvidia.com>
+Cc:     Andrew Morton <akpm@linux-foundation.org>,
+        Al Viro <viro@zeniv.linux.org.uk>,
+        Alex Williamson <alex.williamson@redhat.com>,
+        Benjamin Herrenschmidt <benh@kernel.crashing.org>,
+        =?utf-8?B?QmrDtnJuIFTDtnBlbA==?= <bjorn.topel@intel.com>,
+        Christoph Hellwig <hch@infradead.org>,
+        Dan Williams <dan.j.williams@intel.com>,
+        Daniel Vetter <daniel@ffwll.ch>,
+        Dave Chinner <david@fromorbit.com>,
+        David Airlie <airlied@linux.ie>,
+        "David S . Miller" <davem@davemloft.net>,
+        Ira Weiny <ira.weiny@intel.com>, Jan Kara <jack@suse.cz>,
+        Jens Axboe <axboe@kernel.dk>, Jonathan Corbet <corbet@lwn.net>,
+        =?utf-8?B?SsOpcsO0bWU=?= Glisse <jglisse@redhat.com>,
+        Magnus Karlsson <magnus.karlsson@intel.com>,
+        Mauro Carvalho Chehab <mchehab@kernel.org>,
+        Michael Ellerman <mpe@ellerman.id.au>,
+        Michal Hocko <mhocko@suse.com>,
+        Mike Kravetz <mike.kravetz@oracle.com>,
+        Paul Mackerras <paulus@samba.org>,
+        Shuah Khan <shuah@kernel.org>,
+        Vlastimil Babka <vbabka@suse.cz>, bpf@vger.kernel.org,
+        dri-devel@lists.freedesktop.org, kvm@vger.kernel.org,
+        linux-block@vger.kernel.org, linux-doc@vger.kernel.org,
+        linux-fsdevel@vger.kernel.org, linux-kselftest@vger.kernel.org,
+        linux-media@vger.kernel.org, linux-rdma@vger.kernel.org,
+        linuxppc-dev@lists.ozlabs.org, netdev@vger.kernel.org,
+        linux-mm@kvack.org, LKML <linux-kernel@vger.kernel.org>
+Subject: Re: [PATCH v5 09/24] vfio, mm: fix get_user_pages_remote() and
+ FOLL_LONGTERM
+Message-ID: <20191115140842.GA4055@ziepe.ca>
+References: <20191115055340.1825745-1-jhubbard@nvidia.com>
+ <20191115055340.1825745-10-jhubbard@nvidia.com>
 MIME-Version: 1.0
-Content-ID: <9278.1573824532.1@warthog.procyon.org.uk>
-Date:   Fri, 15 Nov 2019 13:28:52 +0000
-Message-ID: <9279.1573824532@warthog.procyon.org.uk>
-X-Scanned-By: MIMEDefang 2.79 on 10.5.11.14
-X-MC-Unique: HPOfJgVkOrK1lyjxuhbP-w-1
-X-Mimecast-Spam-Score: 0
-Content-Type: text/plain; charset=WINDOWS-1252
-Content-Transfer-Encoding: quoted-printable
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <20191115055340.1825745-10-jhubbard@nvidia.com>
+User-Agent: Mutt/1.9.4 (2018-02-28)
 Sender: linux-block-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-kernel test robot <lkp@intel.com> wrote:
+On Thu, Nov 14, 2019 at 09:53:25PM -0800, John Hubbard wrote:
+> As it says in the updated comment in gup.c: current FOLL_LONGTERM
+> behavior is incompatible with FAULT_FLAG_ALLOW_RETRY because of the
+> FS DAX check requirement on vmas.
+> 
+> However, the corresponding restriction in get_user_pages_remote() was
+> slightly stricter than is actually required: it forbade all
+> FOLL_LONGTERM callers, but we can actually allow FOLL_LONGTERM callers
+> that do not set the "locked" arg.
+> 
+> Update the code and comments accordingly, and update the VFIO caller
+> to take advantage of this, fixing a bug as a result: the VFIO caller
+> is logically a FOLL_LONGTERM user.
+> 
+> Also, remove an unnessary pair of calls that were releasing and
+> reacquiring the mmap_sem. There is no need to avoid holding mmap_sem
+> just in order to call page_to_pfn().
+> 
+> Also, move the DAX check ("if a VMA is DAX, don't allow long term
+> pinning") from the VFIO call site, all the way into the internals
+> of get_user_pages_remote() and __gup_longterm_locked(). That is:
+> get_user_pages_remote() calls __gup_longterm_locked(), which in turn
+> calls check_dax_vmas(). It's lightly explained in the comments as well.
+> 
+> Thanks to Jason Gunthorpe for pointing out a clean way to fix this,
+> and to Dan Williams for helping clarify the DAX refactoring.
+> 
+> Suggested-by: Jason Gunthorpe <jgg@ziepe.ca>
+> Cc: Dan Williams <dan.j.williams@intel.com>
+> Cc: Jerome Glisse <jglisse@redhat.com>
+> Cc: Ira Weiny <ira.weiny@intel.com>
+> Signed-off-by: John Hubbard <jhubbard@nvidia.com>
+> ---
+>  drivers/vfio/vfio_iommu_type1.c | 30 +++++-------------------------
+>  mm/gup.c                        | 27 ++++++++++++++++++++++-----
+>  2 files changed, 27 insertions(+), 30 deletions(-)
 
-> [    9.423019] BUG: kernel NULL pointer dereference, address: 00000000000=
-00008
-> [    9.425646] #PF: supervisor read access in kernel mode
-> [    9.427714] #PF: error_code(0x0000) - not-present page
-> [    9.429851] PGD 80000001fb937067 P4D 80000001fb937067 PUD 1739e1067 PM=
-D 0=20
-> [    9.432468] Oops: 0000 [#1] SMP PTI
-> [    9.434064] CPU: 0 PID: 178 Comm: cat Not tainted 5.4.0-rc5-00353-gd60=
-337eff18a3 #1
-> [    9.437139] Hardware name: QEMU Standard PC (i440FX + PIIX, 1996), BIO=
-S 1.10.2-1 04/01/2014
-> [    9.440439] RIP: 0010:iov_iter_get_pages_alloc+0x2a8/0x400
+Looks OK now  
 
-Can you tell me if the following change fixes it for you?
-
---- a/lib/iov_iter.c
-+++ b/lib/iov_iter.c
-@@ -404,7 +404,7 @@ static size_t copy_page_to_iter_pipe(struct page *page,=
- size_t offset, size_t by
- =09buf->offset =3D offset;
- =09buf->len =3D bytes;
-=20
--=09pipe->head =3D i_head;
-+=09pipe->head =3D i_head + 1;
- =09i->iov_offset =3D offset + bytes;
- =09i->head =3D i_head;
- out:
-
-Attached is a test program that can induce some a bug in
-copy_page_to_iter_pipe() where I forgot to increment the new head when
-assigning it to pipe->head.
-
-David
----
-#define _GNU_SOURCE
-#include <stdio.h>
-#include <stdlib.h>
-#include <unistd.h>
-#include <fcntl.h>
-#include <err.h>
-#include <sys/wait.h>
-
-static char buf[256 * 1024] __attribute__((aligned(512)));
-static char *filename;
-static int pipe_wfd =3D -1;
-
-static void cleanup(void)
-{
-=09close(pipe_wfd);
-}
-
-static void cleanup_child(void)
-{
-=09int w;
-=09wait(&w);
-}
-
-int child(int fd)
-{
-=09ssize_t r;
-
-=09do {
-=09=09r =3D read(fd, buf, 256 * 1024);
-=09=09if (r =3D=3D -1)
-=09=09=09err(1, "read");
-=09} while (r !=3D 0);
-
-=09if (close(fd) =3D=3D -1)
-=09=09err(1, "close");
-
-=09return 0;
-}
-
-int main(int argc, char **argv)
-{
-=09ssize_t n;
-=09loff_t offset;
-=09size_t len;
-=09pid_t pid;
-=09int fd, pfd[2];
-
-=09if (argc !=3D 2) {
-=09=09fprintf(stderr, "Format: %s <file>\n", argv[1]);
-=09=09exit(2);
-=09}
-
-=09filename =3D argv[1];
-
-=09if (pipe(pfd) =3D=3D -1)
-=09=09err(1, "pipe");
-=09pipe_wfd =3D pfd[1];
-
-=09pid =3D fork();
-=09switch (pid) {
-=09case -1:
-=09=09err(1, "fork");
-=09case 0:
-=09=09close(pfd[1]);
-=09=09return child(pfd[0]);
-=09default:
-=09=09close(pfd[0]);
-=09=09atexit(cleanup_child);
-=09=09break;
-=09}
-
-=09fd =3D open(filename, O_RDONLY);
-=09if (fd =3D=3D -1)
-=09=09err(1, "%s", filename);
-
-=09atexit(cleanup);
-
-=09len =3D 256 * 1024;
-=09offset =3D 0;
-=09do {
-=09=09n =3D splice(fd, &offset, pfd[1], NULL, 256 * 1024, 0);
-=09=09if (n =3D=3D -1)
-=09=09=09err(1, "splice");
-=09} while (len -=3D n, len > 0);
-
-=09if (close(pfd[1]) =3D=3D -1)
-=09=09err(1, "close/p");
-=09if (close(fd) =3D=3D -1)
-=09=09err(1, "close/f");
-=09return 0;
-}
-
+Reviewed-by: Jason Gunthorpe <jgg@mellanox.com>
