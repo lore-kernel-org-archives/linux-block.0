@@ -2,225 +2,87 @@ Return-Path: <SRS0=zNjm=ZH=vger.kernel.org=linux-block-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-8.2 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
-	INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,
-	URIBL_BLOCKED,USER_AGENT_SANE_1 autolearn=unavailable autolearn_force=no
-	version=3.4.0
+X-Spam-Status: No, score=-5.2 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
+	MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED,
+	USER_AGENT_SANE_1 autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 4E2C8C432C3
-	for <linux-block@archiver.kernel.org>; Fri, 15 Nov 2019 18:06:35 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 018CCC432C3
+	for <linux-block@archiver.kernel.org>; Fri, 15 Nov 2019 18:32:55 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.kernel.org (Postfix) with ESMTP id 2C8F62073A
-	for <linux-block@archiver.kernel.org>; Fri, 15 Nov 2019 18:06:35 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id CDF5B20730
+	for <linux-block@archiver.kernel.org>; Fri, 15 Nov 2019 18:32:54 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1726323AbfKOSGe (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Fri, 15 Nov 2019 13:06:34 -0500
-Received: from mga05.intel.com ([192.55.52.43]:12098 "EHLO mga05.intel.com"
+        id S1726704AbfKOScy (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Fri, 15 Nov 2019 13:32:54 -0500
+Received: from mail.itouring.de ([188.40.134.68]:43298 "EHLO mail.itouring.de"
         rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-        id S1726131AbfKOSGe (ORCPT <rfc822;linux-block@vger.kernel.org>);
-        Fri, 15 Nov 2019 13:06:34 -0500
-X-Amp-Result: UNKNOWN
-X-Amp-Original-Verdict: FILE UNKNOWN
-X-Amp-File-Uploaded: False
-Received: from fmsmga008.fm.intel.com ([10.253.24.58])
-  by fmsmga105.fm.intel.com with ESMTP/TLS/DHE-RSA-AES256-GCM-SHA384; 15 Nov 2019 10:06:33 -0800
-X-ExtLoop1: 1
-X-IronPort-AV: E=Sophos;i="5.68,309,1569308400"; 
-   d="scan'208";a="203454343"
-Received: from iweiny-desk2.sc.intel.com ([10.3.52.157])
-  by fmsmga008.fm.intel.com with ESMTP; 15 Nov 2019 10:06:32 -0800
-Date:   Fri, 15 Nov 2019 10:06:32 -0800
-From:   Ira Weiny <ira.weiny@intel.com>
-To:     John Hubbard <jhubbard@nvidia.com>
-Cc:     Andrew Morton <akpm@linux-foundation.org>,
-        Al Viro <viro@zeniv.linux.org.uk>,
-        Alex Williamson <alex.williamson@redhat.com>,
-        Benjamin Herrenschmidt <benh@kernel.crashing.org>,
-        =?iso-8859-1?Q?Bj=F6rn_T=F6pel?= <bjorn.topel@intel.com>,
-        Christoph Hellwig <hch@infradead.org>,
-        Dan Williams <dan.j.williams@intel.com>,
-        Daniel Vetter <daniel@ffwll.ch>,
-        Dave Chinner <david@fromorbit.com>,
-        David Airlie <airlied@linux.ie>,
-        "David S . Miller" <davem@davemloft.net>, Jan Kara <jack@suse.cz>,
-        Jason Gunthorpe <jgg@ziepe.ca>, Jens Axboe <axboe@kernel.dk>,
-        Jonathan Corbet <corbet@lwn.net>,
-        =?iso-8859-1?B?Suly9G1l?= Glisse <jglisse@redhat.com>,
-        Magnus Karlsson <magnus.karlsson@intel.com>,
-        Mauro Carvalho Chehab <mchehab@kernel.org>,
-        Michael Ellerman <mpe@ellerman.id.au>,
-        Michal Hocko <mhocko@suse.com>,
-        Mike Kravetz <mike.kravetz@oracle.com>,
-        Paul Mackerras <paulus@samba.org>,
-        Shuah Khan <shuah@kernel.org>,
-        Vlastimil Babka <vbabka@suse.cz>, bpf@vger.kernel.org,
-        dri-devel@lists.freedesktop.org, kvm@vger.kernel.org,
-        linux-block@vger.kernel.org, linux-doc@vger.kernel.org,
-        linux-fsdevel@vger.kernel.org, linux-kselftest@vger.kernel.org,
-        linux-media@vger.kernel.org, linux-rdma@vger.kernel.org,
-        linuxppc-dev@lists.ozlabs.org, netdev@vger.kernel.org,
-        linux-mm@kvack.org, LKML <linux-kernel@vger.kernel.org>
-Subject: Re: [PATCH v5 09/24] vfio, mm: fix get_user_pages_remote() and
- FOLL_LONGTERM
-Message-ID: <20191115180631.GA23832@iweiny-DESK2.sc.intel.com>
-References: <20191115055340.1825745-1-jhubbard@nvidia.com>
- <20191115055340.1825745-10-jhubbard@nvidia.com>
+        id S1726075AbfKOScx (ORCPT <rfc822;linux-block@vger.kernel.org>);
+        Fri, 15 Nov 2019 13:32:53 -0500
+Received: from tux.wizards.de (p5B07EF98.dip0.t-ipconnect.de [91.7.239.152])
+        by mail.itouring.de (Postfix) with ESMTPSA id 52D3B4160141;
+        Fri, 15 Nov 2019 19:32:51 +0100 (CET)
+Received: from [192.168.100.223] (ragnarok.applied-asynchrony.com [192.168.100.223])
+        by tux.wizards.de (Postfix) with ESMTP id D47175F04C2;
+        Fri, 15 Nov 2019 19:32:50 +0100 (CET)
+Subject: Re: [PATCH BUGFIX V2 1/1] block, bfq: deschedule empty bfq_queues not
+ referred by any process
+To:     Paolo Valente <paolo.valente@linaro.org>,
+        Jens Axboe <axboe@kernel.dk>
+Cc:     linux-block@vger.kernel.org, linux-kernel@vger.kernel.org,
+        ulf.hansson@linaro.org, linus.walleij@linaro.org,
+        bfq-iosched@googlegroups.com, oleksandr@natalenko.name,
+        tschubert@bafh.org, patdung100@gmail.com, cevich@redhat.com
+References: <20191114093311.47877-1-paolo.valente@linaro.org>
+ <20191114093311.47877-2-paolo.valente@linaro.org>
+From:   =?UTF-8?Q?Holger_Hoffst=c3=a4tte?= <holger@applied-asynchrony.com>
+Organization: Applied Asynchrony, Inc.
+Message-ID: <89dde326-fc76-10cc-5ec9-ec5fd4dae4ac@applied-asynchrony.com>
+Date:   Fri, 15 Nov 2019 19:32:50 +0100
+User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:60.0) Gecko/20100101
+ Thunderbird/60.9.1
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <20191115055340.1825745-10-jhubbard@nvidia.com>
-User-Agent: Mutt/1.11.1 (2018-12-01)
+In-Reply-To: <20191114093311.47877-2-paolo.valente@linaro.org>
+Content-Type: text/plain; charset=utf-8; format=flowed
+Content-Language: en-US
+Content-Transfer-Encoding: 7bit
 Sender: linux-block-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-On Thu, Nov 14, 2019 at 09:53:25PM -0800, John Hubbard wrote:
-> As it says in the updated comment in gup.c: current FOLL_LONGTERM
-> behavior is incompatible with FAULT_FLAG_ALLOW_RETRY because of the
-> FS DAX check requirement on vmas.
+On 11/14/19 10:33 AM, Paolo Valente wrote:
+> Since commit 3726112ec731 ("block, bfq: re-schedule empty queues if
+> they deserve I/O plugging"), to prevent the service guarantees of a
+> bfq_queue from being violated, the bfq_queue may be left busy, i.e.,
+> scheduled for service, even if empty (see comments in
+> __bfq_bfqq_expire() for details). But, if no process will send
+> requests to the bfq_queue any longer, then there is no point in
+> keeping the bfq_queue scheduled for service.
 > 
-> However, the corresponding restriction in get_user_pages_remote() was
-> slightly stricter than is actually required: it forbade all
-> FOLL_LONGTERM callers, but we can actually allow FOLL_LONGTERM callers
-> that do not set the "locked" arg.
+> In addition, keeping the bfq_queue scheduled for service, but with no
+> process reference any longer, may cause the bfq_queue to be freed when
+> descheduled from service. But this is assumed to never happen, and
+> causes a UAF if it happens. This, in turn, caused crashes [1, 2].
 > 
-> Update the code and comments accordingly, and update the VFIO caller
-> to take advantage of this, fixing a bug as a result: the VFIO caller
-> is logically a FOLL_LONGTERM user.
+> This commit fixes this issue by descheduling an empty bfq_queue when
+> it remains with not process reference.
 > 
-> Also, remove an unnessary pair of calls that were releasing and
-> reacquiring the mmap_sem. There is no need to avoid holding mmap_sem
-> just in order to call page_to_pfn().
+> [1] https://bugzilla.redhat.com/show_bug.cgi?id=1767539
+> [2] https://bugzilla.kernel.org/show_bug.cgi?id=205447
 > 
-> Also, move the DAX check ("if a VMA is DAX, don't allow long term
-> pinning") from the VFIO call site, all the way into the internals
-> of get_user_pages_remote() and __gup_longterm_locked(). That is:
-> get_user_pages_remote() calls __gup_longterm_locked(), which in turn
-> calls check_dax_vmas(). It's lightly explained in the comments as well.
-> 
-> Thanks to Jason Gunthorpe for pointing out a clean way to fix this,
-> and to Dan Williams for helping clarify the DAX refactoring.
-> 
-> Suggested-by: Jason Gunthorpe <jgg@ziepe.ca>
-> Cc: Dan Williams <dan.j.williams@intel.com>
-> Cc: Jerome Glisse <jglisse@redhat.com>
-> Cc: Ira Weiny <ira.weiny@intel.com>
+> Fixes: 3726112ec731 ("block, bfq: re-schedule empty queues if they deserve I/O plugging")
+> Reported-by: Chris Evich <cevich@redhat.com>
+> Reported-by: Patrick Dung <patdung100@gmail.com>
+> Reported-by: Thorsten Schubert <tschubert@bafh.org>
+> Tested-by: Thorsten Schubert <tschubert@bafh.org>
+> Tested-by: Oleksandr Natalenko <oleksandr@natalenko.name>
+> Signed-off-by: Paolo Valente <paolo.valente@linaro.org>
 
-Reviewed-by: Ira Weiny <ira.weiny@intel.com>
+Jens,
 
-> Signed-off-by: John Hubbard <jhubbard@nvidia.com>
-> ---
->  drivers/vfio/vfio_iommu_type1.c | 30 +++++-------------------------
->  mm/gup.c                        | 27 ++++++++++++++++++++++-----
->  2 files changed, 27 insertions(+), 30 deletions(-)
-> 
-> diff --git a/drivers/vfio/vfio_iommu_type1.c b/drivers/vfio/vfio_iommu_type1.c
-> index d864277ea16f..c7a111ad9975 100644
-> --- a/drivers/vfio/vfio_iommu_type1.c
-> +++ b/drivers/vfio/vfio_iommu_type1.c
-> @@ -340,7 +340,6 @@ static int vaddr_get_pfn(struct mm_struct *mm, unsigned long vaddr,
->  {
->  	struct page *page[1];
->  	struct vm_area_struct *vma;
-> -	struct vm_area_struct *vmas[1];
->  	unsigned int flags = 0;
->  	int ret;
->  
-> @@ -348,33 +347,14 @@ static int vaddr_get_pfn(struct mm_struct *mm, unsigned long vaddr,
->  		flags |= FOLL_WRITE;
->  
->  	down_read(&mm->mmap_sem);
-> -	if (mm == current->mm) {
-> -		ret = get_user_pages(vaddr, 1, flags | FOLL_LONGTERM, page,
-> -				     vmas);
-> -	} else {
-> -		ret = get_user_pages_remote(NULL, mm, vaddr, 1, flags, page,
-> -					    vmas, NULL);
-> -		/*
-> -		 * The lifetime of a vaddr_get_pfn() page pin is
-> -		 * userspace-controlled. In the fs-dax case this could
-> -		 * lead to indefinite stalls in filesystem operations.
-> -		 * Disallow attempts to pin fs-dax pages via this
-> -		 * interface.
-> -		 */
-> -		if (ret > 0 && vma_is_fsdax(vmas[0])) {
-> -			ret = -EOPNOTSUPP;
-> -			put_page(page[0]);
-> -		}
-> -	}
-> -	up_read(&mm->mmap_sem);
-> -
-> +	ret = get_user_pages_remote(NULL, mm, vaddr, 1, flags | FOLL_LONGTERM,
-> +				    page, NULL, NULL);
->  	if (ret == 1) {
->  		*pfn = page_to_pfn(page[0]);
-> -		return 0;
-> +		ret = 0;
-> +		goto done;
->  	}
->  
-> -	down_read(&mm->mmap_sem);
-> -
->  	vaddr = untagged_addr(vaddr);
->  
->  	vma = find_vma_intersection(mm, vaddr, vaddr + 1);
-> @@ -384,7 +364,7 @@ static int vaddr_get_pfn(struct mm_struct *mm, unsigned long vaddr,
->  		if (is_invalid_reserved_pfn(*pfn))
->  			ret = 0;
->  	}
-> -
-> +done:
->  	up_read(&mm->mmap_sem);
->  	return ret;
->  }
-> diff --git a/mm/gup.c b/mm/gup.c
-> index b859bd4da4d7..6cf613bfe7dc 100644
-> --- a/mm/gup.c
-> +++ b/mm/gup.c
-> @@ -29,6 +29,13 @@ struct follow_page_context {
->  	unsigned int page_mask;
->  };
->  
-> +static __always_inline long __gup_longterm_locked(struct task_struct *tsk,
-> +						  struct mm_struct *mm,
-> +						  unsigned long start,
-> +						  unsigned long nr_pages,
-> +						  struct page **pages,
-> +						  struct vm_area_struct **vmas,
-> +						  unsigned int flags);
->  /*
->   * Return the compound head page with ref appropriately incremented,
->   * or NULL if that failed.
-> @@ -1167,13 +1174,23 @@ long get_user_pages_remote(struct task_struct *tsk, struct mm_struct *mm,
->  		struct vm_area_struct **vmas, int *locked)
->  {
->  	/*
-> -	 * FIXME: Current FOLL_LONGTERM behavior is incompatible with
-> +	 * Parts of FOLL_LONGTERM behavior are incompatible with
->  	 * FAULT_FLAG_ALLOW_RETRY because of the FS DAX check requirement on
-> -	 * vmas.  As there are no users of this flag in this call we simply
-> -	 * disallow this option for now.
-> +	 * vmas. However, this only comes up if locked is set, and there are
-> +	 * callers that do request FOLL_LONGTERM, but do not set locked. So,
-> +	 * allow what we can.
->  	 */
-> -	if (WARN_ON_ONCE(gup_flags & FOLL_LONGTERM))
-> -		return -EINVAL;
-> +	if (gup_flags & FOLL_LONGTERM) {
-> +		if (WARN_ON_ONCE(locked))
-> +			return -EINVAL;
-> +		/*
-> +		 * This will check the vmas (even if our vmas arg is NULL)
-> +		 * and return -ENOTSUPP if DAX isn't allowed in this case:
-> +		 */
-> +		return __gup_longterm_locked(tsk, mm, start, nr_pages, pages,
-> +					     vmas, gup_flags | FOLL_TOUCH |
-> +					     FOLL_REMOTE);
-> +	}
->  
->  	return __get_user_pages_locked(tsk, mm, start, nr_pages, pages, vmas,
->  				       locked,
-> -- 
-> 2.24.0
-> 
+can you please also tag this for stable-5.3 before the next push?
+The original problem was found on 5.3 after all, and hoping for the
+stable-bot to pick it up automagically is a bit unreliable.
+
+Thanks,
+Holger
