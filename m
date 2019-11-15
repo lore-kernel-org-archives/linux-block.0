@@ -2,69 +2,78 @@ Return-Path: <SRS0=zNjm=ZH=vger.kernel.org=linux-block-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-7.2 required=3.0 tests=DKIM_SIGNED,DKIM_VALID,
-	HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,MENTIONS_GIT_HOSTING,
-	SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED,USER_AGENT_SANE_1 autolearn=ham
-	autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-2.2 required=3.0 tests=DKIM_SIGNED,DKIM_VALID,
+	HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,
+	URIBL_BLOCKED,USER_AGENT_SANE_1 autolearn=no autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 9A745C43215
-	for <linux-block@archiver.kernel.org>; Fri, 15 Nov 2019 19:40:51 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 85C95C43141
+	for <linux-block@archiver.kernel.org>; Fri, 15 Nov 2019 21:16:47 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.kernel.org (Postfix) with ESMTP id 737512073A
-	for <linux-block@archiver.kernel.org>; Fri, 15 Nov 2019 19:40:51 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id 580D020729
+	for <linux-block@archiver.kernel.org>; Fri, 15 Nov 2019 21:16:47 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel-dk.20150623.gappssmtp.com header.i=@kernel-dk.20150623.gappssmtp.com header.b="Y73XatIw"
+	dkim=pass (2048-bit key) header.d=kernel-dk.20150623.gappssmtp.com header.i=@kernel-dk.20150623.gappssmtp.com header.b="zXOoFyHg"
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1726549AbfKOTkv (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Fri, 15 Nov 2019 14:40:51 -0500
-Received: from mail-io1-f67.google.com ([209.85.166.67]:34280 "EHLO
+        id S1726704AbfKOVQq (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Fri, 15 Nov 2019 16:16:46 -0500
+Received: from mail-io1-f67.google.com ([209.85.166.67]:42645 "EHLO
         mail-io1-f67.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1726550AbfKOTku (ORCPT
+        with ESMTP id S1726598AbfKOVQq (ORCPT
         <rfc822;linux-block@vger.kernel.org>);
-        Fri, 15 Nov 2019 14:40:50 -0500
-Received: by mail-io1-f67.google.com with SMTP id q83so11730152iod.1
-        for <linux-block@vger.kernel.org>; Fri, 15 Nov 2019 11:40:49 -0800 (PST)
+        Fri, 15 Nov 2019 16:16:46 -0500
+Received: by mail-io1-f67.google.com with SMTP id k13so11937701ioa.9
+        for <linux-block@vger.kernel.org>; Fri, 15 Nov 2019 13:16:45 -0800 (PST)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=kernel-dk.20150623.gappssmtp.com; s=20150623;
-        h=to:cc:from:subject:message-id:date:user-agent:mime-version
-         :content-language:content-transfer-encoding;
-        bh=KWd4WvqIdKsuAtcf7EW7UDGGZSRzre1Mwnulmg9/DNk=;
-        b=Y73XatIwQh/W/d2aW41Dg2huXRboeVadqyLAEwKcuwVeU9Rx0S7qngTxBPH0XXis03
-         Vm9eHtTJopw/XjxKEsTIC8tYdBDVhhEb7y5Eg+hUi4BjqrPzRbjUUODvmD1RzWN0T2IB
-         ZI7yv7g/zYIfpdMKTPlux19I0EVlbMt6N3tY9DIuUulhBXrLyTSScxhCdzZ+u6Z2roHq
-         Mg82Jfq/mT55plYz/ZUy9rnaIo+07GCC7kCqTpWceTrdJlObWms0AX9zlgtJsXZFVwil
-         leU/F2I7Onxv1Jm+cpKeoDtOwY7ntuLLOs1I7hF56GtaCu+NK1sIolvG2KnpAFkBUOWe
-         aKyA==
+        h=subject:from:to:cc:references:message-id:date:user-agent
+         :mime-version:in-reply-to:content-language:content-transfer-encoding;
+        bh=mJmTC1QtNMiaCcr8D76CJ+X9L2KeTkZm+OBCF6hm9ZM=;
+        b=zXOoFyHgi6U7TPx8HDoeqzaEYSYazoOtsSrRCwEId+0Vyt1VxoIHay1RLm14x7Kuec
+         qKo1S9jYdiL/tfZxgT4hNtXagy+/sg7gbsTDGmJj45jLilIvRQZlFNiJvHkh9+VUSYGX
+         XywLMzi5X+CgctttfSUxhnxA4nuL+tCC6BXdSVbJ4Y6Txe4mx4cWGOKkc7JLjGVtvYC5
+         Iv6l6ALx+zQw1IzWU4Q8WL+xBCtRxfEX5Bnb1S+I2At4wAT+iXiLeh3RRWuayAIlxHWB
+         35hA14dDAKpp+8SSbp5AXvwOhUxnwBAk2LWGlGCtr3AsEi8uHrzEOQ8MVsYTlZdGF458
+         2Eqw==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=1e100.net; s=20161025;
-        h=x-gm-message-state:to:cc:from:subject:message-id:date:user-agent
-         :mime-version:content-language:content-transfer-encoding;
-        bh=KWd4WvqIdKsuAtcf7EW7UDGGZSRzre1Mwnulmg9/DNk=;
-        b=F8kR07Wz7ok/JEWV1HF74zGqVaPv22NEeOE+648XwJgpjus+iKPcdzOXh8z3q7Lsu9
-         otk0dgl66J3GCAG0WWAG59fU2f6KqbvMKe1XCoy7GBjWBPNqYGdx8cDV8djExBjz1nJN
-         wdp68D1n8QsdWdZF2UQQkkKx8lcsCWjRv3dovvcq3ThvfOZ6MuO8DH2rNRhMucBt2X4H
-         qa/Oty7YSBxDDR8TAymPAsKXqc3HrT+gwsRoP39UMoKS0iJ1/xFcK2NoY4b9bV9Wr05b
-         BOKo+NNc722xGmMkX8aDAA+0QdGCh2yZot0C/gbsWxerpcRP321m5R5em1K0EizEu8Nt
-         +90A==
-X-Gm-Message-State: APjAAAUXrS+k4IiNCc0C0gd5+jS6aZiZBkwebXJJxJYXvgqCyWS7IcF0
-        2FPOBMFAiXVvrsGPUACgRJPz9w==
-X-Google-Smtp-Source: APXvYqzx18IX/DyVN6h9/vjvNNa+JaKbDk2F/5LOqHLAdObhk5QnTiJpy0GW6JVUTWLnuPNQ8O/uIQ==
-X-Received: by 2002:a05:6638:a27:: with SMTP id 7mr2168776jao.114.1573846849366;
-        Fri, 15 Nov 2019 11:40:49 -0800 (PST)
+        h=x-gm-message-state:subject:from:to:cc:references:message-id:date
+         :user-agent:mime-version:in-reply-to:content-language
+         :content-transfer-encoding;
+        bh=mJmTC1QtNMiaCcr8D76CJ+X9L2KeTkZm+OBCF6hm9ZM=;
+        b=GxrOk5BgTzac3x9OrENhcC9TfpPTI+p6YMNXt9NEp4zNorXk2XdFGEd97rJtkFCrYR
+         INKBhq1NKGfj0CFdEVKnTaRb4zhPR2wBT/Hhjlju1KBTQzibxoiBvSVbs/oXx77dBoOy
+         Mx+oQxBSH9RXua7kosttQ14nc8czI11yc88Cl0Y6/swJnHwHhP73DHugFOzYr02Fwly/
+         8uXQdOeXKkkfsDcKW7V0Uw1QThG/Z9QdR1mN2IO329UrRtvnZ4q7kfEQiPMclrmulrC/
+         WoynYxRnzcHYHMm529K1YKUT54P+Z6aO9gUeP+4AO70fdIkfB+zzhNmx0X3KsQdaDayR
+         46yA==
+X-Gm-Message-State: APjAAAUCw5432QY2BLg3iskZ9+d2nkiuA9PU/9Lw/mdO6d63IzwpDdtI
+        IZXNE5npRPIVwhOQ9trvE+k9rg==
+X-Google-Smtp-Source: APXvYqysQd6n/HqrBk5Sae6V/L2DWeByT8WfjX3YbOmKoOWkbFWyXNV0gUsyNrFrLwd0uvQQFmlwVw==
+X-Received: by 2002:a5d:9153:: with SMTP id y19mr422748ioq.26.1573852604986;
+        Fri, 15 Nov 2019 13:16:44 -0800 (PST)
 Received: from [192.168.1.159] ([65.144.74.34])
-        by smtp.gmail.com with ESMTPSA id k199sm1827239ilk.20.2019.11.15.11.40.47
+        by smtp.gmail.com with ESMTPSA id d11sm1842228ill.17.2019.11.15.13.16.43
         (version=TLS1_2 cipher=ECDHE-RSA-AES128-GCM-SHA256 bits=128/128);
-        Fri, 15 Nov 2019 11:40:48 -0800 (PST)
-To:     Linus Torvalds <torvalds@linux-foundation.org>
-Cc:     "linux-block@vger.kernel.org" <linux-block@vger.kernel.org>,
-        io-uring@vger.kernel.org
+        Fri, 15 Nov 2019 13:16:43 -0800 (PST)
+Subject: Re: [PATCHSET 0/2] io_uring support for linked timeouts
 From:   Jens Axboe <axboe@kernel.dk>
-Subject: [GIT PULL] Fixes for 5.4-rc8/final
-Message-ID: <749566df-9390-2b57-ca8e-7f3b6493eae8@kernel.dk>
-Date:   Fri, 15 Nov 2019 12:40:46 -0700
+To:     Pavel Begunkov <asml.silence@gmail.com>, io-uring@vger.kernel.org,
+        linux-block@vger.kernel.org
+Cc:     zeba.hrvoje@gmail.com, liuyun01@kylinos.cn
+References: <20191105211130.6130-1-axboe@kernel.dk>
+ <4566889a-7e12-9bfd-b2a1-716d8b934684@gmail.com>
+ <9b6cd06b-cd6c-d7e5-157b-32c1e2e9ceac@kernel.dk>
+ <3c0ef10d-9524-e2e2-abf2-e1b0bcee9223@gmail.com>
+ <178bae7d-3162-7de2-8bb8-037bac70469b@gmail.com>
+ <d0f1065e-f295-6c0d-66cc-a424ec72751b@kernel.dk>
+ <aabbed5f-db68-4a48-1596-28ac4110ce95@gmail.com>
+ <2b35c1a0-69bf-1e50-8bda-2fff73bac8de@kernel.dk>
+Message-ID: <cdba1334-b037-d223-29a6-051bd49fef70@kernel.dk>
+Date:   Fri, 15 Nov 2019 14:16:42 -0700
 User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:60.0) Gecko/20100101
  Thunderbird/60.9.0
 MIME-Version: 1.0
+In-Reply-To: <2b35c1a0-69bf-1e50-8bda-2fff73bac8de@kernel.dk>
 Content-Type: text/plain; charset=utf-8
 Content-Language: en-US
 Content-Transfer-Encoding: 7bit
@@ -73,64 +82,18 @@ Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-Hi Linus,
+On 11/15/19 12:34 PM, Jens Axboe wrote:
+> How about something like this? Should work (and be valid) to have any
+> sequence of timeout links, as long as there's something in front of it.
+> Commit message has more details.
 
-We have a few fixes that should make it into this release. This pull
-request contains:
+Updated below (missed the sqe free), easiest to check out the repo
+here:
 
-- io_uring:
-	- The timeout command assumes sequence == 0 means that we want
-	  one completion, but this kind of overloading is unfortunate as
-	  it prevents users from doing a pure time based wait. Since
-	  this operation was introduced in this cycle, let's correct it
-	  now, while we can. (me)
-	- One-liner to fix an issue with dependent links and fixed
-	  buffer reads. The actual IO completed fine, but the link got
-	  severed since we stored the wrong expected value. (me)
-	- Add TIMEOUT to list of opcodes that don't need a file. (Pavel)
+https://git.kernel.dk/cgit/linux-block/log/?h=for-5.5/io_uring-post
 
-- rsxx missing workqueue destry calls. Old bug. (Chuhong)
-
-- Fix blk-iocost active list check (Jiufei)
-
-- Fix impossible-to-hit overflow merge condition, that still hit some
-  folks very rarely (Junichi)
-
-- Fix bfq hang issue from 5.3. This didn't get marked for stable, but
-  will go into stable post this merge (Paolo)
-
-Please pull!
-
-
-  git://git.kernel.dk/linux-block.git tags/for-linus-20191115
-
-
-----------------------------------------------------------------
-Chuhong Yuan (1):
-      rsxx: add missed destroy_workqueue calls in remove
-
-Jens Axboe (2):
-      io_uring: make timeout sequence == 0 mean no sequence
-      io_uring: ensure registered buffer import returns the IO length
-
-Jiufei Xue (1):
-      iocost: check active_list of all the ancestors in iocg_activate()
-
-Junichi Nomura (1):
-      block: check bi_size overflow before merge
-
-Paolo Valente (1):
-      block, bfq: deschedule empty bfq_queues not referred by any process
-
-Pavel Begunkov (1):
-      io_uring: Fix getting file for timeout
-
- block/bfq-iosched.c       | 32 ++++++++++++++++++++++++++------
- block/bio.c               |  2 +-
- block/blk-iocost.c        |  8 ++++++--
- drivers/block/rsxx/core.c |  2 ++
- fs/io_uring.c             | 32 ++++++++++++++++++++++++--------
- 5 files changed, 59 insertions(+), 17 deletions(-)
+as that will show the couple of prep patches, too. Let me know what
+you think.
 
 -- 
 Jens Axboe
