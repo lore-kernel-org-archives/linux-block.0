@@ -4,51 +4,50 @@ X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 X-Spam-Level: 
 X-Spam-Status: No, score=-10.1 required=3.0 tests=DKIMWL_WL_HIGH,DKIM_SIGNED,
 	DKIM_VALID,DKIM_VALID_AU,INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,
-	SPF_HELO_NONE,SPF_PASS,USER_AGENT_GIT autolearn=unavailable
+	SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED,USER_AGENT_GIT autolearn=ham
 	autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id A7F9DC43215
-	for <linux-block@archiver.kernel.org>; Sat, 16 Nov 2019 15:45:21 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id B83ABC432C3
+	for <linux-block@archiver.kernel.org>; Sat, 16 Nov 2019 15:51:28 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.kernel.org (Postfix) with ESMTP id 7045F2077B
-	for <linux-block@archiver.kernel.org>; Sat, 16 Nov 2019 15:45:21 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id 8CD46214E0
+	for <linux-block@archiver.kernel.org>; Sat, 16 Nov 2019 15:51:28 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=default; t=1573919121;
-	bh=w0/xY84kePr1FeSz8bEq9jbc2HkpuXp4oF3+DxCx8oU=;
+	s=default; t=1573919488;
+	bh=rerAJvjwdtQCiHvZLYvd1cdCUR0ciLOvhCZJulM6qU4=;
 	h=From:To:Cc:Subject:Date:In-Reply-To:References:List-ID:From;
-	b=x28PMdGzoBTsLrNkgsQy8dikZm4pKPiueB5I9u0elcqW6PJucqNKDfVUmiEm6O3so
-	 tpxzO+dfh0XM4hMNnBn5gDZb6Oeq0eA52sciDceGpKIQm6O9WfCpHfCdxYs+F0PU+/
-	 svh/kH5Fi6BF59TkmGwuzNNLxdv1yV0fq2NpBTPk=
+	b=UTZH4UXX4p/5fzgLE6RxPVqCVZaiV4uMvCbQeF17t5fiZ/1GdgaAekGgMscrniNa7
+	 keIIJxrEcqQ4Aj0s0ujXvLgovSHVCOdoDG8LnxTbixZFK6UXef1URTX9hnQviTGyJ0
+	 VtrUup9YF9devUSQjt1pAH4pryFOo3VUQMvvyBLU=
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1728140AbfKPPor (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Sat, 16 Nov 2019 10:44:47 -0500
-Received: from mail.kernel.org ([198.145.29.99]:49870 "EHLO mail.kernel.org"
+        id S1730749AbfKPPv0 (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Sat, 16 Nov 2019 10:51:26 -0500
+Received: from mail.kernel.org ([198.145.29.99]:60030 "EHLO mail.kernel.org"
         rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-        id S1729064AbfKPPor (ORCPT <rfc822;linux-block@vger.kernel.org>);
-        Sat, 16 Nov 2019 10:44:47 -0500
+        id S1730745AbfKPPvZ (ORCPT <rfc822;linux-block@vger.kernel.org>);
+        Sat, 16 Nov 2019 10:51:25 -0500
 Received: from sasha-vm.mshome.net (unknown [50.234.116.4])
         (using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
         (No client certificate requested)
-        by mail.kernel.org (Postfix) with ESMTPSA id C8EF82072D;
-        Sat, 16 Nov 2019 15:44:45 +0000 (UTC)
+        by mail.kernel.org (Postfix) with ESMTPSA id 5205320895;
+        Sat, 16 Nov 2019 15:51:24 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-        s=default; t=1573919086;
-        bh=w0/xY84kePr1FeSz8bEq9jbc2HkpuXp4oF3+DxCx8oU=;
+        s=default; t=1573919484;
+        bh=rerAJvjwdtQCiHvZLYvd1cdCUR0ciLOvhCZJulM6qU4=;
         h=From:To:Cc:Subject:Date:In-Reply-To:References:From;
-        b=rDTTG/aZIq2/5jXH/1DudVwjMVsMUooueRqkQzOkN+sL5hXqZQcx+bjQTmxgj+E7j
-         6xz22EChGC+83GY242U9NdHXRyPvWS/lvASRyko4ff4fTAH8wkoFj4A7GJJXxX5xkg
-         T53KgIDPsNdncgF7UOTvznHWLSR3BoTXMy4pPFC0=
+        b=gIdkv8wvU+EfSfW3k0DWKrXgztvkY6UoTakKAbcNKDWKjehBpy82y853/Shz6YVxf
+         LM5oFbWtO8fpEP7fTDOZf95f65Jr4gzaBjjUhXRVVtEIPb3L5JF1McUka/5V2MYgRE
+         Ot9vXDanPitJYGNOYbqvvbgGDS/e+9t+nK2QzC4M=
 From:   Sasha Levin <sashal@kernel.org>
 To:     linux-kernel@vger.kernel.org, stable@vger.kernel.org
-Cc:     Ming Lei <ming.lei@redhat.com>, Josef Bacik <josef@toxicpanda.com>,
-        Jens Axboe <axboe@kernel.dk>, Sasha Levin <sashal@kernel.org>,
-        linux-block@vger.kernel.org
-Subject: [PATCH AUTOSEL 4.19 148/237] block: call rq_qos_exit() after queue is frozen
-Date:   Sat, 16 Nov 2019 10:39:43 -0500
-Message-Id: <20191116154113.7417-148-sashal@kernel.org>
+Cc:     Omar Sandoval <osandov@fb.com>, Jens Axboe <axboe@kernel.dk>,
+        Sasha Levin <sashal@kernel.org>, linux-block@vger.kernel.org
+Subject: [PATCH AUTOSEL 4.9 15/99] amiflop: clean up on errors during setup
+Date:   Sat, 16 Nov 2019 10:49:38 -0500
+Message-Id: <20191116155103.10971-15-sashal@kernel.org>
 X-Mailer: git-send-email 2.20.1
-In-Reply-To: <20191116154113.7417-1-sashal@kernel.org>
-References: <20191116154113.7417-1-sashal@kernel.org>
+In-Reply-To: <20191116155103.10971-1-sashal@kernel.org>
+References: <20191116155103.10971-1-sashal@kernel.org>
 MIME-Version: 1.0
 X-stable: review
 X-Patchwork-Hint: Ignore
@@ -58,52 +57,148 @@ Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-From: Ming Lei <ming.lei@redhat.com>
+From: Omar Sandoval <osandov@fb.com>
 
-[ Upstream commit c57cdf7a9e51d97a43e29b8f4a04157875104000 ]
+[ Upstream commit 53d0f8dbde89cf6c862c7a62e00c6123e02cba41 ]
 
-rq_qos_exit() removes the current q->rq_qos, this action has to be
-done after queue is frozen, otherwise the IO queue path may never
-be waken up, then IO hang is caused.
+The error handling in fd_probe_drives() doesn't clean up at all. Fix it
+up in preparation for converting to blk-mq. While we're here, get rid of
+the commented out amiga_floppy_remove().
 
-So fixes this issue by moving rq_qos_exit() after queue is frozen.
-
-Cc: Josef Bacik <josef@toxicpanda.com>
-Signed-off-by: Ming Lei <ming.lei@redhat.com>
+Signed-off-by: Omar Sandoval <osandov@fb.com>
 Signed-off-by: Jens Axboe <axboe@kernel.dk>
 Signed-off-by: Sasha Levin <sashal@kernel.org>
 ---
- block/blk-core.c  | 3 +++
- block/blk-sysfs.c | 2 --
- 2 files changed, 3 insertions(+), 2 deletions(-)
+ drivers/block/amiflop.c | 84 ++++++++++++++++++++---------------------
+ 1 file changed, 40 insertions(+), 44 deletions(-)
 
-diff --git a/block/blk-core.c b/block/blk-core.c
-index 074ae9376189b..ea33d6abdcfc9 100644
---- a/block/blk-core.c
-+++ b/block/blk-core.c
-@@ -784,6 +784,9 @@ void blk_cleanup_queue(struct request_queue *q)
- 	 * prevent that q->request_fn() gets invoked after draining finished.
- 	 */
- 	blk_freeze_queue(q);
-+
-+	rq_qos_exit(q);
-+
- 	spin_lock_irq(lock);
- 	queue_flag_set(QUEUE_FLAG_DEAD, q);
- 	spin_unlock_irq(lock);
-diff --git a/block/blk-sysfs.c b/block/blk-sysfs.c
-index bab47a17b96f4..8286640d4d663 100644
---- a/block/blk-sysfs.c
-+++ b/block/blk-sysfs.c
-@@ -997,8 +997,6 @@ void blk_unregister_queue(struct gendisk *disk)
- 	kobject_del(&q->kobj);
- 	blk_trace_remove_sysfs(disk_to_dev(disk));
+diff --git a/drivers/block/amiflop.c b/drivers/block/amiflop.c
+index 5fd50a2841682..db4354fb2a0d3 100644
+--- a/drivers/block/amiflop.c
++++ b/drivers/block/amiflop.c
+@@ -1699,11 +1699,41 @@ static const struct block_device_operations floppy_fops = {
+ 	.check_events	= amiga_check_events,
+ };
  
--	rq_qos_exit(q);
++static struct gendisk *fd_alloc_disk(int drive)
++{
++	struct gendisk *disk;
++
++	disk = alloc_disk(1);
++	if (!disk)
++		goto out;
++
++	disk->queue = blk_init_queue(do_fd_request, &amiflop_lock);
++	if (IS_ERR(disk->queue)) {
++		disk->queue = NULL;
++		goto out_put_disk;
++	}
++
++	unit[drive].trackbuf = kmalloc(FLOPPY_MAX_SECTORS * 512, GFP_KERNEL);
++	if (!unit[drive].trackbuf)
++		goto out_cleanup_queue;
++
++	return disk;
++
++out_cleanup_queue:
++	blk_cleanup_queue(disk->queue);
++	disk->queue = NULL;
++out_put_disk:
++	put_disk(disk);
++out:
++	unit[drive].type->code = FD_NODRIVE;
++	return NULL;
++}
++
+ static int __init fd_probe_drives(void)
+ {
+ 	int drive,drives,nomem;
+ 
+-	printk(KERN_INFO "FD: probing units\nfound ");
++	pr_info("FD: probing units\nfound");
+ 	drives=0;
+ 	nomem=0;
+ 	for(drive=0;drive<FD_MAX_UNITS;drive++) {
+@@ -1711,27 +1741,17 @@ static int __init fd_probe_drives(void)
+ 		fd_probe(drive);
+ 		if (unit[drive].type->code == FD_NODRIVE)
+ 			continue;
+-		disk = alloc_disk(1);
++
++		disk = fd_alloc_disk(drive);
+ 		if (!disk) {
+-			unit[drive].type->code = FD_NODRIVE;
++			pr_cont(" no mem for fd%d", drive);
++			nomem = 1;
+ 			continue;
+ 		}
+ 		unit[drive].gendisk = disk;
 -
- 	mutex_lock(&q->sysfs_lock);
- 	if (q->request_fn || (q->mq_ops && q->elevator))
- 		elv_unregister_queue(q);
+-		disk->queue = blk_init_queue(do_fd_request, &amiflop_lock);
+-		if (!disk->queue) {
+-			unit[drive].type->code = FD_NODRIVE;
+-			continue;
+-		}
+-
+ 		drives++;
+-		if ((unit[drive].trackbuf = kmalloc(FLOPPY_MAX_SECTORS * 512, GFP_KERNEL)) == NULL) {
+-			printk("no mem for ");
+-			unit[drive].type = &drive_types[num_dr_types - 1]; /* FD_NODRIVE */
+-			drives--;
+-			nomem = 1;
+-		}
+-		printk("fd%d ",drive);
++
++		pr_cont(" fd%d",drive);
+ 		disk->major = FLOPPY_MAJOR;
+ 		disk->first_minor = drive;
+ 		disk->fops = &floppy_fops;
+@@ -1742,11 +1762,11 @@ static int __init fd_probe_drives(void)
+ 	}
+ 	if ((drives > 0) || (nomem == 0)) {
+ 		if (drives == 0)
+-			printk("no drives");
+-		printk("\n");
++			pr_cont(" no drives");
++		pr_cont("\n");
+ 		return drives;
+ 	}
+-	printk("\n");
++	pr_cont("\n");
+ 	return -ENOMEM;
+ }
+  
+@@ -1837,30 +1857,6 @@ static int __init amiga_floppy_probe(struct platform_device *pdev)
+ 	return ret;
+ }
+ 
+-#if 0 /* not safe to unload */
+-static int __exit amiga_floppy_remove(struct platform_device *pdev)
+-{
+-	int i;
+-
+-	for( i = 0; i < FD_MAX_UNITS; i++) {
+-		if (unit[i].type->code != FD_NODRIVE) {
+-			struct request_queue *q = unit[i].gendisk->queue;
+-			del_gendisk(unit[i].gendisk);
+-			put_disk(unit[i].gendisk);
+-			kfree(unit[i].trackbuf);
+-			if (q)
+-				blk_cleanup_queue(q);
+-		}
+-	}
+-	blk_unregister_region(MKDEV(FLOPPY_MAJOR, 0), 256);
+-	free_irq(IRQ_AMIGA_CIAA_TB, NULL);
+-	free_irq(IRQ_AMIGA_DSKBLK, NULL);
+-	custom.dmacon = DMAF_DISK; /* disable DMA */
+-	amiga_chip_free(raw_buf);
+-	unregister_blkdev(FLOPPY_MAJOR, "fd");
+-}
+-#endif
+-
+ static struct platform_driver amiga_floppy_driver = {
+ 	.driver   = {
+ 		.name	= "amiga-floppy",
 -- 
 2.20.1
 
