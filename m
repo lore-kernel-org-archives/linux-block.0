@@ -4,49 +4,47 @@ X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 X-Spam-Level: 
 X-Spam-Status: No, score=-10.1 required=3.0 tests=DKIMWL_WL_HIGH,DKIM_SIGNED,
 	DKIM_VALID,DKIM_VALID_AU,INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,
-	SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED,USER_AGENT_GIT autolearn=unavailable
+	SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED,USER_AGENT_GIT autolearn=ham
 	autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 06D57C432C3
-	for <linux-block@archiver.kernel.org>; Sat, 16 Nov 2019 16:09:58 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 28424C432C3
+	for <linux-block@archiver.kernel.org>; Sat, 16 Nov 2019 16:13:54 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.kernel.org (Postfix) with ESMTP id D135E21845
-	for <linux-block@archiver.kernel.org>; Sat, 16 Nov 2019 16:09:57 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id F2A1F214DE
+	for <linux-block@archiver.kernel.org>; Sat, 16 Nov 2019 16:13:53 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=default; t=1573920597;
-	bh=yBjFzhPXopZMDn2CcBcQl8G9pKCxB5RUD8DZ79AQZmM=;
+	s=default; t=1573920834;
+	bh=4qWikL+dgIycA9R60kt5tym208RHB/8vxf181e199fg=;
 	h=From:To:Cc:Subject:Date:In-Reply-To:References:List-ID:From;
-	b=WeVxIi7jJzfQlKE8A3BJ1qstXW6zCjOurxzBScBFsxSpE+xewRHVfnUTtV/IRokHu
-	 8GF5gir4tflHK6PciP/IY8eDSNpoN9WRqDOTkSa6fIIHJRC3ecONbnvBxWuyUqrMLF
-	 7Z4rExMr/lVBEdmfguyrAfB47OFCHXsU4ukdRTro=
+	b=xluW401mUYnS5oIayfxSkCEnha38XXw1i6FHZMPMiTW3bTilYeeRNfj6WH3sh9P0z
+	 3IiQF9tl1nKplBZperR8wZ8Cc1fe923+nQBD0FDDpYl5uu8tp+benAtCXLEu7U+nL8
+	 vjYoLOsg5F5fYsRWrqjvkEV7BG1+XCekvk1ldAuY=
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1730310AbfKPPtY (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Sat, 16 Nov 2019 10:49:24 -0500
-Received: from mail.kernel.org ([198.145.29.99]:56918 "EHLO mail.kernel.org"
+        id S1729158AbfKPQNw (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Sat, 16 Nov 2019 11:13:52 -0500
+Received: from mail.kernel.org ([198.145.29.99]:54804 "EHLO mail.kernel.org"
         rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-        id S1730279AbfKPPtW (ORCPT <rfc822;linux-block@vger.kernel.org>);
-        Sat, 16 Nov 2019 10:49:22 -0500
+        id S1729860AbfKPPr5 (ORCPT <rfc822;linux-block@vger.kernel.org>);
+        Sat, 16 Nov 2019 10:47:57 -0500
 Received: from sasha-vm.mshome.net (unknown [50.234.116.4])
         (using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
         (No client certificate requested)
-        by mail.kernel.org (Postfix) with ESMTPSA id 977EA20857;
-        Sat, 16 Nov 2019 15:49:21 +0000 (UTC)
+        by mail.kernel.org (Postfix) with ESMTPSA id D77FE20815;
+        Sat, 16 Nov 2019 15:47:55 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-        s=default; t=1573919362;
-        bh=yBjFzhPXopZMDn2CcBcQl8G9pKCxB5RUD8DZ79AQZmM=;
+        s=default; t=1573919276;
+        bh=4qWikL+dgIycA9R60kt5tym208RHB/8vxf181e199fg=;
         h=From:To:Cc:Subject:Date:In-Reply-To:References:From;
-        b=AhL3rrtcDktA195x+pyZ0dEFPrIKj5tdFLbqIig0V2ECVwvop+8OetK973Op5XF2W
-         7rkeoSR3glt0rc0uwsS4Uo4ug8zgFDayWfRUJRM8QwGMLgqLnyFlW16rZJDWDhxVhS
-         X2gV+ybgOwQ05E+KpmbOZcYyUJ1KfIF8GRpRjzz8=
+        b=xgn+DCzR2RRJ4hqAzplcfMN9VkhWFdnGyHnCyFGzLafCV+g6z/GG/HVjqu7JCUdRu
+         puu48j/0k42P6jjwAqPxdDTUnE/i0SBD5Oc5Xc29ckuPz6eV9pWhUH8+H4QUfUAcD+
+         sDE97Xmp9yqTG13GT1YuVFWtN4Vf01CuesPtSHAc=
 From:   Sasha Levin <sashal@kernel.org>
 To:     linux-kernel@vger.kernel.org, stable@vger.kernel.org
-Cc:     Jianchao Wang <jianchao.w.wang@oracle.com>,
-        Christoph Hellwig <hch@lst.de>, Ming Lei <ming.lei@redhat.com>,
-        Jens Axboe <axboe@kernel.dk>, Sasha Levin <sashal@kernel.org>,
-        linux-block@vger.kernel.org
-Subject: [PATCH AUTOSEL 4.14 083/150] block: fix the DISCARD request merge
-Date:   Sat, 16 Nov 2019 10:46:21 -0500
-Message-Id: <20191116154729.9573-83-sashal@kernel.org>
+Cc:     Omar Sandoval <osandov@fb.com>, Jens Axboe <axboe@kernel.dk>,
+        Sasha Levin <sashal@kernel.org>, linux-block@vger.kernel.org
+Subject: [PATCH AUTOSEL 4.14 025/150] amiflop: clean up on errors during setup
+Date:   Sat, 16 Nov 2019 10:45:23 -0500
+Message-Id: <20191116154729.9573-25-sashal@kernel.org>
 X-Mailer: git-send-email 2.20.1
 In-Reply-To: <20191116154729.9573-1-sashal@kernel.org>
 References: <20191116154729.9573-1-sashal@kernel.org>
@@ -59,111 +57,148 @@ Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-From: Jianchao Wang <jianchao.w.wang@oracle.com>
+From: Omar Sandoval <osandov@fb.com>
 
-[ Upstream commit 69840466086d2248898020a08dda52732686c4e6 ]
+[ Upstream commit 53d0f8dbde89cf6c862c7a62e00c6123e02cba41 ]
 
-There are two cases when handle DISCARD merge.
-If max_discard_segments == 1, the bios/requests need to be contiguous
-to merge. If max_discard_segments > 1, it takes every bio as a range
-and different range needn't to be contiguous.
+The error handling in fd_probe_drives() doesn't clean up at all. Fix it
+up in preparation for converting to blk-mq. While we're here, get rid of
+the commented out amiga_floppy_remove().
 
-But now, attempt_merge screws this up. It always consider contiguity
-for DISCARD for the case max_discard_segments > 1 and cannot merge
-contiguous DISCARD for the case max_discard_segments == 1, because
-rq_attempt_discard_merge always returns false in this case.
-This patch fixes both of the two cases above.
-
-Reviewed-by: Christoph Hellwig <hch@lst.de>
-Reviewed-by: Ming Lei <ming.lei@redhat.com>
-Signed-off-by: Jianchao Wang <jianchao.w.wang@oracle.com>
+Signed-off-by: Omar Sandoval <osandov@fb.com>
 Signed-off-by: Jens Axboe <axboe@kernel.dk>
 Signed-off-by: Sasha Levin <sashal@kernel.org>
 ---
- block/blk-merge.c | 46 ++++++++++++++++++++++++++++++++++++----------
- 1 file changed, 36 insertions(+), 10 deletions(-)
+ drivers/block/amiflop.c | 84 ++++++++++++++++++++---------------------
+ 1 file changed, 40 insertions(+), 44 deletions(-)
 
-diff --git a/block/blk-merge.c b/block/blk-merge.c
-index 8d60a5bbcef93..94650cdf2924b 100644
---- a/block/blk-merge.c
-+++ b/block/blk-merge.c
-@@ -659,6 +659,31 @@ static void blk_account_io_merge(struct request *req)
- 		part_stat_unlock();
- 	}
- }
-+/*
-+ * Two cases of handling DISCARD merge:
-+ * If max_discard_segments > 1, the driver takes every bio
-+ * as a range and send them to controller together. The ranges
-+ * needn't to be contiguous.
-+ * Otherwise, the bios/requests will be handled as same as
-+ * others which should be contiguous.
-+ */
-+static inline bool blk_discard_mergable(struct request *req)
-+{
-+	if (req_op(req) == REQ_OP_DISCARD &&
-+	    queue_max_discard_segments(req->q) > 1)
-+		return true;
-+	return false;
-+}
-+
-+enum elv_merge blk_try_req_merge(struct request *req, struct request *next)
-+{
-+	if (blk_discard_mergable(req))
-+		return ELEVATOR_DISCARD_MERGE;
-+	else if (blk_rq_pos(req) + blk_rq_sectors(req) == blk_rq_pos(next))
-+		return ELEVATOR_BACK_MERGE;
-+
-+	return ELEVATOR_NO_MERGE;
-+}
+diff --git a/drivers/block/amiflop.c b/drivers/block/amiflop.c
+index 49908c74bfcb0..b0e8d8364876b 100644
+--- a/drivers/block/amiflop.c
++++ b/drivers/block/amiflop.c
+@@ -1699,11 +1699,41 @@ static const struct block_device_operations floppy_fops = {
+ 	.check_events	= amiga_check_events,
+ };
  
- /*
-  * For non-mq, this has to be called with the request spinlock acquired.
-@@ -676,12 +701,6 @@ static struct request *attempt_merge(struct request_queue *q,
- 	if (req_op(req) != req_op(next))
- 		return NULL;
- 
--	/*
--	 * not contiguous
--	 */
--	if (blk_rq_pos(req) + blk_rq_sectors(req) != blk_rq_pos(next))
--		return NULL;
--
- 	if (rq_data_dir(req) != rq_data_dir(next)
- 	    || req->rq_disk != next->rq_disk
- 	    || req_no_special_merge(next))
-@@ -705,11 +724,19 @@ static struct request *attempt_merge(struct request_queue *q,
- 	 * counts here. Handle DISCARDs separately, as they
- 	 * have separate settings.
- 	 */
--	if (req_op(req) == REQ_OP_DISCARD) {
++static struct gendisk *fd_alloc_disk(int drive)
++{
++	struct gendisk *disk;
 +
-+	switch (blk_try_req_merge(req, next)) {
-+	case ELEVATOR_DISCARD_MERGE:
- 		if (!req_attempt_discard_merge(q, req, next))
- 			return NULL;
--	} else if (!ll_merge_requests_fn(q, req, next))
-+		break;
-+	case ELEVATOR_BACK_MERGE:
-+		if (!ll_merge_requests_fn(q, req, next))
-+			return NULL;
-+		break;
-+	default:
- 		return NULL;
++	disk = alloc_disk(1);
++	if (!disk)
++		goto out;
++
++	disk->queue = blk_init_queue(do_fd_request, &amiflop_lock);
++	if (IS_ERR(disk->queue)) {
++		disk->queue = NULL;
++		goto out_put_disk;
 +	}
- 
- 	/*
- 	 * If failfast settings disagree or any of the two is already
-@@ -834,8 +861,7 @@ bool blk_rq_merge_ok(struct request *rq, struct bio *bio)
- 
- enum elv_merge blk_try_merge(struct request *rq, struct bio *bio)
++
++	unit[drive].trackbuf = kmalloc(FLOPPY_MAX_SECTORS * 512, GFP_KERNEL);
++	if (!unit[drive].trackbuf)
++		goto out_cleanup_queue;
++
++	return disk;
++
++out_cleanup_queue:
++	blk_cleanup_queue(disk->queue);
++	disk->queue = NULL;
++out_put_disk:
++	put_disk(disk);
++out:
++	unit[drive].type->code = FD_NODRIVE;
++	return NULL;
++}
++
+ static int __init fd_probe_drives(void)
  {
--	if (req_op(rq) == REQ_OP_DISCARD &&
--	    queue_max_discard_segments(rq->q) > 1)
-+	if (blk_discard_mergable(rq))
- 		return ELEVATOR_DISCARD_MERGE;
- 	else if (blk_rq_pos(rq) + blk_rq_sectors(rq) == bio->bi_iter.bi_sector)
- 		return ELEVATOR_BACK_MERGE;
+ 	int drive,drives,nomem;
+ 
+-	printk(KERN_INFO "FD: probing units\nfound ");
++	pr_info("FD: probing units\nfound");
+ 	drives=0;
+ 	nomem=0;
+ 	for(drive=0;drive<FD_MAX_UNITS;drive++) {
+@@ -1711,27 +1741,17 @@ static int __init fd_probe_drives(void)
+ 		fd_probe(drive);
+ 		if (unit[drive].type->code == FD_NODRIVE)
+ 			continue;
+-		disk = alloc_disk(1);
++
++		disk = fd_alloc_disk(drive);
+ 		if (!disk) {
+-			unit[drive].type->code = FD_NODRIVE;
++			pr_cont(" no mem for fd%d", drive);
++			nomem = 1;
+ 			continue;
+ 		}
+ 		unit[drive].gendisk = disk;
+-
+-		disk->queue = blk_init_queue(do_fd_request, &amiflop_lock);
+-		if (!disk->queue) {
+-			unit[drive].type->code = FD_NODRIVE;
+-			continue;
+-		}
+-
+ 		drives++;
+-		if ((unit[drive].trackbuf = kmalloc(FLOPPY_MAX_SECTORS * 512, GFP_KERNEL)) == NULL) {
+-			printk("no mem for ");
+-			unit[drive].type = &drive_types[num_dr_types - 1]; /* FD_NODRIVE */
+-			drives--;
+-			nomem = 1;
+-		}
+-		printk("fd%d ",drive);
++
++		pr_cont(" fd%d",drive);
+ 		disk->major = FLOPPY_MAJOR;
+ 		disk->first_minor = drive;
+ 		disk->fops = &floppy_fops;
+@@ -1742,11 +1762,11 @@ static int __init fd_probe_drives(void)
+ 	}
+ 	if ((drives > 0) || (nomem == 0)) {
+ 		if (drives == 0)
+-			printk("no drives");
+-		printk("\n");
++			pr_cont(" no drives");
++		pr_cont("\n");
+ 		return drives;
+ 	}
+-	printk("\n");
++	pr_cont("\n");
+ 	return -ENOMEM;
+ }
+  
+@@ -1837,30 +1857,6 @@ static int __init amiga_floppy_probe(struct platform_device *pdev)
+ 	return ret;
+ }
+ 
+-#if 0 /* not safe to unload */
+-static int __exit amiga_floppy_remove(struct platform_device *pdev)
+-{
+-	int i;
+-
+-	for( i = 0; i < FD_MAX_UNITS; i++) {
+-		if (unit[i].type->code != FD_NODRIVE) {
+-			struct request_queue *q = unit[i].gendisk->queue;
+-			del_gendisk(unit[i].gendisk);
+-			put_disk(unit[i].gendisk);
+-			kfree(unit[i].trackbuf);
+-			if (q)
+-				blk_cleanup_queue(q);
+-		}
+-	}
+-	blk_unregister_region(MKDEV(FLOPPY_MAJOR, 0), 256);
+-	free_irq(IRQ_AMIGA_CIAA_TB, NULL);
+-	free_irq(IRQ_AMIGA_DSKBLK, NULL);
+-	custom.dmacon = DMAF_DISK; /* disable DMA */
+-	amiga_chip_free(raw_buf);
+-	unregister_blkdev(FLOPPY_MAJOR, "fd");
+-}
+-#endif
+-
+ static struct platform_driver amiga_floppy_driver = {
+ 	.driver   = {
+ 		.name	= "amiga-floppy",
 -- 
 2.20.1
 
