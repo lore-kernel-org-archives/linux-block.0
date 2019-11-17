@@ -7,52 +7,52 @@ X-Spam-Status: No, score=-2.3 required=3.0 tests=DKIM_SIGNED,DKIM_VALID,
 	SPF_PASS,URIBL_BLOCKED,USER_AGENT_SANE_1 autolearn=no autolearn_force=no
 	version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 6E8D5C432C3
-	for <linux-block@archiver.kernel.org>; Sun, 17 Nov 2019 14:09:17 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id DA993C432C3
+	for <linux-block@archiver.kernel.org>; Sun, 17 Nov 2019 17:53:33 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.kernel.org (Postfix) with ESMTP id 47F4B20718
-	for <linux-block@archiver.kernel.org>; Sun, 17 Nov 2019 14:09:17 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id B5B0C20850
+	for <linux-block@archiver.kernel.org>; Sun, 17 Nov 2019 17:53:33 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="PMy/lc9n"
+	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="Hjl755FV"
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1726037AbfKQOJQ (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Sun, 17 Nov 2019 09:09:16 -0500
-Received: from us-smtp-delivery-1.mimecast.com ([207.211.31.120]:37778 "EHLO
+        id S1726070AbfKQRxc (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Sun, 17 Nov 2019 12:53:32 -0500
+Received: from us-smtp-delivery-1.mimecast.com ([207.211.31.120]:30141 "EHLO
         us-smtp-1.mimecast.com" rhost-flags-OK-OK-OK-FAIL) by vger.kernel.org
-        with ESMTP id S1726069AbfKQOJQ (ORCPT
+        with ESMTP id S1726067AbfKQRxc (ORCPT
         <rfc822;linux-block@vger.kernel.org>);
-        Sun, 17 Nov 2019 09:09:16 -0500
+        Sun, 17 Nov 2019 12:53:32 -0500
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-        s=mimecast20190719; t=1573999755;
+        s=mimecast20190719; t=1574013211;
         h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
          to:to:cc:cc:mime-version:mime-version:content-type:content-type:
          content-transfer-encoding:content-transfer-encoding;
         bh=z3jThtnFHn+u2Zbntihdur7DaqZTHatfWOLXJf5lMaI=;
-        b=PMy/lc9nNKfwbBQZzyvK63d4/gtAhW6ywFRa+XiTulnQKv2qB0vYPc5EVWfYPl3+bqDqX2
-        VBrED3kClSvzIJWR+5UgyB9wJ50iRB03lFKcwjU4+2rnNDToNP5Kxorutdr90KFnHPzPEn
-        FBtg/E1XwJD66BiKqHCKuGM12z+wPyU=
+        b=Hjl755FV3YPhozJVPCoT9QSY2iqbyeZWzfi2wsCI46A4UYNMRvV+DhIZOu+JnO2k9nv+YE
+        6v/3UGgrAEtHEdvEAuEatQXLkrlxNajKqpJskMwn+CoOxkBUlVbrvIPYh6v1c7JxdXkA5Y
+        ZdvGkR20fDM27sCszdZzBZjv3g2FxEs=
 Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
  [209.132.183.4]) (Using TLS) by relay.mimecast.com with ESMTP id
- us-mta-423-6JacbFZ6Mbyq1yJB19xQJA-1; Sun, 17 Nov 2019 09:09:12 -0500
+ us-mta-173-fKrGSsigMlm1CY9tzT5iOA-1; Sun, 17 Nov 2019 12:53:28 -0500
 Received: from smtp.corp.redhat.com (int-mx03.intmail.prod.int.phx2.redhat.com [10.5.11.13])
         (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
         (No client certificate requested)
-        by mimecast-mx01.redhat.com (Postfix) with ESMTPS id E66D31005500;
-        Sun, 17 Nov 2019 14:09:10 +0000 (UTC)
+        by mimecast-mx01.redhat.com (Postfix) with ESMTPS id 615281800D4F;
+        Sun, 17 Nov 2019 17:53:27 +0000 (UTC)
 Received: from localhost (dhcp-12-102.nay.redhat.com [10.66.12.102])
-        by smtp.corp.redhat.com (Postfix) with ESMTP id 5EAF16090B;
-        Sun, 17 Nov 2019 14:09:10 +0000 (UTC)
-Date:   Sun, 17 Nov 2019 22:16:59 +0800
+        by smtp.corp.redhat.com (Postfix) with ESMTP id CBE6D60900;
+        Sun, 17 Nov 2019 17:53:26 +0000 (UTC)
+Date:   Mon, 18 Nov 2019 02:01:15 +0800
 From:   Zorro Lang <zlang@redhat.com>
 To:     linux-block@vger.kernel.org
-Cc:     cgroups@vger.kernel.org, bfoster@vger.kernel.org,
+Cc:     bfoster@redhat.com, cgroups@vger.kernel.org,
         fstests@vger.kernel.org
-Subject: Question about block cgroup for disk partition
-Message-ID: <20191117141658.GP3802@dhcp-12-102.nay.redhat.com>
+Subject: Qestion about block cgroup for disk partition
+Message-ID: <20191117180114.GQ3802@dhcp-12-102.nay.redhat.com>
 MIME-Version: 1.0
 User-Agent: Mutt/1.10.1 (2018-07-13)
 X-Scanned-By: MIMEDefang 2.79 on 10.5.11.13
-X-MC-Unique: 6JacbFZ6Mbyq1yJB19xQJA-1
+X-MC-Unique: fKrGSsigMlm1CY9tzT5iOA-1
 X-Mimecast-Spam-Score: 0
 Content-Type: text/plain; charset=WINDOWS-1252
 Content-Transfer-Encoding: quoted-printable
