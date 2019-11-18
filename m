@@ -2,96 +2,108 @@ Return-Path: <SRS0=eqh8=ZK=vger.kernel.org=linux-block-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-2.2 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
-	MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED,USER_AGENT_SANE_1
-	autolearn=no autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-6.7 required=3.0 tests=DKIM_SIGNED,DKIM_VALID,
+	DKIM_VALID_AU,FREEMAIL_FORGED_FROMDOMAIN,FREEMAIL_FROM,
+	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,
+	SPF_HELO_NONE,SPF_PASS autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 10C07C432C0
-	for <linux-block@archiver.kernel.org>; Mon, 18 Nov 2019 12:02:29 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 7167DC43215
+	for <linux-block@archiver.kernel.org>; Mon, 18 Nov 2019 12:49:58 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.kernel.org (Postfix) with ESMTP id E395620862
-	for <linux-block@archiver.kernel.org>; Mon, 18 Nov 2019 12:02:28 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id 4B50220748
+	for <linux-block@archiver.kernel.org>; Mon, 18 Nov 2019 12:49:58 +0000 (UTC)
+Authentication-Results: mail.kernel.org;
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="JfccVARt"
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1727404AbfKRMC2 (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Mon, 18 Nov 2019 07:02:28 -0500
-Received: from mx2.suse.de ([195.135.220.15]:37408 "EHLO mx1.suse.de"
-        rhost-flags-OK-OK-OK-FAIL) by vger.kernel.org with ESMTP
-        id S1726490AbfKRMBY (ORCPT <rfc822;linux-block@vger.kernel.org>);
-        Mon, 18 Nov 2019 07:01:24 -0500
-X-Virus-Scanned: by amavisd-new at test-mx.suse.de
-Received: from relay2.suse.de (unknown [195.135.220.254])
-        by mx1.suse.de (Postfix) with ESMTP id 8CBC2AFDB;
-        Mon, 18 Nov 2019 12:01:20 +0000 (UTC)
-Received: by quack2.suse.cz (Postfix, from userid 1000)
-        id BE4051E4B05; Mon, 18 Nov 2019 11:16:01 +0100 (CET)
-Date:   Mon, 18 Nov 2019 11:16:01 +0100
-From:   Jan Kara <jack@suse.cz>
-To:     John Hubbard <jhubbard@nvidia.com>
-Cc:     Andrew Morton <akpm@linux-foundation.org>,
-        Al Viro <viro@zeniv.linux.org.uk>,
-        Alex Williamson <alex.williamson@redhat.com>,
-        Benjamin Herrenschmidt <benh@kernel.crashing.org>,
-        =?iso-8859-1?Q?Bj=F6rn_T=F6pel?= <bjorn.topel@intel.com>,
-        Christoph Hellwig <hch@infradead.org>,
-        Dan Williams <dan.j.williams@intel.com>,
-        Daniel Vetter <daniel@ffwll.ch>,
-        Dave Chinner <david@fromorbit.com>,
-        David Airlie <airlied@linux.ie>,
-        "David S . Miller" <davem@davemloft.net>,
-        Ira Weiny <ira.weiny@intel.com>, Jan Kara <jack@suse.cz>,
-        Jason Gunthorpe <jgg@ziepe.ca>, Jens Axboe <axboe@kernel.dk>,
-        Jonathan Corbet <corbet@lwn.net>,
-        =?iso-8859-1?B?Suly9G1l?= Glisse <jglisse@redhat.com>,
-        Magnus Karlsson <magnus.karlsson@intel.com>,
-        Mauro Carvalho Chehab <mchehab@kernel.org>,
-        Michael Ellerman <mpe@ellerman.id.au>,
-        Michal Hocko <mhocko@suse.com>,
-        Mike Kravetz <mike.kravetz@oracle.com>,
-        Paul Mackerras <paulus@samba.org>,
-        Shuah Khan <shuah@kernel.org>,
-        Vlastimil Babka <vbabka@suse.cz>, bpf@vger.kernel.org,
-        dri-devel@lists.freedesktop.org, kvm@vger.kernel.org,
-        linux-block@vger.kernel.org, linux-doc@vger.kernel.org,
-        linux-fsdevel@vger.kernel.org, linux-kselftest@vger.kernel.org,
-        linux-media@vger.kernel.org, linux-rdma@vger.kernel.org,
-        linuxppc-dev@lists.ozlabs.org, netdev@vger.kernel.org,
-        linux-mm@kvack.org, LKML <linux-kernel@vger.kernel.org>,
-        Mike Rapoport <rppt@linux.ibm.com>
-Subject: Re: [PATCH v5 10/24] mm/gup: introduce pin_user_pages*() and FOLL_PIN
-Message-ID: <20191118101601.GF17319@quack2.suse.cz>
-References: <20191115055340.1825745-1-jhubbard@nvidia.com>
- <20191115055340.1825745-11-jhubbard@nvidia.com>
+        id S1726506AbfKRMt5 (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Mon, 18 Nov 2019 07:49:57 -0500
+Received: from mail-wr1-f68.google.com ([209.85.221.68]:33801 "EHLO
+        mail-wr1-f68.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S1726774AbfKRMt4 (ORCPT
+        <rfc822;linux-block@vger.kernel.org>);
+        Mon, 18 Nov 2019 07:49:56 -0500
+Received: by mail-wr1-f68.google.com with SMTP id e6so19347968wrw.1
+        for <linux-block@vger.kernel.org>; Mon, 18 Nov 2019 04:49:55 -0800 (PST)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=gmail.com; s=20161025;
+        h=mime-version:references:in-reply-to:from:date:message-id:subject:to
+         :cc;
+        bh=HzafYSZxnPK6IARPnsA3hMeydxdZ+vWMbZqlbTbu264=;
+        b=JfccVARt1sSwpJGTtDR8EMG4H4J/sFy2OH3nynkFuMHRxl+B/4tBnlPH1t/AFzSMXe
+         Sen39S4GOvg2QYLvVw2MyTOp2DZ1puxe+p6E5NcZNP1Ob/e2t7LTdJtFrgcrhbFPheFI
+         UC2IoNp6MzlGmH26HSM6eVNlbhZN7U86J+KM1iuD3TohtdP3kCBiKL77SGdq7aAFtAjM
+         w26F5x2v+4ZSOA0W9UtRFYezkUk2p5flSGSEsNPd5iEY4f3ifhx4MwkWwwG9hLUOgJy9
+         soFmSksPFEZDHxxqyXtqfUstoHODD+ThInY49iLReF5J8+0AiJXN0JYlshdrqjl7bMze
+         JFoQ==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20161025;
+        h=x-gm-message-state:mime-version:references:in-reply-to:from:date
+         :message-id:subject:to:cc;
+        bh=HzafYSZxnPK6IARPnsA3hMeydxdZ+vWMbZqlbTbu264=;
+        b=OGxlCFNsGu+ZmGi0PORy5R4nNzPqIIjZto68ntMw9YAI+gvXtRAcA+G71QMusDJz4q
+         4V64FzcewUssdb9stm/tTVDWCZrkNuH5WtKO18PNoubbGPlab72hxkOSDs8NQg1gPAB8
+         h9DKM4DwcCXPBcWduZcBOg655Cw6D8VcMRWuJotZZDc393DdmOVM+twem/YFL8x2OHJY
+         3aFmsdG6S4G9BTcUpjo2i1nnjhh+cE4E0ZZFtY+CglS4EEWQi1jX2JMoguNWhBSS1DGw
+         aL1esqitxJRDt21VL1Si8WufHK0/0/5lL4z7wOHNA3R8iBjV/LW01Spy98UQf39aDJ2J
+         j67Q==
+X-Gm-Message-State: APjAAAVmudZmqMTrATDWyTMCA0OKn8HJH0JNjofXpX1c4kCP+RjcQIoR
+        DNn0EeTOyoPlV0yYhzTgC6bjgblxdkG+ZWhMFKa/JkMB
+X-Google-Smtp-Source: APXvYqyPEWCBhJ6YujPNRNnxWClv1u1FteWv8iwzp4+o+/LP1jXVeMYlfUwe8Y64NjPffy6VraPunQNj4d7JF1MKos8=
+X-Received: by 2002:adf:979a:: with SMTP id s26mr30720656wrb.92.1574081394736;
+ Mon, 18 Nov 2019 04:49:54 -0800 (PST)
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <20191115055340.1825745-11-jhubbard@nvidia.com>
-User-Agent: Mutt/1.10.1 (2018-07-13)
+References: <20191118110122.50070-1-bigeasy@linutronix.de>
+In-Reply-To: <20191118110122.50070-1-bigeasy@linutronix.de>
+From:   Ming Lei <tom.leiming@gmail.com>
+Date:   Mon, 18 Nov 2019 20:49:43 +0800
+Message-ID: <CACVXFVO6BA1HDUL=0XZzPVDDg0YYTyKwC1ajcXQ0OjF3VWpuHg@mail.gmail.com>
+Subject: Re: [PATCH] block: Don't disable interrupts in trigger_softirq()
+To:     Sebastian Andrzej Siewior <bigeasy@linutronix.de>
+Cc:     linux-block <linux-block@vger.kernel.org>,
+        Jens Axboe <axboe@kernel.dk>,
+        Thomas Gleixner <tglx@linutronix.de>
+Content-Type: text/plain; charset="UTF-8"
 Sender: linux-block-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-On Thu 14-11-19 21:53:26, John Hubbard wrote:
->  /*
-> - * NOTE on FOLL_LONGTERM:
-> + * FOLL_PIN and FOLL_LONGTERM may be used in various combinations with each
-> + * other. Here is what they mean, and how to use them:
->   *
->   * FOLL_LONGTERM indicates that the page will be held for an indefinite time
-> - * period _often_ under userspace control.  This is contrasted with
-> - * iov_iter_get_pages() where usages which are transient.
-> + * period _often_ under userspace control.  This is in contrast to
-> + * iov_iter_get_pages(), where usages which are transient.
-                          ^^^ when you touch this, please fix also the
-second sentense. It doesn't quite make sense to me... I'd probably write
-there "whose usages are transient" but maybe you can come up with something
-even better.
+On Mon, Nov 18, 2019 at 7:03 PM Sebastian Andrzej Siewior
+<bigeasy@linutronix.de> wrote:
+>
+> trigger_softirq() is always invoked as a SMP-function call which is
+> always invoked with disables interrupts.
+>
+> Don't disable interrupt in trigger_softirq() because interrupts are
+> already disabled.
+>
+> Signed-off-by: Sebastian Andrzej Siewior <bigeasy@linutronix.de>
+> ---
+>  block/blk-softirq.c | 4 ----
+>  1 file changed, 4 deletions(-)
+>
+> diff --git a/block/blk-softirq.c b/block/blk-softirq.c
+> index 457d9ba3eb204..6e7ec87d49faa 100644
+> --- a/block/blk-softirq.c
+> +++ b/block/blk-softirq.c
+> @@ -42,17 +42,13 @@ static __latent_entropy void blk_done_softirq(struct softirq_action *h)
+>  static void trigger_softirq(void *data)
+>  {
+>         struct request *rq = data;
+> -       unsigned long flags;
+>         struct list_head *list;
+>
+> -       local_irq_save(flags);
+>         list = this_cpu_ptr(&blk_cpu_done);
+>         list_add_tail(&rq->ipi_list, list);
+>
+>         if (list->next == &rq->ipi_list)
+>                 raise_softirq_irqoff(BLOCK_SOFTIRQ);
+> -
+> -       local_irq_restore(flags);
+>  }
 
-Otherwise the patch looks good to me so feel free to add:
+Reviewed-by: Ming Lei <ming.lei@redhat.com>
 
-Reviewed-by: Jan Kara <jack@suse.cz>
-
-								Honza
 -- 
-Jan Kara <jack@suse.com>
-SUSE Labs, CR
+Ming Lei
