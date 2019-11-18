@@ -4,27 +4,28 @@ X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 X-Spam-Level: 
 X-Spam-Status: No, score=-8.2 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
 	INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,
-	USER_AGENT_SANE_1 autolearn=unavailable autolearn_force=no version=3.4.0
+	URIBL_BLOCKED,USER_AGENT_SANE_1 autolearn=unavailable autolearn_force=no
+	version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 69C74C33C9C
-	for <linux-block@archiver.kernel.org>; Mon, 18 Nov 2019 12:01:29 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id A667EC432C0
+	for <linux-block@archiver.kernel.org>; Mon, 18 Nov 2019 12:01:48 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.kernel.org (Postfix) with ESMTP id 3A6292084D
-	for <linux-block@archiver.kernel.org>; Mon, 18 Nov 2019 12:01:29 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id 869CB2084D
+	for <linux-block@archiver.kernel.org>; Mon, 18 Nov 2019 12:01:48 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1727171AbfKRMB2 (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Mon, 18 Nov 2019 07:01:28 -0500
-Received: from mx2.suse.de ([195.135.220.15]:37606 "EHLO mx1.suse.de"
-        rhost-flags-OK-OK-OK-FAIL) by vger.kernel.org with ESMTP
-        id S1727073AbfKRMB1 (ORCPT <rfc822;linux-block@vger.kernel.org>);
+        id S1726506AbfKRMB1 (ORCPT <rfc822;linux-block@archiver.kernel.org>);
         Mon, 18 Nov 2019 07:01:27 -0500
+Received: from mx2.suse.de ([195.135.220.15]:37310 "EHLO mx1.suse.de"
+        rhost-flags-OK-OK-OK-FAIL) by vger.kernel.org with ESMTP
+        id S1726518AbfKRMBZ (ORCPT <rfc822;linux-block@vger.kernel.org>);
+        Mon, 18 Nov 2019 07:01:25 -0500
 X-Virus-Scanned: by amavisd-new at test-mx.suse.de
 Received: from relay2.suse.de (unknown [195.135.220.254])
-        by mx1.suse.de (Postfix) with ESMTP id E73AFB071;
+        by mx1.suse.de (Postfix) with ESMTP id 8ECD9AFF6;
         Mon, 18 Nov 2019 12:01:20 +0000 (UTC)
 Received: by quack2.suse.cz (Postfix, from userid 1000)
-        id 8AEB01E4B0D; Mon, 18 Nov 2019 11:34:09 +0100 (CET)
-Date:   Mon, 18 Nov 2019 11:34:09 +0100
+        id CAC881E4AFE; Mon, 18 Nov 2019 10:47:37 +0100 (CET)
+Date:   Mon, 18 Nov 2019 10:47:37 +0100
 From:   Jan Kara <jack@suse.cz>
 To:     John Hubbard <jhubbard@nvidia.com>
 Cc:     Andrew Morton <akpm@linux-foundation.org>,
@@ -56,32 +57,31 @@ Cc:     Andrew Morton <akpm@linux-foundation.org>,
         linux-media@vger.kernel.org, linux-rdma@vger.kernel.org,
         linuxppc-dev@lists.ozlabs.org, netdev@vger.kernel.org,
         linux-mm@kvack.org, LKML <linux-kernel@vger.kernel.org>
-Subject: Re: [PATCH v5 15/24] fs/io_uring: set FOLL_PIN via pin_user_pages()
-Message-ID: <20191118103409.GI17319@quack2.suse.cz>
+Subject: Re: [PATCH v5 06/24] goldish_pipe: rename local pin_user_pages()
+ routine
+Message-ID: <20191118094737.GD17319@quack2.suse.cz>
 References: <20191115055340.1825745-1-jhubbard@nvidia.com>
- <20191115055340.1825745-16-jhubbard@nvidia.com>
+ <20191115055340.1825745-7-jhubbard@nvidia.com>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
+Content-Type: text/plain; charset=iso-8859-1
 Content-Disposition: inline
-In-Reply-To: <20191115055340.1825745-16-jhubbard@nvidia.com>
+Content-Transfer-Encoding: 8bit
+In-Reply-To: <20191115055340.1825745-7-jhubbard@nvidia.com>
 User-Agent: Mutt/1.10.1 (2018-07-13)
 Sender: linux-block-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-On Thu 14-11-19 21:53:31, John Hubbard wrote:
-> Convert fs/io_uring to use the new pin_user_pages() call, which sets
-> FOLL_PIN. Setting FOLL_PIN is now required for code that requires
-> tracking of pinned pages, and therefore for any code that calls
-> put_user_page().
+On Thu 14-11-19 21:53:22, John Hubbard wrote:
+> 1. Avoid naming conflicts: rename local static function from
+> "pin_user_pages()" to "pin_goldfish_pages()".
 > 
-> In partial anticipation of this work, the io_uring code was already
-> calling put_user_page() instead of put_page(). Therefore, in order to
-> convert from the get_user_pages()/put_page() model, to the
-> pin_user_pages()/put_user_page() model, the only change required
-> here is to change get_user_pages() to pin_user_pages().
+> An upcoming patch will introduce a global pin_user_pages()
+> function.
 > 
+> Reviewed-by: Jérôme Glisse <jglisse@redhat.com>
+> Reviewed-by: Ira Weiny <ira.weiny@intel.com>
 > Signed-off-by: John Hubbard <jhubbard@nvidia.com>
 
 Looks good to me. You can add:
@@ -91,22 +91,45 @@ Reviewed-by: Jan Kara <jack@suse.cz>
 								Honza
 
 > ---
->  fs/io_uring.c | 2 +-
->  1 file changed, 1 insertion(+), 1 deletion(-)
+>  drivers/platform/goldfish/goldfish_pipe.c | 18 +++++++++---------
+>  1 file changed, 9 insertions(+), 9 deletions(-)
 > 
-> diff --git a/fs/io_uring.c b/fs/io_uring.c
-> index f9a38998f2fc..cff64bd00db9 100644
-> --- a/fs/io_uring.c
-> +++ b/fs/io_uring.c
-> @@ -3433,7 +3433,7 @@ static int io_sqe_buffer_register(struct io_ring_ctx *ctx, void __user *arg,
+> diff --git a/drivers/platform/goldfish/goldfish_pipe.c b/drivers/platform/goldfish/goldfish_pipe.c
+> index cef0133aa47a..7ed2a21a0bac 100644
+> --- a/drivers/platform/goldfish/goldfish_pipe.c
+> +++ b/drivers/platform/goldfish/goldfish_pipe.c
+> @@ -257,12 +257,12 @@ static int goldfish_pipe_error_convert(int status)
+>  	}
+>  }
 >  
->  		ret = 0;
->  		down_read(&current->mm->mmap_sem);
-> -		pret = get_user_pages(ubuf, nr_pages,
-> +		pret = pin_user_pages(ubuf, nr_pages,
->  				      FOLL_WRITE | FOLL_LONGTERM,
->  				      pages, vmas);
->  		if (pret == nr_pages) {
+> -static int pin_user_pages(unsigned long first_page,
+> -			  unsigned long last_page,
+> -			  unsigned int last_page_size,
+> -			  int is_write,
+> -			  struct page *pages[MAX_BUFFERS_PER_COMMAND],
+> -			  unsigned int *iter_last_page_size)
+> +static int pin_goldfish_pages(unsigned long first_page,
+> +			      unsigned long last_page,
+> +			      unsigned int last_page_size,
+> +			      int is_write,
+> +			      struct page *pages[MAX_BUFFERS_PER_COMMAND],
+> +			      unsigned int *iter_last_page_size)
+>  {
+>  	int ret;
+>  	int requested_pages = ((last_page - first_page) >> PAGE_SHIFT) + 1;
+> @@ -354,9 +354,9 @@ static int transfer_max_buffers(struct goldfish_pipe *pipe,
+>  	if (mutex_lock_interruptible(&pipe->lock))
+>  		return -ERESTARTSYS;
+>  
+> -	pages_count = pin_user_pages(first_page, last_page,
+> -				     last_page_size, is_write,
+> -				     pipe->pages, &iter_last_page_size);
+> +	pages_count = pin_goldfish_pages(first_page, last_page,
+> +					 last_page_size, is_write,
+> +					 pipe->pages, &iter_last_page_size);
+>  	if (pages_count < 0) {
+>  		mutex_unlock(&pipe->lock);
+>  		return pages_count;
 > -- 
 > 2.24.0
 > 
