@@ -2,176 +2,107 @@ Return-Path: <SRS0=eqh8=ZK=vger.kernel.org=linux-block-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-8.2 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
+X-Spam-Status: No, score=-6.7 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
 	INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,
-	URIBL_BLOCKED,USER_AGENT_SANE_1 autolearn=unavailable autolearn_force=no
-	version=3.4.0
+	URIBL_BLOCKED autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 3B508C432C0
-	for <linux-block@archiver.kernel.org>; Mon, 18 Nov 2019 16:28:02 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id A6BEBC432C0
+	for <linux-block@archiver.kernel.org>; Mon, 18 Nov 2019 16:47:51 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.kernel.org (Postfix) with ESMTP id 120AC218AF
-	for <linux-block@archiver.kernel.org>; Mon, 18 Nov 2019 16:28:02 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id 85B502186D
+	for <linux-block@archiver.kernel.org>; Mon, 18 Nov 2019 16:47:51 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1726664AbfKRQ2B (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Mon, 18 Nov 2019 11:28:01 -0500
-Received: from mx0b-001b2d01.pphosted.com ([148.163.158.5]:35668 "EHLO
-        mx0a-001b2d01.pphosted.com" rhost-flags-OK-OK-OK-FAIL)
-        by vger.kernel.org with ESMTP id S1726216AbfKRQ2B (ORCPT
-        <rfc822;linux-block@vger.kernel.org>);
-        Mon, 18 Nov 2019 11:28:01 -0500
-Received: from pps.filterd (m0098413.ppops.net [127.0.0.1])
-        by mx0b-001b2d01.pphosted.com (8.16.0.42/8.16.0.42) with SMTP id xAIGEscb107185
-        for <linux-block@vger.kernel.org>; Mon, 18 Nov 2019 11:27:59 -0500
-Received: from e06smtp05.uk.ibm.com (e06smtp05.uk.ibm.com [195.75.94.101])
-        by mx0b-001b2d01.pphosted.com with ESMTP id 2wayagc1dx-1
-        (version=TLSv1.2 cipher=AES256-GCM-SHA384 bits=256 verify=NOT)
-        for <linux-block@vger.kernel.org>; Mon, 18 Nov 2019 11:27:59 -0500
-Received: from localhost
-        by e06smtp05.uk.ibm.com with IBM ESMTP SMTP Gateway: Authorized Use Only! Violators will be prosecuted
-        for <linux-block@vger.kernel.org> from <srikar@linux.vnet.ibm.com>;
-        Mon, 18 Nov 2019 16:26:42 -0000
-Received: from b06cxnps4075.portsmouth.uk.ibm.com (9.149.109.197)
-        by e06smtp05.uk.ibm.com (192.168.101.135) with IBM ESMTP SMTP Gateway: Authorized Use Only! Violators will be prosecuted;
-        (version=TLSv1/SSLv3 cipher=AES256-GCM-SHA384 bits=256/256)
-        Mon, 18 Nov 2019 16:26:37 -0000
-Received: from d06av24.portsmouth.uk.ibm.com (d06av24.portsmouth.uk.ibm.com [9.149.105.60])
-        by b06cxnps4075.portsmouth.uk.ibm.com (8.14.9/8.14.9/NCO v10.0) with ESMTP id xAIGQaH854001892
-        (version=TLSv1/SSLv3 cipher=DHE-RSA-AES256-GCM-SHA384 bits=256 verify=OK);
-        Mon, 18 Nov 2019 16:26:36 GMT
-Received: from d06av24.portsmouth.uk.ibm.com (unknown [127.0.0.1])
-        by IMSVA (Postfix) with ESMTP id 55DFD4203F;
-        Mon, 18 Nov 2019 16:26:36 +0000 (GMT)
-Received: from d06av24.portsmouth.uk.ibm.com (unknown [127.0.0.1])
-        by IMSVA (Postfix) with ESMTP id E5A2442049;
-        Mon, 18 Nov 2019 16:26:33 +0000 (GMT)
-Received: from linux.vnet.ibm.com (unknown [9.126.150.29])
-        by d06av24.portsmouth.uk.ibm.com (Postfix) with SMTP;
-        Mon, 18 Nov 2019 16:26:33 +0000 (GMT)
-Date:   Mon, 18 Nov 2019 21:56:33 +0530
-From:   Srikar Dronamraju <srikar@linux.vnet.ibm.com>
-To:     Dave Chinner <david@fromorbit.com>
-Cc:     Ming Lei <ming.lei@redhat.com>, linux-block@vger.kernel.org,
-        linux-fsdevel@vger.kernel.org, linux-xfs@vger.kernel.org,
-        linux-kernel@vger.kernel.org, Jeff Moyer <jmoyer@redhat.com>,
-        Dave Chinner <dchinner@redhat.com>,
-        Eric Sandeen <sandeen@redhat.com>,
-        Christoph Hellwig <hch@lst.de>, Jens Axboe <axboe@kernel.dk>,
-        Ingo Molnar <mingo@redhat.com>,
-        Peter Zijlstra <peterz@infradead.org>,
-        Tejun Heo <tj@kernel.org>
-Subject: Re: single aio thread is migrated crazily by scheduler
-Reply-To: Srikar Dronamraju <srikar@linux.vnet.ibm.com>
-References: <20191114113153.GB4213@ming.t460p>
- <20191114235415.GL4614@dread.disaster.area>
- <20191115010824.GC4847@ming.t460p>
- <20191115045634.GN4614@dread.disaster.area>
- <20191115070843.GA24246@ming.t460p>
- <20191115234005.GO4614@dread.disaster.area>
+        id S1726472AbfKRQrv (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Mon, 18 Nov 2019 11:47:51 -0500
+Received: from mga18.intel.com ([134.134.136.126]:35933 "EHLO mga18.intel.com"
+        rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
+        id S1726322AbfKRQru (ORCPT <rfc822;linux-block@vger.kernel.org>);
+        Mon, 18 Nov 2019 11:47:50 -0500
+X-Amp-Result: SKIPPED(no attachment in message)
+X-Amp-File-Uploaded: False
+Received: from orsmga007.jf.intel.com ([10.7.209.58])
+  by orsmga106.jf.intel.com with ESMTP/TLS/DHE-RSA-AES256-GCM-SHA384; 18 Nov 2019 08:47:50 -0800
+X-ExtLoop1: 1
+X-IronPort-AV: E=Sophos;i="5.68,320,1569308400"; 
+   d="scan'208";a="196185270"
+Received: from orsmsx110.amr.corp.intel.com ([10.22.240.8])
+  by orsmga007.jf.intel.com with ESMTP; 18 Nov 2019 08:47:50 -0800
+Received: from orsmsx101.amr.corp.intel.com ([169.254.8.229]) by
+ ORSMSX110.amr.corp.intel.com ([169.254.10.52]) with mapi id 14.03.0439.000;
+ Mon, 18 Nov 2019 08:47:49 -0800
+From:   "Derrick, Jonathan" <jonathan.derrick@intel.com>
+To:     "Rajashekar, Revanth" <revanth.rajashekar@intel.com>,
+        "linux-block@vger.kernel.org" <linux-block@vger.kernel.org>,
+        "axboe@kernel.dk" <axboe@kernel.dk>
+CC:     "sbauer@plzdonthack.me" <sbauer@plzdonthack.me>
+Subject: Re: [PATCH] block: sed-opal: Introduce SUM_SET_LIST parameter and
+ append it using 'add_token_u64'
+Thread-Topic: [PATCH] block: sed-opal: Introduce SUM_SET_LIST parameter and
+ append it using 'add_token_u64'
+Thread-Index: AQHVlomhnY96T2uKoEqQnoL5mXDAqaeLZjCAgAAUmoCABj4EAA==
+Date:   Mon, 18 Nov 2019 16:47:48 +0000
+Message-ID: <0799d4b77fc58ff0be7d403648e25a99a5077bdb.camel@intel.com>
+References: <20191108230904.7932-1-revanth.rajashekar@intel.com>
+         <e1bd6f75-b352-1ff8-af73-1ed9de04cff5@intel.com>
+         <63cfa17b-28df-ac52-30ac-d5d6bd93a116@kernel.dk>
+In-Reply-To: <63cfa17b-28df-ac52-30ac-d5d6bd93a116@kernel.dk>
+Accept-Language: en-US
+Content-Language: en-US
+X-MS-Has-Attach: 
+X-MS-TNEF-Correlator: 
+x-originating-ip: [10.232.115.143]
+Content-Type: text/plain; charset="utf-8"
+Content-ID: <6D5B0DBC53CB854A9D4120AFD27337C9@intel.com>
+Content-Transfer-Encoding: base64
 MIME-Version: 1.0
-Content-Type: text/plain; charset=iso-8859-1
-Content-Disposition: inline
-In-Reply-To: <20191115234005.GO4614@dread.disaster.area>
-User-Agent: Mutt/1.10.1 (2018-07-13)
-X-TM-AS-GCONF: 00
-x-cbid: 19111816-0020-0000-0000-0000038982B7
-X-IBM-AV-DETECTION: SAVI=unused REMOTE=unused XFE=unused
-x-cbparentid: 19111816-0021-0000-0000-000021DFAA93
-Message-Id: <20191118162633.GC32306@linux.vnet.ibm.com>
-X-Proofpoint-Virus-Version: vendor=fsecure engine=2.50.10434:6.0.95,18.0.572
- definitions=2019-11-18_04:2019-11-15,2019-11-18 signatures=0
-X-Proofpoint-Spam-Details: rule=outbound_notspam policy=outbound score=0 phishscore=0 clxscore=1011
- suspectscore=0 priorityscore=1501 malwarescore=0 lowpriorityscore=0
- bulkscore=0 impostorscore=0 spamscore=0 adultscore=0 mlxlogscore=999
- mlxscore=0 classifier=spam adjust=0 reason=mlx scancount=1
- engine=8.12.0-1910280000 definitions=main-1911180147
 Sender: linux-block-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-* Dave Chinner <david@fromorbit.com> [2019-11-16 10:40:05]:
-
-> On Fri, Nov 15, 2019 at 03:08:43PM +0800, Ming Lei wrote:
-> > On Fri, Nov 15, 2019 at 03:56:34PM +1100, Dave Chinner wrote:
-> > > On Fri, Nov 15, 2019 at 09:08:24AM +0800, Ming Lei wrote:
-> > I can reproduce the issue with 4k block size on another RH system, and
-> > the login info of that system has been shared to you in RH BZ.
-> > 
-> > 1)
-> 
-> Almost all the fio task migrations are coming from migration/X
-> kernel threads. i.e it's the scheduler active balancing that is
-> causing the fio thread to bounce around.
-> 
-
-Can we try with the below patch.
-
--- 
-Thanks and Regards
-Srikar Dronamraju
-
---->8-----------------------------8<----------------------------------
-From 9687c1447532558aa564bd2e471b7987d6bda70f Mon Sep 17 00:00:00 2001
-From: Srikar Dronamraju <srikar@linux.vnet.ibm.com>
-Date: Tue, 2 Jul 2019 16:38:29 -0500
-Subject: [PATCH] sched/fair: Avoid active balance on small load imbalance
-
-Skip active load balance when destination CPU is busy and the imbalance
-is small and fix_small_imabalance is unable to calculate minor
-imbalance. Its observed that active load balances can lead to ping-pong
-of tasks between two CPUs.
-
-Signed-off-by: Srikar Dronamraju <srikar@linux.vnet.ibm.com>
----
- kernel/sched/fair.c | 12 +++++++++++-
- 1 file changed, 11 insertions(+), 1 deletion(-)
-
-diff --git a/kernel/sched/fair.c b/kernel/sched/fair.c
-index 3599bdcab395..0db380c8eb6c 100644
---- a/kernel/sched/fair.c
-+++ b/kernel/sched/fair.c
-@@ -7094,6 +7094,7 @@ enum group_type {
- #define LBF_SOME_PINNED	0x08
- #define LBF_NOHZ_STATS	0x10
- #define LBF_NOHZ_AGAIN	0x20
-+#define LBF_SMALL_IMBL	0x40
- 
- struct lb_env {
- 	struct sched_domain	*sd;
-@@ -8386,6 +8387,8 @@ void fix_small_imbalance(struct lb_env *env, struct sd_lb_stats *sds)
- 	/* Move if we gain throughput */
- 	if (capa_move > capa_now)
- 		env->imbalance = busiest->load_per_task;
-+	else if (env->idle == CPU_NOT_IDLE)
-+		env->flags |= LBF_SMALL_IMBL;
- }
- 
- /**
-@@ -8466,7 +8469,7 @@ static inline void calculate_imbalance(struct lb_env *env, struct sd_lb_stats *s
- 	 * moved
- 	 */
- 	if (env->imbalance < busiest->load_per_task)
--		return fix_small_imbalance(env, sds);
-+		fix_small_imbalance(env, sds);
- }
- 
- /******* find_busiest_group() helpers end here *********************/
-@@ -8732,6 +8735,13 @@ static int need_active_balance(struct lb_env *env)
- 	if (voluntary_active_balance(env))
- 		return 1;
- 
-+	/*
-+	 * Destination CPU is not idle and fix_small_imbalance is unable
-+	 * to calculate even minor imbalances, skip active balance.
-+	 */
-+	if (env->flags & LBF_SMALL_IMBL)
-+		return 0;
-+
- 	return unlikely(sd->nr_balance_failed > sd->cache_nice_tries+2);
- }
- 
--- 
-2.18.1
-
-
+T24gVGh1LCAyMDE5LTExLTE0IGF0IDEwOjI4IC0wNzAwLCBKZW5zIEF4Ym9lIHdyb3RlOg0KPiBP
+biAxMS8xNC8xOSA5OjE0IEFNLCBSYWphc2hla2FyLCBSZXZhbnRoIHdyb3RlOg0KPiA+IEhpLA0K
+PiA+IA0KPiA+IE9uIDExLzgvMjAxOSA0OjA5IFBNLCBSZXZhbnRoIFJhamFzaGVrYXIgd3JvdGU6
+DQo+ID4gPiBJbiBmdW5jdGlvbiAnYWN0aXZhdGVfbHNwJywgcmF0aGVyIHRoYW4gaGFyZC1jb2Rp
+bmcgdGhlDQo+ID4gPiBzaG9ydCBhdG9tIGhlYWRlcigweDgzKSwgd2UgbmVlZCB0byBsZXQgdGhl
+IGZ1bmN0aW9uDQo+ID4gPiAnYWRkX3Nob3J0X2F0b21faGVhZGVyJyBhcHBlbmQgdGhlIGhlYWRl
+ciBiYXNlZCBvbiB0aGUNCj4gPiA+IHBhcmFtZXRlciBiZWluZyBhcHBlbmRlZC4NCj4gPiA+IA0K
+PiA+ID4gVGhlIHBhcmFtZXRlIGhhcyBiZWVuIGRlZmluZWQgaW4gU2VjdGlvbiAzLjEuMi4xIG9m
+DQo+ID4gPiBodHRwczovL3RydXN0ZWRjb21wdXRpbmdncm91cC5vcmcvd3AtY29udGVudC91cGxv
+YWRzL1RDR19TdG9yYWdlLU9wYWxfRmVhdHVyZV9TZXRfU2luZ2xlX1VzZXJfTW9kZV92MS0wMF9y
+MS0wMC1GaW5hbC5wZGYNCj4gPiA+IA0KPiA+ID4gU2lnbmVkLW9mZi1ieTogUmV2YW50aCBSYWph
+c2hla2FyIDxyZXZhbnRoLnJhamFzaGVrYXJAaW50ZWwuY29tPg0KPiA+ID4gLS0tDQo+ID4gPiAg
+IGJsb2NrL29wYWxfcHJvdG8uaCB8IDQgKysrKw0KPiA+ID4gICBibG9jay9zZWQtb3BhbC5jICAg
+fCA2ICstLS0tLQ0KPiA+ID4gICAyIGZpbGVzIGNoYW5nZWQsIDUgaW5zZXJ0aW9ucygrKSwgNSBk
+ZWxldGlvbnMoLSkNCj4gPiA+IA0KPiA+ID4gZGlmZiAtLWdpdCBhL2Jsb2NrL29wYWxfcHJvdG8u
+aCBiL2Jsb2NrL29wYWxfcHJvdG8uaA0KPiA+ID4gaW5kZXggNzM2ZTY3YzNlN2M1Li4zMjVjYmJh
+MjQ2NWYgMTAwNjQ0DQo+ID4gPiAtLS0gYS9ibG9jay9vcGFsX3Byb3RvLmgNCj4gPiA+ICsrKyBi
+L2Jsb2NrL29wYWxfcHJvdG8uaA0KPiA+ID4gQEAgLTIwNSw2ICsyMDUsMTAgQEAgZW51bSBvcGFs
+X2xvY2tpbmdzdGF0ZSB7DQo+ID4gPiAgIAlPUEFMX0xPQ0tJTkdfTE9DS0VEID0gMHgwMywNCj4g
+PiA+ICAgfTsNCj4gPiA+ICAgDQo+ID4gPiArZW51bSBvcGFsX3BhcmFtZXRlciB7DQo+ID4gPiAr
+CU9QQUxfU1VNX1NFVF9MSVNUID0gMHgwNjAwMDAsDQo+ID4gPiArfTsNCj4gPiA+ICsNCj4gPiA+
+ICAgLyogUGFja2V0cyBkZXJpdmVkIGZyb206DQo+ID4gPiAgICAqIFRDR19TdG9yYWdlX0FyY2hp
+dGVjdHVyZV9Db3JlX1NwZWNfdjIuMDFfcjEuMDANCj4gPiA+ICAgICogU2VjaW9uOiAzLjIuMyBD
+b21QYWNrZXRzLCBQYWNrZXRzICYgU3VicGFja2V0cw0KPiA+ID4gZGlmZiAtLWdpdCBhL2Jsb2Nr
+L3NlZC1vcGFsLmMgYi9ibG9jay9zZWQtb3BhbC5jDQo+ID4gPiBpbmRleCBiMmNhY2M5ZGRkMTEu
+Ljg4MGNjNTdhNWY2YiAxMDA2NDQNCj4gPiA+IC0tLSBhL2Jsb2NrL3NlZC1vcGFsLmMNCj4gPiA+
+ICsrKyBiL2Jsb2NrL3NlZC1vcGFsLmMNCj4gPiA+IEBAIC0xODg2LDcgKzE4ODYsNiBAQCBzdGF0
+aWMgaW50IGFjdGl2YXRlX2xzcChzdHJ1Y3Qgb3BhbF9kZXYgKmRldiwgdm9pZCAqZGF0YSkNCj4g
+PiA+ICAgew0KPiA+ID4gICAJc3RydWN0IG9wYWxfbHJfYWN0ICpvcGFsX2FjdCA9IGRhdGE7DQo+
+ID4gPiAgIAl1OCB1c2VyX2xyW09QQUxfVUlEX0xFTkdUSF07DQo+ID4gPiAtCXU4IHVpbnRfMyA9
+IDB4ODM7DQo+ID4gPiAgIAlpbnQgZXJyLCBpOw0KPiA+ID4gICANCj4gPiA+ICAgCWVyciA9IGNt
+ZF9zdGFydChkZXYsIG9wYWx1aWRbT1BBTF9MT0NLSU5HU1BfVUlEXSwNCj4gPiA+IEBAIC0xODk5
+LDEwICsxODk4LDcgQEAgc3RhdGljIGludCBhY3RpdmF0ZV9sc3Aoc3RydWN0IG9wYWxfZGV2ICpk
+ZXYsIHZvaWQgKmRhdGEpDQo+ID4gPiAgIAkJCXJldHVybiBlcnI7DQo+ID4gPiAgIA0KPiA+ID4g
+ICAJCWFkZF90b2tlbl91OCgmZXJyLCBkZXYsIE9QQUxfU1RBUlROQU1FKTsNCj4gPiA+IC0JCWFk
+ZF90b2tlbl91OCgmZXJyLCBkZXYsIHVpbnRfMyk7DQo+ID4gPiAtCQlhZGRfdG9rZW5fdTgoJmVy
+ciwgZGV2LCA2KTsNCj4gPiA+IC0JCWFkZF90b2tlbl91OCgmZXJyLCBkZXYsIDApOw0KPiA+ID4g
+LQkJYWRkX3Rva2VuX3U4KCZlcnIsIGRldiwgMCk7DQo+ID4gPiArCQlhZGRfdG9rZW5fdTY0KCZl
+cnIsIGRldiwgT1BBTF9TVU1fU0VUX0xJU1QpOw0KPiA+ID4gICANCj4gPiA+ICAgCQlhZGRfdG9r
+ZW5fdTgoJmVyciwgZGV2LCBPUEFMX1NUQVJUTElTVCk7DQo+ID4gPiAgIAkJYWRkX3Rva2VuX2J5
+dGVzdHJpbmcoJmVyciwgZGV2LCB1c2VyX2xyLCBPUEFMX1VJRF9MRU5HVEgpOw0KPiA+IA0KPiA+
+IEtpbmQgcmVtYWluZGVyIHRvIHJldmlldyB0aGlzIHBhdGNoIGFuZCB0aHJvdyB5b3VyIGNvbW1l
+bnRzIGlmIGFueSA6KQ0KPiANCj4gSSdsbCBiZSBoYXBweSB0byBxdWV1ZSBpdCB1cCBmb3IgNS41
+LCBidXQgU2NvdHQvSm9uYXRoYW4gc2hvdWxkDQo+IHJldmlldy9hY2sgaXQgZmlyc3QuDQo+IA0K
+DQpMb29rcyBsaWtlIGl0IHNob3VsZCB3b3JrIHRoZSBzYW1lDQpSZXZpZXdlZC1ieTogSm9uIERl
+cnJpY2sgPGpvbmF0aGFuLmRlcnJpY2tAaW50ZWwuY29tPg0K
