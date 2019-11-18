@@ -2,89 +2,114 @@ Return-Path: <SRS0=eqh8=ZK=vger.kernel.org=linux-block-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-5.2 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
-	INCLUDES_PATCH,MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED,
+X-Spam-Status: No, score=-8.3 required=3.0 tests=DKIMWL_WL_HIGH,DKIM_SIGNED,
+	DKIM_VALID,DKIM_VALID_AU,HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,
+	MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED,
 	USER_AGENT_SANE_1 autolearn=unavailable autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 4FA40C43141
-	for <linux-block@archiver.kernel.org>; Mon, 18 Nov 2019 07:53:36 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id CA9C4C432C0
+	for <linux-block@archiver.kernel.org>; Mon, 18 Nov 2019 08:39:09 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.kernel.org (Postfix) with ESMTP id 296322073A
-	for <linux-block@archiver.kernel.org>; Mon, 18 Nov 2019 07:53:36 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id A42D22071C
+	for <linux-block@archiver.kernel.org>; Mon, 18 Nov 2019 08:39:09 +0000 (UTC)
+Authentication-Results: mail.kernel.org;
+	dkim=pass (1024-bit key) header.d=ti.com header.i=@ti.com header.b="JQk58HK+"
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1726328AbfKRHxa (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Mon, 18 Nov 2019 02:53:30 -0500
-Received: from mga07.intel.com ([134.134.136.100]:29559 "EHLO mga07.intel.com"
-        rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-        id S1726315AbfKRHxa (ORCPT <rfc822;linux-block@vger.kernel.org>);
-        Mon, 18 Nov 2019 02:53:30 -0500
-X-Amp-Result: SKIPPED(no attachment in message)
-X-Amp-File-Uploaded: False
-Received: from orsmga007.jf.intel.com ([10.7.209.58])
-  by orsmga105.jf.intel.com with ESMTP/TLS/DHE-RSA-AES256-GCM-SHA384; 17 Nov 2019 23:53:28 -0800
-X-ExtLoop1: 1
-X-IronPort-AV: E=Sophos;i="5.68,319,1569308400"; 
-   d="scan'208";a="196047576"
-Received: from rongch2-mobl.ccr.corp.intel.com (HELO [10.255.29.39]) ([10.255.29.39])
-  by orsmga007.jf.intel.com with ESMTP; 17 Nov 2019 23:53:24 -0800
-Subject: Re: [LKP] Re: [pipe] d60337eff1:
- BUG:kernel_NULL_pointer_dereference,address
-To:     David Howells <dhowells@redhat.com>,
-        kernel test robot <lkp@intel.com>
-Cc:     torvalds@linux-foundation.org,
-        Rasmus Villemoes <linux@rasmusvillemoes.dk>,
-        Greg Kroah-Hartman <gregkh@linuxfoundation.org>,
-        Peter Zijlstra <peterz@infradead.org>,
-        nicolas.dichtel@6wind.com, raven@themaw.net,
-        Christian Brauner <christian@brauner.io>,
-        keyrings@vger.kernel.org, linux-usb@vger.kernel.org,
-        linux-block@vger.kernel.org, linux-security-module@vger.kernel.org,
-        linux-fsdevel@vger.kernel.org, linux-api@vger.kernel.org,
-        linux-kernel@vger.kernel.org, lkp@lists.01.org
-References: <9279.1573824532@warthog.procyon.org.uk>
- <20191110031348.GE29418@shao2-debian>
- <6853.1573834946@warthog.procyon.org.uk>
-From:   kernel test robot <rong.a.chen@intel.com>
-Message-ID: <35daca93-ff2b-2c7d-b837-72396ca0677a@intel.com>
-Date:   Mon, 18 Nov 2019 15:53:22 +0800
-User-Agent: Mozilla/5.0 (Windows NT 10.0; WOW64; rv:60.0) Gecko/20100101
- Thunderbird/60.9.1
+        id S1726488AbfKRIjG (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Mon, 18 Nov 2019 03:39:06 -0500
+Received: from fllv0015.ext.ti.com ([198.47.19.141]:47080 "EHLO
+        fllv0015.ext.ti.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S1726371AbfKRIjF (ORCPT
+        <rfc822;linux-block@vger.kernel.org>);
+        Mon, 18 Nov 2019 03:39:05 -0500
+Received: from lelv0265.itg.ti.com ([10.180.67.224])
+        by fllv0015.ext.ti.com (8.15.2/8.15.2) with ESMTP id xAI8cmmB033613;
+        Mon, 18 Nov 2019 02:38:48 -0600
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=ti.com;
+        s=ti-com-17Q1; t=1574066328;
+        bh=2FmC6WnguELH0WljaqAvUXHz4oovTIg5XA3M9m7laOM=;
+        h=Subject:To:CC:References:From:Date:In-Reply-To;
+        b=JQk58HK+KG2z9Y7+qVN3JLPmEHQ+wsw40VdDVyonlPjWTyUovUDwXsKg1NKgobvMG
+         bMeoY97hekPv8YSMIffnOMGmbk6NqrB+OONU9gvN1GMg5ZC4CsTUDHdz3DUrVk3pZ7
+         D8vjzUdjnTP5OwUMqW61010vvke/PcVkUYYejwB8=
+Received: from DFLE102.ent.ti.com (dfle102.ent.ti.com [10.64.6.23])
+        by lelv0265.itg.ti.com (8.15.2/8.15.2) with ESMTPS id xAI8cmZ5055342
+        (version=TLSv1.2 cipher=AES256-GCM-SHA384 bits=256 verify=FAIL);
+        Mon, 18 Nov 2019 02:38:48 -0600
+Received: from DFLE115.ent.ti.com (10.64.6.36) by DFLE102.ent.ti.com
+ (10.64.6.23) with Microsoft SMTP Server (version=TLS1_2,
+ cipher=TLS_ECDHE_RSA_WITH_AES_128_CBC_SHA256_P256) id 15.1.1847.3; Mon, 18
+ Nov 2019 02:38:47 -0600
+Received: from lelv0326.itg.ti.com (10.180.67.84) by DFLE115.ent.ti.com
+ (10.64.6.36) with Microsoft SMTP Server (version=TLS1_2,
+ cipher=TLS_ECDHE_RSA_WITH_AES_128_CBC_SHA256_P256) id 15.1.1847.3 via
+ Frontend Transport; Mon, 18 Nov 2019 02:38:47 -0600
+Received: from [172.24.190.215] (ileax41-snat.itg.ti.com [10.172.224.153])
+        by lelv0326.itg.ti.com (8.15.2/8.15.2) with ESMTP id xAI8ciXl127055;
+        Mon, 18 Nov 2019 02:38:45 -0600
+Subject: Re: [PATCH block/for-next] blk-cgroup: cgroup_rstat_updated()
+ shouldn't be called on cgroup1
+To:     Tejun Heo <tj@kernel.org>, Jens Axboe <axboe@kernel.dk>
+CC:     <cgroups@vger.kernel.org>, <linux-block@vger.kernel.org>,
+        <linux-kernel@vger.kernel.org>, <lizefan@huawei.com>,
+        <hannes@cmpxchg.org>, <kernel-team@fb.com>,
+        Dan Schatzberg <dschatzberg@fb.com>, Daniel Xu <dlxu@fb.com>
+References: <20191107191804.3735303-1-tj@kernel.org>
+ <20191107191804.3735303-6-tj@kernel.org>
+ <cd3ebcee-6819-a09b-aeba-de6817f32cde@ti.com>
+ <20191113163501.GI4163745@devbig004.ftw2.facebook.com>
+ <20191114223128.GM4163745@devbig004.ftw2.facebook.com>
+From:   Faiz Abbas <faiz_abbas@ti.com>
+Message-ID: <6f791736-2728-be53-9544-e0a0f0d09dd0@ti.com>
+Date:   Mon, 18 Nov 2019 14:09:40 +0530
+User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:60.0) Gecko/20100101
+ Thunderbird/60.9.0
 MIME-Version: 1.0
-In-Reply-To: <6853.1573834946@warthog.procyon.org.uk>
-Content-Type: text/plain; charset=utf-8; format=flowed
-Content-Transfer-Encoding: 7bit
+In-Reply-To: <20191114223128.GM4163745@devbig004.ftw2.facebook.com>
+Content-Type: text/plain; charset="utf-8"
 Content-Language: en-US
+Content-Transfer-Encoding: 7bit
+X-EXCLAIMER-MD-CONFIG: e1e8a2fd-e40a-4ac6-ac9b-f7e9cc9ee180
 Sender: linux-block-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-Hi David,
+Hi,
 
-Yes, it can fix the problem.
+On 15/11/19 4:01 AM, Tejun Heo wrote:
+> Currently, cgroup rstat is supported only on cgroup2 hierarchy and
+> rstat functions shouldn't be called on cgroup1 cgroups.  While
+> converting blk-cgroup core statistics to rstat, f73316482977
+> ("blk-cgroup: reimplement basic IO stats using cgroup rstat")
+> accidentally ended up calling cgroup_rstat_updated() on cgroup1
+> cgroups causing crashes.
+> 
+> Longer term, we probably should add cgroup1 support to rstat but for
+> now let's mask the call directly.
+> 
+> Signed-off-by: Tejun Heo <tj@kernel.org>
+> Fixes: f73316482977 ("blk-cgroup: reimplement basic IO stats using cgroup rstat")
+Tested-by: Faiz Abbas <faiz_abbas@ti.com>
+> ---
+>  include/linux/blk-cgroup.h |    3 ++-
+>  1 file changed, 2 insertions(+), 1 deletion(-)
+> 
+> diff --git a/include/linux/blk-cgroup.h b/include/linux/blk-cgroup.h
+> index 48a66738143d..19394c77ed99 100644
+> --- a/include/linux/blk-cgroup.h
+> +++ b/include/linux/blk-cgroup.h
+> @@ -626,7 +626,8 @@ static inline bool blkcg_bio_issue_check(struct request_queue *q,
+>  		bis->cur.ios[rwd]++;
+>  
+>  		u64_stats_update_end(&bis->sync);
+> -		cgroup_rstat_updated(blkg->blkcg->css.cgroup, cpu);
+> +		if (cgroup_subsys_on_dfl(io_cgrp_subsys))
+> +			cgroup_rstat_updated(blkg->blkcg->css.cgroup, cpu);
+>  		put_cpu();
+>  	}
+>  
+> 
 
-Best Regards,
-Rong Chen
-
-On 11/16/2019 12:22 AM, David Howells wrote:
-> Actually, no, this is the fix:
->
-> diff --git a/lib/iov_iter.c b/lib/iov_iter.c
-> index 7006b5b2106d..be2fc5793ddd 100644
-> --- a/lib/iov_iter.c
-> +++ b/lib/iov_iter.c
-> @@ -537,7 +537,7 @@ static size_t push_pipe(struct iov_iter *i, size_t size,
->   		buf->ops = &default_pipe_buf_ops;
->   		buf->page = page;
->   		buf->offset = 0;
-> -		buf->len = max_t(ssize_t, left, PAGE_SIZE);
-> +		buf->len = min_t(ssize_t, left, PAGE_SIZE);
->   		left -= buf->len;
->   		iter_head++;
->   		pipe->head = iter_head;
->
-> David
-> _______________________________________________
-> LKP mailing list -- lkp@lists.01.org
-> To unsubscribe send an email to lkp-leave@lists.01.org
-
+Thanks,
+Faiz
