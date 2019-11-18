@@ -2,99 +2,176 @@ Return-Path: <SRS0=eqh8=ZK=vger.kernel.org=linux-block-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-2.2 required=3.0 tests=DKIM_SIGNED,DKIM_VALID,
-	HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,
-	USER_AGENT_SANE_1 autolearn=no autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-8.2 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
+	INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,
+	URIBL_BLOCKED,USER_AGENT_SANE_1 autolearn=unavailable autolearn_force=no
+	version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id E421EC432C0
-	for <linux-block@archiver.kernel.org>; Mon, 18 Nov 2019 15:41:18 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 3B508C432C0
+	for <linux-block@archiver.kernel.org>; Mon, 18 Nov 2019 16:28:02 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.kernel.org (Postfix) with ESMTP id AC7492195D
-	for <linux-block@archiver.kernel.org>; Mon, 18 Nov 2019 15:41:18 +0000 (UTC)
-Authentication-Results: mail.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel-dk.20150623.gappssmtp.com header.i=@kernel-dk.20150623.gappssmtp.com header.b="JaQ3lkdx"
+	by mail.kernel.org (Postfix) with ESMTP id 120AC218AF
+	for <linux-block@archiver.kernel.org>; Mon, 18 Nov 2019 16:28:02 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1726646AbfKRPlS (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Mon, 18 Nov 2019 10:41:18 -0500
-Received: from mail-io1-f66.google.com ([209.85.166.66]:45861 "EHLO
-        mail-io1-f66.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1726216AbfKRPlS (ORCPT
+        id S1726664AbfKRQ2B (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Mon, 18 Nov 2019 11:28:01 -0500
+Received: from mx0b-001b2d01.pphosted.com ([148.163.158.5]:35668 "EHLO
+        mx0a-001b2d01.pphosted.com" rhost-flags-OK-OK-OK-FAIL)
+        by vger.kernel.org with ESMTP id S1726216AbfKRQ2B (ORCPT
         <rfc822;linux-block@vger.kernel.org>);
-        Mon, 18 Nov 2019 10:41:18 -0500
-Received: by mail-io1-f66.google.com with SMTP id v17so8113374iol.12
-        for <linux-block@vger.kernel.org>; Mon, 18 Nov 2019 07:41:16 -0800 (PST)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=kernel-dk.20150623.gappssmtp.com; s=20150623;
-        h=subject:to:cc:references:from:message-id:date:user-agent
-         :mime-version:in-reply-to:content-language:content-transfer-encoding;
-        bh=LDK9yK9BoIJXiRshGH8S+ARb//vvA/0NHK9tQB/EqPk=;
-        b=JaQ3lkdxJbg8bC1c3jS+KwvIPC4OYHwwfxOOr83yS4U4QDzFNnWNlZ/p8PuJ96np2E
-         fSAKxEDc8Nlw46j0x8sDTkmy8rEIthr/WFem2d8bAl0iNj18msLAPp9+Qqw8SvjrYFOj
-         3EJP2rizmnWjpUQ81QDQLHav2Tp5HVA4u81MwCU4l9mmA08xnqINakg2qQ0Qqif/jPDU
-         cj76eJwfOZnRj3nWeBGiV/PEuiL0fSFQfPs36u/4sn+YKAJg5MIM0MMYKTeugndAPPka
-         ajIMC8PlwEyo22uO2Ji9NNlBpygJnk5UjX4ca26Yx50OfsMWk84dbtjiEcKRS6BQEBNE
-         yt5g==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20161025;
-        h=x-gm-message-state:subject:to:cc:references:from:message-id:date
-         :user-agent:mime-version:in-reply-to:content-language
-         :content-transfer-encoding;
-        bh=LDK9yK9BoIJXiRshGH8S+ARb//vvA/0NHK9tQB/EqPk=;
-        b=D5Nn3kVBSURgsrcK0kHaKBxRCjBxmRl9ogQXdVovOXDW96i2Hfpg9xm+DWbgCrt+Be
-         nfBN8hw9wdsWvBGkGY6DDjCsTKVWRtdKBT6s0UNQNXCoSGQsed90xEGkAHcndXQLKGRg
-         7dQIJOuuICOZORLl8NiA9XrIAaJPRW7vv7AdUsoGRPuKT6Aqd0/es/NMVZjoI10LkOVt
-         /1rzt6FHuExh4E16Mp3meyXWXHbIEcVcIb76CUj9X6NUz7ViggDRQJMwFZwE3Qc4xjja
-         g6Ycwvg8H7O8hKa8gt5C1nIlnlEn5URDwYpywb8xOZrcEqTcfwYA71bUUDKv4uq+iJ92
-         1UHg==
-X-Gm-Message-State: APjAAAXoBz4Dcm+qez6DAd4ZePNZiS4Tj85+zbrN4gqACFIM7ww6IaPr
-        WMH82quN6/HMQxJbbAVHrjLcDg==
-X-Google-Smtp-Source: APXvYqwof3l/MsVfP7ktJ3h+n1HCG5pvVXBQdOFvhVIS26ekBuLo1YKhPDa/JlQ2jH5waDFiOTh3+Q==
-X-Received: by 2002:a6b:c0c7:: with SMTP id q190mr9712406iof.256.1574091676102;
-        Mon, 18 Nov 2019 07:41:16 -0800 (PST)
-Received: from [192.168.1.159] ([65.144.74.34])
-        by smtp.gmail.com with ESMTPSA id u6sm4612045ilm.22.2019.11.18.07.41.14
-        (version=TLS1_2 cipher=ECDHE-RSA-AES128-GCM-SHA256 bits=128/128);
-        Mon, 18 Nov 2019 07:41:15 -0800 (PST)
-Subject: Re: [PATCH block/for-next] blk-cgroup: cgroup_rstat_updated()
- shouldn't be called on cgroup1
-To:     Tejun Heo <tj@kernel.org>
-Cc:     Faiz Abbas <faiz_abbas@ti.com>, cgroups@vger.kernel.org,
-        linux-block@vger.kernel.org, linux-kernel@vger.kernel.org,
-        lizefan@huawei.com, hannes@cmpxchg.org, kernel-team@fb.com,
-        Dan Schatzberg <dschatzberg@fb.com>, Daniel Xu <dlxu@fb.com>
-References: <20191107191804.3735303-1-tj@kernel.org>
- <20191107191804.3735303-6-tj@kernel.org>
- <cd3ebcee-6819-a09b-aeba-de6817f32cde@ti.com>
- <20191113163501.GI4163745@devbig004.ftw2.facebook.com>
- <20191114223128.GM4163745@devbig004.ftw2.facebook.com>
-From:   Jens Axboe <axboe@kernel.dk>
-Message-ID: <091022e8-e6a1-178d-80cd-b2a070d3519f@kernel.dk>
-Date:   Mon, 18 Nov 2019 08:41:14 -0700
-User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:60.0) Gecko/20100101
- Thunderbird/60.9.0
+        Mon, 18 Nov 2019 11:28:01 -0500
+Received: from pps.filterd (m0098413.ppops.net [127.0.0.1])
+        by mx0b-001b2d01.pphosted.com (8.16.0.42/8.16.0.42) with SMTP id xAIGEscb107185
+        for <linux-block@vger.kernel.org>; Mon, 18 Nov 2019 11:27:59 -0500
+Received: from e06smtp05.uk.ibm.com (e06smtp05.uk.ibm.com [195.75.94.101])
+        by mx0b-001b2d01.pphosted.com with ESMTP id 2wayagc1dx-1
+        (version=TLSv1.2 cipher=AES256-GCM-SHA384 bits=256 verify=NOT)
+        for <linux-block@vger.kernel.org>; Mon, 18 Nov 2019 11:27:59 -0500
+Received: from localhost
+        by e06smtp05.uk.ibm.com with IBM ESMTP SMTP Gateway: Authorized Use Only! Violators will be prosecuted
+        for <linux-block@vger.kernel.org> from <srikar@linux.vnet.ibm.com>;
+        Mon, 18 Nov 2019 16:26:42 -0000
+Received: from b06cxnps4075.portsmouth.uk.ibm.com (9.149.109.197)
+        by e06smtp05.uk.ibm.com (192.168.101.135) with IBM ESMTP SMTP Gateway: Authorized Use Only! Violators will be prosecuted;
+        (version=TLSv1/SSLv3 cipher=AES256-GCM-SHA384 bits=256/256)
+        Mon, 18 Nov 2019 16:26:37 -0000
+Received: from d06av24.portsmouth.uk.ibm.com (d06av24.portsmouth.uk.ibm.com [9.149.105.60])
+        by b06cxnps4075.portsmouth.uk.ibm.com (8.14.9/8.14.9/NCO v10.0) with ESMTP id xAIGQaH854001892
+        (version=TLSv1/SSLv3 cipher=DHE-RSA-AES256-GCM-SHA384 bits=256 verify=OK);
+        Mon, 18 Nov 2019 16:26:36 GMT
+Received: from d06av24.portsmouth.uk.ibm.com (unknown [127.0.0.1])
+        by IMSVA (Postfix) with ESMTP id 55DFD4203F;
+        Mon, 18 Nov 2019 16:26:36 +0000 (GMT)
+Received: from d06av24.portsmouth.uk.ibm.com (unknown [127.0.0.1])
+        by IMSVA (Postfix) with ESMTP id E5A2442049;
+        Mon, 18 Nov 2019 16:26:33 +0000 (GMT)
+Received: from linux.vnet.ibm.com (unknown [9.126.150.29])
+        by d06av24.portsmouth.uk.ibm.com (Postfix) with SMTP;
+        Mon, 18 Nov 2019 16:26:33 +0000 (GMT)
+Date:   Mon, 18 Nov 2019 21:56:33 +0530
+From:   Srikar Dronamraju <srikar@linux.vnet.ibm.com>
+To:     Dave Chinner <david@fromorbit.com>
+Cc:     Ming Lei <ming.lei@redhat.com>, linux-block@vger.kernel.org,
+        linux-fsdevel@vger.kernel.org, linux-xfs@vger.kernel.org,
+        linux-kernel@vger.kernel.org, Jeff Moyer <jmoyer@redhat.com>,
+        Dave Chinner <dchinner@redhat.com>,
+        Eric Sandeen <sandeen@redhat.com>,
+        Christoph Hellwig <hch@lst.de>, Jens Axboe <axboe@kernel.dk>,
+        Ingo Molnar <mingo@redhat.com>,
+        Peter Zijlstra <peterz@infradead.org>,
+        Tejun Heo <tj@kernel.org>
+Subject: Re: single aio thread is migrated crazily by scheduler
+Reply-To: Srikar Dronamraju <srikar@linux.vnet.ibm.com>
+References: <20191114113153.GB4213@ming.t460p>
+ <20191114235415.GL4614@dread.disaster.area>
+ <20191115010824.GC4847@ming.t460p>
+ <20191115045634.GN4614@dread.disaster.area>
+ <20191115070843.GA24246@ming.t460p>
+ <20191115234005.GO4614@dread.disaster.area>
 MIME-Version: 1.0
-In-Reply-To: <20191114223128.GM4163745@devbig004.ftw2.facebook.com>
-Content-Type: text/plain; charset=utf-8
-Content-Language: en-US
-Content-Transfer-Encoding: 7bit
+Content-Type: text/plain; charset=iso-8859-1
+Content-Disposition: inline
+In-Reply-To: <20191115234005.GO4614@dread.disaster.area>
+User-Agent: Mutt/1.10.1 (2018-07-13)
+X-TM-AS-GCONF: 00
+x-cbid: 19111816-0020-0000-0000-0000038982B7
+X-IBM-AV-DETECTION: SAVI=unused REMOTE=unused XFE=unused
+x-cbparentid: 19111816-0021-0000-0000-000021DFAA93
+Message-Id: <20191118162633.GC32306@linux.vnet.ibm.com>
+X-Proofpoint-Virus-Version: vendor=fsecure engine=2.50.10434:6.0.95,18.0.572
+ definitions=2019-11-18_04:2019-11-15,2019-11-18 signatures=0
+X-Proofpoint-Spam-Details: rule=outbound_notspam policy=outbound score=0 phishscore=0 clxscore=1011
+ suspectscore=0 priorityscore=1501 malwarescore=0 lowpriorityscore=0
+ bulkscore=0 impostorscore=0 spamscore=0 adultscore=0 mlxlogscore=999
+ mlxscore=0 classifier=spam adjust=0 reason=mlx scancount=1
+ engine=8.12.0-1910280000 definitions=main-1911180147
 Sender: linux-block-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-On 11/14/19 3:31 PM, Tejun Heo wrote:
-> Currently, cgroup rstat is supported only on cgroup2 hierarchy and
-> rstat functions shouldn't be called on cgroup1 cgroups.  While
-> converting blk-cgroup core statistics to rstat, f73316482977
-> ("blk-cgroup: reimplement basic IO stats using cgroup rstat")
-> accidentally ended up calling cgroup_rstat_updated() on cgroup1
-> cgroups causing crashes.
-> 
-> Longer term, we probably should add cgroup1 support to rstat but for
-> now let's mask the call directly.
+* Dave Chinner <david@fromorbit.com> [2019-11-16 10:40:05]:
 
-Applied, thanks.
+> On Fri, Nov 15, 2019 at 03:08:43PM +0800, Ming Lei wrote:
+> > On Fri, Nov 15, 2019 at 03:56:34PM +1100, Dave Chinner wrote:
+> > > On Fri, Nov 15, 2019 at 09:08:24AM +0800, Ming Lei wrote:
+> > I can reproduce the issue with 4k block size on another RH system, and
+> > the login info of that system has been shared to you in RH BZ.
+> > 
+> > 1)
+> 
+> Almost all the fio task migrations are coming from migration/X
+> kernel threads. i.e it's the scheduler active balancing that is
+> causing the fio thread to bounce around.
+> 
+
+Can we try with the below patch.
 
 -- 
-Jens Axboe
+Thanks and Regards
+Srikar Dronamraju
+
+--->8-----------------------------8<----------------------------------
+From 9687c1447532558aa564bd2e471b7987d6bda70f Mon Sep 17 00:00:00 2001
+From: Srikar Dronamraju <srikar@linux.vnet.ibm.com>
+Date: Tue, 2 Jul 2019 16:38:29 -0500
+Subject: [PATCH] sched/fair: Avoid active balance on small load imbalance
+
+Skip active load balance when destination CPU is busy and the imbalance
+is small and fix_small_imabalance is unable to calculate minor
+imbalance. Its observed that active load balances can lead to ping-pong
+of tasks between two CPUs.
+
+Signed-off-by: Srikar Dronamraju <srikar@linux.vnet.ibm.com>
+---
+ kernel/sched/fair.c | 12 +++++++++++-
+ 1 file changed, 11 insertions(+), 1 deletion(-)
+
+diff --git a/kernel/sched/fair.c b/kernel/sched/fair.c
+index 3599bdcab395..0db380c8eb6c 100644
+--- a/kernel/sched/fair.c
++++ b/kernel/sched/fair.c
+@@ -7094,6 +7094,7 @@ enum group_type {
+ #define LBF_SOME_PINNED	0x08
+ #define LBF_NOHZ_STATS	0x10
+ #define LBF_NOHZ_AGAIN	0x20
++#define LBF_SMALL_IMBL	0x40
+ 
+ struct lb_env {
+ 	struct sched_domain	*sd;
+@@ -8386,6 +8387,8 @@ void fix_small_imbalance(struct lb_env *env, struct sd_lb_stats *sds)
+ 	/* Move if we gain throughput */
+ 	if (capa_move > capa_now)
+ 		env->imbalance = busiest->load_per_task;
++	else if (env->idle == CPU_NOT_IDLE)
++		env->flags |= LBF_SMALL_IMBL;
+ }
+ 
+ /**
+@@ -8466,7 +8469,7 @@ static inline void calculate_imbalance(struct lb_env *env, struct sd_lb_stats *s
+ 	 * moved
+ 	 */
+ 	if (env->imbalance < busiest->load_per_task)
+-		return fix_small_imbalance(env, sds);
++		fix_small_imbalance(env, sds);
+ }
+ 
+ /******* find_busiest_group() helpers end here *********************/
+@@ -8732,6 +8735,13 @@ static int need_active_balance(struct lb_env *env)
+ 	if (voluntary_active_balance(env))
+ 		return 1;
+ 
++	/*
++	 * Destination CPU is not idle and fix_small_imbalance is unable
++	 * to calculate even minor imbalances, skip active balance.
++	 */
++	if (env->flags & LBF_SMALL_IMBL)
++		return 0;
++
+ 	return unlikely(sd->nr_balance_failed > sd->cache_nice_tries+2);
+ }
+ 
+-- 
+2.18.1
+
 
