@@ -4,27 +4,27 @@ X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 X-Spam-Level: 
 X-Spam-Status: No, score=-8.2 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
 	INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,
-	URIBL_BLOCKED,USER_AGENT_SANE_1 autolearn=ham autolearn_force=no version=3.4.0
+	USER_AGENT_SANE_1 autolearn=unavailable autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 04314C432C0
-	for <linux-block@archiver.kernel.org>; Mon, 18 Nov 2019 11:58:46 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 69C74C33C9C
+	for <linux-block@archiver.kernel.org>; Mon, 18 Nov 2019 12:01:29 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.kernel.org (Postfix) with ESMTP id CD50220862
-	for <linux-block@archiver.kernel.org>; Mon, 18 Nov 2019 11:58:45 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id 3A6292084D
+	for <linux-block@archiver.kernel.org>; Mon, 18 Nov 2019 12:01:29 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1726956AbfKRL6o (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Mon, 18 Nov 2019 06:58:44 -0500
-Received: from mx2.suse.de ([195.135.220.15]:36158 "EHLO mx1.suse.de"
+        id S1727171AbfKRMB2 (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Mon, 18 Nov 2019 07:01:28 -0500
+Received: from mx2.suse.de ([195.135.220.15]:37606 "EHLO mx1.suse.de"
         rhost-flags-OK-OK-OK-FAIL) by vger.kernel.org with ESMTP
-        id S1726506AbfKRL6m (ORCPT <rfc822;linux-block@vger.kernel.org>);
-        Mon, 18 Nov 2019 06:58:42 -0500
+        id S1727073AbfKRMB1 (ORCPT <rfc822;linux-block@vger.kernel.org>);
+        Mon, 18 Nov 2019 07:01:27 -0500
 X-Virus-Scanned: by amavisd-new at test-mx.suse.de
 Received: from relay2.suse.de (unknown [195.135.220.254])
-        by mx1.suse.de (Postfix) with ESMTP id 67C34AE68;
-        Mon, 18 Nov 2019 11:58:37 +0000 (UTC)
+        by mx1.suse.de (Postfix) with ESMTP id E73AFB071;
+        Mon, 18 Nov 2019 12:01:20 +0000 (UTC)
 Received: by quack2.suse.cz (Postfix, from userid 1000)
-        id 912131E4B0C; Mon, 18 Nov 2019 12:58:29 +0100 (CET)
-Date:   Mon, 18 Nov 2019 12:58:29 +0100
+        id 8AEB01E4B0D; Mon, 18 Nov 2019 11:34:09 +0100 (CET)
+Date:   Mon, 18 Nov 2019 11:34:09 +0100
 From:   Jan Kara <jack@suse.cz>
 To:     John Hubbard <jhubbard@nvidia.com>
 Cc:     Andrew Morton <akpm@linux-foundation.org>,
@@ -56,148 +56,60 @@ Cc:     Andrew Morton <akpm@linux-foundation.org>,
         linux-media@vger.kernel.org, linux-rdma@vger.kernel.org,
         linuxppc-dev@lists.ozlabs.org, netdev@vger.kernel.org,
         linux-mm@kvack.org, LKML <linux-kernel@vger.kernel.org>
-Subject: Re: [PATCH v5 17/24] mm/gup: track FOLL_PIN pages
-Message-ID: <20191118115829.GJ17319@quack2.suse.cz>
+Subject: Re: [PATCH v5 15/24] fs/io_uring: set FOLL_PIN via pin_user_pages()
+Message-ID: <20191118103409.GI17319@quack2.suse.cz>
 References: <20191115055340.1825745-1-jhubbard@nvidia.com>
- <20191115055340.1825745-18-jhubbard@nvidia.com>
+ <20191115055340.1825745-16-jhubbard@nvidia.com>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=iso-8859-1
+Content-Type: text/plain; charset=us-ascii
 Content-Disposition: inline
-Content-Transfer-Encoding: 8bit
-In-Reply-To: <20191115055340.1825745-18-jhubbard@nvidia.com>
+In-Reply-To: <20191115055340.1825745-16-jhubbard@nvidia.com>
 User-Agent: Mutt/1.10.1 (2018-07-13)
 Sender: linux-block-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-On Thu 14-11-19 21:53:33, John Hubbard wrote:
-> Add tracking of pages that were pinned via FOLL_PIN.
+On Thu 14-11-19 21:53:31, John Hubbard wrote:
+> Convert fs/io_uring to use the new pin_user_pages() call, which sets
+> FOLL_PIN. Setting FOLL_PIN is now required for code that requires
+> tracking of pinned pages, and therefore for any code that calls
+> put_user_page().
 > 
-> As mentioned in the FOLL_PIN documentation, callers who effectively set
-> FOLL_PIN are required to ultimately free such pages via put_user_page().
-> The effect is similar to FOLL_GET, and may be thought of as "FOLL_GET
-> for DIO and/or RDMA use".
+> In partial anticipation of this work, the io_uring code was already
+> calling put_user_page() instead of put_page(). Therefore, in order to
+> convert from the get_user_pages()/put_page() model, to the
+> pin_user_pages()/put_user_page() model, the only change required
+> here is to change get_user_pages() to pin_user_pages().
 > 
-> Pages that have been pinned via FOLL_PIN are identifiable via a
-> new function call:
-> 
->    bool page_dma_pinned(struct page *page);
-> 
-> What to do in response to encountering such a page, is left to later
-> patchsets. There is discussion about this in [1].
-						^^ missing this reference
-in the changelog...
-
-> This also changes a BUG_ON(), to a WARN_ON(), in follow_page_mask().
-> 
-> Suggested-by: Jan Kara <jack@suse.cz>
-> Suggested-by: Jérôme Glisse <jglisse@redhat.com>
 > Signed-off-by: John Hubbard <jhubbard@nvidia.com>
-> ---
-> diff --git a/include/linux/mm.h b/include/linux/mm.h
-> index 6588d2e02628..db872766480f 100644
-> --- a/include/linux/mm.h
-> +++ b/include/linux/mm.h
-> @@ -1054,6 +1054,8 @@ static inline __must_check bool try_get_page(struct page *page)
->  	return true;
->  }
->  
-> +__must_check bool user_page_ref_inc(struct page *page);
-> +
->  static inline void put_page(struct page *page)
->  {
->  	page = compound_head(page);
-> @@ -1071,29 +1073,70 @@ static inline void put_page(struct page *page)
->  		__put_page(page);
->  }
->  
-> -/**
-> - * put_user_page() - release a gup-pinned page
-> - * @page:            pointer to page to be released
-> +/*
-> + * GUP_PIN_COUNTING_BIAS, and the associated functions that use it, overload
-> + * the page's refcount so that two separate items are tracked: the original page
-> + * reference count, and also a new count of how many get_user_pages() calls were
-							^^ pin_user_pages()
 
-> + * made against the page. ("gup-pinned" is another term for the latter).
-> + *
-> + * With this scheme, get_user_pages() becomes special: such pages are marked
-			^^^ pin_user_pages()
+Looks good to me. You can add:
 
-> + * as distinct from normal pages. As such, the put_user_page() call (and its
-> + * variants) must be used in order to release gup-pinned pages.
-> + *
-> + * Choice of value:
->   *
-> - * Pages that were pinned via pin_user_pages*() must be released via either
-> - * put_user_page(), or one of the put_user_pages*() routines. This is so that
-> - * eventually such pages can be separately tracked and uniquely handled. In
-> - * particular, interactions with RDMA and filesystems need special handling.
-> + * By making GUP_PIN_COUNTING_BIAS a power of two, debugging of page reference
-> + * counts with respect to get_user_pages() and put_user_page() becomes simpler,
-				^^^ pin_user_pages()
-
-> + * due to the fact that adding an even power of two to the page refcount has
-> + * the effect of using only the upper N bits, for the code that counts up using
-> + * the bias value. This means that the lower bits are left for the exclusive
-> + * use of the original code that increments and decrements by one (or at least,
-> + * by much smaller values than the bias value).
->   *
-> - * put_user_page() and put_page() are not interchangeable, despite this early
-> - * implementation that makes them look the same. put_user_page() calls must
-> - * be perfectly matched up with pin*() calls.
-> + * Of course, once the lower bits overflow into the upper bits (and this is
-> + * OK, because subtraction recovers the original values), then visual inspection
-> + * no longer suffices to directly view the separate counts. However, for normal
-> + * applications that don't have huge page reference counts, this won't be an
-> + * issue.
-> + *
-> + * Locking: the lockless algorithm described in page_cache_get_speculative()
-> + * and page_cache_gup_pin_speculative() provides safe operation for
-> + * get_user_pages and page_mkclean and other calls that race to set up page
-> + * table entries.
->   */
-...
-> @@ -2070,9 +2191,16 @@ static int gup_hugepte(pte_t *ptep, unsigned long sz, unsigned long addr,
->  	page = head + ((addr & (sz-1)) >> PAGE_SHIFT);
->  	refs = __record_subpages(page, addr, end, pages + *nr);
->  
-> -	head = try_get_compound_head(head, refs);
-> -	if (!head)
-> -		return 0;
-> +	if (flags & FOLL_PIN) {
-> +		head = page;
-> +		if (unlikely(!user_page_ref_inc(head)))
-> +			return 0;
-> +		head = page;
-
-Why do you assign 'head' twice? Also the refcounting logic is repeated
-several times so perhaps you can factor it out in to a helper function or
-even move it to __record_subpages()?
-
-> +	} else {
-> +		head = try_get_compound_head(head, refs);
-> +		if (!head)
-> +			return 0;
-> +	}
->  
->  	if (unlikely(pte_val(pte) != pte_val(*ptep))) {
->  		put_compound_head(head, refs);
-
-So this will do the wrong thing for FOLL_PIN. We took just one "pin"
-reference there but here we'll release 'refs' normal references AFAICT.
-Also the fact that you take just one pin reference for each huge page
-substantially changes how GUP refcounting works in the huge page case.
-Currently, FOLL_GET users can be completely agnostic of huge pages. So you
-can e.g. GUP whole 2 MB page, submit it as 2 different bios and then
-drop page references from each bio completion function. With your new
-FOLL_PIN behavior you cannot do that and I believe it will be a problem for
-some users. So I think you have to maintain the behavior that you increase
-the head->_refcount by (refs * GUP_PIN_COUNTING_BIAS) here.
+Reviewed-by: Jan Kara <jack@suse.cz>
 
 								Honza
+
+> ---
+>  fs/io_uring.c | 2 +-
+>  1 file changed, 1 insertion(+), 1 deletion(-)
+> 
+> diff --git a/fs/io_uring.c b/fs/io_uring.c
+> index f9a38998f2fc..cff64bd00db9 100644
+> --- a/fs/io_uring.c
+> +++ b/fs/io_uring.c
+> @@ -3433,7 +3433,7 @@ static int io_sqe_buffer_register(struct io_ring_ctx *ctx, void __user *arg,
+>  
+>  		ret = 0;
+>  		down_read(&current->mm->mmap_sem);
+> -		pret = get_user_pages(ubuf, nr_pages,
+> +		pret = pin_user_pages(ubuf, nr_pages,
+>  				      FOLL_WRITE | FOLL_LONGTERM,
+>  				      pages, vmas);
+>  		if (pret == nr_pages) {
+> -- 
+> 2.24.0
+> 
 -- 
 Jan Kara <jack@suse.com>
 SUSE Labs, CR
