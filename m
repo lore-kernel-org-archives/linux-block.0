@@ -2,93 +2,97 @@ Return-Path: <SRS0=5EpG=ZL=vger.kernel.org=linux-block-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-3.8 required=3.0 tests=DKIM_SIGNED,DKIM_VALID,
-	HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,
-	SPF_PASS,URIBL_BLOCKED autolearn=no autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-8.3 required=3.0 tests=DKIM_SIGNED,DKIM_VALID,
+	DKIM_VALID_AU,HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,
+	SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED,USER_AGENT_SANE_1
+	autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 21811C432C0
-	for <linux-block@archiver.kernel.org>; Tue, 19 Nov 2019 16:17:03 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id E3924C432C0
+	for <linux-block@archiver.kernel.org>; Tue, 19 Nov 2019 16:22:57 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.kernel.org (Postfix) with ESMTP id E0D4C22363
-	for <linux-block@archiver.kernel.org>; Tue, 19 Nov 2019 16:17:02 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id AE4B5222A2
+	for <linux-block@archiver.kernel.org>; Tue, 19 Nov 2019 16:22:57 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=pass (2048-bit key) header.d=toxicpanda-com.20150623.gappssmtp.com header.i=@toxicpanda-com.20150623.gappssmtp.com header.b="EEDZ6kzK"
+	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="EXxnPZO+"
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1727728AbfKSQRC (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Tue, 19 Nov 2019 11:17:02 -0500
-Received: from mail-qk1-f169.google.com ([209.85.222.169]:35513 "EHLO
-        mail-qk1-f169.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1727509AbfKSQRC (ORCPT
+        id S1726307AbfKSQW5 (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Tue, 19 Nov 2019 11:22:57 -0500
+Received: from us-smtp-delivery-1.mimecast.com ([205.139.110.120]:31651 "EHLO
+        us-smtp-1.mimecast.com" rhost-flags-OK-OK-OK-FAIL) by vger.kernel.org
+        with ESMTP id S1727560AbfKSQW5 (ORCPT
         <rfc822;linux-block@vger.kernel.org>);
-        Tue, 19 Nov 2019 11:17:02 -0500
-Received: by mail-qk1-f169.google.com with SMTP id i19so18317386qki.2
-        for <linux-block@vger.kernel.org>; Tue, 19 Nov 2019 08:17:01 -0800 (PST)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=toxicpanda-com.20150623.gappssmtp.com; s=20150623;
-        h=date:from:to:cc:subject:message-id:references:mime-version
-         :content-disposition:in-reply-to;
-        bh=ZqRLNz3QoP7lC3GoX4dGbpM/0X+BMWIWcZVOVY7dcIU=;
-        b=EEDZ6kzKJxHxR0jYrvurpFG7/VtWy3lmas2bKyDXg0ZIHpu7ZvgPRmxgNIdJ5Trl8o
-         2i+mkawUu3GG/1fSr9nzBfLa1IwyzlN5vbaTmoKGke3iU9oK6RwfGr4wkUK2CcZ4XRS4
-         T8m6NFVGWYmHUhSii2nMalguQ49rr8DmBIkT46n//mCXFsljMqZhQqpPqcvsVRXp5ZR8
-         j3Yz/HgyL4AScR2b/nyEyR8AHVMVBqeRo3TLRgbr+kXQezQzjhiWi7JePw3i6rj+I7Kk
-         fXVbFKoYoCJ9W+vXBQuspHHAYavKVmMHwyEXIdioL2V4cpezvpipuNysIJNNSxebF/rO
-         m8VA==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20161025;
-        h=x-gm-message-state:date:from:to:cc:subject:message-id:references
-         :mime-version:content-disposition:in-reply-to;
-        bh=ZqRLNz3QoP7lC3GoX4dGbpM/0X+BMWIWcZVOVY7dcIU=;
-        b=p7YDZc/lXubiQcwMTGLPhUcy9apijtQOOnxzAo97RxGwZHxmoyKBkYlnEMXA5R/GE6
-         fetjTFogwnerZerI6cx5OMA7cQjolLhRy8ukmRhemqE+iBJN6rhlYcPWSm18dBq7BeHi
-         y3uP/eCaxL9eNicrSQM9EqVMo/+cZAr47ywLiQpq2SEXjDfIuiYl6OXjNqSOOHob072z
-         forATtRliUKnxyiVIE+mZpG5RDkrw0v0MPbe1xZL/ufR6wiev/iamvbkjTmpTLnKcAqH
-         maY8dm0zKDmZZoYMKknWK+imJjIF0FHVKoXrUk2Y7Pypi9mSM5j6u4aTF8h+UvUKzYd9
-         yyqA==
-X-Gm-Message-State: APjAAAVBxo/+AvOX5+/7gfyMhGtzt4vI6gnZM5yhNkviD9bAoJs5OH0I
-        TfQ//jeeG6mrGGIaSgwWv5tHZBXab3tXqA==
-X-Google-Smtp-Source: APXvYqw4sM1JFEaj5qBtyeVFL3GFBIz1nwvBoJWPMV830wZLNSSNqslB0uqWWe1hYNiEkrIrWvyc7Q==
-X-Received: by 2002:a37:a70b:: with SMTP id q11mr30591722qke.350.1574180221163;
-        Tue, 19 Nov 2019 08:17:01 -0800 (PST)
-Received: from localhost ([2620:10d:c091:480::61cf])
-        by smtp.gmail.com with ESMTPSA id b3sm9769407qkl.88.2019.11.19.08.16.59
-        (version=TLS1_2 cipher=ECDHE-RSA-AES128-GCM-SHA256 bits=128/128);
-        Tue, 19 Nov 2019 08:17:00 -0800 (PST)
-Date:   Tue, 19 Nov 2019 11:16:58 -0500
-From:   Josef Bacik <josef@toxicpanda.com>
-To:     Jens Axboe <axboe@kernel.dk>
-Cc:     Sun Ke <sunke32@huawei.com>, josef@toxicpanda.com,
-        linux-block@vger.kernel.org, nbd@other.debian.org,
-        linux-kernel@vger.kernel.org, Mike Christie <mchristi@redhat.com>
+        Tue, 19 Nov 2019 11:22:57 -0500
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+        s=mimecast20190719; t=1574180576;
+        h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+         to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+         content-transfer-encoding:content-transfer-encoding:
+         in-reply-to:in-reply-to:references:references;
+        bh=9dqMi9w8FGMz0iOTrsEVSdaPR96qMxP3SmDt20AyNaA=;
+        b=EXxnPZO+cqwXfOTi8x4YTOh51cAIl4M/wZQgecK7fuUoTN0sEu/A6rH2RQY0C3MJTMJ8tm
+        xoz0VaMXYwWODOqqzpSk/HUGrWeaElv6YHGbaa2nhduvyy881/9Q1nQ7y50SOxvjTqG8Ex
+        D80Q6wqRSuMEKOgDnBw1KCL3duNKbwY=
+Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
+ [209.132.183.4]) (Using TLS) by relay.mimecast.com with ESMTP id
+ us-mta-168-UanJR99WNNSuLTN67p4xeQ-1; Tue, 19 Nov 2019 11:22:54 -0500
+Received: from smtp.corp.redhat.com (int-mx04.intmail.prod.int.phx2.redhat.com [10.5.11.14])
+        (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
+        (No client certificate requested)
+        by mimecast-mx01.redhat.com (Postfix) with ESMTPS id 1E3338018A1;
+        Tue, 19 Nov 2019 16:22:53 +0000 (UTC)
+Received: from [10.10.121.199] (ovpn-121-199.rdu2.redhat.com [10.10.121.199])
+        by smtp.corp.redhat.com (Postfix) with ESMTP id 361F55E243;
+        Tue, 19 Nov 2019 16:22:52 +0000 (UTC)
 Subject: Re: [v2] nbd:fix memory leak in nbd_get_socket()
-Message-ID: <20191119161658.mmifoeplc5vsdt64@macbook-pro-91.dhcp.thefacebook.com>
+To:     Sun Ke <sunke32@huawei.com>, josef@toxicpanda.com, axboe@kernel.dk,
+        linux-block@vger.kernel.org, nbd@other.debian.org,
+        linux-kernel@vger.kernel.org
 References: <1574143751-138680-1-git-send-email-sunke32@huawei.com>
- <d68d17be-0c4e-1286-4327-0e3ba6600eca@kernel.dk>
+Cc:     stable@vger.kernel.org
+From:   Mike Christie <mchristi@redhat.com>
+Message-ID: <5DD416DB.1040302@redhat.com>
+Date:   Tue, 19 Nov 2019 10:22:51 -0600
+User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:38.0) Gecko/20100101
+ Thunderbird/38.6.0
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <d68d17be-0c4e-1286-4327-0e3ba6600eca@kernel.dk>
+In-Reply-To: <1574143751-138680-1-git-send-email-sunke32@huawei.com>
+X-Scanned-By: MIMEDefang 2.79 on 10.5.11.14
+X-MC-Unique: UanJR99WNNSuLTN67p4xeQ-1
+X-Mimecast-Spam-Score: 0
+Content-Type: text/plain; charset=WINDOWS-1252
+Content-Transfer-Encoding: quoted-printable
 Sender: linux-block-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-On Tue, Nov 19, 2019 at 09:13:34AM -0700, Jens Axboe wrote:
-> On 11/18/19 11:09 PM, Sun Ke wrote:
-> > Before return NULL,put the sock first.
-> > 
-> > Cc: stable@vger.kernel.org
-> > Fixes: cf1b2326b734 ("nbd: verify socket is supported during setup")
-> > Signed-off-by: Sun Ke <sunke32@huawei.com>
-> 
-> Please always CC the author of the patch you're fixing.
-> 
-> Mike, Josef - we probably need to get this upstream ASAP.
+On 11/19/2019 12:09 AM, Sun Ke wrote:
+> Before return NULL,put the sock first.
+>=20
+> Cc: stable@vger.kernel.org
+> Fixes: cf1b2326b734 ("nbd: verify socket is supported during setup")
+> Signed-off-by: Sun Ke <sunke32@huawei.com>
+> ---
+> v2: add cc:stable tag
+> ---
+>  drivers/block/nbd.c | 1 +
+>  1 file changed, 1 insertion(+)
+>=20
+> diff --git a/drivers/block/nbd.c b/drivers/block/nbd.c
+> index a94ee45..19e7599 100644
+> --- a/drivers/block/nbd.c
+> +++ b/drivers/block/nbd.c
+> @@ -993,6 +993,7 @@ static struct socket *nbd_get_socket(struct nbd_devic=
+e *nbd, unsigned long fd,
+>  =09if (sock->ops->shutdown =3D=3D sock_no_shutdown) {
+>  =09=09dev_err(disk_to_dev(nbd->disk), "Unsupported socket: shutdown call=
+out must be supported.\n");
+>  =09=09*err =3D -EINVAL;
+> +=09=09sockfd_put(sock);
+>  =09=09return NULL;
+>  =09}
+> =20
+>=20
 
-Yup sorry got distracted,
+Reviewed-by: Mike Christie <mchristi@redhat.com>
 
-Reviewed-by: Josef Bacik <josef@toxicpanda.com>
-
-Thanks,
-
-Josef
