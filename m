@@ -2,79 +2,207 @@ Return-Path: <SRS0=5EpG=ZL=vger.kernel.org=linux-block-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-2.2 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
-	MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,USER_AGENT_SANE_1 autolearn=no
-	autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-8.3 required=3.0 tests=DKIM_SIGNED,DKIM_VALID,
+	DKIM_VALID_AU,HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,
+	SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED,USER_AGENT_SANE_1
+	autolearn=unavailable autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 3316FC432C0
-	for <linux-block@archiver.kernel.org>; Tue, 19 Nov 2019 01:44:00 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 9FC9FC33CA1
+	for <linux-block@archiver.kernel.org>; Tue, 19 Nov 2019 02:21:19 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.kernel.org (Postfix) with ESMTP id 0F22A222ED
-	for <linux-block@archiver.kernel.org>; Tue, 19 Nov 2019 01:44:00 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id 6E2D722316
+	for <linux-block@archiver.kernel.org>; Tue, 19 Nov 2019 02:21:19 +0000 (UTC)
+Authentication-Results: mail.kernel.org;
+	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="ZmlVjp5v"
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1726939AbfKSBn7 (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Mon, 18 Nov 2019 20:43:59 -0500
-Received: from mail-wr1-f65.google.com ([209.85.221.65]:33701 "EHLO
-        mail-wr1-f65.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1726761AbfKSBn7 (ORCPT
+        id S1727080AbfKSCVS (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Mon, 18 Nov 2019 21:21:18 -0500
+Received: from us-smtp-delivery-1.mimecast.com ([207.211.31.120]:39980 "EHLO
+        us-smtp-1.mimecast.com" rhost-flags-OK-OK-OK-FAIL) by vger.kernel.org
+        with ESMTP id S1727004AbfKSCVS (ORCPT
         <rfc822;linux-block@vger.kernel.org>);
-        Mon, 18 Nov 2019 20:43:59 -0500
-Received: by mail-wr1-f65.google.com with SMTP id w9so21877269wrr.0
-        for <linux-block@vger.kernel.org>; Mon, 18 Nov 2019 17:43:58 -0800 (PST)
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20161025;
-        h=x-gm-message-state:subject:to:cc:references:from:message-id:date
-         :user-agent:mime-version:in-reply-to:content-language
-         :content-transfer-encoding;
-        bh=R/rkDjn/1gGzkg9uVfMR4uDddpNXolTiDd83cfXEc8E=;
-        b=UTdHVAjJMZQu3p7949kgI+2o+tmawoXqutiE0PGuYRZ1vSENbdDPmZccz04SFuFlgh
-         xPyXbD7Zeoykj9UOC72O/caLVFF/69fM+RF3Cgq4d1jwvUYRGm8sVF0r9rf/3bEZ61D8
-         25m36F9/UwGz3YXzYJjPK9iG7ne2pYSq5tSAQo7xjuqfQXFE4P7291bZbzF9x1sHg3/2
-         xjBjQagsSW1VYU8GocRyEIYfEME1fmBOXRGAEKcOwat51UPCugetRTwoDwBaS2CEpn+H
-         +t7Cag0h2Zpl4b20O/zIPBCCx1UBT0uXLgy69vQQwI3kxm+zKEUKXGJe6yGz+GM2PMnf
-         hfZg==
-X-Gm-Message-State: APjAAAXudMEyni7qDf2CKRbtMVASTtpmHQJ7z7TRci64TvQHCErJuUNg
-        YhIrWDdpHUG8tC8jkcCH8dM=
-X-Google-Smtp-Source: APXvYqzWIpTvyfkqRjcxqWlG/w/0JPDMIGwWb0GvTK0Thn7HtXph0DJt65qBwqX0cs6KD1vwGXxuOw==
-X-Received: by 2002:a5d:694d:: with SMTP id r13mr32384686wrw.395.1574127837391;
-        Mon, 18 Nov 2019 17:43:57 -0800 (PST)
-Received: from [192.168.1.114] (162-195-240-247.lightspeed.sntcca.sbcglobal.net. [162.195.240.247])
-        by smtp.gmail.com with ESMTPSA id j2sm25535546wrt.61.2019.11.18.17.43.55
-        (version=TLS1_2 cipher=ECDHE-RSA-AES128-GCM-SHA256 bits=128/128);
-        Mon, 18 Nov 2019 17:43:56 -0800 (PST)
-Subject: Re: [PATCH RFC 0/3] blk-mq/nvme: use blk_mq_alloc_request() for
- NVMe's connect request
-To:     Keith Busch <kbusch@kernel.org>
-Cc:     Ming Lei <ming.lei@redhat.com>, Jens Axboe <axboe@kernel.dk>,
-        linux-block@vger.kernel.org, linux-nvme@lists.infradead.org,
-        Christoph Hellwig <hch@lst.de>,
-        James Smart <james.smart@broadcom.com>
-References: <20191115104238.15107-1-ming.lei@redhat.com>
- <8f4402a0-967d-f12d-2f1a-949e1dda017c@grimberg.me>
- <20191116071754.GB18194@ming.t460p>
- <016afdbc-9c63-4193-e64b-aad91ba5fcc1@grimberg.me>
- <20191119003437.GA1950@redsun51.ssa.fujisawa.hgst.com>
-From:   Sagi Grimberg <sagi@grimberg.me>
-Message-ID: <bde9741b-ee3d-7ba7-1fe9-04c919960412@grimberg.me>
-Date:   Mon, 18 Nov 2019 17:43:52 -0800
-User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:60.0) Gecko/20100101
- Thunderbird/60.9.0
+        Mon, 18 Nov 2019 21:21:18 -0500
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+        s=mimecast20190719; t=1574130077;
+        h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+         to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+         content-transfer-encoding:content-transfer-encoding:
+         in-reply-to:in-reply-to:references:references;
+        bh=86O2DN0L3SDx4AnwOCmuZblOGVlZFGCkgSfX2dhNKhc=;
+        b=ZmlVjp5vdRB8CVEz9kM9EAbGGyr+uAJ4nW/oM2FiXXDlzpE2uvcEsHOaDgiyaKn4SVg/q6
+        yifg+o0vpXU2UKBbLy++RPgDp7qMHo4+zJ1TV5HpbMm0D1wKi635YD2W73A2azVF4hbrpq
+        qdgMEw4ivW7W/75A74XyvdLu4qzEObM=
+Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
+ [209.132.183.4]) (Using TLS) by relay.mimecast.com with ESMTP id
+ us-mta-381-tcmB4oYwN1Gc4tkqhGpUTw-1; Mon, 18 Nov 2019 21:21:13 -0500
+Received: from smtp.corp.redhat.com (int-mx01.intmail.prod.int.phx2.redhat.com [10.5.11.11])
+        (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
+        (No client certificate requested)
+        by mimecast-mx01.redhat.com (Postfix) with ESMTPS id 43623801E5A;
+        Tue, 19 Nov 2019 02:21:11 +0000 (UTC)
+Received: from ming.t460p (ovpn-8-19.pek2.redhat.com [10.72.8.19])
+        by smtp.corp.redhat.com (Postfix) with ESMTPS id 7BBCE600CD;
+        Tue, 19 Nov 2019 02:21:03 +0000 (UTC)
+Date:   Tue, 19 Nov 2019 10:20:58 +0800
+From:   Ming Lei <ming.lei@redhat.com>
+To:     Bart Van Assche <bvanassche@acm.org>
+Cc:     linux-scsi@vger.kernel.org,
+        "Martin K . Petersen" <martin.petersen@oracle.com>,
+        James Bottomley <James.Bottomley@hansenpartnership.com>,
+        Jens Axboe <axboe@kernel.dk>,
+        "Ewan D . Milne" <emilne@redhat.com>,
+        Kashyap Desai <kashyap.desai@broadcom.com>,
+        Hannes Reinecke <hare@suse.de>,
+        Damien Le Moal <damien.lemoal@wdc.com>,
+        Long Li <longli@microsoft.com>, linux-block@vger.kernel.org
+Subject: Re: [PATCH V2] scsi: core: only re-run queue in scsi_end_request()
+ if device queue is busy
+Message-ID: <20191119022058.GB391@ming.t460p>
+References: <20191118100640.3673-1-ming.lei@redhat.com>
+ <9e7b1a1c-f125-b359-4b59-675368e100f2@acm.org>
 MIME-Version: 1.0
-In-Reply-To: <20191119003437.GA1950@redsun51.ssa.fujisawa.hgst.com>
-Content-Type: text/plain; charset=utf-8; format=flowed
-Content-Language: en-US
-Content-Transfer-Encoding: 7bit
+In-Reply-To: <9e7b1a1c-f125-b359-4b59-675368e100f2@acm.org>
+User-Agent: Mutt/1.12.1 (2019-06-15)
+X-Scanned-By: MIMEDefang 2.79 on 10.5.11.11
+X-MC-Unique: tcmB4oYwN1Gc4tkqhGpUTw-1
+X-Mimecast-Spam-Score: 0
+Content-Type: text/plain; charset=WINDOWS-1252
+Content-Transfer-Encoding: quoted-printable
+Content-Disposition: inline
 Sender: linux-block-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
+On Mon, Nov 18, 2019 at 03:40:06PM -0800, Bart Van Assche wrote:
+> On 11/18/19 2:06 AM, Ming Lei wrote:
+> > Now the request queue is run in scsi_end_request() unconditionally if b=
+oth
+> > target queue and host queue is ready. We should have re-run request que=
+ue
+> > only after this device queue becomes busy for restarting this LUN only.
+> >=20
+> > Recently Long Li reported that cost of run queue may be very heavy in
+> > case of high queue depth. So improve this situation by only running
+> > the request queue when this LUN is busy.
+> >=20
+> > Cc: Jens Axboe <axboe@kernel.dk>
+> > Cc: Ewan D. Milne <emilne@redhat.com>
+> > Cc: Kashyap Desai <kashyap.desai@broadcom.com>
+> > Cc: Hannes Reinecke <hare@suse.de>
+> > Cc: Bart Van Assche <bvanassche@acm.org>
+> > Cc: Damien Le Moal <damien.lemoal@wdc.com>
+> > Cc: Long Li <longli@microsoft.com>
+> > Cc: linux-block@vger.kernel.org
+> > Reported-by: Long Li <longli@microsoft.com>
+> > Signed-off-by: Ming Lei <ming.lei@redhat.com>
+> > ---
+> > V2:
+> > =09- commit log change, no any code change
+> > =09- add reported-by tag
+> >=20
+> >=20
+> >   drivers/scsi/scsi_lib.c    | 29 +++++++++++++++++++++++++++--
+> >   include/scsi/scsi_device.h |  1 +
+> >   2 files changed, 28 insertions(+), 2 deletions(-)
+> >=20
+> > diff --git a/drivers/scsi/scsi_lib.c b/drivers/scsi/scsi_lib.c
+> > index 379533ce8661..62a86a82c38d 100644
+> > --- a/drivers/scsi/scsi_lib.c
+> > +++ b/drivers/scsi/scsi_lib.c
+> > @@ -612,7 +612,7 @@ static bool scsi_end_request(struct request *req, b=
+lk_status_t error,
+> >   =09if (scsi_target(sdev)->single_lun ||
+> >   =09    !list_empty(&sdev->host->starved_list))
+> >   =09=09kblockd_schedule_work(&sdev->requeue_work);
+> > -=09else
+> > +=09else if (READ_ONCE(sdev->restart))
+> >   =09=09blk_mq_run_hw_queues(q, true);
+> >   =09percpu_ref_put(&q->q_usage_counter);
+> > @@ -1632,8 +1632,33 @@ static bool scsi_mq_get_budget(struct blk_mq_hw_=
+ctx *hctx)
+> >   =09struct request_queue *q =3D hctx->queue;
+> >   =09struct scsi_device *sdev =3D q->queuedata;
+> > -=09if (scsi_dev_queue_ready(q, sdev))
+> > +=09if (scsi_dev_queue_ready(q, sdev)) {
+> > +=09=09WRITE_ONCE(sdev->restart, 0);
+> >   =09=09return true;
+> > +=09}
+> > +
+> > +=09/*
+> > +=09 * If all in-flight requests originated from this LUN are completed
+> > +=09 * before setting .restart, sdev->device_busy will be observed as
+> > +=09 * zero, then blk_mq_delay_run_hw_queue() will dispatch this reques=
+t
+> > +=09 * soon. Otherwise, completion of one of these request will observe
+> > +=09 * the .restart flag, and the request queue will be run for handlin=
+g
+> > +=09 * this request, see scsi_end_request().
+> > +=09 *
+> > +=09 * However, the .restart flag may be cleared from other dispatch co=
+de
+> > +=09 * path after one inflight request is completed, then:
+> > +=09 *
+> > +=09 * 1) if this request is dispatched from scheduler queue or sw queu=
+e one
+> > +=09 * by one, this request will be handled in that dispatch path too g=
+iven
+> > +=09 * the request still stays at scheduler/sw queue when calling .get_=
+budget()
+> > +=09 * callback.
+> > +=09 *
+> > +=09 * 2) if this request is dispatched from hctx->dispatch or
+> > +=09 * blk_mq_flush_busy_ctxs(), this request will be put into hctx->di=
+spatch
+> > +=09 * list soon, and blk-mq will be responsible for covering it, see
+> > +=09 * blk_mq_dispatch_rq_list().
+> > +=09 */
+> > +=09WRITE_ONCE(sdev->restart, 1);
+>=20
+> Hi Ming,
+>=20
+> Are any memory barriers needed?
+>=20
+> Should WRITE_ONCE(sdev->restart, 1) perhaps be moved above the
+> scsi_dev_queue_ready()? Consider e.g. the following scenario:
+>=20
+> sdev->restart =3D=3D 0
+>=20
+> scsi_mq_get_budget() calls scsi_dev_queue_ready() and that last function
+> returns false.
+>=20
+> scsi_end_request() calls __blk_mq_end_request()
+> scsi_end_request() skips the blk_mq_run_hw_queues() call
 
->> I'm starting to think we maybe need to get the connect out of the block
->> layer execution if its such a big problem... Its a real shame if that is
->> the case...
-> 
-> We still need timeout handling for connect commands, so bypassing the
-> block layer will need to figure out some other way to handle that.
+Suppose the sdev->restart isn't set as 1 or isn't visible by
+scsi_end_request().
 
-Which is why I said it'd be a shame :)
+>=20
+> scsi_mq_get_budget() changes sdev->restart into 1.
+
+As the comment mentioned, if there isn't any in-flight requests
+originated from this LUN, blk_mq_delay_run_hw_queue() in
+scsi_mq_get_budget() will run the hw queue. If there is any
+in-flight requests from this LUN, that request's scsi_end_request()
+will handle that.
+
+Then looks one barrier is required between 'WRITE_ONCE(sdev->restart, 1)'
+and 'atomic_read(&sdev->device_busy) =3D=3D 0'.
+
+And its pair is scsi_device_unbusy() and READ_ONCE(sdev->restart).
+The barrier between the pair could be implied by __blk_mq_end_request(),
+either __blk_mq_free_request() or rq->end_io.
+
+>=20
+> Can this race happen with the above patch applied? Will this scenario res=
+ult
+> in a queue stall?
+
+If barrier is added between 'WRITE_ONCE(sdev->restart, 1)' and
+'atomic_read(&sdev->device_busy) =3D=3D 0', the race should be avoided.
+
+Will do that in V3.
+
+Thanks,
+Ming
+
