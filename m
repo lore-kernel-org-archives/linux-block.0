@@ -2,75 +2,126 @@ Return-Path: <SRS0=5EpG=ZL=vger.kernel.org=linux-block-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-9.6 required=3.0 tests=DKIM_SIGNED,DKIM_VALID,
-	DKIM_VALID_AU,FREEMAIL_FORGED_FROMDOMAIN,FREEMAIL_FROM,
-	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,
-	SPF_HELO_NONE,SPF_PASS,USER_AGENT_GIT autolearn=ham autolearn_force=no
+X-Spam-Status: No, score=-5.2 required=3.0 tests=DKIM_SIGNED,DKIM_VALID,
+	HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,
+	SPF_PASS,URIBL_BLOCKED,USER_AGENT_SANE_1 autolearn=ham autolearn_force=no
 	version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 3D5A5C432C3
-	for <linux-block@archiver.kernel.org>; Tue, 19 Nov 2019 15:05:10 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id DF48EC432C0
+	for <linux-block@archiver.kernel.org>; Tue, 19 Nov 2019 16:10:59 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.kernel.org (Postfix) with ESMTP id 0C466222CD
-	for <linux-block@archiver.kernel.org>; Tue, 19 Nov 2019 15:05:10 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id B5A3822365
+	for <linux-block@archiver.kernel.org>; Tue, 19 Nov 2019 16:10:59 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=pass (1024-bit key) header.d=126.com header.i=@126.com header.b="lI9rukbz"
+	dkim=pass (2048-bit key) header.d=kernel-dk.20150623.gappssmtp.com header.i=@kernel-dk.20150623.gappssmtp.com header.b="oGIJW8Hf"
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1727124AbfKSPFJ (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Tue, 19 Nov 2019 10:05:09 -0500
-Received: from m15-113.126.com ([220.181.15.113]:52604 "EHLO m15-113.126.com"
-        rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-        id S1727066AbfKSPFJ (ORCPT <rfc822;linux-block@vger.kernel.org>);
-        Tue, 19 Nov 2019 10:05:09 -0500
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=126.com;
-        s=s110527; h=From:Subject:Date:Message-Id; bh=ECh/gxGvyp9KSqXajL
-        yZib+zF6gPBMDIeYZREp09BV4=; b=lI9rukbzWZ6xgpv1+CFDPY6+fj9Ivfp2JU
-        Bljz1Y6yJsW4Bcj8k8VczsLLdQpMwGQ22GX9Yl1/cPzGzMCJx1tnt63brEUshgqx
-        LAhZV1mMpc0A5dHWeW/+El2RKQchrLG2Y861Grsq55zDUEXLDnp6nv+iAVTRBs9p
-        zd1pGJbcg=
-Received: from 192.168.137.246 (unknown [112.10.75.10])
-        by smtp3 (Coremail) with SMTP id DcmowADHg_UDBNRdRsnDAw--.8869S3;
-        Tue, 19 Nov 2019 23:02:29 +0800 (CST)
-From:   Xianting Tian <xianting_tian@126.com>
-To:     paolo.valente@linaro.org, axboe@kernel.dk, tj@kernel.org
-Cc:     linux-block@vger.kernel.org, cgroups@vger.kernel.org,
-        linux-kernel@vger.kernel.org
-Subject: [PATCH] bfq: Replace kmalloc_node with kzalloc_node
-Date:   Tue, 19 Nov 2019 10:02:26 -0500
-Message-Id: <1574175746-8809-1-git-send-email-xianting_tian@126.com>
-X-Mailer: git-send-email 1.8.3.1
-X-CM-TRANSID: DcmowADHg_UDBNRdRsnDAw--.8869S3
-X-Coremail-Antispam: 1Uf129KBjvdXoWrXr45Zr15Xw4UCr4rXF1kXwb_yoWxXFc_G3
-        ykGr1I9ryUAryfCrnY9F9xWFZ0kFWxWwnY93W3Cr13ZF15Ja1kA3sxXr47GrsxuFWxCry3
-        X34qgrnrJFn7tjkaLaAFLSUrUUUUUb8apTn2vfkv8UJUUUU8Yxn0WfASr-VFAUDa7-sFnT
-        9fnUUvcSsGvfC2KfnxnUUI43ZEXa7IU8KNt7UUUUU==
-X-Originating-IP: [112.10.75.10]
-X-CM-SenderInfo: h0ld03plqjs3xldqqiyswou0bp/1tbiHgVypF16FasP8gAAsp
+        id S1727929AbfKSQK7 (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Tue, 19 Nov 2019 11:10:59 -0500
+Received: from mail-io1-f67.google.com ([209.85.166.67]:35867 "EHLO
+        mail-io1-f67.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S1727509AbfKSQK7 (ORCPT
+        <rfc822;linux-block@vger.kernel.org>);
+        Tue, 19 Nov 2019 11:10:59 -0500
+Received: by mail-io1-f67.google.com with SMTP id s3so23835646ioe.3
+        for <linux-block@vger.kernel.org>; Tue, 19 Nov 2019 08:10:58 -0800 (PST)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=kernel-dk.20150623.gappssmtp.com; s=20150623;
+        h=subject:to:cc:references:from:message-id:date:user-agent
+         :mime-version:in-reply-to:content-language:content-transfer-encoding;
+        bh=yxTg9Jz6CUPbj7hb+zClDPA6shnTNr7Uh8vLjm12KTA=;
+        b=oGIJW8HfkgkobB0o2Qa1NbNfnl9mEqSGpPEO2LkogyZvOuMJQ7TF55da86qlugqMCd
+         338Wge2YPFXsoEIf9RGDawq7jpCCeV3jwC0W058T6wHLBemhZJS3koszJqUTfQULDiaX
+         2B6RyRY6HS9AE+8hVENsQBKSpUdhkmyAKNXz0Nm/Cxj0QFJRN/CWS+DE/OAhOnYHg0xk
+         tK1FlPGkzCpUU1kARsuIumFoSGAGKhbP5ourqDXhrP7e5xrJzr7bWyrrGYocI1tJI7bI
+         UgAaDI7OLq1bomHv0lR8zAsfor6M3fEsHwxDtlUp7bVspKwb2e69Lw3GuCnkI9VLqTxF
+         /QFQ==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20161025;
+        h=x-gm-message-state:subject:to:cc:references:from:message-id:date
+         :user-agent:mime-version:in-reply-to:content-language
+         :content-transfer-encoding;
+        bh=yxTg9Jz6CUPbj7hb+zClDPA6shnTNr7Uh8vLjm12KTA=;
+        b=CzTokGDlLZ3TDDSGt630aTmdc3Zfl3CjGbz9TBF+S3ArQ1nwqQ/VesKdnahH4aR7CF
+         iIVBSbm34skWSEVJC3eoeO72yY0rBA8zPCrHPGYFUmuBTKiiOIoADGi0WL2cm9V1MzyG
+         LOMgrF6nM5nZMne8A1oyROxWujSph6BNPGEvsoHXQ+Dnb27c5OjM7s/QD116SWNYPKDg
+         +kGfxXGqaNG5edHC6gzQ2tBa0iSkW72Z3BqpA6hz5mix8kgJbBbVQ+uSe2emCSRBFwEi
+         xdvZWJNKCH/eRrpqanFuuHjX9+L92bqYvYjAhHDKtKr+4ejAUa2+VXdVhbS7m5K7KTwc
+         gNIQ==
+X-Gm-Message-State: APjAAAVxhOn6ugt/nocKLKhay3lawyVcYuPUsYQdvnykZVKc0yNYthAD
+        7ipZ3qxhHLS5WGj/O6XGqKAErg==
+X-Google-Smtp-Source: APXvYqw/6l4rejQYc8a+bdmv6/89DOI3Ir5+fK0WCl1y9yQpIdn8Kiz4M9g4FLh+4h0UiHB53RA+ow==
+X-Received: by 2002:a02:140a:: with SMTP id 10mr18915165jag.72.1574179857938;
+        Tue, 19 Nov 2019 08:10:57 -0800 (PST)
+Received: from [192.168.1.159] ([65.144.74.34])
+        by smtp.gmail.com with ESMTPSA id u6sm5616560ilm.22.2019.11.19.08.10.55
+        (version=TLS1_2 cipher=ECDHE-RSA-AES128-GCM-SHA256 bits=128/128);
+        Tue, 19 Nov 2019 08:10:56 -0800 (PST)
+Subject: Re: [PATCH v6 15/24] fs/io_uring: set FOLL_PIN via pin_user_pages()
+To:     John Hubbard <jhubbard@nvidia.com>,
+        Andrew Morton <akpm@linux-foundation.org>
+Cc:     Al Viro <viro@zeniv.linux.org.uk>,
+        Alex Williamson <alex.williamson@redhat.com>,
+        Benjamin Herrenschmidt <benh@kernel.crashing.org>,
+        =?UTF-8?B?QmrDtnJuIFTDtnBlbA==?= <bjorn.topel@intel.com>,
+        Christoph Hellwig <hch@infradead.org>,
+        Dan Williams <dan.j.williams@intel.com>,
+        Daniel Vetter <daniel@ffwll.ch>,
+        Dave Chinner <david@fromorbit.com>,
+        David Airlie <airlied@linux.ie>,
+        "David S . Miller" <davem@davemloft.net>,
+        Ira Weiny <ira.weiny@intel.com>, Jan Kara <jack@suse.cz>,
+        Jason Gunthorpe <jgg@ziepe.ca>,
+        Jonathan Corbet <corbet@lwn.net>,
+        =?UTF-8?B?SsOpcsO0bWUgR2xpc3Nl?= <jglisse@redhat.com>,
+        Magnus Karlsson <magnus.karlsson@intel.com>,
+        Mauro Carvalho Chehab <mchehab@kernel.org>,
+        Michael Ellerman <mpe@ellerman.id.au>,
+        Michal Hocko <mhocko@suse.com>,
+        Mike Kravetz <mike.kravetz@oracle.com>,
+        Paul Mackerras <paulus@samba.org>,
+        Shuah Khan <shuah@kernel.org>,
+        Vlastimil Babka <vbabka@suse.cz>, bpf@vger.kernel.org,
+        dri-devel@lists.freedesktop.org, kvm@vger.kernel.org,
+        linux-block@vger.kernel.org, linux-doc@vger.kernel.org,
+        linux-fsdevel@vger.kernel.org, linux-kselftest@vger.kernel.org,
+        linux-media@vger.kernel.org, linux-rdma@vger.kernel.org,
+        linuxppc-dev@lists.ozlabs.org, netdev@vger.kernel.org,
+        linux-mm@kvack.org, LKML <linux-kernel@vger.kernel.org>
+References: <20191119081643.1866232-1-jhubbard@nvidia.com>
+ <20191119081643.1866232-16-jhubbard@nvidia.com>
+From:   Jens Axboe <axboe@kernel.dk>
+Message-ID: <2ae65d1b-a3eb-74ed-afce-c493de5bbfd3@kernel.dk>
+Date:   Tue, 19 Nov 2019 09:10:54 -0700
+User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:60.0) Gecko/20100101
+ Thunderbird/60.9.0
+MIME-Version: 1.0
+In-Reply-To: <20191119081643.1866232-16-jhubbard@nvidia.com>
+Content-Type: text/plain; charset=utf-8
+Content-Language: en-US
+Content-Transfer-Encoding: 7bit
 Sender: linux-block-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-Replace kmalloc_node with kzalloc_node
+On 11/19/19 1:16 AM, John Hubbard wrote:
+> Convert fs/io_uring to use the new pin_user_pages() call, which sets
+> FOLL_PIN. Setting FOLL_PIN is now required for code that requires
+> tracking of pinned pages, and therefore for any code that calls
+> put_user_page().
+> 
+> In partial anticipation of this work, the io_uring code was already
+> calling put_user_page() instead of put_page(). Therefore, in order to
+> convert from the get_user_pages()/put_page() model, to the
+> pin_user_pages()/put_user_page() model, the only change required
+> here is to change get_user_pages() to pin_user_pages().
+> 
+> Reviewed-by: Jan Kara <jack@suse.cz>
+> Signed-off-by: John Hubbard <jhubbard@nvidia.com>
 
-Signed-off-by: Xianting Tian <xianting_tian@126.com>
----
- block/bfq-cgroup.c | 2 +-
- 1 file changed, 1 insertion(+), 1 deletion(-)
+You dropped my reviewed-by now... Given the file, you'd probably want
+to keep that.
 
-diff --git a/block/bfq-cgroup.c b/block/bfq-cgroup.c
-index 86a607c..9a84d79 100644
---- a/block/bfq-cgroup.c
-+++ b/block/bfq-cgroup.c
-@@ -1385,7 +1385,7 @@ struct bfq_group *bfq_create_group_hierarchy(struct bfq_data *bfqd, int node)
- 	struct bfq_group *bfqg;
- 	int i;
- 
--	bfqg = kmalloc_node(sizeof(*bfqg), GFP_KERNEL | __GFP_ZERO, node);
-+	bfqg = kzalloc_node(sizeof(*bfqg), GFP_KERNEL, node);
- 	if (!bfqg)
- 		return NULL;
- 
 -- 
-1.8.3.1
+Jens Axboe
 
