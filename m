@@ -2,121 +2,79 @@ Return-Path: <SRS0=5EpG=ZL=vger.kernel.org=linux-block-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-2.4 required=3.0 tests=DKIM_SIGNED,DKIM_VALID,
-	DKIM_VALID_AU,HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SPF_HELO_NONE,
-	SPF_PASS,USER_AGENT_SANE_1 autolearn=no autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-2.2 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
+	MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,USER_AGENT_SANE_1 autolearn=no
+	autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 618A5C432C0
-	for <linux-block@archiver.kernel.org>; Tue, 19 Nov 2019 01:42:23 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 3316FC432C0
+	for <linux-block@archiver.kernel.org>; Tue, 19 Nov 2019 01:44:00 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.kernel.org (Postfix) with ESMTP id 2B7CD222ED
-	for <linux-block@archiver.kernel.org>; Tue, 19 Nov 2019 01:42:23 +0000 (UTC)
-Authentication-Results: mail.kernel.org;
-	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="YGTs94eH"
+	by mail.kernel.org (Postfix) with ESMTP id 0F22A222ED
+	for <linux-block@archiver.kernel.org>; Tue, 19 Nov 2019 01:44:00 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1726911AbfKSBmW (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Mon, 18 Nov 2019 20:42:22 -0500
-Received: from us-smtp-1.mimecast.com ([207.211.31.81]:23517 "EHLO
-        us-smtp-delivery-1.mimecast.com" rhost-flags-OK-OK-OK-FAIL)
-        by vger.kernel.org with ESMTP id S1726761AbfKSBmW (ORCPT
+        id S1726939AbfKSBn7 (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Mon, 18 Nov 2019 20:43:59 -0500
+Received: from mail-wr1-f65.google.com ([209.85.221.65]:33701 "EHLO
+        mail-wr1-f65.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S1726761AbfKSBn7 (ORCPT
         <rfc822;linux-block@vger.kernel.org>);
-        Mon, 18 Nov 2019 20:42:22 -0500
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-        s=mimecast20190719; t=1574127741;
-        h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-         to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-         content-transfer-encoding:content-transfer-encoding:
-         in-reply-to:in-reply-to:references:references;
-        bh=c7r3EuGqlV6Li6XVVC8wvTxbwUoxK99q8WwchQzbU5M=;
-        b=YGTs94eHAuh6hbIzUNffMgc9W+JSlu3L6VIqdxxjgv09xfvLbFAncBPtduuaIhhzQH7Boc
-        zVUdUdEcxqiBQkwuAX5ro4/M0MX6JRLJYkyS9ckL9DbguBRh0dWwiBffluR3+cHL8zmSoG
-        Ef34rG8tE4S5oCOSB1cSkTr6NDur2z8=
-Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
- [209.132.183.4]) (Using TLS) by relay.mimecast.com with ESMTP id
- us-mta-191-SIgbOjGuNEimuLHgPRAPPw-1; Mon, 18 Nov 2019 20:42:19 -0500
-Received: from smtp.corp.redhat.com (int-mx01.intmail.prod.int.phx2.redhat.com [10.5.11.11])
-        (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
-        (No client certificate requested)
-        by mimecast-mx01.redhat.com (Postfix) with ESMTPS id 54DA1100550E;
-        Tue, 19 Nov 2019 01:42:17 +0000 (UTC)
-Received: from ming.t460p (ovpn-8-19.pek2.redhat.com [10.72.8.19])
-        by smtp.corp.redhat.com (Postfix) with ESMTPS id C492C60317;
-        Tue, 19 Nov 2019 01:42:08 +0000 (UTC)
-Date:   Tue, 19 Nov 2019 09:42:04 +0800
-From:   Ming Lei <ming.lei@redhat.com>
-To:     "chenxiang (M)" <chenxiang66@hisilicon.com>
-Cc:     lkml@sdf.org, tglx@linutronix.de, kbusch@kernel.org,
-        "axboe@kernel.dk" <axboe@kernel.dk>,
-        "linux-block@vger.kernel.org" <linux-block@vger.kernel.org>,
-        Linuxarm <linuxarm@huawei.com>,
-        John Garry <john.garry@huawei.com>
-Subject: Re: The irq Affinity is changed after the patch(Fixes: b1a5a73e64e9
- ("genirq/affinity: Spread vectors on node according to nr_cpu ratio"))
-Message-ID: <20191119014204.GA391@ming.t460p>
-References: <d59f7f7a-975a-2032-aa61-7cbff7585d33@hisilicon.com>
+        Mon, 18 Nov 2019 20:43:59 -0500
+Received: by mail-wr1-f65.google.com with SMTP id w9so21877269wrr.0
+        for <linux-block@vger.kernel.org>; Mon, 18 Nov 2019 17:43:58 -0800 (PST)
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20161025;
+        h=x-gm-message-state:subject:to:cc:references:from:message-id:date
+         :user-agent:mime-version:in-reply-to:content-language
+         :content-transfer-encoding;
+        bh=R/rkDjn/1gGzkg9uVfMR4uDddpNXolTiDd83cfXEc8E=;
+        b=UTdHVAjJMZQu3p7949kgI+2o+tmawoXqutiE0PGuYRZ1vSENbdDPmZccz04SFuFlgh
+         xPyXbD7Zeoykj9UOC72O/caLVFF/69fM+RF3Cgq4d1jwvUYRGm8sVF0r9rf/3bEZ61D8
+         25m36F9/UwGz3YXzYJjPK9iG7ne2pYSq5tSAQo7xjuqfQXFE4P7291bZbzF9x1sHg3/2
+         xjBjQagsSW1VYU8GocRyEIYfEME1fmBOXRGAEKcOwat51UPCugetRTwoDwBaS2CEpn+H
+         +t7Cag0h2Zpl4b20O/zIPBCCx1UBT0uXLgy69vQQwI3kxm+zKEUKXGJe6yGz+GM2PMnf
+         hfZg==
+X-Gm-Message-State: APjAAAXudMEyni7qDf2CKRbtMVASTtpmHQJ7z7TRci64TvQHCErJuUNg
+        YhIrWDdpHUG8tC8jkcCH8dM=
+X-Google-Smtp-Source: APXvYqzWIpTvyfkqRjcxqWlG/w/0JPDMIGwWb0GvTK0Thn7HtXph0DJt65qBwqX0cs6KD1vwGXxuOw==
+X-Received: by 2002:a5d:694d:: with SMTP id r13mr32384686wrw.395.1574127837391;
+        Mon, 18 Nov 2019 17:43:57 -0800 (PST)
+Received: from [192.168.1.114] (162-195-240-247.lightspeed.sntcca.sbcglobal.net. [162.195.240.247])
+        by smtp.gmail.com with ESMTPSA id j2sm25535546wrt.61.2019.11.18.17.43.55
+        (version=TLS1_2 cipher=ECDHE-RSA-AES128-GCM-SHA256 bits=128/128);
+        Mon, 18 Nov 2019 17:43:56 -0800 (PST)
+Subject: Re: [PATCH RFC 0/3] blk-mq/nvme: use blk_mq_alloc_request() for
+ NVMe's connect request
+To:     Keith Busch <kbusch@kernel.org>
+Cc:     Ming Lei <ming.lei@redhat.com>, Jens Axboe <axboe@kernel.dk>,
+        linux-block@vger.kernel.org, linux-nvme@lists.infradead.org,
+        Christoph Hellwig <hch@lst.de>,
+        James Smart <james.smart@broadcom.com>
+References: <20191115104238.15107-1-ming.lei@redhat.com>
+ <8f4402a0-967d-f12d-2f1a-949e1dda017c@grimberg.me>
+ <20191116071754.GB18194@ming.t460p>
+ <016afdbc-9c63-4193-e64b-aad91ba5fcc1@grimberg.me>
+ <20191119003437.GA1950@redsun51.ssa.fujisawa.hgst.com>
+From:   Sagi Grimberg <sagi@grimberg.me>
+Message-ID: <bde9741b-ee3d-7ba7-1fe9-04c919960412@grimberg.me>
+Date:   Mon, 18 Nov 2019 17:43:52 -0800
+User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:60.0) Gecko/20100101
+ Thunderbird/60.9.0
 MIME-Version: 1.0
-In-Reply-To: <d59f7f7a-975a-2032-aa61-7cbff7585d33@hisilicon.com>
-User-Agent: Mutt/1.12.1 (2019-06-15)
-X-Scanned-By: MIMEDefang 2.79 on 10.5.11.11
-X-MC-Unique: SIgbOjGuNEimuLHgPRAPPw-1
-X-Mimecast-Spam-Score: 0
-Content-Type: text/plain; charset=WINDOWS-1252
-Content-Transfer-Encoding: quoted-printable
-Content-Disposition: inline
+In-Reply-To: <20191119003437.GA1950@redsun51.ssa.fujisawa.hgst.com>
+Content-Type: text/plain; charset=utf-8; format=flowed
+Content-Language: en-US
+Content-Transfer-Encoding: 7bit
 Sender: linux-block-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-On Tue, Nov 19, 2019 at 09:25:30AM +0800, chenxiang (M) wrote:
-> Hi,
->=20
-> There are 128 cpus and 16 irqs for SAS controller in my system, and there
-> are 4 Nodes, every 32 cpus are for one node (cpu0-31 for node0, cpu32-63 =
-for
-> node1, cpu64-95 for node2, cpu96-127 for node3).
-> We use function pci_alloc_irq_vectors_affinity() to set the affinity of
-> irqs.
->=20
-> I find that  before the patch (Fixes: b1a5a73e64e9 ("genirq/affinity: Spr=
-ead
-> vectors on node according to nr_cpu ratio")), the relationship between ir=
-qs
-> and cpus is: irq0 bind to cpu0-7, irq1 bind to cpu8-15,
-> irq2 bind to cpu16-23, irq3 bind to cpu24-31,irq4 bind to cpu32-39... irq=
-15
-> bind to cpu120-127. But after the patch, the relationship is changed: irq=
-0
-> bind to cpu32-39,
-> irq1 bind to cpu40-47, ..., irq11 bind to cpu120-127, irq12 bind to cpu0-=
-7,
-> irq13 bind to cpu8-15, irq14 bind to cpu16-23, irq15 bind to cpu24-31.
->=20
-> I notice that before calling the sort() in function alloc_nodes_vectors()=
-,
-> the id of array node_vectors[] is from 0,1,2,3. But after function sort()=
-,
-> the index of array node_vectors[] is 1,2,3,0.
-> But i think it sorts according to the numbers of cpus in those nodes, so =
-it
-> should be the same as before calling sort() as the numbers of cpus in eve=
-ry
-> node are 32.
 
-Maybe there are more non-present CPUs covered by node 0.
+>> I'm starting to think we maybe need to get the connect out of the block
+>> layer execution if its such a big problem... Its a real shame if that is
+>> the case...
+> 
+> We still need timeout handling for connect commands, so bypassing the
+> block layer will need to figure out some other way to handle that.
 
-Could you provide the following log?
-
-1) lscpu
-
-2) ./dump-io-irq-affinity $PCI_ID_SAS
-
-=09http://people.redhat.com/minlei/tests/tools/dump-io-irq-affinity
-
-You need to figure out the PCI ID(the 1st column of lspci output) of the SA=
-S
-controller via lspci.
-
-Thanks,
-Ming
-
+Which is why I said it'd be a shame :)
