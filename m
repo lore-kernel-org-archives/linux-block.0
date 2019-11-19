@@ -2,270 +2,282 @@ Return-Path: <SRS0=5EpG=ZL=vger.kernel.org=linux-block-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-13.4 required=3.0 tests=DKIMWL_WL_MED,DKIM_SIGNED,
-	DKIM_VALID,DKIM_VALID_AU,HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,
-	MENTIONS_GIT_HOSTING,SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED,USER_IN_DEF_DKIM_WL
-	autolearn=ham autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-8.2 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
+	INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,
+	URIBL_BLOCKED,USER_AGENT_SANE_1 autolearn=unavailable autolearn_force=no
+	version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id E8438C432C0
-	for <linux-block@archiver.kernel.org>; Tue, 19 Nov 2019 10:06:20 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 5A151C432C0
+	for <linux-block@archiver.kernel.org>; Tue, 19 Nov 2019 10:19:26 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.kernel.org (Postfix) with ESMTP id AD8C12230C
-	for <linux-block@archiver.kernel.org>; Tue, 19 Nov 2019 10:06:20 +0000 (UTC)
-Authentication-Results: mail.kernel.org;
-	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="ecCiMqkY"
+	by mail.kernel.org (Postfix) with ESMTP id 31E2C22309
+	for <linux-block@archiver.kernel.org>; Tue, 19 Nov 2019 10:19:26 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1726265AbfKSKGT (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Tue, 19 Nov 2019 05:06:19 -0500
-Received: from mail-qv1-f66.google.com ([209.85.219.66]:38754 "EHLO
-        mail-qv1-f66.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1727587AbfKSKGT (ORCPT
-        <rfc822;linux-block@vger.kernel.org>);
-        Tue, 19 Nov 2019 05:06:19 -0500
-Received: by mail-qv1-f66.google.com with SMTP id q19so7839478qvs.5
-        for <linux-block@vger.kernel.org>; Tue, 19 Nov 2019 02:06:18 -0800 (PST)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=google.com; s=20161025;
-        h=mime-version:references:in-reply-to:from:date:message-id:subject:to
-         :cc;
-        bh=9pIipJGyehxPVtU1yNhGOSdmuY2kHt1JI6IRlGDlJaE=;
-        b=ecCiMqkYnUDX1s32A6nBDiUy0rD7WzwdFX0VVjiaj02tZuM0iKK9MpzZ6yEuAHLv+h
-         hbruUdlfzwXIdv+E09htN5dIlXLpxDufjQB9KyohHMLv8PZbw6lrjgmAGRQxCp+2O40k
-         QOuWSFdC/EKEufVAMumuxe07GW4Lli/jgx1PEw2EJoK9QsIiwQf26DjH9ILlP9AafrXh
-         IGnIVuEF304bulxYyE679XNn5gR+HKq7yczVkPdOILMWVTSEvd7f+iRnz8UvnOrJOf6t
-         ZGZZIJr75aunD9wA34cch+yA30WJllZXKaIjHOVda22Bhnl3FVcy/oFxJd6yphNwbt6m
-         jtLA==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20161025;
-        h=x-gm-message-state:mime-version:references:in-reply-to:from:date
-         :message-id:subject:to:cc;
-        bh=9pIipJGyehxPVtU1yNhGOSdmuY2kHt1JI6IRlGDlJaE=;
-        b=OBoSzlMi2Je8NQkdncWdeXJo4wfIsuCdB+yBopL3ERrurhiz2+kBEWVZo7eVdqI1WM
-         CBGmknmu7Jzk03RZRnW7SSkhHKWZj5UKpG4CRZ2PMAhW8tG6ZNMZhDM+Ol++GTmXdxGB
-         /yvBzu+zXOm7lK3rEYWPQ4hQaVdYERUHf6CGaVrGtkzoTSENhHfNPxffGdczCcb75J7q
-         0J4aDsTORL8hEbIUzuGQ1HqZ+w5TlZxcn9XRGbYehePsFyaicZUcQfN39yXOZ2wTsIkr
-         +klWrMYqVg4q406Nd9vw48vgZJmkY2iD8yTdMsZAhoNkvG3VXobfyxllZj6axEJFPYs5
-         ypRg==
-X-Gm-Message-State: APjAAAXcduWT/4qObhkFz3x0KkL41RPKMdxbTmNR0d7IOXFTDwgwN3Yg
-        AMHzmx/LLR5WomqV20SN1P/v+rgam/6v4EKXXAupqQ==
-X-Google-Smtp-Source: APXvYqzSB9nuBsdvzHvYAyCKHLkSY/LMZ0oa5cLYEKr1qu+ndCEo1Tk8bdkZ8LCp/cgFZsWxRwS3sFyRwD4076R29Hk=
-X-Received: by 2002:a0c:b446:: with SMTP id e6mr30264392qvf.159.1574157977791;
- Tue, 19 Nov 2019 02:06:17 -0800 (PST)
+        id S1727262AbfKSKTS (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Tue, 19 Nov 2019 05:19:18 -0500
+Received: from mx2.suse.de ([195.135.220.15]:49868 "EHLO mx1.suse.de"
+        rhost-flags-OK-OK-OK-FAIL) by vger.kernel.org with ESMTP
+        id S1726555AbfKSKTS (ORCPT <rfc822;linux-block@vger.kernel.org>);
+        Tue, 19 Nov 2019 05:19:18 -0500
+X-Virus-Scanned: by amavisd-new at test-mx.suse.de
+Received: from relay2.suse.de (unknown [195.135.220.254])
+        by mx1.suse.de (Postfix) with ESMTP id 737CFAE87;
+        Tue, 19 Nov 2019 10:19:13 +0000 (UTC)
+Received: by quack2.suse.cz (Postfix, from userid 1000)
+        id D586A1E47E5; Tue, 19 Nov 2019 11:19:10 +0100 (CET)
+Date:   Tue, 19 Nov 2019 11:19:10 +0100
+From:   Jan Kara <jack@suse.cz>
+To:     John Hubbard <jhubbard@nvidia.com>
+Cc:     Andrew Morton <akpm@linux-foundation.org>,
+        Al Viro <viro@zeniv.linux.org.uk>,
+        Alex Williamson <alex.williamson@redhat.com>,
+        Benjamin Herrenschmidt <benh@kernel.crashing.org>,
+        =?iso-8859-1?Q?Bj=F6rn_T=F6pel?= <bjorn.topel@intel.com>,
+        Christoph Hellwig <hch@infradead.org>,
+        Dan Williams <dan.j.williams@intel.com>,
+        Daniel Vetter <daniel@ffwll.ch>,
+        Dave Chinner <david@fromorbit.com>,
+        David Airlie <airlied@linux.ie>,
+        "David S . Miller" <davem@davemloft.net>,
+        Ira Weiny <ira.weiny@intel.com>, Jan Kara <jack@suse.cz>,
+        Jason Gunthorpe <jgg@ziepe.ca>, Jens Axboe <axboe@kernel.dk>,
+        Jonathan Corbet <corbet@lwn.net>,
+        =?iso-8859-1?B?Suly9G1l?= Glisse <jglisse@redhat.com>,
+        Magnus Karlsson <magnus.karlsson@intel.com>,
+        Mauro Carvalho Chehab <mchehab@kernel.org>,
+        Michael Ellerman <mpe@ellerman.id.au>,
+        Michal Hocko <mhocko@suse.com>,
+        Mike Kravetz <mike.kravetz@oracle.com>,
+        Paul Mackerras <paulus@samba.org>,
+        Shuah Khan <shuah@kernel.org>,
+        Vlastimil Babka <vbabka@suse.cz>, bpf@vger.kernel.org,
+        dri-devel@lists.freedesktop.org, kvm@vger.kernel.org,
+        linux-block@vger.kernel.org, linux-doc@vger.kernel.org,
+        linux-fsdevel@vger.kernel.org, linux-kselftest@vger.kernel.org,
+        linux-media@vger.kernel.org, linux-rdma@vger.kernel.org,
+        linuxppc-dev@lists.ozlabs.org, netdev@vger.kernel.org,
+        linux-mm@kvack.org, LKML <linux-kernel@vger.kernel.org>,
+        Christoph Hellwig <hch@lst.de>,
+        "Aneesh Kumar K . V" <aneesh.kumar@linux.ibm.com>
+Subject: Re: [PATCH v6 02/24] mm/gup: factor out duplicate code from four
+ routines
+Message-ID: <20191119101910.GC25605@quack2.suse.cz>
+References: <20191119081643.1866232-1-jhubbard@nvidia.com>
+ <20191119081643.1866232-3-jhubbard@nvidia.com>
 MIME-Version: 1.0
-References: <20191119095731.10116-1-hdanton@sina.com>
-In-Reply-To: <20191119095731.10116-1-hdanton@sina.com>
-From:   Dmitry Vyukov <dvyukov@google.com>
-Date:   Tue, 19 Nov 2019 11:06:06 +0100
-Message-ID: <CACT4Y+aBX-eKqEFk8C4LNDG-bpSQQWhn++jqBmQkWyqqxnDQ1A@mail.gmail.com>
-Subject: Re: KASAN: use-after-free Read in blkcg_print_stat (2)
-To:     Hillf Danton <hdanton@sina.com>
-Cc:     syzbot <syzbot+9bfadf534cf2fd1b5eb8@syzkaller.appspotmail.com>,
-        Jens Axboe <axboe@kernel.dk>,
-        Cgroups <cgroups@vger.kernel.org>,
-        linux-block <linux-block@vger.kernel.org>,
-        LKML <linux-kernel@vger.kernel.org>,
-        syzkaller-bugs <syzkaller-bugs@googlegroups.com>,
-        Tejun Heo <tj@kernel.org>
-Content-Type: text/plain; charset="UTF-8"
+Content-Type: text/plain; charset=iso-8859-1
+Content-Disposition: inline
+Content-Transfer-Encoding: 8bit
+In-Reply-To: <20191119081643.1866232-3-jhubbard@nvidia.com>
+User-Agent: Mutt/1.10.1 (2018-07-13)
 Sender: linux-block-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-On Tue, Nov 19, 2019 at 10:57 AM Hillf Danton <hdanton@sina.com> wrote:
->
->
-> On Mon, 18 Nov 2019 23:11:06 -0800
-> >
-> > Hello,
-> >
-> > syzbot found the following crash on:
-> >
-> > HEAD commit:    fe30021c Merge branch 'x86-urgent-for-linus' of git://git...
-> > git tree:       upstream
-> > console output: https://syzkaller.appspot.com/x/log.txt?x=1196cb3ae00000
-> > kernel config:  https://syzkaller.appspot.com/x/.config?x=1aab6d4187ddf667
-> > dashboard link: https://syzkaller.appspot.com/bug?extid=9bfadf534cf2fd1b5eb8
-> > compiler:       gcc (GCC) 9.0.0 20181231 (experimental)
-> >
-> > Unfortunately, I don't have any reproducer for this crash yet.
-> >
-> > IMPORTANT: if you fix the bug, please add the following tag to the commit:
-> > Reported-by: syzbot+9bfadf534cf2fd1b5eb8@syzkaller.appspotmail.com
-> >
-> > ==================================================================
-> > BUG: KASAN: use-after-free in dev_name include/linux/device.h:1342 [inline]
-> > BUG: KASAN: use-after-free in blkg_dev_name block/blk-cgroup.c:498 [inline]
-> > BUG: KASAN: use-after-free in blkcg_print_stat+0xb26/0xc00
-> > block/blk-cgroup.c:942
-> > Read of size 8 at addr ffff8880a01b2050 by task syz-executor.1/16053
-> >
-> > CPU: 0 PID: 16053 Comm: syz-executor.1 Not tainted 5.4.0-rc7+ #0
-> > Hardware name: Google Google Compute Engine/Google Compute Engine, BIOS
-> > Google 01/01/2011
-> > Call Trace:
-> >   __dump_stack lib/dump_stack.c:77 [inline]
-> >   dump_stack+0x197/0x210 lib/dump_stack.c:118
-> >   print_address_description.constprop.0.cold+0xd4/0x30b mm/kasan/report.c:374
-> >   __kasan_report.cold+0x1b/0x41 mm/kasan/report.c:506
-> >   kasan_report+0x12/0x20 mm/kasan/common.c:634
-> >   __asan_report_load8_noabort+0x14/0x20 mm/kasan/generic_report.c:132
-> >   dev_name include/linux/device.h:1342 [inline]
-> >   blkg_dev_name block/blk-cgroup.c:498 [inline]
-> >   blkcg_print_stat+0xb26/0xc00 block/blk-cgroup.c:942
-> >   cgroup_seqfile_show+0x1a8/0x300 kernel/cgroup/cgroup.c:3816
-> >   kernfs_seq_show+0x14f/0x1b0 fs/kernfs/file.c:167
-> >   seq_read+0x4ca/0x1110 fs/seq_file.c:229
-> >   kernfs_fop_read+0xed/0x560 fs/kernfs/file.c:251
-> >   do_loop_readv_writev fs/read_write.c:714 [inline]
-> >   do_loop_readv_writev fs/read_write.c:701 [inline]
-> >   do_iter_read+0x4a4/0x660 fs/read_write.c:935
-> >   vfs_readv+0xf0/0x160 fs/read_write.c:997
-> >   do_readv+0x15b/0x330 fs/read_write.c:1034
-> >   __do_sys_readv fs/read_write.c:1125 [inline]
-> >   __se_sys_readv fs/read_write.c:1122 [inline]
-> >   __x64_sys_readv+0x75/0xb0 fs/read_write.c:1122
-> >   do_syscall_64+0xfa/0x760 arch/x86/entry/common.c:290
-> >   entry_SYSCALL_64_after_hwframe+0x49/0xbe
-> > RIP: 0033:0x45a639
-> > Code: ad b6 fb ff c3 66 2e 0f 1f 84 00 00 00 00 00 66 90 48 89 f8 48 89 f7
-> > 48 89 d6 48 89 ca 4d 89 c2 4d 89 c8 4c 8b 4c 24 08 0f 05 <48> 3d 01 f0 ff
-> > ff 0f 83 7b b6 fb ff c3 66 2e 0f 1f 84 00 00 00 00
-> > RSP: 002b:00007fd336772c78 EFLAGS: 00000246 ORIG_RAX: 0000000000000013
-> > RAX: ffffffffffffffda RBX: 0000000000000003 RCX: 000000000045a639
-> > RDX: 00000000000001a5 RSI: 00000000200002c0 RDI: 0000000000000004
-> > RBP: 000000000075bfc8 R08: 0000000000000000 R09: 0000000000000000
-> > R10: 0000000000000000 R11: 0000000000000246 R12: 00007fd3367736d4
-> > R13: 00000000004c7ecd R14: 00000000004de160 R15: 00000000ffffffff
-> >
-> > Allocated by task 12327:
-> >   save_stack+0x23/0x90 mm/kasan/common.c:69
-> >   set_track mm/kasan/common.c:77 [inline]
-> >   __kasan_kmalloc mm/kasan/common.c:510 [inline]
-> >   __kasan_kmalloc.constprop.0+0xcf/0xe0 mm/kasan/common.c:483
-> >   kasan_kmalloc+0x9/0x10 mm/kasan/common.c:524
-> >   kmem_cache_alloc_trace+0x158/0x790 mm/slab.c:3550
-> >   kmalloc include/linux/slab.h:556 [inline]
-> >   kzalloc include/linux/slab.h:690 [inline]
-> >   device_create_groups_vargs+0x8e/0x270 drivers/base/core.c:2828
-> >   device_create_vargs+0x45/0x60 drivers/base/core.c:2886
-> >   bdi_register_va.part.0+0x91/0x940 mm/backing-dev.c:940
-> >   bdi_register_va mm/backing-dev.c:976 [inline]
-> >   bdi_register+0x12a/0x140 mm/backing-dev.c:973
-> >   bdi_register_owner+0x6a/0x110 mm/backing-dev.c:983
-> >   __device_add_disk+0xe09/0x1230 block/genhd.c:739
-> >   device_add_disk+0x2b/0x40 block/genhd.c:763
-> >   add_disk include/linux/genhd.h:429 [inline]
-> >   loop_add+0x635/0x8d0 drivers/block/loop.c:2061
-> >   loop_control_ioctl drivers/block/loop.c:2162 [inline]
-> >   loop_control_ioctl+0x165/0x360 drivers/block/loop.c:2144
-> >   vfs_ioctl fs/ioctl.c:46 [inline]
-> >   file_ioctl fs/ioctl.c:509 [inline]
-> >   do_vfs_ioctl+0xdb6/0x13e0 fs/ioctl.c:696
-> >   ksys_ioctl+0xab/0xd0 fs/ioctl.c:713
-> >   __do_sys_ioctl fs/ioctl.c:720 [inline]
-> >   __se_sys_ioctl fs/ioctl.c:718 [inline]
-> >   __x64_sys_ioctl+0x73/0xb0 fs/ioctl.c:718
-> >   do_syscall_64+0xfa/0x760 arch/x86/entry/common.c:290
-> >   entry_SYSCALL_64_after_hwframe+0x49/0xbe
-> >
-> > Freed by task 16049:
-> >   save_stack+0x23/0x90 mm/kasan/common.c:69
-> >   set_track mm/kasan/common.c:77 [inline]
-> >   kasan_set_free_info mm/kasan/common.c:332 [inline]
-> >   __kasan_slab_free+0x102/0x150 mm/kasan/common.c:471
-> >   kasan_slab_free+0xe/0x10 mm/kasan/common.c:480
-> >   __cache_free mm/slab.c:3425 [inline]
-> >   kfree+0x10a/0x2c0 mm/slab.c:3756
-> >   device_create_release+0x16/0x20 drivers/base/power/wakeup_stats.c:130
-> >   device_release+0x7a/0x210 drivers/base/core.c:1101
-> >   kobject_cleanup lib/kobject.c:693 [inline]
-> >   kobject_release lib/kobject.c:722 [inline]
-> >   kref_put include/linux/kref.h:65 [inline]
-> >   kobject_put.cold+0x289/0x2e6 lib/kobject.c:739
-> >   put_device drivers/base/core.c:2301 [inline]
-> >   device_unregister+0x28/0x40 drivers/base/core.c:2409
-> >   bdi_unregister+0x428/0x610 mm/backing-dev.c:1016
-> >   del_gendisk+0x896/0xb30 block/genhd.c:810
-> >   loop_remove+0x3c/0xd0 drivers/block/loop.c:2079
-> >   loop_control_ioctl drivers/block/loop.c:2178 [inline]
-> >   loop_control_ioctl+0x320/0x360 drivers/block/loop.c:2144
-> >   vfs_ioctl fs/ioctl.c:46 [inline]
-> >   file_ioctl fs/ioctl.c:509 [inline]
-> >   do_vfs_ioctl+0xdb6/0x13e0 fs/ioctl.c:696
-> >   ksys_ioctl+0xab/0xd0 fs/ioctl.c:713
-> >   __do_sys_ioctl fs/ioctl.c:720 [inline]
-> >   __se_sys_ioctl fs/ioctl.c:718 [inline]
-> >   __x64_sys_ioctl+0x73/0xb0 fs/ioctl.c:718
-> >   do_syscall_64+0xfa/0x760 arch/x86/entry/common.c:290
-> >   entry_SYSCALL_64_after_hwframe+0x49/0xbe
-> >
-> > The buggy address belongs to the object at ffff8880a01b2000
-> >   which belongs to the cache kmalloc-2k of size 2048
-> > The buggy address is located 80 bytes inside of
-> >   2048-byte region [ffff8880a01b2000, ffff8880a01b2800)
-> > The buggy address belongs to the page:
-> > page:ffffea0002806c80 refcount:1 mapcount:0 mapping:ffff8880aa400e00
-> > index:0x0
-> > raw: 01fffc0000000200 ffffea0002374088 ffffea0002730148 ffff8880aa400e00
-> > raw: 0000000000000000 ffff8880a01b2000 0000000100000001 0000000000000000
-> > page dumped because: kasan: bad access detected
-> >
-> > Memory state around the buggy address:
-> >   ffff8880a01b1f00: fc fc fc fc fc fc fc fc fc fc fc fc fc fc fc fc
-> >   ffff8880a01b1f80: fc fc fc fc fc fc fc fc fc fc fc fc fc fc fc fc
-> > > ffff8880a01b2000: fb fb fb fb fb fb fb fb fb fb fb fb fb fb fb fb
-> >                                                   ^
-> >   ffff8880a01b2080: fb fb fb fb fb fb fb fb fb fb fb fb fb fb fb fb
-> >   ffff8880a01b2100: fb fb fb fb fb fb fb fb fb fb fb fb fb fb fb fb
-> > ==================================================================
->
->
-> bdi can be unregistered without queue_lock protection, so the reference
-> of bdi->dev must be informed on resetting it.
->
+On Tue 19-11-19 00:16:21, John Hubbard wrote:
+> There are four locations in gup.c that have a fair amount of code
+> duplication. This means that changing one requires making the same
+> changes in four places, not to mention reading the same code four
+> times, and wondering if there are subtle differences.
+> 
+> Factor out the common code into static functions, thus reducing the
+> overall line count and the code's complexity.
+> 
+> Also, take the opportunity to slightly improve the efficiency of the
+> error cases, by doing a mass subtraction of the refcount, surrounded
+> by get_page()/put_page().
+> 
+> Also, further simplify (slightly), by waiting until the the successful
+> end of each routine, to increment *nr.
+> 
+> Reviewed-by: Jérôme Glisse <jglisse@redhat.com>
+> Cc: Jan Kara <jack@suse.cz>
+> Cc: Ira Weiny <ira.weiny@intel.com>
+> Cc: Christoph Hellwig <hch@lst.de>
+> Cc: Aneesh Kumar K.V <aneesh.kumar@linux.ibm.com>
+> Signed-off-by: John Hubbard <jhubbard@nvidia.com>
+
+Looks good to me now! You can add:
+
+Reviewed-by: Jan Kara <jack@suse.cz>
+
+								Honza
+
 > ---
->
-> --- a/block/blk-cgroup.c
-> +++ b/block/blk-cgroup.c
-> @@ -494,8 +494,10 @@ static int blkcg_reset_stats(struct cgro
->  const char *blkg_dev_name(struct blkcg_gq *blkg)
->  {
->         /* some drivers (floppy) instantiate a queue w/o disk registered */
-> -       if (blkg->q->backing_dev_info->dev)
-> +       if (blkg->q->backing_dev_info->dev) {
-> +               smp_rmb();
->                 return dev_name(blkg->q->backing_dev_info->dev);
-> +       }
->         return NULL;
+>  mm/gup.c | 91 ++++++++++++++++++++++----------------------------------
+>  1 file changed, 36 insertions(+), 55 deletions(-)
+> 
+> diff --git a/mm/gup.c b/mm/gup.c
+> index 85caf76b3012..f3c7d6625817 100644
+> --- a/mm/gup.c
+> +++ b/mm/gup.c
+> @@ -1969,6 +1969,25 @@ static int __gup_device_huge_pud(pud_t pud, pud_t *pudp, unsigned long addr,
 >  }
->
-> --- a/mm/backing-dev.c
-> +++ b/mm/backing-dev.c
-> @@ -1015,6 +1015,7 @@ void bdi_unregister(struct backing_dev_i
->                 bdi_debug_unregister(bdi);
->                 device_unregister(bdi->dev);
->                 bdi->dev = NULL;
-> +               smp_wmb();
->         }
->
->         if (bdi->owner) {
-
-
-This was hit on x86, so I would assume there is a more substantial bug
-than missed memory barriers (though, of course possible due to
-compiler and formal undefined behavior). But still I think there is
-also something like a missed refcount.
-
-The fix in blkcg_reset_stats() looks suspicious to me on it's own.
-Let's say these functions are racing, even if we read
-blkg->q->backing_dev_info->dev as non-NULL and did smp_rmb()
-afterwards, nothing prevents dev from becoming NULL/freed on the very
-next line. If there is really a race, this type of use would require
-stronger synchronization (locks, refcounts, etc), not a barrier.
-
-But if there is also a data race, then we will get back to this code
-with KCSAN later. Please don't use rmb/wmb, smp_load_acquire/release
-are better primitives. At the very least rmb/wmb must always be used
-with READ/WRITE_ONCE. rmb/wmb cannot possibly prevent a data race on
-dev variable itself.
+>  #endif
+>  
+> +static int __record_subpages(struct page *page, unsigned long addr,
+> +			     unsigned long end, struct page **pages)
+> +{
+> +	int nr;
+> +
+> +	for (nr = 0; addr != end; addr += PAGE_SIZE)
+> +		pages[nr++] = page++;
+> +
+> +	return nr;
+> +}
+> +
+> +static void put_compound_head(struct page *page, int refs)
+> +{
+> +	/* Do a get_page() first, in case refs == page->_refcount */
+> +	get_page(page);
+> +	page_ref_sub(page, refs);
+> +	put_page(page);
+> +}
+> +
+>  #ifdef CONFIG_ARCH_HAS_HUGEPD
+>  static unsigned long hugepte_addr_end(unsigned long addr, unsigned long end,
+>  				      unsigned long sz)
+> @@ -1998,32 +2017,20 @@ static int gup_hugepte(pte_t *ptep, unsigned long sz, unsigned long addr,
+>  	/* hugepages are never "special" */
+>  	VM_BUG_ON(!pfn_valid(pte_pfn(pte)));
+>  
+> -	refs = 0;
+>  	head = pte_page(pte);
+> -
+>  	page = head + ((addr & (sz-1)) >> PAGE_SHIFT);
+> -	do {
+> -		VM_BUG_ON(compound_head(page) != head);
+> -		pages[*nr] = page;
+> -		(*nr)++;
+> -		page++;
+> -		refs++;
+> -	} while (addr += PAGE_SIZE, addr != end);
+> +	refs = __record_subpages(page, addr, end, pages + *nr);
+>  
+>  	head = try_get_compound_head(head, refs);
+> -	if (!head) {
+> -		*nr -= refs;
+> +	if (!head)
+>  		return 0;
+> -	}
+>  
+>  	if (unlikely(pte_val(pte) != pte_val(*ptep))) {
+> -		/* Could be optimized better */
+> -		*nr -= refs;
+> -		while (refs--)
+> -			put_page(head);
+> +		put_compound_head(head, refs);
+>  		return 0;
+>  	}
+>  
+> +	*nr += refs;
+>  	SetPageReferenced(head);
+>  	return 1;
+>  }
+> @@ -2071,28 +2078,19 @@ static int gup_huge_pmd(pmd_t orig, pmd_t *pmdp, unsigned long addr,
+>  					     pages, nr);
+>  	}
+>  
+> -	refs = 0;
+>  	page = pmd_page(orig) + ((addr & ~PMD_MASK) >> PAGE_SHIFT);
+> -	do {
+> -		pages[*nr] = page;
+> -		(*nr)++;
+> -		page++;
+> -		refs++;
+> -	} while (addr += PAGE_SIZE, addr != end);
+> +	refs = __record_subpages(page, addr, end, pages + *nr);
+>  
+>  	head = try_get_compound_head(pmd_page(orig), refs);
+> -	if (!head) {
+> -		*nr -= refs;
+> +	if (!head)
+>  		return 0;
+> -	}
+>  
+>  	if (unlikely(pmd_val(orig) != pmd_val(*pmdp))) {
+> -		*nr -= refs;
+> -		while (refs--)
+> -			put_page(head);
+> +		put_compound_head(head, refs);
+>  		return 0;
+>  	}
+>  
+> +	*nr += refs;
+>  	SetPageReferenced(head);
+>  	return 1;
+>  }
+> @@ -2114,28 +2112,19 @@ static int gup_huge_pud(pud_t orig, pud_t *pudp, unsigned long addr,
+>  					     pages, nr);
+>  	}
+>  
+> -	refs = 0;
+>  	page = pud_page(orig) + ((addr & ~PUD_MASK) >> PAGE_SHIFT);
+> -	do {
+> -		pages[*nr] = page;
+> -		(*nr)++;
+> -		page++;
+> -		refs++;
+> -	} while (addr += PAGE_SIZE, addr != end);
+> +	refs = __record_subpages(page, addr, end, pages + *nr);
+>  
+>  	head = try_get_compound_head(pud_page(orig), refs);
+> -	if (!head) {
+> -		*nr -= refs;
+> +	if (!head)
+>  		return 0;
+> -	}
+>  
+>  	if (unlikely(pud_val(orig) != pud_val(*pudp))) {
+> -		*nr -= refs;
+> -		while (refs--)
+> -			put_page(head);
+> +		put_compound_head(head, refs);
+>  		return 0;
+>  	}
+>  
+> +	*nr += refs;
+>  	SetPageReferenced(head);
+>  	return 1;
+>  }
+> @@ -2151,28 +2140,20 @@ static int gup_huge_pgd(pgd_t orig, pgd_t *pgdp, unsigned long addr,
+>  		return 0;
+>  
+>  	BUILD_BUG_ON(pgd_devmap(orig));
+> -	refs = 0;
+> +
+>  	page = pgd_page(orig) + ((addr & ~PGDIR_MASK) >> PAGE_SHIFT);
+> -	do {
+> -		pages[*nr] = page;
+> -		(*nr)++;
+> -		page++;
+> -		refs++;
+> -	} while (addr += PAGE_SIZE, addr != end);
+> +	refs = __record_subpages(page, addr, end, pages + *nr);
+>  
+>  	head = try_get_compound_head(pgd_page(orig), refs);
+> -	if (!head) {
+> -		*nr -= refs;
+> +	if (!head)
+>  		return 0;
+> -	}
+>  
+>  	if (unlikely(pgd_val(orig) != pgd_val(*pgdp))) {
+> -		*nr -= refs;
+> -		while (refs--)
+> -			put_page(head);
+> +		put_compound_head(head, refs);
+>  		return 0;
+>  	}
+>  
+> +	*nr += refs;
+>  	SetPageReferenced(head);
+>  	return 1;
+>  }
+> -- 
+> 2.24.0
+> 
+-- 
+Jan Kara <jack@suse.com>
+SUSE Labs, CR
