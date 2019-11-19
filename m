@@ -2,80 +2,46 @@ Return-Path: <SRS0=5EpG=ZL=vger.kernel.org=linux-block-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-6.7 required=3.0 tests=DKIM_SIGNED,DKIM_VALID,
-	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,
-	SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED autolearn=unavailable autolearn_force=no
-	version=3.4.0
+X-Spam-Status: No, score=-2.2 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
+	MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,USER_AGENT_SANE_1 autolearn=no
+	autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 48BB6C432C0
-	for <linux-block@archiver.kernel.org>; Tue, 19 Nov 2019 01:21:32 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 6189CC432C0
+	for <linux-block@archiver.kernel.org>; Tue, 19 Nov 2019 01:25:40 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.kernel.org (Postfix) with ESMTP id 1E40522310
-	for <linux-block@archiver.kernel.org>; Tue, 19 Nov 2019 01:21:32 +0000 (UTC)
-Authentication-Results: mail.kernel.org;
-	dkim=pass (2048-bit key) header.d=fredlawl-com.20150623.gappssmtp.com header.i=@fredlawl-com.20150623.gappssmtp.com header.b="zTeOhlOh"
+	by mail.kernel.org (Postfix) with ESMTP id 410B022309
+	for <linux-block@archiver.kernel.org>; Tue, 19 Nov 2019 01:25:40 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1727109AbfKSBVb (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Mon, 18 Nov 2019 20:21:31 -0500
-Received: from mail-oi1-f196.google.com ([209.85.167.196]:33894 "EHLO
-        mail-oi1-f196.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1726911AbfKSBVa (ORCPT
-        <rfc822;linux-block@vger.kernel.org>);
-        Mon, 18 Nov 2019 20:21:30 -0500
-Received: by mail-oi1-f196.google.com with SMTP id l202so17342278oig.1
-        for <linux-block@vger.kernel.org>; Mon, 18 Nov 2019 17:21:28 -0800 (PST)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=fredlawl-com.20150623.gappssmtp.com; s=20150623;
-        h=subject:to:cc:references:from:message-id:date:user-agent
-         :mime-version:in-reply-to:content-language:content-transfer-encoding;
-        bh=bU9yatWUATDadtyUGjLu2bxv54BFgg0wz4MPxKlXIOs=;
-        b=zTeOhlOhY7SzoVwDvHQZNQR1o/r1BerSB+zKMZ5D+hlOH1KxEHActHws1wYP8RAg2H
-         MCR5BxI5Q1+cOZIdzypDxS7RIz/dpCCer1jq/olgGO8wG9PQiwZqJRxd0uCBxVe5RbI9
-         p+4505BHgu3+pYlcuEvB5VKArubyJabfEj2A6dRfmu8a/6rZZARqwrR5p49NFsgdJI/I
-         zPzHz8o042ad4XVXcxqocgddFCBwcYy8s5ao/3pOIVJAI4mDC6HLjFHvZn4Y+K4ZfJ+M
-         8PMkdqTN05K2eHBkDqdSxATRry1+fhFTN+vSEpFv7QXQtSO2FSm/amDOJw2JDOMHL8Jw
-         54Rw==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20161025;
-        h=x-gm-message-state:subject:to:cc:references:from:message-id:date
-         :user-agent:mime-version:in-reply-to:content-language
-         :content-transfer-encoding;
-        bh=bU9yatWUATDadtyUGjLu2bxv54BFgg0wz4MPxKlXIOs=;
-        b=IrozL97GqbXzXbppaCJtEbFCcaJ3D2DzGWvxbHDf0Eekz/tbNkZrxQL3943uz1uzMF
-         hKCL/gkGhOCzazzmGnlA99d3rDW4Tl9jXJGYakygDL5HaUTubrpFv6wREReCQMANuyOQ
-         i6ceG4nDI6JHck0PvxkU72uqZxNnqvE5re1NkgjGeJd6QjlmJaKAKh1zB2PEXPQ9D3Pc
-         Gp7sq5Axr6Nyoc5Qc5fCguOvPPI3v841dVpYHfjQ9qBzam4F0C9KijBjl6sIPUb+zgtD
-         xrJABKHWRh9456kZUo2ymta4DZv2qO/+aW3NCKrY1Sofz10H06lsJuHCblSWn+Fv1B0G
-         TGDg==
-X-Gm-Message-State: APjAAAUdJK0HXlIDEC+AqyfVDS4HI4Dn3q6TZwhqyUtBGBDdM+npqy5H
-        /iZKO5QW+F6kNCzT5I8P/LkZpQ==
-X-Google-Smtp-Source: APXvYqz9bHbxBf7mwUCUBa4jCc1enfY2KcIv7maD6VbCwjP26gmFlWsYsAUbM+9fh5TNy/IVQhCZyQ==
-X-Received: by 2002:a05:6808:b17:: with SMTP id s23mr1749904oij.102.1574126487415;
-        Mon, 18 Nov 2019 17:21:27 -0800 (PST)
-Received: from Fredericks-MacBook-Pro.local ([2600:1700:4870:71e0:c8a4:b0da:bc77:d506])
-        by smtp.gmail.com with ESMTPSA id b12sm6785523otl.34.2019.11.18.17.21.26
-        (version=TLS1_2 cipher=ECDHE-RSA-AES128-GCM-SHA256 bits=128/128);
-        Mon, 18 Nov 2019 17:21:26 -0800 (PST)
-Subject: Re: [PATCH v2 2/4] skd: Replace magic numbers with PCI constants
-To:     Damien Le Moal <Damien.LeMoal@wdc.com>
-Cc:     "axboe@kernel.dk" <axboe@kernel.dk>,
+        id S1727143AbfKSBZj (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Mon, 18 Nov 2019 20:25:39 -0500
+Received: from szxga06-in.huawei.com ([45.249.212.32]:39288 "EHLO huawei.com"
+        rhost-flags-OK-OK-OK-FAIL) by vger.kernel.org with ESMTP
+        id S1726775AbfKSBZi (ORCPT <rfc822;linux-block@vger.kernel.org>);
+        Mon, 18 Nov 2019 20:25:38 -0500
+Received: from DGGEMS408-HUB.china.huawei.com (unknown [172.30.72.60])
+        by Forcepoint Email with ESMTP id 9649D429704EF0A9917D;
+        Tue, 19 Nov 2019 09:25:36 +0800 (CST)
+Received: from [127.0.0.1] (10.74.219.194) by DGGEMS408-HUB.china.huawei.com
+ (10.3.19.208) with Microsoft SMTP Server id 14.3.439.0; Tue, 19 Nov 2019
+ 09:25:30 +0800
+From:   "chenxiang (M)" <chenxiang66@hisilicon.com>
+To:     Ming Lei <ming.lei@redhat.com>, <lkml@sdf.org>,
+        <tglx@linutronix.de>
+Subject: The irq Affinity is changed after the patch(Fixes: b1a5a73e64e9
+ ("genirq/affinity: Spread vectors on node according to nr_cpu ratio"))
+CC:     <kbusch@kernel.org>, "axboe@kernel.dk" <axboe@kernel.dk>,
         "linux-block@vger.kernel.org" <linux-block@vger.kernel.org>,
-        "linux-kernel@vger.kernel.org" <linux-kernel@vger.kernel.org>,
-        "bhelgaas@google.com" <bhelgaas@google.com>,
-        "bvanassche@acm.org" <bvanassche@acm.org>
-References: <20191118002057.9596-1-fred@fredlawl.com>
- <20191118002057.9596-3-fred@fredlawl.com>
- <BYAPR04MB58162980CA2A2244626C999DE74D0@BYAPR04MB5816.namprd04.prod.outlook.com>
-From:   Frederick Lawler <fred@fredlawl.com>
-Message-ID: <a01d4103-b756-afd5-2cc0-e40115a41343@fredlawl.com>
-Date:   Mon, 18 Nov 2019 19:21:24 -0600
-User-Agent: Mozilla/5.0 (Macintosh; Intel Mac OS X 10.14; rv:52.0)
- Gecko/20100101 PostboxApp/6.1.18
+        Linuxarm <linuxarm@huawei.com>,
+        John Garry <john.garry@huawei.com>
+Message-ID: <d59f7f7a-975a-2032-aa61-7cbff7585d33@hisilicon.com>
+Date:   Tue, 19 Nov 2019 09:25:30 +0800
+User-Agent: Mozilla/5.0 (Windows NT 6.1; WOW64; rv:45.0) Gecko/20100101
+ Thunderbird/45.2.0
 MIME-Version: 1.0
-In-Reply-To: <BYAPR04MB58162980CA2A2244626C999DE74D0@BYAPR04MB5816.namprd04.prod.outlook.com>
-Content-Type: text/plain; charset=utf-8; format=flowed
-Content-Language: en-US
+Content-Type: text/plain; charset="UTF-8"; format=flowed
 Content-Transfer-Encoding: 7bit
+X-Originating-IP: [10.74.219.194]
+X-CFilter-Loop: Reflected
 Sender: linux-block-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
@@ -83,49 +49,31 @@ X-Mailing-List: linux-block@vger.kernel.org
 
 Hi,
 
-Damien Le Moal wrote on 11/17/19 7:45 PM:
-> On 2019/11/18 9:21, Frederick Lawler wrote:
->> Readability was improved by replacing pci_read_config_word() with
->> pcie_capability_read_word(). Take that a step further by replacing magic
->> numbers with PCI reg constants.
->>
->> No functional change intended.
->>
->> Signed-off-by: Frederick Lawler <fred@fredlawl.com>
->> ---
->> v2
->> - Added this patch
->> ---
->>   drivers/block/skd_main.c | 8 +++++---
->>   1 file changed, 5 insertions(+), 3 deletions(-)
->>
->> diff --git a/drivers/block/skd_main.c b/drivers/block/skd_main.c
->> index f25f6ef6b4c7..7f8243573ad9 100644
->> --- a/drivers/block/skd_main.c
->> +++ b/drivers/block/skd_main.c
->> @@ -3141,9 +3141,11 @@ static char *skd_pci_info(struct skd_device *skdev, char *str)
->>   		char lwstr[6];
->>   		uint16_t pcie_lstat, lspeed, lwidth;
->>   
->> -		pcie_capability_read_word(skdev->pdev, 0x12, &pcie_lstat);
->> -		lspeed = pcie_lstat & (0xF);
->> -		lwidth = (pcie_lstat & 0x3F0) >> 4;
->> +		pcie_capability_read_word(skdev->pdev, PCI_EXP_LNKSTA,
->> +					  &pcie_lstat);
->> +		lspeed = pcie_lstat & PCI_EXP_LNKSTA_CLS;
->> +		lwidth = (pcie_lstat & PCI_EXP_LNKSTA_NLW) >>
->> +			 PCI_EXP_LNKSTA_NLW_SHIFT;
->>   
->>   		if (lspeed == 1)
->>   			strcat(str, "2.5GT/s ");
->>
-> 
-> Looks OK to me. But since this is changing again one line that is added
-> by patch 1/4, why not make patch 1 and this patch changes a single patch ?
-> 
+There are 128 cpus and 16 irqs for SAS controller in my system, and 
+there are 4 Nodes, every 32 cpus are for one node (cpu0-31 for node0, 
+cpu32-63 for node1, cpu64-95 for node2, cpu96-127 for node3).
+We use function pci_alloc_irq_vectors_affinity() to set the affinity of 
+irqs.
 
-Works for me.
+I find that  before the patch (Fixes: b1a5a73e64e9 ("genirq/affinity: 
+Spread vectors on node according to nr_cpu ratio")), the relationship 
+between irqs and cpus is: irq0 bind to cpu0-7, irq1 bind to cpu8-15,
+irq2 bind to cpu16-23, irq3 bind to cpu24-31,irq4 bind to cpu32-39... 
+irq15 bind to cpu120-127. But after the patch, the relationship is 
+changed: irq0 bind to cpu32-39,
+irq1 bind to cpu40-47, ..., irq11 bind to cpu120-127, irq12 bind to 
+cpu0-7, irq13 bind to cpu8-15, irq14 bind to cpu16-23, irq15 bind to 
+cpu24-31.
+
+I notice that before calling the sort() in function 
+alloc_nodes_vectors(), the id of array node_vectors[] is from 0,1,2,3. 
+But after function sort(), the index of array node_vectors[] is 1,2,3,0.
+But i think it sorts according to the numbers of cpus in those nodes, so 
+it should be the same as before calling sort() as the numbers of cpus in 
+every node are 32.
+
+Is it a bug of sort() or the usage of sort()?
 
 Thanks,
-Frederick Lawler
+Shawn
 
