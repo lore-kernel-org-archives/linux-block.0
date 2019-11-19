@@ -2,180 +2,173 @@ Return-Path: <SRS0=5EpG=ZL=vger.kernel.org=linux-block-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-2.2 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
-	MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,USER_AGENT_SANE_1 autolearn=no
+X-Spam-Status: No, score=-7.6 required=3.0 tests=DKIMWL_WL_HIGH,DKIM_SIGNED,
+	DKIM_VALID,DKIM_VALID_AU,MAILING_LIST_MULTI,MENTIONS_GIT_HOSTING,
+	SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED,USER_AGENT_SANE_1 autolearn=ham
 	autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 865F5C432C0
-	for <linux-block@archiver.kernel.org>; Tue, 19 Nov 2019 03:32:57 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 4686CC432C0
+	for <linux-block@archiver.kernel.org>; Tue, 19 Nov 2019 03:54:13 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.kernel.org (Postfix) with ESMTP id 65627222A4
-	for <linux-block@archiver.kernel.org>; Tue, 19 Nov 2019 03:32:57 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id 191122230F
+	for <linux-block@archiver.kernel.org>; Tue, 19 Nov 2019 03:54:13 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+	s=default; t=1574135653;
+	bh=gVaoEfdiE6QGBVJzfbL1Mk1XcPXpP9BXLfVw/JsCMCQ=;
+	h=Date:From:To:Cc:Subject:Reply-To:References:In-Reply-To:List-ID:
+	 From;
+	b=Lo6HmcgEB+s3SiZ4sGYY5hYilWHxuU0+zFD3THqPhb2Zk5XvvBhRDO1N77KBC044F
+	 JBHWQg/wqr38IZEJIM1DgR+e0/ejEyvzVddbmGA16vaPJWvCx/Af4oqhnOB61oLmAs
+	 OWHk1TGLqem6hhXt1sEky4s5TWvOcMxhVmhqdy10=
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1727239AbfKSDc5 (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Mon, 18 Nov 2019 22:32:57 -0500
-Received: from szxga06-in.huawei.com ([45.249.212.32]:55612 "EHLO huawei.com"
-        rhost-flags-OK-OK-OK-FAIL) by vger.kernel.org with ESMTP
-        id S1727112AbfKSDc4 (ORCPT <rfc822;linux-block@vger.kernel.org>);
-        Mon, 18 Nov 2019 22:32:56 -0500
-Received: from DGGEMS403-HUB.china.huawei.com (unknown [172.30.72.60])
-        by Forcepoint Email with ESMTP id 318A879CF8B82179E162;
-        Tue, 19 Nov 2019 11:32:54 +0800 (CST)
-Received: from [127.0.0.1] (10.74.219.194) by DGGEMS403-HUB.china.huawei.com
- (10.3.19.203) with Microsoft SMTP Server id 14.3.439.0; Tue, 19 Nov 2019
- 11:32:48 +0800
-Subject: Re: The irq Affinity is changed after the patch(Fixes: b1a5a73e64e9
- ("genirq/affinity: Spread vectors on node according to nr_cpu ratio"))
-To:     Ming Lei <ming.lei@redhat.com>
-References: <d59f7f7a-975a-2032-aa61-7cbff7585d33@hisilicon.com>
- <20191119014204.GA391@ming.t460p>
- <a8a89884-8323-ff70-f35e-0fcf5d7afefc@hisilicon.com>
- <20191119031700.GE391@ming.t460p>
-CC:     <lkml@sdf.org>, <tglx@linutronix.de>, <kbusch@kernel.org>,
-        "axboe@kernel.dk" <axboe@kernel.dk>,
-        "linux-block@vger.kernel.org" <linux-block@vger.kernel.org>,
-        Linuxarm <linuxarm@huawei.com>,
-        John Garry <john.garry@huawei.com>
-From:   "chenxiang (M)" <chenxiang66@hisilicon.com>
-Message-ID: <75a630b2-029b-0a3e-79a9-d11143a033ad@hisilicon.com>
-Date:   Tue, 19 Nov 2019 11:32:48 +0800
-User-Agent: Mozilla/5.0 (Windows NT 6.1; WOW64; rv:45.0) Gecko/20100101
- Thunderbird/45.2.0
+        id S1727112AbfKSDyM (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Mon, 18 Nov 2019 22:54:12 -0500
+Received: from mail.kernel.org ([198.145.29.99]:51646 "EHLO mail.kernel.org"
+        rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
+        id S1727363AbfKSDyM (ORCPT <rfc822;linux-block@vger.kernel.org>);
+        Mon, 18 Nov 2019 22:54:12 -0500
+Received: from paulmck-ThinkPad-P72.home (199-192-87-166.static.wiline.com [199.192.87.166])
+        (using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+        (No client certificate requested)
+        by mail.kernel.org (Postfix) with ESMTPSA id 22306222DD;
+        Tue, 19 Nov 2019 03:54:11 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+        s=default; t=1574135651;
+        bh=gVaoEfdiE6QGBVJzfbL1Mk1XcPXpP9BXLfVw/JsCMCQ=;
+        h=Date:From:To:Cc:Subject:Reply-To:References:In-Reply-To:From;
+        b=DkiMhRza8LV0gcVFrffeiUMy2HPFDAdV4VBn6Wgd1M1VQoGTDQghdmLngOD2oMw7a
+         H7Vuu8OeOZB6T0CBMnVlcewDLC2T+tZeJ+sqFWhlhewIxok5FlMVbgLpGJeSCTpUdj
+         2bU5aC4TUUwNbqsVnjYO7m9wOBAS8BTdanBvDL1M=
+Received: by paulmck-ThinkPad-P72.home (Postfix, from userid 1000)
+        id B91CC35227AF; Mon, 18 Nov 2019 19:54:10 -0800 (PST)
+Date:   Mon, 18 Nov 2019 19:54:10 -0800
+From:   "Paul E. McKenney" <paulmck@kernel.org>
+To:     Eric Biggers <ebiggers@kernel.org>
+Cc:     Marco Elver <elver@google.com>,
+        syzbot <syzbot+08f3e9d26e5541e1ecf2@syzkaller.appspotmail.com>,
+        Lai Jiangshan <jiangshanlai@gmail.com>,
+        Josh Triplett <josh@joshtriplett.org>, axboe@kernel.dk,
+        justin@coraid.com, linux-block@vger.kernel.org,
+        LKML <linux-kernel@vger.kernel.org>,
+        syzkaller-bugs@googlegroups.com
+Subject: Re: KCSAN: data-race in process_srcu / synchronize_srcu
+Message-ID: <20191119035410.GR2889@paulmck-ThinkPad-P72>
+Reply-To: paulmck@kernel.org
+References: <000000000000b587670596839fab@google.com>
+ <CANpmjNPpvyxZv9N042Uz1gQb7R0B1MOmCa255-czqWsc7SiOxg@mail.gmail.com>
+ <20191104161152.GB20975@paulmck-ThinkPad-P72>
+ <CANpmjNNFQbtDpBzbf-RkBp=mzhzXCLOO=scA=oB6xSWD3X9zEw@mail.gmail.com>
+ <20191104165303.GG20975@paulmck-ThinkPad-P72>
+ <20191119024805.GF3147@sol.localdomain>
 MIME-Version: 1.0
-In-Reply-To: <20191119031700.GE391@ming.t460p>
-Content-Type: text/plain; charset="UTF-8"; format=flowed
-Content-Transfer-Encoding: 8bit
-X-Originating-IP: [10.74.219.194]
-X-CFilter-Loop: Reflected
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <20191119024805.GF3147@sol.localdomain>
+User-Agent: Mutt/1.9.4 (2018-02-28)
 Sender: linux-block-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
+On Mon, Nov 18, 2019 at 06:48:05PM -0800, Eric Biggers wrote:
+> On Mon, Nov 04, 2019 at 08:53:03AM -0800, Paul E. McKenney wrote:
+> > On Mon, Nov 04, 2019 at 05:14:50PM +0100, Marco Elver wrote:
+> > > On Mon, 4 Nov 2019 at 17:11, Paul E. McKenney <paulmck@kernel.org> wrote:
+> > > >
+> > > > On Mon, Nov 04, 2019 at 12:31:56PM +0100, Marco Elver wrote:
+> > > > > +RCU folks, since this is probably a data race in RCU.
+> > > > >
+> > > > > On Mon, 4 Nov 2019 at 12:29, syzbot
+> > > > > <syzbot+08f3e9d26e5541e1ecf2@syzkaller.appspotmail.com> wrote:
+> > > > > >
+> > > > > > Hello,
+> > > > > >
+> > > > > > syzbot found the following crash on:
+> > > > > >
+> > > > > > HEAD commit:    05f22368 x86, kcsan: Enable KCSAN for x86
+> > > > > > git tree:       https://github.com/google/ktsan.git kcsan
+> > > > > > console output: https://syzkaller.appspot.com/x/log.txt?x=17ade7ef600000
+> > > > > > kernel config:  https://syzkaller.appspot.com/x/.config?x=87d111955f40591f
+> > > > > > dashboard link: https://syzkaller.appspot.com/bug?extid=08f3e9d26e5541e1ecf2
+> > > > > > compiler:       gcc (GCC) 9.0.0 20181231 (experimental)
+> > > > > >
+> > > > > > Unfortunately, I don't have any reproducer for this crash yet.
+> > > > > >
+> > > > > > IMPORTANT: if you fix the bug, please add the following tag to the commit:
+> > > > > > Reported-by: syzbot+08f3e9d26e5541e1ecf2@syzkaller.appspotmail.com
+> > > > > >
+> > > > > > ==================================================================
+> > > > > > BUG: KCSAN: data-race in process_srcu / synchronize_srcu
+> > > > > >
+> > > > > > write to 0xffffffff8604e8a0 of 8 bytes by task 17 on cpu 1:
+> > > > > >   srcu_gp_end kernel/rcu/srcutree.c:533 [inline]
+> > > > > >   srcu_advance_state kernel/rcu/srcutree.c:1146 [inline]
+> > > > > >   process_srcu+0x207/0x780 kernel/rcu/srcutree.c:1237
+> > > > > >   process_one_work+0x3d4/0x890 kernel/workqueue.c:2269
+> > > > > >   worker_thread+0xa0/0x800 kernel/workqueue.c:2415
+> > > > > >   kthread+0x1d4/0x200 drivers/block/aoe/aoecmd.c:1253
+> > > > > >   ret_from_fork+0x1f/0x30 arch/x86/entry/entry_64.S:352
+> > > > > >
+> > > > > > read to 0xffffffff8604e8a0 of 8 bytes by task 12515 on cpu 0:
+> > > > > >   srcu_might_be_idle kernel/rcu/srcutree.c:784 [inline]
+> > > > > >   synchronize_srcu+0x107/0x214 kernel/rcu/srcutree.c:996
+> > > > > >   fsnotify_connector_destroy_workfn+0x63/0xb0 fs/notify/mark.c:164
+> > > > > >   process_one_work+0x3d4/0x890 kernel/workqueue.c:2269
+> > > > > >   worker_thread+0xa0/0x800 kernel/workqueue.c:2415
+> > > > > >   kthread+0x1d4/0x200 drivers/block/aoe/aoecmd.c:1253
+> > > > > >   ret_from_fork+0x1f/0x30 arch/x86/entry/entry_64.S:352
+> > > > > >
+> > > > > > Reported by Kernel Concurrency Sanitizer on:
+> > > > > > CPU: 0 PID: 12515 Comm: kworker/u4:8 Not tainted 5.4.0-rc3+ #0
+> > > > > > Hardware name: Google Google Compute Engine/Google Compute Engine, BIOS
+> > > > > > Google 01/01/2011
+> > > > > > Workqueue: events_unbound fsnotify_connector_destroy_workfn
+> > > > > > ==================================================================
+> > > > > > Kernel panic - not syncing: panic_on_warn set ...
+> > > > > > CPU: 0 PID: 12515 Comm: kworker/u4:8 Not tainted 5.4.0-rc3+ #0
+> > > > > > Hardware name: Google Google Compute Engine/Google Compute Engine, BIOS
+> > > > > > Google 01/01/2011
+> > > > > > Workqueue: events_unbound fsnotify_connector_destroy_workfn
+> > > > > > Call Trace:
+> > > > > >   __dump_stack lib/dump_stack.c:77 [inline]
+> > > > > >   dump_stack+0xf5/0x159 lib/dump_stack.c:113
+> > > > > >   panic+0x210/0x640 kernel/panic.c:221
+> > > > > >   kcsan_report.cold+0xc/0x10 kernel/kcsan/report.c:302
+> > > > > >   __kcsan_setup_watchpoint+0x32e/0x4a0 kernel/kcsan/core.c:411
+> > > > > >   __tsan_read8 kernel/kcsan/kcsan.c:36 [inline]
+> > > > > >   __tsan_read8+0x2c/0x30 kernel/kcsan/kcsan.c:36
+> > > > > >   srcu_might_be_idle kernel/rcu/srcutree.c:784 [inline]
+> > > > > >   synchronize_srcu+0x107/0x214 kernel/rcu/srcutree.c:996
+> > > > > >   fsnotify_connector_destroy_workfn+0x63/0xb0 fs/notify/mark.c:164
+> > > > > >   process_one_work+0x3d4/0x890 kernel/workqueue.c:2269
+> > > > > >   worker_thread+0xa0/0x800 kernel/workqueue.c:2415
+> > > > > >   kthread+0x1d4/0x200 drivers/block/aoe/aoecmd.c:1253
+> > > > > >   ret_from_fork+0x1f/0x30 arch/x86/entry/entry_64.S:352
+> > > > > > Kernel Offset: disabled
+> > > > > > Rebooting in 86400 seconds..
+> > > > > >
+> > > > > >
+> > > > > > ---
+> > > > > > This bug is generated by a bot. It may contain errors.
+> > > > > > See https://goo.gl/tpsmEJ for more information about syzbot.
+> > > > > > syzbot engineers can be reached at syzkaller@googlegroups.com.
+> > > > > >
+> > > > > > syzbot will keep track of this bug report. See:
+> > > > > > https://goo.gl/tpsmEJ#status for how to communicate with syzbot.
+> > > >
+> > > > Good catch!  Does the patch below help?
+> > > 
+> > > Looks good to me, thanks for the quick fix.
+> > > 
+> > > Acked-by: Marco Elver <elver@google.com>
+> > 
+> > Applied, thank you!
+> > 
+> > 							Thanx, Paul
+> 
+> This patch is not in linux-next.  What happened to it?
 
+It is in -rcu, but arrived too late to make my pull request for
+v5.5.  It will hit -next shortly after v5.5-rc1.
 
-在 2019/11/19 11:17, Ming Lei 写道:
-> On Tue, Nov 19, 2019 at 11:05:55AM +0800, chenxiang (M) wrote:
->> Hi Ming,
->>
->> 在 2019/11/19 9:42, Ming Lei 写道:
->>> On Tue, Nov 19, 2019 at 09:25:30AM +0800, chenxiang (M) wrote:
->>>> Hi,
->>>>
->>>> There are 128 cpus and 16 irqs for SAS controller in my system, and there
->>>> are 4 Nodes, every 32 cpus are for one node (cpu0-31 for node0, cpu32-63 for
->>>> node1, cpu64-95 for node2, cpu96-127 for node3).
->>>> We use function pci_alloc_irq_vectors_affinity() to set the affinity of
->>>> irqs.
->>>>
->>>> I find that  before the patch (Fixes: b1a5a73e64e9 ("genirq/affinity: Spread
->>>> vectors on node according to nr_cpu ratio")), the relationship between irqs
->>>> and cpus is: irq0 bind to cpu0-7, irq1 bind to cpu8-15,
->>>> irq2 bind to cpu16-23, irq3 bind to cpu24-31,irq4 bind to cpu32-39... irq15
->>>> bind to cpu120-127. But after the patch, the relationship is changed: irq0
->>>> bind to cpu32-39,
->>>> irq1 bind to cpu40-47, ..., irq11 bind to cpu120-127, irq12 bind to cpu0-7,
->>>> irq13 bind to cpu8-15, irq14 bind to cpu16-23, irq15 bind to cpu24-31.
->>>>
->>>> I notice that before calling the sort() in function alloc_nodes_vectors(),
->>>> the id of array node_vectors[] is from 0,1,2,3. But after function sort(),
->>>> the index of array node_vectors[] is 1,2,3,0.
->>>> But i think it sorts according to the numbers of cpus in those nodes, so it
->>>> should be the same as before calling sort() as the numbers of cpus in every
->>>> node are 32.
->>> Maybe there are more non-present CPUs covered by node 0.
->>>
->>> Could you provide the following log?
->>>
->>> 1) lscpu
->>>
->>> 2) ./dump-io-irq-affinity $PCI_ID_SAS
->>>
->>> 	http://people.redhat.com/minlei/tests/tools/dump-io-irq-affinity
->>>
->>> You need to figure out the PCI ID(the 1st column of lspci output) of the SAS
->>> controller via lspci.
->> Sorry, I can't access the link you provide, but i can provide those irqs'
->> affinity in the attachment.
->> I also write a small testcase, and find id is 1, 2, 3, 0 after calling
->> sort() .
-> Runtime log from /proc/interrupts isn't useful for investigating
-> affinity allocation issue, please use the attached script for collecting
-> log.
-
-Note: there are 32 irqs for SAS controller, irq0-15 are other interrupts 
-(such as phy up/down/channel....), only irq 16-31 are cq interrupts 
-which is processed by function pci_alloc_irq_vectors_affinity().
-The log is as follows:
-
-Euler:~ # ./dump-io-irq-affinity 74:02.0
-kernel version:
-Linux Euler 5.4.0-rc2-14683-g74684b1-dirty #224 SMP PREEMPT Mon Nov 18 
-18:54:27 CST 2019 aarch64 aarch64 aarch64 GNU/Linux
-PCI name is 74:02.0: sdd
-cat: /proc/irq/65/smp_affinity_list: No such file or directory
-cat: /proc/irq/65/effective_affinity_list: No such file or directory
-     irq 65, cpu list , effective list
-     irq 66, cpu list 0-31, effective list 0
-     irq 67, cpu list 0-31, effective list 0
-cat: /proc/irq/68/smp_affinity_list: No such file or directory
-cat: /proc/irq/68/effective_affinity_list: No such file or directory
-     irq 68, cpu list , effective list
-cat: /proc/irq/69/smp_affinity_list: No such file or directory
-cat: /proc/irq/69/effective_affinity_list: No such file or directory
-     irq 69, cpu list , effective list
-cat: /proc/irq/70/smp_affinity_list: No such file or directory
-cat: /proc/irq/70/effective_affinity_list: No such file or directory
-     irq 70, cpu list , effective list
-cat: /proc/irq/71/smp_affinity_list: No such file or directory
-cat: /proc/irq/71/effective_affinity_list: No such file or directory
-     irq 71, cpu list , effective list
-cat: /proc/irq/72/smp_affinity_list: No such file or directory
-cat: /proc/irq/72/effective_affinity_list: No such file or directory
-     irq 72, cpu list , effective list
-cat: /proc/irq/73/smp_affinity_list: No such file or directory
-cat: /proc/irq/73/effective_affinity_list: No such file or directory
-     irq 73, cpu list , effective list
-cat: /proc/irq/74/smp_affinity_list: No such file or directory
-cat: /proc/irq/74/effective_affinity_list: No such file or directory
-     irq 74, cpu list , effective list
-cat: /proc/irq/75/smp_affinity_list: No such file or directory
-cat: /proc/irq/75/effective_affinity_list: No such file or directory
-     irq 75, cpu list , effective list
-     irq 76, cpu list 0-31, effective list 0
-cat: /proc/irq/77/smp_affinity_list: No such file or directory
-cat: /proc/irq/77/effective_affinity_list: No such file or directory
-     irq 77, cpu list , effective list
-cat: /proc/irq/78/smp_affinity_list: No such file or directory
-cat: /proc/irq/78/effective_affinity_list: No such file or directory
-     irq 78, cpu list , effective list
-cat: /proc/irq/79/smp_affinity_list: No such file or directory
-cat: /proc/irq/79/effective_affinity_list: No such file or directory
-     irq 79, cpu list , effective list
-cat: /proc/irq/80/smp_affinity_list: No such file or directory
-cat: /proc/irq/80/effective_affinity_list: No such file or directory
-     irq 80, cpu list , effective list
-     irq 81, cpu list 32-39, effective list 32
-     irq 82, cpu list 40-47, effective list 40
-     irq 83, cpu list 48-55, effective list 48
-     irq 84, cpu list 56-63, effective list 56
-     irq 85, cpu list 64-71, effective list 64
-     irq 86, cpu list 72-79, effective list 72
-     irq 87, cpu list 80-87, effective list 80
-     irq 88, cpu list 88-95, effective list 88
-     irq 89, cpu list 96-103, effective list 96
-     irq 90, cpu list 104-111, effective list 104
-     irq 91, cpu list 112-119, effective list 112
-     irq 92, cpu list 120-127, effective list 120
-     irq 93, cpu list 0-7, effective list 0
-     irq 94, cpu list 8-15, effective list 8
-     irq 95, cpu list 16-23, effective list 16
-     irq 96, cpu list 24-31, effective list 24
-
-
->
->
-> Thanks,
-> Ming
-
-
+							Thanx, Paul
