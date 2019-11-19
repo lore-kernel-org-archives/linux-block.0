@@ -2,69 +2,65 @@ Return-Path: <SRS0=5EpG=ZL=vger.kernel.org=linux-block-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-8.3 required=3.0 tests=DKIM_SIGNED,DKIM_VALID,
-	DKIM_VALID_AU,HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,
-	SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED,USER_AGENT_SANE_1
-	autolearn=unavailable autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-2.4 required=3.0 tests=DKIM_SIGNED,DKIM_VALID,
+	DKIM_VALID_AU,HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SPF_HELO_NONE,
+	SPF_PASS,USER_AGENT_SANE_1 autolearn=no autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 9FC9FC33CA1
-	for <linux-block@archiver.kernel.org>; Tue, 19 Nov 2019 02:21:19 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 175CBC432C0
+	for <linux-block@archiver.kernel.org>; Tue, 19 Nov 2019 02:33:21 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.kernel.org (Postfix) with ESMTP id 6E2D722316
-	for <linux-block@archiver.kernel.org>; Tue, 19 Nov 2019 02:21:19 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id D324422315
+	for <linux-block@archiver.kernel.org>; Tue, 19 Nov 2019 02:33:20 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="ZmlVjp5v"
+	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="WQUakmSr"
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1727080AbfKSCVS (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Mon, 18 Nov 2019 21:21:18 -0500
-Received: from us-smtp-delivery-1.mimecast.com ([207.211.31.120]:39980 "EHLO
-        us-smtp-1.mimecast.com" rhost-flags-OK-OK-OK-FAIL) by vger.kernel.org
-        with ESMTP id S1727004AbfKSCVS (ORCPT
+        id S1726952AbfKSCdU (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Mon, 18 Nov 2019 21:33:20 -0500
+Received: from us-smtp-2.mimecast.com ([205.139.110.61]:40847 "EHLO
+        us-smtp-delivery-1.mimecast.com" rhost-flags-OK-OK-OK-FAIL)
+        by vger.kernel.org with ESMTP id S1726814AbfKSCdU (ORCPT
         <rfc822;linux-block@vger.kernel.org>);
-        Mon, 18 Nov 2019 21:21:18 -0500
+        Mon, 18 Nov 2019 21:33:20 -0500
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-        s=mimecast20190719; t=1574130077;
+        s=mimecast20190719; t=1574130798;
         h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
          to:to:cc:cc:mime-version:mime-version:content-type:content-type:
          content-transfer-encoding:content-transfer-encoding:
          in-reply-to:in-reply-to:references:references;
-        bh=86O2DN0L3SDx4AnwOCmuZblOGVlZFGCkgSfX2dhNKhc=;
-        b=ZmlVjp5vdRB8CVEz9kM9EAbGGyr+uAJ4nW/oM2FiXXDlzpE2uvcEsHOaDgiyaKn4SVg/q6
-        yifg+o0vpXU2UKBbLy++RPgDp7qMHo4+zJ1TV5HpbMm0D1wKi635YD2W73A2azVF4hbrpq
-        qdgMEw4ivW7W/75A74XyvdLu4qzEObM=
+        bh=0MkXorS37MAT9qquxxYHBHfZi9PjbohKS55KZ5S0L6Y=;
+        b=WQUakmSrUbtSfEM8i4TiAN05QtdHxq7KEdhje3KQpvtACaH7ZniAOmBdfM14xWOUxKxQH3
+        ZELkw3dMVCitdTALuUsyYVkhvMVl9Qwuowi+iogR2mLyCiAxtMxLUCHfI4T3GGpkNIw1k3
+        36jyW7O9jpOlHDS8Anzu+DLbFIlNWkc=
 Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
  [209.132.183.4]) (Using TLS) by relay.mimecast.com with ESMTP id
- us-mta-381-tcmB4oYwN1Gc4tkqhGpUTw-1; Mon, 18 Nov 2019 21:21:13 -0500
-Received: from smtp.corp.redhat.com (int-mx01.intmail.prod.int.phx2.redhat.com [10.5.11.11])
+ us-mta-440-WSpetWe3N8mJo7dOYsxl0Q-1; Mon, 18 Nov 2019 21:33:15 -0500
+Received: from smtp.corp.redhat.com (int-mx05.intmail.prod.int.phx2.redhat.com [10.5.11.15])
         (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
         (No client certificate requested)
-        by mimecast-mx01.redhat.com (Postfix) with ESMTPS id 43623801E5A;
-        Tue, 19 Nov 2019 02:21:11 +0000 (UTC)
+        by mimecast-mx01.redhat.com (Postfix) with ESMTPS id A48271005502;
+        Tue, 19 Nov 2019 02:33:13 +0000 (UTC)
 Received: from ming.t460p (ovpn-8-19.pek2.redhat.com [10.72.8.19])
-        by smtp.corp.redhat.com (Postfix) with ESMTPS id 7BBCE600CD;
-        Tue, 19 Nov 2019 02:21:03 +0000 (UTC)
-Date:   Tue, 19 Nov 2019 10:20:58 +0800
+        by smtp.corp.redhat.com (Postfix) with ESMTPS id 837BB46469;
+        Tue, 19 Nov 2019 02:33:06 +0000 (UTC)
+Date:   Tue, 19 Nov 2019 10:33:01 +0800
 From:   Ming Lei <ming.lei@redhat.com>
-To:     Bart Van Assche <bvanassche@acm.org>
-Cc:     linux-scsi@vger.kernel.org,
-        "Martin K . Petersen" <martin.petersen@oracle.com>,
-        James Bottomley <James.Bottomley@hansenpartnership.com>,
-        Jens Axboe <axboe@kernel.dk>,
-        "Ewan D . Milne" <emilne@redhat.com>,
-        Kashyap Desai <kashyap.desai@broadcom.com>,
-        Hannes Reinecke <hare@suse.de>,
-        Damien Le Moal <damien.lemoal@wdc.com>,
-        Long Li <longli@microsoft.com>, linux-block@vger.kernel.org
-Subject: Re: [PATCH V2] scsi: core: only re-run queue in scsi_end_request()
- if device queue is busy
-Message-ID: <20191119022058.GB391@ming.t460p>
-References: <20191118100640.3673-1-ming.lei@redhat.com>
- <9e7b1a1c-f125-b359-4b59-675368e100f2@acm.org>
+To:     Sagi Grimberg <sagi@grimberg.me>
+Cc:     Jens Axboe <axboe@kernel.dk>, linux-block@vger.kernel.org,
+        linux-nvme@lists.infradead.org, Keith Busch <kbusch@kernel.org>,
+        Christoph Hellwig <hch@lst.de>,
+        James Smart <james.smart@broadcom.com>
+Subject: Re: [PATCH RFC 0/3] blk-mq/nvme: use blk_mq_alloc_request() for
+ NVMe's connect request
+Message-ID: <20191119023301.GC391@ming.t460p>
+References: <20191115104238.15107-1-ming.lei@redhat.com>
+ <8f4402a0-967d-f12d-2f1a-949e1dda017c@grimberg.me>
+ <20191116071754.GB18194@ming.t460p>
+ <016afdbc-9c63-4193-e64b-aad91ba5fcc1@grimberg.me>
 MIME-Version: 1.0
-In-Reply-To: <9e7b1a1c-f125-b359-4b59-675368e100f2@acm.org>
+In-Reply-To: <016afdbc-9c63-4193-e64b-aad91ba5fcc1@grimberg.me>
 User-Agent: Mutt/1.12.1 (2019-06-15)
-X-Scanned-By: MIMEDefang 2.79 on 10.5.11.11
-X-MC-Unique: tcmB4oYwN1Gc4tkqhGpUTw-1
+X-Scanned-By: MIMEDefang 2.79 on 10.5.11.15
+X-MC-Unique: WSpetWe3N8mJo7dOYsxl0Q-1
 X-Mimecast-Spam-Score: 0
 Content-Type: text/plain; charset=WINDOWS-1252
 Content-Transfer-Encoding: quoted-printable
@@ -74,135 +70,90 @@ Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-On Mon, Nov 18, 2019 at 03:40:06PM -0800, Bart Van Assche wrote:
-> On 11/18/19 2:06 AM, Ming Lei wrote:
-> > Now the request queue is run in scsi_end_request() unconditionally if b=
-oth
-> > target queue and host queue is ready. We should have re-run request que=
-ue
-> > only after this device queue becomes busy for restarting this LUN only.
+On Mon, Nov 18, 2019 at 04:05:56PM -0800, Sagi Grimberg wrote:
+>=20
+> > Hi Sagi,
 > >=20
-> > Recently Long Li reported that cost of run queue may be very heavy in
-> > case of high queue depth. So improve this situation by only running
-> > the request queue when this LUN is busy.
+> > On Fri, Nov 15, 2019 at 02:38:44PM -0800, Sagi Grimberg wrote:
+> > >=20
+> > > > Hi,
+> > >=20
+> > > Hey Ming,
+> > >=20
+> > > > Use blk_mq_alloc_request() for allocating NVMe loop, fc, rdma and t=
+cp's
+> > > > connect request, and selecting transport queue runtime for connect
+> > > > request.
+> > > >=20
+> > > > Then kill blk_mq_alloc_request_hctx().
+> > >=20
+> > > Is it really so wrong to have an API to allocate a tag that belongs t=
+o
+> > > a specific queue? Why must the tags allocation always correlate to th=
+e
+> > > running cpu? Its true that NVMe is the only consumer of this at the
+> > > moment, but does this mean that the interface should be removed becau=
+se
+> > > it has one (or rather four) consumer(s)?
 > >=20
-> > Cc: Jens Axboe <axboe@kernel.dk>
-> > Cc: Ewan D. Milne <emilne@redhat.com>
-> > Cc: Kashyap Desai <kashyap.desai@broadcom.com>
-> > Cc: Hannes Reinecke <hare@suse.de>
-> > Cc: Bart Van Assche <bvanassche@acm.org>
-> > Cc: Damien Le Moal <damien.lemoal@wdc.com>
-> > Cc: Long Li <longli@microsoft.com>
-> > Cc: linux-block@vger.kernel.org
-> > Reported-by: Long Li <longli@microsoft.com>
-> > Signed-off-by: Ming Lei <ming.lei@redhat.com>
-> > ---
-> > V2:
-> > =09- commit log change, no any code change
-> > =09- add reported-by tag
+> > Now blk-mq takes a static queue mapping between CPU and hw queues, give=
+n
+> > CPU hotplug may happen any time, so the specified hw queue may become
+> > inactive any time.
 > >=20
+> > Queue mapping from CPU to hw queue is one core model of blk-mq which
+> > relies a lot on the fact that hw queue active or not depends on
+> > request's submission CPU. And we always can retrieve one active hw
+> > queue if there is at least one online CPU.
 > >=20
-> >   drivers/scsi/scsi_lib.c    | 29 +++++++++++++++++++++++++++--
-> >   include/scsi/scsi_device.h |  1 +
-> >   2 files changed, 28 insertions(+), 2 deletions(-)
+> > IO request is always mapped to the proper hw queue via the submission
+> > CPU and queue type.
 > >=20
-> > diff --git a/drivers/scsi/scsi_lib.c b/drivers/scsi/scsi_lib.c
-> > index 379533ce8661..62a86a82c38d 100644
-> > --- a/drivers/scsi/scsi_lib.c
-> > +++ b/drivers/scsi/scsi_lib.c
-> > @@ -612,7 +612,7 @@ static bool scsi_end_request(struct request *req, b=
-lk_status_t error,
-> >   =09if (scsi_target(sdev)->single_lun ||
-> >   =09    !list_empty(&sdev->host->starved_list))
-> >   =09=09kblockd_schedule_work(&sdev->requeue_work);
-> > -=09else
-> > +=09else if (READ_ONCE(sdev->restart))
-> >   =09=09blk_mq_run_hw_queues(q, true);
-> >   =09percpu_ref_put(&q->q_usage_counter);
-> > @@ -1632,8 +1632,33 @@ static bool scsi_mq_get_budget(struct blk_mq_hw_=
-ctx *hctx)
-> >   =09struct request_queue *q =3D hctx->queue;
-> >   =09struct scsi_device *sdev =3D q->queuedata;
-> > -=09if (scsi_dev_queue_ready(q, sdev))
-> > +=09if (scsi_dev_queue_ready(q, sdev)) {
-> > +=09=09WRITE_ONCE(sdev->restart, 0);
-> >   =09=09return true;
-> > +=09}
-> > +
-> > +=09/*
-> > +=09 * If all in-flight requests originated from this LUN are completed
-> > +=09 * before setting .restart, sdev->device_busy will be observed as
-> > +=09 * zero, then blk_mq_delay_run_hw_queue() will dispatch this reques=
-t
-> > +=09 * soon. Otherwise, completion of one of these request will observe
-> > +=09 * the .restart flag, and the request queue will be run for handlin=
-g
-> > +=09 * this request, see scsi_end_request().
-> > +=09 *
-> > +=09 * However, the .restart flag may be cleared from other dispatch co=
-de
-> > +=09 * path after one inflight request is completed, then:
-> > +=09 *
-> > +=09 * 1) if this request is dispatched from scheduler queue or sw queu=
-e one
-> > +=09 * by one, this request will be handled in that dispatch path too g=
-iven
-> > +=09 * the request still stays at scheduler/sw queue when calling .get_=
-budget()
-> > +=09 * callback.
-> > +=09 *
-> > +=09 * 2) if this request is dispatched from hctx->dispatch or
-> > +=09 * blk_mq_flush_busy_ctxs(), this request will be put into hctx->di=
-spatch
-> > +=09 * list soon, and blk-mq will be responsible for covering it, see
-> > +=09 * blk_mq_dispatch_rq_list().
-> > +=09 */
-> > +=09WRITE_ONCE(sdev->restart, 1);
+> > So blk_mq_alloc_request_hctx() is really weird from the above blk-mq's
+> > model.
+> >=20
+> > Actually the 4 consumer is just one single type of usage for submitting
+> > connect command, seems no one explain this special usage before. And th=
+e
+> > driver can handle well enough without this interface just like this
+> > patch, can't it?
 >=20
-> Hi Ming,
->=20
-> Are any memory barriers needed?
->=20
-> Should WRITE_ONCE(sdev->restart, 1) perhaps be moved above the
-> scsi_dev_queue_ready()? Consider e.g. the following scenario:
->=20
-> sdev->restart =3D=3D 0
->=20
-> scsi_mq_get_budget() calls scsi_dev_queue_ready() and that last function
-> returns false.
->=20
-> scsi_end_request() calls __blk_mq_end_request()
-> scsi_end_request() skips the blk_mq_run_hw_queues() call
+> Does removing the cpumask_and with cpu_online_mask fix your test?
 
-Suppose the sdev->restart isn't set as 1 or isn't visible by
-scsi_end_request().
+It can be workaround this way, or return NULL if the hctx becomes
+inactive.
+
+But there is big problem to dispatch such request to inactive hctx, as
+I explained.
 
 >=20
-> scsi_mq_get_budget() changes sdev->restart into 1.
+> this check is wrong to begin with because it can not be true right after
+> the check.
+>=20
+> This is a much simpler fix that does not create this churn local to
+> every driver. Also, I don't like the assumptions about tag reservations
+> that the drivers is taking locally (that the connect will have tag 0
+> for example). All this makes this look like a hack.
 
-As the comment mentioned, if there isn't any in-flight requests
-originated from this LUN, blk_mq_delay_run_hw_queue() in
-scsi_mq_get_budget() will run the hw queue. If there is any
-in-flight requests from this LUN, that request's scsi_end_request()
-will handle that.
+The patch I posted can be applied to non-reserved tag too, and the connect
+request can figured by rq->private_rq_data simply.
 
-Then looks one barrier is required between 'WRITE_ONCE(sdev->restart, 1)'
-and 'atomic_read(&sdev->device_busy) =3D=3D 0'.
-
-And its pair is scsi_device_unbusy() and READ_ONCE(sdev->restart).
-The barrier between the pair could be implied by __blk_mq_end_request(),
-either __blk_mq_free_request() or rq->end_io.
+Also, we can provide blk_mq_rq_is_reserved() helper if you think 'rq->tag =
+=3D=3D 0'
+is like a hack.
 
 >=20
-> Can this race happen with the above patch applied? Will this scenario res=
-ult
-> in a queue stall?
+> There is also the question of what happens when we want to make connects
+> parallel, which is not the case at the moment...
 
-If barrier is added between 'WRITE_ONCE(sdev->restart, 1)' and
-'atomic_read(&sdev->device_busy) =3D=3D 0', the race should be avoided.
+There are several solutions for this:
 
-Will do that in V3.
+1) schedule the connection on selected CPUs, so that all hw queues can be
+covered
 
-Thanks,
+2) use single tag_set for connect command only.
+
+
+Thanks,=20
 Ming
 
