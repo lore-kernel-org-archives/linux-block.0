@@ -2,135 +2,88 @@ Return-Path: <SRS0=usZV=ZM=vger.kernel.org=linux-block-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-0.8 required=3.0 tests=DKIM_SIGNED,DKIM_VALID,
-	DKIM_VALID_AU,HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SPF_HELO_NONE,
-	SPF_PASS autolearn=no autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-0.9 required=3.0 tests=DKIMWL_WL_HIGH,DKIM_SIGNED,
+	DKIM_VALID,DKIM_VALID_AU,HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,
+	SPF_HELO_NONE,SPF_PASS autolearn=no autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id B48FFC432C3
-	for <linux-block@archiver.kernel.org>; Wed, 20 Nov 2019 21:36:53 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id A6329C43215
+	for <linux-block@archiver.kernel.org>; Wed, 20 Nov 2019 21:58:44 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.kernel.org (Postfix) with ESMTP id 8571A208D4
-	for <linux-block@archiver.kernel.org>; Wed, 20 Nov 2019 21:36:53 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id 742B420672
+	for <linux-block@archiver.kernel.org>; Wed, 20 Nov 2019 21:58:44 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="Uzxh/XTt"
+	dkim=pass (1024-bit key) header.d=broadcom.com header.i=@broadcom.com header.b="QtCd1255"
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1726705AbfKTVgx (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Wed, 20 Nov 2019 16:36:53 -0500
-Received: from us-smtp-2.mimecast.com ([205.139.110.61]:45409 "EHLO
-        us-smtp-delivery-1.mimecast.com" rhost-flags-OK-OK-OK-FAIL)
-        by vger.kernel.org with ESMTP id S1726664AbfKTVgw (ORCPT
+        id S1725854AbfKTV6o (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Wed, 20 Nov 2019 16:58:44 -0500
+Received: from mail-wr1-f67.google.com ([209.85.221.67]:46876 "EHLO
+        mail-wr1-f67.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S1725819AbfKTV6n (ORCPT
         <rfc822;linux-block@vger.kernel.org>);
-        Wed, 20 Nov 2019 16:36:52 -0500
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-        s=mimecast20190719; t=1574285811;
-        h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-         to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-         content-transfer-encoding:content-transfer-encoding:
-         in-reply-to:in-reply-to:references:references;
-        bh=nl2xOgfKjuO8T4/NhaJ5YOwJbKZiJYEWxcxD/Ki4XI4=;
-        b=Uzxh/XTtIJ4rkbojHRKe6AlN8Qodzfz+tRIAI9Xy9NBcR6pD9ZBjMCXRxcmVYze4gfa3RG
-        JiXwgny67BxvJpqpvp3ndMZ9/yqeGzXAVHBbHjZ/pdni8BFEWNh7mx2SCnGcxe7H+KK/Fe
-        sNyoLIiiFiNMvhXD/cLFaM9JJiW2ATE=
-Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
- [209.132.183.4]) (Using TLS) by relay.mimecast.com with ESMTP id
- us-mta-358-1AJYuSgKOz6C9gtntwd3ig-1; Wed, 20 Nov 2019 16:36:48 -0500
-Received: from smtp.corp.redhat.com (int-mx05.intmail.prod.int.phx2.redhat.com [10.5.11.15])
-        (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
-        (No client certificate requested)
-        by mimecast-mx01.redhat.com (Postfix) with ESMTPS id 1B85E1802D14;
-        Wed, 20 Nov 2019 21:36:46 +0000 (UTC)
-Received: from emilne (unknown [10.18.25.205])
-        by smtp.corp.redhat.com (Postfix) with ESMTP id C024F5D6D0;
-        Wed, 20 Nov 2019 21:36:41 +0000 (UTC)
-Message-ID: <f5b78ec7c0e6fec69950cace8531eb342987c0b9.camel@redhat.com>
+        Wed, 20 Nov 2019 16:58:43 -0500
+Received: by mail-wr1-f67.google.com with SMTP id b3so1765813wrs.13
+        for <linux-block@vger.kernel.org>; Wed, 20 Nov 2019 13:58:42 -0800 (PST)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=broadcom.com; s=google;
+        h=from:mime-version:thread-index:date:message-id:subject:to:cc;
+        bh=p8LCe9JWGcvpS2ewyZOiDIpe5TyhQwLY0HM6jhprWQw=;
+        b=QtCd1255MUFcdBLBBfNmjNjzGPGgAfsCixZsPaR4oYW+L0msGLFHRvtAlW4HuEU8mO
+         GJWCZfSIztiQNh94q5zlOaOQEjSHj/D9W3RVY9znxUBSlQKjHgFxCGMiQPyz9Z9kozhU
+         X4Me1HPZ64r285gtMVmbHufCRm11UFI1X2LEQ=
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20161025;
+        h=x-gm-message-state:from:mime-version:thread-index:date:message-id
+         :subject:to:cc;
+        bh=p8LCe9JWGcvpS2ewyZOiDIpe5TyhQwLY0HM6jhprWQw=;
+        b=SNSqATzrNSONA4G06GJjEhld4xMRuJ4c3Ir3vMorYc8ub3F7fpIg4C/ECP/7bKcFjY
+         N7HijvnUmP7v/psvet1JiPDg/RPd0I98dRK1cmzmOv8JQShtXDWigYFwzV794Nyc+sn/
+         6kFP1Io/xftg/kX5X6j9344bEzaDG0K11FTGngFBQx0DUXe0fcKAYrCbHxs4Uye2YcU/
+         ss0I46O4mktSOib8IxhWxgypi1vIBi090FxWQS3mSJ1S96bWuDsnp/YsVHlHALgR2NzQ
+         9pXhtUfkpL+1/vluS8uzaJah6AzeYx+ANq163NWG3mR0NyC9pOnlAlau0NWbfWSeh2o/
+         Mbrw==
+X-Gm-Message-State: APjAAAVh1Dwewy/l79aB4lCZnioQI++Nu+EqZIRiwbyjPEi/r0RiHfOZ
+        gVhvp2JDNTqTPMKcRMoWGSEJy0GXDO3UoxcWvFjNEg==
+X-Google-Smtp-Source: APXvYqzSWKnd2Ge6i6FzlvK3By3OqKebKKjL+WI9yB2uVL4o+4QIYjH2ELHEzEHQfn14hxHtyyXdJ7+SdO+YwZ8AR/w=
+X-Received: by 2002:adf:eecc:: with SMTP id a12mr6143155wrp.363.1574287121644;
+ Wed, 20 Nov 2019 13:58:41 -0800 (PST)
+From:   Sumanesh Samanta <sumanesh.samanta@broadcom.com>
+MIME-Version: 1.0
+X-Mailer: Microsoft Outlook 14.0
+Thread-Index: AdWf7SRsTAXNfNyfSv6Y9At6URzH3g==
+Date:   Wed, 20 Nov 2019 14:58:40 -0700
+Message-ID: <c7c78e42173ad8bc6e8c775bf6e98f54@mail.gmail.com>
 Subject: Re: [PATCH 4/4] scsi: core: don't limit per-LUN queue depth for SSD
-From:   "Ewan D. Milne" <emilne@redhat.com>
-To:     Bart Van Assche <bvanassche@acm.org>,
-        Hannes Reinecke <hare@suse.de>, Ming Lei <ming.lei@redhat.com>,
-        Jens Axboe <axboe@kernel.dk>
-Cc:     linux-block@vger.kernel.org,
-        "James E . J . Bottomley" <jejb@linux.ibm.com>,
-        "Martin K . Petersen" <martin.petersen@oracle.com>,
-        linux-scsi@vger.kernel.org,
-        Sathya Prakash <sathya.prakash@broadcom.com>,
-        Chaitra P B <chaitra.basappa@broadcom.com>,
-        Suganath Prabu Subramani 
-        <suganath-prabu.subramani@broadcom.com>,
-        Kashyap Desai <kashyap.desai@broadcom.com>,
-        Sumit Saxena <sumit.saxena@broadcom.com>,
-        Shivasharan S <shivasharan.srikanteshwara@broadcom.com>,
-        Christoph Hellwig <hch@lst.de>,
-        Bart Van Assche <bart.vanassche@wdc.com>
-Date:   Wed, 20 Nov 2019 16:36:41 -0500
-In-Reply-To: <44644664-f7b6-facd-d1bb-f7cfc9524379@acm.org>
-References: <20191118103117.978-1-ming.lei@redhat.com>
-         <20191118103117.978-5-ming.lei@redhat.com>
-         <1081145f-3e17-9bc1-2332-50a4b5621ef7@suse.de>
-         <9bbcbbb42b659c323c9e0d74aa9b062a3f517d1f.camel@redhat.com>
-         <44644664-f7b6-facd-d1bb-f7cfc9524379@acm.org>
-Mime-Version: 1.0
-X-Scanned-By: MIMEDefang 2.79 on 10.5.11.15
-X-MC-Unique: 1AJYuSgKOz6C9gtntwd3ig-1
-X-Mimecast-Spam-Score: 0
-Content-Type: text/plain; charset=UTF-8
-Content-Transfer-Encoding: quoted-printable
+To:     emilne@redhat.com
+Cc:     axboe@kernel.dk, bart.vanassche@wdc.com, hare@suse.de, hch@lst.de,
+        jejb@linux.ibm.com, kashyap.desai@broadcom.com,
+        linux-block@vger.kernel.org, linux-scsi@vger.kernel.org,
+        martin.petersen@oracle.com, ming.lei@redhat.com,
+        sathya.prakash@broadcom.com,
+        shivasharan.srikanteshwara@broadcom.com,
+        suganath-prabu.subramani@broadcom.com, sumit.saxena@broadcom.com
+Content-Type: text/plain; charset="UTF-8"
 Sender: linux-block-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-On Wed, 2019-11-20 at 12:56 -0800, Bart Van Assche wrote:
-> On 11/20/19 9:00 AM, Ewan D. Milne wrote:
-> > On Wed, 2019-11-20 at 11:05 +0100, Hannes Reinecke wrote:
-> > > I must admit I patently don't like this explicit dependency on
-> > > blk_nonrot(). Having a conditional counter is just an open invitation=
- to
-> > > getting things wrong...
-> >=20
-> > This concerns me as well, it seems like the SCSI ML should have it's
-> > own per-device attribute if we actually need to control this per-device
-> > instead of on a per-host or per-driver basis.  And it seems like this
-> > is something that is specific to high-performance drivers, so changing
-> > the way this works for all drivers seems a bit much.
-> >=20
-> > Ordinarily I'd prefer a host template attribute as Sumanesh proposed,
-> > but I dislike wrapping the examination of that and the queue flag in
-> > a macro that makes it not obvious how the behavior is affected.
-> > (Plus Hannes just submitted submitted the patches to remove .use_cmd_li=
-st,
-> > which was another piece of ML functionality used by only a few drivers.=
-)
-> >=20
-> > Ming's patch does freeze the queue if NONROT is changed by sysfs, but
-> > the flag can be changed by other kernel code, e.g. sd_revalidate_disk()
-> > clears it and then calls sd_read_block_characteristics() which may set
-> > it again.  So it's not clear to me how reliable this is.
->=20
-> How about changing the default behavior into ignoring sdev->queue_depth=
-=20
-> and only honoring sdev->queue_depth if a "quirk" flag is set or if=20
-> overridden by setting a sysfs attribute? My understanding is that the=20
-> goal of the queue ramp-up/ramp-down mechanism is to reduce the number of=
-=20
-> times a SCSI device responds "BUSY". An alternative for queue=20
-> ramp-up/ramp-down is a delayed queue re-run. I think if scsi_queue_rq()=
-=20
-> returns BLK_STS_RESOURCE that the queue is only rerun after a delay.=20
->  From blk_mq_dispatch_rq_list():
->=20
-> =09[ ... ]
-> =09else if (needs_restart && (ret =3D=3D BLK_STS_RESOURCE))
-> =09=09blk_mq_delay_run_hw_queue(hctx, BLK_MQ_RESOURCE_DELAY);
->=20
-> Bart.
+>Ordinarily I'd prefer a host template attribute as Sumanesh proposed,
+>but I dislike wrapping the examination of that and the queue flag in
+>a macro that makes it not obvious how the behavior is affected.
 
-In general it is better not to put in changes that affect older drivers
-that are not regularly tested, I think.  I would prefer an opt-in for
-drivers desiring higher performance.
+I think we can have a host template attribute and discard this check
+altogether, that is not check device_busy for both SDD and HDDs.
 
-Delaying the queue re-run vs. a ramp down might negatively affect performan=
-ce.
-I'm not sure how accurate the ramp is at discovering the optimum though.
+As both you and Hannes mentioned, this change affects high end controllers
+most, and most of them have some storage IO size limit. Also, for HDD
+sequential IO is almost always large and
+touch the controller max IO size limit. Thus, I am not sure merge matters
+for these kind of controllers. Database use REDO log and small sequential
+IO, but those are targeted to SSDs, where latency and IOPs are far more
+important than IO merging.
+If this patch is opt-in for drivers, so any LLD that cannot take advantage
+of the flag need not set it, and would work as-is
 
--Ewan
 
+Thanks,
+Sumanesh
