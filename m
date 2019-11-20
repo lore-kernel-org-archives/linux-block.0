@@ -2,218 +2,264 @@ Return-Path: <SRS0=usZV=ZM=vger.kernel.org=linux-block-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-8.3 required=3.0 tests=DKIMWL_WL_HIGH,DKIM_SIGNED,
+X-Spam-Status: No, score=-3.9 required=3.0 tests=DKIMWL_WL_HIGH,DKIM_SIGNED,
 	DKIM_VALID,DKIM_VALID_AU,HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,
-	MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,UNPARSEABLE_RELAY,
-	USER_AGENT_SANE_1 autolearn=ham autolearn_force=no version=3.4.0
+	MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS autolearn=no autolearn_force=no
+	version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id A74ABC432C3
-	for <linux-block@archiver.kernel.org>; Wed, 20 Nov 2019 19:45:26 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 84992C432C0
+	for <linux-block@archiver.kernel.org>; Wed, 20 Nov 2019 20:00:12 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.kernel.org (Postfix) with ESMTP id 7F3272133F
-	for <linux-block@archiver.kernel.org>; Wed, 20 Nov 2019 19:45:26 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id 42702218A3
+	for <linux-block@archiver.kernel.org>; Wed, 20 Nov 2019 20:00:12 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=pass (2048-bit key) header.d=oracle.com header.i=@oracle.com header.b="JVnKJLYE"
+	dkim=pass (1024-bit key) header.d=broadcom.com header.i=@broadcom.com header.b="fXYHv7HW"
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1727545AbfKTTpZ (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Wed, 20 Nov 2019 14:45:25 -0500
-Received: from aserp2120.oracle.com ([141.146.126.78]:51514 "EHLO
-        aserp2120.oracle.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1726440AbfKTTpZ (ORCPT
+        id S1727207AbfKTUAL (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Wed, 20 Nov 2019 15:00:11 -0500
+Received: from mail-wr1-f66.google.com ([209.85.221.66]:40322 "EHLO
+        mail-wr1-f66.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S1726757AbfKTUAL (ORCPT
         <rfc822;linux-block@vger.kernel.org>);
-        Wed, 20 Nov 2019 14:45:25 -0500
-Received: from pps.filterd (aserp2120.oracle.com [127.0.0.1])
-        by aserp2120.oracle.com (8.16.0.27/8.16.0.27) with SMTP id xAKJi655056805;
-        Wed, 20 Nov 2019 19:45:14 GMT
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=oracle.com; h=date : from : to : cc
- : subject : message-id : references : mime-version : content-type :
- in-reply-to; s=corp-2019-08-05;
- bh=sEesESEYpLIlatJUbLqzdyEqW5b7T2dYR2CSmmTIChk=;
- b=JVnKJLYEP9tsUjMoNlXpAAtTlFMrRhANCKXk8fUIPxgqdHX/BFyOMg8r45ITyZYJ4Doh
- opj61ydHHGlR0pkPG0+KxWecCxCwGOStf56VKdsxisKN3O3EkTpwESIDLjvnINh1Al87
- 0zRFigvy0Ih2lGsljpdoPU8p41xgrAOqILEuA+DIuXppGFinAnQxCsZTEtZ+g/GOr4wv
- 3ku1YAi5G4YkNu3NErFOSHSIaHtlRxy0Q0lLwGEnYOkAov1n3sk+nsiwoUvgm5ZUAxpM
- LNUTlLvZZ8se+/LWGlBNRc16IMmMmPCfbuOn6JCOusf4aSpgBr3zeA81Os0C6vhMgOJC sg== 
-Received: from aserp3020.oracle.com (aserp3020.oracle.com [141.146.126.70])
-        by aserp2120.oracle.com with ESMTP id 2wa92pyrus-1
-        (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=OK);
-        Wed, 20 Nov 2019 19:45:14 +0000
-Received: from pps.filterd (aserp3020.oracle.com [127.0.0.1])
-        by aserp3020.oracle.com (8.16.0.27/8.16.0.27) with SMTP id xAKJh2g7039918;
-        Wed, 20 Nov 2019 19:45:14 GMT
-Received: from userv0122.oracle.com (userv0122.oracle.com [156.151.31.75])
-        by aserp3020.oracle.com with ESMTP id 2wcemhhtgx-1
-        (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=OK);
-        Wed, 20 Nov 2019 19:45:14 +0000
-Received: from abhmp0004.oracle.com (abhmp0004.oracle.com [141.146.116.10])
-        by userv0122.oracle.com (8.14.4/8.14.4) with ESMTP id xAKJj9r6023179;
-        Wed, 20 Nov 2019 19:45:09 GMT
-Received: from localhost (/10.159.246.236)
-        by default (Oracle Beehive Gateway v4.0)
-        with ESMTP ; Wed, 20 Nov 2019 11:45:09 -0800
-Date:   Wed, 20 Nov 2019 11:45:07 -0800
-From:   "Darrick J. Wong" <darrick.wong@oracle.com>
-To:     Evan Green <evgreen@chromium.org>
-Cc:     Jens Axboe <axboe@kernel.dk>,
-        Martin K Petersen <martin.petersen@oracle.com>,
-        Gwendal Grignou <gwendal@chromium.org>,
-        Christoph Hellwig <hch@infradead.org>,
-        Ming Lei <ming.lei@redhat.com>,
-        Alexis Savery <asavery@chromium.org>,
-        Douglas Anderson <dianders@chromium.org>,
-        Bart Van Assche <bvanassche@acm.org>,
-        Chaitanya Kulkarni <chaitanya.kulkarni@wdc.com>,
-        linux-block <linux-block@vger.kernel.org>,
-        LKML <linux-kernel@vger.kernel.org>
-Subject: Re: [PATCH v7 2/2] loop: Better discard support for block devices
-Message-ID: <20191120194507.GW6235@magnolia>
-References: <20191114235008.185111-1-evgreen@chromium.org>
- <20191114154903.v7.2.I4d476bddbf41a61422ad51502f4361e237d60ad4@changeid>
- <20191120022518.GU6235@magnolia>
- <CAE=gft4mjKc4QKFKxp2FX9G2rUMuE3_eDuW_3Oq7NqTYBQwEjg@mail.gmail.com>
- <20191120191302.GV6235@magnolia>
- <CAE=gft6x1TmkkNTj+gktYMkHcysYyuYL50cavYusQ7hd9zChvA@mail.gmail.com>
+        Wed, 20 Nov 2019 15:00:11 -0500
+Received: by mail-wr1-f66.google.com with SMTP id q15so1392734wrw.7
+        for <linux-block@vger.kernel.org>; Wed, 20 Nov 2019 12:00:09 -0800 (PST)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=broadcom.com; s=google;
+        h=mime-version:references:in-reply-to:from:date:message-id:subject:to
+         :cc:content-transfer-encoding;
+        bh=Qel/Qp9Fo4wMUlCl4DO6D3RTsT7v4Klswcvp9ktFJ+o=;
+        b=fXYHv7HW2Cu4Za7sgOU7gtmDy6miBHEWfa+rW4qNBYDGhzSIyTA2MnRhKwFSCeWftW
+         POplkaSbT6FmP7mtK57mZTyrubyzgZMAyu9g5Rw/FWf3wMFIBQH5NxJPFQLH1GBE8trb
+         ywGZCrXpiDg53E5lE+jZcGMLsBsVYSq5PSwaU=
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20161025;
+        h=x-gm-message-state:mime-version:references:in-reply-to:from:date
+         :message-id:subject:to:cc:content-transfer-encoding;
+        bh=Qel/Qp9Fo4wMUlCl4DO6D3RTsT7v4Klswcvp9ktFJ+o=;
+        b=rpAUcQPr+sBUJD/nU29hOumoUaQ23fYusmN5HwT3UsELoEecx/1KpQGMZjVy0okRKp
+         vgzBqflT2tPxW4R/C/ExxyZnvqAN/ezIRd/DgnGwDyjJJX+oDAsveLoVBAldg+0ePFWO
+         ITCwqM4y9TtFxoDohkczN3jiXdjP7I1nxGXO/BMd49ug7SLaT/gP5VVxPTwPlhWr2kWB
+         s9jQjnYoXLtr0q+BgOcFXMpVk2sQwX4zqmL/NktOZdnTCicAhkoQd2qASYJEqp1BhKK4
+         jstTdwKm0FKiqt0UKvoI5OWQx9mRowNVfxNzY7krGhK+IvA/9/NNAbqi7VIiXkcRzmhO
+         bgZg==
+X-Gm-Message-State: APjAAAXB7FkL9OUVqaRvCTgzz5nmIm0784uvRej+UXYIMPP3hkV5HqcN
+        O5j3JlgzQagWtUGy+RYIj75sLto3fEl+Hx27KvCjNw==
+X-Google-Smtp-Source: APXvYqysLEYlp7kZ7WW4ZVjlUT5rXyQt8eif4tkNKyubxOdwTnU5T5LTpmyJPj49SGd/IPftQL+Fc5vyM7G9G/ZgQyE=
+X-Received: by 2002:adf:db4e:: with SMTP id f14mr5543676wrj.257.1574280008151;
+ Wed, 20 Nov 2019 12:00:08 -0800 (PST)
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <CAE=gft6x1TmkkNTj+gktYMkHcysYyuYL50cavYusQ7hd9zChvA@mail.gmail.com>
-User-Agent: Mutt/1.9.4 (2018-02-28)
-X-Proofpoint-Virus-Version: vendor=nai engine=6000 definitions=9447 signatures=668685
-X-Proofpoint-Spam-Details: rule=notspam policy=default score=0 suspectscore=0 malwarescore=0
- phishscore=0 bulkscore=0 spamscore=0 mlxscore=0 mlxlogscore=999
- adultscore=0 classifier=spam adjust=0 reason=mlx scancount=1
- engine=8.0.1-1911140001 definitions=main-1911200162
-X-Proofpoint-Virus-Version: vendor=nai engine=6000 definitions=9447 signatures=668685
-X-Proofpoint-Spam-Details: rule=notspam policy=default score=0 priorityscore=1501 malwarescore=0
- suspectscore=0 phishscore=0 bulkscore=0 spamscore=0 clxscore=1015
- lowpriorityscore=0 mlxscore=0 impostorscore=0 mlxlogscore=999 adultscore=0
- classifier=spam adjust=0 reason=mlx scancount=1 engine=8.0.1-1911140001
- definitions=main-1911200162
+References: <1574194079-27363-1-git-send-email-sumanesh.samanta@broadcom.com>
+ <1574194079-27363-2-git-send-email-sumanesh.samanta@broadcom.com> <20191120072919.GB3664@ming.t460p>
+In-Reply-To: <20191120072919.GB3664@ming.t460p>
+From:   Sumanesh Samanta <sumanesh.samanta@broadcom.com>
+Date:   Wed, 20 Nov 2019 12:59:56 -0700
+Message-ID: <CADbZ7FqP1EXrUOpD1QSd9MTRz1rgN6BLyhyd0i2r30bu_4xUCA@mail.gmail.com>
+Subject: Re: [PATCH 1/1] scsi core: limit overhead of device_busy counter for SSDs
+To:     Ming Lei <ming.lei@redhat.com>
+Cc:     axboe@kernel.dk, linux-block@vger.kernel.org, jejb@linux.ibm.com,
+        martin.petersen@oracle.com, linux-scsi@vger.kernel.org,
+        Sathya Prakash <sathya.prakash@broadcom.com>,
+        chaitra.basappa@broadcom.com,
+        Suganath Prabu Subramani 
+        <suganath-prabu.subramani@broadcom.com>,
+        Kashyap Desai <kashyap.desai@broadcom.com>,
+        Sumit Saxena <sumit.saxena@broadcom.com>,
+        Shivasharan Srikanteshwara 
+        <shivasharan.srikanteshwara@broadcom.com>,
+        Ewan Milne <emilne@redhat.com>, hch@lst.de, hare@suse.de,
+        bart.vanassche@wdc.com
+Content-Type: text/plain; charset="UTF-8"
+Content-Transfer-Encoding: quoted-printable
 Sender: linux-block-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-On Wed, Nov 20, 2019 at 11:25:48AM -0800, Evan Green wrote:
-> On Wed, Nov 20, 2019 at 11:13 AM Darrick J. Wong
-> <darrick.wong@oracle.com> wrote:
+On Wed, Nov 20, 2019 at 12:29 AM Ming Lei <ming.lei@redhat.com> wrote:
+>
+> On Tue, Nov 19, 2019 at 12:07:59PM -0800, Sumanesh Samanta wrote:
+> > From: root <sumanesh.samanta@broadcom.com>
 > >
-> > On Wed, Nov 20, 2019 at 10:56:30AM -0800, Evan Green wrote:
-> > > On Tue, Nov 19, 2019 at 6:25 PM Darrick J. Wong <darrick.wong@oracle.com> wrote:
-> > > >
-> > > > On Thu, Nov 14, 2019 at 03:50:08PM -0800, Evan Green wrote:
-> > > > > If the backing device for a loop device is itself a block device,
-> > > > > then mirror the "write zeroes" capabilities of the underlying
-> > > > > block device into the loop device. Copy this capability into both
-> > > > > max_write_zeroes_sectors and max_discard_sectors of the loop device.
-> > > > >
-> > > > > The reason for this is that REQ_OP_DISCARD on a loop device translates
-> > > > > into blkdev_issue_zeroout(), rather than blkdev_issue_discard(). This
-> > > > > presents a consistent interface for loop devices (that discarded data
-> > > > > is zeroed), regardless of the backing device type of the loop device.
-> > > > > There should be no behavior change for loop devices backed by regular
-> > > > > files.
-> 
-> (marking this spot for below)
-> 
-> > > > >
-> > > > > This change fixes blktest block/003, and removes an extraneous
-> > > > > error print in block/013 when testing on a loop device backed
-> > > > > by a block device that does not support discard.
-> > > > >
-> > > > > Signed-off-by: Evan Green <evgreen@chromium.org>
-> > > > > Reviewed-by: Gwendal Grignou <gwendal@chromium.org>
-> > > > > Reviewed-by: Chaitanya Kulkarni <chaitanya.kulkarni@wdc.com>
-> > > > > ---
-> > > > >
-> > > > > Changes in v7:
-> > > > > - Rebase on top of Darrick's patch
-> > > > > - Tweak opening line of commit description (Darrick)
-> > > > >
-> > > > > Changes in v6: None
-> > > > > Changes in v5:
-> > > > > - Don't mirror discard if lo_encrypt_key_size is non-zero (Gwendal)
-> > > > >
-> > > > > Changes in v4:
-> > > > > - Mirror blkdev's write_zeroes into loopdev's discard_sectors.
-> > > > >
-> > > > > Changes in v3:
-> > > > > - Updated commit description
-> > > > >
-> > > > > Changes in v2: None
-> > > > >
-> > > > >  drivers/block/loop.c | 40 +++++++++++++++++++++++++++++-----------
-> > > > >  1 file changed, 29 insertions(+), 11 deletions(-)
-> > > > >
-> > > > > diff --git a/drivers/block/loop.c b/drivers/block/loop.c
-> > > > > index 6a9fe1f9fe84..e8f23e4b78f7 100644
-> > > > > --- a/drivers/block/loop.c
-> > > > > +++ b/drivers/block/loop.c
-> > > > > @@ -427,11 +427,12 @@ static int lo_fallocate(struct loop_device *lo, struct request *rq, loff_t pos,
-> > > > >        * information.
-> > > > >        */
-> > > > >       struct file *file = lo->lo_backing_file;
-> > > > > +     struct request_queue *q = lo->lo_queue;
-> > > > >       int ret;
-> > > > >
-> > > > >       mode |= FALLOC_FL_KEEP_SIZE;
-> > > > >
-> > > > > -     if ((!file->f_op->fallocate) || lo->lo_encrypt_key_size) {
-> > > > > +     if (!blk_queue_discard(q)) {
-> > > > >               ret = -EOPNOTSUPP;
-> > > > >               goto out;
-> > > > >       }
-> > > > > @@ -862,6 +863,21 @@ static void loop_config_discard(struct loop_device *lo)
-> > > > >       struct file *file = lo->lo_backing_file;
-> > > > >       struct inode *inode = file->f_mapping->host;
-> > > > >       struct request_queue *q = lo->lo_queue;
-> > > > > +     struct request_queue *backingq;
-> > > > > +
-> > > > > +     /*
-> > > > > +      * If the backing device is a block device, mirror its zeroing
-> > > > > +      * capability. REQ_OP_DISCARD translates to a zero-out even when backed
-> > > > > +      * by block devices to keep consistent behavior with file-backed loop
-> > > > > +      * devices.
-> > > > > +      */
-> > > > > +     if (S_ISBLK(inode->i_mode) && !lo->lo_encrypt_key_size) {
-> > > > > +             backingq = bdev_get_queue(inode->i_bdev);
-> > > > > +             blk_queue_max_discard_sectors(q,
-> > > > > +                     backingq->limits.max_write_zeroes_sectors);
-> > > >
-> > > > max_discard_sectors?
-> > >
-> > > I didn't plumb max_discard_sectors because for my scenario it never
-> > > ends up hitting the block device that way.
-> > >
-> > > The loop device either uses FL_ZERO_RANGE or FL_PUNCH_HOLE. When
-> > > backed by a block device, that ends up in blkdev_fallocate(), which
-> > > always translates both of those into blkdev_issue_zeroout(), not
-> > > blkdev_issue_discard(). So it's really the zeroing capabilities of the
-> > > block device that matters, even for loop discard operations. It seems
-> > > weird, but I think this is the right thing because it presents a
-> > > consistent interface to loop device users whether backed by a file
-> > > system file, or directly by a block device. That is, a previously
-> > > discarded range will read back as zeroes.
+> > Recently a patch was delivered to remove host_busy counter from SCSI mi=
+d layer. That was a major bottleneck, and helped improve SCSI stack perform=
+ance.
+> > With that patch, bottle neck moved to the scsi_device device_busy count=
+er. The performance issue with this counter is seen more in cases where a s=
+ingle device can produce very high IOPs, for example h/w RAID devices where=
+ OS sees one device, but there are many drives behind it, thus being capabl=
+e of very high IOPs. The effect is also visible when cores from multiple NU=
+MA nodes send IO to the same device or same controller.
+> > The device_busy counter is not needed by controllers which can manage a=
+s many IO as submitted to it. Rotating media still uses it for merging IO, =
+but for non-rotating SSD drives it becomes a major bottleneck as described =
+above.
 > >
-> > Ah, right.  Could you add this paragraph as a comment explaining why
-> > we're setting max_discard_sectors from max_write_zeroes_sectors?
-> 
-> Sure. I put an explanation in the commit description (see spot I
-> marked above), but I agree a comment is probably also worthwhile.
+> > A few weeks back, a patch was provided to address the device_busy count=
+er also but unfortunately that had some issues:
+> > 1. There was a functional issue discovered:
+> > https://lists.01.org/hyperkitty/list/lkp@lists.01.org/thread/VFKDTG4XC4=
+VHWX5KKDJJI7P36EIGK526/
+> > 2. There was some concern about existing drivers using the device_busy =
+counter.
+>
+> There are only two drivers(mpt3sas and megaraid_sas) which uses this
+> counter. And there are two types of usage:
+>
+> 1) both use .device_busy to balance interrupt load among LUNs in
+> fast path
+>
+> 2) mpt3sas uses .device_busy in its device reset handler(slow path), and
+> this kind of usage can be replaced by blk_mq_queue_tag_busy_iter()
+> easily.
+>
+> IMO, blk-mq has already considered IO load balance, see
+> hctx_may_queue(), meantime managed IRQ can balance IO completion load
+> among each IRQ vectors, not see obvious reason for driver to do that
+> any more.
+>
+> However, if the two drivers still want to do that, I'd suggest to impleme=
+nt
+> it inside the driver, and no reason to re-invent generic wheels just for
+> two drivers.
+>
+> That is why I replace .device_busy uses in the two drivers with private
+> counters in the patches posted days ago:
+>
+> https://lore.kernel.org/linux-scsi/20191118103117.978-1-ming.lei@redhat.c=
+om/T/#t
+>
 
-<nod> Sorry about the churn here.
+Agreed, a private counter should be good enough.
 
-I have a strong preference towards documenting decisions like these
-directly in the code because (a) I suck at reading patch prologues, (b)
-someone reading the code after this gets committed will see it
-immediately and right next to the relevant code, and (c) spelunking
-through the git history of a file for commit messages is kind of clunky.
+> And if drivers thought the private counter isn't good enough, they can
+> improve it in any way, such as this percpu approach, or even kill them.
+>
 
-Dunno if that's just my age showing (mmm, pre-bk linux) or what. :/
-
---D
+I was more concerned about the functional issue discovered in the
+earlier patch and provided mine as an alternative without any side
+effect or functional issue, since it does not modify any core logic.
+Having said that, if your latest patch goes through and is accepted,
+then agree that my patch is not needed. If however, some issue is
+discovered in your latest patch, then I would request my patch to be
+considered as an alternative, so that the device_busy counter overhead
+can be avoided
 
 > >
-> > --D
+> > This patch is an attempt to address both the above issues.
+> > For this patch to be effective, LLDs need to set a specific flag use_pe=
+r_cpu_device_busy in the scsi_host_template. For other drivers ( who does n=
+ot set the flag), this patch would be a no-op, and should not affect their =
+performance or functionality at all.
 > >
-> > > -Evan
+> > Also, this patch does not fundamentally change any logic or functionali=
+ty of the code. All it does is replace device_busy with a per CPU counter. =
+In fast path, all cpu increment/decrement their own counter. In relatively =
+slow path. they call scsi_device_busy function to get the total no of IO ou=
+tstanding on a device. Only functional aspect it changes is that for non-ro=
+tating media, the number of IO to a device is not restricted. Controllers w=
+hich can handle that, can set the use_per_cpu_device_busy flag in scsi_host=
+_template to take advantage of this patch. Other controllers need not modif=
+y any code and would work as usual.
+> > Since the patch does not modify any other functional aspects, it should=
+ not have any side effects even for drivers that do set the use_per_cpu_dev=
+ice_busy flag.
+> > ---
+> >  drivers/scsi/scsi_lib.c    | 151 ++++++++++++++++++++++++++++++++++---
+> >  drivers/scsi/scsi_scan.c   |  16 ++++
+> >  drivers/scsi/scsi_sysfs.c  |   9 ++-
+> >  drivers/scsi/sg.c          |   2 +-
+> >  include/scsi/scsi_device.h |  15 ++++
+> >  include/scsi/scsi_host.h   |  16 ++++
+> >  6 files changed, 197 insertions(+), 12 deletions(-)
+> >
+> > diff --git a/drivers/scsi/scsi_lib.c b/drivers/scsi/scsi_lib.c
+> > index 2563b061f56b..5dc392914f9e 100644
+> > --- a/drivers/scsi/scsi_lib.c
+> > +++ b/drivers/scsi/scsi_lib.c
+> > @@ -52,6 +52,12 @@
+> >  #define  SCSI_INLINE_SG_CNT  2
+> >  #endif
+> >
+> > +#define MAX_PER_CPU_COUNTER_ABSOLUTE_VAL (0xFFFFFFFFFFF)
+> > +#define PER_CPU_COUNTER_OK_VAL (MAX_PER_CPU_COUNTER_ABSOLUTE_VAL>>16)
+> > +#define USE_DEVICE_BUSY(sdev)        (!(sdev)->host->hostt->use_per_cp=
+u_device_busy \
+> > +                             || !blk_queue_nonrot((sdev)->request_queu=
+e))
+> > +
+> > +
+> >  static struct kmem_cache *scsi_sdb_cache;
+> >  static struct kmem_cache *scsi_sense_cache;
+> >  static struct kmem_cache *scsi_sense_isadma_cache;
+> > @@ -65,6 +71,111 @@ scsi_select_sense_cache(bool unchecked_isa_dma)
+> >       return unchecked_isa_dma ? scsi_sense_isadma_cache : scsi_sense_c=
+ache;
+> >  }
+> >
+> > +/*
+> > + *Generic helper function to decrement per cpu io counter.
+> > + *@per_cpu_counter: The per cpu counter array. Current cpu counter wil=
+l be
+> > + * decremented
+> > + */
+> > +
+> > +static inline void dec_per_cpu_io_counter(atomic64_t __percpu *per_cpu=
+_counter)
+> > +{
+> > +     atomic64_t __percpu *io_count =3D get_cpu_ptr(per_cpu_counter);
+> > +
+> > +     if (unlikely(abs(atomic64_dec_return(io_count)) >
+> > +                             MAX_PER_CPU_COUNTER_ABSOLUTE_VAL))
+> > +             scsi_rebalance_per_cpu_io_counters(per_cpu_counter, io_co=
+unt);
+> > +     put_cpu_ptr(per_cpu_counter);
+> > +}
+> > +/*
+> > + *Generic helper function to increment per cpu io counter.
+> > + *@per_cpu_counter: The per cpu counter array. Current cpu counter wil=
+l be
+> > + * incremented
+> > + */
+> > +static inline void inc_per_cpu_io_counter(atomic64_t __percpu *per_cpu=
+_counter)
+> > +{
+> > +     atomic64_t __percpu *io_count =3D get_cpu_ptr(per_cpu_counter);
+> > +
+> > +     if (unlikely(abs(atomic64_inc_return(io_count)) >
+> > +                             MAX_PER_CPU_COUNTER_ABSOLUTE_VAL))
+> > +             scsi_rebalance_per_cpu_io_counters(per_cpu_counter, io_co=
+unt);
+> > +     put_cpu_ptr(per_cpu_counter);
+> > +}
+> > +
+> > +
+> > +/**
+> > + * scsi_device_busy - Return the device_busy counter
+> > + * @sdev:    Pointer to scsi_device to get busy counter.
+> > + **/
+> > +int scsi_device_busy(struct scsi_device *sdev)
+> > +{
+> > +     long long total =3D 0;
+> > +     int i;
+> > +
+> > +     if (USE_DEVICE_BUSY(sdev))
+>
+> As Ewan and Bart commented, you can't use the NONROT queue flag simply
+> in IO path, given it may be changed somewhere.
+>
+
+I added the NONROT check just as an afterthought. This patch is
+designed for high end controllers, and most of them have some storage
+IO size limit. Also, for HDD sequential IO is almost always large and
+touch the controller max IO size limit. Thus, I am not sure merge
+matters for these kind of controllers. Database use REDO log and small
+sequential IO, but those are targeted to SSDs, where latency and IOPs
+are far more important than IO merging.
+Anyway, this patch is opt-in for drivers, so any LLD that cannot take
+advantage of the flag need not set it, and would work as-is.
+I can provide a new version of the patch with this check removed
+
+> Thanks,
+> Ming
+>
