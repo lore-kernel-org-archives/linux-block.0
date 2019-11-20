@@ -2,109 +2,128 @@ Return-Path: <SRS0=usZV=ZM=vger.kernel.org=linux-block-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-2.4 required=3.0 tests=DKIM_SIGNED,DKIM_VALID,
-	DKIM_VALID_AU,HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SPF_HELO_NONE,
-	SPF_PASS,USER_AGENT_SANE_1 autolearn=no autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-5.4 required=3.0 tests=DKIMWL_WL_HIGH,DKIM_SIGNED,
+	DKIM_VALID,DKIM_VALID_AU,HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,
+	SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,USER_AGENT_SANE_1 autolearn=unavailable
+	autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 48EAEC432C0
-	for <linux-block@archiver.kernel.org>; Wed, 20 Nov 2019 06:36:10 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 19B77C432C0
+	for <linux-block@archiver.kernel.org>; Wed, 20 Nov 2019 07:03:23 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.kernel.org (Postfix) with ESMTP id 138052245B
-	for <linux-block@archiver.kernel.org>; Wed, 20 Nov 2019 06:36:09 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id E544E21D7F
+	for <linux-block@archiver.kernel.org>; Wed, 20 Nov 2019 07:03:22 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="QUe9rfAm"
+	dkim=pass (2048-bit key) header.d=nvidia.com header.i=@nvidia.com header.b="aoAjA12T"
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1727165AbfKTGgJ (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Wed, 20 Nov 2019 01:36:09 -0500
-Received: from us-smtp-1.mimecast.com ([207.211.31.81]:56870 "EHLO
-        us-smtp-delivery-1.mimecast.com" rhost-flags-OK-OK-OK-FAIL)
-        by vger.kernel.org with ESMTP id S1726685AbfKTGgJ (ORCPT
+        id S1726687AbfKTHDM (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Wed, 20 Nov 2019 02:03:12 -0500
+Received: from hqemgate15.nvidia.com ([216.228.121.64]:11798 "EHLO
+        hqemgate15.nvidia.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S1725854AbfKTHDM (ORCPT
         <rfc822;linux-block@vger.kernel.org>);
-        Wed, 20 Nov 2019 01:36:09 -0500
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-        s=mimecast20190719; t=1574231767;
-        h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-         to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-         content-transfer-encoding:content-transfer-encoding:
-         in-reply-to:in-reply-to:references:references;
-        bh=hsXkh/VQI3KB8Zl4hHKe473v7riRmv/Z4J6X27T5pmM=;
-        b=QUe9rfAmppkJgxvhdrcdMU7NgM/qdYNMed76LaRZUbqoAXZJjGwP2s1ePb5h9zDwnHdIJ1
-        zzfbgv2Vc0rTTFkIzD4wafmxIEducxnbGjJy9imI6UYwVGIydnm6oIaHh7NB5nk++Rfe27
-        JmbYW1AZSpnNJu+78/HCvTwdasCAY2k=
-Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
- [209.132.183.4]) (Using TLS) by relay.mimecast.com with ESMTP id
- us-mta-67-TZ6SJJfHPPCktfDD586oLw-1; Wed, 20 Nov 2019 01:36:04 -0500
-Received: from smtp.corp.redhat.com (int-mx06.intmail.prod.int.phx2.redhat.com [10.5.11.16])
-        (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
-        (No client certificate requested)
-        by mimecast-mx01.redhat.com (Postfix) with ESMTPS id 60D021005500;
-        Wed, 20 Nov 2019 06:36:02 +0000 (UTC)
-Received: from ming.t460p (ovpn-8-21.pek2.redhat.com [10.72.8.21])
-        by smtp.corp.redhat.com (Postfix) with ESMTPS id 78B055C1B2;
-        Wed, 20 Nov 2019 06:35:55 +0000 (UTC)
-Date:   Wed, 20 Nov 2019 14:35:50 +0800
-From:   Ming Lei <ming.lei@redhat.com>
-To:     James Smart <james.smart@broadcom.com>
-Cc:     Sagi Grimberg <sagi@grimberg.me>, Jens Axboe <axboe@kernel.dk>,
-        linux-block@vger.kernel.org, Keith Busch <kbusch@kernel.org>,
-        linux-nvme@lists.infradead.org, Christoph Hellwig <hch@lst.de>
-Subject: Re: [PATCH RFC 0/3] blk-mq/nvme: use blk_mq_alloc_request() for
- NVMe's connect request
-Message-ID: <20191120063550.GA3664@ming.t460p>
-References: <20191115104238.15107-1-ming.lei@redhat.com>
- <8f4402a0-967d-f12d-2f1a-949e1dda017c@grimberg.me>
- <20191116071754.GB18194@ming.t460p>
- <016afdbc-9c63-4193-e64b-aad91ba5fcc1@grimberg.me>
- <fda43a50-a484-dde7-84a1-94ccf9346bdd@broadcom.com>
+        Wed, 20 Nov 2019 02:03:12 -0500
+Received: from hqpgpgate101.nvidia.com (Not Verified[216.228.121.13]) by hqemgate15.nvidia.com (using TLS: TLSv1.2, DES-CBC3-SHA)
+        id <B5dd4e52b0000>; Tue, 19 Nov 2019 23:03:07 -0800
+Received: from hqmail.nvidia.com ([172.20.161.6])
+  by hqpgpgate101.nvidia.com (PGP Universal service);
+  Tue, 19 Nov 2019 23:03:11 -0800
+X-PGP-Universal: processed;
+        by hqpgpgate101.nvidia.com on Tue, 19 Nov 2019 23:03:11 -0800
+Received: from [10.110.48.28] (10.124.1.5) by HQMAIL107.nvidia.com
+ (172.20.187.13) with Microsoft SMTP Server (TLS) id 15.0.1473.3; Wed, 20 Nov
+ 2019 07:03:10 +0000
+Subject: Re: [PATCH v6 15/24] fs/io_uring: set FOLL_PIN via pin_user_pages()
+To:     Jens Axboe <axboe@kernel.dk>,
+        Andrew Morton <akpm@linux-foundation.org>
+CC:     Al Viro <viro@zeniv.linux.org.uk>,
+        Alex Williamson <alex.williamson@redhat.com>,
+        Benjamin Herrenschmidt <benh@kernel.crashing.org>,
+        =?UTF-8?B?QmrDtnJuIFTDtnBlbA==?= <bjorn.topel@intel.com>,
+        Christoph Hellwig <hch@infradead.org>,
+        Dan Williams <dan.j.williams@intel.com>,
+        Daniel Vetter <daniel@ffwll.ch>,
+        Dave Chinner <david@fromorbit.com>,
+        David Airlie <airlied@linux.ie>,
+        "David S . Miller" <davem@davemloft.net>,
+        Ira Weiny <ira.weiny@intel.com>, Jan Kara <jack@suse.cz>,
+        Jason Gunthorpe <jgg@ziepe.ca>,
+        Jonathan Corbet <corbet@lwn.net>,
+        =?UTF-8?B?SsOpcsO0bWUgR2xpc3Nl?= <jglisse@redhat.com>,
+        Magnus Karlsson <magnus.karlsson@intel.com>,
+        Mauro Carvalho Chehab <mchehab@kernel.org>,
+        Michael Ellerman <mpe@ellerman.id.au>,
+        Michal Hocko <mhocko@suse.com>,
+        Mike Kravetz <mike.kravetz@oracle.com>,
+        Paul Mackerras <paulus@samba.org>,
+        Shuah Khan <shuah@kernel.org>,
+        Vlastimil Babka <vbabka@suse.cz>, <bpf@vger.kernel.org>,
+        <dri-devel@lists.freedesktop.org>, <kvm@vger.kernel.org>,
+        <linux-block@vger.kernel.org>, <linux-doc@vger.kernel.org>,
+        <linux-fsdevel@vger.kernel.org>, <linux-kselftest@vger.kernel.org>,
+        <linux-media@vger.kernel.org>, <linux-rdma@vger.kernel.org>,
+        <linuxppc-dev@lists.ozlabs.org>, <netdev@vger.kernel.org>,
+        <linux-mm@kvack.org>, LKML <linux-kernel@vger.kernel.org>
+References: <20191119081643.1866232-1-jhubbard@nvidia.com>
+ <20191119081643.1866232-16-jhubbard@nvidia.com>
+ <2ae65d1b-a3eb-74ed-afce-c493de5bbfd3@kernel.dk>
+X-Nvconfidentiality: public
+From:   John Hubbard <jhubbard@nvidia.com>
+Message-ID: <42c80c0a-ad2c-fe74-babd-57680882c7e2@nvidia.com>
+Date:   Tue, 19 Nov 2019 23:03:10 -0800
+User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:68.0) Gecko/20100101
+ Thunderbird/68.2.2
 MIME-Version: 1.0
-In-Reply-To: <fda43a50-a484-dde7-84a1-94ccf9346bdd@broadcom.com>
-User-Agent: Mutt/1.12.1 (2019-06-15)
-X-Scanned-By: MIMEDefang 2.79 on 10.5.11.16
-X-MC-Unique: TZ6SJJfHPPCktfDD586oLw-1
-X-Mimecast-Spam-Score: 0
-Content-Type: text/plain; charset=WINDOWS-1252
-Content-Transfer-Encoding: quoted-printable
-Content-Disposition: inline
+In-Reply-To: <2ae65d1b-a3eb-74ed-afce-c493de5bbfd3@kernel.dk>
+X-Originating-IP: [10.124.1.5]
+X-ClientProxiedBy: HQMAIL105.nvidia.com (172.20.187.12) To
+ HQMAIL107.nvidia.com (172.20.187.13)
+Content-Type: text/plain; charset="utf-8"
+Content-Language: en-US
+Content-Transfer-Encoding: 7bit
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=nvidia.com; s=n1;
+        t=1574233387; bh=ccH+u52vDWCSpx4Mj41DBPFk4Bnr7E1/buLUhbEm50I=;
+        h=X-PGP-Universal:Subject:To:CC:References:X-Nvconfidentiality:From:
+         Message-ID:Date:User-Agent:MIME-Version:In-Reply-To:
+         X-Originating-IP:X-ClientProxiedBy:Content-Type:Content-Language:
+         Content-Transfer-Encoding;
+        b=aoAjA12TDjtYHcqzP6KlOL/T+xFannzF2Ut7WBeMCWKWq7l/9YzjhnMxWFHzZfpR5
+         Iws/71eVjdglCRCFx0borbQjrcWdlbhRBVNYLCTSxJhf+kal1fvOFNYQqlhw4wL9J6
+         MFYFTVnA4OaNermjnVJWu68MlONq0QSjgN/vAiaH7Huv88r7BI/N2hl/4JJ3pl29Td
+         suI6xx3hgozM4FOPwAaNkBjGwwYRC1+cHh6/xlUHPqKTdx1Jisq/17DuqUYf/0K2Yd
+         KJ8+BKNAyQOQiWBn8l76F+wCEq0it7z2sVeN/sAFeVR43NYKvAY4EyGL+PsQeLhyI4
+         eAwjKJTXDphsw==
 Sender: linux-block-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-On Tue, Nov 19, 2019 at 09:56:45AM -0800, James Smart wrote:
-> On 11/18/2019 4:05 PM, Sagi Grimberg wrote:
-> >=20
-> > This is a much simpler fix that does not create this churn local to
-> > every driver. Also, I don't like the assumptions about tag reservations
-> > that the drivers is taking locally (that the connect will have tag 0
-> > for example). All this makes this look like a hack.
->=20
-> Agree with Sagi on this last statement. When I reviewed the patch, it was
-> very non-intuitive. Why dependency on tag 0, why a queue number squirrell=
-ed
-> away on this one request only. Why change the initialization (queue point=
-er)
-> on this one specific request from its hctx and so on. For someone without
-> the history, ugly.
->=20
-> >=20
-> > I'm starting to think we maybe need to get the connect out of the block
-> > layer execution if its such a big problem... Its a real shame if that i=
-s
-> > the case...
->=20
-> Yep. This is starting to be another case of perhaps I should be changing
-> nvme-fc's blk-mq hctx to nvme queue relationship in a different manner.=
-=A0 I'm
-> having a very hard time with all the queue resources today's policy is
-> wasting on targets.
+On 11/19/19 8:10 AM, Jens Axboe wrote:
+> On 11/19/19 1:16 AM, John Hubbard wrote:
+>> Convert fs/io_uring to use the new pin_user_pages() call, which sets
+>> FOLL_PIN. Setting FOLL_PIN is now required for code that requires
+>> tracking of pinned pages, and therefore for any code that calls
+>> put_user_page().
+>>
+>> In partial anticipation of this work, the io_uring code was already
+>> calling put_user_page() instead of put_page(). Therefore, in order to
+>> convert from the get_user_pages()/put_page() model, to the
+>> pin_user_pages()/put_user_page() model, the only change required
+>> here is to change get_user_pages() to pin_user_pages().
+>>
+>> Reviewed-by: Jan Kara <jack@suse.cz>
+>> Signed-off-by: John Hubbard <jhubbard@nvidia.com>
+> 
+> You dropped my reviewed-by now... Given the file, you'd probably want
+> to keep that.
 
-Wrt. the above two points, I believe both are not an issue at all by
-this driver specific approach, see my comment:
+Hi Jens,
 
-https://lore.kernel.org/linux-block/fda43a50-a484-dde7-84a1-94ccf9346bdd@br=
-oadcom.com/T/#mb72afa6ed93bc852ca266779977634cf6214b329
+Yes, I was being too conservative I guess. I changed the patch somewhat
+and dropped the reviewed-by because of those changes...I'm adding it
+back for v7 based on this, thanks!
 
-
-Thanks,
-Ming
-
+thanks,
+-- 
+John Hubbard
+NVIDIA
+ 
