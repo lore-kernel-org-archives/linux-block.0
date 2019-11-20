@@ -2,129 +2,243 @@ Return-Path: <SRS0=usZV=ZM=vger.kernel.org=linux-block-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-10.1 required=3.0 tests=DKIMWL_WL_HIGH,DKIM_SIGNED,
-	DKIM_VALID,DKIM_VALID_AU,INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,
-	SPF_HELO_NONE,SPF_PASS,USER_AGENT_GIT autolearn=ham autolearn_force=no
-	version=3.4.0
+X-Spam-Status: No, score=-6.6 required=3.0 tests=DKIM_SIGNED,DKIM_VALID,
+	DKIM_VALID_AU,FREEMAIL_FORGED_FROMDOMAIN,FREEMAIL_FROM,
+	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,
+	SPF_HELO_NONE,SPF_PASS autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 87129C432C0
-	for <linux-block@archiver.kernel.org>; Wed, 20 Nov 2019 13:42:58 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 26E30C432C0
+	for <linux-block@archiver.kernel.org>; Wed, 20 Nov 2019 16:21:33 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.kernel.org (Postfix) with ESMTP id 5C14D22528
-	for <linux-block@archiver.kernel.org>; Wed, 20 Nov 2019 13:42:58 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=default; t=1574257378;
-	bh=mcshde1DXfPlrTcso7HevGxkj/tsZLZId92qk1mAbV4=;
-	h=From:To:Cc:Subject:Date:List-ID:From;
-	b=nY5MRBwfaNXROy7qmbqNJbUTOEcu4xueDR5HyBgLqjnO5NI0DLnY8wS5tzYloE+nI
-	 W5WRSVg/u39/9I3mCBFeq0E4Yv4EEkWSy6s+0oSIXFlkW/mYsXDpDeUo1mqaiRGup5
-	 Lb0bC+0FOaeVyGOGuigc42QuEgn3T9MknMZnTwCg=
+	by mail.kernel.org (Postfix) with ESMTP id E1FC520731
+	for <linux-block@archiver.kernel.org>; Wed, 20 Nov 2019 16:21:32 +0000 (UTC)
+Authentication-Results: mail.kernel.org;
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="LBejGigu"
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1729547AbfKTNm5 (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Wed, 20 Nov 2019 08:42:57 -0500
-Received: from mail.kernel.org ([198.145.29.99]:50796 "EHLO mail.kernel.org"
-        rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-        id S1730428AbfKTNm4 (ORCPT <rfc822;linux-block@vger.kernel.org>);
-        Wed, 20 Nov 2019 08:42:56 -0500
-Received: from localhost.localdomain (unknown [118.189.143.39])
-        (using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
-        (No client certificate requested)
-        by mail.kernel.org (Postfix) with ESMTPSA id 081AB224FC;
-        Wed, 20 Nov 2019 13:42:54 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-        s=default; t=1574257376;
-        bh=mcshde1DXfPlrTcso7HevGxkj/tsZLZId92qk1mAbV4=;
-        h=From:To:Cc:Subject:Date:From;
-        b=rXRH0AUI5l8YdAs6ip+DUnHABA3BVOMvgunFz7rPz6Hac9d+khiyYIlWhNpo/5M1J
-         lz73qXW4lMGc+juwkL5kN1riPG27w5/7My/xiIny7wL5bNRz1WVmU0mEnDgaGG/sf9
-         cUOvg4T+R6dNo2vpTSWw4VG1uC8SNkmQlEtBKQZ4=
-From:   Krzysztof Kozlowski <krzk@kernel.org>
-To:     linux-kernel@vger.kernel.org
-Cc:     Krzysztof Kozlowski <krzk@kernel.org>,
-        Jens Axboe <axboe@kernel.dk>, linux-block@vger.kernel.org
-Subject: [PATCH] block: Fix Kconfig indentation
-Date:   Wed, 20 Nov 2019 21:42:52 +0800
-Message-Id: <20191120134252.16129-1-krzk@kernel.org>
-X-Mailer: git-send-email 2.17.1
+        id S1728782AbfKTQVc (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Wed, 20 Nov 2019 11:21:32 -0500
+Received: from mail-io1-f65.google.com ([209.85.166.65]:42256 "EHLO
+        mail-io1-f65.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S1727885AbfKTQVc (ORCPT
+        <rfc822;linux-block@vger.kernel.org>);
+        Wed, 20 Nov 2019 11:21:32 -0500
+Received: by mail-io1-f65.google.com with SMTP id k13so28264030ioa.9;
+        Wed, 20 Nov 2019 08:21:31 -0800 (PST)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=gmail.com; s=20161025;
+        h=mime-version:references:in-reply-to:from:date:message-id:subject:to
+         :cc;
+        bh=G/a8KPIH+AXDi1yxdHgT07/LliAS9enq80vIfL27WA4=;
+        b=LBejGigugoMNm8Bg16W2oMRPNSmrXZGpXzIzgxYcuViBXYZQIBlg7Vj01asCexzJk4
+         L8x/nAmdRKmBsMhbJ35Jv2UmjU78PJKlBBAOh8dQS8PepWQxmCVA1QSW/7ox/Ox4+wMm
+         Wks4HXHEDIWzvMLQsbk3GSJW3SBzCWMo0ATZzUFCzT4PdLxOyMUarPICEeiKAHprVAKP
+         j7td40vxoVpICWloLCTa4RlRlchnfNWcjFuRpIioNJptUTciaSOwBXiSsH6hYfYSzGae
+         vzXZ+z9hmEDWwX5CEMdDEQTEbdh5IHI/GNiVMTBvYpUNV+Xt+ouWO0HmrFK9UB7z4MMv
+         j0Nw==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20161025;
+        h=x-gm-message-state:mime-version:references:in-reply-to:from:date
+         :message-id:subject:to:cc;
+        bh=G/a8KPIH+AXDi1yxdHgT07/LliAS9enq80vIfL27WA4=;
+        b=SbmnUphGEiozHZoYqUOj27qJg1AB1TUMhAoxzowxplnTJKU5HktHHAHLfd7K56dQDS
+         yUvtrpZiur7eR3qbl5v1JHOJT+1ZHIi0oVKda1YtMSxNihffwRYVtWbPMg0QfyV7G31R
+         IxHr00F215fkcDk+5C2fy8maBfOy9Q041P5vrH+aKzwheAb/U7rjQbTCYsQ0l1S54lK+
+         6V2yyuMqya1QD3Uyt0aYQs/FzSJmQ5liO/6qF9uhns1scJqQi80K3SuuDRsKoBwvJjrg
+         xMPBQEmbAhZi+DftXo0O59kIJTWX19lRHQaqcOCSj4HJfbLQhlBz4V/gQTMRwSGiBfIy
+         sT+A==
+X-Gm-Message-State: APjAAAX0Xn4nfEC+mNc5RzpXddtxxl9HD51NC97Y2xrNmzC67LJMzqRO
+        QUsguuSaQem7uUv2dBT2wdEjyEsU8fwBNY2iqws6Njp2
+X-Google-Smtp-Source: APXvYqwdl0dqh1yZB3bwi+8z4vWgf/5IfIlpYDRGN3WgEiehlF8vpTZooZGzrx+rsLoNYaaVq8NE8e+Ki+07/o/UbTg=
+X-Received: by 2002:a02:a810:: with SMTP id f16mr3917078jaj.73.1574266890514;
+ Wed, 20 Nov 2019 08:21:30 -0800 (PST)
+MIME-Version: 1.0
+References: <1574147082-22725-1-git-send-email-sheebab@cadence.com> <1574147082-22725-3-git-send-email-sheebab@cadence.com>
+In-Reply-To: <1574147082-22725-3-git-send-email-sheebab@cadence.com>
+From:   Alim Akhtar <alim.akhtar@gmail.com>
+Date:   Wed, 20 Nov 2019 21:50:53 +0530
+Message-ID: <CAGOxZ53Lotp6sBUryHsE2S1dbkQNZhPhWNMXidoi=BOmV074VA@mail.gmail.com>
+Subject: Re: [PATCH RESEND 2/2] scsi: ufs: Update L4 attributes on manual
+ hibern8 exit in Cadence UFS.
+To:     sheebab <sheebab@cadence.com>
+Cc:     Alim Akhtar <alim.akhtar@samsung.com>,
+        Avri Altman <avri.altman@wdc.com>,
+        Pedro Sousa <pedrom.sousa@synopsys.com>,
+        "James E.J. Bottomley" <jejb@linux.ibm.com>,
+        "Martin K. Petersen" <martin.petersen@oracle.com>,
+        Stanley Chu <stanley.chu@mediatek.com>,
+        "Bean Huo (beanhuo)" <beanhuo@micron.com>, yuehaibing@huawei.com,
+        linux-scsi@vger.kernel.org,
+        open list <linux-kernel@vger.kernel.org>,
+        Vignesh Raghavendra <vigneshr@ti.com>,
+        linux-block@vger.kernel.org, rafalc@cadence.com, mparab@cadence.com
+Content-Type: text/plain; charset="UTF-8"
 Sender: linux-block-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-Adjust indentation from spaces to tab (+optional two spaces) as in
-coding style with command like:
-	$ sed -e 's/^        /\t/' -i */Kconfig
+Hi Sheebab
 
-Signed-off-by: Krzysztof Kozlowski <krzk@kernel.org>
----
- drivers/block/Kconfig          | 28 ++++++++++++++--------------
- drivers/block/mtip32xx/Kconfig |  2 +-
- 2 files changed, 15 insertions(+), 15 deletions(-)
+On Tue, Nov 19, 2019 at 12:38 PM sheebab <sheebab@cadence.com> wrote:
+>
+> Backup L4 attributes duirng manual hibern8 entry
+> and restore the L4 attributes on manual hibern8 exit as per JESD220C.
+>
+Can you point me to the relevant section on the spec?
 
-diff --git a/drivers/block/Kconfig b/drivers/block/Kconfig
-index 1bb8ec575352..fa0cd072f5a1 100644
---- a/drivers/block/Kconfig
-+++ b/drivers/block/Kconfig
-@@ -142,10 +142,10 @@ config BLK_DEV_UBD
- 	bool "Virtual block device"
- 	depends on UML
- 	---help---
--          The User-Mode Linux port includes a driver called UBD which will let
--          you access arbitrary files on the host computer as block devices.
--          Unless you know that you do not need such virtual block devices say
--          Y here.
-+	  The User-Mode Linux port includes a driver called UBD which will let
-+	  you access arbitrary files on the host computer as block devices.
-+	  Unless you know that you do not need such virtual block devices say
-+	  Y here.
- 
- config BLK_DEV_UBD_SYNC
- 	bool "Always do synchronous disk IO for UBD"
-@@ -156,16 +156,16 @@ config BLK_DEV_UBD_SYNC
- 	  Linux 'Virtual Machine' uses a journalling filesystem and the host
- 	  computer crashes.
- 
--          Synchronous operation (i.e. always writing data to the host's disk
--          immediately) is configurable on a per-UBD basis by using a special
--          kernel command line option.  Alternatively, you can say Y here to
--          turn on synchronous operation by default for all block devices.
-+	  Synchronous operation (i.e. always writing data to the host's disk
-+	  immediately) is configurable on a per-UBD basis by using a special
-+	  kernel command line option.  Alternatively, you can say Y here to
-+	  turn on synchronous operation by default for all block devices.
- 
--          If you're running a journalling file system (like reiserfs, for
--          example) in your virtual machine, you will want to say Y here.  If
--          you care for the safety of the data in your virtual machine, Y is a
--          wise choice too.  In all other cases (for example, if you're just
--          playing around with User-Mode Linux) you can choose N.
-+	  If you're running a journalling file system (like reiserfs, for
-+	  example) in your virtual machine, you will want to say Y here.  If
-+	  you care for the safety of the data in your virtual machine, Y is a
-+	  wise choice too.  In all other cases (for example, if you're just
-+	  playing around with User-Mode Linux) you can choose N.
- 
- config BLK_DEV_COW_COMMON
- 	bool
-@@ -430,7 +430,7 @@ config VIRTIO_BLK
- 	depends on VIRTIO
- 	---help---
- 	  This is the virtual block driver for virtio.  It can be used with
--          QEMU based VMMs (like KVM or Xen).  Say Y or M.
-+	  QEMU based VMMs (like KVM or Xen).  Say Y or M.
- 
- config VIRTIO_BLK_SCSI
- 	bool "SCSI passthrough request for the Virtio block driver"
-diff --git a/drivers/block/mtip32xx/Kconfig b/drivers/block/mtip32xx/Kconfig
-index bf221358567e..a469dc72e67a 100644
---- a/drivers/block/mtip32xx/Kconfig
-+++ b/drivers/block/mtip32xx/Kconfig
-@@ -7,4 +7,4 @@ config BLK_DEV_PCIESSD_MTIP32XX
- 	tristate "Block Device Driver for Micron PCIe SSDs"
- 	depends on PCI
- 	help
--          This enables the block driver for Micron PCIe SSDs.
-+	  This enables the block driver for Micron PCIe SSDs.
+> Signed-off-by: sheebab <sheebab@cadence.com>
+> ---
+>  drivers/scsi/ufs/cdns-pltfrm.c | 97 +++++++++++++++++++++++++++++++++++++++++-
+>  1 file changed, 95 insertions(+), 2 deletions(-)
+>
+> diff --git a/drivers/scsi/ufs/cdns-pltfrm.c b/drivers/scsi/ufs/cdns-pltfrm.c
+> index adbbd60..5510567 100644
+> --- a/drivers/scsi/ufs/cdns-pltfrm.c
+> +++ b/drivers/scsi/ufs/cdns-pltfrm.c
+> @@ -19,6 +19,14 @@
+>
+>  #define CDNS_UFS_REG_HCLKDIV   0xFC
+>  #define CDNS_UFS_REG_PHY_XCFGD1        0x113C
+> +#define CDNS_UFS_MAX 12
+> +
+> +struct cdns_ufs_host {
+> +       /**
+> +        * cdns_ufs_dme_attr_val - for storing L4 attributes
+> +        */
+> +       u32 cdns_ufs_dme_attr_val[CDNS_UFS_MAX];
+> +};
+>
+>  /**
+>   * cdns_ufs_enable_intr - enable interrupts
+> @@ -47,6 +55,77 @@ static void cdns_ufs_disable_intr(struct ufs_hba *hba, u32 intrs)
+>  }
+>
+>  /**
+> + * cdns_ufs_get_l4_attr - get L4 attributes on local side
+> + * @hba: per adapter instance
+> + *
+> + */
+> +static void cdns_ufs_get_l4_attr(struct ufs_hba *hba)
+> +{
+> +       struct cdns_ufs_host *host = ufshcd_get_variant(hba);
+> +
+> +       ufshcd_dme_get(hba, UIC_ARG_MIB(T_PEERDEVICEID),
+> +                      &host->cdns_ufs_dme_attr_val[0]);
+> +       ufshcd_dme_get(hba, UIC_ARG_MIB(T_PEERCPORTID),
+> +                      &host->cdns_ufs_dme_attr_val[1]);
+> +       ufshcd_dme_get(hba, UIC_ARG_MIB(T_TRAFFICCLASS),
+> +                      &host->cdns_ufs_dme_attr_val[2]);
+> +       ufshcd_dme_get(hba, UIC_ARG_MIB(T_PROTOCOLID),
+> +                      &host->cdns_ufs_dme_attr_val[3]);
+> +       ufshcd_dme_get(hba, UIC_ARG_MIB(T_CPORTFLAGS),
+> +                      &host->cdns_ufs_dme_attr_val[4]);
+> +       ufshcd_dme_get(hba, UIC_ARG_MIB(T_TXTOKENVALUE),
+> +                      &host->cdns_ufs_dme_attr_val[5]);
+> +       ufshcd_dme_get(hba, UIC_ARG_MIB(T_RXTOKENVALUE),
+> +                      &host->cdns_ufs_dme_attr_val[6]);
+> +       ufshcd_dme_get(hba, UIC_ARG_MIB(T_LOCALBUFFERSPACE),
+> +                      &host->cdns_ufs_dme_attr_val[7]);
+> +       ufshcd_dme_get(hba, UIC_ARG_MIB(T_PEERBUFFERSPACE),
+> +                      &host->cdns_ufs_dme_attr_val[8]);
+> +       ufshcd_dme_get(hba, UIC_ARG_MIB(T_CREDITSTOSEND),
+> +                      &host->cdns_ufs_dme_attr_val[9]);
+> +       ufshcd_dme_get(hba, UIC_ARG_MIB(T_CPORTMODE),
+> +                      &host->cdns_ufs_dme_attr_val[10]);
+> +       ufshcd_dme_get(hba, UIC_ARG_MIB(T_CONNECTIONSTATE),
+> +                      &host->cdns_ufs_dme_attr_val[11]);
+> +}
+> +
+> +/**
+> + * cdns_ufs_set_l4_attr - set L4 attributes on local side
+> + * @hba: per adapter instance
+> + *
+> + */
+> +static void cdns_ufs_set_l4_attr(struct ufs_hba *hba)
+> +{
+> +       struct cdns_ufs_host *host = ufshcd_get_variant(hba);
+> +
+> +       ufshcd_dme_set(hba, UIC_ARG_MIB(T_CONNECTIONSTATE), 0);
+> +       ufshcd_dme_set(hba, UIC_ARG_MIB(T_PEERDEVICEID),
+> +                      host->cdns_ufs_dme_attr_val[0]);
+> +       ufshcd_dme_set(hba, UIC_ARG_MIB(T_PEERCPORTID),
+> +                      host->cdns_ufs_dme_attr_val[1]);
+> +       ufshcd_dme_set(hba, UIC_ARG_MIB(T_TRAFFICCLASS),
+> +                      host->cdns_ufs_dme_attr_val[2]);
+> +       ufshcd_dme_set(hba, UIC_ARG_MIB(T_PROTOCOLID),
+> +                      host->cdns_ufs_dme_attr_val[3]);
+> +       ufshcd_dme_set(hba, UIC_ARG_MIB(T_CPORTFLAGS),
+> +                      host->cdns_ufs_dme_attr_val[4]);
+> +       ufshcd_dme_set(hba, UIC_ARG_MIB(T_TXTOKENVALUE),
+> +                      host->cdns_ufs_dme_attr_val[5]);
+> +       ufshcd_dme_set(hba, UIC_ARG_MIB(T_RXTOKENVALUE),
+> +                      host->cdns_ufs_dme_attr_val[6]);
+> +       ufshcd_dme_set(hba, UIC_ARG_MIB(T_LOCALBUFFERSPACE),
+> +                      host->cdns_ufs_dme_attr_val[7]);
+> +       ufshcd_dme_set(hba, UIC_ARG_MIB(T_PEERBUFFERSPACE),
+> +                      host->cdns_ufs_dme_attr_val[8]);
+> +       ufshcd_dme_set(hba, UIC_ARG_MIB(T_CREDITSTOSEND),
+> +                      host->cdns_ufs_dme_attr_val[9]);
+> +       ufshcd_dme_set(hba, UIC_ARG_MIB(T_CPORTMODE),
+> +                      host->cdns_ufs_dme_attr_val[10]);
+> +       ufshcd_dme_set(hba, UIC_ARG_MIB(T_CONNECTIONSTATE),
+> +                      host->cdns_ufs_dme_attr_val[11]);
+> +}
+> +
+> +/**
+>   * Sets HCLKDIV register value based on the core_clk
+>   * @hba: host controller instance
+>   *
+> @@ -134,6 +213,7 @@ static void cdns_ufs_hibern8_notify(struct ufs_hba *hba, enum uic_cmd_dme cmd,
+>                  * before manual hibernate entry.
+>                  */
+>                 cdns_ufs_enable_intr(hba, UFSHCD_UIC_HIBERN8_MASK);
+> +               cdns_ufs_get_l4_attr(hba);
+>         }
+>         if (status == POST_CHANGE && cmd == UIC_CMD_DME_HIBER_EXIT) {
+>                 /**
+> @@ -141,6 +221,7 @@ static void cdns_ufs_hibern8_notify(struct ufs_hba *hba, enum uic_cmd_dme cmd,
+>                  * after manual hibern8 exit.
+>                  */
+>                 cdns_ufs_disable_intr(hba, UFSHCD_UIC_HIBERN8_MASK);
+> +               cdns_ufs_set_l4_attr(hba);
+>         }
+>  }
+>
+> @@ -245,15 +326,27 @@ static int cdns_ufs_pltfrm_probe(struct platform_device *pdev)
+>         const struct of_device_id *of_id;
+>         struct ufs_hba_variant_ops *vops;
+>         struct device *dev = &pdev->dev;
+> +       struct cdns_ufs_host *host;
+> +       struct ufs_hba *hba;
+>
+>         of_id = of_match_node(cdns_ufs_of_match, dev->of_node);
+>         vops = (struct ufs_hba_variant_ops *)of_id->data;
+>
+>         /* Perform generic probe */
+>         err = ufshcd_pltfrm_init(pdev, vops);
+> -       if (err)
+> +       if (err) {
+>                 dev_err(dev, "ufshcd_pltfrm_init() failed %d\n", err);
+> -
+> +               goto out;
+> +       }
+> +       host = devm_kzalloc(dev, sizeof(*host), GFP_KERNEL);
+> +       if (!host) {
+> +               err = -ENOMEM;
+> +               dev_err(dev, "%s: no memory for cdns host\n", __func__);
+> +               goto out;
+> +       }
+> +       hba =  platform_get_drvdata(pdev);
+> +       ufshcd_set_variant(hba, host);
+> +out:
+>         return err;
+>  }
+>
+> --
+> 2.7.4
+>
+
+
 -- 
-2.17.1
-
+Regards,
+Alim
