@@ -2,116 +2,196 @@ Return-Path: <SRS0=usZV=ZM=vger.kernel.org=linux-block-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-2.0 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
-	HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,
-	USER_AGENT_SANE_1 autolearn=no autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-6.9 required=3.0 tests=DKIMWL_WL_HIGH,DKIM_SIGNED,
+	DKIM_VALID,DKIM_VALID_AU,HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,
+	MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS autolearn=unavailable
+	autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id D6358C43141
-	for <linux-block@archiver.kernel.org>; Wed, 20 Nov 2019 19:16:51 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id A24CFC432C3
+	for <linux-block@archiver.kernel.org>; Wed, 20 Nov 2019 19:26:32 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.kernel.org (Postfix) with ESMTP id B032C20898
-	for <linux-block@archiver.kernel.org>; Wed, 20 Nov 2019 19:16:51 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id 70ABC20721
+	for <linux-block@archiver.kernel.org>; Wed, 20 Nov 2019 19:26:32 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (2048-bit key) header.d=infradead.org header.i=@infradead.org header.b="BqmvakRC"
+	dkim=pass (1024-bit key) header.d=chromium.org header.i=@chromium.org header.b="mPCKWx7D"
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1727287AbfKTTQn (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Wed, 20 Nov 2019 14:16:43 -0500
-Received: from bombadil.infradead.org ([198.137.202.133]:44620 "EHLO
-        bombadil.infradead.org" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1726236AbfKTTQn (ORCPT
+        id S1727474AbfKTT0b (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Wed, 20 Nov 2019 14:26:31 -0500
+Received: from mail-lf1-f66.google.com ([209.85.167.66]:43360 "EHLO
+        mail-lf1-f66.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S1727582AbfKTT0a (ORCPT
         <rfc822;linux-block@vger.kernel.org>);
-        Wed, 20 Nov 2019 14:16:43 -0500
-DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed;
-        d=infradead.org; s=bombadil.20170209; h=In-Reply-To:Content-Type:MIME-Version
-        :References:Message-ID:Subject:Cc:To:From:Date:Sender:Reply-To:
-        Content-Transfer-Encoding:Content-ID:Content-Description:Resent-Date:
-        Resent-From:Resent-Sender:Resent-To:Resent-Cc:Resent-Message-ID:List-Id:
-        List-Help:List-Unsubscribe:List-Subscribe:List-Post:List-Owner:List-Archive;
-         bh=+uiX8Y1FAOVx63BgGhdqk6UFOCjK1eb99TNr3TVgrIU=; b=BqmvakRCAIVKzYcDLg/Qch27X
-        35mFslRqqVAYqgbmgTvsmMp3M12VvLOROf5bcDJwZF/FJYUNy8Yk9NmXULSy5g8/pblUsDD2TDfpK
-        BniKwfa3nTylt+8dPT8sl3zfVEBzm0Sl8fe1gz+cvuGMeUX8ufazZqcpvN1pVjjUuPqUHyxXv+7J6
-        sRiuyR6E3hhc1T98sqjCzwFtFe5OXhKGngAlV1NO+c17X7ylg7mqaw2s6RKcSLWq/Xzz+4BUaIOc3
-        +Z7vjEmi3ttpbQKmB6yvBrmSPLbqfCfpJezR9+Ap2Uv2irNXBGTv2NOa/+d+zjFFsGU+S4d10iCDI
-        fTH6oSPeA==;
-Received: from j217100.upc-j.chello.nl ([24.132.217.100] helo=noisy.programming.kicks-ass.net)
-        by bombadil.infradead.org with esmtpsa (Exim 4.92.3 #3 (Red Hat Linux))
-        id 1iXVSw-0005wN-CY; Wed, 20 Nov 2019 19:16:38 +0000
-Received: from hirez.programming.kicks-ass.net (hirez.programming.kicks-ass.net [192.168.1.225])
-        (using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
-        (Client did not present a certificate)
-        by noisy.programming.kicks-ass.net (Postfix) with ESMTPS id 9B0D130068E;
-        Wed, 20 Nov 2019 20:15:25 +0100 (CET)
-Received: by hirez.programming.kicks-ass.net (Postfix, from userid 1000)
-        id 200F42B25DAAD; Wed, 20 Nov 2019 20:16:36 +0100 (CET)
-Date:   Wed, 20 Nov 2019 20:16:36 +0100
-From:   Peter Zijlstra <peterz@infradead.org>
-To:     Dave Chinner <david@fromorbit.com>
-Cc:     Ming Lei <ming.lei@redhat.com>, linux-block@vger.kernel.org,
-        linux-fsdevel@vger.kernel.org, linux-xfs@vger.kernel.org,
-        linux-kernel@vger.kernel.org, Jeff Moyer <jmoyer@redhat.com>,
-        Dave Chinner <dchinner@redhat.com>,
-        Eric Sandeen <sandeen@redhat.com>,
-        Christoph Hellwig <hch@lst.de>, Jens Axboe <axboe@kernel.dk>,
-        Ingo Molnar <mingo@redhat.com>, Tejun Heo <tj@kernel.org>,
-        Vincent Guittot <vincent.guittot@linaro.org>
-Subject: Re: single aio thread is migrated crazily by scheduler
-Message-ID: <20191120191636.GI4097@hirez.programming.kicks-ass.net>
-References: <20191114113153.GB4213@ming.t460p>
- <20191114235415.GL4614@dread.disaster.area>
- <20191115010824.GC4847@ming.t460p>
- <20191115045634.GN4614@dread.disaster.area>
- <20191115070843.GA24246@ming.t460p>
- <20191115234005.GO4614@dread.disaster.area>
- <20191118092121.GV4131@hirez.programming.kicks-ass.net>
- <20191118204054.GV4614@dread.disaster.area>
+        Wed, 20 Nov 2019 14:26:30 -0500
+Received: by mail-lf1-f66.google.com with SMTP id l14so455427lfh.10
+        for <linux-block@vger.kernel.org>; Wed, 20 Nov 2019 11:26:27 -0800 (PST)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=chromium.org; s=google;
+        h=mime-version:references:in-reply-to:from:date:message-id:subject:to
+         :cc;
+        bh=Mw+/fineosuPJvDOnBDBPMogHWUzz9jTmRi29Rw+s8o=;
+        b=mPCKWx7DB8WKiRCILkF/Vp93HtGJYEdHFGc3esVg4bfwz+9ufxMwG7XDtyzMmczsj9
+         onbNWqBPFjCQ12S7lrtRI6fL0ibOD1rJ31/migziZy+08Jx8f3F53jnVZocTReJC6bD8
+         2KZOIOhJBwNhU/+M1IuCWG2kr6yfT4oi5iN10=
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20161025;
+        h=x-gm-message-state:mime-version:references:in-reply-to:from:date
+         :message-id:subject:to:cc;
+        bh=Mw+/fineosuPJvDOnBDBPMogHWUzz9jTmRi29Rw+s8o=;
+        b=XcAPpbY+9uZy6ODSGEEX+hf2LYzs+0O3AKeyGbASP6kAr90eFZDYkN1jRS43r5f4jt
+         hJdKOkbQGPZ4mwSu/uHDMi/pbZaTYZrrnTB4/DQAMf0zL4hEdMj9JzVexfWi33x8pVbq
+         T5vBqMHZqwdsJ7ovwp2/hI6nBlCKZqn9e7yk9wtyrwWApgMLBY7r4Atv8Ovwi84ohK8N
+         A/Y4epPgZUf6kps89EgsDZ03jjtT/f08iHA8zCgefBz4uKm/+WybKV1kMN6rtbxehJa7
+         m6sqixfD62gno2ngFOOGFylNQokpG+LX2bFIAAK4HMxhGJ/Q65S0zI5YpTQ+qouhlQCg
+         rqqg==
+X-Gm-Message-State: APjAAAWuoJr+1ybFzg5kqiuPTwK2CaVJeIcVxvHuL4qupb2vrr/4PFuk
+        tBsjWTfplZ0yDNhkrniPBM9IdTcPuvw=
+X-Google-Smtp-Source: APXvYqwIOVXk+2XwQKXrLhCmaj0ZwgDUfsZlp9G56EESha96EZA05xlWcVYoj15mgxCKRJYfLSCn8g==
+X-Received: by 2002:a19:6b10:: with SMTP id d16mr4366621lfa.137.1574277986125;
+        Wed, 20 Nov 2019 11:26:26 -0800 (PST)
+Received: from mail-lj1-f180.google.com (mail-lj1-f180.google.com. [209.85.208.180])
+        by smtp.gmail.com with ESMTPSA id f25sm31491ljp.100.2019.11.20.11.26.25
+        for <linux-block@vger.kernel.org>
+        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
+        Wed, 20 Nov 2019 11:26:25 -0800 (PST)
+Received: by mail-lj1-f180.google.com with SMTP id g3so374433ljl.11
+        for <linux-block@vger.kernel.org>; Wed, 20 Nov 2019 11:26:25 -0800 (PST)
+X-Received: by 2002:a2e:9208:: with SMTP id k8mr4368991ljg.14.1574277984775;
+ Wed, 20 Nov 2019 11:26:24 -0800 (PST)
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <20191118204054.GV4614@dread.disaster.area>
-User-Agent: Mutt/1.10.1 (2018-07-13)
+References: <20191114235008.185111-1-evgreen@chromium.org> <20191114154903.v7.2.I4d476bddbf41a61422ad51502f4361e237d60ad4@changeid>
+ <20191120022518.GU6235@magnolia> <CAE=gft4mjKc4QKFKxp2FX9G2rUMuE3_eDuW_3Oq7NqTYBQwEjg@mail.gmail.com>
+ <20191120191302.GV6235@magnolia>
+In-Reply-To: <20191120191302.GV6235@magnolia>
+From:   Evan Green <evgreen@chromium.org>
+Date:   Wed, 20 Nov 2019 11:25:48 -0800
+X-Gmail-Original-Message-ID: <CAE=gft6x1TmkkNTj+gktYMkHcysYyuYL50cavYusQ7hd9zChvA@mail.gmail.com>
+Message-ID: <CAE=gft6x1TmkkNTj+gktYMkHcysYyuYL50cavYusQ7hd9zChvA@mail.gmail.com>
+Subject: Re: [PATCH v7 2/2] loop: Better discard support for block devices
+To:     "Darrick J. Wong" <darrick.wong@oracle.com>
+Cc:     Jens Axboe <axboe@kernel.dk>,
+        Martin K Petersen <martin.petersen@oracle.com>,
+        Gwendal Grignou <gwendal@chromium.org>,
+        Christoph Hellwig <hch@infradead.org>,
+        Ming Lei <ming.lei@redhat.com>,
+        Alexis Savery <asavery@chromium.org>,
+        Douglas Anderson <dianders@chromium.org>,
+        Bart Van Assche <bvanassche@acm.org>,
+        Chaitanya Kulkarni <chaitanya.kulkarni@wdc.com>,
+        linux-block <linux-block@vger.kernel.org>,
+        LKML <linux-kernel@vger.kernel.org>
+Content-Type: text/plain; charset="UTF-8"
 Sender: linux-block-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-On Tue, Nov 19, 2019 at 07:40:54AM +1100, Dave Chinner wrote:
-> On Mon, Nov 18, 2019 at 10:21:21AM +0100, Peter Zijlstra wrote:
+On Wed, Nov 20, 2019 at 11:13 AM Darrick J. Wong
+<darrick.wong@oracle.com> wrote:
+>
+> On Wed, Nov 20, 2019 at 10:56:30AM -0800, Evan Green wrote:
+> > On Tue, Nov 19, 2019 at 6:25 PM Darrick J. Wong <darrick.wong@oracle.com> wrote:
+> > >
+> > > On Thu, Nov 14, 2019 at 03:50:08PM -0800, Evan Green wrote:
+> > > > If the backing device for a loop device is itself a block device,
+> > > > then mirror the "write zeroes" capabilities of the underlying
+> > > > block device into the loop device. Copy this capability into both
+> > > > max_write_zeroes_sectors and max_discard_sectors of the loop device.
+> > > >
+> > > > The reason for this is that REQ_OP_DISCARD on a loop device translates
+> > > > into blkdev_issue_zeroout(), rather than blkdev_issue_discard(). This
+> > > > presents a consistent interface for loop devices (that discarded data
+> > > > is zeroed), regardless of the backing device type of the loop device.
+> > > > There should be no behavior change for loop devices backed by regular
+> > > > files.
 
-> > We typically only fall back to the active balancer when there is
-> > (persistent) imbalance and we fail to migrate anything else (of
-> > substance).
-> > 
-> > The tuning mentioned has the effect of less frequent scheduling, IOW,
-> > leaving (short) tasks on the runqueue longer. This obviously means the
-> > load-balancer will have a bigger chance of seeing them.
-> > 
-> > Now; it's been a while since I looked at the workqueue code but one
-> > possible explanation would be if the kworker that picks up the work item
-> > is pinned. That would make it runnable but not migratable, the exact
-> > situation in which we'll end up shooting the current task with active
-> > balance.
-> 
-> Yes, that's precisely the problem - work is queued, by default, on a
-> specific CPU and it will wait for a kworker that is pinned to that
+(marking this spot for below)
 
-I'm thinking the problem is that it doesn't wait. If it went and waited
-for it, active balance wouldn't be needed, that only works on active
-tasks.
+> > > >
+> > > > This change fixes blktest block/003, and removes an extraneous
+> > > > error print in block/013 when testing on a loop device backed
+> > > > by a block device that does not support discard.
+> > > >
+> > > > Signed-off-by: Evan Green <evgreen@chromium.org>
+> > > > Reviewed-by: Gwendal Grignou <gwendal@chromium.org>
+> > > > Reviewed-by: Chaitanya Kulkarni <chaitanya.kulkarni@wdc.com>
+> > > > ---
+> > > >
+> > > > Changes in v7:
+> > > > - Rebase on top of Darrick's patch
+> > > > - Tweak opening line of commit description (Darrick)
+> > > >
+> > > > Changes in v6: None
+> > > > Changes in v5:
+> > > > - Don't mirror discard if lo_encrypt_key_size is non-zero (Gwendal)
+> > > >
+> > > > Changes in v4:
+> > > > - Mirror blkdev's write_zeroes into loopdev's discard_sectors.
+> > > >
+> > > > Changes in v3:
+> > > > - Updated commit description
+> > > >
+> > > > Changes in v2: None
+> > > >
+> > > >  drivers/block/loop.c | 40 +++++++++++++++++++++++++++++-----------
+> > > >  1 file changed, 29 insertions(+), 11 deletions(-)
+> > > >
+> > > > diff --git a/drivers/block/loop.c b/drivers/block/loop.c
+> > > > index 6a9fe1f9fe84..e8f23e4b78f7 100644
+> > > > --- a/drivers/block/loop.c
+> > > > +++ b/drivers/block/loop.c
+> > > > @@ -427,11 +427,12 @@ static int lo_fallocate(struct loop_device *lo, struct request *rq, loff_t pos,
+> > > >        * information.
+> > > >        */
+> > > >       struct file *file = lo->lo_backing_file;
+> > > > +     struct request_queue *q = lo->lo_queue;
+> > > >       int ret;
+> > > >
+> > > >       mode |= FALLOC_FL_KEEP_SIZE;
+> > > >
+> > > > -     if ((!file->f_op->fallocate) || lo->lo_encrypt_key_size) {
+> > > > +     if (!blk_queue_discard(q)) {
+> > > >               ret = -EOPNOTSUPP;
+> > > >               goto out;
+> > > >       }
+> > > > @@ -862,6 +863,21 @@ static void loop_config_discard(struct loop_device *lo)
+> > > >       struct file *file = lo->lo_backing_file;
+> > > >       struct inode *inode = file->f_mapping->host;
+> > > >       struct request_queue *q = lo->lo_queue;
+> > > > +     struct request_queue *backingq;
+> > > > +
+> > > > +     /*
+> > > > +      * If the backing device is a block device, mirror its zeroing
+> > > > +      * capability. REQ_OP_DISCARD translates to a zero-out even when backed
+> > > > +      * by block devices to keep consistent behavior with file-backed loop
+> > > > +      * devices.
+> > > > +      */
+> > > > +     if (S_ISBLK(inode->i_mode) && !lo->lo_encrypt_key_size) {
+> > > > +             backingq = bdev_get_queue(inode->i_bdev);
+> > > > +             blk_queue_max_discard_sectors(q,
+> > > > +                     backingq->limits.max_write_zeroes_sectors);
+> > >
+> > > max_discard_sectors?
+> >
+> > I didn't plumb max_discard_sectors because for my scenario it never
+> > ends up hitting the block device that way.
+> >
+> > The loop device either uses FL_ZERO_RANGE or FL_PUNCH_HOLE. When
+> > backed by a block device, that ends up in blkdev_fallocate(), which
+> > always translates both of those into blkdev_issue_zeroout(), not
+> > blkdev_issue_discard(). So it's really the zeroing capabilities of the
+> > block device that matters, even for loop discard operations. It seems
+> > weird, but I think this is the right thing because it presents a
+> > consistent interface to loop device users whether backed by a file
+> > system file, or directly by a block device. That is, a previously
+> > discarded range will read back as zeroes.
+>
+> Ah, right.  Could you add this paragraph as a comment explaining why
+> we're setting max_discard_sectors from max_write_zeroes_sectors?
 
-> specific CPU to dispatch it. We've already tested that queuing on a
-> different CPU (via queue_work_on()) makes the problem largely go
-> away as the work is not longer queued behind the long running fio
-> task.
-> 
-> This, however, is not at viable solution to the problem. The pattern
-> of a long running process queuing small pieces of individual work
-> for processing in a separate context is pretty common...
+Sure. I put an explanation in the commit description (see spot I
+marked above), but I agree a comment is probably also worthwhile.
 
-Right, but you're putting the scheduler in a bind. By overloading the
-CPU and only allowing the one task to migrate, it pretty much has no
-choice left.
-
-Anyway, I'm still going to have try and reproduce -- I got side-tracked
-into a crashing bug, I'll hopefully get back to this tomorrow. Lastly,
-one other thing to try is -next. Vincent reworked the load-balancer
-quite a bit.
+>
+> --D
+>
+> > -Evan
