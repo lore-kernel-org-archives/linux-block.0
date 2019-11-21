@@ -2,233 +2,257 @@ Return-Path: <SRS0=S5B1=ZN=vger.kernel.org=linux-block-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-8.3 required=3.0 tests=DKIMWL_WL_HIGH,DKIM_SIGNED,
-	DKIM_VALID,DKIM_VALID_AU,HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,
-	MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,UNPARSEABLE_RELAY,
-	URIBL_BLOCKED,USER_AGENT_SANE_1 autolearn=ham autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-6.8 required=3.0 tests=DKIM_SIGNED,DKIM_VALID,
+	DKIM_VALID_AU,HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,
+	SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED autolearn=unavailable
+	autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id EA362C432C0
-	for <linux-block@archiver.kernel.org>; Thu, 21 Nov 2019 21:25:48 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id A8562C43141
+	for <linux-block@archiver.kernel.org>; Thu, 21 Nov 2019 21:35:49 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.kernel.org (Postfix) with ESMTP id B2CBC206D7
-	for <linux-block@archiver.kernel.org>; Thu, 21 Nov 2019 21:25:48 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id 734E6206D8
+	for <linux-block@archiver.kernel.org>; Thu, 21 Nov 2019 21:35:49 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=pass (2048-bit key) header.d=oracle.com header.i=@oracle.com header.b="ndTjdExf"
+	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="F3+4lkP3"
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1726297AbfKUVZr (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Thu, 21 Nov 2019 16:25:47 -0500
-Received: from userp2120.oracle.com ([156.151.31.85]:36986 "EHLO
-        userp2120.oracle.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1726293AbfKUVZr (ORCPT
+        id S1726992AbfKUVfs (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Thu, 21 Nov 2019 16:35:48 -0500
+Received: from us-smtp-delivery-1.mimecast.com ([207.211.31.120]:54090 "EHLO
+        us-smtp-1.mimecast.com" rhost-flags-OK-OK-OK-FAIL) by vger.kernel.org
+        with ESMTP id S1726840AbfKUVfl (ORCPT
         <rfc822;linux-block@vger.kernel.org>);
-        Thu, 21 Nov 2019 16:25:47 -0500
-Received: from pps.filterd (userp2120.oracle.com [127.0.0.1])
-        by userp2120.oracle.com (8.16.0.27/8.16.0.27) with SMTP id xALLApfa106218;
-        Thu, 21 Nov 2019 21:25:20 GMT
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=oracle.com; h=date : from : to : cc
- : subject : message-id : references : mime-version : content-type :
- in-reply-to; s=corp-2019-08-05;
- bh=3q5ELNs+Kx+K1bHZZAOkyUkJbvtpFplQATZijNomOVc=;
- b=ndTjdExf13XL06VeZrCE8QoGVAmT1KzRkeWci8rsBiAYv4ExC3XTUgwREksXDJ5JJphG
- Gk6x8D1vU8ElScTr+fLHmiqaFKkgP+SgM+mtF182RpZ+r9wF7YGmVIUGBwB+V2CsPJ5y
- eWzIt0OMiC9xYqS2zWf3aEMizupJ4/vyZP5e51GuMCQMq8ZrBnwm5f7vKX4mMnQIJeYT
- 7pBc5SLo91d1cXyak5d7hjRz216npkZEe/RJGHPp3bR9ARWcgym2b8FadYcnM56c+3Yy
- juxq3UaASc6Cz6xMjps/EioyTwndIVID91JEzhcfzLHZIzzps1+Yq6fiZSWXwPUGgPdl Vw== 
-Received: from aserp3020.oracle.com (aserp3020.oracle.com [141.146.126.70])
-        by userp2120.oracle.com with ESMTP id 2wa9rqxycj-1
-        (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=OK);
-        Thu, 21 Nov 2019 21:25:20 +0000
-Received: from pps.filterd (aserp3020.oracle.com [127.0.0.1])
-        by aserp3020.oracle.com (8.16.0.27/8.16.0.27) with SMTP id xALLAd1b005329;
-        Thu, 21 Nov 2019 21:25:19 GMT
-Received: from userv0122.oracle.com (userv0122.oracle.com [156.151.31.75])
-        by aserp3020.oracle.com with ESMTP id 2wdfrv2me3-1
-        (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=OK);
-        Thu, 21 Nov 2019 21:25:19 +0000
-Received: from abhmp0008.oracle.com (abhmp0008.oracle.com [141.146.116.14])
-        by userv0122.oracle.com (8.14.4/8.14.4) with ESMTP id xALLPExt009698;
-        Thu, 21 Nov 2019 21:25:16 GMT
-Received: from localhost (/10.145.178.64)
-        by default (Oracle Beehive Gateway v4.0)
-        with ESMTP ; Thu, 21 Nov 2019 13:25:14 -0800
-Date:   Thu, 21 Nov 2019 13:25:12 -0800
-From:   "Darrick J. Wong" <darrick.wong@oracle.com>
-To:     Evan Green <evgreen@chromium.org>
-Cc:     Jens Axboe <axboe@kernel.dk>,
-        Martin K Petersen <martin.petersen@oracle.com>,
-        Gwendal Grignou <gwendal@chromium.org>,
+        Thu, 21 Nov 2019 16:35:41 -0500
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+        s=mimecast20190719; t=1574372139;
+        h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+         to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+         content-transfer-encoding:content-transfer-encoding:
+         in-reply-to:in-reply-to:references:references;
+        bh=YslT4VlrB9mGxRqN5ZKGkdoWX+pImdvI3tx38/mJv/g=;
+        b=F3+4lkP3uqyXkGQy92eLDyAWlOZz+Dqr0YZIfkLtyHHYVwohbTEqIdCNRsxde0wfDY7knz
+        XBDvHo51Hj2F1EIeKg+VyyiD24pZJ2SWYGKVbsb+MJOoqWwlrQoTt76Qmvo17+pHXH9ajy
+        RZwA4C+3Vw5Wc333VaXIQm3zSkrXFs4=
+Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
+ [209.132.183.4]) (Using TLS) by relay.mimecast.com with ESMTP id
+ us-mta-353-_8mqkejRPqeFlprORl3o9g-1; Thu, 21 Nov 2019 16:35:36 -0500
+Received: from smtp.corp.redhat.com (int-mx02.intmail.prod.int.phx2.redhat.com [10.5.11.12])
+        (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
+        (No client certificate requested)
+        by mimecast-mx01.redhat.com (Postfix) with ESMTPS id 42006801E58;
+        Thu, 21 Nov 2019 21:35:30 +0000 (UTC)
+Received: from x1.home (ovpn-116-56.phx2.redhat.com [10.3.116.56])
+        by smtp.corp.redhat.com (Postfix) with ESMTP id 2C5BA6E703;
+        Thu, 21 Nov 2019 21:35:26 +0000 (UTC)
+Date:   Thu, 21 Nov 2019 14:35:25 -0700
+From:   Alex Williamson <alex.williamson@redhat.com>
+To:     John Hubbard <jhubbard@nvidia.com>
+Cc:     Andrew Morton <akpm@linux-foundation.org>,
+        Al Viro <viro@zeniv.linux.org.uk>,
+        Benjamin Herrenschmidt <benh@kernel.crashing.org>,
+        =?UTF-8?B?QmrDtnJuIFTDtnBlbA==?= <bjorn.topel@intel.com>,
         Christoph Hellwig <hch@infradead.org>,
-        Ming Lei <ming.lei@redhat.com>,
-        Alexis Savery <asavery@chromium.org>,
-        Douglas Anderson <dianders@chromium.org>,
-        Bart Van Assche <bvanassche@acm.org>,
-        Chaitanya Kulkarni <chaitanya.kulkarni@wdc.com>,
-        linux-block <linux-block@vger.kernel.org>,
-        LKML <linux-kernel@vger.kernel.org>
-Subject: Re: [PATCH v7 2/2] loop: Better discard support for block devices
-Message-ID: <20191121212512.GA2981917@magnolia>
-References: <20191114235008.185111-1-evgreen@chromium.org>
- <20191114154903.v7.2.I4d476bddbf41a61422ad51502f4361e237d60ad4@changeid>
- <20191120022518.GU6235@magnolia>
- <CAE=gft4mjKc4QKFKxp2FX9G2rUMuE3_eDuW_3Oq7NqTYBQwEjg@mail.gmail.com>
- <20191120191302.GV6235@magnolia>
- <CAE=gft6x1TmkkNTj+gktYMkHcysYyuYL50cavYusQ7hd9zChvA@mail.gmail.com>
- <20191120194507.GW6235@magnolia>
- <CAE=gft4OcxPP7srBe_2bj8K_0jHGD8Ae_PbV1Rq-Nz4F8GtkQA@mail.gmail.com>
+        Dan Williams <dan.j.williams@intel.com>,
+        Daniel Vetter <daniel@ffwll.ch>,
+        Dave Chinner <david@fromorbit.com>,
+        David Airlie <airlied@linux.ie>,
+        "David S . Miller" <davem@davemloft.net>,
+        Ira Weiny <ira.weiny@intel.com>, Jan Kara <jack@suse.cz>,
+        Jason Gunthorpe <jgg@ziepe.ca>, Jens Axboe <axboe@kernel.dk>,
+        Jonathan Corbet <corbet@lwn.net>,
+        =?UTF-8?B?SsOpcsO0?= =?UTF-8?B?bWU=?= Glisse 
+        <jglisse@redhat.com>, Magnus Karlsson <magnus.karlsson@intel.com>,
+        "Mauro Carvalho Chehab" <mchehab@kernel.org>,
+        Michael Ellerman <mpe@ellerman.id.au>,
+        Michal Hocko <mhocko@suse.com>,
+        Mike Kravetz <mike.kravetz@oracle.com>,
+        "Paul Mackerras" <paulus@samba.org>, Shuah Khan <shuah@kernel.org>,
+        Vlastimil Babka <vbabka@suse.cz>, <bpf@vger.kernel.org>,
+        <dri-devel@lists.freedesktop.org>, <kvm@vger.kernel.org>,
+        <linux-block@vger.kernel.org>, <linux-doc@vger.kernel.org>,
+        <linux-fsdevel@vger.kernel.org>, <linux-kselftest@vger.kernel.org>,
+        <linux-media@vger.kernel.org>, <linux-rdma@vger.kernel.org>,
+        <linuxppc-dev@lists.ozlabs.org>, <netdev@vger.kernel.org>,
+        <linux-mm@kvack.org>, LKML <linux-kernel@vger.kernel.org>,
+        "Jason Gunthorpe" <jgg@mellanox.com>
+Subject: Re: [PATCH v7 09/24] vfio, mm: fix get_user_pages_remote() and
+ FOLL_LONGTERM
+Message-ID: <20191121143525.50deb72f@x1.home>
+In-Reply-To: <20191121071354.456618-10-jhubbard@nvidia.com>
+References: <20191121071354.456618-1-jhubbard@nvidia.com>
+        <20191121071354.456618-10-jhubbard@nvidia.com>
+Organization: Red Hat
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <CAE=gft4OcxPP7srBe_2bj8K_0jHGD8Ae_PbV1Rq-Nz4F8GtkQA@mail.gmail.com>
-User-Agent: Mutt/1.9.4 (2018-02-28)
-X-Proofpoint-Virus-Version: vendor=nai engine=6000 definitions=9448 signatures=668685
-X-Proofpoint-Spam-Details: rule=notspam policy=default score=0 suspectscore=0 malwarescore=0
- phishscore=0 bulkscore=0 spamscore=0 mlxscore=0 mlxlogscore=999
- adultscore=0 classifier=spam adjust=0 reason=mlx scancount=1
- engine=8.0.1-1911140001 definitions=main-1911210177
-X-Proofpoint-Virus-Version: vendor=nai engine=6000 definitions=9448 signatures=668685
-X-Proofpoint-Spam-Details: rule=notspam policy=default score=0 priorityscore=1501 malwarescore=0
- suspectscore=0 phishscore=0 bulkscore=0 spamscore=0 clxscore=1015
- lowpriorityscore=0 mlxscore=0 impostorscore=0 mlxlogscore=999 adultscore=0
- classifier=spam adjust=0 reason=mlx scancount=1 engine=8.0.1-1911140001
- definitions=main-1911210177
+X-Scanned-By: MIMEDefang 2.79 on 10.5.11.12
+X-MC-Unique: _8mqkejRPqeFlprORl3o9g-1
+X-Mimecast-Spam-Score: 0
+Content-Type: text/plain; charset=WINDOWS-1252
+Content-Transfer-Encoding: quoted-printable
 Sender: linux-block-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-On Thu, Nov 21, 2019 at 01:18:51PM -0800, Evan Green wrote:
-> On Wed, Nov 20, 2019 at 11:45 AM Darrick J. Wong
-> <darrick.wong@oracle.com> wrote:
-> >
-> > On Wed, Nov 20, 2019 at 11:25:48AM -0800, Evan Green wrote:
-> > > On Wed, Nov 20, 2019 at 11:13 AM Darrick J. Wong
-> > > <darrick.wong@oracle.com> wrote:
-> > > >
-> > > > On Wed, Nov 20, 2019 at 10:56:30AM -0800, Evan Green wrote:
-> > > > > On Tue, Nov 19, 2019 at 6:25 PM Darrick J. Wong <darrick.wong@oracle.com> wrote:
-> > > > > >
-> > > > > > On Thu, Nov 14, 2019 at 03:50:08PM -0800, Evan Green wrote:
-> > > > > > > If the backing device for a loop device is itself a block device,
-> > > > > > > then mirror the "write zeroes" capabilities of the underlying
-> > > > > > > block device into the loop device. Copy this capability into both
-> > > > > > > max_write_zeroes_sectors and max_discard_sectors of the loop device.
-> > > > > > >
-> > > > > > > The reason for this is that REQ_OP_DISCARD on a loop device translates
-> > > > > > > into blkdev_issue_zeroout(), rather than blkdev_issue_discard(). This
-> > > > > > > presents a consistent interface for loop devices (that discarded data
-> > > > > > > is zeroed), regardless of the backing device type of the loop device.
-> > > > > > > There should be no behavior change for loop devices backed by regular
-> > > > > > > files.
-> > >
-> > > (marking this spot for below)
-> > >
-> > > > > > >
-> > > > > > > This change fixes blktest block/003, and removes an extraneous
-> > > > > > > error print in block/013 when testing on a loop device backed
-> > > > > > > by a block device that does not support discard.
-> > > > > > >
-> > > > > > > Signed-off-by: Evan Green <evgreen@chromium.org>
-> > > > > > > Reviewed-by: Gwendal Grignou <gwendal@chromium.org>
-> > > > > > > Reviewed-by: Chaitanya Kulkarni <chaitanya.kulkarni@wdc.com>
-> > > > > > > ---
-> > > > > > >
-> > > > > > > Changes in v7:
-> > > > > > > - Rebase on top of Darrick's patch
-> > > > > > > - Tweak opening line of commit description (Darrick)
-> > > > > > >
-> > > > > > > Changes in v6: None
-> > > > > > > Changes in v5:
-> > > > > > > - Don't mirror discard if lo_encrypt_key_size is non-zero (Gwendal)
-> > > > > > >
-> > > > > > > Changes in v4:
-> > > > > > > - Mirror blkdev's write_zeroes into loopdev's discard_sectors.
-> > > > > > >
-> > > > > > > Changes in v3:
-> > > > > > > - Updated commit description
-> > > > > > >
-> > > > > > > Changes in v2: None
-> > > > > > >
-> > > > > > >  drivers/block/loop.c | 40 +++++++++++++++++++++++++++++-----------
-> > > > > > >  1 file changed, 29 insertions(+), 11 deletions(-)
-> > > > > > >
-> > > > > > > diff --git a/drivers/block/loop.c b/drivers/block/loop.c
-> > > > > > > index 6a9fe1f9fe84..e8f23e4b78f7 100644
-> > > > > > > --- a/drivers/block/loop.c
-> > > > > > > +++ b/drivers/block/loop.c
-> > > > > > > @@ -427,11 +427,12 @@ static int lo_fallocate(struct loop_device *lo, struct request *rq, loff_t pos,
-> > > > > > >        * information.
-> > > > > > >        */
-> > > > > > >       struct file *file = lo->lo_backing_file;
-> > > > > > > +     struct request_queue *q = lo->lo_queue;
-> > > > > > >       int ret;
-> > > > > > >
-> > > > > > >       mode |= FALLOC_FL_KEEP_SIZE;
-> > > > > > >
-> > > > > > > -     if ((!file->f_op->fallocate) || lo->lo_encrypt_key_size) {
-> > > > > > > +     if (!blk_queue_discard(q)) {
-> > > > > > >               ret = -EOPNOTSUPP;
-> > > > > > >               goto out;
-> > > > > > >       }
-> > > > > > > @@ -862,6 +863,21 @@ static void loop_config_discard(struct loop_device *lo)
-> > > > > > >       struct file *file = lo->lo_backing_file;
-> > > > > > >       struct inode *inode = file->f_mapping->host;
-> > > > > > >       struct request_queue *q = lo->lo_queue;
-> > > > > > > +     struct request_queue *backingq;
-> > > > > > > +
-> > > > > > > +     /*
-> > > > > > > +      * If the backing device is a block device, mirror its zeroing
-> > > > > > > +      * capability. REQ_OP_DISCARD translates to a zero-out even when backed
-> > > > > > > +      * by block devices to keep consistent behavior with file-backed loop
-> > > > > > > +      * devices.
-> > > > > > > +      */
-> 
-> Wait, I went to make this change and realized there's already a comment here.
-> 
-> I can tweak the language a bit, but this is pretty much what you wanted, right?
+On Wed, 20 Nov 2019 23:13:39 -0800
+John Hubbard <jhubbard@nvidia.com> wrote:
 
-Yep.
+> As it says in the updated comment in gup.c: current FOLL_LONGTERM
+> behavior is incompatible with FAULT_FLAG_ALLOW_RETRY because of the
+> FS DAX check requirement on vmas.
+>=20
+> However, the corresponding restriction in get_user_pages_remote() was
+> slightly stricter than is actually required: it forbade all
+> FOLL_LONGTERM callers, but we can actually allow FOLL_LONGTERM callers
+> that do not set the "locked" arg.
+>=20
+> Update the code and comments accordingly, and update the VFIO caller
+> to take advantage of this, fixing a bug as a result: the VFIO caller
+> is logically a FOLL_LONGTERM user.
+>=20
+> Also, remove an unnessary pair of calls that were releasing and
+> reacquiring the mmap_sem. There is no need to avoid holding mmap_sem
+> just in order to call page_to_pfn().
+>=20
+> Also, move the DAX check ("if a VMA is DAX, don't allow long term
+> pinning") from the VFIO call site, all the way into the internals
+> of get_user_pages_remote() and __gup_longterm_locked(). That is:
+> get_user_pages_remote() calls __gup_longterm_locked(), which in turn
+> calls check_dax_vmas(). It's lightly explained in the comments as well.
+>=20
+> Thanks to Jason Gunthorpe for pointing out a clean way to fix this,
+> and to Dan Williams for helping clarify the DAX refactoring.
+>=20
+> Reviewed-by: Jason Gunthorpe <jgg@mellanox.com>
+> Reviewed-by: Ira Weiny <ira.weiny@intel.com>
+> Suggested-by: Jason Gunthorpe <jgg@ziepe.ca>
+> Cc: Dan Williams <dan.j.williams@intel.com>
+> Cc: Jerome Glisse <jglisse@redhat.com>
+> Signed-off-by: John Hubbard <jhubbard@nvidia.com>
+> ---
+>  drivers/vfio/vfio_iommu_type1.c | 30 +++++-------------------------
+>  mm/gup.c                        | 27 ++++++++++++++++++++++-----
+>  2 files changed, 27 insertions(+), 30 deletions(-)
 
---D
+Tested with device assignment and Intel mdev vGPU assignment with QEMU
+userspace:
 
-> > > > > > > +     if (S_ISBLK(inode->i_mode) && !lo->lo_encrypt_key_size) {
-> > > > > > > +             backingq = bdev_get_queue(inode->i_bdev);
-> > > > > > > +             blk_queue_max_discard_sectors(q,
-> > > > > > > +                     backingq->limits.max_write_zeroes_sectors);
-> > > > > >
-> > > > > > max_discard_sectors?
-> > > > >
-> > > > > I didn't plumb max_discard_sectors because for my scenario it never
-> > > > > ends up hitting the block device that way.
-> > > > >
-> > > > > The loop device either uses FL_ZERO_RANGE or FL_PUNCH_HOLE. When
-> > > > > backed by a block device, that ends up in blkdev_fallocate(), which
-> > > > > always translates both of those into blkdev_issue_zeroout(), not
-> > > > > blkdev_issue_discard(). So it's really the zeroing capabilities of the
-> > > > > block device that matters, even for loop discard operations. It seems
-> > > > > weird, but I think this is the right thing because it presents a
-> > > > > consistent interface to loop device users whether backed by a file
-> > > > > system file, or directly by a block device. That is, a previously
-> > > > > discarded range will read back as zeroes.
-> > > >
-> > > > Ah, right.  Could you add this paragraph as a comment explaining why
-> > > > we're setting max_discard_sectors from max_write_zeroes_sectors?
-> > >
-> > > Sure. I put an explanation in the commit description (see spot I
-> > > marked above), but I agree a comment is probably also worthwhile.
-> >
-> > <nod> Sorry about the churn here.
-> >
-> > I have a strong preference towards documenting decisions like these
-> > directly in the code because (a) I suck at reading patch prologues, (b)
-> > someone reading the code after this gets committed will see it
-> > immediately and right next to the relevant code, and (c) spelunking
-> > through the git history of a file for commit messages is kind of clunky.
-> >
-> > Dunno if that's just my age showing (mmm, pre-bk linux) or what. :/
-> >
-> > --D
-> >
-> > > >
-> > > > --D
-> > > >
-> > > > > -Evan
+Tested-by: Alex Williamson <alex.williamson@redhat.com>
+Acked-by: Alex Williamson <alex.williamson@redhat.com>
+
+Feel free to include for 19/24 as well.  Thanks,
+
+Alex
+
+> diff --git a/drivers/vfio/vfio_iommu_type1.c b/drivers/vfio/vfio_iommu_ty=
+pe1.c
+> index d864277ea16f..c7a111ad9975 100644
+> --- a/drivers/vfio/vfio_iommu_type1.c
+> +++ b/drivers/vfio/vfio_iommu_type1.c
+> @@ -340,7 +340,6 @@ static int vaddr_get_pfn(struct mm_struct *mm, unsign=
+ed long vaddr,
+>  {
+>  =09struct page *page[1];
+>  =09struct vm_area_struct *vma;
+> -=09struct vm_area_struct *vmas[1];
+>  =09unsigned int flags =3D 0;
+>  =09int ret;
+> =20
+> @@ -348,33 +347,14 @@ static int vaddr_get_pfn(struct mm_struct *mm, unsi=
+gned long vaddr,
+>  =09=09flags |=3D FOLL_WRITE;
+> =20
+>  =09down_read(&mm->mmap_sem);
+> -=09if (mm =3D=3D current->mm) {
+> -=09=09ret =3D get_user_pages(vaddr, 1, flags | FOLL_LONGTERM, page,
+> -=09=09=09=09     vmas);
+> -=09} else {
+> -=09=09ret =3D get_user_pages_remote(NULL, mm, vaddr, 1, flags, page,
+> -=09=09=09=09=09    vmas, NULL);
+> -=09=09/*
+> -=09=09 * The lifetime of a vaddr_get_pfn() page pin is
+> -=09=09 * userspace-controlled. In the fs-dax case this could
+> -=09=09 * lead to indefinite stalls in filesystem operations.
+> -=09=09 * Disallow attempts to pin fs-dax pages via this
+> -=09=09 * interface.
+> -=09=09 */
+> -=09=09if (ret > 0 && vma_is_fsdax(vmas[0])) {
+> -=09=09=09ret =3D -EOPNOTSUPP;
+> -=09=09=09put_page(page[0]);
+> -=09=09}
+> -=09}
+> -=09up_read(&mm->mmap_sem);
+> -
+> +=09ret =3D get_user_pages_remote(NULL, mm, vaddr, 1, flags | FOLL_LONGTE=
+RM,
+> +=09=09=09=09    page, NULL, NULL);
+>  =09if (ret =3D=3D 1) {
+>  =09=09*pfn =3D page_to_pfn(page[0]);
+> -=09=09return 0;
+> +=09=09ret =3D 0;
+> +=09=09goto done;
+>  =09}
+> =20
+> -=09down_read(&mm->mmap_sem);
+> -
+>  =09vaddr =3D untagged_addr(vaddr);
+> =20
+>  =09vma =3D find_vma_intersection(mm, vaddr, vaddr + 1);
+> @@ -384,7 +364,7 @@ static int vaddr_get_pfn(struct mm_struct *mm, unsign=
+ed long vaddr,
+>  =09=09if (is_invalid_reserved_pfn(*pfn))
+>  =09=09=09ret =3D 0;
+>  =09}
+> -
+> +done:
+>  =09up_read(&mm->mmap_sem);
+>  =09return ret;
+>  }
+> diff --git a/mm/gup.c b/mm/gup.c
+> index 14fcdc502166..cce2c9676853 100644
+> --- a/mm/gup.c
+> +++ b/mm/gup.c
+> @@ -29,6 +29,13 @@ struct follow_page_context {
+>  =09unsigned int page_mask;
+>  };
+> =20
+> +static __always_inline long __gup_longterm_locked(struct task_struct *ts=
+k,
+> +=09=09=09=09=09=09  struct mm_struct *mm,
+> +=09=09=09=09=09=09  unsigned long start,
+> +=09=09=09=09=09=09  unsigned long nr_pages,
+> +=09=09=09=09=09=09  struct page **pages,
+> +=09=09=09=09=09=09  struct vm_area_struct **vmas,
+> +=09=09=09=09=09=09  unsigned int flags);
+>  /*
+>   * Return the compound head page with ref appropriately incremented,
+>   * or NULL if that failed.
+> @@ -1167,13 +1174,23 @@ long get_user_pages_remote(struct task_struct *ts=
+k, struct mm_struct *mm,
+>  =09=09struct vm_area_struct **vmas, int *locked)
+>  {
+>  =09/*
+> -=09 * FIXME: Current FOLL_LONGTERM behavior is incompatible with
+> +=09 * Parts of FOLL_LONGTERM behavior are incompatible with
+>  =09 * FAULT_FLAG_ALLOW_RETRY because of the FS DAX check requirement on
+> -=09 * vmas.  As there are no users of this flag in this call we simply
+> -=09 * disallow this option for now.
+> +=09 * vmas. However, this only comes up if locked is set, and there are
+> +=09 * callers that do request FOLL_LONGTERM, but do not set locked. So,
+> +=09 * allow what we can.
+>  =09 */
+> -=09if (WARN_ON_ONCE(gup_flags & FOLL_LONGTERM))
+> -=09=09return -EINVAL;
+> +=09if (gup_flags & FOLL_LONGTERM) {
+> +=09=09if (WARN_ON_ONCE(locked))
+> +=09=09=09return -EINVAL;
+> +=09=09/*
+> +=09=09 * This will check the vmas (even if our vmas arg is NULL)
+> +=09=09 * and return -ENOTSUPP if DAX isn't allowed in this case:
+> +=09=09 */
+> +=09=09return __gup_longterm_locked(tsk, mm, start, nr_pages, pages,
+> +=09=09=09=09=09     vmas, gup_flags | FOLL_TOUCH |
+> +=09=09=09=09=09     FOLL_REMOTE);
+> +=09}
+> =20
+>  =09return __get_user_pages_locked(tsk, mm, start, nr_pages, pages, vmas,
+>  =09=09=09=09       locked,
+
