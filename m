@@ -2,78 +2,78 @@ Return-Path: <SRS0=S5B1=ZN=vger.kernel.org=linux-block-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-0.4 required=3.0 tests=FROM_LOCAL_HEX,
-	HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,
-	URIBL_BLOCKED autolearn=no autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-0.8 required=3.0 tests=DKIM_SIGNED,DKIM_VALID,
+	DKIM_VALID_AU,HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SPF_HELO_NONE,
+	SPF_PASS autolearn=no autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 2E6C2C432C0
-	for <linux-block@archiver.kernel.org>; Thu, 21 Nov 2019 05:56:02 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 39FF1C43215
+	for <linux-block@archiver.kernel.org>; Thu, 21 Nov 2019 07:13:30 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.kernel.org (Postfix) with ESMTP id E5F2520715
-	for <linux-block@archiver.kernel.org>; Thu, 21 Nov 2019 05:56:01 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id DAAEF20898
+	for <linux-block@archiver.kernel.org>; Thu, 21 Nov 2019 07:13:29 +0000 (UTC)
+Authentication-Results: mail.kernel.org;
+	dkim=pass (1024-bit key) header.d=natalenko.name header.i=@natalenko.name header.b="cpWxwtJK"
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1726270AbfKUF4B (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Thu, 21 Nov 2019 00:56:01 -0500
-Received: from mail-io1-f71.google.com ([209.85.166.71]:34624 "EHLO
-        mail-io1-f71.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1726230AbfKUF4B (ORCPT
+        id S1726396AbfKUHN3 (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Thu, 21 Nov 2019 02:13:29 -0500
+Received: from vulcan.natalenko.name ([104.207.131.136]:48304 "EHLO
+        vulcan.natalenko.name" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S1725842AbfKUHN3 (ORCPT
         <rfc822;linux-block@vger.kernel.org>);
-        Thu, 21 Nov 2019 00:56:01 -0500
-Received: by mail-io1-f71.google.com with SMTP id a13so1459622iol.1
-        for <linux-block@vger.kernel.org>; Wed, 20 Nov 2019 21:56:00 -0800 (PST)
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20161025;
-        h=x-gm-message-state:mime-version:date:in-reply-to:message-id:subject
-         :from:to;
-        bh=mfH1KiCJRKrkCk6Xo24N026hP3QeH2tnCMon9TkgaqE=;
-        b=t/TcPuWY9xCF6SCZwTcoQetfiRAS8hFFVbeFXvW+Tu9D0BIB5erT5x6kwKO6fP5SQ5
-         +AM2MMQ9DYKLawmu9MIGh5z+yaVWd4nAqYqLElHzDnbEDdjVtizGZaoJ7Q3EItmegwHX
-         zxI5F59YXr1O3mxMcK3Ew55RryIlXcatHI1GP7yXqNbmZamh4CcaDVb2Ce8AVRkwb0MK
-         Hm5X/tXzpnlneeXr8JeSTX44tkI89z24dRt4RmPHuHU4ToxD23SJeXkfkqxeOqbPaCmt
-         bNUQll08v/l8EGmdbrtFGZX3FkcyePRW892J5YgKLyw/Fwcv25UOkmYVxFode0OQTr+R
-         TRHA==
-X-Gm-Message-State: APjAAAXqcy6cqfFK00Jj/pBx8OCCfzyKBVL7kc6BtAd6HpeuwcfZrK71
-        QRjzhfjdhB+8x9S/59+ss7wVgF+2f7MXhFROp0oauBPAjPcz
-X-Google-Smtp-Source: APXvYqwUKLMPCVsGilywR82DgOMl8S8nXlNM4DAw4/+MPXBC9kph9vWN1fhkX08eEJ5ztd1Hs8pxMXnFldFW3iiHqxZP+FOWzVdW
+        Thu, 21 Nov 2019 02:13:29 -0500
+Received: from mail.natalenko.name (vulcan.natalenko.name [IPv6:fe80::5400:ff:fe0c:dfa0])
+        (using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+        (No client certificate requested)
+        by vulcan.natalenko.name (Postfix) with ESMTPSA id 209EA63ABEF;
+        Thu, 21 Nov 2019 08:13:27 +0100 (CET)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=natalenko.name;
+        s=dkim-20170712; t=1574320407;
+        h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+         to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+         content-transfer-encoding:content-transfer-encoding;
+        bh=xL3ut0Gb5LSFbLI5E9f4K9lAtbTVA7+YunIPYZDbV+o=;
+        b=cpWxwtJKtqIoO/RqxCc67gYWTHufAnDGJ8CkT5onyhsNXZ+wg9KxLT1h2iLinv3poL3CUQ
+        kRJz6nJoEkkg3IzuwGDTNfhhJ2kDHTJf0puhf1jZey7k02yJqJLyNpuUCGv35I+3i5C/Ro
+        T9m2r7IV18VLQp9jvsYY+tYX4R+T+7I=
 MIME-Version: 1.0
-X-Received: by 2002:a6b:9245:: with SMTP id u66mr5976497iod.98.1574315760516;
- Wed, 20 Nov 2019 21:56:00 -0800 (PST)
-Date:   Wed, 20 Nov 2019 21:56:00 -0800
-In-Reply-To: <00000000000072cb6c0597635d04@google.com>
-X-Google-Appengine-App-Id: s~syzkaller
-X-Google-Appengine-App-Id-Alias: syzkaller
-Message-ID: <000000000000ab834f0597d4f337@google.com>
-Subject: Re: INFO: trying to register non-static key in io_cqring_ev_posted
-From:   syzbot <syzbot+0d818c0d39399188f393@syzkaller.appspotmail.com>
-To:     axboe@kernel.dk, io-uring@vger.kernel.org,
-        linux-block@vger.kernel.org, linux-fsdevel@vger.kernel.org,
-        linux-kernel@vger.kernel.org, liuyun01@kylinos.cn,
-        syzkaller-bugs@googlegroups.com, viro@zeniv.linux.org.uk
-Content-Type: text/plain; charset="UTF-8"; format=flowed; delsp=yes
+Content-Type: text/plain; charset=US-ASCII;
+ format=flowed
+Content-Transfer-Encoding: 7bit
+Date:   Thu, 21 Nov 2019 08:13:27 +0100
+From:   Oleksandr Natalenko <oleksandr@natalenko.name>
+To:     linux-kernel@vger.kernel.org
+Cc:     linux-block@vger.kernel.org, paolo.valente@linaro.org
+Subject: Injecting delays into block layer
+User-Agent: Roundcube Webmail/1.4.0
+Message-ID: <d7ee69fc368db16fa96a05643083674a@natalenko.name>
+X-Sender: oleksandr@natalenko.name
 Sender: linux-block-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-syzbot has bisected this bug to:
+Hi Paolo et al.
 
-commit 206aefde4f886fdeb3b6339aacab3a85fb74cb7e
-Author: Jens Axboe <axboe@kernel.dk>
-Date:   Fri Nov 8 01:27:42 2019 +0000
+I have a strong suspect that something is going wrong when the 
+underlying block device responds with a large delay. What makes me 
+thinking so is that I use a VM on some cloud provider, and they have 
+substantial block device latency resulting in permanently high (~20%) 
+iowait. It spikes occasionally when their cluster is overloaded, and 
+when that happens, the I/O in my VM may stop and never recover. This is 
+a rare occasion, but it really happens.
 
-     io_uring: reduce/pack size of io_ring_ctx
+What's worse, so far I've seen such a behaviour with BFQ only. I'm still 
+testing other schedulers though.
 
-bisection log:  https://syzkaller.appspot.com/x/bisect.txt?x=15f98af2e00000
-start commit:   5d1131b4 Add linux-next specific files for 20191119
-git tree:       linux-next
-final crash:    https://syzkaller.appspot.com/x/report.txt?x=17f98af2e00000
-console output: https://syzkaller.appspot.com/x/log.txt?x=13f98af2e00000
-kernel config:  https://syzkaller.appspot.com/x/.config?x=b60c562d89e5a8df
-dashboard link: https://syzkaller.appspot.com/bug?extid=0d818c0d39399188f393
-syz repro:      https://syzkaller.appspot.com/x/repro.syz?x=169b29d2e00000
-C reproducer:   https://syzkaller.appspot.com/x/repro.c?x=14b3956ae00000
+Important note: I have no strict evidences that this is *the* case, thus 
+I'm asking for some suggestions. My idea is to fire up a local VM and 
+inject delays to a block device while performing some I/O from within 
+the VM.
 
-Reported-by: syzbot+0d818c0d39399188f393@syzkaller.appspotmail.com
-Fixes: 206aefde4f88 ("io_uring: reduce/pack size of io_ring_ctx")
+So the question is: how can those delays be injected? Using dm-delay? 
+Can those delays be random?
 
-For information about bisection process see: https://goo.gl/tpsmEJ#bisection
+Thanks in advance.
+
+-- 
+   Oleksandr Natalenko (post-factum)
