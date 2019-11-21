@@ -2,120 +2,92 @@ Return-Path: <SRS0=S5B1=ZN=vger.kernel.org=linux-block-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-0.7 required=3.0 tests=DKIM_SIGNED,DKIM_VALID,
-	HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,
-	URIBL_BLOCKED autolearn=no autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-7.2 required=3.0 tests=DKIM_SIGNED,DKIM_VALID,
+	HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,MENTIONS_GIT_HOSTING,
+	SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED,USER_AGENT_SANE_1 autolearn=ham
+	autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 619FBC432C0
-	for <linux-block@archiver.kernel.org>; Thu, 21 Nov 2019 17:00:20 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id F3676C432C0
+	for <linux-block@archiver.kernel.org>; Thu, 21 Nov 2019 17:00:53 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.kernel.org (Postfix) with ESMTP id 38AE3206D8
-	for <linux-block@archiver.kernel.org>; Thu, 21 Nov 2019 17:00:20 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id C6FE5206DA
+	for <linux-block@archiver.kernel.org>; Thu, 21 Nov 2019 17:00:53 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=pass (2048-bit key) header.d=intel-com.20150623.gappssmtp.com header.i=@intel-com.20150623.gappssmtp.com header.b="f+VuCObI"
+	dkim=pass (2048-bit key) header.d=kernel-dk.20150623.gappssmtp.com header.i=@kernel-dk.20150623.gappssmtp.com header.b="CPrrDF1H"
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1727050AbfKURAQ (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Thu, 21 Nov 2019 12:00:16 -0500
-Received: from mail-oi1-f196.google.com ([209.85.167.196]:33202 "EHLO
-        mail-oi1-f196.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1726962AbfKURAL (ORCPT
+        id S1726747AbfKURAx (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Thu, 21 Nov 2019 12:00:53 -0500
+Received: from mail-il1-f170.google.com ([209.85.166.170]:36914 "EHLO
+        mail-il1-f170.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S1726722AbfKURAx (ORCPT
         <rfc822;linux-block@vger.kernel.org>);
-        Thu, 21 Nov 2019 12:00:11 -0500
-Received: by mail-oi1-f196.google.com with SMTP id m193so3868712oig.0
-        for <linux-block@vger.kernel.org>; Thu, 21 Nov 2019 09:00:10 -0800 (PST)
+        Thu, 21 Nov 2019 12:00:53 -0500
+Received: by mail-il1-f170.google.com with SMTP id s5so3988099iln.4
+        for <linux-block@vger.kernel.org>; Thu, 21 Nov 2019 09:00:51 -0800 (PST)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=intel-com.20150623.gappssmtp.com; s=20150623;
-        h=mime-version:references:in-reply-to:from:date:message-id:subject:to
-         :cc;
-        bh=SDymYy1Cr6msxqeKtzOvSyToG0ApR3Ly++FnBPiFfAU=;
-        b=f+VuCObIDRfrJmbTAA4m3SQhOXNZ4pbf+ZyigT8J2YciKJHX1toKS54ABD40/HbC1d
-         7Pkwsh8oyyINQzVpjfjsJLe3RxxCFvky++3gAGs9me3lgi9X2Cs94Bu46By7m8IZ2aX6
-         6VCe60NDY4cCmQm2ZZlTacWdZ6Ps9MXHsxEoPPvq4YYJFGrJauw8LzXEJJdEFg7nFNai
-         NT0xpYhDehIOprr6cUNw9YoHqOqwfQCKgM0QWVQ6U7LVeCnx2wYwSu33Ka73HmSeIHM7
-         JqrB5AsBrlMh6M533DPgzCdMMVEMlw9v2LJQn2e/uD0VclTth1B3dpfknn3iLontgkuH
-         3IWg==
+        d=kernel-dk.20150623.gappssmtp.com; s=20150623;
+        h=to:cc:from:subject:message-id:date:user-agent:mime-version
+         :content-language:content-transfer-encoding;
+        bh=ogzEOLkqeZaOFs3MCF+gg0bfstSDrwD8uCycA8ygSjI=;
+        b=CPrrDF1HsnZN0n/eD1GN4evTWXSUeg0FBnY2/QZPm98YnGgYDB/SYVDUoqhT7z7Bsf
+         1l2ry62zLduWgfAjYzUEJ3xI/a1BWQdRxYrq9Ut47DefN87i8S8WFe4HslAxiGd77y1z
+         G190A0+eDcOWIfuXEnT7vCsHqxTS51wrIHSQXO3LbB4c+t41UGZfka4GtDrsDcmDlymG
+         8viqSneLv2lykIML1vHflXMttwGX7lhGAwdgF3hBbBE+Jj8M8EyzRK3Czf3gregR0g46
+         GeMtXVDJtYc6yX0Z8gdmw6D0q5GdPlqWF1AtayORluihsNgCq7RLQLVX+lC40pt9BjIt
+         4Vbg==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=1e100.net; s=20161025;
-        h=x-gm-message-state:mime-version:references:in-reply-to:from:date
-         :message-id:subject:to:cc;
-        bh=SDymYy1Cr6msxqeKtzOvSyToG0ApR3Ly++FnBPiFfAU=;
-        b=aH4FAfFN46YR0cI60Ap/Syk+I7B1L/qc6Uv0PvEKv6H9ngarWW3SKLterFBwU5q+8g
-         JkevpxrLDNxJOOY6w2LoRNRpv9ZrcDqdpkB+zm+3IofWYSaLl++XSaIhGmuZja2R6znJ
-         Xca5XVdZcLnsT9j74V/y7NPHu95gaQyebIHgBQpxMmp58CFhrNb4qud0zuyeDbeP0xkO
-         /uJJwGo1G+vRXeh35S+2tXTluIi+HO6Pj/6aUFCb8sjPZNcAigrXdVd72TLMrSTc228G
-         TQzRRsgcfK28D/Pimh4kLMbLDHHDh0WaizbuNXyjZnwIVETLylFepRAUMfYF96WydKAA
-         6ILw==
-X-Gm-Message-State: APjAAAUERoLU9pmq4qEgsS61/mM11YH1aW2WTeoccm1eLVZMPHW9UeFa
-        KZodcss6zd5vtk6niTH6Dnu0I7mV/fPZ3niRJbqYvg==
-X-Google-Smtp-Source: APXvYqzaKFA5sHA2BoiQUxyQp/rlYSGdVkc2qiU+T2e7CfLgs6CP/GdyTJIUkjrV/y2OAJbT5zFGq6OvhTpLAGKVq9Q=
-X-Received: by 2002:aca:ea57:: with SMTP id i84mr8187454oih.73.1574355610298;
- Thu, 21 Nov 2019 09:00:10 -0800 (PST)
+        h=x-gm-message-state:to:cc:from:subject:message-id:date:user-agent
+         :mime-version:content-language:content-transfer-encoding;
+        bh=ogzEOLkqeZaOFs3MCF+gg0bfstSDrwD8uCycA8ygSjI=;
+        b=Gsna5OWeB1z4yDdCiX+dKAqiuUBWxYgB7YBg1Ye4sXaheL3jEfk3atm24baCR8e2AK
+         7QtUgLjx30CUCstpSNRQOMWd/NCl1PatKTbB0aqJ8IM2efrmHHyXwY4/0gyWt+7A8Acx
+         AKKq4RpNakSP/ESn9hHwTRxvE+WN/9vdbm39g4jthafwtgEYktKi90lXO7wc1506aqsd
+         ZewbEZZDlq+EFmAm8RF/FsHQqiWqnWElnBB64DsHPjx8pMmiQ1z4xivpsf+iEbsVM16l
+         /umaNTXcMO2Sqg7a3d2bn1r1YKOJSUblobyznUp+r/60DjHACBEX8P81RPEdrP9Z5kgc
+         0kGA==
+X-Gm-Message-State: APjAAAVO0+jy8+l5/pJBRo3Riw7UPfvnVfsgGYg0r0wi2L8ZGFFjla89
+        bKqByKymBcLGBWpK2vKAfcqtnHAaMUjbdg==
+X-Google-Smtp-Source: APXvYqxdCoTlwAv839O65jiBoEeBwFPz8JEnCJx9jP1+UnfushZMTH1E6VmnxGekVVSRnfaC2Txrvw==
+X-Received: by 2002:a92:de4f:: with SMTP id e15mr11446167ilr.50.1574355649903;
+        Thu, 21 Nov 2019 09:00:49 -0800 (PST)
+Received: from [192.168.1.159] ([65.144.74.34])
+        by smtp.gmail.com with ESMTPSA id r25sm1433103ilb.16.2019.11.21.09.00.48
+        (version=TLS1_2 cipher=ECDHE-RSA-AES128-GCM-SHA256 bits=128/128);
+        Thu, 21 Nov 2019 09:00:49 -0800 (PST)
+To:     Linus Torvalds <torvalds@linux-foundation.org>
+Cc:     "linux-block@vger.kernel.org" <linux-block@vger.kernel.org>
+From:   Jens Axboe <axboe@kernel.dk>
+Subject: [GIT PULL] Single nbd fix for 5.4-final
+Message-ID: <f8df6a8b-5326-9367-0592-0220322a3bfe@kernel.dk>
+Date:   Thu, 21 Nov 2019 10:00:47 -0700
+User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:60.0) Gecko/20100101
+ Thunderbird/60.9.0
 MIME-Version: 1.0
-References: <20191121071354.456618-1-jhubbard@nvidia.com> <20191121071354.456618-6-jhubbard@nvidia.com>
- <20191121080555.GC24784@lst.de> <c5f8750f-af82-8aec-ce70-116acf24fa82@nvidia.com>
-In-Reply-To: <c5f8750f-af82-8aec-ce70-116acf24fa82@nvidia.com>
-From:   Dan Williams <dan.j.williams@intel.com>
-Date:   Thu, 21 Nov 2019 08:59:57 -0800
-Message-ID: <CAPcyv4jzDfxFAnAYc6g8Zz=3DweQFEBLBQyA_tSDP2Wy-RoA4A@mail.gmail.com>
-Subject: Re: [PATCH v7 05/24] mm: devmap: refactor 1-based refcounting for
- ZONE_DEVICE pages
-To:     John Hubbard <jhubbard@nvidia.com>
-Cc:     Christoph Hellwig <hch@lst.de>,
-        Andrew Morton <akpm@linux-foundation.org>,
-        Al Viro <viro@zeniv.linux.org.uk>,
-        Alex Williamson <alex.williamson@redhat.com>,
-        Benjamin Herrenschmidt <benh@kernel.crashing.org>,
-        =?UTF-8?B?QmrDtnJuIFTDtnBlbA==?= <bjorn.topel@intel.com>,
-        Christoph Hellwig <hch@infradead.org>,
-        Daniel Vetter <daniel@ffwll.ch>,
-        Dave Chinner <david@fromorbit.com>,
-        David Airlie <airlied@linux.ie>,
-        "David S . Miller" <davem@davemloft.net>,
-        Ira Weiny <ira.weiny@intel.com>, Jan Kara <jack@suse.cz>,
-        Jason Gunthorpe <jgg@ziepe.ca>, Jens Axboe <axboe@kernel.dk>,
-        Jonathan Corbet <corbet@lwn.net>,
-        =?UTF-8?B?SsOpcsO0bWUgR2xpc3Nl?= <jglisse@redhat.com>,
-        Magnus Karlsson <magnus.karlsson@intel.com>,
-        Mauro Carvalho Chehab <mchehab@kernel.org>,
-        Michael Ellerman <mpe@ellerman.id.au>,
-        Michal Hocko <mhocko@suse.com>,
-        Mike Kravetz <mike.kravetz@oracle.com>,
-        Paul Mackerras <paulus@samba.org>,
-        Shuah Khan <shuah@kernel.org>,
-        Vlastimil Babka <vbabka@suse.cz>, bpf@vger.kernel.org,
-        Maling list - DRI developers 
-        <dri-devel@lists.freedesktop.org>, KVM list <kvm@vger.kernel.org>,
-        linux-block@vger.kernel.org,
-        Linux Doc Mailing List <linux-doc@vger.kernel.org>,
-        linux-fsdevel <linux-fsdevel@vger.kernel.org>,
-        linux-kselftest@vger.kernel.org,
-        "Linux-media@vger.kernel.org" <linux-media@vger.kernel.org>,
-        linux-rdma <linux-rdma@vger.kernel.org>,
-        linuxppc-dev <linuxppc-dev@lists.ozlabs.org>,
-        Netdev <netdev@vger.kernel.org>, Linux MM <linux-mm@kvack.org>,
-        LKML <linux-kernel@vger.kernel.org>
-Content-Type: text/plain; charset="UTF-8"
+Content-Type: text/plain; charset=utf-8
+Content-Language: en-US
+Content-Transfer-Encoding: 7bit
 Sender: linux-block-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-On Thu, Nov 21, 2019 at 12:57 AM John Hubbard <jhubbard@nvidia.com> wrote:
->
-> On 11/21/19 12:05 AM, Christoph Hellwig wrote:
-> > So while this looks correct and I still really don't see the major
-> > benefit of the new code organization, especially as it bloats all
-> > put_page callers.
-> >
-> > I'd love to see code size change stats for an allyesconfig on this
-> > commit.
-> >
->
-> Right, I'm running that now, will post the results. (btw, if there is
-> a script and/or standard format I should use, I'm all ears. I'll dig
-> through lwn...)
->
+Hi Linus,
 
-Just run:
+Just a single fix for an issue in nbd introduced in this cycle. Please
+pull!
 
-    size vmlinux
+
+  git://git.kernel.dk/linux-block.git tags/for-linus-20191121
+
+
+----------------------------------------------------------------
+Sun Ke (1):
+      nbd:fix memory leak in nbd_get_socket()
+
+ drivers/block/nbd.c | 1 +
+ 1 file changed, 1 insertion(+)
+
+-- 
+Jens Axboe
+
