@@ -2,119 +2,192 @@ Return-Path: <SRS0=S5B1=ZN=vger.kernel.org=linux-block-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-2.4 required=3.0 tests=DKIM_SIGNED,DKIM_VALID,
-	DKIM_VALID_AU,HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SPF_HELO_NONE,
-	SPF_PASS,USER_AGENT_SANE_1 autolearn=no autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-10.1 required=3.0 tests=DKIMWL_WL_HIGH,DKIM_SIGNED,
+	DKIM_VALID,DKIM_VALID_AU,INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,
+	SPF_HELO_NONE,SPF_PASS,USER_AGENT_GIT autolearn=ham autolearn_force=no
+	version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id E446EC43215
-	for <linux-block@archiver.kernel.org>; Thu, 21 Nov 2019 02:30:21 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id DA059C432C0
+	for <linux-block@archiver.kernel.org>; Thu, 21 Nov 2019 03:19:10 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.kernel.org (Postfix) with ESMTP id B8BAF206A4
-	for <linux-block@archiver.kernel.org>; Thu, 21 Nov 2019 02:30:21 +0000 (UTC)
-Authentication-Results: mail.kernel.org;
-	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="FmXa9fYm"
+	by mail.kernel.org (Postfix) with ESMTP id A9D6E208A1
+	for <linux-block@archiver.kernel.org>; Thu, 21 Nov 2019 03:19:10 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+	s=default; t=1574306350;
+	bh=TPz5EgcuOBWB3eKu+t5L++624Br3DKKb2jnElgd4ADM=;
+	h=From:To:Cc:Subject:Date:List-ID:From;
+	b=n7zvYMWNS6scBI2mtnXLfGpqRRzJAu6H5PbrmwxTutq5OESG6o27ro61lAc2SQuRM
+	 COZm3BDRsi9jczjTu5RxtonsPVM6vHbNedbp903czzsBrKWB67Kxi3gv4P1AehLh4Z
+	 2u91wkXjdXwCW/41FGf20M2q9ZP930j4QcxB+Uaw=
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1726722AbfKUCaV (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Wed, 20 Nov 2019 21:30:21 -0500
-Received: from us-smtp-1.mimecast.com ([205.139.110.61]:40140 "EHLO
-        us-smtp-delivery-1.mimecast.com" rhost-flags-OK-OK-OK-FAIL)
-        by vger.kernel.org with ESMTP id S1726396AbfKUCaV (ORCPT
-        <rfc822;linux-block@vger.kernel.org>);
-        Wed, 20 Nov 2019 21:30:21 -0500
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-        s=mimecast20190719; t=1574303420;
-        h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-         to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-         content-transfer-encoding:content-transfer-encoding:
-         in-reply-to:in-reply-to:references:references;
-        bh=tV0z8tD74raQUE/RldsvuzKkMSOMH3lprBVwapvdajw=;
-        b=FmXa9fYmsETnZfgaihgEZci/zQ3TCdDp+mhUpp63c0zmvjGDlQoCYkzLjnXhEAG+AqY8ue
-        jCzgoOfKaBqHYtmHjd/Xt/Wv6ATSqYr38ES5kZixEqtR9fAKvX8XWSISmMYu6gNjuVEq+t
-        fS1EzV3xCC4raLa/GEzRhWZIgGofC3U=
-Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
- [209.132.183.4]) (Using TLS) by relay.mimecast.com with ESMTP id
- us-mta-409-G54DyUyuOBKajZXgmttXbQ-1; Wed, 20 Nov 2019 21:24:10 -0500
-Received: from smtp.corp.redhat.com (int-mx04.intmail.prod.int.phx2.redhat.com [10.5.11.14])
-        (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
+        id S1727007AbfKUDTJ (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Wed, 20 Nov 2019 22:19:09 -0500
+Received: from mail.kernel.org ([198.145.29.99]:60682 "EHLO mail.kernel.org"
+        rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
+        id S1725819AbfKUDTJ (ORCPT <rfc822;linux-block@vger.kernel.org>);
+        Wed, 20 Nov 2019 22:19:09 -0500
+Received: from PC-kkoz.proceq.com (unknown [213.160.61.66])
+        (using TLSv1.2 with cipher ECDHE-RSA-AES128-SHA256 (128/128 bits))
         (No client certificate requested)
-        by mimecast-mx01.redhat.com (Postfix) with ESMTPS id 94285107ACC4;
-        Thu, 21 Nov 2019 02:24:07 +0000 (UTC)
-Received: from ming.t460p (ovpn-8-21.pek2.redhat.com [10.72.8.21])
-        by smtp.corp.redhat.com (Postfix) with ESMTPS id 674EB5E268;
-        Thu, 21 Nov 2019 02:23:58 +0000 (UTC)
-Date:   Thu, 21 Nov 2019 10:23:53 +0800
-From:   Ming Lei <ming.lei@redhat.com>
-To:     Sumanesh Samanta <sumanesh.samanta@broadcom.com>
-Cc:     Ewan Milne <emilne@redhat.com>, axboe@kernel.dk,
-        bart.vanassche@wdc.com, hare@suse.de, hch@lst.de,
-        jejb@linux.ibm.com, Kashyap Desai <kashyap.desai@broadcom.com>,
-        linux-block@vger.kernel.org, linux-scsi@vger.kernel.org,
-        martin.petersen@oracle.com,
-        Sathya Prakash <sathya.prakash@broadcom.com>,
-        Shivasharan Srikanteshwara 
-        <shivasharan.srikanteshwara@broadcom.com>,
-        Suganath Prabu Subramani 
-        <suganath-prabu.subramani@broadcom.com>,
-        Sumit Saxena <sumit.saxena@broadcom.com>
-Subject: Re: [PATCH 4/4] scsi: core: don't limit per-LUN queue depth for SSD
-Message-ID: <20191121022353.GH24548@ming.t460p>
-References: <c7c78e42173ad8bc6e8c775bf6e98f54@mail.gmail.com>
- <20191121012148.GE24548@ming.t460p>
- <CADbZ7Fqcx4rWLB7MMVj+J+9n0bMGENj-WZZijiOHN0WrL6OV0A@mail.gmail.com>
-MIME-Version: 1.0
-In-Reply-To: <CADbZ7Fqcx4rWLB7MMVj+J+9n0bMGENj-WZZijiOHN0WrL6OV0A@mail.gmail.com>
-User-Agent: Mutt/1.12.1 (2019-06-15)
-X-Scanned-By: MIMEDefang 2.79 on 10.5.11.14
-X-MC-Unique: G54DyUyuOBKajZXgmttXbQ-1
-X-Mimecast-Spam-Score: 0
-Content-Type: text/plain; charset=WINDOWS-1252
-Content-Transfer-Encoding: quoted-printable
-Content-Disposition: inline
+        by mail.kernel.org (Postfix) with ESMTPSA id 2537820721;
+        Thu, 21 Nov 2019 03:19:06 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+        s=default; t=1574306348;
+        bh=TPz5EgcuOBWB3eKu+t5L++624Br3DKKb2jnElgd4ADM=;
+        h=From:To:Cc:Subject:Date:From;
+        b=X1rWb2kJtwT/XvLPH6WcQrDch7Xhcu4VIHH2NGjxICLVYGKq0bsFPNPQmK4S+GbXB
+         hgHdXmIkpQw/WiqP8HG0s2fTzysuGgsDK/33Edenab+weWQH4oxvykbqlPhnGNnP9y
+         nFCadSKsplCX7k6s5BMoS9NtCrUhgxaukZcYOWxc=
+From:   Krzysztof Kozlowski <krzk@kernel.org>
+To:     linux-kernel@vger.kernel.org
+Cc:     Krzysztof Kozlowski <krzk@kernel.org>,
+        Jens Axboe <axboe@kernel.dk>, linux-block@vger.kernel.org
+Subject: [PATCH v2] block: Fix Kconfig indentation
+Date:   Thu, 21 Nov 2019 04:19:05 +0100
+Message-Id: <1574306345-29160-1-git-send-email-krzk@kernel.org>
+X-Mailer: git-send-email 2.7.4
 Sender: linux-block-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-On Wed, Nov 20, 2019 at 06:50:02PM -0700, Sumanesh Samanta wrote:
-> >>You just see large IO size from driver side or device side, and do you
-> >>know why the big size IO is submitted to driver? Block layer's IO merge
-> >>contributes a lot for that, and IO merge usually starts to work
->=20
-> May be it contribute to some extent, but I do not think streaming
-> applications have any incentive/reason to give small IO. An
-> application like Netflix need to read as much data as soon as possible
-> and serve to customers, they have no reason to read in small chunks.
-> In fact, they read in huge chunks.
-> That is why sequential IO is normally large chunks and random IO (
-> which is more DB kind of operations ) is small IO.
-> Only exception I know of is database REDO logs, that are small
-> sequential IO, because there the DB is logging small transactions --
-> but they go to SSDs.
+Adjust indentation from spaces to tab (+optional two spaces) as in
+coding style with command like:
+	$ sed -e 's/^        /\t/' -i */Kconfig
 
-We can't cover all typical workloads here, and I can write a application
-easily to generate such sequential IO. Even though it is an unusual
-workloads or application, someone still may report it as one regression,
-so we can't risk to bypass .device_busy for HDD.
+Signed-off-by: Krzysztof Kozlowski <krzk@kernel.org>
 
->=20
-> >>Yeah, that is why my patches just bypass sdev->device_busy for SSD, and
-> >>looks you misunderstood the idea behind the patches, right?
->=20
-> No, I got the idea, I am just saying most high end controllers have an
-> IO size limit  , and even if the block layer merges IO, it does not
-> help, since they have to be broken to the max size the controller
-> supports. Also, most high end controllers have their own merging
-> logic, and hence not too much dependent on upper layer merging for
-> them
+---
 
-If the controller's max size is exposed to block layer, block will
-make a proper size IO for controller. I believe all sane drivers do
-that.
+Changes since v1:
+1. Fix also 7-space and tab+1 space indentation issues.
+---
+ block/Kconfig                  | 14 +++++++-------
+ block/Kconfig.iosched          | 12 ++++++------
+ drivers/block/Kconfig          | 28 ++++++++++++++--------------
+ drivers/block/mtip32xx/Kconfig |  2 +-
+ 4 files changed, 28 insertions(+), 28 deletions(-)
 
-Anyway using per-LUN NONROT flag is flexible and reasonable, which
-won't need driver's change.=20
-
-
-Thanks,=20
-Ming
+diff --git a/block/Kconfig b/block/Kconfig
+index 9fa6ce2177bc..ec3b958f0a23 100644
+--- a/block/Kconfig
++++ b/block/Kconfig
+@@ -3,11 +3,11 @@
+ # Block layer core configuration
+ #
+ menuconfig BLOCK
+-       bool "Enable the block layer" if EXPERT
+-       default y
+-       select SBITMAP
+-       select SRCU
+-       help
++	bool "Enable the block layer" if EXPERT
++	default y
++	select SBITMAP
++	select SRCU
++	help
+ 	 Provide block layer support for the kernel.
+ 
+ 	 Disable this option to remove the block layer support from the
+@@ -171,8 +171,8 @@ config BLK_DEBUG_FS
+ 	say Y here.
+ 
+ config BLK_DEBUG_FS_ZONED
+-       bool
+-       default BLK_DEBUG_FS && BLK_DEV_ZONED
++	bool
++	default BLK_DEBUG_FS && BLK_DEV_ZONED
+ 
+ config BLK_SED_OPAL
+ 	bool "Logic for interfacing with Opal enabled SEDs"
+diff --git a/block/Kconfig.iosched b/block/Kconfig.iosched
+index 7df14133adc8..b11a421b7387 100644
+--- a/block/Kconfig.iosched
++++ b/block/Kconfig.iosched
+@@ -29,13 +29,13 @@ config IOSCHED_BFQ
+ 	Documentation/block/bfq-iosched.rst
+ 
+ config BFQ_GROUP_IOSCHED
+-       bool "BFQ hierarchical scheduling support"
+-       depends on IOSCHED_BFQ && BLK_CGROUP
+-       select BLK_CGROUP_RWSTAT
+-       ---help---
++	bool "BFQ hierarchical scheduling support"
++	depends on IOSCHED_BFQ && BLK_CGROUP
++	select BLK_CGROUP_RWSTAT
++	---help---
+ 
+-       Enable hierarchical scheduling in BFQ, using the blkio
+-       (cgroups-v1) or io (cgroups-v2) controller.
++	Enable hierarchical scheduling in BFQ, using the blkio
++	(cgroups-v1) or io (cgroups-v2) controller.
+ 
+ config BFQ_CGROUP_DEBUG
+ 	bool "BFQ IO controller debugging"
+diff --git a/drivers/block/Kconfig b/drivers/block/Kconfig
+index 1bb8ec575352..fa0cd072f5a1 100644
+--- a/drivers/block/Kconfig
++++ b/drivers/block/Kconfig
+@@ -142,10 +142,10 @@ config BLK_DEV_UBD
+ 	bool "Virtual block device"
+ 	depends on UML
+ 	---help---
+-          The User-Mode Linux port includes a driver called UBD which will let
+-          you access arbitrary files on the host computer as block devices.
+-          Unless you know that you do not need such virtual block devices say
+-          Y here.
++	  The User-Mode Linux port includes a driver called UBD which will let
++	  you access arbitrary files on the host computer as block devices.
++	  Unless you know that you do not need such virtual block devices say
++	  Y here.
+ 
+ config BLK_DEV_UBD_SYNC
+ 	bool "Always do synchronous disk IO for UBD"
+@@ -156,16 +156,16 @@ config BLK_DEV_UBD_SYNC
+ 	  Linux 'Virtual Machine' uses a journalling filesystem and the host
+ 	  computer crashes.
+ 
+-          Synchronous operation (i.e. always writing data to the host's disk
+-          immediately) is configurable on a per-UBD basis by using a special
+-          kernel command line option.  Alternatively, you can say Y here to
+-          turn on synchronous operation by default for all block devices.
++	  Synchronous operation (i.e. always writing data to the host's disk
++	  immediately) is configurable on a per-UBD basis by using a special
++	  kernel command line option.  Alternatively, you can say Y here to
++	  turn on synchronous operation by default for all block devices.
+ 
+-          If you're running a journalling file system (like reiserfs, for
+-          example) in your virtual machine, you will want to say Y here.  If
+-          you care for the safety of the data in your virtual machine, Y is a
+-          wise choice too.  In all other cases (for example, if you're just
+-          playing around with User-Mode Linux) you can choose N.
++	  If you're running a journalling file system (like reiserfs, for
++	  example) in your virtual machine, you will want to say Y here.  If
++	  you care for the safety of the data in your virtual machine, Y is a
++	  wise choice too.  In all other cases (for example, if you're just
++	  playing around with User-Mode Linux) you can choose N.
+ 
+ config BLK_DEV_COW_COMMON
+ 	bool
+@@ -430,7 +430,7 @@ config VIRTIO_BLK
+ 	depends on VIRTIO
+ 	---help---
+ 	  This is the virtual block driver for virtio.  It can be used with
+-          QEMU based VMMs (like KVM or Xen).  Say Y or M.
++	  QEMU based VMMs (like KVM or Xen).  Say Y or M.
+ 
+ config VIRTIO_BLK_SCSI
+ 	bool "SCSI passthrough request for the Virtio block driver"
+diff --git a/drivers/block/mtip32xx/Kconfig b/drivers/block/mtip32xx/Kconfig
+index bf221358567e..a469dc72e67a 100644
+--- a/drivers/block/mtip32xx/Kconfig
++++ b/drivers/block/mtip32xx/Kconfig
+@@ -7,4 +7,4 @@ config BLK_DEV_PCIESSD_MTIP32XX
+ 	tristate "Block Device Driver for Micron PCIe SSDs"
+ 	depends on PCI
+ 	help
+-          This enables the block driver for Micron PCIe SSDs.
++	  This enables the block driver for Micron PCIe SSDs.
+-- 
+2.7.4
 
