@@ -2,151 +2,193 @@ Return-Path: <SRS0=S5B1=ZN=vger.kernel.org=linux-block-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-2.4 required=3.0 tests=DKIMWL_WL_HIGH,DKIM_SIGNED,
-	DKIM_VALID,DKIM_VALID_AU,HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,
-	SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED,USER_AGENT_SANE_1 autolearn=no
-	autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-6.8 required=3.0 tests=DKIMWL_WL_HIGH,DKIM_SIGNED,
+	DKIM_VALID,DKIM_VALID_AU,HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,
+	MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED
+	autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id E65BBC43141
-	for <linux-block@archiver.kernel.org>; Thu, 21 Nov 2019 22:25:21 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 81EA0C432C0
+	for <linux-block@archiver.kernel.org>; Thu, 21 Nov 2019 22:36:39 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.kernel.org (Postfix) with ESMTP id BB5D1206D7
-	for <linux-block@archiver.kernel.org>; Thu, 21 Nov 2019 22:25:21 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id 4880020692
+	for <linux-block@archiver.kernel.org>; Thu, 21 Nov 2019 22:36:39 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=pass (2048-bit key) header.d=nvidia.com header.i=@nvidia.com header.b="QiiyQjBd"
+	dkim=pass (1024-bit key) header.d=chromium.org header.i=@chromium.org header.b="n7kt5gyB"
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1726952AbfKUWZP (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Thu, 21 Nov 2019 17:25:15 -0500
-Received: from hqemgate14.nvidia.com ([216.228.121.143]:14864 "EHLO
-        hqemgate14.nvidia.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1726714AbfKUWZO (ORCPT
+        id S1726408AbfKUWgi (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Thu, 21 Nov 2019 17:36:38 -0500
+Received: from mail-lf1-f67.google.com ([209.85.167.67]:42348 "EHLO
+        mail-lf1-f67.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S1726038AbfKUWgi (ORCPT
         <rfc822;linux-block@vger.kernel.org>);
-        Thu, 21 Nov 2019 17:25:14 -0500
-Received: from hqpgpgate102.nvidia.com (Not Verified[216.228.121.13]) by hqemgate14.nvidia.com (using TLS: TLSv1.2, DES-CBC3-SHA)
-        id <B5dd70ecc0001>; Thu, 21 Nov 2019 14:25:17 -0800
-Received: from hqmail.nvidia.com ([172.20.161.6])
-  by hqpgpgate102.nvidia.com (PGP Universal service);
-  Thu, 21 Nov 2019 14:25:13 -0800
-X-PGP-Universal: processed;
-        by hqpgpgate102.nvidia.com on Thu, 21 Nov 2019 14:25:13 -0800
-Received: from [10.2.168.213] (10.124.1.5) by HQMAIL107.nvidia.com
- (172.20.187.13) with Microsoft SMTP Server (TLS) id 15.0.1473.3; Thu, 21 Nov
- 2019 22:25:13 +0000
-Subject: Re: [PATCH v7 05/24] mm: devmap: refactor 1-based refcounting for
- ZONE_DEVICE pages
-To:     Dan Williams <dan.j.williams@intel.com>
-CC:     Christoph Hellwig <hch@lst.de>,
-        Andrew Morton <akpm@linux-foundation.org>,
-        Al Viro <viro@zeniv.linux.org.uk>,
-        Alex Williamson <alex.williamson@redhat.com>,
-        Benjamin Herrenschmidt <benh@kernel.crashing.org>,
-        =?UTF-8?B?QmrDtnJuIFTDtnBlbA==?= <bjorn.topel@intel.com>,
-        Christoph Hellwig <hch@infradead.org>,
-        Daniel Vetter <daniel@ffwll.ch>,
-        Dave Chinner <david@fromorbit.com>,
-        David Airlie <airlied@linux.ie>,
-        "David S . Miller" <davem@davemloft.net>,
-        Ira Weiny <ira.weiny@intel.com>, Jan Kara <jack@suse.cz>,
-        Jason Gunthorpe <jgg@ziepe.ca>, Jens Axboe <axboe@kernel.dk>,
-        Jonathan Corbet <corbet@lwn.net>,
-        =?UTF-8?B?SsOpcsO0bWUgR2xpc3Nl?= <jglisse@redhat.com>,
-        Magnus Karlsson <magnus.karlsson@intel.com>,
-        Mauro Carvalho Chehab <mchehab@kernel.org>,
-        Michael Ellerman <mpe@ellerman.id.au>,
-        Michal Hocko <mhocko@suse.com>,
-        Mike Kravetz <mike.kravetz@oracle.com>,
-        Paul Mackerras <paulus@samba.org>,
-        Shuah Khan <shuah@kernel.org>,
-        Vlastimil Babka <vbabka@suse.cz>, <bpf@vger.kernel.org>,
-        Maling list - DRI developers 
-        <dri-devel@lists.freedesktop.org>, KVM list <kvm@vger.kernel.org>,
-        <linux-block@vger.kernel.org>,
-        Linux Doc Mailing List <linux-doc@vger.kernel.org>,
-        linux-fsdevel <linux-fsdevel@vger.kernel.org>,
-        <linux-kselftest@vger.kernel.org>,
-        "Linux-media@vger.kernel.org" <linux-media@vger.kernel.org>,
-        linux-rdma <linux-rdma@vger.kernel.org>,
-        linuxppc-dev <linuxppc-dev@lists.ozlabs.org>,
-        Netdev <netdev@vger.kernel.org>, Linux MM <linux-mm@kvack.org>,
-        LKML <linux-kernel@vger.kernel.org>
-References: <20191121071354.456618-1-jhubbard@nvidia.com>
- <20191121071354.456618-6-jhubbard@nvidia.com> <20191121080555.GC24784@lst.de>
- <c5f8750f-af82-8aec-ce70-116acf24fa82@nvidia.com>
- <CAPcyv4jzDfxFAnAYc6g8Zz=3DweQFEBLBQyA_tSDP2Wy-RoA4A@mail.gmail.com>
-From:   John Hubbard <jhubbard@nvidia.com>
-X-Nvconfidentiality: public
-Message-ID: <461d6611-0cfb-dd13-f827-0db1ff8a9f2d@nvidia.com>
-Date:   Thu, 21 Nov 2019 14:22:24 -0800
-User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:68.0) Gecko/20100101
- Thunderbird/68.2.2
+        Thu, 21 Nov 2019 17:36:38 -0500
+Received: by mail-lf1-f67.google.com with SMTP id y19so3931977lfl.9
+        for <linux-block@vger.kernel.org>; Thu, 21 Nov 2019 14:36:36 -0800 (PST)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=chromium.org; s=google;
+        h=mime-version:references:in-reply-to:from:date:message-id:subject:to
+         :cc;
+        bh=S2Jylx8PFuLRy2WCWeEwRvTNTPuu/3y4ij0pIDLCdHk=;
+        b=n7kt5gyBx7+CfN0u3awNWs09SUh4HqDtQ8C4yhDsqMjUifowUL/yemrQXqXtFZ+d6m
+         vWN75RfzO6X5Vi1k/t5gVnaXMOOqjcVAjMjfMwCo7tlh0mlA3FTuNdtRrDHqX/wJMjKN
+         yxEKySDdIRP22OyQXOvLPnKVuV6mSP7IPd8C4=
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20161025;
+        h=x-gm-message-state:mime-version:references:in-reply-to:from:date
+         :message-id:subject:to:cc;
+        bh=S2Jylx8PFuLRy2WCWeEwRvTNTPuu/3y4ij0pIDLCdHk=;
+        b=kTD91Y6PMgH4BWzqciBZHR/AcAO5B/7Z0wMNe5JXmFN9Yzx1F95kGQReClyukbWcNu
+         J3cf7Q/VUpSP72C7c32lYsx575lnv69G4snPb/kitDM2SKZBA9Q7Iz1nOieymoD8VTEa
+         uJOi47XOIrAF2/ZJGfHe6IoUMA3QvTRoYbJRMkjZ9wa81ItkzpnXRYTgp1kZQdgoNBTK
+         lxrSy1Dlg8QjueKDhQUwPFZ/Ikmo17IEc7TlVmy9dCmhZM7HTMm2keOwvhoWOs1qBYv9
+         OKZgthsIq2tsEhd2b1toL9OsB0fx+2mUy7gD0bM3hzqis/u6V0Z4yqF+ubHQGtkL4kfj
+         ebWA==
+X-Gm-Message-State: APjAAAXE2BNdtfLJ4Z7qRV/M8/EnYILsRy7uEJHBFLbHkc9ef+Ec6565
+        jLKjlU0ofpnf9t2TgEgd/1yQo83DEdw=
+X-Google-Smtp-Source: APXvYqxsidvOLjCdPH9JT1t3eLqr/ladjOc4zzSxyGsrjpm5sms0b8RhvyHbCerdtoqsdsw5M6fi7w==
+X-Received: by 2002:a19:651b:: with SMTP id z27mr9594174lfb.117.1574375794970;
+        Thu, 21 Nov 2019 14:36:34 -0800 (PST)
+Received: from mail-lf1-f42.google.com (mail-lf1-f42.google.com. [209.85.167.42])
+        by smtp.gmail.com with ESMTPSA id r22sm1968582lji.71.2019.11.21.14.36.33
+        for <linux-block@vger.kernel.org>
+        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
+        Thu, 21 Nov 2019 14:36:33 -0800 (PST)
+Received: by mail-lf1-f42.google.com with SMTP id f18so3936267lfj.6
+        for <linux-block@vger.kernel.org>; Thu, 21 Nov 2019 14:36:33 -0800 (PST)
+X-Received: by 2002:ac2:4945:: with SMTP id o5mr9307426lfi.93.1574375792616;
+ Thu, 21 Nov 2019 14:36:32 -0800 (PST)
 MIME-Version: 1.0
-In-Reply-To: <CAPcyv4jzDfxFAnAYc6g8Zz=3DweQFEBLBQyA_tSDP2Wy-RoA4A@mail.gmail.com>
-X-Originating-IP: [10.124.1.5]
-X-ClientProxiedBy: HQMAIL111.nvidia.com (172.20.187.18) To
- HQMAIL107.nvidia.com (172.20.187.13)
-Content-Type: text/plain; charset="utf-8"; format=flowed
-Content-Language: en-US
-Content-Transfer-Encoding: 7bit
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=nvidia.com; s=n1;
-        t=1574375117; bh=D/eKIo+FJi5bpXqwJfXr6PJt8uCFLnCZclyeodxgmoA=;
-        h=X-PGP-Universal:Subject:To:CC:References:From:X-Nvconfidentiality:
-         Message-ID:Date:User-Agent:MIME-Version:In-Reply-To:
-         X-Originating-IP:X-ClientProxiedBy:Content-Type:Content-Language:
-         Content-Transfer-Encoding;
-        b=QiiyQjBd99PA4tfLyLMiUlQLWaGQU2+co6FamS71fAjNe7NqeNYDH8w7d2wRbOpAp
-         FO2FB4fRVvM6b8p6VFBEfZcwYG6pgVEpA9JmE6+ROgRRGxXCqZY/+YxPczpJznwImd
-         p6u80IPFPE4x/PJetPMB9IpPtmHNp690Ig3KD/FI3Pg1Spw0uK9yY10oBbvhOlh90u
-         VDHu/ArBa3unFu4nkBBDe7Ce1Uz+1D/XrvQ7tfArBFBClI1tdcdtAK+LKBrbmv90AQ
-         ydolBZYKkzfeBhYUC0ZjSrXWwqBfaUR0ElhSrvf057yQhGgjhUwUU8jj5KSdyTH5QE
-         YNZVYalLmeVQg==
+References: <20191114235008.185111-1-evgreen@chromium.org> <20191114154903.v7.2.I4d476bddbf41a61422ad51502f4361e237d60ad4@changeid>
+ <20191120022518.GU6235@magnolia> <CAE=gft4mjKc4QKFKxp2FX9G2rUMuE3_eDuW_3Oq7NqTYBQwEjg@mail.gmail.com>
+ <20191120191302.GV6235@magnolia> <CAE=gft6x1TmkkNTj+gktYMkHcysYyuYL50cavYusQ7hd9zChvA@mail.gmail.com>
+ <20191120194507.GW6235@magnolia> <CAE=gft4OcxPP7srBe_2bj8K_0jHGD8Ae_PbV1Rq-Nz4F8GtkQA@mail.gmail.com>
+ <20191121212512.GA2981917@magnolia>
+In-Reply-To: <20191121212512.GA2981917@magnolia>
+From:   Evan Green <evgreen@chromium.org>
+Date:   Thu, 21 Nov 2019 14:35:56 -0800
+X-Gmail-Original-Message-ID: <CAE=gft4uLmLKexyCdRi2N8iJxzuBMXW-rcw+ob_pxBfyLVNijg@mail.gmail.com>
+Message-ID: <CAE=gft4uLmLKexyCdRi2N8iJxzuBMXW-rcw+ob_pxBfyLVNijg@mail.gmail.com>
+Subject: Re: [PATCH v7 2/2] loop: Better discard support for block devices
+To:     "Darrick J. Wong" <darrick.wong@oracle.com>
+Cc:     Jens Axboe <axboe@kernel.dk>,
+        Martin K Petersen <martin.petersen@oracle.com>,
+        Gwendal Grignou <gwendal@chromium.org>,
+        Christoph Hellwig <hch@infradead.org>,
+        Ming Lei <ming.lei@redhat.com>,
+        Alexis Savery <asavery@chromium.org>,
+        Douglas Anderson <dianders@chromium.org>,
+        Bart Van Assche <bvanassche@acm.org>,
+        Chaitanya Kulkarni <chaitanya.kulkarni@wdc.com>,
+        linux-block <linux-block@vger.kernel.org>,
+        LKML <linux-kernel@vger.kernel.org>
+Content-Type: text/plain; charset="UTF-8"
 Sender: linux-block-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-On 11/21/19 8:59 AM, Dan Williams wrote:
-> On Thu, Nov 21, 2019 at 12:57 AM John Hubbard <jhubbard@nvidia.com> wrote:
->>
->> On 11/21/19 12:05 AM, Christoph Hellwig wrote:
->>> So while this looks correct and I still really don't see the major
->>> benefit of the new code organization, especially as it bloats all
->>> put_page callers.
->>>
->>> I'd love to see code size change stats for an allyesconfig on this
->>> commit.
->>>
->>
->> Right, I'm running that now, will post the results. (btw, if there is
->> a script and/or standard format I should use, I'm all ears. I'll dig
->> through lwn...)
->>
-> 
-> Just run:
-> 
->      size vmlinux
-> 
+On Thu, Nov 21, 2019 at 1:25 PM Darrick J. Wong <darrick.wong@oracle.com> wrote:
+>
+> On Thu, Nov 21, 2019 at 01:18:51PM -0800, Evan Green wrote:
+> > On Wed, Nov 20, 2019 at 11:45 AM Darrick J. Wong
+> > <darrick.wong@oracle.com> wrote:
+> > >
+> > > On Wed, Nov 20, 2019 at 11:25:48AM -0800, Evan Green wrote:
+> > > > On Wed, Nov 20, 2019 at 11:13 AM Darrick J. Wong
+> > > > <darrick.wong@oracle.com> wrote:
+> > > > >
+> > > > > On Wed, Nov 20, 2019 at 10:56:30AM -0800, Evan Green wrote:
+> > > > > > On Tue, Nov 19, 2019 at 6:25 PM Darrick J. Wong <darrick.wong@oracle.com> wrote:
+> > > > > > >
+> > > > > > > On Thu, Nov 14, 2019 at 03:50:08PM -0800, Evan Green wrote:
+> > > > > > > > If the backing device for a loop device is itself a block device,
+> > > > > > > > then mirror the "write zeroes" capabilities of the underlying
+> > > > > > > > block device into the loop device. Copy this capability into both
+> > > > > > > > max_write_zeroes_sectors and max_discard_sectors of the loop device.
+> > > > > > > >
+> > > > > > > > The reason for this is that REQ_OP_DISCARD on a loop device translates
+> > > > > > > > into blkdev_issue_zeroout(), rather than blkdev_issue_discard(). This
+> > > > > > > > presents a consistent interface for loop devices (that discarded data
+> > > > > > > > is zeroed), regardless of the backing device type of the loop device.
+> > > > > > > > There should be no behavior change for loop devices backed by regular
+> > > > > > > > files.
+> > > >
+> > > > (marking this spot for below)
+> > > >
+> > > > > > > >
+> > > > > > > > This change fixes blktest block/003, and removes an extraneous
+> > > > > > > > error print in block/013 when testing on a loop device backed
+> > > > > > > > by a block device that does not support discard.
+> > > > > > > >
+> > > > > > > > Signed-off-by: Evan Green <evgreen@chromium.org>
+> > > > > > > > Reviewed-by: Gwendal Grignou <gwendal@chromium.org>
+> > > > > > > > Reviewed-by: Chaitanya Kulkarni <chaitanya.kulkarni@wdc.com>
+> > > > > > > > ---
+> > > > > > > >
+> > > > > > > > Changes in v7:
+> > > > > > > > - Rebase on top of Darrick's patch
+> > > > > > > > - Tweak opening line of commit description (Darrick)
+> > > > > > > >
+> > > > > > > > Changes in v6: None
+> > > > > > > > Changes in v5:
+> > > > > > > > - Don't mirror discard if lo_encrypt_key_size is non-zero (Gwendal)
+> > > > > > > >
+> > > > > > > > Changes in v4:
+> > > > > > > > - Mirror blkdev's write_zeroes into loopdev's discard_sectors.
+> > > > > > > >
+> > > > > > > > Changes in v3:
+> > > > > > > > - Updated commit description
+> > > > > > > >
+> > > > > > > > Changes in v2: None
+> > > > > > > >
+> > > > > > > >  drivers/block/loop.c | 40 +++++++++++++++++++++++++++++-----------
+> > > > > > > >  1 file changed, 29 insertions(+), 11 deletions(-)
+> > > > > > > >
+> > > > > > > > diff --git a/drivers/block/loop.c b/drivers/block/loop.c
+> > > > > > > > index 6a9fe1f9fe84..e8f23e4b78f7 100644
+> > > > > > > > --- a/drivers/block/loop.c
+> > > > > > > > +++ b/drivers/block/loop.c
+> > > > > > > > @@ -427,11 +427,12 @@ static int lo_fallocate(struct loop_device *lo, struct request *rq, loff_t pos,
+> > > > > > > >        * information.
+> > > > > > > >        */
+> > > > > > > >       struct file *file = lo->lo_backing_file;
+> > > > > > > > +     struct request_queue *q = lo->lo_queue;
+> > > > > > > >       int ret;
+> > > > > > > >
+> > > > > > > >       mode |= FALLOC_FL_KEEP_SIZE;
+> > > > > > > >
+> > > > > > > > -     if ((!file->f_op->fallocate) || lo->lo_encrypt_key_size) {
+> > > > > > > > +     if (!blk_queue_discard(q)) {
+> > > > > > > >               ret = -EOPNOTSUPP;
+> > > > > > > >               goto out;
+> > > > > > > >       }
+> > > > > > > > @@ -862,6 +863,21 @@ static void loop_config_discard(struct loop_device *lo)
+> > > > > > > >       struct file *file = lo->lo_backing_file;
+> > > > > > > >       struct inode *inode = file->f_mapping->host;
+> > > > > > > >       struct request_queue *q = lo->lo_queue;
+> > > > > > > > +     struct request_queue *backingq;
+> > > > > > > > +
+> > > > > > > > +     /*
+> > > > > > > > +      * If the backing device is a block device, mirror its zeroing
+> > > > > > > > +      * capability. REQ_OP_DISCARD translates to a zero-out even when backed
+> > > > > > > > +      * by block devices to keep consistent behavior with file-backed loop
+> > > > > > > > +      * devices.
+> > > > > > > > +      */
+> >
+> > Wait, I went to make this change and realized there's already a comment here.
+> >
+> > I can tweak the language a bit, but this is pretty much what you wanted, right?
+>
+> Yep.
+>
 
-Beautiful. I thought it would involve a lot more. Here's results:
+Jens, any opinions? I'm happy to spin one more time to clarify the
+comment as follows if desired, or leave it as-is too!
 
-linux.git (Linux 5.4-rc8+):
-==============================================
-   text	   data	    bss	    dec	    hex	filename
-227578032	213267935	76877984	517723951	1edbd72f	vmlinux
-
-
-With patches 4 and 5 applied to linux.git:
-==========================================
-   text	   data	    bss	    dec	    hex	filename
-229698560	213288379	76853408	519840347	1efc225b	vmlinux
-
-
-Analysis:
-=========
-
-This increased the size of text by 0.93%. Which is a measurable bloat, so
-the inlining really is undesirable here, yes. I'll do it differently.
-
-thanks,
--- 
-John Hubbard
-NVIDIA
+        /*
+         * If the backing device is a block device, mirror its zeroing
+         * capability. Set the discard sectors to the block device's zeroing
+         * capabilities because loop discards result in blkdev_issue_zeroout(),
+         * not blkdev_issue_discard(). This maintains consistent behavior with
+         * file-backed loop devices: discarded regions read back as zero.
+         */
