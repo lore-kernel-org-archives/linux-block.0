@@ -6,36 +6,36 @@ X-Spam-Status: No, score=-2.0 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
 	HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,
 	USER_AGENT_SANE_1 autolearn=no autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id C478CC432C0
-	for <linux-block@archiver.kernel.org>; Thu, 21 Nov 2019 08:10:33 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 6F562C43215
+	for <linux-block@archiver.kernel.org>; Thu, 21 Nov 2019 08:10:56 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.kernel.org (Postfix) with ESMTP id 9D6DC20898
-	for <linux-block@archiver.kernel.org>; Thu, 21 Nov 2019 08:10:33 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id 4269420855
+	for <linux-block@archiver.kernel.org>; Thu, 21 Nov 2019 08:10:56 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (2048-bit key) header.d=infradead.org header.i=@infradead.org header.b="tSf+ntFI"
+	dkim=fail reason="signature verification failed" (2048-bit key) header.d=infradead.org header.i=@infradead.org header.b="Mafq4UPz"
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1726500AbfKUIKd (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Thu, 21 Nov 2019 03:10:33 -0500
-Received: from bombadil.infradead.org ([198.137.202.133]:43222 "EHLO
+        id S1727232AbfKUIKz (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Thu, 21 Nov 2019 03:10:55 -0500
+Received: from bombadil.infradead.org ([198.137.202.133]:43306 "EHLO
         bombadil.infradead.org" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1726343AbfKUIKc (ORCPT
+        with ESMTP id S1727219AbfKUIKx (ORCPT
         <rfc822;linux-block@vger.kernel.org>);
-        Thu, 21 Nov 2019 03:10:32 -0500
+        Thu, 21 Nov 2019 03:10:53 -0500
 DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed;
         d=infradead.org; s=bombadil.20170209; h=In-Reply-To:Content-Type:MIME-Version
         :References:Message-ID:Subject:Cc:To:From:Date:Sender:Reply-To:
         Content-Transfer-Encoding:Content-ID:Content-Description:Resent-Date:
         Resent-From:Resent-Sender:Resent-To:Resent-Cc:Resent-Message-ID:List-Id:
         List-Help:List-Unsubscribe:List-Subscribe:List-Post:List-Owner:List-Archive;
-         bh=ayytCJcth5GS0yhMc7G3JkwZ14SgYTl8WFFvY2/7v8M=; b=tSf+ntFIx+E4ElPWg7N/YrDA5
-        DJpdGB/LPxrZKjR8XgqAl2zR85VHA697aheq0Zg246jsWgb8mrSdltGy5yMP9HbBodsPoR+gwGpD+
-        QVOFwWDZ+KabSirkp4Tt9dB6kmJIUn0J+Il59Ko2Pkv3hkIl+fSJj/KbwMadKof/10NbX4BVK4ecW
-        CzXkmxFI+A8ZBzCm+FXsPX/uDD3s0HAgf0WBL/2Hz3XeBUWuBLfRR+cpozCLlR9UfRS5SZMBsI4/v
-        eMEAVutB9ql9MJsVHEW4sKjJfLq4kUoa0IJZZM6O6F/e7LcxIe5kML6J3bUd6SLeM+OcPR4CPMA97
-        R/3mfYL1g==;
+         bh=DZddNdyW5FRrAXgTdc6w5huJMr/L+GTDCsXkrpDZQWE=; b=Mafq4UPzuRzO9+6g0idvgtn8y
+        WcDSiCT7hQFVoaJkaXestyiwMGnqfYjgbEOz0r27XeQ+Y5KvjD4Nuhy0YaDkgeX1N2nHrE2fymh9/
+        Kl6qsPzn8bgO9GwKGkSXLJ6yif29++yxYwWthonAbKTOkkQzaykODs/kBCpIPvEL9IlVjXYjhMRJE
+        HObsxeSD97VjwE1Ac50vXPpo12MNChRAcbknrDS9loF08kQwig/wzQVsPl/cwUiTKkHvJYvfDWnFU
+        FO6tlhkm1YjoPatb8/UhLvWJuQFmCn5wpi+24IGZ7mIRAGQpgH/fHbaZ8f9hs4dGNlP7WUQjseLo0
+        O4T8RJ40Q==;
 Received: from hch by bombadil.infradead.org with local (Exim 4.92.3 #3 (Red Hat Linux))
-        id 1iXhVv-0008IQ-Ap; Thu, 21 Nov 2019 08:08:31 +0000
-Date:   Thu, 21 Nov 2019 00:08:31 -0800
+        id 1iXhXf-0001ki-FW; Thu, 21 Nov 2019 08:10:19 +0000
+Date:   Thu, 21 Nov 2019 00:10:19 -0800
 From:   Christoph Hellwig <hch@infradead.org>
 To:     John Hubbard <jhubbard@nvidia.com>
 Cc:     Andrew Morton <akpm@linux-foundation.org>,
@@ -66,16 +66,17 @@ Cc:     Andrew Morton <akpm@linux-foundation.org>,
         linux-fsdevel@vger.kernel.org, linux-kselftest@vger.kernel.org,
         linux-media@vger.kernel.org, linux-rdma@vger.kernel.org,
         linuxppc-dev@lists.ozlabs.org, netdev@vger.kernel.org,
-        linux-mm@kvack.org, LKML <linux-kernel@vger.kernel.org>
-Subject: Re: [PATCH v7 06/24] goldish_pipe: rename local pin_user_pages()
- routine
-Message-ID: <20191121080831.GD30991@infradead.org>
+        linux-mm@kvack.org, LKML <linux-kernel@vger.kernel.org>,
+        Jason Gunthorpe <jgg@mellanox.com>
+Subject: Re: [PATCH v7 09/24] vfio, mm: fix get_user_pages_remote() and
+ FOLL_LONGTERM
+Message-ID: <20191121081019.GF30991@infradead.org>
 References: <20191121071354.456618-1-jhubbard@nvidia.com>
- <20191121071354.456618-7-jhubbard@nvidia.com>
+ <20191121071354.456618-10-jhubbard@nvidia.com>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=us-ascii
 Content-Disposition: inline
-In-Reply-To: <20191121071354.456618-7-jhubbard@nvidia.com>
+In-Reply-To: <20191121071354.456618-10-jhubbard@nvidia.com>
 User-Agent: Mutt/1.12.1 (2019-06-15)
 X-SRS-Rewrite: SMTP reverse-path rewritten from <hch@infradead.org> by bombadil.infradead.org. See http://www.infradead.org/rpr.html
 Sender: linux-block-owner@vger.kernel.org
@@ -83,16 +84,5 @@ Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-On Wed, Nov 20, 2019 at 11:13:36PM -0800, John Hubbard wrote:
-> +static int pin_goldfish_pages(unsigned long first_page,
-> +			      unsigned long last_page,
-> +			      unsigned int last_page_size,
-> +			      int is_write,
-> +			      struct page *pages[MAX_BUFFERS_PER_COMMAND],
-> +			      unsigned int *iter_last_page_size)
-
-Why not goldfish_pin_pages?  Normally we put the module / subsystem
-in front.
-
-Also can we get this queued up for 5.5 to get some trivial changes
-out of the way?
+Should this be two patches, one for th core infrastructure and one for
+the user?  These changes also look like another candidate to pre-load.
