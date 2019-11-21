@@ -2,187 +2,274 @@ Return-Path: <SRS0=S5B1=ZN=vger.kernel.org=linux-block-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-5.2 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
-	INCLUDES_PATCH,MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,USER_AGENT_SANE_1
-	autolearn=ham autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-6.8 required=3.0 tests=DKIM_SIGNED,DKIM_VALID,
+	DKIM_VALID_AU,HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,
+	SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED autolearn=ham
+	autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 52C30C432C0
-	for <linux-block@archiver.kernel.org>; Thu, 21 Nov 2019 10:24:21 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id E1555C432C0
+	for <linux-block@archiver.kernel.org>; Thu, 21 Nov 2019 10:40:32 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.kernel.org (Postfix) with ESMTP id 2F2E620659
-	for <linux-block@archiver.kernel.org>; Thu, 21 Nov 2019 10:24:21 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id 75DF02088F
+	for <linux-block@archiver.kernel.org>; Thu, 21 Nov 2019 10:40:32 +0000 (UTC)
+Authentication-Results: mail.kernel.org;
+	dkim=pass (1024-bit key) header.d=yandex-team.ru header.i=@yandex-team.ru header.b="VdaT6ljR"
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1726165AbfKUKYU (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Thu, 21 Nov 2019 05:24:20 -0500
-Received: from lhrrgout.huawei.com ([185.176.76.210]:2110 "EHLO huawei.com"
-        rhost-flags-OK-OK-OK-FAIL) by vger.kernel.org with ESMTP
-        id S1726014AbfKUKYU (ORCPT <rfc822;linux-block@vger.kernel.org>);
-        Thu, 21 Nov 2019 05:24:20 -0500
-Received: from lhreml708-cah.china.huawei.com (unknown [172.18.7.108])
-        by Forcepoint Email with ESMTP id 0FD5A7597279BC2F94E6;
-        Thu, 21 Nov 2019 10:24:18 +0000 (GMT)
-Received: from lhreml724-chm.china.huawei.com (10.201.108.75) by
- lhreml708-cah.china.huawei.com (10.201.108.49) with Microsoft SMTP Server
- (TLS) id 14.3.408.0; Thu, 21 Nov 2019 10:24:17 +0000
-Received: from [127.0.0.1] (10.202.226.46) by lhreml724-chm.china.huawei.com
- (10.201.108.75) with Microsoft SMTP Server (version=TLS1_2,
- cipher=TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256) id 15.1.1713.5; Thu, 21 Nov
- 2019 10:24:17 +0000
-Subject: Re: [PATCH RFC V2 3/5] blk-mq: Facilitate a shared sbitmap per tagset
-To:     Ming Lei <ming.lei@redhat.com>
-CC:     "axboe@kernel.dk" <axboe@kernel.dk>,
-        "jejb@linux.ibm.com" <jejb@linux.ibm.com>,
-        "martin.petersen@oracle.com" <martin.petersen@oracle.com>,
-        "linux-block@vger.kernel.org" <linux-block@vger.kernel.org>,
-        "linux-kernel@vger.kernel.org" <linux-kernel@vger.kernel.org>,
-        "linux-scsi@vger.kernel.org" <linux-scsi@vger.kernel.org>,
-        "hare@suse.com" <hare@suse.com>,
-        "bvanassche@acm.org" <bvanassche@acm.org>,
-        "chenxiang (M)" <chenxiang66@hisilicon.com>
-References: <1574173658-76818-1-git-send-email-john.garry@huawei.com>
- <1574173658-76818-4-git-send-email-john.garry@huawei.com>
- <20191121085531.GC4755@ming.t460p>
-From:   John Garry <john.garry@huawei.com>
-Message-ID: <db93e0ba-118a-a4f6-41a8-064353568ef7@huawei.com>
-Date:   Thu, 21 Nov 2019 10:24:16 +0000
-User-Agent: Mozilla/5.0 (Windows NT 10.0; WOW64; rv:68.0) Gecko/20100101
- Thunderbird/68.1.2
+        id S1726358AbfKUKkb (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Thu, 21 Nov 2019 05:40:31 -0500
+Received: from forwardcorp1o.mail.yandex.net ([95.108.205.193]:49232 "EHLO
+        forwardcorp1o.mail.yandex.net" rhost-flags-OK-OK-OK-OK)
+        by vger.kernel.org with ESMTP id S1726230AbfKUKkb (ORCPT
+        <rfc822;linux-block@vger.kernel.org>);
+        Thu, 21 Nov 2019 05:40:31 -0500
+Received: from mxbackcorp1g.mail.yandex.net (mxbackcorp1g.mail.yandex.net [IPv6:2a02:6b8:0:1402::301])
+        by forwardcorp1o.mail.yandex.net (Yandex) with ESMTP id 235CB2E18F1;
+        Thu, 21 Nov 2019 13:40:27 +0300 (MSK)
+Received: from vla5-2bf13a090f43.qloud-c.yandex.net (vla5-2bf13a090f43.qloud-c.yandex.net [2a02:6b8:c18:3411:0:640:2bf1:3a09])
+        by mxbackcorp1g.mail.yandex.net (mxbackcorp/Yandex) with ESMTP id 8k5UtZBVOc-eQuieGpg;
+        Thu, 21 Nov 2019 13:40:27 +0300
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=yandex-team.ru; s=default;
+        t=1574332827; bh=jJPE2lkmi4is3srgVXQWiJk3+sodk/rEZ57R5XJTD2A=;
+        h=Message-ID:Date:To:From:Subject:Cc;
+        b=VdaT6ljRC2SUcekXlATqcMbKCncFOBIm5Zi1cy5Wj8O8rszKGb1kg2Akj6jgw+oED
+         0vQAdkbhCN4PU6T6/QE5xPLDLlw4ALeDhv7F1coCZUilJKIdu8gY1gJGOGCisicojB
+         8wTDqm+7Xp+WAXkdqGO9YIjiisnLX3FS2MV6X+Z4=
+Authentication-Results: mxbackcorp1g.mail.yandex.net; dkim=pass header.i=@yandex-team.ru
+Received: from dynamic-red.dhcp.yndx.net (dynamic-red.dhcp.yndx.net [2a02:6b8:0:40c:1009:4fae:ad87:4eae])
+        by vla5-2bf13a090f43.qloud-c.yandex.net (smtpcorp/Yandex) with ESMTPSA id 4uiq2DmQw7-eQV4np4t;
+        Thu, 21 Nov 2019 13:40:26 +0300
+        (using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+        (Client certificate not present)
+Subject: [PATCH] block: add iostat counters for flush requests
+From:   Konstantin Khlebnikov <khlebnikov@yandex-team.ru>
+To:     linux-block@vger.kernel.org, Jens Axboe <axboe@kernel.dk>,
+        linux-kernel@vger.kernel.org, linux-doc@vger.kernel.org
+Cc:     linux-fsdevel@vger.kernel.org, linux-api@vger.kernel.org,
+        Dmitry Monakhov <dmtrmonakhov@yandex-team.ru>
+Date:   Thu, 21 Nov 2019 13:40:26 +0300
+Message-ID: <157433282607.7928.5202409984272248322.stgit@buzz>
+User-Agent: StGit/0.17.1-dirty
 MIME-Version: 1.0
-In-Reply-To: <20191121085531.GC4755@ming.t460p>
-Content-Type: text/plain; charset="windows-1252"; format=flowed
-Content-Language: en-US
+Content-Type: text/plain; charset="utf-8"
 Content-Transfer-Encoding: 7bit
-X-Originating-IP: [10.202.226.46]
-X-ClientProxiedBy: lhreml720-chm.china.huawei.com (10.201.108.71) To
- lhreml724-chm.china.huawei.com (10.201.108.75)
-X-CFilter-Loop: Reflected
 Sender: linux-block-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
->>   
->>   int blk_mq_init_sched(struct request_queue *q, struct elevator_type *e)
->>   {
->> +	struct blk_mq_tag_set *tag_set = q->tag_set;
->>   	struct blk_mq_hw_ctx *hctx;
->>   	struct elevator_queue *eq;
->>   	unsigned int i;
->> @@ -537,6 +538,19 @@ int blk_mq_init_sched(struct request_queue *q, struct elevator_type *e)
->>   		blk_mq_debugfs_register_sched_hctx(q, hctx);
->>   	}
->>   
->> +	if (blk_mq_is_sbitmap_shared(tag_set)) {
->> +		if (!blk_mq_init_sched_shared_sbitmap(tag_set, q->nr_requests)) {
->> +			ret = -ENOMEM;
->> +			goto err;
->> +		}
->> +		queue_for_each_hw_ctx(q, hctx, i) {
->> +			struct blk_mq_tags *tags = hctx->sched_tags;
->> +
->> +			tags->pbitmap_tags = &tag_set->sched_shared_bitmap_tags;
->> +			tags->pbreserved_tags = &tag_set->sched_shared_breserved_tags;
-> 
-> This kind of sharing is wrong, sched tags should be request queue wide
-> instead of tagset wide, and each request queue has its own & independent
-> scheduler queue.
+Requests that triggers flushing volatile writeback cache to disk (barriers)
+have significant effect to overall performance.
 
-Right, so if we get get a scheduler tag we still need to get a driver 
-tag, and this would be the "shared" tag.
+Block layer has sophisticated engine for combining several flush requests
+into one. But there is no statistics for actual flushes executed by disk.
+Requests which trigger flushes usually are barriers - zero-size writes.
 
-That makes things simpler then.
+This patch adds two iostat counters into /sys/class/block/$dev/stat and
+/proc/diskstats - count of completed flush requests and their total time.
 
-> 
->> +		}
->> +	}
->> +
->>   	return 0;
->>   
->>   err:
->> diff --git a/block/blk-mq-tag.c b/block/blk-mq-tag.c
->> index 42792942b428..6625bebb46c3 100644
->> --- a/block/blk-mq-tag.c
->> +++ b/block/blk-mq-tag.c
->> @@ -35,9 +35,9 @@ bool __blk_mq_tag_busy(struct blk_mq_hw_ctx *hctx)
->>    */
->>   void blk_mq_tag_wakeup_all(struct blk_mq_tags *tags, bool include_reserve)
->>   {
->> -	sbitmap_queue_wake_all(&tags->bitmap_tags);
->> +	sbitmap_queue_wake_all(tags->pbitmap_tags);
->>   	if (include_reserve)
->> -		sbitmap_queue_wake_all(&tags->breserved_tags);
->> +		sbitmap_queue_wake_all(tags->pbreserved_tags);
->>   }
->>   
+Signed-off-by: Konstantin Khlebnikov <khlebnikov@yandex-team.ru>
+---
+ Documentation/ABI/testing/procfs-diskstats |    5 +++++
+ Documentation/ABI/testing/sysfs-block      |    6 ++++++
+ Documentation/admin-guide/iostats.rst      |    9 +++++++++
+ Documentation/block/stat.rst               |   14 ++++++++++++--
+ block/blk-flush.c                          |   15 ++++++++++++++-
+ block/genhd.c                              |    8 ++++++--
+ block/partition-generic.c                  |    7 +++++--
+ include/linux/blk_types.h                  |    1 +
+ 8 files changed, 58 insertions(+), 7 deletions(-)
 
-[...]
-
-
->>   	mutex_init(&set->tag_list_lock);
->>   	INIT_LIST_HEAD(&set->tag_list);
->>   
->> @@ -3137,6 +3151,7 @@ int blk_mq_update_nr_requests(struct request_queue *q, unsigned int nr)
->>   {
->>   	struct blk_mq_tag_set *set = q->tag_set;
->>   	struct blk_mq_hw_ctx *hctx;
->> +	bool sched_tags = false;
->>   	int i, ret;
->>   
->>   	if (!set)
->> @@ -3160,6 +3175,7 @@ int blk_mq_update_nr_requests(struct request_queue *q, unsigned int nr)
->>   			ret = blk_mq_tag_update_depth(hctx, &hctx->tags, nr,
->>   							false);
->>   		} else {
->> +			sched_tags = true;
->>   			ret = blk_mq_tag_update_depth(hctx, &hctx->sched_tags,
->>   							nr, true);
->>   		}
->> @@ -3169,8 +3185,41 @@ int blk_mq_update_nr_requests(struct request_queue *q, unsigned int nr)
->>   			q->elevator->type->ops.depth_updated(hctx);
->>   	}
->>   
->> -	if (!ret)
->> +	/*
->> +	 * if ret is 0, all queues should have been updated to the same depth
->> +	 * if not, then maybe some have been updated - yuk, need to handle this for shared sbitmap...
->> +	 * if some are updated, we should probably roll back the change altogether. FIXME
->> +	 */
->> +	if (!ret) {
->> +		if (blk_mq_is_sbitmap_shared(set)) {
->> +			if (sched_tags) {
->> +				sbitmap_queue_free(&set->sched_shared_bitmap_tags);
->> +				sbitmap_queue_free(&set->sched_shared_breserved_tags);
->> +				if (!blk_mq_init_sched_shared_sbitmap(set, nr))
->> +					return -ENOMEM; /* fixup error handling */
->> +
->> +				queue_for_each_hw_ctx(q, hctx, i) {
->> +					hctx->sched_tags->pbitmap_tags = &set->sched_shared_bitmap_tags;
->> +					hctx->sched_tags->pbreserved_tags = &set->sched_shared_breserved_tags;
->> +				}
->> +			} else {
->> +				sbitmap_queue_free(&set->shared_bitmap_tags);
->> +				sbitmap_queue_free(&set->shared_breserved_tags);
->> +				if (!blk_mq_init_shared_sbitmap(set))
->> +					return -ENOMEM; /* fixup error handling */
-> 
-> No, we can't re-allocate driver tags here which are shared by all LUNs. > And you should see that 'can_grow' is set as false for driver tags
-> in blk_mq_update_nr_requests(), which can only touch per-request-queue
-> data, not tagset wide data.
-
-Yeah, I see that. We should just resize for driver tags bitmap.
-
-Personally I think the mainline code is a little loose here, as if we 
-could grow driver tags, then blk_mq_tagset.tags would be out-of-sync 
-with the hctx->tags. Maybe that should be made more explicit in the code.
-
-BTW, do you have anything to say about this (modified slightly) comment:
-
-/*
-  * if ret != 0, q->nr_requests would not be updated, yet the depth
-  * for some hctx sched tags may have changed - is that the right thing
-  * to do?
-  */
-
-Thanks,
-John
+diff --git a/Documentation/ABI/testing/procfs-diskstats b/Documentation/ABI/testing/procfs-diskstats
+index 2c44b4f1b060..70dcaf2481f4 100644
+--- a/Documentation/ABI/testing/procfs-diskstats
++++ b/Documentation/ABI/testing/procfs-diskstats
+@@ -29,4 +29,9 @@ Description:
+ 		17 - sectors discarded
+ 		18 - time spent discarding
+ 
++		Kernel 5.5+ appends two more fields for flush requests:
++
++		19 - flush requests completed successfully
++		20 - time spent flushing
++
+ 		For more details refer to Documentation/admin-guide/iostats.rst
+diff --git a/Documentation/ABI/testing/sysfs-block b/Documentation/ABI/testing/sysfs-block
+index f8c7c7126bb1..ed8c14f161ee 100644
+--- a/Documentation/ABI/testing/sysfs-block
++++ b/Documentation/ABI/testing/sysfs-block
+@@ -15,6 +15,12 @@ Description:
+ 		 9 - I/Os currently in progress
+ 		10 - time spent doing I/Os (ms)
+ 		11 - weighted time spent doing I/Os (ms)
++		12 - discards completed
++		13 - discards merged
++		14 - sectors discarded
++		15 - time spent discarding (ms)
++		16 - flush requests completed
++		17 - time spent flushing (ms)
+ 		For more details refer Documentation/admin-guide/iostats.rst
+ 
+ 
+diff --git a/Documentation/admin-guide/iostats.rst b/Documentation/admin-guide/iostats.rst
+index 5d63b18bd6d1..4f0462af3ca7 100644
+--- a/Documentation/admin-guide/iostats.rst
++++ b/Documentation/admin-guide/iostats.rst
+@@ -121,6 +121,15 @@ Field 15 -- # of milliseconds spent discarding
+     This is the total number of milliseconds spent by all discards (as
+     measured from __make_request() to end_that_request_last()).
+ 
++Field 16 -- # of flush requests completed
++    This is the total number of flush requests completed successfully.
++
++    Block layer combines flush requests and executes at most one at a time.
++    This counts flush requests executed by disk. Not tracked for partitions.
++
++Field 17 -- # of milliseconds spent flushing
++    This is the total number of milliseconds spent by all flush requests.
++
+ To avoid introducing performance bottlenecks, no locks are held while
+ modifying these counters.  This implies that minor inaccuracies may be
+ introduced when changes collide, so (for instance) adding up all the
+diff --git a/Documentation/block/stat.rst b/Documentation/block/stat.rst
+index 9c07bc22b0bc..77311335c08b 100644
+--- a/Documentation/block/stat.rst
++++ b/Documentation/block/stat.rst
+@@ -41,6 +41,8 @@ discard I/Os    requests      number of discard I/Os processed
+ discard merges  requests      number of discard I/Os merged with in-queue I/O
+ discard sectors sectors       number of sectors discarded
+ discard ticks   milliseconds  total wait time for discard requests
++flush I/Os      requests      number of flush I/Os processed
++flush ticks     milliseconds  total wait time for flush requests
+ =============== ============= =================================================
+ 
+ read I/Os, write I/Os, discard I/0s
+@@ -48,6 +50,14 @@ read I/Os, write I/Os, discard I/0s
+ 
+ These values increment when an I/O request completes.
+ 
++flush I/Os
++==========
++
++These values increment when an flush I/O request completes.
++
++Block layer combines flush requests and executes at most one at a time.
++This counts flush requests executed by disk. Not tracked for partitions.
++
+ read merges, write merges, discard merges
+ =========================================
+ 
+@@ -62,8 +72,8 @@ discarded from this block device.  The "sectors" in question are the
+ standard UNIX 512-byte sectors, not any device- or filesystem-specific
+ block size.  The counters are incremented when the I/O completes.
+ 
+-read ticks, write ticks, discard ticks
+-======================================
++read ticks, write ticks, discard ticks, flush ticks
++===================================================
+ 
+ These values count the number of milliseconds that I/O requests have
+ waited on this block device.  If there are multiple I/O requests waiting,
+diff --git a/block/blk-flush.c b/block/blk-flush.c
+index 1eec9cbe5a0a..1777346baf06 100644
+--- a/block/blk-flush.c
++++ b/block/blk-flush.c
+@@ -136,6 +136,17 @@ static void blk_flush_queue_rq(struct request *rq, bool add_front)
+ 	blk_mq_add_to_requeue_list(rq, add_front, true);
+ }
+ 
++static void blk_account_io_flush(struct request *rq)
++{
++	struct hd_struct *part = &rq->rq_disk->part0;
++
++	part_stat_lock();
++	part_stat_inc(part, ios[STAT_FLUSH]);
++	part_stat_add(part, nsecs[STAT_FLUSH],
++		      ktime_get_ns() - rq->start_time_ns);
++	part_stat_unlock();
++}
++
+ /**
+  * blk_flush_complete_seq - complete flush sequence
+  * @rq: PREFLUSH/FUA request being sequenced
+@@ -185,7 +196,7 @@ static void blk_flush_complete_seq(struct request *rq,
+ 
+ 	case REQ_FSEQ_DONE:
+ 		/*
+-		 * @rq was previously adjusted by blk_flush_issue() for
++		 * @rq was previously adjusted by blk_insert_flush() for
+ 		 * flush sequencing and may already have gone through the
+ 		 * flush data request completion path.  Restore @rq for
+ 		 * normal completion and end it.
+@@ -212,6 +223,8 @@ static void flush_end_io(struct request *flush_rq, blk_status_t error)
+ 	struct blk_flush_queue *fq = blk_get_flush_queue(q, flush_rq->mq_ctx);
+ 	struct blk_mq_hw_ctx *hctx;
+ 
++	blk_account_io_flush(flush_rq);
++
+ 	/* release the tag's ownership to the req cloned from */
+ 	spin_lock_irqsave(&fq->mq_flush_lock, flags);
+ 
+diff --git a/block/genhd.c b/block/genhd.c
+index 26b31fcae217..ff6268970ddc 100644
+--- a/block/genhd.c
++++ b/block/genhd.c
+@@ -1385,7 +1385,9 @@ static int diskstats_show(struct seq_file *seqf, void *v)
+ 			   "%lu %lu %lu %u "
+ 			   "%lu %lu %lu %u "
+ 			   "%u %u %u "
+-			   "%lu %lu %lu %u\n",
++			   "%lu %lu %lu %u "
++			   "%lu %u"
++			   "\n",
+ 			   MAJOR(part_devt(hd)), MINOR(part_devt(hd)),
+ 			   disk_name(gp, hd->partno, buf),
+ 			   part_stat_read(hd, ios[STAT_READ]),
+@@ -1402,7 +1404,9 @@ static int diskstats_show(struct seq_file *seqf, void *v)
+ 			   part_stat_read(hd, ios[STAT_DISCARD]),
+ 			   part_stat_read(hd, merges[STAT_DISCARD]),
+ 			   part_stat_read(hd, sectors[STAT_DISCARD]),
+-			   (unsigned int)part_stat_read_msecs(hd, STAT_DISCARD)
++			   (unsigned int)part_stat_read_msecs(hd, STAT_DISCARD),
++			   part_stat_read(hd, ios[STAT_FLUSH]),
++			   (unsigned int)part_stat_read_msecs(hd, STAT_FLUSH)
+ 			);
+ 	}
+ 	disk_part_iter_exit(&piter);
+diff --git a/block/partition-generic.c b/block/partition-generic.c
+index aee643ce13d1..3db8b73a96b1 100644
+--- a/block/partition-generic.c
++++ b/block/partition-generic.c
+@@ -127,7 +127,8 @@ ssize_t part_stat_show(struct device *dev,
+ 		"%8lu %8lu %8llu %8u "
+ 		"%8lu %8lu %8llu %8u "
+ 		"%8u %8u %8u "
+-		"%8lu %8lu %8llu %8u"
++		"%8lu %8lu %8llu %8u "
++		"%8lu %8u"
+ 		"\n",
+ 		part_stat_read(p, ios[STAT_READ]),
+ 		part_stat_read(p, merges[STAT_READ]),
+@@ -143,7 +144,9 @@ ssize_t part_stat_show(struct device *dev,
+ 		part_stat_read(p, ios[STAT_DISCARD]),
+ 		part_stat_read(p, merges[STAT_DISCARD]),
+ 		(unsigned long long)part_stat_read(p, sectors[STAT_DISCARD]),
+-		(unsigned int)part_stat_read_msecs(p, STAT_DISCARD));
++		(unsigned int)part_stat_read_msecs(p, STAT_DISCARD),
++		part_stat_read(p, ios[STAT_FLUSH]),
++		(unsigned int)part_stat_read_msecs(p, STAT_FLUSH));
+ }
+ 
+ ssize_t part_inflight_show(struct device *dev, struct device_attribute *attr,
+diff --git a/include/linux/blk_types.h b/include/linux/blk_types.h
+index d688b96d1d63..b811a673a300 100644
+--- a/include/linux/blk_types.h
++++ b/include/linux/blk_types.h
+@@ -371,6 +371,7 @@ enum stat_group {
+ 	STAT_READ,
+ 	STAT_WRITE,
+ 	STAT_DISCARD,
++	STAT_FLUSH,
+ 
+ 	NR_STAT_GROUPS
+ };
 
