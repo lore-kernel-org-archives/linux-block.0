@@ -2,75 +2,89 @@ Return-Path: <SRS0=S5B1=ZN=vger.kernel.org=linux-block-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-5.2 required=3.0 tests=DKIM_SIGNED,DKIM_VALID,
-	HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,
-	SPF_PASS,URIBL_BLOCKED,USER_AGENT_SANE_1 autolearn=ham autolearn_force=no
-	version=3.4.0
+X-Spam-Status: No, score=-2.2 required=3.0 tests=DKIM_SIGNED,DKIM_VALID,
+	HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,
+	USER_AGENT_SANE_1 autolearn=no autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id CC9E0C432C0
-	for <linux-block@archiver.kernel.org>; Thu, 21 Nov 2019 18:37:28 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 4F6FEC432C0
+	for <linux-block@archiver.kernel.org>; Thu, 21 Nov 2019 19:00:08 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.kernel.org (Postfix) with ESMTP id 9F392206CB
-	for <linux-block@archiver.kernel.org>; Thu, 21 Nov 2019 18:37:28 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id 24E7720672
+	for <linux-block@archiver.kernel.org>; Thu, 21 Nov 2019 19:00:08 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel-dk.20150623.gappssmtp.com header.i=@kernel-dk.20150623.gappssmtp.com header.b="EJjPbSz0"
+	dkim=pass (2048-bit key) header.d=kernel-dk.20150623.gappssmtp.com header.i=@kernel-dk.20150623.gappssmtp.com header.b="v+yf4A6a"
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1727156AbfKUSh1 (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Thu, 21 Nov 2019 13:37:27 -0500
-Received: from mail-il1-f194.google.com ([209.85.166.194]:41859 "EHLO
-        mail-il1-f194.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1727092AbfKUSh1 (ORCPT
+        id S1726541AbfKUTAH (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Thu, 21 Nov 2019 14:00:07 -0500
+Received: from mail-io1-f66.google.com ([209.85.166.66]:44513 "EHLO
+        mail-io1-f66.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S1726379AbfKUTAH (ORCPT
         <rfc822;linux-block@vger.kernel.org>);
-        Thu, 21 Nov 2019 13:37:27 -0500
-Received: by mail-il1-f194.google.com with SMTP id q15so4281190ils.8
-        for <linux-block@vger.kernel.org>; Thu, 21 Nov 2019 10:37:26 -0800 (PST)
+        Thu, 21 Nov 2019 14:00:07 -0500
+Received: by mail-io1-f66.google.com with SMTP id j20so4679372ioo.11
+        for <linux-block@vger.kernel.org>; Thu, 21 Nov 2019 11:00:06 -0800 (PST)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=kernel-dk.20150623.gappssmtp.com; s=20150623;
         h=subject:to:cc:references:from:message-id:date:user-agent
          :mime-version:in-reply-to:content-language:content-transfer-encoding;
-        bh=faq1HCiwAUKpn9KibrFveIIN8Gq95mpKVvXAdv0gtDk=;
-        b=EJjPbSz0Y6tDOEGVI+1jJ8atWnfgVSawkkT8eN6V6cCPix2Oo1Ul5auUyUzMkYlDoK
-         3qNVcfI7jBdMccdBn/qZtJ6b635qSK6GyU075QBm/DiZL+E8zm9p4ZUKRL1MoOZVUo9N
-         hoLYwkn2XLv87sQlikDmsBXss5UhTiaeuDHLmSWYC9JxUub0lmUUW2xZVXJnpyOXNaGw
-         y82WJV8Pyc4iflpx/NYF12hA4nSerOKHfUJ23hnfkFrUUUVENyO4lqlRhEgEEDYvonHB
-         7Ro2z4dGPGwjzFmYorVFleDJuov531ZDGun6BqLfvQZGB8jgtd1IecdJaPKyCHOmApK5
-         PRKw==
+        bh=SnPj/n1gyGH0v59Wr7JbdghJQmtp3nHLjHxqakaNQHY=;
+        b=v+yf4A6aRgckwfN25zrv7pKeKGK6P2XVAvXldacF+NRZh72s3fqXxw895IGgT3kpJ8
+         J0OgyZgRa5EykvqtQ4nlYu2dzwJqrcPu3ygwQatG0jYJ4izFKF4YiFuO3M8eE3TAZMUa
+         JaiLbU169r/mOsVmJIvi2s+I58CDBQY4tdMucTV3RV4eLage8BB3Yd75kYYyAi9ndu0n
+         F4ePjwNjCbZ7yFLNqVUK78A2YqBBp0Wtv6MMpPS5g1y0FUCv0/EXWLB4B/dY/CSpTxFg
+         mrO6v7iaLGZcq2pVfRo/btCriOBV1ZR8IcYvUwaaZttwkJlvUftuWYKJ9wpvxJI32QwW
+         rAhQ==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=1e100.net; s=20161025;
         h=x-gm-message-state:subject:to:cc:references:from:message-id:date
          :user-agent:mime-version:in-reply-to:content-language
          :content-transfer-encoding;
-        bh=faq1HCiwAUKpn9KibrFveIIN8Gq95mpKVvXAdv0gtDk=;
-        b=lTFR+xjRZcpkd1Gi/hi417k2uyr7l1wf/paHhh6qqMJDEmJCh4bVIdgFCn+ygAGJVO
-         t1WXN7XT76XrWaB8LJfLSFkiLv5o7LnNu2ogQzcXb4f5FYhclMDGvE7+/xDQ4D5XtmXg
-         HgSY4TI/p764QIFb6SsWcSNsxskimqAzXEXIalawG96beZXYLjd0CIjqTYxd/6L4vWVd
-         B1wVhHBvHZ26fUc56ng+cmFGdfblX7DK2m5PWd7cNWkV1a63q3TY8A/g1tkCqT3js7YT
-         usI/N3oWk6imOLBvYxKhnOXAqjcy5tn1ys4bJlJnof/HcfLTDv/Y6EZoigsWr65IergX
-         EH+Q==
-X-Gm-Message-State: APjAAAVp/Fzr1pKBYG74iZ4rNaPXpqEtaMTKyF4sorqV6hkQQQpo02sR
-        zsj3WcU+GQGgafaFB7TSiGtxeQ==
-X-Google-Smtp-Source: APXvYqwleGilbYtjejG0htBS2Id79yaqhJ2aVAJKwRv51I6HzmumqzuaenMu1RY8209HZRrCTLCAsA==
-X-Received: by 2002:a92:b686:: with SMTP id m6mr11013166ill.35.1574361446126;
-        Thu, 21 Nov 2019 10:37:26 -0800 (PST)
+        bh=SnPj/n1gyGH0v59Wr7JbdghJQmtp3nHLjHxqakaNQHY=;
+        b=uRpb7/ipZA+bWHiiwpI/4ORuNlfvMf2kp4N7F4PL0FIWRIfbo3/aB2V3JpgfyXIL9I
+         xToiAHot8EvigfJbjDHHh2WoEgASooNLVkbz52S82bcouvOA/RcWYYydBQdsA21JXLbb
+         ZSf7kKhEAG6SeRZkLER8VJak5qzThDWngwSOjHRkU6FQ+of9Sc2VV2JHpDA/KED0gnPv
+         +IRJpenJN9RkQf0+7axnk1YqYB5ZaEr++B0Cw8oX5OUEiEC6oGG/xIMp+Z8bPfJiLyYp
+         Lf+W8xR3K6iEbLS0dmelvy+/9fygueMihYBGWjAnRFxJFYlurw0BiGQLlbrKuzTYAsJq
+         Ygrw==
+X-Gm-Message-State: APjAAAVIGsh/Jz9rC4ptmjRV2I2HVbGz6K8Tq3I9jewQ4wXQGYewcbTI
+        xRgIyLdscqTbRBULMu0rEDB6yw==
+X-Google-Smtp-Source: APXvYqwRT3wSZZTVGt8hSDmQAxZRovFkX++EpdpjERq09vW/IKK+mqwWvCHPHk9lkKVR7nOrptsX6g==
+X-Received: by 2002:a02:b00c:: with SMTP id p12mr4583129jah.112.1574362806304;
+        Thu, 21 Nov 2019 11:00:06 -0800 (PST)
 Received: from [192.168.1.159] ([65.144.74.34])
-        by smtp.gmail.com with ESMTPSA id s11sm1518746ilh.54.2019.11.21.10.37.24
+        by smtp.gmail.com with ESMTPSA id i79sm1492127ild.6.2019.11.21.11.00.03
         (version=TLS1_2 cipher=ECDHE-RSA-AES128-GCM-SHA256 bits=128/128);
-        Thu, 21 Nov 2019 10:37:25 -0800 (PST)
-Subject: Re: [PATCH] nbd: prevent memory leak
-To:     Josef Bacik <josef@toxicpanda.com>,
-        Navid Emamdoost <navid.emamdoost@gmail.com>
-Cc:     emamd001@umn.edu, smccaman@umn.edu, kjlu@umn.edu,
-        linux-block@vger.kernel.org, nbd@other.debian.org,
-        linux-kernel@vger.kernel.org
-References: <20190923200959.29643-1-navid.emamdoost@gmail.com>
- <20191121183017.h3qkpib5re27ty3b@MacBook-Pro-91.local>
+        Thu, 21 Nov 2019 11:00:05 -0800 (PST)
+Subject: Re: [PATCH v4 00/10] Fix cdrom autoclose
+To:     Michal Suchanek <msuchanek@suse.de>, linux-scsi@vger.kernel.org,
+        linux-block@vger.kernel.org
+Cc:     Jonathan Corbet <corbet@lwn.net>,
+        "James E.J. Bottomley" <jejb@linux.ibm.com>,
+        "Martin K. Petersen" <martin.petersen@oracle.com>,
+        Alexander Viro <viro@zeniv.linux.org.uk>,
+        Eric Biggers <ebiggers@google.com>,
+        "J. Bruce Fields" <bfields@redhat.com>,
+        Mauro Carvalho Chehab <mchehab+samsung@kernel.org>,
+        Benjamin Coddington <bcodding@redhat.com>,
+        Ming Lei <ming.lei@redhat.com>,
+        Chaitanya Kulkarni <chaitanya.kulkarni@wdc.com>,
+        Bart Van Assche <bvanassche@acm.org>,
+        Damien Le Moal <damien.lemoal@wdc.com>,
+        Hou Tao <houtao1@huawei.com>,
+        Pavel Begunkov <asml.silence@gmail.com>,
+        linux-kernel@vger.kernel.org, linux-fsdevel@vger.kernel.org,
+        Jan Kara <jack@suse.cz>, Hannes Reinecke <hare@suse.com>,
+        "Ewan D. Milne" <emilne@redhat.com>,
+        Christoph Hellwig <hch@infradead.org>,
+        Matthew Wilcox <willy@infradead.org>
+References: <cover.1574355709.git.msuchanek@suse.de>
 From:   Jens Axboe <axboe@kernel.dk>
-Message-ID: <ae75694c-02a5-6f7f-c812-1350512490da@kernel.dk>
-Date:   Thu, 21 Nov 2019 11:37:23 -0700
+Message-ID: <4ba670de-80d4-130e-91f3-c6e1cc9c7a47@kernel.dk>
+Date:   Thu, 21 Nov 2019 12:00:03 -0700
 User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:60.0) Gecko/20100101
  Thunderbird/60.9.0
 MIME-Version: 1.0
-In-Reply-To: <20191121183017.h3qkpib5re27ty3b@MacBook-Pro-91.local>
+In-Reply-To: <cover.1574355709.git.msuchanek@suse.de>
 Content-Type: text/plain; charset=utf-8
 Content-Language: en-US
 Content-Transfer-Encoding: 7bit
@@ -79,18 +93,25 @@ Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-On 11/21/19 11:30 AM, Josef Bacik wrote:
-> On Mon, Sep 23, 2019 at 03:09:58PM -0500, Navid Emamdoost wrote:
->> In nbd_add_socket when krealloc succeeds, if nsock's allocation fail the
->> reallocted memory is leak. The correct behaviour should be assigning the
->> reallocted memory to config->socks right after success.
->>
->> Signed-off-by: Navid Emamdoost <navid.emamdoost@gmail.com>
->> ---
+On 11/21/19 10:13 AM, Michal Suchanek wrote:
+> Hello,
 > 
-> Reviewed-by: Josef Bacik <josef@toxicpanda.com>
+> there is cdrom autoclose feature that is supposed to close the tray,
+> wait for the disc to become ready, and then open the device.
+> 
+> This used to work in ancient times. Then in old times there was a hack
+> in util-linux which worked around the breakage which probably resulted
+> from switching to scsi emulation.
+> 
+> Currently util-linux maintainer refuses to merge another hack on the
+> basis that kernel still has the feature so it should be fixed there.
+> The code needs not be replicated in every userspace utility like mount
+> or dd which has no business knowing which devices are CD-roms and where
+> the autoclose setting is in the kernel.
 
-Now applied, thanks.
+This is a lot of code/churn (and even an fops addition...) to work around
+a broken hw emulation, essentially. Why aren't we just pushing vmware
+to fix this?
 
 -- 
 Jens Axboe
