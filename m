@@ -2,192 +2,133 @@ Return-Path: <SRS0=S5B1=ZN=vger.kernel.org=linux-block-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-10.1 required=3.0 tests=DKIMWL_WL_HIGH,DKIM_SIGNED,
-	DKIM_VALID,DKIM_VALID_AU,INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,
-	SPF_HELO_NONE,SPF_PASS,USER_AGENT_GIT autolearn=ham autolearn_force=no
-	version=3.4.0
+X-Spam-Status: No, score=-2.4 required=3.0 tests=DKIM_SIGNED,DKIM_VALID,
+	DKIM_VALID_AU,HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SPF_HELO_NONE,
+	SPF_PASS,USER_AGENT_SANE_1 autolearn=no autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id DA059C432C0
-	for <linux-block@archiver.kernel.org>; Thu, 21 Nov 2019 03:19:10 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id AFEB5C432C0
+	for <linux-block@archiver.kernel.org>; Thu, 21 Nov 2019 04:12:41 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.kernel.org (Postfix) with ESMTP id A9D6E208A1
-	for <linux-block@archiver.kernel.org>; Thu, 21 Nov 2019 03:19:10 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=default; t=1574306350;
-	bh=TPz5EgcuOBWB3eKu+t5L++624Br3DKKb2jnElgd4ADM=;
-	h=From:To:Cc:Subject:Date:List-ID:From;
-	b=n7zvYMWNS6scBI2mtnXLfGpqRRzJAu6H5PbrmwxTutq5OESG6o27ro61lAc2SQuRM
-	 COZm3BDRsi9jczjTu5RxtonsPVM6vHbNedbp903czzsBrKWB67Kxi3gv4P1AehLh4Z
-	 2u91wkXjdXwCW/41FGf20M2q9ZP930j4QcxB+Uaw=
+	by mail.kernel.org (Postfix) with ESMTP id 8857A2075A
+	for <linux-block@archiver.kernel.org>; Thu, 21 Nov 2019 04:12:41 +0000 (UTC)
+Authentication-Results: mail.kernel.org;
+	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="A0awJzPu"
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1727007AbfKUDTJ (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Wed, 20 Nov 2019 22:19:09 -0500
-Received: from mail.kernel.org ([198.145.29.99]:60682 "EHLO mail.kernel.org"
-        rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-        id S1725819AbfKUDTJ (ORCPT <rfc822;linux-block@vger.kernel.org>);
-        Wed, 20 Nov 2019 22:19:09 -0500
-Received: from PC-kkoz.proceq.com (unknown [213.160.61.66])
-        (using TLSv1.2 with cipher ECDHE-RSA-AES128-SHA256 (128/128 bits))
+        id S1726396AbfKUEMl (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Wed, 20 Nov 2019 23:12:41 -0500
+Received: from us-smtp-1.mimecast.com ([207.211.31.81]:60145 "EHLO
+        us-smtp-delivery-1.mimecast.com" rhost-flags-OK-OK-OK-FAIL)
+        by vger.kernel.org with ESMTP id S1726358AbfKUEMk (ORCPT
+        <rfc822;linux-block@vger.kernel.org>);
+        Wed, 20 Nov 2019 23:12:40 -0500
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+        s=mimecast20190719; t=1574309559;
+        h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+         to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+         content-transfer-encoding:content-transfer-encoding:
+         in-reply-to:in-reply-to:references:references;
+        bh=CZUIqBMR6wLsrB1pzvMspDtsS2uxJ9Z3B895d3xxyhE=;
+        b=A0awJzPuCi29v5Gk4mNRffgYUpux1f9ynGRO6No2m8fKzxAlOkTBadHFsQa4QjUwPe2hLt
+        P/OcHGqT6ysCynV2VQZteh3+iP4qFh7yLbkpXkIO8DT/nMoGiM0y20x7g2UqGZe/CXPecF
+        69qpyagtonT2qCo/BjymdXLKqsr99mc=
+Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
+ [209.132.183.4]) (Using TLS) by relay.mimecast.com with ESMTP id
+ us-mta-41-GjDFkWbaOa24NTmzCEj4lg-1; Wed, 20 Nov 2019 23:12:36 -0500
+Received: from smtp.corp.redhat.com (int-mx02.intmail.prod.int.phx2.redhat.com [10.5.11.12])
+        (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
         (No client certificate requested)
-        by mail.kernel.org (Postfix) with ESMTPSA id 2537820721;
-        Thu, 21 Nov 2019 03:19:06 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-        s=default; t=1574306348;
-        bh=TPz5EgcuOBWB3eKu+t5L++624Br3DKKb2jnElgd4ADM=;
-        h=From:To:Cc:Subject:Date:From;
-        b=X1rWb2kJtwT/XvLPH6WcQrDch7Xhcu4VIHH2NGjxICLVYGKq0bsFPNPQmK4S+GbXB
-         hgHdXmIkpQw/WiqP8HG0s2fTzysuGgsDK/33Edenab+weWQH4oxvykbqlPhnGNnP9y
-         nFCadSKsplCX7k6s5BMoS9NtCrUhgxaukZcYOWxc=
-From:   Krzysztof Kozlowski <krzk@kernel.org>
-To:     linux-kernel@vger.kernel.org
-Cc:     Krzysztof Kozlowski <krzk@kernel.org>,
-        Jens Axboe <axboe@kernel.dk>, linux-block@vger.kernel.org
-Subject: [PATCH v2] block: Fix Kconfig indentation
-Date:   Thu, 21 Nov 2019 04:19:05 +0100
-Message-Id: <1574306345-29160-1-git-send-email-krzk@kernel.org>
-X-Mailer: git-send-email 2.7.4
+        by mimecast-mx01.redhat.com (Postfix) with ESMTPS id DD8ED107ACC4;
+        Thu, 21 Nov 2019 04:12:34 +0000 (UTC)
+Received: from ming.t460p (ovpn-8-21.pek2.redhat.com [10.72.8.21])
+        by smtp.corp.redhat.com (Postfix) with ESMTPS id 131516CE4D;
+        Thu, 21 Nov 2019 04:12:22 +0000 (UTC)
+Date:   Thu, 21 Nov 2019 12:12:18 +0800
+From:   Ming Lei <ming.lei@redhat.com>
+To:     Phil Auld <pauld@redhat.com>
+Cc:     Peter Zijlstra <peterz@infradead.org>,
+        Dave Chinner <david@fromorbit.com>,
+        linux-block@vger.kernel.org, linux-fsdevel@vger.kernel.org,
+        linux-xfs@vger.kernel.org, linux-kernel@vger.kernel.org,
+        Jeff Moyer <jmoyer@redhat.com>,
+        Dave Chinner <dchinner@redhat.com>,
+        Eric Sandeen <sandeen@redhat.com>,
+        Christoph Hellwig <hch@lst.de>, Jens Axboe <axboe@kernel.dk>,
+        Ingo Molnar <mingo@redhat.com>, Tejun Heo <tj@kernel.org>,
+        Vincent Guittot <vincent.guittot@linaro.org>
+Subject: Re: single aio thread is migrated crazily by scheduler
+Message-ID: <20191121041218.GK24548@ming.t460p>
+References: <20191114113153.GB4213@ming.t460p>
+ <20191114235415.GL4614@dread.disaster.area>
+ <20191115010824.GC4847@ming.t460p>
+ <20191115045634.GN4614@dread.disaster.area>
+ <20191115070843.GA24246@ming.t460p>
+ <20191115234005.GO4614@dread.disaster.area>
+ <20191118092121.GV4131@hirez.programming.kicks-ass.net>
+ <20191118204054.GV4614@dread.disaster.area>
+ <20191120191636.GI4097@hirez.programming.kicks-ass.net>
+ <20191120220313.GC18056@pauld.bos.csb>
+MIME-Version: 1.0
+In-Reply-To: <20191120220313.GC18056@pauld.bos.csb>
+User-Agent: Mutt/1.12.1 (2019-06-15)
+X-Scanned-By: MIMEDefang 2.79 on 10.5.11.12
+X-MC-Unique: GjDFkWbaOa24NTmzCEj4lg-1
+X-Mimecast-Spam-Score: 0
+Content-Type: text/plain; charset=WINDOWS-1252
+Content-Transfer-Encoding: quoted-printable
+Content-Disposition: inline
 Sender: linux-block-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-Adjust indentation from spaces to tab (+optional two spaces) as in
-coding style with command like:
-	$ sed -e 's/^        /\t/' -i */Kconfig
+On Wed, Nov 20, 2019 at 05:03:13PM -0500, Phil Auld wrote:
+> Hi Peter,
+>=20
+> On Wed, Nov 20, 2019 at 08:16:36PM +0100 Peter Zijlstra wrote:
+> > On Tue, Nov 19, 2019 at 07:40:54AM +1100, Dave Chinner wrote:
+> > > On Mon, Nov 18, 2019 at 10:21:21AM +0100, Peter Zijlstra wrote:
+> >=20
+> > > > We typically only fall back to the active balancer when there is
+> > > > (persistent) imbalance and we fail to migrate anything else (of
+> > > > substance).
+> > > >=20
+> > > > The tuning mentioned has the effect of less frequent scheduling, IO=
+W,
+> > > > leaving (short) tasks on the runqueue longer. This obviously means =
+the
+> > > > load-balancer will have a bigger chance of seeing them.
+> > > >=20
+> > > > Now; it's been a while since I looked at the workqueue code but one
+> > > > possible explanation would be if the kworker that picks up the work=
+ item
+> > > > is pinned. That would make it runnable but not migratable, the exac=
+t
+> > > > situation in which we'll end up shooting the current task with acti=
+ve
+> > > > balance.
+> > >=20
+> > > Yes, that's precisely the problem - work is queued, by default, on a
+> > > specific CPU and it will wait for a kworker that is pinned to that
+> >=20
+> > I'm thinking the problem is that it doesn't wait. If it went and waited
+> > for it, active balance wouldn't be needed, that only works on active
+> > tasks.
+>=20
+> Since this is AIO I wonder if it should queue_work on a nearby cpu by=20
+> default instead of unbound. =20
 
-Signed-off-by: Krzysztof Kozlowski <krzk@kernel.org>
+When the current CPU isn't busy enough, there is still cost for completing
+request remotely.
 
----
+Or could we change queue_work() in the following way?
 
-Changes since v1:
-1. Fix also 7-space and tab+1 space indentation issues.
----
- block/Kconfig                  | 14 +++++++-------
- block/Kconfig.iosched          | 12 ++++++------
- drivers/block/Kconfig          | 28 ++++++++++++++--------------
- drivers/block/mtip32xx/Kconfig |  2 +-
- 4 files changed, 28 insertions(+), 28 deletions(-)
+ * We try to queue the work to the CPU on which it was submitted, but if th=
+e
+ * CPU dies or is saturated enough it can be processed by another CPU.
 
-diff --git a/block/Kconfig b/block/Kconfig
-index 9fa6ce2177bc..ec3b958f0a23 100644
---- a/block/Kconfig
-+++ b/block/Kconfig
-@@ -3,11 +3,11 @@
- # Block layer core configuration
- #
- menuconfig BLOCK
--       bool "Enable the block layer" if EXPERT
--       default y
--       select SBITMAP
--       select SRCU
--       help
-+	bool "Enable the block layer" if EXPERT
-+	default y
-+	select SBITMAP
-+	select SRCU
-+	help
- 	 Provide block layer support for the kernel.
- 
- 	 Disable this option to remove the block layer support from the
-@@ -171,8 +171,8 @@ config BLK_DEBUG_FS
- 	say Y here.
- 
- config BLK_DEBUG_FS_ZONED
--       bool
--       default BLK_DEBUG_FS && BLK_DEV_ZONED
-+	bool
-+	default BLK_DEBUG_FS && BLK_DEV_ZONED
- 
- config BLK_SED_OPAL
- 	bool "Logic for interfacing with Opal enabled SEDs"
-diff --git a/block/Kconfig.iosched b/block/Kconfig.iosched
-index 7df14133adc8..b11a421b7387 100644
---- a/block/Kconfig.iosched
-+++ b/block/Kconfig.iosched
-@@ -29,13 +29,13 @@ config IOSCHED_BFQ
- 	Documentation/block/bfq-iosched.rst
- 
- config BFQ_GROUP_IOSCHED
--       bool "BFQ hierarchical scheduling support"
--       depends on IOSCHED_BFQ && BLK_CGROUP
--       select BLK_CGROUP_RWSTAT
--       ---help---
-+	bool "BFQ hierarchical scheduling support"
-+	depends on IOSCHED_BFQ && BLK_CGROUP
-+	select BLK_CGROUP_RWSTAT
-+	---help---
- 
--       Enable hierarchical scheduling in BFQ, using the blkio
--       (cgroups-v1) or io (cgroups-v2) controller.
-+	Enable hierarchical scheduling in BFQ, using the blkio
-+	(cgroups-v1) or io (cgroups-v2) controller.
- 
- config BFQ_CGROUP_DEBUG
- 	bool "BFQ IO controller debugging"
-diff --git a/drivers/block/Kconfig b/drivers/block/Kconfig
-index 1bb8ec575352..fa0cd072f5a1 100644
---- a/drivers/block/Kconfig
-+++ b/drivers/block/Kconfig
-@@ -142,10 +142,10 @@ config BLK_DEV_UBD
- 	bool "Virtual block device"
- 	depends on UML
- 	---help---
--          The User-Mode Linux port includes a driver called UBD which will let
--          you access arbitrary files on the host computer as block devices.
--          Unless you know that you do not need such virtual block devices say
--          Y here.
-+	  The User-Mode Linux port includes a driver called UBD which will let
-+	  you access arbitrary files on the host computer as block devices.
-+	  Unless you know that you do not need such virtual block devices say
-+	  Y here.
- 
- config BLK_DEV_UBD_SYNC
- 	bool "Always do synchronous disk IO for UBD"
-@@ -156,16 +156,16 @@ config BLK_DEV_UBD_SYNC
- 	  Linux 'Virtual Machine' uses a journalling filesystem and the host
- 	  computer crashes.
- 
--          Synchronous operation (i.e. always writing data to the host's disk
--          immediately) is configurable on a per-UBD basis by using a special
--          kernel command line option.  Alternatively, you can say Y here to
--          turn on synchronous operation by default for all block devices.
-+	  Synchronous operation (i.e. always writing data to the host's disk
-+	  immediately) is configurable on a per-UBD basis by using a special
-+	  kernel command line option.  Alternatively, you can say Y here to
-+	  turn on synchronous operation by default for all block devices.
- 
--          If you're running a journalling file system (like reiserfs, for
--          example) in your virtual machine, you will want to say Y here.  If
--          you care for the safety of the data in your virtual machine, Y is a
--          wise choice too.  In all other cases (for example, if you're just
--          playing around with User-Mode Linux) you can choose N.
-+	  If you're running a journalling file system (like reiserfs, for
-+	  example) in your virtual machine, you will want to say Y here.  If
-+	  you care for the safety of the data in your virtual machine, Y is a
-+	  wise choice too.  In all other cases (for example, if you're just
-+	  playing around with User-Mode Linux) you can choose N.
- 
- config BLK_DEV_COW_COMMON
- 	bool
-@@ -430,7 +430,7 @@ config VIRTIO_BLK
- 	depends on VIRTIO
- 	---help---
- 	  This is the virtual block driver for virtio.  It can be used with
--          QEMU based VMMs (like KVM or Xen).  Say Y or M.
-+	  QEMU based VMMs (like KVM or Xen).  Say Y or M.
- 
- config VIRTIO_BLK_SCSI
- 	bool "SCSI passthrough request for the Virtio block driver"
-diff --git a/drivers/block/mtip32xx/Kconfig b/drivers/block/mtip32xx/Kconfig
-index bf221358567e..a469dc72e67a 100644
---- a/drivers/block/mtip32xx/Kconfig
-+++ b/drivers/block/mtip32xx/Kconfig
-@@ -7,4 +7,4 @@ config BLK_DEV_PCIESSD_MTIP32XX
- 	tristate "Block Device Driver for Micron PCIe SSDs"
- 	depends on PCI
- 	help
--          This enables the block driver for Micron PCIe SSDs.
-+	  This enables the block driver for Micron PCIe SSDs.
--- 
-2.7.4
+Can we decide in a simple or efficient way if the current CPU is saturated
+enough?
+
+Thanks,
+Ming
 
