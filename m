@@ -1,75 +1,75 @@
-Return-Path: <SRS0=usZV=ZM=vger.kernel.org=linux-block-owner@kernel.org>
+Return-Path: <SRS0=S5B1=ZN=vger.kernel.org=linux-block-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-2.4 required=3.0 tests=DKIM_SIGNED,DKIM_VALID,
-	DKIM_VALID_AU,HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SPF_HELO_NONE,
-	SPF_PASS,USER_AGENT_SANE_1 autolearn=no autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-8.3 required=3.0 tests=DKIM_SIGNED,DKIM_VALID,
+	DKIM_VALID_AU,HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,
+	SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED,USER_AGENT_SANE_1
+	autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 13FE0C432C0
-	for <linux-block@archiver.kernel.org>; Wed, 20 Nov 2019 22:03:33 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 3CC0BC432C0
+	for <linux-block@archiver.kernel.org>; Thu, 21 Nov 2019 00:53:50 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.kernel.org (Postfix) with ESMTP id D88F620709
-	for <linux-block@archiver.kernel.org>; Wed, 20 Nov 2019 22:03:32 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id F25DE20878
+	for <linux-block@archiver.kernel.org>; Thu, 21 Nov 2019 00:53:49 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="DmZUR+Qy"
+	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="VoYmzusf"
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1726548AbfKTWD3 (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Wed, 20 Nov 2019 17:03:29 -0500
-Received: from us-smtp-1.mimecast.com ([205.139.110.61]:39618 "EHLO
+        id S1726747AbfKUAxt (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Wed, 20 Nov 2019 19:53:49 -0500
+Received: from us-smtp-2.mimecast.com ([205.139.110.61]:50424 "EHLO
         us-smtp-delivery-1.mimecast.com" rhost-flags-OK-OK-OK-FAIL)
-        by vger.kernel.org with ESMTP id S1726044AbfKTWD3 (ORCPT
+        by vger.kernel.org with ESMTP id S1726343AbfKUAxt (ORCPT
         <rfc822;linux-block@vger.kernel.org>);
-        Wed, 20 Nov 2019 17:03:29 -0500
+        Wed, 20 Nov 2019 19:53:49 -0500
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-        s=mimecast20190719; t=1574287407;
+        s=mimecast20190719; t=1574297626;
         h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
          to:to:cc:cc:mime-version:mime-version:content-type:content-type:
          content-transfer-encoding:content-transfer-encoding:
          in-reply-to:in-reply-to:references:references;
-        bh=f6C29Osq+JMxMyTsFEFeFdTV5O5zf4w1ZtFWoHQvhHQ=;
-        b=DmZUR+QysllpJRKa5v9RQt+0hHAZS694g22Fyq3YITnsYaa7NKQrcq7NmE8E53JVGdGmI+
-        gt/WLnmr7I0s7+wn2N77hLnnV38My6aWkLuIaFJLzylH73QBhxRVWfVmFTU9EXp/dXm+hJ
-        SEssoLyoZ45TKcd9neTk6y9+EgLX+aY=
+        bh=HG0/OMA4IePs0RwQcFpc3v10JQC01dLQlpMZrLx9Fik=;
+        b=VoYmzusf8qRucvaC9NJcwHK4wy56Kd7P8W9aI8dO+xwiJOqzkAag6PjW0toOFKOqthzR/t
+        516beU2qzbc6OTmzjaPis2K2N9mqTvYe1Mj6kLcv7C54g4b8XPCs/s4Ap1IPhM26szTt0a
+        BcVsNnGocS1jqTssHtBjSrNijTEX/jY=
 Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
  [209.132.183.4]) (Using TLS) by relay.mimecast.com with ESMTP id
- us-mta-318-cttqolrQN5ynM6c2_mDL9Q-1; Wed, 20 Nov 2019 17:03:24 -0500
+ us-mta-224-5Q7zU7eZOsaArDUQb6CWuA-1; Wed, 20 Nov 2019 19:53:38 -0500
 Received: from smtp.corp.redhat.com (int-mx03.intmail.prod.int.phx2.redhat.com [10.5.11.13])
         (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
         (No client certificate requested)
-        by mimecast-mx01.redhat.com (Postfix) with ESMTPS id 56DCE801E5D;
-        Wed, 20 Nov 2019 22:03:22 +0000 (UTC)
-Received: from pauld.bos.csb (dhcp-17-51.bos.redhat.com [10.18.17.51])
-        by smtp.corp.redhat.com (Postfix) with ESMTPS id 544F853C20;
-        Wed, 20 Nov 2019 22:03:15 +0000 (UTC)
-Date:   Wed, 20 Nov 2019 17:03:13 -0500
-From:   Phil Auld <pauld@redhat.com>
-To:     Peter Zijlstra <peterz@infradead.org>
-Cc:     Dave Chinner <david@fromorbit.com>, Ming Lei <ming.lei@redhat.com>,
-        linux-block@vger.kernel.org, linux-fsdevel@vger.kernel.org,
-        linux-xfs@vger.kernel.org, linux-kernel@vger.kernel.org,
-        Jeff Moyer <jmoyer@redhat.com>,
-        Dave Chinner <dchinner@redhat.com>,
-        Eric Sandeen <sandeen@redhat.com>,
-        Christoph Hellwig <hch@lst.de>, Jens Axboe <axboe@kernel.dk>,
-        Ingo Molnar <mingo@redhat.com>, Tejun Heo <tj@kernel.org>,
-        Vincent Guittot <vincent.guittot@linaro.org>
-Subject: Re: single aio thread is migrated crazily by scheduler
-Message-ID: <20191120220313.GC18056@pauld.bos.csb>
-References: <20191114113153.GB4213@ming.t460p>
- <20191114235415.GL4614@dread.disaster.area>
- <20191115010824.GC4847@ming.t460p>
- <20191115045634.GN4614@dread.disaster.area>
- <20191115070843.GA24246@ming.t460p>
- <20191115234005.GO4614@dread.disaster.area>
- <20191118092121.GV4131@hirez.programming.kicks-ass.net>
- <20191118204054.GV4614@dread.disaster.area>
- <20191120191636.GI4097@hirez.programming.kicks-ass.net>
+        by mimecast-mx01.redhat.com (Postfix) with ESMTPS id E455910CE792;
+        Thu, 21 Nov 2019 00:53:36 +0000 (UTC)
+Received: from ming.t460p (ovpn-8-21.pek2.redhat.com [10.72.8.21])
+        by smtp.corp.redhat.com (Postfix) with ESMTPS id 670046E501;
+        Thu, 21 Nov 2019 00:53:27 +0000 (UTC)
+Date:   Thu, 21 Nov 2019 08:53:23 +0800
+From:   Ming Lei <ming.lei@redhat.com>
+To:     Hannes Reinecke <hare@suse.de>
+Cc:     Jens Axboe <axboe@kernel.dk>, linux-block@vger.kernel.org,
+        "James E . J . Bottomley" <jejb@linux.ibm.com>,
+        "Martin K . Petersen" <martin.petersen@oracle.com>,
+        linux-scsi@vger.kernel.org,
+        Sathya Prakash <sathya.prakash@broadcom.com>,
+        Chaitra P B <chaitra.basappa@broadcom.com>,
+        Suganath Prabu Subramani 
+        <suganath-prabu.subramani@broadcom.com>,
+        Kashyap Desai <kashyap.desai@broadcom.com>,
+        Sumit Saxena <sumit.saxena@broadcom.com>,
+        Shivasharan S <shivasharan.srikanteshwara@broadcom.com>,
+        "Ewan D . Milne" <emilne@redhat.com>,
+        Christoph Hellwig <hch@lst.de>,
+        Bart Van Assche <bart.vanassche@wdc.com>
+Subject: Re: [PATCH 4/4] scsi: core: don't limit per-LUN queue depth for SSD
+Message-ID: <20191121005323.GB24548@ming.t460p>
+References: <20191118103117.978-1-ming.lei@redhat.com>
+ <20191118103117.978-5-ming.lei@redhat.com>
+ <1081145f-3e17-9bc1-2332-50a4b5621ef7@suse.de>
 MIME-Version: 1.0
-In-Reply-To: <20191120191636.GI4097@hirez.programming.kicks-ass.net>
-User-Agent: Mutt/1.5.21 (2010-09-15)
+In-Reply-To: <1081145f-3e17-9bc1-2332-50a4b5621ef7@suse.de>
+User-Agent: Mutt/1.12.1 (2019-06-15)
 X-Scanned-By: MIMEDefang 2.79 on 10.5.11.13
-X-MC-Unique: cttqolrQN5ynM6c2_mDL9Q-1
+X-MC-Unique: 5Q7zU7eZOsaArDUQb6CWuA-1
 X-Mimecast-Spam-Score: 0
 Content-Type: text/plain; charset=WINDOWS-1252
 Content-Transfer-Encoding: quoted-printable
@@ -79,123 +79,226 @@ Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-Hi Peter,
-
-On Wed, Nov 20, 2019 at 08:16:36PM +0100 Peter Zijlstra wrote:
-> On Tue, Nov 19, 2019 at 07:40:54AM +1100, Dave Chinner wrote:
-> > On Mon, Nov 18, 2019 at 10:21:21AM +0100, Peter Zijlstra wrote:
->=20
-> > > We typically only fall back to the active balancer when there is
-> > > (persistent) imbalance and we fail to migrate anything else (of
-> > > substance).
-> > >=20
-> > > The tuning mentioned has the effect of less frequent scheduling, IOW,
-> > > leaving (short) tasks on the runqueue longer. This obviously means th=
-e
-> > > load-balancer will have a bigger chance of seeing them.
-> > >=20
-> > > Now; it's been a while since I looked at the workqueue code but one
-> > > possible explanation would be if the kworker that picks up the work i=
-tem
-> > > is pinned. That would make it runnable but not migratable, the exact
-> > > situation in which we'll end up shooting the current task with active
-> > > balance.
+On Wed, Nov 20, 2019 at 11:05:24AM +0100, Hannes Reinecke wrote:
+> On 11/18/19 11:31 AM, Ming Lei wrote:
+> > SCSI core uses the atomic variable of sdev->device_busy to track
+> > in-flight IO requests dispatched to this scsi device. IO request may be
+> > submitted from any CPU, so the cost for maintaining the shared atomic
+> > counter can be very big on big NUMA machine with lots of CPU cores.
 > >=20
-> > Yes, that's precisely the problem - work is queued, by default, on a
-> > specific CPU and it will wait for a kworker that is pinned to that
->=20
-> I'm thinking the problem is that it doesn't wait. If it went and waited
-> for it, active balance wouldn't be needed, that only works on active
-> tasks.
-
-Since this is AIO I wonder if it should queue_work on a nearby cpu by=20
-default instead of unbound. =20
-
->=20
-> > specific CPU to dispatch it. We've already tested that queuing on a
-> > different CPU (via queue_work_on()) makes the problem largely go
-> > away as the work is not longer queued behind the long running fio
-> > task.
+> > sdev->queue_depth is usually used for two purposes: 1) improve IO merge=
+;
+> > 2) fair IO request scattered among all LUNs.
 > >=20
-> > This, however, is not at viable solution to the problem. The pattern
-> > of a long running process queuing small pieces of individual work
-> > for processing in a separate context is pretty common...
+> > blk-mq already provides fair request allocation among all active shared
+> > request queues(LUNs), see hctx_may_queue().
+> >=20
+> > NVMe doesn't have such per-request-queue(namespace) queue depth, so it
+> > is reasonable to ignore the limit for SCSI SSD too. Also IO merge won't
+> > play big role for reaching top SSD performance.
+> >=20
+> > With this patch, big cost for tracking in-flight per-LUN requests via
+> > atomic variable can be saved.
+> >=20
+> > Given QUEUE_FLAG_NONROT is read in IO path, we have to freeze queue
+> > before changing this flag.
+> >=20
+> > Cc: Sathya Prakash <sathya.prakash@broadcom.com>
+> > Cc: Chaitra P B <chaitra.basappa@broadcom.com>
+> > Cc: Suganath Prabu Subramani <suganath-prabu.subramani@broadcom.com>
+> > Cc: Kashyap Desai <kashyap.desai@broadcom.com>
+> > Cc: Sumit Saxena <sumit.saxena@broadcom.com>
+> > Cc: Shivasharan S <shivasharan.srikanteshwara@broadcom.com>
+> > Cc: Ewan D. Milne <emilne@redhat.com>
+> > Cc: Christoph Hellwig <hch@lst.de>,
+> > Cc: Hannes Reinecke <hare@suse.de>
+> > Cc: Bart Van Assche <bart.vanassche@wdc.com>
+> > Signed-off-by: Ming Lei <ming.lei@redhat.com>
+> > ---
+> >  block/blk-sysfs.c       | 14 +++++++++++++-
+> >  drivers/scsi/scsi_lib.c | 24 ++++++++++++++++++------
+> >  drivers/scsi/sd.c       |  4 ++++
+> >  3 files changed, 35 insertions(+), 7 deletions(-)
+> >=20
+> > diff --git a/block/blk-sysfs.c b/block/blk-sysfs.c
+> > index fca9b158f4a0..9cc0dd5f88a1 100644
+> > --- a/block/blk-sysfs.c
+> > +++ b/block/blk-sysfs.c
+> > @@ -281,6 +281,18 @@ QUEUE_SYSFS_BIT_FNS(random, ADD_RANDOM, 0);
+> >  QUEUE_SYSFS_BIT_FNS(iostats, IO_STAT, 0);
+> >  #undef QUEUE_SYSFS_BIT_FNS
+> > =20
+> > +static ssize_t queue_store_nonrot_freeze(struct request_queue *q,
+> > +=09=09const char *page, size_t count)
+> > +{
+> > +=09size_t ret;
+> > +
+> > +=09blk_mq_freeze_queue(q);
+> > +=09ret =3D queue_store_nonrot(q, page, count);
+> > +=09blk_mq_unfreeze_queue(q);
+> > +
+> > +=09return ret;
+> > +}
+> > +
+> >  static ssize_t queue_zoned_show(struct request_queue *q, char *page)
+> >  {
+> >  =09switch (blk_queue_zoned_model(q)) {
+> > @@ -642,7 +654,7 @@ static struct queue_sysfs_entry queue_write_zeroes_=
+max_entry =3D {
+> >  static struct queue_sysfs_entry queue_nonrot_entry =3D {
+> >  =09.attr =3D {.name =3D "rotational", .mode =3D 0644 },
+> >  =09.show =3D queue_show_nonrot,
+> > -=09.store =3D queue_store_nonrot,
+> > +=09.store =3D queue_store_nonrot_freeze,
+> >  };
+> > =20
+> >  static struct queue_sysfs_entry queue_zoned_entry =3D {
+> > diff --git a/drivers/scsi/scsi_lib.c b/drivers/scsi/scsi_lib.c
+> > index 62a86a82c38d..72655a049efd 100644
+> > --- a/drivers/scsi/scsi_lib.c
+> > +++ b/drivers/scsi/scsi_lib.c
+> > @@ -354,7 +354,8 @@ void scsi_device_unbusy(struct scsi_device *sdev, s=
+truct scsi_cmnd *cmd)
+> >  =09if (starget->can_queue > 0)
+> >  =09=09atomic_dec(&starget->target_busy);
+> > =20
+> > -=09atomic_dec(&sdev->device_busy);
+> > +=09if (!blk_queue_nonrot(sdev->request_queue))
+> > +=09=09atomic_dec(&sdev->device_busy);
+> >  }
+> > =20
+> >  static void scsi_kick_queue(struct request_queue *q)
+> > @@ -410,7 +411,8 @@ static void scsi_single_lun_run(struct scsi_device =
+*current_sdev)
+> > =20
+> >  static inline bool scsi_device_is_busy(struct scsi_device *sdev)
+> >  {
+> > -=09if (atomic_read(&sdev->device_busy) >=3D sdev->queue_depth)
+> > +=09if (!blk_queue_nonrot(sdev->request_queue) &&
+> > +=09=09=09atomic_read(&sdev->device_busy) >=3D sdev->queue_depth)
+> >  =09=09return true;
+> >  =09if (atomic_read(&sdev->device_blocked) > 0)
+> >  =09=09return true;
+> > @@ -1283,8 +1285,12 @@ static inline int scsi_dev_queue_ready(struct re=
+quest_queue *q,
+> >  =09=09=09=09  struct scsi_device *sdev)
+> >  {
+> >  =09unsigned int busy;
+> > +=09bool bypass =3D blk_queue_nonrot(sdev->request_queue);
+> > =20
+> > -=09busy =3D atomic_inc_return(&sdev->device_busy) - 1;
+> > +=09if (!bypass)
+> > +=09=09busy =3D atomic_inc_return(&sdev->device_busy) - 1;
+> > +=09else
+> > +=09=09busy =3D 0;
+> >  =09if (atomic_read(&sdev->device_blocked)) {
+> >  =09=09if (busy)
+> >  =09=09=09goto out_dec;
+> > @@ -1298,12 +1304,16 @@ static inline int scsi_dev_queue_ready(struct r=
+equest_queue *q,
+> >  =09=09=09=09   "unblocking device at zero depth\n"));
+> >  =09}
+> > =20
+> > +=09if (bypass)
+> > +=09=09return 1;
+> > +
+> >  =09if (busy >=3D sdev->queue_depth)
+> >  =09=09goto out_dec;
+> > =20
+> >  =09return 1;
+> >  out_dec:
+> > -=09atomic_dec(&sdev->device_busy);
+> > +=09if (!bypass)
+> > +=09=09atomic_dec(&sdev->device_busy);
+> >  =09return 0;
+> >  }
+> > =20
+> > @@ -1624,7 +1634,8 @@ static void scsi_mq_put_budget(struct blk_mq_hw_c=
+tx *hctx)
+> >  =09struct request_queue *q =3D hctx->queue;
+> >  =09struct scsi_device *sdev =3D q->queuedata;
+> > =20
+> > -=09atomic_dec(&sdev->device_busy);
+> > +=09if (!blk_queue_nonrot(sdev->request_queue))
+> > +=09=09atomic_dec(&sdev->device_busy);
+> >  }
+> > =20
+> >  static bool scsi_mq_get_budget(struct blk_mq_hw_ctx *hctx)
+> > @@ -1731,7 +1742,8 @@ static blk_status_t scsi_queue_rq(struct blk_mq_h=
+w_ctx *hctx,
+> >  =09case BLK_STS_OK:
+> >  =09=09break;
+> >  =09case BLK_STS_RESOURCE:
+> > -=09=09if (atomic_read(&sdev->device_busy) ||
+> > +=09=09if ((!blk_queue_nonrot(sdev->request_queue) &&
+> > +=09=09     atomic_read(&sdev->device_busy)) ||
+> >  =09=09    scsi_device_blocked(sdev))
+> >  =09=09=09ret =3D BLK_STS_DEV_RESOURCE;
+> >  =09=09break;
+> > diff --git a/drivers/scsi/sd.c b/drivers/scsi/sd.c
+> > index 0744c34468e1..c3d47117700d 100644
+> > --- a/drivers/scsi/sd.c
+> > +++ b/drivers/scsi/sd.c
+> > @@ -2927,7 +2927,9 @@ static void sd_read_block_characteristics(struct =
+scsi_disk *sdkp)
+> >  =09rot =3D get_unaligned_be16(&buffer[4]);
+> > =20
+> >  =09if (rot =3D=3D 1) {
+> > +=09=09blk_mq_freeze_queue(q);
+> >  =09=09blk_queue_flag_set(QUEUE_FLAG_NONROT, q);
+> > +=09=09blk_mq_unfreeze_queue(q);
+> >  =09=09blk_queue_flag_clear(QUEUE_FLAG_ADD_RANDOM, q);
+> >  =09}
+> > =20
+> > @@ -3123,7 +3125,9 @@ static int sd_revalidate_disk(struct gendisk *dis=
+k)
+> >  =09=09 * cause this to be updated correctly and any device which
+> >  =09=09 * doesn't support it should be treated as rotational.
+> >  =09=09 */
+> > +=09=09blk_mq_freeze_queue(q);
+> >  =09=09blk_queue_flag_clear(QUEUE_FLAG_NONROT, q);
+> > +=09=09blk_mq_unfreeze_queue(q);
+> >  =09=09blk_queue_flag_set(QUEUE_FLAG_ADD_RANDOM, q);
+> > =20
+> >  =09=09if (scsi_device_supports_vpd(sdp)) {
+> >=20
+> Hmm.
 >=20
-> Right, but you're putting the scheduler in a bind. By overloading the
-> CPU and only allowing the one task to migrate, it pretty much has no
-> choice left.
+> I must admit I patently don't like this explicit dependency on
+> blk_nonrot(). Having a conditional counter is just an open invitation to
+> getting things wrong...
+
+That won't be an issue given this patch freezes queue when the
+NONROT queue flag is changed.
+
 >=20
-> Anyway, I'm still going to have try and reproduce -- I got side-tracked
-> into a crashing bug, I'll hopefully get back to this tomorrow. Lastly,
-> one other thing to try is -next. Vincent reworked the load-balancer
-> quite a bit.
+> I would far prefer if we could delegate any queueing decision to the
+> elevators, and completely drop the device_busy flag for all devices.
+
+If you drop it, you may create big sequential IO performance drop
+on HDD., that is why this patch only bypasses sdev->queue_depth on
+SSD. NVMe bypasses it because no one uses HDD. via NVMe.
+
+> But I do see that this might not be easy to do, nor necessarily
+> something which others agree on.
+> So alternatively, can't we make this a per-host flag, instead of having
+> it per device characteristic?
+
+Are you sure each LUN shares the same NONROT flag? I think it can be
+true for each LUN to have different NONROT flag.
+
 >=20
+> I'm just thinking of a storage array with a massive cache; it's anyone's
+> guess if 'nonrot' is set there, but at the same time these things can be
+> fast, so they might be profiting from dropping the device_busy counter
+> there, too.
 
-I've tried it with the lb patch series. I get basically the same results.
-With the high granularity settings I get 3700 migrations for the 30=20
-second run at 4k. Of those about 3200 are active balance on stock 5.4-rc7.
-With the lb patches it's 3500 and 3000, a slight drop.=20
-
-Using the default granularity settings 50 and 22 for stock and 250 and 25.
-So a few more total migrations with the lb patches but about the same activ=
-e.
+If you are worrying about slow queue freeze, that won't be an issue,
+given we don't switch to percpu mode until the flag is updated during
+sd probe, and blk_mq_freeze_queue_wait() is pretty quick in ATOMIC
+mode.
 
 
-On this system I'm getting 100k migrations using 512 byte blocksize. Almost
-all not active. I haven't looked into that closely yet but it's like 3000
-per second looking like this:
-
-...
-64.19641 386     386     kworker/15:1    sched_migrate_task fio/2784 cpu 15=
-->19=20
-64.19694 386     386     kworker/15:1    sched_migrate_task fio/2784 cpu 15=
-->19=20
-64.19746 386     386     kworker/15:1    sched_migrate_task fio/2784 cpu 15=
-->19=20
-64.19665 389     389     kworker/19:1    sched_migrate_task fio/2784 cpu 19=
-->15=20
-64.19718 389     389     kworker/19:1    sched_migrate_task fio/2784 cpu 19=
-->15=20
-64.19772 389     389     kworker/19:1    sched_migrate_task fio/2784 cpu 19=
-->15=20
-64.19800 386     386     kworker/15:1    sched_migrate_task fio/2784 cpu 15=
-->19=20
-64.19828 389     389     kworker/19:1    sched_migrate_task fio/2784 cpu 19=
-->15=20
-64.19856 386     386     kworker/15:1    sched_migrate_task fio/2784 cpu 15=
-->19=20
-64.19882 389     389     kworker/19:1    sched_migrate_task fio/2784 cpu 19=
-->15=20
-64.19909 386     386     kworker/15:1    sched_migrate_task fio/2784 cpu 15=
-->19=20
-64.19937 389     389     kworker/19:1    sched_migrate_task fio/2784 cpu 19=
-->15=20
-64.19967 386     386     kworker/15:1    sched_migrate_task fio/2784 cpu 15=
-->19=20
-64.19995 389     389     kworker/19:1    sched_migrate_task fio/2784 cpu 19=
-->15=20
-64.20023 386     386     kworker/15:1    sched_migrate_task fio/2784 cpu 15=
-->19=20
-64.20053 389     389     kworker/19:1    sched_migrate_task fio/2784 cpu 19=
-->15=20
-64.20079 386     386     kworker/15:1    sched_migrate_task fio/2784 cpu 15=
-->19=20
-64.20107 389     389     kworker/19:1    sched_migrate_task fio/2784 cpu 19=
-->15=20
-64.20135 386     386     kworker/15:1    sched_migrate_task fio/2784 cpu 15=
-->19=20
-64.20163 389     389     kworker/19:1    sched_migrate_task fio/2784 cpu 19=
-->15=20
-64.20192 386     386     kworker/15:1    sched_migrate_task fio/2784 cpu 15=
-->19=20
-64.20221 389     389     kworker/19:1    sched_migrate_task fio/2784 cpu 19=
-->15=20
-...
-
-Which is roughly equal to the number if iops it's doing.=20
-
-Cheers,
-Phil
-
---=20
+Thanks,
+Ming
 
