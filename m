@@ -2,26 +2,26 @@ Return-Path: <SRS0=S5B1=ZN=vger.kernel.org=linux-block-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-3.8 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
-	MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,USER_AGENT_GIT autolearn=no
-	autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-9.7 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
+	INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,
+	URIBL_BLOCKED,USER_AGENT_GIT autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id CDC82C432C0
-	for <linux-block@archiver.kernel.org>; Thu, 21 Nov 2019 17:13:29 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 7275EC432C0
+	for <linux-block@archiver.kernel.org>; Thu, 21 Nov 2019 17:13:38 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.kernel.org (Postfix) with ESMTP id AA8CA206D8
-	for <linux-block@archiver.kernel.org>; Thu, 21 Nov 2019 17:13:29 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id 4AC86206DA
+	for <linux-block@archiver.kernel.org>; Thu, 21 Nov 2019 17:13:38 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1726563AbfKURN3 (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Thu, 21 Nov 2019 12:13:29 -0500
-Received: from mx2.suse.de ([195.135.220.15]:53954 "EHLO mx1.suse.de"
+        id S1727091AbfKURNh (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Thu, 21 Nov 2019 12:13:37 -0500
+Received: from mx2.suse.de ([195.135.220.15]:54038 "EHLO mx1.suse.de"
         rhost-flags-OK-OK-OK-FAIL) by vger.kernel.org with ESMTP
-        id S1726279AbfKURN2 (ORCPT <rfc822;linux-block@vger.kernel.org>);
-        Thu, 21 Nov 2019 12:13:28 -0500
+        id S1726279AbfKURNg (ORCPT <rfc822;linux-block@vger.kernel.org>);
+        Thu, 21 Nov 2019 12:13:36 -0500
 X-Virus-Scanned: by amavisd-new at test-mx.suse.de
 Received: from relay2.suse.de (unknown [195.135.220.254])
-        by mx1.suse.de (Postfix) with ESMTP id 831E4B27B;
-        Thu, 21 Nov 2019 17:13:26 +0000 (UTC)
+        by mx1.suse.de (Postfix) with ESMTP id 66360B26C;
+        Thu, 21 Nov 2019 17:13:35 +0000 (UTC)
 From:   Michal Suchanek <msuchanek@suse.de>
 To:     linux-scsi@vger.kernel.org, linux-block@vger.kernel.org
 Cc:     Michal Suchanek <msuchanek@suse.de>,
@@ -44,10 +44,12 @@ Cc:     Michal Suchanek <msuchanek@suse.de>,
         "Ewan D. Milne" <emilne@redhat.com>,
         Christoph Hellwig <hch@infradead.org>,
         Matthew Wilcox <willy@infradead.org>
-Subject: [PATCH v4 00/10] Fix cdrom autoclose
-Date:   Thu, 21 Nov 2019 18:13:07 +0100
-Message-Id: <cover.1574355709.git.msuchanek@suse.de>
+Subject: [PATCH v4 01/10] cdrom: add poll_event_interruptible
+Date:   Thu, 21 Nov 2019 18:13:08 +0100
+Message-Id: <c2bc338b4746f21b13262363d218cbb39e889970.1574355709.git.msuchanek@suse.de>
 X-Mailer: git-send-email 2.23.0
+In-Reply-To: <cover.1574355709.git.msuchanek@suse.de>
+References: <cover.1574355709.git.msuchanek@suse.de>
 MIME-Version: 1.0
 Content-Transfer-Encoding: 8bit
 Sender: linux-block-owner@vger.kernel.org
@@ -55,54 +57,43 @@ Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-Hello,
+Add convenience macro for polling an event that does not have a
+waitqueue.
 
-there is cdrom autoclose feature that is supposed to close the tray,
-wait for the disc to become ready, and then open the device.
+Signed-off-by: Michal Suchanek <msuchanek@suse.de>
+---
+ drivers/cdrom/cdrom.c | 14 ++++++++++++++
+ 1 file changed, 14 insertions(+)
 
-This used to work in ancient times. Then in old times there was a hack
-in util-linux which worked around the breakage which probably resulted
-from switching to scsi emulation.
-
-Currently util-linux maintainer refuses to merge another hack on the
-basis that kernel still has the feature so it should be fixed there.
-The code needs not be replicated in every userspace utility like mount
-or dd which has no business knowing which devices are CD-roms and where
-the autoclose setting is in the kernel.
-
-v3:
-- change the VMware workaround to use blacklist flag
-- use exported function instead of ioctl
-v4:
-- fix crash reported by kernel test robot
-- fix the debug message logic while refactoring cdrom_open
-- move repeated code out of __blkdev_get
-
-Link: https://lore.kernel.org/lkml/cover.1571834862.git.msuchanek@suse.de/
-Link: https://lore.kernel.org/lkml/cover.1513263482.git.msuchanek@suse.de/
-
-Michal Suchanek (10):
-  cdrom: add poll_event_interruptible
-  cdrom: factor out common open_for_* code
-  cdrom: wait for the tray to close
-  cdrom: export autoclose logic as a separate function
-  cdrom: unify log messages.
-  bdev: reset first_open when looping in __blkget_dev
-  bdev: separate parts of __blkdev_get as helper functions
-  bdev: add open_finish
-  scsi: blacklist: add VMware ESXi cdrom - broken tray emulation
-  scsi: sr: wait for the medium to become ready
-
- Documentation/filesystems/locking.rst |   2 +
- drivers/cdrom/cdrom.c                 | 471 +++++++++++++-------------
- drivers/scsi/scsi_devinfo.c           |  15 +-
- drivers/scsi/sr.c                     |  60 +++-
- fs/block_dev.c                        |  80 +++--
- include/linux/blkdev.h                |   1 +
- include/linux/cdrom.h                 |   1 +
- include/scsi/scsi_devinfo.h           |   7 +-
- 8 files changed, 360 insertions(+), 277 deletions(-)
-
+diff --git a/drivers/cdrom/cdrom.c b/drivers/cdrom/cdrom.c
+index ac42ae4651ce..2ad6b73482fe 100644
+--- a/drivers/cdrom/cdrom.c
++++ b/drivers/cdrom/cdrom.c
+@@ -282,10 +282,24 @@
+ #include <linux/fcntl.h>
+ #include <linux/blkdev.h>
+ #include <linux/times.h>
++#include <linux/delay.h>
+ #include <linux/uaccess.h>
++#include <linux/sched/signal.h>
+ #include <scsi/scsi_common.h>
+ #include <scsi/scsi_request.h>
+ 
++#define poll_event_interruptible(event, interval) ({ \
++	int ret = 0; \
++	while (!(event)) { \
++		if (signal_pending(current)) { \
++			ret = -ERESTARTSYS; \
++			break; \
++		} \
++		msleep_interruptible(interval); \
++	} \
++	ret; \
++})
++
+ /* used to tell the module to turn on full debugging messages */
+ static bool debug;
+ /* default compatibility mode */
 -- 
 2.23.0
 
