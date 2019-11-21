@@ -2,124 +2,68 @@ Return-Path: <SRS0=S5B1=ZN=vger.kernel.org=linux-block-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-0.8 required=3.0 tests=DKIM_SIGNED,DKIM_VALID,
-	DKIM_VALID_AU,HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SPF_HELO_NONE,
-	SPF_PASS autolearn=no autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-6.1 required=3.0 tests=DKIMWL_WL_HIGH,DKIM_SIGNED,
+	DKIM_VALID,DKIM_VALID_AU,MAILING_LIST_MULTI,MENTIONS_GIT_HOSTING,
+	SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED autolearn=ham autolearn_force=no
+	version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 2E408C432C0
-	for <linux-block@archiver.kernel.org>; Thu, 21 Nov 2019 19:19:39 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id D40F0C432C0
+	for <linux-block@archiver.kernel.org>; Thu, 21 Nov 2019 20:30:10 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.kernel.org (Postfix) with ESMTP id F3A0C2068E
-	for <linux-block@archiver.kernel.org>; Thu, 21 Nov 2019 19:19:38 +0000 (UTC)
-Authentication-Results: mail.kernel.org;
-	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="AJ/eclEn"
+	by mail.kernel.org (Postfix) with ESMTP id ABB1220708
+	for <linux-block@archiver.kernel.org>; Thu, 21 Nov 2019 20:30:10 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+	s=default; t=1574368210;
+	bh=iijrfibMN60y5JpmAgtg4VkodDcZy7GhP/6Obi/zdQo=;
+	h=Subject:From:In-Reply-To:References:Date:To:Cc:List-ID:From;
+	b=u6Xlj1w92hMIiK5fugH1W+yBp/WNp9FVTftZOVE/n14YIzBotFpospDYEJj0bvrk9
+	 bvPSx9I5EEZnN3uWAHvwdP2zlIYz3UN7zt/rIRUrS6rZP3zk+ijpl7cbTdmV3PXdUd
+	 P1xVJL7D/lIFQq+JUtTdEIDrcUK6lGGlk5c+RhA4=
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1726655AbfKUTTi (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Thu, 21 Nov 2019 14:19:38 -0500
-Received: from us-smtp-delivery-1.mimecast.com ([205.139.110.120]:21936 "EHLO
-        us-smtp-1.mimecast.com" rhost-flags-OK-OK-OK-FAIL) by vger.kernel.org
-        with ESMTP id S1726293AbfKUTTi (ORCPT
-        <rfc822;linux-block@vger.kernel.org>);
-        Thu, 21 Nov 2019 14:19:38 -0500
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-        s=mimecast20190719; t=1574363976;
-        h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-         to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-         content-transfer-encoding:content-transfer-encoding:
-         in-reply-to:in-reply-to:references:references;
-        bh=zv/iZ/7iNVXktTSWMBYCInxJ10DtWIchWCIKy4SGAIk=;
-        b=AJ/eclEnSTG/+MJo4bVeDsHdGEPCBdnrXPAaZ1KZqS2D9LWerf003FyL1XnzFDsmewGK80
-        q9FeQIEx2W4BnFSbdef8I0gfS53nhXD2X12zLs+0PRmCPLENfedVTqjmon65SySnoKmraE
-        OpHnK1SFphPPuUwCzxfe3ZJ1wwHR03s=
-Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
- [209.132.183.4]) (Using TLS) by relay.mimecast.com with ESMTP id
- us-mta-348-2Gk-B0iePGudDSZSjCBsPg-1; Thu, 21 Nov 2019 14:19:33 -0500
-Received: from smtp.corp.redhat.com (int-mx07.intmail.prod.int.phx2.redhat.com [10.5.11.22])
-        (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
-        (No client certificate requested)
-        by mimecast-mx01.redhat.com (Postfix) with ESMTPS id 7BF3918C897A;
-        Thu, 21 Nov 2019 19:19:31 +0000 (UTC)
-Received: from emilne (unknown [10.18.25.205])
-        by smtp.corp.redhat.com (Postfix) with ESMTP id EA6B51037AB1;
-        Thu, 21 Nov 2019 19:19:27 +0000 (UTC)
-Message-ID: <5f2a9e5cc4e7832874d5d9ebd204cd8a53695b04.camel@redhat.com>
-Subject: Re: [PATCH 4/4] scsi: core: don't limit per-LUN queue depth for SSD
-From:   "Ewan D. Milne" <emilne@redhat.com>
-To:     Ming Lei <ming.lei@redhat.com>
-Cc:     Hannes Reinecke <hare@suse.de>, Jens Axboe <axboe@kernel.dk>,
-        linux-block@vger.kernel.org,
-        "James E . J . Bottomley" <jejb@linux.ibm.com>,
-        "Martin K . Petersen" <martin.petersen@oracle.com>,
-        linux-scsi@vger.kernel.org,
-        Sathya Prakash <sathya.prakash@broadcom.com>,
-        Chaitra P B <chaitra.basappa@broadcom.com>,
-        Suganath Prabu Subramani 
-        <suganath-prabu.subramani@broadcom.com>,
-        Kashyap Desai <kashyap.desai@broadcom.com>,
-        Sumit Saxena <sumit.saxena@broadcom.com>,
-        Shivasharan S <shivasharan.srikanteshwara@broadcom.com>,
-        Christoph Hellwig <hch@lst.de>,
-        Bart Van Assche <bart.vanassche@wdc.com>
-Date:   Thu, 21 Nov 2019 14:19:26 -0500
-In-Reply-To: <20191121005458.GC24548@ming.t460p>
-References: <20191118103117.978-1-ming.lei@redhat.com>
-         <20191118103117.978-5-ming.lei@redhat.com>
-         <1081145f-3e17-9bc1-2332-50a4b5621ef7@suse.de>
-         <9bbcbbb42b659c323c9e0d74aa9b062a3f517d1f.camel@redhat.com>
-         <20191121005458.GC24548@ming.t460p>
-Mime-Version: 1.0
-X-Scanned-By: MIMEDefang 2.84 on 10.5.11.22
-X-MC-Unique: 2Gk-B0iePGudDSZSjCBsPg-1
-X-Mimecast-Spam-Score: 0
-Content-Type: text/plain; charset=UTF-8
-Content-Transfer-Encoding: quoted-printable
+        id S1727088AbfKUUaJ (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Thu, 21 Nov 2019 15:30:09 -0500
+Received: from mail.kernel.org ([198.145.29.99]:37520 "EHLO mail.kernel.org"
+        rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
+        id S1727008AbfKUUaH (ORCPT <rfc822;linux-block@vger.kernel.org>);
+        Thu, 21 Nov 2019 15:30:07 -0500
+Subject: Re: [GIT PULL] Single nbd fix for 5.4-final
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+        s=default; t=1574368206;
+        bh=iijrfibMN60y5JpmAgtg4VkodDcZy7GhP/6Obi/zdQo=;
+        h=From:In-Reply-To:References:Date:To:Cc:From;
+        b=cm9eGaAQmsKvICE7a2fMHeYYgvjrhbWt2jWWV5t+ly4jtvfXo/yrY1/jScgm4bAJ8
+         S5jX8Of8XimeqVxUfeEhTnFgInWpkpJZtGR0G1EMAyG0C81n6o19FD1jvYQhCyaSqQ
+         iKPBc7yss/ggJ62nfn4JuFLlYrD99sdZs5kY3d0s=
+From:   pr-tracker-bot@kernel.org
+In-Reply-To: <f8df6a8b-5326-9367-0592-0220322a3bfe@kernel.dk>
+References: <f8df6a8b-5326-9367-0592-0220322a3bfe@kernel.dk>
+X-PR-Tracked-List-Id: <linux-block.vger.kernel.org>
+X-PR-Tracked-Message-Id: <f8df6a8b-5326-9367-0592-0220322a3bfe@kernel.dk>
+X-PR-Tracked-Remote: git://git.kernel.dk/linux-block.git
+ tags/for-linus-20191121
+X-PR-Tracked-Commit-Id: dff10bbea4be47bdb615b036c834a275b7c68133
+X-PR-Merge-Tree: torvalds/linux.git
+X-PR-Merge-Refname: refs/heads/master
+X-PR-Merge-Commit-Id: be5fa3aac23fde1a00547ed87144e1f3268cdb48
+Message-Id: <157436820684.3070.2315276680618519466.pr-tracker-bot@kernel.org>
+Date:   Thu, 21 Nov 2019 20:30:06 +0000
+To:     Jens Axboe <axboe@kernel.dk>
+Cc:     Linus Torvalds <torvalds@linux-foundation.org>,
+        "linux-block@vger.kernel.org" <linux-block@vger.kernel.org>
 Sender: linux-block-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-On Thu, 2019-11-21 at 08:54 +0800, Ming Lei wrote:
-> On Wed, Nov 20, 2019 at 12:00:19PM -0500, Ewan D. Milne wrote:
-> > On Wed, 2019-11-20 at 11:05 +0100, Hannes Reinecke wrote:
-> > >=20
-> > > Hmm.
-> > >=20
-> > > I must admit I patently don't like this explicit dependency on
-> > > blk_nonrot(). Having a conditional counter is just an open invitation=
- to
-> > > getting things wrong...
-> > >=20
-> >=20
-> > This concerns me as well, it seems like the SCSI ML should have it's
-> > own per-device attribute if we actually need to control this per-device
-> > instead of on a per-host or per-driver basis.  And it seems like this
-> > is something that is specific to high-performance drivers, so changing
-> > the way this works for all drivers seems a bit much.
-> >=20
-> > Ordinarily I'd prefer a host template attribute as Sumanesh proposed,
-> > but I dislike wrapping the examination of that and the queue flag in
-> > a macro that makes it not obvious how the behavior is affected.
-> > (Plus Hannes just submitted submitted the patches to remove .use_cmd_li=
-st,
-> > which was another piece of ML functionality used by only a few drivers.=
-)
-> >=20
-> > Ming's patch does freeze the queue if NONROT is changed by sysfs, but
-> > the flag can be changed by other kernel code, e.g. sd_revalidate_disk()
-> > clears it and then calls sd_read_block_characteristics() which may set
-> > it again.  So it's not clear to me how reliable this is.
->=20
-> The queue freeze is applied in sd_revalidate_disk() too, isn't it?
->=20
+The pull request you sent on Thu, 21 Nov 2019 10:00:47 -0700:
 
-Yes, sorry, you are right, your patch does add this.  But if anything else =
-changes
-the NONROT attribute for a queue associated with a SCSI device in the futur=
-e
-it would have to freeze the queue.  Because the device_busy counter mechani=
-sm
-would rely on it to work right.  This isn't an obvious connection, it seems=
- to me.
+> git://git.kernel.dk/linux-block.git tags/for-linus-20191121
 
--Ewan
+has been merged into torvalds/linux.git:
+https://git.kernel.org/torvalds/c/be5fa3aac23fde1a00547ed87144e1f3268cdb48
 
+Thank you!
+
+-- 
+Deet-doot-dot, I am a bot.
+https://korg.wiki.kernel.org/userdoc/prtracker
