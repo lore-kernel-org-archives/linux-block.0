@@ -4,24 +4,25 @@ X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 X-Spam-Level: 
 X-Spam-Status: No, score=-9.7 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
 	INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,
-	URIBL_BLOCKED,USER_AGENT_GIT autolearn=ham autolearn_force=no version=3.4.0
+	URIBL_BLOCKED,USER_AGENT_GIT autolearn=unavailable autolearn_force=no
+	version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 89461C432C3
-	for <linux-block@archiver.kernel.org>; Thu, 21 Nov 2019 17:13:45 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id A6526C432C0
+	for <linux-block@archiver.kernel.org>; Thu, 21 Nov 2019 17:13:58 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.kernel.org (Postfix) with ESMTP id 675CE2070E
-	for <linux-block@archiver.kernel.org>; Thu, 21 Nov 2019 17:13:45 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id 86F52206D7
+	for <linux-block@archiver.kernel.org>; Thu, 21 Nov 2019 17:13:58 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1727193AbfKURNo (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Thu, 21 Nov 2019 12:13:44 -0500
+        id S1726279AbfKURNw (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Thu, 21 Nov 2019 12:13:52 -0500
 Received: from mx2.suse.de ([195.135.220.15]:54298 "EHLO mx1.suse.de"
         rhost-flags-OK-OK-OK-FAIL) by vger.kernel.org with ESMTP
-        id S1727165AbfKURNo (ORCPT <rfc822;linux-block@vger.kernel.org>);
-        Thu, 21 Nov 2019 12:13:44 -0500
+        id S1727197AbfKURNp (ORCPT <rfc822;linux-block@vger.kernel.org>);
+        Thu, 21 Nov 2019 12:13:45 -0500
 X-Virus-Scanned: by amavisd-new at test-mx.suse.de
 Received: from relay2.suse.de (unknown [195.135.220.254])
-        by mx1.suse.de (Postfix) with ESMTP id 2B3A0B27A;
-        Thu, 21 Nov 2019 17:13:41 +0000 (UTC)
+        by mx1.suse.de (Postfix) with ESMTP id 11510B2A1;
+        Thu, 21 Nov 2019 17:13:44 +0000 (UTC)
 From:   Michal Suchanek <msuchanek@suse.de>
 To:     linux-scsi@vger.kernel.org, linux-block@vger.kernel.org
 Cc:     Michal Suchanek <msuchanek@suse.de>,
@@ -44,9 +45,9 @@ Cc:     Michal Suchanek <msuchanek@suse.de>,
         "Ewan D. Milne" <emilne@redhat.com>,
         Christoph Hellwig <hch@infradead.org>,
         Matthew Wilcox <willy@infradead.org>
-Subject: [PATCH v4 07/10] bdev: separate parts of __blkdev_get as helper functions
-Date:   Thu, 21 Nov 2019 18:13:14 +0100
-Message-Id: <49c843f88373d9ad4f6e607f704f51ca84c1747d.1574355709.git.msuchanek@suse.de>
+Subject: [PATCH v4 10/10] scsi: sr: wait for the medium to become ready
+Date:   Thu, 21 Nov 2019 18:13:17 +0100
+Message-Id: <c0c769f470be6a91b80fbd92658a3012a7225455.1574355709.git.msuchanek@suse.de>
 X-Mailer: git-send-email 2.23.0
 In-Reply-To: <cover.1574355709.git.msuchanek@suse.de>
 References: <cover.1574355709.git.msuchanek@suse.de>
@@ -57,92 +58,101 @@ Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-This code will be reused in later patch. Hopefully putting it aside
-rather than cut&pasting another copy will make the function more
-readable.
+Use the autoclose function provided by cdrom driver to wait for drive to
+close in open_finish, and attempt to open once more after the door
+closes.
 
 Signed-off-by: Michal Suchanek <msuchanek@suse.de>
 ---
- fs/block_dev.c | 52 +++++++++++++++++++++++++++-----------------------
- 1 file changed, 28 insertions(+), 24 deletions(-)
+v3: use function call rather than IOCTL
+v4: fix reference leak on -ENXIO
+---
+ drivers/scsi/sr.c | 54 ++++++++++++++++++++++++++++++++++++-----------
+ 1 file changed, 42 insertions(+), 12 deletions(-)
 
-diff --git a/fs/block_dev.c b/fs/block_dev.c
-index a3083fbada8b..10c9e0ae2bdc 100644
---- a/fs/block_dev.c
-+++ b/fs/block_dev.c
-@@ -1512,6 +1512,28 @@ EXPORT_SYMBOL(bd_set_size);
+diff --git a/drivers/scsi/sr.c b/drivers/scsi/sr.c
+index 07c319494bf4..41ddf08b4c7b 100644
+--- a/drivers/scsi/sr.c
++++ b/drivers/scsi/sr.c
+@@ -522,29 +522,58 @@ static blk_status_t sr_init_command(struct scsi_cmnd *SCpnt)
+ 	return ret;
+ }
  
- static void __blkdev_put(struct block_device *bdev, fmode_t mode, int for_part);
- 
-+static void blkdev_init_size(struct block_device *bdev, struct gendisk *disk)
-+{
-+	bd_set_size(bdev, (loff_t)get_capacity(disk) << 9);
-+	set_init_blocksize(bdev);
-+}
-+
-+static void blkdev_do_partitions(struct block_device *bdev,
-+				 struct gendisk *disk, int ret)
-+{
-+	/*
-+	 * If the device is invalidated, rescan partition if open succeeded or
-+	 * failed with -ENOMEDIUM.  The latter is necessary to prevent ghost
-+	 * partitions on a removed medium.
-+	 */
-+	if (bdev->bd_invalidated) {
-+		if (!ret)
-+			rescan_partitions(disk, bdev);
-+		else if (ret == -ENOMEDIUM)
-+			invalidate_partitions(disk, bdev);
-+	}
-+}
-+
- /*
-  * bd_mutex locking:
-  *
-@@ -1584,23 +1606,9 @@ static int __blkdev_get(struct block_device *bdev, fmode_t mode, int for_part)
- 				}
- 			}
- 
--			if (!ret) {
--				bd_set_size(bdev,(loff_t)get_capacity(disk)<<9);
--				set_init_blocksize(bdev);
--			}
+-static int sr_block_open(struct block_device *bdev, fmode_t mode)
++static int __sr_block_open(struct block_device *bdev, fmode_t mode)
+ {
+-	struct scsi_cd *cd;
+-	struct scsi_device *sdev;
+-	int ret = -ENXIO;
 -
--			/*
--			 * If the device is invalidated, rescan partition
--			 * if open succeeded or failed with -ENOMEDIUM.
--			 * The latter is necessary to prevent ghost
--			 * partitions on a removed medium.
--			 */
--			if (bdev->bd_invalidated) {
--				if (!ret)
--					rescan_partitions(disk, bdev);
--				else if (ret == -ENOMEDIUM)
--					invalidate_partitions(disk, bdev);
--			}
-+			if (!ret)
-+				blkdev_init_size(bdev, disk);
-+			blkdev_do_partitions(bdev, disk, ret);
+-	cd = scsi_cd_get(bdev->bd_disk);
+-	if (!cd)
+-		goto out;
++	struct scsi_cd *cd = scsi_cd(bdev->bd_disk);
++	int ret;
  
- 			if (ret)
- 				goto out_clear;
-@@ -1632,13 +1640,9 @@ static int __blkdev_get(struct block_device *bdev, fmode_t mode, int for_part)
- 			ret = 0;
- 			if (bdev->bd_disk->fops->open)
- 				ret = bdev->bd_disk->fops->open(bdev, mode);
--			/* the same as first opener case, read comment there */
--			if (bdev->bd_invalidated) {
--				if (!ret)
--					rescan_partitions(bdev->bd_disk, bdev);
--				else if (ret == -ENOMEDIUM)
--					invalidate_partitions(bdev->bd_disk, bdev);
--			}
+-	sdev = cd->device;
+-	scsi_autopm_get_device(sdev);
+ 	check_disk_change(bdev);
+ 
+ 	mutex_lock(&sr_mutex);
+ 	ret = cdrom_open(&cd->cdi, bdev, mode);
+ 	mutex_unlock(&sr_mutex);
+ 
++	return ret;
++}
 +
-+			blkdev_do_partitions(bdev, disk, ret);
++static int sr_block_open(struct block_device *bdev, fmode_t mode)
++{
++	struct scsi_cd *cd = scsi_cd_get(bdev->bd_disk);
++	struct scsi_device *sdev;
++	int ret;
 +
- 			if (ret)
- 				goto out_unlock_bdev;
- 		}
++	if (!cd)
++		return -ENXIO;
++
++	sdev = cd->device;
++	scsi_autopm_get_device(sdev);
++	ret = __sr_block_open(bdev, mode);
+ 	scsi_autopm_put_device(sdev);
+-	if (ret)
++
++	if ((ret == -ERESTARTSYS) || (ret == -ENXIO))
+ 		scsi_cd_put(cd);
+ 
+-out:
++	return ret;
++}
++
++static int sr_block_open_finish(struct block_device *bdev, fmode_t mode,
++				int ret)
++{
++	struct scsi_cd *cd = scsi_cd(bdev->bd_disk);
++
++	/* wait for drive to get ready */
++	if ((ret == -ENOMEDIUM) && !(mode & FMODE_NDELAY)) {
++		struct scsi_device *sdev = cd->device;
++		/*
++		 * Cannot use sr_block_ioctl because it locks sr_mutex blocking
++		 * out any processes trying to access the drive
++		 */
++		scsi_autopm_get_device(sdev);
++		cdrom_autoclose(&cd->cdi);
++		ret = __sr_block_open(bdev, mode);
++		scsi_autopm_put_device(sdev);
++	}
++
+ 	return ret;
+ }
+ 
+@@ -640,6 +669,7 @@ static const struct block_device_operations sr_bdops =
+ {
+ 	.owner		= THIS_MODULE,
+ 	.open		= sr_block_open,
++	.open_finish	= sr_block_open_finish,
+ 	.release	= sr_block_release,
+ 	.ioctl		= sr_block_ioctl,
+ 	.check_events	= sr_block_check_events,
 -- 
 2.23.0
 
