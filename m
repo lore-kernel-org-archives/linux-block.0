@@ -2,274 +2,264 @@ Return-Path: <SRS0=S5B1=ZN=vger.kernel.org=linux-block-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-6.8 required=3.0 tests=DKIM_SIGNED,DKIM_VALID,
-	DKIM_VALID_AU,HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,
-	SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED autolearn=ham
-	autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-8.3 required=3.0 tests=DKIMWL_WL_HIGH,DKIM_SIGNED,
+	DKIM_VALID,DKIM_VALID_AU,HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,
+	MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED,
+	USER_AGENT_SANE_1 autolearn=unavailable autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id E1555C432C0
-	for <linux-block@archiver.kernel.org>; Thu, 21 Nov 2019 10:40:32 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id A8212C432C0
+	for <linux-block@archiver.kernel.org>; Thu, 21 Nov 2019 10:56:21 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.kernel.org (Postfix) with ESMTP id 75DF02088F
-	for <linux-block@archiver.kernel.org>; Thu, 21 Nov 2019 10:40:32 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id 6B1D320715
+	for <linux-block@archiver.kernel.org>; Thu, 21 Nov 2019 10:56:21 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=pass (1024-bit key) header.d=yandex-team.ru header.i=@yandex-team.ru header.b="VdaT6ljR"
+	dkim=pass (1024-bit key) header.d=ti.com header.i=@ti.com header.b="iW2Sym4S"
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1726358AbfKUKkb (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Thu, 21 Nov 2019 05:40:31 -0500
-Received: from forwardcorp1o.mail.yandex.net ([95.108.205.193]:49232 "EHLO
-        forwardcorp1o.mail.yandex.net" rhost-flags-OK-OK-OK-OK)
-        by vger.kernel.org with ESMTP id S1726230AbfKUKkb (ORCPT
+        id S1726165AbfKUK4P (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Thu, 21 Nov 2019 05:56:15 -0500
+Received: from fllv0016.ext.ti.com ([198.47.19.142]:50126 "EHLO
+        fllv0016.ext.ti.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S1726014AbfKUK4O (ORCPT
         <rfc822;linux-block@vger.kernel.org>);
-        Thu, 21 Nov 2019 05:40:31 -0500
-Received: from mxbackcorp1g.mail.yandex.net (mxbackcorp1g.mail.yandex.net [IPv6:2a02:6b8:0:1402::301])
-        by forwardcorp1o.mail.yandex.net (Yandex) with ESMTP id 235CB2E18F1;
-        Thu, 21 Nov 2019 13:40:27 +0300 (MSK)
-Received: from vla5-2bf13a090f43.qloud-c.yandex.net (vla5-2bf13a090f43.qloud-c.yandex.net [2a02:6b8:c18:3411:0:640:2bf1:3a09])
-        by mxbackcorp1g.mail.yandex.net (mxbackcorp/Yandex) with ESMTP id 8k5UtZBVOc-eQuieGpg;
-        Thu, 21 Nov 2019 13:40:27 +0300
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=yandex-team.ru; s=default;
-        t=1574332827; bh=jJPE2lkmi4is3srgVXQWiJk3+sodk/rEZ57R5XJTD2A=;
-        h=Message-ID:Date:To:From:Subject:Cc;
-        b=VdaT6ljRC2SUcekXlATqcMbKCncFOBIm5Zi1cy5Wj8O8rszKGb1kg2Akj6jgw+oED
-         0vQAdkbhCN4PU6T6/QE5xPLDLlw4ALeDhv7F1coCZUilJKIdu8gY1gJGOGCisicojB
-         8wTDqm+7Xp+WAXkdqGO9YIjiisnLX3FS2MV6X+Z4=
-Authentication-Results: mxbackcorp1g.mail.yandex.net; dkim=pass header.i=@yandex-team.ru
-Received: from dynamic-red.dhcp.yndx.net (dynamic-red.dhcp.yndx.net [2a02:6b8:0:40c:1009:4fae:ad87:4eae])
-        by vla5-2bf13a090f43.qloud-c.yandex.net (smtpcorp/Yandex) with ESMTPSA id 4uiq2DmQw7-eQV4np4t;
-        Thu, 21 Nov 2019 13:40:26 +0300
-        (using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
-        (Client certificate not present)
-Subject: [PATCH] block: add iostat counters for flush requests
-From:   Konstantin Khlebnikov <khlebnikov@yandex-team.ru>
-To:     linux-block@vger.kernel.org, Jens Axboe <axboe@kernel.dk>,
-        linux-kernel@vger.kernel.org, linux-doc@vger.kernel.org
-Cc:     linux-fsdevel@vger.kernel.org, linux-api@vger.kernel.org,
-        Dmitry Monakhov <dmtrmonakhov@yandex-team.ru>
-Date:   Thu, 21 Nov 2019 13:40:26 +0300
-Message-ID: <157433282607.7928.5202409984272248322.stgit@buzz>
-User-Agent: StGit/0.17.1-dirty
+        Thu, 21 Nov 2019 05:56:14 -0500
+Received: from lelv0265.itg.ti.com ([10.180.67.224])
+        by fllv0016.ext.ti.com (8.15.2/8.15.2) with ESMTP id xALAthcK026316;
+        Thu, 21 Nov 2019 04:55:43 -0600
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=ti.com;
+        s=ti-com-17Q1; t=1574333743;
+        bh=BN2cOGR0bwSm+uHqvrKwYNrZacJcbpFiZui1RldBkdA=;
+        h=Subject:To:CC:References:From:Date:In-Reply-To;
+        b=iW2Sym4SpEH0edQkHk1ql6Ls1TYm9nYirNeZR5AF6CsvcPnpQxFz5nUVM1brbVxXy
+         J3vMh1iw7E6VN5QEFkx4+nlsqy22d70pqsGJ46WXFHUls2966LHBOvjTdMj9uXOhNK
+         0Jpy0tpEogNoDVgVm97ivMFkPB9OsVpM/h3qPGiU=
+Received: from DLEE107.ent.ti.com (dlee107.ent.ti.com [157.170.170.37])
+        by lelv0265.itg.ti.com (8.15.2/8.15.2) with ESMTPS id xALAthZx068246
+        (version=TLSv1.2 cipher=AES256-GCM-SHA384 bits=256 verify=FAIL);
+        Thu, 21 Nov 2019 04:55:43 -0600
+Received: from DLEE114.ent.ti.com (157.170.170.25) by DLEE107.ent.ti.com
+ (157.170.170.37) with Microsoft SMTP Server (version=TLS1_2,
+ cipher=TLS_ECDHE_RSA_WITH_AES_128_CBC_SHA256_P256) id 15.1.1847.3; Thu, 21
+ Nov 2019 04:55:43 -0600
+Received: from lelv0326.itg.ti.com (10.180.67.84) by DLEE114.ent.ti.com
+ (157.170.170.25) with Microsoft SMTP Server (version=TLS1_2,
+ cipher=TLS_ECDHE_RSA_WITH_AES_128_CBC_SHA256_P256) id 15.1.1847.3 via
+ Frontend Transport; Thu, 21 Nov 2019 04:55:43 -0600
+Received: from [172.24.145.136] (ileax41-snat.itg.ti.com [10.172.224.153])
+        by lelv0326.itg.ti.com (8.15.2/8.15.2) with ESMTP id xALAtcCc041419;
+        Thu, 21 Nov 2019 04:55:39 -0600
+Subject: Re: [PATCH RESEND 2/2] scsi: ufs: Update L4 attributes on manual
+ hibern8 exit in Cadence UFS.
+To:     Alim Akhtar <alim.akhtar@gmail.com>, sheebab <sheebab@cadence.com>
+CC:     Alim Akhtar <alim.akhtar@samsung.com>,
+        Avri Altman <avri.altman@wdc.com>,
+        Pedro Sousa <pedrom.sousa@synopsys.com>,
+        "James E.J. Bottomley" <jejb@linux.ibm.com>,
+        "Martin K. Petersen" <martin.petersen@oracle.com>,
+        Stanley Chu <stanley.chu@mediatek.com>,
+        "Bean Huo (beanhuo)" <beanhuo@micron.com>, <yuehaibing@huawei.com>,
+        <linux-scsi@vger.kernel.org>,
+        open list <linux-kernel@vger.kernel.org>,
+        <linux-block@vger.kernel.org>, <rafalc@cadence.com>,
+        <mparab@cadence.com>
+References: <1574147082-22725-1-git-send-email-sheebab@cadence.com>
+ <1574147082-22725-3-git-send-email-sheebab@cadence.com>
+ <CAGOxZ53Lotp6sBUryHsE2S1dbkQNZhPhWNMXidoi=BOmV074VA@mail.gmail.com>
+From:   Vignesh Raghavendra <vigneshr@ti.com>
+Message-ID: <cfc2c86f-f9ae-ac91-39ac-8bb48c41b243@ti.com>
+Date:   Thu, 21 Nov 2019 16:26:10 +0530
+User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:60.0) Gecko/20100101
+ Thunderbird/60.9.0
 MIME-Version: 1.0
+In-Reply-To: <CAGOxZ53Lotp6sBUryHsE2S1dbkQNZhPhWNMXidoi=BOmV074VA@mail.gmail.com>
 Content-Type: text/plain; charset="utf-8"
+Content-Language: en-US
 Content-Transfer-Encoding: 7bit
+X-EXCLAIMER-MD-CONFIG: e1e8a2fd-e40a-4ac6-ac9b-f7e9cc9ee180
 Sender: linux-block-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-Requests that triggers flushing volatile writeback cache to disk (barriers)
-have significant effect to overall performance.
 
-Block layer has sophisticated engine for combining several flush requests
-into one. But there is no statistics for actual flushes executed by disk.
-Requests which trigger flushes usually are barriers - zero-size writes.
 
-This patch adds two iostat counters into /sys/class/block/$dev/stat and
-/proc/diskstats - count of completed flush requests and their total time.
+On 20/11/19 9:50 PM, Alim Akhtar wrote:
+> Hi Sheebab
+> 
+> On Tue, Nov 19, 2019 at 12:38 PM sheebab <sheebab@cadence.com> wrote:
+>>
+>> Backup L4 attributes duirng manual hibern8 entry
+>> and restore the L4 attributes on manual hibern8 exit as per JESD220C.
+>>
+> Can you point me to the relevant section on the spec?
+> 
 
-Signed-off-by: Konstantin Khlebnikov <khlebnikov@yandex-team.ru>
----
- Documentation/ABI/testing/procfs-diskstats |    5 +++++
- Documentation/ABI/testing/sysfs-block      |    6 ++++++
- Documentation/admin-guide/iostats.rst      |    9 +++++++++
- Documentation/block/stat.rst               |   14 ++++++++++++--
- block/blk-flush.c                          |   15 ++++++++++++++-
- block/genhd.c                              |    8 ++++++--
- block/partition-generic.c                  |    7 +++++--
- include/linux/blk_types.h                  |    1 +
- 8 files changed, 58 insertions(+), 7 deletions(-)
+Per JESD 220C 9.4 UniPro/UFS Control Interface (Control Plane):
 
-diff --git a/Documentation/ABI/testing/procfs-diskstats b/Documentation/ABI/testing/procfs-diskstats
-index 2c44b4f1b060..70dcaf2481f4 100644
---- a/Documentation/ABI/testing/procfs-diskstats
-+++ b/Documentation/ABI/testing/procfs-diskstats
-@@ -29,4 +29,9 @@ Description:
- 		17 - sectors discarded
- 		18 - time spent discarding
- 
-+		Kernel 5.5+ appends two more fields for flush requests:
-+
-+		19 - flush requests completed successfully
-+		20 - time spent flushing
-+
- 		For more details refer to Documentation/admin-guide/iostats.rst
-diff --git a/Documentation/ABI/testing/sysfs-block b/Documentation/ABI/testing/sysfs-block
-index f8c7c7126bb1..ed8c14f161ee 100644
---- a/Documentation/ABI/testing/sysfs-block
-+++ b/Documentation/ABI/testing/sysfs-block
-@@ -15,6 +15,12 @@ Description:
- 		 9 - I/Os currently in progress
- 		10 - time spent doing I/Os (ms)
- 		11 - weighted time spent doing I/Os (ms)
-+		12 - discards completed
-+		13 - discards merged
-+		14 - sectors discarded
-+		15 - time spent discarding (ms)
-+		16 - flush requests completed
-+		17 - time spent flushing (ms)
- 		For more details refer Documentation/admin-guide/iostats.rst
- 
- 
-diff --git a/Documentation/admin-guide/iostats.rst b/Documentation/admin-guide/iostats.rst
-index 5d63b18bd6d1..4f0462af3ca7 100644
---- a/Documentation/admin-guide/iostats.rst
-+++ b/Documentation/admin-guide/iostats.rst
-@@ -121,6 +121,15 @@ Field 15 -- # of milliseconds spent discarding
-     This is the total number of milliseconds spent by all discards (as
-     measured from __make_request() to end_that_request_last()).
- 
-+Field 16 -- # of flush requests completed
-+    This is the total number of flush requests completed successfully.
-+
-+    Block layer combines flush requests and executes at most one at a time.
-+    This counts flush requests executed by disk. Not tracked for partitions.
-+
-+Field 17 -- # of milliseconds spent flushing
-+    This is the total number of milliseconds spent by all flush requests.
-+
- To avoid introducing performance bottlenecks, no locks are held while
- modifying these counters.  This implies that minor inaccuracies may be
- introduced when changes collide, so (for instance) adding up all the
-diff --git a/Documentation/block/stat.rst b/Documentation/block/stat.rst
-index 9c07bc22b0bc..77311335c08b 100644
---- a/Documentation/block/stat.rst
-+++ b/Documentation/block/stat.rst
-@@ -41,6 +41,8 @@ discard I/Os    requests      number of discard I/Os processed
- discard merges  requests      number of discard I/Os merged with in-queue I/O
- discard sectors sectors       number of sectors discarded
- discard ticks   milliseconds  total wait time for discard requests
-+flush I/Os      requests      number of flush I/Os processed
-+flush ticks     milliseconds  total wait time for flush requests
- =============== ============= =================================================
- 
- read I/Os, write I/Os, discard I/0s
-@@ -48,6 +50,14 @@ read I/Os, write I/Os, discard I/0s
- 
- These values increment when an I/O request completes.
- 
-+flush I/Os
-+==========
-+
-+These values increment when an flush I/O request completes.
-+
-+Block layer combines flush requests and executes at most one at a time.
-+This counts flush requests executed by disk. Not tracked for partitions.
-+
- read merges, write merges, discard merges
- =========================================
- 
-@@ -62,8 +72,8 @@ discarded from this block device.  The "sectors" in question are the
- standard UNIX 512-byte sectors, not any device- or filesystem-specific
- block size.  The counters are incremented when the I/O completes.
- 
--read ticks, write ticks, discard ticks
--======================================
-+read ticks, write ticks, discard ticks, flush ticks
-+===================================================
- 
- These values count the number of milliseconds that I/O requests have
- waited on this block device.  If there are multiple I/O requests waiting,
-diff --git a/block/blk-flush.c b/block/blk-flush.c
-index 1eec9cbe5a0a..1777346baf06 100644
---- a/block/blk-flush.c
-+++ b/block/blk-flush.c
-@@ -136,6 +136,17 @@ static void blk_flush_queue_rq(struct request *rq, bool add_front)
- 	blk_mq_add_to_requeue_list(rq, add_front, true);
- }
- 
-+static void blk_account_io_flush(struct request *rq)
-+{
-+	struct hd_struct *part = &rq->rq_disk->part0;
-+
-+	part_stat_lock();
-+	part_stat_inc(part, ios[STAT_FLUSH]);
-+	part_stat_add(part, nsecs[STAT_FLUSH],
-+		      ktime_get_ns() - rq->start_time_ns);
-+	part_stat_unlock();
-+}
-+
- /**
-  * blk_flush_complete_seq - complete flush sequence
-  * @rq: PREFLUSH/FUA request being sequenced
-@@ -185,7 +196,7 @@ static void blk_flush_complete_seq(struct request *rq,
- 
- 	case REQ_FSEQ_DONE:
- 		/*
--		 * @rq was previously adjusted by blk_flush_issue() for
-+		 * @rq was previously adjusted by blk_insert_flush() for
- 		 * flush sequencing and may already have gone through the
- 		 * flush data request completion path.  Restore @rq for
- 		 * normal completion and end it.
-@@ -212,6 +223,8 @@ static void flush_end_io(struct request *flush_rq, blk_status_t error)
- 	struct blk_flush_queue *fq = blk_get_flush_queue(q, flush_rq->mq_ctx);
- 	struct blk_mq_hw_ctx *hctx;
- 
-+	blk_account_io_flush(flush_rq);
-+
- 	/* release the tag's ownership to the req cloned from */
- 	spin_lock_irqsave(&fq->mq_flush_lock, flags);
- 
-diff --git a/block/genhd.c b/block/genhd.c
-index 26b31fcae217..ff6268970ddc 100644
---- a/block/genhd.c
-+++ b/block/genhd.c
-@@ -1385,7 +1385,9 @@ static int diskstats_show(struct seq_file *seqf, void *v)
- 			   "%lu %lu %lu %u "
- 			   "%lu %lu %lu %u "
- 			   "%u %u %u "
--			   "%lu %lu %lu %u\n",
-+			   "%lu %lu %lu %u "
-+			   "%lu %u"
-+			   "\n",
- 			   MAJOR(part_devt(hd)), MINOR(part_devt(hd)),
- 			   disk_name(gp, hd->partno, buf),
- 			   part_stat_read(hd, ios[STAT_READ]),
-@@ -1402,7 +1404,9 @@ static int diskstats_show(struct seq_file *seqf, void *v)
- 			   part_stat_read(hd, ios[STAT_DISCARD]),
- 			   part_stat_read(hd, merges[STAT_DISCARD]),
- 			   part_stat_read(hd, sectors[STAT_DISCARD]),
--			   (unsigned int)part_stat_read_msecs(hd, STAT_DISCARD)
-+			   (unsigned int)part_stat_read_msecs(hd, STAT_DISCARD),
-+			   part_stat_read(hd, ios[STAT_FLUSH]),
-+			   (unsigned int)part_stat_read_msecs(hd, STAT_FLUSH)
- 			);
- 	}
- 	disk_part_iter_exit(&piter);
-diff --git a/block/partition-generic.c b/block/partition-generic.c
-index aee643ce13d1..3db8b73a96b1 100644
---- a/block/partition-generic.c
-+++ b/block/partition-generic.c
-@@ -127,7 +127,8 @@ ssize_t part_stat_show(struct device *dev,
- 		"%8lu %8lu %8llu %8u "
- 		"%8lu %8lu %8llu %8u "
- 		"%8u %8u %8u "
--		"%8lu %8lu %8llu %8u"
-+		"%8lu %8lu %8llu %8u "
-+		"%8lu %8u"
- 		"\n",
- 		part_stat_read(p, ios[STAT_READ]),
- 		part_stat_read(p, merges[STAT_READ]),
-@@ -143,7 +144,9 @@ ssize_t part_stat_show(struct device *dev,
- 		part_stat_read(p, ios[STAT_DISCARD]),
- 		part_stat_read(p, merges[STAT_DISCARD]),
- 		(unsigned long long)part_stat_read(p, sectors[STAT_DISCARD]),
--		(unsigned int)part_stat_read_msecs(p, STAT_DISCARD));
-+		(unsigned int)part_stat_read_msecs(p, STAT_DISCARD),
-+		part_stat_read(p, ios[STAT_FLUSH]),
-+		(unsigned int)part_stat_read_msecs(p, STAT_FLUSH));
- }
- 
- ssize_t part_inflight_show(struct device *dev, struct device_attribute *attr,
-diff --git a/include/linux/blk_types.h b/include/linux/blk_types.h
-index d688b96d1d63..b811a673a300 100644
---- a/include/linux/blk_types.h
-+++ b/include/linux/blk_types.h
-@@ -371,6 +371,7 @@ enum stat_group {
- 	STAT_READ,
- 	STAT_WRITE,
- 	STAT_DISCARD,
-+	STAT_FLUSH,
- 
- 	NR_STAT_GROUPS
- };
+"NOTE After exit from Hibernate all UniPro Transport Layer attributes (including L4 T_PeerDeviceID, 
 
+L4 T_PeerCPortID, L4 T_ConnectionState, etc.) will be reset to their reset values. All required attributes 
+
+must be restored properly on both ends before communication can resume."
+
+But its not clear whether SW needs to restore these attributes or hardware
+
+Regards
+Vignesh
+
+>> Signed-off-by: sheebab <sheebab@cadence.com>
+>> ---
+>>  drivers/scsi/ufs/cdns-pltfrm.c | 97 +++++++++++++++++++++++++++++++++++++++++-
+>>  1 file changed, 95 insertions(+), 2 deletions(-)
+>>
+>> diff --git a/drivers/scsi/ufs/cdns-pltfrm.c b/drivers/scsi/ufs/cdns-pltfrm.c
+>> index adbbd60..5510567 100644
+>> --- a/drivers/scsi/ufs/cdns-pltfrm.c
+>> +++ b/drivers/scsi/ufs/cdns-pltfrm.c
+>> @@ -19,6 +19,14 @@
+>>
+>>  #define CDNS_UFS_REG_HCLKDIV   0xFC
+>>  #define CDNS_UFS_REG_PHY_XCFGD1        0x113C
+>> +#define CDNS_UFS_MAX 12
+>> +
+>> +struct cdns_ufs_host {
+>> +       /**
+>> +        * cdns_ufs_dme_attr_val - for storing L4 attributes
+>> +        */
+>> +       u32 cdns_ufs_dme_attr_val[CDNS_UFS_MAX];
+>> +};
+>>
+>>  /**
+>>   * cdns_ufs_enable_intr - enable interrupts
+>> @@ -47,6 +55,77 @@ static void cdns_ufs_disable_intr(struct ufs_hba *hba, u32 intrs)
+>>  }
+>>
+>>  /**
+>> + * cdns_ufs_get_l4_attr - get L4 attributes on local side
+>> + * @hba: per adapter instance
+>> + *
+>> + */
+>> +static void cdns_ufs_get_l4_attr(struct ufs_hba *hba)
+>> +{
+>> +       struct cdns_ufs_host *host = ufshcd_get_variant(hba);
+>> +
+>> +       ufshcd_dme_get(hba, UIC_ARG_MIB(T_PEERDEVICEID),
+>> +                      &host->cdns_ufs_dme_attr_val[0]);
+>> +       ufshcd_dme_get(hba, UIC_ARG_MIB(T_PEERCPORTID),
+>> +                      &host->cdns_ufs_dme_attr_val[1]);
+>> +       ufshcd_dme_get(hba, UIC_ARG_MIB(T_TRAFFICCLASS),
+>> +                      &host->cdns_ufs_dme_attr_val[2]);
+>> +       ufshcd_dme_get(hba, UIC_ARG_MIB(T_PROTOCOLID),
+>> +                      &host->cdns_ufs_dme_attr_val[3]);
+>> +       ufshcd_dme_get(hba, UIC_ARG_MIB(T_CPORTFLAGS),
+>> +                      &host->cdns_ufs_dme_attr_val[4]);
+>> +       ufshcd_dme_get(hba, UIC_ARG_MIB(T_TXTOKENVALUE),
+>> +                      &host->cdns_ufs_dme_attr_val[5]);
+>> +       ufshcd_dme_get(hba, UIC_ARG_MIB(T_RXTOKENVALUE),
+>> +                      &host->cdns_ufs_dme_attr_val[6]);
+>> +       ufshcd_dme_get(hba, UIC_ARG_MIB(T_LOCALBUFFERSPACE),
+>> +                      &host->cdns_ufs_dme_attr_val[7]);
+>> +       ufshcd_dme_get(hba, UIC_ARG_MIB(T_PEERBUFFERSPACE),
+>> +                      &host->cdns_ufs_dme_attr_val[8]);
+>> +       ufshcd_dme_get(hba, UIC_ARG_MIB(T_CREDITSTOSEND),
+>> +                      &host->cdns_ufs_dme_attr_val[9]);
+>> +       ufshcd_dme_get(hba, UIC_ARG_MIB(T_CPORTMODE),
+>> +                      &host->cdns_ufs_dme_attr_val[10]);
+>> +       ufshcd_dme_get(hba, UIC_ARG_MIB(T_CONNECTIONSTATE),
+>> +                      &host->cdns_ufs_dme_attr_val[11]);
+>> +}
+>> +
+>> +/**
+>> + * cdns_ufs_set_l4_attr - set L4 attributes on local side
+>> + * @hba: per adapter instance
+>> + *
+>> + */
+>> +static void cdns_ufs_set_l4_attr(struct ufs_hba *hba)
+>> +{
+>> +       struct cdns_ufs_host *host = ufshcd_get_variant(hba);
+>> +
+>> +       ufshcd_dme_set(hba, UIC_ARG_MIB(T_CONNECTIONSTATE), 0);
+>> +       ufshcd_dme_set(hba, UIC_ARG_MIB(T_PEERDEVICEID),
+>> +                      host->cdns_ufs_dme_attr_val[0]);
+>> +       ufshcd_dme_set(hba, UIC_ARG_MIB(T_PEERCPORTID),
+>> +                      host->cdns_ufs_dme_attr_val[1]);
+>> +       ufshcd_dme_set(hba, UIC_ARG_MIB(T_TRAFFICCLASS),
+>> +                      host->cdns_ufs_dme_attr_val[2]);
+>> +       ufshcd_dme_set(hba, UIC_ARG_MIB(T_PROTOCOLID),
+>> +                      host->cdns_ufs_dme_attr_val[3]);
+>> +       ufshcd_dme_set(hba, UIC_ARG_MIB(T_CPORTFLAGS),
+>> +                      host->cdns_ufs_dme_attr_val[4]);
+>> +       ufshcd_dme_set(hba, UIC_ARG_MIB(T_TXTOKENVALUE),
+>> +                      host->cdns_ufs_dme_attr_val[5]);
+>> +       ufshcd_dme_set(hba, UIC_ARG_MIB(T_RXTOKENVALUE),
+>> +                      host->cdns_ufs_dme_attr_val[6]);
+>> +       ufshcd_dme_set(hba, UIC_ARG_MIB(T_LOCALBUFFERSPACE),
+>> +                      host->cdns_ufs_dme_attr_val[7]);
+>> +       ufshcd_dme_set(hba, UIC_ARG_MIB(T_PEERBUFFERSPACE),
+>> +                      host->cdns_ufs_dme_attr_val[8]);
+>> +       ufshcd_dme_set(hba, UIC_ARG_MIB(T_CREDITSTOSEND),
+>> +                      host->cdns_ufs_dme_attr_val[9]);
+>> +       ufshcd_dme_set(hba, UIC_ARG_MIB(T_CPORTMODE),
+>> +                      host->cdns_ufs_dme_attr_val[10]);
+>> +       ufshcd_dme_set(hba, UIC_ARG_MIB(T_CONNECTIONSTATE),
+>> +                      host->cdns_ufs_dme_attr_val[11]);
+>> +}
+>> +
+>> +/**
+>>   * Sets HCLKDIV register value based on the core_clk
+>>   * @hba: host controller instance
+>>   *
+>> @@ -134,6 +213,7 @@ static void cdns_ufs_hibern8_notify(struct ufs_hba *hba, enum uic_cmd_dme cmd,
+>>                  * before manual hibernate entry.
+>>                  */
+>>                 cdns_ufs_enable_intr(hba, UFSHCD_UIC_HIBERN8_MASK);
+>> +               cdns_ufs_get_l4_attr(hba);
+>>         }
+>>         if (status == POST_CHANGE && cmd == UIC_CMD_DME_HIBER_EXIT) {
+>>                 /**
+>> @@ -141,6 +221,7 @@ static void cdns_ufs_hibern8_notify(struct ufs_hba *hba, enum uic_cmd_dme cmd,
+>>                  * after manual hibern8 exit.
+>>                  */
+>>                 cdns_ufs_disable_intr(hba, UFSHCD_UIC_HIBERN8_MASK);
+>> +               cdns_ufs_set_l4_attr(hba);
+>>         }
+>>  }
+>>
+>> @@ -245,15 +326,27 @@ static int cdns_ufs_pltfrm_probe(struct platform_device *pdev)
+>>         const struct of_device_id *of_id;
+>>         struct ufs_hba_variant_ops *vops;
+>>         struct device *dev = &pdev->dev;
+>> +       struct cdns_ufs_host *host;
+>> +       struct ufs_hba *hba;
+>>
+>>         of_id = of_match_node(cdns_ufs_of_match, dev->of_node);
+>>         vops = (struct ufs_hba_variant_ops *)of_id->data;
+>>
+>>         /* Perform generic probe */
+>>         err = ufshcd_pltfrm_init(pdev, vops);
+>> -       if (err)
+>> +       if (err) {
+>>                 dev_err(dev, "ufshcd_pltfrm_init() failed %d\n", err);
+>> -
+>> +               goto out;
+>> +       }
+>> +       host = devm_kzalloc(dev, sizeof(*host), GFP_KERNEL);
+>> +       if (!host) {
+>> +               err = -ENOMEM;
+>> +               dev_err(dev, "%s: no memory for cdns host\n", __func__);
+>> +               goto out;
+>> +       }
+>> +       hba =  platform_get_drvdata(pdev);
+>> +       ufshcd_set_variant(hba, host);
+>> +out:
+>>         return err;
+>>  }
+>>
+>> --
+>> 2.7.4
+>>
+> 
+> 
+
+-- 
+Regards
+Vignesh
