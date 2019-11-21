@@ -2,320 +2,96 @@ Return-Path: <SRS0=S5B1=ZN=vger.kernel.org=linux-block-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-8.2 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
-	INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,
-	URIBL_BLOCKED,USER_AGENT_SANE_1 autolearn=unavailable autolearn_force=no
-	version=3.4.0
+X-Spam-Status: No, score=-2.2 required=3.0 tests=DKIM_SIGNED,DKIM_VALID,
+	HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,
+	USER_AGENT_SANE_1 autolearn=no autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 4CD71C432C3
-	for <linux-block@archiver.kernel.org>; Thu, 21 Nov 2019 15:45:55 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 271E5C432C3
+	for <linux-block@archiver.kernel.org>; Thu, 21 Nov 2019 15:56:27 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.kernel.org (Postfix) with ESMTP id 1C34B206D8
-	for <linux-block@archiver.kernel.org>; Thu, 21 Nov 2019 15:45:55 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id F287D206D8
+	for <linux-block@archiver.kernel.org>; Thu, 21 Nov 2019 15:56:26 +0000 (UTC)
+Authentication-Results: mail.kernel.org;
+	dkim=pass (2048-bit key) header.d=kernel-dk.20150623.gappssmtp.com header.i=@kernel-dk.20150623.gappssmtp.com header.b="p9f61F2q"
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1726554AbfKUPpy (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Thu, 21 Nov 2019 10:45:54 -0500
-Received: from mx2.suse.de ([195.135.220.15]:37960 "EHLO mx1.suse.de"
-        rhost-flags-OK-OK-OK-FAIL) by vger.kernel.org with ESMTP
-        id S1726279AbfKUPpy (ORCPT <rfc822;linux-block@vger.kernel.org>);
-        Thu, 21 Nov 2019 10:45:54 -0500
-X-Virus-Scanned: by amavisd-new at test-mx.suse.de
-Received: from relay2.suse.de (unknown [195.135.220.254])
-        by mx1.suse.de (Postfix) with ESMTP id 29534AF79;
-        Thu, 21 Nov 2019 15:45:50 +0000 (UTC)
-Subject: Re: [PATCH 4/4] scsi: core: don't limit per-LUN queue depth for SSD
-To:     Ming Lei <ming.lei@redhat.com>
-Cc:     Jens Axboe <axboe@kernel.dk>, linux-block@vger.kernel.org,
-        "James E . J . Bottomley" <jejb@linux.ibm.com>,
-        "Martin K . Petersen" <martin.petersen@oracle.com>,
-        linux-scsi@vger.kernel.org,
-        Sathya Prakash <sathya.prakash@broadcom.com>,
-        Chaitra P B <chaitra.basappa@broadcom.com>,
-        Suganath Prabu Subramani 
-        <suganath-prabu.subramani@broadcom.com>,
-        Kashyap Desai <kashyap.desai@broadcom.com>,
-        Sumit Saxena <sumit.saxena@broadcom.com>,
-        Shivasharan S <shivasharan.srikanteshwara@broadcom.com>,
-        "Ewan D . Milne" <emilne@redhat.com>,
-        Christoph Hellwig <hch@lst.de>,
-        Bart Van Assche <bart.vanassche@wdc.com>
-References: <20191118103117.978-1-ming.lei@redhat.com>
- <20191118103117.978-5-ming.lei@redhat.com>
- <1081145f-3e17-9bc1-2332-50a4b5621ef7@suse.de>
- <20191121005323.GB24548@ming.t460p>
-From:   Hannes Reinecke <hare@suse.de>
-Openpgp: preference=signencrypt
-Autocrypt: addr=hare@suse.de; prefer-encrypt=mutual; keydata=
- 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
- azzYF4VRJsdl+d0MCaSy8mUh
-Message-ID: <336f35fc-2e22-c615-9405-50297b9737ea@suse.de>
-Date:   Thu, 21 Nov 2019 16:45:48 +0100
+        id S1726563AbfKUP4X (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Thu, 21 Nov 2019 10:56:23 -0500
+Received: from mail-il1-f195.google.com ([209.85.166.195]:40316 "EHLO
+        mail-il1-f195.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S1727207AbfKUP4S (ORCPT
+        <rfc822;linux-block@vger.kernel.org>);
+        Thu, 21 Nov 2019 10:56:18 -0500
+Received: by mail-il1-f195.google.com with SMTP id d83so3748557ilk.7
+        for <linux-block@vger.kernel.org>; Thu, 21 Nov 2019 07:56:17 -0800 (PST)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=kernel-dk.20150623.gappssmtp.com; s=20150623;
+        h=subject:to:cc:references:from:message-id:date:user-agent
+         :mime-version:in-reply-to:content-language:content-transfer-encoding;
+        bh=i6XZTTQSHJKM+KBZCHJbpNr3leYiOU/zZyc4Kt/q1ls=;
+        b=p9f61F2qEE4/QwqhzVpQxRpsxX+tV3SxRebeynsmRfBNHvoMnRcPAeQBMJ4vetLpDz
+         shfSAjNsSLR8/AyOjsQjN2cfgMUQmKjudar8cuqkQT4utDF/Fg0xyKUILGxfQL2m4ykC
+         v2dKDPfCeTVXelv8ErH8wWKv+orr2ysEDzISJsEE+qs4wfsyfactwDmLH8MnBWJzVSmY
+         XCTDegH0huTSluHvW6LcnV5C2iycu99pwuw2Q/YxucMfTo227eo59/I8ZMNVpzMswrI3
+         2Efr4431bVIGY+4pWPJ+b3TiJoIazJewBg9vmPs5YlVPxg8N869vnJ+tezxnZ3CO4XTi
+         5d9w==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20161025;
+        h=x-gm-message-state:subject:to:cc:references:from:message-id:date
+         :user-agent:mime-version:in-reply-to:content-language
+         :content-transfer-encoding;
+        bh=i6XZTTQSHJKM+KBZCHJbpNr3leYiOU/zZyc4Kt/q1ls=;
+        b=BJ7JyaLyUH+RspclNlVID3uRX9biz4E9BzOgp+U+C4D7PP9eHwUFiUfx8k5btrHeR3
+         v1lM4L1rQQevikSobrlgJyumVZGUQC3AkHTA8h4ZZRiIr/4OYKLdawnU/m3u1lxJw0o0
+         oG5BkXWbDWjMS0hBfaMIhnlhqRAgofkRc6OZSRlDHHdMuKkd/LThvCLszHfL3IoEJLFF
+         +nBY6+Sw4ME0oIwqB8VtvLgGUmfo2+H7mpoQ54nURTGdOEelAUwjH6HAPwYdVb7WgL8j
+         QwRdyTJTBVWDrb9XT3pjg9DpfJvEgMcrjW69YZh+pKyd9mTw8NMZwFO/RyT+WImr+nWm
+         i8OQ==
+X-Gm-Message-State: APjAAAUTsS9/oZ7xdyJEN43g2yRjvM17Z1qbRs/RwgErt0QcPPaEqGwA
+        q7Wek4+lZpmJzLflnOv9duetNg==
+X-Google-Smtp-Source: APXvYqyBx1nTqGMRn9GsWSj0/giOcMCoKn/OjZ4stbz+xyyRba03IeYJrruyiFFcHRXe1jGKDNx4oA==
+X-Received: by 2002:a05:6e02:100b:: with SMTP id n11mr10655778ilj.212.1574351776819;
+        Thu, 21 Nov 2019 07:56:16 -0800 (PST)
+Received: from [192.168.1.159] ([65.144.74.34])
+        by smtp.gmail.com with ESMTPSA id 133sm1342001ila.25.2019.11.21.07.56.15
+        (version=TLS1_2 cipher=ECDHE-RSA-AES128-GCM-SHA256 bits=128/128);
+        Thu, 21 Nov 2019 07:56:15 -0800 (PST)
+Subject: Re: [PATCH] block: add iostat counters for flush requests
+To:     Konstantin Khlebnikov <khlebnikov@yandex-team.ru>,
+        linux-block@vger.kernel.org, linux-kernel@vger.kernel.org,
+        linux-doc@vger.kernel.org
+Cc:     linux-fsdevel@vger.kernel.org, linux-api@vger.kernel.org,
+        Dmitry Monakhov <dmtrmonakhov@yandex-team.ru>
+References: <157433282607.7928.5202409984272248322.stgit@buzz>
+From:   Jens Axboe <axboe@kernel.dk>
+Message-ID: <ff971ff6-9a10-c3f1-107d-4f7d378e8755@kernel.dk>
+Date:   Thu, 21 Nov 2019 08:56:14 -0700
 User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:60.0) Gecko/20100101
- Thunderbird/60.7.2
+ Thunderbird/60.9.0
 MIME-Version: 1.0
-In-Reply-To: <20191121005323.GB24548@ming.t460p>
-Content-Type: text/plain; charset=windows-1252
+In-Reply-To: <157433282607.7928.5202409984272248322.stgit@buzz>
+Content-Type: text/plain; charset=utf-8
 Content-Language: en-US
-Content-Transfer-Encoding: 8bit
+Content-Transfer-Encoding: 7bit
 Sender: linux-block-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-On 11/21/19 1:53 AM, Ming Lei wrote:
-> On Wed, Nov 20, 2019 at 11:05:24AM +0100, Hannes Reinecke wrote:
->> On 11/18/19 11:31 AM, Ming Lei wrote:
->>> SCSI core uses the atomic variable of sdev->device_busy to track
->>> in-flight IO requests dispatched to this scsi device. IO request may be
->>> submitted from any CPU, so the cost for maintaining the shared atomic
->>> counter can be very big on big NUMA machine with lots of CPU cores.
->>>
->>> sdev->queue_depth is usually used for two purposes: 1) improve IO merge;
->>> 2) fair IO request scattered among all LUNs.
->>>
->>> blk-mq already provides fair request allocation among all active shared
->>> request queues(LUNs), see hctx_may_queue().
->>>
->>> NVMe doesn't have such per-request-queue(namespace) queue depth, so it
->>> is reasonable to ignore the limit for SCSI SSD too. Also IO merge won't
->>> play big role for reaching top SSD performance.
->>>
->>> With this patch, big cost for tracking in-flight per-LUN requests via
->>> atomic variable can be saved.
->>>
->>> Given QUEUE_FLAG_NONROT is read in IO path, we have to freeze queue
->>> before changing this flag.
->>>
->>> Cc: Sathya Prakash <sathya.prakash@broadcom.com>
->>> Cc: Chaitra P B <chaitra.basappa@broadcom.com>
->>> Cc: Suganath Prabu Subramani <suganath-prabu.subramani@broadcom.com>
->>> Cc: Kashyap Desai <kashyap.desai@broadcom.com>
->>> Cc: Sumit Saxena <sumit.saxena@broadcom.com>
->>> Cc: Shivasharan S <shivasharan.srikanteshwara@broadcom.com>
->>> Cc: Ewan D. Milne <emilne@redhat.com>
->>> Cc: Christoph Hellwig <hch@lst.de>,
->>> Cc: Hannes Reinecke <hare@suse.de>
->>> Cc: Bart Van Assche <bart.vanassche@wdc.com>
->>> Signed-off-by: Ming Lei <ming.lei@redhat.com>
->>> ---
->>>  block/blk-sysfs.c       | 14 +++++++++++++-
->>>  drivers/scsi/scsi_lib.c | 24 ++++++++++++++++++------
->>>  drivers/scsi/sd.c       |  4 ++++
->>>  3 files changed, 35 insertions(+), 7 deletions(-)
->>>
->>> diff --git a/block/blk-sysfs.c b/block/blk-sysfs.c
->>> index fca9b158f4a0..9cc0dd5f88a1 100644
->>> --- a/block/blk-sysfs.c
->>> +++ b/block/blk-sysfs.c
->>> @@ -281,6 +281,18 @@ QUEUE_SYSFS_BIT_FNS(random, ADD_RANDOM, 0);
->>>  QUEUE_SYSFS_BIT_FNS(iostats, IO_STAT, 0);
->>>  #undef QUEUE_SYSFS_BIT_FNS
->>>  
->>> +static ssize_t queue_store_nonrot_freeze(struct request_queue *q,
->>> +		const char *page, size_t count)
->>> +{
->>> +	size_t ret;
->>> +
->>> +	blk_mq_freeze_queue(q);
->>> +	ret = queue_store_nonrot(q, page, count);
->>> +	blk_mq_unfreeze_queue(q);
->>> +
->>> +	return ret;
->>> +}
->>> +
->>>  static ssize_t queue_zoned_show(struct request_queue *q, char *page)
->>>  {
->>>  	switch (blk_queue_zoned_model(q)) {
->>> @@ -642,7 +654,7 @@ static struct queue_sysfs_entry queue_write_zeroes_max_entry = {
->>>  static struct queue_sysfs_entry queue_nonrot_entry = {
->>>  	.attr = {.name = "rotational", .mode = 0644 },
->>>  	.show = queue_show_nonrot,
->>> -	.store = queue_store_nonrot,
->>> +	.store = queue_store_nonrot_freeze,
->>>  };
->>>  
->>>  static struct queue_sysfs_entry queue_zoned_entry = {
->>> diff --git a/drivers/scsi/scsi_lib.c b/drivers/scsi/scsi_lib.c
->>> index 62a86a82c38d..72655a049efd 100644
->>> --- a/drivers/scsi/scsi_lib.c
->>> +++ b/drivers/scsi/scsi_lib.c
->>> @@ -354,7 +354,8 @@ void scsi_device_unbusy(struct scsi_device *sdev, struct scsi_cmnd *cmd)
->>>  	if (starget->can_queue > 0)
->>>  		atomic_dec(&starget->target_busy);
->>>  
->>> -	atomic_dec(&sdev->device_busy);
->>> +	if (!blk_queue_nonrot(sdev->request_queue))
->>> +		atomic_dec(&sdev->device_busy);
->>>  }
->>>  
->>>  static void scsi_kick_queue(struct request_queue *q)
->>> @@ -410,7 +411,8 @@ static void scsi_single_lun_run(struct scsi_device *current_sdev)
->>>  
->>>  static inline bool scsi_device_is_busy(struct scsi_device *sdev)
->>>  {
->>> -	if (atomic_read(&sdev->device_busy) >= sdev->queue_depth)
->>> +	if (!blk_queue_nonrot(sdev->request_queue) &&
->>> +			atomic_read(&sdev->device_busy) >= sdev->queue_depth)
->>>  		return true;
->>>  	if (atomic_read(&sdev->device_blocked) > 0)
->>>  		return true;
->>> @@ -1283,8 +1285,12 @@ static inline int scsi_dev_queue_ready(struct request_queue *q,
->>>  				  struct scsi_device *sdev)
->>>  {
->>>  	unsigned int busy;
->>> +	bool bypass = blk_queue_nonrot(sdev->request_queue);
->>>  
->>> -	busy = atomic_inc_return(&sdev->device_busy) - 1;
->>> +	if (!bypass)
->>> +		busy = atomic_inc_return(&sdev->device_busy) - 1;
->>> +	else
->>> +		busy = 0;
->>>  	if (atomic_read(&sdev->device_blocked)) {
->>>  		if (busy)
->>>  			goto out_dec;
->>> @@ -1298,12 +1304,16 @@ static inline int scsi_dev_queue_ready(struct request_queue *q,
->>>  				   "unblocking device at zero depth\n"));
->>>  	}
->>>  
->>> +	if (bypass)
->>> +		return 1;
->>> +
->>>  	if (busy >= sdev->queue_depth)
->>>  		goto out_dec;
->>>  
->>>  	return 1;
->>>  out_dec:
->>> -	atomic_dec(&sdev->device_busy);
->>> +	if (!bypass)
->>> +		atomic_dec(&sdev->device_busy);
->>>  	return 0;
->>>  }
->>>  
->>> @@ -1624,7 +1634,8 @@ static void scsi_mq_put_budget(struct blk_mq_hw_ctx *hctx)
->>>  	struct request_queue *q = hctx->queue;
->>>  	struct scsi_device *sdev = q->queuedata;
->>>  
->>> -	atomic_dec(&sdev->device_busy);
->>> +	if (!blk_queue_nonrot(sdev->request_queue))
->>> +		atomic_dec(&sdev->device_busy);
->>>  }
->>>  
->>>  static bool scsi_mq_get_budget(struct blk_mq_hw_ctx *hctx)
->>> @@ -1731,7 +1742,8 @@ static blk_status_t scsi_queue_rq(struct blk_mq_hw_ctx *hctx,
->>>  	case BLK_STS_OK:
->>>  		break;
->>>  	case BLK_STS_RESOURCE:
->>> -		if (atomic_read(&sdev->device_busy) ||
->>> +		if ((!blk_queue_nonrot(sdev->request_queue) &&
->>> +		     atomic_read(&sdev->device_busy)) ||
->>>  		    scsi_device_blocked(sdev))
->>>  			ret = BLK_STS_DEV_RESOURCE;
->>>  		break;
->>> diff --git a/drivers/scsi/sd.c b/drivers/scsi/sd.c
->>> index 0744c34468e1..c3d47117700d 100644
->>> --- a/drivers/scsi/sd.c
->>> +++ b/drivers/scsi/sd.c
->>> @@ -2927,7 +2927,9 @@ static void sd_read_block_characteristics(struct scsi_disk *sdkp)
->>>  	rot = get_unaligned_be16(&buffer[4]);
->>>  
->>>  	if (rot == 1) {
->>> +		blk_mq_freeze_queue(q);
->>>  		blk_queue_flag_set(QUEUE_FLAG_NONROT, q);
->>> +		blk_mq_unfreeze_queue(q);
->>>  		blk_queue_flag_clear(QUEUE_FLAG_ADD_RANDOM, q);
->>>  	}
->>>  
->>> @@ -3123,7 +3125,9 @@ static int sd_revalidate_disk(struct gendisk *disk)
->>>  		 * cause this to be updated correctly and any device which
->>>  		 * doesn't support it should be treated as rotational.
->>>  		 */
->>> +		blk_mq_freeze_queue(q);
->>>  		blk_queue_flag_clear(QUEUE_FLAG_NONROT, q);
->>> +		blk_mq_unfreeze_queue(q);
->>>  		blk_queue_flag_set(QUEUE_FLAG_ADD_RANDOM, q);
->>>  
->>>  		if (scsi_device_supports_vpd(sdp)) {
->>>
->> Hmm.
->>
->> I must admit I patently don't like this explicit dependency on
->> blk_nonrot(). Having a conditional counter is just an open invitation to
->> getting things wrong...
+On 11/21/19 3:40 AM, Konstantin Khlebnikov wrote:
+> Requests that triggers flushing volatile writeback cache to disk (barriers)
+> have significant effect to overall performance.
 > 
-> That won't be an issue given this patch freezes queue when the
-> NONROT queue flag is changed.
+> Block layer has sophisticated engine for combining several flush requests
+> into one. But there is no statistics for actual flushes executed by disk.
+> Requests which trigger flushes usually are barriers - zero-size writes.
 > 
-That's not what I'm saying.
+> This patch adds two iostat counters into /sys/class/block/$dev/stat and
+> /proc/diskstats - count of completed flush requests and their total time.
 
-My issue is that we're turning the device_busy counter into a
-conditional counter, which only must be accessed when that condition is
-true.
-This not only puts a burden on the developer (as he has to remember to
-always check the condition), but also has possible issues when switching
-between modes.
-The latter you've addressed with ensuring that the queue must be frozen
-when modifying that flag, but the former is a conceptual problem.
+This makes sense to me, and the "recent" discard addition already proved
+that we're fine extending with more fields. Unless folks object, I'd be
+happy to queue this up for 5.5.
 
-And that was what I had been referring to.
-
->>
->> I would far prefer if we could delegate any queueing decision to the
->> elevators, and completely drop the device_busy flag for all devices.
-> 
-> If you drop it, you may create big sequential IO performance drop
-> on HDD., that is why this patch only bypasses sdev->queue_depth on
-> SSD. NVMe bypasses it because no one uses HDD. via NVMe.
-> 
-I still wonder how much performance drop we actually see; what seems to
-happen is that device_busy just arbitrary pushes back to the block
-layer, giving it more time to do merging.
-I do think we can do better then that...
-
-Cheers,
-
-Hannes
 -- 
-Dr. Hannes Reinecke		      Teamlead Storage & Networking
-hare@suse.de			                  +49 911 74053 688
-SUSE Software Solutions Germany GmbH, Maxfeldstr. 5, 90409 Nürnberg
-HRB 247165 (AG München), GF: Felix Imendörffer
+Jens Axboe
+
