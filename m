@@ -2,118 +2,135 @@ Return-Path: <SRS0=+obT=ZO=vger.kernel.org=linux-block-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-0.8 required=3.0 tests=DKIMWL_WL_HIGH,DKIM_SIGNED,
+X-Spam-Status: No, score=-2.4 required=3.0 tests=DKIMWL_WL_HIGH,DKIM_SIGNED,
 	DKIM_VALID,DKIM_VALID_AU,HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,
-	SPF_HELO_NONE,SPF_PASS,UNPARSEABLE_RELAY autolearn=no autolearn_force=no
-	version=3.4.0
+	SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED,USER_AGENT_SANE_1 autolearn=no
+	autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id C95FDC432C0
-	for <linux-block@archiver.kernel.org>; Fri, 22 Nov 2019 02:25:45 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 41D02C432C0
+	for <linux-block@archiver.kernel.org>; Fri, 22 Nov 2019 02:57:07 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.kernel.org (Postfix) with ESMTP id 9CDAB20692
-	for <linux-block@archiver.kernel.org>; Fri, 22 Nov 2019 02:25:45 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id 198B1204FD
+	for <linux-block@archiver.kernel.org>; Fri, 22 Nov 2019 02:57:07 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=pass (2048-bit key) header.d=oracle.com header.i=@oracle.com header.b="sTVu9Csq"
+	dkim=pass (2048-bit key) header.d=nvidia.com header.i=@nvidia.com header.b="ea5W7/2c"
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1726408AbfKVCZp (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Thu, 21 Nov 2019 21:25:45 -0500
-Received: from userp2120.oracle.com ([156.151.31.85]:59328 "EHLO
-        userp2120.oracle.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1726335AbfKVCZo (ORCPT
+        id S1726540AbfKVC5A (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Thu, 21 Nov 2019 21:57:00 -0500
+Received: from hqemgate16.nvidia.com ([216.228.121.65]:4158 "EHLO
+        hqemgate16.nvidia.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S1726343AbfKVC47 (ORCPT
         <rfc822;linux-block@vger.kernel.org>);
-        Thu, 21 Nov 2019 21:25:44 -0500
-Received: from pps.filterd (userp2120.oracle.com [127.0.0.1])
-        by userp2120.oracle.com (8.16.0.27/8.16.0.27) with SMTP id xAM2O45X129595;
-        Fri, 22 Nov 2019 02:25:32 GMT
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=oracle.com; h=to : cc : subject :
- from : references : date : in-reply-to : message-id : mime-version :
- content-type; s=corp-2019-08-05;
- bh=+IcW1brC9RRuMP8eAOD+qcqBkj+fn9n/g8hILFx4gso=;
- b=sTVu9CsqSD1I+39pMRFypx5e6502JPrLE4TiNzEu7KUZ1OnpHeftqKZ+ES6TXjP6e8sy
- fAQjpLHXhLaFA/92zdrrG7DXGSXedCbFOSswFH21JxlIYQ5x91ILVJ6wtqZ66Nz/JoGC
- IDcv3kmx1xCKRuPWiZfMwnkVS6ljIdOWM3KXrdPPCCjRnwUNoVhLA7jZ31Hf29XePPpH
- kkpj4SGOyk1DkIiLXrZZ7jtNtIp4v2Nv1+MfXuYnPhOZ6CKLlswuEMIa7rnBNIndXst0
- teSFhcFyMZjTe0+xEoyV1dUW3YCYQsHCANRSXL+FoIlR/vmHaLN2SyHz1JPr3U+Iytnu lg== 
-Received: from aserp3020.oracle.com (aserp3020.oracle.com [141.146.126.70])
-        by userp2120.oracle.com with ESMTP id 2wa9rqyuyp-1
-        (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=OK);
-        Fri, 22 Nov 2019 02:25:32 +0000
-Received: from pps.filterd (aserp3020.oracle.com [127.0.0.1])
-        by aserp3020.oracle.com (8.16.0.27/8.16.0.27) with SMTP id xAM2NHNN142965;
-        Fri, 22 Nov 2019 02:25:31 GMT
-Received: from userv0121.oracle.com (userv0121.oracle.com [156.151.31.72])
-        by aserp3020.oracle.com with ESMTP id 2wdfrwexjj-1
-        (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=OK);
-        Fri, 22 Nov 2019 02:25:31 +0000
-Received: from abhmp0002.oracle.com (abhmp0002.oracle.com [141.146.116.8])
-        by userv0121.oracle.com (8.14.4/8.13.8) with ESMTP id xAM2PTqd005753;
-        Fri, 22 Nov 2019 02:25:29 GMT
-Received: from ca-mkp.ca.oracle.com (/10.159.214.123)
-        by default (Oracle Beehive Gateway v4.0)
-        with ESMTP ; Thu, 21 Nov 2019 18:25:29 -0800
-To:     "Ewan D. Milne" <emilne@redhat.com>
-Cc:     Bart Van Assche <bvanassche@acm.org>,
-        Hannes Reinecke <hare@suse.de>, Ming Lei <ming.lei@redhat.com>,
-        Jens Axboe <axboe@kernel.dk>, linux-block@vger.kernel.org,
-        "James E . J . Bottomley" <jejb@linux.ibm.com>,
-        "Martin K . Petersen" <martin.petersen@oracle.com>,
-        linux-scsi@vger.kernel.org,
-        Sathya Prakash <sathya.prakash@broadcom.com>,
-        Chaitra P B <chaitra.basappa@broadcom.com>,
-        Suganath Prabu Subramani 
-        <suganath-prabu.subramani@broadcom.com>,
-        Kashyap Desai <kashyap.desai@broadcom.com>,
-        Sumit Saxena <sumit.saxena@broadcom.com>,
-        Shivasharan S <shivasharan.srikanteshwara@broadcom.com>,
-        Christoph Hellwig <hch@lst.de>,
-        Bart Van Assche <bart.vanassche@wdc.com>
-Subject: Re: [PATCH 4/4] scsi: core: don't limit per-LUN queue depth for SSD
-From:   "Martin K. Petersen" <martin.petersen@oracle.com>
-Organization: Oracle Corporation
-References: <20191118103117.978-1-ming.lei@redhat.com>
-        <20191118103117.978-5-ming.lei@redhat.com>
-        <1081145f-3e17-9bc1-2332-50a4b5621ef7@suse.de>
-        <9bbcbbb42b659c323c9e0d74aa9b062a3f517d1f.camel@redhat.com>
-        <44644664-f7b6-facd-d1bb-f7cfc9524379@acm.org>
-        <f5b78ec7c0e6fec69950cace8531eb342987c0b9.camel@redhat.com>
-Date:   Thu, 21 Nov 2019 21:25:25 -0500
-In-Reply-To: <f5b78ec7c0e6fec69950cace8531eb342987c0b9.camel@redhat.com> (Ewan
-        D. Milne's message of "Wed, 20 Nov 2019 16:36:41 -0500")
-Message-ID: <yq1tv6wbqay.fsf@oracle.com>
-User-Agent: Gnus/5.13 (Gnus v5.13) Emacs/26.1.92 (gnu/linux)
+        Thu, 21 Nov 2019 21:56:59 -0500
+Received: from hqpgpgate101.nvidia.com (Not Verified[216.228.121.13]) by hqemgate16.nvidia.com (using TLS: TLSv1.2, DES-CBC3-SHA)
+        id <B5dd74e740000>; Thu, 21 Nov 2019 18:56:52 -0800
+Received: from hqmail.nvidia.com ([172.20.161.6])
+  by hqpgpgate101.nvidia.com (PGP Universal service);
+  Thu, 21 Nov 2019 18:56:51 -0800
+X-PGP-Universal: processed;
+        by hqpgpgate101.nvidia.com on Thu, 21 Nov 2019 18:56:51 -0800
+Received: from [10.2.168.213] (10.124.1.5) by HQMAIL107.nvidia.com
+ (172.20.187.13) with Microsoft SMTP Server (TLS) id 15.0.1473.3; Fri, 22 Nov
+ 2019 02:56:50 +0000
+Subject: Re: [PATCH v7 02/24] mm/gup: factor out duplicate code from four
+ routines
+To:     Jan Kara <jack@suse.cz>
+CC:     Christoph Hellwig <hch@lst.de>,
+        Andrew Morton <akpm@linux-foundation.org>,
+        Al Viro <viro@zeniv.linux.org.uk>,
+        Alex Williamson <alex.williamson@redhat.com>,
+        Benjamin Herrenschmidt <benh@kernel.crashing.org>,
+        =?UTF-8?B?QmrDtnJuIFTDtnBlbA==?= <bjorn.topel@intel.com>,
+        Christoph Hellwig <hch@infradead.org>,
+        Dan Williams <dan.j.williams@intel.com>,
+        Daniel Vetter <daniel@ffwll.ch>,
+        Dave Chinner <david@fromorbit.com>,
+        David Airlie <airlied@linux.ie>,
+        "David S . Miller" <davem@davemloft.net>,
+        Ira Weiny <ira.weiny@intel.com>,
+        Jason Gunthorpe <jgg@ziepe.ca>, Jens Axboe <axboe@kernel.dk>,
+        Jonathan Corbet <corbet@lwn.net>,
+        =?UTF-8?B?SsOpcsO0bWUgR2xpc3Nl?= <jglisse@redhat.com>,
+        Magnus Karlsson <magnus.karlsson@intel.com>,
+        Mauro Carvalho Chehab <mchehab@kernel.org>,
+        Michael Ellerman <mpe@ellerman.id.au>,
+        Michal Hocko <mhocko@suse.com>,
+        Mike Kravetz <mike.kravetz@oracle.com>,
+        Paul Mackerras <paulus@samba.org>,
+        Shuah Khan <shuah@kernel.org>,
+        Vlastimil Babka <vbabka@suse.cz>, <bpf@vger.kernel.org>,
+        <dri-devel@lists.freedesktop.org>, <kvm@vger.kernel.org>,
+        <linux-block@vger.kernel.org>, <linux-doc@vger.kernel.org>,
+        <linux-fsdevel@vger.kernel.org>, <linux-kselftest@vger.kernel.org>,
+        <linux-media@vger.kernel.org>, <linux-rdma@vger.kernel.org>,
+        <linuxppc-dev@lists.ozlabs.org>, <netdev@vger.kernel.org>,
+        <linux-mm@kvack.org>, LKML <linux-kernel@vger.kernel.org>,
+        "Aneesh Kumar K . V" <aneesh.kumar@linux.ibm.com>
+References: <20191121071354.456618-1-jhubbard@nvidia.com>
+ <20191121071354.456618-3-jhubbard@nvidia.com> <20191121080356.GA24784@lst.de>
+ <852f6c27-8b65-547b-89e0-e8f32a4d17b9@nvidia.com>
+ <20191121095411.GC18190@quack2.suse.cz>
+From:   John Hubbard <jhubbard@nvidia.com>
+X-Nvconfidentiality: public
+Message-ID: <9d0846af-2c4f-7cda-dfcb-1f642943afea@nvidia.com>
+Date:   Thu, 21 Nov 2019 18:54:02 -0800
+User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:68.0) Gecko/20100101
+ Thunderbird/68.2.2
 MIME-Version: 1.0
-Content-Type: text/plain
-X-Proofpoint-Virus-Version: vendor=nai engine=6000 definitions=9448 signatures=668685
-X-Proofpoint-Spam-Details: rule=notspam policy=default score=0 suspectscore=0 malwarescore=0
- phishscore=0 bulkscore=0 spamscore=0 mlxscore=0 mlxlogscore=986
- adultscore=0 classifier=spam adjust=0 reason=mlx scancount=1
- engine=8.0.1-1911140001 definitions=main-1911220020
-X-Proofpoint-Virus-Version: vendor=nai engine=6000 definitions=9448 signatures=668685
-X-Proofpoint-Spam-Details: rule=notspam policy=default score=0 priorityscore=1501 malwarescore=0
- suspectscore=0 phishscore=0 bulkscore=0 spamscore=0 clxscore=1015
- lowpriorityscore=0 mlxscore=0 impostorscore=0 mlxlogscore=999 adultscore=0
- classifier=spam adjust=0 reason=mlx scancount=1 engine=8.0.1-1911140001
- definitions=main-1911220020
+In-Reply-To: <20191121095411.GC18190@quack2.suse.cz>
+X-Originating-IP: [10.124.1.5]
+X-ClientProxiedBy: HQMAIL105.nvidia.com (172.20.187.12) To
+ HQMAIL107.nvidia.com (172.20.187.13)
+Content-Type: text/plain; charset="utf-8"; format=flowed
+Content-Language: en-US
+Content-Transfer-Encoding: 7bit
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=nvidia.com; s=n1;
+        t=1574391412; bh=qs/HIaIDAchvyMkQnxvFfFcxB81lObthoFNUVM9HFsU=;
+        h=X-PGP-Universal:Subject:To:CC:References:From:X-Nvconfidentiality:
+         Message-ID:Date:User-Agent:MIME-Version:In-Reply-To:
+         X-Originating-IP:X-ClientProxiedBy:Content-Type:Content-Language:
+         Content-Transfer-Encoding;
+        b=ea5W7/2c5vGNy7OLObdGvq5o0IpGBD08qzI9LgcD4V8BzKvR7hLDcVgsFBzIPWltE
+         d8PXmpt/WgSDLuhJB1bSFzEA5jjhwY4dlcU7E+jQRx3TB5rkLOwlZyYegEL3tsBCr8
+         8qN6mxRQSSTP+FNbJyR7Zo1HLIMkYFYKo0hlXeg0mt5hFKo6iVEhrdf4E8SgIeOW2y
+         us/ORlXUDHvqcnaCH9l42SZAxDz+ZaaZrH8tpmFx0pDTmT79WYa//P0TZxa1PMT2Ec
+         60tYwrFVvqZaHos2D7eAOKA1eeY7xDL9USjPj3cYeVVtnic4Fxyow9kLNCXK7YejUg
+         or0Rt6li4HM5w==
 Sender: linux-block-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
+On 11/21/19 1:54 AM, Jan Kara wrote:
+> On Thu 21-11-19 00:29:59, John Hubbard wrote:
+>>>
+>>> Otherwise this looks fine and might be a worthwhile cleanup to feed
+>>> Andrew for 5.5 independent of the gut of the changes.
+>>>
+>>> Reviewed-by: Christoph Hellwig <hch@lst.de>
+>>>
+>>
+>> Thanks for the reviews! Say, it sounds like your view here is that this
+>> series should be targeted at 5.6 (not 5.5), is that what you have in mind?
+>> And get the preparatory patches (1-9, and maybe even 10-16) into 5.5?
+> 
+> One more note :) If you are going to push pin_user_pages() interfaces
+> (which I'm fine with), it would probably make sense to push also the
+> put_user_pages() -> unpin_user_pages() renaming so that that inconsistency
+> in naming does not exist in the released upstream kernel.
+> 
+> 								Honza
 
-Ewan,
+Yes, that's what this patch series does. But I'm not sure if "push" here
+means, "push out: defer to 5.6", "push (now) into 5.5", or "advocate for"?
 
-> Delaying the queue re-run vs. a ramp down might negatively affect
-> performance.  I'm not sure how accurate the ramp is at discovering the
-> optimum though.
+I will note that it's not going to be easy to rename in one step, now
+that this is being split up. Because various put_user_pages()-based items
+are going into 5.5 via different maintainer trees now. Probably I'd need
+to introduce unpin_user_page() alongside put_user_page()...thoughts?
 
-The optimum - as well as the actual limit - might change over time in a
-multi-initiator setup as other hosts grab resources on the device.
-
-I do think that the only way forward here, if we want to avoid counting
-outstanding commands for performance reasons, is to ensure that the
-BUSY/QUEUE_FULL/TASK_SET_FULL handling is relatively fast path and not
-something deep in the bowels of error handling. Which it actually
-isn't. But I do think we'll need to take a closer look.
-
+thanks,
 -- 
-Martin K. Petersen	Oracle Linux Engineering
+John Hubbard
+NVIDIA
+  
