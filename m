@@ -2,85 +2,82 @@ Return-Path: <SRS0=+obT=ZO=vger.kernel.org=linux-block-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-2.2 required=3.0 tests=DKIM_SIGNED,DKIM_VALID,
-	HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,
-	USER_AGENT_SANE_1 autolearn=no autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-0.9 required=3.0 tests=DKIMWL_WL_HIGH,DKIM_SIGNED,
+	DKIM_VALID,DKIM_VALID_AU,HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,
+	SPF_HELO_NONE,SPF_PASS autolearn=no autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 1AF16C432C3
-	for <linux-block@archiver.kernel.org>; Fri, 22 Nov 2019 18:55:19 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 1FE48C432C0
+	for <linux-block@archiver.kernel.org>; Fri, 22 Nov 2019 18:57:55 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.kernel.org (Postfix) with ESMTP id E844F2071F
-	for <linux-block@archiver.kernel.org>; Fri, 22 Nov 2019 18:55:18 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id E76542071C
+	for <linux-block@archiver.kernel.org>; Fri, 22 Nov 2019 18:57:54 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel-dk.20150623.gappssmtp.com header.i=@kernel-dk.20150623.gappssmtp.com header.b="v5F6MF9A"
+	dkim=pass (1024-bit key) header.d=chromium.org header.i=@chromium.org header.b="g/Agl4II"
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1726062AbfKVSzR (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Fri, 22 Nov 2019 13:55:17 -0500
-Received: from mail-pl1-f194.google.com ([209.85.214.194]:35279 "EHLO
-        mail-pl1-f194.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1726980AbfKVSzP (ORCPT
+        id S1726869AbfKVS5y (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Fri, 22 Nov 2019 13:57:54 -0500
+Received: from mail-pj1-f66.google.com ([209.85.216.66]:40436 "EHLO
+        mail-pj1-f66.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S1726703AbfKVS5y (ORCPT
         <rfc822;linux-block@vger.kernel.org>);
-        Fri, 22 Nov 2019 13:55:15 -0500
-Received: by mail-pl1-f194.google.com with SMTP id s10so3469475plp.2
-        for <linux-block@vger.kernel.org>; Fri, 22 Nov 2019 10:55:14 -0800 (PST)
+        Fri, 22 Nov 2019 13:57:54 -0500
+Received: by mail-pj1-f66.google.com with SMTP id ep1so3405832pjb.7
+        for <linux-block@vger.kernel.org>; Fri, 22 Nov 2019 10:57:53 -0800 (PST)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=kernel-dk.20150623.gappssmtp.com; s=20150623;
-        h=subject:to:cc:references:from:message-id:date:user-agent
-         :mime-version:in-reply-to:content-language:content-transfer-encoding;
-        bh=X6rPmQDZwe/5i7ZTCvqZcbNZzoAWqfhhq8dBz2pi7Wk=;
-        b=v5F6MF9AvTQxk7Vd5aRT1Y9yCCk/Z9IA82/6jCjumROrrWFeFp1LbnUS5FJt9Xc7db
-         NEEbLR70LWuDqes2CfBtQ6aUTKTa3SB2WZDmj2X1TaEa7JG03Ov0oOxccgWiam8ANZ9v
-         Eme8ZIJlZTJNGSlQ2LoRYWSuhJgV+FRdjjdsymttU5qfRuZMpr5S+CfdK9q5V32uuJk9
-         s7spTGMpIFLp1KaoDmWmCcrrqZNnqsDUpcMkn2PrQZjOT5cArAy/2zeoGmp5XTAGBQTc
-         RAzOzoIri1O2C2TGJS1yJ14UMeJUn/+FRqi0nUY3jgHvmBRTYJ9eptMHcUQ9eczjbpgJ
-         TN1w==
+        d=chromium.org; s=google;
+        h=date:from:to:cc:subject:message-id:references:mime-version
+         :content-disposition:in-reply-to;
+        bh=vD+kTqNKNFaJHHlnS5aCOrni7KxxMunXRiver5To2T0=;
+        b=g/Agl4II1MX+BTTCUS+ZZ4/rAMJxc9T3/gbAxCPvdkQ9nefWpWsM6/QnJE0rpovvat
+         7hON3Yt/r0+/LsKce0ErN0oI6JTIDYsNLwRC0D2lIWV51VozpVdXuNXNpOz8hhdp/I2g
+         YuXzTGI+pXJpxUPwt77bXdlEESJwTNClpLIY8=
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=1e100.net; s=20161025;
-        h=x-gm-message-state:subject:to:cc:references:from:message-id:date
-         :user-agent:mime-version:in-reply-to:content-language
-         :content-transfer-encoding;
-        bh=X6rPmQDZwe/5i7ZTCvqZcbNZzoAWqfhhq8dBz2pi7Wk=;
-        b=t4QS90Wsn6JUb4dRgwkcnP3Acan7e5aiCHjOgvGMGwBEZuxsQuo48Lc5lA1FElGqbi
-         crE3dCWhMRHd1Fvu3/+IRtPH1ikcu5gsRdbkMDelRnz+UHtgeXRsYJazeKTl0453iXHa
-         6Q4cUXC8Kg0vodlYKcwU8yfBuLpPnvUEWn4qdAJkA+7YWKUFclrfAwi0S0xGHe96sY1Y
-         knEYDCnQkfx0Y/MiEPetQBE9M8brLRNWnXctVAue0ipv+8YmtmPna6/lXzA1RliG3cxQ
-         1mH2/Sus/xZ8RtfzobjjYyAqr6v+yY7b848eZkAauFHKftLp5BAonZZtsK2zMEpVCH7P
-         CP7g==
-X-Gm-Message-State: APjAAAUFCbwvnxTTkiuCz4xuHaef2KGqyONIsmziHGxmNHAaVPg4SUkf
-        kd1X6ItTEcKMqM6Pf9Kt2h3NKg==
-X-Google-Smtp-Source: APXvYqx1Uy8tt1rwA8LCWhELsYyAcxykGcj1cwQ1xSbh9BYAAVccoQ2Oqc8lATpIDKDKayjMbyalYg==
-X-Received: by 2002:a17:902:d70a:: with SMTP id w10mr16035047ply.279.1574448913595;
-        Fri, 22 Nov 2019 10:55:13 -0800 (PST)
-Received: from ?IPv6:2620:10d:c081:1132::1126? ([2620:10d:c090:180::835b])
-        by smtp.gmail.com with ESMTPSA id c3sm8303326pfi.91.2019.11.22.10.55.11
-        (version=TLS1_2 cipher=ECDHE-RSA-AES128-GCM-SHA256 bits=128/128);
-        Fri, 22 Nov 2019 10:55:12 -0800 (PST)
-Subject: Re: [PATCH] block: Replace bio_check_ro()'s WARN_ON()
-To:     Kees Cook <keescook@chromium.org>
+        h=x-gm-message-state:date:from:to:cc:subject:message-id:references
+         :mime-version:content-disposition:in-reply-to;
+        bh=vD+kTqNKNFaJHHlnS5aCOrni7KxxMunXRiver5To2T0=;
+        b=oQC7hv353U1DE8sVWmUKKxpeTtEoeDOcKBv+TkxZA3OHfYIt3ce/WODiX1gY+QMWlW
+         a8b7z/FLO4lllfWqF4t2kPcEUYeq2EKP/1Zc/JU64hlwRDepg8aQgI2dSxGyH8HpuCSc
+         2TtKJKsjBF3T+6OwkEKfOIy22cCtr+E2O/oJoPwPRVNwLbmZFITLNEN7Q4JwPceHV/ci
+         liBFPh5igFNWEYfmiTMHOPlLzyKHUm79kTFtpeYzBhDpzQvx5c6Or1hcLIVdsgIlvxbD
+         M0gCunYcRI2VknUsVnnAE+PiWuwwklHT6C78WEs2E9F9SxUqGPzrcDqajpMAx0qdNCOd
+         xSug==
+X-Gm-Message-State: APjAAAW6HdPjfj+Vz4I/10nTg7L69ez8YTkOcKYZ5P8e6dx7HOhCZ0UV
+        9EB6wnmq8vxFB2sc++FgaYLRgKJyUqw=
+X-Google-Smtp-Source: APXvYqy4i51ZomUDiUmgqotvybJkRWcwGT2mjCe9qNMep2IAr0W6vYTafi4bgH/WkbxpKRz1qvkfOg==
+X-Received: by 2002:a17:90a:b385:: with SMTP id e5mr21272476pjr.115.1574449073600;
+        Fri, 22 Nov 2019 10:57:53 -0800 (PST)
+Received: from www.outflux.net (smtp.outflux.net. [198.145.64.163])
+        by smtp.gmail.com with ESMTPSA id a3sm7986059pfo.71.2019.11.22.10.57.52
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Fri, 22 Nov 2019 10:57:52 -0800 (PST)
+Date:   Fri, 22 Nov 2019 10:57:51 -0800
+From:   Kees Cook <keescook@chromium.org>
+To:     Jens Axboe <axboe@kernel.dk>
 Cc:     syzbot+21cfe1f803e0e158acf1@syzkaller.appspotmail.com,
         linux-block@vger.kernel.org, linux-kernel@vger.kernel.org
-References: <20180824211535.GA22251@beast> <201911221052.0FDE1A1@keescook>
-From:   Jens Axboe <axboe@kernel.dk>
-Message-ID: <181810c8-657d-d603-a833-215f753be5be@kernel.dk>
-Date:   Fri, 22 Nov 2019 11:55:11 -0700
-User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:60.0) Gecko/20100101
- Thunderbird/60.9.0
+Subject: Re: [PATCH] block: Replace bio_check_ro()'s WARN_ON()
+Message-ID: <201911221057.2B0E5696C@keescook>
+References: <20180824211535.GA22251@beast>
+ <201911221052.0FDE1A1@keescook>
+ <181810c8-657d-d603-a833-215f753be5be@kernel.dk>
 MIME-Version: 1.0
-In-Reply-To: <201911221052.0FDE1A1@keescook>
-Content-Type: text/plain; charset=utf-8
-Content-Language: en-US
-Content-Transfer-Encoding: 7bit
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <181810c8-657d-d603-a833-215f753be5be@kernel.dk>
 Sender: linux-block-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-On 11/22/19 11:53 AM, Kees Cook wrote:
-> Friendly ping! I keep tripping over this. Can this please get applied so
-> we can silence syzbot and avoid needless WARNs? :)
+On Fri, Nov 22, 2019 at 11:55:11AM -0700, Jens Axboe wrote:
+> On 11/22/19 11:53 AM, Kees Cook wrote:
+> > Friendly ping! I keep tripping over this. Can this please get applied so
+> > we can silence syzbot and avoid needless WARNs? :)
+> 
+> I'll get it applied, I did see syzbot complain about this again.
 
-I'll get it applied, I did see syzbot complain about this again.
+Awesome; thanks! :)
 
 -- 
-Jens Axboe
-
+Kees Cook
