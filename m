@@ -2,143 +2,60 @@ Return-Path: <SRS0=+obT=ZO=vger.kernel.org=linux-block-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-2.4 required=3.0 tests=DKIMWL_WL_HIGH,DKIM_SIGNED,
-	DKIM_VALID,DKIM_VALID_AU,HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,
-	SPF_HELO_NONE,SPF_PASS,USER_AGENT_SANE_1 autolearn=no autolearn_force=no
-	version=3.4.0
+X-Spam-Status: No, score=-2.2 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
+	MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED,USER_AGENT_SANE_1
+	autolearn=no autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id CFC71C432C0
-	for <linux-block@archiver.kernel.org>; Fri, 22 Nov 2019 16:38:22 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 29DBFC432C0
+	for <linux-block@archiver.kernel.org>; Fri, 22 Nov 2019 17:05:26 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.kernel.org (Postfix) with ESMTP id 9C23A20715
-	for <linux-block@archiver.kernel.org>; Fri, 22 Nov 2019 16:38:22 +0000 (UTC)
-Authentication-Results: mail.kernel.org;
-	dkim=pass (1024-bit key) header.d=broadcom.com header.i=@broadcom.com header.b="IZiflNUx"
+	by mail.kernel.org (Postfix) with ESMTP id 0744320714
+	for <linux-block@archiver.kernel.org>; Fri, 22 Nov 2019 17:05:26 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1726784AbfKVQiW (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Fri, 22 Nov 2019 11:38:22 -0500
-Received: from mail-wm1-f44.google.com ([209.85.128.44]:39831 "EHLO
-        mail-wm1-f44.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1726638AbfKVQiV (ORCPT
+        id S1726664AbfKVRFZ (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Fri, 22 Nov 2019 12:05:25 -0500
+Received: from bout01.mta.xmission.com ([166.70.11.15]:33767 "EHLO
+        bout01.mta.xmission.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S1726620AbfKVRFZ (ORCPT
         <rfc822;linux-block@vger.kernel.org>);
-        Fri, 22 Nov 2019 11:38:21 -0500
-Received: by mail-wm1-f44.google.com with SMTP id t26so8321612wmi.4
-        for <linux-block@vger.kernel.org>; Fri, 22 Nov 2019 08:38:20 -0800 (PST)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=broadcom.com; s=google;
-        h=subject:to:cc:references:from:message-id:date:user-agent
-         :mime-version:in-reply-to:content-transfer-encoding:content-language;
-        bh=exJQAKAXPYEkCOTKekh5eN98bjCFwcLRAKxdVYgrjRc=;
-        b=IZiflNUx6h5XTOVBmWN5MqfYDpYQNepaRjTvHhoCBFA+VTqQCPBHvvy0bJocUUq7Yz
-         EHch2Hm+QCaV4rYixxETFv+kpu0KrzkiWS3fXKlyQc3m6uQxQETBqTc/ZvbB+cMgkOeF
-         p8HD7VbCAIBE/6U8fRRJeoX4+3NfUR+dRoQJ0=
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20161025;
-        h=x-gm-message-state:subject:to:cc:references:from:message-id:date
-         :user-agent:mime-version:in-reply-to:content-transfer-encoding
-         :content-language;
-        bh=exJQAKAXPYEkCOTKekh5eN98bjCFwcLRAKxdVYgrjRc=;
-        b=YG+ltvX6vrdjpIseoyDlvjpDhGNWuTSNZS/AQHcWtYvzgK7sQCWfJOXF/WezYQJKMY
-         g6PXM8TN0FhkIt43NcOTfDyvdJj1YXOCrUCfWv7xQVsRVLmOqvxYZY3e1+XN9SeG/xa1
-         Ij8MsaL1EMX8ICen4sf0njSTeQ1WB+XAtGQVzC2jh9jEYEexnq+AV3g24JJtP1IMPfzS
-         2H/1YGAk5WgFczQKaqkchrgrQkE3+vPReJZrOTQjQpvYZWtFQ45p53ylH1N0Y+6s1bNM
-         3LVLAaQooz8wOS2umHgkiH0De7TVFIWUgRVUeSCXSSWt9Dd19CZBo2uKmtfJGxPKNmhJ
-         L01w==
-X-Gm-Message-State: APjAAAWSvb7pOe3oFFUniBmCgx3MhExL4Jr3xSYq5sr0g6lDKixx8Tvs
-        tr2ZFya8uT9s9rf8dKvSbN6Pnw==
-X-Google-Smtp-Source: APXvYqxniHkc0Qq/b9AL+iWbsj2DymsP+xIJX6W68Y3cFgaQp+652aMlOOCWSIHLOxq0LLPsy/Vd4w==
-X-Received: by 2002:a1c:46:: with SMTP id 67mr18237927wma.51.1574440699788;
-        Fri, 22 Nov 2019 08:38:19 -0800 (PST)
-Received: from [10.230.1.213] ([192.19.228.250])
-        by smtp.gmail.com with ESMTPSA id s131sm1840837wmf.48.2019.11.22.08.38.15
-        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
-        Fri, 22 Nov 2019 08:38:18 -0800 (PST)
-Subject: Re: [PATCH 4/4] scsi: core: don't limit per-LUN queue depth for SSD
-To:     "Martin K. Petersen" <martin.petersen@oracle.com>,
-        Ming Lei <ming.lei@redhat.com>
-Cc:     Bart Van Assche <bvanassche@acm.org>,
-        "Ewan D. Milne" <emilne@redhat.com>,
-        Hannes Reinecke <hare@suse.de>, Jens Axboe <axboe@kernel.dk>,
-        linux-block@vger.kernel.org,
-        "James E . J . Bottomley" <jejb@linux.ibm.com>,
-        linux-scsi@vger.kernel.org,
-        Sathya Prakash <sathya.prakash@broadcom.com>,
-        Suganath Prabu Subramani 
-        <suganath-prabu.subramani@broadcom.com>,
-        Kashyap Desai <kashyap.desai@broadcom.com>,
-        Sumit Saxena <sumit.saxena@broadcom.com>,
-        Shivasharan S <shivasharan.srikanteshwara@broadcom.com>,
-        Christoph Hellwig <hch@lst.de>,
-        Bart Van Assche <bart.vanassche@wdc.com>
-References: <20191118103117.978-1-ming.lei@redhat.com>
- <20191118103117.978-5-ming.lei@redhat.com>
- <1081145f-3e17-9bc1-2332-50a4b5621ef7@suse.de>
- <9bbcbbb42b659c323c9e0d74aa9b062a3f517d1f.camel@redhat.com>
- <44644664-f7b6-facd-d1bb-f7cfc9524379@acm.org>
- <20191121010730.GD24548@ming.t460p> <yq1pnhkbopi.fsf@oracle.com>
-From:   Sumanesh Samanta <sumanesh.samanta@broadcom.com>
-Message-ID: <1eeb56b8-2b82-4add-8606-5912fe81fa84@broadcom.com>
-Date:   Fri, 22 Nov 2019 09:38:13 -0700
-User-Agent: Mozilla/5.0 (Windows NT 10.0; WOW64; rv:68.0) Gecko/20100101
- Thunderbird/68.2.2
+        Fri, 22 Nov 2019 12:05:25 -0500
+Received: from mx04.mta.xmission.com ([166.70.13.214])
+        by bout01.mta.xmission.com with esmtps (TLS1.2:ECDHE_RSA_AES_128_GCM_SHA256:128)
+        (Exim 4.87)
+        (envelope-from <sbauer@plzdonthack.me>)
+        id 1iYCN1-0000ir-SN; Fri, 22 Nov 2019 10:05:23 -0700
+Received: from plesk14-shared.xmission.com ([166.70.198.161] helo=plesk14.xmission.com)
+        by mx04.mta.xmission.com with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
+        (Exim 4.87)
+        (envelope-from <sbauer@plzdonthack.me>)
+        id 1iYCN0-0002jD-Kf; Fri, 22 Nov 2019 10:05:23 -0700
+Received: from hacktheplanet (c-68-50-34-150.hsd1.in.comcast.net [68.50.34.150])
+        by plesk14.xmission.com (Postfix) with ESMTPSA id AFB8814E2E8;
+        Fri, 22 Nov 2019 17:05:15 +0000 (UTC)
+Date:   Fri, 22 Nov 2019 12:05:07 -0500
+From:   Scott Bauer <sbauer@plzdonthack.me>
+To:     "Derrick, Jonathan" <jonathan.derrick@intel.com>
+Cc:     "Rajashekar, Revanth" <revanth.rajashekar@intel.com>,
+        "linux-block@vger.kernel.org" <linux-block@vger.kernel.org>
+Message-ID: <20191122170507.GA362@hacktheplanet>
+References: <20191122161854.70939-1-revanth.rajashekar@intel.com>
+ <45c05efa3fb1947de41a47f6cb6fc043fa904f65.camel@intel.com>
 MIME-Version: 1.0
-In-Reply-To: <yq1pnhkbopi.fsf@oracle.com>
-Content-Type: text/plain; charset=utf-8; format=flowed
-Content-Transfer-Encoding: 7bit
-Content-Language: en-US
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <45c05efa3fb1947de41a47f6cb6fc043fa904f65.camel@intel.com>
+User-Agent: Mutt/1.9.4 (2018-02-28)
+X-XM-SPF: eid=1iYCN0-0002jD-Kf;;;mid=<20191122170507.GA362@hacktheplanet>;;;hst=mx04.mta.xmission.com;;;ip=166.70.198.161;;;frm=sbauer@plzdonthack.me;;;spf=none
+X-SA-Exim-Connect-IP: 166.70.198.161
+X-SA-Exim-Mail-From: sbauer@plzdonthack.me
+Subject: Re: [PATCH] block: sed-opal: Cleanup trivial patch
+X-SA-Exim-Version: 4.2.1 (built Thu, 05 May 2016 13:38:54 -0600)
+X-SA-Exim-Scanned: Yes (on mx04.mta.xmission.com)
 Sender: linux-block-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
->>If we ignore the RAID controller use case where the controller
->>internally queues and arbitrates commands between many devices
-
-These controllers should not be "ignored", but rather enabled. Many of them visualize both HDD and NVMe devices behind them, and thus forced to expose themselves as SCSI controllers.
-However, they have their own queue management and IO merging capabilities. Many have capability of holding IO in queue and pull them as needed (just like NVMe), and thus does not bother if many IOs to a device or controller is sent or if there is congestion. In case of congestion, the IO will simply wait in queue, along with advanced timeout handling capabilities.
-Besides, as Ming pointed out, Block layer (function hctx_may_queue) already limits IO on a per controller and per LUN basis.
-
-Overall, if the proposal does not work for all cases, then at least it should be made optional for high end controller, so that they are not disadvantaged vis-a-vis NVMe, just because they expose themselves as SCSI in order to support a wide range of devices behind them.
-
-thanks,
-Sumanesh
-
-On 11/21/2019 7:59 PM, Martin K. Petersen wrote:
-> Ming,
->
->> I don't understand the motivation of ramp-up/ramp-down, maybe it is just
->> for fairness among LUNs.
-> Congestion control. Devices have actual, physical limitations that are
-> different from the tag context limitations on the HBA. You don't have
-> that problem on NVMe because (at least for PCIe) the storage device and
-> the controller are one and the same.
->
-> If you submit 100000 concurrent requests to a SCSI drive that does 100
-> IOPS, some requests will time out before they get serviced.
-> Consequently we have the ability to raise and lower the queue depth to
-> constrain the amount of requests in flight to a given device at any
-> point in time.
->
-> Also, devices use BUSY/QUEUE_FULL/TASK_SET_FULL to cause the OS to back
-> off. We frequently see issues where the host can submit burst I/O much
-> faster than the device can de-stage from cache. In that scenario the
-> device reports BUSY/QF/TSF and we will back off so the device gets a
-> chance to recover. If we just let the application submit new I/O without
-> bounds, the system would never actually recover.
->
-> Note that the actual, physical limitations for how many commands a
-> target can handle are typically much, much lower than the number of tags
-> the HBA can manage. SATA devices can only express 32 concurrent
-> commands. SAS devices typically 128 concurrent commands per
-> port. Arrays differ.
->
-> If we ignore the RAID controller use case where the controller
-> internally queues and arbitrates commands between many devices, how is
-> submitting 1000 concurrent requests to a device which only has 128
-> command slots going to work?
->
-> Some HBAs have special sauce to manage BUSY/QF/TSF, some don't. If we
-> blindly stop restricting the number of I/Os in flight in the ML, we may
-> exceed either the capabilities of what the transport protocol can
-> express or internal device resources.
->
+On Fri, Nov 22, 2019 at 04:28:06PM +0000, Derrick, Jonathan wrote:
+> Acked-by: Jon Derrick <jonathan.derrick@intel.com>
+Reviewed-by: Scott Bauer <sbauer@plzdonthack.me>
