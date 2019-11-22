@@ -4,50 +4,48 @@ X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 X-Spam-Level: 
 X-Spam-Status: No, score=-10.1 required=3.0 tests=DKIMWL_WL_HIGH,DKIM_SIGNED,
 	DKIM_VALID,DKIM_VALID_AU,INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,
-	SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED,USER_AGENT_GIT autolearn=unavailable
+	SPF_HELO_NONE,SPF_PASS,USER_AGENT_GIT autolearn=unavailable
 	autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id F1A83C432C0
-	for <linux-block@archiver.kernel.org>; Fri, 22 Nov 2019 06:09:37 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 0663CC43215
+	for <linux-block@archiver.kernel.org>; Fri, 22 Nov 2019 06:09:40 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.kernel.org (Postfix) with ESMTP id BD4432068F
-	for <linux-block@archiver.kernel.org>; Fri, 22 Nov 2019 06:09:37 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id CE6C32070E
+	for <linux-block@archiver.kernel.org>; Fri, 22 Nov 2019 06:09:39 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=default; t=1574402977;
-	bh=3STd+I0ZH/0LNTU+Yvg39crAO7P5nDqtGIPmBwkDu20=;
+	s=default; t=1574402979;
+	bh=yX1fRkoZa9hfgOfU+yD5L5Gfs4/CUrl+xZh79cZVmSo=;
 	h=From:To:Cc:Subject:Date:In-Reply-To:References:List-ID:From;
-	b=VwPvDveciRCrmAKxe5QyHU55GGxpZ+Nmp/RxTxV75txn8v7k8AlPpGfZ/R5g9bd5F
-	 yzQtlsjEvlf1lLg1mMLf/wuC3HE7Yz+KciFYorzu/wMmTScXAs46Wbufp8HPc1Vvas
-	 8mZ2UvkbXV/A6+Z05WGi1zV1YY3g0mxOC8PiXhHk=
+	b=iN/EIkiNvLpc6VmLDPDpV4e/FGwxa1Nx3TwwmVcYTuX4lsiwu00cFE4XNhk0msiFQ
+	 BlXqL4qfcOC19hdfXV3McII/RAiF58fEXAXm/+iYv7rxUCpTlgULzmZfpZ41Yu6ega
+	 eR2eZpFXd/ygCAvCGtzjGpzWuQ60Blrz3M9P6/Pc=
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1728211AbfKVGJa (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Fri, 22 Nov 2019 01:09:30 -0500
-Received: from mail.kernel.org ([198.145.29.99]:35254 "EHLO mail.kernel.org"
-        rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-        id S1729359AbfKVF5H (ORCPT <rfc822;linux-block@vger.kernel.org>);
+        id S1729363AbfKVF5H (ORCPT <rfc822;linux-block@archiver.kernel.org>);
         Fri, 22 Nov 2019 00:57:07 -0500
+Received: from mail.kernel.org ([198.145.29.99]:35234 "EHLO mail.kernel.org"
+        rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
+        id S1729354AbfKVF5G (ORCPT <rfc822;linux-block@vger.kernel.org>);
+        Fri, 22 Nov 2019 00:57:06 -0500
 Received: from sasha-vm.mshome.net (c-73-47-72-35.hsd1.nh.comcast.net [73.47.72.35])
         (using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
         (No client certificate requested)
-        by mail.kernel.org (Postfix) with ESMTPSA id 59FDD2072D;
-        Fri, 22 Nov 2019 05:57:06 +0000 (UTC)
+        by mail.kernel.org (Postfix) with ESMTPSA id 3441E2071B;
+        Fri, 22 Nov 2019 05:57:05 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-        s=default; t=1574402227;
-        bh=3STd+I0ZH/0LNTU+Yvg39crAO7P5nDqtGIPmBwkDu20=;
+        s=default; t=1574402226;
+        bh=yX1fRkoZa9hfgOfU+yD5L5Gfs4/CUrl+xZh79cZVmSo=;
         h=From:To:Cc:Subject:Date:In-Reply-To:References:From;
-        b=PfVi56ak9vLpcDECrPrLxmqSbc9Kmgc4xXi5fvdrArZKZghqlCxIeKQFtmPRMx7RX
-         NR8uh1YKL2vIQGVskvwEuuH0i5ylhTdClM9TYpeJHxdow/al4o7JadfD9EqCoHofEg
-         7YafT88a5v7Llc+w/OiCTe9//11Q2xNp9Cy4RDzQ=
+        b=bhwaLKk1fIS2NY+BQSYlxv7DceDxHWudYlaL4j7+posV6i9CL2iaUPsbh6LG+83Kj
+         stEHVzIOvTuhxvfyQaX5YUhBj9M1eVVGwqpNxMGg8Ig8wo6/hsmO2YEUMrmA+rvEIA
+         GiSRCO9QwNeMFWmyFbbTSE+iS68WYrnZa+yDumtY=
 From:   Sasha Levin <sashal@kernel.org>
 To:     linux-kernel@vger.kernel.org, stable@vger.kernel.org
-Cc:     Luc Van Oostenryck <luc.vanoostenryck@gmail.com>,
-        Roland Kammerer <roland.kammerer@linbit.com>,
-        Lars Ellenberg <lars.ellenberg@linbit.com>,
+Cc:     Lars Ellenberg <lars.ellenberg@linbit.com>,
         Jens Axboe <axboe@kernel.dk>, Sasha Levin <sashal@kernel.org>,
         drbd-dev@lists.linbit.com, linux-block@vger.kernel.org
-Subject: [PATCH AUTOSEL 4.14 073/127] drbd: fix print_st_err()'s prototype to match the definition
-Date:   Fri, 22 Nov 2019 00:54:51 -0500
-Message-Id: <20191122055544.3299-72-sashal@kernel.org>
+Subject: [PATCH AUTOSEL 4.14 072/127] drbd: do not block when adjusting "disk-options" while IO is frozen
+Date:   Fri, 22 Nov 2019 00:54:50 -0500
+Message-Id: <20191122055544.3299-71-sashal@kernel.org>
 X-Mailer: git-send-email 2.20.1
 In-Reply-To: <20191122055544.3299-1-sashal@kernel.org>
 References: <20191122055544.3299-1-sashal@kernel.org>
@@ -60,37 +58,89 @@ Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-From: Luc Van Oostenryck <luc.vanoostenryck@gmail.com>
+From: Lars Ellenberg <lars.ellenberg@linbit.com>
 
-[ Upstream commit 2c38f035117331eb78d0504843c79ea7c7fabf37 ]
+[ Upstream commit f708bd08ecbdc23d03aaedf5b3311ebe44cfdb50 ]
 
-print_st_err() is defined with its 4th argument taking an
-'enum drbd_state_rv' but its prototype use an int for it.
+"suspending" IO is overloaded.
+It can mean "do not allow new requests" (obviously),
+but it also may mean "must not complete pending IO",
+for example while the fencing handlers do their arbitration.
 
-Fix this by using 'enum drbd_state_rv' in the prototype too.
+When adjusting disk options, we suspend io (disallow new requests), then
+wait for the activity-log to become unused (drain all IO completions),
+and possibly replace it with a new activity log of different size.
 
-Signed-off-by: Luc Van Oostenryck <luc.vanoostenryck@gmail.com>
-Signed-off-by: Roland Kammerer <roland.kammerer@linbit.com>
+If the other "suspend IO" aspect is active, pending IO completions won't
+happen, and we would block forever (unkillable drbdsetup process).
+
+Fix this by skipping the activity log adjustment if the "al-extents"
+setting did not change. Also, in case it did change, fail early without
+blocking if it looks like we would block forever.
+
 Signed-off-by: Lars Ellenberg <lars.ellenberg@linbit.com>
 Signed-off-by: Jens Axboe <axboe@kernel.dk>
 Signed-off-by: Sasha Levin <sashal@kernel.org>
 ---
- drivers/block/drbd/drbd_state.h | 2 +-
- 1 file changed, 1 insertion(+), 1 deletion(-)
+ drivers/block/drbd/drbd_nl.c | 37 ++++++++++++++++++++++++++++--------
+ 1 file changed, 29 insertions(+), 8 deletions(-)
 
-diff --git a/drivers/block/drbd/drbd_state.h b/drivers/block/drbd/drbd_state.h
-index ea58301d0895c..b2a390ba73a05 100644
---- a/drivers/block/drbd/drbd_state.h
-+++ b/drivers/block/drbd/drbd_state.h
-@@ -131,7 +131,7 @@ extern enum drbd_state_rv _drbd_set_state(struct drbd_device *, union drbd_state
- 					  enum chg_state_flags,
- 					  struct completion *done);
- extern void print_st_err(struct drbd_device *, union drbd_state,
--			union drbd_state, int);
-+			union drbd_state, enum drbd_state_rv);
+diff --git a/drivers/block/drbd/drbd_nl.c b/drivers/block/drbd/drbd_nl.c
+index a675a0f61f9c0..31d7fe4480afd 100644
+--- a/drivers/block/drbd/drbd_nl.c
++++ b/drivers/block/drbd/drbd_nl.c
+@@ -1515,6 +1515,30 @@ static void sanitize_disk_conf(struct drbd_device *device, struct disk_conf *dis
+ 	}
+ }
  
- enum drbd_state_rv
- _conn_request_state(struct drbd_connection *connection, union drbd_state mask, union drbd_state val,
++static int disk_opts_check_al_size(struct drbd_device *device, struct disk_conf *dc)
++{
++	int err = -EBUSY;
++
++	if (device->act_log &&
++	    device->act_log->nr_elements == dc->al_extents)
++		return 0;
++
++	drbd_suspend_io(device);
++	/* If IO completion is currently blocked, we would likely wait
++	 * "forever" for the activity log to become unused. So we don't. */
++	if (atomic_read(&device->ap_bio_cnt))
++		goto out;
++
++	wait_event(device->al_wait, lc_try_lock(device->act_log));
++	drbd_al_shrink(device);
++	err = drbd_check_al_size(device, dc);
++	lc_unlock(device->act_log);
++	wake_up(&device->al_wait);
++out:
++	drbd_resume_io(device);
++	return err;
++}
++
+ int drbd_adm_disk_opts(struct sk_buff *skb, struct genl_info *info)
+ {
+ 	struct drbd_config_context adm_ctx;
+@@ -1577,15 +1601,12 @@ int drbd_adm_disk_opts(struct sk_buff *skb, struct genl_info *info)
+ 		}
+ 	}
+ 
+-	drbd_suspend_io(device);
+-	wait_event(device->al_wait, lc_try_lock(device->act_log));
+-	drbd_al_shrink(device);
+-	err = drbd_check_al_size(device, new_disk_conf);
+-	lc_unlock(device->act_log);
+-	wake_up(&device->al_wait);
+-	drbd_resume_io(device);
+-
++	err = disk_opts_check_al_size(device, new_disk_conf);
+ 	if (err) {
++		/* Could be just "busy". Ignore?
++		 * Introduce dedicated error code? */
++		drbd_msg_put_info(adm_ctx.reply_skb,
++			"Try again without changing current al-extents setting");
+ 		retcode = ERR_NOMEM;
+ 		goto fail_unlock;
+ 	}
 -- 
 2.20.1
 
