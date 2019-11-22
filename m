@@ -7,48 +7,50 @@ X-Spam-Status: No, score=-10.1 required=3.0 tests=DKIMWL_WL_HIGH,DKIM_SIGNED,
 	SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED,USER_AGENT_GIT autolearn=unavailable
 	autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 9A3E2C432C0
-	for <linux-block@archiver.kernel.org>; Fri, 22 Nov 2019 06:06:06 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id F1A83C432C0
+	for <linux-block@archiver.kernel.org>; Fri, 22 Nov 2019 06:09:37 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.kernel.org (Postfix) with ESMTP id 70FE52068F
-	for <linux-block@archiver.kernel.org>; Fri, 22 Nov 2019 06:06:06 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id BD4432068F
+	for <linux-block@archiver.kernel.org>; Fri, 22 Nov 2019 06:09:37 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=default; t=1574402766;
-	bh=VJHTaa8af8C2n6uEHdlFvjPNZc6bJr90kjfPgFbMiAg=;
+	s=default; t=1574402977;
+	bh=3STd+I0ZH/0LNTU+Yvg39crAO7P5nDqtGIPmBwkDu20=;
 	h=From:To:Cc:Subject:Date:In-Reply-To:References:List-ID:From;
-	b=xkbXt+52z0/zG6pzAlBNCpjxyRSK1UtEi5RCaArRUCWusB/+wdn3xIfJGThYLv0Mt
-	 8VuftGsD8XrfcGeTsMEJaOJcdL0wFrtgMSFsmlilxGS3YoycSGkHW6TZHndJnmj/XC
-	 4aJMCgXeibgSHjzNdHZjrXiMSFAaLTpjCvB2PxHs=
+	b=VwPvDveciRCrmAKxe5QyHU55GGxpZ+Nmp/RxTxV75txn8v7k8AlPpGfZ/R5g9bd5F
+	 yzQtlsjEvlf1lLg1mMLf/wuC3HE7Yz+KciFYorzu/wMmTScXAs46Wbufp8HPc1Vvas
+	 8mZ2UvkbXV/A6+Z05WGi1zV1YY3g0mxOC8PiXhHk=
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1729703AbfKVGC1 (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Fri, 22 Nov 2019 01:02:27 -0500
-Received: from mail.kernel.org ([198.145.29.99]:41120 "EHLO mail.kernel.org"
+        id S1728211AbfKVGJa (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Fri, 22 Nov 2019 01:09:30 -0500
+Received: from mail.kernel.org ([198.145.29.99]:35254 "EHLO mail.kernel.org"
         rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-        id S1729720AbfKVGC1 (ORCPT <rfc822;linux-block@vger.kernel.org>);
-        Fri, 22 Nov 2019 01:02:27 -0500
+        id S1729359AbfKVF5H (ORCPT <rfc822;linux-block@vger.kernel.org>);
+        Fri, 22 Nov 2019 00:57:07 -0500
 Received: from sasha-vm.mshome.net (c-73-47-72-35.hsd1.nh.comcast.net [73.47.72.35])
         (using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
         (No client certificate requested)
-        by mail.kernel.org (Postfix) with ESMTPSA id 700312068E;
-        Fri, 22 Nov 2019 06:02:25 +0000 (UTC)
+        by mail.kernel.org (Postfix) with ESMTPSA id 59FDD2072D;
+        Fri, 22 Nov 2019 05:57:06 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-        s=default; t=1574402546;
-        bh=VJHTaa8af8C2n6uEHdlFvjPNZc6bJr90kjfPgFbMiAg=;
+        s=default; t=1574402227;
+        bh=3STd+I0ZH/0LNTU+Yvg39crAO7P5nDqtGIPmBwkDu20=;
         h=From:To:Cc:Subject:Date:In-Reply-To:References:From;
-        b=gVnmD9pt7Jm2CsKMSVkBAxqFd73KWFC0YPuT1+Ko2AEVck2pz+T4O4n3+AiRLElQa
-         vUXAmBVwN+7snwGDWgr+t2OXpu8Wb8ZHbyJttArQixLqVW9KdJAqmhxy0K5bxNi08t
-         Iw5wpUV4u11IJM6jsTz+NaDrQxEYVjRBobuB28pY=
+        b=PfVi56ak9vLpcDECrPrLxmqSbc9Kmgc4xXi5fvdrArZKZghqlCxIeKQFtmPRMx7RX
+         NR8uh1YKL2vIQGVskvwEuuH0i5ylhTdClM9TYpeJHxdow/al4o7JadfD9EqCoHofEg
+         7YafT88a5v7Llc+w/OiCTe9//11Q2xNp9Cy4RDzQ=
 From:   Sasha Levin <sashal@kernel.org>
 To:     linux-kernel@vger.kernel.org, stable@vger.kernel.org
-Cc:     Lars Ellenberg <lars.ellenberg@linbit.com>,
+Cc:     Luc Van Oostenryck <luc.vanoostenryck@gmail.com>,
+        Roland Kammerer <roland.kammerer@linbit.com>,
+        Lars Ellenberg <lars.ellenberg@linbit.com>,
         Jens Axboe <axboe@kernel.dk>, Sasha Levin <sashal@kernel.org>,
         drbd-dev@lists.linbit.com, linux-block@vger.kernel.org
-Subject: [PATCH AUTOSEL 4.9 52/91] drbd: ignore "all zero" peer volume sizes in handshake
-Date:   Fri, 22 Nov 2019 01:00:50 -0500
-Message-Id: <20191122060129.4239-51-sashal@kernel.org>
+Subject: [PATCH AUTOSEL 4.14 073/127] drbd: fix print_st_err()'s prototype to match the definition
+Date:   Fri, 22 Nov 2019 00:54:51 -0500
+Message-Id: <20191122055544.3299-72-sashal@kernel.org>
 X-Mailer: git-send-email 2.20.1
-In-Reply-To: <20191122060129.4239-1-sashal@kernel.org>
-References: <20191122060129.4239-1-sashal@kernel.org>
+In-Reply-To: <20191122055544.3299-1-sashal@kernel.org>
+References: <20191122055544.3299-1-sashal@kernel.org>
 MIME-Version: 1.0
 X-stable: review
 X-Patchwork-Hint: Ignore
@@ -58,114 +60,37 @@ Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-From: Lars Ellenberg <lars.ellenberg@linbit.com>
+From: Luc Van Oostenryck <luc.vanoostenryck@gmail.com>
 
-[ Upstream commit 94c43a13b8d6e3e0dd77b3536b5e04a84936b762 ]
+[ Upstream commit 2c38f035117331eb78d0504843c79ea7c7fabf37 ]
 
-During handshake, if we are diskless ourselves, we used to accept any size
-presented by the peer.
+print_st_err() is defined with its 4th argument taking an
+'enum drbd_state_rv' but its prototype use an int for it.
 
-Which could be zero if that peer was just brought up and connected
-to us without having a disk attached first, in which case both
-peers would just "flip" their volume sizes.
+Fix this by using 'enum drbd_state_rv' in the prototype too.
 
-Now, even a diskless node will ignore "zero" sizes
-presented by a diskless peer.
-
-Also a currently Diskless Primary will refuse to shrink during handshake:
-it may be frozen, and waiting for a "suitable" local disk or peer to
-re-appear (on-no-data-accessible suspend-io). If the peer is smaller
-than what we used to be, it is not suitable.
-
-The logic for a diskless node during handshake is now supposed to be:
-believe the peer, if
- - I don't have a current size myself
- - we agree on the size anyways
- - I do have a current size, am Secondary, and he has the only disk
- - I do have a current size, am Primary, and he has the only disk,
-   which is larger than my current size
-
+Signed-off-by: Luc Van Oostenryck <luc.vanoostenryck@gmail.com>
+Signed-off-by: Roland Kammerer <roland.kammerer@linbit.com>
 Signed-off-by: Lars Ellenberg <lars.ellenberg@linbit.com>
 Signed-off-by: Jens Axboe <axboe@kernel.dk>
 Signed-off-by: Sasha Levin <sashal@kernel.org>
 ---
- drivers/block/drbd/drbd_receiver.c | 33 +++++++++++++++++++++++++++---
- 1 file changed, 30 insertions(+), 3 deletions(-)
+ drivers/block/drbd/drbd_state.h | 2 +-
+ 1 file changed, 1 insertion(+), 1 deletion(-)
 
-diff --git a/drivers/block/drbd/drbd_receiver.c b/drivers/block/drbd/drbd_receiver.c
-index 8e8e4ccb128f3..bbd50d7dce43d 100644
---- a/drivers/block/drbd/drbd_receiver.c
-+++ b/drivers/block/drbd/drbd_receiver.c
-@@ -4037,6 +4037,7 @@ static int receive_sizes(struct drbd_connection *connection, struct packet_info
- 	struct o_qlim *o = (connection->agreed_features & DRBD_FF_WSAME) ? p->qlim : NULL;
- 	enum determine_dev_size dd = DS_UNCHANGED;
- 	sector_t p_size, p_usize, p_csize, my_usize;
-+	sector_t new_size, cur_size;
- 	int ldsc = 0; /* local disk size changed */
- 	enum dds_flags ddsf;
+diff --git a/drivers/block/drbd/drbd_state.h b/drivers/block/drbd/drbd_state.h
+index ea58301d0895c..b2a390ba73a05 100644
+--- a/drivers/block/drbd/drbd_state.h
++++ b/drivers/block/drbd/drbd_state.h
+@@ -131,7 +131,7 @@ extern enum drbd_state_rv _drbd_set_state(struct drbd_device *, union drbd_state
+ 					  enum chg_state_flags,
+ 					  struct completion *done);
+ extern void print_st_err(struct drbd_device *, union drbd_state,
+-			union drbd_state, int);
++			union drbd_state, enum drbd_state_rv);
  
-@@ -4044,6 +4045,7 @@ static int receive_sizes(struct drbd_connection *connection, struct packet_info
- 	if (!peer_device)
- 		return config_unknown_volume(connection, pi);
- 	device = peer_device->device;
-+	cur_size = drbd_get_capacity(device->this_bdev);
- 
- 	p_size = be64_to_cpu(p->d_size);
- 	p_usize = be64_to_cpu(p->u_size);
-@@ -4054,7 +4056,6 @@ static int receive_sizes(struct drbd_connection *connection, struct packet_info
- 	device->p_size = p_size;
- 
- 	if (get_ldev(device)) {
--		sector_t new_size, cur_size;
- 		rcu_read_lock();
- 		my_usize = rcu_dereference(device->ldev->disk_conf)->disk_size;
- 		rcu_read_unlock();
-@@ -4072,7 +4073,6 @@ static int receive_sizes(struct drbd_connection *connection, struct packet_info
- 		/* Never shrink a device with usable data during connect.
- 		   But allow online shrinking if we are connected. */
- 		new_size = drbd_new_dev_size(device, device->ldev, p_usize, 0);
--		cur_size = drbd_get_capacity(device->this_bdev);
- 		if (new_size < cur_size &&
- 		    device->state.disk >= D_OUTDATED &&
- 		    device->state.conn < C_CONNECTED) {
-@@ -4137,9 +4137,36 @@ static int receive_sizes(struct drbd_connection *connection, struct packet_info
- 		 *
- 		 * However, if he sends a zero current size,
- 		 * take his (user-capped or) backing disk size anyways.
-+		 *
-+		 * Unless of course he does not have a disk himself.
-+		 * In which case we ignore this completely.
- 		 */
-+		sector_t new_size = p_csize ?: p_usize ?: p_size;
- 		drbd_reconsider_queue_parameters(device, NULL, o);
--		drbd_set_my_capacity(device, p_csize ?: p_usize ?: p_size);
-+		if (new_size == 0) {
-+			/* Ignore, peer does not know nothing. */
-+		} else if (new_size == cur_size) {
-+			/* nothing to do */
-+		} else if (cur_size != 0 && p_size == 0) {
-+			drbd_warn(device, "Ignored diskless peer device size (peer:%llu != me:%llu sectors)!\n",
-+					(unsigned long long)new_size, (unsigned long long)cur_size);
-+		} else if (new_size < cur_size && device->state.role == R_PRIMARY) {
-+			drbd_err(device, "The peer's device size is too small! (%llu < %llu sectors); demote me first!\n",
-+					(unsigned long long)new_size, (unsigned long long)cur_size);
-+			conn_request_state(peer_device->connection, NS(conn, C_DISCONNECTING), CS_HARD);
-+			return -EIO;
-+		} else {
-+			/* I believe the peer, if
-+			 *  - I don't have a current size myself
-+			 *  - we agree on the size anyways
-+			 *  - I do have a current size, am Secondary,
-+			 *    and he has the only disk
-+			 *  - I do have a current size, am Primary,
-+			 *    and he has the only disk,
-+			 *    which is larger than my current size
-+			 */
-+			drbd_set_my_capacity(device, new_size);
-+		}
- 	}
- 
- 	if (get_ldev(device)) {
+ enum drbd_state_rv
+ _conn_request_state(struct drbd_connection *connection, union drbd_state mask, union drbd_state val,
 -- 
 2.20.1
 
