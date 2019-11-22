@@ -2,121 +2,136 @@ Return-Path: <SRS0=+obT=ZO=vger.kernel.org=linux-block-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-2.2 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
-	MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED,USER_AGENT_SANE_1
-	autolearn=no autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-2.4 required=3.0 tests=DKIMWL_WL_HIGH,DKIM_SIGNED,
+	DKIM_VALID,DKIM_VALID_AU,HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,
+	SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED,USER_AGENT_SANE_1 autolearn=no
+	autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 38276C432C0
-	for <linux-block@archiver.kernel.org>; Fri, 22 Nov 2019 11:15:18 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 7C48AC432C0
+	for <linux-block@archiver.kernel.org>; Fri, 22 Nov 2019 11:45:24 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.kernel.org (Postfix) with ESMTP id 161892073F
-	for <linux-block@archiver.kernel.org>; Fri, 22 Nov 2019 11:15:18 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id 5083120718
+	for <linux-block@archiver.kernel.org>; Fri, 22 Nov 2019 11:45:24 +0000 (UTC)
+Authentication-Results: mail.kernel.org;
+	dkim=pass (1024-bit key) header.d=ti.com header.i=@ti.com header.b="MmAtDb/S"
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1729668AbfKVLPJ (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Fri, 22 Nov 2019 06:15:09 -0500
-Received: from mx2.suse.de ([195.135.220.15]:34110 "EHLO mx1.suse.de"
-        rhost-flags-OK-OK-OK-FAIL) by vger.kernel.org with ESMTP
-        id S1729023AbfKVLPI (ORCPT <rfc822;linux-block@vger.kernel.org>);
-        Fri, 22 Nov 2019 06:15:08 -0500
-X-Virus-Scanned: by amavisd-new at test-mx.suse.de
-Received: from relay2.suse.de (unknown [195.135.220.254])
-        by mx1.suse.de (Postfix) with ESMTP id 21586B2F6;
-        Fri, 22 Nov 2019 11:15:04 +0000 (UTC)
-Received: by quack2.suse.cz (Postfix, from userid 1000)
-        id 4FA541E484C; Fri, 22 Nov 2019 12:15:02 +0100 (CET)
-Date:   Fri, 22 Nov 2019 12:15:02 +0100
-From:   Jan Kara <jack@suse.cz>
-To:     John Hubbard <jhubbard@nvidia.com>
-Cc:     Jan Kara <jack@suse.cz>, Christoph Hellwig <hch@lst.de>,
-        Andrew Morton <akpm@linux-foundation.org>,
-        Al Viro <viro@zeniv.linux.org.uk>,
-        Alex Williamson <alex.williamson@redhat.com>,
-        Benjamin Herrenschmidt <benh@kernel.crashing.org>,
-        =?iso-8859-1?Q?Bj=F6rn_T=F6pel?= <bjorn.topel@intel.com>,
-        Christoph Hellwig <hch@infradead.org>,
-        Dan Williams <dan.j.williams@intel.com>,
-        Daniel Vetter <daniel@ffwll.ch>,
-        Dave Chinner <david@fromorbit.com>,
-        David Airlie <airlied@linux.ie>,
-        "David S . Miller" <davem@davemloft.net>,
-        Ira Weiny <ira.weiny@intel.com>,
-        Jason Gunthorpe <jgg@ziepe.ca>, Jens Axboe <axboe@kernel.dk>,
-        Jonathan Corbet <corbet@lwn.net>,
-        =?iso-8859-1?B?Suly9G1l?= Glisse <jglisse@redhat.com>,
-        Magnus Karlsson <magnus.karlsson@intel.com>,
-        Mauro Carvalho Chehab <mchehab@kernel.org>,
-        Michael Ellerman <mpe@ellerman.id.au>,
-        Michal Hocko <mhocko@suse.com>,
-        Mike Kravetz <mike.kravetz@oracle.com>,
-        Paul Mackerras <paulus@samba.org>,
-        Shuah Khan <shuah@kernel.org>,
-        Vlastimil Babka <vbabka@suse.cz>, bpf@vger.kernel.org,
-        dri-devel@lists.freedesktop.org, kvm@vger.kernel.org,
-        linux-block@vger.kernel.org, linux-doc@vger.kernel.org,
-        linux-fsdevel@vger.kernel.org, linux-kselftest@vger.kernel.org,
-        linux-media@vger.kernel.org, linux-rdma@vger.kernel.org,
-        linuxppc-dev@lists.ozlabs.org, netdev@vger.kernel.org,
-        linux-mm@kvack.org, LKML <linux-kernel@vger.kernel.org>,
-        "Aneesh Kumar K . V" <aneesh.kumar@linux.ibm.com>
-Subject: Re: [PATCH v7 02/24] mm/gup: factor out duplicate code from four
- routines
-Message-ID: <20191122111502.GC26721@quack2.suse.cz>
-References: <20191121071354.456618-1-jhubbard@nvidia.com>
- <20191121071354.456618-3-jhubbard@nvidia.com>
- <20191121080356.GA24784@lst.de>
- <852f6c27-8b65-547b-89e0-e8f32a4d17b9@nvidia.com>
- <20191121095411.GC18190@quack2.suse.cz>
- <9d0846af-2c4f-7cda-dfcb-1f642943afea@nvidia.com>
+        id S1726686AbfKVLpX (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Fri, 22 Nov 2019 06:45:23 -0500
+Received: from lelv0143.ext.ti.com ([198.47.23.248]:56622 "EHLO
+        lelv0143.ext.ti.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S1726676AbfKVLpX (ORCPT
+        <rfc822;linux-block@vger.kernel.org>);
+        Fri, 22 Nov 2019 06:45:23 -0500
+Received: from fllv0035.itg.ti.com ([10.64.41.0])
+        by lelv0143.ext.ti.com (8.15.2/8.15.2) with ESMTP id xAMBhpKa102645;
+        Fri, 22 Nov 2019 05:43:51 -0600
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=ti.com;
+        s=ti-com-17Q1; t=1574423031;
+        bh=5rJlm63UVTkhCHrw2W6wXofUd19jkVn8cXok6W3vCrE=;
+        h=Subject:To:CC:References:From:Date:In-Reply-To;
+        b=MmAtDb/SuOxLg/cMSBaFOuAFsMfYfo61hHvQprDVlsUUkX7UyoEZe39J+XDu4FTTh
+         QiegjFzEu0YXUrQa6GBwC3UJ3d2FC1ME0Cx42j7162Ey3RkQme+DWa8vrAya0TpLT0
+         YGPXzNwUJ1UN/FYXmgUFq5L6uvRlsLjtwAiEMQW0=
+Received: from DFLE109.ent.ti.com (dfle109.ent.ti.com [10.64.6.30])
+        by fllv0035.itg.ti.com (8.15.2/8.15.2) with ESMTP id xAMBhpOu066881;
+        Fri, 22 Nov 2019 05:43:51 -0600
+Received: from DFLE109.ent.ti.com (10.64.6.30) by DFLE109.ent.ti.com
+ (10.64.6.30) with Microsoft SMTP Server (version=TLS1_2,
+ cipher=TLS_ECDHE_RSA_WITH_AES_128_CBC_SHA256_P256) id 15.1.1847.3; Fri, 22
+ Nov 2019 05:43:51 -0600
+Received: from fllv0040.itg.ti.com (10.64.41.20) by DFLE109.ent.ti.com
+ (10.64.6.30) with Microsoft SMTP Server (version=TLS1_2,
+ cipher=TLS_ECDHE_RSA_WITH_AES_128_CBC_SHA256_P256) id 15.1.1847.3 via
+ Frontend Transport; Fri, 22 Nov 2019 05:43:51 -0600
+Received: from [172.24.145.136] (ileax41-snat.itg.ti.com [10.172.224.153])
+        by fllv0040.itg.ti.com (8.15.2/8.15.2) with ESMTP id xAMBhkWD086656;
+        Fri, 22 Nov 2019 05:43:47 -0600
+Subject: Re: [PATCH RESEND 0/2] scsi: ufs: hibern8 fixes
+To:     sheebab <sheebab@cadence.com>, <alim.akhtar@samsung.com>,
+        <avri.altman@wdc.com>, <pedrom.sousa@synopsys.com>,
+        <jejb@linux.ibm.com>, <martin.petersen@oracle.com>,
+        <stanley.chu@mediatek.com>, <beanhuo@micron.com>,
+        <yuehaibing@huawei.com>, <linux-scsi@vger.kernel.org>,
+        <linux-kernel@vger.kernel.org>, <linux-block@vger.kernel.org>
+CC:     <rafalc@cadence.com>, <mparab@cadence.com>
+References: <1574147082-22725-1-git-send-email-sheebab@cadence.com>
+From:   Vignesh Raghavendra <vigneshr@ti.com>
+Message-ID: <ae8a7e7e-f60c-0ba3-4a98-78c4c962ae4d@ti.com>
+Date:   Fri, 22 Nov 2019 17:14:18 +0530
+User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:60.0) Gecko/20100101
+ Thunderbird/60.9.0
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <9d0846af-2c4f-7cda-dfcb-1f642943afea@nvidia.com>
-User-Agent: Mutt/1.10.1 (2018-07-13)
+In-Reply-To: <1574147082-22725-1-git-send-email-sheebab@cadence.com>
+Content-Type: text/plain; charset="utf-8"
+Content-Language: en-US
+Content-Transfer-Encoding: 7bit
+X-EXCLAIMER-MD-CONFIG: e1e8a2fd-e40a-4ac6-ac9b-f7e9cc9ee180
 Sender: linux-block-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-On Thu 21-11-19 18:54:02, John Hubbard wrote:
-> On 11/21/19 1:54 AM, Jan Kara wrote:
-> > On Thu 21-11-19 00:29:59, John Hubbard wrote:
-> > > > 
-> > > > Otherwise this looks fine and might be a worthwhile cleanup to feed
-> > > > Andrew for 5.5 independent of the gut of the changes.
-> > > > 
-> > > > Reviewed-by: Christoph Hellwig <hch@lst.de>
-> > > > 
-> > > 
-> > > Thanks for the reviews! Say, it sounds like your view here is that this
-> > > series should be targeted at 5.6 (not 5.5), is that what you have in mind?
-> > > And get the preparatory patches (1-9, and maybe even 10-16) into 5.5?
-> > 
-> > One more note :) If you are going to push pin_user_pages() interfaces
-> > (which I'm fine with), it would probably make sense to push also the
-> > put_user_pages() -> unpin_user_pages() renaming so that that inconsistency
-> > in naming does not exist in the released upstream kernel.
-> > 
-> > 								Honza
+Hi,
+
+On 19/11/19 12:34 PM, sheebab wrote:
+> Hi,
 > 
-> Yes, that's what this patch series does. But I'm not sure if "push" here
-> means, "push out: defer to 5.6", "push (now) into 5.5", or "advocate for"?
+> Resending this patch to include mailing list and miss out patches.
+> 
+> This patch set contains following patches
+> for Cadence UFS controller driver.
+> 
+> 1. 0001-scsi-ufs-Enable-hibern8-interrupt-only-during-manual.patch
+>    This patch is to fix false interrupt assertion during auto hibernation.
+>    In this patch, hibern8 interrupt is Disabled during initialization
+>    and later the interrupt is Enabled/Disabled during manual hibern8
+>    Entry/Exit.
+> 2. 0002-scsi-ufs-Update-L4-attributes-on-manual-hibern8-exit.patch
+>    This patch is to update L4 attributes during manual hibern8 exit.
+>    As per JESD220C spec, L4 attributes will be reset to their reset value 
+>    during DME_HIBERNATION_EXIT. This patch will take backup of the L4 
+>    parameters before DME_HIBERNATION_ENTER and restores the L4 parameters
+>    after DME_HIBERNATION_EXIT
+>  
 
-I meant to include the patch in the "for 5.5" batch.
+While I don't see flood of hibernate related interrupts anymore, I
+occasionally see "Unhandled Interrupt dump"[1] when using rootfs out of
+UFS. I haven't be able to find a way to trigger the issue. But seems to
+happen randomly while trying to input and execute something from console.
 
-> I will note that it's not going to be easy to rename in one step, now
-> that this is being split up. Because various put_user_pages()-based items
-> are going into 5.5 via different maintainer trees now. Probably I'd need
-> to introduce unpin_user_page() alongside put_user_page()...thoughts?
 
-Yes, I understand that moving that patch from the end of the series would
-cause fair amount of conflicts. I was hoping that you could generate the
-patch with sed/Coccinelle and then rebasing what remains for 5.6 on top of
-that patch should not be that painful so overall it should not be that much
-work. But I may be wrong so if it proves to be too tedious, let's just
-postpone the renaming to 5.6. I don't find having both unpin_user_page()
-and put_user_page() a better alternative to current state. Thanks!
+[1]
+j7-evm login: root
+[   55.300495] cdns-ufshcd 4e84000.ufs: ufshcd_intr: Unhandled interrupt
+0x00000000
+[   55.307884] host_regs: 00000000: 1587031f 00000000 00000210 00000000
+[   55.314217] host_regs: 00000010: 00000000 00000000 00000c96 00000000
+[   55.320551] host_regs: 00000020: 00000014 00030e15 00000000 00000000
+[   55.326884] host_regs: 00000030: 0000010f 00000001 00000000 80000002
+[   55.333217] host_regs: 00000040: 00000000 00000000 00000000 00000000
+[   55.339551] host_regs: 00000050: c1ee0000 00000008 00008000 00000000
+[   55.345884] host_regs: 00000060: 00000001 ffffffff 00000000 00000000
+[   55.352217] host_regs: 00000070: c1ef0000 00000008 00000000 00000000
+[   55.358550] host_regs: 00000080: 00000001 00000000 00000000 00000000
+[   55.364884] host_regs: 00000090: 00000002 15710000 00000000 00000000
 
-								Honza
+More such occurrence: https://pastebin.ubuntu.com/p/Df4dykkTmB/
+
+
+
+> 
+> Thanks,
+> Sheeba B
+> 
+> sheebab (2):
+>   scsi: ufs: Enable hibern8 interrupt only during manual hibern8 in
+>     Cadence UFS.
+>   scsi: ufs: Update L4 attributes on manual hibern8 exit in Cadence UFS.
+> 
+>  drivers/scsi/ufs/cdns-pltfrm.c | 172 +++++++++++++++++++++++++++++++++--
+>  1 file changed, 167 insertions(+), 5 deletions(-)
+> 
+
 -- 
-Jan Kara <jack@suse.com>
-SUSE Labs, CR
+Regards
+Vignesh
