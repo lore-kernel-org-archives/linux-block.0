@@ -7,45 +7,45 @@ X-Spam-Status: No, score=-10.1 required=3.0 tests=DKIMWL_WL_HIGH,DKIM_SIGNED,
 	SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED,USER_AGENT_GIT autolearn=unavailable
 	autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 8B403C432C0
-	for <linux-block@archiver.kernel.org>; Fri, 22 Nov 2019 06:24:04 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 97AF9C432C3
+	for <linux-block@archiver.kernel.org>; Fri, 22 Nov 2019 06:24:07 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.kernel.org (Postfix) with ESMTP id 6275320637
-	for <linux-block@archiver.kernel.org>; Fri, 22 Nov 2019 06:24:04 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id 5B6C620637
+	for <linux-block@archiver.kernel.org>; Fri, 22 Nov 2019 06:24:07 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=default; t=1574403844;
-	bh=/3HkWOlR2dU9QLO0moTsiH4d2QGGmw01hAMxrei0oLs=;
+	s=default; t=1574403847;
+	bh=cE1PO+QmHaBe5myBtegunEdnraOxCVMCTh1gItlg7xs=;
 	h=From:To:Cc:Subject:Date:In-Reply-To:References:List-ID:From;
-	b=iRQevwYTG8lc4pFnC9xBTvneq9UcVlSn6r57tKMWYs9fLhVrmS24Y+wLGuLyUm+/h
-	 B+x5wXbfS7LB3e7uRCDq02iIhgpM8p/onDMiopaucXoVTO84sjBxcJnpYnjFvYFUVh
-	 Y8qKu+eZnhqNtR6A3TxgTWA+d/5QKbsihW0EQ2Bg=
+	b=CbFgyUCOvzniINCgdpr8Bkvix/hCxrAkyMUHzBPgKzk78kBBUMQuHSc+9vPs37zdS
+	 M3Ga+CCvHIHSyvRWZyy+OQJl3qedLqJ7xf1wMvLM0A5lCqqTGgTXfobXQ2SRrH7Y7X
+	 L9zNJ8dzgmHoMZUyp+FOcgHGb08SUkaVqbF8g5dA=
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1728191AbfKVFvf (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Fri, 22 Nov 2019 00:51:35 -0500
-Received: from mail.kernel.org ([198.145.29.99]:56734 "EHLO mail.kernel.org"
+        id S1728182AbfKVFvd (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Fri, 22 Nov 2019 00:51:33 -0500
+Received: from mail.kernel.org ([198.145.29.99]:56724 "EHLO mail.kernel.org"
         rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-        id S1728184AbfKVFve (ORCPT <rfc822;linux-block@vger.kernel.org>);
-        Fri, 22 Nov 2019 00:51:34 -0500
+        id S1726802AbfKVFvd (ORCPT <rfc822;linux-block@vger.kernel.org>);
+        Fri, 22 Nov 2019 00:51:33 -0500
 Received: from sasha-vm.mshome.net (c-73-47-72-35.hsd1.nh.comcast.net [73.47.72.35])
         (using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
         (No client certificate requested)
-        by mail.kernel.org (Postfix) with ESMTPSA id DD24F2077B;
-        Fri, 22 Nov 2019 05:51:32 +0000 (UTC)
+        by mail.kernel.org (Postfix) with ESMTPSA id AE3F72073F;
+        Fri, 22 Nov 2019 05:51:31 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-        s=default; t=1574401893;
-        bh=/3HkWOlR2dU9QLO0moTsiH4d2QGGmw01hAMxrei0oLs=;
+        s=default; t=1574401892;
+        bh=cE1PO+QmHaBe5myBtegunEdnraOxCVMCTh1gItlg7xs=;
         h=From:To:Cc:Subject:Date:In-Reply-To:References:From;
-        b=VV5CE1xzMHGseDhXMsmO5/UcaFFGoU+896NL4FtllD1elUuzRR8yo4sRQjksr5MGQ
-         Uk+1ZUz2Ck9HqMHyxphBzvVQ9jM6i3KaK3XKqbFmLoCGYLJDEeWXrptdwvet5xTCKI
-         dlLMMP+TgGjmFaoXqQFY5pUfbsV2yZwLn2BaKgmo=
+        b=zrtEukCoZN2xenMkX+M23pqmlskHC53quzMHKoT5agdE5Xrk4XKwElfB7NUZoD+ml
+         YcSU74J/zEEjzjuxTP3DEicp4RAMy8kH+OET7/sDzXSqGED14gXbquEBHr0hOnLVAd
+         uLHkY2UdgFzaqa1AilfvqZoiFJGqZv5hf9Gc5cB8=
 From:   Sasha Levin <sashal@kernel.org>
 To:     linux-kernel@vger.kernel.org, stable@vger.kernel.org
 Cc:     Lars Ellenberg <lars.ellenberg@linbit.com>,
         Jens Axboe <axboe@kernel.dk>, Sasha Levin <sashal@kernel.org>,
         drbd-dev@lists.linbit.com, linux-block@vger.kernel.org
-Subject: [PATCH AUTOSEL 4.19 126/219] drbd: reject attach of unsuitable uuids even if connected
-Date:   Fri, 22 Nov 2019 00:47:38 -0500
-Message-Id: <20191122054911.1750-119-sashal@kernel.org>
+Subject: [PATCH AUTOSEL 4.19 125/219] drbd: ignore "all zero" peer volume sizes in handshake
+Date:   Fri, 22 Nov 2019 00:47:37 -0500
+Message-Id: <20191122054911.1750-118-sashal@kernel.org>
 X-Mailer: git-send-email 2.20.1
 In-Reply-To: <20191122054911.1750-1-sashal@kernel.org>
 References: <20191122054911.1750-1-sashal@kernel.org>
@@ -60,98 +60,112 @@ X-Mailing-List: linux-block@vger.kernel.org
 
 From: Lars Ellenberg <lars.ellenberg@linbit.com>
 
-[ Upstream commit fe43ed97bba3b11521abd934b83ed93143470e4f ]
+[ Upstream commit 94c43a13b8d6e3e0dd77b3536b5e04a84936b762 ]
 
-Multiple failure scenario:
-a) all good
-   Connected Primary/Secondary UpToDate/UpToDate
-b) lose disk on Primary,
-   Connected Primary/Secondary Diskless/UpToDate
-c) continue to write to the device,
-   changes only make it to the Secondary storage.
-d) lose disk on Secondary,
-   Connected Primary/Secondary Diskless/Diskless
-e) now try to re-attach on Primary
+During handshake, if we are diskless ourselves, we used to accept any size
+presented by the peer.
 
-This would have succeeded before, even though that is clearly the
-wrong data set to attach to (missing the modifications from c).
-Because we only compared our "effective" and the "to-be-attached"
-data generation uuid tags if (device->state.conn < C_CONNECTED).
+Which could be zero if that peer was just brought up and connected
+to us without having a disk attached first, in which case both
+peers would just "flip" their volume sizes.
 
-Fix: change that constraint to (device->state.pdsk != D_UP_TO_DATE)
-compare the uuids, and reject the attach.
+Now, even a diskless node will ignore "zero" sizes
+presented by a diskless peer.
 
-This patch also tries to improve the reverse scenario:
-first lose Secondary, then Primary disk,
-then try to attach the disk on Secondary.
+Also a currently Diskless Primary will refuse to shrink during handshake:
+it may be frozen, and waiting for a "suitable" local disk or peer to
+re-appear (on-no-data-accessible suspend-io). If the peer is smaller
+than what we used to be, it is not suitable.
 
-Before this patch, the attach on the Secondary succeeds, but since commit
-drbd: disconnect, if the wrong UUIDs are attached on a connected peer
-the Primary will notice unsuitable data, and drop the connection hard.
-
-Though unfortunately at a point in time during the handshake where
-we cannot easily abort the attach on the peer without more
-refactoring of the handshake.
-
-We now reject any attach to "unsuitable" uuids,
-as long as we can see a Primary role,
-unless we already have access to "good" data.
+The logic for a diskless node during handshake is now supposed to be:
+believe the peer, if
+ - I don't have a current size myself
+ - we agree on the size anyways
+ - I do have a current size, am Secondary, and he has the only disk
+ - I do have a current size, am Primary, and he has the only disk,
+   which is larger than my current size
 
 Signed-off-by: Lars Ellenberg <lars.ellenberg@linbit.com>
 Signed-off-by: Jens Axboe <axboe@kernel.dk>
 Signed-off-by: Sasha Levin <sashal@kernel.org>
 ---
- drivers/block/drbd/drbd_nl.c       |  6 +++---
- drivers/block/drbd/drbd_receiver.c | 19 +++++++++++++++++++
- 2 files changed, 22 insertions(+), 3 deletions(-)
+ drivers/block/drbd/drbd_receiver.c | 33 +++++++++++++++++++++++++++---
+ 1 file changed, 30 insertions(+), 3 deletions(-)
 
-diff --git a/drivers/block/drbd/drbd_nl.c b/drivers/block/drbd/drbd_nl.c
-index 319fabdd63a3f..3366c1a91ee00 100644
---- a/drivers/block/drbd/drbd_nl.c
-+++ b/drivers/block/drbd/drbd_nl.c
-@@ -1935,9 +1935,9 @@ int drbd_adm_attach(struct sk_buff *skb, struct genl_info *info)
- 		}
- 	}
- 
--	if (device->state.conn < C_CONNECTED &&
--	    device->state.role == R_PRIMARY && device->ed_uuid &&
--	    (device->ed_uuid & ~((u64)1)) != (nbc->md.uuid[UI_CURRENT] & ~((u64)1))) {
-+	if (device->state.pdsk != D_UP_TO_DATE && device->ed_uuid &&
-+	    (device->state.role == R_PRIMARY || device->state.peer == R_PRIMARY) &&
-+            (device->ed_uuid & ~((u64)1)) != (nbc->md.uuid[UI_CURRENT] & ~((u64)1))) {
- 		drbd_err(device, "Can only attach to data with current UUID=%016llX\n",
- 		    (unsigned long long)device->ed_uuid);
- 		retcode = ERR_DATA_NOT_CURRENT;
 diff --git a/drivers/block/drbd/drbd_receiver.c b/drivers/block/drbd/drbd_receiver.c
-index c9e8d61dea248..cbb6ef719978f 100644
+index 3cdadf75c82da..c9e8d61dea248 100644
 --- a/drivers/block/drbd/drbd_receiver.c
 +++ b/drivers/block/drbd/drbd_receiver.c
-@@ -4395,6 +4395,25 @@ static int receive_state(struct drbd_connection *connection, struct packet_info
- 	if (peer_state.conn == C_AHEAD)
- 		ns.conn = C_BEHIND;
+@@ -3980,6 +3980,7 @@ static int receive_sizes(struct drbd_connection *connection, struct packet_info
+ 	struct o_qlim *o = (connection->agreed_features & DRBD_FF_WSAME) ? p->qlim : NULL;
+ 	enum determine_dev_size dd = DS_UNCHANGED;
+ 	sector_t p_size, p_usize, p_csize, my_usize;
++	sector_t new_size, cur_size;
+ 	int ldsc = 0; /* local disk size changed */
+ 	enum dds_flags ddsf;
  
-+	/* TODO:
-+	 * if (primary and diskless and peer uuid != effective uuid)
-+	 *     abort attach on peer;
-+	 *
-+	 * If this node does not have good data, was already connected, but
-+	 * the peer did a late attach only now, trying to "negotiate" with me,
-+	 * AND I am currently Primary, possibly frozen, with some specific
-+	 * "effective" uuid, this should never be reached, really, because
-+	 * we first send the uuids, then the current state.
-+	 *
-+	 * In this scenario, we already dropped the connection hard
-+	 * when we received the unsuitable uuids (receive_uuids().
-+	 *
-+	 * Should we want to change this, that is: not drop the connection in
-+	 * receive_uuids() already, then we would need to add a branch here
-+	 * that aborts the attach of "unsuitable uuids" on the peer in case
-+	 * this node is currently Diskless Primary.
-+	 */
-+
- 	if (device->p_uuid && peer_state.disk >= D_NEGOTIATING &&
- 	    get_ldev_if_state(device, D_NEGOTIATING)) {
- 		int cr; /* consider resync */
+@@ -3987,6 +3988,7 @@ static int receive_sizes(struct drbd_connection *connection, struct packet_info
+ 	if (!peer_device)
+ 		return config_unknown_volume(connection, pi);
+ 	device = peer_device->device;
++	cur_size = drbd_get_capacity(device->this_bdev);
+ 
+ 	p_size = be64_to_cpu(p->d_size);
+ 	p_usize = be64_to_cpu(p->u_size);
+@@ -3997,7 +3999,6 @@ static int receive_sizes(struct drbd_connection *connection, struct packet_info
+ 	device->p_size = p_size;
+ 
+ 	if (get_ldev(device)) {
+-		sector_t new_size, cur_size;
+ 		rcu_read_lock();
+ 		my_usize = rcu_dereference(device->ldev->disk_conf)->disk_size;
+ 		rcu_read_unlock();
+@@ -4015,7 +4016,6 @@ static int receive_sizes(struct drbd_connection *connection, struct packet_info
+ 		/* Never shrink a device with usable data during connect.
+ 		   But allow online shrinking if we are connected. */
+ 		new_size = drbd_new_dev_size(device, device->ldev, p_usize, 0);
+-		cur_size = drbd_get_capacity(device->this_bdev);
+ 		if (new_size < cur_size &&
+ 		    device->state.disk >= D_OUTDATED &&
+ 		    device->state.conn < C_CONNECTED) {
+@@ -4080,9 +4080,36 @@ static int receive_sizes(struct drbd_connection *connection, struct packet_info
+ 		 *
+ 		 * However, if he sends a zero current size,
+ 		 * take his (user-capped or) backing disk size anyways.
++		 *
++		 * Unless of course he does not have a disk himself.
++		 * In which case we ignore this completely.
+ 		 */
++		sector_t new_size = p_csize ?: p_usize ?: p_size;
+ 		drbd_reconsider_queue_parameters(device, NULL, o);
+-		drbd_set_my_capacity(device, p_csize ?: p_usize ?: p_size);
++		if (new_size == 0) {
++			/* Ignore, peer does not know nothing. */
++		} else if (new_size == cur_size) {
++			/* nothing to do */
++		} else if (cur_size != 0 && p_size == 0) {
++			drbd_warn(device, "Ignored diskless peer device size (peer:%llu != me:%llu sectors)!\n",
++					(unsigned long long)new_size, (unsigned long long)cur_size);
++		} else if (new_size < cur_size && device->state.role == R_PRIMARY) {
++			drbd_err(device, "The peer's device size is too small! (%llu < %llu sectors); demote me first!\n",
++					(unsigned long long)new_size, (unsigned long long)cur_size);
++			conn_request_state(peer_device->connection, NS(conn, C_DISCONNECTING), CS_HARD);
++			return -EIO;
++		} else {
++			/* I believe the peer, if
++			 *  - I don't have a current size myself
++			 *  - we agree on the size anyways
++			 *  - I do have a current size, am Secondary,
++			 *    and he has the only disk
++			 *  - I do have a current size, am Primary,
++			 *    and he has the only disk,
++			 *    which is larger than my current size
++			 */
++			drbd_set_my_capacity(device, new_size);
++		}
+ 	}
+ 
+ 	if (get_ldev(device)) {
 -- 
 2.20.1
 
