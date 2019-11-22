@@ -7,50 +7,48 @@ X-Spam-Status: No, score=-10.1 required=3.0 tests=DKIMWL_WL_HIGH,DKIM_SIGNED,
 	SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED,USER_AGENT_GIT autolearn=unavailable
 	autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id F3E68C432C0
-	for <linux-block@archiver.kernel.org>; Fri, 22 Nov 2019 05:55:11 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id EF2E3C432C0
+	for <linux-block@archiver.kernel.org>; Fri, 22 Nov 2019 06:05:49 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.kernel.org (Postfix) with ESMTP id C9F7320659
-	for <linux-block@archiver.kernel.org>; Fri, 22 Nov 2019 05:55:11 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id C18E820717
+	for <linux-block@archiver.kernel.org>; Fri, 22 Nov 2019 06:05:49 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=default; t=1574402111;
-	bh=AkmH7/23k2qjTXz17Saidwk9VDL7TkNqlVi282KJW4M=;
+	s=default; t=1574402749;
+	bh=LHiUdUHDdThUMjt+1McqXD4GQsQ6DLH4P+4atOmQcvU=;
 	h=From:To:Cc:Subject:Date:In-Reply-To:References:List-ID:From;
-	b=Zf8VdV7A+ybMis8YbWXP5T8bgtyTOY2a0BsT21WlGxmCqkKaajuJT/WuY370FUlYJ
-	 RQctLItX3afDh3Yfdv/oeRq/101F/8RVTXa7c5SJRcl3LyJMMQHUvxNZ0+ZlkVQuCE
-	 uYL9GPIFUwD2ntEOs+clRxkHPj2YJjbeIIlHcMcA=
+	b=xpRijDicHst6ZvN70Ufh1htst9CDbcOW84mQvpUxKMRJ0KsU09eckTiVdi2BkUy1S
+	 bQE+2zIdEaP9z5pwbnaU5gVGQGPzOmVesA1wch+8ypjd+Hp1KgIOmr+Pmc4YZm3nzi
+	 FKbWdaFJguFKxnqBwZiGAEucvcDFCU0qgTA5tODg=
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1727954AbfKVFzG (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Fri, 22 Nov 2019 00:55:06 -0500
-Received: from mail.kernel.org ([198.145.29.99]:58904 "EHLO mail.kernel.org"
+        id S1727302AbfKVGCa (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Fri, 22 Nov 2019 01:02:30 -0500
+Received: from mail.kernel.org ([198.145.29.99]:41194 "EHLO mail.kernel.org"
         rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-        id S1728706AbfKVFw7 (ORCPT <rfc822;linux-block@vger.kernel.org>);
-        Fri, 22 Nov 2019 00:52:59 -0500
+        id S1728312AbfKVGC3 (ORCPT <rfc822;linux-block@vger.kernel.org>);
+        Fri, 22 Nov 2019 01:02:29 -0500
 Received: from sasha-vm.mshome.net (c-73-47-72-35.hsd1.nh.comcast.net [73.47.72.35])
         (using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
         (No client certificate requested)
-        by mail.kernel.org (Postfix) with ESMTPSA id 5C5232068F;
-        Fri, 22 Nov 2019 05:52:56 +0000 (UTC)
+        by mail.kernel.org (Postfix) with ESMTPSA id B63342070B;
+        Fri, 22 Nov 2019 06:02:27 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-        s=default; t=1574401977;
-        bh=AkmH7/23k2qjTXz17Saidwk9VDL7TkNqlVi282KJW4M=;
+        s=default; t=1574402548;
+        bh=LHiUdUHDdThUMjt+1McqXD4GQsQ6DLH4P+4atOmQcvU=;
         h=From:To:Cc:Subject:Date:In-Reply-To:References:From;
-        b=HnfRxW3Vw+L/z52IcCrpp/p5WO51yH3clAtrOLvbjOZ8j8TnLOAE2IRa1LuMeX9f0
-         MfsFLTVa2W6nVKvhUsbsfdqcEJUj7SzhqYbOn0OwHDSCd14wocl8lL8RE/ouzMLj9E
-         gUUjxJlj6ssTKVvQwNfZHjDCVIETmYE5vRoej29s=
+        b=RClvpUSAA0UIjH68VQJU6g5071GL9wVPLFgjE6P2NLk4VqWpq61BbMeBGTTizoep6
+         g7kWOSsPb5TbtBOwK4RgKn7nTcAlLVH/fh4INty8Y1t8iW6BB26EHTGZkuI2uEFEQN
+         CZvnouoWjjwIRDQ0WtKViNIMNXQa+8VHkIO0zGs8=
 From:   Sasha Levin <sashal@kernel.org>
 To:     linux-kernel@vger.kernel.org, stable@vger.kernel.org
-Cc:     Ming Lei <ming.lei@redhat.com>,
-        Naresh Kamboju <naresh.kamboju@linaro.org>,
-        Christoph Hellwig <hch@lst.de>, Faiz Abbas <faiz_abbas@ti.com>,
-        linux-block@vger.kernel.org, Ulf Hansson <ulf.hansson@linaro.org>,
-        Sasha Levin <sashal@kernel.org>, linux-mmc@vger.kernel.org
-Subject: [PATCH AUTOSEL 4.19 196/219] mmc: core: align max segment size with logical block size
-Date:   Fri, 22 Nov 2019 00:48:48 -0500
-Message-Id: <20191122054911.1750-189-sashal@kernel.org>
+Cc:     Lars Ellenberg <lars.ellenberg@linbit.com>,
+        Jens Axboe <axboe@kernel.dk>, Sasha Levin <sashal@kernel.org>,
+        drbd-dev@lists.linbit.com, linux-block@vger.kernel.org
+Subject: [PATCH AUTOSEL 4.9 54/91] drbd: do not block when adjusting "disk-options" while IO is frozen
+Date:   Fri, 22 Nov 2019 01:00:52 -0500
+Message-Id: <20191122060129.4239-53-sashal@kernel.org>
 X-Mailer: git-send-email 2.20.1
-In-Reply-To: <20191122054911.1750-1-sashal@kernel.org>
-References: <20191122054911.1750-1-sashal@kernel.org>
+In-Reply-To: <20191122060129.4239-1-sashal@kernel.org>
+References: <20191122060129.4239-1-sashal@kernel.org>
 MIME-Version: 1.0
 X-stable: review
 X-Patchwork-Hint: Ignore
@@ -60,75 +58,89 @@ Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-From: Ming Lei <ming.lei@redhat.com>
+From: Lars Ellenberg <lars.ellenberg@linbit.com>
 
-[ Upstream commit c53336c8f5f29043fded57912cc06c24e12613d7 ]
+[ Upstream commit f708bd08ecbdc23d03aaedf5b3311ebe44cfdb50 ]
 
-Logical block size is the lowest possible block size that the storage
-device can address. Max segment size is often related with controller's
-DMA capability. And it is reasonable to align max segment size with
-logical block size.
+"suspending" IO is overloaded.
+It can mean "do not allow new requests" (obviously),
+but it also may mean "must not complete pending IO",
+for example while the fencing handlers do their arbitration.
 
-SDHCI sets un-aligned max segment size, and causes ADMA error, so
-fix it by aligning max segment size with logical block size.
+When adjusting disk options, we suspend io (disallow new requests), then
+wait for the activity-log to become unused (drain all IO completions),
+and possibly replace it with a new activity log of different size.
 
-Reported-by: Naresh Kamboju <naresh.kamboju@linaro.org>
-Cc: Christoph Hellwig <hch@lst.de>
-Cc: Naresh Kamboju <naresh.kamboju@linaro.org>
-Cc: Faiz Abbas <faiz_abbas@ti.com>
-Cc: linux-block@vger.kernel.org
-Signed-off-by: Ming Lei <ming.lei@redhat.com>
-Signed-off-by: Ulf Hansson <ulf.hansson@linaro.org>
+If the other "suspend IO" aspect is active, pending IO completions won't
+happen, and we would block forever (unkillable drbdsetup process).
+
+Fix this by skipping the activity log adjustment if the "al-extents"
+setting did not change. Also, in case it did change, fail early without
+blocking if it looks like we would block forever.
+
+Signed-off-by: Lars Ellenberg <lars.ellenberg@linbit.com>
+Signed-off-by: Jens Axboe <axboe@kernel.dk>
 Signed-off-by: Sasha Levin <sashal@kernel.org>
 ---
- drivers/mmc/core/block.c | 6 ------
- drivers/mmc/core/queue.c | 9 ++++++++-
- 2 files changed, 8 insertions(+), 7 deletions(-)
+ drivers/block/drbd/drbd_nl.c | 37 ++++++++++++++++++++++++++++--------
+ 1 file changed, 29 insertions(+), 8 deletions(-)
 
-diff --git a/drivers/mmc/core/block.c b/drivers/mmc/core/block.c
-index eee004fb3c3e3..527ab15c421f9 100644
---- a/drivers/mmc/core/block.c
-+++ b/drivers/mmc/core/block.c
-@@ -2384,12 +2384,6 @@ static struct mmc_blk_data *mmc_blk_alloc_req(struct mmc_card *card,
- 	snprintf(md->disk->disk_name, sizeof(md->disk->disk_name),
- 		 "mmcblk%u%s", card->host->index, subname ? subname : "");
+diff --git a/drivers/block/drbd/drbd_nl.c b/drivers/block/drbd/drbd_nl.c
+index ff26f676f24d1..b809f325c2bea 100644
+--- a/drivers/block/drbd/drbd_nl.c
++++ b/drivers/block/drbd/drbd_nl.c
+@@ -1508,6 +1508,30 @@ static void sanitize_disk_conf(struct drbd_device *device, struct disk_conf *dis
+ 	}
+ }
  
--	if (mmc_card_mmc(card))
--		blk_queue_logical_block_size(md->queue.queue,
--					     card->ext_csd.data_sector_size);
--	else
--		blk_queue_logical_block_size(md->queue.queue, 512);
--
- 	set_capacity(md->disk, size);
- 
- 	if (mmc_host_cmd23(card->host)) {
-diff --git a/drivers/mmc/core/queue.c b/drivers/mmc/core/queue.c
-index 18aae28845ec9..becc6594a8a47 100644
---- a/drivers/mmc/core/queue.c
-+++ b/drivers/mmc/core/queue.c
-@@ -355,6 +355,7 @@ static void mmc_setup_queue(struct mmc_queue *mq, struct mmc_card *card)
++static int disk_opts_check_al_size(struct drbd_device *device, struct disk_conf *dc)
++{
++	int err = -EBUSY;
++
++	if (device->act_log &&
++	    device->act_log->nr_elements == dc->al_extents)
++		return 0;
++
++	drbd_suspend_io(device);
++	/* If IO completion is currently blocked, we would likely wait
++	 * "forever" for the activity log to become unused. So we don't. */
++	if (atomic_read(&device->ap_bio_cnt))
++		goto out;
++
++	wait_event(device->al_wait, lc_try_lock(device->act_log));
++	drbd_al_shrink(device);
++	err = drbd_check_al_size(device, dc);
++	lc_unlock(device->act_log);
++	wake_up(&device->al_wait);
++out:
++	drbd_resume_io(device);
++	return err;
++}
++
+ int drbd_adm_disk_opts(struct sk_buff *skb, struct genl_info *info)
  {
- 	struct mmc_host *host = card->host;
- 	u64 limit = BLK_BOUNCE_HIGH;
-+	unsigned block_size = 512;
+ 	struct drbd_config_context adm_ctx;
+@@ -1570,15 +1594,12 @@ int drbd_adm_disk_opts(struct sk_buff *skb, struct genl_info *info)
+ 		}
+ 	}
  
- 	if (mmc_dev(host)->dma_mask && *mmc_dev(host)->dma_mask)
- 		limit = (u64)dma_max_pfn(mmc_dev(host)) << PAGE_SHIFT;
-@@ -368,7 +369,13 @@ static void mmc_setup_queue(struct mmc_queue *mq, struct mmc_card *card)
- 	blk_queue_max_hw_sectors(mq->queue,
- 		min(host->max_blk_count, host->max_req_size / 512));
- 	blk_queue_max_segments(mq->queue, host->max_segs);
--	blk_queue_max_segment_size(mq->queue, host->max_seg_size);
-+
-+	if (mmc_card_mmc(card))
-+		block_size = card->ext_csd.data_sector_size;
-+
-+	blk_queue_logical_block_size(mq->queue, block_size);
-+	blk_queue_max_segment_size(mq->queue,
-+			round_down(host->max_seg_size, block_size));
- 
- 	INIT_WORK(&mq->recovery_work, mmc_mq_recovery_handler);
- 	INIT_WORK(&mq->complete_work, mmc_blk_mq_complete_work);
+-	drbd_suspend_io(device);
+-	wait_event(device->al_wait, lc_try_lock(device->act_log));
+-	drbd_al_shrink(device);
+-	err = drbd_check_al_size(device, new_disk_conf);
+-	lc_unlock(device->act_log);
+-	wake_up(&device->al_wait);
+-	drbd_resume_io(device);
+-
++	err = disk_opts_check_al_size(device, new_disk_conf);
+ 	if (err) {
++		/* Could be just "busy". Ignore?
++		 * Introduce dedicated error code? */
++		drbd_msg_put_info(adm_ctx.reply_skb,
++			"Try again without changing current al-extents setting");
+ 		retcode = ERR_NOMEM;
+ 		goto fail_unlock;
+ 	}
 -- 
 2.20.1
 
