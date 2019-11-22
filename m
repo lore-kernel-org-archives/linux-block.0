@@ -2,195 +2,157 @@ Return-Path: <SRS0=+obT=ZO=vger.kernel.org=linux-block-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-12.3 required=3.0 tests=DKIM_SIGNED,DKIM_VALID,
-	DKIM_VALID_AU,HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PULL_REQUEST,
-	MAILING_LIST_MULTI,MENTIONS_GIT_HOSTING,SPF_HELO_NONE,SPF_PASS,
-	USER_AGENT_SANE_1 autolearn=ham autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-0.8 required=3.0 tests=DKIM_SIGNED,DKIM_VALID,
+	DKIM_VALID_AU,HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SPF_HELO_NONE,
+	SPF_PASS,URIBL_BLOCKED autolearn=no autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 9C3D1C432C3
-	for <linux-block@archiver.kernel.org>; Fri, 22 Nov 2019 15:38:00 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 4200CC432C0
+	for <linux-block@archiver.kernel.org>; Fri, 22 Nov 2019 15:42:19 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.kernel.org (Postfix) with ESMTP id 6E81C20706
-	for <linux-block@archiver.kernel.org>; Fri, 22 Nov 2019 15:38:00 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id 1734F2071F
+	for <linux-block@archiver.kernel.org>; Fri, 22 Nov 2019 15:42:19 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="TOVD9Jnl"
+	dkim=pass (2048-bit key) header.d=linaro.org header.i=@linaro.org header.b="aSwzsfgF"
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1726546AbfKVPiA (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Fri, 22 Nov 2019 10:38:00 -0500
-Received: from us-smtp-2.mimecast.com ([205.139.110.61]:57097 "EHLO
-        us-smtp-1.mimecast.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1726046AbfKVPh7 (ORCPT
+        id S1726638AbfKVPmS (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Fri, 22 Nov 2019 10:42:18 -0500
+Received: from mail-wm1-f65.google.com ([209.85.128.65]:52840 "EHLO
+        mail-wm1-f65.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S1726046AbfKVPmS (ORCPT
         <rfc822;linux-block@vger.kernel.org>);
-        Fri, 22 Nov 2019 10:37:59 -0500
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-        s=mimecast20190719; t=1574437078;
-        h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-         to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-         content-transfer-encoding:content-transfer-encoding;
-        bh=JgOI0RV/c/0FOorScknSDAMGZ0YD4/StvR8vLEuMFig=;
-        b=TOVD9JnlsoulLDxlOnZr96Kbpja3kbM0XykAue/C0r3h6YuSTxfm5IqdmS4LLzmfX8s/PL
-        cEG1K2r89rKWLUhZxF8lJvLYRzhIJD41sIrnl3dNpQI6UTwz8WchZjzVA1ZtnlhOpdMwhq
-        Rcl8Yp+SF8seKXbC0VzslSkUvohykDI=
-Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
- [209.132.183.4]) (Using TLS) by relay.mimecast.com with ESMTP id
- us-mta-6-jMfLaM6KOrezRf8XTnDOBA-1; Fri, 22 Nov 2019 10:37:55 -0500
-Received: from smtp.corp.redhat.com (int-mx08.intmail.prod.int.phx2.redhat.com [10.5.11.23])
-        (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
-        (No client certificate requested)
-        by mimecast-mx01.redhat.com (Postfix) with ESMTPS id AD6BC8C6BBD;
-        Fri, 22 Nov 2019 15:37:52 +0000 (UTC)
-Received: from localhost (unknown [10.18.25.174])
-        by smtp.corp.redhat.com (Postfix) with ESMTPS id 6ECE02934B;
-        Fri, 22 Nov 2019 15:37:48 +0000 (UTC)
-Date:   Fri, 22 Nov 2019 10:37:47 -0500
-From:   Mike Snitzer <snitzer@redhat.com>
-To:     Linus Torvalds <torvalds@linux-foundation.org>
-Cc:     dm-devel@redhat.com, linux-block@vger.kernel.org,
-        Alasdair G Kergon <agk@redhat.com>,
-        Bryan Gurney <bgurney@redhat.com>,
-        Dmitry Fomichev <dmitry.fomichev@wdc.com>,
-        "Gustavo A. R. Silva" <gustavo@embeddedor.com>,
-        Heinz Mauelshagen <heinzm@redhat.com>,
-        Jeffle Xu <jefflexu@linux.alibaba.com>,
-        Krzysztof Kozlowski <krzk@kernel.org>,
-        Maged Mokhtar <mmokhtar@petasan.org>,
-        Mikulas Patocka <mpatocka@redhat.com>,
-        Nathan Chancellor <natechancellor@gmail.com>,
-        Nikos Tsironis <ntsironis@arrikto.com>
-Subject: [git pull] device mapper changes for 5.5
-Message-ID: <20191122153747.GA23143@redhat.com>
-MIME-Version: 1.0
-User-Agent: Mutt/1.5.21 (2010-09-15)
-X-Scanned-By: MIMEDefang 2.84 on 10.5.11.23
-X-MC-Unique: jMfLaM6KOrezRf8XTnDOBA-1
-X-Mimecast-Spam-Score: 0
-Content-Type: text/plain; charset=us-ascii
+        Fri, 22 Nov 2019 10:42:18 -0500
+Received: by mail-wm1-f65.google.com with SMTP id l1so7923326wme.2
+        for <linux-block@vger.kernel.org>; Fri, 22 Nov 2019 07:42:16 -0800 (PST)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=linaro.org; s=google;
+        h=mime-version:subject:from:in-reply-to:date:cc
+         :content-transfer-encoding:message-id:references:to;
+        bh=AhkChjhhkTkmXD5KEPPeHkdoCCiZF1hLVImO/Bt3nAc=;
+        b=aSwzsfgF+FrDcZPZkK7Kc12bjuxIIjPk+vg8NZ6HA6HDVyJkkIbok9MxpDrJGNLwR5
+         BahHSFXCDpo3nCLRNmZU+UDaVbshPM3bdDiGZCtSZKjY8nngLHp+cZ2WWcIIndO2PVW4
+         k9RL30RQbE0gRT4+6uPwLBiXse9LqXvuNTqaBZglspWwX/YKjS81CgJUtnBLW9jRUKZV
+         YGZDZhuvcp76mcUk6inUco9vhLAtOF/lyiDybRQOWXDnuSwG1G2OLAUnzM3ZwJKDl5N4
+         LpM8KmKM1EVVh8rA2UUgzTEhb10YykYols92/j6szA9n/osKzVvo5VTsg8Ng69jzhUoL
+         Cc+g==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20161025;
+        h=x-gm-message-state:mime-version:subject:from:in-reply-to:date:cc
+         :content-transfer-encoding:message-id:references:to;
+        bh=AhkChjhhkTkmXD5KEPPeHkdoCCiZF1hLVImO/Bt3nAc=;
+        b=dNR2Jt2+tYBA4rOhyF9tmXAtkGZipeXDdYQEJaHCZocTkH/AhPmdF1+xm+mZGDs3cV
+         H9vCrQ5I7ocrKU454ZqTbS1k2tU3padw8fE3opc+plEJgdPoRp7ILSKybBsfCIbxihwE
+         SEP5pM0RWuJFMAMo/QbozVQc1PYZYF4jZkSPSQ3xvbAd1s8zfFNXWuHI5nY7qSdTlw5Y
+         4+vU9akxmS2v3FNHC5MXGz7yHuHqaz095lRl9FPFR5GcTrmsWQBDaUn6Cy6oMn6++Bkg
+         deaXmaMMWnmm8Bj85kzrM98uCYtBI1pADvI51utKQgvd1cvOLAOHovI4G421lv2n4orD
+         dWfA==
+X-Gm-Message-State: APjAAAWhrfC4U+DLnbXASWKs8reLHCNbsQnjtd+jF/m6dbFQn7egal2q
+        EuoIuihP649kQyglxAxYOOiXog==
+X-Google-Smtp-Source: APXvYqzzqRL1QYWSXUelmlMsvjdjFQdleOlUNxeQzpX82DJGcr9OjHzO71ZUqqC1Ps9+JGEupqMQ5w==
+X-Received: by 2002:a1c:f00a:: with SMTP id a10mr5395739wmb.167.1574437335675;
+        Fri, 22 Nov 2019 07:42:15 -0800 (PST)
+Received: from [192.168.0.102] (88-147-68-93.dyn.eolo.it. [88.147.68.93])
+        by smtp.gmail.com with ESMTPSA id b3sm3777562wmj.44.2019.11.22.07.42.14
+        (version=TLS1_2 cipher=ECDHE-RSA-AES128-GCM-SHA256 bits=128/128);
+        Fri, 22 Nov 2019 07:42:15 -0800 (PST)
+Content-Type: text/plain;
+        charset=us-ascii
+Mime-Version: 1.0 (Mac OS X Mail 12.4 \(3445.104.8\))
+Subject: Re: [PATCH 0/2] block, bfq: make bfq disable iocost and present a
+ double interface
+From:   Paolo Valente <paolo.valente@linaro.org>
+In-Reply-To: <DE7EFCFA-D8A6-48EB-AE46-0C7D813A2095@linaro.org>
+Date:   Fri, 22 Nov 2019 16:42:10 +0100
+Cc:     linux-block <linux-block@vger.kernel.org>,
+        linux-kernel <linux-kernel@vger.kernel.org>,
+        Ulf Hansson <ulf.hansson@linaro.org>,
+        Linus Walleij <linus.walleij@linaro.org>,
+        noreply-spamdigest via bfq-iosched 
+        <bfq-iosched@googlegroups.com>,
+        Oleksandr Natalenko <oleksandr@natalenko.name>,
+        Tejun Heo <tj@kernel.org>, cgroups@vger.kernel.org
 Content-Transfer-Encoding: quoted-printable
-Content-Disposition: inline
+Message-Id: <14200A37-0721-4444-B8A7-BE03CEDE84FB@linaro.org>
+References: <20191001193316.3330-1-paolo.valente@linaro.org>
+ <19BC0425-559E-433A-ACAD-B12FA02E20E4@linaro.org>
+ <94E51269-62DC-427A-A81C-3851ABC818BC@linaro.org>
+ <DE7EFCFA-D8A6-48EB-AE46-0C7D813A2095@linaro.org>
+To:     Jens Axboe <axboe@kernel.dk>
+X-Mailer: Apple Mail (2.3445.104.8)
 Sender: linux-block-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-Hi Linus,
+Jens,
+5.5 has arrived too, and this version should do what you asked.  Can
+you please consider this series?
 
-The following changes since commit a99d8080aaf358d5d23581244e5da23b35e340b9=
-:
+Thanks,
+Paolo
 
-  Linux 5.4-rc6 (2019-11-03 14:07:26 -0800)
-
-are available in the Git repository at:
-
-  git://git.kernel.org/pub/scm/linux/kernel/git/device-mapper/linux-dm.git =
-tags/for-5.5/dm-changes
-
-for you to fetch changes up to f612b2132db529feac4f965f28a1b9258ea7c22b:
-
-  Revert "dm crypt: use WQ_HIGHPRI for the IO and crypt workqueues" (2019-1=
-1-20 17:27:39 -0500)
-
-Please pull, thanks!
-Mike
-
-----------------------------------------------------------------
-- Fix DM core to disallow stacking request-based DM on partitions.
-
-- Fix DM raid target to properly resync raidset even if bitmap needed
-  additional pages.
-
-- Fix DM crypt performance regression due to use of WQ_HIGHPRI for the
-  IO and crypt workqueues.
-
-- Fix DM integrity metadata layout that was aligned on 128K boundary
-  rather than the intended 4K boundary (removes 124K of wasted space for
-  each metadata block).
-
-- Improve the DM thin, cache and clone targets to use spin_lock_irq
-  rather than spin_lock_irqsave where possible.
-
-- Fix DM thin single thread performance that was lost due to needless
-  workqueue wakeups.
-
-- Fix DM zoned target performance that was lost due to excessive backing
-  device checks.
-
-- Add ability to trigger write failure with the DM dust test target.
-
-- Fix whitespace indentation in drivers/md/Kconfig.
-
-- Various smalls fixes and cleanups (e.g. use struct_size, fix
-  uninitialized variable, variable renames, etc).
-
-----------------------------------------------------------------
-Bryan Gurney (3):
-      dm dust: change result vars to r
-      dm dust: change ret to r in dust_map_read and dust_map
-      dm dust: add limited write failure mode
-
-Dmitry Fomichev (1):
-      dm zoned: reduce overhead of backing device checks
-
-Gustavo A. R. Silva (1):
-      dm stripe: use struct_size() in kmalloc()
-
-Heinz Mauelshagen (4):
-      dm raid: change rs_set_dev_and_array_sectors API and callers
-      dm raid: to ensure resynchronization, perform raid set grow in preres=
-ume
-      dm raid: simplify rs_setup_recovery call chain
-      dm raid: streamline rs_get_progress() and its raid_status() caller si=
-de
-
-Jeffle Xu (1):
-      dm thin: wakeup worker only when deferred bios exist
-
-Krzysztof Kozlowski (1):
-      dm: Fix Kconfig indentation
-
-Maged Mokhtar (1):
-      dm writecache: handle REQ_FUA
-
-Mike Snitzer (2):
-      dm table: do not allow request-based DM to stack on partitions
-      Revert "dm crypt: use WQ_HIGHPRI for the IO and crypt workqueues"
-
-Mikulas Patocka (6):
-      dm writecache: fix uninitialized variable warning
-      dm clone: replace spin_lock_irqsave with spin_lock_irq
-      dm thin: replace spin_lock_irqsave with spin_lock_irq
-      dm bio prison: replace spin_lock_irqsave with spin_lock_irq
-      dm cache: replace spin_lock_irqsave with spin_lock_irq
-      dm integrity: fix excessive alignment of metadata runs
-
-Nathan Chancellor (1):
-      dm raid: Remove unnecessary negation of a shift in raid10_format_to_m=
-d_layout
-
-Nikos Tsironis (1):
-      dm clone: add bucket_lock_irq/bucket_unlock_irq helpers
-
- .../admin-guide/device-mapper/dm-integrity.rst     |   5 +
- .../admin-guide/device-mapper/dm-raid.rst          |   2 +
- drivers/md/Kconfig                                 |  54 +++----
- drivers/md/dm-bio-prison-v1.c                      |  27 ++--
- drivers/md/dm-bio-prison-v2.c                      |  26 ++--
- drivers/md/dm-cache-target.c                       |  77 ++++------
- drivers/md/dm-clone-metadata.c                     |  29 ++--
- drivers/md/dm-clone-metadata.h                     |   4 +-
- drivers/md/dm-clone-target.c                       |  62 ++++----
- drivers/md/dm-crypt.c                              |   9 +-
- drivers/md/dm-dust.c                               |  97 ++++++++----
- drivers/md/dm-integrity.c                          |  28 +++-
- drivers/md/dm-raid.c                               | 164 +++++++++++------=
-----
- drivers/md/dm-stripe.c                             |  15 +-
- drivers/md/dm-table.c                              |  27 +---
- drivers/md/dm-thin.c                               | 118 +++++++--------
- drivers/md/dm-writecache.c                         |   5 +-
- drivers/md/dm-zoned-metadata.c                     |  29 ++--
- drivers/md/dm-zoned-reclaim.c                      |   8 +-
- drivers/md/dm-zoned-target.c                       |  54 +++++--
- drivers/md/dm-zoned.h                              |   2 +
- include/linux/device-mapper.h                      |   3 -
- 22 files changed, 433 insertions(+), 412 deletions(-)
+> Il giorno 4 nov 2019, alle ore 07:55, Paolo Valente =
+<paolo.valente@linaro.org> ha scritto:
+>=20
+> Hi Jens,
+> no issue has been raised in more than a month, and this version was
+> requested by Tejun and is backed by you. So can it be queued for 5.5?
+>=20
+> Thanks,
+> Paolo
+>=20
+>> Il giorno 23 ott 2019, alle ore 07:44, Paolo Valente =
+<paolo.valente@linaro.org> ha scritto:
+>>=20
+>> ping
+>>=20
+>>> Il giorno 9 ott 2019, alle ore 16:25, Paolo Valente =
+<paolo.valente@linaro.org> ha scritto:
+>>>=20
+>>> Jens, Tejun,
+>>> can we proceed with this double-interface solution?
+>>>=20
+>>> Thanks,
+>>> Paolo
+>>>=20
+>>>> Il giorno 1 ott 2019, alle ore 21:33, Paolo Valente =
+<paolo.valente@linaro.org> ha scritto:
+>>>>=20
+>>>> Hi Jens,
+>>>>=20
+>>>> the first patch in this series is Tejun's patch for making BFQ =
+disable
+>>>> io.cost. The second patch makes BFQ present both the bfq-prefixes
+>>>> parameters and non-prefixed parameters, as suggested by Tejun [1].
+>>>>=20
+>>>> In the first patch I've tried to use macros not to repeat code
+>>>> twice. checkpatch complains that these macros should be enclosed in
+>>>> parentheses. I don't see how to do it. I'm willing to switch to any
+>>>> better solution.
+>>>>=20
+>>>> Thanks,
+>>>> Paolo
+>>>>=20
+>>>> [1] https://lkml.org/lkml/2019/9/18/736
+>>>>=20
+>>>> Paolo Valente (1):
+>>>> block, bfq: present a double cgroups interface
+>>>>=20
+>>>> Tejun Heo (1):
+>>>> blkcg: Make bfq disable iocost when enabled
+>>>>=20
+>>>> Documentation/admin-guide/cgroup-v2.rst |   8 +-
+>>>> Documentation/block/bfq-iosched.rst     |  40 ++--
+>>>> block/bfq-cgroup.c                      | 260 =
+++++++++++++------------
+>>>> block/bfq-iosched.c                     |  32 +++
+>>>> block/blk-iocost.c                      |   5 +-
+>>>> include/linux/blk-cgroup.h              |   5 +
+>>>> kernel/cgroup/cgroup.c                  |   2 +
+>>>> 7 files changed, 201 insertions(+), 151 deletions(-)
+>>>>=20
+>>>> --
+>>>> 2.20.1
+>>>=20
+>>=20
+>=20
 
