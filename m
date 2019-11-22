@@ -4,50 +4,50 @@ X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 X-Spam-Level: 
 X-Spam-Status: No, score=-10.1 required=3.0 tests=DKIMWL_WL_HIGH,DKIM_SIGNED,
 	DKIM_VALID,DKIM_VALID_AU,INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,
-	SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED,USER_AGENT_GIT autolearn=ham
+	SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED,USER_AGENT_GIT autolearn=unavailable
 	autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 7458BC43141
-	for <linux-block@archiver.kernel.org>; Fri, 22 Nov 2019 19:50:42 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 1CE33C432C3
+	for <linux-block@archiver.kernel.org>; Fri, 22 Nov 2019 19:52:25 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.kernel.org (Postfix) with ESMTP id 3D58220731
-	for <linux-block@archiver.kernel.org>; Fri, 22 Nov 2019 19:50:42 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id D70392072E
+	for <linux-block@archiver.kernel.org>; Fri, 22 Nov 2019 19:52:24 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=default; t=1574452242;
-	bh=wJrUhHjk0rRXaMfnAyG5/ZYULXbzaf4QEAGrizRThD0=;
+	s=default; t=1574452345;
+	bh=2a4Arq1cQT5fjUZDzAr7jV7YvQfvKlgMRyQqYIyYUY0=;
 	h=From:To:Cc:Subject:Date:In-Reply-To:References:List-ID:From;
-	b=I1buMSBtwPG8v8fS68EHQOrMdDur4FIZpxTZumByer4DXhOk2eCde8IXOOjR+c9Aw
-	 PQzOKTiZW0+b//qeJm+nfEVakZVq+RL8PazQvxDPMHnmRxJU0qPRpRY08B3+xzSk8s
-	 gJGn/TFqaMJ2UkJMOqV8O0vGQc4o6Ga502KlZZDE=
+	b=JSA+IJl1m/E2MfIR/XNbHW2C+C8RET5K02y0Y1tLBVs9UgrLESEWfoxxtXM2J8h4/
+	 WSOJ3RS6nVmW+EkU5Z/NmgM63DbBO+XudHojKGq5B//qVuAp30+VnLTa/6m8OuJmPF
+	 OwMSjKBmfcE/VUqSpcXQ4Ly0A5nMCbgKwRHyGopA=
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1727184AbfKVTul (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Fri, 22 Nov 2019 14:50:41 -0500
-Received: from mail.kernel.org ([198.145.29.99]:51318 "EHLO mail.kernel.org"
+        id S1726752AbfKVTwU (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Fri, 22 Nov 2019 14:52:20 -0500
+Received: from mail.kernel.org ([198.145.29.99]:50104 "EHLO mail.kernel.org"
         rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-        id S1727850AbfKVTuY (ORCPT <rfc822;linux-block@vger.kernel.org>);
-        Fri, 22 Nov 2019 14:50:24 -0500
+        id S1727618AbfKVTtv (ORCPT <rfc822;linux-block@vger.kernel.org>);
+        Fri, 22 Nov 2019 14:49:51 -0500
 Received: from sasha-vm.mshome.net (c-73-47-72-35.hsd1.nh.comcast.net [73.47.72.35])
         (using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
         (No client certificate requested)
-        by mail.kernel.org (Postfix) with ESMTPSA id 8AB702072E;
-        Fri, 22 Nov 2019 19:50:23 +0000 (UTC)
+        by mail.kernel.org (Postfix) with ESMTPSA id 9440D20658;
+        Fri, 22 Nov 2019 19:49:50 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-        s=default; t=1574452224;
-        bh=wJrUhHjk0rRXaMfnAyG5/ZYULXbzaf4QEAGrizRThD0=;
+        s=default; t=1574452191;
+        bh=2a4Arq1cQT5fjUZDzAr7jV7YvQfvKlgMRyQqYIyYUY0=;
         h=From:To:Cc:Subject:Date:In-Reply-To:References:From;
-        b=yD7Jg2M1KR34Uj7jN4D63EwhvQz2+mv6M3WyCGa6q8niecNeUC3pMxtTj7GgZZCSN
-         2mYHuhzoSQcuirNWutT52VIuiYIZIP2PCik9yWswavk4b/N1AC6FdmtLSMfhttEumJ
-         q5czlfwzxpHyT7/vG3o8OhM6Mau49u8EWDjixJZ0=
+        b=tzKsw7vCtGMo3xcW+BhV8svv9GW5qn4OvCIkvv1T3lB85izGG3+Cqjoa0wwJpLJLl
+         NB/Lh38DVkvl68Ue+UJ75WSQs162Y5qpoMQh/ixT/UZ3kaRt2RE6MMQrjrZUjAsfsK
+         DC+/2qciGCDAOSxK3JSWjUdfs48xO4TxJO+lSOTw=
 From:   Sasha Levin <sashal@kernel.org>
 To:     linux-kernel@vger.kernel.org, stable@vger.kernel.org
 Cc:     Chuhong Yuan <hslester96@gmail.com>, Jens Axboe <axboe@kernel.dk>,
         Sasha Levin <sashal@kernel.org>, linux-block@vger.kernel.org
-Subject: [PATCH AUTOSEL 4.4 8/9] rsxx: add missed destroy_workqueue calls in remove
-Date:   Fri, 22 Nov 2019 14:50:13 -0500
-Message-Id: <20191122195014.25065-8-sashal@kernel.org>
+Subject: [PATCH AUTOSEL 4.14 16/21] rsxx: add missed destroy_workqueue calls in remove
+Date:   Fri, 22 Nov 2019 14:49:26 -0500
+Message-Id: <20191122194931.24732-16-sashal@kernel.org>
 X-Mailer: git-send-email 2.20.1
-In-Reply-To: <20191122195014.25065-1-sashal@kernel.org>
-References: <20191122195014.25065-1-sashal@kernel.org>
+In-Reply-To: <20191122194931.24732-1-sashal@kernel.org>
+References: <20191122194931.24732-1-sashal@kernel.org>
 MIME-Version: 1.0
 X-stable: review
 X-Patchwork-Hint: Ignore
@@ -73,10 +73,10 @@ Signed-off-by: Sasha Levin <sashal@kernel.org>
  1 file changed, 2 insertions(+)
 
 diff --git a/drivers/block/rsxx/core.c b/drivers/block/rsxx/core.c
-index d8b2488aaade1..620a3a67cdd52 100644
+index 34997df132e24..6beafaa335c71 100644
 --- a/drivers/block/rsxx/core.c
 +++ b/drivers/block/rsxx/core.c
-@@ -1028,8 +1028,10 @@ static void rsxx_pci_remove(struct pci_dev *dev)
+@@ -1025,8 +1025,10 @@ static void rsxx_pci_remove(struct pci_dev *dev)
  
  	cancel_work_sync(&card->event_work);
  
