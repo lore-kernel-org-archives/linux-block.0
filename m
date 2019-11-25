@@ -7,36 +7,36 @@ X-Spam-Status: No, score=-9.8 required=3.0 tests=DKIMWL_WL_HIGH,DKIM_SIGNED,
 	MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED,
 	USER_AGENT_GIT autolearn=unavailable autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 153CAC432C0
-	for <linux-block@archiver.kernel.org>; Mon, 25 Nov 2019 23:13:55 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 29F89C432C0
+	for <linux-block@archiver.kernel.org>; Mon, 25 Nov 2019 23:13:57 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.kernel.org (Postfix) with ESMTP id E0FEE20748
-	for <linux-block@archiver.kernel.org>; Mon, 25 Nov 2019 23:13:54 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id 022B52075C
+	for <linux-block@archiver.kernel.org>; Mon, 25 Nov 2019 23:13:57 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=pass (2048-bit key) header.d=nvidia.com header.i=@nvidia.com header.b="KTvMYhW+"
+	dkim=pass (2048-bit key) header.d=nvidia.com header.i=@nvidia.com header.b="jC5e+5ML"
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1726016AbfKYXNp (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Mon, 25 Nov 2019 18:13:45 -0500
-Received: from hqemgate16.nvidia.com ([216.228.121.65]:11217 "EHLO
-        hqemgate16.nvidia.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1726118AbfKYXKt (ORCPT
+        id S1727111AbfKYXKp (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Mon, 25 Nov 2019 18:10:45 -0500
+Received: from hqemgate14.nvidia.com ([216.228.121.143]:1082 "EHLO
+        hqemgate14.nvidia.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S1726118AbfKYXKo (ORCPT
         <rfc822;linux-block@vger.kernel.org>);
-        Mon, 25 Nov 2019 18:10:49 -0500
-Received: from hqpgpgate101.nvidia.com (Not Verified[216.228.121.13]) by hqemgate16.nvidia.com (using TLS: TLSv1.2, DES-CBC3-SHA)
-        id <B5ddc5f760000>; Mon, 25 Nov 2019 15:10:46 -0800
+        Mon, 25 Nov 2019 18:10:44 -0500
+Received: from hqpgpgate101.nvidia.com (Not Verified[216.228.121.13]) by hqemgate14.nvidia.com (using TLS: TLSv1.2, DES-CBC3-SHA)
+        id <B5ddc5f750000>; Mon, 25 Nov 2019 15:10:45 -0800
 Received: from hqmail.nvidia.com ([172.20.161.6])
   by hqpgpgate101.nvidia.com (PGP Universal service);
-  Mon, 25 Nov 2019 15:10:44 -0800
+  Mon, 25 Nov 2019 15:10:41 -0800
 X-PGP-Universal: processed;
-        by hqpgpgate101.nvidia.com on Mon, 25 Nov 2019 15:10:44 -0800
-Received: from HQMAIL109.nvidia.com (172.20.187.15) by HQMAIL105.nvidia.com
- (172.20.187.12) with Microsoft SMTP Server (TLS) id 15.0.1473.3; Mon, 25 Nov
- 2019 23:10:44 +0000
-Received: from rnnvemgw01.nvidia.com (10.128.109.123) by HQMAIL109.nvidia.com
- (172.20.187.15) with Microsoft SMTP Server (TLS) id 15.0.1473.3 via Frontend
- Transport; Mon, 25 Nov 2019 23:10:43 +0000
+        by hqpgpgate101.nvidia.com on Mon, 25 Nov 2019 15:10:41 -0800
+Received: from HQMAIL107.nvidia.com (172.20.187.13) by HQMAIL101.nvidia.com
+ (172.20.187.10) with Microsoft SMTP Server (TLS) id 15.0.1473.3; Mon, 25 Nov
+ 2019 23:10:41 +0000
+Received: from rnnvemgw01.nvidia.com (10.128.109.123) by HQMAIL107.nvidia.com
+ (172.20.187.13) with Microsoft SMTP Server (TLS) id 15.0.1473.3 via Frontend
+ Transport; Mon, 25 Nov 2019 23:10:40 +0000
 Received: from blueforge.nvidia.com (Not Verified[10.110.48.28]) by rnnvemgw01.nvidia.com with Trustwave SEG (v7,5,8,10121)
-        id <B5ddc5f710002>; Mon, 25 Nov 2019 15:10:43 -0800
+        id <B5ddc5f6f0001>; Mon, 25 Nov 2019 15:10:40 -0800
 From:   John Hubbard <jhubbard@nvidia.com>
 To:     Andrew Morton <akpm@linux-foundation.org>
 CC:     Al Viro <viro@zeniv.linux.org.uk>,
@@ -67,85 +67,99 @@ CC:     Al Viro <viro@zeniv.linux.org.uk>,
         <linux-media@vger.kernel.org>, <linux-rdma@vger.kernel.org>,
         <linuxppc-dev@lists.ozlabs.org>, <netdev@vger.kernel.org>,
         <linux-mm@kvack.org>, LKML <linux-kernel@vger.kernel.org>,
-        John Hubbard <jhubbard@nvidia.com>
-Subject: [PATCH v2 04/19] goldish_pipe: rename local pin_user_pages() routine
-Date:   Mon, 25 Nov 2019 15:10:20 -0800
-Message-ID: <20191125231035.1539120-5-jhubbard@nvidia.com>
+        John Hubbard <jhubbard@nvidia.com>,
+        Christoph Hellwig <hch@lst.de>
+Subject: [PATCH v2 02/19] mm/gup: move try_get_compound_head() to top, fix minor issues
+Date:   Mon, 25 Nov 2019 15:10:18 -0800
+Message-ID: <20191125231035.1539120-3-jhubbard@nvidia.com>
 X-Mailer: git-send-email 2.24.0
 In-Reply-To: <20191125231035.1539120-1-jhubbard@nvidia.com>
 References: <20191125231035.1539120-1-jhubbard@nvidia.com>
 MIME-Version: 1.0
 X-NVConfidentiality: public
-Content-Type: text/plain; charset="UTF-8"
 Content-Transfer-Encoding: quoted-printable
+Content-Type: text/plain
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=nvidia.com; s=n1;
-        t=1574723446; bh=p0IrnUqP4remCwDP0ZXpn0mTFnqoqFciZQxO81/doUo=;
+        t=1574723445; bh=JKnh6awNMnXx+WkfJCjCpP/dD2pEJJn8AxQ3IWMhLGw=;
         h=X-PGP-Universal:From:To:CC:Subject:Date:Message-ID:X-Mailer:
          In-Reply-To:References:MIME-Version:X-NVConfidentiality:
-         Content-Type:Content-Transfer-Encoding;
-        b=KTvMYhW+K3nI/xBvkjrHMbXJWpM3vGPaT0BOCIyU2R3LhWctE1MG1LhIHgCEhZr/z
-         uszqrW2nRqINHV65Ijj5qgDMc9/15okSFOiBt7u4JKd514oVr4bAUGFgX/CxeXpULH
-         n84IKk0mWiOyOru9uW5NsUY0NNKyuGaVUascp74DAzW7b/2LmtYJxA4qVU6QW3Q0FN
-         AEiLto0DFqsuJoCN78dLaVjuy6TACR2CTRHvKyVPsYpk0bGm7beULw6SfRiUkYbt5C
-         IOboINZ+SeG5Uptq8Yn86QkTLGbP3/PC+E9BSmb+fj4H8JKeyHimgEuMPySollORN1
-         qTejfSZ8clQaA==
+         Content-Transfer-Encoding:Content-Type;
+        b=jC5e+5MLgArfU4yAZ5yV9ldAgz3MPot067ia5Ad3y9iAeyRJ6biBbBLvf/PCDcKlv
+         f1hQ/Ln1SJqFWNipjx8I53p+Zfbb+f0f+0eFPX72aFxcArDBJ+XixYQChzSWmvlesy
+         zo9CRHKV/vec5N4ZMMXzd8ayG92YQVllNM7sho//6Ec10682q2fg0mU5Mju/dwYaDr
+         hHve6RNDUVgJ0X9nqR4M0mmdpOLHFlyo03fMhDAsqenaBK2aq88Zkl6Xydt92kKAR+
+         HKDi4fAiVIqVBpx0TIMHJ1OOACPk0npNX4pp8Ht3TiYweUgnDO7YqKjqhzuNctmybO
+         PDpR/Zsa9AFBQ==
 Sender: linux-block-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-1. Avoid naming conflicts: rename local static function from
-"pin_user_pages()" to "goldfish_pin_pages()".
+An upcoming patch uses try_get_compound_head() more widely,
+so move it to the top of gup.c.
 
-An upcoming patch will introduce a global pin_user_pages()
-function.
+Also fix a tiny spelling error and a checkpatch.pl warning.
 
+Reviewed-by: Christoph Hellwig <hch@lst.de>
 Reviewed-by: Jan Kara <jack@suse.cz>
-Reviewed-by: J=C3=A9r=C3=B4me Glisse <jglisse@redhat.com>
 Reviewed-by: Ira Weiny <ira.weiny@intel.com>
 Signed-off-by: John Hubbard <jhubbard@nvidia.com>
 ---
- drivers/platform/goldfish/goldfish_pipe.c | 18 +++++++++---------
- 1 file changed, 9 insertions(+), 9 deletions(-)
+ mm/gup.c | 29 +++++++++++++++--------------
+ 1 file changed, 15 insertions(+), 14 deletions(-)
 
-diff --git a/drivers/platform/goldfish/goldfish_pipe.c b/drivers/platform/g=
-oldfish/goldfish_pipe.c
-index cef0133aa47a..ef50c264db71 100644
---- a/drivers/platform/goldfish/goldfish_pipe.c
-+++ b/drivers/platform/goldfish/goldfish_pipe.c
-@@ -257,12 +257,12 @@ static int goldfish_pipe_error_convert(int status)
+diff --git a/mm/gup.c b/mm/gup.c
+index f764432914c4..3ecce297a47f 100644
+--- a/mm/gup.c
++++ b/mm/gup.c
+@@ -29,6 +29,21 @@ struct follow_page_context {
+ 	unsigned int page_mask;
+ };
+=20
++/*
++ * Return the compound head page with ref appropriately incremented,
++ * or NULL if that failed.
++ */
++static inline struct page *try_get_compound_head(struct page *page, int re=
+fs)
++{
++	struct page *head =3D compound_head(page);
++
++	if (WARN_ON_ONCE(page_ref_count(head) < 0))
++		return NULL;
++	if (unlikely(!page_cache_add_speculative(head, refs)))
++		return NULL;
++	return head;
++}
++
+ /**
+  * put_user_pages_dirty_lock() - release and optionally dirty gup-pinned p=
+ages
+  * @pages:  array of pages to be maybe marked dirty, and definitely releas=
+ed.
+@@ -1807,20 +1822,6 @@ static void __maybe_unused undo_dev_pagemap(int *nr,=
+ int nr_start,
  	}
  }
 =20
--static int pin_user_pages(unsigned long first_page,
--			  unsigned long last_page,
--			  unsigned int last_page_size,
--			  int is_write,
--			  struct page *pages[MAX_BUFFERS_PER_COMMAND],
--			  unsigned int *iter_last_page_size)
-+static int goldfish_pin_pages(unsigned long first_page,
-+			      unsigned long last_page,
-+			      unsigned int last_page_size,
-+			      int is_write,
-+			      struct page *pages[MAX_BUFFERS_PER_COMMAND],
-+			      unsigned int *iter_last_page_size)
- {
- 	int ret;
- 	int requested_pages =3D ((last_page - first_page) >> PAGE_SHIFT) + 1;
-@@ -354,9 +354,9 @@ static int transfer_max_buffers(struct goldfish_pipe *p=
-ipe,
- 	if (mutex_lock_interruptible(&pipe->lock))
- 		return -ERESTARTSYS;
-=20
--	pages_count =3D pin_user_pages(first_page, last_page,
--				     last_page_size, is_write,
--				     pipe->pages, &iter_last_page_size);
-+	pages_count =3D goldfish_pin_pages(first_page, last_page,
-+					 last_page_size, is_write,
-+					 pipe->pages, &iter_last_page_size);
- 	if (pages_count < 0) {
- 		mutex_unlock(&pipe->lock);
- 		return pages_count;
+-/*
+- * Return the compund head page with ref appropriately incremented,
+- * or NULL if that failed.
+- */
+-static inline struct page *try_get_compound_head(struct page *page, int re=
+fs)
+-{
+-	struct page *head =3D compound_head(page);
+-	if (WARN_ON_ONCE(page_ref_count(head) < 0))
+-		return NULL;
+-	if (unlikely(!page_cache_add_speculative(head, refs)))
+-		return NULL;
+-	return head;
+-}
+-
+ #ifdef CONFIG_ARCH_HAS_PTE_SPECIAL
+ static int gup_pte_range(pmd_t pmd, unsigned long addr, unsigned long end,
+ 			 unsigned int flags, struct page **pages, int *nr)
 --=20
 2.24.0
 
