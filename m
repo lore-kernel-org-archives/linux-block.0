@@ -2,90 +2,107 @@ Return-Path: <SRS0=vXr6=ZR=vger.kernel.org=linux-block-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-2.2 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
-	MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,USER_AGENT_SANE_1 autolearn=no
-	autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-5.2 required=3.0 tests=DKIM_SIGNED,DKIM_VALID,
+	HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,
+	SPF_PASS,URIBL_BLOCKED,USER_AGENT_SANE_1 autolearn=ham autolearn_force=no
+	version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 39A69C432C0
-	for <linux-block@archiver.kernel.org>; Mon, 25 Nov 2019 19:41:57 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 821A1C432C0
+	for <linux-block@archiver.kernel.org>; Mon, 25 Nov 2019 20:13:39 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.kernel.org (Postfix) with ESMTP id 0DC4A2071E
-	for <linux-block@archiver.kernel.org>; Mon, 25 Nov 2019 19:41:57 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id 4A1952082F
+	for <linux-block@archiver.kernel.org>; Mon, 25 Nov 2019 20:13:39 +0000 (UTC)
+Authentication-Results: mail.kernel.org;
+	dkim=pass (2048-bit key) header.d=osandov-com.20150623.gappssmtp.com header.i=@osandov-com.20150623.gappssmtp.com header.b="jesU0vjR"
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1725862AbfKYTlx (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Mon, 25 Nov 2019 14:41:53 -0500
-Received: from mail-pf1-f194.google.com ([209.85.210.194]:36743 "EHLO
-        mail-pf1-f194.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1725823AbfKYTlw (ORCPT
+        id S1725818AbfKYUNi (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Mon, 25 Nov 2019 15:13:38 -0500
+Received: from mail-pl1-f194.google.com ([209.85.214.194]:41849 "EHLO
+        mail-pl1-f194.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S1725799AbfKYUNi (ORCPT
         <rfc822;linux-block@vger.kernel.org>);
-        Mon, 25 Nov 2019 14:41:52 -0500
-Received: by mail-pf1-f194.google.com with SMTP id b19so7870500pfd.3;
-        Mon, 25 Nov 2019 11:41:52 -0800 (PST)
+        Mon, 25 Nov 2019 15:13:38 -0500
+Received: by mail-pl1-f194.google.com with SMTP id t8so6911497plr.8
+        for <linux-block@vger.kernel.org>; Mon, 25 Nov 2019 12:13:36 -0800 (PST)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=osandov-com.20150623.gappssmtp.com; s=20150623;
+        h=date:from:to:cc:subject:message-id:references:mime-version
+         :content-disposition:content-transfer-encoding:in-reply-to
+         :user-agent;
+        bh=SU6TsSbBzeSs/e3bhPm8m2XCWSnbOEfh3IiQPmccc9c=;
+        b=jesU0vjRdCu5el2BSZ/x3Uly8ne8WPKpBxf5LhFnWCPcX37vSuKt0plhiWAO73Ct/P
+         O/dPwJ13ioEAc3LNOLoQHQuvhAqWHbGk/x1wEYrJEKSm9/hyr/bL/JzyIlJVWnDxSIMj
+         9ZHwVS0hFYsIDTZqdbXxFIiFxFkCXPvrv6AWlWnFZTt45R+pIcguoV19/MMp4A4vBLJ4
+         oDl+lNVyHuIc9d20N/ApbFbbO6t9dejCV+dqWLn/dfwzyBY/q3605bBdvdaIGvwa9tvM
+         EfrtqB+I8Vt3mCdYL1xmkjHAFLM2Z10yRTSAhPMSmLUZqI7mNENzfFrfpWH3+qesrGLs
+         goAA==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=1e100.net; s=20161025;
-        h=x-gm-message-state:subject:to:cc:references:from:message-id:date
-         :user-agent:mime-version:in-reply-to:content-language
-         :content-transfer-encoding;
-        bh=42S2SQ4poaCqsC6y0USRopdPGs/iLjn//hI75VsW/20=;
-        b=NNiTz/N/jn3ECok0ZBNk3dM9uZjJ9fxSurv0c3tnygJwrnfEwIxDsXwBCGiaPTMuJH
-         VN9BqrpzT4Y7y6/oGR/gofidm0pEeb2uZmx2EsBAWcJ/nxPHd2jjZ/ytek5mpB4tAdAc
-         PZwxxS4R2/3kR1dsYvLWrMe6wOre/gkc2jhiacLulnq4CnqhA9kB2H0RJ+F7mzMS8T+x
-         M20oW8/OjjZOdBlVOjmOjH94HRVCUnDYWDdXQVISn6QUsWPjgxnMOc2qsyuQ32wJUdsR
-         gSGEWuN4CjubN5YxfZJdkJJ4NMcOrAPIUyqkRCBGR5NofohbyZvzKmE3pjnYxkB+q3R9
-         4uNw==
-X-Gm-Message-State: APjAAAUPq0iFfhBUtIwilfBKgsbEZSWgKkmk/8QJO+45as9KAJIjsDT8
-        6OSp8yFX7/exOAJp9FrnJuImkgwi
-X-Google-Smtp-Source: APXvYqwdQYkz+o5leZlnK7ZcW9MZs/t4kmmvK7Y8obAlwUG16DQsWhXBgHy6kz+uCDoeegQX6aE9Cw==
-X-Received: by 2002:a65:4ccf:: with SMTP id n15mr35051760pgt.248.1574710911337;
-        Mon, 25 Nov 2019 11:41:51 -0800 (PST)
-Received: from desktop-bart.svl.corp.google.com ([2620:15c:2cd:202:4308:52a3:24b6:2c60])
-        by smtp.gmail.com with ESMTPSA id s2sm9668983pfb.109.2019.11.25.11.41.50
-        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
-        Mon, 25 Nov 2019 11:41:50 -0800 (PST)
-Subject: Re: [PATCH v2] loop: avoid EAGAIN, if offset or block_size are
- changed
-To:     Jaegeuk Kim <jaegeuk@kernel.org>
-Cc:     linux-kernel@vger.kernel.org,
-        linux-f2fs-devel@lists.sourceforge.net, stable@vger.kernel.org,
-        Jens Axboe <axboe@kernel.dk>, linux-block@vger.kernel.org
-References: <20190518004751.18962-1-jaegeuk@kernel.org>
- <20190518005304.GA19446@jaegeuk-macbookpro.roam.corp.google.com>
- <1e1aae74-bd6b-dddb-0c88-660aac33872c@acm.org>
- <20191125175913.GC71634@jaegeuk-macbookpro.roam.corp.google.com>
- <a4e5d6bd-3685-379a-c388-cd2871827b21@acm.org>
- <20191125192251.GA76721@jaegeuk-macbookpro.roam.corp.google.com>
-From:   Bart Van Assche <bvanassche@acm.org>
-Message-ID: <baaf9725-09b4-3f2d-1408-ead415f5c20d@acm.org>
-Date:   Mon, 25 Nov 2019 11:41:49 -0800
-User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:60.0) Gecko/20100101
- Thunderbird/60.9.0
+        h=x-gm-message-state:date:from:to:cc:subject:message-id:references
+         :mime-version:content-disposition:content-transfer-encoding
+         :in-reply-to:user-agent;
+        bh=SU6TsSbBzeSs/e3bhPm8m2XCWSnbOEfh3IiQPmccc9c=;
+        b=SohEjjspFWLluKxl5i2+daihWrTvdxag4mFCzhpOMS8PVlvorY7nRltd5AhYtut8fW
+         zljZAt2Exo3v60GxA0PJTKv3X0Jw0COGcsZ7/vZSAz5PGz+I7Mhg6hyP7/y+qefpTUeM
+         9dhTXx1CKtONYTRNknmAjmYtgG/X0/OnHqp7ptvepEdAvep92SMljytzWz+o0v+BqxQ8
+         U4yLZSVlmJdwUq7mdXS+DFHGsIN/Zb1U4QmGhsYeMV7qz1kwpRrs1Kk/30K/GaZEgpA+
+         yn5pGM31egLpJQuEnBbm3YeqSgdyLBr+YarvUbJbr2ljJKa22TMB1G8n3XJ1De5fcgiB
+         9W3g==
+X-Gm-Message-State: APjAAAUtnYRqQJOcnEjrHft93aOkwnV6yJIhVP1jRFmWxdmu3zGKu9u2
+        MfgfhZ2SfKIEXNDzhzAxCYqc9A==
+X-Google-Smtp-Source: APXvYqykeSEL6iIuskt8dXFK1EI8Oz7I/Lc396zlrPEGGRTGRPncXB/drkV+GUBMSs1MRjm+asvWTw==
+X-Received: by 2002:a17:90a:a483:: with SMTP id z3mr976701pjp.55.1574712815804;
+        Mon, 25 Nov 2019 12:13:35 -0800 (PST)
+Received: from vader ([2620:10d:c090:200::2:16e0])
+        by smtp.gmail.com with ESMTPSA id x3sm216617pjq.10.2019.11.25.12.13.34
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Mon, 25 Nov 2019 12:13:34 -0800 (PST)
+Date:   Mon, 25 Nov 2019 12:13:34 -0800
+From:   Omar Sandoval <osandov@osandov.com>
+To:     Bart Van Assche <bvanassche@acm.org>
+Cc:     Omar Sandoval <osandov@fb.com>, linux-block@vger.kernel.org
+Subject: Re: [PATCH blktests 4/4] tests/srp/015: Add a test that uses the
+ SoftiWARP (siw) driver
+Message-ID: <20191125201334.GA639675@vader>
+References: <20191115170711.232741-1-bvanassche@acm.org>
+ <20191115170711.232741-5-bvanassche@acm.org>
 MIME-Version: 1.0
-In-Reply-To: <20191125192251.GA76721@jaegeuk-macbookpro.roam.corp.google.com>
-Content-Type: text/plain; charset=utf-8; format=flowed
-Content-Language: en-US
-Content-Transfer-Encoding: 7bit
+Content-Type: text/plain; charset=utf-8
+Content-Disposition: inline
+Content-Transfer-Encoding: 8bit
+In-Reply-To: <20191115170711.232741-5-bvanassche@acm.org>
+User-Agent: Mutt/1.12.2 (2019-09-21)
 Sender: linux-block-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-On 11/25/19 11:22 AM, Jaegeuk Kim wrote:
-> On 11/25, Bart Van Assche wrote:
->> Thank you for the additional and very helpful clarification. Can you have a look at the (totally untested) patch below? I prefer that version because it prevents concurrent processing of requests and syncing/killing the bdev.
+On Fri, Nov 15, 2019 at 09:07:11AM -0800, Bart Van Assche wrote:
+> Recently support has been added in the SRP initiator and target drivers
+> for the SoftiWARP driver. Add a test for SRP over SoftiWARP.
 > 
-> Yeah, I thought this was much cleaner way, but wasn't sure it could be doable
-> to sync|kill block device after freezing the queue. Is it okay?
+> Signed-off-by: Bart Van Assche <bvanassche@acm.org>
+> ---
+>  tests/srp/015     | 42 ++++++++++++++++++++++++++++++++++++++++++
+>  tests/srp/015.out |  2 ++
+>  2 files changed, 44 insertions(+)
+>  create mode 100755 tests/srp/015
+>  create mode 100644 tests/srp/015.out
 
-Hi Jaegeuk,
+Hi, Bart,
 
-That patch was based on an incorrect interpretation of the meaning of 
-lo_device. After having taken another loop at the block driver, I don't 
-think that calling sync after freezing the queue is OK. How about using 
-the following call sequence:
-* sync_blockdev()
-* blk_mq_freeze_queue()
-* kill_bdev()
+I'm getting:
 
-Thanks,
+srp/015 (File I/O on top of multipath concurrently with logout and login (mq) using the SoftiWARP (siw) driver) [failed]
+    runtime  1.076s  ...  1.026s
+    --- tests/srp/015.out       2019-11-25 12:07:06.749425714 -0800
+    +++ /home/vmuser/repos/blktests/results/nodev/srp/015.out.bad       2019-11-25 12:12:07.634062201 -0800
+    @@ -1,2 +1 @@
+    -Configured SRP target driver
+    -Passed
+    +mkdir: cannot create directory ‘0x52540012345600000000000000000000’: Invalid argument
 
-Bart.
+This is on v5.4-rc8 with CONFIG_RDMA_SIW=m. Do you know what is wrong
+here?
+
+Thanks!
