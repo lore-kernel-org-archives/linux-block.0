@@ -2,69 +2,95 @@ Return-Path: <SRS0=vXr6=ZR=vger.kernel.org=linux-block-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-2.0 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
-	HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,
+X-Spam-Status: No, score=-2.6 required=3.0 tests=DKIMWL_WL_HIGH,DKIM_SIGNED,
+	DKIM_VALID,DKIM_VALID_AU,MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,
 	USER_AGENT_SANE_1 autolearn=no autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id D70A7C432C0
-	for <linux-block@archiver.kernel.org>; Mon, 25 Nov 2019 17:40:43 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id ADC2CC43215
+	for <linux-block@archiver.kernel.org>; Mon, 25 Nov 2019 17:59:15 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.kernel.org (Postfix) with ESMTP id B020B20835
-	for <linux-block@archiver.kernel.org>; Mon, 25 Nov 2019 17:40:43 +0000 (UTC)
-Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (2048-bit key) header.d=infradead.org header.i=@infradead.org header.b="U+XkpZq0"
+	by mail.kernel.org (Postfix) with ESMTP id 8138420869
+	for <linux-block@archiver.kernel.org>; Mon, 25 Nov 2019 17:59:15 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+	s=default; t=1574704755;
+	bh=KeQcj2AKHVhcae5ILgNCmFk/tRvBlisVKhy3DFIZA1c=;
+	h=Date:From:To:Cc:Subject:References:In-Reply-To:List-ID:From;
+	b=FLHYOwT30qTRPE+PdLd9CFRw+wYJHXHRsGHUqtyoEiWgfIpTiq9t5jjoP7K8xIKyZ
+	 OXuATZmM1jBE/pgokqzdsO/IYg3S+01+2B/W1e9d+DDt6BJngTu8D2rkkaQKDb6/v/
+	 v1FcCTK0oQq571Y6WgY4N+0KFlSgZvyeYjvndp58=
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1727405AbfKYRkn (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Mon, 25 Nov 2019 12:40:43 -0500
-Received: from bombadil.infradead.org ([198.137.202.133]:45192 "EHLO
-        bombadil.infradead.org" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1725868AbfKYRkm (ORCPT
-        <rfc822;linux-block@vger.kernel.org>);
-        Mon, 25 Nov 2019 12:40:42 -0500
-DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed;
-        d=infradead.org; s=bombadil.20170209; h=In-Reply-To:Content-Type:MIME-Version
-        :References:Message-ID:Subject:Cc:To:From:Date:Sender:Reply-To:
-        Content-Transfer-Encoding:Content-ID:Content-Description:Resent-Date:
-        Resent-From:Resent-Sender:Resent-To:Resent-Cc:Resent-Message-ID:List-Id:
-        List-Help:List-Unsubscribe:List-Subscribe:List-Post:List-Owner:List-Archive;
-         bh=uxPYNIRvXaDDaZYdugd2AISuQeyYM+VNm+o9iO+FosU=; b=U+XkpZq0mAiGvkr+/u5C2Ze7b
-        AR1n4xm4BNQUrTkqlPPE0rcpm1pR6sa60/rRHZzmhg4mIwOXqWLFypEd2raGJ91PKejoKMpLmUgJj
-        L9frT+KC/V3hufQz9PCcHGyvyDUOK4bqYHFPatuUV0XsB4gzfQn7q9z1UZ+s0DP+BNRKabABJUTj9
-        hVBl/rOvW5TxIC/22b2Hx4bDNuk2GXNRKmLll6b5F4fc6n7/azGk0RA4RVk+ccH6t7WZyi3Tz4PCL
-        uHvv4EdPRi+ISff4Zn65dv4ONfunfxDIrnYedwp3OE+Ts28LcTy8cX2PnLFTR2Vi2TCNOEwQ+j57L
-        DQCqLcRAw==;
-Received: from hch by bombadil.infradead.org with local (Exim 4.92.3 #3 (Red Hat Linux))
-        id 1iZILl-0001gv-Sp; Mon, 25 Nov 2019 17:40:37 +0000
-Date:   Mon, 25 Nov 2019 09:40:37 -0800
-From:   Christoph Hellwig <hch@infradead.org>
-To:     Kees Cook <keescook@chromium.org>
-Cc:     Christoph Hellwig <hch@infradead.org>,
-        Jens Axboe <axboe@kernel.dk>,
-        syzbot+21cfe1f803e0e158acf1@syzkaller.appspotmail.com,
-        linux-block@vger.kernel.org, linux-kernel@vger.kernel.org
-Subject: Re: [PATCH] block: Replace bio_check_ro()'s WARN_ON()
-Message-ID: <20191125174037.GA768@infradead.org>
-References: <20180824211535.GA22251@beast>
- <201911221052.0FDE1A1@keescook>
- <20191122190707.GA2136@infradead.org>
- <94976fb5-12d3-557d-7f31-347d6116b18c@kernel.dk>
- <20191122191434.GA10150@infradead.org>
- <201911221131.A34DFAA49@keescook>
+        id S1727724AbfKYR7O (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Mon, 25 Nov 2019 12:59:14 -0500
+Received: from mail.kernel.org ([198.145.29.99]:52800 "EHLO mail.kernel.org"
+        rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
+        id S1725823AbfKYR7O (ORCPT <rfc822;linux-block@vger.kernel.org>);
+        Mon, 25 Nov 2019 12:59:14 -0500
+Received: from localhost (unknown [104.132.0.81])
+        (using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+        (No client certificate requested)
+        by mail.kernel.org (Postfix) with ESMTPSA id 1721720679;
+        Mon, 25 Nov 2019 17:59:14 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+        s=default; t=1574704754;
+        bh=KeQcj2AKHVhcae5ILgNCmFk/tRvBlisVKhy3DFIZA1c=;
+        h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
+        b=yAhngtwOvHCL1fYdnEEbD3QRzDnSUoSdtwsxjwj6+a1i1oT56fZJhYAeDWOX9pYoJ
+         xqaYgcyIFhuTi5dVMgwAvRXZ0wF5ScvW9P8jBQhJVFk86A8Oz0PT3jLdQXlMaD6ayz
+         ORtsLGOdmTQelG61JjEYrNOPWeP55O76jyMrx3o4=
+Date:   Mon, 25 Nov 2019 09:59:13 -0800
+From:   Jaegeuk Kim <jaegeuk@kernel.org>
+To:     Bart Van Assche <bvanassche@acm.org>
+Cc:     linux-kernel@vger.kernel.org,
+        linux-f2fs-devel@lists.sourceforge.net, stable@vger.kernel.org,
+        Jens Axboe <axboe@kernel.dk>, linux-block@vger.kernel.org
+Subject: Re: [PATCH v2] loop: avoid EAGAIN, if offset or block_size are
+ changed
+Message-ID: <20191125175913.GC71634@jaegeuk-macbookpro.roam.corp.google.com>
+References: <20190518004751.18962-1-jaegeuk@kernel.org>
+ <20190518005304.GA19446@jaegeuk-macbookpro.roam.corp.google.com>
+ <1e1aae74-bd6b-dddb-0c88-660aac33872c@acm.org>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=us-ascii
 Content-Disposition: inline
-In-Reply-To: <201911221131.A34DFAA49@keescook>
-User-Agent: Mutt/1.12.1 (2019-06-15)
-X-SRS-Rewrite: SMTP reverse-path rewritten from <hch@infradead.org> by bombadil.infradead.org. See http://www.infradead.org/rpr.html
+In-Reply-To: <1e1aae74-bd6b-dddb-0c88-660aac33872c@acm.org>
+User-Agent: Mutt/1.8.2 (2017-04-18)
 Sender: linux-block-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-So I looked at this a bit, and doing the right thing (TM) will be
-a little invase and thus not for 5.5.
+On 11/19, Bart Van Assche wrote:
+> On 5/17/19 5:53 PM, Jaegeuk Kim wrote:
+> > This patch tries to avoid EAGAIN due to nrpages!=0 that was originally trying
+> > to drop stale pages resulting in wrong data access.
+> > 
+> > Report: https://bugs.chromium.org/p/chromium/issues/detail?id=938958#c38
+> 
+> Please provide a more detailed commit description. What is wrong with the
+> current implementation and why is the new behavior considered the correct
+> behavior?
 
-But the 5.5. queue already has a patch from Mikulas Patocka:
-8b2ded1c94c ("block: don't warn when doing fsync on read-only devices")
-which should deal with this issue, and in fact I can't trigger the
-WARN_ON with Jens' latest tree.
+Some history would be:
+
+Original bug fix is:
+commit 5db470e229e2 ("loop: drop caches if offset or block_size are changed"),
+which returns EAGAIN so that user land like Chrome would require enhancing their
+error handling routines.
+
+So, this patch tries to avoid EAGAIN while addressing the original bug.
+
+> 
+> This patch moves draining code from before the following comment to after
+> that comment:
+> 
+> /* I/O need to be drained during transfer transition */
+> 
+> Is that comment still correct or should it perhaps be updated?
+
+IMHO, it's still valid.
+
+> 
+> Thanks,
+> 
+
+> Bart.
