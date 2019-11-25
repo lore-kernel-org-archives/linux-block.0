@@ -2,102 +2,209 @@ Return-Path: <SRS0=vXr6=ZR=vger.kernel.org=linux-block-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-0.9 required=3.0 tests=DKIMWL_WL_HIGH,DKIM_SIGNED,
-	DKIM_VALID,DKIM_VALID_AU,HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,
-	SPF_HELO_NONE,SPF_PASS autolearn=no autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-8.2 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
+	INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,
+	USER_AGENT_SANE_1 autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 5C29BC432C0
-	for <linux-block@archiver.kernel.org>; Mon, 25 Nov 2019 18:29:07 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 34ECEC43215
+	for <linux-block@archiver.kernel.org>; Mon, 25 Nov 2019 18:35:59 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.kernel.org (Postfix) with ESMTP id 2BD8A2082F
-	for <linux-block@archiver.kernel.org>; Mon, 25 Nov 2019 18:29:07 +0000 (UTC)
-Authentication-Results: mail.kernel.org;
-	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="TnslP4sS"
+	by mail.kernel.org (Postfix) with ESMTP id 15C232082F
+	for <linux-block@archiver.kernel.org>; Mon, 25 Nov 2019 18:35:59 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1727989AbfKYS3G (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Mon, 25 Nov 2019 13:29:06 -0500
-Received: from us-smtp-2.mimecast.com ([207.211.31.81]:36485 "EHLO
-        us-smtp-delivery-1.mimecast.com" rhost-flags-OK-OK-OK-FAIL)
-        by vger.kernel.org with ESMTP id S1727889AbfKYS3G (ORCPT
+        id S1725893AbfKYSf6 (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Mon, 25 Nov 2019 13:35:58 -0500
+Received: from mail-pg1-f194.google.com ([209.85.215.194]:41647 "EHLO
+        mail-pg1-f194.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S1725793AbfKYSf6 (ORCPT
         <rfc822;linux-block@vger.kernel.org>);
-        Mon, 25 Nov 2019 13:29:06 -0500
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-        s=mimecast20190719; t=1574706544;
-        h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-         to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-         content-transfer-encoding:content-transfer-encoding:
-         in-reply-to:in-reply-to:references:references;
-        bh=9XkBoWLj/Xn7XxBPjtDBghFZzpuVWU0MkgEhLaJjFNU=;
-        b=TnslP4sSHm0TlS7HG+DfjKodAC61JAeLNF++r6s2++YR/gDXYDqvj7wn08I/GCxtpBm7DS
-        VSgN8cqRvt8hISb/dGRhMQQpdVS9PFIKi43Nhm8gK3MKstkrGm6Ebnt71wGajTE4wjuI9o
-        FRLg5MAFkldv3cR0bnIL7BMcROM6Th0=
-Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
- [209.132.183.4]) (Using TLS) by relay.mimecast.com with ESMTP id
- us-mta-417-58X1kjCtNY2yWuX8ZEttSQ-1; Mon, 25 Nov 2019 13:29:01 -0500
-Received: from smtp.corp.redhat.com (int-mx06.intmail.prod.int.phx2.redhat.com [10.5.11.16])
-        (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
-        (No client certificate requested)
-        by mimecast-mx01.redhat.com (Postfix) with ESMTPS id E35498E9360;
-        Mon, 25 Nov 2019 18:28:56 +0000 (UTC)
-Received: from emilne (unknown [10.18.25.205])
-        by smtp.corp.redhat.com (Postfix) with ESMTP id 9BF935C1D8;
-        Mon, 25 Nov 2019 18:28:50 +0000 (UTC)
-Message-ID: <e9cb5e75681537443b393ed1631857df81b8894d.camel@redhat.com>
-Subject: Re: [PATCH 4/4] scsi: core: don't limit per-LUN queue depth for SSD
-From:   "Ewan D. Milne" <emilne@redhat.com>
-To:     Bart Van Assche <bvanassche@acm.org>,
-        Ming Lei <ming.lei@redhat.com>, Hannes Reinecke <hare@suse.de>
-Cc:     Jens Axboe <axboe@kernel.dk>, linux-block@vger.kernel.org,
-        "James E . J . Bottomley" <jejb@linux.ibm.com>,
-        "Martin K . Petersen" <martin.petersen@oracle.com>,
-        linux-scsi@vger.kernel.org,
-        Sathya Prakash <sathya.prakash@broadcom.com>,
-        Chaitra P B <chaitra.basappa@broadcom.com>,
-        Suganath Prabu Subramani 
-        <suganath-prabu.subramani@broadcom.com>,
-        Kashyap Desai <kashyap.desai@broadcom.com>,
-        Sumit Saxena <sumit.saxena@broadcom.com>,
-        Shivasharan S <shivasharan.srikanteshwara@broadcom.com>,
-        Christoph Hellwig <hch@lst.de>,
-        Bart Van Assche <bart.vanassche@wdc.com>
-Date:   Mon, 25 Nov 2019 13:28:49 -0500
-In-Reply-To: <5f84476f-95b4-79b6-f72d-4e2de447065c@acm.org>
-References: <20191118103117.978-1-ming.lei@redhat.com>
-         <20191118103117.978-5-ming.lei@redhat.com>
-         <1081145f-3e17-9bc1-2332-50a4b5621ef7@suse.de>
-         <20191121005323.GB24548@ming.t460p>
-         <336f35fc-2e22-c615-9405-50297b9737ea@suse.de>
-         <20191122080959.GC903@ming.t460p>
-         <5f84476f-95b4-79b6-f72d-4e2de447065c@acm.org>
-Mime-Version: 1.0
-X-Scanned-By: MIMEDefang 2.79 on 10.5.11.16
-X-MC-Unique: 58X1kjCtNY2yWuX8ZEttSQ-1
-X-Mimecast-Spam-Score: 0
-Content-Type: text/plain; charset="UTF-8"
+        Mon, 25 Nov 2019 13:35:58 -0500
+Received: by mail-pg1-f194.google.com with SMTP id 207so7598151pge.8;
+        Mon, 25 Nov 2019 10:35:57 -0800 (PST)
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20161025;
+        h=x-gm-message-state:from:subject:to:cc:references:message-id:date
+         :user-agent:mime-version:in-reply-to:content-language
+         :content-transfer-encoding;
+        bh=5wNA4KHBKZEp6N1N62CKTMhksw9S2p7XTOcetbk9WWE=;
+        b=cWTRY6iNT8eJpcv5qV5pp1oNWqEIBPxjm4szDfklRuIbCpdZEpyegCb0Q3kTtl3YIs
+         TRNdX1Hbgem4KRTyyYGMiBzuXN2cGUWZ+bmbsl3OlOZ1y8Z2R9zfj0YbSxp5s+ivIKoP
+         nGdXeqVHKYktEow5m5Ys6a7iQiGxcOGGAcgp6uXLGgTmQkTg5tw6VduVIGLZDf6nw0br
+         OfsDq4XVLT3BN2TN+n9Lmdo49uAhmBVHW75XDDDpqxESLjUX651Yg7Tsg+0AdoM6+O4S
+         TSkxqpPA2Io3ZydG3F52CmPPwXItSSK8OdpZnjbPbALPbt2Dz1+t1+DyDJd33sTVhNx1
+         Welg==
+X-Gm-Message-State: APjAAAWHMmjQY2UL5XE1aZai50/y3dXvF9aglwCtzv53vcEGWU95rodc
+        PHYHS1k+P9LAyWEczDRWq4Ote9Zg
+X-Google-Smtp-Source: APXvYqzErU6dZ23s05ZiNGrtpG6AeWwc8RJzdWdziKcpVZeVa76TXRWv7WDf2HY1ETAGufIWNDQbhg==
+X-Received: by 2002:a63:6c3:: with SMTP id 186mr33414159pgg.282.1574706956286;
+        Mon, 25 Nov 2019 10:35:56 -0800 (PST)
+Received: from desktop-bart.svl.corp.google.com ([2620:15c:2cd:202:4308:52a3:24b6:2c60])
+        by smtp.gmail.com with ESMTPSA id r5sm9373499pfh.179.2019.11.25.10.35.55
+        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
+        Mon, 25 Nov 2019 10:35:55 -0800 (PST)
+From:   Bart Van Assche <bvanassche@acm.org>
+Subject: Re: [PATCH v2] loop: avoid EAGAIN, if offset or block_size are
+ changed
+To:     Jaegeuk Kim <jaegeuk@kernel.org>
+Cc:     linux-kernel@vger.kernel.org,
+        linux-f2fs-devel@lists.sourceforge.net, stable@vger.kernel.org,
+        Jens Axboe <axboe@kernel.dk>, linux-block@vger.kernel.org
+References: <20190518004751.18962-1-jaegeuk@kernel.org>
+ <20190518005304.GA19446@jaegeuk-macbookpro.roam.corp.google.com>
+ <1e1aae74-bd6b-dddb-0c88-660aac33872c@acm.org>
+ <20191125175913.GC71634@jaegeuk-macbookpro.roam.corp.google.com>
+Message-ID: <a4e5d6bd-3685-379a-c388-cd2871827b21@acm.org>
+Date:   Mon, 25 Nov 2019 10:35:54 -0800
+User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:60.0) Gecko/20100101
+ Thunderbird/60.9.0
+MIME-Version: 1.0
+In-Reply-To: <20191125175913.GC71634@jaegeuk-macbookpro.roam.corp.google.com>
+Content-Type: text/plain; charset=utf-8; format=flowed
+Content-Language: en-US
 Content-Transfer-Encoding: 7bit
 Sender: linux-block-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-On Fri, 2019-11-22 at 10:14 -0800, Bart Van Assche wrote:
+On 11/25/19 9:59 AM, Jaegeuk Kim wrote:
+> On 11/19, Bart Van Assche wrote:
+>> On 5/17/19 5:53 PM, Jaegeuk Kim wrote:
+>>> This patch tries to avoid EAGAIN due to nrpages!=0 that was originally trying
+>>> to drop stale pages resulting in wrong data access.
+>>>
+>>> Report: https://bugs.chromium.org/p/chromium/issues/detail?id=938958#c38
+>>
+>> Please provide a more detailed commit description. What is wrong with the
+>> current implementation and why is the new behavior considered the correct
+>> behavior?
 > 
-> Hi Ming,
+> Some history would be:
 > 
-> Thanks for having shared these numbers. I think this is very useful 
-> information. Do these results show the performance drop that happens if 
-> /sys/block/.../device/queue_depth exceeds .can_queue? What I am 
-> wondering about is how important these results are in the context of 
-> this discussion. Are there any modern SCSI devices for which a SCSI LLD 
-> sets scsi_host->can_queue and scsi_host->cmd_per_lun such that the 
-> device responds with BUSY? What surprised me is that only three SCSI 
-> LLDs call scsi_track_queue_full() (mptsas, bfa, esp_scsi). Does that 
-> mean that BUSY responses from a SCSI device or HBA are rare?
+> Original bug fix is:
+> commit 5db470e229e2 ("loop: drop caches if offset or block_size are changed"),
+> which returns EAGAIN so that user land like Chrome would require enhancing their
+> error handling routines.
 > 
+> So, this patch tries to avoid EAGAIN while addressing the original bug.
+> 
+>>
+>> This patch moves draining code from before the following comment to after
+>> that comment:
+>>
+>> /* I/O need to be drained during transfer transition */
+>>
+>> Is that comment still correct or should it perhaps be updated?
+> 
+> IMHO, it's still valid.
 
-Some FC HBAs end up returning busy from ->queuecommand() but I think
-this is more commonly due to there being and issue with the rport rather
-than the device.
+Hi Jaegeuk,
 
--Ewan
+Thank you for the additional and very helpful clarification. Can you have a look at the (totally untested) patch below? I prefer that version because it prevents concurrent processing of requests and syncing/killing the bdev.
 
+Thanks,
+
+Bart.
+
+
+Subject: [PATCH] loop: Avoid EAGAIN if offset or block_size are changed
+
+After sync_blockdev() and kill_bdev() have been called, more requests
+can be submitted to the loop device. These requests dirty additional
+pages, causing loop_set_status() to return -EAGAIN. Not all user space
+code that changes the offset and/or the block size handles -EAGAIN
+correctly. Hence make sure that loop_set_status() does not return
+-EAGAIN.
+
+Fixes: 5db470e229e2 ("loop: drop caches if offset or block_size are changed")
+Reported-by: Gwendal Grignou <gwendal@chromium.org>
+Reported-by: grygorii tertychnyi <gtertych@cisco.com>
+Reported-by: Jaegeuk Kim <jaegeuk@kernel.org>
+Cc: <stable@vger.kernel.org>
+Signed-off-by: Bart Van Assche <bvanassche@acm.org>
+---
+  drivers/block/loop.c | 35 +++++++----------------------------
+  1 file changed, 7 insertions(+), 28 deletions(-)
+
+diff --git a/drivers/block/loop.c b/drivers/block/loop.c
+index 739b372a5112..48cfc8b9c247 100644
+--- a/drivers/block/loop.c
++++ b/drivers/block/loop.c
+@@ -1264,15 +1264,15 @@ loop_set_status(struct loop_device *lo, const struct loop_info64 *info)
+  		goto out_unlock;
+  	}
+
++	/* I/O need to be drained during transfer transition */
++	blk_mq_freeze_queue(lo->lo_queue);
++
+  	if (lo->lo_offset != info->lo_offset ||
+  	    lo->lo_sizelimit != info->lo_sizelimit) {
+  		sync_blockdev(lo->lo_device);
+  		kill_bdev(lo->lo_device);
+  	}
+
+-	/* I/O need to be drained during transfer transition */
+-	blk_mq_freeze_queue(lo->lo_queue);
+-
+  	err = loop_release_xfer(lo);
+  	if (err)
+  		goto out_unfreeze;
+@@ -1298,14 +1298,6 @@ loop_set_status(struct loop_device *lo, const struct loop_info64 *info)
+
+  	if (lo->lo_offset != info->lo_offset ||
+  	    lo->lo_sizelimit != info->lo_sizelimit) {
+-		/* kill_bdev should have truncated all the pages */
+-		if (lo->lo_device->bd_inode->i_mapping->nrpages) {
+-			err = -EAGAIN;
+-			pr_warn("%s: loop%d (%s) has still dirty pages (nrpages=%lu)\n",
+-				__func__, lo->lo_number, lo->lo_file_name,
+-				lo->lo_device->bd_inode->i_mapping->nrpages);
+-			goto out_unfreeze;
+-		}
+  		if (figure_loop_size(lo, info->lo_offset, info->lo_sizelimit)) {
+  			err = -EFBIG;
+  			goto out_unfreeze;
+@@ -1531,39 +1523,26 @@ static int loop_set_dio(struct loop_device *lo, unsigned long arg)
+
+  static int loop_set_block_size(struct loop_device *lo, unsigned long arg)
+  {
+-	int err = 0;
+-
+  	if (lo->lo_state != Lo_bound)
+  		return -ENXIO;
+
+  	if (arg < 512 || arg > PAGE_SIZE || !is_power_of_2(arg))
+  		return -EINVAL;
+
++	blk_mq_freeze_queue(lo->lo_queue);
++
+  	if (lo->lo_queue->limits.logical_block_size != arg) {
+  		sync_blockdev(lo->lo_device);
+  		kill_bdev(lo->lo_device);
+  	}
+-
+-	blk_mq_freeze_queue(lo->lo_queue);
+-
+-	/* kill_bdev should have truncated all the pages */
+-	if (lo->lo_queue->limits.logical_block_size != arg &&
+-			lo->lo_device->bd_inode->i_mapping->nrpages) {
+-		err = -EAGAIN;
+-		pr_warn("%s: loop%d (%s) has still dirty pages (nrpages=%lu)\n",
+-			__func__, lo->lo_number, lo->lo_file_name,
+-			lo->lo_device->bd_inode->i_mapping->nrpages);
+-		goto out_unfreeze;
+-	}
+-
+  	blk_queue_logical_block_size(lo->lo_queue, arg);
+  	blk_queue_physical_block_size(lo->lo_queue, arg);
+  	blk_queue_io_min(lo->lo_queue, arg);
+  	loop_update_dio(lo);
+-out_unfreeze:
++
+  	blk_mq_unfreeze_queue(lo->lo_queue);
+
+-	return err;
++	return 0;
+  }
+
+  static int lo_simple_ioctl(struct loop_device *lo, unsigned int cmd,
