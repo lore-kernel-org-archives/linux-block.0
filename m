@@ -2,95 +2,102 @@ Return-Path: <SRS0=vXr6=ZR=vger.kernel.org=linux-block-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-2.6 required=3.0 tests=DKIMWL_WL_HIGH,DKIM_SIGNED,
-	DKIM_VALID,DKIM_VALID_AU,MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,
-	USER_AGENT_SANE_1 autolearn=no autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-0.9 required=3.0 tests=DKIMWL_WL_HIGH,DKIM_SIGNED,
+	DKIM_VALID,DKIM_VALID_AU,HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,
+	SPF_HELO_NONE,SPF_PASS autolearn=no autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id ADC2CC43215
-	for <linux-block@archiver.kernel.org>; Mon, 25 Nov 2019 17:59:15 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 5C29BC432C0
+	for <linux-block@archiver.kernel.org>; Mon, 25 Nov 2019 18:29:07 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.kernel.org (Postfix) with ESMTP id 8138420869
-	for <linux-block@archiver.kernel.org>; Mon, 25 Nov 2019 17:59:15 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=default; t=1574704755;
-	bh=KeQcj2AKHVhcae5ILgNCmFk/tRvBlisVKhy3DFIZA1c=;
-	h=Date:From:To:Cc:Subject:References:In-Reply-To:List-ID:From;
-	b=FLHYOwT30qTRPE+PdLd9CFRw+wYJHXHRsGHUqtyoEiWgfIpTiq9t5jjoP7K8xIKyZ
-	 OXuATZmM1jBE/pgokqzdsO/IYg3S+01+2B/W1e9d+DDt6BJngTu8D2rkkaQKDb6/v/
-	 v1FcCTK0oQq571Y6WgY4N+0KFlSgZvyeYjvndp58=
+	by mail.kernel.org (Postfix) with ESMTP id 2BD8A2082F
+	for <linux-block@archiver.kernel.org>; Mon, 25 Nov 2019 18:29:07 +0000 (UTC)
+Authentication-Results: mail.kernel.org;
+	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="TnslP4sS"
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1727724AbfKYR7O (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Mon, 25 Nov 2019 12:59:14 -0500
-Received: from mail.kernel.org ([198.145.29.99]:52800 "EHLO mail.kernel.org"
-        rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-        id S1725823AbfKYR7O (ORCPT <rfc822;linux-block@vger.kernel.org>);
-        Mon, 25 Nov 2019 12:59:14 -0500
-Received: from localhost (unknown [104.132.0.81])
-        (using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+        id S1727989AbfKYS3G (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Mon, 25 Nov 2019 13:29:06 -0500
+Received: from us-smtp-2.mimecast.com ([207.211.31.81]:36485 "EHLO
+        us-smtp-delivery-1.mimecast.com" rhost-flags-OK-OK-OK-FAIL)
+        by vger.kernel.org with ESMTP id S1727889AbfKYS3G (ORCPT
+        <rfc822;linux-block@vger.kernel.org>);
+        Mon, 25 Nov 2019 13:29:06 -0500
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+        s=mimecast20190719; t=1574706544;
+        h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+         to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+         content-transfer-encoding:content-transfer-encoding:
+         in-reply-to:in-reply-to:references:references;
+        bh=9XkBoWLj/Xn7XxBPjtDBghFZzpuVWU0MkgEhLaJjFNU=;
+        b=TnslP4sSHm0TlS7HG+DfjKodAC61JAeLNF++r6s2++YR/gDXYDqvj7wn08I/GCxtpBm7DS
+        VSgN8cqRvt8hISb/dGRhMQQpdVS9PFIKi43Nhm8gK3MKstkrGm6Ebnt71wGajTE4wjuI9o
+        FRLg5MAFkldv3cR0bnIL7BMcROM6Th0=
+Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
+ [209.132.183.4]) (Using TLS) by relay.mimecast.com with ESMTP id
+ us-mta-417-58X1kjCtNY2yWuX8ZEttSQ-1; Mon, 25 Nov 2019 13:29:01 -0500
+Received: from smtp.corp.redhat.com (int-mx06.intmail.prod.int.phx2.redhat.com [10.5.11.16])
+        (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
         (No client certificate requested)
-        by mail.kernel.org (Postfix) with ESMTPSA id 1721720679;
-        Mon, 25 Nov 2019 17:59:14 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-        s=default; t=1574704754;
-        bh=KeQcj2AKHVhcae5ILgNCmFk/tRvBlisVKhy3DFIZA1c=;
-        h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
-        b=yAhngtwOvHCL1fYdnEEbD3QRzDnSUoSdtwsxjwj6+a1i1oT56fZJhYAeDWOX9pYoJ
-         xqaYgcyIFhuTi5dVMgwAvRXZ0wF5ScvW9P8jBQhJVFk86A8Oz0PT3jLdQXlMaD6ayz
-         ORtsLGOdmTQelG61JjEYrNOPWeP55O76jyMrx3o4=
-Date:   Mon, 25 Nov 2019 09:59:13 -0800
-From:   Jaegeuk Kim <jaegeuk@kernel.org>
-To:     Bart Van Assche <bvanassche@acm.org>
-Cc:     linux-kernel@vger.kernel.org,
-        linux-f2fs-devel@lists.sourceforge.net, stable@vger.kernel.org,
-        Jens Axboe <axboe@kernel.dk>, linux-block@vger.kernel.org
-Subject: Re: [PATCH v2] loop: avoid EAGAIN, if offset or block_size are
- changed
-Message-ID: <20191125175913.GC71634@jaegeuk-macbookpro.roam.corp.google.com>
-References: <20190518004751.18962-1-jaegeuk@kernel.org>
- <20190518005304.GA19446@jaegeuk-macbookpro.roam.corp.google.com>
- <1e1aae74-bd6b-dddb-0c88-660aac33872c@acm.org>
-MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <1e1aae74-bd6b-dddb-0c88-660aac33872c@acm.org>
-User-Agent: Mutt/1.8.2 (2017-04-18)
+        by mimecast-mx01.redhat.com (Postfix) with ESMTPS id E35498E9360;
+        Mon, 25 Nov 2019 18:28:56 +0000 (UTC)
+Received: from emilne (unknown [10.18.25.205])
+        by smtp.corp.redhat.com (Postfix) with ESMTP id 9BF935C1D8;
+        Mon, 25 Nov 2019 18:28:50 +0000 (UTC)
+Message-ID: <e9cb5e75681537443b393ed1631857df81b8894d.camel@redhat.com>
+Subject: Re: [PATCH 4/4] scsi: core: don't limit per-LUN queue depth for SSD
+From:   "Ewan D. Milne" <emilne@redhat.com>
+To:     Bart Van Assche <bvanassche@acm.org>,
+        Ming Lei <ming.lei@redhat.com>, Hannes Reinecke <hare@suse.de>
+Cc:     Jens Axboe <axboe@kernel.dk>, linux-block@vger.kernel.org,
+        "James E . J . Bottomley" <jejb@linux.ibm.com>,
+        "Martin K . Petersen" <martin.petersen@oracle.com>,
+        linux-scsi@vger.kernel.org,
+        Sathya Prakash <sathya.prakash@broadcom.com>,
+        Chaitra P B <chaitra.basappa@broadcom.com>,
+        Suganath Prabu Subramani 
+        <suganath-prabu.subramani@broadcom.com>,
+        Kashyap Desai <kashyap.desai@broadcom.com>,
+        Sumit Saxena <sumit.saxena@broadcom.com>,
+        Shivasharan S <shivasharan.srikanteshwara@broadcom.com>,
+        Christoph Hellwig <hch@lst.de>,
+        Bart Van Assche <bart.vanassche@wdc.com>
+Date:   Mon, 25 Nov 2019 13:28:49 -0500
+In-Reply-To: <5f84476f-95b4-79b6-f72d-4e2de447065c@acm.org>
+References: <20191118103117.978-1-ming.lei@redhat.com>
+         <20191118103117.978-5-ming.lei@redhat.com>
+         <1081145f-3e17-9bc1-2332-50a4b5621ef7@suse.de>
+         <20191121005323.GB24548@ming.t460p>
+         <336f35fc-2e22-c615-9405-50297b9737ea@suse.de>
+         <20191122080959.GC903@ming.t460p>
+         <5f84476f-95b4-79b6-f72d-4e2de447065c@acm.org>
+Mime-Version: 1.0
+X-Scanned-By: MIMEDefang 2.79 on 10.5.11.16
+X-MC-Unique: 58X1kjCtNY2yWuX8ZEttSQ-1
+X-Mimecast-Spam-Score: 0
+Content-Type: text/plain; charset="UTF-8"
+Content-Transfer-Encoding: 7bit
 Sender: linux-block-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-On 11/19, Bart Van Assche wrote:
-> On 5/17/19 5:53 PM, Jaegeuk Kim wrote:
-> > This patch tries to avoid EAGAIN due to nrpages!=0 that was originally trying
-> > to drop stale pages resulting in wrong data access.
-> > 
-> > Report: https://bugs.chromium.org/p/chromium/issues/detail?id=938958#c38
+On Fri, 2019-11-22 at 10:14 -0800, Bart Van Assche wrote:
 > 
-> Please provide a more detailed commit description. What is wrong with the
-> current implementation and why is the new behavior considered the correct
-> behavior?
-
-Some history would be:
-
-Original bug fix is:
-commit 5db470e229e2 ("loop: drop caches if offset or block_size are changed"),
-which returns EAGAIN so that user land like Chrome would require enhancing their
-error handling routines.
-
-So, this patch tries to avoid EAGAIN while addressing the original bug.
-
+> Hi Ming,
 > 
-> This patch moves draining code from before the following comment to after
-> that comment:
-> 
-> /* I/O need to be drained during transfer transition */
-> 
-> Is that comment still correct or should it perhaps be updated?
-
-IMHO, it's still valid.
-
-> 
-> Thanks,
+> Thanks for having shared these numbers. I think this is very useful 
+> information. Do these results show the performance drop that happens if 
+> /sys/block/.../device/queue_depth exceeds .can_queue? What I am 
+> wondering about is how important these results are in the context of 
+> this discussion. Are there any modern SCSI devices for which a SCSI LLD 
+> sets scsi_host->can_queue and scsi_host->cmd_per_lun such that the 
+> device responds with BUSY? What surprised me is that only three SCSI 
+> LLDs call scsi_track_queue_full() (mptsas, bfa, esp_scsi). Does that 
+> mean that BUSY responses from a SCSI device or HBA are rare?
 > 
 
-> Bart.
+Some FC HBAs end up returning busy from ->queuecommand() but I think
+this is more commonly due to there being and issue with the rport rather
+than the device.
+
+-Ewan
+
