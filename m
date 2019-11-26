@@ -4,23 +4,24 @@ X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 X-Spam-Level: 
 X-Spam-Status: No, score=-9.8 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
 	INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,
-	URIBL_BLOCKED,USER_AGENT_GIT autolearn=ham autolearn_force=no version=3.4.0
+	URIBL_BLOCKED,USER_AGENT_GIT autolearn=unavailable autolearn_force=no
+	version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id EFDE2C33CA3
+	by smtp.lore.kernel.org (Postfix) with ESMTP id D89E9C47410
 	for <linux-block@archiver.kernel.org>; Tue, 26 Nov 2019 13:10:33 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.kernel.org (Postfix) with ESMTP id CE8D320836
+	by mail.kernel.org (Postfix) with ESMTP id A698220722
 	for <linux-block@archiver.kernel.org>; Tue, 26 Nov 2019 13:10:33 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1727088AbfKZNKc (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Tue, 26 Nov 2019 08:10:32 -0500
-Received: from mx2.suse.de ([195.135.220.15]:36680 "EHLO mx1.suse.de"
+        id S1727385AbfKZNK3 (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Tue, 26 Nov 2019 08:10:29 -0500
+Received: from mx2.suse.de ([195.135.220.15]:36552 "EHLO mx1.suse.de"
         rhost-flags-OK-OK-OK-FAIL) by vger.kernel.org with ESMTP
-        id S1727378AbfKZNKb (ORCPT <rfc822;linux-block@vger.kernel.org>);
-        Tue, 26 Nov 2019 08:10:31 -0500
+        id S1726876AbfKZNK1 (ORCPT <rfc822;linux-block@vger.kernel.org>);
+        Tue, 26 Nov 2019 08:10:27 -0500
 X-Virus-Scanned: by amavisd-new at test-mx.suse.de
 Received: from relay2.suse.de (unknown [195.135.220.254])
-        by mx1.suse.de (Postfix) with ESMTP id 82470B329;
+        by mx1.suse.de (Postfix) with ESMTP id 2B359B2BB;
         Tue, 26 Nov 2019 13:10:25 +0000 (UTC)
 From:   Hannes Reinecke <hare@suse.de>
 To:     "Martin K. Petersen" <martin.petersen@oracle.com>
@@ -30,9 +31,9 @@ Cc:     Christoph Hellwig <hch@lst.de>,
         Bart van Assche <bvanassche@acm.org>,
         John Garry <john.garry@huawei.com>, linux-scsi@vger.kernel.org,
         linux-block@vger.kernel.org
-Subject: [PATCH 6/8] scsi: hisi_sas: Switch v3 hw to MQ
-Date:   Tue, 26 Nov 2019 14:10:07 +0100
-Message-Id: <20191126131009.71726-7-hare@suse.de>
+Subject: [PATCH 1/8] blk-mq: Remove some unused function arguments
+Date:   Tue, 26 Nov 2019 14:10:02 +0100
+Message-Id: <20191126131009.71726-2-hare@suse.de>
 X-Mailer: git-send-email 2.16.4
 In-Reply-To: <20191126131009.71726-1-hare@suse.de>
 References: <20191126131009.71726-1-hare@suse.de>
@@ -43,234 +44,112 @@ X-Mailing-List: linux-block@vger.kernel.org
 
 From: John Garry <john.garry@huawei.com>
 
-Now that the block layer provides a shared tag, we can switch the driver
-to expose all HW queues.
+The struct blk_mq_hw_ctx * argument in blk_mq_put_tag(),
+blk_mq_poll_nsecs(), and blk_mq_poll_hybrid_sleep() is unused, so remove
+it.
 
+Reviewed-by: Hannes Reinecke <hare@suse.de>
 Signed-off-by: John Garry <john.garry@huawei.com>
 ---
- drivers/scsi/hisi_sas/hisi_sas.h       |  3 +-
- drivers/scsi/hisi_sas/hisi_sas_main.c  | 36 +++++++-------
- drivers/scsi/hisi_sas/hisi_sas_v3_hw.c | 86 ++++++++++++++--------------------
- 3 files changed, 56 insertions(+), 69 deletions(-)
+ block/blk-mq-tag.c |  4 ++--
+ block/blk-mq-tag.h |  4 ++--
+ block/blk-mq.c     | 10 ++++------
+ block/blk-mq.h     |  2 +-
+ 4 files changed, 9 insertions(+), 11 deletions(-)
 
-diff --git a/drivers/scsi/hisi_sas/hisi_sas.h b/drivers/scsi/hisi_sas/hisi_sas.h
-index 233c73e01246..0405602df2a4 100644
---- a/drivers/scsi/hisi_sas/hisi_sas.h
-+++ b/drivers/scsi/hisi_sas/hisi_sas.h
-@@ -8,6 +8,8 @@
- #define _HISI_SAS_H_
+diff --git a/block/blk-mq-tag.c b/block/blk-mq-tag.c
+index 008388e82b5c..53b4a9414fbd 100644
+--- a/block/blk-mq-tag.c
++++ b/block/blk-mq-tag.c
+@@ -191,8 +191,8 @@ unsigned int blk_mq_get_tag(struct blk_mq_alloc_data *data)
+ 	return tag + tag_offset;
+ }
  
- #include <linux/acpi.h>
-+#include <linux/blk-mq.h>
-+#include <linux/blk-mq-pci.h>
- #include <linux/clk.h>
- #include <linux/debugfs.h>
- #include <linux/dmapool.h>
-@@ -431,7 +433,6 @@ struct hisi_hba {
- 	u32 intr_coal_count;	/* Interrupt count to coalesce */
+-void blk_mq_put_tag(struct blk_mq_hw_ctx *hctx, struct blk_mq_tags *tags,
+-		    struct blk_mq_ctx *ctx, unsigned int tag)
++void blk_mq_put_tag(struct blk_mq_tags *tags, struct blk_mq_ctx *ctx,
++		    unsigned int tag)
+ {
+ 	if (!blk_mq_tag_is_reserved(tags, tag)) {
+ 		const int real_tag = tag - tags->nr_reserved_tags;
+diff --git a/block/blk-mq-tag.h b/block/blk-mq-tag.h
+index 61deab0b5a5a..66d04dea0bdb 100644
+--- a/block/blk-mq-tag.h
++++ b/block/blk-mq-tag.h
+@@ -26,8 +26,8 @@ extern struct blk_mq_tags *blk_mq_init_tags(unsigned int nr_tags, unsigned int r
+ extern void blk_mq_free_tags(struct blk_mq_tags *tags);
  
- 	int cq_nvecs;
--	unsigned int *reply_map;
+ extern unsigned int blk_mq_get_tag(struct blk_mq_alloc_data *data);
+-extern void blk_mq_put_tag(struct blk_mq_hw_ctx *hctx, struct blk_mq_tags *tags,
+-			   struct blk_mq_ctx *ctx, unsigned int tag);
++extern void blk_mq_put_tag(struct blk_mq_tags *tags, struct blk_mq_ctx *ctx,
++				unsigned int tag);
+ extern bool blk_mq_has_free_tags(struct blk_mq_tags *tags);
+ extern int blk_mq_tag_update_depth(struct blk_mq_hw_ctx *hctx,
+ 					struct blk_mq_tags **tags,
+diff --git a/block/blk-mq.c b/block/blk-mq.c
+index 6e3b15f70cd7..16aa20d23b67 100644
+--- a/block/blk-mq.c
++++ b/block/blk-mq.c
+@@ -499,9 +499,9 @@ static void __blk_mq_free_request(struct request *rq)
+ 	blk_pm_mark_last_busy(rq);
+ 	rq->mq_hctx = NULL;
+ 	if (rq->tag != -1)
+-		blk_mq_put_tag(hctx, hctx->tags, ctx, rq->tag);
++		blk_mq_put_tag(hctx->tags, ctx, rq->tag);
+ 	if (sched_tag != -1)
+-		blk_mq_put_tag(hctx, hctx->sched_tags, ctx, sched_tag);
++		blk_mq_put_tag(hctx->sched_tags, ctx, sched_tag);
+ 	blk_mq_sched_restart(hctx);
+ 	blk_queue_exit(q);
+ }
+@@ -3354,7 +3354,6 @@ static void blk_mq_poll_stats_fn(struct blk_stat_callback *cb)
+ }
  
- 	/* bist */
- 	enum sas_linkrate debugfs_bist_linkrate;
-diff --git a/drivers/scsi/hisi_sas/hisi_sas_main.c b/drivers/scsi/hisi_sas/hisi_sas_main.c
-index 03588ec3c394..e185935c3399 100644
---- a/drivers/scsi/hisi_sas/hisi_sas_main.c
-+++ b/drivers/scsi/hisi_sas/hisi_sas_main.c
-@@ -421,6 +421,7 @@ static int hisi_sas_task_prep(struct sas_task *task,
- 	struct device *dev = hisi_hba->dev;
- 	int dlvry_queue_slot, dlvry_queue, rc, slot_idx;
- 	int n_elem = 0, n_elem_dif = 0, n_elem_req = 0;
-+	struct scsi_cmnd *scmd = NULL;
- 	struct hisi_sas_dq *dq;
- 	unsigned long flags;
- 	int wr_q_index;
-@@ -436,10 +437,23 @@ static int hisi_sas_task_prep(struct sas_task *task,
- 		return -ECOMM;
+ static unsigned long blk_mq_poll_nsecs(struct request_queue *q,
+-				       struct blk_mq_hw_ctx *hctx,
+ 				       struct request *rq)
+ {
+ 	unsigned long ret = 0;
+@@ -3387,7 +3386,6 @@ static unsigned long blk_mq_poll_nsecs(struct request_queue *q,
+ }
+ 
+ static bool blk_mq_poll_hybrid_sleep(struct request_queue *q,
+-				     struct blk_mq_hw_ctx *hctx,
+ 				     struct request *rq)
+ {
+ 	struct hrtimer_sleeper hs;
+@@ -3407,7 +3405,7 @@ static bool blk_mq_poll_hybrid_sleep(struct request_queue *q,
+ 	if (q->poll_nsec > 0)
+ 		nsecs = q->poll_nsec;
+ 	else
+-		nsecs = blk_mq_poll_nsecs(q, hctx, rq);
++		nsecs = blk_mq_poll_nsecs(q, rq);
+ 
+ 	if (!nsecs)
+ 		return false;
+@@ -3462,7 +3460,7 @@ static bool blk_mq_poll_hybrid(struct request_queue *q,
+ 			return false;
  	}
  
--	if (hisi_hba->reply_map) {
--		int cpu = raw_smp_processor_id();
--		unsigned int dq_index = hisi_hba->reply_map[cpu];
-+	if (task->uldd_task) {
-+		struct ata_queued_cmd *qc;
- 
-+		if (dev_is_sata(device)) {
-+			qc = task->uldd_task;
-+			scmd = qc->scsicmd;
-+		} else {
-+			scmd = task->uldd_task;
-+		}
-+	}
-+
-+	if (scmd) {
-+		unsigned int dq_index;
-+		u32 blk_tag;
-+
-+		blk_tag = blk_mq_unique_tag(scmd->request);
-+		dq_index = blk_mq_unique_tag_to_hwq(blk_tag);
- 		*dq_pointer = dq = &hisi_hba->dq[dq_index];
- 	} else {
- 		*dq_pointer = dq = sas_dev->dq;
-@@ -468,21 +482,9 @@ static int hisi_sas_task_prep(struct sas_task *task,
- 
- 	if (hisi_hba->hw->slot_index_alloc)
- 		rc = hisi_hba->hw->slot_index_alloc(hisi_hba, device);
--	else {
--		struct scsi_cmnd *scsi_cmnd = NULL;
--
--		if (task->uldd_task) {
--			struct ata_queued_cmd *qc;
-+	else
-+		rc = hisi_sas_slot_index_alloc(hisi_hba, scmd);
- 
--			if (dev_is_sata(device)) {
--				qc = task->uldd_task;
--				scsi_cmnd = qc->scsicmd;
--			} else {
--				scsi_cmnd = task->uldd_task;
--			}
--		}
--		rc  = hisi_sas_slot_index_alloc(hisi_hba, scsi_cmnd);
--	}
- 	if (rc < 0)
- 		goto err_out_dif_dma_unmap;
- 
-diff --git a/drivers/scsi/hisi_sas/hisi_sas_v3_hw.c b/drivers/scsi/hisi_sas/hisi_sas_v3_hw.c
-index bf5d5f138437..e7b015d88968 100644
---- a/drivers/scsi/hisi_sas/hisi_sas_v3_hw.c
-+++ b/drivers/scsi/hisi_sas/hisi_sas_v3_hw.c
-@@ -2353,66 +2353,35 @@ static irqreturn_t cq_interrupt_v3_hw(int irq_no, void *p)
- 	return IRQ_HANDLED;
+-	return blk_mq_poll_hybrid_sleep(q, hctx, rq);
++	return blk_mq_poll_hybrid_sleep(q, rq);
  }
  
--static void setup_reply_map_v3_hw(struct hisi_hba *hisi_hba, int nvecs)
-+static int interrupt_preinit_v3_hw(struct hisi_hba *hisi_hba)
+ /**
+diff --git a/block/blk-mq.h b/block/blk-mq.h
+index 32c62c64e6c2..78d38b5f2793 100644
+--- a/block/blk-mq.h
++++ b/block/blk-mq.h
+@@ -208,7 +208,7 @@ static inline bool blk_mq_get_dispatch_budget(struct blk_mq_hw_ctx *hctx)
+ static inline void __blk_mq_put_driver_tag(struct blk_mq_hw_ctx *hctx,
+ 					   struct request *rq)
  {
--	const struct cpumask *mask;
--	int queue, cpu;
--
--	for (queue = 0; queue < nvecs; queue++) {
--		struct hisi_sas_cq *cq = &hisi_hba->cq[queue];
-+	int vectors;
-+	int max_msi = HISI_SAS_MSI_COUNT_V3_HW, min_msi;
-+	struct Scsi_Host *shost = hisi_hba->shost;
-+	struct irq_affinity desc = {
-+		.pre_vectors = BASE_VECTORS_V3_HW,
-+	};
-+
-+	min_msi = MIN_AFFINE_VECTORS_V3_HW;
-+	vectors = pci_alloc_irq_vectors_affinity(hisi_hba->pci_dev,
-+						 min_msi, max_msi,
-+						 PCI_IRQ_MSI |
-+						 PCI_IRQ_AFFINITY,
-+						 &desc);
-+	if (vectors < 0)
-+		return -ENOENT;
+-	blk_mq_put_tag(hctx, hctx->tags, rq->mq_ctx, rq->tag);
++	blk_mq_put_tag(hctx->tags, rq->mq_ctx, rq->tag);
+ 	rq->tag = -1;
  
--		mask = pci_irq_get_affinity(hisi_hba->pci_dev, queue +
--					    BASE_VECTORS_V3_HW);
--		if (!mask)
--			goto fallback;
--		cq->pci_irq_mask = mask;
--		for_each_cpu(cpu, mask)
--			hisi_hba->reply_map[cpu] = queue;
--	}
--	return;
-+	hisi_hba->cq_nvecs = vectors - BASE_VECTORS_V3_HW;
-+	shost->nr_hw_queues = hisi_hba->cq_nvecs;
- 
--fallback:
--	for_each_possible_cpu(cpu)
--		hisi_hba->reply_map[cpu] = cpu % hisi_hba->queue_count;
--	/* Don't clean all CQ masks */
-+	return 0;
- }
- 
- static int interrupt_init_v3_hw(struct hisi_hba *hisi_hba)
- {
- 	struct device *dev = hisi_hba->dev;
- 	struct pci_dev *pdev = hisi_hba->pci_dev;
--	int vectors, rc, i;
--	int max_msi = HISI_SAS_MSI_COUNT_V3_HW, min_msi;
--
--	if (auto_affine_msi_experimental) {
--		struct irq_affinity desc = {
--			.pre_vectors = BASE_VECTORS_V3_HW,
--		};
--
--		min_msi = MIN_AFFINE_VECTORS_V3_HW;
--
--		hisi_hba->reply_map = devm_kcalloc(dev, nr_cpu_ids,
--						   sizeof(unsigned int),
--						   GFP_KERNEL);
--		if (!hisi_hba->reply_map)
--			return -ENOMEM;
--		vectors = pci_alloc_irq_vectors_affinity(hisi_hba->pci_dev,
--							 min_msi, max_msi,
--							 PCI_IRQ_MSI |
--							 PCI_IRQ_AFFINITY,
--							 &desc);
--		if (vectors < 0)
--			return -ENOENT;
--		setup_reply_map_v3_hw(hisi_hba, vectors - BASE_VECTORS_V3_HW);
--	} else {
--		min_msi = max_msi;
--		vectors = pci_alloc_irq_vectors(hisi_hba->pci_dev, min_msi,
--						max_msi, PCI_IRQ_MSI);
--		if (vectors < 0)
--			return vectors;
--	}
--
--	hisi_hba->cq_nvecs = vectors - BASE_VECTORS_V3_HW;
-+	int rc, i;
- 
- 	rc = devm_request_irq(dev, pci_irq_vector(pdev, 1),
- 			      int_phy_up_down_bcast_v3_hw, 0,
-@@ -3057,6 +3026,15 @@ static int debugfs_set_bist_v3_hw(struct hisi_hba *hisi_hba, bool enable)
- 	return 0;
- }
- 
-+static int hisi_sas_map_queues(struct Scsi_Host *shost)
-+{
-+	struct hisi_hba *hisi_hba = shost_priv(shost);
-+	struct blk_mq_queue_map *qmap = &shost->tag_set.map[HCTX_TYPE_DEFAULT];
-+
-+	return blk_mq_pci_map_queues(qmap, hisi_hba->pci_dev,
-+					     BASE_VECTORS_V3_HW);
-+}
-+
- static struct scsi_host_template sht_v3_hw = {
- 	.name			= DRV_NAME,
- 	.module			= THIS_MODULE,
-@@ -3065,6 +3043,7 @@ static struct scsi_host_template sht_v3_hw = {
- 	.slave_configure	= hisi_sas_slave_configure,
- 	.scan_finished		= hisi_sas_scan_finished,
- 	.scan_start		= hisi_sas_scan_start,
-+	.map_queues		= hisi_sas_map_queues,
- 	.change_queue_depth	= sas_change_queue_depth,
- 	.bios_param		= sas_bios_param,
- 	.this_id		= -1,
-@@ -3078,6 +3057,7 @@ static struct scsi_host_template sht_v3_hw = {
- 	.shost_attrs		= host_attrs_v3_hw,
- 	.tag_alloc_policy	= BLK_TAG_ALLOC_RR,
- 	.host_reset             = hisi_sas_host_reset,
-+	.host_tagset		= 1,
- };
- 
- static const struct hisi_sas_hw hisi_sas_v3_hw = {
-@@ -3249,6 +3229,10 @@ hisi_sas_v3_probe(struct pci_dev *pdev, const struct pci_device_id *id)
- 	if (hisi_sas_debugfs_enable)
- 		hisi_sas_debugfs_init(hisi_hba);
- 
-+	rc = interrupt_preinit_v3_hw(hisi_hba);
-+	if (rc)
-+		goto err_out_ha;
-+	dev_err(dev, "%d hw qeues\n", shost->nr_hw_queues);
- 	rc = scsi_add_host(shost, dev);
- 	if (rc)
- 		goto err_out_ha;
+ 	if (rq->rq_flags & RQF_MQ_INFLIGHT) {
 -- 
 2.16.4
 
