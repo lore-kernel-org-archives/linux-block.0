@@ -2,145 +2,79 @@ Return-Path: <SRS0=BQu2=ZS=vger.kernel.org=linux-block-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-2.3 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
-	MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,USER_AGENT_SANE_1 autolearn=no
-	autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-0.4 required=3.0 tests=FROM_LOCAL_HEX,
+	HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,
+	URIBL_BLOCKED autolearn=no autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id A6A1BC432C3
-	for <linux-block@archiver.kernel.org>; Tue, 26 Nov 2019 10:09:40 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 4825DC432C0
+	for <linux-block@archiver.kernel.org>; Tue, 26 Nov 2019 10:16:03 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.kernel.org (Postfix) with ESMTP id 850B920898
-	for <linux-block@archiver.kernel.org>; Tue, 26 Nov 2019 10:09:40 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id 203C92071E
+	for <linux-block@archiver.kernel.org>; Tue, 26 Nov 2019 10:16:03 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1727928AbfKZKJi (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Tue, 26 Nov 2019 05:09:38 -0500
-Received: from lhrrgout.huawei.com ([185.176.76.210]:2116 "EHLO huawei.com"
-        rhost-flags-OK-OK-OK-FAIL) by vger.kernel.org with ESMTP
-        id S1727921AbfKZKJi (ORCPT <rfc822;linux-block@vger.kernel.org>);
-        Tue, 26 Nov 2019 05:09:38 -0500
-Received: from lhreml706-cah.china.huawei.com (unknown [172.18.7.107])
-        by Forcepoint Email with ESMTP id 8791E21FB4C8998B4454;
-        Tue, 26 Nov 2019 10:09:36 +0000 (GMT)
-Received: from lhreml724-chm.china.huawei.com (10.201.108.75) by
- lhreml706-cah.china.huawei.com (10.201.108.47) with Microsoft SMTP Server
- (TLS) id 14.3.408.0; Tue, 26 Nov 2019 10:09:35 +0000
-Received: from [127.0.0.1] (10.202.226.46) by lhreml724-chm.china.huawei.com
- (10.201.108.75) with Microsoft SMTP Server (version=TLS1_2,
- cipher=TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256) id 15.1.1713.5; Tue, 26 Nov
- 2019 10:09:35 +0000
-Subject: Re: [PATCH RFC v3 0/8] blk-mq/scsi: Provide hostwide shared tags for
- SCSI HBAs
-To:     Hannes Reinecke <hare@suse.de>,
-        "Martin K. Petersen" <martin.petersen@oracle.com>
-CC:     Christoph Hellwig <hch@lst.de>,
-        James Bottomley <james.bottomley@hansenpartnership.com>,
-        Ming Lei <ming.lei@redhat.com>,
-        "Bart van Assche" <bvanassche@acm.org>,
-        <linux-scsi@vger.kernel.org>, <linux-block@vger.kernel.org>
-References: <20191126091416.20052-1-hare@suse.de>
-From:   John Garry <john.garry@huawei.com>
-Message-ID: <923adbf4-5111-a2b2-c271-805240d747fe@huawei.com>
-Date:   Tue, 26 Nov 2019 10:09:34 +0000
-User-Agent: Mozilla/5.0 (Windows NT 10.0; WOW64; rv:68.0) Gecko/20100101
- Thunderbird/68.1.2
+        id S1727768AbfKZKQC (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Tue, 26 Nov 2019 05:16:02 -0500
+Received: from mail-io1-f69.google.com ([209.85.166.69]:42785 "EHLO
+        mail-io1-f69.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S1727752AbfKZKQC (ORCPT
+        <rfc822;linux-block@vger.kernel.org>);
+        Tue, 26 Nov 2019 05:16:02 -0500
+Received: by mail-io1-f69.google.com with SMTP id p1so13027505ioo.9
+        for <linux-block@vger.kernel.org>; Tue, 26 Nov 2019 02:16:02 -0800 (PST)
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20161025;
+        h=x-gm-message-state:mime-version:date:in-reply-to:message-id:subject
+         :from:to;
+        bh=7ecu66BMHVud9DuzcAquPrxjiVzhM/h7EUP/vbsVeT0=;
+        b=R+PUCglT0H3O2OZ0m0t5aCsd7WvJFdmznSwhkZ4ICtAuOFIgJ6xCNnXdO/7a5eSZ3j
+         TP+pHkPW/90i9s3Ep+auIZYGOhXsd3oV+ltochhLByVL2alXeYxWaAl6YxYyUET6SA+p
+         vmmI+U4+4zPEu3Fv+e7TO3hzuN/ke7ddaIWOkQvgiZqQb3Xy2ApokNL6frggvNMKZLCI
+         suGhc26ff0NAbLfK8qKEMV8ZiIzRU2/FsrOxOpwS0+qBb9P9ESa28mf7bxlCeff5iyTt
+         6ySTR2/6SrCIia2R4pp/9K09eS+n5aMUonvuvs/TWf2wgmdMS54gKhz66hxpl9KgErDQ
+         XyTg==
+X-Gm-Message-State: APjAAAW0049rIExtNhkjPsturVLBxcBy1XjtnBS0UfBoZZfQGYa7GtJy
+        pHijyCWZkcWNNn1vSjpooL9U/VjSplDkuk8ADZ77ILpcQBAT
+X-Google-Smtp-Source: APXvYqyozbo+bQ0Kv4jzAJMRKPS3S8LaBuyHiSS+ZbpT2Dw8Sg5CxjtmgBByAoHJJQ7lf7NxK6t1Htol/EVxcnlk7n9dOWJV1knV
 MIME-Version: 1.0
-In-Reply-To: <20191126091416.20052-1-hare@suse.de>
-Content-Type: text/plain; charset="utf-8"; format=flowed
-Content-Language: en-US
-Content-Transfer-Encoding: 7bit
-X-Originating-IP: [10.202.226.46]
-X-ClientProxiedBy: lhreml720-chm.china.huawei.com (10.201.108.71) To
- lhreml724-chm.china.huawei.com (10.201.108.75)
-X-CFilter-Loop: Reflected
+X-Received: by 2002:a02:c9c6:: with SMTP id c6mr13899624jap.133.1574763361594;
+ Tue, 26 Nov 2019 02:16:01 -0800 (PST)
+Date:   Tue, 26 Nov 2019 02:16:01 -0800
+In-Reply-To: <0000000000001558f3056a369689@google.com>
+X-Google-Appengine-App-Id: s~syzkaller
+X-Google-Appengine-App-Id-Alias: syzkaller
+Message-ID: <000000000000c5f3d905983d2ae0@google.com>
+Subject: Re: WARNING in __device_add_disk
+From:   syzbot <syzbot+3337db851ace689ceb50@syzkaller.appspotmail.com>
+To:     akinobu.mita@gmail.com, akpm@linux-foundation.org, axboe@kernel.dk,
+        dvyukov@google.com, gregkh@linuxfoundation.org,
+        linux-block@vger.kernel.org, linux-kernel@vger.kernel.org,
+        mhocko@kernel.org, syzkaller-bugs@googlegroups.com,
+        torvalds@linux-foundation.org
+Content-Type: text/plain; charset="UTF-8"; format=flowed; delsp=yes
 Sender: linux-block-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-On 26/11/2019 09:14, Hannes Reinecke wrote:
-> Hi all,
-> 
-> here now is an updated version of the v2 patchset from John Garry,
-> including the suggestions and reviews from the mailing list.
-> John, apologies for hijacking your work :-)
+syzbot has bisected this bug to:
 
-No worries as long as we can keep moving this forward.
+commit e41d58185f1444368873d4d7422f7664a68be61d
+Author: Dmitry Vyukov <dvyukov@google.com>
+Date:   Wed Jul 12 21:34:35 2017 +0000
 
-> 
-> The main diffence is that I've changed the bitmaps to be allocated
-> separately in all cases, and just set the pointer to the shared bitmap
-> for the hostwide tags case.
+     fault-inject: support systematic fault injection
 
-Yeah, I was considering this also.
+bisection log:  https://syzkaller.appspot.com/x/bisect.txt?x=17889f5ae00000
+start commit:   6da6c0db Linux v4.17-rc3
+git tree:       upstream
+final crash:    https://syzkaller.appspot.com/x/report.txt?x=14489f5ae00000
+console output: https://syzkaller.appspot.com/x/log.txt?x=10489f5ae00000
+kernel config:  https://syzkaller.appspot.com/x/.config?x=5a1dc06635c10d27
+dashboard link: https://syzkaller.appspot.com/bug?extid=3337db851ace689ceb50
+syz repro:      https://syzkaller.appspot.com/x/repro.syz?x=15191837800000
+C reproducer:   https://syzkaller.appspot.com/x/repro.c?x=120af5c7800000
 
-> I've also modified smartpqi and hpsa to take advantage of host_tags.
-> 
-> I did audit the iterators, and I _think_ they do the correct thing even
-> in the shared bitmap case. But then I might have overlooked things,
-> so feedback and reviews are welcome.
-> 
-> The one thing I'm not happy with is the debugfs interface; for shared
-> bitmaps all will be displaying essentially the same information, which
-> could be moved to a top-level directory. But that would change the
-> layout and I'm not sure if that buys us anything.
+Reported-by: syzbot+3337db851ace689ceb50@syzkaller.appspotmail.com
+Fixes: e41d58185f14 ("fault-inject: support systematic fault injection")
 
-I was having a look at this. I'd say we need to still show which bits 
-are set per hctx.
-
-Maybe we can do something like this:
-
-a. In hctx_tags_bitmaphow() or other relevant functions, copy shared 
-sbitmap map into temp sbitmap map (maybe even the per-hctx sbitmap)
-b. iterate over to unset bits not relevant to hctx in temp sbitmap map
-c. then do sbitmap_show
-
-Locking may be a bit tricky.
-
-Thanks,
-John
-
-> 
-> Differences to v2:
-> - Drop embedded tag bitmaps
-> - Do not share scheduling tags
-> - Add patches for hpsa and smartpqi
-> 
-> Differences to v1:
-> - Use a shared sbitmap, and not a separate shared tags (a big change!)
-> 	- Drop request.shared_tag
-> - Add RB tags
-> 
-> Hannes Reinecke (4):
->    blk-mq: Use a pointer for sbitmap
->    scsi: Add template flag 'host_tagset'
->    smartpqi: enable host tagset
->    hpsa: switch to using blk-mq
-> 
-> John Garry (3):
->    blk-mq: Remove some unused function arguments
->    blk-mq: Facilitate a shared sbitmap per tagset
->    scsi: hisi_sas: Switch v3 hw to MQ
-> 
-> Ming Lei (1):
->    blk-mq: rename BLK_MQ_F_TAG_SHARED as BLK_MQ_F_TAG_QUEUE_SHARED
-> 
->   block/bfq-iosched.c                    |   4 +-
->   block/blk-mq-debugfs.c                 |  10 ++--
->   block/blk-mq-sched.c                   |   8 ++-
->   block/blk-mq-tag.c                     | 104 ++++++++++++++++++++++-----------
->   block/blk-mq-tag.h                     |  18 +++---
->   block/blk-mq.c                         |  80 ++++++++++++++++---------
->   block/blk-mq.h                         |   9 ++-
->   block/kyber-iosched.c                  |   4 +-
->   drivers/scsi/hisi_sas/hisi_sas.h       |   3 +-
->   drivers/scsi/hisi_sas/hisi_sas_main.c  |  36 ++++++------
->   drivers/scsi/hisi_sas/hisi_sas_v3_hw.c |  86 +++++++++++----------------
->   drivers/scsi/hpsa.c                    |  44 +++-----------
->   drivers/scsi/hpsa.h                    |   1 -
->   drivers/scsi/scsi_lib.c                |   2 +
->   drivers/scsi/smartpqi/smartpqi_init.c  |  38 ++++++++----
->   include/linux/blk-mq.h                 |   9 ++-
->   include/scsi/scsi_host.h               |   3 +
->   17 files changed, 260 insertions(+), 199 deletions(-)
-> 
-
+For information about bisection process see: https://goo.gl/tpsmEJ#bisection
