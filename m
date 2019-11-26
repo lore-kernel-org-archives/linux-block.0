@@ -2,107 +2,104 @@ Return-Path: <SRS0=BQu2=ZS=vger.kernel.org=linux-block-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-2.4 required=3.0 tests=DKIMWL_WL_HIGH,DKIM_SIGNED,
-	DKIM_VALID,DKIM_VALID_AU,HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,
-	SPF_HELO_NONE,SPF_PASS,USER_AGENT_SANE_1 autolearn=no autolearn_force=no
+X-Spam-Status: No, score=-9.6 required=3.0 tests=DKIM_SIGNED,DKIM_VALID,
+	DKIM_VALID_AU,FREEMAIL_FORGED_FROMDOMAIN,FREEMAIL_FROM,
+	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,
+	SPF_HELO_NONE,SPF_PASS,USER_AGENT_GIT autolearn=ham autolearn_force=no
 	version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id E4F9DC432C0
-	for <linux-block@archiver.kernel.org>; Tue, 26 Nov 2019 03:38:17 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 200C8C432C0
+	for <linux-block@archiver.kernel.org>; Tue, 26 Nov 2019 04:34:53 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.kernel.org (Postfix) with ESMTP id B34172073F
-	for <linux-block@archiver.kernel.org>; Tue, 26 Nov 2019 03:38:17 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id E5B7220836
+	for <linux-block@archiver.kernel.org>; Tue, 26 Nov 2019 04:34:52 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="WLrrl7Zi"
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="H0Ifhf9+"
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1727207AbfKZDiR (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Mon, 25 Nov 2019 22:38:17 -0500
-Received: from us-smtp-delivery-1.mimecast.com ([205.139.110.120]:50010 "EHLO
-        us-smtp-1.mimecast.com" rhost-flags-OK-OK-OK-FAIL) by vger.kernel.org
-        with ESMTP id S1726962AbfKZDiQ (ORCPT
+        id S1728460AbfKZEew (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Mon, 25 Nov 2019 23:34:52 -0500
+Received: from mail-pg1-f196.google.com ([209.85.215.196]:44428 "EHLO
+        mail-pg1-f196.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S1727416AbfKZEew (ORCPT
         <rfc822;linux-block@vger.kernel.org>);
-        Mon, 25 Nov 2019 22:38:16 -0500
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-        s=mimecast20190719; t=1574739495;
-        h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-         to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-         content-transfer-encoding:content-transfer-encoding:
-         in-reply-to:in-reply-to:references:references;
-        bh=+n9SatzmowdgG7REE3dGVmFt6Fy1TIxHGjnbYR/7jZA=;
-        b=WLrrl7ZiOd7bFvQYG/oKv4nxdFti/a6IfQ0CqYwTHE1cgy8f+uYZv5YNOPbZdNehcrVbVk
-        MGdRIcsMSEPvxQrLbBkJm4VXxydi1j20sY7EQJ4M+4cpaX726/yto3ovSqPwUlNedkTfsG
-        5PN/TePcCid6c32xG+U8CVmPjfXQVOA=
-Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
- [209.132.183.4]) (Using TLS) by relay.mimecast.com with ESMTP id
- us-mta-108-RMlPUSE9MeG-LACu4BYSTg-1; Mon, 25 Nov 2019 22:38:12 -0500
-Received: from smtp.corp.redhat.com (int-mx01.intmail.prod.int.phx2.redhat.com [10.5.11.11])
-        (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
-        (No client certificate requested)
-        by mimecast-mx01.redhat.com (Postfix) with ESMTPS id 35EF7100726C;
-        Tue, 26 Nov 2019 03:38:10 +0000 (UTC)
-Received: from ming.t460p (ovpn-8-20.pek2.redhat.com [10.72.8.20])
-        by smtp.corp.redhat.com (Postfix) with ESMTPS id 90EC0600C6;
-        Tue, 26 Nov 2019 03:38:00 +0000 (UTC)
-Date:   Tue, 26 Nov 2019 11:37:55 +0800
-From:   Ming Lei <ming.lei@redhat.com>
-To:     Kashyap Desai <kashyap.desai@broadcom.com>
-Cc:     Hannes Reinecke <hare@suse.de>, Jens Axboe <axboe@kernel.dk>,
-        linux-block@vger.kernel.org,
-        "James E . J . Bottomley" <jejb@linux.ibm.com>,
-        "Martin K . Petersen" <martin.petersen@oracle.com>,
-        linux-scsi@vger.kernel.org,
-        Sathya Prakash Veerichetty <sathya.prakash@broadcom.com>,
-        Chaitra P B <chaitra.basappa@broadcom.com>,
-        Suganath Prabu Subramani 
-        <suganath-prabu.subramani@broadcom.com>,
-        Sumit Saxena <sumit.saxena@broadcom.com>,
-        Shivasharan Srikanteshwara 
-        <shivasharan.srikanteshwara@broadcom.com>,
-        "Ewan D . Milne" <emilne@redhat.com>,
-        Christoph Hellwig <hch@lst.de>,
-        Bart Van Assche <bart.vanassche@wdc.com>
-Subject: Re: [PATCH 1/4] scsi: megaraid_sas: use private counter for tracking
- inflight per-LUN commands
-Message-ID: <20191126033755.GE24501@ming.t460p>
-References: <20191118103117.978-1-ming.lei@redhat.com>
- <20191118103117.978-2-ming.lei@redhat.com>
- <97bf460e-62c9-dc64-db4c-fb5540e70ae9@suse.de>
- <252362ee5ac748694d205441729c433f@mail.gmail.com>
-MIME-Version: 1.0
-In-Reply-To: <252362ee5ac748694d205441729c433f@mail.gmail.com>
-User-Agent: Mutt/1.12.1 (2019-06-15)
-X-Scanned-By: MIMEDefang 2.79 on 10.5.11.11
-X-MC-Unique: RMlPUSE9MeG-LACu4BYSTg-1
-X-Mimecast-Spam-Score: 0
-Content-Type: text/plain; charset=us-ascii
-Content-Transfer-Encoding: quoted-printable
-Content-Disposition: inline
+        Mon, 25 Nov 2019 23:34:52 -0500
+Received: by mail-pg1-f196.google.com with SMTP id e6so8296715pgi.11;
+        Mon, 25 Nov 2019 20:34:51 -0800 (PST)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=gmail.com; s=20161025;
+        h=from:to:cc:subject:date:message-id;
+        bh=r4sCXiFU1twmyenJG0NM7zHY2TV0D2ORPlGj2mpnJMI=;
+        b=H0Ifhf9+PF78erKiS5IqjyZop5Wkcm2Y5P85j2gnzYg2sdG13OQBPzn8X1owYpfo0b
+         FlpuQK+TdOjPwcXKFKavEhvcPogyDvJdCUqjwcdXzmUwfC689m3bhapXnMIMHyjAoskM
+         zwq00UsoAoeWZ2pAQ/MXarvEllXZtnUY8O4FZY5NdcCxDKSsoatj4qEOc/4mZdU7iTHT
+         tAJ+HyIW180xnFmpZXVHqDJvCD+CB+ontLHpEDMAwSgf1sg0TPz7n3df5FxsvX/ar3kA
+         20QuYpJzl89ONDQhxIiqx2yYe77o72A0kj1tWlEr6QrpGg77TZUVZ78ABt316NQnNgXH
+         PDvg==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20161025;
+        h=x-gm-message-state:from:to:cc:subject:date:message-id;
+        bh=r4sCXiFU1twmyenJG0NM7zHY2TV0D2ORPlGj2mpnJMI=;
+        b=NS5FTDSg0P0M7r5UFT8D3u0MH06VJGtbDV7ul+iG4RdoFyblwX+CwdsruVlZ4501r1
+         k7PjxAOZ8KrGP3NPVsCLoSPPTwv3LDEGFkd1sq/5A3oFCbyXSTMR5uUtU5aNDdVSnB2r
+         dwzHtQthrZoeqP2pJ746N7QKz/DJLuDENjJ5IjOPLkDw/9TPfnWM3s7FY3xwfvqzFF9K
+         cIN2ZwyAz+KfsQrXXaZLp8YMle+Cm7lhuBQ4zQtwr358auht1N02wem3ZL4LqthevLg7
+         7kMjUrN0nlwYYkRPC4xyguW9B1lUVkkZOpxUdR9132Cd/Wef8j1fpEfDk2H/AzAWS7QB
+         uHkw==
+X-Gm-Message-State: APjAAAVdCFBo1MsE/40euPphH40mm3KpnhkU3A452JI1gvia/r/ne+g7
+        bJFFTGw+rhRz8V+SZhYJgew=
+X-Google-Smtp-Source: APXvYqy91r4SioV3aM4LfXCeaDZWLxEZmmP8CYnC/r2l1EkFlBW0Lo7+OWaTYCIGw0UmWuD7Rvwr9Q==
+X-Received: by 2002:a63:5f48:: with SMTP id t69mr35260836pgb.379.1574742891103;
+        Mon, 25 Nov 2019 20:34:51 -0800 (PST)
+Received: from localhost.localdomain ([182.78.163.34])
+        by smtp.gmail.com with ESMTPSA id x9sm10279264pgt.66.2019.11.25.20.34.48
+        (version=TLS1_2 cipher=ECDHE-RSA-AES128-SHA bits=128/128);
+        Mon, 25 Nov 2019 20:34:50 -0800 (PST)
+From:   kc27041980@gmail.com
+X-Google-Original-From: KC17041980@gmail.com
+To:     Philipp Reisner <philipp.reisner@linbit.com>,
+        Lars Ellenberg <lars.ellenberg@linbit.com>,
+        Jens Axboe <axboe@kernel.dk>
+Cc:     drbd-dev@lists.linbit.com, linux-block@vger.kernel.org,
+        linux-kernel@vger.kernel.org, KC27041980 <kc27041980@gmail.com>
+Subject: [PATCH 1/1] block/drbd/drbd_debugfs.c: Protect &connection->kref with resource->req_lock
+Date:   Tue, 26 Nov 2019 10:04:18 +0530
+Message-Id: <1574742858-23131-1-git-send-email-KC17041980@gmail.com>
+X-Mailer: git-send-email 2.7.4
 Sender: linux-block-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-On Tue, Nov 26, 2019 at 08:42:59AM +0530, Kashyap Desai wrote:
-> > >  drivers/scsi/megaraid/megaraid_sas.h        |  1 +
-> > >  drivers/scsi/megaraid/megaraid_sas_base.c   | 15 +++++++++++++--
-> > >  drivers/scsi/megaraid/megaraid_sas_fusion.c | 13 +++++++++----
-> > >  3 files changed, 23 insertions(+), 6 deletions(-)
-> > >
-> > Reviewed-by: Hannes Reinecke <hare@suse.de>
->=20
-> Ming - Sorry for delay. I will update this Patch. We prefer driver to
-> avoid counter for per sdev if possible. We are currently testing driver
-> using below changes.
->=20
-> inline unsigned long sdev_nr_inflight_request(struct request_queue *q) {
->     struct blk_mq_hw_ctx *hctx =3D q->queue_hw_ctx[0]
->=20
->     return atomic_read(&hctx->nr_active);
-> }
+From: KC27041980 <kc27041980@gmail.com>
 
-OK, I am fine with this way, given it is just used for balancing irq load.
+Protect &connection->kref by moving it under resource->req_lock.
 
+Signed-off-by: KC27041980 <kc27041980@gmail.com>
+---
+ drivers/block/drbd/drbd_debugfs.c | 6 +++++-
+ 1 file changed, 5 insertions(+), 1 deletion(-)
 
-Thanks,
-Ming
+diff --git a/drivers/block/drbd/drbd_debugfs.c b/drivers/block/drbd/drbd_debugfs.c
+index b3b9cd5..f6d75fa 100644
+--- a/drivers/block/drbd/drbd_debugfs.c
++++ b/drivers/block/drbd/drbd_debugfs.c
+@@ -363,11 +363,15 @@ static int in_flight_summary_show(struct seq_file *m, void *pos)
+ 	struct drbd_connection *connection;
+ 	unsigned long jif = jiffies;
+ 
++	spin_lock_irq(&resource->req_lock);
+ 	connection = first_connection(resource);
+ 	/* This does not happen, actually.
+ 	 * But be robust and prepare for future code changes. */
+-	if (!connection || !kref_get_unless_zero(&connection->kref))
++	if (!connection || !kref_get_unless_zero(&connection->kref)) {
++		spin_unlock_irq(&resource->req_lock);
+ 		return -ESTALE;
++	}
++	spin_unlock_irq(&resource->req_lock);
+ 
+ 	/* BUMP me if you change the file format/content/presentation */
+ 	seq_printf(m, "v: %u\n\n", 0);
+-- 
+2.7.4
 
