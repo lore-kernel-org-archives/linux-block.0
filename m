@@ -2,92 +2,125 @@ Return-Path: <SRS0=BQu2=ZS=vger.kernel.org=linux-block-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-2.3 required=3.0 tests=DKIM_SIGNED,DKIM_VALID,
-	HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,
-	USER_AGENT_SANE_1 autolearn=no autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-9.9 required=3.0 tests=DKIMWL_WL_HIGH,DKIM_SIGNED,
+	DKIM_VALID,DKIM_VALID_AU,HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,
+	MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,USER_AGENT_GIT
+	autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 2C920C432C0
-	for <linux-block@archiver.kernel.org>; Tue, 26 Nov 2019 15:14:18 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 0D037C432C0
+	for <linux-block@archiver.kernel.org>; Tue, 26 Nov 2019 15:36:44 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.kernel.org (Postfix) with ESMTP id F3E422073F
-	for <linux-block@archiver.kernel.org>; Tue, 26 Nov 2019 15:14:17 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id CBE132071E
+	for <linux-block@archiver.kernel.org>; Tue, 26 Nov 2019 15:36:43 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel-dk.20150623.gappssmtp.com header.i=@kernel-dk.20150623.gappssmtp.com header.b="nFVel339"
+	dkim=pass (1024-bit key) header.d=amazon.com header.i=@amazon.com header.b="niBqkuT4"
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1728043AbfKZPOR (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Tue, 26 Nov 2019 10:14:17 -0500
-Received: from mail-il1-f194.google.com ([209.85.166.194]:46643 "EHLO
-        mail-il1-f194.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1727418AbfKZPOR (ORCPT
+        id S1727511AbfKZPgn (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Tue, 26 Nov 2019 10:36:43 -0500
+Received: from smtp-fw-9102.amazon.com ([207.171.184.29]:59253 "EHLO
+        smtp-fw-9102.amazon.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S1727028AbfKZPgn (ORCPT
         <rfc822;linux-block@vger.kernel.org>);
-        Tue, 26 Nov 2019 10:14:17 -0500
-Received: by mail-il1-f194.google.com with SMTP id q1so17911683ile.13
-        for <linux-block@vger.kernel.org>; Tue, 26 Nov 2019 07:14:16 -0800 (PST)
+        Tue, 26 Nov 2019 10:36:43 -0500
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=kernel-dk.20150623.gappssmtp.com; s=20150623;
-        h=subject:to:cc:references:from:message-id:date:user-agent
-         :mime-version:in-reply-to:content-language:content-transfer-encoding;
-        bh=NelhYQEseu/7zrmJjT1c+B6QEJCkr4nf8LehOSkDJD4=;
-        b=nFVel339LoT+RjzrhKqwVlhsD4zOWXEqXVF9eZ+33w3b0CtB47WthAXlnR1vTVx/1w
-         NyHZwNXp45TU3SFzohlW72uZoo2rdSSRDSwWZfv0IWMAOKRcWMAnVbBEmDpGKK4/KFoz
-         AZ5wWObjKDkiksJ5YCYdjHrY/3X6qKag8Gf3WKpdqj12xmpnAqJo9/v2fjsxOOku/xe9
-         /AB3m7JE1MZrcMYp2L0Ul90DLtHqy+z5LbY6D9wuHaDABmCEatd53QT+jgfgeFNqw/Ih
-         +PSISMHeWNRhMOgrlTvIA5kRhxK+nTqFzwxYoW1qaDFynOCWYMe6J9YsSskZBiT9aXMC
-         4Sxw==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20161025;
-        h=x-gm-message-state:subject:to:cc:references:from:message-id:date
-         :user-agent:mime-version:in-reply-to:content-language
-         :content-transfer-encoding;
-        bh=NelhYQEseu/7zrmJjT1c+B6QEJCkr4nf8LehOSkDJD4=;
-        b=NVUkHmFZVYVIKplDHcbx+NqVWG9f3hccSDRgvJNG48G7Cr/Q5o4j9E2J7wwDcKhN6D
-         luife5QGP4WIcW1szsYnDMMbpvLBry1frv8O7iRdHR5EeNZ/xTEeSm/1OwTqHA9V6UBj
-         LhxWSFQVmiyVCD2TnfQZAefQllPVg9rP3K7/Uibp96wiRXPRe+Kfqz/Xdd6t3El7GzZW
-         itOPU8KdBCk067w27KT1BKLp8UAsBTar8D5TRtafrmdgch5NiH/0/lx33zgu4NFafBNt
-         NbULp0EIQDJQ1jwEssXr2sKErVzkr7Jz0zuEiFVa3XhuhEk5RwCsN13ttIlpjPMb82AG
-         Tuqg==
-X-Gm-Message-State: APjAAAUFEpsDpJ7l6NTgF5dzjXHteNBnEDnvvsXdJ6wtwGIxrp6LF+6P
-        T4gqFpwDl6Fo7AeWBLQvxodNt4wLF446kw==
-X-Google-Smtp-Source: APXvYqz1b8dU2Vt1sEOjb4Z/KXLaXZkk/3jqCl8fwxwDjaLt6YDqTuaGF/o4VCbA1jDI2ujTeq4E5g==
-X-Received: by 2002:a92:86c5:: with SMTP id l66mr38218708ilh.280.1574781255440;
-        Tue, 26 Nov 2019 07:14:15 -0800 (PST)
-Received: from [192.168.1.159] ([65.144.74.34])
-        by smtp.gmail.com with ESMTPSA id p16sm3266654ili.33.2019.11.26.07.14.13
-        (version=TLS1_2 cipher=ECDHE-RSA-AES128-GCM-SHA256 bits=128/128);
-        Tue, 26 Nov 2019 07:14:14 -0800 (PST)
-Subject: Re: [PATCH 3/8] blk-mq: Use a pointer for sbitmap
-To:     Hannes Reinecke <hare@suse.de>,
-        "Martin K. Petersen" <martin.petersen@oracle.com>
-Cc:     Christoph Hellwig <hch@lst.de>,
-        James Bottomley <james.bottomley@hansenpartnership.com>,
-        Ming Lei <ming.lei@redhat.com>,
-        Bart van Assche <bvanassche@acm.org>,
-        John Garry <john.garry@huawei.com>, linux-scsi@vger.kernel.org,
-        linux-block@vger.kernel.org
-References: <20191126091416.20052-1-hare@suse.de>
- <20191126091416.20052-4-hare@suse.de>
-From:   Jens Axboe <axboe@kernel.dk>
-Message-ID: <8f0522ee-2a81-c2ae-d111-3ff89ee6f93e@kernel.dk>
-Date:   Tue, 26 Nov 2019 08:14:13 -0700
-User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:60.0) Gecko/20100101
- Thunderbird/60.9.0
+  d=amazon.com; i=@amazon.com; q=dns/txt; s=amazon201209;
+  t=1574782603; x=1606318603;
+  h=from:to:cc:subject:date:message-id:mime-version;
+  bh=W6LVx4gxON2oRR7lI5LBc6xbhhFYl7QITbdcuRcSicE=;
+  b=niBqkuT43EgB73IVQQNzJjyAT7TlaocwzwoFyN1NApU1UtlCFUsKxQH8
+   CY9rpOEKdDfFnUNH28rQRdIRaXqXMX2h262wHBcVf3k9x1mGu0WmITXxu
+   fIW2YCsrrqEdj8V90l6e62zpNrox/dadcHV3lHUzm7i422q3V/a2skQV/
+   M=;
+IronPort-SDR: 5wWL59AZwO67yqNc5aqVtgEaOhBYBWfL588jw3WwrStdgwZROFHQEOELUJ+fRTE7kLc4lyCuRz
+ a7XRWura312g==
+X-IronPort-AV: E=Sophos;i="5.69,246,1571702400"; 
+   d="scan'208";a="9989878"
+Received: from sea32-co-svc-lb4-vlan3.sea.corp.amazon.com (HELO email-inbound-relay-2a-1c1b5cdd.us-west-2.amazon.com) ([10.47.23.38])
+  by smtp-border-fw-out-9102.sea19.amazon.com with ESMTP; 26 Nov 2019 15:36:33 +0000
+Received: from EX13MTAUEA001.ant.amazon.com (pdx4-ws-svc-p6-lb7-vlan2.pdx.amazon.com [10.170.41.162])
+        by email-inbound-relay-2a-1c1b5cdd.us-west-2.amazon.com (Postfix) with ESMTPS id AC79CA2499;
+        Tue, 26 Nov 2019 15:36:31 +0000 (UTC)
+Received: from EX13D31EUA001.ant.amazon.com (10.43.165.15) by
+ EX13MTAUEA001.ant.amazon.com (10.43.61.243) with Microsoft SMTP Server (TLS)
+ id 15.0.1367.3; Tue, 26 Nov 2019 15:36:31 +0000
+Received: from u886c93fd17d25d.ant.amazon.com (10.43.162.54) by
+ EX13D31EUA001.ant.amazon.com (10.43.165.15) with Microsoft SMTP Server (TLS)
+ id 15.0.1367.3; Tue, 26 Nov 2019 15:36:27 +0000
+From:   SeongJae Park <sjpark@amazon.com>
+To:     <konrad.wilk@oracle.com>, <roger.pau@citrix.com>
+CC:     <axboe@kernel.dk>, <xen-devel@lists.xenproject.org>,
+        <linux-block@vger.kernel.org>, <linux-kernel@vger.kernel.org>,
+        SeongJae Park <sjpark@amazon.de>
+Subject: [PATCH] xen/blkback: Avoid unmapping unmapped grant pages
+Date:   Tue, 26 Nov 2019 16:36:05 +0100
+Message-ID: <20191126153605.27564-1-sjpark@amazon.com>
+X-Mailer: git-send-email 2.17.1
 MIME-Version: 1.0
-In-Reply-To: <20191126091416.20052-4-hare@suse.de>
-Content-Type: text/plain; charset=utf-8
-Content-Language: en-US
-Content-Transfer-Encoding: 7bit
+Content-Type: text/plain
+X-Originating-IP: [10.43.162.54]
+X-ClientProxiedBy: EX13D01UWB003.ant.amazon.com (10.43.161.94) To
+ EX13D31EUA001.ant.amazon.com (10.43.165.15)
 Sender: linux-block-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-On 11/26/19 2:14 AM, Hannes Reinecke wrote:
-> Instead of allocating the tag bitmap in place we should be using a
-> pointer. This is in preparation for shared host-wide bitmaps.
+From: SeongJae Park <sjpark@amazon.de>
 
-Not a huge fan of this, it's an extra indirection in the hot path
-of both submission and completion.
+For each I/O request, blkback first maps the foreign pages for the
+request to its local pages.  If an allocation of a local page for the
+mapping fails, it should unmap every mapping already made for the
+request.
 
+However, blkback's handling mechanism for the allocation failure does
+not mark the remaining foreign pages as unmapped.  Therefore, the unmap
+function merely tries to unmap every valid grant page for the request,
+including the pages not mapped due to the allocation failure.  On a
+system that fails the allocation frequently, this problem leads to
+following kernel crash.
+
+  [  372.012538] BUG: unable to handle kernel NULL pointer dereference at 0000000000000001
+  [  372.012546] IP: [<ffffffff814071ac>] gnttab_unmap_refs.part.7+0x1c/0x40
+  [  372.012557] PGD 16f3e9067 PUD 16426e067 PMD 0
+  [  372.012562] Oops: 0002 [#1] SMP
+  [  372.012566] Modules linked in: act_police sch_ingress cls_u32
+  ...
+  [  372.012746] Call Trace:
+  [  372.012752]  [<ffffffff81407204>] gnttab_unmap_refs+0x34/0x40
+  [  372.012759]  [<ffffffffa0335ae3>] xen_blkbk_unmap+0x83/0x150 [xen_blkback]
+  ...
+  [  372.012802]  [<ffffffffa0336c50>] dispatch_rw_block_io+0x970/0x980 [xen_blkback]
+  ...
+  Decompressing Linux... Parsing ELF... done.
+  Booting the kernel.
+  [    0.000000] Initializing cgroup subsys cpuset
+
+This commit fixes this problem by marking the grant pages of the given
+request that didn't mapped due to the allocation failure as invalid.
+
+Fixes: c6cc142dac52 ("xen-blkback: use balloon pages for all mappings")
+
+Signed-off-by: SeongJae Park <sjpark@amazon.de>
+Reviewed-by: David Woodhouse <dwmw@amazon.de>
+Reviewed-by: Maximilian Heyne <mheyne@amazon.de>
+Reviewed-by: Paul Durrant <pdurrant@amazon.co.uk>
+---
+ drivers/block/xen-blkback/blkback.c | 2 ++
+ 1 file changed, 2 insertions(+)
+
+diff --git a/drivers/block/xen-blkback/blkback.c b/drivers/block/xen-blkback/blkback.c
+index fd1e19f1a49f..3666afa639d1 100644
+--- a/drivers/block/xen-blkback/blkback.c
++++ b/drivers/block/xen-blkback/blkback.c
+@@ -936,6 +936,8 @@ static int xen_blkbk_map(struct xen_blkif_ring *ring,
+ out_of_memory:
+ 	pr_alert("%s: out of memory\n", __func__);
+ 	put_free_pages(ring, pages_to_gnt, segs_to_map);
++	for (i = last_map; i < num; i++)
++		pages[i]->handle = BLKBACK_INVALID_HANDLE;
+ 	return -ENOMEM;
+ }
+ 
 -- 
-Jens Axboe
+2.17.1
 
