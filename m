@@ -2,63 +2,31 @@ Return-Path: <SRS0=BQu2=ZS=vger.kernel.org=linux-block-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-2.3 required=3.0 tests=DKIM_SIGNED,DKIM_VALID,
-	HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,
-	USER_AGENT_SANE_1 autolearn=no autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-2.3 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
+	MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,USER_AGENT_SANE_1 autolearn=no
+	autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 246A5C432C0
-	for <linux-block@archiver.kernel.org>; Tue, 26 Nov 2019 20:01:52 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 12B3CC432C3
+	for <linux-block@archiver.kernel.org>; Tue, 26 Nov 2019 20:22:01 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.kernel.org (Postfix) with ESMTP id E92EF20684
-	for <linux-block@archiver.kernel.org>; Tue, 26 Nov 2019 20:01:51 +0000 (UTC)
-Authentication-Results: mail.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel-dk.20150623.gappssmtp.com header.i=@kernel-dk.20150623.gappssmtp.com header.b="jCteqbHZ"
+	by mail.kernel.org (Postfix) with ESMTP id DAE9020684
+	for <linux-block@archiver.kernel.org>; Tue, 26 Nov 2019 20:22:00 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1726957AbfKZUBr (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Tue, 26 Nov 2019 15:01:47 -0500
-Received: from mail-pj1-f67.google.com ([209.85.216.67]:36682 "EHLO
-        mail-pj1-f67.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1725970AbfKZUBr (ORCPT
-        <rfc822;linux-block@vger.kernel.org>);
-        Tue, 26 Nov 2019 15:01:47 -0500
-Received: by mail-pj1-f67.google.com with SMTP id cq11so8796839pjb.3
-        for <linux-block@vger.kernel.org>; Tue, 26 Nov 2019 12:01:47 -0800 (PST)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=kernel-dk.20150623.gappssmtp.com; s=20150623;
-        h=subject:to:cc:references:from:message-id:date:user-agent
-         :mime-version:in-reply-to:content-language:content-transfer-encoding;
-        bh=b4nMYyMZLdJTu1lsp2vJ7LJSFFbPniRCr7vgs74sWbM=;
-        b=jCteqbHZIlDVKF77LxJogeNq0ChJQpDzdTb8SfTvrCSoky7CKHFC5o66x3Zac7V8Le
-         MEUvAWyMsK6FMcJCKQtGwCCokHpV3OerEo8C0oirA53k+b4rVilYguFTDSJhQZ2Z+neu
-         gzViq+zCV8nrResRpHBZTSyXMgC+g7NoK4DFuziDj56v4GXPPhtTczkSSEmUPDWPpMq1
-         2mRCJTWA0J/IOK9OqwV9LvDqq47Cu99zA7MaT9Symp+NotD+Yg+yHhdlNFtD7EcwQ60z
-         tcXHCUfMGMxyqC8l8J7MIGI5P7js1NCrFu99jSix84tf0ba9h0yWl7xRB4lx81SK8YMM
-         qpsw==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20161025;
-        h=x-gm-message-state:subject:to:cc:references:from:message-id:date
-         :user-agent:mime-version:in-reply-to:content-language
-         :content-transfer-encoding;
-        bh=b4nMYyMZLdJTu1lsp2vJ7LJSFFbPniRCr7vgs74sWbM=;
-        b=VeETHgb1+jIzZTgFByuTgXdVrpfOSYdye3j8lKjfqLCsjQcivx3pkM0MffKf4ESRZA
-         068KcFaUBopM805rsJy+iJY4Ht6ONsSICIhGkKYM1Wy9QExJm3IxYjvi74LycB6yDUiN
-         rH0HhP1hEZoq9QALCRt2Evv6+vBch+UpOeLoQTKeQ/PnOIlnNy25yOFfY4PLmFWIx/68
-         wAAyA8uGh+zQuu08BLNoAMitfZXdpYvEt+iZvkRfGMLvtPKPw2OEjpTIE02sJx1e/lW1
-         xXQ5mu/H3zZzuQWyzEfBSuzCDm7TcMApGZ3f5viO5YHy2rTcrhoXwgAz5YG69VrxKzmw
-         OWBw==
-X-Gm-Message-State: APjAAAV03S6MBhWqOc8TA3RU6Rd0K+tazDc7VdfiZliz6eKWYs405YTK
-        ICB/tHZOkXuIJQbJq8c+zRKc/g==
-X-Google-Smtp-Source: APXvYqzxZXjLZ+Y0q/kzUzpcJTVYX2YMUaQDISq6yRH+d/E+Tl5Yhl/S5xZe/N5wi80C6h7C9sLD+Q==
-X-Received: by 2002:a17:902:b101:: with SMTP id q1mr105469plr.154.1574798506461;
-        Tue, 26 Nov 2019 12:01:46 -0800 (PST)
-Received: from [192.168.1.188] ([66.219.217.79])
-        by smtp.gmail.com with ESMTPSA id u24sm13371114pfh.48.2019.11.26.12.01.43
-        (version=TLS1_2 cipher=ECDHE-RSA-AES128-GCM-SHA256 bits=128/128);
-        Tue, 26 Nov 2019 12:01:45 -0800 (PST)
-Subject: Re: [PATCH v4 rebase 00/10] Fix cdrom autoclose
-To:     Michal Suchanek <msuchanek@suse.de>, linux-scsi@vger.kernel.org,
-        linux-block@vger.kernel.org
-Cc:     Jonathan Corbet <corbet@lwn.net>,
+        id S1726192AbfKZUV4 (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Tue, 26 Nov 2019 15:21:56 -0500
+Received: from mx2.suse.de ([195.135.220.15]:52240 "EHLO mx1.suse.de"
+        rhost-flags-OK-OK-OK-FAIL) by vger.kernel.org with ESMTP
+        id S1726036AbfKZUV4 (ORCPT <rfc822;linux-block@vger.kernel.org>);
+        Tue, 26 Nov 2019 15:21:56 -0500
+X-Virus-Scanned: by amavisd-new at test-mx.suse.de
+Received: from relay2.suse.de (unknown [195.135.220.254])
+        by mx1.suse.de (Postfix) with ESMTP id D5F01B147;
+        Tue, 26 Nov 2019 20:21:53 +0000 (UTC)
+Date:   Tue, 26 Nov 2019 21:21:51 +0100
+From:   Michal =?iso-8859-1?Q?Such=E1nek?= <msuchanek@suse.de>
+To:     Jens Axboe <axboe@kernel.dk>
+Cc:     linux-scsi@vger.kernel.org, linux-block@vger.kernel.org,
+        Jonathan Corbet <corbet@lwn.net>,
         "James E.J. Bottomley" <jejb@linux.ibm.com>,
         "Martin K. Petersen" <martin.petersen@oracle.com>,
         Alexander Viro <viro@zeniv.linux.org.uk>,
@@ -77,50 +45,63 @@ Cc:     Jonathan Corbet <corbet@lwn.net>,
         "Ewan D. Milne" <emilne@redhat.com>,
         Christoph Hellwig <hch@infradead.org>,
         Matthew Wilcox <willy@infradead.org>
+Subject: Re: [PATCH v4 rebase 00/10] Fix cdrom autoclose
+Message-ID: <20191126202151.GY11661@kitsune.suse.cz>
 References: <cover.1574797504.git.msuchanek@suse.de>
-From:   Jens Axboe <axboe@kernel.dk>
-Message-ID: <c6fe572c-530e-93eb-d62a-cb2f89c7b4ec@kernel.dk>
-Date:   Tue, 26 Nov 2019 13:01:42 -0700
-User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:60.0) Gecko/20100101
- Thunderbird/60.9.0
+ <c6fe572c-530e-93eb-d62a-cb2f89c7b4ec@kernel.dk>
 MIME-Version: 1.0
-In-Reply-To: <cover.1574797504.git.msuchanek@suse.de>
-Content-Type: text/plain; charset=utf-8
-Content-Language: en-US
-Content-Transfer-Encoding: 7bit
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <c6fe572c-530e-93eb-d62a-cb2f89c7b4ec@kernel.dk>
+User-Agent: Mutt/1.10.1 (2018-07-13)
 Sender: linux-block-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-On 11/26/19 12:54 PM, Michal Suchanek wrote:
-> Hello,
+On Tue, Nov 26, 2019 at 01:01:42PM -0700, Jens Axboe wrote:
+> On 11/26/19 12:54 PM, Michal Suchanek wrote:
+> > Hello,
+> > 
+> > there is cdrom autoclose feature that is supposed to close the tray,
+> > wait for the disc to become ready, and then open the device.
+> > 
+> > This used to work in ancient times. Then in old times there was a hack
+> > in util-linux which worked around the breakage which probably resulted
+> > from switching to scsi emulation.
+> > 
+> > Currently util-linux maintainer refuses to merge another hack on the
+> > basis that kernel still has the feature so it should be fixed there.
+> > The code needs not be replicated in every userspace utility like mount
+> > or dd which has no business knowing which devices are CD-roms and where
+> > the autoclose setting is in the kernel.
+> > 
+> > This is rebase on top of current master.
+> > 
+> > Also it seems that most people think that this is fix for WMware because
+> > there is one patch dealing with WMware.
 > 
-> there is cdrom autoclose feature that is supposed to close the tray,
-> wait for the disc to become ready, and then open the device.
-> 
-> This used to work in ancient times. Then in old times there was a hack
-> in util-linux which worked around the breakage which probably resulted
-> from switching to scsi emulation.
-> 
-> Currently util-linux maintainer refuses to merge another hack on the
-> basis that kernel still has the feature so it should be fixed there.
-> The code needs not be replicated in every userspace utility like mount
-> or dd which has no business knowing which devices are CD-roms and where
-> the autoclose setting is in the kernel.
-> 
-> This is rebase on top of current master.
-> 
-> Also it seems that most people think that this is fix for WMware because
-> there is one patch dealing with WMware.
+> I think the main complaint with this is that it's kind of a stretch to
+> add core functionality for a device type that's barely being
+> manufactured anymore and is mostly used in a virtualized fashion. I
+> think it you could fix this without 10 patches of churn and without
+> adding a new ->open() addition to fops, then people would be a lot more
+> receptive to the idea of improving cdrom auto-close.
 
-I think the main complaint with this is that it's kind of a stretch to
-add core functionality for a device type that's barely being
-manufactured anymore and is mostly used in a virtualized fashion. I
-think it you could fix this without 10 patches of churn and without
-adding a new ->open() addition to fops, then people would be a lot more
-receptive to the idea of improving cdrom auto-close.
+I see no way to do that cleanly.
 
--- 
-Jens Axboe
+There are two open modes for cdrom devices - blocking and non-blocking.
 
+In blocking mode open() should analyze the medium so that it's ready
+when it returns. In non-blocking mode it should return immediately so
+long as you can talk to the device.
+
+When waiting in open() with locks held the processes trying to open the
+device are locked out regradless of the mode they use.
+
+The only way to solve this is to pretend that the device is open and do
+the wait afterwards with the device unlocked.
+
+Thanks
+
+Michal
