@@ -3,96 +3,145 @@ X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
 X-Spam-Status: No, score=-2.2 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
-	MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,USER_AGENT_SANE_1 autolearn=no
-	autolearn_force=no version=3.4.0
+	MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED,USER_AGENT_SANE_1
+	autolearn=no autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 52589C432C0
-	for <linux-block@archiver.kernel.org>; Wed, 27 Nov 2019 16:35:12 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 78AFCC432C0
+	for <linux-block@archiver.kernel.org>; Wed, 27 Nov 2019 16:53:01 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.kernel.org (Postfix) with ESMTP id 32D84206E0
-	for <linux-block@archiver.kernel.org>; Wed, 27 Nov 2019 16:35:12 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id 5658F2080F
+	for <linux-block@archiver.kernel.org>; Wed, 27 Nov 2019 16:53:01 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1727051AbfK0QfL (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Wed, 27 Nov 2019 11:35:11 -0500
-Received: from mail-pj1-f66.google.com ([209.85.216.66]:44126 "EHLO
-        mail-pj1-f66.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1726937AbfK0QfL (ORCPT
-        <rfc822;linux-block@vger.kernel.org>);
-        Wed, 27 Nov 2019 11:35:11 -0500
-Received: by mail-pj1-f66.google.com with SMTP id w8so10231943pjh.11
-        for <linux-block@vger.kernel.org>; Wed, 27 Nov 2019 08:35:11 -0800 (PST)
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20161025;
-        h=x-gm-message-state:subject:to:cc:references:from:message-id:date
-         :user-agent:mime-version:in-reply-to:content-language
-         :content-transfer-encoding;
-        bh=DwIF8e7q2UxApcJmPweDTTJgiZUrq0rc489rErvdpRk=;
-        b=R8z6Dqsysxgcd+a83QLUuXrE7CgAURXw39F/WtK5UNF/liOKVoHrr+TKJa5EWB2Gpl
-         3cyj3LapjVzayZk4+vlZgptevkq+rHCSQYIeHavGFJS8QCOVYCbB9/NNiotB0O7yoYZ1
-         lPJYM84lD/+9A0tOWkl1nUewrmIkCfMLG55qoMr73rDwXRt837uHUnkHo42uzWjMYDN/
-         sJsG+zdv4Yz/aTi0gcYZxDXbVzPH/ZPrzbMePNmiqnLxrBA8HrawmBCmr48Kylz9FNN5
-         28AHzGHNFrm+kglQoW5+XFfw5IsZ0t7Tj3zfEVWubGDMoudRzQuz0SROXfDsd/Aa2FVC
-         MIKg==
-X-Gm-Message-State: APjAAAVZ0jXpp+4fw5YIUieUGhwtIOFiMyE1gnZzFf83tHlE5G+Yu3Kv
-        KAu6cVFtKqoDTUEPzavkLnBzoBBs
-X-Google-Smtp-Source: APXvYqzUH2TdMKrKZZT2BPrv2ccf1L1d3/z4jMAWotrqWoCyFtuKil+S6maJpfSXlFQefm7GfJtfGw==
-X-Received: by 2002:a17:902:760b:: with SMTP id k11mr4857935pll.272.1574872510180;
-        Wed, 27 Nov 2019 08:35:10 -0800 (PST)
-Received: from desktop-bart.svl.corp.google.com ([2620:15c:2cd:202:4308:52a3:24b6:2c60])
-        by smtp.gmail.com with ESMTPSA id u9sm17203825pfm.102.2019.11.27.08.35.08
-        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
-        Wed, 27 Nov 2019 08:35:09 -0800 (PST)
-Subject: Re: [PATCH v2] loop: avoid EAGAIN, if offset or block_size are
- changed
-To:     Jaegeuk Kim <jaegeuk@kernel.org>
-Cc:     Jens Axboe <axboe@kernel.dk>, linux-block@vger.kernel.org
-References: <a4e5d6bd-3685-379a-c388-cd2871827b21@acm.org>
- <20191125192251.GA76721@jaegeuk-macbookpro.roam.corp.google.com>
- <baaf9725-09b4-3f2d-1408-ead415f5c20d@acm.org>
- <4ab43c9d-8b95-7265-2b55-b6d526938b32@acm.org>
- <20191126182907.GA5510@jaegeuk-macbookpro.roam.corp.google.com>
- <73eb7776-6f13-8dce-28ae-270a90dda229@acm.org>
- <20191126223204.GA20652@jaegeuk-macbookpro.roam.corp.google.com>
- <e64f65cc-d86f-54b9-8b4d-fe74860e16ea@acm.org>
- <20191127000407.GC20652@jaegeuk-macbookpro.roam.corp.google.com>
- <3ca36251-57c4-b62c-c029-77b643ddea77@acm.org>
- <20191127010926.GA34613@jaegeuk-macbookpro.roam.corp.google.com>
-From:   Bart Van Assche <bvanassche@acm.org>
-Message-ID: <5e322380-0f3a-59ad-9d0d-2e1a4a9b676e@acm.org>
-Date:   Wed, 27 Nov 2019 08:35:08 -0800
-User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:60.0) Gecko/20100101
- Thunderbird/60.9.0
+        id S1726937AbfK0QxA (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Wed, 27 Nov 2019 11:53:00 -0500
+Received: from mx2.suse.de ([195.135.220.15]:55780 "EHLO mx1.suse.de"
+        rhost-flags-OK-OK-OK-FAIL) by vger.kernel.org with ESMTP
+        id S1726729AbfK0QxA (ORCPT <rfc822;linux-block@vger.kernel.org>);
+        Wed, 27 Nov 2019 11:53:00 -0500
+X-Virus-Scanned: by amavisd-new at test-mx.suse.de
+Received: from relay2.suse.de (unknown [195.135.220.254])
+        by mx1.suse.de (Postfix) with ESMTP id B47C2B1F2;
+        Wed, 27 Nov 2019 16:52:57 +0000 (UTC)
+Subject: Re: [PATCH 3/8] blk-mq: Use a pointer for sbitmap
+To:     John Garry <john.garry@huawei.com>, Jens Axboe <axboe@kernel.dk>,
+        "Martin K. Petersen" <martin.petersen@oracle.com>
+Cc:     Christoph Hellwig <hch@lst.de>,
+        James Bottomley <james.bottomley@hansenpartnership.com>,
+        Ming Lei <ming.lei@redhat.com>,
+        Bart van Assche <bvanassche@acm.org>,
+        linux-scsi@vger.kernel.org, linux-block@vger.kernel.org
+References: <20191126091416.20052-1-hare@suse.de>
+ <20191126091416.20052-4-hare@suse.de>
+ <8f0522ee-2a81-c2ae-d111-3ff89ee6f93e@kernel.dk>
+ <62838bca-cd3c-fccf-767c-76d8bea12324@huawei.com>
+ <00a6d920-1855-c861-caa3-e845dcbe1fd8@kernel.dk>
+ <baffb360-56c0-3da5-9a52-400fb763adbf@huawei.com>
+ <9290eb7f-8d0b-8012-f9a4-a49c068def1b@kernel.dk>
+ <157f3e58-1d16-cc6b-52aa-15a6e1ac828a@huawei.com>
+ <1add0896-4867-12c5-4507-76526c27fb56@kernel.dk>
+ <4a780199-7997-b677-b184-411afdeabba5@huawei.com>
+ <5bc7b976-845c-92ec-6ccc-8e43237313bc@kernel.dk>
+ <dbd917cc-f8a2-a410-5c2b-79670ede440d@huawei.com>
+From:   Hannes Reinecke <hare@suse.de>
+Message-ID: <58875c2b-5141-b8be-a086-4fa29137d1e6@suse.de>
+Date:   Wed, 27 Nov 2019 17:52:54 +0100
+User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:68.0) Gecko/20100101
+ Thunderbird/68.2.1
 MIME-Version: 1.0
-In-Reply-To: <20191127010926.GA34613@jaegeuk-macbookpro.roam.corp.google.com>
+In-Reply-To: <dbd917cc-f8a2-a410-5c2b-79670ede440d@huawei.com>
 Content-Type: text/plain; charset=utf-8; format=flowed
 Content-Language: en-US
-Content-Transfer-Encoding: 7bit
+Content-Transfer-Encoding: 8bit
 Sender: linux-block-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-On 11/26/19 5:09 PM, Jaegeuk Kim wrote:
-> +	if (drop_request)
-> +		blk_set_queue_dying(lo->lo_queue);
->   
->   	/* I/O need to be drained during transfer transition */
->   	blk_mq_freeze_queue(lo->lo_queue);
+On 11/27/19 3:44 PM, John Garry wrote:
+> On 27/11/2019 14:21, Jens Axboe wrote:
+>> On 11/27/19 6:05 AM, John Garry wrote:
+>>> On 27/11/2019 01:46, Jens Axboe wrote:
+>>>>>> Would be interesting to check the generated code for that, ideally 
+>>>>>> we'd
+>>>>>> get rid of the extra load for that case, even if it is in the same
+>>>>>> cacheline.
+>>>>>>
+>>>>> I checked the disassembly and we still have the load instead of the 
+>>>>> add.
+>>>>>
+>>>>> This is not surprising, as the compiler would not know for certain 
+>>>>> that
+>>>>> we point to a field within the same struct. But at least we still 
+>>>>> should
+>>>>> point to a close memory.
+>>>>>
+>>>>> Note that the pointer could be dropped, which would remove the 
+>>>>> load, but
+>>>>> then we have many if-elses which could be slower, not to mention that
+>>>>> the blk-mq-tag code deals in bitmap pointers anyway.
+>>>
+>>> Hi Jens,
+>>>
+>>>> It might still be worthwhile to do:
+>>>>
+>>>> if (tags->ptr == &tags->__default)
+>>>>     foo(&tags->__default);
+>>>>
+>>>> to make it clear, as that branch will predict easily.
+>>>
+>>> Not sure. So this code does produce the same assembly, as we still need
+>>> to do the tags->ptr load for the comparison.
+>>
+> 
+> Hi Jens,
+> 
+>> How can it be the same? The approach in the patchset needs to load
+>> *tags->ptr, this one needs tags->ptr. That's the big difference.
+>>
+> 
+> In the patch for this thread, we have:
+> 
+> @@ -121,10 +121,10 @@ unsigned int blk_mq_get_tag(struct 
+> blk_mq_alloc_data *data)
+>               WARN_ON_ONCE(1);
+>               return BLK_MQ_TAG_FAIL;
+>           }
+> -        bt = &tags->breserved_tags;
+> +        bt = tags->breserved_tags;
+>           tag_offset = 0;
+>       } else {
+> -        bt = &tags->bitmap_tags;
+> +        bt = tags->bitmap_tags;
+>           tag_offset = tags->nr_reserved_tags;
+>       }
+> 
+> 
+> So current code gets bt pointer by simply offsetting a certain distance 
+> from tags pointer - that is the add I mention.
+> 
+> With the change in this patch, we need to load memory at address 
+> &tags->bitmap_tags to get bt - this is the load I mention.
+> 
+> So for this:
+> 
+> if (tags->ptr == &tags->__default)
+> 
+> We load &tags->ptr to get the pointer value for comparison vs 
+> &tags->__default.
+> 
+> There must be something I'm missing...
+> 
+The point here was that the load might refer to _other_ memory locations 
+(as it's being allocated separately), thus incurring a cache miss.
+With embedded tag bitmaps we'll load from the same cache line 
+(hopefully), and won't get a performance hit.
 
-Since blk_set_queue_dying() calls blk_freeze_queue_start(), I think the 
-above code will increase q->mq_freeze_depth by one or by two depending 
-on which path is taken. How about changing the above code into the 
-following:
+Cheers,
 
-	if (drop_request) {
-		blk_set_queue_dying(lo->lo_queue);
-		blk_mq_freeze_queue_wait(lo->lo_queue);
-	} else {
-		blk_mq_freeze_queue(lo->lo_queue);
-	}
-
-Otherwise this patch looks good to me.
-
-Thanks,
-
-Bart.
+Hannes
+-- 
+Dr. Hannes Reinecke            Teamlead Storage & Networking
+hare@suse.de                              +49 911 74053 688
+SUSE LINUX GmbH, Maxfeldstr. 5, 90409 Nürnberg
+GF: Felix Imendörffer, Mary Higgins, Sri Rasiah
+HRB 21284 (AG Nürnberg)
