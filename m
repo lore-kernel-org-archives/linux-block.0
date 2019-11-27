@@ -2,109 +2,347 @@ Return-Path: <SRS0=Lpm0=ZT=vger.kernel.org=linux-block-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-9.8 required=3.0 tests=DKIM_SIGNED,DKIM_VALID,
-	DKIM_VALID_AU,HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,
-	SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED,USER_AGENT_GIT
-	autolearn=ham autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-6.9 required=3.0 tests=DKIMWL_WL_HIGH,DKIM_SIGNED,
+	DKIM_VALID,DKIM_VALID_AU,HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,
+	MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS autolearn=ham
+	autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 51FF2C432C0
-	for <linux-block@archiver.kernel.org>; Wed, 27 Nov 2019 02:47:12 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 305C9C432C3
+	for <linux-block@archiver.kernel.org>; Wed, 27 Nov 2019 03:42:37 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.kernel.org (Postfix) with ESMTP id D830D206CC
-	for <linux-block@archiver.kernel.org>; Wed, 27 Nov 2019 02:47:11 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id C190520835
+	for <linux-block@archiver.kernel.org>; Wed, 27 Nov 2019 03:42:36 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=pass (1024-bit key) header.d=sslab.ics.keio.ac.jp header.i=@sslab.ics.keio.ac.jp header.b="SMgYIVyN"
+	dkim=pass (1024-bit key) header.d=samsung.com header.i=@samsung.com header.b="ekkPQNs7"
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1726346AbfK0CrL (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Tue, 26 Nov 2019 21:47:11 -0500
-Received: from mail-pj1-f66.google.com ([209.85.216.66]:44076 "EHLO
-        mail-pj1-f66.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1726304AbfK0CrK (ORCPT
+        id S1726525AbfK0Dmg (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Tue, 26 Nov 2019 22:42:36 -0500
+Received: from mailout3.samsung.com ([203.254.224.33]:26010 "EHLO
+        mailout3.samsung.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S1726526AbfK0Dmf (ORCPT
         <rfc822;linux-block@vger.kernel.org>);
-        Tue, 26 Nov 2019 21:47:10 -0500
-Received: by mail-pj1-f66.google.com with SMTP id w8so9213960pjh.11
-        for <linux-block@vger.kernel.org>; Tue, 26 Nov 2019 18:47:10 -0800 (PST)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=sslab.ics.keio.ac.jp; s=google;
-        h=from:to:cc:subject:date:message-id;
-        bh=745A+eCsEg1muKCYSg2p/wtTP4Y+wsxmjId5exHGtfo=;
-        b=SMgYIVyNSzhZH4ald3Xy3UtcVJF+AiXdjJnAZ68iotYqDWhZho5ZFo2BF//Sj/1kEO
-         0RjE3/EpMLC4qRPsA8j+HZ06MCtN6+2it3lpenCl61EnBaYMN8m+tOv7eoQlej63dudM
-         N4F8n0IZIw9bQrXXBOzXzxtxptLLvBD1IlGVo=
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20161025;
-        h=x-gm-message-state:from:to:cc:subject:date:message-id;
-        bh=745A+eCsEg1muKCYSg2p/wtTP4Y+wsxmjId5exHGtfo=;
-        b=JLigwAzFh+xE0+GqMjDgqJQwmUcHB2GnFM5FyczW+XdPcHuzfEbO1MUzMJQYDI6Icm
-         1T6SWyp0XMiaDqhPT54vo/T83uKBe9jbbi8GR/uSmUR14axkHciqMfsMbhLvIGnu/6Xn
-         D6qvZkunCaL2tluMCkiJuF0BqpzP5/PuTAg4tdEigaOYPn0eMggt1KSaZArhfoAcU7FK
-         mpJyRhXvT3c1cNjQuXqVXWzmOxUuumvOM6sTfVpU5ARIdbzEFWT4rd2jrrU+wmOsux3/
-         DiVyyhbjUtnc6V2I10JdvYQeQW7SsIyTGf1/hWUIpl4U6azU0T4SefkLJlJjI4iOjQCU
-         mY8w==
-X-Gm-Message-State: APjAAAVuVJphNu9Iui9zexK5bksc3gpIAu4/HMp5J5Mod7MmAZjUe6qZ
-        kl6KaSGbllBpd3Z3WeP6BJWPEA==
-X-Google-Smtp-Source: APXvYqxTwpIYa40HIhvzypq9bOy9lOxP2whhAnbxjOBTaBb3PY21RhcYJbkySdG5bPTqXi0fIUJdYw==
-X-Received: by 2002:a17:902:d205:: with SMTP id t5mr1546245ply.31.1574822829825;
-        Tue, 26 Nov 2019 18:47:09 -0800 (PST)
-Received: from brooklyn.i.sslab.ics.keio.ac.jp (sslab-relay.ics.keio.ac.jp. [131.113.126.173])
-        by smtp.googlemail.com with ESMTPSA id w15sm13416137pfi.168.2019.11.26.18.47.07
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Tue, 26 Nov 2019 18:47:09 -0800 (PST)
-From:   Keita Suzuki <keitasuzuki.park@sslab.ics.keio.ac.jp>
-To:     Jens Axboe <axboe@kernel.dk>
-Cc:     linux-block@vger.kernel.org, linux-kernel@vger.kernel.org,
-        keitasuzuki.park@sslab.ics.keio.ac.jp,
-        takafumi.kubota1012@sslab.ics.keio.ac.jp
-Subject: [PATCH] block/genhd: Fix memory leak in error path of __alloc_disk_node()
-Date:   Wed, 27 Nov 2019 02:40:57 +0000
-Message-Id: <20191127024057.5827-1-keitasuzuki.park@sslab.ics.keio.ac.jp>
-X-Mailer: git-send-email 2.17.1
+        Tue, 26 Nov 2019 22:42:35 -0500
+Received: from epcas5p3.samsung.com (unknown [182.195.41.41])
+        by mailout3.samsung.com (KnoxPortal) with ESMTP id 20191127034232epoutp036a1fa19dcfb8eb19b4930d8c25148812~a6AqiuqQn3021830218epoutp03N
+        for <linux-block@vger.kernel.org>; Wed, 27 Nov 2019 03:42:32 +0000 (GMT)
+DKIM-Filter: OpenDKIM Filter v2.11.0 mailout3.samsung.com 20191127034232epoutp036a1fa19dcfb8eb19b4930d8c25148812~a6AqiuqQn3021830218epoutp03N
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=samsung.com;
+        s=mail20170921; t=1574826152;
+        bh=pqomQtibYN+g0Hr/ZJ2ztmHx1bzf8wKFb0DFCvW/bSE=;
+        h=From:To:Cc:In-Reply-To:Subject:Date:References:From;
+        b=ekkPQNs7k42A1tAViXaND/q1/kjtqiDRs3a4/eM3TTpR2dKTdCZl/hSORb4sBNXom
+         GRqy8ZoDFfy7EeAVGj9rYtxkxCWUPEezTK5rSeF8Bwop80ITNdx2zto3NQJJynInvm
+         krACnbxGG2cjyjZPeWVGTtbiZHG0wQk5WrQsUSSo=
+Received: from epsmges5p1new.samsung.com (unknown [182.195.42.73]) by
+        epcas5p1.samsung.com (KnoxPortal) with ESMTP id
+        20191127034231epcas5p1c7022edf1d31c7b714d2ad77c1e8bc99~a6Ap19_YR2108321083epcas5p1P;
+        Wed, 27 Nov 2019 03:42:31 +0000 (GMT)
+Received: from epcas5p1.samsung.com ( [182.195.41.39]) by
+        epsmges5p1new.samsung.com (Symantec Messaging Gateway) with SMTP id
+        B4.90.19726.7A0FDDD5; Wed, 27 Nov 2019 12:42:31 +0900 (KST)
+Received: from epsmtrp2.samsung.com (unknown [182.195.40.14]) by
+        epcas5p4.samsung.com (KnoxPortal) with ESMTPA id
+        20191127034230epcas5p4b17b866b29e72ad2ecce3375059b948e~a6ApJZvzh1631116311epcas5p4I;
+        Wed, 27 Nov 2019 03:42:30 +0000 (GMT)
+Received: from epsmgms1p2new.samsung.com (unknown [182.195.42.42]) by
+        epsmtrp2.samsung.com (KnoxPortal) with ESMTP id
+        20191127034230epsmtrp2c8065aa39ebd6e35f2b7755fae8ce599~a6ApIRVpo2115121151epsmtrp26;
+        Wed, 27 Nov 2019 03:42:30 +0000 (GMT)
+X-AuditID: b6c32a49-7a9ff70000014d0e-c7-5dddf0a70f71
+Received: from epsmtip2.samsung.com ( [182.195.34.31]) by
+        epsmgms1p2new.samsung.com (Symantec Messaging Gateway) with SMTP id
+        F3.10.06569.6A0FDDD5; Wed, 27 Nov 2019 12:42:30 +0900 (KST)
+Received: from alimakhtar02 (unknown [107.111.84.32]) by
+        epsmtip2.samsung.com (KnoxPortal) with ESMTPA id
+        20191127034228epsmtip27f9ef28e936b034ce908c22f10e55b56~a6Am_LH401894318943epsmtip2h;
+        Wed, 27 Nov 2019 03:42:28 +0000 (GMT)
+From:   "Alim Akhtar" <alim.akhtar@samsung.com>
+To:     "'Vignesh Raghavendra'" <vigneshr@ti.com>,
+        "'Alim Akhtar'" <alim.akhtar@gmail.com>,
+        "'sheebab'" <sheebab@cadence.com>
+Cc:     "'Avri Altman'" <avri.altman@wdc.com>,
+        "'Pedro Sousa'" <pedrom.sousa@synopsys.com>,
+        "'James E.J. Bottomley'" <jejb@linux.ibm.com>,
+        "'Martin K. Petersen'" <martin.petersen@oracle.com>,
+        "'Stanley Chu'" <stanley.chu@mediatek.com>,
+        "'Bean Huo \(beanhuo\)'" <beanhuo@micron.com>,
+        <yuehaibing@huawei.com>, <linux-scsi@vger.kernel.org>,
+        "'open list'" <linux-kernel@vger.kernel.org>,
+        <linux-block@vger.kernel.org>, <rafalc@cadence.com>,
+        <mparab@cadence.com>
+In-Reply-To: <cfc2c86f-f9ae-ac91-39ac-8bb48c41b243@ti.com>
+Subject: RE: [PATCH RESEND 2/2] scsi: ufs: Update L4 attributes on manual
+ hibern8 exit in Cadence UFS.
+Date:   Wed, 27 Nov 2019 09:12:26 +0530
+Message-ID: <08c701d5a4d4$b20c7300$16255900$@samsung.com>
+MIME-Version: 1.0
+Content-Transfer-Encoding: quoted-printable
+X-Mailer: Microsoft Outlook 16.0
+Thread-Index: AQHedmnDsV+0XJYctqc2u08WFWQfYAIz26ApAn51KZIBSarR9wJHdWspp0qfzwA=
+Content-Language: en-in
+X-Brightmail-Tracker: H4sIAAAAAAAAA02SaUwTURSFfbN1qFYehei1GpcGYmQREZfRqKBRMkZF4k+00YlMKLJIWlBR
+        flRFgVYikBi0IGplc0kQgsoikR2EQFyoIgEXLKgQCUtQUeMyDkb+nfvud3LPSR5LqgdpDRsR
+        EycaYoQoLaOk7tUvW+pTONKrW9H6DXP53Se4j5N2hqt9m0pxtq57BFfd7cU9q8xhOMuLcoYr
+        bP5JcK/axiguqWmC4kxlFxku946J4PLvvkTcr/YRBdcz8Z4KdOZvpw4RfIW1V8EnNXyi+XRb
+        DeKTHj2k+C/FKQw/2t9N8WUPxxHf3HWf4MdLF/LJNRYiZGaockOYGBVxRDT4bjqg1CffcChi
+        s4OOtfb9IEzI7m9GLAt4FeSlLTAjJ1aNqxBUnw81I+UfPYZgrMiikIfPCIYcaQqJkgzvfuTR
+        8qIawalBMyEPgwjasmy0RDHYB8qvn2Uk7YZPwFhtBilBJH5CQsHJViQtnPB6eNfzWiHlcMV6
+        aMoTJUlhD8juSpSkCq+DinaQYBV2gUeXHJSkSewFBdeGSDnPYpjsL6Al3A0Hw7UShYzMhcbJ
+        c3+PAn6qgObGTCQX3goXOkNlqysMNpdN1dLA+HA1IyORcK7SX35OhPzcJkrWAVDTmUNJCImX
+        QXGlr3xpNqR9dxCyUwUpZ9Uy7QGnh+1TzvmQYbHQsuah+3MOnY6WWKfVsk6rZZ2W3/r/2FVE
+        3UTzxFhjdLhoXB3rFyMeXW4Uoo3xMeHLDx6OLkV/f6Dn9nJk7dhZhzCLtLNUepdenZoWjhgT
+        ousQsKTWTeVV36NTq8KEhOOi4fB+Q3yUaKxD81lKO1eVSdv3qXG4ECdGimKsaPi3JVgnjQk5
+        b9B51zS6a01Zui5/H+e9A3anjR9Wa/oe7G+wrW1J3Z34puqjvaQjaNdXavKxi7/esO1UREiQ
+        EGT7ktYWGBw2XLGl4nl8a3zRQEufqX5RyspDIUrvWwI9uo6pDXylMfuucd0R4H5monB2tu9m
+        R8PlT1f8ol6mH4TvHntmTMxJeBCspYx6wc+TNBiF33YOhSp9AwAA
+X-Brightmail-Tracker: H4sIAAAAAAAAA+NgFrrMIsWRmVeSWpSXmKPExsWy7bCSvO6yD3djDf4vV7BYeqva4uXPq2wW
+        Bx92slgsurGNyWLvLW2Ly7vmsFl0X9/BZrH8+D8mi3unP7FYtBz7ymLRsGUGm8W8DQ1MFku3
+        3mS0+H/2A7vFna/PWRz4PdZ0vmby2DnrLrtHy5G3rB4TFh1g9Gg5uZ/F4/v6DjaPj09vsXhs
+        2f+Z0eP4je1MHp83yXm0H+hmCuCO4rJJSc3JLEst0rdL4Mo4OOMca8Eil4pXx68yNTDeM+xi
+        5OSQEDCRePxnCWsXIxeHkMBuRonb92YwQySkJa5vnMAOYQtLrPz3nB2i6AWjxKHzv8ESbAK6
+        EjsWt7GB2CICtRLPDzxmAiliFrjNLNH1aA8jRMcBJok1rbsYQao4BawkHt+5D9YtLJAmsWrF
+        cqA4BweLgKrE7Bs1ICavgKXEzrMSIBW8AoISJ2c+YQGxmQW0JXoftjLC2MsWvoY6VEHi59Nl
+        rCCtIgJ+Egs3skOUiEsc/dnDPIFReBaSSbOQTJqFZNIsJC0LGFlWMUqmFhTnpucWGxYY5aWW
+        6xUn5haX5qXrJefnbmIER7WW1g7GEyfiDzEKcDAq8fBmCN6NFWJNLCuuzD3EKMHBrCTCq334
+        TqwQb0piZVVqUX58UWlOavEhRmkOFiVxXvn8Y5FCAumJJanZqakFqUUwWSYOTqkGRounlWWP
+        fLZyLt9redmqosVyDudiBeM+sx2v58W+Nf6ywHRijOkdVe9f/cfDPp7WkIsR6ta0Srs3oTtf
+        oNSZvezXvS1z2Q7M7xZ4yscXOUWb/cmV3KhVkabd29l31Wa4+hjN6yxqfhk4iz1OUblp0fxs
+        ixMLl4pNN5tiZfrw1NyV95psF918rMRSnJFoqMVcVJwIAMEhQwHmAgAA
+X-CMS-MailID: 20191127034230epcas5p4b17b866b29e72ad2ecce3375059b948e
+X-Msg-Generator: CA
+Content-Type: text/plain; charset="utf-8"
+CMS-TYPE: 105P
+X-CMS-RootMailID: 20191121105613epcas4p1a83df10f9f8dcf9edaa583648cad449e
+References: <1574147082-22725-1-git-send-email-sheebab@cadence.com>
+        <1574147082-22725-3-git-send-email-sheebab@cadence.com>
+        <CAGOxZ53Lotp6sBUryHsE2S1dbkQNZhPhWNMXidoi=BOmV074VA@mail.gmail.com>
+        <CGME20191121105613epcas4p1a83df10f9f8dcf9edaa583648cad449e@epcas4p1.samsung.com>
+        <cfc2c86f-f9ae-ac91-39ac-8bb48c41b243@ti.com>
 Sender: linux-block-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-'disk->part_tbl' is malloced in disk_expand_part_tbl() and should be
-freed before leaving from the error handling cases. However, current code
-does not free this, causing a memory leak. Add disk_replace_part_tbl()
-before freeing 'disk'.
 
-I have tested this by randomly causing failures to the target code,
-and verified on kmemleak that this memory leak does occur.
 
-unreferenced object 0xffff888006dad500 (size 64):
-  comm "systemd-udevd", pid 116, jiffies 4294895558 (age 121.716s)
-  hex dump (first 32 bytes):
-    00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00  ................
-    01 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00  ................
-  backtrace:
-    [<00000000eec79bf3>] disk_expand_part_tbl+0xab/0x170
-    [<00000000624e7d03>] __alloc_disk_node+0xb1/0x1c0
-    [<00000000ca3f4185>] 0xffffffffc01b8584
-    [<000000006f88a6ee>] do_one_initcall+0x8b/0x2a4
-    [<0000000016058199>] do_init_module+0xfd/0x380
-    [<00000000b6fde336>] load_module+0x3fae/0x4240
-    [<00000000c523d013>] __do_sys_finit_module+0x11a/0x1b0
-    [<00000000f07bba26>] do_syscall_64+0x6d/0x1e0
-    [<00000000979467fd>] entry_SYSCALL_64_after_hwframe+0x44/0xa9
+> -----Original Message-----
+> From: Vignesh Raghavendra <vigneshr=40ti.com>
+> Sent: 21 November 2019 16:26
+> To: Alim Akhtar <alim.akhtar=40gmail.com>; sheebab <sheebab=40cadence.com=
+>
+> Cc: Alim Akhtar <alim.akhtar=40samsung.com>; Avri Altman
+> <avri.altman=40wdc.com>; Pedro Sousa <pedrom.sousa=40synopsys.com>; James
+> E.J. Bottomley <jejb=40linux.ibm.com>; Martin K. Petersen
+> <martin.petersen=40oracle.com>; Stanley Chu <stanley.chu=40mediatek.com>;
+> Bean Huo (beanhuo) <beanhuo=40micron.com>; yuehaibing=40huawei.com; linux=
+-
+> scsi=40vger.kernel.org; open list <linux-kernel=40vger.kernel.org>; linux=
+-
+> block=40vger.kernel.org; rafalc=40cadence.com; mparab=40cadence.com
+> Subject: Re: =5BPATCH RESEND 2/2=5D scsi: ufs: Update L4 attributes on ma=
+nual
+> hibern8 exit in Cadence UFS.
+>=20
+>=20
+>=20
+> On 20/11/19 9:50 PM, Alim Akhtar wrote:
+> > Hi Sheebab
+> >
+> > On Tue, Nov 19, 2019 at 12:38 PM sheebab <sheebab=40cadence.com> wrote:
+> >>
+> >> Backup L4 attributes duirng manual hibern8 entry and restore the L4
+> >> attributes on manual hibern8 exit as per JESD220C.
+> >>
+> > Can you point me to the relevant section on the spec?
+> >
+>=20
+> Per JESD 220C 9.4 UniPro/UFS Control Interface (Control Plane):
+>=20
+> =22NOTE After exit from Hibernate all UniPro Transport Layer attributes (=
+including
+> L4 T_PeerDeviceID,
+>=20
+> L4 T_PeerCPortID, L4 T_ConnectionState, etc.) will be reset to their rese=
+t values.
+> All required attributes
+>=20
+> must be restored properly on both ends before communication can resume.=
+=22
+>=20
+> But its not clear whether SW needs to restore these attributes or hardwar=
+e
+>=20
+Thanks Vignesh for pointing out the spec section, yes it is not clear, one =
+way to confirm this is just by read L4 attributes before=20
+And after hinern8 entry/exit.
+(at least in the current platform it is not being done)
+AFA this patch is concerns, this looks ok to me.
+=40 Avri , any thought on this?
 
-Signed-off-by: Keita Suzuki <keitasuzuki.park@sslab.ics.keio.ac.jp>
----
- block/genhd.c | 1 +
- 1 file changed, 1 insertion(+)
-
-diff --git a/block/genhd.c b/block/genhd.c
-index ff6268970ddc..8c4b63d7f507 100644
---- a/block/genhd.c
-+++ b/block/genhd.c
-@@ -1504,6 +1504,7 @@ struct gendisk *__alloc_disk_node(int minors, int node_id)
- 		 */
- 		seqcount_init(&disk->part0.nr_sects_seq);
- 		if (hd_ref_init(&disk->part0)) {
-+			disk_replace_part_tbl(disk, NULL);
- 			hd_free_part(&disk->part0);
- 			kfree(disk);
- 			return NULL;
--- 
-2.17.1
+> Regards
+> Vignesh
+>=20
+> >> Signed-off-by: sheebab <sheebab=40cadence.com>
+> >> ---
+> >>  drivers/scsi/ufs/cdns-pltfrm.c =7C 97
+> >> +++++++++++++++++++++++++++++++++++++++++-
+> >>  1 file changed, 95 insertions(+), 2 deletions(-)
+> >>
+> >> diff --git a/drivers/scsi/ufs/cdns-pltfrm.c
+> >> b/drivers/scsi/ufs/cdns-pltfrm.c index adbbd60..5510567 100644
+> >> --- a/drivers/scsi/ufs/cdns-pltfrm.c
+> >> +++ b/drivers/scsi/ufs/cdns-pltfrm.c
+> >> =40=40 -19,6 +19,14 =40=40
+> >>
+> >>  =23define CDNS_UFS_REG_HCLKDIV   0xFC
+> >>  =23define CDNS_UFS_REG_PHY_XCFGD1        0x113C
+> >> +=23define CDNS_UFS_MAX 12
+> >> +
+> >> +struct cdns_ufs_host =7B
+> >> +       /**
+> >> +        * cdns_ufs_dme_attr_val - for storing L4 attributes
+> >> +        */
+> >> +       u32 cdns_ufs_dme_attr_val=5BCDNS_UFS_MAX=5D;
+> >> +=7D;
+> >>
+> >>  /**
+> >>   * cdns_ufs_enable_intr - enable interrupts =40=40 -47,6 +55,77 =40=
+=40
+> >> static void cdns_ufs_disable_intr(struct ufs_hba *hba, u32 intrs)  =7D
+> >>
+> >>  /**
+> >> + * cdns_ufs_get_l4_attr - get L4 attributes on local side
+> >> + * =40hba: per adapter instance
+> >> + *
+> >> + */
+> >> +static void cdns_ufs_get_l4_attr(struct ufs_hba *hba) =7B
+> >> +       struct cdns_ufs_host *host =3D ufshcd_get_variant(hba);
+> >> +
+> >> +       ufshcd_dme_get(hba, UIC_ARG_MIB(T_PEERDEVICEID),
+> >> +                      &host->cdns_ufs_dme_attr_val=5B0=5D);
+> >> +       ufshcd_dme_get(hba, UIC_ARG_MIB(T_PEERCPORTID),
+> >> +                      &host->cdns_ufs_dme_attr_val=5B1=5D);
+> >> +       ufshcd_dme_get(hba, UIC_ARG_MIB(T_TRAFFICCLASS),
+> >> +                      &host->cdns_ufs_dme_attr_val=5B2=5D);
+> >> +       ufshcd_dme_get(hba, UIC_ARG_MIB(T_PROTOCOLID),
+> >> +                      &host->cdns_ufs_dme_attr_val=5B3=5D);
+> >> +       ufshcd_dme_get(hba, UIC_ARG_MIB(T_CPORTFLAGS),
+> >> +                      &host->cdns_ufs_dme_attr_val=5B4=5D);
+> >> +       ufshcd_dme_get(hba, UIC_ARG_MIB(T_TXTOKENVALUE),
+> >> +                      &host->cdns_ufs_dme_attr_val=5B5=5D);
+> >> +       ufshcd_dme_get(hba, UIC_ARG_MIB(T_RXTOKENVALUE),
+> >> +                      &host->cdns_ufs_dme_attr_val=5B6=5D);
+> >> +       ufshcd_dme_get(hba, UIC_ARG_MIB(T_LOCALBUFFERSPACE),
+> >> +                      &host->cdns_ufs_dme_attr_val=5B7=5D);
+> >> +       ufshcd_dme_get(hba, UIC_ARG_MIB(T_PEERBUFFERSPACE),
+> >> +                      &host->cdns_ufs_dme_attr_val=5B8=5D);
+> >> +       ufshcd_dme_get(hba, UIC_ARG_MIB(T_CREDITSTOSEND),
+> >> +                      &host->cdns_ufs_dme_attr_val=5B9=5D);
+> >> +       ufshcd_dme_get(hba, UIC_ARG_MIB(T_CPORTMODE),
+> >> +                      &host->cdns_ufs_dme_attr_val=5B10=5D);
+> >> +       ufshcd_dme_get(hba, UIC_ARG_MIB(T_CONNECTIONSTATE),
+> >> +                      &host->cdns_ufs_dme_attr_val=5B11=5D);
+> >> +=7D
+> >> +
+> >> +/**
+> >> + * cdns_ufs_set_l4_attr - set L4 attributes on local side
+> >> + * =40hba: per adapter instance
+> >> + *
+> >> + */
+> >> +static void cdns_ufs_set_l4_attr(struct ufs_hba *hba) =7B
+> >> +       struct cdns_ufs_host *host =3D ufshcd_get_variant(hba);
+> >> +
+> >> +       ufshcd_dme_set(hba, UIC_ARG_MIB(T_CONNECTIONSTATE), 0);
+> >> +       ufshcd_dme_set(hba, UIC_ARG_MIB(T_PEERDEVICEID),
+> >> +                      host->cdns_ufs_dme_attr_val=5B0=5D);
+> >> +       ufshcd_dme_set(hba, UIC_ARG_MIB(T_PEERCPORTID),
+> >> +                      host->cdns_ufs_dme_attr_val=5B1=5D);
+> >> +       ufshcd_dme_set(hba, UIC_ARG_MIB(T_TRAFFICCLASS),
+> >> +                      host->cdns_ufs_dme_attr_val=5B2=5D);
+> >> +       ufshcd_dme_set(hba, UIC_ARG_MIB(T_PROTOCOLID),
+> >> +                      host->cdns_ufs_dme_attr_val=5B3=5D);
+> >> +       ufshcd_dme_set(hba, UIC_ARG_MIB(T_CPORTFLAGS),
+> >> +                      host->cdns_ufs_dme_attr_val=5B4=5D);
+> >> +       ufshcd_dme_set(hba, UIC_ARG_MIB(T_TXTOKENVALUE),
+> >> +                      host->cdns_ufs_dme_attr_val=5B5=5D);
+> >> +       ufshcd_dme_set(hba, UIC_ARG_MIB(T_RXTOKENVALUE),
+> >> +                      host->cdns_ufs_dme_attr_val=5B6=5D);
+> >> +       ufshcd_dme_set(hba, UIC_ARG_MIB(T_LOCALBUFFERSPACE),
+> >> +                      host->cdns_ufs_dme_attr_val=5B7=5D);
+> >> +       ufshcd_dme_set(hba, UIC_ARG_MIB(T_PEERBUFFERSPACE),
+> >> +                      host->cdns_ufs_dme_attr_val=5B8=5D);
+> >> +       ufshcd_dme_set(hba, UIC_ARG_MIB(T_CREDITSTOSEND),
+> >> +                      host->cdns_ufs_dme_attr_val=5B9=5D);
+> >> +       ufshcd_dme_set(hba, UIC_ARG_MIB(T_CPORTMODE),
+> >> +                      host->cdns_ufs_dme_attr_val=5B10=5D);
+> >> +       ufshcd_dme_set(hba, UIC_ARG_MIB(T_CONNECTIONSTATE),
+> >> +                      host->cdns_ufs_dme_attr_val=5B11=5D); =7D
+> >> +
+> >> +/**
+> >>   * Sets HCLKDIV register value based on the core_clk
+> >>   * =40hba: host controller instance
+> >>   *
+> >> =40=40 -134,6 +213,7 =40=40 static void cdns_ufs_hibern8_notify(struct=
+ ufs_hba
+> *hba, enum uic_cmd_dme cmd,
+> >>                  * before manual hibernate entry.
+> >>                  */
+> >>                 cdns_ufs_enable_intr(hba, UFSHCD_UIC_HIBERN8_MASK);
+> >> +               cdns_ufs_get_l4_attr(hba);
+> >>         =7D
+> >>         if (status =3D=3D POST_CHANGE && cmd =3D=3D UIC_CMD_DME_HIBER_=
+EXIT) =7B
+> >>                 /**
+> >> =40=40 -141,6 +221,7 =40=40 static void cdns_ufs_hibern8_notify(struct=
+ ufs_hba
+> *hba, enum uic_cmd_dme cmd,
+> >>                  * after manual hibern8 exit.
+> >>                  */
+> >>                 cdns_ufs_disable_intr(hba, UFSHCD_UIC_HIBERN8_MASK);
+> >> +               cdns_ufs_set_l4_attr(hba);
+> >>         =7D
+> >>  =7D
+> >>
+> >> =40=40 -245,15 +326,27 =40=40 static int cdns_ufs_pltfrm_probe(struct
+> platform_device *pdev)
+> >>         const struct of_device_id *of_id;
+> >>         struct ufs_hba_variant_ops *vops;
+> >>         struct device *dev =3D &pdev->dev;
+> >> +       struct cdns_ufs_host *host;
+> >> +       struct ufs_hba *hba;
+> >>
+> >>         of_id =3D of_match_node(cdns_ufs_of_match, dev->of_node);
+> >>         vops =3D (struct ufs_hba_variant_ops *)of_id->data;
+> >>
+> >>         /* Perform generic probe */
+> >>         err =3D ufshcd_pltfrm_init(pdev, vops);
+> >> -       if (err)
+> >> +       if (err) =7B
+> >>                 dev_err(dev, =22ufshcd_pltfrm_init() failed %d=5Cn=22,
+> >> err);
+> >> -
+> >> +               goto out;
+> >> +       =7D
+> >> +       host =3D devm_kzalloc(dev, sizeof(*host), GFP_KERNEL);
+> >> +       if (=21host) =7B
+> >> +               err =3D -ENOMEM;
+> >> +               dev_err(dev, =22%s: no memory for cdns host=5Cn=22, __=
+func__);
+> >> +               goto out;
+> >> +       =7D
+> >> +       hba =3D  platform_get_drvdata(pdev);
+> >> +       ufshcd_set_variant(hba, host);
+> >> +out:
+> >>         return err;
+> >>  =7D
+> >>
+> >> --
+> >> 2.7.4
+> >>
+> >
+> >
+>=20
+> --
+> Regards
+> Vignesh
 
