@@ -2,155 +2,109 @@ Return-Path: <SRS0=Lpm0=ZT=vger.kernel.org=linux-block-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-2.3 required=3.0 tests=DKIM_SIGNED,DKIM_VALID,
-	HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,
-	USER_AGENT_SANE_1 autolearn=no autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-9.8 required=3.0 tests=DKIM_SIGNED,DKIM_VALID,
+	DKIM_VALID_AU,HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,
+	SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED,USER_AGENT_GIT
+	autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 29CD9C43215
-	for <linux-block@archiver.kernel.org>; Wed, 27 Nov 2019 01:46:40 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 51FF2C432C0
+	for <linux-block@archiver.kernel.org>; Wed, 27 Nov 2019 02:47:12 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.kernel.org (Postfix) with ESMTP id 00DE72071E
-	for <linux-block@archiver.kernel.org>; Wed, 27 Nov 2019 01:46:39 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id D830D206CC
+	for <linux-block@archiver.kernel.org>; Wed, 27 Nov 2019 02:47:11 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel-dk.20150623.gappssmtp.com header.i=@kernel-dk.20150623.gappssmtp.com header.b="Zymz3q9j"
+	dkim=pass (1024-bit key) header.d=sslab.ics.keio.ac.jp header.i=@sslab.ics.keio.ac.jp header.b="SMgYIVyN"
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1725871AbfK0Bqj (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Tue, 26 Nov 2019 20:46:39 -0500
-Received: from mail-pg1-f195.google.com ([209.85.215.195]:39232 "EHLO
-        mail-pg1-f195.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1725916AbfK0Bqj (ORCPT
+        id S1726346AbfK0CrL (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Tue, 26 Nov 2019 21:47:11 -0500
+Received: from mail-pj1-f66.google.com ([209.85.216.66]:44076 "EHLO
+        mail-pj1-f66.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S1726304AbfK0CrK (ORCPT
         <rfc822;linux-block@vger.kernel.org>);
-        Tue, 26 Nov 2019 20:46:39 -0500
-Received: by mail-pg1-f195.google.com with SMTP id b137so7647995pga.6
-        for <linux-block@vger.kernel.org>; Tue, 26 Nov 2019 17:46:38 -0800 (PST)
+        Tue, 26 Nov 2019 21:47:10 -0500
+Received: by mail-pj1-f66.google.com with SMTP id w8so9213960pjh.11
+        for <linux-block@vger.kernel.org>; Tue, 26 Nov 2019 18:47:10 -0800 (PST)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=kernel-dk.20150623.gappssmtp.com; s=20150623;
-        h=subject:to:cc:references:from:message-id:date:user-agent
-         :mime-version:in-reply-to:content-language:content-transfer-encoding;
-        bh=D6t9Cwt+Vu79N9+2JsQ1/zQXaSAT/1qvtlCuPBuDo8A=;
-        b=Zymz3q9jURrU5FWSHJlr1GHmy0KXKpQRbpaT+mpyCIM6X8m7MWlfItXpI12x1Tj7XT
-         dm8zaLwcvx/77aFcBkQ14wMUJj45rJnAETXnDGW+JGXz9wBIR/WC60nrxRep2HXa5QBx
-         PDfnahavm/RIb0AWaKn7QLEQFXzNxFYjt5mh+Pq0KhoXMuzMAYRUgL79PYpAz+rvm8J3
-         UpAGtNjF5eDkdAAXhmbY3essF17yoBwSwTXfIEb2S71HqOUt32rlmshgBYAeLt9b4SnI
-         jthVMSMJ2AmdKg9rkni1L985wJB4YcArZMCnorIAbeGVt7EAm6nGdVsUBJzHpYxocO0m
-         5nmQ==
+        d=sslab.ics.keio.ac.jp; s=google;
+        h=from:to:cc:subject:date:message-id;
+        bh=745A+eCsEg1muKCYSg2p/wtTP4Y+wsxmjId5exHGtfo=;
+        b=SMgYIVyNSzhZH4ald3Xy3UtcVJF+AiXdjJnAZ68iotYqDWhZho5ZFo2BF//Sj/1kEO
+         0RjE3/EpMLC4qRPsA8j+HZ06MCtN6+2it3lpenCl61EnBaYMN8m+tOv7eoQlej63dudM
+         N4F8n0IZIw9bQrXXBOzXzxtxptLLvBD1IlGVo=
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=1e100.net; s=20161025;
-        h=x-gm-message-state:subject:to:cc:references:from:message-id:date
-         :user-agent:mime-version:in-reply-to:content-language
-         :content-transfer-encoding;
-        bh=D6t9Cwt+Vu79N9+2JsQ1/zQXaSAT/1qvtlCuPBuDo8A=;
-        b=QOLGg2PhxONUhbs6z6ka9gMldDP0Ul9N54oGRfUq6v3kwtmPBW3wkri72KpO9jqToj
-         jBRBCCsQOsVyWT0dpY5V+jPYuAEgnkCq/6jixYUKAfiQQ0Pwy5mK0gjIzgs0kR7oqNUY
-         hnFJTgxVS1A/g+VzXNAOOc0r5/7jdvVT/Gmp8PuBV8DEcBFLhIYHjqRkOUSqQ2tRAa8s
-         OW/LGNvHr/59xjVR/3m2qM7F9oFK6IzNjpjFBv0SzaSfNKqNIloYKRgTTI3iWr13WyeU
-         h6iILt2Jo7vpSKjzpW69GFODq1fov/71yipIhm51fL60Fm5/tibFgy4pAP8VzAxhcs78
-         uMZw==
-X-Gm-Message-State: APjAAAWFFh8QqL2sBVfzRDwTZo9YJz2X993hs/xzl8VFfgY08BpgcstT
-        250OVJ24O/h0jYPEffs601EYpuRaUkw=
-X-Google-Smtp-Source: APXvYqyCJKfzwwNPf310bwKtxlvevUZMBUOEBy9JduvNDkVO9b2zlRXIvUINsnf3eswEtAtOiRUx9w==
-X-Received: by 2002:a63:4501:: with SMTP id s1mr1892695pga.5.1574819197761;
-        Tue, 26 Nov 2019 17:46:37 -0800 (PST)
-Received: from ?IPv6:2600:380:7746:eea0:4854:d740:64b2:1b9b? ([2600:380:7746:eea0:4854:d740:64b2:1b9b])
-        by smtp.gmail.com with ESMTPSA id z29sm9533pge.21.2019.11.26.17.46.34
-        (version=TLS1_2 cipher=ECDHE-RSA-AES128-GCM-SHA256 bits=128/128);
-        Tue, 26 Nov 2019 17:46:36 -0800 (PST)
-Subject: Re: [PATCH 3/8] blk-mq: Use a pointer for sbitmap
-To:     John Garry <john.garry@huawei.com>, Hannes Reinecke <hare@suse.de>,
-        "Martin K. Petersen" <martin.petersen@oracle.com>
-Cc:     Christoph Hellwig <hch@lst.de>,
-        James Bottomley <james.bottomley@hansenpartnership.com>,
-        Ming Lei <ming.lei@redhat.com>,
-        Bart van Assche <bvanassche@acm.org>,
-        linux-scsi@vger.kernel.org, linux-block@vger.kernel.org
-References: <20191126091416.20052-1-hare@suse.de>
- <20191126091416.20052-4-hare@suse.de>
- <8f0522ee-2a81-c2ae-d111-3ff89ee6f93e@kernel.dk>
- <62838bca-cd3c-fccf-767c-76d8bea12324@huawei.com>
- <00a6d920-1855-c861-caa3-e845dcbe1fd8@kernel.dk>
- <baffb360-56c0-3da5-9a52-400fb763adbf@huawei.com>
- <9290eb7f-8d0b-8012-f9a4-a49c068def1b@kernel.dk>
- <157f3e58-1d16-cc6b-52aa-15a6e1ac828a@huawei.com>
-From:   Jens Axboe <axboe@kernel.dk>
-Message-ID: <1add0896-4867-12c5-4507-76526c27fb56@kernel.dk>
-Date:   Tue, 26 Nov 2019 18:46:32 -0700
-User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:60.0) Gecko/20100101
- Thunderbird/60.9.0
-MIME-Version: 1.0
-In-Reply-To: <157f3e58-1d16-cc6b-52aa-15a6e1ac828a@huawei.com>
-Content-Type: text/plain; charset=utf-8
-Content-Language: en-US
-Content-Transfer-Encoding: 7bit
+        h=x-gm-message-state:from:to:cc:subject:date:message-id;
+        bh=745A+eCsEg1muKCYSg2p/wtTP4Y+wsxmjId5exHGtfo=;
+        b=JLigwAzFh+xE0+GqMjDgqJQwmUcHB2GnFM5FyczW+XdPcHuzfEbO1MUzMJQYDI6Icm
+         1T6SWyp0XMiaDqhPT54vo/T83uKBe9jbbi8GR/uSmUR14axkHciqMfsMbhLvIGnu/6Xn
+         D6qvZkunCaL2tluMCkiJuF0BqpzP5/PuTAg4tdEigaOYPn0eMggt1KSaZArhfoAcU7FK
+         mpJyRhXvT3c1cNjQuXqVXWzmOxUuumvOM6sTfVpU5ARIdbzEFWT4rd2jrrU+wmOsux3/
+         DiVyyhbjUtnc6V2I10JdvYQeQW7SsIyTGf1/hWUIpl4U6azU0T4SefkLJlJjI4iOjQCU
+         mY8w==
+X-Gm-Message-State: APjAAAVuVJphNu9Iui9zexK5bksc3gpIAu4/HMp5J5Mod7MmAZjUe6qZ
+        kl6KaSGbllBpd3Z3WeP6BJWPEA==
+X-Google-Smtp-Source: APXvYqxTwpIYa40HIhvzypq9bOy9lOxP2whhAnbxjOBTaBb3PY21RhcYJbkySdG5bPTqXi0fIUJdYw==
+X-Received: by 2002:a17:902:d205:: with SMTP id t5mr1546245ply.31.1574822829825;
+        Tue, 26 Nov 2019 18:47:09 -0800 (PST)
+Received: from brooklyn.i.sslab.ics.keio.ac.jp (sslab-relay.ics.keio.ac.jp. [131.113.126.173])
+        by smtp.googlemail.com with ESMTPSA id w15sm13416137pfi.168.2019.11.26.18.47.07
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Tue, 26 Nov 2019 18:47:09 -0800 (PST)
+From:   Keita Suzuki <keitasuzuki.park@sslab.ics.keio.ac.jp>
+To:     Jens Axboe <axboe@kernel.dk>
+Cc:     linux-block@vger.kernel.org, linux-kernel@vger.kernel.org,
+        keitasuzuki.park@sslab.ics.keio.ac.jp,
+        takafumi.kubota1012@sslab.ics.keio.ac.jp
+Subject: [PATCH] block/genhd: Fix memory leak in error path of __alloc_disk_node()
+Date:   Wed, 27 Nov 2019 02:40:57 +0000
+Message-Id: <20191127024057.5827-1-keitasuzuki.park@sslab.ics.keio.ac.jp>
+X-Mailer: git-send-email 2.17.1
 Sender: linux-block-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-On 11/26/19 11:08 AM, John Garry wrote:
-> On 26/11/2019 17:25, Jens Axboe wrote:
->> On 11/26/19 10:23 AM, John Garry wrote:
->>> On 26/11/2019 17:11, Jens Axboe wrote:
->>>> On 11/26/19 9:54 AM, John Garry wrote:
->>>>> On 26/11/2019 15:14, Jens Axboe wrote:
->>>>>> On 11/26/19 2:14 AM, Hannes Reinecke wrote:
->>>>>>> Instead of allocating the tag bitmap in place we should be using a
->>>>>>> pointer. This is in preparation for shared host-wide bitmaps.
->>>>>>
->>>>>> Not a huge fan of this, it's an extra indirection in the hot path
->>>>>> of both submission and completion.
->>>>>
->>>>> Hi Jens,
->>>>>
->>>>> Thanks for having a look.
->>>>>
->>>>> I checked the disassembly for blk_mq_get_tag() as a sample - which I
->>>>> assume is one hot path function which you care about - and the cost of
->>>>> the indirection is a load instruction instead of an add, denoted by ***,
->>>>> below:
->>>>
->>>
->>> Hi Jens,
->>>
->>>> I'm not that worried about an extra instruction, my worry is the extra
->>>> load is from different memory. When it's embedded in the struct, we're
->>>> on the same cache line or adjacent.
->>>
->>> Right, so the earlier iteration of this series kept the embedded struct
->>> and we simply pointed at that, so I wouldn't expect a caching issue of
->>> different memory in that case.
->>
-> 
-> Hi Jens,
-> 
->> That would be a much better solution for the common case, my concern
->> here is slowing down the fast path for device that don't need shared
->> tags.
->>
->> Would be interesting to check the generated code for that, ideally we'd
->> get rid of the extra load for that case, even if it is in the same
->> cacheline.
->>
-> 
-> I checked the disassembly and we still have the load instead of the add.
-> 
-> This is not surprising, as the compiler would not know for certain that
-> we point to a field within the same struct. But at least we still should
-> point to a close memory.
-> 
-> Note that the pointer could be dropped, which would remove the load, but
-> then we have many if-elses which could be slower, not to mention that
-> the blk-mq-tag code deals in bitmap pointers anyway.
+'disk->part_tbl' is malloced in disk_expand_part_tbl() and should be
+freed before leaving from the error handling cases. However, current code
+does not free this, causing a memory leak. Add disk_replace_part_tbl()
+before freeing 'disk'.
 
-It might still be worthwhile to do:
+I have tested this by randomly causing failures to the target code,
+and verified on kmemleak that this memory leak does occur.
 
-if (tags->ptr == &tags->__default)
-	foo(&tags->__default);
+unreferenced object 0xffff888006dad500 (size 64):
+  comm "systemd-udevd", pid 116, jiffies 4294895558 (age 121.716s)
+  hex dump (first 32 bytes):
+    00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00  ................
+    01 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00  ................
+  backtrace:
+    [<00000000eec79bf3>] disk_expand_part_tbl+0xab/0x170
+    [<00000000624e7d03>] __alloc_disk_node+0xb1/0x1c0
+    [<00000000ca3f4185>] 0xffffffffc01b8584
+    [<000000006f88a6ee>] do_one_initcall+0x8b/0x2a4
+    [<0000000016058199>] do_init_module+0xfd/0x380
+    [<00000000b6fde336>] load_module+0x3fae/0x4240
+    [<00000000c523d013>] __do_sys_finit_module+0x11a/0x1b0
+    [<00000000f07bba26>] do_syscall_64+0x6d/0x1e0
+    [<00000000979467fd>] entry_SYSCALL_64_after_hwframe+0x44/0xa9
 
-to make it clear, as that branch will predict easily. If if can be done
-in a nice enough fashion and not sprinkled everywhere, in some fashion.
+Signed-off-by: Keita Suzuki <keitasuzuki.park@sslab.ics.keio.ac.jp>
+---
+ block/genhd.c | 1 +
+ 1 file changed, 1 insertion(+)
 
-Should be testable, though.
-
+diff --git a/block/genhd.c b/block/genhd.c
+index ff6268970ddc..8c4b63d7f507 100644
+--- a/block/genhd.c
++++ b/block/genhd.c
+@@ -1504,6 +1504,7 @@ struct gendisk *__alloc_disk_node(int minors, int node_id)
+ 		 */
+ 		seqcount_init(&disk->part0.nr_sects_seq);
+ 		if (hd_ref_init(&disk->part0)) {
++			disk_replace_part_tbl(disk, NULL);
+ 			hd_free_part(&disk->part0);
+ 			kfree(disk);
+ 			return NULL;
 -- 
-Jens Axboe
+2.17.1
 
