@@ -2,128 +2,108 @@ Return-Path: <SRS0=Lpm0=ZT=vger.kernel.org=linux-block-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-2.4 required=3.0 tests=DKIMWL_WL_HIGH,DKIM_SIGNED,
+X-Spam-Status: No, score=-5.9 required=3.0 tests=DKIMWL_WL_HIGH,DKIM_SIGNED,
 	DKIM_VALID,DKIM_VALID_AU,HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,
-	SPF_HELO_NONE,SPF_PASS,USER_AGENT_SANE_1 autolearn=no autolearn_force=no
-	version=3.4.0
+	MENTIONS_GIT_HOSTING,SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED autolearn=ham
+	autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id C43B6C432C0
-	for <linux-block@archiver.kernel.org>; Wed, 27 Nov 2019 04:15:49 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 8AB43C432C0
+	for <linux-block@archiver.kernel.org>; Wed, 27 Nov 2019 04:55:02 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.kernel.org (Postfix) with ESMTP id 9AA262071E
-	for <linux-block@archiver.kernel.org>; Wed, 27 Nov 2019 04:15:49 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id 5D1CF20835
+	for <linux-block@archiver.kernel.org>; Wed, 27 Nov 2019 04:55:02 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=pass (1024-bit key) header.d=ti.com header.i=@ti.com header.b="pjEVQil8"
+	dkim=pass (1024-bit key) header.d=chromium.org header.i=@chromium.org header.b="AJN1uF00"
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1726546AbfK0EPq (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Tue, 26 Nov 2019 23:15:46 -0500
-Received: from lelv0143.ext.ti.com ([198.47.23.248]:46446 "EHLO
-        lelv0143.ext.ti.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1726526AbfK0EPq (ORCPT
+        id S1726852AbfK0EzB (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Tue, 26 Nov 2019 23:55:01 -0500
+Received: from mail-pl1-f195.google.com ([209.85.214.195]:44424 "EHLO
+        mail-pl1-f195.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S1726548AbfK0EzB (ORCPT
         <rfc822;linux-block@vger.kernel.org>);
-        Tue, 26 Nov 2019 23:15:46 -0500
-Received: from fllv0035.itg.ti.com ([10.64.41.0])
-        by lelv0143.ext.ti.com (8.15.2/8.15.2) with ESMTP id xAR4FL1f026273;
-        Tue, 26 Nov 2019 22:15:21 -0600
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=ti.com;
-        s=ti-com-17Q1; t=1574828121;
-        bh=wT3uBStmO0zs8CxdsXEg1fyzmCCiuamwhYlq5icphfU=;
-        h=Subject:To:CC:References:From:Date:In-Reply-To;
-        b=pjEVQil8AxS5Wu73HXta+uN5kXPDTns/4nN/OolK1peBL1nosjT0+L5MF4z3k1ZYp
-         1pO8N52mZWPI5DZF8pK3UbxIYK01LnKFCiwWeSMos2HFxEZ1Mo1/SoNRSrLfSFhgmJ
-         opCmtmRHviuHHmPAxMutSSxi0qo/MKCXGfy2FZDY=
-Received: from DLEE100.ent.ti.com (dlee100.ent.ti.com [157.170.170.30])
-        by fllv0035.itg.ti.com (8.15.2/8.15.2) with ESMTP id xAR4FL93065540;
-        Tue, 26 Nov 2019 22:15:21 -0600
-Received: from DLEE107.ent.ti.com (157.170.170.37) by DLEE100.ent.ti.com
- (157.170.170.30) with Microsoft SMTP Server (version=TLS1_2,
- cipher=TLS_ECDHE_RSA_WITH_AES_128_CBC_SHA256_P256) id 15.1.1847.3; Tue, 26
- Nov 2019 22:15:20 -0600
-Received: from lelv0326.itg.ti.com (10.180.67.84) by DLEE107.ent.ti.com
- (157.170.170.37) with Microsoft SMTP Server (version=TLS1_2,
- cipher=TLS_ECDHE_RSA_WITH_AES_128_CBC_SHA256_P256) id 15.1.1847.3 via
- Frontend Transport; Tue, 26 Nov 2019 22:15:20 -0600
-Received: from [172.24.145.136] (ileax41-snat.itg.ti.com [10.172.224.153])
-        by lelv0326.itg.ti.com (8.15.2/8.15.2) with ESMTP id xAR4FE36093524;
-        Tue, 26 Nov 2019 22:15:16 -0600
-Subject: Re: [PATCH RESEND 2/2] scsi: ufs: Update L4 attributes on manual
- hibern8 exit in Cadence UFS.
-To:     Alim Akhtar <alim.akhtar@samsung.com>,
-        "'Alim Akhtar'" <alim.akhtar@gmail.com>,
-        "'sheebab'" <sheebab@cadence.com>
-CC:     "'Avri Altman'" <avri.altman@wdc.com>,
-        "'Pedro Sousa'" <pedrom.sousa@synopsys.com>,
-        "'James E.J. Bottomley'" <jejb@linux.ibm.com>,
-        "'Martin K. Petersen'" <martin.petersen@oracle.com>,
-        "'Stanley Chu'" <stanley.chu@mediatek.com>,
-        "'Bean Huo (beanhuo)'" <beanhuo@micron.com>,
-        <yuehaibing@huawei.com>, <linux-scsi@vger.kernel.org>,
-        "'open list'" <linux-kernel@vger.kernel.org>,
-        <linux-block@vger.kernel.org>, <rafalc@cadence.com>,
-        <mparab@cadence.com>
-References: <1574147082-22725-1-git-send-email-sheebab@cadence.com>
- <1574147082-22725-3-git-send-email-sheebab@cadence.com>
- <CAGOxZ53Lotp6sBUryHsE2S1dbkQNZhPhWNMXidoi=BOmV074VA@mail.gmail.com>
- <CGME20191121105613epcas4p1a83df10f9f8dcf9edaa583648cad449e@epcas4p1.samsung.com>
- <cfc2c86f-f9ae-ac91-39ac-8bb48c41b243@ti.com>
- <08c701d5a4d4$b20c7300$16255900$@samsung.com>
-From:   Vignesh Raghavendra <vigneshr@ti.com>
-Message-ID: <69e16181-e01c-1120-2074-80b9c1eb19ce@ti.com>
-Date:   Wed, 27 Nov 2019 09:45:45 +0530
-User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:60.0) Gecko/20100101
- Thunderbird/60.9.0
+        Tue, 26 Nov 2019 23:55:01 -0500
+Received: by mail-pl1-f195.google.com with SMTP id az9so9178546plb.11
+        for <linux-block@vger.kernel.org>; Tue, 26 Nov 2019 20:55:01 -0800 (PST)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=chromium.org; s=google;
+        h=date:from:to:cc:subject:message-id:references:mime-version
+         :content-disposition:in-reply-to;
+        bh=x014kdajHiZwpaMlsuru1v/99Jfm4YTVrAu4JkOB+AM=;
+        b=AJN1uF00joCEDQS1lgwWjvl6jjwKkhRtQSqHBSMUPbots4Osm7CiLFx9g2olFkTR61
+         tZk9wuX7nMi86+lGcxoUh/shKpzeyiPWjlfVX98t+OkeZlZ43fcQtLhZg0tXsMjkxz1K
+         aiIgt/Vms09hZRioSwZmIl5tUTcEid9icHiCk=
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20161025;
+        h=x-gm-message-state:date:from:to:cc:subject:message-id:references
+         :mime-version:content-disposition:in-reply-to;
+        bh=x014kdajHiZwpaMlsuru1v/99Jfm4YTVrAu4JkOB+AM=;
+        b=qHTQXS2JHbib5ogw+btIxLeUAnFLoscMvkQOvSLqxsZ816ZbVrqLVuH2FFht21I8t7
+         zvNjdQD46QuHSLZEQgmMK0/CxpB6liSdFU5mINDSPMEPQNNxLU/SDNLHYFlSrKdLxVdi
+         R6RXqU8MmXma9q/FSymhZp5/uXbTtpWEgoG9kwe0qyMPTq9b3pp2jrgKTGvqu6T2Z2Gy
+         QnLuo9kWQj7H3e4ZBnXpmveNiYIDno5JdC07C1a/xpWPrFvXpnOtHGosboxmjcRzKRCC
+         r2qjPY7AbLseNIvyN/JhvLzjz1g4pKpUiy7wXZbmHWO7Mn5haCLebG3708EudzG+hdgO
+         VOAQ==
+X-Gm-Message-State: APjAAAXPLxHlfINzG5mDz2g4l0NrxTso3r8DZVlbU6z3nHZIqYTRY4CK
+        qemkd8uK6U7qHT9Wu5h8Tt4PSw==
+X-Google-Smtp-Source: APXvYqzqV9mvaxiXAzfVPCiGwO1coeJXDQeUreYCGoe9LA2oovG2u34yRY5JIW856tzsTA0nfk4Oug==
+X-Received: by 2002:a17:902:b610:: with SMTP id b16mr2140885pls.70.1574830500738;
+        Tue, 26 Nov 2019 20:55:00 -0800 (PST)
+Received: from www.outflux.net (smtp.outflux.net. [198.145.64.163])
+        by smtp.gmail.com with ESMTPSA id p16sm14894293pfn.171.2019.11.26.20.54.59
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Tue, 26 Nov 2019 20:54:59 -0800 (PST)
+Date:   Tue, 26 Nov 2019 20:54:58 -0800
+From:   Kees Cook <keescook@chromium.org>
+To:     syzbot <syzbot+21cfe1f803e0e158acf1@syzkaller.appspotmail.com>
+Cc:     00moses.alexander00@gmail.com, axboe@kernel.dk, bvanassche@acm.org,
+        hare@suse.com, hch@lst.de, idryomov@gmail.com,
+        joseph.qi@linux.alibaba.com, jthumshirn@suse.de,
+        linux-block@vger.kernel.org, linux-kernel@vger.kernel.org,
+        ming.lei@redhat.com, sagi@grimberg.me, snitzer@redhat.com,
+        syzkaller-bugs@googlegroups.com, tj@kernel.org,
+        torvalds@linux-foundation.org, wgh@torlan.ru, zkabelac@redhat.com
+Subject: Re: WARNING in generic_make_request_checks
+Message-ID: <201911262053.C6317530@keescook>
+References: <0000000000003c4e6d0572f85eb2@google.com>
+ <000000000000350fb80597ee3931@google.com>
 MIME-Version: 1.0
-In-Reply-To: <08c701d5a4d4$b20c7300$16255900$@samsung.com>
-Content-Type: text/plain; charset="utf-8"
-Content-Language: en-US
-Content-Transfer-Encoding: 7bit
-X-EXCLAIMER-MD-CONFIG: e1e8a2fd-e40a-4ac6-ac9b-f7e9cc9ee180
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <000000000000350fb80597ee3931@google.com>
 Sender: linux-block-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-Hi Alim,
-
-On 27/11/19 9:12 AM, Alim Akhtar wrote:
+On Fri, Nov 22, 2019 at 04:05:01AM -0800, syzbot wrote:
+> syzbot has bisected this bug to:
 > 
-[...]
->>>> Backup L4 attributes duirng manual hibern8 entry and restore the L4
->>>> attributes on manual hibern8 exit as per JESD220C.
->>>>
->>> Can you point me to the relevant section on the spec?
->>>
->>
->> Per JESD 220C 9.4 UniPro/UFS Control Interface (Control Plane):
->>
->> "NOTE After exit from Hibernate all UniPro Transport Layer attributes (including
->> L4 T_PeerDeviceID,
->>
->> L4 T_PeerCPortID, L4 T_ConnectionState, etc.) will be reset to their reset values.
->> All required attributes
->>
->> must be restored properly on both ends before communication can resume."
->>
->> But its not clear whether SW needs to restore these attributes or hardware
->>
-> Thanks Vignesh for pointing out the spec section, yes it is not clear, one way to confirm this is just by read L4 attributes before 
-> And after hinern8 entry/exit.
-
-I know that on Cadence UFS controller L4 attributes are definitely lost
-on hibernation entry/exit and therefore needs to be restored. But not
-sure of other controllers. If this issue is seen on other controllers as
-well, then we should probably consider moving this code to core driver
-so that there is code reuse.
-
-> (at least in the current platform it is not being done)
-> AFA this patch is concerns, this looks ok to me.
-> @ Avri , any thought on this?
+> commit a32e236eb93e62a0f692e79b7c3c9636689559b9
+> Author: Linus Torvalds <torvalds@linux-foundation.org>
+> Date:   Fri Aug 3 19:22:09 2018 +0000
 > 
->> Regards
->> Vignesh
->>
+>     Partially revert "block: fail op_is_write() requests to read-only
+> partitions"
+> 
+> bisection log:  https://syzkaller.appspot.com/x/bisect.txt?x=119503d2e00000
+> start commit:   60f5a217 Merge tag 'usercopy-fix-v4.18-rc8' of git://git.k..
+> git tree:       upstream
+> final crash:    https://syzkaller.appspot.com/x/report.txt?x=139503d2e00000
+> console output: https://syzkaller.appspot.com/x/log.txt?x=159503d2e00000
+> kernel config:  https://syzkaller.appspot.com/x/.config?x=2dc0cd7c2eefb46f
+> dashboard link: https://syzkaller.appspot.com/bug?extid=21cfe1f803e0e158acf1
+> syz repro:      https://syzkaller.appspot.com/x/repro.syz?x=17b87bfc400000
+> C reproducer:   https://syzkaller.appspot.com/x/repro.c?x=117ccc8c400000
+> 
+> Reported-by: syzbot+21cfe1f803e0e158acf1@syzkaller.appspotmail.com
+> Fixes: a32e236eb93e ("Partially revert "block: fail op_is_write() requests
+> to read-only partitions"")
+> 
+> For information about bisection process see: https://goo.gl/tpsmEJ#bisection
 
-[...]
+#syz test: git://git.kernel.org/pub/scm/linux/kernel/git/torvalds/linux.git 8b2ded1c94c06f841f8c1612bcfa33c85012a36b
+
+See https://lore.kernel.org/lkml/20191125174037.GA768@infradead.org/
+
 -- 
-Regards
-Vignesh
+Kees Cook
