@@ -2,128 +2,95 @@ Return-Path: <SRS0=Lpm0=ZT=vger.kernel.org=linux-block-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-2.2 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
-	MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,USER_AGENT_SANE_1 autolearn=no
-	autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-2.0 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
+	HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,
+	USER_AGENT_SANE_1 autolearn=no autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 92448C43215
-	for <linux-block@archiver.kernel.org>; Wed, 27 Nov 2019 08:11:55 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 03384C432C0
+	for <linux-block@archiver.kernel.org>; Wed, 27 Nov 2019 09:00:36 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.kernel.org (Postfix) with ESMTP id 705EE20678
-	for <linux-block@archiver.kernel.org>; Wed, 27 Nov 2019 08:11:55 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id CE65A20678
+	for <linux-block@archiver.kernel.org>; Wed, 27 Nov 2019 09:00:35 +0000 (UTC)
+Authentication-Results: mail.kernel.org;
+	dkim=fail reason="signature verification failed" (2048-bit key) header.d=infradead.org header.i=@infradead.org header.b="qyNGXAML"
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1726133AbfK0ILu (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Wed, 27 Nov 2019 03:11:50 -0500
-Received: from mx2.suse.de ([195.135.220.15]:58342 "EHLO mx1.suse.de"
-        rhost-flags-OK-OK-OK-FAIL) by vger.kernel.org with ESMTP
-        id S1726125AbfK0ILu (ORCPT <rfc822;linux-block@vger.kernel.org>);
-        Wed, 27 Nov 2019 03:11:50 -0500
-X-Virus-Scanned: by amavisd-new at test-mx.suse.de
-Received: from relay2.suse.de (unknown [195.135.220.254])
-        by mx1.suse.de (Postfix) with ESMTP id 26FB3B9F7;
-        Wed, 27 Nov 2019 08:11:47 +0000 (UTC)
-Date:   Wed, 27 Nov 2019 09:11:44 +0100
-From:   Michal =?iso-8859-1?Q?Such=E1nek?= <msuchanek@suse.de>
-To:     Jens Axboe <axboe@kernel.dk>
-Cc:     linux-scsi@vger.kernel.org, linux-block@vger.kernel.org,
-        Jonathan Corbet <corbet@lwn.net>,
-        "James E.J. Bottomley" <jejb@linux.ibm.com>,
-        "Martin K. Petersen" <martin.petersen@oracle.com>,
-        Alexander Viro <viro@zeniv.linux.org.uk>,
-        Eric Biggers <ebiggers@google.com>,
-        "J. Bruce Fields" <bfields@redhat.com>,
-        Mauro Carvalho Chehab <mchehab+samsung@kernel.org>,
-        Benjamin Coddington <bcodding@redhat.com>,
-        Ming Lei <ming.lei@redhat.com>,
-        Chaitanya Kulkarni <chaitanya.kulkarni@wdc.com>,
-        Bart Van Assche <bvanassche@acm.org>,
-        Damien Le Moal <damien.lemoal@wdc.com>,
-        Hou Tao <houtao1@huawei.com>,
-        Pavel Begunkov <asml.silence@gmail.com>,
-        linux-kernel@vger.kernel.org, linux-fsdevel@vger.kernel.org,
-        Jan Kara <jack@suse.cz>, Hannes Reinecke <hare@suse.com>,
-        "Ewan D. Milne" <emilne@redhat.com>,
-        Christoph Hellwig <hch@infradead.org>,
-        Matthew Wilcox <willy@infradead.org>
-Subject: Re: [PATCH v4 rebase 00/10] Fix cdrom autoclose
-Message-ID: <20191127081144.GZ11661@kitsune.suse.cz>
-References: <cover.1574797504.git.msuchanek@suse.de>
- <c6fe572c-530e-93eb-d62a-cb2f89c7b4ec@kernel.dk>
- <20191126202151.GY11661@kitsune.suse.cz>
- <08bcfd0a-7433-2fa4-9ca2-ea008836b747@kernel.dk>
+        id S1726191AbfK0JAc (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Wed, 27 Nov 2019 04:00:32 -0500
+Received: from bombadil.infradead.org ([198.137.202.133]:55510 "EHLO
+        bombadil.infradead.org" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S1726112AbfK0JAc (ORCPT
+        <rfc822;linux-block@vger.kernel.org>);
+        Wed, 27 Nov 2019 04:00:32 -0500
+DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed;
+        d=infradead.org; s=bombadil.20170209; h=In-Reply-To:Content-Type:MIME-Version
+        :References:Message-ID:Subject:Cc:To:From:Date:Sender:Reply-To:
+        Content-Transfer-Encoding:Content-ID:Content-Description:Resent-Date:
+        Resent-From:Resent-Sender:Resent-To:Resent-Cc:Resent-Message-ID:List-Id:
+        List-Help:List-Unsubscribe:List-Subscribe:List-Post:List-Owner:List-Archive;
+         bh=JmTonCKgBwtH6ZCVvvwC0xYOpQiZgyClbkDvnybuHtY=; b=qyNGXAMLgO2TTMGb2Td8AI4m+
+        PCOkAfCO0joXtNVP9+JPW9awSmqB2GzhLrHj22gsOAtVSrKg6d/6W6adhJorKoXkY5BaplSIhIeYp
+        EjT+nB1V747ljsacXboUhg6x76TOwqjflIHqx4eI+/jpRx6bUcdLDF3kCpgFBMxhGFD+LjyONGCWP
+        mD22ZsmLp6peakUCMmRIYJPnNA0N2cawuDYgEP5hMDU8E3Z3eX75UEqvGktfu3xtV8EMCYVy6PJzE
+        WScVHuOl59ZGVaNGCA+FrLA6DeALfOia6cydMSnVZQwgFWtudK2Qoyz9fCvNihRp6R3xfAt5BIXe2
+        GYvMy1H5Q==;
+Received: from hch by bombadil.infradead.org with local (Exim 4.92.3 #3 (Red Hat Linux))
+        id 1iZtBP-0000Io-Jy; Wed, 27 Nov 2019 09:00:23 +0000
+Date:   Wed, 27 Nov 2019 01:00:23 -0800
+From:   Christoph Hellwig <hch@infradead.org>
+To:     Hannes Reinecke <hare@suse.de>
+Cc:     Arnd Bergmann <arnd@arndb.de>,
+        "(Exiting) Baolin Wang" <baolin.wang@linaro.org>,
+        Baolin Wang <baolin.wang7@gmail.com>,
+        Adrian Hunter <adrian.hunter@intel.com>,
+        Ulf Hansson <ulf.hansson@linaro.org>, asutoshd@codeaurora.org,
+        Orson Zhai <orsonzhai@gmail.com>,
+        Lyra Zhang <zhang.lyra@gmail.com>,
+        Linus Walleij <linus.walleij@linaro.org>,
+        Vincent Guittot <vincent.guittot@linaro.org>,
+        linux-mmc <linux-mmc@vger.kernel.org>,
+        "linux-kernel@vger.kernel.org" <linux-kernel@vger.kernel.org>,
+        Hannes Reinecke <hare@suse.com>,
+        linux-block <linux-block@vger.kernel.org>,
+        Paolo Valente <paolo.valente@linaro.org>
+Subject: Re: [PATCH v6 0/4] Add MMC software queue support
+Message-ID: <20191127090023.GA23040@infradead.org>
+References: <cover.1573456283.git.baolin.wang@linaro.org>
+ <CAK8P3a1we9D5C2NOBww=cW-4L1PT3t0NnDRmknLwiLm652TmKg@mail.gmail.com>
+ <CAMz4kuK9HEuGdhNqHO_qoy9jD=ccsPPhD_dKYwNRgQyWyYwqRA@mail.gmail.com>
+ <CAK8P3a0rNhyxmUWLUV1js3FsuAESDOPX3E4b8ActtL4GRT4uTA@mail.gmail.com>
+ <CADBw62pzV+5ZXBEbFvTQJ9essAd4cd7Xkz5j9AXB5rAQy0wLqA@mail.gmail.com>
+ <CAMz4kuK_3q4JY1vNXe6zGHDNF8Ep-SkcUq6Z25r790VSz4+Bjw@mail.gmail.com>
+ <CAK8P3a11vJb1riYseqPnF_5SuJA+YnYuGwC0XWx6_rk+eQ0Bmw@mail.gmail.com>
+ <f88856aa-9175-2a93-3747-c98215cb79c3@suse.de>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=iso-8859-1
+Content-Type: text/plain; charset=us-ascii
 Content-Disposition: inline
-Content-Transfer-Encoding: 8bit
-In-Reply-To: <08bcfd0a-7433-2fa4-9ca2-ea008836b747@kernel.dk>
-User-Agent: Mutt/1.10.1 (2018-07-13)
+In-Reply-To: <f88856aa-9175-2a93-3747-c98215cb79c3@suse.de>
+User-Agent: Mutt/1.12.1 (2019-06-15)
+X-SRS-Rewrite: SMTP reverse-path rewritten from <hch@infradead.org> by bombadil.infradead.org. See http://www.infradead.org/rpr.html
 Sender: linux-block-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-On Tue, Nov 26, 2019 at 04:13:32PM -0700, Jens Axboe wrote:
-> On 11/26/19 1:21 PM, Michal Suchánek wrote:
-> > On Tue, Nov 26, 2019 at 01:01:42PM -0700, Jens Axboe wrote:
-> >> On 11/26/19 12:54 PM, Michal Suchanek wrote:
-> >>> Hello,
-> >>>
-> >>> there is cdrom autoclose feature that is supposed to close the tray,
-> >>> wait for the disc to become ready, and then open the device.
-> >>>
-> >>> This used to work in ancient times. Then in old times there was a hack
-> >>> in util-linux which worked around the breakage which probably resulted
-> >>> from switching to scsi emulation.
-> >>>
-> >>> Currently util-linux maintainer refuses to merge another hack on the
-> >>> basis that kernel still has the feature so it should be fixed there.
-> >>> The code needs not be replicated in every userspace utility like mount
-> >>> or dd which has no business knowing which devices are CD-roms and where
-> >>> the autoclose setting is in the kernel.
-> >>>
-> >>> This is rebase on top of current master.
-> >>>
-> >>> Also it seems that most people think that this is fix for WMware because
-> >>> there is one patch dealing with WMware.
-> >>
-> >> I think the main complaint with this is that it's kind of a stretch to
-> >> add core functionality for a device type that's barely being
-> >> manufactured anymore and is mostly used in a virtualized fashion. I
-> >> think it you could fix this without 10 patches of churn and without
-> >> adding a new ->open() addition to fops, then people would be a lot more
-> >> receptive to the idea of improving cdrom auto-close.
-> > 
-> > I see no way to do that cleanly.
-> > 
-> > There are two open modes for cdrom devices - blocking and
-> > non-blocking.
-> > 
-> > In blocking mode open() should analyze the medium so that it's ready
-> > when it returns. In non-blocking mode it should return immediately so
-> > long as you can talk to the device.
-> > 
-> > When waiting in open() with locks held the processes trying to open
-> > the device are locked out regradless of the mode they use.
-> > 
-> > The only way to solve this is to pretend that the device is open and
-> > do the wait afterwards with the device unlocked.
-> 
-> How is this any different from an open on a file that needs to bring in
-> meta data on a busy rotating device, which can also take seconds?
+On Tue, Nov 26, 2019 at 12:17:15PM +0100, Hannes Reinecke wrote:
+> Aligning with the 'traditional' linux way for partition handling is
+> definitely the way to go IMO; otherwise you'll end up having to worry
+> about resource allocation between distinct queues (like you have to do
+> now), and will be having a hard time trying to map it properly to the
+> underlying hardware abstraction in blk-mq.
 
-First, accessing a file will take seconds only when your system is
-seriously overloaded or misconfigured. The access time for rotational
-storage is tens of milliseconds. With cdrom the access time after
-closing the door is measured in tens of seconds on common hardware. It
-can be shorter but also possibly longer. I am not aware of any limit
-there. It may be reasonable to want to get device status during this
-time.
-
-Second, fetching the metadata for the file does not block operations that
-don't need the metadata. Here waiting for the drive to get ready blocks
-all access. You could get drive status if you did not try to open it
-but once you do you can no longer talk to it.
-
-Thanks
-
-Michal
+Sorry, but this is complete bullshit.  Except for the very unfortunate
+name MMC partitions have nothing to do with partitions.  They are a
+concept roughly equivalent to SCSI logical units and nvme namespace,
+just with a pretty idiotic design decision that only allows I/O to one
+of them at a time.  The block layer way to deal with them is to use
+a shared tagset for multiple request queues, which doesn't use up a
+whole lot of resources.  The only hard part is the draining when
+switching between partitions, and there is no really nice way to
+deal with that.   If requests are batched enough we could just drain
+and switch every time an other partition access comes in.  Especially
+so if people only use partitions for boot partitions and other rarely
+used areas.  If that doesn't work out we'll just have to reject other
+partition access and then use a timer and/or counter to eventually
+switch and provide basic fairness.
