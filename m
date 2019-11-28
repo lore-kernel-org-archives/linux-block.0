@@ -2,157 +2,133 @@ Return-Path: <SRS0=c8VV=ZU=vger.kernel.org=linux-block-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-0.6 required=3.0 tests=DKIM_SIGNED,DKIM_VALID,
-	DKIM_VALID_AU,FREEMAIL_FORGED_FROMDOMAIN,FREEMAIL_FROM,
-	HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,
-	URIBL_BLOCKED autolearn=no autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-13.3 required=3.0 tests=DKIMWL_WL_MED,DKIM_SIGNED,
+	DKIM_VALID,DKIM_VALID_AU,HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,
+	MENTIONS_GIT_HOSTING,SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED,USER_IN_DEF_DKIM_WL
+	autolearn=unavailable autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 95854C43215
-	for <linux-block@archiver.kernel.org>; Thu, 28 Nov 2019 05:52:12 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id BB760C432C3
+	for <linux-block@archiver.kernel.org>; Thu, 28 Nov 2019 08:59:48 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.kernel.org (Postfix) with ESMTP id 6CD34215F2
-	for <linux-block@archiver.kernel.org>; Thu, 28 Nov 2019 05:52:12 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id 8D7DF21775
+	for <linux-block@archiver.kernel.org>; Thu, 28 Nov 2019 08:59:48 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="Z3NN7fiH"
+	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="SqLbd+9o"
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1726610AbfK1FwK (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Thu, 28 Nov 2019 00:52:10 -0500
-Received: from mail-ot1-f66.google.com ([209.85.210.66]:37755 "EHLO
-        mail-ot1-f66.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1726448AbfK1FwJ (ORCPT
+        id S1727184AbfK1I7r (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Thu, 28 Nov 2019 03:59:47 -0500
+Received: from mail-qk1-f195.google.com ([209.85.222.195]:46860 "EHLO
+        mail-qk1-f195.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S1726656AbfK1I7r (ORCPT
         <rfc822;linux-block@vger.kernel.org>);
-        Thu, 28 Nov 2019 00:52:09 -0500
-Received: by mail-ot1-f66.google.com with SMTP id k14so5526519otn.4;
-        Wed, 27 Nov 2019 21:52:08 -0800 (PST)
+        Thu, 28 Nov 2019 03:59:47 -0500
+Received: by mail-qk1-f195.google.com with SMTP id f5so3720816qkm.13
+        for <linux-block@vger.kernel.org>; Thu, 28 Nov 2019 00:59:47 -0800 (PST)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20161025;
-        h=mime-version:references:in-reply-to:reply-to:from:date:message-id
-         :subject:to:cc;
-        bh=MdEQJsY/Utok4Nn4+LSSZV9QETD4DTsPXrGDp9ayac4=;
-        b=Z3NN7fiHFI9tkEJAgOlXc51rDZn+xxgMgdk7rPkm9wgF4Zz+vN7+/qRf7w68iU0HqU
-         tR53nYsKhSUS7MzbIxv1z6l+WafuABRpWjliag64+oXmT44ZS5s56lTO+6mrhoWRRsju
-         Klbt3nY54+8Li5g0+aYbfmu6ZHajsExFHUw6OPuvB8ExHiXpU92jAQ0+7vIJpGvNxEEH
-         2q6aY+dRWWDRM9igBG52X1ZAwdREsfDG8xlB0q+lXOKvImYblnPlueY10Nuwh0ThP1rP
-         f8WmfTQ4vJ/qa2CibOatlR+zpSJiYoGsEw6rdOep/88R8M8qMnlJ5DgQiMgjUGnSGboZ
-         MeUw==
+        d=google.com; s=20161025;
+        h=mime-version:references:in-reply-to:from:date:message-id:subject:to
+         :cc;
+        bh=wZDOmo+mPfnPdaN//xLxORxFeLKUGqLr+J7G6xlCcv0=;
+        b=SqLbd+9oTES7vGoU6eGRMkOpdFNV40HLc8s+9TAEtizxbar9kUpZ2tYAOwvaCY1zJ+
+         h2RoTvo57zIm/phFl00V8pNUu++Ie3H2YdWs5duONa6ZKlqZcd3g5I+xw9BtKTc+uUCg
+         mkSzYl/52v0L6ZFbszaSXtmAE+0/SOnzVv8g/2TvaZz1fGjnWDca/ilGBsMv/qxl8KSL
+         xQAZnM9roykuNy0O/hXzxcFl4RG9lANGbs8Syy6W6Bf5a02XsRcE9w5/+oZcjCQaB01w
+         hwiQPa9y/o5RMKSE8pPl9j5Evo2S4Nyk5RdMnwDFqxg8avw58AnnFNmJXvs343DJaTt9
+         oMtw==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=1e100.net; s=20161025;
-        h=x-gm-message-state:mime-version:references:in-reply-to:reply-to
-         :from:date:message-id:subject:to:cc;
-        bh=MdEQJsY/Utok4Nn4+LSSZV9QETD4DTsPXrGDp9ayac4=;
-        b=b185ckKuy5QCIcV2HuLwvIY1GGHiCZj+5/l0XUI+SaWEtGS9omfZ42BVxf5aiuR0TZ
-         mixibzGPcY1q1ndu63hLJ7l4THwXV91rWgkzQ8RJDu6Ly1lQu36wsvqrRuEyaKKOAQS6
-         utYLgHPcUzk2yukOc8n49DxUo8lLTywqaAhY1wEvuMJo/4P2gaOQr4QUOeNQV4Jzbodj
-         cyRJo4ICmndHcKR2FNnthxiIliexkjzXVajhonMzDdhOvZ3uciv7S+pE0qbsdHekJwAZ
-         dD3yoFKop5nJ1jYkMTfdkyDBQXx5JFUJcfnXjbWItviG5digyfhYNVzhIBAhkfP6BbSA
-         e/Sw==
-X-Gm-Message-State: APjAAAWq9pyysncPKCRHqbODvUnQWeCV6+TnC7smM7pJDEB2rgyksyaq
-        mHJjtKW1jI59p+REdO+bB1K5ajOBCrdaZ2GSGl8=
-X-Google-Smtp-Source: APXvYqzInsY7hophOQP2+nEZGGNXBok7RANKqxBeOZYae1OgjLLxGPRqV70MTIeInLmoCGA432X8l3eaGcInyEDdSxg=
-X-Received: by 2002:a05:6830:1158:: with SMTP id x24mr6121936otq.109.1574920328102;
- Wed, 27 Nov 2019 21:52:08 -0800 (PST)
+        h=x-gm-message-state:mime-version:references:in-reply-to:from:date
+         :message-id:subject:to:cc;
+        bh=wZDOmo+mPfnPdaN//xLxORxFeLKUGqLr+J7G6xlCcv0=;
+        b=jskyhgIoDNMiXr4l9h4pDykD/mf3WgJVen6Wli7FseCeWOVUJNF99kFwDTxUU7Xmgx
+         ZTmDEjDvA+zh7f3gAoUvriGW4dHFlByXRLS/l84NkspTkFtMOLUrW4JplVabGGRyZ8cQ
+         U4omA+wEnVwcRJ5t04ZsNNPlNKL42+jkw+QX49dHeUEmnV1l6J6IgC3hlmdb+j5Q+kko
+         4405pL8c3AGbC3FGoR299Bz0scXK+KT8K8V8/Sd2hHkhCO8ZNy7T3dNKVpr9JN7uRvjR
+         iSQUII9olMek+rbRLeuYYAkN8w7U14H5kQew0JtfnN2wtKP/3vbzEjKT3Ch4MIOHUsu3
+         ZBXA==
+X-Gm-Message-State: APjAAAXBefV6gPmGSk669uEKpwQznBXcb6mLP8I8lUkI4JEkcslKOjtq
+        QjJJ4KMfoZcrSoZ00WVNKx7Y4t3rFxpiO7M9lSBf5d5i
+X-Google-Smtp-Source: APXvYqxQ8DtLmeAzs+5VWeB2Gdz5ZzKRF7gLOdRvhy2DWqwJIHm23YKNcX22+xkzBrqhwZiFwlBokOtLC2TXudHDan0=
+X-Received: by 2002:a37:e312:: with SMTP id y18mr5456024qki.250.1574931134398;
+ Thu, 28 Nov 2019 00:52:14 -0800 (PST)
 MIME-Version: 1.0
-References: <CAAFE1bd9wuuobpe4VK7Ty175j7mWT+kRmHCNhVD+6R8MWEAqmw@mail.gmail.com>
- <20191128015748.GA3277@ming.t460p> <CA+VdTb_-CGaPjKUQteKVFSGqDz-5o-tuRRkJYqt8B9iOQypiwQ@mail.gmail.com>
- <20191128025822.GC3277@ming.t460p> <CAAFE1bfsXsKGyw7SU_z4NanT+wmtuJT=XejBYbHHMCDQwm73sw@mail.gmail.com>
- <CAAFE1bdGCx96tLKgSkNf7=MDZEZMnC==PJghpsRctvZpPLaX5w@mail.gmail.com>
-In-Reply-To: <CAAFE1bdGCx96tLKgSkNf7=MDZEZMnC==PJghpsRctvZpPLaX5w@mail.gmail.com>
-Reply-To: Rob.Townley@gmail.com
-From:   Rob Townley <rob.townley@gmail.com>
-Date:   Wed, 27 Nov 2019 23:51:56 -0600
-Message-ID: <CA+VdTb-HTXidfFVmzV2ynJgOGdmb-Ps=j9vQfZ-iZBPFm4RWJg@mail.gmail.com>
-Subject: Re: Data corruption in kernel 5.1+ with iSER attached ramdisk
-To:     Stephen Rust <srust@blockbridge.com>
-Cc:     Ming Lei <ming.lei@redhat.com>, Christoph Hellwig <hch@lst.de>,
-        Jens Axboe <axboe@kernel.dk>, linux-block@vger.kernel.org,
-        linux-rdma@vger.kernel.org, linux-scsi@vger.kernel.org,
-        martin.petersen@oracle.com, target-devel@vger.kernel.org
+References: <201911262053.C6317530@keescook> <00000000000085ce5905984f2c8b@google.com>
+ <201911271124.F01A0B37@keescook>
+In-Reply-To: <201911271124.F01A0B37@keescook>
+From:   Dmitry Vyukov <dvyukov@google.com>
+Date:   Thu, 28 Nov 2019 09:52:03 +0100
+Message-ID: <CACT4Y+aEeUaTQioc85nPXG9GM_ODojdoywNoVEOf5b6yXXU0cg@mail.gmail.com>
+Subject: Re: WARNING in generic_make_request_checks
+To:     Kees Cook <keescook@chromium.org>,
+        syzkaller <syzkaller@googlegroups.com>
+Cc:     syzbot <syzbot+21cfe1f803e0e158acf1@syzkaller.appspotmail.com>,
+        00moses.alexander00@gmail.com, Jens Axboe <axboe@kernel.dk>,
+        Bart Van Assche <bvanassche@acm.org>,
+        Hannes Reinecke <hare@suse.com>,
+        Christoph Hellwig <hch@lst.de>,
+        Ilya Dryomov <idryomov@gmail.com>, joseph.qi@linux.alibaba.com,
+        Johannes Thumshirn <jthumshirn@suse.de>,
+        linux-block <linux-block@vger.kernel.org>,
+        LKML <linux-kernel@vger.kernel.org>,
+        Ming Lei <ming.lei@redhat.com>,
+        Sagi Grimberg <sagi@grimberg.me>,
+        Mike Snitzer <snitzer@redhat.com>,
+        syzkaller-bugs <syzkaller-bugs@googlegroups.com>,
+        Tejun Heo <tj@kernel.org>,
+        Linus Torvalds <torvalds@linux-foundation.org>, wgh@torlan.ru,
+        zkabelac@redhat.com
 Content-Type: text/plain; charset="UTF-8"
 Sender: linux-block-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-Interesting case to follow as there are many types of RamDisks.  The
-common tmpfs kind will use its RAM allocation and all free harddrive
-space.
+On Wed, Nov 27, 2019 at 8:26 PM Kees Cook <keescook@chromium.org> wrote:
+>
+> On Tue, Nov 26, 2019 at 11:45:00PM -0800, syzbot wrote:
+> > Hello,
+> >
+> > syzbot has tested the proposed patch and the reproducer did not trigger
+> > crash:
+> >
+> > Reported-and-tested-by:
+> > syzbot+21cfe1f803e0e158acf1@syzkaller.appspotmail.com
+> >
+> > Tested on:
+> >
+> > commit:         8b2ded1c block: don't warn when doing fsync on read-only d..
+> > git tree:
+> > git://git.kernel.org/pub/scm/linux/kernel/git/torvalds/linux.git
+> > kernel config:  https://syzkaller.appspot.com/x/.config?x=d727e10a28207217
+> > dashboard link: https://syzkaller.appspot.com/bug?extid=21cfe1f803e0e158acf1
+> > compiler:       gcc (GCC) 9.0.0 20181231 (experimental)
+> >
+> > Note: testing is done by a robot and is best-effort only.
+>
+> It seems for successful tests, I still need to tell syzbot that this is
+> fixed?
 
-The ramdisk in CentOS 7 backed by LIO will overflow its size in RAM
-and fill up all remaining free space on spinning platters.  So if the
-RamDisk is 4GB out of 192GB RAM in the lightly used machine. Free
-filesystem space is 16GB.  Writes to the 4GB RamDisk will only error
-out at 21GB when there is no space left on filesystem.
++syzkaller mailing list for syzbot discussion
 
-dd if=/dev/zero of=/dev/iscsiRamDisk
-Will keep writing way past 4GB and not stop till hardrive is full
-which is totally different than normal disks.
+Yes.
+You used a commit. But patch testing may work with raw attached
+patches, or on trees that are not merged, or it may just a trial run
+on HEAD or run with additional debugging only and it may incidentally
+succeed; or may be not incidentally but the patch disables part of
+functionality just to check if it affects the crash or not, but it's
+totally not a fix for the bug.
+Nobody ever figured out how all of this could work; allocate time to
+write a complete proposal for the workflow and implement this.
+So at the moment patch testing functionality is completely unrelated
+to the rest of the workflow. It's a convenience feature.
 
-Wonder what exact kind of RamDisk is in that kernel?
 
-On Wed, Nov 27, 2019 at 10:26 PM Stephen Rust <srust@blockbridge.com> wrote:
+> #syz fix: block: don't warn when doing fsync on read-only devices
 >
-> [Apologies for dup, re-sending without text formatting to lists]
+> --
+> Kees Cook
 >
-> Hi,
->
-> Thanks for your reply.
->
-> I agree it does seem surprising that the git bisect pointed to this
-> particular commit when tracking down this issue.
->
-> > Stephen, could you share us how you setup the ramdisk in your test?
->
-> The ramdisk we export in LIO is a standard "brd" module ramdisk (ie:
-> /dev/ram*). We configure it as a "block" backstore in LIO, not using
-> the built-in LIO ramdisk.
->
-> LIO configuration is as follows:
->
->   o- backstores .......................................................... [...]
->   | o- block .............................................. [Storage Objects: 1]
->   | | o- Blockbridge-952f0334-2535-5fae-9581-6c6524165067
-> [/dev/ram-bb.952f0334-2535-5fae-9581-6c6524165067.cm2 (16.0MiB)
-> write-thru activated]
->   | |   o- alua ............................................... [ALUA Groups: 1]
->   | |     o- default_tg_pt_gp ................... [ALUA state: Active/optimized]
->   | o- fileio ............................................. [Storage Objects: 0]
->   | o- pscsi .............................................. [Storage Objects: 0]
->   | o- ramdisk ............................................ [Storage Objects: 0]
->   o- iscsi ........................................................ [Targets: 1]
->   | o- iqn.2009-12.com.blockbridge:rda:1:952f0334-2535-5fae-9581-6c6524165067:rda
->  [TPGs: 1]
->   |   o- tpg1 ...................................... [no-gen-acls, auth per-acl]
->   |     o- acls ...................................................... [ACLs: 1]
->   |     | o- iqn.1994-05.com.redhat:115ecc56a5c .. [mutual auth, Mapped LUNs: 1]
->   |     |   o- mapped_lun0  [lun0
-> block/Blockbridge-952f0334-2535-5fae-9581-6c6524165067 (rw)]
->   |     o- luns ...................................................... [LUNs: 1]
->   |     | o- lun0
-> [block/Blockbridge-952f0334-2535-5fae-9581-6c6524165067
-> (/dev/ram-bb.952f0334-2535-5fae-9581-6c6524165067.cm2)
-> (default_tg_pt_gp)]
->   |     o- portals ................................................ [Portals: 1]
->   |       o- 0.0.0.0:3260 ............................................... [iser]
->
-> > > > Could you explain a bit what is iSCSI attached with iSER / RDMA? Is the
-> > > > actual transport TCP over RDMA? What is related target driver involved?
->
-> iSER is the iSCSI extension for RDMA, and it is important to note that
-> we have _only_ reproduced this when the writes occur over RDMA, with
-> the target portal in LIO having enabled "iser". The iscsi client
-> (using iscsiadm) connects to the target directly over iSER. We use the
-> Mellanox ConnectX-5 Ethernet NICs (mlx5* module) for this purpose,
-> which utilizes RoCE (RDMA over Converged Ethernet) instead of TCP.
->
-> The identical ramdisk configuration using TCP/IP target in LIO has
-> _not_ reproduced this issue for us.
->
-> > > > /usr/share/bcc/tools/stackcount -K rd_execute_rw
->
-> I installed bcc and used the stackcount tool to trace rd_execute_rw,
-> but I suspect because we are not using the built-in LIO ramdisk this
-> did not catch anything. Are there other function traces we can provide
-> for you?
->
-> Thanks,
-> Steve
+> --
+> You received this message because you are subscribed to the Google Groups "syzkaller-bugs" group.
+> To unsubscribe from this group and stop receiving emails from it, send an email to syzkaller-bugs+unsubscribe@googlegroups.com.
+> To view this discussion on the web visit https://groups.google.com/d/msgid/syzkaller-bugs/201911271124.F01A0B37%40keescook.
