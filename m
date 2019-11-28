@@ -2,292 +2,136 @@ Return-Path: <SRS0=c8VV=ZU=vger.kernel.org=linux-block-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-6.8 required=3.0 tests=DKIMWL_WL_HIGH,DKIM_SIGNED,
-	DKIM_VALID,DKIM_VALID_AU,HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,
-	MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED
-	autolearn=ham autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-0.8 required=3.0 tests=DKIM_SIGNED,DKIM_VALID,
+	DKIM_VALID_AU,HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SPF_HELO_NONE,
+	SPF_PASS autolearn=no autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 82E21C432C3
-	for <linux-block@archiver.kernel.org>; Thu, 28 Nov 2019 13:59:39 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 6E8AAC432C3
+	for <linux-block@archiver.kernel.org>; Thu, 28 Nov 2019 15:00:36 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.kernel.org (Postfix) with ESMTP id 5202D2084D
-	for <linux-block@archiver.kernel.org>; Thu, 28 Nov 2019 13:59:39 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id 45F2521771
+	for <linux-block@archiver.kernel.org>; Thu, 28 Nov 2019 15:00:36 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=pass (1024-bit key) header.d=samsung.com header.i=@samsung.com header.b="dObXyuI7"
+	dkim=pass (1024-bit key) header.d=fb.com header.i=@fb.com header.b="LIvq1oLF";
+	dkim=pass (1024-bit key) header.d=fb.onmicrosoft.com header.i=@fb.onmicrosoft.com header.b="Lt5O9Tia"
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1726496AbfK1N7i (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Thu, 28 Nov 2019 08:59:38 -0500
-Received: from mailout2.samsung.com ([203.254.224.25]:43087 "EHLO
-        mailout2.samsung.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1726520AbfK1N7i (ORCPT
+        id S1726835AbfK1PAf (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Thu, 28 Nov 2019 10:00:35 -0500
+Received: from mx0b-00082601.pphosted.com ([67.231.153.30]:44224 "EHLO
+        mx0a-00082601.pphosted.com" rhost-flags-OK-OK-OK-FAIL)
+        by vger.kernel.org with ESMTP id S1726715AbfK1PAf (ORCPT
         <rfc822;linux-block@vger.kernel.org>);
-        Thu, 28 Nov 2019 08:59:38 -0500
-Received: from epcas5p2.samsung.com (unknown [182.195.41.40])
-        by mailout2.samsung.com (KnoxPortal) with ESMTP id 20191128135935epoutp02a32b2a466011c942fae9778b6ebd145f~bWEtRN5bs2992529925epoutp02J
-        for <linux-block@vger.kernel.org>; Thu, 28 Nov 2019 13:59:35 +0000 (GMT)
-DKIM-Filter: OpenDKIM Filter v2.11.0 mailout2.samsung.com 20191128135935epoutp02a32b2a466011c942fae9778b6ebd145f~bWEtRN5bs2992529925epoutp02J
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=samsung.com;
-        s=mail20170921; t=1574949575;
-        bh=QRyw0lLQtVQOLJHLaBfOinFSbqQnNEXXqAEqLzOVO5g=;
-        h=From:To:Cc:In-Reply-To:Subject:Date:References:From;
-        b=dObXyuI7ef1FgcMMF9S01dV3Og7XKp3VkLHYhc3sPapWcUn2zcAWa+7wNGiAFlIo2
-         jQTvOgsM0d4mRw7vqBSAn5uzHLXQy0upU+REczJjZ9XkrUWDVFAdXWq6EBLR8fqWW0
-         Dg0qALomW1ZfK7yMBx+FNONhEyRObUxWLaQWp0Ys=
-Received: from epsmges5p3new.samsung.com (unknown [182.195.42.75]) by
-        epcas5p2.samsung.com (KnoxPortal) with ESMTP id
-        20191128135933epcas5p2bf2ee973d1d0ccc435f43446487de2c9~bWEsAZErN3228632286epcas5p2M;
-        Thu, 28 Nov 2019 13:59:33 +0000 (GMT)
-Received: from epcas5p3.samsung.com ( [182.195.41.41]) by
-        epsmges5p3new.samsung.com (Symantec Messaging Gateway) with SMTP id
-        15.2F.19629.5C2DFDD5; Thu, 28 Nov 2019 22:59:33 +0900 (KST)
-Received: from epsmtrp1.samsung.com (unknown [182.195.40.13]) by
-        epcas5p1.samsung.com (KnoxPortal) with ESMTPA id
-        20191128135933epcas5p1537a2987cfbd31cbe97c45e2f2268e83~bWErPjGEi0354203542epcas5p12;
-        Thu, 28 Nov 2019 13:59:33 +0000 (GMT)
-Received: from epsmgms1p2new.samsung.com (unknown [182.195.42.42]) by
-        epsmtrp1.samsung.com (KnoxPortal) with ESMTP id
-        20191128135933epsmtrp1f6e58e8c9e56b0ae05fd69484427caf2~bWErOz1zv2878528785epsmtrp1G;
-        Thu, 28 Nov 2019 13:59:33 +0000 (GMT)
-X-AuditID: b6c32a4b-32dff70000014cad-7b-5ddfd2c5c95c
-Received: from epsmtip2.samsung.com ( [182.195.34.31]) by
-        epsmgms1p2new.samsung.com (Symantec Messaging Gateway) with SMTP id
-        7C.57.06569.4C2DFDD5; Thu, 28 Nov 2019 22:59:32 +0900 (KST)
-Received: from alimakhtar02 (unknown [107.111.84.32]) by
-        epsmtip2.samsung.com (KnoxPortal) with ESMTPA id
-        20191128135930epsmtip29a07a267da03acad7434bae7bf992ea7~bWEpFnazX2555125551epsmtip2U;
-        Thu, 28 Nov 2019 13:59:30 +0000 (GMT)
-From:   "Alim Akhtar" <alim.akhtar@samsung.com>
-To:     "'sheebab'" <sheebab@cadence.com>, <avri.altman@wdc.com>,
-        <pedrom.sousa@synopsys.com>, <jejb@linux.ibm.com>,
-        <martin.petersen@oracle.com>, <stanley.chu@mediatek.com>,
-        <beanhuo@micron.com>, <yuehaibing@huawei.com>,
-        <linux-scsi@vger.kernel.org>, <linux-kernel@vger.kernel.org>,
-        <vigneshr@ti.com>, <linux-block@vger.kernel.org>
-Cc:     <rafalc@cadence.com>, <mparab@cadence.com>
-In-Reply-To: <1574147082-22725-3-git-send-email-sheebab@cadence.com>
-Subject: RE: [PATCH RESEND 2/2] scsi: ufs: Update L4 attributes on manual
- hibern8 exit in Cadence UFS.
-Date:   Thu, 28 Nov 2019 19:29:29 +0530
-Message-ID: <0b8f01d5a5f4$0f7a8a70$2e6f9f50$@samsung.com>
-MIME-Version: 1.0
-Content-Transfer-Encoding: 7bit
-X-Mailer: Microsoft Outlook 16.0
-Thread-Index: AQHedmnDsV+0XJYctqc2u08WFWQfYAMqNNbiAjPboCmnZAqHgA==
-Content-Language: en-in
-X-Brightmail-Tracker: H4sIAAAAAAAAA01Se0hTcRjtd+/d3XU4uc6FX0oPVxoWPkKFW5ipCF4qIgpKQtGVFxe5KZuP
-        rMBZZj7J1D9ymNW0hyFYuubSRNPcUEvwRSaZFJr5xApfGK22q+R/53zfOb9zPvhRuGRS4EZd
-        VKVwapU8UUaKCGOHt7dPZ/9YjP/9bj9manWIZN58ySMY/bARY1pG9jMDTRUkU/DBRDJPLH8w
-        5nPPT4LJNi8SjNZwl2Qqn2sx5tHLj4ixvl8QMp8WJ4lQJ7Y2bwZjs9/OCdhifRtis7taCXa5
-        Lpdkf0yMEKyh9RdiLcONGPurfgd7q60AOyk6JwqO5xIvpnFqv5A4kWJ64o8wucv/8mR5jVCL
-        hvbmIwcK6EB4XNovyEciSkI3I/j06iHGk58I9L2tBE+WEBSVjJAblusvjOuLFgTLwzM4T6YR
-        3OutEdhUJO0Dpqoc0raQ0v0YTIxm2e047Qt9s/O4DTvQEaCf//AvkKJcaAWYqznbmKA9wWLS
-        2+Vi+iBUD5ZjPHaGrvJxgn9mJzTOVeB8o12wOvHYniulw+H301Ehr3GFztVCezmgu4Wg+zaA
-        8YYIaGhcWccuMG0xCHnsBlO3c4S2PkBfgsKmAH58DR5VmgkeH4G2wQrCJsFpb6hr8uOjnKBo
-        bRzjnWLIzZHwak+4MT+07nSHOwUFAh6zYF35jhcjD92mw3SbDtNtOkD3P+wBIp6hbVyyRpnA
-        aYKSA1Rcuq9GrtSkqhJ8LyQp65H9++07ZkL1vcfbEU0hmaNYYRiLkQjkaZoMZTsCCpdJxefv
-        /RuJ4+UZVzh1Uqw6NZHTtCN3ipC5iksEQ9ESOkGewl3iuGROvbHFKAc3LbqKWkatPe7jJ/Z7
-        VWUeXHPh3ANKzWlrkZUxgePbpV6ndn9XL2TNCtkmSfFhx2VKa+1O6kxfMhqlUUerqcmtprKz
-        8fqqqRBlcINqSRHkuBwZV+a8J90SYfy66NUX9C62ozbc52bzIBt+xvzaw2qMDdviHfot5HT8
-        Vf2hqGh9ZpiM0CjkB/bhao38L+hV9ip6AwAA
-X-Brightmail-Tracker: H4sIAAAAAAAAA+NgFjrFIsWRmVeSWpSXmKPExsWy7bCSvO6RS/djDb4+tLB4+fMqm8XBh50s
-        FotubGOy2HtL2+LyrjlsFt3Xd7BZLD/+j8ni3ulPLBYtx76yWDRsmcFmMW9DA5PF0q03GS3+
-        n/3AbnHn63MWBz6PNZ2vmTxajrxl9Ziw6ACjR8vJ/Swe39d3sHl8fHqLxWPL/s+MHsdvbGfy
-        +LxJzqP9QDdTAFcUl01Kak5mWWqRvl0CV8arp//YC04aVDyfuZK9gfGqehcjJ4eEgIlE08Zt
-        LF2MXBxCArsZJSa+vMsIkZCWuL5xAjuELSyx8t9zdoiiF4wSs68uBkuwCehK7FjcxgaSEBG4
-        xyRx/9AlFpAEs4CBxKVLn5lBbCGBs4wSizYWgdicAi4Si95dZwKxhQXSJFatWA62jUVAVeL4
-        jkVsIDavgKXEkiszmSBsQYmTM58AzeQAmqkn0baREWK8vMT2t3OYIY5TkPj5dBkriC0i4CTx
-        Z8VddogacYmjP3uYJzAKz0IyaRbCpFlIJs1C0rGAkWUVo2RqQXFuem6xYYFRXmq5XnFibnFp
-        Xrpecn7uJkZwDGtp7WA8cSL+EKMAB6MSD6/ApvuxQqyJZcWVuYcYJTiYlUR4k+YChXhTEiur
-        Uovy44tKc1KLDzFKc7AoifPK5x+LFBJITyxJzU5NLUgtgskycXBKNTAy/vmi2vHWb9I9b8F7
-        G2s8TqfYe6a5zRGI3n/WocHPK13HeW5reZlAl6q5U7PAcusvyYGXVAsi1z3yrzO2nP5d/q/y
-        Gc4jZ4tmPjz0RPlL/9usZbXL3JlDV+v3rZyiELgz7FE7ww/+D7/d6hN077z2aD9rfZLjUtdF
-        vnu3Zro5VN9etW+6rbkSS3FGoqEWc1FxIgAn7zMG3QIAAA==
-X-CMS-MailID: 20191128135933epcas5p1537a2987cfbd31cbe97c45e2f2268e83
-X-Msg-Generator: CA
+        Thu, 28 Nov 2019 10:00:35 -0500
+Received: from pps.filterd (m0001303.ppops.net [127.0.0.1])
+        by m0001303.ppops.net (8.16.0.42/8.16.0.42) with SMTP id xASElZOl027833;
+        Thu, 28 Nov 2019 07:00:31 -0800
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=fb.com; h=from : to : cc : subject
+ : date : message-id : references : in-reply-to : content-type : content-id
+ : content-transfer-encoding : mime-version; s=facebook;
+ bh=oRAp2XlJOXI37qYI7waSGFwMNHGMXT66TP6jzXNe+PQ=;
+ b=LIvq1oLFD1Qg3i4Ez6GVtDNlaowXuTftcnJLdmyJ2slh+SuikwWDvb6MZ0xRgTPzp0F6
+ 5x8EyUiSNVU9tNZGQMrqa/YXrKwZRYZ/rYXBfuL1ckliwjDtEq6Ev4YAcSFp/lbVQrbO
+ Q/LM3gjsD0mtEYJTItNlGTAxBvtIHtuAeBc= 
+Received: from maileast.thefacebook.com ([163.114.130.16])
+        by m0001303.ppops.net with ESMTP id 2wjfhq089v-1
+        (version=TLSv1.2 cipher=ECDHE-RSA-AES128-GCM-SHA256 bits=128 verify=NOT);
+        Thu, 28 Nov 2019 07:00:31 -0800
+Received: from ash-exhub101.TheFacebook.com (2620:10d:c0a8:82::e) by
+ ash-exhub101.TheFacebook.com (2620:10d:c0a8:82::e) with Microsoft SMTP Server
+ (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256) id
+ 15.1.1713.5; Thu, 28 Nov 2019 07:00:31 -0800
+Received: from NAM05-DM3-obe.outbound.protection.outlook.com (100.104.31.183)
+ by o365-in.thefacebook.com (100.104.35.173) with Microsoft SMTP Server
+ (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256) id 15.1.1713.5
+ via Frontend Transport; Thu, 28 Nov 2019 07:00:31 -0800
+ARC-Seal: i=1; a=rsa-sha256; s=arcselector9901; d=microsoft.com; cv=none;
+ b=OY+2h4MWQONRIt3WFmOVfFfz4IpPi/tCI8FJqizazGU4e6O5EGtdxF3DTBCLpXKrGkgz2Dupn9tJ1dD3/pTuKjiDy0bJgJUBJfbKve5Ug7SPkY+NXybMA/jesfGa1VldV+CjEu7kquhi4/sJpi5GtR6BNFXuNQWvLm9LRvlMPF2FAGYd9RzWIyGNg6X14whd3PMbIOWG59JBbwhZFroGpF7eoad6EPKR++ADnGqzxivvJ6FmkNM88mTQUREk8jR9SbIUyTh5DjKXMWOfcvlSFP+tOHgVVm9Qy/KR54r/oafHhErnNNyd/ViCwj/ipdiQ5NwOTbVvYzVGIIMp/56+KA==
+ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com;
+ s=arcselector9901;
+ h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
+ bh=oRAp2XlJOXI37qYI7waSGFwMNHGMXT66TP6jzXNe+PQ=;
+ b=Vm5CBSYAifGxeTMZBoA9MvYW3V4sXO5uknUOZRmI8MKnzP3B3YM3TpnNb5I77kDPrT+/SV/c4ig73NUdQTnY3B7znI4OWIYzmFhzMt07d5xX4CmV3nPkxlX2n+NxSUN8P8LUCgerw7biiPt8qAZTX4E07c/Qv7vTrBXMQrVrSMN5KXKPy+rlI10fEvMPXoob4BBClvRLvQ+EXLxAr9tWauu+i2aDlHaxycjTkYbk4CQNANkKB+h+Yv93i4DR1i34NNf1YHkF0inAud46j4Kt/taDZIBP+Q+G/8qevt8jXzS+lqP20tECZV1dpMohc6flX5ih9M1ehcVosqUd2urgew==
+ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass
+ smtp.mailfrom=fb.com; dmarc=pass action=none header.from=fb.com; dkim=pass
+ header.d=fb.com; arc=none
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=fb.onmicrosoft.com;
+ s=selector2-fb-onmicrosoft-com;
+ h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
+ bh=oRAp2XlJOXI37qYI7waSGFwMNHGMXT66TP6jzXNe+PQ=;
+ b=Lt5O9TiaDcpcJwPrmITXcOwLezfYMjzLSgPvGa9jk4nN83/+bgwxI2rk3iJ4svkyuLCYIuWYVRhLxdAhhWyo57KMhzkvddiZwkOe3mV0VS2DiwBLKJy8uBm4A6IIYYmKr9E7mhUABKIGmrEJ6BULiHu14UU8p/7vpwKIxF8WtIY=
+Received: from BYAPR15MB2790.namprd15.prod.outlook.com (20.179.158.31) by
+ BYAPR15MB3046.namprd15.prod.outlook.com (20.178.238.25) with Microsoft SMTP
+ Server (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
+ 15.20.2474.18; Thu, 28 Nov 2019 15:00:30 +0000
+Received: from BYAPR15MB2790.namprd15.prod.outlook.com
+ ([fe80::1d32:6ae1:9e5d:d82a]) by BYAPR15MB2790.namprd15.prod.outlook.com
+ ([fe80::1d32:6ae1:9e5d:d82a%6]) with mapi id 15.20.2495.014; Thu, 28 Nov 2019
+ 15:00:30 +0000
+From:   Jens Axboe <axboe@fb.com>
+To:     Johannes Thumshirn <jthumshirn@suse.de>
+CC:     Linux Block Layer Mailinglist <linux-block@vger.kernel.org>,
+        io-uring <io-uring@vger.kernel.org>
+Subject: Re: [PATCH liburing] liburing: create an installation target for
+ tests
+Thread-Topic: [PATCH liburing] liburing: create an installation target for
+ tests
+Thread-Index: AQHVpdZN+8X9E8DiIU++RPKAFz2xy6egrXcA
+Date:   Thu, 28 Nov 2019 15:00:29 +0000
+Message-ID: <711e7644-1e65-c1d7-fb13-679e3fce7b6d@fb.com>
+References: <20191128102606.26353-1-jthumshirn@suse.de>
+In-Reply-To: <20191128102606.26353-1-jthumshirn@suse.de>
+Accept-Language: en-US
+Content-Language: en-US
+X-MS-Has-Attach: 
+X-MS-TNEF-Correlator: 
+x-clientproxiedby: BY5PR16CA0008.namprd16.prod.outlook.com
+ (2603:10b6:a03:1a0::21) To BYAPR15MB2790.namprd15.prod.outlook.com
+ (2603:10b6:a03:15a::31)
+x-ms-exchange-messagesentrepresentingtype: 1
+x-originating-ip: [2605:e000:100e:8c61:e01d:21b7:e75a:aa82]
+x-ms-publictraffictype: Email
+x-ms-office365-filtering-correlation-id: 29100136-3586-4a56-cf68-08d77413b5ae
+x-ms-traffictypediagnostic: BYAPR15MB3046:
+x-microsoft-antispam-prvs: <BYAPR15MB304610E7DAB3E57A088C51BAC0470@BYAPR15MB3046.namprd15.prod.outlook.com>
+x-ms-oob-tlc-oobclassifiers: OLM:1247;
+x-forefront-prvs: 0235CBE7D0
+x-forefront-antispam-report: SFV:NSPM;SFS:(10019020)(39860400002)(366004)(396003)(136003)(346002)(376002)(199004)(189003)(186003)(102836004)(86362001)(36756003)(6116002)(5660300002)(6506007)(6436002)(6486002)(76176011)(52116002)(6512007)(6916009)(386003)(53546011)(4744005)(229853002)(54906003)(2906002)(66946007)(316002)(305945005)(7736002)(8936002)(66556008)(64756008)(81156014)(81166006)(66446008)(66476007)(8676002)(4326008)(14454004)(46003)(446003)(2616005)(256004)(31696002)(11346002)(25786009)(71190400001)(478600001)(99286004)(31686004)(71200400001)(6246003);DIR:OUT;SFP:1102;SCL:1;SRVR:BYAPR15MB3046;H:BYAPR15MB2790.namprd15.prod.outlook.com;FPR:;SPF:None;LANG:en;PTR:InfoNoRecords;A:1;MX:1;
+received-spf: None (protection.outlook.com: fb.com does not designate
+ permitted sender hosts)
+x-ms-exchange-senderadcheck: 1
+x-microsoft-antispam: BCL:0;
+x-microsoft-antispam-message-info: FzpbWJKtUGFU9O54wfj4kIzvMEx9KRNENu5dz5q5Gl+E55BMTOZspm4rRSvQxtYirLoiap+2IBhfuNykSIa3H7YRekZJpopdf9Kle1S3T/eL/tnEQgkRIK2+okClMxGc88WULkNw8JpLqy2nG5t/rCrPok2u7zpj1g2Oedhl7qbAQDBj+QwX3NgzDqD6Tgws+yA38mC5QxB/1iilcUrznSuaDvo8LaH4gD/9Ddg+B3S5/329TyEVWWGE3hdaElPJjN7I5OP0NqHHilsLoE3Gc28MF3SkfEzL9a4KMAkzt1fecGg2kp/EQ3fatDlrtiiUiTepMjKabpmZuxT+DL4zeWwX/TdIbAIWj+5GNZKSWnB2aljDRiD8V8dl8l3XhFAsLyzBwwhx2oOuIy+kEjeCawM+6t0D2Hdz09909aiE3+Dq3G3gI3N9NLGiQbcDCP8L
+x-ms-exchange-transport-forked: True
 Content-Type: text/plain; charset="utf-8"
-CMS-TYPE: 105P
-X-CMS-RootMailID: 20191119070557epcas4p1e2ff5e9d4c69f15cb7510ab5277f0391
-References: <1574147082-22725-1-git-send-email-sheebab@cadence.com>
-        <CGME20191119070557epcas4p1e2ff5e9d4c69f15cb7510ab5277f0391@epcas4p1.samsung.com>
-        <1574147082-22725-3-git-send-email-sheebab@cadence.com>
+Content-ID: <F4C2F98AD74A0240BEA8C7C3A202CD4D@namprd15.prod.outlook.com>
+Content-Transfer-Encoding: base64
+MIME-Version: 1.0
+X-MS-Exchange-CrossTenant-Network-Message-Id: 29100136-3586-4a56-cf68-08d77413b5ae
+X-MS-Exchange-CrossTenant-originalarrivaltime: 28 Nov 2019 15:00:30.0166
+ (UTC)
+X-MS-Exchange-CrossTenant-fromentityheader: Hosted
+X-MS-Exchange-CrossTenant-id: 8ae927fe-1255-47a7-a2af-5f3a069daaa2
+X-MS-Exchange-CrossTenant-mailboxtype: HOSTED
+X-MS-Exchange-CrossTenant-userprincipalname: BH5kGQzarjOohmVlw7is/COwuILshqFbVuNdNKSP+xRPRVVnU+vLT+hlNepZcXoZ
+X-MS-Exchange-Transport-CrossTenantHeadersStamped: BYAPR15MB3046
+X-OriginatorOrg: fb.com
+X-Proofpoint-Virus-Version: vendor=fsecure engine=2.50.10434:6.0.95,18.0.572
+ definitions=2019-11-28_03:2019-11-28,2019-11-28 signatures=0
+X-Proofpoint-Spam-Details: rule=fb_default_notspam policy=fb_default score=0 priorityscore=1501
+ lowpriorityscore=0 malwarescore=0 mlxscore=0 impostorscore=0 bulkscore=0
+ suspectscore=0 spamscore=0 clxscore=1011 mlxlogscore=977 adultscore=0
+ phishscore=0 classifier=spam adjust=0 reason=mlx scancount=1
+ engine=8.12.0-1910280000 definitions=main-1911280128
+X-FB-Internal: deliver
 Sender: linux-block-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-
-
-> -----Original Message-----
-> From: sheebab <sheebab@cadence.com>
-> Sent: 19 November 2019 12:35
-> To: alim.akhtar@samsung.com; avri.altman@wdc.com;
-> pedrom.sousa@synopsys.com; jejb@linux.ibm.com;
-> martin.petersen@oracle.com; stanley.chu@mediatek.com;
-> beanhuo@micron.com; yuehaibing@huawei.com; linux-scsi@vger.kernel.org;
-> linux-kernel@vger.kernel.org; vigneshr@ti.com; linux-block@vger.kernel.org
-> Cc: rafalc@cadence.com; mparab@cadence.com; sheebab
-> <sheebab@cadence.com>
-> Subject: [PATCH RESEND 2/2] scsi: ufs: Update L4 attributes on manual
-hibern8
-> exit in Cadence UFS.
-> 
-> Backup L4 attributes duirng manual hibern8 entry and restore the L4
-attributes
-> on manual hibern8 exit as per JESD220C.
-> 
-> Signed-off-by: sheebab <sheebab@cadence.com>
-> ---
-Reviewed-by: Alim Akhtar <alim.akhtar@samsung.com>
-
->  drivers/scsi/ufs/cdns-pltfrm.c | 97
-> +++++++++++++++++++++++++++++++++++++++++-
->  1 file changed, 95 insertions(+), 2 deletions(-)
-> 
-> diff --git a/drivers/scsi/ufs/cdns-pltfrm.c
-b/drivers/scsi/ufs/cdns-pltfrm.c index
-> adbbd60..5510567 100644
-> --- a/drivers/scsi/ufs/cdns-pltfrm.c
-> +++ b/drivers/scsi/ufs/cdns-pltfrm.c
-> @@ -19,6 +19,14 @@
-> 
->  #define CDNS_UFS_REG_HCLKDIV	0xFC
->  #define CDNS_UFS_REG_PHY_XCFGD1	0x113C
-> +#define CDNS_UFS_MAX 12
-> +
-> +struct cdns_ufs_host {
-> +	/**
-> +	 * cdns_ufs_dme_attr_val - for storing L4 attributes
-> +	 */
-> +	u32 cdns_ufs_dme_attr_val[CDNS_UFS_MAX];
-> +};
-> 
->  /**
->   * cdns_ufs_enable_intr - enable interrupts @@ -47,6 +55,77 @@ static
-void
-> cdns_ufs_disable_intr(struct ufs_hba *hba, u32 intrs)  }
-> 
->  /**
-> + * cdns_ufs_get_l4_attr - get L4 attributes on local side
-> + * @hba: per adapter instance
-> + *
-> + */
-> +static void cdns_ufs_get_l4_attr(struct ufs_hba *hba) {
-> +	struct cdns_ufs_host *host = ufshcd_get_variant(hba);
-> +
-> +	ufshcd_dme_get(hba, UIC_ARG_MIB(T_PEERDEVICEID),
-> +		       &host->cdns_ufs_dme_attr_val[0]);
-> +	ufshcd_dme_get(hba, UIC_ARG_MIB(T_PEERCPORTID),
-> +		       &host->cdns_ufs_dme_attr_val[1]);
-> +	ufshcd_dme_get(hba, UIC_ARG_MIB(T_TRAFFICCLASS),
-> +		       &host->cdns_ufs_dme_attr_val[2]);
-> +	ufshcd_dme_get(hba, UIC_ARG_MIB(T_PROTOCOLID),
-> +		       &host->cdns_ufs_dme_attr_val[3]);
-> +	ufshcd_dme_get(hba, UIC_ARG_MIB(T_CPORTFLAGS),
-> +		       &host->cdns_ufs_dme_attr_val[4]);
-> +	ufshcd_dme_get(hba, UIC_ARG_MIB(T_TXTOKENVALUE),
-> +		       &host->cdns_ufs_dme_attr_val[5]);
-> +	ufshcd_dme_get(hba, UIC_ARG_MIB(T_RXTOKENVALUE),
-> +		       &host->cdns_ufs_dme_attr_val[6]);
-> +	ufshcd_dme_get(hba, UIC_ARG_MIB(T_LOCALBUFFERSPACE),
-> +		       &host->cdns_ufs_dme_attr_val[7]);
-> +	ufshcd_dme_get(hba, UIC_ARG_MIB(T_PEERBUFFERSPACE),
-> +		       &host->cdns_ufs_dme_attr_val[8]);
-> +	ufshcd_dme_get(hba, UIC_ARG_MIB(T_CREDITSTOSEND),
-> +		       &host->cdns_ufs_dme_attr_val[9]);
-> +	ufshcd_dme_get(hba, UIC_ARG_MIB(T_CPORTMODE),
-> +		       &host->cdns_ufs_dme_attr_val[10]);
-> +	ufshcd_dme_get(hba, UIC_ARG_MIB(T_CONNECTIONSTATE),
-> +		       &host->cdns_ufs_dme_attr_val[11]);
-> +}
-> +
-> +/**
-> + * cdns_ufs_set_l4_attr - set L4 attributes on local side
-> + * @hba: per adapter instance
-> + *
-> + */
-> +static void cdns_ufs_set_l4_attr(struct ufs_hba *hba) {
-> +	struct cdns_ufs_host *host = ufshcd_get_variant(hba);
-> +
-> +	ufshcd_dme_set(hba, UIC_ARG_MIB(T_CONNECTIONSTATE), 0);
-> +	ufshcd_dme_set(hba, UIC_ARG_MIB(T_PEERDEVICEID),
-> +		       host->cdns_ufs_dme_attr_val[0]);
-> +	ufshcd_dme_set(hba, UIC_ARG_MIB(T_PEERCPORTID),
-> +		       host->cdns_ufs_dme_attr_val[1]);
-> +	ufshcd_dme_set(hba, UIC_ARG_MIB(T_TRAFFICCLASS),
-> +		       host->cdns_ufs_dme_attr_val[2]);
-> +	ufshcd_dme_set(hba, UIC_ARG_MIB(T_PROTOCOLID),
-> +		       host->cdns_ufs_dme_attr_val[3]);
-> +	ufshcd_dme_set(hba, UIC_ARG_MIB(T_CPORTFLAGS),
-> +		       host->cdns_ufs_dme_attr_val[4]);
-> +	ufshcd_dme_set(hba, UIC_ARG_MIB(T_TXTOKENVALUE),
-> +		       host->cdns_ufs_dme_attr_val[5]);
-> +	ufshcd_dme_set(hba, UIC_ARG_MIB(T_RXTOKENVALUE),
-> +		       host->cdns_ufs_dme_attr_val[6]);
-> +	ufshcd_dme_set(hba, UIC_ARG_MIB(T_LOCALBUFFERSPACE),
-> +		       host->cdns_ufs_dme_attr_val[7]);
-> +	ufshcd_dme_set(hba, UIC_ARG_MIB(T_PEERBUFFERSPACE),
-> +		       host->cdns_ufs_dme_attr_val[8]);
-> +	ufshcd_dme_set(hba, UIC_ARG_MIB(T_CREDITSTOSEND),
-> +		       host->cdns_ufs_dme_attr_val[9]);
-> +	ufshcd_dme_set(hba, UIC_ARG_MIB(T_CPORTMODE),
-> +		       host->cdns_ufs_dme_attr_val[10]);
-> +	ufshcd_dme_set(hba, UIC_ARG_MIB(T_CONNECTIONSTATE),
-> +		       host->cdns_ufs_dme_attr_val[11]); }
-> +
-> +/**
->   * Sets HCLKDIV register value based on the core_clk
->   * @hba: host controller instance
->   *
-> @@ -134,6 +213,7 @@ static void cdns_ufs_hibern8_notify(struct ufs_hba
-> *hba, enum uic_cmd_dme cmd,
->  		 * before manual hibernate entry.
->  		 */
->  		cdns_ufs_enable_intr(hba, UFSHCD_UIC_HIBERN8_MASK);
-> +		cdns_ufs_get_l4_attr(hba);
->  	}
->  	if (status == POST_CHANGE && cmd == UIC_CMD_DME_HIBER_EXIT) {
->  		/**
-> @@ -141,6 +221,7 @@ static void cdns_ufs_hibern8_notify(struct ufs_hba
-> *hba, enum uic_cmd_dme cmd,
->  		 * after manual hibern8 exit.
->  		 */
->  		cdns_ufs_disable_intr(hba, UFSHCD_UIC_HIBERN8_MASK);
-> +		cdns_ufs_set_l4_attr(hba);
->  	}
->  }
-> 
-> @@ -245,15 +326,27 @@ static int cdns_ufs_pltfrm_probe(struct
-> platform_device *pdev)
->  	const struct of_device_id *of_id;
->  	struct ufs_hba_variant_ops *vops;
->  	struct device *dev = &pdev->dev;
-> +	struct cdns_ufs_host *host;
-> +	struct ufs_hba *hba;
-> 
->  	of_id = of_match_node(cdns_ufs_of_match, dev->of_node);
->  	vops = (struct ufs_hba_variant_ops *)of_id->data;
-> 
->  	/* Perform generic probe */
->  	err = ufshcd_pltfrm_init(pdev, vops);
-> -	if (err)
-> +	if (err) {
->  		dev_err(dev, "ufshcd_pltfrm_init() failed %d\n", err);
-> -
-> +		goto out;
-> +	}
-> +	host = devm_kzalloc(dev, sizeof(*host), GFP_KERNEL);
-> +	if (!host) {
-> +		err = -ENOMEM;
-> +		dev_err(dev, "%s: no memory for cdns host\n", __func__);
-> +		goto out;
-> +	}
-> +	hba =  platform_get_drvdata(pdev);
-> +	ufshcd_set_variant(hba, host);
-> +out:
->  	return err;
->  }
-> 
-> --
-> 2.7.4
-
-
+T24gMTEvMjgvMTkgMjoyNiBBTSwgSm9oYW5uZXMgVGh1bXNoaXJuIHdyb3RlOg0KPiBDcmVhdGUg
+YW4gaW5zdGFsbGF0aW9uIHRhcmdldCBmb3IgbGlidXJpbmcncyByZWdyZXNzZW4gdGVzdCBzdWl0
+ZS4NCiAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgIF5eXl5e
+Xl5eXg0KcmVncmVzc2lvbiwgd2lsbCBmaXggaXQgdXAuDQoNCkFwcGxpZWQsIHRoYW5rcy4gQlRX
+LCBpby11cmluZ0B2Z2VyLmtlcm5lbC5vcmcgaXMgdGhlIGlvX3VyaW5nIG1haWxpbmcNCmxpc3Qu
+IFNpbmNlIGl0IGhhcyBub3RoaW5nIHRvIGRvIHdpdGggbGludXgtYmxvY2ssIEkndmUgc3RvcHBl
+ZCB1c2luZw0KdGhhdCBsaXN0Lg0KDQotLSANCkplbnMgQXhib2UNCg0K
