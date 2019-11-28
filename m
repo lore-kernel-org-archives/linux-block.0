@@ -2,181 +2,92 @@ Return-Path: <SRS0=c8VV=ZU=vger.kernel.org=linux-block-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-2.4 required=3.0 tests=DKIMWL_WL_HIGH,DKIM_SIGNED,
-	DKIM_VALID,DKIM_VALID_AU,HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,
-	SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED,USER_AGENT_SANE_1 autolearn=no
+X-Spam-Status: No, score=-2.2 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
+	MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,USER_AGENT_SANE_1 autolearn=no
 	autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 4AACBC432C0
-	for <linux-block@archiver.kernel.org>; Thu, 28 Nov 2019 09:12:30 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 143E6C432C0
+	for <linux-block@archiver.kernel.org>; Thu, 28 Nov 2019 09:29:25 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.kernel.org (Postfix) with ESMTP id 1FB6A21781
-	for <linux-block@archiver.kernel.org>; Thu, 28 Nov 2019 09:12:30 +0000 (UTC)
-Authentication-Results: mail.kernel.org;
-	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="TEfFTirE"
+	by mail.kernel.org (Postfix) with ESMTP id D936C216F4
+	for <linux-block@archiver.kernel.org>; Thu, 28 Nov 2019 09:29:24 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1726227AbfK1JM3 (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Thu, 28 Nov 2019 04:12:29 -0500
-Received: from us-smtp-2.mimecast.com ([205.139.110.61]:47461 "EHLO
-        us-smtp-delivery-1.mimecast.com" rhost-flags-OK-OK-OK-FAIL)
-        by vger.kernel.org with ESMTP id S1725789AbfK1JM3 (ORCPT
-        <rfc822;linux-block@vger.kernel.org>);
-        Thu, 28 Nov 2019 04:12:29 -0500
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-        s=mimecast20190719; t=1574932347;
-        h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-         to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-         content-transfer-encoding:content-transfer-encoding:
-         in-reply-to:in-reply-to:references:references;
-        bh=93nTBfXZSHlR8+dS6GNm1bAKHx8uhAYoz9B1bYNCDvo=;
-        b=TEfFTirEiSy7wANdrWvjr1OhuRqxST1T5Qb1X2hDGBxQXCmzQFQxwfPrZONKGPRpgUbm+1
-        H/85hwiSqyCBAc1mu7P+IGacVJ7cbgp6jAD5WY6xqGMo7Y5Vh5mn/OOWKQZ/Ka8OvEzQHn
-        0RAYWKJPdfM/gEWy2h8A9bwyvJgwdCM=
-Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
- [209.132.183.4]) (Using TLS) by relay.mimecast.com with ESMTP id
- us-mta-404-rBL7dYfcNgmQmzjigss6Gg-1; Thu, 28 Nov 2019 04:12:25 -0500
-Received: from smtp.corp.redhat.com (int-mx03.intmail.prod.int.phx2.redhat.com [10.5.11.13])
-        (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
-        (No client certificate requested)
-        by mimecast-mx01.redhat.com (Postfix) with ESMTPS id 5E65B593A0;
-        Thu, 28 Nov 2019 09:12:24 +0000 (UTC)
-Received: from ming.t460p (ovpn-8-17.pek2.redhat.com [10.72.8.17])
-        by smtp.corp.redhat.com (Postfix) with ESMTPS id 499746084E;
-        Thu, 28 Nov 2019 09:12:15 +0000 (UTC)
-Date:   Thu, 28 Nov 2019 17:12:10 +0800
-From:   Ming Lei <ming.lei@redhat.com>
-To:     Stephen Rust <srust@blockbridge.com>
-Cc:     Rob Townley <rob.townley@gmail.com>,
-        Christoph Hellwig <hch@lst.de>, Jens Axboe <axboe@kernel.dk>,
-        linux-block@vger.kernel.org, linux-rdma@vger.kernel.org,
-        linux-scsi@vger.kernel.org, martin.petersen@oracle.com,
-        target-devel@vger.kernel.org
-Subject: Re: Data corruption in kernel 5.1+ with iSER attached ramdisk
-Message-ID: <20191128091210.GC15549@ming.t460p>
-References: <CAAFE1bd9wuuobpe4VK7Ty175j7mWT+kRmHCNhVD+6R8MWEAqmw@mail.gmail.com>
- <20191128015748.GA3277@ming.t460p>
- <CA+VdTb_-CGaPjKUQteKVFSGqDz-5o-tuRRkJYqt8B9iOQypiwQ@mail.gmail.com>
- <20191128025822.GC3277@ming.t460p>
- <CAAFE1bfsXsKGyw7SU_z4NanT+wmtuJT=XejBYbHHMCDQwm73sw@mail.gmail.com>
+        id S1726634AbfK1J3Y (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Thu, 28 Nov 2019 04:29:24 -0500
+Received: from lhrrgout.huawei.com ([185.176.76.210]:2132 "EHLO huawei.com"
+        rhost-flags-OK-OK-OK-FAIL) by vger.kernel.org with ESMTP
+        id S1726510AbfK1J3Y (ORCPT <rfc822;linux-block@vger.kernel.org>);
+        Thu, 28 Nov 2019 04:29:24 -0500
+Received: from LHREML711-CAH.china.huawei.com (unknown [172.18.7.107])
+        by Forcepoint Email with ESMTP id D7C18A2E1CFE1374C5DE;
+        Thu, 28 Nov 2019 09:29:22 +0000 (GMT)
+Received: from lhreml724-chm.china.huawei.com (10.201.108.75) by
+ LHREML711-CAH.china.huawei.com (10.201.108.34) with Microsoft SMTP Server
+ (TLS) id 14.3.408.0; Thu, 28 Nov 2019 09:29:22 +0000
+Received: from [127.0.0.1] (10.202.226.46) by lhreml724-chm.china.huawei.com
+ (10.201.108.75) with Microsoft SMTP Server (version=TLS1_2,
+ cipher=TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256) id 15.1.1713.5; Thu, 28 Nov
+ 2019 09:29:22 +0000
+Subject: Re: [PATCH V4 3/5] blk-mq: stop to handle IO and drain IO before hctx
+ becomes dead
+To:     Ming Lei <ming.lei@redhat.com>, Jens Axboe <axboe@kernel.dk>
+CC:     <linux-block@vger.kernel.org>,
+        Bart Van Assche <bvanassche@acm.org>,
+        Hannes Reinecke <hare@suse.com>,
+        Christoph Hellwig <hch@lst.de>,
+        "Thomas Gleixner" <tglx@linutronix.de>,
+        Keith Busch <keith.busch@intel.com>,
+        chenxiang <chenxiang66@hisilicon.com>
+References: <20191014015043.25029-1-ming.lei@redhat.com>
+ <20191014015043.25029-4-ming.lei@redhat.com>
+From:   John Garry <john.garry@huawei.com>
+Message-ID: <849aea76-755f-f06d-3927-13c35b7720cd@huawei.com>
+Date:   Thu, 28 Nov 2019 09:29:21 +0000
+User-Agent: Mozilla/5.0 (Windows NT 10.0; WOW64; rv:68.0) Gecko/20100101
+ Thunderbird/68.1.2
 MIME-Version: 1.0
-In-Reply-To: <CAAFE1bfsXsKGyw7SU_z4NanT+wmtuJT=XejBYbHHMCDQwm73sw@mail.gmail.com>
-User-Agent: Mutt/1.12.1 (2019-06-15)
-X-Scanned-By: MIMEDefang 2.79 on 10.5.11.13
-X-MC-Unique: rBL7dYfcNgmQmzjigss6Gg-1
-X-Mimecast-Spam-Score: 0
-Content-Type: text/plain; charset=us-ascii
-Content-Transfer-Encoding: quoted-printable
-Content-Disposition: inline
+In-Reply-To: <20191014015043.25029-4-ming.lei@redhat.com>
+Content-Type: text/plain; charset="utf-8"; format=flowed
+Content-Language: en-US
+Content-Transfer-Encoding: 7bit
+X-Originating-IP: [10.202.226.46]
+X-ClientProxiedBy: lhreml720-chm.china.huawei.com (10.201.108.71) To
+ lhreml724-chm.china.huawei.com (10.201.108.75)
+X-CFilter-Loop: Reflected
 Sender: linux-block-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-On Wed, Nov 27, 2019 at 11:14:46PM -0500, Stephen Rust wrote:
-> Hi,
->=20
-> Thanks for your reply.
->=20
-> I agree it does seem surprising that the git bisect pointed to this
-> particular commit when tracking down this issue.
->=20
-> The ramdisk we export in LIO is a standard "brd" module ramdisk (ie:
-> /dev/ram*). We configure it as a "block" backstore in LIO, not using the
-> built-in LIO ramdisk.
+On 14/10/2019 02:50, Ming Lei wrote:
+> 		break;
+> +		msleep(5);
+> +	}
+> +}
+> +
+>   static int blk_mq_hctx_notify_online(unsigned int cpu, struct hlist_node *node)
+>   {
+> +	struct blk_mq_hw_ctx *hctx = hlist_entry_safe(node,
+> +			struct blk_mq_hw_ctx, cpuhp_online);
+> +
+> +	if ((cpumask_next_and(-1, hctx->cpumask, cpu_online_mask) == cpu) &&
+> +	    (cpumask_next_and(cpu, hctx->cpumask, cpu_online_mask) >=
+> +	     nr_cpu_ids)) {
+> +		set_bit(BLK_MQ_S_INTERNAL_STOPPED, &hctx->state);
+> +		blk_mq_hctx_drain_inflight_rqs(hctx);
 
-Then it isn't strange any more, since iblock code uses bio interface.
+Hi Ming,
 
->=20
-> LIO configuration is as follows:
->=20
->   o- backstores .........................................................=
-.
-> [...]
->   | o- block .............................................. [Storage
-> Objects: 1]
->   | | o- Blockbridge-952f0334-2535-5fae-9581-6c6524165067
->  [/dev/ram-bb.952f0334-2535-5fae-9581-6c6524165067.cm2 (16.0MiB) write-th=
-ru
-> activated]
->   | |   o- alua ............................................... [ALUA
-> Groups: 1]
->   | |     o- default_tg_pt_gp ................... [ALUA state:
-> Active/optimized]
->   | o- fileio ............................................. [Storage
-> Objects: 0]
->   | o- pscsi .............................................. [Storage
-> Objects: 0]
->   | o- ramdisk ............................................ [Storage
-> Objects: 0]
->   o- iscsi ........................................................
-> [Targets: 1]
->   | o-
-> iqn.2009-12.com.blockbridge:rda:1:952f0334-2535-5fae-9581-6c6524165067:rd=
-a
->  [TPGs: 1]
->   |   o- tpg1 ...................................... [no-gen-acls, auth
-> per-acl]
->   |     o- acls ......................................................
-> [ACLs: 1]
->   |     | o- iqn.1994-05.com.redhat:115ecc56a5c .. [mutual auth, Mapped
-> LUNs: 1]
->   |     |   o- mapped_lun0  [lun0
-> block/Blockbridge-952f0334-2535-5fae-9581-6c6524165067 (rw)]
->   |     o- luns ......................................................
-> [LUNs: 1]
->   |     | o- lun0  [block/Blockbridge-952f0334-2535-5fae-9581-6c652416506=
-7
-> (/dev/ram-bb.952f0334-2535-5fae-9581-6c6524165067.cm2) (default_tg_pt_gp)=
-]
->   |     o- portals ................................................
-> [Portals: 1]
->   |       o- 0.0.0.0:3260 ...............................................
-> [iser]
->=20
->=20
-> iSER is the iSCSI extension for RDMA, and it is important to note that we
-> have _only_ reproduced this when the writes occur over RDMA, with the
-> target portal in LIO having enabled "iser". The iscsi client (using
-> iscsiadm) connects to the target directly over iSER. We use the Mellanox
-> ConnectX-5 Ethernet NICs (mlx5* module) for this purpose, which utilizes
-> RoCE (RDMA over Converged Ethernet) instead of TCP.
+> +        }
 
-I may get one machine with Mellanox NIC, is it easy to setup & reproduce
-just in the local machine(both host and target are setup on same machine)?
+This goes a bit beyond a nit: The indentation needs to be fixed here.
 
->=20
-> The identical ramdisk configuration using TCP/IP target in LIO has _not_
-> reproduced this issue for us.
+Thanks,
+John
 
-Yeah, I just tried iblock over brd, and can't reproduce it.
-
->=20
-> I installed bcc and used the stackcount tool to trace rd_execute_rw, but =
-I
-> suspect because we are not using the built-in LIO ramdisk this did not
-> catch anything. Are there other function traces we can provide for you?
-
-Please try to trace bio_add_page() a bit via 'bpftrace ./ilo.bt'.
-
-[root@ktest-01 func]# cat ilo.bt
-kprobe:iblock_execute_rw
-{
-    @start[tid]=3D1;
-}
-
-kretprobe:iblock_execute_rw
-{
-    @start[tid]=3D0;
-}
-
-kprobe:bio_add_page
-/@start[tid]/
-{
-  printf("%d %d\n", arg2, arg3);
-}
-
-
-
-Thanks,=20
-Ming
+>   	return 0;
+>   }
+>   
+> @@ -2246,6 +2284,8 @@ static int blk_mq_hctx_notify_dead(unsigned int cpu, struct hlist_node *node)
+>   	ctx
 
