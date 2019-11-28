@@ -2,120 +2,83 @@ Return-Path: <SRS0=c8VV=ZU=vger.kernel.org=linux-block-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-0.8 required=3.0 tests=DKIMWL_WL_HIGH,DKIM_SIGNED,
-	DKIM_VALID,DKIM_VALID_AU,HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,
-	SPF_HELO_NONE,SPF_PASS,UNPARSEABLE_RELAY autolearn=no autolearn_force=no
+X-Spam-Status: No, score=-9.7 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
+	INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,
+	URIBL_BLOCKED,USER_AGENT_GIT autolearn=unavailable autolearn_force=no
 	version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id C6A82C432C0
-	for <linux-block@archiver.kernel.org>; Thu, 28 Nov 2019 12:17:02 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 76B36C432C3
+	for <linux-block@archiver.kernel.org>; Thu, 28 Nov 2019 12:30:06 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.kernel.org (Postfix) with ESMTP id 986BB217C3
-	for <linux-block@archiver.kernel.org>; Thu, 28 Nov 2019 12:17:02 +0000 (UTC)
-Authentication-Results: mail.kernel.org;
-	dkim=pass (2048-bit key) header.d=oracle.com header.i=@oracle.com header.b="U899dvbj"
+	by mail.kernel.org (Postfix) with ESMTP id 5704B2176D
+	for <linux-block@archiver.kernel.org>; Thu, 28 Nov 2019 12:30:06 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1726383AbfK1MRC (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Thu, 28 Nov 2019 07:17:02 -0500
-Received: from aserp2120.oracle.com ([141.146.126.78]:57640 "EHLO
-        aserp2120.oracle.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1726227AbfK1MRC (ORCPT
+        id S1726252AbfK1MaC (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Thu, 28 Nov 2019 07:30:02 -0500
+Received: from youngberry.canonical.com ([91.189.89.112]:42533 "EHLO
+        youngberry.canonical.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S1726227AbfK1MaC (ORCPT
         <rfc822;linux-block@vger.kernel.org>);
-        Thu, 28 Nov 2019 07:17:02 -0500
-Received: from pps.filterd (aserp2120.oracle.com [127.0.0.1])
-        by aserp2120.oracle.com (8.16.0.27/8.16.0.27) with SMTP id xASCEURn041078;
-        Thu, 28 Nov 2019 12:15:20 GMT
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=oracle.com; h=to : cc : subject :
- from : references : date : in-reply-to : message-id : mime-version :
- content-type; s=corp-2019-08-05;
- bh=K23tF4ZOTDK2mqDQjS6SPO2vyRMwZ30j/1NOK4W0JhU=;
- b=U899dvbj2nf503rUrhC7bjlnabTEc8CnGq3kxTbIN9FQZZ7PaHselctxJP0PdlYJaLh1
- MtUr7y3iYlfnHUUoy7vW84HeRpysuJAHISh6hp36cHyPZ8CrfKPoUBbZerKOHfreJwJl
- 7UyhVeXac0Z2hHde+5XqVvg+llnJGS44sBpSHGrgmhKkhT/zKgScPs5ijVSg3N9rSZEt
- 0MpHQyi4PugxpNgdpMGeUxSXJyw4X+sETczYGhlCdIvjimklQs6DGtd17fc/S8IXirJi
- TkpL89TnxKaDyZDfgmvkf9es+AiGbWfo8LmUTCQ6BreW71hxMJ8MdO+fmzWmLT2jn2tT Pg== 
-Received: from userp3030.oracle.com (userp3030.oracle.com [156.151.31.80])
-        by aserp2120.oracle.com with ESMTP id 2wevqqkbnc-1
-        (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=OK);
-        Thu, 28 Nov 2019 12:15:20 +0000
-Received: from pps.filterd (userp3030.oracle.com [127.0.0.1])
-        by userp3030.oracle.com (8.16.0.27/8.16.0.27) with SMTP id xASCEOYE100925;
-        Thu, 28 Nov 2019 12:15:19 GMT
-Received: from userv0121.oracle.com (userv0121.oracle.com [156.151.31.72])
-        by userp3030.oracle.com with ESMTP id 2why49ykr4-1
-        (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=OK);
-        Thu, 28 Nov 2019 12:15:19 +0000
-Received: from abhmp0015.oracle.com (abhmp0015.oracle.com [141.146.116.21])
-        by userv0121.oracle.com (8.14.4/8.13.8) with ESMTP id xASCFD2B023073;
-        Thu, 28 Nov 2019 12:15:14 GMT
-Received: from ca-mkp.ca.oracle.com (/10.159.214.123)
-        by default (Oracle Beehive Gateway v4.0)
-        with ESMTP ; Thu, 28 Nov 2019 04:15:12 -0800
-To:     Christoph Hellwig <hch@infradead.org>
-Cc:     Hannes Reinecke <hare@suse.de>, Arnd Bergmann <arnd@arndb.de>,
-        "\(Exiting\) Baolin Wang" <baolin.wang@linaro.org>,
-        Baolin Wang <baolin.wang7@gmail.com>,
-        Adrian Hunter <adrian.hunter@intel.com>,
-        Ulf Hansson <ulf.hansson@linaro.org>, asutoshd@codeaurora.org,
-        Orson Zhai <orsonzhai@gmail.com>,
-        Lyra Zhang <zhang.lyra@gmail.com>,
-        Linus Walleij <linus.walleij@linaro.org>,
-        Vincent Guittot <vincent.guittot@linaro.org>,
-        linux-mmc <linux-mmc@vger.kernel.org>,
-        "linux-kernel\@vger.kernel.org" <linux-kernel@vger.kernel.org>,
-        Hannes Reinecke <hare@suse.com>,
-        linux-block <linux-block@vger.kernel.org>,
-        Paolo Valente <paolo.valente@linaro.org>
-Subject: Re: [PATCH v6 0/4] Add MMC software queue support
-From:   "Martin K. Petersen" <martin.petersen@oracle.com>
-Organization: Oracle Corporation
-References: <cover.1573456283.git.baolin.wang@linaro.org>
-        <CAK8P3a1we9D5C2NOBww=cW-4L1PT3t0NnDRmknLwiLm652TmKg@mail.gmail.com>
-        <CAMz4kuK9HEuGdhNqHO_qoy9jD=ccsPPhD_dKYwNRgQyWyYwqRA@mail.gmail.com>
-        <CAK8P3a0rNhyxmUWLUV1js3FsuAESDOPX3E4b8ActtL4GRT4uTA@mail.gmail.com>
-        <CADBw62pzV+5ZXBEbFvTQJ9essAd4cd7Xkz5j9AXB5rAQy0wLqA@mail.gmail.com>
-        <CAMz4kuK_3q4JY1vNXe6zGHDNF8Ep-SkcUq6Z25r790VSz4+Bjw@mail.gmail.com>
-        <CAK8P3a11vJb1riYseqPnF_5SuJA+YnYuGwC0XWx6_rk+eQ0Bmw@mail.gmail.com>
-        <f88856aa-9175-2a93-3747-c98215cb79c3@suse.de>
-        <20191127090023.GA23040@infradead.org>
-Date:   Thu, 28 Nov 2019 07:15:09 -0500
-In-Reply-To: <20191127090023.GA23040@infradead.org> (Christoph Hellwig's
-        message of "Wed, 27 Nov 2019 01:00:23 -0800")
-Message-ID: <yq1v9r46vua.fsf@oracle.com>
-User-Agent: Gnus/5.13 (Gnus v5.13) Emacs/26.1.92 (gnu/linux)
+        Thu, 28 Nov 2019 07:30:02 -0500
+Received: from 1.general.cking.uk.vpn ([10.172.193.212] helo=localhost)
+        by youngberry.canonical.com with esmtpsa (TLS1.2:ECDHE_RSA_AES_128_GCM_SHA256:128)
+        (Exim 4.86_2)
+        (envelope-from <colin.king@canonical.com>)
+        id 1iaIvn-0006Kj-A3; Thu, 28 Nov 2019 12:29:59 +0000
+From:   Colin King <colin.king@canonical.com>
+To:     Minchan Kim <minchan@kernel.org>, Nitin Gupta <ngupta@vflare.org>,
+        Sergey Senozhatsky <sergey.senozhatsky@gmail.com>,
+        Jens Axboe <axboe@kernel.dk>, linux-kernel@vger.kernel.org
+Cc:     kernel-janitors@vger.kernel.org, linux-block@vger.kernel.org
+Subject: [PATCH] zram: fix error return codes not being returned in writeback_store
+Date:   Thu, 28 Nov 2019 12:29:58 +0000
+Message-Id: <20191128122958.178290-1-colin.king@canonical.com>
+X-Mailer: git-send-email 2.24.0
 MIME-Version: 1.0
-Content-Type: text/plain
-X-Proofpoint-Virus-Version: vendor=nai engine=6000 definitions=9454 signatures=668685
-X-Proofpoint-Spam-Details: rule=notspam policy=default score=0 suspectscore=0 malwarescore=0
- phishscore=0 bulkscore=0 spamscore=0 mlxscore=0 mlxlogscore=949
- adultscore=0 classifier=spam adjust=0 reason=mlx scancount=1
- engine=8.0.1-1911140001 definitions=main-1911280108
-X-Proofpoint-Virus-Version: vendor=nai engine=6000 definitions=9454 signatures=668685
-X-Proofpoint-Spam-Details: rule=notspam policy=default score=0 priorityscore=1501 malwarescore=0
- suspectscore=0 phishscore=0 bulkscore=0 spamscore=0 clxscore=1011
- lowpriorityscore=0 mlxscore=0 impostorscore=0 mlxlogscore=999 adultscore=0
- classifier=spam adjust=0 reason=mlx scancount=1 engine=8.0.1-1911140001
- definitions=main-1911280108
+Content-Type: text/plain; charset="utf-8"
+Content-Transfer-Encoding: 8bit
 Sender: linux-block-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
+From: Colin Ian King <colin.king@canonical.com>
 
-Christoph,
+Currently when an error code -EIO or -ENOSPC in the for-loop of
+writeback_store the error code is being overwritten by a ret = len
+assignment at the end of the function and the error codes are being
+lost.  Fix this by assigning ret = len at the start of the function
+and remove the assignment from the end, hence allowing ret to be
+preserved when error codes are assigned to it.
 
-> equivalent to SCSI logical units and nvme namespace, just with a
-> pretty idiotic design decision that only allows I/O to one of them at
-> a time.  The block layer way to deal with them is to use a shared
-> tagset for multiple request queues, which doesn't use up a whole lot
-> of resources.  The only hard part is the draining when switching
-> between partitions, and there is no really nice way to deal with that.
-> If requests are batched enough we could just drain and switch every
-> time an other partition access comes in.
+Addresses-Coverity: ("Unused value")
+Fixes: a939888ec38b ("zram: support idle/huge page writeback")
+Signed-off-by: Colin Ian King <colin.king@canonical.com>
+---
+ drivers/block/zram/zram_drv.c | 3 +--
+ 1 file changed, 1 insertion(+), 2 deletions(-)
 
-This mirrors single_lun in SCSI closely. I was hoping we could
-eventually get rid of that travesty but if MMC needs something similar,
-maybe it would be good to move that plumbing to block?
-
+diff --git a/drivers/block/zram/zram_drv.c b/drivers/block/zram/zram_drv.c
+index 4285e75e52c3..1bf4a908a0bd 100644
+--- a/drivers/block/zram/zram_drv.c
++++ b/drivers/block/zram/zram_drv.c
+@@ -626,7 +626,7 @@ static ssize_t writeback_store(struct device *dev,
+ 	struct bio bio;
+ 	struct bio_vec bio_vec;
+ 	struct page *page;
+-	ssize_t ret;
++	ssize_t ret = len;
+ 	int mode;
+ 	unsigned long blk_idx = 0;
+ 
+@@ -762,7 +762,6 @@ static ssize_t writeback_store(struct device *dev,
+ 
+ 	if (blk_idx)
+ 		free_block_bdev(zram, blk_idx);
+-	ret = len;
+ 	__free_page(page);
+ release_init_lock:
+ 	up_read(&zram->init_lock);
 -- 
-Martin K. Petersen	Oracle Linux Engineering
+2.24.0
+
