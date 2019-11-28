@@ -2,133 +2,181 @@ Return-Path: <SRS0=c8VV=ZU=vger.kernel.org=linux-block-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-13.3 required=3.0 tests=DKIMWL_WL_MED,DKIM_SIGNED,
+X-Spam-Status: No, score=-2.4 required=3.0 tests=DKIMWL_WL_HIGH,DKIM_SIGNED,
 	DKIM_VALID,DKIM_VALID_AU,HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,
-	MENTIONS_GIT_HOSTING,SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED,USER_IN_DEF_DKIM_WL
-	autolearn=unavailable autolearn_force=no version=3.4.0
+	SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED,USER_AGENT_SANE_1 autolearn=no
+	autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id BB760C432C3
-	for <linux-block@archiver.kernel.org>; Thu, 28 Nov 2019 08:59:48 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 4AACBC432C0
+	for <linux-block@archiver.kernel.org>; Thu, 28 Nov 2019 09:12:30 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.kernel.org (Postfix) with ESMTP id 8D7DF21775
-	for <linux-block@archiver.kernel.org>; Thu, 28 Nov 2019 08:59:48 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id 1FB6A21781
+	for <linux-block@archiver.kernel.org>; Thu, 28 Nov 2019 09:12:30 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="SqLbd+9o"
+	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="TEfFTirE"
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1727184AbfK1I7r (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Thu, 28 Nov 2019 03:59:47 -0500
-Received: from mail-qk1-f195.google.com ([209.85.222.195]:46860 "EHLO
-        mail-qk1-f195.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1726656AbfK1I7r (ORCPT
+        id S1726227AbfK1JM3 (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Thu, 28 Nov 2019 04:12:29 -0500
+Received: from us-smtp-2.mimecast.com ([205.139.110.61]:47461 "EHLO
+        us-smtp-delivery-1.mimecast.com" rhost-flags-OK-OK-OK-FAIL)
+        by vger.kernel.org with ESMTP id S1725789AbfK1JM3 (ORCPT
         <rfc822;linux-block@vger.kernel.org>);
-        Thu, 28 Nov 2019 03:59:47 -0500
-Received: by mail-qk1-f195.google.com with SMTP id f5so3720816qkm.13
-        for <linux-block@vger.kernel.org>; Thu, 28 Nov 2019 00:59:47 -0800 (PST)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=google.com; s=20161025;
-        h=mime-version:references:in-reply-to:from:date:message-id:subject:to
-         :cc;
-        bh=wZDOmo+mPfnPdaN//xLxORxFeLKUGqLr+J7G6xlCcv0=;
-        b=SqLbd+9oTES7vGoU6eGRMkOpdFNV40HLc8s+9TAEtizxbar9kUpZ2tYAOwvaCY1zJ+
-         h2RoTvo57zIm/phFl00V8pNUu++Ie3H2YdWs5duONa6ZKlqZcd3g5I+xw9BtKTc+uUCg
-         mkSzYl/52v0L6ZFbszaSXtmAE+0/SOnzVv8g/2TvaZz1fGjnWDca/ilGBsMv/qxl8KSL
-         xQAZnM9roykuNy0O/hXzxcFl4RG9lANGbs8Syy6W6Bf5a02XsRcE9w5/+oZcjCQaB01w
-         hwiQPa9y/o5RMKSE8pPl9j5Evo2S4Nyk5RdMnwDFqxg8avw58AnnFNmJXvs343DJaTt9
-         oMtw==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20161025;
-        h=x-gm-message-state:mime-version:references:in-reply-to:from:date
-         :message-id:subject:to:cc;
-        bh=wZDOmo+mPfnPdaN//xLxORxFeLKUGqLr+J7G6xlCcv0=;
-        b=jskyhgIoDNMiXr4l9h4pDykD/mf3WgJVen6Wli7FseCeWOVUJNF99kFwDTxUU7Xmgx
-         ZTmDEjDvA+zh7f3gAoUvriGW4dHFlByXRLS/l84NkspTkFtMOLUrW4JplVabGGRyZ8cQ
-         U4omA+wEnVwcRJ5t04ZsNNPlNKL42+jkw+QX49dHeUEmnV1l6J6IgC3hlmdb+j5Q+kko
-         4405pL8c3AGbC3FGoR299Bz0scXK+KT8K8V8/Sd2hHkhCO8ZNy7T3dNKVpr9JN7uRvjR
-         iSQUII9olMek+rbRLeuYYAkN8w7U14H5kQew0JtfnN2wtKP/3vbzEjKT3Ch4MIOHUsu3
-         ZBXA==
-X-Gm-Message-State: APjAAAXBefV6gPmGSk669uEKpwQznBXcb6mLP8I8lUkI4JEkcslKOjtq
-        QjJJ4KMfoZcrSoZ00WVNKx7Y4t3rFxpiO7M9lSBf5d5i
-X-Google-Smtp-Source: APXvYqxQ8DtLmeAzs+5VWeB2Gdz5ZzKRF7gLOdRvhy2DWqwJIHm23YKNcX22+xkzBrqhwZiFwlBokOtLC2TXudHDan0=
-X-Received: by 2002:a37:e312:: with SMTP id y18mr5456024qki.250.1574931134398;
- Thu, 28 Nov 2019 00:52:14 -0800 (PST)
+        Thu, 28 Nov 2019 04:12:29 -0500
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+        s=mimecast20190719; t=1574932347;
+        h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+         to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+         content-transfer-encoding:content-transfer-encoding:
+         in-reply-to:in-reply-to:references:references;
+        bh=93nTBfXZSHlR8+dS6GNm1bAKHx8uhAYoz9B1bYNCDvo=;
+        b=TEfFTirEiSy7wANdrWvjr1OhuRqxST1T5Qb1X2hDGBxQXCmzQFQxwfPrZONKGPRpgUbm+1
+        H/85hwiSqyCBAc1mu7P+IGacVJ7cbgp6jAD5WY6xqGMo7Y5Vh5mn/OOWKQZ/Ka8OvEzQHn
+        0RAYWKJPdfM/gEWy2h8A9bwyvJgwdCM=
+Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
+ [209.132.183.4]) (Using TLS) by relay.mimecast.com with ESMTP id
+ us-mta-404-rBL7dYfcNgmQmzjigss6Gg-1; Thu, 28 Nov 2019 04:12:25 -0500
+Received: from smtp.corp.redhat.com (int-mx03.intmail.prod.int.phx2.redhat.com [10.5.11.13])
+        (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
+        (No client certificate requested)
+        by mimecast-mx01.redhat.com (Postfix) with ESMTPS id 5E65B593A0;
+        Thu, 28 Nov 2019 09:12:24 +0000 (UTC)
+Received: from ming.t460p (ovpn-8-17.pek2.redhat.com [10.72.8.17])
+        by smtp.corp.redhat.com (Postfix) with ESMTPS id 499746084E;
+        Thu, 28 Nov 2019 09:12:15 +0000 (UTC)
+Date:   Thu, 28 Nov 2019 17:12:10 +0800
+From:   Ming Lei <ming.lei@redhat.com>
+To:     Stephen Rust <srust@blockbridge.com>
+Cc:     Rob Townley <rob.townley@gmail.com>,
+        Christoph Hellwig <hch@lst.de>, Jens Axboe <axboe@kernel.dk>,
+        linux-block@vger.kernel.org, linux-rdma@vger.kernel.org,
+        linux-scsi@vger.kernel.org, martin.petersen@oracle.com,
+        target-devel@vger.kernel.org
+Subject: Re: Data corruption in kernel 5.1+ with iSER attached ramdisk
+Message-ID: <20191128091210.GC15549@ming.t460p>
+References: <CAAFE1bd9wuuobpe4VK7Ty175j7mWT+kRmHCNhVD+6R8MWEAqmw@mail.gmail.com>
+ <20191128015748.GA3277@ming.t460p>
+ <CA+VdTb_-CGaPjKUQteKVFSGqDz-5o-tuRRkJYqt8B9iOQypiwQ@mail.gmail.com>
+ <20191128025822.GC3277@ming.t460p>
+ <CAAFE1bfsXsKGyw7SU_z4NanT+wmtuJT=XejBYbHHMCDQwm73sw@mail.gmail.com>
 MIME-Version: 1.0
-References: <201911262053.C6317530@keescook> <00000000000085ce5905984f2c8b@google.com>
- <201911271124.F01A0B37@keescook>
-In-Reply-To: <201911271124.F01A0B37@keescook>
-From:   Dmitry Vyukov <dvyukov@google.com>
-Date:   Thu, 28 Nov 2019 09:52:03 +0100
-Message-ID: <CACT4Y+aEeUaTQioc85nPXG9GM_ODojdoywNoVEOf5b6yXXU0cg@mail.gmail.com>
-Subject: Re: WARNING in generic_make_request_checks
-To:     Kees Cook <keescook@chromium.org>,
-        syzkaller <syzkaller@googlegroups.com>
-Cc:     syzbot <syzbot+21cfe1f803e0e158acf1@syzkaller.appspotmail.com>,
-        00moses.alexander00@gmail.com, Jens Axboe <axboe@kernel.dk>,
-        Bart Van Assche <bvanassche@acm.org>,
-        Hannes Reinecke <hare@suse.com>,
-        Christoph Hellwig <hch@lst.de>,
-        Ilya Dryomov <idryomov@gmail.com>, joseph.qi@linux.alibaba.com,
-        Johannes Thumshirn <jthumshirn@suse.de>,
-        linux-block <linux-block@vger.kernel.org>,
-        LKML <linux-kernel@vger.kernel.org>,
-        Ming Lei <ming.lei@redhat.com>,
-        Sagi Grimberg <sagi@grimberg.me>,
-        Mike Snitzer <snitzer@redhat.com>,
-        syzkaller-bugs <syzkaller-bugs@googlegroups.com>,
-        Tejun Heo <tj@kernel.org>,
-        Linus Torvalds <torvalds@linux-foundation.org>, wgh@torlan.ru,
-        zkabelac@redhat.com
-Content-Type: text/plain; charset="UTF-8"
+In-Reply-To: <CAAFE1bfsXsKGyw7SU_z4NanT+wmtuJT=XejBYbHHMCDQwm73sw@mail.gmail.com>
+User-Agent: Mutt/1.12.1 (2019-06-15)
+X-Scanned-By: MIMEDefang 2.79 on 10.5.11.13
+X-MC-Unique: rBL7dYfcNgmQmzjigss6Gg-1
+X-Mimecast-Spam-Score: 0
+Content-Type: text/plain; charset=us-ascii
+Content-Transfer-Encoding: quoted-printable
+Content-Disposition: inline
 Sender: linux-block-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-On Wed, Nov 27, 2019 at 8:26 PM Kees Cook <keescook@chromium.org> wrote:
->
-> On Tue, Nov 26, 2019 at 11:45:00PM -0800, syzbot wrote:
-> > Hello,
-> >
-> > syzbot has tested the proposed patch and the reproducer did not trigger
-> > crash:
-> >
-> > Reported-and-tested-by:
-> > syzbot+21cfe1f803e0e158acf1@syzkaller.appspotmail.com
-> >
-> > Tested on:
-> >
-> > commit:         8b2ded1c block: don't warn when doing fsync on read-only d..
-> > git tree:
-> > git://git.kernel.org/pub/scm/linux/kernel/git/torvalds/linux.git
-> > kernel config:  https://syzkaller.appspot.com/x/.config?x=d727e10a28207217
-> > dashboard link: https://syzkaller.appspot.com/bug?extid=21cfe1f803e0e158acf1
-> > compiler:       gcc (GCC) 9.0.0 20181231 (experimental)
-> >
-> > Note: testing is done by a robot and is best-effort only.
->
-> It seems for successful tests, I still need to tell syzbot that this is
-> fixed?
+On Wed, Nov 27, 2019 at 11:14:46PM -0500, Stephen Rust wrote:
+> Hi,
+>=20
+> Thanks for your reply.
+>=20
+> I agree it does seem surprising that the git bisect pointed to this
+> particular commit when tracking down this issue.
+>=20
+> The ramdisk we export in LIO is a standard "brd" module ramdisk (ie:
+> /dev/ram*). We configure it as a "block" backstore in LIO, not using the
+> built-in LIO ramdisk.
 
-+syzkaller mailing list for syzbot discussion
+Then it isn't strange any more, since iblock code uses bio interface.
 
-Yes.
-You used a commit. But patch testing may work with raw attached
-patches, or on trees that are not merged, or it may just a trial run
-on HEAD or run with additional debugging only and it may incidentally
-succeed; or may be not incidentally but the patch disables part of
-functionality just to check if it affects the crash or not, but it's
-totally not a fix for the bug.
-Nobody ever figured out how all of this could work; allocate time to
-write a complete proposal for the workflow and implement this.
-So at the moment patch testing functionality is completely unrelated
-to the rest of the workflow. It's a convenience feature.
+>=20
+> LIO configuration is as follows:
+>=20
+>   o- backstores .........................................................=
+.
+> [...]
+>   | o- block .............................................. [Storage
+> Objects: 1]
+>   | | o- Blockbridge-952f0334-2535-5fae-9581-6c6524165067
+>  [/dev/ram-bb.952f0334-2535-5fae-9581-6c6524165067.cm2 (16.0MiB) write-th=
+ru
+> activated]
+>   | |   o- alua ............................................... [ALUA
+> Groups: 1]
+>   | |     o- default_tg_pt_gp ................... [ALUA state:
+> Active/optimized]
+>   | o- fileio ............................................. [Storage
+> Objects: 0]
+>   | o- pscsi .............................................. [Storage
+> Objects: 0]
+>   | o- ramdisk ............................................ [Storage
+> Objects: 0]
+>   o- iscsi ........................................................
+> [Targets: 1]
+>   | o-
+> iqn.2009-12.com.blockbridge:rda:1:952f0334-2535-5fae-9581-6c6524165067:rd=
+a
+>  [TPGs: 1]
+>   |   o- tpg1 ...................................... [no-gen-acls, auth
+> per-acl]
+>   |     o- acls ......................................................
+> [ACLs: 1]
+>   |     | o- iqn.1994-05.com.redhat:115ecc56a5c .. [mutual auth, Mapped
+> LUNs: 1]
+>   |     |   o- mapped_lun0  [lun0
+> block/Blockbridge-952f0334-2535-5fae-9581-6c6524165067 (rw)]
+>   |     o- luns ......................................................
+> [LUNs: 1]
+>   |     | o- lun0  [block/Blockbridge-952f0334-2535-5fae-9581-6c652416506=
+7
+> (/dev/ram-bb.952f0334-2535-5fae-9581-6c6524165067.cm2) (default_tg_pt_gp)=
+]
+>   |     o- portals ................................................
+> [Portals: 1]
+>   |       o- 0.0.0.0:3260 ...............................................
+> [iser]
+>=20
+>=20
+> iSER is the iSCSI extension for RDMA, and it is important to note that we
+> have _only_ reproduced this when the writes occur over RDMA, with the
+> target portal in LIO having enabled "iser". The iscsi client (using
+> iscsiadm) connects to the target directly over iSER. We use the Mellanox
+> ConnectX-5 Ethernet NICs (mlx5* module) for this purpose, which utilizes
+> RoCE (RDMA over Converged Ethernet) instead of TCP.
+
+I may get one machine with Mellanox NIC, is it easy to setup & reproduce
+just in the local machine(both host and target are setup on same machine)?
+
+>=20
+> The identical ramdisk configuration using TCP/IP target in LIO has _not_
+> reproduced this issue for us.
+
+Yeah, I just tried iblock over brd, and can't reproduce it.
+
+>=20
+> I installed bcc and used the stackcount tool to trace rd_execute_rw, but =
+I
+> suspect because we are not using the built-in LIO ramdisk this did not
+> catch anything. Are there other function traces we can provide for you?
+
+Please try to trace bio_add_page() a bit via 'bpftrace ./ilo.bt'.
+
+[root@ktest-01 func]# cat ilo.bt
+kprobe:iblock_execute_rw
+{
+    @start[tid]=3D1;
+}
+
+kretprobe:iblock_execute_rw
+{
+    @start[tid]=3D0;
+}
+
+kprobe:bio_add_page
+/@start[tid]/
+{
+  printf("%d %d\n", arg2, arg3);
+}
 
 
-> #syz fix: block: don't warn when doing fsync on read-only devices
->
-> --
-> Kees Cook
->
-> --
-> You received this message because you are subscribed to the Google Groups "syzkaller-bugs" group.
-> To unsubscribe from this group and stop receiving emails from it, send an email to syzkaller-bugs+unsubscribe@googlegroups.com.
-> To view this discussion on the web visit https://groups.google.com/d/msgid/syzkaller-bugs/201911271124.F01A0B37%40keescook.
+
+Thanks,=20
+Ming
+
