@@ -2,136 +2,175 @@ Return-Path: <SRS0=c8VV=ZU=vger.kernel.org=linux-block-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-2.2 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
-	MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED,USER_AGENT_SANE_1
-	autolearn=no autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-2.4 required=3.0 tests=DKIMWL_WL_HIGH,DKIM_SIGNED,
+	DKIM_VALID,DKIM_VALID_AU,HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,
+	SPF_HELO_NONE,SPF_PASS,USER_AGENT_SANE_1 autolearn=no autolearn_force=no
+	version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 6EA26C432C0
-	for <linux-block@archiver.kernel.org>; Thu, 28 Nov 2019 01:09:31 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 039F8C432C3
+	for <linux-block@archiver.kernel.org>; Thu, 28 Nov 2019 01:58:08 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.kernel.org (Postfix) with ESMTP id 42FB32158A
-	for <linux-block@archiver.kernel.org>; Thu, 28 Nov 2019 01:09:31 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id D020D215E5
+	for <linux-block@archiver.kernel.org>; Thu, 28 Nov 2019 01:58:07 +0000 (UTC)
+Authentication-Results: mail.kernel.org;
+	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="eYeBj+OG"
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1727146AbfK1BJa (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Wed, 27 Nov 2019 20:09:30 -0500
-Received: from szxga07-in.huawei.com ([45.249.212.35]:40264 "EHLO huawei.com"
-        rhost-flags-OK-OK-OK-FAIL) by vger.kernel.org with ESMTP
-        id S1727088AbfK1BJa (ORCPT <rfc822;linux-block@vger.kernel.org>);
-        Wed, 27 Nov 2019 20:09:30 -0500
-Received: from DGGEMS402-HUB.china.huawei.com (unknown [172.30.72.59])
-        by Forcepoint Email with ESMTP id DA17E9765A0C8A35A9DA;
-        Thu, 28 Nov 2019 09:09:26 +0800 (CST)
-Received: from [127.0.0.1] (10.74.219.194) by DGGEMS402-HUB.china.huawei.com
- (10.3.19.202) with Microsoft SMTP Server id 14.3.439.0; Thu, 28 Nov 2019
- 09:09:13 +0800
-Subject: Re: [PATCH V4 0/5] blk-mq: improvement on handling IO during CPU
- hotplug
-To:     Ming Lei <ming.lei@redhat.com>, Jens Axboe <axboe@kernel.dk>
-References: <20191014015043.25029-1-ming.lei@redhat.com>
-CC:     <linux-block@vger.kernel.org>, John Garry <john.garry@huawei.com>,
-        "Bart Van Assche" <bvanassche@acm.org>,
-        Hannes Reinecke <hare@suse.com>,
-        "Christoph Hellwig" <hch@lst.de>,
-        Thomas Gleixner <tglx@linutronix.de>,
-        Keith Busch <keith.busch@intel.com>
-From:   "chenxiang (M)" <chenxiang66@hisilicon.com>
-Message-ID: <b3d90798-484f-09f5-a22f-f3ed3701f0d4@hisilicon.com>
-Date:   Thu, 28 Nov 2019 09:09:13 +0800
-User-Agent: Mozilla/5.0 (Windows NT 6.1; WOW64; rv:45.0) Gecko/20100101
- Thunderbird/45.2.0
+        id S1727830AbfK1B6H (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Wed, 27 Nov 2019 20:58:07 -0500
+Received: from us-smtp-1.mimecast.com ([207.211.31.81]:41945 "EHLO
+        us-smtp-delivery-1.mimecast.com" rhost-flags-OK-OK-OK-FAIL)
+        by vger.kernel.org with ESMTP id S1728407AbfK1B6G (ORCPT
+        <rfc822;linux-block@vger.kernel.org>);
+        Wed, 27 Nov 2019 20:58:06 -0500
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+        s=mimecast20190719; t=1574906285;
+        h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+         to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+         content-transfer-encoding:content-transfer-encoding:
+         in-reply-to:in-reply-to:references:references;
+        bh=LUPnElubbjlD82TJXHwII0/MHT1qGprga5eaeNVe8gs=;
+        b=eYeBj+OG58ZV95vSxM214yqhFiLV9TtYecabBByJxv5QW8JtdzZ5l9SlZNGM1j88dzwcVD
+        jCEMqNQgP9B6vvuBVrvh12QzUyT+aWIhtNyZ5XkXyDvpEqAzUT9qezLrMUVKg5ODtDBTT3
+        MsrnqhS2kt5X+QNj4s1FTDxVoME9Dng=
+Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
+ [209.132.183.4]) (Using TLS) by relay.mimecast.com with ESMTP id
+ us-mta-337-VuG1VY16PqKZA6xGxTG0wQ-1; Wed, 27 Nov 2019 20:58:02 -0500
+Received: from smtp.corp.redhat.com (int-mx07.intmail.prod.int.phx2.redhat.com [10.5.11.22])
+        (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
+        (No client certificate requested)
+        by mimecast-mx01.redhat.com (Postfix) with ESMTPS id 6983F800D41;
+        Thu, 28 Nov 2019 01:58:00 +0000 (UTC)
+Received: from ming.t460p (ovpn-8-21.pek2.redhat.com [10.72.8.21])
+        by smtp.corp.redhat.com (Postfix) with ESMTPS id 3E80E10018FF;
+        Thu, 28 Nov 2019 01:57:52 +0000 (UTC)
+Date:   Thu, 28 Nov 2019 09:57:48 +0800
+From:   Ming Lei <ming.lei@redhat.com>
+To:     Stephen Rust <srust@blockbridge.com>
+Cc:     Jens Axboe <axboe@kernel.dk>, Christoph Hellwig <hch@lst.de>,
+        linux-block@vger.kernel.org, linux-rdma@vger.kernel.org,
+        linux-scsi@vger.kernel.org, target-devel@vger.kernel.org,
+        martin.petersen@oracle.com
+Subject: Re: Data corruption in kernel 5.1+ with iSER attached ramdisk
+Message-ID: <20191128015748.GA3277@ming.t460p>
+References: <CAAFE1bd9wuuobpe4VK7Ty175j7mWT+kRmHCNhVD+6R8MWEAqmw@mail.gmail.com>
 MIME-Version: 1.0
-In-Reply-To: <20191014015043.25029-1-ming.lei@redhat.com>
-Content-Type: text/plain; charset="UTF-8"; format=flowed
-Content-Transfer-Encoding: 8bit
-X-Originating-IP: [10.74.219.194]
-X-CFilter-Loop: Reflected
+In-Reply-To: <CAAFE1bd9wuuobpe4VK7Ty175j7mWT+kRmHCNhVD+6R8MWEAqmw@mail.gmail.com>
+User-Agent: Mutt/1.12.1 (2019-06-15)
+X-Scanned-By: MIMEDefang 2.84 on 10.5.11.22
+X-MC-Unique: VuG1VY16PqKZA6xGxTG0wQ-1
+X-Mimecast-Spam-Score: 0
+Content-Type: text/plain; charset=utf-8
+Content-Transfer-Encoding: quoted-printable
+Content-Disposition: inline
 Sender: linux-block-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-Hi,
+Hello,
 
-在 2019/10/14 9:50, Ming Lei 写道:
+On Wed, Nov 27, 2019 at 02:38:42PM -0500, Stephen Rust wrote:
 > Hi,
->
-> Thomas mentioned:
->      "
->       That was the constraint of managed interrupts from the very beginning:
->      
->        The driver/subsystem has to quiesce the interrupt line and the associated
->        queue _before_ it gets shutdown in CPU unplug and not fiddle with it
->        until it's restarted by the core when the CPU is plugged in again.
->      "
->
-> But no drivers or blk-mq do that before one hctx becomes dead(all
-> CPUs for one hctx are offline), and even it is worse, blk-mq stills tries
-> to run hw queue after hctx is dead, see blk_mq_hctx_notify_dead().
->
-> This patchset tries to address the issue by two stages:
->
-> 1) add one new cpuhp state of CPUHP_AP_BLK_MQ_ONLINE
->
-> - mark the hctx as internal stopped, and drain all in-flight requests
-> if the hctx is going to be dead.
->
-> 2) re-submit IO in the state of CPUHP_BLK_MQ_DEAD after the hctx becomes dead
->
-> - steal bios from the request, and resubmit them via generic_make_request(),
-> then these IO will be mapped to other live hctx for dispatch
->
-> Please comment & review, thanks!
->
-> John, I don't add your tested-by tag since V3 have some changes,
-> and I appreciate if you may run your test on V3.
+>=20
+> We recently began testing 5.4 in preparation for migration from 4.14. One
+> of our tests found reproducible data corruption in 5.x kernels. The test
+> consists of a few basic single-issue writes to an iSER attached ramdisk.
+> The writes are subsequently verified with single-issue reads. We tracked
+> the corruption down using git bisect. The issue appears to have started i=
+n
+> 5.1 with the following commit:
+>=20
+> 3d75ca0adef4280650c6690a0c4702a74a6f3c95 block: introduce multi-page bvec
+> helpers
+>=20
+> We wanted to bring this to your attention. A reproducer and the git bisec=
+t
+> data follows below.
+>=20
+> Our setup consists of two systems: A ramdisk exported in a LIO target fro=
+m
+> host A, iSCSI attached with iSER / RDMA from host B. Specific writes to t=
+he
 
-I tested those patchset with John's testcase, except dump_stack() in 
-function __blk_mq_run_hw_queue() sometimes occurs  which don't
-affect the function, it solves the CPU hotplug issue, so add tested-by 
-for those patchset:
+Could you explain a bit what is iSCSI attached with iSER / RDMA? Is the
+actual transport TCP over RDMA? What is related target driver involved?
 
-Tested-by: Xiang Chen <chenxiang66@hisilicon.com>
+> very end of the attached disk on B result in incorrect data being written
+> to the remote disk. The writes appear to complete successfully on the
+> client. We=E2=80=99ve also verified that the correct data is being sent o=
+ver the
+> network by tracing the RDMA flow. For reference, the tests were conducted
+> on x86_64 Intel Skylake systems with Mellanox ConnectX5 NICs.
 
->
-> V4:
-> 	- resubmit IOs in dispatch list in case that this hctx is dead
->
-> V3:
-> 	- re-organize patch 2 & 3 a bit for addressing Hannes's comment
-> 	- fix patch 4 for avoiding potential deadlock, as found by Hannes
->
-> V2:
-> 	- patch4 & patch 5 in V1 have been merged to block tree, so remove
-> 	  them
-> 	- address comments from John Garry and Minwoo
->
->
->
-> Ming Lei (5):
->    blk-mq: add new state of BLK_MQ_S_INTERNAL_STOPPED
->    blk-mq: prepare for draining IO when hctx's all CPUs are offline
->    blk-mq: stop to handle IO and drain IO before hctx becomes dead
->    blk-mq: re-submit IO in case that hctx is dead
->    blk-mq: handle requests dispatched from IO scheduler in case that hctx
->      is dead
->
->   block/blk-mq-debugfs.c     |   2 +
->   block/blk-mq-tag.c         |   2 +-
->   block/blk-mq-tag.h         |   2 +
->   block/blk-mq.c             | 137 ++++++++++++++++++++++++++++++++++---
->   block/blk-mq.h             |   3 +-
->   drivers/block/loop.c       |   2 +-
->   drivers/md/dm-rq.c         |   2 +-
->   include/linux/blk-mq.h     |   5 ++
->   include/linux/cpuhotplug.h |   1 +
->   9 files changed, 141 insertions(+), 15 deletions(-)
->
-> Cc: John Garry <john.garry@huawei.com>
-> Cc: Bart Van Assche <bvanassche@acm.org>
-> Cc: Hannes Reinecke <hare@suse.com>
-> Cc: Christoph Hellwig <hch@lst.de>
-> Cc: Thomas Gleixner <tglx@linutronix.de>
-> Cc: Keith Busch <keith.busch@intel.com>
->
+If I understand correctly, LIO ramdisk doesn't generate any IO to block
+stack, see rd_execute_rw(), and the ramdisk should be one big/long
+pre-allocated sgl, see rd_build_device_space().
 
+Seems very strange, given no bvec/bio is involved in this code
+path from iscsi_target_rx_thread to rd_execute_rw. So far I have no idea
+how commit 3d75ca0adef428065 causes this issue, because that patch
+only changes bvec/bio related code.
+
+>=20
+> The issue appears to lie on the target host side. The initiator kernel
+> version does not appear to play a role. The target host exhibits the issu=
+e
+> when running kernel version 5.1+.
+>=20
+> To reproduce, given attached sda on client host B, write data at the end =
+of
+> the device:
+>=20
+>=20
+> SIZE=3D$(blockdev --getsize64 /dev/sda)
+>=20
+> SEEK=3D$((( $SIZE - 512 )))
+>=20
+> # initialize device and seed data
+>=20
+> dd if=3D/dev/zero of=3D/dev/sda bs=3D512 count=3D1 seek=3D$SEEK oflag=3Ds=
+eek_bytes
+> oflag=3Ddirect
+>=20
+> dd if=3D/dev/urandom of=3D/tmp/random bs=3D512 count=3D1 oflag=3Ddirect
+>=20
+>=20
+> # write the random data (note: not direct)
+>=20
+> dd if=3D/tmp/random of=3D/dev/sda bs=3D512 count=3D1 seek=3D$SEEK oflag=
+=3Dseek_bytes
+>=20
+>=20
+> # verify the data was written
+>=20
+> dd if=3D/dev/sda of=3D/tmp/verify bs=3D512 count=3D1 skip=3D$SEEK iflag=
+=3Dskip_bytes
+> iflag=3Ddirect
+>=20
+> hexdump -xv /tmp/random > /tmp/random.hex
+>=20
+> hexdump -xv /tmp/verify > /tmp/verify.hex
+>=20
+> diff -u /tmp/random.hex /tmp/verify.hex
+
+I just setup one LIO for exporting ramdisk(2G) via iscsi, and run the
+above test via iscsi HBA, still can't reproduce the issue.
+
+> # first bad commit: [3d75ca0adef4280650c6690a0c4702a74a6f3c95] block:
+> introduce multi-page bvec helpers
+>=20
+>=20
+> Please advise. We have cycles and systems to help track down the issue. L=
+et
+> me know how best to assist.
+
+Could you install bcc and start to collect the following trace on target si=
+de
+before you run the above test in host side?
+
+/usr/share/bcc/tools/stackcount -K rd_execute_rw
+
+
+Thanks,
+Ming
 
