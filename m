@@ -2,144 +2,196 @@ Return-Path: <SRS0=kXjy=ZV=vger.kernel.org=linux-block-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-2.4 required=3.0 tests=DKIMWL_WL_HIGH,DKIM_SIGNED,
-	DKIM_VALID,DKIM_VALID_AU,HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,
-	SPF_HELO_NONE,SPF_PASS,USER_AGENT_SANE_1 autolearn=no autolearn_force=no
+X-Spam-Status: No, score=-8.1 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
+	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,
+	SPF_HELO_NONE,SPF_PASS,USER_AGENT_SANE_1 autolearn=ham autolearn_force=no
 	version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 0B99DC43215
-	for <linux-block@archiver.kernel.org>; Fri, 29 Nov 2019 21:47:45 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id AF3B4C432C0
+	for <linux-block@archiver.kernel.org>; Fri, 29 Nov 2019 22:17:15 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.kernel.org (Postfix) with ESMTP id D34FC2464C
-	for <linux-block@archiver.kernel.org>; Fri, 29 Nov 2019 21:47:44 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id 703AD2464F
+	for <linux-block@archiver.kernel.org>; Fri, 29 Nov 2019 22:17:15 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=pass (2048-bit key) header.d=nvidia.com header.i=@nvidia.com header.b="P515JTdy"
+	dkim=fail reason="signature verification failed" (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="NkCXlQ6r"
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1727133AbfK2Vro (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Fri, 29 Nov 2019 16:47:44 -0500
-Received: from hqemgate14.nvidia.com ([216.228.121.143]:6093 "EHLO
-        hqemgate14.nvidia.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1727073AbfK2Vro (ORCPT
+        id S1727208AbfK2WRO (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Fri, 29 Nov 2019 17:17:14 -0500
+Received: from mail-qk1-f196.google.com ([209.85.222.196]:44172 "EHLO
+        mail-qk1-f196.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S1727116AbfK2WRO (ORCPT
         <rfc822;linux-block@vger.kernel.org>);
-        Fri, 29 Nov 2019 16:47:44 -0500
-Received: from hqpgpgate101.nvidia.com (Not Verified[216.228.121.13]) by hqemgate14.nvidia.com (using TLS: TLSv1.2, DES-CBC3-SHA)
-        id <B5de192010000>; Fri, 29 Nov 2019 13:47:46 -0800
-Received: from hqmail.nvidia.com ([172.20.161.6])
-  by hqpgpgate101.nvidia.com (PGP Universal service);
-  Fri, 29 Nov 2019 13:47:42 -0800
-X-PGP-Universal: processed;
-        by hqpgpgate101.nvidia.com on Fri, 29 Nov 2019 13:47:42 -0800
-Received: from [10.2.169.205] (10.124.1.5) by HQMAIL107.nvidia.com
- (172.20.187.13) with Microsoft SMTP Server (TLS) id 15.0.1473.3; Fri, 29 Nov
- 2019 21:47:41 +0000
-Subject: Re: [PATCH v2 17/19] powerpc: book3s64: convert to pin_user_pages()
- and put_user_page()
-To:     Jan Kara <jack@suse.cz>
-CC:     Andrew Morton <akpm@linux-foundation.org>,
-        Al Viro <viro@zeniv.linux.org.uk>,
-        Alex Williamson <alex.williamson@redhat.com>,
-        Benjamin Herrenschmidt <benh@kernel.crashing.org>,
-        =?UTF-8?B?QmrDtnJuIFTDtnBlbA==?= <bjorn.topel@intel.com>,
-        Christoph Hellwig <hch@infradead.org>,
-        Dan Williams <dan.j.williams@intel.com>,
-        Daniel Vetter <daniel@ffwll.ch>,
-        Dave Chinner <david@fromorbit.com>,
-        David Airlie <airlied@linux.ie>,
-        "David S . Miller" <davem@davemloft.net>,
-        Ira Weiny <ira.weiny@intel.com>,
-        Jason Gunthorpe <jgg@ziepe.ca>, Jens Axboe <axboe@kernel.dk>,
-        Jonathan Corbet <corbet@lwn.net>,
-        =?UTF-8?B?SsOpcsO0bWUgR2xpc3Nl?= <jglisse@redhat.com>,
-        Magnus Karlsson <magnus.karlsson@intel.com>,
-        Mauro Carvalho Chehab <mchehab@kernel.org>,
-        Michael Ellerman <mpe@ellerman.id.au>,
-        Michal Hocko <mhocko@suse.com>,
-        Mike Kravetz <mike.kravetz@oracle.com>,
-        Paul Mackerras <paulus@samba.org>,
-        Shuah Khan <shuah@kernel.org>,
-        Vlastimil Babka <vbabka@suse.cz>, <bpf@vger.kernel.org>,
-        <dri-devel@lists.freedesktop.org>, <kvm@vger.kernel.org>,
-        <linux-block@vger.kernel.org>, <linux-doc@vger.kernel.org>,
-        <linux-fsdevel@vger.kernel.org>, <linux-kselftest@vger.kernel.org>,
-        <linux-media@vger.kernel.org>, <linux-rdma@vger.kernel.org>,
-        <linuxppc-dev@lists.ozlabs.org>, <netdev@vger.kernel.org>,
-        <linux-mm@kvack.org>, LKML <linux-kernel@vger.kernel.org>
-References: <20191125231035.1539120-1-jhubbard@nvidia.com>
- <20191125231035.1539120-18-jhubbard@nvidia.com>
- <20191129112315.GB1121@quack2.suse.cz>
-From:   John Hubbard <jhubbard@nvidia.com>
-X-Nvconfidentiality: public
-Message-ID: <cb3e2acc-0a83-4053-fbcc-6d75dc47f174@nvidia.com>
-Date:   Fri, 29 Nov 2019 13:44:53 -0800
-User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:68.0) Gecko/20100101
- Thunderbird/68.2.2
+        Fri, 29 Nov 2019 17:17:14 -0500
+Received: by mail-qk1-f196.google.com with SMTP id i18so1598344qkl.11;
+        Fri, 29 Nov 2019 14:17:14 -0800 (PST)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=gmail.com; s=20161025;
+        h=sender:from:date:to:cc:subject:message-id:references:mime-version
+         :content-disposition:in-reply-to:user-agent;
+        bh=fLKk88eVvY3KF64ji7XbiRlsVmL1Sdrh2EvPmKppMtA=;
+        b=NkCXlQ6rScWjwEgHwvckt3xNu7sJ6jJerm/xxcTbDO4SJH6IEn4mNMGqW2rnPWhzGC
+         jCLnJ4gHHyetjvOqamnWw3SiIDr2sqyr38CyyMUw2awba000nlVb3rKcDuX2hupqHPKT
+         8jNPQ6h8NMS36TuxewOe4uzTQy5q/ru1TM4ztufl8vySzlfBlQQDys8rShtwFQnhdgF5
+         jmuEmTDZhlEJheC8/qGIw4jdbxbd88jFwlu1/pbA4nhJfJc0d+Ow5v2hcLxo/8sm+CGx
+         0d7IOzCyWXlH0p/gt942I72jxhLrKTNPmtD0+wj35MMYmsPqA+oN89KlquNzMm5Edj1u
+         w/nA==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20161025;
+        h=x-gm-message-state:sender:from:date:to:cc:subject:message-id
+         :references:mime-version:content-disposition:in-reply-to:user-agent;
+        bh=fLKk88eVvY3KF64ji7XbiRlsVmL1Sdrh2EvPmKppMtA=;
+        b=MoASDAF2P0yB64vqs9yvXrKXTk/dFZWd5pRV1EL+vImyOQuS5j2fatztBX9/jXifiL
+         igM7AGOykXr8n0MiGbN+q6KMD6zR5HjryA5UtQ+b55FAbNO06toF/Du9kYB25q2pv/aK
+         9TIiJFQ+EVqmrTZ8Q6X+YD35E7kRjaM1GU0hQyxqaQj/ta8oD9Q7FUh7ZY147dH2Gyse
+         xjBv3GVkKbnd7XddDsXXUdgewX0VLk61bmHRcaAxmcsclxj/lrRLRpm/wuvPR2kUDoXI
+         LKUk49AuN5VLQU2DMIioLa5qx4ceFNIKwsX25MjGUaAFapSCRtOWzUT4+IAQR2cc6wmf
+         ddkw==
+X-Gm-Message-State: APjAAAWVGK/2ry1NoPPCONeTFhR4fowxDKR5sdAUiPnRsq1SVI/GMg4C
+        AFrUhNwsTO4NtAnCSqAP2rXl9Axkqoc=
+X-Google-Smtp-Source: APXvYqyF2ONdyB5JvKFbVfYWPrqcfOaMRSKgbmeVts93aDpsTq4P+dlAAy0ly+c6Kut/UWYfnTz5oQ==
+X-Received: by 2002:a37:5d1:: with SMTP id 200mr18974112qkf.492.1575065833347;
+        Fri, 29 Nov 2019 14:17:13 -0800 (PST)
+Received: from rani.riverdale.lan ([2001:470:1f07:5f3::b55f])
+        by smtp.gmail.com with ESMTPSA id a187sm10686759qkc.91.2019.11.29.14.17.13
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Fri, 29 Nov 2019 14:17:13 -0800 (PST)
+From:   Arvind Sankar <nivedita@alum.mit.edu>
+X-Google-Original-From: Arvind Sankar <arvind@rani.riverdale.lan>
+Date:   Fri, 29 Nov 2019 17:17:11 -0500
+To:     Pavel Begunkov <asml.silence@gmail.com>
+Cc:     Jens Axboe <axboe@kernel.dk>, Ming Lei <ming.lei@canonical.com>,
+        linux-block@vger.kernel.org, linux-kernel@vger.kernel.org
+Subject: Re: [PATCH] block: optimise bvec_iter_advance()
+Message-ID: <20191129221709.GA1164864@rani.riverdale.lan>
+References: <cover.1574974574.git.asml.silence@gmail.com>
+ <06b1b796b8d9bcaa6d5b325668525b7a5663035b.1574974574.git.asml.silence@gmail.com>
 MIME-Version: 1.0
-In-Reply-To: <20191129112315.GB1121@quack2.suse.cz>
-X-Originating-IP: [10.124.1.5]
-X-ClientProxiedBy: HQMAIL101.nvidia.com (172.20.187.10) To
- HQMAIL107.nvidia.com (172.20.187.13)
-Content-Type: text/plain; charset="utf-8"; format=flowed
-Content-Language: en-US
-Content-Transfer-Encoding: 7bit
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=nvidia.com; s=n1;
-        t=1575064066; bh=tMvn6asqZgJ/8yczcC9lnf1pHEf7TJzCvRVZqLzUEIk=;
-        h=X-PGP-Universal:Subject:To:CC:References:From:X-Nvconfidentiality:
-         Message-ID:Date:User-Agent:MIME-Version:In-Reply-To:
-         X-Originating-IP:X-ClientProxiedBy:Content-Type:Content-Language:
-         Content-Transfer-Encoding;
-        b=P515JTdy70KP3oimNK/fSAtObgW4JDQsh/LN+dj31w7qtgH6JUdGJYKS3j5J8enBM
-         oN04vymJSqszX58P75QNc1cW3k/Ll0LB9zwNlmlBWaR7zw2qd7/o9t2Cy3EugW3wgY
-         XBlQyEsBEMcfywkDPj201lclcvfOCs5gFzs/O+2QmSmHzciD31eTMBkNB0W6VGXEOL
-         BbnrGM91l0GAwjLm+XJmL4eoGQAce5JVCz6FfueQA4/sc24hO2mmz2R1mloKHyP2Ej
-         3q1StOVbP0t0OEBFEGay8puwUyC8jwyLEftGIYNcVrkaz5szmNasFETh2Ir0Xi5Q1g
-         8xDwDUM/1ii9A==
+Content-Type: text/plain; charset=utf-8
+Content-Disposition: inline
+In-Reply-To: <06b1b796b8d9bcaa6d5b325668525b7a5663035b.1574974574.git.asml.silence@gmail.com>
+User-Agent: Mutt/1.10.1 (2018-07-13)
 Sender: linux-block-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-On 11/29/19 3:23 AM, Jan Kara wrote:
-> On Mon 25-11-19 15:10:33, John Hubbard wrote:
->> 1. Convert from get_user_pages() to pin_user_pages().
->>
->> 2. As required by pin_user_pages(), release these pages via
->> put_user_page(). In this case, do so via put_user_pages_dirty_lock().
->>
->> That has the side effect of calling set_page_dirty_lock(), instead
->> of set_page_dirty(). This is probably more accurate.
+On Fri, Nov 29, 2019 at 12:04:37AM +0300, Pavel Begunkov wrote:
+> bvec_iter_advance() is quite popular, but compilers fail to do proper
+> alias analysis and optimise it good enough. The assembly is checked
+> for gcc 9.2, x86-64.
 > 
-> Maybe more accurate but it doesn't work for mm_iommu_unpin(). As I'm
-> checking mm_iommu_unpin() gets called from RCU callback which is executed
-> interrupt context and you cannot lock pages from such context. So you need
-> to queue work from the RCU callback and then do the real work from the
-> workqueue...
+> - remove @iter->bi_size from min(...), as it's always less than @bytes.
+> Modify at the beginning and forget about it.
 > 
-> 								Honza
+> - the compiler isn't able to collapse memory dependencies and remove
+> writes in the loop. Help it by explicitely using local vars.
+> 
+> Signed-off-by: Pavel Begunkov <asml.silence@gmail.com>
+> ---
+>  include/linux/bvec.h | 23 ++++++++++++++---------
+>  1 file changed, 14 insertions(+), 9 deletions(-)
+> 
+> diff --git a/include/linux/bvec.h b/include/linux/bvec.h
+> index a032f01e928c..7b2f05faae14 100644
+> --- a/include/linux/bvec.h
+> +++ b/include/linux/bvec.h
+> @@ -87,26 +87,31 @@ struct bvec_iter_all {
+>  static inline bool bvec_iter_advance(const struct bio_vec *bv,
+>  		struct bvec_iter *iter, unsigned bytes)
+>  {
+> +	unsigned int done = iter->bi_bvec_done;
+> +	unsigned int idx = iter->bi_idx;
+> +
+>  	if (WARN_ONCE(bytes > iter->bi_size,
+>  		     "Attempted to advance past end of bvec iter\n")) {
+>  		iter->bi_size = 0;
+>  		return false;
+>  	}
+>  
+> +	iter->bi_size -= bytes;
+> +
+>  	while (bytes) {
+> -		const struct bio_vec *cur = bv + iter->bi_idx;
+> -		unsigned len = min3(bytes, iter->bi_size,
+> -				    cur->bv_len - iter->bi_bvec_done);
+> +		const struct bio_vec *cur = bv + idx;
+> +		unsigned int len = min(bytes, cur->bv_len - done);
+>  
+>  		bytes -= len;
+> -		iter->bi_size -= len;
+> -		iter->bi_bvec_done += len;
+> -
+> -		if (iter->bi_bvec_done == cur->bv_len) {
+> -			iter->bi_bvec_done = 0;
+> -			iter->bi_idx++;
+> +		done += len;
+> +		if (done == cur->bv_len) {
+> +			idx++;
+> +			done = 0;
+>  		}
+>  	}
+> +
+> +	iter->bi_idx = idx;
+> +	iter->bi_bvec_done = done;
+>  	return true;
+>  }
+>  
+> -- 
+> 2.24.0
+> 
 
-ah yes, fixed locally. (In order to avoid  distracting people during the merge
-window, I won't post any more versions of the series until the merge window is
-over, unless a maintainer tells me that any of these patches are desired for
-5.5.)
+The loop can be simplified a bit further, as done has to be 0 once we go
+beyond the current bio_vec. See below for the simplified version.
 
-With that, we are back to a one-line diff for this part:
+I also check if bi_size became zero so we can skip the rest of the
+calculations in that case. If we want to preserve the current behavior of
+updating iter->bi_idx and iter->bi_bvec_done even if bi_size is going to
+become zero, the loop condition should change to
 
-@@ -215,7 +214,7 @@ static void mm_iommu_unpin(struct mm_iommu_table_group_mem_t *mem)
-                 if (mem->hpas[i] & MM_IOMMU_TABLE_GROUP_PAGE_DIRTY)
-                         SetPageDirty(page);
-  
--               put_page(page);
-+               put_user_page(page);
-                 mem->hpas[i] = 0;
-         }
-  }
+		while (bytes && bytes >= cur->bv_len)
 
-btw, I'm also working on your feedback for patch 17 (mm/gup: track FOLL_PIN pages [1]),
-from a few days earlier, it's not being ignored, I'm just trying to avoid distracting
-people during the merge window.
+to ensure that we don't try to access past the end of the bio_vec array.
 
-[1] https://lore.kernel.org/r/20191121093941.GA18190@quack2.suse.cz
-
-thanks,
--- 
-John Hubbard
-NVIDIA
+diff --git a/include/linux/bvec.h b/include/linux/bvec.h
+index a032f01e928c..380d188dfbd2 100644
+--- a/include/linux/bvec.h
++++ b/include/linux/bvec.h
+@@ -87,25 +87,26 @@ struct bvec_iter_all {
+ static inline bool bvec_iter_advance(const struct bio_vec *bv,
+ 		struct bvec_iter *iter, unsigned bytes)
+ {
++	unsigned int idx = iter->bi_idx;
++	const struct bio_vec *cur = bv + idx;
++
+ 	if (WARN_ONCE(bytes > iter->bi_size,
+ 		     "Attempted to advance past end of bvec iter\n")) {
+ 		iter->bi_size = 0;
+ 		return false;
+ 	}
+ 
+-	while (bytes) {
+-		const struct bio_vec *cur = bv + iter->bi_idx;
+-		unsigned len = min3(bytes, iter->bi_size,
+-				    cur->bv_len - iter->bi_bvec_done);
+-
+-		bytes -= len;
+-		iter->bi_size -= len;
+-		iter->bi_bvec_done += len;
+-
+-		if (iter->bi_bvec_done == cur->bv_len) {
+-			iter->bi_bvec_done = 0;
+-			iter->bi_idx++;
++	iter->bi_size -= bytes;
++	if (iter->bi_size != 0) {
++		bytes += iter->bi_bvec_done;
++		while (bytes >= cur->bv_len) {
++			bytes -= cur->bv_len;
++			idx++;
++			cur++;
+ 		}
++
++		iter->bi_idx = idx;
++		iter->bi_bvec_done = bytes;
+ 	}
+ 	return true;
+ }
