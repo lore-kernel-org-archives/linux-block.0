@@ -2,146 +2,168 @@ Return-Path: <SRS0=kXjy=ZV=vger.kernel.org=linux-block-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-8.2 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
-	INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,
-	USER_AGENT_SANE_1 autolearn=unavailable autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-9.9 required=3.0 tests=DKIMWL_WL_HIGH,DKIM_SIGNED,
+	DKIM_VALID,DKIM_VALID_AU,HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,
+	MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,USER_AGENT_GIT
+	autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 0581FC432C3
-	for <linux-block@archiver.kernel.org>; Fri, 29 Nov 2019 11:23:30 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 0AB87C432C0
+	for <linux-block@archiver.kernel.org>; Fri, 29 Nov 2019 11:31:45 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.kernel.org (Postfix) with ESMTP id CBC63217BC
-	for <linux-block@archiver.kernel.org>; Fri, 29 Nov 2019 11:23:29 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id CE19720833
+	for <linux-block@archiver.kernel.org>; Fri, 29 Nov 2019 11:31:44 +0000 (UTC)
+Authentication-Results: mail.kernel.org;
+	dkim=pass (1024-bit key) header.d=amazon.com header.i=@amazon.com header.b="AdSiDDee"
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1726741AbfK2LXW (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Fri, 29 Nov 2019 06:23:22 -0500
-Received: from mx2.suse.de ([195.135.220.15]:35050 "EHLO mx1.suse.de"
-        rhost-flags-OK-OK-OK-FAIL) by vger.kernel.org with ESMTP
-        id S1725892AbfK2LXW (ORCPT <rfc822;linux-block@vger.kernel.org>);
-        Fri, 29 Nov 2019 06:23:22 -0500
-X-Virus-Scanned: by amavisd-new at test-mx.suse.de
-Received: from relay2.suse.de (unknown [195.135.220.254])
-        by mx1.suse.de (Postfix) with ESMTP id EA9F5AC82;
-        Fri, 29 Nov 2019 11:23:17 +0000 (UTC)
-Received: by quack2.suse.cz (Postfix, from userid 1000)
-        id 4E8A01E0B6A; Fri, 29 Nov 2019 12:23:15 +0100 (CET)
-Date:   Fri, 29 Nov 2019 12:23:15 +0100
-From:   Jan Kara <jack@suse.cz>
-To:     John Hubbard <jhubbard@nvidia.com>
-Cc:     Andrew Morton <akpm@linux-foundation.org>,
-        Al Viro <viro@zeniv.linux.org.uk>,
-        Alex Williamson <alex.williamson@redhat.com>,
-        Benjamin Herrenschmidt <benh@kernel.crashing.org>,
-        =?iso-8859-1?Q?Bj=F6rn_T=F6pel?= <bjorn.topel@intel.com>,
-        Christoph Hellwig <hch@infradead.org>,
-        Dan Williams <dan.j.williams@intel.com>,
-        Daniel Vetter <daniel@ffwll.ch>,
-        Dave Chinner <david@fromorbit.com>,
-        David Airlie <airlied@linux.ie>,
-        "David S . Miller" <davem@davemloft.net>,
-        Ira Weiny <ira.weiny@intel.com>, Jan Kara <jack@suse.cz>,
-        Jason Gunthorpe <jgg@ziepe.ca>, Jens Axboe <axboe@kernel.dk>,
-        Jonathan Corbet <corbet@lwn.net>,
-        =?iso-8859-1?B?Suly9G1l?= Glisse <jglisse@redhat.com>,
-        Magnus Karlsson <magnus.karlsson@intel.com>,
-        Mauro Carvalho Chehab <mchehab@kernel.org>,
-        Michael Ellerman <mpe@ellerman.id.au>,
-        Michal Hocko <mhocko@suse.com>,
-        Mike Kravetz <mike.kravetz@oracle.com>,
-        Paul Mackerras <paulus@samba.org>,
-        Shuah Khan <shuah@kernel.org>,
-        Vlastimil Babka <vbabka@suse.cz>, bpf@vger.kernel.org,
-        dri-devel@lists.freedesktop.org, kvm@vger.kernel.org,
-        linux-block@vger.kernel.org, linux-doc@vger.kernel.org,
-        linux-fsdevel@vger.kernel.org, linux-kselftest@vger.kernel.org,
-        linux-media@vger.kernel.org, linux-rdma@vger.kernel.org,
-        linuxppc-dev@lists.ozlabs.org, netdev@vger.kernel.org,
-        linux-mm@kvack.org, LKML <linux-kernel@vger.kernel.org>
-Subject: Re: [PATCH v2 17/19] powerpc: book3s64: convert to pin_user_pages()
- and put_user_page()
-Message-ID: <20191129112315.GB1121@quack2.suse.cz>
-References: <20191125231035.1539120-1-jhubbard@nvidia.com>
- <20191125231035.1539120-18-jhubbard@nvidia.com>
+        id S1726805AbfK2Lbo (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Fri, 29 Nov 2019 06:31:44 -0500
+Received: from smtp-fw-2101.amazon.com ([72.21.196.25]:5689 "EHLO
+        smtp-fw-2101.amazon.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S1726586AbfK2Lbo (ORCPT
+        <rfc822;linux-block@vger.kernel.org>);
+        Fri, 29 Nov 2019 06:31:44 -0500
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+  d=amazon.com; i=@amazon.com; q=dns/txt; s=amazon201209;
+  t=1575027104; x=1606563104;
+  h=from:to:cc:subject:date:message-id:mime-version:
+   content-transfer-encoding;
+  bh=mMhOHfzPWPTlT1F2YNHMoR0lHgdtufqIO3c7y6opQtU=;
+  b=AdSiDDeeX1p0uLSk14CA3pK6BmTY3b0vpuEM5f2upXnFTCE0vmW8ja2H
+   bYPk1RZ6d7bWXtHlTmKtGZwe5dAeK7QcXi8/w02p8UxqDUzG/XUq4WLl9
+   sWO3v46/kaxrhN3jcDg2wb1h/ssoFLpjydD3DTdb48pohFNejoSSX5izT
+   Y=;
+IronPort-SDR: tCTMha4UmWWdKldyDrvAlDYY68CEDgb6gKIYIsC2/pdiXNN710kvSXEsC3MIFWRdVM2fK2ap+j
+ uQsRzkoyT6Qg==
+X-IronPort-AV: E=Sophos;i="5.69,257,1571702400"; 
+   d="scan'208";a="6338463"
+Received: from iad6-co-svc-p1-lb1-vlan2.amazon.com (HELO email-inbound-relay-1a-67b371d8.us-east-1.amazon.com) ([10.124.125.2])
+  by smtp-border-fw-out-2101.iad2.amazon.com with ESMTP; 29 Nov 2019 11:31:41 +0000
+Received: from EX13MTAUEA001.ant.amazon.com (iad55-ws-svc-p15-lb9-vlan3.iad.amazon.com [10.40.159.166])
+        by email-inbound-relay-1a-67b371d8.us-east-1.amazon.com (Postfix) with ESMTPS id CEE4EA1803;
+        Fri, 29 Nov 2019 11:31:38 +0000 (UTC)
+Received: from EX13D32EUB003.ant.amazon.com (10.43.166.165) by
+ EX13MTAUEA001.ant.amazon.com (10.43.61.82) with Microsoft SMTP Server (TLS)
+ id 15.0.1367.3; Fri, 29 Nov 2019 11:31:38 +0000
+Received: from EX13MTAUWB001.ant.amazon.com (10.43.161.207) by
+ EX13D32EUB003.ant.amazon.com (10.43.166.165) with Microsoft SMTP Server (TLS)
+ id 15.0.1367.3; Fri, 29 Nov 2019 11:31:37 +0000
+Received: from u2f063a87eabd5f.cbg10.amazon.com (10.125.106.135) by
+ mail-relay.amazon.com (10.43.161.249) with Microsoft SMTP Server id
+ 15.0.1367.3 via Frontend Transport; Fri, 29 Nov 2019 11:31:34 +0000
+From:   Paul Durrant <pdurrant@amazon.com>
+To:     <xen-devel@lists.xenproject.org>, <linux-block@vger.kernel.org>,
+        <linux-kernel@vger.kernel.org>
+CC:     Paul Durrant <pdurrant@amazon.com>,
+        Konrad Rzeszutek Wilk <konrad.wilk@oracle.com>,
+        =?UTF-8?q?Roger=20Pau=20Monn=C3=A9?= <roger.pau@citrix.com>,
+        Jens Axboe <axboe@kernel.dk>
+Subject: [PATCH] xen-blkback: allow module to be cleanly unloaded
+Date:   Fri, 29 Nov 2019 11:31:31 +0000
+Message-ID: <20191129113131.1954-1-pdurrant@amazon.com>
+X-Mailer: git-send-email 2.20.1
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <20191125231035.1539120-18-jhubbard@nvidia.com>
-User-Agent: Mutt/1.10.1 (2018-07-13)
+Content-Type: text/plain; charset="UTF-8"
+Content-Transfer-Encoding: 8bit
 Sender: linux-block-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-On Mon 25-11-19 15:10:33, John Hubbard wrote:
-> 1. Convert from get_user_pages() to pin_user_pages().
-> 
-> 2. As required by pin_user_pages(), release these pages via
-> put_user_page(). In this case, do so via put_user_pages_dirty_lock().
-> 
-> That has the side effect of calling set_page_dirty_lock(), instead
-> of set_page_dirty(). This is probably more accurate.
+Add a module_exit() to perform the necessary clean-up. Also add
+__module_get() and module_put() calls into xen_blkif_alloc() and
+xen_blkif_free() respectively to make sure an in-use module cannot be
+unloaded.
 
-Maybe more accurate but it doesn't work for mm_iommu_unpin(). As I'm
-checking mm_iommu_unpin() gets called from RCU callback which is executed
-interrupt context and you cannot lock pages from such context. So you need
-to queue work from the RCU callback and then do the real work from the
-workqueue...
+Signed-off-by: Paul Durrant <pdurrant@amazon.com>
+---
+Cc: Konrad Rzeszutek Wilk <konrad.wilk@oracle.com>
+Cc: "Roger Pau Monné" <roger.pau@citrix.com>
+Cc: Jens Axboe <axboe@kernel.dk>
+---
+ drivers/block/xen-blkback/blkback.c |  8 ++++++++
+ drivers/block/xen-blkback/common.h  |  3 +++
+ drivers/block/xen-blkback/xenbus.c  | 15 +++++++++++++++
+ 3 files changed, 26 insertions(+)
 
-								Honza
-
-> 
-> As Christoph Hellwig put it, "set_page_dirty() is only safe if we are
-> dealing with a file backed page where we have reference on the inode it
-> hangs off." [1]
-> 
-> [1] https://lore.kernel.org/r/20190723153640.GB720@lst.de
-> 
-> Cc: Jan Kara <jack@suse.cz>
-> Signed-off-by: John Hubbard <jhubbard@nvidia.com>
-> ---
->  arch/powerpc/mm/book3s64/iommu_api.c | 12 +++++-------
->  1 file changed, 5 insertions(+), 7 deletions(-)
-> 
-> diff --git a/arch/powerpc/mm/book3s64/iommu_api.c b/arch/powerpc/mm/book3s64/iommu_api.c
-> index 56cc84520577..fc1670a6fc3c 100644
-> --- a/arch/powerpc/mm/book3s64/iommu_api.c
-> +++ b/arch/powerpc/mm/book3s64/iommu_api.c
-> @@ -103,7 +103,7 @@ static long mm_iommu_do_alloc(struct mm_struct *mm, unsigned long ua,
->  	for (entry = 0; entry < entries; entry += chunk) {
->  		unsigned long n = min(entries - entry, chunk);
->  
-> -		ret = get_user_pages(ua + (entry << PAGE_SHIFT), n,
-> +		ret = pin_user_pages(ua + (entry << PAGE_SHIFT), n,
->  				FOLL_WRITE | FOLL_LONGTERM,
->  				mem->hpages + entry, NULL);
->  		if (ret == n) {
-> @@ -167,9 +167,8 @@ static long mm_iommu_do_alloc(struct mm_struct *mm, unsigned long ua,
->  	return 0;
->  
->  free_exit:
-> -	/* free the reference taken */
-> -	for (i = 0; i < pinned; i++)
-> -		put_page(mem->hpages[i]);
-> +	/* free the references taken */
-> +	put_user_pages(mem->hpages, pinned);
->  
->  	vfree(mem->hpas);
->  	kfree(mem);
-> @@ -212,10 +211,9 @@ static void mm_iommu_unpin(struct mm_iommu_table_group_mem_t *mem)
->  		if (!page)
->  			continue;
->  
-> -		if (mem->hpas[i] & MM_IOMMU_TABLE_GROUP_PAGE_DIRTY)
-> -			SetPageDirty(page);
-> +		put_user_pages_dirty_lock(&page, 1,
-> +				mem->hpas[i] & MM_IOMMU_TABLE_GROUP_PAGE_DIRTY);
->  
-> -		put_page(page);
->  		mem->hpas[i] = 0;
->  	}
->  }
-> -- 
-> 2.24.0
-> 
+diff --git a/drivers/block/xen-blkback/blkback.c b/drivers/block/xen-blkback/blkback.c
+index fd1e19f1a49f..e562a7e20c3c 100644
+--- a/drivers/block/xen-blkback/blkback.c
++++ b/drivers/block/xen-blkback/blkback.c
+@@ -1504,5 +1504,13 @@ static int __init xen_blkif_init(void)
+ 
+ module_init(xen_blkif_init);
+ 
++static void __exit xen_blkif_fini(void)
++{
++	xen_blkif_xenbus_fini();
++	xen_blkif_interface_fini();
++}
++
++module_exit(xen_blkif_fini);
++
+ MODULE_LICENSE("Dual BSD/GPL");
+ MODULE_ALIAS("xen-backend:vbd");
+diff --git a/drivers/block/xen-blkback/common.h b/drivers/block/xen-blkback/common.h
+index 1d3002d773f7..49132b0adbbe 100644
+--- a/drivers/block/xen-blkback/common.h
++++ b/drivers/block/xen-blkback/common.h
+@@ -375,9 +375,12 @@ struct phys_req {
+ 	struct block_device	*bdev;
+ 	blkif_sector_t		sector_number;
+ };
++
+ int xen_blkif_interface_init(void);
++void xen_blkif_interface_fini(void);
+ 
+ int xen_blkif_xenbus_init(void);
++void xen_blkif_xenbus_fini(void);
+ 
+ irqreturn_t xen_blkif_be_int(int irq, void *dev_id);
+ int xen_blkif_schedule(void *arg);
+diff --git a/drivers/block/xen-blkback/xenbus.c b/drivers/block/xen-blkback/xenbus.c
+index b90dbcd99c03..f948584fcf66 100644
+--- a/drivers/block/xen-blkback/xenbus.c
++++ b/drivers/block/xen-blkback/xenbus.c
+@@ -173,6 +173,8 @@ static struct xen_blkif *xen_blkif_alloc(domid_t domid)
+ 	init_completion(&blkif->drain_complete);
+ 	INIT_WORK(&blkif->free_work, xen_blkif_deferred_free);
+ 
++	__module_get(THIS_MODULE);
++
+ 	return blkif;
+ }
+ 
+@@ -320,6 +322,8 @@ static void xen_blkif_free(struct xen_blkif *blkif)
+ 
+ 	/* Make sure everything is drained before shutting down */
+ 	kmem_cache_free(xen_blkif_cachep, blkif);
++
++	module_put(THIS_MODULE);
+ }
+ 
+ int __init xen_blkif_interface_init(void)
+@@ -333,6 +337,12 @@ int __init xen_blkif_interface_init(void)
+ 	return 0;
+ }
+ 
++void xen_blkif_interface_fini(void)
++{
++	kmem_cache_destroy(xen_blkif_cachep);
++	xen_blkif_cachep = NULL;
++}
++
+ /*
+  *  sysfs interface for VBD I/O requests
+  */
+@@ -1122,3 +1132,8 @@ int xen_blkif_xenbus_init(void)
+ {
+ 	return xenbus_register_backend(&xen_blkbk_driver);
+ }
++
++void xen_blkif_xenbus_fini(void)
++{
++	xenbus_unregister_driver(&xen_blkbk_driver);
++}
 -- 
-Jan Kara <jack@suse.com>
-SUSE Labs, CR
+2.20.1
+
