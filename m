@@ -2,110 +2,144 @@ Return-Path: <SRS0=kXjy=ZV=vger.kernel.org=linux-block-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-3.9 required=3.0 tests=DKIMWL_WL_HIGH,DKIM_SIGNED,
+X-Spam-Status: No, score=-2.4 required=3.0 tests=DKIMWL_WL_HIGH,DKIM_SIGNED,
 	DKIM_VALID,DKIM_VALID_AU,HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,
-	SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS autolearn=no autolearn_force=no
+	SPF_HELO_NONE,SPF_PASS,USER_AGENT_SANE_1 autolearn=no autolearn_force=no
 	version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id C3DF2C432C0
-	for <linux-block@archiver.kernel.org>; Fri, 29 Nov 2019 16:09:15 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 0B99DC43215
+	for <linux-block@archiver.kernel.org>; Fri, 29 Nov 2019 21:47:45 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.kernel.org (Postfix) with ESMTP id 92D712176D
-	for <linux-block@archiver.kernel.org>; Fri, 29 Nov 2019 16:09:15 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id D34FC2464C
+	for <linux-block@archiver.kernel.org>; Fri, 29 Nov 2019 21:47:44 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=pass (1024-bit key) header.d=amazon.com header.i=@amazon.com header.b="of9ZBTMb"
+	dkim=pass (2048-bit key) header.d=nvidia.com header.i=@nvidia.com header.b="P515JTdy"
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1726963AbfK2QJP (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Fri, 29 Nov 2019 11:09:15 -0500
-Received: from smtp-fw-9101.amazon.com ([207.171.184.25]:56521 "EHLO
-        smtp-fw-9101.amazon.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1726909AbfK2QJO (ORCPT
+        id S1727133AbfK2Vro (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Fri, 29 Nov 2019 16:47:44 -0500
+Received: from hqemgate14.nvidia.com ([216.228.121.143]:6093 "EHLO
+        hqemgate14.nvidia.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S1727073AbfK2Vro (ORCPT
         <rfc822;linux-block@vger.kernel.org>);
-        Fri, 29 Nov 2019 11:09:14 -0500
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-  d=amazon.com; i=@amazon.com; q=dns/txt; s=amazon201209;
-  t=1575043754; x=1606579754;
-  h=from:to:cc:subject:date:message-id:references:
-   in-reply-to:content-transfer-encoding:mime-version;
-  bh=vY3yNMWl4XxQ52Yeor3pYOFSHJJULyJ7C6zSK/m4n5c=;
-  b=of9ZBTMbGXnSVTtc4e4PX5s4zw2XL8sVrj46+9Ln7NBRThOuufR9iHZm
-   PK+ytev3iQkuZJPFxU8EaVAAo8xvu6JB86wEPr3lbAOFUxcFk2wKlfrYu
-   SCFsGyl8sWsylwMK2OOE0qWB0B5Yel/5MH3zcIfxpCi/zp+jrjWQUPo3H
-   8=;
-IronPort-SDR: 2urBnlx6vJFe4PyaljmGlh5Eq0qnF4U/v9BYgul+T5A8y+NZySfdY8CEwS8wDSZsKleKRG5Qxb
- 3dJ9FoBMDjgw==
-X-IronPort-AV: E=Sophos;i="5.69,257,1571702400"; 
-   d="scan'208";a="2195830"
-Received: from sea32-co-svc-lb4-vlan3.sea.corp.amazon.com (HELO email-inbound-relay-1d-37fd6b3d.us-east-1.amazon.com) ([10.47.23.38])
-  by smtp-border-fw-out-9101.sea19.amazon.com with ESMTP; 29 Nov 2019 16:09:01 +0000
-Received: from EX13MTAUEA001.ant.amazon.com (iad55-ws-svc-p15-lb9-vlan2.iad.amazon.com [10.40.159.162])
-        by email-inbound-relay-1d-37fd6b3d.us-east-1.amazon.com (Postfix) with ESMTPS id C3443282274;
-        Fri, 29 Nov 2019 16:08:58 +0000 (UTC)
-Received: from EX13D32EUC002.ant.amazon.com (10.43.164.94) by
- EX13MTAUEA001.ant.amazon.com (10.43.61.82) with Microsoft SMTP Server (TLS)
- id 15.0.1367.3; Fri, 29 Nov 2019 16:08:57 +0000
-Received: from EX13D32EUC003.ant.amazon.com (10.43.164.24) by
- EX13D32EUC002.ant.amazon.com (10.43.164.94) with Microsoft SMTP Server (TLS)
- id 15.0.1367.3; Fri, 29 Nov 2019 16:08:57 +0000
-Received: from EX13D32EUC003.ant.amazon.com ([10.43.164.24]) by
- EX13D32EUC003.ant.amazon.com ([10.43.164.24]) with mapi id 15.00.1367.000;
- Fri, 29 Nov 2019 16:08:57 +0000
-From:   "Durrant, Paul" <pdurrant@amazon.com>
-To:     Jan Beulich <jbeulich@suse.com>
-CC:     "xen-devel@lists.xenproject.org" <xen-devel@lists.xenproject.org>,
-        "linux-block@vger.kernel.org" <linux-block@vger.kernel.org>,
-        "linux-kernel@vger.kernel.org" <linux-kernel@vger.kernel.org>,
-        "Stefano Stabellini" <sstabellini@kernel.org>,
-        Boris Ostrovsky <boris.ostrovsky@oracle.com>,
-        Juergen Gross <jgross@suse.com>
-Subject: RE: [PATCH v2 1/2] xen/xenbus: reference count registered modules
-Thread-Topic: [PATCH v2 1/2] xen/xenbus: reference count registered modules
-Thread-Index: AQHVprryE0ZNGXJKYUWnOWAGzywoqqeiTuoAgAABo6A=
-Date:   Fri, 29 Nov 2019 16:08:56 +0000
-Message-ID: <42cc372e0ada4267bdf4038a0202d95d@EX13D32EUC003.ant.amazon.com>
-References: <20191129134306.2738-1-pdurrant@amazon.com>
- <20191129134306.2738-2-pdurrant@amazon.com>
- <599c254c-035b-33a0-9f32-866ffe644ad5@suse.com>
-In-Reply-To: <599c254c-035b-33a0-9f32-866ffe644ad5@suse.com>
-Accept-Language: en-GB, en-US
-Content-Language: en-US
-X-MS-Has-Attach: 
-X-MS-TNEF-Correlator: 
-x-ms-exchange-transport-fromentityheader: Hosted
-x-originating-ip: [10.43.165.244]
-Content-Type: text/plain; charset="utf-8"
-Content-Transfer-Encoding: base64
+        Fri, 29 Nov 2019 16:47:44 -0500
+Received: from hqpgpgate101.nvidia.com (Not Verified[216.228.121.13]) by hqemgate14.nvidia.com (using TLS: TLSv1.2, DES-CBC3-SHA)
+        id <B5de192010000>; Fri, 29 Nov 2019 13:47:46 -0800
+Received: from hqmail.nvidia.com ([172.20.161.6])
+  by hqpgpgate101.nvidia.com (PGP Universal service);
+  Fri, 29 Nov 2019 13:47:42 -0800
+X-PGP-Universal: processed;
+        by hqpgpgate101.nvidia.com on Fri, 29 Nov 2019 13:47:42 -0800
+Received: from [10.2.169.205] (10.124.1.5) by HQMAIL107.nvidia.com
+ (172.20.187.13) with Microsoft SMTP Server (TLS) id 15.0.1473.3; Fri, 29 Nov
+ 2019 21:47:41 +0000
+Subject: Re: [PATCH v2 17/19] powerpc: book3s64: convert to pin_user_pages()
+ and put_user_page()
+To:     Jan Kara <jack@suse.cz>
+CC:     Andrew Morton <akpm@linux-foundation.org>,
+        Al Viro <viro@zeniv.linux.org.uk>,
+        Alex Williamson <alex.williamson@redhat.com>,
+        Benjamin Herrenschmidt <benh@kernel.crashing.org>,
+        =?UTF-8?B?QmrDtnJuIFTDtnBlbA==?= <bjorn.topel@intel.com>,
+        Christoph Hellwig <hch@infradead.org>,
+        Dan Williams <dan.j.williams@intel.com>,
+        Daniel Vetter <daniel@ffwll.ch>,
+        Dave Chinner <david@fromorbit.com>,
+        David Airlie <airlied@linux.ie>,
+        "David S . Miller" <davem@davemloft.net>,
+        Ira Weiny <ira.weiny@intel.com>,
+        Jason Gunthorpe <jgg@ziepe.ca>, Jens Axboe <axboe@kernel.dk>,
+        Jonathan Corbet <corbet@lwn.net>,
+        =?UTF-8?B?SsOpcsO0bWUgR2xpc3Nl?= <jglisse@redhat.com>,
+        Magnus Karlsson <magnus.karlsson@intel.com>,
+        Mauro Carvalho Chehab <mchehab@kernel.org>,
+        Michael Ellerman <mpe@ellerman.id.au>,
+        Michal Hocko <mhocko@suse.com>,
+        Mike Kravetz <mike.kravetz@oracle.com>,
+        Paul Mackerras <paulus@samba.org>,
+        Shuah Khan <shuah@kernel.org>,
+        Vlastimil Babka <vbabka@suse.cz>, <bpf@vger.kernel.org>,
+        <dri-devel@lists.freedesktop.org>, <kvm@vger.kernel.org>,
+        <linux-block@vger.kernel.org>, <linux-doc@vger.kernel.org>,
+        <linux-fsdevel@vger.kernel.org>, <linux-kselftest@vger.kernel.org>,
+        <linux-media@vger.kernel.org>, <linux-rdma@vger.kernel.org>,
+        <linuxppc-dev@lists.ozlabs.org>, <netdev@vger.kernel.org>,
+        <linux-mm@kvack.org>, LKML <linux-kernel@vger.kernel.org>
+References: <20191125231035.1539120-1-jhubbard@nvidia.com>
+ <20191125231035.1539120-18-jhubbard@nvidia.com>
+ <20191129112315.GB1121@quack2.suse.cz>
+From:   John Hubbard <jhubbard@nvidia.com>
+X-Nvconfidentiality: public
+Message-ID: <cb3e2acc-0a83-4053-fbcc-6d75dc47f174@nvidia.com>
+Date:   Fri, 29 Nov 2019 13:44:53 -0800
+User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:68.0) Gecko/20100101
+ Thunderbird/68.2.2
 MIME-Version: 1.0
+In-Reply-To: <20191129112315.GB1121@quack2.suse.cz>
+X-Originating-IP: [10.124.1.5]
+X-ClientProxiedBy: HQMAIL101.nvidia.com (172.20.187.10) To
+ HQMAIL107.nvidia.com (172.20.187.13)
+Content-Type: text/plain; charset="utf-8"; format=flowed
+Content-Language: en-US
+Content-Transfer-Encoding: 7bit
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=nvidia.com; s=n1;
+        t=1575064066; bh=tMvn6asqZgJ/8yczcC9lnf1pHEf7TJzCvRVZqLzUEIk=;
+        h=X-PGP-Universal:Subject:To:CC:References:From:X-Nvconfidentiality:
+         Message-ID:Date:User-Agent:MIME-Version:In-Reply-To:
+         X-Originating-IP:X-ClientProxiedBy:Content-Type:Content-Language:
+         Content-Transfer-Encoding;
+        b=P515JTdy70KP3oimNK/fSAtObgW4JDQsh/LN+dj31w7qtgH6JUdGJYKS3j5J8enBM
+         oN04vymJSqszX58P75QNc1cW3k/Ll0LB9zwNlmlBWaR7zw2qd7/o9t2Cy3EugW3wgY
+         XBlQyEsBEMcfywkDPj201lclcvfOCs5gFzs/O+2QmSmHzciD31eTMBkNB0W6VGXEOL
+         BbnrGM91l0GAwjLm+XJmL4eoGQAce5JVCz6FfueQA4/sc24hO2mmz2R1mloKHyP2Ej
+         3q1StOVbP0t0OEBFEGay8puwUyC8jwyLEftGIYNcVrkaz5szmNasFETh2Ir0Xi5Q1g
+         8xDwDUM/1ii9A==
 Sender: linux-block-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-PiAtLS0tLU9yaWdpbmFsIE1lc3NhZ2UtLS0tLQ0KPiBGcm9tOiBKYW4gQmV1bGljaCA8amJldWxp
-Y2hAc3VzZS5jb20+DQo+IFNlbnQ6IDI5IE5vdmVtYmVyIDIwMTkgMTY6MDENCj4gVG86IER1cnJh
-bnQsIFBhdWwgPHBkdXJyYW50QGFtYXpvbi5jb20+DQo+IENjOiB4ZW4tZGV2ZWxAbGlzdHMueGVu
-cHJvamVjdC5vcmc7IGxpbnV4LWJsb2NrQHZnZXIua2VybmVsLm9yZzsgbGludXgtDQo+IGtlcm5l
-bEB2Z2VyLmtlcm5lbC5vcmc7IFN0ZWZhbm8gU3RhYmVsbGluaSA8c3N0YWJlbGxpbmlAa2VybmVs
-Lm9yZz47IEJvcmlzDQo+IE9zdHJvdnNreSA8Ym9yaXMub3N0cm92c2t5QG9yYWNsZS5jb20+OyBK
-dWVyZ2VuIEdyb3NzIDxqZ3Jvc3NAc3VzZS5jb20+DQo+IFN1YmplY3Q6IFJlOiBbUEFUQ0ggdjIg
-MS8yXSB4ZW4veGVuYnVzOiByZWZlcmVuY2UgY291bnQgcmVnaXN0ZXJlZCBtb2R1bGVzDQo+IA0K
-PiBPbiAyOS4xMS4yMDE5IDE0OjQzLCBQYXVsIER1cnJhbnQgd3JvdGU6DQo+ID4gVG8gcHJldmVu
-dCBhIG1vZHVsZSBiZWluZyByZW1vdmVkIHdoaWxzdCBhdHRhY2hlZCB0byBhIGZyb250ZW5kLCBh
-bmQNCj4gDQo+IFdoeSBvbmx5IGZyb250ZW5kPw0KPiANCg0KVHJ1ZS4gT3JpZ2luYWxseSB0aGlz
-IHdhcyBvbmx5IGludGVuZGVkIGZvciBiYWNrZW5kcywgYnV0IEkgZ3Vlc3MgdGhpcyBzaG91bGQg
-bm93IGJlICdvdGhlcmVuZCcgb3Igc29tZSBlcXVpdmFsZW50IGZvcm0gb2Ygd29yZHMuDQoNCj4g
-PiBoZW5jZSB4ZW5idXMgY2FsbGluZyBpbnRvIHBvdGVudGlhbGx5IGludmFsaWQgdGV4dCwgdGFr
-ZSBhIHJlZmVyZW5jZSBvbg0KPiA+IHRoZSBtb2R1bGUgYmVmb3JlIGNhbGxpbmcgdGhlIHByb2Jl
-KCkgbWV0aG9kIChkcm9wcGluZyBpdCBpZg0KPiB1bnN1Y2Nlc3NmdWwpDQo+ID4gYW5kIGRyb3Ag
-dGhlIHJlZmVyZW5jZSBhZnRlciByZXR1cm5pbmcgZnJvbSB0aGUgcmVtb3ZlKCkgbWV0aG9kLg0K
-PiA+DQo+ID4gTk9URTogVGhpcyBhbGxvd3MgdGhlIGFkLWhvYyByZWZlcmVuY2UgY291bnRpbmcg
-aW4geGVuLW5ldGJhY2sgdG8gYmUNCj4gPiAgICAgICByZW1vdmVkLiBUaGlzIHdpbGwgYmUgZG9u
-ZSBpbiBhIHN1YnNlcXVlbnQgcGF0Y2guDQo+ID4NCj4gPiBTdWdnZXN0ZWQtYnk6IEphbiBCZXVs
-aWNoIDxqYmV1bGljaEBzdXNlLmNvbT4NCj4gPiBTaWduZWQtb2ZmLWJ5OiBQYXVsIER1cnJhbnQg
-PHBkdXJyYW50QGFtYXpvbi5jb20+DQo+ID4NCj4gPiAtLS0gYS9kcml2ZXJzL3hlbi94ZW5idXMv
-eGVuYnVzX3Byb2JlLmMNCj4gPiArKysgYi9kcml2ZXJzL3hlbi94ZW5idXMveGVuYnVzX3Byb2Jl
-LmMNCj4gPiBAQCAtMjMyLDkgKzIzMiwxMSBAQCBpbnQgeGVuYnVzX2Rldl9wcm9iZShzdHJ1Y3Qg
-ZGV2aWNlICpfZGV2KQ0KPiA+ICAJCXJldHVybiBlcnI7DQo+ID4gIAl9DQo+ID4NCj4gPiArCV9f
-bW9kdWxlX2dldChkcnYtPmRyaXZlci5vd25lcik7DQo+IA0KPiBJIGd1ZXNzIHlvdSByZWFsbHkg
-d2FudCB0cnlfbW9kdWxlX2dldCgpIGFuZCBkZWFsIHdpdGggaXQgcmV0dXJuaW5nDQo+IGZhbHNl
-Lg0KPiANCg0KUGVyaGFwcywgeWVzLg0KDQogIFBhdWwNCg0KPiBKYW4NCg==
+On 11/29/19 3:23 AM, Jan Kara wrote:
+> On Mon 25-11-19 15:10:33, John Hubbard wrote:
+>> 1. Convert from get_user_pages() to pin_user_pages().
+>>
+>> 2. As required by pin_user_pages(), release these pages via
+>> put_user_page(). In this case, do so via put_user_pages_dirty_lock().
+>>
+>> That has the side effect of calling set_page_dirty_lock(), instead
+>> of set_page_dirty(). This is probably more accurate.
+> 
+> Maybe more accurate but it doesn't work for mm_iommu_unpin(). As I'm
+> checking mm_iommu_unpin() gets called from RCU callback which is executed
+> interrupt context and you cannot lock pages from such context. So you need
+> to queue work from the RCU callback and then do the real work from the
+> workqueue...
+> 
+> 								Honza
+
+ah yes, fixed locally. (In order to avoid  distracting people during the merge
+window, I won't post any more versions of the series until the merge window is
+over, unless a maintainer tells me that any of these patches are desired for
+5.5.)
+
+With that, we are back to a one-line diff for this part:
+
+@@ -215,7 +214,7 @@ static void mm_iommu_unpin(struct mm_iommu_table_group_mem_t *mem)
+                 if (mem->hpas[i] & MM_IOMMU_TABLE_GROUP_PAGE_DIRTY)
+                         SetPageDirty(page);
+  
+-               put_page(page);
++               put_user_page(page);
+                 mem->hpas[i] = 0;
+         }
+  }
+
+btw, I'm also working on your feedback for patch 17 (mm/gup: track FOLL_PIN pages [1]),
+from a few days earlier, it's not being ignored, I'm just trying to avoid distracting
+people during the merge window.
+
+[1] https://lore.kernel.org/r/20191121093941.GA18190@quack2.suse.cz
+
+thanks,
+-- 
+John Hubbard
+NVIDIA
