@@ -2,153 +2,112 @@ Return-Path: <SRS0=kXjy=ZV=vger.kernel.org=linux-block-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-9.9 required=3.0 tests=DKIMWL_WL_HIGH,DKIM_SIGNED,
-	DKIM_VALID,DKIM_VALID_AU,HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,
-	MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,USER_AGENT_GIT
-	autolearn=unavailable autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-3.9 required=3.0 tests=DKIMWL_WL_HIGH,DKIM_SIGNED,
+	DKIM_VALID,DKIM_VALID_AU,HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,
+	SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS autolearn=no autolearn_force=no
+	version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 871C4C432C0
-	for <linux-block@archiver.kernel.org>; Fri, 29 Nov 2019 13:43:35 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id B380AC432C0
+	for <linux-block@archiver.kernel.org>; Fri, 29 Nov 2019 15:02:43 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.kernel.org (Postfix) with ESMTP id 5D5A3217BA
-	for <linux-block@archiver.kernel.org>; Fri, 29 Nov 2019 13:43:35 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id 84A412070B
+	for <linux-block@archiver.kernel.org>; Fri, 29 Nov 2019 15:02:43 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=pass (1024-bit key) header.d=amazon.com header.i=@amazon.com header.b="sfv/v4Hz"
+	dkim=pass (1024-bit key) header.d=amazon.com header.i=@amazon.com header.b="Gl28a1+E"
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1726608AbfK2Nnb (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Fri, 29 Nov 2019 08:43:31 -0500
-Received: from smtp-fw-9102.amazon.com ([207.171.184.29]:43721 "EHLO
-        smtp-fw-9102.amazon.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1726821AbfK2Nna (ORCPT
+        id S1726808AbfK2PCm (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Fri, 29 Nov 2019 10:02:42 -0500
+Received: from smtp-fw-6002.amazon.com ([52.95.49.90]:26456 "EHLO
+        smtp-fw-6002.amazon.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S1726608AbfK2PCm (ORCPT
         <rfc822;linux-block@vger.kernel.org>);
-        Fri, 29 Nov 2019 08:43:30 -0500
+        Fri, 29 Nov 2019 10:02:42 -0500
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
   d=amazon.com; i=@amazon.com; q=dns/txt; s=amazon201209;
-  t=1575035011; x=1606571011;
-  h=from:to:cc:subject:date:message-id:in-reply-to:
-   references:mime-version:content-transfer-encoding;
-  bh=0wuTXRU4Sy8QrykGuOio8VY85s141Nvd7sQNiwx40z8=;
-  b=sfv/v4HzwB1k+h1OgJ8U207/x+JYnHHs3OFO6YXM9r7wk/jif18LwyFL
-   DSPaBpQIz5Krd0Zdd2U9e8AxGJuSGYzu6iYIbYRV/HC5jeQ7Yl81Ftg2s
-   JBG+qWrKOAlvkcH3L/0IEexsY8sD5zdGBQDMaIZOVhFQLCeAQ8D8Tdaz4
-   I=;
-IronPort-SDR: PBJTPM/Se4EKdY7tZTf7JHYfAIWVI3TYanP7jOXFt5RONVywmOc7tTicSTzn8H1zkwS88WrFlx
- x3Xvxe9RwsnA==
+  t=1575039761; x=1606575761;
+  h=from:to:cc:subject:date:message-id:references:
+   in-reply-to:content-transfer-encoding:mime-version;
+  bh=FBmcn7qg/GoPD9g1g6BUkkjLeolf0VTqzn6bihHReQU=;
+  b=Gl28a1+EPMjJAmJ67a7w5DikIKR8TSBzJGvAGncv/YjSr47s34+auMhm
+   is9iYWk7l3TO2L3URfx2ID2KO55qOwKeI9cvKzdLMxo9VjzIZhBHP1WjQ
+   wbRuI+lFTJmk359HbRiOyLzi4DH100wp5a+hc5fQEO8ePAkDOBJRyzsD/
+   c=;
+IronPort-SDR: Rf2O4UJ4AzwTF7t1/MajgDmbDCYYpaYTzE3dDwNd4Aw4Xf4LrbC4jyRFXCA52lqF6qCA9tdalw
+ 8WNtgjzbiKlQ==
 X-IronPort-AV: E=Sophos;i="5.69,257,1571702400"; 
-   d="scan'208";a="10582601"
-Received: from sea32-co-svc-lb4-vlan3.sea.corp.amazon.com (HELO email-inbound-relay-1d-98acfc19.us-east-1.amazon.com) ([10.47.23.38])
-  by smtp-border-fw-out-9102.sea19.amazon.com with ESMTP; 29 Nov 2019 13:43:23 +0000
-Received: from EX13MTAUEA001.ant.amazon.com (iad55-ws-svc-p15-lb9-vlan3.iad.amazon.com [10.40.159.166])
-        by email-inbound-relay-1d-98acfc19.us-east-1.amazon.com (Postfix) with ESMTPS id 144ECA292A;
-        Fri, 29 Nov 2019 13:43:20 +0000 (UTC)
-Received: from EX13D32EUB004.ant.amazon.com (10.43.166.212) by
+   d="scan'208";a="5434371"
+Received: from iad6-co-svc-p1-lb1-vlan3.amazon.com (HELO email-inbound-relay-2a-90c42d1d.us-west-2.amazon.com) ([10.124.125.6])
+  by smtp-border-fw-out-6002.iad6.amazon.com with ESMTP; 29 Nov 2019 15:02:40 +0000
+Received: from EX13MTAUEA001.ant.amazon.com (pdx4-ws-svc-p6-lb7-vlan3.pdx.amazon.com [10.170.41.166])
+        by email-inbound-relay-2a-90c42d1d.us-west-2.amazon.com (Postfix) with ESMTPS id 461FAA1F12;
+        Fri, 29 Nov 2019 15:02:39 +0000 (UTC)
+Received: from EX13D32EUC004.ant.amazon.com (10.43.164.121) by
  EX13MTAUEA001.ant.amazon.com (10.43.61.82) with Microsoft SMTP Server (TLS)
- id 15.0.1367.3; Fri, 29 Nov 2019 13:43:20 +0000
-Received: from EX13MTAUEE001.ant.amazon.com (10.43.62.200) by
- EX13D32EUB004.ant.amazon.com (10.43.166.212) with Microsoft SMTP Server (TLS)
- id 15.0.1367.3; Fri, 29 Nov 2019 13:43:19 +0000
-Received: from u2f063a87eabd5f.cbg10.amazon.com (10.125.106.135) by
- mail-relay.amazon.com (10.43.62.226) with Microsoft SMTP Server id
- 15.0.1367.3 via Frontend Transport; Fri, 29 Nov 2019 13:43:17 +0000
-From:   Paul Durrant <pdurrant@amazon.com>
-To:     <linux-block@vger.kernel.org>, <linux-kernel@vger.kernel.org>,
-        <xen-devel@lists.xenproject.org>
-CC:     Paul Durrant <pdurrant@amazon.com>,
-        Konrad Rzeszutek Wilk <konrad.wilk@oracle.com>,
-        =?UTF-8?q?Roger=20Pau=20Monn=C3=A9?= <roger.pau@citrix.com>,
+ id 15.0.1367.3; Fri, 29 Nov 2019 15:02:38 +0000
+Received: from EX13D32EUC003.ant.amazon.com (10.43.164.24) by
+ EX13D32EUC004.ant.amazon.com (10.43.164.121) with Microsoft SMTP Server (TLS)
+ id 15.0.1367.3; Fri, 29 Nov 2019 15:02:38 +0000
+Received: from EX13D32EUC003.ant.amazon.com ([10.43.164.24]) by
+ EX13D32EUC003.ant.amazon.com ([10.43.164.24]) with mapi id 15.00.1367.000;
+ Fri, 29 Nov 2019 15:02:37 +0000
+From:   "Durrant, Paul" <pdurrant@amazon.com>
+To:     =?iso-8859-1?Q?Roger_Pau_Monn=E9?= <roger.pau@citrix.com>
+CC:     "linux-block@vger.kernel.org" <linux-block@vger.kernel.org>,
+        "linux-kernel@vger.kernel.org" <linux-kernel@vger.kernel.org>,
+        "xen-devel@lists.xenproject.org" <xen-devel@lists.xenproject.org>,
+        "Konrad Rzeszutek Wilk" <konrad.wilk@oracle.com>,
         Jens Axboe <axboe@kernel.dk>
-Subject: [PATCH v2 2/2] block/xen-blkback: allow module to be cleanly unloaded
-Date:   Fri, 29 Nov 2019 13:43:06 +0000
-Message-ID: <20191129134306.2738-3-pdurrant@amazon.com>
-X-Mailer: git-send-email 2.20.1
-In-Reply-To: <20191129134306.2738-1-pdurrant@amazon.com>
+Subject: RE: [PATCH v2 2/2] block/xen-blkback: allow module to be cleanly
+ unloaded
+Thread-Topic: [PATCH v2 2/2] block/xen-blkback: allow module to be cleanly
+ unloaded
+Thread-Index: AQHVprr1wqXBoNh5XEupYuifQUpCwqeiPekAgAAAkLA=
+Date:   Fri, 29 Nov 2019 15:02:37 +0000
+Message-ID: <f06bf1967bdf43ca9b218f9b5c5202a6@EX13D32EUC003.ant.amazon.com>
 References: <20191129134306.2738-1-pdurrant@amazon.com>
+ <20191129134306.2738-3-pdurrant@amazon.com>
+ <20191129150006.GZ980@Air-de-Roger>
+In-Reply-To: <20191129150006.GZ980@Air-de-Roger>
+Accept-Language: en-GB, en-US
+Content-Language: en-US
+X-MS-Has-Attach: 
+X-MS-TNEF-Correlator: 
+x-ms-exchange-transport-fromentityheader: Hosted
+x-originating-ip: [10.43.165.244]
+Content-Type: text/plain; charset="iso-8859-1"
+Content-Transfer-Encoding: quoted-printable
 MIME-Version: 1.0
-Content-Type: text/plain; charset="UTF-8"
-Content-Transfer-Encoding: 8bit
 Sender: linux-block-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-Add a module_exit() to perform the necessary clean-up.
+> -----Original Message-----
+> From: Roger Pau Monn=E9 <roger.pau@citrix.com>
+> Sent: 29 November 2019 15:00
+> To: Durrant, Paul <pdurrant@amazon.com>
+> Cc: linux-block@vger.kernel.org; linux-kernel@vger.kernel.org; xen-
+> devel@lists.xenproject.org; Konrad Rzeszutek Wilk
+> <konrad.wilk@oracle.com>; Jens Axboe <axboe@kernel.dk>
+> Subject: Re: [PATCH v2 2/2] block/xen-blkback: allow module to be cleanly
+> unloaded
+>=20
+> On Fri, Nov 29, 2019 at 01:43:06PM +0000, Paul Durrant wrote:
+> > Add a module_exit() to perform the necessary clean-up.
+> >
+> > Signed-off-by: Paul Durrant <pdurrant@amazon.com>
+>=20
+> LGTM:
+>=20
+> Reviewed-by: Roger Pau Monn=E9 <roger.pau@citrix.com>
+>=20
 
-Signed-off-by: Paul Durrant <pdurrant@amazon.com>
----
-Cc: Konrad Rzeszutek Wilk <konrad.wilk@oracle.com>
-Cc: "Roger Pau Monné" <roger.pau@citrix.com>
-Cc: Jens Axboe <axboe@kernel.dk>
+Thanks.
 
-v2:
- - Drop the addition of ad-hoc reference counting as this is now done
-   centrally in xenbus
----
- drivers/block/xen-blkback/blkback.c |  8 ++++++++
- drivers/block/xen-blkback/common.h  |  3 +++
- drivers/block/xen-blkback/xenbus.c  | 11 +++++++++++
- 3 files changed, 22 insertions(+)
+> AFAICT we should make sure this is not committed before patch 1, or
+> else you could unload a blkback module that's still in use?
+>=20
 
-diff --git a/drivers/block/xen-blkback/blkback.c b/drivers/block/xen-blkback/blkback.c
-index fd1e19f1a49f..e562a7e20c3c 100644
---- a/drivers/block/xen-blkback/blkback.c
-+++ b/drivers/block/xen-blkback/blkback.c
-@@ -1504,5 +1504,13 @@ static int __init xen_blkif_init(void)
- 
- module_init(xen_blkif_init);
- 
-+static void __exit xen_blkif_fini(void)
-+{
-+	xen_blkif_xenbus_fini();
-+	xen_blkif_interface_fini();
-+}
-+
-+module_exit(xen_blkif_fini);
-+
- MODULE_LICENSE("Dual BSD/GPL");
- MODULE_ALIAS("xen-backend:vbd");
-diff --git a/drivers/block/xen-blkback/common.h b/drivers/block/xen-blkback/common.h
-index 1d3002d773f7..49132b0adbbe 100644
---- a/drivers/block/xen-blkback/common.h
-+++ b/drivers/block/xen-blkback/common.h
-@@ -375,9 +375,12 @@ struct phys_req {
- 	struct block_device	*bdev;
- 	blkif_sector_t		sector_number;
- };
-+
- int xen_blkif_interface_init(void);
-+void xen_blkif_interface_fini(void);
- 
- int xen_blkif_xenbus_init(void);
-+void xen_blkif_xenbus_fini(void);
- 
- irqreturn_t xen_blkif_be_int(int irq, void *dev_id);
- int xen_blkif_schedule(void *arg);
-diff --git a/drivers/block/xen-blkback/xenbus.c b/drivers/block/xen-blkback/xenbus.c
-index b90dbcd99c03..e8c5c54e1d26 100644
---- a/drivers/block/xen-blkback/xenbus.c
-+++ b/drivers/block/xen-blkback/xenbus.c
-@@ -333,6 +333,12 @@ int __init xen_blkif_interface_init(void)
- 	return 0;
- }
- 
-+void xen_blkif_interface_fini(void)
-+{
-+	kmem_cache_destroy(xen_blkif_cachep);
-+	xen_blkif_cachep = NULL;
-+}
-+
- /*
-  *  sysfs interface for VBD I/O requests
-  */
-@@ -1122,3 +1128,8 @@ int xen_blkif_xenbus_init(void)
- {
- 	return xenbus_register_backend(&xen_blkbk_driver);
- }
-+
-+void xen_blkif_xenbus_fini(void)
-+{
-+	xenbus_unregister_driver(&xen_blkbk_driver);
-+}
--- 
-2.20.1
+Yes, that's correct.
 
+  Paul
