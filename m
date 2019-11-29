@@ -1,110 +1,134 @@
-Return-Path: <SRS0=c8VV=ZU=vger.kernel.org=linux-block-owner@kernel.org>
+Return-Path: <SRS0=kXjy=ZV=vger.kernel.org=linux-block-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-9.6 required=3.0 tests=DKIM_SIGNED,DKIM_VALID,
-	DKIM_VALID_AU,FREEMAIL_FORGED_FROMDOMAIN,FREEMAIL_FROM,
-	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,
-	SPF_HELO_NONE,SPF_PASS,USER_AGENT_GIT autolearn=unavailable
-	autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-2.4 required=3.0 tests=DKIMWL_WL_HIGH,DKIM_SIGNED,
+	DKIM_VALID,DKIM_VALID_AU,HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,
+	SPF_HELO_NONE,SPF_PASS,USER_AGENT_SANE_1 autolearn=no autolearn_force=no
+	version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 0DCA1C432C0
-	for <linux-block@archiver.kernel.org>; Thu, 28 Nov 2019 21:12:36 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 0064EC432C3
+	for <linux-block@archiver.kernel.org>; Fri, 29 Nov 2019 00:26:08 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.kernel.org (Postfix) with ESMTP id D675421774
-	for <linux-block@archiver.kernel.org>; Thu, 28 Nov 2019 21:12:35 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id CA3AC208E4
+	for <linux-block@archiver.kernel.org>; Fri, 29 Nov 2019 00:26:07 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="JXtMTc7o"
+	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="fZVtPNid"
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1726692AbfK1VMX (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Thu, 28 Nov 2019 16:12:23 -0500
-Received: from mail-wr1-f66.google.com ([209.85.221.66]:42029 "EHLO
-        mail-wr1-f66.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1726569AbfK1VMX (ORCPT
+        id S1726656AbfK2A0B (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Thu, 28 Nov 2019 19:26:01 -0500
+Received: from us-smtp-1.mimecast.com ([205.139.110.61]:31530 "EHLO
+        us-smtp-delivery-1.mimecast.com" rhost-flags-OK-OK-OK-FAIL)
+        by vger.kernel.org with ESMTP id S1726655AbfK2A0A (ORCPT
         <rfc822;linux-block@vger.kernel.org>);
-        Thu, 28 Nov 2019 16:12:23 -0500
-Received: by mail-wr1-f66.google.com with SMTP id a15so32647501wrf.9;
-        Thu, 28 Nov 2019 13:12:20 -0800 (PST)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20161025;
-        h=from:to:subject:date:message-id:in-reply-to:references:mime-version
-         :content-transfer-encoding;
-        bh=fIuQVSLMX/1X5Z+UmWPRtwbnLZp5pF/aLYF24EqxQ1U=;
-        b=JXtMTc7ocPvqqjhWGwL4N5XfTDj8IvidBJQBGqSy8ay6tVNlfhLMbwLCktvdaCLDUj
-         g2jup+T3ajILxGPZ5JSmGNH83XvXWl9GqSDsdG2Ww81oJyOhmWbFWH8LUZwJmsorW++T
-         WfD8SUnBT2p9Mc05X0HTlWYzTN+YpltX/UNH3zVBmWfmjMEmbaB0chJJxQb3KhoN5icz
-         7DJGUMHpKJLlqL/IfLWQ0YLKaElaF9gSOfTGPVUsVUKwMtMVlPdsZgtYd0FwS9M/wmNb
-         Z5OOPpGvRYhfFgQvyVlmaDhNqGxNxSGw2MG2zA/8zdSuLZEo/K5nFPyBuMIl/ssCrNQS
-         lGtA==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20161025;
-        h=x-gm-message-state:from:to:subject:date:message-id:in-reply-to
-         :references:mime-version:content-transfer-encoding;
-        bh=fIuQVSLMX/1X5Z+UmWPRtwbnLZp5pF/aLYF24EqxQ1U=;
-        b=rDQkJB5Vno0PiIJwwR8D5II81bx4VC7Itu0czFIaQs3ImAwi7ja9IfP304nFNPkKOl
-         a0hNgWZA1RL/4BNV/71hpZBi+BC42jJFWJux9B1kS42NO0voCEBOXQlc7Oz4IOPHXuhi
-         BF5NWL/Q1mtszU32OT0cXWsHZg0srm5rTDVMumA1uHQ+kFRfC9mHQQQCUaMV3ubQcAew
-         b1pjDND1Jc2h4+v5LLhaQ09R8XhqEREulwSpKo5HDSFaLFp/p+1Znlla9p2ui7h9RfcG
-         g81ZHAio+x0U2dvExbDRr8rqvFkTybh5MHD6rRiiaDB7lGaOaU+tP5f5AtCuSZnZ7gOU
-         dsmw==
-X-Gm-Message-State: APjAAAXGZawhaoAhvSUKfczkuYg7kTDLk3Iib2BegKARVKMpTwfXDgsa
-        VeV7/ihlJi/pQNhcBeNr92c=
-X-Google-Smtp-Source: APXvYqw9YPzhZ5G3E2CqjZguJrFN2rKInPTXGrl7fNNH7DDUc1clMMTdpDu41ANSrPWnVFCvDl5mKw==
-X-Received: by 2002:adf:ec48:: with SMTP id w8mr2500286wrn.19.1574975539807;
-        Thu, 28 Nov 2019 13:12:19 -0800 (PST)
-Received: from localhost.localdomain ([109.126.143.74])
-        by smtp.gmail.com with ESMTPSA id l26sm11620809wmj.48.2019.11.28.13.12.18
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Thu, 28 Nov 2019 13:12:19 -0800 (PST)
-From:   Pavel Begunkov <asml.silence@gmail.com>
-To:     Jens Axboe <axboe@kernel.dk>, linux-block@vger.kernel.org,
-        linux-kernel@vger.kernel.org
-Subject: [PATCH 1/3] blk-mq: optimise rq sort function
-Date:   Fri, 29 Nov 2019 00:11:53 +0300
-Message-Id: <a21e91fff1abe201ebbc010d596b034f7b5123de.1574974577.git.asml.silence@gmail.com>
-X-Mailer: git-send-email 2.24.0
-In-Reply-To: <cover.1574974577.git.asml.silence@gmail.com>
-References: <cover.1574974577.git.asml.silence@gmail.com>
+        Thu, 28 Nov 2019 19:26:00 -0500
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+        s=mimecast20190719; t=1574987158;
+        h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+         to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+         content-transfer-encoding:content-transfer-encoding:
+         in-reply-to:in-reply-to:references:references;
+        bh=P07r2iHQlRL7YpE8GyJm4hL/1kEs3SHdvQU2XugBgys=;
+        b=fZVtPNidQzqlJY0JOZ2k2+gMOCOnN2bwJU2pctlRbkZmuVkzdZsQhBhlZo2B1vfgp/0F4P
+        E4LCzsx4JpjrefUZQzUXQXFnRZ3utFWq8TCPuW8qtd7K46qkN/YsW8Jqg4hXrf0oWJqCFd
+        2dCIn4jjQLbpNdljMTBFKLni7nA/st0=
+Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
+ [209.132.183.4]) (Using TLS) by relay.mimecast.com with ESMTP id
+ us-mta-194-ajoAp75nOeaYXd9gMFLSOA-1; Thu, 28 Nov 2019 19:25:55 -0500
+Received: from smtp.corp.redhat.com (int-mx05.intmail.prod.int.phx2.redhat.com [10.5.11.15])
+        (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
+        (No client certificate requested)
+        by mimecast-mx01.redhat.com (Postfix) with ESMTPS id E67721803818;
+        Fri, 29 Nov 2019 00:25:53 +0000 (UTC)
+Received: from ming.t460p (ovpn-8-18.pek2.redhat.com [10.72.8.18])
+        by smtp.corp.redhat.com (Postfix) with ESMTPS id 1BAAB5D717;
+        Fri, 29 Nov 2019 00:25:44 +0000 (UTC)
+Date:   Fri, 29 Nov 2019 08:25:40 +0800
+From:   Ming Lei <ming.lei@redhat.com>
+To:     Hannes Reinecke <hare@suse.de>
+Cc:     "Martin K. Petersen" <martin.petersen@oracle.com>,
+        Christoph Hellwig <hch@lst.de>,
+        James Bottomley <james.bottomley@hansenpartnership.com>,
+        Bart van Assche <bvanassche@acm.org>,
+        John Garry <john.garry@huawei.com>, linux-scsi@vger.kernel.org,
+        linux-block@vger.kernel.org,
+        Kashyap Desai <kashyap.desai@broadcom.com>
+Subject: Re: [PATCH 4/8] blk-mq: Facilitate a shared sbitmap per tagset
+Message-ID: <20191129002540.GA1829@ming.t460p>
+References: <20191126091416.20052-1-hare@suse.de>
+ <20191126091416.20052-5-hare@suse.de>
+ <20191126110527.GE32135@ming.t460p>
+ <8a10e2f0-bbdc-8b47-a118-0fd7837ef44e@suse.de>
+ <20191126155445.GB17602@ming.t460p>
+ <5561a568-a559-fee8-83aa-449befedae47@suse.de>
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
+In-Reply-To: <5561a568-a559-fee8-83aa-449befedae47@suse.de>
+User-Agent: Mutt/1.12.1 (2019-06-15)
+X-Scanned-By: MIMEDefang 2.79 on 10.5.11.15
+X-MC-Unique: ajoAp75nOeaYXd9gMFLSOA-1
+X-Mimecast-Spam-Score: 0
+Content-Type: text/plain; charset=us-ascii
+Content-Transfer-Encoding: quoted-printable
+Content-Disposition: inline
 Sender: linux-block-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-Check "!=" in multi-layer comparisons. The same memory usage, fewer
-instructions, and 2 from 4 jumps are replaced with SETcc.
+On Wed, Nov 27, 2019 at 06:02:54PM +0100, Hannes Reinecke wrote:
+> On 11/26/19 4:54 PM, Ming Lei wrote:
+> > On Tue, Nov 26, 2019 at 12:27:50PM +0100, Hannes Reinecke wrote:
+> > > On 11/26/19 12:05 PM, Ming Lei wrote:
+> [ .. ]
+> > > >  From performance viewpoint, all hctx belonging to this request que=
+ue should
+> > > > share one scheduler tagset in case of BLK_MQ_F_TAG_HCTX_SHARED, cau=
+se
+> > > > driver tag queue depth isn't changed.
+> > > >=20
+> > > Hmm. Now you get me confused.
+> > > In an earlier mail you said:
+> > >=20
+> > > > This kind of sharing is wrong, sched tags should be request
+> > > > queue wide instead of tagset wide, and each request queue has
+> > > > its own & independent scheduler queue.
+> > >=20
+> > > as in v2 we _had_ shared scheduler tags, too.
+> > > Did I misread your comment above?
+> >=20
+> > Yes, what I meant is that we can't share sched tags in tagset wide.
+> >=20
+> > Now I mean we should share sched tags among all hctxs in same request
+> > queue, and I believe I have described it clearly.
+> >=20
+> I wonder if this makes a big difference; in the end, scheduler tags are
+> primarily there to allow the scheduler to queue more requests, and
+> potentially merge them. These tags are later converted into 'real' ones v=
+ia
+> blk_mq_get_driver_tag(), and only then the resource limitation takes hold=
+.
+> Wouldn't it be sufficient to look at the number of outstanding commands p=
+er
+> queue when getting a scheduler tag, and not having to implement yet anoth=
+er
+> bitmap?
 
-Note, that list_sort() doesn't differ 0 and <0.
+Firstly too much((nr_hw_queues - 1) times) memory is wasted. Secondly IO
+latency could be increased by too deep scheduler queue depth. Finally CPU
+could be wasted in the retrying of running busy hw queue.
 
-Signed-off-by: Pavel Begunkov <asml.silence@gmail.com>
----
- block/blk-mq.c | 12 ++++--------
- 1 file changed, 4 insertions(+), 8 deletions(-)
+Wrt. driver tags, this patch may be worse, given the average limit for
+each LUN is reduced by (nr_hw_queues) times, see hctx_may_queue().
 
-diff --git a/block/blk-mq.c b/block/blk-mq.c
-index 323c9cb28066..f32a3cfdd34e 100644
---- a/block/blk-mq.c
-+++ b/block/blk-mq.c
-@@ -1668,14 +1668,10 @@ static int plug_rq_cmp(void *priv, struct list_head *a, struct list_head *b)
- 	struct request *rqa = container_of(a, struct request, queuelist);
- 	struct request *rqb = container_of(b, struct request, queuelist);
- 
--	if (rqa->mq_ctx < rqb->mq_ctx)
--		return -1;
--	else if (rqa->mq_ctx > rqb->mq_ctx)
--		return 1;
--	else if (rqa->mq_hctx < rqb->mq_hctx)
--		return -1;
--	else if (rqa->mq_hctx > rqb->mq_hctx)
--		return 1;
-+	if (rqa->mq_ctx != rqb->mq_ctx)
-+		return rqa->mq_ctx > rqb->mq_ctx;
-+	if (rqa->mq_hctx != rqb->mq_hctx)
-+		return rqa->mq_hctx > rqb->mq_hctx;
- 
- 	return blk_rq_pos(rqa) > blk_rq_pos(rqb);
- }
--- 
-2.24.0
+Another change is bt_wait_ptr(). Before your patches, there is single
+.wait_index, now the number of .wait_index is changed to nr_hw_queues.
+
+Also the run queue number is increased a lot in SCSI's IO completion, see
+scsi_end_request().
+
+Kashyap Desai has performance benchmark on fast megaraid SSD, and you can
+ask him to provide performance data for this patches.
+
+Thanks,
+Ming
 
