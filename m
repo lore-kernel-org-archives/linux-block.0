@@ -2,189 +2,236 @@ Return-Path: <SRS0=ZuuS=ZW=vger.kernel.org=linux-block-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-7.2 required=3.0 tests=DKIM_SIGNED,DKIM_VALID,
-	HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,MENTIONS_GIT_HOSTING,
-	SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED,USER_AGENT_SANE_1 autolearn=ham
-	autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-2.1 required=3.0 tests=DKIM_SIGNED,DKIM_VALID,
+	DKIM_VALID_AU,FREEMAIL_FORGED_FROMDOMAIN,FREEMAIL_FROM,
+	HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,
+	USER_AGENT_SANE_1 autolearn=no autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 709F0C432C0
-	for <linux-block@archiver.kernel.org>; Sat, 30 Nov 2019 04:47:13 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 06DD6C432C0
+	for <linux-block@archiver.kernel.org>; Sat, 30 Nov 2019 09:27:07 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.kernel.org (Postfix) with ESMTP id 2F0742072C
-	for <linux-block@archiver.kernel.org>; Sat, 30 Nov 2019 04:47:13 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id BDEE920732
+	for <linux-block@archiver.kernel.org>; Sat, 30 Nov 2019 09:27:06 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel-dk.20150623.gappssmtp.com header.i=@kernel-dk.20150623.gappssmtp.com header.b="qEy4B9Hx"
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="WRfxv2QV"
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1727179AbfK3ErM (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Fri, 29 Nov 2019 23:47:12 -0500
-Received: from mail-pg1-f180.google.com ([209.85.215.180]:46240 "EHLO
-        mail-pg1-f180.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1727142AbfK3ErM (ORCPT
+        id S1725792AbfK3JWw (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Sat, 30 Nov 2019 04:22:52 -0500
+Received: from mail-wm1-f45.google.com ([209.85.128.45]:34569 "EHLO
+        mail-wm1-f45.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S1725783AbfK3JWw (ORCPT
         <rfc822;linux-block@vger.kernel.org>);
-        Fri, 29 Nov 2019 23:47:12 -0500
-Received: by mail-pg1-f180.google.com with SMTP id k1so7083982pga.13
-        for <linux-block@vger.kernel.org>; Fri, 29 Nov 2019 20:47:11 -0800 (PST)
+        Sat, 30 Nov 2019 04:22:52 -0500
+Received: by mail-wm1-f45.google.com with SMTP id f4so1903835wmj.1;
+        Sat, 30 Nov 2019 01:22:50 -0800 (PST)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=kernel-dk.20150623.gappssmtp.com; s=20150623;
-        h=subject:references:to:from:message-id:date:user-agent:mime-version
-         :in-reply-to:content-language:content-transfer-encoding;
-        bh=pgy7igpIJ5WOp97qXan6g9vUo/itqe7db6s2xL510cI=;
-        b=qEy4B9Hx0Yck/7Da2ut7GhEHyEiUSPf8zY/kpKoaoaVSK+gZO0ZtZkjIijDuRxfO1a
-         iZ0ZGRDZ71LSwHWzcWY2npUDHo1c/2Vrryxrxsa9yT4BuFBVNTZ1KWW1Ho00XUfYPMVv
-         UzYWvMvHswDGIw73OoLOwLQ9lDD8OvyErWB7Y8iVpI3CUREZ323n24uGJHxWv++YpycJ
-         lMUMdXIGvlivnJFImCyE8vadStBDxZVc8VFi+ulVkUuIsEDIKCO9Vg+hRF6eT5YlHjj+
-         BxSX600kZHm41TzO1N5H90UdpXxEfW670WtIAr5/oOcRW7qfezn0vTeqktRMgtjGxm6z
-         fKlQ==
+        d=gmail.com; s=20161025;
+        h=to:cc:references:from:autocrypt:subject:message-id:date:user-agent
+         :mime-version:in-reply-to;
+        bh=Qhw4j23ozajxo+UrHG0P2fsF7/+JskhPqMNTwJgkbjk=;
+        b=WRfxv2QVPC3WYCVit1l1v6HcnFYNk1+PXrPH8y8mQjxL2el7bm9eB8RykSTCOm1YIP
+         fG24Ukncw+AFQcRKGLfG9RkF5zIIiqFaGZE7RrBFPhoDPqcbiGFiFDlvW2ZGN9Zi4vGj
+         yFMwmDteMug1w6c7Ch3Sc+6kpGPYLxP6GkKpwPBI+ZAb+ZwJNvnBOGQBFRCxQhgBdcpr
+         ii2cDRMruy9mLgxDff6jGZ/7phgPHYtGA7p105XdddWccVHrRFNhYs8I7S1y7jS7nmVg
+         VIj0TwgLdy4OYimsCpbKM5/ttLo9Y1mxPIDfQhOzrDs3KxQSByel3OYQqJGHFFkdMEzj
+         R/oQ==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=1e100.net; s=20161025;
-        h=x-gm-message-state:subject:references:to:from:message-id:date
-         :user-agent:mime-version:in-reply-to:content-language
-         :content-transfer-encoding;
-        bh=pgy7igpIJ5WOp97qXan6g9vUo/itqe7db6s2xL510cI=;
-        b=T1yNV/eTYiITCqDngvz6XRxDjNkUdZiRmPydK4olrLQX8WjfaE9xFk/WhN0hDZfMYX
-         M6q4hNxQNQgYcRrIfb2ZLu0ae2HluizV1S8nsOX1RsNTURASe8elFjFGMfZgiN2MZfDx
-         vksSrfMt7/yYxXzdRuxoLFDRuNFeeUrtknqHgwW55VEimdu8rShF4s1usxHrGnRdusm3
-         u00bqPt7YUAgV+AM73BxGHlrEXGVmBqv79CqjMCkzqLQ5ZGmfY/B/c0ZzkJFO6JYWQcZ
-         kQG3ISVGMo8+YSZ05rLzczP+9XqfDAA891wLrf6hR0QtcNgcuT2ujfqi2L9F5GI2deZ4
-         Ln0g==
-X-Gm-Message-State: APjAAAWOd0YFPWF5MiVDCze8APob5wOw+iB2/obxiz4/yvM4+XpEdw7R
-        RsfcJmZxUg4q7RRFoU5EUREhtyYVVi6Bpw==
-X-Google-Smtp-Source: APXvYqxQ4Gw/XxbwvQ05lXkpqtbnF6yeuROz91gIJ0lIbb0N8jxXWNSkyY8yZeBlsc/tkGCqDJ/cvA==
-X-Received: by 2002:a63:e94d:: with SMTP id q13mr20145588pgj.209.1575089230246;
-        Fri, 29 Nov 2019 20:47:10 -0800 (PST)
-Received: from ?IPv6:2605:e000:100e:8c61:6849:81f9:6b67:ab51? ([2605:e000:100e:8c61:6849:81f9:6b67:ab51])
-        by smtp.gmail.com with ESMTPSA id l7sm12403338pfl.11.2019.11.29.20.47.08
-        for <linux-block@vger.kernel.org>
+        h=x-gm-message-state:to:cc:references:from:autocrypt:subject
+         :message-id:date:user-agent:mime-version:in-reply-to;
+        bh=Qhw4j23ozajxo+UrHG0P2fsF7/+JskhPqMNTwJgkbjk=;
+        b=C+Rd7Jh9JEbTnX2VB4OKxLK4V/FrmGhDmKUQo6UsPzkt9RZaa3QJxLOgssdgGjBsmL
+         Cyf8QOMLniqJlI0hjWIVajQAagwClklJxZNT21tWHVGgLYV7WByopIKL3no87V+7zrl+
+         u+JRMGhH4luB2AP+sk8pK5vcHZRa6mJbxqxK1QY3NleF92hbeI7kwJ4IyQRiadoA6BrP
+         nPjLYvtK2u7g5p0UPsi4GcMDa2gIkXcaJvuNi8z6OtLDm0KaCP6lYbaEsooWPppGmgNO
+         QTyTKlVKQeT3oMSDkC4SYEyVoIPwKYK4+5kK6GUrNvU1A4QXlBGUs7OKqHYfopyWTjAc
+         jhtQ==
+X-Gm-Message-State: APjAAAUL/jFWJY3ay5xpmIw7+++LxEYuNdlVokII3Y+7zYtGZHoOW43e
+        rAYqu9on4EeZzHQMfnVmxTxiyVIKhh0=
+X-Google-Smtp-Source: APXvYqwfQ37VVIHz68wo9ahBaMsDrOCg2Xik9U71iji8f8CszqbjfpYx8hfS9idIN73CblAyNQ8XOg==
+X-Received: by 2002:a7b:ca4b:: with SMTP id m11mr6238908wml.74.1575105769099;
+        Sat, 30 Nov 2019 01:22:49 -0800 (PST)
+Received: from [192.168.43.11] ([109.126.143.74])
+        by smtp.gmail.com with ESMTPSA id y16sm30073357wro.25.2019.11.30.01.22.47
         (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
-        Fri, 29 Nov 2019 20:47:09 -0800 (PST)
-Subject: Fwd: [GIT PULL] Final io_uring bits for 5.5-rc1
-References: <7976eeb9-b8b5-753b-0d8f-203a00fc1118@kernel.dk>
-To:     "linux-block@vger.kernel.org" <linux-block@vger.kernel.org>
-From:   Jens Axboe <axboe@kernel.dk>
-X-Forwarded-Message-Id: <7976eeb9-b8b5-753b-0d8f-203a00fc1118@kernel.dk>
-Message-ID: <62035535-2c12-ecb5-9766-0726e891babe@kernel.dk>
-Date:   Fri, 29 Nov 2019 20:47:07 -0800
+        Sat, 30 Nov 2019 01:22:48 -0800 (PST)
+To:     Arvind Sankar <nivedita@alum.mit.edu>
+Cc:     Jens Axboe <axboe@kernel.dk>, Ming Lei <ming.lei@canonical.com>,
+        linux-block@vger.kernel.org, linux-kernel@vger.kernel.org
+References: <cover.1574974574.git.asml.silence@gmail.com>
+ <06b1b796b8d9bcaa6d5b325668525b7a5663035b.1574974574.git.asml.silence@gmail.com>
+ <20191129221709.GA1164864@rani.riverdale.lan>
+ <71864178-27d6-c6fb-a66b-395dc46041ac@gmail.com>
+ <20191129232445.GA1331087@rani.riverdale.lan>
+From:   Pavel Begunkov <asml.silence@gmail.com>
+Autocrypt: addr=asml.silence@gmail.com; prefer-encrypt=mutual; keydata=
+ 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 bA==
+Subject: Re: [PATCH] block: optimise bvec_iter_advance()
+Message-ID: <7be4b7fb-5c14-3c3a-e7f1-c5cc6c047f60@gmail.com>
+Date:   Sat, 30 Nov 2019 12:22:27 +0300
 User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:68.0) Gecko/20100101
- Thunderbird/68.2.1
+ Thunderbird/68.2.0
 MIME-Version: 1.0
-In-Reply-To: <7976eeb9-b8b5-753b-0d8f-203a00fc1118@kernel.dk>
-Content-Type: text/plain; charset=utf-8; format=flowed
-Content-Language: en-US
-Content-Transfer-Encoding: 7bit
+In-Reply-To: <20191129232445.GA1331087@rani.riverdale.lan>
+Content-Type: multipart/signed; micalg=pgp-sha256;
+ protocol="application/pgp-signature";
+ boundary="KwZwyfJl0orSB4BdMgk6UsqKM5VBI8AvE"
 Sender: linux-block-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-Forgot to CC linux-block on this pull request, sent earlier today.
+This is an OpenPGP/MIME signed message (RFC 4880 and 3156)
+--KwZwyfJl0orSB4BdMgk6UsqKM5VBI8AvE
+Content-Type: multipart/mixed; boundary="9chfTVu7zDdPjdpOBd3wgkTANRLQuxQB5";
+ protected-headers="v1"
+From: Pavel Begunkov <asml.silence@gmail.com>
+To: Arvind Sankar <nivedita@alum.mit.edu>
+Cc: Jens Axboe <axboe@kernel.dk>, Ming Lei <ming.lei@canonical.com>,
+ linux-block@vger.kernel.org, linux-kernel@vger.kernel.org
+Message-ID: <7be4b7fb-5c14-3c3a-e7f1-c5cc6c047f60@gmail.com>
+Subject: Re: [PATCH] block: optimise bvec_iter_advance()
+References: <cover.1574974574.git.asml.silence@gmail.com>
+ <06b1b796b8d9bcaa6d5b325668525b7a5663035b.1574974574.git.asml.silence@gmail.com>
+ <20191129221709.GA1164864@rani.riverdale.lan>
+ <71864178-27d6-c6fb-a66b-395dc46041ac@gmail.com>
+ <20191129232445.GA1331087@rani.riverdale.lan>
+In-Reply-To: <20191129232445.GA1331087@rani.riverdale.lan>
+
+--9chfTVu7zDdPjdpOBd3wgkTANRLQuxQB5
+Content-Type: text/plain; charset=utf-8
+Content-Language: en-US
+Content-Transfer-Encoding: quoted-printable
+
+On 30/11/2019 02:24, Arvind Sankar wrote:
+> On Sat, Nov 30, 2019 at 01:47:16AM +0300, Pavel Begunkov wrote:
+>> On 30/11/2019 01:17, Arvind Sankar wrote:
+>>>
+>>> The loop can be simplified a bit further, as done has to be 0 once we=
+ go
+>>> beyond the current bio_vec. See below for the simplified version.
+>>>
+>>
+>> Thanks for the suggestion! I thought about it, and decided to not
+>> for several reasons. I prefer to not fine-tune and give compilers
+>> more opportunity to do their job. And it's already fast enough with
+>> modern architectures (MOVcc, complex addressing, etc).
+>>
+>> Also need to consider code clarity and the fact, that this is inline,
+>> so should be brief and register-friendly.
+>>
+>=20
+> It should be more register-friendly, as it uses fewer variables, and I
+> think it's easier to see what the loop is doing, i.e. that we advance
+> one bio_vec per iteration: in the existing code, it takes a bit of
+> thinking to see that we won't spend more than one iteration within the
+> same bio_vec.
+
+Yeah, may be. It's more the matter of preference then. I don't think
+it's simpler, and performance is entirely depends on a compiler and=20
+input. But, that's rather subjective and IMHO not worth of time.
+
+Anyway, thanks for thinking this through!
+
+>=20
+> I don't see this as fine-tuning, rather simplifying the code. I do agre=
+e
+> that it's not going to make much difference for performance of the loop=
+
+> itself, as the most common case I think is that we either stay in the
+> current bio_vec or advance by one.
+>=20
+>>
+>>> I also check if bi_size became zero so we can skip the rest of the
+>>> calculations in that case. If we want to preserve the current behavio=
+r of
+>>> updating iter->bi_idx and iter->bi_bvec_done even if bi_size is going=
+ to
+>>> become zero, the loop condition should change to
+>>>
+>>> 		while (bytes && bytes >=3D cur->bv_len)
+>>
+>> Probably, it's better to leave it in a consistent state. Shouldn't be
+>> a problem, but never know when and who will screw it up.=20
+>>
+>=20
+> The WARN_ONCE case does leave it inconsistent, though that's not
+> supposed to happen, so less of a pitfall there.
+>=20
+
+But I hope, this WARN_ONCE won't ever happen, but I wouldn't be
+suprised by code like:
+
+last_page =3D (bv + iter->idx - 1)->page.=20
 
 
--------- Forwarded Message --------
-Subject: [GIT PULL] Final io_uring bits for 5.5-rc1
-Date: Thu, 28 Nov 2019 09:05:30 -0800
-From: Jens Axboe <axboe@kernel.dk>
-To: Linus Torvalds <torvalds@linux-foundation.org>
-CC: io-uring <io-uring@vger.kernel.org>
-
-Hi Linus,
-
-As mentioned in the first pull request, there was a later batch as well.
-This contains fixes to the stuff that already went in, cleanups, and a
-few later additions. In particular, this pull request contains:
-
-- Cleanups/fixes/unification of the submission and completion
-    path (Pavel,me)
-
-- Linked timeouts improvements (Pavel,me)
-
-- Error path fixes (me)
-
-- Fix lookup window where cancellations wouldn't work (me)
-
-- Improve DRAIN support (Pavel)
-
-- Fix backlog flushing -EBUSY on submit (me)
-
-- Add support for connect(2) (me)
-
-- Fix for non-iter based fixed IO (Pavel)
-
-- creds inheritance for async workers (me)
-
-- Disable cmsg/ancillary data for sendmsg/recvmsg (me)
-
-- Shrink io_kiocb to 3 cachelines (me)
-
-- NUMA fix for io-wq (Jann)
-
-Please pull!
+--=20
+Pavel Begunkov
 
 
-    git://git.kernel.dk/linux-block.git tags/for-5.5/io_uring-post-20191128
+--9chfTVu7zDdPjdpOBd3wgkTANRLQuxQB5--
 
+--KwZwyfJl0orSB4BdMgk6UsqKM5VBI8AvE
+Content-Type: application/pgp-signature; name="signature.asc"
+Content-Description: OpenPGP digital signature
+Content-Disposition: attachment; filename="signature.asc"
 
-----------------------------------------------------------------
-Dan Carpenter (1):
-        io-wq: remove extra space characters
+-----BEGIN PGP SIGNATURE-----
 
-Hrvoje Zeba (1):
-        io_uring: remove superfluous check for sqe->off in io_accept()
+iQIzBAEBCAAdFiEE+6JuPTjTbx479o3OWt5b1Glr+6UFAl3iNNcACgkQWt5b1Glr
++6XHEg/+Ieq8bmnCFhfKCwiK20vU2GsLVAbFsk2TqHExwAZa/hnFxoOHkPE4gItH
+YaKSagnfUkCDn3clCgysxJJhLl+uexJel0OW/O02wZyqELS5QkF2uH8SfPgD3Fab
+gZ0TtxYKBpPsxVAnUC6jVURhcQJHN0F+NjBZXyKH7YOtUvSCbUGNX9zO4Y3ZQB75
+iu+loTMdL0qxFN0VSZgRsQ3W3aqpMjtU1kec6GOwGtb4MiYd+Is5Dr3KcocElJKx
+2AqvS40Gx20OKbW8z6DaGVxcy9xakuXuK4HfkcgIAj9TLITN8Z5NxvFt2IxDp9Hq
+1jAu+a2a4kHKVGjJz66xJhUVdQXxLJ8SRiSroE57C126UHHyrEE4Mm1XfFphGJTd
+axHU7X3+67Apmg4eY4AUJj7dercPXJgF7EwfP2du/nMw9w8zP+ebX84Leoxz8UpL
+tAmBFJV79J4/yELGPMnWxlkEbzwWR8g0oKcjAT4clXZVAMUS6Ded8iXfpMjf8TG6
+8qQvHQmehbzrfsuGAyAGPGzqchNoNInADqgoBz9ofyFOslBjWw38erm/1bdNGvHb
+4kUogAF8B7lHzOe8qyqEcZMNx6k8Pv4+JtkTHiMSQE7SVQwIG33qd+XNLd9Bl2C0
+CzxqCUkn5pLhy9kDexsqIcTZo/NhBEud6mXDF3PZyK3l7RkMDp4=
+=Xd72
+-----END PGP SIGNATURE-----
 
-Jann Horn (2):
-        io_uring: use kzalloc instead of kcalloc for single-element allocations
-        io-wq: fix handling of NUMA node IDs
-
-Jens Axboe (23):
-        io_uring: io_async_cancel() should pass in 'nxt' request pointer
-        io_uring: cleanup return values from the queueing functions
-        io_uring: make io_double_put_req() use normal completion path
-        io_uring: make req->timeout be dynamically allocated
-        io_uring: fix sequencing issues with linked timeouts
-        io_uring: remove dead REQ_F_SEQ_PREV flag
-        io_uring: correct poll cancel and linked timeout expiration completion
-        io_uring: request cancellations should break links
-        io-wq: wait for io_wq_create() to setup necessary workers
-        io_uring: io_fail_links() should only consider first linked timeout
-        io_uring: io_allocate_scq_urings() should return a sane state
-        io_uring: allow finding next link independent of req reference count
-        io_uring: close lookup gap for dependent next work
-        io_uring: improve trace_io_uring_defer() trace point
-        io_uring: only return -EBUSY for submit on non-flushed backlog
-        net: add __sys_connect_file() helper
-        io_uring: add support for IORING_OP_CONNECT
-        io-wq: have io_wq_create() take a 'data' argument
-        io_uring: async workers should inherit the user creds
-        net: separate out the msghdr copy from ___sys_{send,recv}msg()
-        net: disallow ancillary data for __sys_{send,recv}msg_file()
-        io-wq: shrink io_wq_work a bit
-        io_uring: make poll->wait dynamically allocated
-
-Pavel Begunkov (15):
-        io_uring: break links for failed defer
-        io_uring: remove redundant check
-        io_uring: Fix leaking linked timeouts
-        io_uring: Always REQ_F_FREE_SQE for allocated sqe
-        io_uring: drain next sqe instead of shadowing
-        io_uring: rename __io_submit_sqe()
-        io_uring: add likely/unlikely in io_get_sqring()
-        io_uring: remove io_free_req_find_next()
-        io_uring: pass only !null to io_req_find_next()
-        io_uring: simplify io_req_link_next()
-        io_uring: only !null ptr to io_issue_sqe()
-        io_uring: fix dead-hung for non-iter fixed rw
-        io_uring: store timeout's sqe->off in proper place
-        io_uring: inline struct sqe_submit
-        io_uring: cleanup io_import_fixed()
-
-   fs/io-wq.c                      | 187 ++++++----
-   fs/io-wq.h                      |  63 +++-
-   fs/io_uring.c                   | 776 ++++++++++++++++++++++------------------
-   include/linux/socket.h          |   3 +
-   include/trace/events/io_uring.h |  16 +-
-   include/uapi/linux/io_uring.h   |   1 +
-   net/socket.c                    | 214 +++++++----
-   7 files changed, 757 insertions(+), 503 deletions(-)
-
--- 
-Jens Axboe
-
+--KwZwyfJl0orSB4BdMgk6UsqKM5VBI8AvE--
