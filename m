@@ -2,104 +2,119 @@ Return-Path: <SRS0=ZuuS=ZW=vger.kernel.org=linux-block-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-5.0 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
-	HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,
-	SPF_PASS,USER_AGENT_SANE_1 autolearn=ham autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-8.6 required=3.0 tests=DKIMWL_WL_HIGH,DKIM_SIGNED,
+	DKIM_VALID,DKIM_VALID_AU,INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,
+	SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED,USER_AGENT_SANE_1 autolearn=ham
+	autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 7399BC432C0
-	for <linux-block@archiver.kernel.org>; Sat, 30 Nov 2019 22:05:05 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 49622C432C0
+	for <linux-block@archiver.kernel.org>; Sat, 30 Nov 2019 22:06:44 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.kernel.org (Postfix) with ESMTP id 3D4C62075A
-	for <linux-block@archiver.kernel.org>; Sat, 30 Nov 2019 22:05:05 +0000 (UTC)
-Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="s4A2sJws"
+	by mail.kernel.org (Postfix) with ESMTP id 1A8B320833
+	for <linux-block@archiver.kernel.org>; Sat, 30 Nov 2019 22:06:44 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+	s=default; t=1575151604;
+	bh=2xayJs4oZK6B8/2irCWF8SEufg76S3680V4/IlMpP4s=;
+	h=Date:From:To:Cc:Subject:References:In-Reply-To:List-ID:From;
+	b=ynIWKdOlu2ek9vSiq5fCYnb/ALIEoz5VPz1taJoNXRkq/Yf3j0FUbhHitVtISxyiU
+	 LIeDptx9fsd1KupKfNQi+o8b0tf5pEo/3xh4pM1V4/TH2X1sxpvFxIiSRIEzrkpjuA
+	 A4B/lIN8NC9sUPXMqeY7ovrVA0BkehWTgP6LBRI4=
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1727201AbfK3WFE (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Sat, 30 Nov 2019 17:05:04 -0500
-Received: from mail-qt1-f196.google.com ([209.85.160.196]:36189 "EHLO
-        mail-qt1-f196.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1727179AbfK3WFE (ORCPT
-        <rfc822;linux-block@vger.kernel.org>);
-        Sat, 30 Nov 2019 17:05:04 -0500
-Received: by mail-qt1-f196.google.com with SMTP id y10so36782144qto.3;
-        Sat, 30 Nov 2019 14:05:04 -0800 (PST)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20161025;
-        h=sender:from:date:to:cc:subject:message-id:references:mime-version
-         :content-disposition:in-reply-to:user-agent;
-        bh=LavGqVWdCa+DgEJijwHbAU0oPvPk/rvkw7rn6vGHe94=;
-        b=s4A2sJwsb7TgqnsHw/GTBPDuz7XkDrPomjfcp991BO0a1XcmM8BwZ5Hao4Vcboim29
-         7EWGGQ5XtYgl4ZzKChRe31qVjEZhiYf8KJCF+36+CtByqBbx+Q/TzamBjKpbace0nrGT
-         ecLpX8RTH6MlIb5o3rCO65H79wgTIAy91QhMXcM78M+KivJ4pKqH2iMOyAb79S8zmi2L
-         Jk9HcQ5V2KQQeeZhrzpwu37Nv4532oxHd00i4gLqxNFIPxnQKxTjSlYa0YeQsmfZFiVx
-         oYeVWdjOcSZKWTflBPlPbqq6FLqPDeteCYwwCHZzlmmEYCRkAekt9HGl5lhvSQ+dhARu
-         bJVA==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20161025;
-        h=x-gm-message-state:sender:from:date:to:cc:subject:message-id
-         :references:mime-version:content-disposition:in-reply-to:user-agent;
-        bh=LavGqVWdCa+DgEJijwHbAU0oPvPk/rvkw7rn6vGHe94=;
-        b=kgwKf9lGvl5gy+SuR5vWdcv90YrN0+6wfXmPTav/6DVWJf3guEeE7TA4DqcZruRR1j
-         t0RIQdSd4CpneKfw0cePK5kgsluTPozcQ0EQVrUZxW9d6Lznwk1PNu8nX1Qo2qxXzt3x
-         cP/aW1rhyARnl0UMHzxn7Xpgrz4sf7RfggkgY6iHXlRbPcFI3RthXdQDct/2SdGRZ2yX
-         vKk40FdSc+Scr4wYvl/LUAMow8tGckpwCAnuatEIzIFEhTtUm8RtimgkoCn1EDDRd/c0
-         2mkwuIkFj/cqRTU581e7iD6obM2WKTlwQgbg5QfihldTv7ZrX7/02Nlqno/xnqPBxkXc
-         rCHQ==
-X-Gm-Message-State: APjAAAVlico8Rg9hHbzWLO3pVv8CFuPD6BA0BSAGVAUnpbumoISvYKjG
-        WKGolfnR07+r0VeuZLtwhjA=
-X-Google-Smtp-Source: APXvYqzTU9c13zW91d8JiG3CkIJUp+ndwSysFJrulNhocQrAsWtPE/0I97hN+dA7VDf4mt/1dO67Eg==
-X-Received: by 2002:ac8:37b6:: with SMTP id d51mr50374025qtc.261.1575151503469;
-        Sat, 30 Nov 2019 14:05:03 -0800 (PST)
-Received: from rani.riverdale.lan ([2001:470:1f07:5f3::b55f])
-        by smtp.gmail.com with ESMTPSA id 24sm4129561qka.32.2019.11.30.14.05.01
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Sat, 30 Nov 2019 14:05:02 -0800 (PST)
-From:   Arvind Sankar <nivedita@alum.mit.edu>
-X-Google-Original-From: Arvind Sankar <arvind@rani.riverdale.lan>
-Date:   Sat, 30 Nov 2019 17:05:00 -0500
-To:     Pavel Begunkov <asml.silence@gmail.com>
-Cc:     Jens Axboe <axboe@kernel.dk>, nivedita@alum.mit.edu,
-        linux-block@vger.kernel.org, linux-kernel@vger.kernel.org
-Subject: Re: [PATCH v2] block: optimise bvec_iter_advance()
-Message-ID: <20191130220458.GA297712@rani.riverdale.lan>
-References: <cover.1575144884.git.asml.silence@gmail.com>
- <b1408bd6cc3f04fe22ce64f97174b6fbf9ffea40.1575144884.git.asml.silence@gmail.com>
+        id S1727312AbfK3WGn (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Sat, 30 Nov 2019 17:06:43 -0500
+Received: from mail.kernel.org ([198.145.29.99]:42728 "EHLO mail.kernel.org"
+        rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
+        id S1727179AbfK3WGn (ORCPT <rfc822;linux-block@vger.kernel.org>);
+        Sat, 30 Nov 2019 17:06:43 -0500
+Received: from sol.localdomain (c-24-5-143-220.hsd1.ca.comcast.net [24.5.143.220])
+        (using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+        (No client certificate requested)
+        by mail.kernel.org (Postfix) with ESMTPSA id 7C4232082E;
+        Sat, 30 Nov 2019 22:06:42 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+        s=default; t=1575151602;
+        bh=2xayJs4oZK6B8/2irCWF8SEufg76S3680V4/IlMpP4s=;
+        h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
+        b=PgX0R7kV5FM7xuss2R9PJ895BZvid6ReH+njGhKpCjbQsFlKu1tPIEtiOHdyKrDpd
+         SMtZxmVt/frn0+h6g+W6OMirxFl25tuUCsM3oBUATQwNi2TNzJUvZuquY1kDchyabt
+         ZoBjFehhHiJqibWj12P678S6f84pxGGtC2PRtE3U=
+Date:   Sat, 30 Nov 2019 14:06:41 -0800
+From:   Eric Biggers <ebiggers@kernel.org>
+To:     Christoph Hellwig <hch@lst.de>
+Cc:     Jens Axboe <axboe@kernel.dk>, Jan Kara <jack@suse.cz>,
+        linux-block@vger.kernel.org, linux-s390@vger.kernel.org
+Subject: Re: [PATCH 2/7] block: merge invalidate_partitions into
+ rescan_partitions
+Message-ID: <20191130220641.GA669@sol.localdomain>
+References: <20191114143438.14681-1-hch@lst.de>
+ <20191114143438.14681-3-hch@lst.de>
+ <20191130214942.GA676@sol.localdomain>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=utf-8
+Content-Type: text/plain; charset=us-ascii
 Content-Disposition: inline
-In-Reply-To: <b1408bd6cc3f04fe22ce64f97174b6fbf9ffea40.1575144884.git.asml.silence@gmail.com>
-User-Agent: Mutt/1.10.1 (2018-07-13)
+In-Reply-To: <20191130214942.GA676@sol.localdomain>
+User-Agent: Mutt/1.12.2 (2019-09-21)
 Sender: linux-block-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-On Sat, Nov 30, 2019 at 11:23:52PM +0300, Pavel Begunkov wrote:
-> bvec_iter_advance() is quite popular, but compilers fail to do proper
-> alias analysis and optimise it good enough. The assembly is checked
-> for gcc 9.2, x86-64.
+On Sat, Nov 30, 2019 at 01:49:42PM -0800, Eric Biggers wrote:
+> Hi Christoph,
 > 
-> - remove @iter->bi_size from min(...), as it's always less than @bytes.
-> Modify at the beginning and forget about it.
+> On Thu, Nov 14, 2019 at 03:34:33PM +0100, Christoph Hellwig wrote:
+> > A lot of the logic in invalidate_partitions and rescan_partitions is
+> > shared.  Merge the two functions to simplify things.  There is a small
+> > behavior change in that we now send the kevent change notice also if we
+> > were not invalidating but no partitions were found, which seems like
+> > the right thing to do.
+> > 
+> > Signed-off-by: Christoph Hellwig <hch@lst.de>
+> > Reviewed-by: Jan Kara <jack@suse.cz>
+> > ---
+> >  block/ioctl.c             |  2 +-
+> >  block/partition-generic.c | 38 ++++++++++++++------------------------
+> >  fs/block_dev.c            |  5 +----
+> >  include/linux/genhd.h     |  4 ++--
+> >  4 files changed, 18 insertions(+), 31 deletions(-)
+> > 
 > 
-> - the compiler isn't able to collapse memory dependencies and remove
-> writes in the loop. Help it by explicitely using local vars.
+> Mainline is broken for me because systemd-udevd spins forever using max CPU
+> starting at boot time.  I bisected it to this commit.
 > 
-> Signed-off-by: Pavel Begunkov <asml.silence@gmail.com>
-> ---
+> I'm not an expert in this code, but the following patch fixes it:
 > 
-> v2: simplify code (Arvind Sankar)
+> diff --git a/block/partition-generic.c b/block/partition-generic.c
+> index 6b9f4f5d993a..b0eebd7580ab 100644
+> --- a/block/partition-generic.c
+> +++ b/block/partition-generic.c
+> @@ -599,7 +599,8 @@ int rescan_partitions(struct gendisk *disk, struct block_device *bdev,
+>  		 * Tell userspace that the media / partition table may have
+>  		 * changed.
+>  		 */
+> -		kobject_uevent(&disk_to_dev(disk)->kobj, KOBJ_CHANGE);
+> +		if (invalidate)
+> +			kobject_uevent(&disk_to_dev(disk)->kobj, KOBJ_CHANGE);
+>  		return 0;
+>  	}
+> 
+> 
+> Do you have any better suggestion, or should I just send this as a formal patch?
 > 
 
-Thanks :)
+Actually this code was moved around more between the bad commit and mainline,
+so the fix for mainline would be:
 
-Signed-off-by: Arvind Sankar <nivedita@alum.mit.edu>
-
-Btw, I discovered that gcc 9.2 doesn't optimize away the second
-comparison in something like
-
-	m = min(a,b);
-	return m>a;
-
-So the WARN_ONCE bit doesn't get optimized away even in cases like
-bio_for_each_bvec where it's guaranteed at compile-time to not trigger.
+diff --git a/fs/block_dev.c b/fs/block_dev.c
+index ee63c2732fa2..69bf2fb6f7cd 100644
+--- a/fs/block_dev.c
++++ b/fs/block_dev.c
+@@ -1531,7 +1531,7 @@ int bdev_disk_changed(struct block_device *bdev, bool invalidate)
+ 		ret = blk_add_partitions(disk, bdev);
+ 		if (ret == -EAGAIN)
+ 			goto rescan;
+-	} else {
++	} else if (invalidate) {
+ 		/*
+ 		 * Tell userspace that the media / partition table may have
+ 		 * changed.
