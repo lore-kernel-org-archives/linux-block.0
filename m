@@ -1,4 +1,4 @@
-Return-Path: <SRS0=5p5X=ZX=vger.kernel.org=linux-block-owner@kernel.org>
+Return-Path: <SRS0=iG2v=ZY=vger.kernel.org=linux-block-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
@@ -7,181 +7,346 @@ X-Spam-Status: No, score=-5.4 required=3.0 tests=DKIMWL_WL_HIGH,DKIM_SIGNED,
 	MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,USER_AGENT_SANE_1
 	autolearn=unavailable autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 09A5DC432C3
-	for <linux-block@archiver.kernel.org>; Sun,  1 Dec 2019 17:11:49 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 2B179C432C3
+	for <linux-block@archiver.kernel.org>; Mon,  2 Dec 2019 02:46:49 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.kernel.org (Postfix) with ESMTP id C5B862073C
-	for <linux-block@archiver.kernel.org>; Sun,  1 Dec 2019 17:11:48 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id EA6D0215F1
+	for <linux-block@archiver.kernel.org>; Mon,  2 Dec 2019 02:46:48 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="bV7II9jf"
+	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="AqFJuuad"
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1726498AbfLARLm (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Sun, 1 Dec 2019 12:11:42 -0500
-Received: from us-smtp-1.mimecast.com ([205.139.110.61]:38554 "EHLO
+        id S1727374AbfLBCqs (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Sun, 1 Dec 2019 21:46:48 -0500
+Received: from us-smtp-2.mimecast.com ([205.139.110.61]:52045 "EHLO
         us-smtp-delivery-1.mimecast.com" rhost-flags-OK-OK-OK-FAIL)
-        by vger.kernel.org with ESMTP id S1726393AbfLARLl (ORCPT
+        by vger.kernel.org with ESMTP id S1727370AbfLBCqs (ORCPT
         <rfc822;linux-block@vger.kernel.org>);
-        Sun, 1 Dec 2019 12:11:41 -0500
+        Sun, 1 Dec 2019 21:46:48 -0500
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-        s=mimecast20190719; t=1575220299;
+        s=mimecast20190719; t=1575254806;
         h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
          to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+         content-transfer-encoding:content-transfer-encoding:
          in-reply-to:in-reply-to:references:references;
-        bh=vIboseq0fDMMwBbrkH9pSvbsR619q2chHbtWr6BrOkg=;
-        b=bV7II9jfTAGHiImmE6jtVBiUFyxz7j/1+9FUFliW+0r8fjVIxYkgG7X0WcXhTzq1VdtKp/
-        OulvvilX91tQafVb+BV+daXENp91GJ2vPcBI65boLDZ2KmhV3QENPPN0LlpEqib7fJuZ08
-        iV59eRoZHJtOTdr6+cg2e2FMZgc7jRU=
+        bh=eiHhzVNDLU4DN/NI7QaUnJhr8fFfVzGhaJUoQNVQ22g=;
+        b=AqFJuuadNGTFJpRIpqTdjkL6vd9lMTrlsxRgMMC5xpwX84KtCpRiXpHetNQraUSp8KmqZb
+        U7/Uqal8fe2U/9Xi+SgTg9XCxe4uMs+SmpqLzESYQbEfmo/W6dSO3TJtSV224DvVbdtwVN
+        dD37zXuV1sFTTJPVJkF10DXhU5NfrOI=
 Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
  [209.132.183.4]) (Using TLS) by relay.mimecast.com with ESMTP id
- us-mta-140-oE2aqEnnP_mRPMcbYHMNXA-1; Sun, 01 Dec 2019 12:11:36 -0500
-Received: from smtp.corp.redhat.com (int-mx04.intmail.prod.int.phx2.redhat.com [10.5.11.14])
+ us-mta-418-EqAXBSroMWGifB_RdhiwDw-1; Sun, 01 Dec 2019 21:46:41 -0500
+Received: from smtp.corp.redhat.com (int-mx01.intmail.prod.int.phx2.redhat.com [10.5.11.11])
         (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
         (No client certificate requested)
-        by mimecast-mx01.redhat.com (Postfix) with ESMTPS id 8DD7110054E3;
-        Sun,  1 Dec 2019 17:11:33 +0000 (UTC)
-Received: from [10.10.121.37] (ovpn-121-37.rdu2.redhat.com [10.10.121.37])
-        by smtp.corp.redhat.com (Postfix) with ESMTP id 7130B5D9E5;
-        Sun,  1 Dec 2019 17:11:32 +0000 (UTC)
-Subject: Re: [PATCH] nbd: fix potential deadlock in nbd_config_put()
-To:     Sun Ke <sunke32@huawei.com>, josef@toxicpanda.com
-References: <1574937951-92828-1-git-send-email-sunke32@huawei.com>
-Cc:     axboe@kernel.dk, linux-block@vger.kernel.org, nbd@other.debian.org,
-        linux-kernel@vger.kernel.org
-From:   Mike Christie <mchristi@redhat.com>
-Message-ID: <5DE3F444.9080706@redhat.com>
-Date:   Sun, 1 Dec 2019 11:11:32 -0600
-User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:38.0) Gecko/20100101
- Thunderbird/38.6.0
+        by mimecast-mx01.redhat.com (Postfix) with ESMTPS id 017268017CC;
+        Mon,  2 Dec 2019 02:46:40 +0000 (UTC)
+Received: from ming.t460p (ovpn-8-21.pek2.redhat.com [10.72.8.21])
+        by smtp.corp.redhat.com (Postfix) with ESMTPS id 33119600C8;
+        Mon,  2 Dec 2019 02:46:29 +0000 (UTC)
+Date:   Mon, 2 Dec 2019 10:46:25 +0800
+From:   Ming Lei <ming.lei@redhat.com>
+To:     Vincent Guittot <vincent.guittot@linaro.org>
+Cc:     Hillf Danton <hdanton@sina.com>,
+        Dave Chinner <david@fromorbit.com>,
+        linux-block <linux-block@vger.kernel.org>,
+        linux-fs <linux-fsdevel@vger.kernel.org>,
+        linux-xfs <linux-xfs@vger.kernel.org>,
+        linux-kernel <linux-kernel@vger.kernel.org>,
+        Christoph Hellwig <hch@lst.de>, Jens Axboe <axboe@kernel.dk>,
+        Peter Zijlstra <peterz@infradead.org>,
+        Rong Chen <rong.a.chen@intel.com>, Tejun Heo <tj@kernel.org>
+Subject: Re: single aio thread is migrated crazily by scheduler
+Message-ID: <20191202024625.GD24512@ming.t460p>
+References: <20191114113153.GB4213@ming.t460p>
+ <20191114235415.GL4614@dread.disaster.area>
+ <20191115010824.GC4847@ming.t460p>
+ <20191115045634.GN4614@dread.disaster.area>
+ <20191115070843.GA24246@ming.t460p>
+ <20191128094003.752-1-hdanton@sina.com>
+ <CAKfTPtA23ErKGCEJVmg6vk-QoufkiUM3NbXd31mZmKnuwbTkFw@mail.gmail.com>
 MIME-Version: 1.0
-In-Reply-To: <1574937951-92828-1-git-send-email-sunke32@huawei.com>
-X-Scanned-By: MIMEDefang 2.79 on 10.5.11.14
-X-MC-Unique: oE2aqEnnP_mRPMcbYHMNXA-1
+In-Reply-To: <CAKfTPtA23ErKGCEJVmg6vk-QoufkiUM3NbXd31mZmKnuwbTkFw@mail.gmail.com>
+User-Agent: Mutt/1.12.1 (2019-06-15)
+X-Scanned-By: MIMEDefang 2.79 on 10.5.11.11
+X-MC-Unique: EqAXBSroMWGifB_RdhiwDw-1
 X-Mimecast-Spam-Score: 0
-Content-Type: multipart/mixed;
- boundary="------------080507070007010002020405"
+Content-Type: text/plain; charset=us-ascii
+Content-Transfer-Encoding: quoted-printable
+Content-Disposition: inline
 Sender: linux-block-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-This is a multi-part message in MIME format.
---------------080507070007010002020405
-Content-Type: text/plain; charset=windows-1252
-Content-Transfer-Encoding: 7bit
+On Thu, Nov 28, 2019 at 10:53:33AM +0100, Vincent Guittot wrote:
+> On Thu, 28 Nov 2019 at 10:40, Hillf Danton <hdanton@sina.com> wrote:
+> >
+> >
+> > On Sat, 16 Nov 2019 10:40:05 Dave Chinner wrote:
+> > > On Fri, Nov 15, 2019 at 03:08:43PM +0800, Ming Lei wrote:
+> > > > On Fri, Nov 15, 2019 at 03:56:34PM +1100, Dave Chinner wrote:
+> > > > > On Fri, Nov 15, 2019 at 09:08:24AM +0800, Ming Lei wrote:
+> > > > I can reproduce the issue with 4k block size on another RH system, =
+and
+> > > > the login info of that system has been shared to you in RH BZ.
+> > > >
+> > > > 1)
+> > > > sysctl kernel.sched_min_granularity_ns=3D10000000
+> > > > sysctl kernel.sched_wakeup_granularity_ns=3D15000000
+> > >
+> > > So, these settings definitely influence behaviour.
+> > >
+> > > If these are set to kernel defaults (4ms and 3ms each):
+> > >
+> > > sysctl kernel.sched_min_granularity_ns=3D4000000
+> > > sysctl kernel.sched_wakeup_granularity_ns=3D3000000
+> > >
+> > > The migration problem largely goes away - the fio task migration
+> > > event count goes from ~2,000 a run down to 200/run.
+> > >
+> > > That indicates that the migration trigger is likely load/timing
+> > > based. The analysis below is based on the 10/15ms numbers above,
+> > > because it makes it so much easier to reproduce.
+> > >
+> > > > 2)
+> > > > ./xfs_complete 4k
+> > > >
+> > > > Then you should see 1k~1.5k fio io thread migration in above test,
+> > > > either v5.4-rc7(build with rhel8 config) or RHEL 4.18 kernel.
+> > >
+> > > Almost all the fio task migrations are coming from migration/X
+> > > kernel threads. i.e it's the scheduler active balancing that is
+> > > causing the fio thread to bounce around.
+> > >
+> > > This is typical a typical trace, trimmed to remove extraneous noise.
+> > > The fio process is running on CPU 10:
+> > >
+> > >              fio-3185  [010] 50419.285954: sched_stat_runtime:   comm=
+=3Dfio pid=3D3185 runtime=3D1004014 [ns] vruntime=3D27067882290 [ns]
+> > >              fio-3185  [010] 50419.286953: sched_stat_runtime:   comm=
+=3Dfio pid=3D3185 runtime=3D979458 [ns] vruntime=3D27068861748 [ns]
+> > >              fio-3185  [010] 50419.287998: sched_stat_runtime:   comm=
+=3Dfio pid=3D3185 runtime=3D1028471 [ns] vruntime=3D27069890219 [ns]
+> > >              fio-3185  [010] 50419.289973: sched_stat_runtime:   comm=
+=3Dfio pid=3D3185 runtime=3D989989 [ns] vruntime=3D27071836208 [ns]
+> > >              fio-3185  [010] 50419.290958: sched_stat_runtime:   comm=
+=3Dfio pid=3D3185 runtime=3D963914 [ns] vruntime=3D27072800122 [ns]
+> > >              fio-3185  [010] 50419.291952: sched_stat_runtime:   comm=
+=3Dfio pid=3D3185 runtime=3D972532 [ns] vruntime=3D27073772654 [ns]
+> > >
+> > > fio consumes CPU for several milliseconds, then:
+> > >
+> > >              fio-3185  [010] 50419.292935: sched_stat_runtime:   comm=
+=3Dfio pid=3D3185 runtime=3D966032 [ns] vruntime=3D27074738686 [ns]
+> > >              fio-3185  [010] 50419.292941: sched_switch:         fio:=
+3185 [120] S =3D=3D> kworker/10:0:2763 [120]
+> > >     kworker/10:0-2763  [010] 50419.292954: sched_stat_runtime:   comm=
+=3Dkworker/10:0 pid=3D2763 runtime=3D13423 [ns] vruntime=3D27052479694 [ns]
+> > >     kworker/10:0-2763  [010] 50419.292956: sched_switch:         kwor=
+ker/10:0:2763 [120] R =3D=3D> fio:3185 [120]
+> > >              fio-3185  [010] 50419.293115: sched_waking:         comm=
+=3Dkworker/10:0 pid=3D2763 prio=3D120 target_cpu=3D010
+> > >              fio-3185  [010] 50419.293116: sched_stat_runtime:   comm=
+=3Dfio pid=3D3185 runtime=3D160370 [ns] vruntime=3D27074899056 [ns]
+> > >              fio-3185  [010] 50419.293118: sched_wakeup:         kwor=
+ker/10:0:2763 [120] success=3D1 CPU:010
+> > >
+> > > A context switch out to a kworker, then 13us later we immediately
+> > > switch back to the fio process, and go on running. No doubt
+> > > somewhere in what the fio process is doing, we queue up more work to
+> > > be run on the cpu, but the fio task keeps running
+> > > (due to CONFIG_PREEMPT=3Dn).
+> > >
+> > >              fio-3185  [010] 50419.293934: sched_stat_runtime:   comm=
+=3Dfio pid=3D3185 runtime=3D803135 [ns] vruntime=3D27075702191 [ns]
+> > >              fio-3185  [010] 50419.294936: sched_stat_runtime:   comm=
+=3Dfio pid=3D3185 runtime=3D988478 [ns] vruntime=3D27076690669 [ns]
+> > >              fio-3185  [010] 50419.295934: sched_stat_runtime:   comm=
+=3Dfio pid=3D3185 runtime=3D982219 [ns] vruntime=3D27077672888 [ns]
+> > >              fio-3185  [010] 50419.296935: sched_stat_runtime:   comm=
+=3Dfio pid=3D3185 runtime=3D984781 [ns] vruntime=3D27078657669 [ns]
+> > >              fio-3185  [010] 50419.297934: sched_stat_runtime:   comm=
+=3Dfio pid=3D3185 runtime=3D981703 [ns] vruntime=3D27079639372 [ns]
+> > >              fio-3185  [010] 50419.298937: sched_stat_runtime:   comm=
+=3Dfio pid=3D3185 runtime=3D990057 [ns] vruntime=3D27080629429 [ns]
+> > >              fio-3185  [010] 50419.299935: sched_stat_runtime:   comm=
+=3Dfio pid=3D3185 runtime=3D977554 [ns] vruntime=3D27081606983 [ns]
+> > >
+> > > About 6ms later, CPU 0 kicks the active load balancer on CPU 10...
+> > >
+> > >           <idle>-0     [000] 50419.300014: sched_waking:         comm=
+=3Dmigration/10 pid=3D70 prio=3D0 target_cpu=3D010
+> > >              fio-3185  [010] 50419.300024: sched_wakeup:         migr=
+ation/10:70 [0] success=3D1 CPU:010
+> > >              fio-3185  [010] 50419.300026: sched_stat_runtime:   comm=
+=3Dfio pid=3D3185 runtime=3D79291 [ns] vruntime=3D27081686274 [ns]
+> > >              fio-3185  [010] 50419.300027: sched_switch:         fio:=
+3185 [120] S =3D=3D> migration/10:70 [0]
+> > >     migration/10-70    [010] 50419.300032: sched_migrate_task:   comm=
+=3Dfio pid=3D3185 prio=3D120 orig_cpu=3D10 dest_cpu=3D12
+> > >     migration/10-70    [010] 50419.300040: sched_switch:         migr=
+ation/10:70 [0] D =3D=3D> kworker/10:0:2763 [120]
+> > >
+> > > And 10us later the fio process is switched away, the active load
+> > > balancer work is run and migrates the fio process to CPU 12. Then...
+> > >
+> > >     kworker/10:0-2763  [010] 50419.300048: sched_stat_runtime:   comm=
+=3Dkworker/10:0 pid=3D2763 runtime=3D9252 [ns] vruntime=3D27062908308 [ns]
+> > >     kworker/10:0-2763  [010] 50419.300062: sched_switch:         kwor=
+ker/10:0:2763 [120] R =3D=3D> swapper/10:0 [120]
+> > >           <idle>-0     [010] 50419.300067: sched_waking:         comm=
+=3Dkworker/10:0 pid=3D2763 prio=3D120 target_cpu=3D010
+> > >           <idle>-0     [010] 50419.300069: sched_wakeup:         kwor=
+ker/10:0:2763 [120] success=3D1 CPU:010
+> > >           <idle>-0     [010] 50419.300071: sched_switch:         swap=
+per/10:0 [120] S =3D=3D> kworker/10:0:2763 [120]
+> > >     kworker/10:0-2763  [010] 50419.300073: sched_switch:         kwor=
+ker/10:0:2763 [120] R =3D=3D> swapper/10:0 [120]
+> > >
+> > > The kworker runs for another 10us and the CPU goes idle. Shortly
+> > > after this, CPU 12 is woken:
+> > >
+> > >           <idle>-0     [012] 50419.300113: sched_switch:         swap=
+per/12:0 [120] S =3D=3D> fio:3185 [120]
+> > >              fio-3185  [012] 50419.300596: sched_waking:         comm=
+=3Dkworker/12:1 pid=3D227 prio=3D120 target_cpu=3D012
+> > >              fio-3185  [012] 50419.300598: sched_stat_runtime:   comm=
+=3Dfio pid=3D3185 runtime=3D561137 [ns] vruntime=3D20361153275 [ns]
+> > >              fio-3185  [012] 50419.300936: sched_stat_runtime:   comm=
+=3Dfio pid=3D3185 runtime=3D326187 [ns] vruntime=3D20361479462 [ns]
+> > >              fio-3185  [012] 50419.301935: sched_stat_runtime:   comm=
+=3Dfio pid=3D3185 runtime=3D981201 [ns] vruntime=3D20362460663 [ns]
+> > >              fio-3185  [012] 50419.302935: sched_stat_runtime:   comm=
+=3Dfio pid=3D3185 runtime=3D983160 [ns] vruntime=3D20363443823 [ns]
+> > >              fio-3185  [012] 50419.303934: sched_stat_runtime:   comm=
+=3Dfio pid=3D3185 runtime=3D983855 [ns] vruntime=3D20364427678 [ns]
+> > >              fio-3185  [012] 50419.304934: sched_stat_runtime:   comm=
+=3Dfio pid=3D3185 runtime=3D977757 [ns] vruntime=3D20365405435 [ns]
+> > >              fio-3185  [012] 50419.305948: sched_stat_runtime:   comm=
+=3Dfio pid=3D3185 runtime=3D999563 [ns] vruntime=3D20366404998 [ns]
+> > >
+> > >
+> > > and fio goes on running there. The pattern repeats very soon afterwar=
+ds:
+> > >
+> > >           <idle>-0     [000] 50419.314982: sched_waking:         comm=
+=3Dmigration/12 pid=3D82 prio=3D0 target_cpu=3D012
+> > >              fio-3185  [012] 50419.314988: sched_wakeup:         migr=
+ation/12:82 [0] success=3D1 CPU:012
+> > >              fio-3185  [012] 50419.314990: sched_stat_runtime:   comm=
+=3Dfio pid=3D3185 runtime=3D46342 [ns] vruntime=3D20375268656 [ns]
+> > >              fio-3185  [012] 50419.314991: sched_switch:         fio:=
+3185 [120] S =3D=3D> migration/12:82 [0]
+> > >     migration/12-82    [012] 50419.314995: sched_migrate_task:   comm=
+=3Dfio pid=3D3185 prio=3D120 orig_cpu=3D12 dest_cpu=3D5
+> > >     migration/12-82    [012] 50419.315001: sched_switch:         migr=
+ation/12:82 [0] D =3D=3D> kworker/12:1:227 [120]
+> > >     kworker/12:1-227   [012] 50419.315022: sched_stat_runtime:   comm=
+=3Dkworker/12:1 pid=3D227 runtime=3D21453 [ns] vruntime=3D20359477889 [ns]
+> > >     kworker/12:1-227   [012] 50419.315028: sched_switch:         kwor=
+ker/12:1:227 [120] R =3D=3D> swapper/12:0 [120]
+> > >           <idle>-0     [005] 50419.315053: sched_switch:         swap=
+per/5:0 [120] S =3D=3D> fio:3185 [120]
+> > >              fio-3185  [005] 50419.315286: sched_waking:         comm=
+=3Dkworker/5:0 pid=3D2646 prio=3D120 target_cpu=3D005
+> > >              fio-3185  [005] 50419.315288: sched_stat_runtime:   comm=
+=3Dfio pid=3D3185 runtime=3D287737 [ns] vruntime=3D33779011507 [ns]
+> > >
+> > > And fio is now running on CPU 5 - it only ran on CPU 12 for about
+> > > 15ms. Hmmm:
+> > >
+> > > $ grep fio-3185 ~/tmp/sched.out | awk 'BEGIN {totcpu =3D 0.0; switche=
+s =3D 0.0; prev_waket =3D 0.0 }/sched_waking/ { cpu =3D $2; split($3, t, ":=
+"); waket =3D t[1]; if (cpu !=3D prev_cpu) { t_on_cpu =3D waket - prev_wake=
+t; if (prev_waket) { print "time on CPU", cpu, "was", t_on_cpu; totcpu +=3D=
+ t_on_cpu; switches++ } prev_waket =3D waket; prev_cpu =3D cpu; } } END { p=
+rint "switches", switches, "time on cpu", totcpu, "aver time on cpu", (totc=
+pu / switches) } ' | stats --trim-outliers
+> > > switches 2211 time on cpu 30.0994 aver time on cpu 0.0136135
+> > > time on CPU [0-23(8.8823+/-6.2)] was 0.000331-0.330772(0.0134759+/-0.=
+012)
+> > >
+> > > Yeah, the fio task averages 13.4ms on any given CPU before being
+> > > switched to another CPU. Mind you, the stddev is 12ms, so the range
+> > > of how long it spends on any one CPU is pretty wide (330us to
+> > > 330ms).
+> > >
+> > Hey Dave
+> >
+> > > IOWs, this doesn't look like a workqueue problem at all - this looks
+> >
+> > Surprised to see you're so sure it has little to do with wq,
+> >
+> > > like the scheduler is repeatedly making the wrong load balancing
+> > > decisions when mixing a very short runtime task (queued work) with a
+> > > long runtime task on the same CPU....
+> > >
+> > and it helps more to know what is driving lb to make decisions like
+> > this. Because for 70+ per cent of communters in cities like London it
+> > is supposed tube is better than cab on work days, the end_io cb is
+> > tweaked to be a lookalike of execute_in_process_context() in the diff
+> > with the devoted s_dio_done_wq taken out of account. It's interesting
+> > to see what difference lb will make in the tube environment.
+> >
+> > Hillf
+> >
+> > > This is not my area of expertise, so I have no idea why this might
+> > > be happening. Scheduler experts: is this expected behaviour? What
+> > > tunables directly influence the active load balancer (and/or CONFIG
+> > > options) to change how aggressive it's behaviour is?
+> > >
+> > > > Not reproduced the issue with 512 block size on the RH system yet,
+> > > > maybe it is related with my kernel config.
+> > >
+> > > I doubt it - this looks like a load specific corner case in the
+> > > scheduling algorithm....
+> > >
+> > > Cheers,
+> > >
+> > > Dave.
+> > > --
+> > > Dave Chinner
+> > > david@fromorbit.com
+> >
+> > --- a/fs/iomap/direct-io.c
+> > +++ b/fs/iomap/direct-io.c
+> > @@ -157,10 +157,8 @@ static void iomap_dio_bio_end_io(struct
+> >                         WRITE_ONCE(dio->submit.waiter, NULL);
+> >                         blk_wake_io_task(waiter);
+> >                 } else if (dio->flags & IOMAP_DIO_WRITE) {
+> > -                       struct inode *inode =3D file_inode(dio->iocb->k=
+i_filp);
+> > -
+> >                         INIT_WORK(&dio->aio.work, iomap_dio_complete_wo=
+rk);
+> > -                       queue_work(inode->i_sb->s_dio_done_wq, &dio->ai=
+o.work);
+> > +                       schedule_work(&dio->aio.work);
+>=20
+> I'm not sure that this will make a real difference because it ends up
+> to call queue_work(system_wq, ...) and system_wq is bounded as well so
+> the work will still be pinned to a CPU
+> Using system_unbound_wq should make a difference because it doesn't
+> pin the work on a CPU
+>  +                       queue_work(system_unbound_wq, &dio->aio.work);
 
-On 11/28/2019 04:45 AM, Sun Ke wrote:
-> I got a deadlock report from syzkaller:
-> 
-> [  234.427696] ============================================
-> [  234.428327] WARNING: possible recursive locking detected
-> [  234.429011] 5.4.0-rc4+ #1 Not tainted
-> [  234.429528] --------------------------------------------
-> [  234.430162] kworker/u9:0/894 is trying to acquire lock:
-> [  234.430911] ffff0000d3aca128 ((wq_completion)knbd0-recv){+.+.}, at: flush_workqueue+0xbc/0xfe8
-> [  234.432330]
-> [  234.432330] but task is already holding lock:
-> [  234.432927] ffff0000d3aca128 ((wq_completion)knbd0-recv){+.+.}, at: process_one_work+0x6a0/0x17e8
-> [  234.433983]
-> [  234.433983] other info that might help us debug this:
-> [  234.434615]  Possible unsafe locking scenario:
-> [  234.434615]
-> [  234.435263]        CPU0
-> [  234.435613]        ----
-> [  234.436019]   lock((wq_completion)knbd0-recv);
-> [  234.436521]   lock((wq_completion)knbd0-recv);
-> [  234.437166]
-> [  234.437166]  *** DEADLOCK ***
-> [  234.437166]
-> [  234.437763]  May be due to missing lock nesting notation
-> [  234.437763]
-> [  234.438559] 3 locks held by kworker/u9:0/894:
-> [  234.439040]  #0: ffff0000d3aca128 ((wq_completion)knbd0-recv){+.+.}, at: process_one_work+0x6a0/0x17e8
-> [  234.440185]  #1: ffff0000d344fd50 ((work_completion)(&args->work)){+.+.}, at: process_one_work+0x6a0/0x17e8
-> [  234.442209]  #2: ffff0000d723cd78 (&nbd->config_lock){+.+.}, at: refcount_dec_and_mutex_lock+0x5c/0x128
-> [  234.443380]
-> [  234.443380] stack backtrace:
-> [  234.444271] CPU: 3 PID: 894 Comm: kworker/u9:0 Not tainted 5.4.0-rc4+ #1
-> [  234.444989] Hardware name: linux,dummy-virt (DT)
-> [  234.446077] Workqueue: knbd0-recv recv_work
-> [  234.446909] Call trace:
-> [  234.447372]  dump_backtrace+0x0/0x358
-> [  234.447877]  show_stack+0x28/0x38
-> [  234.448347]  dump_stack+0x15c/0x1ec
-> [  234.448838]  __lock_acquire+0x12ec/0x2f78
-> [  234.449474]  lock_acquire+0x180/0x590
-> [  234.450075]  flush_workqueue+0x104/0xfe8
-> [  234.450587]  drain_workqueue+0x164/0x390
-> [  234.451090]  destroy_workqueue+0x30/0x560
-> [  234.451598]  nbd_config_put+0x308/0x700
-> [  234.452093]  recv_work+0x198/0x1f0
-> [  234.452556]  process_one_work+0x7ac/0x17e8
-> [  234.453189]  worker_thread+0x36c/0xb70
-> [  234.453788]  kthread+0x2f4/0x378
-> [  234.454257]  ret_from_fork+0x10/0x18
-> 
-> The root cause is recv_work() is the last one to drop the config
-> ref and try to destroy the workqueue from inside the work queue.
-> 
-> There are two ways to fix the bug. The first way is flushing the
-> workqueue before dropping the initial refcount and making sure
-> recv_work() will not be the last owner of nbd_config. However it
-> is hard for ioctl interface. Because nbd_clear_sock_ioctl() may
-> not be invoked, so we need to flush the workqueue in nbd_release()
-> and that will lead to another deadlock because recv_work can not
-> exit from nbd_read_stat() loop.
-> 
-> The second way is using another work to put nbd_config asynchronously
-> for recv_work().
-> 
+Indeed, just run a quick test on my KVM guest, looks the following patch
+makes a difference:
 
-Can we also increment the refcount before we do wait_event_interruptible
-in nbd_start_device_ioctl, always flush the workqueue then drop the
-refcount after the flush? See compile tested only patch.
-
-We will then also know the recv side has stopped after
-nbd_start_device_ioctl has returned, so new NBD_DO_IT calls for the same
-device do not race with shutdowns of previous uses.
+diff --git a/fs/direct-io.c b/fs/direct-io.c
+index 9329ced91f1d..2f4488b0ecec 100644
+--- a/fs/direct-io.c
++++ b/fs/direct-io.c
+@@ -613,7 +613,8 @@ int sb_init_dio_done_wq(struct super_block *sb)
+ {
+        struct workqueue_struct *old;
+        struct workqueue_struct *wq =3D alloc_workqueue("dio/%s",
+-                                                     WQ_MEM_RECLAIM, 0,
++                                                     WQ_MEM_RECLAIM |
++                                                     WQ_UNBOUND, 0,
+                                                      sb->s_id);
 
 
-
---------------080507070007010002020405
-Content-Type: text/x-patch;
- name="nbd-move-flush.patch"
-Content-Transfer-Encoding: 7bit
-Content-Disposition: attachment;
- filename="nbd-move-flush.patch"
-
-diff --git a/drivers/block/nbd.c b/drivers/block/nbd.c
-index 57532465fb83..f8597d2fb365 100644
---- a/drivers/block/nbd.c
-+++ b/drivers/block/nbd.c
-@@ -1293,13 +1293,15 @@ static int nbd_start_device_ioctl(struct nbd_device *nbd, struct block_device *b
- 
- 	if (max_part)
- 		bdev->bd_invalidated = 1;
-+
-+	refcount_inc(&nbd->config_refs);
- 	mutex_unlock(&nbd->config_lock);
- 	ret = wait_event_interruptible(config->recv_wq,
- 					 atomic_read(&config->recv_threads) == 0);
--	if (ret) {
-+	if (ret)
- 		sock_shutdown(nbd);
--		flush_workqueue(nbd->recv_workq);
--	}
-+	flush_workqueue(nbd->recv_workq);
-+
- 	mutex_lock(&nbd->config_lock);
- 	nbd_bdev_reset(bdev);
- 	/* user requested, ignore socket errors */
-@@ -1307,6 +1309,7 @@ static int nbd_start_device_ioctl(struct nbd_device *nbd, struct block_device *b
- 		ret = 0;
- 	if (test_bit(NBD_RT_TIMEDOUT, &config->runtime_flags))
- 		ret = -ETIMEDOUT;
-+	nbd_config_put(nbd);
- 	return ret;
- }
- 
-
---------------080507070007010002020405--
+Thanks,
+Ming
 
