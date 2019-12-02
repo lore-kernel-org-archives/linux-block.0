@@ -2,120 +2,170 @@ Return-Path: <SRS0=iG2v=ZY=vger.kernel.org=linux-block-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-6.9 required=3.0 tests=DKIMWL_WL_HIGH,DKIM_SIGNED,
-	DKIM_VALID,DKIM_VALID_AU,HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,
-	MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS autolearn=ham
+X-Spam-Status: No, score=-2.2 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
+	MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,USER_AGENT_SANE_1 autolearn=no
 	autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 0DAD5C432C0
-	for <linux-block@archiver.kernel.org>; Mon,  2 Dec 2019 21:52:03 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 9754CC432C3
+	for <linux-block@archiver.kernel.org>; Mon,  2 Dec 2019 23:06:27 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.kernel.org (Postfix) with ESMTP id D110F206E0
-	for <linux-block@archiver.kernel.org>; Mon,  2 Dec 2019 21:52:02 +0000 (UTC)
-Authentication-Results: mail.kernel.org;
-	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="AlOhwNXq"
+	by mail.kernel.org (Postfix) with ESMTP id 74F7E20718
+	for <linux-block@archiver.kernel.org>; Mon,  2 Dec 2019 23:06:27 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1726162AbfLBVwC (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Mon, 2 Dec 2019 16:52:02 -0500
-Received: from us-smtp-delivery-1.mimecast.com ([207.211.31.120]:32418 "EHLO
-        us-smtp-1.mimecast.com" rhost-flags-OK-OK-OK-FAIL) by vger.kernel.org
-        with ESMTP id S1725825AbfLBVwC (ORCPT
-        <rfc822;linux-block@vger.kernel.org>); Mon, 2 Dec 2019 16:52:02 -0500
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-        s=mimecast20190719; t=1575323521;
-        h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-         to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-         content-transfer-encoding:content-transfer-encoding;
-        bh=b0+29zshaUbRjfxHy1HWRGMyTGil9Zlb7of0bIH6jfk=;
-        b=AlOhwNXq0jwemIvbRiJDrreIazEVow4jt80N1NdU9bvq5tgBqvg+IM/20rAa94mUIMQF7h
-        hrMSnfO31/Pewp41YpbO6z7mYkCQiJWPVBLBjT/4jd0hvlpHIAyanoGu1uZxwtWtV+G0Zb
-        3Sh+ozqyHtrtym3+blhNrRqZIah3Sg4=
-Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
- [209.132.183.4]) (Using TLS) by relay.mimecast.com with ESMTP id
- us-mta-17--qmsZSzkMcWcu3MRxu67lQ-1; Mon, 02 Dec 2019 16:51:58 -0500
-Received: from smtp.corp.redhat.com (int-mx08.intmail.prod.int.phx2.redhat.com [10.5.11.23])
-        (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
-        (No client certificate requested)
-        by mimecast-mx01.redhat.com (Postfix) with ESMTPS id 4AB74DB61;
-        Mon,  2 Dec 2019 21:51:56 +0000 (UTC)
-Received: from rh2.redhat.com (ovpn-126-161.rdu2.redhat.com [10.10.126.161])
-        by smtp.corp.redhat.com (Postfix) with ESMTP id 73E6A19C68;
-        Mon,  2 Dec 2019 21:51:52 +0000 (UTC)
-From:   Mike Christie <mchristi@redhat.com>
-To:     sunke32@huawei.com, nbd@other.debian.org, axboe@kernel.dk,
-        josef@toxicpanda.com, linux-block@vger.kernel.org
-Cc:     Mike Christie <mchristi@redhat.com>, stable@vger.kernel.org
-Subject: [PATCH] nbd: fix shutdown and recv work deadlock
-Date:   Mon,  2 Dec 2019 15:51:50 -0600
-Message-Id: <20191202215150.10250-1-mchristi@redhat.com>
+        id S1725853AbfLBXG0 (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Mon, 2 Dec 2019 18:06:26 -0500
+Received: from mail105.syd.optusnet.com.au ([211.29.132.249]:44607 "EHLO
+        mail105.syd.optusnet.com.au" rhost-flags-OK-OK-OK-OK)
+        by vger.kernel.org with ESMTP id S1725834AbfLBXG0 (ORCPT
+        <rfc822;linux-block@vger.kernel.org>);
+        Mon, 2 Dec 2019 18:06:26 -0500
+Received: from dread.disaster.area (pa49-179-150-192.pa.nsw.optusnet.com.au [49.179.150.192])
+        by mail105.syd.optusnet.com.au (Postfix) with ESMTPS id 861A83A30BB;
+        Tue,  3 Dec 2019 10:06:18 +1100 (AEDT)
+Received: from dave by dread.disaster.area with local (Exim 4.92.3)
+        (envelope-from <david@fromorbit.com>)
+        id 1ibulm-0006jy-5F; Tue, 03 Dec 2019 10:06:18 +1100
+Date:   Tue, 3 Dec 2019 10:06:18 +1100
+From:   Dave Chinner <david@fromorbit.com>
+To:     Hillf Danton <hdanton@sina.com>
+Cc:     Ming Lei <ming.lei@redhat.com>,
+        linux-block <linux-block@vger.kernel.org>,
+        linux-fs <linux-fsdevel@vger.kernel.org>,
+        linux-xfs <linux-xfs@vger.kernel.org>,
+        linux-kernel <linux-kernel@vger.kernel.org>,
+        Christoph Hellwig <hch@lst.de>, Jens Axboe <axboe@kernel.dk>,
+        Peter Zijlstra <peterz@infradead.org>,
+        Vincent Guittot <vincent.guittot@linaro.org>,
+        Rong Chen <rong.a.chen@intel.com>, Tejun Heo <tj@kernel.org>
+Subject: Re: single aio thread is migrated crazily by scheduler
+Message-ID: <20191202230618.GI2695@dread.disaster.area>
+References: <20191114113153.GB4213@ming.t460p>
+ <20191114235415.GL4614@dread.disaster.area>
+ <20191115010824.GC4847@ming.t460p>
+ <20191115045634.GN4614@dread.disaster.area>
+ <20191115070843.GA24246@ming.t460p>
+ <20191128094003.752-1-hdanton@sina.com>
+ <20191202090158.15016-1-hdanton@sina.com>
 MIME-Version: 1.0
-X-Scanned-By: MIMEDefang 2.84 on 10.5.11.23
-X-MC-Unique: -qmsZSzkMcWcu3MRxu67lQ-1
-X-Mimecast-Spam-Score: 0
-Content-Type: text/plain; charset=US-ASCII
-Content-Transfer-Encoding: quoted-printable
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <20191202090158.15016-1-hdanton@sina.com>
+User-Agent: Mutt/1.10.1 (2018-07-13)
+X-Optus-CM-Score: 0
+X-Optus-CM-Analysis: v=2.3 cv=W5xGqiek c=1 sm=1 tr=0
+        a=ZXpxJgW8/q3NVgupyyvOCQ==:117 a=ZXpxJgW8/q3NVgupyyvOCQ==:17
+        a=jpOVt7BSZ2e4Z31A5e1TngXxSK0=:19 a=kj9zAlcOel0A:10 a=pxVhFHJ0LMsA:10
+        a=7-415B0cAAAA:8 a=vHaZCrEJwQDmUnyvPvAA:9 a=CjuIK1q_8ugA:10
+        a=biEYGPWJfzWAr4FL6Ov7:22
 Sender: linux-block-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-This fixes a regression added with:
+On Mon, Dec 02, 2019 at 05:01:58PM +0800, Hillf Danton wrote:
+> 
+> On Mon, 2 Dec 2019 14:08:44 +1100 Dave Chinner wrote:
+> > On Thu, Nov 28, 2019 at 05:40:03PM +0800, Hillf Danton wrote:
+> > > On Sat, 16 Nov 2019 10:40:05 Dave Chinner wrote:
+> > > > Yeah, the fio task averages 13.4ms on any given CPU before being
+> > > > switched to another CPU. Mind you, the stddev is 12ms, so the range
+> > > > of how long it spends on any one CPU is pretty wide (330us to
+> > > > 330ms).
+> > > > 
+> > > Hey Dave
+> > > 
+> > > > IOWs, this doesn't look like a workqueue problem at all - this looks
+> > > 
+> > > Surprised to see you're so sure it has little to do with wq,
+> > 
+> > Because I understand how the workqueue is used here.
+> > 
+> > Essentially, the workqueue is not necessary for a -pure- overwrite
+> > where no metadata updates or end-of-io filesystem work is required.
+> > 
+> > However, change the workload just slightly, such as allocating the
+> > space, writing into preallocated space (unwritten extents), using
+> > AIO writes to extend the file, using O_DSYNC, etc, and we *must*
+> > use a workqueue as we have to take blocking locks and/or run
+> > transactions.
+> > 
+> > These may still be very short (e.g. updating inode size) and in most
+> > cases will not block, but if they do, then if we don't move the work
+> > out of the block layer completion context (i.e. softirq running the
+> > block bh) then we risk deadlocking the code.
+> > 
+> > Not to mention none of the filesytem inode locks are irq safe.
+> > 
+> > IOWs, we can remove the workqueue for this -one specific instance-
+> > but it does not remove the requirement for using a workqueue for all
+> > the other types of write IO that pass through this code.
+> > 
+> So it's not true that it doesn't has anything to do with workqueue.
 
-commit e9e006f5fcf2bab59149cb38a48a4817c1b538b4
-Author: Mike Christie <mchristi@redhat.com>
-Date:   Sun Aug 4 14:10:06 2019 -0500
+You misunderstood what I was saying. I meant that this adverse
+schdeuler behaviour is not *unique to this specific workqueue
+instance* or workload. There are another 5+ workqueues in XFS alone
+that are based around the same "do all the deferred work on the same
+CPU" queuing behaviour. Several of them are IO completion
+processing workqueues, and it is designed this way to avoid running
+completion work that access common structures across all the CPUs in
+the system.
 
-    nbd: fix max number of supported devs
+And, FWIW, we've had this "per-cpu delayed work" processing
+mechanism in XFS since ~2002 when per-cpu work queues were
+introduced in ~2.5.40. What we are doing with workqueues here is not
+new or novel, and it's worked just fine for most of this time...
 
-where we can deadlock during device shutdown. The problem will occur if
-userpsace has done a NBD_CLEAR_SOCK call, then does close() before the
-recv_work work has done its nbd_config_put() call. If recv_work does the
-last call then it will do destroy_workqueue which will then be stuck
-waiting for the work we are running from.
+> > >  			INIT_WORK(&dio->aio.work, iomap_dio_complete_work);
+> > > -			queue_work(inode->i_sb->s_dio_done_wq, &dio->aio.work);
+> > > +			schedule_work(&dio->aio.work);
+> > 
+> > This does nothing but change the workqueue from a per-sb wq to the
+> > system wq. The work is still bound to the same CPU it is queued on,
+> > so nothing will change.
+> > 
+> The system wq is enough here to make some visible difference as CFS will
+> be looking to make new lb decision in particular when submitter and
+> completion are running on different CPUs.
 
-This fixes the issue by having nbd_start_device_ioctl flush the work
-queue on both the failure and success cases and has a refcount on the
-nbd_device while it is flushing the work queue.
+That's noise caused by slightly different loading of the system
+workqueue vs a private work queue. It's likely just enough to move
+the scheduler out of the window where it makes incorrect decisions.
+i.e. Add a bit more user load or load onto other CPUs, and the
+problem will reappear.
 
-Cc: stable@vger.kernel.org
-Signed-off-by: Mike Christie <mchristi@redhat.com>
----
- drivers/block/nbd.c | 9 ++++++---
- 1 file changed, 6 insertions(+), 3 deletions(-)
+As I said, this is *not* a fix for the problem - it just moves it
+around so that you can't see it for this specific workload instance.
 
-diff --git a/drivers/block/nbd.c b/drivers/block/nbd.c
-index 57532465fb83..f8597d2fb365 100644
---- a/drivers/block/nbd.c
-+++ b/drivers/block/nbd.c
-@@ -1293,13 +1293,15 @@ static int nbd_start_device_ioctl(struct nbd_device=
- *nbd, struct block_device *b
-=20
- =09if (max_part)
- =09=09bdev->bd_invalidated =3D 1;
-+
-+=09refcount_inc(&nbd->config_refs);
- =09mutex_unlock(&nbd->config_lock);
- =09ret =3D wait_event_interruptible(config->recv_wq,
- =09=09=09=09=09 atomic_read(&config->recv_threads) =3D=3D 0);
--=09if (ret) {
-+=09if (ret)
- =09=09sock_shutdown(nbd);
--=09=09flush_workqueue(nbd->recv_workq);
--=09}
-+=09flush_workqueue(nbd->recv_workq);
-+
- =09mutex_lock(&nbd->config_lock);
- =09nbd_bdev_reset(bdev);
- =09/* user requested, ignore socket errors */
-@@ -1307,6 +1309,7 @@ static int nbd_start_device_ioctl(struct nbd_device *=
-nbd, struct block_device *b
- =09=09ret =3D 0;
- =09if (test_bit(NBD_RT_TIMEDOUT, &config->runtime_flags))
- =09=09ret =3D -ETIMEDOUT;
-+=09nbd_config_put(nbd);
- =09return ret;
- }
-=20
---=20
-2.20.1
+> It's claimed that "Maintaining CPU affinity across dispatch and completion
+> work has been proven to be a significant performance win." If completion
+> is running in the softirq context then it would take some time to sort
+> out why irq (not CPU) affinity is making difference across CPUs.
 
+We use irq steering to provide CPU affinity for the structures being
+used by completion because they are the same ones used by
+submission. If completion happens quickly enough, those structures
+are still hot in the cache of the submission CPU, and so we don't
+drag bio and filesystem structures out of the CPU cache they sit in
+by steering the completion to the submission CPU.
+
+Most of the modern high perofrmance storage hardware has hardware
+interrupt steering so the block layer doesn't have to do this. See
+__blk_mq_complete_request() and __blk_complete_request(). If the
+device has multiple hardware queues, they are already delivering CPU
+affine completions. Otherwise __blk_complete_request() uses IPIs
+to steer the completion to a CPU that shares a cache with the
+submission CPU....
+
+IOWs, we are trying to ensure that we run the data IO completion on
+the CPU with that has that data hot in cache. When we are running
+millions of IOs every second, this matters -a lot-. IRQ steering is
+just a mechansim that is used to ensure completion processing hits
+hot caches.
+
+Cheers,
+
+Dave.
+-- 
+Dave Chinner
+david@fromorbit.com
