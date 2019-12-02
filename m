@@ -2,25 +2,25 @@ Return-Path: <SRS0=iG2v=ZY=vger.kernel.org=linux-block-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-3.8 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
-	MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,USER_AGENT_GIT autolearn=no
-	autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-9.8 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
+	INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,
+	USER_AGENT_GIT autolearn=unavailable autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 83FC6C432C0
-	for <linux-block@archiver.kernel.org>; Mon,  2 Dec 2019 15:39:30 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 6D24FC43215
+	for <linux-block@archiver.kernel.org>; Mon,  2 Dec 2019 15:39:31 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.kernel.org (Postfix) with ESMTP id 626042146E
-	for <linux-block@archiver.kernel.org>; Mon,  2 Dec 2019 15:39:30 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id 4CA9020881
+	for <linux-block@archiver.kernel.org>; Mon,  2 Dec 2019 15:39:31 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1727570AbfLBPj2 (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        id S1727562AbfLBPj2 (ORCPT <rfc822;linux-block@archiver.kernel.org>);
         Mon, 2 Dec 2019 10:39:28 -0500
-Received: from mx2.suse.de ([195.135.220.15]:44684 "EHLO mx1.suse.de"
+Received: from mx2.suse.de ([195.135.220.15]:44698 "EHLO mx1.suse.de"
         rhost-flags-OK-OK-OK-FAIL) by vger.kernel.org with ESMTP
-        id S1727431AbfLBPj2 (ORCPT <rfc822;linux-block@vger.kernel.org>);
+        id S1727545AbfLBPj2 (ORCPT <rfc822;linux-block@vger.kernel.org>);
         Mon, 2 Dec 2019 10:39:28 -0500
 X-Virus-Scanned: by amavisd-new at test-mx.suse.de
 Received: from relay2.suse.de (unknown [195.135.220.254])
-        by mx1.suse.de (Postfix) with ESMTP id 6DB81C1A4;
+        by mx1.suse.de (Postfix) with ESMTP id 6D16AC1A3;
         Mon,  2 Dec 2019 15:39:25 +0000 (UTC)
 From:   Hannes Reinecke <hare@suse.de>
 To:     "Martin K. Petersen" <martin.petersen@oracle.com>
@@ -28,106 +28,175 @@ Cc:     Jens Axboe <axboe@kernel.dk>, Christoph Hellwig <hch@lst.de>,
         James Bottomley <james.bottomley@hansenpartnership.com>,
         John Garry <john.garry@huawei.com>,
         Ming Lei <ming.lei@redhat.com>, linux-scsi@vger.kernel.org,
-        linux-block@vger.kernel.org, Hannes Reinecke <hare@suse.de>
-Subject: [PATCH RFC v5 00/11] blk-mq/scsi: Provide hostwide shared tags for SCSI HBAs
-Date:   Mon,  2 Dec 2019 16:39:03 +0100
-Message-Id: <20191202153914.84722-1-hare@suse.de>
+        linux-block@vger.kernel.org
+Subject: [PATCH 02/11] blk-mq: rename BLK_MQ_F_TAG_SHARED as BLK_MQ_F_TAG_QUEUE_SHARED
+Date:   Mon,  2 Dec 2019 16:39:05 +0100
+Message-Id: <20191202153914.84722-3-hare@suse.de>
 X-Mailer: git-send-email 2.16.4
+In-Reply-To: <20191202153914.84722-1-hare@suse.de>
+References: <20191202153914.84722-1-hare@suse.de>
 Sender: linux-block-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-Hi all,
+From: Ming Lei <ming.lei@redhat.com>
 
-here now is an updated version of the v2 patchset from John Garry,
-including the suggestions and reviews from the mailing list.
-John, apologies for hijacking your work :-)
+BLK_MQ_F_TAG_SHARED actually means that tags is shared among request
+queues, all of which should belong to LUNs attached to same HBA.
 
-For this version I've only added some slight modifications to Johns
-original patch (renaming variables etc); the contentious separate sbitmap
-allocation has been dropped in favour of Johns original version with pointers
-to the embedded sbitmap.
+So rename it to make the point explicitly.
 
-But more importantly I've reworked the scheduler tag allocation after
-discussions with Ming Lei.
+Suggested-by: Bart Van Assche <bvanassche@acm.org>
+Reviewed-by: Hannes Reinecke <hare@suse.de>
+Signed-off-by: Ming Lei <ming.lei@redhat.com>
+Signed-off-by: John Garry <john.garry@huawei.com>
+---
+ block/blk-mq-debugfs.c |  2 +-
+ block/blk-mq-tag.c     |  2 +-
+ block/blk-mq-tag.h     |  4 ++--
+ block/blk-mq.c         | 20 ++++++++++----------
+ include/linux/blk-mq.h |  2 +-
+ 5 files changed, 15 insertions(+), 15 deletions(-)
 
-Point is, hostwide shared tags can't really be resized; they surely
-cannot be increased (as it's a hardware limitation), and even decreasing
-is questionable as any modification here would affect all devices
-served by this HBA.
-
-Scheduler tags, OTOH, can be considered as per-queue, as the I/O scheduler
-might want to look at all requests on all queues. As such the queue depth
-is distinct from the actual queue depth of the tagset.
-Seeing that it is distinct the depth can now be changed independently of
-the underlying tagset, and there's no need ever to change the tagset itself.
-
-I've also modified megaraid_sas, smartpqi and hpsa to take advantage of
-host_tags.
-
-Performance for megaraid_sas is on par with the original implementation,
-with the added benefit that with this we should be able to handle cpu
-hotplug properly.
-
-Differences to v4:
-- Rework scheduler tag allocations
-- Revert back to the original implementation from John
-
-Differences to v3:
-- Include reviews from Ming Lei
-
-Differences to v2:
-- Drop embedded tag bitmaps
-- Do not share scheduling tags
-- Add patches for hpsa and smartpqi
-
-Differences to v1:
-- Use a shared sbitmap, and not a separate shared tags (a big change!)
-	- Drop request.shared_tag
-- Add RB tags
-
-Hannes Reinecke (7):
-  blk-mq: rename blk_mq_update_tag_set_depth()
-  blk-mq: add WARN_ON in blk_mq_free_rqs()
-  blk-mq: move shared sbitmap into elevator queue
-  scsi: Add template flag 'host_tagset'
-  megaraid_sas: switch fusion adapters to MQ
-  smartpqi: enable host tagset
-  hpsa: enable host_tagset and switch to MQ
-
-John Garry (3):
-  blk-mq: Remove some unused function arguments
-  blk-mq: Facilitate a shared sbitmap per tagset
-  scsi: hisi_sas: Switch v3 hw to MQ
-
-Ming Lei (1):
-  blk-mq: rename BLK_MQ_F_TAG_SHARED as BLK_MQ_F_TAG_QUEUE_SHARED
-
- block/bfq-iosched.c                         |   4 +-
- block/blk-mq-debugfs.c                      |  12 +--
- block/blk-mq-sched.c                        |  22 +++++
- block/blk-mq-tag.c                          | 140 +++++++++++++++++++++-------
- block/blk-mq-tag.h                          |  27 ++++--
- block/blk-mq.c                              | 104 +++++++++++++++------
- block/blk-mq.h                              |   7 +-
- block/blk-sysfs.c                           |   7 ++
- block/kyber-iosched.c                       |   4 +-
- drivers/scsi/hisi_sas/hisi_sas.h            |   3 +-
- drivers/scsi/hisi_sas/hisi_sas_main.c       |  36 +++----
- drivers/scsi/hisi_sas/hisi_sas_v3_hw.c      |  86 +++++++----------
- drivers/scsi/hpsa.c                         |  44 ++-------
- drivers/scsi/hpsa.h                         |   1 -
- drivers/scsi/megaraid/megaraid_sas.h        |   1 -
- drivers/scsi/megaraid/megaraid_sas_base.c   |  65 ++++---------
- drivers/scsi/megaraid/megaraid_sas_fusion.c |  14 ++-
- drivers/scsi/scsi_lib.c                     |   2 +
- drivers/scsi/smartpqi/smartpqi_init.c       |  38 ++++++--
- include/linux/blk-mq.h                      |   7 +-
- include/linux/elevator.h                    |   3 +
- include/scsi/scsi_host.h                    |   3 +
- 22 files changed, 380 insertions(+), 250 deletions(-)
-
+diff --git a/block/blk-mq-debugfs.c b/block/blk-mq-debugfs.c
+index b3f2ba483992..33a40ae1d60f 100644
+--- a/block/blk-mq-debugfs.c
++++ b/block/blk-mq-debugfs.c
+@@ -236,7 +236,7 @@ static const char *const alloc_policy_name[] = {
+ #define HCTX_FLAG_NAME(name) [ilog2(BLK_MQ_F_##name)] = #name
+ static const char *const hctx_flag_name[] = {
+ 	HCTX_FLAG_NAME(SHOULD_MERGE),
+-	HCTX_FLAG_NAME(TAG_SHARED),
++	HCTX_FLAG_NAME(TAG_QUEUE_SHARED),
+ 	HCTX_FLAG_NAME(BLOCKING),
+ 	HCTX_FLAG_NAME(NO_SCHED),
+ };
+diff --git a/block/blk-mq-tag.c b/block/blk-mq-tag.c
+index 53b4a9414fbd..d7aa23c82dbf 100644
+--- a/block/blk-mq-tag.c
++++ b/block/blk-mq-tag.c
+@@ -73,7 +73,7 @@ static inline bool hctx_may_queue(struct blk_mq_hw_ctx *hctx,
+ {
+ 	unsigned int depth, users;
+ 
+-	if (!hctx || !(hctx->flags & BLK_MQ_F_TAG_SHARED))
++	if (!hctx || !(hctx->flags & BLK_MQ_F_TAG_QUEUE_SHARED))
+ 		return true;
+ 	if (!test_bit(BLK_MQ_S_TAG_ACTIVE, &hctx->state))
+ 		return true;
+diff --git a/block/blk-mq-tag.h b/block/blk-mq-tag.h
+index 66d04dea0bdb..6c0f7c9ce9f6 100644
+--- a/block/blk-mq-tag.h
++++ b/block/blk-mq-tag.h
+@@ -55,7 +55,7 @@ extern void __blk_mq_tag_idle(struct blk_mq_hw_ctx *);
+ 
+ static inline bool blk_mq_tag_busy(struct blk_mq_hw_ctx *hctx)
+ {
+-	if (!(hctx->flags & BLK_MQ_F_TAG_SHARED))
++	if (!(hctx->flags & BLK_MQ_F_TAG_QUEUE_SHARED))
+ 		return false;
+ 
+ 	return __blk_mq_tag_busy(hctx);
+@@ -63,7 +63,7 @@ static inline bool blk_mq_tag_busy(struct blk_mq_hw_ctx *hctx)
+ 
+ static inline void blk_mq_tag_idle(struct blk_mq_hw_ctx *hctx)
+ {
+-	if (!(hctx->flags & BLK_MQ_F_TAG_SHARED))
++	if (!(hctx->flags & BLK_MQ_F_TAG_QUEUE_SHARED))
+ 		return;
+ 
+ 	__blk_mq_tag_idle(hctx);
+diff --git a/block/blk-mq.c b/block/blk-mq.c
+index 16aa20d23b67..6b39cf0efdcd 100644
+--- a/block/blk-mq.c
++++ b/block/blk-mq.c
+@@ -302,7 +302,7 @@ static struct request *blk_mq_rq_ctx_init(struct blk_mq_alloc_data *data,
+ 		rq->tag = -1;
+ 		rq->internal_tag = tag;
+ 	} else {
+-		if (data->hctx->flags & BLK_MQ_F_TAG_SHARED) {
++		if (data->hctx->flags & BLK_MQ_F_TAG_QUEUE_SHARED) {
+ 			rq_flags = RQF_MQ_INFLIGHT;
+ 			atomic_inc(&data->hctx->nr_active);
+ 		}
+@@ -1118,7 +1118,7 @@ static bool blk_mq_mark_tag_wait(struct blk_mq_hw_ctx *hctx,
+ 	wait_queue_entry_t *wait;
+ 	bool ret;
+ 
+-	if (!(hctx->flags & BLK_MQ_F_TAG_SHARED)) {
++	if (!(hctx->flags & BLK_MQ_F_TAG_QUEUE_SHARED)) {
+ 		blk_mq_sched_mark_restart_hctx(hctx);
+ 
+ 		/*
+@@ -1249,7 +1249,7 @@ bool blk_mq_dispatch_rq_list(struct request_queue *q, struct list_head *list,
+ 				 * For non-shared tags, the RESTART check
+ 				 * will suffice.
+ 				 */
+-				if (hctx->flags & BLK_MQ_F_TAG_SHARED)
++				if (hctx->flags & BLK_MQ_F_TAG_QUEUE_SHARED)
+ 					no_tag = true;
+ 				break;
+ 			}
+@@ -2358,7 +2358,7 @@ blk_mq_alloc_hctx(struct request_queue *q, struct blk_mq_tag_set *set,
+ 	spin_lock_init(&hctx->lock);
+ 	INIT_LIST_HEAD(&hctx->dispatch);
+ 	hctx->queue = q;
+-	hctx->flags = set->flags & ~BLK_MQ_F_TAG_SHARED;
++	hctx->flags = set->flags & ~BLK_MQ_F_TAG_QUEUE_SHARED;
+ 
+ 	INIT_LIST_HEAD(&hctx->hctx_list);
+ 
+@@ -2575,9 +2575,9 @@ static void queue_set_hctx_shared(struct request_queue *q, bool shared)
+ 
+ 	queue_for_each_hw_ctx(q, hctx, i) {
+ 		if (shared)
+-			hctx->flags |= BLK_MQ_F_TAG_SHARED;
++			hctx->flags |= BLK_MQ_F_TAG_QUEUE_SHARED;
+ 		else
+-			hctx->flags &= ~BLK_MQ_F_TAG_SHARED;
++			hctx->flags &= ~BLK_MQ_F_TAG_QUEUE_SHARED;
+ 	}
+ }
+ 
+@@ -2603,7 +2603,7 @@ static void blk_mq_del_queue_tag_set(struct request_queue *q)
+ 	list_del_rcu(&q->tag_set_list);
+ 	if (list_is_singular(&set->tag_list)) {
+ 		/* just transitioned to unshared */
+-		set->flags &= ~BLK_MQ_F_TAG_SHARED;
++		set->flags &= ~BLK_MQ_F_TAG_QUEUE_SHARED;
+ 		/* update existing queue */
+ 		blk_mq_update_tag_set_depth(set, false);
+ 	}
+@@ -2620,12 +2620,12 @@ static void blk_mq_add_queue_tag_set(struct blk_mq_tag_set *set,
+ 	 * Check to see if we're transitioning to shared (from 1 to 2 queues).
+ 	 */
+ 	if (!list_empty(&set->tag_list) &&
+-	    !(set->flags & BLK_MQ_F_TAG_SHARED)) {
+-		set->flags |= BLK_MQ_F_TAG_SHARED;
++	    !(set->flags & BLK_MQ_F_TAG_QUEUE_SHARED)) {
++		set->flags |= BLK_MQ_F_TAG_QUEUE_SHARED;
+ 		/* update existing queue */
+ 		blk_mq_update_tag_set_depth(set, true);
+ 	}
+-	if (set->flags & BLK_MQ_F_TAG_SHARED)
++	if (set->flags & BLK_MQ_F_TAG_QUEUE_SHARED)
+ 		queue_set_hctx_shared(q, true);
+ 	list_add_tail_rcu(&q->tag_set_list, &set->tag_list);
+ 
+diff --git a/include/linux/blk-mq.h b/include/linux/blk-mq.h
+index 0bf056de5cc3..147185394a25 100644
+--- a/include/linux/blk-mq.h
++++ b/include/linux/blk-mq.h
+@@ -225,7 +225,7 @@ struct blk_mq_ops {
+ 
+ enum {
+ 	BLK_MQ_F_SHOULD_MERGE	= 1 << 0,
+-	BLK_MQ_F_TAG_SHARED	= 1 << 1,
++	BLK_MQ_F_TAG_QUEUE_SHARED	= 1 << 1,
+ 	BLK_MQ_F_BLOCKING	= 1 << 5,
+ 	BLK_MQ_F_NO_SCHED	= 1 << 6,
+ 	BLK_MQ_F_ALLOC_POLICY_START_BIT = 8,
 -- 
 2.16.4
 
