@@ -6,21 +6,21 @@ X-Spam-Status: No, score=-9.8 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
 	INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,
 	USER_AGENT_GIT autolearn=unavailable autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 592B1C33CBC
-	for <linux-block@archiver.kernel.org>; Mon,  2 Dec 2019 15:39:38 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 6A6CEC43215
+	for <linux-block@archiver.kernel.org>; Mon,  2 Dec 2019 15:39:37 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.kernel.org (Postfix) with ESMTP id 3ACCC21774
-	for <linux-block@archiver.kernel.org>; Mon,  2 Dec 2019 15:39:38 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id 49F1A2084F
+	for <linux-block@archiver.kernel.org>; Mon,  2 Dec 2019 15:39:37 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1727604AbfLBPjh (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Mon, 2 Dec 2019 10:39:37 -0500
-Received: from mx2.suse.de ([195.135.220.15]:44834 "EHLO mx1.suse.de"
+        id S1727431AbfLBPjb (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Mon, 2 Dec 2019 10:39:31 -0500
+Received: from mx2.suse.de ([195.135.220.15]:44838 "EHLO mx1.suse.de"
         rhost-flags-OK-OK-OK-FAIL) by vger.kernel.org with ESMTP
-        id S1727568AbfLBPj3 (ORCPT <rfc822;linux-block@vger.kernel.org>);
-        Mon, 2 Dec 2019 10:39:29 -0500
+        id S1727572AbfLBPja (ORCPT <rfc822;linux-block@vger.kernel.org>);
+        Mon, 2 Dec 2019 10:39:30 -0500
 X-Virus-Scanned: by amavisd-new at test-mx.suse.de
 Received: from relay2.suse.de (unknown [195.135.220.254])
-        by mx1.suse.de (Postfix) with ESMTP id 25AB6C1AA;
+        by mx1.suse.de (Postfix) with ESMTP id 2B0AFC1AC;
         Mon,  2 Dec 2019 15:39:26 +0000 (UTC)
 From:   Hannes Reinecke <hare@suse.de>
 To:     "Martin K. Petersen" <martin.petersen@oracle.com>
@@ -28,10 +28,10 @@ Cc:     Jens Axboe <axboe@kernel.dk>, Christoph Hellwig <hch@lst.de>,
         James Bottomley <james.bottomley@hansenpartnership.com>,
         John Garry <john.garry@huawei.com>,
         Ming Lei <ming.lei@redhat.com>, linux-scsi@vger.kernel.org,
-        linux-block@vger.kernel.org, Hannes Reinecke <hare@suse.com>
-Subject: [PATCH 07/11] scsi: Add template flag 'host_tagset'
-Date:   Mon,  2 Dec 2019 16:39:10 +0100
-Message-Id: <20191202153914.84722-8-hare@suse.de>
+        linux-block@vger.kernel.org, Hannes Reinecke <hare@suse.de>
+Subject: [PATCH 05/11] blk-mq: add WARN_ON in blk_mq_free_rqs()
+Date:   Mon,  2 Dec 2019 16:39:08 +0100
+Message-Id: <20191202153914.84722-6-hare@suse.de>
 X-Mailer: git-send-email 2.16.4
 In-Reply-To: <20191202153914.84722-1-hare@suse.de>
 References: <20191202153914.84722-1-hare@suse.de>
@@ -40,46 +40,37 @@ Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-From: Hannes Reinecke <hare@suse.com>
+Before freeing up the requests we should ensure that none of
+those requests are still present in the ->rqs array; this could
+lead to an use-after free error.
 
-Add a host template flag 'host_tagset' so hostwide tagset can be
-shared on multiple reply queues after the SCSI device's reply queue
-is converted to blk-mq hw queue.
-
-Signed-off-by: Hannes Reinecke <hare@suse.com>
-Signed-off-by: John Garry <john.garry@huawei.com>
+Signed-off-by: Hannes Reinecke <hare@suse.de>
 ---
- drivers/scsi/scsi_lib.c  | 2 ++
- include/scsi/scsi_host.h | 3 +++
- 2 files changed, 5 insertions(+)
+ block/blk-mq.c | 10 +++++++---
+ 1 file changed, 7 insertions(+), 3 deletions(-)
 
-diff --git a/drivers/scsi/scsi_lib.c b/drivers/scsi/scsi_lib.c
-index 2563b061f56b..d7ad7b99bc05 100644
---- a/drivers/scsi/scsi_lib.c
-+++ b/drivers/scsi/scsi_lib.c
-@@ -1899,6 +1899,8 @@ int scsi_mq_setup_tags(struct Scsi_Host *shost)
- 	shost->tag_set.flags = BLK_MQ_F_SHOULD_MERGE;
- 	shost->tag_set.flags |=
- 		BLK_ALLOC_POLICY_TO_MQ_FLAG(shost->hostt->tag_alloc_policy);
-+	if (shost->hostt->host_tagset)
-+		shost->tag_set.flags |= BLK_MQ_F_TAG_HCTX_SHARED;
- 	shost->tag_set.driver_data = shost;
+diff --git a/block/blk-mq.c b/block/blk-mq.c
+index 016f8401cfb9..054c0597c052 100644
+--- a/block/blk-mq.c
++++ b/block/blk-mq.c
+@@ -2049,10 +2049,14 @@ void blk_mq_free_rqs(struct blk_mq_tag_set *set, struct blk_mq_tags *tags,
+ 		     unsigned int hctx_idx)
+ {
+ 	struct page *page;
++	int i;
  
- 	return blk_mq_alloc_tag_set(&shost->tag_set);
-diff --git a/include/scsi/scsi_host.h b/include/scsi/scsi_host.h
-index f577647bf5f2..4fd0af0883dd 100644
---- a/include/scsi/scsi_host.h
-+++ b/include/scsi/scsi_host.h
-@@ -429,6 +429,9 @@ struct scsi_host_template {
- 	/* True if the low-level driver supports blk-mq only */
- 	unsigned force_blk_mq:1;
+-	if (tags->rqs && set->ops->exit_request) {
+-		int i;
+-
++	if (tags->rqs) {
++		for (i = 0; i < tags->nr_tags; i++)
++			if (WARN_ON(tags->rqs[i]))
++				tags->rqs[i] = NULL;
++	}
++	if (tags->static_rqs && set->ops->exit_request) {
+ 		for (i = 0; i < tags->nr_tags; i++) {
+ 			struct request *rq = tags->static_rqs[i];
  
-+	/* True if the host uses host-wide tagspace */
-+	unsigned host_tagset:1;
-+
- 	/*
- 	 * Countdown for host blocking with no commands outstanding.
- 	 */
 -- 
 2.16.4
 
