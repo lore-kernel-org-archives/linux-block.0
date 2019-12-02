@@ -2,152 +2,120 @@ Return-Path: <SRS0=iG2v=ZY=vger.kernel.org=linux-block-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-2.4 required=3.0 tests=DKIMWL_WL_HIGH,DKIM_SIGNED,
-	DKIM_VALID,DKIM_VALID_AU,HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,
-	SPF_HELO_NONE,SPF_PASS,USER_AGENT_SANE_1 autolearn=no autolearn_force=no
-	version=3.4.0
+X-Spam-Status: No, score=-6.9 required=3.0 tests=DKIMWL_WL_HIGH,DKIM_SIGNED,
+	DKIM_VALID,DKIM_VALID_AU,HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,
+	MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS autolearn=ham
+	autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id AB6FAC43215
-	for <linux-block@archiver.kernel.org>; Mon,  2 Dec 2019 21:22:24 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 0DAD5C432C0
+	for <linux-block@archiver.kernel.org>; Mon,  2 Dec 2019 21:52:03 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.kernel.org (Postfix) with ESMTP id 7FFEF2071E
-	for <linux-block@archiver.kernel.org>; Mon,  2 Dec 2019 21:22:24 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id D110F206E0
+	for <linux-block@archiver.kernel.org>; Mon,  2 Dec 2019 21:52:02 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="MaNUiHwj"
+	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="AlOhwNXq"
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1726224AbfLBVWX (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Mon, 2 Dec 2019 16:22:23 -0500
-Received: from us-smtp-1.mimecast.com ([207.211.31.81]:23963 "EHLO
-        us-smtp-delivery-1.mimecast.com" rhost-flags-OK-OK-OK-FAIL)
-        by vger.kernel.org with ESMTP id S1725853AbfLBVWW (ORCPT
-        <rfc822;linux-block@vger.kernel.org>);
-        Mon, 2 Dec 2019 16:22:22 -0500
+        id S1726162AbfLBVwC (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Mon, 2 Dec 2019 16:52:02 -0500
+Received: from us-smtp-delivery-1.mimecast.com ([207.211.31.120]:32418 "EHLO
+        us-smtp-1.mimecast.com" rhost-flags-OK-OK-OK-FAIL) by vger.kernel.org
+        with ESMTP id S1725825AbfLBVwC (ORCPT
+        <rfc822;linux-block@vger.kernel.org>); Mon, 2 Dec 2019 16:52:02 -0500
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-        s=mimecast20190719; t=1575321740;
+        s=mimecast20190719; t=1575323521;
         h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
          to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-         content-transfer-encoding:content-transfer-encoding:
-         in-reply-to:in-reply-to:references:references;
-        bh=GNy5mzrbFUfF+VYedCZNaTyj28AJmYDxC867Fp4tmD4=;
-        b=MaNUiHwjSfyvj0/YdTuNSf4Jcybr1VFBnTE7FATZ4IblM4CtQaeQInhmw1r056mhbHdvL0
-        HFzvrcmv7tKpiGr7V/djoi+MF4+R75De/fJ/KGMJm0CNmbkSO2GPiTNbMvT9m7CiJuDvug
-        tkI+EEe3fAXy5qq3Ivfw7Cv3iFlKFoM=
+         content-transfer-encoding:content-transfer-encoding;
+        bh=b0+29zshaUbRjfxHy1HWRGMyTGil9Zlb7of0bIH6jfk=;
+        b=AlOhwNXq0jwemIvbRiJDrreIazEVow4jt80N1NdU9bvq5tgBqvg+IM/20rAa94mUIMQF7h
+        hrMSnfO31/Pewp41YpbO6z7mYkCQiJWPVBLBjT/4jd0hvlpHIAyanoGu1uZxwtWtV+G0Zb
+        3Sh+ozqyHtrtym3+blhNrRqZIah3Sg4=
 Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
  [209.132.183.4]) (Using TLS) by relay.mimecast.com with ESMTP id
- us-mta-89-uh2s1mFnOQ66DD7AEEL6HA-1; Mon, 02 Dec 2019 16:22:17 -0500
-Received: from smtp.corp.redhat.com (int-mx05.intmail.prod.int.phx2.redhat.com [10.5.11.15])
+ us-mta-17--qmsZSzkMcWcu3MRxu67lQ-1; Mon, 02 Dec 2019 16:51:58 -0500
+Received: from smtp.corp.redhat.com (int-mx08.intmail.prod.int.phx2.redhat.com [10.5.11.23])
         (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
         (No client certificate requested)
-        by mimecast-mx01.redhat.com (Postfix) with ESMTPS id C1FE11005502;
-        Mon,  2 Dec 2019 21:22:15 +0000 (UTC)
-Received: from lorien.usersys.redhat.com (ovpn-117-37.phx2.redhat.com [10.3.117.37])
-        by smtp.corp.redhat.com (Postfix) with ESMTPS id 2C41C5D6A7;
-        Mon,  2 Dec 2019 21:22:12 +0000 (UTC)
-Date:   Mon, 2 Dec 2019 16:22:10 -0500
-From:   Phil Auld <pauld@redhat.com>
-To:     Vincent Guittot <vincent.guittot@linaro.org>
-Cc:     Dave Chinner <david@fromorbit.com>, Ming Lei <ming.lei@redhat.com>,
-        Hillf Danton <hdanton@sina.com>,
-        linux-block <linux-block@vger.kernel.org>,
-        linux-fs <linux-fsdevel@vger.kernel.org>,
-        linux-xfs <linux-xfs@vger.kernel.org>,
-        linux-kernel <linux-kernel@vger.kernel.org>,
-        Christoph Hellwig <hch@lst.de>, Jens Axboe <axboe@kernel.dk>,
-        Peter Zijlstra <peterz@infradead.org>,
-        Rong Chen <rong.a.chen@intel.com>, Tejun Heo <tj@kernel.org>
-Subject: Re: single aio thread is migrated crazily by scheduler
-Message-ID: <20191202212210.GA32767@lorien.usersys.redhat.com>
-References: <20191114113153.GB4213@ming.t460p>
- <20191114235415.GL4614@dread.disaster.area>
- <20191115010824.GC4847@ming.t460p>
- <20191115045634.GN4614@dread.disaster.area>
- <20191115070843.GA24246@ming.t460p>
- <20191128094003.752-1-hdanton@sina.com>
- <CAKfTPtA23ErKGCEJVmg6vk-QoufkiUM3NbXd31mZmKnuwbTkFw@mail.gmail.com>
- <20191202024625.GD24512@ming.t460p>
- <20191202040256.GE2695@dread.disaster.area>
- <CAKfTPtD8Q97qJ_+hdCXQRt=gy7k96XrhnFmGYP1G88YSFW0vNA@mail.gmail.com>
+        by mimecast-mx01.redhat.com (Postfix) with ESMTPS id 4AB74DB61;
+        Mon,  2 Dec 2019 21:51:56 +0000 (UTC)
+Received: from rh2.redhat.com (ovpn-126-161.rdu2.redhat.com [10.10.126.161])
+        by smtp.corp.redhat.com (Postfix) with ESMTP id 73E6A19C68;
+        Mon,  2 Dec 2019 21:51:52 +0000 (UTC)
+From:   Mike Christie <mchristi@redhat.com>
+To:     sunke32@huawei.com, nbd@other.debian.org, axboe@kernel.dk,
+        josef@toxicpanda.com, linux-block@vger.kernel.org
+Cc:     Mike Christie <mchristi@redhat.com>, stable@vger.kernel.org
+Subject: [PATCH] nbd: fix shutdown and recv work deadlock
+Date:   Mon,  2 Dec 2019 15:51:50 -0600
+Message-Id: <20191202215150.10250-1-mchristi@redhat.com>
 MIME-Version: 1.0
-In-Reply-To: <CAKfTPtD8Q97qJ_+hdCXQRt=gy7k96XrhnFmGYP1G88YSFW0vNA@mail.gmail.com>
-User-Agent: Mutt/1.12.1 (2019-06-15)
-X-Scanned-By: MIMEDefang 2.79 on 10.5.11.15
-X-MC-Unique: uh2s1mFnOQ66DD7AEEL6HA-1
+X-Scanned-By: MIMEDefang 2.84 on 10.5.11.23
+X-MC-Unique: -qmsZSzkMcWcu3MRxu67lQ-1
 X-Mimecast-Spam-Score: 0
-Content-Type: text/plain; charset=us-ascii
+Content-Type: text/plain; charset=US-ASCII
 Content-Transfer-Encoding: quoted-printable
-Content-Disposition: inline
 Sender: linux-block-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-Hi Vincent,
+This fixes a regression added with:
 
-On Mon, Dec 02, 2019 at 02:45:42PM +0100 Vincent Guittot wrote:
-> On Mon, 2 Dec 2019 at 05:02, Dave Chinner <david@fromorbit.com> wrote:
+commit e9e006f5fcf2bab59149cb38a48a4817c1b538b4
+Author: Mike Christie <mchristi@redhat.com>
+Date:   Sun Aug 4 14:10:06 2019 -0500
 
-...
+    nbd: fix max number of supported devs
 
-> > So, we can fiddle with workqueues, but it doesn't address the
-> > underlying issue that the scheduler appears to be migrating
-> > non-bound tasks off a busy CPU too easily....
->=20
-> The root cause of the problem is that the sched_wakeup_granularity_ns
-> is in the same range or higher than load balance period. As Peter
-> explained, This make the kworker waiting for the CPU for several load
-> period and a transient unbalanced state becomes a stable one that the
-> scheduler to fix. With default value, the scheduler doesn't try to
-> migrate any task.
+where we can deadlock during device shutdown. The problem will occur if
+userpsace has done a NBD_CLEAR_SOCK call, then does close() before the
+recv_work work has done its nbd_config_put() call. If recv_work does the
+last call then it will do destroy_workqueue which will then be stuck
+waiting for the work we are running from.
 
-There are actually two issues here.   With the high wakeup granularity
-we get the user task actively migrated. This causes the significant
-performance hit Ming was showing. With the fast wakeup_granularity
-(or smaller IOs - 512 instead of 4k) we get, instead, the user task
-migrated at wakeup to a new CPU for every IO completion.
+This fixes the issue by having nbd_start_device_ioctl flush the work
+queue on both the failure and success cases and has a refcount on the
+nbd_device while it is flushing the work queue.
 
-This is the 11k migrations per sec doing 11k iops.  In this test it
-is not by itself causing the measured performance issue. It generally
-flips back and forth between 2 cpus for large periods. I think it is
-crossing cache boundaries at times (but I have not looked closely
-at the traces compared to the topology, yet).
+Cc: stable@vger.kernel.org
+Signed-off-by: Mike Christie <mchristi@redhat.com>
+---
+ drivers/block/nbd.c | 9 ++++++---
+ 1 file changed, 6 insertions(+), 3 deletions(-)
 
-The active balances are what really hurts in thie case but I agree
-that seems to be a tuning problem.
-
-
-Cheers,
-Phil
-
-
->=20
-> Then, I agree that having an ack close to the request makes sense but
-> forcing it on the exact same CPU is too restrictive IMO. Being able to
-> use another CPU on the same core should not harm the performance and
-> may even improve it. And that may still be the case while CPUs share
-> their cache.
->=20
-> >
-> > -Dave.
-> >
-> > [*] Pay attention to the WQ_POWER_EFFICIENT definition for a work
-> > queue: it's designed for interrupt routines that defer work via work
-> > queues to avoid doing work on otherwise idle CPUs. It does this by
-> > turning the per-cpu wq into an unbound wq so that work gets
-> > scheduled on a non-idle CPUs in preference to the local idle CPU
-> > which can then remain in low power states.
-> >
-> > That's the exact opposite of what using WQ_UNBOUND ends up doing in
-> > this IO completion context: it pushes the work out over idle CPUs
-> > rather than keeping them confined on the already busy CPUs where CPU
-> > affinity allows the work to be done quickly. So while WQ_UNBOUND
-> > avoids the user task being migrated frequently, it results in the
-> > work being spread around many more CPUs and we burn more power to do
-> > the same work.
-> >
-> > --
-> > Dave Chinner
-> > david@fromorbit.com
->=20
-
+diff --git a/drivers/block/nbd.c b/drivers/block/nbd.c
+index 57532465fb83..f8597d2fb365 100644
+--- a/drivers/block/nbd.c
++++ b/drivers/block/nbd.c
+@@ -1293,13 +1293,15 @@ static int nbd_start_device_ioctl(struct nbd_device=
+ *nbd, struct block_device *b
+=20
+ =09if (max_part)
+ =09=09bdev->bd_invalidated =3D 1;
++
++=09refcount_inc(&nbd->config_refs);
+ =09mutex_unlock(&nbd->config_lock);
+ =09ret =3D wait_event_interruptible(config->recv_wq,
+ =09=09=09=09=09 atomic_read(&config->recv_threads) =3D=3D 0);
+-=09if (ret) {
++=09if (ret)
+ =09=09sock_shutdown(nbd);
+-=09=09flush_workqueue(nbd->recv_workq);
+-=09}
++=09flush_workqueue(nbd->recv_workq);
++
+ =09mutex_lock(&nbd->config_lock);
+ =09nbd_bdev_reset(bdev);
+ =09/* user requested, ignore socket errors */
+@@ -1307,6 +1309,7 @@ static int nbd_start_device_ioctl(struct nbd_device *=
+nbd, struct block_device *b
+ =09=09ret =3D 0;
+ =09if (test_bit(NBD_RT_TIMEDOUT, &config->runtime_flags))
+ =09=09ret =3D -ETIMEDOUT;
++=09nbd_config_put(nbd);
+ =09return ret;
+ }
+=20
 --=20
+2.20.1
 
