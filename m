@@ -2,200 +2,198 @@ Return-Path: <SRS0=iG2v=ZY=vger.kernel.org=linux-block-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-3.9 required=3.0 tests=DKIM_SIGNED,DKIM_VALID,
-	DKIM_VALID_AU,HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,
-	SPF_HELO_NONE,SPF_PASS autolearn=no autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-7.2 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
+	MAILING_LIST_MULTI,MENTIONS_GIT_HOSTING,SPF_HELO_NONE,SPF_PASS,
+	USER_AGENT_SANE_1 autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 74B52C432C3
-	for <linux-block@archiver.kernel.org>; Mon,  2 Dec 2019 13:46:00 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 01DD1C432C0
+	for <linux-block@archiver.kernel.org>; Mon,  2 Dec 2019 14:15:46 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.kernel.org (Postfix) with ESMTP id 4135F2053B
-	for <linux-block@archiver.kernel.org>; Mon,  2 Dec 2019 13:46:00 +0000 (UTC)
-Authentication-Results: mail.kernel.org;
-	dkim=pass (2048-bit key) header.d=linaro.org header.i=@linaro.org header.b="weHqKqK6"
+	by mail.kernel.org (Postfix) with ESMTP id C434B20717
+	for <linux-block@archiver.kernel.org>; Mon,  2 Dec 2019 14:15:45 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1727487AbfLBNp7 (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Mon, 2 Dec 2019 08:45:59 -0500
-Received: from mail-lj1-f196.google.com ([209.85.208.196]:43378 "EHLO
-        mail-lj1-f196.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1727490AbfLBNp6 (ORCPT
-        <rfc822;linux-block@vger.kernel.org>); Mon, 2 Dec 2019 08:45:58 -0500
-Received: by mail-lj1-f196.google.com with SMTP id a13so17011579ljm.10
-        for <linux-block@vger.kernel.org>; Mon, 02 Dec 2019 05:45:55 -0800 (PST)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=linaro.org; s=google;
-        h=mime-version:references:in-reply-to:from:date:message-id:subject:to
-         :cc;
-        bh=49jYbZVycOXFspdxl9CDUTh2W/4I3gjVIzO2kAHOhfU=;
-        b=weHqKqK6CpbCFt1jkDcyAM9l4ZlRl5wkEuDFLBbazMmIojfqabp5oSo6tLXuCIzaWu
-         MuYMSoa0ONVmpFuwjEWhox/dhcv86Z+wsg/9kFtV+cGU8yOL6I56QuWgtyseIhjPdthi
-         I4+IK8zSzhPx9UAPZQ1g80GtClIcJh08T7JdA38TQ8PMmNgRAMPhKG+oIUfRP8h/P0hE
-         Ax9lEnmLM6EUctVOZmfwlpRgge80/NhgGBajWxHstwa7SYJzz95fdPGiB0sr3VHSmSSy
-         AHtD+4qLHIo/GXk0NdOm9nCKaAktJHtGSveoJV3FECVT+9pI49wRBla4o7CRBlyZVmDK
-         dsBw==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20161025;
-        h=x-gm-message-state:mime-version:references:in-reply-to:from:date
-         :message-id:subject:to:cc;
-        bh=49jYbZVycOXFspdxl9CDUTh2W/4I3gjVIzO2kAHOhfU=;
-        b=NIyknPzMB1ymSkzBPc0To+4sRtczHoJ7LyH0/hVDUdQ29/hxs5p4yDKY2PG9BlA9Jh
-         gAxgQAcYESMi9TE5sjRkVLeaqOKTL2xejx47J34Ge/pW0vT/1jpkAWO2cDR6WT+bm9uG
-         TogkCN92UPRtugPgJJw/qMRNSJuO5qqpP3R811AGTntv2qlEuF/1rKpO/n4nI1ltEwNX
-         jJNozGd2kNjXbc8uv6ACUMaM/f3L0rTu+HTbU3107ZaobZZQYO16YQZOAr4Dle3Kouvx
-         jZnVCDyR8mLv/+9qkRsgun0KBuYOfeYMev7yxOB811PzZZeD6HcTo1IZexOhfADTCRRp
-         E6IA==
-X-Gm-Message-State: APjAAAXmS+YsQJ+BcZtRkFFD6MWP9b6lTrAUyuB5FDoXnugwub7JvjfI
-        Z24NualRF8XFOw6dfz65+CINRZNtDT0gm2Pq9He5Sg==
-X-Google-Smtp-Source: APXvYqxeByd/GwXPla7qySqPY0k0YYlASUzuqjZNj/U6zFcUOWxtXgVlcft9G28tw4AAwHLj66dc1hiGkBjfOJNyWxY=
-X-Received: by 2002:a2e:9a04:: with SMTP id o4mr14412076lji.214.1575294354710;
- Mon, 02 Dec 2019 05:45:54 -0800 (PST)
+        id S1727391AbfLBOPp (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Mon, 2 Dec 2019 09:15:45 -0500
+Received: from lhrrgout.huawei.com ([185.176.76.210]:2148 "EHLO huawei.com"
+        rhost-flags-OK-OK-OK-FAIL) by vger.kernel.org with ESMTP
+        id S1727362AbfLBOPp (ORCPT <rfc822;linux-block@vger.kernel.org>);
+        Mon, 2 Dec 2019 09:15:45 -0500
+Received: from lhreml702-cah.china.huawei.com (unknown [172.18.7.107])
+        by Forcepoint Email with ESMTP id 63DF09670B666654D8C7;
+        Mon,  2 Dec 2019 14:15:42 +0000 (GMT)
+Received: from lhreml724-chm.china.huawei.com (10.201.108.75) by
+ lhreml702-cah.china.huawei.com (10.201.108.43) with Microsoft SMTP Server
+ (TLS) id 14.3.408.0; Mon, 2 Dec 2019 14:15:41 +0000
+Received: from [127.0.0.1] (10.202.226.46) by lhreml724-chm.china.huawei.com
+ (10.201.108.75) with Microsoft SMTP Server (version=TLS1_2,
+ cipher=TLS_ECDHE_RSA_WITH_AES_128_CBC_SHA256) id 15.1.1713.5; Mon, 2 Dec 2019
+ 14:15:41 +0000
+Subject: Re: [blk] 017e1adde9: BUG:kernel_NULL_pointer_dereference,address
+To:     kernel test robot <lkp@intel.com>, Hannes Reinecke <hare@suse.de>
+CC:     "Martin K. Petersen" <martin.petersen@oracle.com>,
+        Christoph Hellwig <hch@lst.de>,
+        James Bottomley <james.bottomley@hansenpartnership.com>,
+        "Ming Lei" <ming.lei@redhat.com>,
+        Bart van Assche <bvanassche@acm.org>,
+        "linux-scsi@vger.kernel.org" <linux-scsi@vger.kernel.org>,
+        "linux-block@vger.kernel.org" <linux-block@vger.kernel.org>,
+        "lkp@lists.01.org" <lkp@lists.01.org>
+References: <20191201145716.GB18573@shao2-debian>
+From:   John Garry <john.garry@huawei.com>
+Message-ID: <42eb0e2d-346b-c5b5-153d-b34329413a9f@huawei.com>
+Date:   Mon, 2 Dec 2019 14:15:41 +0000
+User-Agent: Mozilla/5.0 (Windows NT 10.0; WOW64; rv:68.0) Gecko/20100101
+ Thunderbird/68.1.2
 MIME-Version: 1.0
-References: <20191114113153.GB4213@ming.t460p> <20191114235415.GL4614@dread.disaster.area>
- <20191115010824.GC4847@ming.t460p> <20191115045634.GN4614@dread.disaster.area>
- <20191115070843.GA24246@ming.t460p> <20191128094003.752-1-hdanton@sina.com>
- <CAKfTPtA23ErKGCEJVmg6vk-QoufkiUM3NbXd31mZmKnuwbTkFw@mail.gmail.com>
- <20191202024625.GD24512@ming.t460p> <20191202040256.GE2695@dread.disaster.area>
-In-Reply-To: <20191202040256.GE2695@dread.disaster.area>
-From:   Vincent Guittot <vincent.guittot@linaro.org>
-Date:   Mon, 2 Dec 2019 14:45:42 +0100
-Message-ID: <CAKfTPtD8Q97qJ_+hdCXQRt=gy7k96XrhnFmGYP1G88YSFW0vNA@mail.gmail.com>
-Subject: Re: single aio thread is migrated crazily by scheduler
-To:     Dave Chinner <david@fromorbit.com>
-Cc:     Ming Lei <ming.lei@redhat.com>, Hillf Danton <hdanton@sina.com>,
-        linux-block <linux-block@vger.kernel.org>,
-        linux-fs <linux-fsdevel@vger.kernel.org>,
-        linux-xfs <linux-xfs@vger.kernel.org>,
-        linux-kernel <linux-kernel@vger.kernel.org>,
-        Christoph Hellwig <hch@lst.de>, Jens Axboe <axboe@kernel.dk>,
-        Peter Zijlstra <peterz@infradead.org>,
-        Rong Chen <rong.a.chen@intel.com>, Tejun Heo <tj@kernel.org>
-Content-Type: text/plain; charset="UTF-8"
+In-Reply-To: <20191201145716.GB18573@shao2-debian>
+Content-Type: text/plain; charset="utf-8"; format=flowed
+Content-Language: en-US
+Content-Transfer-Encoding: 7bit
+X-Originating-IP: [10.202.226.46]
+X-ClientProxiedBy: lhreml702-chm.china.huawei.com (10.201.108.51) To
+ lhreml724-chm.china.huawei.com (10.201.108.75)
+X-CFilter-Loop: Reflected
 Sender: linux-block-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-On Mon, 2 Dec 2019 at 05:02, Dave Chinner <david@fromorbit.com> wrote:
->
-> On Mon, Dec 02, 2019 at 10:46:25AM +0800, Ming Lei wrote:
-> > On Thu, Nov 28, 2019 at 10:53:33AM +0100, Vincent Guittot wrote:
-> > > On Thu, 28 Nov 2019 at 10:40, Hillf Danton <hdanton@sina.com> wrote:
-> > > > --- a/fs/iomap/direct-io.c
-> > > > +++ b/fs/iomap/direct-io.c
-> > > > @@ -157,10 +157,8 @@ static void iomap_dio_bio_end_io(struct
-> > > >                         WRITE_ONCE(dio->submit.waiter, NULL);
-> > > >                         blk_wake_io_task(waiter);
-> > > >                 } else if (dio->flags & IOMAP_DIO_WRITE) {
-> > > > -                       struct inode *inode = file_inode(dio->iocb->ki_filp);
-> > > > -
-> > > >                         INIT_WORK(&dio->aio.work, iomap_dio_complete_work);
-> > > > -                       queue_work(inode->i_sb->s_dio_done_wq, &dio->aio.work);
-> > > > +                       schedule_work(&dio->aio.work);
-> > >
-> > > I'm not sure that this will make a real difference because it ends up
-> > > to call queue_work(system_wq, ...) and system_wq is bounded as well so
-> > > the work will still be pinned to a CPU
-> > > Using system_unbound_wq should make a difference because it doesn't
-> > > pin the work on a CPU
-> > >  +                       queue_work(system_unbound_wq, &dio->aio.work);
-> >
-> > Indeed, just run a quick test on my KVM guest, looks the following patch
-> > makes a difference:
-> >
-> > diff --git a/fs/direct-io.c b/fs/direct-io.c
-> > index 9329ced91f1d..2f4488b0ecec 100644
-> > --- a/fs/direct-io.c
-> > +++ b/fs/direct-io.c
-> > @@ -613,7 +613,8 @@ int sb_init_dio_done_wq(struct super_block *sb)
-> >  {
-> >         struct workqueue_struct *old;
-> >         struct workqueue_struct *wq = alloc_workqueue("dio/%s",
-> > -                                                     WQ_MEM_RECLAIM, 0,
-> > +                                                     WQ_MEM_RECLAIM |
-> > +                                                     WQ_UNBOUND, 0,
-> >                                                       sb->s_id);
->
-> That's not an answer to the user task migration issue.
->
-> That is, all this patch does is trade user task migration when the
-> CPU is busy for migrating all the queued work off the CPU so the
-> user task does not get migrated. IOWs, this forces all the queued
-> work to be migrated rather than the user task. IOWs, it does not
-> address the issue we've exposed in the scheduler between tasks with
-> competing CPU affinity scheduling requirements - it just hides the
-> symptom.
->
-> Maintaining CPU affinity across dispatch and completion work has
-> been proven to be a significant performance win. Right throughout
-> the IO stack we try to keep this submitter/completion affinity,
-> and that's the whole point of using a bound wq in the first place:
-> efficient delayed batch processing of work on the local CPU.
+On 01/12/2019 14:57, kernel test robot wrote:
+> FYI, we noticed the following commit (built with gcc-7):
+> 
+> commit: 017e1adde9cfd7e488e6e8328d98f9d84e5f8fb8 ("[PATCH 4/8] blk-mq: Facilitate a shared sbitmap per tagset")
+> url: https://github.com/0day-ci/linux/commits/Hannes-Reinecke/blk-mq-scsi-Provide-hostwide-shared-tags-for-SCSI-HBAs/20191126-234036
+> base: https://git.kernel.org/cgit/linux/kernel/git/mkp/scsi.git for-next
+> 
+> in testcase: boot
+> 
+> on test machine: qemu-system-x86_64 -enable-kvm -cpu SandyBridge -smp 2 -m 8G
+> 
+> caused below changes (please refer to attached dmesg/kmsg for entire log/backtrace):
+> 
+> 
 
-Do you really want to target the same CPU ? looks like what you really
-want to target the same cache instead
+Thanks to kernel test robot.
 
->
-> Spewing deferred completion work across every idle CPU in the
-> machine because the local cpu is temporarily busy is a bad choice,
-> both from a performance perspective (dirty cacheline bouncing) and
-> from a power efficiency point of view as it causes CPUs to be taken
-> out of idle state much more frequently[*].
->
-> The fact that the scheduler migrates the user task we use workqueues
-> for deferred work as they were intended doesn't make this a
-> workqueue problem. If the answer to this problem is "make all IO
-> workqueues WQ_UNBOUND" then we are effectively saying "the scheduler
-> has unfixable problems when mixing bound and unbound work on the
-> same run queue".
->
-> And, besides, what happens when every other CPU is also completely
-> busy and can't run the work in a timely fashion? We've just moved
-> the work to some random CPU where we wait to be scheduled instead of
-> just sitting on the local CPU and waiting....
->
-> So, yes, we can work around the -symptoms- we see (frequent user
-> task migration) by changing the work queue configuration or
-> bypassing the workqueue for this specific workload. But these only
-> address the visible symptom and don't take into account the wider
-> goals of retaining CPU affinity in the IO stack, and they will have
-> variable scheduling latency and perofrmance and as the overall
-> system load changes.
->
-> So, we can fiddle with workqueues, but it doesn't address the
-> underlying issue that the scheduler appears to be migrating
-> non-bound tasks off a busy CPU too easily....
+So this looks like it is caused by the reason mentioned in Bart's review:
 
-The root cause of the problem is that the sched_wakeup_granularity_ns
-is in the same range or higher than load balance period. As Peter
-explained, This make the kworker waiting for the CPU for several load
-period and a transient unbalanced state becomes a stable one that the
-scheduler to fix. With default value, the scheduler doesn't try to
-migrate any task.
+On 27/11/2019 17:03, Bart Van Assche wrote:
+ >
+ >> +struct blk_mq_tags *blk_mq_init_tags(struct blk_mq_tag_set *set,
+ >> +                     unsigned int total_tags,
+ >>                        unsigned int reserved_tags,
+ >> -                     int node, int alloc_policy)
+ >> +                     int node, int alloc_policy,
+ >> +                     bool shared_tags)
+ >>   {
+ >>       struct blk_mq_tags *tags;
+ >> @@ -488,9 +517,11 @@ struct blk_mq_tags *blk_mq_init_tags(unsigned int
+ >> total_tags,
+ >>       tags->nr_tags = total_tags;
+ >>       tags->nr_reserved_tags = reserved_tags;
+ >> -    if (blk_mq_init_bitmap_tags(tags, node, alloc_policy) < 0) {
+ >> -        kfree(tags);
+ >> -        tags = NULL;
+ >> +    if (shared_tags) {
 
-Then, I agree that having an ack close to the request makes sense but
-forcing it on the exact same CPU is too restrictive IMO. Being able to
-use another CPU on the same core should not harm the performance and
-may even improve it. And that may still be the case while CPUs share
-their cache.
+Indeed, this is wrong - the logic is inverted.
 
->
-> -Dave.
->
-> [*] Pay attention to the WQ_POWER_EFFICIENT definition for a work
-> queue: it's designed for interrupt routines that defer work via work
-> queues to avoid doing work on otherwise idle CPUs. It does this by
-> turning the per-cpu wq into an unbound wq so that work gets
-> scheduled on a non-idle CPUs in preference to the local idle CPU
-> which can then remain in low power states.
->
-> That's the exact opposite of what using WQ_UNBOUND ends up doing in
-> this IO completion context: it pushes the work out over idle CPUs
-> rather than keeping them confined on the already busy CPUs where CPU
-> affinity allows the work to be done quickly. So while WQ_UNBOUND
-> avoids the user task being migrated frequently, it results in the
-> work being spread around many more CPUs and we burn more power to do
-> the same work.
->
-> --
-> Dave Chinner
-> david@fromorbit.com
+ >> +        if (blk_mq_init_bitmap_tags(tags, node, alloc_policy) < 0) {
+ >> +            kfree(tags);
+ >> +            tags = NULL;
+ >> +        }
+ >>       }
+ >>       return tags;
+ >>   }
+ >
+ > The above looks weird to me: the existing code path is only called if
+ > shared tags are enabled? Shouldn't "if (shared_tags)" be changed into
+ > "if (!shared_tags)"?
+
+
+Thanks,
+John
+
+
+
+> +---------------------------------------------+------------+------------+
+> |                                             | 240a6aa94a | 017e1adde9 |
+> +---------------------------------------------+------------+------------+
+> | boot_successes                              | 4          | 0          |
+> | boot_failures                               | 0          | 4          |
+> | BUG:kernel_NULL_pointer_dereference,address | 0          | 4          |
+> | Oops:#[##]                                  | 0          | 4          |
+> | RIP:__sbitmap_queue_get                     | 0          | 4          |
+> | Kernel_panic-not_syncing:Fatal_exception    | 0          | 4          |
+> +---------------------------------------------+------------+------------+
+> 
+> 
+> If you fix the issue, kindly add following tag
+> Reported-by: kernel test robot <lkp@intel.com>
+> 
+> 
+> [    8.258248] BUG: kernel NULL pointer dereference, address: 0000000000000018
+> [    8.259858] #PF: supervisor read access in kernel mode
+> [    8.261077] #PF: error_code(0x0000) - not-present page
+> [    8.262296] PGD 0 P4D 0
+> [    8.263028] Oops: 0000 [#1] SMP PTI
+> [    8.263943] CPU: 1 PID: 189 Comm: kworker/u4:2 Not tainted 5.4.0-rc1-00274-g017e1adde9cfd #1
+> [    8.265919] Hardware name: QEMU Standard PC (i440FX + PIIX, 1996), BIOS 1.10.2-1 04/01/2014
+> [    8.267892] Workqueue: events_unbound async_run_entry_fn
+> [    8.269148] RIP: 0010:__sbitmap_queue_get+0x7/0x90
+> [    8.270303] Code: 41 5e 41 5f c3 41 8b 4f 04 d3 e3 01 d8 5b 5d 41 5c 41 5d 41 5e 41 5f c3 66 66 2e 0f 1f 84 00 00 00 00 00 41 54 55 53 48 89 fb <48> 8b 47 18 65 8b 28 44 8b 27 41 39 ec 76 50 0f b6 53 34 89 ee 48
+> [    8.274368] RSP: 0018:ffffc90000107b38 EFLAGS: 00010246
+> [    8.275608] RAX: ffff8881f1ec2800 RBX: 0000000000000000 RCX: 0000000000000000
+> [    8.277193] RDX: 0000000000000000 RSI: 0000000000000000 RDI: 0000000000000000
+> [    8.278781] RBP: 0000000000000000 R08: 0000000000000024 R09: 0000000000000000
+> [    8.280372] R10: ffffc90000107b50 R11: ffff8881ef073047 R12: 0000000000000000
+> [    8.281966] R13: 0000000000000000 R14: 0000000000000001 R15: ffffc90000107d0f
+> [    8.283557] FS:  0000000000000000(0000) GS:ffff88823fd00000(0000) knlGS:0000000000000000
+> [    8.285471] CS:  0010 DS: 0000 ES: 0000 CR0: 0000000080050033
+> [    8.286794] CR2: 0000000000000018 CR3: 00000001f319c000 CR4: 00000000000406e0
+> [    8.288397] Call Trace:
+> [    8.289707]  blk_mq_get_tag+0xf1/0x250
+> [    8.290721]  ? finish_wait+0x80/0x80
+> [    8.291666]  blk_mq_get_request+0xda/0x380
+> [    8.292692]  blk_mq_alloc_request+0x84/0xd0
+> [    8.293729]  blk_get_request+0x22/0x60
+> [    8.294687]  __scsi_execute+0x38/0x250
+> [    8.295650]  scsi_probe_and_add_lun+0x22d/0xda0
+> [    8.296827]  __scsi_scan_target+0xf9/0x620
+> [    8.297916]  ? __switch_to_asm+0x34/0x70
+> [    8.298903]  ? __switch_to_asm+0x40/0x70
+> [    8.299895]  ? __switch_to_asm+0x34/0x70
+> [    8.300882]  ? __switch_to_asm+0x34/0x70
+> [    8.301866]  ? __switch_to_asm+0x40/0x70
+> [    8.302853]  scsi_scan_channel+0x5a/0x80
+> [    8.303844]  scsi_scan_host_selected+0xe3/0x150
+> [    8.304944]  do_scan_async+0x17/0x1a0
+> [    8.305881]  async_run_entry_fn+0x39/0x160
+> [    8.306901]  process_one_work+0x1ae/0x3d0
+> [    8.307911]  worker_thread+0x3c/0x3b0
+> [    8.308850]  ? process_one_work+0x3d0/0x3d0
+> [    8.309884]  kthread+0x11e/0x140
+> [    8.310740]  ? kthread_park+0x90/0x90
+> [    8.311686]  ret_from_fork+0x35/0x40
+> [    8.312609] Modules linked in: serio_raw libata(+) virtio_scsi i2c_piix4 parport_pc(+) parport floppy ip_tables
+> [    8.315085] CR2: 0000000000000018
+> [    8.315978] ---[ end trace 808f3f155f356740 ]---
+> 
+> 
+> To reproduce:
+> 
+>          # build kernel
+> 	cd linux
+> 	cp config-5.4.0-rc1-00274-g017e1adde9cfd .config
+> 	make HOSTCC=gcc-7 CC=gcc-7 ARCH=x86_64 olddefconfig prepare modules_prepare bzImage
+> 
+>          git clone https://github.com/intel/lkp-tests.git
+>          cd lkp-tests
+>          bin/lkp qemu -k <bzImage> job-script # job-script is attached in this email
+> 
+> 
+> 
+> Thanks,
+> lkp
+> 
+
