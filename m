@@ -2,114 +2,200 @@ Return-Path: <SRS0=iG2v=ZY=vger.kernel.org=linux-block-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-0.8 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
-	MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS autolearn=no autolearn_force=no
-	version=3.4.0
+X-Spam-Status: No, score=-3.9 required=3.0 tests=DKIM_SIGNED,DKIM_VALID,
+	DKIM_VALID_AU,HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,
+	SPF_HELO_NONE,SPF_PASS autolearn=no autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id E2CE1C432C0
-	for <linux-block@archiver.kernel.org>; Mon,  2 Dec 2019 11:42:13 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 74B52C432C3
+	for <linux-block@archiver.kernel.org>; Mon,  2 Dec 2019 13:46:00 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.kernel.org (Postfix) with ESMTP id C054D2146E
-	for <linux-block@archiver.kernel.org>; Mon,  2 Dec 2019 11:42:13 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id 4135F2053B
+	for <linux-block@archiver.kernel.org>; Mon,  2 Dec 2019 13:46:00 +0000 (UTC)
+Authentication-Results: mail.kernel.org;
+	dkim=pass (2048-bit key) header.d=linaro.org header.i=@linaro.org header.b="weHqKqK6"
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1727398AbfLBLmN (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Mon, 2 Dec 2019 06:42:13 -0500
-Received: from mx2.suse.de ([195.135.220.15]:41162 "EHLO mx1.suse.de"
-        rhost-flags-OK-OK-OK-FAIL) by vger.kernel.org with ESMTP
-        id S1727399AbfLBLmN (ORCPT <rfc822;linux-block@vger.kernel.org>);
-        Mon, 2 Dec 2019 06:42:13 -0500
-X-Virus-Scanned: by amavisd-new at test-mx.suse.de
-Received: from relay2.suse.de (unknown [195.135.220.254])
-        by mx1.suse.de (Postfix) with ESMTP id 5C727B1AA;
-        Mon,  2 Dec 2019 11:42:11 +0000 (UTC)
+        id S1727487AbfLBNp7 (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Mon, 2 Dec 2019 08:45:59 -0500
+Received: from mail-lj1-f196.google.com ([209.85.208.196]:43378 "EHLO
+        mail-lj1-f196.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S1727490AbfLBNp6 (ORCPT
+        <rfc822;linux-block@vger.kernel.org>); Mon, 2 Dec 2019 08:45:58 -0500
+Received: by mail-lj1-f196.google.com with SMTP id a13so17011579ljm.10
+        for <linux-block@vger.kernel.org>; Mon, 02 Dec 2019 05:45:55 -0800 (PST)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=linaro.org; s=google;
+        h=mime-version:references:in-reply-to:from:date:message-id:subject:to
+         :cc;
+        bh=49jYbZVycOXFspdxl9CDUTh2W/4I3gjVIzO2kAHOhfU=;
+        b=weHqKqK6CpbCFt1jkDcyAM9l4ZlRl5wkEuDFLBbazMmIojfqabp5oSo6tLXuCIzaWu
+         MuYMSoa0ONVmpFuwjEWhox/dhcv86Z+wsg/9kFtV+cGU8yOL6I56QuWgtyseIhjPdthi
+         I4+IK8zSzhPx9UAPZQ1g80GtClIcJh08T7JdA38TQ8PMmNgRAMPhKG+oIUfRP8h/P0hE
+         Ax9lEnmLM6EUctVOZmfwlpRgge80/NhgGBajWxHstwa7SYJzz95fdPGiB0sr3VHSmSSy
+         AHtD+4qLHIo/GXk0NdOm9nCKaAktJHtGSveoJV3FECVT+9pI49wRBla4o7CRBlyZVmDK
+         dsBw==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20161025;
+        h=x-gm-message-state:mime-version:references:in-reply-to:from:date
+         :message-id:subject:to:cc;
+        bh=49jYbZVycOXFspdxl9CDUTh2W/4I3gjVIzO2kAHOhfU=;
+        b=NIyknPzMB1ymSkzBPc0To+4sRtczHoJ7LyH0/hVDUdQ29/hxs5p4yDKY2PG9BlA9Jh
+         gAxgQAcYESMi9TE5sjRkVLeaqOKTL2xejx47J34Ge/pW0vT/1jpkAWO2cDR6WT+bm9uG
+         TogkCN92UPRtugPgJJw/qMRNSJuO5qqpP3R811AGTntv2qlEuF/1rKpO/n4nI1ltEwNX
+         jJNozGd2kNjXbc8uv6ACUMaM/f3L0rTu+HTbU3107ZaobZZQYO16YQZOAr4Dle3Kouvx
+         jZnVCDyR8mLv/+9qkRsgun0KBuYOfeYMev7yxOB811PzZZeD6HcTo1IZexOhfADTCRRp
+         E6IA==
+X-Gm-Message-State: APjAAAXmS+YsQJ+BcZtRkFFD6MWP9b6lTrAUyuB5FDoXnugwub7JvjfI
+        Z24NualRF8XFOw6dfz65+CINRZNtDT0gm2Pq9He5Sg==
+X-Google-Smtp-Source: APXvYqxeByd/GwXPla7qySqPY0k0YYlASUzuqjZNj/U6zFcUOWxtXgVlcft9G28tw4AAwHLj66dc1hiGkBjfOJNyWxY=
+X-Received: by 2002:a2e:9a04:: with SMTP id o4mr14412076lji.214.1575294354710;
+ Mon, 02 Dec 2019 05:45:54 -0800 (PST)
 MIME-Version: 1.0
-Content-Type: text/plain; charset=US-ASCII;
- format=flowed
-Content-Transfer-Encoding: 7bit
-Date:   Mon, 02 Dec 2019 12:42:11 +0100
-From:   Roman Penyaev <rpenyaev@suse.de>
-To:     linux-block@vger.kernel.org, Jens Axboe <axboe@kernel.dk>
-Subject: io_uring: EIO on write to a file on a ram dev
-Message-ID: <5c8191161dad15ae6bbd60e5953a5b51@suse.de>
-X-Sender: rpenyaev@suse.de
-User-Agent: Roundcube Webmail
+References: <20191114113153.GB4213@ming.t460p> <20191114235415.GL4614@dread.disaster.area>
+ <20191115010824.GC4847@ming.t460p> <20191115045634.GN4614@dread.disaster.area>
+ <20191115070843.GA24246@ming.t460p> <20191128094003.752-1-hdanton@sina.com>
+ <CAKfTPtA23ErKGCEJVmg6vk-QoufkiUM3NbXd31mZmKnuwbTkFw@mail.gmail.com>
+ <20191202024625.GD24512@ming.t460p> <20191202040256.GE2695@dread.disaster.area>
+In-Reply-To: <20191202040256.GE2695@dread.disaster.area>
+From:   Vincent Guittot <vincent.guittot@linaro.org>
+Date:   Mon, 2 Dec 2019 14:45:42 +0100
+Message-ID: <CAKfTPtD8Q97qJ_+hdCXQRt=gy7k96XrhnFmGYP1G88YSFW0vNA@mail.gmail.com>
+Subject: Re: single aio thread is migrated crazily by scheduler
+To:     Dave Chinner <david@fromorbit.com>
+Cc:     Ming Lei <ming.lei@redhat.com>, Hillf Danton <hdanton@sina.com>,
+        linux-block <linux-block@vger.kernel.org>,
+        linux-fs <linux-fsdevel@vger.kernel.org>,
+        linux-xfs <linux-xfs@vger.kernel.org>,
+        linux-kernel <linux-kernel@vger.kernel.org>,
+        Christoph Hellwig <hch@lst.de>, Jens Axboe <axboe@kernel.dk>,
+        Peter Zijlstra <peterz@infradead.org>,
+        Rong Chen <rong.a.chen@intel.com>, Tejun Heo <tj@kernel.org>
+Content-Type: text/plain; charset="UTF-8"
 Sender: linux-block-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-Hi Jens,
+On Mon, 2 Dec 2019 at 05:02, Dave Chinner <david@fromorbit.com> wrote:
+>
+> On Mon, Dec 02, 2019 at 10:46:25AM +0800, Ming Lei wrote:
+> > On Thu, Nov 28, 2019 at 10:53:33AM +0100, Vincent Guittot wrote:
+> > > On Thu, 28 Nov 2019 at 10:40, Hillf Danton <hdanton@sina.com> wrote:
+> > > > --- a/fs/iomap/direct-io.c
+> > > > +++ b/fs/iomap/direct-io.c
+> > > > @@ -157,10 +157,8 @@ static void iomap_dio_bio_end_io(struct
+> > > >                         WRITE_ONCE(dio->submit.waiter, NULL);
+> > > >                         blk_wake_io_task(waiter);
+> > > >                 } else if (dio->flags & IOMAP_DIO_WRITE) {
+> > > > -                       struct inode *inode = file_inode(dio->iocb->ki_filp);
+> > > > -
+> > > >                         INIT_WORK(&dio->aio.work, iomap_dio_complete_work);
+> > > > -                       queue_work(inode->i_sb->s_dio_done_wq, &dio->aio.work);
+> > > > +                       schedule_work(&dio->aio.work);
+> > >
+> > > I'm not sure that this will make a real difference because it ends up
+> > > to call queue_work(system_wq, ...) and system_wq is bounded as well so
+> > > the work will still be pinned to a CPU
+> > > Using system_unbound_wq should make a difference because it doesn't
+> > > pin the work on a CPU
+> > >  +                       queue_work(system_unbound_wq, &dio->aio.work);
+> >
+> > Indeed, just run a quick test on my KVM guest, looks the following patch
+> > makes a difference:
+> >
+> > diff --git a/fs/direct-io.c b/fs/direct-io.c
+> > index 9329ced91f1d..2f4488b0ecec 100644
+> > --- a/fs/direct-io.c
+> > +++ b/fs/direct-io.c
+> > @@ -613,7 +613,8 @@ int sb_init_dio_done_wq(struct super_block *sb)
+> >  {
+> >         struct workqueue_struct *old;
+> >         struct workqueue_struct *wq = alloc_workqueue("dio/%s",
+> > -                                                     WQ_MEM_RECLAIM, 0,
+> > +                                                     WQ_MEM_RECLAIM |
+> > +                                                     WQ_UNBOUND, 0,
+> >                                                       sb->s_id);
+>
+> That's not an answer to the user task migration issue.
+>
+> That is, all this patch does is trade user task migration when the
+> CPU is busy for migrating all the queued work off the CPU so the
+> user task does not get migrated. IOWs, this forces all the queued
+> work to be migrated rather than the user task. IOWs, it does not
+> address the issue we've exposed in the scheduler between tasks with
+> competing CPU affinity scheduling requirements - it just hides the
+> symptom.
+>
+> Maintaining CPU affinity across dispatch and completion work has
+> been proven to be a significant performance win. Right throughout
+> the IO stack we try to keep this submitter/completion affinity,
+> and that's the whole point of using a bound wq in the first place:
+> efficient delayed batch processing of work on the local CPU.
 
-I stumbled upon EIO error while writing to a file which is on ram device
-(actually any dev which is in bio mode, i.e. uses make_request_fn hook).
-All details will be clear from the reproduction description.
+Do you really want to target the same CPU ? looks like what you really
+want to target the same cache instead
 
-How to reproduce:
+>
+> Spewing deferred completion work across every idle CPU in the
+> machine because the local cpu is temporarily busy is a bad choice,
+> both from a performance perspective (dirty cacheline bouncing) and
+> from a power efficiency point of view as it causes CPUs to be taken
+> out of idle state much more frequently[*].
+>
+> The fact that the scheduler migrates the user task we use workqueues
+> for deferred work as they were intended doesn't make this a
+> workqueue problem. If the answer to this problem is "make all IO
+> workqueues WQ_UNBOUND" then we are effectively saying "the scheduler
+> has unfixable problems when mixing bound and unbound work on the
+> same run queue".
+>
+> And, besides, what happens when every other CPU is also completely
+> busy and can't run the work in a timely fashion? We've just moved
+> the work to some random CPU where we wait to be scheduled instead of
+> just sitting on the local CPU and waiting....
+>
+> So, yes, we can work around the -symptoms- we see (frequent user
+> task migration) by changing the work queue configuration or
+> bypassing the workqueue for this specific workload. But these only
+> address the visible symptom and don't take into account the wider
+> goals of retaining CPU affinity in the IO stack, and they will have
+> variable scheduling latency and perofrmance and as the overall
+> system load changes.
+>
+> So, we can fiddle with workqueues, but it doesn't address the
+> underlying issue that the scheduler appears to be migrating
+> non-bound tasks off a busy CPU too easily....
 
-   mkfs.ext4 /dev/ram0
-   mount /dev/ram0 /mnt
+The root cause of the problem is that the sched_wakeup_granularity_ns
+is in the same range or higher than load balance period. As Peter
+explained, This make the kworker waiting for the CPU for several load
+period and a transient unbalanced state becomes a stable one that the
+scheduler to fix. With default value, the scheduler doesn't try to
+migrate any task.
 
-   # Works fine, since we take async path in io_uring and create kiocb
-   # without IOCB_NOWAIT
-   fio --rw=write --ioengine=io_uring --size=1M --direct 1 --name=job 
---filename=/mnt/file
+Then, I agree that having an ack close to the request makes sense but
+forcing it on the exact same CPU is too restrictive IMO. Being able to
+use another CPU on the same core should not harm the performance and
+may even improve it. And that may still be the case while CPUs share
+their cache.
 
-   # Repeat, all fs blocks are allocated and pure nowait & direct path
-   # is taken and eventually we get -EIO
-   fio --rw=write --ioengine=io_uring --size=1M --direct 1 --name=job 
---filename=/mnt/file
-
-
-The culprit is the following check:
-
-    generic_make_request_checks():
-         if ((bio->bi_opf & REQ_NOWAIT) && !queue_is_mq(q))
-		    goto not_supported;
-
-
-Probably the solution can be to complete bio with BLK_STS_AGAIN which
-can be then correctly handled in dio_bio_complete() and eventually
-async path in io_uring will be taken:
-
---- a/block/blk-core.c
-+++ b/block/blk-core.c
-@@ -889,20 +889,31 @@ generic_make_request_checks(struct bio *bio)
-         /*
-          * For a REQ_NOWAIT based request, return -EOPNOTSUPP
-          * if queue is not a request based queue.
-          */
--       if ((bio->bi_opf & REQ_NOWAIT) && !queue_is_mq(q))
--               goto not_supported;
-+       if ((bio->bi_opf & REQ_NOWAIT) && !queue_is_mq(q)) {
-+               status = BLK_STS_AGAIN;
-+               goto end_io;
-+       }
-
-(and this works) but I'm afraid that should degrade performance, since
-on each IO we hit the error deeply in the stack, rewind the stack and
-repeat the whole procedure from a worker.
-
-
-Other confusing thing is that when io_uring writes directly to /dev/ram0
-no errors are returned, because eventually bio is created and does not
-inherit NOWAIT flag on this path:
-
-    __blkdev_direct_IO():
-         bio->bi_opf = dio_bio_write_op(iocb);
-
-as opposed to writing directly to a file on the same ram dev, where all
-flags are inherited from dio:
-
-    __blockdev_direct_IO
-    do_blockdev_direct_IO
-    dio_send_cur_page
-    dio_new_bio
-    dio_bio_alloc():
-         bio_set_op_attrs(bio, dio->op, dio->op_flags);
-
-Not clear is that an intention not to inherit the NOWAIT flag inside
-__blkdev_direct_IO or the flag is simply lost?
-
---
-Roman
-
+>
+> -Dave.
+>
+> [*] Pay attention to the WQ_POWER_EFFICIENT definition for a work
+> queue: it's designed for interrupt routines that defer work via work
+> queues to avoid doing work on otherwise idle CPUs. It does this by
+> turning the per-cpu wq into an unbound wq so that work gets
+> scheduled on a non-idle CPUs in preference to the local idle CPU
+> which can then remain in low power states.
+>
+> That's the exact opposite of what using WQ_UNBOUND ends up doing in
+> this IO completion context: it pushes the work out over idle CPUs
+> rather than keeping them confined on the already busy CPUs where CPU
+> affinity allows the work to be done quickly. So while WQ_UNBOUND
+> avoids the user task being migrated frequently, it results in the
+> work being spread around many more CPUs and we burn more power to do
+> the same work.
+>
+> --
+> Dave Chinner
+> david@fromorbit.com
