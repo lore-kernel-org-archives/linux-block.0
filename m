@@ -2,90 +2,95 @@ Return-Path: <SRS0=81jf=ZZ=vger.kernel.org=linux-block-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-2.2 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
-	MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,USER_AGENT_SANE_1 autolearn=no
-	autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-0.8 required=3.0 tests=DKIM_SIGNED,DKIM_VALID,
+	HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS
+	autolearn=no autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 02171C432C3
-	for <linux-block@archiver.kernel.org>; Tue,  3 Dec 2019 16:38:30 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 8E6E5C432C0
+	for <linux-block@archiver.kernel.org>; Tue,  3 Dec 2019 17:17:34 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.kernel.org (Postfix) with ESMTP id CBE7B206EC
-	for <linux-block@archiver.kernel.org>; Tue,  3 Dec 2019 16:38:29 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id 605AE20637
+	for <linux-block@archiver.kernel.org>; Tue,  3 Dec 2019 17:17:34 +0000 (UTC)
+Authentication-Results: mail.kernel.org;
+	dkim=pass (2048-bit key) header.d=javigon-com.20150623.gappssmtp.com header.i=@javigon-com.20150623.gappssmtp.com header.b="qCntB/vR"
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1726766AbfLCQi3 (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Tue, 3 Dec 2019 11:38:29 -0500
-Received: from mail-pl1-f193.google.com ([209.85.214.193]:35168 "EHLO
-        mail-pl1-f193.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1726186AbfLCQi3 (ORCPT
-        <rfc822;linux-block@vger.kernel.org>); Tue, 3 Dec 2019 11:38:29 -0500
-Received: by mail-pl1-f193.google.com with SMTP id s10so1911381plp.2;
-        Tue, 03 Dec 2019 08:38:28 -0800 (PST)
+        id S1726395AbfLCRRd (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Tue, 3 Dec 2019 12:17:33 -0500
+Received: from mail-lj1-f196.google.com ([209.85.208.196]:35614 "EHLO
+        mail-lj1-f196.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S1726182AbfLCRRd (ORCPT
+        <rfc822;linux-block@vger.kernel.org>); Tue, 3 Dec 2019 12:17:33 -0500
+Received: by mail-lj1-f196.google.com with SMTP id j6so4748765lja.2
+        for <linux-block@vger.kernel.org>; Tue, 03 Dec 2019 09:17:32 -0800 (PST)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=javigon-com.20150623.gappssmtp.com; s=20150623;
+        h=content-transfer-encoding:from:mime-version:subject:date:message-id
+         :references:cc:in-reply-to:to;
+        bh=rgsa2I3JNZqKxBw44xS16Ap0SigVs8FPG9nt9ZVQaAQ=;
+        b=qCntB/vRTzWH0OKSbiBsMS8sUHx6KQtYZfnrcADsK5gyD/rOpgoaljnNGCBmsqzuWr
+         /dVA/7gZ9h/3bwX77A9LBajn6DFHHSZCqwja2Hd9EbkVgk0ZnNFh4Wt92qZcD2hVF3z5
+         RQ6D+xSvmFMKhkqMLFWjoQCZNDkl3h0Kmx9CrbSK0u3uKgUFefWxTfOSrLPyok3pL3kn
+         A4GqwYUZN7CjSi1wFmsfeMA8UQ4TEhQY07ZqVgoo5aXw78+2IRiolVazbrLHYB/f0n8c
+         EbJXA+JP2Nl9YK9zrHPyDILBc0LrGY+4xPGygupA+Tzupl7V62y4DBmuLkyqbFfg5Oe/
+         UkfA==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=1e100.net; s=20161025;
-        h=x-gm-message-state:subject:to:cc:references:from:message-id:date
-         :user-agent:mime-version:in-reply-to:content-language
-         :content-transfer-encoding;
-        bh=dfUDHMi/qzcRJxN2pVGjTr0VCbodDkUsVuFikJ7JL5g=;
-        b=KW/Y+Q5XZ2cCFEz6HW7PaLAf9PInUU5t5zlC5Jv3t11wiuV7obg9G3lcg3yjmC3rmJ
-         WXSmkPwTbLg8E6lIj6nI4ixwusdygoGj6RDd8IfSQYMxocCq187wCl0n/duttVVxIcDo
-         ZIMzrP2QXQbRqFnGFj9IwhnCcws6mCP0sGzeFHUUOcE9vAJkfHFrF0ZaGiRSexdNpWT9
-         wtRUUir4/eNEL/0Sj7klFeOSZBajD+02VO3JViaC/iVhgao6pc+d/iQ3CI1uQb8E/Shh
-         zYJhD/zb9Itm1EO03g2ETuGcMyGSVDyqsDMfIJ2a541G7Wy1HXXjE70rxz5SY72qBYLU
-         tBLA==
-X-Gm-Message-State: APjAAAVl1IsEGwVN82s3eKp2UNkJ4llpUhEDi068W1MokXVL8mmEK3nA
-        UrgEW9VCWkAEJJAZsZ3/NXEISgxAcio=
-X-Google-Smtp-Source: APXvYqwJz7YcrlRQfxzYMGcu8vLaD+YDSy0kZQpKSNYwEw2l1ZvaRRR728EGYd/Sg7Hd6kqvVq4fPw==
-X-Received: by 2002:a17:90a:650:: with SMTP id q16mr6527915pje.53.1575391107618;
-        Tue, 03 Dec 2019 08:38:27 -0800 (PST)
-Received: from desktop-bart.svl.corp.google.com ([2620:15c:2cd:202:4308:52a3:24b6:2c60])
-        by smtp.gmail.com with ESMTPSA id d6sm4054505pfn.32.2019.12.03.08.38.25
+        h=x-gm-message-state:content-transfer-encoding:from:mime-version
+         :subject:date:message-id:references:cc:in-reply-to:to;
+        bh=rgsa2I3JNZqKxBw44xS16Ap0SigVs8FPG9nt9ZVQaAQ=;
+        b=JcdDHvgs6d1UvWSclSpK3yUrDgR5BNWWYM18aFDAvSOM4gWICNYHflORlLM43GZ6Y4
+         Xsjt5PzTGoIUEQurlok8R0oZYjqr7oBXkZ822kC6Kd3u/qvaZdzw38ikh0SVIwWjfoxu
+         4Cj4Ycfsaszb9FZS6q34j1ToG1DlX6psozlakpv5vdO43qkqK8M8MYDfkrY0U864VEyw
+         3wCWJ73UlflISXWq5JcakK4JEu0FIRjZrTbfuCKiKru7+Gdxj7JqAvuUCyK75DnHogSp
+         aAQrfRNPXyhi/EscGLKmhF9npXL5p9djhL+bZOiyTrj9IRvMp16bdKHPheRAYbH1lR3t
+         +msA==
+X-Gm-Message-State: APjAAAXPhELDzUFupC13nYcMbZ5ucAN8UpXXi6vFe0afZqAtz9DfGzvd
+        CBrMSIJJQbhokRazcnLx7jDTeQ==
+X-Google-Smtp-Source: APXvYqz3pXG7V1x38757go/1jKccFq3y2phsUB9Pr6eOwmdF4w0YDwKYE80129F+oGby1Bfx9gjCbg==
+X-Received: by 2002:a2e:b5da:: with SMTP id g26mr3212252ljn.107.1575393451526;
+        Tue, 03 Dec 2019 09:17:31 -0800 (PST)
+Received: from [10.55.132.17] ([185.245.84.227])
+        by smtp.gmail.com with ESMTPSA id m26sm2002662lfc.90.2019.12.03.09.17.30
         (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
-        Tue, 03 Dec 2019 08:38:26 -0800 (PST)
-Subject: Re: [PATCH 04/11] blk-mq: Facilitate a shared sbitmap per tagset
-To:     John Garry <john.garry@huawei.com>, Hannes Reinecke <hare@suse.de>,
-        "Martin K. Petersen" <martin.petersen@oracle.com>
-Cc:     Jens Axboe <axboe@kernel.dk>, Christoph Hellwig <hch@lst.de>,
-        James Bottomley <james.bottomley@hansenpartnership.com>,
-        Ming Lei <ming.lei@redhat.com>, linux-scsi@vger.kernel.org,
-        linux-block@vger.kernel.org
-References: <20191202153914.84722-1-hare@suse.de>
- <20191202153914.84722-5-hare@suse.de>
- <ab7555b2-2e95-6fb1-2e44-fe3a323a24e4@huawei.com>
-From:   Bart Van Assche <bvanassche@acm.org>
-Message-ID: <764e2882-b348-aacf-c630-64ffd59f185a@acm.org>
-Date:   Tue, 3 Dec 2019 08:38:24 -0800
-User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:60.0) Gecko/20100101
- Thunderbird/60.9.0
-MIME-Version: 1.0
-In-Reply-To: <ab7555b2-2e95-6fb1-2e44-fe3a323a24e4@huawei.com>
-Content-Type: text/plain; charset=utf-8; format=flowed
-Content-Language: en-US
-Content-Transfer-Encoding: 8bit
+        Tue, 03 Dec 2019 09:17:30 -0800 (PST)
+Content-Type: text/plain; charset=utf-8
+Content-Transfer-Encoding: quoted-printable
+From:   =?utf-8?Q?Javier_Gonz=C3=A1lez?= <javier@javigon.com>
+Mime-Version: 1.0 (1.0)
+Subject: Re: [PATCH 8/8] block: set the zone size in blk_revalidate_disk_zones atomically
+Date:   Tue, 3 Dec 2019 18:17:29 +0100
+Message-Id: <F0EAD4B8-1051-41FE-90A7-91207EA70790@javigon.com>
+References: <20191203154251.GA928@lst.de>
+Cc:     Jens Axboe <axboe@kernel.dk>,
+        Damien Le Moal <damien.lemoal@wdc.com>,
+        Hans Holmberg <hans@owltronix.com>, linux-block@vger.kernel.org
+In-Reply-To: <20191203154251.GA928@lst.de>
+To:     Christoph Hellwig <hch@lst.de>
+X-Mailer: iPhone Mail (17A878)
 Sender: linux-block-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-On 12/3/19 6:54 AM, John Garry wrote:
->> @@ -483,8 +483,8 @@ static int hctx_tags_bitmap_show(void *data, 
->> struct seq_file *m)
->>       res = mutex_lock_interruptible(&q->sysfs_lock);
->>       if (res)
->>           goto out;
->> -    if (hctx->tags)
->> -        sbitmap_bitmap_show(&hctx->tags->bitmap_tags.sb, m);
->> +    if (hctx->tags) /* We should just iterate the relevant bits for 
->> this hctx FIXME */
-> 
-> Bart's solution to this problem seemed ok, if he doesn't mind us 
-> borrowing his idea:
-> 
-> https://lore.kernel.org/linux-block/5183ab13-0c81-95f0-95ba-40318569c6c6@huawei.com/T/#m24394fe70b1ea79a154dfd9620f5e553c3e7e7da 
->  
-> See hctx_tags_bitmap_show().
 
-Hi John,
+> On 3 Dec 2019, at 16.42, Christoph Hellwig <hch@lst.de> wrote:
+>=20
+> =EF=BB=BFOn Tue, Dec 03, 2019 at 04:34:08PM +0100, Javier Gonz=C3=A1lez wr=
+ote:
+>> Agree on the BUG_ON part.  But since you=E2=80=99re looking into this par=
+t now, would it make sense to do the check in the block layer only if the dr=
+iver imposes a power of two? We can also do it down the road, but seems like=
+ double work.
+>=20
+> The whole block layer chunk / zone handling has always assumed power
+> of two zone sizes.  Changing that would introduce expensive divisions
+> in the fast path.  This patch just moves the check to where it belongs.
 
-Sure, borrowing that code is fine with me.
+Ok. Let=E2=80=99s do the refactor now. Though, we will need to support this f=
+or zoned devices that are not powers of two, but we can add this path when t=
+ime comes.=20
 
-Bart.
+You can add my reviewed-by=20
+
+Thanks Christoph!
+Javier=
