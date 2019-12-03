@@ -2,117 +2,186 @@ Return-Path: <SRS0=81jf=ZZ=vger.kernel.org=linux-block-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-2.2 required=3.0 tests=DKIM_SIGNED,DKIM_VALID,
-	HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,
-	USER_AGENT_SANE_1 autolearn=no autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-2.2 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
+	MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,USER_AGENT_SANE_1 autolearn=no
+	autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id CEA07C432C0
-	for <linux-block@archiver.kernel.org>; Tue,  3 Dec 2019 21:03:50 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 8C4ACC432C0
+	for <linux-block@archiver.kernel.org>; Tue,  3 Dec 2019 22:29:33 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.kernel.org (Postfix) with ESMTP id 9712320640
-	for <linux-block@archiver.kernel.org>; Tue,  3 Dec 2019 21:03:50 +0000 (UTC)
-Authentication-Results: mail.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel-dk.20150623.gappssmtp.com header.i=@kernel-dk.20150623.gappssmtp.com header.b="bjMRZrmx"
+	by mail.kernel.org (Postfix) with ESMTP id 5B0E320803
+	for <linux-block@archiver.kernel.org>; Tue,  3 Dec 2019 22:29:33 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1727508AbfLCVDu (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Tue, 3 Dec 2019 16:03:50 -0500
-Received: from mail-il1-f196.google.com ([209.85.166.196]:32796 "EHLO
-        mail-il1-f196.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1727614AbfLCVDt (ORCPT
-        <rfc822;linux-block@vger.kernel.org>); Tue, 3 Dec 2019 16:03:49 -0500
-Received: by mail-il1-f196.google.com with SMTP id r81so4571144ilk.0
-        for <linux-block@vger.kernel.org>; Tue, 03 Dec 2019 13:03:49 -0800 (PST)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=kernel-dk.20150623.gappssmtp.com; s=20150623;
-        h=subject:to:cc:references:from:message-id:date:user-agent
-         :mime-version:in-reply-to:content-language:content-transfer-encoding;
-        bh=sFn+q5M4OQGy2hAfzIasEpnp/G/IQ19ZE4PBt4z+hKs=;
-        b=bjMRZrmxdnENLVxHQwgxiuGhs/pIOOCI7RPVi2IMk3lwgTI7aNB9AryFTQFJ6N34Zz
-         znaAPt4pAIhJrr9eVmUHVToYCNxheTmgPByX99LYCSyVMAjJEY/6aWBIurQG20+1KE2p
-         B7Xx7tBoXqf5elHivpFxXrpx4F+ZdXzRwgJntZCgFBhUIp+3zU9jA7Kkfwf5ndxxUYIF
-         vegXLjcgvhs/y083uQx2obugP2D9bv+dEvcAIvjPPJkew84MoNsU4x0d1yfbOK0T00eX
-         t7g3EDZUcj29+n0c7bK3y+ZSqCCnnlF8cPzoVC2tHqeAUYF8OaAC3w0H9ET1FuwRzPg/
-         /qqg==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20161025;
-        h=x-gm-message-state:subject:to:cc:references:from:message-id:date
-         :user-agent:mime-version:in-reply-to:content-language
-         :content-transfer-encoding;
-        bh=sFn+q5M4OQGy2hAfzIasEpnp/G/IQ19ZE4PBt4z+hKs=;
-        b=HpwfF8TwssDrea/PTWxwbhQzQXhiD8CWJiwqoeBgywinXML3h8ajaRpiVhQIG3w1md
-         V4G5w41vWIqdhBq2xjZcp65P3CB0nu/wbFq+8xlBwAU5e34pqPRKGmKqJMz0YhKAUd2K
-         HqcwiD394qbYGPYFMGc39dxM9jaWvpx/6AQDIRew6qY4bptbUfrl2RtokbG7ZInS5Gmc
-         ghtaWVUMLNTndvF7DPxY/LSgzoHDNzAc/WKiWsc0WJWQW8SnDJ7kn5QsROvjGd4yQ+1X
-         GkDw1CrXSy5kTbMWmthxnv+7CchhcSrsb+kFHOAREpLT1sZ2NkNOREJILiLC4gsylYzf
-         wv/A==
-X-Gm-Message-State: APjAAAVdTz5c/CMMbDg3vlaJ+dZDYyXTLVL2l7Lc3MOMpcaBDwMXr/kk
-        Tljh31S0oVAZS9tipBrEnNqtpg==
-X-Google-Smtp-Source: APXvYqynb9y1GtIc2v9Jt2I8gQfLy2oB0u+TVZ+0gIHqiiCdzgQ3Kw9UoB/KAiRWf5JLsPyTkN/pBA==
-X-Received: by 2002:a92:d282:: with SMTP id p2mr134806ilp.73.1575407028959;
-        Tue, 03 Dec 2019 13:03:48 -0800 (PST)
-Received: from [192.168.1.159] ([65.144.74.34])
-        by smtp.gmail.com with ESMTPSA id a81sm1136094ill.31.2019.12.03.13.03.47
-        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
-        Tue, 03 Dec 2019 13:03:48 -0800 (PST)
-Subject: Re: [PATCH] xen/blkback: Avoid unmapping unmapped grant pages
-To:     SeongJae Park <sjpark@amazon.com>, konrad.wilk@oracle.com,
-        roger.pau@citrix.com
-Cc:     xen-devel@lists.xenproject.org, linux-block@vger.kernel.org,
-        linux-kernel@vger.kernel.org, SeongJae Park <sjpark@amazon.de>
-References: <20191126153605.27564-1-sjpark@amazon.com>
-From:   Jens Axboe <axboe@kernel.dk>
-Message-ID: <43f9881b-4a88-47e9-c321-19033a2bc872@kernel.dk>
-Date:   Tue, 3 Dec 2019 14:03:46 -0700
-User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:68.0) Gecko/20100101
- Thunderbird/68.2.1
+        id S1727516AbfLCW3c (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Tue, 3 Dec 2019 17:29:32 -0500
+Received: from mail105.syd.optusnet.com.au ([211.29.132.249]:54117 "EHLO
+        mail105.syd.optusnet.com.au" rhost-flags-OK-OK-OK-OK)
+        by vger.kernel.org with ESMTP id S1727131AbfLCW3c (ORCPT
+        <rfc822;linux-block@vger.kernel.org>);
+        Tue, 3 Dec 2019 17:29:32 -0500
+Received: from dread.disaster.area (pa49-179-150-192.pa.nsw.optusnet.com.au [49.179.150.192])
+        by mail105.syd.optusnet.com.au (Postfix) with ESMTPS id DF15E3A16AB;
+        Wed,  4 Dec 2019 09:29:26 +1100 (AEDT)
+Received: from dave by dread.disaster.area with local (Exim 4.92.3)
+        (envelope-from <david@fromorbit.com>)
+        id 1icGfd-0006VE-Vs; Wed, 04 Dec 2019 09:29:25 +1100
+Date:   Wed, 4 Dec 2019 09:29:25 +1100
+From:   Dave Chinner <david@fromorbit.com>
+To:     Hillf Danton <hdanton@sina.com>
+Cc:     Ming Lei <ming.lei@redhat.com>,
+        linux-block <linux-block@vger.kernel.org>,
+        linux-fs <linux-fsdevel@vger.kernel.org>,
+        linux-xfs <linux-xfs@vger.kernel.org>,
+        linux-kernel <linux-kernel@vger.kernel.org>,
+        Christoph Hellwig <hch@lst.de>, Jens Axboe <axboe@kernel.dk>,
+        Peter Zijlstra <peterz@infradead.org>,
+        Vincent Guittot <vincent.guittot@linaro.org>,
+        Rong Chen <rong.a.chen@intel.com>, Tejun Heo <tj@kernel.org>
+Subject: Re: single aio thread is migrated crazily by scheduler
+Message-ID: <20191203222925.GM2695@dread.disaster.area>
+References: <20191114113153.GB4213@ming.t460p>
+ <20191114235415.GL4614@dread.disaster.area>
+ <20191115010824.GC4847@ming.t460p>
+ <20191115045634.GN4614@dread.disaster.area>
+ <20191115070843.GA24246@ming.t460p>
+ <20191128094003.752-1-hdanton@sina.com>
+ <20191202090158.15016-1-hdanton@sina.com>
+ <20191203131514.5176-1-hdanton@sina.com>
 MIME-Version: 1.0
-In-Reply-To: <20191126153605.27564-1-sjpark@amazon.com>
-Content-Type: text/plain; charset=utf-8; format=flowed
-Content-Language: en-US
-Content-Transfer-Encoding: 7bit
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <20191203131514.5176-1-hdanton@sina.com>
+User-Agent: Mutt/1.10.1 (2018-07-13)
+X-Optus-CM-Score: 0
+X-Optus-CM-Analysis: v=2.3 cv=W5xGqiek c=1 sm=1 tr=0
+        a=ZXpxJgW8/q3NVgupyyvOCQ==:117 a=ZXpxJgW8/q3NVgupyyvOCQ==:17
+        a=jpOVt7BSZ2e4Z31A5e1TngXxSK0=:19 a=kj9zAlcOel0A:10 a=pxVhFHJ0LMsA:10
+        a=7-415B0cAAAA:8 a=LmalR2UegCLWsU6ZP5sA:9 a=CjuIK1q_8ugA:10
+        a=biEYGPWJfzWAr4FL6Ov7:22
 Sender: linux-block-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-On 11/26/19 8:36 AM, SeongJae Park wrote:
-> From: SeongJae Park <sjpark@amazon.de>
+On Tue, Dec 03, 2019 at 09:15:14PM +0800, Hillf Danton wrote:
+> > IOWs, we are trying to ensure that we run the data IO completion on
+> > the CPU with that has that data hot in cache. When we are running
+> > millions of IOs every second, this matters -a lot-. IRQ steering is
+> > just a mechansim that is used to ensure completion processing hits
+> > hot caches.
 > 
-> For each I/O request, blkback first maps the foreign pages for the
-> request to its local pages.  If an allocation of a local page for the
-> mapping fails, it should unmap every mapping already made for the
-> request.
+> Along the "CPU affinity" direction, a trade-off is made between CPU
+> affinity and cache affinity before lb can bear the ca scheme.
+> Completion works are queued in round robin on the CPUs that share
+> cache with the submission CPU.
 > 
-> However, blkback's handling mechanism for the allocation failure does
-> not mark the remaining foreign pages as unmapped.  Therefore, the unmap
-> function merely tries to unmap every valid grant page for the request,
-> including the pages not mapped due to the allocation failure.  On a
-> system that fails the allocation frequently, this problem leads to
-> following kernel crash.
-> 
->    [  372.012538] BUG: unable to handle kernel NULL pointer dereference at 0000000000000001
->    [  372.012546] IP: [<ffffffff814071ac>] gnttab_unmap_refs.part.7+0x1c/0x40
->    [  372.012557] PGD 16f3e9067 PUD 16426e067 PMD 0
->    [  372.012562] Oops: 0002 [#1] SMP
->    [  372.012566] Modules linked in: act_police sch_ingress cls_u32
->    ...
->    [  372.012746] Call Trace:
->    [  372.012752]  [<ffffffff81407204>] gnttab_unmap_refs+0x34/0x40
->    [  372.012759]  [<ffffffffa0335ae3>] xen_blkbk_unmap+0x83/0x150 [xen_blkback]
->    ...
->    [  372.012802]  [<ffffffffa0336c50>] dispatch_rw_block_io+0x970/0x980 [xen_blkback]
->    ...
->    Decompressing Linux... Parsing ELF... done.
->    Booting the kernel.
->    [    0.000000] Initializing cgroup subsys cpuset
-> 
-> This commit fixes this problem by marking the grant pages of the given
-> request that didn't mapped due to the allocation failure as invalid.
-> 
-> Fixes: c6cc142dac52 ("xen-blkback: use balloon pages for all mappings")
+> --- a/fs/iomap/direct-io.c
+> +++ b/fs/iomap/direct-io.c
+> @@ -143,6 +143,42 @@ static inline void iomap_dio_set_error(s
+>  	cmpxchg(&dio->error, 0, ret);
+>  }
+>  
+> +static DEFINE_PER_CPU(int, iomap_dio_bio_end_io_cnt);
+> +static DEFINE_PER_CPU(int, iomap_dio_bio_end_io_cpu);
+> +#define IOMAP_DIO_BIO_END_IO_BATCH 7
+> +
+> +static int iomap_dio_cpu_rr(void)
+> +{
+> +	int *io_cnt, *io_cpu;
+> +	int cpu, this_cpu;
+> +
+> +	io_cnt = get_cpu_ptr(&iomap_dio_bio_end_io_cnt);
+> +	io_cpu = this_cpu_ptr(&iomap_dio_bio_end_io_cpu);
+> +	this_cpu = smp_processor_id();
+> +
+> +	if (!(*io_cnt & IOMAP_DIO_BIO_END_IO_BATCH)) {
+> +		for (cpu = *io_cpu + 1; cpu < nr_cpu_id; cpu++)
+> +			if (cpu == this_cpu ||
+> +			    cpus_share_cache(cpu, this_cpu))
+> +				goto update_cpu;
+> +
+> +		for (cpu = 0; cpu < *io_cpu; cpu++)
+> +			if (cpu == this_cpu ||
+> +			    cpus_share_cache(cpu, this_cpu))
+> +				goto update_cpu;
 
-Queued up with Roger's reviewed-by.
+Linear scans like this just don't scale. We can have thousands of
+CPUs in a system and maybe only 8 cores that share a local cache.
+And we can be completing millions of direct IO writes a second these
+days. A linear scan of (thousands - 8) cpu ids every so often is
+going to show up as long tail latency for the unfortunate IO that
+has to scan those thousands of non-matching CPU IDs to find a
+sibling, and we'll be doing that every handful of IOs that are
+completed on every CPU.
 
+> +
+> +		cpu = this_cpu;
+> +update_cpu:
+> +		*io_cpu = cpu;
+> +	}
+> +
+> +	(*io_cnt)++;
+> +	cpu = *io_cpu;
+> +	put_cpu_ptr(&iomap_dio_bio_end_io_cnt);
+> +
+> +	return cpu;
+> +}
+> 
+>  static void iomap_dio_bio_end_io(struct bio *bio)
+>  {
+>  	struct iomap_dio *dio = bio->bi_private;
+> @@ -158,9 +194,10 @@ static void iomap_dio_bio_end_io(struct
+>  			blk_wake_io_task(waiter);
+>  		} else if (dio->flags & IOMAP_DIO_WRITE) {
+>  			struct inode *inode = file_inode(dio->iocb->ki_filp);
+> +			int cpu = iomap_dio_cpu_rr();
+
+IMO, this sort of "limit work to sibling CPU cores" does not belong in
+general code. We have *lots* of workqueues that need this treatment,
+and it's not viable to add this sort of linear search loop to every
+workqueue and place we queue work. Besides....
+
+>  
+>  			INIT_WORK(&dio->aio.work, iomap_dio_complete_work);
+> -			queue_work(inode->i_sb->s_dio_done_wq, &dio->aio.work);
+> +			queue_work_on(cpu, inode->i_sb->s_dio_done_wq, &dio->aio.work);
+
+.... as I've stated before, this *does not solve the scheduler
+problem*.  All this does is move the problem to the target CPU
+instead of seeing it on the local CPU.
+
+If we really want to hack around the load balancer problems in this
+way, then we need to add a new workqueue concurrency management type
+with behaviour that lies between the default of bound and WQ_UNBOUND.
+
+WQ_UNBOUND limits scheduling to within a numa node - see
+wq_update_unbound_numa() for how it sets up the cpumask attributes
+it applies to it's workers - but we need the work to be bound to
+within the local cache domain rather than a numa node. IOWs, set up
+the kworker task pool management structure with the right attributes
+(e.g. cpu masks) to define the cache domains, add all the hotplug
+code to make it work with CPU hotplug, then simply apply those
+attributes to the kworker task that is selected to execute the work.
+
+This allows the scheduler to migrate the kworker away from the local
+run queue without interrupting the currently scheduled task. The
+cpumask limits the task is configured with limit the scheduler to
+selecting the best CPU within the local cache domain, and we don't
+have to bind work to CPUs to get CPU cache friendly work scheduling.
+This also avoids overhead of per-queue_work_on() sibling CPU
+calculation, and all the code that wants to use this functionality
+needs to do is add a single flag at work queue init time (e.g.
+WQ_CACHEBOUND).
+
+IOWs, if the task migration behaviour cannot be easily fixed and so
+we need work queue users to be more flexible about work placement,
+then the solution needed here is "cpu cache local work queue
+scheduling" implemented in the work queue infrastructure, not in
+every workqueue user.
+
+Cheers,
+
+Dave.
 -- 
-Jens Axboe
-
+Dave Chinner
+david@fromorbit.com
