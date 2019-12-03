@@ -2,197 +2,92 @@ Return-Path: <SRS0=81jf=ZZ=vger.kernel.org=linux-block-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-0.8 required=3.0 tests=DKIM_SIGNED,DKIM_VALID,
-	HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS
-	autolearn=no autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-9.6 required=3.0 tests=DKIM_SIGNED,DKIM_VALID,
+	DKIM_VALID_AU,FREEMAIL_FORGED_FROMDOMAIN,FREEMAIL_FROM,
+	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,
+	SPF_HELO_NONE,SPF_PASS,USER_AGENT_GIT autolearn=ham autolearn_force=no
+	version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 7F46BC43215
-	for <linux-block@archiver.kernel.org>; Tue,  3 Dec 2019 03:50:45 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id B3CBAC432C0
+	for <linux-block@archiver.kernel.org>; Tue,  3 Dec 2019 03:52:46 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.kernel.org (Postfix) with ESMTP id 4AB39206E0
-	for <linux-block@archiver.kernel.org>; Tue,  3 Dec 2019 03:50:45 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id 82F202068E
+	for <linux-block@archiver.kernel.org>; Tue,  3 Dec 2019 03:52:46 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=pass (2048-bit key) header.d=blockbridge-com.20150623.gappssmtp.com header.i=@blockbridge-com.20150623.gappssmtp.com header.b="pLbmb2eS"
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="oDGWBbGa"
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1726968AbfLCDuo (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Mon, 2 Dec 2019 22:50:44 -0500
-Received: from mail-oi1-f195.google.com ([209.85.167.195]:42082 "EHLO
-        mail-oi1-f195.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1727076AbfLCDuo (ORCPT
-        <rfc822;linux-block@vger.kernel.org>); Mon, 2 Dec 2019 22:50:44 -0500
-Received: by mail-oi1-f195.google.com with SMTP id j22so1974465oij.9
-        for <linux-block@vger.kernel.org>; Mon, 02 Dec 2019 19:50:43 -0800 (PST)
+        id S1726491AbfLCDwp (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Mon, 2 Dec 2019 22:52:45 -0500
+Received: from mail-pl1-f195.google.com ([209.85.214.195]:38177 "EHLO
+        mail-pl1-f195.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S1726480AbfLCDwp (ORCPT
+        <rfc822;linux-block@vger.kernel.org>); Mon, 2 Dec 2019 22:52:45 -0500
+Received: by mail-pl1-f195.google.com with SMTP id o8so1123913pls.5;
+        Mon, 02 Dec 2019 19:52:45 -0800 (PST)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=blockbridge-com.20150623.gappssmtp.com; s=20150623;
-        h=mime-version:references:in-reply-to:from:date:message-id:subject:to
-         :cc;
-        bh=GKPbxfmB1PGBw6TvcuN9gU8taqnju8V9Mq/8x0yxwDQ=;
-        b=pLbmb2eSkmMrLrMPfPmOEskc0Prw/wvpMhbR2leZS+czdZCQkbCir0IfrzICOipfRE
-         jnEyZWSfmWz5S+tTQTRSLZMlU6T/6kKm8SEsJhWVTpD/VokDfq3q+bzLzUp6Gxy4fWtW
-         nM+ek5ar+t8zEf5jxzD++aeCt7+vcLWH5bMZPMkWgUvoT/MMdMZeXPe4Ot7vaL0vLfkg
-         T9BSIE4A4L4yAFEN3iSBrtbub8gcWkG1XDSCPgpxIez6iHTyzuGfGFKZvEvj4/wmgwjE
-         ks4XT1P+3aJWszxS0NlH5Zc+eCSkQ/Q+v9drK8aUviI9vIzg0TjeTC9dzBMfX4/aB77F
-         YyPg==
+        d=gmail.com; s=20161025;
+        h=from:to:cc:subject:date:message-id;
+        bh=WFPxR8j8Ztw3QpWL9VkRXvZS+yt+ltqE6fy7Q8AVdEU=;
+        b=oDGWBbGaEAdv/Tjq+aQgC6JgVI+zjjUkguaejS3WXRSvTAjQuNmVZEIw8at6VqbZ/C
+         w22kRTOZ0dwKZRvBBRWpDodDadUcX71J61eSF8xaxQBAH3BgHC8YnA40iSo1QTjgDmEd
+         L49Egm4Ea4oOKoKM/rUtS9clmCglpfMoAQn0ueTlQTrJwEPSBaoK3Qcvh/kOVH32ePFK
+         Ta4x3WHPnKsBzzpIOATXki7MIxOJdIEfx3bmzOKLDkBU32syQVVCvIe787DzTRLh6hrr
+         QZTE6a/J5Mq8B+fb3MI+AK0190JQRhrRi39SYC6YqMUPDcazLgy7TY30ce8bWxMEeQUj
+         YtHw==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=1e100.net; s=20161025;
-        h=x-gm-message-state:mime-version:references:in-reply-to:from:date
-         :message-id:subject:to:cc;
-        bh=GKPbxfmB1PGBw6TvcuN9gU8taqnju8V9Mq/8x0yxwDQ=;
-        b=G7z7l/OqODaeAPa0s2Ve51o36YRavl6dg9ciOc4rfh/5zs2jj+xZesuEMTLKJSuTNw
-         r6P00hdVvtdfnViLVxkImKEQd8etNDa+U7My9eotOvTLia7B76hQ1ak/3SZd1d8JCx4o
-         2y0AaJK+jWYX2PeJhODNzdSFcGgmd/pephLhBKD2gBHyuePeEThdjPRAm2FRaTr4kOSY
-         zF5rOEqHsKNxUkBYDa81bg8atrchru/QKcJjOGbH2cjsxYMkuwVAOEs/iSn+/FtWcskA
-         c659fw6ecvOqXYbMFzA/KLByNIS4N15jhZTw2OGS6CS9WOW3sil3fWaxyg1uP1y1f1mr
-         tjUQ==
-X-Gm-Message-State: APjAAAU0KZ3MnzRrGHCqtBW2eagekG7KbNQLDsH3SniTyMdhkoeSKwSh
-        IdVbb/a2zufbK1FlxqEva49H4AnfMB4+9/YwRDqwuA==
-X-Google-Smtp-Source: APXvYqzFNXILlSbINpkH0cQeDXWVqxD54NzYCYW2T3wpdRYvd2eNwu9fuEjCpgfgsdWZ5X8utxhiUoyv1Svy8cQXCgI=
-X-Received: by 2002:a05:6808:b2d:: with SMTP id t13mr2061521oij.83.1575345043284;
- Mon, 02 Dec 2019 19:50:43 -0800 (PST)
-MIME-Version: 1.0
-References: <CAAFE1bd9wuuobpe4VK7Ty175j7mWT+kRmHCNhVD+6R8MWEAqmw@mail.gmail.com>
- <20191128015748.GA3277@ming.t460p> <CA+VdTb_-CGaPjKUQteKVFSGqDz-5o-tuRRkJYqt8B9iOQypiwQ@mail.gmail.com>
- <20191128025822.GC3277@ming.t460p> <CAAFE1bfsXsKGyw7SU_z4NanT+wmtuJT=XejBYbHHMCDQwm73sw@mail.gmail.com>
- <20191128091210.GC15549@ming.t460p> <CAAFE1beMkvyRctGqpffd3o_QtDH0CrmQSb=fV4GzqMUXWzPyOw@mail.gmail.com>
- <20191203005849.GB25002@ming.t460p> <CAAFE1bcG8c1Q3iwh-LUjruBMAuFTJ4qWxNGsnhfKvGWHNLAeEQ@mail.gmail.com>
- <20191203031444.GB6245@ming.t460p> <CAAFE1besnb=HV4C_buORYpWbkXecmtybwX8d_Ka2NsKmiym53w@mail.gmail.com>
-In-Reply-To: <CAAFE1besnb=HV4C_buORYpWbkXecmtybwX8d_Ka2NsKmiym53w@mail.gmail.com>
-From:   Stephen Rust <srust@blockbridge.com>
-Date:   Mon, 2 Dec 2019 22:50:32 -0500
-Message-ID: <CAAFE1bfpUWCZrtR8v3S++0-+gi8DJ79X3e0XqDe93i8nuGTnNg@mail.gmail.com>
-Subject: Re: Data corruption in kernel 5.1+ with iSER attached ramdisk
-To:     Ming Lei <ming.lei@redhat.com>
-Cc:     Rob Townley <rob.townley@gmail.com>,
-        Christoph Hellwig <hch@lst.de>, Jens Axboe <axboe@kernel.dk>,
-        linux-block@vger.kernel.org, linux-rdma@vger.kernel.org,
-        linux-scsi@vger.kernel.org, martin.petersen@oracle.com,
-        target-devel@vger.kernel.org
-Content-Type: text/plain; charset="UTF-8"
+        h=x-gm-message-state:from:to:cc:subject:date:message-id;
+        bh=WFPxR8j8Ztw3QpWL9VkRXvZS+yt+ltqE6fy7Q8AVdEU=;
+        b=a3kLN8vI6mCC891RUbodSMmyUHtX5GbGi21uMJ6/4FpYIkr9mnCyaGaofjdGt8TqTi
+         jyAMpoTL5nySn+B6jthu+EtYN8t9upyxy5i0peDFaqSXYGHScs4gNyEttT2Hl8psFyzl
+         2rZGDca/9eFZv92OCMcsy+4nDZ7SOo/iKaj+JYze/JjsXWU/BVhEonFLbz8kvJTY2598
+         9PlFKLdctyZmxKq50GhQoXENSRP104/SlJXJsSQVXJgWZ4Y87b1ylWf8v8rajmz9e/6W
+         v1xIKe5XgIVhbQFN6pwPdue+1qihuuLtl5iSUNYoPV4MxhHqZpZuYFKsszr1NvKVg7G9
+         Zudg==
+X-Gm-Message-State: APjAAAUkXFecCZ1riDNLGiohUfuiyCQzI6O14RK+uVg8aEJJjmjAWTy6
+        CXjJmeZZ57g2yunZcmZROdI=
+X-Google-Smtp-Source: APXvYqzieSs1UI75yXehyUjLI9b+KyuJgvG4DNnaak5PZ4QOKccR85gkkaDwsfT2lzNyUfk2PbNyGA==
+X-Received: by 2002:a17:902:14f:: with SMTP id 73mr2953143plb.19.1575345165095;
+        Mon, 02 Dec 2019 19:52:45 -0800 (PST)
+Received: from localhost.localdomain (23.83.226.166.16clouds.com. [23.83.226.166])
+        by smtp.gmail.com with ESMTPSA id l9sm1111206pgh.34.2019.12.02.19.52.43
+        (version=TLS1_2 cipher=ECDHE-RSA-AES128-GCM-SHA256 bits=128/128);
+        Mon, 02 Dec 2019 19:52:44 -0800 (PST)
+From:   Guoju Fang <fangguoju@gmail.com>
+To:     colyli@suse.de
+Cc:     linux-bcache@vger.kernel.org, linux-block@vger.kernel.org,
+        Guoju Fang <fangguoju@gmail.com>
+Subject: [PATCH] bcache: print written and keys in trace_bcache_btree_write
+Date:   Mon,  2 Dec 2019 22:48:41 -0500
+Message-Id: <1575344921-20254-1-git-send-email-fangguoju@gmail.com>
+X-Mailer: git-send-email 1.7.1
 Sender: linux-block-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-Hi,
+It's useful to dump written block and keys on btree write, this patch
+add them into trace_bcache_btree_write.
 
-Another datapoint.
+Signed-off-by: Guoju Fang <fangguoju@gmail.com>
+---
+ include/trace/events/bcache.h | 3 ++-
+ 1 file changed, 2 insertions(+), 1 deletion(-)
 
-I enabled "isert_debug" tracing and re-ran the test. Here is a small
-snippet of the debug data. FWIW, the "length of 76" in the "lkey
-mismatch" is a pattern that repeats quite often during the exchange.
+diff --git a/include/trace/events/bcache.h b/include/trace/events/bcache.h
+index e4526f8..0bddea6 100644
+--- a/include/trace/events/bcache.h
++++ b/include/trace/events/bcache.h
+@@ -275,7 +275,8 @@
+ 		__entry->keys	= b->keys.set[b->keys.nsets].data->keys;
+ 	),
+ 
+-	TP_printk("bucket %zu", __entry->bucket)
++	TP_printk("bucket %zu written block %u + %u",
++		__entry->bucket, __entry->block, __entry->keys)
+ );
+ 
+ DEFINE_EVENT(btree_node, bcache_btree_node_alloc,
+-- 
+1.8.3.1
 
-
-Dec 03 03:41:12 host-2 kernel: isert: isert_recv_done: DMA:
-0x10a6457000, iSCSI opcode: 0x01, ITT: 0x00000023, flags: 0x81 dlen: 0
-Dec 03 03:41:12 host-2 kernel: isert: isert_recv_done: ISER ISCSI_CTRL PDU
-Dec 03 03:41:12 host-2 kernel: isert: __isert_create_send_desc:
-tx_desc 000000009bbe54ca lkey mismatch, fixing
-Dec 03 03:41:12 host-2 kernel: isert: isert_init_tx_hdrs: Setup
-tx_sg[0].addr: 0x4ce45010 length: 76 lkey: 0x80480
-Dec 03 03:41:12 host-2 kernel: isert: isert_put_response: Posting SCSI Response
-Dec 03 03:41:12 host-2 kernel: isert: isert_send_done: Cmd 00000000238f9047
-Dec 03 03:41:12 host-2 kernel: isert: isert_unmap_tx_desc: unmap
-single for tx_desc->dma_addr
-Dec 03 03:41:12 host-2 kernel: isert: isert_put_cmd: Cmd 00000000238f9047
-Dec 03 03:41:12 host-2 kernel: isert: isert_recv_done: DMA:
-0x10a645a000, iSCSI opcode: 0x01, ITT: 0x00000024, flags: 0xa1 dlen:
-512
-Dec 03 03:41:12 host-2 kernel: isert: isert_recv_done: ISER ISCSI_CTRL PDU
-Dec 03 03:41:12 host-2 kernel: isert: isert_handle_scsi_cmd: Transfer
-Immediate imm_data_len: 512
-Dec 03 03:41:12 host-2 kernel: isert: __isert_create_send_desc:
-tx_desc 000000004b902cb9 lkey mismatch, fixing
-Dec 03 03:41:12 host-2 kernel: isert: isert_init_tx_hdrs: Setup
-tx_sg[0].addr: 0x4ce55b70 length: 76 lkey: 0x80480
-Dec 03 03:41:12 host-2 kernel: isert: isert_put_response: Posting SCSI Response
-Dec 03 03:41:12 host-2 kernel: isert: isert_send_done: Cmd 0000000069929548
-Dec 03 03:41:12 host-2 kernel: isert: isert_unmap_tx_desc: unmap
-single for tx_desc->dma_addr
-Dec 03 03:41:12 host-2 kernel: isert: isert_put_cmd: Cmd 0000000069929548
-Dec 03 03:41:12 host-2 kernel: isert: isert_recv_done: DMA:
-0x10a645d000, iSCSI opcode: 0x01, ITT: 0x00000025, flags: 0x81 dlen: 0
-Dec 03 03:41:12 host-2 kernel: isert: isert_recv_done: ISER ISCSI_CTRL PDU
-Dec 03 03:41:12 host-2 kernel: isert: __isert_create_send_desc:
-tx_desc 000000006d694fe9 lkey mismatch, fixing
-Dec 03 03:41:12 host-2 kernel: isert: isert_init_tx_hdrs: Setup
-tx_sg[0].addr: 0x4ce56140 length: 76 lkey: 0x80480
-Dec 03 03:41:12 host-2 kernel: isert: isert_put_response: Posting SCSI Response
-Dec 03 03:41:12 host-2 kernel: isert: isert_send_done: Cmd 00000000a666ae3c
-Dec 03 03:41:12 host-2 kernel: isert: isert_unmap_tx_desc: unmap
-single for tx_desc->dma_addr
-Dec 03 03:41:12 host-2 kernel: isert: isert_put_cmd: Cmd 00000000a666ae3c
-Dec 03 03:41:12 host-2 kernel: isert: isert_recv_done: DMA:
-0x10a6460000, iSCSI opcode: 0x01, ITT: 0x00000026, flags: 0x81 dlen: 0
-Dec 03 03:41:12 host-2 kernel: isert: isert_recv_done: ISER ISCSI_CTRL PDU
-Dec 03 03:41:12 host-2 kernel: isert: __isert_create_send_desc:
-tx_desc 00000000dd22ea75 lkey mismatch, fixing
-Dec 03 03:41:12 host-2 kernel: isert: isert_init_tx_hdrs: Setup
-tx_sg[0].addr: 0x4ce5e6f0 length: 76 lkey: 0x80480
-Dec 03 03:41:12 host-2 kernel: isert: isert_put_response: Posting SCSI Response
-Dec 03 03:41:12 host-2 kernel: isert: isert_send_done: Cmd 000000009b63dcb0
-Dec 03 03:41:12 host-2 kernel: isert: isert_unmap_tx_desc: unmap
-single for tx_desc->dma_addr
-Dec 03 03:41:12 host-2 kernel: isert: isert_put_cmd: Cmd 000000009b63dcb0
-Dec 03 03:41:12 host-2 kernel: isert: isert_recv_done: DMA:
-0x10a6463000, iSCSI opcode: 0x01, ITT: 0x00000027, flags: 0xc1 dlen: 0
-Dec 03 03:41:12 host-2 kernel: isert: isert_recv_done: ISER_RSV:
-read_stag: 0x4000009a read_va: 0xac29e6800
-Dec 03 03:41:12 host-2 kernel: isert: isert_recv_done: ISER ISCSI_CTRL PDU
-Dec 03 03:41:12 host-2 kernel: isert: isert_put_datain: Cmd:
-00000000fe3d39bf RDMA_WRITE data_length: 32
-Dec 03 03:41:12 host-2 kernel: isert: __isert_create_send_desc:
-tx_desc 00000000f5f10cf7 lkey mismatch, fixing
-Dec 03 03:41:12 host-2 kernel: isert: isert_init_tx_hdrs: Setup
-tx_sg[0].addr: 0x4ce56710 length: 76 lkey: 0x80480
-Dec 03 03:41:12 host-2 kernel: isert: isert_put_datain: Cmd:
-00000000fe3d39bf posted RDMA_WRITE for iSER Data READ rc: 0
-Dec 03 03:41:12 host-2 kernel: isert: isert_send_done: Cmd 00000000fe3d39bf
-Dec 03 03:41:12 host-2 kernel: isert: isert_unmap_tx_desc: unmap
-single for tx_desc->dma_addr
-Dec 03 03:41:12 host-2 kernel: isert: isert_put_cmd: Cmd 00000000fe3d39bf
-
-[snip]
-
-I could post the whole isert debug log somewhere if you'd like?
-
-Thanks,
-Steve
-
-On Mon, Dec 2, 2019 at 10:26 PM Stephen Rust <srust@blockbridge.com> wrote:
->
-> > oops, it should have been (arg4 & 511) != 0.
->
-> Yep, there they are:
->
-> # /usr/share/bcc/tools/trace -K 'bio_add_page ((arg4 & 511) != 0) "%d
-> %d", arg3, arg4'
-> PID     TID     COMM            FUNC             -
-> 7411    7411    kworker/31:1H   bio_add_page     512 76
->         bio_add_page+0x1 [kernel]
->         sbc_execute_rw+0x28 [kernel]
->         __target_execute_cmd+0x2e [kernel]
->         target_execute_cmd+0x1c1 [kernel]
->         iscsit_execute_cmd+0x1e7 [kernel]
->         iscsit_sequence_cmd+0xdc [kernel]
->         isert_recv_done+0x780 [kernel]
->         __ib_process_cq+0x78 [kernel]
->         ib_cq_poll_work+0x29 [kernel]
->         process_one_work+0x179 [kernel]
->         worker_thread+0x4f [kernel]
->         kthread+0x105 [kernel]
->         ret_from_fork+0x1f [kernel]
->
-> 7753    7753    kworker/26:1H   bio_add_page     4096 76
->         bio_add_page+0x1 [kernel]
->         sbc_execute_rw+0x28 [kernel]
->         __target_execute_cmd+0x2e [kernel]
->         target_execute_cmd+0x1c1 [kernel]
->         iscsit_execute_cmd+0x1e7 [kernel]
->         iscsit_sequence_cmd+0xdc [kernel]
->         isert_recv_done+0x780 [kernel]
->         __ib_process_cq+0x78 [kernel]
->         ib_cq_poll_work+0x29 [kernel]
->         process_one_work+0x179 [kernel]
->         worker_thread+0x4f [kernel]
->         kthread+0x105 [kernel]
->         ret_from_fork+0x1f [kernel]
