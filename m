@@ -2,92 +2,110 @@ Return-Path: <SRS0=81jf=ZZ=vger.kernel.org=linux-block-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-9.6 required=3.0 tests=DKIM_SIGNED,DKIM_VALID,
-	DKIM_VALID_AU,FREEMAIL_FORGED_FROMDOMAIN,FREEMAIL_FROM,
-	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,
-	SPF_HELO_NONE,SPF_PASS,USER_AGENT_GIT autolearn=ham autolearn_force=no
+X-Spam-Status: No, score=-2.4 required=3.0 tests=DKIMWL_WL_HIGH,DKIM_SIGNED,
+	DKIM_VALID,DKIM_VALID_AU,HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,
+	SPF_HELO_NONE,SPF_PASS,USER_AGENT_SANE_1 autolearn=no autolearn_force=no
 	version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id B3CBAC432C0
-	for <linux-block@archiver.kernel.org>; Tue,  3 Dec 2019 03:52:46 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 81B58C432C0
+	for <linux-block@archiver.kernel.org>; Tue,  3 Dec 2019 04:15:26 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.kernel.org (Postfix) with ESMTP id 82F202068E
-	for <linux-block@archiver.kernel.org>; Tue,  3 Dec 2019 03:52:46 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id 5843820726
+	for <linux-block@archiver.kernel.org>; Tue,  3 Dec 2019 04:15:26 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="oDGWBbGa"
+	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="fGgx6TAF"
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1726491AbfLCDwp (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Mon, 2 Dec 2019 22:52:45 -0500
-Received: from mail-pl1-f195.google.com ([209.85.214.195]:38177 "EHLO
-        mail-pl1-f195.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1726480AbfLCDwp (ORCPT
-        <rfc822;linux-block@vger.kernel.org>); Mon, 2 Dec 2019 22:52:45 -0500
-Received: by mail-pl1-f195.google.com with SMTP id o8so1123913pls.5;
-        Mon, 02 Dec 2019 19:52:45 -0800 (PST)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20161025;
-        h=from:to:cc:subject:date:message-id;
-        bh=WFPxR8j8Ztw3QpWL9VkRXvZS+yt+ltqE6fy7Q8AVdEU=;
-        b=oDGWBbGaEAdv/Tjq+aQgC6JgVI+zjjUkguaejS3WXRSvTAjQuNmVZEIw8at6VqbZ/C
-         w22kRTOZ0dwKZRvBBRWpDodDadUcX71J61eSF8xaxQBAH3BgHC8YnA40iSo1QTjgDmEd
-         L49Egm4Ea4oOKoKM/rUtS9clmCglpfMoAQn0ueTlQTrJwEPSBaoK3Qcvh/kOVH32ePFK
-         Ta4x3WHPnKsBzzpIOATXki7MIxOJdIEfx3bmzOKLDkBU32syQVVCvIe787DzTRLh6hrr
-         QZTE6a/J5Mq8B+fb3MI+AK0190JQRhrRi39SYC6YqMUPDcazLgy7TY30ce8bWxMEeQUj
-         YtHw==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20161025;
-        h=x-gm-message-state:from:to:cc:subject:date:message-id;
-        bh=WFPxR8j8Ztw3QpWL9VkRXvZS+yt+ltqE6fy7Q8AVdEU=;
-        b=a3kLN8vI6mCC891RUbodSMmyUHtX5GbGi21uMJ6/4FpYIkr9mnCyaGaofjdGt8TqTi
-         jyAMpoTL5nySn+B6jthu+EtYN8t9upyxy5i0peDFaqSXYGHScs4gNyEttT2Hl8psFyzl
-         2rZGDca/9eFZv92OCMcsy+4nDZ7SOo/iKaj+JYze/JjsXWU/BVhEonFLbz8kvJTY2598
-         9PlFKLdctyZmxKq50GhQoXENSRP104/SlJXJsSQVXJgWZ4Y87b1ylWf8v8rajmz9e/6W
-         v1xIKe5XgIVhbQFN6pwPdue+1qihuuLtl5iSUNYoPV4MxhHqZpZuYFKsszr1NvKVg7G9
-         Zudg==
-X-Gm-Message-State: APjAAAUkXFecCZ1riDNLGiohUfuiyCQzI6O14RK+uVg8aEJJjmjAWTy6
-        CXjJmeZZ57g2yunZcmZROdI=
-X-Google-Smtp-Source: APXvYqzieSs1UI75yXehyUjLI9b+KyuJgvG4DNnaak5PZ4QOKccR85gkkaDwsfT2lzNyUfk2PbNyGA==
-X-Received: by 2002:a17:902:14f:: with SMTP id 73mr2953143plb.19.1575345165095;
-        Mon, 02 Dec 2019 19:52:45 -0800 (PST)
-Received: from localhost.localdomain (23.83.226.166.16clouds.com. [23.83.226.166])
-        by smtp.gmail.com with ESMTPSA id l9sm1111206pgh.34.2019.12.02.19.52.43
-        (version=TLS1_2 cipher=ECDHE-RSA-AES128-GCM-SHA256 bits=128/128);
-        Mon, 02 Dec 2019 19:52:44 -0800 (PST)
-From:   Guoju Fang <fangguoju@gmail.com>
-To:     colyli@suse.de
-Cc:     linux-bcache@vger.kernel.org, linux-block@vger.kernel.org,
-        Guoju Fang <fangguoju@gmail.com>
-Subject: [PATCH] bcache: print written and keys in trace_bcache_btree_write
-Date:   Mon,  2 Dec 2019 22:48:41 -0500
-Message-Id: <1575344921-20254-1-git-send-email-fangguoju@gmail.com>
-X-Mailer: git-send-email 1.7.1
+        id S1726673AbfLCEPZ (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Mon, 2 Dec 2019 23:15:25 -0500
+Received: from us-smtp-delivery-1.mimecast.com ([207.211.31.120]:51750 "EHLO
+        us-smtp-1.mimecast.com" rhost-flags-OK-OK-OK-FAIL) by vger.kernel.org
+        with ESMTP id S1726592AbfLCEPZ (ORCPT
+        <rfc822;linux-block@vger.kernel.org>); Mon, 2 Dec 2019 23:15:25 -0500
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+        s=mimecast20190719; t=1575346524;
+        h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+         to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+         content-transfer-encoding:content-transfer-encoding:
+         in-reply-to:in-reply-to:references:references;
+        bh=vD9dxfbrdVwDZagrDgo/lAvzebPEnmFiLO749DDmUoo=;
+        b=fGgx6TAFPjYBMkrLTFZLciLkkOAeM2BzESt6RfLeY5mgb9/BXRQ69M1FK3uQy7CuIDZTMD
+        mokfBRawgDFh6AHRuHemlXUCV+mIjz3vlWY6Hc/n+Ujg+YoAxA672lgKc7+biQZUqb6kqU
+        bPO7o6SKwBja7QPncc3C5FUkwV0FfuM=
+Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
+ [209.132.183.4]) (Using TLS) by relay.mimecast.com with ESMTP id
+ us-mta-189-5K8dFkmGMuK1cVnLcsZZ2g-1; Mon, 02 Dec 2019 23:15:21 -0500
+Received: from smtp.corp.redhat.com (int-mx03.intmail.prod.int.phx2.redhat.com [10.5.11.13])
+        (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
+        (No client certificate requested)
+        by mimecast-mx01.redhat.com (Postfix) with ESMTPS id 12A1A1005513;
+        Tue,  3 Dec 2019 04:15:19 +0000 (UTC)
+Received: from ming.t460p (ovpn-8-19.pek2.redhat.com [10.72.8.19])
+        by smtp.corp.redhat.com (Postfix) with ESMTPS id A58D4608E2;
+        Tue,  3 Dec 2019 04:15:09 +0000 (UTC)
+Date:   Tue, 3 Dec 2019 12:15:04 +0800
+From:   Ming Lei <ming.lei@redhat.com>
+To:     Stephen Rust <srust@blockbridge.com>
+Cc:     Rob Townley <rob.townley@gmail.com>,
+        Christoph Hellwig <hch@lst.de>, Jens Axboe <axboe@kernel.dk>,
+        linux-block@vger.kernel.org, linux-rdma@vger.kernel.org,
+        linux-scsi@vger.kernel.org, martin.petersen@oracle.com,
+        target-devel@vger.kernel.org
+Subject: Re: Data corruption in kernel 5.1+ with iSER attached ramdisk
+Message-ID: <20191203041504.GC6245@ming.t460p>
+References: <20191128015748.GA3277@ming.t460p>
+ <CA+VdTb_-CGaPjKUQteKVFSGqDz-5o-tuRRkJYqt8B9iOQypiwQ@mail.gmail.com>
+ <20191128025822.GC3277@ming.t460p>
+ <CAAFE1bfsXsKGyw7SU_z4NanT+wmtuJT=XejBYbHHMCDQwm73sw@mail.gmail.com>
+ <20191128091210.GC15549@ming.t460p>
+ <CAAFE1beMkvyRctGqpffd3o_QtDH0CrmQSb=fV4GzqMUXWzPyOw@mail.gmail.com>
+ <20191203005849.GB25002@ming.t460p>
+ <CAAFE1bcG8c1Q3iwh-LUjruBMAuFTJ4qWxNGsnhfKvGWHNLAeEQ@mail.gmail.com>
+ <20191203031444.GB6245@ming.t460p>
+ <CAAFE1besnb=HV4C_buORYpWbkXecmtybwX8d_Ka2NsKmiym53w@mail.gmail.com>
+MIME-Version: 1.0
+In-Reply-To: <CAAFE1besnb=HV4C_buORYpWbkXecmtybwX8d_Ka2NsKmiym53w@mail.gmail.com>
+User-Agent: Mutt/1.12.1 (2019-06-15)
+X-Scanned-By: MIMEDefang 2.79 on 10.5.11.13
+X-MC-Unique: 5K8dFkmGMuK1cVnLcsZZ2g-1
+X-Mimecast-Spam-Score: 0
+Content-Type: text/plain; charset=us-ascii
+Content-Transfer-Encoding: quoted-printable
+Content-Disposition: inline
 Sender: linux-block-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-It's useful to dump written block and keys on btree write, this patch
-add them into trace_bcache_btree_write.
+On Mon, Dec 02, 2019 at 10:26:28PM -0500, Stephen Rust wrote:
+> > oops, it should have been (arg4 & 511) !=3D 0.
+>=20
+> Yep, there they are:
+>=20
+> # /usr/share/bcc/tools/trace -K 'bio_add_page ((arg4 & 511) !=3D 0) "%d
+> %d", arg3, arg4'
+> PID     TID     COMM            FUNC             -
+> 7411    7411    kworker/31:1H   bio_add_page     512 76
+>         bio_add_page+0x1 [kernel]
+>         sbc_execute_rw+0x28 [kernel]
+>         __target_execute_cmd+0x2e [kernel]
+>         target_execute_cmd+0x1c1 [kernel]
+>         iscsit_execute_cmd+0x1e7 [kernel]
+>         iscsit_sequence_cmd+0xdc [kernel]
+>         isert_recv_done+0x780 [kernel]
+>         __ib_process_cq+0x78 [kernel]
+>         ib_cq_poll_work+0x29 [kernel]
+>         process_one_work+0x179 [kernel]
+>         worker_thread+0x4f [kernel]
+>         kthread+0x105 [kernel]
+>         ret_from_fork+0x1f [kernel]
+>=20
+> 7753    7753    kworker/26:1H   bio_add_page     4096 76
 
-Signed-off-by: Guoju Fang <fangguoju@gmail.com>
----
- include/trace/events/bcache.h | 3 ++-
- 1 file changed, 2 insertions(+), 1 deletion(-)
+The issue should be in brd_make_request() which assumes that
+bvec.bv_len is 512bytes align.
 
-diff --git a/include/trace/events/bcache.h b/include/trace/events/bcache.h
-index e4526f8..0bddea6 100644
---- a/include/trace/events/bcache.h
-+++ b/include/trace/events/bcache.h
-@@ -275,7 +275,8 @@
- 		__entry->keys	= b->keys.set[b->keys.nsets].data->keys;
- 	),
- 
--	TP_printk("bucket %zu", __entry->bucket)
-+	TP_printk("bucket %zu written block %u + %u",
-+		__entry->bucket, __entry->block, __entry->keys)
- );
- 
- DEFINE_EVENT(btree_node, bcache_btree_node_alloc,
--- 
-1.8.3.1
+I will figure out one patch for you tomorrow.
+
+Thanks,
+Ming
 
