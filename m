@@ -7,42 +7,42 @@ X-Spam-Status: No, score=-9.6 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
 	SPF_HELO_NONE,SPF_PASS,USER_AGENT_GIT autolearn=ham autolearn_force=no
 	version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 64F4FC432C0
-	for <linux-block@archiver.kernel.org>; Tue,  3 Dec 2019 09:39:26 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 546A4C432C0
+	for <linux-block@archiver.kernel.org>; Tue,  3 Dec 2019 09:39:28 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.kernel.org (Postfix) with ESMTP id 3B21920661
-	for <linux-block@archiver.kernel.org>; Tue,  3 Dec 2019 09:39:26 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id 2987720661
+	for <linux-block@archiver.kernel.org>; Tue,  3 Dec 2019 09:39:28 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (2048-bit key) header.d=infradead.org header.i=@infradead.org header.b="FNtOf73Z"
+	dkim=fail reason="signature verification failed" (2048-bit key) header.d=infradead.org header.i=@infradead.org header.b="BNU0yWD3"
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1726105AbfLCJjZ (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Tue, 3 Dec 2019 04:39:25 -0500
-Received: from bombadil.infradead.org ([198.137.202.133]:33126 "EHLO
+        id S1725774AbfLCJj1 (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Tue, 3 Dec 2019 04:39:27 -0500
+Received: from bombadil.infradead.org ([198.137.202.133]:33144 "EHLO
         bombadil.infradead.org" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1725774AbfLCJjZ (ORCPT
-        <rfc822;linux-block@vger.kernel.org>); Tue, 3 Dec 2019 04:39:25 -0500
+        with ESMTP id S1726074AbfLCJj1 (ORCPT
+        <rfc822;linux-block@vger.kernel.org>); Tue, 3 Dec 2019 04:39:27 -0500
 DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed;
         d=infradead.org; s=bombadil.20170209; h=Content-Transfer-Encoding:
         MIME-Version:References:In-Reply-To:Message-Id:Date:Subject:Cc:To:From:Sender
         :Reply-To:Content-Type:Content-ID:Content-Description:Resent-Date:Resent-From
         :Resent-Sender:Resent-To:Resent-Cc:Resent-Message-ID:List-Id:List-Help:
         List-Unsubscribe:List-Subscribe:List-Post:List-Owner:List-Archive;
-        bh=AWfSmqDZ2B2JI9YmK3SlaWe9FMOXc288trASlP2+67g=; b=FNtOf73ZSOd5mPCb+n3bStgYWK
-        f7IEJTSqq0mmGsJeNm80ogW9SNHO+HDtP2pLo1EBe+khj4G2t5yCfuhDfFm+do6ZAM6XozPLk1e3Y
-        bHzJShmAhAPSTURePiNpwPfGe4WybgUY5Jf1x76bGorRKa+n/Z7Ytz/v1KSHOQUCZHGARJZ/Pyn8C
-        30Kx+lkOfSXNcY0zn98xXjUiS03QniMmD8jLOrpXhm4nSYcrzNtHf3mrVIaOv1ZpltmjlmwxPifsx
-        hXFMaMSAr2cd5pxy7Hz1EyXDtZORaZLkWQGe2Piw0yRbLwalT2ZxnPIkb2754wCAePBJ3a1Y+4eYG
-        FOSL/YoQ==;
+        bh=7tGnw5Ck7d7pDDalWTV8uCh18W44+TXfsiC8Nui+qd4=; b=BNU0yWD32z2oJNY1ITgd8gconO
+        mQn3Bhov1J7RprMMZtzmSBXS1VgtUIeU6G3YtxpGOfoyCUt5bxiyC5T6iMrPxeSTzaEzTtDKbXFY1
+        dIT/vhyzHjIn2aeEDVVUEOLZ+5lw7Gl9bW4Qnmj3Dt22qN0opTBCsCwNTLIrolvQDtA3QBgIJmFlC
+        jdFyLX9zkoNaCSP1h2iojiAHBWPlVqyz/6kSa67U0gQLK3lvdI2GEd3mkU2uI9NNpf56aceTkhPTm
+        thUc8wMmScjE/28qI8+2uJPWZ/UbLohVnWqEpmrsTHSJnfyZPrzTcAcLpXQmFUTzoWslb//sS2x+g
+        zdGd1bkw==;
 Received: from clnet-p19-102.ikbnet.co.at ([83.175.77.102] helo=localhost)
         by bombadil.infradead.org with esmtpsa (Exim 4.92.3 #3 (Red Hat Linux))
-        id 1ic4eS-00029P-Co; Tue, 03 Dec 2019 09:39:24 +0000
+        id 1ic4eU-0002AE-In; Tue, 03 Dec 2019 09:39:26 +0000
 From:   Christoph Hellwig <hch@lst.de>
 To:     Jens Axboe <axboe@kernel.dk>
 Cc:     Damien Le Moal <Damien.LeMoal@wdc.com>,
         Hans Holmberg <hans@owltronix.com>, linux-block@vger.kernel.org
-Subject: [PATCH 6/8] block: allocate the zone bitmaps lazily
-Date:   Tue,  3 Dec 2019 10:39:06 +0100
-Message-Id: <20191203093908.24612-7-hch@lst.de>
+Subject: [PATCH 7/8] block: don't handle bio based drivers in blk_revalidate_disk_zones
+Date:   Tue,  3 Dec 2019 10:39:07 +0100
+Message-Id: <20191203093908.24612-8-hch@lst.de>
 X-Mailer: git-send-email 2.20.1
 In-Reply-To: <20191203093908.24612-1-hch@lst.de>
 References: <20191203093908.24612-1-hch@lst.de>
@@ -54,136 +54,118 @@ Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-Allocate the conventional zone bitmap and the sequential zone locking
-bitmap only when we find a zone of the respective type.  This avoids
-wasting memory on the conventional zone bitmap for devices that only
-have sequential zones, and will also prepare for other future changes.
+bio based drivers only need to update q->nr_zones.  Do that manually
+instead of overloading blk_revalidate_disk_zones to keep that function
+simpler for the next round of changes that will rely even more on the
+request based functionality.
 
 Signed-off-by: Christoph Hellwig <hch@lst.de>
 ---
- block/blk-zoned.c | 65 +++++++++++++++++++++++------------------------
- 1 file changed, 32 insertions(+), 33 deletions(-)
+ block/blk-zoned.c             | 16 +++++-----------
+ drivers/block/null_blk_main.c | 12 +++++++++---
+ drivers/md/dm-table.c         | 12 +++++++-----
+ include/linux/blkdev.h        |  5 -----
+ 4 files changed, 21 insertions(+), 24 deletions(-)
 
 diff --git a/block/blk-zoned.c b/block/blk-zoned.c
-index 9c3931051f4f..0131f9e14bd1 100644
+index 0131f9e14bd1..51d427659ce7 100644
 --- a/block/blk-zoned.c
 +++ b/block/blk-zoned.c
-@@ -342,6 +342,7 @@ struct blk_revalidate_zone_args {
- 	struct gendisk	*disk;
- 	unsigned long	*conv_zones_bitmap;
- 	unsigned long	*seq_zones_wlock;
-+	unsigned int	nr_zones;
- 	sector_t	sector;
- };
+@@ -419,8 +419,9 @@ static int blk_revalidate_zone_cb(struct blk_zone *zone, unsigned int idx,
+  *
+  * Helper function for low-level device drivers to (re) allocate and initialize
+  * a disk request queue zone bitmaps. This functions should normally be called
+- * within the disk ->revalidate method. For BIO based queues, no zone bitmap
+- * is allocated.
++ * within the disk ->revalidate method for blk-mq based drivers.  For BIO based
++ * drivers only q->nr_zones needs to be updated so that the sysfs exposed value
++ * is correct.
+  */
+ int blk_revalidate_disk_zones(struct gendisk *disk)
+ {
+@@ -433,15 +434,8 @@ int blk_revalidate_disk_zones(struct gendisk *disk)
  
-@@ -385,8 +386,22 @@ static int blk_revalidate_zone_cb(struct blk_zone *zone, unsigned int idx,
- 	/* Check zone type */
- 	switch (zone->type) {
- 	case BLK_ZONE_TYPE_CONVENTIONAL:
-+		if (!args->conv_zones_bitmap) {
-+			args->conv_zones_bitmap =
-+				blk_alloc_zone_bitmap(q->node, args->nr_zones);
-+			if (!args->conv_zones_bitmap)
-+				return -ENOMEM;
-+		}
-+		set_bit(idx, args->conv_zones_bitmap);
-+		break;
- 	case BLK_ZONE_TYPE_SEQWRITE_REQ:
- 	case BLK_ZONE_TYPE_SEQWRITE_PREF:
-+		if (!args->seq_zones_wlock) {
-+			args->seq_zones_wlock =
-+				blk_alloc_zone_bitmap(q->node, args->nr_zones);
-+			if (!args->seq_zones_wlock)
-+				return -ENOMEM;
-+		}
- 		break;
- 	default:
- 		pr_warn("%s: Invalid zone type 0x%x at sectors %llu\n",
-@@ -394,37 +409,10 @@ static int blk_revalidate_zone_cb(struct blk_zone *zone, unsigned int idx,
- 		return -ENODEV;
- 	}
- 
--	if (zone->type == BLK_ZONE_TYPE_CONVENTIONAL)
--		set_bit(idx, args->conv_zones_bitmap);
+ 	if (WARN_ON_ONCE(!blk_queue_is_zoned(q)))
+ 		return -EIO;
 -
- 	args->sector += zone->len;
+-	/*
+-	 * BIO based queues do not use a scheduler so only q->nr_zones
+-	 * needs to be updated so that the sysfs exposed value is correct.
+-	 */
+-	if (!queue_is_mq(q)) {
+-		q->nr_zones = args.nr_zones;
+-		return 0;
+-	}
++	if (WARN_ON_ONCE(!queue_is_mq(q)))
++		return -EIO;
+ 
+ 	/*
+ 	 * Ensure that all memory allocations in this context are done as
+diff --git a/drivers/block/null_blk_main.c b/drivers/block/null_blk_main.c
+index dd6026289fbf..068cd0ae6e2c 100644
+--- a/drivers/block/null_blk_main.c
++++ b/drivers/block/null_blk_main.c
+@@ -1576,11 +1576,17 @@ static int null_gendisk_register(struct nullb *nullb)
+ 	disk->queue		= nullb->q;
+ 	strncpy(disk->disk_name, nullb->disk_name, DISK_NAME_LEN);
+ 
++#ifdef CONFIG_BLK_DEV_ZONED
+ 	if (nullb->dev->zoned) {
+-		ret = blk_revalidate_disk_zones(disk);
+-		if (ret)
+-			return ret;
++		if (queue_is_mq(nullb->q)) {
++			ret = blk_revalidate_disk_zones(disk);
++			if (ret)
++				return ret;
++		} else {
++			nullb->q->nr_zones = blkdev_nr_zones(disk);
++		}
+ 	}
++#endif
+ 
+ 	add_disk(disk);
+ 	return 0;
+diff --git a/drivers/md/dm-table.c b/drivers/md/dm-table.c
+index 2ae0c1913766..0a2cc197f62b 100644
+--- a/drivers/md/dm-table.c
++++ b/drivers/md/dm-table.c
+@@ -1954,12 +1954,14 @@ void dm_table_set_restrictions(struct dm_table *t, struct request_queue *q,
+ 	/*
+ 	 * For a zoned target, the number of zones should be updated for the
+ 	 * correct value to be exposed in sysfs queue/nr_zones. For a BIO based
+-	 * target, this is all that is needed. For a request based target, the
+-	 * queue zone bitmaps must also be updated.
+-	 * Use blk_revalidate_disk_zones() to handle this.
++	 * target, this is all that is needed.
+ 	 */
+-	if (blk_queue_is_zoned(q))
+-		blk_revalidate_disk_zones(t->md->disk);
++#ifdef CONFIG_BLK_DEV_ZONED
++	if (blk_queue_is_zoned(q)) {
++		WARN_ON_ONCE(queue_is_mq(q));
++		q->nr_zones = blkdev_nr_zones(t->md->disk);
++	}
++#endif
+ 
+ 	/* Allow reads to exceed readahead limits */
+ 	q->backing_dev_info->io_pages = limits->max_sectors >> (PAGE_SHIFT - 9);
+diff --git a/include/linux/blkdev.h b/include/linux/blkdev.h
+index 503c4d4c5884..47eb22a3b7f9 100644
+--- a/include/linux/blkdev.h
++++ b/include/linux/blkdev.h
+@@ -375,11 +375,6 @@ static inline unsigned int blkdev_nr_zones(struct gendisk *disk)
  	return 0;
  }
  
--static int blk_update_zone_info(struct gendisk *disk, unsigned int nr_zones,
--				struct blk_revalidate_zone_args *args)
+-static inline int blk_revalidate_disk_zones(struct gendisk *disk)
 -{
--	/*
--	 * Ensure that all memory allocations in this context are done as
--	 * if GFP_NOIO was specified.
--	 */
--	unsigned int noio_flag = memalloc_noio_save();
--	struct request_queue *q = disk->queue;
--	int ret;
--
--	args->seq_zones_wlock = blk_alloc_zone_bitmap(q->node, nr_zones);
--	if (!args->seq_zones_wlock)
--		return -ENOMEM;
--	args->conv_zones_bitmap = blk_alloc_zone_bitmap(q->node, nr_zones);
--	if (!args->conv_zones_bitmap)
--		return -ENOMEM;
--
--	ret = disk->fops->report_zones(disk, 0, nr_zones,
--				       blk_revalidate_zone_cb, args);
--	memalloc_noio_restore(noio_flag);
--	return ret;
+-	return 0;
 -}
 -
- /**
-  * blk_revalidate_disk_zones - (re)allocate and initialize zone bitmaps
-  * @disk:	Target disk
-@@ -437,8 +425,10 @@ static int blk_update_zone_info(struct gendisk *disk, unsigned int nr_zones,
- int blk_revalidate_disk_zones(struct gendisk *disk)
- {
- 	struct request_queue *q = disk->queue;
--	unsigned int nr_zones = blkdev_nr_zones(disk);
--	struct blk_revalidate_zone_args args = { .disk = disk };
-+	struct blk_revalidate_zone_args args = {
-+		.disk		= disk,
-+		.nr_zones	= blkdev_nr_zones(disk),
-+	};
- 	int ret = 0;
- 
- 	if (WARN_ON_ONCE(!blk_queue_is_zoned(q)))
-@@ -449,12 +439,21 @@ int blk_revalidate_disk_zones(struct gendisk *disk)
- 	 * needs to be updated so that the sysfs exposed value is correct.
- 	 */
- 	if (!queue_is_mq(q)) {
--		q->nr_zones = nr_zones;
-+		q->nr_zones = args.nr_zones;
- 		return 0;
- 	}
- 
--	if (nr_zones)
--		ret = blk_update_zone_info(disk, nr_zones, &args);
-+	/*
-+	 * Ensure that all memory allocations in this context are done as
-+	 * if GFP_NOIO was specified.
-+	 */
-+	if (args.nr_zones) {
-+		unsigned int noio_flag = memalloc_noio_save();
-+
-+		ret = disk->fops->report_zones(disk, 0, args.nr_zones,
-+					       blk_revalidate_zone_cb, &args);
-+		memalloc_noio_restore(noio_flag);
-+	}
- 
- 	/*
- 	 * Install the new bitmaps, making sure the queue is stopped and
-@@ -463,7 +462,7 @@ int blk_revalidate_disk_zones(struct gendisk *disk)
- 	 */
- 	blk_mq_freeze_queue(q);
- 	if (ret >= 0) {
--		q->nr_zones = nr_zones;
-+		q->nr_zones = args.nr_zones;
- 		swap(q->seq_zones_wlock, args.seq_zones_wlock);
- 		swap(q->conv_zones_bitmap, args.conv_zones_bitmap);
- 		ret = 0;
+ static inline int blkdev_report_zones_ioctl(struct block_device *bdev,
+ 					    fmode_t mode, unsigned int cmd,
+ 					    unsigned long arg)
 -- 
 2.20.1
 
