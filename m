@@ -2,138 +2,175 @@ Return-Path: <SRS0=81jf=ZZ=vger.kernel.org=linux-block-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-2.4 required=3.0 tests=DKIMWL_WL_HIGH,DKIM_SIGNED,
-	DKIM_VALID,DKIM_VALID_AU,HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,
-	SPF_HELO_NONE,SPF_PASS,USER_AGENT_SANE_1 autolearn=no autolearn_force=no
-	version=3.4.0
+X-Spam-Status: No, score=-0.8 required=3.0 tests=DKIM_SIGNED,DKIM_VALID,
+	HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS
+	autolearn=no autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id A1504C432C0
-	for <linux-block@archiver.kernel.org>; Tue,  3 Dec 2019 00:59:08 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 4BEA0C43215
+	for <linux-block@archiver.kernel.org>; Tue,  3 Dec 2019 03:04:34 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.kernel.org (Postfix) with ESMTP id 741B320656
-	for <linux-block@archiver.kernel.org>; Tue,  3 Dec 2019 00:59:08 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id 2303A206ED
+	for <linux-block@archiver.kernel.org>; Tue,  3 Dec 2019 03:04:34 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="Ino9xIkz"
+	dkim=pass (2048-bit key) header.d=blockbridge-com.20150623.gappssmtp.com header.i=@blockbridge-com.20150623.gappssmtp.com header.b="K2rskJEv"
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1725899AbfLCA7H (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Mon, 2 Dec 2019 19:59:07 -0500
-Received: from us-smtp-1.mimecast.com ([207.211.31.81]:21109 "EHLO
-        us-smtp-delivery-1.mimecast.com" rhost-flags-OK-OK-OK-FAIL)
-        by vger.kernel.org with ESMTP id S1725997AbfLCA7H (ORCPT
-        <rfc822;linux-block@vger.kernel.org>);
-        Mon, 2 Dec 2019 19:59:07 -0500
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-        s=mimecast20190719; t=1575334746;
-        h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-         to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-         content-transfer-encoding:content-transfer-encoding:
-         in-reply-to:in-reply-to:references:references;
-        bh=DJsbufhtBhVAM9akbCFhx8OR37KN18Pkh0f3aJ/wr48=;
-        b=Ino9xIkzmEb9DHkvfwl6hvT8TMRg7FxvCDLcN/ReYqwcgwP7xLVuZATO8bEwJnfBmv3DVm
-        IIUaMtNs6BtxAKVs9d/HdcF+Ux88Gd6Ft7C5iVzKGKT86xAjeJoiJ15s07IeqHXFbIIBO8
-        JW1DWOgAeBCTMcKLLc3c5XMkN7xA9Mw=
-Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
- [209.132.183.4]) (Using TLS) by relay.mimecast.com with ESMTP id
- us-mta-35-id8hnlJZMgy_H_WpJIWsrQ-1; Mon, 02 Dec 2019 19:59:02 -0500
-Received: from smtp.corp.redhat.com (int-mx08.intmail.prod.int.phx2.redhat.com [10.5.11.23])
-        (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
-        (No client certificate requested)
-        by mimecast-mx01.redhat.com (Postfix) with ESMTPS id 3A00E800D41;
-        Tue,  3 Dec 2019 00:59:01 +0000 (UTC)
-Received: from ming.t460p (ovpn-8-19.pek2.redhat.com [10.72.8.19])
-        by smtp.corp.redhat.com (Postfix) with ESMTPS id D658619C68;
-        Tue,  3 Dec 2019 00:58:53 +0000 (UTC)
-Date:   Tue, 3 Dec 2019 08:58:49 +0800
-From:   Ming Lei <ming.lei@redhat.com>
-To:     Stephen Rust <srust@blockbridge.com>
+        id S1726395AbfLCDEc (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Mon, 2 Dec 2019 22:04:32 -0500
+Received: from mail-ot1-f68.google.com ([209.85.210.68]:43671 "EHLO
+        mail-ot1-f68.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S1726251AbfLCDEc (ORCPT
+        <rfc822;linux-block@vger.kernel.org>); Mon, 2 Dec 2019 22:04:32 -0500
+Received: by mail-ot1-f68.google.com with SMTP id p8so1593003oth.10
+        for <linux-block@vger.kernel.org>; Mon, 02 Dec 2019 19:04:31 -0800 (PST)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=blockbridge-com.20150623.gappssmtp.com; s=20150623;
+        h=mime-version:references:in-reply-to:from:date:message-id:subject:to
+         :cc;
+        bh=2jnaclaqfzAkmDR3Cu1ofNJy4AR7awuVd0ddciKZbp4=;
+        b=K2rskJEvIWjUrD7kECs4sxJuVEJ0IrqrDPEJmivCsLKd2q61VRzZ4iOf/cLlWWLYtu
+         bStH58lVwxcAXOqcDri8Ynx0a0OjZ5cErIxedqGkcd0sG+L7kaGYe16tBlYcyqmHZKXz
+         plGezh+ql6k/rQz9nO+1RH9/JPEupNQuauMba+CYjm3G1OtuvI0hjlPWLVgcpErX/M0y
+         bHBqvGh5og5wXYw36GrBe2bDxanWqR4x7bPNraTpfAyfRLbYt08Fc03m4uN0M7Gh5Xjf
+         ma7xw37wsoHIczYOhProLlTLlWsy03ts2m7sM7mGbSyv0eO4UJl1nJLHQ4oTjYoJgjey
+         Z3vw==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20161025;
+        h=x-gm-message-state:mime-version:references:in-reply-to:from:date
+         :message-id:subject:to:cc;
+        bh=2jnaclaqfzAkmDR3Cu1ofNJy4AR7awuVd0ddciKZbp4=;
+        b=OAcuxMExNSSFnNdlvhtJn88pSjYp6tvzTE9Ra25gyIZoIVJe76o3N8PzkxBnUt5ayK
+         qXYakUPb0kr8gxi7mlHgBID5IQdejG8L9G9GKifkhBveYgLGlZa1EJNF9ywCYLEl5cQE
+         SJOyFKQ6nqOptjBkQCCGHqeNpd25qHrm/u5PuMmLKYpYVbzsAiChtqnWwJT5OW9CiSOp
+         5E5jvl5UfmHNan3g55BuCUR0Aj3zEtyB+3yI4QaipasrxhBz4cVwFHYBLs9gpaNhu/cx
+         LG9RMCpXr3rWosekW4jb7iEqLQo7IhLW/sWHaReZ2HDXxJMJqSb0qzEqD1cCC0Hf9jFJ
+         sy8Q==
+X-Gm-Message-State: APjAAAX6WbVEW+xycJfhXEpWcGIfYt0lJBeIyXyH1Nyj7oMueiUnyq7Y
+        u+PkYzKoaPksKigFsEsP2dgzJowkOj7PCVwi/2faew==
+X-Google-Smtp-Source: APXvYqxNlSvg3UaFUbLQWR0iK/r3j7Gv5v3hDDaubdyjaqiiJPDkc5/m2Wnctz7S8wlPdCcPH9M+N/idA6WzQ2daIGU=
+X-Received: by 2002:a05:6830:4b9:: with SMTP id l25mr1808096otd.266.1575342271203;
+ Mon, 02 Dec 2019 19:04:31 -0800 (PST)
+MIME-Version: 1.0
+References: <CAAFE1bd9wuuobpe4VK7Ty175j7mWT+kRmHCNhVD+6R8MWEAqmw@mail.gmail.com>
+ <20191128015748.GA3277@ming.t460p> <CA+VdTb_-CGaPjKUQteKVFSGqDz-5o-tuRRkJYqt8B9iOQypiwQ@mail.gmail.com>
+ <20191128025822.GC3277@ming.t460p> <CAAFE1bfsXsKGyw7SU_z4NanT+wmtuJT=XejBYbHHMCDQwm73sw@mail.gmail.com>
+ <20191128091210.GC15549@ming.t460p> <CAAFE1beMkvyRctGqpffd3o_QtDH0CrmQSb=fV4GzqMUXWzPyOw@mail.gmail.com>
+ <20191203005849.GB25002@ming.t460p>
+In-Reply-To: <20191203005849.GB25002@ming.t460p>
+From:   Stephen Rust <srust@blockbridge.com>
+Date:   Mon, 2 Dec 2019 22:04:20 -0500
+Message-ID: <CAAFE1bcG8c1Q3iwh-LUjruBMAuFTJ4qWxNGsnhfKvGWHNLAeEQ@mail.gmail.com>
+Subject: Re: Data corruption in kernel 5.1+ with iSER attached ramdisk
+To:     Ming Lei <ming.lei@redhat.com>
 Cc:     Rob Townley <rob.townley@gmail.com>,
         Christoph Hellwig <hch@lst.de>, Jens Axboe <axboe@kernel.dk>,
         linux-block@vger.kernel.org, linux-rdma@vger.kernel.org,
         linux-scsi@vger.kernel.org, martin.petersen@oracle.com,
         target-devel@vger.kernel.org
-Subject: Re: Data corruption in kernel 5.1+ with iSER attached ramdisk
-Message-ID: <20191203005849.GB25002@ming.t460p>
-References: <CAAFE1bd9wuuobpe4VK7Ty175j7mWT+kRmHCNhVD+6R8MWEAqmw@mail.gmail.com>
- <20191128015748.GA3277@ming.t460p>
- <CA+VdTb_-CGaPjKUQteKVFSGqDz-5o-tuRRkJYqt8B9iOQypiwQ@mail.gmail.com>
- <20191128025822.GC3277@ming.t460p>
- <CAAFE1bfsXsKGyw7SU_z4NanT+wmtuJT=XejBYbHHMCDQwm73sw@mail.gmail.com>
- <20191128091210.GC15549@ming.t460p>
- <CAAFE1beMkvyRctGqpffd3o_QtDH0CrmQSb=fV4GzqMUXWzPyOw@mail.gmail.com>
-MIME-Version: 1.0
-In-Reply-To: <CAAFE1beMkvyRctGqpffd3o_QtDH0CrmQSb=fV4GzqMUXWzPyOw@mail.gmail.com>
-User-Agent: Mutt/1.12.1 (2019-06-15)
-X-Scanned-By: MIMEDefang 2.84 on 10.5.11.23
-X-MC-Unique: id8hnlJZMgy_H_WpJIWsrQ-1
-X-Mimecast-Spam-Score: 0
-Content-Type: text/plain; charset=us-ascii
-Content-Transfer-Encoding: quoted-printable
-Content-Disposition: inline
+Content-Type: text/plain; charset="UTF-8"
 Sender: linux-block-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-On Mon, Dec 02, 2019 at 01:42:15PM -0500, Stephen Rust wrote:
-> Hi Ming,
->=20
-> > I may get one machine with Mellanox NIC, is it easy to setup & reproduc=
-e
-> > just in the local machine(both host and target are setup on same machin=
-e)?
->=20
-> Yes, I have reproduced locally on one machine (using the IP address of
-> the Mellanox NIC as the target IP), with iser enabled on the target,
-> and iscsiadm connected via iser.
->=20
-> e.g.:
-> target:
-> /iscsi/iqn.20.../0.0.0.0:3260> enable_iser true
-> iSER enable now: True
->=20
->   | |   o- portals
-> .........................................................................=
-...........................
-> [Portals: 1]
->   | |     o- 0.0.0.0:3260
-> .........................................................................=
-..........................
-> [iser]
->=20
-> client:
-> # iscsiadm -m node -o update --targetname <target> -n
-> iface.transport_name -v iser
-> # iscsiadm -m node --targetname <target> --login
-> # iscsiadm -m session
-> iser: [3] 172.16.XX.XX:3260,1
-> iqn.2003-01.org.linux-iscsi.x8664:sn.c46c084919b0 (non-flash)
->=20
-> > Please try to trace bio_add_page() a bit via 'bpftrace ./ilo.bt'.
->=20
-> Here is the output of this trace from a failed run:
->=20
-> # bpftrace lio.bt
-> modprobe: FATAL: Module kheaders not found.
-> Attaching 3 probes...
-> 512 76
-> 4096 0
-> 4096 0
-> 4096 0
-> 4096 76
+Hi Ming,
 
-The above buffer might be the reason, 4096 is length, and 76 is the
-offset, that means the added buffer crosses two pages, meantime the
-buffer isn't aligned.
+The log you requested with the (arg4 & 512 != 0) predicate did not
+match anything. However, I checked specifically for the offset of "76"
+and came up with the following stack traces:
 
-We need to figure out why the magic 76 offset is passed from target or
-driver.
-
-Please install bcc and collect the following log:
-
-/usr/share/bcc/tools/trace -K 'bio_add_page ((arg4 & 512) !=3D 0) "%d %d", =
+# /usr/share/bcc/tools/trace -K 'bio_add_page ((arg4 == 76)) "%d %d",
 arg3, arg4 '
+PID     TID     COMM            FUNC             -
+7782    7782    kworker/19:1H   bio_add_page     512 76
+        bio_add_page+0x1 [kernel]
+        sbc_execute_rw+0x28 [kernel]
+        __target_execute_cmd+0x2e [kernel]
+        target_execute_cmd+0x1c1 [kernel]
+        iscsit_execute_cmd+0x1e7 [kernel]
+        iscsit_sequence_cmd+0xdc [kernel]
+        isert_recv_done+0x780 [kernel]
+        __ib_process_cq+0x78 [kernel]
+        ib_cq_poll_work+0x29 [kernel]
+        process_one_work+0x179 [kernel]
+        worker_thread+0x4f [kernel]
+        kthread+0x105 [kernel]
+        ret_from_fork+0x1f [kernel]
 
+14475   14475   kworker/13:1H   bio_add_page     4096 76
+        bio_add_page+0x1 [kernel]
+        sbc_execute_rw+0x28 [kernel]
+        __target_execute_cmd+0x2e [kernel]
+        target_execute_cmd+0x1c1 [kernel]
+        iscsit_execute_cmd+0x1e7 [kernel]
+        iscsit_sequence_cmd+0xdc [kernel]
+        isert_recv_done+0x780 [kernel]
+        __ib_process_cq+0x78 [kernel]
+        ib_cq_poll_work+0x29 [kernel]
+        process_one_work+0x179 [kernel]
+        worker_thread+0x4f [kernel]
+        kthread+0x105 [kernel]
+        ret_from_fork+0x1f [kernel]
 
 Thanks,
-Ming
+Steve
 
+On Mon, Dec 2, 2019 at 7:59 PM Ming Lei <ming.lei@redhat.com> wrote:
+>
+> On Mon, Dec 02, 2019 at 01:42:15PM -0500, Stephen Rust wrote:
+> > Hi Ming,
+> >
+> > > I may get one machine with Mellanox NIC, is it easy to setup & reproduce
+> > > just in the local machine(both host and target are setup on same machine)?
+> >
+> > Yes, I have reproduced locally on one machine (using the IP address of
+> > the Mellanox NIC as the target IP), with iser enabled on the target,
+> > and iscsiadm connected via iser.
+> >
+> > e.g.:
+> > target:
+> > /iscsi/iqn.20.../0.0.0.0:3260> enable_iser true
+> > iSER enable now: True
+> >
+> >   | |   o- portals
+> > ....................................................................................................
+> > [Portals: 1]
+> >   | |     o- 0.0.0.0:3260
+> > ...................................................................................................
+> > [iser]
+> >
+> > client:
+> > # iscsiadm -m node -o update --targetname <target> -n
+> > iface.transport_name -v iser
+> > # iscsiadm -m node --targetname <target> --login
+> > # iscsiadm -m session
+> > iser: [3] 172.16.XX.XX:3260,1
+> > iqn.2003-01.org.linux-iscsi.x8664:sn.c46c084919b0 (non-flash)
+> >
+> > > Please try to trace bio_add_page() a bit via 'bpftrace ./ilo.bt'.
+> >
+> > Here is the output of this trace from a failed run:
+> >
+> > # bpftrace lio.bt
+> > modprobe: FATAL: Module kheaders not found.
+> > Attaching 3 probes...
+> > 512 76
+> > 4096 0
+> > 4096 0
+> > 4096 0
+> > 4096 76
+>
+> The above buffer might be the reason, 4096 is length, and 76 is the
+> offset, that means the added buffer crosses two pages, meantime the
+> buffer isn't aligned.
+>
+> We need to figure out why the magic 76 offset is passed from target or
+> driver.
+>
+> Please install bcc and collect the following log:
+>
+> /usr/share/bcc/tools/trace -K 'bio_add_page ((arg4 & 512) != 0) "%d %d", arg3, arg4 '
+>
+>
+> Thanks,
+> Ming
+>
