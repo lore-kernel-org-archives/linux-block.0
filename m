@@ -2,79 +2,178 @@ Return-Path: <SRS0=81jf=ZZ=vger.kernel.org=linux-block-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-2.0 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
-	HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,
-	USER_AGENT_SANE_1 autolearn=no autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-3.9 required=3.0 tests=DKIM_SIGNED,DKIM_VALID,
+	DKIM_VALID_AU,HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,
+	SPF_HELO_NONE,SPF_PASS autolearn=no autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 6EF72C43215
-	for <linux-block@archiver.kernel.org>; Tue,  3 Dec 2019 13:06:14 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 74D3AC432C0
+	for <linux-block@archiver.kernel.org>; Tue,  3 Dec 2019 13:34:58 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.kernel.org (Postfix) with ESMTP id 3CC9720640
-	for <linux-block@archiver.kernel.org>; Tue,  3 Dec 2019 13:06:14 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id 37BE22073B
+	for <linux-block@archiver.kernel.org>; Tue,  3 Dec 2019 13:34:58 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (2048-bit key) header.d=infradead.org header.i=@infradead.org header.b="ENkvTP7/"
+	dkim=pass (2048-bit key) header.d=linaro.org header.i=@linaro.org header.b="ncYaZ0A+"
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1726024AbfLCNGN (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Tue, 3 Dec 2019 08:06:13 -0500
-Received: from bombadil.infradead.org ([198.137.202.133]:52208 "EHLO
-        bombadil.infradead.org" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1725954AbfLCNGN (ORCPT
-        <rfc822;linux-block@vger.kernel.org>); Tue, 3 Dec 2019 08:06:13 -0500
-DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed;
-        d=infradead.org; s=bombadil.20170209; h=In-Reply-To:Content-Type:MIME-Version
-        :References:Message-ID:Subject:Cc:To:From:Date:Sender:Reply-To:
-        Content-Transfer-Encoding:Content-ID:Content-Description:Resent-Date:
-        Resent-From:Resent-Sender:Resent-To:Resent-Cc:Resent-Message-ID:List-Id:
-        List-Help:List-Unsubscribe:List-Subscribe:List-Post:List-Owner:List-Archive;
-         bh=nB+RFuMx6p+ckuFU7XT4n9LRqqE+cpEgvTBUwrwJ8BQ=; b=ENkvTP7/SADn+Vrs/m/95i8on
-        Q0D1kUNIgud/Ip202gJZ1OHdzB+AA034RXVtOjN+em2vaxQEBAvHVcdycQgD8kvUccbDV1Kqgdo6f
-        NaxTzcU/Siv1d7Sz62ZScvTBWMtDw+7ev8vVcSMXAtNN5s7g9F/2MKSuJ1Jhpw6lW+Ishw3iq2/Nj
-        XX1ou+pTsQbCWcVAVEX3AnREDHqHPFW2cK5EnfRwVfO6AlPDXq3h62LMTbAltYgERyM1CLJmjp65o
-        qWtnzXwPqwvCzQ9/NuED3R3xuUbieb9bUX7yffTTJN2GIJ+2eEKle7x4ODrtkazFc2lEQPUS8no6Z
-        5ienkSB/A==;
-Received: from hch by bombadil.infradead.org with local (Exim 4.92.3 #3 (Red Hat Linux))
-        id 1ic7sX-0000aC-BW; Tue, 03 Dec 2019 13:06:09 +0000
-Date:   Tue, 3 Dec 2019 05:06:09 -0800
-From:   Christoph Hellwig <hch@infradead.org>
-To:     Jisheng Zhang <Jisheng.Zhang@synaptics.com>
-Cc:     Christoph Hellwig <hch@infradead.org>,
-        Jun Nie <jun.nie@linaro.org>,
-        "ulf.hansson@linaro.org" <ulf.hansson@linaro.org>,
-        "robh+dt@kernel.org" <robh+dt@kernel.org>,
-        "mark.rutland@arm.com" <mark.rutland@arm.com>,
-        "adrian.hunter@intel.com" <adrian.hunter@intel.com>,
-        "linux-mmc@vger.kernel.org" <linux-mmc@vger.kernel.org>,
-        "devicetree@vger.kernel.org" <devicetree@vger.kernel.org>,
-        "linux-block@vger.kernel.org" <linux-block@vger.kernel.org>,
-        "linux-ide@vger.kernel.org" <linux-ide@vger.kernel.org>
-Subject: Re: [PATCH 4/4] mmc: sdhci: Add DMA memory boundary workaround
-Message-ID: <20191203130609.GA2144@infradead.org>
-References: <20191202144104.5069-1-jun.nie@linaro.org>
- <20191202144104.5069-5-jun.nie@linaro.org>
- <20191203103320.273a7309@xhacker.debian>
- <CABymUCMVi_N2Mt82YDt7wrys4Z_vnXYEu15-YBa+S1CejT9iZw@mail.gmail.com>
- <20191203165123.4e6f9e28@xhacker.debian>
- <20191203091824.GA4685@infradead.org>
- <20191203172434.39b2c2c2@xhacker.debian>
+        id S1726107AbfLCNe5 (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Tue, 3 Dec 2019 08:34:57 -0500
+Received: from mail-lj1-f193.google.com ([209.85.208.193]:42333 "EHLO
+        mail-lj1-f193.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S1726105AbfLCNe5 (ORCPT
+        <rfc822;linux-block@vger.kernel.org>); Tue, 3 Dec 2019 08:34:57 -0500
+Received: by mail-lj1-f193.google.com with SMTP id e28so3806132ljo.9
+        for <linux-block@vger.kernel.org>; Tue, 03 Dec 2019 05:34:55 -0800 (PST)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=linaro.org; s=google;
+        h=mime-version:references:in-reply-to:from:date:message-id:subject:to
+         :cc;
+        bh=kynqR1nbDFIkNKzP6Rkxf3MwtpXbGnrKe/XIiwd66B8=;
+        b=ncYaZ0A+JzkeM+ueWb7Kifpkxut0gtLLA1cbU1CdBhq8424ouIPeYcI8VrlUIZi2HK
+         ARuI9iS9mt9y1I2Wo0vzJ2wi8CrOnKV0UdWPOs1279yY+FtKokdBqoyts4c4cDI01F+i
+         hlxmeVO07Cs7w6gy5eVtSxPZQzb7yoeadp4A2qQ2Uv3F4W7Wy7CU7vOPY3A4jLu/XE+R
+         0re4qP/VHYbQ77R6oAx5r4E/U7/iTFiMyF/Muec79DsknnWcCLJ96uUmvv5gyjeC0Jdt
+         joEACFNe/3rxV3zC1kHfAv6q+0T0vnLD3bAXlJ/3mIBP1UbDBFTkWAQt0l7++SyIbWZA
+         G3uA==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20161025;
+        h=x-gm-message-state:mime-version:references:in-reply-to:from:date
+         :message-id:subject:to:cc;
+        bh=kynqR1nbDFIkNKzP6Rkxf3MwtpXbGnrKe/XIiwd66B8=;
+        b=swRIUoSO27KePIEBNWKqVJcQMZUdKXVPU59LR18RcqWGmbGB5P1ezUmqRC719Sv4ib
+         UOoDNGEcIP4FBB3kz/m4wd0cUTdqYV4lLu5GswTRjseiID1c9DGSymYlQH2juoPayRO1
+         VaXUUhKLFJM81/Gonw2BukwyjiVszdRf0PM05obvACSwTf9AnLxmSMB1KyeLtsp1abnQ
+         89nloj+Ze4orXDd8i3+btv6PHa8FGg2l3qjFoeFMkhU18i5R0E2gA4hRGyz9P3D7lpgd
+         De4PQMNo09NVLan9Xm6gBSET9Pa2kqt4IZAO1H0wWuNGV5583LXEnwv7ejo8kqfKmm/M
+         6LaQ==
+X-Gm-Message-State: APjAAAVyC/ZSORdqApw8y959CZhdPa1VNm8LBxWNuBHJVzNTv2MPOE/z
+        8tloo5Q6b/xjf7gdjWIfsuVixtFfOW9o5ChK/ah7jA==
+X-Google-Smtp-Source: APXvYqyfksBIvduXxfZXQ1244/HfjibHAUIU18bKSJ12ttxuchYS0O2dIXjWalUWt92xwMvRluPOyqvnjHwrfiIu7y0=
+X-Received: by 2002:a2e:9a51:: with SMTP id k17mr1975431ljj.206.1575380094771;
+ Tue, 03 Dec 2019 05:34:54 -0800 (PST)
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <20191203172434.39b2c2c2@xhacker.debian>
-User-Agent: Mutt/1.12.1 (2019-06-15)
-X-SRS-Rewrite: SMTP reverse-path rewritten from <hch@infradead.org> by bombadil.infradead.org. See http://www.infradead.org/rpr.html
+References: <20191114113153.GB4213@ming.t460p> <20191114235415.GL4614@dread.disaster.area>
+ <20191115010824.GC4847@ming.t460p> <20191115045634.GN4614@dread.disaster.area>
+ <20191115070843.GA24246@ming.t460p> <20191128094003.752-1-hdanton@sina.com>
+ <CAKfTPtA23ErKGCEJVmg6vk-QoufkiUM3NbXd31mZmKnuwbTkFw@mail.gmail.com>
+ <20191202024625.GD24512@ming.t460p> <20191202040256.GE2695@dread.disaster.area>
+ <CAKfTPtD8Q97qJ_+hdCXQRt=gy7k96XrhnFmGYP1G88YSFW0vNA@mail.gmail.com> <20191202235321.GJ2695@dread.disaster.area>
+In-Reply-To: <20191202235321.GJ2695@dread.disaster.area>
+From:   Vincent Guittot <vincent.guittot@linaro.org>
+Date:   Tue, 3 Dec 2019 14:34:43 +0100
+Message-ID: <CAKfTPtCX39HS5Qsqq4rjq=M_u25Wnu6xscmSbW=aEaqA6U-wLw@mail.gmail.com>
+Subject: Re: single aio thread is migrated crazily by scheduler
+To:     Dave Chinner <david@fromorbit.com>
+Cc:     Ming Lei <ming.lei@redhat.com>, Hillf Danton <hdanton@sina.com>,
+        linux-block <linux-block@vger.kernel.org>,
+        linux-fs <linux-fsdevel@vger.kernel.org>,
+        linux-xfs <linux-xfs@vger.kernel.org>,
+        linux-kernel <linux-kernel@vger.kernel.org>,
+        Christoph Hellwig <hch@lst.de>, Jens Axboe <axboe@kernel.dk>,
+        Peter Zijlstra <peterz@infradead.org>,
+        Rong Chen <rong.a.chen@intel.com>, Tejun Heo <tj@kernel.org>
+Content-Type: text/plain; charset="UTF-8"
 Sender: linux-block-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-On Tue, Dec 03, 2019 at 09:49:49AM +0000, Jisheng Zhang wrote:
-> > As in exactly one boundary and not an alignment?  Where the one
-> > boundary is not a power of two and thus can't be expressed?
-> 
-> Take drivers/mmc/host/sdhci-of-dwcmshc.c for example, target physical DMA addr
-> can't span 128MB, 256MB, 128*3MB, ...128*nMB
-> 
-> I'm not sure whether blk_queue_segment_boundary could solve this limitation.
+On Tue, 3 Dec 2019 at 00:53, Dave Chinner <david@fromorbit.com> wrote:
+>
+> On Mon, Dec 02, 2019 at 02:45:42PM +0100, Vincent Guittot wrote:
+> > On Mon, 2 Dec 2019 at 05:02, Dave Chinner <david@fromorbit.com> wrote:
+> > >
+> > > On Mon, Dec 02, 2019 at 10:46:25AM +0800, Ming Lei wrote:
+> > > > On Thu, Nov 28, 2019 at 10:53:33AM +0100, Vincent Guittot wrote:
+> > > > > On Thu, 28 Nov 2019 at 10:40, Hillf Danton <hdanton@sina.com> wrote:
+> > > > > > --- a/fs/iomap/direct-io.c
+> > > > > > +++ b/fs/iomap/direct-io.c
+> > > > > > @@ -157,10 +157,8 @@ static void iomap_dio_bio_end_io(struct
+> > > > > >                         WRITE_ONCE(dio->submit.waiter, NULL);
+> > > > > >                         blk_wake_io_task(waiter);
+> > > > > >                 } else if (dio->flags & IOMAP_DIO_WRITE) {
+> > > > > > -                       struct inode *inode = file_inode(dio->iocb->ki_filp);
+> > > > > > -
+> > > > > >                         INIT_WORK(&dio->aio.work, iomap_dio_complete_work);
+> > > > > > -                       queue_work(inode->i_sb->s_dio_done_wq, &dio->aio.work);
+> > > > > > +                       schedule_work(&dio->aio.work);
+> > > > >
+> > > > > I'm not sure that this will make a real difference because it ends up
+> > > > > to call queue_work(system_wq, ...) and system_wq is bounded as well so
+> > > > > the work will still be pinned to a CPU
+> > > > > Using system_unbound_wq should make a difference because it doesn't
+> > > > > pin the work on a CPU
+> > > > >  +                       queue_work(system_unbound_wq, &dio->aio.work);
+> > > >
+> > > > Indeed, just run a quick test on my KVM guest, looks the following patch
+> > > > makes a difference:
+> > > >
+> > > > diff --git a/fs/direct-io.c b/fs/direct-io.c
+> > > > index 9329ced91f1d..2f4488b0ecec 100644
+> > > > --- a/fs/direct-io.c
+> > > > +++ b/fs/direct-io.c
+> > > > @@ -613,7 +613,8 @@ int sb_init_dio_done_wq(struct super_block *sb)
+> > > >  {
+> > > >         struct workqueue_struct *old;
+> > > >         struct workqueue_struct *wq = alloc_workqueue("dio/%s",
+> > > > -                                                     WQ_MEM_RECLAIM, 0,
+> > > > +                                                     WQ_MEM_RECLAIM |
+> > > > +                                                     WQ_UNBOUND, 0,
+> > > >                                                       sb->s_id);
+> > >
+> > > That's not an answer to the user task migration issue.
+> > >
+> > > That is, all this patch does is trade user task migration when the
+> > > CPU is busy for migrating all the queued work off the CPU so the
+> > > user task does not get migrated. IOWs, this forces all the queued
+> > > work to be migrated rather than the user task. IOWs, it does not
+> > > address the issue we've exposed in the scheduler between tasks with
+> > > competing CPU affinity scheduling requirements - it just hides the
+> > > symptom.
+> > >
+> > > Maintaining CPU affinity across dispatch and completion work has
+> > > been proven to be a significant performance win. Right throughout
+> > > the IO stack we try to keep this submitter/completion affinity,
+> > > and that's the whole point of using a bound wq in the first place:
+> > > efficient delayed batch processing of work on the local CPU.
+> >
+> > Do you really want to target the same CPU ? looks like what you really
+> > want to target the same cache instead
+>
+> Well, yes, ideally we want to target the same cache, but we can't do
+> that with workqueues.
 
-That is exaxtly the kind of limitation blk_queue_segment_boundary is
-intended for.
+Yes, this seems to be your main problem IMHO. You want to stay on the
+same cache and the only way to do so it to pin the work on one single
+CPU. But by doing so and increasing sched_wakeup_granularity_ns, the
+scheduler detects an imbalanced state because of pinned task that it
+wants to fix.
+Being able to set the work on a cpumask that covers the cache would be
+the solution so the scheduler would be able to select an idle CPU that
+share the cache instead of being pinned to a CPU
+
+>
+> However, the block layer already does that same-cache steering for
+> it's directed completions (see __blk_mq_complete_request()), so we
+> are *already running in a "hot cache" CPU context* when we queue
+> work. When we queue to the same CPU, we are simply maintaining the
+> "cache-hot" context that we are already running in.
+>
+> Besides, selecting a specific "hot cache" CPU and bind the work to
+> that CPU (via queue_work_on()) doesn't fix the scheduler problem -
+> it just moves it to another CPU. If the destination CPU is loaded
+> like the local CPU, then it's jsut going to cause migrations on the
+> destination CPU instead of the local CPU.
+>
+> IOWs, this is -not a fix- for the scheduler making an incorrect
+> migration decisions when we are mixing bound and unbound tasks on
+> the local run queue. Yes, it will hide the problem from this
+> specific workload instance but it doesn't fix it. We'll just hit it
+> under heavier load, such as when production workloads start running
+> AIO submission from tens of CPUs at a time while burning near 100%
+> CPU in userspace.......
+>
+> Cheers,
+>
+> Dave.
+> --
+> Dave Chinner
+> david@fromorbit.com
