@@ -2,218 +2,160 @@ Return-Path: <SRS0=81jf=ZZ=vger.kernel.org=linux-block-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-9.6 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
-	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,
-	SPF_HELO_NONE,SPF_PASS,USER_AGENT_GIT autolearn=ham autolearn_force=no
-	version=3.4.0
+X-Spam-Status: No, score=-0.4 required=3.0 tests=DKIM_SIGNED,DKIM_VALID,
+	DKIM_VALID_AU,HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,PDS_BTC_ID,
+	SPF_HELO_NONE,SPF_PASS autolearn=no autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 91B28C432C0
-	for <linux-block@archiver.kernel.org>; Tue,  3 Dec 2019 09:39:30 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 5506BC432C0
+	for <linux-block@archiver.kernel.org>; Tue,  3 Dec 2019 09:45:58 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.kernel.org (Postfix) with ESMTP id 6690920661
-	for <linux-block@archiver.kernel.org>; Tue,  3 Dec 2019 09:39:30 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id 2A1052064B
+	for <linux-block@archiver.kernel.org>; Tue,  3 Dec 2019 09:45:58 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (2048-bit key) header.d=infradead.org header.i=@infradead.org header.b="AYpVquDd"
+	dkim=pass (2048-bit key) header.d=linaro.org header.i=@linaro.org header.b="xTItXRhl"
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1726182AbfLCJj3 (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Tue, 3 Dec 2019 04:39:29 -0500
-Received: from bombadil.infradead.org ([198.137.202.133]:33160 "EHLO
-        bombadil.infradead.org" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1726115AbfLCJj3 (ORCPT
-        <rfc822;linux-block@vger.kernel.org>); Tue, 3 Dec 2019 04:39:29 -0500
-DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed;
-        d=infradead.org; s=bombadil.20170209; h=Content-Transfer-Encoding:
-        MIME-Version:References:In-Reply-To:Message-Id:Date:Subject:Cc:To:From:Sender
-        :Reply-To:Content-Type:Content-ID:Content-Description:Resent-Date:Resent-From
-        :Resent-Sender:Resent-To:Resent-Cc:Resent-Message-ID:List-Id:List-Help:
-        List-Unsubscribe:List-Subscribe:List-Post:List-Owner:List-Archive;
-        bh=Tld7yeuyFzA1rKT+6njc/e7upZje2HvkNA0/lhtjung=; b=AYpVquDdaR80Q8mXlCflpdMaS/
-        +XKV25/4CARhT1oI2q5PMmtah1sNmGrL7xjku5mQmVC0vgj5Cm08+5myhLsqdSFYFXzZn1ucoSO1N
-        prgLJ3AmYWt0faO+TR0Q+6MsbAo2MZTJDV/KilKn+P70uvW/xabjHKkCweDSzx9rf2448BvZBbY0W
-        gTL5wjqrE2PoYud20ffOulT0f3w+S33RQpYmTA3Di6ltcA3V4j7jJdpDyS7iUqRAE1/QedbOrf/Mm
-        LllovtJngGgxUMfdUIgOWcLdjcGQDKWhPitywgDkJnGwcgerS/BpvRtD+M58x9iEHp55fbhV97NXP
-        Y0gl/X6g==;
-Received: from clnet-p19-102.ikbnet.co.at ([83.175.77.102] helo=localhost)
-        by bombadil.infradead.org with esmtpsa (Exim 4.92.3 #3 (Red Hat Linux))
-        id 1ic4eW-0002AR-OH; Tue, 03 Dec 2019 09:39:29 +0000
-From:   Christoph Hellwig <hch@lst.de>
-To:     Jens Axboe <axboe@kernel.dk>
-Cc:     Damien Le Moal <Damien.LeMoal@wdc.com>,
-        Hans Holmberg <hans@owltronix.com>, linux-block@vger.kernel.org
-Subject: [PATCH 8/8] block: set the zone size in blk_revalidate_disk_zones atomically
-Date:   Tue,  3 Dec 2019 10:39:08 +0100
-Message-Id: <20191203093908.24612-9-hch@lst.de>
-X-Mailer: git-send-email 2.20.1
-In-Reply-To: <20191203093908.24612-1-hch@lst.de>
-References: <20191203093908.24612-1-hch@lst.de>
+        id S1725774AbfLCJpx (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Tue, 3 Dec 2019 04:45:53 -0500
+Received: from mail-lj1-f169.google.com ([209.85.208.169]:41165 "EHLO
+        mail-lj1-f169.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S1725773AbfLCJpw (ORCPT
+        <rfc822;linux-block@vger.kernel.org>); Tue, 3 Dec 2019 04:45:52 -0500
+Received: by mail-lj1-f169.google.com with SMTP id h23so2981390ljc.8
+        for <linux-block@vger.kernel.org>; Tue, 03 Dec 2019 01:45:51 -0800 (PST)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=linaro.org; s=google;
+        h=mime-version:references:in-reply-to:from:date:message-id:subject:to
+         :cc;
+        bh=neTWFwuJR4Jukr2kV185rqamwxRtM5mkOfSfynGkp0Q=;
+        b=xTItXRhlAS9cxWUEh9q8wXyZXw8qmon9lBOU+YKk3+jsr5zYrJpuOg82lsWCWE9x9X
+         5ADlxer0aiEW2iYzfNSLNiOj63PrR3F1nhK2PdD9hq2kxZiTHUou7Za4v3ekOJ7tCxNy
+         uRMpB5tImy3zbNIFsWsk4L7/gH0FrKa1N+yCJoJNBcz+PC4S+b23G+oB15oopcBSChz8
+         vw7VojQo7xfiSfrnHHarbkiSjhP5VOgbvWWWTzDRZWe8vebQavuihtriA4mlUGNONjmQ
+         +H1/t6RNLmdxVGu0iujLQM/DXgUOSvnjT5FObcWKUE4m/qL+FYOTUVsV0EepEalnzDnn
+         /Rnw==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20161025;
+        h=x-gm-message-state:mime-version:references:in-reply-to:from:date
+         :message-id:subject:to:cc;
+        bh=neTWFwuJR4Jukr2kV185rqamwxRtM5mkOfSfynGkp0Q=;
+        b=HdbdBjrwujRa/hsD5Xh/zmfyCa8ElhnVcLRzjXKFcy7+RE2dwyvLeMV1oEDZk6Co90
+         Ty0th/Dy6wI/x3J/+yUvfuk6PbEMeIhW4z4fzmxV5MJ6dZHOtjgd/qEgGkThucnw/TxQ
+         Aek3jPERUXy0v3eJkSSVhWZiZHMrw9NhBcg3NbDw7DD6qjoZrlxPJC49kTeSXb/jyXMA
+         lceIS5L4U5QbUwBlqBtetuKi0S6opxMvqvd6Uohp+jJKsmPoCJgHlqv734dDbEtphUbu
+         j3BI/nPboJSdFIRk784mtt6CDPMteuRvrC/cijJhNDcyaFTrcSZwVdltkguqYwmKWd47
+         DkNg==
+X-Gm-Message-State: APjAAAUQ5BlM5RdqfyzgXbVRd4R9rPrC4MF8j1jDHnChicSi0msiE11R
+        +bH6aP896/WYfxn6D+JHtumcQUntvfYSxmUKuDDz5A==
+X-Google-Smtp-Source: APXvYqxO6Zl+Be503YP0jAYAavrPaOI2DIRf25Dn1MebkTGcAo5eS2qEtOQyNDnZeVQ/ba9f3n7gueV/EICnAEhnbiU=
+X-Received: by 2002:a2e:9a51:: with SMTP id k17mr1372846ljj.206.1575366350405;
+ Tue, 03 Dec 2019 01:45:50 -0800 (PST)
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
-X-SRS-Rewrite: SMTP reverse-path rewritten from <hch@infradead.org> by bombadil.infradead.org. See http://www.infradead.org/rpr.html
+References: <20191114113153.GB4213@ming.t460p> <20191114235415.GL4614@dread.disaster.area>
+ <20191115010824.GC4847@ming.t460p> <20191115045634.GN4614@dread.disaster.area>
+ <20191115070843.GA24246@ming.t460p> <20191128094003.752-1-hdanton@sina.com>
+ <CAKfTPtA23ErKGCEJVmg6vk-QoufkiUM3NbXd31mZmKnuwbTkFw@mail.gmail.com>
+ <20191202024625.GD24512@ming.t460p> <20191202040256.GE2695@dread.disaster.area>
+ <CAKfTPtD8Q97qJ_+hdCXQRt=gy7k96XrhnFmGYP1G88YSFW0vNA@mail.gmail.com> <20191202212210.GA32767@lorien.usersys.redhat.com>
+In-Reply-To: <20191202212210.GA32767@lorien.usersys.redhat.com>
+From:   Vincent Guittot <vincent.guittot@linaro.org>
+Date:   Tue, 3 Dec 2019 10:45:38 +0100
+Message-ID: <CAKfTPtC7uycC3b2ngOFUqOh9-Fcz7h-151aaYJbLJFXrNq-gkw@mail.gmail.com>
+Subject: Re: single aio thread is migrated crazily by scheduler
+To:     Phil Auld <pauld@redhat.com>
+Cc:     Dave Chinner <david@fromorbit.com>, Ming Lei <ming.lei@redhat.com>,
+        Hillf Danton <hdanton@sina.com>,
+        linux-block <linux-block@vger.kernel.org>,
+        linux-fs <linux-fsdevel@vger.kernel.org>,
+        linux-xfs <linux-xfs@vger.kernel.org>,
+        linux-kernel <linux-kernel@vger.kernel.org>,
+        Christoph Hellwig <hch@lst.de>, Jens Axboe <axboe@kernel.dk>,
+        Peter Zijlstra <peterz@infradead.org>,
+        Rong Chen <rong.a.chen@intel.com>, Tejun Heo <tj@kernel.org>
+Content-Type: text/plain; charset="UTF-8"
 Sender: linux-block-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-The current zone revalidation code has a major problem in that it
-doesn't update the zone size and q->nr_zones atomically, leading
-to a short window where an out of bounds access to the zone arrays
-is possible.
+On Mon, 2 Dec 2019 at 22:22, Phil Auld <pauld@redhat.com> wrote:
+>
+> Hi Vincent,
+>
+> On Mon, Dec 02, 2019 at 02:45:42PM +0100 Vincent Guittot wrote:
+> > On Mon, 2 Dec 2019 at 05:02, Dave Chinner <david@fromorbit.com> wrote:
+>
+> ...
+>
+> > > So, we can fiddle with workqueues, but it doesn't address the
+> > > underlying issue that the scheduler appears to be migrating
+> > > non-bound tasks off a busy CPU too easily....
+> >
+> > The root cause of the problem is that the sched_wakeup_granularity_ns
+> > is in the same range or higher than load balance period. As Peter
+> > explained, This make the kworker waiting for the CPU for several load
+> > period and a transient unbalanced state becomes a stable one that the
+> > scheduler to fix. With default value, the scheduler doesn't try to
+> > migrate any task.
+>
+> There are actually two issues here.   With the high wakeup granularity
+> we get the user task actively migrated. This causes the significant
+> performance hit Ming was showing. With the fast wakeup_granularity
+> (or smaller IOs - 512 instead of 4k) we get, instead, the user task
+> migrated at wakeup to a new CPU for every IO completion.
 
-To fix this move the setting of the zone size into the crticial
-sections blk_revalidate_disk_zones so that it gets updated together
-with the zone bitmaps and q->nr_zones.  This also slightly simplifies
-the caller as it deducts the zone size from the report_zones.
+Ok, I haven't noticed that this one was a problem too. Do we have perf
+regression ?
 
-This change also allows to check for a power of two zone size in generic
-code.
+>
+> This is the 11k migrations per sec doing 11k iops.  In this test it
+> is not by itself causing the measured performance issue. It generally
+> flips back and forth between 2 cpus for large periods. I think it is
+> crossing cache boundaries at times (but I have not looked closely
+> at the traces compared to the topology, yet).
 
-Reported-by: Hans Holmberg <hans@owltronix.com>
-Signed-off-by: Christoph Hellwig <hch@lst.de>
----
- block/blk-zoned.c             | 59 ++++++++++++++++++++---------------
- drivers/block/null_blk_main.c |  3 +-
- drivers/scsi/sd_zbc.c         |  2 --
- 3 files changed, 35 insertions(+), 29 deletions(-)
+At task wake up, scheduler compares local and previous CPU to decide
+where to place the task and will then try to find an idle one which
+shares cache so I don't expect that it will cross cache boundary as
+local and previous are in your case.
 
-diff --git a/block/blk-zoned.c b/block/blk-zoned.c
-index 51d427659ce7..d00fcfd71dfe 100644
---- a/block/blk-zoned.c
-+++ b/block/blk-zoned.c
-@@ -343,6 +343,7 @@ struct blk_revalidate_zone_args {
- 	unsigned long	*conv_zones_bitmap;
- 	unsigned long	*seq_zones_wlock;
- 	unsigned int	nr_zones;
-+	sector_t	zone_sectors;
- 	sector_t	sector;
- };
- 
-@@ -355,25 +356,33 @@ static int blk_revalidate_zone_cb(struct blk_zone *zone, unsigned int idx,
- 	struct blk_revalidate_zone_args *args = data;
- 	struct gendisk *disk = args->disk;
- 	struct request_queue *q = disk->queue;
--	sector_t zone_sectors = blk_queue_zone_sectors(q);
- 	sector_t capacity = get_capacity(disk);
- 
- 	/*
- 	 * All zones must have the same size, with the exception on an eventual
- 	 * smaller last zone.
- 	 */
--	if (zone->start + zone_sectors < capacity &&
--	    zone->len != zone_sectors) {
--		pr_warn("%s: Invalid zoned device with non constant zone size\n",
--			disk->disk_name);
--		return false;
--	}
-+	if (zone->start == 0) {
-+		if (zone->len == 0 || !is_power_of_2(zone->len)) {
-+			pr_warn("%s: Invalid zoned device with non power of two zone size (%llu)\n",
-+				disk->disk_name, zone->len);
-+			return -ENODEV;
-+		}
- 
--	if (zone->start + zone->len >= capacity &&
--	    zone->len > zone_sectors) {
--		pr_warn("%s: Invalid zoned device with larger last zone size\n",
--			disk->disk_name);
--		return -ENODEV;
-+		args->zone_sectors = zone->len;
-+		args->nr_zones = (capacity + zone->len - 1) >> ilog2(zone->len);
-+	} else if (zone->start + args->zone_sectors < capacity) {
-+		if (zone->len != args->zone_sectors) {
-+			pr_warn("%s: Invalid zoned device with non constant zone size\n",
-+				disk->disk_name);
-+			return -ENODEV;
-+		}
-+	} else {
-+		if (zone->len > args->zone_sectors) {
-+			pr_warn("%s: Invalid zoned device with larger last zone size\n",
-+				disk->disk_name);
-+			return -ENODEV;
-+		}
- 	}
- 
- 	/* Check for holes in the zone report */
-@@ -428,9 +437,9 @@ int blk_revalidate_disk_zones(struct gendisk *disk)
- 	struct request_queue *q = disk->queue;
- 	struct blk_revalidate_zone_args args = {
- 		.disk		= disk,
--		.nr_zones	= blkdev_nr_zones(disk),
- 	};
--	int ret = 0;
-+	unsigned int noio_flag;
-+	int ret;
- 
- 	if (WARN_ON_ONCE(!blk_queue_is_zoned(q)))
- 		return -EIO;
-@@ -438,24 +447,22 @@ int blk_revalidate_disk_zones(struct gendisk *disk)
- 		return -EIO;
- 
- 	/*
--	 * Ensure that all memory allocations in this context are done as
--	 * if GFP_NOIO was specified.
-+	 * Ensure that all memory allocations in this context are done as if
-+	 * GFP_NOIO was specified.
- 	 */
--	if (args.nr_zones) {
--		unsigned int noio_flag = memalloc_noio_save();
--
--		ret = disk->fops->report_zones(disk, 0, args.nr_zones,
--					       blk_revalidate_zone_cb, &args);
--		memalloc_noio_restore(noio_flag);
--	}
-+	noio_flag = memalloc_noio_save();
-+	ret = disk->fops->report_zones(disk, 0, UINT_MAX,
-+				       blk_revalidate_zone_cb, &args);
-+	memalloc_noio_restore(noio_flag);
- 
- 	/*
--	 * Install the new bitmaps, making sure the queue is stopped and
--	 * all I/Os are completed (i.e. a scheduler is not referencing the
--	 * bitmaps).
-+	 * Install the new bitmaps and update nr_zones only once the queue is
-+	 * stopped and all I/Os are completed (i.e. a scheduler is not
-+	 * referencing the bitmaps).
- 	 */
- 	blk_mq_freeze_queue(q);
- 	if (ret >= 0) {
-+		blk_queue_chunk_sectors(q, args.zone_sectors);
- 		q->nr_zones = args.nr_zones;
- 		swap(q->seq_zones_wlock, args.seq_zones_wlock);
- 		swap(q->conv_zones_bitmap, args.conv_zones_bitmap);
-diff --git a/drivers/block/null_blk_main.c b/drivers/block/null_blk_main.c
-index 068cd0ae6e2c..997b7dc095b9 100644
---- a/drivers/block/null_blk_main.c
-+++ b/drivers/block/null_blk_main.c
-@@ -1583,6 +1583,8 @@ static int null_gendisk_register(struct nullb *nullb)
- 			if (ret)
- 				return ret;
- 		} else {
-+			blk_queue_chunk_sectors(nullb->q,
-+					nullb->dev->zone_size_sects);
- 			nullb->q->nr_zones = blkdev_nr_zones(disk);
- 		}
- 	}
-@@ -1746,7 +1748,6 @@ static int null_add_dev(struct nullb_device *dev)
- 		if (rv)
- 			goto out_cleanup_blk_queue;
- 
--		blk_queue_chunk_sectors(nullb->q, dev->zone_size_sects);
- 		nullb->q->limits.zoned = BLK_ZONED_HM;
- 		blk_queue_flag_set(QUEUE_FLAG_ZONE_RESETALL, nullb->q);
- 		blk_queue_required_elevator_features(nullb->q,
-diff --git a/drivers/scsi/sd_zbc.c b/drivers/scsi/sd_zbc.c
-index 0e5ede48f045..27d72c1d4654 100644
---- a/drivers/scsi/sd_zbc.c
-+++ b/drivers/scsi/sd_zbc.c
-@@ -412,8 +412,6 @@ int sd_zbc_read_zones(struct scsi_disk *sdkp, unsigned char *buf)
- 		goto err;
- 
- 	/* The drive satisfies the kernel restrictions: set it up */
--	blk_queue_chunk_sectors(sdkp->disk->queue,
--			logical_to_sectors(sdkp->device, zone_blocks));
- 	blk_queue_flag_set(QUEUE_FLAG_ZONE_RESETALL, sdkp->disk->queue);
- 	blk_queue_required_elevator_features(sdkp->disk->queue,
- 					     ELEVATOR_F_ZBD_SEQ_WRITE);
--- 
-2.20.1
-
+>
+> The active balances are what really hurts in thie case but I agree
+> that seems to be a tuning problem.
+>
+>
+> Cheers,
+> Phil
+>
+>
+> >
+> > Then, I agree that having an ack close to the request makes sense but
+> > forcing it on the exact same CPU is too restrictive IMO. Being able to
+> > use another CPU on the same core should not harm the performance and
+> > may even improve it. And that may still be the case while CPUs share
+> > their cache.
+> >
+> > >
+> > > -Dave.
+> > >
+> > > [*] Pay attention to the WQ_POWER_EFFICIENT definition for a work
+> > > queue: it's designed for interrupt routines that defer work via work
+> > > queues to avoid doing work on otherwise idle CPUs. It does this by
+> > > turning the per-cpu wq into an unbound wq so that work gets
+> > > scheduled on a non-idle CPUs in preference to the local idle CPU
+> > > which can then remain in low power states.
+> > >
+> > > That's the exact opposite of what using WQ_UNBOUND ends up doing in
+> > > this IO completion context: it pushes the work out over idle CPUs
+> > > rather than keeping them confined on the already busy CPUs where CPU
+> > > affinity allows the work to be done quickly. So while WQ_UNBOUND
+> > > avoids the user task being migrated frequently, it results in the
+> > > work being spread around many more CPUs and we burn more power to do
+> > > the same work.
+> > >
+> > > --
+> > > Dave Chinner
+> > > david@fromorbit.com
+> >
+>
+> --
+>
