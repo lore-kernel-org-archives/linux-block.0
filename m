@@ -2,91 +2,209 @@ Return-Path: <SRS0=81jf=ZZ=vger.kernel.org=linux-block-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-2.2 required=3.0 tests=DKIM_SIGNED,DKIM_VALID,
-	HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,
-	USER_AGENT_SANE_1 autolearn=no autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-8.2 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
+	INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,
+	USER_AGENT_SANE_1 autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 8C4CCC432C3
-	for <linux-block@archiver.kernel.org>; Tue,  3 Dec 2019 14:37:08 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 8BB93C432C0
+	for <linux-block@archiver.kernel.org>; Tue,  3 Dec 2019 14:53:52 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.kernel.org (Postfix) with ESMTP id 58709205ED
-	for <linux-block@archiver.kernel.org>; Tue,  3 Dec 2019 14:37:08 +0000 (UTC)
-Authentication-Results: mail.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel-dk.20150623.gappssmtp.com header.i=@kernel-dk.20150623.gappssmtp.com header.b="a35jPxts"
+	by mail.kernel.org (Postfix) with ESMTP id 5F467207DD
+	for <linux-block@archiver.kernel.org>; Tue,  3 Dec 2019 14:53:52 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1726298AbfLCOhH (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Tue, 3 Dec 2019 09:37:07 -0500
-Received: from mail-io1-f66.google.com ([209.85.166.66]:42460 "EHLO
-        mail-io1-f66.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1725957AbfLCOhH (ORCPT
-        <rfc822;linux-block@vger.kernel.org>); Tue, 3 Dec 2019 09:37:07 -0500
-Received: by mail-io1-f66.google.com with SMTP id f82so3919388ioa.9
-        for <linux-block@vger.kernel.org>; Tue, 03 Dec 2019 06:37:07 -0800 (PST)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=kernel-dk.20150623.gappssmtp.com; s=20150623;
-        h=subject:to:references:from:message-id:date:user-agent:mime-version
-         :in-reply-to:content-language:content-transfer-encoding;
-        bh=qGRbXUbqd8Z04mtkdXBEuHQg2LkRCVP7LlXsnOJdoYc=;
-        b=a35jPxtshV8+pMg3W3CCCGSqlVGoB1OuQXVQZIKX5SfRQ/C6xoX3NgNI/KLPHUoz/+
-         frqVxdDd3L1rWzUg9Xsl4MbHtvgc6ts2mfVf38VPaGTBbusI4xrxHkxAP9kEjVCE9Q/3
-         nB/uItPGJVSLLETsjYO6iTi3UZrVPnFYzSG3iqJM7/qgb/lBYdm6DrrT79c14qRz7KC5
-         bolEx/oZAaESAAVP91g8jC6gLJUfJF0JK7Z2Y1U25ThPi7atVlWTVFy8//i68yx/LZAH
-         lCYEYn689f9WMK4hWVOQd/T4l7AcCjc8/BNr4inDpiUYCmTijK2PQ3Z9KiyscdgoI/bk
-         IiIg==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20161025;
-        h=x-gm-message-state:subject:to:references:from:message-id:date
-         :user-agent:mime-version:in-reply-to:content-language
-         :content-transfer-encoding;
-        bh=qGRbXUbqd8Z04mtkdXBEuHQg2LkRCVP7LlXsnOJdoYc=;
-        b=Ak8AsTQ2R0oFQqDsOTXmBACg4T152+9zTPmdymF4P/PDY0JzA05AcsAwpj0A5zVXSh
-         J+rtVTTUsZ5h9M+XQ4f00roDCOy7Cd07R82tEZpOSSn8nMnAFuQ/8XvcsIxj5+Sgx01f
-         Zq6QNfzhq63Op4GjbxqBSUsKvkhNScyS9yIjkJ6RSNZIVfc4bIbMIUJkOSrRbZzhJRJ5
-         cKr/Hdv7hM9Jv+SnfNzQbLzt+mcFUTNKfkJrw+TqlXY9Viey3qTm17bwAf1tobBzLenZ
-         mfYDHnC2S1SMzytYH+GppYU9+/Vh3BVSRQO5jvcJGC1kWOtaE9/XTQK6tlBqfAgXKl01
-         aTNg==
-X-Gm-Message-State: APjAAAXmWsKNjUlqNZZEgOH6aU8SA+pAco9NLl/OI6ZFs5TXptKTyL6k
-        FY0QFUkq6U7XQqfuQ0CgLwjbGQ==
-X-Google-Smtp-Source: APXvYqx7Se/ijQfs6J2k9GORA/0UsUMppOuD8JOSqRuCsVgQeEecviXe/bYZtk/e5A5YYZ3jIOqGnw==
-X-Received: by 2002:a6b:4e1a:: with SMTP id c26mr2364220iob.122.1575383826510;
-        Tue, 03 Dec 2019 06:37:06 -0800 (PST)
-Received: from [192.168.1.159] ([65.144.74.34])
-        by smtp.gmail.com with ESMTPSA id 3sm712249iow.71.2019.12.03.06.37.05
-        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
-        Tue, 03 Dec 2019 06:37:05 -0800 (PST)
-Subject: Re: [PATCH v2] block: optimise bvec_iter_advance()
-To:     Pavel Begunkov <asml.silence@gmail.com>, nivedita@alum.mit.edu,
-        linux-block@vger.kernel.org, linux-kernel@vger.kernel.org
-References: <cover.1575144884.git.asml.silence@gmail.com>
- <b1408bd6cc3f04fe22ce64f97174b6fbf9ffea40.1575144884.git.asml.silence@gmail.com>
-From:   Jens Axboe <axboe@kernel.dk>
-Message-ID: <4eb4a426-8180-ec2a-974b-2b8cdd5f285c@kernel.dk>
-Date:   Tue, 3 Dec 2019 07:37:04 -0700
-User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:68.0) Gecko/20100101
- Thunderbird/68.2.1
+        id S1726350AbfLCOxw (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Tue, 3 Dec 2019 09:53:52 -0500
+Received: from mx2.suse.de ([195.135.220.15]:47180 "EHLO mx1.suse.de"
+        rhost-flags-OK-OK-OK-FAIL) by vger.kernel.org with ESMTP
+        id S1725848AbfLCOxv (ORCPT <rfc822;linux-block@vger.kernel.org>);
+        Tue, 3 Dec 2019 09:53:51 -0500
+X-Virus-Scanned: by amavisd-new at test-mx.suse.de
+Received: from relay2.suse.de (unknown [195.135.220.254])
+        by mx1.suse.de (Postfix) with ESMTP id 83A8EB494;
+        Tue,  3 Dec 2019 14:53:48 +0000 (UTC)
+Subject: Re: [PATCH 03/11] blk-mq: rename blk_mq_update_tag_set_depth()
+To:     John Garry <john.garry@huawei.com>,
+        "Martin K. Petersen" <martin.petersen@oracle.com>
+Cc:     Jens Axboe <axboe@kernel.dk>, Christoph Hellwig <hch@lst.de>,
+        James Bottomley <james.bottomley@hansenpartnership.com>,
+        Ming Lei <ming.lei@redhat.com>, linux-scsi@vger.kernel.org,
+        linux-block@vger.kernel.org
+References: <20191202153914.84722-1-hare@suse.de>
+ <20191202153914.84722-4-hare@suse.de>
+ <fbc08f2a-e500-5e29-ccdc-c5a89be446dd@huawei.com>
+From:   Hannes Reinecke <hare@suse.de>
+Openpgp: preference=signencrypt
+Autocrypt: addr=hare@suse.de; prefer-encrypt=mutual; keydata=
+ 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
+ azzYF4VRJsdl+d0MCaSy8mUh
+Message-ID: <1ed59228-ad6b-bccc-ffa8-488ec2ee5801@suse.de>
+Date:   Tue, 3 Dec 2019 15:53:47 +0100
+User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:60.0) Gecko/20100101
+ Thunderbird/60.7.2
 MIME-Version: 1.0
-In-Reply-To: <b1408bd6cc3f04fe22ce64f97174b6fbf9ffea40.1575144884.git.asml.silence@gmail.com>
-Content-Type: text/plain; charset=utf-8; format=flowed
+In-Reply-To: <fbc08f2a-e500-5e29-ccdc-c5a89be446dd@huawei.com>
+Content-Type: text/plain; charset=utf-8
 Content-Language: en-US
-Content-Transfer-Encoding: 7bit
+Content-Transfer-Encoding: 8bit
 Sender: linux-block-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-On 11/30/19 1:23 PM, Pavel Begunkov wrote:
-> bvec_iter_advance() is quite popular, but compilers fail to do proper
-> alias analysis and optimise it good enough. The assembly is checked
-> for gcc 9.2, x86-64.
+On 12/3/19 3:30 PM, John Garry wrote:
+> On 02/12/2019 15:39, Hannes Reinecke wrote:
+>> The function does not set the depth, but rather transitions from
+>> shared to non-shared queues and vice versa.
+>> So rename it to blk_mq_update_tag_set_shared() to better reflect
+>> its purpose.
 > 
-> - remove @iter->bi_size from min(...), as it's always less than @bytes.
-> Modify at the beginning and forget about it.
+> We will probably need to split this patch into two, as we're doing more
+> than just renaming.
 > 
-> - the compiler isn't able to collapse memory dependencies and remove
-> writes in the loop. Help it by explicitely using local vars.
+> The prep patches could be picked up earlier if we're lucky.
+> 
+> Thanks,
+> John
+> 
+>>
+>> Signed-off-by: Hannes Reinecke <hare@suse.de>
+>> ---
+>>   block/blk-mq-tag.c | 18 ++++++++++--------
+>>   block/blk-mq.c     |  8 ++++----
+>>   2 files changed, 14 insertions(+), 12 deletions(-)
+>>
+>> diff --git a/block/blk-mq-tag.c b/block/blk-mq-tag.c
+>> index d7aa23c82dbf..f5009587e1b5 100644
+>> --- a/block/blk-mq-tag.c
+>> +++ b/block/blk-mq-tag.c
+>> @@ -440,24 +440,22 @@ static int bt_alloc(struct sbitmap_queue *bt,
+>> unsigned int depth,
+>>                          node);
+>>   }
+>>   -static struct blk_mq_tags *blk_mq_init_bitmap_tags(struct
+>> blk_mq_tags *tags,
+>> -                           int node, int alloc_policy)
+>> +static int blk_mq_init_bitmap_tags(struct blk_mq_tags *tags,
+>> +                   int node, int alloc_policy)
+>>   {
+>>       unsigned int depth = tags->nr_tags - tags->nr_reserved_tags;
+>>       bool round_robin = alloc_policy == BLK_TAG_ALLOC_RR;
+>>         if (bt_alloc(&tags->bitmap_tags, depth, round_robin, node))
+>> -        goto free_tags;
+>> +        return -ENOMEM;
+>>       if (bt_alloc(&tags->breserved_tags, tags->nr_reserved_tags,
+>> round_robin,
+>>                node))
+>>           goto free_bitmap_tags;
+>>   -    return tags;
+>> +    return 0;
+>>   free_bitmap_tags:
+>>       sbitmap_queue_free(&tags->bitmap_tags);
+>> -free_tags:
+>> -    kfree(tags);
+>> -    return NULL;
+>> +    return -ENOMEM;
+>>   }
+>>     struct blk_mq_tags *blk_mq_init_tags(unsigned int total_tags,
+>> @@ -478,7 +476,11 @@ struct blk_mq_tags *blk_mq_init_tags(unsigned int
+>> total_tags,
+>>       tags->nr_tags = total_tags;
+>>       tags->nr_reserved_tags = reserved_tags;
+>>   -    return blk_mq_init_bitmap_tags(tags, node, alloc_policy);
+>> +    if (blk_mq_init_bitmap_tags(tags, node, alloc_policy) < 0) {
+>> +        kfree(tags);
+>> +        tags = NULL;
+>> +    }
+>> +    return tags;
+>>   }
+>>     void blk_mq_free_tags(struct blk_mq_tags *tags)
+>> diff --git a/block/blk-mq.c b/block/blk-mq.c
+>> index 6b39cf0efdcd..91950d3e436a 100644
+>> --- a/block/blk-mq.c
+>> +++ b/block/blk-mq.c
+>> @@ -2581,8 +2581,8 @@ static void queue_set_hctx_shared(struct
+>> request_queue *q, bool shared)
+>>       }
+>>   }
+>>   -static void blk_mq_update_tag_set_depth(struct blk_mq_tag_set *set,
+>> -                    bool shared)
+>> +static void blk_mq_update_tag_set_shared(struct blk_mq_tag_set *set,
+>> +                     bool shared)
+>>   {
+>>       struct request_queue *q;
+>>   @@ -2605,7 +2605,7 @@ static void blk_mq_del_queue_tag_set(struct
+>> request_queue *q)
+>>           /* just transitioned to unshared */
+>>           set->flags &= ~BLK_MQ_F_TAG_QUEUE_SHARED;
+>>           /* update existing queue */
+>> -        blk_mq_update_tag_set_depth(set, false);
+>> +        blk_mq_update_tag_set_shared(set, false);
+>>       }
+>>       mutex_unlock(&set->tag_list_lock);
+>>       INIT_LIST_HEAD(&q->tag_set_list);
+>> @@ -2623,7 +2623,7 @@ static void blk_mq_add_queue_tag_set(struct
+>> blk_mq_tag_set *set,
+>>           !(set->flags & BLK_MQ_F_TAG_QUEUE_SHARED)) {
+>>           set->flags |= BLK_MQ_F_TAG_QUEUE_SHARED;
+>>           /* update existing queue */
+>> -        blk_mq_update_tag_set_depth(set, true);
+>> +        blk_mq_update_tag_set_shared(set, true);
+>>       }
+>>       if (set->flags & BLK_MQ_F_TAG_QUEUE_SHARED)
+>>           queue_set_hctx_shared(q, true);
+>>
+> 
+Hmm. That shouldn't have happened; I'm sure I've had it in two patches
+originally. Oh well.
 
-Applied, thanks.
+But I'd rather wait for feedback to my shared scheduler tag patch; guess
+that'll meet with some raise eyebrows ...
 
+Cheers,
+
+Hannes
 -- 
-Jens Axboe
-
+Dr. Hannes Reinecke		      Teamlead Storage & Networking
+hare@suse.de			                  +49 911 74053 688
+SUSE Software Solutions Germany GmbH, Maxfeldstr. 5, 90409 Nürnberg
+HRB 36809 (AG Nürnberg), GF: Felix Imendörffer
