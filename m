@@ -2,129 +2,97 @@ Return-Path: <SRS0=81jf=ZZ=vger.kernel.org=linux-block-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-0.8 required=3.0 tests=DKIM_SIGNED,DKIM_VALID,
-	HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS
-	autolearn=no autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-5.6 required=3.0 tests=DKIMWL_WL_HIGH,DKIM_SIGNED,
+	DKIM_VALID,DKIM_VALID_AU,INCLUDES_PATCH,MAILING_LIST_MULTI,SPF_HELO_NONE,
+	SPF_PASS,USER_AGENT_SANE_1 autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id D1E24C432C0
-	for <linux-block@archiver.kernel.org>; Tue,  3 Dec 2019 19:56:21 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id E9D24C432C0
+	for <linux-block@archiver.kernel.org>; Tue,  3 Dec 2019 21:00:20 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.kernel.org (Postfix) with ESMTP id 7DD2B2073F
-	for <linux-block@archiver.kernel.org>; Tue,  3 Dec 2019 19:56:21 +0000 (UTC)
-Authentication-Results: mail.kernel.org;
-	dkim=pass (2048-bit key) header.d=blockbridge-com.20150623.gappssmtp.com header.i=@blockbridge-com.20150623.gappssmtp.com header.b="wLTIGZ++"
+	by mail.kernel.org (Postfix) with ESMTP id B181D20803
+	for <linux-block@archiver.kernel.org>; Tue,  3 Dec 2019 21:00:20 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+	s=default; t=1575406820;
+	bh=gUysKusgzrFNmv+/8bGhsRzSuomY46abKCaaMeiovoo=;
+	h=Date:From:To:Cc:Subject:References:In-Reply-To:List-ID:From;
+	b=g166nZNoe7ohDSb7/vut4BorqNwrnWI2FGF/cRGKgEIca8jpAKGgPWW1c9UroKJ4b
+	 vPl+FSN9kW3hM5kfvH3IAC0AbgBWJEJj2t3tJUMclOXI4ySSe4j8PTLIQxJD5iuxfK
+	 l2fLDCvrV2RVEF9lwLxaJ4GTrarVRHrJsIiTgH5E=
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1727076AbfLCT4U (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Tue, 3 Dec 2019 14:56:20 -0500
-Received: from mail-ot1-f68.google.com ([209.85.210.68]:40048 "EHLO
-        mail-ot1-f68.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1726877AbfLCT4U (ORCPT
-        <rfc822;linux-block@vger.kernel.org>); Tue, 3 Dec 2019 14:56:20 -0500
-Received: by mail-ot1-f68.google.com with SMTP id i15so4079382oto.7
-        for <linux-block@vger.kernel.org>; Tue, 03 Dec 2019 11:56:20 -0800 (PST)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=blockbridge-com.20150623.gappssmtp.com; s=20150623;
-        h=mime-version:references:in-reply-to:from:date:message-id:subject:to
-         :cc;
-        bh=c2eSaP9cJhqPHyzDC8w3CbFx7JCZ6KKxOyraLwR9PhA=;
-        b=wLTIGZ++NbsJM2gFEzkW3jFKZShTPG1f0lsuIQOltlAXcRb5EdTwEBJEbZqvi56cYV
-         PxGHzJBqm2IUSJUdsJnmk+JX0dumKWOVdZo56piubBOVXekQKPppFIt64Nd1w467qyEE
-         RIcaiqRojms1cvrkcuLcWooyxWpal0suWcPT3OTSqHS3RpJzFukQBKDAkIWaUFG3fEHn
-         uWRLqYak21px3vZvwIXwHiydJOe6Uj1/z4PDOQxlJgF9+vZxpVVMPsb3OUBPAJy6FgFX
-         aCFMxshhUvyvHYW6naiBXQQ6k8gmWf/cJg/Ce+oSdkMWYIm9IPawU2/E2H564UQnyidg
-         MXqQ==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20161025;
-        h=x-gm-message-state:mime-version:references:in-reply-to:from:date
-         :message-id:subject:to:cc;
-        bh=c2eSaP9cJhqPHyzDC8w3CbFx7JCZ6KKxOyraLwR9PhA=;
-        b=P0Jg8NEp1lDfjXA5OVz7XrIh8FOaCzFEprmy6nGu/sssmq+jFF9tmEY0xoiO2kMR6t
-         zSAqXgMjLCFH/rbrhI3/tw2YUcZCvoTTAvBiMSpRuQtJ9FcdBDyH8qulPUV31/6OhyrE
-         JF/C1CRBbU24px1LKDwsVfTbCGVpb66iiQU5Ldus6akmY2Ehu4AmYAaquycXeA/T8/8c
-         RLg5NqzFb3sRorXaIF9nX7CmVodL0Uy4iVxzKOli/i1ELYYn/MkUiE1FdhawI77eNLZe
-         bsGbyzJCqKQxj0Ii8lZtut832xqRDYE5dlLJrKx6994AQn8b6b4tSiwuYJ0RFiWygcao
-         PjvA==
-X-Gm-Message-State: APjAAAUjv45Jiy1Gv4w85Ar9XTTfLK/ZZ5KWdDju6HvefKL4PNtGZ+aP
-        SarRyIkjytbq4S0374OsNmxdOcmAhMxPX3xdrMe9bA==
-X-Google-Smtp-Source: APXvYqwe49MzVy71zFCSDiZoF+VH7cE8Gtkn2FX6bQOskDctJh/Gw/DbDHrh82SW4A7nARSNeWI6ROO1GDn0hqM3dG4=
-X-Received: by 2002:a05:6830:58:: with SMTP id d24mr4555139otp.356.1575402979934;
- Tue, 03 Dec 2019 11:56:19 -0800 (PST)
+        id S1727295AbfLCVAU (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Tue, 3 Dec 2019 16:00:20 -0500
+Received: from mail.kernel.org ([198.145.29.99]:33532 "EHLO mail.kernel.org"
+        rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
+        id S1727244AbfLCVAT (ORCPT <rfc822;linux-block@vger.kernel.org>);
+        Tue, 3 Dec 2019 16:00:19 -0500
+Received: from redsun51.ssa.fujisawa.hgst.com (unknown [199.255.47.7])
+        (using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+        (No client certificate requested)
+        by mail.kernel.org (Postfix) with ESMTPSA id 4948820661;
+        Tue,  3 Dec 2019 21:00:18 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+        s=default; t=1575406819;
+        bh=gUysKusgzrFNmv+/8bGhsRzSuomY46abKCaaMeiovoo=;
+        h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
+        b=HFZAGB273MaQvRnX9KzBLfl6Bydel/BD5QAwWyH+xkDVzLB/D443T0bLL3rhGXBpK
+         ENbr7tNsMiwdo0PDs/ukfATW6Ucg6yKSNXYk3GSeTjpJPe8pl9HtLW4SPiH2MySWvG
+         DTcy4q5SGQd+KnEGOUCWOXLnf4imb8r5fVJl0a+g=
+Date:   Wed, 4 Dec 2019 06:00:15 +0900
+From:   Keith Busch <kbusch@kernel.org>
+To:     "Meneghini, John" <John.Meneghini@netapp.com>
+Cc:     Christoph Hellwig <hch@lst.de>, Sagi Grimberg <sagi@grimberg.me>,
+        "linux-nvme@lists.infradead.org" <linux-nvme@lists.infradead.org>,
+        Jen Axboe <axboe@kernel.dk>,
+        "linux-block@vger.kernel.org" <linux-block@vger.kernel.org>,
+        "Knight, Frederick" <Frederick.Knight@netapp.com>
+Subject: Re: [PATCH V2] nvme: Add support for ACRE Command Interrupted status
+Message-ID: <20191203210015.GA2691@redsun51.ssa.fujisawa.hgst.com>
+References: <8D7B5AD6-F195-4E80-8F24-9B42DE68F664@netapp.com>
+ <24E2530B-B88E-43E7-AFA2-4FDA417B6C1E@netapp.com>
 MIME-Version: 1.0
-References: <CA+VdTb_-CGaPjKUQteKVFSGqDz-5o-tuRRkJYqt8B9iOQypiwQ@mail.gmail.com>
- <20191128025822.GC3277@ming.t460p> <CAAFE1bfsXsKGyw7SU_z4NanT+wmtuJT=XejBYbHHMCDQwm73sw@mail.gmail.com>
- <20191128091210.GC15549@ming.t460p> <CAAFE1beMkvyRctGqpffd3o_QtDH0CrmQSb=fV4GzqMUXWzPyOw@mail.gmail.com>
- <20191203005849.GB25002@ming.t460p> <CAAFE1bcG8c1Q3iwh-LUjruBMAuFTJ4qWxNGsnhfKvGWHNLAeEQ@mail.gmail.com>
- <20191203031444.GB6245@ming.t460p> <CAAFE1besnb=HV4C_buORYpWbkXecmtybwX8d_Ka2NsKmiym53w@mail.gmail.com>
- <CAAFE1bfpUWCZrtR8v3S++0-+gi8DJ79X3e0XqDe93i8nuGTnNg@mail.gmail.com> <20191203124558.GA22805@ming.t460p>
-In-Reply-To: <20191203124558.GA22805@ming.t460p>
-From:   Stephen Rust <srust@blockbridge.com>
-Date:   Tue, 3 Dec 2019 14:56:08 -0500
-Message-ID: <CAAFE1bfB2Km+e=T0ahwq0r9BQrBMnSguQQ+y=yzYi3tursS+TQ@mail.gmail.com>
-Subject: Re: Data corruption in kernel 5.1+ with iSER attached ramdisk
-To:     Ming Lei <ming.lei@redhat.com>
-Cc:     Rob Townley <rob.townley@gmail.com>,
-        Christoph Hellwig <hch@lst.de>, Jens Axboe <axboe@kernel.dk>,
-        linux-block@vger.kernel.org, linux-rdma@vger.kernel.org,
-        linux-scsi@vger.kernel.org, martin.petersen@oracle.com,
-        target-devel@vger.kernel.org, Doug Ledford <dledford@redhat.com>,
-        Jason Gunthorpe <jgg@ziepe.ca>
-Content-Type: text/plain; charset="UTF-8"
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <24E2530B-B88E-43E7-AFA2-4FDA417B6C1E@netapp.com>
+User-Agent: Mutt/1.12.1 (2019-06-15)
 Sender: linux-block-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-Hi Ming,
+On Tue, Dec 03, 2019 at 05:38:04PM +0000, Meneghini, John wrote:
+> This is an update to say that I've tested this patch and it works as expected. 
+> 
+> When the controller returns a Command Interrupted status the request is avoids nvme_failover_req()
+> and goes down the nvme_retry_req() path where the CRD is implemented and the command is 
+> retried after a delay.
+> 
+> If the controllers returns Command Interrupted too many times, and nvme_req(req)->retries
+> runs down, this results in a device resource error returned to the block layer.  But I think we'll
+> have this problem with any error.  
 
-Thanks very much for the patch.
+Why is the controller returning the same error so many times? Are we
+not waiting the requested delay timed? If so, the controller told us
+retrying should be successful.
 
-> BTW, you may try the attached test patch. If the issue can be fixed by
-> this patch, that means it is really caused by un-aligned buffer, and
-> the iser driver needs to be fixed.
+It is possible we kick the requeue list early if one command error
+has a valid CRD, but a subsequent retryable command does not. Is that
+what's happening?
 
-I have tried the patch, and re-run the test. Results are mixed.
+I'm just concerned because if we just skip counting the retry, a broken
+device could have the driver retry the same command indefinitely, which
+often leaves a task in an uninterruptible sleep state forever.
 
-To recap, our test writes the last bytes of an iser attached iscsi
-device. The target device is a LIO iblock, backed by a brd ramdisk.
-The client does a simple `dd`, doing a seek to "size - offset" of the
-device, and writing a buffer of "length" which is equivalent to the
-offset.
+>     diff --git a/drivers/nvme/host/core.c b/drivers/nvme/host/core.c
+>     index 9696404a6182..24dc9ed1a11b 100644
+>     --- a/drivers/nvme/host/core.c
+>     +++ b/drivers/nvme/host/core.c
+>     @@ -230,6 +230,8 @@ static blk_status_t nvme_error_status(u16 status)
+>                     return BLK_STS_NEXUS;
+>             case NVME_SC_HOST_PATH_ERROR:
+>                     return BLK_STS_TRANSPORT;
+>     +       case NVME_SC_CMD_INTERRUPTED:
+>     +               return BLK_STS_DEV_RESOURCE;
 
-For example, to test a write at a 512 offset, seek to device "size -
-512", and write a length of data 512 bytes.
-
-WITHOUT the patch, writing data at the following offsets from the end
-of the device failed to write all the correct data (rather, the write
-succeeded, but reading the data back it was invalid):
-
-- failed: 512,1024, 2048, 4096, 8192
-
-Anything larger worked fine.
-
-WITH the patch applied, writing data up to an offset of 4096 all now
-worked and verified correctly. However, offsets between 4096 and 8192
-all still failed. I started at 512, and incremented by 512 all the way
-up to 16384. The following offsets all failed to verify the write:
-
-- failed: 4608, 5120, 5632, 6144, 6656, 7168, 7680, 8192
-
-Anything larger continues to work fine with the patch.
-
-As an example, for the failed 8192 case, the `bpftrace lio.bt` trace shows:
-
-8192 76
-4096 0
-4096 0
-8192 76
-4096 0
-4096 0
-...
-[snip]
-
-What do you think are appropriate next steps? Do you think you have an
-idea on why the specific "multi-page bvec helpers" commit could have
-exposed this particular latent issue? Please let me know what else I
-can try, or additional data I can provide for you.
-
-Thanks,
-Steve
+Just for the sake of keeping this change isloted to nvme, perhaps use an
+existing blk_status_t value that already maps to not path error, like
+BLK_STS_TARGET.
