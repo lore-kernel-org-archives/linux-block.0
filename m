@@ -1,137 +1,175 @@
-Return-Path: <SRS0=81jf=ZZ=vger.kernel.org=linux-block-owner@kernel.org>
+Return-Path: <SRS0=bBnE=Z2=vger.kernel.org=linux-block-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-9.8 required=3.0 tests=DKIMWL_WL_HIGH,DKIM_SIGNED,
-	DKIM_VALID,HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,
-	SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,USER_AGENT_GIT autolearn=unavailable
-	autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-2.4 required=3.0 tests=DKIMWL_WL_HIGH,DKIM_SIGNED,
+	DKIM_VALID,DKIM_VALID_AU,HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,
+	SPF_HELO_NONE,SPF_PASS,USER_AGENT_SANE_1 autolearn=no autolearn_force=no
+	version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 9C4D7C432C3
-	for <linux-block@archiver.kernel.org>; Tue,  3 Dec 2019 23:02:01 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 08EEAC432C3
+	for <linux-block@archiver.kernel.org>; Wed,  4 Dec 2019 01:05:55 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.kernel.org (Postfix) with ESMTP id 65903207DD
-	for <linux-block@archiver.kernel.org>; Tue,  3 Dec 2019 23:02:01 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=default; t=1575414121;
-	bh=AkmH7/23k2qjTXz17Saidwk9VDL7TkNqlVi282KJW4M=;
-	h=From:To:Cc:Subject:Date:In-Reply-To:References:List-ID:From;
-	b=jWJqowS/QKWRdnmFOd1ytrXAzWLwp2nlakUnFznV+l8VjUT6Fvz85FuYHsSMDm0KI
-	 CMfFZO9O1dJWs+Oehem42+sN4Ag0dSExhZlbKolWaviMzYvgS3zdmIxpqfpC7RR9Q6
-	 3a+1v92tBMp3hjU/X6QQ9XW0OaYc6I8eD64wC72Q=
+	by mail.kernel.org (Postfix) with ESMTP id CCB9720684
+	for <linux-block@archiver.kernel.org>; Wed,  4 Dec 2019 01:05:54 +0000 (UTC)
+Authentication-Results: mail.kernel.org;
+	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="iXXvYYBM"
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1729578AbfLCWzd (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Tue, 3 Dec 2019 17:55:33 -0500
-Received: from mail.kernel.org ([198.145.29.99]:49942 "EHLO mail.kernel.org"
-        rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-        id S1729463AbfLCWzc (ORCPT <rfc822;linux-block@vger.kernel.org>);
-        Tue, 3 Dec 2019 17:55:32 -0500
-Received: from localhost (83-86-89-107.cable.dynamic.v4.ziggo.nl [83.86.89.107])
-        (using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+        id S1726549AbfLDBFy (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Tue, 3 Dec 2019 20:05:54 -0500
+Received: from us-smtp-2.mimecast.com ([207.211.31.81]:50944 "EHLO
+        us-smtp-delivery-1.mimecast.com" rhost-flags-OK-OK-OK-FAIL)
+        by vger.kernel.org with ESMTP id S1726060AbfLDBFx (ORCPT
+        <rfc822;linux-block@vger.kernel.org>);
+        Tue, 3 Dec 2019 20:05:53 -0500
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+        s=mimecast20190719; t=1575421553;
+        h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+         to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+         content-transfer-encoding:content-transfer-encoding:
+         in-reply-to:in-reply-to:references:references;
+        bh=mb2uA8H8LkeFlI3MZDn+f+z590eg/6oojJfUikjRY5I=;
+        b=iXXvYYBMQWghlTSe30ia8O6T8vkl65CF6NE5gpETqgsG1CboyHGx1LmtEV9pBzXfXInXhd
+        RST705aaGHcj33ldvkJWOrcAcfbeQPVmqdMB2xX7Sgu99LiuQpTNbMOt7Bf8BadatwZO6D
+        dLE4u62jHc+9YkGH18jn7IyMklzEe/I=
+Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
+ [209.132.183.4]) (Using TLS) by relay.mimecast.com with ESMTP id
+ us-mta-233-oxdtObirPLa0FlLmaJrW7g-1; Tue, 03 Dec 2019 20:05:50 -0500
+Received: from smtp.corp.redhat.com (int-mx07.intmail.prod.int.phx2.redhat.com [10.5.11.22])
+        (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
         (No client certificate requested)
-        by mail.kernel.org (Postfix) with ESMTPSA id AAA612053B;
-        Tue,  3 Dec 2019 22:55:30 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-        s=default; t=1575413731;
-        bh=AkmH7/23k2qjTXz17Saidwk9VDL7TkNqlVi282KJW4M=;
-        h=From:To:Cc:Subject:Date:In-Reply-To:References:From;
-        b=mLqk2UFaaQR6acGZfHCHkkUPiKFHi6zoPsNnaRILB27rCk3JMvZJXEmAjA4NxFcMD
-         hs+GKOQ9LZnKmkpQnr05gfn/SkT/hayOyNQiei2JJZKeFCNHRRVmj4lAw1XQ45b33p
-         ezRCFHgJvyIhgHUcP2U6GkEOO1uuwCteezKCToIA=
-From:   Greg Kroah-Hartman <gregkh@linuxfoundation.org>
-To:     linux-kernel@vger.kernel.org
-Cc:     Greg Kroah-Hartman <gregkh@linuxfoundation.org>,
-        stable@vger.kernel.org, Naresh Kamboju <naresh.kamboju@linaro.org>,
-        Christoph Hellwig <hch@lst.de>, Faiz Abbas <faiz_abbas@ti.com>,
-        linux-block@vger.kernel.org, Ming Lei <ming.lei@redhat.com>,
-        Ulf Hansson <ulf.hansson@linaro.org>,
-        Sasha Levin <sashal@kernel.org>
-Subject: [PATCH 4.19 240/321] mmc: core: align max segment size with logical block size
-Date:   Tue,  3 Dec 2019 23:35:06 +0100
-Message-Id: <20191203223439.627632861@linuxfoundation.org>
-X-Mailer: git-send-email 2.24.0
-In-Reply-To: <20191203223427.103571230@linuxfoundation.org>
-References: <20191203223427.103571230@linuxfoundation.org>
-User-Agent: quilt/0.66
+        by mimecast-mx01.redhat.com (Postfix) with ESMTPS id 4AD3218557C2;
+        Wed,  4 Dec 2019 01:05:42 +0000 (UTC)
+Received: from ming.t460p (ovpn-8-17.pek2.redhat.com [10.72.8.17])
+        by smtp.corp.redhat.com (Postfix) with ESMTPS id 6EEEF100194E;
+        Wed,  4 Dec 2019 01:05:34 +0000 (UTC)
+Date:   Wed, 4 Dec 2019 09:05:29 +0800
+From:   Ming Lei <ming.lei@redhat.com>
+To:     Stephen Rust <srust@blockbridge.com>
+Cc:     Rob Townley <rob.townley@gmail.com>,
+        Christoph Hellwig <hch@lst.de>, Jens Axboe <axboe@kernel.dk>,
+        linux-block@vger.kernel.org, linux-rdma@vger.kernel.org,
+        linux-scsi@vger.kernel.org, martin.petersen@oracle.com,
+        target-devel@vger.kernel.org, Doug Ledford <dledford@redhat.com>,
+        Jason Gunthorpe <jgg@ziepe.ca>
+Subject: Re: Data corruption in kernel 5.1+ with iSER attached ramdisk
+Message-ID: <20191204010529.GA3910@ming.t460p>
+References: <CAAFE1bfsXsKGyw7SU_z4NanT+wmtuJT=XejBYbHHMCDQwm73sw@mail.gmail.com>
+ <20191128091210.GC15549@ming.t460p>
+ <CAAFE1beMkvyRctGqpffd3o_QtDH0CrmQSb=fV4GzqMUXWzPyOw@mail.gmail.com>
+ <20191203005849.GB25002@ming.t460p>
+ <CAAFE1bcG8c1Q3iwh-LUjruBMAuFTJ4qWxNGsnhfKvGWHNLAeEQ@mail.gmail.com>
+ <20191203031444.GB6245@ming.t460p>
+ <CAAFE1besnb=HV4C_buORYpWbkXecmtybwX8d_Ka2NsKmiym53w@mail.gmail.com>
+ <CAAFE1bfpUWCZrtR8v3S++0-+gi8DJ79X3e0XqDe93i8nuGTnNg@mail.gmail.com>
+ <20191203124558.GA22805@ming.t460p>
+ <CAAFE1bfB2Km+e=T0ahwq0r9BQrBMnSguQQ+y=yzYi3tursS+TQ@mail.gmail.com>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=UTF-8
-Content-Transfer-Encoding: 8bit
+In-Reply-To: <CAAFE1bfB2Km+e=T0ahwq0r9BQrBMnSguQQ+y=yzYi3tursS+TQ@mail.gmail.com>
+User-Agent: Mutt/1.12.1 (2019-06-15)
+X-Scanned-By: MIMEDefang 2.84 on 10.5.11.22
+X-MC-Unique: oxdtObirPLa0FlLmaJrW7g-1
+X-Mimecast-Spam-Score: 0
+Content-Type: text/plain; charset=us-ascii
+Content-Transfer-Encoding: quoted-printable
+Content-Disposition: inline
 Sender: linux-block-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-From: Ming Lei <ming.lei@redhat.com>
+On Tue, Dec 03, 2019 at 02:56:08PM -0500, Stephen Rust wrote:
+> Hi Ming,
+>=20
+> Thanks very much for the patch.
+>=20
+> > BTW, you may try the attached test patch. If the issue can be fixed by
+> > this patch, that means it is really caused by un-aligned buffer, and
+> > the iser driver needs to be fixed.
+>=20
+> I have tried the patch, and re-run the test. Results are mixed.
+>=20
+> To recap, our test writes the last bytes of an iser attached iscsi
+> device. The target device is a LIO iblock, backed by a brd ramdisk.
+> The client does a simple `dd`, doing a seek to "size - offset" of the
+> device, and writing a buffer of "length" which is equivalent to the
+> offset.
+>=20
+> For example, to test a write at a 512 offset, seek to device "size -
+> 512", and write a length of data 512 bytes.
+>=20
+> WITHOUT the patch, writing data at the following offsets from the end
+> of the device failed to write all the correct data (rather, the write
+> succeeded, but reading the data back it was invalid):
+>=20
+> - failed: 512,1024, 2048, 4096, 8192
+>=20
+> Anything larger worked fine.
+>=20
+> WITH the patch applied, writing data up to an offset of 4096 all now
+> worked and verified correctly. However, offsets between 4096 and 8192
+> all still failed. I started at 512, and incremented by 512 all the way
+> up to 16384. The following offsets all failed to verify the write:
+>=20
+> - failed: 4608, 5120, 5632, 6144, 6656, 7168, 7680, 8192
+>=20
+> Anything larger continues to work fine with the patch.
+>=20
+> As an example, for the failed 8192 case, the `bpftrace lio.bt` trace show=
+s:
+>=20
+> 8192 76
+> 4096 0
+> 4096 0
+> 8192 76
+> 4096 0
+> 4096 0
+> ...
+> [snip]
+>=20
+> What do you think are appropriate next steps?
 
-[ Upstream commit c53336c8f5f29043fded57912cc06c24e12613d7 ]
+OK, my guess should be correct, and the issue is related with un-aligned
+bvec->bv_offset.
 
-Logical block size is the lowest possible block size that the storage
-device can address. Max segment size is often related with controller's
-DMA capability. And it is reasonable to align max segment size with
-logical block size.
+So firstly, I'd suggest to investigate from RDMA driver side to see why
+un-aligned buffer is passed to block layer.
 
-SDHCI sets un-aligned max segment size, and causes ADMA error, so
-fix it by aligning max segment size with logical block size.
+According to previous discussion, 512 aligned buffer should be provided
+to block layer.
 
-Reported-by: Naresh Kamboju <naresh.kamboju@linaro.org>
-Cc: Christoph Hellwig <hch@lst.de>
-Cc: Naresh Kamboju <naresh.kamboju@linaro.org>
-Cc: Faiz Abbas <faiz_abbas@ti.com>
-Cc: linux-block@vger.kernel.org
-Signed-off-by: Ming Lei <ming.lei@redhat.com>
-Signed-off-by: Ulf Hansson <ulf.hansson@linaro.org>
-Signed-off-by: Sasha Levin <sashal@kernel.org>
----
- drivers/mmc/core/block.c | 6 ------
- drivers/mmc/core/queue.c | 9 ++++++++-
- 2 files changed, 8 insertions(+), 7 deletions(-)
+So looks the driver needs to be fixed.
 
-diff --git a/drivers/mmc/core/block.c b/drivers/mmc/core/block.c
-index eee004fb3c3e3..527ab15c421f9 100644
---- a/drivers/mmc/core/block.c
-+++ b/drivers/mmc/core/block.c
-@@ -2384,12 +2384,6 @@ static struct mmc_blk_data *mmc_blk_alloc_req(struct mmc_card *card,
- 	snprintf(md->disk->disk_name, sizeof(md->disk->disk_name),
- 		 "mmcblk%u%s", card->host->index, subname ? subname : "");
- 
--	if (mmc_card_mmc(card))
--		blk_queue_logical_block_size(md->queue.queue,
--					     card->ext_csd.data_sector_size);
--	else
--		blk_queue_logical_block_size(md->queue.queue, 512);
--
- 	set_capacity(md->disk, size);
- 
- 	if (mmc_host_cmd23(card->host)) {
-diff --git a/drivers/mmc/core/queue.c b/drivers/mmc/core/queue.c
-index 18aae28845ec9..becc6594a8a47 100644
---- a/drivers/mmc/core/queue.c
-+++ b/drivers/mmc/core/queue.c
-@@ -355,6 +355,7 @@ static void mmc_setup_queue(struct mmc_queue *mq, struct mmc_card *card)
- {
- 	struct mmc_host *host = card->host;
- 	u64 limit = BLK_BOUNCE_HIGH;
-+	unsigned block_size = 512;
- 
- 	if (mmc_dev(host)->dma_mask && *mmc_dev(host)->dma_mask)
- 		limit = (u64)dma_max_pfn(mmc_dev(host)) << PAGE_SHIFT;
-@@ -368,7 +369,13 @@ static void mmc_setup_queue(struct mmc_queue *mq, struct mmc_card *card)
- 	blk_queue_max_hw_sectors(mq->queue,
- 		min(host->max_blk_count, host->max_req_size / 512));
- 	blk_queue_max_segments(mq->queue, host->max_segs);
--	blk_queue_max_segment_size(mq->queue, host->max_seg_size);
-+
-+	if (mmc_card_mmc(card))
-+		block_size = card->ext_csd.data_sector_size;
-+
-+	blk_queue_logical_block_size(mq->queue, block_size);
-+	blk_queue_max_segment_size(mq->queue,
-+			round_down(host->max_seg_size, block_size));
- 
- 	INIT_WORK(&mq->recovery_work, mmc_mq_recovery_handler);
- 	INIT_WORK(&mq->complete_work, mmc_blk_mq_complete_work);
--- 
-2.20.1
+> Do you think you have an
+> idea on why the specific "multi-page bvec helpers" commit could have
+> exposed this particular latent issue? Please let me know what else I
+> can try, or additional data I can provide for you.
+=20
+The patch might not cover the big offset case, could you collect bpftrace
+via the following script when you reproduce the issue with >4096 offset?
+
+kprobe:iblock_execute_rw
+{
+    @start[tid]=3D1;
+}
+
+kretprobe:iblock_execute_rw
+{
+    @start[tid]=3D0;
+}
+
+kprobe:bio_add_page
+/@start[tid]/
+{
+  printf("%d %d\n", arg2, arg3);
+}
+
+kprobe:brd_do_bvec
+{
+  printf("%d %d %d %d\n", arg2, arg3, arg4, arg5);
+}
 
 
+Thanks,
+Ming
 
