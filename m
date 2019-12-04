@@ -2,141 +2,131 @@ Return-Path: <SRS0=bBnE=Z2=vger.kernel.org=linux-block-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-2.2 required=3.0 tests=DKIM_SIGNED,DKIM_VALID,
-	HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,
-	USER_AGENT_SANE_2 autolearn=no autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-6.5 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
+	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,
+	SPF_HELO_NONE,SPF_PASS autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 2067FC0044D
-	for <linux-block@archiver.kernel.org>; Wed,  4 Dec 2019 07:12:10 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 27778C43603
+	for <linux-block@archiver.kernel.org>; Wed,  4 Dec 2019 09:56:20 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.kernel.org (Postfix) with ESMTP id DF09F2084F
-	for <linux-block@archiver.kernel.org>; Wed,  4 Dec 2019 07:11:09 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id EC86720803
+	for <linux-block@archiver.kernel.org>; Wed,  4 Dec 2019 09:56:19 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=pass (1024-bit key) header.d=Synaptics.onmicrosoft.com header.i=@Synaptics.onmicrosoft.com header.b="LG8g+Sey"
+	dkim=fail reason="signature verification failed" (2048-bit key) header.d=wdc.com header.i=@wdc.com header.b="gucdqSjo"
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1726508AbfLDHLJ (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Wed, 4 Dec 2019 02:11:09 -0500
-Received: from mail-bn7nam10on2054.outbound.protection.outlook.com ([40.107.92.54]:23361
-        "EHLO NAM10-BN7-obe.outbound.protection.outlook.com"
-        rhost-flags-OK-OK-OK-FAIL) by vger.kernel.org with ESMTP
-        id S1725958AbfLDHLI (ORCPT <rfc822;linux-block@vger.kernel.org>);
-        Wed, 4 Dec 2019 02:11:08 -0500
-ARC-Seal: i=1; a=rsa-sha256; s=arcselector9901; d=microsoft.com; cv=none;
- b=QK8ADGoMo20vUXHIQI4NBiobnJWOkoR6qZEDZdA7uxb7sI9rbEvAoicFfHYhkza4nEtdv+3FHlBdOJeyWNM/vVKymz9A2To9EYN58wnQcPpvlHXIdIwCNJKYEvR/ep66ihqaD9PrpbIZ5MX71LJGT6t5K0UYM/7Inj94VJmLcGjpv1DXmBRwGLth53yf6RsicbPj7EZvGtBcYWqoLXlOMFuS2Tl6cilzFH725glUQb3ZDrRUuucTpLR29SJcS134Nk+fJbuBBSxCHVVeMYFvyhDJOMyyaPPq7liDVB+k6QuDa+XYikGw5rffEGtdhXRHu7L6AhMNSdzuDGw9Ds2TsQ==
-ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com;
- s=arcselector9901;
- h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
- bh=5/L1s+6Zyyh0icNiqHibaC1USTb6zbT6Bd3LIiulJjQ=;
- b=Ou3wRTr2r/f5uc+DKSB9DuvSoC5kgMOafeCTpoMW5CsUiuankY5qJlzYzdDMoROnZmkRR+Hc0x/w9TW7SYQQXTQ2CtlT71cpydx2KmQ8zCoqbKWDAJhZ3JXZ1zZfZcS3M1Sp0dSkXlRqQMHgX8CpcTVqGmv0K2JkgrXy0aZT/pyC4NzN+gOhYOvYVF6jItzKAxTli5S8AV+dBKLFVGuUcpu3/REcgsq4W4L2yFbeBu/i8cucoeN58uNisDwr6v98nN2lTThRFE3DdWxKBmcgTpeeQ3ek9oSV6Yhms4/nAjlIGSiIOedJk6eVCgAe671pz1BchZMFYP5sxBQpOT45fA==
-ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass
- smtp.mailfrom=synaptics.com; dmarc=pass action=none
- header.from=synaptics.com; dkim=pass header.d=synaptics.com; arc=none
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
- d=Synaptics.onmicrosoft.com; s=selector2-Synaptics-onmicrosoft-com;
- h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
- bh=5/L1s+6Zyyh0icNiqHibaC1USTb6zbT6Bd3LIiulJjQ=;
- b=LG8g+SeyHIKJwd9AjIwXqZvdBWubqdwvvP562uzAfDwM80HrBkhskA9ccpyVJ9dxaJ7x0HFSYbp/TiKA1c5CWwpkVo/WT+etmPkWATHfiQKL7T8aLiqdoq6qKVktGBd+br1BbA/Qjg3VRQTZMe4FeUTyIa86DE+/ltybp4/akrU=
-Received: from BYAPR03MB4773.namprd03.prod.outlook.com (20.179.93.213) by
- BYAPR03MB3719.namprd03.prod.outlook.com (52.135.215.23) with Microsoft SMTP
- Server (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
- 15.20.2495.18; Wed, 4 Dec 2019 07:11:05 +0000
-Received: from BYAPR03MB4773.namprd03.prod.outlook.com
- ([fe80::708d:91cc:79a7:9b9a]) by BYAPR03MB4773.namprd03.prod.outlook.com
- ([fe80::708d:91cc:79a7:9b9a%6]) with mapi id 15.20.2495.014; Wed, 4 Dec 2019
- 07:11:04 +0000
-From:   Jisheng Zhang <Jisheng.Zhang@synaptics.com>
-To:     Christoph Hellwig <hch@infradead.org>
-CC:     Jun Nie <jun.nie@linaro.org>,
-        "ulf.hansson@linaro.org" <ulf.hansson@linaro.org>,
-        "robh+dt@kernel.org" <robh+dt@kernel.org>,
-        "mark.rutland@arm.com" <mark.rutland@arm.com>,
-        "adrian.hunter@intel.com" <adrian.hunter@intel.com>,
-        "linux-mmc@vger.kernel.org" <linux-mmc@vger.kernel.org>,
-        "devicetree@vger.kernel.org" <devicetree@vger.kernel.org>,
-        "linux-block@vger.kernel.org" <linux-block@vger.kernel.org>,
-        "linux-ide@vger.kernel.org" <linux-ide@vger.kernel.org>
-Subject: Re: [PATCH 4/4] mmc: sdhci: Add DMA memory boundary workaround
-Thread-Topic: [PATCH 4/4] mmc: sdhci: Add DMA memory boundary workaround
-Thread-Index: AQHVqR6bSNy8xcyAyESfm+a1vx+I5KensdkAgAAQtICAAFjjgIAAB4wAgAAE9QCAADqtgIABKzyA
-Date:   Wed, 4 Dec 2019 07:11:04 +0000
-Message-ID: <20191204145709.34e42f56@xhacker.debian>
-References: <20191202144104.5069-1-jun.nie@linaro.org>
-        <20191202144104.5069-5-jun.nie@linaro.org>
-        <20191203103320.273a7309@xhacker.debian>
-        <CABymUCMVi_N2Mt82YDt7wrys4Z_vnXYEu15-YBa+S1CejT9iZw@mail.gmail.com>
-        <20191203165123.4e6f9e28@xhacker.debian>
-        <20191203091824.GA4685@infradead.org>
-        <20191203172434.39b2c2c2@xhacker.debian>
-        <20191203130609.GA2144@infradead.org>
-In-Reply-To: <20191203130609.GA2144@infradead.org>
-Accept-Language: en-US
-Content-Language: en-US
-X-MS-Has-Attach: 
-X-MS-TNEF-Correlator: 
-x-originating-ip: [124.74.246.114]
-x-clientproxiedby: TYAPR01CA0092.jpnprd01.prod.outlook.com
- (2603:1096:404:2c::32) To BYAPR03MB4773.namprd03.prod.outlook.com
- (2603:10b6:a03:139::21)
-authentication-results: spf=none (sender IP is )
- smtp.mailfrom=Jisheng.Zhang@synaptics.com; 
-x-ms-exchange-messagesentrepresentingtype: 1
-x-mailer: Claws Mail 3.17.4 (GTK+ 2.24.32; x86_64-pc-linux-gnu)
-x-ms-publictraffictype: Email
-x-ms-office365-filtering-correlation-id: e162b7c2-71dd-4716-09af-08d778892041
-x-ms-traffictypediagnostic: BYAPR03MB3719:
-x-microsoft-antispam-prvs: <BYAPR03MB3719361EB266BCBE601EC981ED5D0@BYAPR03MB3719.namprd03.prod.outlook.com>
-x-ms-oob-tlc-oobclassifiers: OLM:8273;
-x-forefront-prvs: 0241D5F98C
-x-forefront-antispam-report: SFV:NSPM;SFS:(10009020)(39860400002)(396003)(366004)(136003)(346002)(376002)(51874003)(189003)(199004)(6436002)(9686003)(2906002)(6246003)(54906003)(6486002)(6116002)(4326008)(102836004)(256004)(66946007)(76176011)(3846002)(6512007)(71190400001)(5660300002)(71200400001)(66446008)(64756008)(66556008)(66476007)(52116002)(478600001)(50226002)(14454004)(316002)(6916009)(25786009)(186003)(4744005)(99286004)(305945005)(386003)(7736002)(6506007)(8676002)(8936002)(81166006)(7416002)(446003)(86362001)(11346002)(229853002)(81156014)(26005)(1076003)(39210200001);DIR:OUT;SFP:1101;SCL:1;SRVR:BYAPR03MB3719;H:BYAPR03MB4773.namprd03.prod.outlook.com;FPR:;SPF:None;LANG:en;PTR:InfoNoRecords;MX:1;A:0;
-received-spf: None (protection.outlook.com: synaptics.com does not designate
- permitted sender hosts)
-x-ms-exchange-senderadcheck: 1
-x-microsoft-antispam: BCL:0;
-x-microsoft-antispam-message-info: 1Ds3v3pX44hgUC+rJoBiMgpgpR1Jwhgfqa8KE1yOYw0cM+739bR8ROdQh5V1q6bAQOlJ2XuMpR+1qS90mLljT+STmjCP8C28pfUVTpwqM5w1Aug+ns5+yJMMumAAz0YrX7ZXyU5arykqBOSj7mtL/rv3d6ibtmOpdvI2rOXQ95RPSj4X76J+pVogrlSB5e83qzCdP7SVTNk9QKy8PN2COFB7e1freP8Sv+/KSlIf9SLnKtCUh+SG5M44Rle5IBDP4Nguhb6nuNxq17O64huY6eRDZZ0tn92DVugQMmvbO1w22mzKa67GZGP3aVh1nZ3ugMXZw0zlyjfdPzgtHbHOzYuulu+gxdCj4hL4qEEkWSuoVpAf6s4p/8zuK4LZ+gtTGODU7qhupftxiy2h2JpEVXC3s/SQkeOG1EVh7RaWMPg1EzNYo2h89dK8dnE7JSe/KRyK3LTW0rAq1mE/C555lDnk/MNyTfJFPbGH7lVPebHwbIu+8nQMS2BIoOb+JSFJeE12TCsfbrh2mie1HEf8Ng==
-x-ms-exchange-transport-forked: True
-Content-Type: text/plain; charset="us-ascii"
-Content-ID: <E328B430D6EEBE469FC9141252210664@namprd03.prod.outlook.com>
-Content-Transfer-Encoding: quoted-printable
+        id S1726632AbfLDJ4T (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Wed, 4 Dec 2019 04:56:19 -0500
+Received: from esa5.hgst.iphmx.com ([216.71.153.144]:20593 "EHLO
+        esa5.hgst.iphmx.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S1726166AbfLDJ4S (ORCPT
+        <rfc822;linux-block@vger.kernel.org>); Wed, 4 Dec 2019 04:56:18 -0500
+DKIM-Signature: v=1; a=rsa-sha256; c=simple/simple;
+  d=wdc.com; i=@wdc.com; q=dns/txt; s=dkim.wdc.com;
+  t=1575453378; x=1606989378;
+  h=date:from:to:cc:subject:message-id:references:
+   mime-version:in-reply-to;
+  bh=MMrvsNDMLWAbO9MEILS+TGm8he4BEQEN8YqOwckuQ28=;
+  b=gucdqSjonYHQmMsCEWVSWqqYZ60hnejCFCtCMs42PjMRTscBaQ2PskhT
+   6v6OztecqDdn+PPbbSRUite9MFB0MiKPM36887bCXfOnastvJqwykabVz
+   pnIqktXz30ocPRLHAJ1HwsMzeK31M3YtUwd5f8sC5uSeoN8oynSub0fzj
+   FnTs0bKLah8DBCtByL9U57AphoeNpbdOC900opNIMYn6/3G4nhInt+W6H
+   nZIhbO/EMSH8WwiBkZ3nodCtD62zeu4GvXrklYJR0LsjV/eNDuE6DATni
+   b7dp3yHjy3whOKxbgPQhYy4lPXsboTRWM11WArGEGSjdlWLMkvka5XjYr
+   A==;
+IronPort-SDR: aKXmKjVRUkKE8iwJNshlIPLRqo6g+AtE8o9yo0fAmaj0VEFHYz1u3hRJoPhJTRPwBavB8x+1Fe
+ kVdQCqU6xfBXK+CJxcWXtmkZ15SZaDd8qWm+HnA7JtuFFhnXnTrS9arEn8VlfzO4fghjj151T7
+ beLltUwUNXhgNhskCYgRRkr7RCIBOFVwaqNUPDIZBuB14MsuSe3C9/tRKlFcqPADKwm/supzFY
+ dIPS+wguCW6Q7Y716qLtuoI6/osLlmdu8EOAacseQ1mor0EJLhoIXJQbkumQGzzxWaIvSgSayN
+ BaM=
+X-IronPort-AV: E=Sophos;i="5.69,277,1571673600"; 
+   d="scan'208";a="125363481"
+Received: from h199-255-45-14.hgst.com (HELO uls-op-cesaep01.wdc.com) ([199.255.45.14])
+  by ob1.hgst.iphmx.com with ESMTP; 04 Dec 2019 17:56:18 +0800
+IronPort-SDR: WEUnwhIVQYIKrP2/Kxc7b0dvSWUALKTptRDdbg6PgBcjfKm+SHNhakENdN+ZMCfHp8M9M5K9Qm
+ 0u/F+5ot23YO9s7ewqEUcyOv9VojB+zTASL7LGRqluIBv4hdZJ+RNFRjEh4agVJSJYC7E38qOQ
+ 8CiuMNqFHztXRJHvGhgxGE4mVnB9A2Wjv74fvWS/r4+SjjenGr9Qw6luSuoPNCwMN31NnospxN
+ Omv8PdcZEIa6lYlN1pyrx8/OeXAK8PKcDI7zrkG9DpudOgh87aOWpOi8Er0NQ9Q+uTgVkH57ah
+ My2mqd3hjg9qtKINaqL698UX
+Received: from uls-op-cesaip02.wdc.com ([10.248.3.37])
+  by uls-op-cesaep01.wdc.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 04 Dec 2019 01:51:05 -0800
+IronPort-SDR: 2+0hE7nYdSw2DI7ET7vzyzVgDLnT6I53JDmEJH5Nsy1KZSawtvq8njkWFl9HdZra7trNIVvI9+
+ +C3jml8b1i7kk66snO1rJW0Yl6flU2QlI60KsHSx9tad1F7Ls6eiIwTonTvkZFRABdIm7iXkCT
+ P4qkpuriPOl+U1UUmICciYWBWYGIFFp7jwfuppSvxWFB86hsMWVYpUlBX0QhqvxfmBZexH07Vb
+ AtXjBp9ii+mFLhHRWztk6f9NNxjx5ozr6XIrvjCdyH49tnHx9XC7LLjcEviRXPwCZTpiYRQJoW
+ DC4=
+WDCIronportException: Internal
+Received: from naota.dhcp.fujisawa.hgst.com ([10.149.53.115])
+  by uls-op-cesaip02.wdc.com with SMTP; 04 Dec 2019 01:56:16 -0800
+Received: (nullmailer pid 1154193 invoked by uid 1000);
+        Wed, 04 Dec 2019 09:56:15 -0000
+Date:   Wed, 4 Dec 2019 18:56:15 +0900
+From:   Naohiro Aota <naohiro.aota@wdc.com>
+To:     Keita Suzuki <keitasuzuki.park@sslab.ics.keio.ac.jp>
+Cc:     Jens Axboe <axboe@kernel.dk>, linux-block@vger.kernel.org,
+        linux-kernel@vger.kernel.org,
+        takafumi.kubota1012@sslab.ics.keio.ac.jp
+Subject: Re: [PATCH] block/genhd: Fix memory leak in error path of
+ __alloc_disk_node()
+Message-ID: <20191204095615.m3bgg276re3qlzzm@naota>
+References: <20191127024057.5827-1-keitasuzuki.park@sslab.ics.keio.ac.jp>
 MIME-Version: 1.0
-X-OriginatorOrg: synaptics.com
-X-MS-Exchange-CrossTenant-Network-Message-Id: e162b7c2-71dd-4716-09af-08d778892041
-X-MS-Exchange-CrossTenant-originalarrivaltime: 04 Dec 2019 07:11:04.7208
- (UTC)
-X-MS-Exchange-CrossTenant-fromentityheader: Hosted
-X-MS-Exchange-CrossTenant-id: 335d1fbc-2124-4173-9863-17e7051a2a0e
-X-MS-Exchange-CrossTenant-mailboxtype: HOSTED
-X-MS-Exchange-CrossTenant-userprincipalname: 4uChLndwhnd1rnS2jyMw19g9LhW43/p84TMgBC+m80kYLBb9248nLrt7qujY2kv6RJIqp6N/o5Acfr3+aSStIA==
-X-MS-Exchange-Transport-CrossTenantHeadersStamped: BYAPR03MB3719
+Content-Type: text/plain; charset=us-ascii; format=flowed
+Content-Disposition: inline
+In-Reply-To: <20191127024057.5827-1-keitasuzuki.park@sslab.ics.keio.ac.jp>
 Sender: linux-block-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-Hi Christoph
+Looks good,
+Reviewed-by: Naohiro Aota <naohiro.aota@wdc.com>
 
-On Tue, 3 Dec 2019 05:06:09 -0800 Christoph Hellwig wrote:
+I think you can also add:
 
+Fixes: 6c71013ecb7e ("block: partition: convert percpu ref")
 
->=20
-> On Tue, Dec 03, 2019 at 09:49:49AM +0000, Jisheng Zhang wrote:
-> > > As in exactly one boundary and not an alignment?  Where the one
-> > > boundary is not a power of two and thus can't be expressed? =20
-> >
-> > Take drivers/mmc/host/sdhci-of-dwcmshc.c for example, target physical D=
-MA addr
-> > can't span 128MB, 256MB, 128*3MB, ...128*nMB
-> >
-> > I'm not sure whether blk_queue_segment_boundary could solve this limita=
-tion. =20
->=20
-> That is exaxtly the kind of limitation blk_queue_segment_boundary is
-> intended for.
-
-Until after dma_map_sg(), we can't know the physical DMA address range, so
-how does block layer know and check the DMA range beforehand? I'm a newbie =
-on
-block layer, could you please teach me? At the same time
-I'm reading the code as well.
-
-Thanks in advance
-
+On Wed, Nov 27, 2019 at 02:40:57AM +0000, Keita Suzuki wrote:
+>'disk->part_tbl' is malloced in disk_expand_part_tbl() and should be
+>freed before leaving from the error handling cases. However, current code
+>does not free this, causing a memory leak. Add disk_replace_part_tbl()
+>before freeing 'disk'.
+>
+>I have tested this by randomly causing failures to the target code,
+>and verified on kmemleak that this memory leak does occur.
+>
+>unreferenced object 0xffff888006dad500 (size 64):
+>  comm "systemd-udevd", pid 116, jiffies 4294895558 (age 121.716s)
+>  hex dump (first 32 bytes):
+>    00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00  ................
+>    01 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00  ................
+>  backtrace:
+>    [<00000000eec79bf3>] disk_expand_part_tbl+0xab/0x170
+>    [<00000000624e7d03>] __alloc_disk_node+0xb1/0x1c0
+>    [<00000000ca3f4185>] 0xffffffffc01b8584
+>    [<000000006f88a6ee>] do_one_initcall+0x8b/0x2a4
+>    [<0000000016058199>] do_init_module+0xfd/0x380
+>    [<00000000b6fde336>] load_module+0x3fae/0x4240
+>    [<00000000c523d013>] __do_sys_finit_module+0x11a/0x1b0
+>    [<00000000f07bba26>] do_syscall_64+0x6d/0x1e0
+>    [<00000000979467fd>] entry_SYSCALL_64_after_hwframe+0x44/0xa9
+>
+>Signed-off-by: Keita Suzuki <keitasuzuki.park@sslab.ics.keio.ac.jp>
+>---
+> block/genhd.c | 1 +
+> 1 file changed, 1 insertion(+)
+>
+>diff --git a/block/genhd.c b/block/genhd.c
+>index ff6268970ddc..8c4b63d7f507 100644
+>--- a/block/genhd.c
+>+++ b/block/genhd.c
+>@@ -1504,6 +1504,7 @@ struct gendisk *__alloc_disk_node(int minors, int node_id)
+> 		 */
+> 		seqcount_init(&disk->part0.nr_sects_seq);
+> 		if (hd_ref_init(&disk->part0)) {
+>+			disk_replace_part_tbl(disk, NULL);
+> 			hd_free_part(&disk->part0);
+> 			kfree(disk);
+> 			return NULL;
+>-- 
+>2.17.1
+>
