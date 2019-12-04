@@ -2,127 +2,183 @@ Return-Path: <SRS0=bBnE=Z2=vger.kernel.org=linux-block-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-0.8 required=3.0 tests=DKIM_SIGNED,DKIM_VALID,
-	HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS
-	autolearn=no autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-2.2 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
+	MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,USER_AGENT_SANE_1 autolearn=no
+	autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id AB183C2BD09
-	for <linux-block@archiver.kernel.org>; Wed,  4 Dec 2019 17:23:43 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id F1EA9C43603
+	for <linux-block@archiver.kernel.org>; Wed,  4 Dec 2019 19:02:08 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.kernel.org (Postfix) with ESMTP id 7B74C2077B
-	for <linux-block@archiver.kernel.org>; Wed,  4 Dec 2019 17:23:43 +0000 (UTC)
-Authentication-Results: mail.kernel.org;
-	dkim=pass (2048-bit key) header.d=blockbridge-com.20150623.gappssmtp.com header.i=@blockbridge-com.20150623.gappssmtp.com header.b="fT1/3V8z"
+	by mail.kernel.org (Postfix) with ESMTP id C2333206DF
+	for <linux-block@archiver.kernel.org>; Wed,  4 Dec 2019 19:02:08 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1728100AbfLDRXm (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Wed, 4 Dec 2019 12:23:42 -0500
-Received: from mail-ot1-f67.google.com ([209.85.210.67]:34304 "EHLO
-        mail-ot1-f67.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1727998AbfLDRXm (ORCPT
-        <rfc822;linux-block@vger.kernel.org>); Wed, 4 Dec 2019 12:23:42 -0500
-Received: by mail-ot1-f67.google.com with SMTP id a15so7069155otf.1
-        for <linux-block@vger.kernel.org>; Wed, 04 Dec 2019 09:23:41 -0800 (PST)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=blockbridge-com.20150623.gappssmtp.com; s=20150623;
-        h=mime-version:references:in-reply-to:from:date:message-id:subject:to
-         :cc;
-        bh=OsCzQi8E+i59OetclexFEuGwaInTqcScwjzkGJ7Iw3Y=;
-        b=fT1/3V8zo6Ho8bQmHchM2zRNQciwQJZW83Ik+qPSTDEnFA/ysUxVKKsXA+WmPkadC5
-         objdZHiPkRjebVmcem9kDUUetJIQ0/Fm3ubn8hT/aQ5BWtsffjrNgistyM4scWf1nYjl
-         j5z4c0FvG281u+UrCXrHaBAovfyUU6iYXwS6TNeBlQLAZ8fycGYxNtygb6FaMHMNQ+dY
-         1EuFdzdUtyCHKpUi2eNzpgGIwWgRT7fBO9iNty7repmudXsrhLYmjw+t9TU+X2OaW/hC
-         whhkGZmNOMBjwL7fb3w6lO3AJ1E1+JCnXLvucw3l8HwMOChWwtyNefnvtvnJ5OSIUCw+
-         ksvg==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20161025;
-        h=x-gm-message-state:mime-version:references:in-reply-to:from:date
-         :message-id:subject:to:cc;
-        bh=OsCzQi8E+i59OetclexFEuGwaInTqcScwjzkGJ7Iw3Y=;
-        b=PS2j60CHhOAyTn5fE+6DlJfVy4T1YgIRaaXPFZ7ITEaeR3Y8P5DRyCRCVCRHf+yYuG
-         3C6Zc52QrwQCupE1DozOLMQQn/xsBz3s1YojsxAPgFFw1ZCDvuPQrez/IunnTDd24UmY
-         AZYA3JZ1VuQZhxJBHn7Hr3GjATD0BLn1WHxWNgK5kYkuePMLJJEkI877WYzgqyb3Jiv7
-         2NhP5g4fGTNrYYsNLde1tLuw8S0HntNUzb7JDDw2Lyx3MfUAnVQdDkgQkl29c34VlLM5
-         A/Te5UKNlHUCxxBviFk847HBuDdfO4oE8q7yPDC6QjjiAMufd2LM7mTjkCIQy8UvzasC
-         +bVg==
-X-Gm-Message-State: APjAAAUn9/shBiDjkTT/v2Jsrs6QJk607oWn6iF8JF6ybrBnaxvcZA8L
-        UdyY9LIvhW+2oZmSuw818dWQp1hSUO9592WzcBLiUQ==
-X-Google-Smtp-Source: APXvYqxDzeT0lRIVPfz0OUxh4T5CV12SKPG3ZsGFxNj7PMyfRcQk4TUX55GUPPYWTmDJouOQEO7uecQGcSnynq4egtY=
-X-Received: by 2002:a05:6830:58:: with SMTP id d24mr3349473otp.356.1575480221331;
- Wed, 04 Dec 2019 09:23:41 -0800 (PST)
+        id S1728449AbfLDTCI (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Wed, 4 Dec 2019 14:02:08 -0500
+Received: from mx2.suse.de ([195.135.220.15]:44306 "EHLO mx1.suse.de"
+        rhost-flags-OK-OK-OK-FAIL) by vger.kernel.org with ESMTP
+        id S1728114AbfLDTCI (ORCPT <rfc822;linux-block@vger.kernel.org>);
+        Wed, 4 Dec 2019 14:02:08 -0500
+X-Virus-Scanned: by amavisd-new at test-mx.suse.de
+Received: from relay2.suse.de (unknown [195.135.220.254])
+        by mx1.suse.de (Postfix) with ESMTP id 3B16EB2F9;
+        Wed,  4 Dec 2019 19:02:04 +0000 (UTC)
+Date:   Wed, 4 Dec 2019 20:01:54 +0100
+From:   Michal =?iso-8859-1?Q?Such=E1nek?= <msuchanek@suse.de>
+To:     Jens Axboe <axboe@kernel.dk>
+Cc:     linux-scsi@vger.kernel.org, linux-block@vger.kernel.org,
+        Jonathan Corbet <corbet@lwn.net>,
+        "James E.J. Bottomley" <jejb@linux.ibm.com>,
+        "Martin K. Petersen" <martin.petersen@oracle.com>,
+        Alexander Viro <viro@zeniv.linux.org.uk>,
+        Eric Biggers <ebiggers@google.com>,
+        "J. Bruce Fields" <bfields@redhat.com>,
+        Mauro Carvalho Chehab <mchehab+samsung@kernel.org>,
+        Benjamin Coddington <bcodding@redhat.com>,
+        Ming Lei <ming.lei@redhat.com>,
+        Chaitanya Kulkarni <chaitanya.kulkarni@wdc.com>,
+        Bart Van Assche <bvanassche@acm.org>,
+        Damien Le Moal <damien.lemoal@wdc.com>,
+        Hou Tao <houtao1@huawei.com>,
+        Pavel Begunkov <asml.silence@gmail.com>,
+        linux-kernel@vger.kernel.org, linux-fsdevel@vger.kernel.org,
+        Jan Kara <jack@suse.cz>, Hannes Reinecke <hare@suse.com>,
+        "Ewan D. Milne" <emilne@redhat.com>,
+        Christoph Hellwig <hch@infradead.org>,
+        Matthew Wilcox <willy@infradead.org>
+Subject: Re: [PATCH v4 rebase 00/10] Fix cdrom autoclose
+Message-ID: <20191204190154.GA28406@kitsune.suse.cz>
+References: <cover.1574797504.git.msuchanek@suse.de>
+ <c6fe572c-530e-93eb-d62a-cb2f89c7b4ec@kernel.dk>
+ <20191126202151.GY11661@kitsune.suse.cz>
+ <08bcfd0a-7433-2fa4-9ca2-ea008836b747@kernel.dk>
+ <20191127081144.GZ11661@kitsune.suse.cz>
 MIME-Version: 1.0
-References: <CAAFE1bfsXsKGyw7SU_z4NanT+wmtuJT=XejBYbHHMCDQwm73sw@mail.gmail.com>
- <20191128091210.GC15549@ming.t460p> <CAAFE1beMkvyRctGqpffd3o_QtDH0CrmQSb=fV4GzqMUXWzPyOw@mail.gmail.com>
- <20191203005849.GB25002@ming.t460p> <CAAFE1bcG8c1Q3iwh-LUjruBMAuFTJ4qWxNGsnhfKvGWHNLAeEQ@mail.gmail.com>
- <20191203031444.GB6245@ming.t460p> <CAAFE1besnb=HV4C_buORYpWbkXecmtybwX8d_Ka2NsKmiym53w@mail.gmail.com>
- <CAAFE1bfpUWCZrtR8v3S++0-+gi8DJ79X3e0XqDe93i8nuGTnNg@mail.gmail.com>
- <20191203124558.GA22805@ming.t460p> <CAAFE1bfB2Km+e=T0ahwq0r9BQrBMnSguQQ+y=yzYi3tursS+TQ@mail.gmail.com>
- <20191204010529.GA3910@ming.t460p>
-In-Reply-To: <20191204010529.GA3910@ming.t460p>
-From:   Stephen Rust <srust@blockbridge.com>
-Date:   Wed, 4 Dec 2019 12:23:39 -0500
-Message-ID: <CAAFE1bcJmRP5OSu=5asNTpvkF=kjEZu=GafaS9h52776tVgpPA@mail.gmail.com>
-Subject: Re: Data corruption in kernel 5.1+ with iSER attached ramdisk
-To:     Ming Lei <ming.lei@redhat.com>
-Cc:     Rob Townley <rob.townley@gmail.com>,
-        Christoph Hellwig <hch@lst.de>, Jens Axboe <axboe@kernel.dk>,
-        linux-block@vger.kernel.org, linux-rdma@vger.kernel.org,
-        linux-scsi@vger.kernel.org, martin.petersen@oracle.com,
-        target-devel@vger.kernel.org, Doug Ledford <dledford@redhat.com>,
-        Jason Gunthorpe <jgg@ziepe.ca>
-Content-Type: text/plain; charset="UTF-8"
+Content-Type: text/plain; charset=iso-8859-1
+Content-Disposition: inline
+Content-Transfer-Encoding: 8bit
+In-Reply-To: <20191127081144.GZ11661@kitsune.suse.cz>
+User-Agent: Mutt/1.10.1 (2018-07-13)
 Sender: linux-block-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-Hi Ming,
+On Wed, Nov 27, 2019 at 09:11:44AM +0100, Michal Suchánek wrote:
+> On Tue, Nov 26, 2019 at 04:13:32PM -0700, Jens Axboe wrote:
+> > On 11/26/19 1:21 PM, Michal Suchánek wrote:
+> > > On Tue, Nov 26, 2019 at 01:01:42PM -0700, Jens Axboe wrote:
+> > >> On 11/26/19 12:54 PM, Michal Suchanek wrote:
+> > >>> Hello,
+> > >>>
+> > >>> there is cdrom autoclose feature that is supposed to close the tray,
+> > >>> wait for the disc to become ready, and then open the device.
+> > >>>
+> > >>> This used to work in ancient times. Then in old times there was a hack
+> > >>> in util-linux which worked around the breakage which probably resulted
+> > >>> from switching to scsi emulation.
+> > >>>
+> > >>> Currently util-linux maintainer refuses to merge another hack on the
+> > >>> basis that kernel still has the feature so it should be fixed there.
+> > >>> The code needs not be replicated in every userspace utility like mount
+> > >>> or dd which has no business knowing which devices are CD-roms and where
+> > >>> the autoclose setting is in the kernel.
+> > >>>
+> > >>> This is rebase on top of current master.
+> > >>>
+> > >>> Also it seems that most people think that this is fix for WMware because
+> > >>> there is one patch dealing with WMware.
+> > >>
+> > >> I think the main complaint with this is that it's kind of a stretch to
+> > >> add core functionality for a device type that's barely being
+> > >> manufactured anymore and is mostly used in a virtualized fashion. I
 
-I have tried your latest "workaround" patch in brd including the fix
-for large offsets, and it does appear to work. I tried the same tests
-and the data was written correctly for all offsets I tried. Thanks!
+That optical drives are hardly manufactured is kind of a stretch. I have
+no problem obtaining drives from a few manufacturers in any nearby
+computer store. While using DVDs may be slowly getting out of fashion
+the same applies to all optical drives, including Blueray. Some of these
+will stay for forseeable future.
 
-I include the updated additional bpftrace below.
+> > >> think it you could fix this without 10 patches of churn and without
+> > >> adding a new ->open() addition to fops, then people would be a lot more
+> > >> receptive to the idea of improving cdrom auto-close.
+> > > 
+> > > I see no way to do that cleanly.
+> > > 
+> > > There are two open modes for cdrom devices - blocking and
+> > > non-blocking.
+> > > 
+> > > In blocking mode open() should analyze the medium so that it's ready
+> > > when it returns. In non-blocking mode it should return immediately so
+> > > long as you can talk to the device.
+> > > 
+> > > When waiting in open() with locks held the processes trying to open
+> > > the device are locked out regradless of the mode they use.
+> > > 
+> > > The only way to solve this is to pretend that the device is open and
+> > > do the wait afterwards with the device unlocked.
+> > 
+> > How is this any different from an open on a file that needs to bring in
+> > meta data on a busy rotating device, which can also take seconds?
+> 
+> First, accessing a file will take seconds only when your system is
+> seriously overloaded or misconfigured. The access time for rotational
+> storage is tens of milliseconds. With cdrom the access time after
+> closing the door is measured in tens of seconds on common hardware. It
+> can be shorter but also possibly longer. I am not aware of any limit
+> there. It may be reasonable to want to get device status during this
+> time.
+> 
+> Second, fetching the metadata for the file does not block operations that
+> don't need the metadata. Here waiting for the drive to get ready blocks
+> all access. You could get drive status if you did not try to open it
+> but once you do you can no longer talk to it.
 
-> So firstly, I'd suggest to investigate from RDMA driver side to see why
-> un-aligned buffer is passed to block layer.
->
-> According to previous discussion, 512 aligned buffer should be provided
-> to block layer.
->
-> So looks the driver needs to be fixed.
+So let's look at the alternatives. One proposed alternative was to
+change the locking calls to the locks that are held while waiting in
+open() to interuptible so that impatient users can at least kill
+processes waiting on their CD medium to become ready.
 
-If it does appear to be an RDMA driver issue, do you know who we
-should follow up with directly from the RDMA driver side of the world?
+What is held are sr_mutex and bd_mutex.
 
-Presumably non-brd devices, ie: real scsi devices work for these test
-cases because they accept un-aligned buffers?
+bd_mutex is per_device so any open() or close() on the same CD-ROM
+device is blocked. There are a number of other sites where bd_mutex is
+locked and it will be needed to figure out which of these can be called
+with a cd-rom device and change them to killable so that processes
+waiting on the lock to don't get uninterriptibly stuck. This may be more
+code churn than this patchset. I think we can exclude loop.c and
+zram-dev.c but ioctl.c, xen-blkfront.c, and block_dev.c apply. Don't
+know about dasd.
 
-> The patch might not cover the big offset case, could you collect bpftrace
-> via the following script when you reproduce the issue with >4096 offset?
+The bd_mutex is held in iterate_bdevs so all bets are off wrt being able
+to operate the system.  Once a process is stuck waiting in blkdev_get()
+which calls open() on the cdrom you cannot iterate block devices. With
+boot times measured in seconds and medium analysis times measured in
+tens of seconds users will not be amused.
 
-Here is the updated bpftrace output for an offset of 8192:
+autoclose defaults to on, and blkid reads deviced in blocking mode
+causing all the fun stuff to trigger (patch pending to change that).
+Nonetheless any number of utilities still not aware of this nonblock
+quirk out there will try to open the device sooner or later blocking all
+operations that require iterating the list of block devices.
 
-8192 76
-4020 76 1 131056
-4096 0 1 131063
-76 0 1 131071
-4096 0
-4096 0 0 0
-4096 0
-4096 0 0 8
-4096 0
-4096 0 0 130944
-8192 76
-4020 76 1 131056
-4096 0 1 131063
-76 0 1 131071
-4096 0
-4096 0 0 130808
-4096 0
-4096 0
-4096 0 0 131056
-4096 0 0 131064
-[snip]
+Adding tens of seconds to block device opening time (which I assume
+might need iterating list of block devices) might even overflow some
+systemd timeout and fail boot.  There is timeout for each particular job
+but there are also cumulative timeouts for something like 'locate device
+with this UUID' which are fixed regardles of the number of layers (LVM,
+md, ..) involved.
 
-Thanks,
-Steve
+The other approach is to do like harddisks. With a harddisk a medium is
+'fixed' - that is assumed to be present always. Any error accessing the
+medium is reported on read() or write() and not necessarily on open().
+This would require hooking the autoclose to the operations that require
+actual medium - probably something like count_tracks(), and eschew
+calling these from open(). That would work but breaks the contract
+described in the current API documentation - that is if you don't open
+with O_NONBLOCK and there is obvious medium error like no medium at all
+or no usable track you get the error on open() rather than on whatever
+opration that tries to use the track.
+
+Thanks
+
+Michal
