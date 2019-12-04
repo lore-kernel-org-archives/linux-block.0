@@ -7,117 +7,123 @@ X-Spam-Status: No, score=-2.4 required=3.0 tests=DKIMWL_WL_HIGH,DKIM_SIGNED,
 	SPF_HELO_NONE,SPF_PASS,USER_AGENT_SANE_1 autolearn=no autolearn_force=no
 	version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 17AF0C43603
-	for <linux-block@archiver.kernel.org>; Wed,  4 Dec 2019 12:09:34 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 001E8C2BD09
+	for <linux-block@archiver.kernel.org>; Wed,  4 Dec 2019 13:50:56 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.kernel.org (Postfix) with ESMTP id DE8AE20803
-	for <linux-block@archiver.kernel.org>; Wed,  4 Dec 2019 12:09:33 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id CAF7C20409
+	for <linux-block@archiver.kernel.org>; Wed,  4 Dec 2019 13:50:55 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=pass (1024-bit key) header.d=amazon.com header.i=@amazon.com header.b="a3RVxmLZ"
+	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="OJ7sCRzp"
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1727452AbfLDMJd (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Wed, 4 Dec 2019 07:09:33 -0500
-Received: from smtp-fw-9102.amazon.com ([207.171.184.29]:46507 "EHLO
-        smtp-fw-9102.amazon.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1727445AbfLDMJd (ORCPT
-        <rfc822;linux-block@vger.kernel.org>); Wed, 4 Dec 2019 07:09:33 -0500
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-  d=amazon.com; i=@amazon.com; q=dns/txt; s=amazon201209;
-  t=1575461372; x=1606997372;
-  h=subject:to:cc:references:from:message-id:date:
-   mime-version:in-reply-to:content-transfer-encoding;
-  bh=0XU4I7wfx1XBSj0BFbZC9Xa7eD2pt9HXv+vFrvgGosk=;
-  b=a3RVxmLZJ+QxCLCZlYVTFQDTFxjReRRcSMKyx2VCUIJP2OhJvugZfhZm
-   kOABMbEsKxc5DpJOe+AH5T1rw7v835nZn3dgwAWUnPcmgmAEoC4orkNLV
-   DdV4xQ6WXJR8EGjzJr5StI93RhxJM31E21b+DvQyYGNW38qxzDRptK2y0
-   A=;
-IronPort-SDR: pPAh3VyOKYzmvWOsJiLjzYBAm32158CHQmvaLASrfxIVhw/Vd2V9GFkK4QdemQZ6v2teZ/0XXt
- hOgcUUWlP9RQ==
-X-IronPort-AV: E=Sophos;i="5.69,277,1571702400"; 
-   d="scan'208";a="11545631"
-Received: from sea32-co-svc-lb4-vlan3.sea.corp.amazon.com (HELO email-inbound-relay-1a-16acd5e0.us-east-1.amazon.com) ([10.47.23.38])
-  by smtp-border-fw-out-9102.sea19.amazon.com with ESMTP; 04 Dec 2019 12:09:19 +0000
-Received: from EX13MTAUEA001.ant.amazon.com (iad55-ws-svc-p15-lb9-vlan2.iad.amazon.com [10.40.159.162])
-        by email-inbound-relay-1a-16acd5e0.us-east-1.amazon.com (Postfix) with ESMTPS id 86FCCA26C9;
-        Wed,  4 Dec 2019 12:09:17 +0000 (UTC)
-Received: from EX13D32EUC002.ant.amazon.com (10.43.164.94) by
- EX13MTAUEA001.ant.amazon.com (10.43.61.82) with Microsoft SMTP Server (TLS)
- id 15.0.1367.3; Wed, 4 Dec 2019 12:09:16 +0000
-Received: from EX13MTAUEE001.ant.amazon.com (10.43.62.200) by
- EX13D32EUC002.ant.amazon.com (10.43.164.94) with Microsoft SMTP Server (TLS)
- id 15.0.1367.3; Wed, 4 Dec 2019 12:09:15 +0000
-Received: from u886c93fd17d25d.ant.amazon.com (10.28.85.76) by
- mail-relay.amazon.com (10.43.62.226) with Microsoft SMTP Server (TLS) id
- 15.0.1367.3 via Frontend Transport; Wed, 4 Dec 2019 12:09:13 +0000
-Subject: Re: [Xen-devel] [PATCH 0/2] xen/blkback: Aggressively shrink page
- pools if a memory pressure is detected
-To:     "Durrant, Paul" <pdurrant@amazon.com>,
-        "konrad.wilk@oracle.com" <konrad.wilk@oracle.com>,
-        "roger.pau@citrix.com" <roger.pau@citrix.com>,
-        "axboe@kernel.dk" <axboe@kernel.dk>
-CC:     "sj38.park@gmail.com" <sj38.park@gmail.com>,
-        "xen-devel@lists.xenproject.org" <xen-devel@lists.xenproject.org>,
-        "linux-block@vger.kernel.org" <linux-block@vger.kernel.org>,
-        "linux-kernel@vger.kernel.org" <linux-kernel@vger.kernel.org>
-References: <20191204113419.2298-1-sjpark@amazon.com>
- <62c68f53cc0145ad9d0dfb167b50eac4@EX13D32EUC003.ant.amazon.com>
-From:   <sjpark@amazon.com>
-Message-ID: <fcf414ab-4ee4-bafc-6683-5527df7a9731@amazon.com>
-Date:   Wed, 4 Dec 2019 13:09:13 +0100
-User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:60.0) Gecko/20100101
- Thunderbird/60.9.0
+        id S1727956AbfLDNux (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Wed, 4 Dec 2019 08:50:53 -0500
+Received: from us-smtp-delivery-1.mimecast.com ([207.211.31.120]:54446 "EHLO
+        us-smtp-1.mimecast.com" rhost-flags-OK-OK-OK-FAIL) by vger.kernel.org
+        with ESMTP id S1727949AbfLDNux (ORCPT
+        <rfc822;linux-block@vger.kernel.org>); Wed, 4 Dec 2019 08:50:53 -0500
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+        s=mimecast20190719; t=1575467452;
+        h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+         to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+         content-transfer-encoding:content-transfer-encoding:
+         in-reply-to:in-reply-to:references:references;
+        bh=VA9lOoBJgqCxzPUvXrp+l1oPS8XjH4P1e6jO6rnjjg8=;
+        b=OJ7sCRzpAFHmkmjvScZK+ZWJJayWKCrEtho6ALh87721wwgjnz93ZSucLusj5PU/zu65xb
+        EUCUbCg4gGZNkTGXbtaive6QysHfLVQSN2jy9eARPF37aozuoW5+jy9CyxCjHRnaGehoq/
+        UN/SeTipLbR6nVPB0fX20jIj4n9stdY=
+Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
+ [209.132.183.4]) (Using TLS) by relay.mimecast.com with ESMTP id
+ us-mta-353-sTXKKfdVOFaPo2t4eAi-uw-1; Wed, 04 Dec 2019 08:50:49 -0500
+Received: from smtp.corp.redhat.com (int-mx08.intmail.prod.int.phx2.redhat.com [10.5.11.23])
+        (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
+        (No client certificate requested)
+        by mimecast-mx01.redhat.com (Postfix) with ESMTPS id 2144D91206;
+        Wed,  4 Dec 2019 13:50:47 +0000 (UTC)
+Received: from ming.t460p (ovpn-8-23.pek2.redhat.com [10.72.8.23])
+        by smtp.corp.redhat.com (Postfix) with ESMTPS id C826E19C68;
+        Wed,  4 Dec 2019 13:50:32 +0000 (UTC)
+Date:   Wed, 4 Dec 2019 21:50:14 +0800
+From:   Ming Lei <ming.lei@redhat.com>
+To:     Vincent Guittot <vincent.guittot@linaro.org>
+Cc:     Phil Auld <pauld@redhat.com>, Dave Chinner <david@fromorbit.com>,
+        Hillf Danton <hdanton@sina.com>,
+        linux-block <linux-block@vger.kernel.org>,
+        linux-fs <linux-fsdevel@vger.kernel.org>,
+        linux-xfs <linux-xfs@vger.kernel.org>,
+        linux-kernel <linux-kernel@vger.kernel.org>,
+        Christoph Hellwig <hch@lst.de>, Jens Axboe <axboe@kernel.dk>,
+        Peter Zijlstra <peterz@infradead.org>,
+        Rong Chen <rong.a.chen@intel.com>, Tejun Heo <tj@kernel.org>
+Subject: Re: single aio thread is migrated crazily by scheduler
+Message-ID: <20191204135014.GA21449@ming.t460p>
+References: <20191115010824.GC4847@ming.t460p>
+ <20191115045634.GN4614@dread.disaster.area>
+ <20191115070843.GA24246@ming.t460p>
+ <20191128094003.752-1-hdanton@sina.com>
+ <CAKfTPtA23ErKGCEJVmg6vk-QoufkiUM3NbXd31mZmKnuwbTkFw@mail.gmail.com>
+ <20191202024625.GD24512@ming.t460p>
+ <20191202040256.GE2695@dread.disaster.area>
+ <CAKfTPtD8Q97qJ_+hdCXQRt=gy7k96XrhnFmGYP1G88YSFW0vNA@mail.gmail.com>
+ <20191202212210.GA32767@lorien.usersys.redhat.com>
+ <CAKfTPtC7uycC3b2ngOFUqOh9-Fcz7h-151aaYJbLJFXrNq-gkw@mail.gmail.com>
 MIME-Version: 1.0
-In-Reply-To: <62c68f53cc0145ad9d0dfb167b50eac4@EX13D32EUC003.ant.amazon.com>
-Content-Type: text/plain; charset="utf-8"
-Content-Transfer-Encoding: 8bit
-Content-Language: en-US
+In-Reply-To: <CAKfTPtC7uycC3b2ngOFUqOh9-Fcz7h-151aaYJbLJFXrNq-gkw@mail.gmail.com>
+User-Agent: Mutt/1.12.1 (2019-06-15)
+X-Scanned-By: MIMEDefang 2.84 on 10.5.11.23
+X-MC-Unique: sTXKKfdVOFaPo2t4eAi-uw-1
+X-Mimecast-Spam-Score: 0
+Content-Type: text/plain; charset=us-ascii
+Content-Transfer-Encoding: quoted-printable
+Content-Disposition: inline
 Sender: linux-block-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-On 04.12.19 12:52, Durrant, Paul wrote:
->> -----Original Message-----
->> From: Xen-devel <xen-devel-bounces@lists.xenproject.org> On Behalf Of
->> SeongJae Park
->> Sent: 04 December 2019 11:34
->> To: konrad.wilk@oracle.com; roger.pau@citrix.com; axboe@kernel.dk
->> Cc: sj38.park@gmail.com; xen-devel@lists.xenproject.org; linux-
->> block@vger.kernel.org; linux-kernel@vger.kernel.org; Park, Seongjae
->> <sjpark@amazon.com>
->> Subject: [Xen-devel] [PATCH 0/2] xen/blkback: Aggressively shrink page
->> pools if a memory pressure is detected
->>
->> Each `blkif` has a free pages pool for the grant mapping.  The size of
->> the pool starts from zero and be increased on demand while processing
->> the I/O requests.  If current I/O requests handling is finished or 100
->> milliseconds has passed since last I/O requests handling, it checks and
->> shrinks the pool to not exceed the size limit, `max_buffer_pages`.
->>
->> Therefore, `blkfront` running guests can cause a memory pressure in the
->> `blkback` running guest by attaching arbitrarily large number of block
->> devices and inducing I/O.
-> OOI... How do guests unilaterally cause the attachment of arbitrary numbers of PV devices?
-Good point.  Many systems have their limit for the maximum number of the
-devices.  Thus, 'arbitrarily' large number of devices cannot be attached.  So,
-there is the upperbound.  System administrators might be able to avoid the
-memory pressure problem by setting the limit low enough or giving more memory
-to the 'blkback' running guest.
+On Tue, Dec 03, 2019 at 10:45:38AM +0100, Vincent Guittot wrote:
+> On Mon, 2 Dec 2019 at 22:22, Phil Auld <pauld@redhat.com> wrote:
+> >
+> > Hi Vincent,
+> >
+> > On Mon, Dec 02, 2019 at 02:45:42PM +0100 Vincent Guittot wrote:
+> > > On Mon, 2 Dec 2019 at 05:02, Dave Chinner <david@fromorbit.com> wrote=
+:
+> >
+> > ...
+> >
+> > > > So, we can fiddle with workqueues, but it doesn't address the
+> > > > underlying issue that the scheduler appears to be migrating
+> > > > non-bound tasks off a busy CPU too easily....
+> > >
+> > > The root cause of the problem is that the sched_wakeup_granularity_ns
+> > > is in the same range or higher than load balance period. As Peter
+> > > explained, This make the kworker waiting for the CPU for several load
+> > > period and a transient unbalanced state becomes a stable one that the
+> > > scheduler to fix. With default value, the scheduler doesn't try to
+> > > migrate any task.
+> >
+> > There are actually two issues here.   With the high wakeup granularity
+> > we get the user task actively migrated. This causes the significant
+> > performance hit Ming was showing. With the fast wakeup_granularity
+> > (or smaller IOs - 512 instead of 4k) we get, instead, the user task
+> > migrated at wakeup to a new CPU for every IO completion.
+>=20
+> Ok, I haven't noticed that this one was a problem too. Do we have perf
+> regression ?
 
-However, many systems also tempt to set the limit high enough so that guests
-can satisfy and to give minimal memory to the 'blkback' running guest for cost
-efficiency.
+Follows the test result on one server(Dell, R630: Haswell-E):
 
-I believe this patchset can be helpful for such situations.
+kernel.sched_wakeup_granularity_ns =3D 4000000
+kernel.sched_min_granularity_ns =3D 3000000
 
-Anyway, using the term 'arbitrarily' is obvisously my fault.  I will update the
-description in the next version of patchset.
-
+---------------------------------------
+test              =09=09        | IOPS
+---------------------------------------
+./xfs_complete 512      =09    | 7.8K=20
+---------------------------------------
+taskset -c 8 ./xfs_complete 512 | 9.8K=20
+---------------------------------------
 
 Thanks,
-SeongJae Park
-
->
->   Paul
->
+Ming
 
