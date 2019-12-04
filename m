@@ -2,115 +2,219 @@ Return-Path: <SRS0=bBnE=Z2=vger.kernel.org=linux-block-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-5.6 required=3.0 tests=DKIMWL_WL_HIGH,DKIM_SIGNED,
-	DKIM_VALID,DKIM_VALID_AU,MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,
-	SPF_PASS,USER_AGENT_SANE_1 autolearn=ham autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-2.2 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
+	MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,USER_AGENT_SANE_1 autolearn=no
+	autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id EE94FC43603
-	for <linux-block@archiver.kernel.org>; Wed,  4 Dec 2019 22:54:55 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 73A99C2D0BE
+	for <linux-block@archiver.kernel.org>; Wed,  4 Dec 2019 22:59:28 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.kernel.org (Postfix) with ESMTP id BC15F206DB
-	for <linux-block@archiver.kernel.org>; Wed,  4 Dec 2019 22:54:55 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=default; t=1575500095;
-	bh=a45N71Qn9JrZvMI/vOhox37/PylKc+JyGeyvvna+jwc=;
-	h=Date:From:To:Cc:Subject:References:In-Reply-To:List-ID:From;
-	b=J0mhetvkwyYweRpbX2vPLgRhZOHyAzUiqQ4FtHawhvt/F+u9Z+WddGxs4EJ1pLV8Z
-	 IvQRnsZPJvAVxUODDO8kHxjzMwk4fc1O4TupUdNocl8UhKIp3peUVp9LMQ7TBtKiKO
-	 tYj+OAdd5Us64ds2uq+AWbe0/x9Z1+oeyj3ecYYU=
+	by mail.kernel.org (Postfix) with ESMTP id 48AE72073C
+	for <linux-block@archiver.kernel.org>; Wed,  4 Dec 2019 22:59:28 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1728053AbfLDWyz (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Wed, 4 Dec 2019 17:54:55 -0500
-Received: from mail-pl1-f196.google.com ([209.85.214.196]:45197 "EHLO
-        mail-pl1-f196.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1728011AbfLDWyy (ORCPT
-        <rfc822;linux-block@vger.kernel.org>); Wed, 4 Dec 2019 17:54:54 -0500
-Received: by mail-pl1-f196.google.com with SMTP id w7so335962plz.12;
-        Wed, 04 Dec 2019 14:54:54 -0800 (PST)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20161025;
-        h=sender:date:from:to:cc:subject:message-id:references:mime-version
-         :content-disposition:in-reply-to:user-agent;
-        bh=71fWNQ0DN1swwIGhbCZ65wzcZtX6q09U8VNbO3XVJ2E=;
-        b=SEGp8TaZeiMDrnk6zAQ1kjGALOWEMQna4WdC85fGpk+uNwpO7tnZKkB+prOLYvB99y
-         yEDkQI6y3v+Gsg4ipXwU+fKGNa8ao5QdJCUNJNuwdzk5i1VlcJ7Y9ZPpMD3sx4S7J6Kd
-         rrIApoCSFgyMoQ9quKG+bxKCUc8I7GT6YB39VejvQ0+WePek+AmGHQyEEh3AXOsCqQMd
-         LBJGwaR/9exSzOsBLf78EckGi1fDZrS1Ux0sV7tyMe57LfeKq78R2mkfF8tRC/fHPFlC
-         HTFeV0Ggvr+LZxLln7KIxLKFwIzwmTq2cgjO0IGA1l5wbdMLBSt+c0/X+FFnIzVUe0kT
-         EpDw==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20161025;
-        h=x-gm-message-state:sender:date:from:to:cc:subject:message-id
-         :references:mime-version:content-disposition:in-reply-to:user-agent;
-        bh=71fWNQ0DN1swwIGhbCZ65wzcZtX6q09U8VNbO3XVJ2E=;
-        b=tYdqwupMlPnwx3dSxZJxn4+WNhdaXG3xICeur+feUC0MmQRna24p8j1ROkQ4vYhAUR
-         WYeIra7Rr0v0+3u+6YWHdJGRnMQYMTdZSYGbrb5T9nV2iX2d7tdvG3uH8e/0IBeCQQUs
-         qg5F163cCK5ABrI71sEJJGiBwLIsT/LLk5J5G+ewB/5NLKN5r6aDYvwOSMqEvtKH4sjB
-         KMM8jGKWghiXAhnfnbBLxuYhHUHaXgOKLwnIyt7WZcaKWggiu+uCMcJdHCsKMzEzRO0w
-         WiXKm6klS899ALhqM5cH9swkV6fgrnKTUsECeflSOAeIGKF/N57Cp1z6hQ8osjPw0EQN
-         JWDA==
-X-Gm-Message-State: APjAAAWz+2EPQOMgHF2P9/+YFNy7Hqv2pAa0LcucTpg6GeXCbTpezcsi
-        E6T9MzLUeFwY+aIGLtcFZJ4=
-X-Google-Smtp-Source: APXvYqxBqYdBKxl+V2SCEjcz4KN8KXwHybwTQg8WM67jtRfnnhU6nU4LkNayv6vE7Jk2ZYUz3LM9VA==
-X-Received: by 2002:a17:902:d204:: with SMTP id t4mr5897686ply.167.1575500094029;
-        Wed, 04 Dec 2019 14:54:54 -0800 (PST)
-Received: from google.com ([2620:15c:211:1:3e01:2939:5992:52da])
-        by smtp.gmail.com with ESMTPSA id l18sm8916725pff.79.2019.12.04.14.54.52
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Wed, 04 Dec 2019 14:54:53 -0800 (PST)
-Date:   Wed, 4 Dec 2019 14:54:51 -0800
-From:   Minchan Kim <minchan@kernel.org>
-To:     Taejoon Song <taejoon.song@lge.com>,
-        Andrew Morton <akpm@linux-foundation.org>
-Cc:     ngupta@vflare.org, sergey.senozhatsky.work@gmail.com,
-        axboe@kernel.dk, linux-kernel@vger.kernel.org,
-        linux-block@vger.kernel.org, yjay.kim@lge.com
-Subject: Re: [PATCH] zram: try to avoid worst-case scenario on same element
- pages
-Message-ID: <20191204225451.GA42672@google.com>
-References: <1575424418-16119-1-git-send-email-taejoon.song@lge.com>
+        id S1728121AbfLDW7X (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Wed, 4 Dec 2019 17:59:23 -0500
+Received: from mail105.syd.optusnet.com.au ([211.29.132.249]:41601 "EHLO
+        mail105.syd.optusnet.com.au" rhost-flags-OK-OK-OK-OK)
+        by vger.kernel.org with ESMTP id S1728053AbfLDW7X (ORCPT
+        <rfc822;linux-block@vger.kernel.org>);
+        Wed, 4 Dec 2019 17:59:23 -0500
+Received: from dread.disaster.area (pa49-179-150-192.pa.nsw.optusnet.com.au [49.179.150.192])
+        by mail105.syd.optusnet.com.au (Postfix) with ESMTPS id 31B6E3A1476;
+        Thu,  5 Dec 2019 09:59:17 +1100 (AEDT)
+Received: from dave by dread.disaster.area with local (Exim 4.92.3)
+        (envelope-from <david@fromorbit.com>)
+        id 1icdc3-0006dP-VE; Thu, 05 Dec 2019 09:59:15 +1100
+Date:   Thu, 5 Dec 2019 09:59:15 +1100
+From:   Dave Chinner <david@fromorbit.com>
+To:     Hillf Danton <hdanton@sina.com>
+Cc:     Ming Lei <ming.lei@redhat.com>,
+        linux-block <linux-block@vger.kernel.org>,
+        linux-fs <linux-fsdevel@vger.kernel.org>,
+        linux-xfs <linux-xfs@vger.kernel.org>,
+        linux-kernel <linux-kernel@vger.kernel.org>,
+        Christoph Hellwig <hch@lst.de>, Jens Axboe <axboe@kernel.dk>,
+        Peter Zijlstra <peterz@infradead.org>,
+        Vincent Guittot <vincent.guittot@linaro.org>,
+        Rong Chen <rong.a.chen@intel.com>, Tejun Heo <tj@kernel.org>
+Subject: Re: single aio thread is migrated crazily by scheduler
+Message-ID: <20191204225915.GO2695@dread.disaster.area>
+References: <20191114113153.GB4213@ming.t460p>
+ <20191114235415.GL4614@dread.disaster.area>
+ <20191115010824.GC4847@ming.t460p>
+ <20191115045634.GN4614@dread.disaster.area>
+ <20191115070843.GA24246@ming.t460p>
+ <20191128094003.752-1-hdanton@sina.com>
+ <20191202090158.15016-1-hdanton@sina.com>
+ <20191203131514.5176-1-hdanton@sina.com>
+ <20191204102903.896-1-hdanton@sina.com>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=us-ascii
 Content-Disposition: inline
-In-Reply-To: <1575424418-16119-1-git-send-email-taejoon.song@lge.com>
+In-Reply-To: <20191204102903.896-1-hdanton@sina.com>
 User-Agent: Mutt/1.10.1 (2018-07-13)
+X-Optus-CM-Score: 0
+X-Optus-CM-Analysis: v=2.3 cv=X6os11be c=1 sm=1 tr=0
+        a=ZXpxJgW8/q3NVgupyyvOCQ==:117 a=ZXpxJgW8/q3NVgupyyvOCQ==:17
+        a=jpOVt7BSZ2e4Z31A5e1TngXxSK0=:19 a=kj9zAlcOel0A:10 a=pxVhFHJ0LMsA:10
+        a=7-415B0cAAAA:8 a=3OwV-sDklMwd061yJKAA:9 a=7Zwj6sZBwVKJAoWSPKxL6X1jA+E=:19
+        a=CjuIK1q_8ugA:10 a=biEYGPWJfzWAr4FL6Ov7:22
 Sender: linux-block-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-On Wed, Dec 04, 2019 at 10:53:38AM +0900, Taejoon Song wrote:
-> The worst-case scenario on finding same element pages is that almost
-> all elements are same at the first glance but only last few elements
-> are different.
+On Wed, Dec 04, 2019 at 06:29:03PM +0800, Hillf Danton wrote:
 > 
-> Since the same element tends to be grouped from the beginning of the
-> pages, if we check the first element with the last element before
-> looping through all elements, we might have some chances to quickly
-> detect non-same element pages.
+> On Wed, 4 Dec 2019 09:29:25 +1100 Dave Chinner wrote:
+> > 
+> > If we really want to hack around the load balancer problems in this
+> > way, then we need to add a new workqueue concurrency management type
+> > with behaviour that lies between the default of bound and WQ_UNBOUND.
+> > 
+> > WQ_UNBOUND limits scheduling to within a numa node - see
+> > wq_update_unbound_numa() for how it sets up the cpumask attributes
+> > it applies to it's workers - but we need the work to be bound to
+> > within the local cache domain rather than a numa node. IOWs, set up
+> > the kworker task pool management structure with the right attributes
+> > (e.g. cpu masks) to define the cache domains, add all the hotplug
+> > code to make it work with CPU hotplug, then simply apply those
+> > attributes to the kworker task that is selected to execute the work.
+> > 
+> > This allows the scheduler to migrate the kworker away from the local
+> > run queue without interrupting the currently scheduled task. The
+> > cpumask limits the task is configured with limit the scheduler to
+> > selecting the best CPU within the local cache domain, and we don't
+> > have to bind work to CPUs to get CPU cache friendly work scheduling.
+> > This also avoids overhead of per-queue_work_on() sibling CPU
+> > calculation, and all the code that wants to use this functionality
+> > needs to do is add a single flag at work queue init time (e.g.
+> > WQ_CACHEBOUND).
+> > 
+> > IOWs, if the task migration behaviour cannot be easily fixed and so
+> > we need work queue users to be more flexible about work placement,
+> > then the solution needed here is "cpu cache local work queue
+> > scheduling" implemented in the work queue infrastructure, not in
+> > every workqueue user.
 > 
-> 1. Test is done under LG webOS TV (64-bit arch)
-> 2. Dump the swap-out pages (~819200 pages)
-> 3. Analyze the pages with simple test script which counts the iteration
->    number and measures the speed at off-line
-> 
-> Under 64-bit arch, the worst iteration count is PAGE_SIZE / 8 bytes = 512.
-> The speed is based on the time to consume page_same_filled() function only.
-> The result, on average, is listed as below:
-> 
->                                    Num of Iter    Speed(MB/s)
-> Looping-Forward (Orig)                 38            99265
-> Looping-Backward                       36           102725
-> Last-element-check (This Patch)        33           125072
-> 
-> The result shows that the average iteration count decreases by 13% and
-> the speed increases by 25% with this patch. This patch does not increase
-> the overall time complexity, though.
-> 
-> I also ran simpler version which uses backward loop. Just looping backward
-> also makes some improvement, but less than this patch.
-> 
-> Signed-off-by: Taejoon Song <taejoon.song@lge.com>
-Acked-by: Minchan Kim <minchan@kernel.org>
+> Add WQ_CACHE_BOUND and a user of it and a helper to find cpus that
+> share cache.
 
-I think it's very reasonable optimization with small cost.
+<sigh>
+
+If you are going to quote my suggestion in full, then please
+implement it in full. This patch does almost none of what you quoted
+above - it still has all the problems of the previous version that
+lead me to write the above.
+
+> --- a/kernel/workqueue.c
+> +++ b/kernel/workqueue.c
+> @@ -1358,16 +1358,42 @@ static bool is_chained_work(struct workq
+>  	return worker && worker->current_pwq->wq == wq;
+>  }
+>  
+> +static DEFINE_PER_CPU(int, wq_sel_cbc_cnt);
+> +static DEFINE_PER_CPU(int, wq_sel_cbc_cpu);
+> +#define WQ_SEL_CBC_BATCH 7
+> +
+> +static int wq_select_cache_bound_cpu(int this_cpu)
+> +{
+> +	int *cntp, *cpup;
+> +	int cpu;
+> +
+> +	cntp = get_cpu_ptr(&wq_sel_cbc_cnt);
+> +	cpup = this_cpu_ptr(&wq_sel_cbc_cpu);
+> +	cpu = *cpup;
+> +
+> +	if (!(*cntp & WQ_SEL_CBC_BATCH)) {
+> +		cpu = cpus_share_cache_next_cpu(this_cpu, cpu);
+> +		*cpup = cpu;
+> +	}
+> +	(*cntp)++;
+> +	put_cpu_ptr(&wq_sel_cbc_cnt);
+> +
+> +	return cpu;
+> +}
+
+This selects a specific CPU in the local cache domain at
+queue_work() time, just like the previous patch. It does not do what
+I suggested above in reponse to the scalability issues this approach
+has...
+
+>  /*
+>   * When queueing an unbound work item to a wq, prefer local CPU if allowed
+>   * by wq_unbound_cpumask.  Otherwise, round robin among the allowed ones to
+>   * avoid perturbing sensitive tasks.
+>   */
+> -static int wq_select_unbound_cpu(int cpu)
+> +static int wq_select_unbound_cpu(int cpu, bool cache_bound)
+>  {
+>  	static bool printed_dbg_warning;
+>  	int new_cpu;
+>  
+> +	if (cache_bound)
+> +		return wq_select_cache_bound_cpu(cpu);
+> +
+>  	if (likely(!wq_debug_force_rr_cpu)) {
+>  		if (cpumask_test_cpu(cpu, wq_unbound_cpumask))
+>  			return cpu;
+> @@ -1417,7 +1443,8 @@ static void __queue_work(int cpu, struct
+>  	rcu_read_lock();
+>  retry:
+>  	if (req_cpu == WORK_CPU_UNBOUND)
+> -		cpu = wq_select_unbound_cpu(raw_smp_processor_id());
+> +		cpu = wq_select_unbound_cpu(raw_smp_processor_id(),
+> +					wq->flags & WQ_CACHE_BOUND);
+
+And the per-cpu  kworker pool selection after we've selected a CPU
+here binds it to that specific CPU or (if WQ_UNBOUND) the local
+node. IOWs, this is exactly the same functionality as the last
+patch, just moved inside the work queue infrastructure.
+
+IOWs, apart from the WQ_CACHE_BOUND flag, this patch doesn't
+implement any of what I suggested above. It does not solve the the
+problem of bound kworkers kicking running tasks off a CPU so the
+bound task can run, and it does not allow the scheduler to select
+the best CPU in the local cache scheduling domain for the kworker to
+run on. i.e. it still behaves like bound work rather than WQ_UNBOUND
+work.
+
+IMO, this adds the CPU selection to the -wrong function-.  We still
+want the local CPU selected when req_cpu == WORK_CPU_UNBOUND.  The
+following code selects where the kworker will be bound based on the
+task pool that the workqueue is configured to use:
+
+	/* pwq which will be used unless @work is executing elsewhere */
+	if (!(wq->flags & WQ_UNBOUND))
+		pwq = per_cpu_ptr(wq->cpu_pwqs, cpu);
+	else
+		pwq = unbound_pwq_by_node(wq, cpu_to_node(cpu));
+
+i.e. the local CPU is the key we need to look up the task pool for
+running tasks in the local cache domain - we do not use it as the
+CPU we want to run work on. IOWs, what we really want is this:
+
+	if (wq->flags & WQ_UNBOUND)
+		pwq = unbound_pwq_by_node(wq, cpu_to_node(cpu));
+	else if (wq->flags & WQ_CACHE_BOUND)
+		pwq = unbound_pwq_by_cache(wq, cpu);
+	else
+		pwq = per_cpu_ptr(wq->cpu_pwqs, cpu);
+
+And then unbound_pwq_by_cache() is implemented in a similar manner
+to unbound_pwq_by_node() where there is a separate worker pool per
+cache domain. THe scheduler domain attributes (cpumask) is held by
+the task pool, and they are applied to the kworker task when it's
+given the task to run. This, like WQ_UNBOUND, allows the scheduler
+to select the best CPU in the cpumask for the task to run on.
+
+Binding kworkers to a single CPU is exactly the problem we need to
+avoid here - we need to let the scheduler choose the best CPU in the
+local cache domain based on the current load. That means the
+implementation needs to behave like a WQ_UNBOUND workqueue, just
+with a more restrictive cpumask.
+
+-Dave.
+-- 
+Dave Chinner
+david@fromorbit.com
