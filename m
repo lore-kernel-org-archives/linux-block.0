@@ -2,103 +2,151 @@ Return-Path: <SRS0=bBnE=Z2=vger.kernel.org=linux-block-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-9.8 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
-	INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,
-	USER_AGENT_GIT autolearn=ham autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-5.4 required=3.0 tests=DKIMWL_WL_HIGH,DKIM_SIGNED,
+	DKIM_VALID,DKIM_VALID_AU,HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,
+	MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,USER_AGENT_SANE_1
+	autolearn=unavailable autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id A26E0C432C0
-	for <linux-block@archiver.kernel.org>; Wed,  4 Dec 2019 01:53:46 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 1C013C43215
+	for <linux-block@archiver.kernel.org>; Wed,  4 Dec 2019 02:40:02 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.kernel.org (Postfix) with ESMTP id 732E82073B
-	for <linux-block@archiver.kernel.org>; Wed,  4 Dec 2019 01:53:46 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id E370720640
+	for <linux-block@archiver.kernel.org>; Wed,  4 Dec 2019 02:40:01 +0000 (UTC)
+Authentication-Results: mail.kernel.org;
+	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="eJ6yMl5Y"
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1726291AbfLDBxq (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Tue, 3 Dec 2019 20:53:46 -0500
-Received: from lgeamrelo13.lge.com ([156.147.23.53]:47108 "EHLO
-        lgeamrelo11.lge.com" rhost-flags-OK-OK-OK-FAIL) by vger.kernel.org
-        with ESMTP id S1726179AbfLDBxp (ORCPT
-        <rfc822;linux-block@vger.kernel.org>); Tue, 3 Dec 2019 20:53:45 -0500
-Received: from unknown (HELO lgemrelse6q.lge.com) (156.147.1.121)
-        by 156.147.23.53 with ESMTP; 4 Dec 2019 10:53:43 +0900
-X-Original-SENDERIP: 156.147.1.121
-X-Original-MAILFROM: taejoon.song@lge.com
-Received: from unknown (HELO ubuntu0.156.147.1.1) (10.177.220.34)
-        by 156.147.1.121 with ESMTP; 4 Dec 2019 10:53:43 +0900
-X-Original-SENDERIP: 10.177.220.34
-X-Original-MAILFROM: taejoon.song@lge.com
-From:   Taejoon Song <taejoon.song@lge.com>
-To:     minchan@kernel.org, ngupta@vflare.org,
-        sergey.senozhatsky.work@gmail.com, axboe@kernel.dk
-Cc:     linux-kernel@vger.kernel.org, linux-block@vger.kernel.org,
-        yjay.kim@lge.com, Taejoon Song <taejoon.song@lge.com>
-Subject: [PATCH] zram: try to avoid worst-case scenario on same element pages
-Date:   Wed,  4 Dec 2019 10:53:38 +0900
-Message-Id: <1575424418-16119-1-git-send-email-taejoon.song@lge.com>
-X-Mailer: git-send-email 2.7.4
+        id S1726923AbfLDCkA (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Tue, 3 Dec 2019 21:40:00 -0500
+Received: from us-smtp-2.mimecast.com ([207.211.31.81]:25920 "EHLO
+        us-smtp-delivery-1.mimecast.com" rhost-flags-OK-OK-OK-FAIL)
+        by vger.kernel.org with ESMTP id S1726486AbfLDCkA (ORCPT
+        <rfc822;linux-block@vger.kernel.org>);
+        Tue, 3 Dec 2019 21:40:00 -0500
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+        s=mimecast20190719; t=1575427199;
+        h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+         to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+         content-transfer-encoding:content-transfer-encoding:
+         in-reply-to:in-reply-to:references:references;
+        bh=lUNcibfkDj9cICd3L3313R4P5SZt0kUgexQ7UYbZQvw=;
+        b=eJ6yMl5YXoveElD3aSR0Pnld+fedmrUFcjnlNpqzKmOCQdF4229NhtsOAfpVMlT0+ooqIF
+        4HDunz6/0jvA9DyabHyzwn0rm4hlBYZ2Ix0Odvyf2cj1Glvh3P8kKe8UUQ2+J6Lro4fGzf
+        NijyYtGAZjjH1d+2vd4xN7AexSka5iA=
+Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
+ [209.132.183.4]) (Using TLS) by relay.mimecast.com with ESMTP id
+ us-mta-407-eal7FyFpPpS8Ce4pW7mcwg-1; Tue, 03 Dec 2019 21:39:55 -0500
+Received: from smtp.corp.redhat.com (int-mx05.intmail.prod.int.phx2.redhat.com [10.5.11.15])
+        (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
+        (No client certificate requested)
+        by mimecast-mx01.redhat.com (Postfix) with ESMTPS id E3DFA10054E3;
+        Wed,  4 Dec 2019 02:39:53 +0000 (UTC)
+Received: from ming.t460p (ovpn-8-17.pek2.redhat.com [10.72.8.17])
+        by smtp.corp.redhat.com (Postfix) with ESMTPS id CBA6C5D6AE;
+        Wed,  4 Dec 2019 02:39:44 +0000 (UTC)
+Date:   Wed, 4 Dec 2019 10:39:39 +0800
+From:   Ming Lei <ming.lei@redhat.com>
+To:     Stephen Rust <srust@blockbridge.com>
+Cc:     Rob Townley <rob.townley@gmail.com>,
+        Christoph Hellwig <hch@lst.de>, Jens Axboe <axboe@kernel.dk>,
+        linux-block@vger.kernel.org, linux-rdma@vger.kernel.org,
+        linux-scsi@vger.kernel.org, martin.petersen@oracle.com,
+        target-devel@vger.kernel.org, Doug Ledford <dledford@redhat.com>,
+        Jason Gunthorpe <jgg@ziepe.ca>
+Subject: Re: Data corruption in kernel 5.1+ with iSER attached ramdisk
+Message-ID: <20191204023939.GD3910@ming.t460p>
+References: <CAAFE1bfsXsKGyw7SU_z4NanT+wmtuJT=XejBYbHHMCDQwm73sw@mail.gmail.com>
+ <20191128091210.GC15549@ming.t460p>
+ <CAAFE1beMkvyRctGqpffd3o_QtDH0CrmQSb=fV4GzqMUXWzPyOw@mail.gmail.com>
+ <20191203005849.GB25002@ming.t460p>
+ <CAAFE1bcG8c1Q3iwh-LUjruBMAuFTJ4qWxNGsnhfKvGWHNLAeEQ@mail.gmail.com>
+ <20191203031444.GB6245@ming.t460p>
+ <CAAFE1besnb=HV4C_buORYpWbkXecmtybwX8d_Ka2NsKmiym53w@mail.gmail.com>
+ <CAAFE1bfpUWCZrtR8v3S++0-+gi8DJ79X3e0XqDe93i8nuGTnNg@mail.gmail.com>
+ <20191203124558.GA22805@ming.t460p>
+ <CAAFE1bfB2Km+e=T0ahwq0r9BQrBMnSguQQ+y=yzYi3tursS+TQ@mail.gmail.com>
+MIME-Version: 1.0
+In-Reply-To: <CAAFE1bfB2Km+e=T0ahwq0r9BQrBMnSguQQ+y=yzYi3tursS+TQ@mail.gmail.com>
+User-Agent: Mutt/1.12.1 (2019-06-15)
+X-Scanned-By: MIMEDefang 2.79 on 10.5.11.15
+X-MC-Unique: eal7FyFpPpS8Ce4pW7mcwg-1
+X-Mimecast-Spam-Score: 0
+Content-Type: text/plain; charset=us-ascii
+Content-Transfer-Encoding: quoted-printable
+Content-Disposition: inline
 Sender: linux-block-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-The worst-case scenario on finding same element pages is that almost
-all elements are same at the first glance but only last few elements
-are different.
+On Tue, Dec 03, 2019 at 02:56:08PM -0500, Stephen Rust wrote:
+> Hi Ming,
+>=20
+> Thanks very much for the patch.
+>=20
+> > BTW, you may try the attached test patch. If the issue can be fixed by
+> > this patch, that means it is really caused by un-aligned buffer, and
+> > the iser driver needs to be fixed.
+>=20
+> I have tried the patch, and re-run the test. Results are mixed.
+>=20
+> To recap, our test writes the last bytes of an iser attached iscsi
+> device. The target device is a LIO iblock, backed by a brd ramdisk.
+> The client does a simple `dd`, doing a seek to "size - offset" of the
+> device, and writing a buffer of "length" which is equivalent to the
+> offset.
+>=20
+> For example, to test a write at a 512 offset, seek to device "size -
+> 512", and write a length of data 512 bytes.
+>=20
+> WITHOUT the patch, writing data at the following offsets from the end
+> of the device failed to write all the correct data (rather, the write
+> succeeded, but reading the data back it was invalid):
+>=20
+> - failed: 512,1024, 2048, 4096, 8192
+>=20
+> Anything larger worked fine.
+>=20
+> WITH the patch applied, writing data up to an offset of 4096 all now
+> worked and verified correctly. However, offsets between 4096 and 8192
+> all still failed. I started at 512, and incremented by 512 all the way
+> up to 16384. The following offsets all failed to verify the write:
+>=20
+> - failed: 4608, 5120, 5632, 6144, 6656, 7168, 7680, 8192
+>=20
+> Anything larger continues to work fine with the patch.
+>=20
+> As an example, for the failed 8192 case, the `bpftrace lio.bt` trace show=
+s:
+>=20
+> 8192 76
+> 4096 0
+> 4096 0
+> 8192 76
+> 4096 0
+> 4096 0
 
-Since the same element tends to be grouped from the beginning of the
-pages, if we check the first element with the last element before
-looping through all elements, we might have some chances to quickly
-detect non-same element pages.
+The following delta change against last patch should fix the issue
+with >4096 bvec length:
 
-1. Test is done under LG webOS TV (64-bit arch)
-2. Dump the swap-out pages (~819200 pages)
-3. Analyze the pages with simple test script which counts the iteration
-   number and measures the speed at off-line
+diff --git a/drivers/block/brd.c b/drivers/block/brd.c
+index 9ea1894c820d..49e37a7dda63 100644
+--- a/drivers/block/brd.c
++++ b/drivers/block/brd.c
+@@ -308,7 +308,7 @@ static blk_qc_t brd_make_request(struct request_queue *=
+q, struct bio *bio)
+                if (err)
+                        goto io_error;
+                sector +=3D secs;
+-               offset_in_sec =3D len - (secs << SECTOR_SHIFT);
++               offset_in_sec +=3D len - (secs << SECTOR_SHIFT);
+        }
 
-Under 64-bit arch, the worst iteration count is PAGE_SIZE / 8 bytes = 512.
-The speed is based on the time to consume page_same_filled() function only.
-The result, on average, is listed as below:
+        bio_endio(bio);
 
-                                   Num of Iter    Speed(MB/s)
-Looping-Forward (Orig)                 38            99265
-Looping-Backward                       36           102725
-Last-element-check (This Patch)        33           125072
+However, the change on brd is a workaround just for confirming the
+issue.
 
-The result shows that the average iteration count decreases by 13% and
-the speed increases by 25% with this patch. This patch does not increase
-the overall time complexity, though.
 
-I also ran simpler version which uses backward loop. Just looping backward
-also makes some improvement, but less than this patch.
-
-Signed-off-by: Taejoon Song <taejoon.song@lge.com>
----
- drivers/block/zram/zram_drv.c | 7 +++++--
- 1 file changed, 5 insertions(+), 2 deletions(-)
-
-diff --git a/drivers/block/zram/zram_drv.c b/drivers/block/zram/zram_drv.c
-index 4285e75..afadd7f 100644
---- a/drivers/block/zram/zram_drv.c
-+++ b/drivers/block/zram/zram_drv.c
-@@ -207,14 +207,17 @@ static inline void zram_fill_page(void *ptr, unsigned long len,
- 
- static bool page_same_filled(void *ptr, unsigned long *element)
- {
--	unsigned int pos;
- 	unsigned long *page;
- 	unsigned long val;
-+	unsigned int pos, last_pos = PAGE_SIZE / sizeof(*page) - 1;
- 
- 	page = (unsigned long *)ptr;
- 	val = page[0];
- 
--	for (pos = 1; pos < PAGE_SIZE / sizeof(*page); pos++) {
-+	if (val != page[last_pos])
-+		return false;
-+
-+	for (pos = 1; pos < last_pos - 1; pos++) {
- 		if (val != page[pos])
- 			return false;
- 	}
--- 
-2.7.4
+Thanks,=20
+Ming
 
