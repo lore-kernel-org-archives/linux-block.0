@@ -2,83 +2,106 @@ Return-Path: <SRS0=S578=Z3=vger.kernel.org=linux-block-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-0.9 required=3.0 tests=DKIMWL_WL_HIGH,DKIM_SIGNED,
-	DKIM_VALID,DKIM_VALID_AU,HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,
-	SPF_HELO_NONE,SPF_PASS autolearn=no autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-2.2 required=3.0 tests=DKIM_SIGNED,DKIM_VALID,
+	HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,
+	USER_AGENT_SANE_1 autolearn=no autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id BFB95C2BD09
-	for <linux-block@archiver.kernel.org>; Thu,  5 Dec 2019 13:57:08 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id E1FC0C43603
+	for <linux-block@archiver.kernel.org>; Thu,  5 Dec 2019 14:31:45 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.kernel.org (Postfix) with ESMTP id 8AFD4224F8
-	for <linux-block@archiver.kernel.org>; Thu,  5 Dec 2019 13:57:08 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id B490F24651
+	for <linux-block@archiver.kernel.org>; Thu,  5 Dec 2019 14:31:45 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="dfF7Li9O"
+	dkim=pass (2048-bit key) header.d=kernel-dk.20150623.gappssmtp.com header.i=@kernel-dk.20150623.gappssmtp.com header.b="svyy6Nww"
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1729503AbfLEN5I (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Thu, 5 Dec 2019 08:57:08 -0500
-Received: from us-smtp-delivery-1.mimecast.com ([205.139.110.120]:50790 "EHLO
-        us-smtp-1.mimecast.com" rhost-flags-OK-OK-OK-FAIL) by vger.kernel.org
-        with ESMTP id S1729240AbfLEN5H (ORCPT
-        <rfc822;linux-block@vger.kernel.org>); Thu, 5 Dec 2019 08:57:07 -0500
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-        s=mimecast20190719; t=1575554227;
-        h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-         to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-         content-transfer-encoding:content-transfer-encoding:
-         in-reply-to:in-reply-to:references:references;
-        bh=iwDpswnvJYEc51uYZ3w4B0L234MkONszPPNZVFbIUh8=;
-        b=dfF7Li9Om74K8UZAtOzofyxAJQf1Jo0nxWNa4ilYj9TpoVfo7gvlYGvkIH+PtbPYgPFqaV
-        SWFypS1kLqmD173MdCkaG3uM6f5LOC0whLF9oWeXMm8xyOyXbhoSxLgFIfOYOaj9PPqF/q
-        rOJR1xg/uzu0RTk0vTtrn4hf8boOibE=
-Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
- [209.132.183.4]) (Using TLS) by relay.mimecast.com with ESMTP id
- us-mta-314-i7QgFGW9O46JVqA37OrdIg-1; Thu, 05 Dec 2019 08:57:03 -0500
-Received: from smtp.corp.redhat.com (int-mx01.intmail.prod.int.phx2.redhat.com [10.5.11.11])
-        (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
-        (No client certificate requested)
-        by mimecast-mx01.redhat.com (Postfix) with ESMTPS id CD828107ACE6;
-        Thu,  5 Dec 2019 13:57:00 +0000 (UTC)
-Received: from warthog.procyon.org.uk (ovpn-120-250.rdu2.redhat.com [10.10.120.250])
-        by smtp.corp.redhat.com (Postfix) with ESMTP id D52D4600D1;
-        Thu,  5 Dec 2019 13:56:57 +0000 (UTC)
-Organization: Red Hat UK Ltd. Registered Address: Red Hat UK Ltd, Amberley
-        Place, 107-111 Peascod Street, Windsor, Berkshire, SI4 1TE, United
-        Kingdom.
-        Registered in England and Wales under Company Registration No. 3798903
-From:   David Howells <dhowells@redhat.com>
-In-Reply-To: <20191205125826.GK2734@twin.jikos.cz>
-References: <20191205125826.GK2734@twin.jikos.cz> <31452.1574721589@warthog.procyon.org.uk>
-To:     dsterba@suse.cz
-Cc:     dhowells@redhat.com, torvalds@linux-foundation.org,
-        Rasmus Villemoes <linux@rasmusvillemoes.dk>,
-        Greg Kroah-Hartman <gregkh@linuxfoundation.org>,
-        Peter Zijlstra <peterz@infradead.org>, raven@themaw.net,
-        Christian Brauner <christian@brauner.io>,
-        keyrings@vger.kernel.org, linux-usb@vger.kernel.org,
-        linux-block@vger.kernel.org, linux-security-module@vger.kernel.org,
-        linux-fsdevel@vger.kernel.org, linux-api@vger.kernel.org,
-        linux-kernel@vger.kernel.org
-Subject: Re: [GIT PULL] pipe: Notification queue preparation
+        id S1729240AbfLEObp (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Thu, 5 Dec 2019 09:31:45 -0500
+Received: from mail-il1-f193.google.com ([209.85.166.193]:36304 "EHLO
+        mail-il1-f193.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S1729099AbfLEObp (ORCPT
+        <rfc822;linux-block@vger.kernel.org>); Thu, 5 Dec 2019 09:31:45 -0500
+Received: by mail-il1-f193.google.com with SMTP id b15so3182421iln.3
+        for <linux-block@vger.kernel.org>; Thu, 05 Dec 2019 06:31:44 -0800 (PST)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=kernel-dk.20150623.gappssmtp.com; s=20150623;
+        h=subject:to:cc:references:from:message-id:date:user-agent
+         :mime-version:in-reply-to:content-language:content-transfer-encoding;
+        bh=IgyIZsGkXhOyBGMyNdc+KtFv0dlQd6LCRsvdmK8SA0g=;
+        b=svyy6NwwJUkG/aeIXKq3I1AJRSl/zcAzFj/2K4qqOekw1HPZXlVHMmxE2dKZPOpsGt
+         cDTd2XPf/blqMySJiA6shLmjkgbxBjMjzbWhuybvaoFwbntoiH9TWhxO07jpHbclN24K
+         0Nyra51whuUFSsSWGioTWRLyFTX5w685UgljNeyDLL+Mw1Ip3XsnhJfBiP3yae/2p2yK
+         hinQfBLQPUvnLgmu636PXmuSvv3k3F/6UQZn0IWu/0YH/XI5v8Du9DOsxzgr0/3u+MoV
+         54G1n2x1uTI5sTgtJwuFF6AOpqx23bWVU4innrWyRarSZQd3AohCLEXccY/F32KSK7Lw
+         RA5w==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20161025;
+        h=x-gm-message-state:subject:to:cc:references:from:message-id:date
+         :user-agent:mime-version:in-reply-to:content-language
+         :content-transfer-encoding;
+        bh=IgyIZsGkXhOyBGMyNdc+KtFv0dlQd6LCRsvdmK8SA0g=;
+        b=Fv2wisigJjzGNqm0/U1EsR+Ap1ctS02x/edZQ+M8ZZMDXmlGhsKDxI8xhSEj9SkPlD
+         vwYwZG9ATLqXkj/4f/A5eqxV5DzZ7BnjCkyZ8mnmTAuDzg+Fk3ph1Mj4uQap7vycsiC6
+         8IHimzwIh8aAp32PgVspwezLCcuFTi214ZJ6l5r24Y09NEdldxauYK1qgyOqfA1cs2UB
+         Q3z+IAHkRtDrqyBEMnws7TI7CHZgBf8cXYpBwfyL3OFCWwlQgQVAYArG2MXqWm4dZgHW
+         MGbNW/1m7BN7hTXLlF0dsr2PMj5YWzrcGDs7lDOCrw7CN90hByvV9olOaCEEcn2Uwmfw
+         WPaQ==
+X-Gm-Message-State: APjAAAVRmOMALvTMh9tPm2ofCaupdsF7wINvlzany5oHe/ENuA/WExST
+        RIa+GPozWOkrMDuniGoLIxdg4xm2TLUDfg==
+X-Google-Smtp-Source: APXvYqxKm4XTwpnmBxasLpscBwsKRGggIS1DPAW/S2dfY1PoBHeecBwtM6YRFC4VKAlru82BkoxYYg==
+X-Received: by 2002:a92:84ce:: with SMTP id y75mr8736595ilk.93.1575556304231;
+        Thu, 05 Dec 2019 06:31:44 -0800 (PST)
+Received: from [192.168.1.159] ([65.144.74.34])
+        by smtp.gmail.com with ESMTPSA id s23sm2850121ild.48.2019.12.05.06.31.42
+        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
+        Thu, 05 Dec 2019 06:31:42 -0800 (PST)
+Subject: Re: [PATCH] bfq-iosched: Ensure bio->bi_blkg is valid before using it
+To:     Hou Tao <houtao1@huawei.com>, linux-block@vger.kernel.org,
+        tj@kernel.org
+Cc:     paolo.valente@linaro.org, cgroups@vger.kernel.org
+References: <20191205125311.40616-1-houtao1@huawei.com>
+From:   Jens Axboe <axboe@kernel.dk>
+Message-ID: <0f828dd3-c0d4-3a7f-8531-dc9ccfd18e32@kernel.dk>
+Date:   Thu, 5 Dec 2019 07:31:41 -0700
+User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:68.0) Gecko/20100101
+ Thunderbird/68.2.1
 MIME-Version: 1.0
-Content-ID: <1592.1575554217.1@warthog.procyon.org.uk>
-Date:   Thu, 05 Dec 2019 13:56:57 +0000
-Message-ID: <1593.1575554217@warthog.procyon.org.uk>
-X-Scanned-By: MIMEDefang 2.79 on 10.5.11.11
-X-MC-Unique: i7QgFGW9O46JVqA37OrdIg-1
-X-Mimecast-Spam-Score: 0
-Content-Type: text/plain; charset="us-ascii"
-Content-Transfer-Encoding: quoted-printable
+In-Reply-To: <20191205125311.40616-1-houtao1@huawei.com>
+Content-Type: text/plain; charset=utf-8
+Content-Language: en-US
+Content-Transfer-Encoding: 7bit
 Sender: linux-block-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-David Sterba <dsterba@suse.cz> wrote:
+On 12/5/19 5:53 AM, Hou Tao wrote:
+> bio->bi_blkg will be NULL when the issue of the request
+> has bypassed the block layer as shown in the following oops:
+> 
+>  Internal error: Oops: 96000005 [#1] SMP
+>  CPU: 17 PID: 2996 Comm: scsi_id Not tainted 5.4.0 #4
+>  Call trace:
+>   percpu_counter_add_batch+0x38/0x4c8
+>   bfqg_stats_update_legacy_io+0x9c/0x280
+>   bfq_insert_requests+0xbac/0x2190
+>   blk_mq_sched_insert_request+0x288/0x670
+>   blk_execute_rq_nowait+0x140/0x178
+>   blk_execute_rq+0x8c/0x140
+>   sg_io+0x604/0x9c0
+>   scsi_cmd_ioctl+0xe38/0x10a8
+>   scsi_cmd_blk_ioctl+0xac/0xe8
+>   sd_ioctl+0xe4/0x238
+>   blkdev_ioctl+0x590/0x20e0
+>   block_ioctl+0x60/0x98
+>   do_vfs_ioctl+0xe0/0x1b58
+>   ksys_ioctl+0x80/0xd8
+>   __arm64_sys_ioctl+0x40/0x78
+>   el0_svc_handler+0xc4/0x270
+> 
+> so ensure its validity before using it.
 
-> [<0>] pipe_write+0x1be/0x4b0
+Applied, thanks.
 
-Can you get me a line number of that?  Assuming you've built with -g, load
-vmlinux into gdb and do "i li pipe_write+0x1be".
-
-David
+-- 
+Jens Axboe
 
