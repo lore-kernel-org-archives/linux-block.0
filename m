@@ -7,58 +7,59 @@ X-Spam-Status: No, score=-8.4 required=3.0 tests=DKIMWL_WL_HIGH,DKIM_SIGNED,
 	MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,USER_AGENT_SANE_1
 	autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id CE81DC43603
-	for <linux-block@archiver.kernel.org>; Thu,  5 Dec 2019 15:16:39 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id BFE31C43603
+	for <linux-block@archiver.kernel.org>; Thu,  5 Dec 2019 15:17:42 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.kernel.org (Postfix) with ESMTP id 8A28A224F8
-	for <linux-block@archiver.kernel.org>; Thu,  5 Dec 2019 15:16:39 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id 7D1792464E
+	for <linux-block@archiver.kernel.org>; Thu,  5 Dec 2019 15:17:42 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=pass (1024-bit key) header.d=amazon.com header.i=@amazon.com header.b="pcQRlDOU"
+	dkim=pass (1024-bit key) header.d=amazon.com header.i=@amazon.com header.b="auBm8oCZ"
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1729695AbfLEPQi (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Thu, 5 Dec 2019 10:16:38 -0500
-Received: from smtp-fw-2101.amazon.com ([72.21.196.25]:18480 "EHLO
-        smtp-fw-2101.amazon.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1729099AbfLEPQi (ORCPT
-        <rfc822;linux-block@vger.kernel.org>); Thu, 5 Dec 2019 10:16:38 -0500
+        id S1729145AbfLEPRm (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Thu, 5 Dec 2019 10:17:42 -0500
+Received: from smtp-fw-9101.amazon.com ([207.171.184.25]:58068 "EHLO
+        smtp-fw-9101.amazon.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S1726257AbfLEPRl (ORCPT
+        <rfc822;linux-block@vger.kernel.org>); Thu, 5 Dec 2019 10:17:41 -0500
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
   d=amazon.com; i=@amazon.com; q=dns/txt; s=amazon201209;
-  t=1575558997; x=1607094997;
+  t=1575559061; x=1607095061;
   h=subject:to:cc:references:from:message-id:date:
    mime-version:in-reply-to:content-transfer-encoding;
   bh=C1oFzrj34QolL5H4aOWLvQyygWmB7hXl2AlARDmhXA0=;
-  b=pcQRlDOUDeED+5lZdZ7RVkh27dJEv4HdL0UDDCkuueAharbY9mCSA3QL
-   1j0pUn4DRkJa70YdRgJ6u++Tx/uIdCVtOHKHZVgOfxV2POhPC+RfdgMKH
-   McWZ94Sj08TcUswFoszP57x66I0UfxHt82c1txUWhQkN6g80rJsbWGC8Z
-   M=;
-IronPort-SDR: mVNUuZ+mLMtgI+ouYSr5spb8rh4BJmura+tGZom9JtflYE6DAyBLYOcahm4Tz8UX1BPsYN84vg
- BADtA2XhAQQA==
+  b=auBm8oCZoGxMyvKqMf5yXxoKl/Z61ElUcHyOhQ6FNVuZU/jPKTs9jGcv
+   a7XIT95Y5Q1gxQ3V7GNTQqkNLrFl5T3yky+4FiFARd8+3qqgQ//qRa9Hz
+   EmGx73lT9QxKsw00NOEx7wccjof7DVPpZk977Egm2hmxm3tSWjF6mF4iN
+   I=;
+IronPort-SDR: niW+dp1cFro9KfTuXZboUHyg8ac7RtyejU1U0AIiCnvjEYSM51bbNJwYnv6XpN1Atixfx79zxF
+ rY+BI3vQ0PdQ==
 X-IronPort-AV: E=Sophos;i="5.69,281,1571702400"; 
-   d="scan'208";a="7284652"
-Received: from iad6-co-svc-p1-lb1-vlan2.amazon.com (HELO email-inbound-relay-2a-22cc717f.us-west-2.amazon.com) ([10.124.125.2])
-  by smtp-border-fw-out-2101.iad2.amazon.com with ESMTP; 05 Dec 2019 15:16:35 +0000
-Received: from EX13MTAUEA001.ant.amazon.com (pdx4-ws-svc-p6-lb7-vlan3.pdx.amazon.com [10.170.41.166])
-        by email-inbound-relay-2a-22cc717f.us-west-2.amazon.com (Postfix) with ESMTPS id 0E886A2047;
-        Thu,  5 Dec 2019 15:16:34 +0000 (UTC)
-Received: from EX13D04UEA002.ant.amazon.com (10.43.61.61) by
+   d="scan'208";a="3414399"
+Received: from sea32-co-svc-lb4-vlan3.sea.corp.amazon.com (HELO email-inbound-relay-2b-4e24fd92.us-west-2.amazon.com) ([10.47.23.38])
+  by smtp-border-fw-out-9101.sea19.amazon.com with ESMTP; 05 Dec 2019 15:17:30 +0000
+Received: from EX13MTAUEA001.ant.amazon.com (pdx4-ws-svc-p6-lb7-vlan2.pdx.amazon.com [10.170.41.162])
+        by email-inbound-relay-2b-4e24fd92.us-west-2.amazon.com (Postfix) with ESMTPS id 47328A25E6;
+        Thu,  5 Dec 2019 15:17:29 +0000 (UTC)
+Received: from EX13D16UEA001.ant.amazon.com (10.43.61.210) by
  EX13MTAUEA001.ant.amazon.com (10.43.61.82) with Microsoft SMTP Server (TLS)
- id 15.0.1367.3; Thu, 5 Dec 2019 15:16:33 +0000
+ id 15.0.1367.3; Thu, 5 Dec 2019 15:17:28 +0000
 Received: from EX13MTAUEA001.ant.amazon.com (10.43.61.82) by
- EX13D04UEA002.ant.amazon.com (10.43.61.61) with Microsoft SMTP Server (TLS)
- id 15.0.1367.3; Thu, 5 Dec 2019 15:16:33 +0000
+ EX13D16UEA001.ant.amazon.com (10.43.61.210) with Microsoft SMTP Server (TLS)
+ id 15.0.1367.3; Thu, 5 Dec 2019 15:17:28 +0000
 Received: from u886c93fd17d25d.ant.amazon.com (10.28.85.76) by
  mail-relay.amazon.com (10.43.61.243) with Microsoft SMTP Server (TLS) id
- 15.0.1367.3 via Frontend Transport; Thu, 5 Dec 2019 15:16:32 +0000
+ 15.0.1367.3 via Frontend Transport; Thu, 5 Dec 2019 15:17:27 +0000
 Subject: Re: [PATCH v2 1/1] xen/blkback: Aggressively shrink page pools if a
  memory pressure is detected
 To:     <axboe@kernel.dk>, <konrad.wilk@oracle.com>, <roger.pau@citrix.com>
 CC:     <linux-block@vger.kernel.org>, <linux-kernel@vger.kernel.org>,
-        <sj38.park@gmail.com>, SeongJae Park <sjpark@amazon.de>
+        <sj38.park@gmail.com>, SeongJae Park <sjpark@amazon.de>,
+        "xen-devel@lists.xenproject.org" <xen-devel@lists.xenproject.org>
 References: <20191205150932.3793-1-sjpark@amazon.com>
  <20191205150932.3793-2-sjpark@amazon.com>
 From:   <sjpark@amazon.com>
-Message-ID: <78340df5-5b4f-ddd8-db79-75f8449be4b3@amazon.com>
-Date:   Thu, 5 Dec 2019 16:16:31 +0100
+Message-ID: <929503ff-63bb-3c29-966c-dd1ce3641ef8@amazon.com>
+Date:   Thu, 5 Dec 2019 16:17:26 +0100
 User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:60.0) Gecko/20100101
  Thunderbird/60.9.0
 MIME-Version: 1.0
