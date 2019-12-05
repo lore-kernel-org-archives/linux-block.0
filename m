@@ -2,95 +2,140 @@ Return-Path: <SRS0=S578=Z3=vger.kernel.org=linux-block-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-2.2 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
-	MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,USER_AGENT_SANE_1 autolearn=no
+X-Spam-Status: No, score=-6.9 required=3.0 tests=DKIMWL_WL_HIGH,DKIM_SIGNED,
+	DKIM_VALID,DKIM_VALID_AU,HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,
+	MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS autolearn=ham
 	autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id C80FCC2D0B1
-	for <linux-block@archiver.kernel.org>; Thu,  5 Dec 2019 00:16:20 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 1C6B0C43603
+	for <linux-block@archiver.kernel.org>; Thu,  5 Dec 2019 02:09:17 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.kernel.org (Postfix) with ESMTP id A8E4320409
-	for <linux-block@archiver.kernel.org>; Thu,  5 Dec 2019 00:16:20 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id DE2AD21823
+	for <linux-block@archiver.kernel.org>; Thu,  5 Dec 2019 02:09:16 +0000 (UTC)
+Authentication-Results: mail.kernel.org;
+	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="S75hR2v/"
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1728449AbfLEAQT (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Wed, 4 Dec 2019 19:16:19 -0500
-Received: from mail-pl1-f172.google.com ([209.85.214.172]:40817 "EHLO
-        mail-pl1-f172.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1728011AbfLEAQT (ORCPT
-        <rfc822;linux-block@vger.kernel.org>); Wed, 4 Dec 2019 19:16:19 -0500
-Received: by mail-pl1-f172.google.com with SMTP id g6so428420plp.7;
-        Wed, 04 Dec 2019 16:16:18 -0800 (PST)
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20161025;
-        h=x-gm-message-state:subject:to:cc:references:from:message-id:date
-         :user-agent:mime-version:in-reply-to:content-language
-         :content-transfer-encoding;
-        bh=QXOTNbfvt4PQWE1w6GCGy81Vtob2l8oNprwO21T/FYw=;
-        b=AUCmDxMl8POPp4XTUrkOvywntVNS/GSITi++pgoQinhP0W/pqLrTm4QhpuhbjCUKXI
-         dpHH2pYh/3/poaczzL6Vl5JrWGJEBYI9IT4RAoYe+xMAlVQxpClo9uRQIarpQtnlHpTE
-         2aWvmcjnGnuiv0tBOAqolGAhhYnRr8C692inPfaX4MTGh1S2cqI2r1zq/iZcnxVWviZs
-         FLx3sq6RUXcQ0mZXA/OGfTQ+fOjYvqKJ4kcn7n1HsToajLfzLOIdwtSmPAlFkoUfVibM
-         8SMHuEFq877fQQlkUWh/zGksy6WIzSXtmzfuqDvZakWgiB1ev7pwCJQTsSz0wgbcficB
-         jA6A==
-X-Gm-Message-State: APjAAAW1o74uLrZIA9tXnUGD/LhS2PzuTCFqBZUnhzE9tswBDC1oGAZP
-        AKssTV3Fk5C1KUCqvfd/GuM=
-X-Google-Smtp-Source: APXvYqyfQGVYaulKAcmWLg8fai9mIRBmWJGk9hRhnBoL3l1xWDIXRBc1Ryagoc5Iin7/tcdwRgWdAw==
-X-Received: by 2002:a17:90a:23a9:: with SMTP id g38mr6397637pje.128.1575504978148;
-        Wed, 04 Dec 2019 16:16:18 -0800 (PST)
-Received: from desktop-bart.svl.corp.google.com ([2620:15c:2cd:202:4308:52a3:24b6:2c60])
-        by smtp.gmail.com with ESMTPSA id s22sm7374112pjr.5.2019.12.04.16.16.16
-        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
-        Wed, 04 Dec 2019 16:16:17 -0800 (PST)
-Subject: Re: Data corruption in kernel 5.1+ with iSER attached ramdisk
-To:     Ming Lei <ming.lei@redhat.com>,
-        Stephen Rust <srust@blockbridge.com>
-Cc:     Rob Townley <rob.townley@gmail.com>,
-        Christoph Hellwig <hch@lst.de>, Jens Axboe <axboe@kernel.dk>,
-        linux-block@vger.kernel.org, linux-rdma@vger.kernel.org,
-        linux-scsi@vger.kernel.org, martin.petersen@oracle.com,
-        target-devel@vger.kernel.org, Doug Ledford <dledford@redhat.com>,
-        Jason Gunthorpe <jgg@ziepe.ca>,
-        Sagi Grimberg <sagi@grimberg.me>,
-        Max Gurtovoy <maxg@mellanox.com>
-References: <CAAFE1beMkvyRctGqpffd3o_QtDH0CrmQSb=fV4GzqMUXWzPyOw@mail.gmail.com>
- <20191203005849.GB25002@ming.t460p>
- <CAAFE1bcG8c1Q3iwh-LUjruBMAuFTJ4qWxNGsnhfKvGWHNLAeEQ@mail.gmail.com>
- <20191203031444.GB6245@ming.t460p>
- <CAAFE1besnb=HV4C_buORYpWbkXecmtybwX8d_Ka2NsKmiym53w@mail.gmail.com>
- <CAAFE1bfpUWCZrtR8v3S++0-+gi8DJ79X3e0XqDe93i8nuGTnNg@mail.gmail.com>
- <20191203124558.GA22805@ming.t460p>
- <CAAFE1bfB2Km+e=T0ahwq0r9BQrBMnSguQQ+y=yzYi3tursS+TQ@mail.gmail.com>
- <20191204010529.GA3910@ming.t460p>
- <CAAFE1bcJmRP5OSu=5asNTpvkF=kjEZu=GafaS9h52776tVgpPA@mail.gmail.com>
- <20191204230225.GA26189@ming.t460p>
-From:   Bart Van Assche <bvanassche@acm.org>
-Message-ID: <683a4567-6b34-ac3b-93ff-74d788ac4242@acm.org>
-Date:   Wed, 4 Dec 2019 16:16:15 -0800
-User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:60.0) Gecko/20100101
- Thunderbird/60.9.0
+        id S1728132AbfLECJQ (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Wed, 4 Dec 2019 21:09:16 -0500
+Received: from us-smtp-delivery-1.mimecast.com ([207.211.31.120]:50293 "EHLO
+        us-smtp-1.mimecast.com" rhost-flags-OK-OK-OK-FAIL) by vger.kernel.org
+        with ESMTP id S1728121AbfLECJP (ORCPT
+        <rfc822;linux-block@vger.kernel.org>); Wed, 4 Dec 2019 21:09:15 -0500
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+        s=mimecast20190719; t=1575511754;
+        h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+         to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+         content-transfer-encoding:content-transfer-encoding;
+        bh=fBGz+zdacxQ8v40nCTTqXW4v4AG5mnPERHjisuIPnRI=;
+        b=S75hR2v/drOahRiffOTcIO+6k+174RdEV6YUQ6/Cv+TR2Mno3wU/y3CoixwvZF1kWq5Tvi
+        6M79QxsiIOz3zvIgxmF76OzsaqwLbXtFm3XmofjgC/pWyLZFQt5jBbOwS89H5bwTdzEu9v
+        bixsAJqkEPH9ZUsGi5oUyXSDNljuvNk=
+Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
+ [209.132.183.4]) (Using TLS) by relay.mimecast.com with ESMTP id
+ us-mta-227-PUJ0UGOXPV-xIo9Mdr5oUw-1; Wed, 04 Dec 2019 21:09:11 -0500
+Received: from smtp.corp.redhat.com (int-mx08.intmail.prod.int.phx2.redhat.com [10.5.11.23])
+        (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
+        (No client certificate requested)
+        by mimecast-mx01.redhat.com (Postfix) with ESMTPS id 0ACD41005502;
+        Thu,  5 Dec 2019 02:09:10 +0000 (UTC)
+Received: from localhost (ovpn-8-24.pek2.redhat.com [10.72.8.24])
+        by smtp.corp.redhat.com (Postfix) with ESMTP id 0436719481;
+        Thu,  5 Dec 2019 02:09:06 +0000 (UTC)
+From:   Ming Lei <ming.lei@redhat.com>
+To:     Jens Axboe <axboe@kernel.dk>
+Cc:     linux-block@vger.kernel.org, Justin Tee <justin.tee@broadcom.com>,
+        Christoph Hellwig <hch@lst.de>, Ming Lei <ming.lei@redhat.com>
+Subject: [PATCH] block: fix memleak of bio integrity data
+Date:   Thu,  5 Dec 2019 10:09:01 +0800
+Message-Id: <20191205020901.18737-1-ming.lei@redhat.com>
 MIME-Version: 1.0
-In-Reply-To: <20191204230225.GA26189@ming.t460p>
-Content-Type: text/plain; charset=utf-8; format=flowed
-Content-Language: en-US
-Content-Transfer-Encoding: 7bit
+X-Scanned-By: MIMEDefang 2.84 on 10.5.11.23
+X-MC-Unique: PUJ0UGOXPV-xIo9Mdr5oUw-1
+X-Mimecast-Spam-Score: 0
+Content-Type: text/plain; charset=US-ASCII
+Content-Transfer-Encoding: quoted-printable
 Sender: linux-block-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-On 12/4/19 3:02 PM, Ming Lei wrote:
-> On Wed, Dec 04, 2019 at 12:23:39PM -0500, Stephen Rust wrote:
->> Presumably non-brd devices, ie: real scsi devices work for these test
->> cases because they accept un-aligned buffers?
-> 
-> Right, not every driver supports such un-aligned buffer.
-> 
-> I am not familiar with RDMA, but from the trace we have done so far,
-> it is highly related with iser driver.
+From: Justin Tee <justin.tee@broadcom.com>
 
-Hi Stephen,
+7c20f11680a4 ("bio-integrity: stop abusing bi_end_io") moves
+bio_integrity_free from bio_uninit() to bio_integrity_verify_fn()
+and bio_endio(). This way looks wrong because bio may be freed
+without calling bio_endio(), for example, blk_rq_unprep_clone() is
+called from dm_mq_queue_rq() when the underlying queue of dm-mpath
+is busy.
 
-Do you need the iSER protocol? I think that the NVMeOF and SRP drivers 
-also support RoCE and that these align data buffers on a 512 byte boundary.
+So memory leak of bio integrity data is caused by commit 7c20f11680a4.
 
-Bart.
+Fixes this issue by re-adding bio_integrity_free() to bio_uninit().
+
+Fixes: 7c20f11680a4 ("bio-integrity: stop abusing bi_end_io")
+Cc: Justin Tee <justin.tee@broadcom.com>
+Cc: Christoph Hellwig <hch@lst.de>
+
+Add commit log, and simplify/fix the original patch wroten by Justin.
+
+Signed-off-by: Ming Lei <ming.lei@redhat.com>
+---
+ block/bio-integrity.c | 2 +-
+ block/bio.c           | 3 +++
+ block/blk.h           | 4 ++++
+ 3 files changed, 8 insertions(+), 1 deletion(-)
+
+diff --git a/block/bio-integrity.c b/block/bio-integrity.c
+index fb95dbb21dd8..bf62c25cde8f 100644
+--- a/block/bio-integrity.c
++++ b/block/bio-integrity.c
+@@ -87,7 +87,7 @@ EXPORT_SYMBOL(bio_integrity_alloc);
+  * Description: Used to free the integrity portion of a bio. Usually
+  * called from bio_free().
+  */
+-static void bio_integrity_free(struct bio *bio)
++void bio_integrity_free(struct bio *bio)
+ {
+ =09struct bio_integrity_payload *bip =3D bio_integrity(bio);
+ =09struct bio_set *bs =3D bio->bi_pool;
+diff --git a/block/bio.c b/block/bio.c
+index b1170ec18464..9d54aa37ce6c 100644
+--- a/block/bio.c
++++ b/block/bio.c
+@@ -233,6 +233,9 @@ struct bio_vec *bvec_alloc(gfp_t gfp_mask, int nr, unsi=
+gned long *idx,
+ void bio_uninit(struct bio *bio)
+ {
+ =09bio_disassociate_blkg(bio);
++
++=09if (bio_integrity(bio))
++=09=09bio_integrity_free(bio);
+ }
+ EXPORT_SYMBOL(bio_uninit);
+=20
+diff --git a/block/blk.h b/block/blk.h
+index 2bea40180b6f..6842f28c033e 100644
+--- a/block/blk.h
++++ b/block/blk.h
+@@ -121,6 +121,7 @@ static inline void blk_rq_bio_prep(struct request *rq, =
+struct bio *bio,
+ #ifdef CONFIG_BLK_DEV_INTEGRITY
+ void blk_flush_integrity(void);
+ bool __bio_integrity_endio(struct bio *);
++void bio_integrity_free(struct bio *bio);
+ static inline bool bio_integrity_endio(struct bio *bio)
+ {
+ =09if (bio_integrity(bio))
+@@ -166,6 +167,9 @@ static inline bool bio_integrity_endio(struct bio *bio)
+ {
+ =09return true;
+ }
++static inline void bio_integrity_free(struct bio *bio)
++{
++}
+ #endif /* CONFIG_BLK_DEV_INTEGRITY */
+=20
+ unsigned long blk_rq_timeout(unsigned long timeout);
+--=20
+2.20.1
+
