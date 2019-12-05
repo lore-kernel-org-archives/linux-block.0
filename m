@@ -2,87 +2,112 @@ Return-Path: <SRS0=S578=Z3=vger.kernel.org=linux-block-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-2.2 required=3.0 tests=DKIM_SIGNED,DKIM_VALID,
-	HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,
-	USER_AGENT_SANE_1 autolearn=no autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-8.9 required=3.0 tests=DKIMWL_WL_HIGH,DKIM_SIGNED,
+	DKIM_VALID,DKIM_VALID_AU,HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,
+	MENTIONS_GIT_HOSTING,SPF_HELO_NONE,SPF_PASS,USER_AGENT_GIT autolearn=ham
+	autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 18B5FC43603
-	for <linux-block@archiver.kernel.org>; Thu,  5 Dec 2019 15:00:42 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 2B887C43603
+	for <linux-block@archiver.kernel.org>; Thu,  5 Dec 2019 15:10:02 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.kernel.org (Postfix) with ESMTP id D657524249
-	for <linux-block@archiver.kernel.org>; Thu,  5 Dec 2019 15:00:41 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id EFB412464F
+	for <linux-block@archiver.kernel.org>; Thu,  5 Dec 2019 15:10:01 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel-dk.20150623.gappssmtp.com header.i=@kernel-dk.20150623.gappssmtp.com header.b="IONzYt78"
+	dkim=pass (1024-bit key) header.d=amazon.com header.i=@amazon.com header.b="IY1MaMtR"
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1729626AbfLEPAl (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Thu, 5 Dec 2019 10:00:41 -0500
-Received: from mail-il1-f193.google.com ([209.85.166.193]:45367 "EHLO
-        mail-il1-f193.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1729099AbfLEPAl (ORCPT
-        <rfc822;linux-block@vger.kernel.org>); Thu, 5 Dec 2019 10:00:41 -0500
-Received: by mail-il1-f193.google.com with SMTP id p8so3199249iln.12
-        for <linux-block@vger.kernel.org>; Thu, 05 Dec 2019 07:00:40 -0800 (PST)
+        id S1729535AbfLEPKB (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Thu, 5 Dec 2019 10:10:01 -0500
+Received: from smtp-fw-4101.amazon.com ([72.21.198.25]:28947 "EHLO
+        smtp-fw-4101.amazon.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S1729489AbfLEPKB (ORCPT
+        <rfc822;linux-block@vger.kernel.org>); Thu, 5 Dec 2019 10:10:01 -0500
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=kernel-dk.20150623.gappssmtp.com; s=20150623;
-        h=subject:to:references:from:message-id:date:user-agent:mime-version
-         :in-reply-to:content-language:content-transfer-encoding;
-        bh=F5mXGgQfdcX4ulNvMgJjySGQKhJoMGbY4UManmb5rnw=;
-        b=IONzYt788nj+bQP2DMnWzbIsVtvCFVv2q6kQwcurdaDuXq17O2n/Dz3sP337r4xXmb
-         cCYaeWsw6A6b+gGxworEyXUUjtWh7q+Hd2lIEgPAWiPeNIZ0eIeiHV0h9Kk0dnG9aDSA
-         SswE0cfdhCdZ143x1FjVlUplkNtdBbCEA6KKcuXXB+43ZKbXGx4etEdt6tEL0Y3wEhqX
-         EJWUhVgFESZKT6os3cMmoYDQ9OD72ahcrPnZP0VTak8sFIvI6Goeq96q8Vk1yzE99e3G
-         uoCDSIkKp+/PPwoOO9WAeAxqVNreJMKLHsET3MvKV8DAXrrYjORfeUsMuRnW43otuvGW
-         GYTw==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20161025;
-        h=x-gm-message-state:subject:to:references:from:message-id:date
-         :user-agent:mime-version:in-reply-to:content-language
-         :content-transfer-encoding;
-        bh=F5mXGgQfdcX4ulNvMgJjySGQKhJoMGbY4UManmb5rnw=;
-        b=nm5xJOP1q3P4cNMx70tDzWv5qwnZknq3/jrjnJMCqElP+dlwyYLR0X4niZgUPJKhWF
-         Ff5Yf2alw0VI5zCttcuNbZBbRVZ5ggXQ8FrZCg8nlZeSVZZdJfx/ceHGXI0BZfArbNHn
-         Cgym/Bm3+au3socK6gB9nqdb6BFoZSTJXZzFtH0D3+KYeuDQTI2B/IBB8Lc4KWKladN+
-         ECZ7gESYoawJZWILPgxnaWG3j1zoJfcBdH8AgN2otVgzNHQD2bfqlKxF0muNhvAIk/Eb
-         /+FRLQVTtSwjRgIWQKbzj0g2uzmvFT8o0ALuJvGT8jXev8bPH0Bmv7ZW7WhkVS+IRALE
-         zXdw==
-X-Gm-Message-State: APjAAAWK4ieYz/UtIdNXrqIGujhbQXc33kRINCV3zEBXyjAPuvYQQCOb
-        ng/e866jUNQ8DXVxD8QL8H0YdQ==
-X-Google-Smtp-Source: APXvYqxIYA4JrNV5BxAT0DEq/LbOrIBZ+ExgEHJoa8r5nn9zo9eBUe6YgDO9mP2pcqCfGBRcYrltUQ==
-X-Received: by 2002:a92:9885:: with SMTP id a5mr9316849ill.107.1575558040476;
-        Thu, 05 Dec 2019 07:00:40 -0800 (PST)
-Received: from [192.168.1.159] ([65.144.74.34])
-        by smtp.gmail.com with ESMTPSA id o83sm2874577ild.13.2019.12.05.07.00.39
-        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
-        Thu, 05 Dec 2019 07:00:39 -0800 (PST)
-Subject: Re: [PATCH 0/3] blk-mq: optimise plugging
-To:     Pavel Begunkov <asml.silence@gmail.com>,
-        linux-block@vger.kernel.org, linux-kernel@vger.kernel.org
-References: <cover.1574974577.git.asml.silence@gmail.com>
- <da7f8969-b2ee-2bfd-c61c-50f12eb7dc16@gmail.com>
-From:   Jens Axboe <axboe@kernel.dk>
-Message-ID: <0f7be0b5-1d70-ae41-ad15-2e1ae7c73f09@kernel.dk>
-Date:   Thu, 5 Dec 2019 08:00:38 -0700
-User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:68.0) Gecko/20100101
- Thunderbird/68.2.1
+  d=amazon.com; i=@amazon.com; q=dns/txt; s=amazon201209;
+  t=1575558601; x=1607094601;
+  h=from:to:cc:subject:date:message-id:mime-version;
+  bh=RhN83U79KGiug/DqnaKKmeMZRDu4agOCS4+3MlYgIcA=;
+  b=IY1MaMtRUY+RdHBM63xh5CnjtuO7HM96sgRrmNsti1MiObj0VGgRZL/6
+   e0kdoplp012yegt9tTYH0icpn6vnCiHr3JXSzGJ2yykqoki88/WoWwCdR
+   6qscwccNjh8KuBA7FTYu23C+Fyhgh/ReTg3Fl33J30Srzp9EYufI4ObEh
+   0=;
+IronPort-SDR: YkV7+81dJRbl1HNaiFtPHjNfYTyCwi315t/o+FBhltEeGD9GAPnrnM4iyjJOh2tifi2xsX9Dn/
+ Xk9xMukUoMRw==
+X-IronPort-AV: E=Sophos;i="5.69,281,1571702400"; 
+   d="scan'208";a="7220372"
+Received: from iad6-co-svc-p1-lb1-vlan3.amazon.com (HELO email-inbound-relay-1d-98acfc19.us-east-1.amazon.com) ([10.124.125.6])
+  by smtp-border-fw-out-4101.iad4.amazon.com with ESMTP; 05 Dec 2019 15:09:59 +0000
+Received: from EX13MTAUEA001.ant.amazon.com (iad55-ws-svc-p15-lb9-vlan3.iad.amazon.com [10.40.159.166])
+        by email-inbound-relay-1d-98acfc19.us-east-1.amazon.com (Postfix) with ESMTPS id 7D494A2529;
+        Thu,  5 Dec 2019 15:09:56 +0000 (UTC)
+Received: from EX13D31EUA001.ant.amazon.com (10.43.165.15) by
+ EX13MTAUEA001.ant.amazon.com (10.43.61.82) with Microsoft SMTP Server (TLS)
+ id 15.0.1367.3; Thu, 5 Dec 2019 15:09:55 +0000
+Received: from u886c93fd17d25d.ant.amazon.com (10.43.162.171) by
+ EX13D31EUA001.ant.amazon.com (10.43.165.15) with Microsoft SMTP Server (TLS)
+ id 15.0.1367.3; Thu, 5 Dec 2019 15:09:51 +0000
+From:   SeongJae Park <sjpark@amazon.com>
+To:     <axboe@kernel.dk>, <konrad.wilk@oracle.com>, <roger.pau@citrix.com>
+CC:     <sjpark@amazon.com>, <linux-block@vger.kernel.org>,
+        <linux-kernel@vger.kernel.org>, <sj38.park@gmail.com>
+Subject: [PATCH v2 0/1] xen/blkback: Aggressively shrink page pools if a memory pressure is detected
+Date:   Thu, 5 Dec 2019 16:09:31 +0100
+Message-ID: <20191205150932.3793-1-sjpark@amazon.com>
+X-Mailer: git-send-email 2.17.1
 MIME-Version: 1.0
-In-Reply-To: <da7f8969-b2ee-2bfd-c61c-50f12eb7dc16@gmail.com>
-Content-Type: text/plain; charset=utf-8
-Content-Language: en-US
-Content-Transfer-Encoding: 7bit
+Content-Type: text/plain
+X-Originating-IP: [10.43.162.171]
+X-ClientProxiedBy: EX13D12UWA004.ant.amazon.com (10.43.160.168) To
+ EX13D31EUA001.ant.amazon.com (10.43.165.15)
 Sender: linux-block-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-On 12/5/19 6:19 AM, Pavel Begunkov wrote:
-> On 29/11/2019 00:11, Pavel Begunkov wrote:
->> Clean and optimise blk_mq_flush_plug_list().
->>
-> ping
+Each `blkif` has a free pages pool for the grant mapping.  The size of
+the pool starts from zero and be increased on demand while processing
+the I/O requests.  If current I/O requests handling is finished or 100
+milliseconds has passed since last I/O requests handling, it checks and
+shrinks the pool to not exceed the size limit, `max_buffer_pages`.
 
-Looks good to me, I've been waiting a bit on this as I'll queue it up
-for 5.6.
+Therefore, `blkfront` running guests can cause a memory pressure in the
+`blkback` running guest by attaching a large number of block devices and
+inducing I/O.  System administrators can avoid such problematic
+situations by limiting the maximum number of devices each guest can
+attach.  However, finding the optimal limit is not so easy.  Improper
+set of the limit can result in the memory pressure or a resource
+underutilization.  This commit avoids such problematic situations by
+shrinking the pools aggressively (further the limit) for a while (users
+can set this duration via a module parameter) if a memory pressure is
+detected.
+
+
+Base Version
+------------
+
+This patch is based on v5.4.  A complete tree is also available at my
+public git repo:
+https://github.com/sjp38/linux/tree/blkback_aggressive_shrinking_v2
+
+
+Patch History
+-------------
+
+Changes from v1 (https://lore.kernel.org/xen-devel/20191204113419.2298-1-sjpark@amazon.com/)
+ - Adjust the description to not use the term, `arbitrarily` (suggested
+   by Paul Durrant)
+ - Specify time unit of the duration in the parameter description,
+   (suggested by Maximilian Heyne)
+ - Change default aggressive shrinking duration from 1ms to 10ms
+ - Merged two patches into one single patch
+
+
+SeongJae Park (1):
+  xen/blkback: Aggressively shrink page pools if a memory pressure is
+    detected
+
+ drivers/block/xen-blkback/blkback.c | 35 +++++++++++++++++++++++++++--
+ 1 file changed, 33 insertions(+), 2 deletions(-)
 
 -- 
-Jens Axboe
+2.17.1
 
