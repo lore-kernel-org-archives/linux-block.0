@@ -2,128 +2,109 @@ Return-Path: <SRS0=S578=Z3=vger.kernel.org=linux-block-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-2.2 required=3.0 tests=DKIM_SIGNED,DKIM_VALID,
-	HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,
-	USER_AGENT_SANE_1 autolearn=no autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-0.9 required=3.0 tests=DKIMWL_WL_HIGH,DKIM_SIGNED,
+	DKIM_VALID,DKIM_VALID_AU,HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,
+	SPF_HELO_NONE,SPF_PASS autolearn=no autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 4B5B1C43603
-	for <linux-block@archiver.kernel.org>; Thu,  5 Dec 2019 18:38:09 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id F0B83C43603
+	for <linux-block@archiver.kernel.org>; Thu,  5 Dec 2019 20:27:19 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.kernel.org (Postfix) with ESMTP id 1D0AC2464D
-	for <linux-block@archiver.kernel.org>; Thu,  5 Dec 2019 18:38:09 +0000 (UTC)
-Authentication-Results: mail.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel-dk.20150623.gappssmtp.com header.i=@kernel-dk.20150623.gappssmtp.com header.b="Zphzt5kj"
+	by mail.kernel.org (Postfix) with ESMTP id C6CCC24671
+	for <linux-block@archiver.kernel.org>; Thu,  5 Dec 2019 20:27:19 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+	s=default; t=1575577639;
+	bh=HBx+Fd/NT+SDbzqqeb4YRELFUwI5g02zAAe+CpFWWPE=;
+	h=References:In-Reply-To:From:Date:Subject:To:Cc:List-ID:From;
+	b=GUfq+OgOb/G0ZQcDlG3JY9RijI3qUgY+nuJDiyjnUpUc2bsKJhfz+Ayto3FAB35F5
+	 YwT1zmFss9izmskR4odbBra47y5Wj9afw5aCEVZYtmCgG+PRBGStfaMh4ntxIqLLOV
+	 d1qSBzlo82AVxLw3+XQvJZ/UGU3Uc+BeBRqnP37k=
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1729497AbfLESiI (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Thu, 5 Dec 2019 13:38:08 -0500
-Received: from mail-pf1-f196.google.com ([209.85.210.196]:35259 "EHLO
-        mail-pf1-f196.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1726028AbfLESiI (ORCPT
-        <rfc822;linux-block@vger.kernel.org>); Thu, 5 Dec 2019 13:38:08 -0500
-Received: by mail-pf1-f196.google.com with SMTP id b19so2020320pfo.2
-        for <linux-block@vger.kernel.org>; Thu, 05 Dec 2019 10:38:08 -0800 (PST)
+        id S1729552AbfLEU1S (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Thu, 5 Dec 2019 15:27:18 -0500
+Received: from mail-lf1-f67.google.com ([209.85.167.67]:41926 "EHLO
+        mail-lf1-f67.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S1729489AbfLEU1O (ORCPT
+        <rfc822;linux-block@vger.kernel.org>); Thu, 5 Dec 2019 15:27:14 -0500
+Received: by mail-lf1-f67.google.com with SMTP id m30so3481373lfp.8
+        for <linux-block@vger.kernel.org>; Thu, 05 Dec 2019 12:27:13 -0800 (PST)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=kernel-dk.20150623.gappssmtp.com; s=20150623;
-        h=subject:to:cc:references:from:message-id:date:user-agent
-         :mime-version:in-reply-to:content-language:content-transfer-encoding;
-        bh=AgeSW3zGctG+Pi7YiPGk/0qK3GJJdvjIDRic+F7mVx4=;
-        b=Zphzt5kjmPRfJyKg+pqtWzRj184lvEaJkLwnSP399fXWA2RDchXLVtbqizLRSb5GaO
-         acStr2BCbu6rNddrm0BhSt1BWWzh+w0zQEMFoWmnOLc5JSz6SXS7pYi3ywRIvD2xGmY6
-         1VHEquGM0IxWcH6c+LNZlMOx24LpDIqPVbUUphEbtSpm0Ab8uw4zS44AUnKSUmO1Rs4+
-         f7lYt2YBbnQwrvorJbqQUsA4oVEuMQQEyShdzw7fU9VaGahV6v8meM2F9RVtZXpkdNVK
-         qMUYq5wR+xOpGxf1KChpDftS1Ccl1dTmLyErmVbngVrHdZaat9xl6EwWMFRT43Dimvk2
-         mfqA==
+        d=linux-foundation.org; s=google;
+        h=mime-version:references:in-reply-to:from:date:message-id:subject:to
+         :cc;
+        bh=K2nboj5xrRkV1yqHjA0Aj2mbWgmjh4x0SrJcMaszVtA=;
+        b=TY6MoxQFBEklRwMxXtPk7pq3Wq5Rwa2J/YtugYsq/w1lH9+ERuu6f1+z8+8JuKIiKx
+         YDkuPczmV+9Qf+ENZhlePKKmJs1rLUEQ7rx1SKksdo9OxMTgxyWfNyX7ZM9ZSUbccBnx
+         JYw40/VtEd257BEbFslSJIyKBygobO7WiYq+0=
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=1e100.net; s=20161025;
-        h=x-gm-message-state:subject:to:cc:references:from:message-id:date
-         :user-agent:mime-version:in-reply-to:content-language
-         :content-transfer-encoding;
-        bh=AgeSW3zGctG+Pi7YiPGk/0qK3GJJdvjIDRic+F7mVx4=;
-        b=T6FCdbmgGF/IF4jhM+q4kR1KvJz+zniqLFNo0V88KUi9KOw4XKm13mUa7pGa049suj
-         fcFGI4hX3EoFB8Y5JO2Y0NVzsvmT873jYyG1QkKWwgYl/NPUJIITgi2THXO4N+afuQaA
-         /nEuFGtx63G4bsBgtc/tJgGRuD6kueGwbNpcqnGdno6ah8wIyAVoHBflg30ZZoInEuCa
-         q1BUlrEYF3CFDaxlTm2HBQVS+iVF8K3d+LYNqcWoGPR4J+uZYEPJa7Hi+caHldrpZmo7
-         ESv0qDWQM+WevdSfgy15r3/tKWdtRJ1UuTNXraRaDrKBSCKfc7sQHsaDAj9h7p9YsRwH
-         5aUA==
-X-Gm-Message-State: APjAAAU/jdjOd+LP8deI14yIQQLVkvRwRGfXkTZQUefuCwjlOUbICGEH
-        J4YjVdj1ytF01f3J5pxO0N1XWg==
-X-Google-Smtp-Source: APXvYqxcm9WGYAzTK2KkGzJ8kco2IJ+qKMwg3WWYGfIqOeAFlZrW0KDfd+A4db0KEHrvJ0iiMx/uOg==
-X-Received: by 2002:aa7:9808:: with SMTP id e8mr10583647pfl.32.1575571087795;
-        Thu, 05 Dec 2019 10:38:07 -0800 (PST)
-Received: from ?IPv6:2620:10d:c081:1132::11db? ([2620:10d:c090:180::1372])
-        by smtp.gmail.com with ESMTPSA id w6sm12478484pge.92.2019.12.05.10.38.06
+        h=x-gm-message-state:mime-version:references:in-reply-to:from:date
+         :message-id:subject:to:cc;
+        bh=K2nboj5xrRkV1yqHjA0Aj2mbWgmjh4x0SrJcMaszVtA=;
+        b=o7GVL17IhNwxOn22FK4kpI76SMYO7BoVGt0YgehB0+xF7TgmRfwGRXsw4NfP+fyPEb
+         JiDFRTeBYp1ra3jExqQKRP8w7LIe3G7wPBtuogUEMGkgqUX1OhWKG3R32uz4xEMQ3Ivj
+         QM6hK5IbaUW3qaCDqufsBfZv6oiPKJJDdxQ6dQ9JG/8CKGT1MJwLQJD1guspBkOZdAnX
+         odLdhlBQZKEUsOn0tr+4ArpQeY5VcE7oM1RGj3m6/PC6emHlfcD+uTdkYZk91qBAQlJi
+         gqNkVrwVXBiWZxKEZzUr/WrbDII9MMCE18sg7626QK9wzM5YROjx/HxQIwhG6kvQIJuy
+         Y+Lg==
+X-Gm-Message-State: APjAAAXRlh5sCIBBRzg76fxrNpW1Hm6sJUt2CVOG2580b4P/tPWZ6vm5
+        BqZFKoD6GsUrnREpUridn6GaYvzqzVk=
+X-Google-Smtp-Source: APXvYqy23Q8drbzhdmKIL5WWg6RvMi+ds5e/ikSXzUbi+aVfX+aoMOL13/bKZcZj/BlTaNLM5a/Yjg==
+X-Received: by 2002:a19:f514:: with SMTP id j20mr5752743lfb.31.1575577630936;
+        Thu, 05 Dec 2019 12:27:10 -0800 (PST)
+Received: from mail-lj1-f179.google.com (mail-lj1-f179.google.com. [209.85.208.179])
+        by smtp.gmail.com with ESMTPSA id m10sm5572474lfa.46.2019.12.05.12.27.09
+        for <linux-block@vger.kernel.org>
         (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
-        Thu, 05 Dec 2019 10:38:06 -0800 (PST)
-Subject: Re: [PATCH] block: fix memleak of bio integrity data
-To:     Justin Tee <justin.tee@broadcom.com>,
-        Ming Lei <ming.lei@redhat.com>
-Cc:     linux-block@vger.kernel.org, Christoph Hellwig <hch@lst.de>
-References: <20191205020901.18737-1-ming.lei@redhat.com>
- <CAAmqgVN6huL60c9aw41yC6wz6fG0w-T4xR0Tuoz0PqX2BqwKDA@mail.gmail.com>
- <20191205074932.GA21955@ming.t460p> <20191205080915.GB21955@ming.t460p>
- <f4f0f90a-0541-a25b-f9a6-f7e0762d6e28@broadcom.com>
-From:   Jens Axboe <axboe@kernel.dk>
-Message-ID: <33d14d7e-2033-8680-8746-d259b51209e7@kernel.dk>
-Date:   Thu, 5 Dec 2019 11:38:05 -0700
-User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:68.0) Gecko/20100101
- Thunderbird/68.2.1
+        Thu, 05 Dec 2019 12:27:09 -0800 (PST)
+Received: by mail-lj1-f179.google.com with SMTP id s22so5086483ljs.7
+        for <linux-block@vger.kernel.org>; Thu, 05 Dec 2019 12:27:09 -0800 (PST)
+X-Received: by 2002:a05:651c:239:: with SMTP id z25mr4294750ljn.48.1575577628995;
+ Thu, 05 Dec 2019 12:27:08 -0800 (PST)
 MIME-Version: 1.0
-In-Reply-To: <f4f0f90a-0541-a25b-f9a6-f7e0762d6e28@broadcom.com>
-Content-Type: text/plain; charset=utf-8
-Content-Language: en-US
-Content-Transfer-Encoding: 7bit
+References: <31555.1574810303@warthog.procyon.org.uk>
+In-Reply-To: <31555.1574810303@warthog.procyon.org.uk>
+From:   Linus Torvalds <torvalds@linux-foundation.org>
+Date:   Thu, 5 Dec 2019 12:26:53 -0800
+X-Gmail-Original-Message-ID: <CAHk-=wj+_n63ps_-Rvwgo4S7rd2eLAVcJwbZee7iHZaO+1hvYQ@mail.gmail.com>
+Message-ID: <CAHk-=wj+_n63ps_-Rvwgo4S7rd2eLAVcJwbZee7iHZaO+1hvYQ@mail.gmail.com>
+Subject: Re: [GIT PULL] pipe: General notification queue
+To:     David Howells <dhowells@redhat.com>
+Cc:     Rasmus Villemoes <linux@rasmusvillemoes.dk>,
+        Greg Kroah-Hartman <gregkh@linuxfoundation.org>,
+        Peter Zijlstra <peterz@infradead.org>, raven@themaw.net,
+        Christian Brauner <christian@brauner.io>,
+        keyrings@vger.kernel.org, linux-usb@vger.kernel.org,
+        linux-block <linux-block@vger.kernel.org>,
+        LSM List <linux-security-module@vger.kernel.org>,
+        linux-fsdevel <linux-fsdevel@vger.kernel.org>,
+        Linux API <linux-api@vger.kernel.org>,
+        Linux Kernel Mailing List <linux-kernel@vger.kernel.org>
+Content-Type: text/plain; charset="UTF-8"
 Sender: linux-block-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-On 12/5/19 11:30 AM, Justin Tee wrote:
-> On 12/5/2019 12:09 AM, Ming Lei wrote:
->> On Thu, Dec 05, 2019 at 03:49:32PM +0800, Ming Lei wrote:
->>> On Wed, Dec 04, 2019 at 09:41:24PM -0800, Justin Tee wrote:
->>>> Hi Ming,
->>>>
->>>> I understand the patch, but I have a concern.
->>>>
->>>> Is it possible to come across a double-free?  from bio_endio ->
->>>> bio_integrity_endio -> __bio_integrity_endio -> bio_integrity_free;  And
->>>> then, resuming in bio_endio -> bio_uninit -> bio_integrity_free;.  Maybe
->>>> it's even possible queue_work  bio_integrity_verify_fn was scheduled and
->>>> called bio_integrity_free from there as well.  So, should also remove
->>>> bio_integrity_free from bio_integrity_verify_fn and __bio_integrity_endio
->>>> routines?
->>>
->>> Yeah, double-free could be caused for READ between bio_integrity_verify_fn()
->>> and bio_uninit().
->>
->> ooops, the above race doesn't exist because __bio_integrity_endio()
->> returns false and bio_endio() won't call bio_uninit(). And bio_uninit()
->> is only called from bio_endio() when bio_integrity_verify_fn() exits.
->>
->> Also we can't remove the bio_integrity_free() from bio_integrity_verify_fn(),
->> otherwise this bio may never be ended because bio_integrity_endio() will
->> schedule the verify_fn again if bio_integrity_verify_fn() won't clear
->> REQ_INTEGRITY.
->>
->> So bio_integrity_free() is always called serially, and the flag of REQ_INTEGRITY
->> guarantees that it is only freed once.
->>
->> I think there isn't such double free you mentioned.
->>
->> Thanks,
->> Ming
->>
->>
->>
-> 
-> Right agreed, the REQ_INTEGRITY flag is what is guaranteeing freeing 
-> only once.
-> 
-> Thanks for clearing this up.  I'm good with the patch.
+On Tue, Nov 26, 2019 at 3:18 PM David Howells <dhowells@redhat.com> wrote:
+>
+> Can you consider pulling my general notification queue patchset after
+> you've pulled the preparatory pipework patchset?  Or should it be deferred
+> to the next window?
 
-Thanks all - I have applied the patch, and re-instated Justin's
-signed-off-by.
+So it's perhaps obvious by now, but I had delayed this pull request
+because I was waiting to see if there were any reports of issues with
+the core pipe changes.
 
--- 
-Jens Axboe
+And considering that there clearly _is_ something going on with the
+pipe changes, I'm not going to pull this for this merge window.
 
+I'm obviously hoping that we'll figure out what the btrfs-test issue
+is asap, but even if we do, it's too late to pull stuff on top of our
+current situation right now.
+
+I suspect this is what you expected anyway (considering your own query
+about the next merge window), but I thought I'd reply to it explicitly
+since I had kept this pull request in my "maybe" queue, but with the
+pipe thread from this morning it's dropped from that.
+
+            Linus
