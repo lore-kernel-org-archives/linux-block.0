@@ -2,293 +2,299 @@ Return-Path: <SRS0=S578=Z3=vger.kernel.org=linux-block-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-8.4 required=3.0 tests=DKIMWL_WL_HIGH,DKIM_SIGNED,
-	DKIM_VALID,DKIM_VALID_AU,HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,
-	MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,USER_AGENT_SANE_1
-	autolearn=ham autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-9.8 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
+	INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,
+	USER_AGENT_GIT autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id BFE31C43603
-	for <linux-block@archiver.kernel.org>; Thu,  5 Dec 2019 15:17:42 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 15328C43603
+	for <linux-block@archiver.kernel.org>; Thu,  5 Dec 2019 15:25:54 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.kernel.org (Postfix) with ESMTP id 7D1792464E
-	for <linux-block@archiver.kernel.org>; Thu,  5 Dec 2019 15:17:42 +0000 (UTC)
-Authentication-Results: mail.kernel.org;
-	dkim=pass (1024-bit key) header.d=amazon.com header.i=@amazon.com header.b="auBm8oCZ"
+	by mail.kernel.org (Postfix) with ESMTP id DB5A22053B
+	for <linux-block@archiver.kernel.org>; Thu,  5 Dec 2019 15:25:53 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1729145AbfLEPRm (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Thu, 5 Dec 2019 10:17:42 -0500
-Received: from smtp-fw-9101.amazon.com ([207.171.184.25]:58068 "EHLO
-        smtp-fw-9101.amazon.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1726257AbfLEPRl (ORCPT
-        <rfc822;linux-block@vger.kernel.org>); Thu, 5 Dec 2019 10:17:41 -0500
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-  d=amazon.com; i=@amazon.com; q=dns/txt; s=amazon201209;
-  t=1575559061; x=1607095061;
-  h=subject:to:cc:references:from:message-id:date:
-   mime-version:in-reply-to:content-transfer-encoding;
-  bh=C1oFzrj34QolL5H4aOWLvQyygWmB7hXl2AlARDmhXA0=;
-  b=auBm8oCZoGxMyvKqMf5yXxoKl/Z61ElUcHyOhQ6FNVuZU/jPKTs9jGcv
-   a7XIT95Y5Q1gxQ3V7GNTQqkNLrFl5T3yky+4FiFARd8+3qqgQ//qRa9Hz
-   EmGx73lT9QxKsw00NOEx7wccjof7DVPpZk977Egm2hmxm3tSWjF6mF4iN
-   I=;
-IronPort-SDR: niW+dp1cFro9KfTuXZboUHyg8ac7RtyejU1U0AIiCnvjEYSM51bbNJwYnv6XpN1Atixfx79zxF
- rY+BI3vQ0PdQ==
-X-IronPort-AV: E=Sophos;i="5.69,281,1571702400"; 
-   d="scan'208";a="3414399"
-Received: from sea32-co-svc-lb4-vlan3.sea.corp.amazon.com (HELO email-inbound-relay-2b-4e24fd92.us-west-2.amazon.com) ([10.47.23.38])
-  by smtp-border-fw-out-9101.sea19.amazon.com with ESMTP; 05 Dec 2019 15:17:30 +0000
-Received: from EX13MTAUEA001.ant.amazon.com (pdx4-ws-svc-p6-lb7-vlan2.pdx.amazon.com [10.170.41.162])
-        by email-inbound-relay-2b-4e24fd92.us-west-2.amazon.com (Postfix) with ESMTPS id 47328A25E6;
-        Thu,  5 Dec 2019 15:17:29 +0000 (UTC)
-Received: from EX13D16UEA001.ant.amazon.com (10.43.61.210) by
- EX13MTAUEA001.ant.amazon.com (10.43.61.82) with Microsoft SMTP Server (TLS)
- id 15.0.1367.3; Thu, 5 Dec 2019 15:17:28 +0000
-Received: from EX13MTAUEA001.ant.amazon.com (10.43.61.82) by
- EX13D16UEA001.ant.amazon.com (10.43.61.210) with Microsoft SMTP Server (TLS)
- id 15.0.1367.3; Thu, 5 Dec 2019 15:17:28 +0000
-Received: from u886c93fd17d25d.ant.amazon.com (10.28.85.76) by
- mail-relay.amazon.com (10.43.61.243) with Microsoft SMTP Server (TLS) id
- 15.0.1367.3 via Frontend Transport; Thu, 5 Dec 2019 15:17:27 +0000
-Subject: Re: [PATCH v2 1/1] xen/blkback: Aggressively shrink page pools if a
- memory pressure is detected
-To:     <axboe@kernel.dk>, <konrad.wilk@oracle.com>, <roger.pau@citrix.com>
-CC:     <linux-block@vger.kernel.org>, <linux-kernel@vger.kernel.org>,
-        <sj38.park@gmail.com>, SeongJae Park <sjpark@amazon.de>,
-        "xen-devel@lists.xenproject.org" <xen-devel@lists.xenproject.org>
-References: <20191205150932.3793-1-sjpark@amazon.com>
- <20191205150932.3793-2-sjpark@amazon.com>
-From:   <sjpark@amazon.com>
-Message-ID: <929503ff-63bb-3c29-966c-dd1ce3641ef8@amazon.com>
-Date:   Thu, 5 Dec 2019 16:17:26 +0100
-User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:60.0) Gecko/20100101
- Thunderbird/60.9.0
-MIME-Version: 1.0
-In-Reply-To: <20191205150932.3793-2-sjpark@amazon.com>
-Content-Type: text/plain; charset="utf-8"
-Content-Transfer-Encoding: 7bit
-Content-Language: en-US
+        id S1729540AbfLEPZx (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Thu, 5 Dec 2019 10:25:53 -0500
+Received: from mx2.suse.de ([195.135.220.15]:43228 "EHLO mx1.suse.de"
+        rhost-flags-OK-OK-OK-FAIL) by vger.kernel.org with ESMTP
+        id S1729145AbfLEPZx (ORCPT <rfc822;linux-block@vger.kernel.org>);
+        Thu, 5 Dec 2019 10:25:53 -0500
+X-Virus-Scanned: by amavisd-new at test-mx.suse.de
+Received: from relay2.suse.de (unknown [195.135.220.254])
+        by mx1.suse.de (Postfix) with ESMTP id F2CC2B2AE;
+        Thu,  5 Dec 2019 15:25:50 +0000 (UTC)
+From:   Coly Li <colyli@suse.de>
+To:     linux-bcache@vger.kernel.org
+Cc:     linux-block@vger.kernel.org, Coly Li <colyli@suse.de>,
+        Damien Le Moal <damien.lemoal@wdc.com>,
+        Hannes Reinecke <hare@suse.com>
+Subject: [RFC PATCH] bcache: enable zoned device support
+Date:   Thu,  5 Dec 2019 23:25:43 +0800
+Message-Id: <20191205152543.73885-1-colyli@suse.de>
+X-Mailer: git-send-email 2.16.4
 Sender: linux-block-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-On 05.12.19 16:09, SeongJae Park wrote:
-> From: SeongJae Park <sjpark@amazon.de>
->
-> Each `blkif` has a free pages pool for the grant mapping.  The size of
-> the pool starts from zero and be increased on demand while processing
-> the I/O requests.  If current I/O requests handling is finished or 100
-> milliseconds has passed since last I/O requests handling, it checks and
-> shrinks the pool to not exceed the size limit, `max_buffer_pages`.
->
-> Therefore, `blkfront` running guests can cause a memory pressure in the
-> `blkback` running guest by attaching a large number of block devices and
-> inducing I/O.  System administrators can avoid such problematic
-> situations by limiting the maximum number of devices each guest can
-> attach.  However, finding the optimal limit is not so easy.  Improper
-> set of the limit can result in the memory pressure or a resource
-> underutilization.  This commit avoids such problematic situations by
-> shrinking the pools aggressively (further the limit) for a while (users
-> can set this duration via a module parameter) if a memory pressure is
-> detected.
->
-> Discussions
-> ===========
->
-> The `blkback`'s original shrinking mechanism returns only pages in the
-> pool which are not currently be used by `blkback`.  In other words, the
-> pages that will be shrunk are not mapped with foreign pages.  Because
-> this commit is changing only the shrink limit but uses the shrinking
-> mechanism as is, this commit does not introduce improper mappings
-> related security issues.
->
-> Once a memory pressure is detected, this commit keeps the aggressive
-> shrinking limit for a user-specified time duration.  The duration should
-> be neither too long nor too short.  If it is too long, free pages pool
-> shrinking overhead can reduce the I/O performance.  If it is too short,
-> `blkback` will not free enough pages to reduce the memory pressure.
-> This commit sets the value as `10 milliseconds` by default because it is
-> a short time in terms of I/O while it is a long time in terms of memory
-> operations.  Also, as the original shrinking mechanism works for at
-> least every 100 milliseconds, this could be a somewhat reasonable
-> choice.  I also tested other durations (refer to the below section for
-> more details) and confirmed that 10 milliseconds is the one that works
-> best.  That said, the proper duration depends on actual configurations
-> and workloads.  That's why this commit is allowing users to set it as
-> their optimal value via the module parameter.
->
-> Memory Pressure Test
-> ====================
->
-> To show how this commit fixes the above mentioned memory pressure
-> situation well, I configured a test environment on a xen-running system.
-> On the `blkfront` running guest instances, I attach a large number of
-> network-backed volume devices and induce I/O to those.  Meanwhile, I
-> measure the number of pages that swapped in and out on the `blkback`
-> running guest.  The test ran twice, once for the `blkback` before this
-> commit and once for that after this commit.  As shown below, this commit
-> has dramatically reduced the memory pressure:
->
->                 pswpin  pswpout
->     before      76,672  185,799
->     after          212    3,325
->
-> Optimal Aggressive Shrinking Duration
-> -------------------------------------
->
-> To find a best aggressive shrinking duration, I repeated the test with
-> three different durations (1ms, 10ms, and 100ms).  The results are as
-> below:
->
->     duration    pswpin  pswpout
->     1           852     6,424
->     10          212     3,325
->     100         203     3,340
->
-> As expected, the numbers have further decreased by increasing the
-> duration, but the reduction stopped from the `10ms`.  Based on this
-> results, I chose the default duration as 10ms.
->
-> Performance Overhead Test
-> =========================
->
-> This commit could incur I/O performance degradation under severe memory
-> pressure because the aggressive shrinking will require more page
-> allocations per I/O.  To show the overhead, I artificially made an
-> aggressive pages pool shrinking situation and measured the I/O
-> performance of a `blkfront` running guest.
->
-> For the artificial shrinking, I set the `blkback.max_buffer_pages` using
-> the `/sys/module/xen_blkback/parameters/max_buffer_pages` file.  We set
-> the value to `1024` and `0`.  The `1024` is the default value.  Setting
-> the value as `0` is same to a situation doing the aggressive shrinking
-> always (worst-case).
->
-> For the I/O performance measurement, I use a simple `dd` command.
->
-> Default Performance
-> -------------------
->
->     [dom0]# echo 1024 >
-> /sys/module/xen_blkback/parameters/max_buffer_pages
->     [instance]$ for i in {1..5}; do dd if=/dev/zero of=file bs=4k
-> count=$((256*512)); sync; done
->     131072+0 records in
->     131072+0 records out
->     536870912 bytes (537 MB) copied, 11.7257 s, 45.8 MB/s
->     131072+0 records in
->     131072+0 records out
->     536870912 bytes (537 MB) copied, 13.8827 s, 38.7 MB/s
->     131072+0 records in
->     131072+0 records out
->     536870912 bytes (537 MB) copied, 13.8781 s, 38.7 MB/s
->     131072+0 records in
->     131072+0 records out
->     536870912 bytes (537 MB) copied, 13.8737 s, 38.7 MB/s
->     131072+0 records in
->     131072+0 records out
->     536870912 bytes (537 MB) copied, 13.8702 s, 38.7 MB/s
->
-> Worst-case Performance
-> ----------------------
->
->     [dom0]# echo 0 >
-> /sys/module/xen_blkback/parameters/max_buffer_pages
->     [instance]$ for i in {1..5}; do dd if=/dev/zero of=file bs=4k
-> count=$((256*512)); sync; done
->     131072+0 records in
->     131072+0 records out
->     536870912 bytes (537 MB) copied, 11.7257 s, 45.8 MB/s
->     131072+0 records in
->     131072+0 records out
->     536870912 bytes (537 MB) copied, 13.878 s, 38.7 MB/s
->     131072+0 records in
->     131072+0 records out
->     536870912 bytes (537 MB) copied, 13.8746 s, 38.7 MB/s
->     131072+0 records in
->     131072+0 records out
->     536870912 bytes (537 MB) copied, 13.8786 s, 38.7 MB/s
->     131072+0 records in
->     131072+0 records out
->     536870912 bytes (537 MB) copied, 13.8749 s, 38.7 MB/s
->
-> In short, even worst case aggressive shrinking makes no visible
-> performance degradation.  I think this is due to the slow speed of the
-> I/O.  In other words, the additional page allocation overhead is hidden
-> under the much slower I/O latency.
->
-> Nevertheless, pleaset note that this is just a very simple and minimal
-> test.
->
-> Signed-off-by: SeongJae Park <sjpark@amazon.de>
-> ---
->  drivers/block/xen-blkback/blkback.c | 35 +++++++++++++++++++++++++++--
->  1 file changed, 33 insertions(+), 2 deletions(-)
->
-> diff --git a/drivers/block/xen-blkback/blkback.c b/drivers/block/xen-blkback/blkback.c
-> index 3666afa639d1..72d068328ef1 100644
-> --- a/drivers/block/xen-blkback/blkback.c
-> +++ b/drivers/block/xen-blkback/blkback.c
-> @@ -135,6 +135,31 @@ module_param(log_stats, int, 0644);
->  /* Number of free pages to remove on each call to gnttab_free_pages */
->  #define NUM_BATCH_FREE_PAGES 10
->  
-> +/*
-> + * Once a memory pressure is detected, keep aggressive shrinking of the free
-> + * page pools for this time (milliseconds)
-> + */
-> +static int xen_blkif_aggressive_shrinking_duration = 10;
-> +module_param_named(aggressive_shrinking_duration,
-> +		xen_blkif_aggressive_shrinking_duration, int, 0644);
-> +MODULE_PARM_DESC(aggressive_shrinking_duration,
-> +"Duration in ms to do aggressive shrinking when a memory pressure is detected");
-> +
-> +static unsigned long xen_blk_mem_pressure_end;
-> +
-> +static unsigned long blkif_shrink_count(struct shrinker *shrinker,
-> +				struct shrink_control *sc)
-> +{
-> +	xen_blk_mem_pressure_end = jiffies +
-> +		msecs_to_jiffies(xen_blkif_aggressive_shrinking_duration);
-> +	return 0;
-> +}
-> +
-> +static struct shrinker blkif_shrinker = {
-> +	.count_objects = blkif_shrink_count,
-> +	.seeks = DEFAULT_SEEKS,
-> +};
-> +
->  static inline bool persistent_gnt_timeout(struct persistent_gnt *persistent_gnt)
->  {
->  	return xen_blkif_pgrant_timeout &&
-> @@ -656,8 +681,11 @@ int xen_blkif_schedule(void *arg)
->  			ring->next_lru = jiffies + msecs_to_jiffies(LRU_INTERVAL);
->  		}
->  
-> -		/* Shrink if we have more than xen_blkif_max_buffer_pages */
-> -		shrink_free_pagepool(ring, xen_blkif_max_buffer_pages);
-> +		/* Shrink the free pages pool if it is too large. */
-> +		if (time_before(jiffies, xen_blk_mem_pressure_end))
-> +			shrink_free_pagepool(ring, 0);
-> +		else
-> +			shrink_free_pagepool(ring, xen_blkif_max_buffer_pages);
->  
->  		if (log_stats && time_after(jiffies, ring->st_print))
->  			print_stats(ring);
-> @@ -1500,6 +1528,9 @@ static int __init xen_blkif_init(void)
->  	if (rc)
->  		goto failed_init;
->  
-> +	if (register_shrinker(&blkif_shrinker))
-> +		pr_warn("shrinker registration failed\n");
-> +
->   failed_init:
->  	return rc;
->  }
+This is a very basic zoned device support. With this patch, bcache
+device is able to,
+- Export zoned device attribution via sysfs
+- Response report zones request, e.g. by command 'blkzone report'
+But the bcache device is still NOT able to,
+- Response any zoned device management request or IOCTL command
 
-CC-ing xen-devel@lists.xenproject.org
+Here are the testings I have done,
+- read /sys/block/bcache0/queue/zoned, content is 'host-managed'
+- read /sys/block/bcache0/queue/nr_zones, content is number of zones
+  including all zone types.
+- read /sys/block/bcache0/queue/chunk_sectors, content is zone size
+  in sectors.
+- run 'blkzone report /dev/bcache0', all zones information displayed.
+- run 'blkzone reset /dev/bcache0', operation is rejected with error
+  information: "blkzone: /dev/bcache0: BLKRESETZONE ioctl failed:
+  Operation not supported"
+- Sequential writes by dd, I can see some zones' write pointer 'wptr'
+  values updated.
 
+All of these are very basic testings, if you have better testing
+tools or cases, please offer me hint.
 
-Thanks,
-SeongJae Park
+Thanks in advance for your review and comments.
+
+Signed-off-by: Coly Li <colyli@suse.de>
+CC: Damien Le Moal <damien.lemoal@wdc.com>
+CC: Hannes Reinecke <hare@suse.com>
+---
+ drivers/md/bcache/bcache.h  | 10 ++++++
+ drivers/md/bcache/request.c | 74 +++++++++++++++++++++++++++++++++++++++++++++
+ drivers/md/bcache/super.c   | 41 +++++++++++++++++++++++--
+ 3 files changed, 122 insertions(+), 3 deletions(-)
+
+diff --git a/drivers/md/bcache/bcache.h b/drivers/md/bcache/bcache.h
+index 9198c1b480d9..77c2040c99ee 100644
+--- a/drivers/md/bcache/bcache.h
++++ b/drivers/md/bcache/bcache.h
+@@ -221,6 +221,7 @@ BITMASK(GC_MOVE, struct bucket, gc_mark, 15, 1);
+ struct search;
+ struct btree;
+ struct keybuf;
++struct bch_report_zones_args;
+ 
+ struct keybuf_key {
+ 	struct rb_node		node;
+@@ -277,6 +278,8 @@ struct bcache_device {
+ 			  struct bio *bio, unsigned int sectors);
+ 	int (*ioctl)(struct bcache_device *d, fmode_t mode,
+ 		     unsigned int cmd, unsigned long arg);
++	int (*report_zones)(struct bch_report_zones_args *args,
++			    unsigned int nr_zones);
+ };
+ 
+ struct io {
+@@ -743,6 +746,13 @@ struct bbio {
+ 	struct bio		bio;
+ };
+ 
++struct bch_report_zones_args {
++	struct bcache_device *bcache_device;
++	sector_t sector;
++	void *orig_data;
++	report_zones_cb orig_cb;
++};
++
+ #define BTREE_PRIO		USHRT_MAX
+ #define INITIAL_PRIO		32768U
+ 
+diff --git a/drivers/md/bcache/request.c b/drivers/md/bcache/request.c
+index 7555e4a93145..d82425300383 100644
+--- a/drivers/md/bcache/request.c
++++ b/drivers/md/bcache/request.c
+@@ -1162,6 +1162,19 @@ static blk_qc_t cached_dev_make_request(struct request_queue *q,
+ 		}
+ 	}
+ 
++	/*
++	 * zone management request may change the data layout and content
++	 * implicitly on backing device, which introduces unacceptible
++	 * inconsistency between the backing device and the cache device.
++	 * Therefore all zone management related request will be denied here.
++	 */
++	if (op_is_zone_mgmt(bio->bi_opf)) {
++		pr_err_ratelimited("zoned device management request denied.");
++		bio->bi_status = BLK_STS_NOTSUPP;
++		bio_endio(bio);
++		return BLK_QC_T_NONE;
++	}
++
+ 	generic_start_io_acct(q,
+ 			      bio_op(bio),
+ 			      bio_sectors(bio),
+@@ -1205,6 +1218,24 @@ static int cached_dev_ioctl(struct bcache_device *d, fmode_t mode,
+ 	if (dc->io_disable)
+ 		return -EIO;
+ 
++	/*
++	 * zone management ioctl commands may change the data layout
++	 * and content implicitly on backing device, which introduces
++	 * unacceptible inconsistency between the backing device and
++	 * the cache device. Therefore all zone management related
++	 * ioctl commands will be denied here.
++	 */
++	switch (cmd) {
++	case BLKRESETZONE:
++	case BLKOPENZONE:
++	case BLKCLOSEZONE:
++	case BLKFINISHZONE:
++		return -EOPNOTSUPP;
++	default:
++		/* Other commands fall through*/
++		break;
++	}
++
+ 	return __blkdev_driver_ioctl(dc->bdev, mode, cmd, arg);
+ }
+ 
+@@ -1233,6 +1264,48 @@ static int cached_dev_congested(void *data, int bits)
+ 	return ret;
+ }
+ 
++static int cached_dev_report_zones_cb(struct blk_zone *zone,
++				      unsigned int idx,
++				      void *data)
++{
++	struct bch_report_zones_args *args = data;
++	struct bcache_device *d = args->bcache_device;
++	struct cached_dev *dc = container_of(d, struct cached_dev, disk);
++	unsigned long data_offset = dc->sb.data_offset;
++
++	if (zone->start >= data_offset) {
++		zone->start -= data_offset;
++		zone->wp -= data_offset;
++	} else {
++		/*
++		 * Normally the first zone is conventional zone,
++		 * we don't need to worry about how to maintain
++		 * the write pointer.
++		 * But the zone->len is special, because the
++		 * sector 0 on bcache device is 8KB offset on
++		 * backing device indeed.
++		 */
++		zone->len -= data_offset;
++	}
++
++	return args->orig_cb(zone, idx, args->orig_data);
++}
++
++static int cached_dev_report_zones(struct bch_report_zones_args *args,
++				   unsigned int nr_zones)
++{
++	struct bcache_device *d = args->bcache_device;
++	struct cached_dev *dc = container_of(d, struct cached_dev, disk);
++	sector_t sector = args->sector + dc->sb.data_offset;
++
++	/* sector is real LBA of backing device */
++	return blkdev_report_zones(dc->bdev,
++				   sector,
++				   nr_zones,
++				   cached_dev_report_zones_cb,
++				   args);
++}
++
+ void bch_cached_dev_request_init(struct cached_dev *dc)
+ {
+ 	struct gendisk *g = dc->disk.disk;
+@@ -1241,6 +1314,7 @@ void bch_cached_dev_request_init(struct cached_dev *dc)
+ 	g->queue->backing_dev_info->congested_fn = cached_dev_congested;
+ 	dc->disk.cache_miss			= cached_dev_cache_miss;
+ 	dc->disk.ioctl				= cached_dev_ioctl;
++	dc->disk.report_zones			= cached_dev_report_zones;
+ }
+ 
+ /* Flash backed devices */
+diff --git a/drivers/md/bcache/super.c b/drivers/md/bcache/super.c
+index 77e9869345e7..7222fcafaf50 100644
+--- a/drivers/md/bcache/super.c
++++ b/drivers/md/bcache/super.c
+@@ -672,10 +672,32 @@ static int ioctl_dev(struct block_device *b, fmode_t mode,
+ 	return d->ioctl(d, mode, cmd, arg);
+ }
+ 
++
++static int report_zones_dev(struct gendisk *disk,
++			    sector_t sector,
++			    unsigned int nr_zones,
++			    report_zones_cb cb,
++			    void *data)
++{
++	struct bcache_device *d = disk->private_data;
++	struct bch_report_zones_args args = {
++		.bcache_device = d,
++		.sector = sector,
++		.orig_data = data,
++		.orig_cb = cb,
++	};
++
++	if (d->report_zones)
++		return d->report_zones(&args, nr_zones);
++
++	return -EOPNOTSUPP;
++}
++
+ static const struct block_device_operations bcache_ops = {
+ 	.open		= open_dev,
+ 	.release	= release_dev,
+ 	.ioctl		= ioctl_dev,
++	.report_zones	= report_zones_dev,
+ 	.owner		= THIS_MODULE,
+ };
+ 
+@@ -808,7 +830,9 @@ static void bcache_device_free(struct bcache_device *d)
+ 	closure_debug_destroy(&d->cl);
+ }
+ 
+-static int bcache_device_init(struct bcache_device *d, unsigned int block_size,
++static int bcache_device_init(struct cached_dev *dc,
++			      struct bcache_device *d,
++			      unsigned int block_size,
+ 			      sector_t sectors)
+ {
+ 	struct request_queue *q;
+@@ -882,6 +906,17 @@ static int bcache_device_init(struct bcache_device *d, unsigned int block_size,
+ 
+ 	blk_queue_write_cache(q, true, true);
+ 
++	/*
++	 * If this is for backing device registration, and it is an
++	 * zoned device (e.g. host-managed S.M.R. hard drive), set
++	 * up zoned device attribution properly for sysfs interface.
++	 */
++	if (dc && bdev_is_zoned(dc->bdev)) {
++		q->limits.zoned = bdev_zoned_model(dc->bdev);
++		q->nr_zones = blkdev_nr_zones(dc->bdev);
++		q->limits.chunk_sectors = bdev_zone_sectors(dc->bdev);
++	}
++
+ 	return 0;
+ 
+ err:
+@@ -1328,7 +1363,7 @@ static int cached_dev_init(struct cached_dev *dc, unsigned int block_size)
+ 		dc->partial_stripes_expensive =
+ 			q->limits.raid_partial_stripes_expensive;
+ 
+-	ret = bcache_device_init(&dc->disk, block_size,
++	ret = bcache_device_init(dc, &dc->disk, block_size,
+ 			 dc->bdev->bd_part->nr_sects - dc->sb.data_offset);
+ 	if (ret)
+ 		return ret;
+@@ -1445,7 +1480,7 @@ static int flash_dev_run(struct cache_set *c, struct uuid_entry *u)
+ 
+ 	kobject_init(&d->kobj, &bch_flash_dev_ktype);
+ 
+-	if (bcache_device_init(d, block_bytes(c), u->sectors))
++	if (bcache_device_init(NULL, d, block_bytes(c), u->sectors))
+ 		goto err;
+ 
+ 	bcache_device_attach(d, c, u - c->uuids);
+-- 
+2.16.4
 
