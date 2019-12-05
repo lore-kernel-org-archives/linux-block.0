@@ -2,104 +2,91 @@ Return-Path: <SRS0=S578=Z3=vger.kernel.org=linux-block-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-0.9 required=3.0 tests=DKIMWL_WL_HIGH,DKIM_SIGNED,
-	DKIM_VALID,DKIM_VALID_AU,HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,
-	SPF_HELO_NONE,SPF_PASS autolearn=no autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-9.8 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
+	INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,
+	USER_AGENT_GIT autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id E2784C43603
-	for <linux-block@archiver.kernel.org>; Thu,  5 Dec 2019 10:32:08 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 1CB0AC43603
+	for <linux-block@archiver.kernel.org>; Thu,  5 Dec 2019 12:46:03 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.kernel.org (Postfix) with ESMTP id A8C0224653
-	for <linux-block@archiver.kernel.org>; Thu,  5 Dec 2019 10:32:08 +0000 (UTC)
-Authentication-Results: mail.kernel.org;
-	dkim=pass (1024-bit key) header.d=broadcom.com header.i=@broadcom.com header.b="LVhKlAce"
+	by mail.kernel.org (Postfix) with ESMTP id ED8B42464D
+	for <linux-block@archiver.kernel.org>; Thu,  5 Dec 2019 12:46:02 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1729072AbfLEKcH (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Thu, 5 Dec 2019 05:32:07 -0500
-Received: from mail-il1-f178.google.com ([209.85.166.178]:37355 "EHLO
-        mail-il1-f178.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1729206AbfLEKcH (ORCPT
-        <rfc822;linux-block@vger.kernel.org>); Thu, 5 Dec 2019 05:32:07 -0500
-Received: by mail-il1-f178.google.com with SMTP id t9so2542387iln.4
-        for <linux-block@vger.kernel.org>; Thu, 05 Dec 2019 02:32:07 -0800 (PST)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=broadcom.com; s=google;
-        h=from:references:in-reply-to:mime-version:thread-index:date
-         :message-id:subject:to:cc;
-        bh=h484k0glhkWeW7tP68ByhNvi+fZQlOfa529/H5/kNzA=;
-        b=LVhKlAce8nAuTjqLQ28M/88nHeVSCvpmtTONx/gjfJqFdGC/R8/YkSGJDRpDJDSbw9
-         5vPQo/2kfj2dYZWBK97sUBtvNS/Ska8w0jTzqvQbfQrwaaCmKtdqbRaJEq4UyGNfQMht
-         huXO4gIrtGC2LSyy+7jgXUpMa3DNxai+/P/Gc=
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20161025;
-        h=x-gm-message-state:from:references:in-reply-to:mime-version
-         :thread-index:date:message-id:subject:to:cc;
-        bh=h484k0glhkWeW7tP68ByhNvi+fZQlOfa529/H5/kNzA=;
-        b=pl3YFXRpC5NEU+llrHzlNQS62WtB7Q1+2V9f+4rmASZJ44ZvgRnlMYfg0Jt7w3MTZS
-         lzn/OMC8qapcUXHwAeogAqDcXPL49eYQDzFV0xwTPextmw5xXaEv3fT2MoFk7eHJn9YA
-         Sg2NFrasGzZ2lRBtRulXSa+ry0cqYs9CTf+Q56XxUBov1z9PxuN5Y1C9COQlk8cacGqA
-         w1J7/wQsvtl54mRgSK9YuWD0XVKi1VyrHqhfyx8AnbHEm60q3AjZhWZluwFWybp9F2Z4
-         LUVWIIs3Qag9wVkSwQ1QZibC7GkauwpMWS3nDEun5h4LsYb7kEElDYtdBOctu4H72lGa
-         IazA==
-X-Gm-Message-State: APjAAAWpWDpTT8rKra0CdD2SYYieUmCfSNL1k1UlBxd5NLBIm9g45KLn
-        0wNArtwB22/AsrICXPNyCqUp3O4h8y5O6OaLs3F+3Q==
-X-Google-Smtp-Source: APXvYqxwhy+zfXnDguKWuxWVMyh43pDCuX4H5mcMy0JqTok7fhi3XNR7px97f46ryUjNHKzGu6gxNo0BVOSYw6Qxgrs=
-X-Received: by 2002:a92:d38e:: with SMTP id o14mr8336126ilo.238.1575541926514;
- Thu, 05 Dec 2019 02:32:06 -0800 (PST)
-From:   Kashyap Desai <kashyap.desai@broadcom.com>
-References: <20191118103117.978-1-ming.lei@redhat.com> <20191118103117.978-2-ming.lei@redhat.com>
- <97bf460e-62c9-dc64-db4c-fb5540e70ae9@suse.de> <252362ee5ac748694d205441729c433f@mail.gmail.com>
- <20191126033755.GE24501@ming.t460p>
-In-Reply-To: <20191126033755.GE24501@ming.t460p>
+        id S1729441AbfLEMqC (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Thu, 5 Dec 2019 07:46:02 -0500
+Received: from szxga04-in.huawei.com ([45.249.212.190]:7640 "EHLO huawei.com"
+        rhost-flags-OK-OK-OK-FAIL) by vger.kernel.org with ESMTP
+        id S1729290AbfLEMqC (ORCPT <rfc822;linux-block@vger.kernel.org>);
+        Thu, 5 Dec 2019 07:46:02 -0500
+Received: from DGGEMS404-HUB.china.huawei.com (unknown [172.30.72.59])
+        by Forcepoint Email with ESMTP id 96EE551B0A0F4371FE58;
+        Thu,  5 Dec 2019 20:45:59 +0800 (CST)
+Received: from huawei.com (10.90.53.225) by DGGEMS404-HUB.china.huawei.com
+ (10.3.19.204) with Microsoft SMTP Server id 14.3.439.0; Thu, 5 Dec 2019
+ 20:45:49 +0800
+From:   Hou Tao <houtao1@huawei.com>
+To:     <linux-block@vger.kernel.org>, <tj@kernel.org>
+CC:     <paolo.valente@linaro.org>, <axboe@kernel.dk>,
+        <cgroups@vger.kernel.org>, <houtao1@huawei.com>
+Subject: [PATCH] bfq-iosched: Ensure bio->bi_blkg is valid before using it
+Date:   Thu, 5 Dec 2019 20:53:11 +0800
+Message-ID: <20191205125311.40616-1-houtao1@huawei.com>
+X-Mailer: git-send-email 2.22.0
 MIME-Version: 1.0
-X-Mailer: Microsoft Outlook 15.0
-Thread-Index: AQH3BpsAXu9UwBJw1xp6lr9PVp09cQMYv4CvAYuhPOYB9sdvUQFPdxjBpylKwxA=
-Date:   Thu, 5 Dec 2019 16:02:03 +0530
-Message-ID: <1925bc9a900aac610d9623ce1a96389a@mail.gmail.com>
-Subject: RE: [PATCH 1/4] scsi: megaraid_sas: use private counter for tracking
- inflight per-LUN commands
-To:     Ming Lei <ming.lei@redhat.com>
-Cc:     Hannes Reinecke <hare@suse.de>, Jens Axboe <axboe@kernel.dk>,
-        linux-block@vger.kernel.org,
-        "James E . J . Bottomley" <jejb@linux.ibm.com>,
-        "Martin K . Petersen" <martin.petersen@oracle.com>,
-        linux-scsi@vger.kernel.org,
-        Sathya Prakash Veerichetty <sathya.prakash@broadcom.com>,
-        Chaitra P B <chaitra.basappa@broadcom.com>,
-        Suganath Prabu Subramani 
-        <suganath-prabu.subramani@broadcom.com>,
-        Sumit Saxena <sumit.saxena@broadcom.com>,
-        Shivasharan Srikanteshwara 
-        <shivasharan.srikanteshwara@broadcom.com>,
-        "Ewan D . Milne" <emilne@redhat.com>,
-        Christoph Hellwig <hch@lst.de>,
-        Bart Van Assche <bart.vanassche@wdc.com>
-Content-Type: text/plain; charset="UTF-8"
+Content-Transfer-Encoding: 7BIT
+Content-Type:   text/plain; charset=US-ASCII
+X-Originating-IP: [10.90.53.225]
+X-CFilter-Loop: Reflected
 Sender: linux-block-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-> > Ming - Sorry for delay. I will update this Patch. We prefer driver to
-> > avoid counter for per sdev if possible. We are currently testing
-> > driver using below changes.
-> >
-> > inline unsigned long sdev_nr_inflight_request(struct request_queue *q)
-{
-> >     struct blk_mq_hw_ctx *hctx = q->queue_hw_ctx[0]
-> >
-> >     return atomic_read(&hctx->nr_active); }
->
-> OK, I am fine with this way, given it is just used for balancing irq
-load.
+bio->bi_blkg will be NULL when the issue of the request
+has bypassed the block layer as shown in the following oops:
 
-We have removed sdev->device_busy check from megaraid_sas and mpt3sas
-drive.  I am able to get required performance 3.0M IOPs on Aero controller
-using <hctx->nr_active>
-Since this is not urgent, we will wait for some testing done by Broadcom.
-We will post this specific change as Driver update.
+ Internal error: Oops: 96000005 [#1] SMP
+ CPU: 17 PID: 2996 Comm: scsi_id Not tainted 5.4.0 #4
+ Call trace:
+  percpu_counter_add_batch+0x38/0x4c8
+  bfqg_stats_update_legacy_io+0x9c/0x280
+  bfq_insert_requests+0xbac/0x2190
+  blk_mq_sched_insert_request+0x288/0x670
+  blk_execute_rq_nowait+0x140/0x178
+  blk_execute_rq+0x8c/0x140
+  sg_io+0x604/0x9c0
+  scsi_cmd_ioctl+0xe38/0x10a8
+  scsi_cmd_blk_ioctl+0xac/0xe8
+  sd_ioctl+0xe4/0x238
+  blkdev_ioctl+0x590/0x20e0
+  block_ioctl+0x60/0x98
+  do_vfs_ioctl+0xe0/0x1b58
+  ksys_ioctl+0x80/0xd8
+  __arm64_sys_ioctl+0x40/0x78
+  el0_svc_handler+0xc4/0x270
 
->
->
-> Thanks,
-> Ming
+so ensure its validity before using it.
+
+Fixes: fd41e60331b1 ("bfq-iosched: stop using blkg->stat_bytes and ->stat_ios")
+Signed-off-by: Hou Tao <houtao1@huawei.com>
+---
+ block/bfq-cgroup.c | 3 +++
+ 1 file changed, 3 insertions(+)
+
+diff --git a/block/bfq-cgroup.c b/block/bfq-cgroup.c
+index cea0ae12f937..e1419edde2ec 100644
+--- a/block/bfq-cgroup.c
++++ b/block/bfq-cgroup.c
+@@ -351,6 +351,9 @@ void bfqg_stats_update_legacy_io(struct request_queue *q, struct request *rq)
+ {
+ 	struct bfq_group *bfqg = blkg_to_bfqg(rq->bio->bi_blkg);
+ 
++	if (!bfqg)
++		return;
++
+ 	blkg_rwstat_add(&bfqg->stats.bytes, rq->cmd_flags, blk_rq_bytes(rq));
+ 	blkg_rwstat_add(&bfqg->stats.ios, rq->cmd_flags, 1);
+ }
+-- 
+2.22.0
+
