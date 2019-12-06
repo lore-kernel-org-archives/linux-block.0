@@ -1,262 +1,328 @@
-Return-Path: <SRS0=S578=Z3=vger.kernel.org=linux-block-owner@kernel.org>
+Return-Path: <SRS0=tn0U=Z4=vger.kernel.org=linux-block-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-14.4 required=3.0 tests=DKIMWL_WL_MED,DKIM_SIGNED,
-	DKIM_VALID,DKIM_VALID_AU,HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,
-	MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,USER_IN_DEF_DKIM_WL
-	autolearn=ham autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-8.2 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
+	INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,
+	USER_AGENT_SANE_1 autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 6C09FC43603
-	for <linux-block@archiver.kernel.org>; Thu,  5 Dec 2019 22:43:43 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 3FBCEC43603
+	for <linux-block@archiver.kernel.org>; Fri,  6 Dec 2019 00:22:08 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.kernel.org (Postfix) with ESMTP id 28E1520706
-	for <linux-block@archiver.kernel.org>; Thu,  5 Dec 2019 22:43:43 +0000 (UTC)
-Authentication-Results: mail.kernel.org;
-	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="bMqRNKM2"
+	by mail.kernel.org (Postfix) with ESMTP id 050B924659
+	for <linux-block@archiver.kernel.org>; Fri,  6 Dec 2019 00:22:08 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1726009AbfLEWnm (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Thu, 5 Dec 2019 17:43:42 -0500
-Received: from mail-ot1-f68.google.com ([209.85.210.68]:36322 "EHLO
-        mail-ot1-f68.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1726473AbfLEWnm (ORCPT
-        <rfc822;linux-block@vger.kernel.org>); Thu, 5 Dec 2019 17:43:42 -0500
-Received: by mail-ot1-f68.google.com with SMTP id i4so4150922otr.3
-        for <linux-block@vger.kernel.org>; Thu, 05 Dec 2019 14:43:41 -0800 (PST)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=google.com; s=20161025;
-        h=mime-version:references:in-reply-to:from:date:message-id:subject:to
-         :cc;
-        bh=gHtk9ElDRlq0lq4u0NPjLGH1Txh8nv1jVGUFuyfxbww=;
-        b=bMqRNKM2P2LAnRWC8z0KWyOpXI7OVxnN9tuounehotHmmNo6mRJXIaIKjoF0fqRp61
-         eFxPsdIomtX9l7K9FlgwtqlsPQmLGYibI2aBrvLuk7I1U+dlkmAxnCYhoQ91tAA+caL4
-         gTewKRU2LTRkvff8iY/ZepkRz4SWFcK2lb4mikPYo+ymZdcWdiFisK6RRYCvTfV2ksmJ
-         wlT3ayvZQbbcshonnryTLBIIwA14lUeNLsNUZDsNbBbvvvqw572oCht0hUDhAcAZyvra
-         ojUnbZ642uER7o5nL+R4EryosFLRpsySDuqpLbvW+Kfj6rq4+mCDlyrQHLlLJD3yoM6x
-         mLeA==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20161025;
-        h=x-gm-message-state:mime-version:references:in-reply-to:from:date
-         :message-id:subject:to:cc;
-        bh=gHtk9ElDRlq0lq4u0NPjLGH1Txh8nv1jVGUFuyfxbww=;
-        b=BMqaYDtU+rKOqNF2FW7fZN++ry7xJmpuPr/5i0hEivj9nSClUqLn1+cY970QXJRhoR
-         hbjpZEGxJXtL5JQKrbH3SMZia4u+JJI4npZB/DPbSpMh5czRtqJqCGbg4QAIg8yhWL/a
-         PHH/AGiBt9djAfmSHhr5tTe2enpiT95mb1Z47weuIUxO3divhmSqG/rudtRpaI5vYFsI
-         WbSDUHLjQ/HhTFpmHBBMzgiue1HzgB/CEi7MEh0getnBCpzL5r5Nkvad+J+Unlv7/Oyf
-         qcjiGvUpsIN38oeRnBzve8OWV2gBk5QyecslD9Ofhd/lkfOmXjk4ooKbrMZ8CTVba1kf
-         j/sw==
-X-Gm-Message-State: APjAAAVdZ97+Qngn5+r0QS7RoinwANy+XhFaEUQaiGHxQmYRtVw0Bisd
-        YCMVjEexAEbUMX4dd/C9yLqLPx+OSgbgqijuFg46XA==
-X-Google-Smtp-Source: APXvYqy+leRhWNDTZep6R8GEh7Ra+JauuhEV9tZ4BzRTHVHL6e527jC5pmTiMG1fq8PSVSJe27n0Km09D/IblJ9iXio=
-X-Received: by 2002:a05:6830:2141:: with SMTP id r1mr8208158otd.124.1575585820837;
- Thu, 05 Dec 2019 14:43:40 -0800 (PST)
+        id S1726037AbfLFAWH (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Thu, 5 Dec 2019 19:22:07 -0500
+Received: from mx.ewheeler.net ([173.205.220.69]:44218 "EHLO mx.ewheeler.net"
+        rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
+        id S1725959AbfLFAWH (ORCPT <rfc822;linux-block@vger.kernel.org>);
+        Thu, 5 Dec 2019 19:22:07 -0500
+Received: from localhost (localhost [127.0.0.1])
+        by mx.ewheeler.net (Postfix) with ESMTP id 8691FA0633;
+        Fri,  6 Dec 2019 00:22:01 +0000 (UTC)
+X-Virus-Scanned: amavisd-new at ewheeler.net
+Received: from mx.ewheeler.net ([127.0.0.1])
+        by localhost (mx.ewheeler.net [127.0.0.1]) (amavisd-new, port 10024)
+        with LMTP id UTMpdt1-hC5r; Fri,  6 Dec 2019 00:21:40 +0000 (UTC)
+Received: from mx.ewheeler.net (mx.ewheeler.net [173.205.220.69])
+        (using TLSv1 with cipher DHE-RSA-AES256-SHA (256/256 bits))
+        (No client certificate requested)
+        by mx.ewheeler.net (Postfix) with ESMTPSA id 3D1AEA0440;
+        Fri,  6 Dec 2019 00:21:40 +0000 (UTC)
+Date:   Fri, 6 Dec 2019 00:21:39 +0000 (UTC)
+From:   Eric Wheeler <bcache@lists.ewheeler.net>
+X-X-Sender: lists@mx.ewheeler.net
+To:     Coly Li <colyli@suse.de>
+cc:     linux-bcache@vger.kernel.org, linux-block@vger.kernel.org,
+        Damien Le Moal <damien.lemoal@wdc.com>,
+        Hannes Reinecke <hare@suse.com>
+Subject: Re: [RFC PATCH] bcache: enable zoned device support
+In-Reply-To: <20191205152543.73885-1-colyli@suse.de>
+Message-ID: <alpine.LRH.2.11.1912060012380.11561@mx.ewheeler.net>
+References: <20191205152543.73885-1-colyli@suse.de>
+User-Agent: Alpine 2.11 (LRH 23 2013-08-11)
 MIME-Version: 1.0
-References: <20191112001900.9206-1-mchristi@redhat.com>
-In-Reply-To: <20191112001900.9206-1-mchristi@redhat.com>
-From:   Shakeel Butt <shakeelb@google.com>
-Date:   Thu, 5 Dec 2019 14:43:29 -0800
-Message-ID: <CALvZod47XyD2x8TuZcb9PgeVY14JBwNhsUpN3RAeAt+RJJC=hg@mail.gmail.com>
-Subject: Re: [PATCH] Add prctl support for controlling mem reclaim V4
-To:     Andrew Morton <akpm@linux-foundation.org>
-Cc:     linux-api@vger.kernel.org, idryomov@gmail.com,
-        Michal Hocko <mhocko@kernel.org>, david@fromorbit.com,
-        Linux MM <linux-mm@kvack.org>,
-        LKML <linux-kernel@vger.kernel.org>, linux-scsi@vger.kernel.org,
-        linux-fsdevel <linux-fsdevel@vger.kernel.org>,
-        linux-block@vger.kernel.org, martin@urbackup.org,
-        Damien.LeMoal@wdc.com, Mike Christie <mchristi@redhat.com>,
-        Michal Hocko <mhocko@suse.com>,
-        Masato Suzuki <masato.suzuki@wdc.com>
-Content-Type: text/plain; charset="UTF-8"
+Content-Type: TEXT/PLAIN; charset=US-ASCII
 Sender: linux-block-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-On Mon, Nov 11, 2019 at 4:19 PM Mike Christie <mchristi@redhat.com> wrote:
->
-> There are several storage drivers like dm-multipath, iscsi, tcmu-runner,
-> amd nbd that have userspace components that can run in the IO path. For
-> example, iscsi and nbd's userspace deamons may need to recreate a socket
-> and/or send IO on it, and dm-multipath's daemon multipathd may need to
-> send SG IO or read/write IO to figure out the state of paths and re-set
-> them up.
->
-> In the kernel these drivers have access to GFP_NOIO/GFP_NOFS and the
-> memalloc_*_save/restore functions to control the allocation behavior,
-> but for userspace we would end up hitting an allocation that ended up
-> writing data back to the same device we are trying to allocate for.
-> The device is then in a state of deadlock, because to execute IO the
-> device needs to allocate memory, but to allocate memory the memory
-> layers want execute IO to the device.
->
-> Here is an example with nbd using a local userspace daemon that performs
-> network IO to a remote server. We are using XFS on top of the nbd device,
-> but it can happen with any FS or other modules layered on top of the nbd
-> device that can write out data to free memory.  Here a nbd daemon helper
-> thread, msgr-worker-1, is performing a write/sendmsg on a socket to execute
-> a request. This kicks off a reclaim operation which results in a WRITE to
-> the nbd device and the nbd thread calling back into the mm layer.
->
-> [ 1626.609191] msgr-worker-1   D    0  1026      1 0x00004000
-> [ 1626.609193] Call Trace:
-> [ 1626.609195]  ? __schedule+0x29b/0x630
-> [ 1626.609197]  ? wait_for_completion+0xe0/0x170
-> [ 1626.609198]  schedule+0x30/0xb0
-> [ 1626.609200]  schedule_timeout+0x1f6/0x2f0
-> [ 1626.609202]  ? blk_finish_plug+0x21/0x2e
-> [ 1626.609204]  ? _xfs_buf_ioapply+0x2e6/0x410
-> [ 1626.609206]  ? wait_for_completion+0xe0/0x170
-> [ 1626.609208]  wait_for_completion+0x108/0x170
-> [ 1626.609210]  ? wake_up_q+0x70/0x70
-> [ 1626.609212]  ? __xfs_buf_submit+0x12e/0x250
-> [ 1626.609214]  ? xfs_bwrite+0x25/0x60
-> [ 1626.609215]  xfs_buf_iowait+0x22/0xf0
-> [ 1626.609218]  __xfs_buf_submit+0x12e/0x250
-> [ 1626.609220]  xfs_bwrite+0x25/0x60
-> [ 1626.609222]  xfs_reclaim_inode+0x2e8/0x310
-> [ 1626.609224]  xfs_reclaim_inodes_ag+0x1b6/0x300
-> [ 1626.609227]  xfs_reclaim_inodes_nr+0x31/0x40
-> [ 1626.609228]  super_cache_scan+0x152/0x1a0
-> [ 1626.609231]  do_shrink_slab+0x12c/0x2d0
-> [ 1626.609233]  shrink_slab+0x9c/0x2a0
-> [ 1626.609235]  shrink_node+0xd7/0x470
-> [ 1626.609237]  do_try_to_free_pages+0xbf/0x380
-> [ 1626.609240]  try_to_free_pages+0xd9/0x1f0
-> [ 1626.609245]  __alloc_pages_slowpath+0x3a4/0xd30
-> [ 1626.609251]  ? ___slab_alloc+0x238/0x560
-> [ 1626.609254]  __alloc_pages_nodemask+0x30c/0x350
-> [ 1626.609259]  skb_page_frag_refill+0x97/0xd0
-> [ 1626.609274]  sk_page_frag_refill+0x1d/0x80
-> [ 1626.609279]  tcp_sendmsg_locked+0x2bb/0xdd0
-> [ 1626.609304]  tcp_sendmsg+0x27/0x40
-> [ 1626.609307]  sock_sendmsg+0x54/0x60
-> [ 1626.609308]  ___sys_sendmsg+0x29f/0x320
-> [ 1626.609313]  ? sock_poll+0x66/0xb0
-> [ 1626.609318]  ? ep_item_poll.isra.15+0x40/0xc0
-> [ 1626.609320]  ? ep_send_events_proc+0xe6/0x230
-> [ 1626.609322]  ? hrtimer_try_to_cancel+0x54/0xf0
-> [ 1626.609324]  ? ep_read_events_proc+0xc0/0xc0
-> [ 1626.609326]  ? _raw_write_unlock_irq+0xa/0x20
-> [ 1626.609327]  ? ep_scan_ready_list.constprop.19+0x218/0x230
-> [ 1626.609329]  ? __hrtimer_init+0xb0/0xb0
-> [ 1626.609331]  ? _raw_spin_unlock_irq+0xa/0x20
-> [ 1626.609334]  ? ep_poll+0x26c/0x4a0
-> [ 1626.609337]  ? tcp_tsq_write.part.54+0xa0/0xa0
-> [ 1626.609339]  ? release_sock+0x43/0x90
-> [ 1626.609341]  ? _raw_spin_unlock_bh+0xa/0x20
-> [ 1626.609342]  __sys_sendmsg+0x47/0x80
-> [ 1626.609347]  do_syscall_64+0x5f/0x1c0
-> [ 1626.609349]  ? prepare_exit_to_usermode+0x75/0xa0
-> [ 1626.609351]  entry_SYSCALL_64_after_hwframe+0x44/0xa9
->
-> This patch adds a new prctl command that daemons can use after they have
-> done their initial setup, and before they start to do allocations that
-> are in the IO path. It sets the PF_MEMALLOC_NOIO and PF_LESS_THROTTLE
-> flags so both userspace block and FS threads can use it to avoid the
-> allocation recursion and try to prevent from being throttled while
-> writing out data to free up memory.
->
-> Signed-off-by: Mike Christie <mchristi@redhat.com>
-> Acked-by: Michal Hocko <mhocko@suse.com>
-> Tested-by: Masato Suzuki <masato.suzuki@wdc.com>
-> Reviewed-by: Damien Le Moal <damien.lemoal@wdc.com>
+On Thu, 5 Dec 2019, Coly Li wrote:
+> This is a very basic zoned device support. With this patch, bcache
+> device is able to,
+> - Export zoned device attribution via sysfs
+> - Response report zones request, e.g. by command 'blkzone report'
+> But the bcache device is still NOT able to,
+> - Response any zoned device management request or IOCTL command
+> 
+> Here are the testings I have done,
+> - read /sys/block/bcache0/queue/zoned, content is 'host-managed'
+> - read /sys/block/bcache0/queue/nr_zones, content is number of zones
+>   including all zone types.
+> - read /sys/block/bcache0/queue/chunk_sectors, content is zone size
+>   in sectors.
+> - run 'blkzone report /dev/bcache0', all zones information displayed.
+> - run 'blkzone reset /dev/bcache0', operation is rejected with error
+>   information: "blkzone: /dev/bcache0: BLKRESETZONE ioctl failed:
+>   Operation not supported"
+> - Sequential writes by dd, I can see some zones' write pointer 'wptr'
+>   values updated.
+> 
+> All of these are very basic testings, if you have better testing
+> tools or cases, please offer me hint.
 
-I suppose this patch should be routed through MM tree, so, CCing Andrew.
+Interesting. 
 
->
+1. should_writeback() could benefit by hinting true when an IO would fall 
+   in a zoned region.
+
+2. The writeback thread could writeback such that they prefer 
+   fully(mostly)-populated zones when choosing what to write out.
+
+--
+Eric Wheeler
+
+
+
+> Thanks in advance for your review and comments.
+> 
+> Signed-off-by: Coly Li <colyli@suse.de>
+> CC: Damien Le Moal <damien.lemoal@wdc.com>
+> CC: Hannes Reinecke <hare@suse.com>
 > ---
->
-> V4:
-> - Fix PR_GET_IO_FLUSHER check to match SET.
->
-> V3:
-> - Drop NOFS, set PF_LESS_THROTTLE and rename prctl flag to reflect it
-> is more general and can support both FS and block devices. Both fuse
-> and block device daemons, nbd and tcmu-runner, have been tested to
-> confirm the more restrictive PF_MEMALLOC_NOIO also works for fuse.
->
-> - Use CAP_SYS_RESOURCE instead of admin.
->
-> V2:
-> - Use prctl instead of procfs.
-> - Add support for NOFS for fuse.
-> - Check permissions.
->
->
->  include/uapi/linux/capability.h |  1 +
->  include/uapi/linux/prctl.h      |  4 ++++
->  kernel/sys.c                    | 25 +++++++++++++++++++++++++
->  3 files changed, 30 insertions(+)
->
-> diff --git a/include/uapi/linux/capability.h b/include/uapi/linux/capability.h
-> index 240fdb9a60f6..272dc69fa080 100644
-> --- a/include/uapi/linux/capability.h
-> +++ b/include/uapi/linux/capability.h
-> @@ -301,6 +301,7 @@ struct vfs_ns_cap_data {
->  /* Allow more than 64hz interrupts from the real-time clock */
->  /* Override max number of consoles on console allocation */
->  /* Override max number of keymaps */
-> +/* Control memory reclaim behavior */
->
->  #define CAP_SYS_RESOURCE     24
->
-> diff --git a/include/uapi/linux/prctl.h b/include/uapi/linux/prctl.h
-> index 7da1b37b27aa..07b4f8131e36 100644
-> --- a/include/uapi/linux/prctl.h
-> +++ b/include/uapi/linux/prctl.h
-> @@ -234,4 +234,8 @@ struct prctl_mm_map {
->  #define PR_GET_TAGGED_ADDR_CTRL                56
->  # define PR_TAGGED_ADDR_ENABLE         (1UL << 0)
->
-> +/* Control reclaim behavior when allocating memory */
-> +#define PR_SET_IO_FLUSHER              57
-> +#define PR_GET_IO_FLUSHER              58
+>  drivers/md/bcache/bcache.h  | 10 ++++++
+>  drivers/md/bcache/request.c | 74 +++++++++++++++++++++++++++++++++++++++++++++
+>  drivers/md/bcache/super.c   | 41 +++++++++++++++++++++++--
+>  3 files changed, 122 insertions(+), 3 deletions(-)
+> 
+> diff --git a/drivers/md/bcache/bcache.h b/drivers/md/bcache/bcache.h
+> index 9198c1b480d9..77c2040c99ee 100644
+> --- a/drivers/md/bcache/bcache.h
+> +++ b/drivers/md/bcache/bcache.h
+> @@ -221,6 +221,7 @@ BITMASK(GC_MOVE, struct bucket, gc_mark, 15, 1);
+>  struct search;
+>  struct btree;
+>  struct keybuf;
+> +struct bch_report_zones_args;
+>  
+>  struct keybuf_key {
+>  	struct rb_node		node;
+> @@ -277,6 +278,8 @@ struct bcache_device {
+>  			  struct bio *bio, unsigned int sectors);
+>  	int (*ioctl)(struct bcache_device *d, fmode_t mode,
+>  		     unsigned int cmd, unsigned long arg);
+> +	int (*report_zones)(struct bch_report_zones_args *args,
+> +			    unsigned int nr_zones);
+>  };
+>  
+>  struct io {
+> @@ -743,6 +746,13 @@ struct bbio {
+>  	struct bio		bio;
+>  };
+>  
+> +struct bch_report_zones_args {
+> +	struct bcache_device *bcache_device;
+> +	sector_t sector;
+> +	void *orig_data;
+> +	report_zones_cb orig_cb;
+> +};
 > +
->  #endif /* _LINUX_PRCTL_H */
-> diff --git a/kernel/sys.c b/kernel/sys.c
-> index a611d1d58c7d..c1a360370d09 100644
-> --- a/kernel/sys.c
-> +++ b/kernel/sys.c
-> @@ -2259,6 +2259,8 @@ int __weak arch_prctl_spec_ctrl_set(struct task_struct *t, unsigned long which,
->         return -EINVAL;
+>  #define BTREE_PRIO		USHRT_MAX
+>  #define INITIAL_PRIO		32768U
+>  
+> diff --git a/drivers/md/bcache/request.c b/drivers/md/bcache/request.c
+> index 7555e4a93145..d82425300383 100644
+> --- a/drivers/md/bcache/request.c
+> +++ b/drivers/md/bcache/request.c
+> @@ -1162,6 +1162,19 @@ static blk_qc_t cached_dev_make_request(struct request_queue *q,
+>  		}
+>  	}
+>  
+> +	/*
+> +	 * zone management request may change the data layout and content
+> +	 * implicitly on backing device, which introduces unacceptible
+> +	 * inconsistency between the backing device and the cache device.
+> +	 * Therefore all zone management related request will be denied here.
+> +	 */
+> +	if (op_is_zone_mgmt(bio->bi_opf)) {
+> +		pr_err_ratelimited("zoned device management request denied.");
+> +		bio->bi_status = BLK_STS_NOTSUPP;
+> +		bio_endio(bio);
+> +		return BLK_QC_T_NONE;
+> +	}
+> +
+>  	generic_start_io_acct(q,
+>  			      bio_op(bio),
+>  			      bio_sectors(bio),
+> @@ -1205,6 +1218,24 @@ static int cached_dev_ioctl(struct bcache_device *d, fmode_t mode,
+>  	if (dc->io_disable)
+>  		return -EIO;
+>  
+> +	/*
+> +	 * zone management ioctl commands may change the data layout
+> +	 * and content implicitly on backing device, which introduces
+> +	 * unacceptible inconsistency between the backing device and
+> +	 * the cache device. Therefore all zone management related
+> +	 * ioctl commands will be denied here.
+> +	 */
+> +	switch (cmd) {
+> +	case BLKRESETZONE:
+> +	case BLKOPENZONE:
+> +	case BLKCLOSEZONE:
+> +	case BLKFINISHZONE:
+> +		return -EOPNOTSUPP;
+> +	default:
+> +		/* Other commands fall through*/
+> +		break;
+> +	}
+> +
+>  	return __blkdev_driver_ioctl(dc->bdev, mode, cmd, arg);
 >  }
->
-> +#define PR_IO_FLUSHER (PF_MEMALLOC_NOIO | PF_LESS_THROTTLE)
+>  
+> @@ -1233,6 +1264,48 @@ static int cached_dev_congested(void *data, int bits)
+>  	return ret;
+>  }
+>  
+> +static int cached_dev_report_zones_cb(struct blk_zone *zone,
+> +				      unsigned int idx,
+> +				      void *data)
+> +{
+> +	struct bch_report_zones_args *args = data;
+> +	struct bcache_device *d = args->bcache_device;
+> +	struct cached_dev *dc = container_of(d, struct cached_dev, disk);
+> +	unsigned long data_offset = dc->sb.data_offset;
 > +
->  SYSCALL_DEFINE5(prctl, int, option, unsigned long, arg2, unsigned long, arg3,
->                 unsigned long, arg4, unsigned long, arg5)
+> +	if (zone->start >= data_offset) {
+> +		zone->start -= data_offset;
+> +		zone->wp -= data_offset;
+> +	} else {
+> +		/*
+> +		 * Normally the first zone is conventional zone,
+> +		 * we don't need to worry about how to maintain
+> +		 * the write pointer.
+> +		 * But the zone->len is special, because the
+> +		 * sector 0 on bcache device is 8KB offset on
+> +		 * backing device indeed.
+> +		 */
+> +		zone->len -= data_offset;
+> +	}
+> +
+> +	return args->orig_cb(zone, idx, args->orig_data);
+> +}
+> +
+> +static int cached_dev_report_zones(struct bch_report_zones_args *args,
+> +				   unsigned int nr_zones)
+> +{
+> +	struct bcache_device *d = args->bcache_device;
+> +	struct cached_dev *dc = container_of(d, struct cached_dev, disk);
+> +	sector_t sector = args->sector + dc->sb.data_offset;
+> +
+> +	/* sector is real LBA of backing device */
+> +	return blkdev_report_zones(dc->bdev,
+> +				   sector,
+> +				   nr_zones,
+> +				   cached_dev_report_zones_cb,
+> +				   args);
+> +}
+> +
+>  void bch_cached_dev_request_init(struct cached_dev *dc)
 >  {
-> @@ -2486,6 +2488,29 @@ SYSCALL_DEFINE5(prctl, int, option, unsigned long, arg2, unsigned long, arg3,
->                         return -EINVAL;
->                 error = GET_TAGGED_ADDR_CTRL();
->                 break;
-> +       case PR_SET_IO_FLUSHER:
-> +               if (!capable(CAP_SYS_RESOURCE))
-> +                       return -EPERM;
+>  	struct gendisk *g = dc->disk.disk;
+> @@ -1241,6 +1314,7 @@ void bch_cached_dev_request_init(struct cached_dev *dc)
+>  	g->queue->backing_dev_info->congested_fn = cached_dev_congested;
+>  	dc->disk.cache_miss			= cached_dev_cache_miss;
+>  	dc->disk.ioctl				= cached_dev_ioctl;
+> +	dc->disk.report_zones			= cached_dev_report_zones;
+>  }
+>  
+>  /* Flash backed devices */
+> diff --git a/drivers/md/bcache/super.c b/drivers/md/bcache/super.c
+> index 77e9869345e7..7222fcafaf50 100644
+> --- a/drivers/md/bcache/super.c
+> +++ b/drivers/md/bcache/super.c
+> @@ -672,10 +672,32 @@ static int ioctl_dev(struct block_device *b, fmode_t mode,
+>  	return d->ioctl(d, mode, cmd, arg);
+>  }
+>  
 > +
-> +               if (arg3 || arg4 || arg5)
-> +                       return -EINVAL;
+> +static int report_zones_dev(struct gendisk *disk,
+> +			    sector_t sector,
+> +			    unsigned int nr_zones,
+> +			    report_zones_cb cb,
+> +			    void *data)
+> +{
+> +	struct bcache_device *d = disk->private_data;
+> +	struct bch_report_zones_args args = {
+> +		.bcache_device = d,
+> +		.sector = sector,
+> +		.orig_data = data,
+> +		.orig_cb = cb,
+> +	};
 > +
-> +               if (arg2 == 1)
-> +                       current->flags |= PR_IO_FLUSHER;
-> +               else if (!arg2)
-> +                       current->flags &= ~PR_IO_FLUSHER;
-> +               else
-> +                       return -EINVAL;
-> +               break;
-> +       case PR_GET_IO_FLUSHER:
-> +               if (!capable(CAP_SYS_RESOURCE))
-> +                       return -EPERM;
+> +	if (d->report_zones)
+> +		return d->report_zones(&args, nr_zones);
 > +
-> +               if (arg2 || arg3 || arg4 || arg5)
-> +                       return -EINVAL;
+> +	return -EOPNOTSUPP;
+> +}
 > +
-> +               error = (current->flags & PR_IO_FLUSHER) == PR_IO_FLUSHER;
-> +               break;
->         default:
->                 error = -EINVAL;
->                 break;
-> --
-> 2.20.1
->
+>  static const struct block_device_operations bcache_ops = {
+>  	.open		= open_dev,
+>  	.release	= release_dev,
+>  	.ioctl		= ioctl_dev,
+> +	.report_zones	= report_zones_dev,
+>  	.owner		= THIS_MODULE,
+>  };
+>  
+> @@ -808,7 +830,9 @@ static void bcache_device_free(struct bcache_device *d)
+>  	closure_debug_destroy(&d->cl);
+>  }
+>  
+> -static int bcache_device_init(struct bcache_device *d, unsigned int block_size,
+> +static int bcache_device_init(struct cached_dev *dc,
+> +			      struct bcache_device *d,
+> +			      unsigned int block_size,
+>  			      sector_t sectors)
+>  {
+>  	struct request_queue *q;
+> @@ -882,6 +906,17 @@ static int bcache_device_init(struct bcache_device *d, unsigned int block_size,
+>  
+>  	blk_queue_write_cache(q, true, true);
+>  
+> +	/*
+> +	 * If this is for backing device registration, and it is an
+> +	 * zoned device (e.g. host-managed S.M.R. hard drive), set
+> +	 * up zoned device attribution properly for sysfs interface.
+> +	 */
+> +	if (dc && bdev_is_zoned(dc->bdev)) {
+> +		q->limits.zoned = bdev_zoned_model(dc->bdev);
+> +		q->nr_zones = blkdev_nr_zones(dc->bdev);
+> +		q->limits.chunk_sectors = bdev_zone_sectors(dc->bdev);
+> +	}
+> +
+>  	return 0;
+>  
+>  err:
+> @@ -1328,7 +1363,7 @@ static int cached_dev_init(struct cached_dev *dc, unsigned int block_size)
+>  		dc->partial_stripes_expensive =
+>  			q->limits.raid_partial_stripes_expensive;
+>  
+> -	ret = bcache_device_init(&dc->disk, block_size,
+> +	ret = bcache_device_init(dc, &dc->disk, block_size,
+>  			 dc->bdev->bd_part->nr_sects - dc->sb.data_offset);
+>  	if (ret)
+>  		return ret;
+> @@ -1445,7 +1480,7 @@ static int flash_dev_run(struct cache_set *c, struct uuid_entry *u)
+>  
+>  	kobject_init(&d->kobj, &bch_flash_dev_ktype);
+>  
+> -	if (bcache_device_init(d, block_bytes(c), u->sectors))
+> +	if (bcache_device_init(NULL, d, block_bytes(c), u->sectors))
+>  		goto err;
+>  
+>  	bcache_device_attach(d, c, u - c->uuids);
+> -- 
+> 2.16.4
+> 
+> 
