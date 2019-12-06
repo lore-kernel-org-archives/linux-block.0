@@ -2,211 +2,114 @@ Return-Path: <SRS0=tn0U=Z4=vger.kernel.org=linux-block-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-7.2 required=3.0 tests=DKIM_SIGNED,DKIM_VALID,
-	HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,MENTIONS_GIT_HOSTING,
-	SPF_HELO_NONE,SPF_PASS,USER_AGENT_SANE_1 autolearn=unavailable
+X-Spam-Status: No, score=-2.2 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
+	MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,USER_AGENT_SANE_1 autolearn=no
 	autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 99582C2D0C0
-	for <linux-block@archiver.kernel.org>; Fri,  6 Dec 2019 02:23:29 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 820C7C43603
+	for <linux-block@archiver.kernel.org>; Fri,  6 Dec 2019 04:37:33 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.kernel.org (Postfix) with ESMTP id 6F5B92245C
-	for <linux-block@archiver.kernel.org>; Fri,  6 Dec 2019 02:23:29 +0000 (UTC)
-Authentication-Results: mail.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel-dk.20150623.gappssmtp.com header.i=@kernel-dk.20150623.gappssmtp.com header.b="O8a8D+8o"
+	by mail.kernel.org (Postfix) with ESMTP id 5BC2724659
+	for <linux-block@archiver.kernel.org>; Fri,  6 Dec 2019 04:37:33 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1726073AbfLFCX2 (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Thu, 5 Dec 2019 21:23:28 -0500
-Received: from mail-pf1-f193.google.com ([209.85.210.193]:34247 "EHLO
-        mail-pf1-f193.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1726037AbfLFCX2 (ORCPT
-        <rfc822;linux-block@vger.kernel.org>); Thu, 5 Dec 2019 21:23:28 -0500
-Received: by mail-pf1-f193.google.com with SMTP id n13so2543361pff.1
-        for <linux-block@vger.kernel.org>; Thu, 05 Dec 2019 18:23:28 -0800 (PST)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=kernel-dk.20150623.gappssmtp.com; s=20150623;
-        h=to:cc:from:subject:message-id:date:user-agent:mime-version
-         :content-language:content-transfer-encoding;
-        bh=wY17/pcKHb0BDe6YGhh2KXvf1injn7RzqVNMJfXcpiY=;
-        b=O8a8D+8obYH25hp9Mn8J75T8B2U3Hv4YNAIFEqoeLOTkHPNBws5/rrE7v3oKhrxugF
-         TMVPzLP50j2o2oc7LohhMA6XKJPJulU1V07SClfrP/jL3/L/0sbuhcAfYFmvtgb8yWCk
-         Z4T5DIJtqVqEcSIhTPoR61r3U1rVxSm9h5YuB4We2KzFpYJZW7lOL7R1tgX6LHAFKnSv
-         I0JHqMfFzg+FxHXBsT5X3uBYNgpdJV1zb+tMYxV5G9SfpmBCyM/k+mQGqRpShkIDyyDo
-         HyxSEH4AtJTIzIDr8zLldVGi8JF8cS/wqaispOdFXQeTh1bq2NUUIh1zWlbvzwakkkWA
-         nsCA==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20161025;
-        h=x-gm-message-state:to:cc:from:subject:message-id:date:user-agent
-         :mime-version:content-language:content-transfer-encoding;
-        bh=wY17/pcKHb0BDe6YGhh2KXvf1injn7RzqVNMJfXcpiY=;
-        b=niJbyra14YKqo6Jcm6e4ct7hzxK/92piVoTz9U5gKSxOn3LqsTsHq2Yqgcdinuj9Dh
-         IOfh54CXp6bTWgmvXYXK0rbyxe8kcykNT5HW/GqyP6FkOKt6FTYIlunUZmQRIrAvONUB
-         Zvv15xwoESWkha0VlrdVpIeZp6b+B0n/3a3yNfaahbqTTodNDO3qwDgHyq0hClQRYOX1
-         fekpseJ69NeoKh7HOrSaOd7277nzAGb2rK7XU7Jmv3f65S+ioUCWHz/ZE9fknsm9rKaB
-         clfdXNPxWMzckNQiinbrijppmKoZ4qHbsvO5fvfliHvpuxnll+MWCadOf1p3LEQ+1kzf
-         KP+g==
-X-Gm-Message-State: APjAAAW1HnjIb7YbyWPZKO1XCPej1Rz30yKlKkDzZ79Ev6kRVXjjceBs
-        yQLoiXQ8aAlWFunr9n5kY5nZY2Yt+7kp/A==
-X-Google-Smtp-Source: APXvYqwqPU6X/AEaCBNbyAMPZp9/DogGXDrIH3CbbnovjFOzzm0K8NN3LMyPTzykUNmYVJc1YzNwIA==
-X-Received: by 2002:a63:fe0a:: with SMTP id p10mr905866pgh.96.1575599007430;
-        Thu, 05 Dec 2019 18:23:27 -0800 (PST)
-Received: from [192.168.1.188] ([66.219.217.145])
-        by smtp.gmail.com with ESMTPSA id j7sm13987156pgn.0.2019.12.05.18.23.26
-        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
-        Thu, 05 Dec 2019 18:23:26 -0800 (PST)
-To:     Linus Torvalds <torvalds@linux-foundation.org>
-Cc:     io-uring <io-uring@vger.kernel.org>,
+        id S1726298AbfLFEhc (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Thu, 5 Dec 2019 23:37:32 -0500
+Received: from mx2.suse.de ([195.135.220.15]:40190 "EHLO mx1.suse.de"
+        rhost-flags-OK-OK-OK-FAIL) by vger.kernel.org with ESMTP
+        id S1726273AbfLFEhc (ORCPT <rfc822;linux-block@vger.kernel.org>);
+        Thu, 5 Dec 2019 23:37:32 -0500
+X-Virus-Scanned: by amavisd-new at test-mx.suse.de
+Received: from relay2.suse.de (unknown [195.135.220.254])
+        by mx1.suse.de (Postfix) with ESMTP id E6180B2BD;
+        Fri,  6 Dec 2019 04:37:29 +0000 (UTC)
+Subject: Re: [RFC PATCH] bcache: enable zoned device support
+To:     Damien Le Moal <Damien.LeMoal@wdc.com>,
+        Eric Wheeler <bcache@lists.ewheeler.net>
+Cc:     "linux-bcache@vger.kernel.org" <linux-bcache@vger.kernel.org>,
         "linux-block@vger.kernel.org" <linux-block@vger.kernel.org>,
-        Networking <netdev@vger.kernel.org>
-From:   Jens Axboe <axboe@kernel.dk>
-Subject: [GIT PULL] Block/io_uring fixes and changes for 5.5-rc1
-Message-ID: <01d2e4de-c834-dd52-e28d-3ff75ca5cd34@kernel.dk>
-Date:   Thu, 5 Dec 2019 19:23:25 -0700
-User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:68.0) Gecko/20100101
- Thunderbird/68.2.1
+        Hannes Reinecke <hare@suse.com>
+References: <20191205152543.73885-1-colyli@suse.de>
+ <alpine.LRH.2.11.1912060012380.11561@mx.ewheeler.net>
+ <BYAPR04MB5816090B934A7CA17EFA688AE75F0@BYAPR04MB5816.namprd04.prod.outlook.com>
+From:   Coly Li <colyli@suse.de>
+Organization: SUSE Labs
+Message-ID: <a21ce3de-5591-198f-56bf-8dc3aee6c926@suse.de>
+Date:   Fri, 6 Dec 2019 12:37:20 +0800
+User-Agent: Mozilla/5.0 (Macintosh; Intel Mac OS X 10.15; rv:68.0)
+ Gecko/20100101 Thunderbird/68.2.2
 MIME-Version: 1.0
+In-Reply-To: <BYAPR04MB5816090B934A7CA17EFA688AE75F0@BYAPR04MB5816.namprd04.prod.outlook.com>
 Content-Type: text/plain; charset=utf-8
 Content-Language: en-US
-Content-Transfer-Encoding: 7bit
+Content-Transfer-Encoding: 8bit
 Sender: linux-block-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-Hi Linus,
+On 2019/12/6 8:30 上午, Damien Le Moal wrote:
+> On 2019/12/06 9:22, Eric Wheeler wrote:
+>> On Thu, 5 Dec 2019, Coly Li wrote:
+>>> This is a very basic zoned device support. With this patch, bcache
+>>> device is able to,
+>>> - Export zoned device attribution via sysfs
+>>> - Response report zones request, e.g. by command 'blkzone report'
+>>> But the bcache device is still NOT able to,
+>>> - Response any zoned device management request or IOCTL command
+>>>
+>>> Here are the testings I have done,
+>>> - read /sys/block/bcache0/queue/zoned, content is 'host-managed'
+>>> - read /sys/block/bcache0/queue/nr_zones, content is number of zones
+>>>   including all zone types.
+>>> - read /sys/block/bcache0/queue/chunk_sectors, content is zone size
+>>>   in sectors.
+>>> - run 'blkzone report /dev/bcache0', all zones information displayed.
+>>> - run 'blkzone reset /dev/bcache0', operation is rejected with error
+>>>   information: "blkzone: /dev/bcache0: BLKRESETZONE ioctl failed:
+>>>   Operation not supported"
+>>> - Sequential writes by dd, I can see some zones' write pointer 'wptr'
+>>>   values updated.
+>>>
+>>> All of these are very basic testings, if you have better testing
+>>> tools or cases, please offer me hint.
+>>
+>> Interesting. 
+>>
+>> 1. should_writeback() could benefit by hinting true when an IO would fall 
+>>    in a zoned region.
+>>
+>> 2. The writeback thread could writeback such that they prefer 
+>>    fully(mostly)-populated zones when choosing what to write out.
+> 
+> That definitely would be a good idea since that would certainly benefit
+> backend-GC (that will be needed).
+> 
+> However, I do not see the point in exposing the /dev/bcacheX block
+> device itself as a zoned disk. In fact, I think we want exactly the
+> opposite: expose it as a regular disk so that any FS or application can
+> run. If the bcache backend disk is zoned, then the writeback handles
+> sequential writes. This would be in the end a solution similar to
+> dm-zoned, that is, a zoned disk becomes useable as a regular block
+> device (random writes anywhere are possible), but likely far more
+> efficient and faster. That may result in imposing some limitations on
+> bcache operations though, e.g. it can only be setup with writeback, no
+> writethrough allowed (not sure though...).
+> Thoughts ?
+> 
 
-Wasn't expecting this to be so big, and if I was, I would have used
-separate branches for this. Going forward I'll be doing separate
-branches for the current tree, just like for the next kernel version
-tree. In any case, this pull request contains:
+I come to realize this is really an idea on the opposite. Let me try to
+explain what I understand, please correct me if I am wrong. The idea you
+proposed indeed is to make bcache act as something like FTL for the
+backend zoned SMR drive, that is, for all random writes, bcache may
+convert them into sequential write onto the backend zoned SMR drive. In
+the meantime, if there are hot data, bcache continues to act as a
+caching device to accelerate read request.
 
-- Series from Christoph that fixes an inherent race condition with zoned
-  devices and revalidation.
-
-- null_blk zone size fix (Damien)
-
-- Fix for a regression in this merge window that caused busy spins by
-  sending empty disk uevents (Eric)
-
-- Fix for a regression in this merge window for bfq stats (Hou)
-
-- Fix for io_uring creds allocation failure handling (me)
-
-- io_uring -ERESTARTSYS send/recvmsg fix (me)
-
-- Series that fixes the need for applications to retain state across
-  async request punts for io_uring. This one is a bit larger than I
-  would have hoped, but I think it's important we get this fixed for
-  5.5.
-
-- connect(2) improvement for io_uring, handling EINPROGRESS instead of
-  having applications needing to poll for it (me)
-
-- Have io_uring use a hash for poll requests instead of an rbtree. This
-  turned out to work much better in practice, so I think we should make
-  the switch now. For some workloads, even with a fair amount of
-  cancellations, the insertion sort is just too expensive. (me)
-
-- Various little io_uring fixes (me, Jackie, Pavel, LimingWu)
-
-- Fix for brd unaligned IO, and a warning for the future (Ming)
-
-- Fix for a bio integrity data leak (Justin)
-
-- bvec_iter_advance() improvement (Pavel)
-
-- Xen blkback page unmap fix (SeongJae)
-
-The major items in here are all well tested, and on the liburing side we
-continue to add regression and feature test cases. We're up to 50 topic
-cases now, each with anywhere from 1 to more than 10 cases in each.
-
-Please pull!
-
-
-  git://git.kernel.dk/linux-block.git tags/for-linus-20191205
-
-
-----------------------------------------------------------------
-Christoph Hellwig (7):
-      null_blk: cleanup null_gendisk_register
-      block: remove the empty line at the end of blk-zoned.c
-      block: simplify blkdev_nr_zones
-      block: replace seq_zones_bitmap with conv_zones_bitmap
-      block: allocate the zone bitmaps lazily
-      block: don't handle bio based drivers in blk_revalidate_disk_zones
-      block: set the zone size in blk_revalidate_disk_zones atomically
-
-Damien Le Moal (1):
-      null_blk: fix zone size paramter check
-
-Eric Biggers (1):
-      block: don't send uevent for empty disk when not invalidating
-
-Hou Tao (1):
-      bfq-iosched: Ensure bio->bi_blkg is valid before using it
-
-Jackie Liu (2):
-      io_uring: remove parameter ctx of io_submit_state_start
-      io_uring: remove io_wq_current_is_worker
-
-Jens Axboe (14):
-      io_uring: use current task creds instead of allocating a new one
-      io_uring: transform send/recvmsg() -ERESTARTSYS to -EINTR
-      io_uring: add general async offload context
-      io_uring: ensure async punted read/write requests copy iovec
-      io_uring: ensure async punted sendmsg/recvmsg requests copy data
-      io_uring: ensure async punted connect requests copy data
-      io_uring: mark us with IORING_FEAT_SUBMIT_STABLE
-      io_uring: handle connect -EINPROGRESS like -EAGAIN
-      null_blk: remove unused variable warning on !CONFIG_BLK_DEV_ZONED
-      io_uring: allow IO_SQE_* flags on IORING_OP_TIMEOUT
-      io_uring: ensure deferred timeouts copy necessary data
-      io-wq: clear node->next on list deletion
-      io_uring: use hash table for poll command lookups
-      Merge branch 'io_uring-5.5' into for-linus
-
-Justin Tee (1):
-      block: fix memleak of bio integrity data
-
-LimingWu (1):
-      io_uring: fix a typo in a comment
-
-Ming Lei (2):
-      brd: remove max_hw_sectors queue limit
-      brd: warn on un-aligned buffer
-
-Pavel Begunkov (3):
-      block: optimise bvec_iter_advance()
-      io_uring: fix error handling in io_queue_link_head
-      io_uring: hook all linked requests via link_list
-
-SeongJae Park (1):
-      xen/blkback: Avoid unmapping unmapped grant pages
-
- block/bfq-cgroup.c                  |   3 +
- block/bio-integrity.c               |   2 +-
- block/bio.c                         |   3 +
- block/blk-zoned.c                   | 149 ++++----
- block/blk.h                         |   4 +
- block/ioctl.c                       |   2 +-
- drivers/block/brd.c                 |   5 +-
- drivers/block/null_blk_main.c       |  40 ++-
- drivers/block/xen-blkback/blkback.c |   2 +
- drivers/md/dm-table.c               |  12 +-
- drivers/md/dm-zoned-target.c        |   2 +-
- drivers/scsi/sd_zbc.c               |   2 -
- fs/block_dev.c                      |   2 +-
- fs/io-wq.c                          |   2 +-
- fs/io-wq.h                          |  11 +-
- fs/io_uring.c                       | 694 +++++++++++++++++++++++++-----------
- include/linux/blkdev.h              |  24 +-
- include/linux/bvec.h                |  22 +-
- include/linux/socket.h              |  20 +-
- include/uapi/linux/io_uring.h       |   1 +
- net/socket.c                        |  76 ++--
- 21 files changed, 672 insertions(+), 406 deletions(-)
+Yes, if I understand your proposal correctly, writeback mode might be
+mandatory and backend-GC will be needed. The idea is interesting, it
+looks like adding a log-structure storage layer between current bcache
+B+tree indexing and zoned SMR hard drive.
 
 -- 
-Jens Axboe
 
+Coly Li
