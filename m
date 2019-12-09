@@ -2,117 +2,165 @@ Return-Path: <SRS0=mQXl=Z7=vger.kernel.org=linux-block-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-2.2 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
-	MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,USER_AGENT_SANE_1 autolearn=no
-	autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-8.2 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
+	INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,
+	USER_AGENT_SANE_1 autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 6F45BC04E30
-	for <linux-block@archiver.kernel.org>; Mon,  9 Dec 2019 16:58:15 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 9AC24C43603
+	for <linux-block@archiver.kernel.org>; Mon,  9 Dec 2019 17:03:55 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.kernel.org (Postfix) with ESMTP id 4FCFA207FD
-	for <linux-block@archiver.kernel.org>; Mon,  9 Dec 2019 16:58:15 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id 789132077B
+	for <linux-block@archiver.kernel.org>; Mon,  9 Dec 2019 17:03:55 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1726502AbfLIQ6O (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Mon, 9 Dec 2019 11:58:14 -0500
-Received: from mx0a-001b2d01.pphosted.com ([148.163.156.1]:34218 "EHLO
-        mx0a-001b2d01.pphosted.com" rhost-flags-OK-OK-OK-OK)
-        by vger.kernel.org with ESMTP id S1726290AbfLIQ6O (ORCPT
-        <rfc822;linux-block@vger.kernel.org>);
-        Mon, 9 Dec 2019 11:58:14 -0500
-Received: from pps.filterd (m0098410.ppops.net [127.0.0.1])
-        by mx0a-001b2d01.pphosted.com (8.16.0.42/8.16.0.42) with SMTP id xB9GlJkU039302
-        for <linux-block@vger.kernel.org>; Mon, 9 Dec 2019 11:58:13 -0500
-Received: from e06smtp03.uk.ibm.com (e06smtp03.uk.ibm.com [195.75.94.99])
-        by mx0a-001b2d01.pphosted.com with ESMTP id 2wsrdmda6c-1
-        (version=TLSv1.2 cipher=AES256-GCM-SHA384 bits=256 verify=NOT)
-        for <linux-block@vger.kernel.org>; Mon, 09 Dec 2019 11:58:12 -0500
-Received: from localhost
-        by e06smtp03.uk.ibm.com with IBM ESMTP SMTP Gateway: Authorized Use Only! Violators will be prosecuted
-        for <linux-block@vger.kernel.org> from <srikar@linux.vnet.ibm.com>;
-        Mon, 9 Dec 2019 16:58:10 -0000
-Received: from b06avi18878370.portsmouth.uk.ibm.com (9.149.26.194)
-        by e06smtp03.uk.ibm.com (192.168.101.133) with IBM ESMTP SMTP Gateway: Authorized Use Only! Violators will be prosecuted;
-        (version=TLSv1/SSLv3 cipher=AES256-GCM-SHA384 bits=256/256)
-        Mon, 9 Dec 2019 16:58:04 -0000
-Received: from d06av25.portsmouth.uk.ibm.com (d06av25.portsmouth.uk.ibm.com [9.149.105.61])
-        by b06avi18878370.portsmouth.uk.ibm.com (8.14.9/8.14.9/NCO v10.0) with ESMTP id xB9Gw3NS44696048
-        (version=TLSv1/SSLv3 cipher=DHE-RSA-AES256-GCM-SHA384 bits=256 verify=OK);
-        Mon, 9 Dec 2019 16:58:04 GMT
-Received: from d06av25.portsmouth.uk.ibm.com (unknown [127.0.0.1])
-        by IMSVA (Postfix) with ESMTP id D612411C050;
-        Mon,  9 Dec 2019 16:58:03 +0000 (GMT)
-Received: from d06av25.portsmouth.uk.ibm.com (unknown [127.0.0.1])
-        by IMSVA (Postfix) with ESMTP id 01B8111C04A;
-        Mon,  9 Dec 2019 16:58:01 +0000 (GMT)
-Received: from linux.vnet.ibm.com (unknown [9.126.150.29])
-        by d06av25.portsmouth.uk.ibm.com (Postfix) with SMTP;
-        Mon,  9 Dec 2019 16:58:00 +0000 (GMT)
-Date:   Mon, 9 Dec 2019 22:28:00 +0530
-From:   Srikar Dronamraju <srikar@linux.vnet.ibm.com>
-To:     Jens Axboe <axboe@kernel.dk>
-Cc:     Boaz Harrosh <boaz@plexistor.com>, Phil Auld <pauld@redhat.com>,
-        Ming Lei <ming.lei@redhat.com>,
-        Peter Zijlstra <peterz@infradead.org>,
-        Dave Chinner <david@fromorbit.com>,
-        linux-block@vger.kernel.org, linux-fsdevel@vger.kernel.org,
-        linux-xfs@vger.kernel.org, linux-kernel@vger.kernel.org,
-        Jeff Moyer <jmoyer@redhat.com>,
-        Dave Chinner <dchinner@redhat.com>,
-        Eric Sandeen <sandeen@redhat.com>,
-        Christoph Hellwig <hch@lst.de>, Ingo Molnar <mingo@redhat.com>,
-        Tejun Heo <tj@kernel.org>,
-        Vincent Guittot <vincent.guittot@linaro.org>
-Subject: Re: single aio thread is migrated crazily by scheduler
-Reply-To: Srikar Dronamraju <srikar@linux.vnet.ibm.com>
-References: <20191115070843.GA24246@ming.t460p>
- <20191115234005.GO4614@dread.disaster.area>
- <20191118092121.GV4131@hirez.programming.kicks-ass.net>
- <20191118204054.GV4614@dread.disaster.area>
- <20191120191636.GI4097@hirez.programming.kicks-ass.net>
- <20191120220313.GC18056@pauld.bos.csb>
- <20191121041218.GK24548@ming.t460p>
- <20191121141207.GA18443@pauld.bos.csb>
- <93de0f75-3664-c71e-9947-5b37ae935ddc@plexistor.com>
- <8c02ab43-3880-68db-f293-9958510fb29e@kernel.dk>
+        id S1726810AbfLIRDy (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Mon, 9 Dec 2019 12:03:54 -0500
+Received: from mail-wr1-f66.google.com ([209.85.221.66]:37883 "EHLO
+        mail-wr1-f66.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S1726787AbfLIRDy (ORCPT
+        <rfc822;linux-block@vger.kernel.org>); Mon, 9 Dec 2019 12:03:54 -0500
+Received: by mail-wr1-f66.google.com with SMTP id w15so17117688wru.4;
+        Mon, 09 Dec 2019 09:03:53 -0800 (PST)
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20161025;
+        h=x-gm-message-state:subject:to:cc:references:reply-to:from
+         :message-id:date:user-agent:mime-version:in-reply-to
+         :content-language:content-transfer-encoding;
+        bh=7QOUlkYUUcL9RJraaiKsihHk7jZjKK6PuheJk93ZnR8=;
+        b=ctEOjv8hYW1/QL2SnxSD7+hHIKBNiMHTop+gaLx5eyNbx4ti9Pit40arXxbDgusB3P
+         dOiAu0L9eNgHBH1hqDsDpQyl0hd0gEk9b+0Xhssne9CheyfgmUWV+hlQunTxwGBOa+Qf
+         i9xRcfAhazyMkzeWzFLzhZ5uUrxe1Au/Fh5rpUsodcnupBInUb7/jewxaO4/KWHMXthu
+         M62Y7g0WhDyG6BHYAkygS6qTL5bLYc6x1doUXFX6Vw1IfZgtSEaBPNCvNdkOtvLa/wB5
+         yAi2W9yrrBImkKJk/9LQJcLQvK2/qh3n7V0lxWQkpZdhqbyIoym4AbiczPM7UdezZUqy
+         h6NQ==
+X-Gm-Message-State: APjAAAWSNAuIkdLCK0btiT1Au1PtgoNKvFnzbkegGlEHYQ3Qmaqw4ORw
+        BmLfca3QO4I4ZplhLcLwNbs=
+X-Google-Smtp-Source: APXvYqyXeQqJ7RT1D+Sl1ilUP24lFuVIODYGVL4QNseqeCGV72i6jF8Qc0eGYSNZhQo8KVsbqYHMSA==
+X-Received: by 2002:a5d:5308:: with SMTP id e8mr3274981wrv.77.1575911032440;
+        Mon, 09 Dec 2019 09:03:52 -0800 (PST)
+Received: from [10.10.2.174] (bran.ispras.ru. [83.149.199.196])
+        by smtp.gmail.com with ESMTPSA id j12sm78312wrw.54.2019.12.09.09.03.51
+        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
+        Mon, 09 Dec 2019 09:03:51 -0800 (PST)
+Subject: Re: [PATCH v3] floppy: hide invalid floppy disk types
+To:     =?UTF-8?Q?Moritz_M=c3=bcller?= <moritzm.mueller@posteo.de>,
+        linux-kernel@vger.kernel.org, linux-block@vger.kernel.org,
+        linux-kernel@i4.cs.fau.de
+Cc:     "Philip K ." <philip@warpmail.net>
+References: <d3f0613c-6c3a-8efc-1c27-a6b75c34972f@gmail.com>
+ <20191209093258.14319-1-moritzm.mueller@posteo.de>
+Reply-To: efremov@linux.com
+From:   Denis Efremov <efremov@linux.com>
+Message-ID: <6e2c358c-6cfb-88cd-7bc8-3d4c87bb85be@linux.com>
+Date:   Mon, 9 Dec 2019 20:03:50 +0300
+User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:68.0) Gecko/20100101
+ Thunderbird/68.2.2
 MIME-Version: 1.0
-Content-Type: text/plain; charset=iso-8859-1
-Content-Disposition: inline
-In-Reply-To: <8c02ab43-3880-68db-f293-9958510fb29e@kernel.dk>
-User-Agent: Mutt/1.10.1 (2018-07-13)
-X-TM-AS-GCONF: 00
-x-cbid: 19120916-0012-0000-0000-000003733800
-X-IBM-AV-DETECTION: SAVI=unused REMOTE=unused XFE=unused
-x-cbparentid: 19120916-0013-0000-0000-000021AF077F
-Message-Id: <20191209165800.GB27229@linux.vnet.ibm.com>
-X-Proofpoint-Virus-Version: vendor=fsecure engine=2.50.10434:6.0.95,18.0.572
- definitions=2019-12-09_04:2019-12-09,2019-12-09 signatures=0
-X-Proofpoint-Spam-Details: rule=outbound_notspam policy=outbound score=0 spamscore=0 phishscore=0
- impostorscore=0 mlxlogscore=953 priorityscore=1501 adultscore=0
- bulkscore=0 mlxscore=0 malwarescore=0 suspectscore=0 lowpriorityscore=0
- clxscore=1015 classifier=spam adjust=0 reason=mlx scancount=1
- engine=8.12.0-1910280000 definitions=main-1912090142
+In-Reply-To: <20191209093258.14319-1-moritzm.mueller@posteo.de>
+Content-Type: text/plain; charset=utf-8
+Content-Language: en-US
+Content-Transfer-Encoding: 8bit
 Sender: linux-block-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-* Jens Axboe <axboe@kernel.dk> [2019-11-21 09:19:29]:
+Hi,
 
-> > 
-> > I wish there was a flag to wake_up() or to the event object that says
-> > to relinquish the remaning of the time-slice to the waiter on same
-> > CPU, since I will be soon sleeping.
+On 12/9/19 12:32 PM, Moritz Müller wrote:
+> In some cases floppy disks are being indexed, even though no actual
+> device exists. In our case this was caused by the CMOS-RAM having a few
+> peculiar bits. This caused a non-existent floppy disk of the type 13 (in
+> our case) to be registered as an possibly mountable device, even though
+> it could not be mounted by any user.
 > 
-> Isn't that basically what wake_up_sync() is?
+> We believe this to be an instance of this bug:
+> 
+>  https://bugzilla.kernel.org/show_bug.cgi?id=13486
+>  https://bugs.launchpad.net/ubuntu/+source/linux/+bug/384579
+> 
+> This patch adds the option FLOPPY_ALLOW_UNKNOWN_TYPES to prevent the
+> additional check that fixed the issue on our reference system, and
+> increases the startup time of affected systems by over a minute.
+> 
+> Co-developed-by: Philip K. <philip@warpmail.net>
+> Signed-off-by: Philip K. <philip@warpmail.net>
+> Signed-off-by: Moritz Müller <moritzm.mueller@posteo.de>
+
+Thank you for the patch!
+
+Have you tested your patch with FLOPPY_ALLOW_UNKNOWN_TYPES and without
+FLOPPY_ALLOW_UNKNOWN_TYPES?
+
+I will answer about motivation for this change in V2 branch of the patch.
+
+> ---
+>  drivers/block/Kconfig  | 10 ++++++++++
+>  drivers/block/floppy.c |  6 ++++++
+>  2 files changed, 16 insertions(+)
+> 
+> diff --git a/drivers/block/Kconfig b/drivers/block/Kconfig
+> index 1bb8ec575352..9e6b32c50b67 100644
+> --- a/drivers/block/Kconfig
+> +++ b/drivers/block/Kconfig
+> @@ -72,6 +72,16 @@ config AMIGA_Z2RAM
+>  	  To compile this driver as a module, choose M here: the
+>  	  module will be called z2ram.
+>  
+> +config FLOPPY_ALLOW_UNKNOWN_TYPES
+> +	bool "Allow floppy disks of unknown type to be registered."
+> +	default n
+> +	help
+> +	  Select this option if you want the Kernel to register floppy
+> +	  disks of an unknown type.
+> +
+> +	  This should usually not be enabled, because of cases where the
+> +	  system falsely recognizes a non-existent floppy disk as mountable.
+> +
+>  config CDROM
+>  	tristate
+>  	select BLK_SCSI_REQUEST
+> diff --git a/drivers/block/floppy.c b/drivers/block/floppy.c
+> index 485865fd0412..9439444d46d0 100644
+> --- a/drivers/block/floppy.c
+> +++ b/drivers/block/floppy.c
+> @@ -3949,7 +3949,11 @@ static void __init config_types(void)
+>  			} else
+>  				allowed_drive_mask &= ~(1 << drive);
+>  		} else {
+> +#ifdef CONFIG_FLOPPY_ALLOW_UNKNOWN_TYPES
+>  			params = &default_drive_params[0].params;
+> +#else
+> + 			params = UDP;
+> +#endif
+>  			snprintf(temparea, sizeof(temparea),
+>  				 "unknown type %d (usb?)", type);
+>  			name = temparea;
+
+Maybe just skip the else branch completely here? This will omit
+snprintf, following if (name) block and UDP update.
+
++#ifdef CONFIG_FLOPPY_ALLOW_UNKNOWN_TYPES
+                        params = &default_drive_params[0].params;
+                        snprintf(temparea, sizeof(temparea),
+                                 "unknown type %d (usb?)", type);
+                        name = temparea;
++#else
++                       continue;
++#endif
+
+
+> @@ -4518,7 +4520,10 @@ static bool floppy_available(int drive)
+>  		return false;
+>  	if (fdc_state[FDC(drive)].version == FDC_NONE)
+>  		return false;
+> +#ifndef CONFIG_FLOPPY_ALLOW_UNKNOWN_TYPES
+> +	if (UDP->cmos >= ARRAY_SIZE(default_drive_params))
+> +		return false;
+> +#endif
+>  	return true;
+>  }
+>  
 > 
 
-Workqueue don't seem to be using wait_queue_head which is needed when using
-wake_up_sync and its related APIs.  Also wake_up_sync would work when the
-waking task seems to hand off the CPU and goes to sleep/block. However here,
-i.e in fsperf case atleast, the waking thread continues to run after it has
-woken the per cpu workqueue.
-
--- 
-Thanks and Regards
-Srikar Dronamraju
-
+Thanks,
+Denis
