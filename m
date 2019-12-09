@@ -2,126 +2,70 @@ Return-Path: <SRS0=mQXl=Z7=vger.kernel.org=linux-block-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-9.6 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
-	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,
-	SPF_HELO_NONE,SPF_PASS,USER_AGENT_GIT autolearn=ham autolearn_force=no
-	version=3.4.0
+X-Spam-Status: No, score=-2.2 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
+	MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,USER_AGENT_SANE_1 autolearn=no
+	autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 1E9E0C2D0C0
-	for <linux-block@archiver.kernel.org>; Mon,  9 Dec 2019 09:38:54 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 385B2C43603
+	for <linux-block@archiver.kernel.org>; Mon,  9 Dec 2019 09:39:07 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.kernel.org (Postfix) with ESMTP id CA6DF20663
-	for <linux-block@archiver.kernel.org>; Mon,  9 Dec 2019 09:38:53 +0000 (UTC)
-Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (2048-bit key) header.d=infradead.org header.i=@infradead.org header.b="aujYUB0V"
+	by mail.kernel.org (Postfix) with ESMTP id 1300B20692
+	for <linux-block@archiver.kernel.org>; Mon,  9 Dec 2019 09:39:07 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1727551AbfLIJiw (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Mon, 9 Dec 2019 04:38:52 -0500
-Received: from bombadil.infradead.org ([198.137.202.133]:57924 "EHLO
-        bombadil.infradead.org" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1727370AbfLIJiv (ORCPT
-        <rfc822;linux-block@vger.kernel.org>); Mon, 9 Dec 2019 04:38:51 -0500
-DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed;
-        d=infradead.org; s=bombadil.20170209; h=Content-Transfer-Encoding:
-        MIME-Version:References:In-Reply-To:Message-Id:Date:Subject:Cc:To:From:Sender
-        :Reply-To:Content-Type:Content-ID:Content-Description:Resent-Date:Resent-From
-        :Resent-Sender:Resent-To:Resent-Cc:Resent-Message-ID:List-Id:List-Help:
-        List-Unsubscribe:List-Subscribe:List-Post:List-Owner:List-Archive;
-        bh=1ce+EBx9Wv/nKl91zuHIgQqitgsBwml/5YDS48TEz4U=; b=aujYUB0ViHJFkNt3aDpnZLGuiT
-        WjqBEev2PCokKK7J/zWv7+roDQE8hO3hA0bnvZRj00/1+Y6Rkol6NQxV3RO4qtCP7O7u6MPW+Svng
-        1brSfPp9bqVrXE2pr5e0wtO4zvvFpkh03Uk5c+LuQp/UNGrNNDZZXjEiHvLm7B2Vrt54sblIO8ph6
-        GGHprdQh6XiQwMxpLpWMDFQpUvW4VQ1udi5hN8cYtPbNw4EFjsNSiXSOQd9dQTujxaS5nci54rYnw
-        w9VjW2pkmylGo4D+4GwBc3DAu6cBPQrbXpC4UwicNKyHbThWSjAUn1LJD1jrtpYJMi9GHQHOOwo7o
-        H62fIu8g==;
-Received: from [2001:4bb8:188:2b00:20e6:8b5a:ed96:f9da] (helo=localhost)
-        by bombadil.infradead.org with esmtpsa (Exim 4.92.3 #3 (Red Hat Linux))
-        id 1ieFVC-0002iL-Ci; Mon, 09 Dec 2019 09:38:50 +0000
-From:   Christoph Hellwig <hch@lst.de>
-To:     colyli@suse.de
-Cc:     kent.overstreet@gmail.com, liangchen.linux@gmail.com,
-        linux-bcache@vger.kernel.org, linux-block@vger.kernel.org
-Subject: [PATCH 7/7] bcache: use read_cache_page_gfp to read the superblock
-Date:   Mon,  9 Dec 2019 10:38:29 +0100
-Message-Id: <20191209093829.19703-8-hch@lst.de>
-X-Mailer: git-send-email 2.20.1
-In-Reply-To: <20191209093829.19703-1-hch@lst.de>
-References: <20191209093829.19703-1-hch@lst.de>
+        id S1727443AbfLIJjG (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Mon, 9 Dec 2019 04:39:06 -0500
+Received: from mx2.suse.de ([195.135.220.15]:43186 "EHLO mx1.suse.de"
+        rhost-flags-OK-OK-OK-FAIL) by vger.kernel.org with ESMTP
+        id S1727388AbfLIJjG (ORCPT <rfc822;linux-block@vger.kernel.org>);
+        Mon, 9 Dec 2019 04:39:06 -0500
+X-Virus-Scanned: by amavisd-new at test-mx.suse.de
+Received: from relay2.suse.de (unknown [195.135.220.254])
+        by mx1.suse.de (Postfix) with ESMTP id 3F59BB1A3;
+        Mon,  9 Dec 2019 09:39:04 +0000 (UTC)
+Subject: Re: [PATCH v3 0/1] xen/blkback: Squeeze page pools if a memory
+ pressure
+To:     SeongJae Park <sjpark@amazon.com>, axboe@kernel.dk,
+        konrad.wilk@oracle.com, roger.pau@citrix.com
+Cc:     linux-block@vger.kernel.org, linux-kernel@vger.kernel.org,
+        pdurrant@amazon.com, sj38.park@gmail.com,
+        xen-devel@lists.xenproject.org
+References: <20191209085839.21215-1-sjpark@amazon.com>
+From:   =?UTF-8?B?SsO8cmdlbiBHcm/Dnw==?= <jgross@suse.com>
+Message-ID: <954f7beb-9d40-253e-260b-4750809bf808@suse.com>
+Date:   Mon, 9 Dec 2019 10:39:02 +0100
+User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:68.0) Gecko/20100101
+ Thunderbird/68.2.1
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
-X-SRS-Rewrite: SMTP reverse-path rewritten from <hch@infradead.org> by bombadil.infradead.org. See http://www.infradead.org/rpr.html
+In-Reply-To: <20191209085839.21215-1-sjpark@amazon.com>
+Content-Type: text/plain; charset=utf-8; format=flowed
+Content-Language: en-US
+Content-Transfer-Encoding: 7bit
 Sender: linux-block-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-Avoid a pointless dependency on buffer heads in bcache by simply open
-coding reading a single page.  Also add a SB_OFFSET define for the
-byte offset of the superblock instead of using magic numbers.
+On 09.12.19 09:58, SeongJae Park wrote:
+> Each `blkif` has a free pages pool for the grant mapping.  The size of
+> the pool starts from zero and be increased on demand while processing
+> the I/O requests.  If current I/O requests handling is finished or 100
+> milliseconds has passed since last I/O requests handling, it checks and
+> shrinks the pool to not exceed the size limit, `max_buffer_pages`.
+> 
+> Therefore, `blkfront` running guests can cause a memory pressure in the
+> `blkback` running guest by attaching a large number of block devices and
+> inducing I/O.
 
-Signed-off-by: Christoph Hellwig <hch@lst.de>
----
- drivers/md/bcache/super.c   | 16 +++++++---------
- include/uapi/linux/bcache.h |  1 +
- 2 files changed, 8 insertions(+), 9 deletions(-)
+I'm having problems to understand how a guest can attach a large number
+of block devices without those having been configured by the host admin
+before.
 
-diff --git a/drivers/md/bcache/super.c b/drivers/md/bcache/super.c
-index df41d103fa34..ecb24316381f 100644
---- a/drivers/md/bcache/super.c
-+++ b/drivers/md/bcache/super.c
-@@ -15,7 +15,6 @@
- #include "writeback.h"
- 
- #include <linux/blkdev.h>
--#include <linux/buffer_head.h>
- #include <linux/debugfs.h>
- #include <linux/genhd.h>
- #include <linux/idr.h>
-@@ -64,13 +63,14 @@ static const char *read_super(struct cache_sb *sb, struct block_device *bdev,
- {
- 	const char *err;
- 	struct cache_sb_disk *s;
--	struct buffer_head *bh = __bread(bdev, 1, SB_SIZE);
-+	struct page *page;
- 	unsigned int i;
- 
--	if (!bh)
-+	page = read_cache_page_gfp(bdev->bd_inode->i_mapping,
-+				   SB_OFFSET >> PAGE_SHIFT, GFP_KERNEL);
-+	if (IS_ERR(page))
- 		return "IO error";
--
--	s = (struct cache_sb_disk *)bh->b_data;
-+	s = page_address(page) + offset_in_page(SB_OFFSET);
- 
- 	sb->offset		= le64_to_cpu(s->offset);
- 	sb->version		= le64_to_cpu(s->version);
-@@ -188,12 +188,10 @@ static const char *read_super(struct cache_sb *sb, struct block_device *bdev,
- 	}
- 
- 	sb->last_mount = (u32)ktime_get_real_seconds();
--	err = NULL;
--
--	get_page(bh->b_page);
- 	*res = s;
-+	return NULL;
- err:
--	put_bh(bh);
-+	put_page(page);
- 	return err;
- }
- 
-diff --git a/include/uapi/linux/bcache.h b/include/uapi/linux/bcache.h
-index 1d8b3a9fc080..9a1965c6c3d0 100644
---- a/include/uapi/linux/bcache.h
-+++ b/include/uapi/linux/bcache.h
-@@ -148,6 +148,7 @@ static inline struct bkey *bkey_idx(const struct bkey *k, unsigned int nr_keys)
- #define BCACHE_SB_MAX_VERSION		4
- 
- #define SB_SECTOR			8
-+#define SB_OFFSET			(SB_SECTOR << SECTOR_SHIFT)
- #define SB_SIZE				4096
- #define SB_LABEL_SIZE			32
- #define SB_JOURNAL_BUCKETS		256U
--- 
-2.20.1
+If those devices have been configured, dom0 should be ready for that
+number of devices, e.g. by having enough spare memory area for ballooned
+pages.
 
+So either I'm missing something here or your reasoning for the need of
+the patch is wrong.
+
+
+Juergen
