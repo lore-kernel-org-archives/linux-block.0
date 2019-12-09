@@ -2,244 +2,85 @@ Return-Path: <SRS0=mQXl=Z7=vger.kernel.org=linux-block-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-6.8 required=3.0 tests=DKIM_SIGNED,DKIM_VALID,
-	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,SPF_HELO_NONE,
-	SPF_PASS,USER_AGENT_GIT autolearn=ham autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-9.8 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
+	INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,
+	USER_AGENT_GIT autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 21F75C43603
-	for <linux-block@archiver.kernel.org>; Mon,  9 Dec 2019 13:58:18 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 4E006C43603
+	for <linux-block@archiver.kernel.org>; Mon,  9 Dec 2019 15:42:50 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.kernel.org (Postfix) with ESMTP id DF81B2068E
-	for <linux-block@archiver.kernel.org>; Mon,  9 Dec 2019 13:58:17 +0000 (UTC)
-Authentication-Results: mail.kernel.org;
-	dkim=pass (2048-bit key) header.d=selectel-ru.20150623.gappssmtp.com header.i=@selectel-ru.20150623.gappssmtp.com header.b="D+D+nI8X"
+	by mail.kernel.org (Postfix) with ESMTP id 22061207FF
+	for <linux-block@archiver.kernel.org>; Mon,  9 Dec 2019 15:42:50 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1727437AbfLIN6R (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Mon, 9 Dec 2019 08:58:17 -0500
-Received: from mail-lf1-f68.google.com ([209.85.167.68]:33685 "EHLO
-        mail-lf1-f68.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1727438AbfLIN6R (ORCPT
-        <rfc822;linux-block@vger.kernel.org>); Mon, 9 Dec 2019 08:58:17 -0500
-Received: by mail-lf1-f68.google.com with SMTP id n25so10828850lfl.0
-        for <linux-block@vger.kernel.org>; Mon, 09 Dec 2019 05:58:15 -0800 (PST)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=selectel-ru.20150623.gappssmtp.com; s=20150623;
-        h=from:to:cc:subject:date:message-id:in-reply-to:references
-         :in-reply-to:references;
-        bh=s74rJWXw7qUN98/mKdN9hYCR+OahgaAFy6Te5TkZixw=;
-        b=D+D+nI8XkzqjtOXhqENxj84e4PcVrt3cJ1ex0DxVSaWp28tbb/2sk705WItFHNWxxq
-         M7Cr/ty2L3SDJnnXuWYPk6AA0stD5IDMbQG0JG51iDJfrYYD9S5xGEg8GrB8aLlfRsyP
-         ZYROQwamA2Rdjah3cSlVECAqnPI4fdZLdVJUhvBqC1Ws660/Pt/n4Cy0Vj76ZK9hVlyT
-         oLktTJOse9XX609jLWOkRiBgBsTdhqoWMrAoGSJ56Al+wdjEB33CmkizPtFgvK47pTHB
-         bw/iFnZFYmtnFQMHqNZr2igYQEnHN/fuh0ulZChlBJ301EwQE3kJZDwkuT/YXUFu/asE
-         JwAw==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20161025;
-        h=x-gm-message-state:from:to:cc:subject:date:message-id:in-reply-to
-         :references:in-reply-to:references;
-        bh=s74rJWXw7qUN98/mKdN9hYCR+OahgaAFy6Te5TkZixw=;
-        b=U+bxdGrIvjB1JjGNw4kJTgJC7cwO9hX7TWnoxCkvukljes/Bc7e3BFCCruhNcRlkIi
-         oE43UdD97Tko7HECs1Cs+jd+IODeIPWpQNTbs4FlxAFmk7clDe4esT+7F+adrQJfKfvp
-         jExhQ7O0DuN+gsrVs8ZADSaoN4DSc85ZC0KvhJtcKULITvbLEhXa0RG6HDBgM0Yl+Dh3
-         UDox/xcLyBYx3uaVnPzGe4EcVeij7STuKmhWv2LB0gXrraRIWCVw23GL7OWQQRcZusPb
-         TMYNDbo11JEid4Y2tvWf3JdFTphKt+Iajz6BT39e5CKRRMza5dToN02etxq6Az4902Vu
-         jLHg==
-X-Gm-Message-State: APjAAAV4WqyylYas/HJ153XKJhvX8kssQcYB+2//qha2LZj00D+/vKJQ
-        9cZTnfHAgPDctAYVHoC5UhTgIIi9mGQ=
-X-Google-Smtp-Source: APXvYqzD0FYpEufHRVqcY8dvQdMaRJzAzUnOkjHg02jO3YKP6JtQN9bODXF6Fymk5bTE3NAeh7QzuA==
-X-Received: by 2002:a19:5013:: with SMTP id e19mr15712211lfb.8.1575899894282;
-        Mon, 09 Dec 2019 05:58:14 -0800 (PST)
-Received: from some-laptop.eq.selectel.org ([188.93.16.2])
-        by smtp.gmail.com with ESMTPSA id g14sm11099511ljj.37.2019.12.09.05.58.13
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Mon, 09 Dec 2019 05:58:13 -0800 (PST)
-From:   Aleksei Zakharov <zaharov@selectel.ru>
-To:     linux-block@vger.kernel.org
-Cc:     Aleksei Zakharov <zaharov@selectel.ru>
-Subject: [PATCH 2/2] block: add iostat counters for requests splits
-Date:   Mon,  9 Dec 2019 16:58:01 +0300
-Message-Id: <7baf0d9f4bf8f3110c630d56ccb5c9da40b668ac.1575899439.git.zaharov@selectel.ru>
-X-Mailer: git-send-email 2.17.1
-In-Reply-To: <cover.1575899438.git.zaharov@selectel.ru>
-References: <cover.1575899438.git.zaharov@selectel.ru>
-In-Reply-To: <cover.1575899438.git.zaharov@selectel.ru>
-References: <cover.1575899438.git.zaharov@selectel.ru>
+        id S1726335AbfLIPmt (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Mon, 9 Dec 2019 10:42:49 -0500
+Received: from mout.kundenserver.de ([212.227.126.134]:46853 "EHLO
+        mout.kundenserver.de" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S1726293AbfLIPmt (ORCPT
+        <rfc822;linux-block@vger.kernel.org>); Mon, 9 Dec 2019 10:42:49 -0500
+Received: from threadripper.lan ([149.172.19.189]) by mrelayeu.kundenserver.de
+ (mreue011 [212.227.15.129]) with ESMTPA (Nemesis) id
+ 1M5wc7-1igGr43rMB-007VUy; Mon, 09 Dec 2019 16:42:42 +0100
+From:   Arnd Bergmann <arnd@arndb.de>
+To:     linux-block@vger.kernel.org, Jens Axboe <axboe@kernel.dk>
+Cc:     Arnd Bergmann <arnd@arndb.de>, Hannes Reinecke <hare@suse.de>,
+        Martin Wilck <mwilck@suse.com>, linux-kernel@vger.kernel.org
+Subject: [PATCH] [regression fix] pktcdvd: fix regression on 64-bit architectures
+Date:   Mon,  9 Dec 2019 16:42:29 +0100
+Message-Id: <20191209154240.2588381-1-arnd@arndb.de>
+X-Mailer: git-send-email 2.20.0
+MIME-Version: 1.0
+Content-Transfer-Encoding: 8bit
+X-Provags-ID: V03:K1:RnvGgNPsLcNsz/pTedpfw6YyLBidhusuTHMHcevs+DRX4+sYTxj
+ dCUyb2XdxJJnqurSCAV+zGC3AKNnaHILQChlfisYAmB3WC2yqI8IP9RNFGHwPZyGi9abBJN
+ ZxXUaipSdk8hwNc3DPZBPC25DxxFWIxeee9xAsZ0SG9W7Q7dMZjRvYSsRy+k5ckiF0aRFvK
+ PFiIcCo4gdUR1JG4l3yUg==
+X-UI-Out-Filterresults: notjunk:1;V03:K0:OehzC7dtquQ=:uwNy207tG0GYdJT8LqashL
+ nRRbljgAQlTGgGQcPrXJgPHYnRdo7vHx+sdNNHgoQsfHEEGyFykOe6vErVb5JYF8nD2SeTAr9
+ Wfnh9nuC1jIVeynN+K5ExhFFTZVqKj7pbc/j0AWlWxcCLT4SP809lJsM1QMoypDbRAbx+j6Rh
+ tQeyyVgLM0x0Sbc1rGtBqdOSmyDr4fkXG0NY2c372OY9R3LVYhLqiUi1cXH6sADeznpjuIyGz
+ 6RGOi1u5Nak66iLb7L9S9tX14lLq8o7dEoDbJV9oBfpZicndHgK5WpyqC9IqTwdGOEQhDUVBK
+ VoPDVlKZs6CLgm9Ym2BwxWs2xd1kDUEamdlLotqzrGU5qgmc9AUcpsi1pez1ETadM/tn9P2SA
+ 8IGqoppF0FASHiQ7b+PkONhqUJIaD3GGe2xkLfZd3QRs/Tw9rh7f4hIlmBwA4TkuOXTtOSGdE
+ lmZ4Yi4g6aIHpQCGJ+n8cgv3Ve7MRyEciRJVle6g7rCCzg7q8SIrNoViR70wGc1RBIVrvdJIV
+ a5/yVbtYUwDEWb1jG8VdPmzgl8oeALxqt93fKvDuq28zmP5MCQ0ppYq38jTdCFKAeDXvIE+IW
+ qKi7Jdi0L14l3K5r8HoYaloeYPhTWiN3Dgb+WuDIY2ZXB8bxXNvpp6b289DEm2Xbsjunv1J6E
+ WOoefeWULQmJa4gbWR+aoGuPoUkMCL744UM9bsWcCOI3QAHnOPgYVufg1zlcV9XTd1YJzpe6V
+ yRS6oFyY8sfHF048Yf/9JQ3YglnErA0CTpVT1BgdFr+k/YANgGa+UTHTRYkwKqUpenUmcgBMu
+ VaBHuy4yXhA9bvC8Js8kfTNBINSIdl0ToUyhCG/XWvwKoECeIUfg3rq4rLWVpdZ6WlO28grcE
+ h0NG84+uxZGAhAa+7OLQ==
 Sender: linux-block-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-I/O request can be splitted for two or more requests,
-if it's size is greater than queue/max_sectors_kb
-setting.
+The support for the compat ioctl did not actually do what it was
+supposed to do because of a typo, instead it broke native support for
+CDROM_LAST_WRITTEN and CDROM_SEND_PACKET on all architectures with
+CONFIG_COMPAT enabled.
 
-Knowledge of splits frequency helps to understand workload
-profile better and to make decision to tune queue/max_sectors_kb.
-
-This patch adds three counters to /sys/class/block/$dev/stat
-and /proc/diskstats: number of reads, writes and discards
-splitted.
-
-There's also counter for flush requests, but it is ignored,
-because flush cannot be splitted.
+Fixes: 1b114b0817cc ("pktcdvd: add compat_ioctl handler")
+Signed-off-by: Arnd Bergmann <arnd@arndb.de>
+----
+Please apply for v5.5, I just noticed the regression while
+rebasing some of the patches I created on top.
 ---
- Documentation/ABI/testing/procfs-diskstats |  3 +++
- Documentation/ABI/testing/sysfs-block      |  5 ++++-
- Documentation/admin-guide/iostats.rst      | 10 ++++++++++
- block/bio.c                                |  2 ++
- block/blk-core.c                           |  2 ++
- block/genhd.c                              |  8 ++++++--
- block/partition-generic.c                  |  8 ++++++--
- include/linux/genhd.h                      |  1 +
- 8 files changed, 34 insertions(+), 5 deletions(-)
+ drivers/block/pktcdvd.c | 2 +-
+ 1 file changed, 1 insertion(+), 1 deletion(-)
 
-diff --git a/Documentation/ABI/testing/procfs-diskstats b/Documentation/ABI/testing/procfs-diskstats
-index 70dcaf2481f4..e1473e93d901 100644
---- a/Documentation/ABI/testing/procfs-diskstats
-+++ b/Documentation/ABI/testing/procfs-diskstats
-@@ -33,5 +33,8 @@ Description:
- 
- 		19 - flush requests completed successfully
- 		20 - time spent flushing
-+		21 - reads splitted
-+		22 - writes splitted
-+		23 - discards splitted
- 
- 		For more details refer to Documentation/admin-guide/iostats.rst
-diff --git a/Documentation/ABI/testing/sysfs-block b/Documentation/ABI/testing/sysfs-block
-index ed8c14f161ee..ffbac0e72508 100644
---- a/Documentation/ABI/testing/sysfs-block
-+++ b/Documentation/ABI/testing/sysfs-block
-@@ -3,7 +3,7 @@ Date:		February 2008
- Contact:	Jerome Marchand <jmarchan@redhat.com>
- Description:
- 		The /sys/block/<disk>/stat files displays the I/O
--		statistics of disk <disk>. They contain 11 fields:
-+		statistics of disk <disk>. They contain 20 fields:
- 		 1 - reads completed successfully
- 		 2 - reads merged
- 		 3 - sectors read
-@@ -21,6 +21,9 @@ Description:
- 		15 - time spent discarding (ms)
- 		16 - flush requests completed
- 		17 - time spent flushing (ms)
-+		18 - reads splitted
-+		19 - writes splitted
-+		20 - discrads splitted
- 		For more details refer Documentation/admin-guide/iostats.rst
- 
- 
-diff --git a/Documentation/admin-guide/iostats.rst b/Documentation/admin-guide/iostats.rst
-index 4f0462af3ca7..7f3f374b82b7 100644
---- a/Documentation/admin-guide/iostats.rst
-+++ b/Documentation/admin-guide/iostats.rst
-@@ -130,6 +130,16 @@ Field 16 -- # of flush requests completed
- Field 17 -- # of milliseconds spent flushing
-     This is the total number of milliseconds spent by all flush requests.
- 
-+Field 18 -- # of reads splitted, field 19 -- # of writes splitted
-+    This is the total number of requests splitted before queue.
-+
-+    The maximum size of I/O is limited by queue/max_sectors_kb.
-+    If size of I/O is greater than this limit, it will be splitted
-+    as many times as needed to keep I/O size withing the limit.
-+
-+Field 20 -- # of discrads Splitted
-+    See description of fileds 18 and 19.
-+
- To avoid introducing performance bottlenecks, no locks are held while
- modifying these counters.  This implies that minor inaccuracies may be
- introduced when changes collide, so (for instance) adding up all the
-diff --git a/block/bio.c b/block/bio.c
-index 8f0ed6228fc5..c8a051e128f8 100644
---- a/block/bio.c
-+++ b/block/bio.c
-@@ -1855,6 +1855,8 @@ struct bio *bio_split(struct bio *bio, int sectors,
- 	if (bio_flagged(bio, BIO_TRACE_COMPLETION))
- 		bio_set_flag(split, BIO_TRACE_COMPLETION);
- 
-+	bio_set_flag(split, BIO_SPLITTED);
-+
- 	return split;
- }
- EXPORT_SYMBOL(bio_split);
-diff --git a/block/blk-core.c b/block/blk-core.c
-index f0d82227a2fc..776d28b9a5bf 100644
---- a/block/blk-core.c
-+++ b/block/blk-core.c
-@@ -1379,6 +1379,8 @@ void blk_account_io_start(struct request *rq, bool new_io)
- 		}
- 		part_inc_in_flight(rq->q, part, rw);
- 		rq->part = part;
-+		if (bio_flagged(rq->bio, BIO_SPLITTED))
-+			part_stat_inc(part, splits[rw]);
- 	}
- 
- 	update_io_ticks(part, jiffies);
-diff --git a/block/genhd.c b/block/genhd.c
-index ff6268970ddc..adb38baa24dc 100644
---- a/block/genhd.c
-+++ b/block/genhd.c
-@@ -1386,7 +1386,8 @@ static int diskstats_show(struct seq_file *seqf, void *v)
- 			   "%lu %lu %lu %u "
- 			   "%u %u %u "
- 			   "%lu %lu %lu %u "
--			   "%lu %u"
-+			   "%lu %u "
-+			   "%lu %lu %lu"
- 			   "\n",
- 			   MAJOR(part_devt(hd)), MINOR(part_devt(hd)),
- 			   disk_name(gp, hd->partno, buf),
-@@ -1406,7 +1407,10 @@ static int diskstats_show(struct seq_file *seqf, void *v)
- 			   part_stat_read(hd, sectors[STAT_DISCARD]),
- 			   (unsigned int)part_stat_read_msecs(hd, STAT_DISCARD),
- 			   part_stat_read(hd, ios[STAT_FLUSH]),
--			   (unsigned int)part_stat_read_msecs(hd, STAT_FLUSH)
-+			   (unsigned int)part_stat_read_msecs(hd, STAT_FLUSH),
-+			   part_stat_read(hd, splits[STAT_READ]),
-+			   part_stat_read(hd, splits[STAT_WRITE]),
-+			   part_stat_read(hd, splits[STAT_DISCARD])
- 			);
- 	}
- 	disk_part_iter_exit(&piter);
-diff --git a/block/partition-generic.c b/block/partition-generic.c
-index 3db8b73a96b1..61e26ec21256 100644
---- a/block/partition-generic.c
-+++ b/block/partition-generic.c
-@@ -128,7 +128,8 @@ ssize_t part_stat_show(struct device *dev,
- 		"%8lu %8lu %8llu %8u "
- 		"%8u %8u %8u "
- 		"%8lu %8lu %8llu %8u "
--		"%8lu %8u"
-+		"%8lu %8u "
-+		"%8lu %8lu %8lu"
- 		"\n",
- 		part_stat_read(p, ios[STAT_READ]),
- 		part_stat_read(p, merges[STAT_READ]),
-@@ -146,7 +147,10 @@ ssize_t part_stat_show(struct device *dev,
- 		(unsigned long long)part_stat_read(p, sectors[STAT_DISCARD]),
- 		(unsigned int)part_stat_read_msecs(p, STAT_DISCARD),
- 		part_stat_read(p, ios[STAT_FLUSH]),
--		(unsigned int)part_stat_read_msecs(p, STAT_FLUSH));
-+		(unsigned int)part_stat_read_msecs(p, STAT_FLUSH),
-+		part_stat_read(p, splits[STAT_READ]),
-+		part_stat_read(p, splits[STAT_WRITE]),
-+		part_stat_read(p, splits[STAT_DISCARD]));
- }
- 
- ssize_t part_inflight_show(struct device *dev, struct device_attribute *attr,
-diff --git a/include/linux/genhd.h b/include/linux/genhd.h
-index 8b5330dd5ac0..ea502e7b12b6 100644
---- a/include/linux/genhd.h
-+++ b/include/linux/genhd.h
-@@ -88,6 +88,7 @@ struct disk_stats {
- 	unsigned long sectors[NR_STAT_GROUPS];
- 	unsigned long ios[NR_STAT_GROUPS];
- 	unsigned long merges[NR_STAT_GROUPS];
-+	unsigned long splits[NR_STAT_GROUPS];
- 	unsigned long io_ticks;
- 	unsigned long time_in_queue;
- 	local_t in_flight[2];
+diff --git a/drivers/block/pktcdvd.c b/drivers/block/pktcdvd.c
+index 48c2eb4bbba2..ab4d3be4b646 100644
+--- a/drivers/block/pktcdvd.c
++++ b/drivers/block/pktcdvd.c
+@@ -2705,7 +2705,7 @@ static const struct block_device_operations pktcdvd_ops = {
+ 	.release =		pkt_close,
+ 	.ioctl =		pkt_ioctl,
+ #ifdef CONFIG_COMPAT
+-	.ioctl =		pkt_compat_ioctl,
++	.compat_ioctl =		pkt_compat_ioctl,
+ #endif
+ 	.check_events =		pkt_check_events,
+ };
 -- 
-2.17.1
+2.20.0
 
