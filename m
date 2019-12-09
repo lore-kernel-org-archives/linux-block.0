@@ -7,42 +7,42 @@ X-Spam-Status: No, score=-9.6 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
 	SPF_HELO_NONE,SPF_PASS,USER_AGENT_GIT autolearn=ham autolearn_force=no
 	version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 05D04C43603
-	for <linux-block@archiver.kernel.org>; Mon,  9 Dec 2019 09:38:42 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 30B6CC43603
+	for <linux-block@archiver.kernel.org>; Mon,  9 Dec 2019 09:38:47 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.kernel.org (Postfix) with ESMTP id D043720663
-	for <linux-block@archiver.kernel.org>; Mon,  9 Dec 2019 09:38:41 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id F40D320663
+	for <linux-block@archiver.kernel.org>; Mon,  9 Dec 2019 09:38:46 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (2048-bit key) header.d=infradead.org header.i=@infradead.org header.b="sF7YgK5x"
+	dkim=fail reason="signature verification failed" (2048-bit key) header.d=infradead.org header.i=@infradead.org header.b="X+V8WHV5"
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1727528AbfLIJil (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Mon, 9 Dec 2019 04:38:41 -0500
-Received: from bombadil.infradead.org ([198.137.202.133]:57870 "EHLO
+        id S1727541AbfLIJiq (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Mon, 9 Dec 2019 04:38:46 -0500
+Received: from bombadil.infradead.org ([198.137.202.133]:57890 "EHLO
         bombadil.infradead.org" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1727160AbfLIJil (ORCPT
-        <rfc822;linux-block@vger.kernel.org>); Mon, 9 Dec 2019 04:38:41 -0500
+        with ESMTP id S1727535AbfLIJiq (ORCPT
+        <rfc822;linux-block@vger.kernel.org>); Mon, 9 Dec 2019 04:38:46 -0500
 DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed;
         d=infradead.org; s=bombadil.20170209; h=Content-Transfer-Encoding:
         MIME-Version:References:In-Reply-To:Message-Id:Date:Subject:Cc:To:From:Sender
         :Reply-To:Content-Type:Content-ID:Content-Description:Resent-Date:Resent-From
         :Resent-Sender:Resent-To:Resent-Cc:Resent-Message-ID:List-Id:List-Help:
         List-Unsubscribe:List-Subscribe:List-Post:List-Owner:List-Archive;
-        bh=D/780rQVU69TfporsGchYf6GlKn19xD5+Y2QNaWjyg4=; b=sF7YgK5x2wWW9gDz6nmR8pCZvh
-        7DAdyXWwkIWrkI6jg4hpnmkIw07w+DJpHwTVKon9aX/fItsqBgm1kdLCdohVOkzMLIK/Nex5SN8RW
-        +laz2dlcXQ34nd9zN6savS7UBbsDAMDUqUxnkxITmMiUt2GY9OBeyYS+clrOIYlLyDoW/gXiQQhAt
-        x5kmH76ERwEZd9eF1ps64qXafO2mZfcjDVIt0J6IhgsNu3yGgdo/tUmnrUCohjbJCJrTWCGASDP0k
-        fEbqdGNvcv+xQafNViLQej2qbVLzntNOJpxwKJ0EoZElTHv+/SL0Y5yR1OznIGRBH2XYKBpiOmqsA
-        2CmVMXBw==;
+        bh=VjdPr9OrAuY0Ld8Hux4ijcPz0qDx6b6t3wYpglKBgZo=; b=X+V8WHV5Vy7SK5H830D8nxKgyQ
+        YQt/txEeGduHSOr1nwcG90oLodAffKcnnhE4LL7+Oo2a2dknXmXZHrNhu+48HdMiIhjZQtwSqLVzd
+        YK/lfQ0ien4Kr6UkcTeuBqwER+U5qQxrUHVLGrrr9rPfJG9rPWFAHTkI1eEjs3B/5IfEyezTWx58N
+        5WRqy7jHSHAlcy5ljkbpIz8YJfuV01raMXeibyV+IjT5+eXJ2COYvN+4TMDJkpc10Uz8ofJbgOzTW
+        ATecTmTVU3jNZhYOa+SRLmX311FW52MSNaCuuCnJqhvCFkpYkcEakThGrs8uVRbRvpPWKDX9GBFUc
+        hHrZkJ0g==;
 Received: from [2001:4bb8:188:2b00:20e6:8b5a:ed96:f9da] (helo=localhost)
         by bombadil.infradead.org with esmtpsa (Exim 4.92.3 #3 (Red Hat Linux))
-        id 1ieFV2-0002gW-4J; Mon, 09 Dec 2019 09:38:40 +0000
+        id 1ieFV7-0002hJ-8p; Mon, 09 Dec 2019 09:38:45 +0000
 From:   Christoph Hellwig <hch@lst.de>
 To:     colyli@suse.de
 Cc:     kent.overstreet@gmail.com, liangchen.linux@gmail.com,
         linux-bcache@vger.kernel.org, linux-block@vger.kernel.org
-Subject: [PATCH 3/7] bcache: rework error unwinding in register_bcache
-Date:   Mon,  9 Dec 2019 10:38:25 +0100
-Message-Id: <20191209093829.19703-4-hch@lst.de>
+Subject: [PATCH 5/7] bcache: return a pointer to the on-disk sb from read_super
+Date:   Mon,  9 Dec 2019 10:38:27 +0100
+Message-Id: <20191209093829.19703-6-hch@lst.de>
 X-Mailer: git-send-email 2.20.1
 In-Reply-To: <20191209093829.19703-1-hch@lst.de>
 References: <20191209093829.19703-1-hch@lst.de>
@@ -54,153 +54,119 @@ Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-Split the successful and error return path, and use one goto label for each
-resource to unwind.  This also fixes some small errors like leaking the
-module reference count in the reboot case (which seems entirely harmless)
-or printing the wrong warning messages for early failures.
+Returning the properly typed actual data structure insteaf of the
+containing struct page will save the callers some work going
+forward.
 
 Signed-off-by: Christoph Hellwig <hch@lst.de>
 ---
- drivers/md/bcache/super.c | 75 +++++++++++++++++++++++----------------
- 1 file changed, 45 insertions(+), 30 deletions(-)
+ drivers/md/bcache/super.c | 22 +++++++++++-----------
+ 1 file changed, 11 insertions(+), 11 deletions(-)
 
 diff --git a/drivers/md/bcache/super.c b/drivers/md/bcache/super.c
-index 3045f27e0d67..e8013e1b0a14 100644
+index c11bc0135ae6..0b7620d9f087 100644
 --- a/drivers/md/bcache/super.c
 +++ b/drivers/md/bcache/super.c
-@@ -2375,29 +2375,33 @@ static bool bch_is_open(struct block_device *bdev)
- static ssize_t register_bcache(struct kobject *k, struct kobj_attribute *attr,
- 			       const char *buffer, size_t size)
+@@ -60,7 +60,7 @@ struct workqueue_struct *bch_journal_wq;
+ /* Superblock */
+ 
+ static const char *read_super(struct cache_sb *sb, struct block_device *bdev,
+-			      struct page **res)
++			      struct cache_sb_disk **res)
  {
--	ssize_t ret = -EINVAL;
--	const char *err = "cannot allocate memory";
--	char *path = NULL;
--	struct cache_sb *sb = NULL;
-+	const char *err;
-+	char *path;
-+	struct cache_sb *sb;
- 	struct block_device *bdev = NULL;
--	struct page *sb_page = NULL;
-+	struct page *sb_page;
-+	ssize_t ret;
+ 	const char *err;
+ 	struct cache_sb_disk *s;
+@@ -191,7 +191,7 @@ static const char *read_super(struct cache_sb *sb, struct block_device *bdev,
+ 	err = NULL;
  
-+	ret = -EBUSY;
- 	if (!try_module_get(THIS_MODULE))
--		return -EBUSY;
-+		goto out;
+ 	get_page(bh->b_page);
+-	*res = bh->b_page;
++	*res = s;
+ err:
+ 	put_bh(bh);
+ 	return err;
+@@ -1353,7 +1353,7 @@ static int cached_dev_init(struct cached_dev *dc, unsigned int block_size)
  
- 	/* For latest state of bcache_is_reboot */
- 	smp_mb();
- 	if (bcache_is_reboot)
--		return -EBUSY;
-+		goto out_module_put;
+ /* Cached device - bcache superblock */
  
-+	ret = -ENOMEM;
-+	err = "cannot allocate memory";
- 	path = kstrndup(buffer, size, GFP_KERNEL);
- 	if (!path)
--		goto err;
-+		goto out_module_put;
+-static int register_bdev(struct cache_sb *sb, struct page *sb_page,
++static int register_bdev(struct cache_sb *sb, struct cache_sb_disk *sb_disk,
+ 				 struct block_device *bdev,
+ 				 struct cached_dev *dc)
+ {
+@@ -1367,7 +1367,7 @@ static int register_bdev(struct cache_sb *sb, struct page *sb_page,
+ 	dc->bdev->bd_holder = dc;
  
- 	sb = kmalloc(sizeof(struct cache_sb), GFP_KERNEL);
- 	if (!sb)
--		goto err;
-+		goto out_free_path;
+ 	bio_init(&dc->sb_bio, dc->sb_bio.bi_inline_vecs, 1);
+-	bio_first_bvec_all(&dc->sb_bio)->bv_page = sb_page;
++	bio_first_bvec_all(&dc->sb_bio)->bv_page = virt_to_page(sb_disk);
  
-+	ret = -EINVAL;
- 	err = "failed to open device";
- 	bdev = blkdev_get_by_path(strim(path),
- 				  FMODE_READ|FMODE_WRITE|FMODE_EXCL,
-@@ -2414,57 +2418,68 @@ static ssize_t register_bcache(struct kobject *k, struct kobj_attribute *attr,
- 			if (!IS_ERR(bdev))
- 				bdput(bdev);
- 			if (attr == &ksysfs_register_quiet)
--				goto quiet_out;
-+				goto done;
- 		}
--		goto err;
-+		goto out_free_sb;
- 	}
+ 	if (cached_dev_init(dc, sb->block_size << 9))
+ 		goto err;
+@@ -2260,7 +2260,7 @@ static int cache_alloc(struct cache *ca)
+ 	return ret;
+ }
  
- 	err = "failed to set blocksize";
+-static int register_cache(struct cache_sb *sb, struct page *sb_page,
++static int register_cache(struct cache_sb *sb, struct cache_sb_disk *sb_disk,
+ 				struct block_device *bdev, struct cache *ca)
+ {
+ 	const char *err = NULL; /* must be set for any error case */
+@@ -2272,7 +2272,7 @@ static int register_cache(struct cache_sb *sb, struct page *sb_page,
+ 	ca->bdev->bd_holder = ca;
+ 
+ 	bio_init(&ca->sb_bio, ca->sb_bio.bi_inline_vecs, 1);
+-	bio_first_bvec_all(&ca->sb_bio)->bv_page = sb_page;
++	bio_first_bvec_all(&ca->sb_bio)->bv_page = virt_to_page(sb_disk);
+ 
+ 	if (blk_queue_discard(bdev_get_queue(bdev)))
+ 		ca->discard = CACHE_DISCARD(&ca->sb);
+@@ -2375,8 +2375,8 @@ static ssize_t register_bcache(struct kobject *k, struct kobj_attribute *attr,
+ 	const char *err;
+ 	char *path;
+ 	struct cache_sb *sb;
++	struct cache_sb_disk *sb_disk;
+ 	struct block_device *bdev;
+-	struct page *sb_page;
+ 	ssize_t ret;
+ 
+ 	ret = -EBUSY;
+@@ -2424,7 +2424,7 @@ static ssize_t register_bcache(struct kobject *k, struct kobj_attribute *attr,
  	if (set_blocksize(bdev, 4096))
--		goto err_close;
-+		goto out_blkdev_put;
+ 		goto out_blkdev_put;
  
- 	err = read_super(sb, bdev, &sb_page);
+-	err = read_super(sb, bdev, &sb_page);
++	err = read_super(sb, bdev, &sb_disk);
  	if (err)
--		goto err_close;
-+		goto out_blkdev_put;
+ 		goto out_blkdev_put;
  
- 	err = "failed to register device";
- 	if (SB_IS_BDEV(sb)) {
- 		struct cached_dev *dc = kzalloc(sizeof(*dc), GFP_KERNEL);
- 
- 		if (!dc)
--			goto err_close;
-+			goto out_put_sb_page;
+@@ -2436,7 +2436,7 @@ static ssize_t register_bcache(struct kobject *k, struct kobj_attribute *attr,
+ 			goto out_put_sb_page;
  
  		mutex_lock(&bch_register_lock);
- 		ret = register_bdev(sb, sb_page, bdev, dc);
+-		ret = register_bdev(sb, sb_page, bdev, dc);
++		ret = register_bdev(sb, sb_disk, bdev, dc);
  		mutex_unlock(&bch_register_lock);
  		/* blkdev_put() will be called in cached_dev_free() */
--		if (ret < 0)
--			goto err;
-+		if (ret < 0) {
-+			bdev = NULL;
-+			goto out_put_sb_page;
-+		}
- 	} else {
- 		struct cache *ca = kzalloc(sizeof(*ca), GFP_KERNEL);
- 
- 		if (!ca)
--			goto err_close;
-+			goto out_put_sb_page;
+ 		if (ret < 0)
+@@ -2448,7 +2448,7 @@ static ssize_t register_bcache(struct kobject *k, struct kobj_attribute *attr,
+ 			goto out_put_sb_page;
  
  		/* blkdev_put() will be called in bch_cache_release() */
 -		if (register_cache(sb, sb_page, bdev, ca) != 0)
--			goto err;
-+		if (register_cache(sb, sb_page, bdev, ca) != 0) {
-+			bdev = NULL;
-+			goto out_put_sb_page;
-+		}
++		if (register_cache(sb, sb_disk, bdev, ca) != 0)
+ 			goto out_free_sb;
  	}
--quiet_out:
--	ret = size;
--out:
--	if (sb_page)
--		put_page(sb_page);
-+
-+	put_page(sb_page);
-+done:
- 	kfree(sb);
- 	kfree(path);
- 	module_put(THIS_MODULE);
--	return ret;
--
--err_close:
--	blkdev_put(bdev, FMODE_READ|FMODE_WRITE|FMODE_EXCL);
--err:
-+	return size;
-+
-+out_put_sb_page:
-+	put_page(sb_page);
-+out_blkdev_put:
-+	if (bdev)
-+		blkdev_put(bdev, FMODE_READ | FMODE_WRITE | FMODE_EXCL);
-+out_free_sb:
-+	kfree(sb);
-+out_free_path:
-+	kfree(path);
-+out_module_put:
-+	module_put(THIS_MODULE);
-+out:
- 	pr_info("error %s: %s", path, err);
--	goto out;
-+	return ret;
- }
  
+@@ -2459,7 +2459,7 @@ static ssize_t register_bcache(struct kobject *k, struct kobj_attribute *attr,
+ 	return size;
  
+ out_put_sb_page:
+-	put_page(sb_page);
++	put_page(virt_to_page(sb_disk));
+ out_blkdev_put:
+ 	blkdev_put(bdev, FMODE_READ | FMODE_WRITE | FMODE_EXCL);
+ out_free_sb:
 -- 
 2.20.1
 
