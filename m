@@ -4,51 +4,51 @@ X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 X-Spam-Level: 
 X-Spam-Status: No, score=-10.1 required=3.0 tests=DKIMWL_WL_HIGH,DKIM_SIGNED,
 	DKIM_VALID,DKIM_VALID_AU,INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,
-	SPF_HELO_NONE,SPF_PASS,USER_AGENT_GIT autolearn=ham autolearn_force=no
-	version=3.4.0
+	SPF_HELO_NONE,SPF_PASS,USER_AGENT_GIT autolearn=unavailable
+	autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id BAE45C2D0C4
-	for <linux-block@archiver.kernel.org>; Tue, 10 Dec 2019 21:34:18 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 32E19C43603
+	for <linux-block@archiver.kernel.org>; Tue, 10 Dec 2019 22:09:47 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.kernel.org (Postfix) with ESMTP id 8A40E205C9
-	for <linux-block@archiver.kernel.org>; Tue, 10 Dec 2019 21:34:18 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id 04F2F20836
+	for <linux-block@archiver.kernel.org>; Tue, 10 Dec 2019 22:09:47 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=default; t=1576013658;
-	bh=Wn5syDq0taCDfRGRzbyEBoljcA5/eCl9XmADb6qn/Q4=;
+	s=default; t=1576015787;
+	bh=Hh3R6bgpfIqgBXr1M5YNdXh6HBN0Bb9I12xn+qgoj1c=;
 	h=From:To:Cc:Subject:Date:In-Reply-To:References:List-ID:From;
-	b=LoqokOvU1l97kHhMN0u2XBYnlTRdF6Pigg0O7uxEpFjnzcuUJKZeexKmx+Dy6lgCn
-	 8V1kVA7+tykEC0rGVzXemETRZe4VDoLtg8UyPzPbGArSpoakIwflx793e9PoZkJhng
-	 fiEr63NCR51QyVojZCDURP35fLH7UwxT6mwGA9og=
+	b=mGKxk3s9PBVXDTa3GfdFmYQyRFYNDQJpCR73CuNevdjaU5AZbZZ4pknLNAhhQLDmT
+	 hOL79ZKEPkXrnR2li5BDlTlofftolve89Js44ukOydNoFfKtPW2COWa7IylufJ3Px9
+	 ml+BYxYHMdro+q6dbZpCk4KHzV3+DZ9He1LcexOc=
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1729986AbfLJVeR (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Tue, 10 Dec 2019 16:34:17 -0500
-Received: from mail.kernel.org ([198.145.29.99]:39190 "EHLO mail.kernel.org"
+        id S1728755AbfLJWEY (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Tue, 10 Dec 2019 17:04:24 -0500
+Received: from mail.kernel.org ([198.145.29.99]:35176 "EHLO mail.kernel.org"
         rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-        id S1729971AbfLJVeO (ORCPT <rfc822;linux-block@vger.kernel.org>);
-        Tue, 10 Dec 2019 16:34:14 -0500
+        id S1728734AbfLJWEX (ORCPT <rfc822;linux-block@vger.kernel.org>);
+        Tue, 10 Dec 2019 17:04:23 -0500
 Received: from sasha-vm.mshome.net (c-73-47-72-35.hsd1.nh.comcast.net [73.47.72.35])
         (using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
         (No client certificate requested)
-        by mail.kernel.org (Postfix) with ESMTPSA id AD3F4222C4;
-        Tue, 10 Dec 2019 21:34:12 +0000 (UTC)
+        by mail.kernel.org (Postfix) with ESMTPSA id 4351320637;
+        Tue, 10 Dec 2019 22:04:21 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-        s=default; t=1576013653;
-        bh=Wn5syDq0taCDfRGRzbyEBoljcA5/eCl9XmADb6qn/Q4=;
+        s=default; t=1576015462;
+        bh=Hh3R6bgpfIqgBXr1M5YNdXh6HBN0Bb9I12xn+qgoj1c=;
         h=From:To:Cc:Subject:Date:In-Reply-To:References:From;
-        b=RBLb7ZWElxqA1yJf4e47ybq2GIVl2SJC99yc3kTSHQtHMuUyJc5s3p4so8yBBB/6G
-         P+HC6fF/hQdcJFyprbxLxkizYhasWWzKlcrx0N2TRWYWnpzprBPx7hq5QFsZktPJk7
-         h57ARrupOBwG/VRhaTwaDrpARBJ0P1vB3JAnm9zk=
+        b=OBRC8/FxQ58Q5G6gr0zfw5XWravlGSKul8R+bo7ecgM8p5TegAEqtTIKwapEG4GpG
+         RTdrXFBgLmfzrnhhL4YvOufIBerpw80+ZwX+RQrvHePoZgVZo7Nh/I2fA33g7qHT+o
+         X8SLhuY8t7WyiPbHov1Ub/tsQBcfiTT0jmIIV5W8=
 From:   Sasha Levin <sashal@kernel.org>
 To:     linux-kernel@vger.kernel.org, stable@vger.kernel.org
 Cc:     "Darrick J. Wong" <darrick.wong@oracle.com>,
         Christoph Hellwig <hch@lst.de>, Jens Axboe <axboe@kernel.dk>,
         Sasha Levin <sashal@kernel.org>, linux-block@vger.kernel.org
-Subject: [PATCH AUTOSEL 4.19 092/177] loop: fix no-unmap write-zeroes request behavior
-Date:   Tue, 10 Dec 2019 16:30:56 -0500
-Message-Id: <20191210213221.11921-92-sashal@kernel.org>
+Subject: [PATCH AUTOSEL 4.14 068/130] loop: fix no-unmap write-zeroes request behavior
+Date:   Tue, 10 Dec 2019 17:01:59 -0500
+Message-Id: <20191210220301.13262-68-sashal@kernel.org>
 X-Mailer: git-send-email 2.20.1
-In-Reply-To: <20191210213221.11921-1-sashal@kernel.org>
-References: <20191210213221.11921-1-sashal@kernel.org>
+In-Reply-To: <20191210220301.13262-1-sashal@kernel.org>
+References: <20191210220301.13262-1-sashal@kernel.org>
 MIME-Version: 1.0
 X-stable: review
 X-Patchwork-Hint: Ignore
@@ -83,10 +83,10 @@ Signed-off-by: Sasha Levin <sashal@kernel.org>
  1 file changed, 18 insertions(+), 8 deletions(-)
 
 diff --git a/drivers/block/loop.c b/drivers/block/loop.c
-index 126c2c5146732..9cd231a27328e 100644
+index ec61dd873c93d..453e3728e6573 100644
 --- a/drivers/block/loop.c
 +++ b/drivers/block/loop.c
-@@ -416,18 +416,20 @@ static int lo_read_transfer(struct loop_device *lo, struct request *rq,
+@@ -414,18 +414,20 @@ static int lo_read_transfer(struct loop_device *lo, struct request *rq,
  	return ret;
  }
  
@@ -113,7 +113,7 @@ index 126c2c5146732..9cd231a27328e 100644
  	if ((!file->f_op->fallocate) || lo->lo_encrypt_key_size) {
  		ret = -EOPNOTSUPP;
  		goto out;
-@@ -596,9 +598,17 @@ static int do_req_filebacked(struct loop_device *lo, struct request *rq)
+@@ -565,9 +567,17 @@ static int do_req_filebacked(struct loop_device *lo, struct request *rq)
  	switch (req_op(rq)) {
  	case REQ_OP_FLUSH:
  		return lo_req_flush(lo, rq);
