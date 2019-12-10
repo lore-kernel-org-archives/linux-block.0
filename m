@@ -2,147 +2,142 @@ Return-Path: <SRS0=EWGC=2A=vger.kernel.org=linux-block-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-2.4 required=3.0 tests=DKIMWL_WL_HIGH,DKIM_SIGNED,
-	DKIM_VALID,DKIM_VALID_AU,HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,
-	SPF_HELO_NONE,SPF_PASS,USER_AGENT_SANE_1 autolearn=no autolearn_force=no
-	version=3.4.0
+X-Spam-Status: No, score=-8.2 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
+	INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,
+	USER_AGENT_SANE_1 autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 76FE8C2D0BE
-	for <linux-block@archiver.kernel.org>; Tue, 10 Dec 2019 05:55:53 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 8007CC43603
+	for <linux-block@archiver.kernel.org>; Tue, 10 Dec 2019 06:11:57 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.kernel.org (Postfix) with ESMTP id 47FD020652
-	for <linux-block@archiver.kernel.org>; Tue, 10 Dec 2019 05:55:53 +0000 (UTC)
-Authentication-Results: mail.kernel.org;
-	dkim=pass (2048-bit key) header.d=nvidia.com header.i=@nvidia.com header.b="Z0uGtjzd"
+	by mail.kernel.org (Postfix) with ESMTP id 59D2B2077B
+	for <linux-block@archiver.kernel.org>; Tue, 10 Dec 2019 06:11:57 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1726573AbfLJFzw (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Tue, 10 Dec 2019 00:55:52 -0500
-Received: from hqnvemgate26.nvidia.com ([216.228.121.65]:2831 "EHLO
-        hqnvemgate26.nvidia.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1725942AbfLJFzw (ORCPT
-        <rfc822;linux-block@vger.kernel.org>);
-        Tue, 10 Dec 2019 00:55:52 -0500
-Received: from hqpgpgate101.nvidia.com (Not Verified[216.228.121.13]) by hqnvemgate26.nvidia.com (using TLS: TLSv1.2, DES-CBC3-SHA)
-        id <B5def33600000>; Mon, 09 Dec 2019 21:55:45 -0800
-Received: from hqmail.nvidia.com ([172.20.161.6])
-  by hqpgpgate101.nvidia.com (PGP Universal service);
-  Mon, 09 Dec 2019 21:55:50 -0800
-X-PGP-Universal: processed;
-        by hqpgpgate101.nvidia.com on Mon, 09 Dec 2019 21:55:50 -0800
-Received: from DRHQMAIL107.nvidia.com (10.27.9.16) by HQMAIL111.nvidia.com
- (172.20.187.18) with Microsoft SMTP Server (TLS) id 15.0.1473.3; Tue, 10 Dec
- 2019 05:55:50 +0000
-Received: from [10.2.166.216] (10.124.1.5) by DRHQMAIL107.nvidia.com
- (10.27.9.16) with Microsoft SMTP Server (TLS) id 15.0.1473.3; Tue, 10 Dec
- 2019 05:55:49 +0000
-Subject: Re: [PATCH v8 20/26] powerpc: book3s64: convert to pin_user_pages()
- and put_user_page()
-From:   John Hubbard <jhubbard@nvidia.com>
-To:     Andrew Morton <akpm@linux-foundation.org>
-CC:     Al Viro <viro@zeniv.linux.org.uk>,
-        Alex Williamson <alex.williamson@redhat.com>,
-        Benjamin Herrenschmidt <benh@kernel.crashing.org>,
-        =?UTF-8?B?QmrDtnJuIFTDtnBlbA==?= <bjorn.topel@intel.com>,
-        Christoph Hellwig <hch@infradead.org>,
-        Dan Williams <dan.j.williams@intel.com>,
-        Daniel Vetter <daniel@ffwll.ch>,
-        Dave Chinner <david@fromorbit.com>,
-        David Airlie <airlied@linux.ie>,
-        "David S . Miller" <davem@davemloft.net>,
-        Ira Weiny <ira.weiny@intel.com>, Jan Kara <jack@suse.cz>,
-        Jason Gunthorpe <jgg@ziepe.ca>, Jens Axboe <axboe@kernel.dk>,
-        Jonathan Corbet <corbet@lwn.net>,
-        =?UTF-8?B?SsOpcsO0bWUgR2xpc3Nl?= <jglisse@redhat.com>,
-        Magnus Karlsson <magnus.karlsson@intel.com>,
-        "Mauro Carvalho Chehab" <mchehab@kernel.org>,
-        Michael Ellerman <mpe@ellerman.id.au>,
-        Michal Hocko <mhocko@suse.com>,
-        Mike Kravetz <mike.kravetz@oracle.com>,
-        "Paul Mackerras" <paulus@samba.org>, Shuah Khan <shuah@kernel.org>,
-        Vlastimil Babka <vbabka@suse.cz>, <bpf@vger.kernel.org>,
-        <dri-devel@lists.freedesktop.org>, <kvm@vger.kernel.org>,
-        <linux-block@vger.kernel.org>, <linux-doc@vger.kernel.org>,
-        <linux-fsdevel@vger.kernel.org>, <linux-kselftest@vger.kernel.org>,
-        <linux-media@vger.kernel.org>, <linux-rdma@vger.kernel.org>,
-        <linuxppc-dev@lists.ozlabs.org>, <netdev@vger.kernel.org>,
-        <linux-mm@kvack.org>, LKML <linux-kernel@vger.kernel.org>
-References: <20191209225344.99740-1-jhubbard@nvidia.com>
- <20191209225344.99740-21-jhubbard@nvidia.com>
- <08f5d716-8b31-b016-4994-19fbe829dc28@nvidia.com>
-X-Nvconfidentiality: public
-Message-ID: <61e0c3a5-992e-4571-e22d-d63286ce10ec@nvidia.com>
-Date:   Mon, 9 Dec 2019 21:53:00 -0800
+        id S1726085AbfLJGL4 (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Tue, 10 Dec 2019 01:11:56 -0500
+Received: from mx2.suse.de ([195.135.220.15]:58028 "EHLO mx1.suse.de"
+        rhost-flags-OK-OK-OK-FAIL) by vger.kernel.org with ESMTP
+        id S1725942AbfLJGL4 (ORCPT <rfc822;linux-block@vger.kernel.org>);
+        Tue, 10 Dec 2019 01:11:56 -0500
+X-Virus-Scanned: by amavisd-new at test-mx.suse.de
+Received: from relay2.suse.de (unknown [195.135.220.254])
+        by mx1.suse.de (Postfix) with ESMTP id 56FF1B311;
+        Tue, 10 Dec 2019 06:11:53 +0000 (UTC)
+Subject: Re: [PATCH v4 1/2] xenbus/backend: Add memory pressure handler
+ callback
+To:     SeongJae Park <sjpark@amazon.com>
+Cc:     axboe@kernel.dk, konrad.wilk@oracle.com,
+        linux-block@vger.kernel.org, linux-kernel@vger.kernel.org,
+        pdurrant@amazon.com, roger.pau@citrix.com, sj38.park@gmail.com,
+        xen-devel@lists.xenproject.org, SeongJae Park <sjpark@amazon.de>
+References: <20191209194305.20828-1-sjpark@amazon.com>
+ <20191209194305.20828-2-sjpark@amazon.com>
+From:   =?UTF-8?B?SsO8cmdlbiBHcm/Dnw==?= <jgross@suse.com>
+Message-ID: <2aca11d5-38ba-e924-c38e-e48c52c915c6@suse.com>
+Date:   Tue, 10 Dec 2019 07:11:49 +0100
 User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:68.0) Gecko/20100101
- Thunderbird/68.3.0
+ Thunderbird/68.2.1
 MIME-Version: 1.0
-In-Reply-To: <08f5d716-8b31-b016-4994-19fbe829dc28@nvidia.com>
-X-Originating-IP: [10.124.1.5]
-X-ClientProxiedBy: HQMAIL101.nvidia.com (172.20.187.10) To
- DRHQMAIL107.nvidia.com (10.27.9.16)
-Content-Type: text/plain; charset="utf-8"; format=flowed
+In-Reply-To: <20191209194305.20828-2-sjpark@amazon.com>
+Content-Type: text/plain; charset=utf-8; format=flowed
 Content-Language: en-US
 Content-Transfer-Encoding: 7bit
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=nvidia.com; s=n1;
-        t=1575957345; bh=hOQHo4yBws9X1nqgVCC1VdrUiF9Z86xIO4U2wGVXRCw=;
-        h=X-PGP-Universal:Subject:From:To:CC:References:X-Nvconfidentiality:
-         Message-ID:Date:User-Agent:MIME-Version:In-Reply-To:
-         X-Originating-IP:X-ClientProxiedBy:Content-Type:Content-Language:
-         Content-Transfer-Encoding;
-        b=Z0uGtjzdMedDuhQsG1jpU7HmbXe0kx1+9sLgOIk8Tsa+qSKrJwruITPp5YqsEqw/n
-         J6r9xabZ4a9OQN/Wl8LVj9LrtdwAy11ChiFmcjZZVTuORyZEi3yR7n2LRqkwn66Ltr
-         eeIwWiN6PGMYv9eL7SAOfeP4KVVco/4prZuZTjVwpd53jjxNLLJqGfcC9sxeGP6ykt
-         D8DJTJbSiZvX3LC8FmFbEGS2I/TRo6uZZSD6HwdT5k7HU7OxF7PBsCrAkF07RmEA1a
-         ZcPVotCE1aYXgj3rJWRvh8EJXUvCr0vK9kwBlCNWSwhBERf1C6gVTs8+AjkAsxO8km
-         d4nN+/tFy5PPg==
 Sender: linux-block-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-On 12/9/19 3:46 PM, John Hubbard wrote:
-> On 12/9/19 2:53 PM, John Hubbard wrote:
-> ...
->> @@ -212,10 +211,9 @@ static void mm_iommu_unpin(struct mm_iommu_table_group_mem_t *mem)
->>   		if (!page)
->>   			continue;
->>   
->> -		if (mem->hpas[i] & MM_IOMMU_TABLE_GROUP_PAGE_DIRTY)
->> -			SetPageDirty(page);
->> +		put_user_pages_dirty_lock(&page, 1,
->> +				mem->hpas[i] & MM_IOMMU_TABLE_GROUP_PAGE_DIRTY);
->>   
->> -		put_page(page);
+On 09.12.19 20:43, SeongJae Park wrote:
+> From: SeongJae Park <sjpark@amazon.de>
 > 
+> Granting pages consumes backend system memory.  In systems configured
+> with insufficient spare memory for those pages, it can cause a memory
+> pressure situation.  However, finding the optimal amount of the spare
+> memory is challenging for large systems having dynamic resource
+> utilization patterns.  Also, such a static configuration might lacks a
+> flexibility.
 > 
-> Correction: this is somehow missing the fixes that resulted from Jan Kara's review (he
-> noted that we can't take a page lock in this context). I must have picked up the
-> wrong version of it, when I rebased for -rc1.
+> To mitigate such problems, this commit adds a memory reclaim callback to
+> 'xenbus_driver'.  Using this facility, 'xenbus' would be able to monitor
+> a memory pressure and request specific domains of specific backend
+> drivers which causing the given pressure to voluntarily release its
+> memory.
 > 
-
-Andrew, given that the series is now in -mm, what's the preferred way for me to fix this?
-Send a v9 version of the whole series? Or something else?
-
-I'm still learning the ropes...
-
-thanks,
--- 
-John Hubbard
-NVIDIA
-
-> Will fix in the next version (including the commit description). Here's what the
-> corrected hunk will look like:
+> That said, this commit simply requests every callback registered driver
+> to release its memory for every domain, rather than issueing the
+> requests to the drivers and domain in charge.  Such things would be a
+> future work.  Also, this commit focuses on memory only.  However, it
+> would be ablt to be extended for general resources.
 > 
-> @@ -215,7 +214,8 @@ static void mm_iommu_unpin(struct mm_iommu_table_group_mem_t *mem)
->                  if (mem->hpas[i] & MM_IOMMU_TABLE_GROUP_PAGE_DIRTY)
->                          SetPageDirty(page);
->   
-> -               put_page(page);
-> +               put_user_page(page);
-> +
->                  mem->hpas[i] = 0;
->          }
+> Signed-off-by: SeongJae Park <sjpark@amazon.de>
+> ---
+>   drivers/xen/xenbus/xenbus_probe_backend.c | 31 +++++++++++++++++++++++
+>   include/xen/xenbus.h                      |  1 +
+>   2 files changed, 32 insertions(+)
+> 
+> diff --git a/drivers/xen/xenbus/xenbus_probe_backend.c b/drivers/xen/xenbus/xenbus_probe_backend.c
+> index b0bed4faf44c..cd5fd1cd8de3 100644
+> --- a/drivers/xen/xenbus/xenbus_probe_backend.c
+> +++ b/drivers/xen/xenbus/xenbus_probe_backend.c
+> @@ -248,6 +248,34 @@ static int backend_probe_and_watch(struct notifier_block *notifier,
+>   	return NOTIFY_DONE;
 >   }
-> 
-> 
-> thanks,
-> 
+>   
+> +static int xenbus_backend_reclaim(struct device *dev, void *data)
+> +{
+> +	struct xenbus_driver *drv;
+> +	if (!dev->driver)
+> +		return -ENOENT;
+> +	drv = to_xenbus_driver(dev->driver);
+> +	if (drv && drv->reclaim)
+> +		drv->reclaim(to_xenbus_device(dev), DOMID_INVALID);
+> +	return 0;
+> +}
+> +
+> +/*
+> + * Returns 0 always because we are using shrinker to only detect memory
+> + * pressure.
+> + */
+> +static unsigned long xenbus_backend_shrink_count(struct shrinker *shrinker,
+> +				struct shrink_control *sc)
+> +{
+> +	bus_for_each_dev(&xenbus_backend.bus, NULL, NULL,
+> +			xenbus_backend_reclaim);
+> +	return 0;
+> +}
+> +
+> +static struct shrinker xenbus_backend_shrinker = {
+> +	.count_objects = xenbus_backend_shrink_count,
+> +	.seeks = DEFAULT_SEEKS,
+> +};
+> +
+>   static int __init xenbus_probe_backend_init(void)
+>   {
+>   	static struct notifier_block xenstore_notifier = {
+> @@ -264,6 +292,9 @@ static int __init xenbus_probe_backend_init(void)
+>   
+>   	register_xenstore_notifier(&xenstore_notifier);
+>   
+> +	if (register_shrinker(&xenbus_backend_shrinker))
+> +		pr_warn("shrinker registration failed\n");
+> +
+>   	return 0;
+>   }
+>   subsys_initcall(xenbus_probe_backend_init);
+> diff --git a/include/xen/xenbus.h b/include/xen/xenbus.h
+> index 869c816d5f8c..52aaf4f78400 100644
+> --- a/include/xen/xenbus.h
+> +++ b/include/xen/xenbus.h
+> @@ -104,6 +104,7 @@ struct xenbus_driver {
+>   	struct device_driver driver;
+>   	int (*read_otherend_details)(struct xenbus_device *dev);
+>   	int (*is_ready)(struct xenbus_device *dev);
+> +	unsigned (*reclaim)(struct xenbus_device *dev, domid_t domid);
+
+Can you please add a comment here regarding semantics of specifying
+DOMID_INVALID as domid?
+
+Block maintainers, would you be fine with me carrying this series
+through the Xen tree?
+
+
+Juergen
