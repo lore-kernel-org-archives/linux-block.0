@@ -2,177 +2,221 @@ Return-Path: <SRS0=EWGC=2A=vger.kernel.org=linux-block-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-5.2 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
-	INCLUDES_PATCH,MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,USER_AGENT_SANE_1
-	autolearn=unavailable autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-8.1 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
+	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,
+	SPF_HELO_NONE,SPF_PASS,USER_AGENT_SANE_1 autolearn=ham autolearn_force=no
+	version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 73209C2D0C4
-	for <linux-block@archiver.kernel.org>; Tue, 10 Dec 2019 10:16:38 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 42368C2D0C6
+	for <linux-block@archiver.kernel.org>; Tue, 10 Dec 2019 10:16:44 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.kernel.org (Postfix) with ESMTP id 524BC2053B
-	for <linux-block@archiver.kernel.org>; Tue, 10 Dec 2019 10:16:38 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id 0B7AE207FF
+	for <linux-block@archiver.kernel.org>; Tue, 10 Dec 2019 10:16:44 +0000 (UTC)
+Authentication-Results: mail.kernel.org;
+	dkim=fail reason="signature verification failed" (1024-bit key) header.d=citrix.com header.i=@citrix.com header.b="FefSaWy9"
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1727412AbfLJKQe (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Tue, 10 Dec 2019 05:16:34 -0500
-Received: from mx0a-001b2d01.pphosted.com ([148.163.156.1]:26362 "EHLO
-        mx0a-001b2d01.pphosted.com" rhost-flags-OK-OK-OK-OK)
-        by vger.kernel.org with ESMTP id S1727406AbfLJKQd (ORCPT
+        id S1727207AbfLJKQn (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Tue, 10 Dec 2019 05:16:43 -0500
+Received: from esa5.hc3370-68.iphmx.com ([216.71.155.168]:46030 "EHLO
+        esa5.hc3370-68.iphmx.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S1727143AbfLJKQn (ORCPT
         <rfc822;linux-block@vger.kernel.org>);
-        Tue, 10 Dec 2019 05:16:33 -0500
-Received: from pps.filterd (m0098404.ppops.net [127.0.0.1])
-        by mx0a-001b2d01.pphosted.com (8.16.0.42/8.16.0.42) with SMTP id xBAA7Gl5131281
-        for <linux-block@vger.kernel.org>; Tue, 10 Dec 2019 05:16:32 -0500
-Received: from e06smtp04.uk.ibm.com (e06smtp04.uk.ibm.com [195.75.94.100])
-        by mx0a-001b2d01.pphosted.com with ESMTP id 2wt2kswqbh-1
-        (version=TLSv1.2 cipher=AES256-GCM-SHA384 bits=256 verify=NOT)
-        for <linux-block@vger.kernel.org>; Tue, 10 Dec 2019 05:16:32 -0500
-Received: from localhost
-        by e06smtp04.uk.ibm.com with IBM ESMTP SMTP Gateway: Authorized Use Only! Violators will be prosecuted
-        for <linux-block@vger.kernel.org> from <srikar@linux.vnet.ibm.com>;
-        Tue, 10 Dec 2019 10:16:30 -0000
-Received: from b06cxnps4074.portsmouth.uk.ibm.com (9.149.109.196)
-        by e06smtp04.uk.ibm.com (192.168.101.134) with IBM ESMTP SMTP Gateway: Authorized Use Only! Violators will be prosecuted;
-        (version=TLSv1/SSLv3 cipher=AES256-GCM-SHA384 bits=256/256)
-        Tue, 10 Dec 2019 10:16:26 -0000
-Received: from d06av23.portsmouth.uk.ibm.com (d06av23.portsmouth.uk.ibm.com [9.149.105.59])
-        by b06cxnps4074.portsmouth.uk.ibm.com (8.14.9/8.14.9/NCO v10.0) with ESMTP id xBAAGPxc36045042
-        (version=TLSv1/SSLv3 cipher=DHE-RSA-AES256-GCM-SHA384 bits=256 verify=OK);
-        Tue, 10 Dec 2019 10:16:25 GMT
-Received: from d06av23.portsmouth.uk.ibm.com (unknown [127.0.0.1])
-        by IMSVA (Postfix) with ESMTP id 2C52DA4051;
-        Tue, 10 Dec 2019 10:16:25 +0000 (GMT)
-Received: from d06av23.portsmouth.uk.ibm.com (unknown [127.0.0.1])
-        by IMSVA (Postfix) with ESMTP id 7307BA404D;
-        Tue, 10 Dec 2019 10:16:22 +0000 (GMT)
-Received: from linux.vnet.ibm.com (unknown [9.126.150.29])
-        by d06av23.portsmouth.uk.ibm.com (Postfix) with SMTP;
-        Tue, 10 Dec 2019 10:16:22 +0000 (GMT)
-Date:   Tue, 10 Dec 2019 15:46:21 +0530
-From:   Srikar Dronamraju <srikar@linux.vnet.ibm.com>
-To:     Peter Zijlstra <peterz@infradead.org>
-Cc:     Dave Chinner <david@fromorbit.com>, Phil Auld <pauld@redhat.com>,
-        Ming Lei <ming.lei@redhat.com>, linux-block@vger.kernel.org,
-        linux-fsdevel@vger.kernel.org, linux-xfs@vger.kernel.org,
-        linux-kernel@vger.kernel.org, Jeff Moyer <jmoyer@redhat.com>,
-        Dave Chinner <dchinner@redhat.com>,
-        Eric Sandeen <sandeen@redhat.com>,
-        Christoph Hellwig <hch@lst.de>, Jens Axboe <axboe@kernel.dk>,
-        Ingo Molnar <mingo@redhat.com>, Tejun Heo <tj@kernel.org>,
-        Vincent Guittot <vincent.guittot@linaro.org>
-Subject: Re: [PATCH v2] sched/core: Preempt current task in favour of bound
- kthread
-Reply-To: Srikar Dronamraju <srikar@linux.vnet.ibm.com>
-References: <20191115234005.GO4614@dread.disaster.area>
- <20191118092121.GV4131@hirez.programming.kicks-ass.net>
- <20191118204054.GV4614@dread.disaster.area>
- <20191120191636.GI4097@hirez.programming.kicks-ass.net>
- <20191120220313.GC18056@pauld.bos.csb>
- <20191121132937.GW4114@hirez.programming.kicks-ass.net>
- <20191209165122.GA27229@linux.vnet.ibm.com>
- <20191209231743.GA19256@dread.disaster.area>
- <20191210054330.GF27253@linux.vnet.ibm.com>
- <20191210092601.GK2844@hirez.programming.kicks-ass.net>
+        Tue, 10 Dec 2019 05:16:43 -0500
+DKIM-Signature: v=1; a=rsa-sha256; c=simple/simple;
+  d=citrix.com; s=securemail; t=1575973002;
+  h=date:from:to:cc:subject:message-id:references:
+   mime-version:in-reply-to;
+  bh=Lvaoe6PF5ne+O8eFrYv6xylYoM5pzWb0Os8/rpg2yvA=;
+  b=FefSaWy9S43QW/Q6YVFj1CY2n8WuAXrT7SwkCGhBFeId/di900fuyeHt
+   zK7QYAcyWFNNN8YswhSOx3SToS9YOnLXODM7PZTWeEoBwZSTgDGR47kpc
+   lQbtdh7mBPuZfZmysczA2aONY1Bhs89BWomvkXE40nE+dJj5TWWlDQoph
+   Y=;
+Authentication-Results: esa5.hc3370-68.iphmx.com; dkim=none (message not signed) header.i=none; spf=None smtp.pra=roger.pau@citrix.com; spf=Pass smtp.mailfrom=roger.pau@citrix.com; spf=None smtp.helo=postmaster@mail.citrix.com
+Received-SPF: None (esa5.hc3370-68.iphmx.com: no sender
+  authenticity information available from domain of
+  roger.pau@citrix.com) identity=pra; client-ip=162.221.158.21;
+  receiver=esa5.hc3370-68.iphmx.com;
+  envelope-from="roger.pau@citrix.com";
+  x-sender="roger.pau@citrix.com";
+  x-conformance=sidf_compatible
+Received-SPF: Pass (esa5.hc3370-68.iphmx.com: domain of
+  roger.pau@citrix.com designates 162.221.158.21 as permitted
+  sender) identity=mailfrom; client-ip=162.221.158.21;
+  receiver=esa5.hc3370-68.iphmx.com;
+  envelope-from="roger.pau@citrix.com";
+  x-sender="roger.pau@citrix.com";
+  x-conformance=sidf_compatible; x-record-type="v=spf1";
+  x-record-text="v=spf1 ip4:209.167.231.154 ip4:178.63.86.133
+  ip4:195.66.111.40/30 ip4:85.115.9.32/28 ip4:199.102.83.4
+  ip4:192.28.146.160 ip4:192.28.146.107 ip4:216.52.6.88
+  ip4:216.52.6.188 ip4:162.221.158.21 ip4:162.221.156.83
+  ip4:168.245.78.127 ~all"
+Received-SPF: None (esa5.hc3370-68.iphmx.com: no sender
+  authenticity information available from domain of
+  postmaster@mail.citrix.com) identity=helo;
+  client-ip=162.221.158.21; receiver=esa5.hc3370-68.iphmx.com;
+  envelope-from="roger.pau@citrix.com";
+  x-sender="postmaster@mail.citrix.com";
+  x-conformance=sidf_compatible
+IronPort-SDR: 9IDqAWxfl6GB4MpZN7qCOk4M8hOVCyJJZkZFstv0Y6xsVz0PCZ38GaHuQOX5FR85MixU1ffCGh
+ /5SCEXREeeZ1a+dcW9UMQlQ2yA9Xzlpn9OCktFGlHD8z3RhdrKQDW+92zEybK098kEsSgz6pjx
+ qxHnI3A2O+cQ80dmJO9zL2Vu5ILc06RzKVhahdm0WUSb4OFAL0l+AN97cR9atUpsQNWwF2+N7p
+ fSbSkb8noLO9/CSxP0FQYUtd54zwI+cuWxdgrbok8S3tAe5Wf/EsGhYevCIugfnc13VhL3sY1N
+ feM=
+X-SBRS: 2.7
+X-MesageID: 9802387
+X-Ironport-Server: esa5.hc3370-68.iphmx.com
+X-Remote-IP: 162.221.158.21
+X-Policy: $RELAYED
+X-IronPort-AV: E=Sophos;i="5.69,299,1571716800"; 
+   d="scan'208";a="9802387"
+Date:   Tue, 10 Dec 2019 11:16:35 +0100
+From:   Roger Pau =?iso-8859-1?Q?Monn=E9?= <roger.pau@citrix.com>
+To:     SeongJae Park <sj38.park@gmail.com>
+CC:     <sjpark@amazon.com>, <axboe@kernel.dk>, <konrad.wilk@oracle.com>,
+        <linux-block@vger.kernel.org>, <linux-kernel@vger.kernel.org>,
+        <pdurrant@amazon.com>, <xen-devel@lists.xenproject.org>,
+        SeongJae Park <sjpark@amazon.de>
+Subject: Re: [PATCH v5 1/2] xenbus/backend: Add memory pressure handler
+ callback
+Message-ID: <20191210101635.GD980@Air-de-Roger>
+References: <20191210080628.5264-1-sjpark@amazon.de>
+ <20191210080628.5264-2-sjpark@amazon.de>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=iso-8859-1
+Content-Type: text/plain; charset="us-ascii"
 Content-Disposition: inline
-In-Reply-To: <20191210092601.GK2844@hirez.programming.kicks-ass.net>
-User-Agent: Mutt/1.10.1 (2018-07-13)
-X-TM-AS-GCONF: 00
-x-cbid: 19121010-0016-0000-0000-000002D36ED9
-X-IBM-AV-DETECTION: SAVI=unused REMOTE=unused XFE=unused
-x-cbparentid: 19121010-0017-0000-0000-000033358525
-Message-Id: <20191210101621.GB9139@linux.vnet.ibm.com>
-X-Proofpoint-Virus-Version: vendor=fsecure engine=2.50.10434:6.0.95,18.0.572
- definitions=2019-12-10_01:2019-12-10,2019-12-10 signatures=0
-X-Proofpoint-Spam-Details: rule=outbound_notspam policy=outbound score=0 suspectscore=0 spamscore=0
- mlxscore=0 adultscore=0 mlxlogscore=999 priorityscore=1501 malwarescore=0
- lowpriorityscore=0 clxscore=1015 phishscore=0 bulkscore=0 impostorscore=0
- classifier=spam adjust=0 reason=mlx scancount=1 engine=8.12.0-1910280000
- definitions=main-1912100090
+In-Reply-To: <20191210080628.5264-2-sjpark@amazon.de>
+User-Agent: Mutt/1.12.2 (2019-09-21)
+X-ClientProxiedBy: AMSPEX02CAS01.citrite.net (10.69.22.112) To
+ AMSPEX02CL03.citrite.net (10.69.22.127)
 Sender: linux-block-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-* Peter Zijlstra <peterz@infradead.org> [2019-12-10 10:26:01]:
+On Tue, Dec 10, 2019 at 08:06:27AM +0000, SeongJae Park wrote:
+> Granting pages consumes backend system memory.  In systems configured
+> with insufficient spare memory for those pages, it can cause a memory
+> pressure situation.  However, finding the optimal amount of the spare
+> memory is challenging for large systems having dynamic resource
+> utilization patterns.  Also, such a static configuration might lack a
 
-> On Tue, Dec 10, 2019 at 11:13:30AM +0530, Srikar Dronamraju wrote:
-> > diff --git a/kernel/sched/core.c b/kernel/sched/core.c
-> > index 44123b4d14e8..82126cbf62cd 100644
-> > --- a/kernel/sched/core.c
-> > +++ b/kernel/sched/core.c
-> > @@ -2664,7 +2664,12 @@ try_to_wake_up(struct task_struct *p, unsigned int state, int wake_flags)
-> >   */
-> >  int wake_up_process(struct task_struct *p)
-> >  {
-> > -	return try_to_wake_up(p, TASK_NORMAL, 0);
-> > +	int wake_flags = 0;
-> > +
-> > +	if (is_per_cpu_kthread(p))
-> > +		wake_flags = WF_KTHREAD;
-> > +
-> > +	return try_to_wake_up(p, TASK_NORMAL, wake_flags);
-> >  }
-> >  EXPORT_SYMBOL(wake_up_process);
+s/lack a/lack/
+
+> flexibility.
 > 
-> Why wake_up_process() and not try_to_wake_up() ? This way
-> wake_up_state(.state = TASK_NORMAL() is no longer the same as
-> wake_up_process(), and that's weird!
+> To mitigate such problems, this commit adds a memory reclaim callback to
+> 'xenbus_driver'.  Using this facility, 'xenbus' would be able to monitor
+> a memory pressure and request specific devices of specific backend
+
+s/monitor a/monitor/
+
+> drivers which causing the given pressure to voluntarily release its
+
+...which are causing...
+
+> memory.
 > 
+> That said, this commit simply requests every callback registered driver
+> to release its memory for every domain, rather than issueing the
 
-Thanks Vincent and Peter for your review comments.
+s/issueing/issuing/
 
-I was trying to be more conservative. But I don't see any reason why we
-can't do the same at try_to_wake_up. And I mostly thought the kthreads were
-using wake_up_process.
+> requests to the drivers and the domain in charge.  Such things will be
 
-So I shall move the check to try_to_wake_up then.
+I'm afraid I don't understand the "domain in charge" part of this
+sentence.
 
-> > diff --git a/kernel/sched/fair.c b/kernel/sched/fair.c
-> > index 69a81a5709ff..36486f71e59f 100644
-> > --- a/kernel/sched/fair.c
-> > +++ b/kernel/sched/fair.c
-> > @@ -6660,6 +6660,27 @@ static void set_skip_buddy(struct sched_entity *se)
-> >  		cfs_rq_of(se)->skip = se;
-> >  }
-> >  
-> > +static int kthread_wakeup_preempt(struct rq *rq, struct task_struct *p, int wake_flags)
-> > +{
-> > +	struct task_struct *curr = rq->curr;
-> > +	struct cfs_rq *cfs_rq = task_cfs_rq(curr);
-> > +
-> > +	if (!(wake_flags & WF_KTHREAD))
-> > +		return 0;
-> > +
-> > +	if (p->nr_cpus_allowed != 1 || curr->nr_cpus_allowed == 1)
-> > +		return 0;
-> 
-> Per the above, WF_KTHREAD already implies p->nr_cpus_allowed == 1.
+> done in a futur.  Also, this commit focuses on memory only.  However, it
 
-Yes, this is redundant.
+... done in a future change. Also I think the period after only should
+be removed in order to tie both sentences together.
+
+> would be ablt to be extended for general resources.
+
+s/ablt/able/
 
 > 
-> > +	if (cfs_rq->nr_running > 2)
-> > +		return 0;
-> > +
-> > +	/*
-> > +	 * Don't preempt, if the waking kthread is more CPU intensive than
-> > +	 * the current thread.
-> > +	 */
-> > +	return p->nvcsw * curr->nivcsw >= p->nivcsw * curr->nvcsw;
+> Signed-off-by: SeongJae Park <sjpark@amazon.de>
+> ---
+>  drivers/xen/xenbus/xenbus_probe_backend.c | 31 +++++++++++++++++++++++
+>  include/xen/xenbus.h                      |  1 +
+>  2 files changed, 32 insertions(+)
 > 
-> Both these conditions seem somewhat arbitrary. The number of context
-> switch does not correspond to CPU usage _at_all_.
-> 
-> vtime OTOH does reflect exactly that, if it runs a lot, it will be ahead
-> in the tree.
-> 
+> diff --git a/drivers/xen/xenbus/xenbus_probe_backend.c b/drivers/xen/xenbus/xenbus_probe_backend.c
+> index b0bed4faf44c..5a5ba29e39df 100644
+> --- a/drivers/xen/xenbus/xenbus_probe_backend.c
+> +++ b/drivers/xen/xenbus/xenbus_probe_backend.c
+> @@ -248,6 +248,34 @@ static int backend_probe_and_watch(struct notifier_block *notifier,
+>  	return NOTIFY_DONE;
+>  }
+>  
+> +static int xenbus_backend_reclaim(struct device *dev, void *data)
+> +{
+> +	struct xenbus_driver *drv;
 
-Right, my rational was to not allow a runaway kthread to preempt and take
-control.
+Newline and const.
 
+> +	if (!dev->driver)
+> +		return -ENOENT;
+> +	drv = to_xenbus_driver(dev->driver);
+> +	if (drv && drv->reclaim)
+> +		drv->reclaim(to_xenbus_device(dev));
 
--- 
-Thanks and Regards
-Srikar Dronamraju
+You seem to completely ignore the return of the reclaim hook...
 
+> +	return 0;
+> +}
+> +
+> +/*
+> + * Returns 0 always because we are using shrinker to only detect memory
+> + * pressure.
+> + */
+> +static unsigned long xenbus_backend_shrink_count(struct shrinker *shrinker,
+> +				struct shrink_control *sc)
+> +{
+> +	bus_for_each_dev(&xenbus_backend.bus, NULL, NULL,
+> +			xenbus_backend_reclaim);
+> +	return 0;
+> +}
+> +
+> +static struct shrinker xenbus_backend_shrinker = {
+> +	.count_objects = xenbus_backend_shrink_count,
+> +	.seeks = DEFAULT_SEEKS,
+> +};
+> +
+>  static int __init xenbus_probe_backend_init(void)
+>  {
+>  	static struct notifier_block xenstore_notifier = {
+> @@ -264,6 +292,9 @@ static int __init xenbus_probe_backend_init(void)
+>  
+>  	register_xenstore_notifier(&xenstore_notifier);
+>  
+> +	if (register_shrinker(&xenbus_backend_shrinker))
+> +		pr_warn("shrinker registration failed\n");
+> +
+>  	return 0;
+>  }
+>  subsys_initcall(xenbus_probe_backend_init);
+> diff --git a/include/xen/xenbus.h b/include/xen/xenbus.h
+> index 869c816d5f8c..cdb075e4182f 100644
+> --- a/include/xen/xenbus.h
+> +++ b/include/xen/xenbus.h
+> @@ -104,6 +104,7 @@ struct xenbus_driver {
+>  	struct device_driver driver;
+>  	int (*read_otherend_details)(struct xenbus_device *dev);
+>  	int (*is_ready)(struct xenbus_device *dev);
+> +	unsigned (*reclaim)(struct xenbus_device *dev);
+
+... hence I wonder why it's returning an unsigned when it's just
+ignored.
+
+IMO it should return an int to signal errors, and the return should be
+ignored.
+
+Also, I think it would preferable for this function to take an extra
+parameter to describe the resource the driver should attempt to free
+(ie: memory or interrupts for example). I'm however not able to find
+any existing Linux type to describe such resources.
+
+Thanks, Roger.
