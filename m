@@ -2,91 +2,108 @@ Return-Path: <SRS0=EWGC=2A=vger.kernel.org=linux-block-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-2.0 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
-	HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,
-	USER_AGENT_SANE_1 autolearn=no autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-6.8 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
+	INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS
+	autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 1AD62C43603
-	for <linux-block@archiver.kernel.org>; Tue, 10 Dec 2019 16:55:41 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 2127DC43603
+	for <linux-block@archiver.kernel.org>; Tue, 10 Dec 2019 16:57:06 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.kernel.org (Postfix) with ESMTP id D75082073D
-	for <linux-block@archiver.kernel.org>; Tue, 10 Dec 2019 16:55:40 +0000 (UTC)
-Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (2048-bit key) header.d=infradead.org header.i=@infradead.org header.b="WlL+KE+x"
+	by mail.kernel.org (Postfix) with ESMTP id EE8A720828
+	for <linux-block@archiver.kernel.org>; Tue, 10 Dec 2019 16:57:05 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1727597AbfLJQzk (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Tue, 10 Dec 2019 11:55:40 -0500
-Received: from bombadil.infradead.org ([198.137.202.133]:45036 "EHLO
-        bombadil.infradead.org" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1727577AbfLJQzk (ORCPT
-        <rfc822;linux-block@vger.kernel.org>);
-        Tue, 10 Dec 2019 11:55:40 -0500
-DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed;
-        d=infradead.org; s=bombadil.20170209; h=In-Reply-To:Content-Type:MIME-Version
-        :References:Message-ID:Subject:Cc:To:From:Date:Sender:Reply-To:
-        Content-Transfer-Encoding:Content-ID:Content-Description:Resent-Date:
-        Resent-From:Resent-Sender:Resent-To:Resent-Cc:Resent-Message-ID:List-Id:
-        List-Help:List-Unsubscribe:List-Subscribe:List-Post:List-Owner:List-Archive;
-         bh=5fcYU56SUZZVQF3+y6QNQ2Ux8rrw+6trvD32tU3jDkw=; b=WlL+KE+xCd/chNjVxM8aQrTdv
-        Uv3Ylrhbg9l5AFyw3pgsyyBhcIXpX4/A+2YbYa6gdbqC8wyv5I/Shy3c4fy/wJG9jP561I9eHSdma
-        RcdAhCrZe+MSwyVFo9bI9B5YSF54yAIp1tnvQag8LzaAYxXLP8DtL4iX2GQGDnUrk4pDj+WtVzulv
-        TcbpIn9MBchiiXD9VGOsaL1UN5IVbzsXV2Xsk0Gj3KwMJZEBks0M0XRpDH7W+kUulfcY9lqJg0S/n
-        71wO+uaqOkTO9iMPdrxVcVq0Yi0o1gmG6gYTv42Gl2FcrU8BIRJ+gXY2sS4fHZeFSRYXxDCdoAbqt
-        e+qDT98Og==;
-Received: from willy by bombadil.infradead.org with local (Exim 4.92.3 #3 (Red Hat Linux))
-        id 1ieinM-0002gn-OT; Tue, 10 Dec 2019 16:55:32 +0000
-Date:   Tue, 10 Dec 2019 08:55:32 -0800
-From:   Matthew Wilcox <willy@infradead.org>
-To:     Jens Axboe <axboe@kernel.dk>
-Cc:     linux-mm@kvack.org, linux-fsdevel@vger.kernel.org,
-        linux-block@vger.kernel.org
-Subject: Re: [PATCH 3/5] mm: make buffered writes work with RWF_UNCACHED
-Message-ID: <20191210165532.GJ32169@bombadil.infradead.org>
-References: <20191210162454.8608-1-axboe@kernel.dk>
- <20191210162454.8608-4-axboe@kernel.dk>
+        id S1727597AbfLJQ5F (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Tue, 10 Dec 2019 11:57:05 -0500
+Received: from relay.sw.ru ([185.231.240.75]:36462 "EHLO relay.sw.ru"
+        rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
+        id S1727545AbfLJQ5F (ORCPT <rfc822;linux-block@vger.kernel.org>);
+        Tue, 10 Dec 2019 11:57:05 -0500
+Received: from dhcp-172-16-24-104.sw.ru ([172.16.24.104] helo=localhost.localdomain)
+        by relay.sw.ru with esmtp (Exim 4.92.3)
+        (envelope-from <ktkhai@virtuozzo.com>)
+        id 1ieio7-0006yx-JX; Tue, 10 Dec 2019 19:56:19 +0300
+Subject: [PATCH RFC 3/3] ext4: Notify block device about fallocate(0)-assigned
+ blocks
+From:   Kirill Tkhai <ktkhai@virtuozzo.com>
+To:     linux-block@vger.kernel.org, linux-kernel@vger.kernel.org,
+        linux-ext4@vger.kernel.org
+Cc:     axboe@kernel.dk, tytso@mit.edu, adilger.kernel@dilger.ca,
+        ming.lei@redhat.com, osandov@fb.com, jthumshirn@suse.de,
+        minwoo.im.dev@gmail.com, damien.lemoal@wdc.com,
+        ktkhai@virtuozzo.com, andrea.parri@amarulasolutions.com,
+        hare@suse.com, tj@kernel.org, ajay.joshi@wdc.com, sagi@grimberg.me,
+        dsterba@suse.com, chaitanya.kulkarni@wdc.com, bvanassche@acm.org,
+        dhowells@redhat.com, asml.silence@gmail.com
+Date:   Tue, 10 Dec 2019 19:56:19 +0300
+Message-ID: <157599697948.12112.3846364542350011691.stgit@localhost.localdomain>
+In-Reply-To: <157599668662.12112.10184894900037871860.stgit@localhost.localdomain>
+References: <157599668662.12112.10184894900037871860.stgit@localhost.localdomain>
+User-Agent: StGit/0.19
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <20191210162454.8608-4-axboe@kernel.dk>
-User-Agent: Mutt/1.12.1 (2019-06-15)
+Content-Type: text/plain; charset="utf-8"
+Content-Transfer-Encoding: 7bit
 Sender: linux-block-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-On Tue, Dec 10, 2019 at 09:24:52AM -0700, Jens Axboe wrote:
-> +/*
-> + * Start writeback on the pages in pgs[], and then try and remove those pages
-> + * from the page cached. Used with RWF_UNCACHED.
-> + */
-> +void write_drop_cached_pages(struct page **pgs, struct address_space *mapping,
-> +			     unsigned *nr)
+Call sb_issue_assign_range() after extent range was allocated
+on user request. Hopeful, this helps block device to maintain
+its internals in the best way, if this is appliable.
 
-It would seem more natural to use a pagevec instead of pgs/nr.
+Signed-off-by: Kirill Tkhai <ktkhai@virtuozzo.com>
+---
+ fs/ext4/ext4.h    |    1 +
+ fs/ext4/extents.c |   11 +++++++++--
+ 2 files changed, 10 insertions(+), 2 deletions(-)
 
-> +{
-> +	loff_t start, end;
-> +	int i;
-> +
-> +	end = 0;
-> +	start = LLONG_MAX;
-> +	for (i = 0; i < *nr; i++) {
-> +		struct page *page = pgs[i];
-> +		loff_t off;
-> +
-> +		off = (loff_t) page_to_index(page) << PAGE_SHIFT;
+diff --git a/fs/ext4/ext4.h b/fs/ext4/ext4.h
+index f8578caba40d..fe2263c00c0e 100644
+--- a/fs/ext4/ext4.h
++++ b/fs/ext4/ext4.h
+@@ -622,6 +622,7 @@ enum {
+ 	 * allows jbd2 to avoid submitting data before commit. */
+ #define EXT4_GET_BLOCKS_IO_SUBMIT		0x0400
+ 
++#define EXT4_GET_BLOCKS_SUBMIT_ALLOC		0x0800
+ /*
+  * The bit position of these flags must not overlap with any of the
+  * EXT4_GET_BLOCKS_*.  They are used by ext4_find_extent(),
+diff --git a/fs/ext4/extents.c b/fs/ext4/extents.c
+index 0e8708b77da6..5f4fc660cbb1 100644
+--- a/fs/ext4/extents.c
++++ b/fs/ext4/extents.c
+@@ -4490,6 +4490,13 @@ int ext4_ext_map_blocks(handle_t *handle, struct inode *inode,
+ 		ar.len = allocated;
+ 
+ got_allocated_blocks:
++	if ((flags & EXT4_GET_BLOCKS_SUBMIT_ALLOC) && sbi->fallocate) {
++		err = sb_issue_assign_range(inode->i_sb, newblock,
++			EXT4_C2B(sbi, allocated_clusters), GFP_NOFS);
++		if (err)
++			goto free_on_err;
++	}
++
+ 	/* try to insert new extent into found leaf and return */
+ 	ext4_ext_store_pblock(&newex, newblock + offset);
+ 	newex.ee_len = cpu_to_le16(ar.len);
+@@ -4506,7 +4513,7 @@ int ext4_ext_map_blocks(handle_t *handle, struct inode *inode,
+ 	if (!err)
+ 		err = ext4_ext_insert_extent(handle, inode, &path,
+ 					     &newex, flags);
+-
++free_on_err:
+ 	if (err && free_on_err) {
+ 		int fb_flags = flags & EXT4_GET_BLOCKS_DELALLOC_RESERVE ?
+ 			EXT4_FREE_BLOCKS_NO_QUOT_UPDATE : 0;
+@@ -4926,7 +4933,7 @@ long ext4_fallocate(struct file *file, int mode, loff_t offset, loff_t len)
+ 	lblk = offset >> blkbits;
+ 
+ 	max_blocks = EXT4_MAX_BLOCKS(len, offset, blkbits);
+-	flags = EXT4_GET_BLOCKS_CREATE_UNWRIT_EXT;
++	flags = EXT4_GET_BLOCKS_CREATE_UNWRIT_EXT | EXT4_GET_BLOCKS_SUBMIT_ALLOC;
+ 	if (mode & FALLOC_FL_KEEP_SIZE)
+ 		flags |= EXT4_GET_BLOCKS_KEEP_SIZE;
+ 
 
-Isn't that page_offset()?
-
-> +	__filemap_fdatawrite_range(mapping, start, end, WB_SYNC_NONE);
-> +
-> +	for (i = 0; i < *nr; i++) {
-> +		struct page *page = pgs[i];
-> +
-> +		lock_page(page);
-> +		if (page->mapping == mapping) {
-
-So you're protecting against the page being freed and reallocated to a
-different file, but not against the page being freed and reallocated to
-a location in the same file which is outside (start, end)?
 
