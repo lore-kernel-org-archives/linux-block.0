@@ -2,108 +2,114 @@ Return-Path: <SRS0=EWGC=2A=vger.kernel.org=linux-block-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-0.8 required=3.0 tests=DKIMWL_WL_HIGH,DKIM_SIGNED,
-	DKIM_VALID,HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SPF_HELO_NONE,
-	SPF_PASS autolearn=no autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-8.4 required=3.0 tests=DKIMWL_WL_HIGH,DKIM_SIGNED,
+	DKIM_VALID,DKIM_VALID_AU,HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,
+	MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,USER_AGENT_SANE_1
+	autolearn=unavailable autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 02393C04E30
-	for <linux-block@archiver.kernel.org>; Tue, 10 Dec 2019 00:56:40 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 4F705C04E30
+	for <linux-block@archiver.kernel.org>; Tue, 10 Dec 2019 02:12:32 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.kernel.org (Postfix) with ESMTP id CEF8A2080D
-	for <linux-block@archiver.kernel.org>; Tue, 10 Dec 2019 00:56:39 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=default; t=1575939399;
-	bh=BbLBjR8wcrsANoTlWrEqQPyK+DvAKxv254F1InccAcs=;
-	h=Date:From:To:Cc:Subject:In-Reply-To:References:List-ID:From;
-	b=u45h8vjM9fg7fX84tsmAmFn9/lCPJCaDsulTtbGJAKvGvJHn6CA78zt6Zfgdtms0L
-	 mAOkpuhfJtSjXxMJyLivSbztV0wnZBKVQn9xgEEGuu7UZmypRI7A4YNVZp0y6Y2X1v
-	 RGnMQ2NN6TyLlGFbddA3d06Rgk8NCMeMZ9wWL0ZI=
+	by mail.kernel.org (Postfix) with ESMTP id 25D4620409
+	for <linux-block@archiver.kernel.org>; Tue, 10 Dec 2019 02:12:32 +0000 (UTC)
+Authentication-Results: mail.kernel.org;
+	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="OkWDO0W2"
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1727059AbfLJA4b (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Mon, 9 Dec 2019 19:56:31 -0500
-Received: from mail.kernel.org ([198.145.29.99]:43384 "EHLO mail.kernel.org"
-        rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-        id S1726743AbfLJA4a (ORCPT <rfc822;linux-block@vger.kernel.org>);
-        Mon, 9 Dec 2019 19:56:30 -0500
-Received: from localhost.localdomain (c-73-231-172-41.hsd1.ca.comcast.net [73.231.172.41])
-        (using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+        id S1726637AbfLJCM2 (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Mon, 9 Dec 2019 21:12:28 -0500
+Received: from us-smtp-delivery-1.mimecast.com ([205.139.110.120]:45111 "EHLO
+        us-smtp-1.mimecast.com" rhost-flags-OK-OK-OK-FAIL) by vger.kernel.org
+        with ESMTP id S1726598AbfLJCM2 (ORCPT
+        <rfc822;linux-block@vger.kernel.org>); Mon, 9 Dec 2019 21:12:28 -0500
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+        s=mimecast20190719; t=1575943946;
+        h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+         to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+         content-transfer-encoding:content-transfer-encoding:
+         in-reply-to:in-reply-to:references:references;
+        bh=AqNXb1DdFGH0UEVoh/67mONToQvKGHBSfZkAshMis24=;
+        b=OkWDO0W2Y/Td11zNJQipGS2QyxGSwwGIyTvxtYMLqp5NKx9EiFQ8oQ6iL9xQ3tr7r6XlvD
+        mJzHGWfIeEYv2HzYab/EJZUOQV/+PjNNxU7n0KcU5LMATyAIBu6mucWf8btKW16LP17+In
+        MMG0l9+nEB9Tx8qsQLOwkcfK3N+0izc=
+Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
+ [209.132.183.4]) (Using TLS) by relay.mimecast.com with ESMTP id
+ us-mta-232-YLXilXRBOQ-dHbPintc99A-1; Mon, 09 Dec 2019 21:12:23 -0500
+Received: from smtp.corp.redhat.com (int-mx07.intmail.prod.int.phx2.redhat.com [10.5.11.22])
+        (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
         (No client certificate requested)
-        by mail.kernel.org (Postfix) with ESMTPSA id CE73720637;
-        Tue, 10 Dec 2019 00:56:27 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-        s=default; t=1575939389;
-        bh=BbLBjR8wcrsANoTlWrEqQPyK+DvAKxv254F1InccAcs=;
-        h=Date:From:To:Cc:Subject:In-Reply-To:References:From;
-        b=uQ6utAA370KB9xY5+qeGGsoo1HH/Hnt/LDZgeHbTSoRMRHkI8VQJNf4H7ZKlSmj42
-         WZSNKaK/IM6JgWSl9QfalBJQuyJfmeZpwpLLwj0NmbsOrQL4FJSoG0TjuPsUzwfCOi
-         N9YkLgu4ONG2hyyuwLyRSMczlQwBZdl/iQWpJ6W0=
-Date:   Mon, 9 Dec 2019 16:56:27 -0800
-From:   Andrew Morton <akpm@linux-foundation.org>
-To:     John Hubbard <jhubbard@nvidia.com>
-Cc:     Al Viro <viro@zeniv.linux.org.uk>,
-        Alex Williamson <alex.williamson@redhat.com>,
-        Benjamin Herrenschmidt <benh@kernel.crashing.org>,
-        =?ISO-8859-1?Q?Bj=F6rn_T=F6pel?= <bjorn.topel@intel.com>,
-        Christoph Hellwig <hch@infradead.org>,
-        Dan Williams <dan.j.williams@intel.com>,
-        Daniel Vetter <daniel@ffwll.ch>,
-        Dave Chinner <david@fromorbit.com>,
-        David Airlie <airlied@linux.ie>,
-        "David S . Miller" <davem@davemloft.net>,
-        Ira Weiny <ira.weiny@intel.com>, Jan Kara <jack@suse.cz>,
-        Jason Gunthorpe <jgg@ziepe.ca>, Jens Axboe <axboe@kernel.dk>,
-        Jonathan Corbet <corbet@lwn.net>,
-        =?ISO-8859-1?Q?J=E9r?= =?ISO-8859-1?Q?=F4me?= Glisse 
-        <jglisse@redhat.com>, Magnus Karlsson <magnus.karlsson@intel.com>,
-        "Mauro Carvalho Chehab" <mchehab@kernel.org>,
-        Michael Ellerman <mpe@ellerman.id.au>,
-        Michal Hocko <mhocko@suse.com>,
-        Mike Kravetz <mike.kravetz@oracle.com>,
-        "Paul Mackerras" <paulus@samba.org>, Shuah Khan <shuah@kernel.org>,
-        Vlastimil Babka <vbabka@suse.cz>, <bpf@vger.kernel.org>,
-        <dri-devel@lists.freedesktop.org>, <kvm@vger.kernel.org>,
-        <linux-block@vger.kernel.org>, <linux-doc@vger.kernel.org>,
-        <linux-fsdevel@vger.kernel.org>, <linux-kselftest@vger.kernel.org>,
-        <linux-media@vger.kernel.org>, <linux-rdma@vger.kernel.org>,
-        <linuxppc-dev@lists.ozlabs.org>, <netdev@vger.kernel.org>,
-        <linux-mm@kvack.org>, LKML <linux-kernel@vger.kernel.org>,
-        "Christoph Hellwig" <hch@lst.de>,
-        Hans Verkuil <hverkuil-cisco@xs4all.nl>,
-        <stable@vger.kernel.org>
-Subject: Re: [PATCH v8 17/26] media/v4l2-core: set pages dirty upon
- releasing DMA buffers
-Message-Id: <20191209165627.bf657cb8fdf660e8f91e966c@linux-foundation.org>
-In-Reply-To: <20191209225344.99740-18-jhubbard@nvidia.com>
-References: <20191209225344.99740-1-jhubbard@nvidia.com>
-        <20191209225344.99740-18-jhubbard@nvidia.com>
-X-Mailer: Sylpheed 3.5.1 (GTK+ 2.24.31; x86_64-pc-linux-gnu)
-Mime-Version: 1.0
-Content-Type: text/plain; charset=US-ASCII
-Content-Transfer-Encoding: 7bit
+        by mimecast-mx01.redhat.com (Postfix) with ESMTPS id E60FE801E53;
+        Tue, 10 Dec 2019 02:12:21 +0000 (UTC)
+Received: from ming.t460p (ovpn-8-25.pek2.redhat.com [10.72.8.25])
+        by smtp.corp.redhat.com (Postfix) with ESMTPS id 522541001925;
+        Tue, 10 Dec 2019 02:12:14 +0000 (UTC)
+Date:   Tue, 10 Dec 2019 10:12:10 +0800
+From:   Ming Lei <ming.lei@redhat.com>
+To:     Andreas Gruenbacher <agruenba@redhat.com>
+Cc:     Jens Axboe <axboe@kernel.dk>,
+        Linus Torvalds <torvalds@linux-foundation.org>,
+        Junichi Nomura <j-nomura@ce.jp.nec.com>,
+        Christoph Hellwig <hch@lst.de>, Hannes Reinecke <hare@suse.de>,
+        linux-block@vger.kernel.org, linux-kernel@vger.kernel.org,
+        stable@vger.kernel.org
+Subject: Re: [PATCH] block: fix "check bi_size overflow before merge"
+Message-ID: <20191210021210.GB25022@ming.t460p>
+References: <20191209191114.17266-1-agruenba@redhat.com>
+MIME-Version: 1.0
+In-Reply-To: <20191209191114.17266-1-agruenba@redhat.com>
+User-Agent: Mutt/1.12.1 (2019-06-15)
+X-Scanned-By: MIMEDefang 2.84 on 10.5.11.22
+X-MC-Unique: YLXilXRBOQ-dHbPintc99A-1
+X-Mimecast-Spam-Score: 0
+Content-Type: text/plain; charset=us-ascii
+Content-Transfer-Encoding: quoted-printable
+Content-Disposition: inline
 Sender: linux-block-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-On Mon, 9 Dec 2019 14:53:35 -0800 John Hubbard <jhubbard@nvidia.com> wrote:
+On Mon, Dec 09, 2019 at 08:11:14PM +0100, Andreas Gruenbacher wrote:
+> This partially reverts commit e3a5d8e386c3fb973fa75f2403622a8f3640ec06.
+>=20
+> Commit e3a5d8e386c3 ("check bi_size overflow before merge") adds a bio_fu=
+ll
+> check to __bio_try_merge_page.  This will cause __bio_try_merge_page to f=
+ail
+> when the last bi_io_vec has been reached.  Instead, what we want here is =
+only
+> the bi_size overflow check.
+>=20
+> Fixes: e3a5d8e386c3 ("block: check bi_size overflow before merge")
+> Cc: stable@vger.kernel.org # v5.4+
+> Signed-off-by: Andreas Gruenbacher <agruenba@redhat.com>
+> ---
+>  block/bio.c | 4 +++-
+>  1 file changed, 3 insertions(+), 1 deletion(-)
+>=20
+> diff --git a/block/bio.c b/block/bio.c
+> index 9d54aa37ce6c..a5d75f6bf4c7 100644
+> --- a/block/bio.c
+> +++ b/block/bio.c
+> @@ -754,10 +754,12 @@ bool __bio_try_merge_page(struct bio *bio, struct p=
+age *page,
+>  =09if (WARN_ON_ONCE(bio_flagged(bio, BIO_CLONED)))
+>  =09=09return false;
+> =20
+> -=09if (bio->bi_vcnt > 0 && !bio_full(bio, len)) {
+> +=09if (bio->bi_vcnt > 0) {
+>  =09=09struct bio_vec *bv =3D &bio->bi_io_vec[bio->bi_vcnt - 1];
+> =20
+>  =09=09if (page_is_mergeable(bv, page, len, off, same_page)) {
+> +=09=09=09if (bio->bi_iter.bi_size > UINT_MAX - len)
+> +=09=09=09=09return false;
+>  =09=09=09bv->bv_len +=3D len;
+>  =09=09=09bio->bi_iter.bi_size +=3D len;
+>  =09=09=09return true;
 
-> After DMA is complete, and the device and CPU caches are synchronized,
-> it's still required to mark the CPU pages as dirty, if the data was
-> coming from the device. However, this driver was just issuing a
-> bare put_page() call, without any set_page_dirty*() call.
-> 
-> Fix the problem, by calling set_page_dirty_lock() if the CPU pages
-> were potentially receiving data from the device.
-> 
-> Reviewed-by: Christoph Hellwig <hch@lst.de>
-> Acked-by: Hans Verkuil <hverkuil-cisco@xs4all.nl>
-> Cc: Mauro Carvalho Chehab <mchehab@kernel.org>
-> Cc: <stable@vger.kernel.org>
+page merging doesn't consume new bvec, so this patch is correct:
 
-What are the user-visible effects of this change?
+Reviewed-by: Ming Lei <ming.lei@redhat.com>
 
-As it's cc:stable I'd normally send this to Linus within 1-2 weeks, or
-sooner.  Please confirm that this is a standalone fix, independent of
-the rest of this series.
-
+Thanks,
+Ming
 
