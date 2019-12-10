@@ -2,118 +2,143 @@ Return-Path: <SRS0=EWGC=2A=vger.kernel.org=linux-block-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-9.9 required=3.0 tests=DKIMWL_WL_HIGH,DKIM_SIGNED,
-	DKIM_VALID,DKIM_VALID_AU,HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,
-	MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,USER_AGENT_GIT
-	autolearn=ham autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-0.8 required=3.0 tests=DKIM_SIGNED,DKIM_VALID,
+	DKIM_VALID_AU,HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SPF_HELO_NONE,
+	SPF_PASS autolearn=no autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 55491C43603
-	for <linux-block@archiver.kernel.org>; Tue, 10 Dec 2019 14:53:15 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 447A9C43603
+	for <linux-block@archiver.kernel.org>; Tue, 10 Dec 2019 15:18:07 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.kernel.org (Postfix) with ESMTP id 2558B2077B
-	for <linux-block@archiver.kernel.org>; Tue, 10 Dec 2019 14:53:15 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id 1405E2053B
+	for <linux-block@archiver.kernel.org>; Tue, 10 Dec 2019 15:18:07 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=pass (1024-bit key) header.d=amazon.com header.i=@amazon.com header.b="VqS3SpQ5"
+	dkim=pass (2048-bit key) header.d=linaro.org header.i=@linaro.org header.b="cSSUpZLt"
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1727514AbfLJOxO (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Tue, 10 Dec 2019 09:53:14 -0500
-Received: from smtp-fw-2101.amazon.com ([72.21.196.25]:18750 "EHLO
-        smtp-fw-2101.amazon.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1727159AbfLJOxO (ORCPT
+        id S1727440AbfLJPSG (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Tue, 10 Dec 2019 10:18:06 -0500
+Received: from mail-vs1-f66.google.com ([209.85.217.66]:38298 "EHLO
+        mail-vs1-f66.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S1727420AbfLJPSG (ORCPT
         <rfc822;linux-block@vger.kernel.org>);
-        Tue, 10 Dec 2019 09:53:14 -0500
+        Tue, 10 Dec 2019 10:18:06 -0500
+Received: by mail-vs1-f66.google.com with SMTP id y195so13309538vsy.5
+        for <linux-block@vger.kernel.org>; Tue, 10 Dec 2019 07:18:05 -0800 (PST)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-  d=amazon.com; i=@amazon.com; q=dns/txt; s=amazon201209;
-  t=1575989593; x=1607525593;
-  h=from:to:cc:subject:date:message-id:mime-version:
-   content-transfer-encoding;
-  bh=NAV6kZQrewVA32BcVnXou+TwbV5q6MZxjxEtrGeNo8M=;
-  b=VqS3SpQ5JJ2oVUm7hETyjPKTuQAxYpYpBnjjT2gO5u8an9JWUl7dTmme
-   iSA53jSaCo8v9J3FLYsP6/mMKSxDWjCMarkzWL8k8tuRjzEi2ULl1vp0d
-   mS1DLMsKhIhi5FoeciX6faUSMdzyyNPh8+KIHVkGYKSnVgYVcC3ph8KQG
-   4=;
-IronPort-SDR: wVWUhxat8iw5Q6ERyDQmmnGyVDPqrDPvphLeTNPJ5eufTf7zRgq8/rqezj2Zfh8mbPGQUj9a9W
- 6wuUfkDS+udQ==
-X-IronPort-AV: E=Sophos;i="5.69,300,1571702400"; 
-   d="scan'208";a="7928558"
-Received: from iad6-co-svc-p1-lb1-vlan2.amazon.com (HELO email-inbound-relay-2a-119b4f96.us-west-2.amazon.com) ([10.124.125.2])
-  by smtp-border-fw-out-2101.iad2.amazon.com with ESMTP; 10 Dec 2019 14:53:11 +0000
-Received: from EX13MTAUEA001.ant.amazon.com (pdx4-ws-svc-p6-lb7-vlan2.pdx.amazon.com [10.170.41.162])
-        by email-inbound-relay-2a-119b4f96.us-west-2.amazon.com (Postfix) with ESMTPS id A2C651A1EEE;
-        Tue, 10 Dec 2019 14:53:10 +0000 (UTC)
-Received: from EX13D32EUB002.ant.amazon.com (10.43.166.114) by
- EX13MTAUEA001.ant.amazon.com (10.43.61.243) with Microsoft SMTP Server (TLS)
- id 15.0.1367.3; Tue, 10 Dec 2019 14:53:10 +0000
-Received: from EX13MTAUEA001.ant.amazon.com (10.43.61.82) by
- EX13D32EUB002.ant.amazon.com (10.43.166.114) with Microsoft SMTP Server (TLS)
- id 15.0.1367.3; Tue, 10 Dec 2019 14:53:09 +0000
-Received: from u2f063a87eabd5f.cbg10.amazon.com (10.125.106.135) by
- mail-relay.amazon.com (10.43.61.243) with Microsoft SMTP Server id
- 15.0.1367.3 via Frontend Transport; Tue, 10 Dec 2019 14:53:07 +0000
-From:   Paul Durrant <pdurrant@amazon.com>
-To:     <xen-devel@lists.xenproject.org>, <linux-block@vger.kernel.org>,
-        <linux-kernel@vger.kernel.org>
-CC:     Paul Durrant <pdurrant@amazon.com>,
-        Konrad Rzeszutek Wilk <konrad.wilk@oracle.com>,
-        =?UTF-8?q?Roger=20Pau=20Monn=C3=A9?= <roger.pau@citrix.com>,
-        Jens Axboe <axboe@kernel.dk>
-Subject: [PATCH] xen-blkback: prevent premature module unload
-Date:   Tue, 10 Dec 2019 14:53:05 +0000
-Message-ID: <20191210145305.6605-1-pdurrant@amazon.com>
-X-Mailer: git-send-email 2.20.1
+        d=linaro.org; s=google;
+        h=mime-version:references:in-reply-to:from:date:message-id:subject:to
+         :cc;
+        bh=jcUnC0/SEm4HDTIw1YLkWhbNF7DV2HNNDkdfVlTygbE=;
+        b=cSSUpZLtf+hCVZvTD7HbKKL/zq4Rkmgcb2lIlIkDlhoxjyGVl0vVSnKlyJSar8oMju
+         kJKrdwjxQ132req2y4+nrrVfisVcDFp//Vza1JYfv88Pn0pawYqigZnVIjKe8hsBLtwo
+         MCeVhuUG+FD6AVkT5efECIF5yoeCURQPE8pK5mLLWFQv5VUdlsUYexM/XG4pBnG0lMlj
+         homajns2YyoPkCVbVSABDLsSQp/B9WvdKRwStVCpME0KK4gfjaFWk6c6Sp+tT9WhGfwd
+         Wm0n+fvhFn2WYXhdCvCyA4aduw0ySOsjxw4ZHQ5FAt3egnPm7ELrA47hNqGA3SWWB7Yy
+         x0ug==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20161025;
+        h=x-gm-message-state:mime-version:references:in-reply-to:from:date
+         :message-id:subject:to:cc;
+        bh=jcUnC0/SEm4HDTIw1YLkWhbNF7DV2HNNDkdfVlTygbE=;
+        b=VkQKV3U6fXSk4Pqu4xCgLAqE28Vp5rPgSQFRN9vInUMQXKB1rSiIa/wmJ8MSpIP041
+         ljJRxfjYbCuF6NA2URoMbScVlQ8g5/uFYpa0J19zcWN1zv6KQSK8/ax9669djEp3fsJk
+         PNSBqNg77ru2kgm+DE0pyFA0A87vwJivKrR//sUPQJV0R7D96gEK74nCgFZYvQebFX/B
+         RcOTuM/35/7jv1PglfwNAyzkjc44W5o1nuKjpB1K3FlSuVw66GnkEYL7tJIyXHltpzD0
+         Gh0FlBCoL9s5sSYCRNakVHh+rTKsjXxK8JW6U85kMAQKolpRX333mNM7qnv5yVmTB7Pa
+         0MtA==
+X-Gm-Message-State: APjAAAWkscrOmTM4UPp/TQdoWD6Y4gXhejXidlgYy0TyJ3tmkFBcNbGB
+        Oj9SffEH4zXBiPcRdIqC1fauJDtuSTQaFlsvczkzd1dTV98=
+X-Google-Smtp-Source: APXvYqxHTWP37WCrbgkX6nxMLdBw/0tPKoRg5nRin2f5LJXHzhcKcpphZKWgMGaQKXGnCPL9VoXyCSqg/WxqTmWfZqM=
+X-Received: by 2002:a05:6102:5d1:: with SMTP id v17mr25314853vsf.200.1575991085086;
+ Tue, 10 Dec 2019 07:18:05 -0800 (PST)
 MIME-Version: 1.0
+References: <cover.1573456283.git.baolin.wang@linaro.org> <CAK8P3a1we9D5C2NOBww=cW-4L1PT3t0NnDRmknLwiLm652TmKg@mail.gmail.com>
+ <CAMz4kuK9HEuGdhNqHO_qoy9jD=ccsPPhD_dKYwNRgQyWyYwqRA@mail.gmail.com>
+ <CAK8P3a0rNhyxmUWLUV1js3FsuAESDOPX3E4b8ActtL4GRT4uTA@mail.gmail.com>
+ <CADBw62pzV+5ZXBEbFvTQJ9essAd4cd7Xkz5j9AXB5rAQy0wLqA@mail.gmail.com>
+ <CAMz4kuK_3q4JY1vNXe6zGHDNF8Ep-SkcUq6Z25r790VSz4+Bjw@mail.gmail.com>
+ <CAK8P3a11vJb1riYseqPnF_5SuJA+YnYuGwC0XWx6_rk+eQ0Bmw@mail.gmail.com>
+ <f88856aa-9175-2a93-3747-c98215cb79c3@suse.de> <20191127090023.GA23040@infradead.org>
+ <CAK8P3a0gUWf_+ZmscuFanvPG=wN09ELL-JpByjJJM4Lo1FYmrQ@mail.gmail.com>
+In-Reply-To: <CAK8P3a0gUWf_+ZmscuFanvPG=wN09ELL-JpByjJJM4Lo1FYmrQ@mail.gmail.com>
+From:   Ulf Hansson <ulf.hansson@linaro.org>
+Date:   Tue, 10 Dec 2019 16:17:28 +0100
+Message-ID: <CAPDyKFoNAF1UUvzvEGxTS=yKJshVgHsXqXiCxno75=aasME4kw@mail.gmail.com>
+Subject: Re: [PATCH v6 0/4] Add MMC software queue support
+To:     Arnd Bergmann <arnd@arndb.de>
+Cc:     Christoph Hellwig <hch@infradead.org>,
+        Hannes Reinecke <hare@suse.de>,
+        "(Exiting) Baolin Wang" <baolin.wang@linaro.org>,
+        Baolin Wang <baolin.wang7@gmail.com>,
+        Adrian Hunter <adrian.hunter@intel.com>,
+        Asutosh Das <asutoshd@codeaurora.org>,
+        Orson Zhai <orsonzhai@gmail.com>,
+        Lyra Zhang <zhang.lyra@gmail.com>,
+        Linus Walleij <linus.walleij@linaro.org>,
+        Vincent Guittot <vincent.guittot@linaro.org>,
+        linux-mmc <linux-mmc@vger.kernel.org>,
+        "linux-kernel@vger.kernel.org" <linux-kernel@vger.kernel.org>,
+        Hannes Reinecke <hare@suse.com>,
+        linux-block <linux-block@vger.kernel.org>,
+        Paolo Valente <paolo.valente@linaro.org>
 Content-Type: text/plain; charset="UTF-8"
-Content-Transfer-Encoding: 8bit
 Sender: linux-block-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-Objects allocated by xen_blkif_alloc come from the 'blkif_cache' kmem
-cache. This cache is destoyed when xen-blkif is unloaded so it is
-necessary to wait for the deferred free routine used for such objects to
-complete. This necessity was missed in commit 14855954f636 "xen-blkback:
-allow module to be cleanly unloaded". This patch fixes the problem by
-taking/releasing extra module references in xen_blkif_alloc/free()
-respectively.
+On Wed, 27 Nov 2019 at 13:01, Arnd Bergmann <arnd@arndb.de> wrote:
+>
+> On Wed, Nov 27, 2019 at 10:00 AM Christoph Hellwig <hch@infradead.org> wrote:
+> >
+> > On Tue, Nov 26, 2019 at 12:17:15PM +0100, Hannes Reinecke wrote:
+> >  If requests are batched enough we could just drain
+> > and switch every time an other partition access comes in.  Especially
+> > so if people only use partitions for boot partitions and other rarely
+> > used areas.
+>
+> We only support a single user partition plus up to two boot partitions that
+> are accessed rarely, I don't think there is any reason to optimize switching
+> between them.
 
-Signed-off-by: Paul Durrant <pdurrant@amazon.com>
----
-Cc: Konrad Rzeszutek Wilk <konrad.wilk@oracle.com>
-Cc: "Roger Pau Monné" <roger.pau@citrix.com>
-Cc: Jens Axboe <axboe@kernel.dk>
----
- drivers/block/xen-blkback/xenbus.c | 10 ++++++++++
- 1 file changed, 10 insertions(+)
+I agree. However, let me just add some more information to this.
 
-diff --git a/drivers/block/xen-blkback/xenbus.c b/drivers/block/xen-blkback/xenbus.c
-index e8c5c54e1d26..59d576d27ca7 100644
---- a/drivers/block/xen-blkback/xenbus.c
-+++ b/drivers/block/xen-blkback/xenbus.c
-@@ -171,6 +171,15 @@ static struct xen_blkif *xen_blkif_alloc(domid_t domid)
- 	blkif->domid = domid;
- 	atomic_set(&blkif->refcnt, 1);
- 	init_completion(&blkif->drain_complete);
-+
-+	/*
-+	 * Because freeing back to the cache may be deferred, it is not
-+	 * safe to unload the module (and hence destroy the cache) until
-+	 * this has completed. To prevent premature unloading, take an
-+	 * extra module reference here and release only when the object
-+	 * has been free back to the cache.
-+	 */
-+	__module_get(THIS_MODULE);
- 	INIT_WORK(&blkif->free_work, xen_blkif_deferred_free);
- 
- 	return blkif;
-@@ -320,6 +329,7 @@ static void xen_blkif_free(struct xen_blkif *blkif)
- 
- 	/* Make sure everything is drained before shutting down */
- 	kmem_cache_free(xen_blkif_cachep, blkif);
-+	module_put(THIS_MODULE);
- }
- 
- int __init xen_blkif_interface_init(void)
--- 
-2.20.1
+There are more partitions, like the RPMB for example. In regards to
+partition switching, after serving a request to the RPMB partition, we
+always switch back to the main user area. I think that is sufficient.
 
+Also note that requests for the RPMB partitions are managed via
+REQ_OP_DRV_IN|OUT.
+
+>
+> The only change that I think we need here is to change the partition switch
+> from something that is done synchronously during ->queue_rq() to
+> something that fits better into normal scheme of sending a cmd to
+> the device, returning BLK_STS_RESOURCE from ->queue_rq.
+
+You want to translate them to be managed similar to REQ_OP_DRV_IN|OUT, no?
+
+I am just trying to understand what this would help us with, but I
+don't get it, sorry.
+
+I realize that I am joining the show a bit late, apologize for that.
+But it seems like you are forgetting about re-tuning, urgent bkops,
+card detect, SDIO combo cards, etc.
+
+For example, re-tuning may be required because of a CRC error on the
+previously sent transfer. Thus re-tuning must be done before serving
+the next request.
+
+Likewise, when the device signals urgent bkops status, we must not
+serve any new request until the card has notified us that it is ready
+with it's internal housekeeping operations.
+
+> Possibly this could even be turned into a standard struct request that is
+> added between two normal requests for different partitions at some
+> point, if this simplifies the logic (I suspect it won't, but it may be worth
+> a try).
+
+Doing so, means re-tuning, bkops, etc, also needs to be managed in the
+same way. Is this really the way to go?
+
+Kind regards
+Uffe
