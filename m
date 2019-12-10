@@ -2,122 +2,136 @@ Return-Path: <SRS0=EWGC=2A=vger.kernel.org=linux-block-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-8.2 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
-	INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,
-	USER_AGENT_SANE_1 autolearn=unavailable autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-0.8 required=3.0 tests=DKIM_SIGNED,DKIM_VALID,
+	DKIM_VALID_AU,HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SPF_HELO_NONE,
+	SPF_PASS autolearn=no autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 9A8B7C3F68F
-	for <linux-block@archiver.kernel.org>; Tue, 10 Dec 2019 10:28:33 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 52D26C2D0BF
+	for <linux-block@archiver.kernel.org>; Tue, 10 Dec 2019 11:02:28 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.kernel.org (Postfix) with ESMTP id 7A6E320828
-	for <linux-block@archiver.kernel.org>; Tue, 10 Dec 2019 10:28:33 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id 27E102073B
+	for <linux-block@archiver.kernel.org>; Tue, 10 Dec 2019 11:02:28 +0000 (UTC)
+Authentication-Results: mail.kernel.org;
+	dkim=pass (2048-bit key) header.d=linaro.org header.i=@linaro.org header.b="Mf3xlkOS"
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1727238AbfLJK2Y (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Tue, 10 Dec 2019 05:28:24 -0500
-Received: from mx2.suse.de ([195.135.220.15]:58544 "EHLO mx1.suse.de"
-        rhost-flags-OK-OK-OK-FAIL) by vger.kernel.org with ESMTP
-        id S1726574AbfLJK2Y (ORCPT <rfc822;linux-block@vger.kernel.org>);
-        Tue, 10 Dec 2019 05:28:24 -0500
-X-Virus-Scanned: by amavisd-new at test-mx.suse.de
-Received: from relay2.suse.de (unknown [195.135.220.254])
-        by mx1.suse.de (Postfix) with ESMTP id 769B2B280;
-        Tue, 10 Dec 2019 10:28:20 +0000 (UTC)
-Received: by quack2.suse.cz (Postfix, from userid 1000)
-        id E89EB1E0B23; Tue, 10 Dec 2019 11:28:18 +0100 (CET)
-Date:   Tue, 10 Dec 2019 11:28:18 +0100
-From:   Jan Kara <jack@suse.cz>
-To:     John Hubbard <jhubbard@nvidia.com>
-Cc:     Andrew Morton <akpm@linux-foundation.org>,
-        Al Viro <viro@zeniv.linux.org.uk>,
-        Alex Williamson <alex.williamson@redhat.com>,
-        Benjamin Herrenschmidt <benh@kernel.crashing.org>,
-        =?iso-8859-1?Q?Bj=F6rn_T=F6pel?= <bjorn.topel@intel.com>,
-        Christoph Hellwig <hch@infradead.org>,
-        Dan Williams <dan.j.williams@intel.com>,
-        Daniel Vetter <daniel@ffwll.ch>,
-        Dave Chinner <david@fromorbit.com>,
-        David Airlie <airlied@linux.ie>,
-        "David S . Miller" <davem@davemloft.net>,
-        Ira Weiny <ira.weiny@intel.com>, Jan Kara <jack@suse.cz>,
-        Jason Gunthorpe <jgg@ziepe.ca>, Jens Axboe <axboe@kernel.dk>,
-        Jonathan Corbet <corbet@lwn.net>,
-        =?iso-8859-1?B?Suly9G1l?= Glisse <jglisse@redhat.com>,
-        Magnus Karlsson <magnus.karlsson@intel.com>,
-        Mauro Carvalho Chehab <mchehab@kernel.org>,
-        Michael Ellerman <mpe@ellerman.id.au>,
-        Michal Hocko <mhocko@suse.com>,
-        Mike Kravetz <mike.kravetz@oracle.com>,
-        Paul Mackerras <paulus@samba.org>,
-        Shuah Khan <shuah@kernel.org>,
-        Vlastimil Babka <vbabka@suse.cz>, bpf@vger.kernel.org,
-        dri-devel@lists.freedesktop.org, kvm@vger.kernel.org,
-        linux-block@vger.kernel.org, linux-doc@vger.kernel.org,
-        linux-fsdevel@vger.kernel.org, linux-kselftest@vger.kernel.org,
-        linux-media@vger.kernel.org, linux-rdma@vger.kernel.org,
-        linuxppc-dev@lists.ozlabs.org, netdev@vger.kernel.org,
-        linux-mm@kvack.org, LKML <linux-kernel@vger.kernel.org>,
-        Christoph Hellwig <hch@lst.de>,
-        Leon Romanovsky <leonro@mellanox.com>
-Subject: Re: [PATCH v8 08/26] mm/gup: allow FOLL_FORCE for
- get_user_pages_fast()
-Message-ID: <20191210102818.GF1551@quack2.suse.cz>
-References: <20191209225344.99740-1-jhubbard@nvidia.com>
- <20191209225344.99740-9-jhubbard@nvidia.com>
+        id S1726915AbfLJLCY (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Tue, 10 Dec 2019 06:02:24 -0500
+Received: from mail-lj1-f195.google.com ([209.85.208.195]:33191 "EHLO
+        mail-lj1-f195.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S1727118AbfLJLCY (ORCPT
+        <rfc822;linux-block@vger.kernel.org>);
+        Tue, 10 Dec 2019 06:02:24 -0500
+Received: by mail-lj1-f195.google.com with SMTP id 21so19408455ljr.0
+        for <linux-block@vger.kernel.org>; Tue, 10 Dec 2019 03:02:22 -0800 (PST)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=linaro.org; s=google;
+        h=mime-version:references:in-reply-to:from:date:message-id:subject:to
+         :cc;
+        bh=avT8djgaVLUaP/1BXJuTZBwRdJwwah+0AF+tp3FQZPs=;
+        b=Mf3xlkOSDEXkKBh/xlW95jq/ctKWC6+5W25pp6TESvMuNfvypSGAfYHsVnbPTF1cYg
+         RR0YLlmQ0tYBn9eVo9B5cXn5iQtVmIH73aTUt7+x6qyrXUIoBdS4hBRmUK0eZkDmLkAb
+         EGIAlfTwNBPpLzuweZ8Ri86B/UxW1T1ZRDG8hmX5tHJ5Y5Aildo02kJCV0NHR6AdkbLh
+         NBmHSZGnygxVFb9Yn3M+Ft/tELQKD1dHnNiv4mWLZc6mZCvBM+Tsyr0Wp7Sd2MG1aAHj
+         Tq/GviXZQEHaPzhya05BIy0b3HF1EnJFgiDF4nG2cr+QZRR8UVHE0LLUBd9LPIqUTqH1
+         6QoQ==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20161025;
+        h=x-gm-message-state:mime-version:references:in-reply-to:from:date
+         :message-id:subject:to:cc;
+        bh=avT8djgaVLUaP/1BXJuTZBwRdJwwah+0AF+tp3FQZPs=;
+        b=apxZZslvHywo/hfiTKyWPVCmgverogMUSweOjabqxjJrLqtbxGsVpChAjpYu6lvUH2
+         L4NwyX0+YSPLT5locZYFYKrV0vZ9sDg7LrNRogK85GVejMkmN9GSZtkmGk02EVbVJ/AI
+         HsUypXeIDvihB/2q8ZCt6sNl9FPjZhpEYjb8geVBI/CqswoRc3wUc4zaty0fASwJDzvO
+         N+7G/O+L9A9KrwFDjgV95oKHs2s5//tTfuSzrpPTVdcusqtcPmHpHX7ShrzEVIAuFr5u
+         Twke60yLjw4FpmKag/O3eMJgI2/sKNlsNAsY2I6Gu5ompoe7IlXLLNO3C8rDC/9mrWn9
+         egKg==
+X-Gm-Message-State: APjAAAVqgNLgw4oNC1ipJKh99aj5epPJBklIV/qYYBAy/iVx5R7HPzEk
+        awWyl2D1R63mXBnLMPGrxmYOOidUc2STXak9sabuyg==
+X-Google-Smtp-Source: APXvYqzdKySfdTeUTqDZf48QC6nKJjVrzelXQbA5XcMaY5YcawhwrWRM8Td38VBdqI6RgEEmwUiYHkXJsa2/pme7HDg=
+X-Received: by 2002:a2e:9a04:: with SMTP id o4mr21104651lji.214.1575975741445;
+ Tue, 10 Dec 2019 03:02:21 -0800 (PST)
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <20191209225344.99740-9-jhubbard@nvidia.com>
-User-Agent: Mutt/1.10.1 (2018-07-13)
+References: <20191115234005.GO4614@dread.disaster.area> <20191118092121.GV4131@hirez.programming.kicks-ass.net>
+ <20191118204054.GV4614@dread.disaster.area> <20191120191636.GI4097@hirez.programming.kicks-ass.net>
+ <20191120220313.GC18056@pauld.bos.csb> <20191121132937.GW4114@hirez.programming.kicks-ass.net>
+ <20191209165122.GA27229@linux.vnet.ibm.com> <20191209231743.GA19256@dread.disaster.area>
+ <20191210054330.GF27253@linux.vnet.ibm.com> <CAKfTPtCBxV+az30n8E9fRv_HweN_QPJn_ni961OsKp5xUWUD2A@mail.gmail.com>
+ <20191210101116.GA9139@linux.vnet.ibm.com>
+In-Reply-To: <20191210101116.GA9139@linux.vnet.ibm.com>
+From:   Vincent Guittot <vincent.guittot@linaro.org>
+Date:   Tue, 10 Dec 2019 12:02:09 +0100
+Message-ID: <CAKfTPtD1by06eQ=vJhh9SvfegRanSSwQrKPageLGo0OODu9bjg@mail.gmail.com>
+Subject: Re: [PATCH v2] sched/core: Preempt current task in favour of bound kthread
+To:     Srikar Dronamraju <srikar@linux.vnet.ibm.com>
+Cc:     Dave Chinner <david@fromorbit.com>,
+        Peter Zijlstra <peterz@infradead.org>,
+        Phil Auld <pauld@redhat.com>, Ming Lei <ming.lei@redhat.com>,
+        linux-block <linux-block@vger.kernel.org>,
+        linux-fs <linux-fsdevel@vger.kernel.org>,
+        linux-xfs <linux-xfs@vger.kernel.org>,
+        linux-kernel <linux-kernel@vger.kernel.org>,
+        Jeff Moyer <jmoyer@redhat.com>,
+        Dave Chinner <dchinner@redhat.com>,
+        Eric Sandeen <sandeen@redhat.com>,
+        Christoph Hellwig <hch@lst.de>, Jens Axboe <axboe@kernel.dk>,
+        Ingo Molnar <mingo@redhat.com>, Tejun Heo <tj@kernel.org>
+Content-Type: text/plain; charset="UTF-8"
 Sender: linux-block-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-On Mon 09-12-19 14:53:26, John Hubbard wrote:
-> Commit 817be129e6f2 ("mm: validate get_user_pages_fast flags") allowed
-> only FOLL_WRITE and FOLL_LONGTERM to be passed to get_user_pages_fast().
-> This, combined with the fact that get_user_pages_fast() falls back to
-> "slow gup", which *does* accept FOLL_FORCE, leads to an odd situation:
-> if you need FOLL_FORCE, you cannot call get_user_pages_fast().
-> 
-> There does not appear to be any reason for filtering out FOLL_FORCE.
-> There is nothing in the _fast() implementation that requires that we
-> avoid writing to the pages. So it appears to have been an oversight.
-> 
-> Fix by allowing FOLL_FORCE to be set for get_user_pages_fast().
-> 
-> Fixes: 817be129e6f2 ("mm: validate get_user_pages_fast flags")
-> Cc: Christoph Hellwig <hch@lst.de>
-> Reviewed-by: Leon Romanovsky <leonro@mellanox.com>
-> Signed-off-by: John Hubbard <jhubbard@nvidia.com>
+On Tue, 10 Dec 2019 at 11:11, Srikar Dronamraju
+<srikar@linux.vnet.ibm.com> wrote:
+>
+> * Vincent Guittot <vincent.guittot@linaro.org> [2019-12-10 10:43:46]:
+>
+> > On Tue, 10 Dec 2019 at 06:43, Srikar Dronamraju
+> > <srikar@linux.vnet.ibm.com> wrote:
+> > >
+> > > This is more prone to happen if the current running task is CPU
+> > > intensive and the sched_wake_up_granularity is set to larger value.
+> > > When the sched_wake_up_granularity was relatively small, it was observed
+> > > that the bound thread would complete before the load balancer would have
+> > > chosen to move the cache hot task to a different CPU.
+> > >
+> > > To deal with this situation, the current running task would yield to a
+> > > per CPU bound kthread, provided kthread is not CPU intensive.
+> > >
+> > > /pboffline/hwcct_prg_old/lib/fsperf -t overwrite --noclean -f 5g -b 4k /pboffline
+> > >
+> > > (With sched_wake_up_granularity set to 15ms)
+> >
+> > So you increase sched_wake_up_granularity to a high level to ensure
+> > that current is no preempted by waking thread but then you add a way
+> > to finally preempt it which is somewhat weird IMO
+> >
+>
+> Yes, setting to a smaller value will help mitigate/solve the problem.
+> There may be folks out who have traditionally set a high wake_up_granularity
+> (and have seen better performance with it), who may miss out that when using
+> blk-mq, such settings will cause more harm. And they may continue to see
+> some performance regressions when they move to a lower wake_up_granularity.
+>
+> > Have you tried to increase the priority of workqueue thread  (decrease
+> > nice priority) ? This is the right way to reduce the impact of the
+> > sched_wake_up_granularity on the wakeup of your specific kthread.
+> > Because what you want at the end is keeping a low wakeup granularity
+> > for these io workqueues
+> >
+>
+> Yes, people can tune the priority of workqueue threads and infact it may be
+> easier to set wake_up_granularity to a lower value. However the point is how
+> do we make everyone aware that they are running into a performance issue
+> with a higher wakeup_granularity?
 
-Looks good to me. You can add:
+I did the test on my local setup to change the nice priority of io
+workqueue and the active migrations are removed even with high
+wakeup_granularity because IO workqueue can still preempt normal task
+but let other workqueue behave normally.
 
-Reviewed-by: Jan Kara <jack@suse.cz>
-
-								Honza
-
-> ---
->  mm/gup.c | 3 ++-
->  1 file changed, 2 insertions(+), 1 deletion(-)
-> 
-> diff --git a/mm/gup.c b/mm/gup.c
-> index c0c56888e7cc..958ab0757389 100644
-> --- a/mm/gup.c
-> +++ b/mm/gup.c
-> @@ -2414,7 +2414,8 @@ int get_user_pages_fast(unsigned long start, int nr_pages,
->  	unsigned long addr, len, end;
->  	int nr = 0, ret = 0;
->  
-> -	if (WARN_ON_ONCE(gup_flags & ~(FOLL_WRITE | FOLL_LONGTERM)))
-> +	if (WARN_ON_ONCE(gup_flags & ~(FOLL_WRITE | FOLL_LONGTERM |
-> +				       FOLL_FORCE)))
->  		return -EINVAL;
->  
->  	start = untagged_addr(start) & PAGE_MASK;
-> -- 
-> 2.24.0
-> 
--- 
-Jan Kara <jack@suse.com>
-SUSE Labs, CR
+>
+> --
+> Thanks and Regards
+> Srikar Dronamraju
+>
