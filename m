@@ -2,107 +2,122 @@ Return-Path: <SRS0=EWGC=2A=vger.kernel.org=linux-block-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-3.6 required=3.0 tests=DKIM_SIGNED,DKIM_VALID,
-	DKIM_VALID_AU,FREEMAIL_FORGED_FROMDOMAIN,FREEMAIL_FROM,
-	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,SPF_HELO_NONE,
-	SPF_PASS autolearn=no autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-8.2 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
+	INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,
+	USER_AGENT_SANE_1 autolearn=unavailable autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 65DCEC43603
-	for <linux-block@archiver.kernel.org>; Tue, 10 Dec 2019 10:25:07 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 9A8B7C3F68F
+	for <linux-block@archiver.kernel.org>; Tue, 10 Dec 2019 10:28:33 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.kernel.org (Postfix) with ESMTP id 2F7E42073B
-	for <linux-block@archiver.kernel.org>; Tue, 10 Dec 2019 10:25:07 +0000 (UTC)
-Authentication-Results: mail.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="FTiCBLot"
+	by mail.kernel.org (Postfix) with ESMTP id 7A6E320828
+	for <linux-block@archiver.kernel.org>; Tue, 10 Dec 2019 10:28:33 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1727145AbfLJKZG (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Tue, 10 Dec 2019 05:25:06 -0500
-Received: from mail-lf1-f68.google.com ([209.85.167.68]:36277 "EHLO
-        mail-lf1-f68.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1727149AbfLJKZG (ORCPT
-        <rfc822;linux-block@vger.kernel.org>);
-        Tue, 10 Dec 2019 05:25:06 -0500
-Received: by mail-lf1-f68.google.com with SMTP id n12so13271986lfe.3;
-        Tue, 10 Dec 2019 02:25:04 -0800 (PST)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20161025;
-        h=mime-version:references:in-reply-to:from:date:message-id:subject:to
-         :cc:content-transfer-encoding;
-        bh=Lg4AhAvPA2MW169lce5BVlmxb20DdD9akZ2hhy6ig3k=;
-        b=FTiCBLotYFjh03wZj4knhcl8BMXBmq0zAi457bVRqn+6sc7GAOVzCj32SSKhUowk39
-         S2ANnGVWu8HiwFveq4v/GT0it5Jv4Sm4Cw6YEYYjHIIv8z7ODCH/ONDyFYw3xryCuAJx
-         KZNz8eUOyKp6173vQJSbNSQBI9U/u21/q8DFVvBcwNBb12hms38D6VYBJCbD0jSNolt9
-         jCXg1kUrfpkD6fKz2WZJx/jLc7gy95Q5tA6mzMa4JIjleJzOzbloLczSC9mpyBblRcqo
-         Gi4UxaDIVKn3aCRl/AmTyYrihS+4IqTCcCKpw8yEikIu4P77/3qmXdEVvWfES4cf7SUP
-         PR6g==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20161025;
-        h=x-gm-message-state:mime-version:references:in-reply-to:from:date
-         :message-id:subject:to:cc:content-transfer-encoding;
-        bh=Lg4AhAvPA2MW169lce5BVlmxb20DdD9akZ2hhy6ig3k=;
-        b=ZULYYPBDUSehEINErlwtnX/Ewz29xY5WAs1jcaXTHUxlxrLH/pD12zpV5k7Us3k4Np
-         mzpPNJWv1p+h3QNPpL3UFRmSB3LY0oJ6M1dtfBaXQmcGJ0vmRkr2bgTu1Bja6zqfgGqh
-         J7Il9HMYBNc9mr0Ds8p8sG/TNbVU/wTMECBuQjxjKet+Envh2UgjKCrN1vOv+95hkdyB
-         hefV/m3JewQlTOIFb28Bqc6GTqe6qWT4uas9rYMPEYbEDKysbqFe3o+ZxM5nbEw4j2u/
-         jQ/3hz7e3uYZbnawFOQXznAuP6pN8X9QmUQgvwJfGqgwWj4hl/FbzvAzvoG4tByF3QQy
-         4CQQ==
-X-Gm-Message-State: APjAAAU+ry7XEyUkVK+ARIroNrseW3G+m2+EI8KDBQPvsj/65/7VQvcw
-        99QyOz7jg3n1BrqHPrGF8fQ0ZHGqTyO/VwBV5dw=
-X-Google-Smtp-Source: APXvYqzJ1n85YcM5EF1ZvSd+1TmfnkyzXyHPP1Je/JBYVDcQHyXtbVJXSpCo0J5NP1ZNn5s9enJ5G9jr2beZsSr+XS8=
-X-Received: by 2002:a19:6a06:: with SMTP id u6mr14474371lfu.187.1575973503519;
- Tue, 10 Dec 2019 02:25:03 -0800 (PST)
+        id S1727238AbfLJK2Y (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Tue, 10 Dec 2019 05:28:24 -0500
+Received: from mx2.suse.de ([195.135.220.15]:58544 "EHLO mx1.suse.de"
+        rhost-flags-OK-OK-OK-FAIL) by vger.kernel.org with ESMTP
+        id S1726574AbfLJK2Y (ORCPT <rfc822;linux-block@vger.kernel.org>);
+        Tue, 10 Dec 2019 05:28:24 -0500
+X-Virus-Scanned: by amavisd-new at test-mx.suse.de
+Received: from relay2.suse.de (unknown [195.135.220.254])
+        by mx1.suse.de (Postfix) with ESMTP id 769B2B280;
+        Tue, 10 Dec 2019 10:28:20 +0000 (UTC)
+Received: by quack2.suse.cz (Postfix, from userid 1000)
+        id E89EB1E0B23; Tue, 10 Dec 2019 11:28:18 +0100 (CET)
+Date:   Tue, 10 Dec 2019 11:28:18 +0100
+From:   Jan Kara <jack@suse.cz>
+To:     John Hubbard <jhubbard@nvidia.com>
+Cc:     Andrew Morton <akpm@linux-foundation.org>,
+        Al Viro <viro@zeniv.linux.org.uk>,
+        Alex Williamson <alex.williamson@redhat.com>,
+        Benjamin Herrenschmidt <benh@kernel.crashing.org>,
+        =?iso-8859-1?Q?Bj=F6rn_T=F6pel?= <bjorn.topel@intel.com>,
+        Christoph Hellwig <hch@infradead.org>,
+        Dan Williams <dan.j.williams@intel.com>,
+        Daniel Vetter <daniel@ffwll.ch>,
+        Dave Chinner <david@fromorbit.com>,
+        David Airlie <airlied@linux.ie>,
+        "David S . Miller" <davem@davemloft.net>,
+        Ira Weiny <ira.weiny@intel.com>, Jan Kara <jack@suse.cz>,
+        Jason Gunthorpe <jgg@ziepe.ca>, Jens Axboe <axboe@kernel.dk>,
+        Jonathan Corbet <corbet@lwn.net>,
+        =?iso-8859-1?B?Suly9G1l?= Glisse <jglisse@redhat.com>,
+        Magnus Karlsson <magnus.karlsson@intel.com>,
+        Mauro Carvalho Chehab <mchehab@kernel.org>,
+        Michael Ellerman <mpe@ellerman.id.au>,
+        Michal Hocko <mhocko@suse.com>,
+        Mike Kravetz <mike.kravetz@oracle.com>,
+        Paul Mackerras <paulus@samba.org>,
+        Shuah Khan <shuah@kernel.org>,
+        Vlastimil Babka <vbabka@suse.cz>, bpf@vger.kernel.org,
+        dri-devel@lists.freedesktop.org, kvm@vger.kernel.org,
+        linux-block@vger.kernel.org, linux-doc@vger.kernel.org,
+        linux-fsdevel@vger.kernel.org, linux-kselftest@vger.kernel.org,
+        linux-media@vger.kernel.org, linux-rdma@vger.kernel.org,
+        linuxppc-dev@lists.ozlabs.org, netdev@vger.kernel.org,
+        linux-mm@kvack.org, LKML <linux-kernel@vger.kernel.org>,
+        Christoph Hellwig <hch@lst.de>,
+        Leon Romanovsky <leonro@mellanox.com>
+Subject: Re: [PATCH v8 08/26] mm/gup: allow FOLL_FORCE for
+ get_user_pages_fast()
+Message-ID: <20191210102818.GF1551@quack2.suse.cz>
+References: <20191209225344.99740-1-jhubbard@nvidia.com>
+ <20191209225344.99740-9-jhubbard@nvidia.com>
 MIME-Version: 1.0
-References: <20191210080628.5264-1-sjpark@amazon.de> <20191210080628.5264-2-sjpark@amazon.de>
- <20191210101635.GD980@Air-de-Roger> <20191210102023.GF980@Air-de-Roger>
-In-Reply-To: <20191210102023.GF980@Air-de-Roger>
-From:   SeongJae Park <sj38.park@gmail.com>
-Date:   Tue, 10 Dec 2019 11:24:37 +0100
-Message-ID: <CAEjAshqsdjANuZDJwUnTgh3FBnhN-fp6T7-oN0hZKq8uHMDWhA@mail.gmail.com>
-Subject: Re: [Xen-devel] [PATCH v5 1/2] xenbus/backend: Add memory pressure
- handler callback
-To:     =?UTF-8?Q?Roger_Pau_Monn=C3=A9?= <roger.pau@citrix.com>
-Cc:     Jens Axboe <axboe@kernel.dk>, SeongJae Park <sjpark@amazon.com>,
-        konrad.wilk@oracle.com, pdurrant@amazon.com,
-        SeongJae Park <sjpark@amazon.de>,
-        LKML <linux-kernel@vger.kernel.org>, linux-block@vger.kernel.org,
-        xen-devel@lists.xenproject.org
-Content-Type: text/plain; charset="UTF-8"
-Content-Transfer-Encoding: quoted-printable
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <20191209225344.99740-9-jhubbard@nvidia.com>
+User-Agent: Mutt/1.10.1 (2018-07-13)
 Sender: linux-block-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-On Tue, Dec 10, 2019 at 11:21 AM Roger Pau Monn=C3=A9 <roger.pau@citrix.com=
-> wrote:
->
-> On Tue, Dec 10, 2019 at 11:16:35AM +0100, Roger Pau Monn=C3=A9 wrote:
-> > On Tue, Dec 10, 2019 at 08:06:27AM +0000, SeongJae Park wrote:
-> > > diff --git a/include/xen/xenbus.h b/include/xen/xenbus.h
-> > > index 869c816d5f8c..cdb075e4182f 100644
-> > > --- a/include/xen/xenbus.h
-> > > +++ b/include/xen/xenbus.h
-> > > @@ -104,6 +104,7 @@ struct xenbus_driver {
-> > >     struct device_driver driver;
-> > >     int (*read_otherend_details)(struct xenbus_device *dev);
-> > >     int (*is_ready)(struct xenbus_device *dev);
-> > > +   unsigned (*reclaim)(struct xenbus_device *dev);
-> >
-> > ... hence I wonder why it's returning an unsigned when it's just
-> > ignored.
-> >
-> > IMO it should return an int to signal errors, and the return should be
-> > ignored.
->
-> Meant to write 'shouldn't be ignored' sorry.
+On Mon 09-12-19 14:53:26, John Hubbard wrote:
+> Commit 817be129e6f2 ("mm: validate get_user_pages_fast flags") allowed
+> only FOLL_WRITE and FOLL_LONGTERM to be passed to get_user_pages_fast().
+> This, combined with the fact that get_user_pages_fast() falls back to
+> "slow gup", which *does* accept FOLL_FORCE, leads to an odd situation:
+> if you need FOLL_FORCE, you cannot call get_user_pages_fast().
+> 
+> There does not appear to be any reason for filtering out FOLL_FORCE.
+> There is nothing in the _fast() implementation that requires that we
+> avoid writing to the pages. So it appears to have been an oversight.
+> 
+> Fix by allowing FOLL_FORCE to be set for get_user_pages_fast().
+> 
+> Fixes: 817be129e6f2 ("mm: validate get_user_pages_fast flags")
+> Cc: Christoph Hellwig <hch@lst.de>
+> Reviewed-by: Leon Romanovsky <leonro@mellanox.com>
+> Signed-off-by: John Hubbard <jhubbard@nvidia.com>
 
-Thanks for good opinions and comments!  I will apply your comments in the n=
-ext
-version.
+Looks good to me. You can add:
 
+Reviewed-by: Jan Kara <jack@suse.cz>
 
-Thanks,
-SeongJae Park
+								Honza
 
->
-> Roger.
+> ---
+>  mm/gup.c | 3 ++-
+>  1 file changed, 2 insertions(+), 1 deletion(-)
+> 
+> diff --git a/mm/gup.c b/mm/gup.c
+> index c0c56888e7cc..958ab0757389 100644
+> --- a/mm/gup.c
+> +++ b/mm/gup.c
+> @@ -2414,7 +2414,8 @@ int get_user_pages_fast(unsigned long start, int nr_pages,
+>  	unsigned long addr, len, end;
+>  	int nr = 0, ret = 0;
+>  
+> -	if (WARN_ON_ONCE(gup_flags & ~(FOLL_WRITE | FOLL_LONGTERM)))
+> +	if (WARN_ON_ONCE(gup_flags & ~(FOLL_WRITE | FOLL_LONGTERM |
+> +				       FOLL_FORCE)))
+>  		return -EINVAL;
+>  
+>  	start = untagged_addr(start) & PAGE_MASK;
+> -- 
+> 2.24.0
+> 
+-- 
+Jan Kara <jack@suse.com>
+SUSE Labs, CR
