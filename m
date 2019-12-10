@@ -2,143 +2,125 @@ Return-Path: <SRS0=EWGC=2A=vger.kernel.org=linux-block-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-0.8 required=3.0 tests=DKIM_SIGNED,DKIM_VALID,
-	DKIM_VALID_AU,HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SPF_HELO_NONE,
-	SPF_PASS autolearn=no autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-3.8 required=3.0 tests=DKIM_SIGNED,DKIM_VALID,
+	HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,
+	USER_AGENT_GIT autolearn=no autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 447A9C43603
-	for <linux-block@archiver.kernel.org>; Tue, 10 Dec 2019 15:18:07 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id BC899C43603
+	for <linux-block@archiver.kernel.org>; Tue, 10 Dec 2019 16:24:58 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.kernel.org (Postfix) with ESMTP id 1405E2053B
-	for <linux-block@archiver.kernel.org>; Tue, 10 Dec 2019 15:18:07 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id 8AD74207FF
+	for <linux-block@archiver.kernel.org>; Tue, 10 Dec 2019 16:24:58 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=pass (2048-bit key) header.d=linaro.org header.i=@linaro.org header.b="cSSUpZLt"
+	dkim=pass (2048-bit key) header.d=kernel-dk.20150623.gappssmtp.com header.i=@kernel-dk.20150623.gappssmtp.com header.b="LTyUtTOi"
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1727440AbfLJPSG (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Tue, 10 Dec 2019 10:18:06 -0500
-Received: from mail-vs1-f66.google.com ([209.85.217.66]:38298 "EHLO
-        mail-vs1-f66.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1727420AbfLJPSG (ORCPT
+        id S1727525AbfLJQY5 (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Tue, 10 Dec 2019 11:24:57 -0500
+Received: from mail-il1-f193.google.com ([209.85.166.193]:36303 "EHLO
+        mail-il1-f193.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S1727178AbfLJQY5 (ORCPT
         <rfc822;linux-block@vger.kernel.org>);
-        Tue, 10 Dec 2019 10:18:06 -0500
-Received: by mail-vs1-f66.google.com with SMTP id y195so13309538vsy.5
-        for <linux-block@vger.kernel.org>; Tue, 10 Dec 2019 07:18:05 -0800 (PST)
+        Tue, 10 Dec 2019 11:24:57 -0500
+Received: by mail-il1-f193.google.com with SMTP id b15so16672907iln.3
+        for <linux-block@vger.kernel.org>; Tue, 10 Dec 2019 08:24:57 -0800 (PST)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=linaro.org; s=google;
-        h=mime-version:references:in-reply-to:from:date:message-id:subject:to
-         :cc;
-        bh=jcUnC0/SEm4HDTIw1YLkWhbNF7DV2HNNDkdfVlTygbE=;
-        b=cSSUpZLtf+hCVZvTD7HbKKL/zq4Rkmgcb2lIlIkDlhoxjyGVl0vVSnKlyJSar8oMju
-         kJKrdwjxQ132req2y4+nrrVfisVcDFp//Vza1JYfv88Pn0pawYqigZnVIjKe8hsBLtwo
-         MCeVhuUG+FD6AVkT5efECIF5yoeCURQPE8pK5mLLWFQv5VUdlsUYexM/XG4pBnG0lMlj
-         homajns2YyoPkCVbVSABDLsSQp/B9WvdKRwStVCpME0KK4gfjaFWk6c6Sp+tT9WhGfwd
-         Wm0n+fvhFn2WYXhdCvCyA4aduw0ySOsjxw4ZHQ5FAt3egnPm7ELrA47hNqGA3SWWB7Yy
-         x0ug==
+        d=kernel-dk.20150623.gappssmtp.com; s=20150623;
+        h=from:to:subject:date:message-id:mime-version
+         :content-transfer-encoding;
+        bh=NL2wx8OhT9nqgeYI97q9VsOTFKCtkP5TFUuqwTv6H6w=;
+        b=LTyUtTOiDdot1XqLMl7i53d11nkIkpHsXZo5aA5qNQorELxc9mAR1aNsmM5j49z653
+         ZyfAKvcNIpn1QLWUtIJWJTWvGsFYz9Vi7ZUKgfVki4us09AZkRrdPaTzyk+l0Uj0IHku
+         5NvFFAaXeBYP9Woq9eCHZMJZ4s5Cj2UOgxNzWtlOuK0mCUUofkS0QaxBBB7CP6G4it0P
+         PDteFrR7FCMx+hQ7BOW+4f8mEsHSJj4kVM+sH7x/xHqjdFzZ2Z9t9y/1ym7bs7xZxScO
+         pKMMgV2UsdiOS5yIu8odu9AUzU7WGUIu0q30XMeOp7GP8DzAeoXj+2WJA49O3UI/WEgi
+         aihQ==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=1e100.net; s=20161025;
-        h=x-gm-message-state:mime-version:references:in-reply-to:from:date
-         :message-id:subject:to:cc;
-        bh=jcUnC0/SEm4HDTIw1YLkWhbNF7DV2HNNDkdfVlTygbE=;
-        b=VkQKV3U6fXSk4Pqu4xCgLAqE28Vp5rPgSQFRN9vInUMQXKB1rSiIa/wmJ8MSpIP041
-         ljJRxfjYbCuF6NA2URoMbScVlQ8g5/uFYpa0J19zcWN1zv6KQSK8/ax9669djEp3fsJk
-         PNSBqNg77ru2kgm+DE0pyFA0A87vwJivKrR//sUPQJV0R7D96gEK74nCgFZYvQebFX/B
-         RcOTuM/35/7jv1PglfwNAyzkjc44W5o1nuKjpB1K3FlSuVw66GnkEYL7tJIyXHltpzD0
-         Gh0FlBCoL9s5sSYCRNakVHh+rTKsjXxK8JW6U85kMAQKolpRX333mNM7qnv5yVmTB7Pa
-         0MtA==
-X-Gm-Message-State: APjAAAWkscrOmTM4UPp/TQdoWD6Y4gXhejXidlgYy0TyJ3tmkFBcNbGB
-        Oj9SffEH4zXBiPcRdIqC1fauJDtuSTQaFlsvczkzd1dTV98=
-X-Google-Smtp-Source: APXvYqxHTWP37WCrbgkX6nxMLdBw/0tPKoRg5nRin2f5LJXHzhcKcpphZKWgMGaQKXGnCPL9VoXyCSqg/WxqTmWfZqM=
-X-Received: by 2002:a05:6102:5d1:: with SMTP id v17mr25314853vsf.200.1575991085086;
- Tue, 10 Dec 2019 07:18:05 -0800 (PST)
+        h=x-gm-message-state:from:to:subject:date:message-id:mime-version
+         :content-transfer-encoding;
+        bh=NL2wx8OhT9nqgeYI97q9VsOTFKCtkP5TFUuqwTv6H6w=;
+        b=XlBABRNVQwOFw4b3tBTDOOrRdF3VAQT6+QufTz4t2MSlICq1P2+2efuQWCztdws3pw
+         TViFw5kTCWyBA1D1XIk47KTTsngNX9rzuhsBKjzCbscVjl4xUWH0BnIyyBtlCp685wC7
+         YgUnoHBi3XvHPUcElIBBClFJzV4TLbJna9HDJIZpnPh0bBDBAEAyOunBvP/oIuVfSDkq
+         /Rk6R4glJ55oR5NrR5f5D1zgFG0dbmQzuqzPh8KaRVVBwMUDwRovgIglvPK0sDX/NqhH
+         3nqCvkJgrA64dH0iTIMt9tqFJdi1n+EW4vujzi1GQhU45dKFFJ+B2K/ZaW00mGdFbSB+
+         cCXw==
+X-Gm-Message-State: APjAAAXNFOx3jNlXfwVneHC9dhgoSTpNMW7fE+GkjeXrKEWWnh8XUl8l
+        +aaFbOaXHk9r4V/AUw9O2wtI1g==
+X-Google-Smtp-Source: APXvYqzFCnW3bCJ9SgM7zc9uOwPn6XurQF380D0hDP/vO67nas52IiaHd40QcaYT8aulE0gULhfCqw==
+X-Received: by 2002:a92:d7c1:: with SMTP id g1mr35930204ilq.192.1575995096800;
+        Tue, 10 Dec 2019 08:24:56 -0800 (PST)
+Received: from x1.thefacebook.com ([65.144.74.34])
+        by smtp.gmail.com with ESMTPSA id y11sm791174iol.23.2019.12.10.08.24.55
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Tue, 10 Dec 2019 08:24:56 -0800 (PST)
+From:   Jens Axboe <axboe@kernel.dk>
+To:     linux-mm@kvack.org, linux-fsdevel@vger.kernel.org,
+        linux-block@vger.kernel.org
+Subject: [PATCHSET 0/5] Support for RWF_UNCACHED
+Date:   Tue, 10 Dec 2019 09:24:49 -0700
+Message-Id: <20191210162454.8608-1-axboe@kernel.dk>
+X-Mailer: git-send-email 2.24.0
 MIME-Version: 1.0
-References: <cover.1573456283.git.baolin.wang@linaro.org> <CAK8P3a1we9D5C2NOBww=cW-4L1PT3t0NnDRmknLwiLm652TmKg@mail.gmail.com>
- <CAMz4kuK9HEuGdhNqHO_qoy9jD=ccsPPhD_dKYwNRgQyWyYwqRA@mail.gmail.com>
- <CAK8P3a0rNhyxmUWLUV1js3FsuAESDOPX3E4b8ActtL4GRT4uTA@mail.gmail.com>
- <CADBw62pzV+5ZXBEbFvTQJ9essAd4cd7Xkz5j9AXB5rAQy0wLqA@mail.gmail.com>
- <CAMz4kuK_3q4JY1vNXe6zGHDNF8Ep-SkcUq6Z25r790VSz4+Bjw@mail.gmail.com>
- <CAK8P3a11vJb1riYseqPnF_5SuJA+YnYuGwC0XWx6_rk+eQ0Bmw@mail.gmail.com>
- <f88856aa-9175-2a93-3747-c98215cb79c3@suse.de> <20191127090023.GA23040@infradead.org>
- <CAK8P3a0gUWf_+ZmscuFanvPG=wN09ELL-JpByjJJM4Lo1FYmrQ@mail.gmail.com>
-In-Reply-To: <CAK8P3a0gUWf_+ZmscuFanvPG=wN09ELL-JpByjJJM4Lo1FYmrQ@mail.gmail.com>
-From:   Ulf Hansson <ulf.hansson@linaro.org>
-Date:   Tue, 10 Dec 2019 16:17:28 +0100
-Message-ID: <CAPDyKFoNAF1UUvzvEGxTS=yKJshVgHsXqXiCxno75=aasME4kw@mail.gmail.com>
-Subject: Re: [PATCH v6 0/4] Add MMC software queue support
-To:     Arnd Bergmann <arnd@arndb.de>
-Cc:     Christoph Hellwig <hch@infradead.org>,
-        Hannes Reinecke <hare@suse.de>,
-        "(Exiting) Baolin Wang" <baolin.wang@linaro.org>,
-        Baolin Wang <baolin.wang7@gmail.com>,
-        Adrian Hunter <adrian.hunter@intel.com>,
-        Asutosh Das <asutoshd@codeaurora.org>,
-        Orson Zhai <orsonzhai@gmail.com>,
-        Lyra Zhang <zhang.lyra@gmail.com>,
-        Linus Walleij <linus.walleij@linaro.org>,
-        Vincent Guittot <vincent.guittot@linaro.org>,
-        linux-mmc <linux-mmc@vger.kernel.org>,
-        "linux-kernel@vger.kernel.org" <linux-kernel@vger.kernel.org>,
-        Hannes Reinecke <hare@suse.com>,
-        linux-block <linux-block@vger.kernel.org>,
-        Paolo Valente <paolo.valente@linaro.org>
-Content-Type: text/plain; charset="UTF-8"
+Content-Transfer-Encoding: 8bit
 Sender: linux-block-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-On Wed, 27 Nov 2019 at 13:01, Arnd Bergmann <arnd@arndb.de> wrote:
->
-> On Wed, Nov 27, 2019 at 10:00 AM Christoph Hellwig <hch@infradead.org> wrote:
-> >
-> > On Tue, Nov 26, 2019 at 12:17:15PM +0100, Hannes Reinecke wrote:
-> >  If requests are batched enough we could just drain
-> > and switch every time an other partition access comes in.  Especially
-> > so if people only use partitions for boot partitions and other rarely
-> > used areas.
->
-> We only support a single user partition plus up to two boot partitions that
-> are accessed rarely, I don't think there is any reason to optimize switching
-> between them.
+Recently someone asked me how io_uring buffered IO compares to mmaped
+IO in terms of performance. So I ran some tests with buffered IO, and
+found the experience to be somewhat painful. The test case is pretty
+basic, random reads over a dataset that's 10x the size of RAM.
+Performance starts out fine, and then the page cache fills up and we
+hit a throughput cliff. CPU usage of the IO threads go up, and we have
+kswapd spending 100% of a core trying to keep up. Seeing that, I was
+reminded of the many complaints I here about buffered IO, and the fact
+that most of the folks complaining will ultimately bite the bullet and
+move to O_DIRECT to just get the kernel out of the way.
 
-I agree. However, let me just add some more information to this.
+But I don't think it needs to be like that. Switching to O_DIRECT isn't
+always easily doable. The buffers have different life times, size and
+alignment constraints, etc. On top of that, mixing buffered and O_DIRECT
+can be painful.
 
-There are more partitions, like the RPMB for example. In regards to
-partition switching, after serving a request to the RPMB partition, we
-always switch back to the main user area. I think that is sufficient.
+Seems to me that we have an opportunity to provide something that sits
+somewhere in between buffered and O_DIRECT, and this is where
+RWF_UNCACHED enters the picture. If this flag is set on IO, we get the
+following behavior:
 
-Also note that requests for the RPMB partitions are managed via
-REQ_OP_DRV_IN|OUT.
+- If the data is in cache, it remains in cache and the copy (in or out)
+  is served to/from that.
 
->
-> The only change that I think we need here is to change the partition switch
-> from something that is done synchronously during ->queue_rq() to
-> something that fits better into normal scheme of sending a cmd to
-> the device, returning BLK_STS_RESOURCE from ->queue_rq.
+- If the data is NOT in cache, we add it while performing the IO. When
+  the IO is done, we remove it again.
 
-You want to translate them to be managed similar to REQ_OP_DRV_IN|OUT, no?
+With this, I can do 100% smooth buffered reads or writes without pushing
+the kernel to the state where kswapd is sweating bullets. In fact it
+doesn't even register.
 
-I am just trying to understand what this would help us with, but I
-don't get it, sorry.
+Comments appreciated! Patches are against current git (ish), and can
+also be found here:
 
-I realize that I am joining the show a bit late, apologize for that.
-But it seems like you are forgetting about re-tuning, urgent bkops,
-card detect, SDIO combo cards, etc.
+https://git.kernel.dk/cgit/linux-block/log/?h=buffered-uncached
 
-For example, re-tuning may be required because of a CRC error on the
-previously sent transfer. Thus re-tuning must be done before serving
-the next request.
+ fs/ceph/file.c          |   2 +-
+ fs/dax.c                |   2 +-
+ fs/ext4/file.c          |   2 +-
+ fs/iomap/apply.c        |   2 +-
+ fs/iomap/buffered-io.c  |  75 +++++++++++++++++------
+ fs/iomap/direct-io.c    |   3 +-
+ fs/iomap/fiemap.c       |   5 +-
+ fs/iomap/seek.c         |   6 +-
+ fs/iomap/swapfile.c     |   2 +-
+ fs/nfs/file.c           |   2 +-
+ include/linux/fs.h      |   9 ++-
+ include/linux/iomap.h   |   6 +-
+ include/uapi/linux/fs.h |   5 +-
+ mm/filemap.c            | 132 ++++++++++++++++++++++++++++++++++++----
+ 14 files changed, 208 insertions(+), 45 deletions(-)
 
-Likewise, when the device signals urgent bkops status, we must not
-serve any new request until the card has notified us that it is ready
-with it's internal housekeeping operations.
+-- 
+Jens Axboe
 
-> Possibly this could even be turned into a standard struct request that is
-> added between two normal requests for different partitions at some
-> point, if this simplifies the logic (I suspect it won't, but it may be worth
-> a try).
 
-Doing so, means re-tuning, bkops, etc, also needs to be managed in the
-same way. Is this really the way to go?
-
-Kind regards
-Uffe
