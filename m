@@ -1,138 +1,138 @@
-Return-Path: <SRS0=EWGC=2A=vger.kernel.org=linux-block-owner@kernel.org>
+Return-Path: <SRS0=X6jZ=2B=vger.kernel.org=linux-block-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-10.1 required=3.0 tests=DKIMWL_WL_HIGH,DKIM_SIGNED,
-	DKIM_VALID,DKIM_VALID_AU,INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,
-	SPF_HELO_NONE,SPF_PASS,USER_AGENT_GIT autolearn=unavailable
+X-Spam-Status: No, score=-2.2 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
+	MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,USER_AGENT_SANE_1 autolearn=no
 	autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 32E19C43603
-	for <linux-block@archiver.kernel.org>; Tue, 10 Dec 2019 22:09:47 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id D47B7C2D0C4
+	for <linux-block@archiver.kernel.org>; Wed, 11 Dec 2019 00:23:57 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.kernel.org (Postfix) with ESMTP id 04F2F20836
-	for <linux-block@archiver.kernel.org>; Tue, 10 Dec 2019 22:09:47 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=default; t=1576015787;
-	bh=Hh3R6bgpfIqgBXr1M5YNdXh6HBN0Bb9I12xn+qgoj1c=;
-	h=From:To:Cc:Subject:Date:In-Reply-To:References:List-ID:From;
-	b=mGKxk3s9PBVXDTa3GfdFmYQyRFYNDQJpCR73CuNevdjaU5AZbZZ4pknLNAhhQLDmT
-	 hOL79ZKEPkXrnR2li5BDlTlofftolve89Js44ukOydNoFfKtPW2COWa7IylufJ3Px9
-	 ml+BYxYHMdro+q6dbZpCk4KHzV3+DZ9He1LcexOc=
+	by mail.kernel.org (Postfix) with ESMTP id B429620836
+	for <linux-block@archiver.kernel.org>; Wed, 11 Dec 2019 00:23:57 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1728755AbfLJWEY (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Tue, 10 Dec 2019 17:04:24 -0500
-Received: from mail.kernel.org ([198.145.29.99]:35176 "EHLO mail.kernel.org"
-        rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-        id S1728734AbfLJWEX (ORCPT <rfc822;linux-block@vger.kernel.org>);
-        Tue, 10 Dec 2019 17:04:23 -0500
-Received: from sasha-vm.mshome.net (c-73-47-72-35.hsd1.nh.comcast.net [73.47.72.35])
-        (using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
-        (No client certificate requested)
-        by mail.kernel.org (Postfix) with ESMTPSA id 4351320637;
-        Tue, 10 Dec 2019 22:04:21 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-        s=default; t=1576015462;
-        bh=Hh3R6bgpfIqgBXr1M5YNdXh6HBN0Bb9I12xn+qgoj1c=;
-        h=From:To:Cc:Subject:Date:In-Reply-To:References:From;
-        b=OBRC8/FxQ58Q5G6gr0zfw5XWravlGSKul8R+bo7ecgM8p5TegAEqtTIKwapEG4GpG
-         RTdrXFBgLmfzrnhhL4YvOufIBerpw80+ZwX+RQrvHePoZgVZo7Nh/I2fA33g7qHT+o
-         X8SLhuY8t7WyiPbHov1Ub/tsQBcfiTT0jmIIV5W8=
-From:   Sasha Levin <sashal@kernel.org>
-To:     linux-kernel@vger.kernel.org, stable@vger.kernel.org
-Cc:     "Darrick J. Wong" <darrick.wong@oracle.com>,
-        Christoph Hellwig <hch@lst.de>, Jens Axboe <axboe@kernel.dk>,
-        Sasha Levin <sashal@kernel.org>, linux-block@vger.kernel.org
-Subject: [PATCH AUTOSEL 4.14 068/130] loop: fix no-unmap write-zeroes request behavior
-Date:   Tue, 10 Dec 2019 17:01:59 -0500
-Message-Id: <20191210220301.13262-68-sashal@kernel.org>
-X-Mailer: git-send-email 2.20.1
-In-Reply-To: <20191210220301.13262-1-sashal@kernel.org>
-References: <20191210220301.13262-1-sashal@kernel.org>
+        id S1727051AbfLKAX5 (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Tue, 10 Dec 2019 19:23:57 -0500
+Received: from mail104.syd.optusnet.com.au ([211.29.132.246]:57919 "EHLO
+        mail104.syd.optusnet.com.au" rhost-flags-OK-OK-OK-OK)
+        by vger.kernel.org with ESMTP id S1726769AbfLKAX4 (ORCPT
+        <rfc822;linux-block@vger.kernel.org>);
+        Tue, 10 Dec 2019 19:23:56 -0500
+Received: from dread.disaster.area (pa49-195-139-249.pa.nsw.optusnet.com.au [49.195.139.249])
+        by mail104.syd.optusnet.com.au (Postfix) with ESMTPS id 05A387E9B8C;
+        Wed, 11 Dec 2019 11:23:51 +1100 (AEDT)
+Received: from dave by dread.disaster.area with local (Exim 4.92.3)
+        (envelope-from <david@fromorbit.com>)
+        id 1iepnB-0006Pe-C7; Wed, 11 Dec 2019 11:23:49 +1100
+Date:   Wed, 11 Dec 2019 11:23:49 +1100
+From:   Dave Chinner <david@fromorbit.com>
+To:     Jens Axboe <axboe@kernel.dk>
+Cc:     linux-mm@kvack.org, linux-fsdevel@vger.kernel.org,
+        linux-block@vger.kernel.org
+Subject: Re: [PATCH 3/5] mm: make buffered writes work with RWF_UNCACHED
+Message-ID: <20191211002349.GC19213@dread.disaster.area>
+References: <20191210162454.8608-1-axboe@kernel.dk>
+ <20191210162454.8608-4-axboe@kernel.dk>
 MIME-Version: 1.0
-X-stable: review
-X-Patchwork-Hint: Ignore
-Content-Transfer-Encoding: 8bit
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <20191210162454.8608-4-axboe@kernel.dk>
+User-Agent: Mutt/1.10.1 (2018-07-13)
+X-Optus-CM-Score: 0
+X-Optus-CM-Analysis: v=2.3 cv=X6os11be c=1 sm=1 tr=0
+        a=KoypXv6BqLCQNZUs2nCMWg==:117 a=KoypXv6BqLCQNZUs2nCMWg==:17
+        a=jpOVt7BSZ2e4Z31A5e1TngXxSK0=:19 a=kj9zAlcOel0A:10 a=pxVhFHJ0LMsA:10
+        a=7-415B0cAAAA:8 a=OUdnQ-l5LQdgMwZtS0UA:9 a=CjuIK1q_8ugA:10
+        a=biEYGPWJfzWAr4FL6Ov7:22
 Sender: linux-block-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-From: "Darrick J. Wong" <darrick.wong@oracle.com>
+On Tue, Dec 10, 2019 at 09:24:52AM -0700, Jens Axboe wrote:
+> If RWF_UNCACHED is set for io_uring (or pwritev2(2)), we'll drop the
+> cache instantiated for buffered writes. If new pages aren't
+> instantiated, we leave them alone. This provides similar semantics to
+> reads with RWF_UNCACHED set.
 
-[ Upstream commit efcfec579f6139528c9e6925eca2bc4a36da65c6 ]
+So what about filesystems that don't use generic_perform_write()?
+i.e. Anything that uses the iomap infrastructure (i.e.
+iomap_file_buffered_write()) instead of generic_file_write_iter())
+will currently ignore RWF_UNCACHED. That's XFS and gfs2 right now,
+but there are likely to be more in the near future as more
+filesystems are ported to the iomap infrastructure.
 
-Currently, if the loop device receives a WRITE_ZEROES request, it asks
-the underlying filesystem to punch out the range.  This behavior is
-correct if unmapping is allowed.  However, a NOUNMAP request means that
-the caller doesn't want us to free the storage backing the range, so
-punching out the range is incorrect behavior.
+I'd also really like to see extensive fsx and fstress testing of
+this new IO mode before it is committed - this is going to exercise page
+cache coherency across different operations in new and unique
+ways. that means we need patches to fstests to detect and use this
+functionality when available, and new tests that explicitly exercise
+combinations of buffered, mmap, dio and uncached for a range of
+different IO size and alignments (e.g. mixing sector sized uncached
+IO with page sized buffered/mmap/dio and vice versa).
 
-To satisfy a NOUNMAP | WRITE_ZEROES request, loop should ask the
-underlying filesystem to FALLOC_FL_ZERO_RANGE, which is (according to
-the fallocate documentation) required to ensure that the entire range is
-backed by real storage, which suffices for our purposes.
+We are not going to have a repeat of the copy_file_range() data
+corruption fuckups because no testing was done and no test
+infrastructure was written before the new API was committed.
 
-Fixes: 19372e2769179dd ("loop: implement REQ_OP_WRITE_ZEROES")
-Signed-off-by: Darrick J. Wong <darrick.wong@oracle.com>
-Reviewed-by: Christoph Hellwig <hch@lst.de>
-Signed-off-by: Jens Axboe <axboe@kernel.dk>
-Signed-off-by: Sasha Levin <sashal@kernel.org>
----
- drivers/block/loop.c | 26 ++++++++++++++++++--------
- 1 file changed, 18 insertions(+), 8 deletions(-)
+> +void write_drop_cached_pages(struct page **pgs, struct address_space *mapping,
+> +			     unsigned *nr)
+> +{
+> +	loff_t start, end;
+> +	int i;
+> +
+> +	end = 0;
+> +	start = LLONG_MAX;
+> +	for (i = 0; i < *nr; i++) {
+> +		struct page *page = pgs[i];
+> +		loff_t off;
+> +
+> +		off = (loff_t) page_to_index(page) << PAGE_SHIFT;
+> +		if (off < start)
+> +			start = off;
+> +		if (off > end)
+> +			end = off;
+> +		get_page(page);
+> +	}
+> +
+> +	__filemap_fdatawrite_range(mapping, start, end, WB_SYNC_NONE);
+> +
+> +	for (i = 0; i < *nr; i++) {
+> +		struct page *page = pgs[i];
+> +
+> +		lock_page(page);
+> +		if (page->mapping == mapping) {
+> +			wait_on_page_writeback(page);
+> +			if (!page_has_private(page) ||
+> +			    try_to_release_page(page, 0))
+> +				remove_mapping(mapping, page);
+> +		}
+> +		unlock_page(page);
+> +	}
+> +	*nr = 0;
+> +}
+> +EXPORT_SYMBOL_GPL(write_drop_cached_pages);
+> +
+> +#define GPW_PAGE_BATCH		16
 
-diff --git a/drivers/block/loop.c b/drivers/block/loop.c
-index ec61dd873c93d..453e3728e6573 100644
---- a/drivers/block/loop.c
-+++ b/drivers/block/loop.c
-@@ -414,18 +414,20 @@ static int lo_read_transfer(struct loop_device *lo, struct request *rq,
- 	return ret;
- }
- 
--static int lo_discard(struct loop_device *lo, struct request *rq, loff_t pos)
-+static int lo_fallocate(struct loop_device *lo, struct request *rq, loff_t pos,
-+			int mode)
- {
- 	/*
--	 * We use punch hole to reclaim the free space used by the
--	 * image a.k.a. discard. However we do not support discard if
--	 * encryption is enabled, because it may give an attacker
--	 * useful information.
-+	 * We use fallocate to manipulate the space mappings used by the image
-+	 * a.k.a. discard/zerorange. However we do not support this if
-+	 * encryption is enabled, because it may give an attacker useful
-+	 * information.
- 	 */
- 	struct file *file = lo->lo_backing_file;
--	int mode = FALLOC_FL_PUNCH_HOLE | FALLOC_FL_KEEP_SIZE;
- 	int ret;
- 
-+	mode |= FALLOC_FL_KEEP_SIZE;
-+
- 	if ((!file->f_op->fallocate) || lo->lo_encrypt_key_size) {
- 		ret = -EOPNOTSUPP;
- 		goto out;
-@@ -565,9 +567,17 @@ static int do_req_filebacked(struct loop_device *lo, struct request *rq)
- 	switch (req_op(rq)) {
- 	case REQ_OP_FLUSH:
- 		return lo_req_flush(lo, rq);
--	case REQ_OP_DISCARD:
- 	case REQ_OP_WRITE_ZEROES:
--		return lo_discard(lo, rq, pos);
-+		/*
-+		 * If the caller doesn't want deallocation, call zeroout to
-+		 * write zeroes the range.  Otherwise, punch them out.
-+		 */
-+		return lo_fallocate(lo, rq, pos,
-+			(rq->cmd_flags & REQ_NOUNMAP) ?
-+				FALLOC_FL_ZERO_RANGE :
-+				FALLOC_FL_PUNCH_HOLE);
-+	case REQ_OP_DISCARD:
-+		return lo_fallocate(lo, rq, pos, FALLOC_FL_PUNCH_HOLE);
- 	case REQ_OP_WRITE:
- 		if (lo->transfer)
- 			return lo_write_transfer(lo, rq, pos);
+In terms of performance, file fragmentation and premature filesystem
+aging, this is also going to suck *really badly* for filesystems
+that use delayed allocation because it is going to force conversion
+of delayed allocation extents during the write() call. IOWs,
+it adds all the overheads of doing delayed allocation, but it reaps
+none of the benefits because it doesn't allow large contiguous
+extents to build up in memory before physical allocation occurs.
+i.e. there is no "delayed" in this allocation....
+
+So it might work fine on a pristine, empty filesystem where it is
+easy to find contiguous free space accross multiple allocations, but
+it's going to suck after a few months of production usage has
+fragmented all the free space into tiny pieces...
+
+Cheers,
+
+Dave.
 -- 
-2.20.1
-
+Dave Chinner
+david@fromorbit.com
