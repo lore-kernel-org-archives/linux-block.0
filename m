@@ -7,62 +7,62 @@ X-Spam-Status: No, score=-9.7 required=3.0 tests=DKIM_SIGNED,DKIM_VALID,
 	SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED,USER_AGENT_GIT autolearn=ham
 	autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id A9A6FC2D0C7
-	for <linux-block@archiver.kernel.org>; Wed, 11 Dec 2019 15:29:52 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 576C6C3F68F
+	for <linux-block@archiver.kernel.org>; Wed, 11 Dec 2019 15:29:57 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.kernel.org (Postfix) with ESMTP id 73C7A22B48
-	for <linux-block@archiver.kernel.org>; Wed, 11 Dec 2019 15:29:52 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id 2AB2222B48
+	for <linux-block@archiver.kernel.org>; Wed, 11 Dec 2019 15:29:57 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel-dk.20150623.gappssmtp.com header.i=@kernel-dk.20150623.gappssmtp.com header.b="hIShSVgu"
+	dkim=pass (2048-bit key) header.d=kernel-dk.20150623.gappssmtp.com header.i=@kernel-dk.20150623.gappssmtp.com header.b="b7eZVja6"
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S2387471AbfLKP3v (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Wed, 11 Dec 2019 10:29:51 -0500
-Received: from mail-pg1-f195.google.com ([209.85.215.195]:46050 "EHLO
-        mail-pg1-f195.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1733306AbfLKP3u (ORCPT
+        id S2387954AbfLKP3z (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Wed, 11 Dec 2019 10:29:55 -0500
+Received: from mail-pj1-f65.google.com ([209.85.216.65]:43737 "EHLO
+        mail-pj1-f65.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S2387925AbfLKP3y (ORCPT
         <rfc822;linux-block@vger.kernel.org>);
-        Wed, 11 Dec 2019 10:29:50 -0500
-Received: by mail-pg1-f195.google.com with SMTP id b9so10526435pgk.12
-        for <linux-block@vger.kernel.org>; Wed, 11 Dec 2019 07:29:50 -0800 (PST)
+        Wed, 11 Dec 2019 10:29:54 -0500
+Received: by mail-pj1-f65.google.com with SMTP id g4so9055435pjs.10
+        for <linux-block@vger.kernel.org>; Wed, 11 Dec 2019 07:29:54 -0800 (PST)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=kernel-dk.20150623.gappssmtp.com; s=20150623;
         h=from:to:cc:subject:date:message-id:in-reply-to:references
          :mime-version:content-transfer-encoding;
-        bh=g934jRFitGK2n249ARajPKYt/UpPdfJOZffggpxpM9A=;
-        b=hIShSVguWXwm0y2cL0ju6hNSTjgZP3jIvU5CANQeaBbbgcdD6PfmACfAi4kfMs+Sqx
-         nATEMWbANyYz5uspreNDCqQMAz2eCalKMGWZm21O9mpV7mCH/K4jmhnX/pB/lM1aE0vM
-         Xm/hmRQamtmiB6Pj9UPRaQ2DAIiLu2Qy0H/4qEegJZeOX1p+Yl2jRURAqxI866AIvP3Y
-         3UkbbAU+/7GJlWj/F02kfTmothrYFyD0N89sVtF04WTWIQx7aeucl6rRkCb2zrxepLZQ
-         xP8vmSzTeiLhDUm2cExVT4HSFl9BTSNUR3f3NiK51XVhiZASq3GK9ydsAXSn+aeHt6A5
-         Ghsg==
+        bh=es9BSJvoDpT3WZtR0L+ZV+Or+1xGCPbWn6QJpLr3Xx4=;
+        b=b7eZVja6aKMDWQsCKiYnvs5qkkMtb4DoRhvZH0mwJvk9LESKsse6xmT3WWlILNTvSh
+         v88npyxYy5/e7tLfGcgiIVXEYnv46FT50sPnEQt69UhDuyJOSuVNzLSlAXpUWTdkrJku
+         nBpk9ZFk1qOaWPCwwhIIUbpQcT9k4a3aWUlDts7fPgZxFfbctK2wZluabjrrFqSzFkdb
+         ugqNIWkF1i16/QrpWLX9gvSlMh+w4/NfxFGOtFaxQnCkEmSB/wopkF4l1CCYgv3FmwBY
+         8JMlN5D7vigbmAU/36SNoC65YkKfas3+j+3P0Mey+EpgI+uJdC4zZ8pPIn6ofe48cSq8
+         fYrw==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=1e100.net; s=20161025;
         h=x-gm-message-state:from:to:cc:subject:date:message-id:in-reply-to
          :references:mime-version:content-transfer-encoding;
-        bh=g934jRFitGK2n249ARajPKYt/UpPdfJOZffggpxpM9A=;
-        b=ahsWtSoKbfki9tuDkDp3RsDYmuwU0ECiyenuUwjcbYgYW85yFbdDTEoRu0lhyKXfHe
-         d8Tc48tT2YAppO6nN+1IjTnGIj4PRSA7HZxoLuIyr8s4q2ZPnruyx2KDGu1V5JrAkfXL
-         aeFo8ASqZQx4+3Ju60pmU3afjEjsNYFoaQ8YP9gMeIJ7UWnJwEFRunLxPb/6Pi+4wCsN
-         K+yv+6prZjDLoi/JsKK5wXhnmoGbn9wSrEKeGL3QOPcKEyiGMA5Siq+O8Exu6M5od+HT
-         xcGq49YvyzN3+ZWsioMaNu30AIoKGYu5eC5H42biewQfnXjPawqB86rUKjNm/nTj+TjU
-         0fHA==
-X-Gm-Message-State: APjAAAWCg682fmDwGvWrLYrOps4iApqY9qzN0zeGhAlx/lLiWjprP6JV
-        5g7BtVosCuiMpFLl4epet1aImA==
-X-Google-Smtp-Source: APXvYqwpF6dGCPhavv63RwYf+8PYYsJTF9C7RX+z8Jolg/cVO5+K6nTPhv4+p5ass14DlFh2i74SoA==
-X-Received: by 2002:a63:a707:: with SMTP id d7mr4668981pgf.93.1576078189951;
-        Wed, 11 Dec 2019 07:29:49 -0800 (PST)
+        bh=es9BSJvoDpT3WZtR0L+ZV+Or+1xGCPbWn6QJpLr3Xx4=;
+        b=IBW52+G8K8OpfWzS/PXGdj1qn9qaChLThVvl+ga17Jj3JELvE47RQMFk5EDHNAW6TF
+         gdoqjPo5yhvjmJ9cHns5WeF2MC5av4Oe9wZyRHbdPUC7NfVRkmocw53vjHL/fOYIVzjr
+         c/HNH4WJVS7FRN0kx13H+cOOIcfehx2UqulS+GNk7Ff0P8jqRq8V6cx5VKGPbouyCm0V
+         rUawNInUR7JsqtbFJowvYhQdKreJMyxBZvtIu95gW64BesPXcojKCChmIaPtAhouiH7n
+         ltAW9Dz3AI2FTNTYg22f7UNbkjqL8pH7OfmLGgoZEKrTMx+zGLpaNIPLDQ5864jLw2s7
+         D3YA==
+X-Gm-Message-State: APjAAAVe109jDj3xewTU1p3hNfr3JB0kThrJv9CgBg9Uij8qNff2yL7V
+        xOQfVO4uKpMhKJseSglaS3+EYQ==
+X-Google-Smtp-Source: APXvYqwO4KCx+Py7lrwxvyOY5WGp+WpfJGvARNpLtItIFsqOyOUndXtXBekGEuoMQQchwtmsNvTWrg==
+X-Received: by 2002:a17:902:8d8a:: with SMTP id v10mr3929048plo.282.1576078193740;
+        Wed, 11 Dec 2019 07:29:53 -0800 (PST)
 Received: from x1.thefacebook.com ([2620:10d:c090:180::50da])
-        by smtp.gmail.com with ESMTPSA id n26sm3661882pgd.46.2019.12.11.07.29.48
+        by smtp.gmail.com with ESMTPSA id n26sm3661882pgd.46.2019.12.11.07.29.52
         (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Wed, 11 Dec 2019 07:29:48 -0800 (PST)
+        Wed, 11 Dec 2019 07:29:52 -0800 (PST)
 From:   Jens Axboe <axboe@kernel.dk>
 To:     linux-mm@kvack.org, linux-fsdevel@vger.kernel.org,
         linux-block@vger.kernel.org
 Cc:     willy@infradead.org, clm@fb.com, torvalds@linux-foundation.org,
         david@fromorbit.com, Jens Axboe <axboe@kernel.dk>
-Subject: [PATCH 1/5] fs: add read support for RWF_UNCACHED
-Date:   Wed, 11 Dec 2019 08:29:39 -0700
-Message-Id: <20191211152943.2933-2-axboe@kernel.dk>
+Subject: [PATCH 3/5] mm: make buffered writes work with RWF_UNCACHED
+Date:   Wed, 11 Dec 2019 08:29:41 -0700
+Message-Id: <20191211152943.2933-4-axboe@kernel.dk>
 X-Mailer: git-send-email 2.24.0
 In-Reply-To: <20191211152943.2933-1-axboe@kernel.dk>
 References: <20191211152943.2933-1-axboe@kernel.dk>
@@ -73,149 +73,108 @@ Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-If RWF_UNCACHED is set for io_uring (or preadv2(2)), we'll drop the
-cache for buffered reads if we are the ones instantiating it. If the
-data is already cached, we leave it cached.
+If RWF_UNCACHED is set for io_uring (or pwritev2(2)), we'll drop the
+cache instantiated for buffered writes. If new pages aren't
+instantiated, we leave them alone. This provides similar semantics to
+reads with RWF_UNCACHED set.
 
 Signed-off-by: Jens Axboe <axboe@kernel.dk>
 ---
- include/linux/fs.h      |  3 +++
- include/uapi/linux/fs.h |  5 ++++-
- mm/filemap.c            | 46 ++++++++++++++++++++++++++++++++++++-----
- 3 files changed, 48 insertions(+), 6 deletions(-)
+ include/linux/fs.h |  1 +
+ mm/filemap.c       | 41 +++++++++++++++++++++++++++++++++++++++--
+ 2 files changed, 40 insertions(+), 2 deletions(-)
 
 diff --git a/include/linux/fs.h b/include/linux/fs.h
-index 98e0349adb52..092ea2a4319b 100644
+index bf58db1bc032..5ea5fc167524 100644
 --- a/include/linux/fs.h
 +++ b/include/linux/fs.h
-@@ -314,6 +314,7 @@ enum rw_hint {
- #define IOCB_SYNC		(1 << 5)
- #define IOCB_WRITE		(1 << 6)
- #define IOCB_NOWAIT		(1 << 7)
-+#define IOCB_UNCACHED		(1 << 8)
+@@ -285,6 +285,7 @@ enum positive_aop_returns {
+ #define AOP_FLAG_NOFS			0x0002 /* used by filesystem to direct
+ 						* helper code (eg buffer layer)
+ 						* to clear GFP_FS from alloc */
++#define AOP_FLAG_UNCACHED		0x0004
  
- struct kiocb {
- 	struct file		*ki_filp;
-@@ -3418,6 +3419,8 @@ static inline int kiocb_set_rw_flags(struct kiocb *ki, rwf_t flags)
- 		ki->ki_flags |= (IOCB_DSYNC | IOCB_SYNC);
- 	if (flags & RWF_APPEND)
- 		ki->ki_flags |= IOCB_APPEND;
-+	if (flags & RWF_UNCACHED)
-+		ki->ki_flags |= IOCB_UNCACHED;
- 	return 0;
- }
- 
-diff --git a/include/uapi/linux/fs.h b/include/uapi/linux/fs.h
-index 379a612f8f1d..357ebb0e0c5d 100644
---- a/include/uapi/linux/fs.h
-+++ b/include/uapi/linux/fs.h
-@@ -299,8 +299,11 @@ typedef int __bitwise __kernel_rwf_t;
- /* per-IO O_APPEND */
- #define RWF_APPEND	((__force __kernel_rwf_t)0x00000010)
- 
-+/* drop cache after reading or writing data */
-+#define RWF_UNCACHED	((__force __kernel_rwf_t)0x00000040)
-+
- /* mask of flags supported by the kernel */
- #define RWF_SUPPORTED	(RWF_HIPRI | RWF_DSYNC | RWF_SYNC | RWF_NOWAIT |\
--			 RWF_APPEND)
-+			 RWF_APPEND | RWF_UNCACHED)
- 
- #endif /* _UAPI_LINUX_FS_H */
+ /*
+  * oh the beauties of C type declarations.
 diff --git a/mm/filemap.c b/mm/filemap.c
-index bf6aa30be58d..ed23a11b3e34 100644
+index fe37bd2b2630..4dadd1a4ca7c 100644
 --- a/mm/filemap.c
 +++ b/mm/filemap.c
-@@ -933,8 +933,8 @@ int add_to_page_cache_locked(struct page *page, struct address_space *mapping,
- }
- EXPORT_SYMBOL(add_to_page_cache_locked);
- 
--int add_to_page_cache_lru(struct page *page, struct address_space *mapping,
--				pgoff_t offset, gfp_t gfp_mask)
-+static int __add_to_page_cache(struct page *page, struct address_space *mapping,
-+			       pgoff_t offset, gfp_t gfp_mask, bool lru)
+@@ -3287,10 +3287,12 @@ struct page *grab_cache_page_write_begin(struct address_space *mapping,
+ 					pgoff_t index, unsigned flags)
  {
- 	void *shadow = NULL;
- 	int ret;
-@@ -956,9 +956,17 @@ int add_to_page_cache_lru(struct page *page, struct address_space *mapping,
- 		WARN_ON_ONCE(PageActive(page));
- 		if (!(gfp_mask & __GFP_WRITE) && shadow)
- 			workingset_refault(page, shadow);
--		lru_cache_add(page);
-+		if (lru)
-+			lru_cache_add(page);
- 	}
- 	return ret;
-+
-+}
-+
-+int add_to_page_cache_lru(struct page *page, struct address_space *mapping,
-+				pgoff_t offset, gfp_t gfp_mask)
-+{
-+	return __add_to_page_cache(page, mapping, offset, gfp_mask, true);
- }
- EXPORT_SYMBOL_GPL(add_to_page_cache_lru);
+ 	struct page *page;
+-	int fgp_flags = FGP_LOCK|FGP_WRITE|FGP_CREAT;
++	int fgp_flags = FGP_LOCK|FGP_WRITE;
  
-@@ -2032,6 +2040,7 @@ static ssize_t generic_file_buffered_read(struct kiocb *iocb,
- 	offset = *ppos & ~PAGE_MASK;
+ 	if (flags & AOP_FLAG_NOFS)
+ 		fgp_flags |= FGP_NOFS;
++	if (!(flags & AOP_FLAG_UNCACHED))
++		fgp_flags |= FGP_CREAT;
  
- 	for (;;) {
-+		bool drop_page = false;
+ 	page = pagecache_get_page(mapping, index, fgp_flags,
+ 			mapping_gfp_mask(mapping));
+@@ -3311,6 +3313,9 @@ ssize_t generic_perform_write(struct file *file,
+ 	ssize_t written = 0;
+ 	unsigned int flags = 0;
+ 
++	if (iocb->ki_flags & IOCB_UNCACHED)
++		flags |= AOP_FLAG_UNCACHED;
++
+ 	do {
  		struct page *page;
- 		pgoff_t end_index;
- 		loff_t isize;
-@@ -2048,6 +2057,9 @@ static ssize_t generic_file_buffered_read(struct kiocb *iocb,
- 		if (!page) {
- 			if (iocb->ki_flags & IOCB_NOWAIT)
- 				goto would_block;
-+			/* UNCACHED implies no read-ahead */
-+			if (iocb->ki_flags & IOCB_UNCACHED)
-+				goto no_cached_page;
- 			page_cache_sync_readahead(mapping,
- 					ra, filp,
- 					index, last_index - index);
-@@ -2147,6 +2159,26 @@ static ssize_t generic_file_buffered_read(struct kiocb *iocb,
- 		offset &= ~PAGE_MASK;
- 		prev_offset = offset;
- 
-+		/*
-+		 * If we're dropping this page due to drop-behind, then
-+		 * lock it first. Ignore errors here, we can just leave it
-+		 * in the page cache. Note that we didn't add this page to
-+		 * the LRU when we added it to the page cache. So if we
-+		 * fail removing it, or lock it, add to the LRU.
-+		 */
-+		if (drop_page) {
-+			bool addlru = true;
-+
-+			if (!lock_page_killable(page)) {
-+				if (page->mapping == mapping)
-+					addlru = !remove_mapping(mapping, page);
-+				else
-+					addlru = false;
-+				unlock_page(page);
-+			}
-+			if (addlru)
-+				lru_cache_add(page);
-+		}
- 		put_page(page);
- 		written += ret;
- 		if (!iov_iter_count(iter))
-@@ -2234,8 +2266,12 @@ static ssize_t generic_file_buffered_read(struct kiocb *iocb,
- 			error = -ENOMEM;
- 			goto out;
+ 		unsigned long offset;	/* Offset into pagecache page */
+@@ -3343,10 +3348,16 @@ ssize_t generic_perform_write(struct file *file,
+ 			break;
  		}
--		error = add_to_page_cache_lru(page, mapping, index,
--				mapping_gfp_constraint(mapping, GFP_KERNEL));
-+		if (iocb->ki_flags & IOCB_UNCACHED)
-+			drop_page = true;
+ 
++retry:
+ 		status = a_ops->write_begin(file, mapping, pos, bytes, flags,
+ 						&page, &fsdata);
+-		if (unlikely(status < 0))
++		if (unlikely(status < 0)) {
++			if (status == -ENOMEM && (flags & AOP_FLAG_UNCACHED)) {
++				flags &= ~AOP_FLAG_UNCACHED;
++				goto retry;
++			}
+ 			break;
++		}
+ 
+ 		if (mapping_writably_mapped(mapping))
+ 			flush_dcache_page(page);
+@@ -3382,6 +3393,32 @@ ssize_t generic_perform_write(struct file *file,
+ 		balance_dirty_pages_ratelimited(mapping);
+ 	} while (iov_iter_count(i));
+ 
++	if (written && (iocb->ki_flags & IOCB_UNCACHED)) {
++		loff_t end;
 +
-+		error = __add_to_page_cache(page, mapping, index,
-+				mapping_gfp_constraint(mapping, GFP_KERNEL),
-+				!drop_page);
- 		if (error) {
- 			put_page(page);
- 			if (error == -EEXIST) {
++		pos = iocb->ki_pos;
++		end = pos + written;
++
++		status = filemap_write_and_wait_range(mapping, pos, end);
++		if (status)
++			goto out;
++
++		/*
++		 * No pages were created for this range, we're done
++		 */
++		if (flags & AOP_FLAG_UNCACHED)
++			 goto out;
++
++		/*
++		 * Try to invalidate cache pages for the range we just wrote.
++		 * We don't care if invalidation fails as the write has still
++		 * worked and leaving clean uptodate pages in the page cache
++		 * isn't a corruption vector for uncached IO.
++		 */
++		 invalidate_inode_pages2_range(mapping,
++					pos >> PAGE_SHIFT, end >> PAGE_SHIFT);
++	}
++out:
+ 	return written ? written : status;
+ }
+ EXPORT_SYMBOL(generic_perform_write);
 -- 
 2.24.0
 
