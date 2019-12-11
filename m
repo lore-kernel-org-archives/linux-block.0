@@ -2,343 +2,222 @@ Return-Path: <SRS0=X6jZ=2B=vger.kernel.org=linux-block-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-2.0 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
-	HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,
-	URIBL_BLOCKED,USER_AGENT_SANE_1 autolearn=no autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-5.2 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
+	INCLUDES_PATCH,MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED,
+	USER_AGENT_SANE_1 autolearn=unavailable autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 27508C43603
-	for <linux-block@archiver.kernel.org>; Wed, 11 Dec 2019 11:14:55 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id D55BFC2D0C8
+	for <linux-block@archiver.kernel.org>; Wed, 11 Dec 2019 11:28:15 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.kernel.org (Postfix) with ESMTP id D974F214AF
-	for <linux-block@archiver.kernel.org>; Wed, 11 Dec 2019 11:14:54 +0000 (UTC)
-Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (1024-bit key) header.d=citrix.com header.i=@citrix.com header.b="KN/NdJZB"
+	by mail.kernel.org (Postfix) with ESMTP id B2BEF21D7D
+	for <linux-block@archiver.kernel.org>; Wed, 11 Dec 2019 11:28:15 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1727851AbfLKLOy (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Wed, 11 Dec 2019 06:14:54 -0500
-Received: from esa1.hc3370-68.iphmx.com ([216.71.145.142]:22399 "EHLO
-        esa1.hc3370-68.iphmx.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1727469AbfLKLOx (ORCPT
-        <rfc822;linux-block@vger.kernel.org>);
-        Wed, 11 Dec 2019 06:14:53 -0500
-DKIM-Signature: v=1; a=rsa-sha256; c=simple/simple;
-  d=citrix.com; s=securemail; t=1576062892;
-  h=date:from:to:cc:subject:message-id:references:
-   mime-version:content-transfer-encoding:in-reply-to;
-  bh=Js+KXVZu0C18q/pPZwN6y53cJHe5c921qavIhxSbNr0=;
-  b=KN/NdJZBHKvsOTj9enYihaSSbrUQ9P9/oxUxur35BCT1RgBWyRFgMyrD
-   9pUWeUNfAvKIJ0es99iT30FYNb+6Ym0nY4JtPMi5OOX+/kEv774IEqt88
-   8MU4hKzLFtvKzP7SrtJH4cSlqMmW6mtfvtFPpZSDGjg05iwREqOic2WId
-   w=;
-Authentication-Results: esa1.hc3370-68.iphmx.com; dkim=none (message not signed) header.i=none; spf=None smtp.pra=roger.pau@citrix.com; spf=Pass smtp.mailfrom=roger.pau@citrix.com; spf=None smtp.helo=postmaster@mail.citrix.com
-Received-SPF: None (esa1.hc3370-68.iphmx.com: no sender
-  authenticity information available from domain of
-  roger.pau@citrix.com) identity=pra; client-ip=162.221.158.21;
-  receiver=esa1.hc3370-68.iphmx.com;
-  envelope-from="roger.pau@citrix.com";
-  x-sender="roger.pau@citrix.com";
-  x-conformance=sidf_compatible
-Received-SPF: Pass (esa1.hc3370-68.iphmx.com: domain of
-  roger.pau@citrix.com designates 162.221.158.21 as permitted
-  sender) identity=mailfrom; client-ip=162.221.158.21;
-  receiver=esa1.hc3370-68.iphmx.com;
-  envelope-from="roger.pau@citrix.com";
-  x-sender="roger.pau@citrix.com";
-  x-conformance=sidf_compatible; x-record-type="v=spf1";
-  x-record-text="v=spf1 ip4:209.167.231.154 ip4:178.63.86.133
-  ip4:195.66.111.40/30 ip4:85.115.9.32/28 ip4:199.102.83.4
-  ip4:192.28.146.160 ip4:192.28.146.107 ip4:216.52.6.88
-  ip4:216.52.6.188 ip4:162.221.158.21 ip4:162.221.156.83
-  ip4:168.245.78.127 ~all"
-Received-SPF: None (esa1.hc3370-68.iphmx.com: no sender
-  authenticity information available from domain of
-  postmaster@mail.citrix.com) identity=helo;
-  client-ip=162.221.158.21; receiver=esa1.hc3370-68.iphmx.com;
-  envelope-from="roger.pau@citrix.com";
-  x-sender="postmaster@mail.citrix.com";
-  x-conformance=sidf_compatible
-IronPort-SDR: E1SgW5d/JwjFrVJ4rG46aG2mxrt+Z9vE+P4acKp8Lh42xK/bQFGNRypqf2fT9YkW7PLI8xIBPz
- z6po0exRV2hbTI43CIoh3Xbdrez9/AzsmRjlJfcTkOrpPKfGFP3ky389luPc0n7G8uNTntQ9Ip
- GacmHMNpXXX62Bt7DAY0JO9WxnexhCc+njV5MJVGPHVxk7dqfky2jd8JKpQbrjATP5MrrgqkXO
- Jnl2i9FjGa4XBtpxyBP0e2uCc3U1U10bMTk0rj2/Ja9WIiWfZ2KLEvnBtf02J0itS4853l2/Ob
- iok=
-X-SBRS: 2.7
-X-MesageID: 9645192
-X-Ironport-Server: esa1.hc3370-68.iphmx.com
-X-Remote-IP: 162.221.158.21
-X-Policy: $RELAYED
-X-IronPort-AV: E=Sophos;i="5.69,301,1571716800"; 
-   d="scan'208";a="9645192"
-Date:   Wed, 11 Dec 2019 12:14:44 +0100
-From:   Roger Pau =?iso-8859-1?Q?Monn=E9?= <roger.pau@citrix.com>
-To:     SeongJae Park <sj38.park@gmail.com>
-CC:     <sjpark@amazon.com>, <axboe@kernel.dk>, <konrad.wilk@oracle.com>,
-        <linux-block@vger.kernel.org>, <linux-kernel@vger.kernel.org>,
-        <pdurrant@amazon.com>, <xen-devel@lists.xenproject.org>,
-        SeongJae Park <sjpark@amazon.de>
-Subject: Re: Re: [PATCH v5 2/2] xen/blkback: Squeeze page pools if a memory
- pressure is detected
-Message-ID: <20191211111444.GL980@Air-de-Roger>
-References: <20191210110432.GG980@Air-de-Roger>
- <20191211040812.12354-1-sj38.park@gmail.com>
+        id S1728401AbfLKL2P (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Wed, 11 Dec 2019 06:28:15 -0500
+Received: from mx2.suse.de ([195.135.220.15]:60980 "EHLO mx1.suse.de"
+        rhost-flags-OK-OK-OK-FAIL) by vger.kernel.org with ESMTP
+        id S1727469AbfLKL2O (ORCPT <rfc822;linux-block@vger.kernel.org>);
+        Wed, 11 Dec 2019 06:28:14 -0500
+X-Virus-Scanned: by amavisd-new at test-mx.suse.de
+Received: from relay2.suse.de (unknown [195.135.220.254])
+        by mx1.suse.de (Postfix) with ESMTP id 4E902AD0E;
+        Wed, 11 Dec 2019 11:28:10 +0000 (UTC)
+Received: by quack2.suse.cz (Postfix, from userid 1000)
+        id 63C461E0B23; Wed, 11 Dec 2019 12:28:07 +0100 (CET)
+Date:   Wed, 11 Dec 2019 12:28:07 +0100
+From:   Jan Kara <jack@suse.cz>
+To:     John Hubbard <jhubbard@nvidia.com>
+Cc:     Andrew Morton <akpm@linux-foundation.org>,
+        Al Viro <viro@zeniv.linux.org.uk>,
+        Alex Williamson <alex.williamson@redhat.com>,
+        Benjamin Herrenschmidt <benh@kernel.crashing.org>,
+        =?iso-8859-1?Q?Bj=F6rn_T=F6pel?= <bjorn.topel@intel.com>,
+        Christoph Hellwig <hch@infradead.org>,
+        Dan Williams <dan.j.williams@intel.com>,
+        Daniel Vetter <daniel@ffwll.ch>,
+        Dave Chinner <david@fromorbit.com>,
+        David Airlie <airlied@linux.ie>,
+        "David S . Miller" <davem@davemloft.net>,
+        Ira Weiny <ira.weiny@intel.com>, Jan Kara <jack@suse.cz>,
+        Jason Gunthorpe <jgg@ziepe.ca>, Jens Axboe <axboe@kernel.dk>,
+        Jonathan Corbet <corbet@lwn.net>,
+        =?iso-8859-1?B?Suly9G1l?= Glisse <jglisse@redhat.com>,
+        Magnus Karlsson <magnus.karlsson@intel.com>,
+        Mauro Carvalho Chehab <mchehab@kernel.org>,
+        Michael Ellerman <mpe@ellerman.id.au>,
+        Michal Hocko <mhocko@suse.com>,
+        Mike Kravetz <mike.kravetz@oracle.com>,
+        Paul Mackerras <paulus@samba.org>,
+        Shuah Khan <shuah@kernel.org>,
+        Vlastimil Babka <vbabka@suse.cz>, bpf@vger.kernel.org,
+        dri-devel@lists.freedesktop.org, kvm@vger.kernel.org,
+        linux-block@vger.kernel.org, linux-doc@vger.kernel.org,
+        linux-fsdevel@vger.kernel.org, linux-kselftest@vger.kernel.org,
+        linux-media@vger.kernel.org, linux-rdma@vger.kernel.org,
+        linuxppc-dev@lists.ozlabs.org, netdev@vger.kernel.org,
+        linux-mm@kvack.org, LKML <linux-kernel@vger.kernel.org>,
+        "Kirill A . Shutemov" <kirill.shutemov@linux.intel.com>
+Subject: Re: [PATCH v9 23/25] mm/gup: track FOLL_PIN pages
+Message-ID: <20191211112807.GN1551@quack2.suse.cz>
+References: <20191211025318.457113-1-jhubbard@nvidia.com>
+ <20191211025318.457113-24-jhubbard@nvidia.com>
 MIME-Version: 1.0
-Content-Type: text/plain; charset="iso-8859-1"
+Content-Type: text/plain; charset=iso-8859-1
 Content-Disposition: inline
 Content-Transfer-Encoding: 8bit
-In-Reply-To: <20191211040812.12354-1-sj38.park@gmail.com>
-User-Agent: Mutt/1.12.2 (2019-09-21)
-X-ClientProxiedBy: AMSPEX02CAS02.citrite.net (10.69.22.113) To
- AMSPEX02CL03.citrite.net (10.69.22.127)
+In-Reply-To: <20191211025318.457113-24-jhubbard@nvidia.com>
+User-Agent: Mutt/1.10.1 (2018-07-13)
 Sender: linux-block-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-Hello,
-
-I see that you have already sent v6, for future iterations can you
-please wait until the conversation on the previous version has been
-settled?
-
-I'm still replying to your replies to v5, and hence you should hold off
-sending v6 until we get some kind of conclusion/agreement.
-
-On Wed, Dec 11, 2019 at 05:08:12AM +0100, SeongJae Park wrote:
-> On Tue, 10 Dec 2019 12:04:32 +0100 "Roger Pau Monné" <roger.pau@citrix.com> wrote:
+On Tue 10-12-19 18:53:16, John Hubbard wrote:
+> Add tracking of pages that were pinned via FOLL_PIN.
 > 
-> > > Each `blkif` has a free pages pool for the grant mapping.  The size of
-> > > the pool starts from zero and be increased on demand while processing
-> > > the I/O requests.  If current I/O requests handling is finished or 100
-> > > milliseconds has passed since last I/O requests handling, it checks and
-> > > shrinks the pool to not exceed the size limit, `max_buffer_pages`.
-> > > 
-> > > Therefore, `blkfront` running guests can cause a memory pressure in the
-> > > `blkback` running guest by attaching a large number of block devices and
-> > > inducing I/O.
-> > 
-> > Hm, I don't think this is actually true. blkfront cannot attach an
-> > arbitrary number of devices, blkfront is just a frontend for a device
-> > that's instantiated by the Xen toolstack, so it's the toolstack the one
-> > that controls the amount of PV block devices.
+> As mentioned in the FOLL_PIN documentation, callers who effectively set
+> FOLL_PIN are required to ultimately free such pages via unpin_user_page().
+> The effect is similar to FOLL_GET, and may be thought of as "FOLL_GET
+> for DIO and/or RDMA use".
 > 
-> Right, the problem can occur only if it is mis-configured so that the frontend
-> running guests can attach a large number of devices which is enough to cause
-> the memory pressure.  I tried to explain it in below paragraph, but seems above
-> paragraph is a little bit confusing.  I will wordsmith the sentence in the next
-> version.
-
-I would word it along these lines:
-
-"Host administrators can cause memory pressure in blkback by attaching
-a large number of block devices and inducing I/O."
-
-> > 
-> > > System administrators can avoid such problematic
-> > > situations by limiting the maximum number of devices each guest can
-> > > attach.  However, finding the optimal limit is not so easy.  Improper
-> > > set of the limit can results in the memory pressure or a resource
-> > > underutilization.  This commit avoids such problematic situations by
-> > > squeezing the pools (returns every free page in the pool to the system)
-> > > for a while (users can set this duration via a module parameter) if a
-> > > memory pressure is detected.
-> > > 
-> > > Discussions
-> > > ===========
-> > > 
-> > > The `blkback`'s original shrinking mechanism returns only pages in the
-> > > pool, which are not currently be used by `blkback`, to the system.  In
-> > > other words, the pages are not mapped with foreign pages.  Because this
-> >                         ^ that               ^ granted
-> > > commit is changing only the shrink limit but uses the mechanism as is,
-> > > this commit does not introduce improper mappings related security
-> > > issues.
-> > 
-> > That last sentence is hard to parse. I think something like:
-> > 
-> > "Because this commit is changing only the shrink limit but still uses the
-> > same freeing mechanism it does not touch pages which are currently
-> > mapping grants."
-> > 
-> > > 
-> > > Once a memory pressure is detected, this commit keeps the squeezing
-> > > limit for a user-specified time duration.  The duration should be
-> > > neither too long nor too short.  If it is too long, the squeezing
-> > > incurring overhead can reduce the I/O performance.  If it is too short,
-> > > `blkback` will not free enough pages to reduce the memory pressure.
-> > > This commit sets the value as `10 milliseconds` by default because it is
-> > > a short time in terms of I/O while it is a long time in terms of memory
-> > > operations.  Also, as the original shrinking mechanism works for at
-> > > least every 100 milliseconds, this could be a somewhat reasonable
-> > > choice.  I also tested other durations (refer to the below section for
-> > > more details) and confirmed that 10 milliseconds is the one that works
-> > > best with the test.  That said, the proper duration depends on actual
-> > > configurations and workloads.  That's why this commit is allowing users
-> >                                                         ^ allows
-> > > to set it as their optimal value via the module parameter.
-> > 
-> > ... to set the duration as a module parameter.
+> Pages that have been pinned via FOLL_PIN are identifiable via a
+> new function call:
 > 
-> Thank you for great suggestions, I will apply those.
+>    bool page_dma_pinned(struct page *page);
 > 
-> > 
-> > > 
-> > > Memory Pressure Test
-> > > ====================
-> > > 
-> > > To show how this commit fixes the memory pressure situation well, I
-> > > configured a test environment on a xen-running virtualization system.
-> > > On the `blkfront` running guest instances, I attach a large number of
-> > > network-backed volume devices and induce I/O to those.  Meanwhile, I
-> > > measure the number of pages that swapped in and out on the `blkback`
-> > > running guest.  The test ran twice, once for the `blkback` before this
-> > > commit and once for that after this commit.  As shown below, this commit
-> > > has dramatically reduced the memory pressure:
-> > > 
-> > >                 pswpin  pswpout
-> > 
-> > I assume pswpin means 'pages swapped in' and pswpout 'pages swapped
-> > out'. Might be good to add a note to that effect.
+> What to do in response to encountering such a page, is left to later
+> patchsets. There is discussion about this in [1], [2], and [3].
 > 
-> Good point!  I will add the note.
+> This also changes a BUG_ON(), to a WARN_ON(), in follow_page_mask().
 > 
-> > 
-> > >     before      76,672  185,799
-> > >     after          212    3,325
-> > > 
-> > > Optimal Aggressive Shrinking Duration
-> > > -------------------------------------
-> > > 
-> > > To find a best squeezing duration, I repeated the test with three
-> > > different durations (1ms, 10ms, and 100ms).  The results are as below:
-> > > 
-> > >     duration    pswpin  pswpout
-> > >     1           852     6,424
-> > >     10          212     3,325
-> > >     100         203     3,340
-> > > 
-> > > As expected, the memory pressure has decreased as the duration is
-> > > increased, but the reduction stopped from the `10ms`.  Based on this
-> > > results, I chose the default duration as 10ms.
-> > > 
-> > > Performance Overhead Test
-> > > =========================
-> > > 
-> > > This commit could incur I/O performance degradation under severe memory
-> > > pressure because the squeezing will require more page allocations per
-> > > I/O.  To show the overhead, I artificially made a worst-case squeezing
-> > > situation and measured the I/O performance of a `blkfront` running
-> > > guest.
-> > > 
-> > > For the artificial squeezing, I set the `blkback.max_buffer_pages` using
-> > > the `/sys/module/xen_blkback/parameters/max_buffer_pages` file.  We set
-> > > the value to `1024` and `0`.  The `1024` is the default value.  Setting
-> > > the value as `0` is same to a situation doing the squeezing always
-> > > (worst-case).
-> > > 
-> > > For the I/O performance measurement, I use a simple `dd` command.
-> > > 
-> > > Default Performance
-> > > -------------------
-> > > 
-> > >     [dom0]# echo 1024 > /sys/module/xen_blkback/parameters/max_buffer_pages
-> > >     [instance]$ for i in {1..5}; do dd if=/dev/zero of=file bs=4k count=$((256*512)); sync; done
-> > >     131072+0 records in
-> > >     131072+0 records out
-> > >     536870912 bytes (537 MB) copied, 11.7257 s, 45.8 MB/s
-> > >     131072+0 records in
-> > >     131072+0 records out
-> > >     536870912 bytes (537 MB) copied, 13.8827 s, 38.7 MB/s
-> > >     131072+0 records in
-> > >     131072+0 records out
-> > >     536870912 bytes (537 MB) copied, 13.8781 s, 38.7 MB/s
-> > >     131072+0 records in
-> > >     131072+0 records out
-> > >     536870912 bytes (537 MB) copied, 13.8737 s, 38.7 MB/s
-> > >     131072+0 records in
-> > >     131072+0 records out
-> > >     536870912 bytes (537 MB) copied, 13.8702 s, 38.7 MB/s
+> [1] Some slow progress on get_user_pages() (Apr 2, 2019):
+>     https://lwn.net/Articles/784574/
+> [2] DMA and get_user_pages() (LPC: Dec 12, 2018):
+>     https://lwn.net/Articles/774411/
+> [3] The trouble with get_user_pages() (Apr 30, 2018):
+>     https://lwn.net/Articles/753027/
 
-While this is useful, it's kind of too verbose IMO. If you need to do
-this kind of performance comparisons I would recommend using ministat
-(available at least on Debian and FreeBSD) in order to plot the
-results and give the std deviation and statistical difference given a
-confidence level.
+The patch looks mostly good to me now. Just a few smaller comments below.
 
-The output of ministat can be pasted in the commit message, since it's
-a text based tool.
+> Suggested-by: Jan Kara <jack@suse.cz>
+> Suggested-by: Jérôme Glisse <jglisse@redhat.com>
+> Reviewed-by: Jan Kara <jack@suse.cz>
+> Reviewed-by: Jérôme Glisse <jglisse@redhat.com>
+> Reviewed-by: Ira Weiny <ira.weiny@intel.com>
 
-> > > 
-> > > Worst-case Performance
-> > > ----------------------
-> > > 
-> > >     [dom0]# echo 0 > /sys/module/xen_blkback/parameters/max_buffer_pages
-> > >     [instance]$ for i in {1..5}; do dd if=/dev/zero of=file bs=4k count=$((256*512)); sync; done
-> > >     131072+0 records in
-> > >     131072+0 records out
-> > >     536870912 bytes (537 MB) copied, 11.7257 s, 45.8 MB/s
-> > >     131072+0 records in
-> > >     131072+0 records out
-> > >     536870912 bytes (537 MB) copied, 13.878 s, 38.7 MB/s
-> > >     131072+0 records in
-> > >     131072+0 records out
-> > >     536870912 bytes (537 MB) copied, 13.8746 s, 38.7 MB/s
-> > >     131072+0 records in
-> > >     131072+0 records out
-> > >     536870912 bytes (537 MB) copied, 13.8786 s, 38.7 MB/s
-> > >     131072+0 records in
-> > >     131072+0 records out
-> > >     536870912 bytes (537 MB) copied, 13.8749 s, 38.7 MB/s
-> > > 
-> > > In short, even worst case squeezing makes no visible performance
-> > > degradation.
-> > 
-> > I would argue that with a ~40MB/s throughput you won't see any
-> > performance difference at all regardless of the size of the pool of
-> > free pages or the amount of persistent grants because the bottleneck is
-> > on the storage performance itself.
-> > 
-> > You need to test this using nullblk or some kind of fast storage, or
-> > else the above figures are not going to reflect any changes you make
-> > because they are hidden by the poor performance of the underlying
-> > storage.
-> 
-> Yes, agree that.  My test is just a minimal check for my environment.  I will
-> note the points and concerns in the commit message.
+I think you inherited here the Reviewed-by tags from the "add flags" patch
+you've merged into this one but that's not really fair since this patch
+does much more... In particular I didn't give my Reviewed-by tag for this
+patch yet.
 
-I'm afraid that just adding a note about this concerns is not enough.
+> +/*
+> + * try_grab_compound_head() - attempt to elevate a page's refcount, by a
+> + * flags-dependent amount.
+> + *
+> + * This has a default assumption of "use FOLL_GET behavior, if FOLL_PIN is not
+> + * set".
+> + *
+> + * "grab" names in this file mean, "look at flags to decide whether to use
+> + * FOLL_PIN or FOLL_GET behavior, when incrementing the page's refcount.
+> + */
+> +static __maybe_unused struct page *try_grab_compound_head(struct page *page,
+> +							  int refs,
+> +							  unsigned int flags)
+> +{
+> +	if (flags & FOLL_PIN)
+> +		return try_pin_compound_head(page, refs);
+> +
+> +	return try_get_compound_head(page, refs);
+> +}
 
-We should make sure that this change doesn't regress the current
-performance of fast storage backends, and hence I have to ask you to
-test with null_blk or a fast storage and provide the figures.
+I somewhat wonder about the asymmetry of try_grab_compound_head() vs
+try_grab_page() in the treatment of 'flags'. How costly would it be to make
+them symmetric (i.e., either set FOLL_GET for try_grab_compound_head()
+callers or make sure one of FOLL_GET, FOLL_PIN is set for try_grab_page())?
 
-> > 
-> > > I think this is due to the slow speed of the I/O.  In
-> > > other words, the additional page allocation overhead is hidden under the
-> > > much slower I/O latency.
-> > > 
-> > > Nevertheless, pleaset note that this is just a very simple and minimal
-> > > test.
-> > 
-> > I would like to add that IMO this is papering over an existing issue,
-> > which is how pages to be used to map grants are allocated. Grant
-> > mappings _shouldn't_ consume RAM pages in the first place, and IIRC
-> > the fact that they do is because Linux balloons out memory in order to
-> > re-use those pages to map grants and have a valid page struct.
-> > 
-> > A way to solve this would be to hotplug a fake memory region and use
-> > it in order to map grant pages, without having to balloon out RAM
-> > regions. At the end of day on a PV domain mapping a grant should just
-> > require virtual address space.
-> > 
-> > This is going to get even worse for PVH that requires a physical memory
-> > address in order to map a grant, but that's another story.
-> 
-> Yes, as Paul also pointed out and suggested, we should consider a structural
-> solution in a big picture.  Until the big change is ready, this simple solution
-> would work as a point fix.
+Because this difference looks like a subtle catch in the long run...
 
-Getting a proper solution would be my preference, in the mean time I
-guess it's fine to accept such a bodge, as it's pretty small and
-non-intrusive.
+> +
+> +/**
+> + * try_grab_page() - elevate a page's refcount by a flag-dependent amount
+> + *
+> + * This might not do anything at all, depending on the flags argument.
+> + *
+> + * "grab" names in this file mean, "look at flags to decide whether to use
+> + * FOLL_PIN or FOLL_GET behavior, when incrementing the page's refcount.
+> + *
+> + * @page:	pointer to page to be grabbed
+> + * @flags:	gup flags: these are the FOLL_* flag values.
+> + *
+> + * Either FOLL_PIN or FOLL_GET (or neither) may be set, but not both at the same
+> + * time. (That's true throughout the get_user_pages*() and pin_user_pages*()
+> + * APIs.) Cases:
+> + *
+> + *	FOLL_GET: page's refcount will be incremented by 1.
+> + *      FOLL_PIN: page's refcount will be incremented by GUP_PIN_COUNTING_BIAS.
+> + *
+> + * Return: true for success, or if no action was required (if neither FOLL_PIN
+> + * nor FOLL_GET was set, nothing is done). False for failure: FOLL_GET or
+> + * FOLL_PIN was set, but the page could not be grabbed.
+> + */
+> +bool __must_check try_grab_page(struct page *page, unsigned int flags)
+> +{
+> +	if (flags & FOLL_GET)
+> +		return try_get_page(page);
+> +	else if (flags & FOLL_PIN) {
+> +		page = compound_head(page);
+> +		WARN_ON_ONCE(flags & FOLL_GET);
+> +
+> +		if (WARN_ON_ONCE(page_ref_zero_or_close_to_bias_overflow(page)))
+> +			return false;
+> +
+> +		page_ref_add(page, GUP_PIN_COUNTING_BIAS);
+> +		__update_proc_vmstat(page, NR_FOLL_PIN_REQUESTED, 1);
+> +	}
+> +
+> +	return true;
+> +}
 
-Thanks, Roger.
+...
+
+> @@ -1522,8 +1536,8 @@ struct page *follow_trans_huge_pmd(struct vm_area_struct *vma,
+>  skip_mlock:
+>  	page += (addr & ~HPAGE_PMD_MASK) >> PAGE_SHIFT;
+>  	VM_BUG_ON_PAGE(!PageCompound(page) && !is_zone_device_page(page), page);
+> -	if (flags & FOLL_GET)
+> -		get_page(page);
+> +	if (!try_grab_page(page, flags))
+> +		page = ERR_PTR(-EFAULT);
+
+I think you need to also move the try_grab_page() earlier in the function.
+At this point the page may be marked as mlocked and you'd need to undo that
+in case try_grab_page() fails.
+
+> diff --git a/mm/hugetlb.c b/mm/hugetlb.c
+> index ac65bb5e38ac..0aab6fe0072f 100644
+> --- a/mm/hugetlb.c
+> +++ b/mm/hugetlb.c
+> @@ -4356,7 +4356,13 @@ long follow_hugetlb_page(struct mm_struct *mm, struct vm_area_struct *vma,
+>  same_page:
+>  		if (pages) {
+>  			pages[i] = mem_map_offset(page, pfn_offset);
+> -			get_page(pages[i]);
+> +			if (!try_grab_page(pages[i], flags)) {
+> +				spin_unlock(ptl);
+> +				remainder = 0;
+> +				err = -ENOMEM;
+> +				WARN_ON_ONCE(1);
+> +				break;
+> +			}
+>  		}
+
+This function does a refcount overflow check early so that it doesn't have
+to do try_get_page() here. So that check can be now removed when you do
+try_grab_page() here anyway since that early check seems to be just a tiny
+optimization AFAICT.
+
+								Honza
+
+-- 
+Jan Kara <jack@suse.com>
+SUSE Labs, CR
