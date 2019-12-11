@@ -7,386 +7,351 @@ X-Spam-Status: No, score=-9.7 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
 	URIBL_BLOCKED,USER_AGENT_GIT autolearn=unavailable autolearn_force=no
 	version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id ED268C43603
-	for <linux-block@archiver.kernel.org>; Wed, 11 Dec 2019 20:46:17 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id B44BDC43603
+	for <linux-block@archiver.kernel.org>; Wed, 11 Dec 2019 20:46:19 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.kernel.org (Postfix) with ESMTP id B53A3222C4
-	for <linux-block@archiver.kernel.org>; Wed, 11 Dec 2019 20:46:17 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id 89826206A5
+	for <linux-block@archiver.kernel.org>; Wed, 11 Dec 2019 20:46:19 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1726638AbfLKUqN (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Wed, 11 Dec 2019 15:46:13 -0500
-Received: from mout.kundenserver.de ([217.72.192.74]:54809 "EHLO
+        id S1726898AbfLKUqF (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Wed, 11 Dec 2019 15:46:05 -0500
+Received: from mout.kundenserver.de ([212.227.17.13]:40797 "EHLO
         mout.kundenserver.de" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1726689AbfLKUqH (ORCPT
+        with ESMTP id S1726890AbfLKUqE (ORCPT
         <rfc822;linux-block@vger.kernel.org>);
-        Wed, 11 Dec 2019 15:46:07 -0500
+        Wed, 11 Dec 2019 15:46:04 -0500
 Received: from threadripper.lan ([149.172.19.189]) by mrelayeu.kundenserver.de
  (mreue108 [212.227.15.145]) with ESMTPA (Nemesis) id
- 1MO9vD-1iKzPs165J-00OU2W; Wed, 11 Dec 2019 21:45:21 +0100
+ 1Mzhf5-1hjio20Ph3-00vbw4; Wed, 11 Dec 2019 21:44:23 +0100
 From:   Arnd Bergmann <arnd@arndb.de>
 To:     Jens Axboe <axboe@kernel.dk>,
         "James E.J. Bottomley" <jejb@linux.ibm.com>,
         "Martin K. Petersen" <martin.petersen@oracle.com>,
         Alexander Viro <viro@zeniv.linux.org.uk>,
-        linux-block@vger.kernel.org
+        Douglas Gilbert <dgilbert@interlog.com>,
+        Arnd Bergmann <arnd@arndb.de>
 Cc:     linux-kernel@vger.kernel.org, y2038@lists.linaro.org,
-        Arnd Bergmann <arnd@arndb.de>,
+        Steffen Maier <maier@linux.ibm.com>,
+        linux-scsi@vger.kernel.org,
         Chaitanya Kulkarni <chaitanya.kulkarni@wdc.com>,
-        Hannes Reinecke <hare@suse.de>, Martin Wilck <mwilck@suse.com>
-Subject: [PATCH 08/24] compat_ioctl: move CDROM_SEND_PACKET handling into scsi
-Date:   Wed, 11 Dec 2019 21:42:42 +0100
-Message-Id: <20191211204306.1207817-9-arnd@arndb.de>
+        Greg Kroah-Hartman <gregkh@linuxfoundation.org>,
+        Thomas Gleixner <tglx@linutronix.de>,
+        linux-block@vger.kernel.org
+Subject: [PATCH 02/24] compat: scsi: sg: fix v3 compat read/write interface
+Date:   Wed, 11 Dec 2019 21:42:36 +0100
+Message-Id: <20191211204306.1207817-3-arnd@arndb.de>
 X-Mailer: git-send-email 2.20.0
 In-Reply-To: <20191211204306.1207817-1-arnd@arndb.de>
 References: <20191211204306.1207817-1-arnd@arndb.de>
 MIME-Version: 1.0
 Content-Transfer-Encoding: 8bit
-X-Provags-ID: V03:K1:T9YafS4Y5YdpmurpT0bF6+4sbIuel2ibFF2FSIKvxx5hotg9jpx
- gpb9EGkrCvb5mTBd03vG9GRI3caFpeQHTodhTU8m1iUDy84RzO/uWY8gk2vbA6MzIpJAwO3
- /rudggSeJ4PhGSjx0xcF0kQBQm8vpu0E//s3mtVRDN+aQz0V5eJ3tPWU1oeYY/aUvjgcatF
- qRhFkz/tUwaR8xIEr6R9A==
-X-UI-Out-Filterresults: notjunk:1;V03:K0:RKPMK4n3QW8=:+BvTC9yynSn32rTUD6Fm3I
- 06HHnAhgSO4ExRPzrlKj18jH7CGbz9a95Le1wRutYE3vjIVovOAEnKT8a3aZ7OEqTHznepmSA
- 7K8++CEcbgfDjarB609ju63go2ttSC6cMPRdz62MNimbftrJsrzE1TWaAumP/+b3T8g0qKWt7
- QcWTiIhX7sTPprF6MdfkBNUo6nQzjD5HSDUZCaA+DbzkS0e6bn2lvNhysouUsE+9AMa+nF8DU
- FO7NCyioHdkV8bMF9qhsWzL+GE/M8qwpLKWbiAUSH+BR+itVACnT4+M5U5KVxktWoGrt+4+Et
- gJp1o9eGj+hMxnKfMDkGCo9/SNgEjxERTszDn0dY1v9Hp8xCD0Lwtn6Uv/s7mZwQGF45KV6rL
- xZgk1TjHgDHDye5RHoh0e+4kJEKXA2vkbF4xqyijzrHlfgfCzkhhjNpSXnSmxHGU+UCiMflDM
- C+xNkEfm63qmi0doNwq78TRq7LgXnlbc6L5oCw4j/cc1mCq1MGv04aCNEDD2+TXcGJEz5XY8Q
- 4snbzIfdWWKssaUl7UR4CY8F1HGL6sz75v22nNr7O6OSxyPlBFSH7VAkK+6d2bsb/zYu6Ne9p
- iE1f9g8gj7O2GK0wE1lTIp77NQ1KZW6DlquGLiOziSyL6vMuzYGKYcp/zEmpvLdYNSGn+Ki8g
- sJD3W8ifzhpj5nm19n/VuPpxFB/6dITjGhb0X25JzN+cigEQnI52cEAbrKycTROerSAXudApw
- zzIZg+7KKCi9kgG2nJ+o5xarNSZ5hKM7F09BILVKoOO6FwKfcAeCvRBS6Xxw4VMZkpYReonUn
- ZWCGxKkhQeGPnuFanX0w6iQ8c53UC4hGFErTIy81otoBekO4OIPUX+ebqp5XE5lEntoGTU6cE
- z801MArhGTGAKoEKdjAQ==
+X-Provags-ID: V03:K1:DlM8/RSZOaYg5JzO7DSn/knKPUvnvQmVJDNmgl9LouBnU4D8Xp1
+ /K/nZQCkejcMwqd34K2Q2OBGVdjrDhpVh8FPdUh0byRt9SW3BLbCX0oUB4xrMRk2xwLEfnB
+ RlZHYWzNGZ9YtHMdiUUn1opDUpu7tCIjKc27WFY9HYeiSanGdlq9NRJjwNv7rVKJxk32BCY
+ AE8eyDTr8OCkKgIhZDYog==
+X-UI-Out-Filterresults: notjunk:1;V03:K0:57TTBnsP064=:xol5gk1SJmTe2qSSdWnL0w
+ 3a3nqIlxgWVtGDMKinfkP6M90bf9xUBEtxuQBD88/UGfqgJAYOiM7L3PPdvTmo9lkvzTpZQu0
+ aUTZ4eiVwRshqensZ4GKhfWdBPld8QbYTSY9AVe0TMeyObvH+y9LetKeAUGCABADtnS5Qkw5G
+ EcSoZvnK5Lh3Epls01CDs91roWqGa/ZaB1C5nZLdrpsVFCSavlzMrMmw9kK5LCanpNY/QQACE
+ obCPL+eBF62x1XXEBpYGO8jj61UjgoLj5JcB1en4jh6StDSuF4kmBkDPiRKfFH/4Ny7uCuau9
+ IBq38vB01H0aEfl268UwWIhsAkmlYXh5yab5jslBPHtuXVZSHql+g6klZ2QWwISYO+TIbWmIG
+ 5g9r0L3ulEJvK/xWDYygijvQo87e6JaMDPWEfVegNznVpasGpwDFZbpn6jq6BKlAee1nL/Aee
+ F8iDOJ6oHpHeDJ+Eu+Z39lV64O9xRSJnuwiFTjIA0agfWveVlmVDoAE8X1t9EcG48N0TRFAqQ
+ Gboa2XdlGNmU4keGeZkZmppSFyE43e/M2U4qftHy1xXmF8xIVVmLRIPp80G1F1A7JvaYLKCCq
+ exaZWu1X5Bj8e8K5pTct5soi2v5F6KiJSu0rOxoIqd4Wvntn9bIrtn8sYFqtnYMphzH6FmHUB
+ XY0X4+deX3vRvsf8L5WE89BH8edm6St/YYxJM2hqRjUIg4Y1x/H+vfQx01oxzSZSpRrExc8v4
+ L3VXA8er+Zo+OFOvu4LSXOhlYxpXUf/nzl2mA8g6uFBRVQJIxz9vpVSXs9O7Csk/l762+jDUa
+ JAewa1xpYzvxig7e+Gw4SqhYNWc2KYC3u7/Amh+SzvE+r0Zdg4ZchYXdUubg2vH0DZ5gAGXr6
+ zbeTPLkZhfhYLYWMIQfQ==
 Sender: linux-block-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-There is only one implementation of this ioctl, so move the handling out
-of the common block layer code into the place where it's actually needed.
+In the v5.4 merge window, a cleanup patch from Al Viro conflicted
+with my rework of the compat handling for sg.c read(). Linus Torvalds
+did a correct merge but pointed out that the resulting code is still
+unsatisfactory.
 
-It also gets called indirectly through pktcdvd, which needs to be aware
-of this change.
+I later noticed that the sg_new_read() function still gets the compat
+mode wrong, when the 'count' argument is large enough to pass a
+compat_sg_io_hdr object, but not a nativ sg_io_hdr.
 
-As I noticed, the old implementation of the compat handler failed to
-convert the structure on the way out, so the updated fields never got
-written back to user space. This is either not important, or it has
-never worked and should be fixed now.
+To address both of these, move the definition of compat_sg_io_hdr
+into a scsi/sg.h to make it visible to sg.c and rewrite the logic
+for reading req_pack_id as well as the size check to a simpler
+version that gets the expected results.
 
+Fixes: c35a5cfb4150 ("scsi: sg: sg_read(): simplify reading ->pack_id of userland sg_io_hdr_t")
+Fixes: 98aaaec4a150 ("compat_ioctl: reimplement SG_IO handling")
 Signed-off-by: Arnd Bergmann <arnd@arndb.de>
 ---
- block/compat_ioctl.c    |  47 +---------
- block/scsi_ioctl.c      | 185 ++++++++++++++++++++++++++++------------
- drivers/block/pktcdvd.c |   6 +-
- 3 files changed, 135 insertions(+), 103 deletions(-)
+ block/scsi_ioctl.c |  29 +----------
+ drivers/scsi/sg.c  | 125 +++++++++++++++++++++------------------------
+ include/scsi/sg.h  |  30 +++++++++++
+ 3 files changed, 89 insertions(+), 95 deletions(-)
 
-diff --git a/block/compat_ioctl.c b/block/compat_ioctl.c
-index f16ae92065d7..578e04f94619 100644
---- a/block/compat_ioctl.c
-+++ b/block/compat_ioctl.c
-@@ -102,18 +102,6 @@ struct compat_cdrom_read_audio {
- 	compat_caddr_t		buf;
- };
- 
--struct compat_cdrom_generic_command {
--	unsigned char	cmd[CDROM_PACKET_SIZE];
--	compat_caddr_t	buffer;
--	compat_uint_t	buflen;
--	compat_int_t	stat;
--	compat_caddr_t	sense;
--	unsigned char	data_direction;
--	compat_int_t	quiet;
--	compat_int_t	timeout;
--	compat_caddr_t	reserved[1];
--};
--
- static int compat_cdrom_read_audio(struct block_device *bdev, fmode_t mode,
- 		unsigned int cmd, unsigned long arg)
- {
-@@ -141,38 +129,6 @@ static int compat_cdrom_read_audio(struct block_device *bdev, fmode_t mode,
- 			(unsigned long)cdread_audio);
- }
- 
--static int compat_cdrom_generic_command(struct block_device *bdev, fmode_t mode,
--		unsigned int cmd, unsigned long arg)
--{
--	struct cdrom_generic_command __user *cgc;
--	struct compat_cdrom_generic_command __user *cgc32;
--	u32 data;
--	unsigned char dir;
--	int itmp;
--
--	cgc = compat_alloc_user_space(sizeof(*cgc));
--	cgc32 = compat_ptr(arg);
--
--	if (copy_in_user(&cgc->cmd, &cgc32->cmd, sizeof(cgc->cmd)) ||
--	    get_user(data, &cgc32->buffer) ||
--	    put_user(compat_ptr(data), &cgc->buffer) ||
--	    copy_in_user(&cgc->buflen, &cgc32->buflen,
--			 (sizeof(unsigned int) + sizeof(int))) ||
--	    get_user(data, &cgc32->sense) ||
--	    put_user(compat_ptr(data), &cgc->sense) ||
--	    get_user(dir, &cgc32->data_direction) ||
--	    put_user(dir, &cgc->data_direction) ||
--	    get_user(itmp, &cgc32->quiet) ||
--	    put_user(itmp, &cgc->quiet) ||
--	    get_user(itmp, &cgc32->timeout) ||
--	    put_user(itmp, &cgc->timeout) ||
--	    get_user(data, &cgc32->reserved[0]) ||
--	    put_user(compat_ptr(data), &cgc->reserved[0]))
--		return -EFAULT;
--
--	return __blkdev_driver_ioctl(bdev, mode, cmd, (unsigned long)cgc);
--}
--
- struct compat_blkpg_ioctl_arg {
- 	compat_int_t op;
- 	compat_int_t flags;
-@@ -224,8 +180,6 @@ static int compat_blkdev_driver_ioctl(struct block_device *bdev, fmode_t mode,
- 		return compat_hdio_ioctl(bdev, mode, cmd, arg);
- 	case CDROMREADAUDIO:
- 		return compat_cdrom_read_audio(bdev, mode, cmd, arg);
--	case CDROM_SEND_PACKET:
--		return compat_cdrom_generic_command(bdev, mode, cmd, arg);
- 
- 	/*
- 	 * No handler required for the ones below, we just need to
-@@ -263,6 +217,7 @@ static int compat_blkdev_driver_ioctl(struct block_device *bdev, fmode_t mode,
- 	case CDROM_DISC_STATUS:
- 	case CDROM_CHANGER_NSLOTS:
- 	case CDROM_GET_CAPABILITY:
-+	case CDROM_SEND_PACKET:
- 	/* Ignore cdrom.h about these next 5 ioctls, they absolutely do
- 	 * not take a struct cdrom_read, instead they take a struct cdrom_msf
- 	 * which is compatible.
 diff --git a/block/scsi_ioctl.c b/block/scsi_ioctl.c
-index b61dbf4d8443..b4e73d5dd5c2 100644
+index 650bade5ea5a..b61dbf4d8443 100644
 --- a/block/scsi_ioctl.c
 +++ b/block/scsi_ioctl.c
-@@ -639,6 +639,136 @@ int get_sg_io_hdr(struct sg_io_hdr *hdr, const void __user *argp)
- }
- EXPORT_SYMBOL(get_sg_io_hdr);
+@@ -20,6 +20,7 @@
+ #include <scsi/scsi.h>
+ #include <scsi/scsi_ioctl.h>
+ #include <scsi/scsi_cmnd.h>
++#include <scsi/sg.h>
  
-+#ifdef CONFIG_COMPAT
-+struct compat_cdrom_generic_command {
-+	unsigned char	cmd[CDROM_PACKET_SIZE];
-+	compat_caddr_t	buffer;
-+	compat_uint_t	buflen;
-+	compat_int_t	stat;
-+	compat_caddr_t	sense;
-+	unsigned char	data_direction;
-+	compat_int_t	quiet;
-+	compat_int_t	timeout;
-+	compat_caddr_t	reserved[1];
+ struct blk_cmd_filter {
+ 	unsigned long read_ok[BLK_SCSI_CMD_PER_LONG];
+@@ -550,34 +551,6 @@ static inline int blk_send_start_stop(struct request_queue *q,
+ 	return __blk_send_generic(q, bd_disk, GPCMD_START_STOP_UNIT, data);
+ }
+ 
+-#ifdef CONFIG_COMPAT
+-struct compat_sg_io_hdr {
+-	compat_int_t interface_id;	/* [i] 'S' for SCSI generic (required) */
+-	compat_int_t dxfer_direction;	/* [i] data transfer direction  */
+-	unsigned char cmd_len;		/* [i] SCSI command length ( <= 16 bytes) */
+-	unsigned char mx_sb_len;	/* [i] max length to write to sbp */
+-	unsigned short iovec_count;	/* [i] 0 implies no scatter gather */
+-	compat_uint_t dxfer_len;	/* [i] byte count of data transfer */
+-	compat_uint_t dxferp;		/* [i], [*io] points to data transfer memory
+-						or scatter gather list */
+-	compat_uptr_t cmdp;		/* [i], [*i] points to command to perform */
+-	compat_uptr_t sbp;		/* [i], [*o] points to sense_buffer memory */
+-	compat_uint_t timeout;		/* [i] MAX_UINT->no timeout (unit: millisec) */
+-	compat_uint_t flags;		/* [i] 0 -> default, see SG_FLAG... */
+-	compat_int_t pack_id;		/* [i->o] unused internally (normally) */
+-	compat_uptr_t usr_ptr;		/* [i->o] unused internally */
+-	unsigned char status;		/* [o] scsi status */
+-	unsigned char masked_status;	/* [o] shifted, masked scsi status */
+-	unsigned char msg_status;	/* [o] messaging level data (optional) */
+-	unsigned char sb_len_wr;	/* [o] byte count actually written to sbp */
+-	unsigned short host_status;	/* [o] errors from host adapter */
+-	unsigned short driver_status;	/* [o] errors from software driver */
+-	compat_int_t resid;		/* [o] dxfer_len - actual_transferred */
+-	compat_uint_t duration;		/* [o] time taken by cmd (unit: millisec) */
+-	compat_uint_t info;		/* [o] auxiliary information */
+-};
+-#endif
+-
+ int put_sg_io_hdr(const struct sg_io_hdr *hdr, void __user *argp)
+ {
+ #ifdef CONFIG_COMPAT
+diff --git a/drivers/scsi/sg.c b/drivers/scsi/sg.c
+index 160748ad9c0f..985546aac236 100644
+--- a/drivers/scsi/sg.c
++++ b/drivers/scsi/sg.c
+@@ -198,6 +198,7 @@ static void sg_device_destroy(struct kref *kref);
+ 
+ #define SZ_SG_HEADER sizeof(struct sg_header)
+ #define SZ_SG_IO_HDR sizeof(sg_io_hdr_t)
++#define SZ_COMPAT_SG_IO_HDR sizeof(struct compat_sg_io_hdr)
+ #define SZ_SG_IOVEC sizeof(sg_iovec_t)
+ #define SZ_SG_REQ_INFO sizeof(sg_req_info_t)
+ 
+@@ -405,6 +406,36 @@ sg_release(struct inode *inode, struct file *filp)
+ 	return 0;
+ }
+ 
++static int get_sg_io_pack_id(int *pack_id, void __user *buf, size_t count)
++{
++	struct sg_header __user *old_hdr = buf;
++	int reply_len;
++
++	if (count < SZ_SG_HEADER)
++		goto unknown_id;
++
++	/* negative reply_len means v3 format, otherwise v1/v2 */
++	if (get_user(reply_len, &old_hdr->reply_len))
++		return -EFAULT;
++	if (reply_len >= 0)
++		return get_user(*pack_id, &old_hdr->pack_id);
++
++	if (in_compat_syscall() && count >= SZ_COMPAT_SG_IO_HDR) {
++		struct compat_sg_io_hdr __user *hp = buf;
++		return get_user(*pack_id, &hp->pack_id);
++	}
++
++	if (count >= SZ_SG_IO_HDR) {
++		struct sg_io_hdr __user *hp = buf;
++		return get_user(*pack_id, &hp->pack_id);
++	}
++
++unknown_id:
++	/* no valid header was passed, so ignore the pack_id */
++	*pack_id = -1;
++	return 0;
++}
++
+ static ssize_t
+ sg_read(struct file *filp, char __user *buf, size_t count, loff_t * ppos)
+ {
+@@ -413,8 +444,8 @@ sg_read(struct file *filp, char __user *buf, size_t count, loff_t * ppos)
+ 	Sg_request *srp;
+ 	int req_pack_id = -1;
+ 	sg_io_hdr_t *hp;
+-	struct sg_header *old_hdr = NULL;
+-	int retval = 0;
++	struct sg_header *old_hdr;
++	int retval;
+ 
+ 	/*
+ 	 * This could cause a response to be stranded. Close the associated
+@@ -429,79 +460,34 @@ sg_read(struct file *filp, char __user *buf, size_t count, loff_t * ppos)
+ 	SCSI_LOG_TIMEOUT(3, sg_printk(KERN_INFO, sdp,
+ 				      "sg_read: count=%d\n", (int) count));
+ 
+-	if (sfp->force_packid && (count >= SZ_SG_HEADER)) {
+-		old_hdr = memdup_user(buf, SZ_SG_HEADER);
+-		if (IS_ERR(old_hdr))
+-			return PTR_ERR(old_hdr);
+-		if (old_hdr->reply_len < 0) {
+-			if (count >= SZ_SG_IO_HDR) {
+-				/*
+-				 * This is stupid.
+-				 *
+-				 * We're copying the whole sg_io_hdr_t from user
+-				 * space just to get the 'pack_id' field. But the
+-				 * field is at different offsets for the compat
+-				 * case, so we'll use "get_sg_io_hdr()" to copy
+-				 * the whole thing and convert it.
+-				 *
+-				 * We could do something like just calculating the
+-				 * offset based of 'in_compat_syscall()', but the
+-				 * 'compat_sg_io_hdr' definition is in the wrong
+-				 * place for that.
+-				 */
+-				sg_io_hdr_t *new_hdr;
+-				new_hdr = kmalloc(SZ_SG_IO_HDR, GFP_KERNEL);
+-				if (!new_hdr) {
+-					retval = -ENOMEM;
+-					goto free_old_hdr;
+-				}
+-				retval = get_sg_io_hdr(new_hdr, buf);
+-				req_pack_id = new_hdr->pack_id;
+-				kfree(new_hdr);
+-				if (retval) {
+-					retval = -EFAULT;
+-					goto free_old_hdr;
+-				}
+-			}
+-		} else
+-			req_pack_id = old_hdr->pack_id;
+-	}
++	if (sfp->force_packid)
++		retval = get_sg_io_pack_id(&req_pack_id, buf, count);
++	if (retval)
++		return retval;
++
+ 	srp = sg_get_rq_mark(sfp, req_pack_id);
+ 	if (!srp) {		/* now wait on packet to arrive */
+-		if (atomic_read(&sdp->detaching)) {
+-			retval = -ENODEV;
+-			goto free_old_hdr;
+-		}
+-		if (filp->f_flags & O_NONBLOCK) {
+-			retval = -EAGAIN;
+-			goto free_old_hdr;
+-		}
++		if (atomic_read(&sdp->detaching))
++			return -ENODEV;
++		if (filp->f_flags & O_NONBLOCK)
++			return -EAGAIN;
+ 		retval = wait_event_interruptible(sfp->read_wait,
+ 			(atomic_read(&sdp->detaching) ||
+ 			(srp = sg_get_rq_mark(sfp, req_pack_id))));
+-		if (atomic_read(&sdp->detaching)) {
+-			retval = -ENODEV;
+-			goto free_old_hdr;
+-		}
+-		if (retval) {
++		if (atomic_read(&sdp->detaching))
++			return -ENODEV;
++		if (retval)
+ 			/* -ERESTARTSYS as signal hit process */
+-			goto free_old_hdr;
+-		}
+-	}
+-	if (srp->header.interface_id != '\0') {
+-		retval = sg_new_read(sfp, buf, count, srp);
+-		goto free_old_hdr;
++			return retval;
+ 	}
++	if (srp->header.interface_id != '\0')
++		return sg_new_read(sfp, buf, count, srp);
+ 
+ 	hp = &srp->header;
+-	if (old_hdr == NULL) {
+-		old_hdr = kmalloc(SZ_SG_HEADER, GFP_KERNEL);
+-		if (! old_hdr) {
+-			retval = -ENOMEM;
+-			goto free_old_hdr;
+-		}
+-	}
+-	memset(old_hdr, 0, SZ_SG_HEADER);
++	old_hdr = kzalloc(SZ_SG_HEADER, GFP_KERNEL);
++	if (!old_hdr)
++		return -ENOMEM;
++
+ 	old_hdr->reply_len = (int) hp->timeout;
+ 	old_hdr->pack_len = old_hdr->reply_len; /* old, strange behaviour */
+ 	old_hdr->pack_id = hp->pack_id;
+@@ -575,7 +561,12 @@ sg_new_read(Sg_fd * sfp, char __user *buf, size_t count, Sg_request * srp)
+ 	int err = 0, err2;
+ 	int len;
+ 
+-	if (count < SZ_SG_IO_HDR) {
++	if (in_compat_syscall()) {
++		if (count < SZ_COMPAT_SG_IO_HDR) {
++			err = -EINVAL;
++			goto err_out;
++		}
++	} else if (count < SZ_SG_IO_HDR) {
+ 		err = -EINVAL;
+ 		goto err_out;
+ 	}
+diff --git a/include/scsi/sg.h b/include/scsi/sg.h
+index f91bcca604e4..29c7ad04d2e2 100644
+--- a/include/scsi/sg.h
++++ b/include/scsi/sg.h
+@@ -68,6 +68,36 @@ typedef struct sg_io_hdr
+     unsigned int info;          /* [o] auxiliary information */
+ } sg_io_hdr_t;  /* 64 bytes long (on i386) */
+ 
++#if defined(__KERNEL__)
++#include <linux/compat.h>
++
++struct compat_sg_io_hdr {
++	compat_int_t interface_id;	/* [i] 'S' for SCSI generic (required) */
++	compat_int_t dxfer_direction;	/* [i] data transfer direction  */
++	unsigned char cmd_len;		/* [i] SCSI command length ( <= 16 bytes) */
++	unsigned char mx_sb_len;	/* [i] max length to write to sbp */
++	unsigned short iovec_count;	/* [i] 0 implies no scatter gather */
++	compat_uint_t dxfer_len;	/* [i] byte count of data transfer */
++	compat_uint_t dxferp;		/* [i], [*io] points to data transfer memory
++						or scatter gather list */
++	compat_uptr_t cmdp;		/* [i], [*i] points to command to perform */
++	compat_uptr_t sbp;		/* [i], [*o] points to sense_buffer memory */
++	compat_uint_t timeout;		/* [i] MAX_UINT->no timeout (unit: millisec) */
++	compat_uint_t flags;		/* [i] 0 -> default, see SG_FLAG... */
++	compat_int_t pack_id;		/* [i->o] unused internally (normally) */
++	compat_uptr_t usr_ptr;		/* [i->o] unused internally */
++	unsigned char status;		/* [o] scsi status */
++	unsigned char masked_status;	/* [o] shifted, masked scsi status */
++	unsigned char msg_status;	/* [o] messaging level data (optional) */
++	unsigned char sb_len_wr;	/* [o] byte count actually written to sbp */
++	unsigned short host_status;	/* [o] errors from host adapter */
++	unsigned short driver_status;	/* [o] errors from software driver */
++	compat_int_t resid;		/* [o] dxfer_len - actual_transferred */
++	compat_uint_t duration;		/* [o] time taken by cmd (unit: millisec) */
++	compat_uint_t info;		/* [o] auxiliary information */
 +};
 +#endif
 +
-+static int scsi_get_cdrom_generic_arg(struct cdrom_generic_command *cgc,
-+				      const void __user *arg)
-+{
-+#ifdef CONFIG_COMPAT
-+	if (in_compat_syscall()) {
-+		struct compat_cdrom_generic_command cgc32;
-+
-+		if (copy_from_user(&cgc32, arg, sizeof(cgc32)))
-+			return -EFAULT;
-+
-+		*cgc = (struct cdrom_generic_command) {
-+			.buffer		= compat_ptr(cgc32.buffer),
-+			.buflen		= cgc32.buflen,
-+			.stat		= cgc32.stat,
-+			.sense		= compat_ptr(cgc32.sense),
-+			.data_direction	= cgc32.data_direction,
-+			.quiet		= cgc32.quiet,
-+			.timeout	= cgc32.timeout,
-+			.reserved[0]	= compat_ptr(cgc32.reserved[0]),
-+		};
-+		memcpy(&cgc->cmd, &cgc32.cmd, CDROM_PACKET_SIZE);
-+		return 0;
-+	}
-+#endif
-+	if (copy_from_user(cgc, arg, sizeof(*cgc)))
-+		return -EFAULT;
-+
-+	return 0;
-+}
-+
-+static int scsi_put_cdrom_generic_arg(const struct cdrom_generic_command *cgc,
-+				      void __user *arg)
-+{
-+#ifdef CONFIG_COMPAT
-+	if (in_compat_syscall()) {
-+		struct compat_cdrom_generic_command cgc32 = {
-+			.buffer		= (uintptr_t)(cgc->buffer),
-+			.buflen		= cgc->buflen,
-+			.stat		= cgc->stat,
-+			.sense		= (uintptr_t)(cgc->sense),
-+			.data_direction	= cgc->data_direction,
-+			.quiet		= cgc->quiet,
-+			.timeout	= cgc->timeout,
-+			.reserved[0]	= (uintptr_t)(cgc->reserved[0]),
-+		};
-+		memcpy(&cgc32.cmd, &cgc->cmd, CDROM_PACKET_SIZE);
-+
-+		if (copy_to_user(arg, &cgc32, sizeof(cgc32)))
-+			return -EFAULT;
-+
-+		return 0;
-+	}
-+#endif
-+	if (copy_to_user(arg, cgc, sizeof(*cgc)))
-+		return -EFAULT;
-+
-+	return 0;
-+}
-+
-+static int scsi_cdrom_send_packet(struct request_queue *q,
-+				  struct gendisk *bd_disk,
-+				  fmode_t mode, void __user *arg)
-+{
-+	struct cdrom_generic_command cgc;
-+	struct sg_io_hdr hdr;
-+	int err;
-+
-+	err = scsi_get_cdrom_generic_arg(&cgc, arg);
-+	if (err)
-+		return err;
-+
-+	cgc.timeout = clock_t_to_jiffies(cgc.timeout);
-+	memset(&hdr, 0, sizeof(hdr));
-+	hdr.interface_id = 'S';
-+	hdr.cmd_len = sizeof(cgc.cmd);
-+	hdr.dxfer_len = cgc.buflen;
-+	switch (cgc.data_direction) {
-+		case CGC_DATA_UNKNOWN:
-+			hdr.dxfer_direction = SG_DXFER_UNKNOWN;
-+			break;
-+		case CGC_DATA_WRITE:
-+			hdr.dxfer_direction = SG_DXFER_TO_DEV;
-+			break;
-+		case CGC_DATA_READ:
-+			hdr.dxfer_direction = SG_DXFER_FROM_DEV;
-+			break;
-+		case CGC_DATA_NONE:
-+			hdr.dxfer_direction = SG_DXFER_NONE;
-+			break;
-+		default:
-+			return -EINVAL;
-+	}
-+
-+	hdr.dxferp = cgc.buffer;
-+	hdr.sbp = cgc.sense;
-+	if (hdr.sbp)
-+		hdr.mx_sb_len = sizeof(struct request_sense);
-+	hdr.timeout = jiffies_to_msecs(cgc.timeout);
-+	hdr.cmdp = ((struct cdrom_generic_command __user*) arg)->cmd;
-+	hdr.cmd_len = sizeof(cgc.cmd);
-+
-+	err = sg_io(q, bd_disk, &hdr, mode);
-+	if (err == -EFAULT)
-+		return -EFAULT;
-+
-+	if (hdr.status)
-+		return -EIO;
-+
-+	cgc.stat = err;
-+	cgc.buflen = hdr.resid;
-+	if (scsi_put_cdrom_generic_arg(&cgc, arg))
-+		return -EFAULT;
-+
-+	return err;
-+}
-+
- int scsi_cmd_ioctl(struct request_queue *q, struct gendisk *bd_disk, fmode_t mode,
- 		   unsigned int cmd, void __user *arg)
- {
-@@ -689,60 +819,9 @@ int scsi_cmd_ioctl(struct request_queue *q, struct gendisk *bd_disk, fmode_t mod
- 				err = -EFAULT;
- 			break;
- 		}
--		case CDROM_SEND_PACKET: {
--			struct cdrom_generic_command cgc;
--			struct sg_io_hdr hdr;
--
--			err = -EFAULT;
--			if (copy_from_user(&cgc, arg, sizeof(cgc)))
--				break;
--			cgc.timeout = clock_t_to_jiffies(cgc.timeout);
--			memset(&hdr, 0, sizeof(hdr));
--			hdr.interface_id = 'S';
--			hdr.cmd_len = sizeof(cgc.cmd);
--			hdr.dxfer_len = cgc.buflen;
--			err = 0;
--			switch (cgc.data_direction) {
--				case CGC_DATA_UNKNOWN:
--					hdr.dxfer_direction = SG_DXFER_UNKNOWN;
--					break;
--				case CGC_DATA_WRITE:
--					hdr.dxfer_direction = SG_DXFER_TO_DEV;
--					break;
--				case CGC_DATA_READ:
--					hdr.dxfer_direction = SG_DXFER_FROM_DEV;
--					break;
--				case CGC_DATA_NONE:
--					hdr.dxfer_direction = SG_DXFER_NONE;
--					break;
--				default:
--					err = -EINVAL;
--			}
--			if (err)
--				break;
--
--			hdr.dxferp = cgc.buffer;
--			hdr.sbp = cgc.sense;
--			if (hdr.sbp)
--				hdr.mx_sb_len = sizeof(struct request_sense);
--			hdr.timeout = jiffies_to_msecs(cgc.timeout);
--			hdr.cmdp = ((struct cdrom_generic_command __user*) arg)->cmd;
--			hdr.cmd_len = sizeof(cgc.cmd);
--
--			err = sg_io(q, bd_disk, &hdr, mode);
--			if (err == -EFAULT)
--				break;
--
--			if (hdr.status)
--				err = -EIO;
--
--			cgc.stat = err;
--			cgc.buflen = hdr.resid;
--			if (copy_to_user(arg, &cgc, sizeof(cgc)))
--				err = -EFAULT;
--
-+		case CDROM_SEND_PACKET:
-+			err = scsi_cdrom_send_packet(q, bd_disk, mode, arg);
- 			break;
--		}
+ #define SG_INTERFACE_ID_ORIG 'S'
  
- 		/*
- 		 * old junk scsi send command ioctl
-diff --git a/drivers/block/pktcdvd.c b/drivers/block/pktcdvd.c
-index 861fc65a1b75..ab4d3be4b646 100644
---- a/drivers/block/pktcdvd.c
-+++ b/drivers/block/pktcdvd.c
-@@ -2671,15 +2671,13 @@ static int pkt_compat_ioctl(struct block_device *bdev, fmode_t mode, unsigned in
- 	case CDROMEJECT:
- 	case CDROMMULTISESSION:
- 	case CDROMREADTOCENTRY:
-+	case CDROM_SEND_PACKET: /* compat mode handled in scsi_cmd_ioctl */
- 	case SCSI_IOCTL_SEND_COMMAND:
- 		return pkt_ioctl(bdev, mode, cmd, (unsigned long)compat_ptr(arg));
- 
--
- 	/* FIXME: no handler so far */
--	case CDROM_LAST_WRITTEN:
--	/* handled in compat_blkdev_driver_ioctl */
--	case CDROM_SEND_PACKET:
- 	default:
-+	case CDROM_LAST_WRITTEN:
- 		return -ENOIOCTLCMD;
- 	}
- }
+ /* Use negative values to flag difference from original sg_header structure */
 -- 
 2.20.0
 
