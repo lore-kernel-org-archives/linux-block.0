@@ -2,103 +2,154 @@ Return-Path: <SRS0=X6jZ=2B=vger.kernel.org=linux-block-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-2.2 required=3.0 tests=DKIM_SIGNED,DKIM_VALID,
-	HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,
-	USER_AGENT_SANE_1 autolearn=no autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-8.6 required=3.0 tests=DKIM_SIGNED,DKIM_VALID,
+	DKIM_VALID_AU,FREEMAIL_FORGED_FROMDOMAIN,FREEMAIL_FROM,
+	HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,MENTIONS_GIT_HOSTING,
+	SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED,USER_AGENT_GIT autolearn=unavailable
+	autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 3722AC43603
-	for <linux-block@archiver.kernel.org>; Wed, 11 Dec 2019 18:05:10 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 23B56C00454
+	for <linux-block@archiver.kernel.org>; Wed, 11 Dec 2019 18:10:42 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.kernel.org (Postfix) with ESMTP id 11739205C9
-	for <linux-block@archiver.kernel.org>; Wed, 11 Dec 2019 18:05:10 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id F22A3222C4
+	for <linux-block@archiver.kernel.org>; Wed, 11 Dec 2019 18:10:41 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel-dk.20150623.gappssmtp.com header.i=@kernel-dk.20150623.gappssmtp.com header.b="oR/onN8T"
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="Y79caoQ+"
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1730708AbfLKSFJ (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Wed, 11 Dec 2019 13:05:09 -0500
-Received: from mail-pl1-f194.google.com ([209.85.214.194]:41564 "EHLO
-        mail-pl1-f194.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1730281AbfLKSFJ (ORCPT
+        id S1730784AbfLKSKi (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Wed, 11 Dec 2019 13:10:38 -0500
+Received: from mail-pf1-f195.google.com ([209.85.210.195]:45978 "EHLO
+        mail-pf1-f195.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S1726242AbfLKSKh (ORCPT
         <rfc822;linux-block@vger.kernel.org>);
-        Wed, 11 Dec 2019 13:05:09 -0500
-Received: by mail-pl1-f194.google.com with SMTP id bd4so1717102plb.8
-        for <linux-block@vger.kernel.org>; Wed, 11 Dec 2019 10:05:07 -0800 (PST)
+        Wed, 11 Dec 2019 13:10:37 -0500
+Received: by mail-pf1-f195.google.com with SMTP id 2so2173839pfg.12;
+        Wed, 11 Dec 2019 10:10:36 -0800 (PST)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=kernel-dk.20150623.gappssmtp.com; s=20150623;
-        h=subject:to:cc:references:from:message-id:date:user-agent
-         :mime-version:in-reply-to:content-language:content-transfer-encoding;
-        bh=U6TVMZIrVU3X6d3dLhfmym7+Uk2eVUbkx4ihgzOBQ70=;
-        b=oR/onN8TjGm9Sp9B92tnxnugU+SFje4O9MoxYqew/+vPFjIUf0fMDc5TF7sZ9+lxPP
-         EtBwZkPAbDt3XQ28p63Zu3TKyn7PBYApNRp1Ak2id6zrkTyKG4j3KwngKuLEmrncX5ga
-         CC6zgmPmCaTA8Grj6veVgetONtpLFm8HlLdZ1FH5JvmnLsUspsJrAY5sOYA4LvKrZ2Vs
-         srVCmNXs17MiViZiiRY3YHZy54pNecQxnqdEKHr6urPp5U86MCsxHNjVfi64tGFXg8WW
-         W/+1z6icoyJCOnJCfQ6nEppaV0KDlT+C+PVMi01QUyR7ezn5+oiU7j+qcmLfQYUYu87N
-         tLRA==
+        d=gmail.com; s=20161025;
+        h=from:to:cc:subject:date:message-id:mime-version
+         :content-transfer-encoding;
+        bh=mc5ORNKDsv0ygGReB4brTZGP+nxF11a/con+3NutTy4=;
+        b=Y79caoQ+lf7odw5APsp3kG+n/VzcsE2Qqxe+syQlgY/qPzHq6ZuRTkiyKhd6DRW3Ux
+         f4D/PUQOZcZY+iqmcLRNz3NnTUHT7PfjJQBcLCnI2aqkwYC64sKRpzJdOHX7b974Fy+x
+         vxhGhp7bD2wQgNDZqFK9859BBc+84xXdvvvgdiGw6b5OUf1XDwn5eIUu3Nd+OLcaHVXu
+         eRQr7P/kICKCCL5Wa5S4U2wDcXekrBpZXOQ4jN149MsLmob8X+xfSLm6HCI8UNCzgpZ7
+         XA23ImjbBjjHw/kDa///ygXqgIGoJ+g+oRi7pYN8mJ16gu5Nfl1yCDGyEiwtZ/QuogJT
+         hYgg==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=1e100.net; s=20161025;
-        h=x-gm-message-state:subject:to:cc:references:from:message-id:date
-         :user-agent:mime-version:in-reply-to:content-language
+        h=x-gm-message-state:from:to:cc:subject:date:message-id:mime-version
          :content-transfer-encoding;
-        bh=U6TVMZIrVU3X6d3dLhfmym7+Uk2eVUbkx4ihgzOBQ70=;
-        b=E7yJLyBgPruCTWhglgpRC0HQLZzeJGh7cAtyCMsnIPnByPb9o/x2b2rhH/SiD/H69k
-         Md16D6xGNm1JCklsvG+DU5gJQJi7xwiLdkQSwk7b93xXtQ1ELSy0x+FSS59GsLYkgrRC
-         BseSh9gWky2Y6/Yo82t9rlV7H5lruW6wdycuIxMtrCH2mssEOPiUGyIyf6IdN6sHy4qv
-         wfMvXIqUfAjHa5TEdAoJc0AVjaZVOgvftTDTR4mJHY+IWRNiSY/MGXs4D6czonINjL0b
-         wO86qL2uIB10l8UQx9k/5dv5L0psTkMV/XsQyPn0sYtqCvtXItIKh5h14bsPufyIuOJ0
-         1KGA==
-X-Gm-Message-State: APjAAAVB826/x9K03bhwFM4/Sx96S0TG+IY4zAe7AJaY6fOpyFWqzPWN
-        Km6YjkIOI3dxsUJ/95P5UYVu5w==
-X-Google-Smtp-Source: APXvYqxzsNYNFGM/ykEVX0FKzhJ8CT5+QQy5QOEvfHdOS7SAr0vp/daHnlm1hKq4gJmE9sArk68cVQ==
-X-Received: by 2002:a17:90b:4004:: with SMTP id ie4mr4934572pjb.49.1576087507033;
-        Wed, 11 Dec 2019 10:05:07 -0800 (PST)
-Received: from ?IPv6:2620:10d:c081:1130::1014? ([2620:10d:c090:180::50da])
-        by smtp.gmail.com with ESMTPSA id b23sm3661708pfo.62.2019.12.11.10.05.03
-        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
-        Wed, 11 Dec 2019 10:05:06 -0800 (PST)
-Subject: Re: [PATCH 5/5] iomap: support RWF_UNCACHED for buffered writes
-To:     Matthew Wilcox <willy@infradead.org>
-Cc:     linux-mm@kvack.org, linux-fsdevel@vger.kernel.org,
-        linux-block@vger.kernel.org, clm@fb.com,
-        torvalds@linux-foundation.org, david@fromorbit.com
-References: <20191211152943.2933-1-axboe@kernel.dk>
- <20191211152943.2933-6-axboe@kernel.dk>
- <20191211171928.GN32169@bombadil.infradead.org>
-From:   Jens Axboe <axboe@kernel.dk>
-Message-ID: <34cd9ce1-da7b-ff0b-0662-c966a16962aa@kernel.dk>
-Date:   Wed, 11 Dec 2019 11:05:02 -0700
-User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:68.0) Gecko/20100101
- Thunderbird/68.2.2
+        bh=mc5ORNKDsv0ygGReB4brTZGP+nxF11a/con+3NutTy4=;
+        b=Yb5Qt1zwc71JBvCIcXWiuhba23v8PuD/fxoM74wJDETM017CFXD2CSaBmPYxoXxGNM
+         AdUv6Di7ZzWBJv/tT+hhPblHYnVkD0vBIsenvuK+rfanJBVcKrNUWl8myeK21P/dqp1U
+         VINJ7V20EXdU4EisYc3mEDtXTgh6hNjUlspBnr7FSsvNGFPnD9SF8fW9z8E00PjioHdP
+         Jr0g72ss4mRr/Vs6Qp9qUk7c27zwLddkOf7zTiHF7ZWZEufthhd6uApTgGeKhW+AP0AO
+         fNDn3p8gM51buRPE0I3PUZhOGgpK1VGV10yOkbg97N5ahsAOvA+5rTWveVo/WEgXCNjw
+         l6DQ==
+X-Gm-Message-State: APjAAAXUEcjA0v9UMbok9YLbomlUX0clnUVZhCVz0su++tQFUf66oMM9
+        eeZ/UrAGU01rWRq+GQG4Okk=
+X-Google-Smtp-Source: APXvYqxtH9H0dIabNUHI+R3GKkz0i7Pm3NwtvvVOQDnlczdsWX81V7kBBojdi2NWi9DqBPYpZqFihA==
+X-Received: by 2002:a63:4723:: with SMTP id u35mr5415175pga.194.1576087836383;
+        Wed, 11 Dec 2019 10:10:36 -0800 (PST)
+Received: from localhost.localdomain (campus-094-212.ucdavis.edu. [168.150.94.212])
+        by smtp.gmail.com with ESMTPSA id x33sm3552651pga.86.2019.12.11.10.10.35
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Wed, 11 Dec 2019 10:10:35 -0800 (PST)
+From:   SeongJae Park <sj38.park@gmail.com>
+X-Google-Original-From: SeongJae Park <sjpark@amazon.de>
+To:     jgross@suse.com, axboe@kernel.dk, konrad.wilk@oracle.com,
+        roger.pau@citrix.com
+Cc:     SeongJae Park <sjpark@amazon.de>, pdurrant@amazon.com,
+        sjpark@amazon.com, sj38.park@gmail.com,
+        xen-devel@lists.xenproject.org, linux-block@vger.kernel.org,
+        linux-kernel@vger.kernel.org
+Subject: [PATCH v7 0/2] xenbus/backend: Add a memory pressure handler callback
+Date:   Wed, 11 Dec 2019 18:10:13 +0000
+Message-Id: <20191211181016.14366-1-sjpark@amazon.de>
+X-Mailer: git-send-email 2.17.1
 MIME-Version: 1.0
-In-Reply-To: <20191211171928.GN32169@bombadil.infradead.org>
-Content-Type: text/plain; charset=utf-8
-Content-Language: en-US
-Content-Transfer-Encoding: 7bit
+Content-Type: text/plain; charset=UTF-8
+Content-Transfer-Encoding: 8bit
 Sender: linux-block-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-On 12/11/19 10:19 AM, Matthew Wilcox wrote:
-> On Wed, Dec 11, 2019 at 08:29:43AM -0700, Jens Axboe wrote:
->> @@ -670,9 +675,14 @@ iomap_write_begin(struct inode *inode, loff_t pos, unsigned len, unsigned flags,
->>  		iomap_read_inline_data(inode, page, srcmap);
->>  	else if (iomap->flags & IOMAP_F_BUFFER_HEAD)
->>  		status = __block_write_begin_int(page, pos, len, NULL, srcmap);
->> -	else
->> -		status = __iomap_write_begin(inode, pos, len, flags, page,
->> +	else {
->> +		unsigned wb_flags = 0;
->> +
->> +		if (flags & IOMAP_UNCACHED)
->> +			wb_flags = IOMAP_WRITE_F_UNCACHED;
->> +		status = __iomap_write_begin(inode, pos, len, wb_flags, page,
->>  				srcmap);
-> 
-> I think if you do an uncached write to a currently shared extent, you
-> just lost the IOMAP_WRITE_F_UNSHARE flag?
+Granting pages consumes backend system memory.  In systems configured
+with insufficient spare memory for those pages, it can cause a memory
+pressure situation.  However, finding the optimal amount of the spare
+memory is challenging for large systems having dynamic resource
+utilization patterns.  Also, such a static configuration might lack
+flexibility.
 
-Oops good catch, I'll fix that up.
+To mitigate such problems, this patchset adds a memory reclaim callback
+to 'xenbus_driver' (patch 1) and use it to mitigate the problem in
+'xen-blkback' (patch 2).  The third patch is a trivial cleanup of
+variable names.
+
+Base Version
+------------
+
+This patch is based on v5.4.  A complete tree is also available at my
+public git repo:
+https://github.com/sjp38/linux/tree/blkback_squeezing_v7
+
+
+Patch History
+-------------
+
+Changes from v6
+(https://lore.kernel.org/linux-block/20191211042428.5961-1-sjpark@amazon.de/)
+ - Remove more unnecessary prefixes (suggested by Roger Pau Monné)
+ - Constify a variable (suggested by Roger Pau Monné)
+ - Rename 'reclaim' into 'reclaim_memory' (suggested by Roger Pau Monné)
+ - More wordsmith of the commit message (suggested by Roger Pau Monné)
+
+Changes from v5
+(https://lore.kernel.org/linux-block/20191210080628.5264-1-sjpark@amazon.de/)
+ - Wordsmith the commit messages (suggested by Roger Pau Monné)
+ - Change the reclaim callback return type (suggested by Roger Pau Monné)
+ - Change the type of the blkback squeeze duration variable
+   (suggested by Roger Pau Monné)
+ - Add a patch for removal of unnecessary static variable name prefixes
+   (suggested by Roger Pau Monné)
+ - Fix checkpatch.pl warnings
+
+Changes from v4
+(https://lore.kernel.org/xen-devel/20191209194305.20828-1-sjpark@amazon.com/)
+ - Remove domain id parameter from the callback (suggested by Juergen Gross)
+ - Rename xen-blkback module parameter (suggested by Stefan Nuernburger)
+
+Changes from v3
+(https://lore.kernel.org/xen-devel/20191209085839.21215-1-sjpark@amazon.com/)
+ - Add general callback in xen_driver and use it (suggested by Juergen Gross)
+
+Changes from v2
+(https://lore.kernel.org/linux-block/af195033-23d5-38ed-b73b-f6e2e3b34541@amazon.com)
+ - Rename the module parameter and variables for brevity
+   (aggressive shrinking -> squeezing)
+
+Changes from v1
+(https://lore.kernel.org/xen-devel/20191204113419.2298-1-sjpark@amazon.com/)
+ - Adjust the description to not use the term, `arbitrarily`
+   (suggested by Paul Durrant)
+ - Specify time unit of the duration in the parameter description,
+   (suggested by Maximilian Heyne)
+ - Change default aggressive shrinking duration from 1ms to 10ms
+ - Merge two patches into one single patch
+
+SeongJae Park (2):
+  xenbus/backend: Add memory pressure handler callback
+  xen/blkback: Squeeze page pools if a memory pressure is detected
+
+ drivers/block/xen-blkback/blkback.c       | 23 +++++++++++++++--
+ drivers/block/xen-blkback/common.h        |  1 +
+ drivers/block/xen-blkback/xenbus.c        |  3 ++-
+ drivers/xen/xenbus/xenbus_probe_backend.c | 31 +++++++++++++++++++++++
+ include/xen/xenbus.h                      |  1 +
+ 5 files changed, 56 insertions(+), 3 deletions(-)
 
 -- 
-Jens Axboe
+2.17.1
 
