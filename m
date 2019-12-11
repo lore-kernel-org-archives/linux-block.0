@@ -6,69 +6,69 @@ X-Spam-Status: No, score=-2.2 required=3.0 tests=DKIM_SIGNED,DKIM_VALID,
 	HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,
 	USER_AGENT_SANE_1 autolearn=no autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id BFEB0C2D0CB
-	for <linux-block@archiver.kernel.org>; Wed, 11 Dec 2019 14:39:28 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 96461C2D0C6
+	for <linux-block@archiver.kernel.org>; Wed, 11 Dec 2019 14:44:45 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.kernel.org (Postfix) with ESMTP id 95B2E2467A
-	for <linux-block@archiver.kernel.org>; Wed, 11 Dec 2019 14:39:28 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id 6A359214D8
+	for <linux-block@archiver.kernel.org>; Wed, 11 Dec 2019 14:44:45 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel-dk.20150623.gappssmtp.com header.i=@kernel-dk.20150623.gappssmtp.com header.b="ItJvVAGS"
+	dkim=pass (2048-bit key) header.d=kernel-dk.20150623.gappssmtp.com header.i=@kernel-dk.20150623.gappssmtp.com header.b="XQlVEpu/"
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1730116AbfLKOj1 (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Wed, 11 Dec 2019 09:39:27 -0500
-Received: from mail-pg1-f195.google.com ([209.85.215.195]:35279 "EHLO
-        mail-pg1-f195.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1730112AbfLKOj0 (ORCPT
+        id S1729689AbfLKOoo (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Wed, 11 Dec 2019 09:44:44 -0500
+Received: from mail-pf1-f194.google.com ([209.85.210.194]:36948 "EHLO
+        mail-pf1-f194.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S1729278AbfLKOoo (ORCPT
         <rfc822;linux-block@vger.kernel.org>);
-        Wed, 11 Dec 2019 09:39:26 -0500
-Received: by mail-pg1-f195.google.com with SMTP id l24so10866213pgk.2
-        for <linux-block@vger.kernel.org>; Wed, 11 Dec 2019 06:39:25 -0800 (PST)
+        Wed, 11 Dec 2019 09:44:44 -0500
+Received: by mail-pf1-f194.google.com with SMTP id p14so1922391pfn.4
+        for <linux-block@vger.kernel.org>; Wed, 11 Dec 2019 06:44:43 -0800 (PST)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=kernel-dk.20150623.gappssmtp.com; s=20150623;
         h=subject:to:cc:references:from:message-id:date:user-agent
          :mime-version:in-reply-to:content-language:content-transfer-encoding;
-        bh=JIZ0Z2kz72zIQNA6G4bYzFn40yhbQ+MQB3rkdPMRBVA=;
-        b=ItJvVAGSLpP2Qi+JlwGHdyO1sjXtP2FS1mtHFHhX0wx1Yd51DPvWT7RxgPM5kfmFl2
-         z5h+0QPmcrpRx8D481hiFimlEXuB5e3/Q6Mh5auXLERPFLAXVjjcMTLPfVAJyc4iOcMu
-         NAkddftDmeAyKALkUXIbLZnXkhOA/BzyOz2aSS6ZWODXr2fObOUeB9Pxrul75Zw5LO3o
-         fmvHxpomY5OKDtxH7sLGXx4OFI2EsHcqHnjaG5I9VQpCzMCU0anGQuibyLwlqOFDNEqY
-         NIoPj5cAsWz3bed/Ph/aApEzac2HTpk/om2JSCJPmteYqBbDC4EpQIDy1A4FoTYmNhxv
-         iVig==
+        bh=0noKfCU616o5aJg1NtSncjkK+qcITrk9Wzz3Uuhs+4A=;
+        b=XQlVEpu/5+hm1CXz95btym65Dq4nyajQDRv9dxux95XhbEsue/bHnBHeL7fH1ggIN0
+         yHhblwjtfodSxqRf+9w4vJ98Oui2Qk8caPMSUNE6nd2bG83aoP9lW6wIacsAnOxoI/YU
+         xEK3mLb1pjWY52mLA3PWZD1dNKQ7Gt6PuyTbm48bEEGzp7f37nh6NSFJlAQzsGOYhJ37
+         P+mkfsTWErCgUjg5btdw4P9ZLcWLSvPxwaxQZ/sYeHJNReSlNHRoC/Nh2HbkfTHLkHuV
+         XVoxE+HtD928lUf8hnfA8/3Q9n4R8teZ1tL05NmcpYDNtYBLCJXXF64f3t6+e34y0Co3
+         rPQA==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=1e100.net; s=20161025;
         h=x-gm-message-state:subject:to:cc:references:from:message-id:date
          :user-agent:mime-version:in-reply-to:content-language
          :content-transfer-encoding;
-        bh=JIZ0Z2kz72zIQNA6G4bYzFn40yhbQ+MQB3rkdPMRBVA=;
-        b=cnzpwbqD/JzvqGaGZJoZJDL4McGJXHVZgPvDIJTATTvdXdPrdcXYNQ4+hjs+yqaiAF
-         SES7k4ZvfWtlDi72jQgWwbDp4PZ4TyL3fQ6x8YEO/gaHm6s8U2wrYEdjZ1/xDHquzeJP
-         U2R8y9ReJL/G1YRjEGst6TuNz3ZW1arG161Bw45IzwcNfjPiYJ2JfG02veB1sj2adBu4
-         b10zvdufumEDyUItDDMynKxK5MyA2nyciE9/qggoVHUWUFrNqAxaK+3v+jFk0KV2rkMA
-         ggVWqSp588zsXwsk2/az8tJvVIZxTibut/6exvlddhnWuE0KV0bUMHh7ctEPj4BHBFro
-         AFPg==
-X-Gm-Message-State: APjAAAV9Kq+Om2rvHcGAskVOPKhD7Y94umLhk9OGo+E/Y0PB0iqtSpUR
-        0ysaHG64QhuYHXhend9aa4w7qvQjIJM=
-X-Google-Smtp-Source: APXvYqyGeiGi1rdrfdXNO/icOwO5gEDSo2Gr7BxhF5G7xiGB1lEMbNYINxHWG76c4XmZgIber6/vfA==
-X-Received: by 2002:a63:ce4b:: with SMTP id r11mr4616880pgi.419.1576075164601;
-        Wed, 11 Dec 2019 06:39:24 -0800 (PST)
+        bh=0noKfCU616o5aJg1NtSncjkK+qcITrk9Wzz3Uuhs+4A=;
+        b=nAvSX4rCLMnK2BOQtIOv0PGSt/mrR6NQQwfIgDCsCcw/xlkE6nTuV8q6MbdTKQ2TiE
+         GJ93l+Az5p7RPTB0jU749WTKCUiSHptNYR3MeKxPEZOkmpzAlLdyVKRbX7JIoBTjjJe9
+         u0BdibEpl40t5TKNl2iAuLuG5jVw1OmZ1Qi/vSb+VWCKaBS3CW6j5SsrYgO6BEEhCuov
+         niqGqXSla9ntqM8eR5YNeRcaZ1FXnL34wX+2nuU2HGqdUL34tbLPIWJGaIAJSzfFV4Kw
+         XawBLXKsU/nYMkYte4D6L8t73dJlHdYgi46Dg3chjGihAIu4AStjLLWh8Devzt86deNV
+         3OVA==
+X-Gm-Message-State: APjAAAWhiYzZiSilV/ICvf7mbHkEPlXhqmrAKgJxXgIIt+Leymoyirel
+        JmQ5P3eZVXZ/qUkmlLL9ih3xLQ==
+X-Google-Smtp-Source: APXvYqwdI1SIycFevQzMpygeUnbYBln4nwDPnIzv35OREB+DT8S/L0C/8VDiyungiINcfSF7M6Q/hw==
+X-Received: by 2002:a63:c12:: with SMTP id b18mr4486272pgl.156.1576075483289;
+        Wed, 11 Dec 2019 06:44:43 -0800 (PST)
 Received: from ?IPv6:2620:10d:c081:1130::1014? ([2620:10d:c090:180::50da])
-        by smtp.gmail.com with ESMTPSA id x197sm3578266pfc.1.2019.12.11.06.39.23
+        by smtp.gmail.com with ESMTPSA id o23sm3397588pgj.90.2019.12.11.06.44.41
         (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
-        Wed, 11 Dec 2019 06:39:23 -0800 (PST)
-Subject: Re: [PATCH 3/5] mm: make buffered writes work with RWF_UNCACHED
+        Wed, 11 Dec 2019 06:44:42 -0800 (PST)
+Subject: Re: [PATCH 5/5] iomap: support RWF_UNCACHED for buffered writes
 To:     Dave Chinner <david@fromorbit.com>
 Cc:     linux-mm@kvack.org, linux-fsdevel@vger.kernel.org,
-        linux-block@vger.kernel.org
-References: <20191210162454.8608-1-axboe@kernel.dk>
- <20191210162454.8608-4-axboe@kernel.dk>
- <20191211002349.GC19213@dread.disaster.area>
+        linux-block@vger.kernel.org, willy@infradead.org, clm@fb.com
+References: <20191210204304.12266-1-axboe@kernel.dk>
+ <20191210204304.12266-6-axboe@kernel.dk>
+ <20191211011415.GE19213@dread.disaster.area>
 From:   Jens Axboe <axboe@kernel.dk>
-Message-ID: <bc595f20-fe12-8b9d-a7d5-53ac4ce6e108@kernel.dk>
-Date:   Wed, 11 Dec 2019 07:39:22 -0700
+Message-ID: <5d69ac99-b97d-283a-213c-7bbd62c3fc15@kernel.dk>
+Date:   Wed, 11 Dec 2019 07:44:40 -0700
 User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:68.0) Gecko/20100101
  Thunderbird/68.2.2
 MIME-Version: 1.0
-In-Reply-To: <20191211002349.GC19213@dread.disaster.area>
+In-Reply-To: <20191211011415.GE19213@dread.disaster.area>
 Content-Type: text/plain; charset=utf-8
 Content-Language: en-US
 Content-Transfer-Encoding: 7bit
@@ -77,101 +77,116 @@ Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-On 12/10/19 5:23 PM, Dave Chinner wrote:
-> On Tue, Dec 10, 2019 at 09:24:52AM -0700, Jens Axboe wrote:
->> If RWF_UNCACHED is set for io_uring (or pwritev2(2)), we'll drop the
->> cache instantiated for buffered writes. If new pages aren't
->> instantiated, we leave them alone. This provides similar semantics to
->> reads with RWF_UNCACHED set.
-> 
-> So what about filesystems that don't use generic_perform_write()?
-> i.e. Anything that uses the iomap infrastructure (i.e.
-> iomap_file_buffered_write()) instead of generic_file_write_iter())
-> will currently ignore RWF_UNCACHED. That's XFS and gfs2 right now,
-> but there are likely to be more in the near future as more
-> filesystems are ported to the iomap infrastructure.
-
-I'll skip this one as you found it.
-
-> I'd also really like to see extensive fsx and fstress testing of
-> this new IO mode before it is committed - this is going to exercise page
-> cache coherency across different operations in new and unique
-> ways. that means we need patches to fstests to detect and use this
-> functionality when available, and new tests that explicitly exercise
-> combinations of buffered, mmap, dio and uncached for a range of
-> different IO size and alignments (e.g. mixing sector sized uncached
-> IO with page sized buffered/mmap/dio and vice versa).
-> 
-> We are not going to have a repeat of the copy_file_range() data
-> corruption fuckups because no testing was done and no test
-> infrastructure was written before the new API was committed.
-
-Oh I totally agree, and there's no push from my end on this. I just
-think it's a cool feature and could be very useful, but it obviously
-needs a healthy dose of testing and test cases written. I'll be doing
-that as well.
-
->> +void write_drop_cached_pages(struct page **pgs, struct address_space *mapping,
->> +			     unsigned *nr)
->> +{
->> +	loff_t start, end;
->> +	int i;
+On 12/10/19 6:14 PM, Dave Chinner wrote:
+>> @@ -864,15 +896,29 @@ iomap_write_actor(struct inode *inode, loff_t pos, loff_t length, void *data,
+>>  			 */
+>>  			bytes = min_t(unsigned long, PAGE_SIZE - offset,
+>>  						iov_iter_single_seg_count(i));
+>> +			if (drop_page)
+>> +				put_page(page);
+>>  			goto again;
+>>  		}
 >> +
->> +	end = 0;
->> +	start = LLONG_MAX;
->> +	for (i = 0; i < *nr; i++) {
->> +		struct page *page = pgs[i];
->> +		loff_t off;
->> +
->> +		off = (loff_t) page_to_index(page) << PAGE_SHIFT;
->> +		if (off < start)
->> +			start = off;
->> +		if (off > end)
->> +			end = off;
->> +		get_page(page);
->> +	}
->> +
->> +	__filemap_fdatawrite_range(mapping, start, end, WB_SYNC_NONE);
->> +
->> +	for (i = 0; i < *nr; i++) {
->> +		struct page *page = pgs[i];
->> +
->> +		lock_page(page);
->> +		if (page->mapping == mapping) {
->> +			wait_on_page_writeback(page);
->> +			if (!page_has_private(page) ||
->> +			    try_to_release_page(page, 0))
->> +				remove_mapping(mapping, page);
+>> +		if (drop_page &&
+>> +		    ((pos >> PAGE_SHIFT) != ((pos + copied) >> PAGE_SHIFT))) {
+>> +			if (!pagevec_add(&pvec, page))
+>> +				write_drop_cached_pages(&pvec, mapping);
+>> +		} else {
+>> +			if (drop_page)
+>> +				put_page(page);
+>> +			balance_dirty_pages_ratelimited(inode->i_mapping);
 >> +		}
->> +		unlock_page(page);
->> +	}
->> +	*nr = 0;
->> +}
->> +EXPORT_SYMBOL_GPL(write_drop_cached_pages);
->> +
->> +#define GPW_PAGE_BATCH		16
 > 
-> In terms of performance, file fragmentation and premature filesystem
-> aging, this is also going to suck *really badly* for filesystems
-> that use delayed allocation because it is going to force conversion
-> of delayed allocation extents during the write() call. IOWs,
-> it adds all the overheads of doing delayed allocation, but it reaps
-> none of the benefits because it doesn't allow large contiguous
-> extents to build up in memory before physical allocation occurs.
-> i.e. there is no "delayed" in this allocation....
+> This looks like it's a problem: this is going to write the
+> data, which can cause the extent mapping of the file to change
+> beyond the range that was written (e.g. due to speculative delayed
+> allocation) and so the iomap we have already cached to direct write
+> behaviour may now be stale.
 > 
-> So it might work fine on a pristine, empty filesystem where it is
-> easy to find contiguous free space accross multiple allocations, but
-> it's going to suck after a few months of production usage has
-> fragmented all the free space into tiny pieces...
+> IOWs, to be safe we need to terminate the write loop at this point,
+> return to iomap_apply() and remap the range we are writing into so
+> that we don't end up using a stale iomap. That kinda defeats the
+> purpose of iomap - we are trying to do a single extent mapping per
+> IO instead of per-page, and this pulls it back to an iomap per 16
+> pages for large user IOs. And it has the issues with breaking
+> delayed allocation optimisations, too.
+> 
+> Hence, IMO, this is the wrong layer in iomap to be dealing with
+> writeback and cache residency for uncached IO. We should be caching
+> residency/invalidation at a per-IO level, not a per-page level.
+> 
+> Sure, have the write actor return a flag (e.g. in the iomap) to say
+> that it encountered cached pages so that we can decide whether or
+> not to invalidate the entire range we just wrote in iomap_apply, but
+> doing it between mappings in iomap_apply means that the writeback is
+> done once per user IO, and cache invalidation only occurs if no
+> cached pages were encountered during that IO. i.e. add this to
+> iomap_apply() after ops->iomap_end() has been called:
+> 
+> 
+> 	if (flags & RWF_UNCACHED) {
+> 		ret = filemap_write_and_wait_range(mapping, start, end);
+> 		if (ret)
+> 			goto out;
+> 
+> 		if (!drop_cache)
+> 			goto out;
+> 
+> 		/*
+> 		 * Try to invalidate cache pages for the range we
+> 		 * just wrote. We don't care if invalidation fails
+> 		 * as the write has still worked and leaving clean
+> 		 * uptodate pages * in the page cache isn't a
+> 		 * corruption vector for uncached IO.
+> 		 */
+> 		invalidate_inode_pages2_range(mapping,
+> 				start >> PAGE_SHIFT, end >> PAGE_SHIFT);
+> 	}
+> out:
+> 	return written ? written : ret;
+> }
 
-I totally agree on this one, and I'm not a huge fan of it. But
-considering your suggestion in the other email, I think we just need to
-move this up a notch and do it per-write instead. If we can pass back
-information about the state of the page cache for the range we care
-about, then there's no reason to do it per-page for the write case.
-Reads are still best done that way, and we can avoid the LRU overhead by
-doing it that way.
+I really like this, and some variant of that solution can also be
+applied to the non-iomap case. It'll make for a cleaner implementation
+as well.
+
+Once we do it per-write we'll have solved the performance and iomap
+weirdness, but it does mean that we need to make a decision on when to
+invalidate. For the per-page case it's clear - if the page is already
+there, leave it. If not, (attempt to) kill it. For the full write range,
+what if just one page was not there? Do we invalidate then? What if one
+page was there?
+
+I'm going to move forward with the notion that if we had to allocate any
+page in the range, we invalidate the range. Only ranges that were fully
+cached already will remain in the cache. I think those semantics make
+the most sense.
+
+> Note that this doesn't solve the write error return issue. i.e.
+> if filemap_write_and_wait_range() fails, should that error be
+> returned or ignored?
+
+I think we should handle this exactly like we do the O_DIRECT case on
+buffered IO write-and-wait.
+
+> And that leads to my next question: what data integrity guarantees
+> does RWF_UNCACHED give? What if the underlying device has a volatile
+> write cache or we dirtied metadata during block allocation? i.e.  to
+> a user, "UNCACHED" kinda implies that the write has ended up on
+> stable storage because they are saying "do not cache this data". To
+> me, none of this implementation guarantees data integrity, and users
+> would still need O_DSYNC or fsync() with RWF_UNCACHED IO. That seems
+> sane to me (same as direct io requirements) but whatever is decided
+> here, it will need to be spelled out clearly in the man page so that 
+> users don't get it wrong.
+
+Fully agree, this isn't about data integrity guarantees. You will still
+need the appropriate sync magic to make it safe. This is exactly like
+O_DIRECT, and I think we should retain those exact same semantics for
+the RWF_UNCACHED case.
+
+Thanks for taking a look at this! I'll respin (and re-test) with the
+write side changed.
 
 -- 
 Jens Axboe
