@@ -2,196 +2,140 @@ Return-Path: <SRS0=X6jZ=2B=vger.kernel.org=linux-block-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-2.4 required=3.0 tests=DKIMWL_WL_HIGH,DKIM_SIGNED,
-	DKIM_VALID,DKIM_VALID_AU,HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,
-	SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED,USER_AGENT_SANE_1 autolearn=no
-	autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-2.2 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
+	MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED,USER_AGENT_SANE_1
+	autolearn=no autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 07473C00454
-	for <linux-block@archiver.kernel.org>; Wed, 11 Dec 2019 21:25:38 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 525EDC43603
+	for <linux-block@archiver.kernel.org>; Wed, 11 Dec 2019 22:46:24 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.kernel.org (Postfix) with ESMTP id C5F282054F
-	for <linux-block@archiver.kernel.org>; Wed, 11 Dec 2019 21:25:37 +0000 (UTC)
-Authentication-Results: mail.kernel.org;
-	dkim=pass (2048-bit key) header.d=nvidia.com header.i=@nvidia.com header.b="n8ng2gW+"
+	by mail.kernel.org (Postfix) with ESMTP id 2186B21556
+	for <linux-block@archiver.kernel.org>; Wed, 11 Dec 2019 22:46:24 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1726524AbfLKVZg (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Wed, 11 Dec 2019 16:25:36 -0500
-Received: from hqnvemgate24.nvidia.com ([216.228.121.143]:1456 "EHLO
-        hqnvemgate24.nvidia.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1726313AbfLKVZg (ORCPT
+        id S1726463AbfLKWqX (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Wed, 11 Dec 2019 17:46:23 -0500
+Received: from mail104.syd.optusnet.com.au ([211.29.132.246]:46912 "EHLO
+        mail104.syd.optusnet.com.au" rhost-flags-OK-OK-OK-OK)
+        by vger.kernel.org with ESMTP id S1726411AbfLKWqX (ORCPT
         <rfc822;linux-block@vger.kernel.org>);
-        Wed, 11 Dec 2019 16:25:36 -0500
-Received: from hqpgpgate101.nvidia.com (Not Verified[216.228.121.13]) by hqnvemgate24.nvidia.com (using TLS: TLSv1.2, DES-CBC3-SHA)
-        id <B5df15eb80000>; Wed, 11 Dec 2019 13:25:12 -0800
-Received: from hqmail.nvidia.com ([172.20.161.6])
-  by hqpgpgate101.nvidia.com (PGP Universal service);
-  Wed, 11 Dec 2019 13:25:34 -0800
-X-PGP-Universal: processed;
-        by hqpgpgate101.nvidia.com on Wed, 11 Dec 2019 13:25:34 -0800
-Received: from [10.110.48.28] (10.124.1.5) by HQMAIL107.nvidia.com
- (172.20.187.13) with Microsoft SMTP Server (TLS) id 15.0.1473.3; Wed, 11 Dec
- 2019 21:25:34 +0000
-Subject: Re: [PATCH v9 10/25] mm/gup: introduce pin_user_pages*() and FOLL_PIN
-To:     Jonathan Corbet <corbet@lwn.net>
-CC:     Andrew Morton <akpm@linux-foundation.org>,
-        Al Viro <viro@zeniv.linux.org.uk>,
-        Alex Williamson <alex.williamson@redhat.com>,
-        Benjamin Herrenschmidt <benh@kernel.crashing.org>,
-        =?UTF-8?B?QmrDtnJuIFTDtnBlbA==?= <bjorn.topel@intel.com>,
-        Christoph Hellwig <hch@infradead.org>,
-        Dan Williams <dan.j.williams@intel.com>,
-        Daniel Vetter <daniel@ffwll.ch>,
-        Dave Chinner <david@fromorbit.com>,
-        David Airlie <airlied@linux.ie>,
-        "David S . Miller" <davem@davemloft.net>,
-        Ira Weiny <ira.weiny@intel.com>, Jan Kara <jack@suse.cz>,
-        Jason Gunthorpe <jgg@ziepe.ca>, Jens Axboe <axboe@kernel.dk>,
-        =?UTF-8?B?SsOpcsO0bWUgR2xpc3Nl?= <jglisse@redhat.com>,
-        Magnus Karlsson <magnus.karlsson@intel.com>,
-        Mauro Carvalho Chehab <mchehab@kernel.org>,
-        Michael Ellerman <mpe@ellerman.id.au>,
-        Michal Hocko <mhocko@suse.com>,
-        Mike Kravetz <mike.kravetz@oracle.com>,
-        Paul Mackerras <paulus@samba.org>,
-        Shuah Khan <shuah@kernel.org>,
-        Vlastimil Babka <vbabka@suse.cz>, <bpf@vger.kernel.org>,
-        <dri-devel@lists.freedesktop.org>, <kvm@vger.kernel.org>,
-        <linux-block@vger.kernel.org>, <linux-doc@vger.kernel.org>,
-        <linux-fsdevel@vger.kernel.org>, <linux-kselftest@vger.kernel.org>,
-        <linux-media@vger.kernel.org>, <linux-rdma@vger.kernel.org>,
-        <linuxppc-dev@lists.ozlabs.org>, <netdev@vger.kernel.org>,
-        <linux-mm@kvack.org>, LKML <linux-kernel@vger.kernel.org>,
-        Mike Rapoport <rppt@linux.ibm.com>
-References: <20191211025318.457113-1-jhubbard@nvidia.com>
- <20191211025318.457113-11-jhubbard@nvidia.com>
- <20191211135737.581add2f@lwn.net>
-From:   John Hubbard <jhubbard@nvidia.com>
-X-Nvconfidentiality: public
-Message-ID: <c8930e77-9c99-2d3d-743d-9d58176ea690@nvidia.com>
-Date:   Wed, 11 Dec 2019 13:25:33 -0800
-User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:68.0) Gecko/20100101
- Thunderbird/68.3.0
+        Wed, 11 Dec 2019 17:46:23 -0500
+Received: from dread.disaster.area (pa49-195-139-249.pa.nsw.optusnet.com.au [49.195.139.249])
+        by mail104.syd.optusnet.com.au (Postfix) with ESMTPS id 2394B82045C;
+        Thu, 12 Dec 2019 09:46:18 +1100 (AEDT)
+Received: from dave by dread.disaster.area with local (Exim 4.92.3)
+        (envelope-from <david@fromorbit.com>)
+        id 1ifAkL-0005w2-3b; Thu, 12 Dec 2019 09:46:17 +1100
+Date:   Thu, 12 Dec 2019 09:46:17 +1100
+From:   Dave Chinner <david@fromorbit.com>
+To:     Srikar Dronamraju <srikar@linux.vnet.ibm.com>
+Cc:     Peter Zijlstra <peterz@infradead.org>,
+        Phil Auld <pauld@redhat.com>, Ming Lei <ming.lei@redhat.com>,
+        linux-block@vger.kernel.org, linux-fsdevel@vger.kernel.org,
+        linux-xfs@vger.kernel.org, linux-kernel@vger.kernel.org,
+        Jeff Moyer <jmoyer@redhat.com>,
+        Dave Chinner <dchinner@redhat.com>,
+        Eric Sandeen <sandeen@redhat.com>,
+        Christoph Hellwig <hch@lst.de>, Jens Axboe <axboe@kernel.dk>,
+        Ingo Molnar <mingo@redhat.com>, Tejun Heo <tj@kernel.org>,
+        Vincent Guittot <vincent.guittot@linaro.org>
+Subject: Re: [PATCH v4] sched/core: Preempt current task in favour of bound
+ kthread
+Message-ID: <20191211224617.GE19256@dread.disaster.area>
+References: <20191118092121.GV4131@hirez.programming.kicks-ass.net>
+ <20191118204054.GV4614@dread.disaster.area>
+ <20191120191636.GI4097@hirez.programming.kicks-ass.net>
+ <20191120220313.GC18056@pauld.bos.csb>
+ <20191121132937.GW4114@hirez.programming.kicks-ass.net>
+ <20191209165122.GA27229@linux.vnet.ibm.com>
+ <20191209231743.GA19256@dread.disaster.area>
+ <20191210054330.GF27253@linux.vnet.ibm.com>
+ <20191210172307.GD9139@linux.vnet.ibm.com>
+ <20191211173829.GB21797@linux.vnet.ibm.com>
 MIME-Version: 1.0
-In-Reply-To: <20191211135737.581add2f@lwn.net>
-X-Originating-IP: [10.124.1.5]
-X-ClientProxiedBy: HQMAIL105.nvidia.com (172.20.187.12) To
- HQMAIL107.nvidia.com (172.20.187.13)
-Content-Type: text/plain; charset="utf-8"
-Content-Language: en-US
-Content-Transfer-Encoding: 7bit
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=nvidia.com; s=n1;
-        t=1576099513; bh=h8WoxBOtUL7d4aBHwikvS71dFoLle6Q1qJcgfYlGzoI=;
-        h=X-PGP-Universal:Subject:To:CC:References:From:X-Nvconfidentiality:
-         Message-ID:Date:User-Agent:MIME-Version:In-Reply-To:
-         X-Originating-IP:X-ClientProxiedBy:Content-Type:Content-Language:
-         Content-Transfer-Encoding;
-        b=n8ng2gW+8yccOTJ0sb0qKZBSBkMzrO2w+mX1jwAwhVYYv3FE21MXjsfMjjhApcnib
-         wo8d+ZRlDZwi9+66AYkoZtFFMIJupZ7au9saOmm/kNh3KbsRApo1SSaYZzqpFUg9dv
-         APDY2cvczFMX0P05ANDG9Wpe8w2DHHN7/JdQsO1AuudRaAw4keF3jV1uyq3uA82xUI
-         ieCnDqXdxIHT69mdMVDE/JA7qgs+lLHW/JROAhLDlkZchTV8THtwKre9xUIr3vtdDd
-         8O/vqZHRFo4GrCktOUJaI0JiNxox7/Ns2xEUIaiCnKWdDSbo4DOz0JmZdD1qJCvncm
-         kDdssHEUgirjg==
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <20191211173829.GB21797@linux.vnet.ibm.com>
+User-Agent: Mutt/1.10.1 (2018-07-13)
+X-Optus-CM-Score: 0
+X-Optus-CM-Analysis: v=2.3 cv=LYdCFQXi c=1 sm=1 tr=0
+        a=KoypXv6BqLCQNZUs2nCMWg==:117 a=KoypXv6BqLCQNZUs2nCMWg==:17
+        a=jpOVt7BSZ2e4Z31A5e1TngXxSK0=:19 a=kj9zAlcOel0A:10 a=pxVhFHJ0LMsA:10
+        a=7-415B0cAAAA:8 a=DKMTVZrBpn61F86xKIIA:9 a=7pSkhifIAIoKH1Ap:21
+        a=Iepqc9itoRpRa7oB:21 a=CjuIK1q_8ugA:10 a=biEYGPWJfzWAr4FL6Ov7:22
+        a=1c-WWmYQErFem0j6iXEC:22
 Sender: linux-block-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-On 12/11/19 12:57 PM, Jonathan Corbet wrote:
-> On Tue, 10 Dec 2019 18:53:03 -0800
-> John Hubbard <jhubbard@nvidia.com> wrote:
+On Wed, Dec 11, 2019 at 11:08:29PM +0530, Srikar Dronamraju wrote:
+> A running task can wake-up a per CPU bound kthread on the same CPU.
+> If the current running task doesn't yield the CPU before the next load
+> balance operation, the scheduler would detect load imbalance and try to
+> balance the load. However this load balance would fail as the waiting
+> task is CPU bound, while the running task cannot be moved by the regular
+> load balancer. Finally the active load balancer would kick in and move
+> the task to a different CPU/Core. Moving the task to a different
+> CPU/core can lead to loss in cache affinity leading to poor performance.
 > 
->> Introduce pin_user_pages*() variations of get_user_pages*() calls,
->> and also pin_longterm_pages*() variations.
+> This is more prone to happen if the current running task is CPU
+> intensive and the sched_wake_up_granularity is set to larger value.
+> When the sched_wake_up_granularity was relatively small, it was observed
+> that the bound thread would complete before the load balancer would have
+> chosen to move the cache hot task to a different CPU.
 > 
-> Just a couple of nits on the documentation patch
+> To deal with this situation, the current running task would yield to a
+> per CPU bound kthread, provided kthread is not CPU intensive.
+
+So a question for you here: when does the workqueue worker pre-empt
+the currently running task? Is it immediately? Or when a time-slice
+of the currently running task runs out?
+
+We don't want queued work immediately pre-empting the task that
+queued the work - the queued work is *deferred* work that should be
+run _soon_ but we want the currently running task to finish what it
+is doing first if possible. i.e. these are not synchronous wakeups,
+and so we shouldn't schedule kworker threads as though they are sync
+wakeups. That will affect batch processing effciency and reduce
+throughput because it will greatly increase the number of
+unnecessary context switches during IO completion processing....
+
+> /pboffline/hwcct_prg_old/lib/fsperf -t overwrite --noclean -f 5g -b 4k /pboffline
 > 
->> +++ b/Documentation/core-api/pin_user_pages.rst
->> @@ -0,0 +1,232 @@
->> +.. SPDX-License-Identifier: GPL-2.0
->> +
->> +====================================================
->> +pin_user_pages() and related calls
->> +====================================================
->> +
->> +.. contents:: :local:
->> +
->> +Overview
->> +========
->> +
->> +This document describes the following functions: ::
->> +
->> + pin_user_pages
->> + pin_user_pages_fast
->> + pin_user_pages_remote
+> (With sched_wake_up_granularity set to 15ms)
 > 
-> You could just say "the following functions::" and get the result you're
-> after with a slightly less alien plain-text reading experience.
+> Performance counter stats for 'system wide' (5 runs):
+> event					    v5.4 				v5.4 + patch(v3)
+> probe:active_load_balance_cpu_stop       1,919  ( +-  2.89% )                     4  ( +- 20.48% )
+> sched:sched_waking                     441,535  ( +-  0.17% )               914,630  ( +-  0.18% )
+> sched:sched_wakeup                     441,533  ( +-  0.17% )               914,630  ( +-  0.18% )
+> sched:sched_wakeup_new                   2,436  ( +-  8.08% )                   545  ( +-  4.02% )
+> sched:sched_switch                     797,007  ( +-  0.26% )             1,490,261  ( +-  0.10% )
+> sched:sched_migrate_task                20,998  ( +-  1.04% )                 2,492  ( +- 11.56% )
 
-I see. That works nicely: same result with fewer :'s. 
+As we see here. We've doubled the number of context switches
+(increased by 700,000) just to avoid 17,000 incorrect load balancer
+task migrations.
 
-> 
-> Of course, you could also just say "This document describes
-> pin_user_pages(), pin_user_pages_fast(), and pin_user_pages_remote()." But
-> that's a matter of personal taste, I guess.  Using the function() notation
-> will cause the docs system to automatically link to the kerneldoc info,
-> though.  
+That seems like we now make 700,000 incorrect decisions instead of
+just 20,000. The difference is that the consequence of making these
+many incorrect pre-emption decisions is vastly less than the
+consequence of making the wrong migration decision.
 
-OK. I did try the single-sentence approach just now, but to me the one-per-line
-seems to make both the text and the generated HTML slightly easier to look at. 
-Of course, like you say, different people will have different preferences. So 
-in the end I've combined the tips, like this:
+It seems to me that we should be checking this is_per_cpu_kthread()
+state for tasks queued on the runqueue during active load balancing,
+rather than at wakeup time.  i.e. in these cases we don't migrate
+the running task, we just let it run out it's timeslice out and the
+local per-cpu kthreads then run appropriately.
 
-+Overview
-+========
-+
-+This document describes the following functions::
-+
-+ pin_user_pages()
-+ pin_user_pages_fast()
-+ pin_user_pages_remote()
+AFAICT this would have the same effect of avoiding unnecessary task
+migrations in this workload, but without causing a global change to
+the way workqueue kworkers are scheduled that has the potential to
+cause regressions in other workqueue intensive workloads....
 
+Cheers,
 
-> 
->> +Basic description of FOLL_PIN
->> +=============================
->> +
->> +FOLL_PIN and FOLL_LONGTERM are flags that can be passed to the get_user_pages*()
->> +("gup") family of functions. FOLL_PIN has significant interactions and
->> +interdependencies with FOLL_LONGTERM, so both are covered here.
->> +
->> +FOLL_PIN is internal to gup, meaning that it should not appear at the gup call
->> +sites. This allows the associated wrapper functions  (pin_user_pages*() and
->> +others) to set the correct combination of these flags, and to check for problems
->> +as well.
->> +
->> +FOLL_LONGTERM, on the other hand, *is* allowed to be set at the gup call sites.
->> +This is in order to avoid creating a large number of wrapper functions to cover
->> +all combinations of get*(), pin*(), FOLL_LONGTERM, and more. Also, the
->> +pin_user_pages*() APIs are clearly distinct from the get_user_pages*() APIs, so
->> +that's a natural dividing line, and a good point to make separate wrapper calls.
->> +In other words, use pin_user_pages*() for DMA-pinned pages, and
->> +get_user_pages*() for other cases. There are four cases described later on in
->> +this document, to further clarify that concept.
->> +
->> +FOLL_PIN and FOLL_GET are mutually exclusive for a given gup call. However,
->> +multiple threads and call sites are free to pin the same struct pages, via both
->> +FOLL_PIN and FOLL_GET. It's just the call site that needs to choose one or the
->> +other, not the struct page(s).
->> +
->> +The FOLL_PIN implementation is nearly the same as FOLL_GET, except that FOLL_PIN
->> +uses a different reference counting technique.
->> +
->> +FOLL_PIN is a prerequisite to FOLL_LONGTGERM. Another way of saying that is,
-> 
-> FOLL_LONGTERM typoed there.
-> 
-
-Good catch. Fixed.
-
-thanks,
+Dave.
 -- 
-John Hubbard
-NVIDIA
-
-
+Dave Chinner
+david@fromorbit.com
