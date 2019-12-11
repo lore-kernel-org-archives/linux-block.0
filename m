@@ -2,167 +2,177 @@ Return-Path: <SRS0=X6jZ=2B=vger.kernel.org=linux-block-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-6.8 required=3.0 tests=DKIMWL_WL_HIGH,DKIM_SIGNED,
-	DKIM_VALID,DKIM_VALID_AU,HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,
-	MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED
-	autolearn=ham autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-2.2 required=3.0 tests=DKIM_SIGNED,DKIM_VALID,
+	HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,
+	USER_AGENT_SANE_1 autolearn=no autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 555E7C2D0C6
-	for <linux-block@archiver.kernel.org>; Wed, 11 Dec 2019 13:58:04 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id BFEB0C2D0CB
+	for <linux-block@archiver.kernel.org>; Wed, 11 Dec 2019 14:39:28 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.kernel.org (Postfix) with ESMTP id 27D5821556
-	for <linux-block@archiver.kernel.org>; Wed, 11 Dec 2019 13:58:04 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id 95B2E2467A
+	for <linux-block@archiver.kernel.org>; Wed, 11 Dec 2019 14:39:28 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=pass (1024-bit key) header.d=amazon.com header.i=@amazon.com header.b="pLF6+ECJ"
+	dkim=pass (2048-bit key) header.d=kernel-dk.20150623.gappssmtp.com header.i=@kernel-dk.20150623.gappssmtp.com header.b="ItJvVAGS"
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1729118AbfLKN6D (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Wed, 11 Dec 2019 08:58:03 -0500
-Received: from smtp-fw-9101.amazon.com ([207.171.184.25]:38463 "EHLO
-        smtp-fw-9101.amazon.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1728128AbfLKN6D (ORCPT
+        id S1730116AbfLKOj1 (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Wed, 11 Dec 2019 09:39:27 -0500
+Received: from mail-pg1-f195.google.com ([209.85.215.195]:35279 "EHLO
+        mail-pg1-f195.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S1730112AbfLKOj0 (ORCPT
         <rfc822;linux-block@vger.kernel.org>);
-        Wed, 11 Dec 2019 08:58:03 -0500
+        Wed, 11 Dec 2019 09:39:26 -0500
+Received: by mail-pg1-f195.google.com with SMTP id l24so10866213pgk.2
+        for <linux-block@vger.kernel.org>; Wed, 11 Dec 2019 06:39:25 -0800 (PST)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-  d=amazon.com; i=@amazon.com; q=dns/txt; s=amazon201209;
-  t=1576072682; x=1607608682;
-  h=from:to:cc:subject:date:message-id:references:
-   in-reply-to:content-transfer-encoding:mime-version;
-  bh=W8TTi/2IIEXbPsGUA9DEIj5AQ0RHJuHWIGTOmHVUQus=;
-  b=pLF6+ECJZtqBNaM3K4bnY13fxpzUOh5lElBDTq3fONH549VhWM+TCnnT
-   bfZwXkHHtcF0/gkTHM5Vf3T9l72Pfpfj1PzVuslTpe+jnCAHj4B73wQSI
-   8+MsXA0gQW++m9t1xTOtCDJYBuh9saAvI2sGrOE4ZdkQjyV+rp/ghZGvg
-   o=;
-IronPort-SDR: mkmquFRZdQ8fhag+H0SlzhM9qj48wmtmu0VhkeL9obp3+XTB70l/s1tnfYtMUyjId7XwSWkwiv
- Nb2KZPkVlIvA==
-X-IronPort-AV: E=Sophos;i="5.69,301,1571702400"; 
-   d="scan'208";a="4498934"
-Received: from sea32-co-svc-lb4-vlan3.sea.corp.amazon.com (HELO email-inbound-relay-2b-5bdc5131.us-west-2.amazon.com) ([10.47.23.38])
-  by smtp-border-fw-out-9101.sea19.amazon.com with ESMTP; 11 Dec 2019 13:57:44 +0000
-Received: from EX13MTAUEA001.ant.amazon.com (pdx4-ws-svc-p6-lb7-vlan3.pdx.amazon.com [10.170.41.166])
-        by email-inbound-relay-2b-5bdc5131.us-west-2.amazon.com (Postfix) with ESMTPS id 38FCAA2707;
-        Wed, 11 Dec 2019 13:57:44 +0000 (UTC)
-Received: from EX13D32EUC003.ant.amazon.com (10.43.164.24) by
- EX13MTAUEA001.ant.amazon.com (10.43.61.82) with Microsoft SMTP Server (TLS)
- id 15.0.1367.3; Wed, 11 Dec 2019 13:57:43 +0000
-Received: from EX13D32EUC003.ant.amazon.com (10.43.164.24) by
- EX13D32EUC003.ant.amazon.com (10.43.164.24) with Microsoft SMTP Server (TLS)
- id 15.0.1367.3; Wed, 11 Dec 2019 13:57:42 +0000
-Received: from EX13D32EUC003.ant.amazon.com ([10.43.164.24]) by
- EX13D32EUC003.ant.amazon.com ([10.43.164.24]) with mapi id 15.00.1367.000;
- Wed, 11 Dec 2019 13:57:42 +0000
-From:   "Durrant, Paul" <pdurrant@amazon.com>
-To:     =?iso-8859-1?Q?Roger_Pau_Monn=E9?= <roger.pau@citrix.com>,
-        Juergen Gross <jgross@suse.com>
-CC:     "xen-devel@lists.xenproject.org" <xen-devel@lists.xenproject.org>,
-        "linux-block@vger.kernel.org" <linux-block@vger.kernel.org>,
-        "linux-kernel@vger.kernel.org" <linux-kernel@vger.kernel.org>,
-        "Konrad Rzeszutek Wilk" <konrad.wilk@oracle.com>,
-        Jens Axboe <axboe@kernel.dk>
-Subject: RE: [PATCH] xen-blkback: prevent premature module unload
-Thread-Topic: [PATCH] xen-blkback: prevent premature module unload
-Thread-Index: AQHVr2mJT7izwmimDUiZW3emm6kz0qe0zXcAgAAhBkCAAAfzgIAAAGuQ
-Date:   Wed, 11 Dec 2019 13:57:42 +0000
-Message-ID: <4c9a0d81d0634f27a41fe10c8d93a4ea@EX13D32EUC003.ant.amazon.com>
-References: <20191210145305.6605-1-pdurrant@amazon.com>
- <20191211112754.GM980@Air-de-Roger>
- <14a01d62046c48ee9b2486917370b5f5@EX13D32EUC003.ant.amazon.com>
- <20191211135523.GP980@Air-de-Roger>
-In-Reply-To: <20191211135523.GP980@Air-de-Roger>
-Accept-Language: en-GB, en-US
-Content-Language: en-US
-X-MS-Has-Attach: 
-X-MS-TNEF-Correlator: 
-x-ms-exchange-transport-fromentityheader: Hosted
-x-originating-ip: [10.43.164.172]
-Content-Type: text/plain; charset="iso-8859-1"
-Content-Transfer-Encoding: quoted-printable
+        d=kernel-dk.20150623.gappssmtp.com; s=20150623;
+        h=subject:to:cc:references:from:message-id:date:user-agent
+         :mime-version:in-reply-to:content-language:content-transfer-encoding;
+        bh=JIZ0Z2kz72zIQNA6G4bYzFn40yhbQ+MQB3rkdPMRBVA=;
+        b=ItJvVAGSLpP2Qi+JlwGHdyO1sjXtP2FS1mtHFHhX0wx1Yd51DPvWT7RxgPM5kfmFl2
+         z5h+0QPmcrpRx8D481hiFimlEXuB5e3/Q6Mh5auXLERPFLAXVjjcMTLPfVAJyc4iOcMu
+         NAkddftDmeAyKALkUXIbLZnXkhOA/BzyOz2aSS6ZWODXr2fObOUeB9Pxrul75Zw5LO3o
+         fmvHxpomY5OKDtxH7sLGXx4OFI2EsHcqHnjaG5I9VQpCzMCU0anGQuibyLwlqOFDNEqY
+         NIoPj5cAsWz3bed/Ph/aApEzac2HTpk/om2JSCJPmteYqBbDC4EpQIDy1A4FoTYmNhxv
+         iVig==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20161025;
+        h=x-gm-message-state:subject:to:cc:references:from:message-id:date
+         :user-agent:mime-version:in-reply-to:content-language
+         :content-transfer-encoding;
+        bh=JIZ0Z2kz72zIQNA6G4bYzFn40yhbQ+MQB3rkdPMRBVA=;
+        b=cnzpwbqD/JzvqGaGZJoZJDL4McGJXHVZgPvDIJTATTvdXdPrdcXYNQ4+hjs+yqaiAF
+         SES7k4ZvfWtlDi72jQgWwbDp4PZ4TyL3fQ6x8YEO/gaHm6s8U2wrYEdjZ1/xDHquzeJP
+         U2R8y9ReJL/G1YRjEGst6TuNz3ZW1arG161Bw45IzwcNfjPiYJ2JfG02veB1sj2adBu4
+         b10zvdufumEDyUItDDMynKxK5MyA2nyciE9/qggoVHUWUFrNqAxaK+3v+jFk0KV2rkMA
+         ggVWqSp588zsXwsk2/az8tJvVIZxTibut/6exvlddhnWuE0KV0bUMHh7ctEPj4BHBFro
+         AFPg==
+X-Gm-Message-State: APjAAAV9Kq+Om2rvHcGAskVOPKhD7Y94umLhk9OGo+E/Y0PB0iqtSpUR
+        0ysaHG64QhuYHXhend9aa4w7qvQjIJM=
+X-Google-Smtp-Source: APXvYqyGeiGi1rdrfdXNO/icOwO5gEDSo2Gr7BxhF5G7xiGB1lEMbNYINxHWG76c4XmZgIber6/vfA==
+X-Received: by 2002:a63:ce4b:: with SMTP id r11mr4616880pgi.419.1576075164601;
+        Wed, 11 Dec 2019 06:39:24 -0800 (PST)
+Received: from ?IPv6:2620:10d:c081:1130::1014? ([2620:10d:c090:180::50da])
+        by smtp.gmail.com with ESMTPSA id x197sm3578266pfc.1.2019.12.11.06.39.23
+        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
+        Wed, 11 Dec 2019 06:39:23 -0800 (PST)
+Subject: Re: [PATCH 3/5] mm: make buffered writes work with RWF_UNCACHED
+To:     Dave Chinner <david@fromorbit.com>
+Cc:     linux-mm@kvack.org, linux-fsdevel@vger.kernel.org,
+        linux-block@vger.kernel.org
+References: <20191210162454.8608-1-axboe@kernel.dk>
+ <20191210162454.8608-4-axboe@kernel.dk>
+ <20191211002349.GC19213@dread.disaster.area>
+From:   Jens Axboe <axboe@kernel.dk>
+Message-ID: <bc595f20-fe12-8b9d-a7d5-53ac4ce6e108@kernel.dk>
+Date:   Wed, 11 Dec 2019 07:39:22 -0700
+User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:68.0) Gecko/20100101
+ Thunderbird/68.2.2
 MIME-Version: 1.0
+In-Reply-To: <20191211002349.GC19213@dread.disaster.area>
+Content-Type: text/plain; charset=utf-8
+Content-Language: en-US
+Content-Transfer-Encoding: 7bit
 Sender: linux-block-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-> -----Original Message-----
-> From: Roger Pau Monn=E9 <roger.pau@citrix.com>
-> Sent: 11 December 2019 13:55
-> To: Durrant, Paul <pdurrant@amazon.com>; Juergen Gross <jgross@suse.com>
-> Cc: xen-devel@lists.xenproject.org; linux-block@vger.kernel.org; linux-
-> kernel@vger.kernel.org; Konrad Rzeszutek Wilk <konrad.wilk@oracle.com>;
-> Jens Axboe <axboe@kernel.dk>
-> Subject: Re: [PATCH] xen-blkback: prevent premature module unload
->=20
-> On Wed, Dec 11, 2019 at 01:27:42PM +0000, Durrant, Paul wrote:
-> > > -----Original Message-----
-> > > From: Roger Pau Monn=E9 <roger.pau@citrix.com>
-> > > Sent: 11 December 2019 11:29
-> > > To: Durrant, Paul <pdurrant@amazon.com>
-> > > Cc: xen-devel@lists.xenproject.org; linux-block@vger.kernel.org;
-> linux-
-> > > kernel@vger.kernel.org; Konrad Rzeszutek Wilk
-> <konrad.wilk@oracle.com>;
-> > > Jens Axboe <axboe@kernel.dk>
-> > > Subject: Re: [PATCH] xen-blkback: prevent premature module unload
-> > >
-> > > On Tue, Dec 10, 2019 at 02:53:05PM +0000, Paul Durrant wrote:
-> > > > Objects allocated by xen_blkif_alloc come from the 'blkif_cache'
-> kmem
-> > > > cache. This cache is destoyed when xen-blkif is unloaded so it is
-> > > > necessary to wait for the deferred free routine used for such
-> objects to
-> > > > complete. This necessity was missed in commit 14855954f636 "xen-
-> blkback:
-> > > > allow module to be cleanly unloaded". This patch fixes the problem
-> by
-> > > > taking/releasing extra module references in xen_blkif_alloc/free()
-> > > > respectively.
-> > > >
-> > > > Signed-off-by: Paul Durrant <pdurrant@amazon.com>
-> > >
-> > > Reviewed-by: Roger Pau Monn=E9 <roger.pau@citrix.com>
-> > >
-> > > One nit below.
-> > >
-> > > > ---
-> > > > Cc: Konrad Rzeszutek Wilk <konrad.wilk@oracle.com>
-> > > > Cc: "Roger Pau Monn=E9" <roger.pau@citrix.com>
-> > > > Cc: Jens Axboe <axboe@kernel.dk>
-> > > > ---
-> > > >  drivers/block/xen-blkback/xenbus.c | 10 ++++++++++
-> > > >  1 file changed, 10 insertions(+)
-> > > >
-> > > > diff --git a/drivers/block/xen-blkback/xenbus.c b/drivers/block/xen=
--
-> > > blkback/xenbus.c
-> > > > index e8c5c54e1d26..59d576d27ca7 100644
-> > > > --- a/drivers/block/xen-blkback/xenbus.c
-> > > > +++ b/drivers/block/xen-blkback/xenbus.c
-> > > > @@ -171,6 +171,15 @@ static struct xen_blkif
-> *xen_blkif_alloc(domid_t
-> > > domid)
-> > > >  	blkif->domid =3D domid;
-> > > >  	atomic_set(&blkif->refcnt, 1);
-> > > >  	init_completion(&blkif->drain_complete);
-> > > > +
-> > > > +	/*
-> > > > +	 * Because freeing back to the cache may be deferred, it is
-> not
-> > > > +	 * safe to unload the module (and hence destroy the cache)
-> until
-> > > > +	 * this has completed. To prevent premature unloading, take an
-> > > > +	 * extra module reference here and release only when the
-> object
-> > > > +	 * has been free back to the cache.
-> > >                     ^ freed
-> >
-> > Oh yes. Can this be done on commit, or would you like me to send a v2?
->=20
-> Adjusting on commit would be fine for me, but it's up to Juergen since
-> he is the one that will pick this up. IIRC the module unload patches
-> didn't go through the block subsystem.
+On 12/10/19 5:23 PM, Dave Chinner wrote:
+> On Tue, Dec 10, 2019 at 09:24:52AM -0700, Jens Axboe wrote:
+>> If RWF_UNCACHED is set for io_uring (or pwritev2(2)), we'll drop the
+>> cache instantiated for buffered writes. If new pages aren't
+>> instantiated, we leave them alone. This provides similar semantics to
+>> reads with RWF_UNCACHED set.
+> 
+> So what about filesystems that don't use generic_perform_write()?
+> i.e. Anything that uses the iomap infrastructure (i.e.
+> iomap_file_buffered_write()) instead of generic_file_write_iter())
+> will currently ignore RWF_UNCACHED. That's XFS and gfs2 right now,
+> but there are likely to be more in the near future as more
+> filesystems are ported to the iomap infrastructure.
 
-True. I forgot manually add Juergen cc list.
+I'll skip this one as you found it.
 
-  Paul
+> I'd also really like to see extensive fsx and fstress testing of
+> this new IO mode before it is committed - this is going to exercise page
+> cache coherency across different operations in new and unique
+> ways. that means we need patches to fstests to detect and use this
+> functionality when available, and new tests that explicitly exercise
+> combinations of buffered, mmap, dio and uncached for a range of
+> different IO size and alignments (e.g. mixing sector sized uncached
+> IO with page sized buffered/mmap/dio and vice versa).
+> 
+> We are not going to have a repeat of the copy_file_range() data
+> corruption fuckups because no testing was done and no test
+> infrastructure was written before the new API was committed.
 
->=20
-> Thanks, Roger.
+Oh I totally agree, and there's no push from my end on this. I just
+think it's a cool feature and could be very useful, but it obviously
+needs a healthy dose of testing and test cases written. I'll be doing
+that as well.
+
+>> +void write_drop_cached_pages(struct page **pgs, struct address_space *mapping,
+>> +			     unsigned *nr)
+>> +{
+>> +	loff_t start, end;
+>> +	int i;
+>> +
+>> +	end = 0;
+>> +	start = LLONG_MAX;
+>> +	for (i = 0; i < *nr; i++) {
+>> +		struct page *page = pgs[i];
+>> +		loff_t off;
+>> +
+>> +		off = (loff_t) page_to_index(page) << PAGE_SHIFT;
+>> +		if (off < start)
+>> +			start = off;
+>> +		if (off > end)
+>> +			end = off;
+>> +		get_page(page);
+>> +	}
+>> +
+>> +	__filemap_fdatawrite_range(mapping, start, end, WB_SYNC_NONE);
+>> +
+>> +	for (i = 0; i < *nr; i++) {
+>> +		struct page *page = pgs[i];
+>> +
+>> +		lock_page(page);
+>> +		if (page->mapping == mapping) {
+>> +			wait_on_page_writeback(page);
+>> +			if (!page_has_private(page) ||
+>> +			    try_to_release_page(page, 0))
+>> +				remove_mapping(mapping, page);
+>> +		}
+>> +		unlock_page(page);
+>> +	}
+>> +	*nr = 0;
+>> +}
+>> +EXPORT_SYMBOL_GPL(write_drop_cached_pages);
+>> +
+>> +#define GPW_PAGE_BATCH		16
+> 
+> In terms of performance, file fragmentation and premature filesystem
+> aging, this is also going to suck *really badly* for filesystems
+> that use delayed allocation because it is going to force conversion
+> of delayed allocation extents during the write() call. IOWs,
+> it adds all the overheads of doing delayed allocation, but it reaps
+> none of the benefits because it doesn't allow large contiguous
+> extents to build up in memory before physical allocation occurs.
+> i.e. there is no "delayed" in this allocation....
+> 
+> So it might work fine on a pristine, empty filesystem where it is
+> easy to find contiguous free space accross multiple allocations, but
+> it's going to suck after a few months of production usage has
+> fragmented all the free space into tiny pieces...
+
+I totally agree on this one, and I'm not a huge fan of it. But
+considering your suggestion in the other email, I think we just need to
+move this up a notch and do it per-write instead. If we can pass back
+information about the state of the page cache for the range we care
+about, then there's no reason to do it per-page for the write case.
+Reads are still best done that way, and we can avoid the LRU overhead by
+doing it that way.
+
+-- 
+Jens Axboe
+
