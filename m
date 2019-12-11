@@ -2,192 +2,84 @@ Return-Path: <SRS0=X6jZ=2B=vger.kernel.org=linux-block-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-2.2 required=3.0 tests=DKIM_SIGNED,DKIM_VALID,
-	HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,
-	USER_AGENT_SANE_1 autolearn=no autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-0.6 required=3.0 tests=DKIM_SIGNED,DKIM_VALID,
+	DKIM_VALID_AU,FREEMAIL_FORGED_FROMDOMAIN,FREEMAIL_FROM,
+	HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS
+	autolearn=no autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 96461C2D0C6
-	for <linux-block@archiver.kernel.org>; Wed, 11 Dec 2019 14:44:45 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 0AEABC2D0C7
+	for <linux-block@archiver.kernel.org>; Wed, 11 Dec 2019 15:18:00 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.kernel.org (Postfix) with ESMTP id 6A359214D8
-	for <linux-block@archiver.kernel.org>; Wed, 11 Dec 2019 14:44:45 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id CAEB02465E
+	for <linux-block@archiver.kernel.org>; Wed, 11 Dec 2019 15:17:59 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel-dk.20150623.gappssmtp.com header.i=@kernel-dk.20150623.gappssmtp.com header.b="XQlVEpu/"
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="mqEB68h5"
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1729689AbfLKOoo (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Wed, 11 Dec 2019 09:44:44 -0500
-Received: from mail-pf1-f194.google.com ([209.85.210.194]:36948 "EHLO
-        mail-pf1-f194.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1729278AbfLKOoo (ORCPT
+        id S1731738AbfLKPR6 (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Wed, 11 Dec 2019 10:17:58 -0500
+Received: from mail-qt1-f194.google.com ([209.85.160.194]:36455 "EHLO
+        mail-qt1-f194.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S1731235AbfLKPR5 (ORCPT
         <rfc822;linux-block@vger.kernel.org>);
-        Wed, 11 Dec 2019 09:44:44 -0500
-Received: by mail-pf1-f194.google.com with SMTP id p14so1922391pfn.4
-        for <linux-block@vger.kernel.org>; Wed, 11 Dec 2019 06:44:43 -0800 (PST)
+        Wed, 11 Dec 2019 10:17:57 -0500
+Received: by mail-qt1-f194.google.com with SMTP id k11so6567389qtm.3;
+        Wed, 11 Dec 2019 07:17:56 -0800 (PST)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=kernel-dk.20150623.gappssmtp.com; s=20150623;
-        h=subject:to:cc:references:from:message-id:date:user-agent
-         :mime-version:in-reply-to:content-language:content-transfer-encoding;
-        bh=0noKfCU616o5aJg1NtSncjkK+qcITrk9Wzz3Uuhs+4A=;
-        b=XQlVEpu/5+hm1CXz95btym65Dq4nyajQDRv9dxux95XhbEsue/bHnBHeL7fH1ggIN0
-         yHhblwjtfodSxqRf+9w4vJ98Oui2Qk8caPMSUNE6nd2bG83aoP9lW6wIacsAnOxoI/YU
-         xEK3mLb1pjWY52mLA3PWZD1dNKQ7Gt6PuyTbm48bEEGzp7f37nh6NSFJlAQzsGOYhJ37
-         P+mkfsTWErCgUjg5btdw4P9ZLcWLSvPxwaxQZ/sYeHJNReSlNHRoC/Nh2HbkfTHLkHuV
-         XVoxE+HtD928lUf8hnfA8/3Q9n4R8teZ1tL05NmcpYDNtYBLCJXXF64f3t6+e34y0Co3
-         rPQA==
+        d=gmail.com; s=20161025;
+        h=mime-version:references:in-reply-to:from:date:message-id:subject:to
+         :cc;
+        bh=XSyEpbaPokG867/3ubUmUtm6jKXW5rzJQg/EbiPjhi4=;
+        b=mqEB68h5cwRkQneshEFqEuVp6ajAXX07NsifjCFCUzb4sLj/5Josuh8ybzdPJQYNPq
+         nJrFY1B/qwecZNYWW4pA6FNGTgKVMMXfFGkws1RNT9cE32gFgvWXyJ94Yp/UbnS6T825
+         TbET/4uUgPaFyw3/E6OFEfKVAnCbl/eTDaF7ZEz72WvawC39UlhTayQ8qNMNJwVm9S5Z
+         AxiY0HzJ2ZVnD5QMVBP4Opix6asbBS1MRUIxOzS857zNVNIVuctLlkGPT0DEyDcnyx87
+         wjemeZOUJsYxtI6+MPXtSExkuDQnb2EeaI5J4Ue4OKYYCiU6uP9NriiSLbF5tP94po0v
+         HbxA==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=1e100.net; s=20161025;
-        h=x-gm-message-state:subject:to:cc:references:from:message-id:date
-         :user-agent:mime-version:in-reply-to:content-language
-         :content-transfer-encoding;
-        bh=0noKfCU616o5aJg1NtSncjkK+qcITrk9Wzz3Uuhs+4A=;
-        b=nAvSX4rCLMnK2BOQtIOv0PGSt/mrR6NQQwfIgDCsCcw/xlkE6nTuV8q6MbdTKQ2TiE
-         GJ93l+Az5p7RPTB0jU749WTKCUiSHptNYR3MeKxPEZOkmpzAlLdyVKRbX7JIoBTjjJe9
-         u0BdibEpl40t5TKNl2iAuLuG5jVw1OmZ1Qi/vSb+VWCKaBS3CW6j5SsrYgO6BEEhCuov
-         niqGqXSla9ntqM8eR5YNeRcaZ1FXnL34wX+2nuU2HGqdUL34tbLPIWJGaIAJSzfFV4Kw
-         XawBLXKsU/nYMkYte4D6L8t73dJlHdYgi46Dg3chjGihAIu4AStjLLWh8Devzt86deNV
-         3OVA==
-X-Gm-Message-State: APjAAAWhiYzZiSilV/ICvf7mbHkEPlXhqmrAKgJxXgIIt+Leymoyirel
-        JmQ5P3eZVXZ/qUkmlLL9ih3xLQ==
-X-Google-Smtp-Source: APXvYqwdI1SIycFevQzMpygeUnbYBln4nwDPnIzv35OREB+DT8S/L0C/8VDiyungiINcfSF7M6Q/hw==
-X-Received: by 2002:a63:c12:: with SMTP id b18mr4486272pgl.156.1576075483289;
-        Wed, 11 Dec 2019 06:44:43 -0800 (PST)
-Received: from ?IPv6:2620:10d:c081:1130::1014? ([2620:10d:c090:180::50da])
-        by smtp.gmail.com with ESMTPSA id o23sm3397588pgj.90.2019.12.11.06.44.41
-        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
-        Wed, 11 Dec 2019 06:44:42 -0800 (PST)
-Subject: Re: [PATCH 5/5] iomap: support RWF_UNCACHED for buffered writes
-To:     Dave Chinner <david@fromorbit.com>
-Cc:     linux-mm@kvack.org, linux-fsdevel@vger.kernel.org,
-        linux-block@vger.kernel.org, willy@infradead.org, clm@fb.com
-References: <20191210204304.12266-1-axboe@kernel.dk>
- <20191210204304.12266-6-axboe@kernel.dk>
- <20191211011415.GE19213@dread.disaster.area>
-From:   Jens Axboe <axboe@kernel.dk>
-Message-ID: <5d69ac99-b97d-283a-213c-7bbd62c3fc15@kernel.dk>
-Date:   Wed, 11 Dec 2019 07:44:40 -0700
-User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:68.0) Gecko/20100101
- Thunderbird/68.2.2
+        h=x-gm-message-state:mime-version:references:in-reply-to:from:date
+         :message-id:subject:to:cc;
+        bh=XSyEpbaPokG867/3ubUmUtm6jKXW5rzJQg/EbiPjhi4=;
+        b=MryyKFBq9GnG91K5GiuU2IwSuOlgLFFR5/3Dqg1RJZGLfOMMnShOEKrsYHZZ9ZZ+NI
+         /dWVY8+eZNA2Mj+QFzdiZWkDfAJhkQ3b4KwNZMMpZEe1IaimjlsU5Xhl2vzAinDXSlIP
+         hf1jrTa5kCI9IdWmwQB7oO0zubmmL11ADhM4MyY11ZYEGg7v5u772RPwDReISX17sngT
+         61tG4RdBkspqahJwys+sNEcca+PgETjguDqrHtfNI1D6Yx8vNWAXIKYcKOIX3GQpiSd1
+         4ADcRgBSDo3rczbccUDhfPEA2/ZEvG3VykuiZB9Akc5zs/u9kLPRvnel926OjGOaRnPb
+         8mZw==
+X-Gm-Message-State: APjAAAXUDY/XbB2SRMWhjY6tKZt4hidIKTwlgXHJcOyUvMYLYkoiR58V
+        hqTH5Z+3jQIhmtJ6Wz1JEZtz22FOG58Jv1T81tU=
+X-Google-Smtp-Source: APXvYqxRSL9c0VQzF96BLc43OPSIAk830pM0oJYwLpIpze59iYWOUCDFgCatZK0JG1QynUUg3uymVmyS9L/M36mUCI4=
+X-Received: by 2002:ac8:2898:: with SMTP id i24mr3197998qti.259.1576077476110;
+ Wed, 11 Dec 2019 07:17:56 -0800 (PST)
 MIME-Version: 1.0
-In-Reply-To: <20191211011415.GE19213@dread.disaster.area>
-Content-Type: text/plain; charset=utf-8
-Content-Language: en-US
-Content-Transfer-Encoding: 7bit
+References: <20191209093829.19703-1-hch@lst.de> <b19f677f-d8e5-44af-0575-d1fb74835c65@suse.de>
+In-Reply-To: <b19f677f-d8e5-44af-0575-d1fb74835c65@suse.de>
+From:   Liang C <liangchen.linux@gmail.com>
+Date:   Wed, 11 Dec 2019 23:17:44 +0800
+Message-ID: <CAKhg4tJGWwm5cTkctuch-ACrDOLfLKK8HCCTcJZPF2iURc9rUg@mail.gmail.com>
+Subject: Re: bcache kbuild cleanups
+To:     Christoph Hellwig <hch@lst.de>
+Cc:     Coly Li <colyli@suse.de>,
+        Kent Overstreet <kent.overstreet@gmail.com>,
+        linux-bcache@vger.kernel.org, linux-block@vger.kernel.org
+Content-Type: text/plain; charset="UTF-8"
 Sender: linux-block-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-On 12/10/19 6:14 PM, Dave Chinner wrote:
->> @@ -864,15 +896,29 @@ iomap_write_actor(struct inode *inode, loff_t pos, loff_t length, void *data,
->>  			 */
->>  			bytes = min_t(unsigned long, PAGE_SIZE - offset,
->>  						iov_iter_single_seg_count(i));
->> +			if (drop_page)
->> +				put_page(page);
->>  			goto again;
->>  		}
->> +
->> +		if (drop_page &&
->> +		    ((pos >> PAGE_SHIFT) != ((pos + copied) >> PAGE_SHIFT))) {
->> +			if (!pagevec_add(&pvec, page))
->> +				write_drop_cached_pages(&pvec, mapping);
->> +		} else {
->> +			if (drop_page)
->> +				put_page(page);
->> +			balance_dirty_pages_ratelimited(inode->i_mapping);
->> +		}
-> 
-> This looks like it's a problem: this is going to write the
-> data, which can cause the extent mapping of the file to change
-> beyond the range that was written (e.g. due to speculative delayed
-> allocation) and so the iomap we have already cached to direct write
-> behaviour may now be stale.
-> 
-> IOWs, to be safe we need to terminate the write loop at this point,
-> return to iomap_apply() and remap the range we are writing into so
-> that we don't end up using a stale iomap. That kinda defeats the
-> purpose of iomap - we are trying to do a single extent mapping per
-> IO instead of per-page, and this pulls it back to an iomap per 16
-> pages for large user IOs. And it has the issues with breaking
-> delayed allocation optimisations, too.
-> 
-> Hence, IMO, this is the wrong layer in iomap to be dealing with
-> writeback and cache residency for uncached IO. We should be caching
-> residency/invalidation at a per-IO level, not a per-page level.
-> 
-> Sure, have the write actor return a flag (e.g. in the iomap) to say
-> that it encountered cached pages so that we can decide whether or
-> not to invalidate the entire range we just wrote in iomap_apply, but
-> doing it between mappings in iomap_apply means that the writeback is
-> done once per user IO, and cache invalidation only occurs if no
-> cached pages were encountered during that IO. i.e. add this to
-> iomap_apply() after ops->iomap_end() has been called:
-> 
-> 
-> 	if (flags & RWF_UNCACHED) {
-> 		ret = filemap_write_and_wait_range(mapping, start, end);
-> 		if (ret)
-> 			goto out;
-> 
-> 		if (!drop_cache)
-> 			goto out;
-> 
-> 		/*
-> 		 * Try to invalidate cache pages for the range we
-> 		 * just wrote. We don't care if invalidation fails
-> 		 * as the write has still worked and leaving clean
-> 		 * uptodate pages * in the page cache isn't a
-> 		 * corruption vector for uncached IO.
-> 		 */
-> 		invalidate_inode_pages2_range(mapping,
-> 				start >> PAGE_SHIFT, end >> PAGE_SHIFT);
-> 	}
-> out:
-> 	return written ? written : ret;
-> }
+ > Hi Coly and Liang,
+ >
+ > can you review this series to sort out the bcache superblock reading for
+ > larger page sizes?  I don't have bcache test setup so this is compile
+ > tested only.
+ >
+Hi Christoph,
 
-I really like this, and some variant of that solution can also be
-applied to the non-iomap case. It'll make for a cleaner implementation
-as well.
+Thanks for making the patches. I looked through them, but didn't see
+where cache and cached_dev have their sb_disk assigned.
+That would be an issue when __write_super tries to add the
+corresponding page to the bio. Not sure if there is there anything I
+missed.
 
-Once we do it per-write we'll have solved the performance and iomap
-weirdness, but it does mean that we need to make a decision on when to
-invalidate. For the per-page case it's clear - if the page is already
-there, leave it. If not, (attempt to) kill it. For the full write range,
-what if just one page was not there? Do we invalidate then? What if one
-page was there?
-
-I'm going to move forward with the notion that if we had to allocate any
-page in the range, we invalidate the range. Only ranges that were fully
-cached already will remain in the cache. I think those semantics make
-the most sense.
-
-> Note that this doesn't solve the write error return issue. i.e.
-> if filemap_write_and_wait_range() fails, should that error be
-> returned or ignored?
-
-I think we should handle this exactly like we do the O_DIRECT case on
-buffered IO write-and-wait.
-
-> And that leads to my next question: what data integrity guarantees
-> does RWF_UNCACHED give? What if the underlying device has a volatile
-> write cache or we dirtied metadata during block allocation? i.e.  to
-> a user, "UNCACHED" kinda implies that the write has ended up on
-> stable storage because they are saying "do not cache this data". To
-> me, none of this implementation guarantees data integrity, and users
-> would still need O_DSYNC or fsync() with RWF_UNCACHED IO. That seems
-> sane to me (same as direct io requirements) but whatever is decided
-> here, it will need to be spelled out clearly in the man page so that 
-> users don't get it wrong.
-
-Fully agree, this isn't about data integrity guarantees. You will still
-need the appropriate sync magic to make it safe. This is exactly like
-O_DIRECT, and I think we should retain those exact same semantics for
-the RWF_UNCACHED case.
-
-Thanks for taking a look at this! I'll respin (and re-test) with the
-write side changed.
-
--- 
-Jens Axboe
-
+Liang
