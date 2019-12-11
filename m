@@ -7,62 +7,62 @@ X-Spam-Status: No, score=-9.7 required=3.0 tests=DKIM_SIGNED,DKIM_VALID,
 	SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED,USER_AGENT_GIT autolearn=ham
 	autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id CB862C00454
-	for <linux-block@archiver.kernel.org>; Wed, 11 Dec 2019 15:29:57 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 60300C43603
+	for <linux-block@archiver.kernel.org>; Wed, 11 Dec 2019 15:29:59 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.kernel.org (Postfix) with ESMTP id A050124671
-	for <linux-block@archiver.kernel.org>; Wed, 11 Dec 2019 15:29:57 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id 2BFD72173E
+	for <linux-block@archiver.kernel.org>; Wed, 11 Dec 2019 15:29:59 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel-dk.20150623.gappssmtp.com header.i=@kernel-dk.20150623.gappssmtp.com header.b="mRirhKAW"
+	dkim=pass (2048-bit key) header.d=kernel-dk.20150623.gappssmtp.com header.i=@kernel-dk.20150623.gappssmtp.com header.b="zn3Mpc2f"
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S2387925AbfLKP34 (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Wed, 11 Dec 2019 10:29:56 -0500
-Received: from mail-pf1-f194.google.com ([209.85.210.194]:34221 "EHLO
-        mail-pf1-f194.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S2387576AbfLKP3x (ORCPT
+        id S2387720AbfLKP35 (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Wed, 11 Dec 2019 10:29:57 -0500
+Received: from mail-pl1-f195.google.com ([209.85.214.195]:33747 "EHLO
+        mail-pl1-f195.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S2387955AbfLKP35 (ORCPT
         <rfc822;linux-block@vger.kernel.org>);
-        Wed, 11 Dec 2019 10:29:53 -0500
-Received: by mail-pf1-f194.google.com with SMTP id l127so699098pfl.1
-        for <linux-block@vger.kernel.org>; Wed, 11 Dec 2019 07:29:52 -0800 (PST)
+        Wed, 11 Dec 2019 10:29:57 -0500
+Received: by mail-pl1-f195.google.com with SMTP id c13so1562581pls.0
+        for <linux-block@vger.kernel.org>; Wed, 11 Dec 2019 07:29:56 -0800 (PST)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=kernel-dk.20150623.gappssmtp.com; s=20150623;
         h=from:to:cc:subject:date:message-id:in-reply-to:references
          :mime-version:content-transfer-encoding;
-        bh=2SQjS8rVUv97zNNTlgrJhbpMsmZd4fG/GoKGJP3eAKE=;
-        b=mRirhKAWFljYMiRUx194SXEFEtebKFxO5ZD0NK7T1mtl+xUBGQ0Yst6hneUUfMFIM4
-         CJHbOUUL+TVItwq3msVkfmRDrIS9KiqYgo2pNJJbrxDuK8F/gG/+yjfC8g7Psp/LVVnu
-         myC59YfNOnR6SVVu7c6EDfdojaNua5fvpx4rj4fe07ntRzZFwGGBF3ERckadrGtL+6lw
-         9/cmBdu5Lle5khBqRxuFR4w8QZDVienwJjKpMPXGvei+PZCY5rtWrPZ+bf6sr/rgrYx3
-         W+9MN296zoxWbl0Fw2HGYe5l30oDTQtOkwoyyR2k9l3iBbeMx/iDPfDQ6H6ySMx/jIry
-         0I/w==
+        bh=s8zjCrJz5ZRdYBpdQDfhxTslxtlYCGJ1G+7YBvhVfgI=;
+        b=zn3Mpc2fwIWc8pDQB7gP4q1pc2X/iEkrHaHLDGQcQNv4SUM1gMOlKSJWO0Qa9fumRn
+         V93Ai4CIFs5tfbxv50V+C5LCLzKT/QO6RS+DTBKmRX7+h1Dekabh/e2BZnzXhKE9S96x
+         k3oSrULLsUS4G7/WB6wdu3oxW39bMMOsbwkueMFJz+qwizVg9wpSXOfu1930JZNE5Sv/
+         6B39S5oZSQAXvfDAIWA77wQxq+5o76S+lrOCmQgsIqfxXsmEqmUGMbl9+nGbnpmaVXcQ
+         RmPtQ1ltav6gOMXmPA1F0P/TsJTdPjXwvQFKacyLYt6XtYlH0WwanpyqHoeuJksP1Kjn
+         kiyQ==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=1e100.net; s=20161025;
         h=x-gm-message-state:from:to:cc:subject:date:message-id:in-reply-to
          :references:mime-version:content-transfer-encoding;
-        bh=2SQjS8rVUv97zNNTlgrJhbpMsmZd4fG/GoKGJP3eAKE=;
-        b=rLbn9HPBPfnOXotcoqvKPMfs8bO/tm8+j1777U4i3excqFnTg+2i5hPxTsZkqvfBil
-         as9a3rTW/L7TvAIujKZckeDUF11ABPAaBj1WYFGm4q5DKsKCmgruN+W250ntjzIn6wIi
-         XtiddMIcReiiSkbNjMGjTrB76KqYhCj8ng2rKnhhuoaeq0vi8KXbawZ5cGJIyDW/mvEW
-         ozAm3JlI1NO5XNL1J8TSl4uNtLgUZxQqKrdJqWvCBIg9y3gbeiCzllceIIpFsKZYhh2U
-         pej1akaNznbXEOzx/mngu7dKdK6FYYTg/a0JABCIbW+RC06l8KlbuQkHa4R35VgHP90a
-         jLjA==
-X-Gm-Message-State: APjAAAXSwWyVLBEwpeXZJFyboHTXQ00RYZFZE9TNyoxQjSMrlKV3BwHR
-        11XG0Rz4/CroWjqThpQ3ajTUyQ==
-X-Google-Smtp-Source: APXvYqxfuUbnRf2Sjrpa01+W+GiMj+MkirsJ7dKPdEmqQOm6hBolB0IKP27YH+ADkKThXrnkx7OuJw==
-X-Received: by 2002:a63:1d1a:: with SMTP id d26mr4544893pgd.98.1576078191917;
-        Wed, 11 Dec 2019 07:29:51 -0800 (PST)
+        bh=s8zjCrJz5ZRdYBpdQDfhxTslxtlYCGJ1G+7YBvhVfgI=;
+        b=bm8XAtRV/zeWvBOAAZfx0rX3CLmPPMdKFGvtzQhH240v2ZzQtpruR0ugdT+iB9XxbI
+         jWL749AxGUsOxTnHs5I16d1sAbz8HN+3RhiNUNJL8BwKqtQscXLWpu3L24nWliCo+NnH
+         gNJ79/D/qahqjz/XXYj5rI7LDO4H38BjMllJ6l4YhrlV8sKznIKQRR1756U8bdIcGrwY
+         H3d3bOdNHrxzf9a6jzyhsKXjP7Cikm6Rr31MYGsqDFeRB5Eb41Hkj0qB6TcZ9v/X/Srz
+         4tbgn0jSrepcFc+Z10esh/CpfCkx1z5SFMfynnzhoGj6aoE8/NrpvcoKLcilIzQ8G60T
+         BHJQ==
+X-Gm-Message-State: APjAAAWbAVBF8aoxrG8Fbyk4HZ87GVDsxA7gILXzk9FHdnEOZ1XsprFG
+        b5rzaAcCmj7X+0Uc+YyH6kg0lw==
+X-Google-Smtp-Source: APXvYqzNcqVyVbZb9ulz0Wi2/V5mzS/cYQorx+P9Kc7sv7G0jLWljuOrg76Dj1hLiJyji1gF1tDCJA==
+X-Received: by 2002:a17:90a:62ca:: with SMTP id k10mr4171295pjs.59.1576078195498;
+        Wed, 11 Dec 2019 07:29:55 -0800 (PST)
 Received: from x1.thefacebook.com ([2620:10d:c090:180::50da])
-        by smtp.gmail.com with ESMTPSA id n26sm3661882pgd.46.2019.12.11.07.29.50
+        by smtp.gmail.com with ESMTPSA id n26sm3661882pgd.46.2019.12.11.07.29.53
         (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Wed, 11 Dec 2019 07:29:50 -0800 (PST)
+        Wed, 11 Dec 2019 07:29:54 -0800 (PST)
 From:   Jens Axboe <axboe@kernel.dk>
 To:     linux-mm@kvack.org, linux-fsdevel@vger.kernel.org,
         linux-block@vger.kernel.org
 Cc:     willy@infradead.org, clm@fb.com, torvalds@linux-foundation.org,
         david@fromorbit.com, Jens Axboe <axboe@kernel.dk>
-Subject: [PATCH 2/5] mm: make generic_perform_write() take a struct kiocb
-Date:   Wed, 11 Dec 2019 08:29:40 -0700
-Message-Id: <20191211152943.2933-3-axboe@kernel.dk>
+Subject: [PATCH 4/5] iomap: pass in the write_begin/write_end flags to iomap_actor
+Date:   Wed, 11 Dec 2019 08:29:42 -0700
+Message-Id: <20191211152943.2933-5-axboe@kernel.dk>
 X-Mailer: git-send-email 2.24.0
 In-Reply-To: <20191211152943.2933-1-axboe@kernel.dk>
 References: <20191211152943.2933-1-axboe@kernel.dk>
@@ -73,107 +73,216 @@ Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-Right now all callers pass in iocb->ki_pos, just pass in the iocb. This
-is in preparation for using the iocb flags in generic_perform_write().
+This is in preparation for passing in a flag to the iomap_actor, which
+currently doesn't support that.
+
+No functional changes in this patch.
 
 Signed-off-by: Jens Axboe <axboe@kernel.dk>
 ---
- fs/ceph/file.c     | 2 +-
- fs/ext4/file.c     | 2 +-
- fs/nfs/file.c      | 2 +-
- include/linux/fs.h | 3 ++-
- mm/filemap.c       | 8 +++++---
- 5 files changed, 10 insertions(+), 7 deletions(-)
+ fs/dax.c               |  2 +-
+ fs/iomap/apply.c       |  2 +-
+ fs/iomap/buffered-io.c | 17 ++++++++++-------
+ fs/iomap/direct-io.c   |  3 ++-
+ fs/iomap/fiemap.c      |  5 +++--
+ fs/iomap/seek.c        |  6 ++++--
+ fs/iomap/swapfile.c    |  2 +-
+ include/linux/iomap.h  |  5 +++--
+ 8 files changed, 25 insertions(+), 17 deletions(-)
 
-diff --git a/fs/ceph/file.c b/fs/ceph/file.c
-index 11929d2bb594..096c009f188f 100644
---- a/fs/ceph/file.c
-+++ b/fs/ceph/file.c
-@@ -1538,7 +1538,7 @@ static ssize_t ceph_write_iter(struct kiocb *iocb, struct iov_iter *from)
- 		 * are pending vmtruncate. So write and vmtruncate
- 		 * can not run at the same time
- 		 */
--		written = generic_perform_write(file, from, pos);
-+		written = generic_perform_write(file, from, iocb);
- 		if (likely(written >= 0))
- 			iocb->ki_pos = pos + written;
- 		ceph_end_io_write(inode);
-diff --git a/fs/ext4/file.c b/fs/ext4/file.c
-index 6a7293a5cda2..9ffb857765d5 100644
---- a/fs/ext4/file.c
-+++ b/fs/ext4/file.c
-@@ -249,7 +249,7 @@ static ssize_t ext4_buffered_write_iter(struct kiocb *iocb,
- 		goto out;
+diff --git a/fs/dax.c b/fs/dax.c
+index 1f1f0201cad1..30a20b994140 100644
+--- a/fs/dax.c
++++ b/fs/dax.c
+@@ -1091,7 +1091,7 @@ EXPORT_SYMBOL_GPL(__dax_zero_page_range);
  
- 	current->backing_dev_info = inode_to_bdi(inode);
--	ret = generic_perform_write(iocb->ki_filp, from, iocb->ki_pos);
-+	ret = generic_perform_write(iocb->ki_filp, from, iocb);
- 	current->backing_dev_info = NULL;
- 
- out:
-diff --git a/fs/nfs/file.c b/fs/nfs/file.c
-index 8eb731d9be3e..d8f51a702a4e 100644
---- a/fs/nfs/file.c
-+++ b/fs/nfs/file.c
-@@ -624,7 +624,7 @@ ssize_t nfs_file_write(struct kiocb *iocb, struct iov_iter *from)
- 	result = generic_write_checks(iocb, from);
- 	if (result > 0) {
- 		current->backing_dev_info = inode_to_bdi(inode);
--		result = generic_perform_write(file, from, iocb->ki_pos);
-+		result = generic_perform_write(file, from, iocb);
- 		current->backing_dev_info = NULL;
- 	}
- 	nfs_end_io_write(inode);
-diff --git a/include/linux/fs.h b/include/linux/fs.h
-index 092ea2a4319b..bf58db1bc032 100644
---- a/include/linux/fs.h
-+++ b/include/linux/fs.h
-@@ -3103,7 +3103,8 @@ extern ssize_t generic_file_read_iter(struct kiocb *, struct iov_iter *);
- extern ssize_t __generic_file_write_iter(struct kiocb *, struct iov_iter *);
- extern ssize_t generic_file_write_iter(struct kiocb *, struct iov_iter *);
- extern ssize_t generic_file_direct_write(struct kiocb *, struct iov_iter *);
--extern ssize_t generic_perform_write(struct file *, struct iov_iter *, loff_t);
-+extern ssize_t generic_perform_write(struct file *, struct iov_iter *,
-+				     struct kiocb *);
- 
- ssize_t vfs_iter_read(struct file *file, struct iov_iter *iter, loff_t *ppos,
- 		rwf_t flags);
-diff --git a/mm/filemap.c b/mm/filemap.c
-index ed23a11b3e34..fe37bd2b2630 100644
---- a/mm/filemap.c
-+++ b/mm/filemap.c
-@@ -3302,10 +3302,11 @@ struct page *grab_cache_page_write_begin(struct address_space *mapping,
- EXPORT_SYMBOL(grab_cache_page_write_begin);
- 
- ssize_t generic_perform_write(struct file *file,
--				struct iov_iter *i, loff_t pos)
-+				struct iov_iter *i, struct kiocb *iocb)
+ static loff_t
+ dax_iomap_actor(struct inode *inode, loff_t pos, loff_t length, void *data,
+-		struct iomap *iomap, struct iomap *srcmap)
++		unsigned flags, struct iomap *iomap, struct iomap *srcmap)
  {
- 	struct address_space *mapping = file->f_mapping;
- 	const struct address_space_operations *a_ops = mapping->a_ops;
-+	loff_t pos = iocb->ki_pos;
+ 	struct block_device *bdev = iomap->bdev;
+ 	struct dax_device *dax_dev = iomap->dax_dev;
+diff --git a/fs/iomap/apply.c b/fs/iomap/apply.c
+index 76925b40b5fd..562536da8a13 100644
+--- a/fs/iomap/apply.c
++++ b/fs/iomap/apply.c
+@@ -77,7 +77,7 @@ iomap_apply(struct inode *inode, loff_t pos, loff_t length, unsigned flags,
+ 	 * iomap into the actors so that they don't need to have special
+ 	 * handling for the two cases.
+ 	 */
+-	written = actor(inode, pos, length, data, &iomap,
++	written = actor(inode, pos, length, data, flags, &iomap,
+ 			srcmap.type != IOMAP_HOLE ? &srcmap : &iomap);
+ 
+ 	/*
+diff --git a/fs/iomap/buffered-io.c b/fs/iomap/buffered-io.c
+index 828444e14d09..9b5b770ca4c7 100644
+--- a/fs/iomap/buffered-io.c
++++ b/fs/iomap/buffered-io.c
+@@ -249,7 +249,7 @@ static inline bool iomap_block_needs_zeroing(struct inode *inode,
+ 
+ static loff_t
+ iomap_readpage_actor(struct inode *inode, loff_t pos, loff_t length, void *data,
+-		struct iomap *iomap, struct iomap *srcmap)
++		unsigned flags, struct iomap *iomap, struct iomap *srcmap)
+ {
+ 	struct iomap_readpage_ctx *ctx = data;
+ 	struct page *page = ctx->cur_page;
+@@ -397,7 +397,8 @@ iomap_next_page(struct inode *inode, struct list_head *pages, loff_t pos,
+ 
+ static loff_t
+ iomap_readpages_actor(struct inode *inode, loff_t pos, loff_t length,
+-		void *data, struct iomap *iomap, struct iomap *srcmap)
++		void *data, unsigned flags, struct iomap *iomap,
++		struct iomap *srcmap)
+ {
+ 	struct iomap_readpage_ctx *ctx = data;
+ 	loff_t done, ret;
+@@ -417,7 +418,7 @@ iomap_readpages_actor(struct inode *inode, loff_t pos, loff_t length,
+ 			ctx->cur_page_in_bio = false;
+ 		}
+ 		ret = iomap_readpage_actor(inode, pos + done, length - done,
+-				ctx, iomap, srcmap);
++				ctx, 0, iomap, srcmap);
+ 	}
+ 
+ 	return done;
+@@ -797,7 +798,7 @@ iomap_write_end(struct inode *inode, loff_t pos, unsigned len, unsigned copied,
+ 
+ static loff_t
+ iomap_write_actor(struct inode *inode, loff_t pos, loff_t length, void *data,
+-		struct iomap *iomap, struct iomap *srcmap)
++		unsigned flags, struct iomap *iomap, struct iomap *srcmap)
+ {
+ 	struct iov_iter *i = data;
+ 	long status = 0;
+@@ -897,7 +898,7 @@ EXPORT_SYMBOL_GPL(iomap_file_buffered_write);
+ 
+ static loff_t
+ iomap_unshare_actor(struct inode *inode, loff_t pos, loff_t length, void *data,
+-		struct iomap *iomap, struct iomap *srcmap)
++		unsigned flags, struct iomap *iomap, struct iomap *srcmap)
+ {
  	long status = 0;
  	ssize_t written = 0;
- 	unsigned int flags = 0;
-@@ -3439,7 +3440,8 @@ ssize_t __generic_file_write_iter(struct kiocb *iocb, struct iov_iter *from)
- 		if (written < 0 || !iov_iter_count(from) || IS_DAX(inode))
- 			goto out;
+@@ -983,7 +984,8 @@ static int iomap_dax_zero(loff_t pos, unsigned offset, unsigned bytes,
  
--		status = generic_perform_write(file, from, pos = iocb->ki_pos);
-+		pos = iocb->ki_pos;
-+		status = generic_perform_write(file, from, iocb);
- 		/*
- 		 * If generic_perform_write() returned a synchronous error
- 		 * then we want to return the number of bytes which were
-@@ -3471,7 +3473,7 @@ ssize_t __generic_file_write_iter(struct kiocb *iocb, struct iov_iter *from)
- 			 */
- 		}
- 	} else {
--		written = generic_perform_write(file, from, iocb->ki_pos);
-+		written = generic_perform_write(file, from, iocb);
- 		if (likely(written > 0))
- 			iocb->ki_pos += written;
- 	}
+ static loff_t
+ iomap_zero_range_actor(struct inode *inode, loff_t pos, loff_t count,
+-		void *data, struct iomap *iomap, struct iomap *srcmap)
++		void *data, unsigned flags, struct iomap *iomap,
++		struct iomap *srcmap)
+ {
+ 	bool *did_zero = data;
+ 	loff_t written = 0;
+@@ -1053,7 +1055,8 @@ EXPORT_SYMBOL_GPL(iomap_truncate_page);
+ 
+ static loff_t
+ iomap_page_mkwrite_actor(struct inode *inode, loff_t pos, loff_t length,
+-		void *data, struct iomap *iomap, struct iomap *srcmap)
++		void *data, unsigned flags, struct iomap *iomap,
++		struct iomap *srcmap)
+ {
+ 	struct page *page = data;
+ 	int ret;
+diff --git a/fs/iomap/direct-io.c b/fs/iomap/direct-io.c
+index 23837926c0c5..2525997b09aa 100644
+--- a/fs/iomap/direct-io.c
++++ b/fs/iomap/direct-io.c
+@@ -365,7 +365,8 @@ iomap_dio_inline_actor(struct inode *inode, loff_t pos, loff_t length,
+ 
+ static loff_t
+ iomap_dio_actor(struct inode *inode, loff_t pos, loff_t length,
+-		void *data, struct iomap *iomap, struct iomap *srcmap)
++		void *data, unsigned flags, struct iomap *iomap,
++		struct iomap *srcmap)
+ {
+ 	struct iomap_dio *dio = data;
+ 
+diff --git a/fs/iomap/fiemap.c b/fs/iomap/fiemap.c
+index bccf305ea9ce..04de960259d0 100644
+--- a/fs/iomap/fiemap.c
++++ b/fs/iomap/fiemap.c
+@@ -44,7 +44,7 @@ static int iomap_to_fiemap(struct fiemap_extent_info *fi,
+ 
+ static loff_t
+ iomap_fiemap_actor(struct inode *inode, loff_t pos, loff_t length, void *data,
+-		struct iomap *iomap, struct iomap *srcmap)
++		unsigned flags, struct iomap *iomap, struct iomap *srcmap)
+ {
+ 	struct fiemap_ctx *ctx = data;
+ 	loff_t ret = length;
+@@ -111,7 +111,8 @@ EXPORT_SYMBOL_GPL(iomap_fiemap);
+ 
+ static loff_t
+ iomap_bmap_actor(struct inode *inode, loff_t pos, loff_t length,
+-		void *data, struct iomap *iomap, struct iomap *srcmap)
++		void *data, unsigned flags, struct iomap *iomap,
++		struct iomap *srcmap)
+ {
+ 	sector_t *bno = data, addr;
+ 
+diff --git a/fs/iomap/seek.c b/fs/iomap/seek.c
+index 89f61d93c0bc..a5cbf04e8cb3 100644
+--- a/fs/iomap/seek.c
++++ b/fs/iomap/seek.c
+@@ -119,7 +119,8 @@ page_cache_seek_hole_data(struct inode *inode, loff_t offset, loff_t length,
+ 
+ static loff_t
+ iomap_seek_hole_actor(struct inode *inode, loff_t offset, loff_t length,
+-		      void *data, struct iomap *iomap, struct iomap *srcmap)
++		      void *data, unsigned flags, struct iomap *iomap,
++		      struct iomap *srcmap)
+ {
+ 	switch (iomap->type) {
+ 	case IOMAP_UNWRITTEN:
+@@ -165,7 +166,8 @@ EXPORT_SYMBOL_GPL(iomap_seek_hole);
+ 
+ static loff_t
+ iomap_seek_data_actor(struct inode *inode, loff_t offset, loff_t length,
+-		      void *data, struct iomap *iomap, struct iomap *srcmap)
++		      void *data, unsigned flags, struct iomap *iomap,
++		      struct iomap *srcmap)
+ {
+ 	switch (iomap->type) {
+ 	case IOMAP_HOLE:
+diff --git a/fs/iomap/swapfile.c b/fs/iomap/swapfile.c
+index a648dbf6991e..774bfc3e59e1 100644
+--- a/fs/iomap/swapfile.c
++++ b/fs/iomap/swapfile.c
+@@ -76,7 +76,7 @@ static int iomap_swapfile_add_extent(struct iomap_swapfile_info *isi)
+  * distinction between written and unwritten extents.
+  */
+ static loff_t iomap_swapfile_activate_actor(struct inode *inode, loff_t pos,
+-		loff_t count, void *data, struct iomap *iomap,
++		loff_t count, void *data, unsigned flags, struct iomap *iomap,
+ 		struct iomap *srcmap)
+ {
+ 	struct iomap_swapfile_info *isi = data;
+diff --git a/include/linux/iomap.h b/include/linux/iomap.h
+index 8b09463dae0d..61fcaa3904d4 100644
+--- a/include/linux/iomap.h
++++ b/include/linux/iomap.h
+@@ -113,7 +113,7 @@ struct iomap_page_ops {
+ };
+ 
+ /*
+- * Flags for iomap_begin / iomap_end.  No flag implies a read.
++ * Flags for iomap_begin / iomap_end / factor.  No flag implies a read.
+  */
+ #define IOMAP_WRITE		(1 << 0) /* writing, must allocate blocks */
+ #define IOMAP_ZERO		(1 << 1) /* zeroing operation, may skip holes */
+@@ -146,7 +146,8 @@ struct iomap_ops {
+  * Main iomap iterator function.
+  */
+ typedef loff_t (*iomap_actor_t)(struct inode *inode, loff_t pos, loff_t len,
+-		void *data, struct iomap *iomap, struct iomap *srcmap);
++		void *data, unsigned flags, struct iomap *iomap,
++		struct iomap *srcmap);
+ 
+ loff_t iomap_apply(struct inode *inode, loff_t pos, loff_t length,
+ 		unsigned flags, const struct iomap_ops *ops, void *data,
 -- 
 2.24.0
 
