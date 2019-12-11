@@ -7,59 +7,59 @@ X-Spam-Status: No, score=-9.8 required=3.0 tests=DKIMWL_WL_HIGH,DKIM_SIGNED,
 	MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED,
 	USER_AGENT_GIT autolearn=unavailable autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 35EBFC00454
-	for <linux-block@archiver.kernel.org>; Wed, 11 Dec 2019 15:30:14 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 07D5DC00454
+	for <linux-block@archiver.kernel.org>; Wed, 11 Dec 2019 15:30:18 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.kernel.org (Postfix) with ESMTP id 0D29A24671
-	for <linux-block@archiver.kernel.org>; Wed, 11 Dec 2019 15:30:14 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id D05D12465B
+	for <linux-block@archiver.kernel.org>; Wed, 11 Dec 2019 15:30:17 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=pass (1024-bit key) header.d=amazon.com header.i=@amazon.com header.b="cTSKbM41"
+	dkim=pass (1024-bit key) header.d=amazon.com header.i=@amazon.com header.b="qyPDW5BJ"
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S2387678AbfLKPaJ (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Wed, 11 Dec 2019 10:30:09 -0500
+        id S2387971AbfLKPaM (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Wed, 11 Dec 2019 10:30:12 -0500
 Received: from smtp-fw-4101.amazon.com ([72.21.198.25]:61065 "EHLO
         smtp-fw-4101.amazon.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S2387751AbfLKPaH (ORCPT
+        with ESMTP id S2387966AbfLKPaK (ORCPT
         <rfc822;linux-block@vger.kernel.org>);
-        Wed, 11 Dec 2019 10:30:07 -0500
+        Wed, 11 Dec 2019 10:30:10 -0500
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
   d=amazon.com; i=@amazon.com; q=dns/txt; s=amazon201209;
-  t=1576078207; x=1607614207;
+  t=1576078210; x=1607614210;
   h=from:to:cc:subject:date:message-id:in-reply-to:
    references:mime-version:content-transfer-encoding;
-  bh=iUa3rMrxmsbf7wqyelx7uKp4w0L5PGnWaAJKZ1+2hRA=;
-  b=cTSKbM41K5a+TpaQu2fopTrSOifueqCyPZ1HkG+kaBqU9sgD8BOFjW+c
-   Msa66gq/9iug/gF0j0UOq7wByZ465T0LMJXKpqvpO2iTY8+FrD+IykA/t
-   PpD7nvTh8VKzBh73ZEArTRgYzb7g5tiOaboJHp4x/dZne5eFlzJ55s1qw
-   c=;
-IronPort-SDR: k+ahKTZHIO0ciIGn4hMaP6zVJRPspOxO/cgWgiMFZcQpLsQqkQ6c1rHpCPrZg2+A0/TfDf2Ix1
- 0d4IQXOJvoNw==
+  bh=m7nbgl2u0koiXf/XsA21xWuJDhFDTqL8hhIcGJQO/ns=;
+  b=qyPDW5BJVD6pQ66zeAtBZ7VLqb+rQsjDhjQ/wzo3Ic7f/rjHgkAJCDu9
+   BeOmFVy08PDKw2okSjbFi8UTxeT1QDK+10AmqfDntCaYMaFOJ0n/Zo3TX
+   X+vwfLyHDsGoIhWzrZ+dkTudSbeQ0RVLTLCEdXkjqhvx5ZsSuJxJRGUo3
+   0=;
+IronPort-SDR: 4GuYu5bux2FjlFDxqmxuq57ilbkO5edyeI/1nMkdV9vzHCHfele8wzk9nIAxN04sSYwiqygnzs
+ kyHNvVe+sbcw==
 X-IronPort-AV: E=Sophos;i="5.69,301,1571702400"; 
-   d="scan'208";a="8046829"
-Received: from iad6-co-svc-p1-lb1-vlan3.amazon.com (HELO email-inbound-relay-2a-69849ee2.us-west-2.amazon.com) ([10.124.125.6])
-  by smtp-border-fw-out-4101.iad4.amazon.com with ESMTP; 11 Dec 2019 15:30:06 +0000
+   d="scan'208";a="8046840"
+Received: from iad6-co-svc-p1-lb1-vlan3.amazon.com (HELO email-inbound-relay-2a-6e2fc477.us-west-2.amazon.com) ([10.124.125.6])
+  by smtp-border-fw-out-4101.iad4.amazon.com with ESMTP; 11 Dec 2019 15:30:09 +0000
 Received: from EX13MTAUEA001.ant.amazon.com (pdx4-ws-svc-p6-lb7-vlan2.pdx.amazon.com [10.170.41.162])
-        by email-inbound-relay-2a-69849ee2.us-west-2.amazon.com (Postfix) with ESMTPS id 2B8E7A245B;
-        Wed, 11 Dec 2019 15:30:05 +0000 (UTC)
-Received: from EX13D32EUC001.ant.amazon.com (10.43.164.159) by
+        by email-inbound-relay-2a-6e2fc477.us-west-2.amazon.com (Postfix) with ESMTPS id 32C03A2C58;
+        Wed, 11 Dec 2019 15:30:08 +0000 (UTC)
+Received: from EX13D32EUB002.ant.amazon.com (10.43.166.114) by
  EX13MTAUEA001.ant.amazon.com (10.43.61.243) with Microsoft SMTP Server (TLS)
- id 15.0.1367.3; Wed, 11 Dec 2019 15:30:04 +0000
+ id 15.0.1367.3; Wed, 11 Dec 2019 15:30:07 +0000
 Received: from EX13MTAUWC001.ant.amazon.com (10.43.162.135) by
- EX13D32EUC001.ant.amazon.com (10.43.164.159) with Microsoft SMTP Server (TLS)
- id 15.0.1367.3; Wed, 11 Dec 2019 15:30:03 +0000
+ EX13D32EUB002.ant.amazon.com (10.43.166.114) with Microsoft SMTP Server (TLS)
+ id 15.0.1367.3; Wed, 11 Dec 2019 15:30:06 +0000
 Received: from u2f063a87eabd5f.cbg10.amazon.com (10.125.106.135) by
  mail-relay.amazon.com (10.43.162.232) with Microsoft SMTP Server id
- 15.0.1367.3 via Frontend Transport; Wed, 11 Dec 2019 15:30:01 +0000
+ 15.0.1367.3 via Frontend Transport; Wed, 11 Dec 2019 15:30:04 +0000
 From:   Paul Durrant <pdurrant@amazon.com>
 To:     <xen-devel@lists.xenproject.org>, <linux-block@vger.kernel.org>,
         <linux-kernel@vger.kernel.org>
 CC:     Paul Durrant <pdurrant@amazon.com>,
+        Boris Ostrovsky <boris.ostrovsky@oracle.com>,
         Juergen Gross <jgross@suse.com>,
-        "Boris Ostrovsky" <boris.ostrovsky@oracle.com>,
-        Stefano Stabellini <sstabellini@kernel.org>
-Subject: [PATCH v3 1/4] xenbus: move xenbus_dev_shutdown() into frontend code...
-Date:   Wed, 11 Dec 2019 15:29:53 +0000
-Message-ID: <20191211152956.5168-2-pdurrant@amazon.com>
+        "Stefano Stabellini" <sstabellini@kernel.org>
+Subject: [PATCH v3 2/4] xenbus: limit when state is forced to closed
+Date:   Wed, 11 Dec 2019 15:29:54 +0000
+Message-ID: <20191211152956.5168-3-pdurrant@amazon.com>
 X-Mailer: git-send-email 2.20.1
 In-Reply-To: <20191211152956.5168-1-pdurrant@amazon.com>
 References: <20191211152956.5168-1-pdurrant@amazon.com>
@@ -71,134 +71,75 @@ Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-...and make it static
+If a driver probe() fails then leave the xenstore state alone. There is no
+reason to modify it as the failure may be due to transient resource
+allocation issues and hence a subsequent probe() may succeed.
 
-xenbus_dev_shutdown() is seemingly intended to cause clean shutdown of PV
-frontends when a guest is rebooted. Indeed the function waits for a
-conpletion which is only set by a call to xenbus_frontend_closed().
+If the driver supports re-binding then only force state to closed during
+remove() only in the case when the toolstack may need to clean up. This can
+be detected by checking whether the state in xenstore has been set to
+closing prior to device removal.
 
-This patch removes the shutdown() method from backends and moves
-xenbus_dev_shutdown() from xenbus_probe.c into xenbus_probe_frontend.c,
-renaming it appropriately and making it static.
-
-NOTE: In the case where the backend is running in a driver domain, the
-      toolstack should have already terminated any frontends that may be
-      using it (since Xen does not support re-startable PV driver domains)
-      so xenbus_dev_shutdown() should never be called.
+NOTE: Re-bind support is indicated by new boolean in struct xenbus_driver,
+      which defaults to false. Subsequent patches will add support to
+      some backend drivers.
 
 Signed-off-by: Paul Durrant <pdurrant@amazon.com>
-Reviewed-by: Juergen Gross <jgross@suse.com>
 ---
 Cc: Boris Ostrovsky <boris.ostrovsky@oracle.com>
+Cc: Juergen Gross <jgross@suse.com>
 Cc: Stefano Stabellini <sstabellini@kernel.org>
----
- drivers/xen/xenbus/xenbus.h                |  2 --
- drivers/xen/xenbus/xenbus_probe.c          | 23 ---------------------
- drivers/xen/xenbus/xenbus_probe_backend.c  |  1 -
- drivers/xen/xenbus/xenbus_probe_frontend.c | 24 +++++++++++++++++++++-
- 4 files changed, 23 insertions(+), 27 deletions(-)
 
-diff --git a/drivers/xen/xenbus/xenbus.h b/drivers/xen/xenbus/xenbus.h
-index d75a2385b37c..5f5b8a7d5b80 100644
---- a/drivers/xen/xenbus/xenbus.h
-+++ b/drivers/xen/xenbus/xenbus.h
-@@ -116,8 +116,6 @@ int xenbus_probe_devices(struct xen_bus_type *bus);
- 
- void xenbus_dev_changed(const char *node, struct xen_bus_type *bus);
- 
--void xenbus_dev_shutdown(struct device *_dev);
--
- int xenbus_dev_suspend(struct device *dev);
- int xenbus_dev_resume(struct device *dev);
- int xenbus_dev_cancel(struct device *dev);
+v2:
+ - Introduce the 'allow_rebind' flag
+ - Expand the commit comment
+---
+ drivers/xen/xenbus/xenbus_probe.c | 12 ++++++++++--
+ include/xen/xenbus.h              |  1 +
+ 2 files changed, 11 insertions(+), 2 deletions(-)
+
 diff --git a/drivers/xen/xenbus/xenbus_probe.c b/drivers/xen/xenbus/xenbus_probe.c
-index c21be6e9d38a..5aa29396c9e3 100644
+index 5aa29396c9e3..378486b79f96 100644
 --- a/drivers/xen/xenbus/xenbus_probe.c
 +++ b/drivers/xen/xenbus/xenbus_probe.c
-@@ -281,29 +281,6 @@ int xenbus_dev_remove(struct device *_dev)
+@@ -255,7 +255,6 @@ int xenbus_dev_probe(struct device *_dev)
+ 	module_put(drv->driver.owner);
+ fail:
+ 	xenbus_dev_error(dev, err, "xenbus_dev_probe on %s", dev->nodename);
+-	xenbus_switch_state(dev, XenbusStateClosed);
+ 	return err;
+ }
+ EXPORT_SYMBOL_GPL(xenbus_dev_probe);
+@@ -276,7 +275,16 @@ int xenbus_dev_remove(struct device *_dev)
+ 
+ 	free_otherend_details(dev);
+ 
+-	xenbus_switch_state(dev, XenbusStateClosed);
++	/*
++	 * If the toolstack has forced the device state to closing then set
++	 * the state to closed now to allow it to be cleaned up.
++	 * Similarly, if the driver does not support re-bind, set the
++	 * closed.
++	 */
++	if (!drv->allow_rebind ||
++	    xenbus_read_driver_state(dev->nodename) == XenbusStateClosing)
++		xenbus_switch_state(dev, XenbusStateClosed);
++
+ 	return 0;
  }
  EXPORT_SYMBOL_GPL(xenbus_dev_remove);
- 
--void xenbus_dev_shutdown(struct device *_dev)
--{
--	struct xenbus_device *dev = to_xenbus_device(_dev);
--	unsigned long timeout = 5*HZ;
--
--	DPRINTK("%s", dev->nodename);
--
--	get_device(&dev->dev);
--	if (dev->state != XenbusStateConnected) {
--		pr_info("%s: %s: %s != Connected, skipping\n",
--			__func__, dev->nodename, xenbus_strstate(dev->state));
--		goto out;
--	}
--	xenbus_switch_state(dev, XenbusStateClosing);
--	timeout = wait_for_completion_timeout(&dev->down, timeout);
--	if (!timeout)
--		pr_info("%s: %s timeout closing device\n",
--			__func__, dev->nodename);
-- out:
--	put_device(&dev->dev);
--}
--EXPORT_SYMBOL_GPL(xenbus_dev_shutdown);
--
- int xenbus_register_driver_common(struct xenbus_driver *drv,
- 				  struct xen_bus_type *bus,
- 				  struct module *owner, const char *mod_name)
-diff --git a/drivers/xen/xenbus/xenbus_probe_backend.c b/drivers/xen/xenbus/xenbus_probe_backend.c
-index b0bed4faf44c..14876faff3b0 100644
---- a/drivers/xen/xenbus/xenbus_probe_backend.c
-+++ b/drivers/xen/xenbus/xenbus_probe_backend.c
-@@ -198,7 +198,6 @@ static struct xen_bus_type xenbus_backend = {
- 		.uevent		= xenbus_uevent_backend,
- 		.probe		= xenbus_dev_probe,
- 		.remove		= xenbus_dev_remove,
--		.shutdown	= xenbus_dev_shutdown,
- 		.dev_groups	= xenbus_dev_groups,
- 	},
- };
-diff --git a/drivers/xen/xenbus/xenbus_probe_frontend.c b/drivers/xen/xenbus/xenbus_probe_frontend.c
-index a7d90a719cea..8a1650bbe18f 100644
---- a/drivers/xen/xenbus/xenbus_probe_frontend.c
-+++ b/drivers/xen/xenbus/xenbus_probe_frontend.c
-@@ -126,6 +126,28 @@ static int xenbus_frontend_dev_probe(struct device *dev)
- 	return xenbus_dev_probe(dev);
- }
- 
-+static void xenbus_frontend_dev_shutdown(struct device *_dev)
-+{
-+	struct xenbus_device *dev = to_xenbus_device(_dev);
-+	unsigned long timeout = 5*HZ;
-+
-+	DPRINTK("%s", dev->nodename);
-+
-+	get_device(&dev->dev);
-+	if (dev->state != XenbusStateConnected) {
-+		pr_info("%s: %s: %s != Connected, skipping\n",
-+			__func__, dev->nodename, xenbus_strstate(dev->state));
-+		goto out;
-+	}
-+	xenbus_switch_state(dev, XenbusStateClosing);
-+	timeout = wait_for_completion_timeout(&dev->down, timeout);
-+	if (!timeout)
-+		pr_info("%s: %s timeout closing device\n",
-+			__func__, dev->nodename);
-+ out:
-+	put_device(&dev->dev);
-+}
-+
- static const struct dev_pm_ops xenbus_pm_ops = {
- 	.suspend	= xenbus_dev_suspend,
- 	.resume		= xenbus_frontend_dev_resume,
-@@ -146,7 +168,7 @@ static struct xen_bus_type xenbus_frontend = {
- 		.uevent		= xenbus_uevent_frontend,
- 		.probe		= xenbus_frontend_dev_probe,
- 		.remove		= xenbus_dev_remove,
--		.shutdown	= xenbus_dev_shutdown,
-+		.shutdown	= xenbus_frontend_dev_shutdown,
- 		.dev_groups	= xenbus_dev_groups,
- 
- 		.pm		= &xenbus_pm_ops,
+diff --git a/include/xen/xenbus.h b/include/xen/xenbus.h
+index 869c816d5f8c..24228a102141 100644
+--- a/include/xen/xenbus.h
++++ b/include/xen/xenbus.h
+@@ -93,6 +93,7 @@ struct xenbus_device_id
+ struct xenbus_driver {
+ 	const char *name;       /* defaults to ids[0].devicetype */
+ 	const struct xenbus_device_id *ids;
++	bool allow_rebind; /* avoid setting xenstore closed during remove */
+ 	int (*probe)(struct xenbus_device *dev,
+ 		     const struct xenbus_device_id *id);
+ 	void (*otherend_changed)(struct xenbus_device *dev,
 -- 
 2.20.1
 
