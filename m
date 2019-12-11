@@ -2,113 +2,196 @@ Return-Path: <SRS0=X6jZ=2B=vger.kernel.org=linux-block-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-0.7 required=3.0 tests=DKIM_SIGNED,DKIM_VALID,
-	HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,
-	URIBL_BLOCKED autolearn=no autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-2.4 required=3.0 tests=DKIMWL_WL_HIGH,DKIM_SIGNED,
+	DKIM_VALID,DKIM_VALID_AU,HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,
+	SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED,USER_AGENT_SANE_1 autolearn=no
+	autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 5CB0FC2D0C6
-	for <linux-block@archiver.kernel.org>; Wed, 11 Dec 2019 21:04:05 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 07473C00454
+	for <linux-block@archiver.kernel.org>; Wed, 11 Dec 2019 21:25:38 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.kernel.org (Postfix) with ESMTP id 3097421556
-	for <linux-block@archiver.kernel.org>; Wed, 11 Dec 2019 21:04:05 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id C5F282054F
+	for <linux-block@archiver.kernel.org>; Wed, 11 Dec 2019 21:25:37 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=pass (2048-bit key) header.d=cmpxchg-org.20150623.gappssmtp.com header.i=@cmpxchg-org.20150623.gappssmtp.com header.b="ns0LNqCK"
+	dkim=pass (2048-bit key) header.d=nvidia.com header.i=@nvidia.com header.b="n8ng2gW+"
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1726463AbfLKVEE (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Wed, 11 Dec 2019 16:04:04 -0500
-Received: from mail-qv1-f68.google.com ([209.85.219.68]:39973 "EHLO
-        mail-qv1-f68.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1726313AbfLKVEE (ORCPT
+        id S1726524AbfLKVZg (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Wed, 11 Dec 2019 16:25:36 -0500
+Received: from hqnvemgate24.nvidia.com ([216.228.121.143]:1456 "EHLO
+        hqnvemgate24.nvidia.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S1726313AbfLKVZg (ORCPT
         <rfc822;linux-block@vger.kernel.org>);
-        Wed, 11 Dec 2019 16:04:04 -0500
-Received: by mail-qv1-f68.google.com with SMTP id k10so39696qve.7
-        for <linux-block@vger.kernel.org>; Wed, 11 Dec 2019 13:04:03 -0800 (PST)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=cmpxchg-org.20150623.gappssmtp.com; s=20150623;
-        h=date:from:to:cc:subject:message-id:references:mime-version
-         :content-disposition:in-reply-to;
-        bh=R2PsJGyUpT/iCCg3Yu1TE62l+3HqSX40NgPM4bJnXXE=;
-        b=ns0LNqCK0sYLbEaXEgQbTfsQKmSRApUdDpdU2giNA2frUZuVy2AITBGjQhQCZ5XAa0
-         OHf1XkkRoh7S2lLFqDTDbkqwjISEBUfNG24iQrcfZZ1haypZdUbUWHPjIxpK/bkmMBep
-         B4hRCgqs/F0xu5pP7Gg7dF4ox3R0hHZIzlLeI9dfHw1fXzvWshQvz/0yNkyv/pvgKa9P
-         q0uHYaraQXOIRT5ZpD26hDr+If9EUKfw1sBVqVMHKNM+6OmHzWl7vfyZfrbAAA0iPFVF
-         aIHDbRd/baN0rTREQXjK3D4I2V3SvB/4naasUMiqpOrxucdePn9SUxooXkbrbtKXECHz
-         JI+Q==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20161025;
-        h=x-gm-message-state:date:from:to:cc:subject:message-id:references
-         :mime-version:content-disposition:in-reply-to;
-        bh=R2PsJGyUpT/iCCg3Yu1TE62l+3HqSX40NgPM4bJnXXE=;
-        b=B9F9cTNkK80cb9oURurCWDvHlBFHx51tXK/WWW6ucwTx/3/Fu6G8X0hs+/izT22jpU
-         N5rQ2fk6G8OZAhuj84j0QgjRRjTJxvHU5aGN8LQFNm07ehQoyZ9G/B5fS5BJaJ6wn7dT
-         0OYWzcts0odMU4CvUb/B2YwuwEl8X9gOFY+gn6b9B50iFUQB+Ev/k0l1AnqG77SESuvo
-         XEne0RfLVIoPZWrFD7ixx3B+r/3e55CqWvnV1ugCTGtjFd1a+yQKf18tA3hHG7nMPLtG
-         Lqq5EgtAwqLzCDUTe3ttRzpRGz5y1xcXMuJnGfLNCoEmwOniHLQzKXRG96Rx3a1l9M5S
-         7a2A==
-X-Gm-Message-State: APjAAAX2lnHqyp94jSu6hjHYQHSV4JXoRU1OCIs2EsSDLsQCxUgtY+ic
-        I4p5E1iJ9WMSLG3CTVFy37owaw==
-X-Google-Smtp-Source: APXvYqxq7v6drlnORg/gNcxlU4z0/vNmm+oh4UJTRbqnR5xBG4N1pG1N3WEFTCGN7D9u37ud9MdVmg==
-X-Received: by 2002:a0c:e14f:: with SMTP id c15mr4886674qvl.169.1576098243448;
-        Wed, 11 Dec 2019 13:04:03 -0800 (PST)
-Received: from localhost ([2620:10d:c091:500::151b])
-        by smtp.gmail.com with ESMTPSA id h34sm1307215qtc.62.2019.12.11.13.04.02
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Wed, 11 Dec 2019 13:04:02 -0800 (PST)
-Date:   Wed, 11 Dec 2019 16:04:01 -0500
-From:   Johannes Weiner <hannes@cmpxchg.org>
-To:     Linus Torvalds <torvalds@linux-foundation.org>
-Cc:     Jens Axboe <axboe@kernel.dk>, Linux-MM <linux-mm@kvack.org>,
-        linux-fsdevel <linux-fsdevel@vger.kernel.org>,
-        linux-block <linux-block@vger.kernel.org>,
-        Matthew Wilcox <willy@infradead.org>, Chris Mason <clm@fb.com>,
-        Dave Chinner <david@fromorbit.com>
-Subject: Re: [PATCHSET v3 0/5] Support for RWF_UNCACHED
-Message-ID: <20191211210401.GA158617@cmpxchg.org>
-References: <20191211152943.2933-1-axboe@kernel.dk>
- <CAHk-=wjz3LE1kznro1dozhk9i9Dr4pCnkj7Fuccn2xdWeGHawQ@mail.gmail.com>
- <d0adcde2-3106-4fea-c047-4d17111bab70@kernel.dk>
- <e43a2700-8625-e136-dc9d-d0d2da5d96ac@kernel.dk>
- <CAHk-=wje8i3DVcO=fMC4tzKTS5+eHv0anrVZa_JENQt08T=qCQ@mail.gmail.com>
- <0d4e3954-c467-30a7-5a8e-7c4180275533@kernel.dk>
- <CAHk-=whk4bcVPvtAv5OmHiW5z6AXgCLFhO4YrXD7o0XC+K-aHw@mail.gmail.com>
+        Wed, 11 Dec 2019 16:25:36 -0500
+Received: from hqpgpgate101.nvidia.com (Not Verified[216.228.121.13]) by hqnvemgate24.nvidia.com (using TLS: TLSv1.2, DES-CBC3-SHA)
+        id <B5df15eb80000>; Wed, 11 Dec 2019 13:25:12 -0800
+Received: from hqmail.nvidia.com ([172.20.161.6])
+  by hqpgpgate101.nvidia.com (PGP Universal service);
+  Wed, 11 Dec 2019 13:25:34 -0800
+X-PGP-Universal: processed;
+        by hqpgpgate101.nvidia.com on Wed, 11 Dec 2019 13:25:34 -0800
+Received: from [10.110.48.28] (10.124.1.5) by HQMAIL107.nvidia.com
+ (172.20.187.13) with Microsoft SMTP Server (TLS) id 15.0.1473.3; Wed, 11 Dec
+ 2019 21:25:34 +0000
+Subject: Re: [PATCH v9 10/25] mm/gup: introduce pin_user_pages*() and FOLL_PIN
+To:     Jonathan Corbet <corbet@lwn.net>
+CC:     Andrew Morton <akpm@linux-foundation.org>,
+        Al Viro <viro@zeniv.linux.org.uk>,
+        Alex Williamson <alex.williamson@redhat.com>,
+        Benjamin Herrenschmidt <benh@kernel.crashing.org>,
+        =?UTF-8?B?QmrDtnJuIFTDtnBlbA==?= <bjorn.topel@intel.com>,
+        Christoph Hellwig <hch@infradead.org>,
+        Dan Williams <dan.j.williams@intel.com>,
+        Daniel Vetter <daniel@ffwll.ch>,
+        Dave Chinner <david@fromorbit.com>,
+        David Airlie <airlied@linux.ie>,
+        "David S . Miller" <davem@davemloft.net>,
+        Ira Weiny <ira.weiny@intel.com>, Jan Kara <jack@suse.cz>,
+        Jason Gunthorpe <jgg@ziepe.ca>, Jens Axboe <axboe@kernel.dk>,
+        =?UTF-8?B?SsOpcsO0bWUgR2xpc3Nl?= <jglisse@redhat.com>,
+        Magnus Karlsson <magnus.karlsson@intel.com>,
+        Mauro Carvalho Chehab <mchehab@kernel.org>,
+        Michael Ellerman <mpe@ellerman.id.au>,
+        Michal Hocko <mhocko@suse.com>,
+        Mike Kravetz <mike.kravetz@oracle.com>,
+        Paul Mackerras <paulus@samba.org>,
+        Shuah Khan <shuah@kernel.org>,
+        Vlastimil Babka <vbabka@suse.cz>, <bpf@vger.kernel.org>,
+        <dri-devel@lists.freedesktop.org>, <kvm@vger.kernel.org>,
+        <linux-block@vger.kernel.org>, <linux-doc@vger.kernel.org>,
+        <linux-fsdevel@vger.kernel.org>, <linux-kselftest@vger.kernel.org>,
+        <linux-media@vger.kernel.org>, <linux-rdma@vger.kernel.org>,
+        <linuxppc-dev@lists.ozlabs.org>, <netdev@vger.kernel.org>,
+        <linux-mm@kvack.org>, LKML <linux-kernel@vger.kernel.org>,
+        Mike Rapoport <rppt@linux.ibm.com>
+References: <20191211025318.457113-1-jhubbard@nvidia.com>
+ <20191211025318.457113-11-jhubbard@nvidia.com>
+ <20191211135737.581add2f@lwn.net>
+From:   John Hubbard <jhubbard@nvidia.com>
+X-Nvconfidentiality: public
+Message-ID: <c8930e77-9c99-2d3d-743d-9d58176ea690@nvidia.com>
+Date:   Wed, 11 Dec 2019 13:25:33 -0800
+User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:68.0) Gecko/20100101
+ Thunderbird/68.3.0
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <CAHk-=whk4bcVPvtAv5OmHiW5z6AXgCLFhO4YrXD7o0XC+K-aHw@mail.gmail.com>
+In-Reply-To: <20191211135737.581add2f@lwn.net>
+X-Originating-IP: [10.124.1.5]
+X-ClientProxiedBy: HQMAIL105.nvidia.com (172.20.187.12) To
+ HQMAIL107.nvidia.com (172.20.187.13)
+Content-Type: text/plain; charset="utf-8"
+Content-Language: en-US
+Content-Transfer-Encoding: 7bit
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=nvidia.com; s=n1;
+        t=1576099513; bh=h8WoxBOtUL7d4aBHwikvS71dFoLle6Q1qJcgfYlGzoI=;
+        h=X-PGP-Universal:Subject:To:CC:References:From:X-Nvconfidentiality:
+         Message-ID:Date:User-Agent:MIME-Version:In-Reply-To:
+         X-Originating-IP:X-ClientProxiedBy:Content-Type:Content-Language:
+         Content-Transfer-Encoding;
+        b=n8ng2gW+8yccOTJ0sb0qKZBSBkMzrO2w+mX1jwAwhVYYv3FE21MXjsfMjjhApcnib
+         wo8d+ZRlDZwi9+66AYkoZtFFMIJupZ7au9saOmm/kNh3KbsRApo1SSaYZzqpFUg9dv
+         APDY2cvczFMX0P05ANDG9Wpe8w2DHHN7/JdQsO1AuudRaAw4keF3jV1uyq3uA82xUI
+         ieCnDqXdxIHT69mdMVDE/JA7qgs+lLHW/JROAhLDlkZchTV8THtwKre9xUIr3vtdDd
+         8O/vqZHRFo4GrCktOUJaI0JiNxox7/Ns2xEUIaiCnKWdDSbo4DOz0JmZdD1qJCvncm
+         kDdssHEUgirjg==
 Sender: linux-block-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-On Wed, Dec 11, 2019 at 12:18:38PM -0800, Linus Torvalds wrote:
-> On Wed, Dec 11, 2019 at 12:08 PM Jens Axboe <axboe@kernel.dk> wrote:
-> >
-> > $ cat /proc/meminfo | grep -i active
-> > Active:           134136 kB
-> > Inactive:       28683916 kB
-> > Active(anon):      97064 kB
-> > Inactive(anon):        4 kB
-> > Active(file):      37072 kB
-> > Inactive(file): 28683912 kB
+On 12/11/19 12:57 PM, Jonathan Corbet wrote:
+> On Tue, 10 Dec 2019 18:53:03 -0800
+> John Hubbard <jhubbard@nvidia.com> wrote:
 > 
-> Yeah, that should not put pressure on some swap activity. We have 28
-> GB of basically free inactive file data, and the VM is doing something
-> very very bad if it then doesn't just quickly free it with no real
-> drama.
+>> Introduce pin_user_pages*() variations of get_user_pages*() calls,
+>> and also pin_longterm_pages*() variations.
+> 
+> Just a couple of nits on the documentation patch
+> 
+>> +++ b/Documentation/core-api/pin_user_pages.rst
+>> @@ -0,0 +1,232 @@
+>> +.. SPDX-License-Identifier: GPL-2.0
+>> +
+>> +====================================================
+>> +pin_user_pages() and related calls
+>> +====================================================
+>> +
+>> +.. contents:: :local:
+>> +
+>> +Overview
+>> +========
+>> +
+>> +This document describes the following functions: ::
+>> +
+>> + pin_user_pages
+>> + pin_user_pages_fast
+>> + pin_user_pages_remote
+> 
+> You could just say "the following functions::" and get the result you're
+> after with a slightly less alien plain-text reading experience.
 
-I was looking at this with Jens offline last week. One thing to note
-is the rate of IO that Jens is working with: combined with the low
-cache hit rate, it was pushing upwards of half a million pages through
-the page cache each second.
+I see. That works nicely: same result with fewer :'s. 
 
-There isn't anything obvious sticking out in the kswapd profile: it's
-dominated by cache tree deletions (or rather replacing pages with
-shadow entries, hence the misleading xas_store()), tree lock
-contention, etc. - all work that a direct reclaimer would have to do
-as well, with one exceptions: RWC_UNCACHED doesn't need to go through
-the LRU list, and 8-9% of kswapd cycles alone are going into
-physically getting pages off the list. (And I suspect part of that is
-also contention over the LRU lock as kswapd gets overwhelmed and
-direct reclaim kicks in).
+> 
+> Of course, you could also just say "This document describes
+> pin_user_pages(), pin_user_pages_fast(), and pin_user_pages_remote()." But
+> that's a matter of personal taste, I guess.  Using the function() notation
+> will cause the docs system to automatically link to the kerneldoc info,
+> though.  
 
-Jens, how much throughput difference does kswapd vs RWC_UNCACHED make?
+OK. I did try the single-sentence approach just now, but to me the one-per-line
+seems to make both the text and the generated HTML slightly easier to look at. 
+Of course, like you say, different people will have different preferences. So 
+in the end I've combined the tips, like this:
+
++Overview
++========
++
++This document describes the following functions::
++
++ pin_user_pages()
++ pin_user_pages_fast()
++ pin_user_pages_remote()
+
+
+> 
+>> +Basic description of FOLL_PIN
+>> +=============================
+>> +
+>> +FOLL_PIN and FOLL_LONGTERM are flags that can be passed to the get_user_pages*()
+>> +("gup") family of functions. FOLL_PIN has significant interactions and
+>> +interdependencies with FOLL_LONGTERM, so both are covered here.
+>> +
+>> +FOLL_PIN is internal to gup, meaning that it should not appear at the gup call
+>> +sites. This allows the associated wrapper functions  (pin_user_pages*() and
+>> +others) to set the correct combination of these flags, and to check for problems
+>> +as well.
+>> +
+>> +FOLL_LONGTERM, on the other hand, *is* allowed to be set at the gup call sites.
+>> +This is in order to avoid creating a large number of wrapper functions to cover
+>> +all combinations of get*(), pin*(), FOLL_LONGTERM, and more. Also, the
+>> +pin_user_pages*() APIs are clearly distinct from the get_user_pages*() APIs, so
+>> +that's a natural dividing line, and a good point to make separate wrapper calls.
+>> +In other words, use pin_user_pages*() for DMA-pinned pages, and
+>> +get_user_pages*() for other cases. There are four cases described later on in
+>> +this document, to further clarify that concept.
+>> +
+>> +FOLL_PIN and FOLL_GET are mutually exclusive for a given gup call. However,
+>> +multiple threads and call sites are free to pin the same struct pages, via both
+>> +FOLL_PIN and FOLL_GET. It's just the call site that needs to choose one or the
+>> +other, not the struct page(s).
+>> +
+>> +The FOLL_PIN implementation is nearly the same as FOLL_GET, except that FOLL_PIN
+>> +uses a different reference counting technique.
+>> +
+>> +FOLL_PIN is a prerequisite to FOLL_LONGTGERM. Another way of saying that is,
+> 
+> FOLL_LONGTERM typoed there.
+> 
+
+Good catch. Fixed.
+
+thanks,
+-- 
+John Hubbard
+NVIDIA
+
+
