@@ -2,70 +2,112 @@ Return-Path: <SRS0=X6jZ=2B=vger.kernel.org=linux-block-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-5.2 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
-	INCLUDES_PATCH,MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,USER_AGENT_SANE_1
-	autolearn=ham autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-8.2 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
+	INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,
+	USER_AGENT_SANE_1 autolearn=unavailable autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 88219C43603
-	for <linux-block@archiver.kernel.org>; Wed, 11 Dec 2019 12:30:07 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 34936C43603
+	for <linux-block@archiver.kernel.org>; Wed, 11 Dec 2019 12:56:43 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.kernel.org (Postfix) with ESMTP id 6218520836
-	for <linux-block@archiver.kernel.org>; Wed, 11 Dec 2019 12:30:07 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id 0D86021D7D
+	for <linux-block@archiver.kernel.org>; Wed, 11 Dec 2019 12:56:43 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1729117AbfLKMaG (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Wed, 11 Dec 2019 07:30:06 -0500
-Received: from mx2.suse.de ([195.135.220.15]:40000 "EHLO mx1.suse.de"
-        rhost-flags-OK-OK-OK-FAIL) by vger.kernel.org with ESMTP
-        id S1727477AbfLKMaG (ORCPT <rfc822;linux-block@vger.kernel.org>);
-        Wed, 11 Dec 2019 07:30:06 -0500
-X-Virus-Scanned: by amavisd-new at test-mx.suse.de
-Received: from relay2.suse.de (unknown [195.135.220.254])
-        by mx1.suse.de (Postfix) with ESMTP id BDB67AE50;
-        Wed, 11 Dec 2019 12:30:04 +0000 (UTC)
-Subject: Re: [PATCH v6 1/3] xenbus/backend: Add memory pressure handler
- callback
-To:     =?UTF-8?Q?Roger_Pau_Monn=c3=a9?= <roger.pau@citrix.com>,
-        SeongJae Park <sj38.park@gmail.com>
-Cc:     axboe@kernel.dk, konrad.wilk@oracle.com,
-        SeongJae Park <sjpark@amazon.de>, pdurrant@amazon.com,
-        sjpark@amazon.com, xen-devel@lists.xenproject.org,
-        linux-block@vger.kernel.org, linux-kernel@vger.kernel.org
-References: <20191211042428.5961-1-sjpark@amazon.de>
- <20191211042657.6037-1-sjpark@amazon.de> <20191211114651.GN980@Air-de-Roger>
-From:   =?UTF-8?B?SsO8cmdlbiBHcm/Dnw==?= <jgross@suse.com>
-Message-ID: <f626a29c-e307-38c8-b08d-471ad9b871e4@suse.com>
-Date:   Wed, 11 Dec 2019 13:30:02 +0100
-User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:68.0) Gecko/20100101
- Thunderbird/68.2.1
+        id S1729144AbfLKM4m (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Wed, 11 Dec 2019 07:56:42 -0500
+Received: from relay.sw.ru ([185.231.240.75]:46022 "EHLO relay.sw.ru"
+        rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
+        id S1727402AbfLKM4m (ORCPT <rfc822;linux-block@vger.kernel.org>);
+        Wed, 11 Dec 2019 07:56:42 -0500
+Received: from dhcp-172-16-24-104.sw.ru ([172.16.24.104])
+        by relay.sw.ru with esmtp (Exim 4.92.3)
+        (envelope-from <ktkhai@virtuozzo.com>)
+        id 1if1Wl-00067R-Gc; Wed, 11 Dec 2019 15:55:40 +0300
+Subject: [PATCH RFC v2 3/3] ext4: Notify block device about
+ fallocate(0)-assigned blocks
+To:     linux-block@vger.kernel.org, linux-kernel@vger.kernel.org,
+        linux-ext4@vger.kernel.org
+Cc:     axboe@kernel.dk, tytso@mit.edu, adilger.kernel@dilger.ca,
+        ming.lei@redhat.com, osandov@fb.com, jthumshirn@suse.de,
+        minwoo.im.dev@gmail.com, damien.lemoal@wdc.com,
+        andrea.parri@amarulasolutions.com, hare@suse.com, tj@kernel.org,
+        ajay.joshi@wdc.com, sagi@grimberg.me, dsterba@suse.com,
+        chaitanya.kulkarni@wdc.com, bvanassche@acm.org,
+        dhowells@redhat.com, asml.silence@gmail.com
+References: <157599668662.12112.10184894900037871860.stgit@localhost.localdomain>
+ <157599697948.12112.3846364542350011691.stgit@localhost.localdomain>
+From:   Kirill Tkhai <ktkhai@virtuozzo.com>
+Message-ID: <766824cc-8b40-aa8d-4f94-e015bc8122d4@virtuozzo.com>
+Date:   Wed, 11 Dec 2019 15:55:38 +0300
+User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:60.0) Gecko/20100101
+ Thunderbird/60.9.0
 MIME-Version: 1.0
-In-Reply-To: <20191211114651.GN980@Air-de-Roger>
-Content-Type: text/plain; charset=utf-8; format=flowed
+In-Reply-To: <157599697948.12112.3846364542350011691.stgit@localhost.localdomain>
+Content-Type: text/plain; charset=utf-8
 Content-Language: en-US
-Content-Transfer-Encoding: 8bit
+Content-Transfer-Encoding: 7bit
 Sender: linux-block-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-On 11.12.19 12:46, Roger Pau Monné wrote:
-> On Wed, Dec 11, 2019 at 04:26:57AM +0000, SeongJae Park wrote:
->> +
->>   	return 0;
->>   }
->>   subsys_initcall(xenbus_probe_backend_init);
->> diff --git a/include/xen/xenbus.h b/include/xen/xenbus.h
->> index 869c816d5f8c..196260017666 100644
->> --- a/include/xen/xenbus.h
->> +++ b/include/xen/xenbus.h
->> @@ -104,6 +104,7 @@ struct xenbus_driver {
->>   	struct device_driver driver;
->>   	int (*read_otherend_details)(struct xenbus_device *dev);
->>   	int (*is_ready)(struct xenbus_device *dev);
->> +	void (*reclaim)(struct xenbus_device *dev);
-> 
-> reclaim_memory (if Juergen agrees).
+[I missed debug hunk appeared in v1. Please, see correct patch below]
 
-I do agree.
+Call sb_issue_assign_range() after extent range was allocated
+on user request. Hopeful, this helps block device to maintain
+its internals in the best way, if this is appliable.
 
+Signed-off-by: Kirill Tkhai <ktkhai@virtuozzo.com>
+---
+ fs/ext4/ext4.h    |    1 +
+ fs/ext4/extents.c |   11 +++++++++--
+ 2 files changed, 10 insertions(+), 2 deletions(-)
 
-Juergen
+diff --git a/fs/ext4/ext4.h b/fs/ext4/ext4.h
+index f8578caba40d..fe2263c00c0e 100644
+--- a/fs/ext4/ext4.h
++++ b/fs/ext4/ext4.h
+@@ -622,6 +622,7 @@ enum {
+ 	 * allows jbd2 to avoid submitting data before commit. */
+ #define EXT4_GET_BLOCKS_IO_SUBMIT		0x0400
+ 
++#define EXT4_GET_BLOCKS_SUBMIT_ALLOC		0x0800
+ /*
+  * The bit position of these flags must not overlap with any of the
+  * EXT4_GET_BLOCKS_*.  They are used by ext4_find_extent(),
+diff --git a/fs/ext4/extents.c b/fs/ext4/extents.c
+index 0e8708b77da6..68335e1d6893 100644
+--- a/fs/ext4/extents.c
++++ b/fs/ext4/extents.c
+@@ -4490,6 +4490,13 @@ int ext4_ext_map_blocks(handle_t *handle, struct inode *inode,
+ 		ar.len = allocated;
+ 
+ got_allocated_blocks:
++	if ((flags & EXT4_GET_BLOCKS_SUBMIT_ALLOC)) {
++		err = sb_issue_assign_range(inode->i_sb, newblock,
++			EXT4_C2B(sbi, allocated_clusters), GFP_NOFS);
++		if (err)
++			goto free_on_err;
++	}
++
+ 	/* try to insert new extent into found leaf and return */
+ 	ext4_ext_store_pblock(&newex, newblock + offset);
+ 	newex.ee_len = cpu_to_le16(ar.len);
+@@ -4506,7 +4513,7 @@ int ext4_ext_map_blocks(handle_t *handle, struct inode *inode,
+ 	if (!err)
+ 		err = ext4_ext_insert_extent(handle, inode, &path,
+ 					     &newex, flags);
+-
++free_on_err:
+ 	if (err && free_on_err) {
+ 		int fb_flags = flags & EXT4_GET_BLOCKS_DELALLOC_RESERVE ?
+ 			EXT4_FREE_BLOCKS_NO_QUOT_UPDATE : 0;
+@@ -4926,7 +4933,7 @@ long ext4_fallocate(struct file *file, int mode, loff_t offset, loff_t len)
+ 	lblk = offset >> blkbits;
+ 
+ 	max_blocks = EXT4_MAX_BLOCKS(len, offset, blkbits);
+-	flags = EXT4_GET_BLOCKS_CREATE_UNWRIT_EXT;
++	flags = EXT4_GET_BLOCKS_CREATE_UNWRIT_EXT | EXT4_GET_BLOCKS_SUBMIT_ALLOC;
+ 	if (mode & FALLOC_FL_KEEP_SIZE)
+ 		flags |= EXT4_GET_BLOCKS_KEEP_SIZE;
+ 
+
