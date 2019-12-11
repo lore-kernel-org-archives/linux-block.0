@@ -2,141 +2,124 @@ Return-Path: <SRS0=X6jZ=2B=vger.kernel.org=linux-block-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-0.8 required=3.0 tests=DKIMWL_WL_HIGH,DKIM_SIGNED,
-	DKIM_VALID,DKIM_VALID_AU,HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,
-	SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED autolearn=no autolearn_force=no
-	version=3.4.0
+X-Spam-Status: No, score=-2.2 required=3.0 tests=DKIM_SIGNED,DKIM_VALID,
+	HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,
+	USER_AGENT_SANE_1 autolearn=no autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id EE19EC2D0C6
-	for <linux-block@archiver.kernel.org>; Wed, 11 Dec 2019 19:15:18 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 3F5B6C43603
+	for <linux-block@archiver.kernel.org>; Wed, 11 Dec 2019 19:34:45 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.kernel.org (Postfix) with ESMTP id C5F65206C3
-	for <linux-block@archiver.kernel.org>; Wed, 11 Dec 2019 19:15:18 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=default; t=1576091718;
-	bh=YO4QNve8tgPgMQhk2yTyorPpFpqk5lih6eM7fZNhjPM=;
-	h=References:In-Reply-To:From:Date:Subject:To:Cc:List-ID:From;
-	b=Is1wQ6BnXhG9I5oyA8FAVSlzPJC/Byhf4blS1sqeKGiDt1lGaMXcJpLXwgp/RSqns
-	 BzQLaJEdCwFQS7duzqkrNeZj/W3f3QGh6bb7l9MdQpREYF+V/E9JWO1GvBytiFIs5q
-	 jVVB2uohCNWrINWo+L2kHS6sJPjwaXBWMzU1/R4A=
+	by mail.kernel.org (Postfix) with ESMTP id 06F532173E
+	for <linux-block@archiver.kernel.org>; Wed, 11 Dec 2019 19:34:45 +0000 (UTC)
+Authentication-Results: mail.kernel.org;
+	dkim=pass (2048-bit key) header.d=kernel-dk.20150623.gappssmtp.com header.i=@kernel-dk.20150623.gappssmtp.com header.b="UEc8drWi"
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1726312AbfLKTPS (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Wed, 11 Dec 2019 14:15:18 -0500
-Received: from mail-lj1-f194.google.com ([209.85.208.194]:43610 "EHLO
-        mail-lj1-f194.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1726463AbfLKTPR (ORCPT
+        id S1726595AbfLKTeo (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Wed, 11 Dec 2019 14:34:44 -0500
+Received: from mail-pg1-f195.google.com ([209.85.215.195]:43751 "EHLO
+        mail-pg1-f195.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S1726242AbfLKTeo (ORCPT
         <rfc822;linux-block@vger.kernel.org>);
-        Wed, 11 Dec 2019 14:15:17 -0500
-Received: by mail-lj1-f194.google.com with SMTP id a13so25336005ljm.10
-        for <linux-block@vger.kernel.org>; Wed, 11 Dec 2019 11:15:16 -0800 (PST)
+        Wed, 11 Dec 2019 14:34:44 -0500
+Received: by mail-pg1-f195.google.com with SMTP id k197so757719pga.10
+        for <linux-block@vger.kernel.org>; Wed, 11 Dec 2019 11:34:44 -0800 (PST)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=linux-foundation.org; s=google;
-        h=mime-version:references:in-reply-to:from:date:message-id:subject:to
-         :cc;
-        bh=VOD7R27AsduJWVvdOr2UIanUZawLN4t/gENPDoXyCKs=;
-        b=VdTfqGW9GvpFK5GEtZfMWoXvDM0CVFcRYBxvTgJD7+rU2yW/orFNa/DB6iVh91TX0t
-         aDxZ9K5e9xBP74CjsXLZ6j+btdY5WwxvIgcQ3P7lR8WRNwUHrI70uAyCgm82AEi4TdHY
-         GbH2oENsGX414IFAn8/pU1MmiER9PTwnReX7M=
+        d=kernel-dk.20150623.gappssmtp.com; s=20150623;
+        h=subject:from:to:cc:references:message-id:date:user-agent
+         :mime-version:in-reply-to:content-language:content-transfer-encoding;
+        bh=oTBM3Y8vtSCzFzu0QQg+BVLSXCcLcCz6WCWWZBR21KA=;
+        b=UEc8drWiceCBzQdP4WwAoRAD4V9C8sKEg1FLZDGDXLCkv8SbOs8zwnIk4j4teD70TQ
+         zu3XDVEqS0EnJllQjOUM6+x7WDFpjiN4tCdoxtd96kpgrZuojVNnQ3WCdzO8hrIGimef
+         fnHc55Fbo/bxYc1XfbgqN+dNMxRvtkS8JevaSnJTIpvmwnaB67TAKCMCf14UO4Bl4zu5
+         UqJm0hPSbnuKp8beqgNeMsf3+YE1GCzj/K0Jz7y78tfQBKFvsoND1kjiaOAfHBmqr9kL
+         Hgm29eQ9eqkD1sv7X41r2IVl2JBbKD7xK/4WEFU32jHuSskS0ODdtjXYeUMqwtsz0s2e
+         nQzw==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=1e100.net; s=20161025;
-        h=x-gm-message-state:mime-version:references:in-reply-to:from:date
-         :message-id:subject:to:cc;
-        bh=VOD7R27AsduJWVvdOr2UIanUZawLN4t/gENPDoXyCKs=;
-        b=PM1eZThl5LG0XmdRNGMGHMX4Fv6wMIOmAyBoGiZdeSWSzx3mmcwkGWQ/xvrclaHBre
-         eKdgD7J5OgqVjEp6ymnBJEYv9kPR6O4h2hPaiiaNZX8hMD+ZIzqj0cwfllMGYpVAM6LV
-         24lUyjWqvsTUCu6lvDDtOXpxZmzwBujuiMOwMLwZh9yj0lF8s38hc/9un/ZjCwF0QTBn
-         gZg8tUelnJ/wf9IzhIDUGtrm4jbnyZWhD9N9inROUJJP0p6fuEJPTEGm6tkZxjpRFJCs
-         9QuBhkU3/3LDny61262L7hNzkDhftCs8Br4Ra5cMbv6FCW13tA3weBHtmJto2nyZv+Ex
-         XFOw==
-X-Gm-Message-State: APjAAAWaWMzEibEWneUW5gGc2izG4Z8uDPaZPS+u1qxCt48yHrUfpuA5
-        vCy9JdId2ojwWm/Wl4kmYgcFRS//xHA=
-X-Google-Smtp-Source: APXvYqzOHN7CCEOSTefnQkL0oyhCeqlrnq4tv72qqHI4hcdU0Quls0BtjsQFX1b2Yd1CxPA9IQ/VEw==
-X-Received: by 2002:a2e:144b:: with SMTP id 11mr3337876lju.216.1576091714541;
-        Wed, 11 Dec 2019 11:15:14 -0800 (PST)
-Received: from mail-lj1-f170.google.com (mail-lj1-f170.google.com. [209.85.208.170])
-        by smtp.gmail.com with ESMTPSA id g6sm1697494lja.10.2019.12.11.11.15.13
-        for <linux-block@vger.kernel.org>
+        h=x-gm-message-state:subject:from:to:cc:references:message-id:date
+         :user-agent:mime-version:in-reply-to:content-language
+         :content-transfer-encoding;
+        bh=oTBM3Y8vtSCzFzu0QQg+BVLSXCcLcCz6WCWWZBR21KA=;
+        b=SpI7/bmPxnatx61cw/UOlTzA+j8o8ayIVg+lSl3RlKgJ2nWVwvUNaIS3j/NAMuBPto
+         exShIDpAnWIusMJzXReXzdjwl90R8/e4MOYjFzU+iiNQ4ntXlY7jQYcJ3l9Z94uUp4DB
+         7KdTyHWZyauoJOq2x0B1YzZzdiH2C1fl+qW1CvVGPxwyelvTe3IobjyzNsh2PIaJFzx0
+         LHGDQhKXQtHuoaPSNwVIE7jnXqKURzLQK9rBooW6l2lE4Crd2VXazE9YR+3qSL5Dgp5R
+         50ppEaB6wTz3P5/61W682L5F6Tc/VzqXkwSQ6bu/ctgVylVQoZqpPabWTId8nLdOJsrC
+         Z91w==
+X-Gm-Message-State: APjAAAWUaGsFCXEoDMrVhQRkFbHJxR13ADolImIQgD8Ph/lWURZuKtk/
+        E7Ex7Ym/0EqgqRsYC4T9MKduDA==
+X-Google-Smtp-Source: APXvYqxakjCkHk+LpBa3tkB5k/nQDmnN7UkDoqLLam7NqycuO4Nc8u97kPkYrw0QIsVKOd/vBhCxbw==
+X-Received: by 2002:a63:66c6:: with SMTP id a189mr5515581pgc.401.1576092883494;
+        Wed, 11 Dec 2019 11:34:43 -0800 (PST)
+Received: from ?IPv6:2620:10d:c081:1130::1014? ([2620:10d:c090:180::50da])
+        by smtp.gmail.com with ESMTPSA id p38sm3138206pjp.27.2019.12.11.11.34.41
         (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
-        Wed, 11 Dec 2019 11:15:13 -0800 (PST)
-Received: by mail-lj1-f170.google.com with SMTP id e10so25329434ljj.6
-        for <linux-block@vger.kernel.org>; Wed, 11 Dec 2019 11:15:13 -0800 (PST)
-X-Received: by 2002:a2e:9041:: with SMTP id n1mr3339710ljg.133.1576091712754;
- Wed, 11 Dec 2019 11:15:12 -0800 (PST)
-MIME-Version: 1.0
-References: <20191211152943.2933-1-axboe@kernel.dk> <CAHk-=wjz3LE1kznro1dozhk9i9Dr4pCnkj7Fuccn2xdWeGHawQ@mail.gmail.com>
- <d0adcde2-3106-4fea-c047-4d17111bab70@kernel.dk>
-In-Reply-To: <d0adcde2-3106-4fea-c047-4d17111bab70@kernel.dk>
-From:   Linus Torvalds <torvalds@linux-foundation.org>
-Date:   Wed, 11 Dec 2019 11:14:56 -0800
-X-Gmail-Original-Message-ID: <CAHk-=wh_YwvNNikQ9yh7oqG5hyJE9tw+bXFft-mOQJ0n_v+a7g@mail.gmail.com>
-Message-ID: <CAHk-=wh_YwvNNikQ9yh7oqG5hyJE9tw+bXFft-mOQJ0n_v+a7g@mail.gmail.com>
+        Wed, 11 Dec 2019 11:34:42 -0800 (PST)
 Subject: Re: [PATCHSET v3 0/5] Support for RWF_UNCACHED
-To:     Jens Axboe <axboe@kernel.dk>, Johannes Weiner <hannes@cmpxchg.org>
+From:   Jens Axboe <axboe@kernel.dk>
+To:     Linus Torvalds <torvalds@linux-foundation.org>
 Cc:     Linux-MM <linux-mm@kvack.org>,
         linux-fsdevel <linux-fsdevel@vger.kernel.org>,
         linux-block <linux-block@vger.kernel.org>,
         Matthew Wilcox <willy@infradead.org>, Chris Mason <clm@fb.com>,
-        Dave Chinner <david@fromorbit.com>
-Content-Type: text/plain; charset="UTF-8"
+        Dave Chinner <david@fromorbit.com>,
+        Johannes Weiner <hannes@cmpxchg.org>
+References: <20191211152943.2933-1-axboe@kernel.dk>
+ <CAHk-=wjz3LE1kznro1dozhk9i9Dr4pCnkj7Fuccn2xdWeGHawQ@mail.gmail.com>
+ <d0adcde2-3106-4fea-c047-4d17111bab70@kernel.dk>
+Message-ID: <e43a2700-8625-e136-dc9d-d0d2da5d96ac@kernel.dk>
+Date:   Wed, 11 Dec 2019 12:34:40 -0700
+User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:68.0) Gecko/20100101
+ Thunderbird/68.2.2
+MIME-Version: 1.0
+In-Reply-To: <d0adcde2-3106-4fea-c047-4d17111bab70@kernel.dk>
+Content-Type: text/plain; charset=utf-8
+Content-Language: en-US
+Content-Transfer-Encoding: 8bit
 Sender: linux-block-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-[ Adding Johannes Weiner to the cc, I think he's looked at the working
-set and the inactive/active LRU lists the most ]
+On 12/11/19 10:56 AM, Jens Axboe wrote:
+>> But I think most of the regular IO call chains come through
+>> "mark_page_accessed()". So _that_ is the part you want to avoid (and
+>> maybe the workingset code). And that should be fairly straightforward,
+>> I think.
+> 
+> Sure, I can give that a go and see how that behaves.
 
-On Wed, Dec 11, 2019 at 9:56 AM Jens Axboe <axboe@kernel.dk> wrote:
->
-> > In fact, that you say that just a pure random read case causes lots of
-> > kswapd activity makes me think that maybe we've screwed up page
-> > activation in general, and never noticed (because if you have enough
-> > memory, you don't really see it that often)? So this might not be an
-> > io_ring issue, but an issue in general.
->
-> This is very much not an io_uring issue, you can see exactly the same
-> kind of behavior with normal buffered reads or mmap'ed IO. I do wonder
-> if streamed reads are as bad in terms of making kswapd go crazy, I
-> forget if I tested that explicitly as well.
+Before doing that, I ran a streamed read test instead of just random
+reads, and the behavior is roughly the same. kswapd consumes a bit less
+CPU, but it's still very active once the page cache has been filled. For
+specifics on the setup, I deliberately boot the box with 32G of RAM, and
+the dataset is 320G. My initial tests were with 1 320G file, but
+Johannes complained about that so I went to 32 10G files instead. That's
+what I'm currently using.
 
-We definitely used to have people test things like "read the same
-much-bigger-than-memory file over and over", and it wasn't supposed to
-be all _that_ painful, because the pages never activated, and they got
-moved out of the cache quickly and didn't disturb other activities
-(other than the constant IO, of course, which can be a big deal in
-itself).
+For the random test case, top of profile for kswapd is:
 
-But maybe that was just the streaming case. With read-around and
-random accesses, maybe we end up activating too much (and maybe we
-always did).
++   33.49%  kswapd0  [kernel.vmlinux]  [k] xas_create                          ◆
++    7.93%  kswapd0  [kernel.vmlinux]  [k] __isolate_lru_page                  ▒
++    7.18%  kswapd0  [kernel.vmlinux]  [k] unlock_page                         ▒
++    5.90%  kswapd0  [kernel.vmlinux]  [k] free_pcppages_bulk                  ▒
++    5.64%  kswapd0  [kernel.vmlinux]  [k] _raw_spin_lock_irqsave              ▒
++    5.57%  kswapd0  [kernel.vmlinux]  [k] shrink_page_list                    ▒
++    3.48%  kswapd0  [kernel.vmlinux]  [k] __remove_mapping                    ▒
++    3.35%  kswapd0  [kernel.vmlinux]  [k] isolate_lru_pages                   ▒
++    3.14%  kswapd0  [kernel.vmlinux]  [k] __delete_from_page_cache            ▒
 
-But I wouldn't be surprised if we've lost that as people went from
-having 16-32MB to having that many GB instead - simply because a lot
-of loads are basically entirely cached, and the few things that are
-not tend to be explicitly uncached (ie O_DIRECT etc).
+Next I ran with NOT calling mark_page_accessed() to see if that makes a
+difference. See patch below, I just applied this on top of this patchset
+and added a new RWF_NOACCESS flag for it for ease of teting. I verified
+that we are indeed skipping the mark_page_accessed() call in
+generic_file_buffered_read().
 
-I think the workingset changes actually were maybe kind of related to
-this - the inactive list can become too small to ever give people time
-to do a good job of picking the _right_ thing to activate.
+I can't tell a difference in the results, there's no discernable
+difference between NOT calling mark_page_accessed() or calling it.
+Behavior seems about the same, in terms of pre and post page cache full,
+and kswapd still churns a lot once the page cache is filled up.
 
-So this might either be the reverse situation - maybe we let the
-inactive list grow too large, and then even a big random load will
-activate pages that really shouldn't be activated? Or it might be
-related to the workingset issue in that we've activated pages too
-eagerly and not ever moved things back to the inactive list (which
-then in some situations causes the inactive list to be very small).
+-- 
+Jens Axboe
 
-Who knows. But this is definitely an area that I suspect hasn't gotten
-all that much attention simply because memory has become much more
-plentiful, and a lot of regular loads basically have enough memory
-that almost all IO is cached anyway, and the old "you needed to be
-more clever about balancing swap/inactive/active even under normal
-loads" thing may have gone away a bit.
-
-These days, even if you do somewhat badly in that balancing act, a lot
-of loads probably won't notice that much. Either there is still so
-much memory for caching that the added IO isn't really ever dominant,
-or you had such a big load to begin with that it was long since
-rewritten to use O_DIRECT.
-
-            Linus
