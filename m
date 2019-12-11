@@ -2,204 +2,141 @@ Return-Path: <SRS0=X6jZ=2B=vger.kernel.org=linux-block-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-9.6 required=3.0 tests=DKIM_SIGNED,DKIM_VALID,
-	DKIM_VALID_AU,FREEMAIL_FORGED_FROMDOMAIN,FREEMAIL_FROM,
-	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,
-	SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED,USER_AGENT_GIT autolearn=unavailable
-	autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-0.8 required=3.0 tests=DKIMWL_WL_HIGH,DKIM_SIGNED,
+	DKIM_VALID,DKIM_VALID_AU,HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,
+	SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED autolearn=no autolearn_force=no
+	version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 3409DC00454
-	for <linux-block@archiver.kernel.org>; Wed, 11 Dec 2019 18:11:02 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id EE19EC2D0C6
+	for <linux-block@archiver.kernel.org>; Wed, 11 Dec 2019 19:15:18 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.kernel.org (Postfix) with ESMTP id 048972077B
-	for <linux-block@archiver.kernel.org>; Wed, 11 Dec 2019 18:11:02 +0000 (UTC)
-Authentication-Results: mail.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="p7erjCGJ"
+	by mail.kernel.org (Postfix) with ESMTP id C5F65206C3
+	for <linux-block@archiver.kernel.org>; Wed, 11 Dec 2019 19:15:18 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+	s=default; t=1576091718;
+	bh=YO4QNve8tgPgMQhk2yTyorPpFpqk5lih6eM7fZNhjPM=;
+	h=References:In-Reply-To:From:Date:Subject:To:Cc:List-ID:From;
+	b=Is1wQ6BnXhG9I5oyA8FAVSlzPJC/Byhf4blS1sqeKGiDt1lGaMXcJpLXwgp/RSqns
+	 BzQLaJEdCwFQS7duzqkrNeZj/W3f3QGh6bb7l9MdQpREYF+V/E9JWO1GvBytiFIs5q
+	 jVVB2uohCNWrINWo+L2kHS6sJPjwaXBWMzU1/R4A=
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1731035AbfLKSK5 (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Wed, 11 Dec 2019 13:10:57 -0500
-Received: from mail-pl1-f195.google.com ([209.85.214.195]:37595 "EHLO
-        mail-pl1-f195.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1726242AbfLKSK5 (ORCPT
+        id S1726312AbfLKTPS (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Wed, 11 Dec 2019 14:15:18 -0500
+Received: from mail-lj1-f194.google.com ([209.85.208.194]:43610 "EHLO
+        mail-lj1-f194.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S1726463AbfLKTPR (ORCPT
         <rfc822;linux-block@vger.kernel.org>);
-        Wed, 11 Dec 2019 13:10:57 -0500
-Received: by mail-pl1-f195.google.com with SMTP id c23so1730094plz.4;
-        Wed, 11 Dec 2019 10:10:56 -0800 (PST)
+        Wed, 11 Dec 2019 14:15:17 -0500
+Received: by mail-lj1-f194.google.com with SMTP id a13so25336005ljm.10
+        for <linux-block@vger.kernel.org>; Wed, 11 Dec 2019 11:15:16 -0800 (PST)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20161025;
-        h=from:to:cc:subject:date:message-id:in-reply-to:references
-         :mime-version:content-transfer-encoding;
-        bh=DC1lDQTVGWiZyc47Vd2HTq0B83lbDHqEnIy5EBZ8fmk=;
-        b=p7erjCGJxie+gsJ5gNv6yyP8UEGIYUryfLkT29PiTkBlTy7xUvH/z4836TdtoFqPq6
-         0kOWqjKUKyWnLANLIGaOHzDqbrdrWlOmRopA+hPWSbLHxR2eGdkmQCCOTkoFtbYDtOH4
-         bJplBxvgrKhTSHyhjWkW7YpCMQ3fRG3/9l2OX7+94y3Jx+vwERpZNctRhm74MclskxZL
-         gvEb1jhOflVXMbmRLWEua5gQukz1S+5ZzpF32hTXB58kY0e0e/zWIPSO2ZSi39JzYJ2g
-         cSg7TMCr64sRse8S0sDD6tvApA/BUFO50Op3h/HKX359SzJPJco26MfKBSaDllzz0K5u
-         tlVQ==
+        d=linux-foundation.org; s=google;
+        h=mime-version:references:in-reply-to:from:date:message-id:subject:to
+         :cc;
+        bh=VOD7R27AsduJWVvdOr2UIanUZawLN4t/gENPDoXyCKs=;
+        b=VdTfqGW9GvpFK5GEtZfMWoXvDM0CVFcRYBxvTgJD7+rU2yW/orFNa/DB6iVh91TX0t
+         aDxZ9K5e9xBP74CjsXLZ6j+btdY5WwxvIgcQ3P7lR8WRNwUHrI70uAyCgm82AEi4TdHY
+         GbH2oENsGX414IFAn8/pU1MmiER9PTwnReX7M=
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=1e100.net; s=20161025;
-        h=x-gm-message-state:from:to:cc:subject:date:message-id:in-reply-to
-         :references:mime-version:content-transfer-encoding;
-        bh=DC1lDQTVGWiZyc47Vd2HTq0B83lbDHqEnIy5EBZ8fmk=;
-        b=rCj1jp/DLjKRzU1vEhbSU6l1Q7qffWWs7aMa8q53KOBH3+btqWtoMWoO00/xAMLFTg
-         AD5EPx3PJvsq7hz/3yzJDlrH9HkmS90d9yJ7DaNfllzWNTLbvEpnPut//xw/IfubkCLf
-         jTrw0RIVFPQRdHhzD2ablptrbjmg4XU2IRG7aTwV0rphK0/iAgUiu1VXabJwgzGNSI3H
-         DiMUhNdS02jW5h3eJl5xiKRxJ3WHyRLh8Y4Er0HUwQ3qV0++sh8EHWhKQGCbJv8a/skB
-         8sxXZQB6ZithtN2CUnQGqIpMOoA1svZnNqo2sknHF8MINDNwN5j2dfcQxDLnDSnwm4uU
-         7YlQ==
-X-Gm-Message-State: APjAAAW837VGV43UP6GZELhfjwQVnDFNzcLDpjJs5Brr7tCKA6rzZ+XJ
-        GvxQzh+OsnBA74Spsogyfcs=
-X-Google-Smtp-Source: APXvYqzKPe/LoYUjpZuEEK8kE1cO8ArSTwWZ2pZ6pRISRy4Kk7cykjY8qZRi1VdlMlV9HSKs3WQKqw==
-X-Received: by 2002:a17:902:6bc3:: with SMTP id m3mr4555759plt.185.1576087856306;
-        Wed, 11 Dec 2019 10:10:56 -0800 (PST)
-Received: from localhost.localdomain (campus-094-212.ucdavis.edu. [168.150.94.212])
-        by smtp.gmail.com with ESMTPSA id x33sm3552651pga.86.2019.12.11.10.10.55
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Wed, 11 Dec 2019 10:10:55 -0800 (PST)
-From:   SeongJae Park <sj38.park@gmail.com>
-X-Google-Original-From: SeongJae Park <sjpark@amazon.de>
-To:     jgross@suse.com, axboe@kernel.dk, konrad.wilk@oracle.com
-Cc:     SeongJae Park <sjpark@amazon.de>, pdurrant@amazon.com,
-        sjpark@amazon.com, sj38.park@gmail.com,
-        xen-devel@lists.xenproject.org, linux-block@vger.kernel.org,
-        linux-kernel@vger.kernel.org
-Subject: [PATCH v7 3/3] xen/blkback: Remove unnecessary static variable name prefixes
-Date:   Wed, 11 Dec 2019 18:10:16 +0000
-Message-Id: <20191211181016.14366-4-sjpark@amazon.de>
-X-Mailer: git-send-email 2.17.1
-In-Reply-To: <20191211181016.14366-1-sjpark@amazon.de>
-References: <20191211181016.14366-1-sjpark@amazon.de>
+        h=x-gm-message-state:mime-version:references:in-reply-to:from:date
+         :message-id:subject:to:cc;
+        bh=VOD7R27AsduJWVvdOr2UIanUZawLN4t/gENPDoXyCKs=;
+        b=PM1eZThl5LG0XmdRNGMGHMX4Fv6wMIOmAyBoGiZdeSWSzx3mmcwkGWQ/xvrclaHBre
+         eKdgD7J5OgqVjEp6ymnBJEYv9kPR6O4h2hPaiiaNZX8hMD+ZIzqj0cwfllMGYpVAM6LV
+         24lUyjWqvsTUCu6lvDDtOXpxZmzwBujuiMOwMLwZh9yj0lF8s38hc/9un/ZjCwF0QTBn
+         gZg8tUelnJ/wf9IzhIDUGtrm4jbnyZWhD9N9inROUJJP0p6fuEJPTEGm6tkZxjpRFJCs
+         9QuBhkU3/3LDny61262L7hNzkDhftCs8Br4Ra5cMbv6FCW13tA3weBHtmJto2nyZv+Ex
+         XFOw==
+X-Gm-Message-State: APjAAAWaWMzEibEWneUW5gGc2izG4Z8uDPaZPS+u1qxCt48yHrUfpuA5
+        vCy9JdId2ojwWm/Wl4kmYgcFRS//xHA=
+X-Google-Smtp-Source: APXvYqzOHN7CCEOSTefnQkL0oyhCeqlrnq4tv72qqHI4hcdU0Quls0BtjsQFX1b2Yd1CxPA9IQ/VEw==
+X-Received: by 2002:a2e:144b:: with SMTP id 11mr3337876lju.216.1576091714541;
+        Wed, 11 Dec 2019 11:15:14 -0800 (PST)
+Received: from mail-lj1-f170.google.com (mail-lj1-f170.google.com. [209.85.208.170])
+        by smtp.gmail.com with ESMTPSA id g6sm1697494lja.10.2019.12.11.11.15.13
+        for <linux-block@vger.kernel.org>
+        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
+        Wed, 11 Dec 2019 11:15:13 -0800 (PST)
+Received: by mail-lj1-f170.google.com with SMTP id e10so25329434ljj.6
+        for <linux-block@vger.kernel.org>; Wed, 11 Dec 2019 11:15:13 -0800 (PST)
+X-Received: by 2002:a2e:9041:: with SMTP id n1mr3339710ljg.133.1576091712754;
+ Wed, 11 Dec 2019 11:15:12 -0800 (PST)
 MIME-Version: 1.0
-Content-Type: text/plain; charset=UTF-8
-Content-Transfer-Encoding: 8bit
+References: <20191211152943.2933-1-axboe@kernel.dk> <CAHk-=wjz3LE1kznro1dozhk9i9Dr4pCnkj7Fuccn2xdWeGHawQ@mail.gmail.com>
+ <d0adcde2-3106-4fea-c047-4d17111bab70@kernel.dk>
+In-Reply-To: <d0adcde2-3106-4fea-c047-4d17111bab70@kernel.dk>
+From:   Linus Torvalds <torvalds@linux-foundation.org>
+Date:   Wed, 11 Dec 2019 11:14:56 -0800
+X-Gmail-Original-Message-ID: <CAHk-=wh_YwvNNikQ9yh7oqG5hyJE9tw+bXFft-mOQJ0n_v+a7g@mail.gmail.com>
+Message-ID: <CAHk-=wh_YwvNNikQ9yh7oqG5hyJE9tw+bXFft-mOQJ0n_v+a7g@mail.gmail.com>
+Subject: Re: [PATCHSET v3 0/5] Support for RWF_UNCACHED
+To:     Jens Axboe <axboe@kernel.dk>, Johannes Weiner <hannes@cmpxchg.org>
+Cc:     Linux-MM <linux-mm@kvack.org>,
+        linux-fsdevel <linux-fsdevel@vger.kernel.org>,
+        linux-block <linux-block@vger.kernel.org>,
+        Matthew Wilcox <willy@infradead.org>, Chris Mason <clm@fb.com>,
+        Dave Chinner <david@fromorbit.com>
+Content-Type: text/plain; charset="UTF-8"
 Sender: linux-block-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-A few of static variables in blkback have 'xen_blkif_' prefix, though it
-is unnecessary for static variables.  This commit removes such prefixes.
+[ Adding Johannes Weiner to the cc, I think he's looked at the working
+set and the inactive/active LRU lists the most ]
 
-Reviewed-by: Roger Pau Monné <roger.pau@citrix.com>
-Signed-off-by: SeongJae Park <sjpark@amazon.de>
----
- drivers/block/xen-blkback/blkback.c | 37 +++++++++++++----------------
- 1 file changed, 17 insertions(+), 20 deletions(-)
+On Wed, Dec 11, 2019 at 9:56 AM Jens Axboe <axboe@kernel.dk> wrote:
+>
+> > In fact, that you say that just a pure random read case causes lots of
+> > kswapd activity makes me think that maybe we've screwed up page
+> > activation in general, and never noticed (because if you have enough
+> > memory, you don't really see it that often)? So this might not be an
+> > io_ring issue, but an issue in general.
+>
+> This is very much not an io_uring issue, you can see exactly the same
+> kind of behavior with normal buffered reads or mmap'ed IO. I do wonder
+> if streamed reads are as bad in terms of making kswapd go crazy, I
+> forget if I tested that explicitly as well.
 
-diff --git a/drivers/block/xen-blkback/blkback.c b/drivers/block/xen-blkback/blkback.c
-index 98823d150905..f41c698dd854 100644
---- a/drivers/block/xen-blkback/blkback.c
-+++ b/drivers/block/xen-blkback/blkback.c
-@@ -62,8 +62,8 @@
-  * IO workloads.
-  */
- 
--static int xen_blkif_max_buffer_pages = 1024;
--module_param_named(max_buffer_pages, xen_blkif_max_buffer_pages, int, 0644);
-+static int max_buffer_pages = 1024;
-+module_param_named(max_buffer_pages, max_buffer_pages, int, 0644);
- MODULE_PARM_DESC(max_buffer_pages,
- "Maximum number of free pages to keep in each block backend buffer");
- 
-@@ -78,8 +78,8 @@ MODULE_PARM_DESC(max_buffer_pages,
-  * algorithm.
-  */
- 
--static int xen_blkif_max_pgrants = 1056;
--module_param_named(max_persistent_grants, xen_blkif_max_pgrants, int, 0644);
-+static int max_pgrants = 1056;
-+module_param_named(max_persistent_grants, max_pgrants, int, 0644);
- MODULE_PARM_DESC(max_persistent_grants,
-                  "Maximum number of grants to map persistently");
- 
-@@ -88,8 +88,8 @@ MODULE_PARM_DESC(max_persistent_grants,
-  * use. The time is in seconds, 0 means indefinitely long.
-  */
- 
--static unsigned int xen_blkif_pgrant_timeout = 60;
--module_param_named(persistent_grant_unused_seconds, xen_blkif_pgrant_timeout,
-+static unsigned int pgrant_timeout = 60;
-+module_param_named(persistent_grant_unused_seconds, pgrant_timeout,
- 		   uint, 0644);
- MODULE_PARM_DESC(persistent_grant_unused_seconds,
- 		 "Time in seconds an unused persistent grant is allowed to "
-@@ -137,9 +137,8 @@ module_param(log_stats, int, 0644);
- 
- static inline bool persistent_gnt_timeout(struct persistent_gnt *persistent_gnt)
- {
--	return xen_blkif_pgrant_timeout &&
--	       (jiffies - persistent_gnt->last_used >=
--		HZ * xen_blkif_pgrant_timeout);
-+	return pgrant_timeout && (jiffies - persistent_gnt->last_used >=
-+			HZ * pgrant_timeout);
- }
- 
- /* Once a memory pressure is detected, squeeze free page pools for a while. */
-@@ -249,7 +248,7 @@ static int add_persistent_gnt(struct xen_blkif_ring *ring,
- 	struct persistent_gnt *this;
- 	struct xen_blkif *blkif = ring->blkif;
- 
--	if (ring->persistent_gnt_c >= xen_blkif_max_pgrants) {
-+	if (ring->persistent_gnt_c >= max_pgrants) {
- 		if (!blkif->vbd.overflow_max_grants)
- 			blkif->vbd.overflow_max_grants = 1;
- 		return -EBUSY;
-@@ -412,14 +411,13 @@ static void purge_persistent_gnt(struct xen_blkif_ring *ring)
- 		goto out;
- 	}
- 
--	if (ring->persistent_gnt_c < xen_blkif_max_pgrants ||
--	    (ring->persistent_gnt_c == xen_blkif_max_pgrants &&
-+	if (ring->persistent_gnt_c < max_pgrants ||
-+	    (ring->persistent_gnt_c == max_pgrants &&
- 	    !ring->blkif->vbd.overflow_max_grants)) {
- 		num_clean = 0;
- 	} else {
--		num_clean = (xen_blkif_max_pgrants / 100) * LRU_PERCENT_CLEAN;
--		num_clean = ring->persistent_gnt_c - xen_blkif_max_pgrants +
--			    num_clean;
-+		num_clean = (max_pgrants / 100) * LRU_PERCENT_CLEAN;
-+		num_clean = ring->persistent_gnt_c - max_pgrants + num_clean;
- 		num_clean = min(ring->persistent_gnt_c, num_clean);
- 		pr_debug("Going to purge at least %u persistent grants\n",
- 			 num_clean);
-@@ -614,8 +612,7 @@ static void print_stats(struct xen_blkif_ring *ring)
- 		 current->comm, ring->st_oo_req,
- 		 ring->st_rd_req, ring->st_wr_req,
- 		 ring->st_f_req, ring->st_ds_req,
--		 ring->persistent_gnt_c,
--		 xen_blkif_max_pgrants);
-+		 ring->persistent_gnt_c, max_pgrants);
- 	ring->st_print = jiffies + msecs_to_jiffies(10 * 1000);
- 	ring->st_rd_req = 0;
- 	ring->st_wr_req = 0;
-@@ -675,7 +672,7 @@ int xen_blkif_schedule(void *arg)
- 		if (time_before(jiffies, buffer_squeeze_end))
- 			shrink_free_pagepool(ring, 0);
- 		else
--			shrink_free_pagepool(ring, xen_blkif_max_buffer_pages);
-+			shrink_free_pagepool(ring, max_buffer_pages);
- 
- 		if (log_stats && time_after(jiffies, ring->st_print))
- 			print_stats(ring);
-@@ -902,7 +899,7 @@ static int xen_blkbk_map(struct xen_blkif_ring *ring,
- 			continue;
- 		}
- 		if (use_persistent_gnts &&
--		    ring->persistent_gnt_c < xen_blkif_max_pgrants) {
-+		    ring->persistent_gnt_c < max_pgrants) {
- 			/*
- 			 * We are using persistent grants, the grant is
- 			 * not mapped but we might have room for it.
-@@ -929,7 +926,7 @@ static int xen_blkbk_map(struct xen_blkif_ring *ring,
- 			pages[seg_idx]->persistent_gnt = persistent_gnt;
- 			pr_debug("grant %u added to the tree of persistent grants, using %u/%u\n",
- 				 persistent_gnt->gnt, ring->persistent_gnt_c,
--				 xen_blkif_max_pgrants);
-+				 max_pgrants);
- 			goto next;
- 		}
- 		if (use_persistent_gnts && !blkif->vbd.overflow_max_grants) {
--- 
-2.17.1
+We definitely used to have people test things like "read the same
+much-bigger-than-memory file over and over", and it wasn't supposed to
+be all _that_ painful, because the pages never activated, and they got
+moved out of the cache quickly and didn't disturb other activities
+(other than the constant IO, of course, which can be a big deal in
+itself).
 
+But maybe that was just the streaming case. With read-around and
+random accesses, maybe we end up activating too much (and maybe we
+always did).
+
+But I wouldn't be surprised if we've lost that as people went from
+having 16-32MB to having that many GB instead - simply because a lot
+of loads are basically entirely cached, and the few things that are
+not tend to be explicitly uncached (ie O_DIRECT etc).
+
+I think the workingset changes actually were maybe kind of related to
+this - the inactive list can become too small to ever give people time
+to do a good job of picking the _right_ thing to activate.
+
+So this might either be the reverse situation - maybe we let the
+inactive list grow too large, and then even a big random load will
+activate pages that really shouldn't be activated? Or it might be
+related to the workingset issue in that we've activated pages too
+eagerly and not ever moved things back to the inactive list (which
+then in some situations causes the inactive list to be very small).
+
+Who knows. But this is definitely an area that I suspect hasn't gotten
+all that much attention simply because memory has become much more
+plentiful, and a lot of regular loads basically have enough memory
+that almost all IO is cached anyway, and the old "you needed to be
+more clever about balancing swap/inactive/active even under normal
+loads" thing may have gone away a bit.
+
+These days, even if you do somewhat badly in that balancing act, a lot
+of loads probably won't notice that much. Either there is still so
+much memory for caching that the added IO isn't really ever dominant,
+or you had such a big load to begin with that it was long since
+rewritten to use O_DIRECT.
+
+            Linus
