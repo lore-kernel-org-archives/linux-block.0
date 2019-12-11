@@ -2,124 +2,105 @@ Return-Path: <SRS0=X6jZ=2B=vger.kernel.org=linux-block-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-2.2 required=3.0 tests=DKIM_SIGNED,DKIM_VALID,
-	HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,
-	USER_AGENT_SANE_1 autolearn=no autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-3.9 required=3.0 tests=DKIMWL_WL_HIGH,DKIM_SIGNED,
+	DKIM_VALID,DKIM_VALID_AU,HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,
+	SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED autolearn=no
+	autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 3F5B6C43603
-	for <linux-block@archiver.kernel.org>; Wed, 11 Dec 2019 19:34:45 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id B742DC43603
+	for <linux-block@archiver.kernel.org>; Wed, 11 Dec 2019 19:36:25 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.kernel.org (Postfix) with ESMTP id 06F532173E
-	for <linux-block@archiver.kernel.org>; Wed, 11 Dec 2019 19:34:45 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id 7464C2173E
+	for <linux-block@archiver.kernel.org>; Wed, 11 Dec 2019 19:36:25 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel-dk.20150623.gappssmtp.com header.i=@kernel-dk.20150623.gappssmtp.com header.b="UEc8drWi"
+	dkim=pass (1024-bit key) header.d=amazon.com header.i=@amazon.com header.b="HCb94Ede"
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1726595AbfLKTeo (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Wed, 11 Dec 2019 14:34:44 -0500
-Received: from mail-pg1-f195.google.com ([209.85.215.195]:43751 "EHLO
-        mail-pg1-f195.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1726242AbfLKTeo (ORCPT
+        id S1726487AbfLKTgY (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Wed, 11 Dec 2019 14:36:24 -0500
+Received: from smtp-fw-9102.amazon.com ([207.171.184.29]:7620 "EHLO
+        smtp-fw-9102.amazon.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S1726444AbfLKTgY (ORCPT
         <rfc822;linux-block@vger.kernel.org>);
-        Wed, 11 Dec 2019 14:34:44 -0500
-Received: by mail-pg1-f195.google.com with SMTP id k197so757719pga.10
-        for <linux-block@vger.kernel.org>; Wed, 11 Dec 2019 11:34:44 -0800 (PST)
+        Wed, 11 Dec 2019 14:36:24 -0500
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=kernel-dk.20150623.gappssmtp.com; s=20150623;
-        h=subject:from:to:cc:references:message-id:date:user-agent
-         :mime-version:in-reply-to:content-language:content-transfer-encoding;
-        bh=oTBM3Y8vtSCzFzu0QQg+BVLSXCcLcCz6WCWWZBR21KA=;
-        b=UEc8drWiceCBzQdP4WwAoRAD4V9C8sKEg1FLZDGDXLCkv8SbOs8zwnIk4j4teD70TQ
-         zu3XDVEqS0EnJllQjOUM6+x7WDFpjiN4tCdoxtd96kpgrZuojVNnQ3WCdzO8hrIGimef
-         fnHc55Fbo/bxYc1XfbgqN+dNMxRvtkS8JevaSnJTIpvmwnaB67TAKCMCf14UO4Bl4zu5
-         UqJm0hPSbnuKp8beqgNeMsf3+YE1GCzj/K0Jz7y78tfQBKFvsoND1kjiaOAfHBmqr9kL
-         Hgm29eQ9eqkD1sv7X41r2IVl2JBbKD7xK/4WEFU32jHuSskS0ODdtjXYeUMqwtsz0s2e
-         nQzw==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20161025;
-        h=x-gm-message-state:subject:from:to:cc:references:message-id:date
-         :user-agent:mime-version:in-reply-to:content-language
-         :content-transfer-encoding;
-        bh=oTBM3Y8vtSCzFzu0QQg+BVLSXCcLcCz6WCWWZBR21KA=;
-        b=SpI7/bmPxnatx61cw/UOlTzA+j8o8ayIVg+lSl3RlKgJ2nWVwvUNaIS3j/NAMuBPto
-         exShIDpAnWIusMJzXReXzdjwl90R8/e4MOYjFzU+iiNQ4ntXlY7jQYcJ3l9Z94uUp4DB
-         7KdTyHWZyauoJOq2x0B1YzZzdiH2C1fl+qW1CvVGPxwyelvTe3IobjyzNsh2PIaJFzx0
-         LHGDQhKXQtHuoaPSNwVIE7jnXqKURzLQK9rBooW6l2lE4Crd2VXazE9YR+3qSL5Dgp5R
-         50ppEaB6wTz3P5/61W682L5F6Tc/VzqXkwSQ6bu/ctgVylVQoZqpPabWTId8nLdOJsrC
-         Z91w==
-X-Gm-Message-State: APjAAAWUaGsFCXEoDMrVhQRkFbHJxR13ADolImIQgD8Ph/lWURZuKtk/
-        E7Ex7Ym/0EqgqRsYC4T9MKduDA==
-X-Google-Smtp-Source: APXvYqxakjCkHk+LpBa3tkB5k/nQDmnN7UkDoqLLam7NqycuO4Nc8u97kPkYrw0QIsVKOd/vBhCxbw==
-X-Received: by 2002:a63:66c6:: with SMTP id a189mr5515581pgc.401.1576092883494;
-        Wed, 11 Dec 2019 11:34:43 -0800 (PST)
-Received: from ?IPv6:2620:10d:c081:1130::1014? ([2620:10d:c090:180::50da])
-        by smtp.gmail.com with ESMTPSA id p38sm3138206pjp.27.2019.12.11.11.34.41
-        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
-        Wed, 11 Dec 2019 11:34:42 -0800 (PST)
-Subject: Re: [PATCHSET v3 0/5] Support for RWF_UNCACHED
-From:   Jens Axboe <axboe@kernel.dk>
-To:     Linus Torvalds <torvalds@linux-foundation.org>
-Cc:     Linux-MM <linux-mm@kvack.org>,
-        linux-fsdevel <linux-fsdevel@vger.kernel.org>,
-        linux-block <linux-block@vger.kernel.org>,
-        Matthew Wilcox <willy@infradead.org>, Chris Mason <clm@fb.com>,
-        Dave Chinner <david@fromorbit.com>,
-        Johannes Weiner <hannes@cmpxchg.org>
-References: <20191211152943.2933-1-axboe@kernel.dk>
- <CAHk-=wjz3LE1kznro1dozhk9i9Dr4pCnkj7Fuccn2xdWeGHawQ@mail.gmail.com>
- <d0adcde2-3106-4fea-c047-4d17111bab70@kernel.dk>
-Message-ID: <e43a2700-8625-e136-dc9d-d0d2da5d96ac@kernel.dk>
-Date:   Wed, 11 Dec 2019 12:34:40 -0700
-User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:68.0) Gecko/20100101
- Thunderbird/68.2.2
-MIME-Version: 1.0
-In-Reply-To: <d0adcde2-3106-4fea-c047-4d17111bab70@kernel.dk>
-Content-Type: text/plain; charset=utf-8
+  d=amazon.com; i=@amazon.com; q=dns/txt; s=amazon201209;
+  t=1576092984; x=1607628984;
+  h=from:to:cc:subject:date:message-id:references:
+   in-reply-to:content-id:content-transfer-encoding:
+   mime-version;
+  bh=D/AQrht491ZPuSkniyC8AF1uSsDZTxSScktHXQ9tcas=;
+  b=HCb94EdeBwNV7jkGisM1/b6B6tK1y0AZM3D0flcAVPAnQx/2KY/rnMMZ
+   WTMSV+fDcA/KlkSX7zWrgaHpztipk0Oits9nSwNeSVhrxQYzUdTCz+22X
+   nUwKRfDMfs2QOYDeovPOVy1n9Gkl/3QgAIfC3TEMqc/ebL87U+yDTxodz
+   Y=;
+IronPort-SDR: 7kOHZMP+PPKT5dumufzq2UMtwAG5aP/xGikeM+OabQlSKdSYXfor3mTs9QQCWKGTMkgOm2ZvsG
+ ZPnHUPl7HBFQ==
+X-IronPort-AV: E=Sophos;i="5.69,303,1571702400"; 
+   d="scan'208";a="12985776"
+Received: from sea32-co-svc-lb4-vlan3.sea.corp.amazon.com (HELO email-inbound-relay-2a-e7be2041.us-west-2.amazon.com) ([10.47.23.38])
+  by smtp-border-fw-out-9102.sea19.amazon.com with ESMTP; 11 Dec 2019 19:36:11 +0000
+Received: from EX13MTAUWB001.ant.amazon.com (pdx4-ws-svc-p6-lb7-vlan2.pdx.amazon.com [10.170.41.162])
+        by email-inbound-relay-2a-e7be2041.us-west-2.amazon.com (Postfix) with ESMTPS id 2B294A22B0;
+        Wed, 11 Dec 2019 19:36:10 +0000 (UTC)
+Received: from EX13D11UWB003.ant.amazon.com (10.43.161.206) by
+ EX13MTAUWB001.ant.amazon.com (10.43.161.207) with Microsoft SMTP Server (TLS)
+ id 15.0.1367.3; Wed, 11 Dec 2019 19:36:09 +0000
+Received: from EX13D01UWB002.ant.amazon.com (10.43.161.136) by
+ EX13D11UWB003.ant.amazon.com (10.43.161.206) with Microsoft SMTP Server (TLS)
+ id 15.0.1367.3; Wed, 11 Dec 2019 19:36:09 +0000
+Received: from EX13D01UWB002.ant.amazon.com ([10.43.161.136]) by
+ EX13d01UWB002.ant.amazon.com ([10.43.161.136]) with mapi id 15.00.1367.000;
+ Wed, 11 Dec 2019 19:36:09 +0000
+From:   "Singh, Balbir" <sblbir@amazon.com>
+To:     "linux-block@vger.kernel.org" <linux-block@vger.kernel.org>
+CC:     "hch@lst.de" <hch@lst.de>,
+        "linux-kernel@vger.kernel.org" <linux-kernel@vger.kernel.org>,
+        "jejb@linux.ibm.com" <jejb@linux.ibm.com>,
+        "linux-nvme@lists.infradead.org" <linux-nvme@lists.infradead.org>,
+        "mst@redhat.com" <mst@redhat.com>,
+        "axboe@kernel.dk" <axboe@kernel.dk>,
+        "Sangaraju, Someswarudu" <ssomesh@amazon.com>
+Subject: Re: [RFC PATCH] block/genhd: Notify udev about capacity change
+Thread-Topic: [RFC PATCH] block/genhd: Notify udev about capacity change
+Thread-Index: AQHVrwYjh2l0GmmZOEmELsmopgOsAqe1Vm2A
+Date:   Wed, 11 Dec 2019 19:36:09 +0000
+Message-ID: <3e23c39e2d6c99ce8bdae370de36f7479b6dab95.camel@amazon.com>
+References: <20191210030131.4198-1-sblbir@amazon.com>
+In-Reply-To: <20191210030131.4198-1-sblbir@amazon.com>
+Accept-Language: en-GB, en-US
 Content-Language: en-US
-Content-Transfer-Encoding: 8bit
+X-MS-Has-Attach: 
+X-MS-TNEF-Correlator: 
+x-ms-exchange-messagesentrepresentingtype: 1
+x-ms-exchange-transport-fromentityheader: Hosted
+x-originating-ip: [10.43.162.171]
+Content-Type: text/plain; charset="utf-8"
+Content-ID: <04931DD686A9514F94F948B5E992FB49@amazon.com>
+Content-Transfer-Encoding: base64
+MIME-Version: 1.0
 Sender: linux-block-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-On 12/11/19 10:56 AM, Jens Axboe wrote:
->> But I think most of the regular IO call chains come through
->> "mark_page_accessed()". So _that_ is the part you want to avoid (and
->> maybe the workingset code). And that should be fairly straightforward,
->> I think.
-> 
-> Sure, I can give that a go and see how that behaves.
-
-Before doing that, I ran a streamed read test instead of just random
-reads, and the behavior is roughly the same. kswapd consumes a bit less
-CPU, but it's still very active once the page cache has been filled. For
-specifics on the setup, I deliberately boot the box with 32G of RAM, and
-the dataset is 320G. My initial tests were with 1 320G file, but
-Johannes complained about that so I went to 32 10G files instead. That's
-what I'm currently using.
-
-For the random test case, top of profile for kswapd is:
-
-+   33.49%  kswapd0  [kernel.vmlinux]  [k] xas_create                          ◆
-+    7.93%  kswapd0  [kernel.vmlinux]  [k] __isolate_lru_page                  ▒
-+    7.18%  kswapd0  [kernel.vmlinux]  [k] unlock_page                         ▒
-+    5.90%  kswapd0  [kernel.vmlinux]  [k] free_pcppages_bulk                  ▒
-+    5.64%  kswapd0  [kernel.vmlinux]  [k] _raw_spin_lock_irqsave              ▒
-+    5.57%  kswapd0  [kernel.vmlinux]  [k] shrink_page_list                    ▒
-+    3.48%  kswapd0  [kernel.vmlinux]  [k] __remove_mapping                    ▒
-+    3.35%  kswapd0  [kernel.vmlinux]  [k] isolate_lru_pages                   ▒
-+    3.14%  kswapd0  [kernel.vmlinux]  [k] __delete_from_page_cache            ▒
-
-Next I ran with NOT calling mark_page_accessed() to see if that makes a
-difference. See patch below, I just applied this on top of this patchset
-and added a new RWF_NOACCESS flag for it for ease of teting. I verified
-that we are indeed skipping the mark_page_accessed() call in
-generic_file_buffered_read().
-
-I can't tell a difference in the results, there's no discernable
-difference between NOT calling mark_page_accessed() or calling it.
-Behavior seems about the same, in terms of pre and post page cache full,
-and kswapd still churns a lot once the page cache is filled up.
-
--- 
-Jens Axboe
-
+T24gVHVlLCAyMDE5LTEyLTEwIGF0IDAzOjAxICswMDAwLCBCYWxiaXIgU2luZ2ggd3JvdGU6DQo+
+IEFsbG93IGJsb2NrL2dlbmhkIHRvIG5vdGlmeSB1c2VyIHNwYWNlICh2aWEgdWRldikgYWJvdXQg
+ZGlzayBzaXplIGNoYW5nZXMNCj4gdXNpbmcgYSBuZXcgaGVscGVyIGRpc2tfc2V0X2NhcGFjaXR5
+KCksIHdoaWNoIGlzIGEgd3JhcHBlciBvbiB0b3ANCj4gb2Ygc2V0X2NhcGFjaXR5KCkuIGRpc2tf
+c2V0X2NhcGFjaXR5KCkgd2lsbCBvbmx5IG5vdGlmeSB2aWEgdWRldiBpZg0KPiB0aGUgY3VycmVu
+dCBjYXBhY2l0eSBvciB0aGUgdGFyZ2V0IGNhcGFjaXR5IGlzIG5vdCB6ZXJvLg0KPiANCj4gZGlz
+a19zZXRfY2FwYWNpdHkoKSBpcyBub3QgZW5hYmxlZCBmb3IgYWxsIGRldmljZXMsIGp1c3Qgdmly
+dGlvIGJsb2NrLA0KPiB4ZW4tYmxvY2tmcm9udCwgbnZtZSBhbmQgc2QuIE93bmVycyBvZiBvdGhl
+ciBibG9jayBkaXNrIGRldmljZXMgY2FuDQo+IGVhc2lseSBtb3ZlIG92ZXIgYnkgY2hhbmdpbmcg
+c2V0X2NhcGFjaXR5KCkgdG8gZGlza19zZXRfY2FwYWNpdHkoKQ0KPiANCj4gQmFja2dyb3VuZDoN
+Cj4gDQo+IEFzIGEgcGFydCBvZiBhIHBhdGNoIHRvIGFsbG93IHNlbmRpbmcgdGhlIFJFU0laRSBl
+dmVudCBvbiBkaXNrIGNhcGFjaXR5DQo+IGNoYW5nZSwgQ2hyaXN0b3BoIChoY2hAbHN0LmRlKSBy
+ZXF1ZXN0ZWQgdGhhdCB0aGUgcGF0Y2ggYmUgbWFkZSBnZW5lcmljDQo+IGFuZCB0aGUgaGFja3Mg
+Zm9yIHZpcnRpbyBibG9jayBhbmQgeGVuIGJsb2NrIGRldmljZXMgYmUgcmVtb3ZlZCBhbmQNCj4g
+bWVyZ2VkIHZpYSBhIGdlbmVyaWMgaGVscGVyLg0KPiANCj4gVGVzdGluZzoNCj4gMS4gSSBkaWQg
+c29tZSBiYXNpYyB0ZXN0aW5nIHdpdGggYW4gTlZNRSBkZXZpY2UsIGJ5IHJlc2l6aW5nIGl0IGlu
+DQo+IHRoZSBiYWNrZW5kIGFuZCBlbnN1cmVkIHRoYXQgdWRldmQgcmVjZWl2ZWQgdGhlIGV2ZW50
+Lg0KPiANCj4gU3VnZ2VzdGVkLWJ5OiBDaHJpc3RvcGggSGVsbHdpZyA8aGNoQGxzdC5kZT4NCj4g
+U2lnbmVkLW9mZi1ieTogQmFsYmlyIFNpbmdoIDxzYmxiaXJAYW1hem9uLmNvbT4NCj4gU2lnbmVk
+LW9mZi1ieTogU29tZXN3YXJ1ZHUgU2FuZ2FyYWp1IDxzc29tZXNoQGFtYXpvbi5jb20+DQo+IA0K
+DQpBbnkgZmVlZGJhY2sgb24gdGhlIFJGQz8NCg0KQmFsYmlyIFNpbmdoLg0K
