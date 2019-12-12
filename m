@@ -2,154 +2,134 @@ Return-Path: <SRS0=VRi+=2C=vger.kernel.org=linux-block-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-5.8 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
-	MAILING_LIST_MULTI,MENTIONS_GIT_HOSTING,SPF_HELO_NONE,SPF_PASS
-	autolearn=unavailable autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-0.8 required=3.0 tests=DKIM_SIGNED,DKIM_VALID,
+	DKIM_VALID_AU,HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SPF_HELO_NONE,
+	SPF_PASS autolearn=no autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 17085C2D0C8
-	for <linux-block@archiver.kernel.org>; Thu, 12 Dec 2019 10:55:18 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 4E387C43603
+	for <linux-block@archiver.kernel.org>; Thu, 12 Dec 2019 11:20:15 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.kernel.org (Postfix) with ESMTP id ECBDF214D8
-	for <linux-block@archiver.kernel.org>; Thu, 12 Dec 2019 10:55:17 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id 2315A22B48
+	for <linux-block@archiver.kernel.org>; Thu, 12 Dec 2019 11:20:15 +0000 (UTC)
+Authentication-Results: mail.kernel.org;
+	dkim=pass (2048-bit key) header.d=linaro.org header.i=@linaro.org header.b="ejIqzn/R"
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1728850AbfLLKzR convert rfc822-to-8bit (ORCPT
-        <rfc822;linux-block@archiver.kernel.org>);
-        Thu, 12 Dec 2019 05:55:17 -0500
-Received: from luna.lichtvoll.de ([194.150.191.11]:55953 "EHLO
-        mail.lichtvoll.de" rhost-flags-OK-OK-OK-FAIL) by vger.kernel.org
-        with ESMTP id S1728802AbfLLKzR (ORCPT
+        id S1728966AbfLLLUO (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Thu, 12 Dec 2019 06:20:14 -0500
+Received: from mail-lj1-f193.google.com ([209.85.208.193]:45124 "EHLO
+        mail-lj1-f193.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S1728959AbfLLLUO (ORCPT
         <rfc822;linux-block@vger.kernel.org>);
-        Thu, 12 Dec 2019 05:55:17 -0500
-X-Greylist: delayed 604 seconds by postgrey-1.27 at vger.kernel.org; Thu, 12 Dec 2019 05:55:16 EST
-Received: from 127.0.0.1 (localhost [127.0.0.1])
-        (using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
-         key-exchange X25519 server-signature RSA-PSS (4096 bits) server-digest SHA256)
-        (No client certificate requested)
-        by mail.lichtvoll.de (Postfix) with ESMTPSA id 1A8D699848;
-        Thu, 12 Dec 2019 11:45:07 +0100 (CET)
-From:   Martin Steigerwald <martin@lichtvoll.de>
-To:     Jens Axboe <axboe@kernel.dk>
-Cc:     linux-mm@kvack.org, linux-fsdevel@vger.kernel.org,
-        linux-block@vger.kernel.org, willy@infradead.org, clm@fb.com,
-        torvalds@linux-foundation.org, david@fromorbit.com
-Subject: Re: [PATCHSET v3 0/5] Support for RWF_UNCACHED
-Date:   Thu, 12 Dec 2019 11:44:59 +0100
-Message-ID: <63049728.ylUViGSH3C@merkaba>
-In-Reply-To: <20191211152943.2933-1-axboe@kernel.dk>
-References: <20191211152943.2933-1-axboe@kernel.dk>
+        Thu, 12 Dec 2019 06:20:14 -0500
+Received: by mail-lj1-f193.google.com with SMTP id d20so1815709ljc.12
+        for <linux-block@vger.kernel.org>; Thu, 12 Dec 2019 03:20:13 -0800 (PST)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=linaro.org; s=google;
+        h=mime-version:references:in-reply-to:from:date:message-id:subject:to
+         :cc;
+        bh=P1W0z4HqV64jzJwtaYcGadzOgRZCn2v4chbYC9m9FGs=;
+        b=ejIqzn/RWAjyKo7RBVFzhGkFkF2lSZiGd2eJMd8SI1r0ISOjFbygsYsgAQN8XmQzQk
+         0lLFXQhwKM1eITsy4avAQxAh9YW73FCSxA30SOO4ebLCpg54/FqhH1kVEkL7cqr550+3
+         I9a9nPQN0ywXQrPzcfOaggdXetKiYHLmJjI+1DZc9EUMx2O/iWPayKLBlkjZYv4V8NgJ
+         nan9YSgU3ufNHuyQvCbLyfmekHqbVqfxJNEwf9KzEqsovts3q/fPjhlFqhuzDFb1nWyW
+         xAcA0eUqzW/MADBAAmUvKLx8NNJDQc7mcfuqeaYrbAn5Geo/v9v5h5dAUr3AVBKVcV47
+         h5mw==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20161025;
+        h=x-gm-message-state:mime-version:references:in-reply-to:from:date
+         :message-id:subject:to:cc;
+        bh=P1W0z4HqV64jzJwtaYcGadzOgRZCn2v4chbYC9m9FGs=;
+        b=sDct5llod5x3UA35cRor4xztZJg0ws7AOpWeZ4WXkwcgr7H7wwxZkHytHoXgJVizhP
+         aFgDs48uF2TE3RaL86lA2mo7zy7tVpLYfvwdT1n80VdjiRHkNEOzczWU61a1n1WC7H+2
+         JNjV9MsfvWQrXjttBM4gxtzge7DtlfaSyypXSU7uxobpT6mTivDMNP7Qt8aA8ZTYoZmw
+         Yb4XFH4lWHHth/tLePBggTzO4Ba2HiZBhWs7r66m1BXuboVqSgdFK3eBpQMKvbn3FD/J
+         wVCyLnyOiTs7AD13TfAFZuuvmqOY8YENEkcstarldUBD6BbFHfMNdi4VPztRwoHAagwi
+         bqeQ==
+X-Gm-Message-State: APjAAAWM0r5TGZObv//oQb9635QQfaZWMr2kZtws3aXx3lDDj7qLSEAy
+        gCTVjEh4tXea50r3ADOErir/CukpeHDFgSrfjH2kpg==
+X-Google-Smtp-Source: APXvYqwcNMZYiNwnTt8iXUn4bZLBe/VVIuZbWOxdaGwBRPCIZF6vo/z0Flel1o/NxhVXsNhFkAgOrX3kstFVUuexBm4=
+X-Received: by 2002:a2e:9a51:: with SMTP id k17mr5118022ljj.206.1576149612570;
+ Thu, 12 Dec 2019 03:20:12 -0800 (PST)
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8BIT
+References: <20191120220313.GC18056@pauld.bos.csb> <20191121132937.GW4114@hirez.programming.kicks-ass.net>
+ <20191209165122.GA27229@linux.vnet.ibm.com> <20191209231743.GA19256@dread.disaster.area>
+ <20191210054330.GF27253@linux.vnet.ibm.com> <20191210172307.GD9139@linux.vnet.ibm.com>
+ <20191211173829.GB21797@linux.vnet.ibm.com> <20191211224617.GE19256@dread.disaster.area>
+ <20191212101031.GV2827@hirez.programming.kicks-ass.net> <20191212101424.GH2871@hirez.programming.kicks-ass.net>
+ <20191212102327.GI2871@hirez.programming.kicks-ass.net>
+In-Reply-To: <20191212102327.GI2871@hirez.programming.kicks-ass.net>
+From:   Vincent Guittot <vincent.guittot@linaro.org>
+Date:   Thu, 12 Dec 2019 12:20:01 +0100
+Message-ID: <CAKfTPtCUm5vuvNiWszJ5tWHxmcZ2v_KexOxnBHLUkBcqC-P3fw@mail.gmail.com>
+Subject: Re: [PATCH v4] sched/core: Preempt current task in favour of bound kthread
+To:     Peter Zijlstra <peterz@infradead.org>
+Cc:     Dave Chinner <david@fromorbit.com>,
+        Srikar Dronamraju <srikar@linux.vnet.ibm.com>,
+        Phil Auld <pauld@redhat.com>, Ming Lei <ming.lei@redhat.com>,
+        linux-block <linux-block@vger.kernel.org>,
+        linux-fs <linux-fsdevel@vger.kernel.org>,
+        linux-xfs <linux-xfs@vger.kernel.org>,
+        linux-kernel <linux-kernel@vger.kernel.org>,
+        Jeff Moyer <jmoyer@redhat.com>,
+        Dave Chinner <dchinner@redhat.com>,
+        Eric Sandeen <sandeen@redhat.com>,
+        Christoph Hellwig <hch@lst.de>, Jens Axboe <axboe@kernel.dk>,
+        Ingo Molnar <mingo@redhat.com>, Tejun Heo <tj@kernel.org>
 Content-Type: text/plain; charset="UTF-8"
-Authentication-Results: mail.lichtvoll.de;
-        auth=pass smtp.auth=martin smtp.mailfrom=martin@lichtvoll.de
 Sender: linux-block-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-Hi Jens.
+On Thu, 12 Dec 2019 at 11:23, Peter Zijlstra <peterz@infradead.org> wrote:
+>
+> On Thu, Dec 12, 2019 at 11:14:24AM +0100, Peter Zijlstra wrote:
+> > On Thu, Dec 12, 2019 at 11:10:31AM +0100, Peter Zijlstra wrote:
+> > > @@ -4156,13 +4159,13 @@ check_preempt_tick(struct cfs_rq *cfs_rq, struct sched_entity *curr)
+> > >     if (delta_exec < sysctl_sched_min_granularity)
+> > >             return;
+> > >
+> > > -   se = __pick_first_entity(cfs_rq);
+> > > +   se = __pick_next_entity(cfs_rq, NULL);
+> > >     delta = curr->vruntime - se->vruntime;
+> > >
+> > >     if (delta < 0)
+> > >             return;
+> >
+> > What I mean with the below comment is, when this isn't enough, try
+> > something like:
+> >
+> >       if (se == cfs_rq->next)
+> >               ideal_runtime /= 2;
+> >
+> > to make it yield sooner to 'next' buddies. Sadly, due to the whole
+> > cgroup mess, we can't say what actual task is on the end of it (without
+> > doing a full hierarchy pick, which is more expensive still).
+>
+> Just for giggles, that'd look something like:
+>
+>         while (!entity_is_task(se) {
+>                 cfs_rq = group_cfs_rq(se);
+>                 se = pick_next_entity(cfs_rq, cfs_rq->curr);
+>         }
+>         p = task_of(se);
+>
+>         if (is_per_cpu_kthread(p))
+>                 ideal_runtime /= 2;
+>
+> the core-scheduling patch set includes the right primitive for this I
+> think, pick_task_fair().
 
-Jens Axboe - 11.12.19, 16:29:38 CET:
-> Recently someone asked me how io_uring buffered IO compares to mmaped
-> IO in terms of performance. So I ran some tests with buffered IO, and
-> found the experience to be somewhat painful. The test case is pretty
-> basic, random reads over a dataset that's 10x the size of RAM.
-> Performance starts out fine, and then the page cache fills up and we
-> hit a throughput cliff. CPU usage of the IO threads go up, and we have
-> kswapd spending 100% of a core trying to keep up. Seeing that, I was
-> reminded of the many complaints I here about buffered IO, and the
-> fact that most of the folks complaining will ultimately bite the
-> bullet and move to O_DIRECT to just get the kernel out of the way.
-> 
-> But I don't think it needs to be like that. Switching to O_DIRECT
-> isn't always easily doable. The buffers have different life times,
-> size and alignment constraints, etc. On top of that, mixing buffered
-> and O_DIRECT can be painful.
-> 
-> Seems to me that we have an opportunity to provide something that sits
-> somewhere in between buffered and O_DIRECT, and this is where
-> RWF_UNCACHED enters the picture. If this flag is set on IO, we get
-> the following behavior:
-> 
-> - If the data is in cache, it remains in cache and the copy (in or
-> out) is served to/from that.
-> 
-> - If the data is NOT in cache, we add it while performing the IO. When
-> the IO is done, we remove it again.
-> 
-> With this, I can do 100% smooth buffered reads or writes without
-> pushing the kernel to the state where kswapd is sweating bullets. In
-> fact it doesn't even register.
+why not only updating wan_gran() which is the only function which uses
+sysctl_sched_wakeup_granularity ?
 
-A question from a user or Linux Performance trainer perspective:
+For per cpu kthread, we could set the gran to sched_min_granularity
+instead of scaling it with thread's priority so per cpu kthread can
+still preempt current ask even if sysctl_sched_wakeup_granularity is
+large
 
-How does this compare with posix_fadvise() with POSIX_FADV_DONTNEED that 
-for example the nocache¹ command is using? Excerpt from manpage 
-posix_fadvice(2):
-
-       POSIX_FADV_DONTNEED
-              The specified data will not be accessed  in  the  near
-              future.
-
-              POSIX_FADV_DONTNEED  attempts to free cached pages as‐
-              sociated with the specified region.  This  is  useful,
-              for  example,  while streaming large files.  A program
-              may periodically request the  kernel  to  free  cached
-              data  that  has already been used, so that more useful
-              cached pages are not discarded instead.
-
-[1] packaged in Debian as nocache or available herehttps://github.com/
-Feh/nocache
-
-In any way, would be nice to have some option in rsync… I still did not 
-change my backup script to call rsync via nocache.
-
-Thanks,
-Martin
-
-> Comments appreciated! This should work on any standard file system,
-> using either the generic helpers or iomap. I have tested ext4 and xfs
-> for the right read/write behavior, but no further validation has been
-> done yet. Patches are against current git, and can also be found here:
-> 
-> https://git.kernel.dk/cgit/linux-block/log/?h=buffered-uncached
-> 
->  fs/ceph/file.c          |  2 +-
->  fs/dax.c                |  2 +-
->  fs/ext4/file.c          |  2 +-
->  fs/iomap/apply.c        | 26 ++++++++++-
->  fs/iomap/buffered-io.c  | 54 ++++++++++++++++-------
->  fs/iomap/direct-io.c    |  3 +-
->  fs/iomap/fiemap.c       |  5 ++-
->  fs/iomap/seek.c         |  6 ++-
->  fs/iomap/swapfile.c     |  2 +-
->  fs/nfs/file.c           |  2 +-
->  include/linux/fs.h      |  7 ++-
->  include/linux/iomap.h   | 10 ++++-
->  include/uapi/linux/fs.h |  5 ++-
->  mm/filemap.c            | 95
-> ++++++++++++++++++++++++++++++++++++----- 14 files changed, 181
-> insertions(+), 40 deletions(-)
-> 
-> Changes since v2:
-> - Rework the write side according to Chinners suggestions. Much
-> cleaner this way. It does mean that we invalidate the full write
-> region if just ONE page (or more) had to be created, where before it
-> was more granular. I don't think that's a concern, and on the plus
-> side, we now no longer have to chunk invalidations into 15/16 pages
-> at the time.
-> - Cleanups
-> 
-> Changes since v1:
-> - Switch to pagevecs for write_drop_cached_pages()
-> - Use page_offset() instead of manual shift
-> - Ensure we hold a reference on the page between calling ->write_end()
-> and checking the mapping on the locked page
-> - Fix XFS multi-page streamed writes, we'd drop the UNCACHED flag
-> after the first page
-
-
--- 
-Martin
-
-
+>
+> > > -   if (delta > ideal_runtime)
+> > > +   if (delta > ideal_runtime) // maybe frob this too ?
+> > >             resched_curr(rq_of(cfs_rq));
+> > >  }
