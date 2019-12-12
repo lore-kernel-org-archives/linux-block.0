@@ -2,128 +2,126 @@ Return-Path: <SRS0=VRi+=2C=vger.kernel.org=linux-block-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-12.4 required=3.0 tests=DKIMWL_WL_HIGH,DKIM_SIGNED,
-	DKIM_VALID,DKIM_VALID_AU,HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PULL_REQUEST,
-	MAILING_LIST_MULTI,MENTIONS_GIT_HOSTING,SPF_HELO_NONE,SPF_PASS,
-	USER_AGENT_SANE_1 autolearn=ham autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-2.2 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
+	MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,USER_AGENT_SANE_1 autolearn=no
+	autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 4ACE9C43603
-	for <linux-block@archiver.kernel.org>; Thu, 12 Dec 2019 14:59:07 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id E9EE0C2D0C9
+	for <linux-block@archiver.kernel.org>; Thu, 12 Dec 2019 15:07:55 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.kernel.org (Postfix) with ESMTP id 168A7206C3
-	for <linux-block@archiver.kernel.org>; Thu, 12 Dec 2019 14:59:07 +0000 (UTC)
-Authentication-Results: mail.kernel.org;
-	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="AqZbM3GW"
+	by mail.kernel.org (Postfix) with ESMTP id C869922527
+	for <linux-block@archiver.kernel.org>; Thu, 12 Dec 2019 15:07:55 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1728939AbfLLO7G (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Thu, 12 Dec 2019 09:59:06 -0500
-Received: from us-smtp-2.mimecast.com ([205.139.110.61]:59273 "EHLO
-        us-smtp-delivery-1.mimecast.com" rhost-flags-OK-OK-OK-FAIL)
-        by vger.kernel.org with ESMTP id S1728932AbfLLO7G (ORCPT
+        id S1728853AbfLLPHv (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Thu, 12 Dec 2019 10:07:51 -0500
+Received: from mx0b-001b2d01.pphosted.com ([148.163.158.5]:4770 "EHLO
+        mx0a-001b2d01.pphosted.com" rhost-flags-OK-OK-OK-FAIL)
+        by vger.kernel.org with ESMTP id S1728581AbfLLPHu (ORCPT
         <rfc822;linux-block@vger.kernel.org>);
-        Thu, 12 Dec 2019 09:59:06 -0500
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-        s=mimecast20190719; t=1576162744;
-        h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-         to:to:cc:cc:mime-version:mime-version:content-type:content-type;
-        bh=0UiWSkVrKxFCttope591KZVuHQT9QMDA6N5OqeARWXI=;
-        b=AqZbM3GWg1r46v3YA2hgtKOaqAdYd/ThJKlu4qvV/9aIhHFPDgY80pqEbF0VKf6Cn41qvy
-        pq0RvI+SBw/t6D9KZTti2vQF4jbPA+jNhiUFGd4RFvcm/2P345+7zdKz5ls7Pr+QoojsMl
-        S7wSV4n4Jwl0sHajrBz5Y7phCjnmy5k=
-Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
- [209.132.183.4]) (Using TLS) by relay.mimecast.com with ESMTP id
- us-mta-382-7imFaNEFOtWAcMnD7jdw4g-1; Thu, 12 Dec 2019 09:59:02 -0500
-X-MC-Unique: 7imFaNEFOtWAcMnD7jdw4g-1
-Received: from smtp.corp.redhat.com (int-mx02.intmail.prod.int.phx2.redhat.com [10.5.11.12])
-        (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
-        (No client certificate requested)
-        by mimecast-mx01.redhat.com (Postfix) with ESMTPS id 4CB2218552D3;
-        Thu, 12 Dec 2019 14:59:01 +0000 (UTC)
-Received: from localhost (unknown [10.18.25.174])
-        by smtp.corp.redhat.com (Postfix) with ESMTPS id B859960BE1;
-        Thu, 12 Dec 2019 14:58:58 +0000 (UTC)
-Date:   Thu, 12 Dec 2019 09:58:57 -0500
-From:   Mike Snitzer <snitzer@redhat.com>
-To:     Linus Torvalds <torvalds@linux-foundation.org>
-Cc:     dm-devel@redhat.com, linux-block@vger.kernel.org,
-        Alasdair G Kergon <agk@redhat.com>,
-        Diego Calleja <diegocg@gmail.com>,
-        Eric Biggers <ebiggers@google.com>,
-        Hou Tao <houtao1@huawei.com>,
-        Nikos Tsironis <ntsironis@arrikto.com>
-Subject: [git pull] device mapper fixes for 5.5-rc2
-Message-ID: <20191212145857.GA27301@redhat.com>
+        Thu, 12 Dec 2019 10:07:50 -0500
+Received: from pps.filterd (m0098414.ppops.net [127.0.0.1])
+        by mx0b-001b2d01.pphosted.com (8.16.0.42/8.16.0.42) with SMTP id xBCF7MPo061315
+        for <linux-block@vger.kernel.org>; Thu, 12 Dec 2019 10:07:48 -0500
+Received: from e06smtp07.uk.ibm.com (e06smtp07.uk.ibm.com [195.75.94.103])
+        by mx0b-001b2d01.pphosted.com with ESMTP id 2wu4t7a7a9-1
+        (version=TLSv1.2 cipher=AES256-GCM-SHA384 bits=256 verify=NOT)
+        for <linux-block@vger.kernel.org>; Thu, 12 Dec 2019 10:07:48 -0500
+Received: from localhost
+        by e06smtp07.uk.ibm.com with IBM ESMTP SMTP Gateway: Authorized Use Only! Violators will be prosecuted
+        for <linux-block@vger.kernel.org> from <srikar@linux.vnet.ibm.com>;
+        Thu, 12 Dec 2019 15:07:46 -0000
+Received: from b06cxnps3074.portsmouth.uk.ibm.com (9.149.109.194)
+        by e06smtp07.uk.ibm.com (192.168.101.137) with IBM ESMTP SMTP Gateway: Authorized Use Only! Violators will be prosecuted;
+        (version=TLSv1/SSLv3 cipher=AES256-GCM-SHA384 bits=256/256)
+        Thu, 12 Dec 2019 15:07:41 -0000
+Received: from d06av22.portsmouth.uk.ibm.com (d06av22.portsmouth.uk.ibm.com [9.149.105.58])
+        by b06cxnps3074.portsmouth.uk.ibm.com (8.14.9/8.14.9/NCO v10.0) with ESMTP id xBCF7eX939977108
+        (version=TLSv1/SSLv3 cipher=DHE-RSA-AES256-GCM-SHA384 bits=256 verify=OK);
+        Thu, 12 Dec 2019 15:07:40 GMT
+Received: from d06av22.portsmouth.uk.ibm.com (unknown [127.0.0.1])
+        by IMSVA (Postfix) with ESMTP id BB5C04C040;
+        Thu, 12 Dec 2019 15:07:40 +0000 (GMT)
+Received: from d06av22.portsmouth.uk.ibm.com (unknown [127.0.0.1])
+        by IMSVA (Postfix) with ESMTP id 2D51B4C044;
+        Thu, 12 Dec 2019 15:07:38 +0000 (GMT)
+Received: from linux.vnet.ibm.com (unknown [9.126.150.29])
+        by d06av22.portsmouth.uk.ibm.com (Postfix) with SMTP;
+        Thu, 12 Dec 2019 15:07:38 +0000 (GMT)
+Date:   Thu, 12 Dec 2019 20:37:37 +0530
+From:   Srikar Dronamraju <srikar@linux.vnet.ibm.com>
+To:     Peter Zijlstra <peterz@infradead.org>
+Cc:     Dave Chinner <david@fromorbit.com>, Phil Auld <pauld@redhat.com>,
+        Ming Lei <ming.lei@redhat.com>, linux-block@vger.kernel.org,
+        linux-fsdevel@vger.kernel.org, linux-xfs@vger.kernel.org,
+        linux-kernel@vger.kernel.org, Jeff Moyer <jmoyer@redhat.com>,
+        Dave Chinner <dchinner@redhat.com>,
+        Eric Sandeen <sandeen@redhat.com>,
+        Christoph Hellwig <hch@lst.de>, Jens Axboe <axboe@kernel.dk>,
+        Ingo Molnar <mingo@redhat.com>, Tejun Heo <tj@kernel.org>,
+        Vincent Guittot <vincent.guittot@linaro.org>
+Subject: Re: [PATCH v4] sched/core: Preempt current task in favour of bound
+ kthread
+Reply-To: Srikar Dronamraju <srikar@linux.vnet.ibm.com>
+References: <20191120191636.GI4097@hirez.programming.kicks-ass.net>
+ <20191120220313.GC18056@pauld.bos.csb>
+ <20191121132937.GW4114@hirez.programming.kicks-ass.net>
+ <20191209165122.GA27229@linux.vnet.ibm.com>
+ <20191209231743.GA19256@dread.disaster.area>
+ <20191210054330.GF27253@linux.vnet.ibm.com>
+ <20191210172307.GD9139@linux.vnet.ibm.com>
+ <20191211173829.GB21797@linux.vnet.ibm.com>
+ <20191211224617.GE19256@dread.disaster.area>
+ <20191212101031.GV2827@hirez.programming.kicks-ass.net>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
+Content-Type: text/plain; charset=iso-8859-1
 Content-Disposition: inline
-User-Agent: Mutt/1.5.21 (2010-09-15)
-X-Scanned-By: MIMEDefang 2.79 on 10.5.11.12
+In-Reply-To: <20191212101031.GV2827@hirez.programming.kicks-ass.net>
+User-Agent: Mutt/1.10.1 (2018-07-13)
+X-TM-AS-GCONF: 00
+x-cbid: 19121215-0028-0000-0000-000003C7E3ED
+X-IBM-AV-DETECTION: SAVI=unused REMOTE=unused XFE=unused
+x-cbparentid: 19121215-0029-0000-0000-0000248B1DE8
+Message-Id: <20191212150737.GC21797@linux.vnet.ibm.com>
+X-Proofpoint-Virus-Version: vendor=fsecure engine=2.50.10434:6.0.95,18.0.572
+ definitions=2019-12-12_03:2019-12-12,2019-12-12 signatures=0
+X-Proofpoint-Spam-Details: rule=outbound_notspam policy=outbound score=0 lowpriorityscore=0
+ bulkscore=0 impostorscore=0 spamscore=0 clxscore=1015 suspectscore=0
+ mlxscore=0 mlxlogscore=999 malwarescore=0 adultscore=0 phishscore=0
+ priorityscore=1501 classifier=spam adjust=0 reason=mlx scancount=1
+ engine=8.12.0-1910280000 definitions=main-1912120117
 Sender: linux-block-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-Hi Linus,
+* Peter Zijlstra <peterz@infradead.org> [2019-12-12 11:10:31]:
 
-The following changes since commit f612b2132db529feac4f965f28a1b9258ea7c22b:
+> 
+> +static struct sched_entity *
+> +__pick_next_entity(struct cfs_rq *cfs_rq, struct sched_entity *curr);
 
-  Revert "dm crypt: use WQ_HIGHPRI for the IO and crypt workqueues" (2019-11-20 17:27:39 -0500)
+I think we already have __pick_next_entity in kernel/sched/fair.c
 
-are available in the Git repository at:
+static struct sched_entity *__pick_next_entity(struct sched_entity *se)
+{
+        struct rb_node *next = rb_next(&se->run_node);
 
-  git://git.kernel.org/pub/scm/linux/kernel/git/device-mapper/linux-dm.git tags/for-5.5/dm-fixes
+        if (!next)
+                return NULL;
 
-for you to fetch changes up to 7fc979f8204fb763e203d3e716c17d352eb96b35:
+        return rb_entry(next, struct sched_entity, run_node);
+}
 
-  docs: dm-integrity: remove reference to ARC4 (2019-12-10 10:02:43 -0500)
+I checked in v5.5-rc1, v5.4 and tip/master too. Let me know if you were
+referring to a different version of code.
 
-Please pull, thanks!
-Mike
+So I modified the only place its called to the newer
+__pick_next_entity(cfs_rq, curr); 
 
-----------------------------------------------------------------
-- Fix DM multipath by restoring full path selector functionality for
-  bio-based configurations that don't haave a SCSI device handler.
+But wanted to verify if that's what you had in mind.
 
-- Fix dm-btree removal to ensure non-root btree nodes have at least
-  (max_entries / 3) entries.  This resolves userspace thin_check
-  utility's report of "too few entries in btree_node".
 
-- Fix both the DM thin-provisioning and dm-clone targets to properly
-  flush the data device prior to metadata commit.  This resolves the
-  potential for inconsistency across a power loss event when the data
-  device has a volatile writeback cache.
-
-- Small documentation fixes to dm-clone and dm-integrity.
-
-----------------------------------------------------------------
-Diego Calleja (1):
-      dm: add dm-clone to the documentation index
-
-Eric Biggers (1):
-      docs: dm-integrity: remove reference to ARC4
-
-Hou Tao (1):
-      dm btree: increase rebalance threshold in __rebalance2()
-
-Mike Snitzer (1):
-      dm mpath: remove harmful bio-based optimization
-
-Nikos Tsironis (5):
-      dm clone metadata: Track exact changes per transaction
-      dm clone metadata: Use a two phase commit
-      dm clone: Flush destination device before committing metadata
-      dm thin metadata: Add support for a pre-commit callback
-      dm thin: Flush data device before committing metadata
-
- .../admin-guide/device-mapper/dm-integrity.rst     |   2 +-
- Documentation/admin-guide/device-mapper/index.rst  |   1 +
- drivers/md/dm-clone-metadata.c                     | 136 +++++++++++++++------
- drivers/md/dm-clone-metadata.h                     |  17 +++
- drivers/md/dm-clone-target.c                       |  53 ++++++--
- drivers/md/dm-mpath.c                              |  37 +-----
- drivers/md/dm-thin-metadata.c                      |  29 +++++
- drivers/md/dm-thin-metadata.h                      |   7 ++
- drivers/md/dm-thin.c                               |  42 ++++++-
- drivers/md/persistent-data/dm-btree-remove.c       |   8 +-
- 10 files changed, 248 insertions(+), 84 deletions(-)
+-- 
+Thanks and Regards
+Srikar Dronamraju
 
