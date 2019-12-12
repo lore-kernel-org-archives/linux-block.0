@@ -2,208 +2,87 @@ Return-Path: <SRS0=VRi+=2C=vger.kernel.org=linux-block-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-8.1 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
-	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,
-	SPF_HELO_NONE,SPF_PASS,USER_AGENT_SANE_1 autolearn=unavailable
-	autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-2.2 required=3.0 tests=DKIM_SIGNED,DKIM_VALID,
+	HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,
+	USER_AGENT_SANE_1 autolearn=no autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 2511CC43603
-	for <linux-block@archiver.kernel.org>; Thu, 12 Dec 2019 16:25:33 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 45B89C43603
+	for <linux-block@archiver.kernel.org>; Thu, 12 Dec 2019 16:27:28 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.kernel.org (Postfix) with ESMTP id E2CE022527
-	for <linux-block@archiver.kernel.org>; Thu, 12 Dec 2019 16:25:32 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id 0884922527
+	for <linux-block@archiver.kernel.org>; Thu, 12 Dec 2019 16:27:28 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (2048-bit key) header.d=infradead.org header.i=@infradead.org header.b="PfLS7ZDa"
+	dkim=pass (2048-bit key) header.d=kernel-dk.20150623.gappssmtp.com header.i=@kernel-dk.20150623.gappssmtp.com header.b="T6xkncOL"
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1729912AbfLLQZ0 (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Thu, 12 Dec 2019 11:25:26 -0500
-Received: from bombadil.infradead.org ([198.137.202.133]:50234 "EHLO
-        bombadil.infradead.org" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1729900AbfLLQZZ (ORCPT
+        id S1729857AbfLLQ11 (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Thu, 12 Dec 2019 11:27:27 -0500
+Received: from mail-io1-f54.google.com ([209.85.166.54]:46675 "EHLO
+        mail-io1-f54.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S1729762AbfLLQ11 (ORCPT
         <rfc822;linux-block@vger.kernel.org>);
-        Thu, 12 Dec 2019 11:25:25 -0500
-DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed;
-        d=infradead.org; s=bombadil.20170209; h=In-Reply-To:Content-Type:MIME-Version
-        :References:Message-ID:Subject:Cc:To:From:Date:Sender:Reply-To:
-        Content-Transfer-Encoding:Content-ID:Content-Description:Resent-Date:
-        Resent-From:Resent-Sender:Resent-To:Resent-Cc:Resent-Message-ID:List-Id:
-        List-Help:List-Unsubscribe:List-Subscribe:List-Post:List-Owner:List-Archive;
-         bh=5ym7vw3z3DT5dHcMe5oQGJ3WMFY3uciLjfIk0+QK1sA=; b=PfLS7ZDabCsQBe10ZYCmy7Osh
-        eqmh4JYgXMuOmtCehw5ozo+E64CVbOv6Icbl5HqfKCskSuk04WkMVA3T44CQ31gdWT27SMCl+Ibxa
-        Hg0i+j3HiOK2geKcqFUSpLeYmygBNqnPb9dPU5UG3SkPATsGN1yDxr8VNAmBlpj+5Hrzy/d4qzuDl
-        PkJPDAQf+YnepNxOGLhslNixbuae+XIHu6twlPE0II4IcdMSFvShejsazWRhxkRs+chcRU94DJbLx
-        RyjtpaHan8fEJK10suehHhxSO+KSahCInE6RnI3+B49Pt4GBbxS0f8/yvHFGEyS6ZtbhkeKeAPps0
-        OUqGvLygA==;
-Received: from hch by bombadil.infradead.org with local (Exim 4.92.3 #3 (Red Hat Linux))
-        id 1ifRH0-0003e6-OW; Thu, 12 Dec 2019 16:25:06 +0000
-Date:   Thu, 12 Dec 2019 08:25:06 -0800
-From:   Christoph Hellwig <hch@infradead.org>
-To:     Arnd Bergmann <arnd@arndb.de>
-Cc:     Jens Axboe <axboe@kernel.dk>,
-        "James E.J. Bottomley" <jejb@linux.ibm.com>,
-        "Martin K. Petersen" <martin.petersen@oracle.com>,
-        Alexander Viro <viro@zeniv.linux.org.uk>,
-        Douglas Gilbert <dgilbert@interlog.com>,
-        linux-kernel@vger.kernel.org, y2038@lists.linaro.org,
-        Steffen Maier <maier@linux.ibm.com>,
-        linux-scsi@vger.kernel.org,
-        Chaitanya Kulkarni <chaitanya.kulkarni@wdc.com>,
-        Greg Kroah-Hartman <gregkh@linuxfoundation.org>,
-        Thomas Gleixner <tglx@linutronix.de>,
-        linux-block@vger.kernel.org
-Subject: Re: [PATCH 02/24] compat: scsi: sg: fix v3 compat read/write
- interface
-Message-ID: <20191212162506.GA27991@infradead.org>
-References: <20191211204306.1207817-1-arnd@arndb.de>
- <20191211204306.1207817-3-arnd@arndb.de>
+        Thu, 12 Dec 2019 11:27:27 -0500
+Received: by mail-io1-f54.google.com with SMTP id t26so3377004ioi.13
+        for <linux-block@vger.kernel.org>; Thu, 12 Dec 2019 08:27:27 -0800 (PST)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=kernel-dk.20150623.gappssmtp.com; s=20150623;
+        h=subject:to:cc:references:from:message-id:date:user-agent
+         :mime-version:in-reply-to:content-language:content-transfer-encoding;
+        bh=L2CjDVtbtRmSS9p/ZMC2e8zHEfBbFA8EoUfM5bDUuwA=;
+        b=T6xkncOLY8LZ+5xON4nDUfI/fzvqKg69ZBb0XfMIjL9EDlMcrpyTzYV3jPEUECIu7e
+         /6VePkJbfJ02IxgtjhVi7zhODL3RzicRz8RUUxTG9FMA0/+l2gwHg1lkXa+9Xz19lG5P
+         RIW0WHds+gFZXVLHMoYOU2aVxFfugcJGN8+IRth7RzCBvBQvkKfr6RZdZFv3XFAGcEv8
+         0jvtGdkjF2LOv6J2oK0OhlmGZ96TS3op6ZjE2hRprquRNtnWc1QVP2D5xZElq0NP++dH
+         FdY9uKj1DamP/Cer06/nmE/izvRIUNoXzSdvxib0JD4MDAk3nsjsBw7M9wgtvidm7gjA
+         sI2A==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20161025;
+        h=x-gm-message-state:subject:to:cc:references:from:message-id:date
+         :user-agent:mime-version:in-reply-to:content-language
+         :content-transfer-encoding;
+        bh=L2CjDVtbtRmSS9p/ZMC2e8zHEfBbFA8EoUfM5bDUuwA=;
+        b=I5+zoxnv7s2kpCGcmlQyz4SEzEO6FBq15XMoeQQ7DZfrPc+IP/Y3v7L7BwrC4DOQ+X
+         jGV1N4kKDl8gs2w80gyydZlzNdO5vc0hcMmwANX0o2cKqn/Ka60Pc4BVteJz+Mx79+Ol
+         Q97sXTxsTWGa4OL5M6tsadMXIEPDDqocrR5KQU0sy2L9I79Li3GUnTdL4UuHe6/YWcyy
+         ehjeFoENMZ0ISueb71imLB7BRYqSXOHQH6NTyIQ+6d3L9EGompQfqaZg8OsfrXlvREya
+         cZJhJGNXoZIW22sLR3DTEsGXYYcrA+K2ilH43mkoQq2xf9GNnoWUl8nnb0yKBiK29fv8
+         2qFQ==
+X-Gm-Message-State: APjAAAW2MGjF9560vuYBgd6r0wMzbwRevJ2Cyr/ZwR3RTh3NHfdUxONY
+        aANyVnxmqHFAT6AqYOH0QNpTJA==
+X-Google-Smtp-Source: APXvYqxoJV4anqq+qDAdhKogptjDsSD2zTMOztmiodrLP2ZIGIITw+1PsHhlCWyUyDRKNb2x5gMkZA==
+X-Received: by 2002:a05:6638:304:: with SMTP id w4mr8644279jap.81.1576168046416;
+        Thu, 12 Dec 2019 08:27:26 -0800 (PST)
+Received: from [192.168.1.159] ([65.144.74.34])
+        by smtp.gmail.com with ESMTPSA id k7sm1836770ilg.49.2019.12.12.08.27.25
+        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
+        Thu, 12 Dec 2019 08:27:25 -0800 (PST)
+Subject: Re: [PATCH v2] blk-cgroup: remove blkcg_drain_queue
+To:     jgq516@gmail.com, tj@kernel.org
+Cc:     cgroups@vger.kernel.org, linux-block@vger.kernel.org,
+        Guoqing Jiang <guoqing.jiang@cloud.ionos.com>
+References: <20191212155200.13403-1-guoqing.jiang@cloud.ionos.com>
+From:   Jens Axboe <axboe@kernel.dk>
+Message-ID: <3f8133d5-fb25-a588-3cd8-b3b6dbfae4c8@kernel.dk>
+Date:   Thu, 12 Dec 2019 09:27:24 -0700
+User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:68.0) Gecko/20100101
+ Thunderbird/68.2.2
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <20191211204306.1207817-3-arnd@arndb.de>
-User-Agent: Mutt/1.12.1 (2019-06-15)
-X-SRS-Rewrite: SMTP reverse-path rewritten from <hch@infradead.org> by bombadil.infradead.org. See http://www.infradead.org/rpr.html
+In-Reply-To: <20191212155200.13403-1-guoqing.jiang@cloud.ionos.com>
+Content-Type: text/plain; charset=utf-8
+Content-Language: en-US
+Content-Transfer-Encoding: 7bit
 Sender: linux-block-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-On Wed, Dec 11, 2019 at 09:42:36PM +0100, Arnd Bergmann wrote:
-> In the v5.4 merge window, a cleanup patch from Al Viro conflicted
-> with my rework of the compat handling for sg.c read(). Linus Torvalds
-> did a correct merge but pointed out that the resulting code is still
-> unsatisfactory.
+On 12/12/19 8:52 AM, jgq516@gmail.com wrote:
+> From: Guoqing Jiang <guoqing.jiang@cloud.ionos.com>
 > 
-> I later noticed that the sg_new_read() function still gets the compat
-> mode wrong, when the 'count' argument is large enough to pass a
-> compat_sg_io_hdr object, but not a nativ sg_io_hdr.
-> 
-> To address both of these, move the definition of compat_sg_io_hdr
-> into a scsi/sg.h to make it visible to sg.c and rewrite the logic
-> for reading req_pack_id as well as the size check to a simpler
-> version that gets the expected results.
-> 
-> Fixes: c35a5cfb4150 ("scsi: sg: sg_read(): simplify reading ->pack_id of userland sg_io_hdr_t")
-> Fixes: 98aaaec4a150 ("compat_ioctl: reimplement SG_IO handling")
-> Signed-off-by: Arnd Bergmann <arnd@arndb.de>
-> ---
->  block/scsi_ioctl.c |  29 +----------
->  drivers/scsi/sg.c  | 125 +++++++++++++++++++++------------------------
->  include/scsi/sg.h  |  30 +++++++++++
->  3 files changed, 89 insertions(+), 95 deletions(-)
-> 
-> diff --git a/block/scsi_ioctl.c b/block/scsi_ioctl.c
-> index 650bade5ea5a..b61dbf4d8443 100644
-> --- a/block/scsi_ioctl.c
-> +++ b/block/scsi_ioctl.c
-> @@ -20,6 +20,7 @@
->  #include <scsi/scsi.h>
->  #include <scsi/scsi_ioctl.h>
->  #include <scsi/scsi_cmnd.h>
-> +#include <scsi/sg.h>
->  
->  struct blk_cmd_filter {
->  	unsigned long read_ok[BLK_SCSI_CMD_PER_LONG];
-> @@ -550,34 +551,6 @@ static inline int blk_send_start_stop(struct request_queue *q,
->  	return __blk_send_generic(q, bd_disk, GPCMD_START_STOP_UNIT, data);
->  }
->  
-> -#ifdef CONFIG_COMPAT
-> -struct compat_sg_io_hdr {
-> -	compat_int_t interface_id;	/* [i] 'S' for SCSI generic (required) */
-> -	compat_int_t dxfer_direction;	/* [i] data transfer direction  */
-> -	unsigned char cmd_len;		/* [i] SCSI command length ( <= 16 bytes) */
-> -	unsigned char mx_sb_len;	/* [i] max length to write to sbp */
-> -	unsigned short iovec_count;	/* [i] 0 implies no scatter gather */
-> -	compat_uint_t dxfer_len;	/* [i] byte count of data transfer */
-> -	compat_uint_t dxferp;		/* [i], [*io] points to data transfer memory
-> -						or scatter gather list */
-> -	compat_uptr_t cmdp;		/* [i], [*i] points to command to perform */
-> -	compat_uptr_t sbp;		/* [i], [*o] points to sense_buffer memory */
-> -	compat_uint_t timeout;		/* [i] MAX_UINT->no timeout (unit: millisec) */
-> -	compat_uint_t flags;		/* [i] 0 -> default, see SG_FLAG... */
-> -	compat_int_t pack_id;		/* [i->o] unused internally (normally) */
-> -	compat_uptr_t usr_ptr;		/* [i->o] unused internally */
-> -	unsigned char status;		/* [o] scsi status */
-> -	unsigned char masked_status;	/* [o] shifted, masked scsi status */
-> -	unsigned char msg_status;	/* [o] messaging level data (optional) */
-> -	unsigned char sb_len_wr;	/* [o] byte count actually written to sbp */
-> -	unsigned short host_status;	/* [o] errors from host adapter */
-> -	unsigned short driver_status;	/* [o] errors from software driver */
-> -	compat_int_t resid;		/* [o] dxfer_len - actual_transferred */
-> -	compat_uint_t duration;		/* [o] time taken by cmd (unit: millisec) */
-> -	compat_uint_t info;		/* [o] auxiliary information */
-> -};
-> -#endif
-> -
->  int put_sg_io_hdr(const struct sg_io_hdr *hdr, void __user *argp)
->  {
->  #ifdef CONFIG_COMPAT
-> diff --git a/drivers/scsi/sg.c b/drivers/scsi/sg.c
-> index 160748ad9c0f..985546aac236 100644
-> --- a/drivers/scsi/sg.c
-> +++ b/drivers/scsi/sg.c
-> @@ -198,6 +198,7 @@ static void sg_device_destroy(struct kref *kref);
->  
->  #define SZ_SG_HEADER sizeof(struct sg_header)
->  #define SZ_SG_IO_HDR sizeof(sg_io_hdr_t)
-> +#define SZ_COMPAT_SG_IO_HDR sizeof(struct compat_sg_io_hdr)
+> Since blk_drain_queue had already been removed, so this function
+> is not needed anymore.
 
-I'd rather not add more defines like this.  The raw sizeof is
-much more readable and obvious.
+Applied, thanks.
 
->  
-> +	if (count < SZ_SG_HEADER)
-> +		goto unknown_id;
-> +
-> +	/* negative reply_len means v3 format, otherwise v1/v2 */
-> +	if (get_user(reply_len, &old_hdr->reply_len))
-> +		return -EFAULT;
-> +	if (reply_len >= 0)
-> +		return get_user(*pack_id, &old_hdr->pack_id);
-> +
-> +	if (in_compat_syscall() && count >= SZ_COMPAT_SG_IO_HDR) {
-> +		struct compat_sg_io_hdr __user *hp = buf;
-> +		return get_user(*pack_id, &hp->pack_id);
-> +	}
-> +
-> +	if (count >= SZ_SG_IO_HDR) {
-> +		struct sg_io_hdr __user *hp = buf;
-> +		return get_user(*pack_id, &hp->pack_id);
-> +	}
-> +
-> +unknown_id:
-> +	/* no valid header was passed, so ignore the pack_id */
-> +	*pack_id = -1;
-> +	return 0;
-> +}
+-- 
+Jens Axboe
 
-I find the structure here a little confusing, as it doesn't follow
-the normal flow.  What do you think of:
-
-	if (count >= SZ_SG_HEADER) {
-		if (get_user(reply_len, &old_hdr->reply_len))
-			return -EFAULT;
-
-		/* negative reply_len means v3 format, otherwise v1/v2 */
-		if (reply_len >= 0)
-			return get_user(*pack_id, &old_hdr->pack_id);
-
-		if (in_compat_syscall() {
-			if (count >= SZ_COMPAT_SG_IO_HDR) {
-				struct compat_sg_io_hdr __user *hp = buf;
-
-				return get_user(*pack_id, &hp->pack_id);
-			}
-		} else {
-			if (count >= SZ_SG_IO_HDR) {
-				struct sg_io_hdr __user *hp = buf;
-
-				return get_user(*pack_id, &hp->pack_id);
-			}
-		}
-	}
-
-	/* no valid header was passed, so ignore the pack_id */
-	*pack_id = -1;
-	return 0;
-}
