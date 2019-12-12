@@ -2,216 +2,117 @@ Return-Path: <SRS0=VRi+=2C=vger.kernel.org=linux-block-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-9.8 required=3.0 tests=DKIM_SIGNED,DKIM_VALID,
-	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,
-	SPF_HELO_NONE,SPF_PASS,USER_AGENT_GIT autolearn=unavailable
-	autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-2.0 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
+	HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,
+	USER_AGENT_SANE_1 autolearn=no autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 69791C00454
-	for <linux-block@archiver.kernel.org>; Thu, 12 Dec 2019 19:01:47 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id BD635C43603
+	for <linux-block@archiver.kernel.org>; Thu, 12 Dec 2019 20:05:12 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.kernel.org (Postfix) with ESMTP id 4437A2073D
-	for <linux-block@archiver.kernel.org>; Thu, 12 Dec 2019 19:01:47 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id 8C2E02073B
+	for <linux-block@archiver.kernel.org>; Thu, 12 Dec 2019 20:05:12 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel-dk.20150623.gappssmtp.com header.i=@kernel-dk.20150623.gappssmtp.com header.b="IckOWSwJ"
+	dkim=fail reason="signature verification failed" (2048-bit key) header.d=infradead.org header.i=@infradead.org header.b="fLZHIs5D"
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1730552AbfLLTBq (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Thu, 12 Dec 2019 14:01:46 -0500
-Received: from mail-io1-f68.google.com ([209.85.166.68]:42814 "EHLO
-        mail-io1-f68.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1730629AbfLLTBp (ORCPT
+        id S1730707AbfLLUFL (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Thu, 12 Dec 2019 15:05:11 -0500
+Received: from bombadil.infradead.org ([198.137.202.133]:50392 "EHLO
+        bombadil.infradead.org" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S1730703AbfLLUFL (ORCPT
         <rfc822;linux-block@vger.kernel.org>);
-        Thu, 12 Dec 2019 14:01:45 -0500
-Received: by mail-io1-f68.google.com with SMTP id f82so3918407ioa.9
-        for <linux-block@vger.kernel.org>; Thu, 12 Dec 2019 11:01:45 -0800 (PST)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=kernel-dk.20150623.gappssmtp.com; s=20150623;
-        h=from:to:cc:subject:date:message-id:in-reply-to:references
-         :mime-version:content-transfer-encoding;
-        bh=GaJCkgUv/B3OET1g1Gk3ujWzgIVpNM0nxRodwjfiGBE=;
-        b=IckOWSwJdM1mRDe5xLg+1QZWh5GjmzKz/7oAhzljHbAQD3IR8KlQNignWa1viyT4en
-         Bh37pENQzkkWfMCAI6BipdGMRo/FeyG1ZLUKPSdW+BN/fp8yr0o4MzfkgwtRhNsjRco+
-         M09XIHEM+8rPeoSpTB5EtkKznUCHqVeLvbg1q562VXLpYeQgoKspfnzL5cXCMwpaPm9s
-         64iPUDt8t+FhqGPPjCxwjQKb/UMTjRByOLC6AKfFpFvHPt5TTIbYK8wViTd7F3Hrs/jz
-         F0x/5d299vyhYmAirrEFlRTDD/S4fijWr09sEYNA74raM3wwMiGwx+yKRv9O7TOmRyd4
-         3+OQ==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20161025;
-        h=x-gm-message-state:from:to:cc:subject:date:message-id:in-reply-to
-         :references:mime-version:content-transfer-encoding;
-        bh=GaJCkgUv/B3OET1g1Gk3ujWzgIVpNM0nxRodwjfiGBE=;
-        b=dAPHi3ehq2wF34GN2roVOV9YohurwYcMFhpYcNi6t/BuhoktxlyQGV/W+aRCGAYmyF
-         ghaQn5v/KHqz9nl2wOnlhl7iA5K3oLhNSijXkiiQEGCHm1+iY9ZC/iHNTTXBZe3h0PS3
-         oSOMnOiO4wIa1nxH3BC8v2uiNplTr2vDOKTTO62oZLqGl9Me3QZuTnYJrwMFNYHErtZP
-         CxUc0YGkbUJxBHIEx8dJ/7Bh+IBXP5nViRPLxjYho5uOqYSz5xbZj1vJRnN5q+cyAw/c
-         3oBjn7z8HosBmlHkCt0kvBy0c2zsW278Hka6LlvTyT1a3S3Lv1UWM1x+RC9wcMvRsYbw
-         EWPQ==
-X-Gm-Message-State: APjAAAUmt0vF3+a7uO+Amw9xEfHUsAqsMQm33sXtsJwtSVRxwgNZqHIt
-        VnW1FmkCCZnSKvzHDpD7GINQKA==
-X-Google-Smtp-Source: APXvYqwjTIM6kPV9uE6Psr7sf1orKaXXnKqktbjIaUiI0LaIo8/4HAcLiFgn4bEKliYaVLewxqJuUQ==
-X-Received: by 2002:a02:a388:: with SMTP id y8mr9511471jak.70.1576177304566;
-        Thu, 12 Dec 2019 11:01:44 -0800 (PST)
-Received: from x1.thefacebook.com ([65.144.74.34])
-        by smtp.gmail.com with ESMTPSA id i22sm1957745ill.40.2019.12.12.11.01.43
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Thu, 12 Dec 2019 11:01:43 -0800 (PST)
-From:   Jens Axboe <axboe@kernel.dk>
-To:     linux-mm@kvack.org, linux-fsdevel@vger.kernel.org,
-        linux-block@vger.kernel.org
-Cc:     willy@infradead.org, clm@fb.com, torvalds@linux-foundation.org,
-        david@fromorbit.com, Jens Axboe <axboe@kernel.dk>
-Subject: [PATCH 5/5] iomap: support RWF_UNCACHED for buffered writes
-Date:   Thu, 12 Dec 2019 12:01:33 -0700
-Message-Id: <20191212190133.18473-6-axboe@kernel.dk>
-X-Mailer: git-send-email 2.24.1
-In-Reply-To: <20191212190133.18473-1-axboe@kernel.dk>
-References: <20191212190133.18473-1-axboe@kernel.dk>
+        Thu, 12 Dec 2019 15:05:11 -0500
+DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed;
+        d=infradead.org; s=bombadil.20170209; h=In-Reply-To:Content-Type:MIME-Version
+        :References:Message-ID:Subject:Cc:To:From:Date:Sender:Reply-To:
+        Content-Transfer-Encoding:Content-ID:Content-Description:Resent-Date:
+        Resent-From:Resent-Sender:Resent-To:Resent-Cc:Resent-Message-ID:List-Id:
+        List-Help:List-Unsubscribe:List-Subscribe:List-Post:List-Owner:List-Archive;
+         bh=Zr1kxExAzyfv2B4BiRd28MJfhNLW3Gxwvv8ht0OdwRo=; b=fLZHIs5DHnBZQwMmcxGuIJVS6
+        pF6dZGsH7jYzDpvFADjhy/O/Fnn3m/giBJSDfCIVfQE1QVd5YL5lUxQ84KqcQwQcJLLDlJCerkLMO
+        7IsojluasionpqAgRezxVRPmSqiwPbynaDZN/59BRf6bSnv38rQ0P19bGfpcks82ipnl4VMZ2XkFa
+        YE0Cxr/Fb816OCCVPrQ59Dka0iOBUFfF9+HyUjtlf6gT9KpVcckdmJKhALsWYBrZjTL/E5sl+iexN
+        iC7N4Oy+xxrwF+1KgGIZytkW6khV6QnfapUyBJs1M77/ZYkjzJOMEEnYAqVwJZWDDWNlgAhJumi9t
+        T2gtw0fRw==;
+Received: from willy by bombadil.infradead.org with local (Exim 4.92.3 #3 (Red Hat Linux))
+        id 1ifUhw-0008ND-7k; Thu, 12 Dec 2019 20:05:08 +0000
+Date:   Thu, 12 Dec 2019 12:05:08 -0800
+From:   Matthew Wilcox <willy@infradead.org>
+To:     Linus Torvalds <torvalds@linux-foundation.org>
+Cc:     Jens Axboe <axboe@kernel.dk>, Linux-MM <linux-mm@kvack.org>,
+        linux-fsdevel <linux-fsdevel@vger.kernel.org>,
+        linux-block <linux-block@vger.kernel.org>,
+        Chris Mason <clm@fb.com>, Dave Chinner <david@fromorbit.com>,
+        Johannes Weiner <hannes@cmpxchg.org>
+Subject: Re: [PATCHSET v3 0/5] Support for RWF_UNCACHED
+Message-ID: <20191212200508.GU32169@bombadil.infradead.org>
+References: <fef996ca-a4ed-9633-1f79-91292a984a20@kernel.dk>
+ <CAHk-=wg=hHUFg3i0vDmKEg8HFbEKquAsoC8CJoZpP-8_A1jZDA@mail.gmail.com>
+ <1c93194a-ed91-c3aa-deb5-a3394805defb@kernel.dk>
+ <CAHk-=wj0pXsngjWKw5p3oTvwkNnT2DyoZWqPB+-wBY+BGTQ96w@mail.gmail.com>
+ <d8a8ea42-7f76-926c-ae9a-d49b11578153@kernel.dk>
+ <CAHk-=whtf0-f5wCcSAj=oTK2TEaesF43UdHnPyvgE9X1EuwvBw@mail.gmail.com>
+ <20191212015612.GP32169@bombadil.infradead.org>
+ <CAHk-=wjr1G0xXDs7R=2ZAB=YSs-WLk4GsVwLafw+96XVwo7jyg@mail.gmail.com>
+ <20191212175200.GS32169@bombadil.infradead.org>
+ <CAHk-=wh4J91wMrEU12DP1r+rLiThQ6wDBb+UOzOuMDkusxtdhw@mail.gmail.com>
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <CAHk-=wh4J91wMrEU12DP1r+rLiThQ6wDBb+UOzOuMDkusxtdhw@mail.gmail.com>
+User-Agent: Mutt/1.12.1 (2019-06-15)
 Sender: linux-block-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-This adds support for RWF_UNCACHED for file systems using iomap to
-perform buffered writes. We use the generic infrastructure for this,
-by tracking pages we created and calling write_drop_cached_pages()
-to issue writeback and prune those pages.
+On Thu, Dec 12, 2019 at 10:29:02AM -0800, Linus Torvalds wrote:
+> On Thu, Dec 12, 2019 at 9:52 AM Matthew Wilcox <willy@infradead.org> wrote:
+> > 1. We could semi-sort the pages on the LRU list.  If we know we're going
+> > to remove a bunch of pages, we could take a batch of them off the list,
+> > sort them and remove them in-order.  This probably wouldn't be terribly
+> > effective.
+> 
+> I don't think the sorting is relevant.
+> 
+> Once you batch things, you already would get most of the locality
+> advantage in the cache if it exists (and the batch isn't insanely
+> large so that one batch already causes cache overflows).
+> 
+> The problem - I suspect - is that we don't batch at all. Or rather,
+> the "batching" does exist at a high level, but it's so high that
+> there's just tons of stuff going on between single pages. It is at the
+> shrink_page_list() level, which is pretty high up and basically does
+> one page at a time with locking and a lot of tests for each page, and
+> then we do "__remove_mapping()" (which does some more work) one at a
+> time before we actually get to __delete_from_page_cache().
+> 
+> So it's "batched", but it's in a huge loop, and even at that huge loop
+> level the batch size is fairly small. We limit it to SWAP_CLUSTER_MAX,
+> which is just 32.
+> 
+> Thinking about it, that SWAP_CLUSTER_MAX may make sense in some other
+> circumstances, but not necessarily in the "shrink clean inactive
+> pages" thing. I wonder if we could just batch clean pages a _lot_ more
+> aggressively. Yes, our batching loop is still very big and it might
+> not help at an L1 level, but it might help in the L2, at least.
+> 
+> In kswapd, when we have 28 GB of pages on the inactive list, a batch
+> of 32 pages at a time is pretty small ;)
 
-Signed-off-by: Jens Axboe <axboe@kernel.dk>
----
- fs/iomap/apply.c       | 24 ++++++++++++++++++++++++
- fs/iomap/buffered-io.c | 23 +++++++++++++++++++----
- include/linux/iomap.h  |  5 +++++
- 3 files changed, 48 insertions(+), 4 deletions(-)
+Yeah, that's pretty poor.  I just read through it, and even if pages are
+in order on the page list, they're not going to batch nicely.  It'd be
+nice to accumulate them and call delete_from_page_cache_batch(), but we
+need to put shadow entries in to replace them, so we'd need a variant
+of that which took two pagevecs.
 
-diff --git a/fs/iomap/apply.c b/fs/iomap/apply.c
-index e76148db03b8..11b6812f7b37 100644
---- a/fs/iomap/apply.c
-+++ b/fs/iomap/apply.c
-@@ -92,5 +92,29 @@ iomap_apply(struct iomap_data *data, const struct iomap_ops *ops,
- 				     data->flags, &iomap);
- 	}
- 
-+	if (written && (data->flags & IOMAP_UNCACHED)) {
-+		struct address_space *mapping = data->inode->i_mapping;
-+
-+		end = data->pos + written;
-+		ret = filemap_write_and_wait_range(mapping, data->pos, end);
-+		if (ret)
-+			goto out;
-+
-+		/*
-+		 * No pages were created for this range, we're done
-+		 */
-+		if (!(iomap.flags & IOMAP_F_PAGE_CREATE))
-+			goto out;
-+
-+		/*
-+		 * Try to invalidate cache pages for the range we just wrote.
-+		 * We don't care if invalidation fails as the write has still
-+		 * worked and leaving clean uptodate pages in the page cache
-+		 * isn't a corruption vector for uncached IO.
-+		 */
-+		invalidate_inode_pages2_range(mapping,
-+				data->pos >> PAGE_SHIFT, end >> PAGE_SHIFT);
-+	}
-+out:
- 	return written ? written : ret;
- }
-diff --git a/fs/iomap/buffered-io.c b/fs/iomap/buffered-io.c
-index 0a1a195ed1cc..df9d6002858e 100644
---- a/fs/iomap/buffered-io.c
-+++ b/fs/iomap/buffered-io.c
-@@ -659,6 +659,7 @@ iomap_write_begin(struct inode *inode, loff_t pos, unsigned len, unsigned flags,
- 		struct page **pagep, struct iomap *iomap, struct iomap *srcmap)
- {
- 	const struct iomap_page_ops *page_ops = iomap->page_ops;
-+	unsigned aop_flags;
- 	struct page *page;
- 	int status = 0;
- 
-@@ -675,8 +676,11 @@ iomap_write_begin(struct inode *inode, loff_t pos, unsigned len, unsigned flags,
- 			return status;
- 	}
- 
-+	aop_flags = AOP_FLAG_NOFS;
-+	if (flags & IOMAP_UNCACHED)
-+		aop_flags |= AOP_FLAG_UNCACHED;
- 	page = grab_cache_page_write_begin(inode->i_mapping, pos >> PAGE_SHIFT,
--			AOP_FLAG_NOFS);
-+						aop_flags);
- 	if (!page) {
- 		status = -ENOMEM;
- 		goto out_no_page;
-@@ -818,6 +822,7 @@ iomap_write_actor(const struct iomap_data *data, struct iomap *iomap,
- {
- 	struct inode *inode = data->inode;
- 	struct iov_iter *i = data->priv;
-+	unsigned flags = data->flags;
- 	loff_t length = data->len;
- 	loff_t pos = data->pos;
- 	long status = 0;
-@@ -851,10 +856,17 @@ iomap_write_actor(const struct iomap_data *data, struct iomap *iomap,
- 			break;
- 		}
- 
--		status = iomap_write_begin(inode, pos, bytes, 0, &page, iomap,
--				srcmap);
--		if (unlikely(status))
-+retry:
-+		status = iomap_write_begin(inode, pos, bytes, flags,
-+						&page, iomap, srcmap);
-+		if (unlikely(status)) {
-+			if (status == -ENOMEM && (flags & IOMAP_UNCACHED)) {
-+				iomap->flags |= IOMAP_F_PAGE_CREATE;
-+				flags &= ~IOMAP_UNCACHED;
-+				goto retry;
-+			}
- 			break;
-+		}
- 
- 		if (mapping_writably_mapped(inode->i_mapping))
- 			flush_dcache_page(page);
-@@ -907,6 +919,9 @@ iomap_file_buffered_write(struct kiocb *iocb, struct iov_iter *iter,
- 	};
- 	loff_t ret = 0, written = 0;
- 
-+	if (iocb->ki_flags & IOCB_UNCACHED)
-+		data.flags |= IOMAP_UNCACHED;
-+
- 	while (iov_iter_count(iter)) {
- 		data.len = iov_iter_count(iter);
- 		ret = iomap_apply(&data, ops, iomap_write_actor);
-diff --git a/include/linux/iomap.h b/include/linux/iomap.h
-index 30f40145a9e9..30bb248e1d0d 100644
---- a/include/linux/iomap.h
-+++ b/include/linux/iomap.h
-@@ -48,12 +48,16 @@ struct vm_fault;
-  *
-  * IOMAP_F_BUFFER_HEAD indicates that the file system requires the use of
-  * buffer heads for this mapping.
-+ *
-+ * IOMAP_F_PAGE_CREATE indicates that pages had to be allocated to satisfy
-+ * this operation.
-  */
- #define IOMAP_F_NEW		0x01
- #define IOMAP_F_DIRTY		0x02
- #define IOMAP_F_SHARED		0x04
- #define IOMAP_F_MERGED		0x08
- #define IOMAP_F_BUFFER_HEAD	0x10
-+#define IOMAP_F_PAGE_CREATE	0x20
- 
- /*
-  * Flags set by the core iomap code during operations:
-@@ -121,6 +125,7 @@ struct iomap_page_ops {
- #define IOMAP_FAULT		(1 << 3) /* mapping for page fault */
- #define IOMAP_DIRECT		(1 << 4) /* direct I/O */
- #define IOMAP_NOWAIT		(1 << 5) /* do not block */
-+#define IOMAP_UNCACHED		(1 << 6)
- 
- struct iomap_ops {
- 	/*
--- 
-2.24.1
+> > 2. We could change struct page to point to the xa_node that holds them.
+> > Looking up the page mapping would be page->xa_node->array and then
+> > offsetof(i_pages) to get the mapping.
+> 
+> I don't think we have space in 'struct page', and I'm pretty sure we
+> don't want to grow it. That's one of the more common data structures
+> in the kernel.
 
+Oh, I wasn't clear.  I meant replace page->mapping with page->xa_node.
+We could still get from page to mapping, but it would be an extra
+dereference.  I did say it was a _bad_ idea.
