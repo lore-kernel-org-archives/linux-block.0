@@ -2,113 +2,69 @@ Return-Path: <SRS0=VRi+=2C=vger.kernel.org=linux-block-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-9.6 required=3.0 tests=DKIM_SIGNED,DKIM_VALID,
-	DKIM_VALID_AU,FREEMAIL_FORGED_FROMDOMAIN,FREEMAIL_FROM,
-	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,
-	SPF_HELO_NONE,SPF_PASS,USER_AGENT_GIT autolearn=ham autolearn_force=no
-	version=3.4.0
+X-Spam-Status: No, score=-7.2 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
+	MAILING_LIST_MULTI,MENTIONS_GIT_HOSTING,SPF_HELO_NONE,SPF_PASS,
+	USER_AGENT_SANE_1 autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id A779DC43603
-	for <linux-block@archiver.kernel.org>; Thu, 12 Dec 2019 14:09:04 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 3A4DBC43603
+	for <linux-block@archiver.kernel.org>; Thu, 12 Dec 2019 14:34:46 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.kernel.org (Postfix) with ESMTP id 7A0222173E
-	for <linux-block@archiver.kernel.org>; Thu, 12 Dec 2019 14:09:04 +0000 (UTC)
-Authentication-Results: mail.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="IcKACO99"
+	by mail.kernel.org (Postfix) with ESMTP id 1AED32067C
+	for <linux-block@archiver.kernel.org>; Thu, 12 Dec 2019 14:34:46 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1729672AbfLLOJE (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Thu, 12 Dec 2019 09:09:04 -0500
-Received: from mail-ed1-f65.google.com ([209.85.208.65]:36582 "EHLO
-        mail-ed1-f65.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1729603AbfLLOJD (ORCPT
-        <rfc822;linux-block@vger.kernel.org>);
-        Thu, 12 Dec 2019 09:09:03 -0500
-Received: by mail-ed1-f65.google.com with SMTP id j17so1925138edp.3;
-        Thu, 12 Dec 2019 06:09:02 -0800 (PST)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20161025;
-        h=from:to:cc:subject:date:message-id;
-        bh=g2DYtG1fBQ6px3ecWGYXwRbrai1LWXOdFTpOAsDGfMA=;
-        b=IcKACO99Ks3RgKSrUbaA0GGiGyKBCvFovRFwVe1pDl/xs3Zyc7TrdApXSxyW7ME2K5
-         OfzIv2ettywGHllWbr6/IEz4wxv6cpmAWZwf40u94HMrbipL9toeyAXJe76IBU+6efRu
-         BpYF5khnUbidCdQZ5DMIkmDo6LCiDfbQyhuJlnEjs+VMdMasXRCaGr5vz6vZDH5ra4aJ
-         raC8HX7N04zpKHlF7CHPB1I538t1geYpw5wHPRW2Om08sQtpVKFeSd4R8NZ+oTKPI+Fh
-         J7xsbn91E74q/1SGkitYFRznDUbFrrG4pstFjlHCjSMvkbJMlrbP8qz9+QDaxSo7xBd6
-         mcVg==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20161025;
-        h=x-gm-message-state:from:to:cc:subject:date:message-id;
-        bh=g2DYtG1fBQ6px3ecWGYXwRbrai1LWXOdFTpOAsDGfMA=;
-        b=PSiwiCcc6HK2bmIQNwadte6HxpQtoHgLDU4/UqnNO1Bzsw12j8CCfGXzzSiQNvNwSs
-         0nVbw4fx0sroERD6DNaORWvaupICneW4wa7lq+ut2x+hl/ZxwtQYzl4m+wC7/QrAZCpu
-         PjWmoL13bTO8ppcgMBKanXKt3sQdEpSmSEdEX5durGgqCNFcPLgnxqecgifQrMlY2xIU
-         0qFm2L5t0vgfEtl3J1Pl1441tY8kFZmDuvI5J6zD+mVERY/uHmL/N/6andrv5igWYIQ1
-         aRaYHChNCJ31cXzbCgiNaysK6QsxSfjTN9Rw3dnDj5Am9AvGlVxIQYY+Pe+4RhBLORZf
-         5zwA==
-X-Gm-Message-State: APjAAAVs0pGEhzrrLIuqx5TLNVAETJ/LkUzu1nQR2T2fAIKGH0BWdkiX
-        S5l2WxemUGlOyvQakXJkfL4=
-X-Google-Smtp-Source: APXvYqzNyuKExjH6wzzsVG/QW2WyQAYOCJrKIfhXr3uRP0h9cMPnVR5DfEkhn6LaZDdCYEsXz77dRQ==
-X-Received: by 2002:a50:ac71:: with SMTP id w46mr9724440edc.27.1576159741910;
-        Thu, 12 Dec 2019 06:09:01 -0800 (PST)
-Received: from ls00508.pb.local ([2001:1438:4010:2540:1467:8db0:560a:58ea])
-        by smtp.gmail.com with ESMTPSA id cw10sm157774ejb.56.2019.12.12.06.09.00
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Thu, 12 Dec 2019 06:09:01 -0800 (PST)
-From:   jgq516@gmail.com
-X-Google-Original-From: guoqing.jiang@cloud.ionos.com
-To:     tj@kernel.org, axboe@kernel.dk
-Cc:     cgroups@vger.kernel.org, linux-block@vger.kernel.org,
-        Guoqing Jiang <guoqing.jiang@cloud.ionos.com>
-Subject: [PATCH] blk-cgroup: remove blkcg_drain_queue
-Date:   Thu, 12 Dec 2019 15:08:51 +0100
-Message-Id: <20191212140851.19107-1-guoqing.jiang@cloud.ionos.com>
-X-Mailer: git-send-email 2.17.1
+        id S1729724AbfLLOep (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Thu, 12 Dec 2019 09:34:45 -0500
+Received: from mx2.suse.de ([195.135.220.15]:40132 "EHLO mx1.suse.de"
+        rhost-flags-OK-OK-OK-FAIL) by vger.kernel.org with ESMTP
+        id S1729761AbfLLOem (ORCPT <rfc822;linux-block@vger.kernel.org>);
+        Thu, 12 Dec 2019 09:34:42 -0500
+X-Virus-Scanned: by amavisd-new at test-mx.suse.de
+Received: from relay2.suse.de (unknown [195.135.220.254])
+        by mx1.suse.de (Postfix) with ESMTP id 265B9B289;
+        Thu, 12 Dec 2019 14:34:41 +0000 (UTC)
+To:     "linux-bcache@vger.kernel.org" <linux-bcache@vger.kernel.org>
+Cc:     "linux-block@vger.kernel.org" <linux-block@vger.kernel.org>,
+        Shaoxiong Li <dahefanteng@gmail.com>,
+        Hannes Reinecke <hare@suse.de>, Ruediger Oertel <ro@suse.com>
+From:   Coly Li <colyli@suse.de>
+Subject: bcache works on s390 now
+Organization: SUSE Labs
+Message-ID: <fdf24e85-5f91-3dd8-6199-cf60ba8e125c@suse.de>
+Date:   Thu, 12 Dec 2019 22:33:56 +0800
+User-Agent: Mozilla/5.0 (Macintosh; Intel Mac OS X 10.15; rv:68.0)
+ Gecko/20100101 Thunderbird/68.2.2
+MIME-Version: 1.0
+Content-Type: text/plain; charset=utf-8
+Content-Language: en-US
+Content-Transfer-Encoding: 7bit
 Sender: linux-block-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-From: Guoqing Jiang <guoqing.jiang@cloud.ionos.com>
+Hi folks,
 
-Since blk_drain_queue had already been removed, so this function
-is not needed anymore.
+After a long time effort, now bcache can work on s390 machine.
 
-Signed-off-by: Guoqing Jiang <guoqing.jiang@cloud.ionos.com>
----
- block/blk-cgroup.c | 20 --------------------
- 1 file changed, 20 deletions(-)
+The kernel part is ready since Linux v5.4, the bcache-tools should be
+updated too from,
+https://git.kernel.org/pub/scm/linux/kernel/git/colyli/bcache-tools.git/
 
-diff --git a/block/blk-cgroup.c b/block/blk-cgroup.c
-index 708dea92dac8..a229b94d5390 100644
---- a/block/blk-cgroup.c
-+++ b/block/blk-cgroup.c
-@@ -1061,26 +1061,6 @@ int blkcg_init_queue(struct request_queue *q)
- 	return PTR_ERR(blkg);
- }
- 
--/**
-- * blkcg_drain_queue - drain blkcg part of request_queue
-- * @q: request_queue to drain
-- *
-- * Called from blk_drain_queue().  Responsible for draining blkcg part.
-- */
--void blkcg_drain_queue(struct request_queue *q)
--{
--	lockdep_assert_held(&q->queue_lock);
--
--	/*
--	 * @q could be exiting and already have destroyed all blkgs as
--	 * indicated by NULL root_blkg.  If so, don't confuse policies.
--	 */
--	if (!q->root_blkg)
--		return;
--
--	blk_throtl_drain(q);
--}
--
- /**
-  * blkcg_exit_queue - exit and release blkcg part of request_queue
-  * @q: request_queue being released
+The update for bcache-tools-1.1 is necessary, it fixes a super block
+checksum issue which makes kernel code treats the registering device as
+broken.
+
+I only test bcache on a machine with vendir_id: IBM/S390, not sure
+whether it also works on s390x. If you have interest to deploy bcache on
+s390 or other big endian machines, I will appreciate if you may offer a
+result whether bcache works or not on your machine. Of cause if it does
+not work, I'd like to look into the problem and try to fix them.
+
+BTW. Since bcache-tools is not updated for quite a long time, now I
+start to take the maintenance of bcache-tools. And please permit me to
+thank Shaoxiong Li for contributing many useful patches.
+
+Just for your information.
 -- 
-2.17.1
 
+Coly Li
