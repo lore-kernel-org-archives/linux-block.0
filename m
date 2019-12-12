@@ -2,87 +2,84 @@ Return-Path: <SRS0=VRi+=2C=vger.kernel.org=linux-block-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-2.2 required=3.0 tests=DKIM_SIGNED,DKIM_VALID,
+X-Spam-Status: No, score=-2.0 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
 	HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,
 	USER_AGENT_SANE_1 autolearn=no autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 45B89C43603
-	for <linux-block@archiver.kernel.org>; Thu, 12 Dec 2019 16:27:28 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 467A1C43603
+	for <linux-block@archiver.kernel.org>; Thu, 12 Dec 2019 16:27:45 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.kernel.org (Postfix) with ESMTP id 0884922527
-	for <linux-block@archiver.kernel.org>; Thu, 12 Dec 2019 16:27:28 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id 0C97E2073B
+	for <linux-block@archiver.kernel.org>; Thu, 12 Dec 2019 16:27:45 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel-dk.20150623.gappssmtp.com header.i=@kernel-dk.20150623.gappssmtp.com header.b="T6xkncOL"
+	dkim=fail reason="signature verification failed" (2048-bit key) header.d=infradead.org header.i=@infradead.org header.b="TvUkz5if"
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1729857AbfLLQ11 (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Thu, 12 Dec 2019 11:27:27 -0500
-Received: from mail-io1-f54.google.com ([209.85.166.54]:46675 "EHLO
-        mail-io1-f54.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1729762AbfLLQ11 (ORCPT
+        id S1729864AbfLLQ1o (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Thu, 12 Dec 2019 11:27:44 -0500
+Received: from bombadil.infradead.org ([198.137.202.133]:51748 "EHLO
+        bombadil.infradead.org" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S1729762AbfLLQ1o (ORCPT
         <rfc822;linux-block@vger.kernel.org>);
-        Thu, 12 Dec 2019 11:27:27 -0500
-Received: by mail-io1-f54.google.com with SMTP id t26so3377004ioi.13
-        for <linux-block@vger.kernel.org>; Thu, 12 Dec 2019 08:27:27 -0800 (PST)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=kernel-dk.20150623.gappssmtp.com; s=20150623;
-        h=subject:to:cc:references:from:message-id:date:user-agent
-         :mime-version:in-reply-to:content-language:content-transfer-encoding;
-        bh=L2CjDVtbtRmSS9p/ZMC2e8zHEfBbFA8EoUfM5bDUuwA=;
-        b=T6xkncOLY8LZ+5xON4nDUfI/fzvqKg69ZBb0XfMIjL9EDlMcrpyTzYV3jPEUECIu7e
-         /6VePkJbfJ02IxgtjhVi7zhODL3RzicRz8RUUxTG9FMA0/+l2gwHg1lkXa+9Xz19lG5P
-         RIW0WHds+gFZXVLHMoYOU2aVxFfugcJGN8+IRth7RzCBvBQvkKfr6RZdZFv3XFAGcEv8
-         0jvtGdkjF2LOv6J2oK0OhlmGZ96TS3op6ZjE2hRprquRNtnWc1QVP2D5xZElq0NP++dH
-         FdY9uKj1DamP/Cer06/nmE/izvRIUNoXzSdvxib0JD4MDAk3nsjsBw7M9wgtvidm7gjA
-         sI2A==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20161025;
-        h=x-gm-message-state:subject:to:cc:references:from:message-id:date
-         :user-agent:mime-version:in-reply-to:content-language
-         :content-transfer-encoding;
-        bh=L2CjDVtbtRmSS9p/ZMC2e8zHEfBbFA8EoUfM5bDUuwA=;
-        b=I5+zoxnv7s2kpCGcmlQyz4SEzEO6FBq15XMoeQQ7DZfrPc+IP/Y3v7L7BwrC4DOQ+X
-         jGV1N4kKDl8gs2w80gyydZlzNdO5vc0hcMmwANX0o2cKqn/Ka60Pc4BVteJz+Mx79+Ol
-         Q97sXTxsTWGa4OL5M6tsadMXIEPDDqocrR5KQU0sy2L9I79Li3GUnTdL4UuHe6/YWcyy
-         ehjeFoENMZ0ISueb71imLB7BRYqSXOHQH6NTyIQ+6d3L9EGompQfqaZg8OsfrXlvREya
-         cZJhJGNXoZIW22sLR3DTEsGXYYcrA+K2ilH43mkoQq2xf9GNnoWUl8nnb0yKBiK29fv8
-         2qFQ==
-X-Gm-Message-State: APjAAAW2MGjF9560vuYBgd6r0wMzbwRevJ2Cyr/ZwR3RTh3NHfdUxONY
-        aANyVnxmqHFAT6AqYOH0QNpTJA==
-X-Google-Smtp-Source: APXvYqxoJV4anqq+qDAdhKogptjDsSD2zTMOztmiodrLP2ZIGIITw+1PsHhlCWyUyDRKNb2x5gMkZA==
-X-Received: by 2002:a05:6638:304:: with SMTP id w4mr8644279jap.81.1576168046416;
-        Thu, 12 Dec 2019 08:27:26 -0800 (PST)
-Received: from [192.168.1.159] ([65.144.74.34])
-        by smtp.gmail.com with ESMTPSA id k7sm1836770ilg.49.2019.12.12.08.27.25
-        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
-        Thu, 12 Dec 2019 08:27:25 -0800 (PST)
-Subject: Re: [PATCH v2] blk-cgroup: remove blkcg_drain_queue
-To:     jgq516@gmail.com, tj@kernel.org
-Cc:     cgroups@vger.kernel.org, linux-block@vger.kernel.org,
-        Guoqing Jiang <guoqing.jiang@cloud.ionos.com>
-References: <20191212155200.13403-1-guoqing.jiang@cloud.ionos.com>
-From:   Jens Axboe <axboe@kernel.dk>
-Message-ID: <3f8133d5-fb25-a588-3cd8-b3b6dbfae4c8@kernel.dk>
-Date:   Thu, 12 Dec 2019 09:27:24 -0700
-User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:68.0) Gecko/20100101
- Thunderbird/68.2.2
+        Thu, 12 Dec 2019 11:27:44 -0500
+DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed;
+        d=infradead.org; s=bombadil.20170209; h=In-Reply-To:Content-Type:MIME-Version
+        :References:Message-ID:Subject:Cc:To:From:Date:Sender:Reply-To:
+        Content-Transfer-Encoding:Content-ID:Content-Description:Resent-Date:
+        Resent-From:Resent-Sender:Resent-To:Resent-Cc:Resent-Message-ID:List-Id:
+        List-Help:List-Unsubscribe:List-Subscribe:List-Post:List-Owner:List-Archive;
+         bh=IgVkNZGYYb9ycoy4soM2AlB3WTlIqOyojMWaymh04yw=; b=TvUkz5ifFQk0sY/MKMPhzbCvw
+        sDSWJywp1g/bG3Yqvkr3a3T6Gu2STfYzcopwE6DKn5X7MVeg9VUhuY9rXdmTA9CCcOftkIq3fI2rs
+        hbwck73m0kvEJAouG0rlZyUdOwc2hBOk4i8Qy8WlMVvmIzNUoOqKaPxqlCNTou3d1mXFVBfYTeVtZ
+        cYyfV5FRa3yNSyqk5bOIF4qjM8Tk+5tzQ9iYYRM8WfiaGTwC0v5J8OMgjlUVnBKeQAxLVr74+4NRk
+        Kb9mktlcAXxvU3xrz5q9GLc7DDXKrMOGH92mOxPoy3CBbHA7lduUADCZ8uJK3ozOUCEWHFcPF3b9w
+        fhp0EgPmQ==;
+Received: from hch by bombadil.infradead.org with local (Exim 4.92.3 #3 (Red Hat Linux))
+        id 1ifRJJ-0004WW-2W; Thu, 12 Dec 2019 16:27:29 +0000
+Date:   Thu, 12 Dec 2019 08:27:29 -0800
+From:   Christoph Hellwig <hch@infradead.org>
+To:     Paolo Bonzini <pbonzini@redhat.com>
+Cc:     "Michael S. Tsirkin" <mst@redhat.com>,
+        Arnd Bergmann <arnd@arndb.de>, Jens Axboe <axboe@kernel.dk>,
+        "James E.J. Bottomley" <jejb@linux.ibm.com>,
+        "Martin K. Petersen" <martin.petersen@oracle.com>,
+        Alexander Viro <viro@zeniv.linux.org.uk>,
+        Jason Wang <jasowang@redhat.com>,
+        Doug Gilbert <dgilbert@interlog.com>,
+        Kai =?iso-8859-1?Q?M=E4kisara?= <Kai.Makisara@kolumbus.fi>,
+        linux-kernel@vger.kernel.org, y2038@lists.linaro.org,
+        Stefan Hajnoczi <stefanha@redhat.com>,
+        Bart Van Assche <bvanassche@acm.org>,
+        Hannes Reinecke <hare@suse.com>,
+        Damien Le Moal <damien.lemoal@wdc.com>,
+        John Garry <john.garry@huawei.com>,
+        virtualization@lists.linux-foundation.org,
+        linux-block@vger.kernel.org, linux-scsi@vger.kernel.org,
+        linux-fsdevel@vger.kernel.org
+Subject: Re: [PATCH 15/24] compat_ioctl: scsi: move ioctl handling into
+ drivers
+Message-ID: <20191212162729.GB27991@infradead.org>
+References: <20191211204306.1207817-1-arnd@arndb.de>
+ <20191211204306.1207817-16-arnd@arndb.de>
+ <20191211180155-mutt-send-email-mst@kernel.org>
+ <858768fb-5f79-8259-eb6a-a26f18fb0e04@redhat.com>
 MIME-Version: 1.0
-In-Reply-To: <20191212155200.13403-1-guoqing.jiang@cloud.ionos.com>
-Content-Type: text/plain; charset=utf-8
-Content-Language: en-US
-Content-Transfer-Encoding: 7bit
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <858768fb-5f79-8259-eb6a-a26f18fb0e04@redhat.com>
+User-Agent: Mutt/1.12.1 (2019-06-15)
+X-SRS-Rewrite: SMTP reverse-path rewritten from <hch@infradead.org> by bombadil.infradead.org. See http://www.infradead.org/rpr.html
 Sender: linux-block-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-On 12/12/19 8:52 AM, jgq516@gmail.com wrote:
-> From: Guoqing Jiang <guoqing.jiang@cloud.ionos.com>
-> 
-> Since blk_drain_queue had already been removed, so this function
-> is not needed anymore.
+On Thu, Dec 12, 2019 at 01:28:08AM +0100, Paolo Bonzini wrote:
+> I think it's because the only ioctl for virtio-blk is SG_IO.  It makes
+> sense to lump it in with scsi, but I wouldn't mind getting rid of
+> CONFIG_VIRTIO_BLK_SCSI altogether.
 
-Applied, thanks.
-
--- 
-Jens Axboe
-
+CONFIG_VIRTIO_BLK_SCSI has been broken for about two years, as it
+never set the QUEUE_FLAG_SCSI_PASSTHROUGH flag after that was
+introduced.  I actually have a patch that I plan to send to remove
+this support as it was a really idea to start with (speaking as
+the person who had that idea back in the day).
