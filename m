@@ -2,131 +2,163 @@ Return-Path: <SRS0=VRi+=2C=vger.kernel.org=linux-block-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-0.9 required=3.0 tests=DKIMWL_WL_HIGH,DKIM_SIGNED,
-	DKIM_VALID,DKIM_VALID_AU,HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,
-	SPF_HELO_NONE,SPF_PASS autolearn=no autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-3.8 required=3.0 tests=DKIM_SIGNED,DKIM_VALID,
+	HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,
+	USER_AGENT_GIT autolearn=no autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 7F6E6C00454
-	for <linux-block@archiver.kernel.org>; Thu, 12 Dec 2019 18:29:24 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id C9E4DC43603
+	for <linux-block@archiver.kernel.org>; Thu, 12 Dec 2019 19:01:38 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.kernel.org (Postfix) with ESMTP id 5C48E2464B
-	for <linux-block@archiver.kernel.org>; Thu, 12 Dec 2019 18:29:24 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=default; t=1576175364;
-	bh=pN2pj4aju2pVRKrp/+C58v3IcKaDpQl9YVDd8VndA3w=;
-	h=References:In-Reply-To:From:Date:Subject:To:Cc:List-ID:From;
-	b=Kc0rHx7MCTPLxK3cbP5RbIvVoug3u5LxNRFRMu8+Migo0Wtu8+CO1bBnz+JepRpRo
-	 QQGvdT4DsoJy3b6beKsSc7pM4rxMO9V2IzT/4o8K2PwIXyNn9mCqceLegoK1nC1acw
-	 nV9ncmwirgXe03eZxELvLx5L+W4o3xvveeQa+b6Y=
+	by mail.kernel.org (Postfix) with ESMTP id 954682073B
+	for <linux-block@archiver.kernel.org>; Thu, 12 Dec 2019 19:01:38 +0000 (UTC)
+Authentication-Results: mail.kernel.org;
+	dkim=pass (2048-bit key) header.d=kernel-dk.20150623.gappssmtp.com header.i=@kernel-dk.20150623.gappssmtp.com header.b="0J8yS6LU"
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1730017AbfLLS3X (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Thu, 12 Dec 2019 13:29:23 -0500
-Received: from mail-lj1-f193.google.com ([209.85.208.193]:38740 "EHLO
-        mail-lj1-f193.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1730380AbfLLS3X (ORCPT
+        id S1730556AbfLLTBi (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Thu, 12 Dec 2019 14:01:38 -0500
+Received: from mail-il1-f195.google.com ([209.85.166.195]:41700 "EHLO
+        mail-il1-f195.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S1730261AbfLLTBh (ORCPT
         <rfc822;linux-block@vger.kernel.org>);
-        Thu, 12 Dec 2019 13:29:23 -0500
-Received: by mail-lj1-f193.google.com with SMTP id k8so3384929ljh.5
-        for <linux-block@vger.kernel.org>; Thu, 12 Dec 2019 10:29:22 -0800 (PST)
+        Thu, 12 Dec 2019 14:01:37 -0500
+Received: by mail-il1-f195.google.com with SMTP id z90so2929758ilc.8
+        for <linux-block@vger.kernel.org>; Thu, 12 Dec 2019 11:01:37 -0800 (PST)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=linux-foundation.org; s=google;
-        h=mime-version:references:in-reply-to:from:date:message-id:subject:to
-         :cc;
-        bh=RFYeLe4AYUGFszSVCe9rzGReH5534Kp7HFzyL7IgJoo=;
-        b=gaEqyEltnYHeY4bwG67JYh7XhezoYwB/vlBuat5eb9B1wDrnC3gxSKR6wn2/kJ9gaN
-         xQV2GF7RBP8bhWsGKKAD6uojhcOpaKl/HoD3iV1ESQk4Ak3DGeXjvNFW7PMlrhdEMozD
-         y6r7JlXMbpP8G/nes7/wTMJB8Ait6DP/0iQww=
+        d=kernel-dk.20150623.gappssmtp.com; s=20150623;
+        h=from:to:cc:subject:date:message-id:mime-version
+         :content-transfer-encoding;
+        bh=ovDmnr/9RvR8ZZRh+R6sbKcDY51akdjZYbAek3W/T9E=;
+        b=0J8yS6LU+VJC3DmeIONOJvogXk+0an4zAyd6Jx56rTBrkgeUChz9ZnqthoObvi8EwG
+         QQX+s9eHJEaLMtYtG6Q8cCKAIHCn3voNuwx3MJq3VQq3FYjih3mtVxcF3ZHVUkMB1TMO
+         PCucj93LwVI7ax+mw+nxP2T68Izlu54R738G5abYBJGo2/Fd81T55PgQTCirXCHMh6jh
+         ro+RwJhdQxkltBI/Az1zolVEa4hNTDSwvuZlI8FkE+/D2S1zwOimo6v8LySQAETyqjRF
+         sIcmaNkiPQBjCBQKbvEDqsR7/UO0H3P5ddbFzOoCrwFjd8i7FwTxINyFc+V3URV/7AmN
+         Hy8A==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=1e100.net; s=20161025;
-        h=x-gm-message-state:mime-version:references:in-reply-to:from:date
-         :message-id:subject:to:cc;
-        bh=RFYeLe4AYUGFszSVCe9rzGReH5534Kp7HFzyL7IgJoo=;
-        b=SdDhPo0UIgQYdk2gXItZp7yNCr7N9vxb3314mMfGaLAwUie/ElBj8n7zMLJNWTyCPf
-         IdOtJNvLxc8Ue1QYwDC+rug9gGbNGbRUlzIaX2HELHYRxQgJD2FDPzyndmM4HMn0tqN2
-         OVphHMHbG4+yRXziLMDNeovfD1SwEIYEnoyWC+wEw8Hn2o2crAWc4eLCvqfzmxZMmfll
-         Yi1cmcWnuIAcTe1dd7HmH4kS9Gqpzu53+AHWYZHmrPiFY+YAelI5dbnXDTqr0nJ7P+wM
-         agwWRWkZPvkqDd6gt7v3mw3ZighV1zlVLESZIaT8/HR1KSqKOdTVz38KQbI5k7jw1yoK
-         kJcA==
-X-Gm-Message-State: APjAAAXrENl7QDPbq3tcGKElSC/8uIAoeKKLTNsB8et+vMq15c3FuGQ+
-        v735WT0zDjfXoQ73dBXblgaT8ufAwio=
-X-Google-Smtp-Source: APXvYqyOu5J9oxpY6tCrxTPP6uxHZ3DSVHSG5jGgEvduqnZ1jovhtZLaCATN2rvwNJE9mrzmCopmlg==
-X-Received: by 2002:a2e:914d:: with SMTP id q13mr6964844ljg.198.1576175360460;
-        Thu, 12 Dec 2019 10:29:20 -0800 (PST)
-Received: from mail-lf1-f52.google.com (mail-lf1-f52.google.com. [209.85.167.52])
-        by smtp.gmail.com with ESMTPSA id q25sm3487522lji.7.2019.12.12.10.29.19
-        for <linux-block@vger.kernel.org>
-        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
-        Thu, 12 Dec 2019 10:29:19 -0800 (PST)
-Received: by mail-lf1-f52.google.com with SMTP id 9so2421241lfq.10
-        for <linux-block@vger.kernel.org>; Thu, 12 Dec 2019 10:29:19 -0800 (PST)
-X-Received: by 2002:a19:4351:: with SMTP id m17mr6767957lfj.61.1576175358789;
- Thu, 12 Dec 2019 10:29:18 -0800 (PST)
+        h=x-gm-message-state:from:to:cc:subject:date:message-id:mime-version
+         :content-transfer-encoding;
+        bh=ovDmnr/9RvR8ZZRh+R6sbKcDY51akdjZYbAek3W/T9E=;
+        b=iwMR5dECcteFlUF3uyE0imSZGDuZQ5VUMTaajHo6GLGUtNBW9YERFrk4O/n9vLHjtN
+         oxwbAeKxcSXKFvmyy0Z/ysfKm3mI0VZpfWRYrVJ+6kmMvXCRn5ca0eUIZVc9TanKyDRe
+         X/VMJhTHSlqF+TBID0WQrM2Rahl8vE4Hbwz+SZ2Ulw199ZY26NSr+KU7xKRdEmYf9Obq
+         vUgjF7d64KrDwdFDAuED/CXdWc7bUyr5HuiYoihZ7XJOQ/Hdg2KCdTUUVksekFG6GRE0
+         e0SMmA2NZBaJj+X+1qeCMrXREH6F2cYoV6PmypilcBhN00dcovYP4XE5+b8yxLLhJoar
+         2m5A==
+X-Gm-Message-State: APjAAAV/sWdp0pUAu1sHVNmCHgMkZyZUSsQPGg9uWwyl7CqmfPcIbFMf
+        eZabrn9m8eQbm9ueLyeOMASh8g==
+X-Google-Smtp-Source: APXvYqx7OzUuqUuKPK7adK91kwP6pyHsQWbI4lIk01qvzfE1sY1oclszKDcqlWV9JFKXZnSvUKGCAQ==
+X-Received: by 2002:a92:5bdd:: with SMTP id c90mr10293064ilg.78.1576177296868;
+        Thu, 12 Dec 2019 11:01:36 -0800 (PST)
+Received: from x1.thefacebook.com ([65.144.74.34])
+        by smtp.gmail.com with ESMTPSA id i22sm1957745ill.40.2019.12.12.11.01.35
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Thu, 12 Dec 2019 11:01:35 -0800 (PST)
+From:   Jens Axboe <axboe@kernel.dk>
+To:     linux-mm@kvack.org, linux-fsdevel@vger.kernel.org,
+        linux-block@vger.kernel.org
+Cc:     willy@infradead.org, clm@fb.com, torvalds@linux-foundation.org,
+        david@fromorbit.com
+Subject: [PATCHSET v4 0/5] Support for RWF_UNCACHED
+Date:   Thu, 12 Dec 2019 12:01:28 -0700
+Message-Id: <20191212190133.18473-1-axboe@kernel.dk>
+X-Mailer: git-send-email 2.24.1
 MIME-Version: 1.0
-References: <0d4e3954-c467-30a7-5a8e-7c4180275533@kernel.dk>
- <CAHk-=whk4bcVPvtAv5OmHiW5z6AXgCLFhO4YrXD7o0XC+K-aHw@mail.gmail.com>
- <fef996ca-a4ed-9633-1f79-91292a984a20@kernel.dk> <CAHk-=wg=hHUFg3i0vDmKEg8HFbEKquAsoC8CJoZpP-8_A1jZDA@mail.gmail.com>
- <1c93194a-ed91-c3aa-deb5-a3394805defb@kernel.dk> <CAHk-=wj0pXsngjWKw5p3oTvwkNnT2DyoZWqPB+-wBY+BGTQ96w@mail.gmail.com>
- <d8a8ea42-7f76-926c-ae9a-d49b11578153@kernel.dk> <CAHk-=whtf0-f5wCcSAj=oTK2TEaesF43UdHnPyvgE9X1EuwvBw@mail.gmail.com>
- <20191212015612.GP32169@bombadil.infradead.org> <CAHk-=wjr1G0xXDs7R=2ZAB=YSs-WLk4GsVwLafw+96XVwo7jyg@mail.gmail.com>
- <20191212175200.GS32169@bombadil.infradead.org>
-In-Reply-To: <20191212175200.GS32169@bombadil.infradead.org>
-From:   Linus Torvalds <torvalds@linux-foundation.org>
-Date:   Thu, 12 Dec 2019 10:29:02 -0800
-X-Gmail-Original-Message-ID: <CAHk-=wh4J91wMrEU12DP1r+rLiThQ6wDBb+UOzOuMDkusxtdhw@mail.gmail.com>
-Message-ID: <CAHk-=wh4J91wMrEU12DP1r+rLiThQ6wDBb+UOzOuMDkusxtdhw@mail.gmail.com>
-Subject: Re: [PATCHSET v3 0/5] Support for RWF_UNCACHED
-To:     Matthew Wilcox <willy@infradead.org>
-Cc:     Jens Axboe <axboe@kernel.dk>, Linux-MM <linux-mm@kvack.org>,
-        linux-fsdevel <linux-fsdevel@vger.kernel.org>,
-        linux-block <linux-block@vger.kernel.org>,
-        Chris Mason <clm@fb.com>, Dave Chinner <david@fromorbit.com>,
-        Johannes Weiner <hannes@cmpxchg.org>
-Content-Type: text/plain; charset="UTF-8"
+Content-Transfer-Encoding: 8bit
 Sender: linux-block-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-On Thu, Dec 12, 2019 at 9:52 AM Matthew Wilcox <willy@infradead.org> wrote:
->
-> 1. We could semi-sort the pages on the LRU list.  If we know we're going
-> to remove a bunch of pages, we could take a batch of them off the list,
-> sort them and remove them in-order.  This probably wouldn't be terribly
-> effective.
+Recently someone asked me how io_uring buffered IO compares to mmaped
+IO in terms of performance. So I ran some tests with buffered IO, and
+found the experience to be somewhat painful. The test case is pretty
+basic, random reads over a dataset that's 10x the size of RAM.
+Performance starts out fine, and then the page cache fills up and we
+hit a throughput cliff. CPU usage of the IO threads go up, and we have
+kswapd spending 100% of a core trying to keep up. Seeing that, I was
+reminded of the many complaints I here about buffered IO, and the fact
+that most of the folks complaining will ultimately bite the bullet and
+move to O_DIRECT to just get the kernel out of the way.
 
-I don't think the sorting is relevant.
+But I don't think it needs to be like that. Switching to O_DIRECT isn't
+always easily doable. The buffers have different life times, size and
+alignment constraints, etc. On top of that, mixing buffered and O_DIRECT
+can be painful.
 
-Once you batch things, you already would get most of the locality
-advantage in the cache if it exists (and the batch isn't insanely
-large so that one batch already causes cache overflows).
+Seems to me that we have an opportunity to provide something that sits
+somewhere in between buffered and O_DIRECT, and this is where
+RWF_UNCACHED enters the picture. If this flag is set on IO, we get the
+following behavior:
 
-The problem - I suspect - is that we don't batch at all. Or rather,
-the "batching" does exist at a high level, but it's so high that
-there's just tons of stuff going on between single pages. It is at the
-shrink_page_list() level, which is pretty high up and basically does
-one page at a time with locking and a lot of tests for each page, and
-then we do "__remove_mapping()" (which does some more work) one at a
-time before we actually get to __delete_from_page_cache().
+- If the data is in cache, it remains in cache and the copy (in or out)
+  is served to/from that. This is true for both reads and writes.
 
-So it's "batched", but it's in a huge loop, and even at that huge loop
-level the batch size is fairly small. We limit it to SWAP_CLUSTER_MAX,
-which is just 32.
+- For writes, if the data is NOT in cache, we add it while performing the
+  IO. When the IO is done, we remove it again.
 
-Thinking about it, that SWAP_CLUSTER_MAX may make sense in some other
-circumstances, but not necessarily in the "shrink clean inactive
-pages" thing. I wonder if we could just batch clean pages a _lot_ more
-aggressively. Yes, our batching loop is still very big and it might
-not help at an L1 level, but it might help in the L2, at least.
+- For reads, if the data is NOT in the cache, we allocate a private page
+  and use that for IO. When the IO is done, we free this page. The page
+  never sees the page cache.
 
-In kswapd, when we have 28 GB of pages on the inactive list, a batch
-of 32 pages at a time is pretty small ;)
+With this, I can do 100% smooth buffered reads or writes without pushing
+the kernel to the state where kswapd is sweating bullets. In fact it
+doesn't even register.
 
-> 2. We could change struct page to point to the xa_node that holds them.
-> Looking up the page mapping would be page->xa_node->array and then
-> offsetof(i_pages) to get the mapping.
+Comments appreciated! This should work on any standard file system,
+using either the generic helpers or iomap. I have tested ext4 and xfs
+for the right read/write behavior, but no further validation has been
+done yet. This version contains the bigger prep patch of switching
+iomap_apply() and actors to struct iomap_data, and I hope I didn't
+mess that up too badly. I'll try and exercise it all, I've done XFS
+mounts and reads+writes and it seems happy from that POV at least.
 
-I don't think we have space in 'struct page', and I'm pretty sure we
-don't want to grow it. That's one of the more common data structures
-in the kernel.
+The core of the changes are actually really small, the majority of
+the diff is just prep work to get there.
 
-                         Linus
+Patches are against current git, and can also be found here:
+
+https://git.kernel.dk/cgit/linux-block/log/?h=buffered-uncached
+
+ fs/ceph/file.c          |   2 +-
+ fs/dax.c                |  25 +++--
+ fs/ext4/file.c          |   2 +-
+ fs/iomap/apply.c        |  50 ++++++---
+ fs/iomap/buffered-io.c  | 225 +++++++++++++++++++++++++---------------
+ fs/iomap/direct-io.c    |  57 +++++-----
+ fs/iomap/fiemap.c       |  48 +++++----
+ fs/iomap/seek.c         |  64 +++++++-----
+ fs/iomap/swapfile.c     |  27 ++---
+ fs/nfs/file.c           |   2 +-
+ include/linux/fs.h      |   7 +-
+ include/linux/iomap.h   |  20 +++-
+ include/uapi/linux/fs.h |   5 +-
+ mm/filemap.c            |  89 +++++++++++++---
+ 14 files changed, 416 insertions(+), 207 deletions(-)
+
+Changes since v3:
+- Add iomap_actor_data to cut down on arguments
+- Fix bad flag drop in iomap_write_begin()
+- Remove unused IOMAP_WRITE_F_UNCACHED flag
+- Don't use the page cache at all for reads
+
+Changes since v2:
+- Rework the write side according to Chinners suggestions. Much cleaner
+  this way. It does mean that we invalidate the full write region if just
+  ONE page (or more) had to be created, where before it was more granular.
+  I don't think that's a concern, and on the plus side, we now no longer
+  have to chunk invalidations into 15/16 pages at the time.
+- Cleanups
+
+Changes since v1:
+- Switch to pagevecs for write_drop_cached_pages()
+- Use page_offset() instead of manual shift
+- Ensure we hold a reference on the page between calling ->write_end()
+  and checking the mapping on the locked page
+- Fix XFS multi-page streamed writes, we'd drop the UNCACHED flag after
+  the first page
+
+-- 
+Jens Axboe
+
+
