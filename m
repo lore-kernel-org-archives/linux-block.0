@@ -2,116 +2,170 @@ Return-Path: <SRS0=VRi+=2C=vger.kernel.org=linux-block-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-0.9 required=3.0 tests=DKIMWL_WL_HIGH,DKIM_SIGNED,
-	DKIM_VALID,DKIM_VALID_AU,HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,
-	SPF_HELO_NONE,SPF_PASS autolearn=no autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-2.2 required=3.0 tests=DKIM_SIGNED,DKIM_VALID,
+	HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,
+	USER_AGENT_SANE_1 autolearn=no autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 56518C43603
-	for <linux-block@archiver.kernel.org>; Thu, 12 Dec 2019 01:41:37 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 13D4DC2D0C6
+	for <linux-block@archiver.kernel.org>; Thu, 12 Dec 2019 01:41:49 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.kernel.org (Postfix) with ESMTP id 24B3C22527
-	for <linux-block@archiver.kernel.org>; Thu, 12 Dec 2019 01:41:37 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=default; t=1576114897;
-	bh=6pi1QKFs3ihe469ogQOJBlCrHTgEHvChQo3qNeylyyk=;
-	h=References:In-Reply-To:From:Date:Subject:To:Cc:List-ID:From;
-	b=v+7UHcM5UJzSf7ymKiojBAJT/U5EVgv7n8y1UpFHJ4eDWu6amSfymuDQ7womaiGZK
-	 pAWSFjMmwfsmbVOeB+839PP9VmoKXpzje5O9fnrh1LwgOBUgNcTIpsL0nHENW/RaB2
-	 V5laEvJr8eWTC+b1kEHz7ZdwUbBAVBnetuvMhu/I=
+	by mail.kernel.org (Postfix) with ESMTP id DDFC82464B
+	for <linux-block@archiver.kernel.org>; Thu, 12 Dec 2019 01:41:48 +0000 (UTC)
+Authentication-Results: mail.kernel.org;
+	dkim=pass (2048-bit key) header.d=kernel-dk.20150623.gappssmtp.com header.i=@kernel-dk.20150623.gappssmtp.com header.b="hrnF4TXg"
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1727490AbfLLBlg (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Wed, 11 Dec 2019 20:41:36 -0500
-Received: from mail-lf1-f68.google.com ([209.85.167.68]:37652 "EHLO
-        mail-lf1-f68.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1727297AbfLLBlg (ORCPT
+        id S1727514AbfLLBls (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Wed, 11 Dec 2019 20:41:48 -0500
+Received: from mail-pg1-f193.google.com ([209.85.215.193]:39803 "EHLO
+        mail-pg1-f193.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S1727504AbfLLBls (ORCPT
         <rfc822;linux-block@vger.kernel.org>);
-        Wed, 11 Dec 2019 20:41:36 -0500
-Received: by mail-lf1-f68.google.com with SMTP id b15so377194lfc.4
-        for <linux-block@vger.kernel.org>; Wed, 11 Dec 2019 17:41:35 -0800 (PST)
+        Wed, 11 Dec 2019 20:41:48 -0500
+Received: by mail-pg1-f193.google.com with SMTP id b137so274224pga.6
+        for <linux-block@vger.kernel.org>; Wed, 11 Dec 2019 17:41:47 -0800 (PST)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=linux-foundation.org; s=google;
-        h=mime-version:references:in-reply-to:from:date:message-id:subject:to
-         :cc;
-        bh=qkGwL2n2COMGi/65rr06OKZlwq6a94CxCGW0s5lEfc0=;
-        b=KgSvodEa7eLrcqdNK9kKIImqn5jEmRctWpRgCEnbVU+jw3hmZb5+262OnTWzIHVrKB
-         4bckfwrJrGys15oOES9fMPyMF2VG1oJxHymVlnVo7XzOorvhCUqVrbg00X+UKrC2vXFo
-         SG8r+gelbxFlvgfg2uzQmA5lr/M+IXcQCtoKA=
+        d=kernel-dk.20150623.gappssmtp.com; s=20150623;
+        h=subject:from:to:cc:references:message-id:date:user-agent
+         :mime-version:in-reply-to:content-language:content-transfer-encoding;
+        bh=QxnRj1KTspHy7p7jjV7BEiC8kTXAQbaB4Nasa0uBmKs=;
+        b=hrnF4TXgpHDXedLBaY8w522NQV3GgLZp7239lwIiy9APNQKtr7vpyOoUxgMf4c4pPn
+         zgSquxRTfw5cwSdsjtl6c6fDxnYOqeV4fmJ2Gldio+OHoocZY7Z/6hI0wy5a4O1jgRgO
+         iF1mSK0vpjSK1cI9IOA9ZpTOkJuyLyobGk/k1zVU/7TDgIyO9KQeAfMdBp+LcnoXK0X+
+         J/9TA64kcKSg8Jsvji+Y/wugIAHOqXrh4bk5/Rbcu5uexhTu3drPECCqLYk1+JtsYpgl
+         NbPkRosZagw/jIkQr2JhkyH//XXiiGFB1d6UleMnNPhFgQ8z2rynbwm2S6DXqiySojOu
+         QI7g==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=1e100.net; s=20161025;
-        h=x-gm-message-state:mime-version:references:in-reply-to:from:date
-         :message-id:subject:to:cc;
-        bh=qkGwL2n2COMGi/65rr06OKZlwq6a94CxCGW0s5lEfc0=;
-        b=qazhWflt0eQymwhFmvuxFP/LupsA8hKyG8eM3XX2zFI+N8vU2+YqXCm2ZdsY2mXemv
-         +uH1sVyj5l1RCEtUCSO8t27cySIiTn84Z4GYEnWsTIti7BFfQcqzsB1R3VgmYDRgjE2C
-         q5Sr8wi8cXSsOZO1pqX3sCJwK3tVXFV5wCHlP4vW27gELZY2DU048mF7YAVDU0QT1xXX
-         USJZobSVGvMMM8zHW3gyGokhXbGa6KqfZ1YgqHpZOxnZOv5qjuuXsh2mD5zaaGGM0d31
-         WZtRvWpNlM+SFB7JQPwaAIe3KJXMg5LT6HZIADn2B99ME4G81miOqGXtlD75HCc4RJF5
-         leig==
-X-Gm-Message-State: APjAAAVVkLSDLJnzfM5BaL1QioBPl/sEN7xQea9CK3puMrX/pDHRBRfr
-        UlE83f7YKIyNbSLOdEB7kN/uaPBjucY=
-X-Google-Smtp-Source: APXvYqyNP/Sa3DDaPiIiPLfnmUEvw/1kvefMXNzh5t97NUcHWF3O/WstYaaxaIQDuebxtT3aTNgOLQ==
-X-Received: by 2002:ac2:508e:: with SMTP id f14mr3787084lfm.72.1576114894097;
-        Wed, 11 Dec 2019 17:41:34 -0800 (PST)
-Received: from mail-lj1-f171.google.com (mail-lj1-f171.google.com. [209.85.208.171])
-        by smtp.gmail.com with ESMTPSA id 2sm2009122ljq.38.2019.12.11.17.41.32
-        for <linux-block@vger.kernel.org>
+        h=x-gm-message-state:subject:from:to:cc:references:message-id:date
+         :user-agent:mime-version:in-reply-to:content-language
+         :content-transfer-encoding;
+        bh=QxnRj1KTspHy7p7jjV7BEiC8kTXAQbaB4Nasa0uBmKs=;
+        b=jFioYA4FWoV4XjV7uH8a7rNc8ewOY1JEBekow9sOR8HZtHL8qH58DBOPLlGJooYVaq
+         /q8ki9lCmafcHtwj6EzVXUy+iWdY41rgQRf7swuLcLxB4BqiFWyKYFTKa6xUVTM4vCQ6
+         fph3Hm2ZbC0PkdHDOJV7gAa5P8zHHMh8F6Y/wDxlSpcTZ2dRmIwvOgNggjXRmKLpe15E
+         wpABMLZdfravAkMoXLtujhSTk8wm11tyariyPLHHAIoPple8Wd9MGgFGzj9V4z4sUG7E
+         FXNAath72gxnR+qUb+GwHIyocUekKbHnIpI3CflEjqaA5kGxemlzMlQr+KkPuAesFRcL
+         uaow==
+X-Gm-Message-State: APjAAAVttUoUqKGjH1P7+BMVNUp2f4J9Shhd+2CoQTkRk1YAwnJTZbCe
+        oKsIxhfSdCwEdyp6l+kMBTETrA==
+X-Google-Smtp-Source: APXvYqwUun2qLSYWDkJmEhhOuR/RBu3Dvqm+DjkY/o2GxGB0RxGae2HfaWEfH2qhUPN7GXt7FDDbyA==
+X-Received: by 2002:a65:4203:: with SMTP id c3mr7635957pgq.368.1576114907080;
+        Wed, 11 Dec 2019 17:41:47 -0800 (PST)
+Received: from [192.168.1.188] ([66.219.217.145])
+        by smtp.gmail.com with ESMTPSA id v4sm3619850pjb.24.2019.12.11.17.41.45
         (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
-        Wed, 11 Dec 2019 17:41:33 -0800 (PST)
-Received: by mail-lj1-f171.google.com with SMTP id e28so333448ljo.9
-        for <linux-block@vger.kernel.org>; Wed, 11 Dec 2019 17:41:32 -0800 (PST)
-X-Received: by 2002:a2e:9ad8:: with SMTP id p24mr4229397ljj.148.1576114892571;
- Wed, 11 Dec 2019 17:41:32 -0800 (PST)
-MIME-Version: 1.0
-References: <20191211152943.2933-1-axboe@kernel.dk> <CAHk-=wjz3LE1kznro1dozhk9i9Dr4pCnkj7Fuccn2xdWeGHawQ@mail.gmail.com>
- <d0adcde2-3106-4fea-c047-4d17111bab70@kernel.dk> <e43a2700-8625-e136-dc9d-d0d2da5d96ac@kernel.dk>
- <CAHk-=wje8i3DVcO=fMC4tzKTS5+eHv0anrVZa_JENQt08T=qCQ@mail.gmail.com>
- <0d4e3954-c467-30a7-5a8e-7c4180275533@kernel.dk> <CAHk-=whk4bcVPvtAv5OmHiW5z6AXgCLFhO4YrXD7o0XC+K-aHw@mail.gmail.com>
- <fef996ca-a4ed-9633-1f79-91292a984a20@kernel.dk> <CAHk-=wg=hHUFg3i0vDmKEg8HFbEKquAsoC8CJoZpP-8_A1jZDA@mail.gmail.com>
- <1c93194a-ed91-c3aa-deb5-a3394805defb@kernel.dk> <CAHk-=wj0pXsngjWKw5p3oTvwkNnT2DyoZWqPB+-wBY+BGTQ96w@mail.gmail.com>
- <d8a8ea42-7f76-926c-ae9a-d49b11578153@kernel.dk>
-In-Reply-To: <d8a8ea42-7f76-926c-ae9a-d49b11578153@kernel.dk>
-From:   Linus Torvalds <torvalds@linux-foundation.org>
-Date:   Wed, 11 Dec 2019 17:41:16 -0800
-X-Gmail-Original-Message-ID: <CAHk-=whtf0-f5wCcSAj=oTK2TEaesF43UdHnPyvgE9X1EuwvBw@mail.gmail.com>
-Message-ID: <CAHk-=whtf0-f5wCcSAj=oTK2TEaesF43UdHnPyvgE9X1EuwvBw@mail.gmail.com>
+        Wed, 11 Dec 2019 17:41:46 -0800 (PST)
 Subject: Re: [PATCHSET v3 0/5] Support for RWF_UNCACHED
-To:     Jens Axboe <axboe@kernel.dk>
+From:   Jens Axboe <axboe@kernel.dk>
+To:     Linus Torvalds <torvalds@linux-foundation.org>
 Cc:     Linux-MM <linux-mm@kvack.org>,
         linux-fsdevel <linux-fsdevel@vger.kernel.org>,
         linux-block <linux-block@vger.kernel.org>,
         Matthew Wilcox <willy@infradead.org>, Chris Mason <clm@fb.com>,
         Dave Chinner <david@fromorbit.com>,
         Johannes Weiner <hannes@cmpxchg.org>
-Content-Type: text/plain; charset="UTF-8"
+References: <20191211152943.2933-1-axboe@kernel.dk>
+ <CAHk-=wjz3LE1kznro1dozhk9i9Dr4pCnkj7Fuccn2xdWeGHawQ@mail.gmail.com>
+ <d0adcde2-3106-4fea-c047-4d17111bab70@kernel.dk>
+ <e43a2700-8625-e136-dc9d-d0d2da5d96ac@kernel.dk>
+ <CAHk-=wje8i3DVcO=fMC4tzKTS5+eHv0anrVZa_JENQt08T=qCQ@mail.gmail.com>
+ <0d4e3954-c467-30a7-5a8e-7c4180275533@kernel.dk>
+ <CAHk-=whk4bcVPvtAv5OmHiW5z6AXgCLFhO4YrXD7o0XC+K-aHw@mail.gmail.com>
+ <fef996ca-a4ed-9633-1f79-91292a984a20@kernel.dk>
+ <CAHk-=wg=hHUFg3i0vDmKEg8HFbEKquAsoC8CJoZpP-8_A1jZDA@mail.gmail.com>
+ <1c93194a-ed91-c3aa-deb5-a3394805defb@kernel.dk>
+ <CAHk-=wj0pXsngjWKw5p3oTvwkNnT2DyoZWqPB+-wBY+BGTQ96w@mail.gmail.com>
+ <d8a8ea42-7f76-926c-ae9a-d49b11578153@kernel.dk>
+Message-ID: <6e2ca035-0e06-1def-5ea9-90a7466b2d49@kernel.dk>
+Date:   Wed, 11 Dec 2019 18:41:44 -0700
+User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:68.0) Gecko/20100101
+ Thunderbird/68.2.2
+MIME-Version: 1.0
+In-Reply-To: <d8a8ea42-7f76-926c-ae9a-d49b11578153@kernel.dk>
+Content-Type: text/plain; charset=utf-8
+Content-Language: en-US
+Content-Transfer-Encoding: 7bit
 Sender: linux-block-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-On Wed, Dec 11, 2019 at 5:29 PM Jens Axboe <axboe@kernel.dk> wrote:
->
+On 12/11/19 6:29 PM, Jens Axboe wrote:
+> On 12/11/19 6:22 PM, Linus Torvalds wrote:
+>> On Wed, Dec 11, 2019 at 5:11 PM Jens Axboe <axboe@kernel.dk> wrote:
+>>>
+>>> 15K is likely too slow to really show an issue, I'm afraid. The 970
+>>> is no slouch, but your crypt setup will likely hamper it a lot. You
+>>> don't have a non-encrypted partition on it?
+>>
+>> No. I normally don't need all that much disk, so I've never upgraded
+>> my ssd from the 512G size.
+>>
+>> Which means that it's actually half full or so, and I never felt like
+>> "I should keep an unencrypted partition for IO testing", since I don't
+>> generally _do_ any IO testing.
+>>
+>> I can get my load up with "numjobs=8" and get my iops up to the 100k
+>> range, though.
+>>
+>> But kswapd doesn't much seem to care, the CPU percentage actually does
+>> _down_ to 0.39% when I try that. Probably simply because now my CPU's
+>> are busy, so they are running at 4.7Ghz instead of the 800Mhz "mostly
+>> idle" state ...
+>>
+>> I guess I should be happy. It does mean that the situation you see
+>> isn't exactly the normal case. I understand why you want to do the
+>> non-cached case, but the case I think it the worrisome one is the
+>> regular buffered one, so that's what I'm testing (not even trying the
+>> noaccess patches).
+>>
+>> So from your report I went "uhhuh, that sounds like a bug". And it
+>> appears that it largely isn't - you're seeing it because of pushing
+>> the IO subsystem by another order of magnitude (and then I agree that
+>> "under those kinds of IO loads, caching just won't help")
+> 
 > I'd very much argue that it IS a bug, maybe just doesn't show on your
-> system.
+> system. My test box is a pretty standard 2 socket system, 24 cores / 48
+> threads, 2 nodes. The last numbers I sent were 100K IOPS, so nothing
+> crazy, and granted that's only 10% kswapd cpu time, but that still seems
+> very high for those kinds of rates. I'm surprised you see essentially no
+> kswapd time for the same data rate.
+> 
+> We'll keep poking here, I know Johannes is spending some time looking
+> into the reclaim side.
 
-Oh, I agree. But I also understand why people hadn't noticed, and I
-don't think it's all that critical - because if you do 1M iops cached,
-you're doing something really really strange.
+Out of curiosity, just tried it on my laptop, which also has some
+samsung drive. Using 8 jobs, I get around 100K IOPS too, and this
+is my top listing:
 
-I too can see xas_create using 30% CPU time, but that's when I do a
-perf record on just kswapd - and when I actually look at it on a
-system level, it looks nowhere near that bad.
+23308 axboe     20   0  623156   1304      8 D  10.3  0.0   0:03.81 fio
+23309 axboe     20   0  623160   1304      8 D  10.3  0.0   0:03.81 fio
+23311 axboe     20   0  623168   1304      8 D  10.3  0.0   0:03.82 fio
+23313 axboe     20   0  623176   1304      8 D  10.3  0.0   0:03.82 fio
+23314 axboe     20   0  623180   1304      8 D  10.3  0.0   0:03.81 fio
+  162 root      20   0       0      0      0 S   9.9  0.0   0:12.97 kswapd0
+23307 axboe     20   0  623152   1304      8 D   9.9  0.0   0:03.84 fio
+23310 axboe     20   0  623164   1304      8 D   9.9  0.0   0:03.81 fio
+23312 axboe     20   0  623172   1304      8 D   9.9  0.0   0:03.80 fio
 
-So I think people should look at this. Part of it might be for Willy:
-does that xas_create() need to be that expensive? I hate how "perf"
-callchains work, but it does look like it is probably
-page_cache_delete -> xas_store -> xas_create that is the bulk of the
-cost there.
+kswapd is between 9-11% the whole time, and the profile looks very
+similar to what I saw on my test box:
 
-Replacing the real page with the shadow entry shouldn't be that big of
-a deal, I would really hope.
+    35.79%  kswapd0  [kernel.vmlinux]  [k] xas_create
+     9.97%  kswapd0  [kernel.vmlinux]  [k] free_pcppages_bulk
+     9.94%  kswapd0  [kernel.vmlinux]  [k] isolate_lru_pages
+     7.78%  kswapd0  [kernel.vmlinux]  [k] shrink_page_list
+     3.78%  kswapd0  [kernel.vmlinux]  [k] xas_clear_mark
+     3.08%  kswapd0  [kernel.vmlinux]  [k] workingset_eviction
+     2.48%  kswapd0  [kernel.vmlinux]  [k] __isolate_lru_page
+     2.06%  kswapd0  [kernel.vmlinux]  [k] page_mapping
+     1.95%  kswapd0  [kernel.vmlinux]  [k] __remove_mapping
 
-Willy, that used to be a __radix_tree_lookup -> __radix_tree_replace
-thing, is there perhaps some simple optmization that could be done on
-the XArray case here?
+So now I'm even more puzzled why your (desktop?) doesn't show it, it
+must be more potent than my x1 laptop. But for me, the laptop and 2
+socket test box show EXACTLY the same behavior, laptop is just too slow
+to make it really pathological.
 
-                Linus
+-- 
+Jens Axboe
+
