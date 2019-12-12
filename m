@@ -2,127 +2,91 @@ Return-Path: <SRS0=VRi+=2C=vger.kernel.org=linux-block-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-9.6 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
-	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,
-	SPF_HELO_NONE,SPF_PASS,USER_AGENT_GIT autolearn=ham autolearn_force=no
-	version=3.4.0
+X-Spam-Status: No, score=-2.4 required=3.0 tests=DKIM_SIGNED,DKIM_VALID,
+	DKIM_VALID_AU,HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SPF_HELO_NONE,
+	SPF_PASS,USER_AGENT_SANE_1 autolearn=no autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 37EECC43603
-	for <linux-block@archiver.kernel.org>; Thu, 12 Dec 2019 15:36:27 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 3BEDCC43603
+	for <linux-block@archiver.kernel.org>; Thu, 12 Dec 2019 15:45:26 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.kernel.org (Postfix) with ESMTP id 074692173E
-	for <linux-block@archiver.kernel.org>; Thu, 12 Dec 2019 15:36:27 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id 0628E214AF
+	for <linux-block@archiver.kernel.org>; Thu, 12 Dec 2019 15:45:26 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (2048-bit key) header.d=infradead.org header.i=@infradead.org header.b="QfBZfZB/"
+	dkim=pass (2048-bit key) header.d=cloud.ionos.com header.i=@cloud.ionos.com header.b="M0wjhN6C"
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1729498AbfLLPg0 (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Thu, 12 Dec 2019 10:36:26 -0500
-Received: from bombadil.infradead.org ([198.137.202.133]:50074 "EHLO
-        bombadil.infradead.org" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1729260AbfLLPg0 (ORCPT
+        id S1729013AbfLLPpZ (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Thu, 12 Dec 2019 10:45:25 -0500
+Received: from mail-ed1-f68.google.com ([209.85.208.68]:38812 "EHLO
+        mail-ed1-f68.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S1729152AbfLLPpZ (ORCPT
         <rfc822;linux-block@vger.kernel.org>);
-        Thu, 12 Dec 2019 10:36:26 -0500
-DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed;
-        d=infradead.org; s=bombadil.20170209; h=Content-Transfer-Encoding:
-        MIME-Version:References:In-Reply-To:Message-Id:Date:Subject:Cc:To:From:Sender
-        :Reply-To:Content-Type:Content-ID:Content-Description:Resent-Date:Resent-From
-        :Resent-Sender:Resent-To:Resent-Cc:Resent-Message-ID:List-Id:List-Help:
-        List-Unsubscribe:List-Subscribe:List-Post:List-Owner:List-Archive;
-        bh=QF6L0yxyDcOF3+3+TsggyBHwgdTNvnNGw8mW/jCUXEQ=; b=QfBZfZB/l0JZ5KK4BIJR4mLsu/
-        4jJf0sZ6IbaOUkrLtURFr6ihqWZEsw9NuztGneREcLhv4o+241AJyCwbmtLABCAZec1TEqJqnQxnR
-        4GjZDX+7SkVaccttqadNKRasjktliko2HGU4ZXXlzPVGebUm8LVnVQ14WVMX1acbn5nBkvAQ9jxqM
-        /4i6fzOsUA1Y3DvBIoO1OD+YdhyMsO/zA2r6ka48QzhFNkTyqI+2R22lJK0tHQh2FY47eoViw2cOs
-        Uw389Y1xYgWk1qO26jKy+dz4aG2/NJ52zOHl3J+9zcGKl10xjtN+NFpNcZqGJnVpdgu6ahNIOk9Hq
-        h5TRJ12Q==;
-Received: from [2001:4bb8:188:2b00:20e6:8b5a:ed96:f9da] (helo=localhost)
-        by bombadil.infradead.org with esmtpsa (Exim 4.92.3 #3 (Red Hat Linux))
-        id 1ifQVt-0007Kx-6d; Thu, 12 Dec 2019 15:36:25 +0000
-From:   Christoph Hellwig <hch@lst.de>
-To:     colyli@suse.de
-Cc:     kent.overstreet@gmail.com, liangchen.linux@gmail.com,
-        linux-bcache@vger.kernel.org, linux-block@vger.kernel.org
-Subject: [PATCH 7/7] bcache: use read_cache_page_gfp to read the superblock
-Date:   Thu, 12 Dec 2019 16:36:04 +0100
-Message-Id: <20191212153604.19540-8-hch@lst.de>
-X-Mailer: git-send-email 2.20.1
-In-Reply-To: <20191212153604.19540-1-hch@lst.de>
-References: <20191212153604.19540-1-hch@lst.de>
+        Thu, 12 Dec 2019 10:45:25 -0500
+Received: by mail-ed1-f68.google.com with SMTP id i6so2192077edr.5
+        for <linux-block@vger.kernel.org>; Thu, 12 Dec 2019 07:45:24 -0800 (PST)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=cloud.ionos.com; s=google;
+        h=subject:to:cc:references:from:message-id:date:user-agent
+         :mime-version:in-reply-to:content-transfer-encoding:content-language;
+        bh=Wj0vB/2klCNy1PcPwHyaDosaSN9l/KjNCHs0715Ab+0=;
+        b=M0wjhN6CrkDSzuBqmVUpC7P4l3xgcAH56Kp3RNjJzAtBHUWOPPPWduknJbXTi5ecIJ
+         gQHqW2ydah0+cbrGu0s8jD+oeRAiBnl5KVu6hyUFHPZI0d/oZi4vYRk3QEoRVUN4a79z
+         ukd07Vw2GroUWnEfmyPnflkwj0TVpaZNENPCTb7jpHAPKFe9lUi6xDoXuWSQ38KwwHAQ
+         3zxW07mVMDM/FwdrQCcLh6CXuE356Fj71X3p2zn8oT8vXQbAw2mAphcBweQ7BHqUcMM3
+         Rb7L6a+fSeiWAzZZpgkCec916AfkC/lClABhsP7aWOSxIqEAChBN0KpKkL1jNcOLCcZk
+         736A==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20161025;
+        h=x-gm-message-state:subject:to:cc:references:from:message-id:date
+         :user-agent:mime-version:in-reply-to:content-transfer-encoding
+         :content-language;
+        bh=Wj0vB/2klCNy1PcPwHyaDosaSN9l/KjNCHs0715Ab+0=;
+        b=KKWtN1dBsGMmAofSKYmV4p0GXRN4fzdSGZ+vmc1NxnL7+8BLmT2gLssQA5n0kkU4gP
+         C1XGeoMnd8Be4gacS/liMjJgOEEmxu7Vz0PrmwWZZwhyygN5iqELJPMuCfLZJC8hnugh
+         1divYOHXNhzSJsBwt/cTFi8t0O5bMJMp9OhCx7vg5yPDjhHCZfObf8Vf2PfQ2BRWpwZv
+         lKdCj6eFSqePtigzgdr4nK8unvpWFAMvkwZRCxFHyJH2jznHHjHd4pUG+HWmy6mco+45
+         KilAfKUbrJEqe2KXf8FJasNJ+W/NFSBNCTwOwqe9i7RWjk88/4QNULDjH3Z/0i94Qi2e
+         tNkw==
+X-Gm-Message-State: APjAAAWq3YYGFMEbY1KJkwLYAb4F9IhntWuAEGHmqXa6q1JYg3oqx1ZI
+        37aq6OfDxOvsgVuGKd94vbyK0U+wuE0=
+X-Google-Smtp-Source: APXvYqyNgmEXkcZNQmz/NV/+6HEGrTVWy7x//ZeXMfqOae8r1kOMjILPqWm8qf3O5pvQowwVShZp9w==
+X-Received: by 2002:a17:906:fcd2:: with SMTP id qx18mr10183701ejb.230.1576165523495;
+        Thu, 12 Dec 2019 07:45:23 -0800 (PST)
+Received: from ?IPv6:2a02:247f:ffff:2540:1467:8db0:560a:58ea? ([2001:1438:4010:2540:1467:8db0:560a:58ea])
+        by smtp.gmail.com with ESMTPSA id p6sm13538eja.63.2019.12.12.07.45.22
+        (version=TLS1_2 cipher=ECDHE-RSA-AES128-GCM-SHA256 bits=128/128);
+        Thu, 12 Dec 2019 07:45:22 -0800 (PST)
+Subject: Re: [PATCH] blk-cgroup: remove blkcg_drain_queue
+To:     Jens Axboe <axboe@kernel.dk>, tj@kernel.org
+Cc:     cgroups@vger.kernel.org, linux-block@vger.kernel.org
+References: <20191212140851.19107-1-guoqing.jiang@cloud.ionos.com>
+ <0cb5895c-aa35-b65a-83bf-81f5444e562f@kernel.dk>
+From:   Guoqing Jiang <guoqing.jiang@cloud.ionos.com>
+Message-ID: <adc0412c-6f91-4db7-cd54-3c78d837161c@cloud.ionos.com>
+Date:   Thu, 12 Dec 2019 16:45:22 +0100
+User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:60.0) Gecko/20100101
+ Thunderbird/60.9.0
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
-X-SRS-Rewrite: SMTP reverse-path rewritten from <hch@infradead.org> by bombadil.infradead.org. See http://www.infradead.org/rpr.html
+In-Reply-To: <0cb5895c-aa35-b65a-83bf-81f5444e562f@kernel.dk>
+Content-Type: text/plain; charset=utf-8; format=flowed
+Content-Transfer-Encoding: 7bit
+Content-Language: en-US
 Sender: linux-block-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-Avoid a pointless dependency on buffer heads in bcache by simply open
-coding reading a single page.  Also add a SB_OFFSET define for the
-byte offset of the superblock instead of using magic numbers.
 
-Signed-off-by: Christoph Hellwig <hch@lst.de>
----
- drivers/md/bcache/super.c   | 16 +++++++---------
- include/uapi/linux/bcache.h |  1 +
- 2 files changed, 8 insertions(+), 9 deletions(-)
 
-diff --git a/drivers/md/bcache/super.c b/drivers/md/bcache/super.c
-index c3bfbc813daf..7ebd355f51b1 100644
---- a/drivers/md/bcache/super.c
-+++ b/drivers/md/bcache/super.c
-@@ -15,7 +15,6 @@
- #include "writeback.h"
- 
- #include <linux/blkdev.h>
--#include <linux/buffer_head.h>
- #include <linux/debugfs.h>
- #include <linux/genhd.h>
- #include <linux/idr.h>
-@@ -64,13 +63,14 @@ static const char *read_super(struct cache_sb *sb, struct block_device *bdev,
- {
- 	const char *err;
- 	struct cache_sb_disk *s;
--	struct buffer_head *bh = __bread(bdev, 1, SB_SIZE);
-+	struct page *page;
- 	unsigned int i;
- 
--	if (!bh)
-+	page = read_cache_page_gfp(bdev->bd_inode->i_mapping,
-+				   SB_OFFSET >> PAGE_SHIFT, GFP_KERNEL);
-+	if (IS_ERR(page))
- 		return "IO error";
--
--	s = (struct cache_sb_disk *)bh->b_data;
-+	s = page_address(page) + offset_in_page(SB_OFFSET);
- 
- 	sb->offset		= le64_to_cpu(s->offset);
- 	sb->version		= le64_to_cpu(s->version);
-@@ -188,12 +188,10 @@ static const char *read_super(struct cache_sb *sb, struct block_device *bdev,
- 	}
- 
- 	sb->last_mount = (u32)ktime_get_real_seconds();
--	err = NULL;
--
--	get_page(bh->b_page);
- 	*res = s;
-+	return NULL;
- err:
--	put_bh(bh);
-+	put_page(page);
- 	return err;
- }
- 
-diff --git a/include/uapi/linux/bcache.h b/include/uapi/linux/bcache.h
-index 1d8b3a9fc080..9a1965c6c3d0 100644
---- a/include/uapi/linux/bcache.h
-+++ b/include/uapi/linux/bcache.h
-@@ -148,6 +148,7 @@ static inline struct bkey *bkey_idx(const struct bkey *k, unsigned int nr_keys)
- #define BCACHE_SB_MAX_VERSION		4
- 
- #define SB_SECTOR			8
-+#define SB_OFFSET			(SB_SECTOR << SECTOR_SHIFT)
- #define SB_SIZE				4096
- #define SB_LABEL_SIZE			32
- #define SB_JOURNAL_BUCKETS		256U
--- 
-2.20.1
+On 12/12/19 4:17 PM, Jens Axboe wrote:
+> On 12/12/19 7:08 AM, jgq516@gmail.com wrote:
+>> From: Guoqing Jiang <guoqing.jiang@cloud.ionos.com>
+>>
+>> Since blk_drain_queue had already been removed, so this function
+>> is not needed anymore.
+> You should remove it from include/linux/blk-cgroup.h as well.
+>
 
+Ok, will send a new version.
+
+Thanks,
+Guoqing
