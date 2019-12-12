@@ -2,120 +2,134 @@ Return-Path: <SRS0=VRi+=2C=vger.kernel.org=linux-block-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-2.6 required=3.0 tests=DKIMWL_WL_HIGH,DKIM_SIGNED,
-	DKIM_VALID,DKIM_VALID_AU,MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,
-	USER_AGENT_SANE_1 autolearn=no autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-8.2 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
+	INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,
+	USER_AGENT_SANE_1 autolearn=unavailable autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 233E4C43603
-	for <linux-block@archiver.kernel.org>; Thu, 12 Dec 2019 22:19:59 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 6061DC3F68F
+	for <linux-block@archiver.kernel.org>; Thu, 12 Dec 2019 22:34:09 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.kernel.org (Postfix) with ESMTP id E73A022527
-	for <linux-block@archiver.kernel.org>; Thu, 12 Dec 2019 22:19:58 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=default; t=1576189199;
-	bh=6wqM/8nuJbTo8PW4nFbDaXSi3DHfDv/lnU1COiTALT0=;
-	h=Date:From:To:Cc:Subject:References:In-Reply-To:List-ID:From;
-	b=Q6i2aD31IcVwYJyB/ZeZMZYjvYi2k9iyQpvHobk0fwOyUrc12CkzHMpeT5AIxxNXR
-	 Sb8CG1HnqSlbm5R6Ri+AYUrD0gGiX8DRV9sEx6ktUj2DBDW3SP5gIgQHMmmOH3ylMU
-	 TD2+VrUcors5oEn/qTVfQmjOQbxy8+5VDwk3rCEQ=
+	by mail.kernel.org (Postfix) with ESMTP id 3D0C92173E
+	for <linux-block@archiver.kernel.org>; Thu, 12 Dec 2019 22:34:09 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1731290AbfLLWT6 (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Thu, 12 Dec 2019 17:19:58 -0500
-Received: from mail.kernel.org ([198.145.29.99]:52406 "EHLO mail.kernel.org"
-        rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-        id S1730896AbfLLWT6 (ORCPT <rfc822;linux-block@vger.kernel.org>);
-        Thu, 12 Dec 2019 17:19:58 -0500
-Received: from redsun51.ssa.fujisawa.hgst.com (unknown [199.255.47.7])
-        (using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
-        (No client certificate requested)
-        by mail.kernel.org (Postfix) with ESMTPSA id 311EB2173E;
-        Thu, 12 Dec 2019 22:19:54 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-        s=default; t=1576189196;
-        bh=6wqM/8nuJbTo8PW4nFbDaXSi3DHfDv/lnU1COiTALT0=;
-        h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
-        b=C76X7I0W/t6+u5063t1CUZHbu2JgTgOITbvJUNsHXwayJspBGLMpc+rJIUgo55wUs
-         CrsJuLwBlLeAT5tyll96S6sUmKgWNFrH/Qy5R93yQVPUkyMy9R7ahMIrkh3jN3EcwY
-         hifbQMvc3earqiuVJYueHl3lcBab6aVb05yEPy10=
-Date:   Fri, 13 Dec 2019 07:19:47 +0900
-From:   Keith Busch <kbusch@kernel.org>
-To:     Chaitanya Kulkarni <Chaitanya.Kulkarni@wdc.com>
-Cc:     "lsf-pc@lists.linux-foundation.org" 
-        <lsf-pc@lists.linux-foundation.org>,
-        "axboe@kernel.dk" <axboe@kernel.dk>,
-        Bart Van Assche <bvanassche@acm.org>,
-        Hannes Reinecke <hare@suse.de>,
-        Johannes Thumshirn <jthumshirn@suse.de>,
-        "Martin K. Petersen" <martin.petersen@oracle.com>,
-        Omar Sandoval <osandov@fb.com>,
-        "Theodore Y. Ts'o" <tytso@mit.edu>, Christoph Hellwig <hch@lst.de>,
-        Ming Lei <ming.lei@redhat.com>,
-        Matias Bjorling <Matias.Bjorling@wdc.com>,
-        "linux-block@vger.kernel.org" <linux-block@vger.kernel.org>,
-        "linux-ide@vger.kernel.org" <linux-ide@vger.kernel.org>,
-        "linux-scsi@vger.kernel.org" <linux-scsi@vger.kernel.org>,
-        "linux-fsdevel@vger.kernel.org" <linux-fsdevel@vger.kernel.org>,
-        "linux-nvme@lists.infradead.org" <linux-nvme@lists.infradead.org>,
-        "linux-btrace@vger.kernel.org" <linux-btrace@vger.kernel.org>
-Subject: Re: [LSF/MM/BFP ATTEND] [LSF/MM/BFP TOPIC] Storage: add blktrace
- extension support
-Message-ID: <20191212221947.GA32142@redsun51.ssa.fujisawa.hgst.com>
-References: <BYAPR04MB5749B4DC50C43EE845A04612865A0@BYAPR04MB5749.namprd04.prod.outlook.com>
+        id S1731017AbfLLWeI (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Thu, 12 Dec 2019 17:34:08 -0500
+Received: from mail104.syd.optusnet.com.au ([211.29.132.246]:38431 "EHLO
+        mail104.syd.optusnet.com.au" rhost-flags-OK-OK-OK-OK)
+        by vger.kernel.org with ESMTP id S1730936AbfLLWeI (ORCPT
+        <rfc822;linux-block@vger.kernel.org>);
+        Thu, 12 Dec 2019 17:34:08 -0500
+Received: from dread.disaster.area (pa49-195-139-249.pa.nsw.optusnet.com.au [49.195.139.249])
+        by mail104.syd.optusnet.com.au (Postfix) with ESMTPS id 9EEB38208B0;
+        Fri, 13 Dec 2019 09:34:04 +1100 (AEDT)
+Received: from dave by dread.disaster.area with local (Exim 4.92.3)
+        (envelope-from <david@fromorbit.com>)
+        id 1ifX23-00061Q-20; Fri, 13 Dec 2019 09:34:03 +1100
+Date:   Fri, 13 Dec 2019 09:34:03 +1100
+From:   Dave Chinner <david@fromorbit.com>
+To:     Jens Axboe <axboe@kernel.dk>
+Cc:     linux-mm@kvack.org, linux-fsdevel@vger.kernel.org,
+        linux-block@vger.kernel.org, willy@infradead.org, clm@fb.com,
+        torvalds@linux-foundation.org
+Subject: Re: [PATCH 5/5] iomap: support RWF_UNCACHED for buffered writes
+Message-ID: <20191212223403.GH19213@dread.disaster.area>
+References: <20191211152943.2933-1-axboe@kernel.dk>
+ <20191211152943.2933-6-axboe@kernel.dk>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=us-ascii
 Content-Disposition: inline
-In-Reply-To: <BYAPR04MB5749B4DC50C43EE845A04612865A0@BYAPR04MB5749.namprd04.prod.outlook.com>
-User-Agent: Mutt/1.12.1 (2019-06-15)
+In-Reply-To: <20191211152943.2933-6-axboe@kernel.dk>
+User-Agent: Mutt/1.10.1 (2018-07-13)
+X-Optus-CM-Score: 0
+X-Optus-CM-Analysis: v=2.3 cv=X6os11be c=1 sm=1 tr=0
+        a=KoypXv6BqLCQNZUs2nCMWg==:117 a=KoypXv6BqLCQNZUs2nCMWg==:17
+        a=jpOVt7BSZ2e4Z31A5e1TngXxSK0=:19 a=kj9zAlcOel0A:10 a=pxVhFHJ0LMsA:10
+        a=7-415B0cAAAA:8 a=ikgJNTgf4fhs6WZrna0A:9 a=RKUrkyyTLFFZf7Ed:21
+        a=Xuacn0olY5J5TEqm:21 a=CjuIK1q_8ugA:10 a=biEYGPWJfzWAr4FL6Ov7:22
 Sender: linux-block-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-On Wed, Dec 11, 2019 at 06:16:29AM +0000, Chaitanya Kulkarni wrote:
-> * Current state of the work:-
-> -----------------------------------------------------------------------
+On Wed, Dec 11, 2019 at 08:29:43AM -0700, Jens Axboe wrote:
+> This adds support for RWF_UNCACHED for file systems using iomap to
+> perform buffered writes. We use the generic infrastructure for this,
+> by tracking pages we created and calling write_drop_cached_pages()
+> to issue writeback and prune those pages.
 > 
-> RFC implementations [3] has been posted with the addition of new IOCTLs
-> which is far from the production so that it can provide a basis to get
-> the discussion started.
+> Signed-off-by: Jens Axboe <axboe@kernel.dk>
+> ---
+>  fs/iomap/apply.c       | 24 ++++++++++++++++++++++++
+>  fs/iomap/buffered-io.c | 37 +++++++++++++++++++++++++++++--------
+>  include/linux/iomap.h  |  5 +++++
+>  3 files changed, 58 insertions(+), 8 deletions(-)
 > 
-> This RFC implementation provides:-
-> 1. Extended bits to track new trace categories.
-> 2. Support for tracing per trace priorities.
-> 3. Support for priority mask.
-> 4. New IOCTLs so that user-space tools can setup the extensions.
-> 5. Ability to track the integrity fields.
-> 6. blktrace and blkparse implementation which supports the above
->     mentioned features.
-> 
-> Bart and Martin has suggested changes which I've incorporated in the RFC 
-> revisions.
-> 
-> * What we will discuss in the proposed session ?
-> -----------------------------------------------------------------------
-> 
-> I'd like to propose a session for Storage track to go over the following
-> discussion points:-
-> 
-> 1. What is the right approach to move this work forward?
-> 2. What are the other information bits we need to add which will help
->     kernel community to speed up the development and improve tracing?
-> 3. What are the other tracepoints we need to add in the block layer
->     to improve the tracing?
-> 4. What are device driver callbacks tracing we can add in the block
->     layer?
+> diff --git a/fs/iomap/apply.c b/fs/iomap/apply.c
+> index 562536da8a13..966826ad4bb9 100644
+> --- a/fs/iomap/apply.c
+> +++ b/fs/iomap/apply.c
+> @@ -90,5 +90,29 @@ iomap_apply(struct inode *inode, loff_t pos, loff_t length, unsigned flags,
+>  				     flags, &iomap);
+>  	}
+>  
+> +	if (written && (flags & IOMAP_UNCACHED)) {
+> +		struct address_space *mapping = inode->i_mapping;
+> +
+> +		end = pos + written;
+> +		ret = filemap_write_and_wait_range(mapping, pos, end);
+> +		if (ret)
+> +			goto out;
+> +
+> +		/*
+> +		 * No pages were created for this range, we're done
+> +		 */
+> +		if (!(iomap.flags & IOMAP_F_PAGE_CREATE))
+> +			goto out;
+> +
+> +		/*
+> +		 * Try to invalidate cache pages for the range we just wrote.
+> +		 * We don't care if invalidation fails as the write has still
+> +		 * worked and leaving clean uptodate pages in the page cache
+> +		 * isn't a corruption vector for uncached IO.
+> +		 */
+> +		invalidate_inode_pages2_range(mapping,
+> +				pos >> PAGE_SHIFT, end >> PAGE_SHIFT);
+> +	}
+> +out:
+>  	return written ? written : ret;
+>  }
 
-I would like seeing driver/protocol specific tracepoint decoding for
-users common under a single blkparse utility. For nvme, it'd be great if
-we could set a fixed ABI, as people keep changing it by burdening the
-kernel with making events more human readable. I'd prefer to simplify
-the driver's tracepoints and do the decoding from userspace so that it's
-forward compatible.
+Just a thought on further optimisation for this for XFS.
+IOMAP_UNCACHED is being passed into the filesystem ->iomap_begin
+methods by iomap_apply().  Hence the filesystems know that it is
+an uncached IO that is being done, and we can tailor allocation
+strategies to suit the fact that the data is going to be written
+immediately.
 
-> 5. Since polling is becoming popular what are the new tracepoints
->     we need to improve debugging ?
+In this case, XFS needs to treat it the same way it treats direct
+IO. That is, we do immediate unwritten extent allocation rather than
+delayed allocation. This will reduce the allocation overhead and
+will optimise for immediate IO locality rather than optimise for
+delayed allocation.
 
-Regarding polling, but not tracepoint related, but it'd be nice if
-we had a new cpu state for this. Right now it just looks like all CPU
-utilization from systat says 'system', which isn't really helpful with
-analyzing how the hardware is doing.
+This should just be a relatively simple change to
+xfs_file_iomap_begin() along the lines of:
+
+-	if ((flags & (IOMAP_WRITE | IOMAP_ZERO)) && !(flags & IOMAP_DIRECT) &&
+-			!IS_DAX(inode) && !xfs_get_extsz_hint(ip)) {
++	if ((flags & (IOMAP_WRITE | IOMAP_ZERO)) &&
++	    !(flags & (IOMAP_DIRECT | IOMAP_UNCACHED)) &&
++	    !IS_DAX(inode) && !xfs_get_extsz_hint(ip)) {
+		/* Reserve delalloc blocks for regular writeback. */
+		return xfs_file_iomap_begin_delay(inode, offset, length, flags,
+				iomap);
+	}
+
+so that it avoids delayed allocation for uncached IO...
+
+Cheers,
+
+Dave.
+-- 
+Dave Chinner
+david@fromorbit.com
