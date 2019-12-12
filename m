@@ -6,116 +6,104 @@ X-Spam-Status: No, score=-0.8 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
 	MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS autolearn=no autolearn_force=no
 	version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id D09C3C43603
-	for <linux-block@archiver.kernel.org>; Thu, 12 Dec 2019 17:24:21 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id DB5DFC43603
+	for <linux-block@archiver.kernel.org>; Thu, 12 Dec 2019 17:34:42 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.kernel.org (Postfix) with ESMTP id AA58F22527
-	for <linux-block@archiver.kernel.org>; Thu, 12 Dec 2019 17:24:21 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id B9841206C3
+	for <linux-block@archiver.kernel.org>; Thu, 12 Dec 2019 17:34:42 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1730094AbfLLRYV (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Thu, 12 Dec 2019 12:24:21 -0500
-Received: from mout.kundenserver.de ([212.227.126.133]:48667 "EHLO
+        id S1730106AbfLLRem (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Thu, 12 Dec 2019 12:34:42 -0500
+Received: from mout.kundenserver.de ([217.72.192.74]:48639 "EHLO
         mout.kundenserver.de" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1730088AbfLLRYV (ORCPT
+        with ESMTP id S1730100AbfLLRem (ORCPT
         <rfc822;linux-block@vger.kernel.org>);
-        Thu, 12 Dec 2019 12:24:21 -0500
-Received: from mail-qt1-f170.google.com ([209.85.160.170]) by
- mrelayeu.kundenserver.de (mreue012 [212.227.15.129]) with ESMTPSA (Nemesis)
- id 1MelWf-1i7lLC1jK1-00ajot; Thu, 12 Dec 2019 18:24:19 +0100
-Received: by mail-qt1-f170.google.com with SMTP id z15so2928614qts.5;
-        Thu, 12 Dec 2019 09:24:19 -0800 (PST)
-X-Gm-Message-State: APjAAAXNWJFoxW/3tG6uf0rvrj4UOj2AjOBthaY846LAZtPfFfbsV9Ya
-        BLuQD1pdUBYdlih8AQlpdp2c+0Ltv9GDqQOSBxs=
-X-Google-Smtp-Source: APXvYqxMSJA4eBINe6o8hxIPSZVoK8eZjs+5+YHcQGDQGqHQfVK1aISujBwoLy+oLB3DI9HdriLYUBFB0Xa25dGmSeY=
-X-Received: by 2002:ac8:768d:: with SMTP id g13mr8425301qtr.7.1576171458282;
- Thu, 12 Dec 2019 09:24:18 -0800 (PST)
+        Thu, 12 Dec 2019 12:34:42 -0500
+Received: from mail-qk1-f181.google.com ([209.85.222.181]) by
+ mrelayeu.kundenserver.de (mreue108 [212.227.15.145]) with ESMTPSA (Nemesis)
+ id 1MlNl5-1i18OL1FIT-00lq4z; Thu, 12 Dec 2019 18:34:40 +0100
+Received: by mail-qk1-f181.google.com with SMTP id t129so2261477qke.10;
+        Thu, 12 Dec 2019 09:34:39 -0800 (PST)
+X-Gm-Message-State: APjAAAVKwmNojhrY5Vfyjre+83waJcdEUK8M8ykutTouEzed1OseoMXO
+        HtVagddILdXlaoV8vmUhX0XNh5LVsi+PWn01+7o=
+X-Google-Smtp-Source: APXvYqy6Sndmzm9YVyEhO3BdHaJC4VcQeM7sV3nbNQomHx6PpWYF3DgdNXyFb0rlI7Vazj/BGSb3gFISJSZPIAKOaVc=
+X-Received: by 2002:a37:4e4e:: with SMTP id c75mr9035153qkb.3.1576172078788;
+ Thu, 12 Dec 2019 09:34:38 -0800 (PST)
 MIME-Version: 1.0
-References: <20191211204306.1207817-1-arnd@arndb.de> <20191211204306.1207817-22-arnd@arndb.de>
- <20191212163040.GD27991@infradead.org>
-In-Reply-To: <20191212163040.GD27991@infradead.org>
+References: <20191211204306.1207817-1-arnd@arndb.de> <20191211204306.1207817-3-arnd@arndb.de>
+ <20191212162506.GA27991@infradead.org>
+In-Reply-To: <20191212162506.GA27991@infradead.org>
 From:   Arnd Bergmann <arnd@arndb.de>
-Date:   Thu, 12 Dec 2019 18:24:02 +0100
-X-Gmail-Original-Message-ID: <CAK8P3a2SCr52MZ7Ch769e0bPA=tjSXj1EXkqr_MDyeioJjnk9w@mail.gmail.com>
-Message-ID: <CAK8P3a2SCr52MZ7Ch769e0bPA=tjSXj1EXkqr_MDyeioJjnk9w@mail.gmail.com>
-Subject: Re: [PATCH 21/24] compat_ioctl: block: move blkdev_compat_ioctl()
- into ioctl.c
+Date:   Thu, 12 Dec 2019 18:34:22 +0100
+X-Gmail-Original-Message-ID: <CAK8P3a1AmFAL3qOe3vt-i2L2hjovHhfjSYCyyLHO4ghGAwNZuA@mail.gmail.com>
+Message-ID: <CAK8P3a1AmFAL3qOe3vt-i2L2hjovHhfjSYCyyLHO4ghGAwNZuA@mail.gmail.com>
+Subject: Re: [PATCH 02/24] compat: scsi: sg: fix v3 compat read/write interface
 To:     Christoph Hellwig <hch@infradead.org>
 Cc:     Jens Axboe <axboe@kernel.dk>,
         "James E.J. Bottomley" <jejb@linux.ibm.com>,
         "Martin K. Petersen" <martin.petersen@oracle.com>,
         Alexander Viro <viro@zeniv.linux.org.uk>,
+        Douglas Gilbert <dgilbert@interlog.com>,
         "linux-kernel@vger.kernel.org" <linux-kernel@vger.kernel.org>,
         y2038 Mailman List <y2038@lists.linaro.org>,
-        Tejun Heo <tj@kernel.org>, Jan Kara <jack@suse.cz>,
+        Steffen Maier <maier@linux.ibm.com>,
+        linux-scsi <linux-scsi@vger.kernel.org>,
         Chaitanya Kulkarni <chaitanya.kulkarni@wdc.com>,
-        Dmitry Fomichev <dmitry.fomichev@wdc.com>,
-        Ajay Joshi <ajay.joshi@wdc.com>,
+        Greg Kroah-Hartman <gregkh@linuxfoundation.org>,
+        Thomas Gleixner <tglx@linutronix.de>,
         linux-block <linux-block@vger.kernel.org>
 Content-Type: text/plain; charset="UTF-8"
-X-Provags-ID: V03:K1:E21Utq8Tf2FKFAEeK7tVY7mrXvi63QpJXdoHEjACfdsYe2uh3Tv
- BNwmaOVEPdBz8Z2dFwERTity36sVh/j9qF/OHVYb/uOEJL6yHJNgh0vbeMYIcSv5cekYZ/S
- 1wAVA2zpEM5G5O3Rk1xBpej1yIUAp4ctyULPA5BTN+SiPFRNZO3TEfuKLnNF+iCICzjz40P
- 02fSwhAZ7iTfWzbApQ0OQ==
-X-UI-Out-Filterresults: notjunk:1;V03:K0:6ZkvHzLdRZw=:k7NDFh/lmPU/ghBQE0XHuT
- xtdKOb+/OLzQifrlp/2LnjPgsbfgI5RGhvuUWZfp5q4udZvmhU+CqYbV2P6DvSJEwqSCdMJwT
- n3eh/hIw89N1OBR7KzRcYmB2kDxTDgOsA/FXhLX2Ln51W2sIgn9mL+LYQixMHfb7R3UCyzGzP
- 8n5/3C+FVZUpjQ/UDHDGVtaOdn7E8AUxUEABwJOyhpECXiEN25T8ol95cL4ZzbrdPOXlOGOQB
- O01+IoQEW52UyKGXgfU5Dw4dKl4cVhltco78IPmZvq51VmnwAJgIKpjdHw0dH1XI/yVKJ5ZyT
- YGx84kjH8+UYQNhqvENnmWCUOgQBhyRvcZowJYvbK+RqbHKfZzzL2uUNUTIc6m39j6+NTBezH
- udqlhaW7ATvk69Jif+NPRmgxhp4s2DV5Hi2IZcAyequa0OhziJbqebb7etuMZ29lo8O4Z/Bnh
- fIzuq1jVG9DDWRu6tOZzGfI12VTIf6Aa8hqX0+zxnl9s/Rv/EQ5jph25KS0QRsKZjmBPvxF61
- zRfaUwpoUtxgljaG70dnRavYkFZqMrGGOYxuiLkmFZ73F6M2bLk8i/u79vPngpyTBs3mU+kQf
- xK5ZSkQXnnRV+K6dpCydNcMKhmE604esgn+Ds0Ou9adJyIcg1kalLaJUe832zV92XQEeaSGi0
- DmsMvBqMKTsV1BrbFi0Y6VZNAewx0Sgd8KAcF3eCneQfblHvD9Ezc2/+bHUbpHXkO9OghTQY2
- b8ChC5xVVDJNnoEwPclWj1RdX4o+vMo+7lNzJijT+oH0JiRi3UBjb8rFuTJbjjBKTQ3H+ovFe
- 7jahyPVLotn61vpUzBH9BAl6wJN+U8zcpDNe1VKvwK68XkFIo6V4ndd0f9XzH9vwyoQg7npdf
- TWuwkPZNZu0Flst6huNg==
+X-Provags-ID: V03:K1:foLM2G0r8GVxsTyoJoIOaSk6pMqnEnutYdtpMtbAXngt8SsI6Nd
+ 62AtMeQDmPkmF9iG90vfarvk8zub1ZycyG+G18+7qLogwroak5Z1rv9PPvUjxYi4uXc3ahr
+ DuHw9PsksiotlaUcdWT3UfExJiFpi12TLrcVf0NBCHXFX6Fitvna3LKkMny9eDeJqjGVnUZ
+ ZMvk9MUOFs8OYhQCi7P1Q==
+X-UI-Out-Filterresults: notjunk:1;V03:K0:70jwafmxM6w=:ewSuIuy9w+AR0MM2ZqohRj
+ NvfNmxBJysJd1S+7NCjJolPemXh7F5Y3YOEfAFQ5TYBowEUlgpHkJc7sVKmdWKEtO8evJVXbJ
+ zqA5JOke6QM4pTR8R41cQeRAFIEWnLUelS9E1VJlp9JC2wRVUaIqmawgVdST0JPyFyk8vuU6/
+ qTS2UkSgxelqz8d/SqGa/bGwEuHWQKVe7AUkEkWjlBd21xl6HMQ7ew+L1CH3luWf6A8tQJ9se
+ sVebl8BcICrgSq564qYkHvZAf0UJxn0Cha4zUjfzgwhB0P/16KFRLlaowBVre5rPh5vHqKH+A
+ 0wru7TIgjYmhaYwx4us79kk4hZnKX++RtezA0khoF/cjlqEqVRoKhVTPePsSY4ObF3lDoZQ9u
+ azIlb2uBPZFVZgrEJJg5eM9TWmCitReYkC4FCTr/YQ8peWIMNN3B8vkWdZgoUC/+hUP7rAU7l
+ 2B6tLqTZTkc9rYhry6d7fzqRUwfJH0AH4DpJiPycCGl5N8z4K+RUO8zivVBUpEyNUG40hu8Ho
+ WhHqn/TN6ffYKaEpiTTYXADyPYaFkPxZuALmi5/TY5Y7PWDlncTN85raHEI1uKv473g6rTqzJ
+ Ym6ayc+unIbeUJwX+0ZUiCMflym1PWg87zJ/8sV+snIwXxXseQmNBiO9BqBn2VtGnD6Hz89IK
+ JplRv9FpAfKEHyyUHRga83gg4dAKSSS0rTjlKEaBHanK4vL4ezs65yZ3JYe59htj+i00qRWgy
+ PEXEhlBP5CR/ky/jEWUKWiPm8pZDIo2cswB97+Fi2RLcNRn2oeBmX48J/IVyCiUlT4x/oq7WZ
+ gB0sc2+hdZB4YmB79B+d9BmZvy6LhUvgGavvFYoKEEMUugxyYAb+3VbCRhjwjPdHbm98dHTJi
+ Iq96OTktMcugZO0sNTag==
 Sender: linux-block-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-On Thu, Dec 12, 2019 at 5:30 PM Christoph Hellwig <hch@infradead.org> wrote:
+On Thu, Dec 12, 2019 at 5:25 PM Christoph Hellwig <hch@infradead.org> wrote:
+> On Wed, Dec 11, 2019 at 09:42:36PM +0100, Arnd Bergmann wrote:
+
+> > --- a/drivers/scsi/sg.c
+> > +++ b/drivers/scsi/sg.c
+> > @@ -198,6 +198,7 @@ static void sg_device_destroy(struct kref *kref);
+> >
+> >  #define SZ_SG_HEADER sizeof(struct sg_header)
+> >  #define SZ_SG_IO_HDR sizeof(sg_io_hdr_t)
+> > +#define SZ_COMPAT_SG_IO_HDR sizeof(struct compat_sg_io_hdr)
 >
-> > +#ifdef CONFIG_COMPAT
-> > +static int compat_put_ushort(unsigned long arg, unsigned short val)
-> > +{
-> > +     return put_user(val, (unsigned short __user *)compat_ptr(arg));
-> > +}
-> > +
-> > +static int compat_put_int(unsigned long arg, int val)
-> > +{
-> > +     return put_user(val, (compat_int_t __user *)compat_ptr(arg));
-> > +}
-> > +
-> > +static int compat_put_uint(unsigned long arg, unsigned int val)
-> > +{
-> > +     return put_user(val, (compat_uint_t __user *)compat_ptr(arg));
-> > +}
-> > +
-> > +static int compat_put_long(unsigned long arg, long val)
-> > +{
-> > +     return put_user(val, (compat_long_t __user *)compat_ptr(arg));
-> > +}
-> > +
-> > +static int compat_put_ulong(unsigned long arg, compat_ulong_t val)
-> > +{
-> > +     return put_user(val, (compat_ulong_t __user *)compat_ptr(arg));
-> > +}
-> > +
-> > +static int compat_put_u64(unsigned long arg, u64 val)
-> > +{
-> > +     return put_user(val, (compat_u64 __user *)compat_ptr(arg));
-> > +}
-> > +#endif
+> I'd rather not add more defines like this.  The raw sizeof is
+> much more readable and obvious.
+
+Done. I actually had it that way in the previous submission and then changed
+it for consistency. I considered removing SZ_SG_IO_HDR as well,
+but decided not to make Doug's life harder than necessary -- he has nother
+50 or so patches on top of this that he needs to rebase.
+
+> I find the structure here a little confusing, as it doesn't follow
+> the normal flow.  What do you think of:
 >
-> Can we lift these helpers to compat.h instead?
+>         if (count >= SZ_SG_HEADER) {
+>                 if (get_user(reply_len, &old_hdr->reply_len))
+>                         return -EFAULT;
 
-Nothing else uses them, and it's usually more readable to just
-use put_user directly.
+I don't see much benefit either way. Changed it now it as you suggested.
 
-Note that the next patch removes most of them anyway, but
-we could have another cleanup that removes the
-put_int()/put_long()/etc from block/ioctl.c altogether.
+Thanks for the review!
 
-       Arnd
+      Arnd
