@@ -2,124 +2,202 @@ Return-Path: <SRS0=VRi+=2C=vger.kernel.org=linux-block-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-0.9 required=3.0 tests=DKIMWL_WL_HIGH,DKIM_SIGNED,
-	DKIM_VALID,DKIM_VALID_AU,HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,
-	SPF_HELO_NONE,SPF_PASS autolearn=no autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-5.4 required=3.0 tests=DKIMWL_WL_HIGH,DKIM_SIGNED,
+	DKIM_VALID,DKIM_VALID_AU,HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,
+	MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,USER_AGENT_SANE_1
+	autolearn=unavailable autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id EEFA4C2D0C6
-	for <linux-block@archiver.kernel.org>; Thu, 12 Dec 2019 02:47:46 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id B19A6C43603
+	for <linux-block@archiver.kernel.org>; Thu, 12 Dec 2019 05:56:47 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.kernel.org (Postfix) with ESMTP id C54F52054F
-	for <linux-block@archiver.kernel.org>; Thu, 12 Dec 2019 02:47:46 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=default; t=1576118866;
-	bh=szoPb6QXr55G06MiFIGAGJIgamzTIDGfFCd1oAEQF+o=;
-	h=References:In-Reply-To:From:Date:Subject:To:Cc:List-ID:From;
-	b=tIjjH/hRriedCOzxtBHZBreaa+X82ymqqit99UgCBDtsXPqyhnibkZi/pnb2KjXiU
-	 O4l6KKAYMt1BFJOx7vYzqO3wOuDkcZS7eIdsUaF4udGgzJ/sxe1NjYRPOpv9aw3lrH
-	 Rzm3dHL/tTRQehokOvXJvDL8/k9HOax61ZeusbK8=
+	by mail.kernel.org (Postfix) with ESMTP id 8677A24654
+	for <linux-block@archiver.kernel.org>; Thu, 12 Dec 2019 05:56:47 +0000 (UTC)
+Authentication-Results: mail.kernel.org;
+	dkim=pass (2048-bit key) header.d=nvidia.com header.i=@nvidia.com header.b="lsWfVOx2"
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1727783AbfLLCrq (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Wed, 11 Dec 2019 21:47:46 -0500
-Received: from mail-lf1-f66.google.com ([209.85.167.66]:34405 "EHLO
-        mail-lf1-f66.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1727705AbfLLCrp (ORCPT
+        id S1726907AbfLLF4i (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Thu, 12 Dec 2019 00:56:38 -0500
+Received: from hqnvemgate26.nvidia.com ([216.228.121.65]:14305 "EHLO
+        hqnvemgate26.nvidia.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S1726798AbfLLF4h (ORCPT
         <rfc822;linux-block@vger.kernel.org>);
-        Wed, 11 Dec 2019 21:47:45 -0500
-Received: by mail-lf1-f66.google.com with SMTP id l18so478946lfc.1
-        for <linux-block@vger.kernel.org>; Wed, 11 Dec 2019 18:47:44 -0800 (PST)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=linux-foundation.org; s=google;
-        h=mime-version:references:in-reply-to:from:date:message-id:subject:to
-         :cc;
-        bh=mHahO8LZCdU8zaS7EVF3B7S7ImGonfhaVfJ1tDELB24=;
-        b=HQtj4NOC4GpXxt0IO2bvTeez5WRIJN4iBxbju4l+SfUr9aGQjQQVxEEqv0iSvAH9Cf
-         9oCv9CE4ffHGIPUk2jakyqwdkFRFRmmhpkingwTTi0fiZ9fYFLy2E+IJnHkXNmeji7HD
-         t9R7bmUbOJQIYUbypH6AG8tdoLgT7EDiX9sBc=
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20161025;
-        h=x-gm-message-state:mime-version:references:in-reply-to:from:date
-         :message-id:subject:to:cc;
-        bh=mHahO8LZCdU8zaS7EVF3B7S7ImGonfhaVfJ1tDELB24=;
-        b=kvUK/E7VIF+6bFVrWbh3ncXHUXUQ7bsEide3BgVGy8cspATWccFy9JxnnYa0Ubm0Xm
-         WGa9t3YIHXbt9rFV5NQ4bW572nQ2jexP6PiaTOjb6eVTNlqiCwtmi3FMG4nMrIf4hB5S
-         UsiGv6rHPSanliiHhZqwVdyZ6e8ue4SuiUBpO4IfvFNfOGsfwVD0zriqerFNlyRhOJlg
-         mJB4YerrY4OWpjCdqiFvks5z2GYxYFhpySIDGu8tqS2871/Y+4od67QRK5ajr8lMGSM8
-         nu8hnz2Wpi5r3xvVoFFax1TD7zk7ewsMROkTdnaOBmKc5fybokAPbG2bpz40n55nyRi7
-         ttvQ==
-X-Gm-Message-State: APjAAAUiqyjMJexLLUTmUhNbLJT49jXKgKZCq2mAYTDg4aWbsveEkFZ7
-        6tqCfSiaGPKJRQyR/2tAhKOZ0SyoMMw=
-X-Google-Smtp-Source: APXvYqyloDubZws/TaOCbZ09LC03KYJIBaKadRt/Du61TPXSfLr4G1HeNazha1NJukEAfwtS5Phpmg==
-X-Received: by 2002:a19:f619:: with SMTP id x25mr4110668lfe.146.1576118863327;
-        Wed, 11 Dec 2019 18:47:43 -0800 (PST)
-Received: from mail-lf1-f51.google.com (mail-lf1-f51.google.com. [209.85.167.51])
-        by smtp.gmail.com with ESMTPSA id b63sm2061600lfg.79.2019.12.11.18.47.41
-        for <linux-block@vger.kernel.org>
-        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
-        Wed, 11 Dec 2019 18:47:42 -0800 (PST)
-Received: by mail-lf1-f51.google.com with SMTP id 203so434382lfa.12
-        for <linux-block@vger.kernel.org>; Wed, 11 Dec 2019 18:47:41 -0800 (PST)
-X-Received: by 2002:a19:4351:: with SMTP id m17mr4341762lfj.61.1576118861439;
- Wed, 11 Dec 2019 18:47:41 -0800 (PST)
+        Thu, 12 Dec 2019 00:56:37 -0500
+Received: from hqpgpgate101.nvidia.com (Not Verified[216.228.121.13]) by hqnvemgate26.nvidia.com (using TLS: TLSv1.2, DES-CBC3-SHA)
+        id <B5df1d68d0000>; Wed, 11 Dec 2019 21:56:29 -0800
+Received: from hqmail.nvidia.com ([172.20.161.6])
+  by hqpgpgate101.nvidia.com (PGP Universal service);
+  Wed, 11 Dec 2019 21:56:36 -0800
+X-PGP-Universal: processed;
+        by hqpgpgate101.nvidia.com on Wed, 11 Dec 2019 21:56:36 -0800
+Received: from [10.2.165.195] (10.124.1.5) by HQMAIL107.nvidia.com
+ (172.20.187.13) with Microsoft SMTP Server (TLS) id 15.0.1473.3; Thu, 12 Dec
+ 2019 05:56:35 +0000
+Subject: Re: [PATCH v9 23/25] mm/gup: track FOLL_PIN pages
+To:     Jan Kara <jack@suse.cz>
+CC:     Andrew Morton <akpm@linux-foundation.org>,
+        Al Viro <viro@zeniv.linux.org.uk>,
+        Alex Williamson <alex.williamson@redhat.com>,
+        Benjamin Herrenschmidt <benh@kernel.crashing.org>,
+        =?UTF-8?B?QmrDtnJuIFTDtnBlbA==?= <bjorn.topel@intel.com>,
+        Christoph Hellwig <hch@infradead.org>,
+        Dan Williams <dan.j.williams@intel.com>,
+        Daniel Vetter <daniel@ffwll.ch>,
+        Dave Chinner <david@fromorbit.com>,
+        David Airlie <airlied@linux.ie>,
+        "David S . Miller" <davem@davemloft.net>,
+        Ira Weiny <ira.weiny@intel.com>,
+        Jason Gunthorpe <jgg@ziepe.ca>, Jens Axboe <axboe@kernel.dk>,
+        Jonathan Corbet <corbet@lwn.net>,
+        =?UTF-8?B?SsOpcsO0bWUgR2xpc3Nl?= <jglisse@redhat.com>,
+        Magnus Karlsson <magnus.karlsson@intel.com>,
+        Mauro Carvalho Chehab <mchehab@kernel.org>,
+        Michael Ellerman <mpe@ellerman.id.au>,
+        Michal Hocko <mhocko@suse.com>,
+        Mike Kravetz <mike.kravetz@oracle.com>,
+        Paul Mackerras <paulus@samba.org>,
+        Shuah Khan <shuah@kernel.org>,
+        Vlastimil Babka <vbabka@suse.cz>, <bpf@vger.kernel.org>,
+        <dri-devel@lists.freedesktop.org>, <kvm@vger.kernel.org>,
+        <linux-block@vger.kernel.org>, <linux-doc@vger.kernel.org>,
+        <linux-fsdevel@vger.kernel.org>, <linux-kselftest@vger.kernel.org>,
+        <linux-media@vger.kernel.org>, <linux-rdma@vger.kernel.org>,
+        <linuxppc-dev@lists.ozlabs.org>, <netdev@vger.kernel.org>,
+        <linux-mm@kvack.org>, LKML <linux-kernel@vger.kernel.org>,
+        "Kirill A . Shutemov" <kirill.shutemov@linux.intel.com>
+References: <20191211025318.457113-1-jhubbard@nvidia.com>
+ <20191211025318.457113-24-jhubbard@nvidia.com>
+ <20191211112807.GN1551@quack2.suse.cz>
+From:   John Hubbard <jhubbard@nvidia.com>
+X-Nvconfidentiality: public
+Message-ID: <f961d0b6-c660-85b9-ad01-53bce74e39e9@nvidia.com>
+Date:   Wed, 11 Dec 2019 21:53:45 -0800
+User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:68.0) Gecko/20100101
+ Thunderbird/68.3.0
 MIME-Version: 1.0
-References: <e43a2700-8625-e136-dc9d-d0d2da5d96ac@kernel.dk>
- <CAHk-=wje8i3DVcO=fMC4tzKTS5+eHv0anrVZa_JENQt08T=qCQ@mail.gmail.com>
- <0d4e3954-c467-30a7-5a8e-7c4180275533@kernel.dk> <CAHk-=whk4bcVPvtAv5OmHiW5z6AXgCLFhO4YrXD7o0XC+K-aHw@mail.gmail.com>
- <fef996ca-a4ed-9633-1f79-91292a984a20@kernel.dk> <CAHk-=wg=hHUFg3i0vDmKEg8HFbEKquAsoC8CJoZpP-8_A1jZDA@mail.gmail.com>
- <1c93194a-ed91-c3aa-deb5-a3394805defb@kernel.dk> <CAHk-=wj0pXsngjWKw5p3oTvwkNnT2DyoZWqPB+-wBY+BGTQ96w@mail.gmail.com>
- <d8a8ea42-7f76-926c-ae9a-d49b11578153@kernel.dk> <CAHk-=whtf0-f5wCcSAj=oTK2TEaesF43UdHnPyvgE9X1EuwvBw@mail.gmail.com>
- <20191212015612.GP32169@bombadil.infradead.org>
-In-Reply-To: <20191212015612.GP32169@bombadil.infradead.org>
-From:   Linus Torvalds <torvalds@linux-foundation.org>
-Date:   Wed, 11 Dec 2019 18:47:25 -0800
-X-Gmail-Original-Message-ID: <CAHk-=wjr1G0xXDs7R=2ZAB=YSs-WLk4GsVwLafw+96XVwo7jyg@mail.gmail.com>
-Message-ID: <CAHk-=wjr1G0xXDs7R=2ZAB=YSs-WLk4GsVwLafw+96XVwo7jyg@mail.gmail.com>
-Subject: Re: [PATCHSET v3 0/5] Support for RWF_UNCACHED
-To:     Matthew Wilcox <willy@infradead.org>
-Cc:     Jens Axboe <axboe@kernel.dk>, Linux-MM <linux-mm@kvack.org>,
-        linux-fsdevel <linux-fsdevel@vger.kernel.org>,
-        linux-block <linux-block@vger.kernel.org>,
-        Chris Mason <clm@fb.com>, Dave Chinner <david@fromorbit.com>,
-        Johannes Weiner <hannes@cmpxchg.org>
-Content-Type: text/plain; charset="UTF-8"
+In-Reply-To: <20191211112807.GN1551@quack2.suse.cz>
+X-Originating-IP: [10.124.1.5]
+X-ClientProxiedBy: HQMAIL105.nvidia.com (172.20.187.12) To
+ HQMAIL107.nvidia.com (172.20.187.13)
+Content-Type: text/plain; charset="utf-8"; format=flowed
+Content-Language: en-US
+Content-Transfer-Encoding: quoted-printable
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=nvidia.com; s=n1;
+        t=1576130189; bh=WUvMFBOwsTbLT+9CzNbxGtAponFsFsmTJOyg8MjL8ds=;
+        h=X-PGP-Universal:Subject:To:CC:References:From:X-Nvconfidentiality:
+         Message-ID:Date:User-Agent:MIME-Version:In-Reply-To:
+         X-Originating-IP:X-ClientProxiedBy:Content-Type:Content-Language:
+         Content-Transfer-Encoding;
+        b=lsWfVOx2mYuCSEqMXkqo0p3SpKqw9VwSL+20QlVcuyoMSELQtTCN0YxM6RzLVo9oa
+         uq4Hl9KFn70q6l1bzqmgaiV5HLk4+H2168Aq1l5uWc+mWWgNKPzhftF1QMyxl40GPe
+         nNNgDtbzvAru+MjxE1MbEaMe+90vfqRYKPVuX/JzejQXCe2EVI5eyYy9CwInRuqtjp
+         2idGFh4dXFAMfDwQiKAN1Pz/TUuUoswEkyfXdQEyWp7z5jAlzfpntkPH8s96FOaimZ
+         1olYa+8gPiG8ccYKitvEKwCbv3GPr0UXUD+T0zjEzw7D9d6fQ9awWSzCOfMJ4VZl20
+         16ivttgOjkh4A==
 Sender: linux-block-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-On Wed, Dec 11, 2019 at 5:56 PM Matthew Wilcox <willy@infradead.org> wrote:
->
-> It _should_ be the same order of complexity.  Since there's already
-> a page in the page cache, xas_create() just walks its way down to the
-> right node calling xas_descend() and then xas_store() does the equivalent
-> of __radix_tree_replace().  I don't see a bug that would make it more
-> expensive than the old code ... a 10GB file is going to have four levels
-> of radix tree node, so it shouldn't even spend that long looking for
-> the right node.
-
-The profile seems to say that 85% of the cost of xas_create() is two
-instructions:
-
-# lib/xarray.c:143:     return (index >> node->shift) & XA_CHUNK_MASK;
-        movzbl  (%rsi), %ecx    # MEM[(unsigned char *)node_13],
-MEM[(unsigned char *)node_13]
+On 12/11/19 3:28 AM, Jan Kara wrote:
 ...
-# ./include/linux/xarray.h:1145:        return
-rcu_dereference_check(node->slots[offset],
-# ./include/linux/compiler.h:199:       __READ_ONCE_SIZE;
-        movq    (%rax), %rax    # MEM[(volatile __u64 *)_80], <retval>
+>=20
+> The patch looks mostly good to me now. Just a few smaller comments below.
+>=20
+>> Suggested-by: Jan Kara <jack@suse.cz>
+>> Suggested-by: J=C3=A9r=C3=B4me Glisse <jglisse@redhat.com>
+>> Reviewed-by: Jan Kara <jack@suse.cz>
+>> Reviewed-by: J=C3=A9r=C3=B4me Glisse <jglisse@redhat.com>
+>> Reviewed-by: Ira Weiny <ira.weiny@intel.com>
+>=20
+> I think you inherited here the Reviewed-by tags from the "add flags" patc=
+h
+> you've merged into this one but that's not really fair since this patch
+> does much more... In particular I didn't give my Reviewed-by tag for this
+> patch yet.
 
-where that first load is "node->shift", and the second load seems to
-be just the node dereference.
+OK, I've removed those reviewed-by's. (I felt bad about dropping them, afte=
+r
+people had devoted time to reviewing, but I do see that it's wrong to imply
+that they've reviewed this much much larger thing.)
 
-I think both of them are basically just xas_descend(), but it's a bit
-hard to read the several levels of inlining.
+...
+>=20
+> I somewhat wonder about the asymmetry of try_grab_compound_head() vs
+> try_grab_page() in the treatment of 'flags'. How costly would it be to ma=
+ke
+> them symmetric (i.e., either set FOLL_GET for try_grab_compound_head()
+> callers or make sure one of FOLL_GET, FOLL_PIN is set for try_grab_page()=
+)?
+>=20
+> Because this difference looks like a subtle catch in the long run...
 
-I suspect the real issue is that going through kswapd means we've lost
-almost all locality, and with the random walking the LRU list is
-basically entirely unordered so you don't get any advantage of the
-xarray having (otherwise) possibly good cache patterns.
+Done. It is only a modest code-level change, at least the way I've done it,=
+ which is
+setting FOLL_GET for try_grab_compound_head(). In order to do that, I set
+it at the top of the internal gup fast calling stacks, which is actually a =
+good
+design anyway: gup fast is logically doing FOLL_GET in all cases. So settin=
+g
+the flag internally is accurate and consistent with the overall design.
 
-So we're just missing in the caches all the time, making it expensive.
 
-              Linus
+> ...
+>=20
+>> @@ -1522,8 +1536,8 @@ struct page *follow_trans_huge_pmd(struct vm_area_=
+struct *vma,
+>>   skip_mlock:
+>>   	page +=3D (addr & ~HPAGE_PMD_MASK) >> PAGE_SHIFT;
+>>   	VM_BUG_ON_PAGE(!PageCompound(page) && !is_zone_device_page(page), pag=
+e);
+>> -	if (flags & FOLL_GET)
+>> -		get_page(page);
+>> +	if (!try_grab_page(page, flags))
+>> +		page =3D ERR_PTR(-EFAULT);
+>=20
+> I think you need to also move the try_grab_page() earlier in the function=
+.
+> At this point the page may be marked as mlocked and you'd need to undo th=
+at
+> in case try_grab_page() fails.
+
+
+OK, I've moved it up, adding a "subpage" variable in order to make that wor=
+k.
+
+>=20
+>> diff --git a/mm/hugetlb.c b/mm/hugetlb.c
+>> index ac65bb5e38ac..0aab6fe0072f 100644
+>> --- a/mm/hugetlb.c
+>> +++ b/mm/hugetlb.c
+>> @@ -4356,7 +4356,13 @@ long follow_hugetlb_page(struct mm_struct *mm, st=
+ruct vm_area_struct *vma,
+>>   same_page:
+>>   		if (pages) {
+>>   			pages[i] =3D mem_map_offset(page, pfn_offset);
+>> -			get_page(pages[i]);
+>> +			if (!try_grab_page(pages[i], flags)) {
+>> +				spin_unlock(ptl);
+>> +				remainder =3D 0;
+>> +				err =3D -ENOMEM;
+>> +				WARN_ON_ONCE(1);
+>> +				break;
+>> +			}
+>>   		}
+>=20
+> This function does a refcount overflow check early so that it doesn't hav=
+e
+> to do try_get_page() here. So that check can be now removed when you do
+> try_grab_page() here anyway since that early check seems to be just a tin=
+y
+> optimization AFAICT.
+>=20
+> 								Honza
+>=20
+
+Yes. I've removed it, good spot.
+
+
+thanks,
+--=20
+John Hubbard
+NVIDIA
