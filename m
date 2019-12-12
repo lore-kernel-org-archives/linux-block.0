@@ -2,77 +2,108 @@ Return-Path: <SRS0=VRi+=2C=vger.kernel.org=linux-block-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-2.0 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
+X-Spam-Status: No, score=-2.2 required=3.0 tests=DKIM_SIGNED,DKIM_VALID,
 	HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,
 	USER_AGENT_SANE_1 autolearn=no autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id EDF9EC43603
-	for <linux-block@archiver.kernel.org>; Thu, 12 Dec 2019 15:47:53 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 2BDD4C43603
+	for <linux-block@archiver.kernel.org>; Thu, 12 Dec 2019 15:52:09 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.kernel.org (Postfix) with ESMTP id B544B214AF
-	for <linux-block@archiver.kernel.org>; Thu, 12 Dec 2019 15:47:53 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id 000F222B48
+	for <linux-block@archiver.kernel.org>; Thu, 12 Dec 2019 15:52:08 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (2048-bit key) header.d=infradead.org header.i=@infradead.org header.b="S4p279uX"
+	dkim=pass (2048-bit key) header.d=kernel-dk.20150623.gappssmtp.com header.i=@kernel-dk.20150623.gappssmtp.com header.b="SzI1DOGv"
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1729412AbfLLPrx (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Thu, 12 Dec 2019 10:47:53 -0500
-Received: from bombadil.infradead.org ([198.137.202.133]:54444 "EHLO
-        bombadil.infradead.org" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1729013AbfLLPrx (ORCPT
+        id S1729744AbfLLPwI (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Thu, 12 Dec 2019 10:52:08 -0500
+Received: from mail-il1-f196.google.com ([209.85.166.196]:37408 "EHLO
+        mail-il1-f196.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S1729647AbfLLPwI (ORCPT
         <rfc822;linux-block@vger.kernel.org>);
-        Thu, 12 Dec 2019 10:47:53 -0500
-DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed;
-        d=infradead.org; s=bombadil.20170209; h=In-Reply-To:Content-Type:MIME-Version
-        :References:Message-ID:Subject:Cc:To:From:Date:Sender:Reply-To:
-        Content-Transfer-Encoding:Content-ID:Content-Description:Resent-Date:
-        Resent-From:Resent-Sender:Resent-To:Resent-Cc:Resent-Message-ID:List-Id:
-        List-Help:List-Unsubscribe:List-Subscribe:List-Post:List-Owner:List-Archive;
-         bh=IEJ3LeivFspfBiEBb2hcfjpdM0Mp6JK3jjIKi4Wc18c=; b=S4p279uXXCBU2Sr7nSNRYnMxg
-        XiIwyLIqLjc1P45nwb/Wj3dgZbFCAcqAr7eEAiLZr6zwJBPMeKUiODz9cIszdXW3b14yOn5qVpV6U
-        NB7t01b2WDvZCld45yc9I8rWI2VGusbHpRmMMRbw8OF247CsdscrR/85ZguLg0qLb5FrKuvixAKFm
-        NbRsRjYvwPj/XAosoZI+sW4d7jEKcasecmk0NUdKxzrSyI5YRMGcQLFUz646ffp/e5gYFeTl+qLF+
-        qWR2ldl1Vj6gMlEbWATpI8mF1XNgccJguf2rMJ65uTsl6wAMXPIVlzp7HO7tXjs3QMkxYiTOPhg7J
-        3xorWtnyA==;
-Received: from hch by bombadil.infradead.org with local (Exim 4.92.3 #3 (Red Hat Linux))
-        id 1ifQgy-0002qW-C1; Thu, 12 Dec 2019 15:47:52 +0000
-Date:   Thu, 12 Dec 2019 07:47:52 -0800
-From:   Christoph Hellwig <hch@infradead.org>
-To:     Jens Axboe <axboe@kernel.dk>
+        Thu, 12 Dec 2019 10:52:08 -0500
+Received: by mail-il1-f196.google.com with SMTP id t9so2441517iln.4
+        for <linux-block@vger.kernel.org>; Thu, 12 Dec 2019 07:52:07 -0800 (PST)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=kernel-dk.20150623.gappssmtp.com; s=20150623;
+        h=subject:to:cc:references:from:message-id:date:user-agent
+         :mime-version:in-reply-to:content-language:content-transfer-encoding;
+        bh=V0rzD69sAvpYoYAXwifXkGJ/c3BEX7oHaXNnSu/7R1A=;
+        b=SzI1DOGvsgQG/a8ar2Ti7v2aUdaaiCFJizyPBOlaQbK9xD7GDmASaAQWVmpK/PrJFH
+         feNXUM8rq1SIkXPCAT3IdmpYkcCHLjZskV2782eYG/I+CAlzZRWzyAKaxSQivhOL22rx
+         7TZY0ZwUivRozG48Xlnr1wKrP7wG5Fs9XrK1HM8yGvl2GX/ZcaIxFRgpGvJlo8QFa4Cx
+         suElgOqZ7TUVlqGi7Sho7DskEt+8FWde9DkAZprvCODsA4rbSLFXhK9wSGJKw11FAP0g
+         JbJMcIRGbqw/iezIhnauvM9V7jaDbpY7HX+dBxn9TMBnNe0ohevkevPACyP75fUBBlUF
+         cJjQ==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20161025;
+        h=x-gm-message-state:subject:to:cc:references:from:message-id:date
+         :user-agent:mime-version:in-reply-to:content-language
+         :content-transfer-encoding;
+        bh=V0rzD69sAvpYoYAXwifXkGJ/c3BEX7oHaXNnSu/7R1A=;
+        b=Q1iYAh5vBJKFzVmeSVSp+DMbtKO23M2R7m4RKxsEHc7n/om2Llpd/f3r8a51yDziby
+         mmVDwBN6XUOxPUqgvHuBF6aAE80zWh15J/1boPH30y6FYfBwxk/zjYp1+/QkVfNhoUN0
+         iBNmy0XbZl995IafjzUKRbQX/q8Tq3pkZn1dKgP2La1pQpr72oGs3SxD2zsa1lnY1oR7
+         iUkLbl2dlCVBqsMUo8nbsvT6iJm5iscUWMPXnK/jPZU3mB99n62rXXJHelvFLdvSacmg
+         RMP8B00aY+fHP162M1tY9adDQZsyECkL8Nqn/Ej8uB+FDp4RJKHJyd/2/NYhOCKx6jTt
+         tAJQ==
+X-Gm-Message-State: APjAAAUAa6uKue9PjdP0XXUahgS0n+0WRjxtouCjlNg6uaAcTiQtImTJ
+        hd/2xkmH2cfv3Zs2yJUu2fSYsi7vrflM6w==
+X-Google-Smtp-Source: APXvYqxS2dkp/Ovx5CvFCzb8EkwUApe8FaaO0vOhCgPE2dsCgSj49pRSoy3unKMrBzXFDk9H/Q4mAQ==
+X-Received: by 2002:a92:5c4a:: with SMTP id q71mr9001087ilb.266.1576165926938;
+        Thu, 12 Dec 2019 07:52:06 -0800 (PST)
+Received: from [192.168.1.159] ([65.144.74.34])
+        by smtp.gmail.com with ESMTPSA id u10sm1818820ilb.8.2019.12.12.07.52.05
+        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
+        Thu, 12 Dec 2019 07:52:06 -0800 (PST)
+Subject: Re: [PATCHSET 0/5] Support for RWF_UNCACHED
+To:     Christoph Hellwig <hch@infradead.org>
 Cc:     linux-mm@kvack.org, linux-fsdevel@vger.kernel.org,
         linux-block@vger.kernel.org
-Subject: Re: [PATCHSET 0/5] Support for RWF_UNCACHED
-Message-ID: <20191212154752.GA3936@infradead.org>
 References: <20191210162454.8608-1-axboe@kernel.dk>
+ <20191212154752.GA3936@infradead.org>
+From:   Jens Axboe <axboe@kernel.dk>
+Message-ID: <941edff1-76fb-41f8-cb81-15ea0970e949@kernel.dk>
+Date:   Thu, 12 Dec 2019 08:52:04 -0700
+User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:68.0) Gecko/20100101
+ Thunderbird/68.2.2
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <20191210162454.8608-1-axboe@kernel.dk>
-User-Agent: Mutt/1.12.1 (2019-06-15)
-X-SRS-Rewrite: SMTP reverse-path rewritten from <hch@infradead.org> by bombadil.infradead.org. See http://www.infradead.org/rpr.html
+In-Reply-To: <20191212154752.GA3936@infradead.org>
+Content-Type: text/plain; charset=utf-8
+Content-Language: en-US
+Content-Transfer-Encoding: 7bit
 Sender: linux-block-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-On Tue, Dec 10, 2019 at 09:24:49AM -0700, Jens Axboe wrote:
-> Seems to me that we have an opportunity to provide something that sits
-> somewhere in between buffered and O_DIRECT, and this is where
-> RWF_UNCACHED enters the picture. If this flag is set on IO, we get the
-> following behavior:
+On 12/12/19 8:47 AM, Christoph Hellwig wrote:
+> On Tue, Dec 10, 2019 at 09:24:49AM -0700, Jens Axboe wrote:
+>> Seems to me that we have an opportunity to provide something that sits
+>> somewhere in between buffered and O_DIRECT, and this is where
+>> RWF_UNCACHED enters the picture. If this flag is set on IO, we get the
+>> following behavior:
+>>
+>> - If the data is in cache, it remains in cache and the copy (in or out)
+>>   is served to/from that.
+>>
+>> - If the data is NOT in cache, we add it while performing the IO. When
+>>   the IO is done, we remove it again.
+>>
+>> With this, I can do 100% smooth buffered reads or writes without pushing
+>> the kernel to the state where kswapd is sweating bullets. In fact it
+>> doesn't even register.
+>>
+>> Comments appreciated! Patches are against current git (ish), and can
+>> also be found here:
 > 
-> - If the data is in cache, it remains in cache and the copy (in or out)
->   is served to/from that.
-> 
-> - If the data is NOT in cache, we add it while performing the IO. When
->   the IO is done, we remove it again.
-> 
-> With this, I can do 100% smooth buffered reads or writes without pushing
-> the kernel to the state where kswapd is sweating bullets. In fact it
-> doesn't even register.
-> 
-> Comments appreciated! Patches are against current git (ish), and can
-> also be found here:
+> I can't say I particularly like the model, as it still has all the
+> page cache overhead.  Direct I/O with bounce buffers for unaligned I/O
+> sounds simpler and faster to me.
 
-I can't say I particularly like the model, as it still has all the
-page cache overhead.  Direct I/O with bounce buffers for unaligned I/O
-sounds simpler and faster to me.
+The current patchset read side does not, hopefully the same can be done
+on the write side. No page cache usage for reads, because it did indeed
+turn out to have too much overhead.
+
+-- 
+Jens Axboe
+
