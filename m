@@ -2,119 +2,154 @@ Return-Path: <SRS0=VRi+=2C=vger.kernel.org=linux-block-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-0.9 required=3.0 tests=DKIMWL_WL_HIGH,DKIM_SIGNED,
-	DKIM_VALID,DKIM_VALID_AU,HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,
-	SPF_HELO_NONE,SPF_PASS autolearn=no autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-5.8 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
+	MAILING_LIST_MULTI,MENTIONS_GIT_HOSTING,SPF_HELO_NONE,SPF_PASS
+	autolearn=unavailable autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 183A9C2D0C9
-	for <linux-block@archiver.kernel.org>; Thu, 12 Dec 2019 10:27:46 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 17085C2D0C8
+	for <linux-block@archiver.kernel.org>; Thu, 12 Dec 2019 10:55:18 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.kernel.org (Postfix) with ESMTP id E2E5422B48
-	for <linux-block@archiver.kernel.org>; Thu, 12 Dec 2019 10:27:45 +0000 (UTC)
-Authentication-Results: mail.kernel.org;
-	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="RlV25XoG"
+	by mail.kernel.org (Postfix) with ESMTP id ECBDF214D8
+	for <linux-block@archiver.kernel.org>; Thu, 12 Dec 2019 10:55:17 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1728642AbfLLK1p (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Thu, 12 Dec 2019 05:27:45 -0500
-Received: from us-smtp-1.mimecast.com ([205.139.110.61]:54528 "EHLO
-        us-smtp-delivery-1.mimecast.com" rhost-flags-OK-OK-OK-FAIL)
-        by vger.kernel.org with ESMTP id S1728573AbfLLK1o (ORCPT
+        id S1728850AbfLLKzR convert rfc822-to-8bit (ORCPT
+        <rfc822;linux-block@archiver.kernel.org>);
+        Thu, 12 Dec 2019 05:55:17 -0500
+Received: from luna.lichtvoll.de ([194.150.191.11]:55953 "EHLO
+        mail.lichtvoll.de" rhost-flags-OK-OK-OK-FAIL) by vger.kernel.org
+        with ESMTP id S1728802AbfLLKzR (ORCPT
         <rfc822;linux-block@vger.kernel.org>);
-        Thu, 12 Dec 2019 05:27:44 -0500
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-        s=mimecast20190719; t=1576146464;
-        h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-         to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-         in-reply-to:in-reply-to:references:references;
-        bh=qU9B6VyDpHjtTgIgGRVPpWJk/W+j6466GBB3hhlYf7g=;
-        b=RlV25XoGBhgTBON0WMFGqHKNzsUzYMBJ4QH0aR7wyOBWGd+uj/CrDTEuW/B6wsMqxyUGo7
-        WT6/aIDvSjr89c8aMNRqudTX+QPQL1y6NRE2UHjD6V23nSKd38TcV9cQkh4VsIftM68Dc0
-        yh5AkSKXV8KdTlvKIpk7bPjMQqBWxUM=
-Received: from mail-qt1-f200.google.com (mail-qt1-f200.google.com
- [209.85.160.200]) (Using TLS) by relay.mimecast.com with ESMTP id
- us-mta-146-zRqKNOjeOj6m1T5SwxoDaQ-1; Thu, 12 Dec 2019 05:27:42 -0500
-X-MC-Unique: zRqKNOjeOj6m1T5SwxoDaQ-1
-Received: by mail-qt1-f200.google.com with SMTP id q17so1076582qtc.8
-        for <linux-block@vger.kernel.org>; Thu, 12 Dec 2019 02:27:42 -0800 (PST)
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20161025;
-        h=x-gm-message-state:date:from:to:cc:subject:message-id:references
-         :mime-version:content-disposition:in-reply-to;
-        bh=qU9B6VyDpHjtTgIgGRVPpWJk/W+j6466GBB3hhlYf7g=;
-        b=p6tfHighdKVQt7pGsRScdCt1NNON8N+Drd4IVw+MvMAMe1qoECtaYelloncED7bSR0
-         QsimvkDcGiSXedzT/U6rHUFIaWLkJR4ublu1JlkIcYdEKs94H/lag4eqbTNt/wDhayR8
-         NNCuoSPLs6rhlVe2h9Z9yvQfF057WLzUWpByUdH3yMq65TRL5jxRnNIy389i9Whqy6hX
-         t8tRhEzKRZKcnJ2JyN3ySunVjvzRZjjxmvCvJx+/xK+3p5X0fJgvg1CYJcWQV8nM2J5h
-         YjhLwXuDTrxPKOLaicJfZdOEy5bRQENMAtK9bevCh5dT7WHnkngjM6iEeVj35DajZNTr
-         JybA==
-X-Gm-Message-State: APjAAAXEqBCDKqBLQOvFY+TMdbJ0xZwN55zPrhmqsEhpoizkYzT8Rmz6
-        u6XqpZCjiF+E5cUbH1pB/f6wjOGu4/GnoZI+owhgi43DBKQy1ucDQI5Q69ZymyhYG9Jnj83SFhC
-        aD8ELTw8YLtXBCliNMrcPMMY=
-X-Received: by 2002:a0c:fa4b:: with SMTP id k11mr7283778qvo.55.1576146461809;
-        Thu, 12 Dec 2019 02:27:41 -0800 (PST)
-X-Google-Smtp-Source: APXvYqxtYqnSCAa6qS7eoPNNg8Gjl2R1rf+c6pT8ccpGnyGaK+GWirzetuKwnPIwjkwnOvZt6S9U2w==
-X-Received: by 2002:a0c:fa4b:: with SMTP id k11mr7283726qvo.55.1576146461280;
-        Thu, 12 Dec 2019 02:27:41 -0800 (PST)
-Received: from redhat.com (bzq-79-181-48-215.red.bezeqint.net. [79.181.48.215])
-        by smtp.gmail.com with ESMTPSA id 2sm1599671qkv.98.2019.12.12.02.27.36
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Thu, 12 Dec 2019 02:27:40 -0800 (PST)
-Date:   Thu, 12 Dec 2019 05:27:33 -0500
-From:   "Michael S. Tsirkin" <mst@redhat.com>
-To:     Paolo Bonzini <pbonzini@redhat.com>
-Cc:     Arnd Bergmann <arnd@arndb.de>, Jens Axboe <axboe@kernel.dk>,
-        "James E.J. Bottomley" <jejb@linux.ibm.com>,
-        "Martin K. Petersen" <martin.petersen@oracle.com>,
-        Alexander Viro <viro@zeniv.linux.org.uk>,
-        Jason Wang <jasowang@redhat.com>,
-        Doug Gilbert <dgilbert@interlog.com>,
-        Kai =?iso-8859-1?Q?M=E4kisara?= <Kai.Makisara@kolumbus.fi>,
-        linux-kernel@vger.kernel.org, y2038@lists.linaro.org,
-        Stefan Hajnoczi <stefanha@redhat.com>,
-        Bart Van Assche <bvanassche@acm.org>,
-        Hannes Reinecke <hare@suse.com>,
-        Damien Le Moal <damien.lemoal@wdc.com>,
-        John Garry <john.garry@huawei.com>,
-        virtualization@lists.linux-foundation.org,
-        linux-block@vger.kernel.org, linux-scsi@vger.kernel.org,
-        linux-fsdevel@vger.kernel.org
-Subject: Re: [PATCH 15/24] compat_ioctl: scsi: move ioctl handling into
- drivers
-Message-ID: <20191212052649-mutt-send-email-mst@kernel.org>
-References: <20191211204306.1207817-1-arnd@arndb.de>
- <20191211204306.1207817-16-arnd@arndb.de>
- <20191211180155-mutt-send-email-mst@kernel.org>
- <858768fb-5f79-8259-eb6a-a26f18fb0e04@redhat.com>
+        Thu, 12 Dec 2019 05:55:17 -0500
+X-Greylist: delayed 604 seconds by postgrey-1.27 at vger.kernel.org; Thu, 12 Dec 2019 05:55:16 EST
+Received: from 127.0.0.1 (localhost [127.0.0.1])
+        (using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
+         key-exchange X25519 server-signature RSA-PSS (4096 bits) server-digest SHA256)
+        (No client certificate requested)
+        by mail.lichtvoll.de (Postfix) with ESMTPSA id 1A8D699848;
+        Thu, 12 Dec 2019 11:45:07 +0100 (CET)
+From:   Martin Steigerwald <martin@lichtvoll.de>
+To:     Jens Axboe <axboe@kernel.dk>
+Cc:     linux-mm@kvack.org, linux-fsdevel@vger.kernel.org,
+        linux-block@vger.kernel.org, willy@infradead.org, clm@fb.com,
+        torvalds@linux-foundation.org, david@fromorbit.com
+Subject: Re: [PATCHSET v3 0/5] Support for RWF_UNCACHED
+Date:   Thu, 12 Dec 2019 11:44:59 +0100
+Message-ID: <63049728.ylUViGSH3C@merkaba>
+In-Reply-To: <20191211152943.2933-1-axboe@kernel.dk>
+References: <20191211152943.2933-1-axboe@kernel.dk>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <858768fb-5f79-8259-eb6a-a26f18fb0e04@redhat.com>
+Content-Transfer-Encoding: 8BIT
+Content-Type: text/plain; charset="UTF-8"
+Authentication-Results: mail.lichtvoll.de;
+        auth=pass smtp.auth=martin smtp.mailfrom=martin@lichtvoll.de
 Sender: linux-block-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-On Thu, Dec 12, 2019 at 01:28:08AM +0100, Paolo Bonzini wrote:
-> On 12/12/19 00:05, Michael S. Tsirkin wrote:
-> >> @@ -405,6 +405,9 @@ static int virtblk_getgeo(struct block_device *bd, struct hd_geometry *geo)
-> >>  
-> >>  static const struct block_device_operations virtblk_fops = {
-> >>  	.ioctl  = virtblk_ioctl,
-> >> +#ifdef CONFIG_COMPAT
-> >> +	.compat_ioctl = blkdev_compat_ptr_ioctl,
-> >> +#endif
-> >>  	.owner  = THIS_MODULE,
-> >>  	.getgeo = virtblk_getgeo,
-> >>  };
-> > Hmm - is virtio blk lumped in with scsi things intentionally?
-> 
-> I think it's because the only ioctl for virtio-blk is SG_IO.
+Hi Jens.
 
-Oh right, I forgot about that one ...
-
->  It makes
-> sense to lump it in with scsi, but I wouldn't mind getting rid of
-> CONFIG_VIRTIO_BLK_SCSI altogether.
+Jens Axboe - 11.12.19, 16:29:38 CET:
+> Recently someone asked me how io_uring buffered IO compares to mmaped
+> IO in terms of performance. So I ran some tests with buffered IO, and
+> found the experience to be somewhat painful. The test case is pretty
+> basic, random reads over a dataset that's 10x the size of RAM.
+> Performance starts out fine, and then the page cache fills up and we
+> hit a throughput cliff. CPU usage of the IO threads go up, and we have
+> kswapd spending 100% of a core trying to keep up. Seeing that, I was
+> reminded of the many complaints I here about buffered IO, and the
+> fact that most of the folks complaining will ultimately bite the
+> bullet and move to O_DIRECT to just get the kernel out of the way.
 > 
-> Paolo
+> But I don't think it needs to be like that. Switching to O_DIRECT
+> isn't always easily doable. The buffers have different life times,
+> size and alignment constraints, etc. On top of that, mixing buffered
+> and O_DIRECT can be painful.
+> 
+> Seems to me that we have an opportunity to provide something that sits
+> somewhere in between buffered and O_DIRECT, and this is where
+> RWF_UNCACHED enters the picture. If this flag is set on IO, we get
+> the following behavior:
+> 
+> - If the data is in cache, it remains in cache and the copy (in or
+> out) is served to/from that.
+> 
+> - If the data is NOT in cache, we add it while performing the IO. When
+> the IO is done, we remove it again.
+> 
+> With this, I can do 100% smooth buffered reads or writes without
+> pushing the kernel to the state where kswapd is sweating bullets. In
+> fact it doesn't even register.
+
+A question from a user or Linux Performance trainer perspective:
+
+How does this compare with posix_fadvise() with POSIX_FADV_DONTNEED that 
+for example the nocache¹ command is using? Excerpt from manpage 
+posix_fadvice(2):
+
+       POSIX_FADV_DONTNEED
+              The specified data will not be accessed  in  the  near
+              future.
+
+              POSIX_FADV_DONTNEED  attempts to free cached pages as‐
+              sociated with the specified region.  This  is  useful,
+              for  example,  while streaming large files.  A program
+              may periodically request the  kernel  to  free  cached
+              data  that  has already been used, so that more useful
+              cached pages are not discarded instead.
+
+[1] packaged in Debian as nocache or available herehttps://github.com/
+Feh/nocache
+
+In any way, would be nice to have some option in rsync… I still did not 
+change my backup script to call rsync via nocache.
+
+Thanks,
+Martin
+
+> Comments appreciated! This should work on any standard file system,
+> using either the generic helpers or iomap. I have tested ext4 and xfs
+> for the right read/write behavior, but no further validation has been
+> done yet. Patches are against current git, and can also be found here:
+> 
+> https://git.kernel.dk/cgit/linux-block/log/?h=buffered-uncached
+> 
+>  fs/ceph/file.c          |  2 +-
+>  fs/dax.c                |  2 +-
+>  fs/ext4/file.c          |  2 +-
+>  fs/iomap/apply.c        | 26 ++++++++++-
+>  fs/iomap/buffered-io.c  | 54 ++++++++++++++++-------
+>  fs/iomap/direct-io.c    |  3 +-
+>  fs/iomap/fiemap.c       |  5 ++-
+>  fs/iomap/seek.c         |  6 ++-
+>  fs/iomap/swapfile.c     |  2 +-
+>  fs/nfs/file.c           |  2 +-
+>  include/linux/fs.h      |  7 ++-
+>  include/linux/iomap.h   | 10 ++++-
+>  include/uapi/linux/fs.h |  5 ++-
+>  mm/filemap.c            | 95
+> ++++++++++++++++++++++++++++++++++++----- 14 files changed, 181
+> insertions(+), 40 deletions(-)
+> 
+> Changes since v2:
+> - Rework the write side according to Chinners suggestions. Much
+> cleaner this way. It does mean that we invalidate the full write
+> region if just ONE page (or more) had to be created, where before it
+> was more granular. I don't think that's a concern, and on the plus
+> side, we now no longer have to chunk invalidations into 15/16 pages
+> at the time.
+> - Cleanups
+> 
+> Changes since v1:
+> - Switch to pagevecs for write_drop_cached_pages()
+> - Use page_offset() instead of manual shift
+> - Ensure we hold a reference on the page between calling ->write_end()
+> and checking the mapping on the locked page
+> - Fix XFS multi-page streamed writes, we'd drop the UNCACHED flag
+> after the first page
+
+
+-- 
+Martin
+
 
