@@ -2,168 +2,208 @@ Return-Path: <SRS0=VRi+=2C=vger.kernel.org=linux-block-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-3.6 required=3.0 tests=DKIM_SIGNED,DKIM_VALID,
-	DKIM_VALID_AU,FREEMAIL_FORGED_FROMDOMAIN,FREEMAIL_FROM,
-	HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,
-	USER_AGENT_GIT autolearn=no autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-8.1 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
+	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,
+	SPF_HELO_NONE,SPF_PASS,USER_AGENT_SANE_1 autolearn=unavailable
+	autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 5CEE4C43603
-	for <linux-block@archiver.kernel.org>; Thu, 12 Dec 2019 16:15:50 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 2511CC43603
+	for <linux-block@archiver.kernel.org>; Thu, 12 Dec 2019 16:25:33 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.kernel.org (Postfix) with ESMTP id 1F76521655
-	for <linux-block@archiver.kernel.org>; Thu, 12 Dec 2019 16:15:50 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id E2CE022527
+	for <linux-block@archiver.kernel.org>; Thu, 12 Dec 2019 16:25:32 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="fdFYNx5V"
+	dkim=fail reason="signature verification failed" (2048-bit key) header.d=infradead.org header.i=@infradead.org header.b="PfLS7ZDa"
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1729605AbfLLQPt (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Thu, 12 Dec 2019 11:15:49 -0500
-Received: from mail-pg1-f196.google.com ([209.85.215.196]:34190 "EHLO
-        mail-pg1-f196.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1729247AbfLLQPt (ORCPT
+        id S1729912AbfLLQZ0 (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Thu, 12 Dec 2019 11:25:26 -0500
+Received: from bombadil.infradead.org ([198.137.202.133]:50234 "EHLO
+        bombadil.infradead.org" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S1729900AbfLLQZZ (ORCPT
         <rfc822;linux-block@vger.kernel.org>);
-        Thu, 12 Dec 2019 11:15:49 -0500
-Received: by mail-pg1-f196.google.com with SMTP id r11so1392479pgf.1;
-        Thu, 12 Dec 2019 08:15:48 -0800 (PST)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20161025;
-        h=from:to:cc:subject:date:message-id:mime-version:in-reply-to
-         :content-transfer-encoding;
-        bh=68gsX21jtww7BTikHhzN0eWHN8+olb+7I9zctus38OA=;
-        b=fdFYNx5VvbRzbMylzz0W2hyLknNtYLVLuq9VVIYIN/ammuCZG4BusZ5TKn4lYkLd9N
-         LywSfQARrv/gSZse1tUoK7YSqwUcP0dDpiuFwNXZTvcwc7o81ZTw2z9Y5EMVLiBmeY/u
-         5hqNuqPHA2/k3hd6YXb+yRRis8flHe/GeI8PjXu01/h5YYUPIEhaUrhbW7ZuVvicnmSm
-         JltOuqzl0owoerYQ3Ir23td2KzFNk6yVDKXwyiQxfi750v0W9eYiYiswt92X+I4Bfgyb
-         cM55S2Wtvoruq/CFIV+EI1Q6dwPnUJ9Ury3N3rlyRCdqMw4FAPIqm5Kw+mKTpy5/9EzX
-         hrmA==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20161025;
-        h=x-gm-message-state:from:to:cc:subject:date:message-id:mime-version
-         :in-reply-to:content-transfer-encoding;
-        bh=68gsX21jtww7BTikHhzN0eWHN8+olb+7I9zctus38OA=;
-        b=n5B9M3L/hpf2p1/zhDonBb4pGAaYBHoSIZjigoUen1ObkBNqP8cnSa+LOLq2HBXZTe
-         CXhTfR5oL703XhfygB0cy2x8WEfnRDWyhnJtYwRRxRRsdkOXr+uCYF9Z5ZXHnqpJWJhP
-         vvCG/3Iqq4sd2g5p+LjfdxvGmun0K3crYtnb1oWEhexyJJBgvzgqzmVbHPx95/OqF/g/
-         62x37nxaX2QOI10zsU+u5WvflOjcjGv/2VnfCzN1zSgaKjfiQP91Yx1D+8cggOeIBcxw
-         MNEYu3PxYXsoUJeCJP3/tM6GYlSjd6NdjPLV7NqF2yoAxlb5xbWPelRU+YK73l7Ym6EK
-         OUkQ==
-X-Gm-Message-State: APjAAAWCRZ2HN6NXWK2kxVhzAYBmFKGETEODvrT7pW9KlCLMQkkJZWyS
-        HrJ00vuBXwu5maNzNEh+4cA=
-X-Google-Smtp-Source: APXvYqzAhBSsqgXIB3EREPb06Ubmyza9cZ//120noUYsHwdj8039lOqC3PCyzCpO/LKrVcBD667fqw==
-X-Received: by 2002:a63:9d85:: with SMTP id i127mr10794603pgd.186.1576167348060;
-        Thu, 12 Dec 2019 08:15:48 -0800 (PST)
-Received: from localhost.localdomain ([12.176.148.120])
-        by smtp.gmail.com with ESMTPSA id i4sm6459079pjd.19.2019.12.12.08.15.46
-        (version=TLS1_2 cipher=ECDHE-RSA-CHACHA20-POLY1305 bits=256/256);
-        Thu, 12 Dec 2019 08:15:47 -0800 (PST)
-From:   SeongJae Park <sj38.park@gmail.com>
-To:     =?UTF-8?q?Roger=20Pau=20Monn=C3=A9?= <roger.pau@citrix.com>
-Cc:     jgross@suse.com, axboe@kernel.dk, sjpark@amazon.com,
-        konrad.wilk@oracle.com, pdurrant@amazon.com,
-        SeongJae Park <sjpark@amazon.de>, linux-kernel@vger.kernel.org,
-        linux-block@vger.kernel.org, xen-devel@lists.xenproject.org
-Subject: Re: Re: [Xen-devel] [PATCH v7 2/3] xen/blkback: Squeeze page pools if a memory pressure is detected
-Date:   Thu, 12 Dec 2019 17:15:37 +0100
-Message-Id: <20191212161537.10756-1-sj38.park@gmail.com>
-X-Mailer: git-send-email 2.17.2
+        Thu, 12 Dec 2019 11:25:25 -0500
+DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed;
+        d=infradead.org; s=bombadil.20170209; h=In-Reply-To:Content-Type:MIME-Version
+        :References:Message-ID:Subject:Cc:To:From:Date:Sender:Reply-To:
+        Content-Transfer-Encoding:Content-ID:Content-Description:Resent-Date:
+        Resent-From:Resent-Sender:Resent-To:Resent-Cc:Resent-Message-ID:List-Id:
+        List-Help:List-Unsubscribe:List-Subscribe:List-Post:List-Owner:List-Archive;
+         bh=5ym7vw3z3DT5dHcMe5oQGJ3WMFY3uciLjfIk0+QK1sA=; b=PfLS7ZDabCsQBe10ZYCmy7Osh
+        eqmh4JYgXMuOmtCehw5ozo+E64CVbOv6Icbl5HqfKCskSuk04WkMVA3T44CQ31gdWT27SMCl+Ibxa
+        Hg0i+j3HiOK2geKcqFUSpLeYmygBNqnPb9dPU5UG3SkPATsGN1yDxr8VNAmBlpj+5Hrzy/d4qzuDl
+        PkJPDAQf+YnepNxOGLhslNixbuae+XIHu6twlPE0II4IcdMSFvShejsazWRhxkRs+chcRU94DJbLx
+        RyjtpaHan8fEJK10suehHhxSO+KSahCInE6RnI3+B49Pt4GBbxS0f8/yvHFGEyS6ZtbhkeKeAPps0
+        OUqGvLygA==;
+Received: from hch by bombadil.infradead.org with local (Exim 4.92.3 #3 (Red Hat Linux))
+        id 1ifRH0-0003e6-OW; Thu, 12 Dec 2019 16:25:06 +0000
+Date:   Thu, 12 Dec 2019 08:25:06 -0800
+From:   Christoph Hellwig <hch@infradead.org>
+To:     Arnd Bergmann <arnd@arndb.de>
+Cc:     Jens Axboe <axboe@kernel.dk>,
+        "James E.J. Bottomley" <jejb@linux.ibm.com>,
+        "Martin K. Petersen" <martin.petersen@oracle.com>,
+        Alexander Viro <viro@zeniv.linux.org.uk>,
+        Douglas Gilbert <dgilbert@interlog.com>,
+        linux-kernel@vger.kernel.org, y2038@lists.linaro.org,
+        Steffen Maier <maier@linux.ibm.com>,
+        linux-scsi@vger.kernel.org,
+        Chaitanya Kulkarni <chaitanya.kulkarni@wdc.com>,
+        Greg Kroah-Hartman <gregkh@linuxfoundation.org>,
+        Thomas Gleixner <tglx@linutronix.de>,
+        linux-block@vger.kernel.org
+Subject: Re: [PATCH 02/24] compat: scsi: sg: fix v3 compat read/write
+ interface
+Message-ID: <20191212162506.GA27991@infradead.org>
+References: <20191211204306.1207817-1-arnd@arndb.de>
+ <20191211204306.1207817-3-arnd@arndb.de>
 MIME-Version: 1.0
-In-Reply-To: <20191212152317.GE11756@Air-de-Roger> (raw)
-Content-Type: text/plain; charset=UTF-8
-Content-Transfer-Encoding: 8bit
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <20191211204306.1207817-3-arnd@arndb.de>
+User-Agent: Mutt/1.12.1 (2019-06-15)
+X-SRS-Rewrite: SMTP reverse-path rewritten from <hch@infradead.org> by bombadil.infradead.org. See http://www.infradead.org/rpr.html
 Sender: linux-block-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-On Thu, 12 Dec 2019 16:23:17 +0100 "Roger Pau Monné" <roger.pau@citrix.com> wrote:
-
-> > On Thu, 12 Dec 2019 12:42:47 +0100 "Roger Pau Monné" <roger.pau@citrix.com> wrote:
-> > > > On the slow block device
-> > > > ------------------------
-> > > > 
-> > > >     max_pgs   Min       Max       Median     Avg    Stddev
-> > > >     0         38.7      45.8      38.7       40.12  3.1752165
-> > > >     1024      38.7      45.8      38.7       40.12  3.1752165
-> > > >     No difference proven at 95.0% confidence
-> > > > 
-> > > > On the fast block device
-> > > > ------------------------
-> > > > 
-> > > >     max_pgs   Min       Max       Median     Avg    Stddev
-> > > >     0         417       423       420        419.4  2.5099801
-> > > >     1024      414       425       416        417.8  4.4384682
-> > > >     No difference proven at 95.0% confidence
-> > > 
-> > > This is intriguing, as it seems to prove that the usage of a cache of
-> > > free pages is irrelevant performance wise.
-> > > 
-> > > The pool of free pages was introduced long ago, and it's possible that
-> > > recent improvements to the balloon driver had made such pool useless,
-> > > at which point it could be removed instead of worked around.
-> > 
-> > I guess the grant page allocation overhead in this test scenario is really
-> > small.  In an absence of memory pressure, fragmentation, and NUMA imbalance,
-> > the latency of the page allocation ('get_page()') is very short, as it will
-> > success in the fast path.
+On Wed, Dec 11, 2019 at 09:42:36PM +0100, Arnd Bergmann wrote:
+> In the v5.4 merge window, a cleanup patch from Al Viro conflicted
+> with my rework of the compat handling for sg.c read(). Linus Torvalds
+> did a correct merge but pointed out that the resulting code is still
+> unsatisfactory.
 > 
-> The allocation of the pool of free pages involves more than get_page,
-> it uses gnttab_alloc_pages which in the worse case will allocate a
-> page and balloon it out issuing one hypercall.
+> I later noticed that the sg_new_read() function still gets the compat
+> mode wrong, when the 'count' argument is large enough to pass a
+> compat_sg_io_hdr object, but not a nativ sg_io_hdr.
 > 
-> > Few years ago, I once measured the page allocation latency on my machine.
-> > Roughly speaking, it was about 1us in best case, 100us in worst case, and 5us
-> > in average.  Please keep in mind that the measurement was not designed and
-> > performed in serious way.  Thus the results could have profile overhead in it,
-> > though.  While keeping that in mind, let's simply believe the number and ignore
-> > the latency of the block layer, blkback itself (including the grant
-> > mapping), and anything else including context switch, cache miss, but the
-> > allocation.  In other words, suppose that the grant page allocation is only one
-> > source of the overhead.  It will be able to achieve 1 million IOPS (4KB *
-> > 1MIOPS = 4 GB/s) in the best case, 200 thousand IOPS (800 MB/s) in average, and
-> > 10 thousand IOPS (40 MB/s) in worst case.  Based on this coarse calculation, I
-> > think the test results is reasonable.
-> > 
-> > This also means that the effect of the blkback's free pages pool might be
-> > visible under page allocation fast path failure situation.  Nevertheless, it
-> > would be also hard to measure that in micro level unless the measurement is
-> > well designed and controlled.
-> > 
-> > > 
-> > > Do you think you could perform some more tests (as pointed out above
-> > > against the block device to skip the fs overhead) and report back the
-> > > results?
-> > 
-> > To be honest, I'm not sure whether additional tests are really necessary,
-> > because I think the `dd` test and the results explanation already makes some
-> > sense and provide the minimal proof of the concept.  Also, this change is a
-> > fallback for the memory pressure situation, which is an error path in some
-> > point of view.  Such errorneous situation might not happen frequently and if
-> > the situation is not solved in short time, something much worse (e.g., OOM kill
-> > of the user space xen control processes) than temporal I/O performance
-> > degradation could happen.  Thus, I'm not sure whether such detailed performance
-> > measurement is necessary for this rare error handling change.
+> To address both of these, move the definition of compat_sg_io_hdr
+> into a scsi/sg.h to make it visible to sg.c and rewrite the logic
+> for reading req_pack_id as well as the size check to a simpler
+> version that gets the expected results.
 > 
-> Right, my main concern is that we seem to be adding duck tape so
-> things don't fall apart, but if such cache is really not beneficial
-> from a performance PoV I would rather see it go away than adding more
-> stuff to it in order to workaround corner cases like memory
-> starvation.
-
-Right, if the cache is really giving no benefit, it would be much better to
-simply remove it.  However, as mentioned before, I'm not sure whether it is
-useless at all.  Maybe we could do some more detailed test to know that, but it
-would be an out of scope of this patch.
-
+> Fixes: c35a5cfb4150 ("scsi: sg: sg_read(): simplify reading ->pack_id of userland sg_io_hdr_t")
+> Fixes: 98aaaec4a150 ("compat_ioctl: reimplement SG_IO handling")
+> Signed-off-by: Arnd Bergmann <arnd@arndb.de>
+> ---
+>  block/scsi_ioctl.c |  29 +----------
+>  drivers/scsi/sg.c  | 125 +++++++++++++++++++++------------------------
+>  include/scsi/sg.h  |  30 +++++++++++
+>  3 files changed, 89 insertions(+), 95 deletions(-)
 > 
-> Anyway, I guess we can take such change, but long term we need to look
-> into fixing grants to not use ballooned pages, and figure out if the
-> blkback free page cache is really useful or not.
+> diff --git a/block/scsi_ioctl.c b/block/scsi_ioctl.c
+> index 650bade5ea5a..b61dbf4d8443 100644
+> --- a/block/scsi_ioctl.c
+> +++ b/block/scsi_ioctl.c
+> @@ -20,6 +20,7 @@
+>  #include <scsi/scsi.h>
+>  #include <scsi/scsi_ioctl.h>
+>  #include <scsi/scsi_cmnd.h>
+> +#include <scsi/sg.h>
+>  
+>  struct blk_cmd_filter {
+>  	unsigned long read_ok[BLK_SCSI_CMD_PER_LONG];
+> @@ -550,34 +551,6 @@ static inline int blk_send_start_stop(struct request_queue *q,
+>  	return __blk_send_generic(q, bd_disk, GPCMD_START_STOP_UNIT, data);
+>  }
+>  
+> -#ifdef CONFIG_COMPAT
+> -struct compat_sg_io_hdr {
+> -	compat_int_t interface_id;	/* [i] 'S' for SCSI generic (required) */
+> -	compat_int_t dxfer_direction;	/* [i] data transfer direction  */
+> -	unsigned char cmd_len;		/* [i] SCSI command length ( <= 16 bytes) */
+> -	unsigned char mx_sb_len;	/* [i] max length to write to sbp */
+> -	unsigned short iovec_count;	/* [i] 0 implies no scatter gather */
+> -	compat_uint_t dxfer_len;	/* [i] byte count of data transfer */
+> -	compat_uint_t dxferp;		/* [i], [*io] points to data transfer memory
+> -						or scatter gather list */
+> -	compat_uptr_t cmdp;		/* [i], [*i] points to command to perform */
+> -	compat_uptr_t sbp;		/* [i], [*o] points to sense_buffer memory */
+> -	compat_uint_t timeout;		/* [i] MAX_UINT->no timeout (unit: millisec) */
+> -	compat_uint_t flags;		/* [i] 0 -> default, see SG_FLAG... */
+> -	compat_int_t pack_id;		/* [i->o] unused internally (normally) */
+> -	compat_uptr_t usr_ptr;		/* [i->o] unused internally */
+> -	unsigned char status;		/* [o] scsi status */
+> -	unsigned char masked_status;	/* [o] shifted, masked scsi status */
+> -	unsigned char msg_status;	/* [o] messaging level data (optional) */
+> -	unsigned char sb_len_wr;	/* [o] byte count actually written to sbp */
+> -	unsigned short host_status;	/* [o] errors from host adapter */
+> -	unsigned short driver_status;	/* [o] errors from software driver */
+> -	compat_int_t resid;		/* [o] dxfer_len - actual_transferred */
+> -	compat_uint_t duration;		/* [o] time taken by cmd (unit: millisec) */
+> -	compat_uint_t info;		/* [o] auxiliary information */
+> -};
+> -#endif
+> -
+>  int put_sg_io_hdr(const struct sg_io_hdr *hdr, void __user *argp)
+>  {
+>  #ifdef CONFIG_COMPAT
+> diff --git a/drivers/scsi/sg.c b/drivers/scsi/sg.c
+> index 160748ad9c0f..985546aac236 100644
+> --- a/drivers/scsi/sg.c
+> +++ b/drivers/scsi/sg.c
+> @@ -198,6 +198,7 @@ static void sg_device_destroy(struct kref *kref);
+>  
+>  #define SZ_SG_HEADER sizeof(struct sg_header)
+>  #define SZ_SG_IO_HDR sizeof(sg_io_hdr_t)
+> +#define SZ_COMPAT_SG_IO_HDR sizeof(struct compat_sg_io_hdr)
 
-Totally agreed.
+I'd rather not add more defines like this.  The raw sizeof is
+much more readable and obvious.
 
+>  
+> +	if (count < SZ_SG_HEADER)
+> +		goto unknown_id;
+> +
+> +	/* negative reply_len means v3 format, otherwise v1/v2 */
+> +	if (get_user(reply_len, &old_hdr->reply_len))
+> +		return -EFAULT;
+> +	if (reply_len >= 0)
+> +		return get_user(*pack_id, &old_hdr->pack_id);
+> +
+> +	if (in_compat_syscall() && count >= SZ_COMPAT_SG_IO_HDR) {
+> +		struct compat_sg_io_hdr __user *hp = buf;
+> +		return get_user(*pack_id, &hp->pack_id);
+> +	}
+> +
+> +	if (count >= SZ_SG_IO_HDR) {
+> +		struct sg_io_hdr __user *hp = buf;
+> +		return get_user(*pack_id, &hp->pack_id);
+> +	}
+> +
+> +unknown_id:
+> +	/* no valid header was passed, so ignore the pack_id */
+> +	*pack_id = -1;
+> +	return 0;
+> +}
 
-Thanks,
-SeongJae Park
+I find the structure here a little confusing, as it doesn't follow
+the normal flow.  What do you think of:
 
-> 
-> Thanks, Roger.
-> 
+	if (count >= SZ_SG_HEADER) {
+		if (get_user(reply_len, &old_hdr->reply_len))
+			return -EFAULT;
+
+		/* negative reply_len means v3 format, otherwise v1/v2 */
+		if (reply_len >= 0)
+			return get_user(*pack_id, &old_hdr->pack_id);
+
+		if (in_compat_syscall() {
+			if (count >= SZ_COMPAT_SG_IO_HDR) {
+				struct compat_sg_io_hdr __user *hp = buf;
+
+				return get_user(*pack_id, &hp->pack_id);
+			}
+		} else {
+			if (count >= SZ_SG_IO_HDR) {
+				struct sg_io_hdr __user *hp = buf;
+
+				return get_user(*pack_id, &hp->pack_id);
+			}
+		}
+	}
+
+	/* no valid header was passed, so ignore the pack_id */
+	*pack_id = -1;
+	return 0;
+}
