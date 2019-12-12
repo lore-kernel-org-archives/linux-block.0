@@ -2,120 +2,106 @@ Return-Path: <SRS0=VRi+=2C=vger.kernel.org=linux-block-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-3.5 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
-	HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,
-	SPF_PASS autolearn=no autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-8.2 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
+	INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,
+	USER_AGENT_SANE_1 autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id DDE62C43603
-	for <linux-block@archiver.kernel.org>; Thu, 12 Dec 2019 09:46:16 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id C0D62C43603
+	for <linux-block@archiver.kernel.org>; Thu, 12 Dec 2019 09:54:34 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.kernel.org (Postfix) with ESMTP id 9C6E02173E
-	for <linux-block@archiver.kernel.org>; Thu, 12 Dec 2019 09:46:16 +0000 (UTC)
-Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (1024-bit key) header.d=citrix.com header.i=@citrix.com header.b="QTjchn3P"
+	by mail.kernel.org (Postfix) with ESMTP id 94B70214AF
+	for <linux-block@archiver.kernel.org>; Thu, 12 Dec 2019 09:54:34 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1728494AbfLLJqQ (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Thu, 12 Dec 2019 04:46:16 -0500
-Received: from esa1.hc3370-68.iphmx.com ([216.71.145.142]:55176 "EHLO
-        esa1.hc3370-68.iphmx.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1726382AbfLLJqP (ORCPT
-        <rfc822;linux-block@vger.kernel.org>);
-        Thu, 12 Dec 2019 04:46:15 -0500
-DKIM-Signature: v=1; a=rsa-sha256; c=simple/simple;
-  d=citrix.com; s=securemail; t=1576143975;
-  h=date:from:to:cc:subject:message-id:references:
-   mime-version:content-transfer-encoding:in-reply-to;
-  bh=dhXc0hzpDoP0LP4NSBAMjDZwUwr/XdPCcsPghJX+ijI=;
-  b=QTjchn3P1xveVX0WHkPFwa1p3SL6aQ4kwCuqH8hkncEa7TdorUr0Hs9X
-   fqaHRgTwY3O7212yu5B9Gw3UPvI27+3EQB2iN7D0HoDI5hrphkCnOIlq/
-   sl3WOzLp67ug95NJyLfA/3lFd65DyZfIJywfk8HHUNwqPLn761MMSZW2K
-   g=;
-Authentication-Results: esa1.hc3370-68.iphmx.com; dkim=none (message not signed) header.i=none; spf=None smtp.pra=roger.pau@citrix.com; spf=Pass smtp.mailfrom=roger.pau@citrix.com; spf=None smtp.helo=postmaster@mail.citrix.com
-Received-SPF: None (esa1.hc3370-68.iphmx.com: no sender
-  authenticity information available from domain of
-  roger.pau@citrix.com) identity=pra; client-ip=162.221.158.21;
-  receiver=esa1.hc3370-68.iphmx.com;
-  envelope-from="roger.pau@citrix.com";
-  x-sender="roger.pau@citrix.com";
-  x-conformance=sidf_compatible
-Received-SPF: Pass (esa1.hc3370-68.iphmx.com: domain of
-  roger.pau@citrix.com designates 162.221.158.21 as permitted
-  sender) identity=mailfrom; client-ip=162.221.158.21;
-  receiver=esa1.hc3370-68.iphmx.com;
-  envelope-from="roger.pau@citrix.com";
-  x-sender="roger.pau@citrix.com";
-  x-conformance=sidf_compatible; x-record-type="v=spf1";
-  x-record-text="v=spf1 ip4:209.167.231.154 ip4:178.63.86.133
-  ip4:195.66.111.40/30 ip4:85.115.9.32/28 ip4:199.102.83.4
-  ip4:192.28.146.160 ip4:192.28.146.107 ip4:216.52.6.88
-  ip4:216.52.6.188 ip4:162.221.158.21 ip4:162.221.156.83
-  ip4:168.245.78.127 ~all"
-Received-SPF: None (esa1.hc3370-68.iphmx.com: no sender
-  authenticity information available from domain of
-  postmaster@mail.citrix.com) identity=helo;
-  client-ip=162.221.158.21; receiver=esa1.hc3370-68.iphmx.com;
-  envelope-from="roger.pau@citrix.com";
-  x-sender="postmaster@mail.citrix.com";
-  x-conformance=sidf_compatible
-IronPort-SDR: sZq+6Bqqho6dJH0ffNG0utzQUqfntE8WwDXagBrPi7yOImVchjjDnJ0Mgr+DwacELCKTWXP72Z
- RExnWQaI+o8qRO0fcfw3ThsOPkrf0TGVCURTUd9LOJo06Ljpbb+oRxHc3trlR/Z8ZxNQ+tiWfk
- 8a52pDLzYuXGKaSOFzWSsJzrHef8//cG9BMag8gfBED/rWhGdjvsutJi/Rys/nfwWbPvemsJN0
- Ux2SJ1Mf4UxEL6099h7iJzqHX3iK/rm+FBKSpKWdx0hBvN+g91sJdABtoeGoc3Qd0Xo+08M5fW
- 7EQ=
-X-SBRS: 2.7
-X-MesageID: 9705820
-X-Ironport-Server: esa1.hc3370-68.iphmx.com
-X-Remote-IP: 162.221.158.21
-X-Policy: $RELAYED
-X-IronPort-AV: E=Sophos;i="5.69,305,1571716800"; 
-   d="scan'208";a="9705820"
-Date:   Thu, 12 Dec 2019 10:46:00 +0100
-From:   Roger Pau =?iso-8859-1?Q?Monn=E9?= <roger.pau@citrix.com>
-To:     SeongJae Park <sj38.park@gmail.com>
-CC:     <jgross@suse.com>, <axboe@kernel.dk>, <konrad.wilk@oracle.com>,
-        <linux-block@vger.kernel.org>, <sjpark@amazon.com>,
-        <pdurrant@amazon.com>, SeongJae Park <sjpark@amazon.de>,
-        <linux-kernel@vger.kernel.org>, <xen-devel@lists.xenproject.org>
-Subject: Re: [Xen-devel] [PATCH v7 1/3] xenbus/backend: Add memory pressure
- handler callback
-Message-ID: <20191212094600.GA11756@Air-de-Roger>
-References: <20191211181016.14366-1-sjpark@amazon.de>
- <20191211181016.14366-2-sjpark@amazon.de>
+        id S1728302AbfLLJye (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Thu, 12 Dec 2019 04:54:34 -0500
+Received: from verein.lst.de ([213.95.11.211]:32911 "EHLO verein.lst.de"
+        rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
+        id S1728282AbfLLJye (ORCPT <rfc822;linux-block@vger.kernel.org>);
+        Thu, 12 Dec 2019 04:54:34 -0500
+Received: by verein.lst.de (Postfix, from userid 2407)
+        id 59FF468B05; Thu, 12 Dec 2019 10:54:31 +0100 (CET)
+Date:   Thu, 12 Dec 2019 10:54:31 +0100
+From:   Christoph Hellwig <hch@lst.de>
+To:     Balbir Singh <sblbir@amazon.com>
+Cc:     linux-block@vger.kernel.org, linux-kernel@vger.kernel.org,
+        axboe@kernel.dk, mst@redhat.com, jejb@linux.ibm.com, hch@lst.de,
+        linux-nvme@lists.infradead.org,
+        Someswarudu Sangaraju <ssomesh@amazon.com>
+Subject: Re: [RFC PATCH] block/genhd: Notify udev about capacity change
+Message-ID: <20191212095431.GA3720@lst.de>
+References: <20191210030131.4198-1-sblbir@amazon.com>
 MIME-Version: 1.0
-Content-Type: text/plain; charset="iso-8859-1"
+Content-Type: text/plain; charset=us-ascii
 Content-Disposition: inline
-Content-Transfer-Encoding: 8bit
-In-Reply-To: <20191211181016.14366-2-sjpark@amazon.de>
-X-ClientProxiedBy: AMSPEX02CAS02.citrite.net (10.69.22.113) To
- AMSPEX02CL03.citrite.net (10.69.22.127)
+In-Reply-To: <20191210030131.4198-1-sblbir@amazon.com>
+User-Agent: Mutt/1.5.17 (2007-11-01)
 Sender: linux-block-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-On Wed, Dec 11, 2019 at 06:10:14PM +0000, SeongJae Park wrote:
-> Granting pages consumes backend system memory.  In systems configured
-> with insufficient spare memory for those pages, it can cause a memory
-> pressure situation.  However, finding the optimal amount of the spare
-> memory is challenging for large systems having dynamic resource
-> utilization patterns.  Also, such a static configuration might lack
-> flexibility.
+On Tue, Dec 10, 2019 at 03:01:31AM +0000, Balbir Singh wrote:
+> Allow block/genhd to notify user space (via udev) about disk size changes
+> using a new helper disk_set_capacity(), which is a wrapper on top
+> of set_capacity(). disk_set_capacity() will only notify via udev if
+> the current capacity or the target capacity is not zero.
 > 
-> To mitigate such problems, this commit adds a memory reclaim callback to
-> 'xenbus_driver'.  If a memory pressure is detected, 'xenbus' requests
-> every backend driver to volunarily release its memory.
+> disk_set_capacity() is not enabled for all devices, just virtio block,
+> xen-blockfront, nvme and sd. Owners of other block disk devices can
+> easily move over by changing set_capacity() to disk_set_capacity()
 > 
-> Note that it would be able to improve the callback facility for more
-> sophisticated handlings of general pressures.  For example, it would be
-> possible to monitor the memory consumption of each device and issue the
-> release requests to only devices which causing the pressure.  Also, the
-> callback could be extended to handle not only memory, but general
-> resources.  Nevertheless, this version of the implementation defers such
-> sophisticated goals as a future work.
+> Background:
 > 
-> Reviewed-by: Juergen Gross <jgross@suse.com>
-> Signed-off-by: SeongJae Park <sjpark@amazon.de>
+> As a part of a patch to allow sending the RESIZE event on disk capacity
+> change, Christoph (hch@lst.de) requested that the patch be made generic
+> and the hacks for virtio block and xen block devices be removed and
+> merged via a generic helper.
+> 
+> Testing:
+> 1. I did some basic testing with an NVME device, by resizing it in
+> the backend and ensured that udevd received the event.
+> 
+> Suggested-by: Christoph Hellwig <hch@lst.de>
+> Signed-off-by: Balbir Singh <sblbir@amazon.com>
+> Signed-off-by: Someswarudu Sangaraju <ssomesh@amazon.com>
+> ---
+>  block/genhd.c                | 19 +++++++++++++++++++
+>  drivers/block/virtio_blk.c   |  4 +---
+>  drivers/block/xen-blkfront.c |  5 +----
+>  drivers/nvme/host/core.c     |  2 +-
+>  drivers/scsi/sd.c            |  2 +-
+>  include/linux/genhd.h        |  1 +
+>  6 files changed, 24 insertions(+), 9 deletions(-)
+> 
+> diff --git a/block/genhd.c b/block/genhd.c
+> index ff6268970ddc..94faec98607b 100644
+> --- a/block/genhd.c
+> +++ b/block/genhd.c
+> @@ -46,6 +46,25 @@ static void disk_add_events(struct gendisk *disk);
+>  static void disk_del_events(struct gendisk *disk);
+>  static void disk_release_events(struct gendisk *disk);
+>  
+> +/*
+> + * Set disk capacity and notify if the size is not currently
+> + * zero and will not be set to zero
 
-Reviewed-by: Roger Pau Monné <roger.pau@citrix.com>
+Nit: Use up all the 80 chars per line.  Also maybe turn this into a
+kerneldoc comment.  I think you also want to mention the notification
+as well.
 
-Thanks, Roger.
+> +EXPORT_SYMBOL_GPL(disk_set_capacity);
+> +
+> +
+>  void part_inc_in_flight(struct request_queue *q, struct hd_struct *part, int rw)
+
+No need for the double empty line.
+
+>  {
+>  	if (queue_is_mq(q))
+> diff --git a/drivers/block/virtio_blk.c b/drivers/block/virtio_blk.c
+> index 7ffd719d89de..869cd3c31529 100644
+> --- a/drivers/block/virtio_blk.c
+> +++ b/drivers/block/virtio_blk.c
+
+And you probably want to turn this into a series with patch 1 adding
+the infrastructure, and then one patch per driver switched over.
