@@ -2,44 +2,41 @@ Return-Path: <SRS0=VRi+=2C=vger.kernel.org=linux-block-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-14.9 required=3.0 tests=DKIMWL_WL_HIGH,DKIM_SIGNED,
+X-Spam-Status: No, score=-9.9 required=3.0 tests=DKIMWL_WL_HIGH,DKIM_SIGNED,
 	DKIM_VALID,DKIM_VALID_AU,HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,
-	MAILING_LIST_MULTI,MENTIONS_GIT_HOSTING,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,
-	USER_AGENT_GIT autolearn=unavailable autolearn_force=no version=3.4.0
+	MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,USER_AGENT_GIT
+	autolearn=unavailable autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id B06ACC2D0DD
-	for <linux-block@archiver.kernel.org>; Thu, 12 Dec 2019 08:20:29 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 0D692C47409
+	for <linux-block@archiver.kernel.org>; Thu, 12 Dec 2019 08:20:54 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.kernel.org (Postfix) with ESMTP id 86308214AF
-	for <linux-block@archiver.kernel.org>; Thu, 12 Dec 2019 08:20:29 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id D94392173E
+	for <linux-block@archiver.kernel.org>; Thu, 12 Dec 2019 08:20:53 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=pass (2048-bit key) header.d=nvidia.com header.i=@nvidia.com header.b="WWDMGVYO"
+	dkim=pass (2048-bit key) header.d=nvidia.com header.i=@nvidia.com header.b="SGfib4tt"
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1728471AbfLLITg (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Thu, 12 Dec 2019 03:19:36 -0500
-Received: from hqnvemgate26.nvidia.com ([216.228.121.65]:4024 "EHLO
-        hqnvemgate26.nvidia.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1728457AbfLLITf (ORCPT
+        id S1728535AbfLLIUb (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Thu, 12 Dec 2019 03:20:31 -0500
+Received: from hqnvemgate25.nvidia.com ([216.228.121.64]:8749 "EHLO
+        hqnvemgate25.nvidia.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S1728455AbfLLITf (ORCPT
         <rfc822;linux-block@vger.kernel.org>);
         Thu, 12 Dec 2019 03:19:35 -0500
-Received: from hqpgpgate101.nvidia.com (Not Verified[216.228.121.13]) by hqnvemgate26.nvidia.com (using TLS: TLSv1.2, DES-CBC3-SHA)
-        id <B5df1f8040002>; Thu, 12 Dec 2019 00:19:16 -0800
+Received: from hqpgpgate101.nvidia.com (Not Verified[216.228.121.13]) by hqnvemgate25.nvidia.com (using TLS: TLSv1.2, DES-CBC3-SHA)
+        id <B5df1f8030004>; Thu, 12 Dec 2019 00:19:15 -0800
 Received: from hqmail.nvidia.com ([172.20.161.6])
   by hqpgpgate101.nvidia.com (PGP Universal service);
-  Thu, 12 Dec 2019 00:19:23 -0800
+  Thu, 12 Dec 2019 00:19:22 -0800
 X-PGP-Universal: processed;
-        by hqpgpgate101.nvidia.com on Thu, 12 Dec 2019 00:19:23 -0800
-Received: from HQMAIL109.nvidia.com (172.20.187.15) by HQMAIL107.nvidia.com
- (172.20.187.13) with Microsoft SMTP Server (TLS) id 15.0.1473.3; Thu, 12 Dec
- 2019 08:19:21 +0000
-Received: from HQMAIL109.nvidia.com (172.20.187.15) by HQMAIL109.nvidia.com
- (172.20.187.15) with Microsoft SMTP Server (TLS) id 15.0.1473.3; Thu, 12 Dec
- 2019 08:19:21 +0000
+        by hqpgpgate101.nvidia.com on Thu, 12 Dec 2019 00:19:22 -0800
+Received: from HQMAIL109.nvidia.com (172.20.187.15) by HQMAIL105.nvidia.com
+ (172.20.187.12) with Microsoft SMTP Server (TLS) id 15.0.1473.3; Thu, 12 Dec
+ 2019 08:19:19 +0000
 Received: from hqnvemgw03.nvidia.com (10.124.88.68) by HQMAIL109.nvidia.com
  (172.20.187.15) with Microsoft SMTP Server (TLS) id 15.0.1473.3 via Frontend
- Transport; Thu, 12 Dec 2019 08:19:21 +0000
+ Transport; Thu, 12 Dec 2019 08:19:19 +0000
 Received: from blueforge.nvidia.com (Not Verified[10.110.48.28]) by hqnvemgw03.nvidia.com with Trustwave SEG (v7,5,8,10121)
-        id <B5df1f8090001>; Thu, 12 Dec 2019 00:19:21 -0800
+        id <B5df1f8070002>; Thu, 12 Dec 2019 00:19:19 -0800
 From:   John Hubbard <jhubbard@nvidia.com>
 To:     Andrew Morton <akpm@linux-foundation.org>
 CC:     Al Viro <viro@zeniv.linux.org.uk>,
@@ -69,10 +66,11 @@ CC:     Al Viro <viro@zeniv.linux.org.uk>,
         <linux-media@vger.kernel.org>, <linux-rdma@vger.kernel.org>,
         <linuxppc-dev@lists.ozlabs.org>, <netdev@vger.kernel.org>,
         <linux-mm@kvack.org>, LKML <linux-kernel@vger.kernel.org>,
-        John Hubbard <jhubbard@nvidia.com>
-Subject: [PATCH v10 25/25] selftests/vm: run_vmtests: invoke gup_benchmark with basic FOLL_PIN coverage
-Date:   Thu, 12 Dec 2019 00:19:17 -0800
-Message-ID: <20191212081917.1264184-26-jhubbard@nvidia.com>
+        John Hubbard <jhubbard@nvidia.com>,
+        "Jason Gunthorpe" <jgg@mellanox.com>
+Subject: [PATCH v10 07/25] vfio: fix FOLL_LONGTERM use, simplify get_user_pages_remote() call
+Date:   Thu, 12 Dec 2019 00:18:59 -0800
+Message-ID: <20191212081917.1264184-8-jhubbard@nvidia.com>
 X-Mailer: git-send-email 2.24.0
 In-Reply-To: <20191212081917.1264184-1-jhubbard@nvidia.com>
 References: <20191212081917.1264184-1-jhubbard@nvidia.com>
@@ -81,81 +79,110 @@ X-NVConfidentiality: public
 Content-Transfer-Encoding: quoted-printable
 Content-Type: text/plain
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=nvidia.com; s=n1;
-        t=1576138757; bh=efjW/rF0EGuRthlOGEU05IQnyHi57jZRzyopoxtDk8c=;
+        t=1576138756; bh=8L6xDPC0B530xp/MTT0aA3xB5v7i2RtCewyab6Z4Hgg=;
         h=X-PGP-Universal:From:To:CC:Subject:Date:Message-ID:X-Mailer:
          In-Reply-To:References:MIME-Version:X-NVConfidentiality:
          Content-Transfer-Encoding:Content-Type;
-        b=WWDMGVYOnHd3iWE+NQQYwhBWbPaghrkNlNIExThbsN/YXyZZxolHhixKxcf8GqE/k
-         zF9jZ17Pvol2P/BjE3xhCV/rhnk5thJMSeLFQqOfOazFqY5oolm1j6pVo0cd95tKbN
-         F31zukDFvOKYBV2dvENEhMUn1B91vbhd3i4wJGjJ4RPIwCJFToXC8m4sBIBpz2px5U
-         F9hMccp4L8YeXaEKmlNprmiR65S6O7E7EzTLOutDvfCdRwF9rvkBaMisYbAmbMtoYZ
-         vv3yw+6/SqlvDkIXoOmGW7/OgE7PrZmOTmWZH9P9/nHXXZF5hmGt2C7TTl7TTSsXNI
-         G9Ljkzb2cb+0w==
+        b=SGfib4ttfpgjz9/QYG3Euiqqp7zCZFVjOccbcQ1UEoA0DpAdwToGph7IiLdNdqTm0
+         fFwndsgdD8HfqnAW/YSRyzZKqyVYY9OLSf0YWY6Wf1haqQOu5Ok3SOBUdVTTsAt+VD
+         njM7ow/1hvV8bDUoZdjqFjRlmGrsyYvmJdanPn63HcPlbmDS3RYcUupMmzP8/VWHp4
+         Nk9KaAzbWYwzC+PRuacSt+edyr9CZV4T57ntv3JRbNcSUpVFgNL6MYhrXYJuId9e4S
+         wFevbV4HmZdaBlvhOVO8m5KzGCbDpDqwlApYljJZR0DBxpazPAbwRD8llmQnSWX3NQ
+         2GJ5VLQemysuA==
 Sender: linux-block-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-It's good to have basic unit test coverage of the new FOLL_PIN
-behavior. Fortunately, the gup_benchmark unit test is extremely
-fast (a few milliseconds), so adding it the the run_vmtests suite
-is going to cause no noticeable change in running time.
+Update VFIO to take advantage of the recently loosened restriction on
+FOLL_LONGTERM with get_user_pages_remote(). Also, now it is possible to
+fix a bug: the VFIO caller is logically a FOLL_LONGTERM user, but it
+wasn't setting FOLL_LONGTERM.
 
-So, add two new invocations to run_vmtests:
+Also, remove an unnessary pair of calls that were releasing and
+reacquiring the mmap_sem. There is no need to avoid holding mmap_sem
+just in order to call page_to_pfn().
 
-1) Run gup_benchmark with normal get_user_pages().
+Also, now that the the DAX check ("if a VMA is DAX, don't allow long
+term pinning") is in the internals of get_user_pages_remote() and
+__gup_longterm_locked(), there's no need for it at the VFIO call site.
+So remove it.
 
-2) Run gup_benchmark with pin_user_pages(). This is much like
-the first call, except that it sets FOLL_PIN.
-
-Running these two in quick succession also provide a visual
-comparison of the running times, which is convenient.
-
-The new invocations are fairly early in the run_vmtests script,
-because with test suites, it's usually preferable to put the
-shorter, faster tests first, all other things being equal.
-
+Tested-by: Alex Williamson <alex.williamson@redhat.com>
+Acked-by: Alex Williamson <alex.williamson@redhat.com>
+Reviewed-by: Jason Gunthorpe <jgg@mellanox.com>
 Reviewed-by: Ira Weiny <ira.weiny@intel.com>
+Suggested-by: Jason Gunthorpe <jgg@ziepe.ca>
+Cc: Dan Williams <dan.j.williams@intel.com>
+Cc: Jerome Glisse <jglisse@redhat.com>
 Signed-off-by: John Hubbard <jhubbard@nvidia.com>
 ---
- tools/testing/selftests/vm/run_vmtests | 22 ++++++++++++++++++++++
- 1 file changed, 22 insertions(+)
+ drivers/vfio/vfio_iommu_type1.c | 30 +++++-------------------------
+ 1 file changed, 5 insertions(+), 25 deletions(-)
 
-diff --git a/tools/testing/selftests/vm/run_vmtests b/tools/testing/selftes=
-ts/vm/run_vmtests
-index a692ea828317..df6a6bf3f238 100755
---- a/tools/testing/selftests/vm/run_vmtests
-+++ b/tools/testing/selftests/vm/run_vmtests
-@@ -112,6 +112,28 @@ echo "NOTE: The above hugetlb tests provide minimal co=
-verage.  Use"
- echo "      https://github.com/libhugetlbfs/libhugetlbfs.git for"
- echo "      hugetlb regression testing."
+diff --git a/drivers/vfio/vfio_iommu_type1.c b/drivers/vfio/vfio_iommu_type=
+1.c
+index 2ada8e6cdb88..b800fc9a0251 100644
+--- a/drivers/vfio/vfio_iommu_type1.c
++++ b/drivers/vfio/vfio_iommu_type1.c
+@@ -322,7 +322,6 @@ static int vaddr_get_pfn(struct mm_struct *mm, unsigned=
+ long vaddr,
+ {
+ 	struct page *page[1];
+ 	struct vm_area_struct *vma;
+-	struct vm_area_struct *vmas[1];
+ 	unsigned int flags =3D 0;
+ 	int ret;
 =20
-+echo "--------------------------------------------"
-+echo "running 'gup_benchmark -U' (normal/slow gup)"
-+echo "--------------------------------------------"
-+./gup_benchmark -U
-+if [ $? -ne 0 ]; then
-+	echo "[FAIL]"
-+	exitcode=3D1
-+else
-+	echo "[PASS]"
-+fi
-+
-+echo "------------------------------------------"
-+echo "running gup_benchmark -b (pin_user_pages)"
-+echo "------------------------------------------"
-+./gup_benchmark -b
-+if [ $? -ne 0 ]; then
-+	echo "[FAIL]"
-+	exitcode=3D1
-+else
-+	echo "[PASS]"
-+fi
-+
- echo "-------------------"
- echo "running userfaultfd"
- echo "-------------------"
+@@ -330,33 +329,14 @@ static int vaddr_get_pfn(struct mm_struct *mm, unsign=
+ed long vaddr,
+ 		flags |=3D FOLL_WRITE;
+=20
+ 	down_read(&mm->mmap_sem);
+-	if (mm =3D=3D current->mm) {
+-		ret =3D get_user_pages(vaddr, 1, flags | FOLL_LONGTERM, page,
+-				     vmas);
+-	} else {
+-		ret =3D get_user_pages_remote(NULL, mm, vaddr, 1, flags, page,
+-					    vmas, NULL);
+-		/*
+-		 * The lifetime of a vaddr_get_pfn() page pin is
+-		 * userspace-controlled. In the fs-dax case this could
+-		 * lead to indefinite stalls in filesystem operations.
+-		 * Disallow attempts to pin fs-dax pages via this
+-		 * interface.
+-		 */
+-		if (ret > 0 && vma_is_fsdax(vmas[0])) {
+-			ret =3D -EOPNOTSUPP;
+-			put_page(page[0]);
+-		}
+-	}
+-	up_read(&mm->mmap_sem);
+-
++	ret =3D get_user_pages_remote(NULL, mm, vaddr, 1, flags | FOLL_LONGTERM,
++				    page, NULL, NULL);
+ 	if (ret =3D=3D 1) {
+ 		*pfn =3D page_to_pfn(page[0]);
+-		return 0;
++		ret =3D 0;
++		goto done;
+ 	}
+=20
+-	down_read(&mm->mmap_sem);
+-
+ 	vaddr =3D untagged_addr(vaddr);
+=20
+ 	vma =3D find_vma_intersection(mm, vaddr, vaddr + 1);
+@@ -366,7 +346,7 @@ static int vaddr_get_pfn(struct mm_struct *mm, unsigned=
+ long vaddr,
+ 		if (is_invalid_reserved_pfn(*pfn))
+ 			ret =3D 0;
+ 	}
+-
++done:
+ 	up_read(&mm->mmap_sem);
+ 	return ret;
+ }
 --=20
 2.24.0
 
