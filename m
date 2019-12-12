@@ -2,103 +2,162 @@ Return-Path: <SRS0=VRi+=2C=vger.kernel.org=linux-block-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-0.9 required=3.0 tests=DKIMWL_WL_HIGH,DKIM_SIGNED,
-	DKIM_VALID,DKIM_VALID_AU,HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,
-	SPF_HELO_NONE,SPF_PASS autolearn=no autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-2.2 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
+	MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,USER_AGENT_SANE_1 autolearn=no
+	autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 3BF42C2D0C9
-	for <linux-block@archiver.kernel.org>; Thu, 12 Dec 2019 22:18:27 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 3CD28C2D0CA
+	for <linux-block@archiver.kernel.org>; Thu, 12 Dec 2019 22:18:29 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.kernel.org (Postfix) with ESMTP id 0CEA122527
-	for <linux-block@archiver.kernel.org>; Thu, 12 Dec 2019 22:18:27 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=default; t=1576189107;
-	bh=ppW53ZG+nBfsl61Gq8yucwWvxoD4t5bDoVTGmT1oBD8=;
-	h=References:In-Reply-To:From:Date:Subject:To:Cc:List-ID:From;
-	b=08mLXHdnMuKO8DY8TBBTAR5MbiZmoDQTlUKFjYuGtKgIeCGsfO5gVfTMxFTEpXU2P
-	 RNP4+iSnk1wGaAlserGngtLJeA5U0S79MdTdobGTKoAelXcQo6yB8FbJwDDRfBZkg3
-	 bCJ5Fy0XVOkKlPVLcLI7VM8lDT5YK+f/0AdJPQ6c=
+	by mail.kernel.org (Postfix) with ESMTP id 1B19D22B48
+	for <linux-block@archiver.kernel.org>; Thu, 12 Dec 2019 22:18:29 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1730896AbfLLWS0 (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Thu, 12 Dec 2019 17:18:26 -0500
-Received: from mail-lj1-f196.google.com ([209.85.208.196]:44652 "EHLO
-        mail-lj1-f196.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1730811AbfLLWS0 (ORCPT
+        id S1731272AbfLLWS2 (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Thu, 12 Dec 2019 17:18:28 -0500
+Received: from mail104.syd.optusnet.com.au ([211.29.132.246]:41836 "EHLO
+        mail104.syd.optusnet.com.au" rhost-flags-OK-OK-OK-OK)
+        by vger.kernel.org with ESMTP id S1731241AbfLLWS2 (ORCPT
         <rfc822;linux-block@vger.kernel.org>);
-        Thu, 12 Dec 2019 17:18:26 -0500
-Received: by mail-lj1-f196.google.com with SMTP id c19so373875lji.11
-        for <linux-block@vger.kernel.org>; Thu, 12 Dec 2019 14:18:24 -0800 (PST)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=linux-foundation.org; s=google;
-        h=mime-version:references:in-reply-to:from:date:message-id:subject:to
-         :cc;
-        bh=ibmYe5dmY9qFVLAgJoCojAZp2sCL8vXGU5XsSLw7St8=;
-        b=dSlXNntYZVPGXn3lcC2vbzXF6WipSUsta1btx41YmoTh6VEKRpX2b7fs4TxKEw1Y2K
-         UUZW0j/AAeXCmzGIAkJ4aunSCoZhgKx4W43dwuoHYpIAgug4033pSgKiZUT1ThtmS8ic
-         OMRV4vbDWMBE++REQi15KrlEQuhlW3+R9WzL4=
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20161025;
-        h=x-gm-message-state:mime-version:references:in-reply-to:from:date
-         :message-id:subject:to:cc;
-        bh=ibmYe5dmY9qFVLAgJoCojAZp2sCL8vXGU5XsSLw7St8=;
-        b=Rkyng6JdlIKbfkKZgbxkbq3Z3ilIU95+EV5f90fVL+CmIzNTJeZJV4qCBwddZ3xPSc
-         Bnmke5kOSPDkuyU7bysA6TunJfMXXD41ogDREQSr0hROnYqj2aPkiifxty8mMhpaSOtD
-         XQjfNhLK0lJABx1YdvukXtb+Vn2YqEVAeF69WffYIapTgEAnmq/gi2gCJz/BIoVZ4kXk
-         Fz+pLCjHO+kVXP+7sKZczUWF/rYPYgZI7YSJ3dC/8J0F+nbs3s4J1XJpfRrL5ouDHXEv
-         pilgvXaKBFDAP9IafKz1yQM8H/IDiq3ej+xKWZe+b+A4DEZaWNwDjKNUYpbpCtfhPRH/
-         5Cwg==
-X-Gm-Message-State: APjAAAXm7TBuTfiOlbkiUolRmiY3Ie5u8E/Q0MEmvocw40/pzcPKruE3
-        fwlLALqN2Z7UJenn6LBRme2Gwvjrk0M=
-X-Google-Smtp-Source: APXvYqy19OSkXX5J4l10yfHLILo8Mk5CWu8WzmDJyW4CYApUlouLiXnmJ17eVWnwGYui1G2zkx0/aw==
-X-Received: by 2002:a2e:90c8:: with SMTP id o8mr7601483ljg.4.1576189103614;
-        Thu, 12 Dec 2019 14:18:23 -0800 (PST)
-Received: from mail-lf1-f46.google.com (mail-lf1-f46.google.com. [209.85.167.46])
-        by smtp.gmail.com with ESMTPSA id c12sm3558329lfp.58.2019.12.12.14.18.22
-        for <linux-block@vger.kernel.org>
-        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
-        Thu, 12 Dec 2019 14:18:22 -0800 (PST)
-Received: by mail-lf1-f46.google.com with SMTP id y1so453476lfb.6
-        for <linux-block@vger.kernel.org>; Thu, 12 Dec 2019 14:18:22 -0800 (PST)
-X-Received: by 2002:ac2:50cc:: with SMTP id h12mr6996151lfm.29.1576189102141;
- Thu, 12 Dec 2019 14:18:22 -0800 (PST)
-MIME-Version: 1.0
-References: <20191211152943.2933-1-axboe@kernel.dk> <63049728.ylUViGSH3C@merkaba>
- <7bf74660-874e-6fd7-7a41-f908ccab694e@kernel.dk>
-In-Reply-To: <7bf74660-874e-6fd7-7a41-f908ccab694e@kernel.dk>
-From:   Linus Torvalds <torvalds@linux-foundation.org>
-Date:   Thu, 12 Dec 2019 14:18:06 -0800
-X-Gmail-Original-Message-ID: <CAHk-=wgAdtXUzqFNfZKm+AEh9Oxd5ZvNx_sZZi-RXSFhtf5V+Q@mail.gmail.com>
-Message-ID: <CAHk-=wgAdtXUzqFNfZKm+AEh9Oxd5ZvNx_sZZi-RXSFhtf5V+Q@mail.gmail.com>
-Subject: Re: [PATCHSET v3 0/5] Support for RWF_UNCACHED
+        Thu, 12 Dec 2019 17:18:28 -0500
+Received: from dread.disaster.area (pa49-195-139-249.pa.nsw.optusnet.com.au [49.195.139.249])
+        by mail104.syd.optusnet.com.au (Postfix) with ESMTPS id 5D5028206E4;
+        Fri, 13 Dec 2019 09:18:20 +1100 (AEDT)
+Received: from dave by dread.disaster.area with local (Exim 4.92.3)
+        (envelope-from <david@fromorbit.com>)
+        id 1ifWmo-0005qT-SB; Fri, 13 Dec 2019 09:18:18 +1100
+Date:   Fri, 13 Dec 2019 09:18:18 +1100
+From:   Dave Chinner <david@fromorbit.com>
 To:     Jens Axboe <axboe@kernel.dk>
-Cc:     Martin Steigerwald <martin@lichtvoll.de>,
+Cc:     Linus Torvalds <torvalds@linux-foundation.org>,
         Linux-MM <linux-mm@kvack.org>,
         linux-fsdevel <linux-fsdevel@vger.kernel.org>,
         linux-block <linux-block@vger.kernel.org>,
         Matthew Wilcox <willy@infradead.org>, Chris Mason <clm@fb.com>,
-        Dave Chinner <david@fromorbit.com>
-Content-Type: text/plain; charset="UTF-8"
+        Johannes Weiner <hannes@cmpxchg.org>
+Subject: Re: [PATCHSET v3 0/5] Support for RWF_UNCACHED
+Message-ID: <20191212221818.GG19213@dread.disaster.area>
+References: <20191211152943.2933-1-axboe@kernel.dk>
+ <CAHk-=wjz3LE1kznro1dozhk9i9Dr4pCnkj7Fuccn2xdWeGHawQ@mail.gmail.com>
+ <d0adcde2-3106-4fea-c047-4d17111bab70@kernel.dk>
+ <e43a2700-8625-e136-dc9d-d0d2da5d96ac@kernel.dk>
+ <CAHk-=wje8i3DVcO=fMC4tzKTS5+eHv0anrVZa_JENQt08T=qCQ@mail.gmail.com>
+ <0d4e3954-c467-30a7-5a8e-7c4180275533@kernel.dk>
+ <CAHk-=whk4bcVPvtAv5OmHiW5z6AXgCLFhO4YrXD7o0XC+K-aHw@mail.gmail.com>
+ <fef996ca-a4ed-9633-1f79-91292a984a20@kernel.dk>
+ <e7fc6b37-8106-4fe2-479c-05c3f2b1c1f1@kernel.dk>
+MIME-Version: 1.0
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <e7fc6b37-8106-4fe2-479c-05c3f2b1c1f1@kernel.dk>
+User-Agent: Mutt/1.10.1 (2018-07-13)
+X-Optus-CM-Score: 0
+X-Optus-CM-Analysis: v=2.3 cv=X6os11be c=1 sm=1 tr=0
+        a=KoypXv6BqLCQNZUs2nCMWg==:117 a=KoypXv6BqLCQNZUs2nCMWg==:17
+        a=jpOVt7BSZ2e4Z31A5e1TngXxSK0=:19 a=kj9zAlcOel0A:10 a=pxVhFHJ0LMsA:10
+        a=7-415B0cAAAA:8 a=bGnxjQGj_S2iY3Ve0sMA:9 a=OKTpYkA4xyfJVJG0:21
+        a=eVzGXzw0403_gMhr:21 a=CjuIK1q_8ugA:10 a=biEYGPWJfzWAr4FL6Ov7:22
 Sender: linux-block-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-On Thu, Dec 12, 2019 at 7:16 AM Jens Axboe <axboe@kernel.dk> wrote:
->
-> I don't know the nocache tool, but I'm guessing it just does the writes
-> (or reads) and then uses FADV_DONTNEED to drop behind those pages?
-> That's fine for slower use cases, it won't work very well for fast IO.
-> The write side currently works pretty much like that internally, whereas
-> the read side doesn't use the page cache at all.
+On Wed, Dec 11, 2019 at 06:09:14PM -0700, Jens Axboe wrote:
+> On 12/11/19 4:41 PM, Jens Axboe wrote:
+> > On 12/11/19 1:18 PM, Linus Torvalds wrote:
+> >> On Wed, Dec 11, 2019 at 12:08 PM Jens Axboe <axboe@kernel.dk> wrote:
+> >>>
+> >>> $ cat /proc/meminfo | grep -i active
+> >>> Active:           134136 kB
+> >>> Inactive:       28683916 kB
+> >>> Active(anon):      97064 kB
+> >>> Inactive(anon):        4 kB
+> >>> Active(file):      37072 kB
+> >>> Inactive(file): 28683912 kB
+> >>
+> >> Yeah, that should not put pressure on some swap activity. We have 28
+> >> GB of basically free inactive file data, and the VM is doing something
+> >> very very bad if it then doesn't just quickly free it with no real
+> >> drama.
+> >>
+> >> In fact, I don't think it should even trigger kswapd at all, it should
+> >> all be direct reclaim. Of course, some of the mm people hate that with
+> >> a passion, but this does look like a prime example of why it should
+> >> just be done.
+> > 
+> > For giggles, I ran just a single thread on the file set. We're only
+> > doing about 100K IOPS at that point, yet when the page cache fills,
+> > kswapd still eats 10% cpu. That seems like a lot for something that
+> > slow.
+> 
+> Warning, the below is from the really crazy department...
+> 
+> Anyway, I took a closer look at the profiles for the uncached case.
+> We're spending a lot of time doing memsets (this is the xa_node init,
+> from the radix tree constructor), and call_rcu for the node free later
+> on. All wasted time, and something that meant we weren't as close to the
+> performance of O_DIRECT as we could be.
+> 
+> So Chris and I started talking about this, and pondered "what would
+> happen if we simply bypassed the page cache completely?". Case in point,
+> see below incremental patch. We still do the page cache lookup, and use
+> that page to copy from if it's there. If the page isn't there, allocate
+> one and do IO to it, but DON'T add it to the page cache. With that,
+> we're almost at O_DIRECT levels of performance for the 4k read case,
+> without 1-2%. I think 512b would look awesome, but we're reading full
+> pages, so that won't really help us much. Compared to the previous
+> uncached method, this is 30% faster on this device. That's substantial.
 
-Well, I think that if we have this RWF/IOC_UNCACHED flag, maybe we
-should make FADV_NOREUSE file descriptors just use it even for regular
-read/write..
+Interesting idea, but this seems like it is just direct IO with
+kernel pages and a memcpy() rather than just mapping user pages, but
+has none of the advantages of direct IO in that we can run reads and
+writes concurrently because it's going through the buffered IO path.
 
-Right now FADV_NOREUSE is a no-op for the kernel, I think, because we
-historically didn't have the facility.
+It also needs all the special DIO truncate/hole punch serialisation
+mechanisms to be propagated into the buffered IO path - the
+requirement for inode_dio_wait() serialisation is something I'm
+trying to remove from XFS, not have to add into more paths. And it
+introduces the same issues with other buffered read/mmap access to
+the same file ranges as direct IO has.
 
-But FADV_DONTNEED is different. That's for dropping pages after use
-(ie invalidate_mapping_pages())
+> Obviously this has issues with truncate that would need to be resolved,
+> and it's definitely dirtier. But the performance is very enticing...
 
-               Linus
+At which point I have to ask: why are we considering repeating the
+mistakes that were made with direct IO?  Yes, it might be faster
+than a coherent RWF_UNCACHED IO implementation, but I don't think
+making it more like O_DIRECT is worth the price.
+
+And, ultimately, RWF_UNCACHED will never be as fast as direct IO
+because it *requires* the CPU to copy the data at least once. Direct
+IO is zero-copy, and so it's always going to have lower overhead
+than RWF_UNCACHED, and so when CPU or memory bandwidth is the
+limiting facter, O_DIRECT will always be faster.
+
+IOWs, I think trying to make RWF_UNCACHED as fast as O_DIRECT is a
+fool's game and attempting to do so is taking a step in the wrong
+direction architecturally.  I'd much prefer a sane IO model for
+RWF_UNCACHED that provides coherency w/ mmap and other buffered IO
+than compromise these things in the chase for ultimate performance.
+
+Speaking of IO path architecture, perhaps what we really need here
+is an iomap_apply()->iomap_read_actor loop here similar to the write
+side. This would allow us to bypass all the complex readahead
+shenanigans that generic_file_buffered_read() has to deal with and
+directly control page cache residency and build the exact IOs we
+need when RWF_UNCACHED is set. This moves it much closer to the
+direct IO path in terms IO setup overhead and physical IO patterns,
+but still has all the benefits of being fully cache coherent....
+
+And, really, when we are talking about high end nvme drives that can
+do 5-10GB/s read each, and we can put 20+ of them in a single
+machine, there's no real value in doing readahead. i.e. there's
+little read IO latency to hide in the first place and we such
+systems have little memory bandwidth to spare to waste on readahead
+IO that we don't end up using...
+
+Cheers,
+
+Dave.
+-- 
+Dave Chinner
+david@fromorbit.com
