@@ -6,66 +6,57 @@ X-Spam-Status: No, score=-2.0 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
 	HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,
 	USER_AGENT_SANE_1 autolearn=no autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 467A1C43603
-	for <linux-block@archiver.kernel.org>; Thu, 12 Dec 2019 16:27:45 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 9C3F1C43603
+	for <linux-block@archiver.kernel.org>; Thu, 12 Dec 2019 16:30:05 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.kernel.org (Postfix) with ESMTP id 0C97E2073B
-	for <linux-block@archiver.kernel.org>; Thu, 12 Dec 2019 16:27:45 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id 646A82073B
+	for <linux-block@archiver.kernel.org>; Thu, 12 Dec 2019 16:30:05 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (2048-bit key) header.d=infradead.org header.i=@infradead.org header.b="TvUkz5if"
+	dkim=fail reason="signature verification failed" (2048-bit key) header.d=infradead.org header.i=@infradead.org header.b="F8XIWu5d"
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1729864AbfLLQ1o (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Thu, 12 Dec 2019 11:27:44 -0500
-Received: from bombadil.infradead.org ([198.137.202.133]:51748 "EHLO
+        id S1729890AbfLLQ3w (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Thu, 12 Dec 2019 11:29:52 -0500
+Received: from bombadil.infradead.org ([198.137.202.133]:51826 "EHLO
         bombadil.infradead.org" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1729762AbfLLQ1o (ORCPT
+        with ESMTP id S1729762AbfLLQ3w (ORCPT
         <rfc822;linux-block@vger.kernel.org>);
-        Thu, 12 Dec 2019 11:27:44 -0500
+        Thu, 12 Dec 2019 11:29:52 -0500
 DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed;
         d=infradead.org; s=bombadil.20170209; h=In-Reply-To:Content-Type:MIME-Version
         :References:Message-ID:Subject:Cc:To:From:Date:Sender:Reply-To:
         Content-Transfer-Encoding:Content-ID:Content-Description:Resent-Date:
         Resent-From:Resent-Sender:Resent-To:Resent-Cc:Resent-Message-ID:List-Id:
         List-Help:List-Unsubscribe:List-Subscribe:List-Post:List-Owner:List-Archive;
-         bh=IgVkNZGYYb9ycoy4soM2AlB3WTlIqOyojMWaymh04yw=; b=TvUkz5ifFQk0sY/MKMPhzbCvw
-        sDSWJywp1g/bG3Yqvkr3a3T6Gu2STfYzcopwE6DKn5X7MVeg9VUhuY9rXdmTA9CCcOftkIq3fI2rs
-        hbwck73m0kvEJAouG0rlZyUdOwc2hBOk4i8Qy8WlMVvmIzNUoOqKaPxqlCNTou3d1mXFVBfYTeVtZ
-        cYyfV5FRa3yNSyqk5bOIF4qjM8Tk+5tzQ9iYYRM8WfiaGTwC0v5J8OMgjlUVnBKeQAxLVr74+4NRk
-        Kb9mktlcAXxvU3xrz5q9GLc7DDXKrMOGH92mOxPoy3CBbHA7lduUADCZ8uJK3ozOUCEWHFcPF3b9w
-        fhp0EgPmQ==;
+         bh=IidiBxDJM+VIT+v37VGMG28TIHnD27VtPSaxTsIJSpI=; b=F8XIWu5dE5QOlZY+5UkEYA1bl
+        klREN3ImvGQJucbjAIGPeNrcq8me7SFVJlVcnaEwVNT5l2jewD90OPG2jPNyrUe76CsZb1v0Qf5Gc
+        C6wSuddKzvJiG5oNjTpMJOayfosQqjkzPhKT0OsQEQdHhSBURHFLlSyGPZ2RSqRrw9AfZBrViP0dd
+        iC3JlCiXTt0XmaODIFZX6AGQ5BhXDjALGdZF7WNLYnL8FfLRyLDglEacEhmyk9UFRF+gNH3aNSQkQ
+        a7Vs1AVgrostmvjB2/AU+D1QMt5L5wIOFxjsqMVmMZW8RyIDxB9gAaIWC8Oq750u3ABjiOVVafTwC
+        RBtcsphWg==;
 Received: from hch by bombadil.infradead.org with local (Exim 4.92.3 #3 (Red Hat Linux))
-        id 1ifRJJ-0004WW-2W; Thu, 12 Dec 2019 16:27:29 +0000
-Date:   Thu, 12 Dec 2019 08:27:29 -0800
+        id 1ifRLX-0004nE-4h; Thu, 12 Dec 2019 16:29:47 +0000
+Date:   Thu, 12 Dec 2019 08:29:47 -0800
 From:   Christoph Hellwig <hch@infradead.org>
-To:     Paolo Bonzini <pbonzini@redhat.com>
-Cc:     "Michael S. Tsirkin" <mst@redhat.com>,
-        Arnd Bergmann <arnd@arndb.de>, Jens Axboe <axboe@kernel.dk>,
+To:     Arnd Bergmann <arnd@arndb.de>
+Cc:     Jens Axboe <axboe@kernel.dk>,
         "James E.J. Bottomley" <jejb@linux.ibm.com>,
         "Martin K. Petersen" <martin.petersen@oracle.com>,
         Alexander Viro <viro@zeniv.linux.org.uk>,
-        Jason Wang <jasowang@redhat.com>,
-        Doug Gilbert <dgilbert@interlog.com>,
-        Kai =?iso-8859-1?Q?M=E4kisara?= <Kai.Makisara@kolumbus.fi>,
+        Borislav Petkov <bp@alien8.de>,
+        "David S. Miller" <davem@davemloft.net>,
         linux-kernel@vger.kernel.org, y2038@lists.linaro.org,
-        Stefan Hajnoczi <stefanha@redhat.com>,
-        Bart Van Assche <bvanassche@acm.org>,
         Hannes Reinecke <hare@suse.com>,
-        Damien Le Moal <damien.lemoal@wdc.com>,
-        John Garry <john.garry@huawei.com>,
-        virtualization@lists.linux-foundation.org,
-        linux-block@vger.kernel.org, linux-scsi@vger.kernel.org,
-        linux-fsdevel@vger.kernel.org
-Subject: Re: [PATCH 15/24] compat_ioctl: scsi: move ioctl handling into
- drivers
-Message-ID: <20191212162729.GB27991@infradead.org>
+        Heiko Carstens <heiko.carstens@de.ibm.com>,
+        linux-block@vger.kernel.org, linux-ide@vger.kernel.org
+Subject: Re: [PATCH 20/24] compat_ioctl: move HDIO ioctl handling into
+ drivers/ide
+Message-ID: <20191212162947.GC27991@infradead.org>
 References: <20191211204306.1207817-1-arnd@arndb.de>
- <20191211204306.1207817-16-arnd@arndb.de>
- <20191211180155-mutt-send-email-mst@kernel.org>
- <858768fb-5f79-8259-eb6a-a26f18fb0e04@redhat.com>
+ <20191211204306.1207817-21-arnd@arndb.de>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=us-ascii
 Content-Disposition: inline
-In-Reply-To: <858768fb-5f79-8259-eb6a-a26f18fb0e04@redhat.com>
+In-Reply-To: <20191211204306.1207817-21-arnd@arndb.de>
 User-Agent: Mutt/1.12.1 (2019-06-15)
 X-SRS-Rewrite: SMTP reverse-path rewritten from <hch@infradead.org> by bombadil.infradead.org. See http://www.infradead.org/rpr.html
 Sender: linux-block-owner@vger.kernel.org
@@ -73,13 +64,30 @@ Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-On Thu, Dec 12, 2019 at 01:28:08AM +0100, Paolo Bonzini wrote:
-> I think it's because the only ioctl for virtio-blk is SG_IO.  It makes
-> sense to lump it in with scsi, but I wouldn't mind getting rid of
-> CONFIG_VIRTIO_BLK_SCSI altogether.
+> +static int put_user_long(long val, unsigned long arg)
+> +{
+> +#ifdef CONFIG_COMPAT
+> +	if (in_compat_syscall())
+> +		return put_user(val, (compat_long_t __user *)compat_ptr(arg));
+> +#endif
+> +	return put_user(val, (long __user *)arg);
+> +}
 
-CONFIG_VIRTIO_BLK_SCSI has been broken for about two years, as it
-never set the QUEUE_FLAG_SCSI_PASSTHROUGH flag after that was
-introduced.  I actually have a patch that I plan to send to remove
-this support as it was a really idea to start with (speaking as
-the person who had that idea back in the day).
+We had this
+
+#ifdef CONFIG_COMPAT
+	if (in_compat_syscall())
+		...
+	...
+#endif
+
+patter quite frequently.  Can we define a in_compat_syscall stub
+and make sure compat_ptr and the compat_* types are available available
+to clean this up a bit?
+
+> -	if (NULL == (void *) arg) {
+> +	if (NULL == argp) {
+
+	if (!argp) {
+
+?
