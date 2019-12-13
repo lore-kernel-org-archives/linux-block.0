@@ -6,47 +6,47 @@ X-Spam-Status: No, score=-9.7 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
 	INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,
 	URIBL_BLOCKED,USER_AGENT_GIT autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id D3299C3497F
+	by smtp.lore.kernel.org (Postfix) with ESMTP id A6EE8C34974
 	for <linux-block@archiver.kernel.org>; Fri, 13 Dec 2019 20:37:51 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.kernel.org (Postfix) with ESMTP id 1E7C124787
-	for <linux-block@archiver.kernel.org>; Fri, 13 Dec 2019 20:37:51 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id E4B5E24712
+	for <linux-block@archiver.kernel.org>; Fri, 13 Dec 2019 20:37:50 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1727709AbfLMOdQ (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Fri, 13 Dec 2019 09:33:16 -0500
-Received: from mail-io1-f51.google.com ([209.85.166.51]:36198 "EHLO
-        mail-io1-f51.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1727673AbfLMOdP (ORCPT
+        id S1727610AbfLMOdL (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Fri, 13 Dec 2019 09:33:11 -0500
+Received: from mail-il1-f193.google.com ([209.85.166.193]:45971 "EHLO
+        mail-il1-f193.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S1727673AbfLMOdL (ORCPT
         <rfc822;linux-block@vger.kernel.org>);
-        Fri, 13 Dec 2019 09:33:15 -0500
-Received: by mail-io1-f51.google.com with SMTP id a22so2600808ios.3
-        for <linux-block@vger.kernel.org>; Fri, 13 Dec 2019 06:33:15 -0800 (PST)
+        Fri, 13 Dec 2019 09:33:11 -0500
+Received: by mail-il1-f193.google.com with SMTP id p8so2191582iln.12
+        for <linux-block@vger.kernel.org>; Fri, 13 Dec 2019 06:33:10 -0800 (PST)
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=1e100.net; s=20161025;
         h=x-gm-message-state:from:to:cc:subject:date:message-id:in-reply-to
          :references:mime-version:content-transfer-encoding;
-        bh=dE37kZUC3yYiYi/MLsMUvkcOAr9NO2+1TohR9l9Xusg=;
-        b=Jz0UdQnHwC1DBbjJdGtXD1x4T6g+mR5QtI2nF+/sy41YPv78LCmvSI5VW6unr+NT3Y
-         +rbDtjaeiD7nZOJgcr3HYLZdVkQLQu6ZT6mAq6X2/uyXHplg+boKcgHZSVScqH/mYCj2
-         R15bExh+yfifR+PXtxho/t7eQdLXXS+AX3nJpkkVPkX/uDO4XG1u2yo/p7g1rUw0ECox
-         0O26oDUYliotpyulkdymGULdUcBmUODU2zcbsPeH58kilKS017nf7n2cXab6BfCVEfKl
-         61kkzUZ2SF54RZeAg3FFEO9zisECojvL71k2rGwdxLIkV0HubagVBV5OUi1SPkBzklPD
-         ENPQ==
-X-Gm-Message-State: APjAAAVfwhSY+593qA5ROPETP/NpncHXGVg+FZq3X6VpleQcmj6GQ/3F
-        oJn5Dh/iyNDPLiPb0BYPaBSCsKie
-X-Google-Smtp-Source: APXvYqzK2yL0Af11dWFlkN3AITkZ+rQo5pIbefPkNucukW2cRN0o09PpPvkcgFc6vgVM3E2hmfh0ng==
-X-Received: by 2002:a02:2385:: with SMTP id u127mr13304262jau.127.1576247595210;
-        Fri, 13 Dec 2019 06:33:15 -0800 (PST)
+        bh=drl3Eju3FzWAdVgHEQUgqm6x19DdmauK5QkwxXRH7qI=;
+        b=qFogdp2103g72IypUbnESq0qcPXLrM9YfTdEwo7I9Op0/Xr2NzZ3peG/R+z+kNy2QV
+         xhhKa+6bs2QTk9/LS1On6EEITEXwa0/yEfQymr910QieKBG5dlbEe2tSRyBMrgJ3PaAz
+         CVRm8BlQztXhUOZQ6ckMULGpbvp6o13E+D1MpKoD/JFSSuJLfPFi55YUgiAXqyBTqIlf
+         /czMaaKnWPyL1iWgmc1RiRqPsQnvNQh1DUsBiAR+MFiXoAouF0EyAIHjhrvAZ+tz+gcl
+         lQXi0aJpV2WzFQ8+Cb0szORL7Lkk+/kWWwVpM9i14HFf4OUX60CDdviauzmVendigwpn
+         Wi4g==
+X-Gm-Message-State: APjAAAWP3vnHLiACqwkGvtztRRyygTPYhaZIR3LiH+VIlZ0oLZHxLfTn
+        LLPhkDiul6W7O85BmhjU5D9XPkzZ
+X-Google-Smtp-Source: APXvYqxTsyVGhP+fRyauLG511LHf1Gl0gQMgCdAXTexTDq4ZmPXcNAIO2sw1J68ROCXZ6nIHYE1SNw==
+X-Received: by 2002:a92:81cb:: with SMTP id q72mr13376707ilk.275.1576247589775;
+        Fri, 13 Dec 2019 06:33:09 -0800 (PST)
 Received: from bvanassche-glaptop.ka.ltv ([75.104.68.105])
-        by smtp.gmail.com with ESMTPSA id i79sm2785026ild.6.2019.12.13.06.33.10
+        by smtp.gmail.com with ESMTPSA id i79sm2785026ild.6.2019.12.13.06.33.05
         (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Fri, 13 Dec 2019 06:33:14 -0800 (PST)
+        Fri, 13 Dec 2019 06:33:09 -0800 (PST)
 From:   Bart Van Assche <bvanassche@acm.org>
 To:     Omar Sandoval <osandov@fb.com>
 Cc:     linux-block@vger.kernel.org, Bart Van Assche <bvanassche@acm.org>
-Subject: [PATCH v2 4/4] tests/srp/015: Add a test that uses the SoftiWARP (siw) driver
-Date:   Fri, 13 Dec 2019 09:32:32 -0500
-Message-Id: <20191213143232.29899-5-bvanassche@acm.org>
+Subject: [PATCH v2 3/4] common/multipath-over-rdma, tests/srp: Make it easy to use siw instead of rdma_rxe
+Date:   Fri, 13 Dec 2019 09:32:31 -0500
+Message-Id: <20191213143232.29899-4-bvanassche@acm.org>
 X-Mailer: git-send-email 2.24.1.735.g03f4e72817-goog
 In-Reply-To: <20191213143232.29899-1-bvanassche@acm.org>
 References: <20191213143232.29899-1-bvanassche@acm.org>
@@ -57,120 +57,264 @@ Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-Recently support has been added in the SRP initiator and target drivers
-for the SoftiWARP driver. Add a test for SRP over SoftiWARP.
+Make all_primary_gids() return GIDs with zero suffix since SoftiWARP
+GIDs have such a suffix. Add SoftiWARP support in start_soft_rdma() and
+stop_soft_rdma(). Make do_rdma_cm_login() submit the source IP address
+and scope ID to the SRP initiator driver since that information is
+essential to establish an IPv6 connection between link-local addresses.
+Iterate over RDMA ports instead of UMAD device nodes in log_in() since
+no UMAD device node is associated with SoftiWARP ports. In start_lio_srpt(),
+use the GID format to identify SoftiWARP ports since the GID suffix for
+these ports is zero.
 
 Signed-off-by: Bart Van Assche <bvanassche@acm.org>
 ---
- common/rc         | 28 ++++++++++++++++++++++++++++
- tests/srp/015     | 45 +++++++++++++++++++++++++++++++++++++++++++++
- tests/srp/015.out |  2 ++
- 3 files changed, 75 insertions(+)
- create mode 100755 tests/srp/015
- create mode 100644 tests/srp/015.out
+ common/multipath-over-rdma | 48 ++++++++++++++++---
+ tests/srp/rc               | 98 ++++++++++++++++++++++----------------
+ 2 files changed, 99 insertions(+), 47 deletions(-)
 
-diff --git a/common/rc b/common/rc
-index 87b1e0718382..63b29be7ba74 100644
---- a/common/rc
-+++ b/common/rc
-@@ -87,6 +87,21 @@ _have_program() {
+diff --git a/common/multipath-over-rdma b/common/multipath-over-rdma
+index 9f645f759d2d..40efc4b3aa2e 100644
+--- a/common/multipath-over-rdma
++++ b/common/multipath-over-rdma
+@@ -11,6 +11,7 @@ filesystem_type=ext4
+ fio_aux_path=/tmp/fio-state-files
+ memtotal=$(sed -n 's/^MemTotal:[[:blank:]]*\([0-9]*\)[[:blank:]]*kB$/\1/p' /proc/meminfo)
+ max_ramdisk_size=$((1<<25))
++use_siw=
+ ramdisk_size=$((memtotal*(1024/16)))  # in bytes
+ if [ $ramdisk_size -gt $max_ramdisk_size ]; then
+ 	ramdisk_size=$max_ramdisk_size
+@@ -389,9 +390,13 @@ function mountpoint() {
+ 
+ # All primary RDMA GIDs
+ all_primary_gids() {
+-	find /sys/devices -name infiniband | while read -r p; do
+-		cat "$p"/*/ports/*/gids/0
+-	done | grep -v ':0000:0000:0000:0000$'
++	local gid p
++
++	for p in /sys/class/infiniband/*/ports/*/gids/0; do
++		gid="$(<"$p")"
++		[ "$gid" != 0000:0000:0000:0000:0000:0000:0000:0000 ] &&
++			echo "$gid"
++	done
+ }
+ 
+ # Check whether or not an rdma_rxe instance has been associated with network
+@@ -408,24 +413,40 @@ has_rdma_rxe() {
  	return 1
  }
  
-+# Check whether the iproute2 snapshot is greater than or equal to $1.
-+_have_iproute2() {
-+	local snapshot
-+
-+	if ! snapshot=$(ip -V | sed 's/ip utility, iproute2-ss//'); then
-+		SKIP_REASON="ip utility not found"
-+		return 1
+-# Load the rdma_rxe kernel module and associate it with all network interfaces.
++# Load the rdma_rxe or siw kernel module and associate it with all network
++# interfaces.
+ start_soft_rdma() {
+ 	{
++	if [ -n "$use_siw" ]; then
++		modprobe siw || return $?
++		(
++			cd /sys/class/net &&
++				for i in *; do
++					[ -e "$i" ] || continue
++					[ -e "/sys/class/infiniband/${i}_siw" ] && continue
++					rdma link add "${i}_siw" type siw netdev "$i" ||
++						echo "Failed to bind the siw driver to $i"
++				done
++		)
++	else
+ 		modprobe rdma_rxe || return $?
+ 		(
+ 			cd /sys/class/net &&
+ 				for i in *; do
+ 					if [ -e "$i" ] && ! has_rdma_rxe "$i"; then
+-						echo "$i" > /sys/module/rdma_rxe/parameters/add
++						echo "$i" > /sys/module/rdma_rxe/parameters/add ||
++							echo "Failed to bind the rdma_rxe driver to $i"
+ 					fi
+ 				done
+ 		)
 +	fi
-+	if [ "$snapshot" -lt "$1" ]; then
-+		SKIP_REASON="ip utility too old"
-+		return 1
-+	fi
-+	return 0
-+}
-+
- _have_src_program() {
- 	if [[ ! -x "$SRCDIR/$1" ]]; then
- 		SKIP_REASON="$1 was not built; run \`make\`"
-@@ -134,6 +149,19 @@ _have_kernel_option() {
- 	return 1
+ 	} >>"$FULL"
  }
  
-+# Check whether the version of the running kernel is greater than or equal to
-+# $1.$2.$3
-+_have_kver() {
-+	local d=$1 e=$2 f=$3
-+
-+	IFS='.' read -r a b c < <(uname -r | sed 's/-.*//')
-+	if [ $((a * 65536 + b * 256 + c)) -lt $((d * 65536 + e * 256 + f)) ];
-+	then
-+		SKIP_REASON="Kernel version too old"
+-# Dissociate the rdma_rxe kernel module from all network interfaces and unload
+-# the rdma_rxe kernel module.
++# Dissociate the rdma_rxe or siw kernel module from all network interfaces and
++# unload the rdma_rxe kernel module.
+ stop_soft_rdma() {
++	{
+ 	(
+ 		cd /sys/class/net &&
+ 			for i in *; do
+@@ -439,6 +460,19 @@ stop_soft_rdma() {
+ 		echo "Unloading rdma_rxe failed"
+ 		return 1
+ 	fi
++	(
++		cd /sys/class/net &&
++			for i in *_siw; do
++				[ -e "$i" ] || continue
++				rdma link del "${i}" ||
++					echo "Failed to unbind the siw driver from ${i%_siw}"
++			done
++	)
++	if ! unload_module siw 10; then
++		echo "Unloading siw failed"
 +		return 1
++	fi
++	} >>"$FULL"
+ }
+ 
+ # /dev/sd... device node assigned to the scsi_debug kernel module.
+diff --git a/tests/srp/rc b/tests/srp/rc
+index a1bc09b496ec..2738c8f6a4e5 100755
+--- a/tests/srp/rc
++++ b/tests/srp/rc
+@@ -138,30 +138,51 @@ do_ib_cm_login() {
+ 	done
+ }
+ 
++rdma_dev_to_net_dev() {
++	local b d rdma_dev=$1
++
++	b=/sys/class/infiniband/$rdma_dev/parent
++	if [ -e "$b" ]; then
++		echo "$(<"$b")"
++	else
++		echo "${rdma_dev%_siw}"
 +	fi
 +}
 +
- _have_tracefs() {
- 	stat /sys/kernel/debug/tracing/trace > /dev/null 2>&1
- 	if ! findmnt -t tracefs /sys/kernel/debug/tracing >/dev/null; then
-diff --git a/tests/srp/015 b/tests/srp/015
-new file mode 100755
-index 000000000000..e9769dc8a6a0
---- /dev/null
-+++ b/tests/srp/015
-@@ -0,0 +1,45 @@
-+#!/bin/bash
-+# SPDX-License-Identifier: GPL-2.0+
-+# Copyright 2019 Google LLC
-+
-+. tests/srp/rc
-+
-+DESCRIPTION="File I/O on top of multipath concurrently with logout and login (mq) using the SoftiWARP (siw) driver"
-+TIMED=1
-+
-+requires() {
-+	_have_modules siw
-+	_have_kver 5 5
-+	# See also commit 4336c5821a7b ("rdma: add 'link add/delete' commands").
-+	_have_iproute2 190404
-+}
-+
-+test_disconnect_repeatedly() {
-+	local dev fio_status m
-+
-+	use_blk_mq y y || return $?
-+	dev=$(get_bdev 0) || return $?
-+	m=$(mountpoint 0) || return $?
-+	create_filesystem "$dev" || return $?
-+	mount_and_check "$dev" "$m" || return $?
-+	# shellcheck disable=SC2064
-+	trap "unmount_and_check $m" RETURN
-+	simulate_network_failure_loop "$dev" "$TIMEOUT" &
-+	run_fio --verify=md5 --rw=randwrite --bs=4K --loops=$((10**6)) \
-+		--iodepth=64 --group_reporting --sync=1 --direct=1 \
-+		--ioengine=libaio --directory="$m" --runtime="${TIMEOUT}" \
-+		--name=data-integrity-test-mq --thread --numjobs=16 \
-+		--output="${RESULTS_DIR}/srp/fio-output-015.txt" \
-+		>>"$FULL"
-+	fio_status=$?
-+	wait
-+	log_in
-+	return $fio_status
-+}
-+
-+test() {
-+	: "${TIMEOUT:=30}"
-+	trap 'trap "" EXIT; teardown' EXIT
-+	use_siw=1
-+	setup && test_disconnect_repeatedly && echo Passed
-+}
-diff --git a/tests/srp/015.out b/tests/srp/015.out
-new file mode 100644
-index 000000000000..5e25d8e8672d
---- /dev/null
-+++ b/tests/srp/015.out
-@@ -0,0 +1,2 @@
-+Configured SRP target driver
-+Passed
+ # Tell the SRP initiator to log in to an SRP target using the RDMA/CM.
+ # Arguments: $1: SRP target IOC GUID; $2: IB device to log in to; $3: additional
+ # login parameters.
+ do_rdma_cm_login() {
+-	local a b add_param d dest dests ibdev ioc_guid pd
++	local a b c add_param d dest dests ibdev ioc_guid params
+ 
+ 	ioc_guid=$1
+ 	ibdev=$2
+ 	add_param=$3
+-	pd=/sys/class/infiniband/$ibdev/parent
+-	if [ -e "$pd" ]; then
+-		d=$(<"$pd")
++	if d=$(rdma_dev_to_net_dev "$ibdev"); then
+ 		a=$(get_ipv4_addr "$(basename "$d")")
+ 		b=$(get_ipv6_addr "$(basename "$d")")
+ 	fi
+ 	echo "Interface $d: IPv4 $a IPv6 $b" >>"$FULL"
+ 	[ -n "$a$b" ] || return 1
++	b=${b}%$(<"/sys/class/net/$d/ifindex")
+ 	dests=()
+-	[ -n "$a" ] && dests+=("${a}:${srp_rdma_cm_port}")
+-	[ -n "$b" ] && dests+=("[${b}]:${srp_rdma_cm_port}")
++	for c in $a; do
++		dests+=("${c}:${srp_rdma_cm_port}")
++	done
++	for c in $b; do
++		dests+=("[${c}]:${srp_rdma_cm_port}")
++	done
+ 	for dest in "${dests[@]}"; do
++		src=${dest%:*}
+ 		for p in "/sys/class/infiniband_srp/srp-${2}-"*; do
+ 			[ -e "$p" ] || continue
+-			srp_single_login "id_ext=$ioc_guid,ioc_guid=$ioc_guid,dest=$dest,$add_param" "$p/add_target"
++			ibdev=$(<"$p/ibdev")
++			port=$(<"$p/port")
++			gid=$(<"/sys/class/infiniband/$ibdev/ports/$port/gids/0")
++			gid=${gid//:}
++			gid_pfx=${gid:0:16}
++			params+="id_ext=$ioc_guid,initiator_ext=$gid_pfx,ioc_guid=$ioc_guid,src=$src,dest=$dest,$add_param"
++			srp_single_login "${params}" "$p/add_target"
+ 		done
+ 	done
+ }
+@@ -201,11 +222,11 @@ log_in() {
+ 	ioc_guid=$(</sys/module/ib_srpt/parameters/srpt_service_guid)
+ 
+ 	for ((i=0;i<10;i++)); do
+-		for d in /sys/class/infiniband_mad/umad*; do
+-			[ -e "$d" ] || continue
+-			ibdev=$(<"$d/ibdev")
+-			port=$(<"$d/port")
+-			link_layer=$(<"/sys/class/infiniband/$ibdev/ports/$port/link_layer")
++		for p in /sys/class/infiniband/*/ports/*; do
++			[ -e "$p" ] || continue
++			port=$(basename "$p")
++			ibdev=$(basename "$(dirname "$(dirname "$p")")")
++			link_layer=$(<"$p/link_layer")
+ 			case $link_layer in
+ 				InfiniBand)
+ 					do_ib_cm_login   "$ioc_guid" "$ibdev" "$port" "$add_param" ||
+@@ -454,34 +475,34 @@ configure_target_ports() {
+ 
+ # Load LIO and configure the SRP target driver and LUNs.
+ start_lio_srpt() {
+-	local b d gid guid i ini_gids ini_guids opts p target_gids target_guids vdev
++	local b d gid i ini_ids=() opts p target_ids=() vdev
+ 
+-	# shellcheck disable=SC2207
+-	target_guids=($(all_primary_gids | sed 's/^fe80:0000:0000:0000://'))
+-	# shellcheck disable=SC2207
+-	target_gids=($(all_primary_gids | sed 's/^/0x/;s/://g'))
++	for gid in $(all_primary_gids); do
++		if [ "${gid#fe8}" != "$gid" ]; then
++			gid=${gid#fe80:0000:0000:0000:}
++		else
++			gid=0x${gid//:}
++		fi
++		target_ids+=("$gid")
++	done
++	echo "target_ids=${target_ids[*]}" >>"$FULL"
+ 	for p in /sys/class/infiniband/*/ports/*; do
+ 		[ -e "$p" ] || continue
+-		link_layer=$(<"$p/link_layer")
+-		case "$link_layer" in
+-			InfiniBand)
+-				guid=$(<"$p/gids/0")
+-				gid=$(echo "${guid}" | sed 's/^fe8/0x000/;s/://g')
+-				guid=${guid#fe80:0000:0000:0000:}
+-				[ "$guid" = "0000:0000:0000:0000" ] && continue
+-				ini_guids+=("$guid")
+-				ini_gids+=("$gid")
+-				;;
+-			*)
+-				d=$(<"$(dirname "$(dirname "$p")")/parent")
+-				for b in $(get_ipv4_addr "$d") \
+-						 $(get_ipv6_addr "$d"|expand_ipv6_addr); do
+-					ini_guids+=("$b")
+-					ini_gids+=("$b")
+-				done
+-				;;
+-		esac
++		gid=$(<"$p/gids/0")
++		if [ "${gid#fe8}" != "$gid" ]; then
++			gid=${gid#fe80:0000:0000:0000:}
++			ini_ids+=("$gid")
++		else
++			gid="0x${gid//:}"
++			ini_ids+=("$gid")
++		fi
++		d=$(rdma_dev_to_net_dev "$(basename "$(dirname "$(dirname "$p")")")")
++		for b in $(get_ipv4_addr "$d") \
++				 $(get_ipv6_addr "$d"|expand_ipv6_addr); do
++			ini_ids+=("$b")
++		done
+ 	done
++	echo "ini_ids=${ini_ids[*]}" >>"$FULL"
+ 	mount_configfs || return $?
+ 	modprobe target_core_mod || return $?
+ 	modprobe target_core_iblock || return $?
+@@ -519,10 +540,7 @@ start_lio_srpt() {
+ 			echo "${srp_rdma_cm_port}" > discovery_auth/rdma_cm_port ||
+ 				return $?
+ 		fi
+-		configure_target_ports "${target_guids[@]}" -- "${ini_guids[@]}" || {
+-			echo "Retrying with old port name format"
+-			configure_target_ports "${target_gids[@]}" -- "${ini_gids[@]}"
+-		}
++		configure_target_ports "${target_ids[@]}" -- "${ini_ids[@]}"
+ 	)
+ }
+ 
