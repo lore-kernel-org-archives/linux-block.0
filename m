@@ -2,136 +2,190 @@ Return-Path: <SRS0=J0ZO=2D=vger.kernel.org=linux-block-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-6.8 required=3.0 tests=DKIMWL_WL_HIGH,DKIM_SIGNED,
-	DKIM_VALID,DKIM_VALID_AU,HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,
-	MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED
-	autolearn=ham autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-3.5 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
+	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,SPF_HELO_NONE,
+	SPF_PASS,URIBL_BLOCKED autolearn=no autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id ADA09C43603
-	for <linux-block@archiver.kernel.org>; Fri, 13 Dec 2019 09:13:28 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 78E87C2D0BF
+	for <linux-block@archiver.kernel.org>; Fri, 13 Dec 2019 09:27:52 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.kernel.org (Postfix) with ESMTP id 81DB724658
-	for <linux-block@archiver.kernel.org>; Fri, 13 Dec 2019 09:13:28 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id 429B02465B
+	for <linux-block@archiver.kernel.org>; Fri, 13 Dec 2019 09:27:52 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=pass (1024-bit key) header.d=amazon.com header.i=@amazon.com header.b="NS6Anzv2"
+	dkim=fail reason="signature verification failed" (1024-bit key) header.d=citrix.com header.i=@citrix.com header.b="T0u2UpOs"
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1725946AbfLMJN2 (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Fri, 13 Dec 2019 04:13:28 -0500
-Received: from smtp-fw-9102.amazon.com ([207.171.184.29]:46536 "EHLO
-        smtp-fw-9102.amazon.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1725945AbfLMJN1 (ORCPT
+        id S1726877AbfLMJ1v (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Fri, 13 Dec 2019 04:27:51 -0500
+Received: from esa2.hc3370-68.iphmx.com ([216.71.145.153]:31428 "EHLO
+        esa2.hc3370-68.iphmx.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S1726779AbfLMJ1u (ORCPT
         <rfc822;linux-block@vger.kernel.org>);
-        Fri, 13 Dec 2019 04:13:27 -0500
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-  d=amazon.com; i=@amazon.com; q=dns/txt; s=amazon201209;
-  t=1576228406; x=1607764406;
-  h=from:to:cc:subject:date:message-id:references:
-   in-reply-to:content-id:content-transfer-encoding:
-   mime-version;
-  bh=CBG1FDANtU5OZr3itkCR/uZ0kGzF/Rp81mdKwZKZTmw=;
-  b=NS6Anzv2chFhdGEz7LHsKDZeWd72YiVKmNEojWbgpdtPAcsaNda0ORmq
-   +T5hO4gZUocOKGI2Wuy868vl6KjmYXn6AO1VdXNGMlF3uxtBB/ekMqOJG
-   tRofJEkXwviKzUkIwXXDvQC2oy+oIkvW3forIjO2pLrFSt6OaO0xh5KJG
-   E=;
-IronPort-SDR: R4EWnN0LcLv3X8VjF98eHYXSiwobj13NuJFtg1jfSe3jZQPRiaEXcXvdv2mR/rTU60u/8H6D4+
- oZHClg/pP4ww==
-X-IronPort-AV: E=Sophos;i="5.69,309,1571702400"; 
-   d="scan'208";a="13309466"
-Received: from sea32-co-svc-lb4-vlan3.sea.corp.amazon.com (HELO email-inbound-relay-2a-119b4f96.us-west-2.amazon.com) ([10.47.23.38])
-  by smtp-border-fw-out-9102.sea19.amazon.com with ESMTP; 13 Dec 2019 09:13:13 +0000
-Received: from EX13MTAUWB001.ant.amazon.com (pdx4-ws-svc-p6-lb7-vlan2.pdx.amazon.com [10.170.41.162])
-        by email-inbound-relay-2a-119b4f96.us-west-2.amazon.com (Postfix) with ESMTPS id 216D91A1E8F;
-        Fri, 13 Dec 2019 09:13:11 +0000 (UTC)
-Received: from EX13D11UWB004.ant.amazon.com (10.43.161.90) by
- EX13MTAUWB001.ant.amazon.com (10.43.161.207) with Microsoft SMTP Server (TLS)
- id 15.0.1367.3; Fri, 13 Dec 2019 09:13:11 +0000
-Received: from EX13D01UWB002.ant.amazon.com (10.43.161.136) by
- EX13D11UWB004.ant.amazon.com (10.43.161.90) with Microsoft SMTP Server (TLS)
- id 15.0.1367.3; Fri, 13 Dec 2019 09:13:11 +0000
-Received: from EX13D01UWB002.ant.amazon.com ([10.43.161.136]) by
- EX13d01UWB002.ant.amazon.com ([10.43.161.136]) with mapi id 15.00.1367.000;
- Fri, 13 Dec 2019 09:13:11 +0000
-From:   "Singh, Balbir" <sblbir@amazon.com>
-To:     "hch@lst.de" <hch@lst.de>
-CC:     "linux-kernel@vger.kernel.org" <linux-kernel@vger.kernel.org>,
-        "jejb@linux.ibm.com" <jejb@linux.ibm.com>,
-        "linux-block@vger.kernel.org" <linux-block@vger.kernel.org>,
-        "mst@redhat.com" <mst@redhat.com>,
-        "linux-nvme@lists.infradead.org" <linux-nvme@lists.infradead.org>,
-        "axboe@kernel.dk" <axboe@kernel.dk>,
-        "Sangaraju, Someswarudu" <ssomesh@amazon.com>
-Subject: Re: [RFC PATCH] block/genhd: Notify udev about capacity change
-Thread-Topic: [RFC PATCH] block/genhd: Notify udev about capacity change
-Thread-Index: AQHVrwYjh2l0GmmZOEmELsmopgOsAqe2RkCAgAGGxwA=
-Date:   Fri, 13 Dec 2019 09:13:10 +0000
-Message-ID: <8dee699c66a2c8532bd82515291d7fa86cab93f4.camel@amazon.com>
-References: <20191210030131.4198-1-sblbir@amazon.com>
-         <20191212095431.GA3720@lst.de>
-In-Reply-To: <20191212095431.GA3720@lst.de>
-Accept-Language: en-GB, en-US
-Content-Language: en-US
-X-MS-Has-Attach: 
-X-MS-TNEF-Correlator: 
-x-ms-exchange-messagesentrepresentingtype: 1
-x-ms-exchange-transport-fromentityheader: Hosted
-x-originating-ip: [10.43.160.100]
-Content-Type: text/plain; charset="utf-8"
-Content-ID: <85A3E586BE61E449B1EB82A25A1F7677@amazon.com>
-Content-Transfer-Encoding: base64
+        Fri, 13 Dec 2019 04:27:50 -0500
+DKIM-Signature: v=1; a=rsa-sha256; c=simple/simple;
+  d=citrix.com; s=securemail; t=1576229270;
+  h=date:from:to:cc:subject:message-id:references:
+   mime-version:content-transfer-encoding:in-reply-to;
+  bh=f+X38mKQSNA9F1owN4qTfTPlaJCpeqkXKbc60h1txgQ=;
+  b=T0u2UpOsUku1+QCS++Ob9qG0Jh+4fOKSunJyjUVIKR4pneK1xOTsgUD/
+   ZDlMwwSQv2Nbfh6kQSyQgeS766qNKfa3AcLgaGGwNY3OgDg7CKV5QI2F2
+   g5yQWQgYWNpGF+wBU2g1Kx8GkBpdJ4wAtPeiW+2ZXDsOHXCmcVGSpTxEc
+   o=;
+Authentication-Results: esa2.hc3370-68.iphmx.com; dkim=none (message not signed) header.i=none; spf=None smtp.pra=roger.pau@citrix.com; spf=Pass smtp.mailfrom=roger.pau@citrix.com; spf=None smtp.helo=postmaster@mail.citrix.com
+Received-SPF: None (esa2.hc3370-68.iphmx.com: no sender
+  authenticity information available from domain of
+  roger.pau@citrix.com) identity=pra; client-ip=162.221.158.21;
+  receiver=esa2.hc3370-68.iphmx.com;
+  envelope-from="roger.pau@citrix.com";
+  x-sender="roger.pau@citrix.com";
+  x-conformance=sidf_compatible
+Received-SPF: Pass (esa2.hc3370-68.iphmx.com: domain of
+  roger.pau@citrix.com designates 162.221.158.21 as permitted
+  sender) identity=mailfrom; client-ip=162.221.158.21;
+  receiver=esa2.hc3370-68.iphmx.com;
+  envelope-from="roger.pau@citrix.com";
+  x-sender="roger.pau@citrix.com";
+  x-conformance=sidf_compatible; x-record-type="v=spf1";
+  x-record-text="v=spf1 ip4:209.167.231.154 ip4:178.63.86.133
+  ip4:195.66.111.40/30 ip4:85.115.9.32/28 ip4:199.102.83.4
+  ip4:192.28.146.160 ip4:192.28.146.107 ip4:216.52.6.88
+  ip4:216.52.6.188 ip4:162.221.158.21 ip4:162.221.156.83
+  ip4:168.245.78.127 ~all"
+Received-SPF: None (esa2.hc3370-68.iphmx.com: no sender
+  authenticity information available from domain of
+  postmaster@mail.citrix.com) identity=helo;
+  client-ip=162.221.158.21; receiver=esa2.hc3370-68.iphmx.com;
+  envelope-from="roger.pau@citrix.com";
+  x-sender="postmaster@mail.citrix.com";
+  x-conformance=sidf_compatible
+IronPort-SDR: mRR8mxiHNJiuEO4mhyjRrklq/JYbq60/KLbQGZxNas5+v41gcVCNPwnUWSx37kMe6XxeDxBJLB
+ +b7DZQS14dbbgTZga8rDngFmMC3FmOFUSjo8Ceeq4m19Ciu0oKXgOpcmhdbWv5QIPvE4PL7up2
+ xfuJRI0M3Wc8+Zg8T++qnNXev8hurdbeOQZhIn/Ex9zNkhnu8Ii05q0sCf6YgJXCVuhi7iUqGv
+ Rd+j9O/c1P0YhRlJtMJGzgEuDaGNwhmdOzK+F4eT//M2Zu8t0Q2PsbB32PtRZ8N2n5WnULvX7/
+ 1Iw=
+X-SBRS: 2.7
+X-MesageID: 9639731
+X-Ironport-Server: esa2.hc3370-68.iphmx.com
+X-Remote-IP: 162.221.158.21
+X-Policy: $RELAYED
+X-IronPort-AV: E=Sophos;i="5.69,309,1571716800"; 
+   d="scan'208";a="9639731"
+Date:   Fri, 13 Dec 2019 10:27:42 +0100
+From:   Roger Pau =?iso-8859-1?Q?Monn=E9?= <roger.pau@citrix.com>
+To:     SeongJae Park <sj38.park@gmail.com>
+CC:     <jgross@suse.com>, <axboe@kernel.dk>, <sjpark@amazon.com>,
+        <konrad.wilk@oracle.com>, <pdurrant@amazon.com>,
+        SeongJae Park <sjpark@amazon.de>,
+        <linux-kernel@vger.kernel.org>, <linux-block@vger.kernel.org>,
+        <xen-devel@lists.xenproject.org>
+Subject: Re: Re: [Xen-devel] [PATCH v7 2/3] xen/blkback: Squeeze page pools
+ if a memory pressure is detected
+Message-ID: <20191213092742.GG11756@Air-de-Roger>
+References: <20191212152757.GF11756@Air-de-Roger>
+ <20191212160658.10466-1-sj38.park@gmail.com>
 MIME-Version: 1.0
+Content-Type: text/plain; charset="iso-8859-1"
+Content-Disposition: inline
+Content-Transfer-Encoding: 8bit
+In-Reply-To: <20191212160658.10466-1-sj38.park@gmail.com>
+X-ClientProxiedBy: AMSPEX02CAS02.citrite.net (10.69.22.113) To
+ AMSPEX02CL03.citrite.net (10.69.22.127)
 Sender: linux-block-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-T24gVGh1LCAyMDE5LTEyLTEyIGF0IDEwOjU0ICswMTAwLCBDaHJpc3RvcGggSGVsbHdpZyB3cm90
-ZToNCj4gT24gVHVlLCBEZWMgMTAsIDIwMTkgYXQgMDM6MDE6MzFBTSArMDAwMCwgQmFsYmlyIFNp
-bmdoIHdyb3RlOg0KPiA+IEFsbG93IGJsb2NrL2dlbmhkIHRvIG5vdGlmeSB1c2VyIHNwYWNlICh2
-aWEgdWRldikgYWJvdXQgZGlzayBzaXplIGNoYW5nZXMNCj4gPiB1c2luZyBhIG5ldyBoZWxwZXIg
-ZGlza19zZXRfY2FwYWNpdHkoKSwgd2hpY2ggaXMgYSB3cmFwcGVyIG9uIHRvcA0KPiA+IG9mIHNl
-dF9jYXBhY2l0eSgpLiBkaXNrX3NldF9jYXBhY2l0eSgpIHdpbGwgb25seSBub3RpZnkgdmlhIHVk
-ZXYgaWYNCj4gPiB0aGUgY3VycmVudCBjYXBhY2l0eSBvciB0aGUgdGFyZ2V0IGNhcGFjaXR5IGlz
-IG5vdCB6ZXJvLg0KPiA+IA0KPiA+IGRpc2tfc2V0X2NhcGFjaXR5KCkgaXMgbm90IGVuYWJsZWQg
-Zm9yIGFsbCBkZXZpY2VzLCBqdXN0IHZpcnRpbyBibG9jaywNCj4gPiB4ZW4tYmxvY2tmcm9udCwg
-bnZtZSBhbmQgc2QuIE93bmVycyBvZiBvdGhlciBibG9jayBkaXNrIGRldmljZXMgY2FuDQo+ID4g
-ZWFzaWx5IG1vdmUgb3ZlciBieSBjaGFuZ2luZyBzZXRfY2FwYWNpdHkoKSB0byBkaXNrX3NldF9j
-YXBhY2l0eSgpDQo+ID4gDQo+ID4gQmFja2dyb3VuZDoNCj4gPiANCj4gPiBBcyBhIHBhcnQgb2Yg
-YSBwYXRjaCB0byBhbGxvdyBzZW5kaW5nIHRoZSBSRVNJWkUgZXZlbnQgb24gZGlzayBjYXBhY2l0
-eQ0KPiA+IGNoYW5nZSwgQ2hyaXN0b3BoIChoY2hAbHN0LmRlKSByZXF1ZXN0ZWQgdGhhdCB0aGUg
-cGF0Y2ggYmUgbWFkZSBnZW5lcmljDQo+ID4gYW5kIHRoZSBoYWNrcyBmb3IgdmlydGlvIGJsb2Nr
-IGFuZCB4ZW4gYmxvY2sgZGV2aWNlcyBiZSByZW1vdmVkIGFuZA0KPiA+IG1lcmdlZCB2aWEgYSBn
-ZW5lcmljIGhlbHBlci4NCj4gPiANCj4gPiBUZXN0aW5nOg0KPiA+IDEuIEkgZGlkIHNvbWUgYmFz
-aWMgdGVzdGluZyB3aXRoIGFuIE5WTUUgZGV2aWNlLCBieSByZXNpemluZyBpdCBpbg0KPiA+IHRo
-ZSBiYWNrZW5kIGFuZCBlbnN1cmVkIHRoYXQgdWRldmQgcmVjZWl2ZWQgdGhlIGV2ZW50Lg0KPiA+
-IA0KPiA+IFN1Z2dlc3RlZC1ieTogQ2hyaXN0b3BoIEhlbGx3aWcgPGhjaEBsc3QuZGU+DQo+ID4g
-U2lnbmVkLW9mZi1ieTogQmFsYmlyIFNpbmdoIDxzYmxiaXJAYW1hem9uLmNvbT4NCj4gPiBTaWdu
-ZWQtb2ZmLWJ5OiBTb21lc3dhcnVkdSBTYW5nYXJhanUgPHNzb21lc2hAYW1hem9uLmNvbT4NCj4g
-PiAtLS0NCj4gPiAgYmxvY2svZ2VuaGQuYyAgICAgICAgICAgICAgICB8IDE5ICsrKysrKysrKysr
-KysrKysrKysNCj4gPiAgZHJpdmVycy9ibG9jay92aXJ0aW9fYmxrLmMgICB8ICA0ICstLS0NCj4g
-PiAgZHJpdmVycy9ibG9jay94ZW4tYmxrZnJvbnQuYyB8ICA1ICstLS0tDQo+ID4gIGRyaXZlcnMv
-bnZtZS9ob3N0L2NvcmUuYyAgICAgfCAgMiArLQ0KPiA+ICBkcml2ZXJzL3Njc2kvc2QuYyAgICAg
-ICAgICAgIHwgIDIgKy0NCj4gPiAgaW5jbHVkZS9saW51eC9nZW5oZC5oICAgICAgICB8ICAxICsN
-Cj4gPiAgNiBmaWxlcyBjaGFuZ2VkLCAyNCBpbnNlcnRpb25zKCspLCA5IGRlbGV0aW9ucygtKQ0K
-PiA+IA0KPiA+IGRpZmYgLS1naXQgYS9ibG9jay9nZW5oZC5jIGIvYmxvY2svZ2VuaGQuYw0KPiA+
-IGluZGV4IGZmNjI2ODk3MGRkYy4uOTRmYWVjOTg2MDdiIDEwMDY0NA0KPiA+IC0tLSBhL2Jsb2Nr
-L2dlbmhkLmMNCj4gPiArKysgYi9ibG9jay9nZW5oZC5jDQo+ID4gQEAgLTQ2LDYgKzQ2LDI1IEBA
-IHN0YXRpYyB2b2lkIGRpc2tfYWRkX2V2ZW50cyhzdHJ1Y3QgZ2VuZGlzayAqZGlzayk7DQo+ID4g
-IHN0YXRpYyB2b2lkIGRpc2tfZGVsX2V2ZW50cyhzdHJ1Y3QgZ2VuZGlzayAqZGlzayk7DQo+ID4g
-IHN0YXRpYyB2b2lkIGRpc2tfcmVsZWFzZV9ldmVudHMoc3RydWN0IGdlbmRpc2sgKmRpc2spOw0K
-PiA+ICANCj4gPiArLyoNCj4gPiArICogU2V0IGRpc2sgY2FwYWNpdHkgYW5kIG5vdGlmeSBpZiB0
-aGUgc2l6ZSBpcyBub3QgY3VycmVudGx5DQo+ID4gKyAqIHplcm8gYW5kIHdpbGwgbm90IGJlIHNl
-dCB0byB6ZXJvDQo+IA0KPiBOaXQ6IFVzZSB1cCBhbGwgdGhlIDgwIGNoYXJzIHBlciBsaW5lLiAg
-QWxzbyBtYXliZSB0dXJuIHRoaXMgaW50byBhDQo+IGtlcm5lbGRvYyBjb21tZW50LiAgSSB0aGlu
-ayB5b3UgYWxzbyB3YW50IHRvIG1lbnRpb24gdGhlIG5vdGlmaWNhdGlvbg0KPiBhcyB3ZWxsLg0K
-DQpXaWxsIGRvIQ0KDQo+IA0KPiA+ICtFWFBPUlRfU1lNQk9MX0dQTChkaXNrX3NldF9jYXBhY2l0
-eSk7DQo+ID4gKw0KPiA+ICsNCj4gPiAgdm9pZCBwYXJ0X2luY19pbl9mbGlnaHQoc3RydWN0IHJl
-cXVlc3RfcXVldWUgKnEsIHN0cnVjdCBoZF9zdHJ1Y3QgKnBhcnQsDQo+ID4gaW50IHJ3KQ0KPiAN
-Cj4gTm8gbmVlZCBmb3IgdGhlIGRvdWJsZSBlbXB0eSBsaW5lLg0KPiANCj4gPiAgew0KPiA+ICAJ
-aWYgKHF1ZXVlX2lzX21xKHEpKQ0KPiA+IGRpZmYgLS1naXQgYS9kcml2ZXJzL2Jsb2NrL3ZpcnRp
-b19ibGsuYyBiL2RyaXZlcnMvYmxvY2svdmlydGlvX2Jsay5jDQo+ID4gaW5kZXggN2ZmZDcxOWQ4
-OWRlLi44NjljZDNjMzE1MjkgMTAwNjQ0DQo+ID4gLS0tIGEvZHJpdmVycy9ibG9jay92aXJ0aW9f
-YmxrLmMNCj4gPiArKysgYi9kcml2ZXJzL2Jsb2NrL3ZpcnRpb19ibGsuYw0KPiANCj4gQW5kIHlv
-dSBwcm9iYWJseSB3YW50IHRvIHR1cm4gdGhpcyBpbnRvIGEgc2VyaWVzIHdpdGggcGF0Y2ggMSBh
-ZGRpbmcNCj4gdGhlIGluZnJhc3RydWN0dXJlLCBhbmQgdGhlbiBvbmUgcGF0Y2ggcGVyIGRyaXZl
-ciBzd2l0Y2hlZCBvdmVyLg0KTWFrZXMgc2Vuc2UsIHdpbGwgZG8NCg0KVGhhbmtzIGZvciB0aGUg
-ZmVlZGJhY2sNCkJhbGJpciBTaW5naC4NCg==
+On Thu, Dec 12, 2019 at 05:06:58PM +0100, SeongJae Park wrote:
+> On Thu, 12 Dec 2019 16:27:57 +0100 "Roger Pau Monné" <roger.pau@citrix.com> wrote:
+> 
+> > > diff --git a/drivers/block/xen-blkback/blkback.c b/drivers/block/xen-blkback/blkback.c
+> > > index fd1e19f1a49f..98823d150905 100644
+> > > --- a/drivers/block/xen-blkback/blkback.c
+> > > +++ b/drivers/block/xen-blkback/blkback.c
+> > > @@ -142,6 +142,21 @@ static inline bool persistent_gnt_timeout(struct persistent_gnt *persistent_gnt)
+> > >  		HZ * xen_blkif_pgrant_timeout);
+> > >  }
+> > >  
+> > > +/* Once a memory pressure is detected, squeeze free page pools for a while. */
+> > > +static unsigned int buffer_squeeze_duration_ms = 10;
+> > > +module_param_named(buffer_squeeze_duration_ms,
+> > > +		buffer_squeeze_duration_ms, int, 0644);
+> > > +MODULE_PARM_DESC(buffer_squeeze_duration_ms,
+> > > +"Duration in ms to squeeze pages buffer when a memory pressure is detected");
+> > > +
+> > > +static unsigned long buffer_squeeze_end;
+> > > +
+> > > +void xen_blkbk_reclaim_memory(struct xenbus_device *dev)
+> > > +{
+> > > +	buffer_squeeze_end = jiffies +
+> > > +		msecs_to_jiffies(buffer_squeeze_duration_ms);
+> > 
+> > I'm not sure this is fully correct. This function will be called for
+> > each blkback instance, but the timeout is stored in a global variable
+> > that's shared between all blkback instances. Shouldn't this timeout be
+> > stored in xen_blkif so each instance has it's own local variable?
+> > 
+> > Or else in the case you have 1k blkback instances the timeout is
+> > certainly going to be longer than expected, because each call to
+> > xen_blkbk_reclaim_memory will move it forward.
+> 
+> Agreed that.  I think the extended timeout would not make a visible
+> performance, though, because the time that 1k-loop take would be short enough
+> to be ignored compared to the millisecond-scope duration.
+> 
+> I took this way because I wanted to minimize such structural changes as far as
+> I can, as this is just a point-fix rather than ultimate solution.  That said,
+> it is not fully correct and very confusing.  My another colleague also pointed
+> out it in internal review.  Correct solution would be to adding a variable in
+> the struct as you suggested or avoiding duplicated update of the variable by
+> initializing the variable once the squeezing duration passes.  I would prefer
+> the later way, as it is more straightforward and still not introducing
+> structural change.  For example, it might be like below:
+> 
+> diff --git a/drivers/block/xen-blkback/blkback.c b/drivers/block/xen-blkback/blkback.c
+> index f41c698dd854..6856c8ef88de 100644
+> --- a/drivers/block/xen-blkback/blkback.c
+> +++ b/drivers/block/xen-blkback/blkback.c
+> @@ -152,8 +152,9 @@ static unsigned long buffer_squeeze_end;
+>  
+>  void xen_blkbk_reclaim_memory(struct xenbus_device *dev)
+>  {
+> -       buffer_squeeze_end = jiffies +
+> -               msecs_to_jiffies(buffer_squeeze_duration_ms);
+> +       if (!buffer_squeeze_end)
+> +               buffer_squeeze_end = jiffies +
+> +                       msecs_to_jiffies(buffer_squeeze_duration_ms);
+>  }
+>  
+>  static inline int get_free_page(struct xen_blkif_ring *ring, struct page **page)
+> @@ -669,10 +670,13 @@ int xen_blkif_schedule(void *arg)
+>                 }
+>  
+>                 /* Shrink the free pages pool if it is too large. */
+> -               if (time_before(jiffies, buffer_squeeze_end))
+> +               if (time_before(jiffies, buffer_squeeze_end)) {
+>                         shrink_free_pagepool(ring, 0);
+> -               else
+> +               } else {
+> +                       if (unlikely(buffer_squeeze_end))
+> +                               buffer_squeeze_end = 0;
+>                         shrink_free_pagepool(ring, max_buffer_pages);
+> +               }
+>  
+>                 if (log_stats && time_after(jiffies, ring->st_print))
+>                         print_stats(ring);
+> 
+> May I ask you what way would you prefer?
+
+I'm not particularly found of this approach, as I think it's racy. Ie:
+you would have to add some kind of lock to make sure the contents of
+buffer_squeeze_end stay unmodified during the read and set cycle, or
+else xen_blkif_schedule will race with xen_blkbk_reclaim_memory.
+
+This is likely not a big deal ATM since the code will work as
+expected in most cases AFAICT, but I would still prefer to have a
+per-instance buffer_squeeze_end added to xen_blkif, given that the
+callback is per-instance. I wouldn't call it a structural change, it's
+just adding a variable to a struct instead of having a shared one, but
+the code is almost the same as the current version.
+
+Thanks, Roger.
