@@ -2,224 +2,256 @@ Return-Path: <SRS0=J0ZO=2D=vger.kernel.org=linux-block-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-0.8 required=3.0 tests=DKIM_SIGNED,DKIM_VALID,
-	DKIM_VALID_AU,HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SPF_HELO_NONE,
-	SPF_PASS autolearn=no autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-8.3 required=3.0 tests=DKIMWL_WL_HIGH,DKIM_SIGNED,
+	DKIM_VALID,DKIM_VALID_AU,HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,
+	MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,UNPARSEABLE_RELAY,
+	URIBL_BLOCKED,USER_AGENT_SANE_1 autolearn=unavailable autolearn_force=no
+	version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id E52F1C2D0C8
-	for <linux-block@archiver.kernel.org>; Fri, 13 Dec 2019 01:32:31 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id C4939C43603
+	for <linux-block@archiver.kernel.org>; Fri, 13 Dec 2019 02:27:28 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.kernel.org (Postfix) with ESMTP id A6B5D22527
-	for <linux-block@archiver.kernel.org>; Fri, 13 Dec 2019 01:32:31 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id 901A221655
+	for <linux-block@archiver.kernel.org>; Fri, 13 Dec 2019 02:27:28 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=pass (1024-bit key) header.d=fb.com header.i=@fb.com header.b="DVCUBXTp";
-	dkim=pass (1024-bit key) header.d=fb.onmicrosoft.com header.i=@fb.onmicrosoft.com header.b="IEkqI5BM"
+	dkim=pass (2048-bit key) header.d=oracle.com header.i=@oracle.com header.b="Gh17UR+F"
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1731699AbfLMBca (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Thu, 12 Dec 2019 20:32:30 -0500
-Received: from mx0a-00082601.pphosted.com ([67.231.145.42]:5314 "EHLO
-        mx0a-00082601.pphosted.com" rhost-flags-OK-OK-OK-OK)
-        by vger.kernel.org with ESMTP id S1727070AbfLMBca (ORCPT
+        id S1731366AbfLMC11 (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Thu, 12 Dec 2019 21:27:27 -0500
+Received: from aserp2120.oracle.com ([141.146.126.78]:52990 "EHLO
+        aserp2120.oracle.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S1731330AbfLMC11 (ORCPT
         <rfc822;linux-block@vger.kernel.org>);
-        Thu, 12 Dec 2019 20:32:30 -0500
-Received: from pps.filterd (m0109334.ppops.net [127.0.0.1])
-        by mx0a-00082601.pphosted.com (8.16.0.42/8.16.0.42) with SMTP id xBD1TNSi016789;
-        Thu, 12 Dec 2019 17:32:13 -0800
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=fb.com; h=from : to : cc : subject
- : date : message-id : references : in-reply-to : content-type :
- content-transfer-encoding : mime-version; s=facebook;
- bh=2KNVzVM2kUItAfJ5cvyp8GdVfELXumXuvDr4Ww5ueQk=;
- b=DVCUBXTp8CiSDsa92dpCoyXY+szdDaNowpMjCdm6eHmKyJpywY5v6ZLKYsaLiHyxWWh/
- lBLgqIJykkePfDJOQuPN9qvK95/W10xg7AsSYj5GhXj1OCdMW/TpdKBFduxSbji1weBM
- i4NH3M8Ko681L35fiaH0aKu+2fTYjeBwf80= 
-Received: from maileast.thefacebook.com ([163.114.130.16])
-        by mx0a-00082601.pphosted.com with ESMTP id 2wuskg2be2-1
-        (version=TLSv1.2 cipher=ECDHE-RSA-AES128-GCM-SHA256 bits=128 verify=NOT);
-        Thu, 12 Dec 2019 17:32:13 -0800
-Received: from ash-exhub101.TheFacebook.com (2620:10d:c0a8:82::e) by
- ash-exhub202.TheFacebook.com (2620:10d:c0a8:83::6) with Microsoft SMTP Server
- (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256) id
- 15.1.1713.5; Thu, 12 Dec 2019 17:32:11 -0800
-Received: from NAM10-MW2-obe.outbound.protection.outlook.com (100.104.31.183)
- by o365-in.thefacebook.com (100.104.35.173) with Microsoft SMTP Server
- (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256) id 15.1.1713.5
- via Frontend Transport; Thu, 12 Dec 2019 17:32:11 -0800
-ARC-Seal: i=1; a=rsa-sha256; s=arcselector9901; d=microsoft.com; cv=none;
- b=kcVXsLAhLoxbUGlWNNRxFBMfnxVp/gM7/uDpos0f/QvcRpjGKVGtrXHvt4T+T/n5gdZnZjyooxUKp0vdoyyyzUNypqRivGNQUQ/pyqZjaWYMjgj5fTgnptuD23anSGWFHaXAo9iaKV27+B0PqDONp3Oh14j8JmXWXIAAo5DRP40kSfeGXXMYbPh03HdkzeW4ZV5JZ9vMCQusHuLIkXhn4amqn97K4D2n8Iel9JtjsYLLwRaGf+2EivAj4RTnllvYe8YVSq+/uwDzwRIo4nWO/zm49EJpkTniQnrhjEfMII6N0+hrJWO6WxHsfq9KoEPGt3sbrZU+Jc3PG0v8puQQPA==
-ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com;
- s=arcselector9901;
- h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
- bh=2KNVzVM2kUItAfJ5cvyp8GdVfELXumXuvDr4Ww5ueQk=;
- b=WkTPLQj+yI8io/IkojDerTM3bCcLJ4k9l+lHnMQYh3zhVkL62Kfg9nWgVAcZsc9H6LWNs97zVDY/oDatQO5/caJobUTKLVYiM16VwgcJE2NgliWKzHJcJiwhVh4xXYjznyCts5C8b9vV8rEmjXKLdZGXAVph8ILXMbMb14zwqkxk6McGaliR/G8rpv4eJCGvWjL89mn9KKxv511FFJFFwJfkor+oHYl3w9OosWLopTLrQ7bJg/1urN11iAGN9wSMYQ8cipRPZXc1bPBToP01TgMFMX78od82iCw1hd5zGbeKK0qpoAL1+OgRabjExoZgfXqaKmg+nexyMRbI2xq8WQ==
-ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass
- smtp.mailfrom=fb.com; dmarc=pass action=none header.from=fb.com; dkim=pass
- header.d=fb.com; arc=none
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=fb.onmicrosoft.com;
- s=selector2-fb-onmicrosoft-com;
- h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
- bh=2KNVzVM2kUItAfJ5cvyp8GdVfELXumXuvDr4Ww5ueQk=;
- b=IEkqI5BMjDZHdbV3t2/rC+px57006LmW1GirXTUn5re2KNW+jH0IDvT4GTzaGdytnrWPq62eokF1SwIpp06ni8blZZrAYDGsn6PLPDugHIJeHlp21FAaZgLcpdFqkJLoB5eJPbhA7y8die+2R7+2taKytRhOQlS1Ei2nTNNpxCc=
-Received: from SN6PR15MB2446.namprd15.prod.outlook.com (52.135.64.153) by
- SN6PR15MB2367.namprd15.prod.outlook.com (52.132.124.148) with Microsoft SMTP
- Server (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
- 15.20.2538.17; Fri, 13 Dec 2019 01:32:10 +0000
-Received: from SN6PR15MB2446.namprd15.prod.outlook.com
- ([fe80::21bd:84c5:4e24:4695]) by SN6PR15MB2446.namprd15.prod.outlook.com
- ([fe80::21bd:84c5:4e24:4695%6]) with mapi id 15.20.2538.017; Fri, 13 Dec 2019
- 01:32:10 +0000
-From:   Chris Mason <clm@fb.com>
-To:     Dave Chinner <david@fromorbit.com>
-CC:     Jens Axboe <axboe@kernel.dk>,
-        Linus Torvalds <torvalds@linux-foundation.org>,
-        Linux-MM <linux-mm@kvack.org>,
-        linux-fsdevel <linux-fsdevel@vger.kernel.org>,
-        linux-block <linux-block@vger.kernel.org>,
-        Matthew Wilcox <willy@infradead.org>,
-        Johannes Weiner <hannes@cmpxchg.org>
-Subject: Re: [PATCHSET v3 0/5] Support for RWF_UNCACHED
-Thread-Topic: [PATCHSET v3 0/5] Support for RWF_UNCACHED
-Thread-Index: AQHVsDfZCAhJpFV97UaB5wo39Jtv8ae1MtkAgAAFQoCAABuEAIAACAuAgAABbACAAALSAIAAOMgAgAAYaQCAAWKTAIAANieA
-Date:   Fri, 13 Dec 2019 01:32:10 +0000
-Message-ID: <C08B7F86-C3D6-47C6-AB17-6F234EA33687@fb.com>
-References: <20191211152943.2933-1-axboe@kernel.dk>
- <CAHk-=wjz3LE1kznro1dozhk9i9Dr4pCnkj7Fuccn2xdWeGHawQ@mail.gmail.com>
- <d0adcde2-3106-4fea-c047-4d17111bab70@kernel.dk>
- <e43a2700-8625-e136-dc9d-d0d2da5d96ac@kernel.dk>
- <CAHk-=wje8i3DVcO=fMC4tzKTS5+eHv0anrVZa_JENQt08T=qCQ@mail.gmail.com>
- <0d4e3954-c467-30a7-5a8e-7c4180275533@kernel.dk>
- <CAHk-=whk4bcVPvtAv5OmHiW5z6AXgCLFhO4YrXD7o0XC+K-aHw@mail.gmail.com>
- <fef996ca-a4ed-9633-1f79-91292a984a20@kernel.dk>
- <e7fc6b37-8106-4fe2-479c-05c3f2b1c1f1@kernel.dk>
- <20191212221818.GG19213@dread.disaster.area>
-In-Reply-To: <20191212221818.GG19213@dread.disaster.area>
-Accept-Language: en-US
-Content-Language: en-US
-X-MS-Has-Attach: 
-X-MS-TNEF-Correlator: 
-x-mailer: MailMate (1.10r5443)
-x-clientproxiedby: MN2PR20CA0016.namprd20.prod.outlook.com
- (2603:10b6:208:e8::29) To SN6PR15MB2446.namprd15.prod.outlook.com
- (2603:10b6:805:22::25)
-x-ms-exchange-messagesentrepresentingtype: 1
-x-originating-ip: [2620:10d:c091:480::326]
-x-ms-publictraffictype: Email
-x-ms-office365-filtering-correlation-id: bcdde16c-1fcc-4284-cbea-08d77f6c45dc
-x-ms-traffictypediagnostic: SN6PR15MB2367:
-x-microsoft-antispam-prvs: <SN6PR15MB2367529B68DCBC7EAB26B6EAD3540@SN6PR15MB2367.namprd15.prod.outlook.com>
-x-ms-oob-tlc-oobclassifiers: OLM:10000;
-x-forefront-prvs: 0250B840C1
-x-forefront-antispam-report: SFV:NSPM;SFS:(10019020)(136003)(346002)(39860400002)(376002)(366004)(396003)(189003)(199004)(51444003)(478600001)(2616005)(6486002)(71200400001)(81156014)(5660300002)(186003)(6916009)(53546011)(6506007)(8936002)(52116002)(8676002)(81166006)(54906003)(86362001)(2906002)(316002)(36756003)(33656002)(6512007)(66446008)(64756008)(66946007)(66476007)(66556008)(4326008);DIR:OUT;SFP:1102;SCL:1;SRVR:SN6PR15MB2367;H:SN6PR15MB2446.namprd15.prod.outlook.com;FPR:;SPF:None;LANG:en;PTR:InfoNoRecords;MX:1;A:1;
-received-spf: None (protection.outlook.com: fb.com does not designate
- permitted sender hosts)
-x-ms-exchange-senderadcheck: 1
-x-microsoft-antispam: BCL:0;
-x-microsoft-antispam-message-info: cSxGGaXGUMcQWDYgWSWcXPGqbqsdgnYh6P9d6liy7LGctFX8/ZZkrHja381H+1kD1AxkAhVWZq0bids3BeK3w5Wa8H52zMAbS4SFwRazI3kwL5wtPjOdWRpGp4zKY7O82oNf0rpOb6VxC6Yc9g0KTpFf5sF/XFp1q4xbIUYgWzyjpEK0mPwnDogESUSv4d1ggUF9ss32aWkS8TG4Ty5++2/kzXTXUDe6SRmk/1LnOh3ejvtokx+9Zap20oaj6+mXrWvuaJjdm58wvDIDs1XCVetuH1c9WcdZdtozf5e8u9S5UgHKwqICk+0rmiP1H3bUrLWnaQkUL2ziEB+nbvMD6K68DQOC4l+b5s9P8hk8aAbc0UXBxGV/Az/76CIi4foilxNo6nCNtS7mecBrJjONSjhTGO3xDWebh87/lMCEzYrqQ58F2OG3SNwQArr+w8QEZ87NTb7adPGqmOfGdJVQulTb5fSUtpkUN9QAkk2Q77E2uPw3M67D4wucpyjQlLSp
-x-ms-exchange-transport-forked: True
-Content-Type: text/plain; charset="iso-8859-1"
-Content-Transfer-Encoding: quoted-printable
+        Thu, 12 Dec 2019 21:27:27 -0500
+Received: from pps.filterd (aserp2120.oracle.com [127.0.0.1])
+        by aserp2120.oracle.com (8.16.0.27/8.16.0.27) with SMTP id xBD2OgHp016387;
+        Fri, 13 Dec 2019 02:27:00 GMT
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=oracle.com; h=mime-version :
+ message-id : date : from : to : cc : subject : references : in-reply-to :
+ content-type : content-transfer-encoding; s=corp-2019-08-05;
+ bh=ezI5Hm7Ylq9q8YZeLlKlEfbheDOvaElbiAJvafzEp7M=;
+ b=Gh17UR+FmwF8t4a6ekezcTj2culQSvyApGdRNxqZp76Ihkv2QnisG8mSmuIT8RqNce1Z
+ +u7VU0/K0to4IWLFyWaMK+fT34ttYsxJnh5A8z3uFwS/hKjSZ8zCtCYx+DHhIQ+qHWTN
+ 3x5/otkJSbMIfjxfH9kpVzXDhlMUhBupwI3/jLsUp2BhXMkvg3TzOtEWrt1yRc/jyFGN
+ ovvbQThUjTYu8Q7A/QyQkaUxt8ciJXEiAE687ieLsQniLpj5SnyDdk9XRk/xSGE5w6AC
+ NU/YrPGwGVgO76xNTxoDL8jew6xSQ71fGUPbFq6PCTV1DgHJEFZRkVG/JlqDxgeX6jw1 6w== 
+Received: from userp3020.oracle.com (userp3020.oracle.com [156.151.31.79])
+        by aserp2120.oracle.com with ESMTP id 2wr41qphsj-1
+        (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=OK);
+        Fri, 13 Dec 2019 02:26:59 +0000
+Received: from pps.filterd (userp3020.oracle.com [127.0.0.1])
+        by userp3020.oracle.com (8.16.0.27/8.16.0.27) with SMTP id xBD2OTrk188698;
+        Fri, 13 Dec 2019 02:26:59 GMT
+Received: from userv0122.oracle.com (userv0122.oracle.com [156.151.31.75])
+        by userp3020.oracle.com with ESMTP id 2wumsabp0q-1
+        (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=OK);
+        Fri, 13 Dec 2019 02:26:58 +0000
+Received: from abhmp0002.oracle.com (abhmp0002.oracle.com [141.146.116.8])
+        by userv0122.oracle.com (8.14.4/8.14.4) with ESMTP id xBD2Qr4Y001936;
+        Fri, 13 Dec 2019 02:26:53 GMT
+Received: from localhost (/10.145.178.64) by default (Oracle Beehive Gateway
+ v4.0) with ESMTP ; Thu, 12 Dec 2019 18:26:35 -0800
+USER-AGENT: Mutt/1.9.4 (2018-02-28)
 MIME-Version: 1.0
-X-MS-Exchange-CrossTenant-Network-Message-Id: bcdde16c-1fcc-4284-cbea-08d77f6c45dc
-X-MS-Exchange-CrossTenant-originalarrivaltime: 13 Dec 2019 01:32:10.4046
- (UTC)
-X-MS-Exchange-CrossTenant-fromentityheader: Hosted
-X-MS-Exchange-CrossTenant-id: 8ae927fe-1255-47a7-a2af-5f3a069daaa2
-X-MS-Exchange-CrossTenant-mailboxtype: HOSTED
-X-MS-Exchange-CrossTenant-userprincipalname: OJTJm9xGPEBF0evSqumb8pAubewak+JHM2Yw7/y4nUeNILC5mnB39T6WMyi2DjIE
-X-MS-Exchange-Transport-CrossTenantHeadersStamped: SN6PR15MB2367
-X-OriginatorOrg: fb.com
-X-Proofpoint-Virus-Version: vendor=fsecure engine=2.50.10434:6.0.95,18.0.572
- definitions=2019-12-12_08:2019-12-12,2019-12-12 signatures=0
-X-Proofpoint-Spam-Details: rule=fb_default_notspam policy=fb_default score=0 mlxlogscore=854
- suspectscore=0 impostorscore=0 priorityscore=1501 clxscore=1011
- adultscore=0 bulkscore=0 malwarescore=0 mlxscore=0 spamscore=0
- lowpriorityscore=0 phishscore=0 classifier=spam adjust=0 reason=mlx
- scancount=1 engine=8.12.0-1910280000 definitions=main-1912130010
-X-FB-Internal: deliver
+Message-ID: <20191213022634.GA99868@magnolia>
+Date:   Thu, 12 Dec 2019 18:26:34 -0800 (PST)
+From:   "Darrick J. Wong" <darrick.wong@oracle.com>
+To:     Jens Axboe <axboe@kernel.dk>
+Cc:     linux-mm@kvack.org, linux-fsdevel@vger.kernel.org,
+        linux-block@vger.kernel.org, willy@infradead.org, clm@fb.com,
+        torvalds@linux-foundation.org, david@fromorbit.com
+Subject: Re: [PATCH 5/5] iomap: support RWF_UNCACHED for buffered writes
+References: <20191212190133.18473-1-axboe@kernel.dk>
+ <20191212190133.18473-6-axboe@kernel.dk>
+In-Reply-To: <20191212190133.18473-6-axboe@kernel.dk>
+Content-Type: text/plain; charset=us-ascii
+Content-Transfer-Encoding: 7bit
+X-Proofpoint-Virus-Version: vendor=nai engine=6000 definitions=9469 signatures=668685
+X-Proofpoint-Spam-Details: rule=notspam policy=default score=0 suspectscore=0 malwarescore=0
+ phishscore=0 bulkscore=0 spamscore=0 mlxscore=0 mlxlogscore=999
+ adultscore=0 classifier=spam adjust=0 reason=mlx scancount=1
+ engine=8.0.1-1911140001 definitions=main-1912130019
+X-Proofpoint-Virus-Version: vendor=nai engine=6000 definitions=9469 signatures=668685
+X-Proofpoint-Spam-Details: rule=notspam policy=default score=0 priorityscore=1501 malwarescore=0
+ suspectscore=0 phishscore=0 bulkscore=0 spamscore=0 clxscore=1015
+ lowpriorityscore=0 mlxscore=0 impostorscore=0 mlxlogscore=999 adultscore=0
+ classifier=spam adjust=0 reason=mlx scancount=1 engine=8.0.1-1911140001
+ definitions=main-1912130019
 Sender: linux-block-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-On 12 Dec 2019, at 17:18, Dave Chinner wrote:
+On Thu, Dec 12, 2019 at 12:01:33PM -0700, Jens Axboe wrote:
+> This adds support for RWF_UNCACHED for file systems using iomap to
+> perform buffered writes. We use the generic infrastructure for this,
+> by tracking pages we created and calling write_drop_cached_pages()
+> to issue writeback and prune those pages.
+> 
+> Signed-off-by: Jens Axboe <axboe@kernel.dk>
+> ---
+>  fs/iomap/apply.c       | 24 ++++++++++++++++++++++++
+>  fs/iomap/buffered-io.c | 23 +++++++++++++++++++----
+>  include/linux/iomap.h  |  5 +++++
+>  3 files changed, 48 insertions(+), 4 deletions(-)
+> 
+> diff --git a/fs/iomap/apply.c b/fs/iomap/apply.c
+> index e76148db03b8..11b6812f7b37 100644
+> --- a/fs/iomap/apply.c
+> +++ b/fs/iomap/apply.c
+> @@ -92,5 +92,29 @@ iomap_apply(struct iomap_data *data, const struct iomap_ops *ops,
+>  				     data->flags, &iomap);
+>  	}
+>  
+> +	if (written && (data->flags & IOMAP_UNCACHED)) {
 
-> On Wed, Dec 11, 2019 at 06:09:14PM -0700, Jens Axboe wrote:
->>
->> So Chris and I started talking about this, and pondered "what would
->> happen if we simply bypassed the page cache completely?". Case in=20
->> point,
->> see below incremental patch. We still do the page cache lookup, and=20
->> use
->> that page to copy from if it's there. If the page isn't there,=20
->> allocate
->> one and do IO to it, but DON'T add it to the page cache. With that,
->> we're almost at O_DIRECT levels of performance for the 4k read case,
->> without 1-2%. I think 512b would look awesome, but we're reading full
->> pages, so that won't really help us much. Compared to the previous
->> uncached method, this is 30% faster on this device. That's=20
->> substantial.
->
-> Interesting idea, but this seems like it is just direct IO with
-> kernel pages and a memcpy() rather than just mapping user pages, but
-> has none of the advantages of direct IO in that we can run reads and
-> writes concurrently because it's going through the buffered IO path.
->
-> It also needs all the special DIO truncate/hole punch serialisation
-> mechanisms to be propagated into the buffered IO path - the
-> requirement for inode_dio_wait() serialisation is something I'm
-> trying to remove from XFS, not have to add into more paths. And it
-> introduces the same issues with other buffered read/mmap access to
-> the same file ranges as direct IO has.
->
->> Obviously this has issues with truncate that would need to be=20
->> resolved,
->> and it's definitely dirtier. But the performance is very enticing...
->
-> At which point I have to ask: why are we considering repeating the
-> mistakes that were made with direct IO?  Yes, it might be faster
-> than a coherent RWF_UNCACHED IO implementation, but I don't think
-> making it more like O_DIRECT is worth the price.
->
-> And, ultimately, RWF_UNCACHED will never be as fast as direct IO
-> because it *requires* the CPU to copy the data at least once.
+Hmmm... why is a chunk of buffered write(?) code landing in the iomap
+apply function?
 
-They just have different tradeoffs.  O_DIRECT actively blows away caches=20
-and can also force writes during reads, making RWF_UNCACHED a more=20
-natural fit for some applications.  There are fewer surprises, and some=20
-services are willing to pay for flexibility with a memcpy.  In general,=20
-they still want to do some cache management because it reduces p90+=20
-latencies across the board, and gives them more control over which pages=20
-stay in cache.
+The #define for IOMAP_UNCACHED doesn't have a comment, so I don't know
+what this is supposed to mean.  Judging from the one place it gets set
+in the buffered write function I gather that this is how you implement
+the "write through page cache and immediately unmap the page if it
+wasn't there before" behavior?
 
-Most services using buffered IO here as part of their main workload are=20
-pairing it with sync_file_range() and sometimes fadvise DONT_NEED. =20
-We've seen kswapd saturating cores with much slower flash than the fancy=20
-stuff Jens is using, and the solution is usually O_DIRECT or fadvise.
+So based on that, I think you want ...
 
-Grepping through the code shows a wonderful assortment of helpers to=20
-control the cache, and RWF_UNCACHED would be both cleaner and faster=20
-than what we have today.  I'm on the fence about asking for=20
-RWF_FILE_RANGE_WRITE (+/- naming) to force writes to start without=20
-pitching pages, but we can talk to some service owners to see how useful=20
-that would be.   They can always chain a sync_file_range() in io_uring,=20
-but RWF_ would be lower overhead if it were a common pattern.
+if IOMAP_WRITE && _UNCACHED && !_DIRECT && written > 0:
+	flush and invalidate
 
-With all of that said, I really agree that xfs+O_DIRECT wins on write=20
-concurrency.  Jens's current patches are a great first step, but I think=20
-that if he really loved us, Jens would carve up a concurrent pageless=20
-write patch series before Christmas.
+Since direct writes are never going to create page cache, right?
 
-> Direct
-> IO is zero-copy, and so it's always going to have lower overhead
-> than RWF_UNCACHED, and so when CPU or memory bandwidth is the
-> limiting facter, O_DIRECT will always be faster.
->
-> IOWs, I think trying to make RWF_UNCACHED as fast as O_DIRECT is a
-> fool's game and attempting to do so is taking a step in the wrong
-> direction architecturally.  I'd much prefer a sane IO model for
-> RWF_UNCACHED that provides coherency w/ mmap and other buffered IO
-> than compromise these things in the chase for ultimate performance.
+And in that case, why not put this at the end of iomap_write_actor?
 
-No matter what I wrote in my letters to Santa this year, I agree that we=20
-shouldn't compromise on avoiding the warts from O_DIRECT.
+(Sorry if this came up in the earlier discussions, I've been busy this
+week and still have a long way to go for catching up...)
 
--chris
+> +		struct address_space *mapping = data->inode->i_mapping;
+> +
+> +		end = data->pos + written;
+> +		ret = filemap_write_and_wait_range(mapping, data->pos, end);
+> +		if (ret)
+> +			goto out;
+> +
+> +		/*
+> +		 * No pages were created for this range, we're done
+> +		 */
+> +		if (!(iomap.flags & IOMAP_F_PAGE_CREATE))
+> +			goto out;
+> +
+> +		/*
+> +		 * Try to invalidate cache pages for the range we just wrote.
+> +		 * We don't care if invalidation fails as the write has still
+> +		 * worked and leaving clean uptodate pages in the page cache
+> +		 * isn't a corruption vector for uncached IO.
+> +		 */
+> +		invalidate_inode_pages2_range(mapping,
+> +				data->pos >> PAGE_SHIFT, end >> PAGE_SHIFT);
+> +	}
+> +out:
+>  	return written ? written : ret;
+>  }
+> diff --git a/fs/iomap/buffered-io.c b/fs/iomap/buffered-io.c
+> index 0a1a195ed1cc..df9d6002858e 100644
+> --- a/fs/iomap/buffered-io.c
+> +++ b/fs/iomap/buffered-io.c
+> @@ -659,6 +659,7 @@ iomap_write_begin(struct inode *inode, loff_t pos, unsigned len, unsigned flags,
+>  		struct page **pagep, struct iomap *iomap, struct iomap *srcmap)
+>  {
+>  	const struct iomap_page_ops *page_ops = iomap->page_ops;
+> +	unsigned aop_flags;
+>  	struct page *page;
+>  	int status = 0;
+>  
+> @@ -675,8 +676,11 @@ iomap_write_begin(struct inode *inode, loff_t pos, unsigned len, unsigned flags,
+>  			return status;
+>  	}
+>  
+> +	aop_flags = AOP_FLAG_NOFS;
+> +	if (flags & IOMAP_UNCACHED)
+> +		aop_flags |= AOP_FLAG_UNCACHED;
+>  	page = grab_cache_page_write_begin(inode->i_mapping, pos >> PAGE_SHIFT,
+> -			AOP_FLAG_NOFS);
+> +						aop_flags);
+>  	if (!page) {
+>  		status = -ENOMEM;
+>  		goto out_no_page;
+> @@ -818,6 +822,7 @@ iomap_write_actor(const struct iomap_data *data, struct iomap *iomap,
+>  {
+>  	struct inode *inode = data->inode;
+>  	struct iov_iter *i = data->priv;
+> +	unsigned flags = data->flags;
+>  	loff_t length = data->len;
+>  	loff_t pos = data->pos;
+>  	long status = 0;
+> @@ -851,10 +856,17 @@ iomap_write_actor(const struct iomap_data *data, struct iomap *iomap,
+>  			break;
+>  		}
+>  
+> -		status = iomap_write_begin(inode, pos, bytes, 0, &page, iomap,
+> -				srcmap);
+> -		if (unlikely(status))
+> +retry:
+> +		status = iomap_write_begin(inode, pos, bytes, flags,
+> +						&page, iomap, srcmap);
+> +		if (unlikely(status)) {
+> +			if (status == -ENOMEM && (flags & IOMAP_UNCACHED)) {
+> +				iomap->flags |= IOMAP_F_PAGE_CREATE;
+> +				flags &= ~IOMAP_UNCACHED;
+> +				goto retry;
+> +			}
+>  			break;
+> +		}
+>  
+>  		if (mapping_writably_mapped(inode->i_mapping))
+>  			flush_dcache_page(page);
+> @@ -907,6 +919,9 @@ iomap_file_buffered_write(struct kiocb *iocb, struct iov_iter *iter,
+>  	};
+>  	loff_t ret = 0, written = 0;
+>  
+> +	if (iocb->ki_flags & IOCB_UNCACHED)
+> +		data.flags |= IOMAP_UNCACHED;
+> +
+>  	while (iov_iter_count(iter)) {
+>  		data.len = iov_iter_count(iter);
+>  		ret = iomap_apply(&data, ops, iomap_write_actor);
+> diff --git a/include/linux/iomap.h b/include/linux/iomap.h
+> index 30f40145a9e9..30bb248e1d0d 100644
+> --- a/include/linux/iomap.h
+> +++ b/include/linux/iomap.h
+> @@ -48,12 +48,16 @@ struct vm_fault;
+>   *
+>   * IOMAP_F_BUFFER_HEAD indicates that the file system requires the use of
+>   * buffer heads for this mapping.
+> + *
+> + * IOMAP_F_PAGE_CREATE indicates that pages had to be allocated to satisfy
+> + * this operation.
+>   */
+>  #define IOMAP_F_NEW		0x01
+>  #define IOMAP_F_DIRTY		0x02
+>  #define IOMAP_F_SHARED		0x04
+>  #define IOMAP_F_MERGED		0x08
+>  #define IOMAP_F_BUFFER_HEAD	0x10
+> +#define IOMAP_F_PAGE_CREATE	0x20
+
+I think these new flags need an update to the _STRINGS arrays in
+fs/iomap/trace.h.
+>  
+>  /*
+>   * Flags set by the core iomap code during operations:
+> @@ -121,6 +125,7 @@ struct iomap_page_ops {
+>  #define IOMAP_FAULT		(1 << 3) /* mapping for page fault */
+>  #define IOMAP_DIRECT		(1 << 4) /* direct I/O */
+>  #define IOMAP_NOWAIT		(1 << 5) /* do not block */
+> +#define IOMAP_UNCACHED		(1 << 6)
+
+No comment?
+
+--D
+
+>  
+>  struct iomap_ops {
+>  	/*
+> -- 
+> 2.24.1
+> 
