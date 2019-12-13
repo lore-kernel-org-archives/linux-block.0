@@ -2,326 +2,163 @@ Return-Path: <SRS0=J0ZO=2D=vger.kernel.org=linux-block-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-6.8 required=3.0 tests=DKIMWL_WL_HIGH,DKIM_SIGNED,
-	DKIM_VALID,DKIM_VALID_AU,HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,
-	MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED
-	autolearn=ham autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-8.6 required=3.0 tests=DKIM_SIGNED,DKIM_VALID,
+	DKIM_VALID_AU,FREEMAIL_FORGED_FROMDOMAIN,FREEMAIL_FROM,
+	HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,MENTIONS_GIT_HOSTING,
+	SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED,USER_AGENT_GIT autolearn=ham
+	autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 9C3D5C341C4
-	for <linux-block@archiver.kernel.org>; Fri, 13 Dec 2019 20:36:50 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id C37F0C3434E
+	for <linux-block@archiver.kernel.org>; Fri, 13 Dec 2019 20:37:08 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.kernel.org (Postfix) with ESMTP id C3E9A24725
-	for <linux-block@archiver.kernel.org>; Fri, 13 Dec 2019 20:36:49 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id F3EA52473A
+	for <linux-block@archiver.kernel.org>; Fri, 13 Dec 2019 20:37:07 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="dA+KsnkD"
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="N6i0hqkB"
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1726891AbfLMMY4 (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Fri, 13 Dec 2019 07:24:56 -0500
-Received: from us-smtp-1.mimecast.com ([207.211.31.81]:21492 "EHLO
-        us-smtp-delivery-1.mimecast.com" rhost-flags-OK-OK-OK-FAIL)
-        by vger.kernel.org with ESMTP id S1726421AbfLMMYz (ORCPT
+        id S1727197AbfLMNCd (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Fri, 13 Dec 2019 08:02:33 -0500
+Received: from mail-pf1-f195.google.com ([209.85.210.195]:34279 "EHLO
+        mail-pf1-f195.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S1726345AbfLMNCd (ORCPT
         <rfc822;linux-block@vger.kernel.org>);
-        Fri, 13 Dec 2019 07:24:55 -0500
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-        s=mimecast20190719; t=1576239893;
-        h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-         to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-         in-reply-to:in-reply-to:references:references;
-        bh=QBv73Zw1cLXkfaNA9S7uX+uLE9sOk/4dzs63QzjxufA=;
-        b=dA+KsnkDYbYEKw+PtfcotUFlI2ZXf0M6HF6QYzmczcvHNXDlbW1jd6U2DZdZVmtLJfiWBQ
-        R2Xzx/EYjv1K7YfwN4lGW/CZiLCDmS4zn0gNUZP0zEoRw1+qwwRJm3Ouf77l0e3FFkclzT
-        kY2SlJVB8lnPYpVHX24o6POSzhJwj9k=
-Received: from mail-qk1-f200.google.com (mail-qk1-f200.google.com
- [209.85.222.200]) (Using TLS) by relay.mimecast.com with ESMTP id
- us-mta-397-4Gq-Qy_dO8qGwV9zMDDc9w-1; Fri, 13 Dec 2019 07:24:50 -0500
-X-MC-Unique: 4Gq-Qy_dO8qGwV9zMDDc9w-1
-Received: by mail-qk1-f200.google.com with SMTP id 65so1279942qkl.23
-        for <linux-block@vger.kernel.org>; Fri, 13 Dec 2019 04:24:50 -0800 (PST)
+        Fri, 13 Dec 2019 08:02:33 -0500
+Received: by mail-pf1-f195.google.com with SMTP id l127so1457673pfl.1;
+        Fri, 13 Dec 2019 05:02:32 -0800 (PST)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=gmail.com; s=20161025;
+        h=from:to:cc:subject:date:message-id:mime-version
+         :content-transfer-encoding;
+        bh=ZPc8DBX2ZfbjwaEgLInVI3S8HFj/56kByg4DfIObTMc=;
+        b=N6i0hqkBEVIM+jlUwMzon0U9mzngTnFvijSsH1izi82SQgmncvfMlOQRxxSCyeRErs
+         WL56byCPvCe56fFydeRT2Ia4b/SzfWT2nd2PyfZ8vUpQ8onIG/VXPCnOIRrdUdSwtG63
+         ch7UzZhNMp0ZTyzc0uONuiAZkgDnVOJF3coeex5qeyFLx1wEhvsqQt9hZY585vTPGgXK
+         FiakZ3BYj4Xz43/FfNyprjLZut5G0uv1r90pWwxn2PrmhrU878wZcyYE3R/Nk3Xz4Ckk
+         1VCU4LgCDj5ZlW7cKLFKT67YYsfp7cu4VgRy3/23ZycJBD8ly5bH5maHZuQspiTHJMfS
+         OCBg==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=1e100.net; s=20161025;
-        h=x-gm-message-state:date:from:to:cc:subject:message-id:references
-         :mime-version:content-disposition:in-reply-to;
-        bh=QBv73Zw1cLXkfaNA9S7uX+uLE9sOk/4dzs63QzjxufA=;
-        b=KLe6IoP+JncgXjaPyoAZhJGj1FZnlZD/SQc/GwneYY/ODTjEfQVXDnZIj4D/PcHm1c
-         QSRPREgewurhPOz7ocw8RZUASUMmwt1bUHZ3hqI3ljQtnEcrptKhXhJ7n+cOFIXbAP/d
-         Q+h1MBywYe6ayGRjZvqvfDSdCqZ1LU6VoMNMyrWaCY1+mq3+4WtW6ANcKXI3cdD+dJkv
-         0hISAYBELGBHGWv1Qb0WSfLTy1FXOV24R3Ga/6HtNSZfe3gGCfClINEbug+uWSevAs9C
-         fW1a+BHS03S/N9hFxOq1+/5oTgsli6P8EBg+llgtuwVA6Q0OsTKvE/CWcYB0Olv0yTzV
-         E/Ng==
-X-Gm-Message-State: APjAAAWSXLbG2F6cY+tuwDnh3u1WWHGQ25sPZMOkFiECHw/tcdIOir4m
-        URoV882laCzPXKti0btM95lJm8CKAZOIaLBaImcSKNsiNDehx/MaMdyVqwiY/e2Dxov94MEOPiR
-        h+BjUOPWXSZLfKndSdQjpFJk=
-X-Received: by 2002:a37:851:: with SMTP id 78mr13372673qki.266.1576239889903;
-        Fri, 13 Dec 2019 04:24:49 -0800 (PST)
-X-Google-Smtp-Source: APXvYqxnsw34OaUZ11rT4iUv3S0yARlQ8f6FJubIwVQyywaWp7Bqv5aFAy8uK3XZ0yzQKi6EnxnUdw==
-X-Received: by 2002:a37:851:: with SMTP id 78mr13372651qki.266.1576239889520;
-        Fri, 13 Dec 2019 04:24:49 -0800 (PST)
-Received: from redhat.com (bzq-79-181-48-215.red.bezeqint.net. [79.181.48.215])
-        by smtp.gmail.com with ESMTPSA id n20sm2747584qkk.54.2019.12.13.04.24.46
+        h=x-gm-message-state:from:to:cc:subject:date:message-id:mime-version
+         :content-transfer-encoding;
+        bh=ZPc8DBX2ZfbjwaEgLInVI3S8HFj/56kByg4DfIObTMc=;
+        b=YXDdXkeaJnF/9SfzeE40XbvoWrnVzZl0+eJeTn8r2G953JKO8agILLYRkOpIHq6mh7
+         +dYOAhe8uJE4biO7saUP8O651DwkLafeWs3UgsLL50gX5Ie9VGLUI7mAYMbvbrLUs2Tz
+         StKGHARneNDsEJXGAOSyY09zzHQ6P5CxWJEcR6yZoB6BbxSntvlOHbw90A1vdbPiro1L
+         Q5fA9BVHV0GZFl2jUYtCJQPgzlGdRqNVAJBLY7xF+AIyWKK5Vgsr74S2mSzr6W7RAUBo
+         Kp06a1Zh8gOaRWPZQ5V1TbxqpYjR/hf6j0WhGxc4uEHY/zO+1fxim6OjAUlnzDEKY749
+         oIlg==
+X-Gm-Message-State: APjAAAX5vBeXRidGGcVRuMX+KpFw+9EbadPRVWtRjMIfmeY7/Kwkyydf
+        F/9fcu+UPd2FhD4EXeyKoCo=
+X-Google-Smtp-Source: APXvYqwwGYLLtINm/TP+G8Tba8uazrIqTPMf1a8m0SsSyI2D6fxD3WkOSpHXI4F9WCaxEyvwPl52lg==
+X-Received: by 2002:aa7:9808:: with SMTP id e8mr16113067pfl.32.1576242152522;
+        Fri, 13 Dec 2019 05:02:32 -0800 (PST)
+Received: from localhost.localdomain ([12.176.148.120])
+        by smtp.gmail.com with ESMTPSA id k3sm10872278pgc.3.2019.12.13.05.02.31
         (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Fri, 13 Dec 2019 04:24:48 -0800 (PST)
-Date:   Fri, 13 Dec 2019 07:24:44 -0500
-From:   "Michael S. Tsirkin" <mst@redhat.com>
-To:     Christoph Hellwig <hch@lst.de>
-Cc:     axboe@kernel.dk, jasowang@redhat.com, pbonzini@redhat.com,
-        stefanha@redhat.com, linux-block@vger.kernel.org,
-        virtualization@lists.linux-foundation.org
-Subject: Re: [PATCH] virtio-blk: remove VIRTIO_BLK_F_SCSI support
-Message-ID: <20191213072432-mutt-send-email-mst@kernel.org>
-References: <20191212163719.28432-1-hch@lst.de>
+        Fri, 13 Dec 2019 05:02:31 -0800 (PST)
+From:   SeongJae Park <sj38.park@gmail.com>
+X-Google-Original-From: SeongJae Park <sjpark@amazon.de>
+To:     jgross@suse.com, axboe@kernel.dk, konrad.wilk@oracle.com,
+        roger.pau@citrix.com
+Cc:     SeongJae Park <sjpark@amazon.de>, pdurrant@amazon.com,
+        sjpark@amazon.com, sj38.park@gmail.com,
+        xen-devel@lists.xenproject.org, linux-block@vger.kernel.org,
+        linux-kernel@vger.kernel.org
+Subject: [PATCH v8 0/3] xenbus/backend: Add a memory pressure handler callback
+Date:   Fri, 13 Dec 2019 13:02:08 +0000
+Message-Id: <20191213130211.24011-1-sjpark@amazon.de>
+X-Mailer: git-send-email 2.17.1
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <20191212163719.28432-1-hch@lst.de>
+Content-Type: text/plain; charset=UTF-8
+Content-Transfer-Encoding: 8bit
 Sender: linux-block-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-On Thu, Dec 12, 2019 at 05:37:19PM +0100, Christoph Hellwig wrote:
-> Since the need for a special flag to support SCSI passthrough on a
-> block device was added in May 2017 the SCSI passthrough support in
-> virtio-blk has been disabled.  It has always been a bad idea
-> (just ask the original author..) and we have virtio-scsi for proper
-> passthrough.  The feature also never made it into the virtio 1.0
-> or later specifications.
-> 
-> Signed-off-by: Christoph Hellwig <hch@lst.de>
+Granting pages consumes backend system memory.  In systems configured
+with insufficient spare memory for those pages, it can cause a memory
+pressure situation.  However, finding the optimal amount of the spare
+memory is challenging for large systems having dynamic resource
+utilization patterns.  Also, such a static configuration might lack
+flexibility.
 
-OK I'll queue this.
-Thanks!
+To mitigate such problems, this patchset adds a memory reclaim callback
+to 'xenbus_driver' (patch 1) and use it to mitigate the problem in
+'xen-blkback' (patch 2).  The third patch is a trivial cleanup of
+variable names.
 
-> ---
->  arch/powerpc/configs/guest.config |   1 -
->  drivers/block/Kconfig             |  10 ---
->  drivers/block/virtio_blk.c        | 115 +-----------------------------
->  3 files changed, 1 insertion(+), 125 deletions(-)
-> 
-> diff --git a/arch/powerpc/configs/guest.config b/arch/powerpc/configs/guest.config
-> index 8b8cd18ecd7c..209f58515d88 100644
-> --- a/arch/powerpc/configs/guest.config
-> +++ b/arch/powerpc/configs/guest.config
-> @@ -1,5 +1,4 @@
->  CONFIG_VIRTIO_BLK=y
-> -CONFIG_VIRTIO_BLK_SCSI=y
->  CONFIG_SCSI_VIRTIO=y
->  CONFIG_VIRTIO_NET=y
->  CONFIG_NET_FAILOVER=y
-> diff --git a/drivers/block/Kconfig b/drivers/block/Kconfig
-> index 1bb8ec575352..025b1b77b11a 100644
-> --- a/drivers/block/Kconfig
-> +++ b/drivers/block/Kconfig
-> @@ -432,16 +432,6 @@ config VIRTIO_BLK
->  	  This is the virtual block driver for virtio.  It can be used with
->            QEMU based VMMs (like KVM or Xen).  Say Y or M.
->  
-> -config VIRTIO_BLK_SCSI
-> -	bool "SCSI passthrough request for the Virtio block driver"
-> -	depends on VIRTIO_BLK
-> -	select BLK_SCSI_REQUEST
-> -	---help---
-> -	  Enable support for SCSI passthrough (e.g. the SG_IO ioctl) on
-> -	  virtio-blk devices.  This is only supported for the legacy
-> -	  virtio protocol and not enabled by default by any hypervisor.
-> -	  You probably want to use virtio-scsi instead.
-> -
->  config BLK_DEV_RBD
->  	tristate "Rados block device (RBD)"
->  	depends on INET && BLOCK
-> diff --git a/drivers/block/virtio_blk.c b/drivers/block/virtio_blk.c
-> index 7ffd719d89de..54158766334b 100644
-> --- a/drivers/block/virtio_blk.c
-> +++ b/drivers/block/virtio_blk.c
-> @@ -11,7 +11,6 @@
->  #include <linux/virtio_blk.h>
->  #include <linux/scatterlist.h>
->  #include <linux/string_helpers.h>
-> -#include <scsi/scsi_cmnd.h>
->  #include <linux/idr.h>
->  #include <linux/blk-mq.h>
->  #include <linux/blk-mq-virtio.h>
-> @@ -56,11 +55,6 @@ struct virtio_blk {
->  };
->  
->  struct virtblk_req {
-> -#ifdef CONFIG_VIRTIO_BLK_SCSI
-> -	struct scsi_request sreq;	/* for SCSI passthrough, must be first */
-> -	u8 sense[SCSI_SENSE_BUFFERSIZE];
-> -	struct virtio_scsi_inhdr in_hdr;
-> -#endif
->  	struct virtio_blk_outhdr out_hdr;
->  	u8 status;
->  	struct scatterlist sg[];
-> @@ -78,80 +72,6 @@ static inline blk_status_t virtblk_result(struct virtblk_req *vbr)
->  	}
->  }
->  
-> -/*
-> - * If this is a packet command we need a couple of additional headers.  Behind
-> - * the normal outhdr we put a segment with the scsi command block, and before
-> - * the normal inhdr we put the sense data and the inhdr with additional status
-> - * information.
-> - */
-> -#ifdef CONFIG_VIRTIO_BLK_SCSI
-> -static int virtblk_add_req_scsi(struct virtqueue *vq, struct virtblk_req *vbr,
-> -		struct scatterlist *data_sg, bool have_data)
-> -{
-> -	struct scatterlist hdr, status, cmd, sense, inhdr, *sgs[6];
-> -	unsigned int num_out = 0, num_in = 0;
-> -
-> -	sg_init_one(&hdr, &vbr->out_hdr, sizeof(vbr->out_hdr));
-> -	sgs[num_out++] = &hdr;
-> -	sg_init_one(&cmd, vbr->sreq.cmd, vbr->sreq.cmd_len);
-> -	sgs[num_out++] = &cmd;
-> -
-> -	if (have_data) {
-> -		if (vbr->out_hdr.type & cpu_to_virtio32(vq->vdev, VIRTIO_BLK_T_OUT))
-> -			sgs[num_out++] = data_sg;
-> -		else
-> -			sgs[num_out + num_in++] = data_sg;
-> -	}
-> -
-> -	sg_init_one(&sense, vbr->sense, SCSI_SENSE_BUFFERSIZE);
-> -	sgs[num_out + num_in++] = &sense;
-> -	sg_init_one(&inhdr, &vbr->in_hdr, sizeof(vbr->in_hdr));
-> -	sgs[num_out + num_in++] = &inhdr;
-> -	sg_init_one(&status, &vbr->status, sizeof(vbr->status));
-> -	sgs[num_out + num_in++] = &status;
-> -
-> -	return virtqueue_add_sgs(vq, sgs, num_out, num_in, vbr, GFP_ATOMIC);
-> -}
-> -
-> -static inline void virtblk_scsi_request_done(struct request *req)
-> -{
-> -	struct virtblk_req *vbr = blk_mq_rq_to_pdu(req);
-> -	struct virtio_blk *vblk = req->q->queuedata;
-> -	struct scsi_request *sreq = &vbr->sreq;
-> -
-> -	sreq->resid_len = virtio32_to_cpu(vblk->vdev, vbr->in_hdr.residual);
-> -	sreq->sense_len = virtio32_to_cpu(vblk->vdev, vbr->in_hdr.sense_len);
-> -	sreq->result = virtio32_to_cpu(vblk->vdev, vbr->in_hdr.errors);
-> -}
-> -
-> -static int virtblk_ioctl(struct block_device *bdev, fmode_t mode,
-> -			     unsigned int cmd, unsigned long data)
-> -{
-> -	struct gendisk *disk = bdev->bd_disk;
-> -	struct virtio_blk *vblk = disk->private_data;
-> -
-> -	/*
-> -	 * Only allow the generic SCSI ioctls if the host can support it.
-> -	 */
-> -	if (!virtio_has_feature(vblk->vdev, VIRTIO_BLK_F_SCSI))
-> -		return -ENOTTY;
-> -
-> -	return scsi_cmd_blk_ioctl(bdev, mode, cmd,
-> -				  (void __user *)data);
-> -}
-> -#else
-> -static inline int virtblk_add_req_scsi(struct virtqueue *vq,
-> -		struct virtblk_req *vbr, struct scatterlist *data_sg,
-> -		bool have_data)
-> -{
-> -	return -EIO;
-> -}
-> -static inline void virtblk_scsi_request_done(struct request *req)
-> -{
-> -}
-> -#define virtblk_ioctl	NULL
-> -#endif /* CONFIG_VIRTIO_BLK_SCSI */
-> -
->  static int virtblk_add_req(struct virtqueue *vq, struct virtblk_req *vbr,
->  		struct scatterlist *data_sg, bool have_data)
->  {
-> @@ -216,13 +136,6 @@ static inline void virtblk_request_done(struct request *req)
->  		      req->special_vec.bv_offset);
->  	}
->  
-> -	switch (req_op(req)) {
-> -	case REQ_OP_SCSI_IN:
-> -	case REQ_OP_SCSI_OUT:
-> -		virtblk_scsi_request_done(req);
-> -		break;
-> -	}
-> -
->  	blk_mq_end_request(req, virtblk_result(vbr));
->  }
->  
-> @@ -299,10 +212,6 @@ static blk_status_t virtio_queue_rq(struct blk_mq_hw_ctx *hctx,
->  		type = VIRTIO_BLK_T_WRITE_ZEROES;
->  		unmap = !(req->cmd_flags & REQ_NOUNMAP);
->  		break;
-> -	case REQ_OP_SCSI_IN:
-> -	case REQ_OP_SCSI_OUT:
-> -		type = VIRTIO_BLK_T_SCSI_CMD;
-> -		break;
->  	case REQ_OP_DRV_IN:
->  		type = VIRTIO_BLK_T_GET_ID;
->  		break;
-> @@ -333,10 +242,7 @@ static blk_status_t virtio_queue_rq(struct blk_mq_hw_ctx *hctx,
->  	}
->  
->  	spin_lock_irqsave(&vblk->vqs[qid].lock, flags);
-> -	if (blk_rq_is_scsi(req))
-> -		err = virtblk_add_req_scsi(vblk->vqs[qid].vq, vbr, vbr->sg, num);
-> -	else
-> -		err = virtblk_add_req(vblk->vqs[qid].vq, vbr, vbr->sg, num);
-> +	err = virtblk_add_req(vblk->vqs[qid].vq, vbr, vbr->sg, num);
->  	if (err) {
->  		virtqueue_kick(vblk->vqs[qid].vq);
->  		blk_mq_stop_hw_queue(hctx);
-> @@ -404,7 +310,6 @@ static int virtblk_getgeo(struct block_device *bd, struct hd_geometry *geo)
->  }
->  
->  static const struct block_device_operations virtblk_fops = {
-> -	.ioctl  = virtblk_ioctl,
->  	.owner  = THIS_MODULE,
->  	.getgeo = virtblk_getgeo,
->  };
-> @@ -683,9 +588,6 @@ static int virtblk_init_request(struct blk_mq_tag_set *set, struct request *rq,
->  	struct virtio_blk *vblk = set->driver_data;
->  	struct virtblk_req *vbr = blk_mq_rq_to_pdu(rq);
->  
-> -#ifdef CONFIG_VIRTIO_BLK_SCSI
-> -	vbr->sreq.sense = vbr->sense;
-> -#endif
->  	sg_init_table(vbr->sg, vblk->sg_elems);
->  	return 0;
->  }
-> @@ -698,23 +600,11 @@ static int virtblk_map_queues(struct blk_mq_tag_set *set)
->  					vblk->vdev, 0);
->  }
->  
-> -#ifdef CONFIG_VIRTIO_BLK_SCSI
-> -static void virtblk_initialize_rq(struct request *req)
-> -{
-> -	struct virtblk_req *vbr = blk_mq_rq_to_pdu(req);
-> -
-> -	scsi_req_init(&vbr->sreq);
-> -}
-> -#endif
-> -
->  static const struct blk_mq_ops virtio_mq_ops = {
->  	.queue_rq	= virtio_queue_rq,
->  	.commit_rqs	= virtio_commit_rqs,
->  	.complete	= virtblk_request_done,
->  	.init_request	= virtblk_init_request,
-> -#ifdef CONFIG_VIRTIO_BLK_SCSI
-> -	.initialize_rq_fn = virtblk_initialize_rq,
-> -#endif
->  	.map_queues	= virtblk_map_queues,
->  };
->  
-> @@ -991,9 +881,6 @@ static const struct virtio_device_id id_table[] = {
->  static unsigned int features_legacy[] = {
->  	VIRTIO_BLK_F_SEG_MAX, VIRTIO_BLK_F_SIZE_MAX, VIRTIO_BLK_F_GEOMETRY,
->  	VIRTIO_BLK_F_RO, VIRTIO_BLK_F_BLK_SIZE,
-> -#ifdef CONFIG_VIRTIO_BLK_SCSI
-> -	VIRTIO_BLK_F_SCSI,
-> -#endif
->  	VIRTIO_BLK_F_FLUSH, VIRTIO_BLK_F_TOPOLOGY, VIRTIO_BLK_F_CONFIG_WCE,
->  	VIRTIO_BLK_F_MQ, VIRTIO_BLK_F_DISCARD, VIRTIO_BLK_F_WRITE_ZEROES,
->  }
-> -- 
-> 2.20.1
+Base Version
+------------
+
+This patch is based on v5.4.  A complete tree is also available at my
+public git repo:
+https://github.com/sjp38/linux/tree/blkback_squeezing_v8
+
+
+Patch History
+-------------
+
+Changes from v7
+(https://lore.kernel.org/xen-devel/20191211181016.14366-1-sjpark@amazon.de/)
+ - Update sysfs-driver-xen-blkback for new parameter
+   (suggested by Roger Pau Monné)
+ - Use per-xen_blkif buffer_squeeze_end instead of global variable
+   (suggested by Roger Pau Monné)
+
+Changes from v6
+(https://lore.kernel.org/linux-block/20191211042428.5961-1-sjpark@amazon.de/)
+ - Remove more unnecessary prefixes (suggested by Roger Pau Monné)
+ - Constify a variable (suggested by Roger Pau Monné)
+ - Rename 'reclaim' into 'reclaim_memory' (suggested by Roger Pau Monné)
+ - More wordsmith of the commit message (suggested by Roger Pau Monné)
+
+Changes from v5
+(https://lore.kernel.org/linux-block/20191210080628.5264-1-sjpark@amazon.de/)
+ - Wordsmith the commit messages (suggested by Roger Pau Monné)
+ - Change the reclaim callback return type (suggested by Roger Pau Monné)
+ - Change the type of the blkback squeeze duration variable
+   (suggested by Roger Pau Monné)
+ - Add a patch for removal of unnecessary static variable name prefixes
+   (suggested by Roger Pau Monné)
+ - Fix checkpatch.pl warnings
+
+Changes from v4
+(https://lore.kernel.org/xen-devel/20191209194305.20828-1-sjpark@amazon.com/)
+ - Remove domain id parameter from the callback (suggested by Juergen Gross)
+ - Rename xen-blkback module parameter (suggested by Stefan Nuernburger)
+
+Changes from v3
+(https://lore.kernel.org/xen-devel/20191209085839.21215-1-sjpark@amazon.com/)
+ - Add general callback in xen_driver and use it (suggested by Juergen Gross)
+
+Changes from v2
+(https://lore.kernel.org/linux-block/af195033-23d5-38ed-b73b-f6e2e3b34541@amazon.com)
+ - Rename the module parameter and variables for brevity
+   (aggressive shrinking -> squeezing)
+
+Changes from v1
+(https://lore.kernel.org/xen-devel/20191204113419.2298-1-sjpark@amazon.com/)
+ - Adjust the description to not use the term, `arbitrarily`
+   (suggested by Paul Durrant)
+ - Specify time unit of the duration in the parameter description,
+   (suggested by Maximilian Heyne)
+ - Change default aggressive shrinking duration from 1ms to 10ms
+ - Merge two patches into one single patch
+
+SeongJae Park (3):
+  xenbus/backend: Add memory pressure handler callback
+  xen/blkback: Squeeze page pools if a memory pressure is detected
+  xen/blkback: Remove unnecessary static variable name prefixes
+
+ .../ABI/testing/sysfs-driver-xen-blkback      |  9 +++
+ drivers/block/xen-blkback/blkback.c           | 57 ++++++++++++-------
+ drivers/block/xen-blkback/common.h            |  2 +
+ drivers/block/xen-blkback/xenbus.c            | 11 +++-
+ drivers/xen/xenbus/xenbus_probe_backend.c     | 32 +++++++++++
+ include/xen/xenbus.h                          |  1 +
+ 6 files changed, 90 insertions(+), 22 deletions(-)
+
+-- 
+2.17.1
 
