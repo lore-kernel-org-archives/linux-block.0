@@ -2,140 +2,72 @@ Return-Path: <SRS0=J0ZO=2D=vger.kernel.org=linux-block-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-8.2 required=3.0 tests=DKIM_SIGNED,DKIM_VALID,
-	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,
-	SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED,USER_AGENT_SANE_1 autolearn=ham
-	autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-6.1 required=3.0 tests=DKIMWL_WL_HIGH,DKIM_SIGNED,
+	DKIM_VALID,DKIM_VALID_AU,MAILING_LIST_MULTI,MENTIONS_GIT_HOSTING,
+	SPF_HELO_NONE,SPF_PASS autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 9EA20C32767
-	for <linux-block@archiver.kernel.org>; Fri, 13 Dec 2019 20:47:39 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 6CAFCC00454
+	for <linux-block@archiver.kernel.org>; Fri, 13 Dec 2019 23:10:20 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.kernel.org (Postfix) with ESMTP id CEFEB2469B
-	for <linux-block@archiver.kernel.org>; Fri, 13 Dec 2019 20:47:38 +0000 (UTC)
-Authentication-Results: mail.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel-dk.20150623.gappssmtp.com header.i=@kernel-dk.20150623.gappssmtp.com header.b="ZHnQ8l1+"
+	by mail.kernel.org (Postfix) with ESMTP id 4DC3C2253D
+	for <linux-block@archiver.kernel.org>; Fri, 13 Dec 2019 23:10:20 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+	s=default; t=1576278620;
+	bh=XEAR1+ynYVHi761410y7vofACgzyaWGXNdTlUtHnxKQ=;
+	h=Subject:From:In-Reply-To:References:Date:To:Cc:List-ID:From;
+	b=s7H5g8riL37lfFILUjmHYYEP57/lz3MqOkxFRBqS7P5tYojMocB926LfpTIQrnMo/
+	 drr8GXbq5rI2Z7q1HIq8AXenqwB2cTzPjxgTRHczDcuHrDH1acrwTpgC5UykagdA65
+	 eMys7CFazr1BX41mGP2lNUFqXslKV9b50XpRd2mc=
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1726004AbfLMUrj (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Fri, 13 Dec 2019 15:47:39 -0500
-Received: from mail-io1-f66.google.com ([209.85.166.66]:35365 "EHLO
-        mail-io1-f66.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1725989AbfLMUri (ORCPT
-        <rfc822;linux-block@vger.kernel.org>);
-        Fri, 13 Dec 2019 15:47:38 -0500
-Received: by mail-io1-f66.google.com with SMTP id v18so779446iol.2
-        for <linux-block@vger.kernel.org>; Fri, 13 Dec 2019 12:47:38 -0800 (PST)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=kernel-dk.20150623.gappssmtp.com; s=20150623;
-        h=subject:to:cc:references:from:message-id:date:user-agent
-         :mime-version:in-reply-to:content-language:content-transfer-encoding;
-        bh=6sB8y2iaNHCxNWX2heldJxu0UPqZdo++w30Yr9hAFf8=;
-        b=ZHnQ8l1+CLl9GeJBhbz+xV21W7J0kQjB5/9uQjhe/OvyD8lBuZ1CNOzFMfo2nOB2Bc
-         VEXVZA8Y+KHPRJyKE1r68eqEw1x322Src1DB5H2EAnwkNCrz9m1XsgviniW9jWnlEGoX
-         j1nIwVrTqt4XaIMNZRjr4Rukbd4I01XB/19uSWfvvyJqk7f1KAi5EzGXMMmw5mr86eAn
-         4GDaEjfj8+Lh23ArwqQ4XscnpU9uVyiYywAjJ6sVDNIhegAkvzf29fhYkxsPP/Ss7xGE
-         GbBCKhgyY0RPAr4z9OWbvPS+6fIVg+OE7CTBMCunyTWegGnwnChoK2r1G5we5/H/8UZ5
-         pdXw==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20161025;
-        h=x-gm-message-state:subject:to:cc:references:from:message-id:date
-         :user-agent:mime-version:in-reply-to:content-language
-         :content-transfer-encoding;
-        bh=6sB8y2iaNHCxNWX2heldJxu0UPqZdo++w30Yr9hAFf8=;
-        b=EArZL325oIYleBWHh780GGP7umQe1nEOYW58ABWoW+svBQYHUh9gvTxQIJ1eq+n/1x
-         zx0r2Wlp3TiaqNmF72/n5JiqsC5BUvFho8BHYSIK5hFcHxudRRA29px61EzPCQmdzgXZ
-         PqtuYjhEs2y5p+unpmkXGnVOZPkJMJOdkroukfeRNc7RxxWnU1FnERcmwwT5bp9pYjN0
-         UodxYaSGMa3KdWiA9/cPLQXfiUgymR+8fDrR8oPctPOj498OSOu78NLEBmrDaDxuUkGd
-         xqhZ7xnSpfYSXBXhzT8y6IWZBC9pP5qyq9eyuEZtG8lv48kAOi2Li8yOoTlEnsPZTRNr
-         Iq9g==
-X-Gm-Message-State: APjAAAVDkpYalZrDYUnhFFw4fofHafe3qCbATTbt2XcnbRva0Vj3an35
-        6cuc3pBii7No1FS651Jjl64R1w==
-X-Google-Smtp-Source: APXvYqxtZDedWPUq8ULNgcbZ/UKPCJ/p44H78xxlx+Vcyu3li8+yxy6GUJEv149yD89bTP48e+HSkw==
-X-Received: by 2002:a02:3e83:: with SMTP id s125mr1335024jas.104.1576270057981;
-        Fri, 13 Dec 2019 12:47:37 -0800 (PST)
-Received: from [192.168.1.159] ([65.144.74.34])
-        by smtp.gmail.com with ESMTPSA id n3sm3093281ilm.74.2019.12.13.12.47.36
-        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
-        Fri, 13 Dec 2019 12:47:37 -0800 (PST)
-Subject: Re: [PATCH 4/5] iomap: add struct iomap_data
-To:     "Darrick J. Wong" <darrick.wong@oracle.com>
-Cc:     linux-mm@kvack.org, linux-fsdevel@vger.kernel.org,
-        linux-block@vger.kernel.org, willy@infradead.org, clm@fb.com,
-        torvalds@linux-foundation.org, david@fromorbit.com
-References: <20191212190133.18473-1-axboe@kernel.dk>
- <20191212190133.18473-5-axboe@kernel.dk> <20191213203242.GB99868@magnolia>
-From:   Jens Axboe <axboe@kernel.dk>
-Message-ID: <90f26792-3751-c755-c0b9-a85b816e5340@kernel.dk>
-Date:   Fri, 13 Dec 2019 13:47:35 -0700
-User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:68.0) Gecko/20100101
- Thunderbird/68.2.2
-MIME-Version: 1.0
-In-Reply-To: <20191213203242.GB99868@magnolia>
-Content-Type: text/plain; charset=utf-8
-Content-Language: en-US
-Content-Transfer-Encoding: 7bit
+        id S1727070AbfLMXKS (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Fri, 13 Dec 2019 18:10:18 -0500
+Received: from mail.kernel.org ([198.145.29.99]:38278 "EHLO mail.kernel.org"
+        rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
+        id S1727063AbfLMXKR (ORCPT <rfc822;linux-block@vger.kernel.org>);
+        Fri, 13 Dec 2019 18:10:17 -0500
+Subject: Re: [git pull] device mapper fixes for 5.5-rc2
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+        s=default; t=1576278617;
+        bh=XEAR1+ynYVHi761410y7vofACgzyaWGXNdTlUtHnxKQ=;
+        h=From:In-Reply-To:References:Date:To:Cc:From;
+        b=zlY6t7AVsdX6Wxas5Pk4mi8U31oc9IY2aYsTV1kRouE9PNty2pblbD9jlWNZ3e9CM
+         Gu4lT99r5N3mM+T/tUQHRP/b9l6dbxZV+DM9uu2gr9L5xffuwLPI59o85hH//1zMvH
+         H8rPzAK7vth3Y+vd2wDYl1dTOQNUz43GhshLoNAY=
+From:   pr-tracker-bot@kernel.org
+In-Reply-To: <20191212145857.GA27301@redhat.com>
+References: <20191212145857.GA27301@redhat.com>
+X-PR-Tracked-List-Id: <linux-block.vger.kernel.org>
+X-PR-Tracked-Message-Id: <20191212145857.GA27301@redhat.com>
+X-PR-Tracked-Remote: git://git.kernel.org/pub/scm/linux/kernel/git/device-mapper/linux-dm.git
+ tags/for-5.5/dm-fixes
+X-PR-Tracked-Commit-Id: 7fc979f8204fb763e203d3e716c17d352eb96b35
+X-PR-Merge-Tree: torvalds/linux.git
+X-PR-Merge-Refname: refs/heads/master
+X-PR-Merge-Commit-Id: 15da849c910da05622c75c5741dd6e176a8b6fe2
+Message-Id: <157627861729.1837.4537371197446010276.pr-tracker-bot@kernel.org>
+Date:   Fri, 13 Dec 2019 23:10:17 +0000
+To:     Mike Snitzer <snitzer@redhat.com>
+Cc:     Linus Torvalds <torvalds@linux-foundation.org>,
+        dm-devel@redhat.com, linux-block@vger.kernel.org,
+        Alasdair G Kergon <agk@redhat.com>,
+        Diego Calleja <diegocg@gmail.com>,
+        Eric Biggers <ebiggers@google.com>,
+        Hou Tao <houtao1@huawei.com>,
+        Nikos Tsironis <ntsironis@arrikto.com>
 Sender: linux-block-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-On 12/13/19 1:32 PM, Darrick J. Wong wrote:
-> On Thu, Dec 12, 2019 at 12:01:32PM -0700, Jens Axboe wrote:
->> We pass a lot of arguments to iomap_apply(), and subsequently to the
->> actors that it calls. In preparation for adding one more argument,
->> switch them to using a struct iomap_data instead. The actor gets a const
->> version of that, they are not supposed to change anything in it.
->>
->> Signed-off-by: Jens Axboe <axboe@kernel.dk>
-> 
-> Looks good, only a couple of questions...
+The pull request you sent on Thu, 12 Dec 2019 09:58:57 -0500:
 
-Thanks!
+> git://git.kernel.org/pub/scm/linux/kernel/git/device-mapper/linux-dm.git tags/for-5.5/dm-fixes
 
->>  fs/dax.c               |  25 +++--
->>  fs/iomap/apply.c       |  26 +++---
->>  fs/iomap/buffered-io.c | 202 +++++++++++++++++++++++++----------------
->>  fs/iomap/direct-io.c   |  57 +++++++-----
->>  fs/iomap/fiemap.c      |  48 ++++++----
->>  fs/iomap/seek.c        |  64 ++++++++-----
->>  fs/iomap/swapfile.c    |  27 +++---
->>  include/linux/iomap.h  |  15 ++-
->>  8 files changed, 278 insertions(+), 186 deletions(-)
->>
->> diff --git a/fs/dax.c b/fs/dax.c
->> index 1f1f0201cad1..d1c32dbbdf24 100644
->> --- a/fs/dax.c
->> +++ b/fs/dax.c
->> @@ -1090,13 +1090,16 @@ int __dax_zero_page_range(struct block_device *bdev,
->>  EXPORT_SYMBOL_GPL(__dax_zero_page_range);
->>  
->>  static loff_t
->> -dax_iomap_actor(struct inode *inode, loff_t pos, loff_t length, void *data,
->> -		struct iomap *iomap, struct iomap *srcmap)
->> +dax_iomap_actor(const struct iomap_data *data, struct iomap *iomap,
-> 
-> I wonder, is 'struct iomap_ctx' a better name for the context structure?
+has been merged into torvalds/linux.git:
+https://git.kernel.org/torvalds/c/15da849c910da05622c75c5741dd6e176a8b6fe2
 
-Yeah I think you are right, does seem like a better fit. I'll rename it
-for the next version.
-
->> @@ -43,17 +44,18 @@ iomap_apply(struct inode *inode, loff_t pos, loff_t length, unsigned flags,
->>  	 * expose transient stale data. If the reserve fails, we can safely
->>  	 * back out at this point as there is nothing to undo.
->>  	 */
->> -	ret = ops->iomap_begin(inode, pos, length, flags, &iomap, &srcmap);
->> +	ret = ops->iomap_begin(data->inode, data->pos, data->len, data->flags,
->> +				&iomap, &srcmap);
-> 
-> ...and second, what do people think about about passing "const struct
-> iomap_ctx *ctx" to iomap_begin and iomap_end to reduce the argument
-> counts there too?
-> 
-> (That's definitely a separate patch though, and I might just do that on
-> my own if nobody beats me to it...)
-
-To be honest, I just did what I needed, but I do think it's worth
-pursuing in general. The argument clutter is real.
+Thank you!
 
 -- 
-Jens Axboe
-
+Deet-doot-dot, I am a bot.
+https://korg.wiki.kernel.org/userdoc/prtracker
