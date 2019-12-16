@@ -2,149 +2,125 @@ Return-Path: <SRS0=l7do=2G=vger.kernel.org=linux-block-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-8.6 required=3.0 tests=DKIMWL_WL_HIGH,DKIM_SIGNED,
-	DKIM_VALID,DKIM_VALID_AU,INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,
-	SPF_HELO_NONE,SPF_PASS,USER_AGENT_SANE_1 autolearn=unavailable
-	autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-2.4 required=3.0 tests=DKIMWL_WL_HIGH,DKIM_SIGNED,
+	DKIM_VALID,DKIM_VALID_AU,HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,
+	SPF_HELO_NONE,SPF_PASS,USER_AGENT_SANE_1 autolearn=no autolearn_force=no
+	version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 896C2C43603
-	for <linux-block@archiver.kernel.org>; Mon, 16 Dec 2019 21:34:04 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 06657C2D0BF
+	for <linux-block@archiver.kernel.org>; Mon, 16 Dec 2019 22:22:05 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.kernel.org (Postfix) with ESMTP id 5B1A120665
-	for <linux-block@archiver.kernel.org>; Mon, 16 Dec 2019 21:34:04 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=default; t=1576532044;
-	bh=g246O6lku9jrBHP+EmFMoKjMp2vLypJYvUbQNJKo0TY=;
-	h=Date:From:To:Cc:Subject:List-ID:From;
-	b=BTbyyXilkQ33zft9qfJdrp7AKc5qqu7d8SLxiuswEFiitiI5scKDKs/Jm8DG5eMC9
-	 y1XY506GmzuVSn0z7fBX9fh9BxRNLTvM/nUm1SugtVMkbpdVMFe6MLT6vfJ1QD8twx
-	 pWVClGyyJ4h007I2ufqf511s0uzViQqgUMh6tzO4=
+	by mail.kernel.org (Postfix) with ESMTP id CEFEA21835
+	for <linux-block@archiver.kernel.org>; Mon, 16 Dec 2019 22:22:04 +0000 (UTC)
+Authentication-Results: mail.kernel.org;
+	dkim=pass (2048-bit key) header.d=nvidia.com header.i=@nvidia.com header.b="amsVlFr4"
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1727226AbfLPVeD (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Mon, 16 Dec 2019 16:34:03 -0500
-Received: from mail-qv1-f68.google.com ([209.85.219.68]:36725 "EHLO
-        mail-qv1-f68.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1726891AbfLPVeD (ORCPT
+        id S1726699AbfLPWVz (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Mon, 16 Dec 2019 17:21:55 -0500
+Received: from hqnvemgate24.nvidia.com ([216.228.121.143]:11660 "EHLO
+        hqnvemgate24.nvidia.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S1726141AbfLPWVz (ORCPT
         <rfc822;linux-block@vger.kernel.org>);
-        Mon, 16 Dec 2019 16:34:03 -0500
-Received: by mail-qv1-f68.google.com with SMTP id m14so2806988qvl.3;
-        Mon, 16 Dec 2019 13:34:03 -0800 (PST)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20161025;
-        h=sender:date:from:to:cc:subject:message-id:mime-version
-         :content-disposition:user-agent;
-        bh=gilqVXjewwhIA+/H+uhFEXgFGjhc0Nb4bpY0xnskfZw=;
-        b=p8mPv5jm1Qu39lGJzVKgWbKLmF4XT3ywrXoYnisUT6RfJ3zxPyPFFlGcq3BlKpjqCV
-         iFxOM697VUQ2O/DZE08qCIvNPUcb3ADyUfKCFflVwrPBKrJB2B5Lh/Pf9umEqDrccOGI
-         5fyTNR4QcPWVWGyGs1+xMsb10wIYRC2gX1iSX3/55XdW28jU602keEhwTNuF3lx3vzGk
-         OQF2mqjNz3WYv393+dcMviQJCxLu1cQtNLCHkW4xU/J0no/uhHkXqDHZJZ1+z6pJp4l0
-         RuqwUkI6BglPfm61QEnznU0lPzRWxUPUVRMcT8uML+Vwae7spIo7s11Z1Drl5+Op2cuP
-         fuDA==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20161025;
-        h=x-gm-message-state:sender:date:from:to:cc:subject:message-id
-         :mime-version:content-disposition:user-agent;
-        bh=gilqVXjewwhIA+/H+uhFEXgFGjhc0Nb4bpY0xnskfZw=;
-        b=uOaCUX5D9+GA8hjVgWcdEpaLGTJRFZgREW+1fpQnYuyU0tpEGO05WL7jzRTlBQ6X86
-         iUNx2sFz5glY0kw1+hbNBuPFFuLyln8UEsD4q3IOZBN/KqtA2UslycWPmABScak9T7vQ
-         0IX30Buqc6b+0sD8PudrfmpcUYj43A/TM+ap7c5+BagS1NyZJcV6/pZdBGMUioI+n6mV
-         UlPByaTlGDgUAZxFUKEpvXoh9prFkBj/OhziYsCsQl6XXIx2gsQfTfT4Qh7YDRE7n5M8
-         so/2F5MQGl8K0Wr8Djm72vHLfx0trh3+B1fFzT0cNgp7CTfJLxsSahS6tSOLyY1NVqkJ
-         393w==
-X-Gm-Message-State: APjAAAVtRoORgRU5IoAYVHdY0HtS+ckb7yOr6uXOVgbIeDgZjfdx2/eA
-        8XCsb1aMi76+PZpyncUxOb4=
-X-Google-Smtp-Source: APXvYqyCSOyoc/1RZy+2Lilir6hKHpBGg7MaSuEoNOqlVDgneUC9Fdu2VSBsn/TjzAe6KYAssdyoBw==
-X-Received: by 2002:a0c:8a21:: with SMTP id 30mr1589603qvt.240.1576532042226;
-        Mon, 16 Dec 2019 13:34:02 -0800 (PST)
-Received: from localhost ([2620:10d:c091:500::d63d])
-        by smtp.gmail.com with ESMTPSA id i28sm7467761qtc.57.2019.12.16.13.34.01
-        (version=TLS1_2 cipher=ECDHE-RSA-AES128-GCM-SHA256 bits=128/128);
-        Mon, 16 Dec 2019 13:34:01 -0800 (PST)
-Date:   Mon, 16 Dec 2019 13:34:00 -0800
-From:   Tejun Heo <tj@kernel.org>
-To:     Jens Axboe <axboe@kernel.dk>
-Cc:     linux-block@vger.kernel.org, kernel-team@fb.com,
-        linux-kernel@vger.kernel.org, cgroups@vger.kernel.org,
-        Josef Bacik <josef@toxicpanda.com>
-Subject: [PATCH block/for-5.5-fixes] iocost: over-budget forced IOs should
- schedule async delay
-Message-ID: <20191216213400.GA2914998@devbig004.ftw2.facebook.com>
+        Mon, 16 Dec 2019 17:21:55 -0500
+Received: from hqpgpgate101.nvidia.com (Not Verified[216.228.121.13]) by hqnvemgate24.nvidia.com (using TLS: TLSv1.2, DES-CBC3-SHA)
+        id <B5df803630000>; Mon, 16 Dec 2019 14:21:23 -0800
+Received: from hqmail.nvidia.com ([172.20.161.6])
+  by hqpgpgate101.nvidia.com (PGP Universal service);
+  Mon, 16 Dec 2019 14:21:50 -0800
+X-PGP-Universal: processed;
+        by hqpgpgate101.nvidia.com on Mon, 16 Dec 2019 14:21:50 -0800
+Received: from [10.2.165.205] (10.124.1.5) by HQMAIL107.nvidia.com
+ (172.20.187.13) with Microsoft SMTP Server (TLS) id 15.0.1473.3; Mon, 16 Dec
+ 2019 22:21:49 +0000
+Subject: Re: [PATCH v11 23/25] mm/gup: track FOLL_PIN pages
+To:     Jan Kara <jack@suse.cz>
+CC:     Andrew Morton <akpm@linux-foundation.org>,
+        Al Viro <viro@zeniv.linux.org.uk>,
+        Alex Williamson <alex.williamson@redhat.com>,
+        Benjamin Herrenschmidt <benh@kernel.crashing.org>,
+        =?UTF-8?B?QmrDtnJuIFTDtnBlbA==?= <bjorn.topel@intel.com>,
+        Christoph Hellwig <hch@infradead.org>,
+        Dan Williams <dan.j.williams@intel.com>,
+        Daniel Vetter <daniel@ffwll.ch>,
+        Dave Chinner <david@fromorbit.com>,
+        David Airlie <airlied@linux.ie>,
+        "David S . Miller" <davem@davemloft.net>,
+        Ira Weiny <ira.weiny@intel.com>,
+        Jason Gunthorpe <jgg@ziepe.ca>, Jens Axboe <axboe@kernel.dk>,
+        Jonathan Corbet <corbet@lwn.net>,
+        =?UTF-8?B?SsOpcsO0bWUgR2xpc3Nl?= <jglisse@redhat.com>,
+        Magnus Karlsson <magnus.karlsson@intel.com>,
+        Mauro Carvalho Chehab <mchehab@kernel.org>,
+        Michael Ellerman <mpe@ellerman.id.au>,
+        Michal Hocko <mhocko@suse.com>,
+        Mike Kravetz <mike.kravetz@oracle.com>,
+        Paul Mackerras <paulus@samba.org>,
+        Shuah Khan <shuah@kernel.org>,
+        Vlastimil Babka <vbabka@suse.cz>, <bpf@vger.kernel.org>,
+        <dri-devel@lists.freedesktop.org>, <kvm@vger.kernel.org>,
+        <linux-block@vger.kernel.org>, <linux-doc@vger.kernel.org>,
+        <linux-fsdevel@vger.kernel.org>, <linux-kselftest@vger.kernel.org>,
+        <linux-media@vger.kernel.org>, <linux-rdma@vger.kernel.org>,
+        <linuxppc-dev@lists.ozlabs.org>, <netdev@vger.kernel.org>,
+        <linux-mm@kvack.org>, LKML <linux-kernel@vger.kernel.org>,
+        "Kirill A . Shutemov" <kirill.shutemov@linux.intel.com>
+References: <20191212101741.GD10065@quack2.suse.cz>
+ <20191214032617.1670759-1-jhubbard@nvidia.com>
+ <20191216125353.GF22157@quack2.suse.cz>
+From:   John Hubbard <jhubbard@nvidia.com>
+X-Nvconfidentiality: public
+Message-ID: <86297621-0200-01db-923b-9f8d3ee87354@nvidia.com>
+Date:   Mon, 16 Dec 2019 14:18:59 -0800
+User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:68.0) Gecko/20100101
+ Thunderbird/68.3.0
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-User-Agent: Mutt/1.5.21 (2010-09-15)
+In-Reply-To: <20191216125353.GF22157@quack2.suse.cz>
+X-Originating-IP: [10.124.1.5]
+X-ClientProxiedBy: HQMAIL105.nvidia.com (172.20.187.12) To
+ HQMAIL107.nvidia.com (172.20.187.13)
+Content-Type: text/plain; charset="utf-8"; format=flowed
+Content-Language: en-US
+Content-Transfer-Encoding: 7bit
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=nvidia.com; s=n1;
+        t=1576534883; bh=YMhg/Haff63lefKvHJkcKDJlwsa7xb5b4lrnUemlU7g=;
+        h=X-PGP-Universal:Subject:To:CC:References:From:X-Nvconfidentiality:
+         Message-ID:Date:User-Agent:MIME-Version:In-Reply-To:
+         X-Originating-IP:X-ClientProxiedBy:Content-Type:Content-Language:
+         Content-Transfer-Encoding;
+        b=amsVlFr4hw9MYNrHr5/DYyX51JWA4Fkp/OrGL5Hbx4jMwoyI9BWBiyVnsOuxsMRIB
+         iaLSTfEX4Yqo/iVj68XTBu0YqNDpOKgLZv4iJJL9jXaVCKbZ5JRpa2udb5A5igVcw2
+         1sJ9NO2FUwaGqY/GZOYBsW4L6j0KjdlhAuITY2UHIyczf/OJ5Ld/YorqU0JPKNcd1d
+         I994/z/XcmSLl51Zt+AHfBnbzOf+k0FilaRTGpdBKRUjSH3tUdnc5ed7upp7HB/ZdP
+         yPbbF1+4hTs972ehSF2pBSOHKp1BKWsgCDOuYbNfow5D4LRa3DPocQgihOq0BFqmMR
+         WOmZ1eSWqtu/A==
 Sender: linux-block-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-When over-budget IOs are force-issued through root cgroup,
-iocg_kick_delay() adjusts the async delay accordingly but doesn't
-actually schedule async throttle for the issuing task.  This bug is
-pretty well masked because sooner or later the offending threads are
-gonna get directly throttled on regular IOs or have async delay
-scheduled by mem_cgroup_throttle_swaprate().
+On 12/16/19 4:53 AM, Jan Kara wrote:
+...
 
-However, it can affect control quality on filesystem metadata heavy
-operations.  Let's fix it by invoking blkcg_schedule_throttle() when
-iocg_kick_delay() says async delay is needed.
+> I'd move this still a bit higher - just after VM_BUG_ON_PAGE() and before
+> if (flags & FOLL_TOUCH) test. Because touch_pmd() can update page tables
+> and we don't won't that if we're going to fail the fault.
+> 
 
-Signed-off-by: Tejun Heo <tj@kernel.org>
-Fixes: 7caa47151ab2 ("blkcg: implement blk-iocost")
-Cc: stable@vger.kernel.org
-Reported-by: Josef Bacik <josef@toxicpanda.com>
----
- block/blk-iocost.c |   13 ++++++++-----
- 1 file changed, 8 insertions(+), 5 deletions(-)
+Done. I'll post a full v11 series shortly.
 
-diff --git a/block/blk-iocost.c b/block/blk-iocost.c
-index e01267f99183..27ca68621137 100644
---- a/block/blk-iocost.c
-+++ b/block/blk-iocost.c
-@@ -1212,7 +1212,7 @@ static enum hrtimer_restart iocg_waitq_timer_fn(struct hrtimer *timer)
- 	return HRTIMER_NORESTART;
- }
- 
--static void iocg_kick_delay(struct ioc_gq *iocg, struct ioc_now *now, u64 cost)
-+static bool iocg_kick_delay(struct ioc_gq *iocg, struct ioc_now *now, u64 cost)
- {
- 	struct ioc *ioc = iocg->ioc;
- 	struct blkcg_gq *blkg = iocg_to_blkg(iocg);
-@@ -1229,11 +1229,11 @@ static void iocg_kick_delay(struct ioc_gq *iocg, struct ioc_now *now, u64 cost)
- 	/* clear or maintain depending on the overage */
- 	if (time_before_eq64(vtime, now->vnow)) {
- 		blkcg_clear_delay(blkg);
--		return;
-+		return false;
- 	}
- 	if (!atomic_read(&blkg->use_delay) &&
- 	    time_before_eq64(vtime, now->vnow + vmargin))
--		return;
-+		return false;
- 
- 	/* use delay */
- 	if (cost) {
-@@ -1250,10 +1250,11 @@ static void iocg_kick_delay(struct ioc_gq *iocg, struct ioc_now *now, u64 cost)
- 	oexpires = ktime_to_ns(hrtimer_get_softexpires(&iocg->delay_timer));
- 	if (hrtimer_is_queued(&iocg->delay_timer) &&
- 	    abs(oexpires - expires) <= margin_ns / 4)
--		return;
-+		return true;
- 
- 	hrtimer_start_range_ns(&iocg->delay_timer, ns_to_ktime(expires),
- 			       margin_ns / 4, HRTIMER_MODE_ABS);
-+	return true;
- }
- 
- static enum hrtimer_restart iocg_delay_timer_fn(struct hrtimer *timer)
-@@ -1739,7 +1740,9 @@ static void ioc_rqos_throttle(struct rq_qos *rqos, struct bio *bio)
- 	 */
- 	if (bio_issue_as_root_blkg(bio) || fatal_signal_pending(current)) {
- 		atomic64_add(abs_cost, &iocg->abs_vdebt);
--		iocg_kick_delay(iocg, &now, cost);
-+		if (iocg_kick_delay(iocg, &now, cost))
-+			blkcg_schedule_throttle(rqos->q,
-+					(bio->bi_opf & REQ_SWAP) == REQ_SWAP);
- 		return;
- 	}
- 
+> With this fixed, the patch looks good to me so you can then add:
+> 
+> Reviewed-by: Jan Kara <jack@suse.cz>
+> 
+> 								Honza
+> 
+
+btw, thanks for the thorough review of this critical patch (and for your
+patience with my mistakes). I really appreciate it, and this patchset would
+not have made it this far without your detailed help and explanations.
+
+
+thanks,
+-- 
+John Hubbard
+NVIDIA
