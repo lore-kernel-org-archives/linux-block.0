@@ -2,147 +2,134 @@ Return-Path: <SRS0=l7do=2G=vger.kernel.org=linux-block-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-9.9 required=3.0 tests=DKIMWL_WL_HIGH,DKIM_SIGNED,
-	DKIM_VALID,DKIM_VALID_AU,HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,
-	MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,USER_AGENT_GIT
+X-Spam-Status: No, score=-5.2 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
+	MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,USER_AGENT_SANE_1
 	autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 8381CC2D0C3
-	for <linux-block@archiver.kernel.org>; Mon, 16 Dec 2019 12:46:35 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 9D9CAC2D0BF
+	for <linux-block@archiver.kernel.org>; Mon, 16 Dec 2019 12:54:00 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.kernel.org (Postfix) with ESMTP id 52D0320726
-	for <linux-block@archiver.kernel.org>; Mon, 16 Dec 2019 12:46:35 +0000 (UTC)
-Authentication-Results: mail.kernel.org;
-	dkim=pass (1024-bit key) header.d=amazon.com header.i=@amazon.com header.b="U8X6Tnpj"
+	by mail.kernel.org (Postfix) with ESMTP id 7969720726
+	for <linux-block@archiver.kernel.org>; Mon, 16 Dec 2019 12:54:00 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1727750AbfLPMqe (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Mon, 16 Dec 2019 07:46:34 -0500
-Received: from smtp-fw-9101.amazon.com ([207.171.184.25]:28960 "EHLO
-        smtp-fw-9101.amazon.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1727762AbfLPMqe (ORCPT
-        <rfc822;linux-block@vger.kernel.org>);
-        Mon, 16 Dec 2019 07:46:34 -0500
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-  d=amazon.com; i=@amazon.com; q=dns/txt; s=amazon201209;
-  t=1576500394; x=1608036394;
-  h=from:to:cc:subject:date:message-id:in-reply-to:
-   references:mime-version:content-transfer-encoding;
-  bh=3wUq7NVc4+sidS4pAAgpsonFVA8x65I2ysAdyu6loeQ=;
-  b=U8X6TnpjuKL78ql9t6ws0eIa2cyH/dn6M3xSPEMzlIC9Y738XX1pwZ5w
-   Uo+e+TiREj2MsHCTya3kHCbZVp2Bt9UHyS62buSDBFlHrwE2+uFdpDGEy
-   5RWQFihyQ8gNeiI8yLRnJYNIhsHwDgZUMtNJA5gThnrfSRxzZP6I34f69
-   g=;
-IronPort-SDR: HMp7wXZhWVtFFefZrzn7Kv7KL1TJrHobjxdjhRxfPhKY91g7P30qTjfzvPekQIqH4QZMHCQFjH
- RrUz+qoCp+Sg==
-X-IronPort-AV: E=Sophos;i="5.69,321,1571702400"; 
-   d="scan'208";a="5354839"
-Received: from sea32-co-svc-lb4-vlan3.sea.corp.amazon.com (HELO email-inbound-relay-1e-62350142.us-east-1.amazon.com) ([10.47.23.38])
-  by smtp-border-fw-out-9101.sea19.amazon.com with ESMTP; 16 Dec 2019 12:46:33 +0000
-Received: from EX13MTAUEA001.ant.amazon.com (iad55-ws-svc-p15-lb9-vlan3.iad.amazon.com [10.40.159.166])
-        by email-inbound-relay-1e-62350142.us-east-1.amazon.com (Postfix) with ESMTPS id 1902BA230E;
-        Mon, 16 Dec 2019 12:46:30 +0000 (UTC)
-Received: from EX13D31EUA001.ant.amazon.com (10.43.165.15) by
- EX13MTAUEA001.ant.amazon.com (10.43.61.243) with Microsoft SMTP Server (TLS)
- id 15.0.1367.3; Mon, 16 Dec 2019 12:46:29 +0000
-Received: from u886c93fd17d25d.ant.amazon.com (10.43.160.100) by
- EX13D31EUA001.ant.amazon.com (10.43.165.15) with Microsoft SMTP Server (TLS)
- id 15.0.1367.3; Mon, 16 Dec 2019 12:46:24 +0000
-From:   SeongJae Park <sjpark@amazon.com>
-To:     <jgross@suse.com>, <axboe@kernel.dk>, <konrad.wilk@oracle.com>,
-        <roger.pau@citrix.com>
-CC:     SeongJae Park <sjpark@amazon.de>, <pdurrant@amazon.com>,
-        <sjpark@amazon.com>, <sj38.park@gmail.com>,
-        <xen-devel@lists.xenproject.org>, <linux-block@vger.kernel.org>,
-        <linux-kernel@vger.kernel.org>
-Subject: [PATCH v10 4/4] xen/blkback: Consistently insert one empty line between functions
-Date:   Mon, 16 Dec 2019 13:45:27 +0100
-Message-ID: <20191216124527.30306-5-sjpark@amazon.com>
-X-Mailer: git-send-email 2.17.1
-In-Reply-To: <20191216124527.30306-1-sjpark@amazon.com>
-References: <20191216124527.30306-1-sjpark@amazon.com>
+        id S1727599AbfLPMx7 (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Mon, 16 Dec 2019 07:53:59 -0500
+Received: from mx2.suse.de ([195.135.220.15]:39022 "EHLO mx1.suse.de"
+        rhost-flags-OK-OK-OK-FAIL) by vger.kernel.org with ESMTP
+        id S1727550AbfLPMx7 (ORCPT <rfc822;linux-block@vger.kernel.org>);
+        Mon, 16 Dec 2019 07:53:59 -0500
+X-Virus-Scanned: by amavisd-new at test-mx.suse.de
+Received: from relay2.suse.de (unknown [195.135.220.254])
+        by mx1.suse.de (Postfix) with ESMTP id 29D62AFAF;
+        Mon, 16 Dec 2019 12:53:55 +0000 (UTC)
+Received: by quack2.suse.cz (Postfix, from userid 1000)
+        id 69B531E0B2E; Mon, 16 Dec 2019 13:53:53 +0100 (CET)
+Date:   Mon, 16 Dec 2019 13:53:53 +0100
+From:   Jan Kara <jack@suse.cz>
+To:     John Hubbard <jhubbard@nvidia.com>
+Cc:     Andrew Morton <akpm@linux-foundation.org>,
+        Al Viro <viro@zeniv.linux.org.uk>,
+        Alex Williamson <alex.williamson@redhat.com>,
+        Benjamin Herrenschmidt <benh@kernel.crashing.org>,
+        =?iso-8859-1?Q?Bj=F6rn_T=F6pel?= <bjorn.topel@intel.com>,
+        Christoph Hellwig <hch@infradead.org>,
+        Dan Williams <dan.j.williams@intel.com>,
+        Daniel Vetter <daniel@ffwll.ch>,
+        Dave Chinner <david@fromorbit.com>,
+        David Airlie <airlied@linux.ie>,
+        "David S . Miller" <davem@davemloft.net>,
+        Ira Weiny <ira.weiny@intel.com>, Jan Kara <jack@suse.cz>,
+        Jason Gunthorpe <jgg@ziepe.ca>, Jens Axboe <axboe@kernel.dk>,
+        Jonathan Corbet <corbet@lwn.net>,
+        =?iso-8859-1?B?Suly9G1l?= Glisse <jglisse@redhat.com>,
+        Magnus Karlsson <magnus.karlsson@intel.com>,
+        Mauro Carvalho Chehab <mchehab@kernel.org>,
+        Michael Ellerman <mpe@ellerman.id.au>,
+        Michal Hocko <mhocko@suse.com>,
+        Mike Kravetz <mike.kravetz@oracle.com>,
+        Paul Mackerras <paulus@samba.org>,
+        Shuah Khan <shuah@kernel.org>,
+        Vlastimil Babka <vbabka@suse.cz>, bpf@vger.kernel.org,
+        dri-devel@lists.freedesktop.org, kvm@vger.kernel.org,
+        linux-block@vger.kernel.org, linux-doc@vger.kernel.org,
+        linux-fsdevel@vger.kernel.org, linux-kselftest@vger.kernel.org,
+        linux-media@vger.kernel.org, linux-rdma@vger.kernel.org,
+        linuxppc-dev@lists.ozlabs.org, netdev@vger.kernel.org,
+        linux-mm@kvack.org, LKML <linux-kernel@vger.kernel.org>,
+        "Kirill A . Shutemov" <kirill.shutemov@linux.intel.com>
+Subject: Re: [PATCH v11 23/25] mm/gup: track FOLL_PIN pages
+Message-ID: <20191216125353.GF22157@quack2.suse.cz>
+References: <20191212101741.GD10065@quack2.suse.cz>
+ <20191214032617.1670759-1-jhubbard@nvidia.com>
 MIME-Version: 1.0
-Content-Type: text/plain; charset="UTF-8"
+Content-Type: text/plain; charset=iso-8859-1
+Content-Disposition: inline
 Content-Transfer-Encoding: 8bit
-X-Originating-IP: [10.43.160.100]
-X-ClientProxiedBy: EX13D17UWC002.ant.amazon.com (10.43.162.61) To
- EX13D31EUA001.ant.amazon.com (10.43.165.15)
+In-Reply-To: <20191214032617.1670759-1-jhubbard@nvidia.com>
+User-Agent: Mutt/1.10.1 (2018-07-13)
 Sender: linux-block-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-From: SeongJae Park <sjpark@amazon.de>
+On Fri 13-12-19 19:26:17, John Hubbard wrote:
+> Add tracking of pages that were pinned via FOLL_PIN.
+> 
+> As mentioned in the FOLL_PIN documentation, callers who effectively set
+> FOLL_PIN are required to ultimately free such pages via unpin_user_page().
+> The effect is similar to FOLL_GET, and may be thought of as "FOLL_GET
+> for DIO and/or RDMA use".
+> 
+> Pages that have been pinned via FOLL_PIN are identifiable via a
+> new function call:
+> 
+>    bool page_dma_pinned(struct page *page);
+> 
+> What to do in response to encountering such a page, is left to later
+> patchsets. There is discussion about this in [1], [2], and [3].
+> 
+> This also changes a BUG_ON(), to a WARN_ON(), in follow_page_mask().
+> 
+> [1] Some slow progress on get_user_pages() (Apr 2, 2019):
+>     https://lwn.net/Articles/784574/
+> [2] DMA and get_user_pages() (LPC: Dec 12, 2018):
+>     https://lwn.net/Articles/774411/
+> [3] The trouble with get_user_pages() (Apr 30, 2018):
+>     https://lwn.net/Articles/753027/
+> 
+> Suggested-by: Jan Kara <jack@suse.cz>
+> Suggested-by: Jérôme Glisse <jglisse@redhat.com>
+> Cc: Kirill A. Shutemov <kirill.shutemov@linux.intel.com>
+> Signed-off-by: John Hubbard <jhubbard@nvidia.com>
+> ---
+> 
+> Hi Jan,
+> 
+> This should address all of your comments for patch 23!
 
-The number of empty lines between functions in the xenbus.c is
-inconsistent.  This trivial style cleanup commit fixes the file to
-consistently place only one empty line.
+Thanks. One comment below:
 
-Acked-by: Roger Pau MonnÃ© <roger.pau@citrix.com>
-Signed-off-by: SeongJae Park <sjpark@amazon.de>
----
- drivers/block/xen-blkback/xenbus.c | 7 ++-----
- 1 file changed, 2 insertions(+), 5 deletions(-)
+> @@ -1486,6 +1500,10 @@ struct page *follow_trans_huge_pmd(struct vm_area_struct *vma,
+>  	VM_BUG_ON_PAGE(!PageHead(page) && !is_zone_device_page(page), page);
+>  	if (flags & FOLL_TOUCH)
+>  		touch_pmd(vma, addr, pmd, flags);
+> +
+> +	if (!try_grab_page(page, flags))
+> +		return ERR_PTR(-ENOMEM);
+> +
+>  	if ((flags & FOLL_MLOCK) && (vma->vm_flags & VM_LOCKED)) {
+>  		/*
+>  		 * We don't mlock() pte-mapped THPs. This way we can avoid
 
-diff --git a/drivers/block/xen-blkback/xenbus.c b/drivers/block/xen-blkback/xenbus.c
-index 4f6ea4feca79..dc0ea123c74c 100644
---- a/drivers/block/xen-blkback/xenbus.c
-+++ b/drivers/block/xen-blkback/xenbus.c
-@@ -432,7 +432,6 @@ static void xenvbd_sysfs_delif(struct xenbus_device *dev)
- 	device_remove_file(&dev->dev, &dev_attr_physical_device);
- }
- 
--
- static void xen_vbd_free(struct xen_vbd *vbd)
- {
- 	if (vbd->bdev)
-@@ -489,6 +488,7 @@ static int xen_vbd_create(struct xen_blkif *blkif, blkif_vdev_t handle,
- 		handle, blkif->domid);
- 	return 0;
- }
-+
- static int xen_blkbk_remove(struct xenbus_device *dev)
- {
- 	struct backend_info *be = dev_get_drvdata(&dev->dev);
-@@ -572,6 +572,7 @@ static void xen_blkbk_discard(struct xenbus_transaction xbt, struct backend_info
- 	if (err)
- 		dev_warn(&dev->dev, "writing feature-discard (%d)", err);
- }
-+
- int xen_blkbk_barrier(struct xenbus_transaction xbt,
- 		      struct backend_info *be, int state)
- {
-@@ -656,7 +657,6 @@ static int xen_blkbk_probe(struct xenbus_device *dev,
- 	return err;
- }
- 
--
- /*
-  * Callback received when the hotplug scripts have placed the physical-device
-  * node.  Read it and the mode node, and create a vbd.  If the frontend is
-@@ -748,7 +748,6 @@ static void backend_changed(struct xenbus_watch *watch,
- 	}
- }
- 
--
- /*
-  * Callback received when the frontend's state changes.
-  */
-@@ -823,7 +822,6 @@ static void frontend_changed(struct xenbus_device *dev,
- 	}
- }
- 
--
- /* Once a memory pressure is detected, squeeze free page pools for a while. */
- static unsigned int buffer_squeeze_duration_ms = 10;
- module_param_named(buffer_squeeze_duration_ms,
-@@ -844,7 +842,6 @@ static void reclaim_memory(struct xenbus_device *dev)
- 
- /* ** Connection ** */
- 
--
- /*
-  * Write the physical details regarding the block device to the store, and
-  * switch to Connected state.
+I'd move this still a bit higher - just after VM_BUG_ON_PAGE() and before
+if (flags & FOLL_TOUCH) test. Because touch_pmd() can update page tables
+and we don't won't that if we're going to fail the fault.
+
+With this fixed, the patch looks good to me so you can then add:
+
+Reviewed-by: Jan Kara <jack@suse.cz>
+
+								Honza
 -- 
-2.17.1
-
+Jan Kara <jack@suse.com>
+SUSE Labs, CR
