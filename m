@@ -1,130 +1,167 @@
-Return-Path: <SRS0=PLNA=2F=vger.kernel.org=linux-block-owner@kernel.org>
+Return-Path: <SRS0=l7do=2G=vger.kernel.org=linux-block-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-2.1 required=3.0 tests=DKIM_SIGNED,DKIM_VALID,
-	DKIM_VALID_AU,FREEMAIL_FORGED_FROMDOMAIN,FREEMAIL_FROM,
-	HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,
-	USER_AGENT_SANE_1 autolearn=no autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-8.2 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
+	INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,
+	USER_AGENT_SANE_1 autolearn=unavailable autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id E1F54C43603
-	for <linux-block@archiver.kernel.org>; Sun, 15 Dec 2019 22:00:43 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 47A5CC43603
+	for <linux-block@archiver.kernel.org>; Mon, 16 Dec 2019 04:18:28 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.kernel.org (Postfix) with ESMTP id A7EB524676
-	for <linux-block@archiver.kernel.org>; Sun, 15 Dec 2019 22:00:43 +0000 (UTC)
-Authentication-Results: mail.kernel.org;
-	dkim=pass (1024-bit key) header.d=web.de header.i=@web.de header.b="SyC4FGUs"
+	by mail.kernel.org (Postfix) with ESMTP id 0FAFA2064B
+	for <linux-block@archiver.kernel.org>; Mon, 16 Dec 2019 04:18:28 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1726292AbfLOWAX (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Sun, 15 Dec 2019 17:00:23 -0500
-Received: from mout.web.de ([212.227.17.12]:58279 "EHLO mout.web.de"
-        rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-        id S1726232AbfLOWAX (ORCPT <rfc822;linux-block@vger.kernel.org>);
-        Sun, 15 Dec 2019 17:00:23 -0500
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=web.de;
-        s=dbaedf251592; t=1576447210;
-        bh=MEuVMTzxFT03+YnVTN8Qa/paKtmADt3WIQppotGSB+0=;
-        h=X-UI-Sender-Class:Cc:References:Subject:To:From:Date:In-Reply-To;
-        b=SyC4FGUs6boEW1pQD/qh5RTa8pjAQBk1Mw52knF027CQkCpdW+57/ioBJsZ0FKFVy
-         9sPbTNUrdwZ2aIshaQnqxjMZZjBoForFrGPp9KyIJWJGS2mQu9Hk4LDuh2cActlS88
-         mc3KsA21y0BqWvBARKDu3VCy8Ri9GAm2lYHTgIJ8=
-X-UI-Sender-Class: c548c8c5-30a9-4db5-a2e7-cb6cb037b8f9
-Received: from [192.168.1.3] ([2.243.76.50]) by smtp.web.de (mrweb101
- [213.165.67.124]) with ESMTPSA (Nemesis) id 0M3jwL-1hq1LX0FAP-00rL2W; Sun, 15
- Dec 2019 23:00:10 +0100
-Cc:     linux-kernel@vger.kernel.org,
-        Dongsheng Yang <dongsheng.yang@easystack.cn>,
-        Ilya Dryomov <idryomov@gmail.com>,
-        Jens Axboe <axboe@kernel.dk>, Kangjie Lu <kjlu@umn.edu>,
-        Sage Weil <sage@redhat.com>
-References: <20191215163527.25203-1-pakki001@umn.edu>
-Subject: Re: [PATCH] rbd: Avoid calling BUG() when object_map is not empty
-To:     Aditya Pakki <pakki001@umn.edu>, ceph-devel@vger.kernel.org,
-        linux-block@vger.kernel.org
-From:   Markus Elfring <Markus.Elfring@web.de>
-Autocrypt: addr=Markus.Elfring@web.de; prefer-encrypt=mutual; keydata=
- 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 FEE=
-Message-ID: <2b5305f3-1224-01a4-ee52-5e05b92e56d6@web.de>
-Date:   Sun, 15 Dec 2019 23:00:06 +0100
-User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:68.0) Gecko/20100101
- Thunderbird/68.3.0
+        id S1726638AbfLPERy (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Sun, 15 Dec 2019 23:17:54 -0500
+Received: from mail105.syd.optusnet.com.au ([211.29.132.249]:48742 "EHLO
+        mail105.syd.optusnet.com.au" rhost-flags-OK-OK-OK-OK)
+        by vger.kernel.org with ESMTP id S1726437AbfLPERx (ORCPT
+        <rfc822;linux-block@vger.kernel.org>);
+        Sun, 15 Dec 2019 23:17:53 -0500
+Received: from dread.disaster.area (pa49-195-139-249.pa.nsw.optusnet.com.au [49.195.139.249])
+        by mail105.syd.optusnet.com.au (Postfix) with ESMTPS id D6D053A1320;
+        Mon, 16 Dec 2019 15:17:49 +1100 (AEDT)
+Received: from dave by dread.disaster.area with local (Exim 4.92.3)
+        (envelope-from <david@fromorbit.com>)
+        id 1ighpM-0007Vm-NT; Mon, 16 Dec 2019 15:17:48 +1100
+Date:   Mon, 16 Dec 2019 15:17:48 +1100
+From:   Dave Chinner <david@fromorbit.com>
+To:     Jens Axboe <axboe@kernel.dk>
+Cc:     linux-mm@kvack.org, linux-fsdevel@vger.kernel.org,
+        linux-block@vger.kernel.org, willy@infradead.org, clm@fb.com,
+        torvalds@linux-foundation.org
+Subject: Re: [PATCH 5/5] iomap: support RWF_UNCACHED for buffered writes
+Message-ID: <20191216041748.GL19213@dread.disaster.area>
+References: <20191211152943.2933-1-axboe@kernel.dk>
+ <20191211152943.2933-6-axboe@kernel.dk>
+ <20191212223403.GH19213@dread.disaster.area>
+ <df334467-9c1a-2f03-654f-58b002ea5ae4@kernel.dk>
+ <39af5a4d-7539-5746-ac3e-e2d6bd2209e3@kernel.dk>
 MIME-Version: 1.0
-In-Reply-To: <20191215163527.25203-1-pakki001@umn.edu>
-Content-Type: text/plain; charset=utf-8
-Content-Language: en-US
-Content-Transfer-Encoding: quoted-printable
-X-Provags-ID: V03:K1:fVDxTeu5YavYWreg6nYpuyDmw0DU/PFA/q7RcKJigR0hVGq8Jij
- wKtlNM6Gl58PTQkrauhXor0mlek6f7a70eh45qsoiLM6Sf2Csoz7HHXo1UY021MF7SEP1Ia
- FM9KNysKPx5EnGQSQkW6O0OlXLSVhZFBqDK4putHRV1iVIji4m2smiqXkALnOJrj/DSwCxC
- wiCH2BcOQ+LQUNX9HOh5A==
-X-UI-Out-Filterresults: notjunk:1;V03:K0:QZDpB2b+TCI=:fNzrWN/6qzH7xsjxkHZfRM
- ylRGhop23RXq4Q6TbmhtFMpi930GEagxJ37VL+QbfwYHRbNJKHxUGfqb0nj6RY+02LLCBrWf4
- HWq8fT8h5ESgKbk5gv164kPj/LKgKecew8lQVT6hHFuS1gvyKrlyA597MSlDr7GYF8WWlTHfm
- aFg4/d0hp8eYK9mU29qdSeXZ7IZEUYVaz3nN0lHjbak9zJqmvV/jyVTQRoQgDwjAQxVFYTe+d
- NEUGGg9vLvLnNaC4amJSGbbDIH7hb7b0aXNzka+Gklsuy0GI9POKui1IY3o+r/+6X1+A54qR1
- syB96TmR/vvo9VDMuC6BUEjx/t2UzTMoU+HwpoQtfM/xwaVvDJjZPXUGm3srZ5d7KmYmdIPGs
- bV2kq/eND5ZdbYsUyk4QjxEwAljtYMSmGinloE7dR7SkLUQ2sKJwDX4xcNB9wTKzlQc6FyW/t
- OSXaxBV8Pr9oLxG/+K/1ixCz9J1sqq8D9riDmuXXlOdZbeF1427nnAT65YqIleyWeQhqZ39Un
- wsE1Y6P92wGLEDjj0ay1urByEfVr9husEStf9qtgl+/N8gff59u14TYKO1cLezHSIbgneoJmx
- c5ZO3HdGSkXhuKJjyLA3WzfT6bDOoglvv0V/yLWtbD5VfPubtOfSNt42SIYh8+eTc/WkKDUIw
- UOhgIBzaKEkCkYDuP4L2/E4wUqX1norDtlRbOhavIn5zpzAFfGNWQIgJ50toRIcy7raX6Vkd/
- eJw5M6cNTIJKmymxA8DuXeprqwxJCAGonj6El+VZx5YUfnNt0moCYYbTxLgIsKQ2XgZZGD/i9
- 7tNalg9NPjm0S7ZVzUg2fdl/5Ft3hE22dygbh1QlXcQyNQVLZbBjeI8rOzApzvDNu9vJ+WojS
- RDT4rkVavBORvcuk4F7DUmIsvAZUrq0mGEHbNtqyZcujJ6nY+VYpaR+bsa+ISMhLXEMBgpCdI
- fLXU0JjKeiBpjWSs3rDUaPVbQKgxPQeUnu1Z9GSE/Rfp0QUkOXdtq9RP0hr3GfqAIkqWIUDGq
- WYXQKm854ZJvzJQo9TD73LIHu5Cy0gw7DG30fosiC5RvhrYVpplWatGzCMNT1HbHMWAPR3R8w
- sIzxdtNxFNQrk5xl5PSuRAnBA8cfLNI+a05fXoXMweYQ8fJoOGH+h2q2Ic2/RDRlUcoeJFAlF
- Wf5nrAxYN9ETWgB8rYJsjLM334SLLpySQslun/U4oRDaFjgzl/sFA19y1cyvXAGwJ9EuUcCq6
- KYRrwvyLGpNLWNg7FQQNfQpP82dZ2kpw7c2pBw05IJkV3VfAOh7RC65Pkw1M=
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <39af5a4d-7539-5746-ac3e-e2d6bd2209e3@kernel.dk>
+User-Agent: Mutt/1.10.1 (2018-07-13)
+X-Optus-CM-Score: 0
+X-Optus-CM-Analysis: v=2.3 cv=W5xGqiek c=1 sm=1 tr=0
+        a=KoypXv6BqLCQNZUs2nCMWg==:117 a=KoypXv6BqLCQNZUs2nCMWg==:17
+        a=jpOVt7BSZ2e4Z31A5e1TngXxSK0=:19 a=kj9zAlcOel0A:10 a=pxVhFHJ0LMsA:10
+        a=7-415B0cAAAA:8 a=ttecOIznnv4Bib-PtgkA:9 a=MxdZBAM7kpbZ0xAP:21
+        a=ww7lA5-8tPDbahhq:21 a=CjuIK1q_8ugA:10 a=biEYGPWJfzWAr4FL6Ov7:22
 Sender: linux-block-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-> The patch fixes this issue.
+On Thu, Dec 12, 2019 at 05:57:57PM -0700, Jens Axboe wrote:
+> On 12/12/19 5:54 PM, Jens Axboe wrote:
+> > On 12/12/19 3:34 PM, Dave Chinner wrote:
+> >> On Wed, Dec 11, 2019 at 08:29:43AM -0700, Jens Axboe wrote:
+> >>> This adds support for RWF_UNCACHED for file systems using iomap to
+> >>> perform buffered writes. We use the generic infrastructure for this,
+> >>> by tracking pages we created and calling write_drop_cached_pages()
+> >>> to issue writeback and prune those pages.
+> >>>
+> >>> Signed-off-by: Jens Axboe <axboe@kernel.dk>
+> >>> ---
+> >>>  fs/iomap/apply.c       | 24 ++++++++++++++++++++++++
+> >>>  fs/iomap/buffered-io.c | 37 +++++++++++++++++++++++++++++--------
+> >>>  include/linux/iomap.h  |  5 +++++
+> >>>  3 files changed, 58 insertions(+), 8 deletions(-)
+> >>>
+> >>> diff --git a/fs/iomap/apply.c b/fs/iomap/apply.c
+> >>> index 562536da8a13..966826ad4bb9 100644
+> >>> --- a/fs/iomap/apply.c
+> >>> +++ b/fs/iomap/apply.c
+> >>> @@ -90,5 +90,29 @@ iomap_apply(struct inode *inode, loff_t pos, loff_t length, unsigned flags,
+> >>>  				     flags, &iomap);
+> >>>  	}
+> >>>  
+> >>> +	if (written && (flags & IOMAP_UNCACHED)) {
+> >>> +		struct address_space *mapping = inode->i_mapping;
+> >>> +
+> >>> +		end = pos + written;
+> >>> +		ret = filemap_write_and_wait_range(mapping, pos, end);
+> >>> +		if (ret)
+> >>> +			goto out;
+> >>> +
+> >>> +		/*
+> >>> +		 * No pages were created for this range, we're done
+> >>> +		 */
+> >>> +		if (!(iomap.flags & IOMAP_F_PAGE_CREATE))
+> >>> +			goto out;
+> >>> +
+> >>> +		/*
+> >>> +		 * Try to invalidate cache pages for the range we just wrote.
+> >>> +		 * We don't care if invalidation fails as the write has still
+> >>> +		 * worked and leaving clean uptodate pages in the page cache
+> >>> +		 * isn't a corruption vector for uncached IO.
+> >>> +		 */
+> >>> +		invalidate_inode_pages2_range(mapping,
+> >>> +				pos >> PAGE_SHIFT, end >> PAGE_SHIFT);
+> >>> +	}
+> >>> +out:
+> >>>  	return written ? written : ret;
+> >>>  }
+> >>
+> >> Just a thought on further optimisation for this for XFS.
+> >> IOMAP_UNCACHED is being passed into the filesystem ->iomap_begin
+> >> methods by iomap_apply().  Hence the filesystems know that it is
+> >> an uncached IO that is being done, and we can tailor allocation
+> >> strategies to suit the fact that the data is going to be written
+> >> immediately.
+> >>
+> >> In this case, XFS needs to treat it the same way it treats direct
+> >> IO. That is, we do immediate unwritten extent allocation rather than
+> >> delayed allocation. This will reduce the allocation overhead and
+> >> will optimise for immediate IO locality rather than optimise for
+> >> delayed allocation.
+> >>
+> >> This should just be a relatively simple change to
+> >> xfs_file_iomap_begin() along the lines of:
+> >>
+> >> -	if ((flags & (IOMAP_WRITE | IOMAP_ZERO)) && !(flags & IOMAP_DIRECT) &&
+> >> -			!IS_DAX(inode) && !xfs_get_extsz_hint(ip)) {
+> >> +	if ((flags & (IOMAP_WRITE | IOMAP_ZERO)) &&
+> >> +	    !(flags & (IOMAP_DIRECT | IOMAP_UNCACHED)) &&
+> >> +	    !IS_DAX(inode) && !xfs_get_extsz_hint(ip)) {
+> >> 		/* Reserve delalloc blocks for regular writeback. */
+> >> 		return xfs_file_iomap_begin_delay(inode, offset, length, flags,
+> >> 				iomap);
+> >> 	}
+> >>
+> >> so that it avoids delayed allocation for uncached IO...
+> > 
+> > That's very handy! Thanks, I'll add that to the next version. Just out
+> > of curiosity, would you prefer this as a separate patch, or just bundle
+> > it with the iomap buffered RWF_UNCACHED patch? I'm assuming the latter,
+> > and I'll just mention it in the changelog.
+> 
+> OK, since it's in XFS, it'd be a separate patch.
 
-Will the tag =E2=80=9CFixes=E2=80=9D be more helpful than this sentence?
+*nod*
 
-Regards,
-Markus
+> The code you quote seems
+> to be something out-of-tree?
+
+Ah, I quoted the code in the 5.4 release branch, not the 5.5-rc1
+tree. I'd forgotten that the xfs_file_iomap_begin() got massively
+refactored in the 5.5 merge and I hadn't updated my cscope trees. SO
+I'm guessing you want to go looking for the
+xfs_buffered_write_iomap_begin() and add another case to this
+initial branch:
+
+        /* we can't use delayed allocations when using extent size hints */
+        if (xfs_get_extsz_hint(ip))
+                return xfs_direct_write_iomap_begin(inode, offset, count,
+                                flags, iomap, srcmap);
+
+To make the buffered write IO go down the direct IO allocation path...
+
+Cheers,
+
+Dave.
+-- 
+Dave Chinner
+david@fromorbit.com
