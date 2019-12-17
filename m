@@ -6,22 +6,22 @@ X-Spam-Status: No, score=-9.8 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
 	INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,
 	USER_AGENT_GIT autolearn=unavailable autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 40EA2C3F68F
-	for <linux-block@archiver.kernel.org>; Tue, 17 Dec 2019 22:20:10 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id C1D1FC43603
+	for <linux-block@archiver.kernel.org>; Tue, 17 Dec 2019 22:20:14 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.kernel.org (Postfix) with ESMTP id 1FE6E21582
-	for <linux-block@archiver.kernel.org>; Tue, 17 Dec 2019 22:20:10 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id 9B56721775
+	for <linux-block@archiver.kernel.org>; Tue, 17 Dec 2019 22:20:14 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1726591AbfLQWRi (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Tue, 17 Dec 2019 17:17:38 -0500
-Received: from mout.kundenserver.de ([217.72.192.74]:45633 "EHLO
+        id S1726757AbfLQWUJ (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Tue, 17 Dec 2019 17:20:09 -0500
+Received: from mout.kundenserver.de ([212.227.17.10]:60465 "EHLO
         mout.kundenserver.de" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1726539AbfLQWRh (ORCPT
+        with ESMTP id S1726569AbfLQWRi (ORCPT
         <rfc822;linux-block@vger.kernel.org>);
-        Tue, 17 Dec 2019 17:17:37 -0500
+        Tue, 17 Dec 2019 17:17:38 -0500
 Received: from threadripper.lan ([149.172.19.189]) by mrelayeu.kundenserver.de
  (mreue108 [212.227.15.145]) with ESMTPA (Nemesis) id
- 1MWiUg-1iAIaz11AG-00X7Da; Tue, 17 Dec 2019 23:17:25 +0100
+ 1MLz7f-1iPOdC2idl-00Hxzz; Tue, 17 Dec 2019 23:17:27 +0100
 From:   Arnd Bergmann <arnd@arndb.de>
 To:     Jens Axboe <axboe@kernel.dk>,
         "James E.J. Bottomley" <jejb@linux.ibm.com>,
@@ -31,68 +31,75 @@ Cc:     linux-scsi@vger.kernel.org, linux-block@vger.kernel.org,
         Christoph Hellwig <hch@lst.de>,
         Ben Hutchings <ben.hutchings@codethink.co.uk>,
         linux-doc@vger.kernel.org, corbet@lwn.net, viro@zeniv.linux.org.uk,
-        linux-fsdevel@vger.kernel.org, Arnd Bergmann <arnd@arndb.de>,
-        stable@vger.kernel.org
-Subject: [PATCH v2 05/27] compat_ioctl: block: handle Persistent Reservations
-Date:   Tue, 17 Dec 2019 23:16:46 +0100
-Message-Id: <20191217221708.3730997-6-arnd@arndb.de>
+        linux-fsdevel@vger.kernel.org, Arnd Bergmann <arnd@arndb.de>
+Subject: [PATCH v2 10/27] compat_ioctl: ubd, aoe: use blkdev_compat_ptr_ioctl
+Date:   Tue, 17 Dec 2019 23:16:51 +0100
+Message-Id: <20191217221708.3730997-11-arnd@arndb.de>
 X-Mailer: git-send-email 2.20.0
 In-Reply-To: <20191217221708.3730997-1-arnd@arndb.de>
 References: <20191217221708.3730997-1-arnd@arndb.de>
 MIME-Version: 1.0
 Content-Transfer-Encoding: 8bit
-X-Provags-ID: V03:K1:tx22KhkD8iJEZwgYOFJOPlY7/tV41LHYXsZyhEEBtPVUvOD6tZ9
- 4vPV9N8E62lgxAxzbfK8VDbGilQv+sX1qrJOYnivJO3Kx7yLG1YXPA9d3OSBQ2Up50TY2P5
- E+6JBT8vWfcZROysq2+gDwTDnZCBZvKYpKY5KsUZKiWLRhBcIt0dDmgK7tehattqwqXno49
- vXnJSOt2f4OGkue9fXHKg==
-X-UI-Out-Filterresults: notjunk:1;V03:K0:7CYFyHsACKo=:iyqLTw2Ohx2BEyJYsY+41B
- hmwCpRKunMUl5x4CJcPTcGVIU5H44ivCnbINJS9mY+fwQyDURv9WqnbJ8BKVg9OfGh0zuhGuJ
- E410up0th9p7KZUbMj7TMBh2DwGyF4mvvWKAA5o6lXrfK9JoZrSfUsB5nPW7mNINFtgCVK6q+
- C5ho2O5/A5yBtAUmN64W+FrC+/fHoVI0GCjzmZ6hlEzFvDX5SbIAtIxjC99izWWjugaLMyX6N
- 27qHiPIxK/4sFWFthVGVDijLh8GaQYnfJ/KuesQ+l4IAmo6vDORhk33l5yV66TpT/RIFdEAf0
- 4x73Z8R6U0zssgg8ECCn3uS0Fp1eZtEiueO2/ZWjZah8FHdlpK6HJFTKGGrCacMXpnFZ+/X0P
- frWn1az7Dzraw9EtnxDoi208ZXqwffjTDOJX33eDDBpr5XMkE6MOJFeE9QC1vRdQ16xzDDQYy
- NVuLk3W10H+rnGj5kUVvcfLF5ltPJe/sSH2SKVMSYf+LFg4scM+8xOpJO/ItnkAlPLFKydGy4
- kd/OLhf8xRqcbJsgkt9/YxeY59pHHB3USKVHP23C9YP7Q1U+eDd55rOLPsnyfrZ8dfv6EfKuu
- snRrXg6PaLYh5gnyjsinoeAx2aHPbOYfK5WRUA2j6S2SFX4CJUyC9Ztk3ehYK/ifB9EmYjWhz
- 6MbLS+22UGdPgqIbcwauE98Q+zazJtoPwRXc0cP9elqDfdSx2iN5iRhOuNIqEUwyIQLcaLens
- EgMCvwj72YNusvtNS/E1eqcJffNdTWGYofCMPbJZwajFRs3blHACkQPD0KHiboA0h9T3umrqT
- sEUgKmBzCLZSmf2JYy9Ni4gBWr1RoTw3UHhLFcRICibhg0pKZlgplQlOZ3nROO28SseqNcmVL
- O9es2vmgaCJxzqdKwRsw==
+X-Provags-ID: V03:K1:pXgtQR2qBCnSxJSJP7Y8qCzLQ/VoWcKI8ZIUVUSLjozoL96eoEm
+ jS/dQT773HwnIlYtCaz/VwTxsgiorHcK0GE59g6ES4DCAbJYDR1pNRuCqoUrPHL4Ry4d3U7
+ TBlboU8N5E4h71VTNV7UqnqgBwVPx8dGUD6nhs40UU5t+Hdgl82MsiuumI+NIWKdfJpzvX4
+ BT+G3Xk7tKgva9zDuTjig==
+X-UI-Out-Filterresults: notjunk:1;V03:K0:3Sn1qxFJj1c=:tUMSxbPiYFrI6EX1e3mwt7
+ rHN1+PnajD2XFYaIDBNraD9FEMOuqalFH++3MPe70YKbWzHjPVXp2SL1e2amVBuwM/tQF2poX
+ ZAxg9IGxSpByjPBLphmGwJ8tzfMgc23wRM9E/pheclEc7m26cxOfl3TGgSCxXueTFmEB3ohUE
+ 8SFPImb/0CCIBMaoCC2lrjkTXrQWtrhzYfy0hXOg5SKiZCFOn2hsV1NwgrfqVUF2XXM4zDZB3
+ mFdH5RfFHOMubdOiTJhBtV81Q6rN0AaRiJ2t9RYKpPKv8kBfzJsECcI2K3Wo6P3e84R8oAQ/+
+ 8TSMWS/N3oAkC0IXVoOtDUhRyPVSZnXGkarWjwRIAkOZ+m1p0E1QXhImXsX71oNmMzdJNOk17
+ LbnQyUIr+3uUxLO/OKVOqRlfMs0UBbLGTD/7WdEw8jF3Lxy1jW8ohmVl35A9BqT57HpCnJz6H
+ ttP+634RpDmKwCHYo+tJT3VYhKH5pOi7ScDUJPa5Vcaqc6WOgT56/xSvxPWv5SQp/2+TsCOOe
+ YMqIbm2UwTskJlSOMI72+cmdPr+mFZomb7+1H5hjHOuj6HNO9PLZ7KLPCjgs+bJoYdqWKCXFO
+ oAvSVUClMcvqPYvrqNSGkawmqmMsocU5kEZQGQV8/+FbJMXd+iN3AyE4T2iZQrk76Lbci7NCc
+ U4jzy012goNB6UshKCU1nzNVTz2E1LKl7rD8liiurZhA7iCl4VsKQEMOSuS557ulSbEkt+thf
+ sHP2x/MvCyoZiGz5M2N2lUQhAX1hz1I3NDvqZ7pT1wef7kU8blXu2l61NyozCxE59CEaM6fNv
+ MakRtMJYuEDJbktoFgqDV2ycF6ZejToGYzbs6Qj86pA/GACn7UrBO5Uup/i/sqiz9Axo6UzW+
+ 6CAa68o34dGq7Dc9F0mA==
 Sender: linux-block-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-These were added to blkdev_ioctl() in linux-5.5 but not
-blkdev_compat_ioctl, so add them now.
+These drivers implement the HDIO_GET_IDENTITY and CDROMVOLREAD ioctl
+commands, which are compatible between 32-bit and 64-bit user space and
+traditionally handled by compat_blkdev_driver_ioctl().
 
-Cc: <stable@vger.kernel.org> # v4.4+
-Fixes: bbd3e064362e ("block: add an API for Persistent Reservations")
+As a prerequisite to removing that function, make both drivers use
+blkdev_compat_ptr_ioctl() as their .compat_ioctl callback.
+
 Signed-off-by: Arnd Bergmann <arnd@arndb.de>
 ---
- block/compat_ioctl.c | 8 ++++++++
- 1 file changed, 8 insertions(+)
+ arch/um/drivers/ubd_kern.c | 1 +
+ drivers/block/aoe/aoeblk.c | 1 +
+ 2 files changed, 2 insertions(+)
 
-diff --git a/block/compat_ioctl.c b/block/compat_ioctl.c
-index 5b13e344229c..f16ae92065d7 100644
---- a/block/compat_ioctl.c
-+++ b/block/compat_ioctl.c
-@@ -408,6 +408,14 @@ long compat_blkdev_ioctl(struct file *file, unsigned cmd, unsigned long arg)
- 	case BLKTRACETEARDOWN: /* compatible */
- 		ret = blk_trace_ioctl(bdev, cmd, compat_ptr(arg));
- 		return ret;
-+	case IOC_PR_REGISTER:
-+	case IOC_PR_RESERVE:
-+	case IOC_PR_RELEASE:
-+	case IOC_PR_PREEMPT:
-+	case IOC_PR_PREEMPT_ABORT:
-+	case IOC_PR_CLEAR:
-+		return blkdev_ioctl(bdev, mode, cmd,
-+				(unsigned long)compat_ptr(arg));
- 	default:
- 		if (disk->fops->compat_ioctl)
- 			ret = disk->fops->compat_ioctl(bdev, mode, cmd, arg);
+diff --git a/arch/um/drivers/ubd_kern.c b/arch/um/drivers/ubd_kern.c
+index 6627d7c30f37..582eb5b1f09b 100644
+--- a/arch/um/drivers/ubd_kern.c
++++ b/arch/um/drivers/ubd_kern.c
+@@ -113,6 +113,7 @@ static const struct block_device_operations ubd_blops = {
+         .open		= ubd_open,
+         .release	= ubd_release,
+         .ioctl		= ubd_ioctl,
++        .compat_ioctl	= blkdev_compat_ptr_ioctl,
+ 	.getgeo		= ubd_getgeo,
+ };
+ 
+diff --git a/drivers/block/aoe/aoeblk.c b/drivers/block/aoe/aoeblk.c
+index bd19f8af950b..7b32fb673375 100644
+--- a/drivers/block/aoe/aoeblk.c
++++ b/drivers/block/aoe/aoeblk.c
+@@ -329,6 +329,7 @@ static const struct block_device_operations aoe_bdops = {
+ 	.open = aoeblk_open,
+ 	.release = aoeblk_release,
+ 	.ioctl = aoeblk_ioctl,
++	.compat_ioctl = blkdev_compat_ptr_ioctl,
+ 	.getgeo = aoeblk_getgeo,
+ 	.owner = THIS_MODULE,
+ };
 -- 
 2.20.0
 
