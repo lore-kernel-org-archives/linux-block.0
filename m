@@ -2,112 +2,97 @@ Return-Path: <SRS0=G4H8=2H=vger.kernel.org=linux-block-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-8.4 required=3.0 tests=DKIMWL_WL_HIGH,DKIM_SIGNED,
-	DKIM_VALID,DKIM_VALID_AU,HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,
-	MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,USER_AGENT_SANE_1
-	autolearn=ham autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-2.3 required=3.0 tests=DKIM_SIGNED,DKIM_VALID,
+	HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,
+	USER_AGENT_SANE_1 autolearn=no autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id B66C0C43603
-	for <linux-block@archiver.kernel.org>; Tue, 17 Dec 2019 16:00:31 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 032F5C43603
+	for <linux-block@archiver.kernel.org>; Tue, 17 Dec 2019 16:02:10 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.kernel.org (Postfix) with ESMTP id 8995121835
-	for <linux-block@archiver.kernel.org>; Tue, 17 Dec 2019 16:00:31 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id C46BE24672
+	for <linux-block@archiver.kernel.org>; Tue, 17 Dec 2019 16:02:09 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="FIUTIhif"
+	dkim=pass (2048-bit key) header.d=kernel-dk.20150623.gappssmtp.com header.i=@kernel-dk.20150623.gappssmtp.com header.b="R7KIp6zl"
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1726933AbfLQQAb (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Tue, 17 Dec 2019 11:00:31 -0500
-Received: from us-smtp-1.mimecast.com ([207.211.31.81]:30058 "EHLO
-        us-smtp-delivery-1.mimecast.com" rhost-flags-OK-OK-OK-FAIL)
-        by vger.kernel.org with ESMTP id S1726858AbfLQQAa (ORCPT
+        id S1727517AbfLQQCJ (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Tue, 17 Dec 2019 11:02:09 -0500
+Received: from mail-io1-f66.google.com ([209.85.166.66]:40320 "EHLO
+        mail-io1-f66.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S1726858AbfLQQCI (ORCPT
         <rfc822;linux-block@vger.kernel.org>);
-        Tue, 17 Dec 2019 11:00:30 -0500
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-        s=mimecast20190719; t=1576598429;
-        h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-         to:to:cc:cc:mime-version:mime-version:content-type:content-type;
-        bh=LHY7/sCHlK9IhST8k8x/+uuV5bPNih9LNczJAHNHTZw=;
-        b=FIUTIhifJN9nIRwC5vgZ2BvzWTE74gh/q/Uf3qIQ5f2W+e1IId2POv9sC95BmfOVNUxNYo
-        yz/B+TDO4quxODQAA5HAVstQY5VZ0FqHejloXqQ7TW+G34bhZHi0W9jrKbdbKxv/RVftDP
-        FwlZFaL8laFmlYPslTLYoMK1otZytGk=
-Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
- [209.132.183.4]) (Using TLS) by relay.mimecast.com with ESMTP id
- us-mta-195-qgkBDHZCMv-tKbI_DTZH4w-1; Tue, 17 Dec 2019 11:00:27 -0500
-X-MC-Unique: qgkBDHZCMv-tKbI_DTZH4w-1
-Received: from smtp.corp.redhat.com (int-mx01.intmail.prod.int.phx2.redhat.com [10.5.11.11])
-        (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
-        (No client certificate requested)
-        by mimecast-mx01.redhat.com (Postfix) with ESMTPS id A0B58107ACCD
-        for <linux-block@vger.kernel.org>; Tue, 17 Dec 2019 16:00:26 +0000 (UTC)
-Received: from redhat (ovpn-124-205.rdu2.redhat.com [10.10.124.205])
-        by smtp.corp.redhat.com (Postfix) with ESMTPS id 357E4620CE;
-        Tue, 17 Dec 2019 16:00:26 +0000 (UTC)
-Date:   Tue, 17 Dec 2019 11:00:24 -0500
-From:   David Jeffery <djeffery@redhat.com>
-To:     linux-block@vger.kernel.org
-Cc:     David Jeffery <djeffery@redhat.com>,
-        John Pittman <jpittman@redhat.com>
-Subject: [PATCH] sbitmap: only queue kyber's wait callback if not already
- active
-Message-ID: <20191217160024.GA23066@redhat>
+        Tue, 17 Dec 2019 11:02:08 -0500
+Received: by mail-io1-f66.google.com with SMTP id x1so2449397iop.7
+        for <linux-block@vger.kernel.org>; Tue, 17 Dec 2019 08:02:08 -0800 (PST)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=kernel-dk.20150623.gappssmtp.com; s=20150623;
+        h=subject:to:cc:references:from:message-id:date:user-agent
+         :mime-version:in-reply-to:content-language:content-transfer-encoding;
+        bh=5JIm+66jed2pLoKMUo/hqq7wkhQB4//2xuBd2ygSaNg=;
+        b=R7KIp6zlfUik0IXY+VjHwKMOdTHoc7uLYkmii16Joq6fT0R6SDlBzaVfg3xBvCU3MI
+         A0sg8uE8R+aKAYgeJa1pCB348yHY1bgNArCl3P8UJyhLQh8Eu09QJJ8KY/of6nAnLSWQ
+         N7/t/ptfH7gAtWnk176IxWb4+KVdE12gjSKO56OgPAIPz8M0YxVuuP31daA9s91hYuYg
+         e1xhT/bH+Jw+6aEq9BT49RD4eKQLiy01BYJxa+dJoFA7izEeNcN9i435vcwkXQIJOT16
+         DRvgzzGLslNRs2H8jM6Aqc3eIAmd61B2b594brygRh8xrk+FBHMUQVMz5CSvxKK2vHU1
+         fzZQ==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20161025;
+        h=x-gm-message-state:subject:to:cc:references:from:message-id:date
+         :user-agent:mime-version:in-reply-to:content-language
+         :content-transfer-encoding;
+        bh=5JIm+66jed2pLoKMUo/hqq7wkhQB4//2xuBd2ygSaNg=;
+        b=n4pV3nlaBymgJfn8iKEIpb/reFz89eszPwN8imuvpdSLxfqG+tn8ZnkxhsicHQXdMV
+         E6/vhS+fC++cU0qo13e0u8RL5DHi+hs6uLb/YL9PvwxhKwe7M7Mn0wKcRTFqaD/RyBWr
+         0FBen9ZBGKM0oZnJCNaTPX4jvvMa9R8WS2ERlsX4boAuGj4b7jFwuvZGTfWxkrEahZYx
+         CscDOWoJnLHC1p0CzP5+lOi+s6xC7iYUtgsBQpn2QmBkjkJVrw6IIsxgrZGT+kGi4IKO
+         6aBipaa3T2TeRc6mQ0rjDobg/PBqCInzxRwuCJVqo3mT81NmQRhrwk0ZDmtO6TMjdIty
+         yllw==
+X-Gm-Message-State: APjAAAUa9X4i8vXljQAt71fi8d5ZM779T9WeYkkcsevZp7+Vmz1U67VG
+        N42gfFqA3j0ccYZ7SEdeGN3udK3U8wyblQ==
+X-Google-Smtp-Source: APXvYqyXqI7MAB3jK3X4MXe3QR4hgLAKfWqQppblEyl5vfrVHkY23Rws/m2uca0zCYYDu2blc6H41g==
+X-Received: by 2002:a02:1041:: with SMTP id 62mr17461376jay.51.1576598527956;
+        Tue, 17 Dec 2019 08:02:07 -0800 (PST)
+Received: from [192.168.1.159] ([65.144.74.34])
+        by smtp.gmail.com with ESMTPSA id 75sm3970179ila.61.2019.12.17.08.02.07
+        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
+        Tue, 17 Dec 2019 08:02:07 -0800 (PST)
+Subject: Re: [PATCH 1/1] block: end bio with BLK_STS_AGAIN in case of non-mq
+ devs and REQ_NOWAIT
+To:     Roman Penyaev <rpenyaev@suse.de>
+Cc:     linux-block@vger.kernel.org
+References: <20191217155407.928386-1-rpenyaev@suse.de>
+From:   Jens Axboe <axboe@kernel.dk>
+Message-ID: <08f4bf46-fc8f-b2e4-d887-cde71ff4a75c@kernel.dk>
+Date:   Tue, 17 Dec 2019 09:02:06 -0700
+User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:68.0) Gecko/20100101
+ Thunderbird/68.2.2
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-User-Agent: Mutt/1.12.1 (2019-06-15)
-X-Scanned-By: MIMEDefang 2.79 on 10.5.11.11
+In-Reply-To: <20191217155407.928386-1-rpenyaev@suse.de>
+Content-Type: text/plain; charset=utf-8
+Content-Language: en-US
+Content-Transfer-Encoding: 7bit
 Sender: linux-block-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-Under heavy loads where the kyber I/O scheduler hits the token limits for
-its scheduling domains, kyber can become stuck.  When active requests
-complete, kyber may not be woken up leaving the I/O requests in kyber
-stuck.
+On 12/17/19 8:54 AM, Roman Penyaev wrote:
+> Non-mq devs do not honor REQ_NOWAIT so give a chance to the caller to repeat
+> request gracefully on -EAGAIN error.
+> 
+> The problem is well reproduced using io_uring:
+> 
+>    mkfs.ext4 /dev/ram0
+>    mount /dev/ram0 /mnt
+> 
+>    # Preallocate a file
+>    dd if=/dev/zero of=/mnt/file bs=1M count=1
+> 
+>    # Start fio with io_uring and get -EIO
+>    fio --rw=write --ioengine=io_uring --size=1M --direct=1 --name=job --filename=/mnt/file
 
-This stuck state is due to a race condition with kyber and the sbitmap
-functions it uses to run a callback when enough requests have completed.
-The running of a sbt_wait callback can race with the attempt to insert the
-sbt_wait.  Since sbitmap_del_wait_queue removes the sbt_wait from the list
-first then sets the sbq field to NULL, kyber can see the item as not on a
-list but the call to sbitmap_add_wait_queue will see sbq as non-NULL. This
-results in the sbt_wait being inserted onto the wait list but ws_active
-doesn't get incremented.  So the sbitmap queue does not know there is a
-waiter on a wait list.
+Thanks, this makes a lot of sense, doing -EIO for that case is wrong. Applied
+for 5.5.
 
-Since sbitmap doesn't think there is a waiter, kyber may never be
-informed that there are domain tokens available and the I/O never advances.
-With the sbt_wait on a wait list, kyber believes it has an active waiter
-so cannot insert a new waiter when reaching the domain's full state.
-
-This race can be fixed by only adding the sbt_wait to the queue if the
-sbq field is NULL.  If sbq is not NULL, there is already an action active
-which will trigger the re-running of kyber.  Let it run and add the
-sbt_wait to the wait list if still needing to wait.
-
-Signed-off-by: David Jeffery <djeffery@redhat.com>
-Reported-by: John Pittman <jpittman@redhat.com>
-Tested-by: John Pittman <jpittman@redhat.com>
----
-
-This bug was reliably being triggered on several test systems.  With the
-fix, the tests no longer fail.
-
- sbitmap.c |    2 +-
- 1 file changed, 1 insertion(+), 1 deletion(-)
-
-diff --git a/lib/sbitmap.c b/lib/sbitmap.c
-index 33feec8989f1..af88d1346dd7 100644
---- a/lib/sbitmap.c
-+++ b/lib/sbitmap.c
-@@ -650,8 +650,8 @@ void sbitmap_add_wait_queue(struct sbitmap_queue *sbq,
- 	if (!sbq_wait->sbq) {
- 		sbq_wait->sbq = sbq;
- 		atomic_inc(&sbq->ws_active);
-+		add_wait_queue(&ws->wait, &sbq_wait->wait);
- 	}
--	add_wait_queue(&ws->wait, &sbq_wait->wait);
- }
- EXPORT_SYMBOL_GPL(sbitmap_add_wait_queue);
- 
+-- 
+Jens Axboe
 
