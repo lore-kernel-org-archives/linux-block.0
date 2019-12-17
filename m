@@ -5,48 +5,48 @@ X-Spam-Level:
 X-Spam-Status: No, score=-9.9 required=3.0 tests=DKIMWL_WL_HIGH,DKIM_SIGNED,
 	DKIM_VALID,DKIM_VALID_AU,HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,
 	MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,USER_AGENT_GIT
-	autolearn=unavailable autolearn_force=no version=3.4.0
+	autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 7B3C3C2D0BF
-	for <linux-block@archiver.kernel.org>; Tue, 17 Dec 2019 16:09:15 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 94010C43603
+	for <linux-block@archiver.kernel.org>; Tue, 17 Dec 2019 16:10:35 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.kernel.org (Postfix) with ESMTP id 50E7C2467B
-	for <linux-block@archiver.kernel.org>; Tue, 17 Dec 2019 16:09:15 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id 5CB2221582
+	for <linux-block@archiver.kernel.org>; Tue, 17 Dec 2019 16:10:35 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=pass (1024-bit key) header.d=amazon.com header.i=@amazon.com header.b="Uibd2SRs"
+	dkim=pass (1024-bit key) header.d=amazon.com header.i=@amazon.com header.b="SE9hhwD3"
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1728194AbfLQQJL (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Tue, 17 Dec 2019 11:09:11 -0500
-Received: from smtp-fw-6001.amazon.com ([52.95.48.154]:62168 "EHLO
-        smtp-fw-6001.amazon.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1728097AbfLQQJK (ORCPT
+        id S1727480AbfLQQKf (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Tue, 17 Dec 2019 11:10:35 -0500
+Received: from smtp-fw-4101.amazon.com ([72.21.198.25]:36309 "EHLO
+        smtp-fw-4101.amazon.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S1727427AbfLQQKe (ORCPT
         <rfc822;linux-block@vger.kernel.org>);
-        Tue, 17 Dec 2019 11:09:10 -0500
+        Tue, 17 Dec 2019 11:10:34 -0500
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
   d=amazon.com; i=@amazon.com; q=dns/txt; s=amazon201209;
-  t=1576598950; x=1608134950;
+  t=1576599034; x=1608135034;
   h=from:to:cc:subject:date:message-id:in-reply-to:
-   references:mime-version;
-  bh=NVFC9qV2eoj93ZmYEaKEr4kRRmxcwtF4qCgUA1XgM8c=;
-  b=Uibd2SRsT0lXIFVPheFrKDiW/MQjyLaEo7avuliqBE2gjL2aAGIbO9Mq
-   gWZvAypsYVH6Yean+rh34UFUMQ7/k50Glh493ndI5rg6rbVtnup48LcJ9
-   0JoTfT/d+e4n9HRGC3KSSPjb18N1FmgQAZjdzT1TUsoUeLT6wDZ3sj1Gn
-   0=;
-IronPort-SDR: aRO1wLh9GqAmNNqsU3pay3V9ZmFMs4xiqfcPlG864PHeqR5P2dbee9CuQQFkIOZkbpvnzYiCR+
- QfjSy1l0Ljog==
+   references:mime-version:content-transfer-encoding;
+  bh=X93izDi+OFRUN5FGBE4eNUsCd4hh4S1nRuspQbSs7oM=;
+  b=SE9hhwD39rxL/tVLBUWI2n6JVW5x96ji4yVNO90n6+M7/oRegzOxzJPO
+   ZngD9nzW23XCaj5UfrePbH3vYflY+kXOymWCFDn3KeOlpgRui1eCS38wq
+   eYCb6LHQkT1Q5bV3zTwH7miHhamiriqQKn1y5wKKnoMqGJKcNPlsfWfK7
+   Q=;
+IronPort-SDR: 70ddUbeW6owvy2EsZEB5V7klIKYTlDr9YFdJgX2Vus9Ax3jr06+HmRW82KbVIgZc2xnkseooqS
+ yAEfbOh9IRNg==
 X-IronPort-AV: E=Sophos;i="5.69,326,1571702400"; 
-   d="scan'208";a="9472487"
-Received: from iad12-co-svc-p1-lb1-vlan3.amazon.com (HELO email-inbound-relay-2b-55156cd4.us-west-2.amazon.com) ([10.43.8.6])
-  by smtp-border-fw-out-6001.iad6.amazon.com with ESMTP; 17 Dec 2019 16:09:08 +0000
-Received: from EX13MTAUEA002.ant.amazon.com (pdx4-ws-svc-p6-lb7-vlan2.pdx.amazon.com [10.170.41.162])
-        by email-inbound-relay-2b-55156cd4.us-west-2.amazon.com (Postfix) with ESMTPS id 7C933A21FC;
-        Tue, 17 Dec 2019 16:09:06 +0000 (UTC)
+   d="scan'208";a="8883589"
+Received: from iad12-co-svc-p1-lb1-vlan3.amazon.com (HELO email-inbound-relay-2c-6f38efd9.us-west-2.amazon.com) ([10.43.8.6])
+  by smtp-border-fw-out-4101.iad4.amazon.com with ESMTP; 17 Dec 2019 16:10:33 +0000
+Received: from EX13MTAUEA002.ant.amazon.com (pdx4-ws-svc-p6-lb7-vlan3.pdx.amazon.com [10.170.41.166])
+        by email-inbound-relay-2c-6f38efd9.us-west-2.amazon.com (Postfix) with ESMTPS id BBB14A1D78;
+        Tue, 17 Dec 2019 16:10:31 +0000 (UTC)
 Received: from EX13D31EUA001.ant.amazon.com (10.43.165.15) by
  EX13MTAUEA002.ant.amazon.com (10.43.61.77) with Microsoft SMTP Server (TLS)
- id 15.0.1236.3; Tue, 17 Dec 2019 16:09:05 +0000
+ id 15.0.1236.3; Tue, 17 Dec 2019 16:10:31 +0000
 Received: from u886c93fd17d25d.ant.amazon.com (10.43.161.179) by
  EX13D31EUA001.ant.amazon.com (10.43.165.15) with Microsoft SMTP Server (TLS)
- id 15.0.1367.3; Tue, 17 Dec 2019 16:09:00 +0000
+ id 15.0.1367.3; Tue, 17 Dec 2019 16:10:26 +0000
 From:   SeongJae Park <sjpark@amazon.com>
 To:     <jgross@suse.com>, <axboe@kernel.dk>, <konrad.wilk@oracle.com>,
         <roger.pau@citrix.com>
@@ -54,16 +54,17 @@ CC:     SeongJae Park <sjpark@amazon.de>, <pdurrant@amazon.com>,
         <sjpark@amazon.com>, <sj38.park@gmail.com>,
         <xen-devel@lists.xenproject.org>, <linux-block@vger.kernel.org>,
         <linux-kernel@vger.kernel.org>
-Subject: [PATCH v11 4/6] xen/blkback: Protect 'reclaim_memory()' with 'reclaim_lock'
-Date:   Tue, 17 Dec 2019 17:07:46 +0100
-Message-ID: <20191217160748.693-5-sjpark@amazon.com>
+Subject: [PATCH v11 5/6] xen/blkback: Remove unnecessary static variable name prefixes
+Date:   Tue, 17 Dec 2019 17:10:07 +0100
+Message-ID: <20191217161007.1102-1-sjpark@amazon.com>
 X-Mailer: git-send-email 2.17.1
 In-Reply-To: <20191217160748.693-1-sjpark@amazon.com>
 References: <20191217160748.693-1-sjpark@amazon.com>
 MIME-Version: 1.0
-Content-Type: text/plain
+Content-Type: text/plain; charset="UTF-8"
+Content-Transfer-Encoding: 8bit
 X-Originating-IP: [10.43.161.179]
-X-ClientProxiedBy: EX13d09UWC002.ant.amazon.com (10.43.162.102) To
+X-ClientProxiedBy: EX13D16UWC002.ant.amazon.com (10.43.162.161) To
  EX13D31EUA001.ant.amazon.com (10.43.165.15)
 Sender: linux-block-owner@vger.kernel.org
 Precedence: bulk
@@ -72,88 +73,129 @@ X-Mailing-List: linux-block@vger.kernel.org
 
 From: SeongJae Park <sjpark@amazon.de>
 
-The 'reclaim_memory()' callback of blkback could race with
-'xen_blkbk_probe()' and 'xen_blkbk_remove()'.  In the case, incompletely
-linked 'backend_info' and 'blkif' might be exposed to the callback, thus
-result in bad results including NULL dereference.  This commit fixes the
-problem by applying the 'reclaim_lock' protection to those.
+A few of static variables in blkback have 'xen_blkif_' prefix, though it
+is unnecessary for static variables.  This commit removes such prefixes.
 
-Note that this commit is separated for review purpose only.  As the
-previous commit might result in race condition and might make bisect
-confuse, please squash this commit into previous commit if possible.
-
+Reviewed-by: Roger Pau Monné <roger.pau@citrix.com>
 Signed-off-by: SeongJae Park <sjpark@amazon.de>
-
 ---
- drivers/block/xen-blkback/xenbus.c | 11 +++++++++++
- 1 file changed, 11 insertions(+)
+ drivers/block/xen-blkback/blkback.c | 37 +++++++++++++----------------
+ 1 file changed, 17 insertions(+), 20 deletions(-)
 
-diff --git a/drivers/block/xen-blkback/xenbus.c b/drivers/block/xen-blkback/xenbus.c
-index 4f6ea4feca79..20045827a391 100644
---- a/drivers/block/xen-blkback/xenbus.c
-+++ b/drivers/block/xen-blkback/xenbus.c
-@@ -492,6 +492,7 @@ static int xen_vbd_create(struct xen_blkif *blkif, blkif_vdev_t handle,
- static int xen_blkbk_remove(struct xenbus_device *dev)
+diff --git a/drivers/block/xen-blkback/blkback.c b/drivers/block/xen-blkback/blkback.c
+index 79f677aeb5cc..fbd67f8e4e4e 100644
+--- a/drivers/block/xen-blkback/blkback.c
++++ b/drivers/block/xen-blkback/blkback.c
+@@ -62,8 +62,8 @@
+  * IO workloads.
+  */
+ 
+-static int xen_blkif_max_buffer_pages = 1024;
+-module_param_named(max_buffer_pages, xen_blkif_max_buffer_pages, int, 0644);
++static int max_buffer_pages = 1024;
++module_param_named(max_buffer_pages, max_buffer_pages, int, 0644);
+ MODULE_PARM_DESC(max_buffer_pages,
+ "Maximum number of free pages to keep in each block backend buffer");
+ 
+@@ -78,8 +78,8 @@ MODULE_PARM_DESC(max_buffer_pages,
+  * algorithm.
+  */
+ 
+-static int xen_blkif_max_pgrants = 1056;
+-module_param_named(max_persistent_grants, xen_blkif_max_pgrants, int, 0644);
++static int max_pgrants = 1056;
++module_param_named(max_persistent_grants, max_pgrants, int, 0644);
+ MODULE_PARM_DESC(max_persistent_grants,
+                  "Maximum number of grants to map persistently");
+ 
+@@ -88,8 +88,8 @@ MODULE_PARM_DESC(max_persistent_grants,
+  * use. The time is in seconds, 0 means indefinitely long.
+  */
+ 
+-static unsigned int xen_blkif_pgrant_timeout = 60;
+-module_param_named(persistent_grant_unused_seconds, xen_blkif_pgrant_timeout,
++static unsigned int pgrant_timeout = 60;
++module_param_named(persistent_grant_unused_seconds, pgrant_timeout,
+ 		   uint, 0644);
+ MODULE_PARM_DESC(persistent_grant_unused_seconds,
+ 		 "Time in seconds an unused persistent grant is allowed to "
+@@ -137,9 +137,8 @@ module_param(log_stats, int, 0644);
+ 
+ static inline bool persistent_gnt_timeout(struct persistent_gnt *persistent_gnt)
  {
- 	struct backend_info *be = dev_get_drvdata(&dev->dev);
-+	unsigned long flags;
- 
- 	pr_debug("%s %p %d\n", __func__, dev, dev->otherend_id);
- 
-@@ -504,6 +505,7 @@ static int xen_blkbk_remove(struct xenbus_device *dev)
- 		be->backend_watch.node = NULL;
- 	}
- 
-+	spin_lock_irqsave(&dev->reclaim_lock, flags);
- 	dev_set_drvdata(&dev->dev, NULL);
- 
- 	if (be->blkif) {
-@@ -512,6 +514,7 @@ static int xen_blkbk_remove(struct xenbus_device *dev)
- 		/* Put the reference we set in xen_blkif_alloc(). */
- 		xen_blkif_put(be->blkif);
- 	}
-+	spin_unlock_irqrestore(&dev->reclaim_lock, flags);
- 
- 	return 0;
+-	return xen_blkif_pgrant_timeout &&
+-	       (jiffies - persistent_gnt->last_used >=
+-		HZ * xen_blkif_pgrant_timeout);
++	return pgrant_timeout && (jiffies - persistent_gnt->last_used >=
++			HZ * pgrant_timeout);
  }
-@@ -597,6 +600,7 @@ static int xen_blkbk_probe(struct xenbus_device *dev,
- 	int err;
- 	struct backend_info *be = kzalloc(sizeof(struct backend_info),
- 					  GFP_KERNEL);
-+	unsigned long flags;
  
- 	/* match the pr_debug in xen_blkbk_remove */
- 	pr_debug("%s %p %d\n", __func__, dev, dev->otherend_id);
-@@ -607,6 +611,7 @@ static int xen_blkbk_probe(struct xenbus_device *dev,
- 		return -ENOMEM;
+ static inline int get_free_page(struct xen_blkif_ring *ring, struct page **page)
+@@ -234,7 +233,7 @@ static int add_persistent_gnt(struct xen_blkif_ring *ring,
+ 	struct persistent_gnt *this;
+ 	struct xen_blkif *blkif = ring->blkif;
+ 
+-	if (ring->persistent_gnt_c >= xen_blkif_max_pgrants) {
++	if (ring->persistent_gnt_c >= max_pgrants) {
+ 		if (!blkif->vbd.overflow_max_grants)
+ 			blkif->vbd.overflow_max_grants = 1;
+ 		return -EBUSY;
+@@ -397,14 +396,13 @@ static void purge_persistent_gnt(struct xen_blkif_ring *ring)
+ 		goto out;
  	}
- 	be->dev = dev;
-+	spin_lock_irqsave(&dev->reclaim_lock, flags);
- 	dev_set_drvdata(&dev->dev, be);
  
- 	be->blkif = xen_blkif_alloc(dev->otherend_id);
-@@ -614,8 +619,10 @@ static int xen_blkbk_probe(struct xenbus_device *dev,
- 		err = PTR_ERR(be->blkif);
- 		be->blkif = NULL;
- 		xenbus_dev_fatal(dev, err, "creating block interface");
-+		spin_unlock_irqrestore(&dev->reclaim_lock, flags);
- 		goto fail;
- 	}
-+	spin_unlock_irqrestore(&dev->reclaim_lock, flags);
+-	if (ring->persistent_gnt_c < xen_blkif_max_pgrants ||
+-	    (ring->persistent_gnt_c == xen_blkif_max_pgrants &&
++	if (ring->persistent_gnt_c < max_pgrants ||
++	    (ring->persistent_gnt_c == max_pgrants &&
+ 	    !ring->blkif->vbd.overflow_max_grants)) {
+ 		num_clean = 0;
+ 	} else {
+-		num_clean = (xen_blkif_max_pgrants / 100) * LRU_PERCENT_CLEAN;
+-		num_clean = ring->persistent_gnt_c - xen_blkif_max_pgrants +
+-			    num_clean;
++		num_clean = (max_pgrants / 100) * LRU_PERCENT_CLEAN;
++		num_clean = ring->persistent_gnt_c - max_pgrants + num_clean;
+ 		num_clean = min(ring->persistent_gnt_c, num_clean);
+ 		pr_debug("Going to purge at least %u persistent grants\n",
+ 			 num_clean);
+@@ -599,8 +597,7 @@ static void print_stats(struct xen_blkif_ring *ring)
+ 		 current->comm, ring->st_oo_req,
+ 		 ring->st_rd_req, ring->st_wr_req,
+ 		 ring->st_f_req, ring->st_ds_req,
+-		 ring->persistent_gnt_c,
+-		 xen_blkif_max_pgrants);
++		 ring->persistent_gnt_c, max_pgrants);
+ 	ring->st_print = jiffies + msecs_to_jiffies(10 * 1000);
+ 	ring->st_rd_req = 0;
+ 	ring->st_wr_req = 0;
+@@ -660,7 +657,7 @@ int xen_blkif_schedule(void *arg)
+ 		if (time_before(jiffies, blkif->buffer_squeeze_end))
+ 			shrink_free_pagepool(ring, 0);
+ 		else
+-			shrink_free_pagepool(ring, xen_blkif_max_buffer_pages);
++			shrink_free_pagepool(ring, max_buffer_pages);
  
- 	err = xenbus_printf(XBT_NIL, dev->nodename,
- 			    "feature-max-indirect-segments", "%u",
-@@ -838,6 +845,10 @@ static void reclaim_memory(struct xenbus_device *dev)
- {
- 	struct backend_info *be = dev_get_drvdata(&dev->dev);
- 
-+	/* Device is registered but not probed yet */
-+	if (!be)
-+		return;
-+
- 	be->blkif->buffer_squeeze_end = jiffies +
- 		msecs_to_jiffies(buffer_squeeze_duration_ms);
- }
+ 		if (log_stats && time_after(jiffies, ring->st_print))
+ 			print_stats(ring);
+@@ -887,7 +884,7 @@ static int xen_blkbk_map(struct xen_blkif_ring *ring,
+ 			continue;
+ 		}
+ 		if (use_persistent_gnts &&
+-		    ring->persistent_gnt_c < xen_blkif_max_pgrants) {
++		    ring->persistent_gnt_c < max_pgrants) {
+ 			/*
+ 			 * We are using persistent grants, the grant is
+ 			 * not mapped but we might have room for it.
+@@ -914,7 +911,7 @@ static int xen_blkbk_map(struct xen_blkif_ring *ring,
+ 			pages[seg_idx]->persistent_gnt = persistent_gnt;
+ 			pr_debug("grant %u added to the tree of persistent grants, using %u/%u\n",
+ 				 persistent_gnt->gnt, ring->persistent_gnt_c,
+-				 xen_blkif_max_pgrants);
++				 max_pgrants);
+ 			goto next;
+ 		}
+ 		if (use_persistent_gnts && !blkif->vbd.overflow_max_grants) {
 -- 
 2.17.1
 
