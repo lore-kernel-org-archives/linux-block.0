@@ -2,120 +2,103 @@ Return-Path: <SRS0=G4H8=2H=vger.kernel.org=linux-block-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-0.9 required=3.0 tests=DKIMWL_WL_HIGH,DKIM_SIGNED,
-	DKIM_VALID,DKIM_VALID_AU,HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,
-	SPF_HELO_NONE,SPF_PASS autolearn=no autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-0.8 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
+	MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS autolearn=no autolearn_force=no
+	version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 70F0FC2D0D1
-	for <linux-block@archiver.kernel.org>; Tue, 17 Dec 2019 20:26:48 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 519BFC43603
+	for <linux-block@archiver.kernel.org>; Tue, 17 Dec 2019 21:39:19 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.kernel.org (Postfix) with ESMTP id 438A821D7D
-	for <linux-block@archiver.kernel.org>; Tue, 17 Dec 2019 20:26:48 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=default; t=1576614408;
-	bh=ELgblhnRlUhHQhpVzXjr3fc4chVVeiMX7dNeAUHFsVs=;
-	h=References:In-Reply-To:From:Date:Subject:To:Cc:List-ID:From;
-	b=lue4c/8+a9H6AeCw9H21Ji7ks/gJiKQS4E/vfY/ydNJ0CPDcyDdn4M7GIi5j9BrNT
-	 HiG/hsu3wSavKhPb4wS5VNcM71gjwYliGiRoPlNusKUKBwf4d9xFUSJZDWGMi1+Pvi
-	 z5ktF9lfk4Ygkgv323rfpbtCucRQ8xK7DE3FFSzM=
+	by mail.kernel.org (Postfix) with ESMTP id 2C59E2082E
+	for <linux-block@archiver.kernel.org>; Tue, 17 Dec 2019 21:39:19 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1727741AbfLQU0r (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Tue, 17 Dec 2019 15:26:47 -0500
-Received: from mail-lj1-f193.google.com ([209.85.208.193]:38213 "EHLO
-        mail-lj1-f193.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1727492AbfLQU0q (ORCPT
+        id S1727529AbfLQVjS (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Tue, 17 Dec 2019 16:39:18 -0500
+Received: from mout.kundenserver.de ([212.227.17.13]:36295 "EHLO
+        mout.kundenserver.de" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S1727704AbfLQVjS (ORCPT
         <rfc822;linux-block@vger.kernel.org>);
-        Tue, 17 Dec 2019 15:26:46 -0500
-Received: by mail-lj1-f193.google.com with SMTP id k8so1070017ljh.5
-        for <linux-block@vger.kernel.org>; Tue, 17 Dec 2019 12:26:45 -0800 (PST)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=linux-foundation.org; s=google;
-        h=mime-version:references:in-reply-to:from:date:message-id:subject:to
-         :cc;
-        bh=i1T7+oLmgUY62ytPiNODIrz1cZeW8gAZnOGieJ8ZkwA=;
-        b=B25Yd0xdGvGJ4bCIEr4Bgw/88tBjEJ0OPfoVc5YLKvIjM26jyP64rHYwIIEVDLTF0T
-         74GwFgIu0A96nSZ33TTCFUmysZjkwE8bDL13x64JVHMOo8K7cEIepUclqLbfA2V4o+Gz
-         t+TIx/86gc/llbykG0MWlhLehR8Su42SrUwv4=
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20161025;
-        h=x-gm-message-state:mime-version:references:in-reply-to:from:date
-         :message-id:subject:to:cc;
-        bh=i1T7+oLmgUY62ytPiNODIrz1cZeW8gAZnOGieJ8ZkwA=;
-        b=E2llVnTl2pBmokcO2DGBE/2BzS0CFZC3E2NfN7V6HPW0k2mZfOunflmJizQp5dx44X
-         4eLxMPqxvse6Un0+r4RG3+lzRhBVs5tejhExQ4tj3uEsxi8P6BGCaNaFWavhvICwvRuu
-         UmYtzOVLQeyTetLhgQpPp7I/CTgS3sn9aZsiyiD1t17wSe/XbiufrzUoCcUc3Gz1c1N7
-         H/boX2UL47mNtDW+5qtP7MoUSm3mUxmZZwEXnK/94HOYfmi9nAiO0sHQbjxJIi1h7bQF
-         6MKlQLfAGeGFqmw4yMt+Z7Z9ju02QSbCXsjtwIMVMYUexsnfanPbptyo8nputmsXW4EW
-         jfHQ==
-X-Gm-Message-State: APjAAAUfm9fBz+kQuxvo2vGnRPmqXKJEVR210Mf37dreFhT6K/PiYon8
-        dYctY3/lkK2jQpGeDHtlAOGUBGOgE7E=
-X-Google-Smtp-Source: APXvYqzf9jq0vxnyAZ5eZEkO82MpCdiVc9GEoeHIoE+LVbo3OnXtUyoMHBXR0ByxM8tOFbrMbDUHEg==
-X-Received: by 2002:a2e:9b05:: with SMTP id u5mr4578821lji.59.1576614403898;
-        Tue, 17 Dec 2019 12:26:43 -0800 (PST)
-Received: from mail-lj1-f170.google.com (mail-lj1-f170.google.com. [209.85.208.170])
-        by smtp.gmail.com with ESMTPSA id v24sm16140294ljc.18.2019.12.17.12.26.42
-        for <linux-block@vger.kernel.org>
-        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
-        Tue, 17 Dec 2019 12:26:42 -0800 (PST)
-Received: by mail-lj1-f170.google.com with SMTP id z17so12395957ljk.13
-        for <linux-block@vger.kernel.org>; Tue, 17 Dec 2019 12:26:42 -0800 (PST)
-X-Received: by 2002:a2e:91cb:: with SMTP id u11mr4707040ljg.82.1576614402189;
- Tue, 17 Dec 2019 12:26:42 -0800 (PST)
+        Tue, 17 Dec 2019 16:39:18 -0500
+Received: from mail-qv1-f45.google.com ([209.85.219.45]) by
+ mrelayeu.kundenserver.de (mreue107 [212.227.15.145]) with ESMTPSA (Nemesis)
+ id 1Ma1HG-1iDcVb3Zzw-00W0BJ; Tue, 17 Dec 2019 22:39:16 +0100
+Received: by mail-qv1-f45.google.com with SMTP id f16so2612778qvi.4;
+        Tue, 17 Dec 2019 13:39:15 -0800 (PST)
+X-Gm-Message-State: APjAAAVvUpkNX47bVY7y7BA/xiOxNSKSS5O5IGPIs3A9SzgbGtpy4xua
+        /DbJIJnN03/RHY+/Gu49dbRDQCeT7mLCLi42a08=
+X-Google-Smtp-Source: APXvYqwLgTq/5K3B2a0Kv5JqoIJuNjoXwcTS39ZAj3UFgfd+yZoCWCBdOxFZcsSuuLqlG8YzlR2R9O/gYJsSc823Fwo=
+X-Received: by 2002:ad4:4021:: with SMTP id q1mr6532445qvp.211.1576618754626;
+ Tue, 17 Dec 2019 13:39:14 -0800 (PST)
 MIME-Version: 1.0
-References: <20191217143948.26380-1-axboe@kernel.dk> <20191217143948.26380-5-axboe@kernel.dk>
- <CAHk-=wgcPAfOSigMf0xwaGfVjw413XN3UPATwYWHrss+QuivhQ@mail.gmail.com>
-In-Reply-To: <CAHk-=wgcPAfOSigMf0xwaGfVjw413XN3UPATwYWHrss+QuivhQ@mail.gmail.com>
-From:   Linus Torvalds <torvalds@linux-foundation.org>
-Date:   Tue, 17 Dec 2019 12:26:26 -0800
-X-Gmail-Original-Message-ID: <CAHk-=wgvROUnrEVADVR_zTHY8NmYo-_jVjV37O1MdDm2de+Lmw@mail.gmail.com>
-Message-ID: <CAHk-=wgvROUnrEVADVR_zTHY8NmYo-_jVjV37O1MdDm2de+Lmw@mail.gmail.com>
-Subject: Re: [PATCH 4/6] iomap: add struct iomap_ctx
-To:     Jens Axboe <axboe@kernel.dk>
-Cc:     Linux-MM <linux-mm@kvack.org>,
-        linux-fsdevel <linux-fsdevel@vger.kernel.org>,
+References: <20191211204306.1207817-1-arnd@arndb.de> <20191211204306.1207817-11-arnd@arndb.de>
+ <f0e7384f3eb6203eb72b36433b0666150cf560ff.camel@codethink.co.uk>
+In-Reply-To: <f0e7384f3eb6203eb72b36433b0666150cf560ff.camel@codethink.co.uk>
+From:   Arnd Bergmann <arnd@arndb.de>
+Date:   Tue, 17 Dec 2019 22:38:58 +0100
+X-Gmail-Original-Message-ID: <CAK8P3a0evGt++XO5dCx5u_0oyyoYGRVVPi4vo9FUdDS68G-4+g@mail.gmail.com>
+Message-ID: <CAK8P3a0evGt++XO5dCx5u_0oyyoYGRVVPi4vo9FUdDS68G-4+g@mail.gmail.com>
+Subject: Re: [Y2038] [PATCH 10/24] compat_ioctl: cdrom: handle CDROM_LAST_WRITTEN
+To:     Ben Hutchings <ben.hutchings@codethink.co.uk>
+Cc:     Jens Axboe <axboe@kernel.dk>,
+        "James E.J. Bottomley" <jejb@linux.ibm.com>,
+        "Martin K. Petersen" <martin.petersen@oracle.com>,
+        Alexander Viro <viro@zeniv.linux.org.uk>,
         linux-block <linux-block@vger.kernel.org>,
-        Matthew Wilcox <willy@infradead.org>, Chris Mason <clm@fb.com>,
-        Dave Chinner <david@fromorbit.com>
+        Jonathan Corbet <corbet@lwn.net>,
+        y2038 Mailman List <y2038@lists.linaro.org>,
+        "linux-kernel@vger.kernel.org" <linux-kernel@vger.kernel.org>,
+        =?UTF-8?Q?Diego_Elio_Petten=C3=B2?= <flameeyes@flameeyes.com>,
+        Hannes Reinecke <hare@suse.de>,
+        Mauro Carvalho Chehab <mchehab+samsung@kernel.org>,
+        Martin Wilck <mwilck@suse.com>,
+        Guenter Roeck <linux@roeck-us.net>
 Content-Type: text/plain; charset="UTF-8"
+X-Provags-ID: V03:K1:oQkrP4ALT6kCEbxBi5aycouamEEcuDaXShQq86/XRr34366WmAl
+ +DW2uaAOthFXbkEcpxuI/QOIRgD77+iMZL/EA06p4h382KSE8IGCju8xX6DHTfd3yT+L5m2
+ kTgVQc83W5eKgHt+Re0YZ0oZf192kXKv0i8NtN77bnOPS3MASWKtapRiOcIfJi9/lljyVO4
+ 7rGeSgtf+yyOeFZ4+Thqw==
+X-UI-Out-Filterresults: notjunk:1;V03:K0:Nx6byoREsV4=:RAU+LI+4bt7lUL72KS/rFh
+ qiOCyFU9GwISJ+5srjJpSMjiSIh6d6ebpQA/3G1N3aklya9dU+hlu18nX8PP7bCTHcPWjzG0u
+ UAMTZQr/BzK+rLwg5e5cYkpz/DHn0fxRTi7qaRR7zL1wrUsWVU6PsE4+8jQzog7rHBVZULKWY
+ 1FDdyFlBOUb/nZixVzK+2UN7mtEy+/eofM+T23bV7ZwZuHXxuyfGOrMiQRTtR8hqtt/eVTAgX
+ +pgV3uOLuNnCcWkAPrNNpbTiKtE2cM+hMzFEjyI6JJA6YWmee2zJGIKWz97Xd1dZiQJ3wU9K9
+ X2cmvABgK3T0qgyMWyIGuoaq7c9fyyjO/rSzbhY7ywmS3xwrZxoKB7y7XJ/TaRyW7ffH1Ok55
+ HQroNEat7CRxQN62V22pYwq04uoQQpNkwveI5FfU7dJLDSA7N70RFV0NBiaOIz1V17Nqx4buV
+ lgPhKW3ED5DXc4biumpRPwXUsBX08o1ZfqGjKY72YwD8rONj01CiHxGJj7qORaxBELShli7xX
+ JasNwsMY+JQJCwn/F4ki4xmLQCR/alcqdYwn0ZnuriHz52ic+M/VvqHwGMtyFtA66dabrefAH
+ cZVQELEzslDJCzaVAw3JvSxg3A1WD29EKBxxnXjWMljE5NAnlXRiC/omLggTc/Ad+C4GQOd6T
+ 5ufq3VstTLtq3d99zdeKZLibs6ukCqznuFrLgKrllZJFJHPpWGr1xiK5cYomzjmJ4+7/h++zY
+ hV0gzpa4E0+98gVwjtDwzKo7raW9o13ZYoPP+QwON29RVkayNtcL9qZarDKuoLGqvwTKws3ST
+ 0zc+ZctmGhQlUetxy0kQDdldDndacx8QWMK7wlaVs4hAnzRxEHjMHnpDh7S/+B2TKAHyw87Mp
+ 7+dSKSH3xwL2vn6Zr38g==
 Sender: linux-block-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-On Tue, Dec 17, 2019 at 11:39 AM Linus Torvalds
-<torvalds@linux-foundation.org> wrote:
+On Tue, Dec 17, 2019 at 4:20 PM Ben Hutchings
+<ben.hutchings@codethink.co.uk> wrote:
 >
-> 'loff_t length' is not right.
-
-Looking around, it does seem to get used that way. Too much, though.
-
-> > +       loff_t pos = data->pos;
-> > +       loff_t length = pos + data->len;
+> On Wed, 2019-12-11 at 21:42 +0100, Arnd Bergmann wrote:
+> > This is the only ioctl command that does not have a proper
+> > compat handler. Making the normal implementation do the
+> > right thing is actually very simply, so just do that by
+> > using an in_compat_syscall() check to avoid the special
+> > case in the pkcdvd driver.
+> [...]
 >
-> And WTH is that? "pos + data->len" is not "length", that's end. And this:
+> Since this uses blkdev_compat_ptr_ioctl() it needs to be moved after
+> the following patch.
 >
-> >         loff_t end = pos + length, done = 0;
->
-> What? Now 'end' is 'pos+length', which is 'pos+pos+data->len'.
 
-But this is unrelated to the crazy types. That just can't bve right.
+Ah right, I obviously reshuffled my patches too much to end up
+with the most reasonable order and avoid introducing something
+that would be removed again later.
 
-> Is there some reason for this horrible case of "let's allow 64-bit sizes?"
->
-> Because even if there is, it shouldn't be "loff_t". That's an
-> _offset_. Not a length.
+I'll split out the addition of blkdev_compat_ptr_ioctl() into a separate
+patch and move that all in front, as I'm no longer sure if there
+was another dependency in the other way.
 
-We do seem to have a lot of these across filesystems. And a lot of
-confusion. Most of the IO reoutines clearly take or return a size_t
-(returning ssize_t) as the IO size. And then you have the
-zeroing/truncation stuff that tends to take loff_t. Which still smells
-wrong, and s64 would look like a better case, but whatever.
+Thanks!
 
-The "iomap_zero_range() for truncate" case really does seem to need a
-64-bit value, because people do the difference of two loff_t's for it.
-In fact, it almost looks like that function should take a "start ,
-end" pair, which would make loff_t be the _right_ thing.
-
-Because "length" really is just (a positive) size_t normally.
-
-                Linus
+        Arnd
