@@ -2,103 +2,144 @@ Return-Path: <SRS0=G4H8=2H=vger.kernel.org=linux-block-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-2.3 required=3.0 tests=DKIM_SIGNED,DKIM_VALID,
-	HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,
-	USER_AGENT_SANE_1 autolearn=no autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-0.9 required=3.0 tests=DKIMWL_WL_HIGH,DKIM_SIGNED,
+	DKIM_VALID,DKIM_VALID_AU,HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,
+	SPF_HELO_NONE,SPF_PASS autolearn=no autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 189E8C2D0CD
-	for <linux-block@archiver.kernel.org>; Tue, 17 Dec 2019 17:50:33 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 24706C2D0CD
+	for <linux-block@archiver.kernel.org>; Tue, 17 Dec 2019 19:40:03 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.kernel.org (Postfix) with ESMTP id E4D722465E
-	for <linux-block@archiver.kernel.org>; Tue, 17 Dec 2019 17:50:32 +0000 (UTC)
-Authentication-Results: mail.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel-dk.20150623.gappssmtp.com header.i=@kernel-dk.20150623.gappssmtp.com header.b="c2/nDvfy"
+	by mail.kernel.org (Postfix) with ESMTP id EB3DE2146E
+	for <linux-block@archiver.kernel.org>; Tue, 17 Dec 2019 19:40:02 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+	s=default; t=1576611603;
+	bh=hSXdv9jRzbNvDra3oqB/7j+Mcp5L/wdRsIZvrLCULRw=;
+	h=References:In-Reply-To:From:Date:Subject:To:Cc:List-ID:From;
+	b=ggvmgQHSLsYO06cK+aDpu+sU811lNzX+xt9MtK3imxL68cwWbuvGZL1mHKC+uvs7u
+	 QbrNalki0pkWmHPXGs6fDMylFyZA/h48LuTBefiisVMiulDkBmFiUILaTblVMZ7jb/
+	 GjXfcfKNPyQFmp61lEvlAJAxkW5Fl4eRnJRvlEXk=
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1726546AbfLQRuc (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Tue, 17 Dec 2019 12:50:32 -0500
-Received: from mail-io1-f65.google.com ([209.85.166.65]:45849 "EHLO
-        mail-io1-f65.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1726623AbfLQRuc (ORCPT
+        id S1727431AbfLQTkC (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Tue, 17 Dec 2019 14:40:02 -0500
+Received: from mail-lj1-f193.google.com ([209.85.208.193]:42980 "EHLO
+        mail-lj1-f193.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S1726612AbfLQTkB (ORCPT
         <rfc822;linux-block@vger.kernel.org>);
-        Tue, 17 Dec 2019 12:50:32 -0500
-Received: by mail-io1-f65.google.com with SMTP id i11so8862441ioi.12
-        for <linux-block@vger.kernel.org>; Tue, 17 Dec 2019 09:50:31 -0800 (PST)
+        Tue, 17 Dec 2019 14:40:01 -0500
+Received: by mail-lj1-f193.google.com with SMTP id e28so5415605ljo.9
+        for <linux-block@vger.kernel.org>; Tue, 17 Dec 2019 11:39:59 -0800 (PST)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=kernel-dk.20150623.gappssmtp.com; s=20150623;
-        h=subject:to:cc:references:from:message-id:date:user-agent
-         :mime-version:in-reply-to:content-language:content-transfer-encoding;
-        bh=PIHajc5T69riCgfx1WTM9wSNYlMqcBP3FW3/e8WLwW8=;
-        b=c2/nDvfyq4GTr+gc8nYpZSJO9zSjRaTVbXSwTjz040mkufZ1aIt3/Tv2L+3w7VDOvd
-         k5F7o4O3pauikobpVeY6fjBJDdeq/opt78VnHVbkEjqtfFnAuqGWJLCGsEoXCHvVfQcT
-         ucT7ICyumVsU4+GKOuBzskQXQMfv6vmgoYGJARKFB9svsd/HcNyHLJIVnqv1TeWEf0v9
-         d8xhkBWyuXIM6iIKD/MPqwWeg4w0ffKhdMEpUDW0upWU9iBYt8xVr2lYV7hZ7rlAi8uA
-         0ARanpwf7dLBwaLlHycfWPs74/USc92rW3mdOdyvH7OghrxSFh2qDOJF232anXxhD9rF
-         ZHag==
+        d=linux-foundation.org; s=google;
+        h=mime-version:references:in-reply-to:from:date:message-id:subject:to
+         :cc;
+        bh=qFRWpBT/yna7msZCz1h2wfxEJHa/dpTRSDTuMPZJuko=;
+        b=aMhd1gYr/CaA40gJd+Y5v2iKz3PpftHLH7meUakQxXR667vcpSEeG+f7RRgZ9EScB8
+         QPC5XzSuBsPm691KBjptv6ye07x5hIgbc7KafGV8ZlGArW6KOkIPnZeOx0iU0AevTOka
+         8z9zZfU3hjnoqjS219RuVLiUlb7YJo5q+60u4=
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=1e100.net; s=20161025;
-        h=x-gm-message-state:subject:to:cc:references:from:message-id:date
-         :user-agent:mime-version:in-reply-to:content-language
-         :content-transfer-encoding;
-        bh=PIHajc5T69riCgfx1WTM9wSNYlMqcBP3FW3/e8WLwW8=;
-        b=dBGqAJGGlRW58+0R8WGfsWqqJ94t23FITj2rOGZJ9t6IegpntDVvEdQUEcB1k9WB0K
-         qw2ChyNRi7mhbZhV2jv87zyoDyeT0wQrJxgo3pLRJKsbbzI4KqvOpgPB3eVXXNtatQk+
-         Lzg8bDajufxzv3rI1a24paNKwrl9fMupEzg/WN+kktNGAmMu7Mi/D9Rb94dZjpJMlAXU
-         d+/Ya1EgjAiPKg5tBorwuSlrHY8lpw/d7XgUpPaxGwwTJ3WnrrxLaHOgrfQwOyjGtZAh
-         0O6lGyZdmpiF27KdPXspImPk5MxXGDfEO1PD7pSR+DODqxO5QvL2PJVtk+3Yr9Ddro5s
-         M3sw==
-X-Gm-Message-State: APjAAAV+YbSf++rb1sWoJOiA0A0hogianYLm3R3h59QGGR/AD2+SX3uh
-        uKpDiqJ7JmNI4JaSqqylbnZyGQ==
-X-Google-Smtp-Source: APXvYqwVrKM1N+oHGRkj51mPZn4JC/P64LM/EyVU/TOjtftWlFuKwEr+DIXhrirm0a1jR8TKm6Ajbg==
-X-Received: by 2002:a02:3f26:: with SMTP id d38mr18522848jaa.53.1576605031200;
-        Tue, 17 Dec 2019 09:50:31 -0800 (PST)
-Received: from [192.168.1.159] ([65.144.74.34])
-        by smtp.gmail.com with ESMTPSA id r22sm6893741ilb.25.2019.12.17.09.50.30
+        h=x-gm-message-state:mime-version:references:in-reply-to:from:date
+         :message-id:subject:to:cc;
+        bh=qFRWpBT/yna7msZCz1h2wfxEJHa/dpTRSDTuMPZJuko=;
+        b=oI9dzmP1JjCATGvIp22Ccmqrk/A8b8FgaeBFZij+99M3hZWBMYvFQSbAe74lVNXPRS
+         d626zwrGQI6wSOC08Vlph3n3zY5SFPS8CgrcSm1DJzzVfcABe758sIo45L4Qb+1y7ACg
+         S/t/yIoApckw3Bix8BEo18mpkeoG9ShSmf5sJTNGeClYg93p6cIqlM+87jBIXPiJcjda
+         28qVI5XKuI0U5BROa7adVozupo2NcuTNlLhNunq9JojTZo7VOgIFpLgfTTo20wdj6+Oo
+         xsN5xwyzln1cwweKnfV6f6uSYDXS8NZFALR3revZQa32NHld93jLOMaxN+J/8L3bbX64
+         DgTA==
+X-Gm-Message-State: APjAAAW88UkZ/8K2hAy61db3nsiddU2GuJu07Dk3eXfTTQE8XT6wrelq
+        xDcz57ChjW3v/ux6jB8euFgNHFkaIIg=
+X-Google-Smtp-Source: APXvYqwD5jqYE/H8Q8LoQiiEGvk1AOUd90fqP/SuZXfjfnNkcSfNzAnrbg1JS5nuabuiyxVr3yjdUA==
+X-Received: by 2002:a05:651c:119b:: with SMTP id w27mr2686369ljo.242.1576611598279;
+        Tue, 17 Dec 2019 11:39:58 -0800 (PST)
+Received: from mail-lj1-f173.google.com (mail-lj1-f173.google.com. [209.85.208.173])
+        by smtp.gmail.com with ESMTPSA id w29sm10960361lfa.34.2019.12.17.11.39.57
+        for <linux-block@vger.kernel.org>
         (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
-        Tue, 17 Dec 2019 09:50:30 -0800 (PST)
-Subject: Re: [PATCH] nbd: fix shutdown and recv work deadlock v2
-To:     Mike Christie <mchristi@redhat.com>, sunke32@huawei.com,
-        nbd@other.debian.org, josef@toxicpanda.com,
-        linux-block@vger.kernel.org
-Cc:     stable@vger.kernel.org
-References: <20191208225150.5944-1-mchristi@redhat.com>
-From:   Jens Axboe <axboe@kernel.dk>
-Message-ID: <89b62516-087a-d5f7-6f53-749df63129cf@kernel.dk>
-Date:   Tue, 17 Dec 2019 10:50:29 -0700
-User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:68.0) Gecko/20100101
- Thunderbird/68.2.2
+        Tue, 17 Dec 2019 11:39:57 -0800 (PST)
+Received: by mail-lj1-f173.google.com with SMTP id u17so12315130lja.4
+        for <linux-block@vger.kernel.org>; Tue, 17 Dec 2019 11:39:57 -0800 (PST)
+X-Received: by 2002:a2e:9ad8:: with SMTP id p24mr4517160ljj.148.1576611596942;
+ Tue, 17 Dec 2019 11:39:56 -0800 (PST)
 MIME-Version: 1.0
-In-Reply-To: <20191208225150.5944-1-mchristi@redhat.com>
-Content-Type: text/plain; charset=utf-8
-Content-Language: en-US
-Content-Transfer-Encoding: 7bit
+References: <20191217143948.26380-1-axboe@kernel.dk> <20191217143948.26380-5-axboe@kernel.dk>
+In-Reply-To: <20191217143948.26380-5-axboe@kernel.dk>
+From:   Linus Torvalds <torvalds@linux-foundation.org>
+Date:   Tue, 17 Dec 2019 11:39:41 -0800
+X-Gmail-Original-Message-ID: <CAHk-=wgcPAfOSigMf0xwaGfVjw413XN3UPATwYWHrss+QuivhQ@mail.gmail.com>
+Message-ID: <CAHk-=wgcPAfOSigMf0xwaGfVjw413XN3UPATwYWHrss+QuivhQ@mail.gmail.com>
+Subject: Re: [PATCH 4/6] iomap: add struct iomap_ctx
+To:     Jens Axboe <axboe@kernel.dk>
+Cc:     Linux-MM <linux-mm@kvack.org>,
+        linux-fsdevel <linux-fsdevel@vger.kernel.org>,
+        linux-block <linux-block@vger.kernel.org>,
+        Matthew Wilcox <willy@infradead.org>, Chris Mason <clm@fb.com>,
+        Dave Chinner <david@fromorbit.com>
+Content-Type: text/plain; charset="UTF-8"
 Sender: linux-block-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-On 12/8/19 3:51 PM, Mike Christie wrote:
-> This fixes a regression added with:
-> 
-> commit e9e006f5fcf2bab59149cb38a48a4817c1b538b4
-> Author: Mike Christie <mchristi@redhat.com>
-> Date:   Sun Aug 4 14:10:06 2019 -0500
-> 
->     nbd: fix max number of supported devs
-> 
-> where we can deadlock during device shutdown. The problem occurs if
-> the recv_work's nbd_config_put occurs after nbd_start_device_ioctl has
-> returned and the userspace app has droppped its reference via closing
-> the device and running nbd_release. The recv_work nbd_config_put call
-> would then drop the refcount to zero and try to destroy the config which
-> would try to do destroy_workqueue from the recv work.
-> 
-> This patch just has nbd_start_device_ioctl do a flush_workqueue when it
-> wakes so we know after the ioctl returns running works have exited. This
-> also fixes a possible race where we could try to reuse the device while
-> old recv_works are still running.
+On Tue, Dec 17, 2019 at 6:40 AM Jens Axboe <axboe@kernel.dk> wrote:
+>
+> We pass a lot of arguments to iomap_apply(), and subsequently to the
+> actors that it calls. In preparation for adding one more argument,
+> switch them to using a struct iomap_ctx instead. The actor gets a const
+> version of that, they are not supposed to change anything in it.
 
-Applied, thanks Mike.
+Looks generally like what I expected, but when looking at the patch I
+notice that the type of 'len' is crazy and wrong.
 
--- 
-Jens Axboe
+It was wrong before too, though:
 
+> -dax_iomap_actor(struct inode *inode, loff_t pos, loff_t length, void *data,
+
+'loff_t length' is not right.
+
+> +       loff_t pos = data->pos;
+> +       loff_t length = pos + data->len;
+
+And WTH is that? "pos + data->len" is not "length", that's end. And this:
+
+>         loff_t end = pos + length, done = 0;
+
+What? Now 'end' is 'pos+length', which is 'pos+pos+data->len'.
+
+WHAA?
+
+> @@ -1197,22 +1200,26 @@ dax_iomap_rw(struct kiocb *iocb, struct iov_iter *iter,
+>  {
+> +       loff_t ret = 0, done = 0;
+
+More insanity. "ret" shouldn't be loff_t.
+
+dax_iomap_rw() returns a ssize_t.
+
+> +       loff_t count = data->len;
+
+More of this crazy things.
+
+>  iomap_zero_range(struct inode *inode, loff_t pos, loff_t len, bool *did_zero,
+
+This was wrong before.
+
+> +struct iomap_ctx {
+> +       struct inode    *inode;
+> +       loff_t          pos;
+> +       loff_t          len;
+> +       void            *priv;
+> +       unsigned        flags;
+> +};
+
+Please make 'len' be 'size_t' or something.
+
+If you're on a 32-bit architecture, you shouldn't be writing more than
+4GB in a go anyway.
+
+Is there some reason for this horrible case of "let's allow 64-bit sizes?"
+
+Because even if there is, it shouldn't be "loff_t". That's an
+_offset_. Not a length.
+
+            Linus
