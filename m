@@ -2,145 +2,124 @@ Return-Path: <SRS0=G4H8=2H=vger.kernel.org=linux-block-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-8.4 required=3.0 tests=DKIMWL_WL_HIGH,DKIM_SIGNED,
-	DKIM_VALID,DKIM_VALID_AU,HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,
-	MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,USER_AGENT_SANE_1
-	autolearn=ham autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-10.3 required=3.0
+	tests=HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,MENTIONS_GIT_HOSTING,
+	SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,USER_AGENT_SANE_1 autolearn=ham
+	autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 620AFC43603
-	for <linux-block@archiver.kernel.org>; Tue, 17 Dec 2019 13:59:51 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id D80F7C43603
+	for <linux-block@archiver.kernel.org>; Tue, 17 Dec 2019 14:17:31 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.kernel.org (Postfix) with ESMTP id 3339E218AC
-	for <linux-block@archiver.kernel.org>; Tue, 17 Dec 2019 13:59:51 +0000 (UTC)
-Authentication-Results: mail.kernel.org;
-	dkim=pass (2048-bit key) header.d=nvidia.com header.i=@nvidia.com header.b="GbGZzaEh"
+	by mail.kernel.org (Postfix) with ESMTP id B4B0220663
+	for <linux-block@archiver.kernel.org>; Tue, 17 Dec 2019 14:17:31 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1728662AbfLQN7u (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Tue, 17 Dec 2019 08:59:50 -0500
-Received: from hqnvemgate26.nvidia.com ([216.228.121.65]:15008 "EHLO
-        hqnvemgate26.nvidia.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1728539AbfLQN7u (ORCPT
-        <rfc822;linux-block@vger.kernel.org>);
-        Tue, 17 Dec 2019 08:59:50 -0500
-Received: from hqpgpgate101.nvidia.com (Not Verified[216.228.121.13]) by hqnvemgate26.nvidia.com (using TLS: TLSv1.2, DES-CBC3-SHA)
-        id <B5df8df4b0000>; Tue, 17 Dec 2019 05:59:40 -0800
-Received: from hqmail.nvidia.com ([172.20.161.6])
-  by hqpgpgate101.nvidia.com (PGP Universal service);
-  Tue, 17 Dec 2019 05:59:49 -0800
-X-PGP-Universal: processed;
-        by hqpgpgate101.nvidia.com on Tue, 17 Dec 2019 05:59:49 -0800
-Received: from [10.2.165.11] (10.124.1.5) by HQMAIL107.nvidia.com
- (172.20.187.13) with Microsoft SMTP Server (TLS) id 15.0.1473.3; Tue, 17 Dec
- 2019 13:59:48 +0000
-Subject: Re: [RFC PATCH] mm/gup: try_pin_compound_head() can be static
-To:     kbuild test robot <lkp@intel.com>
-CC:     <kbuild-all@lists.01.org>,
-        Andrew Morton <akpm@linux-foundation.org>,
-        Al Viro <viro@zeniv.linux.org.uk>,
-        Alex Williamson <alex.williamson@redhat.com>,
-        Benjamin Herrenschmidt <benh@kernel.crashing.org>,
-        =?UTF-8?B?QmrDtnJuIFTDtnBlbA==?= <bjorn.topel@intel.com>,
-        Christoph Hellwig <hch@infradead.org>,
-        Dan Williams <dan.j.williams@intel.com>,
-        Daniel Vetter <daniel@ffwll.ch>,
-        Dave Chinner <david@fromorbit.com>,
-        David Airlie <airlied@linux.ie>,
-        "David S . Miller" <davem@davemloft.net>,
-        Ira Weiny <ira.weiny@intel.com>, Jan Kara <jack@suse.cz>,
-        Jason Gunthorpe <jgg@ziepe.ca>, Jens Axboe <axboe@kernel.dk>,
-        Jonathan Corbet <corbet@lwn.net>,
-        =?UTF-8?B?SsOpcsO0bWUgR2xpc3Nl?= <jglisse@redhat.com>,
-        Magnus Karlsson <magnus.karlsson@intel.com>,
-        Mauro Carvalho Chehab <mchehab@kernel.org>,
-        Michael Ellerman <mpe@ellerman.id.au>,
-        Michal Hocko <mhocko@suse.com>,
-        Mike Kravetz <mike.kravetz@oracle.com>,
-        Paul Mackerras <paulus@samba.org>,
-        Shuah Khan <shuah@kernel.org>,
-        Vlastimil Babka <vbabka@suse.cz>, <bpf@vger.kernel.org>,
-        <dri-devel@lists.freedesktop.org>, <kvm@vger.kernel.org>,
-        <linux-block@vger.kernel.org>, <linux-doc@vger.kernel.org>,
-        <linux-fsdevel@vger.kernel.org>, <linux-kselftest@vger.kernel.org>,
-        <linux-media@vger.kernel.org>, <linux-rdma@vger.kernel.org>,
-        <linuxppc-dev@lists.ozlabs.org>, <netdev@vger.kernel.org>,
-        <linux-mm@kvack.org>, LKML <linux-kernel@vger.kernel.org>,
-        "Kirill A . Shutemov" <kirill.shutemov@linux.intel.com>
-References: <20191211025318.457113-24-jhubbard@nvidia.com>
- <20191217080358.q3k57ta62txvip5h@4978f4969bb8>
-From:   John Hubbard <jhubbard@nvidia.com>
-X-Nvconfidentiality: public
-Message-ID: <7828a101-e422-8e2a-ef9b-9c0285065ed5@nvidia.com>
-Date:   Tue, 17 Dec 2019 05:56:56 -0800
-User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:68.0) Gecko/20100101
- Thunderbird/68.3.0
+        id S1728788AbfLQORb (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Tue, 17 Dec 2019 09:17:31 -0500
+Received: from relay.sw.ru ([185.231.240.75]:46920 "EHLO relay.sw.ru"
+        rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
+        id S1728554AbfLQORa (ORCPT <rfc822;linux-block@vger.kernel.org>);
+        Tue, 17 Dec 2019 09:17:30 -0500
+Received: from dhcp-172-16-24-104.sw.ru ([172.16.24.104])
+        by relay.sw.ru with esmtp (Exim 4.92.3)
+        (envelope-from <ktkhai@virtuozzo.com>)
+        id 1ihDeB-0005aE-AS; Tue, 17 Dec 2019 17:16:23 +0300
+Subject: Re: [PATCH RFC 0/3] block,ext4: Introduce REQ_OP_ASSIGN_RANGE to
+ reflect extents allocation in block device internals
+To:     linux-block@vger.kernel.org, linux-kernel@vger.kernel.org,
+        linux-ext4@vger.kernel.org, axboe@kernel.dk
+Cc:     tytso@mit.edu, adilger.kernel@dilger.ca, ming.lei@redhat.com,
+        osandov@fb.com, jthumshirn@suse.de, minwoo.im.dev@gmail.com,
+        damien.lemoal@wdc.com, andrea.parri@amarulasolutions.com,
+        hare@suse.com, tj@kernel.org, ajay.joshi@wdc.com, sagi@grimberg.me,
+        dsterba@suse.com, chaitanya.kulkarni@wdc.com, bvanassche@acm.org,
+        dhowells@redhat.com, asml.silence@gmail.com
+References: <157599668662.12112.10184894900037871860.stgit@localhost.localdomain>
+From:   Kirill Tkhai <ktkhai@virtuozzo.com>
+Message-ID: <750538f7-33af-d98d-47d1-9753fd87e8fd@virtuozzo.com>
+Date:   Tue, 17 Dec 2019 17:16:22 +0300
+User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:60.0) Gecko/20100101
+ Thunderbird/60.9.0
 MIME-Version: 1.0
-In-Reply-To: <20191217080358.q3k57ta62txvip5h@4978f4969bb8>
-X-Originating-IP: [10.124.1.5]
-X-ClientProxiedBy: HQMAIL105.nvidia.com (172.20.187.12) To
- HQMAIL107.nvidia.com (172.20.187.13)
-Content-Type: text/plain; charset="utf-8"; format=flowed
+In-Reply-To: <157599668662.12112.10184894900037871860.stgit@localhost.localdomain>
+Content-Type: text/plain; charset=utf-8
 Content-Language: en-US
 Content-Transfer-Encoding: 7bit
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=nvidia.com; s=n1;
-        t=1576591180; bh=+kY6WrbKA7lSfaR6JiJsMhpW0kY3DW4edAlAk5Ve1Ws=;
-        h=X-PGP-Universal:Subject:To:CC:References:From:X-Nvconfidentiality:
-         Message-ID:Date:User-Agent:MIME-Version:In-Reply-To:
-         X-Originating-IP:X-ClientProxiedBy:Content-Type:Content-Language:
-         Content-Transfer-Encoding;
-        b=GbGZzaEh7giluV7bpN/IIAOj3Mc18AXcjLeuEGsTgM8/schRNFGUqCq00YAc4ARRK
-         0PVe1s7+qdvFmh1Ttru614AJtLodM6wJzZ2UNnA1jIm2+JCvQssDVh7rwrwji91hSp
-         Dmomrx8a2mkRdKDi+zuehTjS+cK+ceZUGuV2qS+Q00TgS6unnj2J/spZ+jPwNEGl3X
-         xJTAKof+O0alRzDH3cC7VTlXjNJwIWhcBZya8mbb62MvfcrAHYE78VekfobHefcZXx
-         ueLyg5p/jxUNWHBbbcLlFxuQBAi3TiHxhM/GsO23RipjSLUTZwruxA+61/WfeUhUby
-         xcvllM2I0K27A==
 Sender: linux-block-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-On 12/17/19 12:03 AM, kbuild test robot wrote:
+Hi!
+
+Any comments on this?
+
+Thanks
+
+On 10.12.2019 19:56, Kirill Tkhai wrote:
+> Information about continuous extent placement may be useful
+> for some block devices. Say, distributed network filesystems,
+> which provide block device interface, may use this information
+> for better blocks placement over the nodes in their cluster,
+> and for better performance. Block devices, which map a file
+> on another filesystem (loop), may request the same length extent
+> on underlining filesystem for less fragmentation and for batching
+> allocation requests. Also, hypervisors like QEMU may use this
+> information for optimization of cluster allocations.
 > 
-> Fixes: 8086d1c61970 ("mm/gup: track FOLL_PIN pages")
-> Signed-off-by: kbuild test robot <lkp@intel.com>
+> This patchset introduces REQ_OP_ASSIGN_RANGE, which is going
+> to be used for forwarding user's fallocate(0) requests into
+> block device internals. It rather similar to existing
+> REQ_OP_DISCARD, REQ_OP_WRITE_ZEROES, etc. The corresponding
+> exported primitive is called blkdev_issue_assign_range().
+> See [1/3] for the details.
+> 
+> Patch [2/3] teaches loop driver to handle REQ_OP_ASSIGN_RANGE
+> requests by calling fallocate(0).
+> 
+> Patch [3/3] makes ext4 to notify a block device about fallocate(0).
+> 
+> Here is a simple test I did:
+> https://gist.github.com/tkhai/5b788651cdb74c1dbff3500745878856
+> 
+> I attached a file on ext4 to loop. Then, created ext4 partition
+> on loop device and started the test in the partition. Direct-io
+> is enabled on loop.
+> 
+> The test fallocates 4G file and writes from some offset with
+> given step, then it chooses another offset and repeats. After
+> the test all the blocks in the file become written.
+> 
+> The results shows that batching extents-assigning requests improves
+> the performance:
+> 
+> Before patchset: real ~ 1min 27sec
+> After patchset:  real ~ 1min 16sec (18% better)
+> 
+> Ordinary fallocate() before writes improves the performance
+> by batching the requests. These results just show, the same
+> is in case of forwarding extents information to underlining
+> filesystem.
 > ---
->   gup.c |    2 +-
->   1 file changed, 1 insertion(+), 1 deletion(-)
 > 
-> diff --git a/mm/gup.c b/mm/gup.c
-> index 038b71165a761..849a6f55938e6 100644
-> --- a/mm/gup.c
-> +++ b/mm/gup.c
-> @@ -75,7 +75,7 @@ static inline struct page *try_get_compound_head(struct page *page, int refs)
->    * @Return:	the compound head page, with ref appropriately incremented,
->    * or NULL upon failure.
->    */
-> -__must_check struct page *try_pin_compound_head(struct page *page, int refs)
-> +static __must_check struct page *try_pin_compound_head(struct page *page, int refs)
->   {
->   	struct page *head = try_get_compound_head(page,
->   						  GUP_PIN_COUNTING_BIAS * refs);
+> Kirill Tkhai (3):
+>       block: Add support for REQ_OP_ASSIGN_RANGE operation
+>       loop: Forward REQ_OP_ASSIGN_RANGE into fallocate(0)
+>       ext4: Notify block device about fallocate(0)-assigned blocks
+> 
+> 
+>  block/blk-core.c          |    4 +++
+>  block/blk-lib.c           |   70 +++++++++++++++++++++++++++++++++++++++++++++
+>  block/blk-merge.c         |   21 ++++++++++++++
+>  block/bounce.c            |    1 +
+>  drivers/block/loop.c      |    5 +++
+>  fs/ext4/ext4.h            |    1 +
+>  fs/ext4/extents.c         |   11 ++++++-
+>  include/linux/bio.h       |    3 ++
+>  include/linux/blk_types.h |    2 +
+>  include/linux/blkdev.h    |   29 +++++++++++++++++++
+>  10 files changed, 145 insertions(+), 2 deletions(-)
+> 
+> --
+> Signed-off-by: Kirill Tkhai <ktkhai@virtuozzo.com>
 > 
 
-Yes, it should have been declared static. And this also applies to the latest version
-(v11). The preferred fix would stay within 80 columns, like this:
-
-diff --git a/mm/gup.c b/mm/gup.c
-index c2793a86450e..39b2f683bd2e 100644
---- a/mm/gup.c
-+++ b/mm/gup.c
-@@ -75,7 +75,8 @@ static inline struct page *try_get_compound_head(struct page *page, int refs)
-   * @Return:    the compound head page, with ref appropriately incremented,
-   * or NULL upon failure.
-   */
--__must_check struct page *try_pin_compound_head(struct page *page, int refs)
-+static __must_check struct page *try_pin_compound_head(struct page *page,
-+                                                      int refs)
-  {
-         struct page *head = try_get_compound_head(page,
-                                                   GUP_PIN_COUNTING_BIAS * refs);
-
-
-thanks,
--- 
-John Hubbard
-NVIDIA
