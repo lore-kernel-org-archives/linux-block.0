@@ -2,355 +2,109 @@ Return-Path: <SRS0=G4H8=2H=vger.kernel.org=linux-block-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-9.9 required=3.0 tests=DKIMWL_WL_HIGH,DKIM_SIGNED,
-	DKIM_VALID,DKIM_VALID_AU,HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,
-	MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,USER_AGENT_GIT
-	autolearn=ham autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-2.3 required=3.0 tests=DKIM_SIGNED,DKIM_VALID,
+	HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,
+	USER_AGENT_SANE_1 autolearn=no autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id C200FC43603
-	for <linux-block@archiver.kernel.org>; Tue, 17 Dec 2019 16:31:50 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id EEAD4C43603
+	for <linux-block@archiver.kernel.org>; Tue, 17 Dec 2019 16:42:00 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.kernel.org (Postfix) with ESMTP id 60B6B21582
-	for <linux-block@archiver.kernel.org>; Tue, 17 Dec 2019 16:31:50 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id 9CFA421D7D
+	for <linux-block@archiver.kernel.org>; Tue, 17 Dec 2019 16:42:00 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=pass (1024-bit key) header.d=amazon.com header.i=@amazon.com header.b="DtJoiKX7"
+	dkim=pass (2048-bit key) header.d=kernel-dk.20150623.gappssmtp.com header.i=@kernel-dk.20150623.gappssmtp.com header.b="1YyNrajD"
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1728257AbfLQQbu (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Tue, 17 Dec 2019 11:31:50 -0500
-Received: from smtp-fw-33001.amazon.com ([207.171.190.10]:18856 "EHLO
-        smtp-fw-33001.amazon.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1728238AbfLQQbt (ORCPT
+        id S1727793AbfLQQl7 (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Tue, 17 Dec 2019 11:41:59 -0500
+Received: from mail-io1-f68.google.com ([209.85.166.68]:46269 "EHLO
+        mail-io1-f68.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S1727388AbfLQQl7 (ORCPT
         <rfc822;linux-block@vger.kernel.org>);
-        Tue, 17 Dec 2019 11:31:49 -0500
+        Tue, 17 Dec 2019 11:41:59 -0500
+Received: by mail-io1-f68.google.com with SMTP id t26so11290650ioi.13
+        for <linux-block@vger.kernel.org>; Tue, 17 Dec 2019 08:41:59 -0800 (PST)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-  d=amazon.com; i=@amazon.com; q=dns/txt; s=amazon201209;
-  t=1576600307; x=1608136307;
-  h=from:to:cc:subject:date:message-id:in-reply-to:
-   references:mime-version;
-  bh=0HyRVMghdtV+tK4t2O4rhJZ4omB7wWKasfkgKQVvX+M=;
-  b=DtJoiKX7iMc5GTUwOwsWZA8hutPbqlJ26UPj0MYZop6NxA0wEizlVzqR
-   1cr8o8cbGQEvpzS1XcyaFDuRs3eKJXypsN/w+vfogBHZOkUjLW6NcmBJK
-   8bfSAp5Um0rI59CHFipiL/axTIqartJVB14EwN2AGbpLS+/zXCGBV9KnJ
-   k=;
-IronPort-SDR: syuyglB0yNqcG0rDH91e1FUxt9b5bR/iJUx/EMDGw72mjqDGQdnwqATFUlXYhvlm7OR8CW4dw/
- PIQYYraJ4+kg==
-X-IronPort-AV: E=Sophos;i="5.69,326,1571702400"; 
-   d="scan'208";a="15427431"
-Received: from sea32-co-svc-lb4-vlan3.sea.corp.amazon.com (HELO email-inbound-relay-1d-f273de60.us-east-1.amazon.com) ([10.47.23.38])
-  by smtp-border-fw-out-33001.sea14.amazon.com with ESMTP; 17 Dec 2019 16:31:34 +0000
-Received: from EX13MTAUEA001.ant.amazon.com (iad55-ws-svc-p15-lb9-vlan2.iad.amazon.com [10.40.159.162])
-        by email-inbound-relay-1d-f273de60.us-east-1.amazon.com (Postfix) with ESMTPS id 986DCA20F8;
-        Tue, 17 Dec 2019 16:31:31 +0000 (UTC)
-Received: from EX13D31EUA001.ant.amazon.com (10.43.165.15) by
- EX13MTAUEA001.ant.amazon.com (10.43.61.82) with Microsoft SMTP Server (TLS)
- id 15.0.1367.3; Tue, 17 Dec 2019 16:31:30 +0000
-Received: from u886c93fd17d25d.ant.amazon.com (10.43.161.179) by
- EX13D31EUA001.ant.amazon.com (10.43.165.15) with Microsoft SMTP Server (TLS)
- id 15.0.1367.3; Tue, 17 Dec 2019 16:31:25 +0000
-From:   SeongJae Park <sjpark@amazon.com>
-To:     <jgross@suse.com>
-CC:     <axboe@kernel.dk>, <konrad.wilk@oracle.com>,
-        <linux-block@vger.kernel.org>, <linux-kernel@vger.kernel.org>,
-        <pdurrant@amazon.com>, <roger.pau@citrix.com>,
-        <sj38.park@gmail.com>, <sjpark@amazon.com>, <sjpark@amazon.de>,
-        <xen-devel@lists.xenproject.org>
-Subject: [PATCH 1/3] xen/blkback: Squeeze page pools if a memory pressure is detected
-Date:   Tue, 17 Dec 2019 17:31:06 +0100
-Message-ID: <20191217163106.6497-1-sjpark@amazon.com>
-X-Mailer: git-send-email 2.17.1
-In-Reply-To: <027a402d-029a-e6c4-9f07-98728a161f22@suse.com>
-References: <027a402d-029a-e6c4-9f07-98728a161f22@suse.com>
+        d=kernel-dk.20150623.gappssmtp.com; s=20150623;
+        h=subject:to:cc:references:from:message-id:date:user-agent
+         :mime-version:in-reply-to:content-language:content-transfer-encoding;
+        bh=ch4pT9eAXuOnt9aCH34myvOKU14iVJ51Ia+nfld+XYo=;
+        b=1YyNrajDUI2YIJxfCBALtwSAK2gvsMNAuP0i91YlCmUz62ouZ6WF1tT0fHhFeP/6Ja
+         EHZRByZL6AsLF/yq7ZXwddBIxpOtC834HnFFkhzOIjYLlj44wlN+t+zxwxW7uK1NWN6X
+         EP8j+6iX9riGl8ah/2GW3uiI5Xo+n51YlZ9VhoJp5FV3NPliTgjfmJ9VUN+0qr6I+Ho+
+         YDcLmboVyDfRbYuvkgX8u9opGEQnwa8kyVxmmJyKXJq5H15fJiXxU0wiDyKZ8F2o3BAP
+         adbhsTtK31AwYA+23QClWWweac1izfxeW2Ls+kOpiOQz3ScW5Su3tycEnWNzSWjmzan2
+         mwAw==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20161025;
+        h=x-gm-message-state:subject:to:cc:references:from:message-id:date
+         :user-agent:mime-version:in-reply-to:content-language
+         :content-transfer-encoding;
+        bh=ch4pT9eAXuOnt9aCH34myvOKU14iVJ51Ia+nfld+XYo=;
+        b=PBYE510kW9a1tlSk4LNdOFlWa3Fe97RB8a1/88ONf3QpfmpwXeIv8TcFAIgRY7imBU
+         wyACIgBWiv/ukwK1RP9uiYuRTatiCz1ZLtfeYF1PIYorUoWg7nQ9M+0kTa23/TiwwLFh
+         X+SccKz9WzbA3e4UqqbPqv519vLELuIbnzHkjbJ0atZlMbh39ktmtVOSTaEVKy++MjMa
+         Y5eWf6s2NeZrofF5Wbc6MJtBp0ayRNGPsnQeQfKOuNlxyEgOSjoZV/IChFkBSoyK0bKO
+         LSMcqTTPtkVdHRb6a4D5IxwFLd7OCLjuBR5LgwKwC0am8rP6QEhZ76I0nltd2/YpcouF
+         gmlw==
+X-Gm-Message-State: APjAAAVi27ptr9TOvX2YSTb/zFlcei7xy0IesyHxbwHT7QJ7RIKGogA2
+        ui+bIq5ga5ocwAQ/+l3Du5IpIA==
+X-Google-Smtp-Source: APXvYqxh5lsU9Ndk/BeMGn/zyvX+NgyYy2mh8ckeftTI6DIJt9pRgxZcg+f8Hepjj4yJa16wHgtlKA==
+X-Received: by 2002:a5d:9a17:: with SMTP id s23mr4524073iol.293.1576600918943;
+        Tue, 17 Dec 2019 08:41:58 -0800 (PST)
+Received: from [192.168.1.159] ([65.144.74.34])
+        by smtp.gmail.com with ESMTPSA id s64sm6948214ili.56.2019.12.17.08.41.58
+        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
+        Tue, 17 Dec 2019 08:41:58 -0800 (PST)
+Subject: Re: [PATCH 1/6] fs: add read support for RWF_UNCACHED
+To:     Matthew Wilcox <willy@infradead.org>
+Cc:     linux-mm@kvack.org, linux-fsdevel@vger.kernel.org,
+        linux-block@vger.kernel.org, clm@fb.com,
+        torvalds@linux-foundation.org, david@fromorbit.com
+References: <20191217143948.26380-1-axboe@kernel.dk>
+ <20191217143948.26380-2-axboe@kernel.dk>
+ <20191217155749.GC32169@bombadil.infradead.org>
+From:   Jens Axboe <axboe@kernel.dk>
+Message-ID: <65992df0-1ccf-a51a-9ae0-43a0c268b1f4@kernel.dk>
+Date:   Tue, 17 Dec 2019 09:41:57 -0700
+User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:68.0) Gecko/20100101
+ Thunderbird/68.2.2
 MIME-Version: 1.0
-Content-Type: text/plain
-X-Originating-IP: [10.43.161.179]
-X-ClientProxiedBy: EX13D12UWA003.ant.amazon.com (10.43.160.50) To
- EX13D31EUA001.ant.amazon.com (10.43.165.15)
+In-Reply-To: <20191217155749.GC32169@bombadil.infradead.org>
+Content-Type: text/plain; charset=utf-8
+Content-Language: en-US
+Content-Transfer-Encoding: 7bit
 Sender: linux-block-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-From: SeongJae Park <sjpark@amazon.de>
+On 12/17/19 8:57 AM, Matthew Wilcox wrote:
+> On Tue, Dec 17, 2019 at 07:39:43AM -0700, Jens Axboe wrote:
+>> +static void buffered_put_page(struct page *page, bool clear_mapping)
+>> +{
+>> +	if (clear_mapping)
+>> +		page->mapping = NULL;
+>> +	put_page(page);
+>> +}
+> 
+> I'm not a huge fan of the variable name 'clear_mapping'.  It describes
+> what it does rather than why it does it.  So maybe 'drop_immediate'?
+> Or 'uncached'?
 
-I though it would be better to review separated patches, but seems it
-was my mistake.  As Juergen asked, merged them again and post here.
-Also, dropped Roger's reviewed-by.
+I do like 'uncached' a lot better, I've made that change.
 
+> I think this needs to be:
+> 
+> 				if (!did_dio_begin)
+> 					inode_dio_begin(inode);
+> 				did_dio_begin = true;
+> 
+> otherwise inode->i_dio_count is going to be increased once per uncached
+> page.  Do you have a test in your test-suite that does I/O to more than
+> one page at a time?
 
-Thanks,
-SeongJae Park
+Good catch! Yes it does, I have fixed that up. Thanks.
 
-
------------------------- >8 -------------------------------------------
-Subject: [PATCH 1/3] xen/blkback: Squeeze page pools if a memory pressure is
- detected
-
-Each `blkif` has a free pages pool for the grant mapping.  The size of
-the pool starts from zero and is increased on demand while processing
-the I/O requests.  If current I/O requests handling is finished or 100
-milliseconds has passed since last I/O requests handling, it checks and
-shrinks the pool to not exceed the size limit, `max_buffer_pages`.
-
-Therefore, host administrators can cause memory pressure in blkback by
-attaching a large number of block devices and inducing I/O.  Such
-problematic situations can be avoided by limiting the maximum number of
-devices that can be attached, but finding the optimal limit is not so
-easy.  Improper set of the limit can results in memory pressure or a
-resource underutilization.  This commit avoids such problematic
-situations by squeezing the pools (returns every free page in the pool
-to the system) for a while (users can set this duration via a module
-parameter) if memory pressure is detected.
-
-Discussions
-===========
-
-The `blkback`'s original shrinking mechanism returns only pages in the
-pool which are not currently be used by `blkback` to the system.  In
-other words, the pages that are not mapped with granted pages.  Because
-this commit is changing only the shrink limit but still uses the same
-freeing mechanism it does not touch pages which are currently mapping
-grants.
-
-Once memory pressure is detected, this commit keeps the squeezing limit
-for a user-specified time duration.  The duration should be neither too
-long nor too short.  If it is too long, the squeezing incurring overhead
-can reduce the I/O performance.  If it is too short, `blkback` will not
-free enough pages to reduce the memory pressure.  This commit sets the
-value as `10 milliseconds` by default because it is a short time in
-terms of I/O while it is a long time in terms of memory operations.
-Also, as the original shrinking mechanism works for at least every 100
-milliseconds, this could be a somewhat reasonable choice.  I also tested
-other durations (refer to the below section for more details) and
-confirmed that 10 milliseconds is the one that works best with the test.
-That said, the proper duration depends on actual configurations and
-workloads.  That's why this commit allows users to set the duration as a
-module parameter.
-
-Memory Pressure Test
-====================
-
-To show how this commit fixes the memory pressure situation well, I
-configured a test environment on a xen-running virtualization system.
-On the `blkfront` running guest instances, I attach a large number of
-network-backed volume devices and induce I/O to those.  Meanwhile, I
-measure the number of pages that swapped in (pswpin) and out (pswpout)
-on the `blkback` running guest.  The test ran twice, once for the
-`blkback` before this commit and once for that after this commit.  As
-shown below, this commit has dramatically reduced the memory pressure:
-
-                pswpin  pswpout
-    before      76,672  185,799
-    after          212    3,325
-
-Optimal Aggressive Shrinking Duration
--------------------------------------
-
-To find a best squeezing duration, I repeated the test with three
-different durations (1ms, 10ms, and 100ms).  The results are as below:
-
-    duration    pswpin  pswpout
-    1           852     6,424
-    10          212     3,325
-    100         203     3,340
-
-As expected, the memory pressure has decreased as the duration is
-increased, but the reduction stopped from the `10ms`.  Based on this
-results, I chose the default duration as 10ms.
-
-Performance Overhead Test
-=========================
-
-This commit could incur I/O performance degradation under severe memory
-pressure because the squeezing will require more page allocations per
-I/O.  To show the overhead, I artificially made a worst-case squeezing
-situation and measured the I/O performance of a `blkfront` running
-guest.
-
-For the artificial squeezing, I set the `blkback.max_buffer_pages` using
-the `/sys/module/xen_blkback/parameters/max_buffer_pages` file.  In this
-test, I set the value to `1024` and `0`.  The `1024` is the default
-value.  Setting the value as `0` is same to a situation doing the
-squeezing always (worst-case).
-
-If the underlying block device is slow enough, the squeezing overhead
-could be hidden.  For the reason, I use a fast block device, namely the
-rbd[1]:
-
-    # xl block-attach guest phy:/dev/ram0 xvdb w
-
-For the I/O performance measurement, I run a simple `dd` command 5 times
-directly to the device as below and collect the 'MB/s' results.
-
-    $ for i in {1..5}; do dd if=/dev/zero of=/dev/xvdb \
-                             bs=4k count=$((256*512)); sync; done
-
-The results are as below.  'max_pgs' represents the value of the
-`blkback.max_buffer_pages` parameter.
-
-    max_pgs   Min       Max       Median     Avg    Stddev
-    0         417       423       420        419.4  2.5099801
-    1024      414       425       416        417.8  4.4384682
-    No difference proven at 95.0% confidence
-
-In short, even worst case squeezing on ramdisk based fast block device
-makes no visible performance degradation.  Please note that this is just
-a very simple and minimal test.  On systems using super-fast block
-devices and a special I/O workload, the results might be different.  If
-you have any doubt, test on your machine with your workload to find the
-optimal squeezing duration for you.
-
-[1] https://www.kernel.org/doc/html/latest/admin-guide/blockdev/ramdisk.html
-
-Signed-off-by: SeongJae Park <sjpark@amazon.de>
----
- .../ABI/testing/sysfs-driver-xen-blkback      | 10 ++++++
- drivers/block/xen-blkback/blkback.c           |  7 ++--
- drivers/block/xen-blkback/common.h            |  1 +
- drivers/block/xen-blkback/xenbus.c            | 32 ++++++++++++++++++-
- 4 files changed, 47 insertions(+), 3 deletions(-)
-
-diff --git a/Documentation/ABI/testing/sysfs-driver-xen-blkback b/Documentation/ABI/testing/sysfs-driver-xen-blkback
-index 4e7babb3ba1f..f01224231f3f 100644
---- a/Documentation/ABI/testing/sysfs-driver-xen-blkback
-+++ b/Documentation/ABI/testing/sysfs-driver-xen-blkback
-@@ -25,3 +25,13 @@ Description:
-                 allocated without being in use. The time is in
-                 seconds, 0 means indefinitely long.
-                 The default is 60 seconds.
-+
-+What:           /sys/module/xen_blkback/parameters/buffer_squeeze_duration_ms
-+Date:           December 2019
-+KernelVersion:  5.5
-+Contact:        SeongJae Park <sjpark@amazon.de>
-+Description:
-+                When memory pressure is reported to blkback this option
-+                controls the duration in milliseconds that blkback will not
-+                cache any page not backed by a grant mapping.
-+                The default is 10ms.
-diff --git a/drivers/block/xen-blkback/blkback.c b/drivers/block/xen-blkback/blkback.c
-index fd1e19f1a49f..79f677aeb5cc 100644
---- a/drivers/block/xen-blkback/blkback.c
-+++ b/drivers/block/xen-blkback/blkback.c
-@@ -656,8 +656,11 @@ int xen_blkif_schedule(void *arg)
- 			ring->next_lru = jiffies + msecs_to_jiffies(LRU_INTERVAL);
- 		}
- 
--		/* Shrink if we have more than xen_blkif_max_buffer_pages */
--		shrink_free_pagepool(ring, xen_blkif_max_buffer_pages);
-+		/* Shrink the free pages pool if it is too large. */
-+		if (time_before(jiffies, blkif->buffer_squeeze_end))
-+			shrink_free_pagepool(ring, 0);
-+		else
-+			shrink_free_pagepool(ring, xen_blkif_max_buffer_pages);
- 
- 		if (log_stats && time_after(jiffies, ring->st_print))
- 			print_stats(ring);
-diff --git a/drivers/block/xen-blkback/common.h b/drivers/block/xen-blkback/common.h
-index 1d3002d773f7..536c84f61fed 100644
---- a/drivers/block/xen-blkback/common.h
-+++ b/drivers/block/xen-blkback/common.h
-@@ -319,6 +319,7 @@ struct xen_blkif {
- 	/* All rings for this device. */
- 	struct xen_blkif_ring	*rings;
- 	unsigned int		nr_rings;
-+	unsigned long		buffer_squeeze_end;
- };
- 
- struct seg_buf {
-diff --git a/drivers/block/xen-blkback/xenbus.c b/drivers/block/xen-blkback/xenbus.c
-index b90dbcd99c03..20045827a391 100644
---- a/drivers/block/xen-blkback/xenbus.c
-+++ b/drivers/block/xen-blkback/xenbus.c
-@@ -492,6 +492,7 @@ static int xen_vbd_create(struct xen_blkif *blkif, blkif_vdev_t handle,
- static int xen_blkbk_remove(struct xenbus_device *dev)
- {
- 	struct backend_info *be = dev_get_drvdata(&dev->dev);
-+	unsigned long flags;
- 
- 	pr_debug("%s %p %d\n", __func__, dev, dev->otherend_id);
- 
-@@ -504,6 +505,7 @@ static int xen_blkbk_remove(struct xenbus_device *dev)
- 		be->backend_watch.node = NULL;
- 	}
- 
-+	spin_lock_irqsave(&dev->reclaim_lock, flags);
- 	dev_set_drvdata(&dev->dev, NULL);
- 
- 	if (be->blkif) {
-@@ -512,6 +514,7 @@ static int xen_blkbk_remove(struct xenbus_device *dev)
- 		/* Put the reference we set in xen_blkif_alloc(). */
- 		xen_blkif_put(be->blkif);
- 	}
-+	spin_unlock_irqrestore(&dev->reclaim_lock, flags);
- 
- 	return 0;
- }
-@@ -597,6 +600,7 @@ static int xen_blkbk_probe(struct xenbus_device *dev,
- 	int err;
- 	struct backend_info *be = kzalloc(sizeof(struct backend_info),
- 					  GFP_KERNEL);
-+	unsigned long flags;
- 
- 	/* match the pr_debug in xen_blkbk_remove */
- 	pr_debug("%s %p %d\n", __func__, dev, dev->otherend_id);
-@@ -607,6 +611,7 @@ static int xen_blkbk_probe(struct xenbus_device *dev,
- 		return -ENOMEM;
- 	}
- 	be->dev = dev;
-+	spin_lock_irqsave(&dev->reclaim_lock, flags);
- 	dev_set_drvdata(&dev->dev, be);
- 
- 	be->blkif = xen_blkif_alloc(dev->otherend_id);
-@@ -614,8 +619,10 @@ static int xen_blkbk_probe(struct xenbus_device *dev,
- 		err = PTR_ERR(be->blkif);
- 		be->blkif = NULL;
- 		xenbus_dev_fatal(dev, err, "creating block interface");
-+		spin_unlock_irqrestore(&dev->reclaim_lock, flags);
- 		goto fail;
- 	}
-+	spin_unlock_irqrestore(&dev->reclaim_lock, flags);
- 
- 	err = xenbus_printf(XBT_NIL, dev->nodename,
- 			    "feature-max-indirect-segments", "%u",
-@@ -824,6 +831,28 @@ static void frontend_changed(struct xenbus_device *dev,
- }
- 
- 
-+/* Once a memory pressure is detected, squeeze free page pools for a while. */
-+static unsigned int buffer_squeeze_duration_ms = 10;
-+module_param_named(buffer_squeeze_duration_ms,
-+		buffer_squeeze_duration_ms, int, 0644);
-+MODULE_PARM_DESC(buffer_squeeze_duration_ms,
-+"Duration in ms to squeeze pages buffer when a memory pressure is detected");
-+
-+/*
-+ * Callback received when the memory pressure is detected.
-+ */
-+static void reclaim_memory(struct xenbus_device *dev)
-+{
-+	struct backend_info *be = dev_get_drvdata(&dev->dev);
-+
-+	/* Device is registered but not probed yet */
-+	if (!be)
-+		return;
-+
-+	be->blkif->buffer_squeeze_end = jiffies +
-+		msecs_to_jiffies(buffer_squeeze_duration_ms);
-+}
-+
- /* ** Connection ** */
- 
- 
-@@ -1115,7 +1144,8 @@ static struct xenbus_driver xen_blkbk_driver = {
- 	.ids  = xen_blkbk_ids,
- 	.probe = xen_blkbk_probe,
- 	.remove = xen_blkbk_remove,
--	.otherend_changed = frontend_changed
-+	.otherend_changed = frontend_changed,
-+	.reclaim_memory = reclaim_memory,
- };
- 
- int xen_blkif_xenbus_init(void)
 -- 
-2.17.1
+Jens Axboe
 
