@@ -7,62 +7,62 @@ X-Spam-Status: No, score=-9.8 required=3.0 tests=DKIM_SIGNED,DKIM_VALID,
 	SPF_HELO_NONE,SPF_PASS,USER_AGENT_GIT autolearn=ham autolearn_force=no
 	version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id EF8ABC2D0CD
-	for <linux-block@archiver.kernel.org>; Tue, 17 Dec 2019 14:39:57 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id EB407C2D0D4
+	for <linux-block@archiver.kernel.org>; Tue, 17 Dec 2019 14:39:58 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.kernel.org (Postfix) with ESMTP id C636824679
-	for <linux-block@archiver.kernel.org>; Tue, 17 Dec 2019 14:39:57 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id C0A312467B
+	for <linux-block@archiver.kernel.org>; Tue, 17 Dec 2019 14:39:58 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel-dk.20150623.gappssmtp.com header.i=@kernel-dk.20150623.gappssmtp.com header.b="tLwP2zT0"
+	dkim=pass (2048-bit key) header.d=kernel-dk.20150623.gappssmtp.com header.i=@kernel-dk.20150623.gappssmtp.com header.b="1w7hkIWz"
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1728639AbfLQOj5 (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        id S1727926AbfLQOj5 (ORCPT <rfc822;linux-block@archiver.kernel.org>);
         Tue, 17 Dec 2019 09:39:57 -0500
-Received: from mail-il1-f196.google.com ([209.85.166.196]:44272 "EHLO
-        mail-il1-f196.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1728589AbfLQOjy (ORCPT
+Received: from mail-io1-f66.google.com ([209.85.166.66]:44334 "EHLO
+        mail-io1-f66.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S1728642AbfLQOj5 (ORCPT
         <rfc822;linux-block@vger.kernel.org>);
-        Tue, 17 Dec 2019 09:39:54 -0500
-Received: by mail-il1-f196.google.com with SMTP id z12so8523054iln.11
-        for <linux-block@vger.kernel.org>; Tue, 17 Dec 2019 06:39:54 -0800 (PST)
+        Tue, 17 Dec 2019 09:39:57 -0500
+Received: by mail-io1-f66.google.com with SMTP id b10so11207874iof.11
+        for <linux-block@vger.kernel.org>; Tue, 17 Dec 2019 06:39:57 -0800 (PST)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=kernel-dk.20150623.gappssmtp.com; s=20150623;
         h=from:to:cc:subject:date:message-id:in-reply-to:references
          :mime-version:content-transfer-encoding;
-        bh=EOt7OEDxASzJpz4aW2OtR1NM6hhZ1aYaA0R6ITxPWMg=;
-        b=tLwP2zT0MtI2kOTe48uSomwZIjJUT0pySzMCDXzO1sNdjdjOCFI1XHkUHEOozqFc8c
-         nD8w1OUooAyprmV1auAjotvgf/lwQQgtJmjU0OOuifVAcFA6tNABcFtRb6VTMGQNvXW8
-         R+UIQQhagkuaIdQ7XtSKY2NXtNhP26jjoETMW/zxAtTmWwRpQW/LEGudNmZGscJC8QcP
-         5bfFqpV+WXfMvXGjvCr86gr0YU9WkuoxK8tJyuGnk+U8na/TmrO8XsxhHpezKrsvh+V8
-         wbxIlP/OlD3s6ghZTqeNhQeYNghwcPJnzfXH2JT64KUq2IgoyaXWFWMfddWHwG8HGDQK
-         3y0A==
+        bh=hSvlHPa+iglQscNJSf7xQ/5HwRTlC6yUkzeNdFCcqV8=;
+        b=1w7hkIWzvLtMu/dLZZMcZIijlZyfYWT25XG5COOJJfc8oH+ykaNVmhW+kyy47uEmxT
+         44BfhsIy0PIQPcGGVhchbkR3/gV/mUaau6NjOzs4QWM9ffCFMNcxvMItscKe+DnZ8qPF
+         Po3NAj4x4dgXGv6qHecBmhualhrDq1w6EvAdBXsygv8MWFEzZ7R9YWkEgVggpMNvni6n
+         n37RGtE7bIULBdKOjo8NKGU+SO0IhHzTxOZvEEt83L9ftLfxh3r/Lej6KO9UMyH6X+iN
+         W11mqMTLUelQXj54y55ExU0ini0NqxR9dbme6TbUTRm5QE3/urjzZE6sDy95hbxBcJ6x
+         ntdg==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=1e100.net; s=20161025;
         h=x-gm-message-state:from:to:cc:subject:date:message-id:in-reply-to
          :references:mime-version:content-transfer-encoding;
-        bh=EOt7OEDxASzJpz4aW2OtR1NM6hhZ1aYaA0R6ITxPWMg=;
-        b=TPg9wNeAdVwA3jawcSb7rM+4z46vyHa4qZbW2t8ukrpz31MY3KYfSHHxMLwaGaTiFV
-         ZZynm+yA7kUrBlNM43lVb1X8+iqwueNuj4Rg5/wUr24py6d16sFB/VF/YHlFISznBgaU
-         2juJXKWVy4iFMQo4cBshh/pr0wnqwPt8obaVf2WbGTkxaOCZTZTfC7NjCq0fpdL6Vh7O
-         c8GNOpc4SvMIWBe5buo+6We45ncpaH3Culyc5uLKLb9MdTBzDfFb2AZnUz9/RYuE1NZ+
-         Q/hNKrdx3fAzHG9sSBqCMAG509qAh2fxMtLUoi896WKFZDnwkaM0g4uEYoRz8cLUrjTl
-         5hNA==
-X-Gm-Message-State: APjAAAXCvQvAaNuHd7n0d5r4pTCXiZA4WHq89TktT0m/MmRg7Nou2+e/
-        dMBXNMUtCB6Th/LWC6WJihL9kQ==
-X-Google-Smtp-Source: APXvYqy373igjl5RaNDqw4GXVKR/B2FPaCQeTRyE7cK02n7sdyI5xVepqdHZGKv7py+DgJxlDb4Q6Q==
-X-Received: by 2002:a92:cb11:: with SMTP id s17mr10211920ilo.114.1576593593985;
-        Tue, 17 Dec 2019 06:39:53 -0800 (PST)
+        bh=hSvlHPa+iglQscNJSf7xQ/5HwRTlC6yUkzeNdFCcqV8=;
+        b=DAm5u0PEHCgCPT8NtrDP1SSCBmaJUdOVVd8WE0/tk8lCOh2NXL5ot/zQOh7yw9rZ3/
+         Q3t7MCOzXEQCqoCd5vQ0G0kSGr2PaMdBXxXU19sJkglkBogkQHJTYmJ1C3ZqxtZfuSoQ
+         cF2/8H9XjwqP9awE4SOHSNDyTRfeBjJqWGiQxEVCWwZIJQRyzlFEbTsVEqk95RJSX2HU
+         8u+uyATEJcP4+x1wwspvNmhVkZxdIwg3vqKgCdkxkMqMi2zCxVEjPopxGP4JYClBttoS
+         SQZXyIlRkCieVv/7ps/n0K+w7buVi7BfYrF4qeMpgEawPhy9Ef9bj5V8D4s5uvfWfYxy
+         T+Hg==
+X-Gm-Message-State: APjAAAU4OusUOa5HR6KB5nlQfJF8phk6yUY88F3AKouIYR1TU40ekZfU
+        QoRt1y9F1sH1cU7Y8xTpL8+zQw==
+X-Google-Smtp-Source: APXvYqyLgOsF8+OSoa6LuQKDnmSyMVA3kpVF98IU1cYOBzMtc4vb4+N38upf1F2528sIApqSicZCyw==
+X-Received: by 2002:a6b:680d:: with SMTP id d13mr3796828ioc.188.1576593596972;
+        Tue, 17 Dec 2019 06:39:56 -0800 (PST)
 Received: from x1.thefacebook.com ([65.144.74.34])
-        by smtp.gmail.com with ESMTPSA id w21sm5285255ioc.34.2019.12.17.06.39.53
+        by smtp.gmail.com with ESMTPSA id w21sm5285255ioc.34.2019.12.17.06.39.55
         (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Tue, 17 Dec 2019 06:39:53 -0800 (PST)
+        Tue, 17 Dec 2019 06:39:56 -0800 (PST)
 From:   Jens Axboe <axboe@kernel.dk>
 To:     linux-mm@kvack.org, linux-fsdevel@vger.kernel.org,
         linux-block@vger.kernel.org
 Cc:     willy@infradead.org, clm@fb.com, torvalds@linux-foundation.org,
         david@fromorbit.com, Jens Axboe <axboe@kernel.dk>
-Subject: [PATCH 3/6] mm: make buffered writes work with RWF_UNCACHED
-Date:   Tue, 17 Dec 2019 07:39:45 -0700
-Message-Id: <20191217143948.26380-4-axboe@kernel.dk>
+Subject: [PATCH 6/6] xfs: don't do delayed allocations for uncached buffered writes
+Date:   Tue, 17 Dec 2019 07:39:48 -0700
+Message-Id: <20191217143948.26380-7-axboe@kernel.dk>
 X-Mailer: git-send-email 2.24.1
 In-Reply-To: <20191217143948.26380-1-axboe@kernel.dk>
 References: <20191217143948.26380-1-axboe@kernel.dk>
@@ -73,108 +73,33 @@ Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-If RWF_UNCACHED is set for io_uring (or pwritev2(2)), we'll drop the
-cache instantiated for buffered writes. If new pages aren't
-instantiated, we leave them alone. This provides similar semantics to
-reads with RWF_UNCACHED set.
+This data is going to be written immediately, so don't bother trying
+to do delayed allocation for it.
 
+Suggested-by: Dave Chinner <david@fromorbit.com>
 Signed-off-by: Jens Axboe <axboe@kernel.dk>
 ---
- include/linux/fs.h |  1 +
- mm/filemap.c       | 41 +++++++++++++++++++++++++++++++++++++++--
- 2 files changed, 40 insertions(+), 2 deletions(-)
+ fs/xfs/xfs_iomap.c | 7 +++++--
+ 1 file changed, 5 insertions(+), 2 deletions(-)
 
-diff --git a/include/linux/fs.h b/include/linux/fs.h
-index bf58db1bc032..5ea5fc167524 100644
---- a/include/linux/fs.h
-+++ b/include/linux/fs.h
-@@ -285,6 +285,7 @@ enum positive_aop_returns {
- #define AOP_FLAG_NOFS			0x0002 /* used by filesystem to direct
- 						* helper code (eg buffer layer)
- 						* to clear GFP_FS from alloc */
-+#define AOP_FLAG_UNCACHED		0x0004
+diff --git a/fs/xfs/xfs_iomap.c b/fs/xfs/xfs_iomap.c
+index 28e2d1f37267..d0cd4a05d59f 100644
+--- a/fs/xfs/xfs_iomap.c
++++ b/fs/xfs/xfs_iomap.c
+@@ -847,8 +847,11 @@ xfs_buffered_write_iomap_begin(
+ 	int			allocfork = XFS_DATA_FORK;
+ 	int			error = 0;
  
- /*
-  * oh the beauties of C type declarations.
-diff --git a/mm/filemap.c b/mm/filemap.c
-index 522152ed86d8..0b5f29b30c34 100644
---- a/mm/filemap.c
-+++ b/mm/filemap.c
-@@ -3277,10 +3277,12 @@ struct page *grab_cache_page_write_begin(struct address_space *mapping,
- 					pgoff_t index, unsigned flags)
- {
- 	struct page *page;
--	int fgp_flags = FGP_LOCK|FGP_WRITE|FGP_CREAT;
-+	int fgp_flags = FGP_LOCK|FGP_WRITE;
+-	/* we can't use delayed allocations when using extent size hints */
+-	if (xfs_get_extsz_hint(ip))
++	/*
++	 * Don't do delayed allocations when using extent size hints, or
++	 * if we were asked to do uncached buffered writes.
++	 */
++	if (xfs_get_extsz_hint(ip) || (flags & IOMAP_UNCACHED))
+ 		return xfs_direct_write_iomap_begin(inode, offset, count,
+ 				flags, iomap, srcmap);
  
- 	if (flags & AOP_FLAG_NOFS)
- 		fgp_flags |= FGP_NOFS;
-+	if (!(flags & AOP_FLAG_UNCACHED))
-+		fgp_flags |= FGP_CREAT;
- 
- 	page = pagecache_get_page(mapping, index, fgp_flags,
- 			mapping_gfp_mask(mapping));
-@@ -3301,6 +3303,9 @@ ssize_t generic_perform_write(struct file *file,
- 	ssize_t written = 0;
- 	unsigned int flags = 0;
- 
-+	if (iocb->ki_flags & IOCB_UNCACHED)
-+		flags |= AOP_FLAG_UNCACHED;
-+
- 	do {
- 		struct page *page;
- 		unsigned long offset;	/* Offset into pagecache page */
-@@ -3333,10 +3338,16 @@ ssize_t generic_perform_write(struct file *file,
- 			break;
- 		}
- 
-+retry:
- 		status = a_ops->write_begin(file, mapping, pos, bytes, flags,
- 						&page, &fsdata);
--		if (unlikely(status < 0))
-+		if (unlikely(status < 0)) {
-+			if (status == -ENOMEM && (flags & AOP_FLAG_UNCACHED)) {
-+				flags &= ~AOP_FLAG_UNCACHED;
-+				goto retry;
-+			}
- 			break;
-+		}
- 
- 		if (mapping_writably_mapped(mapping))
- 			flush_dcache_page(page);
-@@ -3372,6 +3383,32 @@ ssize_t generic_perform_write(struct file *file,
- 		balance_dirty_pages_ratelimited(mapping);
- 	} while (iov_iter_count(i));
- 
-+	if (written && (iocb->ki_flags & IOCB_UNCACHED)) {
-+		loff_t end;
-+
-+		pos = iocb->ki_pos;
-+		end = pos + written;
-+
-+		status = filemap_write_and_wait_range(mapping, pos, end);
-+		if (status)
-+			goto out;
-+
-+		/*
-+		 * No pages were created for this range, we're done
-+		 */
-+		if (flags & AOP_FLAG_UNCACHED)
-+			 goto out;
-+
-+		/*
-+		 * Try to invalidate cache pages for the range we just wrote.
-+		 * We don't care if invalidation fails as the write has still
-+		 * worked and leaving clean uptodate pages in the page cache
-+		 * isn't a corruption vector for uncached IO.
-+		 */
-+		 invalidate_inode_pages2_range(mapping,
-+					pos >> PAGE_SHIFT, end >> PAGE_SHIFT);
-+	}
-+out:
- 	return written ? written : status;
- }
- EXPORT_SYMBOL(generic_perform_write);
 -- 
 2.24.1
 
