@@ -6,68 +6,69 @@ X-Spam-Status: No, score=-0.9 required=3.0 tests=DKIMWL_WL_HIGH,DKIM_SIGNED,
 	DKIM_VALID,DKIM_VALID_AU,HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,
 	SPF_HELO_NONE,SPF_PASS autolearn=no autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 24706C2D0CD
-	for <linux-block@archiver.kernel.org>; Tue, 17 Dec 2019 19:40:03 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 70F0FC2D0D1
+	for <linux-block@archiver.kernel.org>; Tue, 17 Dec 2019 20:26:48 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.kernel.org (Postfix) with ESMTP id EB3DE2146E
-	for <linux-block@archiver.kernel.org>; Tue, 17 Dec 2019 19:40:02 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id 438A821D7D
+	for <linux-block@archiver.kernel.org>; Tue, 17 Dec 2019 20:26:48 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=default; t=1576611603;
-	bh=hSXdv9jRzbNvDra3oqB/7j+Mcp5L/wdRsIZvrLCULRw=;
+	s=default; t=1576614408;
+	bh=ELgblhnRlUhHQhpVzXjr3fc4chVVeiMX7dNeAUHFsVs=;
 	h=References:In-Reply-To:From:Date:Subject:To:Cc:List-ID:From;
-	b=ggvmgQHSLsYO06cK+aDpu+sU811lNzX+xt9MtK3imxL68cwWbuvGZL1mHKC+uvs7u
-	 QbrNalki0pkWmHPXGs6fDMylFyZA/h48LuTBefiisVMiulDkBmFiUILaTblVMZ7jb/
-	 GjXfcfKNPyQFmp61lEvlAJAxkW5Fl4eRnJRvlEXk=
+	b=lue4c/8+a9H6AeCw9H21Ji7ks/gJiKQS4E/vfY/ydNJ0CPDcyDdn4M7GIi5j9BrNT
+	 HiG/hsu3wSavKhPb4wS5VNcM71gjwYliGiRoPlNusKUKBwf4d9xFUSJZDWGMi1+Pvi
+	 z5ktF9lfk4Ygkgv323rfpbtCucRQ8xK7DE3FFSzM=
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1727431AbfLQTkC (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Tue, 17 Dec 2019 14:40:02 -0500
-Received: from mail-lj1-f193.google.com ([209.85.208.193]:42980 "EHLO
+        id S1727741AbfLQU0r (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Tue, 17 Dec 2019 15:26:47 -0500
+Received: from mail-lj1-f193.google.com ([209.85.208.193]:38213 "EHLO
         mail-lj1-f193.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1726612AbfLQTkB (ORCPT
+        with ESMTP id S1727492AbfLQU0q (ORCPT
         <rfc822;linux-block@vger.kernel.org>);
-        Tue, 17 Dec 2019 14:40:01 -0500
-Received: by mail-lj1-f193.google.com with SMTP id e28so5415605ljo.9
-        for <linux-block@vger.kernel.org>; Tue, 17 Dec 2019 11:39:59 -0800 (PST)
+        Tue, 17 Dec 2019 15:26:46 -0500
+Received: by mail-lj1-f193.google.com with SMTP id k8so1070017ljh.5
+        for <linux-block@vger.kernel.org>; Tue, 17 Dec 2019 12:26:45 -0800 (PST)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=linux-foundation.org; s=google;
         h=mime-version:references:in-reply-to:from:date:message-id:subject:to
          :cc;
-        bh=qFRWpBT/yna7msZCz1h2wfxEJHa/dpTRSDTuMPZJuko=;
-        b=aMhd1gYr/CaA40gJd+Y5v2iKz3PpftHLH7meUakQxXR667vcpSEeG+f7RRgZ9EScB8
-         QPC5XzSuBsPm691KBjptv6ye07x5hIgbc7KafGV8ZlGArW6KOkIPnZeOx0iU0AevTOka
-         8z9zZfU3hjnoqjS219RuVLiUlb7YJo5q+60u4=
+        bh=i1T7+oLmgUY62ytPiNODIrz1cZeW8gAZnOGieJ8ZkwA=;
+        b=B25Yd0xdGvGJ4bCIEr4Bgw/88tBjEJ0OPfoVc5YLKvIjM26jyP64rHYwIIEVDLTF0T
+         74GwFgIu0A96nSZ33TTCFUmysZjkwE8bDL13x64JVHMOo8K7cEIepUclqLbfA2V4o+Gz
+         t+TIx/86gc/llbykG0MWlhLehR8Su42SrUwv4=
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=1e100.net; s=20161025;
         h=x-gm-message-state:mime-version:references:in-reply-to:from:date
          :message-id:subject:to:cc;
-        bh=qFRWpBT/yna7msZCz1h2wfxEJHa/dpTRSDTuMPZJuko=;
-        b=oI9dzmP1JjCATGvIp22Ccmqrk/A8b8FgaeBFZij+99M3hZWBMYvFQSbAe74lVNXPRS
-         d626zwrGQI6wSOC08Vlph3n3zY5SFPS8CgrcSm1DJzzVfcABe758sIo45L4Qb+1y7ACg
-         S/t/yIoApckw3Bix8BEo18mpkeoG9ShSmf5sJTNGeClYg93p6cIqlM+87jBIXPiJcjda
-         28qVI5XKuI0U5BROa7adVozupo2NcuTNlLhNunq9JojTZo7VOgIFpLgfTTo20wdj6+Oo
-         xsN5xwyzln1cwweKnfV6f6uSYDXS8NZFALR3revZQa32NHld93jLOMaxN+J/8L3bbX64
-         DgTA==
-X-Gm-Message-State: APjAAAW88UkZ/8K2hAy61db3nsiddU2GuJu07Dk3eXfTTQE8XT6wrelq
-        xDcz57ChjW3v/ux6jB8euFgNHFkaIIg=
-X-Google-Smtp-Source: APXvYqwD5jqYE/H8Q8LoQiiEGvk1AOUd90fqP/SuZXfjfnNkcSfNzAnrbg1JS5nuabuiyxVr3yjdUA==
-X-Received: by 2002:a05:651c:119b:: with SMTP id w27mr2686369ljo.242.1576611598279;
-        Tue, 17 Dec 2019 11:39:58 -0800 (PST)
-Received: from mail-lj1-f173.google.com (mail-lj1-f173.google.com. [209.85.208.173])
-        by smtp.gmail.com with ESMTPSA id w29sm10960361lfa.34.2019.12.17.11.39.57
+        bh=i1T7+oLmgUY62ytPiNODIrz1cZeW8gAZnOGieJ8ZkwA=;
+        b=E2llVnTl2pBmokcO2DGBE/2BzS0CFZC3E2NfN7V6HPW0k2mZfOunflmJizQp5dx44X
+         4eLxMPqxvse6Un0+r4RG3+lzRhBVs5tejhExQ4tj3uEsxi8P6BGCaNaFWavhvICwvRuu
+         UmYtzOVLQeyTetLhgQpPp7I/CTgS3sn9aZsiyiD1t17wSe/XbiufrzUoCcUc3Gz1c1N7
+         H/boX2UL47mNtDW+5qtP7MoUSm3mUxmZZwEXnK/94HOYfmi9nAiO0sHQbjxJIi1h7bQF
+         6MKlQLfAGeGFqmw4yMt+Z7Z9ju02QSbCXsjtwIMVMYUexsnfanPbptyo8nputmsXW4EW
+         jfHQ==
+X-Gm-Message-State: APjAAAUfm9fBz+kQuxvo2vGnRPmqXKJEVR210Mf37dreFhT6K/PiYon8
+        dYctY3/lkK2jQpGeDHtlAOGUBGOgE7E=
+X-Google-Smtp-Source: APXvYqzf9jq0vxnyAZ5eZEkO82MpCdiVc9GEoeHIoE+LVbo3OnXtUyoMHBXR0ByxM8tOFbrMbDUHEg==
+X-Received: by 2002:a2e:9b05:: with SMTP id u5mr4578821lji.59.1576614403898;
+        Tue, 17 Dec 2019 12:26:43 -0800 (PST)
+Received: from mail-lj1-f170.google.com (mail-lj1-f170.google.com. [209.85.208.170])
+        by smtp.gmail.com with ESMTPSA id v24sm16140294ljc.18.2019.12.17.12.26.42
         for <linux-block@vger.kernel.org>
         (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
-        Tue, 17 Dec 2019 11:39:57 -0800 (PST)
-Received: by mail-lj1-f173.google.com with SMTP id u17so12315130lja.4
-        for <linux-block@vger.kernel.org>; Tue, 17 Dec 2019 11:39:57 -0800 (PST)
-X-Received: by 2002:a2e:9ad8:: with SMTP id p24mr4517160ljj.148.1576611596942;
- Tue, 17 Dec 2019 11:39:56 -0800 (PST)
+        Tue, 17 Dec 2019 12:26:42 -0800 (PST)
+Received: by mail-lj1-f170.google.com with SMTP id z17so12395957ljk.13
+        for <linux-block@vger.kernel.org>; Tue, 17 Dec 2019 12:26:42 -0800 (PST)
+X-Received: by 2002:a2e:91cb:: with SMTP id u11mr4707040ljg.82.1576614402189;
+ Tue, 17 Dec 2019 12:26:42 -0800 (PST)
 MIME-Version: 1.0
 References: <20191217143948.26380-1-axboe@kernel.dk> <20191217143948.26380-5-axboe@kernel.dk>
-In-Reply-To: <20191217143948.26380-5-axboe@kernel.dk>
+ <CAHk-=wgcPAfOSigMf0xwaGfVjw413XN3UPATwYWHrss+QuivhQ@mail.gmail.com>
+In-Reply-To: <CAHk-=wgcPAfOSigMf0xwaGfVjw413XN3UPATwYWHrss+QuivhQ@mail.gmail.com>
 From:   Linus Torvalds <torvalds@linux-foundation.org>
-Date:   Tue, 17 Dec 2019 11:39:41 -0800
-X-Gmail-Original-Message-ID: <CAHk-=wgcPAfOSigMf0xwaGfVjw413XN3UPATwYWHrss+QuivhQ@mail.gmail.com>
-Message-ID: <CAHk-=wgcPAfOSigMf0xwaGfVjw413XN3UPATwYWHrss+QuivhQ@mail.gmail.com>
+Date:   Tue, 17 Dec 2019 12:26:26 -0800
+X-Gmail-Original-Message-ID: <CAHk-=wgvROUnrEVADVR_zTHY8NmYo-_jVjV37O1MdDm2de+Lmw@mail.gmail.com>
+Message-ID: <CAHk-=wgvROUnrEVADVR_zTHY8NmYo-_jVjV37O1MdDm2de+Lmw@mail.gmail.com>
 Subject: Re: [PATCH 4/6] iomap: add struct iomap_ctx
 To:     Jens Axboe <axboe@kernel.dk>
 Cc:     Linux-MM <linux-mm@kvack.org>,
@@ -81,65 +82,40 @@ Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-On Tue, Dec 17, 2019 at 6:40 AM Jens Axboe <axboe@kernel.dk> wrote:
+On Tue, Dec 17, 2019 at 11:39 AM Linus Torvalds
+<torvalds@linux-foundation.org> wrote:
 >
-> We pass a lot of arguments to iomap_apply(), and subsequently to the
-> actors that it calls. In preparation for adding one more argument,
-> switch them to using a struct iomap_ctx instead. The actor gets a const
-> version of that, they are not supposed to change anything in it.
+> 'loff_t length' is not right.
 
-Looks generally like what I expected, but when looking at the patch I
-notice that the type of 'len' is crazy and wrong.
+Looking around, it does seem to get used that way. Too much, though.
 
-It was wrong before too, though:
+> > +       loff_t pos = data->pos;
+> > +       loff_t length = pos + data->len;
+>
+> And WTH is that? "pos + data->len" is not "length", that's end. And this:
+>
+> >         loff_t end = pos + length, done = 0;
+>
+> What? Now 'end' is 'pos+length', which is 'pos+pos+data->len'.
 
-> -dax_iomap_actor(struct inode *inode, loff_t pos, loff_t length, void *data,
+But this is unrelated to the crazy types. That just can't bve right.
 
-'loff_t length' is not right.
+> Is there some reason for this horrible case of "let's allow 64-bit sizes?"
+>
+> Because even if there is, it shouldn't be "loff_t". That's an
+> _offset_. Not a length.
 
-> +       loff_t pos = data->pos;
-> +       loff_t length = pos + data->len;
+We do seem to have a lot of these across filesystems. And a lot of
+confusion. Most of the IO reoutines clearly take or return a size_t
+(returning ssize_t) as the IO size. And then you have the
+zeroing/truncation stuff that tends to take loff_t. Which still smells
+wrong, and s64 would look like a better case, but whatever.
 
-And WTH is that? "pos + data->len" is not "length", that's end. And this:
+The "iomap_zero_range() for truncate" case really does seem to need a
+64-bit value, because people do the difference of two loff_t's for it.
+In fact, it almost looks like that function should take a "start ,
+end" pair, which would make loff_t be the _right_ thing.
 
->         loff_t end = pos + length, done = 0;
+Because "length" really is just (a positive) size_t normally.
 
-What? Now 'end' is 'pos+length', which is 'pos+pos+data->len'.
-
-WHAA?
-
-> @@ -1197,22 +1200,26 @@ dax_iomap_rw(struct kiocb *iocb, struct iov_iter *iter,
->  {
-> +       loff_t ret = 0, done = 0;
-
-More insanity. "ret" shouldn't be loff_t.
-
-dax_iomap_rw() returns a ssize_t.
-
-> +       loff_t count = data->len;
-
-More of this crazy things.
-
->  iomap_zero_range(struct inode *inode, loff_t pos, loff_t len, bool *did_zero,
-
-This was wrong before.
-
-> +struct iomap_ctx {
-> +       struct inode    *inode;
-> +       loff_t          pos;
-> +       loff_t          len;
-> +       void            *priv;
-> +       unsigned        flags;
-> +};
-
-Please make 'len' be 'size_t' or something.
-
-If you're on a 32-bit architecture, you shouldn't be writing more than
-4GB in a go anyway.
-
-Is there some reason for this horrible case of "let's allow 64-bit sizes?"
-
-Because even if there is, it shouldn't be "loff_t". That's an
-_offset_. Not a length.
-
-            Linus
+                Linus
