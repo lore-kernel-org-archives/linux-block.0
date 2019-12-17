@@ -6,22 +6,22 @@ X-Spam-Status: No, score=-9.8 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
 	INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,
 	USER_AGENT_GIT autolearn=unavailable autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id BCE06C43603
-	for <linux-block@archiver.kernel.org>; Tue, 17 Dec 2019 22:19:09 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id AED0FC2D0D1
+	for <linux-block@archiver.kernel.org>; Tue, 17 Dec 2019 22:19:11 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.kernel.org (Postfix) with ESMTP id 8D6DC2465E
-	for <linux-block@archiver.kernel.org>; Tue, 17 Dec 2019 22:19:09 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id 836212465E
+	for <linux-block@archiver.kernel.org>; Tue, 17 Dec 2019 22:19:11 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1726676AbfLQWRm (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        id S1726664AbfLQWRm (ORCPT <rfc822;linux-block@archiver.kernel.org>);
         Tue, 17 Dec 2019 17:17:42 -0500
-Received: from mout.kundenserver.de ([217.72.192.74]:49705 "EHLO
+Received: from mout.kundenserver.de ([217.72.192.74]:47167 "EHLO
         mout.kundenserver.de" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1726613AbfLQWRk (ORCPT
+        with ESMTP id S1726616AbfLQWRk (ORCPT
         <rfc822;linux-block@vger.kernel.org>);
         Tue, 17 Dec 2019 17:17:40 -0500
 Received: from threadripper.lan ([149.172.19.189]) by mrelayeu.kundenserver.de
  (mreue108 [212.227.15.145]) with ESMTPA (Nemesis) id
- 1MFba4-1iTcQl3JfS-00H5hY; Tue, 17 Dec 2019 23:17:25 +0100
+ 1N7Qt9-1hc4Aj0to5-017p51; Tue, 17 Dec 2019 23:17:24 +0100
 From:   Arnd Bergmann <arnd@arndb.de>
 To:     Jens Axboe <axboe@kernel.dk>,
         "James E.J. Bottomley" <jejb@linux.ibm.com>,
@@ -32,73 +32,63 @@ Cc:     linux-scsi@vger.kernel.org, linux-block@vger.kernel.org,
         Ben Hutchings <ben.hutchings@codethink.co.uk>,
         linux-doc@vger.kernel.org, corbet@lwn.net, viro@zeniv.linux.org.uk,
         linux-fsdevel@vger.kernel.org, Arnd Bergmann <arnd@arndb.de>,
-        Will Deacon <will@kernel.org>
-Subject: [PATCH v2 06/27] compat: ARM64: always include asm-generic/compat.h
-Date:   Tue, 17 Dec 2019 23:16:47 +0100
-Message-Id: <20191217221708.3730997-7-arnd@arndb.de>
+        stable@vger.kernel.org, Damien Le Moal <damien.lemoal@wdc.com>
+Subject: [PATCH v2 03/27] compat_ioctl: block: handle BLKGETZONESZ/BLKGETNRZONES
+Date:   Tue, 17 Dec 2019 23:16:44 +0100
+Message-Id: <20191217221708.3730997-4-arnd@arndb.de>
 X-Mailer: git-send-email 2.20.0
 In-Reply-To: <20191217221708.3730997-1-arnd@arndb.de>
 References: <20191217221708.3730997-1-arnd@arndb.de>
 MIME-Version: 1.0
 Content-Transfer-Encoding: 8bit
-X-Provags-ID: V03:K1:KL1ro4KGbRgth3ZyPB/rUAk9SI9caDwc2wmp7lID3j5UJuG/6zE
- jjRLuKXhvnIFa8qaMfReNfEXctttFgrIVqB/F8fk6VYQq40G8/4HFBUMSIUgljh/CHDrt8Q
- 69toNQfZopjNWJs7hsjfa6yd254sA/h57NFTXYoc3PkHXFksuk6NUBA9BahejYNLdG0/ZsG
- N/KriVo2wRDf+NrqqW4hg==
-X-UI-Out-Filterresults: notjunk:1;V03:K0:QObuhZbO9AY=:n0QH6H90N+kFOplb/DnWZ7
- AlmmIj0UejnAga/WbAExgs2nDVyWB/XfJ7GAn2Q1LEIaRzeMt+5oc3DltGf1LAybWfMe+LsWq
- qRT0IBjoptB0bN/M4aR7pGKQY9o275avtkdPO4ix1KuMR6QAf7CihdPYXkrrEWtF6y6HbQjGn
- +j7YNZ4ske8uUFEkTuPGN9vtjsXUD/g++1sMeTvNA0pysgKnDz1AcBec0pa6U2mC56CYbzz2O
- FAGnT6Rqnp7h8cluJ5tY52HItYlR8nB0dLN3UCUNFh9LKryA1hcvslQubQq5btgxFZ5ufDTtt
- aF4gllxZynPOzLuJ6cAgQU4GIEsPUXY7UKLnuvQmmrPh425Jxsg8lvAgtx9SBxdBK6Oe+Kgh0
- JtarlkrG8OBIigoaX0oxhJDADSiQhBBrun0in9FXXqCqYjv9Q+5TOn6Sgv8bFVs3gmik7UpS9
- YpU9Af5Fo18iTuNJYU7DsfcvLLKsd3Dig4yL8fNgjsWED2ZtnqCrtp8PAapztEhl18QRjRmf2
- ZgwhrhZLP9qUXMW0EqH5thD1lHVAgMk4h6T7N7lAdvpdXxQ3dLpHb4QYh2d3YdPOZ8aU648pX
- zpj0K2wvorwOq6gIzurxnQu7AEgQ2rSPqauCjyu4gwNwYXNnsXHoWZtn9HhC4RCP3vcV8Ahq1
- sY3YxVYa9uKMpx9ESnHjo0R6GMvaMBdYyb4e0JIsoY27AcD+gO56rXtfn5LzpdRpAuxxUQptk
- DVbjSB82MpSC8bXKr2ErxNXQ6NDIbDkAA8XwMFByKjYLaRu/w3DUnx9iiq6UBFIIGOIdgjMbw
- sNM/QJbtJxuaa5VyyvbYnk9ng7001Wn0sqVDJTkJ8VQkBltfwzmRa5Q0WYKHP5MJkQ2WoSspl
- VXUq4MYIhhGNm4ZWEO0w==
+X-Provags-ID: V03:K1:qZe5YHLKHLHpHJZclyVZA0fCxWsO2YWO0AhXGovOQ1fZAYHfawL
+ PlgMmuwRjxPbewOZKAHylAsdjtO5Fe/LyB5CoqTBmrCuAd/xJZkTNN2Xe6IE5gl9V6JPzSt
+ wvrf4HNaht3Bulo2IXSq2733GPK1CFCKtmRyV0YYyH/U4G/08T9e4oHS3EjXjMzJqv1R6qu
+ YXpz3kgtPpBQ+l8/25RAg==
+X-UI-Out-Filterresults: notjunk:1;V03:K0:Hk6RW/QL2Xc=:a9P9ugAbeQlBAd8QTVyh2z
+ 5InWQgdBINeinSpZATAEdhQ/i9YNLE4Cs+a4GFKgz8jKOPxplXc0dczKp/R69c5g8upJqXc65
+ Inze+14ZfZRZaI0BopuCyPY5TUVy08obBhggcQi+WudXUEHWwBsXUFluiycvo4Qaurb+6rEtF
+ wl/PyloS7vvgNbHp3oizoL/VE9M/fDRKOZnJVXS33E5tAxmuyEeS+c06bSgvorA2N0WUlGegL
+ JR96X/5oeTYQNiS6LNCZOFNiaK7DxSoFNL2X//sV4r/tkqil9NVYbVqSA57bXb27MZdAlvzce
+ teYoIFLXA6UzJ6tlnlyGnkX0lzqkCqNUxxn2Vz3OLxiBy708VuKvki7fpMwIoFK5zb8uismKl
+ NVnMG3k+kqutWYugmpAYLlsd46sD0BA3aS7H/7sbtwCkJbLmSHzGzUzT3QwFLvufPwS7gjtVa
+ LkVlGEraoHwX6J/Aq5FlQxnpaZCOZaoD2ipgjveEAiRud97oZd3v0U1P+jQVsZ31Vd+ZmWrGT
+ 99AZMqe5M7rDHP9ViRtLfEhibVOQhXjLSW+6xch6lCzJ219MgwF1MnPomwWr/0C9C2kvM0BuW
+ j5FGSpZiAZjCLNLEkmuBo6gIivj9IxCbQPMRAzV5rRkt2cZS6sEc13znh6WL9OTKMbXBlAoEg
+ 92vBK+F5J4ulrPf/6JaQ+KO+dW1b0XoqtMB47HnrBzadfiYpZbvLrSGZ9glboP6AhZN/k8rL7
+ bCxTfErhrRnqMpnIuouQQawVleSt5C4nvOHsvTHLrT7EfkeC0Orh2YFb1qjgwN0bBoM067VZr
+ rD9N8ZXHsBYH9Hk++YNJRhYpCVImlVrPMX8irVmtJnFkRUa5wg509PSNNIxy3I6lxJmDXGb5E
+ AEnRWMTVaEAGbAC7t4wA==
 Sender: linux-block-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-In order to use compat_* type defininitions in device drivers
-outside of CONFIG_COMPAT, move the inclusion of asm-generic/compat.h
-ahead of the #ifdef.
+These were added to blkdev_ioctl() in v4.20 but not blkdev_compat_ioctl,
+so add them now.
 
-All other architectures already do this.
-
-Acked-by: Will Deacon <will@kernel.org>
+Cc: <stable@vger.kernel.org> # v4.20+
+Fixes: 72cd87576d1d ("block: Introduce BLKGETZONESZ ioctl")
+Fixes: 65e4e3eee83d ("block: Introduce BLKGETNRZONES ioctl")
+Reviewed-by: Damien Le Moal <damien.lemoal@wdc.com>
 Signed-off-by: Arnd Bergmann <arnd@arndb.de>
 ---
- arch/arm64/include/asm/compat.h | 5 +++--
- 1 file changed, 3 insertions(+), 2 deletions(-)
+ block/compat_ioctl.c | 2 ++
+ 1 file changed, 2 insertions(+)
 
-diff --git a/arch/arm64/include/asm/compat.h b/arch/arm64/include/asm/compat.h
-index b0d53a265f1d..7b4172ce497c 100644
---- a/arch/arm64/include/asm/compat.h
-+++ b/arch/arm64/include/asm/compat.h
-@@ -4,6 +4,9 @@
-  */
- #ifndef __ASM_COMPAT_H
- #define __ASM_COMPAT_H
-+
-+#include <asm-generic/compat.h>
-+
- #ifdef CONFIG_COMPAT
- 
- /*
-@@ -13,8 +16,6 @@
- #include <linux/sched.h>
- #include <linux/sched/task_stack.h>
- 
--#include <asm-generic/compat.h>
--
- #define COMPAT_USER_HZ		100
- #ifdef __AARCH64EB__
- #define COMPAT_UTS_MACHINE	"armv8b\0\0"
+diff --git a/block/compat_ioctl.c b/block/compat_ioctl.c
+index 830f91e05fe3..f5c1140b8624 100644
+--- a/block/compat_ioctl.c
++++ b/block/compat_ioctl.c
+@@ -356,6 +356,8 @@ long compat_blkdev_ioctl(struct file *file, unsigned cmd, unsigned long arg)
+ 	case BLKRRPART:
+ 	case BLKREPORTZONE:
+ 	case BLKRESETZONE:
++	case BLKGETZONESZ:
++	case BLKGETNRZONES:
+ 		return blkdev_ioctl(bdev, mode, cmd,
+ 				(unsigned long)compat_ptr(arg));
+ 	case BLKBSZSET_32:
 -- 
 2.20.0
 
