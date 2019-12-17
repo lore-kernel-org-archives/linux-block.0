@@ -2,165 +2,103 @@ Return-Path: <SRS0=G4H8=2H=vger.kernel.org=linux-block-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-9.6 required=3.0 tests=DKIM_SIGNED,DKIM_VALID,
-	DKIM_VALID_AU,FREEMAIL_FORGED_FROMDOMAIN,FREEMAIL_FROM,
-	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,
-	SPF_HELO_NONE,SPF_PASS,USER_AGENT_GIT autolearn=ham autolearn_force=no
-	version=3.4.0
+X-Spam-Status: No, score=-2.3 required=3.0 tests=DKIM_SIGNED,DKIM_VALID,
+	HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,
+	USER_AGENT_SANE_1 autolearn=no autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id EE11BC43603
-	for <linux-block@archiver.kernel.org>; Tue, 17 Dec 2019 17:28:09 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 189E8C2D0CD
+	for <linux-block@archiver.kernel.org>; Tue, 17 Dec 2019 17:50:33 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.kernel.org (Postfix) with ESMTP id C30902465E
-	for <linux-block@archiver.kernel.org>; Tue, 17 Dec 2019 17:28:09 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id E4D722465E
+	for <linux-block@archiver.kernel.org>; Tue, 17 Dec 2019 17:50:32 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="cXjCCWzN"
+	dkim=pass (2048-bit key) header.d=kernel-dk.20150623.gappssmtp.com header.i=@kernel-dk.20150623.gappssmtp.com header.b="c2/nDvfy"
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1727654AbfLQR2J (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Tue, 17 Dec 2019 12:28:09 -0500
-Received: from mail-wr1-f65.google.com ([209.85.221.65]:33811 "EHLO
-        mail-wr1-f65.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1726191AbfLQR2J (ORCPT
+        id S1726546AbfLQRuc (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Tue, 17 Dec 2019 12:50:32 -0500
+Received: from mail-io1-f65.google.com ([209.85.166.65]:45849 "EHLO
+        mail-io1-f65.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S1726623AbfLQRuc (ORCPT
         <rfc822;linux-block@vger.kernel.org>);
-        Tue, 17 Dec 2019 12:28:09 -0500
-Received: by mail-wr1-f65.google.com with SMTP id t2so12240286wrr.1;
-        Tue, 17 Dec 2019 09:28:06 -0800 (PST)
+        Tue, 17 Dec 2019 12:50:32 -0500
+Received: by mail-io1-f65.google.com with SMTP id i11so8862441ioi.12
+        for <linux-block@vger.kernel.org>; Tue, 17 Dec 2019 09:50:31 -0800 (PST)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20161025;
-        h=from:to:cc:subject:date:message-id:mime-version:in-reply-to
-         :content-transfer-encoding;
-        bh=vXn2Yu4RkHlP1Gh90RCX44u/DnD2AY3PkGZLCTXZShY=;
-        b=cXjCCWzNHoaJgyu5OIAhA2JSISeRLzdsicjh5w4b9kGXxlnUazSpdYDlnZrlOSqKE4
-         Ku04u/hnECWcv8Y62FEoFKtozKEyoaUrlIob2NUiMoaDQuy+mQYBNbbQLLaGBX/6O9KM
-         pbFLYKyC38pfyCzXVwRPSwRsGTpVPoGxUJhbKQTbFnZMurl84obSvskY5a47FNc769Ap
-         uz2SdvgyiFK88ICAM8PCOcgHRVOBNvnyiRZuqtfMJcjCgOEv/69SRvYPtLPsZwWZ4J0v
-         BoWDMp/T+459syiNlholtJWR/jErBI1rTo4wYsVMRwAdYWCKbuYQ9xIyZnw46lSWOI3I
-         jNIw==
+        d=kernel-dk.20150623.gappssmtp.com; s=20150623;
+        h=subject:to:cc:references:from:message-id:date:user-agent
+         :mime-version:in-reply-to:content-language:content-transfer-encoding;
+        bh=PIHajc5T69riCgfx1WTM9wSNYlMqcBP3FW3/e8WLwW8=;
+        b=c2/nDvfyq4GTr+gc8nYpZSJO9zSjRaTVbXSwTjz040mkufZ1aIt3/Tv2L+3w7VDOvd
+         k5F7o4O3pauikobpVeY6fjBJDdeq/opt78VnHVbkEjqtfFnAuqGWJLCGsEoXCHvVfQcT
+         ucT7ICyumVsU4+GKOuBzskQXQMfv6vmgoYGJARKFB9svsd/HcNyHLJIVnqv1TeWEf0v9
+         d8xhkBWyuXIM6iIKD/MPqwWeg4w0ffKhdMEpUDW0upWU9iBYt8xVr2lYV7hZ7rlAi8uA
+         0ARanpwf7dLBwaLlHycfWPs74/USc92rW3mdOdyvH7OghrxSFh2qDOJF232anXxhD9rF
+         ZHag==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=1e100.net; s=20161025;
-        h=x-gm-message-state:from:to:cc:subject:date:message-id:mime-version
-         :in-reply-to:content-transfer-encoding;
-        bh=vXn2Yu4RkHlP1Gh90RCX44u/DnD2AY3PkGZLCTXZShY=;
-        b=LnxMsWBjXWTktTX7EzIQTDAmdvQICUwIzId+ewKOswhWq5lsHZWDrvaagCtMBNd0Wq
-         etDxrJQFCQPzMgvWyw3WJI6BsyBX0HGZNaGzCbdb6wdYGzbXb4I0Xq6p6gSynRjFWBsD
-         wGbKkrfqalORVPg1SzFS7TP3uVDh5N90dj4H74dPohQe65c27JVjeqXzQaaOHc53suwv
-         8VCbFdjbmHIiEpgKogJyGsn9bwuG4NthEsd8YkTiezNkDE5w7xousqnSzwKxXlNemsph
-         cJfuuIkJ2+hJq9GuTQOE7XT2av+DiDT/gnrSB9DPDUJxFBg4V5Z33l2rkaQVD34P35wk
-         qcQg==
-X-Gm-Message-State: APjAAAUnVjaqS8zkopL3GgMxX85Ar5la1h0tfIbV65oGLtWyfyY/w1Lp
-        Udcb5/HkUVVGzglu0lSHSGw=
-X-Google-Smtp-Source: APXvYqxWnHbAUaxerL55jC58SIZbNR5PNO5hY231h8MMtPhz29c3VbD89coH273KvyzCzv+FPtZxKQ==
-X-Received: by 2002:a5d:4687:: with SMTP id u7mr38050795wrq.176.1576603685895;
-        Tue, 17 Dec 2019 09:28:05 -0800 (PST)
-Received: from localhost.localdomain ([2a02:2450:10d2:194d:5015:4c4c:42e9:e517])
-        by smtp.gmail.com with ESMTPSA id 188sm3875074wmd.1.2019.12.17.09.28.04
-        (version=TLS1_2 cipher=ECDHE-RSA-CHACHA20-POLY1305 bits=256/256);
-        Tue, 17 Dec 2019 09:28:05 -0800 (PST)
-From:   SeongJae Park <sj38.park@gmail.com>
-To:     =?UTF-8?q?J=C3=BCrgen=20Gro=C3=9F?= <jgross@suse.com>
-Cc:     SeongJae Park <sjpark@amazon.com>, axboe@kernel.dk,
-        sj38.park@gmail.com, konrad.wilk@oracle.com, pdurrant@amazon.com,
-        SeongJae Park <sjpark@amazon.de>, linux-kernel@vger.kernel.org,
-        linux-block@vger.kernel.org, xen-devel@lists.xenproject.org,
-        roger.pau@citrix.com
-Subject: Re: Re: [Xen-devel] [PATCH v11 2/6] xenbus/backend: Protect xenbus callback with lock
-Date:   Tue, 17 Dec 2019 18:27:38 +0100
-Message-Id: <20191217172738.20787-1-sj38.park@gmail.com>
-X-Mailer: git-send-email 2.17.2
+        h=x-gm-message-state:subject:to:cc:references:from:message-id:date
+         :user-agent:mime-version:in-reply-to:content-language
+         :content-transfer-encoding;
+        bh=PIHajc5T69riCgfx1WTM9wSNYlMqcBP3FW3/e8WLwW8=;
+        b=dBGqAJGGlRW58+0R8WGfsWqqJ94t23FITj2rOGZJ9t6IegpntDVvEdQUEcB1k9WB0K
+         qw2ChyNRi7mhbZhV2jv87zyoDyeT0wQrJxgo3pLRJKsbbzI4KqvOpgPB3eVXXNtatQk+
+         Lzg8bDajufxzv3rI1a24paNKwrl9fMupEzg/WN+kktNGAmMu7Mi/D9Rb94dZjpJMlAXU
+         d+/Ya1EgjAiPKg5tBorwuSlrHY8lpw/d7XgUpPaxGwwTJ3WnrrxLaHOgrfQwOyjGtZAh
+         0O6lGyZdmpiF27KdPXspImPk5MxXGDfEO1PD7pSR+DODqxO5QvL2PJVtk+3Yr9Ddro5s
+         M3sw==
+X-Gm-Message-State: APjAAAV+YbSf++rb1sWoJOiA0A0hogianYLm3R3h59QGGR/AD2+SX3uh
+        uKpDiqJ7JmNI4JaSqqylbnZyGQ==
+X-Google-Smtp-Source: APXvYqwVrKM1N+oHGRkj51mPZn4JC/P64LM/EyVU/TOjtftWlFuKwEr+DIXhrirm0a1jR8TKm6Ajbg==
+X-Received: by 2002:a02:3f26:: with SMTP id d38mr18522848jaa.53.1576605031200;
+        Tue, 17 Dec 2019 09:50:31 -0800 (PST)
+Received: from [192.168.1.159] ([65.144.74.34])
+        by smtp.gmail.com with ESMTPSA id r22sm6893741ilb.25.2019.12.17.09.50.30
+        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
+        Tue, 17 Dec 2019 09:50:30 -0800 (PST)
+Subject: Re: [PATCH] nbd: fix shutdown and recv work deadlock v2
+To:     Mike Christie <mchristi@redhat.com>, sunke32@huawei.com,
+        nbd@other.debian.org, josef@toxicpanda.com,
+        linux-block@vger.kernel.org
+Cc:     stable@vger.kernel.org
+References: <20191208225150.5944-1-mchristi@redhat.com>
+From:   Jens Axboe <axboe@kernel.dk>
+Message-ID: <89b62516-087a-d5f7-6f53-749df63129cf@kernel.dk>
+Date:   Tue, 17 Dec 2019 10:50:29 -0700
+User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:68.0) Gecko/20100101
+ Thunderbird/68.2.2
 MIME-Version: 1.0
-In-Reply-To: <f9a601af-4413-ed1d-f7f4-89343118a2f1@suse.com>
-Content-Type: text/plain; charset=UTF-8
-Content-Transfer-Encoding: 8bit
+In-Reply-To: <20191208225150.5944-1-mchristi@redhat.com>
+Content-Type: text/plain; charset=utf-8
+Content-Language: en-US
+Content-Transfer-Encoding: 7bit
 Sender: linux-block-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-On Tue, 17 Dec 2019 18:10:19 +0100 "Jürgen Groß" <jgross@suse.com> wrote:
+On 12/8/19 3:51 PM, Mike Christie wrote:
+> This fixes a regression added with:
+> 
+> commit e9e006f5fcf2bab59149cb38a48a4817c1b538b4
+> Author: Mike Christie <mchristi@redhat.com>
+> Date:   Sun Aug 4 14:10:06 2019 -0500
+> 
+>     nbd: fix max number of supported devs
+> 
+> where we can deadlock during device shutdown. The problem occurs if
+> the recv_work's nbd_config_put occurs after nbd_start_device_ioctl has
+> returned and the userspace app has droppped its reference via closing
+> the device and running nbd_release. The recv_work nbd_config_put call
+> would then drop the refcount to zero and try to destroy the config which
+> would try to do destroy_workqueue from the recv work.
+> 
+> This patch just has nbd_start_device_ioctl do a flush_workqueue when it
+> wakes so we know after the ioctl returns running works have exited. This
+> also fixes a possible race where we could try to reuse the device while
+> old recv_works are still running.
 
-> On 17.12.19 17:24, SeongJae Park wrote:
-> > On Tue, 17 Dec 2019 17:13:42 +0100 "Jürgen Groß" <jgross@suse.com> wrote:
-> > 
-> >> On 17.12.19 17:07, SeongJae Park wrote:
-> >>> From: SeongJae Park <sjpark@amazon.de>
-> >>>
-> >>> 'reclaim_memory' callback can race with a driver code as this callback
-> >>> will be called from any memory pressure detected context.  To deal with
-> >>> the case, this commit adds a spinlock in the 'xenbus_device'.  Whenever
-> >>> 'reclaim_memory' callback is called, the lock of the device which passed
-> >>> to the callback as its argument is locked.  Thus, drivers registering
-> >>> their 'reclaim_memory' callback should protect the data that might race
-> >>> with the callback with the lock by themselves.
-> >>>
-> >>> Signed-off-by: SeongJae Park <sjpark@amazon.de>
-> >>> ---
-> >>>    drivers/xen/xenbus/xenbus_probe.c         |  1 +
-> >>>    drivers/xen/xenbus/xenbus_probe_backend.c | 10 ++++++++--
-> >>>    include/xen/xenbus.h                      |  2 ++
-> >>>    3 files changed, 11 insertions(+), 2 deletions(-)
-> >>>
-> >>> diff --git a/drivers/xen/xenbus/xenbus_probe.c b/drivers/xen/xenbus/xenbus_probe.c
-> >>> index 5b471889d723..b86393f172e6 100644
-> >>> --- a/drivers/xen/xenbus/xenbus_probe.c
-> >>> +++ b/drivers/xen/xenbus/xenbus_probe.c
-> >>> @@ -472,6 +472,7 @@ int xenbus_probe_node(struct xen_bus_type *bus,
-> >>>    		goto fail;
-> >>>    
-> >>>    	dev_set_name(&xendev->dev, "%s", devname);
-> >>> +	spin_lock_init(&xendev->reclaim_lock);
-> >>>    
-> >>>    	/* Register with generic device framework. */
-> >>>    	err = device_register(&xendev->dev);
-> >>> diff --git a/drivers/xen/xenbus/xenbus_probe_backend.c b/drivers/xen/xenbus/xenbus_probe_backend.c
-> >>> index 7e78ebef7c54..516aa64b9967 100644
-> >>> --- a/drivers/xen/xenbus/xenbus_probe_backend.c
-> >>> +++ b/drivers/xen/xenbus/xenbus_probe_backend.c
-> >>> @@ -251,12 +251,18 @@ static int backend_probe_and_watch(struct notifier_block *notifier,
-> >>>    static int backend_reclaim_memory(struct device *dev, void *data)
-> >>>    {
-> >>>    	const struct xenbus_driver *drv;
-> >>> +	struct xenbus_device *xdev;
-> >>> +	unsigned long flags;
-> >>>    
-> >>>    	if (!dev->driver)
-> >>>    		return 0;
-> >>>    	drv = to_xenbus_driver(dev->driver);
-> >>> -	if (drv && drv->reclaim_memory)
-> >>> -		drv->reclaim_memory(to_xenbus_device(dev));
-> >>> +	if (drv && drv->reclaim_memory) {
-> >>> +		xdev = to_xenbus_device(dev);
-> >>> +		spin_trylock_irqsave(&xdev->reclaim_lock, flags);
-> >>
-> >> You need spin_lock_irqsave() here. Or maybe spin_lock() would be fine,
-> >> too? I can't see a reason why you'd want to disable irqs here.
-> > 
-> > I needed to diable irq here as this is called from the memory shrinker context.
-> 
-> Okay.
-> 
-> > 
-> > Also, used 'trylock' because the 'probe()' and 'remove()' code of the driver
-> > might include memory allocation.  And the xen-blkback actually does.  If the
-> > allocation shows a memory pressure during the allocation, it will trigger this
-> > shrinker callback again and then deadlock.
-> 
-> In that case you need to either return when you didn't get the lock or
+Applied, thanks Mike.
 
-Yes, it should.  Cannot believe how I posted this code.  Seems I made some
-terrible mistake while formatting patches.  Anyway, will return if fail to
-acquire the lock, in the next version.
+-- 
+Jens Axboe
 
-
-Thanks,
-SeongJae Park
-
-> 
-> - when obtaining the lock during probe() and remove() set a variable
->    containing the current cpu number
-> - and reset that to e.g NR_CPUS before releasing the lock again
-> - in the shrinker callback do trylock, and if you didn't get the lock
->    test whether the cpu-variable above is set to your current cpu and
->    continue only if yes; if not, redo the the trylock
-> 
-> 
-> Juergen
