@@ -6,125 +6,90 @@ X-Spam-Status: No, score=-2.3 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
 	MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,USER_AGENT_SANE_1 autolearn=no
 	autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 94016C43603
-	for <linux-block@archiver.kernel.org>; Tue, 17 Dec 2019 06:23:18 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 756F4C2D0C5
+	for <linux-block@archiver.kernel.org>; Tue, 17 Dec 2019 07:30:05 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.kernel.org (Postfix) with ESMTP id 711592072D
-	for <linux-block@archiver.kernel.org>; Tue, 17 Dec 2019 06:23:18 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id 4C02B2067C
+	for <linux-block@archiver.kernel.org>; Tue, 17 Dec 2019 07:30:05 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1725856AbfLQGXR (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Tue, 17 Dec 2019 01:23:17 -0500
-Received: from mx2.suse.de ([195.135.220.15]:46738 "EHLO mx2.suse.de"
+        id S1726609AbfLQH34 (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Tue, 17 Dec 2019 02:29:56 -0500
+Received: from mx2.suse.de ([195.135.220.15]:42050 "EHLO mx2.suse.de"
         rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-        id S1725812AbfLQGXR (ORCPT <rfc822;linux-block@vger.kernel.org>);
-        Tue, 17 Dec 2019 01:23:17 -0500
+        id S1725893AbfLQH34 (ORCPT <rfc822;linux-block@vger.kernel.org>);
+        Tue, 17 Dec 2019 02:29:56 -0500
 X-Virus-Scanned: by amavisd-new at test-mx.suse.de
 Received: from relay2.suse.de (unknown [195.135.220.254])
-        by mx2.suse.de (Postfix) with ESMTP id 06E4FB25B;
-        Tue, 17 Dec 2019 06:23:14 +0000 (UTC)
-Subject: Re: [Xen-devel] [PATCH v10 2/4] xen/blkback: Squeeze page pools if a
- memory pressure is detected
-To:     SeongJae Park <sj38.park@gmail.com>
-Cc:     axboe@kernel.dk, konrad.wilk@oracle.com, roger.pau@citrix.com,
-        linux-block@vger.kernel.org, xen-devel@lists.xenproject.org,
-        pdurrant@amazon.com, linux-kernel@vger.kernel.org
-References: <20191216194803.6294-1-sj38.park@gmail.com>
-From:   =?UTF-8?B?SsO8cmdlbiBHcm/Dnw==?= <jgross@suse.com>
-Message-ID: <c4efaabf-a925-0af0-b772-49a2e15623e7@suse.com>
-Date:   Tue, 17 Dec 2019 07:23:12 +0100
-User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:68.0) Gecko/20100101
- Thunderbird/68.2.1
+        by mx2.suse.de (Postfix) with ESMTP id 8FDE2AD8E;
+        Tue, 17 Dec 2019 07:29:51 +0000 (UTC)
+Received: by quack2.suse.cz (Postfix, from userid 1000)
+        id C60311E0B35; Tue, 17 Dec 2019 08:29:46 +0100 (CET)
+Date:   Tue, 17 Dec 2019 08:29:46 +0100
+From:   Jan Kara <jack@suse.cz>
+To:     John Hubbard <jhubbard@nvidia.com>
+Cc:     Jan Kara <jack@suse.cz>, Andrew Morton <akpm@linux-foundation.org>,
+        Al Viro <viro@zeniv.linux.org.uk>,
+        Alex Williamson <alex.williamson@redhat.com>,
+        Benjamin Herrenschmidt <benh@kernel.crashing.org>,
+        =?iso-8859-1?Q?Bj=F6rn_T=F6pel?= <bjorn.topel@intel.com>,
+        Christoph Hellwig <hch@infradead.org>,
+        Dan Williams <dan.j.williams@intel.com>,
+        Daniel Vetter <daniel@ffwll.ch>,
+        Dave Chinner <david@fromorbit.com>,
+        David Airlie <airlied@linux.ie>,
+        "David S . Miller" <davem@davemloft.net>,
+        Ira Weiny <ira.weiny@intel.com>,
+        Jason Gunthorpe <jgg@ziepe.ca>, Jens Axboe <axboe@kernel.dk>,
+        Jonathan Corbet <corbet@lwn.net>,
+        =?iso-8859-1?B?Suly9G1l?= Glisse <jglisse@redhat.com>,
+        Magnus Karlsson <magnus.karlsson@intel.com>,
+        Mauro Carvalho Chehab <mchehab@kernel.org>,
+        Michael Ellerman <mpe@ellerman.id.au>,
+        Michal Hocko <mhocko@suse.com>,
+        Mike Kravetz <mike.kravetz@oracle.com>,
+        Paul Mackerras <paulus@samba.org>,
+        Shuah Khan <shuah@kernel.org>,
+        Vlastimil Babka <vbabka@suse.cz>, bpf@vger.kernel.org,
+        dri-devel@lists.freedesktop.org, kvm@vger.kernel.org,
+        linux-block@vger.kernel.org, linux-doc@vger.kernel.org,
+        linux-fsdevel@vger.kernel.org, linux-kselftest@vger.kernel.org,
+        linux-media@vger.kernel.org, linux-rdma@vger.kernel.org,
+        linuxppc-dev@lists.ozlabs.org, netdev@vger.kernel.org,
+        linux-mm@kvack.org, LKML <linux-kernel@vger.kernel.org>,
+        "Kirill A . Shutemov" <kirill.shutemov@linux.intel.com>
+Subject: Re: [PATCH v11 23/25] mm/gup: track FOLL_PIN pages
+Message-ID: <20191217072946.GB16051@quack2.suse.cz>
+References: <20191212101741.GD10065@quack2.suse.cz>
+ <20191214032617.1670759-1-jhubbard@nvidia.com>
+ <20191216125353.GF22157@quack2.suse.cz>
+ <86297621-0200-01db-923b-9f8d3ee87354@nvidia.com>
 MIME-Version: 1.0
-In-Reply-To: <20191216194803.6294-1-sj38.park@gmail.com>
-Content-Type: text/plain; charset=utf-8; format=flowed
-Content-Language: en-US
-Content-Transfer-Encoding: 8bit
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <86297621-0200-01db-923b-9f8d3ee87354@nvidia.com>
+User-Agent: Mutt/1.10.1 (2018-07-13)
 Sender: linux-block-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-On 16.12.19 20:48, SeongJae Park wrote:
-> On on, 16 Dec 2019 17:23:44 +0100, Jürgen Groß wrote:
+On Mon 16-12-19 14:18:59, John Hubbard wrote:
+> On 12/16/19 4:53 AM, Jan Kara wrote:
+> > With this fixed, the patch looks good to me so you can then add:
+> > 
+> > Reviewed-by: Jan Kara <jack@suse.cz>
+> > 
+> > 								Honza
+> > 
 > 
->> On 16.12.19 17:15, SeongJae Park wrote:
->>> On Mon, 16 Dec 2019 15:37:20 +0100 SeongJae Park <sjpark@amazon.com> wrote:
->>>
->>>> On Mon, 16 Dec 2019 13:45:25 +0100 SeongJae Park <sjpark@amazon.com> wrote:
->>>>
->>>>> From: SeongJae Park <sjpark@amazon.de>
->>>>>
->>> [...]
->>>>> --- a/drivers/block/xen-blkback/xenbus.c
->>>>> +++ b/drivers/block/xen-blkback/xenbus.c
->>>>> @@ -824,6 +824,24 @@ static void frontend_changed(struct xenbus_device *dev,
->>>>>    }
->>>>>    
->>>>>    
->>>>> +/* Once a memory pressure is detected, squeeze free page pools for a while. */
->>>>> +static unsigned int buffer_squeeze_duration_ms = 10;
->>>>> +module_param_named(buffer_squeeze_duration_ms,
->>>>> +		buffer_squeeze_duration_ms, int, 0644);
->>>>> +MODULE_PARM_DESC(buffer_squeeze_duration_ms,
->>>>> +"Duration in ms to squeeze pages buffer when a memory pressure is detected");
->>>>> +
->>>>> +/*
->>>>> + * Callback received when the memory pressure is detected.
->>>>> + */
->>>>> +static void reclaim_memory(struct xenbus_device *dev)
->>>>> +{
->>>>> +	struct backend_info *be = dev_get_drvdata(&dev->dev);
->>>>> +
->>>>> +	be->blkif->buffer_squeeze_end = jiffies +
->>>>> +		msecs_to_jiffies(buffer_squeeze_duration_ms);
->>>>
->>>> This callback might race with 'xen_blkbk_probe()'.  The race could result in
->>>> __NULL dereferencing__, as 'xen_blkbk_probe()' sets '->blkif' after it links
->>>> 'be' to the 'dev'.  Please _don't merge_ this patch now!
->>>>
->>>> I will do more test and share results.  Meanwhile, if you have any opinion,
->>>> please let me know.
-> 
-> I reduced system memory and attached bunch of devices in short time so that
-> memory pressure occurs while device attachments are ongoing.  Under this
-> circumstance, I was able to see the race.
-> 
->>>
->>> Not only '->blkif', but 'be' itself also coule be a NULL.  As similar
->>> concurrency issues could be in other drivers in their way, I suggest to change
->>> the reclaim callback ('->reclaim_memory') to be called for each driver instead
->>> of each device.  Then, each driver could be able to deal with its concurrency
->>> issues by itself.
->>
->> Hmm, I don't like that. This would need to be changed back in case we
->> add per-guest quota.
-> 
-> Extending this callback in that way would be still not too hard.  We could use
-> the argument to the callback.  I would keep the argument of the callback to
-> 'struct device *' as is, and will add a comment saying 'NULL' value of the
-> argument means every devices.  As an example, xenbus would pass NULL-ending
-> array of the device pointers that need to free its resources.
-> 
-> After seeing this race, I am now also thinking it could be better to delegate
-> detailed control of each device to its driver, as some drivers have some
-> complicated and unique relation with its devices.
-> 
->>
->> Wouldn't a get_device() before calling the callback and a put_device()
->> afterwards avoid that problem?
-> 
-> I didn't used the reference count manipulation operations because other similar
-> parts also didn't.  But, if there is no implicit reference count guarantee, it
-> seems those operations are indeed necessary.
-> 
-> That said, as get/put operations only adjust the reference count, those will
-> not make the callback to wait until the linking of the 'backend' and 'blkif' to
-> the device (xen_blkbk_probe()) is finished.  Thus, the race could still happen.
-> Or, am I missing something?
+> btw, thanks for the thorough review of this critical patch (and for your
+> patience with my mistakes). I really appreciate it, and this patchset would
+> not have made it this far without your detailed help and explanations.
 
-No, I think we need a xenbus lock per device which will need to be
-taken in xen_blkbk_probe(), xenbus_dev_remove() and while calling the
-callback.
+You're welcome! I'd also like to thank you for persistently driving this
+series :)
 
-
-Juergen
+								Honza
+-- 
+Jan Kara <jack@suse.com>
+SUSE Labs, CR
