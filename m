@@ -2,198 +2,92 @@ Return-Path: <SRS0=ocaT=2I=vger.kernel.org=linux-block-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-6.9 required=3.0 tests=DKIMWL_WL_HIGH,DKIM_SIGNED,
-	DKIM_VALID,DKIM_VALID_AU,HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,
-	MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS autolearn=unavailable
-	autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-9.8 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
+	INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,
+	USER_AGENT_GIT autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id B86C0C43603
-	for <linux-block@archiver.kernel.org>; Wed, 18 Dec 2019 07:20:25 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 67797C43603
+	for <linux-block@archiver.kernel.org>; Wed, 18 Dec 2019 08:17:09 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.kernel.org (Postfix) with ESMTP id 8E126206B7
-	for <linux-block@archiver.kernel.org>; Wed, 18 Dec 2019 07:20:25 +0000 (UTC)
-Authentication-Results: mail.kernel.org;
-	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="M1gh7Go+"
+	by mail.kernel.org (Postfix) with ESMTP id 318D224691
+	for <linux-block@archiver.kernel.org>; Wed, 18 Dec 2019 08:17:09 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1726613AbfLRHUY (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Wed, 18 Dec 2019 02:20:24 -0500
-Received: from us-smtp-delivery-1.mimecast.com ([207.211.31.120]:22617 "EHLO
-        us-smtp-1.mimecast.com" rhost-flags-OK-OK-OK-FAIL) by vger.kernel.org
-        with ESMTP id S1726747AbfLRHUW (ORCPT
-        <rfc822;linux-block@vger.kernel.org>);
-        Wed, 18 Dec 2019 02:20:22 -0500
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-        s=mimecast20190719; t=1576653622;
-        h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-         to:to:cc:cc:mime-version:mime-version:
-         content-transfer-encoding:content-transfer-encoding:
-         in-reply-to:in-reply-to:references:references;
-        bh=P74QapSDHWSEWo88gTuk8f2XOflcdzvr25rHKrQFEEg=;
-        b=M1gh7Go+AGEjHq43BqhMjIOD5RohNSAwn1M+jsl7tQBw3F1TNskVwjysLP2T6nsOD1dpbk
-        xFMHsiVR3HSDYyY2+kRjfLKCXNzMeFAUMjrHd8DLYfeDeN9568n8/Q+I7qPvdV4FGW1OCU
-        AQVZs+8DGFWF3ePbNC9/rG7Yz8j+wDw=
-Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
- [209.132.183.4]) (Using TLS) by relay.mimecast.com with ESMTP id
- us-mta-409-9gNqsdt8N4qDTAlc4jdPZg-1; Wed, 18 Dec 2019 02:20:18 -0500
-X-MC-Unique: 9gNqsdt8N4qDTAlc4jdPZg-1
-Received: from smtp.corp.redhat.com (int-mx05.intmail.prod.int.phx2.redhat.com [10.5.11.15])
-        (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
-        (No client certificate requested)
-        by mimecast-mx01.redhat.com (Postfix) with ESMTPS id EDEFA8024CF;
-        Wed, 18 Dec 2019 07:20:16 +0000 (UTC)
-Received: from localhost (ovpn-8-18.pek2.redhat.com [10.72.8.18])
-        by smtp.corp.redhat.com (Postfix) with ESMTP id 596156888B;
-        Wed, 18 Dec 2019 07:20:12 +0000 (UTC)
-From:   Ming Lei <ming.lei@redhat.com>
-To:     Thomas Gleixner <tglx@linutronix.de>, Jens Axboe <axboe@kernel.dk>
-Cc:     linux-kernel@vger.kernel.org, linux-block@vger.kernel.org,
-        Ming Lei <ming.lei@redhat.com>, Long Li <longli@microsoft.com>,
-        Ingo Molnar <mingo@redhat.com>,
-        Peter Zijlstra <peterz@infradead.org>,
-        Keith Busch <keith.busch@intel.com>,
-        Christoph Hellwig <hch@lst.de>,
-        Sagi Grimberg <sagi@grimberg.me>,
-        John Garry <john.garry@huawei.com>,
-        Hannes Reinecke <hare@suse.com>
-Subject: [RFC PATCH 3/3] blk-mq: complete request in rescuer process context in case of irq flood
-Date:   Wed, 18 Dec 2019 15:19:42 +0800
-Message-Id: <20191218071942.22336-4-ming.lei@redhat.com>
-In-Reply-To: <20191218071942.22336-1-ming.lei@redhat.com>
-References: <20191218071942.22336-1-ming.lei@redhat.com>
+        id S1725799AbfLRIRI (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Wed, 18 Dec 2019 03:17:08 -0500
+Received: from szxga05-in.huawei.com ([45.249.212.191]:7711 "EHLO huawei.com"
+        rhost-flags-OK-OK-OK-FAIL) by vger.kernel.org with ESMTP
+        id S1725535AbfLRIRI (ORCPT <rfc822;linux-block@vger.kernel.org>);
+        Wed, 18 Dec 2019 03:17:08 -0500
+Received: from DGGEMS404-HUB.china.huawei.com (unknown [172.30.72.59])
+        by Forcepoint Email with ESMTP id 420504A90767678B9FA2;
+        Wed, 18 Dec 2019 16:17:06 +0800 (CST)
+Received: from huawei.com (10.175.101.78) by DGGEMS404-HUB.china.huawei.com
+ (10.3.19.204) with Microsoft SMTP Server id 14.3.439.0; Wed, 18 Dec 2019
+ 16:16:58 +0800
+From:   Yang Yingliang <yangyingliang@huawei.com>
+To:     <axboe@kernel.dk>
+CC:     <linux-block@vger.kernel.org>, <linux-kernel@vger.kernel.org>,
+        <yangyingliang@huawei.com>
+Subject: [PATCH] block: fix memleak when __blk_rq_map_user_iov() is failed
+Date:   Wed, 18 Dec 2019 16:44:04 +0800
+Message-ID: <1576658644-88101-1-git-send-email-yangyingliang@huawei.com>
+X-Mailer: git-send-email 1.8.3
 MIME-Version: 1.0
-X-Scanned-By: MIMEDefang 2.79 on 10.5.11.15
-Content-Transfer-Encoding: quoted-printable
+Content-Type: text/plain
+X-Originating-IP: [10.175.101.78]
+X-CFilter-Loop: Reflected
 Sender: linux-block-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-When irq flood is detected, complete requests in the percpu rescuer
-context for avoiding lockup cpu.
+When I doing fuzzy test, get the memleak report:
 
-IO interrupt flood might be triggered in the following situations:
+BUG: memory leak
+unreferenced object 0xffff88837af80000 (size 4096):
+  comm "memleak", pid 3557, jiffies 4294817681 (age 112.499s)
+  hex dump (first 32 bytes):
+    00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00  ................
+    20 00 00 00 10 01 00 00 00 00 00 00 01 00 00 00   ...............
+  backtrace:
+    [<000000001c894df8>] bio_alloc_bioset+0x393/0x590
+    [<000000008b139a3c>] bio_copy_user_iov+0x300/0xcd0
+    [<00000000a998bd8c>] blk_rq_map_user_iov+0x2f1/0x5f0
+    [<000000005ceb7f05>] blk_rq_map_user+0xf2/0x160
+    [<000000006454da92>] sg_common_write.isra.21+0x1094/0x1870
+    [<00000000064bb208>] sg_write.part.25+0x5d9/0x950
+    [<000000004fc670f6>] sg_write+0x5f/0x8c
+    [<00000000b0d05c7b>] __vfs_write+0x7c/0x100
+    [<000000008e177714>] vfs_write+0x1c3/0x500
+    [<0000000087d23f34>] ksys_write+0xf9/0x200
+    [<000000002c8dbc9d>] do_syscall_64+0x9f/0x4f0
+    [<00000000678d8e9a>] entry_SYSCALL_64_after_hwframe+0x49/0xbe
 
-1) the storage device is quicker to handle IO than single CPU core
+If __blk_rq_map_user_iov() is failed in blk_rq_map_user_iov(),
+the bio(s) which is allocated before this failing will leak. The
+refcount of the bio(s) is init to 1 and increased to 2 by calling
+bio_get(), but __blk_rq_unmap_user() only decrease it to 1, so
+the bio cannot be freed. Fix it by calling blk_rq_unmap_user().
 
-2) N:1 queue mapping, single CPU core is saturated by handling IO interru=
-pts
-from multiple storage disks or multiple HBAs
-
-Cc: Long Li <longli@microsoft.com>
-Cc: Ingo Molnar <mingo@redhat.com>,
-Cc: Peter Zijlstra <peterz@infradead.org>
-Cc: Keith Busch <keith.busch@intel.com>
-Cc: Christoph Hellwig <hch@lst.de>
-Cc: Sagi Grimberg <sagi@grimberg.me>
-Cc: John Garry <john.garry@huawei.com>
-Cc: Thomas Gleixner <tglx@linutronix.de>
-Cc: Hannes Reinecke <hare@suse.com>
-Signed-off-by: Ming Lei <ming.lei@redhat.com>
+Reported-by: Hulk Robot <hulkci@huawei.com>
+Signed-off-by: Yang Yingliang <yangyingliang@huawei.com>
 ---
- block/blk-mq.c | 68 +++++++++++++++++++++++++++++++++++++++++++++++++-
- 1 file changed, 67 insertions(+), 1 deletion(-)
+ block/blk-map.c | 2 +-
+ 1 file changed, 1 insertion(+), 1 deletion(-)
 
-diff --git a/block/blk-mq.c b/block/blk-mq.c
-index 323c9cb28066..a7fe00f1a313 100644
---- a/block/blk-mq.c
-+++ b/block/blk-mq.c
-@@ -40,6 +40,14 @@
- #include "blk-mq-sched.h"
- #include "blk-rq-qos.h"
-=20
-+struct blk_mq_comp_rescuer {
-+	struct list_head head;
-+	bool running;
-+	struct work_struct work;
-+};
-+
-+static DEFINE_PER_CPU(struct blk_mq_comp_rescuer, blk_mq_comp_rescuer);
-+
- static void blk_mq_poll_stats_start(struct request_queue *q);
- static void blk_mq_poll_stats_fn(struct blk_stat_callback *cb);
-=20
-@@ -624,6 +632,50 @@ static void hctx_lock(struct blk_mq_hw_ctx *hctx, in=
-t *srcu_idx)
- 		*srcu_idx =3D srcu_read_lock(hctx->srcu);
- }
-=20
-+static void blk_mq_complete_rq_in_rescuer(struct request *rq)
-+{
-+	struct blk_mq_comp_rescuer *rescuer;
-+	unsigned long flags;
-+
-+	WARN_ON(!in_interrupt());
-+
-+	local_irq_save(flags);
-+	rescuer =3D this_cpu_ptr(&blk_mq_comp_rescuer);
-+	list_add_tail(&rq->queuelist, &rescuer->head);
-+	if (!rescuer->running) {
-+		rescuer->running =3D true;
-+		kblockd_schedule_work(&rescuer->work);
-+	}
-+	local_irq_restore(flags);
-+
-+}
-+
-+static void blk_mq_complete_rescue_work(struct work_struct *work)
-+{
-+	struct blk_mq_comp_rescuer *rescuer =3D
-+		container_of(work, struct blk_mq_comp_rescuer, work);
-+	struct list_head local_list;
-+
-+	local_irq_disable();
-+ run_again:
-+	list_replace_init(&rescuer->head, &local_list);
-+	local_irq_enable();
-+
-+	while (!list_empty(&local_list)) {
-+		struct request *rq =3D list_entry(local_list.next,
-+				struct request, queuelist);
-+		list_del_init(&rq->queuelist);
-+		__blk_mq_complete_request(rq);
-+		cond_resched();
-+	}
-+
-+	local_irq_disable();
-+	if (!list_empty(&rescuer->head))
-+		goto run_again;
-+	rescuer->running =3D false;
-+	local_irq_enable();
-+}
-+
- /**
-  * blk_mq_complete_request - end I/O on a request
-  * @rq:		the request being processed
-@@ -636,7 +688,11 @@ bool blk_mq_complete_request(struct request *rq)
- {
- 	if (unlikely(blk_should_fake_timeout(rq->q)))
- 		return false;
--	__blk_mq_complete_request(rq);
-+
-+	if (likely(!irq_is_flood() || !in_interrupt()))
-+		__blk_mq_complete_request(rq);
-+	else
-+		blk_mq_complete_rq_in_rescuer(rq);
- 	return true;
- }
- EXPORT_SYMBOL(blk_mq_complete_request);
-@@ -3525,6 +3581,16 @@ EXPORT_SYMBOL(blk_mq_rq_cpu);
-=20
- static int __init blk_mq_init(void)
- {
-+	int i;
-+
-+	for_each_possible_cpu(i) {
-+		struct blk_mq_comp_rescuer *rescuer =3D
-+			&per_cpu(blk_mq_comp_rescuer, i);
-+
-+		INIT_LIST_HEAD(&rescuer->head);
-+		INIT_WORK(&rescuer->work, blk_mq_complete_rescue_work);
-+	}
-+
- 	cpuhp_setup_state_multi(CPUHP_BLK_MQ_DEAD, "block/mq:dead", NULL,
- 				blk_mq_hctx_notify_dead);
+diff --git a/block/blk-map.c b/block/blk-map.c
+index 3a62e471d81b..b0790268ed9d 100644
+--- a/block/blk-map.c
++++ b/block/blk-map.c
+@@ -151,7 +151,7 @@ int blk_rq_map_user_iov(struct request_queue *q, struct request *rq,
  	return 0;
---=20
-2.20.1
+ 
+ unmap_rq:
+-	__blk_rq_unmap_user(bio);
++	blk_rq_unmap_user(bio);
+ fail:
+ 	rq->bio = NULL;
+ 	return ret;
+-- 
+2.17.1
 
