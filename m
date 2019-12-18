@@ -2,188 +2,137 @@ Return-Path: <SRS0=ocaT=2I=vger.kernel.org=linux-block-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-8.4 required=3.0 tests=DKIMWL_WL_HIGH,DKIM_SIGNED,
-	DKIM_VALID,DKIM_VALID_AU,HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,
-	MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,UNPARSEABLE_RELAY,
-	USER_AGENT_SANE_1 autolearn=ham autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-0.9 required=3.0 tests=DKIMWL_WL_HIGH,DKIM_SIGNED,
+	DKIM_VALID,DKIM_VALID_AU,HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,
+	SPF_HELO_NONE,SPF_PASS autolearn=no autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id EB06CC2D0C3
-	for <linux-block@archiver.kernel.org>; Wed, 18 Dec 2019 04:16:14 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id EAC6AC2D0C3
+	for <linux-block@archiver.kernel.org>; Wed, 18 Dec 2019 07:20:07 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.kernel.org (Postfix) with ESMTP id B719121582
-	for <linux-block@archiver.kernel.org>; Wed, 18 Dec 2019 04:16:14 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id BDC5B206B7
+	for <linux-block@archiver.kernel.org>; Wed, 18 Dec 2019 07:20:07 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=pass (2048-bit key) header.d=oracle.com header.i=@oracle.com header.b="YgLEY4Ud"
+	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="StBvN2/s"
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1726518AbfLREQO (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Tue, 17 Dec 2019 23:16:14 -0500
-Received: from aserp2120.oracle.com ([141.146.126.78]:34674 "EHLO
-        aserp2120.oracle.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1726387AbfLREQO (ORCPT
+        id S1726591AbfLRHUF (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Wed, 18 Dec 2019 02:20:05 -0500
+Received: from us-smtp-delivery-1.mimecast.com ([205.139.110.120]:51091 "EHLO
+        us-smtp-1.mimecast.com" rhost-flags-OK-OK-OK-FAIL) by vger.kernel.org
+        with ESMTP id S1725882AbfLRHUF (ORCPT
         <rfc822;linux-block@vger.kernel.org>);
-        Tue, 17 Dec 2019 23:16:14 -0500
-Received: from pps.filterd (aserp2120.oracle.com [127.0.0.1])
-        by aserp2120.oracle.com (8.16.0.27/8.16.0.27) with SMTP id xBI4Fwk9143662;
-        Wed, 18 Dec 2019 04:15:58 GMT
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=oracle.com; h=date : from : to : cc
- : subject : message-id : references : mime-version : content-type :
- content-transfer-encoding : in-reply-to; s=corp-2019-08-05;
- bh=ZdwOsyjN5HsgkVOu2FtsoDs7BV0Xv1iaEdwJgAfSqsY=;
- b=YgLEY4UdadOrIhYY5SUK4ZoC6t0t/Z8FCuX66lnkVQi04FOpfv8sJXTGvta7r64kohjW
- 6veksFUflQ6UxXl8UVbHaMpiK02vG148vSDdPhnij1RaVbEWPMNDibrN/xXIE661H1Gs
- ZurCUcHSkCYU7bI/DXQ0Rh0533dct7waQ+5HCzlrdVClVV+RFXdcgU004AMQ5XBtDnDt
- H9Ey5+7zb63zoKdX6fSmVWbzxsbNj167yrW6Hnu8IYeuTKztlTs5RMuEbvk5O6qrrvwZ
- fzEuoNGuPniliCnYw9fRYDA9TTYqLLJanQ0L6tsadq6BL8xB2+G8todqmgideSq/9D7s 3w== 
-Received: from aserp3020.oracle.com (aserp3020.oracle.com [141.146.126.70])
-        by aserp2120.oracle.com with ESMTP id 2wvqpqb05r-1
-        (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=OK);
-        Wed, 18 Dec 2019 04:15:58 +0000
-Received: from pps.filterd (aserp3020.oracle.com [127.0.0.1])
-        by aserp3020.oracle.com (8.16.0.27/8.16.0.27) with SMTP id xBI4DrLY195461;
-        Wed, 18 Dec 2019 04:15:57 GMT
-Received: from userv0121.oracle.com (userv0121.oracle.com [156.151.31.72])
-        by aserp3020.oracle.com with ESMTP id 2wxm75kw2m-1
-        (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=OK);
-        Wed, 18 Dec 2019 04:15:57 +0000
-Received: from abhmp0001.oracle.com (abhmp0001.oracle.com [141.146.116.7])
-        by userv0121.oracle.com (8.14.4/8.13.8) with ESMTP id xBI4Fm50023743;
-        Wed, 18 Dec 2019 04:15:48 GMT
-Received: from localhost (/10.159.137.228)
-        by default (Oracle Beehive Gateway v4.0)
-        with ESMTP ; Tue, 17 Dec 2019 20:15:48 -0800
-Date:   Tue, 17 Dec 2019 20:15:46 -0800
-From:   "Darrick J. Wong" <darrick.wong@oracle.com>
-To:     Jens Axboe <axboe@kernel.dk>
-Cc:     linux-mm@kvack.org, linux-fsdevel@vger.kernel.org,
-        linux-block@vger.kernel.org, willy@infradead.org, clm@fb.com,
-        torvalds@linux-foundation.org, david@fromorbit.com
-Subject: Re: [PATCH 5/6] iomap: support RWF_UNCACHED for buffered writes
-Message-ID: <20191218041546.GN12766@magnolia>
-References: <20191217143948.26380-1-axboe@kernel.dk>
- <20191217143948.26380-6-axboe@kernel.dk>
- <20191218015259.GJ12766@magnolia>
- <58036cc3-e0c3-70fe-0ce6-a86754258f24@kernel.dk>
+        Wed, 18 Dec 2019 02:20:05 -0500
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+        s=mimecast20190719; t=1576653603;
+        h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+         to:to:cc:cc:mime-version:mime-version:
+         content-transfer-encoding:content-transfer-encoding;
+        bh=fYeOh3Byq//a4cdBHK5jgsQ7V90xFPhkylt6ogpeL8Q=;
+        b=StBvN2/sbC4Npg4JEYnz88Me8FNkwetdZ4EQFMcFSW2PJQ5qqpLGuC0ieU11tYSClp1f2/
+        dt7R3SRMh8ZWHQSSXWQoc8ip6kHO5SnnbO1KP0jUVn35RQD0NjS8tIcRR1RH8tkVI7uZqg
+        IOt4J8ys1vaNCjsqhRn67kRBUp3d0Xs=
+Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
+ [209.132.183.4]) (Using TLS) by relay.mimecast.com with ESMTP id
+ us-mta-370-OObexW6QMtSMIR0UsAJLTA-1; Wed, 18 Dec 2019 02:19:59 -0500
+X-MC-Unique: OObexW6QMtSMIR0UsAJLTA-1
+Received: from smtp.corp.redhat.com (int-mx03.intmail.prod.int.phx2.redhat.com [10.5.11.13])
+        (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
+        (No client certificate requested)
+        by mimecast-mx01.redhat.com (Postfix) with ESMTPS id E18C21083E51;
+        Wed, 18 Dec 2019 07:19:56 +0000 (UTC)
+Received: from localhost (ovpn-8-18.pek2.redhat.com [10.72.8.18])
+        by smtp.corp.redhat.com (Postfix) with ESMTP id 0B35B7D8FC;
+        Wed, 18 Dec 2019 07:19:52 +0000 (UTC)
+From:   Ming Lei <ming.lei@redhat.com>
+To:     Thomas Gleixner <tglx@linutronix.de>, Jens Axboe <axboe@kernel.dk>
+Cc:     linux-kernel@vger.kernel.org, linux-block@vger.kernel.org,
+        Ming Lei <ming.lei@redhat.com>, Long Li <longli@microsoft.com>,
+        Ingo Molnar <mingo@redhat.com>,
+        Peter Zijlstra <peterz@infradead.org>,
+        Keith Busch <keith.busch@intel.com>,
+        Christoph Hellwig <hch@lst.de>,
+        Sagi Grimberg <sagi@grimberg.me>,
+        John Garry <john.garry@huawei.com>,
+        Hannes Reinecke <hare@suse.com>
+Subject: [RFC PATCH 0/3] softirq/blk-mq: implement interrupt flood detection for avoiding cpu lockup
+Date:   Wed, 18 Dec 2019 15:19:39 +0800
+Message-Id: <20191218071942.22336-1-ming.lei@redhat.com>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=iso-8859-1
-Content-Disposition: inline
-Content-Transfer-Encoding: 8bit
-In-Reply-To: <58036cc3-e0c3-70fe-0ce6-a86754258f24@kernel.dk>
-User-Agent: Mutt/1.9.4 (2018-02-28)
-X-Proofpoint-Virus-Version: vendor=nai engine=6000 definitions=9474 signatures=668685
-X-Proofpoint-Spam-Details: rule=notspam policy=default score=0 suspectscore=0 malwarescore=0
- phishscore=0 bulkscore=0 spamscore=0 mlxscore=0 mlxlogscore=999
- adultscore=0 classifier=spam adjust=0 reason=mlx scancount=1
- engine=8.0.1-1911140001 definitions=main-1912180031
-X-Proofpoint-Virus-Version: vendor=nai engine=6000 definitions=9474 signatures=668685
-X-Proofpoint-Spam-Details: rule=notspam policy=default score=0 priorityscore=1501 malwarescore=0
- suspectscore=0 phishscore=0 bulkscore=0 spamscore=0 clxscore=1015
- lowpriorityscore=0 mlxscore=0 impostorscore=0 mlxlogscore=999 adultscore=0
- classifier=spam adjust=0 reason=mlx scancount=1 engine=8.0.1-1911140001
- definitions=main-1912180031
+X-Scanned-By: MIMEDefang 2.79 on 10.5.11.13
+Content-Transfer-Encoding: quoted-printable
 Sender: linux-block-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-On Tue, Dec 17, 2019 at 08:18:07PM -0700, Jens Axboe wrote:
-> On 12/17/19 6:52 PM, Darrick J. Wong wrote:
-> > On Tue, Dec 17, 2019 at 07:39:47AM -0700, Jens Axboe wrote:
-> >> This adds support for RWF_UNCACHED for file systems using iomap to
-> >> perform buffered writes. We use the generic infrastructure for this,
-> >> by tracking pages we created and calling write_drop_cached_pages()
-> >> to issue writeback and prune those pages.
-> >>
-> >> Signed-off-by: Jens Axboe <axboe@kernel.dk>
-> >> ---
-> >>  fs/iomap/apply.c       | 35 +++++++++++++++++++++++++++++++++++
-> >>  fs/iomap/buffered-io.c | 28 ++++++++++++++++++++++++----
-> >>  fs/iomap/trace.h       |  4 +++-
-> >>  include/linux/iomap.h  |  5 +++++
-> >>  4 files changed, 67 insertions(+), 5 deletions(-)
-> >>
-> >> diff --git a/fs/iomap/apply.c b/fs/iomap/apply.c
-> >> index 792079403a22..687e86945b27 100644
-> >> --- a/fs/iomap/apply.c
-> >> +++ b/fs/iomap/apply.c
-> >> @@ -92,5 +92,40 @@ iomap_apply(struct iomap_ctx *data, const struct iomap_ops *ops,
-> >>  				     data->flags, &iomap);
-> >>  	}
-> >>  
-> >> +	if (written <= 0)
-> >> +		goto out;
-> >> +
-> >> +	/*
-> >> +	 * If this is an uncached write, then we need to write and sync this
-> >> +	 * range of data. This is only true for a buffered write, not for
-> >> +	 * O_DIRECT.
-> >> +	 */
-> > 
-> > I tracked down the original conversation, where Dave had this to say:
-> > 
-> > "Hence, IMO, this is the wrong layer in iomap to be dealing with¬
-> > writeback and cache residency for uncached IO. We should be caching¬
-> > residency/invalidation at a per-IO level, not a per-page level."
-> > 
-> > He's right, but I still think it doesn't quite smell right to be putting
-> > this in iomap_apply, since that's a generic function that implements
-> > iteration and shouldn't be messing with cache invalidation.
-> > 
-> > So I have two possible suggestions for where to put this:
-> > 
-> > (1) Add the "flush and maybe invalidate" behavior to the bottom of
-> > iomap_write_actor like I said in the v4 patchset.  That will issue
-> > writeback and invalidate pagecache in smallish quantities.
-> > 
-> > (2) Find a way to pass the IOMAP_F_PAGE_CREATE state from
-> > iomap_write_actor back to iomap_file_buffered_write and do the
-> > flush-and-invalidate for the entire write request once at the end.
-> 
-> Thanks for your suggestion, I'll look into option 2. Option 1 isn't
-> going to work, as smaller quantities is going to cause a performance
-> issue for streamed IO.
+Hi Guys,
 
-<nod> I would also conjecture that pushing fewer flushes through xfs
-might reduce the amount of seeking writing around that it has to do,
-which may or may not help with storage these days.
+For minimizing IO latency, blk-mq often completes IO in the hardware
+interrupt context. However, in case of multiple HBAs, or multiple
+storage devices attached to same HBA, if one CPU core has to handle
+interrupts of IOs submitted from multile CPU , there is risk to lock
+up CPUs[1][2].
 
-> >> @@ -851,10 +860,18 @@ iomap_write_actor(const struct iomap_ctx *data, struct iomap *iomap,
-> >>  			break;
-> >>  		}
-> >>  
-> >> -		status = iomap_write_begin(inode, pos, bytes, 0, &page, iomap,
-> >> -				srcmap);
-> >> -		if (unlikely(status))
-> >> +retry:
-> >> +		status = iomap_write_begin(inode, pos, bytes, flags,
-> >> +						&page, iomap, srcmap);
-> >> +		if (unlikely(status)) {
-> >> +			if (status == -ENOMEM &&
-> >> +			    (flags & IOMAP_WRITE_F_UNCACHED)) {
-> >> +				iomap->flags |= IOMAP_F_PAGE_CREATE;
-> >> +				flags &= ~IOMAP_WRITE_F_UNCACHED;
-> > 
-> > What's the strategy here?  We couldn't get a page for an uncached write,
-> > so try again as a regular cached write?
-> 
-> The idea is that we start with IOMAP_WRITE_F_UNCACHED set, in which case
-> we only do page lookup, not create. If that works, then we know that the
-> given page was already in the page cache. If it fails with -ENOMEM, we
-> store this information as IOMAP_F_PAGE_CREATE, and then clear
-> IOMAP_WRITE_F_UNCACHED and retry. The retry will create the page, and
-> now the caller knows that we had to create pages to satisfy this
-> write. The caller uses this information to invalidate the entire range.
+Follows the idea when there is mutliple IO submitter and single
+CPU for completing these IOs:
 
-Ah, ok, it's intrinsic to the operation.  Would you mind putting that in
-as a comment?
+1) in case of multiple storages attached to one single HBA, these
+storages may handle IO more quickly than single CPU core
 
---D
+2) in case of multiple HBAs in one system, one single effective CPU
+can be selected for handling interrupts from several queues, then
+multiple storages still may handle IO more quickly than single CPU
+core.
 
-> Hope that explains better!
-> 
-> > Thanks for making the updates, it's looking better.
-> 
-> Thanks!
-> 
-> -- 
-> Jens Axboe
-> 
+When handling IO completion in interrupt context, IO latency is good,
+but there is risk to lock up CPU. When moving IO completion to process
+context via NAPI or threaded interrupt handler, CPU lockup can be
+avoided. So people try to move part of IO completion into process
+context for avoiding CPU lockup, meantime trying to not hurt IO
+performance, such as Keith's work[3].
+
+However, it is hard to partition IO completion in the two contexts, if
+less work is moved to process context, risk of locking up CPU can't be
+eliminated; if more work is moved to process context, extra IO latency is
+introduced, then IO performance is hurt.
+
+Interrupt flood information can be one useful hint for partitioning IO
+completion work into the two contexts effectively.
+
+The 1st two patches implement interrpupt flood detection, and the 3rd
+patch applies the hint to complet IO in process context when interrupt
+flood happens. This way avoids CPU lockup, meantime IO performance isn't
+hurt obviously.
+
+[1] https://lore.kernel.org/lkml/1566281669-48212-1-git-send-email-longli=
+@linuxonhyperv.com/
+[2] https://lore.kernel.org/lkml/a7ef3810-31af-013a-6d18-ceb6154aa2ef@hua=
+wei.com/
+[3] https://lore.kernel.org/linux-nvme/20191209175622.1964-1-kbusch@kerne=
+l.org/T/#t
+
+Ming Lei (3):
+  sched/core: add API for exporting runqueue clock
+  softirq: implement interrupt flood detection
+  blk-mq: complete request in rescuer process context in case of irq
+    flood
+
+ block/blk-mq.c          |  68 ++++++++++++++++-
+ drivers/base/cpu.c      |  23 ++++++
+ include/linux/hardirq.h |   2 +
+ include/linux/sched.h   |   2 +
+ kernel/sched/core.c     |   5 ++
+ kernel/softirq.c        | 161 ++++++++++++++++++++++++++++++++++++++++
+ 6 files changed, 260 insertions(+), 1 deletion(-)
+
+Cc: Long Li <longli@microsoft.com>
+Cc: Ingo Molnar <mingo@redhat.com>,
+Cc: Peter Zijlstra <peterz@infradead.org>
+Cc: Keith Busch <keith.busch@intel.com>
+Cc: Christoph Hellwig <hch@lst.de>
+Cc: Sagi Grimberg <sagi@grimberg.me>
+Cc: John Garry <john.garry@huawei.com>
+Cc: Thomas Gleixner <tglx@linutronix.de>
+Cc: Hannes Reinecke <hare@suse.com>
+--=20
+2.20.1
+
