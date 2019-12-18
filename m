@@ -2,161 +2,158 @@ Return-Path: <SRS0=ocaT=2I=vger.kernel.org=linux-block-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-9.8 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
+X-Spam-Status: No, score=-8.3 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
 	INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,
-	USER_AGENT_GIT autolearn=ham autolearn_force=no version=3.4.0
+	USER_AGENT_SANE_1 autolearn=unavailable autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 1B009C43603
-	for <linux-block@archiver.kernel.org>; Wed, 18 Dec 2019 00:24:44 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id D7FB6C2D0BF
+	for <linux-block@archiver.kernel.org>; Wed, 18 Dec 2019 00:49:42 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.kernel.org (Postfix) with ESMTP id EA7BC2176D
-	for <linux-block@archiver.kernel.org>; Wed, 18 Dec 2019 00:24:43 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id B85B22082E
+	for <linux-block@archiver.kernel.org>; Wed, 18 Dec 2019 00:49:42 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1726227AbfLRAYn (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Tue, 17 Dec 2019 19:24:43 -0500
-Received: from mail-pf1-f193.google.com ([209.85.210.193]:43175 "EHLO
-        mail-pf1-f193.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1726205AbfLRAYn (ORCPT
+        id S1726072AbfLRAtm (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Tue, 17 Dec 2019 19:49:42 -0500
+Received: from mail104.syd.optusnet.com.au ([211.29.132.246]:39735 "EHLO
+        mail104.syd.optusnet.com.au" rhost-flags-OK-OK-OK-OK)
+        by vger.kernel.org with ESMTP id S1725940AbfLRAtm (ORCPT
         <rfc822;linux-block@vger.kernel.org>);
-        Tue, 17 Dec 2019 19:24:43 -0500
-Received: by mail-pf1-f193.google.com with SMTP id h14so164008pfe.10
-        for <linux-block@vger.kernel.org>; Tue, 17 Dec 2019 16:24:43 -0800 (PST)
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20161025;
-        h=x-gm-message-state:from:to:cc:subject:date:message-id:mime-version
-         :content-transfer-encoding;
-        bh=ze59zer+GYEGG2Td6k7yLasBF+/gzee4bTZGIMLT6fY=;
-        b=ZwoTZjJkPX13A6Wa4tTFspSJfFItnDz1oO9LyWnPAwKkcKgVKj0DfYTsgaJfJIssFq
-         6dKn4ymEbF0vTWDsUXlxAlea5qpoGQgx/Bb1NuZQ7a//nrIUrL54wlTb1l2u2n6dPtEI
-         wjYt3fXJAJiVa31QffJGupxrJ80svhu5xQMGtM8Qx5NJBN4GQwe+H3I6DniBvQw1Gznr
-         Xdo82lMn3azjfAb1T59e3vo/BUAESHARUprY8dKjoZU3PgHlmDmyq9JYtqL11B83oRN3
-         rHjtDp6m5XV0ECYPudcS797uUHDhhV8km2Q6+ZNXAt+Z2KJFpFpXnvbPDI8xgrFhW5G/
-         xVTQ==
-X-Gm-Message-State: APjAAAW07QBU/UHLgfiAxWofWQTM6hURq9XDFHCstt3hjapwChG53+Om
-        XUEHTun0p2s2i8KhT2jhWYk=
-X-Google-Smtp-Source: APXvYqxnoN9EE7EPKHK5CYTP3DtSOi5upUEocb7hkeEWz1uwSP/Onj8G8/snwDnxI72Pa20uQAcrbw==
-X-Received: by 2002:a63:465b:: with SMTP id v27mr142543pgk.257.1576628682764;
-        Tue, 17 Dec 2019 16:24:42 -0800 (PST)
-Received: from desktop-bart.svl.corp.google.com ([2620:15c:2cd:202:4308:52a3:24b6:2c60])
-        by smtp.gmail.com with ESMTPSA id e6sm228889pfh.32.2019.12.17.16.24.41
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Tue, 17 Dec 2019 16:24:41 -0800 (PST)
-From:   Bart Van Assche <bvanassche@acm.org>
+        Tue, 17 Dec 2019 19:49:42 -0500
+Received: from dread.disaster.area (pa49-195-139-249.pa.nsw.optusnet.com.au [49.195.139.249])
+        by mail104.syd.optusnet.com.au (Postfix) with ESMTPS id D95547EA8C0;
+        Wed, 18 Dec 2019 11:49:34 +1100 (AEDT)
+Received: from dave by dread.disaster.area with local (Exim 4.92.3)
+        (envelope-from <david@fromorbit.com>)
+        id 1ihNWv-0006Lh-SB; Wed, 18 Dec 2019 11:49:33 +1100
+Date:   Wed, 18 Dec 2019 11:49:33 +1100
+From:   Dave Chinner <david@fromorbit.com>
 To:     Jens Axboe <axboe@kernel.dk>
-Cc:     linux-block@vger.kernel.org, Christoph Hellwig <hch@lst.de>,
-        Bart Van Assche <bvanassche@acm.org>,
-        Christoph Hellwig <hch@infradead.org>,
-        Ming Lei <ming.lei@redhat.com>, Hannes Reinecke <hare@suse.com>
-Subject: [PATCH] block: Fix a lockdep complaint triggered by request queue flushing
-Date:   Tue, 17 Dec 2019 16:24:35 -0800
-Message-Id: <20191218002435.48863-1-bvanassche@acm.org>
-X-Mailer: git-send-email 2.24.1.735.g03f4e72817-goog
+Cc:     linux-mm@kvack.org, linux-fsdevel@vger.kernel.org,
+        linux-block@vger.kernel.org, willy@infradead.org, clm@fb.com,
+        torvalds@linux-foundation.org
+Subject: Re: [PATCH 5/5] iomap: support RWF_UNCACHED for buffered writes
+Message-ID: <20191218004933.GR19213@dread.disaster.area>
+References: <20191211152943.2933-1-axboe@kernel.dk>
+ <20191211152943.2933-6-axboe@kernel.dk>
+ <20191212223403.GH19213@dread.disaster.area>
+ <df334467-9c1a-2f03-654f-58b002ea5ae4@kernel.dk>
+ <39af5a4d-7539-5746-ac3e-e2d6bd2209e3@kernel.dk>
+ <20191216041748.GL19213@dread.disaster.area>
+ <a30113f7-2d5a-3adf-19c4-fe49e8ef1ae8@kernel.dk>
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <a30113f7-2d5a-3adf-19c4-fe49e8ef1ae8@kernel.dk>
+User-Agent: Mutt/1.10.1 (2018-07-13)
+X-Optus-CM-Score: 0
+X-Optus-CM-Analysis: v=2.3 cv=LYdCFQXi c=1 sm=1 tr=0
+        a=KoypXv6BqLCQNZUs2nCMWg==:117 a=KoypXv6BqLCQNZUs2nCMWg==:17
+        a=jpOVt7BSZ2e4Z31A5e1TngXxSK0=:19 a=kj9zAlcOel0A:10 a=pxVhFHJ0LMsA:10
+        a=7-415B0cAAAA:8 a=OqSb7lb-M-3Ou3G8FbcA:9 a=CjuIK1q_8ugA:10
+        a=biEYGPWJfzWAr4FL6Ov7:22
 Sender: linux-block-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-Avoid that running test nvme/012 from the blktests suite triggers the
-following false positive lockdep complaint:
+On Tue, Dec 17, 2019 at 07:31:51AM -0700, Jens Axboe wrote:
+> On 12/15/19 9:17 PM, Dave Chinner wrote:
+> > On Thu, Dec 12, 2019 at 05:57:57PM -0700, Jens Axboe wrote:
+> >> On 12/12/19 5:54 PM, Jens Axboe wrote:
+> >>> On 12/12/19 3:34 PM, Dave Chinner wrote:
+> >>>> Just a thought on further optimisation for this for XFS.
+> >>>> IOMAP_UNCACHED is being passed into the filesystem ->iomap_begin
+> >>>> methods by iomap_apply().  Hence the filesystems know that it is
+> >>>> an uncached IO that is being done, and we can tailor allocation
+> >>>> strategies to suit the fact that the data is going to be written
+> >>>> immediately.
+> >>>>
+> >>>> In this case, XFS needs to treat it the same way it treats direct
+> >>>> IO. That is, we do immediate unwritten extent allocation rather than
+> >>>> delayed allocation. This will reduce the allocation overhead and
+> >>>> will optimise for immediate IO locality rather than optimise for
+> >>>> delayed allocation.
+> >>>>
+> >>>> This should just be a relatively simple change to
+> >>>> xfs_file_iomap_begin() along the lines of:
+> >>>>
+> >>>> -	if ((flags & (IOMAP_WRITE | IOMAP_ZERO)) && !(flags & IOMAP_DIRECT) &&
+> >>>> -			!IS_DAX(inode) && !xfs_get_extsz_hint(ip)) {
+> >>>> +	if ((flags & (IOMAP_WRITE | IOMAP_ZERO)) &&
+> >>>> +	    !(flags & (IOMAP_DIRECT | IOMAP_UNCACHED)) &&
+> >>>> +	    !IS_DAX(inode) && !xfs_get_extsz_hint(ip)) {
+> >>>> 		/* Reserve delalloc blocks for regular writeback. */
+> >>>> 		return xfs_file_iomap_begin_delay(inode, offset, length, flags,
+> >>>> 				iomap);
+> >>>> 	}
+> >>>>
+> >>>> so that it avoids delayed allocation for uncached IO...
+> >>>
+> >>> That's very handy! Thanks, I'll add that to the next version. Just out
+> >>> of curiosity, would you prefer this as a separate patch, or just bundle
+> >>> it with the iomap buffered RWF_UNCACHED patch? I'm assuming the latter,
+> >>> and I'll just mention it in the changelog.
+> >>
+> >> OK, since it's in XFS, it'd be a separate patch.
+> > 
+> > *nod*
+> > 
+> >> The code you quote seems
+> >> to be something out-of-tree?
+> > 
+> > Ah, I quoted the code in the 5.4 release branch, not the 5.5-rc1
+> > tree. I'd forgotten that the xfs_file_iomap_begin() got massively
+> > refactored in the 5.5 merge and I hadn't updated my cscope trees. SO
+> > I'm guessing you want to go looking for the
+> > xfs_buffered_write_iomap_begin() and add another case to this
+> > initial branch:
+> > 
+> >         /* we can't use delayed allocations when using extent size hints */
+> >         if (xfs_get_extsz_hint(ip))
+> >                 return xfs_direct_write_iomap_begin(inode, offset, count,
+> >                                 flags, iomap, srcmap);
+> > 
+> > To make the buffered write IO go down the direct IO allocation path...
+> 
+> Makes it even simpler! Something like this:
+> 
+> 
+> commit 1783722cd4b7088a3c004462c7ae610b8e42b720
+> Author: Jens Axboe <axboe@kernel.dk>
+> Date:   Tue Dec 17 07:30:04 2019 -0700
+> 
+>     xfs: don't do delayed allocations for uncached buffered writes
+>     
+>     This data is going to be written immediately, so don't bother trying
+>     to do delayed allocation for it.
+>     
+>     Suggested-by: Dave Chinner <david@fromorbit.com>
+>     Signed-off-by: Jens Axboe <axboe@kernel.dk>
+> 
+> diff --git a/fs/xfs/xfs_iomap.c b/fs/xfs/xfs_iomap.c
+> index 28e2d1f37267..d0cd4a05d59f 100644
+> --- a/fs/xfs/xfs_iomap.c
+> +++ b/fs/xfs/xfs_iomap.c
+> @@ -847,8 +847,11 @@ xfs_buffered_write_iomap_begin(
+>  	int			allocfork = XFS_DATA_FORK;
+>  	int			error = 0;
+>  
+> -	/* we can't use delayed allocations when using extent size hints */
+> -	if (xfs_get_extsz_hint(ip))
+> +	/*
+> +	 * Don't do delayed allocations when using extent size hints, or
+> +	 * if we were asked to do uncached buffered writes.
+> +	 */
+> +	if (xfs_get_extsz_hint(ip) || (flags & IOMAP_UNCACHED))
+>  		return xfs_direct_write_iomap_begin(inode, offset, count,
+>  				flags, iomap, srcmap);
+>  
 
-============================================
-WARNING: possible recursive locking detected
-5.0.0-rc3-xfstests-00015-g1236f7d60242 #841 Not tainted
---------------------------------------------
-ksoftirqd/1/16 is trying to acquire lock:
-000000000282032e (&(&fq->mq_flush_lock)->rlock){..-.}, at: flush_end_io+0x4e/0x1d0
+Yup, that's pretty much what I was thinking. :)
 
-but task is already holding lock:
-00000000cbadcbc2 (&(&fq->mq_flush_lock)->rlock){..-.}, at: flush_end_io+0x4e/0x1d0
+Cheers,
 
-other info that might help us debug this:
- Possible unsafe locking scenario:
-
-       CPU0
-       ----
-  lock(&(&fq->mq_flush_lock)->rlock);
-  lock(&(&fq->mq_flush_lock)->rlock);
-
- *** DEADLOCK ***
-
- May be due to missing lock nesting notation
-
-1 lock held by ksoftirqd/1/16:
- #0: 00000000cbadcbc2 (&(&fq->mq_flush_lock)->rlock){..-.}, at: flush_end_io+0x4e/0x1d0
-
-stack backtrace:
-CPU: 1 PID: 16 Comm: ksoftirqd/1 Not tainted 5.0.0-rc3-xfstests-00015-g1236f7d60242 #841
-Hardware name: Google Google Compute Engine/Google Compute Engine, BIOS Google 01/01/2011
-Call Trace:
- dump_stack+0x67/0x90
- __lock_acquire.cold.45+0x2b4/0x313
- lock_acquire+0x98/0x160
- _raw_spin_lock_irqsave+0x3b/0x80
- flush_end_io+0x4e/0x1d0
- blk_mq_complete_request+0x76/0x110
- nvmet_req_complete+0x15/0x110 [nvmet]
- nvmet_bio_done+0x27/0x50 [nvmet]
- blk_update_request+0xd7/0x2d0
- blk_mq_end_request+0x1a/0x100
- blk_flush_complete_seq+0xe5/0x350
- flush_end_io+0x12f/0x1d0
- blk_done_softirq+0x9f/0xd0
- __do_softirq+0xca/0x440
- run_ksoftirqd+0x24/0x50
- smpboot_thread_fn+0x113/0x1e0
- kthread+0x121/0x140
- ret_from_fork+0x3a/0x50
-
-Cc: Christoph Hellwig <hch@infradead.org>
-Cc: Ming Lei <ming.lei@redhat.com>
-Cc: Hannes Reinecke <hare@suse.com>
-Signed-off-by: Bart Van Assche <bvanassche@acm.org>
----
- block/blk-flush.c | 5 +++++
- block/blk.h       | 1 +
- 2 files changed, 6 insertions(+)
-
-diff --git a/block/blk-flush.c b/block/blk-flush.c
-index 1777346baf06..3f977c517960 100644
---- a/block/blk-flush.c
-+++ b/block/blk-flush.c
-@@ -69,6 +69,7 @@
- #include <linux/blkdev.h>
- #include <linux/gfp.h>
- #include <linux/blk-mq.h>
-+#include <linux/lockdep.h>
- 
- #include "blk.h"
- #include "blk-mq.h"
-@@ -505,6 +506,9 @@ struct blk_flush_queue *blk_alloc_flush_queue(struct request_queue *q,
- 	INIT_LIST_HEAD(&fq->flush_queue[1]);
- 	INIT_LIST_HEAD(&fq->flush_data_in_flight);
- 
-+	lockdep_register_key(&fq->key);
-+	lockdep_set_class(&fq->mq_flush_lock, &fq->key);
-+
- 	return fq;
- 
-  fail_rq:
-@@ -519,6 +523,7 @@ void blk_free_flush_queue(struct blk_flush_queue *fq)
- 	if (!fq)
- 		return;
- 
-+	lockdep_unregister_key(&fq->key);
- 	kfree(fq->flush_rq);
- 	kfree(fq);
- }
-diff --git a/block/blk.h b/block/blk.h
-index 6842f28c033e..0b8884353f6b 100644
---- a/block/blk.h
-+++ b/block/blk.h
-@@ -30,6 +30,7 @@ struct blk_flush_queue {
- 	 * at the same time
- 	 */
- 	struct request		*orig_rq;
-+	struct lock_class_key	key;
- 	spinlock_t		mq_flush_lock;
- };
- 
+Dave.
+-- 
+Dave Chinner
+david@fromorbit.com
