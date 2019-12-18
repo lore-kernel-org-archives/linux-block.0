@@ -2,122 +2,182 @@ Return-Path: <SRS0=ocaT=2I=vger.kernel.org=linux-block-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-8.4 required=3.0 tests=DKIMWL_WL_HIGH,DKIM_SIGNED,
-	DKIM_VALID,DKIM_VALID_AU,HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,
-	MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,UNPARSEABLE_RELAY,
-	USER_AGENT_SANE_1 autolearn=unavailable autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-2.3 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
+	MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,USER_AGENT_SANE_1 autolearn=no
+	autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 8B382C43603
-	for <linux-block@archiver.kernel.org>; Wed, 18 Dec 2019 01:58:01 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id A0E22C3F68F
+	for <linux-block@archiver.kernel.org>; Wed, 18 Dec 2019 03:24:51 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.kernel.org (Postfix) with ESMTP id 61DFC2176D
-	for <linux-block@archiver.kernel.org>; Wed, 18 Dec 2019 01:58:01 +0000 (UTC)
-Authentication-Results: mail.kernel.org;
-	dkim=pass (2048-bit key) header.d=oracle.com header.i=@oracle.com header.b="iJejrBuo"
+	by mail.kernel.org (Postfix) with ESMTP id 80B7F21835
+	for <linux-block@archiver.kernel.org>; Wed, 18 Dec 2019 03:24:51 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1726454AbfLRB6A (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Tue, 17 Dec 2019 20:58:00 -0500
-Received: from userp2120.oracle.com ([156.151.31.85]:46130 "EHLO
-        userp2120.oracle.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1726382AbfLRB6A (ORCPT
+        id S1726402AbfLRDR1 (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Tue, 17 Dec 2019 22:17:27 -0500
+Received: from mail104.syd.optusnet.com.au ([211.29.132.246]:46177 "EHLO
+        mail104.syd.optusnet.com.au" rhost-flags-OK-OK-OK-OK)
+        by vger.kernel.org with ESMTP id S1726387AbfLRDR1 (ORCPT
         <rfc822;linux-block@vger.kernel.org>);
-        Tue, 17 Dec 2019 20:58:00 -0500
-Received: from pps.filterd (userp2120.oracle.com [127.0.0.1])
-        by userp2120.oracle.com (8.16.0.27/8.16.0.27) with SMTP id xBI1sKpQ039809;
-        Wed, 18 Dec 2019 01:57:50 GMT
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=oracle.com; h=date : from : to : cc
- : subject : message-id : references : mime-version : content-type :
- in-reply-to; s=corp-2019-08-05;
- bh=15neapn3hexipdYPtu5c6du1j7tBf71ljZTqTLp/yK0=;
- b=iJejrBuoxC49PzOrv7wgVmtR8pKVwk5BP4lVklbYqjswXAz39Nd8KtfMf+SzSRk7x+dr
- 0cAbrExT8Un1uODdNwoj0PuuHfTsRgPrnmVQcMv9Dus9S4eQrgOryU/vbg2JMwEOjSfI
- 1mhX/uAzxcfCWp3QADsGL4/Pl4EPWdEDXZ549iW1NcImKPM34YSHESNYYBL+2GAb4Xu9
- jR1H5dLad3KVgnDq6fAfKpdSqEKvmTH4s/Fkb//gVP4W4Z1YCVjV4B/PmboBq9wBgKXa
- r3zbHJxYG7DbmBQAcmEfNX0k2pTcuWFz+BMdmYeH0dpQCcY65GmSsRN2gMN2N5oTDJIV Pg== 
-Received: from userp3020.oracle.com (userp3020.oracle.com [156.151.31.79])
-        by userp2120.oracle.com with ESMTP id 2wvrcrad1n-1
-        (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=OK);
-        Wed, 18 Dec 2019 01:57:50 +0000
-Received: from pps.filterd (userp3020.oracle.com [127.0.0.1])
-        by userp3020.oracle.com (8.16.0.27/8.16.0.27) with SMTP id xBI1sAuJ061303;
-        Wed, 18 Dec 2019 01:57:50 GMT
-Received: from aserv0121.oracle.com (aserv0121.oracle.com [141.146.126.235])
-        by userp3020.oracle.com with ESMTP id 2wxm5p7r7h-1
-        (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=OK);
-        Wed, 18 Dec 2019 01:57:49 +0000
-Received: from abhmp0006.oracle.com (abhmp0006.oracle.com [141.146.116.12])
-        by aserv0121.oracle.com (8.14.4/8.13.8) with ESMTP id xBI1vl7a007227;
-        Wed, 18 Dec 2019 01:57:47 GMT
-Received: from localhost (/10.159.137.228)
-        by default (Oracle Beehive Gateway v4.0)
-        with ESMTP ; Tue, 17 Dec 2019 17:57:47 -0800
-Date:   Tue, 17 Dec 2019 17:57:46 -0800
-From:   "Darrick J. Wong" <darrick.wong@oracle.com>
-To:     Jens Axboe <axboe@kernel.dk>, '@magnolia
+        Tue, 17 Dec 2019 22:17:27 -0500
+Received: from dread.disaster.area (pa49-195-139-249.pa.nsw.optusnet.com.au [49.195.139.249])
+        by mail104.syd.optusnet.com.au (Postfix) with ESMTPS id 6F8377E8F9C;
+        Wed, 18 Dec 2019 14:17:17 +1100 (AEDT)
+Received: from dave by dread.disaster.area with local (Exim 4.92.3)
+        (envelope-from <david@fromorbit.com>)
+        id 1ihPps-0007DD-OZ; Wed, 18 Dec 2019 14:17:16 +1100
+Date:   Wed, 18 Dec 2019 14:17:16 +1100
+From:   Dave Chinner <david@fromorbit.com>
+To:     Jens Axboe <axboe@kernel.dk>
 Cc:     linux-mm@kvack.org, linux-fsdevel@vger.kernel.org,
         linux-block@vger.kernel.org, willy@infradead.org, clm@fb.com,
-        torvalds@linux-foundation.org, david@fromorbit.com
-Subject: Re: [PATCH 6/6] xfs: don't do delayed allocations for uncached
- buffered writes
-Message-ID: <20191218015746.GB12752@magnolia>
+        torvalds@linux-foundation.org
+Subject: Re: [PATCH 1/6] fs: add read support for RWF_UNCACHED
+Message-ID: <20191218031716.GU19213@dread.disaster.area>
 References: <20191217143948.26380-1-axboe@kernel.dk>
- <20191217143948.26380-7-axboe@kernel.dk>
+ <20191217143948.26380-2-axboe@kernel.dk>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=us-ascii
 Content-Disposition: inline
-In-Reply-To: <20191217143948.26380-7-axboe@kernel.dk>
-User-Agent: Mutt/1.9.4 (2018-02-28)
-X-Proofpoint-Virus-Version: vendor=nai engine=6000 definitions=9474 signatures=668685
-X-Proofpoint-Spam-Details: rule=notspam policy=default score=0 suspectscore=0 malwarescore=0
- phishscore=0 bulkscore=0 spamscore=0 mlxscore=0 mlxlogscore=999
- adultscore=0 classifier=spam adjust=0 reason=mlx scancount=1
- engine=8.0.1-1911140001 definitions=main-1912180014
-X-Proofpoint-Virus-Version: vendor=nai engine=6000 definitions=9474 signatures=668685
-X-Proofpoint-Spam-Details: rule=notspam policy=default score=0 priorityscore=1501 malwarescore=0
- suspectscore=0 phishscore=0 bulkscore=0 spamscore=0 clxscore=-1004
- lowpriorityscore=0 mlxscore=0 impostorscore=0 mlxlogscore=999 adultscore=0
- classifier=spam adjust=0 reason=mlx scancount=1 engine=8.0.1-1911140001
- definitions=main-1912180014
+In-Reply-To: <20191217143948.26380-2-axboe@kernel.dk>
+User-Agent: Mutt/1.10.1 (2018-07-13)
+X-Optus-CM-Score: 0
+X-Optus-CM-Analysis: v=2.3 cv=W5xGqiek c=1 sm=1 tr=0
+        a=KoypXv6BqLCQNZUs2nCMWg==:117 a=KoypXv6BqLCQNZUs2nCMWg==:17
+        a=jpOVt7BSZ2e4Z31A5e1TngXxSK0=:19 a=kj9zAlcOel0A:10 a=pxVhFHJ0LMsA:10
+        a=7-415B0cAAAA:8 a=sHR7OoHQe-bhMzIJJDcA:9 a=CjuIK1q_8ugA:10
+        a=biEYGPWJfzWAr4FL6Ov7:22
 Sender: linux-block-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-On Tue, Dec 17, 2019 at 07:39:48AM -0700, Jens Axboe wrote:
-> This data is going to be written immediately, so don't bother trying
-> to do delayed allocation for it.
+On Tue, Dec 17, 2019 at 07:39:43AM -0700, Jens Axboe wrote:
+> If RWF_UNCACHED is set for io_uring (or preadv2(2)), we'll use private
+> pages for the buffered reads. These pages will never be inserted into
+> the page cache, and they are simply droped when we have done the copy at
+> the end of IO.
+
+Ok, so unlike the uncached write case, this /isn't/ coherent with
+the page cache. IOWs, it can race with other reads and page faults
+and mmap can change the data it has faulted into the page cache and
+write it back before the RWF_UNCACHED read completes, resulting
+in RWF_UNCACHED potential returning torn data.
+
+And it's not coherent with uncached writes, either, if the
+filesystem does not provide it's own serialisation between buffered
+reads and writes. i.e. simple/legacy filesystems just use the page
+lock to serialise buffered reads against buffered writes, while
+buffered writes are serialised against each other via the
+inode_lock() in generic_file_write_iter().
+
+Further, the use of inode_dio_wait() for truncate serialisation is
+optional for filesystems - it's not a generic mechanism. Filesystems
+that only support buffered IO only use page locks to provide
+truncate serialisation and don't call inode_dio_wait() in their
+->setattr methods. Hence to serialise truncates against uncached
+reads in such filesystems the uncached read needs to be page cache
+coherent.
+
+As I said previously: I don't think this is a viable approach
+because it has page cache coherency issues that are just as bad, if
+not worse, than direct IO.
+
+> If pages in the read range are already in the page cache, then use those
+> for just copying the data instead of starting IO on private pages.
 > 
-> Suggested-by: Dave Chinner <david@fromorbit.com>
-> Signed-off-by: Jens Axboe <axboe@kernel.dk>
+> A previous solution used the page cache even for non-cached ranges, but
+> the cost of doing so was too high. Removing nodes at the end is
+> expensive, even with LRU bypass.
 
-Looks reasonable once all the previous patches go in,
+If you want to bypass the page cache overhead all together, then
+use direct IO. We should not make the same mistakes as O_DIRECT
+for the same reasons (performance!). Instead, once we have the
+page cache coherent path working we should then work to optimise
+it with better page cache insert/remove primitives to lower the
+overhead.
 
-Reviewed-by: Darrick J. Wong <darrick.wong@oracle.com>
+> On top of that, repeatedly
+> instantiating new xarray nodes is very costly, as it needs to memset 576
+> bytes of data, and freeing said nodes involve an RCU call per node as
+> well. All that adds up, making uncached somewhat slower than O_DIRECT.
 
---D
+I think some of that has to do with implementation details and the
+fact you appear to be focussing on PAGE_SIZE IOs. This means you are
+instantiating and removing a single cached page at a time from the
+mapping tree, and that means we need to allocate and free an xarray
+node per IO.
 
-> ---
->  fs/xfs/xfs_iomap.c | 7 +++++--
->  1 file changed, 5 insertions(+), 2 deletions(-)
-> 
-> diff --git a/fs/xfs/xfs_iomap.c b/fs/xfs/xfs_iomap.c
-> index 28e2d1f37267..d0cd4a05d59f 100644
-> --- a/fs/xfs/xfs_iomap.c
-> +++ b/fs/xfs/xfs_iomap.c
-> @@ -847,8 +847,11 @@ xfs_buffered_write_iomap_begin(
->  	int			allocfork = XFS_DATA_FORK;
->  	int			error = 0;
->  
-> -	/* we can't use delayed allocations when using extent size hints */
-> -	if (xfs_get_extsz_hint(ip))
-> +	/*
-> +	 * Don't do delayed allocations when using extent size hints, or
-> +	 * if we were asked to do uncached buffered writes.
-> +	 */
-> +	if (xfs_get_extsz_hint(ip) || (flags & IOMAP_UNCACHED))
->  		return xfs_direct_write_iomap_begin(inode, offset, count,
->  				flags, iomap, srcmap);
->  
-> -- 
-> 2.24.1
-> 
+I would say this is a future Xarray optimisation target, not a
+reason for introducing a new incoherent IO API we'll have to support
+long after we've fixed the xarray inefficiency....
+
+> @@ -2048,6 +2057,13 @@ static ssize_t generic_file_buffered_read(struct kiocb *iocb,
+>  		if (!page) {
+>  			if (iocb->ki_flags & IOCB_NOWAIT)
+>  				goto would_block;
+> +			/* UNCACHED implies no read-ahead */
+> +			if (iocb->ki_flags & IOCB_UNCACHED) {
+> +				did_dio_begin = true;
+> +				/* block truncate for UNCACHED reads */
+> +				inode_dio_begin(inode);
+> +				goto no_cached_page;
+> +			}
+
+Ok, so for every page we don't find in the cache, we go issue IO.
+We also call inode_dio_begin() on every page we miss, but only call
+inode_dio_end() a single time. So we leak i_dio_count on every IO
+that needs to read more than a single page, which means we'll hang
+in the next call to inode_dio_wait()...
+
+>  no_cached_page:
+> @@ -2234,6 +2250,14 @@ static ssize_t generic_file_buffered_read(struct kiocb *iocb,
+>  			error = -ENOMEM;
+>  			goto out;
+>  		}
+> +		if (iocb->ki_flags & IOCB_UNCACHED) {
+> +			__SetPageLocked(page);
+> +			page->mapping = mapping;
+> +			page->index = index;
+> +			clear_mapping = true;
+> +			goto readpage;
+> +		}
+
+And we go through the ->readpage path, which means we a building and
+issuing a single bio per page we miss. THis is highly inefficient,
+and relies on bio merging to form large IOs in the block layer.
+Sure, you won't notice the impact if all you do is PAGE_SIZE read()
+calls, but if you are doing multi-megabyte IOs because you have
+spinning rust storage then it will make a big difference.
+
+IOWs, this does not take advantage of either the mpage_readpages or
+the iomap_readpages many-pages-to-a-bio read optimisations that the
+readahead path gives us, so there's more CPU and IO overhead from this
+RWF_UNCACHED path than there is from the normal readahead based
+buffered IO path.
+
+Oh, and if we have random pages in the cache, this
+single-page-at-atime approach that will break up large sequential
+IOs in smaller, non-sequential IOs that will be dispatched
+separately. It's much more CPU efficient to do a single large IO
+that pulls new data into the random page in middle of the range than
+it is to build, issue and complete two separate IOs. It's also much
+more friendly to spinning rust to do a single large IO than two
+small separated-by-a-few-sectors IOs...
+
+IMO, this looks like an implementation hyper-focussed on brute
+performance of PAGE_SIZE IOs and it compromises on coherency and
+efficiency to attain that performance. Quite frankly, if performance
+is so critical that you need to compromise the IO path in the way,
+then just use direct IO.
+
+Let's get a sane, clean, efficient page cache coherent read IO path
+in place for RWF_UNCACHED, then optimise it for performance. If it's
+done right, then the page cache/xarray insert/remove overhead should
+largely disappear in the noise.
+
+Cheers,
+
+Dave.
+-- 
+Dave Chinner
+david@fromorbit.com
