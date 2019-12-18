@@ -2,91 +2,105 @@ Return-Path: <SRS0=ocaT=2I=vger.kernel.org=linux-block-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-2.0 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
-	HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,
-	USER_AGENT_SANE_1 autolearn=no autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-3.9 required=3.0 tests=DKIMWL_WL_HIGH,DKIM_SIGNED,
+	DKIM_VALID,DKIM_VALID_AU,HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,
+	SPF_HELO_NONE,SPF_PASS,USER_AGENT_GIT autolearn=no autolearn_force=no
+	version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 7FAC7C43603
-	for <linux-block@archiver.kernel.org>; Wed, 18 Dec 2019 12:30:04 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id A0CBBC43603
+	for <linux-block@archiver.kernel.org>; Wed, 18 Dec 2019 12:43:29 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.kernel.org (Postfix) with ESMTP id 46A8F2176D
-	for <linux-block@archiver.kernel.org>; Wed, 18 Dec 2019 12:30:04 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id 71E3C2146E
+	for <linux-block@archiver.kernel.org>; Wed, 18 Dec 2019 12:43:29 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (2048-bit key) header.d=infradead.org header.i=@infradead.org header.b="0DgA0W9l"
+	dkim=pass (1024-bit key) header.d=amazon.com header.i=@amazon.com header.b="ghmpKaSb"
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1726710AbfLRMaD (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Wed, 18 Dec 2019 07:30:03 -0500
-Received: from merlin.infradead.org ([205.233.59.134]:36570 "EHLO
-        merlin.infradead.org" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1726545AbfLRMaD (ORCPT
+        id S1726682AbfLRMn3 (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Wed, 18 Dec 2019 07:43:29 -0500
+Received: from smtp-fw-33001.amazon.com ([207.171.190.10]:63581 "EHLO
+        smtp-fw-33001.amazon.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S1726545AbfLRMn2 (ORCPT
         <rfc822;linux-block@vger.kernel.org>);
-        Wed, 18 Dec 2019 07:30:03 -0500
-DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed;
-        d=infradead.org; s=merlin.20170209; h=In-Reply-To:Content-Type:MIME-Version:
-        References:Message-ID:Subject:Cc:To:From:Date:Sender:Reply-To:
-        Content-Transfer-Encoding:Content-ID:Content-Description:Resent-Date:
-        Resent-From:Resent-Sender:Resent-To:Resent-Cc:Resent-Message-ID:List-Id:
-        List-Help:List-Unsubscribe:List-Subscribe:List-Post:List-Owner:List-Archive;
-         bh=WsfnNd7m2nvvl03QBT9ECyml/bzyuRqjZFKsto4Vzsg=; b=0DgA0W9llHe5C9DFdwetb4wNv
-        1C43E4j/YR7Ex8bi/XiWUwLPzzczrdH3iBq5Pg6NyJAIpYePKI+chlpY6UFcW7Givfi6B5VptscDP
-        N+0kXd9lM2tLT5HHPpor8skjygrw3ztPgFJh0N/8tSj7FbsvGdYHe1ZDiyl8+rQiG6rVzOykB71IX
-        AObFVoToGixx7PdzxtzEWhJ/8s93CH3EOMVqdXnZ142uutwz7zFiEzunGR6JHxPqceRlDAVgwZnIf
-        NwuH/Jsve3rOH/VLsrWW0kyqAvppzYNSJVZuT8Ghmpfl4B4X8rCbrXM14v4LELNPivzpt5pz9sCGA
-        bnhx5ETOA==;
-Received: from j217100.upc-j.chello.nl ([24.132.217.100] helo=noisy.programming.kicks-ass.net)
-        by merlin.infradead.org with esmtpsa (Exim 4.92.3 #3 (Red Hat Linux))
-        id 1ihYSF-0003IU-82; Wed, 18 Dec 2019 12:29:27 +0000
-Received: from hirez.programming.kicks-ass.net (hirez.programming.kicks-ass.net [192.168.1.225])
-        (using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
-        (Client did not present a certificate)
-        by noisy.programming.kicks-ass.net (Postfix) with ESMTPS id 46B16300F29;
-        Wed, 18 Dec 2019 13:27:59 +0100 (CET)
-Received: by hirez.programming.kicks-ass.net (Postfix, from userid 1000)
-        id 4CC6529DFB923; Wed, 18 Dec 2019 13:29:22 +0100 (CET)
-Date:   Wed, 18 Dec 2019 13:29:22 +0100
-From:   Peter Zijlstra <peterz@infradead.org>
-To:     Ming Lei <ming.lei@redhat.com>
-Cc:     Thomas Gleixner <tglx@linutronix.de>, Jens Axboe <axboe@kernel.dk>,
-        linux-kernel@vger.kernel.org, linux-block@vger.kernel.org,
-        Long Li <longli@microsoft.com>, Ingo Molnar <mingo@redhat.com>,
-        Christoph Hellwig <hch@lst.de>,
-        Keith Busch <keith.busch@intel.com>,
-        Sagi Grimberg <sagi@grimberg.me>,
-        John Garry <john.garry@huawei.com>,
-        Hannes Reinecke <hare@suse.com>
-Subject: Re: [RFC PATCH 2/3] softirq: implement interrupt flood detection
-Message-ID: <20191218122922.GR2871@hirez.programming.kicks-ass.net>
-References: <20191218071942.22336-1-ming.lei@redhat.com>
- <20191218071942.22336-3-ming.lei@redhat.com>
- <20191218104941.GR2844@hirez.programming.kicks-ass.net>
+        Wed, 18 Dec 2019 07:43:28 -0500
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+  d=amazon.com; i=@amazon.com; q=dns/txt; s=amazon201209;
+  t=1576673008; x=1608209008;
+  h=from:to:cc:subject:date:message-id:mime-version:
+   in-reply-to:content-transfer-encoding;
+  bh=xHFo6mvkYQfQbv/gkkkxzHborqm3JkMeR8OIVG6UBXk=;
+  b=ghmpKaSbziZQuKiQDMq+MtWv3r0GxFuk8Hb10CyPlgJbHq3191pt9myG
+   188zmtDyp2TiwxfamAIP59Y6XftR/f5zCYsNtO9k0w7FOr1Gu7NQM+iTn
+   uxPrlZpWk/SOenc+MIZ9wx5whmzCohMfkq4kzGHCCOrRIdQOWo9pDP6YU
+   A=;
+IronPort-SDR: nHmGLueb0tT74FASDEbqGU0v4H6T3ZMOFwQejVqZ7VBgH8XZxt8zIkWugLKdBymWO4lkWAwvUt
+ cLAUIMuq3n2A==
+X-IronPort-AV: E=Sophos;i="5.69,329,1571702400"; 
+   d="scan'208";a="15616175"
+Received: from sea32-co-svc-lb4-vlan3.sea.corp.amazon.com (HELO email-inbound-relay-2b-55156cd4.us-west-2.amazon.com) ([10.47.23.38])
+  by smtp-border-fw-out-33001.sea14.amazon.com with ESMTP; 18 Dec 2019 12:43:17 +0000
+Received: from EX13MTAUEA001.ant.amazon.com (pdx4-ws-svc-p6-lb7-vlan2.pdx.amazon.com [10.170.41.162])
+        by email-inbound-relay-2b-55156cd4.us-west-2.amazon.com (Postfix) with ESMTPS id B218EA1D18;
+        Wed, 18 Dec 2019 12:43:16 +0000 (UTC)
+Received: from EX13D31EUA001.ant.amazon.com (10.43.165.15) by
+ EX13MTAUEA001.ant.amazon.com (10.43.61.82) with Microsoft SMTP Server (TLS)
+ id 15.0.1367.3; Wed, 18 Dec 2019 12:43:16 +0000
+Received: from u886c93fd17d25d.ant.amazon.com (10.43.160.90) by
+ EX13D31EUA001.ant.amazon.com (10.43.165.15) with Microsoft SMTP Server (TLS)
+ id 15.0.1367.3; Wed, 18 Dec 2019 12:43:10 +0000
+From:   SeongJae Park <sjpark@amazon.com>
+To:     =?UTF-8?q?J=C3=BCrgen=20Gro=C3=9F?= <jgross@suse.com>
+CC:     SeongJae Park <sjpark@amazon.com>, <axboe@kernel.dk>,
+        <konrad.wilk@oracle.com>, <roger.pau@citrix.com>,
+        <linux-block@vger.kernel.org>, <pdurrant@amazon.com>,
+        SeongJae Park <sjpark@amazon.de>,
+        <linux-kernel@vger.kernel.org>, <sj38.park@gmail.com>,
+        <xen-devel@lists.xenproject.org>
+Subject: Re: Re: [Xen-devel] [PATCH v12 2/5] xenbus/backend: Protect xenbus callback with lock
+Date:   Wed, 18 Dec 2019 13:42:44 +0100
+Message-ID: <20191218124244.8840-1-sjpark@amazon.com>
+X-Mailer: git-send-email 2.17.1
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <20191218104941.GR2844@hirez.programming.kicks-ass.net>
-User-Agent: Mutt/1.10.1 (2018-07-13)
+In-Reply-To: <af02058a-fa76-5eb5-5c2b-60555273bac2@suse.com>
+Content-Type: text/plain; charset="UTF-8"
+Content-Transfer-Encoding: 8bit
+X-Originating-IP: [10.43.160.90]
+X-ClientProxiedBy: EX13D01UWA003.ant.amazon.com (10.43.160.107) To
+ EX13D31EUA001.ant.amazon.com (10.43.165.15)
 Sender: linux-block-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-On Wed, Dec 18, 2019 at 11:49:41AM +0100, Peter Zijlstra wrote:
-> 
-> _If_ you want to do something like this, do it like the below. That only
-> adds a few instruction to irq_exit() and only touches a cacheline that's
-> already touched.
-> 
-> It computes both the avg duration and the avg inter-arrival-time of
-> hardirqs. Things get critical when:
-> 
-> 	inter-arrival-avg < 2*duration-avg
-> 
-> or something like that.
+On Wed, 18 Dec 2019 13:27:37 +0100 "Jürgen Groß" <jgross@suse.com> wrote:
 
-Better yet, try something like:
+> On 18.12.19 11:42, SeongJae Park wrote:
+> > From: SeongJae Park <sjpark@amazon.de>
+> > 
+> > 'reclaim_memory' callback can race with a driver code as this callback
+> > will be called from any memory pressure detected context.  To deal with
+> > the case, this commit adds a spinlock in the 'xenbus_device'.  Whenever
+> > 'reclaim_memory' callback is called, the lock of the device which passed
+> > to the callback as its argument is locked.  Thus, drivers registering
+> > their 'reclaim_memory' callback should protect the data that might race
+> > with the callback with the lock by themselves.
+> 
+> Any reason you don't take the lock around the .probe() and .remove()
+> calls of the backend (xenbus_dev_probe() and xenbus_dev_remove())? This
+> would eliminate the need to do that in each backend instead.
 
-bool cpu_irq_heavy(int cpu)
-{
-	return cpu_util_irq(cpu_rq(cpu)) >= arch_scale_cpu_capacity(cpu);
-}
+First of all, I would like to keep the critical section as small as possible.
+With my small test, I could see slightly increasing memory pressure as the
+critical section becomes wider.  Also, some drivers might share the data their
+'reclaim_memory' callback touches with other functions.  I think only the
+driver owners can know what data is shared and what is the minimum critical
+section to protect it.
+
+If you think differently or I am missing something, please let me know.
 
 
+Thanks,
+SeongJae Park
+
+> 
+> 
+> Juergen
