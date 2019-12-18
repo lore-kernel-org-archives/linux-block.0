@@ -2,63 +2,91 @@ Return-Path: <SRS0=ocaT=2I=vger.kernel.org=linux-block-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-2.2 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
-	MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,USER_AGENT_SANE_1 autolearn=no
-	autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-2.0 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
+	HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,
+	USER_AGENT_SANE_1 autolearn=no autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id DAC62C43603
-	for <linux-block@archiver.kernel.org>; Wed, 18 Dec 2019 12:27:41 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 7FAC7C43603
+	for <linux-block@archiver.kernel.org>; Wed, 18 Dec 2019 12:30:04 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.kernel.org (Postfix) with ESMTP id B254021582
-	for <linux-block@archiver.kernel.org>; Wed, 18 Dec 2019 12:27:41 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id 46A8F2176D
+	for <linux-block@archiver.kernel.org>; Wed, 18 Dec 2019 12:30:04 +0000 (UTC)
+Authentication-Results: mail.kernel.org;
+	dkim=fail reason="signature verification failed" (2048-bit key) header.d=infradead.org header.i=@infradead.org header.b="0DgA0W9l"
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1726545AbfLRM1k (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Wed, 18 Dec 2019 07:27:40 -0500
-Received: from mx2.suse.de ([195.135.220.15]:58036 "EHLO mx2.suse.de"
-        rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-        id S1726029AbfLRM1k (ORCPT <rfc822;linux-block@vger.kernel.org>);
-        Wed, 18 Dec 2019 07:27:40 -0500
-X-Virus-Scanned: by amavisd-new at test-mx.suse.de
-Received: from relay2.suse.de (unknown [195.135.220.254])
-        by mx2.suse.de (Postfix) with ESMTP id C3EA8B164;
-        Wed, 18 Dec 2019 12:27:38 +0000 (UTC)
-Subject: Re: [PATCH v12 2/5] xenbus/backend: Protect xenbus callback with lock
-To:     SeongJae Park <sjpark@amazon.com>, axboe@kernel.dk,
-        konrad.wilk@oracle.com, roger.pau@citrix.com
-Cc:     SeongJae Park <sjpark@amazon.de>, pdurrant@amazon.com,
-        sj38.park@gmail.com, xen-devel@lists.xenproject.org,
-        linux-block@vger.kernel.org, linux-kernel@vger.kernel.org
-References: <20191218104232.9606-1-sjpark@amazon.com>
- <20191218104232.9606-3-sjpark@amazon.com>
-From:   =?UTF-8?B?SsO8cmdlbiBHcm/Dnw==?= <jgross@suse.com>
-Message-ID: <af02058a-fa76-5eb5-5c2b-60555273bac2@suse.com>
-Date:   Wed, 18 Dec 2019 13:27:37 +0100
-User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:68.0) Gecko/20100101
- Thunderbird/68.2.1
+        id S1726710AbfLRMaD (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Wed, 18 Dec 2019 07:30:03 -0500
+Received: from merlin.infradead.org ([205.233.59.134]:36570 "EHLO
+        merlin.infradead.org" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S1726545AbfLRMaD (ORCPT
+        <rfc822;linux-block@vger.kernel.org>);
+        Wed, 18 Dec 2019 07:30:03 -0500
+DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed;
+        d=infradead.org; s=merlin.20170209; h=In-Reply-To:Content-Type:MIME-Version:
+        References:Message-ID:Subject:Cc:To:From:Date:Sender:Reply-To:
+        Content-Transfer-Encoding:Content-ID:Content-Description:Resent-Date:
+        Resent-From:Resent-Sender:Resent-To:Resent-Cc:Resent-Message-ID:List-Id:
+        List-Help:List-Unsubscribe:List-Subscribe:List-Post:List-Owner:List-Archive;
+         bh=WsfnNd7m2nvvl03QBT9ECyml/bzyuRqjZFKsto4Vzsg=; b=0DgA0W9llHe5C9DFdwetb4wNv
+        1C43E4j/YR7Ex8bi/XiWUwLPzzczrdH3iBq5Pg6NyJAIpYePKI+chlpY6UFcW7Givfi6B5VptscDP
+        N+0kXd9lM2tLT5HHPpor8skjygrw3ztPgFJh0N/8tSj7FbsvGdYHe1ZDiyl8+rQiG6rVzOykB71IX
+        AObFVoToGixx7PdzxtzEWhJ/8s93CH3EOMVqdXnZ142uutwz7zFiEzunGR6JHxPqceRlDAVgwZnIf
+        NwuH/Jsve3rOH/VLsrWW0kyqAvppzYNSJVZuT8Ghmpfl4B4X8rCbrXM14v4LELNPivzpt5pz9sCGA
+        bnhx5ETOA==;
+Received: from j217100.upc-j.chello.nl ([24.132.217.100] helo=noisy.programming.kicks-ass.net)
+        by merlin.infradead.org with esmtpsa (Exim 4.92.3 #3 (Red Hat Linux))
+        id 1ihYSF-0003IU-82; Wed, 18 Dec 2019 12:29:27 +0000
+Received: from hirez.programming.kicks-ass.net (hirez.programming.kicks-ass.net [192.168.1.225])
+        (using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+        (Client did not present a certificate)
+        by noisy.programming.kicks-ass.net (Postfix) with ESMTPS id 46B16300F29;
+        Wed, 18 Dec 2019 13:27:59 +0100 (CET)
+Received: by hirez.programming.kicks-ass.net (Postfix, from userid 1000)
+        id 4CC6529DFB923; Wed, 18 Dec 2019 13:29:22 +0100 (CET)
+Date:   Wed, 18 Dec 2019 13:29:22 +0100
+From:   Peter Zijlstra <peterz@infradead.org>
+To:     Ming Lei <ming.lei@redhat.com>
+Cc:     Thomas Gleixner <tglx@linutronix.de>, Jens Axboe <axboe@kernel.dk>,
+        linux-kernel@vger.kernel.org, linux-block@vger.kernel.org,
+        Long Li <longli@microsoft.com>, Ingo Molnar <mingo@redhat.com>,
+        Christoph Hellwig <hch@lst.de>,
+        Keith Busch <keith.busch@intel.com>,
+        Sagi Grimberg <sagi@grimberg.me>,
+        John Garry <john.garry@huawei.com>,
+        Hannes Reinecke <hare@suse.com>
+Subject: Re: [RFC PATCH 2/3] softirq: implement interrupt flood detection
+Message-ID: <20191218122922.GR2871@hirez.programming.kicks-ass.net>
+References: <20191218071942.22336-1-ming.lei@redhat.com>
+ <20191218071942.22336-3-ming.lei@redhat.com>
+ <20191218104941.GR2844@hirez.programming.kicks-ass.net>
 MIME-Version: 1.0
-In-Reply-To: <20191218104232.9606-3-sjpark@amazon.com>
-Content-Type: text/plain; charset=utf-8; format=flowed
-Content-Language: en-US
-Content-Transfer-Encoding: 7bit
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <20191218104941.GR2844@hirez.programming.kicks-ass.net>
+User-Agent: Mutt/1.10.1 (2018-07-13)
 Sender: linux-block-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-On 18.12.19 11:42, SeongJae Park wrote:
-> From: SeongJae Park <sjpark@amazon.de>
+On Wed, Dec 18, 2019 at 11:49:41AM +0100, Peter Zijlstra wrote:
 > 
-> 'reclaim_memory' callback can race with a driver code as this callback
-> will be called from any memory pressure detected context.  To deal with
-> the case, this commit adds a spinlock in the 'xenbus_device'.  Whenever
-> 'reclaim_memory' callback is called, the lock of the device which passed
-> to the callback as its argument is locked.  Thus, drivers registering
-> their 'reclaim_memory' callback should protect the data that might race
-> with the callback with the lock by themselves.
+> _If_ you want to do something like this, do it like the below. That only
+> adds a few instruction to irq_exit() and only touches a cacheline that's
+> already touched.
+> 
+> It computes both the avg duration and the avg inter-arrival-time of
+> hardirqs. Things get critical when:
+> 
+> 	inter-arrival-avg < 2*duration-avg
+> 
+> or something like that.
 
-Any reason you don't take the lock around the .probe() and .remove()
-calls of the backend (xenbus_dev_probe() and xenbus_dev_remove())? This
-would eliminate the need to do that in each backend instead.
+Better yet, try something like:
+
+bool cpu_irq_heavy(int cpu)
+{
+	return cpu_util_irq(cpu_rq(cpu)) >= arch_scale_cpu_capacity(cpu);
+}
 
 
-Juergen
