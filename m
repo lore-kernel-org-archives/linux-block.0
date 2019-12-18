@@ -2,142 +2,117 @@ Return-Path: <SRS0=ocaT=2I=vger.kernel.org=linux-block-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-2.4 required=3.0 tests=DKIMWL_WL_HIGH,DKIM_SIGNED,
-	DKIM_VALID,DKIM_VALID_AU,HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,
-	SPF_HELO_NONE,SPF_PASS,USER_AGENT_SANE_1 autolearn=no autolearn_force=no
-	version=3.4.0
+X-Spam-Status: No, score=-3.8 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
+	INCLUDES_PATCH,MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS autolearn=no
+	autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id A464CC43603
-	for <linux-block@archiver.kernel.org>; Wed, 18 Dec 2019 22:18:59 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id BB4BFC2D0CD
+	for <linux-block@archiver.kernel.org>; Wed, 18 Dec 2019 22:20:31 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.kernel.org (Postfix) with ESMTP id 77C5A227BF
-	for <linux-block@archiver.kernel.org>; Wed, 18 Dec 2019 22:18:59 +0000 (UTC)
-Authentication-Results: mail.kernel.org;
-	dkim=pass (2048-bit key) header.d=nvidia.com header.i=@nvidia.com header.b="ScM+7x8q"
+	by mail.kernel.org (Postfix) with ESMTP id 988BD218AC
+	for <linux-block@archiver.kernel.org>; Wed, 18 Dec 2019 22:20:31 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1726698AbfLRWSs (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Wed, 18 Dec 2019 17:18:48 -0500
-Received: from hqnvemgate25.nvidia.com ([216.228.121.64]:8926 "EHLO
-        hqnvemgate25.nvidia.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1726594AbfLRWSr (ORCPT
+        id S1726530AbfLRWU0 (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Wed, 18 Dec 2019 17:20:26 -0500
+Received: from imap2.colo.codethink.co.uk ([78.40.148.184]:43988 "EHLO
+        imap2.colo.codethink.co.uk" rhost-flags-OK-OK-OK-OK)
+        by vger.kernel.org with ESMTP id S1726463AbfLRWU0 (ORCPT
         <rfc822;linux-block@vger.kernel.org>);
-        Wed, 18 Dec 2019 17:18:47 -0500
-Received: from hqpgpgate101.nvidia.com (Not Verified[216.228.121.13]) by hqnvemgate25.nvidia.com (using TLS: TLSv1.2, DES-CBC3-SHA)
-        id <B5dfaa5ba0000>; Wed, 18 Dec 2019 14:18:34 -0800
-Received: from hqmail.nvidia.com ([172.20.161.6])
-  by hqpgpgate101.nvidia.com (PGP Universal service);
-  Wed, 18 Dec 2019 14:18:44 -0800
-X-PGP-Universal: processed;
-        by hqpgpgate101.nvidia.com on Wed, 18 Dec 2019 14:18:44 -0800
-Received: from [10.2.165.11] (10.124.1.5) by HQMAIL107.nvidia.com
- (172.20.187.13) with Microsoft SMTP Server (TLS) id 15.0.1473.3; Wed, 18 Dec
- 2019 22:18:43 +0000
-Subject: Re: [PATCH v11 01/25] mm/gup: factor out duplicate code from four
- routines
-To:     "Kirill A. Shutemov" <kirill@shutemov.name>
-CC:     Andrew Morton <akpm@linux-foundation.org>,
-        Al Viro <viro@zeniv.linux.org.uk>,
-        Alex Williamson <alex.williamson@redhat.com>,
-        Benjamin Herrenschmidt <benh@kernel.crashing.org>,
-        =?UTF-8?B?QmrDtnJuIFTDtnBlbA==?= <bjorn.topel@intel.com>,
-        Christoph Hellwig <hch@infradead.org>,
-        Dan Williams <dan.j.williams@intel.com>,
-        Daniel Vetter <daniel@ffwll.ch>,
-        Dave Chinner <david@fromorbit.com>,
-        David Airlie <airlied@linux.ie>,
-        "David S . Miller" <davem@davemloft.net>,
-        Ira Weiny <ira.weiny@intel.com>, Jan Kara <jack@suse.cz>,
-        Jason Gunthorpe <jgg@ziepe.ca>, Jens Axboe <axboe@kernel.dk>,
-        Jonathan Corbet <corbet@lwn.net>,
-        =?UTF-8?B?SsOpcsO0bWUgR2xpc3Nl?= <jglisse@redhat.com>,
-        Magnus Karlsson <magnus.karlsson@intel.com>,
-        Mauro Carvalho Chehab <mchehab@kernel.org>,
-        Michael Ellerman <mpe@ellerman.id.au>,
-        Michal Hocko <mhocko@suse.com>,
-        Mike Kravetz <mike.kravetz@oracle.com>,
-        Paul Mackerras <paulus@samba.org>,
-        Shuah Khan <shuah@kernel.org>,
-        Vlastimil Babka <vbabka@suse.cz>, <bpf@vger.kernel.org>,
-        <dri-devel@lists.freedesktop.org>, <kvm@vger.kernel.org>,
-        <linux-block@vger.kernel.org>, <linux-doc@vger.kernel.org>,
-        <linux-fsdevel@vger.kernel.org>, <linux-kselftest@vger.kernel.org>,
-        <linux-media@vger.kernel.org>, <linux-rdma@vger.kernel.org>,
-        <linuxppc-dev@lists.ozlabs.org>, <netdev@vger.kernel.org>,
-        <linux-mm@kvack.org>, LKML <linux-kernel@vger.kernel.org>,
+        Wed, 18 Dec 2019 17:20:26 -0500
+Received: from [167.98.27.226] (helo=xylophone)
+        by imap2.colo.codethink.co.uk with esmtpsa  (Exim 4.92 #3 (Debian))
+        id 1ihhg1-0004b8-9k; Wed, 18 Dec 2019 22:20:17 +0000
+Message-ID: <50aa62939858f36007d84b97ad02626f32d0c477.camel@codethink.co.uk>
+Subject: Re: [PATCH v2 23/27] compat_ioctl: move HDIO ioctl handling into
+ drivers/ide
+From:   Ben Hutchings <ben.hutchings@codethink.co.uk>
+To:     Arnd Bergmann <arnd@arndb.de>
+Cc:     Jens Axboe <axboe@kernel.dk>,
+        "James E.J. Bottomley" <jejb@linux.ibm.com>,
+        "Martin K. Petersen" <martin.petersen@oracle.com>,
+        linux-scsi <linux-scsi@vger.kernel.org>,
+        linux-block <linux-block@vger.kernel.org>,
+        y2038 Mailman List <y2038@lists.linaro.org>,
+        "linux-kernel@vger.kernel.org" <linux-kernel@vger.kernel.org>,
         Christoph Hellwig <hch@lst.de>,
-        "Aneesh Kumar K . V" <aneesh.kumar@linux.ibm.com>
-References: <20191216222537.491123-1-jhubbard@nvidia.com>
- <20191216222537.491123-2-jhubbard@nvidia.com>
- <20191218155211.emcegdp5uqgorfwe@box>
-From:   John Hubbard <jhubbard@nvidia.com>
-X-Nvconfidentiality: public
-Message-ID: <5719efc4-e560-b3d9-8d1f-3ae289bed289@nvidia.com>
-Date:   Wed, 18 Dec 2019 14:15:53 -0800
-User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:68.0) Gecko/20100101
- Thunderbird/68.3.0
+        "open list:DOCUMENTATION" <linux-doc@vger.kernel.org>,
+        Jonathan Corbet <corbet@lwn.net>,
+        Al Viro <viro@zeniv.linux.org.uk>,
+        Linux FS-devel Mailing List <linux-fsdevel@vger.kernel.org>
+Date:   Wed, 18 Dec 2019 22:20:16 +0000
+In-Reply-To: <CAK8P3a28Qn22Cx-bVhY5rjZVuhRXE2Jb0rezCozAhC0DZqxcUg@mail.gmail.com>
+References: <20191217221708.3730997-1-arnd@arndb.de>
+         <20191217221708.3730997-24-arnd@arndb.de>
+         <a75a7d44ebd9ff65499445dd6b087c92345af2e4.camel@codethink.co.uk>
+         <CAK8P3a28Qn22Cx-bVhY5rjZVuhRXE2Jb0rezCozAhC0DZqxcUg@mail.gmail.com>
+Organization: Codethink Ltd.
+Content-Type: text/plain; charset="UTF-8"
+User-Agent: Evolution 3.30.5-1.1 
 MIME-Version: 1.0
-In-Reply-To: <20191218155211.emcegdp5uqgorfwe@box>
-X-Originating-IP: [10.124.1.5]
-X-ClientProxiedBy: HQMAIL105.nvidia.com (172.20.187.12) To
- HQMAIL107.nvidia.com (172.20.187.13)
-Content-Type: text/plain; charset="utf-8"; format=flowed
-Content-Language: en-US
 Content-Transfer-Encoding: 7bit
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=nvidia.com; s=n1;
-        t=1576707514; bh=A0thRHEqnXg6dZZRQ3XItHq709pByy7GtW01Hq1OCoc=;
-        h=X-PGP-Universal:Subject:To:CC:References:From:X-Nvconfidentiality:
-         Message-ID:Date:User-Agent:MIME-Version:In-Reply-To:
-         X-Originating-IP:X-ClientProxiedBy:Content-Type:Content-Language:
-         Content-Transfer-Encoding;
-        b=ScM+7x8q8mWlcIQciYsHkNMCacR+c0EXHDYwd9LQIuUPf7aoJ2FVBW026iU1SWAnl
-         ltogqGk6aIee+Km4SQR7f32cksncAyW4lNLn2TYKFrtJdbIHsrOldxBh5IaPhHdDqE
-         sdIpDxyyx+Jf8CyjrZWs/sYEpgdFVpjkjtWEpt4nJp1e7SjqwB5Cu2GqZfKBuKVEar
-         BRhkAV/MDLjwytEs34akliPwG7VvslpNx0c0XwWMRq9z3Nwumj3m+z4SVir8YPvZEf
-         vV7cvsqLQ3VGt46WIl4RoFGnV1Qa4B1dL2lodfVBrgXk2TIEVopJfv3Sggeyd8NtB5
-         Kn8oXib8wW5/w==
 Sender: linux-block-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-On 12/18/19 7:52 AM, Kirill A. Shutemov wrote:
-> On Mon, Dec 16, 2019 at 02:25:13PM -0800, John Hubbard wrote:
->> +static void put_compound_head(struct page *page, int refs)
->> +{
->> +	/* Do a get_page() first, in case refs == page->_refcount */
->> +	get_page(page);
->> +	page_ref_sub(page, refs);
->> +	put_page(page);
->> +}
+On Wed, 2019-12-18 at 23:17 +0100, Arnd Bergmann wrote:
+> On Wed, Dec 18, 2019 at 10:11 PM Ben Hutchings
+> <ben.hutchings@codethink.co.uk> wrote:
+> > On Tue, 2019-12-17 at 23:17 +0100, Arnd Bergmann wrote:
+> > > Most of the HDIO ioctls are only used by the obsolete drivers/ide
+> > > subsystem, these can be handled by changing ide_cmd_ioctl() to be aware
+> > > of compat mode and doing the correct transformations in place and using
+> > > it as both native and compat handlers for all drivers.
+> > > 
+> > > The SCSI drivers implementing the same commands are already doing
+> > > this in the drivers, so the compat_blkdev_driver_ioctl() function
+> > > is no longer needed now.
+> > > 
+> > > The BLKSECTSET and HDIO_GETGEO_BIG ioctls are not implemented
+> > > in any driver any more and no longer need any conversion.
+> > [...]
+> > 
+> > I noticed that HDIO_DRIVE_TASKFILE, handled by ide_taskfile_ioctl() in
+> > drivers/ide/ide-taskfile.c, never had compat handling before.  After
+> > this patch it does, but its argument isn't passed through compat_ptr().
+> > Again, doesn't really matter because IDE isn't a thing on s390.
 > 
-> It's not terribly efficient. Maybe something like:
+> I checked again, and I think it's worse than that: ide_taskfile_ioctl()
+> takes an ide_task_request_t argument, which is not compatible
+> at all (it has two long members). I suspect what happened here
+> is that I confused it with ide_cmd_ioctl(), which takes a 'struct
+> ide_taskfile' argument that /is/ compatible.
 > 
-> 	VM_BUG_ON_PAGE(page_ref_count(page) < ref, page);
-> 	if (refs > 2)
-> 		page_ref_sub(page, refs - 1);
-> 	put_page(page);
+> I don't think there is a point in adding a handler now: most
+> users of drivers/ide are 32-bit only, and nobody complained
+> so far, but I would add this change if you agree:
+
+Looks good to me.
+
+Ben.
+
+> diff --git a/drivers/ide/ide-ioctls.c b/drivers/ide/ide-ioctls.c
+> index f6497c817493..83afee3983fe 100644
+> --- a/drivers/ide/ide-ioctls.c
+> +++ b/drivers/ide/ide-ioctls.c
+> @@ -270,6 +270,9 @@ int generic_ide_ioctl(ide_drive_t *drive, struct
+> block_device *bdev,
+>         case HDIO_DRIVE_TASKFILE:
+>                 if (!capable(CAP_SYS_ADMIN) || !capable(CAP_SYS_RAWIO))
+>                         return -EACCES;
+> +               /* missing compat handler for HDIO_DRIVE_TASKFILE */
+> +               if (in_compat_syscall())
+> +                       return -ENOTTY;
+>                 if (drive->media == ide_disk)
+>                         return ide_taskfile_ioctl(drive, arg);
+>                 return -ENOMSG;
 > 
-> ?
-
-OK, but how about this instead? I don't see the need for a "2", as that
-is a magic number that requires explanation. Whereas "1" is not a magic
-number--here it means: either there are "many" (>1) refs, or not.
-
-And the routine won't be called with refs less than about 32 (2MB huge
-page, 64KB base page == 32 subpages) anyway.
-
-	VM_BUG_ON_PAGE(page_ref_count(page) < refs, page);
-	/*
-	 * Calling put_page() for each ref is unnecessarily slow. Only the last
-	 * ref needs a put_page().
-	 */
-	if (refs > 1)
-		page_ref_sub(page, refs - 1);
-	put_page(page);
-
-
-thanks,
+> 
+> 
+>          Arnd
+> 
 -- 
-John Hubbard
-NVIDIA
-  
+Ben Hutchings, Software Developer                         Codethink Ltd
+https://www.codethink.co.uk/                 Dale House, 35 Dale Street
+                                     Manchester, M1 2HF, United Kingdom
+
