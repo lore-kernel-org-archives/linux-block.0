@@ -2,73 +2,73 @@ Return-Path: <SRS0=ocaT=2I=vger.kernel.org=linux-block-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-2.3 required=3.0 tests=DKIM_SIGNED,DKIM_VALID,
-	HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,
-	USER_AGENT_SANE_1 autolearn=no autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-8.3 required=3.0 tests=DKIM_SIGNED,DKIM_VALID,
+	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,
+	SPF_HELO_NONE,SPF_PASS,USER_AGENT_SANE_1 autolearn=ham autolearn_force=no
+	version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 0CBFDC43603
-	for <linux-block@archiver.kernel.org>; Wed, 18 Dec 2019 01:11:03 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 82A33C43603
+	for <linux-block@archiver.kernel.org>; Wed, 18 Dec 2019 01:14:58 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.kernel.org (Postfix) with ESMTP id D0D122176D
-	for <linux-block@archiver.kernel.org>; Wed, 18 Dec 2019 01:11:02 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id 4A50B2176D
+	for <linux-block@archiver.kernel.org>; Wed, 18 Dec 2019 01:14:58 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel-dk.20150623.gappssmtp.com header.i=@kernel-dk.20150623.gappssmtp.com header.b="QMzMOw/a"
+	dkim=pass (2048-bit key) header.d=kernel-dk.20150623.gappssmtp.com header.i=@kernel-dk.20150623.gappssmtp.com header.b="j9CJEujl"
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1726072AbfLRBLC (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Tue, 17 Dec 2019 20:11:02 -0500
-Received: from mail-io1-f67.google.com ([209.85.166.67]:41635 "EHLO
-        mail-io1-f67.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1725975AbfLRBLC (ORCPT
+        id S1726167AbfLRBO5 (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Tue, 17 Dec 2019 20:14:57 -0500
+Received: from mail-il1-f193.google.com ([209.85.166.193]:40964 "EHLO
+        mail-il1-f193.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S1726143AbfLRBO5 (ORCPT
         <rfc822;linux-block@vger.kernel.org>);
-        Tue, 17 Dec 2019 20:11:02 -0500
-Received: by mail-io1-f67.google.com with SMTP id c16so182000ioo.8
-        for <linux-block@vger.kernel.org>; Tue, 17 Dec 2019 17:11:01 -0800 (PST)
+        Tue, 17 Dec 2019 20:14:57 -0500
+Received: by mail-il1-f193.google.com with SMTP id f10so216070ils.8
+        for <linux-block@vger.kernel.org>; Tue, 17 Dec 2019 17:14:57 -0800 (PST)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=kernel-dk.20150623.gappssmtp.com; s=20150623;
         h=subject:to:cc:references:from:message-id:date:user-agent
          :mime-version:in-reply-to:content-language:content-transfer-encoding;
-        bh=hldTe2GfzDtz8+/s1U4tZFCHJzt9L6rMIb8ZdEeo92M=;
-        b=QMzMOw/a5W4qKEaZp38qSdUZIblniCJNgpp3AaVOVx1nmjoeWlcoGkj0RBnit3hTRq
-         2/YRGKQZqNkiIW/hlIR6Ij0CGQ+sMAetS5/yuoLincAvZyf6hGf5V3/RLKdkQLK+J4bb
-         nGpXFyxxxrOOReZDXhsECBsNfW2deeSzBC/HEFB/AhSPD3obC2lZ6I/At8hV6r4Q+auw
-         JF1vW3L4GHWs2XLailLa1kORTiR4HVYh2rJGuxGwZHsN4h8PU7TtMH31Kn0QpvhSUUXy
-         fOU4sWBLoZktFRpY72oSOd0vsDtvNnGAXBk3EBj0mkElXz12Sgtt2zlGYGMegNERUztd
-         iDhA==
+        bh=jHMze2R5sGSN2eUdrzOAy+Dv9T36Z4u2RHOSw0IjoPs=;
+        b=j9CJEujl7GBep7gWNlxkSWRlqg9cEAXc1Ps8yzqaNh3zrQxtEgeDCoHgRbqd858d9X
+         e+2/HyXai9ryx418L8y1grzEapgz9fvmcTx/Lof6SFswoAu2grLZQx07GN8qXC4sbvYy
+         4Ophz/6DnJfFBq57ykO9xQM/fb31nxLjjU/QxaH66P2dW9gUlkVJt/TtiggiRvnmuIv3
+         nykt1meNSZBJPXcESJw06JjZCk/4/2M/ZD7X0Xu8kXgagHA8uPHE9Q+O7OzvxlrBz9WM
+         6JhADVQxenhGebcVdoFg52vEhnqV2Scy4KLw4KR7kXWNDhgw38CSsCfZSobHJA/Jajxk
+         GXxA==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=1e100.net; s=20161025;
         h=x-gm-message-state:subject:to:cc:references:from:message-id:date
          :user-agent:mime-version:in-reply-to:content-language
          :content-transfer-encoding;
-        bh=hldTe2GfzDtz8+/s1U4tZFCHJzt9L6rMIb8ZdEeo92M=;
-        b=jVfKBbXYv5ldlNb3UasZEuKprt79wKrBmkxWRAwYuYc0MIm9gi/F9dJrqOkdJeyYa2
-         pqpcC0g9WihNzxjfIf3CEnILCVbzxWUpfDs87fNM39i/7j6kpS4xZBhuNqoiCF4E5JFB
-         gaywWMJ966MpiWj1+9nfvFtsP1u6J3p9LuHlrfx7PQqztdL4+wyyPE79Wcr4WehL09kq
-         4fN5iSFqg+qjwlF0fNAU/KugaJEI91HQl98aKr4Wb5ynk7wdvrxciTFJiDO80AQJyQi0
-         ErpUIDko298qvCCzqKWg9KXXsHHFY+qXOf5s0t4MzHGITwYBAfL2/QQbb90uIFJldYGL
-         3bWg==
-X-Gm-Message-State: APjAAAWEmw41/2iCbL/pMKOVpXzGto0Q1DviCkqcY612awx5ZlgT/1EC
-        ruy6jBMpMFk5nBodrbhCpIrGs62Dbvtpag==
-X-Google-Smtp-Source: APXvYqx+xFBbxCkQaUDa4Eh+He6nFv0cbdePBIOpVHpBqAMazzaXrBgRoUHX2aTvVYSeoTQA9bGuuw==
-X-Received: by 2002:a02:c988:: with SMTP id b8mr27880jap.122.1576631461364;
-        Tue, 17 Dec 2019 17:11:01 -0800 (PST)
+        bh=jHMze2R5sGSN2eUdrzOAy+Dv9T36Z4u2RHOSw0IjoPs=;
+        b=Ia5kznI3ohd3AaR92C6wCRVoLgzYV/KpLIJaK8RT0ENuBOALqSiABQqfD5tSD4rTXI
+         /lRLWZ+TeUHPL2QeMQ2LQ9AaWYMk/FvU8hZ5ZScnc5A1vympnQglDjzxUv9E6W0EU5eE
+         slRUXDuUG33xfCDJu09y4dooV+ofoACjnq54eWRDk3Tn/50YRrOy5ekON8L2nKuuKB9l
+         6TlExtnVnBaJ4yLXcA82SkwN9JMe7GMqY/F3medKbqtLWr+cckItVTzgZEhmLMcTAXRJ
+         WjBrZNxhYRShatHvkuXXS8Y6fXnCq0g3wszaB1qTStYzEofb+ZO+a4wXXoueenLc0nfl
+         DUoQ==
+X-Gm-Message-State: APjAAAUQb1qV25AM+gSu7F3CIu0yvyNSAm2m7axt1cd4VH83tPHPAzJs
+        z0c82W8BmHP0v8FiilnlOCoBwmawiCNTWQ==
+X-Google-Smtp-Source: APXvYqxgHwvHkt/Pxljix1ugco+k46cBNYiRMc6k+hX67AkZWCAS0Op1TQHIUsKKP/yrG+w8bp7Euw==
+X-Received: by 2002:a92:3f0f:: with SMTP id m15mr335669ila.164.1576631696830;
+        Tue, 17 Dec 2019 17:14:56 -0800 (PST)
 Received: from [192.168.1.159] ([65.144.74.34])
-        by smtp.gmail.com with ESMTPSA id r7sm113362ioo.7.2019.12.17.17.11.00
+        by smtp.gmail.com with ESMTPSA id t17sm147701ilb.29.2019.12.17.17.14.56
         (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
-        Tue, 17 Dec 2019 17:11:00 -0800 (PST)
-Subject: Re: [PATCH] block: Fix a lockdep complaint triggered by request queue
- flushing
-To:     Bart Van Assche <bvanassche@acm.org>
-Cc:     linux-block@vger.kernel.org, Christoph Hellwig <hch@lst.de>,
-        Christoph Hellwig <hch@infradead.org>,
-        Ming Lei <ming.lei@redhat.com>, Hannes Reinecke <hare@suse.com>
-References: <20191218002435.48863-1-bvanassche@acm.org>
+        Tue, 17 Dec 2019 17:14:56 -0800 (PST)
+Subject: Re: [PATCH] sbitmap: only queue kyber's wait callback if not already
+ active
+To:     David Jeffery <djeffery@redhat.com>, linux-block@vger.kernel.org
+Cc:     John Pittman <jpittman@redhat.com>,
+        Omar Sandoval <osandov@osandov.com>
+References: <20191217160024.GA23066@redhat>
 From:   Jens Axboe <axboe@kernel.dk>
-Message-ID: <a4483a73-54c6-896d-dfb2-77118bb858cc@kernel.dk>
-Date:   Tue, 17 Dec 2019 18:10:59 -0700
+Message-ID: <647af756-3a8a-d895-cbf8-ed3583732817@kernel.dk>
+Date:   Tue, 17 Dec 2019 18:14:55 -0700
 User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:68.0) Gecko/20100101
  Thunderbird/68.2.2
 MIME-Version: 1.0
-In-Reply-To: <20191218002435.48863-1-bvanassche@acm.org>
+In-Reply-To: <20191217160024.GA23066@redhat>
 Content-Type: text/plain; charset=utf-8
 Content-Language: en-US
 Content-Transfer-Encoding: 7bit
@@ -77,59 +77,58 @@ Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-On 12/17/19 5:24 PM, Bart Van Assche wrote:
-> Avoid that running test nvme/012 from the blktests suite triggers the
-> following false positive lockdep complaint:
+On 12/17/19 9:00 AM, David Jeffery wrote:
+> Under heavy loads where the kyber I/O scheduler hits the token limits for
+> its scheduling domains, kyber can become stuck.  When active requests
+> complete, kyber may not be woken up leaving the I/O requests in kyber
+> stuck.
 > 
-> ============================================
-> WARNING: possible recursive locking detected
-> 5.0.0-rc3-xfstests-00015-g1236f7d60242 #841 Not tainted
-> --------------------------------------------
-> ksoftirqd/1/16 is trying to acquire lock:
-> 000000000282032e (&(&fq->mq_flush_lock)->rlock){..-.}, at: flush_end_io+0x4e/0x1d0
+> This stuck state is due to a race condition with kyber and the sbitmap
+> functions it uses to run a callback when enough requests have completed.
+> The running of a sbt_wait callback can race with the attempt to insert the
+> sbt_wait.  Since sbitmap_del_wait_queue removes the sbt_wait from the list
+> first then sets the sbq field to NULL, kyber can see the item as not on a
+> list but the call to sbitmap_add_wait_queue will see sbq as non-NULL. This
+> results in the sbt_wait being inserted onto the wait list but ws_active
+> doesn't get incremented.  So the sbitmap queue does not know there is a
+> waiter on a wait list.
 > 
-> but task is already holding lock:
-> 00000000cbadcbc2 (&(&fq->mq_flush_lock)->rlock){..-.}, at: flush_end_io+0x4e/0x1d0
+> Since sbitmap doesn't think there is a waiter, kyber may never be
+> informed that there are domain tokens available and the I/O never advances.
+> With the sbt_wait on a wait list, kyber believes it has an active waiter
+> so cannot insert a new waiter when reaching the domain's full state.
 > 
-> other info that might help us debug this:
->  Possible unsafe locking scenario:
+> This race can be fixed by only adding the sbt_wait to the queue if the
+> sbq field is NULL.  If sbq is not NULL, there is already an action active
+> which will trigger the re-running of kyber.  Let it run and add the
+> sbt_wait to the wait list if still needing to wait.
 > 
->        CPU0
->        ----
->   lock(&(&fq->mq_flush_lock)->rlock);
->   lock(&(&fq->mq_flush_lock)->rlock);
+> Signed-off-by: David Jeffery <djeffery@redhat.com>
+> Reported-by: John Pittman <jpittman@redhat.com>
+> Tested-by: John Pittman <jpittman@redhat.com>
+> ---
 > 
->  *** DEADLOCK ***
+> This bug was reliably being triggered on several test systems.  With the
+> fix, the tests no longer fail.
 > 
->  May be due to missing lock nesting notation
+>  sbitmap.c |    2 +-
+>  1 file changed, 1 insertion(+), 1 deletion(-)
 > 
-> 1 lock held by ksoftirqd/1/16:
->  #0: 00000000cbadcbc2 (&(&fq->mq_flush_lock)->rlock){..-.}, at: flush_end_io+0x4e/0x1d0
-> 
-> stack backtrace:
-> CPU: 1 PID: 16 Comm: ksoftirqd/1 Not tainted 5.0.0-rc3-xfstests-00015-g1236f7d60242 #841
-> Hardware name: Google Google Compute Engine/Google Compute Engine, BIOS Google 01/01/2011
-> Call Trace:
->  dump_stack+0x67/0x90
->  __lock_acquire.cold.45+0x2b4/0x313
->  lock_acquire+0x98/0x160
->  _raw_spin_lock_irqsave+0x3b/0x80
->  flush_end_io+0x4e/0x1d0
->  blk_mq_complete_request+0x76/0x110
->  nvmet_req_complete+0x15/0x110 [nvmet]
->  nvmet_bio_done+0x27/0x50 [nvmet]
->  blk_update_request+0xd7/0x2d0
->  blk_mq_end_request+0x1a/0x100
->  blk_flush_complete_seq+0xe5/0x350
->  flush_end_io+0x12f/0x1d0
->  blk_done_softirq+0x9f/0xd0
->  __do_softirq+0xca/0x440
->  run_ksoftirqd+0x24/0x50
->  smpboot_thread_fn+0x113/0x1e0
->  kthread+0x121/0x140
->  ret_from_fork+0x3a/0x50
+> diff --git a/lib/sbitmap.c b/lib/sbitmap.c
+> index 33feec8989f1..af88d1346dd7 100644
+> --- a/lib/sbitmap.c
+> +++ b/lib/sbitmap.c
+> @@ -650,8 +650,8 @@ void sbitmap_add_wait_queue(struct sbitmap_queue *sbq,
+>  	if (!sbq_wait->sbq) {
+>  		sbq_wait->sbq = sbq;
+>  		atomic_inc(&sbq->ws_active);
+> +		add_wait_queue(&ws->wait, &sbq_wait->wait);
+>  	}
+> -	add_wait_queue(&ws->wait, &sbq_wait->wait);
+>  }
+>  EXPORT_SYMBOL_GPL(sbitmap_add_wait_queue);
 
-Applied, thanks.
+This looks good to me, waiting for Omar to take a look (CC'ed).
 
 -- 
 Jens Axboe
