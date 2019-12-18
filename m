@@ -2,169 +2,87 @@ Return-Path: <SRS0=ocaT=2I=vger.kernel.org=linux-block-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-2.4 required=3.0 tests=DKIMWL_WL_HIGH,DKIM_SIGNED,
-	DKIM_VALID,DKIM_VALID_AU,HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,
-	SPF_HELO_NONE,SPF_PASS,UNPARSEABLE_RELAY,USER_AGENT_SANE_1 autolearn=no
-	autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-2.3 required=3.0 tests=DKIM_SIGNED,DKIM_VALID,
+	HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,
+	USER_AGENT_SANE_1 autolearn=no autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 58739C2D0CD
-	for <linux-block@archiver.kernel.org>; Wed, 18 Dec 2019 01:25:35 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 7B61EC43603
+	for <linux-block@archiver.kernel.org>; Wed, 18 Dec 2019 01:28:07 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.kernel.org (Postfix) with ESMTP id 2A2A621582
-	for <linux-block@archiver.kernel.org>; Wed, 18 Dec 2019 01:25:35 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id 4AA5021582
+	for <linux-block@archiver.kernel.org>; Wed, 18 Dec 2019 01:28:07 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=pass (2048-bit key) header.d=oracle.com header.i=@oracle.com header.b="OGVchsZM"
+	dkim=pass (2048-bit key) header.d=kernel-dk.20150623.gappssmtp.com header.i=@kernel-dk.20150623.gappssmtp.com header.b="LN64OzUR"
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1726383AbfLRBZe (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Tue, 17 Dec 2019 20:25:34 -0500
-Received: from aserp2120.oracle.com ([141.146.126.78]:51754 "EHLO
-        aserp2120.oracle.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1726167AbfLRBZd (ORCPT
+        id S1726520AbfLRB2G (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Tue, 17 Dec 2019 20:28:06 -0500
+Received: from mail-il1-f194.google.com ([209.85.166.194]:42799 "EHLO
+        mail-il1-f194.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S1726383AbfLRB2G (ORCPT
         <rfc822;linux-block@vger.kernel.org>);
-        Tue, 17 Dec 2019 20:25:33 -0500
-Received: from pps.filterd (aserp2120.oracle.com [127.0.0.1])
-        by aserp2120.oracle.com (8.16.0.27/8.16.0.27) with SMTP id xBI1JhJl017398;
-        Wed, 18 Dec 2019 01:25:20 GMT
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=oracle.com; h=date : from : to : cc
- : subject : message-id : references : mime-version : content-type :
- in-reply-to; s=corp-2019-08-05;
- bh=CPrPTKGRWbte5d18j8OyziiV63P7dvuHEgE/Q71iwPA=;
- b=OGVchsZMv9g7X7LtF9Ayc6TQeIzSwqUHV2M1v9QCjLQktykMPgCbuEff9XcFGhlcZpCX
- MCy43T5fy/GKyMhvLbGS/1Fr3kmuh6XYWC+7liKOtWIisa/Dy/d5MUdefDhjx7Ikz3eW
- YpqZaMm1TeG4DdXAnnwm1PDcLxxumA/3h3jjY+hJ+bgdItMf11SQ92Uz+llhN8z3WrU3
- 1GvgkITmE1RLWWp3HvW17qfLExEItakRW+8zb0Rqb5lRULcloz7YEVjNihm0n6N2eiPH
- AKF7a/m7vfZC7TSIPeGPISq6ReJbWlVS5nXXe1hC+7RMUr7e7HS3039exUEy9jizGNQo HQ== 
-Received: from aserp3020.oracle.com (aserp3020.oracle.com [141.146.126.70])
-        by aserp2120.oracle.com with ESMTP id 2wvqpqacgw-1
-        (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=OK);
-        Wed, 18 Dec 2019 01:25:20 +0000
-Received: from pps.filterd (aserp3020.oracle.com [127.0.0.1])
-        by aserp3020.oracle.com (8.16.0.27/8.16.0.27) with SMTP id xBI1MtxK037321;
-        Wed, 18 Dec 2019 01:25:20 GMT
-Received: from aserv0122.oracle.com (aserv0122.oracle.com [141.146.126.236])
-        by aserp3020.oracle.com with ESMTP id 2wxm74v2j2-1
-        (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=OK);
-        Wed, 18 Dec 2019 01:25:20 +0000
-Received: from abhmp0014.oracle.com (abhmp0014.oracle.com [141.146.116.20])
-        by aserv0122.oracle.com (8.14.4/8.14.4) with ESMTP id xBI1PIQ4003591;
-        Wed, 18 Dec 2019 01:25:19 GMT
-Received: from localhost (/10.159.137.228)
-        by default (Oracle Beehive Gateway v4.0)
-        with ESMTP ; Tue, 17 Dec 2019 17:25:17 -0800
-Date:   Tue, 17 Dec 2019 17:25:16 -0800
-From:   "Darrick J. Wong" <darrick.wong@oracle.com>
-To:     Jens Axboe <axboe@kernel.dk>
-Cc:     Linus Torvalds <torvalds@linux-foundation.org>,
-        Linux-MM <linux-mm@kvack.org>,
-        linux-fsdevel <linux-fsdevel@vger.kernel.org>,
-        linux-block <linux-block@vger.kernel.org>,
-        Matthew Wilcox <willy@infradead.org>, Chris Mason <clm@fb.com>,
-        Dave Chinner <david@fromorbit.com>,
-        Christoph Hellwig <hch@infradead.org>
-Subject: Re: [PATCH 4/6] iomap: add struct iomap_ctx
-Message-ID: <20191218012516.GA12752@magnolia>
-References: <20191217143948.26380-1-axboe@kernel.dk>
- <20191217143948.26380-5-axboe@kernel.dk>
- <CAHk-=wgcPAfOSigMf0xwaGfVjw413XN3UPATwYWHrss+QuivhQ@mail.gmail.com>
- <CAHk-=wgvROUnrEVADVR_zTHY8NmYo-_jVjV37O1MdDm2de+Lmw@mail.gmail.com>
- <9941995e-19c5-507b-9339-b8d2cb568932@kernel.dk>
+        Tue, 17 Dec 2019 20:28:06 -0500
+Received: by mail-il1-f194.google.com with SMTP id a6so235021ili.9
+        for <linux-block@vger.kernel.org>; Tue, 17 Dec 2019 17:28:05 -0800 (PST)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=kernel-dk.20150623.gappssmtp.com; s=20150623;
+        h=subject:to:cc:references:from:message-id:date:user-agent
+         :mime-version:in-reply-to:content-language:content-transfer-encoding;
+        bh=rsdijfwxXIxEdfTf0BJ4NmtNQn2EATypQJ6GWjnlpeA=;
+        b=LN64OzUR0PK6WuZ1fEl4fu8/YArhpB0cNXjvLjDyVu4uSbb1wZHaJI8pdSOrfCaAqt
+         Je1XxbdQjFviM1dg0yITmdQcncyA9VHiL2PYu9cSm9o5LO1ByfFpaXGx26MECSkeYjef
+         C9KJXeSU78bQwI4zGaNwJ6Tq0wCp7Zncnv7esvgYC48tD/qA1k0GF/RiDC94FV+uRlUp
+         Mvzyzq6WWkigWT3qBTJFetlWPdXCO2NR4xmIB8dkyRcmivmTtTl6jo39EWNBxI67bFU8
+         7mIKH/oIIoCo2Y6j7HdvZ6DH5GkQbIaei8i8njuBAwsfZ7fmNqBKpLgDU55yjpsQ6n87
+         f1MA==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20161025;
+        h=x-gm-message-state:subject:to:cc:references:from:message-id:date
+         :user-agent:mime-version:in-reply-to:content-language
+         :content-transfer-encoding;
+        bh=rsdijfwxXIxEdfTf0BJ4NmtNQn2EATypQJ6GWjnlpeA=;
+        b=dNYA7EjpUkz0nMnv94oioUxuxbF80MfGREibm+GbCjGpOh1rwZpiHfSBAkxEEEYOwf
+         YR/QdNAscZEkCVfDR5GRqA9+bRBSM1VCgLa4KzfDlgYaexgjt9WP0w7Ln4gKzV7Gojdt
+         SKEyMYEls7AkvWoUoaHMxk0sY8SJeGivxo9CrcbK9d6A7ryX0Z2SBfS2JvgkL9yVDcyJ
+         3RUEjtwyq2WO0QuOJUsn9/gZxyxSFdXB9ip7wDKWUkkKwjG1yHXAuxth4tuMMqgEKhbF
+         wi0jhGPB3SzpYcKZI9/McjZVYdRAYJmyCWioI2MJZdPrAZPwjsrL7vFd4cWKX/Tt0+V4
+         sYDA==
+X-Gm-Message-State: APjAAAVx2phCX47sFe4wW5nmeS/XSCIdzTIpYpZos/JJ5SbaktVkPHVO
+        UL5d2UHEnFuy23HxVeq32VgmiQ==
+X-Google-Smtp-Source: APXvYqxMoNlpt/TC/axYgAFYjxnhzrkeZChcmx0aIRqCHbKGd9YPVayHYz3Z+3XrRumsEypM7n7L1Q==
+X-Received: by 2002:a92:45d2:: with SMTP id z79mr386262ilj.76.1576632485203;
+        Tue, 17 Dec 2019 17:28:05 -0800 (PST)
+Received: from [192.168.1.159] ([65.144.74.34])
+        by smtp.gmail.com with ESMTPSA id e5sm146581ilq.77.2019.12.17.17.28.04
+        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
+        Tue, 17 Dec 2019 17:28:04 -0800 (PST)
+Subject: Re: [PATCH] block: make the io_ticks counter more accurate
+To:     Wen Yang <wenyang@linux.alibaba.com>
+Cc:     Joseph Qi <joseph.qi@linux.alibaba.com>, xlpang@linux.alibaba.com,
+        Mikulas Patocka <mpatocka@redhat.com>,
+        Mike Snitzer <snitzer@redhat.com>, linux-block@vger.kernel.org,
+        linux-kernel@vger.kernel.org
+References: <20191217142828.79295-1-wenyang@linux.alibaba.com>
+From:   Jens Axboe <axboe@kernel.dk>
+Message-ID: <658ba1d9-45b3-db85-250d-7a1a9328e9ff@kernel.dk>
+Date:   Tue, 17 Dec 2019 18:28:03 -0700
+User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:68.0) Gecko/20100101
+ Thunderbird/68.2.2
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <9941995e-19c5-507b-9339-b8d2cb568932@kernel.dk>
-User-Agent: Mutt/1.9.4 (2018-02-28)
-X-Proofpoint-Virus-Version: vendor=nai engine=6000 definitions=9474 signatures=668685
-X-Proofpoint-Spam-Details: rule=notspam policy=default score=0 suspectscore=0 malwarescore=0
- phishscore=0 bulkscore=0 spamscore=0 mlxscore=0 mlxlogscore=999
- adultscore=0 classifier=spam adjust=0 reason=mlx scancount=1
- engine=8.0.1-1911140001 definitions=main-1912180009
-X-Proofpoint-Virus-Version: vendor=nai engine=6000 definitions=9474 signatures=668685
-X-Proofpoint-Spam-Details: rule=notspam policy=default score=0 priorityscore=1501 malwarescore=0
- suspectscore=0 phishscore=0 bulkscore=0 spamscore=0 clxscore=1015
- lowpriorityscore=0 mlxscore=0 impostorscore=0 mlxlogscore=999 adultscore=0
- classifier=spam adjust=0 reason=mlx scancount=1 engine=8.0.1-1911140001
- definitions=main-1912180009
+In-Reply-To: <20191217142828.79295-1-wenyang@linux.alibaba.com>
+Content-Type: text/plain; charset=utf-8
+Content-Language: en-US
+Content-Transfer-Encoding: 7bit
 Sender: linux-block-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-On Tue, Dec 17, 2019 at 05:15:46PM -0700, Jens Axboe wrote:
-> On 12/17/19 1:26 PM, Linus Torvalds wrote:
-> > On Tue, Dec 17, 2019 at 11:39 AM Linus Torvalds
-> > <torvalds@linux-foundation.org> wrote:
-> >>
-> >> 'loff_t length' is not right.
-> > 
-> > Looking around, it does seem to get used that way. Too much, though.
-> > 
-> >>> +       loff_t pos = data->pos;
-> >>> +       loff_t length = pos + data->len;
-> >>
-> >> And WTH is that? "pos + data->len" is not "length", that's end. And this:
-> >>
-> >>>         loff_t end = pos + length, done = 0;
-> >>
-> >> What? Now 'end' is 'pos+length', which is 'pos+pos+data->len'.
-> > 
-> > But this is unrelated to the crazy types. That just can't bve right.
-> 
-> Yeah, I fixed that one up, that was my error.
-> 
-> >> Is there some reason for this horrible case of "let's allow 64-bit sizes?"
-> >>
-> >> Because even if there is, it shouldn't be "loff_t". That's an
-> >> _offset_. Not a length.
-> > 
-> > We do seem to have a lot of these across filesystems. And a lot of
-> > confusion. Most of the IO reoutines clearly take or return a size_t
-> > (returning ssize_t) as the IO size. And then you have the
-> > zeroing/truncation stuff that tends to take loff_t. Which still smells
-> > wrong, and s64 would look like a better case, but whatever.
-> > 
-> > The "iomap_zero_range() for truncate" case really does seem to need a
-> > 64-bit value, because people do the difference of two loff_t's for it.
-> > In fact, it almost looks like that function should take a "start ,
-> > end" pair, which would make loff_t be the _right_ thing.
+On 12/17/19 7:28 AM, Wen Yang wrote:
+> Instead of the jiffies, we should update the io_ticks counter
+> with the passed in parameter 'now'.
 
-Yeah.  "loff_t length" always struck me as a little odd, but until now I
-hadn't heard enough complaining about it to put any effort into fixing
-the iomap_apply code that (afaict) mostly worked ok.  But it shouldn't
-be a difficult change.
+But they are not the same clock source...
 
-> > Because "length" really is just (a positive) size_t normally.
+-- 
+Jens Axboe
 
-However, I don't think it's a good idea to reduce the @length argument
-to size_t (and the iomap_apply return value to ssize_t) because they're
-32-bit values and doing that will force iomap to clamp lengths and
-return values to S32_MAX.  Instituting a ~2G max on read and write calls
-is fine because those operate directly on file data (== slow), but the
-vfs already clamps the length before the iov gets to iomap.
-
-For the other iomap users that care more about the mappings and less
-about the data in those mappings (seek hole, seek data, fiemap, swap) it
-doesn't make much sense.  If the filesystem can send back a 100GB extent
-map (e.g. holes in a sparse file, or we just have superstar allocation
-strategies), the fs should send that straight to the iomap actor
-function without having to cut that into 50x loop iterations.  Looking
-ahead to things like file mapping leases, a (formerly wealthy) client
-should be able to request a mmap lease on 100GB worth of pmem and get
-the whole lease if the fs can allocate 100G at once.
-
-I like the idea of making the length parameter and the return value
-int64_t instead of loff_t.  Is int64_t the preferred typedef or s64?  I
-forget.
-
-> Honestly, I'd much rather leave the loff_t -> size_t/ssize_t to
-> Darrick/Dave, it's really outside the scope of this patch, and I'd
-> prefer not to have to muck with it. They probably feel the same way!
-
-Don't forget Christoph.  Heh, we /did/ forget Christoph. :(
-Maybe they have better historical context since they invented this iomap
-mechanism for pnfs or something long before I came along.
-
---D
-
-> -- 
-> Jens Axboe
-> 
