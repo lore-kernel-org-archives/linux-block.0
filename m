@@ -2,128 +2,87 @@ Return-Path: <SRS0=ocaT=2I=vger.kernel.org=linux-block-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-2.3 required=3.0 tests=DKIM_SIGNED,DKIM_VALID,
-	HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,
-	USER_AGENT_SANE_1 autolearn=no autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-9.8 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
+	INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,
+	USER_AGENT_GIT autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id AC22DC43603
-	for <linux-block@archiver.kernel.org>; Wed, 18 Dec 2019 00:15:50 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 8F3A6C43603
+	for <linux-block@archiver.kernel.org>; Wed, 18 Dec 2019 00:23:37 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.kernel.org (Postfix) with ESMTP id 7E3F92176D
-	for <linux-block@archiver.kernel.org>; Wed, 18 Dec 2019 00:15:50 +0000 (UTC)
-Authentication-Results: mail.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel-dk.20150623.gappssmtp.com header.i=@kernel-dk.20150623.gappssmtp.com header.b="w1cqjlIY"
+	by mail.kernel.org (Postfix) with ESMTP id 6BD1D2176D
+	for <linux-block@archiver.kernel.org>; Wed, 18 Dec 2019 00:23:37 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1725940AbfLRAPu (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Tue, 17 Dec 2019 19:15:50 -0500
-Received: from mail-pg1-f194.google.com ([209.85.215.194]:38141 "EHLO
-        mail-pg1-f194.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1725975AbfLRAPt (ORCPT
+        id S1726167AbfLRAXg (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Tue, 17 Dec 2019 19:23:36 -0500
+Received: from mail-pg1-f196.google.com ([209.85.215.196]:39793 "EHLO
+        mail-pg1-f196.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S1725940AbfLRAXg (ORCPT
         <rfc822;linux-block@vger.kernel.org>);
-        Tue, 17 Dec 2019 19:15:49 -0500
-Received: by mail-pg1-f194.google.com with SMTP id a33so219245pgm.5
-        for <linux-block@vger.kernel.org>; Tue, 17 Dec 2019 16:15:49 -0800 (PST)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=kernel-dk.20150623.gappssmtp.com; s=20150623;
-        h=subject:to:cc:references:from:message-id:date:user-agent
-         :mime-version:in-reply-to:content-language:content-transfer-encoding;
-        bh=YQMmzMY37i2Mof3lbYfpF5chISi7sMrvZ/ycgoxfAyA=;
-        b=w1cqjlIYrAIkEphkj7SjLigIfIMzBn0DtSSscagQOjaBWS1xVHc9HO7ue1501V9FuR
-         YAPsJDbP/asVmSC7PQlSEbkOqHc1WzR1NP0129mG6G7x0gNohKSh+76V7lIuFMObyPED
-         kX32//b8ctPM3sgFXfm6SqxiXLt4eHljSLIoDruli2RsZXHQb3Hru+To3T8wt/OVW9AH
-         bIxjtLX/riBfARkhw23oslkfo1EJwHIYkL6X/8rwC+IGGpSZFtqlw5t5cyrvcvoyNAJr
-         uGxkFiYtrGCxH5f/QylLn/0O3f7JM0VkzNVKEBxeGUGQSFsI3xXayhR6xzo3KZSR99zA
-         Cf8g==
+        Tue, 17 Dec 2019 19:23:36 -0500
+Received: by mail-pg1-f196.google.com with SMTP id b137so225634pga.6
+        for <linux-block@vger.kernel.org>; Tue, 17 Dec 2019 16:23:36 -0800 (PST)
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=1e100.net; s=20161025;
-        h=x-gm-message-state:subject:to:cc:references:from:message-id:date
-         :user-agent:mime-version:in-reply-to:content-language
+        h=x-gm-message-state:from:to:cc:subject:date:message-id:mime-version
          :content-transfer-encoding;
-        bh=YQMmzMY37i2Mof3lbYfpF5chISi7sMrvZ/ycgoxfAyA=;
-        b=bbiGd5T6WpgWptgEOfzCFU1RE/1lWOI1dapIxJ5TonfyoO/UDYX1mXecdHiqdHARKW
-         vbFdp66xVvPlShnh6YRXiL+lE8F/NgZjNi2/ykrOn9YdL5K2St4e55EKRe3CzlFcGhrJ
-         uWOt4/FyEApJfDjjbkZgU994OE4UwI7WmWdtFNJtLStWpZEYE4rLhtcU0gmJHKogMDh9
-         +hEcHl542tTtdCmBRouek4hT3woMe78y4MbH+CBhD6xL2pY/5lypJrIRNYkUxLa8F1YS
-         Fx9eOJGfsEPkbfaO0YpxfGzscdXjVoEtKOGVpaqI3X/OExN9gcFEp1Cqpr+mbI3BxUAR
-         zebA==
-X-Gm-Message-State: APjAAAXKPVTjpJxeBBHk/lvpyhRNX6pvf8o6klO6aBMDuq7xf220sUR5
-        vE8OUk0+rJc4Ybg1mFauvbnbSg==
-X-Google-Smtp-Source: APXvYqyg4gmsFwb+g+QqPm6sNT4veLef7n1AMHYvnq9f2ULLZNauq5tLOQMsMKSXl1ieZQsQbjMe9w==
-X-Received: by 2002:a65:6216:: with SMTP id d22mr80575pgv.437.1576628148980;
-        Tue, 17 Dec 2019 16:15:48 -0800 (PST)
-Received: from ?IPv6:2620:10d:c081:1131::13f4? ([2620:10d:c090:180::6446])
-        by smtp.gmail.com with ESMTPSA id l186sm161084pge.31.2019.12.17.16.15.47
-        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
-        Tue, 17 Dec 2019 16:15:48 -0800 (PST)
-Subject: Re: [PATCH 4/6] iomap: add struct iomap_ctx
-To:     Linus Torvalds <torvalds@linux-foundation.org>
-Cc:     Linux-MM <linux-mm@kvack.org>,
-        linux-fsdevel <linux-fsdevel@vger.kernel.org>,
-        linux-block <linux-block@vger.kernel.org>,
-        Matthew Wilcox <willy@infradead.org>, Chris Mason <clm@fb.com>,
-        Dave Chinner <david@fromorbit.com>
-References: <20191217143948.26380-1-axboe@kernel.dk>
- <20191217143948.26380-5-axboe@kernel.dk>
- <CAHk-=wgcPAfOSigMf0xwaGfVjw413XN3UPATwYWHrss+QuivhQ@mail.gmail.com>
- <CAHk-=wgvROUnrEVADVR_zTHY8NmYo-_jVjV37O1MdDm2de+Lmw@mail.gmail.com>
-From:   Jens Axboe <axboe@kernel.dk>
-Message-ID: <9941995e-19c5-507b-9339-b8d2cb568932@kernel.dk>
-Date:   Tue, 17 Dec 2019 17:15:46 -0700
-User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:68.0) Gecko/20100101
- Thunderbird/68.2.2
+        bh=N9W9yUgcvKXs4XHF/mDXHZmrLG54A/evsL0mHnPR1C0=;
+        b=mlTTy1jSwat8ctyDdTjpdvkAXOBeSvczfN9dex17Y3tGR4BA1qzsCx/1aL6CdPQgbi
+         oFwX+qeT9OThY+/LF8vm8a0x4jUMEsaMMNOXGnDjaDrXstWdvYEpXp9XUG1CTdTi9GVU
+         mbQ13DGnKs/7ic6f+nexsiAE8tF8sKnccgKCtmNHfnLxP+CY4XdJTdrmc14MnjMRMwrO
+         9U5O6IhKOGINWHzBFrPyzQ01PbrwLmIc1pEXEowuR89SRNGXajR/qDKY2wnle8SHbTjE
+         UbfvMcCozcyExM1lgoBwzIX5VXiDXKZNDBR8UfopmPh3T/SW4mnPBVZVP1boGaUYdSDY
+         MXcg==
+X-Gm-Message-State: APjAAAW8Y3fd82317RA0z89JdnyPKErdrmZAMZ7+XPaIgAmeC9VnE/6b
+        DSivA/Xs1/AiuQ0Y9l5MnUqXl9cT
+X-Google-Smtp-Source: APXvYqwA/yupulEfnBfB3pMusNExMBAXLCgZ0WR+4SnviYoRmo/j+URwtePCThkmx3kDO017rnVscg==
+X-Received: by 2002:a63:483:: with SMTP id 125mr136324pge.217.1576628615796;
+        Tue, 17 Dec 2019 16:23:35 -0800 (PST)
+Received: from desktop-bart.svl.corp.google.com ([2620:15c:2cd:202:4308:52a3:24b6:2c60])
+        by smtp.gmail.com with ESMTPSA id r62sm218177pfc.89.2019.12.17.16.23.34
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Tue, 17 Dec 2019 16:23:35 -0800 (PST)
+From:   Bart Van Assche <bvanassche@acm.org>
+To:     Jens Axboe <axboe@kernel.dk>
+Cc:     linux-block@vger.kernel.org, Christoph Hellwig <hch@lst.de>,
+        Bart Van Assche <bvanassche@acm.org>,
+        Martin Wilck <mwilck@suse.com>
+Subject: [PATCH] block: Fix the type of 'sts' in bsg_queue_rq()
+Date:   Tue, 17 Dec 2019 16:23:29 -0800
+Message-Id: <20191218002329.48593-1-bvanassche@acm.org>
+X-Mailer: git-send-email 2.24.1.735.g03f4e72817-goog
 MIME-Version: 1.0
-In-Reply-To: <CAHk-=wgvROUnrEVADVR_zTHY8NmYo-_jVjV37O1MdDm2de+Lmw@mail.gmail.com>
-Content-Type: text/plain; charset=utf-8
-Content-Language: en-US
-Content-Transfer-Encoding: 7bit
+Content-Transfer-Encoding: 8bit
 Sender: linux-block-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-On 12/17/19 1:26 PM, Linus Torvalds wrote:
-> On Tue, Dec 17, 2019 at 11:39 AM Linus Torvalds
-> <torvalds@linux-foundation.org> wrote:
->>
->> 'loff_t length' is not right.
-> 
-> Looking around, it does seem to get used that way. Too much, though.
-> 
->>> +       loff_t pos = data->pos;
->>> +       loff_t length = pos + data->len;
->>
->> And WTH is that? "pos + data->len" is not "length", that's end. And this:
->>
->>>         loff_t end = pos + length, done = 0;
->>
->> What? Now 'end' is 'pos+length', which is 'pos+pos+data->len'.
-> 
-> But this is unrelated to the crazy types. That just can't bve right.
+This patch fixes the following sparse warnings:
 
-Yeah, I fixed that one up, that was my error.
+block/bsg-lib.c:269:19: warning: incorrect type in initializer (different base types)
+block/bsg-lib.c:269:19:    expected int sts
+block/bsg-lib.c:269:19:    got restricted blk_status_t [usertype]
+block/bsg-lib.c:286:16: warning: incorrect type in return expression (different base types)
+block/bsg-lib.c:286:16:    expected restricted blk_status_t
+block/bsg-lib.c:286:16:    got int [assigned] sts
 
->> Is there some reason for this horrible case of "let's allow 64-bit sizes?"
->>
->> Because even if there is, it shouldn't be "loff_t". That's an
->> _offset_. Not a length.
-> 
-> We do seem to have a lot of these across filesystems. And a lot of
-> confusion. Most of the IO reoutines clearly take or return a size_t
-> (returning ssize_t) as the IO size. And then you have the
-> zeroing/truncation stuff that tends to take loff_t. Which still smells
-> wrong, and s64 would look like a better case, but whatever.
-> 
-> The "iomap_zero_range() for truncate" case really does seem to need a
-> 64-bit value, because people do the difference of two loff_t's for it.
-> In fact, it almost looks like that function should take a "start ,
-> end" pair, which would make loff_t be the _right_ thing.
-> 
-> Because "length" really is just (a positive) size_t normally.
+Cc: Martin Wilck <mwilck@suse.com>
+Fixes: d46fe2cb2dce ("block: drop device references in bsg_queue_rq()")
+Signed-off-by: Bart Van Assche <bvanassche@acm.org>
+---
+ block/bsg-lib.c | 2 +-
+ 1 file changed, 1 insertion(+), 1 deletion(-)
 
-Honestly, I'd much rather leave the loff_t -> size_t/ssize_t to
-Darrick/Dave, it's really outside the scope of this patch, and I'd
-prefer not to have to muck with it. They probably feel the same way!
-
--- 
-Jens Axboe
-
+diff --git a/block/bsg-lib.c b/block/bsg-lib.c
+index 347dda16c2f4..6cbb7926534c 100644
+--- a/block/bsg-lib.c
++++ b/block/bsg-lib.c
+@@ -266,7 +266,7 @@ static blk_status_t bsg_queue_rq(struct blk_mq_hw_ctx *hctx,
+ 	struct request *req = bd->rq;
+ 	struct bsg_set *bset =
+ 		container_of(q->tag_set, struct bsg_set, tag_set);
+-	int sts = BLK_STS_IOERR;
++	blk_status_t sts = BLK_STS_IOERR;
+ 	int ret;
+ 
+ 	blk_mq_start_request(req);
