@@ -2,92 +2,93 @@ Return-Path: <SRS0=ocaT=2I=vger.kernel.org=linux-block-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-9.8 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
-	INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,
-	USER_AGENT_GIT autolearn=ham autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-5.0 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
+	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,SPF_HELO_NONE,
+	SPF_PASS,USER_AGENT_SANE_1 autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 67797C43603
-	for <linux-block@archiver.kernel.org>; Wed, 18 Dec 2019 08:17:09 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 02668C43603
+	for <linux-block@archiver.kernel.org>; Wed, 18 Dec 2019 09:51:38 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.kernel.org (Postfix) with ESMTP id 318D224691
-	for <linux-block@archiver.kernel.org>; Wed, 18 Dec 2019 08:17:09 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id C851120717
+	for <linux-block@archiver.kernel.org>; Wed, 18 Dec 2019 09:51:37 +0000 (UTC)
+Authentication-Results: mail.kernel.org;
+	dkim=fail reason="signature verification failed" (2048-bit key) header.d=infradead.org header.i=@infradead.org header.b="TucDaIm+"
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1725799AbfLRIRI (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Wed, 18 Dec 2019 03:17:08 -0500
-Received: from szxga05-in.huawei.com ([45.249.212.191]:7711 "EHLO huawei.com"
-        rhost-flags-OK-OK-OK-FAIL) by vger.kernel.org with ESMTP
-        id S1725535AbfLRIRI (ORCPT <rfc822;linux-block@vger.kernel.org>);
-        Wed, 18 Dec 2019 03:17:08 -0500
-Received: from DGGEMS404-HUB.china.huawei.com (unknown [172.30.72.59])
-        by Forcepoint Email with ESMTP id 420504A90767678B9FA2;
-        Wed, 18 Dec 2019 16:17:06 +0800 (CST)
-Received: from huawei.com (10.175.101.78) by DGGEMS404-HUB.china.huawei.com
- (10.3.19.204) with Microsoft SMTP Server id 14.3.439.0; Wed, 18 Dec 2019
- 16:16:58 +0800
-From:   Yang Yingliang <yangyingliang@huawei.com>
-To:     <axboe@kernel.dk>
-CC:     <linux-block@vger.kernel.org>, <linux-kernel@vger.kernel.org>,
-        <yangyingliang@huawei.com>
-Subject: [PATCH] block: fix memleak when __blk_rq_map_user_iov() is failed
-Date:   Wed, 18 Dec 2019 16:44:04 +0800
-Message-ID: <1576658644-88101-1-git-send-email-yangyingliang@huawei.com>
-X-Mailer: git-send-email 1.8.3
+        id S1725955AbfLRJvh (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Wed, 18 Dec 2019 04:51:37 -0500
+Received: from merlin.infradead.org ([205.233.59.134]:35050 "EHLO
+        merlin.infradead.org" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S1725828AbfLRJvh (ORCPT
+        <rfc822;linux-block@vger.kernel.org>);
+        Wed, 18 Dec 2019 04:51:37 -0500
+DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed;
+        d=infradead.org; s=merlin.20170209; h=In-Reply-To:Content-Type:MIME-Version:
+        References:Message-ID:Subject:Cc:To:From:Date:Sender:Reply-To:
+        Content-Transfer-Encoding:Content-ID:Content-Description:Resent-Date:
+        Resent-From:Resent-Sender:Resent-To:Resent-Cc:Resent-Message-ID:List-Id:
+        List-Help:List-Unsubscribe:List-Subscribe:List-Post:List-Owner:List-Archive;
+         bh=CCYsTiKmLFf9CmOEzk5lgJx0OEGqguLyDzTVud+iGeA=; b=TucDaIm+ISUWU5BpkawY63Sb3
+        SJ9SWk9Pu7f2dafCRqmUyN1UDC0w4kLQTiN7ACWPV22SKSosG2JeNzQElk7s4wDWElgtDN43Pu3Xs
+        rgKJEYCbDoYbJObPK03ZeFF0p1VjonN6AyqIxvArc3Uh6MaYeiUzmHTRev4x8o1yRMSdDNe5l7PXU
+        iT9AlSg8sP/UTe+q5TnbqfZ6ZBgMaKbcJ2XmfRB5wfEKx3+h7keMutdUIEhY7YAF9rQEq19Rk2W10
+        m2UIYcY37jmJT4elzwPg/t0rAFoteeDnVyns2y1aCLzL+ZhYyumgETnqOsEuTTloMoiggMq44kzI3
+        +YKxUJ5nQ==;
+Received: from j217100.upc-j.chello.nl ([24.132.217.100] helo=noisy.programming.kicks-ass.net)
+        by merlin.infradead.org with esmtpsa (Exim 4.92.3 #3 (Red Hat Linux))
+        id 1ihVyx-0001FP-98; Wed, 18 Dec 2019 09:51:03 +0000
+Received: from hirez.programming.kicks-ass.net (hirez.programming.kicks-ass.net [192.168.1.225])
+        (using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+        (Client did not present a certificate)
+        by noisy.programming.kicks-ass.net (Postfix) with ESMTPS id 36B023007F2;
+        Wed, 18 Dec 2019 10:49:38 +0100 (CET)
+Received: by hirez.programming.kicks-ass.net (Postfix, from userid 1000)
+        id 1966B2B3E30FC; Wed, 18 Dec 2019 10:51:01 +0100 (CET)
+Date:   Wed, 18 Dec 2019 10:51:01 +0100
+From:   Peter Zijlstra <peterz@infradead.org>
+To:     Ming Lei <ming.lei@redhat.com>
+Cc:     Thomas Gleixner <tglx@linutronix.de>, Jens Axboe <axboe@kernel.dk>,
+        linux-kernel@vger.kernel.org, linux-block@vger.kernel.org,
+        Long Li <longli@microsoft.com>, Ingo Molnar <mingo@redhat.com>,
+        Keith Busch <keith.busch@intel.com>,
+        Christoph Hellwig <hch@lst.de>,
+        Sagi Grimberg <sagi@grimberg.me>,
+        John Garry <john.garry@huawei.com>,
+        Hannes Reinecke <hare@suse.com>
+Subject: Re: [RFC PATCH 1/3] sched/core: add API for exporting runqueue clock
+Message-ID: <20191218095101.GQ2844@hirez.programming.kicks-ass.net>
+References: <20191218071942.22336-1-ming.lei@redhat.com>
+ <20191218071942.22336-2-ming.lei@redhat.com>
 MIME-Version: 1.0
-Content-Type: text/plain
-X-Originating-IP: [10.175.101.78]
-X-CFilter-Loop: Reflected
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <20191218071942.22336-2-ming.lei@redhat.com>
+User-Agent: Mutt/1.10.1 (2018-07-13)
 Sender: linux-block-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-When I doing fuzzy test, get the memleak report:
+On Wed, Dec 18, 2019 at 03:19:40PM +0800, Ming Lei wrote:
+> Scheduler runqueue maintains its own software clock that is periodically
+> synchronised with hardware. Export this clock so that it can be used
+> by interrupt flood detection for saving the cost of reading from hardware.
 
-BUG: memory leak
-unreferenced object 0xffff88837af80000 (size 4096):
-  comm "memleak", pid 3557, jiffies 4294817681 (age 112.499s)
-  hex dump (first 32 bytes):
-    00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00  ................
-    20 00 00 00 10 01 00 00 00 00 00 00 01 00 00 00   ...............
-  backtrace:
-    [<000000001c894df8>] bio_alloc_bioset+0x393/0x590
-    [<000000008b139a3c>] bio_copy_user_iov+0x300/0xcd0
-    [<00000000a998bd8c>] blk_rq_map_user_iov+0x2f1/0x5f0
-    [<000000005ceb7f05>] blk_rq_map_user+0xf2/0x160
-    [<000000006454da92>] sg_common_write.isra.21+0x1094/0x1870
-    [<00000000064bb208>] sg_write.part.25+0x5d9/0x950
-    [<000000004fc670f6>] sg_write+0x5f/0x8c
-    [<00000000b0d05c7b>] __vfs_write+0x7c/0x100
-    [<000000008e177714>] vfs_write+0x1c3/0x500
-    [<0000000087d23f34>] ksys_write+0xf9/0x200
-    [<000000002c8dbc9d>] do_syscall_64+0x9f/0x4f0
-    [<00000000678d8e9a>] entry_SYSCALL_64_after_hwframe+0x49/0xbe
+But you don't have much, if any, guarantees the thing gets updated.
 
-If __blk_rq_map_user_iov() is failed in blk_rq_map_user_iov(),
-the bio(s) which is allocated before this failing will leak. The
-refcount of the bio(s) is init to 1 and increased to 2 by calling
-bio_get(), but __blk_rq_unmap_user() only decrease it to 1, so
-the bio cannot be freed. Fix it by calling blk_rq_unmap_user().
+> diff --git a/kernel/sched/core.c b/kernel/sched/core.c
+> index 90e4b00ace89..03e2e3c36067 100644
+> --- a/kernel/sched/core.c
+> +++ b/kernel/sched/core.c
+> @@ -219,6 +219,11 @@ void update_rq_clock(struct rq *rq)
+>  	update_rq_clock_task(rq, delta);
+>  }
+>  
+> +u64 sched_local_rq_clock(void)
+> +{
+> +	return this_rq()->clock;
+> +}
+> +EXPORT_SYMBOL_GPL(sched_local_rq_clock);
 
-Reported-by: Hulk Robot <hulkci@huawei.com>
-Signed-off-by: Yang Yingliang <yangyingliang@huawei.com>
----
- block/blk-map.c | 2 +-
- 1 file changed, 1 insertion(+), 1 deletion(-)
+Also, more NAK, you're exporting a variant of __rq_clock_broken().
 
-diff --git a/block/blk-map.c b/block/blk-map.c
-index 3a62e471d81b..b0790268ed9d 100644
---- a/block/blk-map.c
-+++ b/block/blk-map.c
-@@ -151,7 +151,7 @@ int blk_rq_map_user_iov(struct request_queue *q, struct request *rq,
- 	return 0;
- 
- unmap_rq:
--	__blk_rq_unmap_user(bio);
-+	blk_rq_unmap_user(bio);
- fail:
- 	rq->bio = NULL;
- 	return ret;
--- 
-2.17.1
-
+(which, now that I git-grep for it, has become unused, good!)
