@@ -2,99 +2,126 @@ Return-Path: <SRS0=ocaT=2I=vger.kernel.org=linux-block-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-2.2 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
-	MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,USER_AGENT_SANE_1 autolearn=no
-	autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-2.2 required=3.0 tests=DKIM_SIGNED,DKIM_VALID,
+	HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,
+	USER_AGENT_SANE_1 autolearn=no autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id F25B3C43603
-	for <linux-block@archiver.kernel.org>; Wed, 18 Dec 2019 15:11:56 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 23536C2D0D1
+	for <linux-block@archiver.kernel.org>; Wed, 18 Dec 2019 15:52:22 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.kernel.org (Postfix) with ESMTP id D290F2146E
-	for <linux-block@archiver.kernel.org>; Wed, 18 Dec 2019 15:11:56 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id E7D1A2146E
+	for <linux-block@archiver.kernel.org>; Wed, 18 Dec 2019 15:52:21 +0000 (UTC)
+Authentication-Results: mail.kernel.org;
+	dkim=pass (2048-bit key) header.d=shutemov-name.20150623.gappssmtp.com header.i=@shutemov-name.20150623.gappssmtp.com header.b="KDdHHJJR"
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1727511AbfLRPL4 (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Wed, 18 Dec 2019 10:11:56 -0500
-Received: from mx2.suse.de ([195.135.220.15]:51290 "EHLO mx2.suse.de"
-        rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-        id S1727021AbfLRPLz (ORCPT <rfc822;linux-block@vger.kernel.org>);
-        Wed, 18 Dec 2019 10:11:55 -0500
-X-Virus-Scanned: by amavisd-new at test-mx.suse.de
-Received: from relay2.suse.de (unknown [195.135.220.254])
-        by mx2.suse.de (Postfix) with ESMTP id A01B4AD45;
-        Wed, 18 Dec 2019 15:11:53 +0000 (UTC)
-Subject: Re: [Xen-devel] [PATCH v12 2/5] xenbus/backend: Protect xenbus
- callback with lock
-To:     SeongJae Park <sjpark@amazon.com>
-Cc:     axboe@kernel.dk, sj38.park@gmail.com, konrad.wilk@oracle.com,
-        pdurrant@amazon.com, SeongJae Park <sjpark@amazon.de>,
-        linux-kernel@vger.kernel.org, linux-block@vger.kernel.org,
-        xen-devel@lists.xenproject.org, roger.pau@citrix.com
-References: <20191218144025.24277-1-sjpark@amazon.com>
-From:   =?UTF-8?B?SsO8cmdlbiBHcm/Dnw==?= <jgross@suse.com>
-Message-ID: <7edb266e-3185-5adc-1121-1b61feaf5a34@suse.com>
-Date:   Wed, 18 Dec 2019 16:11:51 +0100
-User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:68.0) Gecko/20100101
- Thunderbird/68.2.1
+        id S1727185AbfLRPwO (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Wed, 18 Dec 2019 10:52:14 -0500
+Received: from mail-lj1-f193.google.com ([209.85.208.193]:39024 "EHLO
+        mail-lj1-f193.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S1727150AbfLRPwO (ORCPT
+        <rfc822;linux-block@vger.kernel.org>);
+        Wed, 18 Dec 2019 10:52:14 -0500
+Received: by mail-lj1-f193.google.com with SMTP id l2so2695421lja.6
+        for <linux-block@vger.kernel.org>; Wed, 18 Dec 2019 07:52:13 -0800 (PST)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=shutemov-name.20150623.gappssmtp.com; s=20150623;
+        h=date:from:to:cc:subject:message-id:references:mime-version
+         :content-disposition:in-reply-to:user-agent;
+        bh=9SaCbmKz1ngtAKjewhoah2l6ODU7+VciCnZ7nlhe26A=;
+        b=KDdHHJJR0qVpHZqAH81m6HqiNucHS6+DyOVljs3zJhGM2FtVdbdAm0v2Xxx2kkMzcc
+         COndoaW+YFAjiesHFNY+QGvBhkVduyh7QLCQeLwcNzFcgoRSyGgSLcKxln6/f1EUD6yP
+         0y/6+ZumAIbzC9iZaVPFSydS1BkjYoeUFSafS/fB2OWFlpyQaG5ZPEXYvAMbIqCKuFSL
+         vWtk3rEHKc5uyahuOPC2nUQfw14PqKcbFsQXhuikgf46s/H3eDyiCMpavZwnwbAsy3mj
+         YXZ/SZZpNe1V4549MQIslp0gnIgv8CLO8jjGejFKXWpzPMIfXWxDiYo5N9hhWPoVV8yK
+         Z+eQ==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20161025;
+        h=x-gm-message-state:date:from:to:cc:subject:message-id:references
+         :mime-version:content-disposition:in-reply-to:user-agent;
+        bh=9SaCbmKz1ngtAKjewhoah2l6ODU7+VciCnZ7nlhe26A=;
+        b=iBt8uAzfcVjIDFx4DpTKwysZWgi4zwDRlnNiJ7mObSjU9QFN52rHJ/KbSgs3+EybwJ
+         wCEF6thJZa1WbJXJ1YvcdzsKu4h5jG1jXhVeyjkqlgXd+C3+vjReJzgQpbgeOyzpCkNG
+         n/bPahy7EMEc2s6hprZVCckWt353OIqggruaRICp45niZXTSdhPXxHyhfb6ivjvytPch
+         jKrlXctBQ5EKd/Jadvo1AMvgoK79E4EzBN4GD1cSATdWyqluLyRMM0/lss6oE7PvscE7
+         GiakRnrJBEYwEZWkojhQ2Cc/IiCehfmOsqdTT2VILW5gFSnUtij3Yw8r7fhcdTNLRwaa
+         z+nw==
+X-Gm-Message-State: APjAAAXvOegzo61c4BBkXS5HmLhB8/wBSSe51K0Kj26NU/K9DbAFeyXE
+        SwKyzmhKWQdyItaj/geCSXHRwQ==
+X-Google-Smtp-Source: APXvYqwSmzkDxFfUqfRx+ol+ctreHSER3AZEkxHGbqQ5sNtLr5I/0+mwtD90Owb4uveY0c44Ujy5Kw==
+X-Received: by 2002:a2e:3312:: with SMTP id d18mr2333248ljc.222.1576684332255;
+        Wed, 18 Dec 2019 07:52:12 -0800 (PST)
+Received: from box.localdomain ([86.57.175.117])
+        by smtp.gmail.com with ESMTPSA id s16sm1351312lfc.35.2019.12.18.07.52.10
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Wed, 18 Dec 2019 07:52:11 -0800 (PST)
+Received: by box.localdomain (Postfix, from userid 1000)
+        id 66C2E1012CF; Wed, 18 Dec 2019 18:52:11 +0300 (+03)
+Date:   Wed, 18 Dec 2019 18:52:11 +0300
+From:   "Kirill A. Shutemov" <kirill@shutemov.name>
+To:     John Hubbard <jhubbard@nvidia.com>
+Cc:     Andrew Morton <akpm@linux-foundation.org>,
+        Al Viro <viro@zeniv.linux.org.uk>,
+        Alex Williamson <alex.williamson@redhat.com>,
+        Benjamin Herrenschmidt <benh@kernel.crashing.org>,
+        =?utf-8?B?QmrDtnJuIFTDtnBlbA==?= <bjorn.topel@intel.com>,
+        Christoph Hellwig <hch@infradead.org>,
+        Dan Williams <dan.j.williams@intel.com>,
+        Daniel Vetter <daniel@ffwll.ch>,
+        Dave Chinner <david@fromorbit.com>,
+        David Airlie <airlied@linux.ie>,
+        "David S . Miller" <davem@davemloft.net>,
+        Ira Weiny <ira.weiny@intel.com>, Jan Kara <jack@suse.cz>,
+        Jason Gunthorpe <jgg@ziepe.ca>, Jens Axboe <axboe@kernel.dk>,
+        Jonathan Corbet <corbet@lwn.net>,
+        =?utf-8?B?SsOpcsO0bWU=?= Glisse <jglisse@redhat.com>,
+        Magnus Karlsson <magnus.karlsson@intel.com>,
+        Mauro Carvalho Chehab <mchehab@kernel.org>,
+        Michael Ellerman <mpe@ellerman.id.au>,
+        Michal Hocko <mhocko@suse.com>,
+        Mike Kravetz <mike.kravetz@oracle.com>,
+        Paul Mackerras <paulus@samba.org>,
+        Shuah Khan <shuah@kernel.org>,
+        Vlastimil Babka <vbabka@suse.cz>, bpf@vger.kernel.org,
+        dri-devel@lists.freedesktop.org, kvm@vger.kernel.org,
+        linux-block@vger.kernel.org, linux-doc@vger.kernel.org,
+        linux-fsdevel@vger.kernel.org, linux-kselftest@vger.kernel.org,
+        linux-media@vger.kernel.org, linux-rdma@vger.kernel.org,
+        linuxppc-dev@lists.ozlabs.org, netdev@vger.kernel.org,
+        linux-mm@kvack.org, LKML <linux-kernel@vger.kernel.org>,
+        Christoph Hellwig <hch@lst.de>,
+        "Aneesh Kumar K . V" <aneesh.kumar@linux.ibm.com>
+Subject: Re: [PATCH v11 01/25] mm/gup: factor out duplicate code from four
+ routines
+Message-ID: <20191218155211.emcegdp5uqgorfwe@box>
+References: <20191216222537.491123-1-jhubbard@nvidia.com>
+ <20191216222537.491123-2-jhubbard@nvidia.com>
 MIME-Version: 1.0
-In-Reply-To: <20191218144025.24277-1-sjpark@amazon.com>
-Content-Type: text/plain; charset=utf-8; format=flowed
-Content-Language: en-US
-Content-Transfer-Encoding: 8bit
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <20191216222537.491123-2-jhubbard@nvidia.com>
+User-Agent: NeoMutt/20180716
 Sender: linux-block-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-On 18.12.19 15:40, SeongJae Park wrote:
-> On Wed, 18 Dec 2019 14:30:44 +0100 "Jürgen Groß" <jgross@suse.com> wrote:
-> 
->> On 18.12.19 13:42, SeongJae Park wrote:
->>> On Wed, 18 Dec 2019 13:27:37 +0100 "Jürgen Groß" <jgross@suse.com> wrote:
->>>
->>>> On 18.12.19 11:42, SeongJae Park wrote:
->>>>> From: SeongJae Park <sjpark@amazon.de>
->>>>>
->>>>> 'reclaim_memory' callback can race with a driver code as this callback
->>>>> will be called from any memory pressure detected context.  To deal with
->>>>> the case, this commit adds a spinlock in the 'xenbus_device'.  Whenever
->>>>> 'reclaim_memory' callback is called, the lock of the device which passed
->>>>> to the callback as its argument is locked.  Thus, drivers registering
->>>>> their 'reclaim_memory' callback should protect the data that might race
->>>>> with the callback with the lock by themselves.
->>>>
->>>> Any reason you don't take the lock around the .probe() and .remove()
->>>> calls of the backend (xenbus_dev_probe() and xenbus_dev_remove())? This
->>>> would eliminate the need to do that in each backend instead.
->>>
->>> First of all, I would like to keep the critical section as small as possible.
->>> With my small test, I could see slightly increasing memory pressure as the
->>> critical section becomes wider.  Also, some drivers might share the data their
->>> 'reclaim_memory' callback touches with other functions.  I think only the
->>> driver owners can know what data is shared and what is the minimum critical
->>> section to protect it.
->>
->> But this kind of serialization can still be added on top.
-> 
-> I'm still worrying about the unnecessarily large critical section, but it might
-> be small enough to be ignored.  If no others have strong objection, I will take
-> the lock around the '->probe()' and '->remove()'.
+On Mon, Dec 16, 2019 at 02:25:13PM -0800, John Hubbard wrote:
+> +static void put_compound_head(struct page *page, int refs)
+> +{
+> +	/* Do a get_page() first, in case refs == page->_refcount */
+> +	get_page(page);
+> +	page_ref_sub(page, refs);
+> +	put_page(page);
+> +}
 
-The lock is per device, so contention is possible only for the
-reclaim case. In case probe or remove are running reclaim will have
-nothing to free (in probe case nothing is allocated yet, in remove
-case everything should be freed anyway). So the larger critical section
-is no problem at all IMO.
+It's not terribly efficient. Maybe something like:
 
->> And with the trylock in the reclaim path I believe you can even avoid
->> the irq variants of the spinlock. But I might be wrong, so you should
->> try that with lockdep enabled. If it is working there is no harm done
->> when making the critical section larger, as memory allocations will
->> work as before.
-> 
-> Yes, you're right.  I will try test with lockdep.
+	VM_BUG_ON_PAGE(page_ref_count(page) < ref, page);
+	if (refs > 2)
+		page_ref_sub(page, refs - 1);
+	put_page(page);
 
-Thanks,
+?
 
-
-Juergen
-
+-- 
+ Kirill A. Shutemov
