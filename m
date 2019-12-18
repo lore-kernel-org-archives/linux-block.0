@@ -2,134 +2,169 @@ Return-Path: <SRS0=ocaT=2I=vger.kernel.org=linux-block-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-8.3 required=3.0 tests=DKIM_SIGNED,DKIM_VALID,
-	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,
-	SPF_HELO_NONE,SPF_PASS,USER_AGENT_SANE_1 autolearn=ham autolearn_force=no
-	version=3.4.0
+X-Spam-Status: No, score=-2.4 required=3.0 tests=DKIMWL_WL_HIGH,DKIM_SIGNED,
+	DKIM_VALID,DKIM_VALID_AU,HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,
+	SPF_HELO_NONE,SPF_PASS,UNPARSEABLE_RELAY,USER_AGENT_SANE_1 autolearn=no
+	autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 82A33C43603
-	for <linux-block@archiver.kernel.org>; Wed, 18 Dec 2019 01:14:58 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 58739C2D0CD
+	for <linux-block@archiver.kernel.org>; Wed, 18 Dec 2019 01:25:35 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.kernel.org (Postfix) with ESMTP id 4A50B2176D
-	for <linux-block@archiver.kernel.org>; Wed, 18 Dec 2019 01:14:58 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id 2A2A621582
+	for <linux-block@archiver.kernel.org>; Wed, 18 Dec 2019 01:25:35 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel-dk.20150623.gappssmtp.com header.i=@kernel-dk.20150623.gappssmtp.com header.b="j9CJEujl"
+	dkim=pass (2048-bit key) header.d=oracle.com header.i=@oracle.com header.b="OGVchsZM"
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1726167AbfLRBO5 (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Tue, 17 Dec 2019 20:14:57 -0500
-Received: from mail-il1-f193.google.com ([209.85.166.193]:40964 "EHLO
-        mail-il1-f193.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1726143AbfLRBO5 (ORCPT
+        id S1726383AbfLRBZe (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Tue, 17 Dec 2019 20:25:34 -0500
+Received: from aserp2120.oracle.com ([141.146.126.78]:51754 "EHLO
+        aserp2120.oracle.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S1726167AbfLRBZd (ORCPT
         <rfc822;linux-block@vger.kernel.org>);
-        Tue, 17 Dec 2019 20:14:57 -0500
-Received: by mail-il1-f193.google.com with SMTP id f10so216070ils.8
-        for <linux-block@vger.kernel.org>; Tue, 17 Dec 2019 17:14:57 -0800 (PST)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=kernel-dk.20150623.gappssmtp.com; s=20150623;
-        h=subject:to:cc:references:from:message-id:date:user-agent
-         :mime-version:in-reply-to:content-language:content-transfer-encoding;
-        bh=jHMze2R5sGSN2eUdrzOAy+Dv9T36Z4u2RHOSw0IjoPs=;
-        b=j9CJEujl7GBep7gWNlxkSWRlqg9cEAXc1Ps8yzqaNh3zrQxtEgeDCoHgRbqd858d9X
-         e+2/HyXai9ryx418L8y1grzEapgz9fvmcTx/Lof6SFswoAu2grLZQx07GN8qXC4sbvYy
-         4Ophz/6DnJfFBq57ykO9xQM/fb31nxLjjU/QxaH66P2dW9gUlkVJt/TtiggiRvnmuIv3
-         nykt1meNSZBJPXcESJw06JjZCk/4/2M/ZD7X0Xu8kXgagHA8uPHE9Q+O7OzvxlrBz9WM
-         6JhADVQxenhGebcVdoFg52vEhnqV2Scy4KLw4KR7kXWNDhgw38CSsCfZSobHJA/Jajxk
-         GXxA==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20161025;
-        h=x-gm-message-state:subject:to:cc:references:from:message-id:date
-         :user-agent:mime-version:in-reply-to:content-language
-         :content-transfer-encoding;
-        bh=jHMze2R5sGSN2eUdrzOAy+Dv9T36Z4u2RHOSw0IjoPs=;
-        b=Ia5kznI3ohd3AaR92C6wCRVoLgzYV/KpLIJaK8RT0ENuBOALqSiABQqfD5tSD4rTXI
-         /lRLWZ+TeUHPL2QeMQ2LQ9AaWYMk/FvU8hZ5ZScnc5A1vympnQglDjzxUv9E6W0EU5eE
-         slRUXDuUG33xfCDJu09y4dooV+ofoACjnq54eWRDk3Tn/50YRrOy5ekON8L2nKuuKB9l
-         6TlExtnVnBaJ4yLXcA82SkwN9JMe7GMqY/F3medKbqtLWr+cckItVTzgZEhmLMcTAXRJ
-         WjBrZNxhYRShatHvkuXXS8Y6fXnCq0g3wszaB1qTStYzEofb+ZO+a4wXXoueenLc0nfl
-         DUoQ==
-X-Gm-Message-State: APjAAAUQb1qV25AM+gSu7F3CIu0yvyNSAm2m7axt1cd4VH83tPHPAzJs
-        z0c82W8BmHP0v8FiilnlOCoBwmawiCNTWQ==
-X-Google-Smtp-Source: APXvYqxgHwvHkt/Pxljix1ugco+k46cBNYiRMc6k+hX67AkZWCAS0Op1TQHIUsKKP/yrG+w8bp7Euw==
-X-Received: by 2002:a92:3f0f:: with SMTP id m15mr335669ila.164.1576631696830;
-        Tue, 17 Dec 2019 17:14:56 -0800 (PST)
-Received: from [192.168.1.159] ([65.144.74.34])
-        by smtp.gmail.com with ESMTPSA id t17sm147701ilb.29.2019.12.17.17.14.56
-        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
-        Tue, 17 Dec 2019 17:14:56 -0800 (PST)
-Subject: Re: [PATCH] sbitmap: only queue kyber's wait callback if not already
- active
-To:     David Jeffery <djeffery@redhat.com>, linux-block@vger.kernel.org
-Cc:     John Pittman <jpittman@redhat.com>,
-        Omar Sandoval <osandov@osandov.com>
-References: <20191217160024.GA23066@redhat>
-From:   Jens Axboe <axboe@kernel.dk>
-Message-ID: <647af756-3a8a-d895-cbf8-ed3583732817@kernel.dk>
-Date:   Tue, 17 Dec 2019 18:14:55 -0700
-User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:68.0) Gecko/20100101
- Thunderbird/68.2.2
+        Tue, 17 Dec 2019 20:25:33 -0500
+Received: from pps.filterd (aserp2120.oracle.com [127.0.0.1])
+        by aserp2120.oracle.com (8.16.0.27/8.16.0.27) with SMTP id xBI1JhJl017398;
+        Wed, 18 Dec 2019 01:25:20 GMT
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=oracle.com; h=date : from : to : cc
+ : subject : message-id : references : mime-version : content-type :
+ in-reply-to; s=corp-2019-08-05;
+ bh=CPrPTKGRWbte5d18j8OyziiV63P7dvuHEgE/Q71iwPA=;
+ b=OGVchsZMv9g7X7LtF9Ayc6TQeIzSwqUHV2M1v9QCjLQktykMPgCbuEff9XcFGhlcZpCX
+ MCy43T5fy/GKyMhvLbGS/1Fr3kmuh6XYWC+7liKOtWIisa/Dy/d5MUdefDhjx7Ikz3eW
+ YpqZaMm1TeG4DdXAnnwm1PDcLxxumA/3h3jjY+hJ+bgdItMf11SQ92Uz+llhN8z3WrU3
+ 1GvgkITmE1RLWWp3HvW17qfLExEItakRW+8zb0Rqb5lRULcloz7YEVjNihm0n6N2eiPH
+ AKF7a/m7vfZC7TSIPeGPISq6ReJbWlVS5nXXe1hC+7RMUr7e7HS3039exUEy9jizGNQo HQ== 
+Received: from aserp3020.oracle.com (aserp3020.oracle.com [141.146.126.70])
+        by aserp2120.oracle.com with ESMTP id 2wvqpqacgw-1
+        (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=OK);
+        Wed, 18 Dec 2019 01:25:20 +0000
+Received: from pps.filterd (aserp3020.oracle.com [127.0.0.1])
+        by aserp3020.oracle.com (8.16.0.27/8.16.0.27) with SMTP id xBI1MtxK037321;
+        Wed, 18 Dec 2019 01:25:20 GMT
+Received: from aserv0122.oracle.com (aserv0122.oracle.com [141.146.126.236])
+        by aserp3020.oracle.com with ESMTP id 2wxm74v2j2-1
+        (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=OK);
+        Wed, 18 Dec 2019 01:25:20 +0000
+Received: from abhmp0014.oracle.com (abhmp0014.oracle.com [141.146.116.20])
+        by aserv0122.oracle.com (8.14.4/8.14.4) with ESMTP id xBI1PIQ4003591;
+        Wed, 18 Dec 2019 01:25:19 GMT
+Received: from localhost (/10.159.137.228)
+        by default (Oracle Beehive Gateway v4.0)
+        with ESMTP ; Tue, 17 Dec 2019 17:25:17 -0800
+Date:   Tue, 17 Dec 2019 17:25:16 -0800
+From:   "Darrick J. Wong" <darrick.wong@oracle.com>
+To:     Jens Axboe <axboe@kernel.dk>
+Cc:     Linus Torvalds <torvalds@linux-foundation.org>,
+        Linux-MM <linux-mm@kvack.org>,
+        linux-fsdevel <linux-fsdevel@vger.kernel.org>,
+        linux-block <linux-block@vger.kernel.org>,
+        Matthew Wilcox <willy@infradead.org>, Chris Mason <clm@fb.com>,
+        Dave Chinner <david@fromorbit.com>,
+        Christoph Hellwig <hch@infradead.org>
+Subject: Re: [PATCH 4/6] iomap: add struct iomap_ctx
+Message-ID: <20191218012516.GA12752@magnolia>
+References: <20191217143948.26380-1-axboe@kernel.dk>
+ <20191217143948.26380-5-axboe@kernel.dk>
+ <CAHk-=wgcPAfOSigMf0xwaGfVjw413XN3UPATwYWHrss+QuivhQ@mail.gmail.com>
+ <CAHk-=wgvROUnrEVADVR_zTHY8NmYo-_jVjV37O1MdDm2de+Lmw@mail.gmail.com>
+ <9941995e-19c5-507b-9339-b8d2cb568932@kernel.dk>
 MIME-Version: 1.0
-In-Reply-To: <20191217160024.GA23066@redhat>
-Content-Type: text/plain; charset=utf-8
-Content-Language: en-US
-Content-Transfer-Encoding: 7bit
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <9941995e-19c5-507b-9339-b8d2cb568932@kernel.dk>
+User-Agent: Mutt/1.9.4 (2018-02-28)
+X-Proofpoint-Virus-Version: vendor=nai engine=6000 definitions=9474 signatures=668685
+X-Proofpoint-Spam-Details: rule=notspam policy=default score=0 suspectscore=0 malwarescore=0
+ phishscore=0 bulkscore=0 spamscore=0 mlxscore=0 mlxlogscore=999
+ adultscore=0 classifier=spam adjust=0 reason=mlx scancount=1
+ engine=8.0.1-1911140001 definitions=main-1912180009
+X-Proofpoint-Virus-Version: vendor=nai engine=6000 definitions=9474 signatures=668685
+X-Proofpoint-Spam-Details: rule=notspam policy=default score=0 priorityscore=1501 malwarescore=0
+ suspectscore=0 phishscore=0 bulkscore=0 spamscore=0 clxscore=1015
+ lowpriorityscore=0 mlxscore=0 impostorscore=0 mlxlogscore=999 adultscore=0
+ classifier=spam adjust=0 reason=mlx scancount=1 engine=8.0.1-1911140001
+ definitions=main-1912180009
 Sender: linux-block-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-On 12/17/19 9:00 AM, David Jeffery wrote:
-> Under heavy loads where the kyber I/O scheduler hits the token limits for
-> its scheduling domains, kyber can become stuck.  When active requests
-> complete, kyber may not be woken up leaving the I/O requests in kyber
-> stuck.
+On Tue, Dec 17, 2019 at 05:15:46PM -0700, Jens Axboe wrote:
+> On 12/17/19 1:26 PM, Linus Torvalds wrote:
+> > On Tue, Dec 17, 2019 at 11:39 AM Linus Torvalds
+> > <torvalds@linux-foundation.org> wrote:
+> >>
+> >> 'loff_t length' is not right.
+> > 
+> > Looking around, it does seem to get used that way. Too much, though.
+> > 
+> >>> +       loff_t pos = data->pos;
+> >>> +       loff_t length = pos + data->len;
+> >>
+> >> And WTH is that? "pos + data->len" is not "length", that's end. And this:
+> >>
+> >>>         loff_t end = pos + length, done = 0;
+> >>
+> >> What? Now 'end' is 'pos+length', which is 'pos+pos+data->len'.
+> > 
+> > But this is unrelated to the crazy types. That just can't bve right.
 > 
-> This stuck state is due to a race condition with kyber and the sbitmap
-> functions it uses to run a callback when enough requests have completed.
-> The running of a sbt_wait callback can race with the attempt to insert the
-> sbt_wait.  Since sbitmap_del_wait_queue removes the sbt_wait from the list
-> first then sets the sbq field to NULL, kyber can see the item as not on a
-> list but the call to sbitmap_add_wait_queue will see sbq as non-NULL. This
-> results in the sbt_wait being inserted onto the wait list but ws_active
-> doesn't get incremented.  So the sbitmap queue does not know there is a
-> waiter on a wait list.
+> Yeah, I fixed that one up, that was my error.
 > 
-> Since sbitmap doesn't think there is a waiter, kyber may never be
-> informed that there are domain tokens available and the I/O never advances.
-> With the sbt_wait on a wait list, kyber believes it has an active waiter
-> so cannot insert a new waiter when reaching the domain's full state.
-> 
-> This race can be fixed by only adding the sbt_wait to the queue if the
-> sbq field is NULL.  If sbq is not NULL, there is already an action active
-> which will trigger the re-running of kyber.  Let it run and add the
-> sbt_wait to the wait list if still needing to wait.
-> 
-> Signed-off-by: David Jeffery <djeffery@redhat.com>
-> Reported-by: John Pittman <jpittman@redhat.com>
-> Tested-by: John Pittman <jpittman@redhat.com>
-> ---
-> 
-> This bug was reliably being triggered on several test systems.  With the
-> fix, the tests no longer fail.
-> 
->  sbitmap.c |    2 +-
->  1 file changed, 1 insertion(+), 1 deletion(-)
-> 
-> diff --git a/lib/sbitmap.c b/lib/sbitmap.c
-> index 33feec8989f1..af88d1346dd7 100644
-> --- a/lib/sbitmap.c
-> +++ b/lib/sbitmap.c
-> @@ -650,8 +650,8 @@ void sbitmap_add_wait_queue(struct sbitmap_queue *sbq,
->  	if (!sbq_wait->sbq) {
->  		sbq_wait->sbq = sbq;
->  		atomic_inc(&sbq->ws_active);
-> +		add_wait_queue(&ws->wait, &sbq_wait->wait);
->  	}
-> -	add_wait_queue(&ws->wait, &sbq_wait->wait);
->  }
->  EXPORT_SYMBOL_GPL(sbitmap_add_wait_queue);
+> >> Is there some reason for this horrible case of "let's allow 64-bit sizes?"
+> >>
+> >> Because even if there is, it shouldn't be "loff_t". That's an
+> >> _offset_. Not a length.
+> > 
+> > We do seem to have a lot of these across filesystems. And a lot of
+> > confusion. Most of the IO reoutines clearly take or return a size_t
+> > (returning ssize_t) as the IO size. And then you have the
+> > zeroing/truncation stuff that tends to take loff_t. Which still smells
+> > wrong, and s64 would look like a better case, but whatever.
+> > 
+> > The "iomap_zero_range() for truncate" case really does seem to need a
+> > 64-bit value, because people do the difference of two loff_t's for it.
+> > In fact, it almost looks like that function should take a "start ,
+> > end" pair, which would make loff_t be the _right_ thing.
 
-This looks good to me, waiting for Omar to take a look (CC'ed).
+Yeah.  "loff_t length" always struck me as a little odd, but until now I
+hadn't heard enough complaining about it to put any effort into fixing
+the iomap_apply code that (afaict) mostly worked ok.  But it shouldn't
+be a difficult change.
 
--- 
-Jens Axboe
+> > Because "length" really is just (a positive) size_t normally.
 
+However, I don't think it's a good idea to reduce the @length argument
+to size_t (and the iomap_apply return value to ssize_t) because they're
+32-bit values and doing that will force iomap to clamp lengths and
+return values to S32_MAX.  Instituting a ~2G max on read and write calls
+is fine because those operate directly on file data (== slow), but the
+vfs already clamps the length before the iov gets to iomap.
+
+For the other iomap users that care more about the mappings and less
+about the data in those mappings (seek hole, seek data, fiemap, swap) it
+doesn't make much sense.  If the filesystem can send back a 100GB extent
+map (e.g. holes in a sparse file, or we just have superstar allocation
+strategies), the fs should send that straight to the iomap actor
+function without having to cut that into 50x loop iterations.  Looking
+ahead to things like file mapping leases, a (formerly wealthy) client
+should be able to request a mmap lease on 100GB worth of pmem and get
+the whole lease if the fs can allocate 100G at once.
+
+I like the idea of making the length parameter and the return value
+int64_t instead of loff_t.  Is int64_t the preferred typedef or s64?  I
+forget.
+
+> Honestly, I'd much rather leave the loff_t -> size_t/ssize_t to
+> Darrick/Dave, it's really outside the scope of this patch, and I'd
+> prefer not to have to muck with it. They probably feel the same way!
+
+Don't forget Christoph.  Heh, we /did/ forget Christoph. :(
+Maybe they have better historical context since they invented this iomap
+mechanism for pnfs or something long before I came along.
+
+--D
+
+> -- 
+> Jens Axboe
+> 
