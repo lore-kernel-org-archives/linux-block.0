@@ -2,61 +2,64 @@ Return-Path: <SRS0=ocaT=2I=vger.kernel.org=linux-block-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-2.2 required=3.0 tests=DKIM_SIGNED,DKIM_VALID,
-	HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,
-	USER_AGENT_SANE_1 autolearn=no autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-8.2 required=3.0 tests=DKIM_SIGNED,DKIM_VALID,
+	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,
+	SPF_HELO_NONE,SPF_PASS,USER_AGENT_SANE_1 autolearn=unavailable
+	autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 23536C2D0D1
-	for <linux-block@archiver.kernel.org>; Wed, 18 Dec 2019 15:52:22 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 5367CC2D0D1
+	for <linux-block@archiver.kernel.org>; Wed, 18 Dec 2019 16:04:27 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.kernel.org (Postfix) with ESMTP id E7D1A2146E
-	for <linux-block@archiver.kernel.org>; Wed, 18 Dec 2019 15:52:21 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id 2492724680
+	for <linux-block@archiver.kernel.org>; Wed, 18 Dec 2019 16:04:27 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=pass (2048-bit key) header.d=shutemov-name.20150623.gappssmtp.com header.i=@shutemov-name.20150623.gappssmtp.com header.b="KDdHHJJR"
+	dkim=pass (2048-bit key) header.d=shutemov-name.20150623.gappssmtp.com header.i=@shutemov-name.20150623.gappssmtp.com header.b="z5wPjhUP"
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1727185AbfLRPwO (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Wed, 18 Dec 2019 10:52:14 -0500
-Received: from mail-lj1-f193.google.com ([209.85.208.193]:39024 "EHLO
-        mail-lj1-f193.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1727150AbfLRPwO (ORCPT
+        id S1727276AbfLRQEZ (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Wed, 18 Dec 2019 11:04:25 -0500
+Received: from mail-lj1-f195.google.com ([209.85.208.195]:36471 "EHLO
+        mail-lj1-f195.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S1727431AbfLRQEZ (ORCPT
         <rfc822;linux-block@vger.kernel.org>);
-        Wed, 18 Dec 2019 10:52:14 -0500
-Received: by mail-lj1-f193.google.com with SMTP id l2so2695421lja.6
-        for <linux-block@vger.kernel.org>; Wed, 18 Dec 2019 07:52:13 -0800 (PST)
+        Wed, 18 Dec 2019 11:04:25 -0500
+Received: by mail-lj1-f195.google.com with SMTP id r19so2752141ljg.3
+        for <linux-block@vger.kernel.org>; Wed, 18 Dec 2019 08:04:21 -0800 (PST)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=shutemov-name.20150623.gappssmtp.com; s=20150623;
         h=date:from:to:cc:subject:message-id:references:mime-version
-         :content-disposition:in-reply-to:user-agent;
-        bh=9SaCbmKz1ngtAKjewhoah2l6ODU7+VciCnZ7nlhe26A=;
-        b=KDdHHJJR0qVpHZqAH81m6HqiNucHS6+DyOVljs3zJhGM2FtVdbdAm0v2Xxx2kkMzcc
-         COndoaW+YFAjiesHFNY+QGvBhkVduyh7QLCQeLwcNzFcgoRSyGgSLcKxln6/f1EUD6yP
-         0y/6+ZumAIbzC9iZaVPFSydS1BkjYoeUFSafS/fB2OWFlpyQaG5ZPEXYvAMbIqCKuFSL
-         vWtk3rEHKc5uyahuOPC2nUQfw14PqKcbFsQXhuikgf46s/H3eDyiCMpavZwnwbAsy3mj
-         YXZ/SZZpNe1V4549MQIslp0gnIgv8CLO8jjGejFKXWpzPMIfXWxDiYo5N9hhWPoVV8yK
-         Z+eQ==
+         :content-disposition:content-transfer-encoding:in-reply-to
+         :user-agent;
+        bh=lx2tYrxH76TzOflvrZdMYwmw6kPdiwBO2AoS02kSF8I=;
+        b=z5wPjhUP09OUtbjMjcfRXuIHIwQ6JsCqdqDQrpkHeR2FGTJKRgTZuRVpd8Ejot/uzW
+         WkIRJ1o23H1rHR8qrWtCj6uBitDImUrGPYpJ5mMWyp3EmJAhL7rYh6HpljzRDkNNAPx0
+         LUjYdc/PK8ZbQZUps8imW7pyun+gW90XpZ53fBcBIDiOV27gBLz+BEehaTKZC5uM8Oqa
+         ydjJOsIeBdrZtGFXR3Ff0Wal0p2P05zNibodcJL9uNUAN8pxDWcLGNcXSYNkE83Lm4vk
+         MRxOsdbgin+Oe/MgK9nfd0EbUF6BgvQFFgBekQTNtwPB0Nh3TqyAfgcwxiXCuXBEgxgt
+         8yAA==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=1e100.net; s=20161025;
         h=x-gm-message-state:date:from:to:cc:subject:message-id:references
-         :mime-version:content-disposition:in-reply-to:user-agent;
-        bh=9SaCbmKz1ngtAKjewhoah2l6ODU7+VciCnZ7nlhe26A=;
-        b=iBt8uAzfcVjIDFx4DpTKwysZWgi4zwDRlnNiJ7mObSjU9QFN52rHJ/KbSgs3+EybwJ
-         wCEF6thJZa1WbJXJ1YvcdzsKu4h5jG1jXhVeyjkqlgXd+C3+vjReJzgQpbgeOyzpCkNG
-         n/bPahy7EMEc2s6hprZVCckWt353OIqggruaRICp45niZXTSdhPXxHyhfb6ivjvytPch
-         jKrlXctBQ5EKd/Jadvo1AMvgoK79E4EzBN4GD1cSATdWyqluLyRMM0/lss6oE7PvscE7
-         GiakRnrJBEYwEZWkojhQ2Cc/IiCehfmOsqdTT2VILW5gFSnUtij3Yw8r7fhcdTNLRwaa
-         z+nw==
-X-Gm-Message-State: APjAAAXvOegzo61c4BBkXS5HmLhB8/wBSSe51K0Kj26NU/K9DbAFeyXE
-        SwKyzmhKWQdyItaj/geCSXHRwQ==
-X-Google-Smtp-Source: APXvYqwSmzkDxFfUqfRx+ol+ctreHSER3AZEkxHGbqQ5sNtLr5I/0+mwtD90Owb4uveY0c44Ujy5Kw==
-X-Received: by 2002:a2e:3312:: with SMTP id d18mr2333248ljc.222.1576684332255;
-        Wed, 18 Dec 2019 07:52:12 -0800 (PST)
+         :mime-version:content-disposition:content-transfer-encoding
+         :in-reply-to:user-agent;
+        bh=lx2tYrxH76TzOflvrZdMYwmw6kPdiwBO2AoS02kSF8I=;
+        b=ronvjQu3hZK3oaBCVUkDQrY+2dhlbvqwzIXXcKmrC1RpbPpURBseu+tPBkkLpYUbXH
+         vOC2G+/g+WcE2v+6mergcmEoVySEHfLkxTXEGWP36yyOab9r7Y/+v0PDC+V452k6TtY/
+         qe24dB2i0lAX9clKiLgna+krCfQk/uFhvL8VHUIap8RJQ4RPSUnVKfxPjXYPxB01RVk9
+         rc8ac//LmikR6mv3Xtqsnynyt2XE1sLvWVdv6TFLUH7EioVbidHTgfcvno/FUp8jEraV
+         zhZSk6cJ7rSom5N2d/vO6E1IFHpPSayPZAZlXblP9VCAToUX5+QwNaI7Kuv6/b6I+LkB
+         y5pQ==
+X-Gm-Message-State: APjAAAV1ghAS5FWAQmRd1Y8MW+VUb3YihGKxPeLG+79q9FH+UvXy2lzo
+        ZGFbI94s0RB9Jtie592zFDGhTg==
+X-Google-Smtp-Source: APXvYqwF7pecGZBZMkXKVp15IXhXZo2PGYpkUgZNZl53wUwEdzClRBwVejnpDULy6WyyjOVSSgygvA==
+X-Received: by 2002:a2e:9284:: with SMTP id d4mr2361276ljh.226.1576685060830;
+        Wed, 18 Dec 2019 08:04:20 -0800 (PST)
 Received: from box.localdomain ([86.57.175.117])
-        by smtp.gmail.com with ESMTPSA id s16sm1351312lfc.35.2019.12.18.07.52.10
+        by smtp.gmail.com with ESMTPSA id j19sm1730231lfb.90.2019.12.18.08.04.19
         (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Wed, 18 Dec 2019 07:52:11 -0800 (PST)
+        Wed, 18 Dec 2019 08:04:19 -0800 (PST)
 Received: by box.localdomain (Postfix, from userid 1000)
-        id 66C2E1012CF; Wed, 18 Dec 2019 18:52:11 +0300 (+03)
-Date:   Wed, 18 Dec 2019 18:52:11 +0300
+        id 5A04D1012CF; Wed, 18 Dec 2019 19:04:20 +0300 (+03)
+Date:   Wed, 18 Dec 2019 19:04:20 +0300
 From:   "Kirill A. Shutemov" <kirill@shutemov.name>
 To:     John Hubbard <jhubbard@nvidia.com>
 Cc:     Andrew Morton <akpm@linux-foundation.org>,
@@ -88,40 +91,188 @@ Cc:     Andrew Morton <akpm@linux-foundation.org>,
         linux-media@vger.kernel.org, linux-rdma@vger.kernel.org,
         linuxppc-dev@lists.ozlabs.org, netdev@vger.kernel.org,
         linux-mm@kvack.org, LKML <linux-kernel@vger.kernel.org>,
-        Christoph Hellwig <hch@lst.de>,
-        "Aneesh Kumar K . V" <aneesh.kumar@linux.ibm.com>
-Subject: Re: [PATCH v11 01/25] mm/gup: factor out duplicate code from four
- routines
-Message-ID: <20191218155211.emcegdp5uqgorfwe@box>
+        Christoph Hellwig <hch@lst.de>
+Subject: Re: [PATCH v11 04/25] mm: devmap: refactor 1-based refcounting for
+ ZONE_DEVICE pages
+Message-ID: <20191218160420.gyt4c45e6zsnxqv6@box>
 References: <20191216222537.491123-1-jhubbard@nvidia.com>
- <20191216222537.491123-2-jhubbard@nvidia.com>
+ <20191216222537.491123-5-jhubbard@nvidia.com>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
+Content-Type: text/plain; charset=iso-8859-1
 Content-Disposition: inline
-In-Reply-To: <20191216222537.491123-2-jhubbard@nvidia.com>
+Content-Transfer-Encoding: 8bit
+In-Reply-To: <20191216222537.491123-5-jhubbard@nvidia.com>
 User-Agent: NeoMutt/20180716
 Sender: linux-block-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-On Mon, Dec 16, 2019 at 02:25:13PM -0800, John Hubbard wrote:
-> +static void put_compound_head(struct page *page, int refs)
+On Mon, Dec 16, 2019 at 02:25:16PM -0800, John Hubbard wrote:
+> An upcoming patch changes and complicates the refcounting and
+> especially the "put page" aspects of it. In order to keep
+> everything clean, refactor the devmap page release routines:
+> 
+> * Rename put_devmap_managed_page() to page_is_devmap_managed(),
+>   and limit the functionality to "read only": return a bool,
+>   with no side effects.
+> 
+> * Add a new routine, put_devmap_managed_page(), to handle checking
+>   what kind of page it is, and what kind of refcount handling it
+>   requires.
+> 
+> * Rename __put_devmap_managed_page() to free_devmap_managed_page(),
+>   and limit the functionality to unconditionally freeing a devmap
+>   page.
+
+What the reason to separate put_devmap_managed_page() from
+free_devmap_managed_page() if free_devmap_managed_page() has exacly one
+caller? Is it preparation for the next patches?
+
+> This is originally based on a separate patch by Ira Weiny, which
+> applied to an early version of the put_user_page() experiments.
+> Since then, Jérôme Glisse suggested the refactoring described above.
+> 
+> Cc: Christoph Hellwig <hch@lst.de>
+> Suggested-by: Jérôme Glisse <jglisse@redhat.com>
+> Reviewed-by: Dan Williams <dan.j.williams@intel.com>
+> Reviewed-by: Jan Kara <jack@suse.cz>
+> Signed-off-by: Ira Weiny <ira.weiny@intel.com>
+> Signed-off-by: John Hubbard <jhubbard@nvidia.com>
+> ---
+>  include/linux/mm.h | 17 +++++++++++++----
+>  mm/memremap.c      | 16 ++--------------
+>  mm/swap.c          | 24 ++++++++++++++++++++++++
+>  3 files changed, 39 insertions(+), 18 deletions(-)
+> 
+> diff --git a/include/linux/mm.h b/include/linux/mm.h
+> index c97ea3b694e6..77a4df06c8a7 100644
+> --- a/include/linux/mm.h
+> +++ b/include/linux/mm.h
+> @@ -952,9 +952,10 @@ static inline bool is_zone_device_page(const struct page *page)
+>  #endif
+>  
+>  #ifdef CONFIG_DEV_PAGEMAP_OPS
+> -void __put_devmap_managed_page(struct page *page);
+> +void free_devmap_managed_page(struct page *page);
+>  DECLARE_STATIC_KEY_FALSE(devmap_managed_key);
+> -static inline bool put_devmap_managed_page(struct page *page)
+> +
+> +static inline bool page_is_devmap_managed(struct page *page)
+>  {
+>  	if (!static_branch_unlikely(&devmap_managed_key))
+>  		return false;
+> @@ -963,7 +964,6 @@ static inline bool put_devmap_managed_page(struct page *page)
+>  	switch (page->pgmap->type) {
+>  	case MEMORY_DEVICE_PRIVATE:
+>  	case MEMORY_DEVICE_FS_DAX:
+> -		__put_devmap_managed_page(page);
+>  		return true;
+>  	default:
+>  		break;
+> @@ -971,7 +971,14 @@ static inline bool put_devmap_managed_page(struct page *page)
+>  	return false;
+>  }
+>  
+> +bool put_devmap_managed_page(struct page *page);
+> +
+>  #else /* CONFIG_DEV_PAGEMAP_OPS */
+> +static inline bool page_is_devmap_managed(struct page *page)
 > +{
-> +	/* Do a get_page() first, in case refs == page->_refcount */
-> +	get_page(page);
-> +	page_ref_sub(page, refs);
-> +	put_page(page);
+> +	return false;
 > +}
+> +
+>  static inline bool put_devmap_managed_page(struct page *page)
+>  {
+>  	return false;
+> @@ -1028,8 +1035,10 @@ static inline void put_page(struct page *page)
+>  	 * need to inform the device driver through callback. See
+>  	 * include/linux/memremap.h and HMM for details.
+>  	 */
+> -	if (put_devmap_managed_page(page))
+> +	if (page_is_devmap_managed(page)) {
+> +		put_devmap_managed_page(page);
 
-It's not terribly efficient. Maybe something like:
+put_devmap_managed_page() has yet another page_is_devmap_managed() check
+inside. It looks strange.
 
-	VM_BUG_ON_PAGE(page_ref_count(page) < ref, page);
-	if (refs > 2)
-		page_ref_sub(page, refs - 1);
-	put_page(page);
+>  		return;
+> +	}
+>  
+>  	if (put_page_testzero(page))
+>  		__put_page(page);
+> diff --git a/mm/memremap.c b/mm/memremap.c
+> index e899fa876a62..2ba773859031 100644
+> --- a/mm/memremap.c
+> +++ b/mm/memremap.c
+> @@ -411,20 +411,8 @@ struct dev_pagemap *get_dev_pagemap(unsigned long pfn,
+>  EXPORT_SYMBOL_GPL(get_dev_pagemap);
+>  
+>  #ifdef CONFIG_DEV_PAGEMAP_OPS
+> -void __put_devmap_managed_page(struct page *page)
+> +void free_devmap_managed_page(struct page *page)
+>  {
+> -	int count = page_ref_dec_return(page);
+> -
+> -	/* still busy */
+> -	if (count > 1)
+> -		return;
+> -
+> -	/* only triggered by the dev_pagemap shutdown path */
+> -	if (count == 0) {
+> -		__put_page(page);
+> -		return;
+> -	}
+> -
+>  	/* notify page idle for dax */
+>  	if (!is_device_private_page(page)) {
+>  		wake_up_var(&page->_refcount);
+> @@ -461,5 +449,5 @@ void __put_devmap_managed_page(struct page *page)
+>  	page->mapping = NULL;
+>  	page->pgmap->ops->page_free(page);
+>  }
+> -EXPORT_SYMBOL(__put_devmap_managed_page);
+> +EXPORT_SYMBOL(free_devmap_managed_page);
+>  #endif /* CONFIG_DEV_PAGEMAP_OPS */
+> diff --git a/mm/swap.c b/mm/swap.c
+> index 5341ae93861f..49f7c2eea0ba 100644
+> --- a/mm/swap.c
+> +++ b/mm/swap.c
+> @@ -1102,3 +1102,27 @@ void __init swap_setup(void)
+>  	 * _really_ don't want to cluster much more
+>  	 */
+>  }
+> +
+> +#ifdef CONFIG_DEV_PAGEMAP_OPS
+> +bool put_devmap_managed_page(struct page *page)
+> +{
+> +	bool is_devmap = page_is_devmap_managed(page);
+> +
+> +	if (is_devmap) {
 
-?
+Reversing the condition would save you an indentation level.
+
+> +		int count = page_ref_dec_return(page);
+> +
+> +		/*
+> +		 * devmap page refcounts are 1-based, rather than 0-based: if
+> +		 * refcount is 1, then the page is free and the refcount is
+> +		 * stable because nobody holds a reference on the page.
+> +		 */
+> +		if (count == 1)
+> +			free_devmap_managed_page(page);
+> +		else if (!count)
+> +			__put_page(page);
+> +	}
+> +
+> +	return is_devmap;
+> +}
+> +EXPORT_SYMBOL(put_devmap_managed_page);
+> +#endif
+> -- 
+> 2.24.1
+> 
+> 
 
 -- 
  Kirill A. Shutemov
