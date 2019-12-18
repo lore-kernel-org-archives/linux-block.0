@@ -1,391 +1,129 @@
-Return-Path: <SRS0=G4H8=2H=vger.kernel.org=linux-block-owner@kernel.org>
+Return-Path: <SRS0=ocaT=2I=vger.kernel.org=linux-block-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-9.8 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
-	INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,
-	USER_AGENT_GIT autolearn=unavailable autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-2.3 required=3.0 tests=DKIM_SIGNED,DKIM_VALID,
+	HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,
+	USER_AGENT_SANE_1 autolearn=no autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 8C664C2D0BF
-	for <linux-block@archiver.kernel.org>; Tue, 17 Dec 2019 22:22:50 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id AC22DC43603
+	for <linux-block@archiver.kernel.org>; Wed, 18 Dec 2019 00:15:50 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.kernel.org (Postfix) with ESMTP id 5B2EA2082E
-	for <linux-block@archiver.kernel.org>; Tue, 17 Dec 2019 22:22:50 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id 7E3F92176D
+	for <linux-block@archiver.kernel.org>; Wed, 18 Dec 2019 00:15:50 +0000 (UTC)
+Authentication-Results: mail.kernel.org;
+	dkim=pass (2048-bit key) header.d=kernel-dk.20150623.gappssmtp.com header.i=@kernel-dk.20150623.gappssmtp.com header.b="w1cqjlIY"
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1726402AbfLQWWj (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Tue, 17 Dec 2019 17:22:39 -0500
-Received: from mout.kundenserver.de ([212.227.17.10]:50303 "EHLO
-        mout.kundenserver.de" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1725805AbfLQWWj (ORCPT
+        id S1725940AbfLRAPu (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Tue, 17 Dec 2019 19:15:50 -0500
+Received: from mail-pg1-f194.google.com ([209.85.215.194]:38141 "EHLO
+        mail-pg1-f194.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S1725975AbfLRAPt (ORCPT
         <rfc822;linux-block@vger.kernel.org>);
-        Tue, 17 Dec 2019 17:22:39 -0500
-Received: from threadripper.lan ([149.172.19.189]) by mrelayeu.kundenserver.de
- (mreue108 [212.227.15.145]) with ESMTPA (Nemesis) id
- 1MJV5K-1iNTt20bmK-00JtoE; Tue, 17 Dec 2019 23:17:28 +0100
-From:   Arnd Bergmann <arnd@arndb.de>
-To:     Jens Axboe <axboe@kernel.dk>,
-        "James E.J. Bottomley" <jejb@linux.ibm.com>,
-        "Martin K. Petersen" <martin.petersen@oracle.com>
-Cc:     linux-scsi@vger.kernel.org, linux-block@vger.kernel.org,
-        y2038@lists.linaro.org, linux-kernel@vger.kernel.org,
-        Christoph Hellwig <hch@lst.de>,
-        Ben Hutchings <ben.hutchings@codethink.co.uk>,
-        linux-doc@vger.kernel.org, corbet@lwn.net, viro@zeniv.linux.org.uk,
-        linux-fsdevel@vger.kernel.org, Arnd Bergmann <arnd@arndb.de>
-Subject: [PATCH v2 11/27] compat_ioctl: move CDROM_SEND_PACKET handling into scsi
-Date:   Tue, 17 Dec 2019 23:16:52 +0100
-Message-Id: <20191217221708.3730997-12-arnd@arndb.de>
-X-Mailer: git-send-email 2.20.0
-In-Reply-To: <20191217221708.3730997-1-arnd@arndb.de>
-References: <20191217221708.3730997-1-arnd@arndb.de>
+        Tue, 17 Dec 2019 19:15:49 -0500
+Received: by mail-pg1-f194.google.com with SMTP id a33so219245pgm.5
+        for <linux-block@vger.kernel.org>; Tue, 17 Dec 2019 16:15:49 -0800 (PST)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=kernel-dk.20150623.gappssmtp.com; s=20150623;
+        h=subject:to:cc:references:from:message-id:date:user-agent
+         :mime-version:in-reply-to:content-language:content-transfer-encoding;
+        bh=YQMmzMY37i2Mof3lbYfpF5chISi7sMrvZ/ycgoxfAyA=;
+        b=w1cqjlIYrAIkEphkj7SjLigIfIMzBn0DtSSscagQOjaBWS1xVHc9HO7ue1501V9FuR
+         YAPsJDbP/asVmSC7PQlSEbkOqHc1WzR1NP0129mG6G7x0gNohKSh+76V7lIuFMObyPED
+         kX32//b8ctPM3sgFXfm6SqxiXLt4eHljSLIoDruli2RsZXHQb3Hru+To3T8wt/OVW9AH
+         bIxjtLX/riBfARkhw23oslkfo1EJwHIYkL6X/8rwC+IGGpSZFtqlw5t5cyrvcvoyNAJr
+         uGxkFiYtrGCxH5f/QylLn/0O3f7JM0VkzNVKEBxeGUGQSFsI3xXayhR6xzo3KZSR99zA
+         Cf8g==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20161025;
+        h=x-gm-message-state:subject:to:cc:references:from:message-id:date
+         :user-agent:mime-version:in-reply-to:content-language
+         :content-transfer-encoding;
+        bh=YQMmzMY37i2Mof3lbYfpF5chISi7sMrvZ/ycgoxfAyA=;
+        b=bbiGd5T6WpgWptgEOfzCFU1RE/1lWOI1dapIxJ5TonfyoO/UDYX1mXecdHiqdHARKW
+         vbFdp66xVvPlShnh6YRXiL+lE8F/NgZjNi2/ykrOn9YdL5K2St4e55EKRe3CzlFcGhrJ
+         uWOt4/FyEApJfDjjbkZgU994OE4UwI7WmWdtFNJtLStWpZEYE4rLhtcU0gmJHKogMDh9
+         +hEcHl542tTtdCmBRouek4hT3woMe78y4MbH+CBhD6xL2pY/5lypJrIRNYkUxLa8F1YS
+         Fx9eOJGfsEPkbfaO0YpxfGzscdXjVoEtKOGVpaqI3X/OExN9gcFEp1Cqpr+mbI3BxUAR
+         zebA==
+X-Gm-Message-State: APjAAAXKPVTjpJxeBBHk/lvpyhRNX6pvf8o6klO6aBMDuq7xf220sUR5
+        vE8OUk0+rJc4Ybg1mFauvbnbSg==
+X-Google-Smtp-Source: APXvYqyg4gmsFwb+g+QqPm6sNT4veLef7n1AMHYvnq9f2ULLZNauq5tLOQMsMKSXl1ieZQsQbjMe9w==
+X-Received: by 2002:a65:6216:: with SMTP id d22mr80575pgv.437.1576628148980;
+        Tue, 17 Dec 2019 16:15:48 -0800 (PST)
+Received: from ?IPv6:2620:10d:c081:1131::13f4? ([2620:10d:c090:180::6446])
+        by smtp.gmail.com with ESMTPSA id l186sm161084pge.31.2019.12.17.16.15.47
+        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
+        Tue, 17 Dec 2019 16:15:48 -0800 (PST)
+Subject: Re: [PATCH 4/6] iomap: add struct iomap_ctx
+To:     Linus Torvalds <torvalds@linux-foundation.org>
+Cc:     Linux-MM <linux-mm@kvack.org>,
+        linux-fsdevel <linux-fsdevel@vger.kernel.org>,
+        linux-block <linux-block@vger.kernel.org>,
+        Matthew Wilcox <willy@infradead.org>, Chris Mason <clm@fb.com>,
+        Dave Chinner <david@fromorbit.com>
+References: <20191217143948.26380-1-axboe@kernel.dk>
+ <20191217143948.26380-5-axboe@kernel.dk>
+ <CAHk-=wgcPAfOSigMf0xwaGfVjw413XN3UPATwYWHrss+QuivhQ@mail.gmail.com>
+ <CAHk-=wgvROUnrEVADVR_zTHY8NmYo-_jVjV37O1MdDm2de+Lmw@mail.gmail.com>
+From:   Jens Axboe <axboe@kernel.dk>
+Message-ID: <9941995e-19c5-507b-9339-b8d2cb568932@kernel.dk>
+Date:   Tue, 17 Dec 2019 17:15:46 -0700
+User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:68.0) Gecko/20100101
+ Thunderbird/68.2.2
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
-X-Provags-ID: V03:K1:Mp6Rj1N7d53mOvmoxMfJiXqVy8L4vX/KvDXHNCZwCkj5FtqvPqF
- LmsoqBqoIPLL7AWulDNY/HeW0lyyWQFtfqHhobt64l7pTViW29nW6M1yeERIiviw+HfvW9Q
- cTGasJcn8hQNeBqcIHZ3tp1szj6SouCBKTs1wZrLmWyroDrgUBg7FdHwEOUDsQvv9ZRTh/V
- HOPorWfYSm2xUQnMzZwig==
-X-UI-Out-Filterresults: notjunk:1;V03:K0:0YLBBWODoHM=:uDf/SRKlIUIKgACjezHiKS
- 5nSxSvF9qoF1iaB0ddvSTisSkno8s9Wk2vTRscWdwMFfHcVcv5uL2dLxFru8slEBa0C3U2AzB
- +qvKfh/fPsmmkm2x/eslA9pOJUnr6wCQU5MLzCM0fwzyVdsAqEXws3ArzSAMGTULxdNwCl4Kw
- jzcRXYpbhpYUmZ2AzexKsdTrmKLOFZblJ0whfwdLfYqHbovYis78zMBp/3+pm+Au8g/q+7fQj
- 2Se9G2tsx/xL4Ppv1Dw05sZaBVH4OHfjgNCv1/TjrRGmi6FlCDpcZCHP3tatmDvdwE/nf08EE
- +ZKkdw2y4IzjO8AR9efNnYOe2aVtS/xcvN97fzsVDM11AhDI7EY3hhRwXKK9EIh3fTE4+Jiy+
- DYuSwqJu+Jv4y0in9PHCLvcHUIqeHiKH5xbb8GDpvHfUrRYxxjxWok+wbAf74aoUVLPHq3hrU
- 76ULf2FBo4wGrUAX/yrB6gmTUjrQlIyk5xh3BcP5Q4fk/1rTsPVo/6GplaCA2WK1LeAecFioU
- vsxhBfDw1tqC4rPy1DmGUB9QVAUd755Gu6npvnTHp29MURmGGWdFGvRqmVOlD4zfqYDVE3xsb
- q5YtAiSaxqrlBRGzLCH6XQuxjnugDwQoos7XnSvuzZEV1UeepTyGsrRQafzB3SBgAy74Jannt
- aTUkELjMbxJFbK5tZCFiXQNjUT2S8HFPeG8MBbqJYflhP+SrQW3Tdse4n4wv91i8VsBoMFA+2
- z5N1q1j5Ucs3O+vRyHlAfia0CCIFDkU4p9pLC49Vw6ZJxFVYj/2S4XrzteXWLuLf594skFg3w
- xHq1mv+oQ5G0a3hH4R8YBcRABnBxssGrqj5MOVJkubu1LIag86jK0XzsRY4IzUOpJJ6gosCeL
- dLgbzKKx/LBfJPL/h5tQ==
+In-Reply-To: <CAHk-=wgvROUnrEVADVR_zTHY8NmYo-_jVjV37O1MdDm2de+Lmw@mail.gmail.com>
+Content-Type: text/plain; charset=utf-8
+Content-Language: en-US
+Content-Transfer-Encoding: 7bit
 Sender: linux-block-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-There is only one implementation of this ioctl, so move the handling out
-of the common block layer code into the place where it's actually needed.
+On 12/17/19 1:26 PM, Linus Torvalds wrote:
+> On Tue, Dec 17, 2019 at 11:39 AM Linus Torvalds
+> <torvalds@linux-foundation.org> wrote:
+>>
+>> 'loff_t length' is not right.
+> 
+> Looking around, it does seem to get used that way. Too much, though.
+> 
+>>> +       loff_t pos = data->pos;
+>>> +       loff_t length = pos + data->len;
+>>
+>> And WTH is that? "pos + data->len" is not "length", that's end. And this:
+>>
+>>>         loff_t end = pos + length, done = 0;
+>>
+>> What? Now 'end' is 'pos+length', which is 'pos+pos+data->len'.
+> 
+> But this is unrelated to the crazy types. That just can't bve right.
 
-It also gets called indirectly through pktcdvd, which needs to be aware
-of this change.
+Yeah, I fixed that one up, that was my error.
 
-As I noticed, the old implementation of the compat handler failed to
-convert the structure on the way out, so the updated fields never got
-written back to user space. This is either not important, or it has
-never worked and should be fixed now.
+>> Is there some reason for this horrible case of "let's allow 64-bit sizes?"
+>>
+>> Because even if there is, it shouldn't be "loff_t". That's an
+>> _offset_. Not a length.
+> 
+> We do seem to have a lot of these across filesystems. And a lot of
+> confusion. Most of the IO reoutines clearly take or return a size_t
+> (returning ssize_t) as the IO size. And then you have the
+> zeroing/truncation stuff that tends to take loff_t. Which still smells
+> wrong, and s64 would look like a better case, but whatever.
+> 
+> The "iomap_zero_range() for truncate" case really does seem to need a
+> 64-bit value, because people do the difference of two loff_t's for it.
+> In fact, it almost looks like that function should take a "start ,
+> end" pair, which would make loff_t be the _right_ thing.
+> 
+> Because "length" really is just (a positive) size_t normally.
 
-Signed-off-by: Arnd Bergmann <arnd@arndb.de>
----
- block/compat_ioctl.c    |  47 +---------
- block/scsi_ioctl.c      | 185 ++++++++++++++++++++++++++++------------
- drivers/block/pktcdvd.c |   6 +-
- 3 files changed, 135 insertions(+), 103 deletions(-)
+Honestly, I'd much rather leave the loff_t -> size_t/ssize_t to
+Darrick/Dave, it's really outside the scope of this patch, and I'd
+prefer not to have to muck with it. They probably feel the same way!
 
-diff --git a/block/compat_ioctl.c b/block/compat_ioctl.c
-index f16ae92065d7..578e04f94619 100644
---- a/block/compat_ioctl.c
-+++ b/block/compat_ioctl.c
-@@ -102,18 +102,6 @@ struct compat_cdrom_read_audio {
- 	compat_caddr_t		buf;
- };
- 
--struct compat_cdrom_generic_command {
--	unsigned char	cmd[CDROM_PACKET_SIZE];
--	compat_caddr_t	buffer;
--	compat_uint_t	buflen;
--	compat_int_t	stat;
--	compat_caddr_t	sense;
--	unsigned char	data_direction;
--	compat_int_t	quiet;
--	compat_int_t	timeout;
--	compat_caddr_t	reserved[1];
--};
--
- static int compat_cdrom_read_audio(struct block_device *bdev, fmode_t mode,
- 		unsigned int cmd, unsigned long arg)
- {
-@@ -141,38 +129,6 @@ static int compat_cdrom_read_audio(struct block_device *bdev, fmode_t mode,
- 			(unsigned long)cdread_audio);
- }
- 
--static int compat_cdrom_generic_command(struct block_device *bdev, fmode_t mode,
--		unsigned int cmd, unsigned long arg)
--{
--	struct cdrom_generic_command __user *cgc;
--	struct compat_cdrom_generic_command __user *cgc32;
--	u32 data;
--	unsigned char dir;
--	int itmp;
--
--	cgc = compat_alloc_user_space(sizeof(*cgc));
--	cgc32 = compat_ptr(arg);
--
--	if (copy_in_user(&cgc->cmd, &cgc32->cmd, sizeof(cgc->cmd)) ||
--	    get_user(data, &cgc32->buffer) ||
--	    put_user(compat_ptr(data), &cgc->buffer) ||
--	    copy_in_user(&cgc->buflen, &cgc32->buflen,
--			 (sizeof(unsigned int) + sizeof(int))) ||
--	    get_user(data, &cgc32->sense) ||
--	    put_user(compat_ptr(data), &cgc->sense) ||
--	    get_user(dir, &cgc32->data_direction) ||
--	    put_user(dir, &cgc->data_direction) ||
--	    get_user(itmp, &cgc32->quiet) ||
--	    put_user(itmp, &cgc->quiet) ||
--	    get_user(itmp, &cgc32->timeout) ||
--	    put_user(itmp, &cgc->timeout) ||
--	    get_user(data, &cgc32->reserved[0]) ||
--	    put_user(compat_ptr(data), &cgc->reserved[0]))
--		return -EFAULT;
--
--	return __blkdev_driver_ioctl(bdev, mode, cmd, (unsigned long)cgc);
--}
--
- struct compat_blkpg_ioctl_arg {
- 	compat_int_t op;
- 	compat_int_t flags;
-@@ -224,8 +180,6 @@ static int compat_blkdev_driver_ioctl(struct block_device *bdev, fmode_t mode,
- 		return compat_hdio_ioctl(bdev, mode, cmd, arg);
- 	case CDROMREADAUDIO:
- 		return compat_cdrom_read_audio(bdev, mode, cmd, arg);
--	case CDROM_SEND_PACKET:
--		return compat_cdrom_generic_command(bdev, mode, cmd, arg);
- 
- 	/*
- 	 * No handler required for the ones below, we just need to
-@@ -263,6 +217,7 @@ static int compat_blkdev_driver_ioctl(struct block_device *bdev, fmode_t mode,
- 	case CDROM_DISC_STATUS:
- 	case CDROM_CHANGER_NSLOTS:
- 	case CDROM_GET_CAPABILITY:
-+	case CDROM_SEND_PACKET:
- 	/* Ignore cdrom.h about these next 5 ioctls, they absolutely do
- 	 * not take a struct cdrom_read, instead they take a struct cdrom_msf
- 	 * which is compatible.
-diff --git a/block/scsi_ioctl.c b/block/scsi_ioctl.c
-index b61dbf4d8443..b4e73d5dd5c2 100644
---- a/block/scsi_ioctl.c
-+++ b/block/scsi_ioctl.c
-@@ -639,6 +639,136 @@ int get_sg_io_hdr(struct sg_io_hdr *hdr, const void __user *argp)
- }
- EXPORT_SYMBOL(get_sg_io_hdr);
- 
-+#ifdef CONFIG_COMPAT
-+struct compat_cdrom_generic_command {
-+	unsigned char	cmd[CDROM_PACKET_SIZE];
-+	compat_caddr_t	buffer;
-+	compat_uint_t	buflen;
-+	compat_int_t	stat;
-+	compat_caddr_t	sense;
-+	unsigned char	data_direction;
-+	compat_int_t	quiet;
-+	compat_int_t	timeout;
-+	compat_caddr_t	reserved[1];
-+};
-+#endif
-+
-+static int scsi_get_cdrom_generic_arg(struct cdrom_generic_command *cgc,
-+				      const void __user *arg)
-+{
-+#ifdef CONFIG_COMPAT
-+	if (in_compat_syscall()) {
-+		struct compat_cdrom_generic_command cgc32;
-+
-+		if (copy_from_user(&cgc32, arg, sizeof(cgc32)))
-+			return -EFAULT;
-+
-+		*cgc = (struct cdrom_generic_command) {
-+			.buffer		= compat_ptr(cgc32.buffer),
-+			.buflen		= cgc32.buflen,
-+			.stat		= cgc32.stat,
-+			.sense		= compat_ptr(cgc32.sense),
-+			.data_direction	= cgc32.data_direction,
-+			.quiet		= cgc32.quiet,
-+			.timeout	= cgc32.timeout,
-+			.reserved[0]	= compat_ptr(cgc32.reserved[0]),
-+		};
-+		memcpy(&cgc->cmd, &cgc32.cmd, CDROM_PACKET_SIZE);
-+		return 0;
-+	}
-+#endif
-+	if (copy_from_user(cgc, arg, sizeof(*cgc)))
-+		return -EFAULT;
-+
-+	return 0;
-+}
-+
-+static int scsi_put_cdrom_generic_arg(const struct cdrom_generic_command *cgc,
-+				      void __user *arg)
-+{
-+#ifdef CONFIG_COMPAT
-+	if (in_compat_syscall()) {
-+		struct compat_cdrom_generic_command cgc32 = {
-+			.buffer		= (uintptr_t)(cgc->buffer),
-+			.buflen		= cgc->buflen,
-+			.stat		= cgc->stat,
-+			.sense		= (uintptr_t)(cgc->sense),
-+			.data_direction	= cgc->data_direction,
-+			.quiet		= cgc->quiet,
-+			.timeout	= cgc->timeout,
-+			.reserved[0]	= (uintptr_t)(cgc->reserved[0]),
-+		};
-+		memcpy(&cgc32.cmd, &cgc->cmd, CDROM_PACKET_SIZE);
-+
-+		if (copy_to_user(arg, &cgc32, sizeof(cgc32)))
-+			return -EFAULT;
-+
-+		return 0;
-+	}
-+#endif
-+	if (copy_to_user(arg, cgc, sizeof(*cgc)))
-+		return -EFAULT;
-+
-+	return 0;
-+}
-+
-+static int scsi_cdrom_send_packet(struct request_queue *q,
-+				  struct gendisk *bd_disk,
-+				  fmode_t mode, void __user *arg)
-+{
-+	struct cdrom_generic_command cgc;
-+	struct sg_io_hdr hdr;
-+	int err;
-+
-+	err = scsi_get_cdrom_generic_arg(&cgc, arg);
-+	if (err)
-+		return err;
-+
-+	cgc.timeout = clock_t_to_jiffies(cgc.timeout);
-+	memset(&hdr, 0, sizeof(hdr));
-+	hdr.interface_id = 'S';
-+	hdr.cmd_len = sizeof(cgc.cmd);
-+	hdr.dxfer_len = cgc.buflen;
-+	switch (cgc.data_direction) {
-+		case CGC_DATA_UNKNOWN:
-+			hdr.dxfer_direction = SG_DXFER_UNKNOWN;
-+			break;
-+		case CGC_DATA_WRITE:
-+			hdr.dxfer_direction = SG_DXFER_TO_DEV;
-+			break;
-+		case CGC_DATA_READ:
-+			hdr.dxfer_direction = SG_DXFER_FROM_DEV;
-+			break;
-+		case CGC_DATA_NONE:
-+			hdr.dxfer_direction = SG_DXFER_NONE;
-+			break;
-+		default:
-+			return -EINVAL;
-+	}
-+
-+	hdr.dxferp = cgc.buffer;
-+	hdr.sbp = cgc.sense;
-+	if (hdr.sbp)
-+		hdr.mx_sb_len = sizeof(struct request_sense);
-+	hdr.timeout = jiffies_to_msecs(cgc.timeout);
-+	hdr.cmdp = ((struct cdrom_generic_command __user*) arg)->cmd;
-+	hdr.cmd_len = sizeof(cgc.cmd);
-+
-+	err = sg_io(q, bd_disk, &hdr, mode);
-+	if (err == -EFAULT)
-+		return -EFAULT;
-+
-+	if (hdr.status)
-+		return -EIO;
-+
-+	cgc.stat = err;
-+	cgc.buflen = hdr.resid;
-+	if (scsi_put_cdrom_generic_arg(&cgc, arg))
-+		return -EFAULT;
-+
-+	return err;
-+}
-+
- int scsi_cmd_ioctl(struct request_queue *q, struct gendisk *bd_disk, fmode_t mode,
- 		   unsigned int cmd, void __user *arg)
- {
-@@ -689,60 +819,9 @@ int scsi_cmd_ioctl(struct request_queue *q, struct gendisk *bd_disk, fmode_t mod
- 				err = -EFAULT;
- 			break;
- 		}
--		case CDROM_SEND_PACKET: {
--			struct cdrom_generic_command cgc;
--			struct sg_io_hdr hdr;
--
--			err = -EFAULT;
--			if (copy_from_user(&cgc, arg, sizeof(cgc)))
--				break;
--			cgc.timeout = clock_t_to_jiffies(cgc.timeout);
--			memset(&hdr, 0, sizeof(hdr));
--			hdr.interface_id = 'S';
--			hdr.cmd_len = sizeof(cgc.cmd);
--			hdr.dxfer_len = cgc.buflen;
--			err = 0;
--			switch (cgc.data_direction) {
--				case CGC_DATA_UNKNOWN:
--					hdr.dxfer_direction = SG_DXFER_UNKNOWN;
--					break;
--				case CGC_DATA_WRITE:
--					hdr.dxfer_direction = SG_DXFER_TO_DEV;
--					break;
--				case CGC_DATA_READ:
--					hdr.dxfer_direction = SG_DXFER_FROM_DEV;
--					break;
--				case CGC_DATA_NONE:
--					hdr.dxfer_direction = SG_DXFER_NONE;
--					break;
--				default:
--					err = -EINVAL;
--			}
--			if (err)
--				break;
--
--			hdr.dxferp = cgc.buffer;
--			hdr.sbp = cgc.sense;
--			if (hdr.sbp)
--				hdr.mx_sb_len = sizeof(struct request_sense);
--			hdr.timeout = jiffies_to_msecs(cgc.timeout);
--			hdr.cmdp = ((struct cdrom_generic_command __user*) arg)->cmd;
--			hdr.cmd_len = sizeof(cgc.cmd);
--
--			err = sg_io(q, bd_disk, &hdr, mode);
--			if (err == -EFAULT)
--				break;
--
--			if (hdr.status)
--				err = -EIO;
--
--			cgc.stat = err;
--			cgc.buflen = hdr.resid;
--			if (copy_to_user(arg, &cgc, sizeof(cgc)))
--				err = -EFAULT;
--
-+		case CDROM_SEND_PACKET:
-+			err = scsi_cdrom_send_packet(q, bd_disk, mode, arg);
- 			break;
--		}
- 
- 		/*
- 		 * old junk scsi send command ioctl
-diff --git a/drivers/block/pktcdvd.c b/drivers/block/pktcdvd.c
-index 861fc65a1b75..ab4d3be4b646 100644
---- a/drivers/block/pktcdvd.c
-+++ b/drivers/block/pktcdvd.c
-@@ -2671,15 +2671,13 @@ static int pkt_compat_ioctl(struct block_device *bdev, fmode_t mode, unsigned in
- 	case CDROMEJECT:
- 	case CDROMMULTISESSION:
- 	case CDROMREADTOCENTRY:
-+	case CDROM_SEND_PACKET: /* compat mode handled in scsi_cmd_ioctl */
- 	case SCSI_IOCTL_SEND_COMMAND:
- 		return pkt_ioctl(bdev, mode, cmd, (unsigned long)compat_ptr(arg));
- 
--
- 	/* FIXME: no handler so far */
--	case CDROM_LAST_WRITTEN:
--	/* handled in compat_blkdev_driver_ioctl */
--	case CDROM_SEND_PACKET:
- 	default:
-+	case CDROM_LAST_WRITTEN:
- 		return -ENOIOCTLCMD;
- 	}
- }
 -- 
-2.20.0
+Jens Axboe
 
