@@ -7,46 +7,46 @@ X-Spam-Status: No, score=-9.9 required=3.0 tests=DKIMWL_WL_HIGH,DKIM_SIGNED,
 	MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,USER_AGENT_GIT
 	autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id C336BC43603
-	for <linux-block@archiver.kernel.org>; Wed, 18 Dec 2019 10:43:15 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 760F8C43603
+	for <linux-block@archiver.kernel.org>; Wed, 18 Dec 2019 10:43:34 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.kernel.org (Postfix) with ESMTP id 90390227BF
-	for <linux-block@archiver.kernel.org>; Wed, 18 Dec 2019 10:43:15 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id 498FA2465E
+	for <linux-block@archiver.kernel.org>; Wed, 18 Dec 2019 10:43:34 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=pass (1024-bit key) header.d=amazon.com header.i=@amazon.com header.b="OVC+/1R+"
+	dkim=pass (1024-bit key) header.d=amazon.com header.i=@amazon.com header.b="Myon/dg+"
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1726682AbfLRKnP (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Wed, 18 Dec 2019 05:43:15 -0500
-Received: from smtp-fw-4101.amazon.com ([72.21.198.25]:13741 "EHLO
-        smtp-fw-4101.amazon.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1725828AbfLRKnO (ORCPT
+        id S1726752AbfLRKnd (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Wed, 18 Dec 2019 05:43:33 -0500
+Received: from smtp-fw-9101.amazon.com ([207.171.184.25]:21363 "EHLO
+        smtp-fw-9101.amazon.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S1725828AbfLRKnd (ORCPT
         <rfc822;linux-block@vger.kernel.org>);
-        Wed, 18 Dec 2019 05:43:14 -0500
+        Wed, 18 Dec 2019 05:43:33 -0500
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
   d=amazon.com; i=@amazon.com; q=dns/txt; s=amazon201209;
-  t=1576665795; x=1608201795;
+  t=1576665813; x=1608201813;
   h=from:to:cc:subject:date:message-id:in-reply-to:
-   references:mime-version:content-transfer-encoding;
-  bh=6HH7PeknGCYANJeR4Z4A5j/5EdY1wACfauzPdOr50Ks=;
-  b=OVC+/1R+L/cE8Gwo68YAf2MqJEMkeN2/iRyS8YYXwyQ+dQ7naR/4UD22
-   gisfpXH2QYDQ95C2T6JCtK+Dn/scXYEjFqmNGtlYm9jF1fZtYoU/Bdjb1
-   DbcSp1JXGhLMounzV058DivaDuXtkzJcQe0Oj/SqEoO6+ypGYW7Xhj+jJ
-   g=;
-IronPort-SDR: pXXPpQ94o2PFanZfgkiArLRqYLmZkSnUZR3A0k0zOjAILvvqJwc8x1LGVVKpBklOSrhgpzilPi
- r0GyC4ycayFg==
+   references:mime-version;
+  bh=+zW5Xl7nIWaH59KtKB8TMfJ8+qGCgB0IlDIGxqn2j8U=;
+  b=Myon/dg+lOX3FcaNQKg2+CFD5bYbrwt3b0TuuF0Swuv5Vy0awswWU8Wh
+   ptyFQwxboSBL/sskwuCE9lDPlWSY5jCTKXebB9/vtsYDlymcXaslsW7eL
+   hbdwk1qi4oIikDC1nVDkT72Ao9bTEhjG5HbInlVOq/MiVhnBaVPW2/Q1p
+   o=;
+IronPort-SDR: c0niSukasfQpNaphYn8H13G8sbDU0LWgOwvWZjYo8JngTn00Yd9CGiWJT1PR7ouInXEAfk34MW
+ C/20QdjnyhWA==
 X-IronPort-AV: E=Sophos;i="5.69,329,1571702400"; 
-   d="scan'208";a="9016324"
-Received: from iad12-co-svc-p1-lb1-vlan3.amazon.com (HELO email-inbound-relay-2a-22cc717f.us-west-2.amazon.com) ([10.43.8.6])
-  by smtp-border-fw-out-4101.iad4.amazon.com with ESMTP; 18 Dec 2019 10:43:12 +0000
-Received: from EX13MTAUEA001.ant.amazon.com (pdx4-ws-svc-p6-lb7-vlan3.pdx.amazon.com [10.170.41.166])
-        by email-inbound-relay-2a-22cc717f.us-west-2.amazon.com (Postfix) with ESMTPS id F198FA25BC;
-        Wed, 18 Dec 2019 10:43:10 +0000 (UTC)
+   d="scan'208";a="5820940"
+Received: from sea32-co-svc-lb4-vlan3.sea.corp.amazon.com (HELO email-inbound-relay-2c-4e7c8266.us-west-2.amazon.com) ([10.47.23.38])
+  by smtp-border-fw-out-9101.sea19.amazon.com with ESMTP; 18 Dec 2019 10:43:22 +0000
+Received: from EX13MTAUEA002.ant.amazon.com (pdx4-ws-svc-p6-lb7-vlan2.pdx.amazon.com [10.170.41.162])
+        by email-inbound-relay-2c-4e7c8266.us-west-2.amazon.com (Postfix) with ESMTPS id 0119EA1927;
+        Wed, 18 Dec 2019 10:43:20 +0000 (UTC)
 Received: from EX13D31EUA001.ant.amazon.com (10.43.165.15) by
- EX13MTAUEA001.ant.amazon.com (10.43.61.243) with Microsoft SMTP Server (TLS)
- id 15.0.1367.3; Wed, 18 Dec 2019 10:43:10 +0000
+ EX13MTAUEA002.ant.amazon.com (10.43.61.77) with Microsoft SMTP Server (TLS)
+ id 15.0.1236.3; Wed, 18 Dec 2019 10:43:20 +0000
 Received: from u886c93fd17d25d.ant.amazon.com (10.43.160.100) by
  EX13D31EUA001.ant.amazon.com (10.43.165.15) with Microsoft SMTP Server (TLS)
- id 15.0.1367.3; Wed, 18 Dec 2019 10:43:05 +0000
+ id 15.0.1367.3; Wed, 18 Dec 2019 10:43:15 +0000
 From:   SeongJae Park <sjpark@amazon.com>
 To:     <jgross@suse.com>, <axboe@kernel.dk>, <konrad.wilk@oracle.com>,
         <roger.pau@citrix.com>
@@ -54,15 +54,14 @@ CC:     SeongJae Park <sjpark@amazon.de>, <pdurrant@amazon.com>,
         <sjpark@amazon.com>, <sj38.park@gmail.com>,
         <xen-devel@lists.xenproject.org>, <linux-block@vger.kernel.org>,
         <linux-kernel@vger.kernel.org>
-Subject: [PATCH v12 1/5] xenbus/backend: Add memory pressure handler callback
-Date:   Wed, 18 Dec 2019 11:42:28 +0100
-Message-ID: <20191218104232.9606-2-sjpark@amazon.com>
+Subject: [PATCH v12 2/5] xenbus/backend: Protect xenbus callback with lock
+Date:   Wed, 18 Dec 2019 11:42:29 +0100
+Message-ID: <20191218104232.9606-3-sjpark@amazon.com>
 X-Mailer: git-send-email 2.17.1
 In-Reply-To: <20191218104232.9606-1-sjpark@amazon.com>
 References: <20191218104232.9606-1-sjpark@amazon.com>
 MIME-Version: 1.0
-Content-Type: text/plain; charset="UTF-8"
-Content-Transfer-Encoding: 8bit
+Content-Type: text/plain
 X-Originating-IP: [10.43.160.100]
 X-ClientProxiedBy: EX13D18UWA003.ant.amazon.com (10.43.160.238) To
  EX13D31EUA001.ant.amazon.com (10.43.165.15)
@@ -73,95 +72,72 @@ X-Mailing-List: linux-block@vger.kernel.org
 
 From: SeongJae Park <sjpark@amazon.de>
 
-Granting pages consumes backend system memory.  In systems configured
-with insufficient spare memory for those pages, it can cause a memory
-pressure situation.  However, finding the optimal amount of the spare
-memory is challenging for large systems having dynamic resource
-utilization patterns.  Also, such a static configuration might lack
-flexibility.
+'reclaim_memory' callback can race with a driver code as this callback
+will be called from any memory pressure detected context.  To deal with
+the case, this commit adds a spinlock in the 'xenbus_device'.  Whenever
+'reclaim_memory' callback is called, the lock of the device which passed
+to the callback as its argument is locked.  Thus, drivers registering
+their 'reclaim_memory' callback should protect the data that might race
+with the callback with the lock by themselves.
 
-To mitigate such problems, this commit adds a memory reclaim callback to
-'xenbus_driver'.  If a memory pressure is detected, 'xenbus' requests
-every backend driver to volunarily release its memory.
-
-Note that it would be able to improve the callback facility for more
-sophisticated handlings of general pressures.  For example, it would be
-possible to monitor the memory consumption of each device and issue the
-release requests to only devices which causing the pressure.  Also, the
-callback could be extended to handle not only memory, but general
-resources.  Nevertheless, this version of the implementation defers such
-sophisticated goals as a future work.
-
-Reviewed-by: Juergen Gross <jgross@suse.com>
-Reviewed-by: Roger Pau Monné <roger.pau@citrix.com>
 Signed-off-by: SeongJae Park <sjpark@amazon.de>
 ---
- drivers/xen/xenbus/xenbus_probe_backend.c | 32 +++++++++++++++++++++++
- include/xen/xenbus.h                      |  1 +
- 2 files changed, 33 insertions(+)
+ drivers/xen/xenbus/xenbus_probe.c         |  1 +
+ drivers/xen/xenbus/xenbus_probe_backend.c | 11 +++++++++--
+ include/xen/xenbus.h                      |  2 ++
+ 3 files changed, 12 insertions(+), 2 deletions(-)
 
+diff --git a/drivers/xen/xenbus/xenbus_probe.c b/drivers/xen/xenbus/xenbus_probe.c
+index 5b471889d723..b86393f172e6 100644
+--- a/drivers/xen/xenbus/xenbus_probe.c
++++ b/drivers/xen/xenbus/xenbus_probe.c
+@@ -472,6 +472,7 @@ int xenbus_probe_node(struct xen_bus_type *bus,
+ 		goto fail;
+ 
+ 	dev_set_name(&xendev->dev, "%s", devname);
++	spin_lock_init(&xendev->reclaim_lock);
+ 
+ 	/* Register with generic device framework. */
+ 	err = device_register(&xendev->dev);
 diff --git a/drivers/xen/xenbus/xenbus_probe_backend.c b/drivers/xen/xenbus/xenbus_probe_backend.c
-index b0bed4faf44c..7e78ebef7c54 100644
+index 7e78ebef7c54..e862cb932cc4 100644
 --- a/drivers/xen/xenbus/xenbus_probe_backend.c
 +++ b/drivers/xen/xenbus/xenbus_probe_backend.c
-@@ -248,6 +248,35 @@ static int backend_probe_and_watch(struct notifier_block *notifier,
- 	return NOTIFY_DONE;
- }
- 
-+static int backend_reclaim_memory(struct device *dev, void *data)
-+{
-+	const struct xenbus_driver *drv;
-+
-+	if (!dev->driver)
-+		return 0;
-+	drv = to_xenbus_driver(dev->driver);
-+	if (drv && drv->reclaim_memory)
-+		drv->reclaim_memory(to_xenbus_device(dev));
-+	return 0;
-+}
-+
-+/*
-+ * Returns 0 always because we are using shrinker to only detect memory
-+ * pressure.
-+ */
-+static unsigned long backend_shrink_memory_count(struct shrinker *shrinker,
-+				struct shrink_control *sc)
-+{
-+	bus_for_each_dev(&xenbus_backend.bus, NULL, NULL,
-+			backend_reclaim_memory);
-+	return 0;
-+}
-+
-+static struct shrinker backend_memory_shrinker = {
-+	.count_objects = backend_shrink_memory_count,
-+	.seeks = DEFAULT_SEEKS,
-+};
-+
- static int __init xenbus_probe_backend_init(void)
+@@ -251,12 +251,19 @@ static int backend_probe_and_watch(struct notifier_block *notifier,
+ static int backend_reclaim_memory(struct device *dev, void *data)
  {
- 	static struct notifier_block xenstore_notifier = {
-@@ -264,6 +293,9 @@ static int __init xenbus_probe_backend_init(void)
+ 	const struct xenbus_driver *drv;
++	struct xenbus_device *xdev;
++	unsigned long flags;
  
- 	register_xenstore_notifier(&xenstore_notifier);
- 
-+	if (register_shrinker(&backend_memory_shrinker))
-+		pr_warn("shrinker registration failed\n");
-+
+ 	if (!dev->driver)
+ 		return 0;
+ 	drv = to_xenbus_driver(dev->driver);
+-	if (drv && drv->reclaim_memory)
+-		drv->reclaim_memory(to_xenbus_device(dev));
++	if (drv && drv->reclaim_memory) {
++		xdev = to_xenbus_device(dev);
++		if (!spin_trylock_irqsave(&xdev->reclaim_lock, flags))
++			return 0;
++		drv->reclaim_memory(xdev);
++		spin_unlock_irqrestore(&xdev->reclaim_lock, flags);
++	}
  	return 0;
  }
- subsys_initcall(xenbus_probe_backend_init);
+ 
 diff --git a/include/xen/xenbus.h b/include/xen/xenbus.h
-index 869c816d5f8c..c861cfb6f720 100644
+index c861cfb6f720..d9468313061d 100644
 --- a/include/xen/xenbus.h
 +++ b/include/xen/xenbus.h
-@@ -104,6 +104,7 @@ struct xenbus_driver {
- 	struct device_driver driver;
- 	int (*read_otherend_details)(struct xenbus_device *dev);
- 	int (*is_ready)(struct xenbus_device *dev);
-+	void (*reclaim_memory)(struct xenbus_device *dev);
+@@ -76,6 +76,8 @@ struct xenbus_device {
+ 	enum xenbus_state state;
+ 	struct completion down;
+ 	struct work_struct work;
++	/* 'reclaim_memory' callback is called while this lock is acquired */
++	spinlock_t reclaim_lock;
  };
  
- static inline struct xenbus_driver *to_xenbus_driver(struct device_driver *drv)
+ static inline struct xenbus_device *to_xenbus_device(struct device *dev)
 -- 
 2.17.1
 
