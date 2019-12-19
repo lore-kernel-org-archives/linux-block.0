@@ -2,102 +2,215 @@ Return-Path: <SRS0=q1Dd=2J=vger.kernel.org=linux-block-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-0.8 required=3.0 tests=DKIM_SIGNED,DKIM_VALID,
-	HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS
-	autolearn=no autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-7.4 required=3.0 tests=DKIMWL_WL_HIGH,DKIM_SIGNED,
+	DKIM_VALID,DKIM_VALID_AU,HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,
+	MENTIONS_GIT_HOSTING,SPF_HELO_NONE,SPF_PASS,USER_AGENT_SANE_1
+	autolearn=unavailable autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id CEAAAC43603
-	for <linux-block@archiver.kernel.org>; Thu, 19 Dec 2019 22:44:00 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 99221C43603
+	for <linux-block@archiver.kernel.org>; Thu, 19 Dec 2019 23:01:42 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.kernel.org (Postfix) with ESMTP id 9C00A24676
-	for <linux-block@archiver.kernel.org>; Thu, 19 Dec 2019 22:44:00 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id 6076024672
+	for <linux-block@archiver.kernel.org>; Thu, 19 Dec 2019 23:01:42 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=pass (2048-bit key) header.d=osandov-com.20150623.gappssmtp.com header.i=@osandov-com.20150623.gappssmtp.com header.b="AaYXIWTa"
+	dkim=pass (2048-bit key) header.d=nvidia.com header.i=@nvidia.com header.b="ax5pfVwR"
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1726911AbfLSWoA (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Thu, 19 Dec 2019 17:44:00 -0500
-Received: from mail-pj1-f66.google.com ([209.85.216.66]:37426 "EHLO
-        mail-pj1-f66.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1726818AbfLSWn7 (ORCPT
+        id S1726952AbfLSXBl (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Thu, 19 Dec 2019 18:01:41 -0500
+Received: from hqnvemgate26.nvidia.com ([216.228.121.65]:15328 "EHLO
+        hqnvemgate26.nvidia.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S1726880AbfLSXBl (ORCPT
         <rfc822;linux-block@vger.kernel.org>);
-        Thu, 19 Dec 2019 17:43:59 -0500
-Received: by mail-pj1-f66.google.com with SMTP id m13so3216740pjb.2
-        for <linux-block@vger.kernel.org>; Thu, 19 Dec 2019 14:43:59 -0800 (PST)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=osandov-com.20150623.gappssmtp.com; s=20150623;
-        h=date:from:to:cc:subject:message-id:references:mime-version
-         :content-disposition:in-reply-to;
-        bh=nx1GFVhK4cgTsK0sn6kKnP1a5ElZyM4XkzOfrxOF3rg=;
-        b=AaYXIWTaC1RtehBohxg4QwM04ayGnGTsDE+hWp+hJhvbgXLh99yD8fBouprPy8/kse
-         qNtDVJxLM8fAUIDiQzTDy4j8KvUkvNivEKSpq9VFxbKerYB1S/t14FSTm+bO6fU/bALy
-         Lv5scfA5hcpQ7tOO/jf/PFkKSqfhY3Cj0e88OmtKvQeJLiMQ6Fzk2e93PCOsCtSq+Lxp
-         fNlFHlTfzAP8ycTzT0KJ8PL2LPWNtoaIikzkg5Z1jCCizNmPuC4RQm0A04YnYygBkljB
-         pqIp2hF3Haa0OzRo4vGwUQJy9F/ePiIRcCy5T0rVIFN8nXNPxtD3KAhFPIK4A/MtDR+i
-         syRA==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20161025;
-        h=x-gm-message-state:date:from:to:cc:subject:message-id:references
-         :mime-version:content-disposition:in-reply-to;
-        bh=nx1GFVhK4cgTsK0sn6kKnP1a5ElZyM4XkzOfrxOF3rg=;
-        b=LNpKxsxyFiuj2lL+lRkwmmT3hXB16r+XRMgX+ioN8WjP2cv0YCBrq/iZ/+uUp2dhZB
-         QoH3oJzT/iHzkJzFH6mawbbLe/eMFpZRXSDGsKvSCqI/LQy+ygTSByultLqLjqaCmk+C
-         hvb1nL3TxX5tPKHjsGOYC76r/Aw78ntl57kMUOtmAfo/90n9HcVAE5YjE5q0/g8IYdC3
-         QvvwgW5ovLEXwEE5eDAhoxO70lCLpDVqYpTdWIX6jqXEc4iokyVirfrwTBuD3R8TW/eF
-         tzTYv5cXbzdfCdrRCyAFXIdkgI6rz2FZOL3h24sx4dMygvJ3cMAFailJvX2y28APS84s
-         uLcw==
-X-Gm-Message-State: APjAAAWnPOixWzYCqwcG3fgaCkG2sxp2JzzH+lCzFKwaL14kRtwOY7v0
-        dcXObhNIu8HBaeHBNpIPUKlh+w==
-X-Google-Smtp-Source: APXvYqx0s8FxJ2KxpfjokpHjizC3CSHZIy8/SGPAN9bezuRAg5vp5Cp8/4PZu7KzUZqnRMtXdTYRwA==
-X-Received: by 2002:a17:90a:9385:: with SMTP id q5mr11639587pjo.127.1576795438920;
-        Thu, 19 Dec 2019 14:43:58 -0800 (PST)
-Received: from vader ([2601:602:8b80:8e0:e6a7:a0ff:fe0b:c9a8])
-        by smtp.gmail.com with ESMTPSA id h16sm9843890pfn.85.2019.12.19.14.43.57
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Thu, 19 Dec 2019 14:43:58 -0800 (PST)
-Date:   Thu, 19 Dec 2019 14:43:57 -0800
-From:   Omar Sandoval <osandov@osandov.com>
-To:     Bart Van Assche <bvanassche@acm.org>
-Cc:     Omar Sandoval <osandov@fb.com>, linux-block@vger.kernel.org
-Subject: Re: [PATCH v2 0/4] Add an SRP test for the SoftiWARP driver
-Message-ID: <20191219224357.GC830111@vader>
-References: <20191213143232.29899-1-bvanassche@acm.org>
- <20191219214735.GA830111@vader>
- <de0feeff-debb-8c14-2f17-6d17c5c27c9a@acm.org>
+        Thu, 19 Dec 2019 18:01:41 -0500
+Received: from hqpgpgate101.nvidia.com (Not Verified[216.228.121.13]) by hqnvemgate26.nvidia.com (using TLS: TLSv1.2, DES-CBC3-SHA)
+        id <B5dfc01460000>; Thu, 19 Dec 2019 15:01:26 -0800
+Received: from hqmail.nvidia.com ([172.20.161.6])
+  by hqpgpgate101.nvidia.com (PGP Universal service);
+  Thu, 19 Dec 2019 15:01:36 -0800
+X-PGP-Universal: processed;
+        by hqpgpgate101.nvidia.com on Thu, 19 Dec 2019 15:01:36 -0800
+Received: from [10.2.165.11] (10.124.1.5) by HQMAIL107.nvidia.com
+ (172.20.187.13) with Microsoft SMTP Server (TLS) id 15.0.1473.3; Thu, 19 Dec
+ 2019 23:01:32 +0000
+Subject: Re: [PATCH v11 00/25] mm/gup: track dma-pinned pages: FOLL_PIN
+To:     Jason Gunthorpe <jgg@ziepe.ca>
+CC:     Leon Romanovsky <leon@kernel.org>,
+        Andrew Morton <akpm@linux-foundation.org>,
+        Al Viro <viro@zeniv.linux.org.uk>,
+        "Alex Williamson" <alex.williamson@redhat.com>,
+        Benjamin Herrenschmidt <benh@kernel.crashing.org>,
+        =?UTF-8?B?QmrDtnJuIFTDtnBlbA==?= <bjorn.topel@intel.com>,
+        Christoph Hellwig <hch@infradead.org>,
+        Dan Williams <dan.j.williams@intel.com>,
+        Daniel Vetter <daniel@ffwll.ch>,
+        Dave Chinner <david@fromorbit.com>,
+        David Airlie <airlied@linux.ie>,
+        "David S . Miller" <davem@davemloft.net>,
+        Ira Weiny <ira.weiny@intel.com>, Jan Kara <jack@suse.cz>,
+        Jens Axboe <axboe@kernel.dk>, Jonathan Corbet <corbet@lwn.net>,
+        =?UTF-8?B?SsOpcsO0bWUgR2xpc3Nl?= <jglisse@redhat.com>,
+        Magnus Karlsson <magnus.karlsson@intel.com>,
+        Mauro Carvalho Chehab <mchehab@kernel.org>,
+        Michael Ellerman <mpe@ellerman.id.au>,
+        Michal Hocko <mhocko@suse.com>,
+        Mike Kravetz <mike.kravetz@oracle.com>,
+        Paul Mackerras <paulus@samba.org>,
+        Shuah Khan <shuah@kernel.org>,
+        Vlastimil Babka <vbabka@suse.cz>, <bpf@vger.kernel.org>,
+        <dri-devel@lists.freedesktop.org>, <kvm@vger.kernel.org>,
+        <linux-block@vger.kernel.org>, <linux-doc@vger.kernel.org>,
+        <linux-fsdevel@vger.kernel.org>, <linux-kselftest@vger.kernel.org>,
+        <linux-media@vger.kernel.org>, <linux-rdma@vger.kernel.org>,
+        <linuxppc-dev@lists.ozlabs.org>, <netdev@vger.kernel.org>,
+        <linux-mm@kvack.org>, LKML <linux-kernel@vger.kernel.org>,
+        Maor Gottlieb <maorg@mellanox.com>
+References: <20191216222537.491123-1-jhubbard@nvidia.com>
+ <20191219132607.GA410823@unreal>
+ <a4849322-8e17-119e-a664-80d9f95d850b@nvidia.com>
+ <20191219210743.GN17227@ziepe.ca>
+From:   John Hubbard <jhubbard@nvidia.com>
+X-Nvconfidentiality: public
+Message-ID: <f10b2a18-a109-d87d-f156-2e5941cbf4a0@nvidia.com>
+Date:   Thu, 19 Dec 2019 14:58:43 -0800
+User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:68.0) Gecko/20100101
+ Thunderbird/68.3.0
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <de0feeff-debb-8c14-2f17-6d17c5c27c9a@acm.org>
+In-Reply-To: <20191219210743.GN17227@ziepe.ca>
+X-Originating-IP: [10.124.1.5]
+X-ClientProxiedBy: HQMAIL111.nvidia.com (172.20.187.18) To
+ HQMAIL107.nvidia.com (172.20.187.13)
+Content-Type: text/plain; charset="utf-8"; format=flowed
+Content-Language: en-US
+Content-Transfer-Encoding: 7bit
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=nvidia.com; s=n1;
+        t=1576796486; bh=tiz2hjGylLUwQicEfM7bbVznNfOI7NYEds0c0vA1QMM=;
+        h=X-PGP-Universal:Subject:To:CC:References:From:X-Nvconfidentiality:
+         Message-ID:Date:User-Agent:MIME-Version:In-Reply-To:
+         X-Originating-IP:X-ClientProxiedBy:Content-Type:Content-Language:
+         Content-Transfer-Encoding;
+        b=ax5pfVwRTOuRMGRTTENUug1V5pL/RA0R/ro68Ef6qbAC2dMIpaMVof5lAjrJh/YsQ
+         tzguzyOG/LzutEbtWDwyfHV9sKc8B+QE/oAsfQggRxnppIAZTNjdwjoShd1hqL3Scp
+         PwDEgdunQ5+3RZaDnDjRY1Ma0ZpDqQcVz1QAXQFHukq22+SRzGz1hOWdS1Kam2nyY2
+         CDT0AZ+Yyg+ZRHDTJHnr4JvmQTB2CGF09WlCJB69OrCNdaPzyZjzlP0CWvWnN5wMNt
+         lrxupzD+I8Xm9/TBpPiZ2SZw5etOEm+wZ4cFWC8o/KBZNRn3emLZ8rxxX3WRl4ZX7o
+         4lpXlR7HRSRdg==
 Sender: linux-block-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-On Thu, Dec 19, 2019 at 02:04:13PM -0800, Bart Van Assche wrote:
-> On 12/19/19 1:47 PM, Omar Sandoval wrote:
-> > On Fri, Dec 13, 2019 at 09:32:28AM -0500, Bart Van Assche wrote:
-> > > Recently a new low-level RDMA driver went upstream, namely the SoftiWARP
-> > > driver. That driver implements RDMA over TCP. Support has been added in the
-> > > SRP initiator and target drivers for iWARP. This patch series adds a test
-> > > for SRP over SoftiWARP. Please consider integration of this patch series in
-> > > the official blktests repository.
-> > > 
-> > > Changes compared to v1:
-> > > - Only run the new test if the kernel version is at least 5.5 (the version in
-> > >    which iWARP support was added to the SRP drivers) and if "rdma link" is
-> > >    supported.
-> > 
-> > Is there no way to detect this feature other than checking the kernel
-> > version?
+On 12/19/19 1:07 PM, Jason Gunthorpe wrote:
+...
+>> 3. It would be nice if I could reproduce this. I have a two-node mlx5 Infiniband
+>> test setup, but I have done only the tiniest bit of user space IB coding, so
+>> if you have any test programs that aren't too hard to deal with that could
+>> possibly hit this, or be tweaked to hit it, I'd be grateful. Keeping in mind
+>> that I'm not an advanced IB programmer. At all. :)
 > 
-> Hi Omar,
+> Clone this:
 > 
-> The only other way I can think of to verify whether the SRP initiator and
-> target drivers support iWARP is by loading the SRP drivers, loading the
-> iWARP driver, by configuring LIO + ib_srpt and by attempting to set up a
-> connection. However, I assume that's way more than what a _have() test
-> should do?
+> https://github.com/linux-rdma/rdma-core.git
+> 
+> Install all the required deps to build it (notably cython), see the README.md
+> 
+> $ ./build.sh
+> $ build/bin/run_tests.py
+> 
+> If you get things that far I think Leon can get a reproduction for you
+> 
 
-Hmm, we should probably add the ability to skip a test from test() in
-order to handle these cases where you need to do a bunch of setup before
-you know whether the test can run. For now, the kernel version check is
-fine.
+Cool, it's up and running (1 failure, 3 skipped, out of 67 tests).
+
+This is a great test suite to have running, I'll add it to my scripts. Here's the
+full output in case the failure or skip cases are a problem:
+
+$ sudo ./build/bin/run_tests.py --verbose
+
+test_create_ah (tests.test_addr.AHTest) ... ok
+test_create_ah_roce (tests.test_addr.AHTest) ... skipped "Can't run RoCE tests on IB link layer"
+test_destroy_ah (tests.test_addr.AHTest) ... ok
+test_create_comp_channel (tests.test_cq.CCTest) ... ok
+test_destroy_comp_channel (tests.test_cq.CCTest) ... ok
+test_create_cq_ex (tests.test_cq.CQEXTest) ... ok
+test_create_cq_ex_bad_flow (tests.test_cq.CQEXTest) ... ok
+test_destroy_cq_ex (tests.test_cq.CQEXTest) ... ok
+test_create_cq (tests.test_cq.CQTest) ... ok
+test_create_cq_bad_flow (tests.test_cq.CQTest) ... ok
+test_destroy_cq (tests.test_cq.CQTest) ... ok
+test_rc_traffic_cq_ex (tests.test_cqex.CqExTestCase) ... ok
+test_ud_traffic_cq_ex (tests.test_cqex.CqExTestCase) ... ok
+test_xrc_traffic_cq_ex (tests.test_cqex.CqExTestCase) ... ok
+test_create_dm (tests.test_device.DMTest) ... ok
+test_create_dm_bad_flow (tests.test_device.DMTest) ... ok
+test_destroy_dm (tests.test_device.DMTest) ... ok
+test_destroy_dm_bad_flow (tests.test_device.DMTest) ... ok
+test_dm_read (tests.test_device.DMTest) ... ok
+test_dm_write (tests.test_device.DMTest) ... ok
+test_dm_write_bad_flow (tests.test_device.DMTest) ... ok
+test_dev_list (tests.test_device.DeviceTest) ... ok
+test_open_dev (tests.test_device.DeviceTest) ... ok
+test_query_device (tests.test_device.DeviceTest) ... ok
+test_query_device_ex (tests.test_device.DeviceTest) ... ok
+test_query_gid (tests.test_device.DeviceTest) ... ok
+test_query_port (tests.test_device.DeviceTest) ... FAIL
+test_query_port_bad_flow (tests.test_device.DeviceTest) ... ok
+test_create_dm_mr (tests.test_mr.DMMRTest) ... ok
+test_destroy_dm_mr (tests.test_mr.DMMRTest) ... ok
+test_buffer (tests.test_mr.MRTest) ... ok
+test_dereg_mr (tests.test_mr.MRTest) ... ok
+test_dereg_mr_twice (tests.test_mr.MRTest) ... ok
+test_lkey (tests.test_mr.MRTest) ... ok
+test_read (tests.test_mr.MRTest) ... ok
+test_reg_mr (tests.test_mr.MRTest) ... ok
+test_reg_mr_bad_flags (tests.test_mr.MRTest) ... ok
+test_reg_mr_bad_flow (tests.test_mr.MRTest) ... ok
+test_rkey (tests.test_mr.MRTest) ... ok
+test_write (tests.test_mr.MRTest) ... ok
+test_dereg_mw_type1 (tests.test_mr.MWTest) ... ok
+test_dereg_mw_type2 (tests.test_mr.MWTest) ... ok
+test_reg_mw_type1 (tests.test_mr.MWTest) ... ok
+test_reg_mw_type2 (tests.test_mr.MWTest) ... ok
+test_reg_mw_wrong_type (tests.test_mr.MWTest) ... ok
+test_odp_rc_traffic (tests.test_odp.OdpTestCase) ... ok
+test_odp_ud_traffic (tests.test_odp.OdpTestCase) ... skipped 'ODP is not supported - ODP recv not supported'
+test_odp_xrc_traffic (tests.test_odp.OdpTestCase) ... ok
+test_default_allocators (tests.test_parent_domain.ParentDomainTestCase) ... ok
+test_mem_align_allocators (tests.test_parent_domain.ParentDomainTestCase) ... ok
+test_without_allocators (tests.test_parent_domain.ParentDomainTestCase) ... ok
+test_alloc_pd (tests.test_pd.PDTest) ... ok
+test_create_pd_none_ctx (tests.test_pd.PDTest) ... ok
+test_dealloc_pd (tests.test_pd.PDTest) ... ok
+test_destroy_pd_twice (tests.test_pd.PDTest) ... ok
+test_multiple_pd_creation (tests.test_pd.PDTest) ... ok
+test_create_qp_ex_no_attr (tests.test_qp.QPTest) ... ok
+test_create_qp_ex_no_attr_connected (tests.test_qp.QPTest) ... ok
+test_create_qp_ex_with_attr (tests.test_qp.QPTest) ... ok
+test_create_qp_ex_with_attr_connected (tests.test_qp.QPTest) ... ok
+test_create_qp_no_attr (tests.test_qp.QPTest) ... ok
+test_create_qp_no_attr_connected (tests.test_qp.QPTest) ... ok
+test_create_qp_with_attr (tests.test_qp.QPTest) ... ok
+test_create_qp_with_attr_connected (tests.test_qp.QPTest) ... ok
+test_modify_qp (tests.test_qp.QPTest) ... ok
+test_query_qp (tests.test_qp.QPTest) ... ok
+test_rdmacm_sync_traffic (tests.test_rdmacm.CMTestCase) ... skipped 'No devices with net interface'
+
+======================================================================
+FAIL: test_query_port (tests.test_device.DeviceTest)
+----------------------------------------------------------------------
+Traceback (most recent call last):
+   File "/kernel_work/rdma-core/tests/test_device.py", line 129, in test_query_port
+     self.verify_port_attr(port_attr)
+   File "/kernel_work/rdma-core/tests/test_device.py", line 113, in verify_port_attr
+     assert 'Invalid' not in d.speed_to_str(attr.active_speed)
+AssertionError
+
+----------------------------------------------------------------------
+Ran 67 tests in 10.058s
+
+FAILED (failures=1, skipped=3)
+
+
+thanks,
+-- 
+John Hubbard
+NVIDIA
