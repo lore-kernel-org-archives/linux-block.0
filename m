@@ -1,269 +1,299 @@
-Return-Path: <SRS0=ocaT=2I=vger.kernel.org=linux-block-owner@kernel.org>
+Return-Path: <SRS0=q1Dd=2J=vger.kernel.org=linux-block-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-0.8 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
-	MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS autolearn=no autolearn_force=no
-	version=3.4.0
+X-Spam-Status: No, score=-6.8 required=3.0 tests=DKIMWL_WL_HIGH,DKIM_SIGNED,
+	DKIM_VALID,DKIM_VALID_AU,FSL_HELO_FAKE,INCLUDES_PATCH,MAILING_LIST_MULTI,
+	SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,USER_AGENT_SANE_1 autolearn=unavailable
+	autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id B39F9C2D0BF
-	for <linux-block@archiver.kernel.org>; Wed, 18 Dec 2019 22:45:40 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 821AFC43603
+	for <linux-block@archiver.kernel.org>; Thu, 19 Dec 2019 00:12:45 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.kernel.org (Postfix) with ESMTP id 83FE320717
-	for <linux-block@archiver.kernel.org>; Wed, 18 Dec 2019 22:45:40 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id 49598222C2
+	for <linux-block@archiver.kernel.org>; Thu, 19 Dec 2019 00:12:45 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+	s=default; t=1576714365;
+	bh=t9eobqLU5zZnDpTX9F8DnN3q6+imrU5dEKYtoOZPHA4=;
+	h=Date:From:To:Cc:Subject:References:In-Reply-To:List-ID:From;
+	b=A58uLBxah6PaXqNrpK0pypJM8CIJgHlOUFvj3Vu/bPE3UQfGP9OIbsOUy0aZAW24B
+	 p6cIz2Twt3YjTcL4UOjN4RQYpJLQFkU3bJmKhbEYfBj2daQdgH+aS3Kp42DZnS6gBb
+	 4RQzu1BrU4aMHX7s/v6b26FLECkwsQzwL7zDGf/0=
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1726705AbfLRWpf (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Wed, 18 Dec 2019 17:45:35 -0500
-Received: from imap2.colo.codethink.co.uk ([78.40.148.184]:44768 "EHLO
-        imap2.colo.codethink.co.uk" rhost-flags-OK-OK-OK-OK)
-        by vger.kernel.org with ESMTP id S1726387AbfLRWpd (ORCPT
-        <rfc822;linux-block@vger.kernel.org>);
-        Wed, 18 Dec 2019 17:45:33 -0500
-Received: from [167.98.27.226] (helo=xylophone)
-        by imap2.colo.codethink.co.uk with esmtpsa  (Exim 4.92 #3 (Debian))
-        id 1ihi4I-0005B3-TV; Wed, 18 Dec 2019 22:45:23 +0000
-Message-ID: <53cd123fdcb893df36e0b3bf9dddbfe08f9c545e.camel@codethink.co.uk>
-Subject: Re: [PATCH v2 27/27] Documentation: document ioctl interfaces better
-From:   Ben Hutchings <ben.hutchings@codethink.co.uk>
-To:     Arnd Bergmann <arnd@arndb.de>, Jens Axboe <axboe@kernel.dk>,
-        "James E.J. Bottomley" <jejb@linux.ibm.com>,
-        "Martin K. Petersen" <martin.petersen@oracle.com>
-Cc:     linux-scsi@vger.kernel.org, linux-block@vger.kernel.org,
-        y2038@lists.linaro.org, linux-kernel@vger.kernel.org,
-        Christoph Hellwig <hch@lst.de>, linux-doc@vger.kernel.org,
-        corbet@lwn.net, viro@zeniv.linux.org.uk,
-        linux-fsdevel@vger.kernel.org
-Date:   Wed, 18 Dec 2019 22:45:22 +0000
-In-Reply-To: <20191217221708.3730997-28-arnd@arndb.de>
-References: <20191217221708.3730997-1-arnd@arndb.de>
-         <20191217221708.3730997-28-arnd@arndb.de>
-Organization: Codethink Ltd.
-Content-Type: text/plain; charset="UTF-8"
-User-Agent: Evolution 3.30.5-1.1 
+        id S1726561AbfLSAMo (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Wed, 18 Dec 2019 19:12:44 -0500
+Received: from mail.kernel.org ([198.145.29.99]:55838 "EHLO mail.kernel.org"
+        rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
+        id S1726559AbfLSAMo (ORCPT <rfc822;linux-block@vger.kernel.org>);
+        Wed, 18 Dec 2019 19:12:44 -0500
+Received: from gmail.com (unknown [104.132.1.77])
+        (using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+        (No client certificate requested)
+        by mail.kernel.org (Postfix) with ESMTPSA id 901942176D;
+        Thu, 19 Dec 2019 00:12:42 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+        s=default; t=1576714362;
+        bh=t9eobqLU5zZnDpTX9F8DnN3q6+imrU5dEKYtoOZPHA4=;
+        h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
+        b=0TCswugXuHO49ooSCJVbRrpCPYkIxqkA3hkl9ik586Z+1nH9t9mtmBX04drzQ90F+
+         10xVzVc/81szaOrGUrl89TpEoW6yzcPKqpr5ip53Vz38VE2l7z4LLKXLtm8YdJ7iHx
+         O7fZxCX3iMQgSx5jxMyNuEsRtDa7tI/BttV1qs+Q=
+Date:   Wed, 18 Dec 2019 16:12:41 -0800
+From:   Eric Biggers <ebiggers@kernel.org>
+To:     Satya Tangirala <satyat@google.com>
+Cc:     linux-block@vger.kernel.org, linux-scsi@vger.kernel.org,
+        linux-fscrypt@vger.kernel.org, linux-fsdevel@vger.kernel.org,
+        linux-f2fs-devel@lists.sourceforge.net,
+        Barani Muthukumaran <bmuthuku@qti.qualcomm.com>,
+        Kuohong Wang <kuohong.wang@mediatek.com>,
+        Kim Boojin <boojin.kim@samsung.com>, linux-ext4@vger.kernel.org
+Subject: Re: [PATCH v6 9/9] ext4: add inline encryption support
+Message-ID: <20191219001240.GD47399@gmail.com>
+References: <20191218145136.172774-1-satyat@google.com>
+ <20191218145136.172774-10-satyat@google.com>
 MIME-Version: 1.0
-Content-Transfer-Encoding: 7bit
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <20191218145136.172774-10-satyat@google.com>
+User-Agent: Mutt/1.10.1 (2018-07-13)
 Sender: linux-block-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-On Tue, 2019-12-17 at 23:17 +0100, Arnd Bergmann wrote:
-[...]
-> --- /dev/null
-> +++ b/Documentation/core-api/ioctl.rst
-> @@ -0,0 +1,248 @@
-> +======================
-> +ioctl based interfaces
-> +======================
+[+Cc linux-ext4]
+
+On Wed, Dec 18, 2019 at 06:51:36AM -0800, Satya Tangirala wrote:
+> Wire up ext4 to support inline encryption via the helper functions which
+> fs/crypto/ now provides.  This includes:
+> 
+> - Adding a mount option 'inlinecrypt' which enables inline encryption
+>   on encrypted files where it can be used.
+> 
+> - Setting the bio_crypt_ctx on bios that will be submitted to an
+>   inline-encrypted file.
+> 
+>   Note: submit_bh_wbc() in fs/buffer.c also needed to be patched for
+>   this part, since ext4 sometimes uses ll_rw_block() on file data.
+> 
+> - Not adding logically discontiguous data to bios that will be submitted
+>   to an inline-encrypted file.
+> 
+> - Not doing filesystem-layer crypto on inline-encrypted files.
+> 
+> Signed-off-by: Eric Biggers <ebiggers@google.com>
+> Signed-off-by: Satya Tangirala <satyat@google.com>
+
+In the next version can you please add linux-ext4 to Cc for the series?
+
+> ---
+>  fs/buffer.c        |  2 ++
+>  fs/ext4/ext4.h     |  1 +
+>  fs/ext4/inode.c    |  4 ++--
+>  fs/ext4/page-io.c  |  6 ++++--
+>  fs/ext4/readpage.c | 11 ++++++++---
+>  fs/ext4/super.c    | 13 +++++++++++++
+>  6 files changed, 30 insertions(+), 7 deletions(-)
+> 
+> diff --git a/fs/buffer.c b/fs/buffer.c
+> index d8c7242426bb..3ad000db4a19 100644
+> --- a/fs/buffer.c
+> +++ b/fs/buffer.c
+> @@ -3108,6 +3108,8 @@ static int submit_bh_wbc(int op, int op_flags, struct buffer_head *bh,
+>  	 */
+>  	bio = bio_alloc(GFP_NOIO, 1);
+>  
+> +	fscrypt_set_bio_crypt_ctx_bh(bio, bh, GFP_NOIO);
 > +
-> +ioctl() is the most common way for applications to interface
-> +with device drivers. It is flexible and easily extended by adding new
-> +commands and can be passed through character devices, block devices as
-> +well as sockets and other special file descriptors.
+>  	bio->bi_iter.bi_sector = bh->b_blocknr * (bh->b_size >> 9);
+>  	bio_set_dev(bio, bh->b_bdev);
+>  	bio->bi_write_hint = write_hint;
+
+In 5.5, there was some decryption code added to fs/buffer.c in order to support
+ext4 encryption with blocksize < PAGE_SIZE:
+
+static void end_buffer_async_read_io(struct buffer_head *bh, int uptodate)
+{
+        /* Decrypt if needed */
+        if (uptodate && IS_ENABLED(CONFIG_FS_ENCRYPTION) &&
+            IS_ENCRYPTED(bh->b_page->mapping->host) &&
+            S_ISREG(bh->b_page->mapping->host->i_mode)) {
+	...
+
+
+This needs to be updated to use fscrypt_inode_uses_fs_layer_crypto() instead, so
+that the filesystem-layer decryption is not done when the file is already using
+inline decryption.
+
+> diff --git a/fs/ext4/ext4.h b/fs/ext4/ext4.h
+> index f8578caba40d..aeaa01724d7c 100644
+> --- a/fs/ext4/ext4.h
+> +++ b/fs/ext4/ext4.h
+> @@ -1153,6 +1153,7 @@ struct ext4_inode_info {
+>  #define EXT4_MOUNT_JOURNAL_CHECKSUM	0x800000 /* Journal checksums */
+>  #define EXT4_MOUNT_JOURNAL_ASYNC_COMMIT	0x1000000 /* Journal Async Commit */
+>  #define EXT4_MOUNT_WARN_ON_ERROR	0x2000000 /* Trigger WARN_ON on error */
+> +#define EXT4_MOUNT_INLINECRYPT		0x4000000 /* Inline encryption support */
+>  #define EXT4_MOUNT_DELALLOC		0x8000000 /* Delalloc support */
+>  #define EXT4_MOUNT_DATA_ERR_ABORT	0x10000000 /* Abort on file data write */
+>  #define EXT4_MOUNT_BLOCK_VALIDITY	0x20000000 /* Block validity checking */
+> diff --git a/fs/ext4/inode.c b/fs/ext4/inode.c
+> index 28f28de0c1b6..44d9651b8638 100644
+> --- a/fs/ext4/inode.c
+> +++ b/fs/ext4/inode.c
+> @@ -1090,7 +1090,7 @@ static int ext4_block_write_begin(struct page *page, loff_t pos, unsigned len,
+>  	}
+>  	if (unlikely(err)) {
+>  		page_zero_new_buffers(page, from, to);
+> -	} else if (IS_ENCRYPTED(inode) && S_ISREG(inode->i_mode)) {
+> +	} else if (fscrypt_inode_uses_fs_layer_crypto(inode)) {
+>  		for (i = 0; i < nr_wait; i++) {
+>  			int err2;
+>  
+> @@ -3698,7 +3698,7 @@ static int __ext4_block_zero_page_range(handle_t *handle,
+>  		/* Uhhuh. Read error. Complain and punt. */
+>  		if (!buffer_uptodate(bh))
+>  			goto unlock;
+> -		if (S_ISREG(inode->i_mode) && IS_ENCRYPTED(inode)) {
+> +		if (fscrypt_inode_uses_fs_layer_crypto(inode)) {
+>  			/* We expect the key to be set. */
+>  			BUG_ON(!fscrypt_has_encryption_key(inode));
+>  			WARN_ON_ONCE(fscrypt_decrypt_pagecache_blocks(
+> diff --git a/fs/ext4/page-io.c b/fs/ext4/page-io.c
+> index 24aeedb8fc75..acde754cc5ca 100644
+> --- a/fs/ext4/page-io.c
+> +++ b/fs/ext4/page-io.c
+> @@ -404,6 +404,7 @@ static void io_submit_init_bio(struct ext4_io_submit *io,
+>  	 * __GFP_DIRECT_RECLAIM is set, see comments for bio_alloc_bioset().
+>  	 */
+>  	bio = bio_alloc(GFP_NOIO, BIO_MAX_PAGES);
+> +	fscrypt_set_bio_crypt_ctx_bh(bio, bh, GFP_NOIO);
+>  	bio->bi_iter.bi_sector = bh->b_blocknr * (bh->b_size >> 9);
+>  	bio_set_dev(bio, bh->b_bdev);
+>  	bio->bi_end_io = ext4_end_bio;
+> @@ -420,7 +421,8 @@ static void io_submit_add_bh(struct ext4_io_submit *io,
+>  {
+>  	int ret;
+>  
+> -	if (io->io_bio && bh->b_blocknr != io->io_next_block) {
+> +	if (io->io_bio && (bh->b_blocknr != io->io_next_block ||
+> +			   !fscrypt_mergeable_bio_bh(io->io_bio, bh))) {
+>  submit_and_retry:
+>  		ext4_io_submit(io);
+>  	}
+> @@ -508,7 +510,7 @@ int ext4_bio_write_page(struct ext4_io_submit *io,
+>  	 * (e.g. holes) to be unnecessarily encrypted, but this is rare and
+>  	 * can't happen in the common case of blocksize == PAGE_SIZE.
+>  	 */
+> -	if (IS_ENCRYPTED(inode) && S_ISREG(inode->i_mode) && nr_to_submit) {
+> +	if (fscrypt_inode_uses_fs_layer_crypto(inode) && nr_to_submit) {
+>  		gfp_t gfp_flags = GFP_NOFS;
+>  		unsigned int enc_bytes = round_up(len, i_blocksize(inode));
+>  
+> diff --git a/fs/ext4/readpage.c b/fs/ext4/readpage.c
+> index fef7755300c3..7844e27518b4 100644
+> --- a/fs/ext4/readpage.c
+> +++ b/fs/ext4/readpage.c
+> @@ -183,7 +183,7 @@ static struct bio_post_read_ctx *get_bio_post_read_ctx(struct inode *inode,
+>  	unsigned int post_read_steps = 0;
+>  	struct bio_post_read_ctx *ctx = NULL;
+>  
+> -	if (IS_ENCRYPTED(inode) && S_ISREG(inode->i_mode))
+> +	if (fscrypt_inode_uses_fs_layer_crypto(inode))
+>  		post_read_steps |= 1 << STEP_DECRYPT;
+>  
+>  	if (ext4_need_verity(inode, first_idx))
+> @@ -220,6 +220,7 @@ int ext4_mpage_readpages(struct address_space *mapping,
+>  	const unsigned blkbits = inode->i_blkbits;
+>  	const unsigned blocks_per_page = PAGE_SIZE >> blkbits;
+>  	const unsigned blocksize = 1 << blkbits;
+> +	sector_t next_block;
+>  	sector_t block_in_file;
+>  	sector_t last_block;
+>  	sector_t last_block_in_file;
+> @@ -252,7 +253,8 @@ int ext4_mpage_readpages(struct address_space *mapping,
+>  		if (page_has_buffers(page))
+>  			goto confused;
+>  
+> -		block_in_file = (sector_t)page->index << (PAGE_SHIFT - blkbits);
+> +		block_in_file = next_block =
+> +			(sector_t)page->index << (PAGE_SHIFT - blkbits);
+>  		last_block = block_in_file + nr_pages * blocks_per_page;
+>  		last_block_in_file = (ext4_readpage_limit(inode) +
+>  				      blocksize - 1) >> blkbits;
+> @@ -352,7 +354,8 @@ int ext4_mpage_readpages(struct address_space *mapping,
+>  		 * This page will go to BIO.  Do we need to send this
+>  		 * BIO off first?
+>  		 */
+> -		if (bio && (last_block_in_bio != blocks[0] - 1)) {
+> +		if (bio && (last_block_in_bio != blocks[0] - 1 ||
+> +			    !fscrypt_mergeable_bio(bio, inode, next_block))) {
+>  		submit_and_realloc:
+>  			submit_bio(bio);
+>  			bio = NULL;
+> @@ -366,6 +369,8 @@ int ext4_mpage_readpages(struct address_space *mapping,
+>  			 */
+>  			bio = bio_alloc(GFP_KERNEL,
+>  				min_t(int, nr_pages, BIO_MAX_PAGES));
+> +			fscrypt_set_bio_crypt_ctx(bio, inode, next_block,
+> +						  GFP_KERNEL);
+>  			ctx = get_bio_post_read_ctx(inode, bio, page->index);
+>  			if (IS_ERR(ctx)) {
+>  				bio_put(bio);
+> diff --git a/fs/ext4/super.c b/fs/ext4/super.c
+> index 1d82b56d9b11..0a6b60620942 100644
+> --- a/fs/ext4/super.c
+> +++ b/fs/ext4/super.c
+> @@ -1357,6 +1357,11 @@ static void ext4_get_ino_and_lblk_bits(struct super_block *sb,
+>  	*lblk_bits_ret = 8 * sizeof(ext4_lblk_t);
+>  }
+>  
+> +static bool ext4_inline_crypt_enabled(struct super_block *sb)
+> +{
+> +	return test_opt(sb, INLINECRYPT);
+> +}
 > +
-> +However, it is also very easy to get ioctl command definitions wrong,
-> +and hard to fix them later without breaking existing applications,
-> +so this documentation tries to help developers get it right.
-> +
-> +Command number definitions
-> +==========================
-> +
-> +The command number, or request number, is the second argument passed to
-> +the ioctl system call. While this can be any 32-bit number that uniquely
-> +identifies an action for a particular driver, there are a number of
-> +conventions around defining them.
-> +
-> +``include/uapi/asm-generic/ioctl.h`` provides four macros for defining
-> +ioctl commands that follow modern conventions: ``_IO``, ``_IOR``,
-> +``_IOW``, and ``_IORW``. These should be used for all new commands,
+>  static const struct fscrypt_operations ext4_cryptops = {
+>  	.key_prefix		= "ext4:",
+>  	.get_context		= ext4_get_context,
+> @@ -1366,6 +1371,7 @@ static const struct fscrypt_operations ext4_cryptops = {
+>  	.max_namelen		= EXT4_NAME_LEN,
+>  	.has_stable_inodes	= ext4_has_stable_inodes,
+>  	.get_ino_and_lblk_bits	= ext4_get_ino_and_lblk_bits,
+> +	.inline_crypt_enabled	= ext4_inline_crypt_enabled,
+>  };
+>  #endif
+>  
+> @@ -1460,6 +1466,7 @@ enum {
+>  	Opt_journal_path, Opt_journal_checksum, Opt_journal_async_commit,
+>  	Opt_abort, Opt_data_journal, Opt_data_ordered, Opt_data_writeback,
+>  	Opt_data_err_abort, Opt_data_err_ignore, Opt_test_dummy_encryption,
+> +	Opt_inlinecrypt,
+>  	Opt_usrjquota, Opt_grpjquota, Opt_offusrjquota, Opt_offgrpjquota,
+>  	Opt_jqfmt_vfsold, Opt_jqfmt_vfsv0, Opt_jqfmt_vfsv1, Opt_quota,
+>  	Opt_noquota, Opt_barrier, Opt_nobarrier, Opt_err,
+> @@ -1556,6 +1563,7 @@ static const match_table_t tokens = {
+>  	{Opt_noinit_itable, "noinit_itable"},
+>  	{Opt_max_dir_size_kb, "max_dir_size_kb=%u"},
+>  	{Opt_test_dummy_encryption, "test_dummy_encryption"},
+> +	{Opt_inlinecrypt, "inlinecrypt"},
+>  	{Opt_nombcache, "nombcache"},
+>  	{Opt_nombcache, "no_mbcache"},	/* for backward compatibility */
+>  	{Opt_removed, "check=none"},	/* mount option from ext2/3 */
+> @@ -1767,6 +1775,11 @@ static const struct mount_opts {
+>  	{Opt_jqfmt_vfsv1, QFMT_VFS_V1, MOPT_QFMT},
+>  	{Opt_max_dir_size_kb, 0, MOPT_GTE0},
+>  	{Opt_test_dummy_encryption, 0, MOPT_GTE0},
+> +#ifdef CONFIG_FS_ENCRYPTION_INLINE_CRYPT
+> +	{Opt_inlinecrypt, EXT4_MOUNT_INLINECRYPT, MOPT_SET},
+> +#else
+> +	{Opt_inlinecrypt, EXT4_MOUNT_INLINECRYPT, MOPT_NOSUPPORT},
+> +#endif
+>  	{Opt_nombcache, EXT4_MOUNT_NO_MBCACHE, MOPT_SET},
+>  	{Opt_err, 0, 0}
+>  };
 
-Typo: "_IORW" should be "_IOWR".
+On v5 there was a discussion about using a flag like SB_INLINECRYPT to replace
+the ->inline_crypt_enabled() function.  Was this considered?
 
-> +with the correct parameters:
-> +
-> +_IO/_IOR/_IOW/_IOWR
-> +   The macro name determines whether the argument is used for passing
-> +   data into kernel (_IOW), from the kernel (_IOR), both (_IOWR) or is
-> +   not a pointer (_IO). It is possible but not recommended to pass an
-> +   integer value instead of a pointer with _IO.
-
-I feel the explanation of _IO here could be confusing.  I think what
-you meant to say was that it is possible, but not recommended, to pass
-integers directly (arg is integer) rather than indirectly (arg is
-pointer to integer).  I suggest the alternate wording:
-
-The macro name specifies how the argument will be used.  It may be a
-pointer to data to be passed into the kernel (_IOW), out of the kernel
-(_IOR), or both (_IOWR).  The argument may also be an integer value
-instead of a pointer (_IO), but this is not recommended.
-
-> +type
-> +   An 8-bit number, often a character literal, specific to a subsystem
-> +   or driver, and listed in :doc:`../userspace-api/ioctl/ioctl-number`
-> +
-> +nr
-> +  An 8-bit number identifying the specific command, unique for a give
-> +  value of 'type'
-> +
-> +data_type
-> +  The name of the data type pointed to by the argument, the command number
-> +  encodes the ``sizeof(data_type)`` value in a 13-bit or 14-bit integer,
-> +  leading to a limit of 8191 bytes for the maximum size of the argument.
-> +  Note: do not pass sizeof(data_type) type into _IOR/IOW, as that will
-> +  lead to encoding sizeof(sizeof(data_type)), i.e. sizeof(size_t).
-
-You left out _IOWR here.  It might also be worth mentioning that _IO
-doesn't have this parameter.
-
-[...]
-> +Return code
-> +===========
-> +
-> +ioctl commands can return negative error codes as documented in errno(3),
-> +these get turned into errno values in user space.
-
-Use a semi-colon instead of a comma, or change "these" to "which".
-
-> On success, the return
-> +code should be zero. It is also possible but not recommended to return
-> +a positive 'long' value.
-> +
-> +When the ioctl callback is called with an unknown command number, the
-> +handler returns either -ENOTTY or -ENOIOCTLCMD, which also results in
-> +-ENOTTY being returned from the system call. Some subsystems return
-> +-ENOSYS or -EINVAL here for historic reasons, but this is wrong.
-> +
-> +Prior to Linux-5.5, compat_ioctl handlers were required to return
-
-Space instead of hyphen.
-
-> +-ENOIOCTLCMD in order to use the fallback conversion into native
-> +commands. As all subsystems are now responsible for handling compat
-> +mode themselves, this is no longer needed, but it may be important to
-> +consider when backporting bug fixes to older kernels.
-> +
-> +Timestamps
-> +==========
-> +
-> +Traditionally, timestamps and timeout values are passed as ``struct
-> +timespec`` or ``struct timeval``, but these are problematic because of
-> +incompatible definitions of these structures in user space after the
-> +move to 64-bit time_t.
-> +
-> +The __kernel_timespec type can be used instead to be embedded in other
-
-It's not a typedef, so ``struct __kernel_timespec``.
-
-[...]
-> +32-bit compat mode
-> +==================
-> +
-> +In order to support 32-bit user space running on a 64-bit machine, each
-> +subsystem or driver that implements an ioctl callback handler must also
-> +implement the corresponding compat_ioctl handler.
-> +
-> +As long as all the rules for data structures are followed, this is as
-> +easy as setting the .compat_ioctl pointer to a helper function such as
-> +compat_ptr_ioctl() or blkdev_compat_ptr_ioctl().
-> +
-> +compat_ptr()
-> +------------
-> +
-> +On the s/390 architecture, 31-bit user space has ambiguous representations
-
-IBM never used the name "S/390" for the 64-bit mainframe architecture,
-but they have rebranded it several times.  Rather than trying to follow
-what it's called this year, maybe just write "s390" to match what we
-usually call it?
-
-[...]
-> +Structure layout
-> +----------------
-> +
-> +Compatible data structures have the same layout on all architectures,
-> +avoiding all problematic members:
-> +
-> +* ``long`` and ``unsigned long`` are the size of a register, so
-> +  they can be either 32-bit or 64-bit wide and cannot be used in portable
-> +  data structures. Fixed-length replacements are ``__s32``, ``__u32``,
-> +  ``__s64`` and ``__u64``.
-> +
-> +* Pointers have the same problem, in addition to requiring the
-> +  use of compat_ptr(). The best workaround is to use ``__u64``
-> +  in place of pointers, which requires a cast to ``uintptr_t`` in user
-> +  space, and the use of u64_to_user_ptr() in the kernel to convert
-> +  it back into a user pointer.
-> +
-> +* On the x86-32 (i386) architecture, the alignment of 64-bit variables
-> +  is only 32-bit, but they are naturally aligned on most other
-> +  architectures including x86-64. This means a structure like::
-> +
-> +    struct foo {
-> +        __u32 a;
-> +        __u64 b;
-> +        __u32 c;
-> +    };
-> +
-> +  has four bytes of padding between a and b on x86-64, plus another four
-> +  bytes of padding at the end, but no padding on i386, and it needs a
-> +  compat_ioctl conversion handler to translate between the two formats.
-> +
-> +  To avoid this problem, all structures should have their members
-> +  naturally aligned, or explicit reserved fields added in place of the
-> +  implicit padding.
-
-This should explain how to check that - presumably by running pahole on
-some sensible architecture.
-
-> +* On ARM OABI user space, 16-bit member variables have 32-bit
-> +  alignment, making them incompatible with modern EABI kernels.
-
-I thought that OABI required structures as a whole to have alignment of
-4, not individual members?  Which obviously does affect small
-structures as members of other structures.
-
-[...]
-> +Information leaks
-> +=================
-> +
-> +Uninitialized data must not be copied back to user space, as this can
-> +cause an information leak, which can be used to defeat kernel address
-> +space layout randomization (KASLR), helping in an attack.
-> +
-> +As explained for the compat mode, it is best to not avoid any implicit
-
-Delete "not".
-
-> +padding in data structures, but if there is already padding in existing
-> +structures, the kernel driver must be careful to zero out the padding
-> +using memset() or similar before copying it to user space.
-
-This sentence is rather too long.  Also it can be read as suggesting
-that one should somehow identify and memset() the padding just before
-copying to user-space.  I suggest an alternate wording:
-
-For this reason (and for compat support) it is best to avoid any
-implicit padding in data structures.  Where there is implicit padding
-in an existing structure, kernel drivers must be careful to fully
-initialize an instance of the structure before copying it to user
-space.  This is usually done by calling memset() before assigning to
-individual members.
-
-[...]
-> +Alternatives to ioctl
-> +=====================
-[...]
-> +* A custom file system can provide extra flexibility with a simple
-> +  user interface but add a lot of complexity to the implementation.
-
-Typo: "add" should be "adds".
-
-Anyway, it's great to have documentation for this all in one place.
-
-Ben.
-
--- 
-Ben Hutchings, Software Developer                         Codethink Ltd
-https://www.codethink.co.uk/                 Dale House, 35 Dale Street
-                                     Manchester, M1 2HF, United Kingdom
-
+- Eric
