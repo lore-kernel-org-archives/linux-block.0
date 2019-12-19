@@ -2,141 +2,91 @@ Return-Path: <SRS0=q1Dd=2J=vger.kernel.org=linux-block-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-3.8 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
-	INCLUDES_PATCH,MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS autolearn=no
-	autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-2.2 required=3.0 tests=DKIM_SIGNED,DKIM_VALID,
+	HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,
+	USER_AGENT_SANE_1 autolearn=no autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 1CC86C43603
-	for <linux-block@archiver.kernel.org>; Thu, 19 Dec 2019 12:15:29 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 537E1C43603
+	for <linux-block@archiver.kernel.org>; Thu, 19 Dec 2019 12:35:04 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.kernel.org (Postfix) with ESMTP id ECC7D24672
-	for <linux-block@archiver.kernel.org>; Thu, 19 Dec 2019 12:15:28 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id 26A73218AC
+	for <linux-block@archiver.kernel.org>; Thu, 19 Dec 2019 12:35:04 +0000 (UTC)
+Authentication-Results: mail.kernel.org;
+	dkim=pass (2048-bit key) header.d=kernel-dk.20150623.gappssmtp.com header.i=@kernel-dk.20150623.gappssmtp.com header.b="AVVsH4ZQ"
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1726824AbfLSMPX (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Thu, 19 Dec 2019 07:15:23 -0500
-Received: from mout.kundenserver.de ([212.227.17.13]:49619 "EHLO
-        mout.kundenserver.de" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1726668AbfLSMPW (ORCPT
+        id S1726698AbfLSMfD (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Thu, 19 Dec 2019 07:35:03 -0500
+Received: from mail-pl1-f195.google.com ([209.85.214.195]:39668 "EHLO
+        mail-pl1-f195.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S1726668AbfLSMfD (ORCPT
         <rfc822;linux-block@vger.kernel.org>);
-        Thu, 19 Dec 2019 07:15:22 -0500
-Received: from mail-qt1-f180.google.com ([209.85.160.180]) by
- mrelayeu.kundenserver.de (mreue109 [212.227.15.145]) with ESMTPSA (Nemesis)
- id 1MirfG-1i5ZgJ30Vg-00exGF; Thu, 19 Dec 2019 13:15:19 +0100
-Received: by mail-qt1-f180.google.com with SMTP id q20so4865171qtp.3;
-        Thu, 19 Dec 2019 04:15:19 -0800 (PST)
-X-Gm-Message-State: APjAAAU2ozyKe1HKrRDr4/+bTdOo+BZBhvLR0n6tXjhJH6yTp66+ccmq
-        959YKNQhp8FJOjifitsupAIvhcWUxa37I12tWjs=
-X-Google-Smtp-Source: APXvYqzBJaTMUPYhRE1yI60oc1+7sq5M0T66IfZX2Nf0hnuyPkKbQDZSiXOuH7DY+joNcZzsJrZtnzD3uIY4JdbWGfE=
-X-Received: by 2002:ac8:47d3:: with SMTP id d19mr6556062qtr.142.1576757718254;
- Thu, 19 Dec 2019 04:15:18 -0800 (PST)
+        Thu, 19 Dec 2019 07:35:03 -0500
+Received: by mail-pl1-f195.google.com with SMTP id z3so2492443plk.6
+        for <linux-block@vger.kernel.org>; Thu, 19 Dec 2019 04:35:03 -0800 (PST)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=kernel-dk.20150623.gappssmtp.com; s=20150623;
+        h=subject:to:cc:references:from:message-id:date:user-agent
+         :mime-version:in-reply-to:content-language:content-transfer-encoding;
+        bh=+enTLPaxJhC1TwqAq4+1F2qGOQKD/UrJ0jEU9e+3gRs=;
+        b=AVVsH4ZQJTG7PUhNZ+zAB3TrhrGWSyTSr61KlucnS3IksTaWlHRnzVi8pgdHgeg+1w
+         /uZ5etKAgSYzCHehz5PhQssEh8n/UrzhuGik1x/ZuVb3rJazdXXxnzLUu69r0Cas+cQs
+         SFjxhzqwfK1jrPKa048n7wh2Qt8gS2W+YAErnwBJbeh48orHTn38Pp5Igf5xcfVpYBmx
+         MKeZ9rn+ApvIwaeJ7BZIqX+0mH75IyOY46wrL30GKbjeoZf5tHHlKeegGi/qeNNOT1fz
+         5+kY4m7njdz2QPgniZcPK3h9DqZ8sbZjntfBVsu00swMx/ITnZKsO7+7Ebn30/vx0lDn
+         ONew==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20161025;
+        h=x-gm-message-state:subject:to:cc:references:from:message-id:date
+         :user-agent:mime-version:in-reply-to:content-language
+         :content-transfer-encoding;
+        bh=+enTLPaxJhC1TwqAq4+1F2qGOQKD/UrJ0jEU9e+3gRs=;
+        b=B5lQU+qBUyuSbcrMDFqDT5HvzG3k0aj5TqRFTrlwHVaetrFUvlq9McUueEQtzl3tWo
+         1vJsWs0NUfVkZJw2ym/qZONKpG4qUrEt1JLMaUCU9PV+/vhymMcdPWCRH4mEFOjW2Cpk
+         zoB8sjwSonqaG384MezySoF5v4urTMUD4sFAo1moIy3jkt+KCy06g2PKD2iiNNJukFUG
+         Rv55aZgSeF/m0KaxAq8jq/k88ABDWj4fosI495v2PXHcqM1MqSPbPdr/DQQYB+hxNM0+
+         N70FqEFvSnzv3TWo2v/Po/4pdPdVkfaUMnqUFhnsRLbEiBC9JkP9HZPQ1JxcflO/t/JD
+         bEbA==
+X-Gm-Message-State: APjAAAXfFN/QxJpcSzEoxuhgArlxkrDi7LBBA32punBJynAS99Qm85Vy
+        gaMQpYuNhHkJVq8mnyy5cVUWEw==
+X-Google-Smtp-Source: APXvYqxwpK4qbhD/LMFfaxH+fRVezUHLOcOMQQEUJAWogK8KhDdXF0sZnsAkld/uIRu+uB7d3DLIEA==
+X-Received: by 2002:a17:902:6802:: with SMTP id h2mr8746717plk.233.1576758902414;
+        Thu, 19 Dec 2019 04:35:02 -0800 (PST)
+Received: from [192.168.1.188] ([66.219.217.145])
+        by smtp.gmail.com with ESMTPSA id z14sm8487146pfg.57.2019.12.19.04.35.01
+        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
+        Thu, 19 Dec 2019 04:35:01 -0800 (PST)
+Subject: Re: [PATCH 0/3] s390/dasd patches
+To:     Stefan Haberland <sth@linux.ibm.com>
+Cc:     linux-block@vger.kernel.org, hoeppner@linux.ibm.com,
+        linux-s390@vger.kernel.org, heiko.carstens@de.ibm.com,
+        gor@linux.ibm.com, borntraeger@de.ibm.com
+References: <20191219084352.75114-1-sth@linux.ibm.com>
+From:   Jens Axboe <axboe@kernel.dk>
+Message-ID: <911ec978-791d-aac3-072b-dab9f3d1bf54@kernel.dk>
+Date:   Thu, 19 Dec 2019 05:35:00 -0700
+User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:68.0) Gecko/20100101
+ Thunderbird/68.2.2
 MIME-Version: 1.0
-References: <20191217221708.3730997-1-arnd@arndb.de> <20191217221708.3730997-22-arnd@arndb.de>
- <5826d31fcf2fcbe25bf2396e32df3df7d585dd99.camel@codethink.co.uk>
-In-Reply-To: <5826d31fcf2fcbe25bf2396e32df3df7d585dd99.camel@codethink.co.uk>
-From:   Arnd Bergmann <arnd@arndb.de>
-Date:   Thu, 19 Dec 2019 13:15:02 +0100
-X-Gmail-Original-Message-ID: <CAK8P3a3W+5RTa5jTunotZyV=hgXTxJaPqz_5kJnsdbvSZZPmjg@mail.gmail.com>
-Message-ID: <CAK8P3a3W+5RTa5jTunotZyV=hgXTxJaPqz_5kJnsdbvSZZPmjg@mail.gmail.com>
-Subject: Re: [PATCH v2 21/27] compat_ioctl: move cdrom commands into cdrom.c
-To:     Ben Hutchings <ben.hutchings@codethink.co.uk>
-Cc:     Jens Axboe <axboe@kernel.dk>,
-        "James E.J. Bottomley" <jejb@linux.ibm.com>,
-        "Martin K. Petersen" <martin.petersen@oracle.com>,
-        linux-scsi <linux-scsi@vger.kernel.org>,
-        linux-block <linux-block@vger.kernel.org>,
-        y2038 Mailman List <y2038@lists.linaro.org>,
-        "linux-kernel@vger.kernel.org" <linux-kernel@vger.kernel.org>,
-        Christoph Hellwig <hch@lst.de>,
-        "open list:DOCUMENTATION" <linux-doc@vger.kernel.org>,
-        Jonathan Corbet <corbet@lwn.net>,
-        Al Viro <viro@zeniv.linux.org.uk>,
-        Linux FS-devel Mailing List <linux-fsdevel@vger.kernel.org>
-Content-Type: text/plain; charset="UTF-8"
-X-Provags-ID: V03:K1:TEDryguOcCH9gogHQGldrcRHNWTpgeIL8C4kJi51MAPgG/9mxVV
- Rk3wyzHd4pGTUXGPm2w/KXpFoRl43u8nPX2/oMroULIcXjY9TW1HJ8+ygH5Hena4Ea+klC/
- 9xXvZTGMjge1E86DPJTR5zSKBekB4VK7nHCTJ0fWNP93pB2DSfeoKhOfg4w80WRMn3lqAzp
- 4vNVezU7c3PLFXQ4F3ixw==
-X-UI-Out-Filterresults: notjunk:1;V03:K0:WMG3D85XS7Y=:kQOXUFqRvWoxbmscz/tw+x
- 6VSej/2D+FLv45TGznZknJYXn8O5k9WJO9YTvnQF9TteweSfCHkRGCSbCWU8/Y9rAqKBgOz0J
- X8xlJ6Cp21no9Zr+4GoOrHlIzW4sMFuklW2xxXixLrMA4rTnCWOzaC0xwhkDA6NygdyuFLEpN
- 3lnEONQ3v3NTTsZEwt9u+Knpa9C/aFjfwCjnntsDtQpq13qzRSN5nzu1wRU27RArdlHnGhB4i
- 0y7jVtJBLN+WXK560KgN1PZR6LgPUh15HgEgvVtVxRUmVCEzkmCf/gRKt3ZvvkUiP3nhyc8W9
- gr2LMIYImwZgl7wNuiDBX2SvX2mJ8v7AKlMcnfnD84f8lET3kyk8PIBzzmHMQbLCOtB8nZlA+
- 9E9VyiSPQnUGbq7DJywUAAsSl6xrrTueXIysBtCgpcKAtHaAS30elfaodA19qKXrmhtBLw6HE
- Gs+hIwWWJB3WlfkYtM236Bfwg6JIcdSMUelzXzc5N91CeYUpJrp2I4/9x/xOPbax6++9YMvBF
- nGvOfYDDgo6Ee53pQ5++Y2fmbnQ9i00u4ADJhxaGdkl3JCSn36S6Ou6wZB6IDFIfTH4/KfT+o
- L6uXkkF0Vlf7UfbYQOVp1SEcgVftSRC9PthPNcFG2fD6QmfybeidkM8CaN8ZuPF1Ko3ZM/V9Y
- uLUzxJVynaZjQs7K6rKeEEQ4HE9Tl6QNOUypxmlmjI+tU9bwwh3DaPI8LDREoXJ63wV0Ob7sh
- RMq9+1xDIVSwqS2bTm2GgMbcWWQmHq1n0lxqmen+SO24j8xBjXOaTNISHwWmStR83PsxJyi2+
- k/unNOVE+XZ+5vhmJ55fYzAdp3wic/xZqYvy4fE/+K1vPyPdeRbfPA04kgA6LvszgkaZhA7Pz
- 2sbCKfQ8sZA9MhpOCuUg==
+In-Reply-To: <20191219084352.75114-1-sth@linux.ibm.com>
+Content-Type: text/plain; charset=utf-8
+Content-Language: en-US
+Content-Transfer-Encoding: 7bit
 Sender: linux-block-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-On Wed, Dec 18, 2019 at 9:11 PM Ben Hutchings
-<ben.hutchings@codethink.co.uk> wrote:
->
-> On Tue, 2019-12-17 at 23:17 +0100, Arnd Bergmann wrote:
-> [...]
-> > @@ -1710,6 +1711,38 @@ static int idecd_ioctl(struct block_device *bdev, fmode_t mode,
-> >       return ret;
-> >  }
-> >
-> > +#ifdef CONFIG_COMPAT
-> > +static int idecd_locked_compat_ioctl(struct block_device *bdev, fmode_t mode,
-> > +                     unsigned int cmd, unsigned long arg)
-> > +{
-> > +     struct cdrom_info *info = ide_drv_g(bdev->bd_disk, cdrom_info);
-> > +     int err;
-> > +
-> > +     switch (cmd) {
-> > +     case CDROMSETSPINDOWN:
-> > +             return idecd_set_spindown(&info->devinfo, arg);
-> > +     case CDROMGETSPINDOWN:
-> > +             return idecd_get_spindown(&info->devinfo, arg);
->
-> compat_ptr() should also be applied to the argument for these two
-> commands, though I'm fairly sure IDE drivers have never been useful on
-> s390 so it doesn't matter in practice.
+On 12/19/19 1:43 AM, Stefan Haberland wrote:
+> Hi Jens,
+> 
+> please see the following three patches that
+> 
+>  - fix a dead code path for DASD
+>  - fix a memleak in DASD error case
+>  - fix typo in copyright statement
 
-Agreed on both, fixed by folding in this change:
+Applied for 5.5, thanks
 
-diff --git a/drivers/ide/ide-cd.c b/drivers/ide/ide-cd.c
-index 2de6e8ace957..e09b949a7c46 100644
---- a/drivers/ide/ide-cd.c
-+++ b/drivers/ide/ide-cd.c
-@@ -1716,19 +1716,20 @@ static int idecd_locked_compat_ioctl(struct
-block_device *bdev, fmode_t mode,
-                        unsigned int cmd, unsigned long arg)
- {
-        struct cdrom_info *info = ide_drv_g(bdev->bd_disk, cdrom_info);
-+       void __user *argp = compat_ptr(arg);
-        int err;
+-- 
+Jens Axboe
 
-        switch (cmd) {
-        case CDROMSETSPINDOWN:
--               return idecd_set_spindown(&info->devinfo, arg);
-+               return idecd_set_spindown(&info->devinfo, (unsigned long)argp);
-        case CDROMGETSPINDOWN:
--               return idecd_get_spindown(&info->devinfo, arg);
-+               return idecd_get_spindown(&info->devinfo, (unsigned long)argp);
-        default:
-                break;
-        }
-
-        return cdrom_ioctl(&info->devinfo, bdev, mode, cmd,
--                          (unsigned long)compat_ptr(arg));
-+                          (unsigned long)argp);
- }
-
-static int idecd_compat_ioctl(struct block_device *bdev, fmode_t mode,
-
-Unfortunately the generic_ide_ioctl() call still needs an unconverted arg,
-so I can't just use compat_ptr() to call the native idecd_locked_ioctl()
-for all commands.
-
-Thanks,
-
-       Arnd
