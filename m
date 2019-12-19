@@ -2,100 +2,144 @@ Return-Path: <SRS0=q1Dd=2J=vger.kernel.org=linux-block-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-9.6 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
-	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,
-	SPF_HELO_NONE,SPF_PASS,USER_AGENT_GIT autolearn=ham autolearn_force=no
-	version=3.4.0
+X-Spam-Status: No, score=-0.8 required=3.0 tests=DKIM_SIGNED,DKIM_VALID,
+	HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS
+	autolearn=no autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 9A87BC43603
-	for <linux-block@archiver.kernel.org>; Thu, 19 Dec 2019 06:14:26 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id DC144C43603
+	for <linux-block@archiver.kernel.org>; Thu, 19 Dec 2019 06:52:51 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.kernel.org (Postfix) with ESMTP id 5EB6824682
-	for <linux-block@archiver.kernel.org>; Thu, 19 Dec 2019 06:14:26 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id ADEB1227BF
+	for <linux-block@archiver.kernel.org>; Thu, 19 Dec 2019 06:52:51 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (2048-bit key) header.d=wdc.com header.i=@wdc.com header.b="YA6DyBPC"
+	dkim=pass (2048-bit key) header.d=intel-com.20150623.gappssmtp.com header.i=@intel-com.20150623.gappssmtp.com header.b="SiBKFSWb"
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1726294AbfLSGO0 (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Thu, 19 Dec 2019 01:14:26 -0500
-Received: from esa3.hgst.iphmx.com ([216.71.153.141]:47783 "EHLO
-        esa3.hgst.iphmx.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1725987AbfLSGOZ (ORCPT
+        id S1726656AbfLSGwr (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Thu, 19 Dec 2019 01:52:47 -0500
+Received: from mail-ot1-f66.google.com ([209.85.210.66]:40148 "EHLO
+        mail-ot1-f66.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S1726652AbfLSGwq (ORCPT
         <rfc822;linux-block@vger.kernel.org>);
-        Thu, 19 Dec 2019 01:14:25 -0500
-DKIM-Signature: v=1; a=rsa-sha256; c=simple/simple;
-  d=wdc.com; i=@wdc.com; q=dns/txt; s=dkim.wdc.com;
-  t=1576736065; x=1608272065;
-  h=from:to:cc:subject:date:message-id:mime-version:
-   content-transfer-encoding;
-  bh=tzhrBoUJYUSx5xB3XnzJ4NswKblEn+E255iXADaMYdQ=;
-  b=YA6DyBPCk/Vo0j77ecg54XsE8KGLmO1BTe32JyoFGfGZ9KOe0s0qqLAg
-   5zss4hevzW5SCI82fBhRzDw5hKVMZvsep+ti61HVU2oB0zQmB3VW1WI9p
-   rfV57OIB3o1C2tMuLaqR2lQwBsyzFeG5jZjZNF3nR7tCsSNR/LotVjjuc
-   bIy4QtClq6qdcjK8MtXan1twLLkCX1bhsGW7i0i7lf1lT9mcxtHCP6PG5
-   InBki5ewe4ATETC6u9xF3AUGs0uwaVusBZBqSNW8nSkpwsQwWPWIfel+0
-   IBQIbu9Rf0EbP16meENd9HR4XdAzGhFl/uBs9f7Q/NGdrBx450FQWNzPT
-   A==;
-IronPort-SDR: t5tJ6Cas2g/Lxfcpek4GR/hImePKuUD2rUOLAnTEAd+shYP92MCEbZvd/hM+nvcmlN7wNs9c0d
- MaSIEmRXxm6NNHTjZd7o1sScltdrY+biYoIWu1gy6yNq/Yn4ZktkHwSvbddbW+Eqbd3IPxFLap
- LfshT+OJSeBDMgyjzhYc+nDxlq0O3fZxz3MZCcucLJwJerCSCbRROTrG0vG2HHHPi4zljsYCWP
- 5bf0COmedaIKP13JoYUK+4nSw1XN213eaCPlu26IPnktNPdt7/j3ggpSGityqXXFNDEUww7jCF
- odI=
-X-IronPort-AV: E=Sophos;i="5.69,330,1571673600"; 
-   d="scan'208";a="130132707"
-Received: from h199-255-45-14.hgst.com (HELO uls-op-cesaep01.wdc.com) ([199.255.45.14])
-  by ob1.hgst.iphmx.com with ESMTP; 19 Dec 2019 14:14:25 +0800
-IronPort-SDR: +TsMJiZX42TUBE5VOTCX86aJdl+895r7G/PG2+Y0zG+1+hF6C25DBkxYWzORdPmHXk1tPga/0/
- UH9Wpu+8ax67rppsxdT/N9k9z1ON7Xn4AppaKvgg5GG4c0y4kPRzke/VPeB9q5fjBIbzEwKZBU
- Y3zFhE4Xoy6odKwN9Y/f2eC2WTho/42lyN9Mx9aQnoJDUSPPuaEbqQxsCS5H/pHhXBQX53vT1D
- cjai+GqWDFqYgd11ndegXIMEtIrDAt/+mJ1/hqxc7uv0xa24A7/L9s6Sw9jP5alSHgH0F5Iqj3
- grtmYGxZUBD6/BQ8DgaYE1dx
-Received: from uls-op-cesaip02.wdc.com ([10.248.3.37])
-  by uls-op-cesaep01.wdc.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 18 Dec 2019 22:08:47 -0800
-IronPort-SDR: W8ub+u02ixh63sIfuPMG5LEHSb6a1A/ciNHMiWF++YjHaA4BG3GHVRSruwXmLQJ55lAeSY0Ve5
- ERYx+XX5dGhjtACUd/9SS3QrgwwBYBtpBKCFiWCHRduAvknCownNSzJh4kr/2e21pS9CfDAiH4
- hDD0rQJ/69mOEBXOWHbvGqXKhj22BFxrZsMixoeeIas7JB61KAkcI/oa2y4ZEAsKD0ReG4BJLy
- 8aCClvyb6i2TH0jngVGSFFjAaqiDDAD1xueenF/yn83iE3IGnJCrI+8kNOdSYMcwSkRwtoCV1W
- RVU=
-WDCIronportException: Internal
-Received: from iouring.labspan.wdc.com (HELO iouring.sc.wdc.com) ([10.6.138.107])
-  by uls-op-cesaip02.wdc.com with ESMTP; 18 Dec 2019 22:14:24 -0800
-From:   Chaitanya Kulkarni <chaitanya.kulkarni@wdc.com>
-To:     linux-block@vger.kernel.org
-Cc:     damien.lamoal@wdc.com, axboe@kernel.dk,
-        Chaitanya Kulkarni <chaitanya.kulkarni@wdc.com>,
-        Damien Le Moal <damien.lemoal@wdc.com>
-Subject: [PATCH] block: mark zone-mgmt bios with REQ_SYNC
-Date:   Wed, 18 Dec 2019 22:14:23 -0800
-Message-Id: <20191219061423.3775-1-chaitanya.kulkarni@wdc.com>
-X-Mailer: git-send-email 2.22.1
+        Thu, 19 Dec 2019 01:52:46 -0500
+Received: by mail-ot1-f66.google.com with SMTP id i15so5889442oto.7
+        for <linux-block@vger.kernel.org>; Wed, 18 Dec 2019 22:52:46 -0800 (PST)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=intel-com.20150623.gappssmtp.com; s=20150623;
+        h=mime-version:references:in-reply-to:from:date:message-id:subject:to
+         :cc;
+        bh=dhLbadWhXkT8uLUvoIQHEOPXZo986OHkQZmNW5JELSg=;
+        b=SiBKFSWbGZ/DlTuqAeJWCQJfko4CpkONzPTdXHk5ITfn6wjNPKckEYMfWXVa2KjE/9
+         EnvKM5uCkbPNuMcmnnmOIL13PX8cysvho7VLWXbG/qQdn+K7/fzi8Ww4DNnz531U3iaT
+         ek1DixOnTmNKqPks25kBzv6fRlRYJb99R8rIhogy+n5/aKHmuRVk2bVwwFWgffjz3noA
+         ZerH0bwQzplUBLkBL/JrHxP9P4K0mBWvBTnlliMpof9I4Sttm4IJTOIKoWl16jE3wTmG
+         IAzt5ZvdYfPhwgyAVURwEUcOXBJqNdhdpF54lEQXTrtdeMxzkaBCmBvpJo6eizOwHL7A
+         6gAQ==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20161025;
+        h=x-gm-message-state:mime-version:references:in-reply-to:from:date
+         :message-id:subject:to:cc;
+        bh=dhLbadWhXkT8uLUvoIQHEOPXZo986OHkQZmNW5JELSg=;
+        b=aLcHuAC4wkr/MBJmdzMTJhZnRnvcr8P3BK0DtGRtwgWp5nonTu9BeYUsb/1KFzmxJX
+         70WV/3Qn5UgHMw4qjjohAAy/vaH3Hw6f2oaJ6s4/boh794fg2dpaQnRjRU/hyaAqiL18
+         hjqaZIs85T/WhwSvtL/GweHlO1E85Vo/QvtoOFZrVsVqr98iFwYpcAsIgFYvjXkpwPPx
+         ASr7BSXu2rgtvKWM/kxDYtFXlTv673ZIKKX/PqhomMjpCL+Tq+Joj98ZOiLAvuWi78vJ
+         qcH+u1WZKrfvygW2PrhYevSO1orykHUC3rfenF6G3adrT96NG7XaAp7Ynk8Dds+jAzvk
+         T7Gw==
+X-Gm-Message-State: APjAAAXpKeBE0Nld2leikNiHG8ebhTG/zHr1gaNFgrwQdyKlcACHGGlX
+        nFvglSMuwZ6KA90Zxi3abbVlqKvLLrJ/vGGBWCAFgw==
+X-Google-Smtp-Source: APXvYqx2SQBCxtdPGsjOU3QNzNDjKuhpt1dAk9YJbVoUKqLIltD16iivCU1omckA5/EjvPPrP0sP5CVaNkhukyqv6+8=
+X-Received: by 2002:a9d:6f11:: with SMTP id n17mr7085591otq.126.1576738365531;
+ Wed, 18 Dec 2019 22:52:45 -0800 (PST)
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
+References: <20191216222537.491123-1-jhubbard@nvidia.com> <20191216222537.491123-5-jhubbard@nvidia.com>
+ <CAPcyv4hQBMxYMurxG=Vwh0=FKWoT3z-Kf=dqES1-icRV5bLwKg@mail.gmail.com> <d0a99e75-0175-0f31-f176-8c37c18a4108@nvidia.com>
+In-Reply-To: <d0a99e75-0175-0f31-f176-8c37c18a4108@nvidia.com>
+From:   Dan Williams <dan.j.williams@intel.com>
+Date:   Wed, 18 Dec 2019 22:52:34 -0800
+Message-ID: <CAPcyv4j+Zgom17UZ-6Njkij1R0UQ=vUQdnaEZj9qDezEUJSZGg@mail.gmail.com>
+Subject: Re: [PATCH v11 04/25] mm: devmap: refactor 1-based refcounting for
+ ZONE_DEVICE pages
+To:     John Hubbard <jhubbard@nvidia.com>
+Cc:     Andrew Morton <akpm@linux-foundation.org>,
+        Al Viro <viro@zeniv.linux.org.uk>,
+        Alex Williamson <alex.williamson@redhat.com>,
+        Benjamin Herrenschmidt <benh@kernel.crashing.org>,
+        =?UTF-8?B?QmrDtnJuIFTDtnBlbA==?= <bjorn.topel@intel.com>,
+        Christoph Hellwig <hch@infradead.org>,
+        Daniel Vetter <daniel@ffwll.ch>,
+        Dave Chinner <david@fromorbit.com>,
+        David Airlie <airlied@linux.ie>,
+        "David S . Miller" <davem@davemloft.net>,
+        Ira Weiny <ira.weiny@intel.com>, Jan Kara <jack@suse.cz>,
+        Jason Gunthorpe <jgg@ziepe.ca>, Jens Axboe <axboe@kernel.dk>,
+        Jonathan Corbet <corbet@lwn.net>,
+        =?UTF-8?B?SsOpcsO0bWUgR2xpc3Nl?= <jglisse@redhat.com>,
+        Magnus Karlsson <magnus.karlsson@intel.com>,
+        Mauro Carvalho Chehab <mchehab@kernel.org>,
+        Michael Ellerman <mpe@ellerman.id.au>,
+        Michal Hocko <mhocko@suse.com>,
+        Mike Kravetz <mike.kravetz@oracle.com>,
+        Paul Mackerras <paulus@samba.org>,
+        Shuah Khan <shuah@kernel.org>,
+        Vlastimil Babka <vbabka@suse.cz>, bpf@vger.kernel.org,
+        Maling list - DRI developers 
+        <dri-devel@lists.freedesktop.org>, KVM list <kvm@vger.kernel.org>,
+        linux-block@vger.kernel.org,
+        Linux Doc Mailing List <linux-doc@vger.kernel.org>,
+        linux-fsdevel <linux-fsdevel@vger.kernel.org>,
+        linux-kselftest@vger.kernel.org,
+        "Linux-media@vger.kernel.org" <linux-media@vger.kernel.org>,
+        linux-rdma <linux-rdma@vger.kernel.org>,
+        linuxppc-dev <linuxppc-dev@lists.ozlabs.org>,
+        Netdev <netdev@vger.kernel.org>, Linux MM <linux-mm@kvack.org>,
+        LKML <linux-kernel@vger.kernel.org>,
+        Christoph Hellwig <hch@lst.de>
+Content-Type: text/plain; charset="UTF-8"
 Sender: linux-block-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-This patch marks the zone-mgmt bios with REQ_SYNC flag.
+On Wed, Dec 18, 2019 at 9:51 PM John Hubbard <jhubbard@nvidia.com> wrote:
+>
+> On 12/18/19 9:27 PM, Dan Williams wrote:
+> ...
+> >> @@ -461,5 +449,5 @@ void __put_devmap_managed_page(struct page *page)
+> >>          page->mapping = NULL;
+> >>          page->pgmap->ops->page_free(page);
+> >>   }
+> >> -EXPORT_SYMBOL(__put_devmap_managed_page);
+> >> +EXPORT_SYMBOL(free_devmap_managed_page);
+> >
+> > This patch does not have a module consumer for
+> > free_devmap_managed_page(), so the export should move to the patch
+> > that needs the new export.
+>
+> Hi Dan,
+>
+> OK, I know that's a policy--although it seems quite pointless here given
+> that this is definitely going to need an EXPORT.
+>
+> At the moment, the series doesn't use it in any module at all, so I'll just
+> delete the EXPORT for now.
+>
+> >
+> > Also the only reason that put_devmap_managed_page() is EXPORT_SYMBOL
+> > instead of EXPORT_SYMBOL_GPL is that there was no practical way to
+> > hide the devmap details from evey module in the kernel that did
+> > put_page(). I would expect free_devmap_managed_page() to
+> > EXPORT_SYMBOL_GPL if it is not inlined into an existing exported
+> > static inline api.
+> >
+>
+> Sure, I'll change it to EXPORT_SYMBOL_GPL when the time comes. We do have
+> to be careful that we don't shut out normal put_page() types of callers,
+> but...glancing through the current callers, that doesn't look to be a problem.
+> Good. So it should be OK to do EXPORT_SYMBOL_GPL here.
+>
+> Are you *sure* you don't want to just pre-emptively EXPORT now, and save
+> looking at it again?
 
-Suggested-by: Damien Le Moal <damien.lemoal@wdc.com>
-Signed-off-by: Chaitanya Kulkarni <chaitanya.kulkarni@wdc.com>
----
- block/blk-zoned.c | 2 +-
- 1 file changed, 1 insertion(+), 1 deletion(-)
-
-diff --git a/block/blk-zoned.c b/block/blk-zoned.c
-index d00fcfd71dfe..05741c6f618b 100644
---- a/block/blk-zoned.c
-+++ b/block/blk-zoned.c
-@@ -198,7 +198,7 @@ int blkdev_zone_mgmt(struct block_device *bdev, enum req_opf op,
- 			break;
- 		}
- 
--		bio->bi_opf = op;
-+		bio->bi_opf = op | REQ_SYNC;
- 		bio->bi_iter.bi_sector = sector;
- 		sector += zone_sectors;
- 
--- 
-2.22.1
-
+I'm positive. There is enough history for "trust me the consumer is
+coming" turning out not to be true to justify the hassle in my mind. I
+do trust you, but things happen.
