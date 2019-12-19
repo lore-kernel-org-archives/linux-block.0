@@ -6,66 +6,67 @@ X-Spam-Status: No, score=-2.2 required=3.0 tests=DKIM_SIGNED,DKIM_VALID,
 	HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,
 	USER_AGENT_SANE_1 autolearn=no autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 264F9C43603
-	for <linux-block@archiver.kernel.org>; Thu, 19 Dec 2019 12:45:36 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 5C636C43603
+	for <linux-block@archiver.kernel.org>; Thu, 19 Dec 2019 12:47:15 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.kernel.org (Postfix) with ESMTP id EB5F524672
-	for <linux-block@archiver.kernel.org>; Thu, 19 Dec 2019 12:45:35 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id 3205524650
+	for <linux-block@archiver.kernel.org>; Thu, 19 Dec 2019 12:47:15 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel-dk.20150623.gappssmtp.com header.i=@kernel-dk.20150623.gappssmtp.com header.b="RP155P0q"
+	dkim=pass (2048-bit key) header.d=kernel-dk.20150623.gappssmtp.com header.i=@kernel-dk.20150623.gappssmtp.com header.b="W5OFVKHw"
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1726699AbfLSMpf (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Thu, 19 Dec 2019 07:45:35 -0500
-Received: from mail-pj1-f67.google.com ([209.85.216.67]:33806 "EHLO
-        mail-pj1-f67.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1726695AbfLSMpf (ORCPT
+        id S1726704AbfLSMrO (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Thu, 19 Dec 2019 07:47:14 -0500
+Received: from mail-pg1-f194.google.com ([209.85.215.194]:39997 "EHLO
+        mail-pg1-f194.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S1726696AbfLSMrO (ORCPT
         <rfc822;linux-block@vger.kernel.org>);
-        Thu, 19 Dec 2019 07:45:35 -0500
-Received: by mail-pj1-f67.google.com with SMTP id s94so2562697pjc.1
-        for <linux-block@vger.kernel.org>; Thu, 19 Dec 2019 04:45:34 -0800 (PST)
+        Thu, 19 Dec 2019 07:47:14 -0500
+Received: by mail-pg1-f194.google.com with SMTP id k25so3058886pgt.7
+        for <linux-block@vger.kernel.org>; Thu, 19 Dec 2019 04:47:14 -0800 (PST)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=kernel-dk.20150623.gappssmtp.com; s=20150623;
         h=subject:to:cc:references:from:message-id:date:user-agent
          :mime-version:in-reply-to:content-language:content-transfer-encoding;
-        bh=Z/xYSl6zQKjABLBTONR1NAB8T0yFBm0l2LQ2eaQw2EE=;
-        b=RP155P0qGjBkRG3bhkvHndHmrwp9Llla3wDhunWiTYVqDWJ1dEbVLWz8ii9l25yKDv
-         MS4sgKHJcS78zL6L8R05uLrSHADSi8OeAcHnMn892flYwp8w8k817RwuHKfKyqWYzljU
-         ifZbRTmhZRxvPpZ/qGYBHAR61cmoo+tc1qFFHcUacUc7eYKZY7tvFaxhy5lbHCeXZ0PP
-         zy/FgjeBx3g9wUxuLFz7wtZKqvIctzSFR513epcayjAenYhJCg7gNhJXYH6WRzj1lKVH
-         nnvOymZxdX4KhPRioI/3lXC0NOyc/ehWDwI41Jm8wtnBdmYokvvi0yNO5kHaSyYmYlfU
-         6SdA==
+        bh=yW1IsyXNAje0QGXX1u9y0hF2DtFQjc7pR3jvloXZHWo=;
+        b=W5OFVKHwErzq/LMoZZyOYiwu0LKg8Ab3t3E/xhT/wvo2ti0eBZONmHM6wws56BorFi
+         isFWKEbVK7q/s2CUPdEqIav4T5vH3zzx/FWd7azF2zX/z/CDs5M5nxUsDAK+a21VWy1Z
+         w2/DG+4wmTdVosl9F5GT+z8Y8z0xpam3uS54ZadgyZ+ArDKlDR6P8DBs+38cA67G6tkr
+         0RV2lkbH+XpH1v/fOIPxYKAxk0Vn91X3kYTMZDw5gdMVQmturkKQ1VU9727LC/DkNH4w
+         jWz7r8jYysH8T4Fsy6RIZEHN3KzMzFMDjgJcCqqe6vIcMMHFtcFanOqQK06chuls8GC4
+         U1BA==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=1e100.net; s=20161025;
         h=x-gm-message-state:subject:to:cc:references:from:message-id:date
          :user-agent:mime-version:in-reply-to:content-language
          :content-transfer-encoding;
-        bh=Z/xYSl6zQKjABLBTONR1NAB8T0yFBm0l2LQ2eaQw2EE=;
-        b=twolyx0K3i0xZHZ91B0SiOaVNSHhVf+aMIPSz3hV2VyDgC544qYTwIo+qYqh/F3Ft5
-         iSZwP+x2NIornhG20flBJVZ2fP7dc67s1Dt3Se6X7QNuKMyOyvampOoS2fDhLHo6khLv
-         Q+EvR39jZzcV/0b+VG/c5ztxKHWS++E5w+rnB9Cd8K7WQ/uQ9vzVG42PxT8Ho6pEj7Ff
-         UaJ71raSQcMlIn1yEBEle5c0prHL/9cE9r/uC/5DmkRpTN4iRbEA0ZqUEQ3EMZ5ktwY8
-         bBbVLjOBlihs1tvCeFRShXfJgRSLrSGmqH0mVKs6OyMTBBZGmwkcou96DmQpGHyvvGVr
-         z0eA==
-X-Gm-Message-State: APjAAAWj7+9RFKxx9atf1JK2A4QIMMHpRLrjUWJwGEudRUJJ6E0r1lK4
-        Su9NCQDHzWzih6XClGqr9j6hyg==
-X-Google-Smtp-Source: APXvYqy6HTR64BHbjBbMtSNTgHsPQfIuOLG3t31OX3o/0XEEirytJKmtxMG+dB64dUKLh5yc1ScyOg==
-X-Received: by 2002:a17:90a:1ae9:: with SMTP id p96mr9640448pjp.8.1576759534340;
-        Thu, 19 Dec 2019 04:45:34 -0800 (PST)
+        bh=yW1IsyXNAje0QGXX1u9y0hF2DtFQjc7pR3jvloXZHWo=;
+        b=nwAKgAUkBhfGtPcPzdhNWYPM69QZIezP6JSpE9GhmVatgtvRxoW8EvkDZ9o5uuxxMt
+         IxHp0qv8Yx5qnAtahDSJMY/3jJJ9Bou1qON6EU2yLO65OSljCbZsOiOE+mv6M2eMJZ6O
+         cDQM7gNlOy3DI+NjzZrEbeRnmgaEXfMS9i5Bu58ba3mCGiMwyymzNqroVbm2iSs9/l+N
+         4nqZ1vns4Hfay5ITceP20BWtF02U7n33zyTVQlr8ZGbrVpqgml/svLlP1AoOSrdnIx3D
+         3he1TPD4gu0SpVODdBNUTbaLh/e6AoukhGDq++50LXStZ4Dx+xBqLLfrwjt2SLoZMjn1
+         X+oQ==
+X-Gm-Message-State: APjAAAWVNimVl05eVjITkhWbSdTav5Mknaf25AkcGL/ma0CwaHEOWnc8
+        tinTOiQfralwgOGH4m5+6fUvfjap+2bpcQ==
+X-Google-Smtp-Source: APXvYqwR+b/qCIp9sdqqkG82R1oJY2ONzlLPkIcOwPTWCccbch8FpMZmCbJqTa4q4kMvM7tHDTazNQ==
+X-Received: by 2002:a63:d543:: with SMTP id v3mr8641639pgi.285.1576759633620;
+        Thu, 19 Dec 2019 04:47:13 -0800 (PST)
 Received: from [192.168.1.188] ([66.219.217.145])
-        by smtp.gmail.com with ESMTPSA id s15sm7451809pgq.4.2019.12.19.04.45.33
+        by smtp.gmail.com with ESMTPSA id b98sm6755767pjc.16.2019.12.19.04.47.12
         (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
-        Thu, 19 Dec 2019 04:45:33 -0800 (PST)
-Subject: Re: [PATCH] block: fix memleak when __blk_rq_map_user_iov() is failed
-To:     Yang Yingliang <yangyingliang@huawei.com>
-Cc:     linux-block@vger.kernel.org, linux-kernel@vger.kernel.org
-References: <1576658644-88101-1-git-send-email-yangyingliang@huawei.com>
+        Thu, 19 Dec 2019 04:47:13 -0800 (PST)
+Subject: Re: [PATCH] block: mark zone-mgmt bios with REQ_SYNC
+To:     Chaitanya Kulkarni <chaitanya.kulkarni@wdc.com>,
+        linux-block@vger.kernel.org
+Cc:     damien.lamoal@wdc.com, Damien Le Moal <damien.lemoal@wdc.com>
+References: <20191219061423.3775-1-chaitanya.kulkarni@wdc.com>
 From:   Jens Axboe <axboe@kernel.dk>
-Message-ID: <4e2e03e4-b5ed-e16a-e7a0-0900afb23042@kernel.dk>
-Date:   Thu, 19 Dec 2019 05:45:32 -0700
+Message-ID: <e63f8fd4-77bd-1031-bf15-b3155b262974@kernel.dk>
+Date:   Thu, 19 Dec 2019 05:47:11 -0700
 User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:68.0) Gecko/20100101
  Thunderbird/68.2.2
 MIME-Version: 1.0
-In-Reply-To: <1576658644-88101-1-git-send-email-yangyingliang@huawei.com>
+In-Reply-To: <20191219061423.3775-1-chaitanya.kulkarni@wdc.com>
 Content-Type: text/plain; charset=utf-8
 Content-Language: en-US
 Content-Transfer-Encoding: 7bit
@@ -74,36 +75,13 @@ Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-On 12/18/19 1:44 AM, Yang Yingliang wrote:
-> When I doing fuzzy test, get the memleak report:
-> 
-> BUG: memory leak
-> unreferenced object 0xffff88837af80000 (size 4096):
->   comm "memleak", pid 3557, jiffies 4294817681 (age 112.499s)
->   hex dump (first 32 bytes):
->     00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00  ................
->     20 00 00 00 10 01 00 00 00 00 00 00 01 00 00 00   ...............
->   backtrace:
->     [<000000001c894df8>] bio_alloc_bioset+0x393/0x590
->     [<000000008b139a3c>] bio_copy_user_iov+0x300/0xcd0
->     [<00000000a998bd8c>] blk_rq_map_user_iov+0x2f1/0x5f0
->     [<000000005ceb7f05>] blk_rq_map_user+0xf2/0x160
->     [<000000006454da92>] sg_common_write.isra.21+0x1094/0x1870
->     [<00000000064bb208>] sg_write.part.25+0x5d9/0x950
->     [<000000004fc670f6>] sg_write+0x5f/0x8c
->     [<00000000b0d05c7b>] __vfs_write+0x7c/0x100
->     [<000000008e177714>] vfs_write+0x1c3/0x500
->     [<0000000087d23f34>] ksys_write+0xf9/0x200
->     [<000000002c8dbc9d>] do_syscall_64+0x9f/0x4f0
->     [<00000000678d8e9a>] entry_SYSCALL_64_after_hwframe+0x49/0xbe
-> 
-> If __blk_rq_map_user_iov() is failed in blk_rq_map_user_iov(),
-> the bio(s) which is allocated before this failing will leak. The
-> refcount of the bio(s) is init to 1 and increased to 2 by calling
-> bio_get(), but __blk_rq_unmap_user() only decrease it to 1, so
-> the bio cannot be freed. Fix it by calling blk_rq_unmap_user().
+On 12/18/19 11:14 PM, Chaitanya Kulkarni wrote:
+> This patch marks the zone-mgmt bios with REQ_SYNC flag.
 
-Applied, thanks.
+This needs a much better commit message, you're not telling me
+anything I can't see by reading the patch itself. A good commit
+message contains the reason for the patch, there's no justification
+right now.
 
 -- 
 Jens Axboe
