@@ -7,68 +7,73 @@ X-Spam-Status: No, score=-0.8 required=3.0 tests=DKIMWL_WL_HIGH,DKIM_SIGNED,
 	SPF_HELO_NONE,SPF_PASS,UNPARSEABLE_RELAY autolearn=no autolearn_force=no
 	version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 16A48C43603
-	for <linux-block@archiver.kernel.org>; Thu, 19 Dec 2019 03:04:21 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id E9518C2D0D1
+	for <linux-block@archiver.kernel.org>; Thu, 19 Dec 2019 03:19:14 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.kernel.org (Postfix) with ESMTP id DE4C522314
-	for <linux-block@archiver.kernel.org>; Thu, 19 Dec 2019 03:04:20 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id BF38821D7D
+	for <linux-block@archiver.kernel.org>; Thu, 19 Dec 2019 03:19:14 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=pass (2048-bit key) header.d=oracle.com header.i=@oracle.com header.b="aCIK+kSN"
+	dkim=pass (2048-bit key) header.d=oracle.com header.i=@oracle.com header.b="fUfP3frz"
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1726869AbfLSDEU (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Wed, 18 Dec 2019 22:04:20 -0500
-Received: from userp2120.oracle.com ([156.151.31.85]:40492 "EHLO
-        userp2120.oracle.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1726751AbfLSDET (ORCPT
+        id S1726875AbfLSDTK (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Wed, 18 Dec 2019 22:19:10 -0500
+Received: from aserp2120.oracle.com ([141.146.126.78]:49688 "EHLO
+        aserp2120.oracle.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S1726773AbfLSDTK (ORCPT
         <rfc822;linux-block@vger.kernel.org>);
-        Wed, 18 Dec 2019 22:04:19 -0500
-Received: from pps.filterd (userp2120.oracle.com [127.0.0.1])
-        by userp2120.oracle.com (8.16.0.27/8.16.0.27) with SMTP id xBJ2xiPR058087;
-        Thu, 19 Dec 2019 03:03:46 GMT
+        Wed, 18 Dec 2019 22:19:10 -0500
+Received: from pps.filterd (aserp2120.oracle.com [127.0.0.1])
+        by aserp2120.oracle.com (8.16.0.27/8.16.0.27) with SMTP id xBJ39uYC068077;
+        Thu, 19 Dec 2019 03:18:49 GMT
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=oracle.com; h=to : cc : subject :
  from : references : date : in-reply-to : message-id : mime-version :
  content-type; s=corp-2019-08-05;
- bh=cdxYY44jNJqlprPyo2O9QUPx1Qi/xcVZ/t3x9qspneU=;
- b=aCIK+kSNQFpBbsOLnWXLh+CBVkP6h9MgQAB4U6wa3KL1k3WS9MFm3hUT4nnE7+AJA06j
- 9kLEVwIKMSm5JZB7JELCW7S7t0qrTatOWDRxv7sBSbVFjIDjpDO0svO7K29fXA9x+kN4
- MchVN3Pww0WSWtbp8syVu2OZX3/N5wAQiOhi1Dmw1UmGk3QyfDTEjyS56O9MHYoJRGEC
- vKWnJrmDo2GNMMQH9z3eGACrvo95Xqni2SHWyrw0iLFPpgjyHFQm//ESA5S+vnS/ZfJ8
- I2kMFZaWp5X6eDTKHnYiHGXQv61yhj1WPuiqcSl9vpRcjWpte9uLO/kiHjrK9piMTwO9 Pg== 
-Received: from userp3030.oracle.com (userp3030.oracle.com [156.151.31.80])
-        by userp2120.oracle.com with ESMTP id 2wvrcrhb9h-1
+ bh=oLFGR/WhIs5dA3HxvsHBFdeGRs+wvX0i1xh6f2MYyak=;
+ b=fUfP3frzqd+rvFOH7JcewpXXCeJ3/2sQfUXbVYzrcjnegAmXD+1cw+nkY6p1n8WC/jfq
+ 2T0ejE4lcRIcgqh3bPB9O/uE1jZWOAYo+JrI7UTtWdOFaI40Sv3aeUyzl12bXLyrk32G
+ FRjWhE79aO5nPaGPKHkX+WRqehzPNfVTQuPrb56Mu0rJi55OPzR/wsJAWebKD2ickLL4
+ oizKrdcRrkkBIYEMp7fSmKGq0A4IF0TUKCypatDE6Gtz3Z3jEG3vmlB4zXRgXTVPFHHe
+ lfgq4tZyurWkw0Yw8Hd7AwbZLL0VMV1yL4kpLx3A+3PGJ0ycjkZbx1sgz+vmqD6Cjr57 mA== 
+Received: from aserp3030.oracle.com (aserp3030.oracle.com [141.146.126.71])
+        by aserp2120.oracle.com with ESMTP id 2wvqpqhfwf-1
         (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=OK);
-        Thu, 19 Dec 2019 03:03:45 +0000
-Received: from pps.filterd (userp3030.oracle.com [127.0.0.1])
-        by userp3030.oracle.com (8.16.0.27/8.16.0.27) with SMTP id xBJ2xj2Z075954;
-        Thu, 19 Dec 2019 03:03:45 GMT
-Received: from userv0121.oracle.com (userv0121.oracle.com [156.151.31.72])
-        by userp3030.oracle.com with ESMTP id 2wyxqgwtq0-1
+        Thu, 19 Dec 2019 03:18:49 +0000
+Received: from pps.filterd (aserp3030.oracle.com [127.0.0.1])
+        by aserp3030.oracle.com (8.16.0.27/8.16.0.27) with SMTP id xBJ39t0O038689;
+        Thu, 19 Dec 2019 03:18:49 GMT
+Received: from aserv0122.oracle.com (aserv0122.oracle.com [141.146.126.236])
+        by aserp3030.oracle.com with ESMTP id 2wyut4nd60-1
         (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=OK);
-        Thu, 19 Dec 2019 03:03:45 +0000
-Received: from abhmp0007.oracle.com (abhmp0007.oracle.com [141.146.116.13])
-        by userv0121.oracle.com (8.14.4/8.13.8) with ESMTP id xBJ33dg7026575;
-        Thu, 19 Dec 2019 03:03:39 GMT
+        Thu, 19 Dec 2019 03:18:49 +0000
+Received: from abhmp0013.oracle.com (abhmp0013.oracle.com [141.146.116.19])
+        by aserv0122.oracle.com (8.14.4/8.14.4) with ESMTP id xBJ3IX95010331;
+        Thu, 19 Dec 2019 03:18:33 GMT
 Received: from ca-mkp.ca.oracle.com (/10.159.214.123)
         by default (Oracle Beehive Gateway v4.0)
-        with ESMTP ; Wed, 18 Dec 2019 19:03:38 -0800
-To:     Kirill Tkhai <ktkhai@virtuozzo.com>
-Cc:     linux-block@vger.kernel.org, linux-kernel@vger.kernel.org,
-        linux-ext4@vger.kernel.org, axboe@kernel.dk, tytso@mit.edu,
-        adilger.kernel@dilger.ca, ming.lei@redhat.com, osandov@fb.com,
-        jthumshirn@suse.de, minwoo.im.dev@gmail.com, damien.lemoal@wdc.com,
-        andrea.parri@amarulasolutions.com, hare@suse.com, tj@kernel.org,
-        ajay.joshi@wdc.com, sagi@grimberg.me, dsterba@suse.com,
-        chaitanya.kulkarni@wdc.com, bvanassche@acm.org,
-        dhowells@redhat.com, asml.silence@gmail.com
-Subject: Re: [PATCH RFC 1/3] block: Add support for REQ_OP_ASSIGN_RANGE operation
+        with ESMTP ; Wed, 18 Dec 2019 19:18:33 -0800
+To:     Arnd Bergmann <arnd@arndb.de>
+Cc:     Jens Axboe <axboe@kernel.dk>,
+        "James E.J. Bottomley" <jejb@linux.ibm.com>,
+        "Martin K. Petersen" <martin.petersen@oracle.com>,
+        linux-scsi <linux-scsi@vger.kernel.org>,
+        linux-block <linux-block@vger.kernel.org>,
+        y2038 Mailman List <y2038@lists.linaro.org>,
+        "linux-kernel\@vger.kernel.org" <linux-kernel@vger.kernel.org>,
+        Christoph Hellwig <hch@lst.de>,
+        Ben Hutchings <ben.hutchings@codethink.co.uk>,
+        "open list\:DOCUMENTATION" <linux-doc@vger.kernel.org>,
+        Jonathan Corbet <corbet@lwn.net>,
+        Al Viro <viro@zeniv.linux.org.uk>,
+        Linux FS-devel Mailing List <linux-fsdevel@vger.kernel.org>
+Subject: Re: [GIT PULL v2 00/27] block, scsi: final compat_ioctl cleanup
 From:   "Martin K. Petersen" <martin.petersen@oracle.com>
 Organization: Oracle Corporation
-References: <157599668662.12112.10184894900037871860.stgit@localhost.localdomain>
-        <157599696813.12112.14140818972910110796.stgit@localhost.localdomain>
-Date:   Wed, 18 Dec 2019 22:03:34 -0500
-In-Reply-To: <157599696813.12112.14140818972910110796.stgit@localhost.localdomain>
-        (Kirill Tkhai's message of "Tue, 10 Dec 2019 19:56:08 +0300")
-Message-ID: <yq1woatc8zd.fsf@oracle.com>
+References: <20191217221708.3730997-1-arnd@arndb.de>
+        <CAK8P3a3fsDRsZh--vn4SWA-NfeeSpzueqGDvjF5jDSZ91P9+Hw@mail.gmail.com>
+Date:   Wed, 18 Dec 2019 22:18:28 -0500
+In-Reply-To: <CAK8P3a3fsDRsZh--vn4SWA-NfeeSpzueqGDvjF5jDSZ91P9+Hw@mail.gmail.com>
+        (Arnd Bergmann's message of "Wed, 18 Dec 2019 18:24:32 +0100")
+Message-ID: <yq1sglhc8aj.fsf@oracle.com>
 User-Agent: Gnus/5.13 (Gnus v5.13) Emacs/26.1.92 (gnu/linux)
 MIME-Version: 1.0
 Content-Type: text/plain
@@ -76,33 +81,26 @@ X-Proofpoint-Virus-Version: vendor=nai engine=6000 definitions=9475 signatures=6
 X-Proofpoint-Spam-Details: rule=notspam policy=default score=0 suspectscore=0 malwarescore=0
  phishscore=0 bulkscore=0 spamscore=0 mlxscore=0 mlxlogscore=999
  adultscore=0 classifier=spam adjust=0 reason=mlx scancount=1
- engine=8.0.1-1911140001 definitions=main-1912190023
+ engine=8.0.1-1911140001 definitions=main-1912190025
 X-Proofpoint-Virus-Version: vendor=nai engine=6000 definitions=9475 signatures=668685
 X-Proofpoint-Spam-Details: rule=notspam policy=default score=0 priorityscore=1501 malwarescore=0
  suspectscore=0 phishscore=0 bulkscore=0 spamscore=0 clxscore=1011
  lowpriorityscore=0 mlxscore=0 impostorscore=0 mlxlogscore=999 adultscore=0
  classifier=spam adjust=0 reason=mlx scancount=1 engine=8.0.1-1911140001
- definitions=main-1912190023
+ definitions=main-1912190025
 Sender: linux-block-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
 
-Hi Kirill!
+Hi Arnd!
 
-> The patch adds a new blkdev_issue_assign_range() primitive, which is
-> rather similar to existing blkdev_issue_{*} api.  Also, a new queue
-> limit.max_assign_range_sectors is added.
+> Any suggestion for how this should be merged?
 
-I am not so keen on the assign_range name. What's wrong with "allocate"?
-
-But why introduce a completely new operation? Isn't this essentially a
-write zeroes with BLKDEV_ZERO_NOUNMAP flag set?
-
-If the zeroing aspect is perceived to be a problem we could add a
-BLKDEV_ZERO_ALLOCATE flag (or BLKDEV_ZERO_ANCHOR since that's the
-terminology used in SCSI).
+I'm pretty flexible. When you post v3 I'll try to set up a branch to get
+an idea what conflicts we might have to deal with. And then we can take
+it from there.
 
 -- 
 Martin K. Petersen	Oracle Linux Engineering
