@@ -2,77 +2,91 @@ Return-Path: <SRS0=q1Dd=2J=vger.kernel.org=linux-block-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-0.8 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
-	MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS autolearn=no autolearn_force=no
-	version=3.4.0
+X-Spam-Status: No, score=-2.2 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
+	MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,USER_AGENT_SANE_1 autolearn=no
+	autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 444BDC2D0C1
-	for <linux-block@archiver.kernel.org>; Thu, 19 Dec 2019 10:43:37 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 79B28C2D0C1
+	for <linux-block@archiver.kernel.org>; Thu, 19 Dec 2019 11:08:27 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.kernel.org (Postfix) with ESMTP id 16284222C2
-	for <linux-block@archiver.kernel.org>; Thu, 19 Dec 2019 10:43:37 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id 4E4D8222C2
+	for <linux-block@archiver.kernel.org>; Thu, 19 Dec 2019 11:08:27 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1726964AbfLSKnP (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Thu, 19 Dec 2019 05:43:15 -0500
-Received: from mx2.suse.de ([195.135.220.15]:48032 "EHLO mx2.suse.de"
+        id S1726698AbfLSLI0 (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Thu, 19 Dec 2019 06:08:26 -0500
+Received: from relay.sw.ru ([185.231.240.75]:47626 "EHLO relay.sw.ru"
         rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-        id S1726925AbfLSKnM (ORCPT <rfc822;linux-block@vger.kernel.org>);
-        Thu, 19 Dec 2019 05:43:12 -0500
-X-Virus-Scanned: by amavisd-new at test-mx.suse.de
-Received: from relay2.suse.de (unknown [195.135.220.254])
-        by mx2.suse.de (Postfix) with ESMTP id 1E71CAC0C;
-        Thu, 19 Dec 2019 10:43:10 +0000 (UTC)
-Date:   Thu, 19 Dec 2019 11:43:47 +0100
-From:   Daniel Wagner <dwagner@suse.de>
-To:     Peter Zijlstra <peterz@infradead.org>
-Cc:     Ming Lei <ming.lei@redhat.com>,
-        Thomas Gleixner <tglx@linutronix.de>,
-        Jens Axboe <axboe@kernel.dk>, linux-kernel@vger.kernel.org,
-        linux-block@vger.kernel.org, Long Li <longli@microsoft.com>,
-        Ingo Molnar <mingo@redhat.com>, Christoph Hellwig <hch@lst.de>,
-        Keith Busch <keith.busch@intel.com>,
-        Sagi Grimberg <sagi@grimberg.me>,
-        John Garry <john.garry@huawei.com>,
-        Hannes Reinecke <hare@suse.com>
-Subject: Re: [RFC PATCH 2/3] softirq: implement interrupt flood detection
-Message-ID: <20191219104347.ql6shgh2x7hk6iid@boron>
-References: <20191218071942.22336-1-ming.lei@redhat.com>
- <20191218071942.22336-3-ming.lei@redhat.com>
- <20191218104941.GR2844@hirez.programming.kicks-ass.net>
- <20191219015948.GB6080@ming.t460p>
- <20191219092319.GX2844@hirez.programming.kicks-ass.net>
+        id S1726694AbfLSLI0 (ORCPT <rfc822;linux-block@vger.kernel.org>);
+        Thu, 19 Dec 2019 06:08:26 -0500
+Received: from dhcp-172-16-24-104.sw.ru ([172.16.24.104])
+        by relay.sw.ru with esmtp (Exim 4.92.3)
+        (envelope-from <ktkhai@virtuozzo.com>)
+        id 1ihteG-0005CI-NY; Thu, 19 Dec 2019 14:07:16 +0300
+Subject: Re: [PATCH RFC 1/3] block: Add support for REQ_OP_ASSIGN_RANGE
+ operation
+To:     "Martin K. Petersen" <martin.petersen@oracle.com>, axboe@kernel.dk
+Cc:     linux-block@vger.kernel.org, linux-kernel@vger.kernel.org,
+        linux-ext4@vger.kernel.org, tytso@mit.edu,
+        adilger.kernel@dilger.ca, ming.lei@redhat.com, osandov@fb.com,
+        jthumshirn@suse.de, minwoo.im.dev@gmail.com, damien.lemoal@wdc.com,
+        andrea.parri@amarulasolutions.com, hare@suse.com, tj@kernel.org,
+        ajay.joshi@wdc.com, sagi@grimberg.me, dsterba@suse.com,
+        chaitanya.kulkarni@wdc.com, bvanassche@acm.org,
+        dhowells@redhat.com, asml.silence@gmail.com
+References: <157599668662.12112.10184894900037871860.stgit@localhost.localdomain>
+ <157599696813.12112.14140818972910110796.stgit@localhost.localdomain>
+ <yq1woatc8zd.fsf@oracle.com>
+From:   Kirill Tkhai <ktkhai@virtuozzo.com>
+Message-ID: <3f2e341b-dea4-c5d0-8eb0-568b6ad2f17b@virtuozzo.com>
+Date:   Thu, 19 Dec 2019 14:07:16 +0300
+User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:60.0) Gecko/20100101
+ Thunderbird/60.9.0
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <20191219092319.GX2844@hirez.programming.kicks-ass.net>
+In-Reply-To: <yq1woatc8zd.fsf@oracle.com>
+Content-Type: text/plain; charset=utf-8
+Content-Language: en-US
+Content-Transfer-Encoding: 7bit
 Sender: linux-block-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-Hi,
+Hi, Martin!
 
-On Thu, Dec 19, 2019 at 10:23:19AM +0100, Peter Zijlstra wrote:
-> On Thu, Dec 19, 2019 at 09:59:48AM +0800, Ming Lei wrote:
-> > > So pray tell, why did you not integrate this with IRQ_TIME_ACCOUNTING ?
-> > > That already takes a timestamp and does most of what you need.
-> > 
-> > Yeah, that was the 1st approach I thought of, but IRQ_TIME_ACCOUNTING
-> > may be disabled, and enabling it may cause observable effect on IO
-> > performance.
+On 19.12.2019 06:03, Martin K. Petersen wrote:
 > 
-> Is that an actual concern, are people disabling it?
+> Hi Kirill!
+> 
+>> The patch adds a new blkdev_issue_assign_range() primitive, which is
+>> rather similar to existing blkdev_issue_{*} api.  Also, a new queue
+>> limit.max_assign_range_sectors is added.
+> 
+> I am not so keen on the assign_range name. What's wrong with "allocate"?
 
-In SLE and openSUSE kernels it is disabled for x86_64 at this
-point. And if I am not completely misstaken only x86_64 supports it at
-this point. I was looking at enable_sched_clock_irqtime() which is
-only called from x86_64.
+REQ_OP_ALLOCATE_RANGE seemed for me as looking very long for the reviewers.
+And I found that there is no an abbreviation of operations name in enum req_opf,
+so REQ_OP_ALLOC_RANGE won't look good. Thus, I found a replacement.
 
-Another thing I noticed get_util_irq() is defined in
-kernel/sched/sched.h. I don't think the block/blq-mq.c driver should
-include it direclty.
+But in case of REQ_OP_ALLOCATE_RANGE length is OK for people, there is no
+a problem to choose it.
+
+> But why introduce a completely new operation? Isn't this essentially a
+> write zeroes with BLKDEV_ZERO_NOUNMAP flag set?
+> 
+> If the zeroing aspect is perceived to be a problem we could add a
+> BLKDEV_ZERO_ALLOCATE flag (or BLKDEV_ZERO_ANCHOR since that's the
+> terminology used in SCSI).
+
+Hm. BLKDEV_ZERO_NOUNMAP is used in __blkdev_issue_write_zeroes() only.
+So, do I understand right that we should the below two?:
+
+1)Introduce a new flag BLKDEV_ZERO_ALLOCATE for blkdev_issue_write_zeroes().
+2)Introduce a new flag REQ_NOZERO in enum req_opf.
+
+Won't this confuse a reader that we have blkdev_issue_write_zeroes(),
+which does not write zeroes sometimes? Maybe we should rename
+blkdev_issue_write_zeroes() in some more generic name?
 
 Thanks,
-Daniel
+Kirill
 
-ps: A customer observes the same problem as Ming is reporting.
