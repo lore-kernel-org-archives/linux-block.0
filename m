@@ -2,134 +2,85 @@ Return-Path: <SRS0=q1Dd=2J=vger.kernel.org=linux-block-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-0.8 required=3.0 tests=DKIMWL_WL_HIGH,DKIM_SIGNED,
+X-Spam-Status: No, score=-2.4 required=3.0 tests=DKIMWL_WL_HIGH,DKIM_SIGNED,
 	DKIM_VALID,DKIM_VALID_AU,HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,
-	SPF_HELO_NONE,SPF_PASS,UNPARSEABLE_RELAY autolearn=no autolearn_force=no
+	SPF_HELO_NONE,SPF_PASS,USER_AGENT_SANE_1 autolearn=no autolearn_force=no
 	version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 22EE6C43603
-	for <linux-block@archiver.kernel.org>; Thu, 19 Dec 2019 00:48:29 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 3F5EEC43603
+	for <linux-block@archiver.kernel.org>; Thu, 19 Dec 2019 01:29:40 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.kernel.org (Postfix) with ESMTP id E9410222C2
-	for <linux-block@archiver.kernel.org>; Thu, 19 Dec 2019 00:48:28 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id 1585221D7D
+	for <linux-block@archiver.kernel.org>; Thu, 19 Dec 2019 01:29:40 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=pass (2048-bit key) header.d=oracle.com header.i=@oracle.com header.b="kwma+DRo"
+	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="QPlHRIHb"
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1726536AbfLSAs2 (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Wed, 18 Dec 2019 19:48:28 -0500
-Received: from aserp2120.oracle.com ([141.146.126.78]:36292 "EHLO
-        aserp2120.oracle.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1726518AbfLSAs2 (ORCPT
+        id S1726721AbfLSB3g (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Wed, 18 Dec 2019 20:29:36 -0500
+Received: from us-smtp-delivery-1.mimecast.com ([205.139.110.120]:57862 "EHLO
+        us-smtp-1.mimecast.com" rhost-flags-OK-OK-OK-FAIL) by vger.kernel.org
+        with ESMTP id S1726518AbfLSB3g (ORCPT
         <rfc822;linux-block@vger.kernel.org>);
-        Wed, 18 Dec 2019 19:48:28 -0500
-Received: from pps.filterd (aserp2120.oracle.com [127.0.0.1])
-        by aserp2120.oracle.com (8.16.0.27/8.16.0.27) with SMTP id xBJ0iMd9157571;
-        Thu, 19 Dec 2019 00:48:02 GMT
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=oracle.com; h=to : cc : subject :
- from : references : date : in-reply-to : message-id : mime-version :
- content-type; s=corp-2019-08-05;
- bh=VjYqnKsbKLbGD7l5o8X0VpqMjq3yPMzJMi6BXtsxD14=;
- b=kwma+DRoyxBskpnclqNLB0aDpF8HvXVbZH5jt+b/PdrMyJ+FBk7t8gL8mXeDEZ0u3IBo
- y/C9i9XvRGsuPEl3K8HpoK9JzdIwSlIxpnpItdtDtCt4RqTRhlDwojFLly31r0a+Inoe
- 8AuCKirdNfDtYUjcc5bSkigVGtjkuRlPX+DKwppFj9Cbe29e0+7aZqU0yNkoXD7mYeaF
- 4MUnRb+s/oYwBx8RAZIBEuNqGvAXKOJeF7XJG2midn8083OJtmXiJe5ELYKRdYU/Jvh5
- a5I502v6Sz/24k9eRkPuMCA7Nt4AVB+dQrbQqWHP1aTS2E6hMqprfyOpi+ieq94hY0qZ Ow== 
-Received: from userp3020.oracle.com (userp3020.oracle.com [156.151.31.79])
-        by aserp2120.oracle.com with ESMTP id 2wvqpqgxbx-1
-        (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=OK);
-        Thu, 19 Dec 2019 00:48:02 +0000
-Received: from pps.filterd (userp3020.oracle.com [127.0.0.1])
-        by userp3020.oracle.com (8.16.0.27/8.16.0.27) with SMTP id xBJ0iOtp112735;
-        Thu, 19 Dec 2019 00:48:01 GMT
-Received: from aserv0121.oracle.com (aserv0121.oracle.com [141.146.126.235])
-        by userp3020.oracle.com with ESMTP id 2wyp08j1hj-1
-        (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=OK);
-        Thu, 19 Dec 2019 00:48:01 +0000
-Received: from abhmp0011.oracle.com (abhmp0011.oracle.com [141.146.116.17])
-        by aserv0121.oracle.com (8.14.4/8.13.8) with ESMTP id xBJ0lxd5003393;
-        Thu, 19 Dec 2019 00:47:59 GMT
-Received: from ca-mkp.ca.oracle.com (/10.159.214.123)
-        by default (Oracle Beehive Gateway v4.0)
-        with ESMTP ; Wed, 18 Dec 2019 16:47:59 -0800
-To:     Eric Biggers <ebiggers@kernel.org>
-Cc:     "Martin K. Petersen" <martin.petersen@oracle.com>,
-        "Darrick J. Wong" <darrick.wong@oracle.com>,
-        Satya Tangirala <satyat@google.com>,
-        linux-block@vger.kernel.org, linux-scsi@vger.kernel.org,
-        linux-fscrypt@vger.kernel.org, linux-fsdevel@vger.kernel.org,
-        linux-f2fs-devel@lists.sourceforge.net,
-        Barani Muthukumaran <bmuthuku@qti.qualcomm.com>,
-        Kuohong Wang <kuohong.wang@mediatek.com>,
-        Kim Boojin <boojin.kim@samsung.com>
-Subject: Re: [PATCH v6 2/9] block: Add encryption context to struct bio
-From:   "Martin K. Petersen" <martin.petersen@oracle.com>
-Organization: Oracle Corporation
-References: <20191218145136.172774-1-satyat@google.com>
-        <20191218145136.172774-3-satyat@google.com>
-        <20191218212116.GA7476@magnolia> <yq1y2v9e37b.fsf@oracle.com>
-        <20191218222726.GC47399@gmail.com>
-Date:   Wed, 18 Dec 2019 19:47:56 -0500
-In-Reply-To: <20191218222726.GC47399@gmail.com> (Eric Biggers's message of
-        "Wed, 18 Dec 2019 14:27:26 -0800")
-Message-ID: <yq1fthhdttv.fsf@oracle.com>
-User-Agent: Gnus/5.13 (Gnus v5.13) Emacs/26.1.92 (gnu/linux)
+        Wed, 18 Dec 2019 20:29:36 -0500
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+        s=mimecast20190719; t=1576718974;
+        h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+         to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+         in-reply-to:in-reply-to:references:references;
+        bh=4LhO4qnJS45ZijWda0VRuzykvBdUDahmQTHCJMOmgGs=;
+        b=QPlHRIHbQjUaUS9DdNlALFjTRxw7T88lvqrmSDQeUxD3A/aQrxixAcRNLvXXqU38aAYhxZ
+        VDwEgELfl3OiPP9oPGTX5alRLv0T/n4w/X6FXAw/tIIa1hxQRw/sq+fiNfBzaNgcn237jP
+        dHNZOCU+PngC0PerSTEmKi/Z1+lefh8=
+Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
+ [209.132.183.4]) (Using TLS) by relay.mimecast.com with ESMTP id
+ us-mta-46-fS7bsj_0OvSazFPteXhE0Q-1; Wed, 18 Dec 2019 20:29:31 -0500
+X-MC-Unique: fS7bsj_0OvSazFPteXhE0Q-1
+Received: from smtp.corp.redhat.com (int-mx06.intmail.prod.int.phx2.redhat.com [10.5.11.16])
+        (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
+        (No client certificate requested)
+        by mimecast-mx01.redhat.com (Postfix) with ESMTPS id DDB361854334;
+        Thu, 19 Dec 2019 01:29:28 +0000 (UTC)
+Received: from ming.t460p (ovpn-8-22.pek2.redhat.com [10.72.8.22])
+        by smtp.corp.redhat.com (Postfix) with ESMTPS id E894F5C28C;
+        Thu, 19 Dec 2019 01:29:19 +0000 (UTC)
+Date:   Thu, 19 Dec 2019 09:29:14 +0800
+From:   Ming Lei <ming.lei@redhat.com>
+To:     Peter Zijlstra <peterz@infradead.org>
+Cc:     Thomas Gleixner <tglx@linutronix.de>, Jens Axboe <axboe@kernel.dk>,
+        linux-kernel@vger.kernel.org, linux-block@vger.kernel.org,
+        Long Li <longli@microsoft.com>, Ingo Molnar <mingo@redhat.com>,
+        Keith Busch <keith.busch@intel.com>,
+        Christoph Hellwig <hch@lst.de>,
+        Sagi Grimberg <sagi@grimberg.me>,
+        John Garry <john.garry@huawei.com>,
+        Hannes Reinecke <hare@suse.com>
+Subject: Re: [RFC PATCH 1/3] sched/core: add API for exporting runqueue clock
+Message-ID: <20191219012914.GA6080@ming.t460p>
+References: <20191218071942.22336-1-ming.lei@redhat.com>
+ <20191218071942.22336-2-ming.lei@redhat.com>
+ <20191218095101.GQ2844@hirez.programming.kicks-ass.net>
 MIME-Version: 1.0
-Content-Type: text/plain
-X-Proofpoint-Virus-Version: vendor=nai engine=6000 definitions=9475 signatures=668685
-X-Proofpoint-Spam-Details: rule=notspam policy=default score=0 suspectscore=0 malwarescore=0
- phishscore=0 bulkscore=0 spamscore=0 mlxscore=0 mlxlogscore=999
- adultscore=0 classifier=spam adjust=0 reason=mlx scancount=1
- engine=8.0.1-1911140001 definitions=main-1912190005
-X-Proofpoint-Virus-Version: vendor=nai engine=6000 definitions=9475 signatures=668685
-X-Proofpoint-Spam-Details: rule=notspam policy=default score=0 priorityscore=1501 malwarescore=0
- suspectscore=0 phishscore=0 bulkscore=0 spamscore=0 clxscore=1011
- lowpriorityscore=0 mlxscore=0 impostorscore=0 mlxlogscore=999 adultscore=0
- classifier=spam adjust=0 reason=mlx scancount=1 engine=8.0.1-1911140001
- definitions=main-1912190005
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <20191218095101.GQ2844@hirez.programming.kicks-ass.net>
+User-Agent: Mutt/1.12.1 (2019-06-15)
+X-Scanned-By: MIMEDefang 2.79 on 10.5.11.16
 Sender: linux-block-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
+On Wed, Dec 18, 2019 at 10:51:01AM +0100, Peter Zijlstra wrote:
+> On Wed, Dec 18, 2019 at 03:19:40PM +0800, Ming Lei wrote:
+> > Scheduler runqueue maintains its own software clock that is periodically
+> > synchronised with hardware. Export this clock so that it can be used
+> > by interrupt flood detection for saving the cost of reading from hardware.
+> 
+> But you don't have much, if any, guarantees the thing gets updated.
 
-Eric,
+Any software clock won't be guaranteed to be updated in time, however,
+they are still useful.
 
-> There's not really any such thing as "use the bio integrity plumbing".
-> blk-integrity just does blk-integrity; it's not a plumbing layer that
-> allows other features to be supported.  Well, in theory we could
-> refactor and rename all the hooks to "blk-extra" and make them
-> delegate to either blk-integrity or blk-crypto, but I think that would
-> be overkill.
+Thanks,
+Ming
 
-I certainly don't expect your crypto stuff to plug in without any
-modification to what we currently have. I'm just observing that the
-existing plumbing is designed to have pluggable functions that let
-filesystems attach additional information to bios on writes and process
-additional attached information on reads. And the block layer already
-handles slicing and dicing these attachments as the I/O traverses the
-stack.
-
-There's also other stuff that probably won't be directly applicable or
-interesting for your use case. It just seems like identifying actual
-commonalities and differences would be worthwhile.
-
-Note that substantial changes to the integrity code would inevitably
-lead to a lot of pain and suffering for me. So from that perspective I
-am very happy if you leave it alone. From an architectural viewpoint,
-however, it seems that there are more similarities than differences
-between crypto and integrity. And we should avoid duplication where
-possible. That's all.
-
-> What we could do, though, is say that at most one of blk-crypto and
-> blk-integrity can be used at once on a given bio, and put the
-> bi_integrity and bi_crypt_context pointers in union.  (That would
-> require allocating a REQ_INLINECRYPT bit so that we can tell what the
-> pointer points to.)
-
-Absolutely. That's why it's a union. Putting your stuff there is a
-prerequisite as far as I'm concerned. No need to grow the bio when the
-two features are unlikely to coexist. We can revisit that later should
-the need arise.
-
--- 
-Martin K. Petersen	Oracle Linux Engineering
