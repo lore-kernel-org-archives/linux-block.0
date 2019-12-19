@@ -2,160 +2,111 @@ Return-Path: <SRS0=q1Dd=2J=vger.kernel.org=linux-block-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-2.4 required=3.0 tests=DKIMWL_WL_HIGH,DKIM_SIGNED,
-	DKIM_VALID,DKIM_VALID_AU,HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,
-	SPF_HELO_NONE,SPF_PASS,USER_AGENT_SANE_1 autolearn=no autolearn_force=no
-	version=3.4.0
+X-Spam-Status: No, score=-8.4 required=3.0 tests=DKIMWL_WL_HIGH,DKIM_SIGNED,
+	DKIM_VALID,DKIM_VALID_AU,HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,
+	MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,USER_AGENT_SANE_1
+	autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 15D04C43603
-	for <linux-block@archiver.kernel.org>; Thu, 19 Dec 2019 07:36:30 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id A350CC43603
+	for <linux-block@archiver.kernel.org>; Thu, 19 Dec 2019 08:27:09 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.kernel.org (Postfix) with ESMTP id D941A2146E
-	for <linux-block@archiver.kernel.org>; Thu, 19 Dec 2019 07:36:29 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id 7661321D7D
+	for <linux-block@archiver.kernel.org>; Thu, 19 Dec 2019 08:27:09 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=pass (2048-bit key) header.d=nvidia.com header.i=@nvidia.com header.b="rn2yGjgw"
+	dkim=pass (2048-bit key) header.d=oracle.com header.i=@oracle.com header.b="QgUq9dro"
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1726599AbfLSHg3 (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Thu, 19 Dec 2019 02:36:29 -0500
-Received: from hqnvemgate26.nvidia.com ([216.228.121.65]:4230 "EHLO
-        hqnvemgate26.nvidia.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1726340AbfLSHg3 (ORCPT
+        id S1726609AbfLSI1I (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Thu, 19 Dec 2019 03:27:08 -0500
+Received: from aserp2120.oracle.com ([141.146.126.78]:55418 "EHLO
+        aserp2120.oracle.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S1726498AbfLSI1I (ORCPT
         <rfc822;linux-block@vger.kernel.org>);
-        Thu, 19 Dec 2019 02:36:29 -0500
-Received: from hqpgpgate101.nvidia.com (Not Verified[216.228.121.13]) by hqnvemgate26.nvidia.com (using TLS: TLSv1.2, DES-CBC3-SHA)
-        id <B5dfb28710000>; Wed, 18 Dec 2019 23:36:17 -0800
-Received: from hqmail.nvidia.com ([172.20.161.6])
-  by hqpgpgate101.nvidia.com (PGP Universal service);
-  Wed, 18 Dec 2019 23:36:27 -0800
-X-PGP-Universal: processed;
-        by hqpgpgate101.nvidia.com on Wed, 18 Dec 2019 23:36:27 -0800
-Received: from [10.2.165.11] (10.124.1.5) by HQMAIL107.nvidia.com
- (172.20.187.13) with Microsoft SMTP Server (TLS) id 15.0.1473.3; Thu, 19 Dec
- 2019 07:36:25 +0000
-Subject: Re: [PATCH v11 04/25] mm: devmap: refactor 1-based refcounting for
- ZONE_DEVICE pages
-To:     Dan Williams <dan.j.williams@intel.com>
-CC:     Andrew Morton <akpm@linux-foundation.org>,
-        Al Viro <viro@zeniv.linux.org.uk>,
-        Alex Williamson <alex.williamson@redhat.com>,
-        Benjamin Herrenschmidt <benh@kernel.crashing.org>,
-        =?UTF-8?B?QmrDtnJuIFTDtnBlbA==?= <bjorn.topel@intel.com>,
-        Christoph Hellwig <hch@infradead.org>,
-        Daniel Vetter <daniel@ffwll.ch>,
-        Dave Chinner <david@fromorbit.com>,
-        David Airlie <airlied@linux.ie>,
-        "David S . Miller" <davem@davemloft.net>,
-        Ira Weiny <ira.weiny@intel.com>, Jan Kara <jack@suse.cz>,
-        Jason Gunthorpe <jgg@ziepe.ca>, Jens Axboe <axboe@kernel.dk>,
-        Jonathan Corbet <corbet@lwn.net>,
-        =?UTF-8?B?SsOpcsO0bWUgR2xpc3Nl?= <jglisse@redhat.com>,
-        Magnus Karlsson <magnus.karlsson@intel.com>,
-        Mauro Carvalho Chehab <mchehab@kernel.org>,
-        Michael Ellerman <mpe@ellerman.id.au>,
-        Michal Hocko <mhocko@suse.com>,
-        Mike Kravetz <mike.kravetz@oracle.com>,
-        Paul Mackerras <paulus@samba.org>,
-        Shuah Khan <shuah@kernel.org>,
-        Vlastimil Babka <vbabka@suse.cz>, <bpf@vger.kernel.org>,
-        Maling list - DRI developers 
-        <dri-devel@lists.freedesktop.org>, KVM list <kvm@vger.kernel.org>,
-        <linux-block@vger.kernel.org>,
-        Linux Doc Mailing List <linux-doc@vger.kernel.org>,
-        linux-fsdevel <linux-fsdevel@vger.kernel.org>,
-        <linux-kselftest@vger.kernel.org>,
-        "Linux-media@vger.kernel.org" <linux-media@vger.kernel.org>,
-        linux-rdma <linux-rdma@vger.kernel.org>,
-        linuxppc-dev <linuxppc-dev@lists.ozlabs.org>,
-        Netdev <netdev@vger.kernel.org>, Linux MM <linux-mm@kvack.org>,
-        LKML <linux-kernel@vger.kernel.org>,
-        Christoph Hellwig <hch@lst.de>
-References: <20191216222537.491123-1-jhubbard@nvidia.com>
- <20191216222537.491123-5-jhubbard@nvidia.com>
- <CAPcyv4hQBMxYMurxG=Vwh0=FKWoT3z-Kf=dqES1-icRV5bLwKg@mail.gmail.com>
- <d0a99e75-0175-0f31-f176-8c37c18a4108@nvidia.com>
- <CAPcyv4j+Zgom17UZ-6Njkij1R0UQ=vUQdnaEZj9qDezEUJSZGg@mail.gmail.com>
-From:   John Hubbard <jhubbard@nvidia.com>
-X-Nvconfidentiality: public
-Message-ID: <a9782048-0c6a-b906-2bd6-3800269f4b01@nvidia.com>
-Date:   Wed, 18 Dec 2019 23:33:36 -0800
-User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:68.0) Gecko/20100101
- Thunderbird/68.3.0
+        Thu, 19 Dec 2019 03:27:08 -0500
+Received: from pps.filterd (aserp2120.oracle.com [127.0.0.1])
+        by aserp2120.oracle.com (8.16.0.27/8.16.0.27) with SMTP id xBJ8QqGT118484;
+        Thu, 19 Dec 2019 08:27:05 GMT
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=oracle.com; h=subject : to : cc :
+ references : from : message-id : date : mime-version : in-reply-to :
+ content-type : content-transfer-encoding; s=corp-2019-08-05;
+ bh=FfWf1XuNQRK4VrisC30ZLg6lfGkDRUu4LVNVjw8wVFQ=;
+ b=QgUq9droixRqWByU5ezI3p2bGfJAXyuICaognT+xlUme3i9OwumsNZoUqxagL49bRGkP
+ v5yhaJ4qWAjQaDpxXJs61hcXOmOW9X0Uqvxq5Ikdjj82BcjJy3nDllzhzPrMTcE1uHjR
+ CgPSXQv1PopH8GkEFuBeb9pX6gll6PCwVC2k4fhhOkPpPQtvVocoDwT73dOBkpg2Evsx
+ gGL0GwUXvvntkgWSutf7yIq/80p2fohlb+sF69NeJlUPWVa6gh4c6wAgMbXDM9l0AwyH
+ JD0QrI3cZKLPsY3gtGm6LE80Z+LHRVTm16txYFQP+MqfSbGPfSoUXA9r3kMQKBNIQQ7v jw== 
+Received: from aserp3030.oracle.com (aserp3030.oracle.com [141.146.126.71])
+        by aserp2120.oracle.com with ESMTP id 2x01knh87w-1
+        (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=OK);
+        Thu, 19 Dec 2019 08:27:05 +0000
+Received: from pps.filterd (aserp3030.oracle.com [127.0.0.1])
+        by aserp3030.oracle.com (8.16.0.27/8.16.0.27) with SMTP id xBJ8IW6i136130;
+        Thu, 19 Dec 2019 08:27:04 GMT
+Received: from aserv0122.oracle.com (aserv0122.oracle.com [141.146.126.236])
+        by aserp3030.oracle.com with ESMTP id 2wyut50cts-1
+        (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=OK);
+        Thu, 19 Dec 2019 08:27:04 +0000
+Received: from abhmp0018.oracle.com (abhmp0018.oracle.com [141.146.116.24])
+        by aserv0122.oracle.com (8.14.4/8.14.4) with ESMTP id xBJ8R4DK011853;
+        Thu, 19 Dec 2019 08:27:04 GMT
+Received: from [10.191.9.152] (/10.191.9.152)
+        by default (Oracle Beehive Gateway v4.0)
+        with ESMTP ; Thu, 19 Dec 2019 00:27:04 -0800
+Subject: Re: [PATCH] block: mark zone-mgmt bios with REQ_SYNC
+To:     Chaitanya Kulkarni <chaitanya.kulkarni@wdc.com>,
+        linux-block@vger.kernel.org
+Cc:     damien.lamoal@wdc.com, axboe@kernel.dk,
+        Damien Le Moal <damien.lemoal@wdc.com>
+References: <20191219061423.3775-1-chaitanya.kulkarni@wdc.com>
+From:   Bob Liu <bob.liu@oracle.com>
+Message-ID: <66dae123-4bb3-3280-53cd-6b338f6959f1@oracle.com>
+Date:   Thu, 19 Dec 2019 16:27:10 +0800
+User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:60.0) Gecko/20100101
+ Thunderbird/60.5.1
 MIME-Version: 1.0
-In-Reply-To: <CAPcyv4j+Zgom17UZ-6Njkij1R0UQ=vUQdnaEZj9qDezEUJSZGg@mail.gmail.com>
-X-Originating-IP: [10.124.1.5]
-X-ClientProxiedBy: HQMAIL111.nvidia.com (172.20.187.18) To
- HQMAIL107.nvidia.com (172.20.187.13)
-Content-Type: text/plain; charset="utf-8"; format=flowed
+In-Reply-To: <20191219061423.3775-1-chaitanya.kulkarni@wdc.com>
+Content-Type: text/plain; charset=utf-8
 Content-Language: en-US
 Content-Transfer-Encoding: 7bit
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=nvidia.com; s=n1;
-        t=1576740978; bh=AwGIHszd33R/kLZlUt1Z4JwwlD2NSoQAiltNw2UIah0=;
-        h=X-PGP-Universal:Subject:To:CC:References:From:X-Nvconfidentiality:
-         Message-ID:Date:User-Agent:MIME-Version:In-Reply-To:
-         X-Originating-IP:X-ClientProxiedBy:Content-Type:Content-Language:
-         Content-Transfer-Encoding;
-        b=rn2yGjgwQ9+/2v2mcxWjrZFxdrk3/eEgjxRU1LJiuOVyjVOa62J0tvoTcmLOK6fXS
-         xTiiEKdaSrRaYvKoHJFISdC+5xDr9wuGKGy6eL+p8mnXTv3WmxTBQ5uSD1vNUHW7Zv
-         FL1u5zml1dT0aGOGbVIB8FGZRe/vZmwx0E0SfZqPp5XPLjqF6k+D7FwuHs+yKnEljh
-         6K2DgflrDdhvNm7j657NcorkWkt+15POYkE/QPPC6A7qk9vcVVLh/jftFFqBiaLSef
-         +CbFHF0Oi6KJR9YDOdsjceXX460BQcgisIE59hm4mMu6iV3pT5dz1gvUWjcugiRrZC
-         tT/WLbmWB9r/w==
+X-Proofpoint-Virus-Version: vendor=nai engine=6000 definitions=9475 signatures=668685
+X-Proofpoint-Spam-Details: rule=notspam policy=default score=0 suspectscore=0 malwarescore=0
+ phishscore=0 bulkscore=0 spamscore=0 mlxscore=0 mlxlogscore=999
+ adultscore=0 classifier=spam adjust=0 reason=mlx scancount=1
+ engine=8.0.1-1911140001 definitions=main-1912190071
+X-Proofpoint-Virus-Version: vendor=nai engine=6000 definitions=9475 signatures=668685
+X-Proofpoint-Spam-Details: rule=notspam policy=default score=0 priorityscore=1501 malwarescore=0
+ suspectscore=0 phishscore=0 bulkscore=0 spamscore=0 clxscore=1011
+ lowpriorityscore=0 mlxscore=0 impostorscore=0 mlxlogscore=999 adultscore=0
+ classifier=spam adjust=0 reason=mlx scancount=1 engine=8.0.1-1911140001
+ definitions=main-1912190072
 Sender: linux-block-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-On 12/18/19 10:52 PM, Dan Williams wrote:
-> On Wed, Dec 18, 2019 at 9:51 PM John Hubbard <jhubbard@nvidia.com> wrote:
->>
->> On 12/18/19 9:27 PM, Dan Williams wrote:
->> ...
->>>> @@ -461,5 +449,5 @@ void __put_devmap_managed_page(struct page *page)
->>>>           page->mapping = NULL;
->>>>           page->pgmap->ops->page_free(page);
->>>>    }
->>>> -EXPORT_SYMBOL(__put_devmap_managed_page);
->>>> +EXPORT_SYMBOL(free_devmap_managed_page);
->>>
->>> This patch does not have a module consumer for
->>> free_devmap_managed_page(), so the export should move to the patch
->>> that needs the new export.
->>
->> Hi Dan,
->>
->> OK, I know that's a policy--although it seems quite pointless here given
->> that this is definitely going to need an EXPORT.
->>
->> At the moment, the series doesn't use it in any module at all, so I'll just
->> delete the EXPORT for now.
->>
->>>
->>> Also the only reason that put_devmap_managed_page() is EXPORT_SYMBOL
->>> instead of EXPORT_SYMBOL_GPL is that there was no practical way to
->>> hide the devmap details from evey module in the kernel that did
->>> put_page(). I would expect free_devmap_managed_page() to
->>> EXPORT_SYMBOL_GPL if it is not inlined into an existing exported
->>> static inline api.
->>>
->>
->> Sure, I'll change it to EXPORT_SYMBOL_GPL when the time comes. We do have
->> to be careful that we don't shut out normal put_page() types of callers,
->> but...glancing through the current callers, that doesn't look to be a problem.
->> Good. So it should be OK to do EXPORT_SYMBOL_GPL here.
->>
->> Are you *sure* you don't want to just pre-emptively EXPORT now, and save
->> looking at it again?
+On 12/19/19 2:14 PM, Chaitanya Kulkarni wrote:
+> This patch marks the zone-mgmt bios with REQ_SYNC flag.
 > 
-> I'm positive. There is enough history for "trust me the consumer is
-> coming" turning out not to be true to justify the hassle in my mind. I
-> do trust you, but things happen.
+> Suggested-by: Damien Le Moal <damien.lemoal@wdc.com>
+> Signed-off-by: Chaitanya Kulkarni <chaitanya.kulkarni@wdc.com>
+> ---
+
+Reviewed-by: Bob Liu <bob.liu@oracle.com>
+
+>  block/blk-zoned.c | 2 +-
+>  1 file changed, 1 insertion(+), 1 deletion(-)
+> 
+> diff --git a/block/blk-zoned.c b/block/blk-zoned.c
+> index d00fcfd71dfe..05741c6f618b 100644
+> --- a/block/blk-zoned.c
+> +++ b/block/blk-zoned.c
+> @@ -198,7 +198,7 @@ int blkdev_zone_mgmt(struct block_device *bdev, enum req_opf op,
+>  			break;
+>  		}
+>  
+> -		bio->bi_opf = op;
+> +		bio->bi_opf = op | REQ_SYNC;
+>  		bio->bi_iter.bi_sector = sector;
+>  		sector += zone_sectors;
+>  
 > 
 
-OK, it's deleted locally. Thanks for looking at the patch. I'll post a v12 series
-that includes the change, once it looks like reviews are slowing down.
-
-
-thanks,
--- 
-John Hubbard
-NVIDIA
