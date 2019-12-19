@@ -2,152 +2,276 @@ Return-Path: <SRS0=q1Dd=2J=vger.kernel.org=linux-block-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-0.8 required=3.0 tests=DKIM_SIGNED,DKIM_VALID,
-	HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS
-	autolearn=no autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-0.8 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
+	MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS autolearn=no autolearn_force=no
+	version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id DAC83C43603
-	for <linux-block@archiver.kernel.org>; Thu, 19 Dec 2019 19:25:56 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 63044C3F68F
+	for <linux-block@archiver.kernel.org>; Thu, 19 Dec 2019 20:05:34 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.kernel.org (Postfix) with ESMTP id 9142D21D7D
-	for <linux-block@archiver.kernel.org>; Thu, 19 Dec 2019 19:25:56 +0000 (UTC)
-Authentication-Results: mail.kernel.org;
-	dkim=pass (1024-bit key) header.d=intel.onmicrosoft.com header.i=@intel.onmicrosoft.com header.b="mQIYq+PV"
+	by mail.kernel.org (Postfix) with ESMTP id 4072F2467E
+	for <linux-block@archiver.kernel.org>; Thu, 19 Dec 2019 20:05:34 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1726906AbfLSTZ4 (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Thu, 19 Dec 2019 14:25:56 -0500
-Received: from mga02.intel.com ([134.134.136.20]:26344 "EHLO mga02.intel.com"
-        rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-        id S1726836AbfLSTZz (ORCPT <rfc822;linux-block@vger.kernel.org>);
-        Thu, 19 Dec 2019 14:25:55 -0500
-X-Amp-Result: SKIPPED(no attachment in message)
-X-Amp-File-Uploaded: False
-Received: from orsmga006.jf.intel.com ([10.7.209.51])
-  by orsmga101.jf.intel.com with ESMTP/TLS/DHE-RSA-AES256-GCM-SHA384; 19 Dec 2019 11:25:54 -0800
-X-ExtLoop1: 1
-X-IronPort-AV: E=Sophos;i="5.69,333,1571727600"; 
-   d="scan'208";a="218266184"
-Received: from fmsmsx106.amr.corp.intel.com ([10.18.124.204])
-  by orsmga006.jf.intel.com with ESMTP; 19 Dec 2019 11:25:54 -0800
-Received: from fmsmsx603.amr.corp.intel.com (10.18.126.83) by
- FMSMSX106.amr.corp.intel.com (10.18.124.204) with Microsoft SMTP Server (TLS)
- id 14.3.439.0; Thu, 19 Dec 2019 11:25:53 -0800
-Received: from fmsmsx603.amr.corp.intel.com (10.18.126.83) by
- fmsmsx603.amr.corp.intel.com (10.18.126.83) with Microsoft SMTP Server
- (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256) id
- 15.1.1713.5; Thu, 19 Dec 2019 11:25:53 -0800
-Received: from FMSEDG001.ED.cps.intel.com (10.1.192.133) by
- fmsmsx603.amr.corp.intel.com (10.18.126.83) with Microsoft SMTP Server
- (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_128_CBC_SHA256) id 15.1.1713.5
- via Frontend Transport; Thu, 19 Dec 2019 11:25:53 -0800
-Received: from NAM02-CY1-obe.outbound.protection.outlook.com (104.47.37.57) by
- edgegateway.intel.com (192.55.55.68) with Microsoft SMTP Server (TLS) id
- 14.3.439.0; Thu, 19 Dec 2019 11:25:53 -0800
-ARC-Seal: i=1; a=rsa-sha256; s=arcselector9901; d=microsoft.com; cv=none;
- b=DLnq3eCyT46Bb0XZe03ysIbdLL1UTR5KFbSc1zZIj4gD6JkM9O+Hf1yYwXmOVd9Ev2cRZ5FMS9uuj1/GJ1h6dzkoLjyct/hZGK+SdLHVSce0xzh1aoF1/NOQvZv4pDc4QEAZBsYR48gBwyQTUufW2pQrcjQdoCN3NdDfI9g89LSITXz9fKg7E01rdH6EcQjfk+TDkSsCWgkMxZFJAgdqN0jWZscZEEkrYc44NTMjZWwyzkASauQd/usFWGKpfKbHh2TqAvQkyysqBWTqCz8YCMD4FzaMzced1dHNHVYtePaU9Mp2XsA8wRSGeEMCIkp95CnA5VQtibj+/WfgpfVXSA==
-ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com;
- s=arcselector9901;
- h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
- bh=v9qoaflxNsz25EAXUaQMCQeYBmfyLyHsNV3wIBD5Ecc=;
- b=Q9iw88TezHVgffoGIuqKItqRoYJcklCbO/envzvAZnU6/wH4fTWBH61EYW7OFlgqrRNTQiqlR7H5Cdzu0ltP7WLdZ3Zv4DdLTjE8PqUYc+zsDJ4VwdHLClHf2aMQ9y1xUxq3Ps0j88A6PALAM6SQYY8877QCWpaO0ZLUFdq/oYe923LzlktrCUpeQ1kgHCBNu83DeO91g6Fj06CcUGbr5QA+9S3iARR6AdIMCZTmXEIxZ4rOBaKLWHzOthQqK+Xc1l8SwfKeDW3qj3J/KM1UmUGKRusXFtMqHPUyzXueE97Rpgai2hnVCdgwjIWOSAB4SqpAE5lvIlD5V9FYnGNv8A==
-ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass
- smtp.mailfrom=intel.com; dmarc=pass action=none header.from=intel.com;
- dkim=pass header.d=intel.com; arc=none
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=intel.onmicrosoft.com;
- s=selector2-intel-onmicrosoft-com;
- h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
- bh=v9qoaflxNsz25EAXUaQMCQeYBmfyLyHsNV3wIBD5Ecc=;
- b=mQIYq+PVXpi68pPtMC6KM9aI4P+4UkPoGxCdfXDZfQ8ETMws9+TGTqMRVJzQOvGl7ngw4gLnFvP+10LEk8BOQDZstCXIjo5h+SGmt6w5CMiDk3Qs+chatieIJLH0kRCGIiH9JcYsrpkcxhwKjoBlDnAQ/1tZaDilqflzmZftVj0=
-Received: from SN6PR11MB2669.namprd11.prod.outlook.com (52.135.90.153) by
- SN6PR11MB3134.namprd11.prod.outlook.com (52.135.127.76) with Microsoft SMTP
- Server (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
- 15.20.2559.14; Thu, 19 Dec 2019 19:25:51 +0000
-Received: from SN6PR11MB2669.namprd11.prod.outlook.com
- ([fe80::5db8:ff89:9146:d508]) by SN6PR11MB2669.namprd11.prod.outlook.com
- ([fe80::5db8:ff89:9146:d508%7]) with mapi id 15.20.2559.016; Thu, 19 Dec 2019
- 19:25:51 +0000
-From:   "Ober, Frank" <frank.ober@intel.com>
-To:     "linux-block@vger.kernel.org" <linux-block@vger.kernel.org>,
-        "linux-nvme@lists.infradead.org" <linux-nvme@lists.infradead.org>
-CC:     "Derrick, Jonathan" <jonathan.derrick@intel.com>,
-        "Rajendiran, Swetha" <swetha.rajendiran@intel.com>,
-        "Liang, Mark" <mark.liang@intel.com>
-Subject: Polled io for Linux kernel 5.x
-Thread-Topic: Polled io for Linux kernel 5.x
-Thread-Index: AdW2ohLJtbfHvfzMSqCNfckqZUjK2w==
-Date:   Thu, 19 Dec 2019 19:25:51 +0000
-Message-ID: <SN6PR11MB2669E7A65DD0AD9DC65A67C58B520@SN6PR11MB2669.namprd11.prod.outlook.com>
-Accept-Language: en-US
-Content-Language: en-US
-X-MS-Has-Attach: 
-X-MS-TNEF-Correlator: 
-x-titus-metadata-40: eyJDYXRlZ29yeUxhYmVscyI6IiIsIk1ldGFkYXRhIjp7Im5zIjoiaHR0cDpcL1wvd3d3LnRpdHVzLmNvbVwvbnNcL0ludGVsMyIsImlkIjoiMTQyNTllNzUtMTcyYi00OTQ4LWI3MWUtMWUzNzM2ZGE3ZTgxIiwicHJvcHMiOlt7Im4iOiJDVFBDbGFzc2lmaWNhdGlvbiIsInZhbHMiOlt7InZhbHVlIjoiQ1RQX05UIn1dfV19LCJTdWJqZWN0TGFiZWxzIjpbXSwiVE1DVmVyc2lvbiI6IjE3LjEwLjE4MDQuNDkiLCJUcnVzdGVkTGFiZWxIYXNoIjoialwvbng2Z1ZZZVRvcVFLanNHNnBwSlZBZElicW9JQmhQWmNYRFlKNmhyNEtcL3BmUlpkdEJ1WDlzeEVJeUpmd3hZIn0=
-dlp-version: 11.2.0.6
-dlp-product: dlpe-windows
-dlp-reaction: no-action
-x-ctpclassification: CTP_NT
-authentication-results: spf=none (sender IP is )
- smtp.mailfrom=frank.ober@intel.com; 
-x-originating-ip: [192.55.55.45]
-x-ms-publictraffictype: Email
-x-ms-office365-filtering-correlation-id: 3ae56d15-d3a2-4056-16a2-08d784b9426b
-x-ms-traffictypediagnostic: SN6PR11MB3134:
-x-ld-processed: 46c98d88-e344-4ed4-8496-4ed7712e255d,ExtAddr
-x-ms-exchange-transport-forked: True
-x-microsoft-antispam-prvs: <SN6PR11MB31349DE5CF95034820BEC3138B520@SN6PR11MB3134.namprd11.prod.outlook.com>
-x-ms-oob-tlc-oobclassifiers: OLM:10000;
-x-forefront-prvs: 0256C18696
-x-forefront-antispam-report: SFV:NSPM;SFS:(10019020)(366004)(39860400002)(346002)(376002)(136003)(396003)(189003)(199004)(66556008)(316002)(55016002)(966005)(107886003)(8676002)(71200400001)(66476007)(8936002)(66446008)(2906002)(33656002)(26005)(52536014)(6506007)(64756008)(66946007)(81166006)(54906003)(76116006)(81156014)(5660300002)(478600001)(86362001)(186003)(9686003)(110136005)(4326008)(7696005);DIR:OUT;SFP:1102;SCL:1;SRVR:SN6PR11MB3134;H:SN6PR11MB2669.namprd11.prod.outlook.com;FPR:;SPF:None;LANG:en;PTR:InfoNoRecords;MX:1;A:1;
-x-ms-exchange-senderadcheck: 1
-x-microsoft-antispam: BCL:0;
-x-microsoft-antispam-message-info: eOIRikFGRd+vqx3WNL7wSw9ksRHGa6DOw0SCLINNRrRaA031rzevv5/iP5eOblq3YYZMj7/Y/urywPA4MAwulxpGJmFRYFQ96XGpMfSr00jTVEwVdTzHr5D5QXpwb1VjhPyozmAH/DcuRuPIf3psZqH4hmu5G/92ca/FnTCl5mvpEsRBDLDWBoJ70nlgcXlK99PpRuJ0m6n8A+O/HU1gMsu0mRNHlaqQLBybCGwFdSl9L1s8Kf35J4tlx3aNNnu29b6tlLk321gVjQgt3XRJQtoyXN/T981+1R/mkcaEDTisJIJXrbHIhXC4i6/RhbTLQgpJzND5uHHZPcOrJGDLPJyE44EnpaopkgnWD4m5u2ZPDCv7+tHLqqNDwFH3emNBEC+qzi+Akj8Br70TicxXI+dOI2Wk0w4/+mTocI6IDwo/ZeGV8ivMybKdZfhRzdiJrpUGjI6odqVp/n3frA5ko/5bUYrkhWlCwat9aIZkiT8=
-Content-Type: text/plain; charset="us-ascii"
-Content-Transfer-Encoding: quoted-printable
+        id S1726908AbfLSUFd (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Thu, 19 Dec 2019 15:05:33 -0500
+Received: from mout.kundenserver.de ([212.227.17.24]:43243 "EHLO
+        mout.kundenserver.de" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S1726840AbfLSUFd (ORCPT
+        <rfc822;linux-block@vger.kernel.org>);
+        Thu, 19 Dec 2019 15:05:33 -0500
+Received: from mail-qv1-f54.google.com ([209.85.219.54]) by
+ mrelayeu.kundenserver.de (mreue109 [212.227.15.145]) with ESMTPSA (Nemesis)
+ id 1MUokB-1iHKGZ3brF-00Qflk; Thu, 19 Dec 2019 21:05:31 +0100
+Received: by mail-qv1-f54.google.com with SMTP id x1so2719740qvr.8;
+        Thu, 19 Dec 2019 12:05:30 -0800 (PST)
+X-Gm-Message-State: APjAAAU0p4byrv7r1t29nrbPdk3EDYRod6/vXXo4fDv114znkPPuzoaH
+        aMgrcBnjbQXZ76S/u3LihT/kB+ARYclEDR1vZDU=
+X-Google-Smtp-Source: APXvYqw2a1l7eEIr13cHLyNlsGkSNHsp1JQwEETwWf2YAkPJRiT6U8vWTcmVEngBVA+PLBF5rXJPEjsI8UqbgQa0lUc=
+X-Received: by 2002:a0c:e7c7:: with SMTP id c7mr9408634qvo.222.1576785929164;
+ Thu, 19 Dec 2019 12:05:29 -0800 (PST)
 MIME-Version: 1.0
-X-MS-Exchange-CrossTenant-Network-Message-Id: 3ae56d15-d3a2-4056-16a2-08d784b9426b
-X-MS-Exchange-CrossTenant-originalarrivaltime: 19 Dec 2019 19:25:51.2676
- (UTC)
-X-MS-Exchange-CrossTenant-fromentityheader: Hosted
-X-MS-Exchange-CrossTenant-id: 46c98d88-e344-4ed4-8496-4ed7712e255d
-X-MS-Exchange-CrossTenant-mailboxtype: HOSTED
-X-MS-Exchange-CrossTenant-userprincipalname: E3qQrTJPQFvN0fjFkapVwoJubGrQK+9l+C3TsJm6x7mNfuWSorYnQvCsknlDULTX54uwrJcUUQb9vUP/JO8NVA==
-X-MS-Exchange-Transport-CrossTenantHeadersStamped: SN6PR11MB3134
-X-OriginatorOrg: intel.com
+References: <20191217221708.3730997-1-arnd@arndb.de> <20191217221708.3730997-28-arnd@arndb.de>
+ <53cd123fdcb893df36e0b3bf9dddbfe08f9c545e.camel@codethink.co.uk>
+In-Reply-To: <53cd123fdcb893df36e0b3bf9dddbfe08f9c545e.camel@codethink.co.uk>
+From:   Arnd Bergmann <arnd@arndb.de>
+Date:   Thu, 19 Dec 2019 21:05:13 +0100
+X-Gmail-Original-Message-ID: <CAK8P3a3Zv4+WUtCNMpNi_TUW2ytCbX6e3KTc2a+0uRiU7aesnQ@mail.gmail.com>
+Message-ID: <CAK8P3a3Zv4+WUtCNMpNi_TUW2ytCbX6e3KTc2a+0uRiU7aesnQ@mail.gmail.com>
+Subject: Re: [PATCH v2 27/27] Documentation: document ioctl interfaces better
+To:     Ben Hutchings <ben.hutchings@codethink.co.uk>
+Cc:     Jens Axboe <axboe@kernel.dk>,
+        "James E.J. Bottomley" <jejb@linux.ibm.com>,
+        "Martin K. Petersen" <martin.petersen@oracle.com>,
+        linux-scsi <linux-scsi@vger.kernel.org>,
+        linux-block <linux-block@vger.kernel.org>,
+        y2038 Mailman List <y2038@lists.linaro.org>,
+        "linux-kernel@vger.kernel.org" <linux-kernel@vger.kernel.org>,
+        Christoph Hellwig <hch@lst.de>,
+        "open list:DOCUMENTATION" <linux-doc@vger.kernel.org>,
+        Jonathan Corbet <corbet@lwn.net>,
+        Al Viro <viro@zeniv.linux.org.uk>,
+        Linux FS-devel Mailing List <linux-fsdevel@vger.kernel.org>
+Content-Type: text/plain; charset="UTF-8"
+X-Provags-ID: V03:K1:Vf6A7wnHdwUV1mmBQc//xZwBN4G9rpUAs4Cf4Gurwa8dpNwlzny
+ yA5SEKDQ8ARq4LcXLCcAR2Y76nL5f3TZ45mo4Nv0oHAQiTBuj2DpGJwHFlkiEr8MPEU4vLx
+ OGpVOMZvPhrFs3h7PUuXLWbmsNxUe5bqcg65a+l0FN6P0EtkVMptMtHfyhH+KbWOxJUF/MI
+ 3mx3Ul4nOUwn8a/J0+2ZA==
+X-UI-Out-Filterresults: notjunk:1;V03:K0:EtSIYLuNofc=:aNaf3WD9WlDBC4TeeToiHz
+ INZlLA0W/3aaXz5vfdAESg4qKaeaE/24uCsbyzu9ptJrYZC25l/IEM0M7CI+SSv75dnJREONO
+ msIqOP0JJ6SzYnIF9rEB/yD1rWreXDh2B4lryehLhq7ktZuoP6ZC/t0GfM5OSON5/LCh0Fo5/
+ S4cdJkq5Lde2COSnOSoc+nfLv7vxYY3GXj5wt6yRx41b52v5UFql8W3D5lp2Aeihs5beVt186
+ MKSW91lEPWJAAknHRX5gbDUHLHAaIZvno9mXKyH4cmthspA8zKP18hZ+BG6MAjlJM8eOlNDZd
+ C6QO5cjDuIM5Qe3JF9wSbNSwhPTnUilLAGFsHEU1YNAKi74wPdpaBa8hoKk7/opvKtCHinRjV
+ hL9hV3aEWqjjOtNhc71qmSNEolRZlHkOVsdCucmOl2kC6ktJev4nB6Z6lW9P1JHU0QDNwvNdW
+ 0xK03ZgmDNgTk8S2+iKQ9pab5G6Apks6s4zjmnsqwH4ppY9XEQbJjRBgvNvKangVYfiP/vyuf
+ WUfJ/9Iyl7JrsVFD35sQDy5DOzIBOW3avRQDzxvvEzDeR57n+SI57KcSUqnv/yu5zEYadlI3x
+ Jx+20+QRlhGe9hjd4ztAlJCmi9c6ZpbhrpKF2fcTkWutm8SXzQ3VQv3Ihi5UO0lJ69qTR7pqJ
+ RG2mYyPLS4Q+MneyoTqzcAAzOSUJGCI/CZtc/Wg4/CX+SIWSb/PEdzQs9TmxW8Eahf9DG5daT
+ H94WbscY5xfyxctzrR4116woLeMi1+lnPk2EU5fd/0qEOIZcpB9naEPzC2+MtAu5lZQ6+uDgS
+ tsIPna3XCSisaN/5ra1TAL9uJj0Tt9L7V74SBspfIRPL2xOpzrsx8cNj2g4ywxLP774WRXzyA
+ loFRkhfTdchtAWID9RMg==
 Sender: linux-block-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-Hi block/nvme communities,=20
-On 4.x kernels we used to be able to do:
-# echo 1 > /sys/block/nvme0n1/queue/io_poll
-And then run a polled_io job in fio with pvsync2 as our ioengine, with the =
-hipri flag set. This is actually how we test the very best SSDs that depend=
- on 3D xpoint media.
+On Wed, Dec 18, 2019 at 11:45 PM Ben Hutchings
+<ben.hutchings@codethink.co.uk> wrote:
+> On Tue, 2019-12-17 at 23:17 +0100, Arnd Bergmann wrote:
+> > --- /dev/null
+> > +++ b/Documentation/core-api/ioctl.rst
+> > +``include/uapi/asm-generic/ioctl.h`` provides four macros for defining
+> > +ioctl commands that follow modern conventions: ``_IO``, ``_IOR``,
+> > +``_IOW``, and ``_IORW``. These should be used for all new commands,
+>
+> Typo: "_IORW" should be "_IOWR".
 
-On 5.x kernels we see the following error trying to write the device settin=
-gs>>>
--bash: echo: write error: Invalid argument
+Fixed now
 
-We can reload the entire nvme module with nvme poll_queues but this is not =
-well explained or written up anywhere? Or sorry "not found"?
+> > +with the correct parameters:
+> > +
+> > +_IO/_IOR/_IOW/_IOWR
+> > +   The macro name determines whether the argument is used for passing
+> > +   data into kernel (_IOW), from the kernel (_IOR), both (_IOWR) or is
+> > +   not a pointer (_IO). It is possible but not recommended to pass an
+> > +   integer value instead of a pointer with _IO.
+>
+> I feel the explanation of _IO here could be confusing.  I think what
+> you meant to say was that it is possible, but not recommended, to pass
+> integers directly (arg is integer) rather than indirectly (arg is
+> pointer to integer).  I suggest the alternate wording:
+>
+> The macro name specifies how the argument will be used.  It may be a
+> pointer to data to be passed into the kernel (_IOW), out of the kernel
+> (_IOR), or both (_IOWR).  The argument may also be an integer value
+> instead of a pointer (_IO), but this is not recommended.
 
-This is verifiable on 5.3, 5.4 kernels with fio 3.16 builds.
+That's probably better than my version, but I find that misleading as well:
+it sounds like _IO() is not recommended, but having no argument with
+_IO() is actually fine. This is what I have now:
 
-What is the background on what has changed because Jens wrote this note bac=
-k in 2015, which did work in the 4.x kernel era.
-But now things have changed, and there is not a new lwn article that has re=
-placed the one here:
-https://lwn.net/Articles/663543/
+   The macro name specifies how the argument will be used.  It may be a
+   pointer to data to be passed into the kernel (_IOW), out of the kernel
+   (_IOR), or both (_IOWR).  _IO can indicate either commands with no
+   argument or those passing an integer value instead of a pointer.
+   It is recommended to only use _IO for commands without arguments,
+   and use pointers for passing data.
 
-More documentation can be found here on the confusion that exists today is =
-here: https://stackoverflow.com/questions/55223883/echo-write-error-invalid=
--argument-while-setting-io-poll-for-nvme-ssd/=20
 
-Can a new LWN article be written around design decisions, usage of these po=
-ll_queues?
+> > +data_type
+> > +  The name of the data type pointed to by the argument, the command number
+> > +  encodes the ``sizeof(data_type)`` value in a 13-bit or 14-bit integer,
+> > +  leading to a limit of 8191 bytes for the maximum size of the argument.
+> > +  Note: do not pass sizeof(data_type) type into _IOR/IOW, as that will
+> > +  lead to encoding sizeof(sizeof(data_type)), i.e. sizeof(size_t).
+>
+> You left out _IOWR here.  It might also be worth mentioning that _IO
+> doesn't have this parameter.
 
-How come we cannot have a device/controller level setup of polled io today =
-in 5.x kernels, all that exists is module based?
-Thank you!
-Frank Ober
+Changed now.
+
+> [...]
+> > +Return code
+> > +===========
+> > +
+> > +ioctl commands can return negative error codes as documented in errno(3),
+> > +these get turned into errno values in user space.
+>
+> Use a semi-colon instead of a comma, or change "these" to "which".
+
+done
+
+> > On success, the return
+> > +code should be zero. It is also possible but not recommended to return
+> > +a positive 'long' value.
+> > +
+> > +When the ioctl callback is called with an unknown command number, the
+> > +handler returns either -ENOTTY or -ENOIOCTLCMD, which also results in
+> > +-ENOTTY being returned from the system call. Some subsystems return
+> > +-ENOSYS or -EINVAL here for historic reasons, but this is wrong.
+> > +
+> > +Prior to Linux-5.5, compat_ioctl handlers were required to return
+>
+> Space instead of hyphen.
+
+done
+
+> > +-ENOIOCTLCMD in order to use the fallback conversion into native
+> > +commands. As all subsystems are now responsible for handling compat
+> > +mode themselves, this is no longer needed, but it may be important to
+> > +consider when backporting bug fixes to older kernels.
+> > +
+> > +Timestamps
+> > +==========
+> > +
+> > +Traditionally, timestamps and timeout values are passed as ``struct
+> > +timespec`` or ``struct timeval``, but these are problematic because of
+> > +incompatible definitions of these structures in user space after the
+> > +move to 64-bit time_t.
+> > +
+> > +The __kernel_timespec type can be used instead to be embedded in other
+>
+> It's not a typedef, so ``struct __kernel_timespec``.
+
+done
+
+> [...]
+> > +32-bit compat mode
+> > +==================
+> > +
+> > +In order to support 32-bit user space running on a 64-bit machine, each
+> > +subsystem or driver that implements an ioctl callback handler must also
+> > +implement the corresponding compat_ioctl handler.
+> > +
+> > +As long as all the rules for data structures are followed, this is as
+> > +easy as setting the .compat_ioctl pointer to a helper function such as
+> > +compat_ptr_ioctl() or blkdev_compat_ptr_ioctl().
+> > +
+> > +compat_ptr()
+> > +------------
+> > +
+> > +On the s/390 architecture, 31-bit user space has ambiguous representations
+>
+> IBM never used the name "S/390" for the 64-bit mainframe architecture,
+> but they have rebranded it several times.  Rather than trying to follow
+> what it's called this year, maybe just write "s390" to match what we
+> usually call it?
+
+ok, done
+
+> > +
+> > +  has four bytes of padding between a and b on x86-64, plus another four
+> > +  bytes of padding at the end, but no padding on i386, and it needs a
+> > +  compat_ioctl conversion handler to translate between the two formats.
+> > +
+> > +  To avoid this problem, all structures should have their members
+> > +  naturally aligned, or explicit reserved fields added in place of the
+> > +  implicit padding.
+>
+> This should explain how to check that - presumably by running pahole on
+> some sensible architecture.
+
+Ok, added "The ``pahole`` tool can be used for checking the alignment.".
+
+> > +* On ARM OABI user space, 16-bit member variables have 32-bit
+> > +  alignment, making them incompatible with modern EABI kernels.
+>
+> I thought that OABI required structures as a whole to have alignment of
+> 4, not individual members?  Which obviously does affect small
+> structures as members of other structures.
+
+You are right, I clearly misunderstood that. Changed the paragraph now to
+
+* On ARM OABI user space, structures are padded to multiples of 32-bit,
+  making some structs incompatible with modern EABI kernels if they
+  do not end on a 32-bit boundary.
+
+* On the m68k architecture, struct members are not guaranteed to have an
+  alignment greater than 16-bit, which is a problem when relying on
+  implicit padding.
+
+> [...]
+> > +Information leaks
+> > +=================
+> > +
+> > +Uninitialized data must not be copied back to user space, as this can
+> > +cause an information leak, which can be used to defeat kernel address
+> > +space layout randomization (KASLR), helping in an attack.
+> > +
+> > +As explained for the compat mode, it is best to not avoid any implicit
+>
+> Delete "not".
+
+Done.
+
+ > +padding in data structures, but if there is already padding in existing
+> > +structures, the kernel driver must be careful to zero out the padding
+> > +using memset() or similar before copying it to user space.
+>
+> This sentence is rather too long.  Also it can be read as suggesting
+> that one should somehow identify and memset() the padding just before
+> copying to user-space.  I suggest an alternate wording:
+>
+> For this reason (and for compat support) it is best to avoid any
+> implicit padding in data structures.  Where there is implicit padding
+> in an existing structure, kernel drivers must be careful to fully
+> initialize an instance of the structure before copying it to user
+> space.  This is usually done by calling memset() before assigning to
+> individual members.
+
+Sounds good, I've taken that paragraph now.
+
+> [...]
+> > +Alternatives to ioctl
+> > +=====================
+> [...]
+> > +* A custom file system can provide extra flexibility with a simple
+> > +  user interface but add a lot of complexity to the implementation.
+>
+> Typo: "add" should be "adds".
+
+Fixed
+
+Thanks for all the good suggestions!
+
+      Arnd
