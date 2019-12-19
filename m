@@ -2,123 +2,85 @@ Return-Path: <SRS0=q1Dd=2J=vger.kernel.org=linux-block-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-8.4 required=3.0 tests=DKIMWL_WL_HIGH,DKIM_SIGNED,
-	DKIM_VALID,DKIM_VALID_AU,HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,
-	MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,USER_AGENT_SANE_1
-	autolearn=ham autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-2.0 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
+	HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,
+	USER_AGENT_SANE_1 autolearn=no autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 8E735C43603
-	for <linux-block@archiver.kernel.org>; Thu, 19 Dec 2019 08:56:59 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id D5979C43603
+	for <linux-block@archiver.kernel.org>; Thu, 19 Dec 2019 09:21:04 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.kernel.org (Postfix) with ESMTP id 600C72467B
-	for <linux-block@archiver.kernel.org>; Thu, 19 Dec 2019 08:56:59 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id A5DC0222C2
+	for <linux-block@archiver.kernel.org>; Thu, 19 Dec 2019 09:21:04 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=pass (2048-bit key) header.d=oracle.com header.i=@oracle.com header.b="Pq66JbP2"
+	dkim=fail reason="signature verification failed" (2048-bit key) header.d=infradead.org header.i=@infradead.org header.b="mddEP1se"
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1726609AbfLSI46 (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Thu, 19 Dec 2019 03:56:58 -0500
-Received: from userp2120.oracle.com ([156.151.31.85]:39806 "EHLO
-        userp2120.oracle.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1726591AbfLSI46 (ORCPT
+        id S1726617AbfLSJVE (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Thu, 19 Dec 2019 04:21:04 -0500
+Received: from merlin.infradead.org ([205.233.59.134]:44860 "EHLO
+        merlin.infradead.org" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S1726599AbfLSJVD (ORCPT
         <rfc822;linux-block@vger.kernel.org>);
-        Thu, 19 Dec 2019 03:56:58 -0500
-Received: from pps.filterd (userp2120.oracle.com [127.0.0.1])
-        by userp2120.oracle.com (8.16.0.27/8.16.0.27) with SMTP id xBJ8sATp136393;
-        Thu, 19 Dec 2019 08:56:56 GMT
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=oracle.com; h=subject : to : cc :
- references : from : message-id : date : mime-version : in-reply-to :
- content-type : content-transfer-encoding; s=corp-2019-08-05;
- bh=zgbUyIwZSlRwJrqDCWGlA4t1prryEIZ4r9PN/qSElVc=;
- b=Pq66JbP2S3ux0zcsdOhwsA6fLEOnwGhzwvqSe4rf6/KC26HITyE8QZosS0Au8DESR1lp
- SgDoCiibuFVCZPXphi/5jIKDoRTjyDwf9bb1GOpex5B4IzkL38CH0M+azYwKiBWXoor8
- y8xmFMOED0k7HF74222sMEmGVQyacm83iG0fhj/G6IlzXPuqZq2giNUoTm2JE5WrsaCw
- 5qRXrJpnM9CSjZj5L7gVwIEEELEDI/N5q6RAgwjVBw80wuptW3ae2oxbWMV+jmsnjOfM
- 6hOXHaZ8X0xGCeSnymnz3AeWDlxBQg0hrwslSrk+gmh9dLdaHB29QV/LCEW3mzxjseEi 1Q== 
-Received: from userp3020.oracle.com (userp3020.oracle.com [156.151.31.79])
-        by userp2120.oracle.com with ESMTP id 2wvrcrjv19-1
-        (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=OK);
-        Thu, 19 Dec 2019 08:56:56 +0000
-Received: from pps.filterd (userp3020.oracle.com [127.0.0.1])
-        by userp3020.oracle.com (8.16.0.27/8.16.0.27) with SMTP id xBJ8s7sN064759;
-        Thu, 19 Dec 2019 08:56:55 GMT
-Received: from userv0121.oracle.com (userv0121.oracle.com [156.151.31.72])
-        by userp3020.oracle.com with ESMTP id 2wyp0957p8-1
-        (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=OK);
-        Thu, 19 Dec 2019 08:56:55 +0000
-Received: from abhmp0020.oracle.com (abhmp0020.oracle.com [141.146.116.26])
-        by userv0121.oracle.com (8.14.4/8.13.8) with ESMTP id xBJ8usjk012521;
-        Thu, 19 Dec 2019 08:56:54 GMT
-Received: from [10.191.9.152] (/10.191.9.152)
-        by default (Oracle Beehive Gateway v4.0)
-        with ESMTP ; Thu, 19 Dec 2019 00:56:54 -0800
-Subject: Re: [PATCH] block: streamline merge possibility checks
-To:     Dmitry Fomichev <dmitry.fomichev@wdc.com>,
-        linux-block@vger.kernel.org, Jens Axboe <axboe@kernel.dk>
-Cc:     Damien Le Moal <damien.lemoal@wdc.com>
-References: <20191218194156.29430-1-dmitry.fomichev@wdc.com>
-From:   Bob Liu <bob.liu@oracle.com>
-Message-ID: <c76929ea-2fcb-bbd3-a394-5d42f619191e@oracle.com>
-Date:   Thu, 19 Dec 2019 16:56:54 +0800
-User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:60.0) Gecko/20100101
- Thunderbird/60.5.1
+        Thu, 19 Dec 2019 04:21:03 -0500
+DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed;
+        d=infradead.org; s=merlin.20170209; h=In-Reply-To:Content-Type:MIME-Version:
+        References:Message-ID:Subject:Cc:To:From:Date:Sender:Reply-To:
+        Content-Transfer-Encoding:Content-ID:Content-Description:Resent-Date:
+        Resent-From:Resent-Sender:Resent-To:Resent-Cc:Resent-Message-ID:List-Id:
+        List-Help:List-Unsubscribe:List-Subscribe:List-Post:List-Owner:List-Archive;
+         bh=L5GkT/t6f4PnNOvpHdWu3aKGL2zH/bo2tSmNC9/q9HA=; b=mddEP1seEEQAJCSWNeDGhge7a
+        1v9fDA9ktosw6z8UFtOF11Q7LsoUHivAylwsfp/MnLDAzmo2fs1DseTWKz1Kzp4rtHQd6L2psD4Nj
+        7dG8aKM6HeUTTsD15EMqCijzys4PmoKjOqAohFrQSRl78r70RtSwpGiBTaWB61TIrahAZnWozWdeH
+        xFWuRZuIEboS1BBgCwUJCiUWVsRJgwdqi4bHrFtTnMbeXiCysahaT7x/vIdCkbhOG5qhEFmRZYzVc
+        MVtAF6FdHkF6XtGdYo/k8m9KFMYnrcr+o2RIPAkA5yR71aq6UFerio/21v1RZFMyfcR4m4aNJEeJi
+        Dd0fzC12g==;
+Received: from j217100.upc-j.chello.nl ([24.132.217.100] helo=noisy.programming.kicks-ass.net)
+        by merlin.infradead.org with esmtpsa (Exim 4.92.3 #3 (Red Hat Linux))
+        id 1ihryx-0005Zr-Fv; Thu, 19 Dec 2019 09:20:31 +0000
+Received: from hirez.programming.kicks-ass.net (hirez.programming.kicks-ass.net [192.168.1.225])
+        (using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+        (Client did not present a certificate)
+        by noisy.programming.kicks-ass.net (Postfix) with ESMTPS id 9871A3007F2;
+        Thu, 19 Dec 2019 10:19:03 +0100 (CET)
+Received: by hirez.programming.kicks-ass.net (Postfix, from userid 1000)
+        id 06B162B291C41; Thu, 19 Dec 2019 10:20:27 +0100 (CET)
+Date:   Thu, 19 Dec 2019 10:20:26 +0100
+From:   Peter Zijlstra <peterz@infradead.org>
+To:     Ming Lei <ming.lei@redhat.com>
+Cc:     Thomas Gleixner <tglx@linutronix.de>, Jens Axboe <axboe@kernel.dk>,
+        linux-kernel@vger.kernel.org, linux-block@vger.kernel.org,
+        Long Li <longli@microsoft.com>, Ingo Molnar <mingo@redhat.com>,
+        Keith Busch <keith.busch@intel.com>,
+        Christoph Hellwig <hch@lst.de>,
+        Sagi Grimberg <sagi@grimberg.me>,
+        John Garry <john.garry@huawei.com>,
+        Hannes Reinecke <hare@suse.com>
+Subject: Re: [RFC PATCH 1/3] sched/core: add API for exporting runqueue clock
+Message-ID: <20191219092026.GW2844@hirez.programming.kicks-ass.net>
+References: <20191218071942.22336-1-ming.lei@redhat.com>
+ <20191218071942.22336-2-ming.lei@redhat.com>
+ <20191218095101.GQ2844@hirez.programming.kicks-ass.net>
+ <20191219012914.GA6080@ming.t460p>
 MIME-Version: 1.0
-In-Reply-To: <20191218194156.29430-1-dmitry.fomichev@wdc.com>
-Content-Type: text/plain; charset=utf-8
-Content-Language: en-US
-Content-Transfer-Encoding: 7bit
-X-Proofpoint-Virus-Version: vendor=nai engine=6000 definitions=9475 signatures=668685
-X-Proofpoint-Spam-Details: rule=notspam policy=default score=0 suspectscore=0 malwarescore=0
- phishscore=0 bulkscore=0 spamscore=0 mlxscore=0 mlxlogscore=999
- adultscore=0 classifier=spam adjust=0 reason=mlx scancount=1
- engine=8.0.1-1911140001 definitions=main-1912190076
-X-Proofpoint-Virus-Version: vendor=nai engine=6000 definitions=9475 signatures=668685
-X-Proofpoint-Spam-Details: rule=notspam policy=default score=0 priorityscore=1501 malwarescore=0
- suspectscore=0 phishscore=0 bulkscore=0 spamscore=0 clxscore=1011
- lowpriorityscore=0 mlxscore=0 impostorscore=0 mlxlogscore=999 adultscore=0
- classifier=spam adjust=0 reason=mlx scancount=1 engine=8.0.1-1911140001
- definitions=main-1912190076
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <20191219012914.GA6080@ming.t460p>
+User-Agent: Mutt/1.10.1 (2018-07-13)
 Sender: linux-block-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-On 12/19/19 3:41 AM, Dmitry Fomichev wrote:
-> Checks for data direction in attempt_merge() and blk_rq_merge_ok()
-> are redundant and will always succeed when the both I/O request
-> operations are equal. Therefore, remove them.
+On Thu, Dec 19, 2019 at 09:29:14AM +0800, Ming Lei wrote:
+> On Wed, Dec 18, 2019 at 10:51:01AM +0100, Peter Zijlstra wrote:
+> > On Wed, Dec 18, 2019 at 03:19:40PM +0800, Ming Lei wrote:
+> > > Scheduler runqueue maintains its own software clock that is periodically
+> > > synchronised with hardware. Export this clock so that it can be used
+> > > by interrupt flood detection for saving the cost of reading from hardware.
+> > 
+> > But you don't have much, if any, guarantees the thing gets updated.
 > 
-> Signed-off-by: Dmitry Fomichev <dmitry.fomichev@wdc.com>
-> ---
->  block/blk-merge.c | 7 +------
->  1 file changed, 1 insertion(+), 6 deletions(-)
-> 
-> diff --git a/block/blk-merge.c b/block/blk-merge.c
-> index d783bdc4559b..796451aed7d6 100644
-> --- a/block/blk-merge.c
-> +++ b/block/blk-merge.c
-> @@ -745,8 +745,7 @@ static struct request *attempt_merge(struct request_queue *q,
->  	if (req_op(req) != req_op(next))
->  		return NULL;
->  
-> -	if (rq_data_dir(req) != rq_data_dir(next)
-> -	    || req->rq_disk != next->rq_disk)
-> +	if (req->rq_disk != next->rq_disk)
->  		return NULL;
->  
->  	if (req_op(req) == REQ_OP_WRITE_SAME &&
-> @@ -868,10 +867,6 @@ bool blk_rq_merge_ok(struct request *rq, struct bio *bio)
->  	if (req_op(rq) != bio_op(bio))
->  		return false;
->  
-> -	/* different data direction or already started, don't merge */
-> -	if (bio_data_dir(bio) != rq_data_dir(rq))
-> -		return false;
-> -
+> Any software clock won't be guaranteed to be updated in time, however,
+> they are still useful.
 
-Reviewed-by: Bob Liu <bob.liu@oracle.com>
-
->  	/* must be same device */
->  	if (rq->rq_disk != bio->bi_disk)
->  		return false;
-> 
-
+It still is broken, and I really don't want to expose this for whatever
+reason.
