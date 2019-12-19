@@ -2,98 +2,171 @@ Return-Path: <SRS0=q1Dd=2J=vger.kernel.org=linux-block-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-2.0 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
-	HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,
-	USER_AGENT_SANE_1 autolearn=no autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-6.9 required=3.0 tests=DKIMWL_WL_HIGH,DKIM_SIGNED,
+	DKIM_VALID,DKIM_VALID_AU,HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,
+	MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS autolearn=ham
+	autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 9394FC43603
-	for <linux-block@archiver.kernel.org>; Thu, 19 Dec 2019 09:23:35 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 71FEAC43603
+	for <linux-block@archiver.kernel.org>; Thu, 19 Dec 2019 09:25:11 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.kernel.org (Postfix) with ESMTP id 64BA02465E
-	for <linux-block@archiver.kernel.org>; Thu, 19 Dec 2019 09:23:35 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id 441542467B
+	for <linux-block@archiver.kernel.org>; Thu, 19 Dec 2019 09:25:11 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (2048-bit key) header.d=infradead.org header.i=@infradead.org header.b="IkiMFE+I"
+	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="ghkk5d20"
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1726622AbfLSJXf (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Thu, 19 Dec 2019 04:23:35 -0500
-Received: from merlin.infradead.org ([205.233.59.134]:44892 "EHLO
-        merlin.infradead.org" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1726620AbfLSJXe (ORCPT
+        id S1726824AbfLSJZK (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Thu, 19 Dec 2019 04:25:10 -0500
+Received: from us-smtp-1.mimecast.com ([207.211.31.81]:28299 "EHLO
+        us-smtp-delivery-1.mimecast.com" rhost-flags-OK-OK-OK-FAIL)
+        by vger.kernel.org with ESMTP id S1726599AbfLSJZJ (ORCPT
         <rfc822;linux-block@vger.kernel.org>);
-        Thu, 19 Dec 2019 04:23:34 -0500
-DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed;
-        d=infradead.org; s=merlin.20170209; h=In-Reply-To:Content-Type:MIME-Version:
-        References:Message-ID:Subject:Cc:To:From:Date:Sender:Reply-To:
-        Content-Transfer-Encoding:Content-ID:Content-Description:Resent-Date:
-        Resent-From:Resent-Sender:Resent-To:Resent-Cc:Resent-Message-ID:List-Id:
-        List-Help:List-Unsubscribe:List-Subscribe:List-Post:List-Owner:List-Archive;
-         bh=24GBdvgPOniGO/u5Izbxbzv5IyyCWf616Is9oo5bboE=; b=IkiMFE+IcFYckiwO+I/fcf1MJ
-        r6UTOjpgng6pF5rYTgTYW6LqO+2AuIP+72yCDVZn73fuJlkJXE+Z8hQzqr/12NibItH+SdwR/1WW1
-        I4wcDCWItTYlUOM3tMIc1Jh64if4MsvSu/aHkGQYztIf+dXOo8BoWyBMtKZVlFO42eaDS4qXJ1sBG
-        oymRrm1w76EZlnzrH5druTNPIWF5i6oCrYykaUKX9xruroRn1PDyXftHdj2y4rX0W0EtsOTAmxReL
-        YPWDMtK4iEfJ1qyq6chSQe33ZCpwIPrnRGclYpObEkKYbd5qoTT8v3PFakpC9E/j1V1WedcUnbX6f
-        aairSL9qw==;
-Received: from j217100.upc-j.chello.nl ([24.132.217.100] helo=noisy.programming.kicks-ass.net)
-        by merlin.infradead.org with esmtpsa (Exim 4.92.3 #3 (Red Hat Linux))
-        id 1ihs1h-0005cs-0B; Thu, 19 Dec 2019 09:23:21 +0000
-Received: from hirez.programming.kicks-ass.net (hirez.programming.kicks-ass.net [192.168.1.225])
-        (using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
-        (Client did not present a certificate)
-        by noisy.programming.kicks-ass.net (Postfix) with ESMTPS id 1EF64304D00;
-        Thu, 19 Dec 2019 10:21:56 +0100 (CET)
-Received: by hirez.programming.kicks-ass.net (Postfix, from userid 1000)
-        id 949ED2B291C41; Thu, 19 Dec 2019 10:23:19 +0100 (CET)
-Date:   Thu, 19 Dec 2019 10:23:19 +0100
-From:   Peter Zijlstra <peterz@infradead.org>
-To:     Ming Lei <ming.lei@redhat.com>
-Cc:     Thomas Gleixner <tglx@linutronix.de>, Jens Axboe <axboe@kernel.dk>,
-        linux-kernel@vger.kernel.org, linux-block@vger.kernel.org,
-        Long Li <longli@microsoft.com>, Ingo Molnar <mingo@redhat.com>,
-        Christoph Hellwig <hch@lst.de>,
-        Keith Busch <keith.busch@intel.com>,
-        Sagi Grimberg <sagi@grimberg.me>,
-        John Garry <john.garry@huawei.com>,
-        Hannes Reinecke <hare@suse.com>
-Subject: Re: [RFC PATCH 2/3] softirq: implement interrupt flood detection
-Message-ID: <20191219092319.GX2844@hirez.programming.kicks-ass.net>
-References: <20191218071942.22336-1-ming.lei@redhat.com>
- <20191218071942.22336-3-ming.lei@redhat.com>
- <20191218104941.GR2844@hirez.programming.kicks-ass.net>
- <20191219015948.GB6080@ming.t460p>
+        Thu, 19 Dec 2019 04:25:09 -0500
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+        s=mimecast20190719; t=1576747508;
+        h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+         to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+         content-transfer-encoding:content-transfer-encoding:
+         in-reply-to:in-reply-to:references:references;
+        bh=PS1Ppzg7zZwCn5KsW+P0K8cXdORYyX0ludGbM5VdEfI=;
+        b=ghkk5d20KlttUPfYgiZGc5NoQKuajjJ2MiUDjOfrySSzSWZe9FNnnmbMX6BRaMZEh8QVZX
+        grjoAq1ruD4npmaHH6qTnuXjtnm6G0IkMq8TqQQAww+pIR/r8DaB0gRcYMKzASxrUsdHvA
+        juXVF/LtRfmV17cnlf0lnUu0k0Jak8o=
+Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
+ [209.132.183.4]) (Using TLS) by relay.mimecast.com with ESMTP id
+ us-mta-395-ZSVtTFEjM6mprY6qR0H_mg-1; Thu, 19 Dec 2019 04:25:05 -0500
+X-MC-Unique: ZSVtTFEjM6mprY6qR0H_mg-1
+Received: from smtp.corp.redhat.com (int-mx03.intmail.prod.int.phx2.redhat.com [10.5.11.13])
+        (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
+        (No client certificate requested)
+        by mimecast-mx01.redhat.com (Postfix) with ESMTPS id 74EBF801E78;
+        Thu, 19 Dec 2019 09:25:03 +0000 (UTC)
+Received: from gondolin (ovpn-117-134.ams2.redhat.com [10.36.117.134])
+        by smtp.corp.redhat.com (Postfix) with ESMTP id A9B8B7D97D;
+        Thu, 19 Dec 2019 09:25:01 +0000 (UTC)
+Date:   Thu, 19 Dec 2019 10:24:59 +0100
+From:   Cornelia Huck <cohuck@redhat.com>
+To:     Stefan Haberland <sth@linux.ibm.com>
+Cc:     axboe@kernel.dk, linux-block@vger.kernel.org,
+        hoeppner@linux.ibm.com, linux-s390@vger.kernel.org,
+        heiko.carstens@de.ibm.com, gor@linux.ibm.com,
+        borntraeger@de.ibm.com
+Subject: Re: [PATCH 1/3] s390/dasd/cio: Interpret ccw_device_get_mdc return
+ value correctly
+Message-ID: <20191219102459.053999a2.cohuck@redhat.com>
+In-Reply-To: <20191219084352.75114-2-sth@linux.ibm.com>
+References: <20191219084352.75114-1-sth@linux.ibm.com>
+        <20191219084352.75114-2-sth@linux.ibm.com>
+Organization: Red Hat GmbH
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <20191219015948.GB6080@ming.t460p>
-User-Agent: Mutt/1.10.1 (2018-07-13)
+Content-Type: text/plain; charset=UTF-8
+Content-Transfer-Encoding: quoted-printable
+X-Scanned-By: MIMEDefang 2.79 on 10.5.11.13
 Sender: linux-block-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-On Thu, Dec 19, 2019 at 09:59:48AM +0800, Ming Lei wrote:
-> > So pray tell, why did you not integrate this with IRQ_TIME_ACCOUNTING ?
-> > That already takes a timestamp and does most of what you need.
-> 
-> Yeah, that was the 1st approach I thought of, but IRQ_TIME_ACCOUNTING
-> may be disabled, and enabling it may cause observable effect on IO
-> performance.
+On Thu, 19 Dec 2019 09:43:50 +0100
+Stefan Haberland <sth@linux.ibm.com> wrote:
 
-Is that an actual concern, are people disabling it?
+> From: Jan H=C3=B6ppner <hoeppner@linux.ibm.com>
+>=20
+> The max data count (mdc) is an unsigned 16-bit integer value as per AR
+> documentation and is received via ccw_device_get_mdc() for a specific
+> path mask from the CIO layer. The function itself also always returns a
+> positive mdc value or 0 in case mdc isn't supported or couldn't be
+> determined.
+>=20
+> Though, the comment for this function describes a negative return value
+> to indicate failures.
 
-> > > @@ -356,6 +512,7 @@ void irq_enter(void)
-> > >  	}
-> > >  
-> > >  	__irq_enter();
-> > > +	irq_interval_update();
-> > >  }
-> > 
-> > Arggh.. you're going to make every single interrupt take at least 2
-> > extra cache misses for this gunk?!?
-> 
-> Could you explain it a bit why two cache misses are involved?
-> 
-> I understand at most one miss is caused, which should only happen in
-> irq_interval_update(), and what is the other one?
+Note that this used to be true before 040495d110ba ("s390/cio: make use
+of newly added format 1 channel-path data").
 
-The rq clock thing IIRC.
+>=20
+> As a result, the DASD device driver interprets the return value of
+> ccw_device_get_mdc() incorrectly. The error case is essentially a dead
+> code path.
+
+To be pedantic: It did not check for <=3D 0 (as documented) either :)
+
+>=20
+> To fix this behaviour, check explicitly for a return value of 0 and
+> change the comment for ccw_device_get_mdc() accordingly.
+>=20
+> This fix merely enables the error code path in the DASD functions
+> get_fcx_max_data() and verify_fcx_max_data(). The actual functionality
+> stays the same and is still correct.
+>=20
+> Signed-off-by: Jan H=C3=B6ppner <hoeppner@linux.ibm.com>
+> Acked-by: Peter Oberparleiter <oberpar@linux.ibm.com>
+> Reviewed-by: Stefan Haberland <sth@linux.ibm.com>
+> Signed-off-by: Stefan Haberland <sth@linux.ibm.com>
+> ---
+>  drivers/s390/block/dasd_eckd.c | 9 +++++----
+>  drivers/s390/cio/device_ops.c  | 2 +-
+>  2 files changed, 6 insertions(+), 5 deletions(-)
+>=20
+> diff --git a/drivers/s390/block/dasd_eckd.c b/drivers/s390/block/dasd_eck=
+d.c
+> index c94184d080f8..f5622f4a2ecf 100644
+> --- a/drivers/s390/block/dasd_eckd.c
+> +++ b/drivers/s390/block/dasd_eckd.c
+> @@ -1128,7 +1128,8 @@ static u32 get_fcx_max_data(struct dasd_device *dev=
+ice)
+>  {
+>  	struct dasd_eckd_private *private =3D device->private;
+>  	int fcx_in_css, fcx_in_gneq, fcx_in_features;
+> -	int tpm, mdc;
+> +	unsigned int mdc;
+> +	int tpm;
+> =20
+>  	if (dasd_nofcx)
+>  		return 0;
+> @@ -1142,7 +1143,7 @@ static u32 get_fcx_max_data(struct dasd_device *dev=
+ice)
+>  		return 0;
+> =20
+>  	mdc =3D ccw_device_get_mdc(device->cdev, 0);
+> -	if (mdc < 0) {
+> +	if (mdc =3D=3D 0) {
+>  		dev_warn(&device->cdev->dev, "Detecting the maximum supported data siz=
+e for zHPF requests failed\n");
+>  		return 0;
+>  	} else {
+> @@ -1153,12 +1154,12 @@ static u32 get_fcx_max_data(struct dasd_device *d=
+evice)
+>  static int verify_fcx_max_data(struct dasd_device *device, __u8 lpm)
+>  {
+>  	struct dasd_eckd_private *private =3D device->private;
+> -	int mdc;
+> +	unsigned int mdc;
+>  	u32 fcx_max_data;
+> =20
+>  	if (private->fcx_max_data) {
+>  		mdc =3D ccw_device_get_mdc(device->cdev, lpm);
+> -		if ((mdc < 0)) {
+> +		if (mdc =3D=3D 0) {
+>  			dev_warn(&device->cdev->dev,
+>  				 "Detecting the maximum data size for zHPF "
+>  				 "requests failed (rc=3D%d) for a new path %x\n",
+> diff --git a/drivers/s390/cio/device_ops.c b/drivers/s390/cio/device_ops.c
+> index 65841af15748..ccecf6b9504e 100644
+> --- a/drivers/s390/cio/device_ops.c
+> +++ b/drivers/s390/cio/device_ops.c
+> @@ -635,7 +635,7 @@ EXPORT_SYMBOL(ccw_device_tm_start_timeout);
+>   * @mask: mask of paths to use
+>   *
+>   * Return the number of 64K-bytes blocks all paths at least support
+> - * for a transport command. Return values <=3D 0 indicate failures.
+> + * for a transport command. Return value 0 indicates failure.
+
+s/Return value/The return value/ ?
+
+>   */
+>  int ccw_device_get_mdc(struct ccw_device *cdev, u8 mask)
+>  {
+
+Reviewed-by: Cornelia Huck <cohuck@redhat.com>
 
