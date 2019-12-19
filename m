@@ -2,91 +2,94 @@ Return-Path: <SRS0=q1Dd=2J=vger.kernel.org=linux-block-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-2.2 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
-	MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,USER_AGENT_SANE_1 autolearn=no
-	autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-0.8 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
+	MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS autolearn=no autolearn_force=no
+	version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 79B28C2D0C1
-	for <linux-block@archiver.kernel.org>; Thu, 19 Dec 2019 11:08:27 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 0F0EEC43603
+	for <linux-block@archiver.kernel.org>; Thu, 19 Dec 2019 12:07:02 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.kernel.org (Postfix) with ESMTP id 4E4D8222C2
-	for <linux-block@archiver.kernel.org>; Thu, 19 Dec 2019 11:08:27 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id E2FB020716
+	for <linux-block@archiver.kernel.org>; Thu, 19 Dec 2019 12:07:01 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1726698AbfLSLI0 (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Thu, 19 Dec 2019 06:08:26 -0500
-Received: from relay.sw.ru ([185.231.240.75]:47626 "EHLO relay.sw.ru"
-        rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-        id S1726694AbfLSLI0 (ORCPT <rfc822;linux-block@vger.kernel.org>);
-        Thu, 19 Dec 2019 06:08:26 -0500
-Received: from dhcp-172-16-24-104.sw.ru ([172.16.24.104])
-        by relay.sw.ru with esmtp (Exim 4.92.3)
-        (envelope-from <ktkhai@virtuozzo.com>)
-        id 1ihteG-0005CI-NY; Thu, 19 Dec 2019 14:07:16 +0300
-Subject: Re: [PATCH RFC 1/3] block: Add support for REQ_OP_ASSIGN_RANGE
- operation
-To:     "Martin K. Petersen" <martin.petersen@oracle.com>, axboe@kernel.dk
-Cc:     linux-block@vger.kernel.org, linux-kernel@vger.kernel.org,
-        linux-ext4@vger.kernel.org, tytso@mit.edu,
-        adilger.kernel@dilger.ca, ming.lei@redhat.com, osandov@fb.com,
-        jthumshirn@suse.de, minwoo.im.dev@gmail.com, damien.lemoal@wdc.com,
-        andrea.parri@amarulasolutions.com, hare@suse.com, tj@kernel.org,
-        ajay.joshi@wdc.com, sagi@grimberg.me, dsterba@suse.com,
-        chaitanya.kulkarni@wdc.com, bvanassche@acm.org,
-        dhowells@redhat.com, asml.silence@gmail.com
-References: <157599668662.12112.10184894900037871860.stgit@localhost.localdomain>
- <157599696813.12112.14140818972910110796.stgit@localhost.localdomain>
- <yq1woatc8zd.fsf@oracle.com>
-From:   Kirill Tkhai <ktkhai@virtuozzo.com>
-Message-ID: <3f2e341b-dea4-c5d0-8eb0-568b6ad2f17b@virtuozzo.com>
-Date:   Thu, 19 Dec 2019 14:07:16 +0300
-User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:60.0) Gecko/20100101
- Thunderbird/60.9.0
+        id S1726702AbfLSMG4 (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Thu, 19 Dec 2019 07:06:56 -0500
+Received: from mout.kundenserver.de ([217.72.192.74]:59145 "EHLO
+        mout.kundenserver.de" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S1726712AbfLSMGz (ORCPT
+        <rfc822;linux-block@vger.kernel.org>);
+        Thu, 19 Dec 2019 07:06:55 -0500
+Received: from mail-qt1-f175.google.com ([209.85.160.175]) by
+ mrelayeu.kundenserver.de (mreue106 [212.227.15.145]) with ESMTPSA (Nemesis)
+ id 1N7hrw-1hdPlH2kDa-014iUw; Thu, 19 Dec 2019 13:06:53 +0100
+Received: by mail-qt1-f175.google.com with SMTP id w47so4841476qtk.4;
+        Thu, 19 Dec 2019 04:06:53 -0800 (PST)
+X-Gm-Message-State: APjAAAXBpysAqOUpd6hdW7AkYF9anE8ixycq5E/EWty85GW+sE3rZNOY
+        s/JBA+Uin0p/9kV6COCGCBcXnf6gBe/GEzuE3qs=
+X-Google-Smtp-Source: APXvYqxGQKByw2kvN17TFz5IHkyanI0u18EN6ad0C5VbYexL/eZvygPOcm6Qo3HJ+QnsJhFv9L477EgsjzRCAopMqgw=
+X-Received: by 2002:ac8:768d:: with SMTP id g13mr6613343qtr.7.1576757212184;
+ Thu, 19 Dec 2019 04:06:52 -0800 (PST)
 MIME-Version: 1.0
-In-Reply-To: <yq1woatc8zd.fsf@oracle.com>
-Content-Type: text/plain; charset=utf-8
-Content-Language: en-US
-Content-Transfer-Encoding: 7bit
+References: <20191217221708.3730997-1-arnd@arndb.de> <20191217221708.3730997-19-arnd@arndb.de>
+ <f9fd39116713f17e55091868326a419190220559.camel@codethink.co.uk>
+In-Reply-To: <f9fd39116713f17e55091868326a419190220559.camel@codethink.co.uk>
+From:   Arnd Bergmann <arnd@arndb.de>
+Date:   Thu, 19 Dec 2019 13:06:36 +0100
+X-Gmail-Original-Message-ID: <CAK8P3a0oNYMoyLbpPqNaXSWV3j7dXhKZ5GLq1EEGA=ansVxvsA@mail.gmail.com>
+Message-ID: <CAK8P3a0oNYMoyLbpPqNaXSWV3j7dXhKZ5GLq1EEGA=ansVxvsA@mail.gmail.com>
+Subject: Re: [PATCH v2 18/27] compat_ioctl: scsi: move ioctl handling into drivers
+To:     Ben Hutchings <ben.hutchings@codethink.co.uk>
+Cc:     Jens Axboe <axboe@kernel.dk>,
+        "James E.J. Bottomley" <jejb@linux.ibm.com>,
+        "Martin K. Petersen" <martin.petersen@oracle.com>,
+        linux-scsi <linux-scsi@vger.kernel.org>,
+        linux-block <linux-block@vger.kernel.org>,
+        y2038 Mailman List <y2038@lists.linaro.org>,
+        "linux-kernel@vger.kernel.org" <linux-kernel@vger.kernel.org>,
+        Christoph Hellwig <hch@lst.de>,
+        "open list:DOCUMENTATION" <linux-doc@vger.kernel.org>,
+        Jonathan Corbet <corbet@lwn.net>,
+        Al Viro <viro@zeniv.linux.org.uk>,
+        Linux FS-devel Mailing List <linux-fsdevel@vger.kernel.org>
+Content-Type: text/plain; charset="UTF-8"
+X-Provags-ID: V03:K1:+fWi9PxG9cjEwLcZlRIq6OeQDH2hEZ4pw5hpJkGpVtEeWAlAivF
+ CbPr0NC3QuKQvm6kKLoHJbAxJuZKqLJyDWcHTQoJ16eaRPEQvoCC1bXU6pKK9i/0/7yUFrB
+ /TRpJyIWpD4oNYm1hCje7EqIkSxyFtmj5zAED48WVkQqJX39CCVvpG/jui6MqUa5Mk0gIYN
+ Y1uy1exUFBIIvcQMWzNMg==
+X-UI-Out-Filterresults: notjunk:1;V03:K0:fuV12pAVl+Q=:JNkmuxB1GGiZ2oSKG3N9l2
+ PecDtonxNza7r+VU1FQI2gXKy4eOwxT1z5eRg+T9pZaWPrLcxj72yCAuGMH1cPW0O7V/T8v39
+ RhsZ4b5yA9jSeKcdlSw6k/srmunKQmq/f56xFwH/QxTN7aJFcdvmLcx4bcEAFzlJU7pPf2903
+ aykxVDbdwsvWCfCTFojlHC7stwSemNAuIS+jfBxNDOrqZ1cmgPscmsCpIBMQtUZcyLbw2Ha65
+ dSLuuHOtD49UvgeLeLCwjisAhAphYMVSM/gYJAnRg1Qui6fMkCbjV0UMdKK3nndXzxZKALi0t
+ MlCjXoSbVqpLzEgwxeWcy/h7EmrR1pS93py40sGTq4RX77Cmap1qQkQK0cvADoH4lJjedY3C8
+ jzHG1cw44oFuy3/M4PoMuxiFS8WZPa6T5nCMPdhY2V1NrswNFN3HYGggMfpIE80WrDiC7GAxz
+ saPlqhJs6CzRCVELk1NIcGESwXBjGkFyoPBrrni/oVKUaQs8R55UIluhnywy6SdLw4+f0hdW8
+ 5O0u2sL/oyPoswBakGI9Ppr3A35o0XF3RMABoaJmvbaAHBvSblSt2KXUp64iAkDCkx35R9sp9
+ +atIRp86CaJDxiaULDJ9NWYEL9LSwD3Eumw/LqNzm4bJvOn2e2YsP2SUZa4D5rKxX3JVcHSqT
+ Kvlzg2O6KMb8B0r/Rqm4tZryip31E6BhzJyYos/0YHRhbioA6UbYwCbGHuVJfsCEpobZUz4QE
+ ddlEKJzsI6UvRYWxHfSkMi3kD//JzyuunBqE+/vfsvHy8YNxDMb/CxHmwAnprNII66M82Yngg
+ F5/ZjI7kY5rQCt2DR2G54kWOPp4LmWRDIt8v0U20UFpSMU2DolvDzNENy9atgl3rnn5wE/CJU
+ 5kC0Mp8mNra9q7mBhwew==
 Sender: linux-block-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-Hi, Martin!
+On Wed, Dec 18, 2019 at 8:57 PM Ben Hutchings
+<ben.hutchings@codethink.co.uk> wrote:
+>
+> On Tue, 2019-12-17 at 23:16 +0100, Arnd Bergmann wrote:
+> > +
+> > +     /*
+> > +      * CDROM ioctls are handled in the block layer, but
+> > +      * do the scsi blk ioctls here.
+> > +      */
+> > +     ret = scsi_cmd_blk_ioctl(bdev, mode, cmd, argp);
+> > +     if (ret != -ENOTTY)
+> > +             return ret;
+>
+> This needs to be be "goto put;"
 
-On 19.12.2019 06:03, Martin K. Petersen wrote:
-> 
-> Hi Kirill!
-> 
->> The patch adds a new blkdev_issue_assign_range() primitive, which is
->> rather similar to existing blkdev_issue_{*} api.  Also, a new queue
->> limit.max_assign_range_sectors is added.
-> 
-> I am not so keen on the assign_range name. What's wrong with "allocate"?
+Fixed now, thanks!
 
-REQ_OP_ALLOCATE_RANGE seemed for me as looking very long for the reviewers.
-And I found that there is no an abbreviation of operations name in enum req_opf,
-so REQ_OP_ALLOC_RANGE won't look good. Thus, I found a replacement.
-
-But in case of REQ_OP_ALLOCATE_RANGE length is OK for people, there is no
-a problem to choose it.
-
-> But why introduce a completely new operation? Isn't this essentially a
-> write zeroes with BLKDEV_ZERO_NOUNMAP flag set?
-> 
-> If the zeroing aspect is perceived to be a problem we could add a
-> BLKDEV_ZERO_ALLOCATE flag (or BLKDEV_ZERO_ANCHOR since that's the
-> terminology used in SCSI).
-
-Hm. BLKDEV_ZERO_NOUNMAP is used in __blkdev_issue_write_zeroes() only.
-So, do I understand right that we should the below two?:
-
-1)Introduce a new flag BLKDEV_ZERO_ALLOCATE for blkdev_issue_write_zeroes().
-2)Introduce a new flag REQ_NOZERO in enum req_opf.
-
-Won't this confuse a reader that we have blkdev_issue_write_zeroes(),
-which does not write zeroes sometimes? Maybe we should rename
-blkdev_issue_write_zeroes() in some more generic name?
-
-Thanks,
-Kirill
-
+       Arnd
