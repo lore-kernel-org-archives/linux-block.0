@@ -2,85 +2,168 @@ Return-Path: <SRS0=q1Dd=2J=vger.kernel.org=linux-block-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-2.6 required=3.0 tests=DKIMWL_WL_HIGH,DKIM_SIGNED,
-	DKIM_VALID,DKIM_VALID_AU,MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,
-	USER_AGENT_SANE_1 autolearn=no autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-7.3 required=3.0 tests=DKIM_SIGNED,DKIM_VALID,
+	DKIM_VALID_AU,HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,
+	MENTIONS_GIT_HOSTING,SPF_HELO_NONE,SPF_PASS,USER_AGENT_SANE_1
+	autolearn=unavailable autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 7634CC43603
-	for <linux-block@archiver.kernel.org>; Thu, 19 Dec 2019 20:52:18 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 22CA1C2D0D3
+	for <linux-block@archiver.kernel.org>; Thu, 19 Dec 2019 21:07:49 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.kernel.org (Postfix) with ESMTP id 3DBF524679
-	for <linux-block@archiver.kernel.org>; Thu, 19 Dec 2019 20:52:18 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=default; t=1576788738;
-	bh=v9auNo8rkNHOXG05cTjzKAwluyv3XeVsSOf+rklCYPY=;
-	h=Date:From:To:Cc:Subject:References:In-Reply-To:List-ID:From;
-	b=DU7DDMKpKeFlNxM1unDVcKpRMtvnz8IbPJGoUEx93DnnyxiBjHNChDCNpihbHVeaP
-	 DHvUJ8GWNxMl1gV2JyTFI2YtLGrgN+GoUsdCEjv8kb7AhtY/juf+UZ5FZ0THHbHXc+
-	 pYfQrIKuO5QIFEgKyDTJc6Z/3Heuo09q0B6IpNP4=
+	by mail.kernel.org (Postfix) with ESMTP id E86352467B
+	for <linux-block@archiver.kernel.org>; Thu, 19 Dec 2019 21:07:48 +0000 (UTC)
+Authentication-Results: mail.kernel.org;
+	dkim=pass (2048-bit key) header.d=ziepe.ca header.i=@ziepe.ca header.b="I0eeHPXE"
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1727071AbfLSUwR (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Thu, 19 Dec 2019 15:52:17 -0500
-Received: from mail.kernel.org ([198.145.29.99]:50418 "EHLO mail.kernel.org"
-        rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-        id S1726967AbfLSUwR (ORCPT <rfc822;linux-block@vger.kernel.org>);
-        Thu, 19 Dec 2019 15:52:17 -0500
-Received: from redsun51.ssa.fujisawa.hgst.com (unknown [199.255.47.7])
-        (using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
-        (No client certificate requested)
-        by mail.kernel.org (Postfix) with ESMTPSA id E681E227BF;
-        Thu, 19 Dec 2019 20:52:15 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-        s=default; t=1576788736;
-        bh=v9auNo8rkNHOXG05cTjzKAwluyv3XeVsSOf+rklCYPY=;
-        h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
-        b=PoNSjSNZj7/ypeN73ewtv/LvBgZ6bhnrJNr3eYPqwRdFTbuBC/Jqk/TN+CW3yBuC5
-         xAtyjg+taT1+XU1mDc0mPVYN8PJ7zsxvFq5AbRGQ/KDiCHNmoh8WhSkziKFT9jcEo5
-         w12PQILu5aNGblagVhfYZU2khTGRtXEkG/8UPbSE=
-Date:   Fri, 20 Dec 2019 05:52:10 +0900
-From:   Keith Busch <kbusch@kernel.org>
-To:     "Ober, Frank" <frank.ober@intel.com>
-Cc:     "linux-block@vger.kernel.org" <linux-block@vger.kernel.org>,
-        "linux-nvme@lists.infradead.org" <linux-nvme@lists.infradead.org>,
-        "Derrick, Jonathan" <jonathan.derrick@intel.com>,
-        "Rajendiran, Swetha" <swetha.rajendiran@intel.com>,
-        "Liang, Mark" <mark.liang@intel.com>
-Subject: Re: Polled io for Linux kernel 5.x
-Message-ID: <20191219205210.GA26490@redsun51.ssa.fujisawa.hgst.com>
-References: <SN6PR11MB2669E7A65DD0AD9DC65A67C58B520@SN6PR11MB2669.namprd11.prod.outlook.com>
+        id S1727281AbfLSVHr (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Thu, 19 Dec 2019 16:07:47 -0500
+Received: from mail-qt1-f193.google.com ([209.85.160.193]:41959 "EHLO
+        mail-qt1-f193.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S1727024AbfLSVHq (ORCPT
+        <rfc822;linux-block@vger.kernel.org>);
+        Thu, 19 Dec 2019 16:07:46 -0500
+Received: by mail-qt1-f193.google.com with SMTP id k40so6251562qtk.8
+        for <linux-block@vger.kernel.org>; Thu, 19 Dec 2019 13:07:46 -0800 (PST)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=ziepe.ca; s=google;
+        h=date:from:to:cc:subject:message-id:references:mime-version
+         :content-disposition:in-reply-to:user-agent;
+        bh=b1m6ooTcPBF03IyS8tXbQFWmui5q38MZyl7sgcWDrVc=;
+        b=I0eeHPXEKyhR6F3+w0uZp8nZL74lZ+A5yJ1jcW4KB5MO7vY9ONwJPcIUEGlT8SbUeO
+         LH81YaW3GC7SMUuObdRRRlnGzTOYLS475Sg1mUPvLmi4JlCQaPrNqV+lDtlEr4ByHobI
+         ZOHWHIxyfXKwjF07HIG3BbuRvW3BGN4Y76jyGe62WEFR0v3gEx92h1yDdyRSLYhNDwBJ
+         tpCIZrQ8KxYH2/vN+ZSvjy5imMLbf+TFj3Y+cP0N+OLWwhHVLOxCMvkJX7OZ7EDojcBc
+         GAxbNt0FBcreyN8pFhlQHApx98BWQ2R7K6v8eS90taP+fCjutUcn9h1snaULI5tTj6Dz
+         Afvg==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20161025;
+        h=x-gm-message-state:date:from:to:cc:subject:message-id:references
+         :mime-version:content-disposition:in-reply-to:user-agent;
+        bh=b1m6ooTcPBF03IyS8tXbQFWmui5q38MZyl7sgcWDrVc=;
+        b=LLyN0PH6NdZBzbZwL09pICUJr3v/JCaB9csmb+L9CdenzDGYUOpan1Fys9wQ+hfw/m
+         NpgzXOCpgaumNJPxDpiKMrH4tPo811Dm8OcDCRBm/sc5XxMj35xGixZWYS8dmuBAdmsm
+         zMzx2vkay9UMJl4GJiWhJstDWE3st/XZSZ0JexHXn9yWF4aVICca7Bty2YzaPpVjhWuo
+         F5B5p4fr6ueol6TObf/gnGS3ONz8xsxtNLL/3qrzA/9paWRGCkvowbAKeKUpCtEXebma
+         Tkp96aQR79ByqtnB+NdL0fiRhMSZ4tBlazuo/+6MQ2Pemq/EDnUETlyEZU0yTa+1Wd/e
+         is6g==
+X-Gm-Message-State: APjAAAUHUGmNhNa3wlabfE70oG7uMf3CE6sXicCekRKBSkyvSFDDMXvG
+        D2h5ZTTeV6/SU2CvxCeJ2ww89A==
+X-Google-Smtp-Source: APXvYqxVnwIXGsi0o/bO9dZGQ7XuTOfFwgCWi/4t790OZPxPymgdPJt3SfFmZqkv2903tXMsYUoGBQ==
+X-Received: by 2002:ac8:2d30:: with SMTP id n45mr8586782qta.203.1576789665577;
+        Thu, 19 Dec 2019 13:07:45 -0800 (PST)
+Received: from ziepe.ca (hlfxns017vw-142-68-57-212.dhcp-dynamic.fibreop.ns.bellaliant.net. [142.68.57.212])
+        by smtp.gmail.com with ESMTPSA id m20sm2085982qkk.15.2019.12.19.13.07.44
+        (version=TLS1_2 cipher=ECDHE-RSA-CHACHA20-POLY1305 bits=256/256);
+        Thu, 19 Dec 2019 13:07:44 -0800 (PST)
+Received: from jgg by mlx.ziepe.ca with local (Exim 4.90_1)
+        (envelope-from <jgg@ziepe.ca>)
+        id 1ii31L-0007mU-Uf; Thu, 19 Dec 2019 17:07:43 -0400
+Date:   Thu, 19 Dec 2019 17:07:43 -0400
+From:   Jason Gunthorpe <jgg@ziepe.ca>
+To:     John Hubbard <jhubbard@nvidia.com>
+Cc:     Leon Romanovsky <leon@kernel.org>,
+        Andrew Morton <akpm@linux-foundation.org>,
+        Al Viro <viro@zeniv.linux.org.uk>,
+        Alex Williamson <alex.williamson@redhat.com>,
+        Benjamin Herrenschmidt <benh@kernel.crashing.org>,
+        =?utf-8?B?QmrDtnJuIFTDtnBlbA==?= <bjorn.topel@intel.com>,
+        Christoph Hellwig <hch@infradead.org>,
+        Dan Williams <dan.j.williams@intel.com>,
+        Daniel Vetter <daniel@ffwll.ch>,
+        Dave Chinner <david@fromorbit.com>,
+        David Airlie <airlied@linux.ie>,
+        "David S . Miller" <davem@davemloft.net>,
+        Ira Weiny <ira.weiny@intel.com>, Jan Kara <jack@suse.cz>,
+        Jens Axboe <axboe@kernel.dk>, Jonathan Corbet <corbet@lwn.net>,
+        =?utf-8?B?SsOpcsO0bWU=?= Glisse <jglisse@redhat.com>,
+        Magnus Karlsson <magnus.karlsson@intel.com>,
+        Mauro Carvalho Chehab <mchehab@kernel.org>,
+        Michael Ellerman <mpe@ellerman.id.au>,
+        Michal Hocko <mhocko@suse.com>,
+        Mike Kravetz <mike.kravetz@oracle.com>,
+        Paul Mackerras <paulus@samba.org>,
+        Shuah Khan <shuah@kernel.org>,
+        Vlastimil Babka <vbabka@suse.cz>, bpf@vger.kernel.org,
+        dri-devel@lists.freedesktop.org, kvm@vger.kernel.org,
+        linux-block@vger.kernel.org, linux-doc@vger.kernel.org,
+        linux-fsdevel@vger.kernel.org, linux-kselftest@vger.kernel.org,
+        linux-media@vger.kernel.org, linux-rdma@vger.kernel.org,
+        linuxppc-dev@lists.ozlabs.org, netdev@vger.kernel.org,
+        linux-mm@kvack.org, LKML <linux-kernel@vger.kernel.org>,
+        Maor Gottlieb <maorg@mellanox.com>
+Subject: Re: [PATCH v11 00/25] mm/gup: track dma-pinned pages: FOLL_PIN
+Message-ID: <20191219210743.GN17227@ziepe.ca>
+References: <20191216222537.491123-1-jhubbard@nvidia.com>
+ <20191219132607.GA410823@unreal>
+ <a4849322-8e17-119e-a664-80d9f95d850b@nvidia.com>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=us-ascii
 Content-Disposition: inline
-In-Reply-To: <SN6PR11MB2669E7A65DD0AD9DC65A67C58B520@SN6PR11MB2669.namprd11.prod.outlook.com>
-User-Agent: Mutt/1.12.1 (2019-06-15)
+In-Reply-To: <a4849322-8e17-119e-a664-80d9f95d850b@nvidia.com>
+User-Agent: Mutt/1.9.4 (2018-02-28)
 Sender: linux-block-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-On Thu, Dec 19, 2019 at 07:25:51PM +0000, Ober, Frank wrote:
-> Hi block/nvme communities, 
-> On 4.x kernels we used to be able to do:
-> # echo 1 > /sys/block/nvme0n1/queue/io_poll
-> And then run a polled_io job in fio with pvsync2 as our ioengine, with the hipri flag set. This is actually how we test the very best SSDs that depend on 3D xpoint media.
+On Thu, Dec 19, 2019 at 12:30:31PM -0800, John Hubbard wrote:
+> On 12/19/19 5:26 AM, Leon Romanovsky wrote:
+> > On Mon, Dec 16, 2019 at 02:25:12PM -0800, John Hubbard wrote:
+> > > Hi,
+> > > 
+> > > This implements an API naming change (put_user_page*() -->
+> > > unpin_user_page*()), and also implements tracking of FOLL_PIN pages. It
+> > > extends that tracking to a few select subsystems. More subsystems will
+> > > be added in follow up work.
+> > 
+> > Hi John,
+> > 
+> > The patchset generates kernel panics in our IB testing. In our tests, we
+> > allocated single memory block and registered multiple MRs using the single
+> > block.
+> > 
+> > The possible bad flow is:
+> >   ib_umem_geti() ->
+> >    pin_user_pages_fast(FOLL_WRITE) ->
+> >     internal_get_user_pages_fast(FOLL_WRITE) ->
+> >      gup_pgd_range() ->
+> >       gup_huge_pd() ->
+> >        gup_hugepte() ->
+> >         try_grab_compound_head() ->
 > 
-> On 5.x kernels we see the following error trying to write the device settings>>>
-> -bash: echo: write error: Invalid argument
+> Hi Leon,
 > 
-> We can reload the entire nvme module with nvme poll_queues but this is not well explained or written up anywhere? Or sorry "not found"?
+> Thanks very much for the detailed report! So we're overflowing...
 > 
-> This is verifiable on 5.3, 5.4 kernels with fio 3.16 builds.
+> At first look, this seems likely to be hitting a weak point in the
+> GUP_PIN_COUNTING_BIAS-based design, one that I believed could be deferred
+> (there's a writeup in Documentation/core-api/pin_user_page.rst, lines
+> 99-121). Basically it's pretty easy to overflow the page->_refcount
+> with huge pages if the pages have a *lot* of subpages.
 > 
-> What is the background on what has changed because Jens wrote this note back in 2015, which did work in the 4.x kernel era.
+> We can only do about 7 pins on 1GB huge pages that use 4KB subpages.
 
-The original polling implementation shared resources that generate
-interrupts. This prevents it from running as fast as it can, so
-dedicated polling queues are used now.
+Considering that establishing these pins is entirely under user
+control, we can't have a limit here.
 
-> How come we cannot have a device/controller level setup of polled io today in 5.x kernels, all that exists is module based?
+If the number of allowed pins are exhausted then the
+pin_user_pages_fast() must fail back to the user.
 
-Polled queues are a dedicated resource that we have to reserve up front.
-They're optional, so you don't need to use the hipri flag if you have a
-device you don't want polled. But we need to know how many queues to
-reserve before we've even discovered the controllers, so we don't have a
-good way to define it per-controller.
+> 3. It would be nice if I could reproduce this. I have a two-node mlx5 Infiniband
+> test setup, but I have done only the tiniest bit of user space IB coding, so
+> if you have any test programs that aren't too hard to deal with that could
+> possibly hit this, or be tweaked to hit it, I'd be grateful. Keeping in mind
+> that I'm not an advanced IB programmer. At all. :)
+
+Clone this:
+
+https://github.com/linux-rdma/rdma-core.git
+
+Install all the required deps to build it (notably cython), see the README.md
+
+$ ./build.sh
+$ build/bin/run_tests.py 
+
+If you get things that far I think Leon can get a reproduction for you
+
+Jason
