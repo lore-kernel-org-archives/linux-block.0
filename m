@@ -2,50 +2,45 @@ Return-Path: <SRS0=4Sb2=2K=vger.kernel.org=linux-block-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-2.2 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
-	MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,USER_AGENT_SANE_1 autolearn=no
+X-Spam-Status: No, score=-10.2 required=3.0
+	tests=HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,MENTIONS_GIT_HOSTING,
+	SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,USER_AGENT_SANE_1 autolearn=ham
 	autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 0CEB4C43603
-	for <linux-block@archiver.kernel.org>; Fri, 20 Dec 2019 11:56:16 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 4F39CC43603
+	for <linux-block@archiver.kernel.org>; Fri, 20 Dec 2019 12:39:37 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.kernel.org (Postfix) with ESMTP id DDEAF24679
-	for <linux-block@archiver.kernel.org>; Fri, 20 Dec 2019 11:56:15 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id 21B9D2467F
+	for <linux-block@archiver.kernel.org>; Fri, 20 Dec 2019 12:39:37 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1727184AbfLTL4P (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Fri, 20 Dec 2019 06:56:15 -0500
-Received: from relay.sw.ru ([185.231.240.75]:41354 "EHLO relay.sw.ru"
+        id S1727347AbfLTMjg (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Fri, 20 Dec 2019 07:39:36 -0500
+Received: from mx2.suse.de ([195.135.220.15]:47296 "EHLO mx2.suse.de"
         rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-        id S1727177AbfLTL4P (ORCPT <rfc822;linux-block@vger.kernel.org>);
-        Fri, 20 Dec 2019 06:56:15 -0500
-Received: from dhcp-172-16-24-104.sw.ru ([172.16.24.104])
-        by relay.sw.ru with esmtp (Exim 4.92.3)
-        (envelope-from <ktkhai@virtuozzo.com>)
-        id 1iiGs9-0006Sg-TL; Fri, 20 Dec 2019 14:55:10 +0300
-Subject: Re: [PATCH RFC 1/3] block: Add support for REQ_OP_ASSIGN_RANGE
- operation
-To:     "Martin K. Petersen" <martin.petersen@oracle.com>
-Cc:     axboe@kernel.dk, linux-block@vger.kernel.org,
-        linux-kernel@vger.kernel.org, linux-ext4@vger.kernel.org,
-        tytso@mit.edu, adilger.kernel@dilger.ca, ming.lei@redhat.com,
-        osandov@fb.com, jthumshirn@suse.de, minwoo.im.dev@gmail.com,
-        damien.lemoal@wdc.com, andrea.parri@amarulasolutions.com,
-        hare@suse.com, tj@kernel.org, ajay.joshi@wdc.com, sagi@grimberg.me,
-        dsterba@suse.com, chaitanya.kulkarni@wdc.com, bvanassche@acm.org,
-        dhowells@redhat.com, asml.silence@gmail.com
-References: <157599668662.12112.10184894900037871860.stgit@localhost.localdomain>
- <157599696813.12112.14140818972910110796.stgit@localhost.localdomain>
- <yq1woatc8zd.fsf@oracle.com>
- <3f2e341b-dea4-c5d0-8eb0-568b6ad2f17b@virtuozzo.com>
- <yq1a77oc56s.fsf@oracle.com>
-From:   Kirill Tkhai <ktkhai@virtuozzo.com>
-Message-ID: <625c9ee4-bedb-ff60-845e-2d440c4f58aa@virtuozzo.com>
-Date:   Fri, 20 Dec 2019 14:55:09 +0300
-User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:60.0) Gecko/20100101
- Thunderbird/60.9.0
+        id S1727317AbfLTMjg (ORCPT <rfc822;linux-block@vger.kernel.org>);
+        Fri, 20 Dec 2019 07:39:36 -0500
+X-Virus-Scanned: by amavisd-new at test-mx.suse.de
+Received: from relay2.suse.de (unknown [195.135.220.254])
+        by mx2.suse.de (Postfix) with ESMTP id B9110AE47;
+        Fri, 20 Dec 2019 12:39:34 +0000 (UTC)
+Subject: Re: [PATCH] xen/blkfront: Adjust indentation in xlvbd_alloc_gendisk
+To:     Nathan Chancellor <natechancellor@gmail.com>,
+        Boris Ostrovsky <boris.ostrovsky@oracle.com>,
+        Konrad Rzeszutek Wilk <konrad.wilk@oracle.com>,
+        =?UTF-8?Q?Roger_Pau_Monn=c3=a9?= <roger.pau@citrix.com>,
+        Jens Axboe <axboe@kernel.dk>
+Cc:     Stefano Stabellini <stefano.stabellini@eu.citrix.com>,
+        xen-devel@lists.xenproject.org, linux-block@vger.kernel.org,
+        linux-kernel@vger.kernel.org, clang-built-linux@googlegroups.com
+References: <20191209201444.33243-1-natechancellor@gmail.com>
+From:   =?UTF-8?B?SsO8cmdlbiBHcm/Dnw==?= <jgross@suse.com>
+Message-ID: <f915e97e-e395-7ef5-0971-1b6088cc4a6a@suse.com>
+Date:   Fri, 20 Dec 2019 13:39:34 +0100
+User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:68.0) Gecko/20100101
+ Thunderbird/68.2.1
 MIME-Version: 1.0
-In-Reply-To: <yq1a77oc56s.fsf@oracle.com>
-Content-Type: text/plain; charset=utf-8
+In-Reply-To: <20191209201444.33243-1-natechancellor@gmail.com>
+Content-Type: text/plain; charset=utf-8; format=flowed
 Content-Language: en-US
 Content-Transfer-Encoding: 7bit
 Sender: linux-block-owner@vger.kernel.org
@@ -53,65 +48,29 @@ Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-Hi, Martin,
+On 09.12.19 21:14, Nathan Chancellor wrote:
+> Clang warns:
+> 
+> ../drivers/block/xen-blkfront.c:1117:4: warning: misleading indentation;
+> statement is not part of the previous 'if' [-Wmisleading-indentation]
+>                  nr_parts = PARTS_PER_DISK;
+>                  ^
+> ../drivers/block/xen-blkfront.c:1115:3: note: previous statement is here
+>                  if (err)
+>                  ^
+> 
+> This is because there is a space at the beginning of this line; remove
+> it so that the indentation is consistent according to the Linux kernel
+> coding style and clang no longer warns.
+> 
+> While we are here, the previous line has some trailing whitespace; clean
+> that up as well.
+> 
+> Fixes: c80a420995e7 ("xen-blkfront: handle Xen major numbers other than XENVBD")
+> Link: https://github.com/ClangBuiltLinux/linux/issues/791
+> Signed-off-by: Nathan Chancellor <natechancellor@gmail.com>
 
-On 20.12.2019 01:37, Martin K. Petersen wrote:
-> 
-> Kirill,
-> 
->> Hm. BLKDEV_ZERO_NOUNMAP is used in __blkdev_issue_write_zeroes() only.
->> So, do I understand right that we should the below two?:
->>
->> 1) Introduce a new flag BLKDEV_ZERO_ALLOCATE for
->> blkdev_issue_write_zeroes().
-> 
->> 2) Introduce a new flag REQ_NOZERO in enum req_opf.
-> 
-> Something like that. If zeroing is a problem for you.
+Pushed to xen/tip.git for-linus-5.5b
 
-My intention is to use this in fs allocators to notify virtual block devices
-about allocated blocks (like in patch [3/3]). Filesystems allocators know about
-written and unwritten extents, and they don't need a zeroing of allocated blocks.
 
-Since a block range allocation action is less complicated (and faster), than
-operation of allocation + zeroing of allocated blocks (at least for some devices),
-we just choose it as the fastest. This is the reason we avoid zeroing.
-
-> Right now we offer the following semantics:
-> 
-> 	Deallocate, no zeroing (discard)
-> 
-> 	Optionally deallocate, zeroing (zeroout)
-> 
-> 	Allocate, zeroing (zeroout + NOUNMAP)
-> 
-> Some devices also implement a fourth option which would be:
-> 
-> 	Anchor: Allocate, no zeroing
-> 
->> Won't this confuse a reader that we have blkdev_issue_write_zeroes(),
->> which does not write zeroes sometimes? Maybe we should rename
->> blkdev_issue_write_zeroes() in some more generic name?
-> 
-> Maybe. The naming is what it is for hysterical raisins and reflects how
-> things are implemented in the storage protocols. I wouldn't worry too
-> much about that. We can rename things if need be but we shouldn't plumb
-> an essentially identical operation through the block stack just to
-> expose a different name at the top.
-
-Not introduction a new operation is a good thing. Especially, since we don't
-need a specific max_xxx_xxx_sectors != max_write_zeroes_sectors for it.
-
-I'll rework the patch in this way (it seems it will become pretty small
-after that).
-
-One more thing to discuss. The new REQ_NOZERO flag won't be supported
-by many block devices (their number will be even less, than number of
-REQ_OP_WRITE_ZEROES supporters). Will this be a good thing, in case
-of we will be completing BLKDEV_ZERO_ALLOCATE bios in __blkdev_issue_write_zeroes()
-before splitting? I mean introduction of some flag in struct request_queue::limits.
-Completion of them with -EOPNOTSUPP in block devices drivers looks
-suboptimal for me.
-
-Thanks,
-Kirill
+Juergen
