@@ -7,37 +7,37 @@ X-Spam-Status: No, score=-10.1 required=3.0 tests=DKIMWL_WL_HIGH,DKIM_SIGNED,
 	SPF_HELO_NONE,SPF_PASS,USER_AGENT_GIT autolearn=unavailable
 	autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 8C0EEC43603
-	for <linux-block@archiver.kernel.org>; Fri, 20 Dec 2019 14:31:59 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id D88C1C2D0D2
+	for <linux-block@archiver.kernel.org>; Fri, 20 Dec 2019 14:35:42 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.kernel.org (Postfix) with ESMTP id 61076206CB
-	for <linux-block@archiver.kernel.org>; Fri, 20 Dec 2019 14:31:59 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id ABDE5206CB
+	for <linux-block@archiver.kernel.org>; Fri, 20 Dec 2019 14:35:42 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=default; t=1576852319;
-	bh=BSMkqmRXgeX1/bPvH4POSuwtq+XdKjoPpNBYCSOA42k=;
+	s=default; t=1576852542;
+	bh=cef2ALIBEnBzxkYG45vbt3FVcHCfQJFOp3MYNavC4e0=;
 	h=From:To:Cc:Subject:Date:In-Reply-To:References:List-ID:From;
-	b=RcG/tns4aLdThCTbGGembP0UEa2aEnLTl+1mKuU60KVnGVW+aa9q8ypz84WyQKDSC
-	 WdLRcGCQ5P8RsRMLdVb2YTPbb/MI9YoLM65Iiw5TifqtJYtLGY8l82PDnBLNlp/aGt
-	 4QhVSHxYRC1dz9p3lINfryw/T1is0RkRPsfe5NC0=
+	b=kx7craEqe5o8xzRKp4FgZGisVxV6JPO6S8zn+0qNmH//9FzkM1hjpx1LuWgpl/FOx
+	 5sOJeLQX5kHvPqgBMWc0YxsmK0LhkDZJogNfQwtwabZkDZvWC0+ALfsijAgPz1XQg4
+	 GRm/UYsPo2N5fVyMtuA7PQYjQHOULrp9MgnZzrME=
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1727682AbfLTObz (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Fri, 20 Dec 2019 09:31:55 -0500
-Received: from mail.kernel.org ([198.145.29.99]:35110 "EHLO mail.kernel.org"
+        id S1728250AbfLTOfQ (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Fri, 20 Dec 2019 09:35:16 -0500
+Received: from mail.kernel.org ([198.145.29.99]:39706 "EHLO mail.kernel.org"
         rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-        id S1727988AbfLTObC (ORCPT <rfc822;linux-block@vger.kernel.org>);
-        Fri, 20 Dec 2019 09:31:02 -0500
+        id S1728383AbfLTOfP (ORCPT <rfc822;linux-block@vger.kernel.org>);
+        Fri, 20 Dec 2019 09:35:15 -0500
 Received: from sasha-vm.mshome.net (c-73-47-72-35.hsd1.nh.comcast.net [73.47.72.35])
         (using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
         (No client certificate requested)
-        by mail.kernel.org (Postfix) with ESMTPSA id 4BCF024686;
-        Fri, 20 Dec 2019 14:31:00 +0000 (UTC)
+        by mail.kernel.org (Postfix) with ESMTPSA id 641B02465E;
+        Fri, 20 Dec 2019 14:35:14 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-        s=default; t=1576852261;
-        bh=BSMkqmRXgeX1/bPvH4POSuwtq+XdKjoPpNBYCSOA42k=;
+        s=default; t=1576852515;
+        bh=cef2ALIBEnBzxkYG45vbt3FVcHCfQJFOp3MYNavC4e0=;
         h=From:To:Cc:Subject:Date:In-Reply-To:References:From;
-        b=PGEzLZEGVwC4XWkTLNvAmcyAvLlxVPTAGpbtshWYGCkoF8mYBTCGHl21QSLLDmtfU
-         cSMrGUJP4lHsnOw6jI/CR6d850OZnERZgB34hGp/D0uOiVjsTsP56dwqnZDVzX3R7N
-         zZQbYMv+uT7cprF/nRl0yubyWFjkXKHRXpt2wd5g=
+        b=2PND1+PivRSwfqQVRK1NKRtuSPfXdH7T4FGlkwzkqSTw5MPOUOmDR3WmtaXXYUMfl
+         0f82TMKwlt6by5zLr4aPEZCeaczJNax4tLu5eVhJf5UZSXBf2oVAXmoWENWoVsxrnD
+         ZC3cmJiST7oWZl9cADug76KfOamDQz2odlxixXdk=
 From:   Sasha Levin <sashal@kernel.org>
 To:     linux-kernel@vger.kernel.org, stable@vger.kernel.org
 Cc:     Paul Durrant <pdurrant@amazon.com>,
@@ -45,12 +45,12 @@ Cc:     Paul Durrant <pdurrant@amazon.com>,
         Juergen Gross <jgross@suse.com>,
         Sasha Levin <sashal@kernel.org>,
         xen-devel@lists.xenproject.org, linux-block@vger.kernel.org
-Subject: [PATCH AUTOSEL 5.4 50/52] xen-blkback: prevent premature module unload
-Date:   Fri, 20 Dec 2019 09:29:52 -0500
-Message-Id: <20191220142954.9500-50-sashal@kernel.org>
+Subject: [PATCH AUTOSEL 4.19 32/34] xen-blkback: prevent premature module unload
+Date:   Fri, 20 Dec 2019 09:34:31 -0500
+Message-Id: <20191220143433.9922-32-sashal@kernel.org>
 X-Mailer: git-send-email 2.20.1
-In-Reply-To: <20191220142954.9500-1-sashal@kernel.org>
-References: <20191220142954.9500-1-sashal@kernel.org>
+In-Reply-To: <20191220143433.9922-1-sashal@kernel.org>
+References: <20191220143433.9922-1-sashal@kernel.org>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=UTF-8
 X-stable: review
@@ -82,10 +82,10 @@ Signed-off-by: Sasha Levin <sashal@kernel.org>
  1 file changed, 10 insertions(+)
 
 diff --git a/drivers/block/xen-blkback/xenbus.c b/drivers/block/xen-blkback/xenbus.c
-index b90dbcd99c03e..c4cd68116e7fc 100644
+index 55869b362fdfb..25c41ce070a7f 100644
 --- a/drivers/block/xen-blkback/xenbus.c
 +++ b/drivers/block/xen-blkback/xenbus.c
-@@ -171,6 +171,15 @@ static struct xen_blkif *xen_blkif_alloc(domid_t domid)
+@@ -179,6 +179,15 @@ static struct xen_blkif *xen_blkif_alloc(domid_t domid)
  	blkif->domid = domid;
  	atomic_set(&blkif->refcnt, 1);
  	init_completion(&blkif->drain_complete);
@@ -101,7 +101,7 @@ index b90dbcd99c03e..c4cd68116e7fc 100644
  	INIT_WORK(&blkif->free_work, xen_blkif_deferred_free);
  
  	return blkif;
-@@ -320,6 +329,7 @@ static void xen_blkif_free(struct xen_blkif *blkif)
+@@ -328,6 +337,7 @@ static void xen_blkif_free(struct xen_blkif *blkif)
  
  	/* Make sure everything is drained before shutting down */
  	kmem_cache_free(xen_blkif_cachep, blkif);
