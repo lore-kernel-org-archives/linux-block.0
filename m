@@ -5,65 +5,65 @@ X-Spam-Level:
 X-Spam-Status: No, score=-9.6 required=3.0 tests=DKIM_SIGNED,DKIM_VALID,
 	DKIM_VALID_AU,FREEMAIL_FORGED_FROMDOMAIN,FREEMAIL_FROM,
 	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,
-	SPF_HELO_NONE,SPF_PASS,USER_AGENT_GIT autolearn=unavailable
-	autolearn_force=no version=3.4.0
+	SPF_HELO_NONE,SPF_PASS,USER_AGENT_GIT autolearn=ham autolearn_force=no
+	version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 5296CC2D0D4
-	for <linux-block@archiver.kernel.org>; Fri, 20 Dec 2019 15:51:22 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id EC994C2D0D2
+	for <linux-block@archiver.kernel.org>; Fri, 20 Dec 2019 15:51:24 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.kernel.org (Postfix) with ESMTP id 1EA9B222C2
-	for <linux-block@archiver.kernel.org>; Fri, 20 Dec 2019 15:51:22 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id AB9ED2467F
+	for <linux-block@archiver.kernel.org>; Fri, 20 Dec 2019 15:51:24 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="cGvpDHz5"
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="UEgicXUY"
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1727505AbfLTPvV (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Fri, 20 Dec 2019 10:51:21 -0500
-Received: from mail-wr1-f66.google.com ([209.85.221.66]:40971 "EHLO
-        mail-wr1-f66.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1727428AbfLTPvU (ORCPT
+        id S1727513AbfLTPvY (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Fri, 20 Dec 2019 10:51:24 -0500
+Received: from mail-wr1-f68.google.com ([209.85.221.68]:34888 "EHLO
+        mail-wr1-f68.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S1727508AbfLTPvX (ORCPT
         <rfc822;linux-block@vger.kernel.org>);
-        Fri, 20 Dec 2019 10:51:20 -0500
-Received: by mail-wr1-f66.google.com with SMTP id c9so9874808wrw.8;
-        Fri, 20 Dec 2019 07:51:18 -0800 (PST)
+        Fri, 20 Dec 2019 10:51:23 -0500
+Received: by mail-wr1-f68.google.com with SMTP id g17so9881894wro.2;
+        Fri, 20 Dec 2019 07:51:22 -0800 (PST)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=gmail.com; s=20161025;
         h=from:to:cc:subject:date:message-id:in-reply-to:references;
-        bh=pAgRONZTzPmjdJnTZLYRDoN1dIGAD24eZpRUdYYBTfU=;
-        b=cGvpDHz5EvxuaOn9jJ8wuxavVEcidzMilTwTtYJL3+XzgYSZ+6NywG2qG0f3FAyJ13
-         dNbiX6Ys00Y82Y9Lr0GOaS19hUQ4zy75ALWZ8pjccGORFJgvn2kCiJG4ydxyU/sOCLWf
-         xliejD2f0DqwFbxU9iYwtPPmAGQtS1bVZn/sYWkMQGNr3wNQj5+uEYFNU6yOieE04cQl
-         xsZ5ajbEoSwZ57hUHs5MZpvwa2ZfHxi95YnsmrOyxeoHd0IApMNm2adubLew5s0M9YZ0
-         kjLB0J6BlNeGrlBDm01+FsIX2NVMsH4IfnblcKGtWrrQE23T6dJF7KUjTS8YqE5sDygC
-         9Jdg==
+        bh=e2UyM1ddhG6LAe+raY4p18Uxp2IfFHpyoTAZFUUfifo=;
+        b=UEgicXUYamC2HjDJTaWOTxL4QPeEF+9T01KQ8k90GjC2xx9ZDDd3tWjn4nx7uW59mt
+         exodXqn2B2ugx9ai+NdMLsTalNlFZR+VBnU2wF6Qd4SYG7X4+j21opBTH10f4CXLXUc6
+         PWfWYe7iyHUOXJu1WHD7wQ9eRFV5mertJK8jCYvAralOJTIPCiql9yBRDs5cfZIN7iq+
+         jTCI81TYHMJ7nBaFTMYS8h4Wlf7mXLbZa5Poz1ESx4X7k/pGuxn03kxJrDzVXVN7EyMn
+         qnAWWk7cE7QWlOgWGMOa35xgJhj8pdP9Be+TcvWkeLy76OIB5bh2ecdsgamAVHpQXr36
+         bbtg==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=1e100.net; s=20161025;
         h=x-gm-message-state:from:to:cc:subject:date:message-id:in-reply-to
          :references;
-        bh=pAgRONZTzPmjdJnTZLYRDoN1dIGAD24eZpRUdYYBTfU=;
-        b=p/LkSZ4cE7+4f7xUfrJuY9un5MejJiDbnYIi9KNkjGk3UG2yT2UuJXiZ3hJ9KG5DkX
-         EJ5m1ClTkCa05lunXA1Hfgu9dyLzjd4DAEfO2AZGcOy9T5oK6e4/cV4MN+WkzFZxzCkg
-         J5Akqm/MYSwHyD9Y5WPbyFYGP9C01B3HAmcJRszh4JQO2ctkvN5dtO0jAjEWeSsFRJKV
-         rks0OQVOH159v4mUnD41U3dzaIR3bPp/7frXoeU4VQ0pV1YbIGtCMbx8ojj48Q9YHNPr
-         wnrovOZzZnt9LkuGYsbZJisEAM8kwvOQW6yLJPx4aLWB9cBvYMpWQmhlPt9QnA+yxmRP
-         jA/w==
-X-Gm-Message-State: APjAAAUMOtM74X9c+juybR3Ztcy8YjlpNYFv3377XHUaFBLYTKDgtbZE
-        iDFuj8cD2y/X5V9+J1/tmipHQtddrSE=
-X-Google-Smtp-Source: APXvYqzG8+l4z4CuuKZDkgoSYTnYfdvEXBD5cZ+cvpXYQVhDQ8dw40XNR4CoPWc24S4VrAMi7hc9Bw==
-X-Received: by 2002:adf:e78a:: with SMTP id n10mr16673279wrm.62.1576857077097;
-        Fri, 20 Dec 2019 07:51:17 -0800 (PST)
+        bh=e2UyM1ddhG6LAe+raY4p18Uxp2IfFHpyoTAZFUUfifo=;
+        b=ZPXi1fcSh1q2oGHY3aBATlo+aXyeKohyiu8Ecv/nlWYzackxXp/wYP9/yGqVjrg49F
+         Hgdeazo3MDYn7/H9A/0e4s6gpz15jey7xbx3HIsfGudwKJdAvPnlYnqOOiBCYxujE1GZ
+         mTF4x3PPoEPnBKC4mpGFXjNLHWhlvf8eDIfZ2YM2e//hikAU5qNdLVyQ3h0oOLwhmdC/
+         tLTW8zqwB4JcwqSpsycon7sfy0Mmxe5ykgilLfGCqw2ecEVgtlsBHmfS2Mwtp8Pa5dCV
+         SUXxJIzjroZj5MGx+qWTleCQKgzOeFoitFGD5tObQ1SpmMP6JmqCT1oDvAPYaOSWCMHg
+         CvFg==
+X-Gm-Message-State: APjAAAWVJBSJ/HvSA0XNnZKom+K0uWXsX/SNsoBeUvva32xhmPWWKld6
+        VzSa9bUb1H8UK4nJ73+QDqD1h8X1kpU=
+X-Google-Smtp-Source: APXvYqz2mKh5c3LSpjVdadt3yq3ZnX/qWSt+PM7ItkBVcNU8oA1xr7CyF7ADwb5P0rv3j5aIMkvjow==
+X-Received: by 2002:a5d:6a88:: with SMTP id s8mr15440129wru.173.1576857081137;
+        Fri, 20 Dec 2019 07:51:21 -0800 (PST)
 Received: from jwang-Latitude-5491.fritz.box ([2001:16b8:4972:cc00:b9e0:6ef7:286d:4897])
-        by smtp.gmail.com with ESMTPSA id u14sm10372139wrm.51.2019.12.20.07.51.15
+        by smtp.gmail.com with ESMTPSA id u14sm10372139wrm.51.2019.12.20.07.51.20
         (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Fri, 20 Dec 2019 07:51:16 -0800 (PST)
+        Fri, 20 Dec 2019 07:51:20 -0800 (PST)
 From:   Jack Wang <jinpuwang@gmail.com>
 To:     linux-block@vger.kernel.org, linux-rdma@vger.kernel.org
 Cc:     axboe@kernel.dk, hch@infradead.org, sagi@grimberg.me,
         bvanassche@acm.org, leon@kernel.org, dledford@redhat.com,
         danil.kipnis@cloud.ionos.com, jinpu.wang@cloud.ionos.com,
         rpenyaev@suse.de
-Subject: [PATCH v5 04/25] rtrs: core: lib functions shared between client and server modules
-Date:   Fri, 20 Dec 2019 16:50:48 +0100
-Message-Id: <20191220155109.8959-5-jinpuwang@gmail.com>
+Subject: [PATCH v5 07/25] rtrs: client: statistics functions
+Date:   Fri, 20 Dec 2019 16:50:51 +0100
+Message-Id: <20191220155109.8959-8-jinpuwang@gmail.com>
 X-Mailer: git-send-email 2.17.1
 In-Reply-To: <20191220155109.8959-1-jinpuwang@gmail.com>
 References: <20191220155109.8959-1-jinpuwang@gmail.com>
@@ -74,26 +74,24 @@ X-Mailing-List: linux-block@vger.kernel.org
 
 From: Jack Wang <jinpu.wang@cloud.ionos.com>
 
-This is a set of library functions existing as a rtrs-core module,
-used by client and server modules.
-
-Mainly these functions wrap IB and RDMA calls and provide a bit higher
-abstraction for implementing of RTRS protocol on client or server
-sides.
+This introduces set of functions used on client side to account
+statistics of RDMA data sent/received, amount of IOs inflight,
+latency, cpu migrations, etc.  Almost all statistics is collected
+using percpu variables.
 
 Signed-off-by: Danil Kipnis <danil.kipnis@cloud.ionos.com>
 Signed-off-by: Jack Wang <jinpu.wang@cloud.ionos.com>
 ---
- drivers/infiniband/ulp/rtrs/rtrs.c | 646 +++++++++++++++++++++++++++++
- 1 file changed, 646 insertions(+)
- create mode 100644 drivers/infiniband/ulp/rtrs/rtrs.c
+ drivers/infiniband/ulp/rtrs/rtrs-clt-stats.c | 453 +++++++++++++++++++
+ 1 file changed, 453 insertions(+)
+ create mode 100644 drivers/infiniband/ulp/rtrs/rtrs-clt-stats.c
 
-diff --git a/drivers/infiniband/ulp/rtrs/rtrs.c b/drivers/infiniband/ulp/rtrs/rtrs.c
+diff --git a/drivers/infiniband/ulp/rtrs/rtrs-clt-stats.c b/drivers/infiniband/ulp/rtrs/rtrs-clt-stats.c
 new file mode 100644
-index 000000000000..34f4f641a935
+index 000000000000..421898f941a1
 --- /dev/null
-+++ b/drivers/infiniband/ulp/rtrs/rtrs.c
-@@ -0,0 +1,646 @@
++++ b/drivers/infiniband/ulp/rtrs/rtrs-clt-stats.c
+@@ -0,0 +1,453 @@
 +// SPDX-License-Identifier: GPL-2.0-or-later
 +/*
 + * InfiniBand Transport Layer
@@ -125,621 +123,428 @@ index 000000000000..34f4f641a935
 +#undef pr_fmt
 +#define pr_fmt(fmt) KBUILD_MODNAME " L" __stringify(__LINE__) ": " fmt
 +
-+#include <linux/module.h>
-+#include <linux/inet.h>
++#include "rtrs-clt.h"
 +
-+#include "rtrs-pri.h"
-+#include "rtrs-log.h"
-+
-+MODULE_DESCRIPTION("RTRS Core");
-+MODULE_LICENSE("GPL");
-+
-+struct rtrs_iu *rtrs_iu_alloc(u32 queue_size, size_t size, gfp_t gfp_mask,
-+				struct ib_device *dma_dev,
-+				enum dma_data_direction dir,
-+				void (*done)(struct ib_cq *cq,
-+					     struct ib_wc *wc))
++static inline int rtrs_clt_ms_to_id(unsigned long ms)
 +{
-+	struct rtrs_iu *ius, *iu;
-+	int i;
++	int id = ms ? ilog2(ms) - MIN_LOG_LAT + 1 : 0;
 +
-+	WARN_ON(!queue_size);
-+	ius = kcalloc(queue_size, sizeof(*ius), gfp_mask);
-+
-+	if (unlikely(!ius))
-+		return NULL;
-+	for (i = 0; i < queue_size; i++) {
-+		iu = &ius[i];
-+		iu->buf = kzalloc(size, gfp_mask);
-+		if (unlikely(!iu->buf))
-+			goto err;
-+
-+		iu->dma_addr = ib_dma_map_single(dma_dev, iu->buf, size, dir);
-+		if (unlikely(ib_dma_mapping_error(dma_dev, iu->dma_addr)))
-+			goto err;
-+
-+		iu->cqe.done  = done;
-+		iu->size      = size;
-+		iu->direction = dir;
-+	}
-+
-+	return ius;
-+
-+err:
-+	rtrs_iu_free(ius, dir, dma_dev, i);
-+
-+	return NULL;
++	return clamp(id, 0, LOG_LAT_SZ - 1);
 +}
-+EXPORT_SYMBOL_GPL(rtrs_iu_alloc);
 +
-+void rtrs_iu_free(struct rtrs_iu *ius, enum dma_data_direction dir,
-+		   struct ib_device *ibdev, u32 queue_size)
++void rtrs_clt_update_rdma_lat(struct rtrs_clt_stats *stats, bool read,
++			       unsigned long ms)
 +{
-+	struct rtrs_iu *iu;
-+	int i;
++	struct rtrs_clt_stats_pcpu *s;
++	int id;
 +
-+	if (!ius)
-+		return;
-+
-+	for (i = 0; i < queue_size; i++) {
-+		iu = &ius[i];
-+		ib_dma_unmap_single(ibdev, iu->dma_addr, iu->size, dir);
-+		kfree(iu->buf);
-+	}
-+	kfree(ius);
-+}
-+EXPORT_SYMBOL_GPL(rtrs_iu_free);
-+
-+int rtrs_iu_post_recv(struct rtrs_con *con, struct rtrs_iu *iu)
-+{
-+	struct rtrs_sess *sess = con->sess;
-+	struct ib_recv_wr wr;
-+	const struct ib_recv_wr *bad_wr;
-+	struct ib_sge list;
-+
-+	list.addr   = iu->dma_addr;
-+	list.length = iu->size;
-+	list.lkey   = sess->dev->ib_pd->local_dma_lkey;
-+
-+	if (WARN_ON(list.length == 0)) {
-+		rtrs_wrn(con->sess,
-+			  "Posting receive work request failed, sg list is empty\n");
-+		return -EINVAL;
-+	}
-+
-+	wr.next    = NULL;
-+	wr.wr_cqe  = &iu->cqe;
-+	wr.sg_list = &list;
-+	wr.num_sge = 1;
-+
-+	return ib_post_recv(con->qp, &wr, &bad_wr);
-+}
-+EXPORT_SYMBOL_GPL(rtrs_iu_post_recv);
-+
-+int rtrs_post_recv_empty(struct rtrs_con *con, struct ib_cqe *cqe)
-+{
-+	struct ib_recv_wr wr;
-+	const struct ib_recv_wr *bad_wr;
-+
-+	wr.next    = NULL;
-+	wr.wr_cqe  = cqe;
-+	wr.sg_list = NULL;
-+	wr.num_sge = 0;
-+
-+	return ib_post_recv(con->qp, &wr, &bad_wr);
-+}
-+EXPORT_SYMBOL_GPL(rtrs_post_recv_empty);
-+
-+int rtrs_post_recv_empty_x2(struct rtrs_con *con, struct ib_cqe *cqe)
-+{
-+	struct ib_recv_wr wr_arr[2], *wr;
-+	const struct ib_recv_wr *bad_wr;
-+	int i;
-+
-+	memset(wr_arr, 0, sizeof(wr_arr));
-+	for (i = 0; i < ARRAY_SIZE(wr_arr); i++) {
-+		wr = &wr_arr[i];
-+		wr->wr_cqe  = cqe;
-+		if (i)
-+			/* Chain backwards */
-+			wr->next = &wr_arr[i - 1];
-+	}
-+
-+	return ib_post_recv(con->qp, wr, &bad_wr);
-+}
-+EXPORT_SYMBOL_GPL(rtrs_post_recv_empty_x2);
-+
-+int rtrs_iu_post_send(struct rtrs_con *con, struct rtrs_iu *iu, size_t size,
-+		       struct ib_send_wr *head)
-+{
-+	struct rtrs_sess *sess = con->sess;
-+	struct ib_send_wr wr;
-+	const struct ib_send_wr *bad_wr;
-+	struct ib_sge list;
-+
-+	if ((WARN_ON(size == 0)))
-+		return -EINVAL;
-+
-+	list.addr   = iu->dma_addr;
-+	list.length = size;
-+	list.lkey   = sess->dev->ib_pd->local_dma_lkey;
-+
-+	memset(&wr, 0, sizeof(wr));
-+	wr.next       = NULL;
-+	wr.wr_cqe     = &iu->cqe;
-+	wr.sg_list    = &list;
-+	wr.num_sge    = 1;
-+	wr.opcode     = IB_WR_SEND;
-+	wr.send_flags = IB_SEND_SIGNALED;
-+
-+	if (head) {
-+		struct ib_send_wr *tail = head;
-+
-+		while (tail->next)
-+			tail = tail->next;
-+		tail->next = &wr;
++	id = rtrs_clt_ms_to_id(ms);
++	s = this_cpu_ptr(stats->pcpu_stats);
++	if (read) {
++		s->rdma_lat_distr[id].read++;
++		if (s->rdma_lat_max.read < ms)
++			s->rdma_lat_max.read = ms;
 +	} else {
-+		head = &wr;
-+	}
-+
-+	return ib_post_send(con->qp, head, &bad_wr);
-+}
-+EXPORT_SYMBOL_GPL(rtrs_iu_post_send);
-+
-+int rtrs_iu_post_rdma_write_imm(struct rtrs_con *con, struct rtrs_iu *iu,
-+				 struct ib_sge *sge, unsigned int num_sge,
-+				 u32 rkey, u64 rdma_addr, u32 imm_data,
-+				 enum ib_send_flags flags,
-+				 struct ib_send_wr *head)
-+{
-+	const struct ib_send_wr *bad_wr;
-+	struct ib_rdma_wr wr;
-+	int i;
-+
-+	wr.wr.next	  = NULL;
-+	wr.wr.wr_cqe	  = &iu->cqe;
-+	wr.wr.sg_list	  = sge;
-+	wr.wr.num_sge	  = num_sge;
-+	wr.rkey		  = rkey;
-+	wr.remote_addr	  = rdma_addr;
-+	wr.wr.opcode	  = IB_WR_RDMA_WRITE_WITH_IMM;
-+	wr.wr.ex.imm_data = cpu_to_be32(imm_data);
-+	wr.wr.send_flags  = flags;
-+
-+	/*
-+	 * If one of the sges has 0 size, the operation will fail with an
-+	 * length error
-+	 */
-+	for (i = 0; i < num_sge; i++)
-+		if (WARN_ON(sge[i].length == 0))
-+			return -EINVAL;
-+
-+	if (head) {
-+		struct ib_send_wr *tail = head;
-+
-+		while (tail->next)
-+			tail = tail->next;
-+		tail->next = &wr.wr;
-+	} else {
-+		head = &wr.wr;
-+	}
-+
-+	return ib_post_send(con->qp, head, &bad_wr);
-+}
-+EXPORT_SYMBOL_GPL(rtrs_iu_post_rdma_write_imm);
-+
-+int rtrs_post_rdma_write_imm_empty(struct rtrs_con *con, struct ib_cqe *cqe,
-+				    u32 imm_data, enum ib_send_flags flags,
-+				    struct ib_send_wr *head)
-+{
-+	struct ib_send_wr wr;
-+	const struct ib_send_wr *bad_wr;
-+
-+	memset(&wr, 0, sizeof(wr));
-+	wr.wr_cqe	= cqe;
-+	wr.send_flags	= flags;
-+	wr.opcode	= IB_WR_RDMA_WRITE_WITH_IMM;
-+	wr.ex.imm_data	= cpu_to_be32(imm_data);
-+
-+	if (head) {
-+		struct ib_send_wr *tail = head;
-+
-+		while (tail->next)
-+			tail = tail->next;
-+		tail->next = &wr;
-+	} else {
-+		head = &wr;
-+	}
-+
-+	return ib_post_send(con->qp, head, &bad_wr);
-+}
-+EXPORT_SYMBOL_GPL(rtrs_post_rdma_write_imm_empty);
-+
-+static void qp_event_handler(struct ib_event *ev, void *ctx)
-+{
-+	struct rtrs_con *con = ctx;
-+
-+	switch (ev->event) {
-+	case IB_EVENT_COMM_EST:
-+		rtrs_info(con->sess, "QP event %s (%d) received\n",
-+			   ib_event_msg(ev->event), ev->event);
-+		rdma_notify(con->cm_id, IB_EVENT_COMM_EST);
-+		break;
-+	default:
-+		rtrs_info(con->sess, "Unhandled QP event %s (%d) received\n",
-+			   ib_event_msg(ev->event), ev->event);
-+		break;
++		s->rdma_lat_distr[id].write++;
++		if (s->rdma_lat_max.write < ms)
++			s->rdma_lat_max.write = ms;
 +	}
 +}
 +
-+static int create_cq(struct rtrs_con *con, int cq_vector, u16 cq_size,
-+		     enum ib_poll_context poll_ctx)
++void rtrs_clt_decrease_inflight(struct rtrs_clt_stats *stats)
 +{
-+	struct rdma_cm_id *cm_id = con->cm_id;
-+	struct ib_cq *cq;
-+
-+	cq = ib_alloc_cq(cm_id->device, con, cq_size,
-+			 cq_vector, poll_ctx);
-+	if (IS_ERR(cq)) {
-+		rtrs_err(con->sess, "Creating completion queue failed, errno: %ld\n",
-+			  PTR_ERR(cq));
-+		return PTR_ERR(cq);
-+	}
-+	con->cq = cq;
-+
-+	return 0;
++	atomic_dec(&stats->inflight);
 +}
 +
-+static int create_qp(struct rtrs_con *con, struct ib_pd *pd,
-+		     u16 wr_queue_size, u32 max_sge)
++void rtrs_clt_update_wc_stats(struct rtrs_clt_con *con)
 +{
-+	struct ib_qp_init_attr init_attr = {NULL};
-+	struct rdma_cm_id *cm_id = con->cm_id;
-+	int ret;
++	struct rtrs_clt_sess *sess = to_clt_sess(con->c.sess);
++	struct rtrs_clt_stats *stats = &sess->stats;
++	struct rtrs_clt_stats_pcpu *s;
++	int cpu;
 +
-+	init_attr.cap.max_send_wr = wr_queue_size;
-+	init_attr.cap.max_recv_wr = wr_queue_size;
-+	init_attr.cap.max_recv_sge = 1;
-+	init_attr.event_handler = qp_event_handler;
-+	init_attr.qp_context = con;
-+#undef max_send_sge
-+	init_attr.cap.max_send_sge = max_sge;
++	cpu = raw_smp_processor_id();
++	s = this_cpu_ptr(stats->pcpu_stats);
++	s->wc_comp.cnt++;
++	s->wc_comp.total_cnt++;
++	if (unlikely(con->cpu != cpu)) {
++		s->cpu_migr.to++;
 +
-+	init_attr.qp_type = IB_QPT_RC;
-+	init_attr.send_cq = con->cq;
-+	init_attr.recv_cq = con->cq;
-+	init_attr.sq_sig_type = IB_SIGNAL_REQ_WR;
-+
-+	ret = rdma_create_qp(cm_id, pd, &init_attr);
-+	if (unlikely(ret)) {
-+		rtrs_err(con->sess, "Creating QP failed, err: %d\n", ret);
-+		return ret;
-+	}
-+	con->qp = cm_id->qp;
-+
-+	return ret;
-+}
-+
-+int rtrs_cq_qp_create(struct rtrs_sess *sess, struct rtrs_con *con,
-+		       u32 max_send_sge, int cq_vector, u16 cq_size,
-+		       u16 wr_queue_size, enum ib_poll_context poll_ctx)
-+{
-+	int err;
-+
-+	err = create_cq(con, cq_vector, cq_size, poll_ctx);
-+	if (unlikely(err))
-+		return err;
-+
-+	err = create_qp(con, sess->dev->ib_pd, wr_queue_size, max_send_sge);
-+	if (unlikely(err)) {
-+		ib_free_cq(con->cq);
-+		con->cq = NULL;
-+		return err;
-+	}
-+	con->sess = sess;
-+
-+	return 0;
-+}
-+EXPORT_SYMBOL_GPL(rtrs_cq_qp_create);
-+
-+void rtrs_cq_qp_destroy(struct rtrs_con *con)
-+{
-+	if (con->qp) {
-+		rdma_destroy_qp(con->cm_id);
-+		con->qp = NULL;
-+	}
-+	if (con->cq) {
-+		ib_free_cq(con->cq);
-+		con->cq = NULL;
++		/* Careful here, override s pointer */
++		s = per_cpu_ptr(stats->pcpu_stats, con->cpu);
++		atomic_inc(&s->cpu_migr.from);
 +	}
 +}
-+EXPORT_SYMBOL_GPL(rtrs_cq_qp_destroy);
 +
-+static void schedule_hb(struct rtrs_sess *sess)
++void rtrs_clt_inc_failover_cnt(struct rtrs_clt_stats *stats)
 +{
-+	queue_delayed_work(sess->hb_wq, &sess->hb_dwork,
-+			   msecs_to_jiffies(sess->hb_interval_ms));
++	struct rtrs_clt_stats_pcpu *s;
++
++	s = this_cpu_ptr(stats->pcpu_stats);
++	s->rdma.failover_cnt++;
 +}
 +
-+void rtrs_send_hb_ack(struct rtrs_sess *sess)
++static inline u32 rtrs_clt_stats_get_avg_wc_cnt(struct rtrs_clt_stats *stats)
 +{
-+	struct rtrs_con *usr_con = sess->con[0];
-+	u32 imm;
-+	int err;
++	u32 cnt = 0;
++	u64 sum = 0;
++	int cpu;
 +
-+	imm = rtrs_to_imm(RTRS_HB_ACK_IMM, 0);
-+	err = rtrs_post_rdma_write_imm_empty(usr_con, sess->hb_cqe, imm,
-+					      IB_SEND_SIGNALED, NULL);
-+	if (unlikely(err)) {
-+		sess->hb_err_handler(usr_con);
-+		return;
-+	}
-+}
-+EXPORT_SYMBOL_GPL(rtrs_send_hb_ack);
++	for_each_possible_cpu(cpu) {
++		struct rtrs_clt_stats_pcpu *s;
 +
-+static void hb_work(struct work_struct *work)
-+{
-+	struct rtrs_con *usr_con;
-+	struct rtrs_sess *sess;
-+	u32 imm;
-+	int err;
-+
-+	sess = container_of(to_delayed_work(work), typeof(*sess), hb_dwork);
-+	usr_con = sess->con[0];
-+
-+	if (sess->hb_missed_cnt > sess->hb_missed_max) {
-+		sess->hb_err_handler(usr_con);
-+		return;
-+	}
-+	if (sess->hb_missed_cnt++) {
-+		/* Reschedule work without sending hb */
-+		schedule_hb(sess);
-+		return;
-+	}
-+	imm = rtrs_to_imm(RTRS_HB_MSG_IMM, 0);
-+	err = rtrs_post_rdma_write_imm_empty(usr_con, sess->hb_cqe, imm,
-+					      IB_SEND_SIGNALED, NULL);
-+	if (unlikely(err)) {
-+		sess->hb_err_handler(usr_con);
-+		return;
++		s = per_cpu_ptr(stats->pcpu_stats, cpu);
++		sum += s->wc_comp.total_cnt;
++		cnt += s->wc_comp.cnt;
 +	}
 +
-+	schedule_hb(sess);
++	return cnt ? sum / cnt : 0;
 +}
 +
-+void rtrs_init_hb(struct rtrs_sess *sess, struct ib_cqe *cqe,
-+		   unsigned int interval_ms, unsigned int missed_max,
-+		   rtrs_hb_handler_t *err_handler,
-+		   struct workqueue_struct *wq)
++int rtrs_clt_stats_wc_completion_to_str(struct rtrs_clt_stats *stats,
++					 char *buf, size_t len)
 +{
-+	sess->hb_cqe = cqe;
-+	sess->hb_interval_ms = interval_ms;
-+	sess->hb_err_handler = err_handler;
-+	sess->hb_wq = wq;
-+	sess->hb_missed_max = missed_max;
-+	sess->hb_missed_cnt = 0;
-+	INIT_DELAYED_WORK(&sess->hb_dwork, hb_work);
-+}
-+EXPORT_SYMBOL_GPL(rtrs_init_hb);
-+
-+void rtrs_start_hb(struct rtrs_sess *sess)
-+{
-+	schedule_hb(sess);
-+}
-+EXPORT_SYMBOL_GPL(rtrs_start_hb);
-+
-+void rtrs_stop_hb(struct rtrs_sess *sess)
-+{
-+	cancel_delayed_work_sync(&sess->hb_dwork);
-+	sess->hb_missed_cnt = 0;
-+	sess->hb_missed_max = 0;
-+}
-+EXPORT_SYMBOL_GPL(rtrs_stop_hb);
-+
-+static int rtrs_str_gid_to_sockaddr(const char *addr, size_t len,
-+				     short port, struct sockaddr_storage *dst)
-+{
-+	struct sockaddr_ib *dst_ib = (struct sockaddr_ib *)dst;
-+	int ret;
-+
-+	/*
-+	 * We can use some of the I6 functions since GID is a valid
-+	 * IPv6 address format
-+	 */
-+	ret = in6_pton(addr, len, dst_ib->sib_addr.sib_raw, '\0', NULL);
-+	if (ret == 0)
-+		return -EINVAL;
-+
-+	dst_ib->sib_family = AF_IB;
-+	/*
-+	 * Use the same TCP server port number as the IB service ID
-+	 * on the IB port space range
-+	 */
-+	dst_ib->sib_sid = cpu_to_be64(RDMA_IB_IP_PS_IB | port);
-+	dst_ib->sib_sid_mask = cpu_to_be64(0xffffffffffffffffULL);
-+	dst_ib->sib_pkey = cpu_to_be16(0xffff);
-+
-+	return 0;
++	return scnprintf(buf, len, "%u\n",
++			 rtrs_clt_stats_get_avg_wc_cnt(stats));
 +}
 +
-+/**
-+ * rtrs_str_to_sockaddr() - Convert rtrs address string to sockaddr
-+ * @addr:	String representation of an addr (IPv4, IPv6 or IB GID):
-+ *              - "ip:192.168.1.1"
-+ *              - "ip:fe80::200:5aee:feaa:20a2"
-+ *              - "gid:fe80::200:5aee:feaa:20a2"
-+ * @len:        String address length
-+ * @port:	Destination port
-+ * @dst:	Destination sockaddr structure
-+ *
-+ * Returns 0 if conversion successful. Non-zero on error.
-+ */
-+static int rtrs_str_to_sockaddr(const char *addr, size_t len,
-+				 short port, struct sockaddr_storage *dst)
++ssize_t rtrs_clt_stats_rdma_lat_distr_to_str(struct rtrs_clt_stats *stats,
++					      char *page, size_t len)
 +{
-+	if (strncmp(addr, "gid:", 4) == 0) {
-+		return rtrs_str_gid_to_sockaddr(addr + 4, len - 4, port, dst);
-+	} else if (strncmp(addr, "ip:", 3) == 0) {
-+		char port_str[8];
-+		char *cpy;
-+		int err;
++	struct rtrs_clt_stats_rdma_lat res[LOG_LAT_SZ];
++	struct rtrs_clt_stats_rdma_lat max;
++	struct rtrs_clt_stats_pcpu *s;
 +
-+		snprintf(port_str, sizeof(port_str), "%u", port);
-+		cpy = kstrndup(addr + 3, len - 3, GFP_KERNEL);
-+		err = cpy ? inet_pton_with_scope(&init_net, AF_UNSPEC,
-+						 cpy, port_str, dst) : -ENOMEM;
-+		kfree(cpy);
++	ssize_t cnt = 0;
++	int i, cpu;
 +
-+		return err;
++	max.write = 0;
++	max.read = 0;
++	for_each_possible_cpu(cpu) {
++		s = per_cpu_ptr(stats->pcpu_stats, cpu);
++
++		if (max.write < s->rdma_lat_max.write)
++			max.write = s->rdma_lat_max.write;
++		if (max.read < s->rdma_lat_max.read)
++			max.read = s->rdma_lat_max.read;
 +	}
-+	return -EPROTONOSUPPORT;
-+}
++	for (i = 0; i < ARRAY_SIZE(res); i++) {
++		res[i].write = 0;
++		res[i].read = 0;
++		for_each_possible_cpu(cpu) {
++			s = per_cpu_ptr(stats->pcpu_stats, cpu);
 +
-+int sockaddr_to_str(const struct sockaddr *addr, char *buf, size_t len)
-+{
-+	int cnt;
-+
-+	switch (addr->sa_family) {
-+	case AF_IB:
-+		cnt = scnprintf(buf, len, "gid:%pI6",
-+			&((struct sockaddr_ib *)addr)->sib_addr.sib_raw);
-+		return cnt;
-+	case AF_INET:
-+		cnt = scnprintf(buf, len, "ip:%pI4",
-+			&((struct sockaddr_in *)addr)->sin_addr);
-+		return cnt;
-+	case AF_INET6:
-+		cnt = scnprintf(buf, len, "ip:%pI6c",
-+			  &((struct sockaddr_in6 *)addr)->sin6_addr);
-+		return cnt;
++			res[i].write += s->rdma_lat_distr[i].write;
++			res[i].read += s->rdma_lat_distr[i].read;
++		}
 +	}
-+	cnt = scnprintf(buf, len, "<invalid address family>");
-+	pr_err("Invalid address family\n");
++
++	for (i = 0; i < ARRAY_SIZE(res) - 1; i++)
++		cnt += scnprintf(page + cnt, len - cnt,
++				 "< %6d ms: %llu %llu\n",
++				 1 << (i + MIN_LOG_LAT), res[i].read,
++				 res[i].write);
++	cnt += scnprintf(page + cnt, len - cnt, ">= %5d ms: %llu %llu\n",
++			 1 << (i - 1 + MIN_LOG_LAT), res[i].read,
++			 res[i].write);
++	cnt += scnprintf(page + cnt, len - cnt, " maximum ms: %llu %llu\n",
++			 max.read, max.write);
++
 +	return cnt;
 +}
-+EXPORT_SYMBOL(sockaddr_to_str);
 +
-+int rtrs_addr_to_sockaddr(const char *str, size_t len, short port,
-+			   struct rtrs_addr *addr)
++int rtrs_clt_stats_migration_cnt_to_str(struct rtrs_clt_stats *stats,
++					 char *buf, size_t len)
 +{
-+	const char *d;
-+	int ret;
++	struct rtrs_clt_stats_pcpu *s;
 +
-+	d = strchr(str, ',');
-+	if (!d)
-+		d = strchr(str, '@');
-+	if (d) {
-+		if (rtrs_str_to_sockaddr(str, d - str, 0, addr->src))
-+			return -EINVAL;
-+		d += 1;
-+		len -= d - str;
-+		str  = d;
++	size_t used;
++	int cpu;
 +
-+	} else {
-+		addr->src = NULL;
++	used = scnprintf(buf, len, "    ");
++	for_each_possible_cpu(cpu)
++		used += scnprintf(buf + used, len - used, " CPU%u", cpu);
++
++	used += scnprintf(buf + used, len - used, "\nfrom:");
++	for_each_possible_cpu(cpu) {
++		s = per_cpu_ptr(stats->pcpu_stats, cpu);
++		used += scnprintf(buf + used, len - used, " %d",
++				  atomic_read(&s->cpu_migr.from));
 +	}
-+	ret = rtrs_str_to_sockaddr(str, len, port, addr->dst);
 +
-+	return ret;
-+}
-+EXPORT_SYMBOL(rtrs_addr_to_sockaddr);
-+
-+void rtrs_ib_dev_pool_init(enum ib_pd_flags pd_flags,
-+			    struct rtrs_ib_dev_pool *pool)
-+{
-+	WARN_ON(pool->ops && (!pool->ops->alloc ^ !pool->ops->free));
-+	INIT_LIST_HEAD(&pool->list);
-+	mutex_init(&pool->mutex);
-+	pool->pd_flags = pd_flags;
-+}
-+EXPORT_SYMBOL(rtrs_ib_dev_pool_init);
-+
-+void rtrs_ib_dev_pool_deinit(struct rtrs_ib_dev_pool *pool)
-+{
-+	WARN_ON(!list_empty(&pool->list));
-+}
-+EXPORT_SYMBOL(rtrs_ib_dev_pool_deinit);
-+
-+static void dev_free(struct kref *ref)
-+{
-+	struct rtrs_ib_dev_pool *pool;
-+	struct rtrs_ib_dev *dev;
-+
-+	dev = container_of(ref, typeof(*dev), ref);
-+	pool = dev->pool;
-+
-+	mutex_lock(&pool->mutex);
-+	list_del(&dev->entry);
-+	mutex_unlock(&pool->mutex);
-+
-+	if (pool->ops && pool->ops->deinit)
-+		pool->ops->deinit(dev);
-+
-+	ib_dealloc_pd(dev->ib_pd);
-+
-+	if (pool->ops && pool->ops->free)
-+		pool->ops->free(dev);
-+	else
-+		kfree(dev);
-+}
-+
-+int rtrs_ib_dev_put(struct rtrs_ib_dev *dev)
-+{
-+	return kref_put(&dev->ref, dev_free);
-+}
-+EXPORT_SYMBOL(rtrs_ib_dev_put);
-+
-+static int rtrs_ib_dev_get(struct rtrs_ib_dev *dev)
-+{
-+	return kref_get_unless_zero(&dev->ref);
-+}
-+
-+struct rtrs_ib_dev *
-+rtrs_ib_dev_find_or_add(struct ib_device *ib_dev,
-+			 struct rtrs_ib_dev_pool *pool)
-+{
-+	struct rtrs_ib_dev *dev;
-+
-+	mutex_lock(&pool->mutex);
-+	list_for_each_entry(dev, &pool->list, entry) {
-+		if (dev->ib_dev->node_guid == ib_dev->node_guid &&
-+		    rtrs_ib_dev_get(dev))
-+			goto out_unlock;
++	used += scnprintf(buf + used, len - used, "\nto  :");
++	for_each_possible_cpu(cpu) {
++		s = per_cpu_ptr(stats->pcpu_stats, cpu);
++		used += scnprintf(buf + used, len - used, " %d",
++				  s->cpu_migr.to);
 +	}
-+	if (pool->ops && pool->ops->alloc)
-+		dev = pool->ops->alloc();
-+	else
-+		dev = kzalloc(sizeof(*dev), GFP_KERNEL);
-+	if (IS_ERR_OR_NULL(dev))
-+		goto out_err;
++	used += scnprintf(buf + used, len - used, "\n");
 +
-+	kref_init(&dev->ref);
-+	dev->pool = pool;
-+	dev->ib_dev = ib_dev;
-+	dev->ib_pd = ib_alloc_pd(ib_dev, pool->pd_flags);
-+	if (IS_ERR(dev->ib_pd))
-+		goto out_free_dev;
-+
-+	if (pool->ops && pool->ops->init && pool->ops->init(dev))
-+		goto out_free_pd;
-+
-+	list_add(&dev->entry, &pool->list);
-+out_unlock:
-+	mutex_unlock(&pool->mutex);
-+	return dev;
-+
-+out_free_pd:
-+	ib_dealloc_pd(dev->ib_pd);
-+out_free_dev:
-+	if (pool->ops && pool->ops->free)
-+		pool->ops->free(dev);
-+	else
-+		kfree(dev);
-+out_err:
-+	mutex_unlock(&pool->mutex);
-+	return NULL;
++	return used;
 +}
-+EXPORT_SYMBOL(rtrs_ib_dev_find_or_add);
++
++int rtrs_clt_stats_reconnects_to_str(struct rtrs_clt_stats *stats, char *buf,
++				      size_t len)
++{
++	return scnprintf(buf, len, "%d %d\n",
++			 stats->reconnects.successful_cnt,
++			 stats->reconnects.fail_cnt);
++}
++
++ssize_t rtrs_clt_stats_rdma_to_str(struct rtrs_clt_stats *stats,
++				    char *page, size_t len)
++{
++	struct rtrs_clt_stats_rdma sum;
++	struct rtrs_clt_stats_rdma *r;
++	int cpu;
++
++	memset(&sum, 0, sizeof(sum));
++
++	for_each_possible_cpu(cpu) {
++		r = &per_cpu_ptr(stats->pcpu_stats, cpu)->rdma;
++
++		sum.dir[READ].cnt	  += r->dir[READ].cnt;
++		sum.dir[READ].size_total  += r->dir[READ].size_total;
++		sum.dir[WRITE].cnt	  += r->dir[WRITE].cnt;
++		sum.dir[WRITE].size_total += r->dir[WRITE].size_total;
++		sum.failover_cnt	  += r->failover_cnt;
++	}
++
++	return scnprintf(page, len, "%llu %llu %llu %llu %u %llu\n",
++			 sum.dir[READ].cnt, sum.dir[READ].size_total,
++			 sum.dir[WRITE].cnt, sum.dir[WRITE].size_total,
++			 atomic_read(&stats->inflight), sum.failover_cnt);
++}
++
++int rtrs_clt_stats_sg_list_distr_to_str(struct rtrs_clt_stats *stats,
++					 char *buf, size_t len)
++{
++	struct rtrs_clt_stats_pcpu *s;
++
++	int i, cpu, cnt;
++
++	cnt = scnprintf(buf, len, "n\\cpu:");
++	for_each_possible_cpu(cpu)
++		cnt += scnprintf(buf + cnt, len - cnt, "%5d", cpu);
++
++	for (i = 0; i < SG_DISTR_SZ; i++) {
++		if (i <= MAX_LIN_SG)
++			cnt += scnprintf(buf + cnt, len - cnt, "\n= %3d:", i);
++		else if (i < SG_DISTR_SZ - 1)
++			cnt += scnprintf(buf + cnt, len - cnt, "\n< %3d:",
++					 1 << (i + MIN_LOG_SG - MAX_LIN_SG));
++		else
++			cnt += scnprintf(buf + cnt, len - cnt, "\n>=%3d:",
++					 1 << (i + MIN_LOG_SG -
++					       MAX_LIN_SG - 1));
++
++		for_each_possible_cpu(cpu) {
++			unsigned int p, p_i, p_f;
++			u64 total, distr;
++
++			s = per_cpu_ptr(stats->pcpu_stats, cpu);
++			total = s->sg_list_total;
++			distr = s->sg_list_distr[i];
++
++			p = total ? distr * 1000 / total : 0;
++			p_i = p / 10;
++			p_f = p % 10;
++
++			if (distr)
++				cnt += scnprintf(buf + cnt, len - cnt,
++						 " %2u.%01u", p_i, p_f);
++			else
++				cnt += scnprintf(buf + cnt, len - cnt, "    0");
++		}
++	}
++
++	cnt += scnprintf(buf + cnt, len - cnt, "\ntotal:");
++	for_each_possible_cpu(cpu) {
++		s = per_cpu_ptr(stats->pcpu_stats, cpu);
++		cnt += scnprintf(buf + cnt, len - cnt, " %llu",
++				 s->sg_list_total);
++	}
++	cnt += scnprintf(buf + cnt, len - cnt, "\n");
++
++	return cnt;
++}
++
++ssize_t rtrs_clt_reset_all_help(struct rtrs_clt_stats *s,
++				 char *page, size_t len)
++{
++	return scnprintf(page, len, "echo 1 to reset all statistics\n");
++}
++
++int rtrs_clt_reset_rdma_stats(struct rtrs_clt_stats *stats, bool enable)
++{
++	struct rtrs_clt_stats_pcpu *s;
++	int cpu;
++
++	if (unlikely(!enable))
++		return -EINVAL;
++
++	for_each_possible_cpu(cpu) {
++		s = per_cpu_ptr(stats->pcpu_stats, cpu);
++		memset(&s->rdma, 0, sizeof(s->rdma));
++	}
++
++	return 0;
++}
++
++int rtrs_clt_reset_rdma_lat_distr_stats(struct rtrs_clt_stats *stats,
++					 bool enable)
++{
++	struct rtrs_clt_stats_pcpu *s;
++	int cpu;
++
++	if (enable) {
++		for_each_possible_cpu(cpu) {
++			s = per_cpu_ptr(stats->pcpu_stats, cpu);
++			memset(&s->rdma_lat_max, 0, sizeof(s->rdma_lat_max));
++			memset(&s->rdma_lat_distr, 0,
++			       sizeof(s->rdma_lat_distr));
++		}
++	}
++	stats->enable_rdma_lat = enable;
++
++	return 0;
++}
++
++int rtrs_clt_reset_sg_list_distr_stats(struct rtrs_clt_stats *stats,
++					bool enable)
++{
++	struct rtrs_clt_stats_pcpu *s;
++	int cpu;
++
++	if (unlikely(!enable))
++		return -EINVAL;
++
++	for_each_possible_cpu(cpu) {
++		s = per_cpu_ptr(stats->pcpu_stats, cpu);
++		memset(&s->sg_list_total, 0, sizeof(s->sg_list_total));
++		memset(&s->sg_list_distr, 0, sizeof(s->sg_list_distr));
++	}
++
++	return 0;
++}
++
++int rtrs_clt_reset_cpu_migr_stats(struct rtrs_clt_stats *stats, bool enable)
++{
++	struct rtrs_clt_stats_pcpu *s;
++	int cpu;
++
++	if (unlikely(!enable))
++		return -EINVAL;
++
++	for_each_possible_cpu(cpu) {
++		s = per_cpu_ptr(stats->pcpu_stats, cpu);
++		memset(&s->cpu_migr, 0, sizeof(s->cpu_migr));
++	}
++
++	return 0;
++}
++
++int rtrs_clt_reset_reconnects_stat(struct rtrs_clt_stats *stats, bool enable)
++{
++	if (unlikely(!enable))
++		return -EINVAL;
++
++	memset(&stats->reconnects, 0, sizeof(stats->reconnects));
++
++	return 0;
++}
++
++int rtrs_clt_reset_wc_comp_stats(struct rtrs_clt_stats *stats, bool enable)
++{
++	struct rtrs_clt_stats_pcpu *s;
++	int cpu;
++
++	if (unlikely(!enable))
++		return -EINVAL;
++
++	for_each_possible_cpu(cpu) {
++		s = per_cpu_ptr(stats->pcpu_stats, cpu);
++		memset(&s->wc_comp, 0, sizeof(s->wc_comp));
++	}
++
++	return 0;
++}
++
++int rtrs_clt_reset_all_stats(struct rtrs_clt_stats *s, bool enable)
++{
++	if (enable) {
++		rtrs_clt_reset_rdma_stats(s, enable);
++		rtrs_clt_reset_rdma_lat_distr_stats(s, enable);
++		rtrs_clt_reset_sg_list_distr_stats(s, enable);
++		rtrs_clt_reset_cpu_migr_stats(s, enable);
++		rtrs_clt_reset_reconnects_stat(s, enable);
++		rtrs_clt_reset_wc_comp_stats(s, enable);
++		atomic_set(&s->inflight, 0);
++		return 0;
++	}
++
++	return -EINVAL;
++}
++
++static inline void rtrs_clt_record_sg_distr(u64 stat[SG_DISTR_SZ], u64 *total,
++					     unsigned int cnt)
++{
++	int i;
++
++	i = cnt > MAX_LIN_SG ? ilog2(cnt) + MAX_LIN_SG - MIN_LOG_SG + 1 : cnt;
++	i = i < SG_DISTR_SZ ? i : SG_DISTR_SZ - 1;
++
++	stat[i]++;
++	(*total)++;
++}
++
++static inline void rtrs_clt_update_rdma_stats(struct rtrs_clt_stats *stats,
++					       size_t size, int d)
++{
++	struct rtrs_clt_stats_pcpu *s;
++
++	s = this_cpu_ptr(stats->pcpu_stats);
++	s->rdma.dir[d].cnt++;
++	s->rdma.dir[d].size_total += size;
++}
++
++void rtrs_clt_update_all_stats(struct rtrs_clt_io_req *req, int dir)
++{
++	struct rtrs_clt_con *con = req->con;
++	struct rtrs_clt_sess *sess = to_clt_sess(con->c.sess);
++	struct rtrs_clt_stats *stats = &sess->stats;
++	unsigned int len;
++
++	struct rtrs_clt_stats_pcpu *s;
++
++	s = this_cpu_ptr(stats->pcpu_stats);
++	rtrs_clt_record_sg_distr(s->sg_list_distr, &s->sg_list_total,
++				  req->sg_cnt);
++	len = req->usr_len + req->data_len;
++	rtrs_clt_update_rdma_stats(stats, len, dir);
++	atomic_inc(&stats->inflight);
++}
++
++int rtrs_clt_init_stats(struct rtrs_clt_stats *stats)
++{
++	stats->enable_rdma_lat = false;
++	stats->pcpu_stats = alloc_percpu(typeof(*stats->pcpu_stats));
++	if (unlikely(!stats->pcpu_stats))
++		return -ENOMEM;
++
++	/*
++	 * successful_cnt will be set to 0 after session
++	 * is established for the first time
++	 */
++	stats->reconnects.successful_cnt = -1;
++
++	return 0;
++}
++
++void rtrs_clt_free_stats(struct rtrs_clt_stats *stats)
++{
++	free_percpu(stats->pcpu_stats);
++}
 -- 
 2.17.1
 
