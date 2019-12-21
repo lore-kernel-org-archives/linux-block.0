@@ -2,78 +2,117 @@ Return-Path: <SRS0=rhTN=2L=vger.kernel.org=linux-block-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-0.4 required=3.0 tests=FROM_LOCAL_HEX,
-	HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS
-	autolearn=no autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-0.8 required=3.0 tests=DKIMWL_WL_HIGH,DKIM_SIGNED,
+	DKIM_VALID,DKIM_VALID_AU,HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,
+	SPF_HELO_NONE,SPF_PASS,UNPARSEABLE_RELAY autolearn=no autolearn_force=no
+	version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id BC4C0C2D0C3
-	for <linux-block@archiver.kernel.org>; Sat, 21 Dec 2019 17:49:08 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 887C8C2D0C3
+	for <linux-block@archiver.kernel.org>; Sat, 21 Dec 2019 18:57:46 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.kernel.org (Postfix) with ESMTP id 9F13D2072B
-	for <linux-block@archiver.kernel.org>; Sat, 21 Dec 2019 17:49:08 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id 593A020665
+	for <linux-block@archiver.kernel.org>; Sat, 21 Dec 2019 18:57:46 +0000 (UTC)
+Authentication-Results: mail.kernel.org;
+	dkim=pass (2048-bit key) header.d=oracle.com header.i=@oracle.com header.b="YNcJqv62"
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1727015AbfLURtG (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Sat, 21 Dec 2019 12:49:06 -0500
-Received: from mail-io1-f69.google.com ([209.85.166.69]:33635 "EHLO
-        mail-io1-f69.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1727029AbfLURtD (ORCPT
+        id S1727101AbfLUS5p (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Sat, 21 Dec 2019 13:57:45 -0500
+Received: from userp2130.oracle.com ([156.151.31.86]:40626 "EHLO
+        userp2130.oracle.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S1726593AbfLUS5p (ORCPT
         <rfc822;linux-block@vger.kernel.org>);
-        Sat, 21 Dec 2019 12:49:03 -0500
-Received: by mail-io1-f69.google.com with SMTP id i8so8422244ioi.0
-        for <linux-block@vger.kernel.org>; Sat, 21 Dec 2019 09:49:01 -0800 (PST)
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20161025;
-        h=x-gm-message-state:mime-version:date:in-reply-to:message-id:subject
-         :from:to;
-        bh=GshsWrdoEPyx2vd7d7UXajSCgogocC5OTxKPrWDtn2k=;
-        b=ggcYXeqLzaSJSFvzBtLN1ozX4WrT4QBB0mPP5wtE/N9t7jrxCPECQPmU9nWasCtWcx
-         oo8Ou1OcfQFZJM2U1mbIET5Jk03MLrMRfxbSUlhdQWt3NyAZnhi9RbbtmdsdpXSiWf9X
-         TbpAdrEQY8nN60STFvGjVvtKUGqR+ALEK/f/T1ud3xwegYzWjkZhJZfkLqF9SHC73WGH
-         nPTbUrdwazggd+zxrRadCStpT3zpVFS2yGo2qADCsKxihYbiXDCgcLIpDM/Rfo8fq5Ik
-         GSjK/NCp1D1t9xW7uqRo1CGmWlh0jU3X+xGmczGXWeGG7CZnjvGfVhC0QKQT4Ma1JjRu
-         WGwg==
-X-Gm-Message-State: APjAAAXmZWk1pS0wiSbYMRjqdUmm9JOgnXXSYMeIHge1Mm5g5Sfm4gEy
-        nUid3FNLRRWgl0seMJLVxpyX5b5RslR3cpg6BdTgkdLLDQYh
-X-Google-Smtp-Source: APXvYqyCKPkUw/hvhEZzXqoyo1tTaKHhSZzOInzWI8gOHUFYW5HjZUeSJEoBRod5KvA94zqYvimn+I2NEHvJijo6waweNFndE35n
+        Sat, 21 Dec 2019 13:57:45 -0500
+Received: from pps.filterd (userp2130.oracle.com [127.0.0.1])
+        by userp2130.oracle.com (8.16.0.27/8.16.0.27) with SMTP id xBLIsYgC105795;
+        Sat, 21 Dec 2019 18:57:07 GMT
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=oracle.com; h=to : cc : subject :
+ from : references : date : in-reply-to : message-id : mime-version :
+ content-type; s=corp-2019-08-05;
+ bh=D2wcasH1ZhiCVNdqmYp9V03i7PEyRJEfWju3qTFe+5A=;
+ b=YNcJqv62W9/CZb6j+sLKFv8RjQJTMAMnpPgtc8agrx8zDCLYh0M/2VSc4RD0EcBxuCkT
+ qcx0O8gPGM/L1Ck8vp87nnMLr3OWmFEBbAaUY0FjlqvIeDuEvJJn1MRl6Iymgu2a5m+1
+ H2NOdQkL6IRUuxbWEkRPPOWp6vPU//khGOnt12U+Nn1XQoju7xqrY1yDrYHdl2se0ChA
+ X0Ff9V33AFUX5vdSNnLRUpIGQ6gFop/SIbYJ8Q6VaJODL9Sn4E+ETyUSC5dfZvm3LUwr
+ yIWfsermwHsVUUwiZJMRT3hVavh/0R+D+YtrK5B0Y5f2AMzbIKBvhy+xzSHe05WuaKbH Ww== 
+Received: from aserp3030.oracle.com (aserp3030.oracle.com [141.146.126.71])
+        by userp2130.oracle.com with ESMTP id 2x1att9mv4-1
+        (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=OK);
+        Sat, 21 Dec 2019 18:57:07 +0000
+Received: from pps.filterd (aserp3030.oracle.com [127.0.0.1])
+        by aserp3030.oracle.com (8.16.0.27/8.16.0.27) with SMTP id xBLIn6jb110474;
+        Sat, 21 Dec 2019 18:55:06 GMT
+Received: from userv0122.oracle.com (userv0122.oracle.com [156.151.31.75])
+        by aserp3030.oracle.com with ESMTP id 2x19f5ku4w-1
+        (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=OK);
+        Sat, 21 Dec 2019 18:55:06 +0000
+Received: from abhmp0015.oracle.com (abhmp0015.oracle.com [141.146.116.21])
+        by userv0122.oracle.com (8.14.4/8.14.4) with ESMTP id xBLIssO7006659;
+        Sat, 21 Dec 2019 18:54:56 GMT
+Received: from ca-mkp.ca.oracle.com (/10.159.214.123)
+        by default (Oracle Beehive Gateway v4.0)
+        with ESMTP ; Sat, 21 Dec 2019 10:54:54 -0800
+To:     Kirill Tkhai <ktkhai@virtuozzo.com>
+Cc:     "Martin K. Petersen" <martin.petersen@oracle.com>, axboe@kernel.dk,
+        linux-block@vger.kernel.org, linux-kernel@vger.kernel.org,
+        linux-ext4@vger.kernel.org, tytso@mit.edu,
+        adilger.kernel@dilger.ca, ming.lei@redhat.com, osandov@fb.com,
+        jthumshirn@suse.de, minwoo.im.dev@gmail.com, damien.lemoal@wdc.com,
+        andrea.parri@amarulasolutions.com, hare@suse.com, tj@kernel.org,
+        ajay.joshi@wdc.com, sagi@grimberg.me, dsterba@suse.com,
+        chaitanya.kulkarni@wdc.com, bvanassche@acm.org,
+        dhowells@redhat.com, asml.silence@gmail.com
+Subject: Re: [PATCH RFC 1/3] block: Add support for REQ_OP_ASSIGN_RANGE operation
+From:   "Martin K. Petersen" <martin.petersen@oracle.com>
+Organization: Oracle Corporation
+References: <157599668662.12112.10184894900037871860.stgit@localhost.localdomain>
+        <157599696813.12112.14140818972910110796.stgit@localhost.localdomain>
+        <yq1woatc8zd.fsf@oracle.com>
+        <3f2e341b-dea4-c5d0-8eb0-568b6ad2f17b@virtuozzo.com>
+        <yq1a77oc56s.fsf@oracle.com>
+        <625c9ee4-bedb-ff60-845e-2d440c4f58aa@virtuozzo.com>
+Date:   Sat, 21 Dec 2019 13:54:50 -0500
+In-Reply-To: <625c9ee4-bedb-ff60-845e-2d440c4f58aa@virtuozzo.com> (Kirill
+        Tkhai's message of "Fri, 20 Dec 2019 14:55:09 +0300")
+Message-ID: <yq1pngh7blx.fsf@oracle.com>
+User-Agent: Gnus/5.13 (Gnus v5.13) Emacs/26.1.92 (gnu/linux)
 MIME-Version: 1.0
-X-Received: by 2002:a92:d809:: with SMTP id y9mr18895833ilm.261.1576950541498;
- Sat, 21 Dec 2019 09:49:01 -0800 (PST)
-Date:   Sat, 21 Dec 2019 09:49:01 -0800
-In-Reply-To: <00000000000031376f059a31f9fb@google.com>
-X-Google-Appengine-App-Id: s~syzkaller
-X-Google-Appengine-App-Id-Alias: syzkaller
-Message-ID: <000000000000dac3b1059a3a684b@google.com>
-Subject: Re: WARNING: ODEBUG bug in io_sqe_files_unregister
-From:   syzbot <syzbot+6bf913476056cb0f8d13@syzkaller.appspotmail.com>
-To:     axboe@kernel.dk, io-uring@vger.kernel.org,
-        linux-block@vger.kernel.org, linux-fsdevel@vger.kernel.org,
-        linux-kernel@vger.kernel.org, syzkaller-bugs@googlegroups.com,
-        viro@zeniv.linux.org.uk
-Content-Type: text/plain; charset="UTF-8"; format=flowed; delsp=yes
+Content-Type: text/plain
+X-Proofpoint-Virus-Version: vendor=nai engine=6000 definitions=9478 signatures=668685
+X-Proofpoint-Spam-Details: rule=notspam policy=default score=0 suspectscore=0 malwarescore=0
+ phishscore=0 bulkscore=0 spamscore=0 mlxscore=0 mlxlogscore=999
+ adultscore=0 classifier=spam adjust=0 reason=mlx scancount=1
+ engine=8.0.1-1911140001 definitions=main-1912210166
+X-Proofpoint-Virus-Version: vendor=nai engine=6000 definitions=9478 signatures=668685
+X-Proofpoint-Spam-Details: rule=notspam policy=default score=0 priorityscore=1501 malwarescore=0
+ suspectscore=0 phishscore=0 bulkscore=0 spamscore=0 clxscore=1015
+ lowpriorityscore=0 mlxscore=0 impostorscore=0 mlxlogscore=999 adultscore=0
+ classifier=spam adjust=0 reason=mlx scancount=1 engine=8.0.1-1911140001
+ definitions=main-1912210167
 Sender: linux-block-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-syzbot has bisected this bug to:
 
-commit cbb537634780172137459dead490d668d437ef4d
-Author: Jens Axboe <axboe@kernel.dk>
-Date:   Mon Dec 9 18:22:50 2019 +0000
+Kirill,
 
-     io_uring: avoid ring quiesce for fixed file set unregister and update
+> One more thing to discuss. The new REQ_NOZERO flag won't be supported
+> by many block devices (their number will be even less, than number of
+> REQ_OP_WRITE_ZEROES supporters). Will this be a good thing, in case of
+> we will be completing BLKDEV_ZERO_ALLOCATE bios in
+> __blkdev_issue_write_zeroes() before splitting? I mean introduction of
+> some flag in struct request_queue::limits.  Completion of them with
+> -EOPNOTSUPP in block devices drivers looks suboptimal for me.
 
-bisection log:  https://syzkaller.appspot.com/x/bisect.txt?x=10eadc56e00000
-start commit:   7ddd09fc Add linux-next specific files for 20191220
-git tree:       linux-next
-final crash:    https://syzkaller.appspot.com/x/report.txt?x=12eadc56e00000
-console output: https://syzkaller.appspot.com/x/log.txt?x=14eadc56e00000
-kernel config:  https://syzkaller.appspot.com/x/.config?x=f183b01c3088afc6
-dashboard link: https://syzkaller.appspot.com/bug?extid=6bf913476056cb0f8d13
-syz repro:      https://syzkaller.appspot.com/x/repro.syz?x=15653c3ee00000
+We already have the NOFALLBACK flag to let the user make that decision.
 
-Reported-by: syzbot+6bf913476056cb0f8d13@syzkaller.appspotmail.com
-Fixes: cbb537634780 ("io_uring: avoid ring quiesce for fixed file set  
-unregister and update")
+If that flag is not specified, and I receive an allocate request for a
+SCSI device that does not support ANCHOR, my expectation would be that I
+would do a regular write same.
 
-For information about bisection process see: https://goo.gl/tpsmEJ#bisection
+If it's a filesystem that is the recipient of the operation and not a
+SCSI device, how to react would depend on how the filesystem handles
+unwritten extents, etc.
+
+-- 
+Martin K. Petersen	Oracle Linux Engineering
