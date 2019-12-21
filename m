@@ -2,99 +2,81 @@ Return-Path: <SRS0=rhTN=2L=vger.kernel.org=linux-block-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-1.1 required=3.0 tests=DKIMWL_WL_HIGH,DKIM_SIGNED,
-	DKIM_VALID,DKIM_VALID_AU,MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS
-	autolearn=no autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-9.8 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
+	INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,
+	USER_AGENT_GIT autolearn=unavailable autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 2B0EEC2D0C0
-	for <linux-block@archiver.kernel.org>; Sat, 21 Dec 2019 10:17:12 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 85EF8C2D0C0
+	for <linux-block@archiver.kernel.org>; Sat, 21 Dec 2019 12:45:39 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.kernel.org (Postfix) with ESMTP id F16AA222C2
-	for <linux-block@archiver.kernel.org>; Sat, 21 Dec 2019 10:17:11 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=default; t=1576923432;
-	bh=bDlgy8lsRzxzzBg1z25vE4MtL8FCduXazTqCT3s0Zkc=;
-	h=Date:From:To:Cc:Subject:References:In-Reply-To:List-ID:From;
-	b=ntwB+JqGDxbji6fWhhnTFGC9g9RLZP7RcJQMiDOqWLN353TIWBqfq04n7w9OdhgB6
-	 hYpbzohaZoj3D5qBoV+g5b0qyECPLrGIoqifKdKrG+spYDLT3R7Dlr68y/GeC0QQBn
-	 wXPNZz4scwKt2cbwqtYreCiYtSm8MeVjuZjLDIbg=
+	by mail.kernel.org (Postfix) with ESMTP id 58B7F2070C
+	for <linux-block@archiver.kernel.org>; Sat, 21 Dec 2019 12:45:39 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1726466AbfLUKRL (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Sat, 21 Dec 2019 05:17:11 -0500
-Received: from mail.kernel.org ([198.145.29.99]:37846 "EHLO mail.kernel.org"
-        rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-        id S1726074AbfLUKRL (ORCPT <rfc822;linux-block@vger.kernel.org>);
-        Sat, 21 Dec 2019 05:17:11 -0500
-Received: from localhost (unknown [5.29.147.182])
-        (using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
-        (No client certificate requested)
-        by mail.kernel.org (Postfix) with ESMTPSA id 7A52F2072B;
-        Sat, 21 Dec 2019 10:17:09 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-        s=default; t=1576923430;
-        bh=bDlgy8lsRzxzzBg1z25vE4MtL8FCduXazTqCT3s0Zkc=;
-        h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
-        b=b1Ab1jcaZqv7qcZRUP+4KwcYx7r+yfjDPhA96l9lmtUB464PHkk2oaFIAcrC/Jjh2
-         piK4/oTurT1Zfa+p/uaO0hDMYOQLfinJ+IgC+WEEfMJaSlsPPi4bFRmLzggY2XzDRq
-         K16uxxYMYRemXUfo1Mp/BWFYiQWRr15dxoVV5ST4=
-Date:   Sat, 21 Dec 2019 12:17:05 +0200
-From:   Leon Romanovsky <leon@kernel.org>
-To:     Jack Wang <jinpuwang@gmail.com>
-Cc:     linux-block@vger.kernel.org, linux-rdma@vger.kernel.org,
-        axboe@kernel.dk, hch@infradead.org, sagi@grimberg.me,
-        bvanassche@acm.org, dledford@redhat.com,
-        danil.kipnis@cloud.ionos.com, jinpu.wang@cloud.ionos.com,
-        rpenyaev@suse.de
-Subject: Re: [PATCH v5 00/25] RTRS (former IBTRS) rdma transport library and
- the corresponding RNBD (former IBNBD) rdma network block device
-Message-ID: <20191221101705.GD13335@unreal>
-References: <20191220155109.8959-1-jinpuwang@gmail.com>
-MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <20191220155109.8959-1-jinpuwang@gmail.com>
+        id S1726549AbfLUMpi (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Sat, 21 Dec 2019 07:45:38 -0500
+Received: from mout.kundenserver.de ([212.227.126.133]:53001 "EHLO
+        mout.kundenserver.de" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S1726182AbfLUMpi (ORCPT
+        <rfc822;linux-block@vger.kernel.org>);
+        Sat, 21 Dec 2019 07:45:38 -0500
+Received: from klappe2.local ([80.187.114.20]) by mrelayeu.kundenserver.de
+ (mreue012 [212.227.15.130]) with ESMTPSA (Nemesis) id
+ 1M6H7o-1ic2Qo3cN6-006gyn; Sat, 21 Dec 2019 13:45:35 +0100
+From:   Arnd Bergmann <arnd@arndb.de>
+To:     Jens Axboe <axboe@kernel.dk>, linux-block@vger.kernel.org
+Cc:     Linus Torvalds <torvalds@linux-foundation.org>,
+        linux-kernel@vger.kernel.org, Arnd Bergmann <arnd@arndb.de>
+Subject: [PATCH] compat_ioctl: block: add missing include
+Date:   Sat, 21 Dec 2019 12:45:30 +0000
+Message-Id: <1576932330-32095-1-git-send-email-arnd@arndb.de>
+X-Mailer: git-send-email 2.7.4
+X-Provags-ID: V03:K1:PGahc2NOKbsTSPnDNuX3+86D+trvODF3aHNu7G5NN1Hz2/N1DIc
+ S9BZNZm2USvCvy6OP2xsecwgDeRwv8vPrxNL67cILWzBFyts3JAERh1qPsINCOUPRbgJrM1
+ 9JRiwnGfIu83sp2akK5/j5Gw82EThJKKFp/ZkhDAMrzHpZuAoVHxPus5mXlCCg4eO6/zlNS
+ sJ2pN6ZcEccndNu2FFGMg==
+X-UI-Out-Filterresults: notjunk:1;V03:K0:lKdnAMuUh90=:KUCWhSgpkqP5rvClKQnded
+ J5UE0BluTjGir3/f9D0vXxKZ1oF85zu6cQPM8avBEKV5ridznQsc6yyet6Yhb8TeBDKs80NCj
+ HKoP5IMNrGYJbmgBDmzoP7FEmHAGh2fP5YjcTy6QdCoOPpCRMAEDK9XzzEdUR/cvEHVbNsJ3z
+ 2tHGg2nU1JA1gQJINDkIAajVpFPSdehf0PnhNZln66YbkStuCMXU1p+/3IUworVH1/rjPZWmH
+ DyvIcEnICxuisAaNFrI6BopLyvZH4E3icyxIcdigwZ+KqbcVsGeYUOeVAKpXn8kQ+FxW1YDk+
+ 1qkos3UpP3mxr44LpTPoB2FnsHRixajAMzXuAwUwp4QLfS30J3xDp21ikDPPS3t5/tt9Q8IDy
+ 9TToA/7rFOkksnXW/juWPjczeyDI8G8POb0Dy9mkRtMHcMpIR9kHZ2KanKDWFTrMRg06zJUhP
+ FsVFrsIN5rz8Npg4wvdQApFeqXkhwZGS8iNuYAuGUq95UQ48aIcMl/bgltNX9eirIUkSwEKaI
+ sey1KI36hbaToHFW+74MNaQLCCHQE1eRjK3OtHn7ESYCiRv50d4aQdUWXVJ0z3xNi6o9WB+If
+ CIVESQgMzfSf+hHIYmHEAlsoWIa0kU5fkMO1gn1GqENP9hFb2BbcCswao7LuTbZVWrgcDkEkh
+ HHNNQvB2QfYigKHydxgSA6GpkznHeg3aYrWo2BIt2bAJ8qH7gLhzKBoJfNC6p6K7k41bp3T4W
+ bmO9NYxC34fnaXrNgZ0qCLK20bmfZuFLBhUKwAB8krkNd3xl0ltTS4usnKYPFQxoxeGjv5KnM
+ Th7b48kaQWnobDvnNf/OpngrKXcNNI12GpjmqOYQDMNRjJcJ+Ng+SAcRuD0TpagfY1G0spHGA
+ JYDlbyIQ7Zvx9im1PjOg==
 Sender: linux-block-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-On Fri, Dec 20, 2019 at 04:50:44PM +0100, Jack Wang wrote:
-> Hi all,
->
-> here is V5 of the RTRS (former IBTRS) rdma transport library and the
-> corresponding RNBD (former IBNBD) rdma network block device.
->
-> Main changes are the following:
-> 1. Fix the security problem pointed out by Jason
-> 2. Implement code-style/readability/API/etc suggestions by Bart van Assche
-> 3. Rename IBTRS and IBNBD to RTRS and RNBD accordingly
-> 4. Fileio mode support in rnbd-srv has been removed.
->
-> The main functional change is a fix for the security problem pointed out by
-> Jason and discussed both on the mailing list and during the last LPC RDMA MC 2019.
-> On the server side we now invalidate in RTRS each rdma buffer before we hand it
-> over to RNBD server and in turn to the block layer. A new rkey is generated and
-> registered for the buffer after it returns back from the block layer and RNBD
-> server. The new rkey is sent back to the client along with the IO result.
-> The procedure is the default behaviour of the driver. This invalidation and
-> registration on each IO causes performance drop of up to 20%. A user of the
-> driver may choose to load the modules with this mechanism switched off
-> (always_invalidate=N), if he understands and can take the risk of a malicious
-> client being able to corrupt memory of a server it is connected to. This might
-> be a reasonable option in a scenario where all the clients and all the servers
-> are located within a secure datacenter.
->
-> Huge thanks to Bart van Assche for the very detailed review of both RNBD and
-> RTRS. These included suggestions for style fixes, better readability and
-> documentation, code simplifications, eliminating usage of deprecated APIs,
-> too many to name.
->
-> The transport library and the network block device using it have been renamed to
-> RTRS and RNBD accordingly in order to reflect the fact that they are based on
-> the rdma subsystem and not bound to InfiniBand only.
->
-> Fileio mode support in rnbd-server is not so efficent as pointed out by Bart,
-> and we can use loop device in between if there is need, hence we just
-> removed the fileio mode support.
+As the 0day bot pointed out, a header inclusion is missing in
+my earlier bugfixes:
 
-Thanks for pushing the code forward.
+block/compat_ioctl.c: In function 'compat_blkdev_ioctl':
+ block/compat_ioctl.c:411:7: error: 'IOC_PR_REGISTER' undeclared (first use in this function); did you mean 'TRACE_REG_REGISTER'?
+
+Reported-by: kbuild test robot <lkp@intel.com>
+Signed-off-by: Arnd Bergmann <arnd@arndb.de>
+---
+ block/compat_ioctl.c | 1 +
+ 1 file changed, 1 insertion(+)
+
+diff --git a/block/compat_ioctl.c b/block/compat_ioctl.c
+index f16ae92..3ed7a0f 100644
+--- a/block/compat_ioctl.c
++++ b/block/compat_ioctl.c
+@@ -6,6 +6,7 @@
+ #include <linux/compat.h>
+ #include <linux/elevator.h>
+ #include <linux/hdreg.h>
++#include <linux/pr.h>
+ #include <linux/slab.h>
+ #include <linux/syscalls.h>
+ #include <linux/types.h>
+-- 
+2.7.4
+
