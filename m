@@ -2,88 +2,90 @@ Return-Path: <SRS0=rhTN=2L=vger.kernel.org=linux-block-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-0.8 required=3.0 tests=DKIM_SIGNED,DKIM_VALID,
-	DKIM_VALID_AU,HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SPF_HELO_NONE,
-	SPF_PASS autolearn=no autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-2.2 required=3.0 tests=DKIM_SIGNED,DKIM_VALID,
+	HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,
+	USER_AGENT_SANE_1 autolearn=no autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id D7C1EC3F68F
-	for <linux-block@archiver.kernel.org>; Sat, 21 Dec 2019 14:28:07 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 4BF31C2D0C0
+	for <linux-block@archiver.kernel.org>; Sat, 21 Dec 2019 14:28:13 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.kernel.org (Postfix) with ESMTP id ACBA4222C2
-	for <linux-block@archiver.kernel.org>; Sat, 21 Dec 2019 14:28:07 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id 1D9F221655
+	for <linux-block@archiver.kernel.org>; Sat, 21 Dec 2019 14:28:13 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=pass (2048-bit key) header.d=cloud.ionos.com header.i=@cloud.ionos.com header.b="CZdIRwnv"
+	dkim=pass (2048-bit key) header.d=kernel-dk.20150623.gappssmtp.com header.i=@kernel-dk.20150623.gappssmtp.com header.b="eUhvhP0L"
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1726680AbfLUO2H (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Sat, 21 Dec 2019 09:28:07 -0500
-Received: from mail-io1-f67.google.com ([209.85.166.67]:35275 "EHLO
-        mail-io1-f67.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1726339AbfLUO2G (ORCPT
+        id S1726768AbfLUO2M (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Sat, 21 Dec 2019 09:28:12 -0500
+Received: from mail-pg1-f196.google.com ([209.85.215.196]:34593 "EHLO
+        mail-pg1-f196.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S1726363AbfLUO2M (ORCPT
         <rfc822;linux-block@vger.kernel.org>);
-        Sat, 21 Dec 2019 09:28:06 -0500
-Received: by mail-io1-f67.google.com with SMTP id v18so12272709iol.2
-        for <linux-block@vger.kernel.org>; Sat, 21 Dec 2019 06:28:06 -0800 (PST)
+        Sat, 21 Dec 2019 09:28:12 -0500
+Received: by mail-pg1-f196.google.com with SMTP id r11so6487893pgf.1
+        for <linux-block@vger.kernel.org>; Sat, 21 Dec 2019 06:28:12 -0800 (PST)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=cloud.ionos.com; s=google;
-        h=mime-version:references:in-reply-to:from:date:message-id:subject:to
-         :cc;
-        bh=Prd73x3m1oH2epmhiGL3DVbj6k1ituH6b/G8OUPXtR0=;
-        b=CZdIRwnvAf8usj6GfyZc4kMlzNjW6Ln8nxKlXFcc/5q8nJCvtg+MkoS5x9+RyP9mr0
-         UiEYlvsGcyFqTibPBI+qI+NTUDZe0j9dObsnkzsBi4hfmi45eTRrQsB2NRW33rDQuzql
-         TxdxqGK+1NkTI6XaNgumky/VpPQLPnZjXXjzdVE/SAf5v9HRfLW/7ltUQYzUSR991I53
-         P3OiuqU91y294hJqkoQnwbs7/4DXQV+pS0l0srOJIbBtQkMTnLZnqWPkZxEdKmiRt9vu
-         qBTj3kfR1ttUVzHBNHKVpXZl+5hVo2ydTThCSzrPNrihWy+Jl7SMxfuHtxEU2NxmyoqD
-         LL7Q==
+        d=kernel-dk.20150623.gappssmtp.com; s=20150623;
+        h=subject:to:cc:references:from:message-id:date:user-agent
+         :mime-version:in-reply-to:content-language:content-transfer-encoding;
+        bh=J9PeLUrwxMgt0ipUNGLGw536cdWaDOecBS6uBw4Swkk=;
+        b=eUhvhP0LP8aWfBvziJi6WFkhFOwf8Iaz9YNJ5O4Kxjyf+u2RVXOJ3LzjEa+jSP1hjB
+         SxRrN2mMaVejjRTOFTtKw3akl6CN8/D0SDDcg1I9FJmNBbJpnTwq4bIVGGbqZKJTMmN8
+         6Ays8s0DB5XAfbeuIS8qkiYb4FfV4IKQHRFGgYexdlbPNvDteCwYjgSi1Ca20rGPhzYf
+         dZUfxnNmMnLbpElcZwUu3Rd3EvdcTkrpH+dCLzMwS7ro/ZAZcNM4XGo6FrH7qMfrI0Hz
+         29KWhXFCLZo8sfnsZiywJqQseLwryvwC/Y69/aWVl1Bg+ww5nU7Y3IYE0IVwxpySa8fc
+         5CAQ==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=1e100.net; s=20161025;
-        h=x-gm-message-state:mime-version:references:in-reply-to:from:date
-         :message-id:subject:to:cc;
-        bh=Prd73x3m1oH2epmhiGL3DVbj6k1ituH6b/G8OUPXtR0=;
-        b=SpVP8AEufPDx02AGXjnS2KsvooM+/y6mFGXxtjwFHg79Puy9n+lESKSyEj1EEUzsxr
-         lW5XYKZZClrlb9ogDN7ICWDvVsy/vn7qCDLoFoA8++siPg0XNXte0CHN4M6keJ3HruUG
-         Sykw1o8uFMOheJDMj/zovB7LrNuwhfKTUKEm7hnLDSDpE86stAjI9YLXXgJfQWkEqWbG
-         ++amz+TmsBLDG5ekctu9i9wf3RW18XIgU+8NeX8//jafKlsorq7M1cCF3wRDO7RSPy3R
-         UKctnrm1hE3sL6WLfFThQVxivwLSdwc4I3NjvLeK/9p8V1E7zFoaf7UfsFuyzdvvEuW5
-         T5Aw==
-X-Gm-Message-State: APjAAAVk82ZtM+bHI4Xk9KMrHtTu7wXt3wSoKdFyyzdD92I5JpxGpygP
-        yPgTa+f1QPdTilut2ZS8CpEjVWm+dDRTZUbEQK/3
-X-Google-Smtp-Source: APXvYqxCao/ASHWi/KROdKEZlBEBZwYnWwjdjl+mM9lQuL/kqN11QE/EHFHGWMmmndchgbHqo37EFHTtfekrGT1XWM8=
-X-Received: by 2002:a5e:c314:: with SMTP id a20mr14285199iok.300.1576938485965;
- Sat, 21 Dec 2019 06:28:05 -0800 (PST)
+        h=x-gm-message-state:subject:to:cc:references:from:message-id:date
+         :user-agent:mime-version:in-reply-to:content-language
+         :content-transfer-encoding;
+        bh=J9PeLUrwxMgt0ipUNGLGw536cdWaDOecBS6uBw4Swkk=;
+        b=lB8TwRv9Z5Js70j7w+KD7JhyTDGMfVeich34fRVCkrwluHydrEViG0vfmow0BSp4T/
+         W6ITLz80UKrsZrph88r25lX7+4mnP2kB9JKJImorjoyfR8c35Kpuk82hBiiSSQx8zkv7
+         AL6AaoBMNU1U0NZNH/ZlVM1286gIaUjfojb8Cobr+AqVRNZQodre0ybVwi5mm/m1qZ8Q
+         ZQXLxAdJzgi3zSyVj5Y+TU1zkq6Z0qxRBTAxKb6tG+XUQnQ3BFk3oOHDsWRlahh4JqVs
+         E+qI/0XulY+tI8Uqvzd+REPs/SxGwHirXJ/O0m5wajysueLTSVzKoOHyzaiGs8dYOKDT
+         SjLg==
+X-Gm-Message-State: APjAAAUGXxm8rsJ+pjjksO7heCWEaV/4XJYyW811nSgHjtW436RlFCfE
+        pzwEKh5/HuiaxrBtG3k/18eRsQ==
+X-Google-Smtp-Source: APXvYqxVZPOmwWrUSweyNzFxkd7STK0kQE5jxgbhnpd9eDZEu791l03SAgHSdXCkcc0VxU+8qfA9FA==
+X-Received: by 2002:a63:6d8d:: with SMTP id i135mr20999865pgc.90.1576938491693;
+        Sat, 21 Dec 2019 06:28:11 -0800 (PST)
+Received: from [192.168.1.188] ([66.219.217.145])
+        by smtp.gmail.com with ESMTPSA id g67sm13243439pfb.66.2019.12.21.06.28.10
+        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
+        Sat, 21 Dec 2019 06:28:11 -0800 (PST)
+Subject: Re: [PATCH] compat_ioctl: block: add missing include
+To:     Arnd Bergmann <arnd@arndb.de>, linux-block@vger.kernel.org
+Cc:     Linus Torvalds <torvalds@linux-foundation.org>,
+        linux-kernel@vger.kernel.org
+References: <1576932330-32095-1-git-send-email-arnd@arndb.de>
+From:   Jens Axboe <axboe@kernel.dk>
+Message-ID: <49713de0-12f9-94f1-00bf-d3189ce9f921@kernel.dk>
+Date:   Sat, 21 Dec 2019 07:28:10 -0700
+User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:68.0) Gecko/20100101
+ Thunderbird/68.2.2
 MIME-Version: 1.0
-References: <20191220155109.8959-1-jinpuwang@gmail.com> <20191220155109.8959-3-jinpuwang@gmail.com>
- <20191221101530.GC13335@unreal>
-In-Reply-To: <20191221101530.GC13335@unreal>
-From:   Danil Kipnis <danil.kipnis@cloud.ionos.com>
-Date:   Sat, 21 Dec 2019 15:27:55 +0100
-Message-ID: <CAHg0HuxC9b+E9CRKuw4qDeEfz7=rwUceG+fFGfNHK5=H2aQMGw@mail.gmail.com>
-Subject: Re: [PATCH v5 02/25] rtrs: public interface header to establish RDMA connections
-To:     Leon Romanovsky <leon@kernel.org>
-Cc:     Jack Wang <jinpuwang@gmail.com>, linux-block@vger.kernel.org,
-        linux-rdma@vger.kernel.org, Jens Axboe <axboe@kernel.dk>,
-        Christoph Hellwig <hch@infradead.org>,
-        Sagi Grimberg <sagi@grimberg.me>,
-        Bart Van Assche <bvanassche@acm.org>,
-        Doug Ledford <dledford@redhat.com>,
-        Jack Wang <jinpu.wang@cloud.ionos.com>, rpenyaev@suse.de
-Content-Type: text/plain; charset="UTF-8"
+In-Reply-To: <1576932330-32095-1-git-send-email-arnd@arndb.de>
+Content-Type: text/plain; charset=utf-8
+Content-Language: en-US
+Content-Transfer-Encoding: 7bit
 Sender: linux-block-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-Hi Leon,
+On 12/21/19 5:45 AM, Arnd Bergmann wrote:
+> As the 0day bot pointed out, a header inclusion is missing in
+> my earlier bugfixes:
+> 
+> block/compat_ioctl.c: In function 'compat_blkdev_ioctl':
+>  block/compat_ioctl.c:411:7: error: 'IOC_PR_REGISTER' undeclared (first use in this function); did you mean 'TRACE_REG_REGISTER'?
 
-On Sat, Dec 21, 2019 at 11:15 AM Leon Romanovsky <leon@kernel.org> wrote:
->
-> Perhaps it is normal practice to write half a company as authors,
-> and I'm wrong in the following, but code authorship is determined by
-> multiple tags in the commit messages.
+Folded in, here's the update series on top of block-5.5:
 
-Different developers contributed to the driver over the last several
-years. Currently they are not working any more on this code. What tags
-in the commit message do you think would be appropriate to give those
-people credit for their work?
+https://git.kernel.dk/cgit/linux-block/log/?h=block-5.5-next
 
-Best,
-Danil
+-- 
+Jens Axboe
+
