@@ -1,118 +1,149 @@
-Return-Path: <SRS0=rhTN=2L=vger.kernel.org=linux-block-owner@kernel.org>
+Return-Path: <SRS0=tC1N=2M=vger.kernel.org=linux-block-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-0.8 required=3.0 tests=DKIMWL_WL_HIGH,DKIM_SIGNED,
+X-Spam-Status: No, score=-2.4 required=3.0 tests=DKIMWL_WL_HIGH,DKIM_SIGNED,
 	DKIM_VALID,DKIM_VALID_AU,HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,
-	SPF_HELO_NONE,SPF_PASS,UNPARSEABLE_RELAY autolearn=no autolearn_force=no
+	SPF_HELO_NONE,SPF_PASS,USER_AGENT_SANE_1 autolearn=no autolearn_force=no
 	version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 887C8C2D0C3
-	for <linux-block@archiver.kernel.org>; Sat, 21 Dec 2019 18:57:46 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 2B98AC2D0D4
+	for <linux-block@archiver.kernel.org>; Sun, 22 Dec 2019 00:02:31 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.kernel.org (Postfix) with ESMTP id 593A020665
-	for <linux-block@archiver.kernel.org>; Sat, 21 Dec 2019 18:57:46 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id E9CF4206D3
+	for <linux-block@archiver.kernel.org>; Sun, 22 Dec 2019 00:02:30 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=pass (2048-bit key) header.d=oracle.com header.i=@oracle.com header.b="YNcJqv62"
+	dkim=pass (2048-bit key) header.d=nvidia.com header.i=@nvidia.com header.b="Ih1gQcFI"
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1727101AbfLUS5p (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Sat, 21 Dec 2019 13:57:45 -0500
-Received: from userp2130.oracle.com ([156.151.31.86]:40626 "EHLO
-        userp2130.oracle.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1726593AbfLUS5p (ORCPT
+        id S1726550AbfLVACZ (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Sat, 21 Dec 2019 19:02:25 -0500
+Received: from hqnvemgate25.nvidia.com ([216.228.121.64]:3582 "EHLO
+        hqnvemgate25.nvidia.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S1726024AbfLVACY (ORCPT
         <rfc822;linux-block@vger.kernel.org>);
-        Sat, 21 Dec 2019 13:57:45 -0500
-Received: from pps.filterd (userp2130.oracle.com [127.0.0.1])
-        by userp2130.oracle.com (8.16.0.27/8.16.0.27) with SMTP id xBLIsYgC105795;
-        Sat, 21 Dec 2019 18:57:07 GMT
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=oracle.com; h=to : cc : subject :
- from : references : date : in-reply-to : message-id : mime-version :
- content-type; s=corp-2019-08-05;
- bh=D2wcasH1ZhiCVNdqmYp9V03i7PEyRJEfWju3qTFe+5A=;
- b=YNcJqv62W9/CZb6j+sLKFv8RjQJTMAMnpPgtc8agrx8zDCLYh0M/2VSc4RD0EcBxuCkT
- qcx0O8gPGM/L1Ck8vp87nnMLr3OWmFEBbAaUY0FjlqvIeDuEvJJn1MRl6Iymgu2a5m+1
- H2NOdQkL6IRUuxbWEkRPPOWp6vPU//khGOnt12U+Nn1XQoju7xqrY1yDrYHdl2se0ChA
- X0Ff9V33AFUX5vdSNnLRUpIGQ6gFop/SIbYJ8Q6VaJODL9Sn4E+ETyUSC5dfZvm3LUwr
- yIWfsermwHsVUUwiZJMRT3hVavh/0R+D+YtrK5B0Y5f2AMzbIKBvhy+xzSHe05WuaKbH Ww== 
-Received: from aserp3030.oracle.com (aserp3030.oracle.com [141.146.126.71])
-        by userp2130.oracle.com with ESMTP id 2x1att9mv4-1
-        (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=OK);
-        Sat, 21 Dec 2019 18:57:07 +0000
-Received: from pps.filterd (aserp3030.oracle.com [127.0.0.1])
-        by aserp3030.oracle.com (8.16.0.27/8.16.0.27) with SMTP id xBLIn6jb110474;
-        Sat, 21 Dec 2019 18:55:06 GMT
-Received: from userv0122.oracle.com (userv0122.oracle.com [156.151.31.75])
-        by aserp3030.oracle.com with ESMTP id 2x19f5ku4w-1
-        (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=OK);
-        Sat, 21 Dec 2019 18:55:06 +0000
-Received: from abhmp0015.oracle.com (abhmp0015.oracle.com [141.146.116.21])
-        by userv0122.oracle.com (8.14.4/8.14.4) with ESMTP id xBLIssO7006659;
-        Sat, 21 Dec 2019 18:54:56 GMT
-Received: from ca-mkp.ca.oracle.com (/10.159.214.123)
-        by default (Oracle Beehive Gateway v4.0)
-        with ESMTP ; Sat, 21 Dec 2019 10:54:54 -0800
-To:     Kirill Tkhai <ktkhai@virtuozzo.com>
-Cc:     "Martin K. Petersen" <martin.petersen@oracle.com>, axboe@kernel.dk,
-        linux-block@vger.kernel.org, linux-kernel@vger.kernel.org,
-        linux-ext4@vger.kernel.org, tytso@mit.edu,
-        adilger.kernel@dilger.ca, ming.lei@redhat.com, osandov@fb.com,
-        jthumshirn@suse.de, minwoo.im.dev@gmail.com, damien.lemoal@wdc.com,
-        andrea.parri@amarulasolutions.com, hare@suse.com, tj@kernel.org,
-        ajay.joshi@wdc.com, sagi@grimberg.me, dsterba@suse.com,
-        chaitanya.kulkarni@wdc.com, bvanassche@acm.org,
-        dhowells@redhat.com, asml.silence@gmail.com
-Subject: Re: [PATCH RFC 1/3] block: Add support for REQ_OP_ASSIGN_RANGE operation
-From:   "Martin K. Petersen" <martin.petersen@oracle.com>
-Organization: Oracle Corporation
-References: <157599668662.12112.10184894900037871860.stgit@localhost.localdomain>
-        <157599696813.12112.14140818972910110796.stgit@localhost.localdomain>
-        <yq1woatc8zd.fsf@oracle.com>
-        <3f2e341b-dea4-c5d0-8eb0-568b6ad2f17b@virtuozzo.com>
-        <yq1a77oc56s.fsf@oracle.com>
-        <625c9ee4-bedb-ff60-845e-2d440c4f58aa@virtuozzo.com>
-Date:   Sat, 21 Dec 2019 13:54:50 -0500
-In-Reply-To: <625c9ee4-bedb-ff60-845e-2d440c4f58aa@virtuozzo.com> (Kirill
-        Tkhai's message of "Fri, 20 Dec 2019 14:55:09 +0300")
-Message-ID: <yq1pngh7blx.fsf@oracle.com>
-User-Agent: Gnus/5.13 (Gnus v5.13) Emacs/26.1.92 (gnu/linux)
+        Sat, 21 Dec 2019 19:02:24 -0500
+Received: from hqpgpgate101.nvidia.com (Not Verified[216.228.121.13]) by hqnvemgate25.nvidia.com (using TLS: TLSv1.2, DES-CBC3-SHA)
+        id <B5dfeb2820001>; Sat, 21 Dec 2019 16:02:11 -0800
+Received: from hqmail.nvidia.com ([172.20.161.6])
+  by hqpgpgate101.nvidia.com (PGP Universal service);
+  Sat, 21 Dec 2019 16:02:22 -0800
+X-PGP-Universal: processed;
+        by hqpgpgate101.nvidia.com on Sat, 21 Dec 2019 16:02:22 -0800
+Received: from [10.2.167.41] (10.124.1.5) by HQMAIL107.nvidia.com
+ (172.20.187.13) with Microsoft SMTP Server (TLS) id 15.0.1473.3; Sun, 22 Dec
+ 2019 00:02:18 +0000
+Subject: Re: [PATCH v11 00/25] mm/gup: track dma-pinned pages: FOLL_PIN
+To:     Leon Romanovsky <leon@kernel.org>
+CC:     Jason Gunthorpe <jgg@ziepe.ca>,
+        Andrew Morton <akpm@linux-foundation.org>,
+        Al Viro <viro@zeniv.linux.org.uk>,
+        Alex Williamson <alex.williamson@redhat.com>,
+        Benjamin Herrenschmidt <benh@kernel.crashing.org>,
+        =?UTF-8?B?QmrDtnJuIFTDtnBlbA==?= <bjorn.topel@intel.com>,
+        Christoph Hellwig <hch@infradead.org>,
+        Dan Williams <dan.j.williams@intel.com>,
+        Daniel Vetter <daniel@ffwll.ch>,
+        Dave Chinner <david@fromorbit.com>,
+        David Airlie <airlied@linux.ie>,
+        "David S . Miller" <davem@davemloft.net>,
+        Ira Weiny <ira.weiny@intel.com>, Jan Kara <jack@suse.cz>,
+        Jens Axboe <axboe@kernel.dk>, Jonathan Corbet <corbet@lwn.net>,
+        =?UTF-8?B?SsOpcsO0bWUgR2xpc3Nl?= <jglisse@redhat.com>,
+        Magnus Karlsson <magnus.karlsson@intel.com>,
+        Mauro Carvalho Chehab <mchehab@kernel.org>,
+        Michael Ellerman <mpe@ellerman.id.au>,
+        Michal Hocko <mhocko@suse.com>,
+        Mike Kravetz <mike.kravetz@oracle.com>,
+        Paul Mackerras <paulus@samba.org>,
+        Shuah Khan <shuah@kernel.org>,
+        Vlastimil Babka <vbabka@suse.cz>, <bpf@vger.kernel.org>,
+        <dri-devel@lists.freedesktop.org>, <kvm@vger.kernel.org>,
+        <linux-block@vger.kernel.org>, <linux-doc@vger.kernel.org>,
+        <linux-fsdevel@vger.kernel.org>, <linux-kselftest@vger.kernel.org>,
+        <linux-media@vger.kernel.org>, <linux-rdma@vger.kernel.org>,
+        <linuxppc-dev@lists.ozlabs.org>, <netdev@vger.kernel.org>,
+        <linux-mm@kvack.org>, LKML <linux-kernel@vger.kernel.org>,
+        Maor Gottlieb <maorg@mellanox.com>
+References: <20191216222537.491123-1-jhubbard@nvidia.com>
+ <20191219132607.GA410823@unreal>
+ <a4849322-8e17-119e-a664-80d9f95d850b@nvidia.com>
+ <20191219210743.GN17227@ziepe.ca> <20191220182939.GA10944@unreal>
+ <1001a5fc-a71d-9c0f-1090-546c4913d8a2@nvidia.com>
+ <20191221100843.GB13335@unreal>
+From:   John Hubbard <jhubbard@nvidia.com>
+X-Nvconfidentiality: public
+Message-ID: <9261f37b-5932-4580-cbc8-f591b0b33b2a@nvidia.com>
+Date:   Sat, 21 Dec 2019 15:59:24 -0800
+User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:68.0) Gecko/20100101
+ Thunderbird/68.3.0
 MIME-Version: 1.0
-Content-Type: text/plain
-X-Proofpoint-Virus-Version: vendor=nai engine=6000 definitions=9478 signatures=668685
-X-Proofpoint-Spam-Details: rule=notspam policy=default score=0 suspectscore=0 malwarescore=0
- phishscore=0 bulkscore=0 spamscore=0 mlxscore=0 mlxlogscore=999
- adultscore=0 classifier=spam adjust=0 reason=mlx scancount=1
- engine=8.0.1-1911140001 definitions=main-1912210166
-X-Proofpoint-Virus-Version: vendor=nai engine=6000 definitions=9478 signatures=668685
-X-Proofpoint-Spam-Details: rule=notspam policy=default score=0 priorityscore=1501 malwarescore=0
- suspectscore=0 phishscore=0 bulkscore=0 spamscore=0 clxscore=1015
- lowpriorityscore=0 mlxscore=0 impostorscore=0 mlxlogscore=999 adultscore=0
- classifier=spam adjust=0 reason=mlx scancount=1 engine=8.0.1-1911140001
- definitions=main-1912210167
+In-Reply-To: <20191221100843.GB13335@unreal>
+X-Originating-IP: [10.124.1.5]
+X-ClientProxiedBy: HQMAIL105.nvidia.com (172.20.187.12) To
+ HQMAIL107.nvidia.com (172.20.187.13)
+Content-Type: text/plain; charset="utf-8"; format=flowed
+Content-Language: en-US
+Content-Transfer-Encoding: 7bit
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=nvidia.com; s=n1;
+        t=1576972931; bh=95pYs1E9YJXlQbksWpOmj6qddfnejBQ8umGtr6ZpFwY=;
+        h=X-PGP-Universal:Subject:To:CC:References:From:X-Nvconfidentiality:
+         Message-ID:Date:User-Agent:MIME-Version:In-Reply-To:
+         X-Originating-IP:X-ClientProxiedBy:Content-Type:Content-Language:
+         Content-Transfer-Encoding;
+        b=Ih1gQcFIGgKg5n193VWHK/fpuYOWnxEAjDWwUpeL0db+IZfCrijIZXMmxlXytkJAy
+         GyHybquB0rAC4PSC5fyYYOxPtnlJHJXbYbE1OnuToKQzSNtOX1E6jCjMDILoLbqZ4V
+         OX5Q1eZnL4jcgn4z6z9ok9K0mg+OyYm6pC3L/Y0Cn97KIjBe5Xa80wOPiCj7nBJ7Qf
+         tzyFw5L1dY/NfwyZ7ZrE7k0OMtxXiptqvzxEOmfi4Y/W4Mi7z2d4dMo373vMb2W5ZL
+         8xmwOO+L537Cy6K9gc3OcvyItc0amK8uE6k5ZFJ8R4rau7j4DfEX/idektDGaSQXw9
+         Z/MQNsIwlLFsA==
 Sender: linux-block-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
+On 12/21/19 2:08 AM, Leon Romanovsky wrote:
+> On Fri, Dec 20, 2019 at 03:54:55PM -0800, John Hubbard wrote:
+>> On 12/20/19 10:29 AM, Leon Romanovsky wrote:
+>> ...
+>>>> $ ./build.sh
+>>>> $ build/bin/run_tests.py
+>>>>
+>>>> If you get things that far I think Leon can get a reproduction for you
+>>>
+>>> I'm not so optimistic about that.
+>>>
+>>
+>> OK, I'm going to proceed for now on the assumption that I've got an overflow
+>> problem that happens when huge pages are pinned. If I can get more information,
+>> great, otherwise it's probably enough.
+>>
+>> One thing: for your repro, if you know the huge page size, and the system
+>> page size for that case, that would really help. Also the number of pins per
+>> page, more or less, that you'd expect. Because Jason says that only 2M huge
+>> pages are used...
+>>
+>> Because the other possibility is that the refcount really is going negative,
+>> likely due to a mismatched pin/unpin somehow.
+>>
+>> If there's not an obvious repro case available, but you do have one (is it easy
+>> to repro, though?), then *if* you have the time, I could point you to a github
+>> branch that reduces GUP_PIN_COUNTING_BIAS by, say, 4x, by applying this:
+> 
+> I'll see what I can do this Sunday.
+> 
 
-Kirill,
+The other data point that might shed light on whether it's a mismatch (this only
+works if the system is not actually crashing, though), is checking the new
+vmstat items, like this:
 
-> One more thing to discuss. The new REQ_NOZERO flag won't be supported
-> by many block devices (their number will be even less, than number of
-> REQ_OP_WRITE_ZEROES supporters). Will this be a good thing, in case of
-> we will be completing BLKDEV_ZERO_ALLOCATE bios in
-> __blkdev_issue_write_zeroes() before splitting? I mean introduction of
-> some flag in struct request_queue::limits.  Completion of them with
-> -EOPNOTSUPP in block devices drivers looks suboptimal for me.
+$ grep foll_pin /proc/vmstat
+nr_foll_pin_requested 16288188
+nr_foll_pin_returned 16288188
 
-We already have the NOFALLBACK flag to let the user make that decision.
+...but OTOH, if you've got long-term pins, then those are *supposed* to be
+mismatched, so it only really helps in between tests.
 
-If that flag is not specified, and I receive an allocate request for a
-SCSI device that does not support ANCHOR, my expectation would be that I
-would do a regular write same.
-
-If it's a filesystem that is the recipient of the operation and not a
-SCSI device, how to react would depend on how the filesystem handles
-unwritten extents, etc.
-
+thanks,
 -- 
-Martin K. Petersen	Oracle Linux Engineering
+John Hubbard
+NVIDIA
