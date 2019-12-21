@@ -2,81 +2,88 @@ Return-Path: <SRS0=rhTN=2L=vger.kernel.org=linux-block-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-9.8 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
-	INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,
-	USER_AGENT_GIT autolearn=unavailable autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-0.8 required=3.0 tests=DKIM_SIGNED,DKIM_VALID,
+	DKIM_VALID_AU,HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SPF_HELO_NONE,
+	SPF_PASS autolearn=no autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 85EF8C2D0C0
-	for <linux-block@archiver.kernel.org>; Sat, 21 Dec 2019 12:45:39 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id D7C1EC3F68F
+	for <linux-block@archiver.kernel.org>; Sat, 21 Dec 2019 14:28:07 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.kernel.org (Postfix) with ESMTP id 58B7F2070C
-	for <linux-block@archiver.kernel.org>; Sat, 21 Dec 2019 12:45:39 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id ACBA4222C2
+	for <linux-block@archiver.kernel.org>; Sat, 21 Dec 2019 14:28:07 +0000 (UTC)
+Authentication-Results: mail.kernel.org;
+	dkim=pass (2048-bit key) header.d=cloud.ionos.com header.i=@cloud.ionos.com header.b="CZdIRwnv"
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1726549AbfLUMpi (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Sat, 21 Dec 2019 07:45:38 -0500
-Received: from mout.kundenserver.de ([212.227.126.133]:53001 "EHLO
-        mout.kundenserver.de" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1726182AbfLUMpi (ORCPT
+        id S1726680AbfLUO2H (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Sat, 21 Dec 2019 09:28:07 -0500
+Received: from mail-io1-f67.google.com ([209.85.166.67]:35275 "EHLO
+        mail-io1-f67.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S1726339AbfLUO2G (ORCPT
         <rfc822;linux-block@vger.kernel.org>);
-        Sat, 21 Dec 2019 07:45:38 -0500
-Received: from klappe2.local ([80.187.114.20]) by mrelayeu.kundenserver.de
- (mreue012 [212.227.15.130]) with ESMTPSA (Nemesis) id
- 1M6H7o-1ic2Qo3cN6-006gyn; Sat, 21 Dec 2019 13:45:35 +0100
-From:   Arnd Bergmann <arnd@arndb.de>
-To:     Jens Axboe <axboe@kernel.dk>, linux-block@vger.kernel.org
-Cc:     Linus Torvalds <torvalds@linux-foundation.org>,
-        linux-kernel@vger.kernel.org, Arnd Bergmann <arnd@arndb.de>
-Subject: [PATCH] compat_ioctl: block: add missing include
-Date:   Sat, 21 Dec 2019 12:45:30 +0000
-Message-Id: <1576932330-32095-1-git-send-email-arnd@arndb.de>
-X-Mailer: git-send-email 2.7.4
-X-Provags-ID: V03:K1:PGahc2NOKbsTSPnDNuX3+86D+trvODF3aHNu7G5NN1Hz2/N1DIc
- S9BZNZm2USvCvy6OP2xsecwgDeRwv8vPrxNL67cILWzBFyts3JAERh1qPsINCOUPRbgJrM1
- 9JRiwnGfIu83sp2akK5/j5Gw82EThJKKFp/ZkhDAMrzHpZuAoVHxPus5mXlCCg4eO6/zlNS
- sJ2pN6ZcEccndNu2FFGMg==
-X-UI-Out-Filterresults: notjunk:1;V03:K0:lKdnAMuUh90=:KUCWhSgpkqP5rvClKQnded
- J5UE0BluTjGir3/f9D0vXxKZ1oF85zu6cQPM8avBEKV5ridznQsc6yyet6Yhb8TeBDKs80NCj
- HKoP5IMNrGYJbmgBDmzoP7FEmHAGh2fP5YjcTy6QdCoOPpCRMAEDK9XzzEdUR/cvEHVbNsJ3z
- 2tHGg2nU1JA1gQJINDkIAajVpFPSdehf0PnhNZln66YbkStuCMXU1p+/3IUworVH1/rjPZWmH
- DyvIcEnICxuisAaNFrI6BopLyvZH4E3icyxIcdigwZ+KqbcVsGeYUOeVAKpXn8kQ+FxW1YDk+
- 1qkos3UpP3mxr44LpTPoB2FnsHRixajAMzXuAwUwp4QLfS30J3xDp21ikDPPS3t5/tt9Q8IDy
- 9TToA/7rFOkksnXW/juWPjczeyDI8G8POb0Dy9mkRtMHcMpIR9kHZ2KanKDWFTrMRg06zJUhP
- FsVFrsIN5rz8Npg4wvdQApFeqXkhwZGS8iNuYAuGUq95UQ48aIcMl/bgltNX9eirIUkSwEKaI
- sey1KI36hbaToHFW+74MNaQLCCHQE1eRjK3OtHn7ESYCiRv50d4aQdUWXVJ0z3xNi6o9WB+If
- CIVESQgMzfSf+hHIYmHEAlsoWIa0kU5fkMO1gn1GqENP9hFb2BbcCswao7LuTbZVWrgcDkEkh
- HHNNQvB2QfYigKHydxgSA6GpkznHeg3aYrWo2BIt2bAJ8qH7gLhzKBoJfNC6p6K7k41bp3T4W
- bmO9NYxC34fnaXrNgZ0qCLK20bmfZuFLBhUKwAB8krkNd3xl0ltTS4usnKYPFQxoxeGjv5KnM
- Th7b48kaQWnobDvnNf/OpngrKXcNNI12GpjmqOYQDMNRjJcJ+Ng+SAcRuD0TpagfY1G0spHGA
- JYDlbyIQ7Zvx9im1PjOg==
+        Sat, 21 Dec 2019 09:28:06 -0500
+Received: by mail-io1-f67.google.com with SMTP id v18so12272709iol.2
+        for <linux-block@vger.kernel.org>; Sat, 21 Dec 2019 06:28:06 -0800 (PST)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=cloud.ionos.com; s=google;
+        h=mime-version:references:in-reply-to:from:date:message-id:subject:to
+         :cc;
+        bh=Prd73x3m1oH2epmhiGL3DVbj6k1ituH6b/G8OUPXtR0=;
+        b=CZdIRwnvAf8usj6GfyZc4kMlzNjW6Ln8nxKlXFcc/5q8nJCvtg+MkoS5x9+RyP9mr0
+         UiEYlvsGcyFqTibPBI+qI+NTUDZe0j9dObsnkzsBi4hfmi45eTRrQsB2NRW33rDQuzql
+         TxdxqGK+1NkTI6XaNgumky/VpPQLPnZjXXjzdVE/SAf5v9HRfLW/7ltUQYzUSR991I53
+         P3OiuqU91y294hJqkoQnwbs7/4DXQV+pS0l0srOJIbBtQkMTnLZnqWPkZxEdKmiRt9vu
+         qBTj3kfR1ttUVzHBNHKVpXZl+5hVo2ydTThCSzrPNrihWy+Jl7SMxfuHtxEU2NxmyoqD
+         LL7Q==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20161025;
+        h=x-gm-message-state:mime-version:references:in-reply-to:from:date
+         :message-id:subject:to:cc;
+        bh=Prd73x3m1oH2epmhiGL3DVbj6k1ituH6b/G8OUPXtR0=;
+        b=SpVP8AEufPDx02AGXjnS2KsvooM+/y6mFGXxtjwFHg79Puy9n+lESKSyEj1EEUzsxr
+         lW5XYKZZClrlb9ogDN7ICWDvVsy/vn7qCDLoFoA8++siPg0XNXte0CHN4M6keJ3HruUG
+         Sykw1o8uFMOheJDMj/zovB7LrNuwhfKTUKEm7hnLDSDpE86stAjI9YLXXgJfQWkEqWbG
+         ++amz+TmsBLDG5ekctu9i9wf3RW18XIgU+8NeX8//jafKlsorq7M1cCF3wRDO7RSPy3R
+         UKctnrm1hE3sL6WLfFThQVxivwLSdwc4I3NjvLeK/9p8V1E7zFoaf7UfsFuyzdvvEuW5
+         T5Aw==
+X-Gm-Message-State: APjAAAVk82ZtM+bHI4Xk9KMrHtTu7wXt3wSoKdFyyzdD92I5JpxGpygP
+        yPgTa+f1QPdTilut2ZS8CpEjVWm+dDRTZUbEQK/3
+X-Google-Smtp-Source: APXvYqxCao/ASHWi/KROdKEZlBEBZwYnWwjdjl+mM9lQuL/kqN11QE/EHFHGWMmmndchgbHqo37EFHTtfekrGT1XWM8=
+X-Received: by 2002:a5e:c314:: with SMTP id a20mr14285199iok.300.1576938485965;
+ Sat, 21 Dec 2019 06:28:05 -0800 (PST)
+MIME-Version: 1.0
+References: <20191220155109.8959-1-jinpuwang@gmail.com> <20191220155109.8959-3-jinpuwang@gmail.com>
+ <20191221101530.GC13335@unreal>
+In-Reply-To: <20191221101530.GC13335@unreal>
+From:   Danil Kipnis <danil.kipnis@cloud.ionos.com>
+Date:   Sat, 21 Dec 2019 15:27:55 +0100
+Message-ID: <CAHg0HuxC9b+E9CRKuw4qDeEfz7=rwUceG+fFGfNHK5=H2aQMGw@mail.gmail.com>
+Subject: Re: [PATCH v5 02/25] rtrs: public interface header to establish RDMA connections
+To:     Leon Romanovsky <leon@kernel.org>
+Cc:     Jack Wang <jinpuwang@gmail.com>, linux-block@vger.kernel.org,
+        linux-rdma@vger.kernel.org, Jens Axboe <axboe@kernel.dk>,
+        Christoph Hellwig <hch@infradead.org>,
+        Sagi Grimberg <sagi@grimberg.me>,
+        Bart Van Assche <bvanassche@acm.org>,
+        Doug Ledford <dledford@redhat.com>,
+        Jack Wang <jinpu.wang@cloud.ionos.com>, rpenyaev@suse.de
+Content-Type: text/plain; charset="UTF-8"
 Sender: linux-block-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-As the 0day bot pointed out, a header inclusion is missing in
-my earlier bugfixes:
+Hi Leon,
 
-block/compat_ioctl.c: In function 'compat_blkdev_ioctl':
- block/compat_ioctl.c:411:7: error: 'IOC_PR_REGISTER' undeclared (first use in this function); did you mean 'TRACE_REG_REGISTER'?
+On Sat, Dec 21, 2019 at 11:15 AM Leon Romanovsky <leon@kernel.org> wrote:
+>
+> Perhaps it is normal practice to write half a company as authors,
+> and I'm wrong in the following, but code authorship is determined by
+> multiple tags in the commit messages.
 
-Reported-by: kbuild test robot <lkp@intel.com>
-Signed-off-by: Arnd Bergmann <arnd@arndb.de>
----
- block/compat_ioctl.c | 1 +
- 1 file changed, 1 insertion(+)
+Different developers contributed to the driver over the last several
+years. Currently they are not working any more on this code. What tags
+in the commit message do you think would be appropriate to give those
+people credit for their work?
 
-diff --git a/block/compat_ioctl.c b/block/compat_ioctl.c
-index f16ae92..3ed7a0f 100644
---- a/block/compat_ioctl.c
-+++ b/block/compat_ioctl.c
-@@ -6,6 +6,7 @@
- #include <linux/compat.h>
- #include <linux/elevator.h>
- #include <linux/hdreg.h>
-+#include <linux/pr.h>
- #include <linux/slab.h>
- #include <linux/syscalls.h>
- #include <linux/types.h>
--- 
-2.7.4
-
+Best,
+Danil
