@@ -2,127 +2,133 @@ Return-Path: <SRS0=vQdV=2N=vger.kernel.org=linux-block-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-0.8 required=3.0 tests=DKIM_SIGNED,DKIM_VALID,
+X-Spam-Status: No, score=-2.4 required=3.0 tests=DKIM_SIGNED,DKIM_VALID,
 	DKIM_VALID_AU,HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SPF_HELO_NONE,
-	SPF_PASS autolearn=no autolearn_force=no version=3.4.0
+	SPF_PASS,USER_AGENT_SANE_1 autolearn=no autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 4D63BC2D0D0
-	for <linux-block@archiver.kernel.org>; Mon, 23 Dec 2019 10:31:41 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 06A72C2D0C0
+	for <linux-block@archiver.kernel.org>; Mon, 23 Dec 2019 18:24:58 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.kernel.org (Postfix) with ESMTP id 24094206CB
-	for <linux-block@archiver.kernel.org>; Mon, 23 Dec 2019 10:31:41 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id DA39620709
+	for <linux-block@archiver.kernel.org>; Mon, 23 Dec 2019 18:24:57 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=pass (2048-bit key) header.d=cloud.ionos.com header.i=@cloud.ionos.com header.b="ZJDHLQVm"
+	dkim=pass (2048-bit key) header.d=ziepe.ca header.i=@ziepe.ca header.b="FctYOOrJ"
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1726744AbfLWKbk (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Mon, 23 Dec 2019 05:31:40 -0500
-Received: from mail-il1-f195.google.com ([209.85.166.195]:33825 "EHLO
-        mail-il1-f195.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1726709AbfLWKbk (ORCPT
+        id S1726865AbfLWSYv (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Mon, 23 Dec 2019 13:24:51 -0500
+Received: from mail-qv1-f67.google.com ([209.85.219.67]:36225 "EHLO
+        mail-qv1-f67.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S1726866AbfLWSYv (ORCPT
         <rfc822;linux-block@vger.kernel.org>);
-        Mon, 23 Dec 2019 05:31:40 -0500
-Received: by mail-il1-f195.google.com with SMTP id s15so13687252iln.1
-        for <linux-block@vger.kernel.org>; Mon, 23 Dec 2019 02:31:39 -0800 (PST)
+        Mon, 23 Dec 2019 13:24:51 -0500
+Received: by mail-qv1-f67.google.com with SMTP id m14so6670833qvl.3
+        for <linux-block@vger.kernel.org>; Mon, 23 Dec 2019 10:24:50 -0800 (PST)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=cloud.ionos.com; s=google;
-        h=mime-version:references:in-reply-to:from:date:message-id:subject:to
-         :cc;
-        bh=k2KG3qxeHruibpXGsVIa4Wl/ThA0sLV8fQC/MJrjy0s=;
-        b=ZJDHLQVmWJg9pubaWSGVw5+bzHZEsCdrO8rLoMCYF5cD2/uIjAhCvjh/B0MzplTmY+
-         gtYzoWO8Z3eIjCu0cHNk9EAVPcLtQFGo7fHT1e+KoySOm2KJKZ5VEfqOEa33YGiasb1j
-         K5TZb9CnawjfJDnE9su1egPT1920OGfeqEId3x0Jm5nv+rEo5F/nVnWGqWiaH9ePM+Ju
-         4Y68emC8fzscXHq4v9YeQb9wCJ87GOHzhJVFu3j5T8UAHjzNRloZBMAe66I0lcVxCu3l
-         7QQMSP5YEKJsFftAR5etS/D3AjqVOxUhtuI6u3+bsyNGGIMb5CteVoNWaJibSTo13nmU
-         ETzQ==
+        d=ziepe.ca; s=google;
+        h=date:from:to:cc:subject:message-id:references:mime-version
+         :content-disposition:in-reply-to:user-agent;
+        bh=KNSp0xKzXXca6h2YP8X3emLAqK9GuJuCbstCZTI5ulI=;
+        b=FctYOOrJ074bGu2erxfD+ggi+amf34vJ2+/SB/OaLs8ZFEcoEOPSKxrX7J7vfW72iX
+         iaD1ph6XI9oWEr/nnku4Pr+MbBh9He5Xr+rBPzoju6TBhM7n5pqaYtl/oqkKFK9Nr8fH
+         Us04jbJ3zTX0WDIVdGhJyQO5EPn2JUvIhBvTug4ZRXtCzaFxharK0qUYwO9ZIkwiEqhS
+         c9Aa/tUvtqh3RdzKBnkDvwefmOBkVu9RUXlbwmdawA3jtTcA8wQCgHrvBfiWYN8r7VQg
+         T/hlkSjI6vXJcCVxYIXrbbrRmfsaCa4t09oEgSwlogc3AYXQW7LtDW06LM/jq8bAmut6
+         WCJg==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=1e100.net; s=20161025;
-        h=x-gm-message-state:mime-version:references:in-reply-to:from:date
-         :message-id:subject:to:cc;
-        bh=k2KG3qxeHruibpXGsVIa4Wl/ThA0sLV8fQC/MJrjy0s=;
-        b=teViqGwt7RVUqEb+7HwYnF4cHheisJ1UJbIJuxmBmzM4Tv83bWOTp/z9z1NrMg9UwX
-         0y0/37CHzfY1ijrpreWLBd6k9rO/BAHWXiUxfRDAIm5W5nD4wSWuET9EACpm+hR9rqzD
-         ZCdu39JsAeUtDvFSGYkUYRkCswn+IM9nN5+2n0dVyeZo4Iy4ULjcY+PeyUvsK+piViFH
-         Kx8JpN2z2fnT8lur7R1wiL+1zcB4YtrTWp9lRT5xuxeDXnWkvCU5IeFDxx23cvKD1aOy
-         jP0RMG9Bpnm4vbnDMNh0kPdMBbmFLj+UGsF/mQszOokSa/bfC13B/+snc0I3aq0cw92/
-         ktNA==
-X-Gm-Message-State: APjAAAVEdSpXVeFNvgL6oykRNIQoG8faTGy3mTJWosKi9hsVdcvg3M3U
-        uULAF3imd2vAn1RGm2p7qdSTEPRsLCDtwNeAiK9HaQ==
-X-Google-Smtp-Source: APXvYqx8puoUeQ/1rOf+Mmdibf48OOGKRlBiWxu0EI9nTQSX7vkl6dvMqzS+1T4ybMe+KUcJ7VJoPM0eqZwQ/TUzLtM=
-X-Received: by 2002:a92:d2:: with SMTP id 201mr25608188ila.22.1577097099298;
- Mon, 23 Dec 2019 02:31:39 -0800 (PST)
-MIME-Version: 1.0
-References: <20191220155109.8959-1-jinpuwang@gmail.com> <20191220155109.8959-3-jinpuwang@gmail.com>
- <20191221101530.GC13335@unreal> <CAHg0HuxC9b+E9CRKuw4qDeEfz7=rwUceG+fFGfNHK5=H2aQMGw@mail.gmail.com>
- <20191222073629.GE13335@unreal> <CAMGffEn9xcBO0661AXCfv0KDnZBX6meCaT07ZutHykSxM4aGaQ@mail.gmail.com>
- <20191223080438.GL13335@unreal>
-In-Reply-To: <20191223080438.GL13335@unreal>
-From:   Jinpu Wang <jinpu.wang@cloud.ionos.com>
-Date:   Mon, 23 Dec 2019 11:31:28 +0100
-Message-ID: <CAMGffEk_3QYzj6MoSh_06fmvJzvv5qLKJXJ3d-m4oQRhH5ZyGg@mail.gmail.com>
-Subject: Re: [PATCH v5 02/25] rtrs: public interface header to establish RDMA connections
-To:     Leon Romanovsky <leon@kernel.org>
-Cc:     Danil Kipnis <danil.kipnis@cloud.ionos.com>,
-        Jack Wang <jinpuwang@gmail.com>, linux-block@vger.kernel.org,
-        linux-rdma@vger.kernel.org, Jens Axboe <axboe@kernel.dk>,
+        h=x-gm-message-state:date:from:to:cc:subject:message-id:references
+         :mime-version:content-disposition:in-reply-to:user-agent;
+        bh=KNSp0xKzXXca6h2YP8X3emLAqK9GuJuCbstCZTI5ulI=;
+        b=tl+lcGgVEyn1sbmrLA2ofX8uzd0t8oFTOZlkI0jaK55QixenJnTgiD2w5q47rdff4c
+         dFoTBzWKXbBzACBa+CA8CUwu84XD/m5ifpHq4An3Fw6eLyLyzXwbq4fI490gHkoNterh
+         akYK8rdtEqtTw6CH27fFXWHYZthyJB/JlMAoFE+fNTMydaqJE2iQrH1JDeQ2C6ycBL8K
+         EGUQJsxX4Usp64K6JQMYuZINjWM2shAwbIUyR1egweI1ogB40O5FYm4HAB/6VoAPogL5
+         cjDBZ3EkzzaqjZ12GPHpqp/B16zXQcLqxA7B3b/b4y8XSw0VC1wrXHuhpYz2HbpH2K9y
+         j9vg==
+X-Gm-Message-State: APjAAAWj9JLxJ3PzGCyA1VJHZSFKHFYpDdWsJesu8wyFHH10i9YoHtaF
+        mxaOzmfQZQlYiR/kAVUVZviE+A==
+X-Google-Smtp-Source: APXvYqyOJm+HA/OOXOk1TxOLC8pk6pJEfZhfUy8M7as0rtMhyNSoNfAsriRZZomXf9eRLN7qDrjm+A==
+X-Received: by 2002:a0c:e150:: with SMTP id c16mr25637620qvl.51.1577125488455;
+        Mon, 23 Dec 2019 10:24:48 -0800 (PST)
+Received: from ziepe.ca (hlfxns017vw-142-68-57-212.dhcp-dynamic.fibreop.ns.bellaliant.net. [142.68.57.212])
+        by smtp.gmail.com with ESMTPSA id b7sm6449933qtj.15.2019.12.23.10.24.47
+        (version=TLS1_2 cipher=ECDHE-RSA-CHACHA20-POLY1305 bits=256/256);
+        Mon, 23 Dec 2019 10:24:47 -0800 (PST)
+Received: from jgg by mlx.ziepe.ca with local (Exim 4.90_1)
+        (envelope-from <jgg@ziepe.ca>)
+        id 1ijSNq-0007Pv-LV; Mon, 23 Dec 2019 14:24:46 -0400
+Date:   Mon, 23 Dec 2019 14:24:46 -0400
+From:   Jason Gunthorpe <jgg@ziepe.ca>
+To:     Dan Williams <dan.j.williams@intel.com>
+Cc:     John Hubbard <jhubbard@nvidia.com>,
+        Leon Romanovsky <leon@kernel.org>,
+        Andrew Morton <akpm@linux-foundation.org>,
+        Al Viro <viro@zeniv.linux.org.uk>,
+        Alex Williamson <alex.williamson@redhat.com>,
+        Benjamin Herrenschmidt <benh@kernel.crashing.org>,
+        =?utf-8?B?QmrDtnJuIFTDtnBlbA==?= <bjorn.topel@intel.com>,
         Christoph Hellwig <hch@infradead.org>,
-        Sagi Grimberg <sagi@grimberg.me>,
-        Bart Van Assche <bvanassche@acm.org>,
-        Doug Ledford <dledford@redhat.com>, rpenyaev@suse.de
-Content-Type: text/plain; charset="UTF-8"
+        Daniel Vetter <daniel@ffwll.ch>,
+        Dave Chinner <david@fromorbit.com>,
+        David Airlie <airlied@linux.ie>,
+        "David S . Miller" <davem@davemloft.net>,
+        Ira Weiny <ira.weiny@intel.com>, Jan Kara <jack@suse.cz>,
+        Jens Axboe <axboe@kernel.dk>, Jonathan Corbet <corbet@lwn.net>,
+        =?utf-8?B?SsOpcsO0bWU=?= Glisse <jglisse@redhat.com>,
+        Magnus Karlsson <magnus.karlsson@intel.com>,
+        Mauro Carvalho Chehab <mchehab@kernel.org>,
+        Michael Ellerman <mpe@ellerman.id.au>,
+        Michal Hocko <mhocko@suse.com>,
+        Mike Kravetz <mike.kravetz@oracle.com>,
+        Paul Mackerras <paulus@samba.org>,
+        Shuah Khan <shuah@kernel.org>,
+        Vlastimil Babka <vbabka@suse.cz>, bpf@vger.kernel.org,
+        Maling list - DRI developers 
+        <dri-devel@lists.freedesktop.org>, KVM list <kvm@vger.kernel.org>,
+        linux-block@vger.kernel.org,
+        Linux Doc Mailing List <linux-doc@vger.kernel.org>,
+        linux-fsdevel <linux-fsdevel@vger.kernel.org>,
+        linux-kselftest@vger.kernel.org,
+        "Linux-media@vger.kernel.org" <linux-media@vger.kernel.org>,
+        linux-rdma <linux-rdma@vger.kernel.org>,
+        linuxppc-dev <linuxppc-dev@lists.ozlabs.org>,
+        Netdev <netdev@vger.kernel.org>, Linux MM <linux-mm@kvack.org>,
+        LKML <linux-kernel@vger.kernel.org>,
+        Maor Gottlieb <maorg@mellanox.com>
+Subject: Re: [PATCH v11 00/25] mm/gup: track dma-pinned pages: FOLL_PIN
+Message-ID: <20191223182446.GA28321@ziepe.ca>
+References: <20191216222537.491123-1-jhubbard@nvidia.com>
+ <20191219132607.GA410823@unreal>
+ <a4849322-8e17-119e-a664-80d9f95d850b@nvidia.com>
+ <20191219210743.GN17227@ziepe.ca>
+ <42a3e5c1-6301-db0b-5d09-212edf5ecf2a@nvidia.com>
+ <20191220133423.GA13506@ziepe.ca>
+ <CAPcyv4hX9TsTMjsv2hnbEM-TpkC9abtWGSVskr9nPwpR8c5E1Q@mail.gmail.com>
+MIME-Version: 1.0
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <CAPcyv4hX9TsTMjsv2hnbEM-TpkC9abtWGSVskr9nPwpR8c5E1Q@mail.gmail.com>
+User-Agent: Mutt/1.9.4 (2018-02-28)
 Sender: linux-block-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-On Mon, Dec 23, 2019 at 9:04 AM Leon Romanovsky <leon@kernel.org> wrote:
->
-> On Mon, Dec 23, 2019 at 08:38:54AM +0100, Jinpu Wang wrote:
-> > On Sun, Dec 22, 2019 at 8:36 AM Leon Romanovsky <leon@kernel.org> wrote:
-> > >
-> > > On Sat, Dec 21, 2019 at 03:27:55PM +0100, Danil Kipnis wrote:
-> > > > Hi Leon,
-> > > >
-> > > > On Sat, Dec 21, 2019 at 11:15 AM Leon Romanovsky <leon@kernel.org> wrote:
-> > > > >
-> > > > > Perhaps it is normal practice to write half a company as authors,
-> > > > > and I'm wrong in the following, but code authorship is determined by
-> > > > > multiple tags in the commit messages.
-> > > >
-> > > > Different developers contributed to the driver over the last several
-> > > > years. Currently they are not working any more on this code. What tags
-> > > > in the commit message do you think would be appropriate to give those
-> > > > people credit for their work?
-> > >
-> > > Signed-of-by/Co-developed-../e.t.c
-> > >
-> > > But honestly without looking in your company contract, I'm pretty sure
-> > > that those people are not eligible for special authorship rights and
-> > > credits beyond already payed by the employer.
-> > >
-> > Hi, Leon,
-> >
-> > Thanks for the suggestion, how about only remove the authors for the
-> > new entry, only keep the company copyright?
-> > > +/* Copyright (c) 2019 1&1 IONOS SE. All rights reserved.
-> > > + * Authors: Jack Wang <jinpu.wang@cloud.ionos.com>
-> > > + *          Danil Kipnis <danil.kipnis@cloud.ionos.com>
-> > > + *          Guoqing Jiang <guoqing.jiang@cloud.ionos.com>
-> > > + *          Lutz Pogrell <lutz.pogrell@cloud.ionos.com>
-> > > + */
-> >
-> > The older entries were there, I think it's not polite to remove them.
->
-> From our point of view, this is brand new code and it doesn't matter how
-> many internal iterations you had prior submission. If you want to be
-> polite, your company shall issue official press release and mention
-> all those names there as main contributors for RTRS success.
->
-> You can find a lot of examples of "Authors:" in the kernel code, but
-> they one of two: code from pre-git era or copy/paste multiplied by
-> cargo cult.
->
-> Thanks
->
-Ok, will only keep the copyright lines, and remove Authors.
+On Fri, Dec 20, 2019 at 04:32:13PM -0800, Dan Williams wrote:
 
-Thanks
+> > > There's already a limit, it's just a much larger one. :) What does "no limit"
+> > > really mean, numerically, to you in this case?
+> >
+> > I guess I mean 'hidden limit' - hitting the limit and failing would
+> > be managable.
+> >
+> > I think 7 is probably too low though, but we are not using 1GB huge
+> > pages, only 2M..
+> 
+> What about RDMA to 1GB-hugetlbfs and 1GB-device-dax mappings?
+
+I don't think the failing testing is doing that.
+
+It is also less likely that 1GB regions will need multi-mapping, IMHO.
+
+Jason
