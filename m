@@ -4,52 +4,52 @@ X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 X-Spam-Level: 
 X-Spam-Status: No, score=-6.9 required=3.0 tests=DKIMWL_WL_HIGH,DKIM_SIGNED,
 	DKIM_VALID,DKIM_VALID_AU,HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,
-	MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS autolearn=ham
+	MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS autolearn=unavailable
 	autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 73975C2D0C0
-	for <linux-block@archiver.kernel.org>; Mon, 23 Dec 2019 22:56:19 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id A1479C2D0C0
+	for <linux-block@archiver.kernel.org>; Mon, 23 Dec 2019 22:56:22 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.kernel.org (Postfix) with ESMTP id 3F8EF2053B
-	for <linux-block@archiver.kernel.org>; Mon, 23 Dec 2019 22:56:19 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id 6B21D2053B
+	for <linux-block@archiver.kernel.org>; Mon, 23 Dec 2019 22:56:22 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="AxipSpEW"
+	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="c7WYowDY"
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1726954AbfLWW4S (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        id S1726936AbfLWW4S (ORCPT <rfc822;linux-block@archiver.kernel.org>);
         Mon, 23 Dec 2019 17:56:18 -0500
-Received: from us-smtp-delivery-1.mimecast.com ([207.211.31.120]:46612 "EHLO
-        us-smtp-1.mimecast.com" rhost-flags-OK-OK-OK-FAIL) by vger.kernel.org
-        with ESMTP id S1726936AbfLWW4M (ORCPT
+Received: from us-smtp-1.mimecast.com ([207.211.31.81]:53362 "EHLO
+        us-smtp-delivery-1.mimecast.com" rhost-flags-OK-OK-OK-FAIL)
+        by vger.kernel.org with ESMTP id S1727071AbfLWW4Q (ORCPT
         <rfc822;linux-block@vger.kernel.org>);
-        Mon, 23 Dec 2019 17:56:12 -0500
+        Mon, 23 Dec 2019 17:56:16 -0500
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-        s=mimecast20190719; t=1577141771;
+        s=mimecast20190719; t=1577141775;
         h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
          to:to:cc:mime-version:mime-version:
          content-transfer-encoding:content-transfer-encoding:
          in-reply-to:in-reply-to:references:references;
-        bh=UXBplLcKGcpkDyS8yQgGXGNohbofkhElCmjtU2legM0=;
-        b=AxipSpEWjGsg4Co0daYo62g8wTNVUa1+BrZB11S4KpD2MtpGbEOSvSbIbxcqIqBzfOXpyO
-        LWVFNkCKyDoX97Oqggs9XTt6gV84jWIWCsjtq6fScLFqXqH1qRDyLeNcmDfjFLs1IWqdEp
-        +jY40lRd5uJuYkPTmtAJHkqo7VHPMv0=
+        bh=vefL+wod3IF0bm304mueY4QtPGsIHZR1kZjIDWRhJoA=;
+        b=c7WYowDYqA1tyoIeLTtg9mflc6bqdbtHR7OorQH4wGmEnSLCJ+0FEMLmn50TC/FFRAjnCO
+        2v6mMgVSY2/o+wKZ5V2+IL+1ymQ9ie7o07z1I16WklCRIreJvLA7J2xu+A/+RZi1a2AuLo
+        8hNC2Z/4af35PTif/Gk7lcrgSIZ5+Co=
 Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
  [209.132.183.4]) (Using TLS) by relay.mimecast.com with ESMTP id
- us-mta-101-cH2QAAxSOymhWEqg6-2E2A-1; Mon, 23 Dec 2019 17:56:10 -0500
-X-MC-Unique: cH2QAAxSOymhWEqg6-2E2A-1
+ us-mta-423-GdshT3QoN1GGMMTcbOwoxA-1; Mon, 23 Dec 2019 17:56:13 -0500
+X-MC-Unique: GdshT3QoN1GGMMTcbOwoxA-1
 Received: from smtp.corp.redhat.com (int-mx02.intmail.prod.int.phx2.redhat.com [10.5.11.12])
         (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
         (No client certificate requested)
-        by mimecast-mx01.redhat.com (Postfix) with ESMTPS id 8678E10054E3;
-        Mon, 23 Dec 2019 22:56:09 +0000 (UTC)
+        by mimecast-mx01.redhat.com (Postfix) with ESMTPS id 15643801E74;
+        Mon, 23 Dec 2019 22:56:12 +0000 (UTC)
 Received: from sulaco.redhat.com (ovpn-112-13.rdu2.redhat.com [10.10.112.13])
-        by smtp.corp.redhat.com (Postfix) with ESMTP id A373960BE2;
-        Mon, 23 Dec 2019 22:56:08 +0000 (UTC)
+        by smtp.corp.redhat.com (Postfix) with ESMTP id 2558260BE2;
+        Mon, 23 Dec 2019 22:56:10 +0000 (UTC)
 From:   Tony Asleson <tasleson@redhat.com>
 To:     linux-scsi@vger.kernel.org, linux-block@vger.kernel.org,
         linux-fsdevel@vger.kernel.org
-Subject: [RFC 7/9] print_req_error: Add persistent durable name
-Date:   Mon, 23 Dec 2019 16:55:56 -0600
-Message-Id: <20191223225558.19242-8-tasleson@redhat.com>
+Subject: [RFC 9/9] __xfs_printk: Add durable name to output
+Date:   Mon, 23 Dec 2019 16:55:58 -0600
+Message-Id: <20191223225558.19242-10-tasleson@redhat.com>
 In-Reply-To: <20191223225558.19242-1-tasleson@redhat.com>
 References: <20191223225558.19242-1-tasleson@redhat.com>
 MIME-Version: 1.0
@@ -60,40 +60,43 @@ Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-Add persistent durable name to errors that occur in block mid layer.
+Add persistent durable name to xfs messages so we can
+correlate them with other messages for the same block
+device.
 
 Signed-off-by: Tony Asleson <tasleson@redhat.com>
 ---
- block/blk-core.c | 11 ++++++++++-
- 1 file changed, 10 insertions(+), 1 deletion(-)
+ fs/xfs/xfs_message.c | 17 +++++++++++++++++
+ 1 file changed, 17 insertions(+)
 
-diff --git a/block/blk-core.c b/block/blk-core.c
-index d5e668ec751b..a0171a7c6535 100644
---- a/block/blk-core.c
-+++ b/block/blk-core.c
-@@ -211,11 +211,20 @@ static void print_req_error(struct request *req, bl=
-k_status_t status,
- 		const char *caller)
+diff --git a/fs/xfs/xfs_message.c b/fs/xfs/xfs_message.c
+index 9804efe525a9..8447cdd985b4 100644
+--- a/fs/xfs/xfs_message.c
++++ b/fs/xfs/xfs_message.c
+@@ -20,6 +20,23 @@ __xfs_printk(
+ 	const struct xfs_mount	*mp,
+ 	struct va_format	*vaf)
  {
- 	int idx =3D (__force int)status;
 +	char dict[128];
 +	int dict_len =3D 0;
-=20
- 	if (WARN_ON_ONCE(idx >=3D ARRAY_SIZE(blk_errors)))
- 		return;
-=20
--	printk_ratelimited(KERN_ERR
-+	if (req->rq_disk) {
++
++	if (mp && mp->m_super && mp->m_super->s_bdev &&
++		mp->m_super->s_bdev->bd_disk) {
 +		dict_len =3D dev_durable_name(
-+				disk_to_dev(req->rq_disk)->parent,
-+				dict,
-+				sizeof(dict));
++			disk_to_dev(mp->m_super->s_bdev->bd_disk)->parent,
++			dict,
++			sizeof(dict));
++		if (dict_len) {
++			printk_emit(
++				0, level[1] - '0', dict, dict_len,
++				"XFS (%s): %pV\n",  mp->m_fsname, vaf);
++			return;
++		}
 +	}
 +
-+	printk_emit_ratelimited(0, LOGLEVEL_ERR, dict, dict_len,
- 		"%s: %s error, dev %s, sector %llu op 0x%x:(%s) flags 0x%x "
- 		"phys_seg %u prio class %u\n",
- 		caller, blk_errors[idx].name,
+ 	if (mp && mp->m_fsname) {
+ 		printk("%sXFS (%s): %pV\n", level, mp->m_fsname, vaf);
+ 		return;
 --=20
 2.21.0
 
