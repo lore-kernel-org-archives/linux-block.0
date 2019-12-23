@@ -2,133 +2,132 @@ Return-Path: <SRS0=vQdV=2N=vger.kernel.org=linux-block-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-2.4 required=3.0 tests=DKIM_SIGNED,DKIM_VALID,
-	DKIM_VALID_AU,HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SPF_HELO_NONE,
-	SPF_PASS,USER_AGENT_SANE_1 autolearn=no autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-6.9 required=3.0 tests=DKIMWL_WL_HIGH,DKIM_SIGNED,
+	DKIM_VALID,DKIM_VALID_AU,HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,
+	MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS autolearn=ham
+	autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 06A72C2D0C0
-	for <linux-block@archiver.kernel.org>; Mon, 23 Dec 2019 18:24:58 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 340C4C2D0C0
+	for <linux-block@archiver.kernel.org>; Mon, 23 Dec 2019 22:56:07 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.kernel.org (Postfix) with ESMTP id DA39620709
-	for <linux-block@archiver.kernel.org>; Mon, 23 Dec 2019 18:24:57 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id 0390220715
+	for <linux-block@archiver.kernel.org>; Mon, 23 Dec 2019 22:56:06 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=pass (2048-bit key) header.d=ziepe.ca header.i=@ziepe.ca header.b="FctYOOrJ"
+	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="W55TwLRV"
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1726865AbfLWSYv (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Mon, 23 Dec 2019 13:24:51 -0500
-Received: from mail-qv1-f67.google.com ([209.85.219.67]:36225 "EHLO
-        mail-qv1-f67.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1726866AbfLWSYv (ORCPT
+        id S1727014AbfLWW4G (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Mon, 23 Dec 2019 17:56:06 -0500
+Received: from us-smtp-delivery-1.mimecast.com ([205.139.110.120]:51013 "EHLO
+        us-smtp-1.mimecast.com" rhost-flags-OK-OK-OK-FAIL) by vger.kernel.org
+        with ESMTP id S1726860AbfLWW4F (ORCPT
         <rfc822;linux-block@vger.kernel.org>);
-        Mon, 23 Dec 2019 13:24:51 -0500
-Received: by mail-qv1-f67.google.com with SMTP id m14so6670833qvl.3
-        for <linux-block@vger.kernel.org>; Mon, 23 Dec 2019 10:24:50 -0800 (PST)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=ziepe.ca; s=google;
-        h=date:from:to:cc:subject:message-id:references:mime-version
-         :content-disposition:in-reply-to:user-agent;
-        bh=KNSp0xKzXXca6h2YP8X3emLAqK9GuJuCbstCZTI5ulI=;
-        b=FctYOOrJ074bGu2erxfD+ggi+amf34vJ2+/SB/OaLs8ZFEcoEOPSKxrX7J7vfW72iX
-         iaD1ph6XI9oWEr/nnku4Pr+MbBh9He5Xr+rBPzoju6TBhM7n5pqaYtl/oqkKFK9Nr8fH
-         Us04jbJ3zTX0WDIVdGhJyQO5EPn2JUvIhBvTug4ZRXtCzaFxharK0qUYwO9ZIkwiEqhS
-         c9Aa/tUvtqh3RdzKBnkDvwefmOBkVu9RUXlbwmdawA3jtTcA8wQCgHrvBfiWYN8r7VQg
-         T/hlkSjI6vXJcCVxYIXrbbrRmfsaCa4t09oEgSwlogc3AYXQW7LtDW06LM/jq8bAmut6
-         WCJg==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20161025;
-        h=x-gm-message-state:date:from:to:cc:subject:message-id:references
-         :mime-version:content-disposition:in-reply-to:user-agent;
-        bh=KNSp0xKzXXca6h2YP8X3emLAqK9GuJuCbstCZTI5ulI=;
-        b=tl+lcGgVEyn1sbmrLA2ofX8uzd0t8oFTOZlkI0jaK55QixenJnTgiD2w5q47rdff4c
-         dFoTBzWKXbBzACBa+CA8CUwu84XD/m5ifpHq4An3Fw6eLyLyzXwbq4fI490gHkoNterh
-         akYK8rdtEqtTw6CH27fFXWHYZthyJB/JlMAoFE+fNTMydaqJE2iQrH1JDeQ2C6ycBL8K
-         EGUQJsxX4Usp64K6JQMYuZINjWM2shAwbIUyR1egweI1ogB40O5FYm4HAB/6VoAPogL5
-         cjDBZ3EkzzaqjZ12GPHpqp/B16zXQcLqxA7B3b/b4y8XSw0VC1wrXHuhpYz2HbpH2K9y
-         j9vg==
-X-Gm-Message-State: APjAAAWj9JLxJ3PzGCyA1VJHZSFKHFYpDdWsJesu8wyFHH10i9YoHtaF
-        mxaOzmfQZQlYiR/kAVUVZviE+A==
-X-Google-Smtp-Source: APXvYqyOJm+HA/OOXOk1TxOLC8pk6pJEfZhfUy8M7as0rtMhyNSoNfAsriRZZomXf9eRLN7qDrjm+A==
-X-Received: by 2002:a0c:e150:: with SMTP id c16mr25637620qvl.51.1577125488455;
-        Mon, 23 Dec 2019 10:24:48 -0800 (PST)
-Received: from ziepe.ca (hlfxns017vw-142-68-57-212.dhcp-dynamic.fibreop.ns.bellaliant.net. [142.68.57.212])
-        by smtp.gmail.com with ESMTPSA id b7sm6449933qtj.15.2019.12.23.10.24.47
-        (version=TLS1_2 cipher=ECDHE-RSA-CHACHA20-POLY1305 bits=256/256);
-        Mon, 23 Dec 2019 10:24:47 -0800 (PST)
-Received: from jgg by mlx.ziepe.ca with local (Exim 4.90_1)
-        (envelope-from <jgg@ziepe.ca>)
-        id 1ijSNq-0007Pv-LV; Mon, 23 Dec 2019 14:24:46 -0400
-Date:   Mon, 23 Dec 2019 14:24:46 -0400
-From:   Jason Gunthorpe <jgg@ziepe.ca>
-To:     Dan Williams <dan.j.williams@intel.com>
-Cc:     John Hubbard <jhubbard@nvidia.com>,
-        Leon Romanovsky <leon@kernel.org>,
-        Andrew Morton <akpm@linux-foundation.org>,
-        Al Viro <viro@zeniv.linux.org.uk>,
-        Alex Williamson <alex.williamson@redhat.com>,
-        Benjamin Herrenschmidt <benh@kernel.crashing.org>,
-        =?utf-8?B?QmrDtnJuIFTDtnBlbA==?= <bjorn.topel@intel.com>,
-        Christoph Hellwig <hch@infradead.org>,
-        Daniel Vetter <daniel@ffwll.ch>,
-        Dave Chinner <david@fromorbit.com>,
-        David Airlie <airlied@linux.ie>,
-        "David S . Miller" <davem@davemloft.net>,
-        Ira Weiny <ira.weiny@intel.com>, Jan Kara <jack@suse.cz>,
-        Jens Axboe <axboe@kernel.dk>, Jonathan Corbet <corbet@lwn.net>,
-        =?utf-8?B?SsOpcsO0bWU=?= Glisse <jglisse@redhat.com>,
-        Magnus Karlsson <magnus.karlsson@intel.com>,
-        Mauro Carvalho Chehab <mchehab@kernel.org>,
-        Michael Ellerman <mpe@ellerman.id.au>,
-        Michal Hocko <mhocko@suse.com>,
-        Mike Kravetz <mike.kravetz@oracle.com>,
-        Paul Mackerras <paulus@samba.org>,
-        Shuah Khan <shuah@kernel.org>,
-        Vlastimil Babka <vbabka@suse.cz>, bpf@vger.kernel.org,
-        Maling list - DRI developers 
-        <dri-devel@lists.freedesktop.org>, KVM list <kvm@vger.kernel.org>,
-        linux-block@vger.kernel.org,
-        Linux Doc Mailing List <linux-doc@vger.kernel.org>,
-        linux-fsdevel <linux-fsdevel@vger.kernel.org>,
-        linux-kselftest@vger.kernel.org,
-        "Linux-media@vger.kernel.org" <linux-media@vger.kernel.org>,
-        linux-rdma <linux-rdma@vger.kernel.org>,
-        linuxppc-dev <linuxppc-dev@lists.ozlabs.org>,
-        Netdev <netdev@vger.kernel.org>, Linux MM <linux-mm@kvack.org>,
-        LKML <linux-kernel@vger.kernel.org>,
-        Maor Gottlieb <maorg@mellanox.com>
-Subject: Re: [PATCH v11 00/25] mm/gup: track dma-pinned pages: FOLL_PIN
-Message-ID: <20191223182446.GA28321@ziepe.ca>
-References: <20191216222537.491123-1-jhubbard@nvidia.com>
- <20191219132607.GA410823@unreal>
- <a4849322-8e17-119e-a664-80d9f95d850b@nvidia.com>
- <20191219210743.GN17227@ziepe.ca>
- <42a3e5c1-6301-db0b-5d09-212edf5ecf2a@nvidia.com>
- <20191220133423.GA13506@ziepe.ca>
- <CAPcyv4hX9TsTMjsv2hnbEM-TpkC9abtWGSVskr9nPwpR8c5E1Q@mail.gmail.com>
+        Mon, 23 Dec 2019 17:56:05 -0500
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+        s=mimecast20190719; t=1577141764;
+        h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+         to:to:cc:mime-version:mime-version:
+         content-transfer-encoding:content-transfer-encoding:
+         in-reply-to:in-reply-to:references:references;
+        bh=Ti74zgLwc9xdwukIMd+N9Ca9W+CO/0vNVJxfQlPd5OY=;
+        b=W55TwLRVxXdSlIuqNsjAL4iDpU1YYUXLLAJtb2gWMsA5lOMrFSDuechr0dIzYWrZ8DMrBo
+        bzVt2fYtrndu8286F11XzHaR+YcbJ0r/1qyKrb+pEQpINZLDKaCRl4k0PvwNFPBbaoRDWf
+        xP4Xbdmh48x43VIpyQLJ/IycrwnansY=
+Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
+ [209.132.183.4]) (Using TLS) by relay.mimecast.com with ESMTP id
+ us-mta-116--SyhMrKbN4Kn6hs4rcI6dA-1; Mon, 23 Dec 2019 17:56:03 -0500
+X-MC-Unique: -SyhMrKbN4Kn6hs4rcI6dA-1
+Received: from smtp.corp.redhat.com (int-mx02.intmail.prod.int.phx2.redhat.com [10.5.11.12])
+        (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
+        (No client certificate requested)
+        by mimecast-mx01.redhat.com (Postfix) with ESMTPS id 2BBF510054E3;
+        Mon, 23 Dec 2019 22:56:02 +0000 (UTC)
+Received: from sulaco.redhat.com (ovpn-112-13.rdu2.redhat.com [10.10.112.13])
+        by smtp.corp.redhat.com (Postfix) with ESMTP id 3E50160BE2;
+        Mon, 23 Dec 2019 22:56:01 +0000 (UTC)
+From:   Tony Asleson <tasleson@redhat.com>
+To:     linux-scsi@vger.kernel.org, linux-block@vger.kernel.org,
+        linux-fsdevel@vger.kernel.org
+Subject: [RFC 1/9] lib/string: Add function to trim duplicate WS
+Date:   Mon, 23 Dec 2019 16:55:50 -0600
+Message-Id: <20191223225558.19242-2-tasleson@redhat.com>
+In-Reply-To: <20191223225558.19242-1-tasleson@redhat.com>
+References: <20191223225558.19242-1-tasleson@redhat.com>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <CAPcyv4hX9TsTMjsv2hnbEM-TpkC9abtWGSVskr9nPwpR8c5E1Q@mail.gmail.com>
-User-Agent: Mutt/1.9.4 (2018-02-28)
+X-Scanned-By: MIMEDefang 2.79 on 10.5.11.12
+Content-Transfer-Encoding: quoted-printable
 Sender: linux-block-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-On Fri, Dec 20, 2019 at 04:32:13PM -0800, Dan Williams wrote:
+Adds function strim_dupe which trims leading & trailing whitespace and
+duplicate adjacent.  Initial use case is to shorten T10 storage IDs.
 
-> > > There's already a limit, it's just a much larger one. :) What does "no limit"
-> > > really mean, numerically, to you in this case?
-> >
-> > I guess I mean 'hidden limit' - hitting the limit and failing would
-> > be managable.
-> >
-> > I think 7 is probably too low though, but we are not using 1GB huge
-> > pages, only 2M..
-> 
-> What about RDMA to 1GB-hugetlbfs and 1GB-device-dax mappings?
+Signed-off-by: Tony Asleson <tasleson@redhat.com>
+---
+ include/linux/string.h |  2 ++
+ lib/string.c           | 35 +++++++++++++++++++++++++++++++++++
+ 2 files changed, 37 insertions(+)
 
-I don't think the failing testing is doing that.
+diff --git a/include/linux/string.h b/include/linux/string.h
+index b6ccdc2c7f02..bcca6bfab6ab 100644
+--- a/include/linux/string.h
++++ b/include/linux/string.h
+@@ -72,6 +72,8 @@ extern char * __must_check skip_spaces(const char *);
+=20
+ extern char *strim(char *);
+=20
++extern size_t strim_dupe(char *s);
++
+ static inline __must_check char *strstrip(char *str)
+ {
+ 	return strim(str);
+diff --git a/lib/string.c b/lib/string.c
+index 08ec58cc673b..1186cce1f66b 100644
+--- a/lib/string.c
++++ b/lib/string.c
+@@ -515,6 +515,41 @@ char *strim(char *s)
+ }
+ EXPORT_SYMBOL(strim);
+=20
++/**
++ * Removes leading and trailing whitespace and removes duplicate
++ * adjacent whitespace in a string, modifies string in place.
++ * @s The %NUL-terminated string to have spaces removed
++ * Returns the new length
++ */
++size_t strim_dupe(char *s)
++{
++	size_t ret =3D 0;
++	char *w =3D s;
++	char *p;
++
++	/*
++	 * This will remove all leading and duplicate adjacent, but leave
++	 * 1 space at the end if one or more are present.
++	 */
++	for (p =3D s; *p !=3D '\0'; ++p) {
++		if (!isspace(*p) || (p !=3D s && !isspace(*(p - 1)))) {
++			*w =3D *p;
++			++w;
++			ret +=3D 1;
++		}
++	}
++
++	*w =3D '\0';
++
++	/* Take off the last character if it's a space too */
++	if (ret && isspace(*(w - 1))) {
++		ret--;
++		*(w - 1) =3D '\0';
++	}
++	return ret;
++}
++EXPORT_SYMBOL(strim_dupe);
++
+ #ifndef __HAVE_ARCH_STRLEN
+ /**
+  * strlen - Find the length of a string
+--=20
+2.21.0
 
-It is also less likely that 1GB regions will need multi-mapping, IMHO.
-
-Jason
