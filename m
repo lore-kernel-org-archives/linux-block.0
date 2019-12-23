@@ -2,61 +2,121 @@ Return-Path: <SRS0=vQdV=2N=vger.kernel.org=linux-block-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-2.2 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
-	MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,USER_AGENT_SANE_1 autolearn=no
-	autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-6.8 required=3.0 tests=DKIM_SIGNED,DKIM_VALID,
+	DKIM_VALID_AU,HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,
+	SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS autolearn=ham autolearn_force=no
+	version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 43AA5C2D0D2
-	for <linux-block@archiver.kernel.org>; Mon, 23 Dec 2019 03:15:41 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 71C8FC2D0C0
+	for <linux-block@archiver.kernel.org>; Mon, 23 Dec 2019 07:20:19 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.kernel.org (Postfix) with ESMTP id 1216C20733
-	for <linux-block@archiver.kernel.org>; Mon, 23 Dec 2019 03:15:41 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id 3DA7E20709
+	for <linux-block@archiver.kernel.org>; Mon, 23 Dec 2019 07:20:19 +0000 (UTC)
+Authentication-Results: mail.kernel.org;
+	dkim=pass (2048-bit key) header.d=cloud.ionos.com header.i=@cloud.ionos.com header.b="Ayjkb78O"
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1726539AbfLWDPk (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Sun, 22 Dec 2019 22:15:40 -0500
-Received: from szxga05-in.huawei.com ([45.249.212.191]:7727 "EHLO huawei.com"
-        rhost-flags-OK-OK-OK-FAIL) by vger.kernel.org with ESMTP
-        id S1726393AbfLWDPk (ORCPT <rfc822;linux-block@vger.kernel.org>);
-        Sun, 22 Dec 2019 22:15:40 -0500
-Received: from DGGEMS413-HUB.china.huawei.com (unknown [172.30.72.59])
-        by Forcepoint Email with ESMTP id 6F6DE8F43E9875C0B0A4;
-        Mon, 23 Dec 2019 11:15:38 +0800 (CST)
-Received: from [127.0.0.1] (10.173.222.66) by DGGEMS413-HUB.china.huawei.com
- (10.3.19.213) with Microsoft SMTP Server id 14.3.439.0; Mon, 23 Dec 2019
- 11:15:35 +0800
-Subject: Re: [PATCH blktests v4] nbd/003:add mount and clear_sock test for nbd
-To:     <linux-block@vger.kernel.org>, <osandov@fb.com>
-References: <1577071109-68332-1-git-send-email-sunke32@huawei.com>
-From:   "sunke (E)" <sunke32@huawei.com>
-Message-ID: <8ece15f7-addf-44b2-0b54-4e1a450037f2@huawei.com>
-Date:   Mon, 23 Dec 2019 11:15:35 +0800
-User-Agent: Mozilla/5.0 (Windows NT 10.0; WOW64; rv:68.0) Gecko/20100101
- Thunderbird/68.2.2
+        id S1725880AbfLWHUS (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Mon, 23 Dec 2019 02:20:18 -0500
+Received: from mail-io1-f65.google.com ([209.85.166.65]:40920 "EHLO
+        mail-io1-f65.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S1725810AbfLWHUS (ORCPT
+        <rfc822;linux-block@vger.kernel.org>);
+        Mon, 23 Dec 2019 02:20:18 -0500
+Received: by mail-io1-f65.google.com with SMTP id x1so15245798iop.7
+        for <linux-block@vger.kernel.org>; Sun, 22 Dec 2019 23:20:17 -0800 (PST)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=cloud.ionos.com; s=google;
+        h=mime-version:references:in-reply-to:from:date:message-id:subject:to
+         :cc;
+        bh=ttGL4+rAzNXTX2Tnq6h3tFr0OQnGnOOLQHuyK09xGds=;
+        b=Ayjkb78OydEZ0TXht2CsrKKwoCTFkm9UnPn3zsidkYkIYw2wiQnviHOcqiCaqikM9H
+         Hv/Ha+zqTgmi3yLih80kG69nDr1ibnvdAlzVaBtSxGraACXYR0l1XswHDSmUE6MwMhxu
+         aDqKWPdzSizb0sOnFnAIEFlcj1SF4x04ARWlbmdU0qE1LBnq/uqxjaPAEC+xSRpOE70e
+         truTDaxC/v8xTLbdJgMnJUGGGvRsvz6r+tMFmoTe54FeBKkBWZvSWsNzDdWF5FRKx4hN
+         Sru98DsnNTQS6rG7B9C61+LFcn8tyisIlzZuNtY4W1AX9vO66IbJB37qHG7DkfpBn9Tn
+         3p+g==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20161025;
+        h=x-gm-message-state:mime-version:references:in-reply-to:from:date
+         :message-id:subject:to:cc;
+        bh=ttGL4+rAzNXTX2Tnq6h3tFr0OQnGnOOLQHuyK09xGds=;
+        b=bGoVHdocBrMASioirexoPuE8RrGDZ09+T8q4lZTi4hBAglHDYFHqplgvYN2Pilim75
+         ZoULFD5y2G3G0/En0eKKHbXoL7ezst6XlQi6vN2Po2hRJ0LbWfyYZXUDx1BjjNkyNl5c
+         W1Zn+qiKwYUpwS+vCqSpN8hRtqGdvGC7PZW2crLjY+iJCDaiuJIdS5duUAqAeA1gXLKu
+         grDCqOBCCWyFkR/t5i0mI7SqMGyBw7JambVrn8aRUHhPlN47GYIKzsneh1Ylv/tQVwSR
+         zOao0bJvSL0Yzgx7LFNw2ZJdhoTYKvdyoqrkpAQ/pDrDXmboilY90xQ9mNZ6h0rpkw8X
+         pV+g==
+X-Gm-Message-State: APjAAAUv15QaD3Icwe5m7s37ToyRtbH123ta0bN4WV1SgtaY4Mcy/oMm
+        CCCTb2RFbdJq6i1KwRW2eXb+X5f+h+heDSz9WLJa9w==
+X-Google-Smtp-Source: APXvYqxmmbOZRBX89vHfbtplFNPe+MDeKEj2hP6ww1S4gdn0Gj+xT5VYvprwy2anSIalcKcQGZ2Bi4ykXgtm9CMOFYU=
+X-Received: by 2002:a5d:84d6:: with SMTP id z22mr18136770ior.54.1577085617331;
+ Sun, 22 Dec 2019 23:20:17 -0800 (PST)
 MIME-Version: 1.0
-In-Reply-To: <1577071109-68332-1-git-send-email-sunke32@huawei.com>
-Content-Type: text/plain; charset="gbk"; format=flowed
-Content-Transfer-Encoding: 7bit
-X-Originating-IP: [10.173.222.66]
-X-CFilter-Loop: Reflected
+References: <20191220155109.8959-1-jinpuwang@gmail.com> <20191220155109.8959-26-jinpuwang@gmail.com>
+ <655f25d2-7c3f-989a-0aa4-9f8f72c63c6b@amazon.com>
+In-Reply-To: <655f25d2-7c3f-989a-0aa4-9f8f72c63c6b@amazon.com>
+From:   Jinpu Wang <jinpu.wang@cloud.ionos.com>
+Date:   Mon, 23 Dec 2019 08:20:08 +0100
+Message-ID: <CAMGffEmhYhhYhhZ++7hd9c3n7jOwgUKiC7vwNc4y++KMgqrEEg@mail.gmail.com>
+Subject: Re: [PATCH v5 25/25] MAINTAINERS: Add maintainers for RNBD/RTRS modules
+To:     Gal Pressman <galpress@amazon.com>
+Cc:     Jack Wang <jinpuwang@gmail.com>, linux-block@vger.kernel.org,
+        linux-rdma@vger.kernel.org, Jens Axboe <axboe@kernel.dk>,
+        Christoph Hellwig <hch@infradead.org>,
+        Sagi Grimberg <sagi@grimberg.me>,
+        Bart Van Assche <bvanassche@acm.org>,
+        Leon Romanovsky <leon@kernel.org>,
+        Doug Ledford <dledford@redhat.com>,
+        Danil Kipnis <danil.kipnis@cloud.ionos.com>, rpenyaev@suse.de
+Content-Type: text/plain; charset="UTF-8"
 Sender: linux-block-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-Hi Omar,
+On Sun, Dec 22, 2019 at 10:55 AM Gal Pressman <galpress@amazon.com> wrote:
+>
+> On 20/12/2019 17:51, Jack Wang wrote:
+> > From: Jack Wang <jinpu.wang@cloud.ionos.com>
+> >
+> > Danil and me will maintain RNBD/RTRS modules.
+> >
+> > Signed-off-by: Danil Kipnis <danil.kipnis@cloud.ionos.com>
+> > Signed-off-by: Jack Wang <jinpu.wang@cloud.ionos.com>
+> > ---
+> >  MAINTAINERS | 14 ++++++++++++++
+> >  1 file changed, 14 insertions(+)
+> >
+> > diff --git a/MAINTAINERS b/MAINTAINERS
+> > index cc0a4a8ae06a..e0caeac43fc8 100644
+> > --- a/MAINTAINERS
+> > +++ b/MAINTAINERS
+> > @@ -7955,6 +7955,20 @@ IBM ServeRAID RAID DRIVER
+> >  S:   Orphan
+> >  F:   drivers/scsi/ips.*
+> >
+> > +RNBD BLOCK DRIVERS
+> > +M:   Danil Kipnis <danil.kipnis@cloud.ionos.com>
+> > +M:   Jack Wang <jinpu.wang@cloud.ionos.com>
+> > +L:   linux-block@vger.kernel.org
+> > +S:   Maintained
+> > +F:   drivers/block/rnbd/
+> > +
+> > +RTRS TRANSPORT DRIVERS
+> > +M:   Danil Kipnis <danil.kipnis@cloud.ionos.com>
+> > +M:   Jack Wang <jinpu.wang@cloud.ionos.com>
+> > +L:   linux-rdma@vger.kernel.org
+> > +S:   Maintained
+> > +F:   drivers/infiniband/ulp/rtrs/
+> > +
+> >  ICH LPC AND GPIO DRIVER
+> >  M:   Peter Tyser <ptyser@xes-inc.com>
+> >  S:   Maintained
+> >
+>
+> Entries should be added in alphabetical order.
+Thanks, Gal,
+Will fix the next round.
 
-The nbd/003 you simplified does the same I want to do and I made some 
-small changes. I ran the simplified nbd/003 with linux kernel at the 
-commit 7e0165b2f1a, it could pass.Then, I rollbacked the linux kernel to 
-commit 090bb803708, it indeed triggered the BUGON.
-
-However, there is one difference. NBD has ioctl and netlink interfaces. 
-I use the netlink interface and the simplified nbd/003 use the ioctl 
-interface. The nbd/003 with the netlink interface indeed seem to trigger 
-some other issue. So, can it be nbd/004?
-
-thanks,
-
-Sun Ke.
-
-
+Regards,
+Jack
