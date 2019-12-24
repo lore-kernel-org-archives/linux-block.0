@@ -2,127 +2,106 @@ Return-Path: <SRS0=ozoq=2O=vger.kernel.org=linux-block-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-8.1 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
-	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,
-	SPF_HELO_NONE,SPF_PASS,USER_AGENT_SANE_2 autolearn=ham autolearn_force=no
-	version=3.4.0
+X-Spam-Status: No, score=-9.8 required=3.0 tests=DKIM_SIGNED,DKIM_VALID,
+	DKIM_VALID_AU,HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,
+	SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,USER_AGENT_GIT autolearn=unavailable
+	autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id ABF7AC2D0C0
-	for <linux-block@archiver.kernel.org>; Tue, 24 Dec 2019 00:56:06 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 9C707C2D0D2
+	for <linux-block@archiver.kernel.org>; Tue, 24 Dec 2019 09:29:47 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.kernel.org (Postfix) with ESMTP id 737692073A
-	for <linux-block@archiver.kernel.org>; Tue, 24 Dec 2019 00:56:06 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id 743BA206B7
+	for <linux-block@archiver.kernel.org>; Tue, 24 Dec 2019 09:29:47 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (1024-bit key) header.d=hansenpartnership.com header.i=@hansenpartnership.com header.b="AVfwYTGX";
-	dkim=fail reason="signature verification failed" (1024-bit key) header.d=hansenpartnership.com header.i=@hansenpartnership.com header.b="AVfwYTGX"
+	dkim=pass (2048-bit key) header.d=inango-systems.com header.i=@inango-systems.com header.b="jYec26/e"
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1726860AbfLXA4F (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Mon, 23 Dec 2019 19:56:05 -0500
-Received: from bedivere.hansenpartnership.com ([66.63.167.143]:50406 "EHLO
-        bedivere.hansenpartnership.com" rhost-flags-OK-OK-OK-OK)
-        by vger.kernel.org with ESMTP id S1726833AbfLXA4F (ORCPT
+        id S1726091AbfLXJ3q (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Tue, 24 Dec 2019 04:29:46 -0500
+Received: from mail.inango-systems.com ([178.238.230.57]:38324 "EHLO
+        mail.inango-sw.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S1726084AbfLXJ3q (ORCPT
         <rfc822;linux-block@vger.kernel.org>);
-        Mon, 23 Dec 2019 19:56:05 -0500
+        Tue, 24 Dec 2019 04:29:46 -0500
+X-Greylist: delayed 496 seconds by postgrey-1.27 at vger.kernel.org; Tue, 24 Dec 2019 04:29:46 EST
 Received: from localhost (localhost [127.0.0.1])
-        by bedivere.hansenpartnership.com (Postfix) with ESMTP id 4CDC58EE165;
-        Mon, 23 Dec 2019 16:56:05 -0800 (PST)
-DKIM-Signature: v=1; a=rsa-sha256; c=simple/simple; d=hansenpartnership.com;
-        s=20151216; t=1577148965;
-        bh=iD2pVUJTAElo6XNlJ4Ka0d03YwCX7zbTkAqdNNqjais=;
-        h=Subject:From:To:Date:In-Reply-To:References:From;
-        b=AVfwYTGXYBV6Aze+goC29LNX3R9F0KThPgT2Q4HET0UPBOPl9lHp72VJ6Usb+olha
-         znC3omlsaGnhPcE49vBf85suDSD8SEVir+2bukfvKzMQoYbWkTaSm8C2LjdsD4ovV4
-         Xgt8MEvhpvDibHyirOsiE0hy6OHeDGCDBo7nOV0w=
-Received: from bedivere.hansenpartnership.com ([127.0.0.1])
-        by localhost (bedivere.hansenpartnership.com [127.0.0.1]) (amavisd-new, port 10024)
-        with ESMTP id IEUCgobfJHTn; Mon, 23 Dec 2019 16:56:05 -0800 (PST)
-Received: from jarvis.lan (unknown [50.35.76.230])
-        (using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
-        (No client certificate requested)
-        by bedivere.hansenpartnership.com (Postfix) with ESMTPSA id CC0D78EE092;
-        Mon, 23 Dec 2019 16:56:04 -0800 (PST)
-DKIM-Signature: v=1; a=rsa-sha256; c=simple/simple; d=hansenpartnership.com;
-        s=20151216; t=1577148965;
-        bh=iD2pVUJTAElo6XNlJ4Ka0d03YwCX7zbTkAqdNNqjais=;
-        h=Subject:From:To:Date:In-Reply-To:References:From;
-        b=AVfwYTGXYBV6Aze+goC29LNX3R9F0KThPgT2Q4HET0UPBOPl9lHp72VJ6Usb+olha
-         znC3omlsaGnhPcE49vBf85suDSD8SEVir+2bukfvKzMQoYbWkTaSm8C2LjdsD4ovV4
-         Xgt8MEvhpvDibHyirOsiE0hy6OHeDGCDBo7nOV0w=
-Message-ID: <1577148963.29997.34.camel@HansenPartnership.com>
-Subject: Re: [RFC 8/9] ata_dev_printk: Add durable name to output
-From:   James Bottomley <James.Bottomley@HansenPartnership.com>
-To:     Tony Asleson <tasleson@redhat.com>, linux-scsi@vger.kernel.org,
-        linux-block@vger.kernel.org, linux-fsdevel@vger.kernel.org
-Date:   Mon, 23 Dec 2019 16:56:03 -0800
-In-Reply-To: <20191223225558.19242-9-tasleson@redhat.com>
-References: <20191223225558.19242-1-tasleson@redhat.com>
-         <20191223225558.19242-9-tasleson@redhat.com>
-Content-Type: text/plain; charset="UTF-8"
-X-Mailer: Evolution 3.26.6 
-Mime-Version: 1.0
-Content-Transfer-Encoding: 7bit
+        by mail.inango-sw.com (Postfix) with ESMTP id 69B2A1080783;
+        Tue, 24 Dec 2019 11:21:29 +0200 (IST)
+Received: from mail.inango-sw.com ([127.0.0.1])
+        by localhost (mail.inango-sw.com [127.0.0.1]) (amavisd-new, port 10032)
+        with ESMTP id 1fxzy3dGzunS; Tue, 24 Dec 2019 11:21:28 +0200 (IST)
+Received: from localhost (localhost [127.0.0.1])
+        by mail.inango-sw.com (Postfix) with ESMTP id DE3D9108078E;
+        Tue, 24 Dec 2019 11:21:28 +0200 (IST)
+DKIM-Filter: OpenDKIM Filter v2.10.3 mail.inango-sw.com DE3D9108078E
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=inango-systems.com;
+        s=45A440E0-D841-11E8-B985-5FCC721607E0; t=1577179288;
+        bh=CAmI7apeyL7jZ6co+qwW6zsFPTjggPHOPX6bTaAoTBQ=;
+        h=From:To:Date:Message-Id;
+        b=jYec26/eP5rkBjgKag80Q62vw95TEj1y+Cs11iTw2xYKxUdpAqnI1mkOqARJm/YFL
+         JOwhfcR7m56oX2R0jCchrumekxx2qvoRS/D3Yb2qsKSR+r/AWquos/6GhLVv7xbLT+
+         3cbi4gPunzbfWPZTPi3s4UN31yBoWaC9DH5e0PhslvdmNH7EZw7JwQcYO7Pnq+KhQe
+         PB6BbYt6+i66zx9XL6vVMxLmzdKR6k4aPwAAvdEGJkAySQfQ1N1HF3GuQYRVw+PVna
+         mDN8Et9jKR6+LGkc51+HBgXuHHqW7tCJz8fwyjBPSL5BeHf4C7PKbEmqd0FevXMUuG
+         Bl+UamaTZxy9A==
+X-Virus-Scanned: amavisd-new at inango-sw.com
+Received: from mail.inango-sw.com ([127.0.0.1])
+        by localhost (mail.inango-sw.com [127.0.0.1]) (amavisd-new, port 10026)
+        with ESMTP id VoL7VamDXbEy; Tue, 24 Dec 2019 11:21:28 +0200 (IST)
+Received: from nmerinov.inango.loc (unknown [194.60.247.123])
+        by mail.inango-sw.com (Postfix) with ESMTPSA id 22D7B108023C;
+        Tue, 24 Dec 2019 11:21:28 +0200 (IST)
+From:   Nikolai Merinov <n.merinov@inango-systems.com>
+To:     Davidlohr Bueso <dave@stgolabs.net>, Jens Axboe <axboe@kernel.dk>,
+        linux-efi@vger.kernel.org, linux-block@vger.kernel.org,
+        linux-kernel@vger.kernel.org
+Cc:     Nikolai Merinov <n.merinov@inango-systems.com>
+Subject: [PATCH v2] partitions/efi: Fix partition name parsing in GUID partition entry
+Date:   Tue, 24 Dec 2019 14:21:19 +0500
+Message-Id: <20191224092119.4581-1-n.merinov@inango-systems.com>
+X-Mailer: git-send-email 2.17.1
+In-Reply-To: <20181124162123.21300-1-n.merinov@inango-systems.com>
+References: <20181124162123.21300-1-n.merinov@inango-systems.com>
 Sender: linux-block-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-On Mon, 2019-12-23 at 16:55 -0600, Tony Asleson wrote:
-> If we have a durable name we will add to output, else
-> we will default to existing message output format.
-> 
-> Signed-off-by: Tony Asleson <tasleson@redhat.com>
-> ---
->  drivers/ata/libata-core.c | 26 +++++++++++++++++++++++---
->  1 file changed, 23 insertions(+), 3 deletions(-)
-> 
-> diff --git a/drivers/ata/libata-core.c b/drivers/ata/libata-core.c
-> index 28c492be0a57..b57a74cfb529 100644
-> --- a/drivers/ata/libata-core.c
-> +++ b/drivers/ata/libata-core.c
-> @@ -7249,6 +7249,9 @@ EXPORT_SYMBOL(ata_link_printk);
->  void ata_dev_printk(const struct ata_device *dev, const char *level,
->  		    const char *fmt, ...)
->  {
-> +	char dict[128];
-> +	int dict_len = 0;
-> +
->  	struct va_format vaf;
->  	va_list args;
->  
-> @@ -7257,9 +7260,26 @@ void ata_dev_printk(const struct ata_device
-> *dev, const char *level,
->  	vaf.fmt = fmt;
->  	vaf.va = &args;
->  
-> -	printk("%sata%u.%02u: %pV",
-> -	       level, dev->link->ap->print_id, dev->link->pmp + dev-
-> >devno,
-> -	       &vaf);
-> +	if (dev->sdev) {
-> +		dict_len = dev_durable_name(
-> +			&dev->sdev->sdev_gendev,
-> +			dict,
-> +			sizeof(dict));
-> +	}
-> +
-> +	if (dict_len > 0) {
-> +		printk_emit(0, level[1] - '0', dict, dict_len,
-> +				"sata%u.%02u: %pV",
-> +				dev->link->ap->print_id,
-> +				dev->link->pmp + dev->devno,
-> +				&vaf);
-> +	} else {
-> +		printk("%sata%u.%02u: %pV",
-> +			level,
-> +			dev->link->ap->print_id,
-> +			dev->link->pmp + dev->devno,
-> +			&vaf);
-> +	}
+GUID partition entry defined to have a partition name as 36 UTF-16LE
+code units. This means that on big-endian platforms ASCII symbols
+would be read with 0xXX00 efi_char16_t character code. In order to
+correctly extract ASCII characters from a partition name field we
+should be converted from 16LE to CPU architecture.
 
-As I said, I think ata_dev_printk should expand to dev_printk, which
-would render all the above unnecessary, but just in case there's a
-problem, printk_emit() with a dict_len == 0 is directly equivalent to
-printk() so the whole if (dict_len > 0) is unnecessary.
+The problem exists on all big endian platforms.
 
-James
+Signed-off-by: Nikolai Merinov <n.merinov@inango-systems.com>
+
+diff --git a/block/partitions/efi.c b/block/partitions/efi.c
+index db2fef7dfc47..51287a8a3bea 100644
+--- a/block/partitions/efi.c
++++ b/block/partitions/efi.c
+@@ -715,7 +715,7 @@ int efi_partition(struct parsed_partitions *state)
+ 				ARRAY_SIZE(ptes[i].partition_name));
+ 		info->volname[label_max] = 0;
+ 		while (label_count < label_max) {
+-			u8 c = ptes[i].partition_name[label_count] & 0xff;
++			u8 c = le16_to_cpu(ptes[i].partition_name[label_count]) & 0xff;
+ 			if (c && !isprint(c))
+ 				c = '!';
+ 			info->volname[label_count] = c;
+diff --git a/block/partitions/efi.h b/block/partitions/efi.h
+index 3e8576157575..0b6d5b7be111 100644
+--- a/block/partitions/efi.h
++++ b/block/partitions/efi.h
+@@ -88,7 +88,7 @@ typedef struct _gpt_entry {
+ 	__le64 starting_lba;
+ 	__le64 ending_lba;
+ 	gpt_entry_attributes attributes;
+-	efi_char16_t partition_name[72 / sizeof (efi_char16_t)];
++	__le16 partition_name[72 / sizeof (__le16)];
+ } __packed gpt_entry;
+ 
+ typedef struct _gpt_mbr_record {
+-- 
+2.17.1
 
