@@ -7,49 +7,49 @@ X-Spam-Status: No, score=-10.1 required=3.0 tests=DKIMWL_WL_HIGH,DKIM_SIGNED,
 	SPF_HELO_NONE,SPF_PASS,USER_AGENT_GIT autolearn=unavailable
 	autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 911D8C2D0CE
-	for <linux-block@archiver.kernel.org>; Fri, 27 Dec 2019 17:45:38 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id A444EC2D0C6
+	for <linux-block@archiver.kernel.org>; Fri, 27 Dec 2019 18:04:25 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.kernel.org (Postfix) with ESMTP id 6F99224125
-	for <linux-block@archiver.kernel.org>; Fri, 27 Dec 2019 17:45:38 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id 7E3A520CC7
+	for <linux-block@archiver.kernel.org>; Fri, 27 Dec 2019 18:04:25 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=default; t=1577468738;
-	bh=WHjFgNYP6inPBpEBgMdiquy7P92dDHNZgcPaa/lqkQw=;
+	s=default; t=1577469865;
+	bh=EP0SVqUmoXOJjI5gUdiDY42SwakQbyZ3BQJ4zWKpusA=;
 	h=From:To:Cc:Subject:Date:In-Reply-To:References:List-ID:From;
-	b=f/Ph+xyyikTPclepppD0YKPAvVCGPoiW97DWZvPc0byo7lIcM6pqCWGRnDAii9A/8
-	 nb45QBa6oiTXwOYyPu/baT1Xk2pOHHiuVuUUOBp12v4qNjmknUJ3/lF9lcnQAS3GrI
-	 ncKl3GbTdbyN/+5ttLVIQt4nOTlW9tEmXA1d0K+Y=
+	b=qkBlsyY1+hHxW8ioTjofOgaV4HDkFwKpSDp/IFRZYYNQtUO7aeDMdHJ7t2IWd/tN3
+	 rw9kg6d9DKlsvoWI0Z3NuvtQsnm1fjSmNhjIGasbCQvbnB0DVn7PYw54NaTTtOlDTg
+	 zszJDaOiW9BUz2c3Jaf/p2dz9W9A3QJjStCMHKLo=
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1728778AbfL0Rp0 (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Fri, 27 Dec 2019 12:45:26 -0500
-Received: from mail.kernel.org ([198.145.29.99]:44072 "EHLO mail.kernel.org"
+        id S1727360AbfL0SDu (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Fri, 27 Dec 2019 13:03:50 -0500
+Received: from mail.kernel.org ([198.145.29.99]:60696 "EHLO mail.kernel.org"
         rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-        id S1728192AbfL0Rp0 (ORCPT <rfc822;linux-block@vger.kernel.org>);
-        Fri, 27 Dec 2019 12:45:26 -0500
+        id S1728684AbfL0SD0 (ORCPT <rfc822;linux-block@vger.kernel.org>);
+        Fri, 27 Dec 2019 13:03:26 -0500
 Received: from sasha-vm.mshome.net (c-73-47-72-35.hsd1.nh.comcast.net [73.47.72.35])
         (using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
         (No client certificate requested)
-        by mail.kernel.org (Postfix) with ESMTPSA id A16412464E;
-        Fri, 27 Dec 2019 17:45:24 +0000 (UTC)
+        by mail.kernel.org (Postfix) with ESMTPSA id 1CCCB222C4;
+        Fri, 27 Dec 2019 18:03:25 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-        s=default; t=1577468725;
-        bh=WHjFgNYP6inPBpEBgMdiquy7P92dDHNZgcPaa/lqkQw=;
+        s=default; t=1577469805;
+        bh=EP0SVqUmoXOJjI5gUdiDY42SwakQbyZ3BQJ4zWKpusA=;
         h=From:To:Cc:Subject:Date:In-Reply-To:References:From;
-        b=NFKPeXXj9eANMDdKn/9Vr8iaAr6vFyQ0JkjEt7dj7pij2WLEKn0twp0smNWAkV2/A
-         GTyh+3ZjK4whNtaUkZ+TFB447xzXWfu1sPjwh8zBRevTVWT+et6zM8hB8l08vnP9pV
-         cBZ/FjeCzBFRusv2KEKJM2wK2dBc7gNbOLvIL1rc=
+        b=Tm7JIXfaHPzb5Nca+J12/8wLzLy9oOjJlgeYlEnTb9hzdIGQzRcOa6gbuTMZFOZ+F
+         lfFKYs0Rq6obxe3C1C2XPiUlww6+pbAmKGyDLA+XRMyvNprTImQH5d7hnNLjZXpBxk
+         O/iGob/l90IYLK2SokdXVZMFWQDDDEMUOz7L7Fwc=
 From:   Sasha Levin <sashal@kernel.org>
 To:     linux-kernel@vger.kernel.org, stable@vger.kernel.org
 Cc:     Yang Yingliang <yangyingliang@huawei.com>,
         Bob Liu <bob.liu@oracle.com>, Hulk Robot <hulkci@huawei.com>,
         Jens Axboe <axboe@kernel.dk>, Sasha Levin <sashal@kernel.org>,
         linux-block@vger.kernel.org
-Subject: [PATCH AUTOSEL 4.19 78/84] block: fix memleak when __blk_rq_map_user_iov() is failed
-Date:   Fri, 27 Dec 2019 12:43:46 -0500
-Message-Id: <20191227174352.6264-78-sashal@kernel.org>
+Subject: [PATCH AUTOSEL 4.14 52/57] block: fix memleak when __blk_rq_map_user_iov() is failed
+Date:   Fri, 27 Dec 2019 13:02:17 -0500
+Message-Id: <20191227180222.7076-52-sashal@kernel.org>
 X-Mailer: git-send-email 2.20.1
-In-Reply-To: <20191227174352.6264-1-sashal@kernel.org>
-References: <20191227174352.6264-1-sashal@kernel.org>
+In-Reply-To: <20191227180222.7076-1-sashal@kernel.org>
+References: <20191227180222.7076-1-sashal@kernel.org>
 MIME-Version: 1.0
 X-stable: review
 X-Patchwork-Hint: Ignore
@@ -101,10 +101,10 @@ Signed-off-by: Sasha Levin <sashal@kernel.org>
  1 file changed, 1 insertion(+), 1 deletion(-)
 
 diff --git a/block/blk-map.c b/block/blk-map.c
-index db9373bd31ac..9d8627acc2f5 100644
+index e31be14da8ea..f72a3af689b6 100644
 --- a/block/blk-map.c
 +++ b/block/blk-map.c
-@@ -145,7 +145,7 @@ int blk_rq_map_user_iov(struct request_queue *q, struct request *rq,
+@@ -152,7 +152,7 @@ int blk_rq_map_user_iov(struct request_queue *q, struct request *rq,
  	return 0;
  
  unmap_rq:
