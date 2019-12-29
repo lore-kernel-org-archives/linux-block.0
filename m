@@ -2,128 +2,168 @@ Return-Path: <SRS0=yHxa=2T=vger.kernel.org=linux-block-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-6.9 required=3.0 tests=DKIMWL_WL_HIGH,DKIM_SIGNED,
-	DKIM_VALID,DKIM_VALID_AU,HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,
-	MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS autolearn=ham
-	autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-7.4 required=3.0 tests=DKIMWL_WL_HIGH,DKIM_SIGNED,
+	DKIM_VALID,DKIM_VALID_AU,HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,
+	MENTIONS_GIT_HOSTING,SPF_HELO_NONE,SPF_PASS,USER_AGENT_SANE_1
+	autolearn=unavailable autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 6AC23C2D0C8
-	for <linux-block@archiver.kernel.org>; Sun, 29 Dec 2019 02:32:47 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 4E6C6C2D0D1
+	for <linux-block@archiver.kernel.org>; Sun, 29 Dec 2019 04:33:37 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.kernel.org (Postfix) with ESMTP id 34CBB21741
-	for <linux-block@archiver.kernel.org>; Sun, 29 Dec 2019 02:32:47 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id 23104208E4
+	for <linux-block@archiver.kernel.org>; Sun, 29 Dec 2019 04:33:37 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="iTiaEzio"
+	dkim=pass (2048-bit key) header.d=nvidia.com header.i=@nvidia.com header.b="n7iOptnw"
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1726248AbfL2Ccq (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Sat, 28 Dec 2019 21:32:46 -0500
-Received: from us-smtp-2.mimecast.com ([205.139.110.61]:54339 "EHLO
-        us-smtp-delivery-1.mimecast.com" rhost-flags-OK-OK-OK-FAIL)
-        by vger.kernel.org with ESMTP id S1726187AbfL2Ccq (ORCPT
+        id S1726359AbfL2Edg (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Sat, 28 Dec 2019 23:33:36 -0500
+Received: from hqnvemgate26.nvidia.com ([216.228.121.65]:1482 "EHLO
+        hqnvemgate26.nvidia.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S1726293AbfL2Edf (ORCPT
         <rfc822;linux-block@vger.kernel.org>);
-        Sat, 28 Dec 2019 21:32:46 -0500
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-        s=mimecast20190719; t=1577586764;
-        h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-         to:to:cc:cc:mime-version:mime-version:
-         content-transfer-encoding:content-transfer-encoding;
-        bh=Ybn2C2h2DHgE+3vcixIRzlx8G6Ik5hcUJldK5GhD/5Q=;
-        b=iTiaEzioR4NP+3762khxpCn6obVbLRLtneU5S1i+CvHAKP4tEmgTbv7jZxZl4ANRzIM2e8
-        wPqSrjHcqe5ujq3bCURuh6hpV/7mTTaJ70FUJembwW/vHDrf6Ln7aDOVuT8Z+QWX/oPXAq
-        Kh2bBbpGVFIQ2PLniTvl2XohlPhAFUs=
-Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
- [209.132.183.4]) (Using TLS) by relay.mimecast.com with ESMTP id
- us-mta-156-QHoxB8zQP3G5L1ePekvJXQ-1; Sat, 28 Dec 2019 21:32:43 -0500
-X-MC-Unique: QHoxB8zQP3G5L1ePekvJXQ-1
-Received: from smtp.corp.redhat.com (int-mx05.intmail.prod.int.phx2.redhat.com [10.5.11.15])
-        (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
-        (No client certificate requested)
-        by mimecast-mx01.redhat.com (Postfix) with ESMTPS id 7A5E2107ACC4;
-        Sun, 29 Dec 2019 02:32:42 +0000 (UTC)
-Received: from localhost (ovpn-8-19.pek2.redhat.com [10.72.8.19])
-        by smtp.corp.redhat.com (Postfix) with ESMTP id A7F5E77C82;
-        Sun, 29 Dec 2019 02:32:38 +0000 (UTC)
-From:   Ming Lei <ming.lei@redhat.com>
-To:     Jens Axboe <axboe@kernel.dk>
-Cc:     linux-block@vger.kernel.org, Ming Lei <ming.lei@redhat.com>
-Subject: [PATCH] block: fix splitting segments
-Date:   Sun, 29 Dec 2019 10:32:30 +0800
-Message-Id: <20191229023230.28940-1-ming.lei@redhat.com>
+        Sat, 28 Dec 2019 23:33:35 -0500
+Received: from hqpgpgate102.nvidia.com (Not Verified[216.228.121.13]) by hqnvemgate26.nvidia.com (using TLS: TLSv1.2, DES-CBC3-SHA)
+        id <B5e082c900000>; Sat, 28 Dec 2019 20:33:21 -0800
+Received: from hqmail.nvidia.com ([172.20.161.6])
+  by hqpgpgate102.nvidia.com (PGP Universal service);
+  Sat, 28 Dec 2019 20:33:34 -0800
+X-PGP-Universal: processed;
+        by hqpgpgate102.nvidia.com on Sat, 28 Dec 2019 20:33:34 -0800
+Received: from [10.110.48.28] (10.124.1.5) by HQMAIL107.nvidia.com
+ (172.20.187.13) with Microsoft SMTP Server (TLS) id 15.0.1473.3; Sun, 29 Dec
+ 2019 04:33:33 +0000
+Subject: Re: [PATCH v11 00/25] mm/gup: track dma-pinned pages: FOLL_PIN
+From:   John Hubbard <jhubbard@nvidia.com>
+To:     Leon Romanovsky <leon@kernel.org>
+CC:     Jason Gunthorpe <jgg@ziepe.ca>,
+        Andrew Morton <akpm@linux-foundation.org>,
+        Al Viro <viro@zeniv.linux.org.uk>,
+        Alex Williamson <alex.williamson@redhat.com>,
+        Benjamin Herrenschmidt <benh@kernel.crashing.org>,
+        =?UTF-8?B?QmrDtnJuIFTDtnBlbA==?= <bjorn.topel@intel.com>,
+        Christoph Hellwig <hch@infradead.org>,
+        Dan Williams <dan.j.williams@intel.com>,
+        Daniel Vetter <daniel@ffwll.ch>,
+        Dave Chinner <david@fromorbit.com>,
+        David Airlie <airlied@linux.ie>,
+        "David S . Miller" <davem@davemloft.net>,
+        Ira Weiny <ira.weiny@intel.com>, Jan Kara <jack@suse.cz>,
+        Jens Axboe <axboe@kernel.dk>, Jonathan Corbet <corbet@lwn.net>,
+        =?UTF-8?B?SsOpcsO0bWUgR2xpc3Nl?= <jglisse@redhat.com>,
+        Magnus Karlsson <magnus.karlsson@intel.com>,
+        Mauro Carvalho Chehab <mchehab@kernel.org>,
+        Michael Ellerman <mpe@ellerman.id.au>,
+        Michal Hocko <mhocko@suse.com>,
+        Mike Kravetz <mike.kravetz@oracle.com>,
+        Paul Mackerras <paulus@samba.org>,
+        Shuah Khan <shuah@kernel.org>,
+        Vlastimil Babka <vbabka@suse.cz>, <bpf@vger.kernel.org>,
+        <dri-devel@lists.freedesktop.org>, <kvm@vger.kernel.org>,
+        <linux-block@vger.kernel.org>, <linux-doc@vger.kernel.org>,
+        <linux-fsdevel@vger.kernel.org>, <linux-kselftest@vger.kernel.org>,
+        <linux-media@vger.kernel.org>, <linux-rdma@vger.kernel.org>,
+        <linuxppc-dev@lists.ozlabs.org>, <netdev@vger.kernel.org>,
+        <linux-mm@kvack.org>, LKML <linux-kernel@vger.kernel.org>,
+        Maor Gottlieb <maorg@mellanox.com>,
+        "Ran Rozenstein" <ranro@mellanox.com>
+References: <20191216222537.491123-1-jhubbard@nvidia.com>
+ <20191219132607.GA410823@unreal>
+ <a4849322-8e17-119e-a664-80d9f95d850b@nvidia.com>
+ <20191219210743.GN17227@ziepe.ca> <20191220182939.GA10944@unreal>
+ <1001a5fc-a71d-9c0f-1090-546c4913d8a2@nvidia.com>
+ <20191222132357.GF13335@unreal>
+ <49d57efe-85e1-6910-baf5-c18df1382206@nvidia.com>
+ <20191225052612.GA212002@unreal>
+ <b879d191-a07c-e808-e48f-2b9bd8ba4fa3@nvidia.com>
+X-Nvconfidentiality: public
+Message-ID: <612aa292-ec45-295c-b56c-c622876620fa@nvidia.com>
+Date:   Sat, 28 Dec 2019 20:33:32 -0800
+User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:68.0) Gecko/20100101
+ Thunderbird/68.3.1
 MIME-Version: 1.0
-X-Scanned-By: MIMEDefang 2.79 on 10.5.11.15
+In-Reply-To: <b879d191-a07c-e808-e48f-2b9bd8ba4fa3@nvidia.com>
+X-Originating-IP: [10.124.1.5]
+X-ClientProxiedBy: HQMAIL111.nvidia.com (172.20.187.18) To
+ HQMAIL107.nvidia.com (172.20.187.13)
+Content-Type: text/plain; charset="utf-8"
+Content-Language: en-US
 Content-Transfer-Encoding: quoted-printable
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=nvidia.com; s=n1;
+        t=1577594001; bh=CS/Y1CGyDS+9QLfc4LRardH5VS56W/PAJOyfRY2LjTc=;
+        h=X-PGP-Universal:Subject:From:To:CC:References:X-Nvconfidentiality:
+         Message-ID:Date:User-Agent:MIME-Version:In-Reply-To:
+         X-Originating-IP:X-ClientProxiedBy:Content-Type:Content-Language:
+         Content-Transfer-Encoding;
+        b=n7iOptnwN3ZVsCu/0DXie5ShRcR4/jOzIn6W7P3uTBxVaZt8ko4Dms+OE9l2tNSxe
+         95GOtrfVtIDr0VsAlD/d/zPWSpFCkJY5UP5Eb2ss2F3NEgv4iTUN6NL2VHU+RtQqVi
+         nFPi4CTJq0hll0B94/tPBP/T736se/ycwi7dWWtNiIfcgsX/aG2ZU9RUFFoSuSYe5B
+         fwPDB3yWJZmxzNFs+zKaKVZ1e+/lnxSIdtwRl5XP/Vm1rz2l41lunDXgCSZTy/8O/h
+         ByGzcgSVg+SF9TRzjsSZ/pWRsIBTO2VIGDe+IjvB1qU+Q0EIsH+JijQJxdtnLBWoeO
+         bb0/oQMKrQ56Q==
 Sender: linux-block-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-There are two issues in get_max_segment_size():
+On 12/27/19 1:56 PM, John Hubbard wrote:
+...
+>> It is ancient verification test (~10y) which is not an easy task to
+>> make it understandable and standalone :).
+>>
+>=20
+> Is this the only test that fails, btw? No other test failures or hints of
+> problems?
+>=20
+> (Also, maybe hopeless, but can *anyone* on the RDMA list provide some
+> characterization of the test, such as how many pins per page, what page
+> sizes are used? I'm still hoping to write a test to trigger something
+> close to this...)
+>=20
+> I do have a couple more ideas for test runs:
+>=20
+> 1. Reduce GUP_PIN_COUNTING_BIAS to 1. That would turn the whole override =
+of
+> page->_refcount into a no-op, and so if all is well (it may not be!) with=
+ the
+> rest of the patch, then we'd expect this problem to not reappear.
+>=20
+> 2. Active /proc/vmstat *foll_pin* statistics unconditionally (just for th=
+ese
+> tests, of course), so we can see if there is a get/put mismatch. However,=
+ that
+> will change the timing, and so it must be attempted independently of (1),=
+ in
+> order to see if it ends up hiding the repro.
+>=20
+> I've updated this branch to implement (1), but not (2), hoping you can gi=
+ve
+> this one a spin?
+>=20
+> =C2=A0=C2=A0=C2=A0 git@github.com:johnhubbard/linux.git=C2=A0 pin_user_pa=
+ges_tracking_v11_with_diags
+>=20
+>=20
 
-1) the default segment boudary mask is bypassed, and some devices still
-require segment to not cross the default 4G boundary
+Also, looking ahead:
 
-2) the segment start address isn't taken into account when checking
-segment boundary limit
+a) if the problem disappears with the latest above test, then we likely hav=
+e
+   a huge page refcount overflow, and there are a couple of different ways =
+to
+   fix it.=20
 
-Fixes the two issues.
+b) if it still reproduces with the above, then it's some other random mista=
+ke,
+   and in that case I'd be inclined to do a sort of guided (or classic, ung=
+uided)
+   git bisect of the series. Because it could be any of several patches.
 
-Fixes: dcebd755926b ("block: use bio_for_each_bvec() to compute multi-pag=
-e bvec count")
-Signed-off-by: Ming Lei <ming.lei@redhat.com>
----
- block/blk-merge.c | 18 +++++++++---------
- 1 file changed, 9 insertions(+), 9 deletions(-)
+   If that's too much trouble, then I'd have to fall back to submitting a f=
+ew
+   patches at a time and working my way up to the tracking patch...
 
-diff --git a/block/blk-merge.c b/block/blk-merge.c
-index d783bdc4559b..234377d8146b 100644
---- a/block/blk-merge.c
-+++ b/block/blk-merge.c
-@@ -157,16 +157,14 @@ static inline unsigned get_max_io_size(struct reque=
-st_queue *q,
- 	return sectors & (lbs - 1);
- }
-=20
--static unsigned get_max_segment_size(const struct request_queue *q,
--				     unsigned offset)
-+static inline unsigned get_max_segment_size(const struct request_queue *=
-q,
-+					    const struct page *start_page,
-+					    unsigned long offset)
- {
- 	unsigned long mask =3D queue_segment_boundary(q);
-=20
--	/* default segment boundary mask means no boundary limit */
--	if (mask =3D=3D BLK_SEG_BOUNDARY_MASK)
--		return queue_max_segment_size(q);
--
--	return min_t(unsigned long, mask - (mask & offset) + 1,
-+	offset =3D mask & (page_to_phys(start_page) + offset);
-+	return min_t(unsigned long, mask - offset + 1,
- 		     queue_max_segment_size(q));
- }
-=20
-@@ -201,7 +199,8 @@ static bool bvec_split_segs(const struct request_queu=
-e *q,
- 	unsigned seg_size =3D 0;
-=20
- 	while (len && *nsegs < max_segs) {
--		seg_size =3D get_max_segment_size(q, bv->bv_offset + total_len);
-+		seg_size =3D get_max_segment_size(q, bv->bv_page,
-+						bv->bv_offset + total_len);
- 		seg_size =3D min(seg_size, len);
-=20
- 		(*nsegs)++;
-@@ -419,7 +418,8 @@ static unsigned blk_bvec_map_sg(struct request_queue =
-*q,
-=20
- 	while (nbytes > 0) {
- 		unsigned offset =3D bvec->bv_offset + total;
--		unsigned len =3D min(get_max_segment_size(q, offset), nbytes);
-+		unsigned len =3D min(get_max_segment_size(q, bvec->bv_page,
-+					offset), nbytes);
- 		struct page *page =3D bvec->bv_page;
-=20
- 		/*
+
+thanks,
 --=20
-2.20.1
-
+John Hubbard
+NVIDIA
