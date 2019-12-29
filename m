@@ -1,145 +1,129 @@
-Return-Path: <SRS0=1KJW=2S=vger.kernel.org=linux-block-owner@kernel.org>
+Return-Path: <SRS0=yHxa=2T=vger.kernel.org=linux-block-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-0.4 required=3.0 tests=FROM_LOCAL_HEX,
-	HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS
-	autolearn=no autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-6.9 required=3.0 tests=DKIMWL_WL_HIGH,DKIM_SIGNED,
+	DKIM_VALID,DKIM_VALID_AU,HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,
+	MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS autolearn=ham
+	autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 45C8AC2D0C8
-	for <linux-block@archiver.kernel.org>; Sat, 28 Dec 2019 21:53:11 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 6AC23C2D0C8
+	for <linux-block@archiver.kernel.org>; Sun, 29 Dec 2019 02:32:47 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.kernel.org (Postfix) with ESMTP id 1394520838
-	for <linux-block@archiver.kernel.org>; Sat, 28 Dec 2019 21:53:10 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id 34CBB21741
+	for <linux-block@archiver.kernel.org>; Sun, 29 Dec 2019 02:32:47 +0000 (UTC)
+Authentication-Results: mail.kernel.org;
+	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="iTiaEzio"
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1726187AbfL1VxK (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Sat, 28 Dec 2019 16:53:10 -0500
-Received: from mail-il1-f199.google.com ([209.85.166.199]:42855 "EHLO
-        mail-il1-f199.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1726100AbfL1VxJ (ORCPT
+        id S1726248AbfL2Ccq (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Sat, 28 Dec 2019 21:32:46 -0500
+Received: from us-smtp-2.mimecast.com ([205.139.110.61]:54339 "EHLO
+        us-smtp-delivery-1.mimecast.com" rhost-flags-OK-OK-OK-FAIL)
+        by vger.kernel.org with ESMTP id S1726187AbfL2Ccq (ORCPT
         <rfc822;linux-block@vger.kernel.org>);
-        Sat, 28 Dec 2019 16:53:09 -0500
-Received: by mail-il1-f199.google.com with SMTP id c5so19268596ilo.9
-        for <linux-block@vger.kernel.org>; Sat, 28 Dec 2019 13:53:09 -0800 (PST)
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20161025;
-        h=x-gm-message-state:mime-version:date:in-reply-to:message-id:subject
-         :from:to;
-        bh=dBLJhKt7bDmql16REWPUIvVdkd4XeGK8aXz3PHpRshc=;
-        b=VpFb9WI/x9QAy8mnuFLoHl8dmBgxQ8DcwR2zEOPgr7Io3/cvQZl2hByQZofYCSW+Ey
-         8w6ONRc8i4I0sQ5FBR4OdL+vP3Vun7TxRyuebUhd1dVAZL2HIo5AwjKVadhXm5eDwSwE
-         gIpsTpp+bMsS8zXYFjzZYFZsLORQpQpfGSMjsn0LQMV+5Roe3nP/m5Il1oB+/x37FBlw
-         gJtWo1v2fOl3o5FsA/njd4KZcaDeX1fWyuL6qjYu3ewAsRPtco6WQjB2KTlJn1Dv1IyR
-         8skxnNjf7SngWmUnRUJrSry9u4WFt9JVKk5D2j62B7i3GfEvAa9H7HjJQyNwPKYLUtys
-         VJXA==
-X-Gm-Message-State: APjAAAXKyZcIJ+p+5HBbTnstCuSZGoWWYwPrOxa7zP8pI9F+LSgc4amj
-        YDcNF6aSHRKfQ9Sx3qzPqrWk+EWa5Hgct/npePzfbmS7AduA
-X-Google-Smtp-Source: APXvYqzqimDH9yxxhUKBBE5Hb9zL9sppKoe8qHp/BBcEZiuvsEGZAk5LQs11Xjl6dFpUkbfM+8HqE2uZfmh+zYCaZwOKIYqRI98e
+        Sat, 28 Dec 2019 21:32:46 -0500
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+        s=mimecast20190719; t=1577586764;
+        h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+         to:to:cc:cc:mime-version:mime-version:
+         content-transfer-encoding:content-transfer-encoding;
+        bh=Ybn2C2h2DHgE+3vcixIRzlx8G6Ik5hcUJldK5GhD/5Q=;
+        b=iTiaEzioR4NP+3762khxpCn6obVbLRLtneU5S1i+CvHAKP4tEmgTbv7jZxZl4ANRzIM2e8
+        wPqSrjHcqe5ujq3bCURuh6hpV/7mTTaJ70FUJembwW/vHDrf6Ln7aDOVuT8Z+QWX/oPXAq
+        Kh2bBbpGVFIQ2PLniTvl2XohlPhAFUs=
+Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
+ [209.132.183.4]) (Using TLS) by relay.mimecast.com with ESMTP id
+ us-mta-156-QHoxB8zQP3G5L1ePekvJXQ-1; Sat, 28 Dec 2019 21:32:43 -0500
+X-MC-Unique: QHoxB8zQP3G5L1ePekvJXQ-1
+Received: from smtp.corp.redhat.com (int-mx05.intmail.prod.int.phx2.redhat.com [10.5.11.15])
+        (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
+        (No client certificate requested)
+        by mimecast-mx01.redhat.com (Postfix) with ESMTPS id 7A5E2107ACC4;
+        Sun, 29 Dec 2019 02:32:42 +0000 (UTC)
+Received: from localhost (ovpn-8-19.pek2.redhat.com [10.72.8.19])
+        by smtp.corp.redhat.com (Postfix) with ESMTP id A7F5E77C82;
+        Sun, 29 Dec 2019 02:32:38 +0000 (UTC)
+From:   Ming Lei <ming.lei@redhat.com>
+To:     Jens Axboe <axboe@kernel.dk>
+Cc:     linux-block@vger.kernel.org, Ming Lei <ming.lei@redhat.com>
+Subject: [PATCH] block: fix splitting segments
+Date:   Sun, 29 Dec 2019 10:32:30 +0800
+Message-Id: <20191229023230.28940-1-ming.lei@redhat.com>
 MIME-Version: 1.0
-X-Received: by 2002:a92:4707:: with SMTP id u7mr51321743ila.264.1577569989190;
- Sat, 28 Dec 2019 13:53:09 -0800 (PST)
-Date:   Sat, 28 Dec 2019 13:53:09 -0800
-In-Reply-To: <00000000000031376f059a31f9fb@google.com>
-X-Google-Appengine-App-Id: s~syzkaller
-X-Google-Appengine-App-Id-Alias: syzkaller
-Message-ID: <000000000000d08235059acaa215@google.com>
-Subject: Re: WARNING: ODEBUG bug in io_sqe_files_unregister
-From:   syzbot <syzbot+6bf913476056cb0f8d13@syzkaller.appspotmail.com>
-To:     axboe@kernel.dk, io-uring@vger.kernel.org,
-        linux-block@vger.kernel.org, linux-fsdevel@vger.kernel.org,
-        linux-kernel@vger.kernel.org, syzkaller-bugs@googlegroups.com,
-        viro@zeniv.linux.org.uk
-Content-Type: text/plain; charset="UTF-8"; format=flowed; delsp=yes
+X-Scanned-By: MIMEDefang 2.79 on 10.5.11.15
+Content-Transfer-Encoding: quoted-printable
 Sender: linux-block-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-syzbot has found a reproducer for the following crash on:
+There are two issues in get_max_segment_size():
 
-HEAD commit:    7ddd09fc Add linux-next specific files for 20191220
-git tree:       linux-next
-console output: https://syzkaller.appspot.com/x/log.txt?x=13d0dd25e00000
-kernel config:  https://syzkaller.appspot.com/x/.config?x=f183b01c3088afc6
-dashboard link: https://syzkaller.appspot.com/bug?extid=6bf913476056cb0f8d13
-compiler:       gcc (GCC) 9.0.0 20181231 (experimental)
-syz repro:      https://syzkaller.appspot.com/x/repro.syz?x=16945e49e00000
-C reproducer:   https://syzkaller.appspot.com/x/repro.c?x=121999c1e00000
+1) the default segment boudary mask is bypassed, and some devices still
+require segment to not cross the default 4G boundary
 
-The bug was bisected to:
+2) the segment start address isn't taken into account when checking
+segment boundary limit
 
-commit cbb537634780172137459dead490d668d437ef4d
-Author: Jens Axboe <axboe@kernel.dk>
-Date:   Mon Dec 9 18:22:50 2019 +0000
+Fixes the two issues.
 
-     io_uring: avoid ring quiesce for fixed file set unregister and update
+Fixes: dcebd755926b ("block: use bio_for_each_bvec() to compute multi-pag=
+e bvec count")
+Signed-off-by: Ming Lei <ming.lei@redhat.com>
+---
+ block/blk-merge.c | 18 +++++++++---------
+ 1 file changed, 9 insertions(+), 9 deletions(-)
 
-bisection log:  https://syzkaller.appspot.com/x/bisect.txt?x=10eadc56e00000
-final crash:    https://syzkaller.appspot.com/x/report.txt?x=12eadc56e00000
-console output: https://syzkaller.appspot.com/x/log.txt?x=14eadc56e00000
-
-IMPORTANT: if you fix the bug, please add the following tag to the commit:
-Reported-by: syzbot+6bf913476056cb0f8d13@syzkaller.appspotmail.com
-Fixes: cbb537634780 ("io_uring: avoid ring quiesce for fixed file set  
-unregister and update")
-
-------------[ cut here ]------------
-ODEBUG: free active (active state 0) object type: work_struct hint:  
-io_ring_file_ref_switch+0x0/0xac0 fs/io_uring.c:5186
-WARNING: CPU: 1 PID: 10017 at lib/debugobjects.c:481  
-debug_print_object+0x168/0x250 lib/debugobjects.c:481
-Kernel panic - not syncing: panic_on_warn set ...
-CPU: 1 PID: 10017 Comm: syz-executor148 Not tainted  
-5.5.0-rc2-next-20191220-syzkaller #0
-Hardware name: Google Google Compute Engine/Google Compute Engine, BIOS  
-Google 01/01/2011
-Call Trace:
-  __dump_stack lib/dump_stack.c:77 [inline]
-  dump_stack+0x197/0x210 lib/dump_stack.c:118
-  panic+0x2e3/0x75c kernel/panic.c:221
-  __warn.cold+0x2f/0x3e kernel/panic.c:582
-  report_bug+0x289/0x300 lib/bug.c:195
-  fixup_bug arch/x86/kernel/traps.c:174 [inline]
-  fixup_bug arch/x86/kernel/traps.c:169 [inline]
-  do_error_trap+0x11b/0x200 arch/x86/kernel/traps.c:267
-  do_invalid_op+0x37/0x50 arch/x86/kernel/traps.c:286
-  invalid_op+0x23/0x30 arch/x86/entry/entry_64.S:1027
-RIP: 0010:debug_print_object+0x168/0x250 lib/debugobjects.c:481
-Code: dd c0 24 70 88 48 89 fa 48 c1 ea 03 80 3c 02 00 0f 85 b5 00 00 00 48  
-8b 14 dd c0 24 70 88 48 c7 c7 20 1a 70 88 e8 67 6c b1 fd <0f> 0b 83 05 53  
-2d ed 06 01 48 83 c4 20 5b 41 5c 41 5d 41 5e 5d c3
-RSP: 0018:ffffc9000331fc30 EFLAGS: 00010082
-RAX: 0000000000000000 RBX: 0000000000000003 RCX: 0000000000000000
-RDX: 0000000000000000 RSI: ffffffff815e9f66 RDI: fffff52000663f78
-RBP: ffffc9000331fc70 R08: ffff8880975da340 R09: ffffed1015d245c9
-R10: ffffed1015d245c8 R11: ffff8880ae922e43 R12: 0000000000000001
-R13: ffffffff8997da40 R14: ffffffff814c75d0 R15: ffff888216f92118
-  __debug_check_no_obj_freed lib/debugobjects.c:963 [inline]
-  debug_check_no_obj_freed+0x2d4/0x43f lib/debugobjects.c:994
-  kfree+0xf8/0x2c0 mm/slab.c:3756
-  io_sqe_files_unregister+0x1fb/0x2f0 fs/io_uring.c:4631
-  io_ring_ctx_free fs/io_uring.c:5575 [inline]
-  io_ring_ctx_wait_and_kill+0x430/0x9a0 fs/io_uring.c:5644
-  io_uring_release+0x42/0x50 fs/io_uring.c:5652
-  __fput+0x2ff/0x890 fs/file_table.c:280
-  ____fput+0x16/0x20 fs/file_table.c:313
-  task_work_run+0x145/0x1c0 kernel/task_work.c:113
-  tracehook_notify_resume include/linux/tracehook.h:188 [inline]
-  exit_to_usermode_loop+0x316/0x380 arch/x86/entry/common.c:164
-  prepare_exit_to_usermode arch/x86/entry/common.c:195 [inline]
-  syscall_return_slowpath arch/x86/entry/common.c:278 [inline]
-  do_syscall_64+0x676/0x790 arch/x86/entry/common.c:304
-  entry_SYSCALL_64_after_hwframe+0x49/0xbe
-RIP: 0033:0x4035a0
-Code: 01 f0 ff ff 0f 83 c0 0f 00 00 c3 66 2e 0f 1f 84 00 00 00 00 00 0f 1f  
-44 00 00 83 3d ad 07 2e 00 00 75 14 b8 03 00 00 00 0f 05 <48> 3d 01 f0 ff  
-ff 0f 83 94 0f 00 00 c3 48 83 ec 08 e8 fa 04 00 00
-RSP: 002b:00007ffcba7e1fa8 EFLAGS: 00000246 ORIG_RAX: 0000000000000003
-RAX: 0000000000000000 RBX: 0000000000000004 RCX: 00000000004035a0
-RDX: 0000000000000000 RSI: 0000000000000006 RDI: 0000000000000003
-RBP: 0000000000000000 R08: 00000000000003e8 R09: 00000000000003e8
-R10: 0000000000000000 R11: 0000000000000246 R12: 000000000000008f
-R13: 0000000000000003 R14: 0000000000000004 R15: 00007ffcba7e2280
-Kernel Offset: disabled
-Rebooting in 86400 seconds..
+diff --git a/block/blk-merge.c b/block/blk-merge.c
+index d783bdc4559b..234377d8146b 100644
+--- a/block/blk-merge.c
++++ b/block/blk-merge.c
+@@ -157,16 +157,14 @@ static inline unsigned get_max_io_size(struct reque=
+st_queue *q,
+ 	return sectors & (lbs - 1);
+ }
+=20
+-static unsigned get_max_segment_size(const struct request_queue *q,
+-				     unsigned offset)
++static inline unsigned get_max_segment_size(const struct request_queue *=
+q,
++					    const struct page *start_page,
++					    unsigned long offset)
+ {
+ 	unsigned long mask =3D queue_segment_boundary(q);
+=20
+-	/* default segment boundary mask means no boundary limit */
+-	if (mask =3D=3D BLK_SEG_BOUNDARY_MASK)
+-		return queue_max_segment_size(q);
+-
+-	return min_t(unsigned long, mask - (mask & offset) + 1,
++	offset =3D mask & (page_to_phys(start_page) + offset);
++	return min_t(unsigned long, mask - offset + 1,
+ 		     queue_max_segment_size(q));
+ }
+=20
+@@ -201,7 +199,8 @@ static bool bvec_split_segs(const struct request_queu=
+e *q,
+ 	unsigned seg_size =3D 0;
+=20
+ 	while (len && *nsegs < max_segs) {
+-		seg_size =3D get_max_segment_size(q, bv->bv_offset + total_len);
++		seg_size =3D get_max_segment_size(q, bv->bv_page,
++						bv->bv_offset + total_len);
+ 		seg_size =3D min(seg_size, len);
+=20
+ 		(*nsegs)++;
+@@ -419,7 +418,8 @@ static unsigned blk_bvec_map_sg(struct request_queue =
+*q,
+=20
+ 	while (nbytes > 0) {
+ 		unsigned offset =3D bvec->bv_offset + total;
+-		unsigned len =3D min(get_max_segment_size(q, offset), nbytes);
++		unsigned len =3D min(get_max_segment_size(q, bvec->bv_page,
++					offset), nbytes);
+ 		struct page *page =3D bvec->bv_page;
+=20
+ 		/*
+--=20
+2.20.1
 
