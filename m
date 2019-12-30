@@ -2,86 +2,121 @@ Return-Path: <SRS0=HKcR=2U=vger.kernel.org=linux-block-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-8.3 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
-	INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,
-	USER_AGENT_SANE_1 autolearn=ham autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-8.4 required=3.0 tests=DKIMWL_WL_HIGH,DKIM_SIGNED,
+	DKIM_VALID,DKIM_VALID_AU,HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,
+	MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,USER_AGENT_SANE_1
+	autolearn=unavailable autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 8FD4DC2D0C2
-	for <linux-block@archiver.kernel.org>; Mon, 30 Dec 2019 12:17:52 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 36E3EC2D0C2
+	for <linux-block@archiver.kernel.org>; Mon, 30 Dec 2019 12:22:51 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.kernel.org (Postfix) with ESMTP id 6386C20730
-	for <linux-block@archiver.kernel.org>; Mon, 30 Dec 2019 12:17:52 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id F390420663
+	for <linux-block@archiver.kernel.org>; Mon, 30 Dec 2019 12:22:50 +0000 (UTC)
+Authentication-Results: mail.kernel.org;
+	dkim=pass (1024-bit key) header.d=amazon.com header.i=@amazon.com header.b="QzYcOjr7"
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1727404AbfL3MRv (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Mon, 30 Dec 2019 07:17:51 -0500
-Received: from szxga06-in.huawei.com ([45.249.212.32]:37566 "EHLO huawei.com"
-        rhost-flags-OK-OK-OK-FAIL) by vger.kernel.org with ESMTP
-        id S1727376AbfL3MRv (ORCPT <rfc822;linux-block@vger.kernel.org>);
-        Mon, 30 Dec 2019 07:17:51 -0500
-Received: from DGGEMS412-HUB.china.huawei.com (unknown [172.30.72.59])
-        by Forcepoint Email with ESMTP id B5710449A74B5DD08040;
-        Mon, 30 Dec 2019 20:17:48 +0800 (CST)
-Received: from [127.0.0.1] (10.173.220.183) by DGGEMS412-HUB.china.huawei.com
- (10.3.19.212) with Microsoft SMTP Server id 14.3.439.0; Mon, 30 Dec 2019
- 20:17:42 +0800
-To:     Jens Axboe <axboe@kernel.dk>, <linux-block@vger.kernel.org>,
-        <jens.axboe@oracle.com>, <namhyung@gmail.com>,
-        <bharrosh@panasas.com>, renxudong <renxudong1@huawei.com>
-CC:     Mingfangsen <mingfangsen@huawei.com>, <zhengbin13@huawei.com>,
-        Guiyao <guiyao@huawei.com>
-From:   Zhiqiang Liu <liuzhiqiang26@huawei.com>
-Subject: [PATCH] blk-map: add kernel address validation in blk_rq_map_kern
- func
-Message-ID: <239c8928-aea0-abe9-a75d-dc3f1b573ec5@huawei.com>
-Date:   Mon, 30 Dec 2019 20:17:41 +0800
-User-Agent: Mozilla/5.0 (Windows NT 10.0; WOW64; rv:68.0) Gecko/20100101
- Thunderbird/68.2.2
+        id S1727407AbfL3MWu (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Mon, 30 Dec 2019 07:22:50 -0500
+Received: from smtp-fw-6002.amazon.com ([52.95.49.90]:25550 "EHLO
+        smtp-fw-6002.amazon.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S1727376AbfL3MWu (ORCPT
+        <rfc822;linux-block@vger.kernel.org>);
+        Mon, 30 Dec 2019 07:22:50 -0500
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+  d=amazon.com; i=@amazon.com; q=dns/txt; s=amazon201209;
+  t=1577708569; x=1609244569;
+  h=subject:to:cc:references:from:message-id:date:
+   mime-version:in-reply-to:content-transfer-encoding;
+  bh=SABsUx1T1jSoGqJORYPDibJGPM+X6pZmzZHfIRFddbE=;
+  b=QzYcOjr7tFPGNgKgTujMq5YOWVIWrrpCREGR7crNOteAZhBM3bD4tRhE
+   yrfnixTIrvNvTBwH8EI3MCbEziS68/5YJqekaQeo2mRAga65n8YZ4wdaZ
+   QCXkkuv1tfCG6IiYNOoivmmbjedX7UUftZECL2zP/8+4RLFk3oBjIa7j7
+   E=;
+IronPort-SDR: 9LFYe89JaB2Br1uX48QJCwdd1keF5E8n5djbe5kamHgQX8mbsejbrTT0p0zo5hdicpYsRyfW8y
+ z2w2xHzJ/gpQ==
+X-IronPort-AV: E=Sophos;i="5.69,375,1571702400"; 
+   d="scan'208";a="9545906"
+Received: from iad12-co-svc-p1-lb1-vlan3.amazon.com (HELO email-inbound-relay-2c-6f38efd9.us-west-2.amazon.com) ([10.43.8.6])
+  by smtp-border-fw-out-6002.iad6.amazon.com with ESMTP; 30 Dec 2019 12:22:47 +0000
+Received: from EX13MTAUEA001.ant.amazon.com (pdx4-ws-svc-p6-lb7-vlan3.pdx.amazon.com [10.170.41.166])
+        by email-inbound-relay-2c-6f38efd9.us-west-2.amazon.com (Postfix) with ESMTPS id 09753A1CCA;
+        Mon, 30 Dec 2019 12:22:45 +0000 (UTC)
+Received: from EX13D19EUB003.ant.amazon.com (10.43.166.69) by
+ EX13MTAUEA001.ant.amazon.com (10.43.61.82) with Microsoft SMTP Server (TLS)
+ id 15.0.1367.3; Mon, 30 Dec 2019 12:22:45 +0000
+Received: from 8c85908914bf.ant.amazon.com (10.43.160.155) by
+ EX13D19EUB003.ant.amazon.com (10.43.166.69) with Microsoft SMTP Server (TLS)
+ id 15.0.1367.3; Mon, 30 Dec 2019 12:22:39 +0000
+Subject: Re: [PATCH v6 25/25] MAINTAINERS: Add maintainers for RNBD/RTRS
+ modules
+To:     Jack Wang <jinpuwang@gmail.com>
+CC:     <linux-block@vger.kernel.org>, <linux-rdma@vger.kernel.org>,
+        <axboe@kernel.dk>, <hch@infradead.org>, <sagi@grimberg.me>,
+        <bvanassche@acm.org>, <leon@kernel.org>, <dledford@redhat.com>,
+        <danil.kipnis@cloud.ionos.com>, <jinpu.wang@cloud.ionos.com>,
+        <rpenyaev@suse.de>
+References: <20191230102942.18395-1-jinpuwang@gmail.com>
+ <20191230102942.18395-26-jinpuwang@gmail.com>
+From:   Gal Pressman <galpress@amazon.com>
+Message-ID: <9b923988-acb3-9a44-255f-47da7609d225@amazon.com>
+Date:   Mon, 30 Dec 2019 14:22:34 +0200
+User-Agent: Mozilla/5.0 (Macintosh; Intel Mac OS X 10.14; rv:68.0)
+ Gecko/20100101 Thunderbird/68.3.1
 MIME-Version: 1.0
+In-Reply-To: <20191230102942.18395-26-jinpuwang@gmail.com>
 Content-Type: text/plain; charset="utf-8"
 Content-Language: en-US
 Content-Transfer-Encoding: 7bit
-X-Originating-IP: [10.173.220.183]
-X-CFilter-Loop: Reflected
+X-Originating-IP: [10.43.160.155]
+X-ClientProxiedBy: EX13d09UWC002.ant.amazon.com (10.43.162.102) To
+ EX13D19EUB003.ant.amazon.com (10.43.166.69)
 Sender: linux-block-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-From: renxudong <renxudong1@huawei.com>
+On 30/12/2019 12:29, Jack Wang wrote:
+> From: Jack Wang <jinpu.wang@cloud.ionos.com>
+> 
+> Danil and me will maintain RNBD/RTRS modules.
+> 
+> Signed-off-by: Danil Kipnis <danil.kipnis@cloud.ionos.com>
+> Signed-off-by: Jack Wang <jinpu.wang@cloud.ionos.com>
+> ---
+>  MAINTAINERS | 14 ++++++++++++++
+>  1 file changed, 14 insertions(+)
+> 
+> diff --git a/MAINTAINERS b/MAINTAINERS
+> index e09bd92a1e44..2ba370d8145d 100644
+> --- a/MAINTAINERS
+> +++ b/MAINTAINERS
+> @@ -14125,6 +14125,13 @@ F:	arch/riscv/
+>  K:	riscv
+>  N:	riscv
+>  
+> +RNBD BLOCK DRIVERS
+> +M:	Danil Kipnis <danil.kipnis@cloud.ionos.com>
+> +M:	Jack Wang <jinpu.wang@cloud.ionos.com>
+> +L:	linux-block@vger.kernel.org
+> +S:	Maintained
+> +F:	drivers/block/rnbd/
+> +
+>  ROCCAT DRIVERS
+>  M:	Stefan Achatz <erazor_de@users.sourceforge.net>
+>  W:	http://sourceforge.net/projects/roccat/
+> @@ -14192,6 +14199,13 @@ F:	include/net/rose.h
+>  F:	include/uapi/linux/rose.h
+>  F:	net/rose/
+>  
+> +RTRS TRANSPORT DRIVERS
+> +M:	Danil Kipnis <danil.kipnis@cloud.ionos.com>
+> +M:	Jack Wang <jinpu.wang@cloud.ionos.com>
+> +L:	linux-rdma@vger.kernel.org
+> +S:	Maintained
+> +F:	drivers/infiniband/ulp/rtrs/
+> +
+>  RTL2830 MEDIA DRIVER
+>  M:	Antti Palosaari <crope@iki.fi>
+>  L:	linux-media@vger.kernel.org
 
-Blk_rq_map_kern func is used to map kernel data to a request,
-in which kbuf par should be a valid kernel buffer. However,
-kbuf par is only checked whether it is null in blk_rq_map_kern func.
-
-If users pass a non kernel address to blk_rq_map_kern func in the
-non-aligned scenario, the invalid kbuf will be set to bio->bi_private.
-When the request is completed, bio_copy_kern_endio_read will be called
-to copy data to the kernel address in bio->bi_private. If the bi_private
-is not a valid kernel address, the system will oops. In this case, we
-cannot judge whether the bio structure is damaged or the kernel address is
-invalid.
-
-Here, we add kernel address validation by calling virt_addr_valid.
-
-Signed-off-by: renxudong <renxudong1@huawei.com>
-Reviewed-by: Zhiqiang Liu <liuzhiqiang26@huawei.com>
----
- block/blk-map.c | 2 +-
- 1 file changed, 1 insertion(+), 1 deletion(-)
-
-diff --git a/block/blk-map.c b/block/blk-map.c
-index 3a62e471d81b..7deb1b44d1e3 100644
---- a/block/blk-map.c
-+++ b/block/blk-map.c
-@@ -229,7 +229,7 @@ int blk_rq_map_kern(struct request_queue *q, struct request *rq, void *kbuf,
-
- 	if (len > (queue_max_hw_sectors(q) << 9))
- 		return -EINVAL;
--	if (!len || !kbuf)
-+	if (!len || !virt_addr_valid(kbuf))
- 		return -EINVAL;
-
- 	do_copy = !blk_rq_aligned(q, addr, len) || object_is_on_stack(kbuf);
--- 
-2.24.0.windows.2
-
+RTRS should be after RTL, right :)?
