@@ -7,60 +7,60 @@ X-Spam-Status: No, score=-9.8 required=3.0 tests=DKIM_SIGNED,DKIM_VALID,
 	SPF_HELO_NONE,SPF_PASS,USER_AGENT_GIT autolearn=ham autolearn_force=no
 	version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 9AF22C2D0C2
-	for <linux-block@archiver.kernel.org>; Mon, 30 Dec 2019 18:15:17 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id DF5EFC2D0C2
+	for <linux-block@archiver.kernel.org>; Mon, 30 Dec 2019 18:15:19 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.kernel.org (Postfix) with ESMTP id 6F81220722
-	for <linux-block@archiver.kernel.org>; Mon, 30 Dec 2019 18:15:17 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id ACE79206DB
+	for <linux-block@archiver.kernel.org>; Mon, 30 Dec 2019 18:15:19 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel-dk.20150623.gappssmtp.com header.i=@kernel-dk.20150623.gappssmtp.com header.b="G70D0aou"
+	dkim=pass (2048-bit key) header.d=kernel-dk.20150623.gappssmtp.com header.i=@kernel-dk.20150623.gappssmtp.com header.b="xQk1OX6p"
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1727518AbfL3SPR (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Mon, 30 Dec 2019 13:15:17 -0500
-Received: from mail-yw1-f67.google.com ([209.85.161.67]:34130 "EHLO
-        mail-yw1-f67.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1727389AbfL3SPQ (ORCPT
+        id S1727511AbfL3SPT (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Mon, 30 Dec 2019 13:15:19 -0500
+Received: from mail-yb1-f194.google.com ([209.85.219.194]:46096 "EHLO
+        mail-yb1-f194.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S1727389AbfL3SPT (ORCPT
         <rfc822;linux-block@vger.kernel.org>);
-        Mon, 30 Dec 2019 13:15:16 -0500
-Received: by mail-yw1-f67.google.com with SMTP id b186so14402662ywc.1
-        for <linux-block@vger.kernel.org>; Mon, 30 Dec 2019 10:15:15 -0800 (PST)
+        Mon, 30 Dec 2019 13:15:19 -0500
+Received: by mail-yb1-f194.google.com with SMTP id k128so3409839ybc.13
+        for <linux-block@vger.kernel.org>; Mon, 30 Dec 2019 10:15:17 -0800 (PST)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=kernel-dk.20150623.gappssmtp.com; s=20150623;
         h=from:to:cc:subject:date:message-id:in-reply-to:references
          :mime-version:content-transfer-encoding;
-        bh=SPorQbNkP1bf95wsY52FC/L7timFxE0VwX0FyytlDUU=;
-        b=G70D0aou+wOFtMT6j1UZuhky31phf4N+//mWV4SErw3DmO9rBwLvHWnFJXQwBzHU4O
-         bAMr+RiUtCJLTVpsqiZ1eHZ47+kxW3y00J0Fk8Sq8jMIDwARkGVpucwfB11X1bEKqyEj
-         Iipsge6DMq+g5C3f6OZjEvXR7sudtUB5HoN6q3IYvA+OLLaHm7++DPLmbIxRSlZ4YwJT
-         N+t7T0aZtFVMYcQsQf/kfyCSnM7HVWrMjPerhhlMnR9lmnfvoyJQpujGEOfH1VuKCD7f
-         /cWQp5IYd6Z9TIldv1ftrMTaJId/E2vzpufR9/TOUPgb4GLFuurRt3vhRfYx6QNok10U
-         u4bA==
+        bh=l+uhEeKKazCGxLFzF/yGc13aEcKSzORgIo7hoCqdM7E=;
+        b=xQk1OX6p9AqBfvMSEGxAKQLMLWUl5xRKygKeJxK2rIS+PPZw7JoLKBXUD2Gotf7xak
+         hYRdQgwhGqn7wZ/5ihV9GUH4nZW7P6bWudbxghNBY4/+vHBNWu0w7NkgC0unkujFDNkI
+         C3ug+xqsHvGOsSmisqPOpGDyin+3Ff2aSnRMnOja+OKCq5e266FxzKJQ+uvJH4LJtI9I
+         EybLUHzb+jqkzgOhgfyL9DvR5l6R11o8NSm66cZ2D8vDjPSrd2WY3LSJUMzMpnZt9Nnf
+         lhgcaTbGiweFbEs/qYlBlhbUNIc6MIEi7AR37A1cldzL8aei5s7RPJGS3+6qOk/6fSnK
+         /m3w==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=1e100.net; s=20161025;
         h=x-gm-message-state:from:to:cc:subject:date:message-id:in-reply-to
          :references:mime-version:content-transfer-encoding;
-        bh=SPorQbNkP1bf95wsY52FC/L7timFxE0VwX0FyytlDUU=;
-        b=gIigOcNGxkSNphGCjfzj07JZIWto4PlTrFcJAxmE46fx9vgqG3UgloP/MLj6BlTY17
-         6zF9F7AEoKZTmfLtb1bUiqAE+HghnVeH7IaeDxubzEidrxdo5Uj5KNLbWtdUWK8W7jCU
-         b1Zk7dDvpArkN6rRSxgLWDr92JT99WHHaS3OG3HnTWiRk4TU+cGmMRzGhV6tJqulMl3G
-         6iSK4rw00bsqsxSXvQeseg8Q8habZFZkt8Xgc8s84M1o6Uv4r/3tW9PHVoSfpJRj5f4F
-         dlaNYPUK5lKOQvJCkYEmViak1OQIExpF3g3g83LfMIpR5ZdUGkLNwk/l+YJwN213oYXX
-         flVA==
-X-Gm-Message-State: APjAAAU8nxBhTbDJXWVBVsQ1wxBUwG4PCKytnKPtZYaeD2fDGUL6euwZ
-        8kMiWuuUZawwPARdzhlzobqurcil/F0=
-X-Google-Smtp-Source: APXvYqzd3w8wO6QsZsmK5EskSeKzraWI5sxWOPBrUbGx7ENmyuTDMVcdtnnxps+YeDYW6270sNNhug==
-X-Received: by 2002:a0d:c404:: with SMTP id g4mr48272299ywd.403.1577729714306;
-        Mon, 30 Dec 2019 10:15:14 -0800 (PST)
+        bh=l+uhEeKKazCGxLFzF/yGc13aEcKSzORgIo7hoCqdM7E=;
+        b=AE13YKpiwcRfsji2tXmOFDqlpHFks6TwSJTKZAlsyFjOrTexqY//9aGwakAHt3XNcx
+         xUJP6YYpbahm0OV4diO1uWmWKQSmTyGWXlmWKnLqk93hVwahvY69kb2IUtxUh+/T8rH/
+         4QtMT9sRjQ9GTqFsk2Jvf56Y+URAMudKXB+zYN+YhMG8dZAkZD0IjnpBJN+ALiV0RWJj
+         OVkheGahC+nTGL71U2M9BefNPdrNjD9rz9oRimLK+uZ/z8Qm6ggi0SNRNNP+ntCct1We
+         DSEHv1NtHhfy+zxfh0jQByrH4eQEhAJvSW0OVcPcrvGuie1TTi/8JGa3sZnWLm6nO+Xo
+         irnQ==
+X-Gm-Message-State: APjAAAVR1eF7cR3Hgr8RbECRxWgGwJB0IHQ6hrurFv2vApR+UJAjTL+g
+        swcYeRR+YMmpDPNY2AlcF/Ug1VR4TFw=
+X-Google-Smtp-Source: APXvYqxMLwV2dAuz02My2HwDs2mC0DS8LLpUFHMVcxYrYdZXwDZFQiJKR9y2/uiObE4a7Wj7XEXAdg==
+X-Received: by 2002:a25:8186:: with SMTP id p6mr47485756ybk.489.1577729716681;
+        Mon, 30 Dec 2019 10:15:16 -0800 (PST)
 Received: from x1.localdomain ([8.46.73.113])
-        by smtp.gmail.com with ESMTPSA id u136sm17879910ywf.101.2019.12.30.10.15.12
+        by smtp.gmail.com with ESMTPSA id u136sm17879910ywf.101.2019.12.30.10.15.14
         (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Mon, 30 Dec 2019 10:15:13 -0800 (PST)
+        Mon, 30 Dec 2019 10:15:16 -0800 (PST)
 From:   Jens Axboe <axboe@kernel.dk>
 To:     linux-block@vger.kernel.org
 Cc:     Jens Axboe <axboe@kernel.dk>
-Subject: [PATCH 3/4] sbitmap: add batch tag retrieval
-Date:   Mon, 30 Dec 2019 11:14:42 -0700
-Message-Id: <20191230181442.4460-4-axboe@kernel.dk>
+Subject: [PATCH 4/4] blk-mq: allocate tags in batches
+Date:   Mon, 30 Dec 2019 11:14:43 -0700
+Message-Id: <20191230181442.4460-5-axboe@kernel.dk>
 X-Mailer: git-send-email 2.24.1
 In-Reply-To: <20191230181442.4460-1-axboe@kernel.dk>
 References: <20191230181442.4460-1-axboe@kernel.dk>
@@ -71,164 +71,268 @@ Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-This allows retrieving a batch of tags by the caller, instead of getting
-them one at the time.
+Instead of grabbing tags one by one, grab a batch and store the local
+cache in the software queue. Then subsequent tag allocations can just
+grab free tags from there, without having to hit the shared tag map.
+
+We flush these batches out if we run out of tags on the hardware queue.
+The intent here is this should rarely happen.
+
+This works very well in practice, with anywhere from 40-60 batch counts
+seen regularly in testing.
 
 Signed-off-by: Jens Axboe <axboe@kernel.dk>
 ---
- include/linux/sbitmap.h | 23 ++++++++++
- lib/sbitmap.c           | 97 +++++++++++++++++++++++++++++++++++++++++
- 2 files changed, 120 insertions(+)
+ block/blk-mq-debugfs.c |  18 +++++++
+ block/blk-mq-tag.c     | 105 ++++++++++++++++++++++++++++++++++++++++-
+ block/blk-mq.c         |  13 ++++-
+ block/blk-mq.h         |   5 ++
+ 4 files changed, 139 insertions(+), 2 deletions(-)
 
-diff --git a/include/linux/sbitmap.h b/include/linux/sbitmap.h
-index 7cdd82e0e0dd..d7560f57cd6f 100644
---- a/include/linux/sbitmap.h
-+++ b/include/linux/sbitmap.h
-@@ -366,6 +366,29 @@ static inline void sbitmap_queue_free(struct sbitmap_queue *sbq)
-  */
- void sbitmap_queue_resize(struct sbitmap_queue *sbq, unsigned int depth);
+diff --git a/block/blk-mq-debugfs.c b/block/blk-mq-debugfs.c
+index b3f2ba483992..fcd6f7ce80cc 100644
+--- a/block/blk-mq-debugfs.c
++++ b/block/blk-mq-debugfs.c
+@@ -659,6 +659,23 @@ CTX_RQ_SEQ_OPS(default, HCTX_TYPE_DEFAULT);
+ CTX_RQ_SEQ_OPS(read, HCTX_TYPE_READ);
+ CTX_RQ_SEQ_OPS(poll, HCTX_TYPE_POLL);
  
-+/**
-+ * __sbitmap_queue_get_batch() - Try to allocate a batch of free tags from a
-+ * &struct sbitmap_queue with preemption already disabled.
-+ * @sbq: Bitmap queue to allocate from.
-+ * @offset: tag offset
-+ * @mask: mask of free tags
-+ *
-+ * Return: Zero if successful, -1 otherwise.
-+ */
-+int __sbitmap_queue_get_batch(struct sbitmap_queue *sbq, unsigned int *offset,
-+			      unsigned long *mask);
-+
-+/**
-+ * __sbitmap_queue_clear_batch() - Free a batch a tags
-+ * @sbq: Bitmap queue to allocate from.
-+ * @offset: tag offset
-+ * @mask: mask of free tags
-+ *
-+ * Return: Zero if successful, -1 otherwise.
-+ */
-+void __sbitmap_queue_clear_batch(struct sbitmap_queue *sbq, unsigned int offset,
-+				 unsigned long mask);
-+
- /**
-  * __sbitmap_queue_get() - Try to allocate a free bit from a &struct
-  * sbitmap_queue with preemption already disabled.
-diff --git a/lib/sbitmap.c b/lib/sbitmap.c
-index a6c6c104b063..62cfc7761e4b 100644
---- a/lib/sbitmap.c
-+++ b/lib/sbitmap.c
-@@ -143,6 +143,42 @@ int sbitmap_get(struct sbitmap *sb, unsigned int alloc_hint, bool round_robin)
- }
- EXPORT_SYMBOL_GPL(sbitmap_get);
- 
-+static int __sbitmap_get_batch(struct sbitmap *sb, unsigned int index,
-+			       unsigned long *ret)
++static ssize_t ctx_tag_hit_write(void *data, const char __user *buf,
++				    size_t count, loff_t *ppos)
 +{
-+	do {
-+		unsigned long val = sb->map[index].word;
-+		unsigned long new_val;
++	struct blk_mq_ctx *ctx = data;
 +
-+		*ret = ~val;
-+		if (!(*ret))
-+			return -1;
++	ctx->tag_hit = ctx->tag_refill = 0;
++	return count;
++}
 +
-+		new_val = val | *ret;
-+		if (cmpxchg(&sb->map[index].word, val, new_val) == val)
-+			break;
-+	} while (1);
++static int ctx_tag_hit_show(void *data, struct seq_file *m)
++{
++	struct blk_mq_ctx *ctx = data;
 +
++	seq_printf(m, "hit=%lu refills=%lu, tags=%lx, tag_offset=%u\n", ctx->tag_hit, ctx->tag_refill, ctx->tags, ctx->tag_offset);
 +	return 0;
 +}
 +
-+int sbitmap_get_batch(struct sbitmap *sb, unsigned int *index,
-+		      unsigned long *ret)
+ static int ctx_dispatched_show(void *data, struct seq_file *m)
+ {
+ 	struct blk_mq_ctx *ctx = data;
+@@ -800,6 +817,7 @@ static const struct blk_mq_debugfs_attr blk_mq_debugfs_ctx_attrs[] = {
+ 	{"read_rq_list", 0400, .seq_ops = &ctx_read_rq_list_seq_ops},
+ 	{"poll_rq_list", 0400, .seq_ops = &ctx_poll_rq_list_seq_ops},
+ 	{"dispatched", 0600, ctx_dispatched_show, ctx_dispatched_write},
++	{"tag_hit", 0600, ctx_tag_hit_show, ctx_tag_hit_write},
+ 	{"merged", 0600, ctx_merged_show, ctx_merged_write},
+ 	{"completed", 0600, ctx_completed_show, ctx_completed_write},
+ 	{},
+diff --git a/block/blk-mq-tag.c b/block/blk-mq-tag.c
+index fbacde454718..3b5269bc4e36 100644
+--- a/block/blk-mq-tag.c
++++ b/block/blk-mq-tag.c
+@@ -99,6 +99,101 @@ static int __blk_mq_get_tag(struct blk_mq_alloc_data *data,
+ 		return __sbitmap_queue_get(bt);
+ }
+ 
++static void blk_mq_tag_flush_batches(struct blk_mq_hw_ctx *hctx)
 +{
++	struct sbitmap_queue *bt = &hctx->tags->bitmap_tags;
++	struct blk_mq_ctx *ctx;
++	unsigned int i;
++
++	/*
++	 * we could potentially add a ctx map for this, but probably not
++	 * worth it. better to ensure that we rarely (or never) get into
++	 * the need to flush ctx tag batches.
++	 */
++	hctx_for_each_ctx(hctx, ctx, i) {
++		unsigned long mask;
++		unsigned int offset;
++
++		if (!ctx->tags)
++			continue;
++
++		spin_lock(&ctx->lock);
++		mask = ctx->tags;
++		offset = ctx->tag_offset;
++		ctx->tags = 0;
++		ctx->tag_offset = -1;
++		spin_unlock(&ctx->lock);
++
++		if (mask)
++			__sbitmap_queue_clear_batch(bt, offset, mask);
++	}
++}
++
++void blk_mq_tag_queue_flush_batches(struct request_queue *q)
++{
++	struct blk_mq_hw_ctx *hctx;
 +	int i;
 +
-+	for (i = 0; i < sb->map_nr; i++) {
-+		if (!__sbitmap_get_batch(sb, *index, ret))
-+			return 0;
-+
-+		/* Jump to next index. */
-+		if (++(*index) >= sb->map_nr)
-+			*index = 0;
-+	}
-+
-+	return -1;
++	queue_for_each_hw_ctx(q, hctx, i)
++		blk_mq_tag_flush_batches(hctx);
 +}
 +
- int sbitmap_get_shallow(struct sbitmap *sb, unsigned int alloc_hint,
- 			unsigned long shallow_depth)
++static int blk_mq_get_tag_batch(struct blk_mq_alloc_data *data)
++{
++	struct blk_mq_tags *tags = blk_mq_tags_from_data(data);
++	struct sbitmap_queue *bt = &tags->bitmap_tags;
++	struct blk_mq_ctx *ctx = data->ctx;
++	int tag, cpu;
++
++	if (!ctx)
++		return -1;
++
++	preempt_disable();
++
++	/* bad luck if we got preempted coming in here, should be rare */
++	cpu = smp_processor_id();
++	if (unlikely(ctx->cpu != cpu)) {
++		ctx = data->ctx = __blk_mq_get_ctx(data->q, cpu);
++		data->hctx = blk_mq_map_queue(data->q, data->cmd_flags, ctx);
++		tags = blk_mq_tags_from_data(data);
++		bt = &tags->bitmap_tags;
++	}
++
++	spin_lock(&ctx->lock);
++
++	if (WARN_ON_ONCE(ctx->tag_offset != -1 && !ctx->tags)) {
++		printk("hit=%lu, refill=%lun", ctx->tag_hit,  ctx->tag_refill);
++		ctx->tag_offset = -1;
++	}
++
++	/* if offset is != -1, we have a tag cache. grab first free one */
++	if (ctx->tag_offset != -1) {
++get_tag:
++		ctx->tag_hit++;
++
++		WARN_ON_ONCE(!ctx->tags);
++
++		tag = __ffs(ctx->tags);
++		__clear_bit(tag, &ctx->tags);
++		tag += ctx->tag_offset;
++		if (!ctx->tags)
++			ctx->tag_offset = -1;
++out:
++		spin_unlock(&ctx->lock);
++		preempt_enable();
++		return tag;
++	}
++
++	/* no current tag cache, attempt to refill a batch */
++	if (!__sbitmap_queue_get_batch(bt, &ctx->tag_offset, &ctx->tags)) {
++		ctx->tag_refill++;
++		goto get_tag;
++	}
++
++	tag = -1;
++	goto out;
++}
++
+ unsigned int blk_mq_get_tag(struct blk_mq_alloc_data *data)
  {
-@@ -354,6 +390,67 @@ void sbitmap_queue_resize(struct sbitmap_queue *sbq, unsigned int depth)
- }
- EXPORT_SYMBOL_GPL(sbitmap_queue_resize);
+ 	struct blk_mq_tags *tags = blk_mq_tags_from_data(data);
+@@ -116,8 +211,13 @@ unsigned int blk_mq_get_tag(struct blk_mq_alloc_data *data)
+ 		bt = &tags->breserved_tags;
+ 		tag_offset = 0;
+ 	} else {
+-		bt = &tags->bitmap_tags;
+ 		tag_offset = tags->nr_reserved_tags;
++
++		tag = blk_mq_get_tag_batch(data);
++		if (tag != -1)
++			goto found_tag;
++
++		bt = &tags->bitmap_tags;
+ 	}
  
-+void __sbitmap_queue_clear_batch(struct sbitmap_queue *sbq, unsigned int index,
-+				 unsigned long mask)
-+{
-+	index >>= sbq->sb.shift;
-+	do {
-+		unsigned long val = sbq->sb.map[index].word;
-+		unsigned long new_val = val & ~mask;
+ 	tag = __blk_mq_get_tag(data, bt);
+@@ -146,6 +246,9 @@ unsigned int blk_mq_get_tag(struct blk_mq_alloc_data *data)
+ 		if (tag != -1)
+ 			break;
+ 
++		if (!(data->flags & BLK_MQ_REQ_RESERVED))
++			blk_mq_tag_flush_batches(data->hctx);
 +
-+		if (cmpxchg(&sbq->sb.map[index].word, val, new_val) == val)
-+			break;
-+	} while (1);
+ 		sbitmap_prepare_to_wait(bt, ws, &wait, TASK_UNINTERRUPTIBLE);
+ 
+ 		tag = __blk_mq_get_tag(data, bt);
+diff --git a/block/blk-mq.c b/block/blk-mq.c
+index 3c71d52b6401..9eeade7736eb 100644
+--- a/block/blk-mq.c
++++ b/block/blk-mq.c
+@@ -276,6 +276,9 @@ static struct request *blk_mq_rq_ctx_init(struct blk_mq_alloc_data *data,
+ 	struct request *rq = tags->static_rqs[tag];
+ 	req_flags_t rq_flags = 0;
+ 
++	if (WARN_ON_ONCE(!rq))
++		printk("no rq for tag %u\n", tag);
 +
-+	/*
-+	 * Pairs with the memory barrier in set_current_state() to ensure the
-+	 * proper ordering of clear_bit_unlock()/waitqueue_active() in the waker
-+	 * and test_and_set_bit_lock()/prepare_to_wait()/finish_wait() in the
-+	 * waiter. See the comment on waitqueue_active().
-+	 */
-+	smp_mb__after_atomic();
-+	sbitmap_queue_wake_up(sbq);
-+}
+ 	if (data->flags & BLK_MQ_REQ_INTERNAL) {
+ 		rq->tag = -1;
+ 		rq->internal_tag = tag;
+@@ -2358,6 +2361,9 @@ static void blk_mq_init_cpu_queues(struct request_queue *q,
+ 		struct blk_mq_hw_ctx *hctx;
+ 		int k;
+ 
++		__ctx->tags = 0;
++		__ctx->tag_offset = -1;
 +
-+int __sbitmap_queue_get_batch(struct sbitmap_queue *sbq, unsigned int *offset,
-+			      unsigned long *mask)
-+{
-+	unsigned int hint, depth;
-+	int nr;
-+
-+	/* don't do batches for round-robin or very sparse maps */
-+	if (sbq->round_robin || sbq->sb.shift < 5)
-+		return -1;
-+
-+	hint = this_cpu_read(*sbq->alloc_hint);
-+	depth = READ_ONCE(sbq->sb.depth);
-+	if (unlikely(hint >= depth))
-+		hint = depth ? prandom_u32() % depth : 0;
-+
-+	*offset = SB_NR_TO_INDEX(&sbq->sb, hint);
-+
-+	nr = sbitmap_get_batch(&sbq->sb, offset, mask);
-+
-+	if (nr == -1) {
-+		/* If the map is full, a hint won't do us much good. */
-+		this_cpu_write(*sbq->alloc_hint, 0);
-+		return -1;
+ 		__ctx->cpu = i;
+ 		spin_lock_init(&__ctx->lock);
+ 		for (k = HCTX_TYPE_DEFAULT; k < HCTX_MAX_TYPES; k++)
+@@ -2447,6 +2453,8 @@ static void blk_mq_map_swqueue(struct request_queue *q)
+ 			}
+ 
+ 			hctx = blk_mq_map_queue_type(q, j, i);
++			ctx->tags = 0;
++			ctx->tag_offset = -1;
+ 			ctx->hctxs[j] = hctx;
+ 			/*
+ 			 * If the CPU is already set in the mask, then we've
+@@ -3224,8 +3232,11 @@ static void __blk_mq_update_nr_hw_queues(struct blk_mq_tag_set *set,
+ 	if (nr_hw_queues < 1 || nr_hw_queues == set->nr_hw_queues)
+ 		return;
+ 
+-	list_for_each_entry(q, &set->tag_list, tag_set_list)
++	list_for_each_entry(q, &set->tag_list, tag_set_list) {
++		blk_mq_tag_queue_flush_batches(q);
+ 		blk_mq_freeze_queue(q);
 +	}
 +
-+	/*
-+	 * Only update the hint if we used it. We might not have gotten a
-+	 * full 'count' worth of bits, but pretend we did. Even if we didn't,
-+	 * we want to advance to the next index since we failed to get a full
-+	 * batch in this one.
-+	 */
-+	hint = ((*offset) + 1) << sbq->sb.shift;
-+	if (hint >= depth - 1)
-+		hint = 0;
-+	this_cpu_write(*sbq->alloc_hint, hint);
-+	*offset <<= sbq->sb.shift;
-+	return 0;
-+}
+ 	/*
+ 	 * Switch IO scheduler to 'none', cleaning up the data associated
+ 	 * with the previous scheduler. We will switch back once we are done
+diff --git a/block/blk-mq.h b/block/blk-mq.h
+index eaaca8fc1c28..7a3198f62f6e 100644
+--- a/block/blk-mq.h
++++ b/block/blk-mq.h
+@@ -18,7 +18,9 @@ struct blk_mq_ctxs {
+ struct blk_mq_ctx {
+ 	struct {
+ 		spinlock_t		lock;
++		unsigned int		tag_offset;
+ 		struct list_head	rq_lists[HCTX_MAX_TYPES];
++		unsigned long		tags;
+ 	} ____cacheline_aligned_in_smp;
+ 
+ 	unsigned int		cpu;
+@@ -32,6 +34,8 @@ struct blk_mq_ctx {
+ 	/* incremented at completion time */
+ 	unsigned long		____cacheline_aligned_in_smp rq_completed[2];
+ 
++	unsigned long		tag_hit, tag_refill;
 +
- int __sbitmap_queue_get(struct sbitmap_queue *sbq)
- {
- 	unsigned int hint, depth;
+ 	struct request_queue	*queue;
+ 	struct blk_mq_ctxs      *ctxs;
+ 	struct kobject		kobj;
+@@ -60,6 +64,7 @@ struct blk_mq_tags *blk_mq_alloc_rq_map(struct blk_mq_tag_set *set,
+ 					unsigned int reserved_tags);
+ int blk_mq_alloc_rqs(struct blk_mq_tag_set *set, struct blk_mq_tags *tags,
+ 		     unsigned int hctx_idx, unsigned int depth);
++void blk_mq_tag_queue_flush_batches(struct request_queue *q);
+ 
+ /*
+  * Internal helpers for request insertion into sw queues
 -- 
 2.24.1
 
