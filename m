@@ -6,101 +6,164 @@ X-Spam-Status: No, score=-9.8 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
 	INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,
 	USER_AGENT_GIT autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id D85E8C2D0DC
-	for <linux-block@archiver.kernel.org>; Thu,  2 Jan 2020 14:58:50 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 5A421C2D0DC
+	for <linux-block@archiver.kernel.org>; Thu,  2 Jan 2020 14:59:33 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.kernel.org (Postfix) with ESMTP id B991F21835
-	for <linux-block@archiver.kernel.org>; Thu,  2 Jan 2020 14:58:50 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id 36C94217F4
+	for <linux-block@archiver.kernel.org>; Thu,  2 Jan 2020 14:59:33 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1728652AbgABO6t (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Thu, 2 Jan 2020 09:58:49 -0500
-Received: from mout.kundenserver.de ([212.227.126.134]:58161 "EHLO
+        id S1728566AbgABO7c (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Thu, 2 Jan 2020 09:59:32 -0500
+Received: from mout.kundenserver.de ([212.227.126.187]:60111 "EHLO
         mout.kundenserver.de" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1728544AbgABO6t (ORCPT
-        <rfc822;linux-block@vger.kernel.org>); Thu, 2 Jan 2020 09:58:49 -0500
+        with ESMTP id S1728544AbgABO7c (ORCPT
+        <rfc822;linux-block@vger.kernel.org>); Thu, 2 Jan 2020 09:59:32 -0500
 Received: from threadripper.lan ([149.172.19.189]) by mrelayeu.kundenserver.de
  (mreue011 [212.227.15.129]) with ESMTPA (Nemesis) id
- 1M433w-1in1vY3uwi-0003Hv; Thu, 02 Jan 2020 15:58:21 +0100
+ 1MMoOy-1j3asu1Afs-00Ip7v; Thu, 02 Jan 2020 15:58:56 +0100
 From:   Arnd Bergmann <arnd@arndb.de>
 To:     "James E.J. Bottomley" <jejb@linux.ibm.com>,
         "Martin K. Petersen" <martin.petersen@oracle.com>
-Cc:     Arnd Bergmann <arnd@arndb.de>, Jeff Dike <jdike@addtoit.com>,
-        Richard Weinberger <richard@nod.at>,
-        Anton Ivanov <anton.ivanov@cambridgegreys.com>,
-        Justin Sanders <justin@coraid.com>,
-        Jens Axboe <axboe@kernel.dk>,
-        Daniel Walter <dwalter@google.com>,
-        Alex Dewar <alex.dewar@gmx.co.uk>,
-        linux-um@lists.infradead.org, linux-kernel@vger.kernel.org,
-        linux-block@vger.kernel.org
-Subject: [PATCH v3 05/22] compat_ioctl: ubd, aoe: use blkdev_compat_ptr_ioctl
-Date:   Thu,  2 Jan 2020 15:55:23 +0100
-Message-Id: <20200102145552.1853992-6-arnd@arndb.de>
+Cc:     Arnd Bergmann <arnd@arndb.de>, Jens Axboe <axboe@kernel.dk>,
+        Damien Le Moal <damien.lemoal@wdc.com>,
+        Mauro Carvalho Chehab <mchehab+samsung@kernel.org>,
+        Jonathan Corbet <corbet@lwn.net>,
+        =?UTF-8?q?Diego=20Elio=20Petten=C3=B2?= <flameeyes@flameeyes.com>,
+        Guenter Roeck <linux@roeck-us.net>,
+        linux-block@vger.kernel.org, linux-kernel@vger.kernel.org
+Subject: [PATCH v3 07/22] compat_ioctl: move CDROMREADADIO to cdrom.c
+Date:   Thu,  2 Jan 2020 15:55:25 +0100
+Message-Id: <20200102145552.1853992-8-arnd@arndb.de>
 X-Mailer: git-send-email 2.20.0
 In-Reply-To: <20200102145552.1853992-1-arnd@arndb.de>
 References: <20200102145552.1853992-1-arnd@arndb.de>
 MIME-Version: 1.0
 Content-Transfer-Encoding: 8bit
-X-Provags-ID: V03:K1:8p6BJLwWlOj4GvZq2jwHiMBi4e9jJiHHbTeRXtMc/ApbEdKhklc
- gKlW1NaJh90o2mvhxJRo47hmvCzaB15auzhfRK08JSJldtXQK+TFAbQnCnVZulkj5SogMn4
- LfbZdloSdsbQbAhiQeotT/ZakSv8yylow0e+EApZlUEBrIppF2EzpE6WOgmXG/gLywQZxZx
- rjT/qfDnsWHma4CB8nMaA==
-X-UI-Out-Filterresults: notjunk:1;V03:K0:MrbTKH9MBv8=:tGOIcVKUd15dl5QCSnQhWi
- l92uQbcHjmyxlz3mrYVH+VEzMKjGo99LlZCaa00Cs9CW/8c1yR4TqOnAqtq2cyyTm7BydkDN3
- M1oQrb3D0yzJNz2qT5vhX3uAaH9ELre7mNJf1lFrEaltKs9LrMdgZRFSTBKHTv0XwHoIhlFrK
- iAfucu65aHNau9imkICR//naYpZqEe9oJQsmFCqqC/NXNoZoEy0HdLC/zwDzcJxQr++0Ql1w7
- OmyB01FdKfIB+dNOl9q4mUPgwSCJ2FF8GOI7rLsVEajQ3twqYGU532orIIbPP579kpe+vW6Wd
- 0UTU50Gqjbi3Rdb7hQIOoPue8RDQlEMCADDW1tijPnR+7ds73XPy+g8cy3nK1lgTPGntDwN4U
- w9nzLdHkPHMEbkIxd7zHVKlkHwJecfUC9u9xk4Y8PDzsJVnuVkSthxgVpw5j2b1lT7QAzLA3p
- MEBPOADTWWZwQjSFNVx4yflFSY0A+SzaTL7NlPJYWlyciQyUDWeKi3+wD5GIvBAi4GKCNRwL3
- zWoZHo9QzmA2vj8e5m5I6i+17omfJdbjOcb8IJKcPC0vF7ZnuMluOIRnSvlSOJ2Dhc4xk8+qx
- DpCnZNOjGxjAAQOT/1dsbvbJD4T7byudIqLDyiiYxeZ5RIiZeHk0Vl/p0hK8pn06oKk1ZSIMb
- dW+VDrNJlVEVt21k5K7jrzRxpAY0n0AF41TdhraKf3lagtDcva/ON8ug0sirgQiezEBvcovUr
- pMDACkpS3KTrz8X6yZpRQlhYjuCAKlBRv8D8gk3191Z52wetwpvcQSfgE7bszS0A1ItxITQlj
- n5szWhlnByKP4I8KStDZLS1PXM/QlWPFNuHICr8hjXvzl7SKGhsHGE1BmVHcWsG6s8qFFncjK
- iNE5bzoy6IW09u5hSBow==
+X-Provags-ID: V03:K1:yC0KphMQ1+jnKNs/TZQcxE6mhJ8DI2BYfsTPoVcbUgaeAslYM1E
+ +kDeZqbUJadN1PpR9x8xf6D1wRqI76SYi4qPB8Pn5nQ5LVbniZIaEa5h5YVIDwT0GvC4BEc
+ VSbWkOJMe6hAEy4xQ5Qilz8rsgyXx60SBBEXK2X/bPWP2D+3dyjKdrOdXgRD7sf+oCaeOSw
+ MvEzObUZ8SGijvgCyrrGg==
+X-UI-Out-Filterresults: notjunk:1;V03:K0:0LyknXyySuU=:QGnS3AemUqQiWwsUb3cQ/0
+ uuErWnUU23YRVY1fLesU2gdZctGhMViXl8+td7MXCS35Fk9iowBsTwHZRD80P/Hx91wyK6v/R
+ 5nt5w2FQNTNwP8rgUFqVHjzku2BAMJPhyoj4KQ89HowsHYZim9Ldxo68o4b+8/XxWwNP2qkNz
+ pnNUU8PuHd6PcfuanisY4QTXj6pk9A/67mABX40gtjRWMYddnOgA8uL1ZaY1kuwL6isZEs9Ki
+ /JDLvt9IWDOIm7pYo7AKlFRW5383nr+mb+NrYM0uV3SU0412iMKKcAbkE97TDFif92HbVyfbc
+ QeBy3LD2IZFHu3HFxT52awhYufiOTtQSgJkL1IPStQfWUl2JerUq9vcQqTMJt7I7UjOvtJuoL
+ k9cqEqREoPTUgLY3Xq0QqnvxMjkCtihchOz6CHtpxNW763ZJjRC6zp7HZoQodID3Pea7pB4u2
+ FgbeWeX+xdwf/I9UXF87392pBu0Nx+xQGf4t6whI7RTSy/NmYlROtB/9vjp0TOXiQuNGETnqm
+ SMYt86fggLGoYEV5V6T/9CQEweNSxvbqouK+e1KmGvCKKNXD719X8rhh0MqOJ9LS1k6+ZfAzz
+ pCPwjiU2N9LigHlM0PyXlgoM2pwP+CYbRTy9jQMzn0k6fx97qiQOC+xlurx1PiiTFw33mJGvq
+ bu1DrM1gKavMfJUn8yJIFWTaLVWvFLYfpaAFci+kzktY40ScAYUbMzdOmcGG827F/Q7FRK5ez
+ 2SGBpPcAaSrLNUSqVjg1vLhmCixfxq+wUHqRYHK9FtXMk1/9LvZRmhhiBKISNVyRy5iXHiwln
+ Yvd5ArmMtpq1/2599K8jgYBJvrinU6YiMZELyzXSRBdwPQ1kq7hc0beTn0IGb1XZDtNP9u6hn
+ UW6qirvFHKQzVxCJVrJA==
 Sender: linux-block-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-These drivers implement the HDIO_GET_IDENTITY and CDROMVOLREAD ioctl
-commands, which are compatible between 32-bit and 64-bit user space and
-traditionally handled by compat_blkdev_driver_ioctl().
-
-As a prerequisite to removing that function, make both drivers use
-blkdev_compat_ptr_ioctl() as their .compat_ioctl callback.
+Again, there is only one file that needs this, so move the conversion
+handler into the native implementation.
 
 Signed-off-by: Arnd Bergmann <arnd@arndb.de>
 ---
- arch/um/drivers/ubd_kern.c | 1 +
- drivers/block/aoe/aoeblk.c | 1 +
- 2 files changed, 2 insertions(+)
+ block/compat_ioctl.c  | 36 ------------------------------------
+ drivers/cdrom/cdrom.c | 28 +++++++++++++++++++++++++---
+ 2 files changed, 25 insertions(+), 39 deletions(-)
 
-diff --git a/arch/um/drivers/ubd_kern.c b/arch/um/drivers/ubd_kern.c
-index 6627d7c30f37..582eb5b1f09b 100644
---- a/arch/um/drivers/ubd_kern.c
-+++ b/arch/um/drivers/ubd_kern.c
-@@ -113,6 +113,7 @@ static const struct block_device_operations ubd_blops = {
-         .open		= ubd_open,
-         .release	= ubd_release,
-         .ioctl		= ubd_ioctl,
-+        .compat_ioctl	= blkdev_compat_ptr_ioctl,
- 	.getgeo		= ubd_getgeo,
- };
+diff --git a/block/compat_ioctl.c b/block/compat_ioctl.c
+index e34203f7d1cf..91a5dcf6e36c 100644
+--- a/block/compat_ioctl.c
++++ b/block/compat_ioctl.c
+@@ -96,40 +96,6 @@ static int compat_hdio_ioctl(struct block_device *bdev, fmode_t mode,
+ 	return error;
+ }
  
-diff --git a/drivers/block/aoe/aoeblk.c b/drivers/block/aoe/aoeblk.c
-index bd19f8af950b..7b32fb673375 100644
---- a/drivers/block/aoe/aoeblk.c
-+++ b/drivers/block/aoe/aoeblk.c
-@@ -329,6 +329,7 @@ static const struct block_device_operations aoe_bdops = {
- 	.open = aoeblk_open,
- 	.release = aoeblk_release,
- 	.ioctl = aoeblk_ioctl,
-+	.compat_ioctl = blkdev_compat_ptr_ioctl,
- 	.getgeo = aoeblk_getgeo,
- 	.owner = THIS_MODULE,
- };
+-struct compat_cdrom_read_audio {
+-	union cdrom_addr	addr;
+-	u8			addr_format;
+-	compat_int_t		nframes;
+-	compat_caddr_t		buf;
+-};
+-
+-static int compat_cdrom_read_audio(struct block_device *bdev, fmode_t mode,
+-		unsigned int cmd, unsigned long arg)
+-{
+-	struct cdrom_read_audio __user *cdread_audio;
+-	struct compat_cdrom_read_audio __user *cdread_audio32;
+-	__u32 data;
+-	void __user *datap;
+-
+-	cdread_audio = compat_alloc_user_space(sizeof(*cdread_audio));
+-	cdread_audio32 = compat_ptr(arg);
+-
+-	if (copy_in_user(&cdread_audio->addr,
+-			 &cdread_audio32->addr,
+-			 (sizeof(*cdread_audio32) -
+-			  sizeof(compat_caddr_t))))
+-		return -EFAULT;
+-
+-	if (get_user(data, &cdread_audio32->buf))
+-		return -EFAULT;
+-	datap = compat_ptr(data);
+-	if (put_user(datap, &cdread_audio->buf))
+-		return -EFAULT;
+-
+-	return __blkdev_driver_ioctl(bdev, mode, cmd,
+-			(unsigned long)cdread_audio);
+-}
+-
+ struct compat_blkpg_ioctl_arg {
+ 	compat_int_t op;
+ 	compat_int_t flags;
+@@ -179,8 +145,6 @@ static int compat_blkdev_driver_ioctl(struct block_device *bdev, fmode_t mode,
+ 	case HDIO_GET_ADDRESS:
+ 	case HDIO_GET_BUSSTATE:
+ 		return compat_hdio_ioctl(bdev, mode, cmd, arg);
+-	case CDROMREADAUDIO:
+-		return compat_cdrom_read_audio(bdev, mode, cmd, arg);
+ 
+ 	/*
+ 	 * No handler required for the ones below, we just need to
+diff --git a/drivers/cdrom/cdrom.c b/drivers/cdrom/cdrom.c
+index eebdcbef0578..48095025e588 100644
+--- a/drivers/cdrom/cdrom.c
++++ b/drivers/cdrom/cdrom.c
+@@ -3017,9 +3017,31 @@ static noinline int mmc_ioctl_cdrom_read_audio(struct cdrom_device_info *cdi,
+ 	struct cdrom_read_audio ra;
+ 	int lba;
+ 
+-	if (copy_from_user(&ra, (struct cdrom_read_audio __user *)arg,
+-			   sizeof(ra)))
+-		return -EFAULT;
++#ifdef CONFIG_COMPAT
++	if (in_compat_syscall()) {
++		struct compat_cdrom_read_audio {
++			union cdrom_addr	addr;
++			u8			addr_format;
++			compat_int_t		nframes;
++			compat_caddr_t		buf;
++		} ra32;
++
++		if (copy_from_user(&ra32, arg, sizeof(ra32)))
++			return -EFAULT;
++
++		ra = (struct cdrom_read_audio) {
++			.addr		= ra32.addr,
++			.addr_format	= ra32.addr_format,
++			.nframes	= ra32.nframes,
++			.buf		= compat_ptr(ra32.buf),
++		};
++	} else
++#endif
++	{
++		if (copy_from_user(&ra, (struct cdrom_read_audio __user *)arg,
++				   sizeof(ra)))
++			return -EFAULT;
++	}
+ 
+ 	if (ra.addr_format == CDROM_MSF)
+ 		lba = msf_to_lba(ra.addr.msf.minute,
 -- 
 2.20.0
 
