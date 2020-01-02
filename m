@@ -2,283 +2,135 @@ Return-Path: <SRS0=T2Jf=2X=vger.kernel.org=linux-block-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-0.9 required=3.0 tests=DKIM_SIGNED,DKIM_VALID,
-	DKIM_VALID_AU,HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SPF_HELO_NONE,
-	SPF_PASS autolearn=no autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-3.9 required=3.0 tests=DKIMWL_WL_HIGH,DKIM_SIGNED,
+	DKIM_VALID,DKIM_VALID_AU,HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,
+	SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS autolearn=no autolearn_force=no
+	version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id BDA1DC3276D
-	for <linux-block@archiver.kernel.org>; Thu,  2 Jan 2020 15:27:50 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 45847C2D0DC
+	for <linux-block@archiver.kernel.org>; Thu,  2 Jan 2020 16:33:34 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.kernel.org (Postfix) with ESMTP id 865F220848
-	for <linux-block@archiver.kernel.org>; Thu,  2 Jan 2020 15:27:50 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id 16F74215A4
+	for <linux-block@archiver.kernel.org>; Thu,  2 Jan 2020 16:33:34 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=pass (2048-bit key) header.d=cloud.ionos.com header.i=@cloud.ionos.com header.b="V2qRdo33"
+	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="AV/Uk42A"
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1728680AbgABP1u (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Thu, 2 Jan 2020 10:27:50 -0500
-Received: from mail-io1-f67.google.com ([209.85.166.67]:33175 "EHLO
-        mail-io1-f67.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1728561AbgABP1t (ORCPT
-        <rfc822;linux-block@vger.kernel.org>); Thu, 2 Jan 2020 10:27:49 -0500
-Received: by mail-io1-f67.google.com with SMTP id z8so38592003ioh.0
-        for <linux-block@vger.kernel.org>; Thu, 02 Jan 2020 07:27:48 -0800 (PST)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=cloud.ionos.com; s=google;
-        h=mime-version:references:in-reply-to:from:date:message-id:subject:to
-         :cc;
-        bh=XuGmkaJu1UfI6YMMJvZiG3h7yvuBPE+FwkjyCnxeW3U=;
-        b=V2qRdo33wQH3K9VbyDnzZ9lHZVq4OZwJU17msFoJlUrkekDpMW8uH1334NGxtlDJH3
-         MdUCQ0QCWQYu38n4OoC3LLWma9ShVdtXKpNZ9CeyfG/qTHcnIqVE7jZAyZpBAZa8CMMW
-         BRLixdyyle+h2Aj3VhPdvYqcC85AePbSphM0f0Be3DRfIokLoz8EnJ85QLuyGPE+EyS1
-         9vQer/ZU3ke+AO6gneI9BjIcGauPI5QB4SLWrIcZAyE3iAcCNlsQ5t9NORTR4sfG0r5b
-         BYY08sxVcAie5qidPp4GkfgRxtWo/otTLIqEREfpxA4NFUKRJvQH+FhOZ2pSL7KsP3ZJ
-         FqSQ==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20161025;
-        h=x-gm-message-state:mime-version:references:in-reply-to:from:date
-         :message-id:subject:to:cc;
-        bh=XuGmkaJu1UfI6YMMJvZiG3h7yvuBPE+FwkjyCnxeW3U=;
-        b=DtQANa4n8V0wUxtpNNQLzzE5yaL9wyEFU9vwoAcdj/CKypRensaXnSMSjAzERdmMii
-         /LOPiuOMkRcznIQEtMIpLs9qtu/ir9pyBkWHAQhMtquwgCPFiDUkv6td5LEaFtobZi2k
-         gol+6iiYvUtQvueL98fVPrpe8NbzFj7lmDiYIYgRDKOmAMvzJnv2mB8NUNfHtvLynS/o
-         5bImuUfVX4C2Cjnx1pKiLM8x8Q3ACpNDO9rktBG7sx8FIXuW0fLosYGOqjKu8UtFfdsm
-         PR6O7ST7m6VErnN9jr9pbgBnzOgtHJTrzck69UWpAe8/Q3SOfLABxODFIytiuIO5+EPr
-         l0zg==
-X-Gm-Message-State: APjAAAVZ2JeS3PjEzIAL6SsSULqXembwSvcOqv6IYKGLzB7GxqEk5r1X
-        RBGp52t+IeNnwkpV+Yjn221CRFJoPyR/n9nbtcbAtg==
-X-Google-Smtp-Source: APXvYqxfMEEVrQIhsuKukYdR8w0Qg4Kv4C022IoSpGwR8Ko29fB7ufz5BZGQHsEFtBLAvm++FQ5TsRMw85Zouo2Zwqc=
-X-Received: by 2002:a02:a610:: with SMTP id c16mr64226215jam.13.1577978868146;
- Thu, 02 Jan 2020 07:27:48 -0800 (PST)
+        id S1728837AbgABQdd (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Thu, 2 Jan 2020 11:33:33 -0500
+Received: from us-smtp-delivery-1.mimecast.com ([205.139.110.120]:46997 "EHLO
+        us-smtp-1.mimecast.com" rhost-flags-OK-OK-OK-FAIL) by vger.kernel.org
+        with ESMTP id S1728832AbgABQdd (ORCPT
+        <rfc822;linux-block@vger.kernel.org>); Thu, 2 Jan 2020 11:33:33 -0500
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+        s=mimecast20190719; t=1577982812;
+        h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+         to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+         in-reply-to:in-reply-to:references:references;
+        bh=TlchMaIvasLMm30BcrAzvO65BEfeYNv4RmHmgwKHDHM=;
+        b=AV/Uk42ASCaTxh4rK+oyrgmCjHXNj5r5vyKYmcFGQaE/LI7TkqXVpjNIFauWL7cLKtiVvt
+        jppTczM+bTWeaA3kX5RyJnAtw08xP7Tuh9HxgWKJMQbrr8Jnm6QNdP5WTBYqoySUjeCjRE
+        Xz1POlZV+IOeRW15jC8+pqm81xBjSVM=
+Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
+ [209.132.183.4]) (Using TLS) by relay.mimecast.com with ESMTP id
+ us-mta-326-f6RSfu66O-SgKyoHEVPNVg-1; Thu, 02 Jan 2020 11:33:31 -0500
+X-MC-Unique: f6RSfu66O-SgKyoHEVPNVg-1
+Received: from smtp.corp.redhat.com (int-mx04.intmail.prod.int.phx2.redhat.com [10.5.11.14])
+        (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
+        (No client certificate requested)
+        by mimecast-mx01.redhat.com (Postfix) with ESMTPS id 76E6F800D55;
+        Thu,  2 Jan 2020 16:33:27 +0000 (UTC)
+Received: from localhost (ovpn-117-73.ams2.redhat.com [10.36.117.73])
+        by smtp.corp.redhat.com (Postfix) with ESMTP id 654815D9C9;
+        Thu,  2 Jan 2020 16:33:23 +0000 (UTC)
+Date:   Thu, 2 Jan 2020 16:33:21 +0000
+From:   Stefan Hajnoczi <stefanha@redhat.com>
+To:     Arnd Bergmann <arnd@arndb.de>
+Cc:     "James E.J. Bottomley" <jejb@linux.ibm.com>,
+        "Martin K. Petersen" <martin.petersen@oracle.com>,
+        "Michael S. Tsirkin" <mst@redhat.com>,
+        Jason Wang <jasowang@redhat.com>,
+        Paolo Bonzini <pbonzini@redhat.com>,
+        Jens Axboe <axboe@kernel.dk>,
+        Doug Gilbert <dgilbert@interlog.com>,
+        Kai =?iso-8859-1?Q?M=E4kisara?= <Kai.Makisara@kolumbus.fi>,
+        Alexander Viro <viro@zeniv.linux.org.uk>,
+        Dongli Zhang <dongli.zhang@oracle.com>,
+        Thomas Gleixner <tglx@linutronix.de>,
+        Bart Van Assche <bvanassche@acm.org>,
+        Hannes Reinecke <hare@suse.com>,
+        Damien Le Moal <damien.lemoal@wdc.com>,
+        John Garry <john.garry@huawei.com>,
+        Martin Wilck <mwilck@suse.com>,
+        Heiko Carstens <heiko.carstens@de.ibm.com>,
+        "Gustavo A. R. Silva" <gustavo@embeddedor.com>,
+        Ira Weiny <ira.weiny@intel.com>, Iustin Pop <iustin@k1024.org>,
+        "Darrick J. Wong" <darrick.wong@oracle.com>,
+        virtualization@lists.linux-foundation.org,
+        linux-block@vger.kernel.org, linux-kernel@vger.kernel.org,
+        linux-scsi@vger.kernel.org, linux-fsdevel@vger.kernel.org
+Subject: Re: [PATCH v3 13/22] compat_ioctl: scsi: move ioctl handling into
+ drivers
+Message-ID: <20200102163321.GA129642@stefanha-x1.localdomain>
+References: <20200102145552.1853992-1-arnd@arndb.de>
+ <20200102145552.1853992-14-arnd@arndb.de>
 MIME-Version: 1.0
-References: <20191230102942.18395-1-jinpuwang@gmail.com> <20191230102942.18395-4-jinpuwang@gmail.com>
- <b13eccdd-09a2-70d5-1c78-3c4dbf1aefe8@acm.org>
-In-Reply-To: <b13eccdd-09a2-70d5-1c78-3c4dbf1aefe8@acm.org>
-From:   Jinpu Wang <jinpu.wang@cloud.ionos.com>
-Date:   Thu, 2 Jan 2020 16:27:37 +0100
-Message-ID: <CAMGffEmC3T9M+RmeOXX4ecE3E01azjD8fz2Lz8kHC9Ff-Xx-Aw@mail.gmail.com>
-Subject: Re: [PATCH v6 03/25] rtrs: private headers with rtrs protocol structs
- and helpers
-To:     Bart Van Assche <bvanassche@acm.org>
-Cc:     Jack Wang <jinpuwang@gmail.com>, linux-block@vger.kernel.org,
-        linux-rdma@vger.kernel.org, Jens Axboe <axboe@kernel.dk>,
-        Christoph Hellwig <hch@infradead.org>,
-        Sagi Grimberg <sagi@grimberg.me>,
-        Leon Romanovsky <leon@kernel.org>,
-        Doug Ledford <dledford@redhat.com>,
-        Danil Kipnis <danil.kipnis@cloud.ionos.com>, rpenyaev@suse.de
-Content-Type: text/plain; charset="UTF-8"
+In-Reply-To: <20200102145552.1853992-14-arnd@arndb.de>
+X-Scanned-By: MIMEDefang 2.79 on 10.5.11.14
+X-Mimecast-Spam-Score: 0
+Content-Type: multipart/signed; micalg=pgp-sha256;
+        protocol="application/pgp-signature"; boundary="d6Gm4EdcadzBjdND"
+Content-Disposition: inline
 Sender: linux-block-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-On Mon, Dec 30, 2019 at 8:48 PM Bart Van Assche <bvanassche@acm.org> wrote:
->
-> On 2019-12-30 02:29, Jack Wang wrote:
-> > + * InfiniBand Transport Layer
->
-> Is RTRS an InfiniBand or an RDMA transport layer?
-The later,  will fix.
->
-> > +#define rtrs_prefix(obj) (obj->sessname)
->
-> Is it really worth it to introduce a macro for accessing a single member
-> of a single pointer?
-maybe not, will remove.
->
-> > + * InfiniBand Transport Layer
->
-> Same question here: is RTRS an InfiniBand or an RDMA transport layer?
-will fix.
+--d6Gm4EdcadzBjdND
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+Content-Transfer-Encoding: quoted-printable
 
->
-> > +enum {
-> > +     SERVICE_CON_QUEUE_DEPTH = 512,
->
-> What is a service connection?
-s/SERVICE_CON_QUEUE_DEPTH/CON_QUEUE_DEPTH/g, do you think
-CON_QUEUE_DEPTH is better or just QUEUE_DEPTH?
->
-> > +     /*
-> > +      * With the current size of the tag allocated on the client, 4K
-> > +      * is the maximum number of tags we can allocate.  This number is
-> > +      * also used on the client to allocate the IU for the user connection
-> > +      * to receive the RDMA addresses from the server.
-> > +      */
->
-> What does the word 'tag' mean in the context of the RTRS protocol?
-should be struct rtrs_permit, will fix.
->
-> > +struct rtrs_ib_dev;
->
-> What does the "rtrs_ib_dev" data structure represent? Additionally, I
-> think it's confusing that a single name has an "r" that refers to "RDMA"
-> and "ib" that refers to InfiniBand.
-Naming is hard, it's structure mainly to cache struct ib_device
-pointer and ib_pd pointer.
-more info can be found below, Roman did try to push it to upstream,
-see comment below.
->
-> > +struct rtrs_ib_dev_pool {
-> > +     struct mutex            mutex;
-> > +     struct list_head        list;
-> > +     enum ib_pd_flags        pd_flags;
-> > +     const struct rtrs_ib_dev_pool_ops *ops;
-> > +};
->
-> What is the purpose of an rtrs_ib_dev_pool and what does it contain?
-The idea was documented in the patchset here:
-https://www.spinics.net/lists/linux-rdma/msg64025.html
-"'
-This is an attempt to make a device pool API out of a common code,
-which caches pair of ib_device and ib_pd pointers. I found 4 places,
-where this common functionality can be replaced by some lib calls:
-nvme, nvmet, iser and isert. Total deduplication gain in loc is not
-quite significant, but eventually new ULP IB code can also require
-the same device/pd pair cache, e.g. in our IBTRS module the same
-code has to be repeated again, which was observed by Sagi and he
-suggested to make a common helper function instead of producing
-another copy.
-'''
+On Thu, Jan 02, 2020 at 03:55:31PM +0100, Arnd Bergmann wrote:
+> Each driver calling scsi_ioctl() gets an equivalent compat_ioctl()
+> handler that implements the same commands by calling scsi_compat_ioctl().
+>=20
+> The scsi_cmd_ioctl() and scsi_cmd_blk_ioctl() functions are compatible
+> at this point, so any driver that calls those can do so for both native
+> and compat mode, with the argument passed through compat_ptr().
+>=20
+> With this, we can remove the entries from fs/compat_ioctl.c.  The new
+> code is larger, but should be easier to maintain and keep updated with
+> newly added commands.
+>=20
+> Signed-off-by: Arnd Bergmann <arnd@arndb.de>
+> ---
+>  drivers/block/virtio_blk.c |   3 +
+>  drivers/scsi/ch.c          |   9 ++-
+>  drivers/scsi/sd.c          |  50 ++++++--------
+>  drivers/scsi/sg.c          |  44 ++++++++-----
+>  drivers/scsi/sr.c          |  57 ++++++++++++++--
+>  drivers/scsi/st.c          |  51 ++++++++------
+>  fs/compat_ioctl.c          | 132 +------------------------------------
+>  7 files changed, 142 insertions(+), 204 deletions(-)
 
->
-> > +struct rtrs_iu {
->
-> A comment that explains what the "iu" abbreviation stands for would be
-> welcome.
-ok.
->
-> > +/**
-> > + * enum rtrs_msg_types - RTRS message types.
-> > + * @RTRS_MSG_INFO_REQ:               Client additional info request to the server
-> > + * @RTRS_MSG_INFO_RSP:               Server additional info response to the client
-> > + * @RTRS_MSG_WRITE:          Client writes data per RDMA to server
-> > + * @RTRS_MSG_READ:           Client requests data transfer from server
-> > + * @RTRS_MSG_RKEY_RSP:               Server refreshed rkey for rbuf
-> > + */
->
-> What is "additional info" in this context?
-We have a bit more documentation in rtrs/README in patch 14,
-"'
-3. After all connections of a path are established client sends to server the
-RTRS_MSG_INFO_REQ message, containing the name of the session. This message
-requests the address information from the server.
+virtio_blk.c changes:
 
-4. Server replies to the session info request message with RTRS_MSG_INFO_RSP,
-which contains the addresses and keys of the RDMA buffers allocated for that
-session.
-"'
->
-> > +/**
-> > + * struct rtrs_msg_conn_req - Client connection request to the server
-> > + * @magic:      RTRS magic
-> > + * @version:    RTRS protocol version
-> > + * @cid:        Current connection id
-> > + * @cid_num:    Number of connections per session
-> > + * @recon_cnt:          Reconnections counter
-> > + * @sess_uuid:          UUID of a session (path)
-> > + * @paths_uuid:         UUID of a group of sessions (paths)
-> > + *
-> > + * NOTE: max size 56 bytes, see man rdma_connect().
-> > + */
-> > +struct rtrs_msg_conn_req {
-> > +     u8              __cma_version; /* Is set to 0 by cma.c in case of
-> > +                                     * AF_IB, do not touch that.
-> > +                                     */
-> > +     u8              __ip_version;  /* On sender side that should be
-> > +                                     * set to 0, or cma_save_ip_info()
-> > +                                     * extract garbage and will fail.
-> > +                                     */
->
-> The above two fields and the comments next to it look suspicious to me.
-> Does RTRS perhaps try to generate CMA-formatted messages without using
-> the CMA to format these messages?
-The problem is in cma_format_hdr over-writes the first byte for AF_IB
-https://www.spinics.net/lists/linux-rdma/msg22397.html
+Acked-by: Stefan Hajnoczi <stefanha@redhat.com>
 
-No one fixes the problem since then.
+--d6Gm4EdcadzBjdND
+Content-Type: application/pgp-signature; name="signature.asc"
 
->
-> > +     u8              reserved[12];
->
-> Please leave out the reserved data. If future versions of the protocol
-> would need any of these bytes it is easy to add more data to this structure.
-Sorry, we can't do that, as I explained in the past, we have code
-running in production and
-there are checks expecting the size the of message are the same, it
-will make the transition
-to upstream version in the future a lot harder if we change the size
-of the controll message.
->
-> > +/**
-> > + * struct rtrs_msg_conn_rsp - Server connection response to the client
-> > + * @magic:      RTRS magic
-> > + * @version:    RTRS protocol version
-> > + * @errno:      If rdma_accept() then 0, if rdma_reject() indicates error
-> > + * @queue_depth:   max inflight messages (queue-depth) in this session
-> > + * @max_io_size:   max io size server supports
-> > + * @max_hdr_size:  max msg header size server supports
-> > + *
-> > + * NOTE: size is 56 bytes, max possible is 136 bytes, see man rdma_accept().
-> > + */
-> > +struct rtrs_msg_conn_rsp {
-> > +     __le16          magic;
-> > +     __le16          version;
-> > +     __le16          errno;
-> > +     __le16          queue_depth;
-> > +     __le32          max_io_size;
-> > +     __le32          max_hdr_size;
-> > +     __le32          flags;
-> > +     u8              reserved[36];
-> > +};
->
-> Same comment here: please leave out the "reserved[]" array. Sending a
-> bunch of zero-bytes at the end of a message over the wire is not useful.
-same here.
->
-> > +static inline void rtrs_from_imm(u32 imm, u32 *type, u32 *payload)
-> > +{
-> > +     *payload = (imm & MAX_IMM_PAYL_MASK);
-> > +     *type = (imm >> MAX_IMM_PAYL_BITS);
-> > +}
->
-> Please do not use parentheses when not necessary. Such superfluous
-> parentheses namely hurt readability of the code.
-ok, will remove.
->
-> > +     type = (w_inval ? RTRS_IO_RSP_W_INV_IMM : RTRS_IO_RSP_IMM);
->
-> Same comment here: I think the parentheses can be left out from the
-> above statement.
-ok, will remove
->
-> > +static inline void rtrs_from_io_rsp_imm(u32 payload, u32 *msg_id, int *errno)
-> > +{
-> > +     /* 9 bits for errno, 19 bits for msg_id */
-> > +     *msg_id = (payload & 0x7ffff);
->
-> Are the parentheses in the above expression necessary?
-will remove.
->
-> > +     *errno = -(int)((payload >> 19) & 0x1ff);
->
-> Is the '(int)' cast useful in the above expression? Can it be left out?
-I think it's necessary, and make it more clear errno is a negative int
-value, isn't it?
+-----BEGIN PGP SIGNATURE-----
 
->
-> > +#define STAT_ATTR(type, stat, print, reset)                          \
-> > +STAT_STORE_FUNC(type, stat, reset)                                   \
-> > +STAT_SHOW_FUNC(type, stat, print)                                    \
-> > +static struct kobj_attribute stat##_attr =                           \
-> > +             __ATTR(stat, 0644,                                      \
-> > +                    stat##_show,                                     \
-> > +                    stat##_store)
->
-> Is the above use of __ATTR() perhaps an open-coded version of __ATTR_RW()?
-right, will use __ATTR_RW() instead.
->
-> Thanks,
->
-> Bart.
-Thanks Bart!
+iQEzBAEBCAAdFiEEhpWov9P5fNqsNXdanKSrs4Grc8gFAl4OG1AACgkQnKSrs4Gr
+c8gMMQf/cVfSKOJIWw9oQSb1Jtb5IIqXpqhGWNQXQPYbbsemSZJf8GuCcr81Y/O8
+thKinuXXPDyxp2YiInq3zMfIn72igNBLu6R7+vlLftbmMGpcrz6NNeZHGqCrYYpH
+tAbiYVKixufdkX3Z7zYKF17i1dNJNpfUojqhkjgV6v0/T/p6kaf1B7wzJa1Jxwol
+Et0imw7jvfyzjcKb285/9aX+zWpzupOPtjuBwZdqxW/UU6RtNq4zw0aqT3HtxKRH
+pU/1PuaHsZPWdag7TssEimmaRlgOkAlGr5zxjQXEeVV+Cx9rVJEr+Alnl/NB2qrY
+AOe6O0GvhUnX+3rYXUwaVHnsPPkEPw==
+=C/4U
+-----END PGP SIGNATURE-----
+
+--d6Gm4EdcadzBjdND--
+
