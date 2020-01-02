@@ -2,87 +2,89 @@ Return-Path: <SRS0=T2Jf=2X=vger.kernel.org=linux-block-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-0.8 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
-	MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS autolearn=no autolearn_force=no
-	version=3.4.0
+X-Spam-Status: No, score=-2.3 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
+	MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,USER_AGENT_SANE_1 autolearn=no
+	autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 1D7B8C47409
-	for <linux-block@archiver.kernel.org>; Thu,  2 Jan 2020 20:22:55 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 004D2C3276C
+	for <linux-block@archiver.kernel.org>; Thu,  2 Jan 2020 21:07:11 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.kernel.org (Postfix) with ESMTP id E3FA421835
-	for <linux-block@archiver.kernel.org>; Thu,  2 Jan 2020 20:22:54 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id C8DAD21D7D
+	for <linux-block@archiver.kernel.org>; Thu,  2 Jan 2020 21:07:10 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1725862AbgABUWv (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Thu, 2 Jan 2020 15:22:51 -0500
-Received: from mout.kundenserver.de ([217.72.192.73]:53641 "EHLO
-        mout.kundenserver.de" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1725783AbgABUWu (ORCPT
-        <rfc822;linux-block@vger.kernel.org>); Thu, 2 Jan 2020 15:22:50 -0500
-Received: from mail-qt1-f174.google.com ([209.85.160.174]) by
- mrelayeu.kundenserver.de (mreue106 [212.227.15.145]) with ESMTPSA (Nemesis)
- id 1MvJo7-1jeFg12wev-00rEBI; Thu, 02 Jan 2020 21:22:48 +0100
-Received: by mail-qt1-f174.google.com with SMTP id g1so28554104qtr.13;
-        Thu, 02 Jan 2020 12:22:48 -0800 (PST)
-X-Gm-Message-State: APjAAAXcuzat/FvU7gXdKMvGfoNPS9BFkBdJdfJ+1XfrxLMxCVoSsWA5
-        40Y8kvtdfphEOvPyWUUwJWHCpOZLdKZKTGuqkZo=
-X-Google-Smtp-Source: APXvYqw1WBWes+WH0CrFxHA8FylK6AQHYik3my7LV7FPF6NFz9oKafXjddaDiVHL3AvLnvKIAQdI30SksZ7m1AJhJMc=
-X-Received: by 2002:ac8:47d3:: with SMTP id d19mr60326581qtr.142.1577996567289;
- Thu, 02 Jan 2020 12:22:47 -0800 (PST)
+        id S1725827AbgABVHK (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Thu, 2 Jan 2020 16:07:10 -0500
+Received: from mail-pl1-f178.google.com ([209.85.214.178]:44117 "EHLO
+        mail-pl1-f178.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S1725783AbgABVHJ (ORCPT
+        <rfc822;linux-block@vger.kernel.org>); Thu, 2 Jan 2020 16:07:09 -0500
+Received: by mail-pl1-f178.google.com with SMTP id az3so18256863plb.11;
+        Thu, 02 Jan 2020 13:07:09 -0800 (PST)
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20161025;
+        h=x-gm-message-state:subject:to:cc:references:from:message-id:date
+         :user-agent:mime-version:in-reply-to:content-language
+         :content-transfer-encoding;
+        bh=xuVv97eyIemkAMeVge7I3l88KsPUVa7tYbSHOzH+w74=;
+        b=ruwpdg18c4bdhQUo/ShjXTOrQoPuACoC6kx/vl3ndkl2t9OPiEGM+zYji3HKcpxre+
+         EeKFi+X7nLZTCaQTmShhovIM13SCRthOIIcHzoQMz9l7R3OOfz/Pcl/LDkOhAsKwV85Z
+         37eEicrRCywzF+3foTx4dJh+koL7AlQuW+hDtXw/l+maEIHGxPgR/IJMeor65xFBGnkM
+         jcD3EWXTsFUZMpAJncmsM1MwDyCtlLMdpBH6GgCB23sVTSE4gQ/QUQTOH+kk3m8Y9REW
+         QIiADfTc8kZ8yhsJNXWz6t+xKuA4yTntJLu707WsV7/roGPgcAkR1fv84Dgvo02SCqMt
+         XSaQ==
+X-Gm-Message-State: APjAAAWz/MTJ260KrPq9reJLeLsrb+aSq9w0FaQ9lIZiGkQ4yt/EzGjG
+        7iDcqt5edvYUJV6DahqYVzQ=
+X-Google-Smtp-Source: APXvYqwriHRtefuZ+nTMhSzhumBpyea2cVR/jq3Ph9ToZ3xiJqe+wnu5/x48KVt8XCXSrQMwQvTeEw==
+X-Received: by 2002:a17:90a:5108:: with SMTP id t8mr22376938pjh.107.1577999229189;
+        Thu, 02 Jan 2020 13:07:09 -0800 (PST)
+Received: from desktop-bart.svl.corp.google.com ([2620:15c:2cd:202:4308:52a3:24b6:2c60])
+        by smtp.gmail.com with ESMTPSA id f9sm63197657pfd.141.2020.01.02.13.07.07
+        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
+        Thu, 02 Jan 2020 13:07:08 -0800 (PST)
+Subject: Re: [PATCH v6 07/25] rtrs: client: statistics functions
+To:     Jack Wang <jinpuwang@gmail.com>, linux-block@vger.kernel.org,
+        linux-rdma@vger.kernel.org
+Cc:     axboe@kernel.dk, hch@infradead.org, sagi@grimberg.me,
+        leon@kernel.org, dledford@redhat.com, danil.kipnis@cloud.ionos.com,
+        jinpu.wang@cloud.ionos.com, rpenyaev@suse.de
+References: <20191230102942.18395-1-jinpuwang@gmail.com>
+ <20191230102942.18395-8-jinpuwang@gmail.com>
+From:   Bart Van Assche <bvanassche@acm.org>
+Message-ID: <c4875699-68a6-9a82-4324-553f30504574@acm.org>
+Date:   Thu, 2 Jan 2020 13:07:07 -0800
+User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:68.0) Gecko/20100101
+ Thunderbird/68.2.2
 MIME-Version: 1.0
-References: <20200102145552.1853992-1-arnd@arndb.de>
-In-Reply-To: <20200102145552.1853992-1-arnd@arndb.de>
-From:   Arnd Bergmann <arnd@arndb.de>
-Date:   Thu, 2 Jan 2020 21:22:31 +0100
-X-Gmail-Original-Message-ID: <CAK8P3a2y71R38AyOJBXWwukZ-odjSMSL4wBumdMBsNp=So0u7A@mail.gmail.com>
-Message-ID: <CAK8P3a2y71R38AyOJBXWwukZ-odjSMSL4wBumdMBsNp=So0u7A@mail.gmail.com>
-Subject: Re: [GIT PULL v3 00/27] block, scsi: final compat_ioctl cleanup
-To:     "James E.J. Bottomley" <jejb@linux.ibm.com>,
-        "Martin K. Petersen" <martin.petersen@oracle.com>
-Cc:     linux-scsi <linux-scsi@vger.kernel.org>,
-        linux-block <linux-block@vger.kernel.org>,
-        y2038 Mailman List <y2038@lists.linaro.org>,
-        "linux-kernel@vger.kernel.org" <linux-kernel@vger.kernel.org>,
-        Christoph Hellwig <hch@lst.de>,
-        Ben Hutchings <ben.hutchings@codethink.co.uk>,
-        "open list:DOCUMENTATION" <linux-doc@vger.kernel.org>,
-        Jonathan Corbet <corbet@lwn.net>,
-        Al Viro <viro@zeniv.linux.org.uk>,
-        Linux FS-devel Mailing List <linux-fsdevel@vger.kernel.org>,
-        Jens Axboe <axboe@kernel.dk>
-Content-Type: text/plain; charset="UTF-8"
-X-Provags-ID: V03:K1:Jod/qPEhvywko/uHVmu+k/2nrH/2auin298Lqla0cYwztJPxo5C
- tLWz1QNbBuqG4709wjHgQPhajRdhnyjJXXJrpiBrVl+Jk4ADzkngavtkCIMCjN6iHkraSBs
- ZV+IvhXdxvLukbpxY61cN66ZxnhA141x8ANnPQizAb6FtEJD4dry5W+qIk1QRB1Rpe5IN0X
- 37nsI95RQKc2/Vq+q3wtQ==
-X-UI-Out-Filterresults: notjunk:1;V03:K0:IxD7BSXId+w=:WWN1G8LdJPkOr+99O/QmC5
- JcnNbFZfZzf/2ftaUZXmNHErTwB3LEorjS4FMM3IIEPFeYuWUdWR2ZoEFz1lpUpl45WkOzq+A
- iDsulEehz+MvJfKVoDE2vt7wchLJKFWAptGi4P7AKwAIFsxTt++fUEVCPURvwLREIvoLnWT8F
- uIubzCfzIz7bU17Pt0fbMkSO7jULmL2M2Aepw/S+m9Q3r+js6bEqO5OCphEVDNfU4mNlZ3DGM
- cXU8mH7JOccjHiub57p+0TrqpTk4aJEyBTwDKQOzAbcmtbWoLDTbTomznpf//L/4KsiMH3iG+
- mAX6UeC3+UAgVhNPoJN5/D0ty7cnKf5fr1wTHGvnuKYqwGUDsxx9P1+DzPrnF7FCuo0MSmH0V
- YFx2TeiyEMn6AoAR0TRKAeh32l2ESvsOFn1vZARvZlwzP+KtvgdrHTHryV/HStThTFmHxjz9v
- HGtn178fhQ0k+1UlPZ2hjwQeG0FV/4oFJxn+d/ipNTHhZXrRmX+BtT2BLAca66a6yYS6oFXub
- 8Au3Uy2YicXn5j+BRYROJ+BNllEmajO6Tgz7DIFxxbpQQ9lBFsZBUZ6JHGFFtloOwy35xqnM2
- bEyFljrf0eWNA/LiBOcn+FRdwT2P2EsAX01aqtab9PDKv68Y97ktFtcW4UPUAfa4sLlUsgbdz
- q+CIGru+2SC0WCtq4gKsP/cBCBtD0MxeT1Vrh+ntZwuEaKvPU5sSrPDBApeW1P9KiXjjeW45E
- cSq9JY/C8uzVyOezQM4LQSTcjsm6GoWUIwjLF3bLnrXCVTWFrbAc/3OhDuTDmNOnuKy/2Pf1k
- 6gpKe/RXiVJXj3jb2dOFku/0xbKjurbfVef5RcaweVnJP6x36AjJ/johGqTvODN1LcsAtZnlv
- jkVlaQ5tKcNFq0mm9D6g==
+In-Reply-To: <20191230102942.18395-8-jinpuwang@gmail.com>
+Content-Type: text/plain; charset=utf-8; format=flowed
+Content-Language: en-US
+Content-Transfer-Encoding: 7bit
 Sender: linux-block-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-On Thu, Jan 2, 2020 at 3:56 PM Arnd Bergmann <arnd@arndb.de> wrote:
->
-> Hi Martin, James,
->
-> If this version seems ok to everyone, please pull into
-> the scsi tree.
+On 12/30/19 2:29 AM, Jack Wang wrote:
+> From: Jack Wang <jinpu.wang@cloud.ionos.com>
+> 
+> This introduces set of functions used on client side to account
+> statistics of RDMA data sent/received, amount of IOs inflight,
+> latency, cpu migrations, etc.  Almost all statistics is collected
+                                                        ^^
+                                                        are?
+> using percpu variables.
+> [ ... ]
+> +static inline int rtrs_clt_ms_to_id(unsigned long ms)
+> +{
+> +	int id = ms ? ilog2(ms) - MIN_LOG_LAT + 1 : 0;
+> +
+> +	return clamp(id, 0, LOG_LAT_SZ - 1);
+> +}
 
-It seems I slightly messed up the Cc list here, in case some of you are
-missing patches, the full series (22 patches, not 27) is mirrored at
-https://lore.kernel.org/lkml/20200102145552.1853992-1-arnd@arndb.de/T/
-as well.
+I think it is unusual to call the returned value an "id" in this 
+context. How about changing "id" into "bin" or "bucket"? See also 
+https://en.wikipedia.org/wiki/Histogram.
 
-         Arnd
+Thanks,
+
+Bart.
