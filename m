@@ -6,138 +6,101 @@ X-Spam-Status: No, score=-9.8 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
 	INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,
 	USER_AGENT_GIT autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 945F3C2D0DC
-	for <linux-block@archiver.kernel.org>; Thu,  2 Jan 2020 14:58:47 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id D85E8C2D0DC
+	for <linux-block@archiver.kernel.org>; Thu,  2 Jan 2020 14:58:50 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.kernel.org (Postfix) with ESMTP id 6E40E2072C
-	for <linux-block@archiver.kernel.org>; Thu,  2 Jan 2020 14:58:47 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id B991F21835
+	for <linux-block@archiver.kernel.org>; Thu,  2 Jan 2020 14:58:50 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1728559AbgABO6r (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Thu, 2 Jan 2020 09:58:47 -0500
-Received: from mout.kundenserver.de ([212.227.126.134]:38545 "EHLO
+        id S1728652AbgABO6t (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Thu, 2 Jan 2020 09:58:49 -0500
+Received: from mout.kundenserver.de ([212.227.126.134]:58161 "EHLO
         mout.kundenserver.de" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1728544AbgABO6q (ORCPT
-        <rfc822;linux-block@vger.kernel.org>); Thu, 2 Jan 2020 09:58:46 -0500
+        with ESMTP id S1728544AbgABO6t (ORCPT
+        <rfc822;linux-block@vger.kernel.org>); Thu, 2 Jan 2020 09:58:49 -0500
 Received: from threadripper.lan ([149.172.19.189]) by mrelayeu.kundenserver.de
  (mreue011 [212.227.15.129]) with ESMTPA (Nemesis) id
- 1Ml6Zo-1jRu2Z2XTo-00lSv9; Thu, 02 Jan 2020 15:58:03 +0100
+ 1M433w-1in1vY3uwi-0003Hv; Thu, 02 Jan 2020 15:58:21 +0100
 From:   Arnd Bergmann <arnd@arndb.de>
 To:     "James E.J. Bottomley" <jejb@linux.ibm.com>,
-        "Martin K. Petersen" <martin.petersen@oracle.com>,
-        Jens Axboe <axboe@kernel.dk>
-Cc:     Arnd Bergmann <arnd@arndb.de>, Jan Kara <jack@suse.cz>,
-        Stefan Haberland <sth@linux.ibm.com>,
-        Dmitry Fomichev <dmitry.fomichev@wdc.com>,
-        Ajay Joshi <ajay.joshi@wdc.com>,
-        Damien Le Moal <damien.lemoal@wdc.com>,
-        Ming Lei <ming.lei@redhat.com>,
-        Chaitanya Kulkarni <chaitanya.kulkarni@wdc.com>,
-        Bart Van Assche <bvanassche@acm.org>,
-        Pavel Begunkov <asml.silence@gmail.com>,
-        linux-block@vger.kernel.org, linux-kernel@vger.kernel.org
-Subject: [PATCH v3 04/22] compat_ioctl: block: add blkdev_compat_ptr_ioctl
-Date:   Thu,  2 Jan 2020 15:55:22 +0100
-Message-Id: <20200102145552.1853992-5-arnd@arndb.de>
+        "Martin K. Petersen" <martin.petersen@oracle.com>
+Cc:     Arnd Bergmann <arnd@arndb.de>, Jeff Dike <jdike@addtoit.com>,
+        Richard Weinberger <richard@nod.at>,
+        Anton Ivanov <anton.ivanov@cambridgegreys.com>,
+        Justin Sanders <justin@coraid.com>,
+        Jens Axboe <axboe@kernel.dk>,
+        Daniel Walter <dwalter@google.com>,
+        Alex Dewar <alex.dewar@gmx.co.uk>,
+        linux-um@lists.infradead.org, linux-kernel@vger.kernel.org,
+        linux-block@vger.kernel.org
+Subject: [PATCH v3 05/22] compat_ioctl: ubd, aoe: use blkdev_compat_ptr_ioctl
+Date:   Thu,  2 Jan 2020 15:55:23 +0100
+Message-Id: <20200102145552.1853992-6-arnd@arndb.de>
 X-Mailer: git-send-email 2.20.0
 In-Reply-To: <20200102145552.1853992-1-arnd@arndb.de>
 References: <20200102145552.1853992-1-arnd@arndb.de>
 MIME-Version: 1.0
 Content-Transfer-Encoding: 8bit
-X-Provags-ID: V03:K1:KgLrTmywy3bbbvY0LZm/M628mSRoY/VIMuh4eTLrKVmXyt1GW9D
- qTf9qNpJ/r7gpch3KaMQdHvbCSK6zQjXj0kj1ywg/xU9Uk5+nwu+opKHMwpA36qU04BTioD
- HZfur8uZF/wduzz3V8sIdThEty5+pSYqtRa3D1yKuuaZuP45I5oMWpH2mNA4ppQZRbEO6K4
- /U0HiGQxN0B3xuc4JwpPQ==
-X-UI-Out-Filterresults: notjunk:1;V03:K0:owynCMj6ZB0=:dY43jbnMOLA/sdXkY9YXDt
- 3D3kgMLQNVE2RgFfOx7xc8a7esy4Fk42QCIElbKmzyZNWvodqHLKFx4ctaNvzwEx4QdbIlD/7
- U5mBSqAfU0IFPgM0KznBV/Kt+5Dijw+iAR3saaWatbQwFh+KPONxqJwf9A/eCYD53+xYhcCPT
- eSF/ObWp06DdewxPFGVOSUZfnrkGWfFhXHLQl7vOeakoA59y8TU88Ksfl6GK+Qo90B0KGEmgy
- ejpLEkyNilqUY2xWsdhuxjdzaV6ghqW1GGNgUp1GKxtnsdAumOut2g5zTQNI+C5TPpzDQpNa0
- vX4rtkdN2cAopgwRuCAE1CQY7JylXi1gUQ/QPZoKlerMe+Lv0V9O7/7Ra6e0wqehoXCEJXWTc
- N/7ojAA696jwWZv3Lygju4MbQysj87aBctHELqawOETtkZAB9bTuXZFwXIcj+bQ3kvgN9GSiG
- F16dgsTmc37bPg7XScURB2edDngbgkVdD6p0ZszQrtrhTsCxb1RTDDytfTwnKiaduP1UYIrKK
- HAhMXOup7KC+tUg3R/qdZsdLBlVr3HJoQ0MIW7M4h//vlOfRooJJ3TJRhd9iRVIfG2tSmHIRb
- z+RoSGIhvAtLLVsQCbO7lYabm919yTgWAg/+pYkBXR3d1fFIU+hqWFCKFd5nd8h0CUfnatQJv
- LBTi7IJGa43pxCfytY17FC34U2Iplp9vXiRImIwrNjUlDAWQpOHZZhp8DeJQf3Z/XE23m2Pg5
- KGFberihYSRc8vkKrTyUIoONZ5V8R6DPUdRGmnhITcSq0q3zpcfLEtSbrUWpY7pWUmODhPKA8
- 1v0yzafUNyvPRH8jvHtL2i/QY5R4ZUJfUdT5s6J4DzukGwp1iEu4On0wPmyq+6HpMmpGNIeVW
- GZS+P8C4HMsApTc0z9lQ==
+X-Provags-ID: V03:K1:8p6BJLwWlOj4GvZq2jwHiMBi4e9jJiHHbTeRXtMc/ApbEdKhklc
+ gKlW1NaJh90o2mvhxJRo47hmvCzaB15auzhfRK08JSJldtXQK+TFAbQnCnVZulkj5SogMn4
+ LfbZdloSdsbQbAhiQeotT/ZakSv8yylow0e+EApZlUEBrIppF2EzpE6WOgmXG/gLywQZxZx
+ rjT/qfDnsWHma4CB8nMaA==
+X-UI-Out-Filterresults: notjunk:1;V03:K0:MrbTKH9MBv8=:tGOIcVKUd15dl5QCSnQhWi
+ l92uQbcHjmyxlz3mrYVH+VEzMKjGo99LlZCaa00Cs9CW/8c1yR4TqOnAqtq2cyyTm7BydkDN3
+ M1oQrb3D0yzJNz2qT5vhX3uAaH9ELre7mNJf1lFrEaltKs9LrMdgZRFSTBKHTv0XwHoIhlFrK
+ iAfucu65aHNau9imkICR//naYpZqEe9oJQsmFCqqC/NXNoZoEy0HdLC/zwDzcJxQr++0Ql1w7
+ OmyB01FdKfIB+dNOl9q4mUPgwSCJ2FF8GOI7rLsVEajQ3twqYGU532orIIbPP579kpe+vW6Wd
+ 0UTU50Gqjbi3Rdb7hQIOoPue8RDQlEMCADDW1tijPnR+7ds73XPy+g8cy3nK1lgTPGntDwN4U
+ w9nzLdHkPHMEbkIxd7zHVKlkHwJecfUC9u9xk4Y8PDzsJVnuVkSthxgVpw5j2b1lT7QAzLA3p
+ MEBPOADTWWZwQjSFNVx4yflFSY0A+SzaTL7NlPJYWlyciQyUDWeKi3+wD5GIvBAi4GKCNRwL3
+ zWoZHo9QzmA2vj8e5m5I6i+17omfJdbjOcb8IJKcPC0vF7ZnuMluOIRnSvlSOJ2Dhc4xk8+qx
+ DpCnZNOjGxjAAQOT/1dsbvbJD4T7byudIqLDyiiYxeZ5RIiZeHk0Vl/p0hK8pn06oKk1ZSIMb
+ dW+VDrNJlVEVt21k5K7jrzRxpAY0n0AF41TdhraKf3lagtDcva/ON8ug0sirgQiezEBvcovUr
+ pMDACkpS3KTrz8X6yZpRQlhYjuCAKlBRv8D8gk3191Z52wetwpvcQSfgE7bszS0A1ItxITQlj
+ n5szWhlnByKP4I8KStDZLS1PXM/QlWPFNuHICr8hjXvzl7SKGhsHGE1BmVHcWsG6s8qFFncjK
+ iNE5bzoy6IW09u5hSBow==
 Sender: linux-block-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-A lot of block drivers need only a trivial .compat_ioctl callback.
+These drivers implement the HDIO_GET_IDENTITY and CDROMVOLREAD ioctl
+commands, which are compatible between 32-bit and 64-bit user space and
+traditionally handled by compat_blkdev_driver_ioctl().
 
-Add a helper function that can be set as the callback pointer
-to only convert the argument using the compat_ptr() conversion
-and otherwise assume all input and output data is compatible,
-or handled using in_compat_syscall() checks.
-
-This mirrors the compat_ptr_ioctl() helper function used in
-character devices.
+As a prerequisite to removing that function, make both drivers use
+blkdev_compat_ptr_ioctl() as their .compat_ioctl callback.
 
 Signed-off-by: Arnd Bergmann <arnd@arndb.de>
 ---
- block/ioctl.c          | 21 +++++++++++++++++++++
- include/linux/blkdev.h |  7 +++++++
- 2 files changed, 28 insertions(+)
+ arch/um/drivers/ubd_kern.c | 1 +
+ drivers/block/aoe/aoeblk.c | 1 +
+ 2 files changed, 2 insertions(+)
 
-diff --git a/block/ioctl.c b/block/ioctl.c
-index 5de98b97af2a..e728331d1a5b 100644
---- a/block/ioctl.c
-+++ b/block/ioctl.c
-@@ -1,5 +1,6 @@
- // SPDX-License-Identifier: GPL-2.0
- #include <linux/capability.h>
-+#include <linux/compat.h>
- #include <linux/blkdev.h>
- #include <linux/export.h>
- #include <linux/gfp.h>
-@@ -285,6 +286,26 @@ int __blkdev_driver_ioctl(struct block_device *bdev, fmode_t mode,
-  */
- EXPORT_SYMBOL_GPL(__blkdev_driver_ioctl);
- 
-+#ifdef CONFIG_COMPAT
-+/*
-+ * This is the equivalent of compat_ptr_ioctl(), to be used by block
-+ * drivers that implement only commands that are completely compatible
-+ * between 32-bit and 64-bit user space
-+ */
-+int blkdev_compat_ptr_ioctl(struct block_device *bdev, fmode_t mode,
-+			unsigned cmd, unsigned long arg)
-+{
-+	struct gendisk *disk = bdev->bd_disk;
-+
-+	if (disk->fops->ioctl)
-+		return disk->fops->ioctl(bdev, mode, cmd,
-+					 (unsigned long)compat_ptr(arg));
-+
-+	return -ENOIOCTLCMD;
-+}
-+EXPORT_SYMBOL(blkdev_compat_ptr_ioctl);
-+#endif
-+
- static int blkdev_pr_register(struct block_device *bdev,
- 		struct pr_registration __user *arg)
- {
-diff --git a/include/linux/blkdev.h b/include/linux/blkdev.h
-index 47eb22a3b7f9..3e0408618da7 100644
---- a/include/linux/blkdev.h
-+++ b/include/linux/blkdev.h
-@@ -1711,6 +1711,13 @@ struct block_device_operations {
- 	const struct pr_ops *pr_ops;
+diff --git a/arch/um/drivers/ubd_kern.c b/arch/um/drivers/ubd_kern.c
+index 6627d7c30f37..582eb5b1f09b 100644
+--- a/arch/um/drivers/ubd_kern.c
++++ b/arch/um/drivers/ubd_kern.c
+@@ -113,6 +113,7 @@ static const struct block_device_operations ubd_blops = {
+         .open		= ubd_open,
+         .release	= ubd_release,
+         .ioctl		= ubd_ioctl,
++        .compat_ioctl	= blkdev_compat_ptr_ioctl,
+ 	.getgeo		= ubd_getgeo,
  };
  
-+#ifdef CONFIG_COMPAT
-+extern int blkdev_compat_ptr_ioctl(struct block_device *, fmode_t,
-+				      unsigned int, unsigned long);
-+#else
-+#define blkdev_compat_ptr_ioctl NULL
-+#endif
-+
- extern int __blkdev_driver_ioctl(struct block_device *, fmode_t, unsigned int,
- 				 unsigned long);
- extern int bdev_read_page(struct block_device *, sector_t, struct page *);
+diff --git a/drivers/block/aoe/aoeblk.c b/drivers/block/aoe/aoeblk.c
+index bd19f8af950b..7b32fb673375 100644
+--- a/drivers/block/aoe/aoeblk.c
++++ b/drivers/block/aoe/aoeblk.c
+@@ -329,6 +329,7 @@ static const struct block_device_operations aoe_bdops = {
+ 	.open = aoeblk_open,
+ 	.release = aoeblk_release,
+ 	.ioctl = aoeblk_ioctl,
++	.compat_ioctl = blkdev_compat_ptr_ioctl,
+ 	.getgeo = aoeblk_getgeo,
+ 	.owner = THIS_MODULE,
+ };
 -- 
 2.20.0
 
