@@ -2,109 +2,110 @@ Return-Path: <SRS0=T2Jf=2X=vger.kernel.org=linux-block-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-5.3 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
-	INCLUDES_PATCH,MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,USER_AGENT_SANE_1
-	autolearn=ham autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-8.4 required=3.0 tests=DKIMWL_WL_HIGH,DKIM_SIGNED,
+	DKIM_VALID,DKIM_VALID_AU,HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,
+	MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,USER_AGENT_SANE_1
+	autolearn=unavailable autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id E2382C3276C
-	for <linux-block@archiver.kernel.org>; Thu,  2 Jan 2020 22:53:46 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 7C8ABC3276C
+	for <linux-block@archiver.kernel.org>; Thu,  2 Jan 2020 22:54:08 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.kernel.org (Postfix) with ESMTP id C170321835
-	for <linux-block@archiver.kernel.org>; Thu,  2 Jan 2020 22:53:46 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id 5146221D7D
+	for <linux-block@archiver.kernel.org>; Thu,  2 Jan 2020 22:54:08 +0000 (UTC)
+Authentication-Results: mail.kernel.org;
+	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="gTs/0ldx"
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1728999AbgABWxq (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Thu, 2 Jan 2020 17:53:46 -0500
-Received: from mail-pj1-f67.google.com ([209.85.216.67]:40043 "EHLO
-        mail-pj1-f67.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1728988AbgABWV1 (ORCPT
-        <rfc822;linux-block@vger.kernel.org>); Thu, 2 Jan 2020 17:21:27 -0500
-Received: by mail-pj1-f67.google.com with SMTP id bg7so3934426pjb.5;
-        Thu, 02 Jan 2020 14:21:27 -0800 (PST)
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20161025;
-        h=x-gm-message-state:subject:to:cc:references:from:message-id:date
-         :user-agent:mime-version:in-reply-to:content-language
-         :content-transfer-encoding;
-        bh=w8RjK4aftLZxkYESHjiXhuMfaSosoMz2QGwQm1yGCxw=;
-        b=M0/X2u5+kxoL3yppAOAUg9+0tKFNNhbjkhpgqPbgp1rdHptNqWTfpBuyf4GuWd5eTX
-         pHIjNh5i84gbtmKQAXhfjHOZeq4+SYycicWuUH/Tcj5R5KbYIy+/YsaWeDbxD+35UtE1
-         xLmIf48PLaQ/VDpJ9uAqt0uai/+9p5ARuzfl2topyuTHrPadcEIUb/9LAaM40rjn0S4d
-         iNz19nLs5AvSKoCstGcoqqOl3RBzTMDVenB0ZmHUs6UyQq909mlodKVAUF2QjOiAtNut
-         Fukg6sna0FoCVudMJ0ty8TBRQWtbbW++eNTaPs7Ru+ZXrA3WKYS40v0dUehZdXeHtT3Y
-         AlEA==
-X-Gm-Message-State: APjAAAXHBDttFkloMew+JG96rOrcLJuWwFGAc5U6aNzNn/rAt5JpFgN1
-        yAuowqfANy7sjoprfHnGbnCKlXgv
-X-Google-Smtp-Source: APXvYqzKn2fxYO5t+3k2rLLRrKegG6hlyWEbJfBx++NBBKCapm8vcB1QCRucYm5+8zR1Rzjhs1aiYA==
-X-Received: by 2002:a17:90a:6484:: with SMTP id h4mr21717824pjj.84.1578003686433;
-        Thu, 02 Jan 2020 14:21:26 -0800 (PST)
-Received: from desktop-bart.svl.corp.google.com ([2620:15c:2cd:202:4308:52a3:24b6:2c60])
-        by smtp.gmail.com with ESMTPSA id 199sm67865209pfv.81.2020.01.02.14.21.25
-        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
-        Thu, 02 Jan 2020 14:21:25 -0800 (PST)
-Subject: Re: [PATCH v6 14/25] rtrs: a bit of documentation
-To:     Jack Wang <jinpuwang@gmail.com>, linux-block@vger.kernel.org,
-        linux-rdma@vger.kernel.org
-Cc:     axboe@kernel.dk, hch@infradead.org, sagi@grimberg.me,
-        leon@kernel.org, dledford@redhat.com, danil.kipnis@cloud.ionos.com,
-        jinpu.wang@cloud.ionos.com, rpenyaev@suse.de,
-        linux-kernel@vger.kernel.org
-References: <20191230102942.18395-1-jinpuwang@gmail.com>
- <20191230102942.18395-15-jinpuwang@gmail.com>
-From:   Bart Van Assche <bvanassche@acm.org>
-Message-ID: <bb668d4e-f768-a408-c541-d862d1a2f959@acm.org>
-Date:   Thu, 2 Jan 2020 14:21:24 -0800
+        id S1729389AbgABWyC (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Thu, 2 Jan 2020 17:54:02 -0500
+Received: from us-smtp-delivery-1.mimecast.com ([205.139.110.120]:22165 "EHLO
+        us-smtp-1.mimecast.com" rhost-flags-OK-OK-OK-FAIL) by vger.kernel.org
+        with ESMTP id S1728432AbgABWyB (ORCPT
+        <rfc822;linux-block@vger.kernel.org>); Thu, 2 Jan 2020 17:54:01 -0500
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+        s=mimecast20190719; t=1578005640;
+        h=from:from:reply-to:reply-to:subject:subject:date:date:
+         message-id:message-id:to:to:cc:mime-version:mime-version:
+         content-type:content-type:
+         content-transfer-encoding:content-transfer-encoding:
+         in-reply-to:in-reply-to:references:references;
+        bh=15CQpc4ye1yHxOgZq+RNTAriJ+ZhSxpEpKwtlFpdSD0=;
+        b=gTs/0ldxxz1ERD6xwvP3Mg7KI+Br1BylTHOZX0Tkd86Xm1fUWhGkOQxxFZVGQM+wqBd6Bu
+        J2QiJZgr+rHw0v7NnSRDlVRDMigIWsNFnm/itywBNYEUrQTqvjqcY68hsm60KQ/Jmgm75a
+        3LjirGCjGtndZgFX9gSBx4RAXbZf0UQ=
+Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
+ [209.132.183.4]) (Using TLS) by relay.mimecast.com with ESMTP id
+ us-mta-142-J3F73UBSNGyHyGNyjjECEw-1; Thu, 02 Jan 2020 17:53:59 -0500
+X-MC-Unique: J3F73UBSNGyHyGNyjjECEw-1
+Received: from smtp.corp.redhat.com (int-mx02.intmail.prod.int.phx2.redhat.com [10.5.11.12])
+        (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
+        (No client certificate requested)
+        by mimecast-mx01.redhat.com (Postfix) with ESMTPS id 63240800D48;
+        Thu,  2 Jan 2020 22:53:58 +0000 (UTC)
+Received: from [10.3.112.12] (ovpn-112-12.phx2.redhat.com [10.3.112.12])
+        by smtp.corp.redhat.com (Postfix) with ESMTP id AB2D560BF7;
+        Thu,  2 Jan 2020 22:53:56 +0000 (UTC)
+From:   Tony Asleson <tasleson@redhat.com>
+Subject: Re: [RFC 6/9] create_syslog_header: Add durable name
+Reply-To: tasleson@redhat.com
+To:     James Bottomley <James.Bottomley@HansenPartnership.com>,
+        linux-scsi@vger.kernel.org, linux-block@vger.kernel.org,
+        linux-fsdevel@vger.kernel.org
+References: <20191223225558.19242-1-tasleson@redhat.com>
+ <20191223225558.19242-7-tasleson@redhat.com>
+ <1577148851.29997.32.camel@HansenPartnership.com>
+Organization: Red Hat
+Message-ID: <fe598a6e-6d3c-162b-85ec-5aa1e631e441@redhat.com>
+Date:   Thu, 2 Jan 2020 16:53:55 -0600
 User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:68.0) Gecko/20100101
  Thunderbird/68.2.2
 MIME-Version: 1.0
-In-Reply-To: <20191230102942.18395-15-jinpuwang@gmail.com>
-Content-Type: text/plain; charset=utf-8; format=flowed
+In-Reply-To: <1577148851.29997.32.camel@HansenPartnership.com>
+Content-Type: text/plain; charset=utf-8
 Content-Language: en-US
 Content-Transfer-Encoding: 7bit
+X-Scanned-By: MIMEDefang 2.79 on 10.5.11.12
 Sender: linux-block-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-On 12/30/19 2:29 AM, Jack Wang wrote:
-> diff --git a/Documentation/ABI/testing/sysfs-class-rtrs-client b/Documentation/ABI/testing/sysfs-class-rtrs-client
-> new file mode 100644
-> index 000000000000..8b219cf6c5c4
-> --- /dev/null
-> +++ b/Documentation/ABI/testing/sysfs-class-rtrs-client
-> @@ -0,0 +1,190 @@
-> +What:		/sys/class/rtrs-client
-> +Date:		Jan 2020
-> +KernelVersion:	5.6
-> +Contact:	Jack Wang <jinpu.wang@cloud.ionos.com> Danil Kipnis <danil.kipnis@cloud.ionos.com>
-> +Description:
-> +When a user of RTRS API creates a new session, a directory entry with
-> +the name of that session is created under /sys/class/rtrs-client/<session-name>/
+On 12/23/19 6:54 PM, James Bottomley wrote:
+> On Mon, 2019-12-23 at 16:55 -0600, Tony Asleson wrote:
+>> This gets us a persistent durable name for code that logs messages in
+>> the
+>> block layer that have the appropriate callbacks setup for durable
+>> name.
+>>
+>> Signed-off-by: Tony Asleson <tasleson@redhat.com>
+>> ---
+>>  drivers/base/core.c | 9 +++++++++
+>>  1 file changed, 9 insertions(+)
+>>
+>> diff --git a/drivers/base/core.c b/drivers/base/core.c
+>> index 93cc1c45e9d3..57b5f5cd29fc 100644
+>> --- a/drivers/base/core.c
+>> +++ b/drivers/base/core.c
+>> @@ -3318,6 +3318,15 @@ create_syslog_header(const struct device *dev,
+>> char *hdr, size_t hdrlen)
+>>  				"DEVICE=+%s:%s", subsys,
+>> dev_name(dev));
+>>  	}
+>>  
+>> +	if (dev->type && dev->type->durable_name) {
+>> +		int dlen;
+>> +
+>> +		dlen = dev_durable_name(dev, hdr + (pos + 1),
+>> +					hdrlen - (pos + 1));
+>> +		if (dlen)
+>> +			pos += dlen + 1;
+>> +	}
+>> +
+> 
+> dev_durable_name already returns zero if either dev->type or dev->type-
+>> durable_name are NULL, so the if() above is pointless.
 
-Thank you for having included this ABI description. This is very 
-helpful. Please follow the format documented in Documentation/ABI/README 
-and make sure that all text, including the description, start in column 
-17 and please use tabs for indentation.
+Indeed, will remove redundant checks in patch re-work.
 
-> diff --git a/drivers/infiniband/ulp/rtrs/README b/drivers/infiniband/ulp/rtrs/README
-> new file mode 100644
-> index 000000000000..59ad60318a18
-> --- /dev/null
-> +++ b/drivers/infiniband/ulp/rtrs/README
-> @@ -0,0 +1,149 @@
-> +****************************
-> +InfiniBand Transport (RTRS)
-> +****************************
-> +
-> +RTRS (InfiniBand Transport) is a reliable high speed transport library
-> +which provides support to establish optimal number of connections
-> +between client and server machines using RDMA (InfiniBand, RoCE, iWarp)
-> +transport. It is optimized to transfer (read/write) IO blocks.
+Thanks
+-Tony
 
-Is it explained somewhere how the optimal number of connections is 
-determined and also according to which metric the number of connections 
-is optimized? Is the number of connections chosen to minimize latency, 
-maximize IOPS or perhaps to optimize yet another metric?
-
-Thanks,
-
-Bart.
