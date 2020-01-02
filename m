@@ -6,119 +6,96 @@ X-Spam-Status: No, score=-2.4 required=3.0 tests=DKIM_SIGNED,DKIM_VALID,
 	DKIM_VALID_AU,HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SPF_HELO_NONE,
 	SPF_PASS,USER_AGENT_SANE_1 autolearn=no autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 6F5B0C2D0C2
-	for <linux-block@archiver.kernel.org>; Thu,  2 Jan 2020 18:26:56 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 7D7C3C2D0C2
+	for <linux-block@archiver.kernel.org>; Thu,  2 Jan 2020 18:28:43 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.kernel.org (Postfix) with ESMTP id 44A3321655
-	for <linux-block@archiver.kernel.org>; Thu,  2 Jan 2020 18:26:56 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id 4F85121655
+	for <linux-block@archiver.kernel.org>; Thu,  2 Jan 2020 18:28:43 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=pass (2048-bit key) header.d=ziepe.ca header.i=@ziepe.ca header.b="OiLbqCgV"
+	dkim=pass (2048-bit key) header.d=ziepe.ca header.i=@ziepe.ca header.b="CG5V0ed7"
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1728039AbgABS0z (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Thu, 2 Jan 2020 13:26:55 -0500
-Received: from mail-qt1-f193.google.com ([209.85.160.193]:43166 "EHLO
-        mail-qt1-f193.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1727829AbgABS0z (ORCPT
-        <rfc822;linux-block@vger.kernel.org>); Thu, 2 Jan 2020 13:26:55 -0500
-Received: by mail-qt1-f193.google.com with SMTP id d18so32549746qtj.10
-        for <linux-block@vger.kernel.org>; Thu, 02 Jan 2020 10:26:55 -0800 (PST)
+        id S1728017AbgABS2m (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Thu, 2 Jan 2020 13:28:42 -0500
+Received: from mail-qk1-f196.google.com ([209.85.222.196]:45976 "EHLO
+        mail-qk1-f196.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S1727829AbgABS2m (ORCPT
+        <rfc822;linux-block@vger.kernel.org>); Thu, 2 Jan 2020 13:28:42 -0500
+Received: by mail-qk1-f196.google.com with SMTP id x1so31976653qkl.12
+        for <linux-block@vger.kernel.org>; Thu, 02 Jan 2020 10:28:41 -0800 (PST)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=ziepe.ca; s=google;
         h=date:from:to:cc:subject:message-id:references:mime-version
          :content-disposition:in-reply-to:user-agent;
-        bh=4ANPrUozhLVe+ERMaAjPezhK2FpYHmz/ZK6CktW+rYI=;
-        b=OiLbqCgVK8ztiRki/GcLxWEuO5DQg0ZkSMV+2Sc3MgffnUKac2Ad1WqQJx3nmo7TD1
-         XeeKjC04iSgZlK9LHmoJZ+NQ+TJpKxmLgnPOLxp/Ap+89X9wnL+JdWE1DPR3rv8khbE4
-         VYx51N52mN5ZVoxlruu6f7T8L1nSSNaEEc5pY7HGRxsFLLz6daQm7gdDz7aMifLER0Le
-         BKb7B0cpI89tS0oAhdpUoUR95hj2EW01SNcmd/dt+PqFMaJZs3R17TeusDnvzLOmuLH+
-         c48jFEbSMvqHv6Ny8jdndodmQ5Z8/7squ45OPfWUfSClfvgjPzqyf2oMH3Wvom78VNRt
-         rlVA==
+        bh=7yfBSL7b333vVmNuWf0Eg7CSRDnibjGCkKeYoXOyt28=;
+        b=CG5V0ed7nF2Y6mFiOEH07FVOXdvKKaNQYJGYIP7db6v8BiGo6UMj8JMnexLtTrbe0X
+         WFYn1A8DeaK8da6yh/Y76ww1SQ+5WE0vD6bePqEHZyv7HtDfdsGUEqVCIbyCM0vOnBmF
+         gPWLRlFjXXwJTj/Cw6enVfeodQuMoxeikuqrIITDUU0QBaLma0r5+wbmYtAlW1Alki+7
+         L315zur7d97xVL8/kLrAOTma3rc9sy1uk/MkObRyq89GFezP+yvjJJKZOiMLBsRruKQH
+         gB5A4rdd7MK+xNWeBv8g7CQFfVTKHqudugs+3hEZrpD2MjhmuX1a2S7HGkj7ilEc3eC4
+         B/kg==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=1e100.net; s=20161025;
         h=x-gm-message-state:date:from:to:cc:subject:message-id:references
          :mime-version:content-disposition:in-reply-to:user-agent;
-        bh=4ANPrUozhLVe+ERMaAjPezhK2FpYHmz/ZK6CktW+rYI=;
-        b=ov4AznNpuMeTT2ZBqx4HWfOkWK2PTvPvubgrmOAIjnegS/sR3Ob9c4bxGpnX6RCupl
-         r9w0geqHMLU3xlmtiaNkwnkiapnIHXvdikSJsXnMCjZcAC2x41k/BQO+C4Z4dGGuRTuC
-         sgbISSIjdnCL3U7xEk4Mw1g0DlRf5C35ydNRQYVC2Nd5UPcifYUASJY9X0a6rgRFPToG
-         L+SDJ0PirmGHncsPqORiMY+sljYbv/hy8kzM1ixpkyLvL5LCAvCKbttif6PInD4uIZD7
-         nY9aF77VRN6jmALMUep2FETfW9DqCwOK84cNNHws8Qty3xbBmIw0AdZhyyZO2IcA2S3M
-         Luuw==
-X-Gm-Message-State: APjAAAXj9cWv3Y+50vOHKaDrzJ3t+LYTC52NkbShBxQ8Pn+CudifOO9s
-        G3ABs7e82PmagjJBrpeM10Quhw==
-X-Google-Smtp-Source: APXvYqwMJqHGJ2PN3vAIFGjuy6eIvEWgb0csdncv6eeWefCzsb9tu/s/AoFbnu0ArN4qvBvi20nepQ==
-X-Received: by 2002:ac8:43ce:: with SMTP id w14mr60349266qtn.256.1577989614651;
-        Thu, 02 Jan 2020 10:26:54 -0800 (PST)
+        bh=7yfBSL7b333vVmNuWf0Eg7CSRDnibjGCkKeYoXOyt28=;
+        b=oKijSh4rcDFTvHJVKtXXYnRErgvMf278yVqYyRBXuvPTKQZhbtI0KOd+efoPYeGtlU
+         OiTladLZ13LVMpARa8sFJQNyj94x+iwTThxcdXE3mATexu8nZB543iQuX7Fey4ABNyRL
+         1E4rIFbjBVcx8idDdH9ZbgWz95VlOSQWIy+KcwSS0lli277zYlynC6jQbO/HRYvRHlbB
+         /O8blzLR3yMYEp/8xYfSHSrf+gz4Qs/9qYsqaqwpJRQ/cUpDJclKNopGhnscWgGcK3z2
+         76fXjkKMVQ/mfW3VHWIwbu90Mbc1bQHFg0D0oTesrqajIONokVWS+od6L0oTTIAoCULl
+         Rg4g==
+X-Gm-Message-State: APjAAAVLDoi0wHoQjZ6leWkUNcCWqYlP697xIbE9R1jdX7k8fmi8yIdJ
+        cnhSE0SYk3ePcwR/mQiALRmN6A==
+X-Google-Smtp-Source: APXvYqxf6p8x7LAWRTtiQlB6P75GHTLc7nCrzNmZ2aqfWA8dW5wI+1HKrUIXmBQVHbB7rWKhXteRsg==
+X-Received: by 2002:a37:356:: with SMTP id 83mr63050642qkd.409.1577989721368;
+        Thu, 02 Jan 2020 10:28:41 -0800 (PST)
 Received: from ziepe.ca (hlfxns017vw-142-68-57-212.dhcp-dynamic.fibreop.ns.bellaliant.net. [142.68.57.212])
-        by smtp.gmail.com with ESMTPSA id 4sm15292480qki.51.2020.01.02.10.26.54
+        by smtp.gmail.com with ESMTPSA id q130sm15228641qka.114.2020.01.02.10.28.40
         (version=TLS1_2 cipher=ECDHE-RSA-CHACHA20-POLY1305 bits=256/256);
-        Thu, 02 Jan 2020 10:26:54 -0800 (PST)
+        Thu, 02 Jan 2020 10:28:40 -0800 (PST)
 Received: from jgg by mlx.ziepe.ca with local (Exim 4.90_1)
         (envelope-from <jgg@ziepe.ca>)
-        id 1in5BN-0003Zi-Lt; Thu, 02 Jan 2020 14:26:53 -0400
-Date:   Thu, 2 Jan 2020 14:26:53 -0400
+        id 1in5D6-0003dH-EA; Thu, 02 Jan 2020 14:28:40 -0400
+Date:   Thu, 2 Jan 2020 14:28:40 -0400
 From:   Jason Gunthorpe <jgg@ziepe.ca>
 To:     Bart Van Assche <bvanassche@acm.org>
-Cc:     Jinpu Wang <jinpu.wang@cloud.ionos.com>,
-        Jack Wang <jinpuwang@gmail.com>, linux-block@vger.kernel.org,
-        linux-rdma@vger.kernel.org, Jens Axboe <axboe@kernel.dk>,
-        Christoph Hellwig <hch@infradead.org>,
-        Sagi Grimberg <sagi@grimberg.me>,
-        Leon Romanovsky <leon@kernel.org>,
-        Doug Ledford <dledford@redhat.com>,
-        Danil Kipnis <danil.kipnis@cloud.ionos.com>, rpenyaev@suse.de
-Subject: Re: [PATCH v6 03/25] rtrs: private headers with rtrs protocol
- structs and helpers
-Message-ID: <20200102182653.GE9282@ziepe.ca>
+Cc:     Jack Wang <jinpuwang@gmail.com>, linux-block@vger.kernel.org,
+        linux-rdma@vger.kernel.org, axboe@kernel.dk, hch@infradead.org,
+        sagi@grimberg.me, leon@kernel.org, dledford@redhat.com,
+        danil.kipnis@cloud.ionos.com, jinpu.wang@cloud.ionos.com,
+        rpenyaev@suse.de
+Subject: Re: [PATCH v6 00/25] RTRS (former IBTRS) rdma transport library and
+ RNBD (former IBNBD) rdma network block device
+Message-ID: <20200102182840.GF9282@ziepe.ca>
 References: <20191230102942.18395-1-jinpuwang@gmail.com>
- <20191230102942.18395-4-jinpuwang@gmail.com>
- <b13eccdd-09a2-70d5-1c78-3c4dbf1aefe8@acm.org>
- <CAMGffEmC3T9M+RmeOXX4ecE3E01azjD8fz2Lz8kHC9Ff-Xx-Aw@mail.gmail.com>
- <51f2aec2-db24-ce7b-b3e8-68f9561a584b@acm.org>
+ <a56985f4-fbd3-3546-34e1-4185150f4af2@acm.org>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=us-ascii
 Content-Disposition: inline
-In-Reply-To: <51f2aec2-db24-ce7b-b3e8-68f9561a584b@acm.org>
+In-Reply-To: <a56985f4-fbd3-3546-34e1-4185150f4af2@acm.org>
 User-Agent: Mutt/1.9.4 (2018-02-28)
 Sender: linux-block-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-On Thu, Jan 02, 2020 at 09:00:53AM -0800, Bart Van Assche wrote:
-
-> > > > +/**
-> > > > + * struct rtrs_msg_conn_req - Client connection request to the server
-> > > > + * @magic:      RTRS magic
-> > > > + * @version:    RTRS protocol version
-> > > > + * @cid:        Current connection id
-> > > > + * @cid_num:    Number of connections per session
-> > > > + * @recon_cnt:          Reconnections counter
-> > > > + * @sess_uuid:          UUID of a session (path)
-> > > > + * @paths_uuid:         UUID of a group of sessions (paths)
-> > > > + *
-> > > > + * NOTE: max size 56 bytes, see man rdma_connect().
-> > > > + */
-> > > > +struct rtrs_msg_conn_req {
-> > > > +     u8              __cma_version; /* Is set to 0 by cma.c in case of
-> > > > +                                     * AF_IB, do not touch that.
-> > > > +                                     */
-> > > > +     u8              __ip_version;  /* On sender side that should be
-> > > > +                                     * set to 0, or cma_save_ip_info()
-> > > > +                                     * extract garbage and will fail.
-> > > > +                                     */
-> > > 
-> > > The above two fields and the comments next to it look suspicious to me.
-> > > Does RTRS perhaps try to generate CMA-formatted messages without using
-> > > the CMA to format these messages?
-> > The problem is in cma_format_hdr over-writes the first byte for AF_IB
-> > https://www.spinics.net/lists/linux-rdma/msg22397.html
+On Mon, Dec 30, 2019 at 06:39:00PM -0800, Bart Van Assche wrote:
+> On 2019-12-30 02:29, Jack Wang wrote:
+> > here is V6 of the RTRS (former IBTRS) rdma transport library and the
+> > corresponding RNBD (former IBNBD) rdma network block device.
 > > 
-> > No one fixes the problem since then.
+> > Changelog since v5:
+> > 1 rebased to linux-5.5-rc4
+> > 2 fix typo in my email address in first patch
+> > 3 cleanup copyright as suggested by Leon Romanovsky
+> > 4 remove 2 redudant kobject_del in error path as suggested by Leon Romanovsky
+> > 5 add MAINTAINERS entries in alphabetical order as Gal Pressman suggested
 > 
-> How about adding that URL to the comment block above struct
-> rtrs_msg_conn_req?
+> Please always include the full changelog when posting a new version.
+> Every other Linux kernel patch series I have seen includes a full
+> changelog in version two and later versions of its cover letter.
 
-Or just fixing whatever the problem is..
+We now also like it if you include URLs to lore.kernel.org for the
+prior submissions.
 
 Jason
