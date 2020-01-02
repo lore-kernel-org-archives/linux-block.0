@@ -2,135 +2,96 @@ Return-Path: <SRS0=T2Jf=2X=vger.kernel.org=linux-block-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-3.9 required=3.0 tests=DKIMWL_WL_HIGH,DKIM_SIGNED,
-	DKIM_VALID,DKIM_VALID_AU,HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,
-	SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS autolearn=no autolearn_force=no
-	version=3.4.0
+X-Spam-Status: No, score=-2.3 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
+	MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,USER_AGENT_SANE_1 autolearn=no
+	autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 45847C2D0DC
-	for <linux-block@archiver.kernel.org>; Thu,  2 Jan 2020 16:33:34 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id D05A7C2D0DC
+	for <linux-block@archiver.kernel.org>; Thu,  2 Jan 2020 16:36:48 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.kernel.org (Postfix) with ESMTP id 16F74215A4
-	for <linux-block@archiver.kernel.org>; Thu,  2 Jan 2020 16:33:34 +0000 (UTC)
-Authentication-Results: mail.kernel.org;
-	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="AV/Uk42A"
+	by mail.kernel.org (Postfix) with ESMTP id B120D217F4
+	for <linux-block@archiver.kernel.org>; Thu,  2 Jan 2020 16:36:48 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1728837AbgABQdd (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Thu, 2 Jan 2020 11:33:33 -0500
-Received: from us-smtp-delivery-1.mimecast.com ([205.139.110.120]:46997 "EHLO
-        us-smtp-1.mimecast.com" rhost-flags-OK-OK-OK-FAIL) by vger.kernel.org
-        with ESMTP id S1728832AbgABQdd (ORCPT
-        <rfc822;linux-block@vger.kernel.org>); Thu, 2 Jan 2020 11:33:33 -0500
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-        s=mimecast20190719; t=1577982812;
-        h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-         to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-         in-reply-to:in-reply-to:references:references;
-        bh=TlchMaIvasLMm30BcrAzvO65BEfeYNv4RmHmgwKHDHM=;
-        b=AV/Uk42ASCaTxh4rK+oyrgmCjHXNj5r5vyKYmcFGQaE/LI7TkqXVpjNIFauWL7cLKtiVvt
-        jppTczM+bTWeaA3kX5RyJnAtw08xP7Tuh9HxgWKJMQbrr8Jnm6QNdP5WTBYqoySUjeCjRE
-        Xz1POlZV+IOeRW15jC8+pqm81xBjSVM=
-Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
- [209.132.183.4]) (Using TLS) by relay.mimecast.com with ESMTP id
- us-mta-326-f6RSfu66O-SgKyoHEVPNVg-1; Thu, 02 Jan 2020 11:33:31 -0500
-X-MC-Unique: f6RSfu66O-SgKyoHEVPNVg-1
-Received: from smtp.corp.redhat.com (int-mx04.intmail.prod.int.phx2.redhat.com [10.5.11.14])
-        (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
-        (No client certificate requested)
-        by mimecast-mx01.redhat.com (Postfix) with ESMTPS id 76E6F800D55;
-        Thu,  2 Jan 2020 16:33:27 +0000 (UTC)
-Received: from localhost (ovpn-117-73.ams2.redhat.com [10.36.117.73])
-        by smtp.corp.redhat.com (Postfix) with ESMTP id 654815D9C9;
-        Thu,  2 Jan 2020 16:33:23 +0000 (UTC)
-Date:   Thu, 2 Jan 2020 16:33:21 +0000
-From:   Stefan Hajnoczi <stefanha@redhat.com>
-To:     Arnd Bergmann <arnd@arndb.de>
-Cc:     "James E.J. Bottomley" <jejb@linux.ibm.com>,
-        "Martin K. Petersen" <martin.petersen@oracle.com>,
-        "Michael S. Tsirkin" <mst@redhat.com>,
-        Jason Wang <jasowang@redhat.com>,
-        Paolo Bonzini <pbonzini@redhat.com>,
-        Jens Axboe <axboe@kernel.dk>,
-        Doug Gilbert <dgilbert@interlog.com>,
-        Kai =?iso-8859-1?Q?M=E4kisara?= <Kai.Makisara@kolumbus.fi>,
-        Alexander Viro <viro@zeniv.linux.org.uk>,
-        Dongli Zhang <dongli.zhang@oracle.com>,
-        Thomas Gleixner <tglx@linutronix.de>,
-        Bart Van Assche <bvanassche@acm.org>,
-        Hannes Reinecke <hare@suse.com>,
-        Damien Le Moal <damien.lemoal@wdc.com>,
-        John Garry <john.garry@huawei.com>,
-        Martin Wilck <mwilck@suse.com>,
-        Heiko Carstens <heiko.carstens@de.ibm.com>,
-        "Gustavo A. R. Silva" <gustavo@embeddedor.com>,
-        Ira Weiny <ira.weiny@intel.com>, Iustin Pop <iustin@k1024.org>,
-        "Darrick J. Wong" <darrick.wong@oracle.com>,
-        virtualization@lists.linux-foundation.org,
-        linux-block@vger.kernel.org, linux-kernel@vger.kernel.org,
-        linux-scsi@vger.kernel.org, linux-fsdevel@vger.kernel.org
-Subject: Re: [PATCH v3 13/22] compat_ioctl: scsi: move ioctl handling into
- drivers
-Message-ID: <20200102163321.GA129642@stefanha-x1.localdomain>
-References: <20200102145552.1853992-1-arnd@arndb.de>
- <20200102145552.1853992-14-arnd@arndb.de>
+        id S1728841AbgABQgs (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Thu, 2 Jan 2020 11:36:48 -0500
+Received: from mail-pl1-f193.google.com ([209.85.214.193]:43916 "EHLO
+        mail-pl1-f193.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S1728812AbgABQgr (ORCPT
+        <rfc822;linux-block@vger.kernel.org>); Thu, 2 Jan 2020 11:36:47 -0500
+Received: by mail-pl1-f193.google.com with SMTP id p27so17990621pli.10;
+        Thu, 02 Jan 2020 08:36:47 -0800 (PST)
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20161025;
+        h=x-gm-message-state:subject:to:cc:references:from:message-id:date
+         :user-agent:mime-version:in-reply-to:content-language
+         :content-transfer-encoding;
+        bh=F/bpBaStoBJx7wEMAMw9Q0zSpOG40c2sgoNWvrCquug=;
+        b=I+n2Zj5dJ8PiY9bn9PnSumk+pnHhH/opPdMbH5iU4/peAHMB5fbRSzF6smE2aHkzin
+         IU36fpP2HGw3LCZofAZei0/c/sbbcg5iUPxlZjt8Az+u7EUz99F1w7DQQ1dR7c+xCJ7L
+         kwKpPx1VvPFI+dGil14wlj/dvhDMY9LE9l7jx8YpRzDa+LHVXquJSzHfbTxqPYDU5qpv
+         LbbbeHcAg9RY9ule5sHzAgF8fDtTRf1bQ2x8zLfyHDT2cSWlbUyfEvzYKM7JKB5hYfFT
+         R/SR79q3m52+bl4/KNknaGr/UbfbD5qlb4ZFOZkc1W/k+uVttDIxtjsPmk23Xh/9fPMz
+         I3jA==
+X-Gm-Message-State: APjAAAUQH6/alexHkz8cCcvI7iiLwguZcL1ad3/sVnA156M3MEuhvKx2
+        I1viBo44nNxSGI3kFAAaXQM=
+X-Google-Smtp-Source: APXvYqx56IdmJiLXaMgdq04mVeR7eOhdvMcDh1NwoJiKStDEYkxTHq/VWzW4PEmmv79OI3RHbeAh4w==
+X-Received: by 2002:a17:902:700b:: with SMTP id y11mr87273466plk.304.1577983007154;
+        Thu, 02 Jan 2020 08:36:47 -0800 (PST)
+Received: from desktop-bart.svl.corp.google.com ([2620:15c:2cd:202:4308:52a3:24b6:2c60])
+        by smtp.gmail.com with ESMTPSA id i66sm33301772pfg.85.2020.01.02.08.36.45
+        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
+        Thu, 02 Jan 2020 08:36:45 -0800 (PST)
+Subject: Re: [PATCH v6 02/25] rtrs: public interface header to establish RDMA
+ connections
+To:     Jinpu Wang <jinpu.wang@cloud.ionos.com>
+Cc:     Jack Wang <jinpuwang@gmail.com>, linux-block@vger.kernel.org,
+        linux-rdma@vger.kernel.org, Jens Axboe <axboe@kernel.dk>,
+        Christoph Hellwig <hch@infradead.org>,
+        Sagi Grimberg <sagi@grimberg.me>,
+        Leon Romanovsky <leon@kernel.org>,
+        Doug Ledford <dledford@redhat.com>,
+        Danil Kipnis <danil.kipnis@cloud.ionos.com>, rpenyaev@suse.de
+References: <20191230102942.18395-1-jinpuwang@gmail.com>
+ <20191230102942.18395-3-jinpuwang@gmail.com>
+ <cc66bb26-68da-8add-6813-a330dc23facd@acm.org>
+ <CAMGffEmdQ2SuP6JTrPYyP70ZYPC+H+GSyL2Lib7mbG4-DUN6Kg@mail.gmail.com>
+From:   Bart Van Assche <bvanassche@acm.org>
+Message-ID: <8b070c98-a9fd-3cb1-d619-8836bf38b851@acm.org>
+Date:   Thu, 2 Jan 2020 08:36:44 -0800
+User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:68.0) Gecko/20100101
+ Thunderbird/68.2.2
 MIME-Version: 1.0
-In-Reply-To: <20200102145552.1853992-14-arnd@arndb.de>
-X-Scanned-By: MIMEDefang 2.79 on 10.5.11.14
-X-Mimecast-Spam-Score: 0
-Content-Type: multipart/signed; micalg=pgp-sha256;
-        protocol="application/pgp-signature"; boundary="d6Gm4EdcadzBjdND"
-Content-Disposition: inline
+In-Reply-To: <CAMGffEmdQ2SuP6JTrPYyP70ZYPC+H+GSyL2Lib7mbG4-DUN6Kg@mail.gmail.com>
+Content-Type: text/plain; charset=utf-8; format=flowed
+Content-Language: en-US
+Content-Transfer-Encoding: 7bit
 Sender: linux-block-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
---d6Gm4EdcadzBjdND
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-Content-Transfer-Encoding: quoted-printable
+On 1/2/20 5:35 AM, Jinpu Wang wrote:
+> On Mon, Dec 30, 2019 at 8:25 PM Bart Van Assche <bvanassche@acm.org> wrote:
+>>> +/**
+>>> + * enum rtrs_clt_con_type() type of ib connection to use with a given permit
+>>
+>> What is a "permit"?
+> Does use rtrs_permit sound better?
 
-On Thu, Jan 02, 2020 at 03:55:31PM +0100, Arnd Bergmann wrote:
-> Each driver calling scsi_ioctl() gets an equivalent compat_ioctl()
-> handler that implements the same commands by calling scsi_compat_ioctl().
->=20
-> The scsi_cmd_ioctl() and scsi_cmd_blk_ioctl() functions are compatible
-> at this point, so any driver that calls those can do so for both native
-> and compat mode, with the argument passed through compat_ptr().
->=20
-> With this, we can remove the entries from fs/compat_ioctl.c.  The new
-> code is larger, but should be easier to maintain and keep updated with
-> newly added commands.
->=20
-> Signed-off-by: Arnd Bergmann <arnd@arndb.de>
-> ---
->  drivers/block/virtio_blk.c |   3 +
->  drivers/scsi/ch.c          |   9 ++-
->  drivers/scsi/sd.c          |  50 ++++++--------
->  drivers/scsi/sg.c          |  44 ++++++++-----
->  drivers/scsi/sr.c          |  57 ++++++++++++++--
->  drivers/scsi/st.c          |  51 ++++++++------
->  fs/compat_ioctl.c          | 132 +------------------------------------
->  7 files changed, 142 insertions(+), 204 deletions(-)
+I think keeping the word "permit" is fine. How about adding a comment 
+above rtrs_permit that explains more clearly what the role of that data 
+structure is? This is what I found in rtrs-clt.h:
 
-virtio_blk.c changes:
+/**
+  * rtrs_permit - permits the memory allocation for future RDMA operation
+  */
+struct rtrs_permit {
+         enum rtrs_clt_con_type con_type;
+         unsigned int cpu_id;
+         unsigned int mem_id;
+         unsigned int mem_off;
+};
 
-Acked-by: Stefan Hajnoczi <stefanha@redhat.com>
+Thanks,
 
---d6Gm4EdcadzBjdND
-Content-Type: application/pgp-signature; name="signature.asc"
-
------BEGIN PGP SIGNATURE-----
-
-iQEzBAEBCAAdFiEEhpWov9P5fNqsNXdanKSrs4Grc8gFAl4OG1AACgkQnKSrs4Gr
-c8gMMQf/cVfSKOJIWw9oQSb1Jtb5IIqXpqhGWNQXQPYbbsemSZJf8GuCcr81Y/O8
-thKinuXXPDyxp2YiInq3zMfIn72igNBLu6R7+vlLftbmMGpcrz6NNeZHGqCrYYpH
-tAbiYVKixufdkX3Z7zYKF17i1dNJNpfUojqhkjgV6v0/T/p6kaf1B7wzJa1Jxwol
-Et0imw7jvfyzjcKb285/9aX+zWpzupOPtjuBwZdqxW/UU6RtNq4zw0aqT3HtxKRH
-pU/1PuaHsZPWdag7TssEimmaRlgOkAlGr5zxjQXEeVV+Cx9rVJEr+Alnl/NB2qrY
-AOe6O0GvhUnX+3rYXUwaVHnsPPkEPw==
-=C/4U
------END PGP SIGNATURE-----
-
---d6Gm4EdcadzBjdND--
-
+Bart.
