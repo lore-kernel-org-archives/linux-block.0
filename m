@@ -6,104 +6,109 @@ X-Spam-Status: No, score=-2.4 required=3.0 tests=DKIM_SIGNED,DKIM_VALID,
 	DKIM_VALID_AU,HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SPF_HELO_NONE,
 	SPF_PASS,USER_AGENT_SANE_1 autolearn=no autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id A1612C3276C
-	for <linux-block@archiver.kernel.org>; Thu,  2 Jan 2020 18:19:02 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 5F4A9C2D0C2
+	for <linux-block@archiver.kernel.org>; Thu,  2 Jan 2020 18:23:59 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.kernel.org (Postfix) with ESMTP id 7ADEA21835
-	for <linux-block@archiver.kernel.org>; Thu,  2 Jan 2020 18:19:02 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id 34D0121582
+	for <linux-block@archiver.kernel.org>; Thu,  2 Jan 2020 18:23:59 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=pass (2048-bit key) header.d=ziepe.ca header.i=@ziepe.ca header.b="W19s5UfI"
+	dkim=pass (2048-bit key) header.d=ziepe.ca header.i=@ziepe.ca header.b="BbBQ8pHx"
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1728022AbgABSTB (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Thu, 2 Jan 2020 13:19:01 -0500
-Received: from mail-qk1-f193.google.com ([209.85.222.193]:41296 "EHLO
-        mail-qk1-f193.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1727905AbgABSTB (ORCPT
-        <rfc822;linux-block@vger.kernel.org>); Thu, 2 Jan 2020 13:19:01 -0500
-Received: by mail-qk1-f193.google.com with SMTP id x129so31983766qke.8
-        for <linux-block@vger.kernel.org>; Thu, 02 Jan 2020 10:19:00 -0800 (PST)
+        id S1727983AbgABSX6 (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Thu, 2 Jan 2020 13:23:58 -0500
+Received: from mail-qt1-f195.google.com ([209.85.160.195]:37897 "EHLO
+        mail-qt1-f195.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S1727976AbgABSX6 (ORCPT
+        <rfc822;linux-block@vger.kernel.org>); Thu, 2 Jan 2020 13:23:58 -0500
+Received: by mail-qt1-f195.google.com with SMTP id n15so35262864qtp.5
+        for <linux-block@vger.kernel.org>; Thu, 02 Jan 2020 10:23:57 -0800 (PST)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=ziepe.ca; s=google;
         h=date:from:to:cc:subject:message-id:references:mime-version
          :content-disposition:in-reply-to:user-agent;
-        bh=Csv9RkX+btH1fRvzYebWxmzJI2nh5n+bdHJt7GV96bk=;
-        b=W19s5UfI8xZ/KO3HJhNiipzFAQm8HdoBFEioSovzaBQGcMrkij9Zry71gOHhhjEsTv
-         EuCDhVZ4WV4J89gBeFPXT3UpATus3af+NNO2ZBSp8SW4bvqE1fIFbcmf37j9iOMM2l11
-         nCTvXyz9+k/KPxMTX9P5uvXQyaLmGgiWftoyTFbPL3O8c0jLc0v0M6jsZ/nmBGNqVT2T
-         5xpCkienhd7S2T9spuZf36ZEijYdIuv59dth99wcPdONRyywUMVeQGu4pCk1fkwRIJ2d
-         xu+Wz47RGcibYzzNO86ju4eYU830dhb8KeyBx8V7MtuEi16tB84f8GWPXpxpIPceQANQ
-         o0GA==
+        bh=zAwqsRR5p0WQ1FXAD94ssaK9uFiL3MMXtJkj40Y5ME4=;
+        b=BbBQ8pHxMSCg1FRK2/9Xmge46DvZ5pwR6dQgQSqPyKWaSX7skW6fo+eapjhmTaGZVe
+         HgbdRwsGddZnRBTZ9ol07RyiJFe5oQTm10XNPdQFLcMycphSPZIBF7ZIZlMQQPNZjH+W
+         PiXPnRynCswGNrk5s8mVsQnmeJE7XTsuIJkpdnVjSFDqi61p/OpKvyz6ATc0emGr4UVZ
+         z3IrEIdfXrXOGeLAoihJL0Lc5U+zNjxhnVmR2NO9OyFcTs5XUBWfnFdobWzh9chWY0L5
+         vjJ3oW9Pn2lXXjNYjslpGXMCrFKWMjQwZhiqWLelNpwQkQNZsG56EtKWyI9l+XGKL7mr
+         0HYQ==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=1e100.net; s=20161025;
         h=x-gm-message-state:date:from:to:cc:subject:message-id:references
          :mime-version:content-disposition:in-reply-to:user-agent;
-        bh=Csv9RkX+btH1fRvzYebWxmzJI2nh5n+bdHJt7GV96bk=;
-        b=XNZ/ITz0fMwzwUGdjMAWWYRuWcj2suJEW37KW7TjWfUQGtRwIvlIHAJTNOSDfYYklF
-         yslbMbt5Lad3cj9tiCeZVGJ1WmvZhIKwFtwBXKJJVPEDtOal/k8ALjvploO1EoIjWc/E
-         GbbdsA0CDKX+Hj+oyLAPBqLPcuUeYqUhT9LSUDT8TiF/+WNDu0kjsnx8CQgh39iC89v5
-         fRRgD9XQzMw7XMtSJ830E3nBF2PhDlqRziEOzjFyJwDxfsF0KVOGvCcP3ppuEhklzI0D
-         LvAl+lX/9HUjcxpFnRCZmdyRlV8YXMzQkBX7bYr6pSGASiuf54CjmLltE+B1C2NHY8eH
-         T6Sw==
-X-Gm-Message-State: APjAAAVWcwfoIHu30/pOfinyE/J41vIZTtJ30VgVkvh97km6SSQqiCsd
-        EVbuwvnSCFqflij3wl4J5dPdeQ==
-X-Google-Smtp-Source: APXvYqz4IehmERvZkSLn4dv0AlZiLqxjIhUPXsfbcmH1QR56baIC/yZYOdzyT1EtgjA6A3n0bzymnw==
-X-Received: by 2002:a37:9f41:: with SMTP id i62mr65840276qke.272.1577989140443;
-        Thu, 02 Jan 2020 10:19:00 -0800 (PST)
+        bh=zAwqsRR5p0WQ1FXAD94ssaK9uFiL3MMXtJkj40Y5ME4=;
+        b=QZjncJ2sLrLbBPOqbT4LJusBziH0r21aumltkNXzf5OozpJC5ggkEXB1Ytb3YszRv6
+         kPgiXuA+vbTjaWpoHjmoavzuBmY44al3ebkMuR28OJkUHFOp0YIw65pyONzUc1f9pN2b
+         5iaLb2aqsP7d4hYfkSXqt7WqjXIQ7r+zlFvEzrm/nfBZde6sSwIIkwX2vzW6dbXBBvZW
+         DxnpIajpvyyI1nMnf8vPgJ4TYir1QJz2741fE3hx2nDUvzieyxmDQmTa3nCnXyR+sfWQ
+         pszZbkxMbra4HMPFeGuFG/QNiP6rzoseaG20oXQM8BZ04G505XSAezOCBkAC6bgs9v4I
+         HFmA==
+X-Gm-Message-State: APjAAAVAfDz518CRLoUMbupp4yaqenCTg9CawHsVy7HNZ7Au0NJNq0BN
+        IGpe3dvPNp/CIfZ/3W6QvSU+wQ==
+X-Google-Smtp-Source: APXvYqzlkWLLP2XjfL2M0f5z2qad2eqD1MLtK2QP0ABvzi+Up6KAgHVirMSsFqRfcngstb+4Qbunjw==
+X-Received: by 2002:ac8:3703:: with SMTP id o3mr60602438qtb.208.1577989437359;
+        Thu, 02 Jan 2020 10:23:57 -0800 (PST)
 Received: from ziepe.ca (hlfxns017vw-142-68-57-212.dhcp-dynamic.fibreop.ns.bellaliant.net. [142.68.57.212])
-        by smtp.gmail.com with ESMTPSA id q25sm15412176qkq.88.2020.01.02.10.18.59
+        by smtp.gmail.com with ESMTPSA id i6sm15312719qkk.7.2020.01.02.10.23.56
         (version=TLS1_2 cipher=ECDHE-RSA-CHACHA20-POLY1305 bits=256/256);
-        Thu, 02 Jan 2020 10:18:59 -0800 (PST)
+        Thu, 02 Jan 2020 10:23:56 -0800 (PST)
 Received: from jgg by mlx.ziepe.ca with local (Exim 4.90_1)
         (envelope-from <jgg@ziepe.ca>)
-        id 1in53j-0003H7-CA; Thu, 02 Jan 2020 14:18:59 -0400
-Date:   Thu, 2 Jan 2020 14:18:59 -0400
+        id 1in58W-0003Pg-HN; Thu, 02 Jan 2020 14:23:56 -0400
+Date:   Thu, 2 Jan 2020 14:23:56 -0400
 From:   Jason Gunthorpe <jgg@ziepe.ca>
-To:     Jack Wang <jinpuwang@gmail.com>
-Cc:     linux-block@vger.kernel.org, linux-rdma@vger.kernel.org,
-        axboe@kernel.dk, hch@infradead.org, sagi@grimberg.me,
-        bvanassche@acm.org, leon@kernel.org, dledford@redhat.com,
+To:     Bart Van Assche <bvanassche@acm.org>
+Cc:     Jack Wang <jinpuwang@gmail.com>, linux-block@vger.kernel.org,
+        linux-rdma@vger.kernel.org, axboe@kernel.dk, hch@infradead.org,
+        sagi@grimberg.me, leon@kernel.org, dledford@redhat.com,
         danil.kipnis@cloud.ionos.com, jinpu.wang@cloud.ionos.com,
         rpenyaev@suse.de
-Subject: Re: [PATCH v5 00/25] RTRS (former IBTRS) rdma transport library and
- the corresponding RNBD (former IBNBD) rdma network block device
-Message-ID: <20200102181859.GC9282@ziepe.ca>
-References: <20191220155109.8959-1-jinpuwang@gmail.com>
+Subject: Re: [PATCH v6 06/25] rtrs: client: main functionality
+Message-ID: <20200102182356.GD9282@ziepe.ca>
+References: <20191230102942.18395-1-jinpuwang@gmail.com>
+ <20191230102942.18395-7-jinpuwang@gmail.com>
+ <e242c08f-68e0-49b7-82e6-924d0124b792@acm.org>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=us-ascii
 Content-Disposition: inline
-In-Reply-To: <20191220155109.8959-1-jinpuwang@gmail.com>
+In-Reply-To: <e242c08f-68e0-49b7-82e6-924d0124b792@acm.org>
 User-Agent: Mutt/1.9.4 (2018-02-28)
 Sender: linux-block-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-On Fri, Dec 20, 2019 at 04:50:44PM +0100, Jack Wang wrote:
-> Hi all,
+On Mon, Dec 30, 2019 at 03:53:10PM -0800, Bart Van Assche wrote:
+> > +	if (req->sg_cnt) {
+> > +		if (unlikely(req->dir == DMA_FROM_DEVICE && req->need_inv)) {
+> > +			/*
+> > +			 * We are here to invalidate RDMA read requests
+> > +			 * ourselves.  In normal scenario server should
+> > +			 * send INV for all requested RDMA reads, but
+> > +			 * we are here, thus two things could happen:
+> > +			 *
+> > +			 *    1.  this is failover, when errno != 0
+> > +			 *        and can_wait == 1,
+> > +			 *
+> > +			 *    2.  something totally bad happened and
+> > +			 *        server forgot to send INV, so we
+> > +			 *        should do that ourselves.
+> > +			 */
 > 
-> here is V5 of the RTRS (former IBTRS) rdma transport library and the 
-> corresponding RNBD (former IBNBD) rdma network block device.
+> Please document in the protocol documentation when RDMA reads are used.
 > 
-> Main changes are the following:
-> 1. Fix the security problem pointed out by Jason
-> 2. Implement code-style/readability/API/etc suggestions by Bart van Assche
-> 3. Rename IBTRS and IBNBD to RTRS and RNBD accordingly
-> 4. Fileio mode support in rnbd-srv has been removed.
+> What does "server forgot to send INV" mean?
 > 
-> The main functional change is a fix for the security problem pointed out by 
-> Jason and discussed both on the mailing list and during the last LPC RDMA MC 2019.
-> On the server side we now invalidate in RTRS each rdma buffer before we hand it
-> over to RNBD server and in turn to the block layer. A new rkey is generated and
-> registered for the buffer after it returns back from the block layer and RNBD
-> server. The new rkey is sent back to the client along with the IO result.
-> The procedure is the default behaviour of the driver. This invalidation and
-> registration on each IO causes performance drop of up to 20%. A user of the
-> driver may choose to load the modules with this mechanism switched
-> off
+> Additionally, if I remember correctly Jason considers it very important
+> that invalidation happens from the submitting context because otherwise
+> the RDMA retry mechanism can't work.
 
-So, how does this compare now to nvme over fabrics?
+I think my point has usually been you can't use completions on the RQ
+to deduce the state of the SQ
 
-I recall there were questiosn why we needed yet another RDMA block
-transport?
+But if you are doing inv by posting it on the same SQ then things will
+get ordered OK as the HW shouldn't progress the INV until any work
+touching that rkey is also concluded.
 
 Jason
