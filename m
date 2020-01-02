@@ -2,103 +2,149 @@ Return-Path: <SRS0=T2Jf=2X=vger.kernel.org=linux-block-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-2.3 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
-	MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,USER_AGENT_SANE_1 autolearn=no
-	autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-2.4 required=3.0 tests=DKIMWL_WL_HIGH,DKIM_SIGNED,
+	DKIM_VALID,DKIM_VALID_AU,HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,
+	SPF_HELO_NONE,SPF_PASS,USER_AGENT_SANE_1 autolearn=no autolearn_force=no
+	version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 8AAB4C3276F
-	for <linux-block@archiver.kernel.org>; Thu,  2 Jan 2020 22:43:34 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 2C66CC3276C
+	for <linux-block@archiver.kernel.org>; Thu,  2 Jan 2020 22:52:29 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.kernel.org (Postfix) with ESMTP id 68C5921835
-	for <linux-block@archiver.kernel.org>; Thu,  2 Jan 2020 22:43:34 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id F178721D7D
+	for <linux-block@archiver.kernel.org>; Thu,  2 Jan 2020 22:52:28 +0000 (UTC)
+Authentication-Results: mail.kernel.org;
+	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="AZkJ+Jqa"
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1730585AbgABWed (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Thu, 2 Jan 2020 17:34:33 -0500
-Received: from mail-pg1-f195.google.com ([209.85.215.195]:45014 "EHLO
-        mail-pg1-f195.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1730576AbgABWed (ORCPT
-        <rfc822;linux-block@vger.kernel.org>); Thu, 2 Jan 2020 17:34:33 -0500
-Received: by mail-pg1-f195.google.com with SMTP id x7so22545627pgl.11;
-        Thu, 02 Jan 2020 14:34:32 -0800 (PST)
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20161025;
-        h=x-gm-message-state:subject:to:cc:references:from:message-id:date
-         :user-agent:mime-version:in-reply-to:content-language
-         :content-transfer-encoding;
-        bh=8mVvbAyQUW31vtCB7au92EGbYazy736+WkClVlaU2E0=;
-        b=SkH84y9Kc6c1gxSiWpFkpNWuml4KFD3mC5SIXA3wzffzsTg2dx8fDVQaKwq/3ZsOJx
-         Eba9sKAf7WjT+mphyWQKUEAgbp4Zq9AKkQVwchQjMbKxcWMWkt917ChcfsVR2fmTDA2s
-         XdQgARIQf/n7mJ/YuBcIH6sSjzFriRkUJRP6HOvi4B2vCB/SobZ1nirgj0VT3HebEmsD
-         dxc84USgLDybXj9HFwZi5yC/DK/6qJSVRsV0QK+tyTTkudsCj61mJoyueE8TPjTo08Wl
-         FGHGYKq8l1hGJ65eoPeuxUXDafUFdVUpeaA+dT/xthqwpIf9RJlPsqOJ6JEcl9Xt61hX
-         dVkw==
-X-Gm-Message-State: APjAAAUjXallXNuEeM3bDq3fiWWWSeZFqkstORZ62jMPtcNOHVdxzPVS
-        l9VmjUegUIwe4hxIyD1buEM=
-X-Google-Smtp-Source: APXvYqzRXAPVdCIewiz9WFuQlrMZDrTyt9R+nWJ8bKFMmTlpu+xdIZnMCAjsyFlXH3I3x8W7+auR1g==
-X-Received: by 2002:a63:2bcd:: with SMTP id r196mr90058338pgr.65.1578004472447;
-        Thu, 02 Jan 2020 14:34:32 -0800 (PST)
-Received: from desktop-bart.svl.corp.google.com ([2620:15c:2cd:202:4308:52a3:24b6:2c60])
-        by smtp.gmail.com with ESMTPSA id n1sm65339662pfd.47.2020.01.02.14.34.30
-        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
-        Thu, 02 Jan 2020 14:34:31 -0800 (PST)
-Subject: Re: [PATCH v6 15/25] rnbd: private headers with rnbd protocol structs
- and helpers
-To:     Jack Wang <jinpuwang@gmail.com>, linux-block@vger.kernel.org,
-        linux-rdma@vger.kernel.org
-Cc:     axboe@kernel.dk, hch@infradead.org, sagi@grimberg.me,
-        leon@kernel.org, dledford@redhat.com, danil.kipnis@cloud.ionos.com,
-        jinpu.wang@cloud.ionos.com, rpenyaev@suse.de
-References: <20191230102942.18395-1-jinpuwang@gmail.com>
- <20191230102942.18395-16-jinpuwang@gmail.com>
-From:   Bart Van Assche <bvanassche@acm.org>
-Message-ID: <f8ec030c-9279-c5c0-617b-26305327a3b0@acm.org>
-Date:   Thu, 2 Jan 2020 14:34:30 -0800
+        id S1729943AbgABWw1 (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Thu, 2 Jan 2020 17:52:27 -0500
+Received: from us-smtp-delivery-1.mimecast.com ([205.139.110.120]:29117 "EHLO
+        us-smtp-1.mimecast.com" rhost-flags-OK-OK-OK-FAIL) by vger.kernel.org
+        with ESMTP id S1729195AbgABWw0 (ORCPT
+        <rfc822;linux-block@vger.kernel.org>); Thu, 2 Jan 2020 17:52:26 -0500
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+        s=mimecast20190719; t=1578005545;
+        h=from:from:reply-to:reply-to:subject:subject:date:date:
+         message-id:message-id:to:to:cc:cc:mime-version:mime-version:
+         content-type:content-type:
+         content-transfer-encoding:content-transfer-encoding:
+         in-reply-to:in-reply-to:references:references;
+        bh=NJsGqBOY1K6pZkFZVEsOXGibkPyRI5rSYqFWSQRZKKw=;
+        b=AZkJ+Jqamhw2sb+poIfc+LeqFli08hXh/I/lbZo1RjuVXd8IF7DGLsOfxXPd8kO7O3uxMq
+        70Gx6Kf3vcxyUOr5xy6yHhoKzLY3QUrfoSMcx+09Bxhm+CqOPbCDg7a7xRZyuLYJ7/isEu
+        qZ9RrTNH3y0dFU3QwCef/t/VJS20Iyo=
+Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
+ [209.132.183.4]) (Using TLS) by relay.mimecast.com with ESMTP id
+ us-mta-90-9dCTwSABOde9gsqzr5DZqg-1; Thu, 02 Jan 2020 17:52:23 -0500
+X-MC-Unique: 9dCTwSABOde9gsqzr5DZqg-1
+Received: from smtp.corp.redhat.com (int-mx02.intmail.prod.int.phx2.redhat.com [10.5.11.12])
+        (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
+        (No client certificate requested)
+        by mimecast-mx01.redhat.com (Postfix) with ESMTPS id 7A518800D48;
+        Thu,  2 Jan 2020 22:52:22 +0000 (UTC)
+Received: from [10.3.112.12] (ovpn-112-12.phx2.redhat.com [10.3.112.12])
+        by smtp.corp.redhat.com (Postfix) with ESMTP id 58BD160BF7;
+        Thu,  2 Jan 2020 22:52:20 +0000 (UTC)
+From:   Tony Asleson <tasleson@redhat.com>
+Subject: Re: [RFC 1/9] lib/string: Add function to trim duplicate WS
+Reply-To: tasleson@redhat.com
+To:     Matthew Wilcox <willy@infradead.org>
+Cc:     linux-scsi@vger.kernel.org, linux-block@vger.kernel.org,
+        linux-fsdevel@vger.kernel.org
+References: <20191223225558.19242-1-tasleson@redhat.com>
+ <20191223225558.19242-2-tasleson@redhat.com>
+ <20191223232824.GB31820@bombadil.infradead.org>
+Organization: Red Hat
+Message-ID: <8392b726-fa55-baa4-6913-5ca0e4fa46a7@redhat.com>
+Date:   Thu, 2 Jan 2020 16:52:19 -0600
 User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:68.0) Gecko/20100101
  Thunderbird/68.2.2
 MIME-Version: 1.0
-In-Reply-To: <20191230102942.18395-16-jinpuwang@gmail.com>
-Content-Type: text/plain; charset=utf-8; format=flowed
+In-Reply-To: <20191223232824.GB31820@bombadil.infradead.org>
+Content-Type: text/plain; charset=utf-8
 Content-Language: en-US
 Content-Transfer-Encoding: 7bit
+X-Scanned-By: MIMEDefang 2.79 on 10.5.11.12
 Sender: linux-block-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-On 12/30/19 2:29 AM, Jack Wang wrote:
-> + * @device_id:		device_id on server side to identify the device
+On 12/23/19 5:28 PM, Matthew Wilcox wrote:
+> On Mon, Dec 23, 2019 at 04:55:50PM -0600, Tony Asleson wrote:
+>> +/**
+>> + * Removes leading and trailing whitespace and removes duplicate
+>> + * adjacent whitespace in a string, modifies string in place.
+>> + * @s The %NUL-terminated string to have spaces removed
+>> + * Returns the new length
+>> + */
+> 
+> This isn't good kernel-doc.  See Documentation/doc-guide/kernel-doc.rst
+> Compile with W=1 to get the format checked.
 
-Is this a number that only has a meaning inside the RTRS software? Is 
-the role of this number perhaps similar to an NVMe namespace or SCSI 
-LUN? If so, please mention this. Additionally, does this number start 
-from zero or from one?
+Indeed, I'll correct it.
 
-> + * @max_segments:	max segments hardware support in one transfer
+>> +size_t strim_dupe(char *s)
+>> +{
+>> +	size_t ret = 0;
+>> +	char *w = s;
+>> +	char *p;
+>> +
+>> +	/*
+>> +	 * This will remove all leading and duplicate adjacent, but leave
+>> +	 * 1 space at the end if one or more are present.
+>> +	 */
+>> +	for (p = s; *p != '\0'; ++p) {
+>> +		if (!isspace(*p) || (p != s && !isspace(*(p - 1)))) {
+>> +			*w = *p;
+>> +			++w;
+>> +			ret += 1;
+>> +		}
+>> +	}
+> 
+> I'd be tempted to do ...
+> 
+> 	size_t ret = 0;
+> 	char *w = s;
+> 	bool last_space = false;
+> 
+> 	do {
+> 		bool this_space = isspace(*s);
+> 
+> 		if (!this_space || !last_space) {
+> 			*w++ = *s;
+> 			ret++;
+> 		}
+> 		s++;
+> 		last_space = this_space;
+> 	} while (s[-1] != '\0');
 
-Which "hardware" does this comment refer to? The RDMA adapter or the 
-block device in the server? In the latter case, what if the block device 
-has been implemented in software?
+That leaves a starting and trailing WS, how about something like this?
 
-What kind of transfer does this comment refer to? A DMA transfer? If so, 
-please mention this.
+size_t strim_dupe(char *s)
+{
+	size_t ret = 0;
+	char *w = s;
+	bool last_space = false;
 
-> +struct rnbd_msg_open_rsp {
-> +	struct rnbd_msg_hdr	hdr;
-> +	__le32			device_id;
-> +	__le64			nsectors;
-> +	__le32			max_hw_sectors;
-> +	__le32			max_write_same_sectors;
-> +	__le32			max_discard_sectors;
-> +	__le32			discard_granularity;
-> +	__le32			discard_alignment;
-> +	__le16			physical_block_size;
-> +	__le16			logical_block_size;
-> +	__le16			max_segments;
-> +	__le16			secure_discard;
-> +	u8			rotational;
-> +	u8			reserved[11];
-> +};
+	do {
+		bool this_space = isspace(*s);
+		if (!this_space || (!last_space && ret)) {
+			*w++ = *s;
+			ret++;
+		}
+		s++;
+		last_space = this_space;
+	} while (s[-1] != '\0');
 
-Thanks,
+	if (ret > 1 && isspace(w[-2])) {
+		w[-2] = '\0';
+		ret--;
+	}
 
-Bart.
+	ret--;
+	return ret;
+}
+
+Thanks
+-Tony
+
