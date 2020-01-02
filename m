@@ -4,341 +4,140 @@ X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 X-Spam-Level: 
 X-Spam-Status: No, score=-9.8 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
 	INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,
-	USER_AGENT_GIT autolearn=unavailable autolearn_force=no version=3.4.0
+	USER_AGENT_GIT autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 32345C3276E
-	for <linux-block@archiver.kernel.org>; Thu,  2 Jan 2020 14:58:07 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 945F3C2D0DC
+	for <linux-block@archiver.kernel.org>; Thu,  2 Jan 2020 14:58:47 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.kernel.org (Postfix) with ESMTP id F1DBC20848
-	for <linux-block@archiver.kernel.org>; Thu,  2 Jan 2020 14:58:06 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id 6E40E2072C
+	for <linux-block@archiver.kernel.org>; Thu,  2 Jan 2020 14:58:47 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1728599AbgABO6C (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Thu, 2 Jan 2020 09:58:02 -0500
-Received: from mout.kundenserver.de ([212.227.126.133]:57085 "EHLO
+        id S1728559AbgABO6r (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Thu, 2 Jan 2020 09:58:47 -0500
+Received: from mout.kundenserver.de ([212.227.126.134]:38545 "EHLO
         mout.kundenserver.de" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1728544AbgABO6C (ORCPT
-        <rfc822;linux-block@vger.kernel.org>); Thu, 2 Jan 2020 09:58:02 -0500
+        with ESMTP id S1728544AbgABO6q (ORCPT
+        <rfc822;linux-block@vger.kernel.org>); Thu, 2 Jan 2020 09:58:46 -0500
 Received: from threadripper.lan ([149.172.19.189]) by mrelayeu.kundenserver.de
  (mreue011 [212.227.15.129]) with ESMTPA (Nemesis) id
- 1MLzSD-1j4yPT0dAv-00Hze6; Thu, 02 Jan 2020 15:57:46 +0100
+ 1Ml6Zo-1jRu2Z2XTo-00lSv9; Thu, 02 Jan 2020 15:58:03 +0100
 From:   Arnd Bergmann <arnd@arndb.de>
 To:     "James E.J. Bottomley" <jejb@linux.ibm.com>,
-        "Martin K. Petersen" <martin.petersen@oracle.com>
-Cc:     Arnd Bergmann <arnd@arndb.de>, Al Viro <viro@zeniv.linux.org.uk>,
-        Douglas Gilbert <dgilbert@interlog.com>,
-        Steffen Maier <maier@linux.ibm.com>,
-        linux-scsi@vger.kernel.org, Jens Axboe <axboe@kernel.dk>,
+        "Martin K. Petersen" <martin.petersen@oracle.com>,
+        Jens Axboe <axboe@kernel.dk>
+Cc:     Arnd Bergmann <arnd@arndb.de>, Jan Kara <jack@suse.cz>,
+        Stefan Haberland <sth@linux.ibm.com>,
+        Dmitry Fomichev <dmitry.fomichev@wdc.com>,
+        Ajay Joshi <ajay.joshi@wdc.com>,
+        Damien Le Moal <damien.lemoal@wdc.com>,
+        Ming Lei <ming.lei@redhat.com>,
         Chaitanya Kulkarni <chaitanya.kulkarni@wdc.com>,
+        Bart Van Assche <bvanassche@acm.org>,
+        Pavel Begunkov <asml.silence@gmail.com>,
         linux-block@vger.kernel.org, linux-kernel@vger.kernel.org
-Subject: [PATCH v3 03/22] compat: scsi: sg: fix v3 compat read/write interface
-Date:   Thu,  2 Jan 2020 15:55:21 +0100
-Message-Id: <20200102145552.1853992-4-arnd@arndb.de>
+Subject: [PATCH v3 04/22] compat_ioctl: block: add blkdev_compat_ptr_ioctl
+Date:   Thu,  2 Jan 2020 15:55:22 +0100
+Message-Id: <20200102145552.1853992-5-arnd@arndb.de>
 X-Mailer: git-send-email 2.20.0
 In-Reply-To: <20200102145552.1853992-1-arnd@arndb.de>
 References: <20200102145552.1853992-1-arnd@arndb.de>
 MIME-Version: 1.0
 Content-Transfer-Encoding: 8bit
-X-Provags-ID: V03:K1:nRc504jMOm3JteF2RHJQED6rMExyEXomIbEfWluQRtfGedaueYQ
- HSnicqYeOwDMEjGgqcf4j08q/sMz5sHGGLthM74HFeHngEPEkorJ45QatkmReK5HEnYGg0Q
- oLtQoQ+Cf1LpV37J0Pz07NhxUCOLR9IJXxJ2yqt8zUvjH6ItrQ9pvGsmV0x6jLpTq1PxO9/
- ufsyhI+t4Svq5bNIPe5gg==
-X-UI-Out-Filterresults: notjunk:1;V03:K0:BnXOhNwbfkU=:G4tQDXF/WQu5mAC+Qjokpr
- UzEnwTBWXbsWHaLla/qdLs2mW5qNgZFwTiUDd5DGbBe2SricT8IdiLgWGayPiowyVZtcGJO/P
- B6taIxfgDh2HALD87S/IQmx4wUXwYB1G2D74gIpPEfxtmCHHZ729sfiWkGsJ0hF+VTpRZwLz3
- brfDXU+c7fPpl5WV8D/9dt1WEGMraFDU1geUYc+AtvT4hrluVjuHlrkKNgZzbOc+0+p0WNL+z
- K0l2aGuYpsEjy13CBPGhTjb3csc88TfTvTBoUANZ4/fXBArGyxir/jD59hg2kjLX6t7hLuaw8
- qZi5DT3kG1FVW4VsbQa1noXXXr4pgEd/iVqU4lFSOeqfLhbZOnjkj4+7q/toElEx5/QoG6woP
- AZ9Fe8xbsqoeew7RyIMyhyHVXujjooBHbqe+MzgR6kKtVt0GIyk7V8LSliYgOhlWBhzEsNI9Y
- FdMd/eMbUjQCyCISrCrtTZqD2lX1Bh5LDLrosiISU0xar6BJe1iQgjUnhKidcO2sqw3KOxd0b
- h3dXVxLFB3qm4UZ0nZRaVCQAA6rrJw76q9BMg5EeccPRRWz9zB0B/6y8V7izQJdVqmRdTnE13
- aLa4tQxm3nxcjMcHlJ90A8hQBoW5YQnbBN/z23+CSluU7B9fm0RusOc4zrQvUeUmAhIhgq6Ea
- fLiKLXSx9zXlxZfL8xm4lkePrfln4NDwecxDAka5J9x5vgPcH7qnFZ0hSnJTz9dwmOzz3zjRa
- nQ42O1hnRr37jL6KnlRFoiyyYbFOQxVShu7NJ7XGnDqCaoBek9uOp3bXYRMFsjmp0216Q4A2R
- vHWzGQAk4Oh06U6wzVfXf+fcOV4Yy7UZkWEIUUHWrSozyHsatqTsxDaIsvOkDKre1ioI3FqbN
- ZTQ6UcJF3QsKHHwZgbRQ==
+X-Provags-ID: V03:K1:KgLrTmywy3bbbvY0LZm/M628mSRoY/VIMuh4eTLrKVmXyt1GW9D
+ qTf9qNpJ/r7gpch3KaMQdHvbCSK6zQjXj0kj1ywg/xU9Uk5+nwu+opKHMwpA36qU04BTioD
+ HZfur8uZF/wduzz3V8sIdThEty5+pSYqtRa3D1yKuuaZuP45I5oMWpH2mNA4ppQZRbEO6K4
+ /U0HiGQxN0B3xuc4JwpPQ==
+X-UI-Out-Filterresults: notjunk:1;V03:K0:owynCMj6ZB0=:dY43jbnMOLA/sdXkY9YXDt
+ 3D3kgMLQNVE2RgFfOx7xc8a7esy4Fk42QCIElbKmzyZNWvodqHLKFx4ctaNvzwEx4QdbIlD/7
+ U5mBSqAfU0IFPgM0KznBV/Kt+5Dijw+iAR3saaWatbQwFh+KPONxqJwf9A/eCYD53+xYhcCPT
+ eSF/ObWp06DdewxPFGVOSUZfnrkGWfFhXHLQl7vOeakoA59y8TU88Ksfl6GK+Qo90B0KGEmgy
+ ejpLEkyNilqUY2xWsdhuxjdzaV6ghqW1GGNgUp1GKxtnsdAumOut2g5zTQNI+C5TPpzDQpNa0
+ vX4rtkdN2cAopgwRuCAE1CQY7JylXi1gUQ/QPZoKlerMe+Lv0V9O7/7Ra6e0wqehoXCEJXWTc
+ N/7ojAA696jwWZv3Lygju4MbQysj87aBctHELqawOETtkZAB9bTuXZFwXIcj+bQ3kvgN9GSiG
+ F16dgsTmc37bPg7XScURB2edDngbgkVdD6p0ZszQrtrhTsCxb1RTDDytfTwnKiaduP1UYIrKK
+ HAhMXOup7KC+tUg3R/qdZsdLBlVr3HJoQ0MIW7M4h//vlOfRooJJ3TJRhd9iRVIfG2tSmHIRb
+ z+RoSGIhvAtLLVsQCbO7lYabm919yTgWAg/+pYkBXR3d1fFIU+hqWFCKFd5nd8h0CUfnatQJv
+ LBTi7IJGa43pxCfytY17FC34U2Iplp9vXiRImIwrNjUlDAWQpOHZZhp8DeJQf3Z/XE23m2Pg5
+ KGFberihYSRc8vkKrTyUIoONZ5V8R6DPUdRGmnhITcSq0q3zpcfLEtSbrUWpY7pWUmODhPKA8
+ 1v0yzafUNyvPRH8jvHtL2i/QY5R4ZUJfUdT5s6J4DzukGwp1iEu4On0wPmyq+6HpMmpGNIeVW
+ GZS+P8C4HMsApTc0z9lQ==
 Sender: linux-block-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-In the v5.4 merge window, a cleanup patch from Al Viro conflicted
-with my rework of the compat handling for sg.c read(). Linus Torvalds
-did a correct merge but pointed out that the resulting code is still
-unsatisfactory.
+A lot of block drivers need only a trivial .compat_ioctl callback.
 
-I later noticed that the sg_new_read() function still gets the compat
-mode wrong, when the 'count' argument is large enough to pass a
-compat_sg_io_hdr object, but not a nativ sg_io_hdr.
+Add a helper function that can be set as the callback pointer
+to only convert the argument using the compat_ptr() conversion
+and otherwise assume all input and output data is compatible,
+or handled using in_compat_syscall() checks.
 
-To address both of these, move the definition of compat_sg_io_hdr
-into a scsi/sg.h to make it visible to sg.c and rewrite the logic
-for reading req_pack_id as well as the size check to a simpler
-version that gets the expected results.
+This mirrors the compat_ptr_ioctl() helper function used in
+character devices.
 
-Fixes: c35a5cfb4150 ("scsi: sg: sg_read(): simplify reading ->pack_id of userland sg_io_hdr_t")
-Fixes: 98aaaec4a150 ("compat_ioctl: reimplement SG_IO handling")
 Signed-off-by: Arnd Bergmann <arnd@arndb.de>
 ---
- block/scsi_ioctl.c |  29 +----------
- drivers/scsi/sg.c  | 126 +++++++++++++++++++++------------------------
- include/scsi/sg.h  |  30 +++++++++++
- 3 files changed, 90 insertions(+), 95 deletions(-)
+ block/ioctl.c          | 21 +++++++++++++++++++++
+ include/linux/blkdev.h |  7 +++++++
+ 2 files changed, 28 insertions(+)
 
-diff --git a/block/scsi_ioctl.c b/block/scsi_ioctl.c
-index 650bade5ea5a..b61dbf4d8443 100644
---- a/block/scsi_ioctl.c
-+++ b/block/scsi_ioctl.c
-@@ -20,6 +20,7 @@
- #include <scsi/scsi.h>
- #include <scsi/scsi_ioctl.h>
- #include <scsi/scsi_cmnd.h>
-+#include <scsi/sg.h>
- 
- struct blk_cmd_filter {
- 	unsigned long read_ok[BLK_SCSI_CMD_PER_LONG];
-@@ -550,34 +551,6 @@ static inline int blk_send_start_stop(struct request_queue *q,
- 	return __blk_send_generic(q, bd_disk, GPCMD_START_STOP_UNIT, data);
- }
- 
--#ifdef CONFIG_COMPAT
--struct compat_sg_io_hdr {
--	compat_int_t interface_id;	/* [i] 'S' for SCSI generic (required) */
--	compat_int_t dxfer_direction;	/* [i] data transfer direction  */
--	unsigned char cmd_len;		/* [i] SCSI command length ( <= 16 bytes) */
--	unsigned char mx_sb_len;	/* [i] max length to write to sbp */
--	unsigned short iovec_count;	/* [i] 0 implies no scatter gather */
--	compat_uint_t dxfer_len;	/* [i] byte count of data transfer */
--	compat_uint_t dxferp;		/* [i], [*io] points to data transfer memory
--						or scatter gather list */
--	compat_uptr_t cmdp;		/* [i], [*i] points to command to perform */
--	compat_uptr_t sbp;		/* [i], [*o] points to sense_buffer memory */
--	compat_uint_t timeout;		/* [i] MAX_UINT->no timeout (unit: millisec) */
--	compat_uint_t flags;		/* [i] 0 -> default, see SG_FLAG... */
--	compat_int_t pack_id;		/* [i->o] unused internally (normally) */
--	compat_uptr_t usr_ptr;		/* [i->o] unused internally */
--	unsigned char status;		/* [o] scsi status */
--	unsigned char masked_status;	/* [o] shifted, masked scsi status */
--	unsigned char msg_status;	/* [o] messaging level data (optional) */
--	unsigned char sb_len_wr;	/* [o] byte count actually written to sbp */
--	unsigned short host_status;	/* [o] errors from host adapter */
--	unsigned short driver_status;	/* [o] errors from software driver */
--	compat_int_t resid;		/* [o] dxfer_len - actual_transferred */
--	compat_uint_t duration;		/* [o] time taken by cmd (unit: millisec) */
--	compat_uint_t info;		/* [o] auxiliary information */
--};
--#endif
--
- int put_sg_io_hdr(const struct sg_io_hdr *hdr, void __user *argp)
- {
- #ifdef CONFIG_COMPAT
-diff --git a/drivers/scsi/sg.c b/drivers/scsi/sg.c
-index 160748ad9c0f..eace8886d95a 100644
---- a/drivers/scsi/sg.c
-+++ b/drivers/scsi/sg.c
-@@ -405,6 +405,38 @@ sg_release(struct inode *inode, struct file *filp)
- 	return 0;
- }
- 
-+static int get_sg_io_pack_id(int *pack_id, void __user *buf, size_t count)
-+{
-+	struct sg_header __user *old_hdr = buf;
-+	int reply_len;
-+
-+	if (count >= SZ_SG_HEADER) {
-+		/* negative reply_len means v3 format, otherwise v1/v2 */
-+		if (get_user(reply_len, &old_hdr->reply_len))
-+			return -EFAULT;
-+
-+		if (reply_len >= 0)
-+			return get_user(*pack_id, &old_hdr->pack_id);
-+
-+		if (in_compat_syscall() &&
-+		    count >= sizeof(struct compat_sg_io_hdr)) {
-+			struct compat_sg_io_hdr __user *hp = buf;
-+
-+			return get_user(*pack_id, &hp->pack_id);
-+		}
-+
-+		if (count >= sizeof(struct sg_io_hdr)) {
-+			struct sg_io_hdr __user *hp = buf;
-+
-+			return get_user(*pack_id, &hp->pack_id);
-+		}
-+	}
-+
-+	/* no valid header was passed, so ignore the pack_id */
-+	*pack_id = -1;
-+	return 0;
-+}
-+
- static ssize_t
- sg_read(struct file *filp, char __user *buf, size_t count, loff_t * ppos)
- {
-@@ -413,8 +445,8 @@ sg_read(struct file *filp, char __user *buf, size_t count, loff_t * ppos)
- 	Sg_request *srp;
- 	int req_pack_id = -1;
- 	sg_io_hdr_t *hp;
--	struct sg_header *old_hdr = NULL;
--	int retval = 0;
-+	struct sg_header *old_hdr;
-+	int retval;
- 
- 	/*
- 	 * This could cause a response to be stranded. Close the associated
-@@ -429,79 +461,34 @@ sg_read(struct file *filp, char __user *buf, size_t count, loff_t * ppos)
- 	SCSI_LOG_TIMEOUT(3, sg_printk(KERN_INFO, sdp,
- 				      "sg_read: count=%d\n", (int) count));
- 
--	if (sfp->force_packid && (count >= SZ_SG_HEADER)) {
--		old_hdr = memdup_user(buf, SZ_SG_HEADER);
--		if (IS_ERR(old_hdr))
--			return PTR_ERR(old_hdr);
--		if (old_hdr->reply_len < 0) {
--			if (count >= SZ_SG_IO_HDR) {
--				/*
--				 * This is stupid.
--				 *
--				 * We're copying the whole sg_io_hdr_t from user
--				 * space just to get the 'pack_id' field. But the
--				 * field is at different offsets for the compat
--				 * case, so we'll use "get_sg_io_hdr()" to copy
--				 * the whole thing and convert it.
--				 *
--				 * We could do something like just calculating the
--				 * offset based of 'in_compat_syscall()', but the
--				 * 'compat_sg_io_hdr' definition is in the wrong
--				 * place for that.
--				 */
--				sg_io_hdr_t *new_hdr;
--				new_hdr = kmalloc(SZ_SG_IO_HDR, GFP_KERNEL);
--				if (!new_hdr) {
--					retval = -ENOMEM;
--					goto free_old_hdr;
--				}
--				retval = get_sg_io_hdr(new_hdr, buf);
--				req_pack_id = new_hdr->pack_id;
--				kfree(new_hdr);
--				if (retval) {
--					retval = -EFAULT;
--					goto free_old_hdr;
--				}
--			}
--		} else
--			req_pack_id = old_hdr->pack_id;
--	}
-+	if (sfp->force_packid)
-+		retval = get_sg_io_pack_id(&req_pack_id, buf, count);
-+	if (retval)
-+		return retval;
-+
- 	srp = sg_get_rq_mark(sfp, req_pack_id);
- 	if (!srp) {		/* now wait on packet to arrive */
--		if (atomic_read(&sdp->detaching)) {
--			retval = -ENODEV;
--			goto free_old_hdr;
--		}
--		if (filp->f_flags & O_NONBLOCK) {
--			retval = -EAGAIN;
--			goto free_old_hdr;
--		}
-+		if (atomic_read(&sdp->detaching))
-+			return -ENODEV;
-+		if (filp->f_flags & O_NONBLOCK)
-+			return -EAGAIN;
- 		retval = wait_event_interruptible(sfp->read_wait,
- 			(atomic_read(&sdp->detaching) ||
- 			(srp = sg_get_rq_mark(sfp, req_pack_id))));
--		if (atomic_read(&sdp->detaching)) {
--			retval = -ENODEV;
--			goto free_old_hdr;
--		}
--		if (retval) {
-+		if (atomic_read(&sdp->detaching))
-+			return -ENODEV;
-+		if (retval)
- 			/* -ERESTARTSYS as signal hit process */
--			goto free_old_hdr;
--		}
--	}
--	if (srp->header.interface_id != '\0') {
--		retval = sg_new_read(sfp, buf, count, srp);
--		goto free_old_hdr;
-+			return retval;
- 	}
-+	if (srp->header.interface_id != '\0')
-+		return sg_new_read(sfp, buf, count, srp);
- 
- 	hp = &srp->header;
--	if (old_hdr == NULL) {
--		old_hdr = kmalloc(SZ_SG_HEADER, GFP_KERNEL);
--		if (! old_hdr) {
--			retval = -ENOMEM;
--			goto free_old_hdr;
--		}
--	}
--	memset(old_hdr, 0, SZ_SG_HEADER);
-+	old_hdr = kzalloc(SZ_SG_HEADER, GFP_KERNEL);
-+	if (!old_hdr)
-+		return -ENOMEM;
-+
- 	old_hdr->reply_len = (int) hp->timeout;
- 	old_hdr->pack_len = old_hdr->reply_len; /* old, strange behaviour */
- 	old_hdr->pack_id = hp->pack_id;
-@@ -575,7 +562,12 @@ sg_new_read(Sg_fd * sfp, char __user *buf, size_t count, Sg_request * srp)
- 	int err = 0, err2;
- 	int len;
- 
--	if (count < SZ_SG_IO_HDR) {
-+	if (in_compat_syscall()) {
-+		if (count < sizeof(struct compat_sg_io_hdr)) {
-+			err = -EINVAL;
-+			goto err_out;
-+		}
-+	} else if (count < SZ_SG_IO_HDR) {
- 		err = -EINVAL;
- 		goto err_out;
- 	}
-diff --git a/include/scsi/sg.h b/include/scsi/sg.h
-index f91bcca604e4..29c7ad04d2e2 100644
---- a/include/scsi/sg.h
-+++ b/include/scsi/sg.h
-@@ -68,6 +68,36 @@ typedef struct sg_io_hdr
-     unsigned int info;          /* [o] auxiliary information */
- } sg_io_hdr_t;  /* 64 bytes long (on i386) */
- 
-+#if defined(__KERNEL__)
+diff --git a/block/ioctl.c b/block/ioctl.c
+index 5de98b97af2a..e728331d1a5b 100644
+--- a/block/ioctl.c
++++ b/block/ioctl.c
+@@ -1,5 +1,6 @@
+ // SPDX-License-Identifier: GPL-2.0
+ #include <linux/capability.h>
 +#include <linux/compat.h>
+ #include <linux/blkdev.h>
+ #include <linux/export.h>
+ #include <linux/gfp.h>
+@@ -285,6 +286,26 @@ int __blkdev_driver_ioctl(struct block_device *bdev, fmode_t mode,
+  */
+ EXPORT_SYMBOL_GPL(__blkdev_driver_ioctl);
+ 
++#ifdef CONFIG_COMPAT
++/*
++ * This is the equivalent of compat_ptr_ioctl(), to be used by block
++ * drivers that implement only commands that are completely compatible
++ * between 32-bit and 64-bit user space
++ */
++int blkdev_compat_ptr_ioctl(struct block_device *bdev, fmode_t mode,
++			unsigned cmd, unsigned long arg)
++{
++	struct gendisk *disk = bdev->bd_disk;
 +
-+struct compat_sg_io_hdr {
-+	compat_int_t interface_id;	/* [i] 'S' for SCSI generic (required) */
-+	compat_int_t dxfer_direction;	/* [i] data transfer direction  */
-+	unsigned char cmd_len;		/* [i] SCSI command length ( <= 16 bytes) */
-+	unsigned char mx_sb_len;	/* [i] max length to write to sbp */
-+	unsigned short iovec_count;	/* [i] 0 implies no scatter gather */
-+	compat_uint_t dxfer_len;	/* [i] byte count of data transfer */
-+	compat_uint_t dxferp;		/* [i], [*io] points to data transfer memory
-+						or scatter gather list */
-+	compat_uptr_t cmdp;		/* [i], [*i] points to command to perform */
-+	compat_uptr_t sbp;		/* [i], [*o] points to sense_buffer memory */
-+	compat_uint_t timeout;		/* [i] MAX_UINT->no timeout (unit: millisec) */
-+	compat_uint_t flags;		/* [i] 0 -> default, see SG_FLAG... */
-+	compat_int_t pack_id;		/* [i->o] unused internally (normally) */
-+	compat_uptr_t usr_ptr;		/* [i->o] unused internally */
-+	unsigned char status;		/* [o] scsi status */
-+	unsigned char masked_status;	/* [o] shifted, masked scsi status */
-+	unsigned char msg_status;	/* [o] messaging level data (optional) */
-+	unsigned char sb_len_wr;	/* [o] byte count actually written to sbp */
-+	unsigned short host_status;	/* [o] errors from host adapter */
-+	unsigned short driver_status;	/* [o] errors from software driver */
-+	compat_int_t resid;		/* [o] dxfer_len - actual_transferred */
-+	compat_uint_t duration;		/* [o] time taken by cmd (unit: millisec) */
-+	compat_uint_t info;		/* [o] auxiliary information */
-+};
++	if (disk->fops->ioctl)
++		return disk->fops->ioctl(bdev, mode, cmd,
++					 (unsigned long)compat_ptr(arg));
++
++	return -ENOIOCTLCMD;
++}
++EXPORT_SYMBOL(blkdev_compat_ptr_ioctl);
 +#endif
 +
- #define SG_INTERFACE_ID_ORIG 'S'
+ static int blkdev_pr_register(struct block_device *bdev,
+ 		struct pr_registration __user *arg)
+ {
+diff --git a/include/linux/blkdev.h b/include/linux/blkdev.h
+index 47eb22a3b7f9..3e0408618da7 100644
+--- a/include/linux/blkdev.h
++++ b/include/linux/blkdev.h
+@@ -1711,6 +1711,13 @@ struct block_device_operations {
+ 	const struct pr_ops *pr_ops;
+ };
  
- /* Use negative values to flag difference from original sg_header structure */
++#ifdef CONFIG_COMPAT
++extern int blkdev_compat_ptr_ioctl(struct block_device *, fmode_t,
++				      unsigned int, unsigned long);
++#else
++#define blkdev_compat_ptr_ioctl NULL
++#endif
++
+ extern int __blkdev_driver_ioctl(struct block_device *, fmode_t, unsigned int,
+ 				 unsigned long);
+ extern int bdev_read_page(struct block_device *, sector_t, struct page *);
 -- 
 2.20.0
 
