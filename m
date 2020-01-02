@@ -2,481 +2,283 @@ Return-Path: <SRS0=T2Jf=2X=vger.kernel.org=linux-block-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-9.8 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
-	INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,
-	USER_AGENT_GIT autolearn=ham autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-0.9 required=3.0 tests=DKIM_SIGNED,DKIM_VALID,
+	DKIM_VALID_AU,HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SPF_HELO_NONE,
+	SPF_PASS autolearn=no autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id A5456C2D0DC
-	for <linux-block@archiver.kernel.org>; Thu,  2 Jan 2020 15:04:50 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id BDA1DC3276D
+	for <linux-block@archiver.kernel.org>; Thu,  2 Jan 2020 15:27:50 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.kernel.org (Postfix) with ESMTP id 7857C20848
-	for <linux-block@archiver.kernel.org>; Thu,  2 Jan 2020 15:04:50 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id 865F220848
+	for <linux-block@archiver.kernel.org>; Thu,  2 Jan 2020 15:27:50 +0000 (UTC)
+Authentication-Results: mail.kernel.org;
+	dkim=pass (2048-bit key) header.d=cloud.ionos.com header.i=@cloud.ionos.com header.b="V2qRdo33"
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1728723AbgABPEt (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Thu, 2 Jan 2020 10:04:49 -0500
-Received: from mout.kundenserver.de ([212.227.126.130]:56953 "EHLO
-        mout.kundenserver.de" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1728655AbgABPEt (ORCPT
-        <rfc822;linux-block@vger.kernel.org>); Thu, 2 Jan 2020 10:04:49 -0500
-Received: from threadripper.lan ([149.172.19.189]) by mrelayeu.kundenserver.de
- (mreue011 [212.227.15.129]) with ESMTPA (Nemesis) id
- 1MvazO-1jcNUc31vC-00siAv; Thu, 02 Jan 2020 16:04:32 +0100
-From:   Arnd Bergmann <arnd@arndb.de>
-To:     "James E.J. Bottomley" <jejb@linux.ibm.com>,
-        "Martin K. Petersen" <martin.petersen@oracle.com>
-Cc:     Arnd Bergmann <arnd@arndb.de>, Jens Axboe <axboe@kernel.dk>,
-        Jan Kara <jack@suse.cz>,
-        Chaitanya Kulkarni <chaitanya.kulkarni@wdc.com>,
-        =?UTF-8?q?Javier=20Gonz=C3=A1lez?= <javier@javigon.com>,
-        Ajay Joshi <ajay.joshi@wdc.com>, linux-block@vger.kernel.org,
-        linux-kernel@vger.kernel.org
-Subject: [PATCH v3 21/22] compat_ioctl: simplify up block/ioctl.c
-Date:   Thu,  2 Jan 2020 15:55:39 +0100
-Message-Id: <20200102145552.1853992-22-arnd@arndb.de>
-X-Mailer: git-send-email 2.20.0
-In-Reply-To: <20200102145552.1853992-1-arnd@arndb.de>
-References: <20200102145552.1853992-1-arnd@arndb.de>
+        id S1728680AbgABP1u (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Thu, 2 Jan 2020 10:27:50 -0500
+Received: from mail-io1-f67.google.com ([209.85.166.67]:33175 "EHLO
+        mail-io1-f67.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S1728561AbgABP1t (ORCPT
+        <rfc822;linux-block@vger.kernel.org>); Thu, 2 Jan 2020 10:27:49 -0500
+Received: by mail-io1-f67.google.com with SMTP id z8so38592003ioh.0
+        for <linux-block@vger.kernel.org>; Thu, 02 Jan 2020 07:27:48 -0800 (PST)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=cloud.ionos.com; s=google;
+        h=mime-version:references:in-reply-to:from:date:message-id:subject:to
+         :cc;
+        bh=XuGmkaJu1UfI6YMMJvZiG3h7yvuBPE+FwkjyCnxeW3U=;
+        b=V2qRdo33wQH3K9VbyDnzZ9lHZVq4OZwJU17msFoJlUrkekDpMW8uH1334NGxtlDJH3
+         MdUCQ0QCWQYu38n4OoC3LLWma9ShVdtXKpNZ9CeyfG/qTHcnIqVE7jZAyZpBAZa8CMMW
+         BRLixdyyle+h2Aj3VhPdvYqcC85AePbSphM0f0Be3DRfIokLoz8EnJ85QLuyGPE+EyS1
+         9vQer/ZU3ke+AO6gneI9BjIcGauPI5QB4SLWrIcZAyE3iAcCNlsQ5t9NORTR4sfG0r5b
+         BYY08sxVcAie5qidPp4GkfgRxtWo/otTLIqEREfpxA4NFUKRJvQH+FhOZ2pSL7KsP3ZJ
+         FqSQ==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20161025;
+        h=x-gm-message-state:mime-version:references:in-reply-to:from:date
+         :message-id:subject:to:cc;
+        bh=XuGmkaJu1UfI6YMMJvZiG3h7yvuBPE+FwkjyCnxeW3U=;
+        b=DtQANa4n8V0wUxtpNNQLzzE5yaL9wyEFU9vwoAcdj/CKypRensaXnSMSjAzERdmMii
+         /LOPiuOMkRcznIQEtMIpLs9qtu/ir9pyBkWHAQhMtquwgCPFiDUkv6td5LEaFtobZi2k
+         gol+6iiYvUtQvueL98fVPrpe8NbzFj7lmDiYIYgRDKOmAMvzJnv2mB8NUNfHtvLynS/o
+         5bImuUfVX4C2Cjnx1pKiLM8x8Q3ACpNDO9rktBG7sx8FIXuW0fLosYGOqjKu8UtFfdsm
+         PR6O7ST7m6VErnN9jr9pbgBnzOgtHJTrzck69UWpAe8/Q3SOfLABxODFIytiuIO5+EPr
+         l0zg==
+X-Gm-Message-State: APjAAAVZ2JeS3PjEzIAL6SsSULqXembwSvcOqv6IYKGLzB7GxqEk5r1X
+        RBGp52t+IeNnwkpV+Yjn221CRFJoPyR/n9nbtcbAtg==
+X-Google-Smtp-Source: APXvYqxfMEEVrQIhsuKukYdR8w0Qg4Kv4C022IoSpGwR8Ko29fB7ufz5BZGQHsEFtBLAvm++FQ5TsRMw85Zouo2Zwqc=
+X-Received: by 2002:a02:a610:: with SMTP id c16mr64226215jam.13.1577978868146;
+ Thu, 02 Jan 2020 07:27:48 -0800 (PST)
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
-X-Provags-ID: V03:K1:B4Fh0GjnWw4L91lIqSeGoYU/IDbi9IpD5S0mu86IQo8id2AcYHQ
- T2kPry3perMpHqhDWFKLXuP/pr6xUTF7uaa2TxDIxavXMjf3SXj6Vwq6zg8FnJPGi0p72/C
- dbMLZ+fLowuN90CSEzcc2b226j2NNbSDmK5t9HbpYYBlWwgOo+l/EjJtE02E8E+omB6WGzN
- +5SmvPJYvzsPKz4XisoQg==
-X-UI-Out-Filterresults: notjunk:1;V03:K0:DxkPszahlxI=:H95Wx14ZxHniHx35fHkqqk
- 24yzenpzgTQKx58QV0bw4Fma0ZfQFOjNt3+GFeqrf1ymxg/Tnet1S7GuR2zQUh3JjTGN38Fit
- MwwY6oDSwQserGKWVCTTkAHf2iHgcHIvQCh/B9N6g8FPW3/0SD8WN+v92sJm3ouzP2fheN/0j
- OgU07mqXo16oDR1vMrNauWNqvp8Doy9FCdl3tUyjJQ1DOVhi+RD+pY3E+iJfaLe1OS/6EdR3d
- nNwaZ5HlTeITHJw4d8TFyBPyCNmElV/mAgjrMeYniKYO2WPpV4nur2mXyRHWc414GJAbRcLvh
- j6SndLSOnZgrUlrq/MIO8hK2NPJ7dRA9YqnkHRasvqPMrDFdRgHZHzb6EAVtziv1FM++MHNUx
- QhdQA+t0PvkzsJMAAU6FOgChOuOPTGqD3Pe8seaiM3ueUAq1uj9vckWxa6BVUtntHffKf4CXf
- C8C4O0NhECwo0AF94fpQvUcMDxvPjL1FGKG2l+Agu0NwmKECPm82VuSaXj2Jgai5VExPhiV38
- hQkkPwiyEj3YkFNHe+sld2aR4G2kKsdUo1i5l9EkDUrocVRv4nbsxof1lQf/wNNU+4IfasxTJ
- Het71rcx5lM793gyZfJm142RZtMcDbvKwXL/egHkbV2+ZwT/p4BajTABfU5UHrDaUk3tAC9kt
- tUekkgQ2QimImvEOFW+YaEqiK18PN23cJx/zWFyqSLthio76f2QbJUQQMi0BPl1oLY/l5y8+/
- gffvFGpjl3vHCDMLfVyR8r07zcJ2EPc9CYQh0KyNa7uMC3HE0Kbse/g55PsxXdU9D5weMXQFJ
- m1ZBWO68Jf9AUY7G2C07d0vXxOKb+LJjj2hBqYTNc7R6z9ReTDgdPbEPvkUzuAQEkhIdsdIvh
- ENgi58A1Qu+3Cdlz5DUA==
+References: <20191230102942.18395-1-jinpuwang@gmail.com> <20191230102942.18395-4-jinpuwang@gmail.com>
+ <b13eccdd-09a2-70d5-1c78-3c4dbf1aefe8@acm.org>
+In-Reply-To: <b13eccdd-09a2-70d5-1c78-3c4dbf1aefe8@acm.org>
+From:   Jinpu Wang <jinpu.wang@cloud.ionos.com>
+Date:   Thu, 2 Jan 2020 16:27:37 +0100
+Message-ID: <CAMGffEmC3T9M+RmeOXX4ecE3E01azjD8fz2Lz8kHC9Ff-Xx-Aw@mail.gmail.com>
+Subject: Re: [PATCH v6 03/25] rtrs: private headers with rtrs protocol structs
+ and helpers
+To:     Bart Van Assche <bvanassche@acm.org>
+Cc:     Jack Wang <jinpuwang@gmail.com>, linux-block@vger.kernel.org,
+        linux-rdma@vger.kernel.org, Jens Axboe <axboe@kernel.dk>,
+        Christoph Hellwig <hch@infradead.org>,
+        Sagi Grimberg <sagi@grimberg.me>,
+        Leon Romanovsky <leon@kernel.org>,
+        Doug Ledford <dledford@redhat.com>,
+        Danil Kipnis <danil.kipnis@cloud.ionos.com>, rpenyaev@suse.de
+Content-Type: text/plain; charset="UTF-8"
 Sender: linux-block-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-Having separate implementations of blkdev_ioctl() often leads to these
-getting out of sync, despite the comment at the top.
+On Mon, Dec 30, 2019 at 8:48 PM Bart Van Assche <bvanassche@acm.org> wrote:
+>
+> On 2019-12-30 02:29, Jack Wang wrote:
+> > + * InfiniBand Transport Layer
+>
+> Is RTRS an InfiniBand or an RDMA transport layer?
+The later,  will fix.
+>
+> > +#define rtrs_prefix(obj) (obj->sessname)
+>
+> Is it really worth it to introduce a macro for accessing a single member
+> of a single pointer?
+maybe not, will remove.
+>
+> > + * InfiniBand Transport Layer
+>
+> Same question here: is RTRS an InfiniBand or an RDMA transport layer?
+will fix.
 
-Since most of the ioctl commands are compatible, and we try very hard
-not to add any new incompatible ones, move all the common bits into a
-shared function and leave only the ones that are historically different
-in separate functions for native/compat mode.
+>
+> > +enum {
+> > +     SERVICE_CON_QUEUE_DEPTH = 512,
+>
+> What is a service connection?
+s/SERVICE_CON_QUEUE_DEPTH/CON_QUEUE_DEPTH/g, do you think
+CON_QUEUE_DEPTH is better or just QUEUE_DEPTH?
+>
+> > +     /*
+> > +      * With the current size of the tag allocated on the client, 4K
+> > +      * is the maximum number of tags we can allocate.  This number is
+> > +      * also used on the client to allocate the IU for the user connection
+> > +      * to receive the RDMA addresses from the server.
+> > +      */
+>
+> What does the word 'tag' mean in the context of the RTRS protocol?
+should be struct rtrs_permit, will fix.
+>
+> > +struct rtrs_ib_dev;
+>
+> What does the "rtrs_ib_dev" data structure represent? Additionally, I
+> think it's confusing that a single name has an "r" that refers to "RDMA"
+> and "ib" that refers to InfiniBand.
+Naming is hard, it's structure mainly to cache struct ib_device
+pointer and ib_pd pointer.
+more info can be found below, Roman did try to push it to upstream,
+see comment below.
+>
+> > +struct rtrs_ib_dev_pool {
+> > +     struct mutex            mutex;
+> > +     struct list_head        list;
+> > +     enum ib_pd_flags        pd_flags;
+> > +     const struct rtrs_ib_dev_pool_ops *ops;
+> > +};
+>
+> What is the purpose of an rtrs_ib_dev_pool and what does it contain?
+The idea was documented in the patchset here:
+https://www.spinics.net/lists/linux-rdma/msg64025.html
+"'
+This is an attempt to make a device pool API out of a common code,
+which caches pair of ib_device and ib_pd pointers. I found 4 places,
+where this common functionality can be replaced by some lib calls:
+nvme, nvmet, iser and isert. Total deduplication gain in loc is not
+quite significant, but eventually new ULP IB code can also require
+the same device/pd pair cache, e.g. in our IBTRS module the same
+code has to be repeated again, which was observed by Sagi and he
+suggested to make a common helper function instead of producing
+another copy.
+'''
 
-To deal with the compat_ptr() conversion, pass both the integer
-argument and the pointer argument into the new blkdev_common_ioctl()
-and make sure to always use the correct one of these.
+>
+> > +struct rtrs_iu {
+>
+> A comment that explains what the "iu" abbreviation stands for would be
+> welcome.
+ok.
+>
+> > +/**
+> > + * enum rtrs_msg_types - RTRS message types.
+> > + * @RTRS_MSG_INFO_REQ:               Client additional info request to the server
+> > + * @RTRS_MSG_INFO_RSP:               Server additional info response to the client
+> > + * @RTRS_MSG_WRITE:          Client writes data per RDMA to server
+> > + * @RTRS_MSG_READ:           Client requests data transfer from server
+> > + * @RTRS_MSG_RKEY_RSP:               Server refreshed rkey for rbuf
+> > + */
+>
+> What is "additional info" in this context?
+We have a bit more documentation in rtrs/README in patch 14,
+"'
+3. After all connections of a path are established client sends to server the
+RTRS_MSG_INFO_REQ message, containing the name of the session. This message
+requests the address information from the server.
 
-blkdev_ioctl() is now only kept as a separate exported interfact
-for drivers/char/raw.c, which lacks a compat_ioctl variant.
-We should probably either move raw.c to staging if there are no
-more users, or export blkdev_compat_ioctl() as well.
+4. Server replies to the session info request message with RTRS_MSG_INFO_RSP,
+which contains the addresses and keys of the RDMA buffers allocated for that
+session.
+"'
+>
+> > +/**
+> > + * struct rtrs_msg_conn_req - Client connection request to the server
+> > + * @magic:      RTRS magic
+> > + * @version:    RTRS protocol version
+> > + * @cid:        Current connection id
+> > + * @cid_num:    Number of connections per session
+> > + * @recon_cnt:          Reconnections counter
+> > + * @sess_uuid:          UUID of a session (path)
+> > + * @paths_uuid:         UUID of a group of sessions (paths)
+> > + *
+> > + * NOTE: max size 56 bytes, see man rdma_connect().
+> > + */
+> > +struct rtrs_msg_conn_req {
+> > +     u8              __cma_version; /* Is set to 0 by cma.c in case of
+> > +                                     * AF_IB, do not touch that.
+> > +                                     */
+> > +     u8              __ip_version;  /* On sender side that should be
+> > +                                     * set to 0, or cma_save_ip_info()
+> > +                                     * extract garbage and will fail.
+> > +                                     */
+>
+> The above two fields and the comments next to it look suspicious to me.
+> Does RTRS perhaps try to generate CMA-formatted messages without using
+> the CMA to format these messages?
+The problem is in cma_format_hdr over-writes the first byte for AF_IB
+https://www.spinics.net/lists/linux-rdma/msg22397.html
 
-Signed-off-by: Arnd Bergmann <arnd@arndb.de>
----
- block/ioctl.c | 269 ++++++++++++++++++++++----------------------------
- 1 file changed, 117 insertions(+), 152 deletions(-)
+No one fixes the problem since then.
 
-diff --git a/block/ioctl.c b/block/ioctl.c
-index d6911a1149f5..127194b9f9bd 100644
---- a/block/ioctl.c
-+++ b/block/ioctl.c
-@@ -270,65 +270,45 @@ static int blk_ioctl_zeroout(struct block_device *bdev, fmode_t mode,
- 			BLKDEV_ZERO_NOUNMAP);
- }
- 
--static int put_ushort(unsigned long arg, unsigned short val)
-+static int put_ushort(unsigned short __user *argp, unsigned short val)
- {
--	return put_user(val, (unsigned short __user *)arg);
-+	return put_user(val, argp);
- }
- 
--static int put_int(unsigned long arg, int val)
-+static int put_int(int __user *argp, int val)
- {
--	return put_user(val, (int __user *)arg);
-+	return put_user(val, argp);
- }
- 
--static int put_uint(unsigned long arg, unsigned int val)
-+static int put_uint(unsigned int __user *argp, unsigned int val)
- {
--	return put_user(val, (unsigned int __user *)arg);
-+	return put_user(val, argp);
- }
- 
--static int put_long(unsigned long arg, long val)
-+static int put_long(long __user *argp, long val)
- {
--	return put_user(val, (long __user *)arg);
-+	return put_user(val, argp);
- }
- 
--static int put_ulong(unsigned long arg, unsigned long val)
-+static int put_ulong(unsigned long __user *argp, unsigned long val)
- {
--	return put_user(val, (unsigned long __user *)arg);
-+	return put_user(val, argp);
- }
- 
--static int put_u64(unsigned long arg, u64 val)
-+static int put_u64(u64 __user *argp, u64 val)
- {
--	return put_user(val, (u64 __user *)arg);
-+	return put_user(val, argp);
- }
- 
- #ifdef CONFIG_COMPAT
--static int compat_put_ushort(unsigned long arg, unsigned short val)
-+static int compat_put_long(compat_long_t *argp, long val)
- {
--	return put_user(val, (unsigned short __user *)compat_ptr(arg));
-+	return put_user(val, argp);
- }
- 
--static int compat_put_int(unsigned long arg, int val)
-+static int compat_put_ulong(compat_ulong_t *argp, compat_ulong_t val)
- {
--	return put_user(val, (compat_int_t __user *)compat_ptr(arg));
--}
--
--static int compat_put_uint(unsigned long arg, unsigned int val)
--{
--	return put_user(val, (compat_uint_t __user *)compat_ptr(arg));
--}
--
--static int compat_put_long(unsigned long arg, long val)
--{
--	return put_user(val, (compat_long_t __user *)compat_ptr(arg));
--}
--
--static int compat_put_ulong(unsigned long arg, compat_ulong_t val)
--{
--	return put_user(val, (compat_ulong_t __user *)compat_ptr(arg));
--}
--
--static int compat_put_u64(unsigned long arg, u64 val)
--{
--	return put_user(val, (compat_u64 __user *)compat_ptr(arg));
-+	return put_user(val, argp);
- }
- #endif
- 
-@@ -547,9 +527,10 @@ struct compat_hd_geometry {
- 	u32 start;
- };
- 
--static int compat_hdio_getgeo(struct gendisk *disk, struct block_device *bdev,
--			struct compat_hd_geometry __user *ugeo)
-+static int compat_hdio_getgeo(struct block_device *bdev,
-+			      struct compat_hd_geometry __user *ugeo)
- {
-+	struct gendisk *disk = bdev->bd_disk;
- 	struct hd_geometry geo;
- 	int ret;
- 
-@@ -603,13 +584,13 @@ static int blkdev_bszset(struct block_device *bdev, fmode_t mode,
- }
- 
- /*
-- * always keep this in sync with compat_blkdev_ioctl()
-+ * Common commands that are handled the same way on native and compat
-+ * user space. Note the separate arg/argp parameters that are needed
-+ * to deal with the compat_ptr() conversion.
-  */
--int blkdev_ioctl(struct block_device *bdev, fmode_t mode, unsigned cmd,
--			unsigned long arg)
-+static int blkdev_common_ioctl(struct block_device *bdev, fmode_t mode,
-+				unsigned cmd, unsigned long arg, void __user *argp)
- {
--	void __user *argp = (void __user *)arg;
--	loff_t size;
- 	unsigned int max_sectors;
- 
- 	switch (cmd) {
-@@ -632,60 +613,39 @@ int blkdev_ioctl(struct block_device *bdev, fmode_t mode, unsigned cmd,
- 	case BLKFINISHZONE:
- 		return blkdev_zone_mgmt_ioctl(bdev, mode, cmd, arg);
- 	case BLKGETZONESZ:
--		return put_uint(arg, bdev_zone_sectors(bdev));
-+		return put_uint(argp, bdev_zone_sectors(bdev));
- 	case BLKGETNRZONES:
--		return put_uint(arg, blkdev_nr_zones(bdev->bd_disk));
--	case HDIO_GETGEO:
--		return blkdev_getgeo(bdev, argp);
--	case BLKRAGET:
--	case BLKFRAGET:
--		if (!arg)
--			return -EINVAL;
--		return put_long(arg, (bdev->bd_bdi->ra_pages*PAGE_SIZE) / 512);
-+		return put_uint(argp, blkdev_nr_zones(bdev->bd_disk));
- 	case BLKROGET:
--		return put_int(arg, bdev_read_only(bdev) != 0);
--	case BLKBSZGET: /* get block device soft block size (cf. BLKSSZGET) */
--		return put_int(arg, block_size(bdev));
-+		return put_int(argp, bdev_read_only(bdev) != 0);
- 	case BLKSSZGET: /* get block device logical block size */
--		return put_int(arg, bdev_logical_block_size(bdev));
-+		return put_int(argp, bdev_logical_block_size(bdev));
- 	case BLKPBSZGET: /* get block device physical block size */
--		return put_uint(arg, bdev_physical_block_size(bdev));
-+		return put_uint(argp, bdev_physical_block_size(bdev));
- 	case BLKIOMIN:
--		return put_uint(arg, bdev_io_min(bdev));
-+		return put_uint(argp, bdev_io_min(bdev));
- 	case BLKIOOPT:
--		return put_uint(arg, bdev_io_opt(bdev));
-+		return put_uint(argp, bdev_io_opt(bdev));
- 	case BLKALIGNOFF:
--		return put_int(arg, bdev_alignment_offset(bdev));
-+		return put_int(argp, bdev_alignment_offset(bdev));
- 	case BLKDISCARDZEROES:
--		return put_uint(arg, 0);
-+		return put_uint(argp, 0);
- 	case BLKSECTGET:
- 		max_sectors = min_t(unsigned int, USHRT_MAX,
- 				    queue_max_sectors(bdev_get_queue(bdev)));
--		return put_ushort(arg, max_sectors);
-+		return put_ushort(argp, max_sectors);
- 	case BLKROTATIONAL:
--		return put_ushort(arg, !blk_queue_nonrot(bdev_get_queue(bdev)));
-+		return put_ushort(argp, !blk_queue_nonrot(bdev_get_queue(bdev)));
- 	case BLKRASET:
- 	case BLKFRASET:
- 		if(!capable(CAP_SYS_ADMIN))
- 			return -EACCES;
- 		bdev->bd_bdi->ra_pages = (arg * 512) / PAGE_SIZE;
- 		return 0;
--	case BLKBSZSET:
--		return blkdev_bszset(bdev, mode, argp);
--	case BLKPG:
--		return blkpg_ioctl(bdev, argp);
- 	case BLKRRPART:
- 		return blkdev_reread_part(bdev);
--	case BLKGETSIZE:
--		size = i_size_read(bdev->bd_inode);
--		if ((size >> 9) > ~0UL)
--			return -EFBIG;
--		return put_ulong(arg, size >> 9);
--	case BLKGETSIZE64:
--		return put_u64(arg, i_size_read(bdev->bd_inode));
- 	case BLKTRACESTART:
- 	case BLKTRACESTOP:
--	case BLKTRACESETUP:
- 	case BLKTRACETEARDOWN:
- 		return blk_trace_ioctl(bdev, cmd, argp);
- 	case IOC_PR_REGISTER:
-@@ -701,12 +661,67 @@ int blkdev_ioctl(struct block_device *bdev, fmode_t mode, unsigned cmd,
- 	case IOC_PR_CLEAR:
- 		return blkdev_pr_clear(bdev, argp);
- 	default:
--		return __blkdev_driver_ioctl(bdev, mode, cmd, arg);
-+		return -ENOIOCTLCMD;
- 	}
- }
--EXPORT_SYMBOL_GPL(blkdev_ioctl);
-+
-+/*
-+ * Always keep this in sync with compat_blkdev_ioctl()
-+ * to handle all incompatible commands in both functions.
-+ *
-+ * New commands must be compatible and go into blkdev_common_ioctl
-+ */
-+int blkdev_ioctl(struct block_device *bdev, fmode_t mode, unsigned cmd,
-+			unsigned long arg)
-+{
-+	int ret;
-+	loff_t size;
-+	void __user *argp = (void __user *)arg;
-+
-+	switch (cmd) {
-+	/* These need separate implementations for the data structure */
-+	case HDIO_GETGEO:
-+		return blkdev_getgeo(bdev, argp);
-+	case BLKPG:
-+		return blkpg_ioctl(bdev, argp);
-+
-+	/* Compat mode returns 32-bit data instead of 'long' */
-+	case BLKRAGET:
-+	case BLKFRAGET:
-+		if (!argp)
-+			return -EINVAL;
-+		return put_long(argp, (bdev->bd_bdi->ra_pages*PAGE_SIZE) / 512);
-+	case BLKGETSIZE:
-+		size = i_size_read(bdev->bd_inode);
-+		if ((size >> 9) > ~0UL)
-+			return -EFBIG;
-+		return put_ulong(argp, size >> 9);
-+
-+	/* The data is compatible, but the command number is different */
-+	case BLKBSZGET: /* get block device soft block size (cf. BLKSSZGET) */
-+		return put_int(argp, block_size(bdev));
-+	case BLKBSZSET:
-+		return blkdev_bszset(bdev, mode, argp);
-+	case BLKGETSIZE64:
-+		return put_u64(argp, i_size_read(bdev->bd_inode));
-+
-+	/* Incompatible alignment on i386 */
-+	case BLKTRACESETUP:
-+		return blk_trace_ioctl(bdev, cmd, argp);
-+	default:
-+		break;
-+	}
-+
-+	ret = blkdev_common_ioctl(bdev, mode, cmd, arg, argp);
-+	if (ret == -ENOIOCTLCMD)
-+		return __blkdev_driver_ioctl(bdev, mode, cmd, arg);
-+
-+	return ret;
-+}
-+EXPORT_SYMBOL_GPL(blkdev_ioctl); /* for /dev/raw */
- 
- #ifdef CONFIG_COMPAT
-+
- #define BLKBSZGET_32		_IOR(0x12, 112, int)
- #define BLKBSZSET_32		_IOW(0x12, 113, int)
- #define BLKGETSIZE64_32		_IOR(0x12, 114, int)
-@@ -716,13 +731,13 @@ EXPORT_SYMBOL_GPL(blkdev_ioctl);
-    ENOIOCTLCMD for unknown ioctls. */
- long compat_blkdev_ioctl(struct file *file, unsigned cmd, unsigned long arg)
- {
--	int ret = -ENOIOCTLCMD;
-+	int ret;
-+	void __user *argp = compat_ptr(arg);
- 	struct inode *inode = file->f_mapping->host;
- 	struct block_device *bdev = inode->i_bdev;
- 	struct gendisk *disk = bdev->bd_disk;
- 	fmode_t mode = file->f_mode;
- 	loff_t size;
--	unsigned int max_sectors;
- 
- 	/*
- 	 * O_NDELAY can be altered using fcntl(.., F_SETFL, ..), so we have
-@@ -734,94 +749,44 @@ long compat_blkdev_ioctl(struct file *file, unsigned cmd, unsigned long arg)
- 		mode &= ~FMODE_NDELAY;
- 
- 	switch (cmd) {
-+	/* These need separate implementations for the data structure */
- 	case HDIO_GETGEO:
--		return compat_hdio_getgeo(disk, bdev, compat_ptr(arg));
--	case BLKPBSZGET:
--		return compat_put_uint(arg, bdev_physical_block_size(bdev));
--	case BLKIOMIN:
--		return compat_put_uint(arg, bdev_io_min(bdev));
--	case BLKIOOPT:
--		return compat_put_uint(arg, bdev_io_opt(bdev));
--	case BLKALIGNOFF:
--		return compat_put_int(arg, bdev_alignment_offset(bdev));
--	case BLKDISCARDZEROES:
--		return compat_put_uint(arg, 0);
--	case BLKFLSBUF:
--	case BLKROSET:
--	case BLKDISCARD:
--	case BLKSECDISCARD:
--	case BLKZEROOUT:
--	/*
--	 * the ones below are implemented in blkdev_locked_ioctl,
--	 * but we call blkdev_ioctl, which gets the lock for us
--	 */
--	case BLKRRPART:
--	case BLKREPORTZONE:
--	case BLKRESETZONE:
--	case BLKOPENZONE:
--	case BLKCLOSEZONE:
--	case BLKFINISHZONE:
--	case BLKGETZONESZ:
--	case BLKGETNRZONES:
--		return blkdev_ioctl(bdev, mode, cmd,
--				(unsigned long)compat_ptr(arg));
--	case BLKBSZSET_32:
--		return blkdev_ioctl(bdev, mode, BLKBSZSET,
--				(unsigned long)compat_ptr(arg));
-+		return compat_hdio_getgeo(bdev, argp);
- 	case BLKPG:
--		return compat_blkpg_ioctl(bdev, compat_ptr(arg));
-+		return compat_blkpg_ioctl(bdev, argp);
-+
-+	/* Compat mode returns 32-bit data instead of 'long' */
- 	case BLKRAGET:
- 	case BLKFRAGET:
--		if (!arg)
-+		if (!argp)
- 			return -EINVAL;
--		return compat_put_long(arg,
-+		return compat_put_long(argp,
- 			       (bdev->bd_bdi->ra_pages * PAGE_SIZE) / 512);
--	case BLKROGET: /* compatible */
--		return compat_put_int(arg, bdev_read_only(bdev) != 0);
--	case BLKBSZGET_32: /* get the logical block size (cf. BLKSSZGET) */
--		return compat_put_int(arg, block_size(bdev));
--	case BLKSSZGET: /* get block device hardware sector size */
--		return compat_put_int(arg, bdev_logical_block_size(bdev));
--	case BLKSECTGET:
--		max_sectors = min_t(unsigned int, USHRT_MAX,
--				    queue_max_sectors(bdev_get_queue(bdev)));
--		return compat_put_ushort(arg, max_sectors);
--	case BLKROTATIONAL:
--		return compat_put_ushort(arg,
--					 !blk_queue_nonrot(bdev_get_queue(bdev)));
--	case BLKRASET: /* compatible, but no compat_ptr (!) */
--	case BLKFRASET:
--		if (!capable(CAP_SYS_ADMIN))
--			return -EACCES;
--		bdev->bd_bdi->ra_pages = (arg * 512) / PAGE_SIZE;
--		return 0;
- 	case BLKGETSIZE:
- 		size = i_size_read(bdev->bd_inode);
- 		if ((size >> 9) > ~0UL)
- 			return -EFBIG;
--		return compat_put_ulong(arg, size >> 9);
-+		return compat_put_ulong(argp, size >> 9);
- 
-+	/* The data is compatible, but the command number is different */
-+	case BLKBSZGET_32: /* get the logical block size (cf. BLKSSZGET) */
-+		return put_int(argp, bdev_logical_block_size(bdev));
-+	case BLKBSZSET_32:
-+		return blkdev_bszset(bdev, mode, argp);
- 	case BLKGETSIZE64_32:
--		return compat_put_u64(arg, i_size_read(bdev->bd_inode));
-+		return put_u64(argp, i_size_read(bdev->bd_inode));
- 
-+	/* Incompatible alignment on i386 */
- 	case BLKTRACESETUP32:
--	case BLKTRACESTART: /* compatible */
--	case BLKTRACESTOP:  /* compatible */
--	case BLKTRACETEARDOWN: /* compatible */
--		ret = blk_trace_ioctl(bdev, cmd, compat_ptr(arg));
--		return ret;
--	case IOC_PR_REGISTER:
--	case IOC_PR_RESERVE:
--	case IOC_PR_RELEASE:
--	case IOC_PR_PREEMPT:
--	case IOC_PR_PREEMPT_ABORT:
--	case IOC_PR_CLEAR:
--		return blkdev_ioctl(bdev, mode, cmd,
--				(unsigned long)compat_ptr(arg));
-+		return blk_trace_ioctl(bdev, cmd, argp);
- 	default:
--		if (disk->fops->compat_ioctl)
--			ret = disk->fops->compat_ioctl(bdev, mode, cmd, arg);
--		return ret;
-+		break;
- 	}
-+
-+	ret = blkdev_common_ioctl(bdev, mode, cmd, arg, argp);
-+	if (ret == -ENOIOCTLCMD && disk->fops->compat_ioctl)
-+		ret = disk->fops->compat_ioctl(bdev, mode, cmd, arg);
-+
-+	return ret;
- }
- #endif
--- 
-2.20.0
+>
+> > +     u8              reserved[12];
+>
+> Please leave out the reserved data. If future versions of the protocol
+> would need any of these bytes it is easy to add more data to this structure.
+Sorry, we can't do that, as I explained in the past, we have code
+running in production and
+there are checks expecting the size the of message are the same, it
+will make the transition
+to upstream version in the future a lot harder if we change the size
+of the controll message.
+>
+> > +/**
+> > + * struct rtrs_msg_conn_rsp - Server connection response to the client
+> > + * @magic:      RTRS magic
+> > + * @version:    RTRS protocol version
+> > + * @errno:      If rdma_accept() then 0, if rdma_reject() indicates error
+> > + * @queue_depth:   max inflight messages (queue-depth) in this session
+> > + * @max_io_size:   max io size server supports
+> > + * @max_hdr_size:  max msg header size server supports
+> > + *
+> > + * NOTE: size is 56 bytes, max possible is 136 bytes, see man rdma_accept().
+> > + */
+> > +struct rtrs_msg_conn_rsp {
+> > +     __le16          magic;
+> > +     __le16          version;
+> > +     __le16          errno;
+> > +     __le16          queue_depth;
+> > +     __le32          max_io_size;
+> > +     __le32          max_hdr_size;
+> > +     __le32          flags;
+> > +     u8              reserved[36];
+> > +};
+>
+> Same comment here: please leave out the "reserved[]" array. Sending a
+> bunch of zero-bytes at the end of a message over the wire is not useful.
+same here.
+>
+> > +static inline void rtrs_from_imm(u32 imm, u32 *type, u32 *payload)
+> > +{
+> > +     *payload = (imm & MAX_IMM_PAYL_MASK);
+> > +     *type = (imm >> MAX_IMM_PAYL_BITS);
+> > +}
+>
+> Please do not use parentheses when not necessary. Such superfluous
+> parentheses namely hurt readability of the code.
+ok, will remove.
+>
+> > +     type = (w_inval ? RTRS_IO_RSP_W_INV_IMM : RTRS_IO_RSP_IMM);
+>
+> Same comment here: I think the parentheses can be left out from the
+> above statement.
+ok, will remove
+>
+> > +static inline void rtrs_from_io_rsp_imm(u32 payload, u32 *msg_id, int *errno)
+> > +{
+> > +     /* 9 bits for errno, 19 bits for msg_id */
+> > +     *msg_id = (payload & 0x7ffff);
+>
+> Are the parentheses in the above expression necessary?
+will remove.
+>
+> > +     *errno = -(int)((payload >> 19) & 0x1ff);
+>
+> Is the '(int)' cast useful in the above expression? Can it be left out?
+I think it's necessary, and make it more clear errno is a negative int
+value, isn't it?
 
+>
+> > +#define STAT_ATTR(type, stat, print, reset)                          \
+> > +STAT_STORE_FUNC(type, stat, reset)                                   \
+> > +STAT_SHOW_FUNC(type, stat, print)                                    \
+> > +static struct kobj_attribute stat##_attr =                           \
+> > +             __ATTR(stat, 0644,                                      \
+> > +                    stat##_show,                                     \
+> > +                    stat##_store)
+>
+> Is the above use of __ATTR() perhaps an open-coded version of __ATTR_RW()?
+right, will use __ATTR_RW() instead.
+>
+> Thanks,
+>
+> Bart.
+Thanks Bart!
