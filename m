@@ -4,95 +4,94 @@ X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 X-Spam-Level: 
 X-Spam-Status: No, score=-0.9 required=3.0 tests=DKIMWL_WL_HIGH,DKIM_SIGNED,
 	DKIM_VALID,DKIM_VALID_AU,HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,
-	SPF_HELO_NONE,SPF_PASS autolearn=no autolearn_force=no version=3.4.0
+	SPF_HELO_NONE,SPF_PASS,UNPARSEABLE_RELAY autolearn=no autolearn_force=no
+	version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 2AB84C3276C
-	for <linux-block@archiver.kernel.org>; Fri,  3 Jan 2020 00:23:27 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id D1E6BC32771
+	for <linux-block@archiver.kernel.org>; Fri,  3 Jan 2020 03:03:36 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.kernel.org (Postfix) with ESMTP id DCC47222C3
-	for <linux-block@archiver.kernel.org>; Fri,  3 Jan 2020 00:23:26 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id A88DC24649
+	for <linux-block@archiver.kernel.org>; Fri,  3 Jan 2020 03:03:36 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=pass (1024-bit key) header.d=amazon.com header.i=@amazon.com header.b="Len6NRcY"
+	dkim=pass (2048-bit key) header.d=oracle.com header.i=@oracle.com header.b="R/1jD1Nn"
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1726083AbgACAX0 (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Thu, 2 Jan 2020 19:23:26 -0500
-Received: from smtp-fw-33001.amazon.com ([207.171.190.10]:22838 "EHLO
-        smtp-fw-33001.amazon.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1725900AbgACAX0 (ORCPT
-        <rfc822;linux-block@vger.kernel.org>); Thu, 2 Jan 2020 19:23:26 -0500
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-  d=amazon.com; i=@amazon.com; q=dns/txt; s=amazon201209;
-  t=1578011005; x=1609547005;
-  h=from:to:cc:subject:date:message-id:references:
-   in-reply-to:content-id:content-transfer-encoding:
-   mime-version;
-  bh=nxNZvIi52VletypUSupLtShqS3EDyEFQMmbPqmMqXZ8=;
-  b=Len6NRcYs5P89q6NJqy93mJuNU0xp/onldrQAYhkRJ4CyGXTx2Wcsnmh
-   VO6mvahvCgLolsagBPuJmHI2TABQezBvRKfIIY+hztsbDJITaCB7RnPI1
-   CXCiggL1A7JJCxf+xXhwqkNrexR8BtDYkYXpmDGi0mT160UmzoUF6Sq/a
-   k=;
-IronPort-SDR: OD7PnJDvlniTzMV0V0Hj/1cIoEAOJpJQCZL8f6Wz3oOiOrbnPC9FRXpTKY/XKr6gCm4ZubRc2I
- ys6RXunBn6JA==
-X-IronPort-AV: E=Sophos;i="5.69,388,1571702400"; 
-   d="scan'208";a="17920676"
-Received: from sea32-co-svc-lb4-vlan3.sea.corp.amazon.com (HELO email-inbound-relay-1a-67b371d8.us-east-1.amazon.com) ([10.47.23.38])
-  by smtp-border-fw-out-33001.sea14.amazon.com with ESMTP; 03 Jan 2020 00:23:14 +0000
-Received: from EX13MTAUWB001.ant.amazon.com (iad55-ws-svc-p15-lb9-vlan3.iad.amazon.com [10.40.159.166])
-        by email-inbound-relay-1a-67b371d8.us-east-1.amazon.com (Postfix) with ESMTPS id C518EA209A;
-        Fri,  3 Jan 2020 00:23:11 +0000 (UTC)
-Received: from EX13D11UWB001.ant.amazon.com (10.43.161.53) by
- EX13MTAUWB001.ant.amazon.com (10.43.161.207) with Microsoft SMTP Server (TLS)
- id 15.0.1367.3; Fri, 3 Jan 2020 00:23:11 +0000
-Received: from EX13D01UWB002.ant.amazon.com (10.43.161.136) by
- EX13D11UWB001.ant.amazon.com (10.43.161.53) with Microsoft SMTP Server (TLS)
- id 15.0.1367.3; Fri, 3 Jan 2020 00:23:10 +0000
-Received: from EX13D01UWB002.ant.amazon.com ([10.43.161.136]) by
- EX13d01UWB002.ant.amazon.com ([10.43.161.136]) with mapi id 15.00.1367.000;
- Fri, 3 Jan 2020 00:23:10 +0000
-From:   "Singh, Balbir" <sblbir@amazon.com>
-To:     "linux-kernel@vger.kernel.org" <linux-kernel@vger.kernel.org>,
-        "Chaitanya.Kulkarni@wdc.com" <Chaitanya.Kulkarni@wdc.com>,
-        "linux-block@vger.kernel.org" <linux-block@vger.kernel.org>,
-        "linux-nvme@lists.infradead.org" <linux-nvme@lists.infradead.org>
-CC:     "hch@lst.de" <hch@lst.de>,
-        "jejb@linux.ibm.com" <jejb@linux.ibm.com>,
-        "mst@redhat.com" <mst@redhat.com>,
-        "axboe@kernel.dk" <axboe@kernel.dk>,
-        "Sangaraju, Someswarudu" <ssomesh@amazon.com>
-Subject: Re: [resend v1 5/5] drivers/scsi/sd.c: Convert to use
- disk_set_capacity
-Thread-Topic: [resend v1 5/5] drivers/scsi/sd.c: Convert to use
- disk_set_capacity
-Thread-Index: AQHVwUG2bzD2dJjWXU+Xwn7M8hFup6fYFXCA
-Date:   Fri, 3 Jan 2020 00:23:10 +0000
-Message-ID: <804eef7a517fb93f5bdc3986515bb8f2b845681f.camel@amazon.com>
-References: <20200102075315.22652-1-sblbir@amazon.com>
-         <20200102075315.22652-6-sblbir@amazon.com>
-         <BYAPR04MB57496B5D29688B7DA14F53DB86200@BYAPR04MB5749.namprd04.prod.outlook.com>
-In-Reply-To: <BYAPR04MB57496B5D29688B7DA14F53DB86200@BYAPR04MB5749.namprd04.prod.outlook.com>
-Accept-Language: en-GB, en-US
-Content-Language: en-US
-X-MS-Has-Attach: 
-X-MS-TNEF-Correlator: 
-x-ms-exchange-messagesentrepresentingtype: 1
-x-ms-exchange-transport-fromentityheader: Hosted
-x-originating-ip: [10.43.162.133]
-Content-Type: text/plain; charset="utf-8"
-Content-ID: <02240C7601AC7C4CA288FB856F429E7A@amazon.com>
-Content-Transfer-Encoding: base64
+        id S1727388AbgACDDc (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Thu, 2 Jan 2020 22:03:32 -0500
+Received: from userp2120.oracle.com ([156.151.31.85]:60482 "EHLO
+        userp2120.oracle.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S1726481AbgACDDc (ORCPT
+        <rfc822;linux-block@vger.kernel.org>); Thu, 2 Jan 2020 22:03:32 -0500
+Received: from pps.filterd (userp2120.oracle.com [127.0.0.1])
+        by userp2120.oracle.com (8.16.0.27/8.16.0.27) with SMTP id 0032xkfC086712;
+        Fri, 3 Jan 2020 03:03:08 GMT
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=oracle.com; h=to : cc : subject :
+ from : references : date : in-reply-to : message-id : mime-version :
+ content-type; s=corp-2019-08-05;
+ bh=7Uzhms73a+KJbfSORtunBkSoE2Z7DP+Q+lxT3XVHdoA=;
+ b=R/1jD1NnKGX7/K3I27fBOLJWsRClXryip95BkQ+8YVeXm05fjOyQvTYaan/e64Qweoac
+ 9udVPmiijnZJip7nuPT9UYtOikEjK0dhCKfuF0falCYoXNVpaG92oppNY0xtkiz0wwUS
+ q8PGnsdBaFUpTvkUWKZ9H6Q4BgCdb2HWRnaZc4+eRkDlJXFQ+Gpn18gyBxxtssT4QjgP
+ Ufa+IN9kLk4waD2v2cGe877meQz5hE+5fXjT0BwjcWzM84bPT6ut9zA9yiAxcyPsnLig
+ YIdQOj80nD1q1w29iYyMNNlp0t4qcTnlRmgDe9pA/m9LWvtNxVKTNXribNcntMaMSG8C 6A== 
+Received: from userp3020.oracle.com (userp3020.oracle.com [156.151.31.79])
+        by userp2120.oracle.com with ESMTP id 2x5ypqta06-1
+        (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=OK);
+        Fri, 03 Jan 2020 03:03:07 +0000
+Received: from pps.filterd (userp3020.oracle.com [127.0.0.1])
+        by userp3020.oracle.com (8.16.0.27/8.16.0.27) with SMTP id 0032xHrY183017;
+        Fri, 3 Jan 2020 03:03:07 GMT
+Received: from aserv0122.oracle.com (aserv0122.oracle.com [141.146.126.236])
+        by userp3020.oracle.com with ESMTP id 2x8bsttj74-1
+        (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=OK);
+        Fri, 03 Jan 2020 03:03:07 +0000
+Received: from abhmp0018.oracle.com (abhmp0018.oracle.com [141.146.116.24])
+        by aserv0122.oracle.com (8.14.4/8.14.4) with ESMTP id 00332pLK000715;
+        Fri, 3 Jan 2020 03:02:51 GMT
+Received: from ca-mkp.ca.oracle.com (/10.159.214.123)
+        by default (Oracle Beehive Gateway v4.0)
+        with ESMTP ; Thu, 02 Jan 2020 19:02:51 -0800
+To:     Arnd Bergmann <arnd@arndb.de>
+Cc:     "James E.J. Bottomley" <jejb@linux.ibm.com>,
+        "Martin K. Petersen" <martin.petersen@oracle.com>,
+        linux-scsi@vger.kernel.org, linux-block@vger.kernel.org,
+        y2038@lists.linaro.org, linux-kernel@vger.kernel.org,
+        Christoph Hellwig <hch@lst.de>,
+        Ben Hutchings <ben.hutchings@codethink.co.uk>,
+        linux-doc@vger.kernel.org, corbet@lwn.net, viro@zeniv.linux.org.uk,
+        linux-fsdevel@vger.kernel.org, Jens Axboe <axboe@kernel.dk>
+Subject: Re: [GIT PULL v3 00/27] block, scsi: final compat_ioctl cleanup
+From:   "Martin K. Petersen" <martin.petersen@oracle.com>
+Organization: Oracle Corporation
+References: <20200102145552.1853992-1-arnd@arndb.de>
+Date:   Thu, 02 Jan 2020 22:02:47 -0500
+In-Reply-To: <20200102145552.1853992-1-arnd@arndb.de> (Arnd Bergmann's message
+        of "Thu, 2 Jan 2020 15:55:18 +0100")
+Message-ID: <yq1woa944yw.fsf@oracle.com>
+User-Agent: Gnus/5.13 (Gnus v5.13) Emacs/26.1.92 (gnu/linux)
 MIME-Version: 1.0
+Content-Type: text/plain
+X-Proofpoint-Virus-Version: vendor=nai engine=6000 definitions=9488 signatures=668685
+X-Proofpoint-Spam-Details: rule=notspam policy=default score=0 suspectscore=0 malwarescore=0
+ phishscore=0 bulkscore=0 spamscore=0 mlxscore=0 mlxlogscore=965
+ adultscore=0 classifier=spam adjust=0 reason=mlx scancount=1
+ engine=8.0.1-1911140001 definitions=main-2001030026
+X-Proofpoint-Virus-Version: vendor=nai engine=6000 definitions=9488 signatures=668685
+X-Proofpoint-Spam-Details: rule=notspam policy=default score=0 priorityscore=1501 malwarescore=0
+ suspectscore=0 phishscore=0 bulkscore=0 spamscore=0 clxscore=1015
+ lowpriorityscore=0 mlxscore=0 impostorscore=0 mlxlogscore=999 adultscore=0
+ classifier=spam adjust=0 reason=mlx scancount=1 engine=8.0.1-1911140001
+ definitions=main-2001030027
 Sender: linux-block-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-T24gVGh1LCAyMDIwLTAxLTAyIGF0IDIyOjIxICswMDAwLCBDaGFpdGFueWEgS3Vsa2Fybmkgd3Jv
-dGU6DQo+IE9uIDAxLzAxLzIwMjAgMTE6NTMgUE0sIEJhbGJpciBTaW5naCB3cm90ZToNCj4gPiBi
-bG9jay9nZW5oZCBwcm92aWRlcyBkaXNrX3NldF9jYXBhY2l0eSgpIGZvciBzZW5kaW5nDQo+ID4g
-UkVTSVpFIG5vdGlmaWNhdGlvbnMgdmlhIHVldmVudHMuIFRoaXMgbm90aWZpY2F0aW9uIGlzDQo+
-ID4gbmV3bHkgYWRkZWQgdG8gc2NzaSBzZC4NCj4gDQo+IG5pdCA6LQ0KPiANCj4gVGhlIGFib3Zl
-IGNvbW1pdCBtZXNzYWdlcyBpbiB0aGlzIHNlcmllcyBhcmUgbG9va2luZyBvZGQgZnJvbQ0KPiB0
-aGUgb25lcyB3ZSBoYXZlIGluIHRoZSB0cmVlIGFuZCBpcyBpdCBwb3NzaWJsZSB0byBmb2xkIGl0
-IGluDQo+IHR3byBsaW5lcyA/DQo+IA0KPiBbQ2FuIGJlIGRvbmUgYXQgdGhlIHRpbWUgb2YgYXBw
-bHlpbmcgc2VyaWVzLl0NCj4gDQoNClNvdW5kcyBnb29kISBJJ2xsIHJlcXVlc3QgdGhlIG1haW50
-YWluZXIgb3IgcmVwb3N0IGlmIG5lZWRlZA0KDQpCYWxiaXIgU2luZ2guDQo=
+
+Arnd,
+
+> If this version seems ok to everyone, please pull into the scsi tree.
+
+Looks good to me. Please address Ben's comment and I'll pull it in.
+
+-- 
+Martin K. Petersen	Oracle Linux Engineering
