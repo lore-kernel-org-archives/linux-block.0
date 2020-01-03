@@ -2,165 +2,101 @@ Return-Path: <SRS0=4w+H=2Y=vger.kernel.org=linux-block-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-2.4 required=3.0 tests=DKIMWL_WL_HIGH,DKIM_SIGNED,
-	DKIM_VALID,DKIM_VALID_AU,HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,
-	SPF_HELO_NONE,SPF_PASS,USER_AGENT_SANE_1 autolearn=no autolearn_force=no
-	version=3.4.0
+X-Spam-Status: No, score=-0.8 required=3.0 tests=DKIM_SIGNED,DKIM_VALID,
+	DKIM_VALID_AU,HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SPF_HELO_NONE,
+	SPF_PASS autolearn=no autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 90721C2D0CE
-	for <linux-block@archiver.kernel.org>; Fri,  3 Jan 2020 14:30:22 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 3C5F4C2D0C2
+	for <linux-block@archiver.kernel.org>; Fri,  3 Jan 2020 14:39:46 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.kernel.org (Postfix) with ESMTP id 67031206DA
-	for <linux-block@archiver.kernel.org>; Fri,  3 Jan 2020 14:30:22 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id 131C721835
+	for <linux-block@archiver.kernel.org>; Fri,  3 Jan 2020 14:39:46 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="HYBTazvZ"
+	dkim=pass (2048-bit key) header.d=cloud.ionos.com header.i=@cloud.ionos.com header.b="F5lh6fAL"
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1727543AbgACOaW (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Fri, 3 Jan 2020 09:30:22 -0500
-Received: from us-smtp-1.mimecast.com ([205.139.110.61]:42047 "EHLO
-        us-smtp-delivery-1.mimecast.com" rhost-flags-OK-OK-OK-FAIL)
-        by vger.kernel.org with ESMTP id S1727670AbgACOaV (ORCPT
-        <rfc822;linux-block@vger.kernel.org>);
-        Fri, 3 Jan 2020 09:30:21 -0500
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-        s=mimecast20190719; t=1578061820;
-        h=from:from:reply-to:reply-to:subject:subject:date:date:
-         message-id:message-id:to:to:cc:cc:mime-version:mime-version:
-         content-type:content-type:
-         content-transfer-encoding:content-transfer-encoding:
-         in-reply-to:in-reply-to:references:references;
-        bh=NhK5nDqlvB+sIRSPKXBkymesRttMWOxw8giPyZmb1PQ=;
-        b=HYBTazvZ7ahCjYuQbrTz0t45JwLsIbnTyiTWHSuUIKxnt+0Xf4Jeu3qfKNo9Ta2KoVRpw4
-        8xASgbvP5Gh0npzOGg5TQKDHKy30W4bqG8J67r6cxjMMNYcmZzeMlN1UvhEh2ZBysEVM/G
-        7TfCNOAtHWeTB64Q8aMFYBhUQrwWC6I=
-Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
- [209.132.183.4]) (Using TLS) by relay.mimecast.com with ESMTP id
- us-mta-298-FMDEIzQdMBiFS42WJCZe4A-1; Fri, 03 Jan 2020 09:30:17 -0500
-X-MC-Unique: FMDEIzQdMBiFS42WJCZe4A-1
-Received: from smtp.corp.redhat.com (int-mx03.intmail.prod.int.phx2.redhat.com [10.5.11.13])
-        (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
-        (No client certificate requested)
-        by mimecast-mx01.redhat.com (Postfix) with ESMTPS id EF32B8024DD;
-        Fri,  3 Jan 2020 14:30:15 +0000 (UTC)
-Received: from [10.3.112.12] (ovpn-112-12.phx2.redhat.com [10.3.112.12])
-        by smtp.corp.redhat.com (Postfix) with ESMTP id CD74A843DA;
-        Fri,  3 Jan 2020 14:30:14 +0000 (UTC)
-Reply-To: tasleson@redhat.com
-Subject: Re: [RFC 1/9] lib/string: Add function to trim duplicate WS
-From:   Tony Asleson <tasleson@redhat.com>
-To:     Matthew Wilcox <willy@infradead.org>
-Cc:     linux-scsi@vger.kernel.org, linux-block@vger.kernel.org,
-        linux-fsdevel@vger.kernel.org
-References: <20191223225558.19242-1-tasleson@redhat.com>
- <20191223225558.19242-2-tasleson@redhat.com>
- <20191223232824.GB31820@bombadil.infradead.org>
- <8392b726-fa55-baa4-6913-5ca0e4fa46a7@redhat.com>
-Organization: Red Hat
-Message-ID: <1e22cee9-3fda-a548-57e3-910c5a79d6ba@redhat.com>
-Date:   Fri, 3 Jan 2020 08:30:13 -0600
-User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:68.0) Gecko/20100101
- Thunderbird/68.2.2
+        id S1727858AbgACOjp (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Fri, 3 Jan 2020 09:39:45 -0500
+Received: from mail-io1-f66.google.com ([209.85.166.66]:35964 "EHLO
+        mail-io1-f66.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S1727857AbgACOjp (ORCPT
+        <rfc822;linux-block@vger.kernel.org>); Fri, 3 Jan 2020 09:39:45 -0500
+Received: by mail-io1-f66.google.com with SMTP id r13so31461950ioa.3
+        for <linux-block@vger.kernel.org>; Fri, 03 Jan 2020 06:39:45 -0800 (PST)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=cloud.ionos.com; s=google;
+        h=mime-version:references:in-reply-to:from:date:message-id:subject:to
+         :cc;
+        bh=5RN9HFVC8/4wrj1xZ018jyfw28e2mD+SWO6pvdC3TeY=;
+        b=F5lh6fALXVB6JryMbs6j1wFTsL3dfMRKZPyzu9ebay/+oey6DVPD0+rPS4cSzMHGKa
+         io6VWPtzfdqgJwvPCdKQxNQqDwNnBwZpIPKEd1xfGVBqrko8Ek7SdHCQEb9uO3N4S162
+         hcDT1AmnIjNuTjxS5jaNJHP0S4O2jAtLrP4wORPEGuTcSxfay/kW04NWlhjl8QtL8q2B
+         WcwDLkzRIoKcy0f+3ESBM0QCqGPnOUIZZIiueWhKbh98kNGUJifm3fsFXpJzkjmphzb1
+         zWgVHGqWZeA/jceOfDNRAfscjDNqaXoNoMDDvKK5VBfhRcVP/qM8Ox8XgaWW94QGZXbs
+         Fciw==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20161025;
+        h=x-gm-message-state:mime-version:references:in-reply-to:from:date
+         :message-id:subject:to:cc;
+        bh=5RN9HFVC8/4wrj1xZ018jyfw28e2mD+SWO6pvdC3TeY=;
+        b=HfAuoD7gPXI5f4TQxlLlSbkLndTjMhlR/kfK3G/qGWSJOaMGSmMqNRzmEYCuGR2i/s
+         D7ob9SvkOF8gMrLJCh+hlU70HijWlEvjKVY4srNueQt+wo6PA4OEJMxKerTmeGdW6Mht
+         CjvXoIt6OPm8L142EoQuoIEvK5a7+B5cyEA8023r1cdjDplC3641qBYnXcM01Ob/EKhi
+         zI7Sp122EqMS7Z8usYGxbzbW02M+bmj2OEkBvlVYv/4/24PSQl9ZguhXi6SBH7PMoNPV
+         U1s6UowHOR1wBMbrumWuKkcXjuj4j2HrwL11zdO1rA5plb5VbTM0wCAeO8py6X01V+lh
+         c/dQ==
+X-Gm-Message-State: APjAAAUuYAs8F9Kmk3g848QpjaZrYI0pA+L5Byj9mde7zH7RLqaJ6iTl
+        y/l7tqvuo0ZhYd6Y5+nZbp6Kv75mXuXpcCi6HyMBgDM+
+X-Google-Smtp-Source: APXvYqwREroFheKRCPoBTx3GS/vRMEQRWhH66/SrZi370tBE90y7g9QKiwO0SgXi9HyiUH2cAN4Vvv2pAdufbHOLn/o=
+X-Received: by 2002:a02:a610:: with SMTP id c16mr68588683jam.13.1578062384700;
+ Fri, 03 Jan 2020 06:39:44 -0800 (PST)
 MIME-Version: 1.0
-In-Reply-To: <8392b726-fa55-baa4-6913-5ca0e4fa46a7@redhat.com>
-Content-Type: text/plain; charset=utf-8
-Content-Language: en-US
-Content-Transfer-Encoding: 7bit
-X-Scanned-By: MIMEDefang 2.79 on 10.5.11.13
+References: <20191230102942.18395-1-jinpuwang@gmail.com> <20191230102942.18395-8-jinpuwang@gmail.com>
+ <c4875699-68a6-9a82-4324-553f30504574@acm.org>
+In-Reply-To: <c4875699-68a6-9a82-4324-553f30504574@acm.org>
+From:   Jinpu Wang <jinpu.wang@cloud.ionos.com>
+Date:   Fri, 3 Jan 2020 15:39:34 +0100
+Message-ID: <CAMGffEn5D235q=6vV6nE2avvW3D7wwB4=BBn_5HcBbxH4WLyxQ@mail.gmail.com>
+Subject: Re: [PATCH v6 07/25] rtrs: client: statistics functions
+To:     Bart Van Assche <bvanassche@acm.org>
+Cc:     Jack Wang <jinpuwang@gmail.com>, linux-block@vger.kernel.org,
+        linux-rdma@vger.kernel.org, Jens Axboe <axboe@kernel.dk>,
+        Christoph Hellwig <hch@infradead.org>,
+        Sagi Grimberg <sagi@grimberg.me>,
+        Leon Romanovsky <leon@kernel.org>,
+        Doug Ledford <dledford@redhat.com>,
+        Danil Kipnis <danil.kipnis@cloud.ionos.com>, rpenyaev@suse.de
+Content-Type: text/plain; charset="UTF-8"
 Sender: linux-block-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-On 1/2/20 4:52 PM, Tony Asleson wrote:
-> On 12/23/19 5:28 PM, Matthew Wilcox wrote:
->> On Mon, Dec 23, 2019 at 04:55:50PM -0600, Tony Asleson wrote:
->>> +/**
->>> + * Removes leading and trailing whitespace and removes duplicate
->>> + * adjacent whitespace in a string, modifies string in place.
->>> + * @s The %NUL-terminated string to have spaces removed
->>> + * Returns the new length
->>> + */
->>
->> This isn't good kernel-doc.  See Documentation/doc-guide/kernel-doc.rst
->> Compile with W=1 to get the format checked.
-> 
-> Indeed, I'll correct it.
-> 
->>> +size_t strim_dupe(char *s)
->>> +{
->>> +	size_t ret = 0;
->>> +	char *w = s;
->>> +	char *p;
->>> +
->>> +	/*
->>> +	 * This will remove all leading and duplicate adjacent, but leave
->>> +	 * 1 space at the end if one or more are present.
->>> +	 */
->>> +	for (p = s; *p != '\0'; ++p) {
->>> +		if (!isspace(*p) || (p != s && !isspace(*(p - 1)))) {
->>> +			*w = *p;
->>> +			++w;
->>> +			ret += 1;
->>> +		}
->>> +	}
->>
->> I'd be tempted to do ...
->>
->> 	size_t ret = 0;
->> 	char *w = s;
->> 	bool last_space = false;
->>
->> 	do {
->> 		bool this_space = isspace(*s);
->>
->> 		if (!this_space || !last_space) {
->> 			*w++ = *s;
->> 			ret++;
->> 		}
->> 		s++;
->> 		last_space = this_space;
->> 	} while (s[-1] != '\0');
-> 
-> That leaves a starting and trailing WS, how about something like this?
-> 
-> size_t strim_dupe(char *s)
-> {
-> 	size_t ret = 0;
-> 	char *w = s;
-> 	bool last_space = false;
-> 
-> 	do {
-> 		bool this_space = isspace(*s);
-> 		if (!this_space || (!last_space && ret)) {Mollie Fitzgerald
-> 			*w++ = *s;
-> 			ret++;
-> 		}
-> 		s++;
-> 		last_space = this_space;
-> 	} while (s[-1] != '\0');
-> 
-> 	if (ret > 1 && isspace(w[-2])) {
-> 		w[-2] = '\0';
-> 		ret--;
-> 	}
-> 
-> 	ret--;
-> 	return ret;
-> }
-
-This function was added so I could strip out extra spaces in the vpd
-0x83 string representation, to shorten them before they get added to the
-structured syslog message.  I'm starting to think this is a bad idea as
-anyone that might want to write some code to use the kernel sysfs entry
-for a device and search for it in the syslog would have to perturb the
-id string the same way.
-
-I think this change should just be removed from the patch series and
-leave the IDs as they are.
-
-If we really wanted a shorter ID, a better approach would be use a hash
-of the ID string, but that introduces another level of complexity that
-isn't helpful to end users.
-
--Tony
-
+On Thu, Jan 2, 2020 at 10:07 PM Bart Van Assche <bvanassche@acm.org> wrote:
+>
+> On 12/30/19 2:29 AM, Jack Wang wrote:
+> > From: Jack Wang <jinpu.wang@cloud.ionos.com>
+> >
+> > This introduces set of functions used on client side to account
+> > statistics of RDMA data sent/received, amount of IOs inflight,
+> > latency, cpu migrations, etc.  Almost all statistics is collected
+>                                                         ^^
+>                                                         are?
+will fix.
+> > using percpu variables.
+> > [ ... ]
+> > +static inline int rtrs_clt_ms_to_id(unsigned long ms)
+> > +{
+> > +     int id = ms ? ilog2(ms) - MIN_LOG_LAT + 1 : 0;
+> > +
+> > +     return clamp(id, 0, LOG_LAT_SZ - 1);
+> > +}
+>
+> I think it is unusual to call the returned value an "id" in this
+> context. How about changing "id" into "bin" or "bucket"? See also
+> https://en.wikipedia.org/wiki/Histogram.
+will rename id to bin
+>
+> Thanks,
+>
+> Bart.
+Thanks
