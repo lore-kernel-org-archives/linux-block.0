@@ -2,303 +2,200 @@ Return-Path: <SRS0=4w+H=2Y=vger.kernel.org=linux-block-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-9.9 required=3.0 tests=DKIMWL_WL_HIGH,DKIM_SIGNED,
+X-Spam-Status: No, score=-5.4 required=3.0 tests=DKIMWL_WL_HIGH,DKIM_SIGNED,
 	DKIM_VALID,DKIM_VALID_AU,HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,
-	MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,USER_AGENT_GIT
-	autolearn=ham autolearn_force=no version=3.4.0
+	MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,USER_AGENT_SANE_1
+	autolearn=unavailable autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 146EAC00523
-	for <linux-block@archiver.kernel.org>; Fri,  3 Jan 2020 07:55:30 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id E8098C00523
+	for <linux-block@archiver.kernel.org>; Fri,  3 Jan 2020 08:18:11 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.kernel.org (Postfix) with ESMTP id 0138821D7D
-	for <linux-block@archiver.kernel.org>; Fri,  3 Jan 2020 07:55:28 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id B61CE21835
+	for <linux-block@archiver.kernel.org>; Fri,  3 Jan 2020 08:18:11 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=pass (1024-bit key) header.d=amazon.com header.i=@amazon.com header.b="a4p9aCO1"
+	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="XiwjkqjL"
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1726005AbgACHz2 (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Fri, 3 Jan 2020 02:55:28 -0500
-Received: from smtp-fw-4101.amazon.com ([72.21.198.25]:36750 "EHLO
-        smtp-fw-4101.amazon.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1725890AbgACHz2 (ORCPT
-        <rfc822;linux-block@vger.kernel.org>); Fri, 3 Jan 2020 02:55:28 -0500
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-  d=amazon.com; i=@amazon.com; q=dns/txt; s=amazon201209;
-  t=1578038127; x=1609574127;
-  h=from:to:cc:subject:date:message-id:in-reply-to:
-   mime-version;
-  bh=BNj2ZpEqscC16GT1ujYI1MhyWZyxnccFrqY6TpA1/wU=;
-  b=a4p9aCO18n0D9tWTRIkfJhUEzU3WBiJlxiGQAfRG7FydhrohcEa8Tio1
-   zm7f4Whv7K4kWp3BtWwYoWZfXxmti+pylCMktT4ANEVZgFn26uu8qbqoi
-   1e69hYBISrDC64hcnasUkh5EV4gF5rAWdXd3BtFKW0uNrKyBdLCa96h6u
-   M=;
-IronPort-SDR: QwSJXMSAWI5rBa/AVXZwfYid/EHff+9L/s8IDNWg6pTX+v8EnMtlCqIc9bOvfc1hEdMe38punz
- qQ2Ta0LX70cg==
-X-IronPort-AV: E=Sophos;i="5.69,389,1571702400"; 
-   d="scan'208";a="10782255"
-Received: from iad12-co-svc-p1-lb1-vlan3.amazon.com (HELO email-inbound-relay-1a-16acd5e0.us-east-1.amazon.com) ([10.43.8.6])
-  by smtp-border-fw-out-4101.iad4.amazon.com with ESMTP; 03 Jan 2020 07:55:25 +0000
-Received: from EX13MTAUEA001.ant.amazon.com (iad55-ws-svc-p15-lb9-vlan2.iad.amazon.com [10.40.159.162])
-        by email-inbound-relay-1a-16acd5e0.us-east-1.amazon.com (Postfix) with ESMTPS id 5FEC8A2575;
-        Fri,  3 Jan 2020 07:55:22 +0000 (UTC)
-Received: from EX13D31EUA001.ant.amazon.com (10.43.165.15) by
- EX13MTAUEA001.ant.amazon.com (10.43.61.82) with Microsoft SMTP Server (TLS)
- id 15.0.1367.3; Fri, 3 Jan 2020 07:55:21 +0000
-Received: from u886c93fd17d25d.ant.amazon.com (10.43.160.109) by
- EX13D31EUA001.ant.amazon.com (10.43.165.15) with Microsoft SMTP Server (TLS)
- id 15.0.1367.3; Fri, 3 Jan 2020 07:55:16 +0000
-From:   SeongJae Park <sjpark@amazon.com>
-To:     <roger.pau@citrix.com>, SeongJae Park <sjpark@amazon.com>
-CC:     <jgross@suse.com>, <axboe@kernel.dk>, <konrad.wilk@oracle.com>,
-        <linux-block@vger.kernel.org>, <pdurrant@amazon.com>,
-        SeongJae Park <sjpark@amazon.de>,
-        <linux-kernel@vger.kernel.org>, <sj38.park@gmail.com>,
-        <xen-devel@lists.xenproject.org>
-Subject: Re: [Xen-devel] [PATCH v13 3/5] xen/blkback: Squeeze page pools if a memory pressure is detected
-Date:   Fri, 3 Jan 2020 08:54:48 +0100
-Message-ID: <20200103075448.12994-1-sjpark@amazon.com>
-X-Mailer: git-send-email 2.17.1
-In-Reply-To: <20191218183718.31719-4-sjpark@amazon.com> (raw)
+        id S1727361AbgACISK (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Fri, 3 Jan 2020 03:18:10 -0500
+Received: from us-smtp-1.mimecast.com ([207.211.31.81]:20406 "EHLO
+        us-smtp-delivery-1.mimecast.com" rhost-flags-OK-OK-OK-FAIL)
+        by vger.kernel.org with ESMTP id S1726054AbgACISK (ORCPT
+        <rfc822;linux-block@vger.kernel.org>);
+        Fri, 3 Jan 2020 03:18:10 -0500
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+        s=mimecast20190719; t=1578039488;
+        h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+         to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+         in-reply-to:in-reply-to:references:references;
+        bh=3Pzczq1MemrN8Qun1c3a5FlGzlcFvE9MzD8Dtf48uPQ=;
+        b=XiwjkqjLADxSr/pmu5q7FVBtd4FjYXZpKfIwStAjmgISSRV4q0Qg92Cx8OOa5t31+R4dOG
+        KeBcWCYbCl9BQ8FNilANrFWkKmt44vXTWrj/xsaRs4aEJxauf9wFdgvCsqG2sUzc0dhwlw
+        /53sg+G3RG7QUp3co6EDUBxk1YP0XrE=
+Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
+ [209.132.183.4]) (Using TLS) by relay.mimecast.com with ESMTP id
+ us-mta-119-kQZd5XElNuiBiDU6RMSPvg-1; Fri, 03 Jan 2020 03:18:05 -0500
+X-MC-Unique: kQZd5XElNuiBiDU6RMSPvg-1
+Received: from smtp.corp.redhat.com (int-mx02.intmail.prod.int.phx2.redhat.com [10.5.11.12])
+        (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
+        (No client certificate requested)
+        by mimecast-mx01.redhat.com (Postfix) with ESMTPS id 246D9100551D;
+        Fri,  3 Jan 2020 08:18:03 +0000 (UTC)
+Received: from ming.t460p (ovpn-8-18.pek2.redhat.com [10.72.8.18])
+        by smtp.corp.redhat.com (Postfix) with ESMTPS id 2F23B60BF1;
+        Fri,  3 Jan 2020 08:17:50 +0000 (UTC)
+Date:   Fri, 3 Jan 2020 16:17:45 +0800
+From:   Ming Lei <ming.lei@redhat.com>
+To:     Hou Tao <houtao1@huawei.com>
+Cc:     Yufen Yu <yuyufen@huawei.com>, axboe@kernel.dk,
+        linux-block@vger.kernel.org, hch@lst.de, zhengchuan@huawei.com,
+        yi.zhang@huawei.com, paulmck@kernel.org, joel@joelfernandes.org,
+        rcu@vger.kernel.org
+Subject: Re: [PATCH] block: make sure last_lookup set as NULL after part
+ deleted
+Message-ID: <20200103081745.GA11275@ming.t460p>
+References: <20191231110945.10857-1-yuyufen@huawei.com>
+ <a9ce86d6-dadb-9301-7d76-8cef81d782fd@huawei.com>
+ <20200102012314.GB16719@ming.t460p>
+ <c12da8ca-be66-496b-efb2-a60ceaf9ce54@huawei.com>
+ <20200103041805.GA29924@ming.t460p>
+ <ea362a86-d2de-7dfe-c826-d59e8b5068c3@huawei.com>
 MIME-Version: 1.0
-Content-Type: text/plain
-X-Originating-IP: [10.43.160.109]
-X-ClientProxiedBy: EX13d09UWC003.ant.amazon.com (10.43.162.113) To
- EX13D31EUA001.ant.amazon.com (10.43.165.15)
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <ea362a86-d2de-7dfe-c826-d59e8b5068c3@huawei.com>
+User-Agent: Mutt/1.12.1 (2019-06-15)
+X-Scanned-By: MIMEDefang 2.79 on 10.5.11.12
 Sender: linux-block-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-Hello Roger,
+On Fri, Jan 03, 2020 at 03:35:42PM +0800, Hou Tao wrote:
+> Hi,
+> 
+> On 2020/1/3 12:18, Ming Lei wrote:
+> > On Fri, Jan 03, 2020 at 11:06:25AM +0800, Hou Tao wrote:
+> >> Hi,
+> >>
+> >> On 2020/1/2 9:23, Ming Lei wrote:
+> >>> On Tue, Dec 31, 2019 at 10:55:47PM +0800, Hou Tao wrote:
+> >>>> Hi,
+> >>>>
+> snip
+> 
+> >> We have got a seemingly better solution: caching the index of last_lookup in tbl->part[]
+> >> instead of caching the pointer itself, so we can ensure the validity of returned pointer
+> >> by ensuring it's not NULL in tbl->part[] as does when last_lookup is NULL or 0.
+> > 
+> > Thinking of the problem further, looks we don't need to hold ref for
+> > .last_lookup.
+> > 
+> > What we need is to make sure the partition's ref is increased just
+> > before assigning .last_lookup, so how about something like the following?
+> > 
+> The approach will work for the above case, but it will not work for the following case:
+> 
+> when blk_account_io_done() releases the last ref-counter of last_lookup and calls call_rcu(),
+> and then a RCU read gets the to-be-freed hd-struct.
+> 
+> blk_account_io_done
+>   rcu_read_lock()
+>   // the last ref of last_lookup
+>   hd_struct_put()
+>     call_rcu
+> 
+>                               rcu_read_lock
+>                               read last_lookup
+> 
+>     free()
+>                               // use-after-free ?
+>                               hd_struct_try_get
 
-Sorry if I'm disturbing your vacation.  If you are already came back to work,
-may I ask your opinion about this patch?
+We may avoid that by clearing partition pointer after killing the
+partition, how about the following change?
 
-On Wed, 18 Dec 2019 19:37:16 +0100 SeongJae Park <sjpark@amazon.com> wrote:
-
-> From: SeongJae Park <sjpark@amazon.de>
-> 
-> Each `blkif` has a free pages pool for the grant mapping.  The size of
-> the pool starts from zero and is increased on demand while processing
-> the I/O requests.  If current I/O requests handling is finished or 100
-> milliseconds has passed since last I/O requests handling, it checks and
-> shrinks the pool to not exceed the size limit, `max_buffer_pages`.
-> 
-> Therefore, host administrators can cause memory pressure in blkback by
-> attaching a large number of block devices and inducing I/O.  Such
-> problematic situations can be avoided by limiting the maximum number of
-> devices that can be attached, but finding the optimal limit is not so
-> easy.  Improper set of the limit can results in memory pressure or a
-> resource underutilization.  This commit avoids such problematic
-> situations by squeezing the pools (returns every free page in the pool
-> to the system) for a while (users can set this duration via a module
-> parameter) if memory pressure is detected.
-> 
-> Discussions
-> ===========
-> 
-> The `blkback`'s original shrinking mechanism returns only pages in the
-> pool which are not currently be used by `blkback` to the system.  In
-> other words, the pages that are not mapped with granted pages.  Because
-> this commit is changing only the shrink limit but still uses the same
-> freeing mechanism it does not touch pages which are currently mapping
-> grants.
-> 
-> Once memory pressure is detected, this commit keeps the squeezing limit
-> for a user-specified time duration.  The duration should be neither too
-> long nor too short.  If it is too long, the squeezing incurring overhead
-> can reduce the I/O performance.  If it is too short, `blkback` will not
-> free enough pages to reduce the memory pressure.  This commit sets the
-> value as `10 milliseconds` by default because it is a short time in
-> terms of I/O while it is a long time in terms of memory operations.
-> Also, as the original shrinking mechanism works for at least every 100
-> milliseconds, this could be a somewhat reasonable choice.  I also tested
-> other durations (refer to the below section for more details) and
-> confirmed that 10 milliseconds is the one that works best with the test.
-> That said, the proper duration depends on actual configurations and
-> workloads.  That's why this commit allows users to set the duration as a
-> module parameter.
-> 
-> Memory Pressure Test
-> ====================
-> 
-> To show how this commit fixes the memory pressure situation well, I
-> configured a test environment on a xen-running virtualization system.
-> On the `blkfront` running guest instances, I attach a large number of
-> network-backed volume devices and induce I/O to those.  Meanwhile, I
-> measure the number of pages that swapped in (pswpin) and out (pswpout)
-> on the `blkback` running guest.  The test ran twice, once for the
-> `blkback` before this commit and once for that after this commit.  As
-> shown below, this commit has dramatically reduced the memory pressure:
-> 
->                 pswpin  pswpout
->     before      76,672  185,799
->     after          867    3,967
-> 
-> Optimal Aggressive Shrinking Duration
-> -------------------------------------
-> 
-> To find a best squeezing duration, I repeated the test with three
-> different durations (1ms, 10ms, and 100ms).  The results are as below:
-> 
->     duration    pswpin  pswpout
->     1           707     5,095
->     10          867     3,967
->     100         362     3,348
-> 
-> As expected, the memory pressure decreases as the duration increases,
-> but the reduction become slow from the `10ms`.  Based on this results, I
-> chose the default duration as 10ms.
-> 
-> Performance Overhead Test
-> =========================
-> 
-> This commit could incur I/O performance degradation under severe memory
-> pressure because the squeezing will require more page allocations per
-> I/O.  To show the overhead, I artificially made a worst-case squeezing
-> situation and measured the I/O performance of a `blkfront` running
-> guest.
-> 
-> For the artificial squeezing, I set the `blkback.max_buffer_pages` using
-> the `/sys/module/xen_blkback/parameters/max_buffer_pages` file.  In this
-> test, I set the value to `1024` and `0`.  The `1024` is the default
-> value.  Setting the value as `0` is same to a situation doing the
-> squeezing always (worst-case).
-> 
-> If the underlying block device is slow enough, the squeezing overhead
-> could be hidden.  For the reason, I use a fast block device, namely the
-> rbd[1]:
-> 
->     # xl block-attach guest phy:/dev/ram0 xvdb w
-> 
-> For the I/O performance measurement, I run a simple `dd` command 5 times
-> directly to the device as below and collect the 'MB/s' results.
-> 
->     $ for i in {1..5}; do dd if=/dev/zero of=/dev/xvdb \
->                              bs=4k count=$((256*512)); sync; done
-> 
-> The results are as below.  'max_pgs' represents the value of the
-> `blkback.max_buffer_pages` parameter.
-> 
->     max_pgs   Min       Max       Median     Avg    Stddev
->     0         417       423       420        419.4  2.5099801
->     1024      414       425       416        417.8  4.4384682
->     No difference proven at 95.0% confidence
-> 
-> In short, even worst case squeezing on ramdisk based fast block device
-> makes no visible performance degradation.  Please note that this is just
-> a very simple and minimal test.  On systems using super-fast block
-> devices and a special I/O workload, the results might be different.  If
-> you have any doubt, test on your machine with your workload to find the
-> optimal squeezing duration for you.
-> 
-> [1] https://www.kernel.org/doc/html/latest/admin-guide/blockdev/ramdisk.html
-> 
-> Signed-off-by: SeongJae Park <sjpark@amazon.de>
-> ---
->  .../ABI/testing/sysfs-driver-xen-blkback      | 10 ++++++++
->  drivers/block/xen-blkback/blkback.c           |  7 ++++--
->  drivers/block/xen-blkback/common.h            |  1 +
->  drivers/block/xen-blkback/xenbus.c            | 23 ++++++++++++++++++-
->  4 files changed, 38 insertions(+), 3 deletions(-)
-> 
-> diff --git a/Documentation/ABI/testing/sysfs-driver-xen-blkback b/Documentation/ABI/testing/sysfs-driver-xen-blkback
-> index 4e7babb3ba1f..f01224231f3f 100644
-> --- a/Documentation/ABI/testing/sysfs-driver-xen-blkback
-> +++ b/Documentation/ABI/testing/sysfs-driver-xen-blkback
-> @@ -25,3 +25,13 @@ Description:
->                  allocated without being in use. The time is in
->                  seconds, 0 means indefinitely long.
->                  The default is 60 seconds.
-> +
-> +What:           /sys/module/xen_blkback/parameters/buffer_squeeze_duration_ms
-> +Date:           December 2019
-> +KernelVersion:  5.5
-> +Contact:        SeongJae Park <sjpark@amazon.de>
-> +Description:
-> +                When memory pressure is reported to blkback this option
-> +                controls the duration in milliseconds that blkback will not
-> +                cache any page not backed by a grant mapping.
-> +                The default is 10ms.
-> diff --git a/drivers/block/xen-blkback/blkback.c b/drivers/block/xen-blkback/blkback.c
-> index fd1e19f1a49f..79f677aeb5cc 100644
-> --- a/drivers/block/xen-blkback/blkback.c
-> +++ b/drivers/block/xen-blkback/blkback.c
-> @@ -656,8 +656,11 @@ int xen_blkif_schedule(void *arg)
->  			ring->next_lru = jiffies + msecs_to_jiffies(LRU_INTERVAL);
->  		}
->  
-> -		/* Shrink if we have more than xen_blkif_max_buffer_pages */
-> -		shrink_free_pagepool(ring, xen_blkif_max_buffer_pages);
-> +		/* Shrink the free pages pool if it is too large. */
-> +		if (time_before(jiffies, blkif->buffer_squeeze_end))
-> +			shrink_free_pagepool(ring, 0);
-> +		else
-> +			shrink_free_pagepool(ring, xen_blkif_max_buffer_pages);
->  
->  		if (log_stats && time_after(jiffies, ring->st_print))
->  			print_stats(ring);
-> diff --git a/drivers/block/xen-blkback/common.h b/drivers/block/xen-blkback/common.h
-> index 1d3002d773f7..536c84f61fed 100644
-> --- a/drivers/block/xen-blkback/common.h
-> +++ b/drivers/block/xen-blkback/common.h
-> @@ -319,6 +319,7 @@ struct xen_blkif {
->  	/* All rings for this device. */
->  	struct xen_blkif_ring	*rings;
->  	unsigned int		nr_rings;
-> +	unsigned long		buffer_squeeze_end;
->  };
->  
->  struct seg_buf {
-> diff --git a/drivers/block/xen-blkback/xenbus.c b/drivers/block/xen-blkback/xenbus.c
-> index b90dbcd99c03..24172c180f5f 100644
-> --- a/drivers/block/xen-blkback/xenbus.c
-> +++ b/drivers/block/xen-blkback/xenbus.c
-> @@ -824,6 +824,26 @@ static void frontend_changed(struct xenbus_device *dev,
->  }
->  
->  
-> +/* Once a memory pressure is detected, squeeze free page pools for a while. */
-> +static unsigned int buffer_squeeze_duration_ms = 10;
-> +module_param_named(buffer_squeeze_duration_ms,
-> +		buffer_squeeze_duration_ms, int, 0644);
-> +MODULE_PARM_DESC(buffer_squeeze_duration_ms,
-> +"Duration in ms to squeeze pages buffer when a memory pressure is detected");
-> +
-> +/*
-> + * Callback received when the memory pressure is detected.
-> + */
-> +static void reclaim_memory(struct xenbus_device *dev)
-> +{
-> +	struct backend_info *be = dev_get_drvdata(&dev->dev);
-> +
-> +	if (!be)
-> +		return;
-
-This null check is the only one change from the version
-(https://lore.kernel.org/xen-devel/20191216093755.GJ11756@Air-de-Roger/)
-you gave me the 'Reviewed-by' before.  This check is necessary because
-'reclaim_memory()' can be called before 'probe' or after 'remove' callback.
-
+diff --git a/block/blk-core.c b/block/blk-core.c
+index 089e890ab208..79599f5fd5b7 100644
+--- a/block/blk-core.c
++++ b/block/blk-core.c
+@@ -1365,18 +1365,6 @@ void blk_account_io_start(struct request *rq, bool new_io)
+ 		part_stat_inc(part, merges[rw]);
+ 	} else {
+ 		part = disk_map_sector_rcu(rq->rq_disk, blk_rq_pos(rq));
+-		if (!hd_struct_try_get(part)) {
+-			/*
+-			 * The partition is already being removed,
+-			 * the request will be accounted on the disk only
+-			 *
+-			 * We take a reference on disk->part0 although that
+-			 * partition will never be deleted, so we can treat
+-			 * it as any other partition.
+-			 */
+-			part = &rq->rq_disk->part0;
+-			hd_struct_get(part);
+-		}
+ 		part_inc_in_flight(rq->q, part, rw);
+ 		rq->part = part;
+ 	}
+diff --git a/block/genhd.c b/block/genhd.c
+index ff6268970ddc..e3dec90b1f43 100644
+--- a/block/genhd.c
++++ b/block/genhd.c
+@@ -286,17 +286,21 @@ struct hd_struct *disk_map_sector_rcu(struct gendisk *disk, sector_t sector)
+ 	ptbl = rcu_dereference(disk->part_tbl);
+ 
+ 	part = rcu_dereference(ptbl->last_lookup);
+-	if (part && sector_in_part(part, sector))
++	if (part && sector_in_part(part, sector) && hd_struct_try_get(part))
+ 		return part;
+ 
+ 	for (i = 1; i < ptbl->len; i++) {
+ 		part = rcu_dereference(ptbl->part[i]);
+ 
+ 		if (part && sector_in_part(part, sector)) {
++                       if (!hd_struct_try_get(part))
++                               goto exit;
+ 			rcu_assign_pointer(ptbl->last_lookup, part);
+ 			return part;
+ 		}
+ 	}
++ exit:
++	hd_struct_get(&disk->part0);
+ 	return &disk->part0;
+ }
+ EXPORT_SYMBOL_GPL(disk_map_sector_rcu);
+diff --git a/block/partition-generic.c b/block/partition-generic.c
+index 1d20c9cf213f..9ef6c13d5650 100644
+--- a/block/partition-generic.c
++++ b/block/partition-generic.c
+@@ -283,8 +283,8 @@ void delete_partition(struct gendisk *disk, int partno)
+ 	if (!part)
+ 		return;
+ 
+-	rcu_assign_pointer(ptbl->part[partno], NULL);
+-	rcu_assign_pointer(ptbl->last_lookup, NULL);
++	get_device(disk_to_dev(disk));
++
+ 	kobject_put(part->holder_dir);
+ 	device_del(part_to_dev(part));
+ 
+@@ -296,6 +296,15 @@ void delete_partition(struct gendisk *disk, int partno)
+ 	 */
+ 	blk_invalidate_devt(part_devt(part));
+ 	hd_struct_kill(part);
++
++	/*
++	 * clear partition pointers after this partition is killed, then
++	 * IO path can't re-assign ->last_lookup any more
++	 */
++	rcu_assign_pointer(ptbl->part[partno], NULL);
++	rcu_assign_pointer(ptbl->last_lookup, NULL);
++
++	put_device(disk_to_dev(disk));
+ }
+ 
+ static ssize_t whole_disk_show(struct device *dev,
 
 Thanks,
-SeongJae Park
+Ming
 
-> +	be->blkif->buffer_squeeze_end = jiffies +
-> +		msecs_to_jiffies(buffer_squeeze_duration_ms);
-> +}
-> +
->  /* ** Connection ** */
->  
->  
-> @@ -1115,7 +1135,8 @@ static struct xenbus_driver xen_blkbk_driver = {
->  	.ids  = xen_blkbk_ids,
->  	.probe = xen_blkbk_probe,
->  	.remove = xen_blkbk_remove,
-> -	.otherend_changed = frontend_changed
-> +	.otherend_changed = frontend_changed,
-> +	.reclaim_memory = reclaim_memory,
->  };
->  
->  int xen_blkif_xenbus_init(void)
-> -- 
-> 2.17.1
