@@ -2,94 +2,68 @@ Return-Path: <SRS0=4w+H=2Y=vger.kernel.org=linux-block-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-7.2 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
-	MAILING_LIST_MULTI,MENTIONS_GIT_HOSTING,SPF_HELO_NONE,SPF_PASS,
-	USER_AGENT_SANE_1 autolearn=unavailable autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-3.3 required=3.0 tests=DKIMWL_WL_HIGH,DKIM_SIGNED,
+	DKIM_VALID,DKIM_VALID_AU,MAILING_LIST_MULTI,MENTIONS_GIT_HOSTING,
+	SPF_HELO_NONE,SPF_PASS,UNWANTED_LANGUAGE_BODY autolearn=ham
+	autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id EACE2C2D0C2
-	for <linux-block@archiver.kernel.org>; Fri,  3 Jan 2020 16:29:02 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 89972C2D0C2
+	for <linux-block@archiver.kernel.org>; Fri,  3 Jan 2020 20:40:11 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.kernel.org (Postfix) with ESMTP id C5EE321734
-	for <linux-block@archiver.kernel.org>; Fri,  3 Jan 2020 16:29:02 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id 5E8422253D
+	for <linux-block@archiver.kernel.org>; Fri,  3 Jan 2020 20:40:11 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+	s=default; t=1578084011;
+	bh=0NsOmgi90q1K0lU+bt2PIwrj1JnZDmRaUXtbq0qtfko=;
+	h=Subject:From:In-Reply-To:References:Date:To:Cc:List-ID:From;
+	b=nmmRfRzwWp6J+1CjlIZ3iXSa12wBzgJ0r4qZW473SJlBYNX1nIv5vl5+mrpVlIGPZ
+	 yIaqLRIMFYvZSWISeds33vWmd5UFjeZngDx0e5Lxy54/+q6Boxt5SoV7IMqMSMp5TW
+	 c4igKVwF9ia/cGhRUKhvPS5uZ4lEzbnCnYh28YPo=
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1727905AbgACQ3C (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Fri, 3 Jan 2020 11:29:02 -0500
-Received: from mail-pg1-f194.google.com ([209.85.215.194]:43337 "EHLO
-        mail-pg1-f194.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1727793AbgACQ3C (ORCPT
-        <rfc822;linux-block@vger.kernel.org>); Fri, 3 Jan 2020 11:29:02 -0500
-Received: by mail-pg1-f194.google.com with SMTP id k197so23634087pga.10;
-        Fri, 03 Jan 2020 08:29:01 -0800 (PST)
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20161025;
-        h=x-gm-message-state:subject:to:cc:references:from:message-id:date
-         :user-agent:mime-version:in-reply-to:content-language
-         :content-transfer-encoding;
-        bh=JqvZcEu8W8qbxYaL1d0CeIMIcPYQQjtkLM1EHupMOTw=;
-        b=pkSMVe+mOkmpGhX/5kjiHQCYoIk/6az+FjYDZtOYadvUvtpHzVGtOnNxgbPYz/rca2
-         4r4yF8MioIZq+Vn6wbhEtaMaQHREnsB4fl44dzHYm5jSqOK5WuqkD4JpIeZ/VP7g/coJ
-         5ME5FZdoVZRbx3FjMHS/itg61FhgVmtlqP6yRiqU/KvAN1ERO1F+D0vMaVS3m7RkAQOm
-         Xkxgx86t4l13EIUNPx3UotxtrT7BaxkwJQxC47FvqH/Ym86Ros+Q4e8TtOwcmeZHQeeB
-         Hip9TuB8IoF13OWorloMA5+OjKyJuRPc/FOlKRbsLcb4dDD+biaxVjMSOxU7PiYljQMx
-         I30g==
-X-Gm-Message-State: APjAAAWrkOjTkKLEVdWzIkmC9cSdmBcYBAnOAGTjiYItUnT4tPjnWoUH
-        0juIk5HyXlvijlWP+FYYNgw=
-X-Google-Smtp-Source: APXvYqznV4MvK/lkK8CWTfG4BOxMM8tNc6vMJpxLLLOwaxirSgdxE3YG2JCSDNMjUGy+c2DE88WWEg==
-X-Received: by 2002:a63:1a08:: with SMTP id a8mr73067236pga.425.1578068941359;
-        Fri, 03 Jan 2020 08:29:01 -0800 (PST)
-Received: from desktop-bart.svl.corp.google.com ([2620:15c:2cd:202:4308:52a3:24b6:2c60])
-        by smtp.gmail.com with ESMTPSA id k10sm15027522pjs.13.2020.01.03.08.29.00
-        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
-        Fri, 03 Jan 2020 08:29:00 -0800 (PST)
-Subject: Re: [PATCH v5 00/25] RTRS (former IBTRS) rdma transport library and
- the corresponding RNBD (former IBNBD) rdma network block device
-To:     Jinpu Wang <jinpu.wang@cloud.ionos.com>,
-        Jason Gunthorpe <jgg@ziepe.ca>
-Cc:     Jack Wang <jinpuwang@gmail.com>, linux-block@vger.kernel.org,
-        linux-rdma@vger.kernel.org, Jens Axboe <axboe@kernel.dk>,
-        Christoph Hellwig <hch@infradead.org>,
-        Sagi Grimberg <sagi@grimberg.me>,
-        Leon Romanovsky <leon@kernel.org>,
-        Doug Ledford <dledford@redhat.com>,
-        Danil Kipnis <danil.kipnis@cloud.ionos.com>, rpenyaev@suse.de
-References: <20191220155109.8959-1-jinpuwang@gmail.com>
- <20200102181859.GC9282@ziepe.ca>
- <CAMGffE=h24jmi0RnYks_rur71qrXCxJnPB5+cCACR50hKF6QRA@mail.gmail.com>
-From:   Bart Van Assche <bvanassche@acm.org>
-Message-ID: <d5be42e2-94d4-ad13-43ac-fcc1bb108ad0@acm.org>
-Date:   Fri, 3 Jan 2020 08:28:59 -0800
-User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:68.0) Gecko/20100101
- Thunderbird/68.2.2
-MIME-Version: 1.0
-In-Reply-To: <CAMGffE=h24jmi0RnYks_rur71qrXCxJnPB5+cCACR50hKF6QRA@mail.gmail.com>
-Content-Type: text/plain; charset=utf-8; format=flowed
-Content-Language: en-US
-Content-Transfer-Encoding: 7bit
+        id S1728553AbgACUkJ (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Fri, 3 Jan 2020 15:40:09 -0500
+Received: from mail.kernel.org ([198.145.29.99]:37452 "EHLO mail.kernel.org"
+        rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
+        id S1727400AbgACUkJ (ORCPT <rfc822;linux-block@vger.kernel.org>);
+        Fri, 3 Jan 2020 15:40:09 -0500
+Subject: Re: [GIT PULL] Block fixes for 5.5-rc
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+        s=default; t=1578084008;
+        bh=0NsOmgi90q1K0lU+bt2PIwrj1JnZDmRaUXtbq0qtfko=;
+        h=From:In-Reply-To:References:Date:To:Cc:From;
+        b=BMDeB/IHMrR61aF/Edxa4+HrPcZXY0KfCBSvQXRJ1ndl4N/vWCxB+rjq58KgCSWPh
+         Z8ZcRiEz5yO532ZD5rgPRq93TGJTWSk8pFjd23nnxYkl36ernTKtcNPlpR3IkXV7f4
+         cIMJ4vULY5hHCT9TSAHXOC1RXajv4OAsrt7GVlek=
+From:   pr-tracker-bot@kernel.org
+In-Reply-To: <a947b677-cf96-0126-9e42-31d478d0c897@kernel.dk>
+References: <a947b677-cf96-0126-9e42-31d478d0c897@kernel.dk>
+X-PR-Tracked-List-Id: <linux-block.vger.kernel.org>
+X-PR-Tracked-Message-Id: <a947b677-cf96-0126-9e42-31d478d0c897@kernel.dk>
+X-PR-Tracked-Remote: git://git.kernel.dk/linux-block.git
+ tags/block-5.5-20200103
+X-PR-Tracked-Commit-Id: c7d776f85dfe5159ebf621ee1e50e555237b1a25
+X-PR-Merge-Tree: torvalds/linux.git
+X-PR-Merge-Refname: refs/heads/master
+X-PR-Merge-Commit-Id: b6b4aafc99d7c8dbf7d9429bf054b591daab1ad0
+Message-Id: <157808400860.14632.8909034110478439823.pr-tracker-bot@kernel.org>
+Date:   Fri, 03 Jan 2020 20:40:08 +0000
+To:     Jens Axboe <axboe@kernel.dk>
+Cc:     Linus Torvalds <torvalds@linux-foundation.org>,
+        "linux-block@vger.kernel.org" <linux-block@vger.kernel.org>
 Sender: linux-block-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-On 1/3/20 4:39 AM, Jinpu Wang wrote:
-> Performance results for the v5.5-rc1 kernel are here:
->    link: https://github.com/ionos-enterprise/ibnbd/tree/develop/performance/v5-v5.5-rc1
-> 
-> Some workloads RNBD are faster, some workloads NVMeoF are faster.
+The pull request you sent on Fri, 3 Jan 2020 09:27:15 -0700:
 
-Thank you for having shared these graphs.
+> git://git.kernel.dk/linux-block.git tags/block-5.5-20200103
 
-Do the graphs in RNBD-SinglePath.pdf show that NVMeOF achieves similar 
-or higher IOPS, higher bandwidth and lower latency than RNBD for 
-workloads with a block size of 4 KB and also for mixed workloads with 
-less than 20 disks, whether or not invalidation is enabled for RNBD?
+has been merged into torvalds/linux.git:
+https://git.kernel.org/torvalds/c/b6b4aafc99d7c8dbf7d9429bf054b591daab1ad0
 
-Is it already clear why NVMeOF performance drops if the number of disks 
-is above 25? Is that perhaps caused by contention on the block layer tag 
-allocator because multiple NVMe namespaces share a tag set? Can that 
-contention be avoided by increasing the NVMeOF queue depth further?
+Thank you!
 
-Thanks,
-
-Bart.
-
-
+-- 
+Deet-doot-dot, I am a bot.
+https://korg.wiki.kernel.org/userdoc/prtracker
