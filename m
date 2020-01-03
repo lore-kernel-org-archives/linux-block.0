@@ -2,96 +2,205 @@ Return-Path: <SRS0=4w+H=2Y=vger.kernel.org=linux-block-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-0.9 required=3.0 tests=DKIMWL_WL_HIGH,DKIM_SIGNED,
-	DKIM_VALID,DKIM_VALID_AU,HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,
-	SPF_HELO_NONE,SPF_PASS,UNPARSEABLE_RELAY autolearn=no autolearn_force=no
-	version=3.4.0
+X-Spam-Status: No, score=-5.3 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
+	INCLUDES_PATCH,MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,USER_AGENT_SANE_1
+	autolearn=unavailable autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id D1E6BC32771
-	for <linux-block@archiver.kernel.org>; Fri,  3 Jan 2020 03:03:36 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id D388BC32771
+	for <linux-block@archiver.kernel.org>; Fri,  3 Jan 2020 03:06:34 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.kernel.org (Postfix) with ESMTP id A88DC24649
-	for <linux-block@archiver.kernel.org>; Fri,  3 Jan 2020 03:03:36 +0000 (UTC)
-Authentication-Results: mail.kernel.org;
-	dkim=pass (2048-bit key) header.d=oracle.com header.i=@oracle.com header.b="R/1jD1Nn"
+	by mail.kernel.org (Postfix) with ESMTP id B24AF21D7D
+	for <linux-block@archiver.kernel.org>; Fri,  3 Jan 2020 03:06:34 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1727388AbgACDDc (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Thu, 2 Jan 2020 22:03:32 -0500
-Received: from userp2120.oracle.com ([156.151.31.85]:60482 "EHLO
-        userp2120.oracle.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1726481AbgACDDc (ORCPT
-        <rfc822;linux-block@vger.kernel.org>); Thu, 2 Jan 2020 22:03:32 -0500
-Received: from pps.filterd (userp2120.oracle.com [127.0.0.1])
-        by userp2120.oracle.com (8.16.0.27/8.16.0.27) with SMTP id 0032xkfC086712;
-        Fri, 3 Jan 2020 03:03:08 GMT
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=oracle.com; h=to : cc : subject :
- from : references : date : in-reply-to : message-id : mime-version :
- content-type; s=corp-2019-08-05;
- bh=7Uzhms73a+KJbfSORtunBkSoE2Z7DP+Q+lxT3XVHdoA=;
- b=R/1jD1NnKGX7/K3I27fBOLJWsRClXryip95BkQ+8YVeXm05fjOyQvTYaan/e64Qweoac
- 9udVPmiijnZJip7nuPT9UYtOikEjK0dhCKfuF0falCYoXNVpaG92oppNY0xtkiz0wwUS
- q8PGnsdBaFUpTvkUWKZ9H6Q4BgCdb2HWRnaZc4+eRkDlJXFQ+Gpn18gyBxxtssT4QjgP
- Ufa+IN9kLk4waD2v2cGe877meQz5hE+5fXjT0BwjcWzM84bPT6ut9zA9yiAxcyPsnLig
- YIdQOj80nD1q1w29iYyMNNlp0t4qcTnlRmgDe9pA/m9LWvtNxVKTNXribNcntMaMSG8C 6A== 
-Received: from userp3020.oracle.com (userp3020.oracle.com [156.151.31.79])
-        by userp2120.oracle.com with ESMTP id 2x5ypqta06-1
-        (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=OK);
-        Fri, 03 Jan 2020 03:03:07 +0000
-Received: from pps.filterd (userp3020.oracle.com [127.0.0.1])
-        by userp3020.oracle.com (8.16.0.27/8.16.0.27) with SMTP id 0032xHrY183017;
-        Fri, 3 Jan 2020 03:03:07 GMT
-Received: from aserv0122.oracle.com (aserv0122.oracle.com [141.146.126.236])
-        by userp3020.oracle.com with ESMTP id 2x8bsttj74-1
-        (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=OK);
-        Fri, 03 Jan 2020 03:03:07 +0000
-Received: from abhmp0018.oracle.com (abhmp0018.oracle.com [141.146.116.24])
-        by aserv0122.oracle.com (8.14.4/8.14.4) with ESMTP id 00332pLK000715;
-        Fri, 3 Jan 2020 03:02:51 GMT
-Received: from ca-mkp.ca.oracle.com (/10.159.214.123)
-        by default (Oracle Beehive Gateway v4.0)
-        with ESMTP ; Thu, 02 Jan 2020 19:02:51 -0800
-To:     Arnd Bergmann <arnd@arndb.de>
-Cc:     "James E.J. Bottomley" <jejb@linux.ibm.com>,
-        "Martin K. Petersen" <martin.petersen@oracle.com>,
-        linux-scsi@vger.kernel.org, linux-block@vger.kernel.org,
-        y2038@lists.linaro.org, linux-kernel@vger.kernel.org,
-        Christoph Hellwig <hch@lst.de>,
-        Ben Hutchings <ben.hutchings@codethink.co.uk>,
-        linux-doc@vger.kernel.org, corbet@lwn.net, viro@zeniv.linux.org.uk,
-        linux-fsdevel@vger.kernel.org, Jens Axboe <axboe@kernel.dk>
-Subject: Re: [GIT PULL v3 00/27] block, scsi: final compat_ioctl cleanup
-From:   "Martin K. Petersen" <martin.petersen@oracle.com>
-Organization: Oracle Corporation
-References: <20200102145552.1853992-1-arnd@arndb.de>
-Date:   Thu, 02 Jan 2020 22:02:47 -0500
-In-Reply-To: <20200102145552.1853992-1-arnd@arndb.de> (Arnd Bergmann's message
-        of "Thu, 2 Jan 2020 15:55:18 +0100")
-Message-ID: <yq1woa944yw.fsf@oracle.com>
-User-Agent: Gnus/5.13 (Gnus v5.13) Emacs/26.1.92 (gnu/linux)
+        id S1727331AbgACDGe (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Thu, 2 Jan 2020 22:06:34 -0500
+Received: from szxga06-in.huawei.com ([45.249.212.32]:47644 "EHLO huawei.com"
+        rhost-flags-OK-OK-OK-FAIL) by vger.kernel.org with ESMTP
+        id S1727325AbgACDGe (ORCPT <rfc822;linux-block@vger.kernel.org>);
+        Thu, 2 Jan 2020 22:06:34 -0500
+Received: from DGGEMS413-HUB.china.huawei.com (unknown [172.30.72.59])
+        by Forcepoint Email with ESMTP id 7E5ED8A828111D5EE3C1;
+        Fri,  3 Jan 2020 11:06:31 +0800 (CST)
+Received: from [127.0.0.1] (10.133.219.224) by DGGEMS413-HUB.china.huawei.com
+ (10.3.19.213) with Microsoft SMTP Server id 14.3.439.0; Fri, 3 Jan 2020
+ 11:06:26 +0800
+Subject: Re: [PATCH] block: make sure last_lookup set as NULL after part
+ deleted
+To:     Ming Lei <ming.lei@redhat.com>
+CC:     Yufen Yu <yuyufen@huawei.com>, <axboe@kernel.dk>,
+        <linux-block@vger.kernel.org>, <hch@lst.de>,
+        <zhengchuan@huawei.com>, <yi.zhang@huawei.com>,
+        <paulmck@kernel.org>, <joel@joelfernandes.org>,
+        <rcu@vger.kernel.org>
+References: <20191231110945.10857-1-yuyufen@huawei.com>
+ <a9ce86d6-dadb-9301-7d76-8cef81d782fd@huawei.com>
+ <20200102012314.GB16719@ming.t460p>
+From:   Hou Tao <houtao1@huawei.com>
+Message-ID: <c12da8ca-be66-496b-efb2-a60ceaf9ce54@huawei.com>
+Date:   Fri, 3 Jan 2020 11:06:25 +0800
+User-Agent: Mozilla/5.0 (Windows NT 6.1; WOW64; rv:52.0) Gecko/20100101
+ Thunderbird/52.8.0
 MIME-Version: 1.0
-Content-Type: text/plain
-X-Proofpoint-Virus-Version: vendor=nai engine=6000 definitions=9488 signatures=668685
-X-Proofpoint-Spam-Details: rule=notspam policy=default score=0 suspectscore=0 malwarescore=0
- phishscore=0 bulkscore=0 spamscore=0 mlxscore=0 mlxlogscore=965
- adultscore=0 classifier=spam adjust=0 reason=mlx scancount=1
- engine=8.0.1-1911140001 definitions=main-2001030026
-X-Proofpoint-Virus-Version: vendor=nai engine=6000 definitions=9488 signatures=668685
-X-Proofpoint-Spam-Details: rule=notspam policy=default score=0 priorityscore=1501 malwarescore=0
- suspectscore=0 phishscore=0 bulkscore=0 spamscore=0 clxscore=1015
- lowpriorityscore=0 mlxscore=0 impostorscore=0 mlxlogscore=999 adultscore=0
- classifier=spam adjust=0 reason=mlx scancount=1 engine=8.0.1-1911140001
- definitions=main-2001030027
+In-Reply-To: <20200102012314.GB16719@ming.t460p>
+Content-Type: text/plain; charset="utf-8"
+Content-Language: en-US
+Content-Transfer-Encoding: 7bit
+X-Originating-IP: [10.133.219.224]
+X-CFilter-Loop: Reflected
 Sender: linux-block-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
+Hi,
 
-Arnd,
+On 2020/1/2 9:23, Ming Lei wrote:
+> On Tue, Dec 31, 2019 at 10:55:47PM +0800, Hou Tao wrote:
+>> Hi,
+>>
+>> On 2019/12/31 19:09, Yufen Yu wrote:
+>>> When delete partition executes concurrently with IOs issue,
+>>> it may cause use-after-free on part in disk_map_sector_rcu()
+>>> as following:
+>> snip
+>>
+>>>
+>>> diff --git a/block/genhd.c b/block/genhd.c
+>>> index ff6268970ddc..39fa8999905f 100644
+>>> --- a/block/genhd.c
+>>> +++ b/block/genhd.c
+>>> @@ -293,7 +293,23 @@ struct hd_struct *disk_map_sector_rcu(struct gendisk *disk, sector_t sector)
+>>>  		part = rcu_dereference(ptbl->part[i]);
+>>>  
+>>>  		if (part && sector_in_part(part, sector)) {
+>> snip
+>>
+>>>  			rcu_assign_pointer(ptbl->last_lookup, part);
+>>> +			part = rcu_dereference(ptbl->part[i]);
+>>> +			if (part == NULL) {
+>>> +				rcu_assign_pointer(ptbl->last_lookup, NULL);
+>>> +				break;
+>>> +			}
+>>>  			return part;
+>>>  		}
+>>>  	}
+>>
+>> Not ensure whether the re-read can handle the following case or not:
+>>
+We have written a similar test case for the following case and found out that
+process C still may got the freed hd_struct pointer from process A. So
+the re-read will not resolve the problem.
 
-> If this version seems ok to everyone, please pull into the scsi tree.
+>> process A                                 process B                          process C
+>>
+>> disk_map_sector_rcu():                    delete_partition():               disk_map_sector_rcu():
+>>
+>> rcu_read_lock
+>>
+>>   // need to iterate partition table
+>>   part[i] != NULL   (1)                   part[i] = NULL (2)
+>>                                           smp_mb()
+>>                                           last_lookup = NULL (3)
+>>                                           call_rcu()  (4)
+>>     last_lookup = part[i] (5)
+>>
+>>
+>>                                                                              rcu_read_lock()
+>>                                                                              read last_lookup return part[i] (6)
+>>                                                                              sector_in_part() is OK (7)
+>>                                                                              return part[i] (8)
+>>
+>>   part[i] == NULL (9)
+>>       last_lookup = NULL (10)
+>>   rcu_read_unlock() (11)
+>>                                            one RCU grace period completes
+>>                                            __delete_partition() (12)
+>>                                            free hd_partition (13)
+>>                                                                              // use-after-free
+>>                                                                              hd_struct_try_get(part[i])  (14)
+>>
+>> * the number in the parenthesis is the sequence of events.
+>>
 
-Looks good to me. Please address Ben's comment and I'll pull it in.
 
--- 
-Martin K. Petersen	Oracle Linux Engineering
+
+>> Maybe RCU experts can shed some light on this problem, so cc +paulmck@kernel.org, +joel@joelfernandes.org and +RCU maillist.
+>>
+>> If the above case is possible, maybe we can fix the problem by pinning last_lookup through increasing its ref-count
+>> (the following patch is only compile tested):
+>>
+>> diff --git a/block/genhd.c b/block/genhd.c
+>> index 6e8543ca6912..179e0056fae1 100644
+>> --- a/block/genhd.c
+>> +++ b/block/genhd.c
+>> @@ -279,7 +279,14 @@ struct hd_struct *disk_map_sector_rcu(struct gendisk *disk, sector_t sector)
+>>  		part = rcu_dereference(ptbl->part[i]);
+>>
+>>  		if (part && sector_in_part(part, sector)) {
+>> -			rcu_assign_pointer(ptbl->last_lookup, part);
+>> +			struct hd_struct *old;
+>> +
+>> +			if (!hd_struct_try_get(part))
+>> +				break;
+>> +
+>> +			old = xchg(&ptbl->last_lookup, part);
+>> +			if (old)
+>> +				hd_struct_put(old);
+>>  			return part;
+>>  		}
+>>  	}
+>> @@ -1231,7 +1238,11 @@ static void disk_replace_part_tbl(struct gendisk *disk,
+>>  	rcu_assign_pointer(disk->part_tbl, new_ptbl);
+>>
+>>  	if (old_ptbl) {
+>> -		rcu_assign_pointer(old_ptbl->last_lookup, NULL);
+>> +		struct hd_struct *part;
+>> +
+>> +		part = xchg(&old_ptbl->last_lookup, NULL);
+>> +		if (part)
+>> +			hd_struct_put(part);
+>>  		kfree_rcu(old_ptbl, rcu_head);
+>>  	}
+>>  }
+>> diff --git a/block/partition-generic.c b/block/partition-generic.c
+>> index 98d60a59b843..441c1c591c04 100644
+>> --- a/block/partition-generic.c
+>> +++ b/block/partition-generic.c
+>> @@ -285,7 +285,8 @@ void delete_partition(struct gendisk *disk, int partno)
+>>  		return;
+>>
+>>  	rcu_assign_pointer(ptbl->part[partno], NULL);
+>> -	rcu_assign_pointer(ptbl->last_lookup, NULL);
+>> +	if (cmpxchg(&ptbl->last_lookup, part, NULL) == part)
+>> +		hd_struct_put(part);
+>>  	kobject_put(part->holder_dir);
+>>  	device_del(part_to_dev(part));
+> 
+> IMO this approach looks good.
+>
+Not sure about the overhead when there are concurrent IOs on different partitions,
+we will measure that.
+
+We have got a seemingly better solution: caching the index of last_lookup in tbl->part[]
+instead of caching the pointer itself, so we can ensure the validity of returned pointer
+by ensuring it's not NULL in tbl->part[] as does when last_lookup is NULL or 0.
+
+> Given partition is actually protected by percpu-refcount now, I guess the
+> RCU annotation for referencing ->part[partno] and ->last_lookup may not
+> be necessary, together with the part->rcu_work.
+> 
+So we will depends on the invocation of of call_rcu() on __percpu_ref_switch_mode() to
+ensure the RCU readers will find part[i] is NULL before trying to increasing
+the atomic ref-counter of part[i], right ?
+
+Regards,
+Tao
+
+> 
+> Thanks,
+> Ming
+> 
+> 
+> .
+> 
+
