@@ -6,59 +6,58 @@ X-Spam-Status: No, score=-0.8 required=3.0 tests=DKIM_SIGNED,DKIM_VALID,
 	DKIM_VALID_AU,HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SPF_HELO_NONE,
 	SPF_PASS autolearn=no autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 89845C2D0CE
-	for <linux-block@archiver.kernel.org>; Fri,  3 Jan 2020 12:31:22 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 6E2FEC2D0C2
+	for <linux-block@archiver.kernel.org>; Fri,  3 Jan 2020 12:34:31 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.kernel.org (Postfix) with ESMTP id 603992253D
-	for <linux-block@archiver.kernel.org>; Fri,  3 Jan 2020 12:31:22 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id 3EBF32085B
+	for <linux-block@archiver.kernel.org>; Fri,  3 Jan 2020 12:34:31 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=pass (2048-bit key) header.d=cloud.ionos.com header.i=@cloud.ionos.com header.b="Ruh2Euoa"
+	dkim=pass (2048-bit key) header.d=cloud.ionos.com header.i=@cloud.ionos.com header.b="GbR4Ofpk"
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1727653AbgACMbU (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Fri, 3 Jan 2020 07:31:20 -0500
-Received: from mail-io1-f65.google.com ([209.85.166.65]:36967 "EHLO
-        mail-io1-f65.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1727457AbgACMbU (ORCPT
-        <rfc822;linux-block@vger.kernel.org>); Fri, 3 Jan 2020 07:31:20 -0500
-Received: by mail-io1-f65.google.com with SMTP id k24so10854787ioc.4
-        for <linux-block@vger.kernel.org>; Fri, 03 Jan 2020 04:31:19 -0800 (PST)
+        id S1727489AbgACMea (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Fri, 3 Jan 2020 07:34:30 -0500
+Received: from mail-il1-f194.google.com ([209.85.166.194]:45367 "EHLO
+        mail-il1-f194.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S1727508AbgACMea (ORCPT
+        <rfc822;linux-block@vger.kernel.org>); Fri, 3 Jan 2020 07:34:30 -0500
+Received: by mail-il1-f194.google.com with SMTP id p8so36480367iln.12
+        for <linux-block@vger.kernel.org>; Fri, 03 Jan 2020 04:34:30 -0800 (PST)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=cloud.ionos.com; s=google;
         h=mime-version:references:in-reply-to:from:date:message-id:subject:to
          :cc;
-        bh=8NFqG/iQr/riL4obmy1p2wa1Hmnb75Lus5pO/+Zthrs=;
-        b=Ruh2EuoaewyPvyU41AQeIFQYvExW8pJJaaR02aFtBtQztfA1I/hQsiuxaFgeYM7SOv
-         XILNu/Z6a9tOfbnjv8cbMg5mJ/DBafj5Wye9m5+ZUv+8DN2Rb8Joe4rH5qq9sNSui691
-         AP3QeoLwY+34BEnbpqpswuCpWYaKVQnPAS45iYQrvN8VPY7G5iXD/OAs0eh128pFRc78
-         TYtjYL7t2bnTgAQ1LgjiY2LKb0bv3oWYDU575a81DxQcbkvP16RevB3sp6abkZVoUMnN
-         +s68T7tWD6+B8CgCC2fL9s9toVLT6I7ZpU7QGPKyFrgovIXy0Ab6IR6Tj3R55mexDF0z
-         bNHQ==
+        bh=fQBNdebVOjJsqjvDHTeF1hVFvcu6+SpjgR+qmN5lO9I=;
+        b=GbR4OfpkJPzqn0HF/BfdUrZgYJy/t9m+O7Gou3FujHO9ZXG4QlzLj7mNtmTGMqfySp
+         LBropy52nKtf1GmOM9fLrVuTZKgG/IqxA9i87nz5hyKxRlVdEg7J8VLMUZ+2KtkQW3h8
+         43NC2fEn0NLiASQqIvcHQQpJhJD7IWCkJe1ZyAERk1lcBHEdliM9Pz80YE1ueguF+VBV
+         8FcPGKYLFgCdG3qe229vdS2FC02NFLBQkQa4R4pzkD2x0ZsY1Ow3mZT2V0PP+t2qTfmm
+         88Dz6I3VkMumgl496p79a37XWXMs691TQkvq9wf0p872CLmlQ1r75WlikM9kj6lt4k5C
+         w7DQ==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=1e100.net; s=20161025;
         h=x-gm-message-state:mime-version:references:in-reply-to:from:date
          :message-id:subject:to:cc;
-        bh=8NFqG/iQr/riL4obmy1p2wa1Hmnb75Lus5pO/+Zthrs=;
-        b=JGR/NorM5HVK6JqYbGH7PHhkGCxRPa3x5kuKke7Ih77ql6KoEHygWVywMkofJ4ExdW
-         k1JRACAOPUAtDG0I4EXThBaAr89xPiO72jLyUr0tBM5MNwm4rNjFIOz7ohKB5YqyhyIt
-         S5G4GbRyluAwTEwBlI7OO72HzMxe8mydjfLxce0oNSp0dJDArKaMp6fr+AR6keB7oxgY
-         a+RvxPbBXyzGR0IYSvF+8jN9MhUSwYBGtlhx5z18PaKh/4IgAmE8Bi/h6EoOWYODmwrH
-         jnDd0OIF4i1zfEAOn+gH0qpyaHBS8eWz11r2YvB5ZFYtJAsRLGjvIRd3GYgFVlYVsHjt
-         TUsw==
-X-Gm-Message-State: APjAAAXwfe7DNAvX7n53VBihcRbSDf1GNGZykKyD7pGkHaC1aQihRN2L
-        oGkL6gTE6Ric9p3iNNTXQP7Up8GNkD8jLefDbIB2yg==
-X-Google-Smtp-Source: APXvYqyhkVZvSZo6HhOsxdPj6wwKc/pshsSv6FHg+6LnZGg+LxY6AQS3cgQwwHwdcDbBaeh02I/SjTA+bef3JG3wuPY=
-X-Received: by 2002:a6b:6e02:: with SMTP id d2mr60291340ioh.22.1578054679297;
- Fri, 03 Jan 2020 04:31:19 -0800 (PST)
+        bh=fQBNdebVOjJsqjvDHTeF1hVFvcu6+SpjgR+qmN5lO9I=;
+        b=jBp6L/mCKDNcRcR5/Uv0h87JR4FZ2xDJg0bSZ1gPklBZu8+Jur6NvRbnmBT1aCY+pt
+         Vs0+DVrymaJ17WYCUjTvPNOVbAzEaX5ByVGlEaBjs8ZdvZbbkFufNjH9HTY59ioCOP9s
+         +AJ25Qj7kOMS5b3/CS2A7O7CwH0cuInnmUqM+PsQHnAVDu7FI1U32289wDwjle7RdMg2
+         d2UTVX5CnHouPS7o+0b8U4DORcnMIAgdmbXXq7b6i4HoR7oIMKioWB5kQ5JGtuZ1SF7m
+         gg3VRcEWt8FOJKVdXonct885co2mL+e55BfGkFb1V1GhQIoKEiZgR7fTDJSvsPZyP7NA
+         PsTA==
+X-Gm-Message-State: APjAAAU/t7MpksS6NJKGNJDiKQMUZCQHExF3lfTarRbmUO/s9RQXa1Ac
+        2Kf51C/u2mLlp3UYDFK1TTzyQILIX4Bx3WkkXJb1dg==
+X-Google-Smtp-Source: APXvYqwHyBfcBx7ZF0gOT5DpfJVIq+6gyRsp0/ioGLDdv6afv/CJZ4aHA3jhQ2DbnDrghb5BtHs6dRnR4Nq4zdd5MHw=
+X-Received: by 2002:a92:d2:: with SMTP id 201mr77769369ila.22.1578054869876;
+ Fri, 03 Jan 2020 04:34:29 -0800 (PST)
 MIME-Version: 1.0
-References: <20191230102942.18395-1-jinpuwang@gmail.com> <20191230102942.18395-4-jinpuwang@gmail.com>
- <b13eccdd-09a2-70d5-1c78-3c4dbf1aefe8@acm.org> <CAMGffEmC3T9M+RmeOXX4ecE3E01azjD8fz2Lz8kHC9Ff-Xx-Aw@mail.gmail.com>
- <51f2aec2-db24-ce7b-b3e8-68f9561a584b@acm.org> <20200102182653.GE9282@ziepe.ca>
-In-Reply-To: <20200102182653.GE9282@ziepe.ca>
+References: <20191230102942.18395-1-jinpuwang@gmail.com> <a56985f4-fbd3-3546-34e1-4185150f4af2@acm.org>
+ <20200102182840.GF9282@ziepe.ca>
+In-Reply-To: <20200102182840.GF9282@ziepe.ca>
 From:   Jinpu Wang <jinpu.wang@cloud.ionos.com>
-Date:   Fri, 3 Jan 2020 13:31:08 +0100
-Message-ID: <CAMGffEmwcVU7OTKGbGWiuDV2wmZy6jZyffFyGC9cT=yVF3ky_Q@mail.gmail.com>
-Subject: Re: [PATCH v6 03/25] rtrs: private headers with rtrs protocol structs
- and helpers
+Date:   Fri, 3 Jan 2020 13:34:19 +0100
+Message-ID: <CAMGffE=37tYaXSQqiSqO63tL-ZdJ3-uRem3ZBjC1q4yO5+ffbA@mail.gmail.com>
+Subject: Re: [PATCH v6 00/25] RTRS (former IBTRS) rdma transport library and
+ RNBD (former IBNBD) rdma network block device
 To:     Jason Gunthorpe <jgg@ziepe.ca>
 Cc:     Bart Van Assche <bvanassche@acm.org>,
         Jack Wang <jinpuwang@gmail.com>, linux-block@vger.kernel.org,
@@ -74,45 +73,26 @@ Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-On Thu, Jan 2, 2020 at 7:26 PM Jason Gunthorpe <jgg@ziepe.ca> wrote:
+On Thu, Jan 2, 2020 at 7:28 PM Jason Gunthorpe <jgg@ziepe.ca> wrote:
 >
-> On Thu, Jan 02, 2020 at 09:00:53AM -0800, Bart Van Assche wrote:
->
-> > > > > +/**
-> > > > > + * struct rtrs_msg_conn_req - Client connection request to the server
-> > > > > + * @magic:      RTRS magic
-> > > > > + * @version:    RTRS protocol version
-> > > > > + * @cid:        Current connection id
-> > > > > + * @cid_num:    Number of connections per session
-> > > > > + * @recon_cnt:          Reconnections counter
-> > > > > + * @sess_uuid:          UUID of a session (path)
-> > > > > + * @paths_uuid:         UUID of a group of sessions (paths)
-> > > > > + *
-> > > > > + * NOTE: max size 56 bytes, see man rdma_connect().
-> > > > > + */
-> > > > > +struct rtrs_msg_conn_req {
-> > > > > +     u8              __cma_version; /* Is set to 0 by cma.c in case of
-> > > > > +                                     * AF_IB, do not touch that.
-> > > > > +                                     */
-> > > > > +     u8              __ip_version;  /* On sender side that should be
-> > > > > +                                     * set to 0, or cma_save_ip_info()
-> > > > > +                                     * extract garbage and will fail.
-> > > > > +                                     */
-> > > >
-> > > > The above two fields and the comments next to it look suspicious to me.
-> > > > Does RTRS perhaps try to generate CMA-formatted messages without using
-> > > > the CMA to format these messages?
-> > > The problem is in cma_format_hdr over-writes the first byte for AF_IB
-> > > https://www.spinics.net/lists/linux-rdma/msg22397.html
+> On Mon, Dec 30, 2019 at 06:39:00PM -0800, Bart Van Assche wrote:
+> > On 2019-12-30 02:29, Jack Wang wrote:
+> > > here is V6 of the RTRS (former IBTRS) rdma transport library and the
+> > > corresponding RNBD (former IBNBD) rdma network block device.
 > > >
-> > > No one fixes the problem since then.
+> > > Changelog since v5:
+> > > 1 rebased to linux-5.5-rc4
+> > > 2 fix typo in my email address in first patch
+> > > 3 cleanup copyright as suggested by Leon Romanovsky
+> > > 4 remove 2 redudant kobject_del in error path as suggested by Leon Romanovsky
+> > > 5 add MAINTAINERS entries in alphabetical order as Gal Pressman suggested
 > >
-> > How about adding that URL to the comment block above struct
-> > rtrs_msg_conn_req?
+> > Please always include the full changelog when posting a new version.
+> > Every other Linux kernel patch series I have seen includes a full
+> > changelog in version two and later versions of its cover letter.
 >
-> Or just fixing whatever the problem is..
+> We now also like it if you include URLs to lore.kernel.org for the
+> prior submissions.
 >
 > Jason
-I can do another try if no one else fix the problem, but I have plenty of to-do.
-
-Thanks
+Will do.
