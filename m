@@ -2,111 +2,148 @@ Return-Path: <SRS0=NecV=22=vger.kernel.org=linux-block-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-8.4 required=3.0 tests=DKIMWL_WL_HIGH,DKIM_SIGNED,
+X-Spam-Status: No, score=-6.9 required=3.0 tests=DKIMWL_WL_HIGH,DKIM_SIGNED,
 	DKIM_VALID,DKIM_VALID_AU,HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,
-	MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,USER_AGENT_SANE_1
-	autolearn=ham autolearn_force=no version=3.4.0
+	MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS autolearn=ham
+	autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 09417C32767
-	for <linux-block@archiver.kernel.org>; Sun,  5 Jan 2020 00:49:19 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 92D01C32767
+	for <linux-block@archiver.kernel.org>; Sun,  5 Jan 2020 01:41:30 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.kernel.org (Postfix) with ESMTP id C916C215A4
-	for <linux-block@archiver.kernel.org>; Sun,  5 Jan 2020 00:49:18 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id 5F2782465B
+	for <linux-block@archiver.kernel.org>; Sun,  5 Jan 2020 01:41:30 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="NWyAKwNR"
+	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="BzCCBHU0"
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1726240AbgAEAtS (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Sat, 4 Jan 2020 19:49:18 -0500
-Received: from us-smtp-1.mimecast.com ([207.211.31.81]:54590 "EHLO
-        us-smtp-delivery-1.mimecast.com" rhost-flags-OK-OK-OK-FAIL)
-        by vger.kernel.org with ESMTP id S1726205AbgAEAtS (ORCPT
-        <rfc822;linux-block@vger.kernel.org>);
-        Sat, 4 Jan 2020 19:49:18 -0500
+        id S1726313AbgAEBl3 (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Sat, 4 Jan 2020 20:41:29 -0500
+Received: from us-smtp-delivery-1.mimecast.com ([205.139.110.120]:39193 "EHLO
+        us-smtp-1.mimecast.com" rhost-flags-OK-OK-OK-FAIL) by vger.kernel.org
+        with ESMTP id S1726205AbgAEBl3 (ORCPT
+        <rfc822;linux-block@vger.kernel.org>); Sat, 4 Jan 2020 20:41:29 -0500
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-        s=mimecast20190719; t=1578185356;
+        s=mimecast20190719; t=1578188487;
         h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-         to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-         in-reply-to:in-reply-to:references:references;
-        bh=F7kx1fYZnl08Zrl5qbG/2Z5BQvBXmJ+dX7kdzKz8TW4=;
-        b=NWyAKwNR/HloZmWWxoH3AQHVbp4ljzBvPcMau1fTEMof3K34KBOR5OA7zm/FCG0etY+OLk
-        4i7s+idDcid3DtVPhj2OvVbLGa51gPM/puJrWn6Pl1S0Gs/tKKChoHXp1AEF8QnO5chh85
-        uTvIEbYkhXezT0u9JH80gdw9UTsAvCE=
+         to:to:cc:cc:mime-version:mime-version:
+         content-transfer-encoding:content-transfer-encoding;
+        bh=PFbuxjhzkUeppz8ScPsjki0VOQ0QjZ2Z1MTS33+xgec=;
+        b=BzCCBHU0tyag0Q53LTxfEtURi//L7imYZtqHZQlYsxw5l+QpBZObQ7xtqmaiy0CB1zP3M4
+        jheyIHFm9szqzCc/EJgvsvvYwkW/arEOOy8xqjPTWWazSQceQATjJetA/NGpVOVGCsAGoa
+        MW/43VsEaqwMtQunh7x1jyUI8SDlgFQ=
 Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
  [209.132.183.4]) (Using TLS) by relay.mimecast.com with ESMTP id
- us-mta-213-IoFbELNWOA2IfiBBBiEjoA-1; Sat, 04 Jan 2020 19:49:13 -0500
-X-MC-Unique: IoFbELNWOA2IfiBBBiEjoA-1
-Received: from smtp.corp.redhat.com (int-mx02.intmail.prod.int.phx2.redhat.com [10.5.11.12])
+ us-mta-362-rPilglJfMeSLFR4wdkMzYw-1; Sat, 04 Jan 2020 20:41:26 -0500
+X-MC-Unique: rPilglJfMeSLFR4wdkMzYw-1
+Received: from smtp.corp.redhat.com (int-mx08.intmail.prod.int.phx2.redhat.com [10.5.11.23])
         (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
         (No client certificate requested)
-        by mimecast-mx01.redhat.com (Postfix) with ESMTPS id E23CC182B791;
-        Sun,  5 Jan 2020 00:49:11 +0000 (UTC)
-Received: from ming.t460p (ovpn-8-18.pek2.redhat.com [10.72.8.18])
-        by smtp.corp.redhat.com (Postfix) with ESMTPS id 9848860C81;
-        Sun,  5 Jan 2020 00:49:07 +0000 (UTC)
-Date:   Sun, 5 Jan 2020 08:49:02 +0800
+        by mimecast-mx01.redhat.com (Postfix) with ESMTPS id A6515182B791;
+        Sun,  5 Jan 2020 01:41:25 +0000 (UTC)
+Received: from localhost (ovpn-8-18.pek2.redhat.com [10.72.8.18])
+        by smtp.corp.redhat.com (Postfix) with ESMTP id 3837C38A;
+        Sun,  5 Jan 2020 01:41:19 +0000 (UTC)
 From:   Ming Lei <ming.lei@redhat.com>
 To:     Jens Axboe <axboe@kernel.dk>
-Cc:     "linux-block@vger.kernel.org" <linux-block@vger.kernel.org>
-Subject: Re: [PATCH] block: remove unused mp_bvec_last_segment
-Message-ID: <20200105004902.GA1812@ming.t460p>
-References: <d8642060-8984-f584-6d93-6fcf032d6b6e@kernel.dk>
+Cc:     linux-block@vger.kernel.org, Ming Lei <ming.lei@redhat.com>,
+        Carlos Maiolino <cmaiolino@redhat.com>,
+        linux-fsdevel@vger.kernel.org
+Subject: [PATCH] fs: move guard_bio_eod() after bio_set_op_attrs
+Date:   Sun,  5 Jan 2020 09:41:14 +0800
+Message-Id: <20200105014114.4824-1-ming.lei@redhat.com>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <d8642060-8984-f584-6d93-6fcf032d6b6e@kernel.dk>
-User-Agent: Mutt/1.12.1 (2019-06-15)
-X-Scanned-By: MIMEDefang 2.79 on 10.5.11.12
+X-Scanned-By: MIMEDefang 2.84 on 10.5.11.23
+Content-Transfer-Encoding: quoted-printable
 Sender: linux-block-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-On Sat, Jan 04, 2020 at 10:43:09AM -0700, Jens Axboe wrote:
-> After commit 85a8ce62c2ea ("block: add bio_truncate to fix guard_bio_eod")
-> this function is unused, remove it.
-> 
-> Signed-off-by: Jens Axboe <axboe@kernel.dk>
-> 
-> ---
-> 
-> diff --git a/include/linux/bvec.h b/include/linux/bvec.h
-> index 679a42253170..a81c13ac1972 100644
-> --- a/include/linux/bvec.h
-> +++ b/include/linux/bvec.h
-> @@ -153,26 +153,4 @@ static inline void bvec_advance(const struct bio_vec *bvec,
->  	}
->  }
->  
-> -/*
-> - * Get the last single-page segment from the multi-page bvec and store it
-> - * in @seg
-> - */
-> -static inline void mp_bvec_last_segment(const struct bio_vec *bvec,
-> -					struct bio_vec *seg)
-> -{
-> -	unsigned total = bvec->bv_offset + bvec->bv_len;
-> -	unsigned last_page = (total - 1) / PAGE_SIZE;
-> -
-> -	seg->bv_page = bvec->bv_page + last_page;
-> -
-> -	/* the whole segment is inside the last page */
-> -	if (bvec->bv_offset >= last_page * PAGE_SIZE) {
-> -		seg->bv_offset = bvec->bv_offset % PAGE_SIZE;
-> -		seg->bv_len = bvec->bv_len;
-> -	} else {
-> -		seg->bv_offset = 0;
-> -		seg->bv_len = total - last_page * PAGE_SIZE;
-> -	}
-> -}
-> -
->  #endif /* __LINUX_BVEC_ITER_H */
-> 
-> -- 
-> Jens Axboe
-> 
+Commit 85a8ce62c2ea ("block: add bio_truncate to fix guard_bio_eod")
+adds bio_truncate() for handling bio EOD. However, bio_truncate()
+doesn't use the passed 'op' parameter from guard_bio_eod's callers.
 
-Reviewed-by: Ming Lei <ming.lei@redhat.com>
+So bio_trunacate() may retrieve wrong 'op', and zering pages may
+not be done for READ bio.
 
--- 
-Ming
+Fixes this issue by moving guard_bio_eod() after bio_set_op_attrs()
+in submit_bh_wbc() so that bio_truncate() can always retrieve correct
+op info.
+
+Meantime remove the 'op' parameter from guard_bio_eod() because it isn't
+used any more.
+
+Cc: Carlos Maiolino <cmaiolino@redhat.com>
+Cc: linux-fsdevel@vger.kernel.org
+Fixes: 85a8ce62c2ea ("block: add bio_truncate to fix guard_bio_eod")
+Signed-off-by: Ming Lei <ming.lei@redhat.com>
+---
+ fs/buffer.c   | 8 ++++----
+ fs/internal.h | 2 +-
+ fs/mpage.c    | 2 +-
+ 3 files changed, 6 insertions(+), 6 deletions(-)
+
+diff --git a/fs/buffer.c b/fs/buffer.c
+index e94a6619464c..18a87ec8a465 100644
+--- a/fs/buffer.c
++++ b/fs/buffer.c
+@@ -3031,7 +3031,7 @@ static void end_bio_bh_io_sync(struct bio *bio)
+  * errors, this only handles the "we need to be able to
+  * do IO at the final sector" case.
+  */
+-void guard_bio_eod(int op, struct bio *bio)
++void guard_bio_eod(struct bio *bio)
+ {
+ 	sector_t maxsector;
+ 	struct hd_struct *part;
+@@ -3095,15 +3095,15 @@ static int submit_bh_wbc(int op, int op_flags, st=
+ruct buffer_head *bh,
+ 	bio->bi_end_io =3D end_bio_bh_io_sync;
+ 	bio->bi_private =3D bh;
+=20
+-	/* Take care of bh's that straddle the end of the device */
+-	guard_bio_eod(op, bio);
+-
+ 	if (buffer_meta(bh))
+ 		op_flags |=3D REQ_META;
+ 	if (buffer_prio(bh))
+ 		op_flags |=3D REQ_PRIO;
+ 	bio_set_op_attrs(bio, op, op_flags);
+=20
++	/* Take care of bh's that straddle the end of the device */
++	guard_bio_eod(bio);
++
+ 	if (wbc) {
+ 		wbc_init_bio(wbc, bio);
+ 		wbc_account_cgroup_owner(wbc, bh->b_page, bh->b_size);
+diff --git a/fs/internal.h b/fs/internal.h
+index 4a7da1df573d..e3fa69544b66 100644
+--- a/fs/internal.h
++++ b/fs/internal.h
+@@ -38,7 +38,7 @@ static inline int __sync_blockdev(struct block_device *=
+bdev, int wait)
+ /*
+  * buffer.c
+  */
+-extern void guard_bio_eod(int rw, struct bio *bio);
++extern void guard_bio_eod(struct bio *bio);
+ extern int __block_write_begin_int(struct page *page, loff_t pos, unsign=
+ed len,
+ 		get_block_t *get_block, struct iomap *iomap);
+=20
+diff --git a/fs/mpage.c b/fs/mpage.c
+index a63620cdb73a..ccba3c4c4479 100644
+--- a/fs/mpage.c
++++ b/fs/mpage.c
+@@ -62,7 +62,7 @@ static struct bio *mpage_bio_submit(int op, int op_flag=
+s, struct bio *bio)
+ {
+ 	bio->bi_end_io =3D mpage_end_io;
+ 	bio_set_op_attrs(bio, op, op_flags);
+-	guard_bio_eod(op, bio);
++	guard_bio_eod(bio);
+ 	submit_bio(bio);
+ 	return NULL;
+ }
+--=20
+2.20.1
 
