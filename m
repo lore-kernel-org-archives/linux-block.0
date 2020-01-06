@@ -2,93 +2,111 @@ Return-Path: <SRS0=PDkS=23=vger.kernel.org=linux-block-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-9.6 required=3.0 tests=DKIM_SIGNED,DKIM_VALID,
-	DKIM_VALID_AU,FREEMAIL_FORGED_FROMDOMAIN,FREEMAIL_FROM,
-	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,
-	SPF_HELO_NONE,SPF_PASS,USER_AGENT_GIT autolearn=ham autolearn_force=no
-	version=3.4.0
+X-Spam-Status: No, score=-5.8 required=3.0 tests=DKIM_SIGNED,DKIM_VALID,
+	DKIM_VALID_AU,HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,
+	MENTIONS_GIT_HOSTING,SPF_HELO_NONE,SPF_PASS autolearn=unavailable
+	autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 44F85C2D0D1
-	for <linux-block@archiver.kernel.org>; Mon,  6 Jan 2020 10:37:48 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 7C545C33C9E
+	for <linux-block@archiver.kernel.org>; Mon,  6 Jan 2020 17:07:34 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.kernel.org (Postfix) with ESMTP id 1406C2072E
-	for <linux-block@archiver.kernel.org>; Mon,  6 Jan 2020 10:37:47 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id 4D641207FF
+	for <linux-block@archiver.kernel.org>; Mon,  6 Jan 2020 17:07:34 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="QvE/ckqk"
+	dkim=pass (2048-bit key) header.d=cloud.ionos.com header.i=@cloud.ionos.com header.b="MUeK7d5Y"
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1726303AbgAFKhr (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Mon, 6 Jan 2020 05:37:47 -0500
-Received: from mail-ed1-f45.google.com ([209.85.208.45]:43976 "EHLO
-        mail-ed1-f45.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1726294AbgAFKhq (ORCPT
-        <rfc822;linux-block@vger.kernel.org>); Mon, 6 Jan 2020 05:37:46 -0500
-Received: by mail-ed1-f45.google.com with SMTP id dc19so46986200edb.10
-        for <linux-block@vger.kernel.org>; Mon, 06 Jan 2020 02:37:45 -0800 (PST)
+        id S1726526AbgAFRHd (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Mon, 6 Jan 2020 12:07:33 -0500
+Received: from mail-il1-f194.google.com ([209.85.166.194]:32859 "EHLO
+        mail-il1-f194.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S1726524AbgAFRHd (ORCPT
+        <rfc822;linux-block@vger.kernel.org>); Mon, 6 Jan 2020 12:07:33 -0500
+Received: by mail-il1-f194.google.com with SMTP id v15so43194391iln.0
+        for <linux-block@vger.kernel.org>; Mon, 06 Jan 2020 09:07:32 -0800 (PST)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20161025;
-        h=from:to:cc:subject:date:message-id;
-        bh=4BadsxmgCZIRtcL/pBAoBP5vBouLHiMhovHL2ji+PcQ=;
-        b=QvE/ckqklBRDh/M7fWVtNjqb/LCheA0OKvKy2CzGi23tFgf+0RmXPXIsARzQdMfzPV
-         wPPX7rH6rAuvn2JyraCxik+iyxevDlQb1QXDrjdsDyg1hdplkMdHN8GBJK4tadrbGvWJ
-         i6iRWbHVOlH8U6KhcKFWDLqvRurhFjFg19AMXZ3mqlpJf2mj4YE7N0dVUNLaKhtJDJHX
-         6/sY73DX5L4SQpNvUF7HJ2Q6XkzaNF9GbJQTgKBe9LZS9qKuG9KT/gbS5WA6zOsedHpT
-         OwYRS0LS9+BeOMZViVs5/ZeMmkISdxfv0S67mH9VtoVDgdovdXgG5xFGCEiKgYiHyySH
-         Adsg==
+        d=cloud.ionos.com; s=google;
+        h=mime-version:references:in-reply-to:from:date:message-id:subject:to
+         :cc;
+        bh=HZHfMaYSoFvmYLiDLnniQwp5Jcc0dLCV9c9ledHZ8eU=;
+        b=MUeK7d5YtD2lFnmxgOLSZuo/x6kf65GgzVij7FRkau6+dwrPiVwioAfvHRKTokwDH9
+         1XK8iQuzCHiGuGU/9f1iC90bDNRf12JcDhZ4nZau3Wq7w9rdPWamPkGIuTMrFZLeY/xq
+         eLMsV6D+oBS63L6HgcuQgVc0kKwqc+Ur2c3aMyLCoBu41I8eNVLHxbSO8x8LJK1UWM5n
+         LW7AhHyZ6bPuI2seq7bWdOXBzZGWQDtc8w82/WXd+mK3jtlKqOnAsf+/xyEDJdj2P9Ed
+         5fWc05Lj73R+L1ZC9+8b4LJLDA3QWr1r5yyyz9NPOh/U0+/UUFhxttLpiapdy4brFjQx
+         ma3Q==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=1e100.net; s=20161025;
-        h=x-gm-message-state:from:to:cc:subject:date:message-id;
-        bh=4BadsxmgCZIRtcL/pBAoBP5vBouLHiMhovHL2ji+PcQ=;
-        b=gSX3C8TDQZQrQK3Fhgg/W5YQj8R872NFwfzSonCLkQqqRSaP3WFhRY05hA9IeejATK
-         y2D2K0H4I+Ow4Z1fntrJxjdHH0kOgcjYSbL0NYhj+l43mf2LRBCcQzuxJqlIVJ/A8qfw
-         QIFIaVWwjj58unhjJq165Exd6+olCfxopUnspEgrYcDp8xJ4kDrl+7t3C+MMsyQ77FuY
-         vYN1ix9EvfGZHcaJz+IpOmkCdilyr8ERkqDTGfshVHvpA4rZyE0I8VLHQveiNSosprls
-         r4lCE3e7UmTjmC2q1Le6ZnSprjNrL51MWQrS7iTYStjgeDhEVAeoqjlBz8OPXl1X1Q3Q
-         /Tsw==
-X-Gm-Message-State: APjAAAXCMthxT5tCPy8v27/nwrxbmNExDDTkUdOAfiAEVTnZX8pT7eXa
-        Yq9a+wwqC+OGBLTJJAdcFf94VdkZ
-X-Google-Smtp-Source: APXvYqycaZ1P+M9YGlgD7vkzkG1+DLspGQGadd1bNQFPWPCL2ccWk8pCh8G1UqBDLduiB6YX6/nAzg==
-X-Received: by 2002:a17:906:f251:: with SMTP id gy17mr106344614ejb.308.1578307064989;
-        Mon, 06 Jan 2020 02:37:44 -0800 (PST)
-Received: from ls00508.pb.local ([2001:1438:4010:2540:443c:bea1:ffb8:40f])
-        by smtp.gmail.com with ESMTPSA id u21sm7609436edv.43.2020.01.06.02.37.43
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Mon, 06 Jan 2020 02:37:44 -0800 (PST)
-From:   jgq516@gmail.com
-X-Google-Original-From: guoqing.jiang@cloud.ionos.com
-To:     axboe@kernel.dk, corbet@lwn.net
-Cc:     linux-block@vger.kernel.org,
-        Guoqing Jiang <guoqing.jiang@cloud.ionos.com>
-Subject: [PATCH] docs: block/biovecs: update the location of bio.c
-Date:   Mon,  6 Jan 2020 11:37:35 +0100
-Message-Id: <20200106103735.10327-1-guoqing.jiang@cloud.ionos.com>
-X-Mailer: git-send-email 2.17.1
+        h=x-gm-message-state:mime-version:references:in-reply-to:from:date
+         :message-id:subject:to:cc;
+        bh=HZHfMaYSoFvmYLiDLnniQwp5Jcc0dLCV9c9ledHZ8eU=;
+        b=lFPX1Aax2dMxfjcBQJkBx1lW6ei5HSdEqpD7/dLLOfM1ORJLe/gNEiTLLDOZiESSI1
+         104IiGzxpS3k437JAg557wn46DorMBKODt9y6vyQ7692ygikYvgo9rFx7ho0XIdWoXKN
+         s2uNI4ESU2ANq0ON44g63QbWy2n5gG4uTu2wfFoE3nCS4t5U5S4ITorFwszRagv1+LfK
+         2+2wX0GZiejFYiST17hYMt7XI5YK4QK2FwYk9j/p8NIP3O7a+6RP5rrWkenKNNwDKhLJ
+         cAQu1obTHqYLFxhhT6OxXta/MSxAsRcmf1TV6KswEER2HsyOJoVubUn0fhbkZX2XX1U3
+         yXBw==
+X-Gm-Message-State: APjAAAVgIiYtbY46S4EIf+qXO3PLxr432iD4oiMvsKh4JiguKxRcOlEo
+        dpa3rFW2I8AXCXpD9xfNM1Eg1dyl8p+RGPPg3e9DTw==
+X-Google-Smtp-Source: APXvYqxGIGJe3cC0TgJn54u78DisxF+DobqiIPRqA+VcoePJTIDq4lx+eFWLkwoYfelMNX5J4pLWmOQSXbmpHZldlzo=
+X-Received: by 2002:a05:6e02:4d2:: with SMTP id f18mr83102168ils.54.1578330452530;
+ Mon, 06 Jan 2020 09:07:32 -0800 (PST)
+MIME-Version: 1.0
+References: <20191220155109.8959-1-jinpuwang@gmail.com> <20200102181859.GC9282@ziepe.ca>
+ <CAMGffE=h24jmi0RnYks_rur71qrXCxJnPB5+cCACR50hKF6QRA@mail.gmail.com> <d5be42e2-94d4-ad13-43ac-fcc1bb108ad0@acm.org>
+In-Reply-To: <d5be42e2-94d4-ad13-43ac-fcc1bb108ad0@acm.org>
+From:   Jinpu Wang <jinpu.wang@cloud.ionos.com>
+Date:   Mon, 6 Jan 2020 18:07:21 +0100
+Message-ID: <CAMGffEntYmFfGD8BGEtykoFXD_3DvNWQ8hrRmDoLtdr9ykTwug@mail.gmail.com>
+Subject: Re: [PATCH v5 00/25] RTRS (former IBTRS) rdma transport library and
+ the corresponding RNBD (former IBNBD) rdma network block device
+To:     Bart Van Assche <bvanassche@acm.org>
+Cc:     Jason Gunthorpe <jgg@ziepe.ca>, Jack Wang <jinpuwang@gmail.com>,
+        linux-block@vger.kernel.org, linux-rdma@vger.kernel.org,
+        Jens Axboe <axboe@kernel.dk>,
+        Christoph Hellwig <hch@infradead.org>,
+        Sagi Grimberg <sagi@grimberg.me>,
+        Leon Romanovsky <leon@kernel.org>,
+        Doug Ledford <dledford@redhat.com>,
+        Danil Kipnis <danil.kipnis@cloud.ionos.com>, rpenyaev@suse.de
+Content-Type: text/plain; charset="UTF-8"
 Sender: linux-block-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-From: Guoqing Jiang <guoqing.jiang@cloud.ionos.com>
+On Fri, Jan 3, 2020 at 5:29 PM Bart Van Assche <bvanassche@acm.org> wrote:
+>
+> On 1/3/20 4:39 AM, Jinpu Wang wrote:
+> > Performance results for the v5.5-rc1 kernel are here:
+> >    link: https://github.com/ionos-enterprise/ibnbd/tree/develop/performance/v5-v5.5-rc1
+> >
+> > Some workloads RNBD are faster, some workloads NVMeoF are faster.
+>
+> Thank you for having shared these graphs.
+>
+> Do the graphs in RNBD-SinglePath.pdf show that NVMeOF achieves similar
+> or higher IOPS, higher bandwidth and lower latency than RNBD for
+> workloads with a block size of 4 KB and also for mixed workloads with
+> less than 20 disks, whether or not invalidation is enabled for RNBD?
+Hi Bart,
 
-Replace fs with block since bio.c had been moved to block folder.
+Yes, that's the result on one pair of Server with Connect X4 HCA, I
+did another test on another
+2 servers with Connect X5 HCA, results are quite different, we will
+double-check the
+performance results also on old machines, will share new results later.
 
-Signed-off-by: Guoqing Jiang <guoqing.jiang@cloud.ionos.com>
----
- Documentation/block/biovecs.rst | 2 +-
- 1 file changed, 1 insertion(+), 1 deletion(-)
 
-diff --git a/Documentation/block/biovecs.rst b/Documentation/block/biovecs.rst
-index 86fa66c87172..ad303a2569d3 100644
---- a/Documentation/block/biovecs.rst
-+++ b/Documentation/block/biovecs.rst
-@@ -47,7 +47,7 @@ Having a real iterator, and making biovecs immutable, has a number of
- advantages:
- 
-  * Before, iterating over bios was very awkward when you weren't processing
--   exactly one bvec at a time - for example, bio_copy_data() in fs/bio.c,
-+   exactly one bvec at a time - for example, bio_copy_data() in block/bio.c,
-    which copies the contents of one bio into another. Because the biovecs
-    wouldn't necessarily be the same size, the old code was tricky convoluted -
-    it had to walk two different bios at the same time, keeping both bi_idx and
--- 
-2.17.1
-
+>
+> Is it already clear why NVMeOF performance drops if the number of disks
+> is above 25? Is that perhaps caused by contention on the block layer tag
+> allocator because multiple NVMe namespaces share a tag set? Can that
+> contention be avoided by increasing the NVMeOF queue depth further?
+No yet, will check.
+>
+> Thanks,
+>
+> Bart.
+>
+>
+Thanks
