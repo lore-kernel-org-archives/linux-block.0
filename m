@@ -2,169 +2,146 @@ Return-Path: <SRS0=PDkS=23=vger.kernel.org=linux-block-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-8.4 required=3.0 tests=DKIMWL_WL_HIGH,DKIM_SIGNED,
-	DKIM_VALID,DKIM_VALID_AU,HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,
-	MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,USER_AGENT_SANE_1
-	autolearn=ham autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-2.4 required=3.0 tests=DKIMWL_WL_HIGH,DKIM_SIGNED,
+	DKIM_VALID,DKIM_VALID_AU,HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,
+	SPF_HELO_NONE,SPF_PASS,USER_AGENT_SANE_1 autolearn=no autolearn_force=no
+	version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 10630C33C9A
-	for <linux-block@archiver.kernel.org>; Mon,  6 Jan 2020 02:45:13 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 7643DC3F68F
+	for <linux-block@archiver.kernel.org>; Mon,  6 Jan 2020 06:01:57 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.kernel.org (Postfix) with ESMTP id D2406217F4
-	for <linux-block@archiver.kernel.org>; Mon,  6 Jan 2020 02:45:12 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id 4942421775
+	for <linux-block@archiver.kernel.org>; Mon,  6 Jan 2020 06:01:57 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="bp1QaRp/"
+	dkim=pass (2048-bit key) header.d=oracle.com header.i=@oracle.com header.b="sQrqpLYN"
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1727378AbgAFCpL (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Sun, 5 Jan 2020 21:45:11 -0500
-Received: from us-smtp-2.mimecast.com ([205.139.110.61]:41556 "EHLO
-        us-smtp-delivery-1.mimecast.com" rhost-flags-OK-OK-OK-FAIL)
-        by vger.kernel.org with ESMTP id S1727340AbgAFCpL (ORCPT
-        <rfc822;linux-block@vger.kernel.org>);
-        Sun, 5 Jan 2020 21:45:11 -0500
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-        s=mimecast20190719; t=1578278710;
-        h=from:from:reply-to:reply-to:subject:subject:date:date:
-         message-id:message-id:to:to:cc:cc:mime-version:mime-version:
-         content-type:content-type:
-         content-transfer-encoding:content-transfer-encoding:
-         in-reply-to:in-reply-to:references:references;
-        bh=R7cuW4nr6dXYOh0P9VyDEZmrT7Y+OzXd9iAtK+rNk4U=;
-        b=bp1QaRp/i+CM94SoJjBsqf+qWy0ma4Lx6QFpiU0CLzvoxlzcPxLYRe5tmHzvUP34OHx5+b
-        WWHP6Rb5Ca4WlzBGPnmi4xvaEEkHuUNCS0ibUMxgoYIFgyQUnKybqlBID59kjp81LIPTnj
-        xq62FCvXeB85AAbmO+4ngSAvJZSI4Pk=
-Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
- [209.132.183.4]) (Using TLS) by relay.mimecast.com with ESMTP id
- us-mta-104-dr3OOEMuN7-CQWg_qHRm-Q-1; Sun, 05 Jan 2020 21:45:07 -0500
-X-MC-Unique: dr3OOEMuN7-CQWg_qHRm-Q-1
-Received: from smtp.corp.redhat.com (int-mx05.intmail.prod.int.phx2.redhat.com [10.5.11.15])
-        (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
-        (No client certificate requested)
-        by mimecast-mx01.redhat.com (Postfix) with ESMTPS id E663C800D48;
-        Mon,  6 Jan 2020 02:45:05 +0000 (UTC)
-Received: from [10.3.112.12] (ovpn-112-12.phx2.redhat.com [10.3.112.12])
-        by smtp.corp.redhat.com (Postfix) with ESMTP id 0D4747BFFB;
-        Mon,  6 Jan 2020 02:45:02 +0000 (UTC)
-Reply-To: tasleson@redhat.com
-Subject: Re: [RFC 9/9] __xfs_printk: Add durable name to output
-To:     Dave Chinner <david@fromorbit.com>,
-        James Bottomley <James.Bottomley@HansenPartnership.com>
-Cc:     linux-scsi@vger.kernel.org, linux-block@vger.kernel.org,
-        linux-fsdevel@vger.kernel.org
-References: <20191223225558.19242-1-tasleson@redhat.com>
- <20191223225558.19242-10-tasleson@redhat.com>
- <20200104025620.GC23195@dread.disaster.area>
-From:   Tony Asleson <tasleson@redhat.com>
-Organization: Red Hat
-Message-ID: <5ad7cf7b-e261-102c-afdc-fa34bed98921@redhat.com>
-Date:   Sun, 5 Jan 2020 20:45:00 -0600
-User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:68.0) Gecko/20100101
- Thunderbird/68.2.2
+        id S1726536AbgAFGB4 (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Mon, 6 Jan 2020 01:01:56 -0500
+Received: from userp2120.oracle.com ([156.151.31.85]:49338 "EHLO
+        userp2120.oracle.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S1726338AbgAFGB4 (ORCPT
+        <rfc822;linux-block@vger.kernel.org>); Mon, 6 Jan 2020 01:01:56 -0500
+Received: from pps.filterd (userp2120.oracle.com [127.0.0.1])
+        by userp2120.oracle.com (8.16.0.27/8.16.0.27) with SMTP id 0065jCiE006637;
+        Mon, 6 Jan 2020 06:01:33 GMT
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=oracle.com; h=subject : to : cc :
+ references : from : message-id : date : mime-version : in-reply-to :
+ content-type : content-transfer-encoding; s=corp-2019-08-05;
+ bh=0zelCiREPyenR2QYtmR9ZeGfHkO4MI8l17JPDOcphVg=;
+ b=sQrqpLYNqHigKlPsXLD1kuu8LIRjyyWMsVV4wmHH9w/UvRbuExo0savdiJmZvNFthqfQ
+ 58o3LA5r10qOYNnumg1q5NsNGkTDZZe8rBF67BcPkFIJzZzrgEmEsncjqKWQEJuUaBeE
+ CAktISzxwKnPH2nk+pkBi2hZNa0wiX/B3prEWih0GfpPt2ibeLcEuAyuTwK5b70OaFzu
+ 8FbDEzf5+9VIeC/rCxo88Vk3bGdlDbTTdgdLCkA5tnxTS6SGvEHskmXQJdgPxaJNU/gt
+ /EOkwApdrM6eV6qVYzc1Yis7SQNKK/rJnpHxIP5sF8cHFWraxelIis+nsHuNmxAh7TR1 lA== 
+Received: from aserp3020.oracle.com (aserp3020.oracle.com [141.146.126.70])
+        by userp2120.oracle.com with ESMTP id 2xakbqd35h-1
+        (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=OK);
+        Mon, 06 Jan 2020 06:01:32 +0000
+Received: from pps.filterd (aserp3020.oracle.com [127.0.0.1])
+        by aserp3020.oracle.com (8.16.0.27/8.16.0.27) with SMTP id 0065iY14075592;
+        Mon, 6 Jan 2020 05:59:32 GMT
+Received: from aserv0122.oracle.com (aserv0122.oracle.com [141.146.126.236])
+        by aserp3020.oracle.com with ESMTP id 2xb47b5mfx-1
+        (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=OK);
+        Mon, 06 Jan 2020 05:59:32 +0000
+Received: from abhmp0006.oracle.com (abhmp0006.oracle.com [141.146.116.12])
+        by aserv0122.oracle.com (8.14.4/8.14.4) with ESMTP id 0065xOPm032657;
+        Mon, 6 Jan 2020 05:59:25 GMT
+Received: from [192.168.1.14] (/114.88.246.185)
+        by default (Oracle Beehive Gateway v4.0)
+        with ESMTP ; Sun, 05 Jan 2020 21:59:24 -0800
+Subject: Re: [resend v1 0/5] Add support for block disk resize notification
+To:     Balbir Singh <sblbir@amazon.com>, linux-kernel@vger.kernel.org,
+        linux-block@vger.kernel.org, linux-nvme@lists.infradead.org
+Cc:     axboe@kernel.dk, ssomesh@amazon.com, jejb@linux.ibm.com,
+        hch@lst.de, mst@redhat.com, Chaitanya.Kulkarni@wdc.com
+References: <20200102075315.22652-1-sblbir@amazon.com>
+From:   Bob Liu <bob.liu@oracle.com>
+Message-ID: <62ef2cd2-42a2-6117-155d-ed052a136c5c@oracle.com>
+Date:   Mon, 6 Jan 2020 13:59:17 +0800
+User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:60.0) Gecko/20100101
+ Thunderbird/60.5.1
 MIME-Version: 1.0
-In-Reply-To: <20200104025620.GC23195@dread.disaster.area>
-Content-Type: text/plain; charset=windows-1252
+In-Reply-To: <20200102075315.22652-1-sblbir@amazon.com>
+Content-Type: text/plain; charset=utf-8
 Content-Language: en-US
 Content-Transfer-Encoding: 7bit
-X-Scanned-By: MIMEDefang 2.79 on 10.5.11.15
+X-Proofpoint-Virus-Version: vendor=nai engine=6000 definitions=9491 signatures=668685
+X-Proofpoint-Spam-Details: rule=notspam policy=default score=0 suspectscore=0 malwarescore=0
+ phishscore=0 bulkscore=0 spamscore=0 mlxscore=0 mlxlogscore=913
+ adultscore=0 classifier=spam adjust=0 reason=mlx scancount=1
+ engine=8.0.1-1911140001 definitions=main-2001060053
+X-Proofpoint-Virus-Version: vendor=nai engine=6000 definitions=9491 signatures=668685
+X-Proofpoint-Spam-Details: rule=notspam policy=default score=0 priorityscore=1501 malwarescore=0
+ suspectscore=0 phishscore=0 bulkscore=0 spamscore=0 clxscore=1011
+ lowpriorityscore=0 mlxscore=0 impostorscore=0 mlxlogscore=957 adultscore=0
+ classifier=spam adjust=0 reason=mlx scancount=1 engine=8.0.1-1911140001
+ definitions=main-2001060053
 Sender: linux-block-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-On 1/3/20 8:56 PM, Dave Chinner wrote:
-> On Mon, Dec 23, 2019 at 04:55:58PM -0600, Tony Asleson wrote:
->> Add persistent durable name to xfs messages so we can
->> correlate them with other messages for the same block
->> device.
->>
->> Signed-off-by: Tony Asleson <tasleson@redhat.com>
->> ---
->>  fs/xfs/xfs_message.c | 17 +++++++++++++++++
->>  1 file changed, 17 insertions(+)
->>
->> diff --git a/fs/xfs/xfs_message.c b/fs/xfs/xfs_message.c
->> index 9804efe525a9..8447cdd985b4 100644
->> --- a/fs/xfs/xfs_message.c
->> +++ b/fs/xfs/xfs_message.c
->> @@ -20,6 +20,23 @@ __xfs_printk(
->>  	const struct xfs_mount	*mp,
->>  	struct va_format	*vaf)
->>  {
->> +	char dict[128];
->> +	int dict_len = 0;
->> +
->> +	if (mp && mp->m_super && mp->m_super->s_bdev &&
->> +		mp->m_super->s_bdev->bd_disk) {
->> +		dict_len = dev_durable_name(
->> +			disk_to_dev(mp->m_super->s_bdev->bd_disk)->parent,
->> +			dict,
->> +			sizeof(dict));
->> +		if (dict_len) {
->> +			printk_emit(
->> +				0, level[1] - '0', dict, dict_len,
->> +				"XFS (%s): %pV\n",  mp->m_fsname, vaf);
->> +			return;
->> +		}
->> +	}
+On 1/2/20 3:53 PM, Balbir Singh wrote:
+> Allow block/genhd to notify user space about disk size changes
+> using a new helper disk_set_capacity(), which is a wrapper on top
+> of set_capacity(). disk_set_capacity() will only notify if
+> the current capacity or the target capacity is not zero.
 > 
-> NACK on the ground this is a gross hack.
 
-James suggested I utilize dev_printk, which does make things simpler.
-Would something like this be acceptable?
+set_capacity_and_notify() may be a more straightforward name.
 
-diff --git a/fs/xfs/xfs_message.c b/fs/xfs/xfs_message.c
-index 9804efe525a9..0738c74a8d3a 100644
---- a/fs/xfs/xfs_message.c
-+++ b/fs/xfs/xfs_message.c
-@@ -20,11 +20,18 @@ __xfs_printk(
-        const struct xfs_mount  *mp,
-        struct va_format        *vaf)
- {
-+       struct device *dev = NULL;
-+
-+       if (mp && mp->m_super && mp->m_super->s_bdev &&
-+               mp->m_super->s_bdev->bd_disk) {
-+               dev = disk_to_dev(mp->m_super->s_bdev->bd_disk)->parent;
-+       }
-+
-        if (mp && mp->m_fsname) {
--               printk("%sXFS (%s): %pV\n", level, mp->m_fsname, vaf);
-+               dev_printk(level, dev, "XFS (%s): %pV\n", mp->m_fsname,
-vaf);
-                return;
-        }
--       printk("%sXFS: %pV\n", level, vaf);
-+       dev_printk(level, dev, "XFS: %pV\n", vaf);
- }
-
->> +
->>  	if (mp && mp->m_fsname) {
+> Background:
 > 
-> mp->m_fsname is the name of the device we use everywhere for log
-> messages, it's set up at mount time so we don't have to do runtime
-> evaulation of the device name every time we need to emit the device
-> name in a log message.
+> As a part of a patch to allow sending the RESIZE event on disk capacity
+> change, Christoph (hch@lst.de) requested that the patch be made generic
+> and the hacks for virtio block and xen block devices be removed and
+> merged via a generic helper.
 > 
-> So, if you have some sooper speshial new device naming scheme, it
-> needs to be stored into the struct xfs_mount to replace mp->m_fsname.
-
-I don't think we want to replace mp->m_fsname with the vpd 0x83 device
-identifier.  This proposed change is adding a key/value structured data
-to the log message for non-ambiguous device identification over time,
-not to place the ID in the human readable portion of the message.  The
-existing name is useful too, especially when it involves a partition.
-
-> And if you have some sooper spehsial new printk API that uses this
-> new device name, everything XFS emits needs to use it
-> unconditionally as we do with mp->m_fsname now.
+> This series consists of 5 changes. The first one adds the basic
+> support for changing the size and notifying. The follow up patches
+> are per block subsystem changes. Other block drivers can add their
+> changes as necessary on top of this series.
 > 
-> IOWs, this isn't conditional code - it either works for the entire
-> life of the mount for every message we have to emit with a single
-> setup call, or the API is broken and needs to be rethought.
+> Testing:
+> 1. I did some basic testing with an NVME device, by resizing it in
+> the backend and ensured that udevd received the event.
+> 
+> NOTE: After these changes, the notification might happen before
+> revalidate disk, where as it occured later before.
+> 
 
-I've been wondering why the struct scsi device uses rcu data for the vpd
-as I would not think that it would be changing for a specific device.
-Perhaps James can shed some light on this?
+It's better not to change original behavior.
+How about something like:
 
--Tony
++void set_capacity_and_notify(struct gendisk *disk, sector_t size, bool revalidate)
+{
+	sector_t capacity = get_capacity(disk);
+
+	set_capacity(disk, size);
+
++        if (revalidate)
++		revalidate_disk(disk);
+	if (capacity != 0 && size != 0) {
+		char *envp[] = { "RESIZE=1", NULL };
+
+		kobject_uevent_env(&disk_to_dev(disk)->kobj, KOBJ_CHANGE, envp);
+	}
+}
+
+> Balbir Singh (5):
+>   block/genhd: Notify udev about capacity change
+>   drivers/block/virtio_blk.c: Convert to use disk_set_capacity
+>   drivers/block/xen-blkfront.c: Convert to use disk_set_capacity
+>   drivers/nvme/host/core.c: Convert to use disk_set_capacity
+>   drivers/scsi/sd.c: Convert to use disk_set_capacity
+> 
+>  block/genhd.c                | 19 +++++++++++++++++++
+>  drivers/block/virtio_blk.c   |  4 +---
+>  drivers/block/xen-blkfront.c |  5 +----
+>  drivers/nvme/host/core.c     |  2 +-
+>  drivers/scsi/sd.c            |  2 +-
+>  include/linux/genhd.h        |  1 +
+>  6 files changed, 24 insertions(+), 9 deletions(-)
+> 
 
