@@ -2,115 +2,169 @@ Return-Path: <SRS0=PDkS=23=vger.kernel.org=linux-block-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-6.9 required=3.0 tests=DKIMWL_WL_HIGH,DKIM_SIGNED,
+X-Spam-Status: No, score=-8.4 required=3.0 tests=DKIMWL_WL_HIGH,DKIM_SIGNED,
 	DKIM_VALID,DKIM_VALID_AU,HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,
-	MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS autolearn=ham
-	autolearn_force=no version=3.4.0
+	MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,USER_AGENT_SANE_1
+	autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 220CDC00523
-	for <linux-block@archiver.kernel.org>; Mon,  6 Jan 2020 00:46:45 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 10630C33C9A
+	for <linux-block@archiver.kernel.org>; Mon,  6 Jan 2020 02:45:13 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.kernel.org (Postfix) with ESMTP id C5B692072C
-	for <linux-block@archiver.kernel.org>; Mon,  6 Jan 2020 00:46:44 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id D2406217F4
+	for <linux-block@archiver.kernel.org>; Mon,  6 Jan 2020 02:45:12 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=pass (1024-bit key) header.d=amazon.com header.i=@amazon.com header.b="LYPwCLxg"
+	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="bp1QaRp/"
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1726772AbgAFAqo (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Sun, 5 Jan 2020 19:46:44 -0500
-Received: from smtp-fw-9102.amazon.com ([207.171.184.29]:13184 "EHLO
-        smtp-fw-9102.amazon.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1726731AbgAFAqo (ORCPT
-        <rfc822;linux-block@vger.kernel.org>); Sun, 5 Jan 2020 19:46:44 -0500
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-  d=amazon.com; i=@amazon.com; q=dns/txt; s=amazon201209;
-  t=1578271604; x=1609807604;
-  h=from:to:cc:subject:date:message-id:references:
-   in-reply-to:content-id:content-transfer-encoding:
-   mime-version;
-  bh=Nm1HPLZ/VpXMl1rLxnlZl6cpUugevRClIBZqy2h1HHY=;
-  b=LYPwCLxgV0ljFa8Yn0MvyccWhtE7RoKMbaZabLpmh7nkXXDHBcwvxLC+
-   N1cxg86wlGBy4VzatBVrc0rw3n4ftyhA7c/D42Xrp7yAwRw379CQcafKM
-   H2byuKHBHXvQCwcvMFNvmtSmJx0UKRWAUXknrNOFUKZoqnSY4V6jKXBOS
-   Q=;
-IronPort-SDR: mP9tPbE7gNPbslPChUuDQUv3q5kWneKRt1xJ5Ul5rKiNjptAkUCHBrrVMXtgfjYNLC0ld1s6Tr
- yS6oCCP0FIXg==
-X-IronPort-AV: E=Sophos;i="5.69,400,1571702400"; 
-   d="scan'208";a="16874826"
-Received: from sea32-co-svc-lb4-vlan3.sea.corp.amazon.com (HELO email-inbound-relay-1e-c7c08562.us-east-1.amazon.com) ([10.47.23.38])
-  by smtp-border-fw-out-9102.sea19.amazon.com with ESMTP; 06 Jan 2020 00:46:32 +0000
-Received: from EX13MTAUWB001.ant.amazon.com (iad55-ws-svc-p15-lb9-vlan2.iad.amazon.com [10.40.159.162])
-        by email-inbound-relay-1e-c7c08562.us-east-1.amazon.com (Postfix) with ESMTPS id 000F72497BB;
-        Mon,  6 Jan 2020 00:46:27 +0000 (UTC)
-Received: from EX13D11UWB001.ant.amazon.com (10.43.161.53) by
- EX13MTAUWB001.ant.amazon.com (10.43.161.249) with Microsoft SMTP Server (TLS)
- id 15.0.1367.3; Mon, 6 Jan 2020 00:46:27 +0000
-Received: from EX13D01UWB002.ant.amazon.com (10.43.161.136) by
- EX13D11UWB001.ant.amazon.com (10.43.161.53) with Microsoft SMTP Server (TLS)
- id 15.0.1367.3; Mon, 6 Jan 2020 00:46:27 +0000
-Received: from EX13D01UWB002.ant.amazon.com ([10.43.161.136]) by
- EX13d01UWB002.ant.amazon.com ([10.43.161.136]) with mapi id 15.00.1367.000;
- Mon, 6 Jan 2020 00:46:26 +0000
-From:   "Singh, Balbir" <sblbir@amazon.com>
-To:     "linux-kernel@vger.kernel.org" <linux-kernel@vger.kernel.org>,
-        "Chaitanya.Kulkarni@wdc.com" <Chaitanya.Kulkarni@wdc.com>,
-        "linux-block@vger.kernel.org" <linux-block@vger.kernel.org>,
-        "linux-nvme@lists.infradead.org" <linux-nvme@lists.infradead.org>
-CC:     "hch@lst.de" <hch@lst.de>,
-        "jejb@linux.ibm.com" <jejb@linux.ibm.com>,
-        "mst@redhat.com" <mst@redhat.com>,
-        "axboe@kernel.dk" <axboe@kernel.dk>,
-        "Sangaraju, Someswarudu" <ssomesh@amazon.com>
-Subject: Re: [resend v1 4/5] drivers/nvme/host/core.c: Convert to use
- disk_set_capacity
-Thread-Topic: [resend v1 4/5] drivers/nvme/host/core.c: Convert to use
- disk_set_capacity
-Thread-Index: AQHVwUG1iZmE8Pm/G0CenFe4gZ349afc0u0A
-Date:   Mon, 6 Jan 2020 00:46:26 +0000
-Message-ID: <1b88bedc6d5435fa7154f3356fa3f1a3e6888ded.camel@amazon.com>
-References: <20200102075315.22652-1-sblbir@amazon.com>
-         <20200102075315.22652-5-sblbir@amazon.com>
-         <BYAPR04MB57490FFCC025A88F4D97D40A86220@BYAPR04MB5749.namprd04.prod.outlook.com>
-In-Reply-To: <BYAPR04MB57490FFCC025A88F4D97D40A86220@BYAPR04MB5749.namprd04.prod.outlook.com>
-Accept-Language: en-GB, en-US
-Content-Language: en-US
-X-MS-Has-Attach: 
-X-MS-TNEF-Correlator: 
-x-ms-exchange-messagesentrepresentingtype: 1
-x-ms-exchange-transport-fromentityheader: Hosted
-x-originating-ip: [10.43.160.101]
-Content-Type: text/plain; charset="utf-8"
-Content-ID: <50ECDC6CF5780E44B2534B78D9303263@amazon.com>
-Content-Transfer-Encoding: base64
+        id S1727378AbgAFCpL (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Sun, 5 Jan 2020 21:45:11 -0500
+Received: from us-smtp-2.mimecast.com ([205.139.110.61]:41556 "EHLO
+        us-smtp-delivery-1.mimecast.com" rhost-flags-OK-OK-OK-FAIL)
+        by vger.kernel.org with ESMTP id S1727340AbgAFCpL (ORCPT
+        <rfc822;linux-block@vger.kernel.org>);
+        Sun, 5 Jan 2020 21:45:11 -0500
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+        s=mimecast20190719; t=1578278710;
+        h=from:from:reply-to:reply-to:subject:subject:date:date:
+         message-id:message-id:to:to:cc:cc:mime-version:mime-version:
+         content-type:content-type:
+         content-transfer-encoding:content-transfer-encoding:
+         in-reply-to:in-reply-to:references:references;
+        bh=R7cuW4nr6dXYOh0P9VyDEZmrT7Y+OzXd9iAtK+rNk4U=;
+        b=bp1QaRp/i+CM94SoJjBsqf+qWy0ma4Lx6QFpiU0CLzvoxlzcPxLYRe5tmHzvUP34OHx5+b
+        WWHP6Rb5Ca4WlzBGPnmi4xvaEEkHuUNCS0ibUMxgoYIFgyQUnKybqlBID59kjp81LIPTnj
+        xq62FCvXeB85AAbmO+4ngSAvJZSI4Pk=
+Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
+ [209.132.183.4]) (Using TLS) by relay.mimecast.com with ESMTP id
+ us-mta-104-dr3OOEMuN7-CQWg_qHRm-Q-1; Sun, 05 Jan 2020 21:45:07 -0500
+X-MC-Unique: dr3OOEMuN7-CQWg_qHRm-Q-1
+Received: from smtp.corp.redhat.com (int-mx05.intmail.prod.int.phx2.redhat.com [10.5.11.15])
+        (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
+        (No client certificate requested)
+        by mimecast-mx01.redhat.com (Postfix) with ESMTPS id E663C800D48;
+        Mon,  6 Jan 2020 02:45:05 +0000 (UTC)
+Received: from [10.3.112.12] (ovpn-112-12.phx2.redhat.com [10.3.112.12])
+        by smtp.corp.redhat.com (Postfix) with ESMTP id 0D4747BFFB;
+        Mon,  6 Jan 2020 02:45:02 +0000 (UTC)
+Reply-To: tasleson@redhat.com
+Subject: Re: [RFC 9/9] __xfs_printk: Add durable name to output
+To:     Dave Chinner <david@fromorbit.com>,
+        James Bottomley <James.Bottomley@HansenPartnership.com>
+Cc:     linux-scsi@vger.kernel.org, linux-block@vger.kernel.org,
+        linux-fsdevel@vger.kernel.org
+References: <20191223225558.19242-1-tasleson@redhat.com>
+ <20191223225558.19242-10-tasleson@redhat.com>
+ <20200104025620.GC23195@dread.disaster.area>
+From:   Tony Asleson <tasleson@redhat.com>
+Organization: Red Hat
+Message-ID: <5ad7cf7b-e261-102c-afdc-fa34bed98921@redhat.com>
+Date:   Sun, 5 Jan 2020 20:45:00 -0600
+User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:68.0) Gecko/20100101
+ Thunderbird/68.2.2
 MIME-Version: 1.0
+In-Reply-To: <20200104025620.GC23195@dread.disaster.area>
+Content-Type: text/plain; charset=windows-1252
+Content-Language: en-US
+Content-Transfer-Encoding: 7bit
+X-Scanned-By: MIMEDefang 2.79 on 10.5.11.15
 Sender: linux-block-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-T24gU2F0LCAyMDIwLTAxLTA0IGF0IDIyOjI3ICswMDAwLCBDaGFpdGFueWEgS3Vsa2Fybmkgd3Jv
-dGU6DQo+IFF1aWNrIHF1ZXN0aW9uIGhlcmUgaWYgdXNlciBleGVjdXRlcyBudm1lIG5zLXJlc2Nh
-biAvZGV2L252bWUxDQo+IHdpbGwgZm9sbG93aW5nIGNvZGUgcmVzdWx0IGluIHRyaWdnZXJpbmcg
-dWV2ZW50KHMpIGZvcg0KPiB0aGUgbmFtZXNwYWNlKHMoIGZvciB3aGljaCB0aGVyZSBpcyBubyBj
-aGFuZ2UgaW4gdGhlIHNpemUgPw0KPiANCj4gSWYgc28gaXMgdGhhdCBhbiBleHBlY3RlZCBiZWhh
-dmlvciA/DQo+IA0KDQpNeSBvbGQgY29kZSBoYWQgYSBjaGVjayB0byBzZWUgaWYgb2xkX2NhcGFj
-aXR5ICE9IG5ld19jYXBhY2l0eSBhcyB3ZWxsLg0KSSBjYW4gcmVkbyB0aG9zZSBiaXRzIGlmIG5l
-ZWRlZC4NCg0KVGhlIGV4cGVjdGVkIGJlaGF2aW91ciBpcyBub3QgY2xlYXIsIGJ1dCB0aGUgZnVu
-Y3Rpb25hbGl0eSBpcyBub3QgYnJva2VuLCB1c2VyDQpzcGFjZSBzaG91bGQgYmUgYWJsZSB0byBk
-ZWFsIHdpdGggYSByZXNpemUgZXZlbnQgd2hlcmUgdGhlIHByZXZpb3VzIGNhcGFjaXR5DQo9PSBu
-ZXcgY2FwYWNpdHkgSU1ITy4NCg0KQmFsYmlyIFNpbmdoLg0KDQoNCj4gT24gMDEvMDEvMjAyMCAx
-MTo1NCBQTSwgQmFsYmlyIFNpbmdoIHdyb3RlOg0KPiA+IGJsb2NrL2dlbmhkIHByb3ZpZGVzIGRp
-c2tfc2V0X2NhcGFjaXR5KCkgZm9yIHNlbmRpbmcNCj4gPiBSRVNJWkUgbm90aWZpY2F0aW9ucyB2
-aWEgdWV2ZW50cy4gVGhpcyBub3RpZmljYXRpb24gaXMNCj4gPiBuZXdseSBhZGRlZCB0byBOVk1F
-IGRldmljZXMNCj4gPiANCj4gPiBTaWduZWQtb2ZmLWJ5OiBCYWxiaXIgU2luZ2ggPHNibGJpckBh
-bWF6b24uY29tPg0KPiA+IC0tLQ0KPiA+ICAgZHJpdmVycy9udm1lL2hvc3QvY29yZS5jIHwgMiAr
-LQ0KPiA+ICAgMSBmaWxlIGNoYW5nZWQsIDEgaW5zZXJ0aW9uKCspLCAxIGRlbGV0aW9uKC0pDQo+
-ID4gDQo+ID4gZGlmZiAtLWdpdCBhL2RyaXZlcnMvbnZtZS9ob3N0L2NvcmUuYyBiL2RyaXZlcnMv
-bnZtZS9ob3N0L2NvcmUuYw0KPiA+IGluZGV4IDY2N2YxOGY0NjViZS4uY2IyMTRlOTE0ZmMyIDEw
-MDY0NA0KPiA+IC0tLSBhL2RyaXZlcnMvbnZtZS9ob3N0L2NvcmUuYw0KPiA+ICsrKyBiL2RyaXZl
-cnMvbnZtZS9ob3N0L2NvcmUuYw0KPiA+IEBAIC0xODA4LDcgKzE4MDgsNyBAQCBzdGF0aWMgdm9p
-ZCBudm1lX3VwZGF0ZV9kaXNrX2luZm8oc3RydWN0IGdlbmRpc2sNCj4gPiAqZGlzaywNCj4gPiAg
-IAkgICAgbnMtPmxiYV9zaGlmdCA+IFBBR0VfU0hJRlQpDQo+ID4gICAJCWNhcGFjaXR5ID0gMDsN
-Cj4gPiANCj4gPiAtCXNldF9jYXBhY2l0eShkaXNrLCBjYXBhY2l0eSk7DQo+ID4gKwlkaXNrX3Nl
-dF9jYXBhY2l0eShkaXNrLCBjYXBhY2l0eSk7DQoNCg0KPiA+IA0KPiA+ICAgCW52bWVfY29uZmln
-X2Rpc2NhcmQoZGlzaywgbnMpOw0KPiA+ICAgCW52bWVfY29uZmlnX3dyaXRlX3plcm9lcyhkaXNr
-LCBucyk7DQo+ID4gDQo+IA0KPiANCg==
+On 1/3/20 8:56 PM, Dave Chinner wrote:
+> On Mon, Dec 23, 2019 at 04:55:58PM -0600, Tony Asleson wrote:
+>> Add persistent durable name to xfs messages so we can
+>> correlate them with other messages for the same block
+>> device.
+>>
+>> Signed-off-by: Tony Asleson <tasleson@redhat.com>
+>> ---
+>>  fs/xfs/xfs_message.c | 17 +++++++++++++++++
+>>  1 file changed, 17 insertions(+)
+>>
+>> diff --git a/fs/xfs/xfs_message.c b/fs/xfs/xfs_message.c
+>> index 9804efe525a9..8447cdd985b4 100644
+>> --- a/fs/xfs/xfs_message.c
+>> +++ b/fs/xfs/xfs_message.c
+>> @@ -20,6 +20,23 @@ __xfs_printk(
+>>  	const struct xfs_mount	*mp,
+>>  	struct va_format	*vaf)
+>>  {
+>> +	char dict[128];
+>> +	int dict_len = 0;
+>> +
+>> +	if (mp && mp->m_super && mp->m_super->s_bdev &&
+>> +		mp->m_super->s_bdev->bd_disk) {
+>> +		dict_len = dev_durable_name(
+>> +			disk_to_dev(mp->m_super->s_bdev->bd_disk)->parent,
+>> +			dict,
+>> +			sizeof(dict));
+>> +		if (dict_len) {
+>> +			printk_emit(
+>> +				0, level[1] - '0', dict, dict_len,
+>> +				"XFS (%s): %pV\n",  mp->m_fsname, vaf);
+>> +			return;
+>> +		}
+>> +	}
+> 
+> NACK on the ground this is a gross hack.
+
+James suggested I utilize dev_printk, which does make things simpler.
+Would something like this be acceptable?
+
+diff --git a/fs/xfs/xfs_message.c b/fs/xfs/xfs_message.c
+index 9804efe525a9..0738c74a8d3a 100644
+--- a/fs/xfs/xfs_message.c
++++ b/fs/xfs/xfs_message.c
+@@ -20,11 +20,18 @@ __xfs_printk(
+        const struct xfs_mount  *mp,
+        struct va_format        *vaf)
+ {
++       struct device *dev = NULL;
++
++       if (mp && mp->m_super && mp->m_super->s_bdev &&
++               mp->m_super->s_bdev->bd_disk) {
++               dev = disk_to_dev(mp->m_super->s_bdev->bd_disk)->parent;
++       }
++
+        if (mp && mp->m_fsname) {
+-               printk("%sXFS (%s): %pV\n", level, mp->m_fsname, vaf);
++               dev_printk(level, dev, "XFS (%s): %pV\n", mp->m_fsname,
+vaf);
+                return;
+        }
+-       printk("%sXFS: %pV\n", level, vaf);
++       dev_printk(level, dev, "XFS: %pV\n", vaf);
+ }
+
+>> +
+>>  	if (mp && mp->m_fsname) {
+> 
+> mp->m_fsname is the name of the device we use everywhere for log
+> messages, it's set up at mount time so we don't have to do runtime
+> evaulation of the device name every time we need to emit the device
+> name in a log message.
+> 
+> So, if you have some sooper speshial new device naming scheme, it
+> needs to be stored into the struct xfs_mount to replace mp->m_fsname.
+
+I don't think we want to replace mp->m_fsname with the vpd 0x83 device
+identifier.  This proposed change is adding a key/value structured data
+to the log message for non-ambiguous device identification over time,
+not to place the ID in the human readable portion of the message.  The
+existing name is useful too, especially when it involves a partition.
+
+> And if you have some sooper spehsial new printk API that uses this
+> new device name, everything XFS emits needs to use it
+> unconditionally as we do with mp->m_fsname now.
+> 
+> IOWs, this isn't conditional code - it either works for the entire
+> life of the mount for every message we have to emit with a single
+> setup call, or the API is broken and needs to be rethought.
+
+I've been wondering why the struct scsi device uses rcu data for the vpd
+as I would not think that it would be changing for a specific device.
+Perhaps James can shed some light on this?
+
+-Tony
+
