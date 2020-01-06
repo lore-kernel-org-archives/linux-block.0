@@ -2,247 +2,199 @@ Return-Path: <SRS0=PDkS=23=vger.kernel.org=linux-block-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-9.8 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
+X-Spam-Status: No, score=-8.2 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
 	INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,
-	USER_AGENT_GIT autolearn=ham autolearn_force=no version=3.4.0
+	USER_AGENT_SANE_1 autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 14C45C33C8C
-	for <linux-block@archiver.kernel.org>; Mon,  6 Jan 2020 18:10:48 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 74339C33C8C
+	for <linux-block@archiver.kernel.org>; Mon,  6 Jan 2020 22:02:40 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.kernel.org (Postfix) with ESMTP id DA5F4206F0
-	for <linux-block@archiver.kernel.org>; Mon,  6 Jan 2020 18:10:47 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id 5113A2072A
+	for <linux-block@archiver.kernel.org>; Mon,  6 Jan 2020 22:02:40 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1726719AbgAFSKr (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Mon, 6 Jan 2020 13:10:47 -0500
-Received: from bhuna.collabora.co.uk ([46.235.227.227]:35606 "EHLO
-        bhuna.collabora.co.uk" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1726448AbgAFSKq (ORCPT
-        <rfc822;linux-block@vger.kernel.org>); Mon, 6 Jan 2020 13:10:46 -0500
-Received: from turingmachine.home (unknown [IPv6:2804:431:c7f4:447f:d711:794d:1c68:5ed3])
-        (using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
-        (No client certificate requested)
-        (Authenticated sender: tonyk)
-        by bhuna.collabora.co.uk (Postfix) with ESMTPSA id 9A26529172E;
-        Mon,  6 Jan 2020 18:10:40 +0000 (GMT)
-From:   =?UTF-8?q?Andr=C3=A9=20Almeida?= <andrealmeid@collabora.com>
-To:     linux-block@vger.kernel.org, linux-kernel@vger.kernel.org
-Cc:     axboe@kernel.dk, kernel@collabora.com, krisman@collabora.com,
-        =?UTF-8?q?Andr=C3=A9=20Almeida?= <andrealmeid@collabora.com>
-Subject: [RESEND PATCH v3] blk-mq: Document functions for sending request
-Date:   Mon,  6 Jan 2020 15:08:18 -0300
-Message-Id: <20200106180818.85365-1-andrealmeid@collabora.com>
-X-Mailer: git-send-email 2.24.1
+        id S1727001AbgAFWCj (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Mon, 6 Jan 2020 17:02:39 -0500
+Received: from mail104.syd.optusnet.com.au ([211.29.132.246]:57310 "EHLO
+        mail104.syd.optusnet.com.au" rhost-flags-OK-OK-OK-OK)
+        by vger.kernel.org with ESMTP id S1726895AbgAFWCj (ORCPT
+        <rfc822;linux-block@vger.kernel.org>);
+        Mon, 6 Jan 2020 17:02:39 -0500
+Received: from dread.disaster.area (pa49-180-68-255.pa.nsw.optusnet.com.au [49.180.68.255])
+        by mail104.syd.optusnet.com.au (Postfix) with ESMTPS id DAEBE7E84E1;
+        Tue,  7 Jan 2020 09:02:34 +1100 (AEDT)
+Received: from dave by dread.disaster.area with local (Exim 4.92.3)
+        (envelope-from <david@fromorbit.com>)
+        id 1ioaSH-00061A-5f; Tue, 07 Jan 2020 09:02:33 +1100
+Date:   Tue, 7 Jan 2020 09:02:33 +1100
+From:   Dave Chinner <david@fromorbit.com>
+To:     Tony Asleson <tasleson@redhat.com>
+Cc:     James Bottomley <James.Bottomley@HansenPartnership.com>,
+        linux-scsi@vger.kernel.org, linux-block@vger.kernel.org,
+        linux-fsdevel@vger.kernel.org
+Subject: Re: [RFC 9/9] __xfs_printk: Add durable name to output
+Message-ID: <20200106220233.GK23195@dread.disaster.area>
+References: <20191223225558.19242-1-tasleson@redhat.com>
+ <20191223225558.19242-10-tasleson@redhat.com>
+ <20200104025620.GC23195@dread.disaster.area>
+ <5ad7cf7b-e261-102c-afdc-fa34bed98921@redhat.com>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=UTF-8
-Content-Transfer-Encoding: 8bit
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <5ad7cf7b-e261-102c-afdc-fa34bed98921@redhat.com>
+User-Agent: Mutt/1.10.1 (2018-07-13)
+X-Optus-CM-Score: 0
+X-Optus-CM-Analysis: v=2.3 cv=W5xGqiek c=1 sm=1 tr=0
+        a=sbdTpStuSq8iNQE8viVliQ==:117 a=sbdTpStuSq8iNQE8viVliQ==:17
+        a=jpOVt7BSZ2e4Z31A5e1TngXxSK0=:19 a=kj9zAlcOel0A:10 a=Jdjhy38mL1oA:10
+        a=20KFwNOVAAAA:8 a=7-415B0cAAAA:8 a=J_bn1_9MaN90Pk6s4eYA:9
+        a=CjuIK1q_8ugA:10 a=biEYGPWJfzWAr4FL6Ov7:22
 Sender: linux-block-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-Add or improve documentation for function regarding creating and sending
-IO requests to the hardware.
+On Sun, Jan 05, 2020 at 08:45:00PM -0600, Tony Asleson wrote:
+> On 1/3/20 8:56 PM, Dave Chinner wrote:
+> > On Mon, Dec 23, 2019 at 04:55:58PM -0600, Tony Asleson wrote:
+> >> Add persistent durable name to xfs messages so we can
+> >> correlate them with other messages for the same block
+> >> device.
+> >>
+> >> Signed-off-by: Tony Asleson <tasleson@redhat.com>
+> >> ---
+> >>  fs/xfs/xfs_message.c | 17 +++++++++++++++++
+> >>  1 file changed, 17 insertions(+)
+> >>
+> >> diff --git a/fs/xfs/xfs_message.c b/fs/xfs/xfs_message.c
+> >> index 9804efe525a9..8447cdd985b4 100644
+> >> --- a/fs/xfs/xfs_message.c
+> >> +++ b/fs/xfs/xfs_message.c
+> >> @@ -20,6 +20,23 @@ __xfs_printk(
+> >>  	const struct xfs_mount	*mp,
+> >>  	struct va_format	*vaf)
+> >>  {
+> >> +	char dict[128];
+> >> +	int dict_len = 0;
+> >> +
+> >> +	if (mp && mp->m_super && mp->m_super->s_bdev &&
+> >> +		mp->m_super->s_bdev->bd_disk) {
+> >> +		dict_len = dev_durable_name(
+> >> +			disk_to_dev(mp->m_super->s_bdev->bd_disk)->parent,
+> >> +			dict,
+> >> +			sizeof(dict));
+> >> +		if (dict_len) {
+> >> +			printk_emit(
+> >> +				0, level[1] - '0', dict, dict_len,
+> >> +				"XFS (%s): %pV\n",  mp->m_fsname, vaf);
+> >> +			return;
+> >> +		}
+> >> +	}
+> > 
+> > NACK on the ground this is a gross hack.
+> 
+> James suggested I utilize dev_printk, which does make things simpler.
+> Would something like this be acceptable?
+> 
+> diff --git a/fs/xfs/xfs_message.c b/fs/xfs/xfs_message.c
+> index 9804efe525a9..0738c74a8d3a 100644
+> --- a/fs/xfs/xfs_message.c
+> +++ b/fs/xfs/xfs_message.c
+> @@ -20,11 +20,18 @@ __xfs_printk(
+>         const struct xfs_mount  *mp,
+>         struct va_format        *vaf)
+>  {
+> +       struct device *dev = NULL;
+> +
+> +       if (mp && mp->m_super && mp->m_super->s_bdev &&
+> +               mp->m_super->s_bdev->bd_disk) {
+> +               dev = disk_to_dev(mp->m_super->s_bdev->bd_disk)->parent;
+> +       }
+> +
+>         if (mp && mp->m_fsname) {
+> -               printk("%sXFS (%s): %pV\n", level, mp->m_fsname, vaf);
+> +               dev_printk(level, dev, "XFS (%s): %pV\n", mp->m_fsname,
+> vaf);
+>                 return;
+>         }
+> -       printk("%sXFS: %pV\n", level, vaf);
+> +       dev_printk(level, dev, "XFS: %pV\n", vaf);
 
-Signed-off-by: André Almeida <andrealmeid@collabora.com>
----
-Hello,
+No, because that's just doing the same thing involving dynamic
+extraction of static, unchanging information. Only now we get the
+output looking like:
 
-I did my best to describe all variations of *_run_hw_queue, although
-their names and functionally are really similar. I would be happy to get
-feedback about those functions descriptions.
+[ts] "<driver string> <dev name>: XFS (<dev name>): <message>"
 
-Those comments were tested with:
+Or we get:
 
-./scripts/kernel-doc -none block/blk-mq.c
+[ts] "(NULL device *): XFS: <message>"
 
-Which did not returned any warning or error.
+Both of which don't provide any extra useful information to the
+person/script parsing the log message.
 
-Thanks,
-	André
+Oh, and calling dev_printk() with a null dev pointer is likely to
+panic the machine in dev_driver_string().
 
-Changes since v2:
-- Update blk_mq_run_hw_queue() from bool to void type
+>  }
+> 
+> >> +
+> >>  	if (mp && mp->m_fsname) {
+> > 
+> > mp->m_fsname is the name of the device we use everywhere for log
+> > messages, it's set up at mount time so we don't have to do runtime
+> > evaulation of the device name every time we need to emit the device
+> > name in a log message.
+> > 
+> > So, if you have some sooper speshial new device naming scheme, it
+> > needs to be stored into the struct xfs_mount to replace mp->m_fsname.
+> 
+> I don't think we want to replace mp->m_fsname with the vpd 0x83 device
+> identifier.  This proposed change is adding a key/value structured data
+> to the log message for non-ambiguous device identification over time,
+> not to place the ID in the human readable portion of the message.  The
+> existing name is useful too, especially when it involves a partition.
 
-Changes since v1:
-- Add documentation for blk_mq_start_request()
----
- block/blk-mq.c | 85 ++++++++++++++++++++++++++++++++++++++++++++++++--
- 1 file changed, 83 insertions(+), 2 deletions(-)
+Oh, if that's all you want to do, then why is this identifier needed
+in every log message? It does not change over the life of the
+filesystem, so it the persistent identifier only needs to be emitted
+to the log once at filesystem mount time. i.e.  instead of:
 
-diff --git a/block/blk-mq.c b/block/blk-mq.c
-index 323c9cb28066..8eb7d45ec710 100644
---- a/block/blk-mq.c
-+++ b/block/blk-mq.c
-@@ -641,6 +641,14 @@ bool blk_mq_complete_request(struct request *rq)
- }
- EXPORT_SYMBOL(blk_mq_complete_request);
- 
-+/**
-+ * blk_mq_start_request - Start processing a request
-+ * @rq: Pointer to request to be started
-+ *
-+ * Function used by device drivers to notify the block layer that a request
-+ * is going to be processed now, so blk layer can do proper initializations
-+ * such as starting the timeout timer.
-+ */
- void blk_mq_start_request(struct request *rq)
- {
- 	struct request_queue *q = rq->q;
-@@ -1327,6 +1335,12 @@ bool blk_mq_dispatch_rq_list(struct request_queue *q, struct list_head *list,
- 	return (queued + errors) != 0;
- }
- 
-+/**
-+ * __blk_mq_run_hw_queue - Run a hardware queue.
-+ * @hctx: Pointer to the hardware queue to run.
-+ *
-+ * Send pending requests to the hardware.
-+ */
- static void __blk_mq_run_hw_queue(struct blk_mq_hw_ctx *hctx)
- {
- 	int srcu_idx;
-@@ -1424,6 +1438,15 @@ static int blk_mq_hctx_next_cpu(struct blk_mq_hw_ctx *hctx)
- 	return next_cpu;
- }
- 
-+/**
-+ * __blk_mq_delay_run_hw_queue - Run (or schedule to run) a hardware queue.
-+ * @hctx: Pointer to the hardware queue to run.
-+ * @async: If we want to run the queue asynchronously.
-+ * @msecs: Microseconds of delay to wait before running the queue.
-+ *
-+ * If !@async, try to run the queue now. Else, run the queue asynchronously and
-+ * with a delay of @msecs.
-+ */
- static void __blk_mq_delay_run_hw_queue(struct blk_mq_hw_ctx *hctx, bool async,
- 					unsigned long msecs)
- {
-@@ -1445,12 +1468,28 @@ static void __blk_mq_delay_run_hw_queue(struct blk_mq_hw_ctx *hctx, bool async,
- 				    msecs_to_jiffies(msecs));
- }
- 
-+/**
-+ * blk_mq_delay_run_hw_queue - Run a hardware queue asynchronously.
-+ * @hctx: Pointer to the hardware queue to run.
-+ * @msecs: Microseconds of delay to wait before running the queue.
-+ *
-+ * Run a hardware queue asynchronously with a delay of @msecs.
-+ */
- void blk_mq_delay_run_hw_queue(struct blk_mq_hw_ctx *hctx, unsigned long msecs)
- {
- 	__blk_mq_delay_run_hw_queue(hctx, true, msecs);
- }
- EXPORT_SYMBOL(blk_mq_delay_run_hw_queue);
- 
-+/**
-+ * blk_mq_run_hw_queue - Start to run a hardware queue.
-+ * @hctx: Pointer to the hardware queue to run.
-+ * @async: If we want to run the queue asynchronously.
-+ *
-+ * Check if the request queue is not in a quiesced state and if there are
-+ * pending requests to be sent. If this is true, run the queue to send requests
-+ * to hardware.
-+ */
- void blk_mq_run_hw_queue(struct blk_mq_hw_ctx *hctx, bool async)
- {
- 	int srcu_idx;
-@@ -1474,6 +1513,11 @@ void blk_mq_run_hw_queue(struct blk_mq_hw_ctx *hctx, bool async)
- }
- EXPORT_SYMBOL(blk_mq_run_hw_queue);
- 
-+/**
-+ * blk_mq_run_hw_queue - Run all hardware queues in a request queue.
-+ * @q: Pointer to the request queue to run.
-+ * @async: If we want to run the queue asynchronously.
-+ */
- void blk_mq_run_hw_queues(struct request_queue *q, bool async)
- {
- 	struct blk_mq_hw_ctx *hctx;
-@@ -1625,7 +1669,11 @@ void __blk_mq_insert_request(struct blk_mq_hw_ctx *hctx, struct request *rq,
- 	blk_mq_hctx_mark_pending(hctx, ctx);
- }
- 
--/*
-+/**
-+ * blk_mq_request_bypass_insert - Insert a request at dispatch list.
-+ * @rq: Pointer to request to be inserted.
-+ * @run_queue: If we should run the hardware queue after inserting the request.
-+ *
-  * Should only be used carefully, when the caller knows we want to
-  * bypass a potential IO scheduler on the target device.
-  */
-@@ -1828,6 +1876,17 @@ static blk_status_t __blk_mq_try_issue_directly(struct blk_mq_hw_ctx *hctx,
- 	return BLK_STS_OK;
- }
- 
-+/**
-+ * blk_mq_try_issue_directly - Try to send a request directly to device driver.
-+ * @hctx: Pointer of the associated hardware queue.
-+ * @rq: Pointer to request to be sent.
-+ * @cookie: Request queue cookie.
-+ *
-+ * If the device has enough resources to accept a new request now, send the
-+ * request directly to device driver. Else, insert at hctx->dispatch queue, so
-+ * we can try send it another time in the future. Requests inserted at this
-+ * queue have higher priority.
-+ */
- static void blk_mq_try_issue_directly(struct blk_mq_hw_ctx *hctx,
- 		struct request *rq, blk_qc_t *cookie)
- {
-@@ -1905,6 +1964,22 @@ static void blk_add_rq_to_plug(struct blk_plug *plug, struct request *rq)
- 	}
- }
- 
-+/**
-+ * blk_mq_make_request - Create and send a request to block device.
-+ * @q: Request queue pointer.
-+ * @bio: Bio pointer.
-+ *
-+ * Builds up a request structure from @q and @bio and send to the device. The
-+ * request may not be queued directly to hardware if:
-+ * * This request can be merged with another one
-+ * * We want to place request at plug queue for possible future merging
-+ * * There is an IO scheduler active at this queue
-+ *
-+ * It will not queue the request if there is an error with the bio, or at the
-+ * request creation.
-+ *
-+ * Returns: Request queue cookie.
-+ */
- static blk_qc_t blk_mq_make_request(struct request_queue *q, struct bio *bio)
- {
- 	const int is_sync = op_is_sync(bio->bi_opf);
-@@ -1950,7 +2025,7 @@ static blk_qc_t blk_mq_make_request(struct request_queue *q, struct bio *bio)
- 
- 	plug = blk_mq_plug(q, bio);
- 	if (unlikely(is_flush_fua)) {
--		/* bypass scheduler for flush rq */
-+		/* Bypass scheduler for flush requests */
- 		blk_insert_flush(rq);
- 		blk_mq_run_hw_queue(data.hctx, true);
- 	} else if (plug && (q->nr_hw_queues == 1 || q->mq_ops->commit_rqs ||
-@@ -1978,6 +2053,7 @@ static blk_qc_t blk_mq_make_request(struct request_queue *q, struct bio *bio)
- 
- 		blk_add_rq_to_plug(plug, rq);
- 	} else if (q->elevator) {
-+		/* Insert the request at the IO scheduler queue */
- 		blk_mq_sched_insert_request(rq, false, true, true);
- 	} else if (plug && !blk_queue_nomerges(q)) {
- 		/*
-@@ -2004,8 +2080,13 @@ static blk_qc_t blk_mq_make_request(struct request_queue *q, struct bio *bio)
- 		}
- 	} else if ((q->nr_hw_queues > 1 && is_sync) ||
- 			!data.hctx->dispatch_busy) {
-+		/*
-+		 * There is no scheduler and we can try to send directly
-+		 * to the hardware.
-+		 */
- 		blk_mq_try_issue_directly(data.hctx, rq, &cookie);
- 	} else {
-+		/* Default case. */
- 		blk_mq_sched_insert_request(rq, false, true, true);
- 	}
- 
+[    2.716841] XFS (dm-0): Mounting V5 Filesystem
+
+It just needs to be:
+
+[    2.716841] XFS (dm-0): Mounting V5 Filesystem on device <persistent dev id>
+
+If you need to do any sort of special "is this the right device"
+checking, it needs to be done immediately at mount time so action
+can be taken to shutdown the filesystem and unmount the device
+immediately before further damage is done....
+
+i.e. once the filesystem is mounted, you've already got a unique and
+persistent identifier in the log for the life of the filesystem (the
+m_fsname string), so I'm struggling to understand exactly what
+problem you are trying to solve by adding redundant information
+to every log message.....
+
+> > And if you have some sooper spehsial new printk API that uses this
+> > new device name, everything XFS emits needs to use it
+> > unconditionally as we do with mp->m_fsname now.
+> > 
+> > IOWs, this isn't conditional code - it either works for the entire
+> > life of the mount for every message we have to emit with a single
+> > setup call, or the API is broken and needs to be rethought.
+> 
+> I've been wondering why the struct scsi device uses rcu data for the vpd
+> as I would not think that it would be changing for a specific device.
+> Perhaps James can shed some light on this?
+
+The implementation of the in-memory driver vpd data page has no
+relationship to the lifetime of the persistent information that
+the VPD stores/reports.
+
+Cheers,
+
+Dave.
 -- 
-2.24.1
-
+Dave Chinner
+david@fromorbit.com
