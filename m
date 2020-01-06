@@ -2,146 +2,164 @@ Return-Path: <SRS0=PDkS=23=vger.kernel.org=linux-block-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-2.4 required=3.0 tests=DKIMWL_WL_HIGH,DKIM_SIGNED,
-	DKIM_VALID,DKIM_VALID_AU,HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,
-	SPF_HELO_NONE,SPF_PASS,USER_AGENT_SANE_1 autolearn=no autolearn_force=no
-	version=3.4.0
+X-Spam-Status: No, score=-9.8 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
+	INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,
+	USER_AGENT_GIT autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 7643DC3F68F
-	for <linux-block@archiver.kernel.org>; Mon,  6 Jan 2020 06:01:57 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id F169AC32771
+	for <linux-block@archiver.kernel.org>; Mon,  6 Jan 2020 07:36:12 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.kernel.org (Postfix) with ESMTP id 4942421775
-	for <linux-block@archiver.kernel.org>; Mon,  6 Jan 2020 06:01:57 +0000 (UTC)
-Authentication-Results: mail.kernel.org;
-	dkim=pass (2048-bit key) header.d=oracle.com header.i=@oracle.com header.b="sQrqpLYN"
+	by mail.kernel.org (Postfix) with ESMTP id CE5C42072C
+	for <linux-block@archiver.kernel.org>; Mon,  6 Jan 2020 07:36:12 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1726536AbgAFGB4 (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Mon, 6 Jan 2020 01:01:56 -0500
-Received: from userp2120.oracle.com ([156.151.31.85]:49338 "EHLO
-        userp2120.oracle.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1726338AbgAFGB4 (ORCPT
-        <rfc822;linux-block@vger.kernel.org>); Mon, 6 Jan 2020 01:01:56 -0500
-Received: from pps.filterd (userp2120.oracle.com [127.0.0.1])
-        by userp2120.oracle.com (8.16.0.27/8.16.0.27) with SMTP id 0065jCiE006637;
-        Mon, 6 Jan 2020 06:01:33 GMT
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=oracle.com; h=subject : to : cc :
- references : from : message-id : date : mime-version : in-reply-to :
- content-type : content-transfer-encoding; s=corp-2019-08-05;
- bh=0zelCiREPyenR2QYtmR9ZeGfHkO4MI8l17JPDOcphVg=;
- b=sQrqpLYNqHigKlPsXLD1kuu8LIRjyyWMsVV4wmHH9w/UvRbuExo0savdiJmZvNFthqfQ
- 58o3LA5r10qOYNnumg1q5NsNGkTDZZe8rBF67BcPkFIJzZzrgEmEsncjqKWQEJuUaBeE
- CAktISzxwKnPH2nk+pkBi2hZNa0wiX/B3prEWih0GfpPt2ibeLcEuAyuTwK5b70OaFzu
- 8FbDEzf5+9VIeC/rCxo88Vk3bGdlDbTTdgdLCkA5tnxTS6SGvEHskmXQJdgPxaJNU/gt
- /EOkwApdrM6eV6qVYzc1Yis7SQNKK/rJnpHxIP5sF8cHFWraxelIis+nsHuNmxAh7TR1 lA== 
-Received: from aserp3020.oracle.com (aserp3020.oracle.com [141.146.126.70])
-        by userp2120.oracle.com with ESMTP id 2xakbqd35h-1
-        (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=OK);
-        Mon, 06 Jan 2020 06:01:32 +0000
-Received: from pps.filterd (aserp3020.oracle.com [127.0.0.1])
-        by aserp3020.oracle.com (8.16.0.27/8.16.0.27) with SMTP id 0065iY14075592;
-        Mon, 6 Jan 2020 05:59:32 GMT
-Received: from aserv0122.oracle.com (aserv0122.oracle.com [141.146.126.236])
-        by aserp3020.oracle.com with ESMTP id 2xb47b5mfx-1
-        (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=OK);
-        Mon, 06 Jan 2020 05:59:32 +0000
-Received: from abhmp0006.oracle.com (abhmp0006.oracle.com [141.146.116.12])
-        by aserv0122.oracle.com (8.14.4/8.14.4) with ESMTP id 0065xOPm032657;
-        Mon, 6 Jan 2020 05:59:25 GMT
-Received: from [192.168.1.14] (/114.88.246.185)
-        by default (Oracle Beehive Gateway v4.0)
-        with ESMTP ; Sun, 05 Jan 2020 21:59:24 -0800
-Subject: Re: [resend v1 0/5] Add support for block disk resize notification
-To:     Balbir Singh <sblbir@amazon.com>, linux-kernel@vger.kernel.org,
-        linux-block@vger.kernel.org, linux-nvme@lists.infradead.org
-Cc:     axboe@kernel.dk, ssomesh@amazon.com, jejb@linux.ibm.com,
-        hch@lst.de, mst@redhat.com, Chaitanya.Kulkarni@wdc.com
-References: <20200102075315.22652-1-sblbir@amazon.com>
-From:   Bob Liu <bob.liu@oracle.com>
-Message-ID: <62ef2cd2-42a2-6117-155d-ed052a136c5c@oracle.com>
-Date:   Mon, 6 Jan 2020 13:59:17 +0800
-User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:60.0) Gecko/20100101
- Thunderbird/60.5.1
+        id S1726072AbgAFHgM (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Mon, 6 Jan 2020 02:36:12 -0500
+Received: from szxga07-in.huawei.com ([45.249.212.35]:50990 "EHLO huawei.com"
+        rhost-flags-OK-OK-OK-FAIL) by vger.kernel.org with ESMTP
+        id S1725844AbgAFHgM (ORCPT <rfc822;linux-block@vger.kernel.org>);
+        Mon, 6 Jan 2020 02:36:12 -0500
+Received: from DGGEMS402-HUB.china.huawei.com (unknown [172.30.72.59])
+        by Forcepoint Email with ESMTP id 49B5DC237A51AB415BD6;
+        Mon,  6 Jan 2020 15:36:09 +0800 (CST)
+Received: from huawei.com (10.175.124.28) by DGGEMS402-HUB.china.huawei.com
+ (10.3.19.202) with Microsoft SMTP Server id 14.3.439.0; Mon, 6 Jan 2020
+ 15:35:58 +0800
+From:   Yufen Yu <yuyufen@huawei.com>
+To:     <axboe@kernel.dk>
+CC:     <linux-block@vger.kernel.org>, <ming.lei@redhat.com>,
+        <houtao1@huawei.com>, <hch@lst.de>, <yi.zhang@huawei.com>,
+        <zhengchuan@huawei.com>
+Subject: [PATCH] block: cache index instead of part self to avoid use-after-free
+Date:   Mon, 6 Jan 2020 15:35:10 +0800
+Message-ID: <20200106073510.10825-1-yuyufen@huawei.com>
+X-Mailer: git-send-email 2.17.2
 MIME-Version: 1.0
-In-Reply-To: <20200102075315.22652-1-sblbir@amazon.com>
-Content-Type: text/plain; charset=utf-8
-Content-Language: en-US
-Content-Transfer-Encoding: 7bit
-X-Proofpoint-Virus-Version: vendor=nai engine=6000 definitions=9491 signatures=668685
-X-Proofpoint-Spam-Details: rule=notspam policy=default score=0 suspectscore=0 malwarescore=0
- phishscore=0 bulkscore=0 spamscore=0 mlxscore=0 mlxlogscore=913
- adultscore=0 classifier=spam adjust=0 reason=mlx scancount=1
- engine=8.0.1-1911140001 definitions=main-2001060053
-X-Proofpoint-Virus-Version: vendor=nai engine=6000 definitions=9491 signatures=668685
-X-Proofpoint-Spam-Details: rule=notspam policy=default score=0 priorityscore=1501 malwarescore=0
- suspectscore=0 phishscore=0 bulkscore=0 spamscore=0 clxscore=1011
- lowpriorityscore=0 mlxscore=0 impostorscore=0 mlxlogscore=957 adultscore=0
- classifier=spam adjust=0 reason=mlx scancount=1 engine=8.0.1-1911140001
- definitions=main-2001060053
+Content-Type: text/plain
+X-Originating-IP: [10.175.124.28]
+X-CFilter-Loop: Reflected
 Sender: linux-block-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-On 1/2/20 3:53 PM, Balbir Singh wrote:
-> Allow block/genhd to notify user space about disk size changes
-> using a new helper disk_set_capacity(), which is a wrapper on top
-> of set_capacity(). disk_set_capacity() will only notify if
-> the current capacity or the target capacity is not zero.
-> 
+When delete partition executes concurrently with IOs issue,
+it may cause use-after-free on part in disk_map_sector_rcu()
+as following:
 
-set_capacity_and_notify() may be a more straightforward name.
+blk_account_io_start(req1)  delete_partition  blk_account_io_start(req2)
 
-> Background:
-> 
-> As a part of a patch to allow sending the RESIZE event on disk capacity
-> change, Christoph (hch@lst.de) requested that the patch be made generic
-> and the hacks for virtio block and xen block devices be removed and
-> merged via a generic helper.
-> 
-> This series consists of 5 changes. The first one adds the basic
-> support for changing the size and notifying. The follow up patches
-> are per block subsystem changes. Other block drivers can add their
-> changes as necessary on top of this series.
-> 
-> Testing:
-> 1. I did some basic testing with an NVME device, by resizing it in
-> the backend and ensured that udevd received the event.
-> 
-> NOTE: After these changes, the notification might happen before
-> revalidate disk, where as it occured later before.
-> 
+rcu_read_lock()
+disk_map_sector_rcu
+part = rcu_dereference(ptbl->part[4])
+                           rcu_assign_pointer(ptbl->part[4], NULL);
+                           rcu_assign_pointer(ptbl->last_lookup, NULL);
+rcu_assign_pointer(ptbl->last_lookup, part);
 
-It's better not to change original behavior.
-How about something like:
+                           hd_struct_kill(part)
+!hd_struct_try_get
+  part = &rq->rq_disk->part0;
+rcu_read_unlock()
+                           __delete_partition
+                           call_rcu
+                                            rcu_read_lock
+                                            disk_map_sector_rcu
+                                            part = rcu_dereference(ptbl->last_lookup);
 
-+void set_capacity_and_notify(struct gendisk *disk, sector_t size, bool revalidate)
-{
-	sector_t capacity = get_capacity(disk);
+                           delete_partition_work_fn
+                           free(part)
+                                            hd_struct_try_get(part)
+                                            BUG_ON use-after-free
 
-	set_capacity(disk, size);
+req1 try to get 'ptbl->part[4]', while the part is beening
+deleted. Although the delete_partition() will set last_lookup
+as NULL, req1 can overwrite it as 'part[4]' again.
 
-+        if (revalidate)
-+		revalidate_disk(disk);
-	if (capacity != 0 && size != 0) {
-		char *envp[] = { "RESIZE=1", NULL };
+After calling call_rcu() and free() for the part, req2 can
+access the part by last_lookup, resulting in use after free.
 
-		kobject_uevent_env(&disk_to_dev(disk)->kobj, KOBJ_CHANGE, envp);
-	}
-}
+In fact, this bug has been reported by syzbot:
+    https://lkml.org/lkml/2019/1/4/357
 
-> Balbir Singh (5):
->   block/genhd: Notify udev about capacity change
->   drivers/block/virtio_blk.c: Convert to use disk_set_capacity
->   drivers/block/xen-blkfront.c: Convert to use disk_set_capacity
->   drivers/nvme/host/core.c: Convert to use disk_set_capacity
->   drivers/scsi/sd.c: Convert to use disk_set_capacity
-> 
->  block/genhd.c                | 19 +++++++++++++++++++
->  drivers/block/virtio_blk.c   |  4 +---
->  drivers/block/xen-blkfront.c |  5 +----
->  drivers/nvme/host/core.c     |  2 +-
->  drivers/scsi/sd.c            |  2 +-
->  include/linux/genhd.h        |  1 +
->  6 files changed, 24 insertions(+), 9 deletions(-)
-> 
+To fix the bug, we try to cache index of part[] instead of
+part[i] itself in last_lookup. Even if the index may been
+re-assign, others can either get part[i] as value of NULL,
+or get the new allocated part[i] after call_rcu. Both of
+them is okay.
+
+Signed-off-by: Yufen Yu <yuyufen@huawei.com>
+---
+ block/genhd.c             | 15 +++++++++------
+ block/partition-generic.c |  2 +-
+ include/linux/genhd.h     |  3 ++-
+ 3 files changed, 12 insertions(+), 8 deletions(-)
+
+diff --git a/block/genhd.c b/block/genhd.c
+index ff6268970ddc..97447281a4f5 100644
+--- a/block/genhd.c
++++ b/block/genhd.c
+@@ -282,18 +282,21 @@ struct hd_struct *disk_map_sector_rcu(struct gendisk *disk, sector_t sector)
+ 	struct disk_part_tbl *ptbl;
+ 	struct hd_struct *part;
+ 	int i;
++	int last_lookup;
+ 
+ 	ptbl = rcu_dereference(disk->part_tbl);
+-
+-	part = rcu_dereference(ptbl->last_lookup);
+-	if (part && sector_in_part(part, sector))
+-		return part;
++	last_lookup = READ_ONCE(ptbl->last_lookup);
++	if (last_lookup > 0 && last_lookup < ptbl->len) {
++		part = rcu_dereference(ptbl->part[last_lookup]);
++		if (part && sector_in_part(part, sector))
++			return part;
++	}
+ 
+ 	for (i = 1; i < ptbl->len; i++) {
+ 		part = rcu_dereference(ptbl->part[i]);
+ 
+ 		if (part && sector_in_part(part, sector)) {
+-			rcu_assign_pointer(ptbl->last_lookup, part);
++			WRITE_ONCE(ptbl->last_lookup, i);
+ 			return part;
+ 		}
+ 	}
+@@ -1263,7 +1266,7 @@ static void disk_replace_part_tbl(struct gendisk *disk,
+ 	rcu_assign_pointer(disk->part_tbl, new_ptbl);
+ 
+ 	if (old_ptbl) {
+-		rcu_assign_pointer(old_ptbl->last_lookup, NULL);
++		WRITE_ONCE(old_ptbl->last_lookup, 0);
+ 		kfree_rcu(old_ptbl, rcu_head);
+ 	}
+ }
+diff --git a/block/partition-generic.c b/block/partition-generic.c
+index 1d20c9cf213f..a9fd24ae3acb 100644
+--- a/block/partition-generic.c
++++ b/block/partition-generic.c
+@@ -284,7 +284,7 @@ void delete_partition(struct gendisk *disk, int partno)
+ 		return;
+ 
+ 	rcu_assign_pointer(ptbl->part[partno], NULL);
+-	rcu_assign_pointer(ptbl->last_lookup, NULL);
++	WRITE_ONCE(ptbl->last_lookup, 0);
+ 	kobject_put(part->holder_dir);
+ 	device_del(part_to_dev(part));
+ 
+diff --git a/include/linux/genhd.h b/include/linux/genhd.h
+index 8bb63027e4d6..9be4fb8f8b8b 100644
+--- a/include/linux/genhd.h
++++ b/include/linux/genhd.h
+@@ -160,7 +160,8 @@ enum {
+ struct disk_part_tbl {
+ 	struct rcu_head rcu_head;
+ 	int len;
+-	struct hd_struct __rcu *last_lookup;
++	/* Cache last lookup part[] index */
++	int last_lookup;
+ 	struct hd_struct __rcu *part[];
+ };
+ 
+-- 
+2.17.2
 
