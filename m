@@ -2,132 +2,130 @@ Return-Path: <SRS0=BJAb=24=vger.kernel.org=linux-block-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-5.2 required=3.0 tests=DKIM_SIGNED,DKIM_VALID,
-	HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,
-	SPF_PASS,USER_AGENT_SANE_1 autolearn=ham autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-9.9 required=3.0 tests=DKIMWL_WL_HIGH,DKIM_SIGNED,
+	DKIM_VALID,DKIM_VALID_AU,HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,
+	MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,USER_AGENT_GIT
+	autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id A3E0AC282DD
-	for <linux-block@archiver.kernel.org>; Tue,  7 Jan 2020 22:33:02 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id B4645C33CA3
+	for <linux-block@archiver.kernel.org>; Tue,  7 Jan 2020 22:46:11 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.kernel.org (Postfix) with ESMTP id 6AF5D2072A
-	for <linux-block@archiver.kernel.org>; Tue,  7 Jan 2020 22:33:02 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id 7FDDA2081E
+	for <linux-block@archiver.kernel.org>; Tue,  7 Jan 2020 22:46:11 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel-dk.20150623.gappssmtp.com header.i=@kernel-dk.20150623.gappssmtp.com header.b="mIXOWeDR"
+	dkim=pass (2048-bit key) header.d=nvidia.com header.i=@nvidia.com header.b="pMHOUYTS"
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1727206AbgAGWdB (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Tue, 7 Jan 2020 17:33:01 -0500
-Received: from mail-pf1-f195.google.com ([209.85.210.195]:41380 "EHLO
-        mail-pf1-f195.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1726558AbgAGWdB (ORCPT
-        <rfc822;linux-block@vger.kernel.org>); Tue, 7 Jan 2020 17:33:01 -0500
-Received: by mail-pf1-f195.google.com with SMTP id w62so561067pfw.8
-        for <linux-block@vger.kernel.org>; Tue, 07 Jan 2020 14:33:01 -0800 (PST)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=kernel-dk.20150623.gappssmtp.com; s=20150623;
-        h=subject:to:cc:references:from:message-id:date:user-agent
-         :mime-version:in-reply-to:content-language:content-transfer-encoding;
-        bh=XRiS/kenaXg7SZmNLSxylaMfUm+yt4xVkhJf7MIsuM0=;
-        b=mIXOWeDRssPm9xYaJbB0pMhXHGtyJ0N/bPkzg5r8WArlJeS1/EDmPmYz70Hz76BaU+
-         nzLNyeMrGMVg4kUWmBqN+gEt87UhbdWjq20ICoROOgns0bWlKk62r51ll77NMcp9BSVT
-         vO9x43Ti+Q6Mn3iy/0s/bIJfgh8gJVfQofsP2CpJ/Qsw0A2CI7FEVEcaRl93ppzmMhMZ
-         FUauXclxBLmtmiu02d/5NQb+QzRennpCQ0wwPJ8PVADJwwWPNWBkiIy7y8B9YIVqVg7Y
-         RhpFLREaAQrIfhm2x50bBHLig+mHGAT0as5l2rSyH7hMOcDUh85/CRTMKfgb5OdjvgWP
-         HpoQ==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20161025;
-        h=x-gm-message-state:subject:to:cc:references:from:message-id:date
-         :user-agent:mime-version:in-reply-to:content-language
-         :content-transfer-encoding;
-        bh=XRiS/kenaXg7SZmNLSxylaMfUm+yt4xVkhJf7MIsuM0=;
-        b=rT7Cb/k53H31ilUk18TlNWjlN493x/1yWGhnGecBSyWma2V+FmJrCKUzM6PmRLMW20
-         EY06zCTs586XbRLuT8cwh6YJccLBVKmzrqphCNiGgpRKdCPSC4x815vDtiL5ogpbxR7E
-         SdB+3h98hm4P/rtGSbMxPPQN1/5sP28PHcWFSRplkVnTI1QBr8zgBHcA2kqsk3OzuL8d
-         0WZCxmdmxsu9SsRPgNW15i67rOQB1WhWzaP5NpUKBOXjb/uOjNLpOQBoesmZQENWXYdy
-         NqCoLTZBRjYJ4S9PL9iFgX4fAYG1KwLdNRFO1B8aXo/rWdO5ABsuk/b3CHYpU8RWJiZM
-         QiOg==
-X-Gm-Message-State: APjAAAXbYG4Xgg1TuQ/j1pzuVxrJrUtcC8Qr8joDQYoagSzB1rc0fHfr
-        rk0/0kvlygJPdk3iHd4wKSHtrHafo+s=
-X-Google-Smtp-Source: APXvYqzTmk/w38eM+QUnrT21lreh59E8q2tHSB3ZFcAdt0J7PzWOBdTeIkX/fbtcyO4DUtGwdAPMSg==
-X-Received: by 2002:a63:fd10:: with SMTP id d16mr1810632pgh.177.1578436380843;
-        Tue, 07 Jan 2020 14:33:00 -0800 (PST)
-Received: from [192.168.1.188] ([66.219.217.145])
-        by smtp.gmail.com with ESMTPSA id g22sm746358pgk.85.2020.01.07.14.32.59
-        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
-        Tue, 07 Jan 2020 14:33:00 -0800 (PST)
-Subject: Re: [PATCH] block: fix splitting segments
-To:     Ming Lei <ming.lei@redhat.com>, Guenter Roeck <linux@roeck-us.net>
-Cc:     linux-block@vger.kernel.org, linux-kernel@vger.kernel.org,
-        Chris Mason <clm@fb.com>
-References: <20191229023230.28940-1-ming.lei@redhat.com>
- <20200107124708.GA20285@roeck-us.net> <20200107152339.GA23622@ming.t460p>
- <20200107181145.GA22076@roeck-us.net> <20200107223035.GA7505@ming.t460p>
-From:   Jens Axboe <axboe@kernel.dk>
-Message-ID: <25ce5140-ee29-c32c-7f5e-b8c6da5c7e90@kernel.dk>
-Date:   Tue, 7 Jan 2020 15:32:58 -0700
-User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:68.0) Gecko/20100101
- Thunderbird/68.2.2
+        id S1727642AbgAGWqK (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Tue, 7 Jan 2020 17:46:10 -0500
+Received: from hqnvemgate24.nvidia.com ([216.228.121.143]:11427 "EHLO
+        hqnvemgate24.nvidia.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S1727619AbgAGWqJ (ORCPT
+        <rfc822;linux-block@vger.kernel.org>); Tue, 7 Jan 2020 17:46:09 -0500
+Received: from hqpgpgate102.nvidia.com (Not Verified[216.228.121.13]) by hqnvemgate24.nvidia.com (using TLS: TLSv1.2, DES-CBC3-SHA)
+        id <B5e1509fa0002>; Tue, 07 Jan 2020 14:45:14 -0800
+Received: from hqmail.nvidia.com ([172.20.161.6])
+  by hqpgpgate102.nvidia.com (PGP Universal service);
+  Tue, 07 Jan 2020 14:46:02 -0800
+X-PGP-Universal: processed;
+        by hqpgpgate102.nvidia.com on Tue, 07 Jan 2020 14:46:02 -0800
+Received: from HQMAIL109.nvidia.com (172.20.187.15) by HQMAIL111.nvidia.com
+ (172.20.187.18) with Microsoft SMTP Server (TLS) id 15.0.1473.3; Tue, 7 Jan
+ 2020 22:46:02 +0000
+Received: from HQMAIL109.nvidia.com (172.20.187.15) by HQMAIL109.nvidia.com
+ (172.20.187.15) with Microsoft SMTP Server (TLS) id 15.0.1473.3; Tue, 7 Jan
+ 2020 22:46:01 +0000
+Received: from hqnvemgw03.nvidia.com (10.124.88.68) by HQMAIL109.nvidia.com
+ (172.20.187.15) with Microsoft SMTP Server (TLS) id 15.0.1473.3 via Frontend
+ Transport; Tue, 7 Jan 2020 22:46:01 +0000
+Received: from blueforge.nvidia.com (Not Verified[10.110.48.28]) by hqnvemgw03.nvidia.com with Trustwave SEG (v7,5,8,10121)
+        id <B5e150a290009>; Tue, 07 Jan 2020 14:46:01 -0800
+From:   John Hubbard <jhubbard@nvidia.com>
+To:     Andrew Morton <akpm@linux-foundation.org>
+CC:     Al Viro <viro@zeniv.linux.org.uk>,
+        Alex Williamson <alex.williamson@redhat.com>,
+        Benjamin Herrenschmidt <benh@kernel.crashing.org>,
+        =?UTF-8?q?Bj=C3=B6rn=20T=C3=B6pel?= <bjorn.topel@intel.com>,
+        Christoph Hellwig <hch@infradead.org>,
+        Dan Williams <dan.j.williams@intel.com>,
+        Daniel Vetter <daniel@ffwll.ch>,
+        Dave Chinner <david@fromorbit.com>,
+        David Airlie <airlied@linux.ie>,
+        "David S . Miller" <davem@davemloft.net>,
+        Ira Weiny <ira.weiny@intel.com>, Jan Kara <jack@suse.cz>,
+        Jason Gunthorpe <jgg@ziepe.ca>, Jens Axboe <axboe@kernel.dk>,
+        Jonathan Corbet <corbet@lwn.net>,
+        =?UTF-8?q?J=C3=A9r=C3=B4me=20Glisse?= <jglisse@redhat.com>,
+        "Kirill A . Shutemov" <kirill@shutemov.name>,
+        "Magnus Karlsson" <magnus.karlsson@intel.com>,
+        Mauro Carvalho Chehab <mchehab@kernel.org>,
+        Michael Ellerman <mpe@ellerman.id.au>,
+        Michal Hocko <mhocko@suse.com>,
+        Mike Kravetz <mike.kravetz@oracle.com>,
+        Paul Mackerras <paulus@samba.org>,
+        Shuah Khan <shuah@kernel.org>,
+        Vlastimil Babka <vbabka@suse.cz>, <bpf@vger.kernel.org>,
+        <dri-devel@lists.freedesktop.org>, <kvm@vger.kernel.org>,
+        <linux-block@vger.kernel.org>, <linux-doc@vger.kernel.org>,
+        <linux-fsdevel@vger.kernel.org>, <linux-kselftest@vger.kernel.org>,
+        <linux-media@vger.kernel.org>, <linux-rdma@vger.kernel.org>,
+        <linuxppc-dev@lists.ozlabs.org>, <netdev@vger.kernel.org>,
+        <linux-mm@kvack.org>, LKML <linux-kernel@vger.kernel.org>,
+        John Hubbard <jhubbard@nvidia.com>
+Subject: [PATCH v12 17/22] net/xdp: set FOLL_PIN via pin_user_pages()
+Date:   Tue, 7 Jan 2020 14:45:53 -0800
+Message-ID: <20200107224558.2362728-18-jhubbard@nvidia.com>
+X-Mailer: git-send-email 2.24.1
+In-Reply-To: <20200107224558.2362728-1-jhubbard@nvidia.com>
+References: <20200107224558.2362728-1-jhubbard@nvidia.com>
 MIME-Version: 1.0
-In-Reply-To: <20200107223035.GA7505@ming.t460p>
-Content-Type: text/plain; charset=utf-8
-Content-Language: en-US
-Content-Transfer-Encoding: 7bit
+X-NVConfidentiality: public
+Content-Type: text/plain; charset="UTF-8"
+Content-Transfer-Encoding: quoted-printable
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=nvidia.com; s=n1;
+        t=1578437114; bh=ZT0qQeDGzOfjOR8r+Vh655vAE0xyyVSAGHaZ2J8yjZ0=;
+        h=X-PGP-Universal:From:To:CC:Subject:Date:Message-ID:X-Mailer:
+         In-Reply-To:References:MIME-Version:X-NVConfidentiality:
+         Content-Type:Content-Transfer-Encoding;
+        b=pMHOUYTSnIGYvp2QjbUK2zP+G/kcACpYigXx78Byfv36Yi6/ec3CnvdeW0+4ZqOqn
+         2h5v1Ndk2jEMU2x2cWs2d2ADGY3mWiI9+nhhJEnGVJ2/S9N7ML4IveqaFcIKWSBuZ4
+         ejfHfyXHww6mtaiHjGC2gJktl3AzAVFB4bXa41XytiA6DBQQDosGEUiewAEarM+Cpd
+         hfK7QpVRSKN2VJdGwSdqFp2z4N9L5QSp+WKFF7xzXfnXM5SHGW9l2uE1A6kdXgOCwM
+         zO8QDGyRa/Rh05r4x5GRSOQzmCzhnXZCmHNRxTNpuQkEknq1/BbzhSudwPGafoet2p
+         ktCEMwz0zfydQ==
 Sender: linux-block-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-On 1/7/20 3:30 PM, Ming Lei wrote:
-> On Tue, Jan 07, 2020 at 10:11:45AM -0800, Guenter Roeck wrote:
->> On Tue, Jan 07, 2020 at 11:23:39PM +0800, Ming Lei wrote:
->>> On Tue, Jan 07, 2020 at 04:47:08AM -0800, Guenter Roeck wrote:
->>>> Hi,
->>>>
->>>> On Sun, Dec 29, 2019 at 10:32:30AM +0800, Ming Lei wrote:
->>>>> There are two issues in get_max_segment_size():
->>>>>
->>>>> 1) the default segment boudary mask is bypassed, and some devices still
->>>>> require segment to not cross the default 4G boundary
->>>>>
->>>>> 2) the segment start address isn't taken into account when checking
->>>>> segment boundary limit
->>>>>
->>>>> Fixes the two issues.
->>>>>
->>>>> Fixes: dcebd755926b ("block: use bio_for_each_bvec() to compute multi-page bvec count")
->>>>> Signed-off-by: Ming Lei <ming.lei@redhat.com>
->>>>
->>>> This patch, pushed into mainline as "block: fix splitting segments on
->>>> boundary masks", results in the following crash when booting 'versatilepb'
->>>> in qemu from disk. Bisect log is attached. Detailed log is at
->>>> https://kerneltests.org/builders/qemu-arm-master/builds/1410/steps/qemubuildcommand/logs/stdio
->>>>
->>>> Guenter
->>>>
->>>> ---
->>>> Crash:
->>>>
->>>> kernel BUG at block/bio.c:1885!
->>>> Internal error: Oops - BUG: 0 [#1] ARM
->>>
->>> Please apply the following debug patch, and post the log.
->>>
->>
->> Here you are:
->>
->> max_sectors 2560 max_segs 96 max_seg_size 65536 mask ffffffff
->> c738da80: 8c80/0 2416 28672, 0
->>          total sectors 56
->>
->> (I replaced %p with %px).
->>
-> 
-> Please try the following patch and see if it makes a difference.
-> If not, replace trace_printk with printk in previous debug patch,
-> and apply the debug patch only & post the log.
+Convert net/xdp to use the new pin_longterm_pages() call, which sets
+FOLL_PIN. Setting FOLL_PIN is now required for code that requires
+tracking of pinned pages.
 
-If it is a 32-bit issue, then we should use a 64-bit type to make
-this nicer than ULL. But it seems reasonable that it could be!
+In partial anticipation of this work, the net/xdp code was already
+calling put_user_page() instead of put_page(). Therefore, in order to
+convert from the get_user_pages()/put_page() model, to the
+pin_user_pages()/put_user_page() model, the only change required
+here is to change get_user_pages() to pin_user_pages().
 
--- 
-Jens Axboe
+Acked-by: Bj=C3=B6rn T=C3=B6pel <bjorn.topel@intel.com>
+Signed-off-by: John Hubbard <jhubbard@nvidia.com>
+---
+ net/xdp/xdp_umem.c | 2 +-
+ 1 file changed, 1 insertion(+), 1 deletion(-)
+
+diff --git a/net/xdp/xdp_umem.c b/net/xdp/xdp_umem.c
+index 3049af269fbf..d071003b5e76 100644
+--- a/net/xdp/xdp_umem.c
++++ b/net/xdp/xdp_umem.c
+@@ -291,7 +291,7 @@ static int xdp_umem_pin_pages(struct xdp_umem *umem)
+ 		return -ENOMEM;
+=20
+ 	down_read(&current->mm->mmap_sem);
+-	npgs =3D get_user_pages(umem->address, umem->npgs,
++	npgs =3D pin_user_pages(umem->address, umem->npgs,
+ 			      gup_flags | FOLL_LONGTERM, &umem->pgs[0], NULL);
+ 	up_read(&current->mm->mmap_sem);
+=20
+--=20
+2.24.1
 
