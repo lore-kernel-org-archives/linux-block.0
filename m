@@ -2,90 +2,121 @@ Return-Path: <SRS0=BJAb=24=vger.kernel.org=linux-block-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-8.2 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
-	INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,
-	USER_AGENT_SANE_1 autolearn=ham autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-0.8 required=3.0 tests=DKIMWL_WL_HIGH,DKIM_SIGNED,
+	DKIM_VALID,DKIM_VALID_AU,HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,
+	SPF_HELO_NONE,SPF_PASS,UNPARSEABLE_RELAY autolearn=no autolearn_force=no
+	version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 6BBB2C32771
-	for <linux-block@archiver.kernel.org>; Tue,  7 Jan 2020 02:38:20 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 86D13C32771
+	for <linux-block@archiver.kernel.org>; Tue,  7 Jan 2020 03:24:55 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.kernel.org (Postfix) with ESMTP id 3E9D62072E
-	for <linux-block@archiver.kernel.org>; Tue,  7 Jan 2020 02:38:20 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id 58B822064C
+	for <linux-block@archiver.kernel.org>; Tue,  7 Jan 2020 03:24:55 +0000 (UTC)
+Authentication-Results: mail.kernel.org;
+	dkim=pass (2048-bit key) header.d=oracle.com header.i=@oracle.com header.b="QDSlbGup"
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1727295AbgAGCiT (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Mon, 6 Jan 2020 21:38:19 -0500
-Received: from szxga06-in.huawei.com ([45.249.212.32]:45558 "EHLO huawei.com"
-        rhost-flags-OK-OK-OK-FAIL) by vger.kernel.org with ESMTP
-        id S1727405AbgAGCiT (ORCPT <rfc822;linux-block@vger.kernel.org>);
-        Mon, 6 Jan 2020 21:38:19 -0500
-Received: from DGGEMS404-HUB.china.huawei.com (unknown [172.30.72.60])
-        by Forcepoint Email with ESMTP id E7EBFD25E457392EBDF9;
-        Tue,  7 Jan 2020 10:38:16 +0800 (CST)
-Received: from [127.0.0.1] (10.173.220.183) by DGGEMS404-HUB.china.huawei.com
- (10.3.19.204) with Microsoft SMTP Server id 14.3.439.0; Tue, 7 Jan 2020
- 10:38:06 +0800
-Subject: Re: [PATCH] blk-map: add kernel address validation in blk_rq_map_kern
- func
-From:   Zhiqiang Liu <liuzhiqiang26@huawei.com>
-To:     Jens Axboe <axboe@kernel.dk>, <linux-block@vger.kernel.org>,
-        <jens.axboe@oracle.com>, <namhyung@gmail.com>,
-        <bharrosh@panasas.com>, renxudong <renxudong1@huawei.com>
-CC:     Mingfangsen <mingfangsen@huawei.com>, <zhengbin13@huawei.com>,
-        Guiyao <guiyao@huawei.com>, <ming.lei@redhat.com>
-References: <239c8928-aea0-abe9-a75d-dc3f1b573ec5@huawei.com>
-Message-ID: <6b282b91-b157-5260-57d9-774be223998c@huawei.com>
-Date:   Tue, 7 Jan 2020 10:38:05 +0800
-User-Agent: Mozilla/5.0 (Windows NT 10.0; WOW64; rv:68.0) Gecko/20100101
- Thunderbird/68.2.2
+        id S1727406AbgAGDYy (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Mon, 6 Jan 2020 22:24:54 -0500
+Received: from aserp2120.oracle.com ([141.146.126.78]:47188 "EHLO
+        aserp2120.oracle.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S1727377AbgAGDYy (ORCPT
+        <rfc822;linux-block@vger.kernel.org>); Mon, 6 Jan 2020 22:24:54 -0500
+Received: from pps.filterd (aserp2120.oracle.com [127.0.0.1])
+        by aserp2120.oracle.com (8.16.0.27/8.16.0.27) with SMTP id 0073EXIE025855;
+        Tue, 7 Jan 2020 03:24:24 GMT
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=oracle.com; h=to : cc : subject :
+ from : references : date : in-reply-to : message-id : mime-version :
+ content-type; s=corp-2019-08-05;
+ bh=eEDEB5cRiaDaMI401AFI3YVYzUZ8UFoQLMybywdErVQ=;
+ b=QDSlbGupGflTHfqrIDNN0pRGV03FnSpuCfigptfoFqoaA1spKKkx9D4dFkT4G4dyADdK
+ KTO58n7GOAw3kOHJ5OmGz/YSqQg9fDfUNSklRPcfXSCAqcfdiNi9SqY6ibt54v1OEe8o
+ 9PP/h4km77fvB47MLrijeXfen1XxOvm/ZX15n+BOWpB/H+l1LbMKKx86T6uoq04LxhhH
+ +rbvtc5p71h5DvFiZfvaDTlRYtzajq18gFUJdRJa1d47RvZshe2sbcrWXL8ZETcIHDyY
+ Q3PgPRP0rHuCR0C+zmXK685klXj7A+DIwARvEDZYW2EhGqLzHOLmRyOBpZWxc9UyXaoV ew== 
+Received: from userp3020.oracle.com (userp3020.oracle.com [156.151.31.79])
+        by aserp2120.oracle.com with ESMTP id 2xajnpts86-1
+        (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=OK);
+        Tue, 07 Jan 2020 03:24:23 +0000
+Received: from pps.filterd (userp3020.oracle.com [127.0.0.1])
+        by userp3020.oracle.com (8.16.0.27/8.16.0.27) with SMTP id 0073EOoh192221;
+        Tue, 7 Jan 2020 03:24:23 GMT
+Received: from userv0122.oracle.com (userv0122.oracle.com [156.151.31.75])
+        by userp3020.oracle.com with ESMTP id 2xb4uq6njs-1
+        (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=OK);
+        Tue, 07 Jan 2020 03:24:22 +0000
+Received: from abhmp0008.oracle.com (abhmp0008.oracle.com [141.146.116.14])
+        by userv0122.oracle.com (8.14.4/8.14.4) with ESMTP id 0073ODw1027853;
+        Tue, 7 Jan 2020 03:24:14 GMT
+Received: from ca-mkp.ca.oracle.com (/10.159.214.123)
+        by default (Oracle Beehive Gateway v4.0)
+        with ESMTP ; Mon, 06 Jan 2020 19:24:13 -0800
+To:     Kirill Tkhai <ktkhai@virtuozzo.com>
+Cc:     "Martin K. Petersen" <martin.petersen@oracle.com>, axboe@kernel.dk,
+        linux-block@vger.kernel.org, linux-kernel@vger.kernel.org,
+        linux-ext4@vger.kernel.org, tytso@mit.edu,
+        adilger.kernel@dilger.ca, ming.lei@redhat.com, osandov@fb.com,
+        jthumshirn@suse.de, minwoo.im.dev@gmail.com, damien.lemoal@wdc.com,
+        andrea.parri@amarulasolutions.com, hare@suse.com, tj@kernel.org,
+        ajay.joshi@wdc.com, sagi@grimberg.me, dsterba@suse.com,
+        chaitanya.kulkarni@wdc.com, bvanassche@acm.org,
+        dhowells@redhat.com, asml.silence@gmail.com
+Subject: Re: [PATCH RFC 1/3] block: Add support for REQ_OP_ASSIGN_RANGE operation
+From:   "Martin K. Petersen" <martin.petersen@oracle.com>
+Organization: Oracle Corporation
+References: <157599668662.12112.10184894900037871860.stgit@localhost.localdomain>
+        <157599696813.12112.14140818972910110796.stgit@localhost.localdomain>
+        <yq1woatc8zd.fsf@oracle.com>
+        <3f2e341b-dea4-c5d0-8eb0-568b6ad2f17b@virtuozzo.com>
+        <yq1a77oc56s.fsf@oracle.com>
+        <625c9ee4-bedb-ff60-845e-2d440c4f58aa@virtuozzo.com>
+        <yq1pngh7blx.fsf@oracle.com>
+        <405b9106-0a97-0821-c41d-58ab8d0e2d09@virtuozzo.com>
+Date:   Mon, 06 Jan 2020 22:24:09 -0500
+In-Reply-To: <405b9106-0a97-0821-c41d-58ab8d0e2d09@virtuozzo.com> (Kirill
+        Tkhai's message of "Mon, 23 Dec 2019 11:51:34 +0300")
+Message-ID: <yq1o8vg2bl2.fsf@oracle.com>
+User-Agent: Gnus/5.13 (Gnus v5.13) Emacs/26.1.92 (gnu/linux)
 MIME-Version: 1.0
-In-Reply-To: <239c8928-aea0-abe9-a75d-dc3f1b573ec5@huawei.com>
-Content-Type: text/plain; charset="utf-8"
-Content-Language: en-US
-Content-Transfer-Encoding: 7bit
-X-Originating-IP: [10.173.220.183]
-X-CFilter-Loop: Reflected
+Content-Type: text/plain
+X-Proofpoint-Virus-Version: vendor=nai engine=6000 definitions=9492 signatures=668685
+X-Proofpoint-Spam-Details: rule=notspam policy=default score=0 suspectscore=0 malwarescore=0
+ phishscore=0 bulkscore=0 spamscore=0 mlxscore=0 mlxlogscore=999
+ adultscore=0 classifier=spam adjust=0 reason=mlx scancount=1
+ engine=8.0.1-1911140001 definitions=main-2001070025
+X-Proofpoint-Virus-Version: vendor=nai engine=6000 definitions=9492 signatures=668685
+X-Proofpoint-Spam-Details: rule=notspam policy=default score=0 priorityscore=1501 malwarescore=0
+ suspectscore=0 phishscore=0 bulkscore=0 spamscore=0 clxscore=1015
+ lowpriorityscore=0 mlxscore=0 impostorscore=0 mlxlogscore=999 adultscore=0
+ classifier=spam adjust=0 reason=mlx scancount=1 engine=8.0.1-1911140001
+ definitions=main-2001070025
 Sender: linux-block-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-Friendly ping...
 
-On 2019/12/30 20:17, Zhiqiang Liu wrote:
-> From: renxudong <renxudong1@huawei.com>
-> 
-> Blk_rq_map_kern func is used to map kernel data to a request,
-> in which kbuf par should be a valid kernel buffer. However,
-> kbuf par is only checked whether it is null in blk_rq_map_kern func.
-> 
-> If users pass a non kernel address to blk_rq_map_kern func in the
-> non-aligned scenario, the invalid kbuf will be set to bio->bi_private.
-> When the request is completed, bio_copy_kern_endio_read will be called
-> to copy data to the kernel address in bio->bi_private. If the bi_private
-> is not a valid kernel address, the system will oops. In this case, we
-> cannot judge whether the bio structure is damaged or the kernel address is
-> invalid.
-> 
-> Here, we add kernel address validation by calling virt_addr_valid.
-> 
-> Signed-off-by: renxudong <renxudong1@huawei.com>
-> Reviewed-by: Zhiqiang Liu <liuzhiqiang26@huawei.com>
-> ---
->  block/blk-map.c | 2 +-
->  1 file changed, 1 insertion(+), 1 deletion(-)
-> 
-> diff --git a/block/blk-map.c b/block/blk-map.c
-> index 3a62e471d81b..7deb1b44d1e3 100644
-> --- a/block/blk-map.c
-> +++ b/block/blk-map.c
-> @@ -229,7 +229,7 @@ int blk_rq_map_kern(struct request_queue *q, struct request *rq, void *kbuf,
-> 
->  	if (len > (queue_max_hw_sectors(q) << 9))
->  		return -EINVAL;
-> -	if (!len || !kbuf)
-> +	if (!len || !virt_addr_valid(kbuf))
->  		return -EINVAL;
-> 
->  	do_copy = !blk_rq_aligned(q, addr, len) || object_is_on_stack(kbuf);
-> 
+Kirill,
 
+Sorry, the holiday break got in the way.
+
+> But I also worry about NOFALLBACK case. There are possible block
+> devices, which support write zeroes, but they can't allocate blocks
+> (block allocation are just not appliable for them, say, these are all
+> ordinary hdd).
+
+Correct. We shouldn't go down this path unless a device is thinly
+provisioned (i.e. max_discard_sectors > 0).
+
+> But won't it be a good thing to return EOPNOTSUPP right from
+> __blkdev_issue_write_zeroes() in case of block device can't allocate
+> blocks (q->limits.write_zeroes_can_allocate in the patch below)? Here
+> is just a way to underline block devices, which support write zeroes,
+> but allocation of blocks is meant nothing for them (wasting of time).
+
+I don't like "write_zeroes_can_allocate" because that makes assumptions
+about WRITE ZEROES being the command of choice. I suggest we call it
+"max_allocate_sectors" to mirror "max_discard_sectors". I.e. put
+emphasis on the semantic operation and not the plumbing.
+
+-- 
+Martin K. Petersen	Oracle Linux Engineering
