@@ -2,126 +2,92 @@ Return-Path: <SRS0=BJAb=24=vger.kernel.org=linux-block-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-2.4 required=3.0 tests=DKIMWL_WL_HIGH,DKIM_SIGNED,
+X-Spam-Status: No, score=-0.9 required=3.0 tests=DKIMWL_WL_HIGH,DKIM_SIGNED,
 	DKIM_VALID,DKIM_VALID_AU,HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,
-	SPF_HELO_NONE,SPF_PASS,UNPARSEABLE_RELAY,USER_AGENT_SANE_1 autolearn=no
-	autolearn_force=no version=3.4.0
+	SPF_HELO_NONE,SPF_PASS autolearn=no autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id AC4F0C33C99
-	for <linux-block@archiver.kernel.org>; Tue,  7 Jan 2020 08:49:14 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 60EB6C33C99
+	for <linux-block@archiver.kernel.org>; Tue,  7 Jan 2020 10:36:03 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.kernel.org (Postfix) with ESMTP id 7ED09206DB
-	for <linux-block@archiver.kernel.org>; Tue,  7 Jan 2020 08:49:14 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id 28E052081E
+	for <linux-block@archiver.kernel.org>; Tue,  7 Jan 2020 10:36:03 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=pass (2048-bit key) header.d=oracle.com header.i=@oracle.com header.b="Na+1tm1P"
+	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="O/E2JMFG"
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1726492AbgAGItO (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Tue, 7 Jan 2020 03:49:14 -0500
-Received: from userp2130.oracle.com ([156.151.31.86]:58696 "EHLO
-        userp2130.oracle.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1725801AbgAGItN (ORCPT
-        <rfc822;linux-block@vger.kernel.org>); Tue, 7 Jan 2020 03:49:13 -0500
-Received: from pps.filterd (userp2130.oracle.com [127.0.0.1])
-        by userp2130.oracle.com (8.16.0.27/8.16.0.27) with SMTP id 0078hUC0093414;
-        Tue, 7 Jan 2020 08:49:09 GMT
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=oracle.com; h=date : from : to : cc
- : subject : message-id : mime-version : content-type; s=corp-2019-08-05;
- bh=pg1w4l5lmMFappxkKDoFEKH5iKsiM0ufnEC9QtBIhnI=;
- b=Na+1tm1PB48mvJEsQlozQtNiyPN8NERhMGLUsfZnQwrLS5QVA0GW9N7r+mXoqWCKMu8P
- rtdt0JxgBQ3no8vZmAYuGfwQZ5iIIesjuy+3ksBmPM3xPGymFW7oI29Ur2rfyKm1Zk0B
- 5ycgUN9in4UcK8oEGb60+Sump5mx1JlDLO3H5P5BWWX4FiYXGVIV/k0r58aXAGG9ITp+
- iRMglRWgFgJlGdj3NAbNJZtn8oR9hIsv9ui9PYx6aGYkzcb/NxJCo8uSCzhBu4TuVjMz
- VqiA+ExgWXJbEtD9uZoitdQH1tzMHexthd8DtWEqgVHu7KxeeJRiLYe2n3i541iYMrF1 LQ== 
-Received: from aserp3020.oracle.com (aserp3020.oracle.com [141.146.126.70])
-        by userp2130.oracle.com with ESMTP id 2xaj4tv36k-1
-        (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=OK);
-        Tue, 07 Jan 2020 08:49:09 +0000
-Received: from pps.filterd (aserp3020.oracle.com [127.0.0.1])
-        by aserp3020.oracle.com (8.16.0.27/8.16.0.27) with SMTP id 0078irvX125305;
-        Tue, 7 Jan 2020 08:47:09 GMT
-Received: from aserv0122.oracle.com (aserv0122.oracle.com [141.146.126.236])
-        by aserp3020.oracle.com with ESMTP id 2xb47k1tvy-1
-        (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=OK);
-        Tue, 07 Jan 2020 08:47:08 +0000
-Received: from abhmp0016.oracle.com (abhmp0016.oracle.com [141.146.116.22])
-        by aserv0122.oracle.com (8.14.4/8.14.4) with ESMTP id 0078l7ZO021515;
-        Tue, 7 Jan 2020 08:47:07 GMT
-Received: from kili.mountain (/129.205.23.165)
-        by default (Oracle Beehive Gateway v4.0)
-        with ESMTP ; Tue, 07 Jan 2020 00:47:06 -0800
-Date:   Tue, 7 Jan 2020 11:46:59 +0300
-From:   Dan Carpenter <dan.carpenter@oracle.com>
-To:     arnd@arndb.de
-Cc:     linux-block@vger.kernel.org
-Subject: [bug report] compat_ioctl: move CDROM_SEND_PACKET handling into scsi
-Message-ID: <20200107084659.uyaucu73yd5rhim3@kili.mountain>
+        id S1726565AbgAGKgC (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Tue, 7 Jan 2020 05:36:02 -0500
+Received: from us-smtp-1.mimecast.com ([207.211.31.81]:43586 "EHLO
+        us-smtp-delivery-1.mimecast.com" rhost-flags-OK-OK-OK-FAIL)
+        by vger.kernel.org with ESMTP id S1726558AbgAGKgC (ORCPT
+        <rfc822;linux-block@vger.kernel.org>);
+        Tue, 7 Jan 2020 05:36:02 -0500
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+        s=mimecast20190719; t=1578393360;
+        h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+         to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+         in-reply-to:in-reply-to:references:references;
+        bh=FfN1P6ZObu9SrbzlwvpLv9bwkLap5FviWZtNgAzWxvY=;
+        b=O/E2JMFGoGCNJ/F4Q5DxlSPBY3qPv1zXlQh2+b+gh785x/irlCykT2+ud/AVXSup2H3KL+
+        6wgYNnoIcMXWQqePQ1x5Zn60G0RZYgK7Pq5yzmVWTOtmPazi+yeI+PSafyDmZ53506ZncF
+        SEk6bUZIbB5Ena1BQGpAEacCusi7/To=
+Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
+ [209.132.183.4]) (Using TLS) by relay.mimecast.com with ESMTP id
+ us-mta-265-vVUkVBscNsCxSx74nvAwjA-1; Tue, 07 Jan 2020 05:35:57 -0500
+X-MC-Unique: vVUkVBscNsCxSx74nvAwjA-1
+Received: from smtp.corp.redhat.com (int-mx01.intmail.prod.int.phx2.redhat.com [10.5.11.11])
+        (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
+        (No client certificate requested)
+        by mimecast-mx01.redhat.com (Postfix) with ESMTPS id 7DB9A800D4C;
+        Tue,  7 Jan 2020 10:35:56 +0000 (UTC)
+Received: from localhost (unknown [10.33.36.144])
+        by smtp.corp.redhat.com (Postfix) with ESMTP id 43B6D1C4;
+        Tue,  7 Jan 2020 10:35:46 +0000 (UTC)
+Date:   Tue, 7 Jan 2020 10:35:46 +0000
+From:   Joe Thornber <thornber@redhat.com>
+To:     LVM2 development <lvm-devel@redhat.com>
+Cc:     Mike Snitzer <snitzer@redhat.com>, markus.schade@gmail.com,
+        ejt@redhat.com, linux-block@vger.kernel.org, dm-devel@redhat.com,
+        joe.thornber@gmail.com
+Subject: Re: [lvm-devel] [dm-devel] kernel BUG at
+ drivers/md/persistent-data/dm-space-map-disk.c:178
+Message-ID: <20200107103546.asf4tmlfdmk6xsub@reti>
+Mail-Followup-To: LVM2 development <lvm-devel@redhat.com>,
+        Mike Snitzer <snitzer@redhat.com>, markus.schade@gmail.com,
+        ejt@redhat.com, linux-block@vger.kernel.org, dm-devel@redhat.com,
+        joe.thornber@gmail.com
+References: <alpine.LRH.2.11.1909251814220.15810@mx.ewheeler.net>
+ <alpine.LRH.2.11.1912201829300.26683@mx.ewheeler.net>
+ <alpine.LRH.2.11.1912270137420.26683@mx.ewheeler.net>
+ <alpine.LRH.2.11.1912271946380.26683@mx.ewheeler.net>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=us-ascii
 Content-Disposition: inline
-User-Agent: NeoMutt/20170113 (1.7.2)
-X-Proofpoint-Virus-Version: vendor=nai engine=6000 definitions=9492 signatures=668685
-X-Proofpoint-Spam-Details: rule=notspam policy=default score=0 suspectscore=1 malwarescore=0
- phishscore=0 bulkscore=0 spamscore=0 mlxscore=0 mlxlogscore=713
- adultscore=0 classifier=spam adjust=0 reason=mlx scancount=1
- engine=8.0.1-1911140001 definitions=main-2001070070
-X-Proofpoint-Virus-Version: vendor=nai engine=6000 definitions=9492 signatures=668685
-X-Proofpoint-Spam-Details: rule=notspam policy=default score=0 priorityscore=1501 malwarescore=0
- suspectscore=1 phishscore=0 bulkscore=0 spamscore=0 clxscore=1011
- lowpriorityscore=0 mlxscore=0 impostorscore=0 mlxlogscore=766 adultscore=0
- classifier=spam adjust=0 reason=mlx scancount=1 engine=8.0.1-1911140001
- definitions=main-2001070070
+In-Reply-To: <alpine.LRH.2.11.1912271946380.26683@mx.ewheeler.net>
+X-Scanned-By: MIMEDefang 2.79 on 10.5.11.11
 Sender: linux-block-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-Hello Arnd Bergmann,
+On Sat, Dec 28, 2019 at 02:13:07AM +0000, Eric Wheeler wrote:
+> On Fri, 27 Dec 2019, Eric Wheeler wrote:
 
-The patch f3ee6e63a9df: "compat_ioctl: move CDROM_SEND_PACKET
-handling into scsi" from Nov 28, 2019, leads to the following static
-checker warning:
+> > Just hit the bug again without mq-scsi (scsi_mod.use_blk_mq=n), all other 
+> > times MQ has been turned on. 
+> > 
+> > I'm trying the -ENOSPC hack which will flag the pool as being out of space 
+> > so I can recover more gracefully than a BUG_ON. Here's a first-draft 
+> > patch, maybe the spinlock will even prevent the issue.
+> > 
+> > Compile tested, I'll try on a real system tomorrow.
+> > 
+> > Comments welcome:
 
-	block/scsi_ioctl.c:703 scsi_put_cdrom_generic_arg()
-	warn: check that 'cgc32' doesn't leak information (struct has a hole after 'data_direction')
+Both sm_ll_find_free_block() and sm_ll_inc() can trigger synchronous IO.  So you
+absolutely cannot use a spin lock.
 
-block/scsi_ioctl.c
-   686  static int scsi_put_cdrom_generic_arg(const struct cdrom_generic_command *cgc,
-   687                                        void __user *arg)
-   688  {
-   689  #ifdef CONFIG_COMPAT
-   690          if (in_compat_syscall()) {
-   691                  struct compat_cdrom_generic_command cgc32 = {
-   692                          .buffer         = (uintptr_t)(cgc->buffer),
-   693                          .buflen         = cgc->buflen,
-   694                          .stat           = cgc->stat,
-   695                          .sense          = (uintptr_t)(cgc->sense),
-   696                          .data_direction = cgc->data_direction,
-   697                          .quiet          = cgc->quiet,
-   698                          .timeout        = cgc->timeout,
-   699                          .reserved[0]    = (uintptr_t)(cgc->reserved[0]),
-   700                  };
+dm_pool_alloc_data_block() holds a big rw semaphore which should prevent anything
+else trying to allocate at the same time.
 
-It's possible that initializations like this don't clear out the struct
-hole but I haven't seen a compiler which is affected.  So maybe it's
-fine?
+- Joe
 
-   701                  memcpy(&cgc32.cmd, &cgc->cmd, CDROM_PACKET_SIZE);
-   702  
-   703                  if (copy_to_user(arg, &cgc32, sizeof(cgc32)))
-   704                          return -EFAULT;
-   705  
-   706                  return 0;
-   707          }
-   708  #endif
-   709          if (copy_to_user(arg, cgc, sizeof(*cgc)))
-   710                  return -EFAULT;
-   711  
-   712          return 0;
-   713  }
-
-See also:
-drivers/media/v4l2-core/v4l2-ioctl.c:3140 video_put_user() warn: check that 'ev32' doesn't leak information (struct has a hole after 'type')
-drivers/media/v4l2-core/v4l2-ioctl.c:3165 video_put_user() warn: check that 'vb32' doesn't leak information (struct has a hole after 'memory')
-
-regards,
-dan carpenter
