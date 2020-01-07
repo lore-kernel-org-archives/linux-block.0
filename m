@@ -6,77 +6,94 @@ X-Spam-Status: No, score=-2.2 required=3.0 tests=DKIM_SIGNED,DKIM_VALID,
 	HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,
 	USER_AGENT_SANE_1 autolearn=no autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 686E5C33C99
-	for <linux-block@archiver.kernel.org>; Tue,  7 Jan 2020 04:00:53 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 6B84AC33C99
+	for <linux-block@archiver.kernel.org>; Tue,  7 Jan 2020 04:02:04 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.kernel.org (Postfix) with ESMTP id 2AEF2206DA
-	for <linux-block@archiver.kernel.org>; Tue,  7 Jan 2020 04:00:53 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id 3C3E62075A
+	for <linux-block@archiver.kernel.org>; Tue,  7 Jan 2020 04:02:04 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel-dk.20150623.gappssmtp.com header.i=@kernel-dk.20150623.gappssmtp.com header.b="AgSB2QGc"
+	dkim=pass (2048-bit key) header.d=kernel-dk.20150623.gappssmtp.com header.i=@kernel-dk.20150623.gappssmtp.com header.b="cjULPnN2"
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1727463AbgAGEAw (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Mon, 6 Jan 2020 23:00:52 -0500
-Received: from mail-pj1-f67.google.com ([209.85.216.67]:38139 "EHLO
-        mail-pj1-f67.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1727452AbgAGEAw (ORCPT
-        <rfc822;linux-block@vger.kernel.org>); Mon, 6 Jan 2020 23:00:52 -0500
-Received: by mail-pj1-f67.google.com with SMTP id l35so8649321pje.3
-        for <linux-block@vger.kernel.org>; Mon, 06 Jan 2020 20:00:52 -0800 (PST)
+        id S1727458AbgAGECD (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Mon, 6 Jan 2020 23:02:03 -0500
+Received: from mail-pf1-f194.google.com ([209.85.210.194]:43760 "EHLO
+        mail-pf1-f194.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S1727441AbgAGECD (ORCPT
+        <rfc822;linux-block@vger.kernel.org>); Mon, 6 Jan 2020 23:02:03 -0500
+Received: by mail-pf1-f194.google.com with SMTP id x6so26823874pfo.10
+        for <linux-block@vger.kernel.org>; Mon, 06 Jan 2020 20:02:03 -0800 (PST)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=kernel-dk.20150623.gappssmtp.com; s=20150623;
         h=subject:to:cc:references:from:message-id:date:user-agent
          :mime-version:in-reply-to:content-language:content-transfer-encoding;
-        bh=IDCrh5LU02xdyVVSeGrhk0v+Nn+rcCBZJkM7RND9gQc=;
-        b=AgSB2QGcNOkAmQDnPg0qJ95jZuF+cox/xKD8BbOZPNirA5QsJ2qABy6jsOHbmFe86x
-         feKPo1pAzo5sNCeduh1hwtHtLlqlI3KqiQfI3X84uB/ZdCymQ6/jKqDhDOp5ISFzwUeU
-         W0Zc5STk1TY4RG2xQ9M5kW1GwIsoPNDDz/J2F3xef2CoXrLGRzWMQXat7Y15YLT8Gzrx
-         O08dvSkjnrUFYr3OdkVNFRuoR6xo4U447jP2K6R3irf8dkurnhJmkvLOwHfvzIgwpCQ3
-         0VtuhTtLDYytE0lzl3RnNoRJjtq1/L5aBFyxl25W+9mpkBt0tg3q8Z6wd8QenQmAWOpB
-         nvRA==
+        bh=RR8e/NlvB7jdmN26lALy0C0cTtjRvEF3yevD6G7bV+Q=;
+        b=cjULPnN2HmFli+pWTB2KJwN9dRs7aeOIjuh9ZpCy1SFdwBTBD2oyGz53iB7gTgrsOF
+         4szQ/hp0VgYhPc2lcH5WOeCgBNSznmIQBLBlyk4eTUON5C+cQeAdbHWyhQfTuCQn3M5o
+         UGUXhTfXNBlBNz4draN2NOONiW/5uiUaKOzoeiDPfFSm4LKMAJ9WtLLx/+EuVJZ/OmzM
+         pUvakE/yVZCnh6Yoz3j/+fPgqKw84nIRepkzxCZlC3aEFimAx/aDOtJS9da1phvcitMZ
+         RlvAl7Q75HraPVQnpPQyaHtSXBufHi+9e6pluijI6FgDsu56J9NEtobTeqffolMUZ8gq
+         WuSQ==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=1e100.net; s=20161025;
         h=x-gm-message-state:subject:to:cc:references:from:message-id:date
          :user-agent:mime-version:in-reply-to:content-language
          :content-transfer-encoding;
-        bh=IDCrh5LU02xdyVVSeGrhk0v+Nn+rcCBZJkM7RND9gQc=;
-        b=N6XwPM2LKpMaN1Kjj72oidi5QaFpPiW/rRzwcIb3LCdOzud4SHsKx814wI+K3sLxWT
-         W6cvY1Hd6L2sC95ILMlpO+Nr4Yjk9vIYM8NOPOv6k6V7vrs0Lyh9u1tVzuUl3BJ/p69a
-         eS89Ly2es78atbQJkSXFrAPmY4l5XZwDK26ol0AHAhKja6j+335NxZWvLF+NtTWLGbEO
-         Y4d4p1FFM39CNLzInnyQLrYCm2MWl/maUPfg80oMWnjhC9ivTiy04Jo8OhMDX38Oaf2T
-         qX2Hp6BDj9pE1t5g0+dRJdlvA4DYkfNApMHugm7db9q919FmC+yU3mCsF4SuAcvf91QA
-         NTbQ==
-X-Gm-Message-State: APjAAAXhsk8JBm8PSZIY4BWiRL4y9JYum5J6My90YCt5wk/HUb+qfJ7Y
-        tzMO7/GOoRfiI2Rcdi0ti4wq4hl8sUU=
-X-Google-Smtp-Source: APXvYqxXapE4v1DYtCz23M9HSUSd41DR55c5Hx3bHbCFrSt8T1CTv9+m5BUMjHoBcbR81AGcHP0z0A==
-X-Received: by 2002:a17:902:a407:: with SMTP id p7mr103951146plq.4.1578369651826;
-        Mon, 06 Jan 2020 20:00:51 -0800 (PST)
+        bh=RR8e/NlvB7jdmN26lALy0C0cTtjRvEF3yevD6G7bV+Q=;
+        b=VO/43sw26/FfbrA2kYJwW+7mV/OFxaFxu43mRFIu6g7Shz8Cp4wEhFdUw/ygQiI1aR
+         PI4EUAcUd/qYSaG3WiMqTkpsgvYhaa8IugiV0njhd8MigxgWBghKV8FpBEWhmY1EiSvZ
+         fNGK2qHGLuE3Ac6zhS32qv02Dk88Pe03zAsAt9MKlZH1h2fbD6krdS7iJ5kBzWZG4PWV
+         pGjjzXN0jhq8jqT4siJGLWPsICsZ2vQOMCKAjkhpF24KRV+jtJSF+ZmsII2gNFNeu3LU
+         GEd8HPFU1tk7qF5LUPT3gGB7G5qRvs3K0d4FlqmErOPqVZwi/LBwxVzWvfoHekwhbH0c
+         0UTw==
+X-Gm-Message-State: APjAAAWQGbG8RAGw83GgMkDRH/+0zphJaSk49eSI2GSY9XQn8Z+6BlnM
+        tqvZC/3GviRaH+1tCQ0cFsNcXg==
+X-Google-Smtp-Source: APXvYqyIIJ9HWIbRPiInZT/nn71zThA0LiVv+zpElg5NW8xFu9mCKsnP3x62CUHZ2bZ3BRGNvrmP3w==
+X-Received: by 2002:aa7:874a:: with SMTP id g10mr94017274pfo.205.1578369722826;
+        Mon, 06 Jan 2020 20:02:02 -0800 (PST)
 Received: from [192.168.1.188] ([66.219.217.145])
-        by smtp.gmail.com with ESMTPSA id z22sm73051202pfr.83.2020.01.06.20.00.50
+        by smtp.gmail.com with ESMTPSA id y7sm72626836pfb.139.2020.01.06.20.02.01
         (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
-        Mon, 06 Jan 2020 20:00:51 -0800 (PST)
-Subject: Re: [RESEND PATCH v3] blk-mq: Document functions for sending request
-To:     =?UTF-8?Q?Andr=c3=a9_Almeida?= <andrealmeid@collabora.com>,
-        linux-block@vger.kernel.org, linux-kernel@vger.kernel.org
-Cc:     kernel@collabora.com, krisman@collabora.com
-References: <20200106180818.85365-1-andrealmeid@collabora.com>
+        Mon, 06 Jan 2020 20:02:02 -0800 (PST)
+Subject: Re: [PATCH] blk-map: add kernel address validation in blk_rq_map_kern
+ func
+To:     Zhiqiang Liu <liuzhiqiang26@huawei.com>,
+        linux-block@vger.kernel.org, jens.axboe@oracle.com,
+        namhyung@gmail.com, bharrosh@panasas.com,
+        renxudong <renxudong1@huawei.com>
+Cc:     Mingfangsen <mingfangsen@huawei.com>, zhengbin13@huawei.com,
+        Guiyao <guiyao@huawei.com>
+References: <239c8928-aea0-abe9-a75d-dc3f1b573ec5@huawei.com>
 From:   Jens Axboe <axboe@kernel.dk>
-Message-ID: <6ff62e36-b285-3fcd-be2e-fece1ddcb0cb@kernel.dk>
-Date:   Mon, 6 Jan 2020 21:00:49 -0700
+Message-ID: <4175ce74-ec06-c1c4-4733-00f7dfe2d545@kernel.dk>
+Date:   Mon, 6 Jan 2020 21:02:01 -0700
 User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:68.0) Gecko/20100101
  Thunderbird/68.2.2
 MIME-Version: 1.0
-In-Reply-To: <20200106180818.85365-1-andrealmeid@collabora.com>
+In-Reply-To: <239c8928-aea0-abe9-a75d-dc3f1b573ec5@huawei.com>
 Content-Type: text/plain; charset=utf-8
 Content-Language: en-US
-Content-Transfer-Encoding: 8bit
+Content-Transfer-Encoding: 7bit
 Sender: linux-block-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-On 1/6/20 11:08 AM, André Almeida wrote:
-> Add or improve documentation for function regarding creating and sending
-> IO requests to the hardware.
+On 12/30/19 5:17 AM, Zhiqiang Liu wrote:
+> From: renxudong <renxudong1@huawei.com>
+> 
+> Blk_rq_map_kern func is used to map kernel data to a request,
+> in which kbuf par should be a valid kernel buffer. However,
+> kbuf par is only checked whether it is null in blk_rq_map_kern func.
+> 
+> If users pass a non kernel address to blk_rq_map_kern func in the
+> non-aligned scenario, the invalid kbuf will be set to bio->bi_private.
+> When the request is completed, bio_copy_kern_endio_read will be called
+> to copy data to the kernel address in bio->bi_private. If the bi_private
+> is not a valid kernel address, the system will oops. In this case, we
+> cannot judge whether the bio structure is damaged or the kernel address is
+> invalid.
+> 
+> Here, we add kernel address validation by calling virt_addr_valid.
 
 Applied, thanks.
 
