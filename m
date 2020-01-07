@@ -7,59 +7,59 @@ X-Spam-Status: No, score=-9.8 required=3.0 tests=DKIM_SIGNED,DKIM_VALID,
 	SPF_HELO_NONE,SPF_PASS,USER_AGENT_GIT autolearn=ham autolearn_force=no
 	version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 6D21CC47409
-	for <linux-block@archiver.kernel.org>; Tue,  7 Jan 2020 16:30:44 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id B6DEDC33C9B
+	for <linux-block@archiver.kernel.org>; Tue,  7 Jan 2020 16:30:45 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.kernel.org (Postfix) with ESMTP id 44A22214D8
-	for <linux-block@archiver.kernel.org>; Tue,  7 Jan 2020 16:30:44 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id 8C74D208C4
+	for <linux-block@archiver.kernel.org>; Tue,  7 Jan 2020 16:30:45 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel-dk.20150623.gappssmtp.com header.i=@kernel-dk.20150623.gappssmtp.com header.b="1d+W57Rz"
+	dkim=pass (2048-bit key) header.d=kernel-dk.20150623.gappssmtp.com header.i=@kernel-dk.20150623.gappssmtp.com header.b="Vzb4SfLm"
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1728173AbgAGQan (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Tue, 7 Jan 2020 11:30:43 -0500
-Received: from mail-io1-f67.google.com ([209.85.166.67]:46663 "EHLO
+        id S1728215AbgAGQap (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Tue, 7 Jan 2020 11:30:45 -0500
+Received: from mail-io1-f67.google.com ([209.85.166.67]:41818 "EHLO
         mail-io1-f67.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1727559AbgAGQan (ORCPT
-        <rfc822;linux-block@vger.kernel.org>); Tue, 7 Jan 2020 11:30:43 -0500
-Received: by mail-io1-f67.google.com with SMTP id t26so53255152ioi.13
+        with ESMTP id S1727559AbgAGQao (ORCPT
+        <rfc822;linux-block@vger.kernel.org>); Tue, 7 Jan 2020 11:30:44 -0500
+Received: by mail-io1-f67.google.com with SMTP id c16so49674286ioo.8
         for <linux-block@vger.kernel.org>; Tue, 07 Jan 2020 08:30:43 -0800 (PST)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=kernel-dk.20150623.gappssmtp.com; s=20150623;
         h=from:to:cc:subject:date:message-id:in-reply-to:references
          :mime-version:content-transfer-encoding;
-        bh=QX8yZUBrOqiAGP6vlQsEk/ggNO5z+OMPNA91V6ToLSk=;
-        b=1d+W57RzX1j2qLwiyoZK/MNAKYv2Vhx+KdlMlr6Ah1F3LoDy+PLwIE9XBqV6UpLIHM
-         3alPEKrF+ZLp084rXlsfi2KqkKobz1+yCcd1xADmuj5XkTfAxigepvooACGy/pAzLnJZ
-         As844RluVUEw+f9EN7iqzXWaU4ZfPCNUTiNr+LeUT8+ajqn2YQO3eGuTnzNo8gj3mD9T
-         FY/IARUWCytq8h4m9UeusFd1pYptuMiK0nH+4oVKgqWYWRMf3FICVIiMaKFIQUK7t6cT
-         817wPdWlcJR/lwyiMVmcamQ6q6wWWlxf+h4U53LlD2Hw85sKwfk+m7PspfkvNXdSvgXT
-         Le2Q==
+        bh=02WrhvT9MKXQhtl97p5XQGxAO2MSQtzBgMftZca/EuU=;
+        b=Vzb4SfLmtU9ydglHlUg6Zvup5x8KKL6YDpM8lDj5NZ/2ukxjRjthzofc0egDfd0C8l
+         NQpSTYEEGeLso2YNd9rA6Kw/5QL6e0O1Du8q/LprxXPEAyEzV6HLieYhLb35SLbnKRB1
+         hGVQjk4jiAbY4dKAItrvTqrPf4CdfduZofT6nNMQhQMqsO0kx6lEr+12xiYnTM1VQ/ju
+         vdGRfEF4p6kg7e+gVXHIsTI7COmTIeXzfoJnv6Uz1mRy/t5/G+kIHaJXISHO5FOw0DpA
+         U1rtpA4KsmK2+a6hHc8y9eISzxyHshjGajoNHZ6+BI4qkF/5gTS/5XGDfOUTl/eNwqV+
+         hEAQ==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=1e100.net; s=20161025;
         h=x-gm-message-state:from:to:cc:subject:date:message-id:in-reply-to
          :references:mime-version:content-transfer-encoding;
-        bh=QX8yZUBrOqiAGP6vlQsEk/ggNO5z+OMPNA91V6ToLSk=;
-        b=LDYxtl1EIGwOPABHYLRI6DsYayVXck7r8tvIs38BM2dt4a5yfntHtsJ0rsYLbraZtL
-         VwZOic4nUKb4zrTcBYo8lR7yPERY6mi1KRR2Yr9rAIb9zoDDu2nAHG6L081JnWo7WryG
-         3vtyf72HH2xzcxG9uic6lc/nSM3+h5ECOjXNijJPw5QcAFZmtTflizkC2+nsKTcRGIgI
-         Z8uoMFkvjCzEHiofI9O1jBYU2b9N0gaGcwf5r1z6rA5e/F2muL6M3Je7lMZF4xlm6GZu
-         08TexVrWvi7z3MvBKyiVa05gttQdTbep5bp08Dalzq+7bL7MM9hldC2WbqNBzP1yqD+g
-         GClA==
-X-Gm-Message-State: APjAAAXQC/gnUy6vlYT8+MDGhJlJyl5GOhabI19PLmIUSCR1EJRdX3gV
-        lWdYvR/gkXd4enlOahdz/mRVM0LJUYQ=
-X-Google-Smtp-Source: APXvYqw0HoSUBH2PNRQpv/NDXOQ5NebMk5aAcJVJnCz0o2D0j79+YN3GWrv8t6kQrYf9gNz0cJ1whg==
-X-Received: by 2002:a6b:7e02:: with SMTP id i2mr72395384iom.172.1578414642605;
-        Tue, 07 Jan 2020 08:30:42 -0800 (PST)
+        bh=02WrhvT9MKXQhtl97p5XQGxAO2MSQtzBgMftZca/EuU=;
+        b=dE8AHZu76Mek6haopXwe8q+7/c1l91wra6VpFDKwpIBpEal5ceas0SZIHQ4+/zV5H0
+         w64TwC1bra2mFHZlZFuaOU+MhBT2/jkjpnvdQbJ/YMv76yvgTCTI9KxMhnpMB+5T55Xy
+         ifDD1aMiSVc/V3mq+elw4ZByxtgqjNRLctm7FEzKRn2I2pm9yLNUZVpBlEU+sildK+Jn
+         gIpHYHIqFLWe2zVeDmW3MRkT9Q1aCoeUf5AmqA9iz2fp29lRBsuErsf2rr6TPK8N7QtA
+         JC3HT2LbbYJ/n2crhUeLaplHg5z90LSFWMazMvA3kuuPUtQba04m7PSp2+ER8LMyfZWu
+         BFnA==
+X-Gm-Message-State: APjAAAWsylw2JGfXtV+iZRkzW0G6JvuYj19CU5wTpzcrc/sVDC2kZsJ8
+        GkWtylBPLG5b2zOj4gCafaDHY9vFePI=
+X-Google-Smtp-Source: APXvYqxs1shqYGXMydjb8G1l7MR1UrtYHQbMSGbx8oI9O7vGaXuxgG0y+RZCrtZV51iu2zhNkCxUcQ==
+X-Received: by 2002:a5d:9d03:: with SMTP id j3mr74245831ioj.266.1578414643410;
+        Tue, 07 Jan 2020 08:30:43 -0800 (PST)
 Received: from x1.localdomain ([65.144.74.34])
-        by smtp.gmail.com with ESMTPSA id w11sm20639ilh.55.2020.01.07.08.30.41
+        by smtp.gmail.com with ESMTPSA id w11sm20639ilh.55.2020.01.07.08.30.42
         (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
         Tue, 07 Jan 2020 08:30:42 -0800 (PST)
 From:   Jens Axboe <axboe@kernel.dk>
 To:     linux-block@vger.kernel.org
 Cc:     Jens Axboe <axboe@kernel.dk>
-Subject: [PATCH 3/6] blk-mq: remove 'clear_ctx_on_error'
-Date:   Tue,  7 Jan 2020 09:30:34 -0700
-Message-Id: <20200107163037.31745-4-axboe@kernel.dk>
+Subject: [PATCH 4/6] blk-mq: remove ctx->queue
+Date:   Tue,  7 Jan 2020 09:30:35 -0700
+Message-Id: <20200107163037.31745-5-axboe@kernel.dk>
 X-Mailer: git-send-email 2.24.1
 In-Reply-To: <20200107163037.31745-1-axboe@kernel.dk>
 References: <20200107163037.31745-1-axboe@kernel.dk>
@@ -70,47 +70,63 @@ Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-We used to have this because getting the ctx meant disabling preemption,
-but that hasn't been the case since commit c05f42206f4d.
+We only use this for a lookup in the sysfs code, replace with getting
+the queue off the default set of hardware queues.
 
 Signed-off-by: Jens Axboe <axboe@kernel.dk>
 ---
- block/blk-mq.c | 7 +------
- 1 file changed, 1 insertion(+), 6 deletions(-)
+ block/blk-mq-sysfs.c | 4 ++--
+ block/blk-mq.c       | 2 --
+ block/blk-mq.h       | 1 -
+ 3 files changed, 2 insertions(+), 5 deletions(-)
 
+diff --git a/block/blk-mq-sysfs.c b/block/blk-mq-sysfs.c
+index 062229395a50..1f3cb13f932e 100644
+--- a/block/blk-mq-sysfs.c
++++ b/block/blk-mq-sysfs.c
+@@ -69,7 +69,7 @@ static ssize_t blk_mq_sysfs_show(struct kobject *kobj, struct attribute *attr,
+ 
+ 	entry = container_of(attr, struct blk_mq_ctx_sysfs_entry, attr);
+ 	ctx = container_of(kobj, struct blk_mq_ctx, kobj);
+-	q = ctx->queue;
++	q = ctx->hctxs[0]->queue;
+ 
+ 	if (!entry->show)
+ 		return -EIO;
+@@ -90,7 +90,7 @@ static ssize_t blk_mq_sysfs_store(struct kobject *kobj, struct attribute *attr,
+ 
+ 	entry = container_of(attr, struct blk_mq_ctx_sysfs_entry, attr);
+ 	ctx = container_of(kobj, struct blk_mq_ctx, kobj);
+-	q = ctx->queue;
++	q = ctx->hctxs[0]->queue;
+ 
+ 	if (!entry->store)
+ 		return -EIO;
 diff --git a/block/blk-mq.c b/block/blk-mq.c
-index a12b1763508d..6a68e8a246dc 100644
+index 6a68e8a246dc..a36764c38bfb 100644
 --- a/block/blk-mq.c
 +++ b/block/blk-mq.c
-@@ -338,7 +338,6 @@ static struct request *blk_mq_get_request(struct request_queue *q,
- 	struct elevator_queue *e = q->elevator;
- 	struct request *rq;
- 	unsigned int tag;
--	bool clear_ctx_on_error = false;
- 	u64 alloc_time_ns = 0;
+@@ -2439,8 +2439,6 @@ static void blk_mq_init_cpu_queues(struct request_queue *q,
+ 		for (k = HCTX_TYPE_DEFAULT; k < HCTX_MAX_TYPES; k++)
+ 			INIT_LIST_HEAD(&__ctx->rq_lists[k]);
  
- 	blk_queue_enter_live(q);
-@@ -348,10 +347,8 @@ static struct request *blk_mq_get_request(struct request_queue *q,
- 		alloc_time_ns = ktime_get_ns();
+-		__ctx->queue = q;
+-
+ 		/*
+ 		 * Set local node, IFF we have more than one hw queue. If
+ 		 * not, we remain on the home node of the device
+diff --git a/block/blk-mq.h b/block/blk-mq.h
+index eaaca8fc1c28..d15ef0bafe29 100644
+--- a/block/blk-mq.h
++++ b/block/blk-mq.h
+@@ -32,7 +32,6 @@ struct blk_mq_ctx {
+ 	/* incremented at completion time */
+ 	unsigned long		____cacheline_aligned_in_smp rq_completed[2];
  
- 	data->q = q;
--	if (likely(!data->ctx)) {
-+	if (likely(!data->ctx))
- 		data->ctx = blk_mq_get_ctx(q);
--		clear_ctx_on_error = true;
--	}
- 	if (likely(!data->hctx))
- 		data->hctx = blk_mq_map_queue(q, data->cmd_flags,
- 						data->ctx);
-@@ -376,8 +373,6 @@ static struct request *blk_mq_get_request(struct request_queue *q,
- 
- 	tag = blk_mq_get_tag(data);
- 	if (tag == BLK_MQ_TAG_FAIL) {
--		if (clear_ctx_on_error)
--			data->ctx = NULL;
- 		blk_queue_exit(q);
- 		return NULL;
- 	}
+-	struct request_queue	*queue;
+ 	struct blk_mq_ctxs      *ctxs;
+ 	struct kobject		kobj;
+ } ____cacheline_aligned_in_smp;
 -- 
 2.24.1
 
