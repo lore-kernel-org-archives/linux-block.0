@@ -2,182 +2,203 @@ Return-Path: <SRS0=BJAb=24=vger.kernel.org=linux-block-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-3.9 required=3.0 tests=DKIM_SIGNED,DKIM_VALID,
-	DKIM_VALID_AU,HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,
-	SPF_HELO_NONE,SPF_PASS autolearn=no autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-3.8 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
+	INCLUDES_PATCH,MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS autolearn=no
+	autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 11AE2C33C9E
-	for <linux-block@archiver.kernel.org>; Tue,  7 Jan 2020 14:49:10 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 75F69C33C9B
+	for <linux-block@archiver.kernel.org>; Tue,  7 Jan 2020 15:03:34 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.kernel.org (Postfix) with ESMTP id D6F7524672
-	for <linux-block@archiver.kernel.org>; Tue,  7 Jan 2020 14:49:09 +0000 (UTC)
-Authentication-Results: mail.kernel.org;
-	dkim=pass (2048-bit key) header.d=cloud.ionos.com header.i=@cloud.ionos.com header.b="Jvncn3ti"
+	by mail.kernel.org (Postfix) with ESMTP id 4C9DA208C4
+	for <linux-block@archiver.kernel.org>; Tue,  7 Jan 2020 15:03:34 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1728262AbgAGOtJ (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Tue, 7 Jan 2020 09:49:09 -0500
-Received: from mail-io1-f68.google.com ([209.85.166.68]:42338 "EHLO
-        mail-io1-f68.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1728232AbgAGOtI (ORCPT
-        <rfc822;linux-block@vger.kernel.org>); Tue, 7 Jan 2020 09:49:08 -0500
-Received: by mail-io1-f68.google.com with SMTP id n11so46108118iom.9
-        for <linux-block@vger.kernel.org>; Tue, 07 Jan 2020 06:49:08 -0800 (PST)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=cloud.ionos.com; s=google;
-        h=mime-version:references:in-reply-to:from:date:message-id:subject:to
-         :cc;
-        bh=xURPOfyF2UK2ImfN0jV4a8KRwy9Nblqyu9sgwhGxs5s=;
-        b=Jvncn3tijiI+u+3cvBj5W7Gb8ZHassVRprsVHpn6hdwsYUoJIf0J0zpAeyjjlzCKeH
-         nY+P3BP7Dw5q/F2TclcXczu+dhVPWcEesVllGg3V5LCZB1c/N5KqP2tOmpf9j7VMdQpK
-         KngmC4wGP2sX/E4BgHtDXa4zfoHX1IAC4kUp07/Odh23+CKkbfvPlLgEj7v/4Gl+BrTZ
-         2Vz+p8Oh5sXHSdNTbR4adTEz/1Zk5t8Lz9bx9c9jDMpuMPCAV2bhUfsgs8ABaF4ERObH
-         H+0nTbLsW1JugC37ccnnPMklDcH6g0yRp2vwGwKe0YuxHWinMCKYlxDscq+FsSIayYy1
-         eLxQ==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20161025;
-        h=x-gm-message-state:mime-version:references:in-reply-to:from:date
-         :message-id:subject:to:cc;
-        bh=xURPOfyF2UK2ImfN0jV4a8KRwy9Nblqyu9sgwhGxs5s=;
-        b=inBqfCpYGOXD/VxPrprYkiY1s+Ce23pDEscFl7CUxkMZZzjVASf2vdKWF4zGI4xSJ3
-         NDiWWEuCzjLCn+nB+eiyfvOxa+dsiQqJe3Ofyv0azEGIzTpHDTOy0YtuqlU321ox6Cj/
-         b7Db4e7GuL6nmQj1jFcYvvAxbwEYKHGpml7Atl1HZ31fgLYKf+QB0h6i+AqAVLOq1s3+
-         FrQu73mJH07wcXv8Lvd7WKeeVsmc8atySMh1bNmLJ7nkUHxNpI4r9GP+KF5U+0PwjPx/
-         0uzLNIrGiHgN433cmDJ+DJJCG6NzxuFdXRlL/5jEpCc2fEw26WeMBRPpDkuetz8xhZuT
-         Qr8A==
-X-Gm-Message-State: APjAAAVDHA3eFyFB8dOEdZcTF5+Wq/D56pUGzzR7+GpifHYM5dJy48H2
-        SW+k67ECOh4Xdmis4+vNXCVE+yCx9u4iiPsZdTyQFw==
-X-Google-Smtp-Source: APXvYqwETYMrSMTjdRtdmgSUVl74ByetyxJrK526VXRrVqCE2iVr2NU5SXb6JOM2nA3EHkb6x606TcaLA6Rbh2tg4BE=
-X-Received: by 2002:a6b:6e02:: with SMTP id d2mr75006830ioh.22.1578408548041;
- Tue, 07 Jan 2020 06:49:08 -0800 (PST)
+        id S1728288AbgAGPDd (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Tue, 7 Jan 2020 10:03:33 -0500
+Received: from mout.kundenserver.de ([217.72.192.75]:58503 "EHLO
+        mout.kundenserver.de" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S1728274AbgAGPDd (ORCPT
+        <rfc822;linux-block@vger.kernel.org>); Tue, 7 Jan 2020 10:03:33 -0500
+Received: from mail-qk1-f182.google.com ([209.85.222.182]) by
+ mrelayeu.kundenserver.de (mreue108 [212.227.15.145]) with ESMTPSA (Nemesis)
+ id 1Mate1-1jQvAP3sBX-00cNvl; Tue, 07 Jan 2020 16:03:31 +0100
+Received: by mail-qk1-f182.google.com with SMTP id w127so42868755qkb.11;
+        Tue, 07 Jan 2020 07:03:30 -0800 (PST)
+X-Gm-Message-State: APjAAAUZcDZqsBnvCqHjXLq2022+QYAXa1yxiQNBCz+OoxvnzY/w02RF
+        JURfhEQuIjxdEYpGwfOrnoVDfI9pBx6EF0ZV3G0=
+X-Google-Smtp-Source: APXvYqwxdv3CnMffWGROluzyN8EtJmt7Qv/zjpuKacZX6xIGNgJJhH/toXHoHDyX4yJa7VVmd4RmZ3zE3NyXULry9c8=
+X-Received: by 2002:a37:84a:: with SMTP id 71mr85970792qki.138.1578409409535;
+ Tue, 07 Jan 2020 07:03:29 -0800 (PST)
 MIME-Version: 1.0
-References: <20191230102942.18395-1-jinpuwang@gmail.com> <20191230102942.18395-15-jinpuwang@gmail.com>
- <1ad8b279-1a45-1d70-39c7-acd42f28abca@acm.org>
-In-Reply-To: <1ad8b279-1a45-1d70-39c7-acd42f28abca@acm.org>
-From:   Jinpu Wang <jinpu.wang@cloud.ionos.com>
-Date:   Tue, 7 Jan 2020 15:48:57 +0100
-Message-ID: <CAMGffEnzoo7Y-Bh4F7ZDONr1kE3U20Btr=763rQyiYu=+YMosA@mail.gmail.com>
-Subject: Re: [PATCH v6 14/25] rtrs: a bit of documentation
-To:     Bart Van Assche <bvanassche@acm.org>
-Cc:     Jack Wang <jinpuwang@gmail.com>, linux-block@vger.kernel.org,
-        linux-rdma@vger.kernel.org, Jens Axboe <axboe@kernel.dk>,
-        Christoph Hellwig <hch@infradead.org>,
-        Sagi Grimberg <sagi@grimberg.me>,
-        Leon Romanovsky <leon@kernel.org>,
-        Doug Ledford <dledford@redhat.com>,
-        Danil Kipnis <danil.kipnis@cloud.ionos.com>, rpenyaev@suse.de,
-        linux-kernel@vger.kernel.org
+References: <20200107084659.uyaucu73yd5rhim3@kili.mountain>
+In-Reply-To: <20200107084659.uyaucu73yd5rhim3@kili.mountain>
+From:   Arnd Bergmann <arnd@arndb.de>
+Date:   Tue, 7 Jan 2020 16:03:12 +0100
+X-Gmail-Original-Message-ID: <CAK8P3a1iUADRcjWEMZjVuCKyESXA7fHEypvFK7vEQ0CseXfmtg@mail.gmail.com>
+Message-ID: <CAK8P3a1iUADRcjWEMZjVuCKyESXA7fHEypvFK7vEQ0CseXfmtg@mail.gmail.com>
+Subject: Re: [bug report] compat_ioctl: move CDROM_SEND_PACKET handling into scsi
+To:     Dan Carpenter <dan.carpenter@oracle.com>
+Cc:     linux-block <linux-block@vger.kernel.org>,
+        Hans Verkuil <hverkuil@xs4all.nl>,
+        Linux Media Mailing List <linux-media@vger.kernel.org>
 Content-Type: text/plain; charset="UTF-8"
+X-Provags-ID: V03:K1:1FsIxDl1pZiGty+oj37I5iTjE/qZVUHpt3hmugUi8V6vXM7ipyd
+ Kx2fddsPERu70jS9Q9EkbJEbXbEo8nx5SQducp69r+nEOqEU8Rq6sxCpW1pnuk5NAljPZl0
+ wn/Y4M5+54VNFmFQB0E1507usrrMsrx9QwJZUjpFgrmpdNumGfrdDMXkq0R+WEDWSkdfi1B
+ oJxqLu6GtpbC8nF12ZStg==
+X-UI-Out-Filterresults: notjunk:1;V03:K0:zF73zkrAZrs=:8qFR+EYK7DfV2ThsNMj2i+
+ Do9NH0Id1iCnhXO2bvKjDmke4VMhYq11BkxPYKH69UuJUzke9wS7re2hcHDQN7hkgdJxQvMUD
+ N/2PRatm5ch3LJQha67zqOfaCpBaxFqyp+AtuNFujlC+DO6ExLW20zuXsS5Vwm9AmJWaJRIqb
+ j+f4UgE18IfGmIEkNRwlftHcY7fnXl+bkaby7RxOOOl2CsHbErRVPWXpXtB6yHxkqeV67Q5u2
+ OpFH0w9n9em8o9SnHkfBX+Ra1W//qJ9og+hsL4ZFAprpwv+n/ozlxDB3RgOPT758Q0s21wQNQ
+ R7zMg8cMACEFLrW+e6/FaFoTpVUsQ1Aw78ro+7NF4IF06q1xoPyzS1+rnGJYafHp+jGvHjQ2m
+ PrFq6ZOdRwHljpv2CQFcLTmjYXC/lK8M5Cwh5Shqpa9TKmRwEAggEOYWVxndtcgkvCpwBF/wl
+ yb0B6zDw3Cp/iFfgkUa95LdURUJmtQC7ftiCeZGALRcrqUnbt+TI6g9qF1907yqRMrZFhPuKh
+ 7LYgaU3kGxJNikUTAKmNYdUPTOSDZdsvOH6mz1CuSE3N+rxJcLitI8rXeteZthzpL8Bckywn/
+ zhlNAlQfO+uarE/+21H0YCPDH5qlg/hvRiQM+XmmwlNGsir7k1qoY2kazB4UrHDa6RqxSHkjW
+ J6XMZu9+2QBmjBM/cB/I6CvmMLKnFwgfef8VcSCORJQK3t4EB5zPNB2cDji1nQ7e8gf0/BvPv
+ bXSI5JK+dGwhhTkuAefm+9+BKg73pYslrcdU+ABswwK+6ZIMDDLHBCSKFSfTggkBOAFa9dbtS
+ 1RCc4fOGNJzA32NWHRAYsbiOfDvmseKFnhD2aAjqPoRvuHnQGFpKBOhnUPEws5fcvchoyPBy7
+ +aAyPk3t3qR9TokhlRIg==
 Sender: linux-block-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-On Tue, Dec 31, 2019 at 12:19 AM Bart Van Assche <bvanassche@acm.org> wrote:
+On Tue, Jan 7, 2020 at 9:49 AM Dan Carpenter <dan.carpenter@oracle.com> wrote:
 >
-> On 2019-12-30 02:29, Jack Wang wrote:
-> > diff --git a/drivers/infiniband/ulp/rtrs/README b/drivers/infiniband/ulp/rtrs/README
+> Hello Arnd Bergmann,
 >
-> Other kernel driver documentation exists under the Documentation/
-> directory. Should this README file perhaps be moved to a subdirectory of
-> the Documentation/ directory?
-I did check most of the drivers are in the drivers directory eg:
-find ./ -name README
-./fs/reiserfs/README
-./fs/qnx4/README
-./fs/qnx6/README
-./fs/cramfs/README
-./Documentation/ABI/README
-./Documentation/virt/kvm/devices/README
-./README
-./tools/usb/usbip/README
-./tools/virtio/ringtest/README
-./tools/virtio/virtio-trace/README
-./tools/power/pm-graph/README
-./tools/power/cpupower/README
-./tools/memory-model/README
-./tools/memory-model/scripts/README
-./tools/memory-model/litmus-tests/README
-./tools/testing/vsock/README
-./tools/testing/ktest/examples/README
-./tools/testing/selftests/ftrace/README
-./tools/testing/selftests/arm64/signal/README
-./tools/testing/selftests/arm64/README
-./tools/testing/selftests/android/ion/README
-./tools/testing/selftests/zram/README
-./tools/testing/selftests/livepatch/README
-./tools/testing/selftests/net/forwarding/README
-./tools/testing/selftests/futex/README
-./tools/testing/selftests/tc-testing/README
-./tools/thermal/tmon/README
-./tools/build/tests/ex/empty2/README
-./tools/perf/tests/attr/README
-./tools/perf/pmu-events/README
-./tools/perf/scripts/perl/Perf-Trace-Util/README
-./tools/io_uring/README
-./net/decnet/README
-./scripts/ksymoops/README
-./scripts/selinux/README
-./arch/powerpc/boot/README
-./arch/m68k/q40/README
-./arch/m68k/ifpsp060/README
-./arch/m68k/fpsp040/README
-./arch/parisc/math-emu/README
-./arch/x86/math-emu/README
-./drivers/bcma/README
-./drivers/char/mwave/README
-./drivers/staging/nvec/README
-./drivers/staging/wlan-ng/README
-./drivers/staging/axis-fifo/README
-./drivers/staging/fbtft/README
-./drivers/staging/fsl-dpaa2/ethsw/README
-./drivers/staging/goldfish/README
-./drivers/staging/gs_fpgaboot/README
-./drivers/staging/comedi/drivers/ni_routing/README
-./drivers/net/wireless/marvell/mwifiex/README
-./drivers/net/wireless/marvell/libertas/README
+> The patch f3ee6e63a9df: "compat_ioctl: move CDROM_SEND_PACKET
+> handling into scsi" from Nov 28, 2019, leads to the following static
+> checker warning:
+>
+>         block/scsi_ioctl.c:703 scsi_put_cdrom_generic_arg()
+>         warn: check that 'cgc32' doesn't leak information (struct has a hole after 'data_direction')
+>
+> block/scsi_ioctl.c
+>    686  static int scsi_put_cdrom_generic_arg(const struct cdrom_generic_command *cgc,
+>    687                                        void __user *arg)
+>    688  {
+>    689  #ifdef CONFIG_COMPAT
+>    690          if (in_compat_syscall()) {
+>    691                  struct compat_cdrom_generic_command cgc32 = {
+>    692                          .buffer         = (uintptr_t)(cgc->buffer),
+>    693                          .buflen         = cgc->buflen,
+>    694                          .stat           = cgc->stat,
+>    695                          .sense          = (uintptr_t)(cgc->sense),
+>    696                          .data_direction = cgc->data_direction,
+>    697                          .quiet          = cgc->quiet,
+>    698                          .timeout        = cgc->timeout,
+>    699                          .reserved[0]    = (uintptr_t)(cgc->reserved[0]),
+>    700                  };
+>
+> It's possible that initializations like this don't clear out the struct
+> hole but I haven't seen a compiler which is affected.  So maybe it's
+> fine?
 
->
-> > +****************************
-> > +InfiniBand Transport (RTRS)
-> > +****************************
->
-> The abbreviation does not match the full title. Do you agree that this
-> is confusing?
->
-> > +RTRS is used by the RNBD (Infiniband Network Block Device) modules.
->
-> Is RNBD an RDMA or an InfiniBand network block device?
-will fix.
->
-> > +
-> > +==================
-> > +Transport protocol
-> > +==================
-> > +
-> > +Overview
-> > +--------
-> > +An established connection between a client and a server is called rtrs
-> > +session. A session is associated with a set of memory chunks reserved on the
-> > +server side for a given client for rdma transfer. A session
-> > +consists of multiple paths, each representing a separate physical link
-> > +between client and server. Those are used for load balancing and failover.
-> > +Each path consists of as many connections (QPs) as there are cpus on
-> > +the client.
-> > +
-> > +When processing an incoming rdma write or read request rtrs client uses memory
->
-> A quote from
-> https://linuxplumbersconf.org/event/4/contributions/367/attachments/331/555/LPC_2019_RMDA_MC_IBNBD_IBTRS_Upstreaming.pdf:
-> "Only RDMA writes with immediate". Has the wire protocol perhaps been
-> changed such that both RDMA reads and writes are used? I haven't found
-> any references to RDMA reads in the "IO path" section in this file. Did
-> I perhaps overlook something?
->
-> Thanks,
->
-> Bart.
-We do not use RDMA_READ, only RDMA_WRITE/RDMA_WRITE_WITH_IMM/SEND_WITH_IMM
-SEND_WITH_IMM was used only when always_invalidate=Y.
-Will extend the document.
+I thlought we already rely on this to initialize the entire structure, but
+trying out a test case shows that it does happen:
 
-Thanks Bart.
+int g(void *);
+int f(void)
+{
+    struct x {
+        char a __attribute__((aligned(4096)));
+    } x = { .a = 23 };
+    return g(&x);
+}
+
+0000000000000000 <f>:
+   0: 55                    push   %rbp
+   1: 48 89 e5              mov    %rsp,%rbp
+   4: 48 81 e4 00 f0 ff ff and    $0xfffffffffffff000,%rsp
+   b: 48 81 ec 00 10 00 00 sub    $0x1000,%rsp
+  12: 48 89 e7              mov    %rsp,%rdi
+  15: c6 04 24 17          movb   $0x17,(%rsp)
+  19: e8 00 00 00 00        callq  1e <f+0x1e>
+1a: R_X86_64_PC32 g-0x4
+  1e: c9                    leaveq
+  1f: c3                    retq
+
+This patch should reliably fix it, right?
+
+diff --git a/block/scsi_ioctl.c b/block/scsi_ioctl.c
+index b4e73d5dd5c2..83a709290b18 100644
+--- a/block/scsi_ioctl.c
++++ b/block/scsi_ioctl.c
+@@ -647,6 +647,7 @@ struct compat_cdrom_generic_command {
+        compat_int_t    stat;
+        compat_caddr_t  sense;
+        unsigned char   data_direction;
++       char            __pad[3];
+        compat_int_t    quiet;
+        compat_int_t    timeout;
+        compat_caddr_t  reserved[1];
+
+>    701                  memcpy(&cgc32.cmd, &cgc->cmd, CDROM_PACKET_SIZE);
+>    702
+>    703                  if (copy_to_user(arg, &cgc32, sizeof(cgc32)))
+>    704                          return -EFAULT;
+>    705
+>    706                  return 0;
+>    707          }
+>    708  #endif
+>    709          if (copy_to_user(arg, cgc, sizeof(*cgc)))
+>    710                  return -EFAULT;
+>    711
+>    712          return 0;
+>    713  }
+>
+> See also:
+> drivers/media/v4l2-core/v4l2-ioctl.c:3140 video_put_user() warn: check that 'ev32' doesn't leak information (struct has a hole after 'type')
+> drivers/media/v4l2-core/v4l2-ioctl.c:3165 video_put_user() warn: check that 'vb32' doesn't leak information (struct has a hole after 'memory')
+
+These get a bit uglier when we try not to change the layout:
+
+diff --git a/include/media/v4l2-ioctl.h b/include/media/v4l2-ioctl.h
+index 291ec28cdf6b..6556e8eeb65e 100644
+--- a/include/media/v4l2-ioctl.h
++++ b/include/media/v4l2-ioctl.h
+@@ -735,6 +735,7 @@ long int video_ioctl2(struct file *file,
+  */
+ struct v4l2_event_time32 {
+        __u32                           type;
++       __u8                            pad[__alignof(__u64) -
+__alignof(__u32)];
+        union {
+                struct v4l2_event_vsync         vsync;
+                struct v4l2_event_ctrl          ctrl;
+@@ -764,6 +765,7 @@ struct v4l2_buffer_time32 {
+
+        /* memory location */
+        __u32                   memory;
++       __u8                    pad[__alignof(void *) - __alignof(__u32)];
+        union {
+                __u32           offset;
+                unsigned long   userptr;
+
+I liked the way the current solution looks, but maybe it's better to use
+an explicit memset and compound expression to force the compiler
+to do the right thing here. This should also be safe and lead to the
+same object code in most cases, right?
+
+diff --git a/drivers/media/v4l2-core/v4l2-ioctl.c
+b/drivers/media/v4l2-core/v4l2-ioctl.c
+index b68ff06009cd..cb1b66463402 100644
+--- a/drivers/media/v4l2-core/v4l2-ioctl.c
++++ b/drivers/media/v4l2-core/v4l2-ioctl.c
+@@ -3125,7 +3125,10 @@ static int video_put_user(void __user *arg,
+void *parg, unsigned int cmd)
+ #ifdef CONFIG_COMPAT_32BIT_TIME
+        case VIDIOC_DQEVENT_TIME32: {
+                struct v4l2_event *ev = parg;
+-               struct v4l2_event_time32 ev32 = {
++               struct v4l2_event_time32 ev32;
++
++               memset(ev32, 0, sizeof(ev32));
++               ev32 = (struct v4l2_event_time32){
+                        .type           = ev->type,
+                        .pending        = ev->pending,
+                        .sequence       = ev->sequence,
+
+        Arnd
