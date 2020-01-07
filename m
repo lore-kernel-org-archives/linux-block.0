@@ -2,195 +2,93 @@ Return-Path: <SRS0=BJAb=24=vger.kernel.org=linux-block-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-5.2 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
-	INCLUDES_PATCH,MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,USER_AGENT_SANE_1
-	autolearn=ham autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-9.8 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
+	INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,
+	USER_AGENT_GIT autolearn=unavailable autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id D85CEC282DD
-	for <linux-block@archiver.kernel.org>; Tue,  7 Jan 2020 18:48:10 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 57018C282DD
+	for <linux-block@archiver.kernel.org>; Tue,  7 Jan 2020 21:21:40 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.kernel.org (Postfix) with ESMTP id AC9FA20656
-	for <linux-block@archiver.kernel.org>; Tue,  7 Jan 2020 18:48:10 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id 33675214D8
+	for <linux-block@archiver.kernel.org>; Tue,  7 Jan 2020 21:21:40 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1728451AbgAGSsK (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Tue, 7 Jan 2020 13:48:10 -0500
-Received: from mx.ewheeler.net ([173.205.220.69]:54695 "EHLO mx.ewheeler.net"
-        rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-        id S1728440AbgAGSsJ (ORCPT <rfc822;linux-block@vger.kernel.org>);
-        Tue, 7 Jan 2020 13:48:09 -0500
-Received: from localhost (localhost [127.0.0.1])
-        by mx.ewheeler.net (Postfix) with ESMTP id D0A54A0692;
-        Tue,  7 Jan 2020 18:48:08 +0000 (UTC)
-X-Virus-Scanned: amavisd-new at ewheeler.net
-Received: from mx.ewheeler.net ([127.0.0.1])
-        by localhost (mx.ewheeler.net [127.0.0.1]) (amavisd-new, port 10024)
-        with LMTP id QR2IEJIFYrx1; Tue,  7 Jan 2020 18:47:38 +0000 (UTC)
-Received: from mx.ewheeler.net (mx.ewheeler.net [173.205.220.69])
-        (using TLSv1 with cipher DHE-RSA-AES256-SHA (256/256 bits))
-        (No client certificate requested)
-        by mx.ewheeler.net (Postfix) with ESMTPSA id EA247A0633;
-        Tue,  7 Jan 2020 18:47:37 +0000 (UTC)
-DKIM-Filter: OpenDKIM Filter v2.11.0 mx.ewheeler.net EA247A0633
-Date:   Tue, 7 Jan 2020 18:47:36 +0000 (UTC)
-From:   Eric Wheeler <dm-devel@lists.ewheeler.net>
-X-X-Sender: lists@mx.ewheeler.net
-To:     Joe Thornber <thornber@redhat.com>
-cc:     LVM2 development <lvm-devel@redhat.com>,
-        Mike Snitzer <snitzer@redhat.com>, markus.schade@gmail.com,
-        ejt@redhat.com, linux-block@vger.kernel.org, dm-devel@redhat.com,
-        joe.thornber@gmail.com
-Subject: Re: [dm-devel] [lvm-devel] kernel BUG at
- drivers/md/persistent-data/dm-space-map-disk.c:178
-In-Reply-To: <20200107122825.qr7o5d6dpwa6kv62@reti>
-Message-ID: <alpine.LRH.2.11.2001071845350.2074@mx.ewheeler.net>
-References: <alpine.LRH.2.11.1909251814220.15810@mx.ewheeler.net> <alpine.LRH.2.11.1912201829300.26683@mx.ewheeler.net> <alpine.LRH.2.11.1912270137420.26683@mx.ewheeler.net> <alpine.LRH.2.11.1912271946380.26683@mx.ewheeler.net> <20200107103546.asf4tmlfdmk6xsub@reti>
- <20200107104627.plviq37qhok2igt4@reti> <20200107122825.qr7o5d6dpwa6kv62@reti>
-User-Agent: Alpine 2.11 (LRH 23 2013-08-11)
+        id S1728861AbgAGVDK (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Tue, 7 Jan 2020 16:03:10 -0500
+Received: from mout.kundenserver.de ([212.227.126.135]:33875 "EHLO
+        mout.kundenserver.de" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S1728865AbgAGVDI (ORCPT
+        <rfc822;linux-block@vger.kernel.org>); Tue, 7 Jan 2020 16:03:08 -0500
+Received: from threadripper.lan ([149.172.19.189]) by mrelayeu.kundenserver.de
+ (mreue009 [212.227.15.129]) with ESMTPA (Nemesis) id
+ 1MK3eI-1j87qh1y5m-00LZCF; Tue, 07 Jan 2020 22:02:57 +0100
+From:   Arnd Bergmann <arnd@arndb.de>
+To:     Ilya Dryomov <idryomov@gmail.com>, Sage Weil <sage@redhat.com>,
+        Jens Axboe <axboe@kernel.dk>
+Cc:     Oleksandr Natalenko <oleksandr@redhat.com>,
+        Arnd Bergmann <arnd@arndb.de>,
+        Dongsheng Yang <dongsheng.yang@easystack.cn>,
+        Jason Dillaman <dillaman@redhat.com>,
+        David Howells <dhowells@redhat.com>,
+        ceph-devel@vger.kernel.org, linux-block@vger.kernel.org,
+        linux-kernel@vger.kernel.org
+Subject: [PATCH] rbd: work around -Wuninitialized warning
+Date:   Tue,  7 Jan 2020 22:01:04 +0100
+Message-Id: <20200107210256.2426176-1-arnd@arndb.de>
+X-Mailer: git-send-email 2.20.0
 MIME-Version: 1.0
-Content-Type: TEXT/PLAIN; charset=US-ASCII
+Content-Transfer-Encoding: 8bit
+X-Provags-ID: V03:K1:qiBbNdWqGEMMIERlxqJELgdKzb8bJCMzjAWQ9HTgak9Ff2vxvog
+ ZiKQ150VLDh9JWrAZooVqHelJQp11Bcb1+CNXSqkQDQ5sRKJxbgEOWMtteK73DtHqmRyONM
+ XuUfU69io62lViiPJ2aYJR+QXe300SyxvfaTS/q7SZo+/bVQOrCU4ddHNeGOxxBML+IUjtl
+ YruDPJn/MY3pY8Cm3Ekbw==
+X-UI-Out-Filterresults: notjunk:1;V03:K0:hziPz/VrV88=:vbym4h2BXvC60iOZqV3c2h
+ O1BEGbiDBe0xht86RpkPm2j0b5Aq9nP58yihvmdmaAs52YAMUFSJQN6lDS5neHyMnJ8CwhTyp
+ q/rUixeG4V50J54isuCECu+RaMN07YIVtYmZvSEIi7x//EvUSwn6U0Lp2n0nVWL61KTKeUK5w
+ bL1Pi3P8Ox+LtG23J3WdbLl6E4SPfOLwY1ikjkvmalIdpPCNR7lAcTG3V69SGee1CyIvLD+47
+ k3ByUp5plwat6dkBTeybDsS7BeOlk+ifWhyhS4brik6DBWh9gkd1GdTGLwsW7db43hNj1lnIv
+ 0LM7pwxPT0QkX2dHM5R/yhB/YZFNz9Sjrys2YjpseeiESAvU/6bbOJtpakDVhHUODCv+08sN6
+ WXkkcXsNc3lBp8AIvhlpjYv2bUyMaLakFP+A+0TP5bvSd1bgdhpJFLxe15QA85rfnVhZI11vk
+ wqUOtz3j4YBROukCc3nky2cbvIrab/mS+eiZBdkbPLo6Zau/Z7mZR1ZWu8AOH+ra1mUCN0/MC
+ osU6Gm2s6foPtPQsSkeP5Eo7/xVdSfyYQz4eVc2pOCS7IBm+6PYaotTcweBIcKfDoemjlimBj
+ JwT1w1u0iW5U/+Cb0PSw2IEkxma7HutNJlAbKqOID4TwiKXfIOlK7umbn/NpWSlTgh8X7H0+U
+ upd5CbeWgqxJVNAI5bNOTL4WsTdDmcKUkxS1ezhMi/4WllLaHkV1A/KAZTsa6DIWXLwR6w0fu
+ anNIdc9Z35OIyHFmhn/4oEUM93rSg8co0ZrKCI9uXiEJzQU4mPH/ve3QLrQ5Hy5LO+9T3xqOF
+ +rOFy+C8Yi7a1h56k44qj5gbp1eBFwMVG33nWa6NciNxm3PYswLJ/eCpea1WdD6UkN76PQn2e
+ LkkHj/b+AE4EjXP1YI5g==
 Sender: linux-block-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-On Tue, 7 Jan 2020, Joe Thornber wrote:
+gcc -O3 warns about a dummy variable that is passed
+down into rbd_img_fill_nodata without being initialized:
 
-> On Tue, Jan 07, 2020 at 10:46:27AM +0000, Joe Thornber wrote:
-> > I'll get a patch to you later today.
-> 
-> Eric,
-> 
-> Patch below.  I've run it through a bunch of tests in the dm test suite.  But
-> obviously I have never hit your issue.  Will do more testing today.
+drivers/block/rbd.c: In function 'rbd_img_fill_nodata':
+drivers/block/rbd.c:2573:13: error: 'dummy' is used uninitialized in this function [-Werror=uninitialized]
+  fctx->iter = *fctx->pos;
 
+Since this is a dummy, I assume the warning is harmless, but
+it's better to initialize it anyway and avoid the warning.
 
-Thank you Joe, I'll apply the patch and pull out the spinlock.  
+Fixes: mmtom ("init/Kconfig: enable -O3 for all arches")
+Signed-off-by: Arnd Bergmann <arnd@arndb.de>
+---
+ drivers/block/rbd.c | 2 +-
+ 1 file changed, 1 insertion(+), 1 deletion(-)
 
-I'm not familiar with how sync IO prevents a spinlock.  Can you give a 
-brief explaination or point me at documentation?
+diff --git a/drivers/block/rbd.c b/drivers/block/rbd.c
+index 29be02838b67..070edc5983df 100644
+--- a/drivers/block/rbd.c
++++ b/drivers/block/rbd.c
+@@ -2664,7 +2664,7 @@ static int rbd_img_fill_nodata(struct rbd_img_request *img_req,
+ 			       u64 off, u64 len)
+ {
+ 	struct ceph_file_extent ex = { off, len };
+-	union rbd_img_fill_iter dummy;
++	union rbd_img_fill_iter dummy = {};
+ 	struct rbd_img_fill_ctx fctx = {
+ 		.pos_type = OBJ_REQUEST_NODATA,
+ 		.pos = &dummy,
+-- 
+2.20.0
 
---
-Eric Wheeler
-
-
-
-> 
-> - Joe
-> 
-> 
-> 
-> Author: Joe Thornber <ejt@redhat.com>
-> Date:   Tue Jan 7 11:58:42 2020 +0000
-> 
->     [dm-thin, dm-cache] Fix bug in space-maps.
->     
->     The space-maps track the reference counts for disk blocks.  There are variants
->     for tracking metadata blocks, and data blocks.
->     
->     We implement transactionality by never touching blocks from the previous
->     transaction, so we can rollback in the event of a crash.
->     
->     When allocating a new block we need to ensure the block is free (has reference
->     count of 0) in both the current and previous transaction.  Prior to this patch we
->     were doing this by searching for a free block in the previous transaction, and
->     relying on a 'begin' counter to track where the last allocation in the current
->     transaction was.  This 'begin' field was not being updated in all code paths (eg,
->     increment of a data block reference count due to breaking sharing of a neighbour
->     block in the same btree leaf).
->     
->     This patch keeps the 'begin' field, but now it's just a hint to speed up the search.
->     Instead we search the current transaction for a free block, and then double check
->     it's free in the old transaction.  Much simpler.
-> 
-> diff --git a/drivers/md/persistent-data/dm-space-map-common.c b/drivers/md/persistent-data/dm-space-map-common.c
-> index bd68f6fef694..b4983e4022e6 100644
-> --- a/drivers/md/persistent-data/dm-space-map-common.c
-> +++ b/drivers/md/persistent-data/dm-space-map-common.c
-> @@ -380,6 +380,34 @@ int sm_ll_find_free_block(struct ll_disk *ll, dm_block_t begin,
->  	return -ENOSPC;
->  }
->  
-> +int sm_ll_find_common_free_block(struct ll_disk *old_ll, struct ll_disk *new_ll,
-> +	                         dm_block_t begin, dm_block_t end, dm_block_t *b)
-> +{
-> +	int r;
-> +	uint32_t count;
-> +
-> +	do {
-> +		r = sm_ll_find_free_block(new_ll, begin, new_ll->nr_blocks, b);
-> +		if (r)
-> +			break;
-> +
-> +		/* double check this block wasn't used in the old transaction */
-> +		if (*b >= old_ll->nr_blocks)
-> +			count = 0;
-> +
-> +		else {
-> +			r = sm_ll_lookup(old_ll, *b, &count);
-> +			if (r)
-> +				break;
-> +
-> +			if (count)
-> +				begin = *b + 1;
-> +		}
-> +	} while (count);
-> +
-> +	return r;
-> +}
-> +
->  static int sm_ll_mutate(struct ll_disk *ll, dm_block_t b,
->  			int (*mutator)(void *context, uint32_t old, uint32_t *new),
->  			void *context, enum allocation_event *ev)
-> diff --git a/drivers/md/persistent-data/dm-space-map-common.h b/drivers/md/persistent-data/dm-space-map-common.h
-> index b3078d5eda0c..8de63ce39bdd 100644
-> --- a/drivers/md/persistent-data/dm-space-map-common.h
-> +++ b/drivers/md/persistent-data/dm-space-map-common.h
-> @@ -109,6 +109,8 @@ int sm_ll_lookup_bitmap(struct ll_disk *ll, dm_block_t b, uint32_t *result);
->  int sm_ll_lookup(struct ll_disk *ll, dm_block_t b, uint32_t *result);
->  int sm_ll_find_free_block(struct ll_disk *ll, dm_block_t begin,
->  			  dm_block_t end, dm_block_t *result);
-> +int sm_ll_find_common_free_block(struct ll_disk *old_ll, struct ll_disk *new_ll,
-> +	                         dm_block_t begin, dm_block_t end, dm_block_t *result);
->  int sm_ll_insert(struct ll_disk *ll, dm_block_t b, uint32_t ref_count, enum allocation_event *ev);
->  int sm_ll_inc(struct ll_disk *ll, dm_block_t b, enum allocation_event *ev);
->  int sm_ll_dec(struct ll_disk *ll, dm_block_t b, enum allocation_event *ev);
-> diff --git a/drivers/md/persistent-data/dm-space-map-disk.c b/drivers/md/persistent-data/dm-space-map-disk.c
-> index 32adf6b4a9c7..bf4c5e2ccb6f 100644
-> --- a/drivers/md/persistent-data/dm-space-map-disk.c
-> +++ b/drivers/md/persistent-data/dm-space-map-disk.c
-> @@ -167,8 +167,10 @@ static int sm_disk_new_block(struct dm_space_map *sm, dm_block_t *b)
->  	enum allocation_event ev;
->  	struct sm_disk *smd = container_of(sm, struct sm_disk, sm);
->  
-> -	/* FIXME: we should loop round a couple of times */
-> -	r = sm_ll_find_free_block(&smd->old_ll, smd->begin, smd->old_ll.nr_blocks, b);
-> +	/*
-> +	 * Any block we allocate has to be free in both the old and current ll.
-> +	 */
-> +	r = sm_ll_find_common_free_block(&smd->old_ll, &smd->ll, smd->begin, smd->ll.nr_blocks, b);
->  	if (r)
->  		return r;
->  
-> diff --git a/drivers/md/persistent-data/dm-space-map-metadata.c b/drivers/md/persistent-data/dm-space-map-metadata.c
-> index 25328582cc48..9e3c64ec2026 100644
-> --- a/drivers/md/persistent-data/dm-space-map-metadata.c
-> +++ b/drivers/md/persistent-data/dm-space-map-metadata.c
-> @@ -448,7 +448,10 @@ static int sm_metadata_new_block_(struct dm_space_map *sm, dm_block_t *b)
->  	enum allocation_event ev;
->  	struct sm_metadata *smm = container_of(sm, struct sm_metadata, sm);
->  
-> -	r = sm_ll_find_free_block(&smm->old_ll, smm->begin, smm->old_ll.nr_blocks, b);
-> +	/*
-> +	 * Any block we allocate has to be free in both the old and current ll.
-> +	 */
-> +	r = sm_ll_find_common_free_block(&smm->old_ll, &smm->ll, smm->begin, smm->ll.nr_blocks, b);
->  	if (r)
->  		return r;
->  
-> 
-> --
-> dm-devel mailing list
-> dm-devel@redhat.com
-> https://www.redhat.com/mailman/listinfo/dm-devel
-> 
-> 
