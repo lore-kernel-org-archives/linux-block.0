@@ -2,325 +2,194 @@ Return-Path: <SRS0=BJAb=24=vger.kernel.org=linux-block-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-0.8 required=3.0 tests=DKIM_SIGNED,DKIM_VALID,
-	DKIM_VALID_AU,HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SPF_HELO_NONE,
-	SPF_PASS autolearn=no autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-3.9 required=3.0 tests=DKIMWL_WL_HIGH,DKIM_SIGNED,
+	DKIM_VALID,DKIM_VALID_AU,HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,
+	MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS autolearn=no autolearn_force=no
+	version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 9EA9EC33C9E
-	for <linux-block@archiver.kernel.org>; Tue,  7 Jan 2020 12:22:56 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id BE83BC33C8C
+	for <linux-block@archiver.kernel.org>; Tue,  7 Jan 2020 12:28:42 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.kernel.org (Postfix) with ESMTP id 6B6EC206F0
-	for <linux-block@archiver.kernel.org>; Tue,  7 Jan 2020 12:22:56 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id 8B5982075A
+	for <linux-block@archiver.kernel.org>; Tue,  7 Jan 2020 12:28:42 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=pass (2048-bit key) header.d=cloud.ionos.com header.i=@cloud.ionos.com header.b="Cm9biH+3"
+	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="g+KXHHqk"
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1727978AbgAGMWz (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Tue, 7 Jan 2020 07:22:55 -0500
-Received: from mail-io1-f66.google.com ([209.85.166.66]:35595 "EHLO
-        mail-io1-f66.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1727939AbgAGMWz (ORCPT
-        <rfc822;linux-block@vger.kernel.org>); Tue, 7 Jan 2020 07:22:55 -0500
-Received: by mail-io1-f66.google.com with SMTP id h8so5319332iob.2
-        for <linux-block@vger.kernel.org>; Tue, 07 Jan 2020 04:22:54 -0800 (PST)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=cloud.ionos.com; s=google;
-        h=mime-version:references:in-reply-to:from:date:message-id:subject:to
-         :cc;
-        bh=ijZNngKPrbpiSHbp4EiHV97XJQRwKlTlChFvzqASRMA=;
-        b=Cm9biH+3ATJN5g8MDXRplcSjNciYoVcPO+YfgEvfUUDhDOQq2jZ+mQEKh7RYyzUtis
-         fk1b3RExekpJB28oXbIJ22GjfE7nu4Y4GGkS4RjF2TZNg0xixmV6JuJRkpK4/9IOd+Ix
-         hXFY3++03Y4VWwtvL1uQ3/MtxJkdqP+sbUb8/hNBhylBKVBafTKx3hi4bPliMQMMQ30q
-         lr1QrJAhKsUwlCXGvikqYtWACW3p/oDqj1pUr5fQNkWK03hPW8udvT06VItLXUAfbitD
-         xSoyksHpWjFzo9tONLKYO/HxX6HOqkJWPdyfYfR4CArqJMQdZWg+593v/Z/a0MHebGbl
-         ZHfA==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20161025;
-        h=x-gm-message-state:mime-version:references:in-reply-to:from:date
-         :message-id:subject:to:cc;
-        bh=ijZNngKPrbpiSHbp4EiHV97XJQRwKlTlChFvzqASRMA=;
-        b=TgJ+Re4BJt5UIoYFo/1/f4aNoKVrPPPDoIwJBSiMbD9cUkjGyoxcgrKYY1wRqnwVlm
-         qYzGzoswH1wmKXP8VSspPdNXrnZLbA5aX5+tD08wnZ7Q28PxMHHQYjb0H8W21Qi3pmce
-         91XRW4gO3lq6hs14XD+P5HU2vsoFzpMBgULIn2DqHm40HnYp39vEEhCK+QvAHgc2b810
-         I251hAUX4KAcNWEDDYWIkmbyGtZ/JMLQlBKpCK/F5AW9BCbX3PH5Ux1cZgw2nXAUEnfG
-         dRjL8GDif4ZYpBsFSzLhzCV3dYctyf9VEVgOTzjH0TrmLvVJ29J6hZpmSjWGRt1/oF3k
-         QOOQ==
-X-Gm-Message-State: APjAAAWk8g/ERW4zs/C5xtLJ/GV5c7aPRe4dZv4Oz2tHM1airUxFsGOp
-        iu5+z9NxyvYGbWWvVPLf9JbK1iAbpMRHM6F/xWRUcw==
-X-Google-Smtp-Source: APXvYqxV0x2hwLXk6oIkLLahjGsyv/VGTdKmH3T4AjccMGFd3R38jyCUczX0QPn05xVr+JlCKw6z3KDCzunxNzxKTPk=
-X-Received: by 2002:a05:6602:25d3:: with SMTP id d19mr61296563iop.217.1578399774210;
- Tue, 07 Jan 2020 04:22:54 -0800 (PST)
+        id S1727942AbgAGM2m (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Tue, 7 Jan 2020 07:28:42 -0500
+Received: from us-smtp-2.mimecast.com ([205.139.110.61]:42282 "EHLO
+        us-smtp-delivery-1.mimecast.com" rhost-flags-OK-OK-OK-FAIL)
+        by vger.kernel.org with ESMTP id S1726937AbgAGM2m (ORCPT
+        <rfc822;linux-block@vger.kernel.org>);
+        Tue, 7 Jan 2020 07:28:42 -0500
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+        s=mimecast20190719; t=1578400120;
+        h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+         to:to:cc:mime-version:mime-version:content-type:content-type:
+         in-reply-to:in-reply-to:references:references;
+        bh=4UTyKgnP0YFJHjbElbv5KiGj5R8K834Ui92u2kW+y6I=;
+        b=g+KXHHqklOfuFFap1zpbbjk5w0WCw8n1IERkwSgOeyZbU+lBFGkNGO4BHNNDZQU76w+xJf
+        9oo2+h+jZajoR2PeII1HcidRyVa1aJsUBxr8WJxTu5i0xftBNEOnxAf5HxRf2xNT7oriy4
+        RG8Oy6Vl/LUbQIwM/uGkdeloUUhdJyA=
+Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
+ [209.132.183.4]) (Using TLS) by relay.mimecast.com with ESMTP id
+ us-mta-264-4JkScn_7PRaZeSlTpXi0dw-1; Tue, 07 Jan 2020 07:28:37 -0500
+X-MC-Unique: 4JkScn_7PRaZeSlTpXi0dw-1
+Received: from smtp.corp.redhat.com (int-mx03.intmail.prod.int.phx2.redhat.com [10.5.11.13])
+        (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
+        (No client certificate requested)
+        by mimecast-mx01.redhat.com (Postfix) with ESMTPS id 5635D18A8C81;
+        Tue,  7 Jan 2020 12:28:36 +0000 (UTC)
+Received: from localhost (unknown [10.33.36.144])
+        by smtp.corp.redhat.com (Postfix) with ESMTP id B752A8208E;
+        Tue,  7 Jan 2020 12:28:26 +0000 (UTC)
+Date:   Tue, 7 Jan 2020 12:28:25 +0000
+From:   Joe Thornber <thornber@redhat.com>
+To:     LVM2 development <lvm-devel@redhat.com>,
+        Mike Snitzer <snitzer@redhat.com>, markus.schade@gmail.com,
+        ejt@redhat.com, linux-block@vger.kernel.org, dm-devel@redhat.com,
+        joe.thornber@gmail.com
+Subject: Re: [dm-devel] [lvm-devel] kernel BUG at
+ drivers/md/persistent-data/dm-space-map-disk.c:178
+Message-ID: <20200107122825.qr7o5d6dpwa6kv62@reti>
+Mail-Followup-To: LVM2 development <lvm-devel@redhat.com>,
+        Mike Snitzer <snitzer@redhat.com>, markus.schade@gmail.com,
+        ejt@redhat.com, linux-block@vger.kernel.org, dm-devel@redhat.com,
+        joe.thornber@gmail.com
+References: <alpine.LRH.2.11.1909251814220.15810@mx.ewheeler.net>
+ <alpine.LRH.2.11.1912201829300.26683@mx.ewheeler.net>
+ <alpine.LRH.2.11.1912270137420.26683@mx.ewheeler.net>
+ <alpine.LRH.2.11.1912271946380.26683@mx.ewheeler.net>
+ <20200107103546.asf4tmlfdmk6xsub@reti>
+ <20200107104627.plviq37qhok2igt4@reti>
 MIME-Version: 1.0
-References: <20191230102942.18395-1-jinpuwang@gmail.com> <20191230102942.18395-5-jinpuwang@gmail.com>
- <d4288d41-b000-9a98-d12a-0738a0f647e8@acm.org>
-In-Reply-To: <d4288d41-b000-9a98-d12a-0738a0f647e8@acm.org>
-From:   Jinpu Wang <jinpu.wang@cloud.ionos.com>
-Date:   Tue, 7 Jan 2020 13:22:43 +0100
-Message-ID: <CAMGffEkG3N7ESyneN6PObq3L0Ps5cGSYboYac=Ti6yt-BqC2xA@mail.gmail.com>
-Subject: Re: [PATCH v6 04/25] rtrs: core: lib functions shared between client
- and server modules
-To:     Bart Van Assche <bvanassche@acm.org>
-Cc:     Jack Wang <jinpuwang@gmail.com>, linux-block@vger.kernel.org,
-        linux-rdma@vger.kernel.org, Jens Axboe <axboe@kernel.dk>,
-        Christoph Hellwig <hch@infradead.org>,
-        Sagi Grimberg <sagi@grimberg.me>,
-        Leon Romanovsky <leon@kernel.org>,
-        Doug Ledford <dledford@redhat.com>,
-        Danil Kipnis <danil.kipnis@cloud.ionos.com>, rpenyaev@suse.de
-Content-Type: text/plain; charset="UTF-8"
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <20200107104627.plviq37qhok2igt4@reti>
+X-Scanned-By: MIMEDefang 2.79 on 10.5.11.13
 Sender: linux-block-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-On Mon, Dec 30, 2019 at 11:25 PM Bart Van Assche <bvanassche@acm.org> wrote:
->
-> On 2019-12-30 02:29, Jack Wang wrote:
-> > + * InfiniBand Transport Layer
->
-> Is RTRS an InfiniBand or an RDMA transport layer?
-will fix.
->
-> > +MODULE_DESCRIPTION("RTRS Core");
->
-> Please write out RTRS in full and consider changing the word "Core" into
-> "client and server".
-will do.
->
-> > +     WARN_ON(!queue_size);
-> > +     ius = kcalloc(queue_size, sizeof(*ius), gfp_mask);
-> > +
-> > +     if (unlikely(!ius))
-> > +             return NULL;
->
-> No blank line between the 'ius' assignment and the 'ius' check please.
-ok.
->
-> > +int rtrs_iu_post_recv(struct rtrs_con *con, struct rtrs_iu *iu)
-> > +{
-> > +     struct rtrs_sess *sess = con->sess;
-> > +     struct ib_recv_wr wr;
-> > +     const struct ib_recv_wr *bad_wr;
-> > +     struct ib_sge list;
-> > +
-> > +     list.addr   = iu->dma_addr;
-> > +     list.length = iu->size;
-> > +     list.lkey   = sess->dev->ib_pd->local_dma_lkey;
-> > +
-> > +     if (WARN_ON(list.length == 0)) {
-> > +             rtrs_wrn(con->sess,
-> > +                       "Posting receive work request failed, sg list is empty\n");
-> > +             return -EINVAL;
-> > +     }
-> > +
-> > +     wr.next    = NULL;
-> > +     wr.wr_cqe  = &iu->cqe;
-> > +     wr.sg_list = &list;
-> > +     wr.num_sge = 1;
-> > +
-> > +     return ib_post_recv(con->qp, &wr, &bad_wr);
-> > +}
-> > +EXPORT_SYMBOL_GPL(rtrs_iu_post_recv);
->
-> The above code is fragile: although this is unlikely, if a member would
-> be added in struct ib_sge or in struct ib_recv_wr then the above code
-> will leave some member variables uninitialized. Has it been considered
-> to initialize these structures using a single assignment statement, e.g.
-> as follows:
->
->         wr = (struct ib_recv_wr) {
->                 .wr_cqe = ...,
->                 .sg_list = ...,
->                 .num_sge = 1,
->         };
-Will do.
->
-> > +int rtrs_post_recv_empty(struct rtrs_con *con, struct ib_cqe *cqe)
-> > +{
-> > +     struct ib_recv_wr wr;
-> > +     const struct ib_recv_wr *bad_wr;
-> > +
-> > +     wr.next    = NULL;
-> > +     wr.wr_cqe  = cqe;
-> > +     wr.sg_list = NULL;
-> > +     wr.num_sge = 0;
-> > +
-> > +     return ib_post_recv(con->qp, &wr, &bad_wr);
-> > +}
-> > +EXPORT_SYMBOL_GPL(rtrs_post_recv_empty);
->
-> Same comment for this function.
-dito.
->
-> > +int rtrs_post_recv_empty_x2(struct rtrs_con *con, struct ib_cqe *cqe)
-> > +{
-> > +     struct ib_recv_wr wr_arr[2], *wr;
-> > +     const struct ib_recv_wr *bad_wr;
-> > +     int i;
-> > +
-> > +     memset(wr_arr, 0, sizeof(wr_arr));
-> > +     for (i = 0; i < ARRAY_SIZE(wr_arr); i++) {
-> > +             wr = &wr_arr[i];
-> > +             wr->wr_cqe  = cqe;
-> > +             if (i)
-> > +                     /* Chain backwards */
-> > +                     wr->next = &wr_arr[i - 1];
-> > +     }
-> > +
-> > +     return ib_post_recv(con->qp, wr, &bad_wr);
-> > +}
-> > +EXPORT_SYMBOL_GPL(rtrs_post_recv_empty_x2);
->
-> I have not yet seen any other RDMA code that is similar to the above
-> function. A comment above this function that explains its purpose would
-> be more than welcome.
-Will add comment.
->
-> > +int rtrs_iu_post_send(struct rtrs_con *con, struct rtrs_iu *iu, size_t size,
-> > +                    struct ib_send_wr *head)
-> > +{
-> > +     struct rtrs_sess *sess = con->sess;
-> > +     struct ib_send_wr wr;
-> > +     const struct ib_send_wr *bad_wr;
-> > +     struct ib_sge list;
-> > +
-> > +     if ((WARN_ON(size == 0)))
-> > +             return -EINVAL;
->
-> No superfluous parentheses please.
-ok
+On Tue, Jan 07, 2020 at 10:46:27AM +0000, Joe Thornber wrote:
+> I'll get a patch to you later today.
 
->
-> > +     list.addr   = iu->dma_addr;
-> > +     list.length = size;
-> > +     list.lkey   = sess->dev->ib_pd->local_dma_lkey;
-> > +
-> > +     memset(&wr, 0, sizeof(wr));
-> > +     wr.next       = NULL;
-> > +     wr.wr_cqe     = &iu->cqe;
-> > +     wr.sg_list    = &list;
-> > +     wr.num_sge    = 1;
-> > +     wr.opcode     = IB_WR_SEND;
-> > +     wr.send_flags = IB_SEND_SIGNALED;
->
-> Has it been considered to use designated initializers instead of a
-> memset() followed by multiple assignments? Same question for
-> rtrs_iu_post_rdma_write_imm() and rtrs_post_rdma_write_imm_empty().
-Sounds good, will do.
+Eric,
 
->
-> > +static int create_qp(struct rtrs_con *con, struct ib_pd *pd,
-> > +                  u16 wr_queue_size, u32 max_sge)
-> > +{
-> > +     struct ib_qp_init_attr init_attr = {NULL};
-> > +     struct rdma_cm_id *cm_id = con->cm_id;
-> > +     int ret;
-> > +
-> > +     init_attr.cap.max_send_wr = wr_queue_size;
-> > +     init_attr.cap.max_recv_wr = wr_queue_size;
->
-> What code is responsible for ensuring that neither max_send_wr nor
-> max_recv_wr exceeds the device limits? Please document this in a comment
-> above this function.
-rtrs-clt/srv queries device limits for ensuring the settings will not
-exceed the limits.
-will add comment.
+Patch below.  I've run it through a bunch of tests in the dm test suite.  But
+obviously I have never hit your issue.  Will do more testing today.
 
->
-> > +     init_attr.cap.max_recv_sge = 1;
-> > +     init_attr.event_handler = qp_event_handler;
-> > +     init_attr.qp_context = con;
-> > +#undef max_send_sge
-> > +     init_attr.cap.max_send_sge = max_sge;
->
-> Is the "undef max_send_sge" really necessary? If so, please add a
-> comment that explains why it is necessary.
-it's not, will remove.
->
-> > +static int rtrs_str_gid_to_sockaddr(const char *addr, size_t len,
-> > +                                  short port, struct sockaddr_storage *dst)
-> > +{
-> > +     struct sockaddr_ib *dst_ib = (struct sockaddr_ib *)dst;
-> > +     int ret;
-> > +
-> > +     /*
-> > +      * We can use some of the I6 functions since GID is a valid
-> > +      * IPv6 address format
-> > +      */
-> > +     ret = in6_pton(addr, len, dst_ib->sib_addr.sib_raw, '\0', NULL);
-> > +     if (ret == 0)
-> > +             return -EINVAL;
->
-> What is "I6"?
-IPv6, will fix.
->
-> Is the fourth argument to this function correct? From the comment above
-> in6_pton(): "@delim: the delimiter of the IPv6 address in @src, -1 means
-> no delimiter".
-'\0' means end of the string here, seems correct to me.
->
-> > +int sockaddr_to_str(const struct sockaddr *addr, char *buf, size_t len)
-> > +{
-> > +     int cnt;
-> > +
-> > +     switch (addr->sa_family) {
-> > +     case AF_IB:
-> > +             cnt = scnprintf(buf, len, "gid:%pI6",
-> > +                     &((struct sockaddr_ib *)addr)->sib_addr.sib_raw);
-> > +             return cnt;
-> > +     case AF_INET:
-> > +             cnt = scnprintf(buf, len, "ip:%pI4",
-> > +                     &((struct sockaddr_in *)addr)->sin_addr);
-> > +             return cnt;
-> > +     case AF_INET6:
-> > +             cnt = scnprintf(buf, len, "ip:%pI6c",
-> > +                       &((struct sockaddr_in6 *)addr)->sin6_addr);
-> > +             return cnt;
-> > +     }
-> > +     cnt = scnprintf(buf, len, "<invalid address family>");
-> > +     pr_err("Invalid address family\n");
-> > +     return cnt;
-> > +}
-> > +EXPORT_SYMBOL(sockaddr_to_str);
->
-> Is the pr_err() statement in the above function useful? Will anyone be
-> able to figure out what is going on if the "Invalid address family"
-> string appears in the system log? Please consider changing that pr_err()
-> statement into a WARN_ON_ONCE() statement.
-I expect the caller should also print something in syslog, combine
-them togather will help.
->
-> > +     ret = rtrs_str_to_sockaddr(str, len, port, addr->dst);
-> > +
-> > +     return ret;
->
-> Please change this into a single return statement.
-ok
->
-> > +EXPORT_SYMBOL(rtrs_addr_to_sockaddr);
-> > +
-> > +void rtrs_ib_dev_pool_init(enum ib_pd_flags pd_flags,
-> > +                         struct rtrs_ib_dev_pool *pool)
-> > +{
-> > +     WARN_ON(pool->ops && (!pool->ops->alloc ^ !pool->ops->free));
-> > +     INIT_LIST_HEAD(&pool->list);
-> > +     mutex_init(&pool->mutex);
-> > +     pool->pd_flags = pd_flags;
-> > +}
-> > +EXPORT_SYMBOL(rtrs_ib_dev_pool_init);
-> > +
-> > +void rtrs_ib_dev_pool_deinit(struct rtrs_ib_dev_pool *pool)
-> > +{
-> > +     WARN_ON(!list_empty(&pool->list));
-> > +}
-> > +EXPORT_SYMBOL(rtrs_ib_dev_pool_deinit);
->
-> Since rtrs_ib_dev_pool_init() calls mutex_init(), should
-> rtrs_ib_dev_pool_deinit() call mutex_destroy()?
-You're right.
+- Joe
 
->
-> Thanks,
->
-> Bart.
->
-Thanks Bart.
+
+
+Author: Joe Thornber <ejt@redhat.com>
+Date:   Tue Jan 7 11:58:42 2020 +0000
+
+    [dm-thin, dm-cache] Fix bug in space-maps.
+    
+    The space-maps track the reference counts for disk blocks.  There are variants
+    for tracking metadata blocks, and data blocks.
+    
+    We implement transactionality by never touching blocks from the previous
+    transaction, so we can rollback in the event of a crash.
+    
+    When allocating a new block we need to ensure the block is free (has reference
+    count of 0) in both the current and previous transaction.  Prior to this patch we
+    were doing this by searching for a free block in the previous transaction, and
+    relying on a 'begin' counter to track where the last allocation in the current
+    transaction was.  This 'begin' field was not being updated in all code paths (eg,
+    increment of a data block reference count due to breaking sharing of a neighbour
+    block in the same btree leaf).
+    
+    This patch keeps the 'begin' field, but now it's just a hint to speed up the search.
+    Instead we search the current transaction for a free block, and then double check
+    it's free in the old transaction.  Much simpler.
+
+diff --git a/drivers/md/persistent-data/dm-space-map-common.c b/drivers/md/persistent-data/dm-space-map-common.c
+index bd68f6fef694..b4983e4022e6 100644
+--- a/drivers/md/persistent-data/dm-space-map-common.c
++++ b/drivers/md/persistent-data/dm-space-map-common.c
+@@ -380,6 +380,34 @@ int sm_ll_find_free_block(struct ll_disk *ll, dm_block_t begin,
+ 	return -ENOSPC;
+ }
+ 
++int sm_ll_find_common_free_block(struct ll_disk *old_ll, struct ll_disk *new_ll,
++	                         dm_block_t begin, dm_block_t end, dm_block_t *b)
++{
++	int r;
++	uint32_t count;
++
++	do {
++		r = sm_ll_find_free_block(new_ll, begin, new_ll->nr_blocks, b);
++		if (r)
++			break;
++
++		/* double check this block wasn't used in the old transaction */
++		if (*b >= old_ll->nr_blocks)
++			count = 0;
++
++		else {
++			r = sm_ll_lookup(old_ll, *b, &count);
++			if (r)
++				break;
++
++			if (count)
++				begin = *b + 1;
++		}
++	} while (count);
++
++	return r;
++}
++
+ static int sm_ll_mutate(struct ll_disk *ll, dm_block_t b,
+ 			int (*mutator)(void *context, uint32_t old, uint32_t *new),
+ 			void *context, enum allocation_event *ev)
+diff --git a/drivers/md/persistent-data/dm-space-map-common.h b/drivers/md/persistent-data/dm-space-map-common.h
+index b3078d5eda0c..8de63ce39bdd 100644
+--- a/drivers/md/persistent-data/dm-space-map-common.h
++++ b/drivers/md/persistent-data/dm-space-map-common.h
+@@ -109,6 +109,8 @@ int sm_ll_lookup_bitmap(struct ll_disk *ll, dm_block_t b, uint32_t *result);
+ int sm_ll_lookup(struct ll_disk *ll, dm_block_t b, uint32_t *result);
+ int sm_ll_find_free_block(struct ll_disk *ll, dm_block_t begin,
+ 			  dm_block_t end, dm_block_t *result);
++int sm_ll_find_common_free_block(struct ll_disk *old_ll, struct ll_disk *new_ll,
++	                         dm_block_t begin, dm_block_t end, dm_block_t *result);
+ int sm_ll_insert(struct ll_disk *ll, dm_block_t b, uint32_t ref_count, enum allocation_event *ev);
+ int sm_ll_inc(struct ll_disk *ll, dm_block_t b, enum allocation_event *ev);
+ int sm_ll_dec(struct ll_disk *ll, dm_block_t b, enum allocation_event *ev);
+diff --git a/drivers/md/persistent-data/dm-space-map-disk.c b/drivers/md/persistent-data/dm-space-map-disk.c
+index 32adf6b4a9c7..bf4c5e2ccb6f 100644
+--- a/drivers/md/persistent-data/dm-space-map-disk.c
++++ b/drivers/md/persistent-data/dm-space-map-disk.c
+@@ -167,8 +167,10 @@ static int sm_disk_new_block(struct dm_space_map *sm, dm_block_t *b)
+ 	enum allocation_event ev;
+ 	struct sm_disk *smd = container_of(sm, struct sm_disk, sm);
+ 
+-	/* FIXME: we should loop round a couple of times */
+-	r = sm_ll_find_free_block(&smd->old_ll, smd->begin, smd->old_ll.nr_blocks, b);
++	/*
++	 * Any block we allocate has to be free in both the old and current ll.
++	 */
++	r = sm_ll_find_common_free_block(&smd->old_ll, &smd->ll, smd->begin, smd->ll.nr_blocks, b);
+ 	if (r)
+ 		return r;
+ 
+diff --git a/drivers/md/persistent-data/dm-space-map-metadata.c b/drivers/md/persistent-data/dm-space-map-metadata.c
+index 25328582cc48..9e3c64ec2026 100644
+--- a/drivers/md/persistent-data/dm-space-map-metadata.c
++++ b/drivers/md/persistent-data/dm-space-map-metadata.c
+@@ -448,7 +448,10 @@ static int sm_metadata_new_block_(struct dm_space_map *sm, dm_block_t *b)
+ 	enum allocation_event ev;
+ 	struct sm_metadata *smm = container_of(sm, struct sm_metadata, sm);
+ 
+-	r = sm_ll_find_free_block(&smm->old_ll, smm->begin, smm->old_ll.nr_blocks, b);
++	/*
++	 * Any block we allocate has to be free in both the old and current ll.
++	 */
++	r = sm_ll_find_common_free_block(&smm->old_ll, &smm->ll, smm->begin, smm->ll.nr_blocks, b);
+ 	if (r)
+ 		return r;
+ 
+
