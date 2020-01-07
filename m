@@ -7,146 +7,96 @@ X-Spam-Status: No, score=-0.8 required=3.0 tests=DKIMWL_WL_HIGH,DKIM_SIGNED,
 	SPF_HELO_NONE,SPF_PASS,UNPARSEABLE_RELAY autolearn=no autolearn_force=no
 	version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id E9A17C33C99
-	for <linux-block@archiver.kernel.org>; Tue,  7 Jan 2020 04:36:25 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 6D6E6C3F68F
+	for <linux-block@archiver.kernel.org>; Tue,  7 Jan 2020 04:39:55 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.kernel.org (Postfix) with ESMTP id BA647206F0
-	for <linux-block@archiver.kernel.org>; Tue,  7 Jan 2020 04:36:25 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id 44B112075A
+	for <linux-block@archiver.kernel.org>; Tue,  7 Jan 2020 04:39:55 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=pass (2048-bit key) header.d=oracle.com header.i=@oracle.com header.b="JWl7seMy"
+	dkim=pass (2048-bit key) header.d=oracle.com header.i=@oracle.com header.b="EXF17GSl"
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1727497AbgAGEgY (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Mon, 6 Jan 2020 23:36:24 -0500
-Received: from userp2120.oracle.com ([156.151.31.85]:47730 "EHLO
+        id S1727537AbgAGEjy (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Mon, 6 Jan 2020 23:39:54 -0500
+Received: from userp2120.oracle.com ([156.151.31.85]:50356 "EHLO
         userp2120.oracle.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1727467AbgAGEgY (ORCPT
-        <rfc822;linux-block@vger.kernel.org>); Mon, 6 Jan 2020 23:36:24 -0500
+        with ESMTP id S1727467AbgAGEjy (ORCPT
+        <rfc822;linux-block@vger.kernel.org>); Mon, 6 Jan 2020 23:39:54 -0500
 Received: from pps.filterd (userp2120.oracle.com [127.0.0.1])
-        by userp2120.oracle.com (8.16.0.27/8.16.0.27) with SMTP id 0074YsE1085910;
-        Tue, 7 Jan 2020 04:35:52 GMT
+        by userp2120.oracle.com (8.16.0.27/8.16.0.27) with SMTP id 0074dSia088622;
+        Tue, 7 Jan 2020 04:39:30 GMT
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=oracle.com; h=to : cc : subject :
  from : references : date : in-reply-to : message-id : mime-version :
  content-type; s=corp-2019-08-05;
- bh=ZkObfQJ3aLTfUDlWz1/H9GrUZm6vFEcO3N6e1Nr/N5o=;
- b=JWl7seMyh/sKhuxzW7P3DtP/EAoNB/SZAymx99crurUpfcuUv2SmthMjxXWWWv7mDraH
- i6CsGpnC0GKOilKE51Fb05b4L4J1Dp8d6e3okfZhjZ+wOA5rVz2/tuMlU78svT/EAuTS
- G4szSJtCcCZMvxErO6m+knjZAU4/Dv6q3+tdvqIJ2+De+DGNbiw3eJYeUsJcbMe4CocK
- yYqTqkdTwL2Sz9784mqjPo8Zd0Q0/OuAjtiJYVxTDAiyrdVUaHYLUpGvU9dkeBA4DmkA
- uuMPEdw+ZDirNPWX/teHMtNgkcWirHVfLeQdGVhTg5aZ1hJfAV/hUhUByWo5Ia+sKrCn Tg== 
+ bh=Ut4HfjsleA5SVSMZ/IcSbSv3IYy2cHSpvO/X4+oPjeU=;
+ b=EXF17GSlVh5i6vXJiSRt/n8Bu0aBoDDIf6+UwUKjkjbEbwVxR98Y/Mfo/tFNFG/NpEMa
+ wtt9DuKSzEVCgw9uuAAoaxZIPpiELCgvaB7r4615rv95+tBOlD0Yz7DpH9980dugJjrG
+ ZTWTTpfK15v+ykRTFqqbrPqaTQwCjCP6sU/QTVVZc2hbXIW471+/0cFQmQzxjrufZOWb
+ UykUo/M5Tc83KNeiH9EH3diV5G0rOR6ds0oBikOq9NeNUsw6X+u+oLxBX2Utzhcys3uD
+ R2twC+4j8SEbMz5pqa/nnN9WaJjNe9WMTSZIjJA0gVnR/x5bmCarGCcFR955oyuR0Hqr 3g== 
 Received: from userp3030.oracle.com (userp3030.oracle.com [156.151.31.80])
-        by userp2120.oracle.com with ESMTP id 2xakbqjvmc-1
+        by userp2120.oracle.com with ESMTP id 2xakbqjvx4-1
         (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=OK);
-        Tue, 07 Jan 2020 04:35:52 +0000
+        Tue, 07 Jan 2020 04:39:30 +0000
 Received: from pps.filterd (userp3030.oracle.com [127.0.0.1])
-        by userp3030.oracle.com (8.16.0.27/8.16.0.27) with SMTP id 0074YEk7115196;
-        Tue, 7 Jan 2020 04:35:52 GMT
-Received: from userv0122.oracle.com (userv0122.oracle.com [156.151.31.75])
-        by userp3030.oracle.com with ESMTP id 2xcjvc8hh5-1
+        by userp3030.oracle.com (8.16.0.27/8.16.0.27) with SMTP id 0074YEpR115118;
+        Tue, 7 Jan 2020 04:39:30 GMT
+Received: from aserv0121.oracle.com (aserv0121.oracle.com [141.146.126.235])
+        by userp3030.oracle.com with ESMTP id 2xcjvc8p7m-1
         (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=OK);
-        Tue, 07 Jan 2020 04:35:51 +0000
-Received: from abhmp0018.oracle.com (abhmp0018.oracle.com [141.146.116.24])
-        by userv0122.oracle.com (8.14.4/8.14.4) with ESMTP id 0074Zn7V027336;
-        Tue, 7 Jan 2020 04:35:50 GMT
+        Tue, 07 Jan 2020 04:39:29 +0000
+Received: from abhmp0019.oracle.com (abhmp0019.oracle.com [141.146.116.25])
+        by aserv0121.oracle.com (8.14.4/8.13.8) with ESMTP id 0074dSCw020340;
+        Tue, 7 Jan 2020 04:39:28 GMT
 Received: from ca-mkp.ca.oracle.com (/10.159.214.123)
         by default (Oracle Beehive Gateway v4.0)
-        with ESMTP ; Mon, 06 Jan 2020 20:35:49 -0800
-To:     Eric Biggers <ebiggers@kernel.org>
+        with ESMTP ; Mon, 06 Jan 2020 20:39:27 -0800
+To:     James Bottomley <jejb@linux.ibm.com>
 Cc:     "Martin K. Petersen" <martin.petersen@oracle.com>,
-        "Darrick J. Wong" <darrick.wong@oracle.com>,
-        Satya Tangirala <satyat@google.com>,
-        linux-block@vger.kernel.org, linux-scsi@vger.kernel.org,
-        linux-fscrypt@vger.kernel.org, linux-fsdevel@vger.kernel.org,
-        linux-f2fs-devel@lists.sourceforge.net,
-        Barani Muthukumaran <bmuthuku@qti.qualcomm.com>,
-        Kuohong Wang <kuohong.wang@mediatek.com>,
-        Kim Boojin <boojin.kim@samsung.com>
-Subject: Re: [PATCH v6 2/9] block: Add encryption context to struct bio
+        Balbir Singh <sblbir@amazon.com>, linux-kernel@vger.kernel.org,
+        linux-block@vger.kernel.org, linux-nvme@lists.infradead.org,
+        axboe@kernel.dk, ssomesh@amazon.com, hch@lst.de, mst@redhat.com,
+        Chaitanya.Kulkarni@wdc.com
+Subject: Re: [resend v1 5/5] drivers/scsi/sd.c: Convert to use disk_set_capacity
 From:   "Martin K. Petersen" <martin.petersen@oracle.com>
 Organization: Oracle Corporation
-References: <20191218145136.172774-1-satyat@google.com>
-        <20191218145136.172774-3-satyat@google.com>
-        <20191218212116.GA7476@magnolia> <yq1y2v9e37b.fsf@oracle.com>
-        <20191218222726.GC47399@gmail.com> <yq1fthhdttv.fsf@oracle.com>
-        <20191220035237.GB718@sol.localdomain>
-Date:   Mon, 06 Jan 2020 23:35:46 -0500
-In-Reply-To: <20191220035237.GB718@sol.localdomain> (Eric Biggers's message of
-        "Thu, 19 Dec 2019 19:52:37 -0800")
-Message-ID: <yq136cr3mu5.fsf@oracle.com>
+References: <20200102075315.22652-1-sblbir@amazon.com>
+        <20200102075315.22652-6-sblbir@amazon.com>
+        <yq1blrg2agh.fsf@oracle.com> <1578369479.3251.31.camel@linux.ibm.com>
+Date:   Mon, 06 Jan 2020 23:39:25 -0500
+In-Reply-To: <1578369479.3251.31.camel@linux.ibm.com> (James Bottomley's
+        message of "Mon, 06 Jan 2020 19:57:59 -0800")
+Message-ID: <yq1y2uj283m.fsf@oracle.com>
 User-Agent: Gnus/5.13 (Gnus v5.13) Emacs/26.1.92 (gnu/linux)
 MIME-Version: 1.0
 Content-Type: text/plain
 X-Proofpoint-Virus-Version: vendor=nai engine=6000 definitions=9492 signatures=668685
 X-Proofpoint-Spam-Details: rule=notspam policy=default score=0 suspectscore=0 malwarescore=0
- phishscore=0 bulkscore=0 spamscore=0 mlxscore=0 mlxlogscore=999
+ phishscore=0 bulkscore=0 spamscore=0 mlxscore=0 mlxlogscore=875
  adultscore=0 classifier=spam adjust=0 reason=mlx scancount=1
  engine=8.0.1-1911140001 definitions=main-2001070036
 X-Proofpoint-Virus-Version: vendor=nai engine=6000 definitions=9492 signatures=668685
 X-Proofpoint-Spam-Details: rule=notspam policy=default score=0 priorityscore=1501 malwarescore=0
  suspectscore=0 phishscore=0 bulkscore=0 spamscore=0 clxscore=1015
- lowpriorityscore=0 mlxscore=0 impostorscore=0 mlxlogscore=999 adultscore=0
+ lowpriorityscore=0 mlxscore=0 impostorscore=0 mlxlogscore=939 adultscore=0
  classifier=spam adjust=0 reason=mlx scancount=1 engine=8.0.1-1911140001
- definitions=main-2001070036
+ definitions=main-2001070037
 Sender: linux-block-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
 
-Eric,
+James,
 
-> However, the nature of the per-bio information is very different.
-> Most of the complexity in blk-integrity is around managing of a
-> separate integrity scatterlist for each bio, alongside the regular
-> data scatterlist.
+>> We already emit an SDEV_EVT_CAPACITY_CHANGE_REPORTED event if device
+>> capacity changes. However, this event does not automatically cause
+>> revalidation.
+>
+> Which I seem to remember was a deliberate choice: some change
+> capacities occur because the path goes passive and default values get
+> installed.
 
-> That's not something we need or want for inline encryption.  For each
-> bio we just need a key, algorithm, data unit number, and data unit
-> size.  Since the data unit number (IV) is automatically incremented
-> for each sector and the encryption is length-preserving, there's no
-> per-sector data.
-
-Fair enough. I just wanted to make sure that you guys had actually
-looked at the integrity stuff and determined it wasn't a good fit.
-
-> There are some ways the two features could be supported simultaneously
-> without using more space, like making the pointer point to a linked
-> list of tagged structs, or making the struct contain both a
-> bio_crypt_ctx and bio_integrity_payload (or whichever combination is
-> enabled in kconfig).
-
-We have previously discussed having a facility in which you could chain
-several different things (with different prep/endio functions) off a
-bio. Similar to how we allow arbitrary stacking of block_devices. That
-was actually my main interest in terms of opening the integrity can of
-worms in this thread. Trying to find out which pieces of the plumbing,
-if any, could potentially be made generic and feature-independent.
-
-The copy offload efforts, which are now again picking up momentum, also
-need to hang things off of the bio. That's the original reason the
-integrity field became a union, fwiw.
-
-> So if people really aren't willing to accept the extra 8 bytes per bio
-> even behind a kconfig option, my vote is we that we put
-> bi_crypt_context in the union with bi_integrity, and add a flag
-> REQ_INLINECRYPT (like REQ_INTEGRITY) that indicates that the
-> bi_crypt_context member of the union is valid.
-
-Agreed.
-
-> We'd also need some error-handling to prevent the two features from
-> actually being used together.  It looks like there are several cases
-> to consider.  One of them is what happens if bio_crypt_set_ctx() is
-> called when blk-integrity verification or generation is enabled for
-> the disk.
-
-The integrity profile is only attached if the device driver identifies a
-discovered device as capable. At least in the short term no device
-should indicate simultaneous support for DIX and your crypto interface.
-
-Not saying that sanity checks shouldn't exist. But I think both of these
-features fall into things that are registered at device discovery time
-so we shouldn't need to clutter the I/O hot path with mutual exclusivity
-checks.
+Yep, it's very tricky territory.
 
 -- 
 Martin K. Petersen	Oracle Linux Engineering
