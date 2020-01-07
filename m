@@ -2,136 +2,132 @@ Return-Path: <SRS0=BJAb=24=vger.kernel.org=linux-block-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-8.4 required=3.0 tests=DKIMWL_WL_HIGH,DKIM_SIGNED,
-	DKIM_VALID,DKIM_VALID_AU,HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,
-	MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,USER_AGENT_SANE_1
-	autolearn=unavailable autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-5.2 required=3.0 tests=DKIM_SIGNED,DKIM_VALID,
+	HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,
+	SPF_PASS,USER_AGENT_SANE_1 autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 9607CC33C9B
-	for <linux-block@archiver.kernel.org>; Tue,  7 Jan 2020 22:30:55 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id A3E0AC282DD
+	for <linux-block@archiver.kernel.org>; Tue,  7 Jan 2020 22:33:02 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.kernel.org (Postfix) with ESMTP id 61C2820715
-	for <linux-block@archiver.kernel.org>; Tue,  7 Jan 2020 22:30:55 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id 6AF5D2072A
+	for <linux-block@archiver.kernel.org>; Tue,  7 Jan 2020 22:33:02 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="Ue5Czogp"
+	dkim=pass (2048-bit key) header.d=kernel-dk.20150623.gappssmtp.com header.i=@kernel-dk.20150623.gappssmtp.com header.b="mIXOWeDR"
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1727345AbgAGWax (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Tue, 7 Jan 2020 17:30:53 -0500
-Received: from us-smtp-delivery-1.mimecast.com ([207.211.31.120]:36619 "EHLO
-        us-smtp-1.mimecast.com" rhost-flags-OK-OK-OK-FAIL) by vger.kernel.org
-        with ESMTP id S1726558AbgAGWax (ORCPT
-        <rfc822;linux-block@vger.kernel.org>); Tue, 7 Jan 2020 17:30:53 -0500
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-        s=mimecast20190719; t=1578436251;
-        h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-         to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-         in-reply-to:in-reply-to:references:references;
-        bh=FN/82vVAxc6XEGEfrEz5NnjIGWwecvczTJRijpb0J5I=;
-        b=Ue5CzogpB5PNr7hx9NpHn5Eg2dRB02WL7pZO0XqQv5fviL52SExJ8wH1QsH4AQgf7D1Dv/
-        pKW6iWD+1myI7IeewlhE2o45THxv7uYqc7JrjM0yQWZWoz1w2LGFfBhJgJgYZRgiXzp4Zj
-        w19dRzZ9Se8EAh/sgmIuZe5oCrwcjaM=
-Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
- [209.132.183.4]) (Using TLS) by relay.mimecast.com with ESMTP id
- us-mta-317-pXs9sK5SP0a-kkriMQE20A-1; Tue, 07 Jan 2020 17:30:48 -0500
-X-MC-Unique: pXs9sK5SP0a-kkriMQE20A-1
-Received: from smtp.corp.redhat.com (int-mx01.intmail.prod.int.phx2.redhat.com [10.5.11.11])
-        (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
-        (No client certificate requested)
-        by mimecast-mx01.redhat.com (Postfix) with ESMTPS id 9BE501800D4E;
-        Tue,  7 Jan 2020 22:30:46 +0000 (UTC)
-Received: from ming.t460p (ovpn-8-16.pek2.redhat.com [10.72.8.16])
-        by smtp.corp.redhat.com (Postfix) with ESMTPS id 19F1A7FB65;
-        Tue,  7 Jan 2020 22:30:40 +0000 (UTC)
-Date:   Wed, 8 Jan 2020 06:30:35 +0800
-From:   Ming Lei <ming.lei@redhat.com>
-To:     Guenter Roeck <linux@roeck-us.net>
-Cc:     Jens Axboe <axboe@kernel.dk>, linux-block@vger.kernel.org,
-        linux-kernel@vger.kernel.org, Chris Mason <clm@fb.com>
+        id S1727206AbgAGWdB (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Tue, 7 Jan 2020 17:33:01 -0500
+Received: from mail-pf1-f195.google.com ([209.85.210.195]:41380 "EHLO
+        mail-pf1-f195.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S1726558AbgAGWdB (ORCPT
+        <rfc822;linux-block@vger.kernel.org>); Tue, 7 Jan 2020 17:33:01 -0500
+Received: by mail-pf1-f195.google.com with SMTP id w62so561067pfw.8
+        for <linux-block@vger.kernel.org>; Tue, 07 Jan 2020 14:33:01 -0800 (PST)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=kernel-dk.20150623.gappssmtp.com; s=20150623;
+        h=subject:to:cc:references:from:message-id:date:user-agent
+         :mime-version:in-reply-to:content-language:content-transfer-encoding;
+        bh=XRiS/kenaXg7SZmNLSxylaMfUm+yt4xVkhJf7MIsuM0=;
+        b=mIXOWeDRssPm9xYaJbB0pMhXHGtyJ0N/bPkzg5r8WArlJeS1/EDmPmYz70Hz76BaU+
+         nzLNyeMrGMVg4kUWmBqN+gEt87UhbdWjq20ICoROOgns0bWlKk62r51ll77NMcp9BSVT
+         vO9x43Ti+Q6Mn3iy/0s/bIJfgh8gJVfQofsP2CpJ/Qsw0A2CI7FEVEcaRl93ppzmMhMZ
+         FUauXclxBLmtmiu02d/5NQb+QzRennpCQ0wwPJ8PVADJwwWPNWBkiIy7y8B9YIVqVg7Y
+         RhpFLREaAQrIfhm2x50bBHLig+mHGAT0as5l2rSyH7hMOcDUh85/CRTMKfgb5OdjvgWP
+         HpoQ==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20161025;
+        h=x-gm-message-state:subject:to:cc:references:from:message-id:date
+         :user-agent:mime-version:in-reply-to:content-language
+         :content-transfer-encoding;
+        bh=XRiS/kenaXg7SZmNLSxylaMfUm+yt4xVkhJf7MIsuM0=;
+        b=rT7Cb/k53H31ilUk18TlNWjlN493x/1yWGhnGecBSyWma2V+FmJrCKUzM6PmRLMW20
+         EY06zCTs586XbRLuT8cwh6YJccLBVKmzrqphCNiGgpRKdCPSC4x815vDtiL5ogpbxR7E
+         SdB+3h98hm4P/rtGSbMxPPQN1/5sP28PHcWFSRplkVnTI1QBr8zgBHcA2kqsk3OzuL8d
+         0WZCxmdmxsu9SsRPgNW15i67rOQB1WhWzaP5NpUKBOXjb/uOjNLpOQBoesmZQENWXYdy
+         NqCoLTZBRjYJ4S9PL9iFgX4fAYG1KwLdNRFO1B8aXo/rWdO5ABsuk/b3CHYpU8RWJiZM
+         QiOg==
+X-Gm-Message-State: APjAAAXbYG4Xgg1TuQ/j1pzuVxrJrUtcC8Qr8joDQYoagSzB1rc0fHfr
+        rk0/0kvlygJPdk3iHd4wKSHtrHafo+s=
+X-Google-Smtp-Source: APXvYqzTmk/w38eM+QUnrT21lreh59E8q2tHSB3ZFcAdt0J7PzWOBdTeIkX/fbtcyO4DUtGwdAPMSg==
+X-Received: by 2002:a63:fd10:: with SMTP id d16mr1810632pgh.177.1578436380843;
+        Tue, 07 Jan 2020 14:33:00 -0800 (PST)
+Received: from [192.168.1.188] ([66.219.217.145])
+        by smtp.gmail.com with ESMTPSA id g22sm746358pgk.85.2020.01.07.14.32.59
+        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
+        Tue, 07 Jan 2020 14:33:00 -0800 (PST)
 Subject: Re: [PATCH] block: fix splitting segments
-Message-ID: <20200107223035.GA7505@ming.t460p>
+To:     Ming Lei <ming.lei@redhat.com>, Guenter Roeck <linux@roeck-us.net>
+Cc:     linux-block@vger.kernel.org, linux-kernel@vger.kernel.org,
+        Chris Mason <clm@fb.com>
 References: <20191229023230.28940-1-ming.lei@redhat.com>
- <20200107124708.GA20285@roeck-us.net>
- <20200107152339.GA23622@ming.t460p>
- <20200107181145.GA22076@roeck-us.net>
+ <20200107124708.GA20285@roeck-us.net> <20200107152339.GA23622@ming.t460p>
+ <20200107181145.GA22076@roeck-us.net> <20200107223035.GA7505@ming.t460p>
+From:   Jens Axboe <axboe@kernel.dk>
+Message-ID: <25ce5140-ee29-c32c-7f5e-b8c6da5c7e90@kernel.dk>
+Date:   Tue, 7 Jan 2020 15:32:58 -0700
+User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:68.0) Gecko/20100101
+ Thunderbird/68.2.2
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <20200107181145.GA22076@roeck-us.net>
-User-Agent: Mutt/1.12.1 (2019-06-15)
-X-Scanned-By: MIMEDefang 2.79 on 10.5.11.11
+In-Reply-To: <20200107223035.GA7505@ming.t460p>
+Content-Type: text/plain; charset=utf-8
+Content-Language: en-US
+Content-Transfer-Encoding: 7bit
 Sender: linux-block-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-On Tue, Jan 07, 2020 at 10:11:45AM -0800, Guenter Roeck wrote:
-> On Tue, Jan 07, 2020 at 11:23:39PM +0800, Ming Lei wrote:
-> > On Tue, Jan 07, 2020 at 04:47:08AM -0800, Guenter Roeck wrote:
-> > > Hi,
-> > > 
-> > > On Sun, Dec 29, 2019 at 10:32:30AM +0800, Ming Lei wrote:
-> > > > There are two issues in get_max_segment_size():
-> > > > 
-> > > > 1) the default segment boudary mask is bypassed, and some devices still
-> > > > require segment to not cross the default 4G boundary
-> > > > 
-> > > > 2) the segment start address isn't taken into account when checking
-> > > > segment boundary limit
-> > > > 
-> > > > Fixes the two issues.
-> > > > 
-> > > > Fixes: dcebd755926b ("block: use bio_for_each_bvec() to compute multi-page bvec count")
-> > > > Signed-off-by: Ming Lei <ming.lei@redhat.com>
-> > > 
-> > > This patch, pushed into mainline as "block: fix splitting segments on
-> > > boundary masks", results in the following crash when booting 'versatilepb'
-> > > in qemu from disk. Bisect log is attached. Detailed log is at
-> > > https://kerneltests.org/builders/qemu-arm-master/builds/1410/steps/qemubuildcommand/logs/stdio
-> > > 
-> > > Guenter
-> > > 
-> > > ---
-> > > Crash:
-> > > 
-> > > kernel BUG at block/bio.c:1885!
-> > > Internal error: Oops - BUG: 0 [#1] ARM
-> > 
-> > Please apply the following debug patch, and post the log.
-> > 
+On 1/7/20 3:30 PM, Ming Lei wrote:
+> On Tue, Jan 07, 2020 at 10:11:45AM -0800, Guenter Roeck wrote:
+>> On Tue, Jan 07, 2020 at 11:23:39PM +0800, Ming Lei wrote:
+>>> On Tue, Jan 07, 2020 at 04:47:08AM -0800, Guenter Roeck wrote:
+>>>> Hi,
+>>>>
+>>>> On Sun, Dec 29, 2019 at 10:32:30AM +0800, Ming Lei wrote:
+>>>>> There are two issues in get_max_segment_size():
+>>>>>
+>>>>> 1) the default segment boudary mask is bypassed, and some devices still
+>>>>> require segment to not cross the default 4G boundary
+>>>>>
+>>>>> 2) the segment start address isn't taken into account when checking
+>>>>> segment boundary limit
+>>>>>
+>>>>> Fixes the two issues.
+>>>>>
+>>>>> Fixes: dcebd755926b ("block: use bio_for_each_bvec() to compute multi-page bvec count")
+>>>>> Signed-off-by: Ming Lei <ming.lei@redhat.com>
+>>>>
+>>>> This patch, pushed into mainline as "block: fix splitting segments on
+>>>> boundary masks", results in the following crash when booting 'versatilepb'
+>>>> in qemu from disk. Bisect log is attached. Detailed log is at
+>>>> https://kerneltests.org/builders/qemu-arm-master/builds/1410/steps/qemubuildcommand/logs/stdio
+>>>>
+>>>> Guenter
+>>>>
+>>>> ---
+>>>> Crash:
+>>>>
+>>>> kernel BUG at block/bio.c:1885!
+>>>> Internal error: Oops - BUG: 0 [#1] ARM
+>>>
+>>> Please apply the following debug patch, and post the log.
+>>>
+>>
+>> Here you are:
+>>
+>> max_sectors 2560 max_segs 96 max_seg_size 65536 mask ffffffff
+>> c738da80: 8c80/0 2416 28672, 0
+>>          total sectors 56
+>>
+>> (I replaced %p with %px).
+>>
 > 
-> Here you are:
-> 
-> max_sectors 2560 max_segs 96 max_seg_size 65536 mask ffffffff
-> c738da80: 8c80/0 2416 28672, 0
->          total sectors 56
-> 
-> (I replaced %p with %px).
-> 
+> Please try the following patch and see if it makes a difference.
+> If not, replace trace_printk with printk in previous debug patch,
+> and apply the debug patch only & post the log.
 
-Please try the following patch and see if it makes a difference.
-If not, replace trace_printk with printk in previous debug patch,
-and apply the debug patch only & post the log.
+If it is a 32-bit issue, then we should use a 64-bit type to make
+this nicer than ULL. But it seems reasonable that it could be!
 
-diff --git a/block/blk-merge.c b/block/blk-merge.c
-index 347782a24a35..f152bdee9b05 100644
---- a/block/blk-merge.c
-+++ b/block/blk-merge.c
-@@ -159,12 +159,12 @@ static inline unsigned get_max_io_size(struct request_queue *q,
- 
- static inline unsigned get_max_segment_size(const struct request_queue *q,
- 					    struct page *start_page,
--					    unsigned long offset)
-+					    unsigned long long offset)
- {
- 	unsigned long mask = queue_segment_boundary(q);
- 
- 	offset = mask & (page_to_phys(start_page) + offset);
--	return min_t(unsigned long, mask - offset + 1,
-+	return min_t(unsigned long long, mask - offset + 1,
- 		     queue_max_segment_size(q));
- }
- 
-
-Thanks,
-Ming
+-- 
+Jens Axboe
 
