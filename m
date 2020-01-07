@@ -2,106 +2,82 @@ Return-Path: <SRS0=BJAb=24=vger.kernel.org=linux-block-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-0.8 required=3.0 tests=DKIM_SIGNED,DKIM_VALID,
-	DKIM_VALID_AU,HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SPF_HELO_NONE,
-	SPF_PASS autolearn=no autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-0.6 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
+	HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS
+	autolearn=no autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 11984C33C8C
-	for <linux-block@archiver.kernel.org>; Tue,  7 Jan 2020 17:09:40 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 42607C33C8C
+	for <linux-block@archiver.kernel.org>; Tue,  7 Jan 2020 17:42:09 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.kernel.org (Postfix) with ESMTP id D70CD2087F
-	for <linux-block@archiver.kernel.org>; Tue,  7 Jan 2020 17:09:39 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id 1569520715
+	for <linux-block@archiver.kernel.org>; Tue,  7 Jan 2020 17:42:09 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=pass (2048-bit key) header.d=cloud.ionos.com header.i=@cloud.ionos.com header.b="cajYypVO"
+	dkim=fail reason="signature verification failed" (2048-bit key) header.d=infradead.org header.i=@infradead.org header.b="kBxKQv05"
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1728449AbgAGRJj (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Tue, 7 Jan 2020 12:09:39 -0500
-Received: from mail-io1-f68.google.com ([209.85.166.68]:46873 "EHLO
-        mail-io1-f68.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1728379AbgAGRJj (ORCPT
-        <rfc822;linux-block@vger.kernel.org>); Tue, 7 Jan 2020 12:09:39 -0500
-Received: by mail-io1-f68.google.com with SMTP id t26so20305ioi.13
-        for <linux-block@vger.kernel.org>; Tue, 07 Jan 2020 09:09:38 -0800 (PST)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=cloud.ionos.com; s=google;
-        h=mime-version:references:in-reply-to:from:date:message-id:subject:to
-         :cc;
-        bh=Yv1XK5ThTQl5/2gi+CzbYRWbQSxFPKCrKi3cSDeoMEQ=;
-        b=cajYypVOAy5qs/R0oi/ZqQqlXJJhxcDDwCtaEps75K6bwPALzv15Wms2uxJbI18RCR
-         mSQjjp1YgGHOu30eoiY6mIxKZ5EEb9yr2fX3L4K6xWX2VbHlhvKYQvXpH+z0dV/g+d0/
-         d1uX5w6Y7xn0xO53mBa0FRo3A6L4L3f2la5DMsENrbI+CBIw9wMVzBJf7Z1BqMjBJ4LU
-         F2vo1JUPGKsZdfALgx8Fy5RYjCFY9y9NYTbyZ0OZ75oKQu95Ugpof376Xgh3kROlNMMO
-         7PVpfosg5jAmz4lcCaYu0S5JsD4IpOTY/B3PitSbRo661r6lXgmr19hD1i/sZ8sm0/5N
-         2lJA==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20161025;
-        h=x-gm-message-state:mime-version:references:in-reply-to:from:date
-         :message-id:subject:to:cc;
-        bh=Yv1XK5ThTQl5/2gi+CzbYRWbQSxFPKCrKi3cSDeoMEQ=;
-        b=gOO8cLcLjkstyFYsOLONakEo292p6A/HHKe5gkw+gwUHyiNL2Eq74lFZm+CsMKaZ7o
-         MLYCeAYWDOOHx5/MDF5hg13J3RI+jF3diQnkOvJecOngh42mk2XqcGdoyERIusr9AJ6f
-         MEHjKYrXXse2doZlvCBBtOAmqEfGlE6jwIA+vnVO278mGzW7bcsIPEVqODqLd3FTyAvA
-         sWtu0s7vpsz9PRb2Fv33+9R+/0wyJB2CMdDDXPPTcYfnnYgt6myXdenFvto3H6HRLVmI
-         5hI4hsvoDMMbOB2rBQjA0rgg9B4WsB7Zpo8jKKAgJRYjqwxAtitzeCQAP9fCop2znEfu
-         v3KA==
-X-Gm-Message-State: APjAAAU3EMA6N3Xuhu3ILtNevsUFx28j9aYGpCoOSS255+IMF1pGxslD
-        U2TtofRHUyAndxjXX7kLV7k4Q/RaPY1vSamxa5ZMsg==
-X-Google-Smtp-Source: APXvYqxFtPBCxkGh55CGADxqto7UfPsdjrHQHzjJyOSecGSo6YNOVZRCRngpQrZF+i9ZHq6bRXdcP1qVYw30wQljtK8=
-X-Received: by 2002:a05:6638:72c:: with SMTP id j12mr493221jad.136.1578416978570;
- Tue, 07 Jan 2020 09:09:38 -0800 (PST)
+        id S1728365AbgAGRmI (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Tue, 7 Jan 2020 12:42:08 -0500
+Received: from bombadil.infradead.org ([198.137.202.133]:40892 "EHLO
+        bombadil.infradead.org" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S1728266AbgAGRmI (ORCPT
+        <rfc822;linux-block@vger.kernel.org>); Tue, 7 Jan 2020 12:42:08 -0500
+DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed;
+        d=infradead.org; s=bombadil.20170209; h=In-Reply-To:Content-Type:MIME-Version
+        :References:Message-ID:Subject:Cc:To:From:Date:Sender:Reply-To:
+        Content-Transfer-Encoding:Content-ID:Content-Description:Resent-Date:
+        Resent-From:Resent-Sender:Resent-To:Resent-Cc:Resent-Message-ID:List-Id:
+        List-Help:List-Unsubscribe:List-Subscribe:List-Post:List-Owner:List-Archive;
+         bh=gOiFIlZRVnOoBxSXmVwGYFu8Oc2PBoCKHWX6MtqQFiU=; b=kBxKQv05tR88yHPqmZPS9DjdT
+        JiNHmm/82p+m9xZTf2dKIujfr9khftReZFdNEXbbHz3w73EarWaoi09SEmqxnSGza9BkXGMBZcKQV
+        oF0+/9JEt35FM/7l+CED0sZhx2ZgyyVZ76L3zzH5O0rEBjoBGu+N8fFR1m40Ku7L9cxLg3srHGU6w
+        WUN+5uPadqjbIfB6BgQpTZS79lnlE4H/AMVAFJ+y02AgL63hfkIlwU3jSqoE5qY1/oMVjApl2yyX1
+        VPzJUfGURFGxrIqPiUViXhqwt59ZQ4Ws539heX5WcP2EVd8rnTMC63qp0wmCTPwk2yDdoUcrFsI7c
+        oevsLctfA==;
+Received: from hch by bombadil.infradead.org with local (Exim 4.92.3 #3 (Red Hat Linux))
+        id 1iosri-00046i-4n; Tue, 07 Jan 2020 17:42:02 +0000
+Date:   Tue, 7 Jan 2020 09:42:02 -0800
+From:   Christoph Hellwig <hch@infradead.org>
+To:     Chris Mason <clm@fb.com>
+Cc:     Dave Chinner <david@fromorbit.com>, Jens Axboe <axboe@kernel.dk>,
+        Linus Torvalds <torvalds@linux-foundation.org>,
+        Linux-MM <linux-mm@kvack.org>,
+        linux-fsdevel <linux-fsdevel@vger.kernel.org>,
+        linux-block <linux-block@vger.kernel.org>,
+        Matthew Wilcox <willy@infradead.org>,
+        Johannes Weiner <hannes@cmpxchg.org>
+Subject: Re: [PATCHSET v3 0/5] Support for RWF_UNCACHED
+Message-ID: <20200107174202.GA8938@infradead.org>
+References: <CAHk-=wjz3LE1kznro1dozhk9i9Dr4pCnkj7Fuccn2xdWeGHawQ@mail.gmail.com>
+ <d0adcde2-3106-4fea-c047-4d17111bab70@kernel.dk>
+ <e43a2700-8625-e136-dc9d-d0d2da5d96ac@kernel.dk>
+ <CAHk-=wje8i3DVcO=fMC4tzKTS5+eHv0anrVZa_JENQt08T=qCQ@mail.gmail.com>
+ <0d4e3954-c467-30a7-5a8e-7c4180275533@kernel.dk>
+ <CAHk-=whk4bcVPvtAv5OmHiW5z6AXgCLFhO4YrXD7o0XC+K-aHw@mail.gmail.com>
+ <fef996ca-a4ed-9633-1f79-91292a984a20@kernel.dk>
+ <e7fc6b37-8106-4fe2-479c-05c3f2b1c1f1@kernel.dk>
+ <20191212221818.GG19213@dread.disaster.area>
+ <C08B7F86-C3D6-47C6-AB17-6F234EA33687@fb.com>
 MIME-Version: 1.0
-References: <20191230102942.18395-1-jinpuwang@gmail.com> <20191230102942.18395-17-jinpuwang@gmail.com>
- <23dc5d7a-06e1-7ce4-3ab6-20cb6f49987a@acm.org>
-In-Reply-To: <23dc5d7a-06e1-7ce4-3ab6-20cb6f49987a@acm.org>
-From:   Jinpu Wang <jinpu.wang@cloud.ionos.com>
-Date:   Tue, 7 Jan 2020 18:09:27 +0100
-Message-ID: <CAMGffEkCRargsdZsbMHktU1mGHeaHVFiwEVP6b+7Mp+zJdKjUg@mail.gmail.com>
-Subject: Re: [PATCH v6 16/25] rnbd: client: private header with client structs
- and functions
-To:     Bart Van Assche <bvanassche@acm.org>
-Cc:     Jack Wang <jinpuwang@gmail.com>, linux-block@vger.kernel.org,
-        linux-rdma@vger.kernel.org, Jens Axboe <axboe@kernel.dk>,
-        Christoph Hellwig <hch@infradead.org>,
-        Sagi Grimberg <sagi@grimberg.me>,
-        Leon Romanovsky <leon@kernel.org>,
-        Doug Ledford <dledford@redhat.com>,
-        Danil Kipnis <danil.kipnis@cloud.ionos.com>, rpenyaev@suse.de
-Content-Type: text/plain; charset="UTF-8"
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <C08B7F86-C3D6-47C6-AB17-6F234EA33687@fb.com>
+X-SRS-Rewrite: SMTP reverse-path rewritten from <hch@infradead.org> by bombadil.infradead.org. See http://www.infradead.org/rpr.html
 Sender: linux-block-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-On Thu, Jan 2, 2020 at 11:37 PM Bart Van Assche <bvanassche@acm.org> wrote:
->
-> On 12/30/19 2:29 AM, Jack Wang wrote:
-> > +struct rnbd_iu {
-> > +     union {
-> > +             struct request *rq; /* for block io */
-> > +             void *buf; /* for user messages */
-> > +     };
-> > +     struct rtrs_permit      *permit;
-> > +     union {
-> > +             /* use to send msg associated with a dev */
-> > +             struct rnbd_clt_dev *dev;
-> > +             /* use to send msg associated with a sess */
-> > +             struct rnbd_clt_session *sess;
-> > +     };
-> > +     blk_status_t            status;
-> > +     struct scatterlist      sglist[BMAX_SEGMENTS];
-> > +     struct work_struct      work;
-> > +     int                     errno;
-> > +     struct rnbd_iu_comp     comp;
-> > +     atomic_t                refcount;
-> > +};
->
-> This data structure includes both a blk_status_t and an errno value. Can
-> these two members be combined into a single member?
-I guess you were suggesting to remove status and use
-errno_to_blk_status(iu->errno) to call into blk_mq_end_request.
-will do.
->
-> Thanks,
->
-> Bart.
-Thanks.
+On Fri, Dec 13, 2019 at 01:32:10AM +0000, Chris Mason wrote:
+> They just have different tradeoffs.  O_DIRECT actively blows away caches 
+> and can also force writes during reads, making RWF_UNCACHED a more 
+> natural fit for some applications.  There are fewer surprises, and some 
+> services are willing to pay for flexibility with a memcpy.  In general, 
+> they still want to do some cache management because it reduces p90+ 
+> latencies across the board, and gives them more control over which pages 
+> stay in cache.
+
+We can always have a variant of O_DIRECT that doesn't do that and
+instead check if data was in the cache and then also copy / from to
+it in that case.  I need some time to actually look through this series,
+so it might be pretty similar to the implementation, but if defined
+the right way it could be concurrent for at least the fast path of no
+cached pages.
