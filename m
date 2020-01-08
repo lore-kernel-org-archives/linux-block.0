@@ -6,67 +6,68 @@ X-Spam-Status: No, score=-0.6 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
 	HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS
 	autolearn=no autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 22F7AC282DD
-	for <linux-block@archiver.kernel.org>; Wed,  8 Jan 2020 14:02:50 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id D03DDC282DD
+	for <linux-block@archiver.kernel.org>; Wed,  8 Jan 2020 14:05:57 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.kernel.org (Postfix) with ESMTP id DE6D820705
-	for <linux-block@archiver.kernel.org>; Wed,  8 Jan 2020 14:02:49 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id 987472051A
+	for <linux-block@archiver.kernel.org>; Wed,  8 Jan 2020 14:05:57 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (2048-bit key) header.d=infradead.org header.i=@infradead.org header.b="K38Bsu/d"
+	dkim=fail reason="signature verification failed" (2048-bit key) header.d=infradead.org header.i=@infradead.org header.b="ZeMiKnCP"
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1727476AbgAHOCt (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Wed, 8 Jan 2020 09:02:49 -0500
-Received: from bombadil.infradead.org ([198.137.202.133]:54458 "EHLO
+        id S1728686AbgAHOF5 (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Wed, 8 Jan 2020 09:05:57 -0500
+Received: from bombadil.infradead.org ([198.137.202.133]:56102 "EHLO
         bombadil.infradead.org" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1726989AbgAHOCt (ORCPT
-        <rfc822;linux-block@vger.kernel.org>); Wed, 8 Jan 2020 09:02:49 -0500
+        with ESMTP id S1727127AbgAHOF4 (ORCPT
+        <rfc822;linux-block@vger.kernel.org>); Wed, 8 Jan 2020 09:05:56 -0500
 DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed;
         d=infradead.org; s=bombadil.20170209; h=In-Reply-To:Content-Type:MIME-Version
         :References:Message-ID:Subject:Cc:To:From:Date:Sender:Reply-To:
         Content-Transfer-Encoding:Content-ID:Content-Description:Resent-Date:
         Resent-From:Resent-Sender:Resent-To:Resent-Cc:Resent-Message-ID:List-Id:
         List-Help:List-Unsubscribe:List-Subscribe:List-Post:List-Owner:List-Archive;
-         bh=PJ62hC68HsIpJ1iBXLGxygN8S3VRsNwZoQYd6ozo4MI=; b=K38Bsu/d/Lih2YM/EQW9RoKTG
-        sU0a4l9fwtBQyVz5PnmIkdg1x3Sf00I+rv2xY09yAtiWmm2hlesi+nNjhzzunw1a6jHZbl7p8E4Ao
-        G6pq9dqi5pXNSIPn8/7SE7TZUGkBD6AXQmkt2zwlJOcwKUcFME7QSr8l67i32QNbLPMGfe7yItUas
-        U7zNHR3xm+yWxE+oKAPyXHFQGuw++yYKDreqHXPM+B1PIfUZaaHXRecjHpI6FY4lqLA6QmGwJbjC6
-        YJbrBQLa4K+5Tf/+e30jZSD6jXwVbW2uKJZ7An/uPlxXHF/GHCc7crSzjNUKXLNrWgufkpZ6r/0rU
-        KrMJd1yrQ==;
+         bh=Y5Zp5DraPm2b4G9FdcZzJFZL/5Lu3ash5oRZzFlJrrQ=; b=ZeMiKnCPJGvzDo+O/UfvlAu/N
+        sZUrBeXq9/DJgejEzJDxzf/u0MHMTCjzgqOmsbdOmsplpjSF+MkuW0DiAqEdNsTqfoUraHxNwAXbk
+        i+aGIqK/w63kPTUn31L2QobgAZ2sdtvimXrYJLJ3R3ImQW6+o9UhbZ9Nz8dc9tG5TrZO/DXYVaW8/
+        BDhX8Dsq/AtEbptlxAGgQ/JUdjA1Ym9PIeV+/4fkGukWoSaaYPAK+crtDFdUWjqOcbtQtFkZAQ4Ep
+        oC76mAnRDykgejw3xuIYmk2Ev4MAzNf5BYpNLIfQTElSy/Orqb2coN+t9D2vtyZkweJH/95p4VxeN
+        pMzqMtnIA==;
 Received: from hch by bombadil.infradead.org with local (Exim 4.92.3 #3 (Red Hat Linux))
-        id 1ipBv6-0006eO-2D; Wed, 08 Jan 2020 14:02:48 +0000
-Date:   Wed, 8 Jan 2020 06:02:48 -0800
+        id 1ipBy8-0008I6-HI; Wed, 08 Jan 2020 14:05:56 +0000
+Date:   Wed, 8 Jan 2020 06:05:56 -0800
 From:   Christoph Hellwig <hch@infradead.org>
-To:     Ming Lei <ming.lei@redhat.com>
-Cc:     Jens Axboe <axboe@kernel.dk>, linux-block@vger.kernel.org
-Subject: Re: [PATCH] block: fix splitting segments
-Message-ID: <20200108140248.GA2896@infradead.org>
-References: <20191229023230.28940-1-ming.lei@redhat.com>
+To:     Satya Tangirala <satyat@google.com>
+Cc:     linux-block@vger.kernel.org, linux-scsi@vger.kernel.org,
+        linux-fscrypt@vger.kernel.org, linux-fsdevel@vger.kernel.org,
+        linux-f2fs-devel@lists.sourceforge.net,
+        Barani Muthukumaran <bmuthuku@qti.qualcomm.com>,
+        Kuohong Wang <kuohong.wang@mediatek.com>,
+        Kim Boojin <boojin.kim@samsung.com>
+Subject: Re: [PATCH v6 0/9] Inline Encryption Support
+Message-ID: <20200108140556.GB2896@infradead.org>
+References: <20191218145136.172774-1-satyat@google.com>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=us-ascii
 Content-Disposition: inline
-In-Reply-To: <20191229023230.28940-1-ming.lei@redhat.com>
+In-Reply-To: <20191218145136.172774-1-satyat@google.com>
 X-SRS-Rewrite: SMTP reverse-path rewritten from <hch@infradead.org> by bombadil.infradead.org. See http://www.infradead.org/rpr.html
 Sender: linux-block-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-> +static inline unsigned get_max_segment_size(const struct request_queue *q,
-> +					    const struct page *start_page,
-> +					    unsigned long offset)
->  {
->  	unsigned long mask = queue_segment_boundary(q);
->  
-> -	/* default segment boundary mask means no boundary limit */
-> -	if (mask == BLK_SEG_BOUNDARY_MASK)
-> -		return queue_max_segment_size(q);
-> -
-> -	return min_t(unsigned long, mask - (mask & offset) + 1,
-> +	offset = mask & (page_to_phys(start_page) + offset);
+I haven't been able to deep dive into the details, but the structure
+of this still makes me very unhappy.
 
-This looks weird and potentionaly incorrect - once you add the offset
-to page_phys it really isn't an offset anymore and should be in a
-variable named paddr or similar.  And that needs to use a phys_addr_t
-as we can have 32-bit architectures that use 64-bit physical addresses.
+Most of it is related to the software fallback again.  Please split the
+fallback into a separate file, and also into a separate data structure.
+There is abslutely no need to have the overhead of the software only
+fields for the hardware case.
 
-I'd also pass in the actual phys_addr_t instead of the page and offset.
+On the counter side I think all the core block layer code added should
+go into a single file instead of split into three with some odd
+layering.
+
+Also what I don't understand is why this managed key-slots on a per-bio
+basis.  Wou;dn't it make a whole lot more sense to manage them on a
+struct request basis once most of the merging has been performed?
