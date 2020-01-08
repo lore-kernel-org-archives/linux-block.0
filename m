@@ -2,73 +2,68 @@ Return-Path: <SRS0=At5W=25=vger.kernel.org=linux-block-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-0.6 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
-	HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS
-	autolearn=no autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-3.5 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
+	HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,
+	SPF_PASS autolearn=no autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 54E62C282DD
-	for <linux-block@archiver.kernel.org>; Wed,  8 Jan 2020 13:39:31 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id BACDAC282DD
+	for <linux-block@archiver.kernel.org>; Wed,  8 Jan 2020 13:39:49 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.kernel.org (Postfix) with ESMTP id 2ACF12077B
-	for <linux-block@archiver.kernel.org>; Wed,  8 Jan 2020 13:39:31 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id 821B320692
+	for <linux-block@archiver.kernel.org>; Wed,  8 Jan 2020 13:39:49 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (2048-bit key) header.d=infradead.org header.i=@infradead.org header.b="eOHK9Q8m"
+	dkim=fail reason="signature verification failed" (2048-bit key) header.d=infradead.org header.i=@infradead.org header.b="L3XyVkHf"
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1728185AbgAHNj2 (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Wed, 8 Jan 2020 08:39:28 -0500
-Received: from bombadil.infradead.org ([198.137.202.133]:36162 "EHLO
+        id S1727533AbgAHNjt (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Wed, 8 Jan 2020 08:39:49 -0500
+Received: from bombadil.infradead.org ([198.137.202.133]:36190 "EHLO
         bombadil.infradead.org" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1727533AbgAHNj1 (ORCPT
-        <rfc822;linux-block@vger.kernel.org>); Wed, 8 Jan 2020 08:39:27 -0500
+        with ESMTP id S1726719AbgAHNjs (ORCPT
+        <rfc822;linux-block@vger.kernel.org>); Wed, 8 Jan 2020 08:39:48 -0500
 DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed;
         d=infradead.org; s=bombadil.20170209; h=In-Reply-To:Content-Type:MIME-Version
         :References:Message-ID:Subject:Cc:To:From:Date:Sender:Reply-To:
         Content-Transfer-Encoding:Content-ID:Content-Description:Resent-Date:
         Resent-From:Resent-Sender:Resent-To:Resent-Cc:Resent-Message-ID:List-Id:
         List-Help:List-Unsubscribe:List-Subscribe:List-Post:List-Owner:List-Archive;
-         bh=clEJSHFzJxXTF/L+L5nG3nazAWlUuBe7SRBk68jFd6s=; b=eOHK9Q8mtURBJ1nEoguBU3qKa
-        ZnVSAnrg+EqlnzxvAjfSGzELcp+uZSRMg31svloblilttWFy1vMeY5F0IOyN1aUtOpMnnq2V6XmNt
-        i98z3Tt9by8DN/Zm/QCgMRNbQruA/gxnYiy6BcXOJv1ym/nubqVxjHwJwh9FUAYgGB82hJ2eHuHn5
-        SSG0Le+CU5/Rq/wAV07qadpuVni8SN2Z7vIlgWecghpt8diUZRzxVW9lpO0BIewrLZ95y8sBP8ZHo
-        BPTN9iBHhC+36BP6Xfj04eQxoPvCDayHj7FuEnFZHsvVwF22MGETmfpqNIdDv/8mFP/IT5HVeMB2L
-        Cb6qq4GoQ==;
+         bh=8voYYRD3ow6zUgiWMFghxszbyHmUx/DHG4PtgP4N+gg=; b=L3XyVkHfiAwLGl3JJ+LsTBWMB
+        nnQAvtUF6ACrYIyTNxILfpNM1s6cAMNfmDBDH7qsBN/Bdiwjbzp5q9fii7O7NP84HIqm1d43v9+VS
+        gwtz8Njb47UlB/E5IcRDPvVRhdU7UV3J3JzDbDmxzbaFKgpL3eNuATEzx/BF5HRMZ+1bbPffeT8/S
+        IzAU2ZFDwTHdyHLXJIeciXPZcTwROl6BmLpE2VoF4zuF1Kn/iKzwJgAcQ8MFB4brIrIryA3rj4DWK
+        PDyCSEzhwuoZgKJHr/y+Xkks8zgLu1CG32D3W9d9lpSTyXh+eEAmyvaGlErGpB2Ragkjo9VokwSMJ
+        6K8mS0Uyw==;
 Received: from hch by bombadil.infradead.org with local (Exim 4.92.3 #3 (Red Hat Linux))
-        id 1ipBYU-0004Yn-Gk; Wed, 08 Jan 2020 13:39:26 +0000
-Date:   Wed, 8 Jan 2020 05:39:26 -0800
+        id 1ipBYp-0004aZ-Ri; Wed, 08 Jan 2020 13:39:47 +0000
+Date:   Wed, 8 Jan 2020 05:39:47 -0800
 From:   Christoph Hellwig <hch@infradead.org>
-To:     Nikolai Merinov <n.merinov@inango-systems.com>
-Cc:     Davidlohr Bueso <dave@stgolabs.net>, Jens Axboe <axboe@kernel.dk>,
-        linux-efi@vger.kernel.org, linux-block@vger.kernel.org,
-        linux-kernel@vger.kernel.org
-Subject: Re: [PATCH v2] partitions/efi: Fix partition name parsing in GUID
- partition entry
-Message-ID: <20200108133926.GC4455@infradead.org>
-References: <20181124162123.21300-1-n.merinov@inango-systems.com>
- <20191224092119.4581-1-n.merinov@inango-systems.com>
+To:     Herbert Xu <herbert@gondor.apana.org.au>
+Cc:     linux-block@vger.kernel.org, Jens Axboe <axboe@kernel.dk>,
+        "Martin K. Petersen" <martin.petersen@oracle.com>
+Subject: Re: [PATCH] block: Allow t10-pi to be modular
+Message-ID: <20200108133947.GD4455@infradead.org>
+References: <20191223081351.gsunwl6zwcltfdy6@gondor.apana.org.au>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=us-ascii
 Content-Disposition: inline
-In-Reply-To: <20191224092119.4581-1-n.merinov@inango-systems.com>
+In-Reply-To: <20191223081351.gsunwl6zwcltfdy6@gondor.apana.org.au>
 X-SRS-Rewrite: SMTP reverse-path rewritten from <hch@infradead.org> by bombadil.infradead.org. See http://www.infradead.org/rpr.html
 Sender: linux-block-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-> index db2fef7dfc47..51287a8a3bea 100644
-> --- a/block/partitions/efi.c
-> +++ b/block/partitions/efi.c
-> @@ -715,7 +715,7 @@ int efi_partition(struct parsed_partitions *state)
->  				ARRAY_SIZE(ptes[i].partition_name));
->  		info->volname[label_max] = 0;
->  		while (label_count < label_max) {
-> -			u8 c = ptes[i].partition_name[label_count] & 0xff;
-> +			u8 c = le16_to_cpu(ptes[i].partition_name[label_count]) & 0xff;
->  			if (c && !isprint(c))
->  				c = '!';
->
-This adds an overly long line.  Please add a an efi_char_from_cpu or
-similarly named helper to encapsulate this logic.
+On Mon, Dec 23, 2019 at 04:13:51PM +0800, Herbert Xu wrote:
+> Currently t10-pi can only be built into the block layer which via
+> crc-t10dif pulls in a whole chunk of the Crypto API.  In fact all
+> users of t10-pi work as modules and there is no reason for it to
+> always be built-in.
+> 
+> This patch adds a new hidden option for t10-pi that is selected
+> automatically based on BLK_DEV_INTEGRITY and whether the users
+> of t10-pi are built-in or not.
+> 
+> Signed-off-by: Herbert Xu <herbert@gondor.apana.org.au>
 
-Otherwise the change looks good.
+Looks good,
 
+Reviewed-by: Christoph Hellwig <hch@lst.de>
