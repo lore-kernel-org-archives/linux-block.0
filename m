@@ -2,101 +2,132 @@ Return-Path: <SRS0=At5W=25=vger.kernel.org=linux-block-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-0.8 required=3.0 tests=DKIMWL_WL_HIGH,DKIM_SIGNED,
+X-Spam-Status: No, score=-2.4 required=3.0 tests=DKIMWL_WL_HIGH,DKIM_SIGNED,
 	DKIM_VALID,DKIM_VALID_AU,HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,
-	SPF_HELO_NONE,SPF_PASS,UNPARSEABLE_RELAY autolearn=no autolearn_force=no
+	SPF_HELO_NONE,SPF_PASS,USER_AGENT_SANE_1 autolearn=no autolearn_force=no
 	version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id BE76BC33C99
-	for <linux-block@archiver.kernel.org>; Wed,  8 Jan 2020 03:15:52 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id BD8CCC33C99
+	for <linux-block@archiver.kernel.org>; Wed,  8 Jan 2020 03:20:00 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.kernel.org (Postfix) with ESMTP id 940A92081E
-	for <linux-block@archiver.kernel.org>; Wed,  8 Jan 2020 03:15:52 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id 889902087F
+	for <linux-block@archiver.kernel.org>; Wed,  8 Jan 2020 03:20:00 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=pass (2048-bit key) header.d=oracle.com header.i=@oracle.com header.b="G53Qfp10"
+	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="jN5/F5XV"
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1726142AbgAHDPw (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Tue, 7 Jan 2020 22:15:52 -0500
-Received: from userp2120.oracle.com ([156.151.31.85]:33328 "EHLO
-        userp2120.oracle.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1725908AbgAHDPv (ORCPT
-        <rfc822;linux-block@vger.kernel.org>); Tue, 7 Jan 2020 22:15:51 -0500
-Received: from pps.filterd (userp2120.oracle.com [127.0.0.1])
-        by userp2120.oracle.com (8.16.0.27/8.16.0.27) with SMTP id 0083E1FP187934;
-        Wed, 8 Jan 2020 03:15:40 GMT
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=oracle.com; h=to : cc : subject :
- from : references : date : in-reply-to : message-id : mime-version :
- content-type; s=corp-2019-08-05;
- bh=fWjv7W6k2+dbFZ/7a6f3esspeWDYpJX7nXT009RTOvI=;
- b=G53Qfp10vGM8/bgVs2w0ED7QJQc/yKQNPcSKtEXsNlpy8AG9Ax+eAgYg9vpQNixMwfKa
- MWHahQhTmqfq9MYF0lZwf5nLFvUglvGEmL/xzuTgTx09dE+DGOUo9ubZ5WGgom0IRfbs
- S/W0tjYn9zx8GnfTUsY3uU8Rr83YGVqlGd5fDBJSJVCk4lMSmja7lGMiTO83hb2bmbb5
- ad1DEEwJsnLyteEcX5UtOUUfT0I9GQoQdpqWu6AvEyHRy0rH3+rBODK8bt+WqomGDia2
- 5bZ21rRy0VMb5Igc2OZd7Jzr/BaaPdGpPYnjcgAoET1YGvBVD4+fP9aK1Cgy26cmPjMC Ag== 
-Received: from userp3030.oracle.com (userp3030.oracle.com [156.151.31.80])
-        by userp2120.oracle.com with ESMTP id 2xakbqs72p-1
-        (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=OK);
-        Wed, 08 Jan 2020 03:15:39 +0000
-Received: from pps.filterd (userp3030.oracle.com [127.0.0.1])
-        by userp3030.oracle.com (8.16.0.27/8.16.0.27) with SMTP id 0083DYEn143964;
-        Wed, 8 Jan 2020 03:15:39 GMT
-Received: from aserv0121.oracle.com (aserv0121.oracle.com [141.146.126.235])
-        by userp3030.oracle.com with ESMTP id 2xcjvek8j5-1
-        (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=OK);
-        Wed, 08 Jan 2020 03:15:39 +0000
-Received: from abhmp0012.oracle.com (abhmp0012.oracle.com [141.146.116.18])
-        by aserv0121.oracle.com (8.14.4/8.13.8) with ESMTP id 0083FbOr022903;
-        Wed, 8 Jan 2020 03:15:37 GMT
-Received: from ca-mkp.ca.oracle.com (/10.159.214.123)
-        by default (Oracle Beehive Gateway v4.0)
-        with ESMTP ; Tue, 07 Jan 2020 19:15:37 -0800
-To:     "Singh\, Balbir" <sblbir@amazon.com>
-Cc:     "martin.petersen\@oracle.com" <martin.petersen@oracle.com>,
-        "linux-kernel\@vger.kernel.org" <linux-kernel@vger.kernel.org>,
-        "linux-block\@vger.kernel.org" <linux-block@vger.kernel.org>,
-        "Sangaraju\, Someswarudu" <ssomesh@amazon.com>,
-        "jejb\@linux.ibm.com" <jejb@linux.ibm.com>,
-        "hch\@lst.de" <hch@lst.de>, "axboe\@kernel.dk" <axboe@kernel.dk>,
-        "mst\@redhat.com" <mst@redhat.com>,
-        "linux-nvme\@lists.infradead.org" <linux-nvme@lists.infradead.org>,
-        "Chaitanya.Kulkarni\@wdc.com" <Chaitanya.Kulkarni@wdc.com>
-Subject: Re: [resend v1 1/5] block/genhd: Notify udev about capacity change
-From:   "Martin K. Petersen" <martin.petersen@oracle.com>
-Organization: Oracle Corporation
-References: <20200102075315.22652-1-sblbir@amazon.com>
-        <20200102075315.22652-2-sblbir@amazon.com>
-        <yq1ftgs2b6g.fsf@oracle.com>
-        <d1635bae908b59fb4fd7de7c90ffbd5b73de7542.camel@amazon.com>
-Date:   Tue, 07 Jan 2020 22:15:34 -0500
-In-Reply-To: <d1635bae908b59fb4fd7de7c90ffbd5b73de7542.camel@amazon.com>
-        (Balbir Singh's message of "Tue, 7 Jan 2020 22:30:30 +0000")
-Message-ID: <yq17e221vvt.fsf@oracle.com>
-User-Agent: Gnus/5.13 (Gnus v5.13) Emacs/26.1.92 (gnu/linux)
+        id S1726149AbgAHDT7 (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Tue, 7 Jan 2020 22:19:59 -0500
+Received: from us-smtp-delivery-1.mimecast.com ([205.139.110.120]:29564 "EHLO
+        us-smtp-1.mimecast.com" rhost-flags-OK-OK-OK-FAIL) by vger.kernel.org
+        with ESMTP id S1726146AbgAHDT7 (ORCPT
+        <rfc822;linux-block@vger.kernel.org>); Tue, 7 Jan 2020 22:19:59 -0500
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+        s=mimecast20190719; t=1578453598;
+        h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+         to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+         in-reply-to:in-reply-to:references:references;
+        bh=wvEBuw7GXT/dhI2u1WBG49AGz4RwHQH9v/2XZP/TBRE=;
+        b=jN5/F5XVh0LKoK+c3GgU9LCtsudqaJPi1EMFfqkj4xotyxQlOOOctypwi4+rtbLnFEpwdM
+        xuIVImXkY0sMnd4ntq1Wceck3hXA3FX2e1yv7iTuZ0yE+ejpC0E/s46F//0+bUgS0zDSl4
+        wo/9xLI2L4SUyj8vDBl7Ohtts56HsNA=
+Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
+ [209.132.183.4]) (Using TLS) by relay.mimecast.com with ESMTP id
+ us-mta-188-BLn_FBXXPTSGiUvJdBs6Qg-1; Tue, 07 Jan 2020 22:19:55 -0500
+X-MC-Unique: BLn_FBXXPTSGiUvJdBs6Qg-1
+Received: from smtp.corp.redhat.com (int-mx07.intmail.prod.int.phx2.redhat.com [10.5.11.22])
+        (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
+        (No client certificate requested)
+        by mimecast-mx01.redhat.com (Postfix) with ESMTPS id 756C0801E6C;
+        Wed,  8 Jan 2020 03:19:53 +0000 (UTC)
+Received: from ming.t460p (ovpn-8-18.pek2.redhat.com [10.72.8.18])
+        by smtp.corp.redhat.com (Postfix) with ESMTPS id E20A110013A7;
+        Wed,  8 Jan 2020 03:19:45 +0000 (UTC)
+Date:   Wed, 8 Jan 2020 11:19:41 +0800
+From:   Ming Lei <ming.lei@redhat.com>
+To:     Hou Tao <houtao1@huawei.com>
+Cc:     Yufen Yu <yuyufen@huawei.com>, axboe@kernel.dk,
+        linux-block@vger.kernel.org, hch@lst.de, zhengchuan@huawei.com,
+        yi.zhang@huawei.com, paulmck@kernel.org, joel@joelfernandes.org,
+        rcu@vger.kernel.org
+Subject: Re: [PATCH] block: make sure last_lookup set as NULL after part
+ deleted
+Message-ID: <20200108031941.GD28075@ming.t460p>
+References: <20200103041805.GA29924@ming.t460p>
+ <ea362a86-d2de-7dfe-c826-d59e8b5068c3@huawei.com>
+ <20200103081745.GA11275@ming.t460p>
+ <82c10514-aec5-0d7c-118f-32c261015c6a@huawei.com>
+ <20200103151616.GA23308@ming.t460p>
+ <582f8e81-6127-47aa-f7fe-035251052238@huawei.com>
+ <20200106081137.GA10487@ming.t460p>
+ <747c3856-afa4-0909-dae2-f3b23aa38118@huawei.com>
+ <20200106100547.GA15256@ming.t460p>
+ <762e1d7b-af3e-93f4-c744-ecd8ae8946e8@huawei.com>
 MIME-Version: 1.0
-Content-Type: text/plain
-X-Proofpoint-Virus-Version: vendor=nai engine=6000 definitions=9493 signatures=668685
-X-Proofpoint-Spam-Details: rule=notspam policy=default score=0 suspectscore=0 malwarescore=0
- phishscore=0 bulkscore=0 spamscore=0 mlxscore=0 mlxlogscore=774
- adultscore=0 classifier=spam adjust=0 reason=mlx scancount=1
- engine=8.0.1-1911140001 definitions=main-2001080026
-X-Proofpoint-Virus-Version: vendor=nai engine=6000 definitions=9493 signatures=668685
-X-Proofpoint-Spam-Details: rule=notspam policy=default score=0 priorityscore=1501 malwarescore=0
- suspectscore=0 phishscore=0 bulkscore=0 spamscore=0 clxscore=1015
- lowpriorityscore=0 mlxscore=0 impostorscore=0 mlxlogscore=835 adultscore=0
- classifier=spam adjust=0 reason=mlx scancount=1 engine=8.0.1-1911140001
- definitions=main-2001080026
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <762e1d7b-af3e-93f4-c744-ecd8ae8946e8@huawei.com>
+User-Agent: Mutt/1.12.1 (2019-06-15)
+X-Scanned-By: MIMEDefang 2.84 on 10.5.11.22
 Sender: linux-block-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
+On Tue, Jan 07, 2020 at 07:40:10PM +0800, Hou Tao wrote:
+> Hi,
+> 
+> On 2020/1/6 18:05, Ming Lei wrote:
+> > On Mon, Jan 06, 2020 at 05:41:45PM +0800, Hou Tao wrote:
+> >> Hi,
+> >>
+> [snipped]
+> 
+> >> Yes. The solution you proposed also adds an invocation of percpu_ref_tryget_live()
+> >> in the fast path. Not sure which one will have a better performance. However the
+> >> reason we prefer the index caching is the simplicity instead of performance.
+> > 
+> > No, hd_struct_try_get() and hd_struct_get() is always called once for one IO, the
+> > patch I proposed changes nothing about this usage.
+> > 
+> > Please take a close look at the patch:
+> > 
+> > https://lore.kernel.org/linux-block/5cc465cc-d68c-088e-0729-2695279c7853@huawei.com/T/#m8f3e6b4e77eadf006ce142a84c966f50f3a9ae26
+> > 
+> > which just moves hd_struct_try_get() from blk_account_io_start() into
+> > disk_map_sector_rcu(), doesn't it?
+> > 
+> Yes, you are right. And a little suggestion for your patch:
+> 
+> @@ -283,8 +289,9 @@ void delete_partition(struct gendisk *disk, int partno)
+>  	if (!part)
+>  		return;
+> 
+> +	get_device(disk_to_dev(disk));
+>  	rcu_assign_pointer(ptbl->part[partno], NULL);
+> -	rcu_assign_pointer(ptbl->last_lookup, NULL);
+> +
+>  	kobject_put(part->holder_dir);
+>  	device_del(part_to_dev(part));
+> 
+> Could we move the call of get_device() into add_partition, and that will make the assignment of
+> disk to p->disk in add_partition() be natural ?
 
-Balbir,
+It isn't necessary to do that way, the parent disk's refcount isn't released
+until device_del(part_to_dev(part)). So it is enough to hold disk's refcount
+before calling device_del(part).
 
-> I did this to avoid having to enforce that set_capacity() implied a
-> notification. Largely to control the impact of the change by default.
+> 
+> Maybe there is no need to add a new disk field in hd_struct, because the kobject of gendisk
+> is already the parent of hd_struct. But make use of part->__dev.parent after the calling
+> of device_del() is a bad_idea.
 
-What I thought. I'm OK with set_capacity_and_notify(), btw.
+Yeah, that is why I added 'disk' field, which can be put with other
+fields not accessed in fast path.
 
--- 
-Martin K. Petersen	Oracle Linux Engineering
+BTW, 'struct percpu_ref ref' should have been put just after 'nr_sects',
+then these fast path fields can share single cache line.
+
+
+Thanks,
+Ming
+
