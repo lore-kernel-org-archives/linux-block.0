@@ -2,83 +2,111 @@ Return-Path: <SRS0=At5W=25=vger.kernel.org=linux-block-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-0.6 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
-	HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS
-	autolearn=no autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-6.6 required=3.0 tests=DKIM_SIGNED,DKIM_VALID,
+	DKIM_VALID_AU,FREEMAIL_FORGED_FROMDOMAIN,FREEMAIL_FROM,
+	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,
+	SPF_HELO_NONE,SPF_PASS autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 2FEEDC282DD
-	for <linux-block@archiver.kernel.org>; Wed,  8 Jan 2020 15:07:47 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id E7FBFC282DD
+	for <linux-block@archiver.kernel.org>; Wed,  8 Jan 2020 15:31:48 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.kernel.org (Postfix) with ESMTP id 068D12077B
-	for <linux-block@archiver.kernel.org>; Wed,  8 Jan 2020 15:07:46 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id AC95320673
+	for <linux-block@archiver.kernel.org>; Wed,  8 Jan 2020 15:31:48 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (2048-bit key) header.d=infradead.org header.i=@infradead.org header.b="aCvd1Ydw"
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="pzH6zeJa"
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1727541AbgAHPHq (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Wed, 8 Jan 2020 10:07:46 -0500
-Received: from bombadil.infradead.org ([198.137.202.133]:55606 "EHLO
-        bombadil.infradead.org" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1727629AbgAHPHn (ORCPT
-        <rfc822;linux-block@vger.kernel.org>); Wed, 8 Jan 2020 10:07:43 -0500
-DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed;
-        d=infradead.org; s=bombadil.20170209; h=In-Reply-To:Content-Type:MIME-Version
-        :References:Message-ID:Subject:Cc:To:From:Date:Sender:Reply-To:
-        Content-Transfer-Encoding:Content-ID:Content-Description:Resent-Date:
-        Resent-From:Resent-Sender:Resent-To:Resent-Cc:Resent-Message-ID:List-Id:
-        List-Help:List-Unsubscribe:List-Subscribe:List-Post:List-Owner:List-Archive;
-         bh=Yt5/k1DHhajT31FzlPb4kx21sxVNXs5EgZwMTBE+z4M=; b=aCvd1YdwglxV2IR+2qj0hsxxi
-        2Zvx/+ieQpto9CKAh40nnEmd5j+6vQSMNpoDYyszYYxx/HL+pCazlIoyNbp4pLH4tnLRyCWt2u6+H
-        smmXymG2Bmhp3TcjoUSthbaOw8oWkQFz3g7YQGeky8DP6R6QFCs8EPDTQBLoacfw8kqfEEf0OXlko
-        4D9V3QuZdIHXLfTiiEfm39STC876rbbDa52Ho19LlNw/FXno7EnDlQmzUcp2YxucUus7qnIYctFUf
-        zzDaMZmsK5v6Fw19zZx6tF5Z6SHAUIm1MHqq9tpNEJzwoK7Sf+B5Ghzvx1UNs6BtUoxhVd7CotYqm
-        /9QKUwnKg==;
-Received: from hch by bombadil.infradead.org with local (Exim 4.92.3 #3 (Red Hat Linux))
-        id 1ipCvq-0000RH-7F; Wed, 08 Jan 2020 15:07:38 +0000
-Date:   Wed, 8 Jan 2020 07:07:38 -0800
-From:   Christoph Hellwig <hch@infradead.org>
-To:     renxudong <renxudong1@huawei.com>
-Cc:     Bob Liu <bob.liu@oracle.com>,
-        Zhiqiang Liu <liuzhiqiang26@huawei.com>,
-        Jens Axboe <axboe@kernel.dk>, linux-block@vger.kernel.org,
-        jens.axboe@oracle.com, namhyung@gmail.com, bharrosh@panasas.com,
-        Mingfangsen <mingfangsen@huawei.com>, zhengbin13@huawei.com,
-        Guiyao <guiyao@huawei.com>, ming.lei@redhat.com
-Subject: Re: [PATCH] blk-map: add kernel address validation in
- blk_rq_map_kern func
-Message-ID: <20200108150738.GB18991@infradead.org>
-References: <239c8928-aea0-abe9-a75d-dc3f1b573ec5@huawei.com>
- <6b282b91-b157-5260-57d9-774be223998c@huawei.com>
- <91b13d6f-04b5-28b0-ea1b-d99564ecc898@oracle.com>
- <bc469dc8-19b6-d979-c061-075e52a355b0@huawei.com>
+        id S1727684AbgAHPbs (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Wed, 8 Jan 2020 10:31:48 -0500
+Received: from mail-io1-f66.google.com ([209.85.166.66]:45768 "EHLO
+        mail-io1-f66.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S1726556AbgAHPbs (ORCPT
+        <rfc822;linux-block@vger.kernel.org>); Wed, 8 Jan 2020 10:31:48 -0500
+Received: by mail-io1-f66.google.com with SMTP id i11so3570410ioi.12;
+        Wed, 08 Jan 2020 07:31:47 -0800 (PST)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=gmail.com; s=20161025;
+        h=mime-version:references:in-reply-to:from:date:message-id:subject:to
+         :cc;
+        bh=X7o/cbIbWQtFq2kL2V0bbwvA4L0Ugp+mDyf5FeCjV9Y=;
+        b=pzH6zeJaZTB+65guQIjtWt9OrS+TW0egL1dGYCFmTIHGpenTiH806NyUQYIC79mO49
+         C8Fa9hJUcTGI4ZtrRFkjTnG0RBBe2RMBrvyAFbxlFlbLZ7Xpltr5VOXhbU8ITg7lH62Z
+         OUGs7mIljKQ+eW/ya9De02u7zuWf9FZvGvZT78FHAUWNVwELEFCSzNtZwShhQunJPI+E
+         7mXgOQ/k50NurhHMFU661OVKF/nFoybb2MJlyXCb7NtMl674a6Bht+abPya5Yf/p0d1M
+         iKH2WYcrDnD4veK9QnQi4Dp9tZbx/ujf4vIk9+J/FzDFCcuoN6FN948J4T7SHp1pKVwX
+         r7GQ==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20161025;
+        h=x-gm-message-state:mime-version:references:in-reply-to:from:date
+         :message-id:subject:to:cc;
+        bh=X7o/cbIbWQtFq2kL2V0bbwvA4L0Ugp+mDyf5FeCjV9Y=;
+        b=sqFxfBR4zQ8IixfwGJWUNTRERgJBMu1+NfJN1L6DrCPO92mA4JtHRAnfaDJp21CL/q
+         nYsqMl+nYnEG/nqCWwEbh1WAjbkpC4NzYa9RskS8CDTr1Nh7mLXZGtN43xyNeCrirgdt
+         HNMiFCkV/bHOTB2MqfaYtwf4mEdTCr88bem8HccvaLrw7TiCTWBegSvNzonS43wJjhlH
+         8Oi6XGN1NpqN+cbhXL8D4TU0gJFwjAUXomq32ytOpWhcobvp5ryLNsPbJzbFY83uINDT
+         Ford0Kre4lhHod3YdnIckyBy0b0vrWUb6l3q3XxhXf7Op2FVsH4PWXwqz0aG8pSS1Apn
+         wOtg==
+X-Gm-Message-State: APjAAAWujnN4Hzsj+nmYsYAAKUw3PR3SE/3AkLl/EEA+rpDla9dLm5t9
+        IaFf+SEfYsO9PDadjaHzUB2u7L45U1jyxXSveBM=
+X-Google-Smtp-Source: APXvYqysDvAgpDgc999+aM9DXdNxlGSltgKcUBQi08cAjKgH4hCse5laLHXcIpWa76h+Wts3egveXx+XtlDD8dK4JTQ=
+X-Received: by 2002:a5e:8d14:: with SMTP id m20mr3593782ioj.282.1578497507212;
+ Wed, 08 Jan 2020 07:31:47 -0800 (PST)
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <bc469dc8-19b6-d979-c061-075e52a355b0@huawei.com>
-X-SRS-Rewrite: SMTP reverse-path rewritten from <hch@infradead.org> by bombadil.infradead.org. See http://www.infradead.org/rpr.html
+References: <20200107210256.2426176-1-arnd@arndb.de>
+In-Reply-To: <20200107210256.2426176-1-arnd@arndb.de>
+From:   Ilya Dryomov <idryomov@gmail.com>
+Date:   Wed, 8 Jan 2020 16:31:36 +0100
+Message-ID: <CAOi1vP_j1Mhdev5yGqxWVyfCvFMtmFzGw+34TdsJiQ53vWOQpA@mail.gmail.com>
+Subject: Re: [PATCH] rbd: work around -Wuninitialized warning
+To:     Arnd Bergmann <arnd@arndb.de>
+Cc:     Sage Weil <sage@redhat.com>, Jens Axboe <axboe@kernel.dk>,
+        Oleksandr Natalenko <oleksandr@redhat.com>,
+        Dongsheng Yang <dongsheng.yang@easystack.cn>,
+        Jason Dillaman <dillaman@redhat.com>,
+        David Howells <dhowells@redhat.com>,
+        Ceph Development <ceph-devel@vger.kernel.org>,
+        linux-block <linux-block@vger.kernel.org>,
+        LKML <linux-kernel@vger.kernel.org>
+Content-Type: text/plain; charset="UTF-8"
 Sender: linux-block-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-On Tue, Jan 07, 2020 at 02:51:04PM +0800, renxudong wrote:
-> When we issued scsi cmd, oops occurred. The call stack was as follows.
-> Call trace:
->  __memcpy+0x110/0x180
->  bio_endio+0x118/0x190
->  blk_update_request+0x94/0x378
->  scsi_end_request+0x48/0x2a8
->  scsi_io_completion+0xa4/0x6d0
->  scsi_finish_command+0xd4/0x138
->  scsi_softirq_done+0x13c/0x198
->  blk_done_softirq+0xc4/0x108
->  __do_softirq+0x120/0x324
->  run_ksoftirqd+0x44/0x60
->  smpboot_thread_fn+0x1ac/0x1e8
->  kthread+0x134/0x138
->  ret_from_fork+0x10/0x18
->  Since oops is in the process of scsi cmd done, we have not added oops info
-> to the commit log.
+On Tue, Jan 7, 2020 at 10:02 PM Arnd Bergmann <arnd@arndb.de> wrote:
+>
+> gcc -O3 warns about a dummy variable that is passed
+> down into rbd_img_fill_nodata without being initialized:
+>
+> drivers/block/rbd.c: In function 'rbd_img_fill_nodata':
+> drivers/block/rbd.c:2573:13: error: 'dummy' is used uninitialized in this function [-Werror=uninitialized]
+>   fctx->iter = *fctx->pos;
+>
+> Since this is a dummy, I assume the warning is harmless, but
+> it's better to initialize it anyway and avoid the warning.
+>
+> Fixes: mmtom ("init/Kconfig: enable -O3 for all arches")
+> Signed-off-by: Arnd Bergmann <arnd@arndb.de>
+> ---
+>  drivers/block/rbd.c | 2 +-
+>  1 file changed, 1 insertion(+), 1 deletion(-)
+>
+> diff --git a/drivers/block/rbd.c b/drivers/block/rbd.c
+> index 29be02838b67..070edc5983df 100644
+> --- a/drivers/block/rbd.c
+> +++ b/drivers/block/rbd.c
+> @@ -2664,7 +2664,7 @@ static int rbd_img_fill_nodata(struct rbd_img_request *img_req,
+>                                u64 off, u64 len)
+>  {
+>         struct ceph_file_extent ex = { off, len };
+> -       union rbd_img_fill_iter dummy;
+> +       union rbd_img_fill_iter dummy = {};
+>         struct rbd_img_fill_ctx fctx = {
+>                 .pos_type = OBJ_REQUEST_NODATA,
+>                 .pos = &dummy,
 
-What workload is this?  If the address is freed while the I/O is
-in progress we have much deeper problem than what a virt_addr_valid
-could paper over.
+Applied, but slightly confused.  Wasn't selecting -O3/s/etc supposed to
+automatically disable -Wmaybe-uninitialized via Kconfig?
+
+Thanks,
+
+                Ilya
