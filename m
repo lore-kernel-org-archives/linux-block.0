@@ -2,127 +2,129 @@ Return-Path: <SRS0=At5W=25=vger.kernel.org=linux-block-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-6.8 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
-	INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS
-	autolearn=unavailable autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-0.8 required=3.0 tests=DKIM_SIGNED,DKIM_VALID,
+	DKIM_VALID_AU,HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SPF_HELO_NONE,
+	SPF_PASS autolearn=no autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 455FFC282DD
-	for <linux-block@archiver.kernel.org>; Wed,  8 Jan 2020 16:05:50 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 82365C33CA2
+	for <linux-block@archiver.kernel.org>; Wed,  8 Jan 2020 16:33:39 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.kernel.org (Postfix) with ESMTP id 2661F2070E
-	for <linux-block@archiver.kernel.org>; Wed,  8 Jan 2020 16:05:49 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id 579172067D
+	for <linux-block@archiver.kernel.org>; Wed,  8 Jan 2020 16:33:39 +0000 (UTC)
+Authentication-Results: mail.kernel.org;
+	dkim=pass (2048-bit key) header.d=cloud.ionos.com header.i=@cloud.ionos.com header.b="bmjouH+x"
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1727666AbgAHQFp (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Wed, 8 Jan 2020 11:05:45 -0500
-Received: from mout.kundenserver.de ([212.227.126.131]:48453 "EHLO
-        mout.kundenserver.de" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1726922AbgAHQFo (ORCPT
-        <rfc822;linux-block@vger.kernel.org>); Wed, 8 Jan 2020 11:05:44 -0500
-Received: from mail-qt1-f180.google.com ([209.85.160.180]) by
- mrelayeu.kundenserver.de (mreue012 [212.227.15.129]) with ESMTPSA (Nemesis)
- id 1MEUaQ-1iwJWG3s66-00G4ZF; Wed, 08 Jan 2020 17:05:43 +0100
-Received: by mail-qt1-f180.google.com with SMTP id w30so1985478qtd.12;
-        Wed, 08 Jan 2020 08:05:42 -0800 (PST)
-X-Gm-Message-State: APjAAAWlBzYgEylMmXpCYKzZmqEVpUf15RLp/cydgBVsQ16MUfKOntfu
-        7tbB/T2R1DyJll8SqQpSg1Js93g/dUOQOyT8OQY=
-X-Google-Smtp-Source: APXvYqzqWQEeHE7TaWNtzpBpnp1E3rb+fs8wMFW5zsPq4jwo54iNI9QBbVdA5oc0dSdNHlxIFwVe6vphV190F0C143E=
-X-Received: by 2002:ac8:768d:: with SMTP id g13mr4188797qtr.7.1578499541624;
- Wed, 08 Jan 2020 08:05:41 -0800 (PST)
+        id S1727338AbgAHQdi (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Wed, 8 Jan 2020 11:33:38 -0500
+Received: from mail-io1-f67.google.com ([209.85.166.67]:45043 "EHLO
+        mail-io1-f67.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S1727148AbgAHQdi (ORCPT
+        <rfc822;linux-block@vger.kernel.org>); Wed, 8 Jan 2020 11:33:38 -0500
+Received: by mail-io1-f67.google.com with SMTP id b10so3809994iof.11
+        for <linux-block@vger.kernel.org>; Wed, 08 Jan 2020 08:33:38 -0800 (PST)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=cloud.ionos.com; s=google;
+        h=mime-version:references:in-reply-to:from:date:message-id:subject:to
+         :cc;
+        bh=O0qG6NRLqy7mvD6qvWnV9Y3yuCIMjNVmVlZXp2JZhAg=;
+        b=bmjouH+xaoy8MBqnIfs6g7C1DwZUA7d0d++MibQVEEoiiyWq99Uo/+kCUoto589/6y
+         Z8XWkR6sO7ZWkeS+aqqN47VO7fJr+exu1n0wuwVKOu72SkPrpNrpUQTL+BUh/XGcOkdo
+         oV/+3LuT3Q77467cm59wy8p0ZkIP3mo6xlnMRwHzopwbwxlQiSQXwc5HH1y5h85BIBpP
+         PVf6pEQ+A1XrjxU6MHi1vAdCgcNS56qedejnBZ5otMqZ7IZp0HjzGBANf/5MdEBblORj
+         6BFra9Uj5HGAH0zuIf9MZTeC/77mBlNAwNCQimFr0229Z1h7iUuD7k3MgH8OiQSt2Ygm
+         gUuA==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20161025;
+        h=x-gm-message-state:mime-version:references:in-reply-to:from:date
+         :message-id:subject:to:cc;
+        bh=O0qG6NRLqy7mvD6qvWnV9Y3yuCIMjNVmVlZXp2JZhAg=;
+        b=jfoHhSey6AqDBxs+EegLCSQI1wWrY8dHQwUYwyiFe05QoJaPcZozkwKrTDIRUYTnoU
+         iw59tDqwvkGlMEVv5JPYNvco4TQfMCMAsoqbXsQBpXJynRmWxq/RUwOkmDHbTfFYkbQg
+         YIUXEepsMM2ISUQkiHAw3VYQYzP7ZvWYvFHLQGlcYYsBrWBIThI0QycnolKpb/21l9o8
+         JSR9VJTh/wRGIcWT6QSRVPt5s+1ajN/gegPJTsASiRys4iTAQssIcL7WbQh+yzEA6ATA
+         Yi9GRj5Fok0p4eqv44+Ju1cpsXq3qhnhPr/6wcyYST+WiRzg9CtQgoQN7SKR2pZwhkLa
+         PMLA==
+X-Gm-Message-State: APjAAAXKbJB9t/BT9UkrwnTFcQNFUukrijF9APOgC4G/eqsPms3y33f0
+        httnaV/QDEqruufr4Sulr2cYK0lfOfpeGO+wEVhqqg==
+X-Google-Smtp-Source: APXvYqxX4un718qenN/+gUObZZrZSck3SyOJJE+AABa0Mp+35gS4S1Ma/zLzbeA56VzoIOm6J/Oa9lz02gLwFXcTk8Q=
+X-Received: by 2002:a6b:6e02:: with SMTP id d2mr4124290ioh.22.1578501217592;
+ Wed, 08 Jan 2020 08:33:37 -0800 (PST)
 MIME-Version: 1.0
-References: <20200107210256.2426176-1-arnd@arndb.de> <CAOi1vP_j1Mhdev5yGqxWVyfCvFMtmFzGw+34TdsJiQ53vWOQpA@mail.gmail.com>
-In-Reply-To: <CAOi1vP_j1Mhdev5yGqxWVyfCvFMtmFzGw+34TdsJiQ53vWOQpA@mail.gmail.com>
-From:   Arnd Bergmann <arnd@arndb.de>
-Date:   Wed, 8 Jan 2020 17:05:25 +0100
-X-Gmail-Original-Message-ID: <CAK8P3a0qb3fE1D4o1wYMVVets8CtbTpMRg1hUJF1wW+oC1GJjg@mail.gmail.com>
-Message-ID: <CAK8P3a0qb3fE1D4o1wYMVVets8CtbTpMRg1hUJF1wW+oC1GJjg@mail.gmail.com>
-Subject: Re: [PATCH] rbd: work around -Wuninitialized warning
-To:     Ilya Dryomov <idryomov@gmail.com>
-Cc:     Sage Weil <sage@redhat.com>, Jens Axboe <axboe@kernel.dk>,
-        Oleksandr Natalenko <oleksandr@redhat.com>,
-        Dongsheng Yang <dongsheng.yang@easystack.cn>,
-        Jason Dillaman <dillaman@redhat.com>,
-        David Howells <dhowells@redhat.com>,
-        Ceph Development <ceph-devel@vger.kernel.org>,
-        linux-block <linux-block@vger.kernel.org>,
-        LKML <linux-kernel@vger.kernel.org>
+References: <20191230102942.18395-1-jinpuwang@gmail.com> <20191230102942.18395-10-jinpuwang@gmail.com>
+ <848cdafd-60c5-b656-1569-81644b7fc5df@acm.org>
+In-Reply-To: <848cdafd-60c5-b656-1569-81644b7fc5df@acm.org>
+From:   Jinpu Wang <jinpu.wang@cloud.ionos.com>
+Date:   Wed, 8 Jan 2020 17:33:26 +0100
+Message-ID: <CAMGffEmT0KGpa5j_FsKq8tmPrjM2-aAYqvCfQaKkDmUb1o17dQ@mail.gmail.com>
+Subject: Re: [PATCH v6 09/25] rtrs: server: private header with server structs
+ and functions
+To:     Bart Van Assche <bvanassche@acm.org>
+Cc:     Jack Wang <jinpuwang@gmail.com>, linux-block@vger.kernel.org,
+        linux-rdma@vger.kernel.org, Jens Axboe <axboe@kernel.dk>,
+        Christoph Hellwig <hch@infradead.org>,
+        Sagi Grimberg <sagi@grimberg.me>,
+        Leon Romanovsky <leon@kernel.org>,
+        Doug Ledford <dledford@redhat.com>,
+        Danil Kipnis <danil.kipnis@cloud.ionos.com>, rpenyaev@suse.de
 Content-Type: text/plain; charset="UTF-8"
-X-Provags-ID: V03:K1:onrL9DaFWfOC/Ad3SvMt2oMgkY5ejSs/ewdb6kHw2Fzj/WdTHGS
- 8fUCcYbiNmmFizt4rxo24Za9n0LxNFWFRkAHDheFc00XCaMm4zzNBm61spWfkTrRv+0S1bG
- +eCbzi3OGnch5XvrMgZX5ekH64dADY+iFDGdZvEAb7We2enFWiqN0wq2beCEaz8o9BKXO2D
- exKA4EB9ZtQMHeHYYDJ4Q==
-X-UI-Out-Filterresults: notjunk:1;V03:K0:quB0CnsP3xg=:Oht/pwgkURotru5YSxY3ge
- aRr5t/bdENbEJxZQx2y2kzCSYUCjB4rVS3dh5X2kMRh9fii/2cpTCBKJTRvP3SQkzBUbVBiBn
- BqxpWP6SweGZ5bDegdlmB+Pmx7s4OptZtmw9PfkHf+fyDbiEL00lfegwxiXlT34vI8ROVTFoo
- 2yyBMIQsV9DvzTC6R4KQoAPTIx2EaxQ1h1kbVCcWm/3EzfkRcQUriITMr2T/OvvARlndi0cx2
- Qb68q3vffEoFEQPuknhpkyqdUJz6OaEj5ygyFiEOjeV1M8ABBxh9XOQDratB1fkFtxhWCGUy1
- B19YbUnj8KT4b3PJJsS5PpEI7XMVHCaOMu7VBeGwvHpvJiuvGXOCtYy3Behsgl5awDsLtJNvM
- AXAX3j+ZplNUZH/KqDr04l3ASql6500MrQkfXJjjcjMw1ECix96imJTuMIIZ4Q5BbCQHKJEV/
- d9gW1G5zgWa/K07XgBNXu3sPXDFk9plu9PvfL007Gv0I2y+7EEJf0bem/9S3v5yfVVQzZrCJY
- mETh1MEt7roXcPN5c/TjVw98f1o1/0AHV8WRmvrCnpO2v+9AyEw7hnpB6ArupMNurUd38gFUu
- VG9roqPRPXhSt/sl/NdKm5UBXImqkKA93YERbfSZFQsPIHVwP/2z2Y8lYHeZEz+wGhGDUaVu0
- G49ZO96GhfmLj8EU0gkUe2UUwmB9SH2i+IGUVK4mxwqNohj59pE5lZVTCAari77+x1LaAQBaG
- 9vo8bcyPvzr6IttubJCyWBdJsO0N/V2Tk/7bq2bHyxKJ6X83uqgAeActwodjwq0dFLjIHzvHi
- jkbL14qmhPoaqDosnbbviAX1/D2FFPrgettUS/XlS98ViPs6/cSBNUixNSAW9y4eMFw/vKy3r
- MCHgaqCj2WISpbZoYB6w==
 Sender: linux-block-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-On Wed, Jan 8, 2020 at 4:31 PM Ilya Dryomov <idryomov@gmail.com> wrote:
+On Thu, Jan 2, 2020 at 10:24 PM Bart Van Assche <bvanassche@acm.org> wrote:
 >
-> On Tue, Jan 7, 2020 at 10:02 PM Arnd Bergmann <arnd@arndb.de> wrote:
-> >
-> > gcc -O3 warns about a dummy variable that is passed
-> > down into rbd_img_fill_nodata without being initialized:
-> >
-> > drivers/block/rbd.c: In function 'rbd_img_fill_nodata':
-> > drivers/block/rbd.c:2573:13: error: 'dummy' is used uninitialized in this function [-Werror=uninitialized]
-> >   fctx->iter = *fctx->pos;
-> >
-> > Since this is a dummy, I assume the warning is harmless, but
-> > it's better to initialize it anyway and avoid the warning.
-> >
-> > Fixes: mmtom ("init/Kconfig: enable -O3 for all arches")
-> > Signed-off-by: Arnd Bergmann <arnd@arndb.de>
-> > ---
-> >  drivers/block/rbd.c | 2 +-
-> >  1 file changed, 1 insertion(+), 1 deletion(-)
-> >
-> > diff --git a/drivers/block/rbd.c b/drivers/block/rbd.c
-> > index 29be02838b67..070edc5983df 100644
-> > --- a/drivers/block/rbd.c
-> > +++ b/drivers/block/rbd.c
-> > @@ -2664,7 +2664,7 @@ static int rbd_img_fill_nodata(struct rbd_img_request *img_req,
-> >                                u64 off, u64 len)
-> >  {
-> >         struct ceph_file_extent ex = { off, len };
-> > -       union rbd_img_fill_iter dummy;
-> > +       union rbd_img_fill_iter dummy = {};
-> >         struct rbd_img_fill_ctx fctx = {
-> >                 .pos_type = OBJ_REQUEST_NODATA,
-> >                 .pos = &dummy,
+> On 12/30/19 2:29 AM, Jack Wang wrote:
+> > +struct rtrs_stats_wc_comp {
+> > +     atomic64_t      calls;
+> > +     atomic64_t      total_wc_cnt;
+> > +};
 >
-> Applied, but slightly confused.  Wasn't selecting -O3/s/etc supposed to
-> automatically disable -Wmaybe-uninitialized via Kconfig?
-
-Oh, that's right. I have a couple of patches in my randconfig tree that
-completely rework the way that the warning options are handled and
-that accidentally ignored CONFIG_CC_DISABLE_WARN_MAYBE_UNINITIALIZED,
-so it's won't actually happen on linux-next right now, just on my kernel.
-
-However, given that -O3 did not actually introduce too many false
-positives here but did find some actual uninitialized variables, we should
-probably have it turned on anyway.
-
-A lot of these false positives seem to happen whenever gcc can partially
-understand how a variable is used, but not enough to see that it's ok.
-With higher optimization levels, this happens less often than with the
-lower levels as it inlines more aggressively and correctly determines
-uses to be safe that were false-positives earlier.
-
-I'm fairly sure that the output at -Os still won't be helpful as that would
-mostly show up cases that -O2 has found to be safe rather than those
-that -O2 decided not to warn about because of lack of information.
-
-      Arnd
+> Please document the meaning of the members of this data structure.
+will do.
+>
+> > +struct rtrs_srv_stats_rdma_stats {
+> > +     struct {
+> > +             atomic64_t      cnt;
+> > +             atomic64_t      size_total;
+> > +     } dir[2];
+> > +};
+>
+> Please document the meaning of the members of this data structure and
+> also which index (0, 1) corresponds to which direction (read, write).
+yes, will do.
+>
+> > +struct rtrs_srv_op {
+> > +     struct rtrs_srv_con             *con;
+> > +     u32                             msg_id;
+> > +     u8                              dir;
+> > +     struct rtrs_msg_rdma_read       *rd_msg;
+> > +     struct ib_rdma_wr               *tx_wr;
+> > +     struct ib_sge                   *tx_sg;
+> > +};
+>
+> Please document the role of this data structure.
+ok.
+>
+> > +struct rtrs_srv_mr {
+> > +     struct ib_mr    *mr;
+> > +     struct sg_table sgt;
+> > +     struct ib_cqe   inv_cqe; /* only for always_invalidate=true */
+> > +     u32             msg_id; /* only for always_invalidate=true */
+> > +     u32             msg_off; /* only for always_invalidate=true */
+> > +     struct rtrs_iu  *iu; /* send buffer for new rkey msg */
+> > +};
+>
+> Please document the role of this data structure.
+ok
+>
+> > +extern struct class *rtrs_dev_class;
+>
+> Please make sure that the static 'rtrs_dev_class' variable in rtrs-clt.c
+> and in this header file have different names.
+ok
+>
+> Thanks,
+>
+> Bart.
+Thanks
