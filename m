@@ -2,219 +2,127 @@ Return-Path: <SRS0=At5W=25=vger.kernel.org=linux-block-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-3.5 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
-	HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,
+X-Spam-Status: No, score=-0.8 required=3.0 tests=DKIM_SIGNED,DKIM_VALID,
+	DKIM_VALID_AU,HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SPF_HELO_NONE,
 	SPF_PASS autolearn=no autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 7507AC282DD
-	for <linux-block@archiver.kernel.org>; Wed,  8 Jan 2020 12:41:32 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 141F6C282DD
+	for <linux-block@archiver.kernel.org>; Wed,  8 Jan 2020 12:55:44 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.kernel.org (Postfix) with ESMTP id 3E3BE2070E
-	for <linux-block@archiver.kernel.org>; Wed,  8 Jan 2020 12:41:32 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id D0D602073A
+	for <linux-block@archiver.kernel.org>; Wed,  8 Jan 2020 12:55:43 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (1024-bit key) header.d=citrix.com header.i=@citrix.com header.b="Fc7Imd7J"
+	dkim=pass (2048-bit key) header.d=cloud.ionos.com header.i=@cloud.ionos.com header.b="G/PyWGGt"
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1726803AbgAHMlb (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Wed, 8 Jan 2020 07:41:31 -0500
-Received: from esa3.hc3370-68.iphmx.com ([216.71.145.155]:13760 "EHLO
-        esa3.hc3370-68.iphmx.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1726199AbgAHMlb (ORCPT
-        <rfc822;linux-block@vger.kernel.org>); Wed, 8 Jan 2020 07:41:31 -0500
-DKIM-Signature: v=1; a=rsa-sha256; c=simple/simple;
-  d=citrix.com; s=securemail; t=1578487291;
-  h=date:from:to:cc:subject:message-id:references:
-   mime-version:content-transfer-encoding:in-reply-to;
-  bh=kKzckFXtd4QCltPF91w9MDyi+uT80gIXF5vn2oy5HgE=;
-  b=Fc7Imd7JKm1UvCVlARDbWFxXt4HngPFAYsQy5QEtN6q2780GVlX1Qk6z
-   vWDy49kCavjP7hZEqYnRznz1ZD4+x/gimR6MEFkQNEsJesR6w/6bj1JPS
-   +gKGE63rtb6fxW/wj5hptd85cfDFuPqN4olDc2tkaz7rwFbvnkZDNGWQq
-   o=;
-Authentication-Results: esa3.hc3370-68.iphmx.com; dkim=none (message not signed) header.i=none; spf=None smtp.pra=roger.pau@citrix.com; spf=Pass smtp.mailfrom=roger.pau@citrix.com; spf=None smtp.helo=postmaster@mail.citrix.com
-Received-SPF: None (esa3.hc3370-68.iphmx.com: no sender
-  authenticity information available from domain of
-  roger.pau@citrix.com) identity=pra; client-ip=162.221.158.21;
-  receiver=esa3.hc3370-68.iphmx.com;
-  envelope-from="roger.pau@citrix.com";
-  x-sender="roger.pau@citrix.com";
-  x-conformance=sidf_compatible
-Received-SPF: Pass (esa3.hc3370-68.iphmx.com: domain of
-  roger.pau@citrix.com designates 162.221.158.21 as permitted
-  sender) identity=mailfrom; client-ip=162.221.158.21;
-  receiver=esa3.hc3370-68.iphmx.com;
-  envelope-from="roger.pau@citrix.com";
-  x-sender="roger.pau@citrix.com";
-  x-conformance=sidf_compatible; x-record-type="v=spf1";
-  x-record-text="v=spf1 ip4:209.167.231.154 ip4:178.63.86.133
-  ip4:195.66.111.40/30 ip4:85.115.9.32/28 ip4:199.102.83.4
-  ip4:192.28.146.160 ip4:192.28.146.107 ip4:216.52.6.88
-  ip4:216.52.6.188 ip4:162.221.158.21 ip4:162.221.156.83
-  ip4:168.245.78.127 ~all"
-Received-SPF: None (esa3.hc3370-68.iphmx.com: no sender
-  authenticity information available from domain of
-  postmaster@mail.citrix.com) identity=helo;
-  client-ip=162.221.158.21; receiver=esa3.hc3370-68.iphmx.com;
-  envelope-from="roger.pau@citrix.com";
-  x-sender="postmaster@mail.citrix.com";
-  x-conformance=sidf_compatible
-IronPort-SDR: /gIoRj6HHUkZXOqLm5gucpQE7SqaVHIUDpCxc5YQw3CQFxfGAHwWPxaOZt3QxuBf2lpYm47rOP
- r9kFNIrnVTds4ZCwZ2qnKoTPkemuaTAiiR9bdVoYGTr9186U0zLx+7X5eX5IoGpNcvxHpOvt4u
- vjJl7UWecuhD5DLRitGStmjA5YJC7XpL1aLFKS4EpJtPH/PbUvxuJSQJMNNeLHC6etw/Rm8lOt
- SO9ENyx8MPxCQHQMn2aMuy6VDYXe8Sn+aVAXKRUQnCx+6UPJs6WySlrPn/yoS0KQ2vnfnb92EQ
- CNM=
-X-SBRS: 2.7
-X-MesageID: 10607407
-X-Ironport-Server: esa3.hc3370-68.iphmx.com
-X-Remote-IP: 162.221.158.21
-X-Policy: $RELAYED
-X-IronPort-AV: E=Sophos;i="5.69,410,1571716800"; 
-   d="scan'208";a="10607407"
-Date:   Wed, 8 Jan 2020 13:40:57 +0100
-From:   Roger Pau =?iso-8859-1?Q?Monn=E9?= <roger.pau@citrix.com>
-To:     SeongJae Park <sjpark@amazon.com>
-CC:     <jgross@suse.com>, <axboe@kernel.dk>, <konrad.wilk@oracle.com>,
-        "SeongJae Park" <sjpark@amazon.de>, <pdurrant@amazon.com>,
-        <sj38.park@gmail.com>, <xen-devel@lists.xenproject.org>,
-        <linux-block@vger.kernel.org>, <linux-kernel@vger.kernel.org>
-Subject: Re: [PATCH v13 3/5] xen/blkback: Squeeze page pools if a memory
- pressure is detected
-Message-ID: <20200108124057.GN11756@Air-de-Roger>
-References: <20191218183718.31719-1-sjpark@amazon.com>
- <20191218183718.31719-4-sjpark@amazon.com>
+        id S1726794AbgAHMzn (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Wed, 8 Jan 2020 07:55:43 -0500
+Received: from mail-il1-f196.google.com ([209.85.166.196]:39805 "EHLO
+        mail-il1-f196.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S1726254AbgAHMzn (ORCPT
+        <rfc822;linux-block@vger.kernel.org>); Wed, 8 Jan 2020 07:55:43 -0500
+Received: by mail-il1-f196.google.com with SMTP id x5so2559764ila.6
+        for <linux-block@vger.kernel.org>; Wed, 08 Jan 2020 04:55:42 -0800 (PST)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=cloud.ionos.com; s=google;
+        h=mime-version:references:in-reply-to:from:date:message-id:subject:to
+         :cc;
+        bh=k+b+8uoqmDNLdb7NpY/ylmrSBRhxXRp5uOtfvXbiX9A=;
+        b=G/PyWGGtb+Py0dClzGP/KAya6c/8oIqrjxKFXtN70jFJvM0rcUdBmLTTpunOVdiv+N
+         0NR13jD1Z0uk8Y9PbSfcu2I4EnlLWg3Tf3f20B81oHbKSPQbQQ33ea8mQhKa7Gd66LgY
+         WMLY1jYYOdQoyhmhru3EUMkVDxPVy96srkmO7YVp4DT2S5N/r7qouP20FvtZvy5uSs+g
+         qXpi4Wgz6a8C+9LTzMTPPZSp5eouvZ0uP+qDROkAXlWskLTDrvQcqLcvK7aqTRmTNfDS
+         ume5IrCoIZp+YvdrBGZuwXDNGNnyFPNw8Xt0IfxdCdgsdSbuIdaL/wsa1/WJ2+QXRkEI
+         lmWA==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20161025;
+        h=x-gm-message-state:mime-version:references:in-reply-to:from:date
+         :message-id:subject:to:cc;
+        bh=k+b+8uoqmDNLdb7NpY/ylmrSBRhxXRp5uOtfvXbiX9A=;
+        b=tXRfMwTuWmWizvuZIByRMK+jhXFx6myb3/tROeQS8sj7j27iriHDGH8mSmn/ZxjDLg
+         let6BvRnn8xU9afos581V1RogtQE1+uaBmd0eGJirYAlrG2o7X8lxfLyaVb00bF6jmk8
+         CbwYmibPisTz+0QYw5/aA8ElcmL2X9dAMHpNxlSZ6UCL8pjqsm2NNHpzKM1UY9aNz5Vd
+         TgFwAKuJp+dhRL3/FLQlH0xjntTjITQrnsz5LsSrx1Klg/BFT2myHfARTIT3iLPEOKEH
+         Kf7Wcx4d/ojF47m9sy/GDSTvASP6iRpFnvY36TiMZXXLlgiqhQIghCxzChuTk8XssVXt
+         66oA==
+X-Gm-Message-State: APjAAAWsiWWBtXJv0qpEt7pWt48SIy4qY+uIzlq/Ge3Zcs9t4Z6mdWqr
+        ThNl7TQHJFtLcJPipG90QkKTT01iXkKAAsqH36hJtA==
+X-Google-Smtp-Source: APXvYqxjWz5Zu/qB+Fax140bVTtEwJQWBCp+FkDPXFvvURppEcOqP3v9PXN2vHxa++l6XhOxpc/uSNaj8M76EP3Rft0=
+X-Received: by 2002:a92:1090:: with SMTP id 16mr3578708ilq.298.1578488142467;
+ Wed, 08 Jan 2020 04:55:42 -0800 (PST)
 MIME-Version: 1.0
-Content-Type: text/plain; charset="iso-8859-1"
-Content-Disposition: inline
-Content-Transfer-Encoding: 8bit
-In-Reply-To: <20191218183718.31719-4-sjpark@amazon.com>
-X-ClientProxiedBy: AMSPEX02CAS02.citrite.net (10.69.22.113) To
- AMSPEX02CL01.citrite.net (10.69.22.125)
+References: <20191230102942.18395-1-jinpuwang@gmail.com> <20191230102942.18395-12-jinpuwang@gmail.com>
+ <15c76744-8ce8-e70a-506a-1a28c2518de0@acm.org>
+In-Reply-To: <15c76744-8ce8-e70a-506a-1a28c2518de0@acm.org>
+From:   Jinpu Wang <jinpu.wang@cloud.ionos.com>
+Date:   Wed, 8 Jan 2020 13:55:31 +0100
+Message-ID: <CAMGffEmdHcoefDAOxGAaKwC05YFXFj6+9rM7MwnYnJ4a2t5hdQ@mail.gmail.com>
+Subject: Re: [PATCH v6 11/25] rtrs: server: statistics functions
+To:     Bart Van Assche <bvanassche@acm.org>
+Cc:     Jack Wang <jinpuwang@gmail.com>, linux-block@vger.kernel.org,
+        linux-rdma@vger.kernel.org, Jens Axboe <axboe@kernel.dk>,
+        Christoph Hellwig <hch@infradead.org>,
+        Sagi Grimberg <sagi@grimberg.me>,
+        Leon Romanovsky <leon@kernel.org>,
+        Doug Ledford <dledford@redhat.com>,
+        Danil Kipnis <danil.kipnis@cloud.ionos.com>, rpenyaev@suse.de
+Content-Type: text/plain; charset="UTF-8"
 Sender: linux-block-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-On Wed, Dec 18, 2019 at 07:37:16PM +0100, SeongJae Park wrote:
-> From: SeongJae Park <sjpark@amazon.de>
-> 
-> Each `blkif` has a free pages pool for the grant mapping.  The size of
-> the pool starts from zero and is increased on demand while processing
-> the I/O requests.  If current I/O requests handling is finished or 100
-> milliseconds has passed since last I/O requests handling, it checks and
-> shrinks the pool to not exceed the size limit, `max_buffer_pages`.
-> 
-> Therefore, host administrators can cause memory pressure in blkback by
-> attaching a large number of block devices and inducing I/O.  Such
-> problematic situations can be avoided by limiting the maximum number of
-> devices that can be attached, but finding the optimal limit is not so
-> easy.  Improper set of the limit can results in memory pressure or a
-> resource underutilization.  This commit avoids such problematic
-> situations by squeezing the pools (returns every free page in the pool
-> to the system) for a while (users can set this duration via a module
-> parameter) if memory pressure is detected.
-> 
-> Discussions
-> ===========
-> 
-> The `blkback`'s original shrinking mechanism returns only pages in the
-> pool which are not currently be used by `blkback` to the system.  In
-> other words, the pages that are not mapped with granted pages.  Because
-> this commit is changing only the shrink limit but still uses the same
-> freeing mechanism it does not touch pages which are currently mapping
-> grants.
-> 
-> Once memory pressure is detected, this commit keeps the squeezing limit
-> for a user-specified time duration.  The duration should be neither too
-> long nor too short.  If it is too long, the squeezing incurring overhead
-> can reduce the I/O performance.  If it is too short, `blkback` will not
-> free enough pages to reduce the memory pressure.  This commit sets the
-> value as `10 milliseconds` by default because it is a short time in
-> terms of I/O while it is a long time in terms of memory operations.
-> Also, as the original shrinking mechanism works for at least every 100
-> milliseconds, this could be a somewhat reasonable choice.  I also tested
-> other durations (refer to the below section for more details) and
-> confirmed that 10 milliseconds is the one that works best with the test.
-> That said, the proper duration depends on actual configurations and
-> workloads.  That's why this commit allows users to set the duration as a
-> module parameter.
-> 
-> Memory Pressure Test
-> ====================
-> 
-> To show how this commit fixes the memory pressure situation well, I
-> configured a test environment on a xen-running virtualization system.
-> On the `blkfront` running guest instances, I attach a large number of
-> network-backed volume devices and induce I/O to those.  Meanwhile, I
-> measure the number of pages that swapped in (pswpin) and out (pswpout)
-> on the `blkback` running guest.  The test ran twice, once for the
-> `blkback` before this commit and once for that after this commit.  As
-> shown below, this commit has dramatically reduced the memory pressure:
-> 
->                 pswpin  pswpout
->     before      76,672  185,799
->     after          867    3,967
-> 
-> Optimal Aggressive Shrinking Duration
-> -------------------------------------
-> 
-> To find a best squeezing duration, I repeated the test with three
-> different durations (1ms, 10ms, and 100ms).  The results are as below:
-> 
->     duration    pswpin  pswpout
->     1           707     5,095
->     10          867     3,967
->     100         362     3,348
-> 
-> As expected, the memory pressure decreases as the duration increases,
-> but the reduction become slow from the `10ms`.  Based on this results, I
-> chose the default duration as 10ms.
-> 
-> Performance Overhead Test
-> =========================
-> 
-> This commit could incur I/O performance degradation under severe memory
-> pressure because the squeezing will require more page allocations per
-> I/O.  To show the overhead, I artificially made a worst-case squeezing
-> situation and measured the I/O performance of a `blkfront` running
-> guest.
-> 
-> For the artificial squeezing, I set the `blkback.max_buffer_pages` using
-> the `/sys/module/xen_blkback/parameters/max_buffer_pages` file.  In this
-> test, I set the value to `1024` and `0`.  The `1024` is the default
-> value.  Setting the value as `0` is same to a situation doing the
-> squeezing always (worst-case).
-> 
-> If the underlying block device is slow enough, the squeezing overhead
-> could be hidden.  For the reason, I use a fast block device, namely the
-> rbd[1]:
-> 
->     # xl block-attach guest phy:/dev/ram0 xvdb w
-> 
-> For the I/O performance measurement, I run a simple `dd` command 5 times
-> directly to the device as below and collect the 'MB/s' results.
-> 
->     $ for i in {1..5}; do dd if=/dev/zero of=/dev/xvdb \
->                              bs=4k count=$((256*512)); sync; done
-> 
-> The results are as below.  'max_pgs' represents the value of the
-> `blkback.max_buffer_pages` parameter.
-> 
->     max_pgs   Min       Max       Median     Avg    Stddev
->     0         417       423       420        419.4  2.5099801
->     1024      414       425       416        417.8  4.4384682
->     No difference proven at 95.0% confidence
-> 
-> In short, even worst case squeezing on ramdisk based fast block device
-> makes no visible performance degradation.  Please note that this is just
-> a very simple and minimal test.  On systems using super-fast block
-> devices and a special I/O workload, the results might be different.  If
-> you have any doubt, test on your machine with your workload to find the
-> optimal squeezing duration for you.
-> 
-> [1] https://www.kernel.org/doc/html/latest/admin-guide/blockdev/ramdisk.html
-> 
-> Signed-off-by: SeongJae Park <sjpark@amazon.de>
-
-Reviewed-by: Roger Pau Monné <roger.pau@citrix.com>
-
-Thanks, and sorry for the delay!
-
-Roger.
+On Thu, Jan 2, 2020 at 11:02 PM Bart Van Assche <bvanassche@acm.org> wrote:
+>
+> On 12/30/19 2:29 AM, Jack Wang wrote:
+> > +int rtrs_srv_reset_rdma_stats(struct rtrs_srv_stats *stats, bool enable)
+> > +{
+> > +     if (enable) {
+> > +             struct rtrs_srv_stats_rdma_stats *r = &stats->rdma_stats;
+> > +
+> > +             memset(r, 0, sizeof(*r));
+> > +             return 0;
+> > +     }
+> > +
+> > +     return -EINVAL;
+> > +}
+>
+> I think the traditional kernel coding style is "if (!enable) return ...".
+This can be changed.
+>
+> > +ssize_t rtrs_srv_stats_rdma_to_str(struct rtrs_srv_stats *stats,
+> > +                                 char *page, size_t len)
+> > +{
+> > +     struct rtrs_srv_stats_rdma_stats *r = &stats->rdma_stats;
+> > +     struct rtrs_srv_sess *sess;
+> > +
+> > +     sess = container_of(stats, typeof(*sess), stats);
+> > +
+> > +     return scnprintf(page, len, "%lld %lld %lld %lld %u\n",
+> > +                      (s64)atomic64_read(&r->dir[READ].cnt),
+> > +                      (s64)atomic64_read(&r->dir[READ].size_total),
+> > +                      (s64)atomic64_read(&r->dir[WRITE].cnt),
+> > +                      (s64)atomic64_read(&r->dir[WRITE].size_total),
+> > +                      atomic_read(&sess->ids_inflight));
+> > +}
+>
+> Does this follow the sysfs one-value-per-file rule?
+We have user space tools already depend on it.
+On the other side one-value-per-file rule is never really enforced,
+see https://lwn.net/Articles/378884/
+I think it doesn't really make sense for the use case.
+>
+> > +int rtrs_srv_stats_wc_completion_to_str(struct rtrs_srv_stats *stats,
+> > +                                      char *buf, size_t len)
+> > +{
+> > +     return snprintf(buf, len, "%lld %lld\n",
+> > +                     (s64)atomic64_read(&stats->wc_comp.total_wc_cnt),
+> > +                     (s64)atomic64_read(&stats->wc_comp.calls));
+> > +}
+>
+> Same comment here.
+See comment above.
+>
+> Thanks,
+>
+> Bart.
+Thanks Bart
