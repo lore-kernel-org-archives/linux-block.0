@@ -2,236 +2,105 @@ Return-Path: <SRS0=At5W=25=vger.kernel.org=linux-block-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-0.8 required=3.0 tests=DKIM_SIGNED,DKIM_VALID,
-	DKIM_VALID_AU,HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SPF_HELO_NONE,
+X-Spam-Status: No, score=-3.5 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
+	HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,
 	SPF_PASS autolearn=no autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 59E18C282DD
-	for <linux-block@archiver.kernel.org>; Wed,  8 Jan 2020 14:22:14 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 9E8E6C282DD
+	for <linux-block@archiver.kernel.org>; Wed,  8 Jan 2020 15:01:09 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.kernel.org (Postfix) with ESMTP id 2270020720
-	for <linux-block@archiver.kernel.org>; Wed,  8 Jan 2020 14:22:14 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id 71811206F0
+	for <linux-block@archiver.kernel.org>; Wed,  8 Jan 2020 15:01:09 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=pass (2048-bit key) header.d=cloud.ionos.com header.i=@cloud.ionos.com header.b="QHW2tlQ5"
+	dkim=fail reason="signature verification failed" (2048-bit key) header.d=infradead.org header.i=@infradead.org header.b="FynjTV8K"
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1726757AbgAHOWN (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Wed, 8 Jan 2020 09:22:13 -0500
-Received: from mail-il1-f194.google.com ([209.85.166.194]:40018 "EHLO
-        mail-il1-f194.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1726466AbgAHOWN (ORCPT
-        <rfc822;linux-block@vger.kernel.org>); Wed, 8 Jan 2020 09:22:13 -0500
-Received: by mail-il1-f194.google.com with SMTP id c4so2793863ilo.7
-        for <linux-block@vger.kernel.org>; Wed, 08 Jan 2020 06:22:12 -0800 (PST)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=cloud.ionos.com; s=google;
-        h=mime-version:references:in-reply-to:from:date:message-id:subject:to
-         :cc;
-        bh=4L0Pdx4M+dUNNcTlTOui4h4we5UqnwVlJk4ErC6HCoY=;
-        b=QHW2tlQ5jxhRzTYnqyTdODJ7Q5VHZnlneCPt3mEOWi01CGMrIIamgeD6I/zZVWs2Tf
-         /JhbtuDYov3ntH8/14x8F2T2YN+COCA2Lxl03iVg6vafuumyJqH8SDtfHVcjB07Op45i
-         FavpBedKvoJQVr3s41M27H3cCUCMAZiAUU96TPxMuk7atfsayqPcR17SHKuXyX9eypH6
-         iK3MgZiUfbsjll3yY3L0QM/uLTISuQxcsJ2Y8xG+nU9Mmc4+QmM58TgWZy5xMGm9DZzI
-         Zr1iqWq904nc7J+60fnqbe5FAus9L/MtPZ3x2jdYUMzZNMf0sP89R8yfNqu4prgj0auq
-         V1qw==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20161025;
-        h=x-gm-message-state:mime-version:references:in-reply-to:from:date
-         :message-id:subject:to:cc;
-        bh=4L0Pdx4M+dUNNcTlTOui4h4we5UqnwVlJk4ErC6HCoY=;
-        b=rJ6JAYuMZRZpdb/3NYejojxht9PRDnyGwrYG5LJD3uX23MNkcYLt7ebYj133MOkZZl
-         T7zGBVrFLqShFMf3FJ592CClNMw2DSPIrIp/hUFm3NPFHG6h7wH1bm+7RDQhsPNMvX20
-         xyrCf4QuC5Q7uRU15C/26479KaNpm99NIXSoakVyePoS0U2DaI8ZejN0Nayo889ItkXS
-         KqS9Hz+tqs+piULefUecki8R62xi2O6V40MSns5SuYgcE2D+4yBQHZBNqM+ranjCGovH
-         CgFKkSyIc1DZCjePdgOfouieZDaydbC/KSMjIcKPoCIamTv7V8qnp7fKcH1/nuED875k
-         FHtg==
-X-Gm-Message-State: APjAAAULesr2HO1hJ612amOx927lbyvkNQ4mIArXbzWxckCwLls9QFKA
-        b6uJjgmXxvkmMMtAw4TBT69cM0Y2xUHAZvhKw6HtwQ==
-X-Google-Smtp-Source: APXvYqxE8DTjI/kYFc6Eod07f6NpDAfu9eUS8dRgkrrNH992e7HubiZpVGbeXDu2qQPUdchvf1qJIGa/WLL0E11MHMU=
-X-Received: by 2002:a05:6e02:4d2:: with SMTP id f18mr3906828ils.54.1578493332379;
- Wed, 08 Jan 2020 06:22:12 -0800 (PST)
+        id S1728378AbgAHPBI (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Wed, 8 Jan 2020 10:01:08 -0500
+Received: from bombadil.infradead.org ([198.137.202.133]:51552 "EHLO
+        bombadil.infradead.org" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S1728219AbgAHPBI (ORCPT
+        <rfc822;linux-block@vger.kernel.org>); Wed, 8 Jan 2020 10:01:08 -0500
+DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed;
+        d=infradead.org; s=bombadil.20170209; h=In-Reply-To:Content-Type:MIME-Version
+        :References:Message-ID:Subject:Cc:To:From:Date:Sender:Reply-To:
+        Content-Transfer-Encoding:Content-ID:Content-Description:Resent-Date:
+        Resent-From:Resent-Sender:Resent-To:Resent-Cc:Resent-Message-ID:List-Id:
+        List-Help:List-Unsubscribe:List-Subscribe:List-Post:List-Owner:List-Archive;
+         bh=yEV5QGTKJfmAEQlA0pFIJS99yfvEeNFsvYRdckWbGg8=; b=FynjTV8KYD8A4OOYY3cEwtGwv
+        7IYOW61UdMX8HZePDqEwHG6e7JXhgpj3um653692zfj/lc+hmM6Aa2g1OcU08aCEDXwZtz9iaSBUt
+        gIBKgYIDxpdtCa13BBxmdcCTZGTQY4r3F3fv1chmMoCmseu990j0sN4ZOjGsmNmBA4rAFVciS6UjO
+        YDXH1nt0t55dw25pXBD0L9WnT/s2A9kn8nJdJnobpoSlz2rlWMOQvdPu4Wtaqjf/VZU52xc6UccA5
+        sU2wVqY4pVgMsPJ5EQy3djpVPEb3cQJftHMdrnisw10VQPiPmTt3oTssGOHWrAYZB8fgq+Tq0pSmJ
+        SSb2mymow==;
+Received: from hch by bombadil.infradead.org with local (Exim 4.92.3 #3 (Red Hat Linux))
+        id 1ipCpW-0006Th-R2; Wed, 08 Jan 2020 15:01:06 +0000
+Date:   Wed, 8 Jan 2020 07:01:06 -0800
+From:   Christoph Hellwig <hch@infradead.org>
+To:     Yufen Yu <yuyufen@huawei.com>
+Cc:     axboe@kernel.dk, linux-block@vger.kernel.org, ming.lei@redhat.com,
+        houtao1@huawei.com, hch@lst.de, yi.zhang@huawei.com,
+        zhengchuan@huawei.com
+Subject: Re: [PATCH] block: cache index instead of part self to avoid
+ use-after-free
+Message-ID: <20200108150106.GA18991@infradead.org>
+References: <20200106073510.10825-1-yuyufen@huawei.com>
 MIME-Version: 1.0
-References: <20191230102942.18395-1-jinpuwang@gmail.com> <20191230102942.18395-18-jinpuwang@gmail.com>
- <aa7eeeda-b3d7-4a26-9043-53ce8c80eef1@acm.org>
-In-Reply-To: <aa7eeeda-b3d7-4a26-9043-53ce8c80eef1@acm.org>
-From:   Jinpu Wang <jinpu.wang@cloud.ionos.com>
-Date:   Wed, 8 Jan 2020 15:22:01 +0100
-Message-ID: <CAMGffEkYVzFJX2=pur7+_gqOsOSiMLpu08Z7eCVs4N3ruz=QWw@mail.gmail.com>
-Subject: Re: [PATCH v6 17/25] rnbd: client: main functionality
-To:     Bart Van Assche <bvanassche@acm.org>
-Cc:     Jack Wang <jinpuwang@gmail.com>, linux-block@vger.kernel.org,
-        linux-rdma@vger.kernel.org, Jens Axboe <axboe@kernel.dk>,
-        Christoph Hellwig <hch@infradead.org>,
-        Sagi Grimberg <sagi@grimberg.me>,
-        Leon Romanovsky <leon@kernel.org>,
-        Doug Ledford <dledford@redhat.com>,
-        Danil Kipnis <danil.kipnis@cloud.ionos.com>, rpenyaev@suse.de
-Content-Type: text/plain; charset="UTF-8"
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <20200106073510.10825-1-yuyufen@huawei.com>
+X-SRS-Rewrite: SMTP reverse-path rewritten from <hch@infradead.org> by bombadil.infradead.org. See http://www.infradead.org/rpr.html
 Sender: linux-block-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-On Fri, Jan 3, 2020 at 12:55 AM Bart Van Assche <bvanassche@acm.org> wrote:
->
-> On 12/30/19 2:29 AM, Jack Wang wrote:
-> > +MODULE_DESCRIPTION("InfiniBand Network Block Device Client");
->
-> InfiniBand or RDMA?
-will fix.
->
-> > +static int rnbd_clt_set_dev_attr(struct rnbd_clt_dev *dev,
-> > +                               const struct rnbd_msg_open_rsp *rsp)
-> > +{
-> > +     struct rnbd_clt_session *sess = dev->sess;
-> > +
-> > +     if (unlikely(!rsp->logical_block_size))
-> > +             return -EINVAL;
-> > +
-> > +     dev->device_id              = le32_to_cpu(rsp->device_id);
-> > +     dev->nsectors               = le64_to_cpu(rsp->nsectors);
-> > +     dev->logical_block_size     = le16_to_cpu(rsp->logical_block_size);
-> > +     dev->physical_block_size    = le16_to_cpu(rsp->physical_block_size);
-> > +     dev->max_write_same_sectors = le32_to_cpu(rsp->max_write_same_sectors);
-> > +     dev->max_discard_sectors    = le32_to_cpu(rsp->max_discard_sectors);
-> > +     dev->discard_granularity    = le32_to_cpu(rsp->discard_granularity);
-> > +     dev->discard_alignment      = le32_to_cpu(rsp->discard_alignment);
-> > +     dev->secure_discard         = le16_to_cpu(rsp->secure_discard);
-> > +     dev->rotational             = rsp->rotational;
-> > +
-> > +     dev->max_hw_sectors = sess->max_io_size / dev->logical_block_size;
->
-> The above statement looks suspicious to me. The unit of the second
-> argument of blk_queue_max_hw_sectors() is 512 bytes. Since
-> dev->max_hw_sectors is passed as the second argument to
-> blk_queue_max_hw_sectors() I think it should also have 512 bytes as unit
-> instead of the logical block size.
-You're right, will fix.
->
-> > +static int rnbd_clt_change_capacity(struct rnbd_clt_dev *dev,
-> > +                                  size_t new_nsectors)
-> > +{
-> > +     int err = 0;
-> > +
-> > +     rnbd_clt_info(dev, "Device size changed from %zu to %zu sectors\n",
-> > +                    dev->nsectors, new_nsectors);
-> > +     dev->nsectors = new_nsectors;
-> > +     set_capacity(dev->gd,
-> > +                  dev->nsectors * (dev->logical_block_size /
-> > +                                   SECTOR_SIZE));
-> > +     err = revalidate_disk(dev->gd);
-> > +     if (err)
-> > +             rnbd_clt_err(dev,
-> > +                           "Failed to change device size from %zu to %zu, err: %d\n",
-> > +                           dev->nsectors, new_nsectors, err);
-> > +     return err;
-> > +}
->
-> Please document the unit of nsectors in struct rnbd_clt_dev. Please also
-> document the unit of the 'new_nsectors' argument.
-will do. The unit of nsectors is 512b.
->
-> > +static void msg_io_conf(void *priv, int errno)
-> > +{
-> > +     struct rnbd_iu *iu = priv;
-> > +     struct rnbd_clt_dev *dev = iu->dev;
-> > +     struct request *rq = iu->rq;
-> > +
-> > +     iu->status = errno ? BLK_STS_IOERR : BLK_STS_OK;
-> > +
-> > +     blk_mq_complete_request(rq);
-> > +
-> > +     if (errno)
-> > +             rnbd_clt_info_rl(dev, "%s I/O failed with err: %d\n",
-> > +                               rq_data_dir(rq) == READ ? "read" : "write",
-> > +                               errno);
-> > +}
->
-> Accessing 'rq' after having called blk_mq_complete_request() may trigger
-> a use-after-free. Please don't do that.
-You are right, will fix.
+On Mon, Jan 06, 2020 at 03:35:10PM +0800, Yufen Yu wrote:
+> When delete partition executes concurrently with IOs issue,
+> it may cause use-after-free on part in disk_map_sector_rcu()
+> as following:
+> 
+> blk_account_io_start(req1)  delete_partition  blk_account_io_start(req2)
+> 
+> rcu_read_lock()
+> disk_map_sector_rcu
+> part = rcu_dereference(ptbl->part[4])
+>                            rcu_assign_pointer(ptbl->part[4], NULL);
+>                            rcu_assign_pointer(ptbl->last_lookup, NULL);
+> rcu_assign_pointer(ptbl->last_lookup, part);
+> 
+>                            hd_struct_kill(part)
+> !hd_struct_try_get
+>   part = &rq->rq_disk->part0;
+> rcu_read_unlock()
+>                            __delete_partition
+>                            call_rcu
+>                                             rcu_read_lock
+>                                             disk_map_sector_rcu
+>                                             part = rcu_dereference(ptbl->last_lookup);
+> 
+>                            delete_partition_work_fn
+>                            free(part)
+>                                             hd_struct_try_get(part)
+>                                             BUG_ON use-after-free
+> 
+> req1 try to get 'ptbl->part[4]', while the part is beening
+> deleted. Although the delete_partition() will set last_lookup
+> as NULL, req1 can overwrite it as 'part[4]' again.
+> 
+> After calling call_rcu() and free() for the part, req2 can
+> access the part by last_lookup, resulting in use after free.
+> 
+> In fact, this bug has been reported by syzbot:
+>     https://lkml.org/lkml/2019/1/4/357
+> 
+> To fix the bug, we try to cache index of part[] instead of
+> part[i] itself in last_lookup. Even if the index may been
+> re-assign, others can either get part[i] as value of NULL,
+> or get the new allocated part[i] after call_rcu. Both of
+> them is okay.
+> 
+> Signed-off-by: Yufen Yu <yuyufen@huawei.com>
 
->
-> > +static void wait_for_rtrs_disconnection(struct rnbd_clt_session *sess)
-> > +__releases(&sess_lock)
-> > +__acquires(&sess_lock)
->
-> Please indent __releases() and __acquires() annotations.
-ok.
+Looks good,
 
-
->
-> > +static int setup_mq_tags(struct rnbd_clt_session *sess)
-> > +{
-> > +     struct blk_mq_tag_set *tags = &sess->tag_set;
-> > +
-> > +     memset(tags, 0, sizeof(*tags));
-> > +     tags->ops               = &rnbd_mq_ops;
-> > +     tags->queue_depth       = sess->queue_depth;
-> > +     tags->numa_node         = NUMA_NO_NODE;
-> > +     tags->flags             = BLK_MQ_F_SHOULD_MERGE |
-> > +                               BLK_MQ_F_TAG_SHARED;
-> > +     tags->cmd_size          = sizeof(struct rnbd_iu);
-> > +     tags->nr_hw_queues      = num_online_cpus();
-> > +
-> > +     return blk_mq_alloc_tag_set(tags);
-> > +}
->
-> Please change the name of the "tags" pointer into "tag_set".
-ok.
->
-> > +static int index_to_minor(int index)
-> > +{
-> > +     return index << RNBD_PART_BITS;
-> > +}
-> > +
-> > +static int minor_to_index(int minor)
-> > +{
-> > +     return minor >> RNBD_PART_BITS;
-> > +}
->
-> Is it useful to introduce functions that encapsulate a single shift
-> operation?
-can be dropped, althrough it's common to do it this way, plenty of
-examples in kernel tree.
->
-> > +     blk_queue_virt_boundary(dev->queue, 4095);
->
-> The virt_boundary parameter must match the RDMA memory registration page
-> size. Please introduce a symbolic constant for the RDMA memory
-> registration page size such that these two parameters stay in sync in
-> case anyone would want to change the memory registration page size.
->
-> > +static void rnbd_clt_setup_gen_disk(struct rnbd_clt_dev *dev, int idx)
-> > +{
-> > +     dev->gd->major          = rnbd_client_major;
-> > +     dev->gd->first_minor    = index_to_minor(idx);
-> > +     dev->gd->fops           = &rnbd_client_ops;
-> > +     dev->gd->queue          = dev->queue;
-> > +     dev->gd->private_data   = dev;
-> > +     snprintf(dev->gd->disk_name, sizeof(dev->gd->disk_name), "rnbd%d",
-> > +              idx);
-> > +     pr_debug("disk_name=%s, capacity=%zu\n",
-> > +              dev->gd->disk_name,
-> > +              dev->nsectors * (dev->logical_block_size / SECTOR_SIZE)
-> > +              );
-> > +
-> > +     set_capacity(dev->gd, dev->nsectors * (dev->logical_block_size /
-> > +                                            SECTOR_SIZE));
->
-> Again, what is the unit of dev->nsectors?
-The unit is 512b, I will remove the multipler, in most of the case
-logical_block_size is SECTOR_SIZE.
->
-> > +static void rnbd_clt_add_gen_disk(struct rnbd_clt_dev *dev)
-> > +{
-> > +     add_disk(dev->gd);
-> > +}
->
-> Is it useful to introduce this wrapper around add_disk()?
-will remove the wrapper.
-
->
-> Thanks,
->
-> Bart.
-Thanks Bart.
+Reviewed-by: Christoph Hellwig <hch@lst.de>
