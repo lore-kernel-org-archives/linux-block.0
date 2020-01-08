@@ -2,89 +2,111 @@ Return-Path: <SRS0=At5W=25=vger.kernel.org=linux-block-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-2.2 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
-	MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,USER_AGENT_SANE_1 autolearn=no
-	autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-0.8 required=3.0 tests=DKIMWL_WL_HIGH,DKIM_SIGNED,
+	DKIM_VALID,DKIM_VALID_AU,HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,
+	SPF_HELO_NONE,SPF_PASS,UNPARSEABLE_RELAY autolearn=no autolearn_force=no
+	version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 75C18C33C99
-	for <linux-block@archiver.kernel.org>; Wed,  8 Jan 2020 03:05:30 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 35DE7C33C99
+	for <linux-block@archiver.kernel.org>; Wed,  8 Jan 2020 03:15:18 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.kernel.org (Postfix) with ESMTP id 50C2A2075A
-	for <linux-block@archiver.kernel.org>; Wed,  8 Jan 2020 03:05:30 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id 0A3B22077B
+	for <linux-block@archiver.kernel.org>; Wed,  8 Jan 2020 03:15:18 +0000 (UTC)
+Authentication-Results: mail.kernel.org;
+	dkim=pass (2048-bit key) header.d=oracle.com header.i=@oracle.com header.b="Jsk8wxeS"
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1726142AbgAHDF3 (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Tue, 7 Jan 2020 22:05:29 -0500
-Received: from mail-pg1-f178.google.com ([209.85.215.178]:45378 "EHLO
-        mail-pg1-f178.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1725812AbgAHDF3 (ORCPT
-        <rfc822;linux-block@vger.kernel.org>); Tue, 7 Jan 2020 22:05:29 -0500
-Received: by mail-pg1-f178.google.com with SMTP id b9so809675pgk.12
-        for <linux-block@vger.kernel.org>; Tue, 07 Jan 2020 19:05:29 -0800 (PST)
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20161025;
-        h=x-gm-message-state:subject:to:cc:references:from:autocrypt
-         :message-id:date:user-agent:mime-version:in-reply-to
-         :content-language:content-transfer-encoding;
-        bh=CZKkmKEIa+mseeeTLJLTyVKbG95SB3g8gb5JIIBRux4=;
-        b=gUCF34MmnbvOY+54FG3VSHrmtWKwUkJ4lieA2rrVO6ZqxnHBdtG9TT3EICpcom75Nf
-         N2jfX129o7LM5kM9eqg5l/OnRaE6YOINeWp8QUAuOYcTy40t1zPm3ZfMW6n6Yj4ESaCJ
-         RBHbEi+Mw+e8Pl9ga5M1qOPGqYNiKN8Q8MjkmXxs5HtaRIYKSAj+4rTSmyNCOnHjglSw
-         F0/d1SLi9ElMJyHudy6BG7IJYrtq+rDpRheLcutAPbN0pofL3MIf/xLx0fvDILsuGURd
-         CJktB3x1Us/dOpnUT2VFr97IsDdpGG4FWmw66c1XOpR/PrWWuP4r31ujsQZxBqRKR8mC
-         9nXA==
-X-Gm-Message-State: APjAAAWRMZv1YaticLQuxR6J0LyiScxiu9zSWd1BaopC9Yewh73GG5hK
-        oZdpRjgzpTREVWK5OgH3bzk=
-X-Google-Smtp-Source: APXvYqwMrwiZlHSjiRBGy3L1v8zvYBSKKFZTWkcj2sIztEd8Omcz5n3YoaE6zBf6rzzJxcmgGzfTIA==
-X-Received: by 2002:a62:f247:: with SMTP id y7mr2737140pfl.5.1578452728883;
-        Tue, 07 Jan 2020 19:05:28 -0800 (PST)
-Received: from ?IPv6:2601:647:4000:13e0:5954:1854:c34a:9e99? ([2601:647:4000:13e0:5954:1854:c34a:9e99])
-        by smtp.gmail.com with ESMTPSA id b4sm1048923pfd.18.2020.01.07.19.05.27
-        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
-        Tue, 07 Jan 2020 19:05:27 -0800 (PST)
-Subject: Re: [PATCH] docs: block/biovecs: update the location of bio.c
-To:     jgq516@gmail.com, axboe@kernel.dk, corbet@lwn.net
-Cc:     linux-block@vger.kernel.org,
-        Guoqing Jiang <guoqing.jiang@cloud.ionos.com>
-References: <20200106103735.10327-1-guoqing.jiang@cloud.ionos.com>
-From:   Bart Van Assche <bvanassche@acm.org>
-Autocrypt: addr=bvanassche@acm.org; prefer-encrypt=mutual; keydata=
- mQENBFSOu4oBCADcRWxVUvkkvRmmwTwIjIJvZOu6wNm+dz5AF4z0FHW2KNZL3oheO3P8UZWr
- LQOrCfRcK8e/sIs2Y2D3Lg/SL7qqbMehGEYcJptu6mKkywBfoYbtBkVoJ/jQsi2H0vBiiCOy
- fmxMHIPcYxaJdXxrOG2UO4B60Y/BzE6OrPDT44w4cZA9DH5xialliWU447Bts8TJNa3lZKS1
- AvW1ZklbvJfAJJAwzDih35LxU2fcWbmhPa7EO2DCv/LM1B10GBB/oQB5kvlq4aA2PSIWkqz4
- 3SI5kCPSsygD6wKnbRsvNn2mIACva6VHdm62A7xel5dJRfpQjXj2snd1F/YNoNc66UUTABEB
- AAG0JEJhcnQgVmFuIEFzc2NoZSA8YnZhbmFzc2NoZUBhY20ub3JnPokBOQQTAQIAIwUCVI67
- igIbAwcLCQgHAwIBBhUIAgkKCwQWAgMBAh4BAheAAAoJEHFcPTXFzhAJ8QkH/1AdXblKL65M
- Y1Zk1bYKnkAb4a98LxCPm/pJBilvci6boefwlBDZ2NZuuYWYgyrehMB5H+q+Kq4P0IBbTqTa
- jTPAANn62A6jwJ0FnCn6YaM9TZQjM1F7LoDX3v+oAkaoXuq0dQ4hnxQNu792bi6QyVdZUvKc
- macVFVgfK9n04mL7RzjO3f+X4midKt/s+G+IPr4DGlrq+WH27eDbpUR3aYRk8EgbgGKvQFdD
- CEBFJi+5ZKOArmJVBSk21RHDpqyz6Vit3rjep7c1SN8s7NhVi9cjkKmMDM7KYhXkWc10lKx2
- RTkFI30rkDm4U+JpdAd2+tP3tjGf9AyGGinpzE2XY1K5AQ0EVI67igEIAKiSyd0nECrgz+H5
- PcFDGYQpGDMTl8MOPCKw/F3diXPuj2eql4xSbAdbUCJzk2ETif5s3twT2ER8cUTEVOaCEUY3
- eOiaFgQ+nGLx4BXqqGewikPJCe+UBjFnH1m2/IFn4T9jPZkV8xlkKmDUqMK5EV9n3eQLkn5g
- lco+FepTtmbkSCCjd91EfThVbNYpVQ5ZjdBCXN66CKyJDMJ85HVr5rmXG/nqriTh6cv1l1Js
- T7AFvvPjUPknS6d+BETMhTkbGzoyS+sywEsQAgA+BMCxBH4LvUmHYhpS+W6CiZ3ZMxjO8Hgc
- ++w1mLeRUvda3i4/U8wDT3SWuHcB3DWlcppECLkAEQEAAYkBHwQYAQIACQUCVI67igIbDAAK
- CRBxXD01xc4QCZ4dB/0QrnEasxjM0PGeXK5hcZMT9Eo998alUfn5XU0RQDYdwp6/kMEXMdmT
- oH0F0xB3SQ8WVSXA9rrc4EBvZruWQ+5/zjVrhhfUAx12CzL4oQ9Ro2k45daYaonKTANYG22y
- //x8dLe2Fv1By4SKGhmzwH87uXxbTJAUxiWIi1np0z3/RDnoVyfmfbbL1DY7zf2hYXLLzsJR
- mSsED/1nlJ9Oq5fALdNEPgDyPUerqHxcmIub+pF0AzJoYHK5punqpqfGmqPbjxrJLPJfHVKy
- goMj5DlBMoYqEgpbwdUYkH6QdizJJCur4icy8GUNbisFYABeoJ91pnD4IGei3MTdvINSZI5e
-Message-ID: <a6abb135-6d8d-be40-f02e-e5a0b83bb3dd@acm.org>
-Date:   Tue, 7 Jan 2020 19:05:26 -0800
-User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:68.0) Gecko/20100101
- Thunderbird/68.3.0
+        id S1726145AbgAHDPR (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Tue, 7 Jan 2020 22:15:17 -0500
+Received: from aserp2120.oracle.com ([141.146.126.78]:33570 "EHLO
+        aserp2120.oracle.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S1726142AbgAHDPR (ORCPT
+        <rfc822;linux-block@vger.kernel.org>); Tue, 7 Jan 2020 22:15:17 -0500
+Received: from pps.filterd (aserp2120.oracle.com [127.0.0.1])
+        by aserp2120.oracle.com (8.16.0.27/8.16.0.27) with SMTP id 0083E0SP178705;
+        Wed, 8 Jan 2020 03:15:06 GMT
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=oracle.com; h=to : cc : subject :
+ from : references : date : in-reply-to : message-id : mime-version :
+ content-type; s=corp-2019-08-05;
+ bh=+X7244jpapKxrqPEWzosk7cJiMl5l1y/5kwgs4R54Jg=;
+ b=Jsk8wxeSumG4zqIRod6RF1QmCjb6BdUEd9yI38DdyjQo5/s6AUvzSDJnJ2Nc/fAUizlu
+ 33/NgFhb1O1vBcg4FuX+WoAtNC36NUB4BRfyoHyHrW1WqnLjswyfoKBZravL6TdbYsEK
+ qjoXOPXp5Pbhxh6U0c/Sqaha374DcxSFkC5pHrl8Rcc6APpM3sBrsnQ0tKHdVrhfOl+c
+ nBcpWapTiU+TIfW779hxJFYifh6WChtrTPh7SQwtlRzhGY7hBRipTcgRspmjyEYI0d9B
+ YwwJAPCTtpqPXTx5wc2HVQG228CXEmJZjkR1gWzbAL+KVz9JQeGpBBPpSw75pR+pUI6J HA== 
+Received: from aserp3030.oracle.com (aserp3030.oracle.com [141.146.126.71])
+        by aserp2120.oracle.com with ESMTP id 2xajnq193a-1
+        (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=OK);
+        Wed, 08 Jan 2020 03:15:05 +0000
+Received: from pps.filterd (aserp3030.oracle.com [127.0.0.1])
+        by aserp3030.oracle.com (8.16.0.27/8.16.0.27) with SMTP id 0083DqJD025975;
+        Wed, 8 Jan 2020 03:15:05 GMT
+Received: from userv0122.oracle.com (userv0122.oracle.com [156.151.31.75])
+        by aserp3030.oracle.com with ESMTP id 2xcpanw421-1
+        (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=OK);
+        Wed, 08 Jan 2020 03:15:05 +0000
+Received: from abhmp0003.oracle.com (abhmp0003.oracle.com [141.146.116.9])
+        by userv0122.oracle.com (8.14.4/8.14.4) with ESMTP id 0083F3Gf025536;
+        Wed, 8 Jan 2020 03:15:03 GMT
+Received: from ca-mkp.ca.oracle.com (/10.159.214.123)
+        by default (Oracle Beehive Gateway v4.0)
+        with ESMTP ; Tue, 07 Jan 2020 19:15:03 -0800
+To:     "Singh\, Balbir" <sblbir@amazon.com>
+Cc:     "martin.petersen\@oracle.com" <martin.petersen@oracle.com>,
+        "linux-kernel\@vger.kernel.org" <linux-kernel@vger.kernel.org>,
+        "linux-block\@vger.kernel.org" <linux-block@vger.kernel.org>,
+        "Sangaraju\, Someswarudu" <ssomesh@amazon.com>,
+        "jejb\@linux.ibm.com" <jejb@linux.ibm.com>,
+        "hch\@lst.de" <hch@lst.de>, "axboe\@kernel.dk" <axboe@kernel.dk>,
+        "mst\@redhat.com" <mst@redhat.com>,
+        "linux-nvme\@lists.infradead.org" <linux-nvme@lists.infradead.org>,
+        "Chaitanya.Kulkarni\@wdc.com" <Chaitanya.Kulkarni@wdc.com>
+Subject: Re: [resend v1 5/5] drivers/scsi/sd.c: Convert to use disk_set_capacity
+From:   "Martin K. Petersen" <martin.petersen@oracle.com>
+Organization: Oracle Corporation
+References: <20200102075315.22652-1-sblbir@amazon.com>
+        <20200102075315.22652-6-sblbir@amazon.com>
+        <yq1blrg2agh.fsf@oracle.com>
+        <bc0575f1bb565f3955a411032f97163b2a5bd832.camel@amazon.com>
+Date:   Tue, 07 Jan 2020 22:15:00 -0500
+In-Reply-To: <bc0575f1bb565f3955a411032f97163b2a5bd832.camel@amazon.com>
+        (Balbir Singh's message of "Tue, 7 Jan 2020 22:28:29 +0000")
+Message-ID: <yq1blre1vwr.fsf@oracle.com>
+User-Agent: Gnus/5.13 (Gnus v5.13) Emacs/26.1.92 (gnu/linux)
 MIME-Version: 1.0
-In-Reply-To: <20200106103735.10327-1-guoqing.jiang@cloud.ionos.com>
-Content-Type: text/plain; charset=utf-8
-Content-Language: en-US
-Content-Transfer-Encoding: 7bit
+Content-Type: text/plain
+X-Proofpoint-Virus-Version: vendor=nai engine=6000 definitions=9493 signatures=668685
+X-Proofpoint-Spam-Details: rule=notspam policy=default score=0 suspectscore=0 malwarescore=0
+ phishscore=0 bulkscore=0 spamscore=0 mlxscore=0 mlxlogscore=933
+ adultscore=0 classifier=spam adjust=0 reason=mlx scancount=1
+ engine=8.0.1-1911140001 definitions=main-2001080026
+X-Proofpoint-Virus-Version: vendor=nai engine=6000 definitions=9493 signatures=668685
+X-Proofpoint-Spam-Details: rule=notspam policy=default score=0 priorityscore=1501 malwarescore=0
+ suspectscore=0 phishscore=0 bulkscore=0 spamscore=0 clxscore=1015
+ lowpriorityscore=0 mlxscore=0 impostorscore=0 mlxlogscore=994 adultscore=0
+ classifier=spam adjust=0 reason=mlx scancount=1 engine=8.0.1-1911140001
+ definitions=main-2001080026
 Sender: linux-block-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-On 2020-01-06 02:37, jgq516@gmail.com wrote:
-> Replace fs with block since bio.c had been moved to block folder.
 
-Reviewed-by: Bart Van Assche <bvanassche@acm.org>
+Balbir,
+
+>> We already emit an SDEV_EVT_CAPACITY_CHANGE_REPORTED event if device
+>> capacity changes. However, this event does not automatically cause
+>> revalidation.
+>
+> The proposed idea is to not reinforce revalidation, unless explictly
+> specified (in the thread before Bob Liu had suggestions). The goal is
+> to notify user space of changes via RESIZE. SCSI sd can opt out of
+> this IOW, I can remove this if you feel
+> SDEV_EVT_CAPACITY_CHANGE_REPORTED is sufficient for current use cases.
+
+I have no particular objection to the code change. I was just observing
+that in the context of sd.c, RESIZE=1 is more of a "your request to
+resize was successful" notification due to the requirement of an
+explicit userland action in case a device reports a capacity change.
+
+-- 
+Martin K. Petersen	Oracle Linux Engineering
