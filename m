@@ -6,175 +6,232 @@ X-Spam-Status: No, score=-0.8 required=3.0 tests=DKIM_SIGNED,DKIM_VALID,
 	DKIM_VALID_AU,HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SPF_HELO_NONE,
 	SPF_PASS autolearn=no autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 3FD52C33CA2
-	for <linux-block@archiver.kernel.org>; Wed,  8 Jan 2020 14:09:45 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 59E18C282DD
+	for <linux-block@archiver.kernel.org>; Wed,  8 Jan 2020 14:22:14 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.kernel.org (Postfix) with ESMTP id 0859B2070E
-	for <linux-block@archiver.kernel.org>; Wed,  8 Jan 2020 14:09:44 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id 2270020720
+	for <linux-block@archiver.kernel.org>; Wed,  8 Jan 2020 14:22:14 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=pass (1024-bit key) header.d=fb.com header.i=@fb.com header.b="V0lhkCoa";
-	dkim=pass (1024-bit key) header.d=fb.onmicrosoft.com header.i=@fb.onmicrosoft.com header.b="IRFi9BCx"
+	dkim=pass (2048-bit key) header.d=cloud.ionos.com header.i=@cloud.ionos.com header.b="QHW2tlQ5"
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1727606AbgAHOJo (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Wed, 8 Jan 2020 09:09:44 -0500
-Received: from mx0a-00082601.pphosted.com ([67.231.145.42]:27650 "EHLO
-        mx0a-00082601.pphosted.com" rhost-flags-OK-OK-OK-OK)
-        by vger.kernel.org with ESMTP id S1726708AbgAHOJo (ORCPT
-        <rfc822;linux-block@vger.kernel.org>);
-        Wed, 8 Jan 2020 09:09:44 -0500
-Received: from pps.filterd (m0044010.ppops.net [127.0.0.1])
-        by mx0a-00082601.pphosted.com (8.16.0.42/8.16.0.42) with SMTP id 008E3JFT029828;
-        Wed, 8 Jan 2020 06:09:29 -0800
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=fb.com; h=from : to : cc : subject
- : date : message-id : references : in-reply-to : content-type :
- content-transfer-encoding : mime-version; s=facebook;
- bh=hP8SA3oZBom72jdiBimMfphYUPD0R7ylGX4dbij5sD8=;
- b=V0lhkCoaWvrxGaEy797GeEvkSw0YWjmFbefdmvSXuq+bGS3KELfJcmNz5cwCA9lnF/Si
- W1Bs+36QNx2UFRCp+vu8+JVGKVqLiDzb2SnnoqsJNMGspHaAyvznrs08sDpqWkfLUEdC
- Rm8ewsZd5H1rWW2jyPXf0Au1YG5rJfX0RsI= 
-Received: from mail.thefacebook.com (mailout.thefacebook.com [199.201.64.23])
-        by mx0a-00082601.pphosted.com with ESMTP id 2xd2ac3umg-1
-        (version=TLSv1.2 cipher=ECDHE-RSA-AES256-SHA384 bits=256 verify=NOT);
-        Wed, 08 Jan 2020 06:09:28 -0800
-Received: from prn-hub02.TheFacebook.com (2620:10d:c081:35::126) by
- prn-hub01.TheFacebook.com (2620:10d:c081:35::125) with Microsoft SMTP Server
- (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_CBC_SHA384) id
- 15.1.1713.5; Wed, 8 Jan 2020 06:09:28 -0800
-Received: from NAM02-SN1-obe.outbound.protection.outlook.com (192.168.54.28)
- by o365-in.thefacebook.com (192.168.16.26) with Microsoft SMTP Server
- (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_CBC_SHA384) id 15.1.1713.5
- via Frontend Transport; Wed, 8 Jan 2020 06:09:28 -0800
-ARC-Seal: i=1; a=rsa-sha256; s=arcselector9901; d=microsoft.com; cv=none;
- b=nrDDeTa2QMkKOZuASdJ9XBNRT1AedD/qxLUCzG4zrpRJbNsly9O5fLBexZhjOk+srm5kjQtWsIu6JfNuAa3BZg8ifRnQlYeCLjhuc4YYN0MTGmXowvV0Q2/IVDr4Ksrv/D9NHF9w8j64RiR95R0cbqmK4aP7/37uu9DPn1EKg+IzWIN6EiOuLG1lpiMUhuU1J4b2nJdhe08i45nOjRAgcTwG+BGKw2+Bf6ESBOuy0qDybEGqGEAdaRbAqHwI5N0vlxcgU7D4e6QXKJz+c7S15ina50ou4CReb29EY9SxggTO33e2/M5I2dTxPOILEDBkTO3jXbQ75x2HZPKxrPik8w==
-ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com;
- s=arcselector9901;
- h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
- bh=hP8SA3oZBom72jdiBimMfphYUPD0R7ylGX4dbij5sD8=;
- b=JgoCSG7OsALOcd8c3hbhPEpdVk2rrJB1gK19mLJGAJDgurEjfQey245RoO7Cp/MuGFM22mRF7oFbvZioPjQb2Yvz/CgLsh8v60v3gisqE5JqZ8h0K258+9DBeep3ho9t/0f+f/g/wpfCd7qEGo0FMtNQ+tOxtotmqIcNw2VGuw3HOOedcoYf+T6r40yZ6fgwKP4pk7RLwJVTkcbhl+HMjjcbRsCOo7G5iPFRngd5k2pyyPB4b5VkINBuU7r1Y4/hF1ljcSUsexJmltoRNY7XVJdcvEDyKm9tmCWb1Cj33453i0MKb7GdQZYg4GcIO8CWVHThw1cj/TrnLt0wWbit7g==
-ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass
- smtp.mailfrom=fb.com; dmarc=pass action=none header.from=fb.com; dkim=pass
- header.d=fb.com; arc=none
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=fb.onmicrosoft.com;
- s=selector2-fb-onmicrosoft-com;
- h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
- bh=hP8SA3oZBom72jdiBimMfphYUPD0R7ylGX4dbij5sD8=;
- b=IRFi9BCxvwcSIaPJyKmJaOV2EoUlRU2ZX+U5gvT9Uek0pm1QuLxklSo54lcyHrhW/ZjqpKMtQ0iQMDceB5FE5hiPbYS2v2r1WeetIdXQ5H8WLcED5jNcUh4/n5ALeMhX36OBhH8mKMEPRu1TfaFscnaEiOQALVkSHZgsC9p8Hwk=
-Received: from SN6PR15MB2446.namprd15.prod.outlook.com (52.135.64.153) by
- SN6PR15MB2208.namprd15.prod.outlook.com (52.132.125.28) with Microsoft SMTP
- Server (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
- 15.20.2623.9; Wed, 8 Jan 2020 14:09:13 +0000
-Received: from SN6PR15MB2446.namprd15.prod.outlook.com
- ([fe80::615e:4236:ddfa:3d10]) by SN6PR15MB2446.namprd15.prod.outlook.com
- ([fe80::615e:4236:ddfa:3d10%6]) with mapi id 15.20.2602.016; Wed, 8 Jan 2020
- 14:09:13 +0000
-Received: from [172.30.74.107] (2620:10d:c091:480::89ea) by MN2PR01CA0019.prod.exchangelabs.com (2603:10b6:208:10c::32) with Microsoft SMTP Server (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.2623.9 via Frontend Transport; Wed, 8 Jan 2020 14:09:11 +0000
-From:   Chris Mason <clm@fb.com>
-To:     Christoph Hellwig <hch@infradead.org>
-CC:     Dave Chinner <david@fromorbit.com>, Jens Axboe <axboe@kernel.dk>,
-        "Linus Torvalds" <torvalds@linux-foundation.org>,
-        Linux-MM <linux-mm@kvack.org>,
-        linux-fsdevel <linux-fsdevel@vger.kernel.org>,
-        linux-block <linux-block@vger.kernel.org>,
-        Matthew Wilcox <willy@infradead.org>,
-        "Johannes Weiner" <hannes@cmpxchg.org>
-Subject: Re: [PATCHSET v3 0/5] Support for RWF_UNCACHED
-Thread-Topic: [PATCHSET v3 0/5] Support for RWF_UNCACHED
-Thread-Index: AQHVsDfZCAhJpFV97UaB5wo39Jtv8ae1MtkAgAAFQoCAABuEAIAACAuAgAABbACAAALSAIAAOMgAgAAYaQCAAWKTAP//4lWAgCitGACAAVbbgA==
-Date:   Wed, 8 Jan 2020 14:09:12 +0000
-Message-ID: <E1435F53-D5B9-49D0-B207-20F0D21AAFCE@fb.com>
-References: <CAHk-=wjz3LE1kznro1dozhk9i9Dr4pCnkj7Fuccn2xdWeGHawQ@mail.gmail.com>
- <d0adcde2-3106-4fea-c047-4d17111bab70@kernel.dk>
- <e43a2700-8625-e136-dc9d-d0d2da5d96ac@kernel.dk>
- <CAHk-=wje8i3DVcO=fMC4tzKTS5+eHv0anrVZa_JENQt08T=qCQ@mail.gmail.com>
- <0d4e3954-c467-30a7-5a8e-7c4180275533@kernel.dk>
- <CAHk-=whk4bcVPvtAv5OmHiW5z6AXgCLFhO4YrXD7o0XC+K-aHw@mail.gmail.com>
- <fef996ca-a4ed-9633-1f79-91292a984a20@kernel.dk>
- <e7fc6b37-8106-4fe2-479c-05c3f2b1c1f1@kernel.dk>
- <20191212221818.GG19213@dread.disaster.area>
- <C08B7F86-C3D6-47C6-AB17-6F234EA33687@fb.com>
- <20200107174202.GA8938@infradead.org>
-In-Reply-To: <20200107174202.GA8938@infradead.org>
-Accept-Language: en-US
-Content-Language: en-US
-X-MS-Has-Attach: 
-X-MS-TNEF-Correlator: 
-x-mailer: MailMate (1.13.1r5671)
-x-clientproxiedby: MN2PR01CA0019.prod.exchangelabs.com (2603:10b6:208:10c::32)
- To SN6PR15MB2446.namprd15.prod.outlook.com (2603:10b6:805:22::25)
-x-ms-exchange-messagesentrepresentingtype: 1
-x-originating-ip: [2620:10d:c091:480::89ea]
-x-ms-publictraffictype: Email
-x-ms-office365-filtering-correlation-id: 9a502c35-2322-47fb-1632-08d79444568c
-x-ms-traffictypediagnostic: SN6PR15MB2208:
-x-microsoft-antispam-prvs: <SN6PR15MB2208CC887130539BB5F19A1ED33E0@SN6PR15MB2208.namprd15.prod.outlook.com>
-x-ms-oob-tlc-oobclassifiers: OLM:8882;
-x-forefront-prvs: 02760F0D1C
-x-forefront-antispam-report: SFV:NSPM;SFS:(10019020)(366004)(136003)(39860400002)(346002)(376002)(396003)(189003)(199004)(8676002)(81166006)(316002)(86362001)(5660300002)(6486002)(54906003)(8936002)(2906002)(36756003)(81156014)(66446008)(64756008)(66476007)(66556008)(66946007)(16526019)(2616005)(186003)(53546011)(4326008)(52116002)(478600001)(71200400001)(33656002)(6916009);DIR:OUT;SFP:1102;SCL:1;SRVR:SN6PR15MB2208;H:SN6PR15MB2446.namprd15.prod.outlook.com;FPR:;SPF:None;LANG:en;PTR:InfoNoRecords;MX:1;A:1;
-received-spf: None (protection.outlook.com: fb.com does not designate
- permitted sender hosts)
-x-ms-exchange-senderadcheck: 1
-x-microsoft-antispam: BCL:0;
-x-microsoft-antispam-message-info: tKIU5/hZoNi3pCFObZe5JN9XcpFWMkAy18Y5cXY+Wx3BWeVvBStybOBArF4/yxwpygrFHBRZtLIlMhrC7fZlB548MKIGfzelp0JUle6Trj8upBgq9Bk7iKVbyXo5adPvgxdmtFX0vz8c9Km+1Q//WiKgygrup7RMcOtCYnL7SvCpUHvn0zb6609VeZA0UfwEK2+C4wQfoNim9P4RrLa/xyfWTQd4Thizhyf5QBC1rhKVCOKNbtiRMBGgqyKR1XFkNsVnW++vdA6qojPSM3lfBV63ddWYPWmA2B7fR6XyJ4KyjM/AlL4DsC1fgNHaMSnTwCf8UzydoERnNa0rBr/LnohuFt0lE6zOm2mXE2jE9smssjPAZwentrNjTTN3a7+DX16Wa8AJav77+dw3b2g/RhS7SZFD4rOF907zsAoGmV9a2dtntwY+RjKa8JiA+hW7
-x-ms-exchange-transport-forked: True
-Content-Type: text/plain; charset="iso-8859-1"
-Content-Transfer-Encoding: quoted-printable
+        id S1726757AbgAHOWN (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Wed, 8 Jan 2020 09:22:13 -0500
+Received: from mail-il1-f194.google.com ([209.85.166.194]:40018 "EHLO
+        mail-il1-f194.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S1726466AbgAHOWN (ORCPT
+        <rfc822;linux-block@vger.kernel.org>); Wed, 8 Jan 2020 09:22:13 -0500
+Received: by mail-il1-f194.google.com with SMTP id c4so2793863ilo.7
+        for <linux-block@vger.kernel.org>; Wed, 08 Jan 2020 06:22:12 -0800 (PST)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=cloud.ionos.com; s=google;
+        h=mime-version:references:in-reply-to:from:date:message-id:subject:to
+         :cc;
+        bh=4L0Pdx4M+dUNNcTlTOui4h4we5UqnwVlJk4ErC6HCoY=;
+        b=QHW2tlQ5jxhRzTYnqyTdODJ7Q5VHZnlneCPt3mEOWi01CGMrIIamgeD6I/zZVWs2Tf
+         /JhbtuDYov3ntH8/14x8F2T2YN+COCA2Lxl03iVg6vafuumyJqH8SDtfHVcjB07Op45i
+         FavpBedKvoJQVr3s41M27H3cCUCMAZiAUU96TPxMuk7atfsayqPcR17SHKuXyX9eypH6
+         iK3MgZiUfbsjll3yY3L0QM/uLTISuQxcsJ2Y8xG+nU9Mmc4+QmM58TgWZy5xMGm9DZzI
+         Zr1iqWq904nc7J+60fnqbe5FAus9L/MtPZ3x2jdYUMzZNMf0sP89R8yfNqu4prgj0auq
+         V1qw==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20161025;
+        h=x-gm-message-state:mime-version:references:in-reply-to:from:date
+         :message-id:subject:to:cc;
+        bh=4L0Pdx4M+dUNNcTlTOui4h4we5UqnwVlJk4ErC6HCoY=;
+        b=rJ6JAYuMZRZpdb/3NYejojxht9PRDnyGwrYG5LJD3uX23MNkcYLt7ebYj133MOkZZl
+         T7zGBVrFLqShFMf3FJ592CClNMw2DSPIrIp/hUFm3NPFHG6h7wH1bm+7RDQhsPNMvX20
+         xyrCf4QuC5Q7uRU15C/26479KaNpm99NIXSoakVyePoS0U2DaI8ZejN0Nayo889ItkXS
+         KqS9Hz+tqs+piULefUecki8R62xi2O6V40MSns5SuYgcE2D+4yBQHZBNqM+ranjCGovH
+         CgFKkSyIc1DZCjePdgOfouieZDaydbC/KSMjIcKPoCIamTv7V8qnp7fKcH1/nuED875k
+         FHtg==
+X-Gm-Message-State: APjAAAULesr2HO1hJ612amOx927lbyvkNQ4mIArXbzWxckCwLls9QFKA
+        b6uJjgmXxvkmMMtAw4TBT69cM0Y2xUHAZvhKw6HtwQ==
+X-Google-Smtp-Source: APXvYqxE8DTjI/kYFc6Eod07f6NpDAfu9eUS8dRgkrrNH992e7HubiZpVGbeXDu2qQPUdchvf1qJIGa/WLL0E11MHMU=
+X-Received: by 2002:a05:6e02:4d2:: with SMTP id f18mr3906828ils.54.1578493332379;
+ Wed, 08 Jan 2020 06:22:12 -0800 (PST)
 MIME-Version: 1.0
-X-MS-Exchange-CrossTenant-Network-Message-Id: 9a502c35-2322-47fb-1632-08d79444568c
-X-MS-Exchange-CrossTenant-originalarrivaltime: 08 Jan 2020 14:09:12.9051
- (UTC)
-X-MS-Exchange-CrossTenant-fromentityheader: Hosted
-X-MS-Exchange-CrossTenant-id: 8ae927fe-1255-47a7-a2af-5f3a069daaa2
-X-MS-Exchange-CrossTenant-mailboxtype: HOSTED
-X-MS-Exchange-CrossTenant-userprincipalname: riY28i0sigkdJaIpPSqARe5OCYmRF0eG0TzTNtyQGx4rXyqqX18qcUQD9EyZtS5Q
-X-MS-Exchange-Transport-CrossTenantHeadersStamped: SN6PR15MB2208
-X-OriginatorOrg: fb.com
-X-Proofpoint-Virus-Version: vendor=fsecure engine=2.50.10434:6.0.138,18.0.572
- definitions=2020-01-08_03:2020-01-08,2020-01-08 signatures=0
-X-Proofpoint-Spam-Details: rule=fb_default_notspam policy=fb_default score=0 mlxscore=0
- lowpriorityscore=0 impostorscore=0 adultscore=0 mlxlogscore=671
- priorityscore=1501 phishscore=0 clxscore=1015 malwarescore=0
- suspectscore=0 bulkscore=0 spamscore=0 classifier=spam adjust=0 reason=mlx
- scancount=1 engine=8.12.0-1910280000 definitions=main-2001080120
-X-FB-Internal: deliver
+References: <20191230102942.18395-1-jinpuwang@gmail.com> <20191230102942.18395-18-jinpuwang@gmail.com>
+ <aa7eeeda-b3d7-4a26-9043-53ce8c80eef1@acm.org>
+In-Reply-To: <aa7eeeda-b3d7-4a26-9043-53ce8c80eef1@acm.org>
+From:   Jinpu Wang <jinpu.wang@cloud.ionos.com>
+Date:   Wed, 8 Jan 2020 15:22:01 +0100
+Message-ID: <CAMGffEkYVzFJX2=pur7+_gqOsOSiMLpu08Z7eCVs4N3ruz=QWw@mail.gmail.com>
+Subject: Re: [PATCH v6 17/25] rnbd: client: main functionality
+To:     Bart Van Assche <bvanassche@acm.org>
+Cc:     Jack Wang <jinpuwang@gmail.com>, linux-block@vger.kernel.org,
+        linux-rdma@vger.kernel.org, Jens Axboe <axboe@kernel.dk>,
+        Christoph Hellwig <hch@infradead.org>,
+        Sagi Grimberg <sagi@grimberg.me>,
+        Leon Romanovsky <leon@kernel.org>,
+        Doug Ledford <dledford@redhat.com>,
+        Danil Kipnis <danil.kipnis@cloud.ionos.com>, rpenyaev@suse.de
+Content-Type: text/plain; charset="UTF-8"
 Sender: linux-block-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-On 7 Jan 2020, at 12:42, Christoph Hellwig wrote:
-
-> On Fri, Dec 13, 2019 at 01:32:10AM +0000, Chris Mason wrote:
->> They just have different tradeoffs.  O_DIRECT actively blows away=20
->> caches
->> and can also force writes during reads, making RWF_UNCACHED a more
->> natural fit for some applications.  There are fewer surprises, and=20
->> some
->> services are willing to pay for flexibility with a memcpy.  In=20
->> general,
->> they still want to do some cache management because it reduces p90+
->> latencies across the board, and gives them more control over which=20
->> pages
->> stay in cache.
+On Fri, Jan 3, 2020 at 12:55 AM Bart Van Assche <bvanassche@acm.org> wrote:
 >
-> We can always have a variant of O_DIRECT that doesn't do that and
-> instead check if data was in the cache and then also copy / from to
-> it in that case.  I need some time to actually look through this=20
-> series,
-> so it might be pretty similar to the implementation, but if defined
-> the right way it could be concurrent for at least the fast path of no
-> cached pages.
+> On 12/30/19 2:29 AM, Jack Wang wrote:
+> > +MODULE_DESCRIPTION("InfiniBand Network Block Device Client");
+>
+> InfiniBand or RDMA?
+will fix.
+>
+> > +static int rnbd_clt_set_dev_attr(struct rnbd_clt_dev *dev,
+> > +                               const struct rnbd_msg_open_rsp *rsp)
+> > +{
+> > +     struct rnbd_clt_session *sess = dev->sess;
+> > +
+> > +     if (unlikely(!rsp->logical_block_size))
+> > +             return -EINVAL;
+> > +
+> > +     dev->device_id              = le32_to_cpu(rsp->device_id);
+> > +     dev->nsectors               = le64_to_cpu(rsp->nsectors);
+> > +     dev->logical_block_size     = le16_to_cpu(rsp->logical_block_size);
+> > +     dev->physical_block_size    = le16_to_cpu(rsp->physical_block_size);
+> > +     dev->max_write_same_sectors = le32_to_cpu(rsp->max_write_same_sectors);
+> > +     dev->max_discard_sectors    = le32_to_cpu(rsp->max_discard_sectors);
+> > +     dev->discard_granularity    = le32_to_cpu(rsp->discard_granularity);
+> > +     dev->discard_alignment      = le32_to_cpu(rsp->discard_alignment);
+> > +     dev->secure_discard         = le16_to_cpu(rsp->secure_discard);
+> > +     dev->rotational             = rsp->rotational;
+> > +
+> > +     dev->max_hw_sectors = sess->max_io_size / dev->logical_block_size;
+>
+> The above statement looks suspicious to me. The unit of the second
+> argument of blk_queue_max_hw_sectors() is 512 bytes. Since
+> dev->max_hw_sectors is passed as the second argument to
+> blk_queue_max_hw_sectors() I think it should also have 512 bytes as unit
+> instead of the logical block size.
+You're right, will fix.
+>
+> > +static int rnbd_clt_change_capacity(struct rnbd_clt_dev *dev,
+> > +                                  size_t new_nsectors)
+> > +{
+> > +     int err = 0;
+> > +
+> > +     rnbd_clt_info(dev, "Device size changed from %zu to %zu sectors\n",
+> > +                    dev->nsectors, new_nsectors);
+> > +     dev->nsectors = new_nsectors;
+> > +     set_capacity(dev->gd,
+> > +                  dev->nsectors * (dev->logical_block_size /
+> > +                                   SECTOR_SIZE));
+> > +     err = revalidate_disk(dev->gd);
+> > +     if (err)
+> > +             rnbd_clt_err(dev,
+> > +                           "Failed to change device size from %zu to %zu, err: %d\n",
+> > +                           dev->nsectors, new_nsectors, err);
+> > +     return err;
+> > +}
+>
+> Please document the unit of nsectors in struct rnbd_clt_dev. Please also
+> document the unit of the 'new_nsectors' argument.
+will do. The unit of nsectors is 512b.
+>
+> > +static void msg_io_conf(void *priv, int errno)
+> > +{
+> > +     struct rnbd_iu *iu = priv;
+> > +     struct rnbd_clt_dev *dev = iu->dev;
+> > +     struct request *rq = iu->rq;
+> > +
+> > +     iu->status = errno ? BLK_STS_IOERR : BLK_STS_OK;
+> > +
+> > +     blk_mq_complete_request(rq);
+> > +
+> > +     if (errno)
+> > +             rnbd_clt_info_rl(dev, "%s I/O failed with err: %d\n",
+> > +                               rq_data_dir(rq) == READ ? "read" : "write",
+> > +                               errno);
+> > +}
+>
+> Accessing 'rq' after having called blk_mq_complete_request() may trigger
+> a use-after-free. Please don't do that.
+You are right, will fix.
 
-Yeah, I really do think we can end up with a fairly unified solution=20
-through iomap:
+>
+> > +static void wait_for_rtrs_disconnection(struct rnbd_clt_session *sess)
+> > +__releases(&sess_lock)
+> > +__acquires(&sess_lock)
+>
+> Please indent __releases() and __acquires() annotations.
+ok.
 
-* Allowing concurrent writes (xfs DIO does this now)
-* Optionally doing zero copy if alignment is good (btrfs DIO does this=20
-now)
-* Optionally tossing pages at the end (requires a separate syscall now)
-* Supporting aio via io_uring
 
-We could just call this O_DIRECT, but I like RWF_UNCACHED as a way to=20
-avoid surprises for people that know and love the existing O_DIRECT=20
-semantics.
+>
+> > +static int setup_mq_tags(struct rnbd_clt_session *sess)
+> > +{
+> > +     struct blk_mq_tag_set *tags = &sess->tag_set;
+> > +
+> > +     memset(tags, 0, sizeof(*tags));
+> > +     tags->ops               = &rnbd_mq_ops;
+> > +     tags->queue_depth       = sess->queue_depth;
+> > +     tags->numa_node         = NUMA_NO_NODE;
+> > +     tags->flags             = BLK_MQ_F_SHOULD_MERGE |
+> > +                               BLK_MQ_F_TAG_SHARED;
+> > +     tags->cmd_size          = sizeof(struct rnbd_iu);
+> > +     tags->nr_hw_queues      = num_online_cpus();
+> > +
+> > +     return blk_mq_alloc_tag_set(tags);
+> > +}
+>
+> Please change the name of the "tags" pointer into "tag_set".
+ok.
+>
+> > +static int index_to_minor(int index)
+> > +{
+> > +     return index << RNBD_PART_BITS;
+> > +}
+> > +
+> > +static int minor_to_index(int minor)
+> > +{
+> > +     return minor >> RNBD_PART_BITS;
+> > +}
+>
+> Is it useful to introduce functions that encapsulate a single shift
+> operation?
+can be dropped, althrough it's common to do it this way, plenty of
+examples in kernel tree.
+>
+> > +     blk_queue_virt_boundary(dev->queue, 4095);
+>
+> The virt_boundary parameter must match the RDMA memory registration page
+> size. Please introduce a symbolic constant for the RDMA memory
+> registration page size such that these two parameters stay in sync in
+> case anyone would want to change the memory registration page size.
+>
+> > +static void rnbd_clt_setup_gen_disk(struct rnbd_clt_dev *dev, int idx)
+> > +{
+> > +     dev->gd->major          = rnbd_client_major;
+> > +     dev->gd->first_minor    = index_to_minor(idx);
+> > +     dev->gd->fops           = &rnbd_client_ops;
+> > +     dev->gd->queue          = dev->queue;
+> > +     dev->gd->private_data   = dev;
+> > +     snprintf(dev->gd->disk_name, sizeof(dev->gd->disk_name), "rnbd%d",
+> > +              idx);
+> > +     pr_debug("disk_name=%s, capacity=%zu\n",
+> > +              dev->gd->disk_name,
+> > +              dev->nsectors * (dev->logical_block_size / SECTOR_SIZE)
+> > +              );
+> > +
+> > +     set_capacity(dev->gd, dev->nsectors * (dev->logical_block_size /
+> > +                                            SECTOR_SIZE));
+>
+> Again, what is the unit of dev->nsectors?
+The unit is 512b, I will remove the multipler, in most of the case
+logical_block_size is SECTOR_SIZE.
+>
+> > +static void rnbd_clt_add_gen_disk(struct rnbd_clt_dev *dev)
+> > +{
+> > +     add_disk(dev->gd);
+> > +}
+>
+> Is it useful to introduce this wrapper around add_disk()?
+will remove the wrapper.
 
--chris
+>
+> Thanks,
+>
+> Bart.
+Thanks Bart.
