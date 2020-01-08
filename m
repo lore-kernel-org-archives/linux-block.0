@@ -2,121 +2,164 @@ Return-Path: <SRS0=At5W=25=vger.kernel.org=linux-block-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-8.4 required=3.0 tests=DKIMWL_WL_HIGH,DKIM_SIGNED,
-	DKIM_VALID,DKIM_VALID_AU,HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,
-	MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,USER_AGENT_SANE_1
-	autolearn=ham autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-0.8 required=3.0 tests=DKIMWL_WL_HIGH,DKIM_SIGNED,
+	DKIM_VALID,DKIM_VALID_AU,HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,
+	SPF_HELO_NONE,SPF_PASS,UNPARSEABLE_RELAY autolearn=no autolearn_force=no
+	version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id E1CD1C33C99
-	for <linux-block@archiver.kernel.org>; Wed,  8 Jan 2020 02:47:33 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 5C809C33C99
+	for <linux-block@archiver.kernel.org>; Wed,  8 Jan 2020 02:49:58 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.kernel.org (Postfix) with ESMTP id A9EDB20880
-	for <linux-block@archiver.kernel.org>; Wed,  8 Jan 2020 02:47:33 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id 2FA80208C4
+	for <linux-block@archiver.kernel.org>; Wed,  8 Jan 2020 02:49:58 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="Pv4pVn97"
+	dkim=pass (2048-bit key) header.d=oracle.com header.i=@oracle.com header.b="CpY2Jxsm"
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1725825AbgAHCrd (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Tue, 7 Jan 2020 21:47:33 -0500
-Received: from us-smtp-delivery-1.mimecast.com ([205.139.110.120]:29309 "EHLO
-        us-smtp-1.mimecast.com" rhost-flags-OK-OK-OK-FAIL) by vger.kernel.org
-        with ESMTP id S1725812AbgAHCrc (ORCPT
-        <rfc822;linux-block@vger.kernel.org>); Tue, 7 Jan 2020 21:47:32 -0500
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-        s=mimecast20190719; t=1578451651;
-        h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-         to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-         in-reply-to:in-reply-to:references:references;
-        bh=J5qXSOMEDncovNcR0PQ80T3zAoiJ7y/MPXaWvwFzR1c=;
-        b=Pv4pVn97pDAthAz8wFVVrV75ykaEAl1L6FodWjrwnUTu9FNDEBxNMXROtvAzM6RJb+2pke
-        c5M1nPDl9IzT+ehg/H6kS8i5PVXdBgQQTa7B4DUhGoVNkKiRZVJmBU8yuKqt/4v5MTwaoO
-        P8VpzI9ahekj8Zmua7El4hT6mQZDKb8=
-Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
- [209.132.183.4]) (Using TLS) by relay.mimecast.com with ESMTP id
- us-mta-4-Dityh_QbM2WbtjzqvUnzPQ-1; Tue, 07 Jan 2020 21:47:28 -0500
-X-MC-Unique: Dityh_QbM2WbtjzqvUnzPQ-1
-Received: from smtp.corp.redhat.com (int-mx05.intmail.prod.int.phx2.redhat.com [10.5.11.15])
-        (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
-        (No client certificate requested)
-        by mimecast-mx01.redhat.com (Postfix) with ESMTPS id E41249B69F;
-        Wed,  8 Jan 2020 02:47:26 +0000 (UTC)
-Received: from ming.t460p (ovpn-8-18.pek2.redhat.com [10.72.8.18])
-        by smtp.corp.redhat.com (Postfix) with ESMTPS id 1C2B17C351;
-        Wed,  8 Jan 2020 02:47:21 +0000 (UTC)
-Date:   Wed, 8 Jan 2020 10:47:17 +0800
-From:   Ming Lei <ming.lei@redhat.com>
-To:     Damien Le Moal <Damien.LeMoal@wdc.com>
-Cc:     Jens Axboe <axboe@kernel.dk>,
-        "linux-block@vger.kernel.org" <linux-block@vger.kernel.org>,
-        Guenter Roeck <linux@roeck-us.net>
-Subject: Re: [PATCH] block: fix get_max_segment_size() overflow on 32bit arch
-Message-ID: <20200108024717.GC28075@ming.t460p>
-References: <20200108012526.26731-1-ming.lei@redhat.com>
- <BYAPR04MB581614236B3088415240723AE73E0@BYAPR04MB5816.namprd04.prod.outlook.com>
- <a5fa8b59-6685-d914-6163-1d515777300b@kernel.dk>
- <BYAPR04MB5816C3DA0641956670F2B323E73E0@BYAPR04MB5816.namprd04.prod.outlook.com>
+        id S1726252AbgAHCt5 (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Tue, 7 Jan 2020 21:49:57 -0500
+Received: from userp2120.oracle.com ([156.151.31.85]:42490 "EHLO
+        userp2120.oracle.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S1725812AbgAHCt5 (ORCPT
+        <rfc822;linux-block@vger.kernel.org>); Tue, 7 Jan 2020 21:49:57 -0500
+Received: from pps.filterd (userp2120.oracle.com [127.0.0.1])
+        by userp2120.oracle.com (8.16.0.27/8.16.0.27) with SMTP id 0082j3hT168191;
+        Wed, 8 Jan 2020 02:49:21 GMT
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=oracle.com; h=to : cc : subject :
+ from : references : date : in-reply-to : message-id : mime-version :
+ content-type; s=corp-2019-08-05;
+ bh=djsuFW26Q10VIQY8oPGzjzhEBcz7rw2ZOk6sov2Cj8E=;
+ b=CpY2JxsmSQUXu2lhWgt9naNTsGQ0eMZAc4f3C6/IESgXByDk8Ph5TgE1fgDcxUjEp/i8
+ O5s2MGYclWkXADBFV6fDbb4veOL6D54loaNmCFzP5AUw/jKKeaj6WKY5+a79RzIHQJ6v
+ dVxjaOEl5NHKmLelbpOykQiX2KdwrjKk206vX+FaWU6+6ieKGG39fR+cRqwo6z5VOy1a
+ i5Gim2LeWZufJ82J6XTOXatsE3lPqJsoghEoVrWSDNj3ZGp51werLN27KX3YAD/6aQof
+ pU1g9Mx5vZtX6XrfTMUBlSVL5V+4Twh58m5b9z/nuoW4P/IHn4DC/ChY9t7maY8fRSk9 vA== 
+Received: from userp3020.oracle.com (userp3020.oracle.com [156.151.31.79])
+        by userp2120.oracle.com with ESMTP id 2xakbqs4g7-1
+        (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=OK);
+        Wed, 08 Jan 2020 02:49:21 +0000
+Received: from pps.filterd (userp3020.oracle.com [127.0.0.1])
+        by userp3020.oracle.com (8.16.0.27/8.16.0.27) with SMTP id 0082nGxq110505;
+        Wed, 8 Jan 2020 02:49:20 GMT
+Received: from userv0121.oracle.com (userv0121.oracle.com [156.151.31.72])
+        by userp3020.oracle.com with ESMTP id 2xcpcrmmqk-1
+        (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=OK);
+        Wed, 08 Jan 2020 02:49:20 +0000
+Received: from abhmp0005.oracle.com (abhmp0005.oracle.com [141.146.116.11])
+        by userv0121.oracle.com (8.14.4/8.13.8) with ESMTP id 0082nBS7020174;
+        Wed, 8 Jan 2020 02:49:11 GMT
+Received: from ca-mkp.ca.oracle.com (/10.159.214.123)
+        by default (Oracle Beehive Gateway v4.0)
+        with ESMTP ; Tue, 07 Jan 2020 18:49:11 -0800
+To:     Kirill Tkhai <ktkhai@virtuozzo.com>
+Cc:     "Martin K. Petersen" <martin.petersen@oracle.com>,
+        "axboe\@kernel.dk" <axboe@kernel.dk>,
+        "linux-block\@vger.kernel.org" <linux-block@vger.kernel.org>,
+        "linux-kernel\@vger.kernel.org" <linux-kernel@vger.kernel.org>,
+        "linux-ext4\@vger.kernel.org" <linux-ext4@vger.kernel.org>,
+        "tytso\@mit.edu" <tytso@mit.edu>,
+        "adilger.kernel\@dilger.ca" <adilger.kernel@dilger.ca>,
+        "ming.lei\@redhat.com" <ming.lei@redhat.com>,
+        "osandov\@fb.com" <osandov@fb.com>,
+        "jthumshirn\@suse.de" <jthumshirn@suse.de>,
+        "minwoo.im.dev\@gmail.com" <minwoo.im.dev@gmail.com>,
+        "damien.lemoal\@wdc.com" <damien.lemoal@wdc.com>,
+        "andrea.parri\@amarulasolutions.com" 
+        <andrea.parri@amarulasolutions.com>,
+        "hare\@suse.com" <hare@suse.com>, "tj\@kernel.org" <tj@kernel.org>,
+        "ajay.joshi\@wdc.com" <ajay.joshi@wdc.com>,
+        "sagi\@grimberg.me" <sagi@grimberg.me>,
+        "dsterba\@suse.com" <dsterba@suse.com>,
+        "chaitanya.kulkarni\@wdc.com" <chaitanya.kulkarni@wdc.com>,
+        "bvanassche\@acm.org" <bvanassche@acm.org>,
+        "dhowells\@redhat.com" <dhowells@redhat.com>,
+        "asml.silence\@gmail.com" <asml.silence@gmail.com>
+Subject: Re: [PATCH RFC 1/3] block: Add support for REQ_OP_ASSIGN_RANGE operation
+From:   "Martin K. Petersen" <martin.petersen@oracle.com>
+Organization: Oracle Corporation
+References: <157599668662.12112.10184894900037871860.stgit@localhost.localdomain>
+        <157599696813.12112.14140818972910110796.stgit@localhost.localdomain>
+        <yq1woatc8zd.fsf@oracle.com>
+        <3f2e341b-dea4-c5d0-8eb0-568b6ad2f17b@virtuozzo.com>
+        <yq1a77oc56s.fsf@oracle.com>
+        <625c9ee4-bedb-ff60-845e-2d440c4f58aa@virtuozzo.com>
+        <yq1pngh7blx.fsf@oracle.com>
+        <405b9106-0a97-0821-c41d-58ab8d0e2d09@virtuozzo.com>
+        <yq1o8vg2bl2.fsf@oracle.com>
+        <d2835bd2-9579-74b5-4339-b576df79a9d5@virtuozzo.com>
+Date:   Tue, 07 Jan 2020 21:49:06 -0500
+In-Reply-To: <d2835bd2-9579-74b5-4339-b576df79a9d5@virtuozzo.com> (Kirill
+        Tkhai's message of "Tue, 7 Jan 2020 13:59:10 +0000")
+Message-ID: <yq1k1621x3x.fsf@oracle.com>
+User-Agent: Gnus/5.13 (Gnus v5.13) Emacs/26.1.92 (gnu/linux)
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <BYAPR04MB5816C3DA0641956670F2B323E73E0@BYAPR04MB5816.namprd04.prod.outlook.com>
-User-Agent: Mutt/1.12.1 (2019-06-15)
-X-Scanned-By: MIMEDefang 2.79 on 10.5.11.15
+Content-Type: text/plain
+X-Proofpoint-Virus-Version: vendor=nai engine=6000 definitions=9493 signatures=668685
+X-Proofpoint-Spam-Details: rule=notspam policy=default score=0 suspectscore=0 malwarescore=0
+ phishscore=0 bulkscore=0 spamscore=0 mlxscore=0 mlxlogscore=999
+ adultscore=0 classifier=spam adjust=0 reason=mlx scancount=1
+ engine=8.0.1-1911140001 definitions=main-2001080022
+X-Proofpoint-Virus-Version: vendor=nai engine=6000 definitions=9493 signatures=668685
+X-Proofpoint-Spam-Details: rule=notspam policy=default score=0 priorityscore=1501 malwarescore=0
+ suspectscore=0 phishscore=0 bulkscore=0 spamscore=0 clxscore=1015
+ lowpriorityscore=0 mlxscore=0 impostorscore=0 mlxlogscore=999 adultscore=0
+ classifier=spam adjust=0 reason=mlx scancount=1 engine=8.0.1-1911140001
+ definitions=main-2001080022
 Sender: linux-block-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-On Wed, Jan 08, 2020 at 02:38:02AM +0000, Damien Le Moal wrote:
-> On 2020/01/08 11:34, Jens Axboe wrote:
-> > On 1/7/20 7:06 PM, Damien Le Moal wrote:
-> >> On 2020/01/08 10:25, Ming Lei wrote:
-> >>> Commit 429120f3df2d starts to take account of segment's start dma address
-> >>> when computing max segment size, and data type of 'unsigned long'
-> >>> is used to do that. However, the segment mask may be 0xffffffff, so
-> >>> the figured out segment size may be overflowed because DMA address can
-> >>> be 64bit on 32bit arch.
-> >>>
-> >>> Fixes the issue by using 'unsigned long long' to compute max segment
-> >>> size.
-> >>>
-> >>> Fixes: 429120f3df2d ("block: fix splitting segments on boundary masks")
-> >>> Reported-by: Guenter Roeck <linux@roeck-us.net>
-> >>> Tested-by: Guenter Roeck <linux@roeck-us.net>
-> >>> Signed-off-by: Ming Lei <ming.lei@redhat.com>
-> >>> ---
-> >>>  block/blk-merge.c | 4 ++--
-> >>>  1 file changed, 2 insertions(+), 2 deletions(-)
-> >>>
-> >>> diff --git a/block/blk-merge.c b/block/blk-merge.c
-> >>> index 347782a24a35..b0fcc72594cb 100644
-> >>> --- a/block/blk-merge.c
-> >>> +++ b/block/blk-merge.c
-> >>> @@ -159,12 +159,12 @@ static inline unsigned get_max_io_size(struct request_queue *q,
-> >>>  
-> >>>  static inline unsigned get_max_segment_size(const struct request_queue *q,
-> >>>  					    struct page *start_page,
-> >>> -					    unsigned long offset)
-> >>> +					    unsigned long long offset)
-> >>>  {
-> >>>  	unsigned long mask = queue_segment_boundary(q);
-> >>>  
-> >>>  	offset = mask & (page_to_phys(start_page) + offset);
-> >>
-> >> Shouldn't mask be an unsigned long long too for this to give the
-> >> expected correct result ?
-> > 
-> > Don't think so, and the seg boundary is a ulong to begin with as well.
-> > 
-> 
-> I was referring to 32bits arch were ulong is 32bits. So we would have
-> 
-> offset = 32bits & 64bits;
-> 
-> with the patch applied. But I am not sure how gcc handles that and if
-> this can be a problem.
 
-Both are 'unsigned', so C compiler will do zero extension for 32bits.
+Kirill,
 
+>> Correct. We shouldn't go down this path unless a device is thinly
+>> provisioned (i.e. max_discard_sectors > 0).
+>
+> (I assumed it is a typo, and you mean max_allocate_sectors like bellow).
 
-Thanks,
-Ming
+No, this was in the context of not having an explicit queue limit for
+allocation. If a device does not have max_discard_sectors > 0 then it is
+not thinly provisioned and therefore attempting allocation makes no
+sense.
 
+>> I don't like "write_zeroes_can_allocate" because that makes assumptions
+>> about WRITE ZEROES being the command of choice. I suggest we call it
+>> "max_allocate_sectors" to mirror "max_discard_sectors". I.e. put
+>> emphasis on the semantic operation and not the plumbing.
+>  
+> Hm. Do you mean "bool max_allocate_sectors" or "unsigned int max_allocate_sectors"?
+
+unsigned int. At least for SCSI we could have a device which would use
+UNMAP for discards and WRITE SAME for allocates. And therefore the range
+limit could be different for the two operations. Sadly.
+
+I have a patch in the pipeline which deals with some problems in this
+department because some devices have a split brain wrt. their discard
+limits.
+
+> In the second case we should make all the
+> q->limits.max_write_zeroes_sectors dereferencing as switches like the
+> below (this is a partial patch and only several of places are
+> converted to switches as examples):
+
+Something like that, yes.
+
+This is getting a bit messy :( However, I am not sure that scattering
+REQ_OP_ALLOCATE all over the I/O stack is particularly attractive
+either.
+
+Both REQ_OP_DISCARD and REQ_OP_WRITE_SAME come with some storage
+protocol baggage that forces us to have special handling all over the
+stack. But REQ_OP_WRITE_ZEROES is fairly clean and simple and, except
+for the potentially different block count limit, an allocate operation
+would be a carbon copy of the plumbing for write zeroes. A lot of
+duplication.
+
+So even through I'm increasingly torn on whether introducing separate
+REQ_OP_ALLOCATE plumbing throughout the stack or having a REQ_ALLOCATE
+flag for REQ_OP_WRITE_ZEROES is best, I still think I'm leaning towards
+the latter. That will also make it easier for me in the SCSI disk
+driver.
+
+-- 
+Martin K. Petersen	Oracle Linux Engineering
