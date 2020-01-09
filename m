@@ -2,89 +2,105 @@ Return-Path: <SRS0=+EVs=26=vger.kernel.org=linux-block-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-7.4 required=3.0 tests=DKIMWL_WL_HIGH,DKIM_SIGNED,
+X-Spam-Status: No, score=-0.8 required=3.0 tests=DKIMWL_WL_HIGH,DKIM_SIGNED,
 	DKIM_VALID,DKIM_VALID_AU,HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,
-	MENTIONS_GIT_HOSTING,SPF_HELO_NONE,SPF_PASS,USER_AGENT_SANE_1
-	autolearn=unavailable autolearn_force=no version=3.4.0
+	SPF_HELO_NONE,SPF_PASS,UNPARSEABLE_RELAY autolearn=no autolearn_force=no
+	version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 89554C33CA2
-	for <linux-block@archiver.kernel.org>; Thu,  9 Jan 2020 02:05:41 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 5C005C33CA1
+	for <linux-block@archiver.kernel.org>; Thu,  9 Jan 2020 02:56:51 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.kernel.org (Postfix) with ESMTP id 571EF20720
-	for <linux-block@archiver.kernel.org>; Thu,  9 Jan 2020 02:05:41 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id 2CB3C205F4
+	for <linux-block@archiver.kernel.org>; Thu,  9 Jan 2020 02:56:51 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="PTYti7+b"
+	dkim=pass (2048-bit key) header.d=oracle.com header.i=@oracle.com header.b="dXa2DBns"
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1727837AbgAICFk (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Wed, 8 Jan 2020 21:05:40 -0500
-Received: from us-smtp-delivery-1.mimecast.com ([205.139.110.120]:36855 "EHLO
-        us-smtp-1.mimecast.com" rhost-flags-OK-OK-OK-FAIL) by vger.kernel.org
-        with ESMTP id S1727831AbgAICFk (ORCPT
-        <rfc822;linux-block@vger.kernel.org>); Wed, 8 Jan 2020 21:05:40 -0500
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-        s=mimecast20190719; t=1578535539;
-        h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-         to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-         in-reply-to:in-reply-to:references:references;
-        bh=39HTy+I9bsQga0QDeboxAcXZyuRivEM92MqxhtYaKTc=;
-        b=PTYti7+beFkwXx3FawWd85Wp0Pv9tTYs0Uam1dskkfu2IBFuW7Ipvas8XqLi7G7UlALyHI
-        WHeGk5A1Jig8dtUuo4ibRQDsPfLq9WfAuQxlBAbcpBKEEzzEssovbHFYvjeVK7HR++6yS4
-        F5GSG6UIimMznnDxwA4y9N6yGgfEHIc=
-Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
- [209.132.183.4]) (Using TLS) by relay.mimecast.com with ESMTP id
- us-mta-178-E_WwN-hBNwalC6slI8-Dsw-1; Wed, 08 Jan 2020 21:05:38 -0500
-X-MC-Unique: E_WwN-hBNwalC6slI8-Dsw-1
-Received: from smtp.corp.redhat.com (int-mx07.intmail.prod.int.phx2.redhat.com [10.5.11.22])
-        (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
-        (No client certificate requested)
-        by mimecast-mx01.redhat.com (Postfix) with ESMTPS id 1D7CD1005514;
-        Thu,  9 Jan 2020 02:05:37 +0000 (UTC)
-Received: from ming.t460p (ovpn-8-20.pek2.redhat.com [10.72.8.20])
-        by smtp.corp.redhat.com (Postfix) with ESMTPS id EC03D10027A6;
-        Thu,  9 Jan 2020 02:05:28 +0000 (UTC)
-Date:   Thu, 9 Jan 2020 10:05:24 +0800
-From:   Ming Lei <ming.lei@redhat.com>
-To:     Christoph Hellwig <hch@infradead.org>
-Cc:     Jens Axboe <axboe@kernel.dk>, linux-block@vger.kernel.org,
-        Carlos Maiolino <cmaiolino@redhat.com>,
-        linux-fsdevel@vger.kernel.org,
-        syzbot+2b9e54155c8c25d8d165@syzkaller.appspotmail.com
-Subject: Re: [PATCH V2] block: add bio_truncate to fix guard_bio_eod
-Message-ID: <20200109020524.GD9655@ming.t460p>
-References: <20191227230548.20079-1-ming.lei@redhat.com>
- <20200108133735.GB4455@infradead.org>
+        id S1727671AbgAIC4u (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Wed, 8 Jan 2020 21:56:50 -0500
+Received: from aserp2120.oracle.com ([141.146.126.78]:47680 "EHLO
+        aserp2120.oracle.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S1726913AbgAIC4u (ORCPT
+        <rfc822;linux-block@vger.kernel.org>); Wed, 8 Jan 2020 21:56:50 -0500
+Received: from pps.filterd (aserp2120.oracle.com [127.0.0.1])
+        by aserp2120.oracle.com (8.16.0.27/8.16.0.27) with SMTP id 0092rQiN135926;
+        Thu, 9 Jan 2020 02:56:34 GMT
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=oracle.com; h=to : cc : subject :
+ from : references : date : in-reply-to : message-id : mime-version :
+ content-type; s=corp-2019-08-05;
+ bh=UkfHdTmJJlai2EOzhsw+ZznpGVVKFCSeoOTXtC0IOPY=;
+ b=dXa2DBnsNjk7TL8YUymzrg0GLgz4XOHOBEsHqVaYnFj0G8xJSUGrlV6Pnh1YtZYzsagr
+ 5TQPp9v4GaTyQQjqyCVG+7eAuMAkHsle1w0cXDAyjEDvWeakRY+n7biP/EFkWPvfxcan
+ 5O8OkfB8ZttPwKvYtTLkGooVAZaJj7waJX9ZJw0WS+BjRrhcRkdScykeiCxzPbfhbF24
+ 0erD6clfGKovzBZb7ialjqoBakh7iLq8nSmFd/yiPKS7518Y/XLtBvMUMSQu+9dehZ9w
+ 0cPAyZ+7FhgaXoAyg5xx3P8++QdwJrrrx/OKmVSkzS/YgRdnK/NW2DpOWCGN3ewmDazv hg== 
+Received: from userp3030.oracle.com (userp3030.oracle.com [156.151.31.80])
+        by aserp2120.oracle.com with ESMTP id 2xajnq7xjh-1
+        (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=OK);
+        Thu, 09 Jan 2020 02:56:34 +0000
+Received: from pps.filterd (userp3030.oracle.com [127.0.0.1])
+        by userp3030.oracle.com (8.16.0.27/8.16.0.27) with SMTP id 0092sTtD024251;
+        Thu, 9 Jan 2020 02:54:34 GMT
+Received: from userv0121.oracle.com (userv0121.oracle.com [156.151.31.72])
+        by userp3030.oracle.com with ESMTP id 2xdmrx6uyk-1
+        (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=OK);
+        Thu, 09 Jan 2020 02:54:32 +0000
+Received: from abhmp0017.oracle.com (abhmp0017.oracle.com [141.146.116.23])
+        by userv0121.oracle.com (8.14.4/8.13.8) with ESMTP id 0092rf3S005091;
+        Thu, 9 Jan 2020 02:53:42 GMT
+Received: from ca-mkp.ca.oracle.com (/10.159.214.123)
+        by default (Oracle Beehive Gateway v4.0)
+        with ESMTP ; Wed, 08 Jan 2020 18:53:41 -0800
+To:     Christoph Hellwig <hch@lst.de>
+Cc:     "Martin K. Petersen" <martin.petersen@oracle.com>,
+        Balbir Singh <sblbir@amazon.com>, linux-kernel@vger.kernel.org,
+        linux-block@vger.kernel.org, linux-nvme@lists.infradead.org,
+        axboe@kernel.dk, ssomesh@amazon.com, jejb@linux.ibm.com,
+        mst@redhat.com, Chaitanya.Kulkarni@wdc.com
+Subject: Re: [resend v1 5/5] drivers/scsi/sd.c: Convert to use disk_set_capacity
+From:   "Martin K. Petersen" <martin.petersen@oracle.com>
+Organization: Oracle Corporation
+References: <20200102075315.22652-1-sblbir@amazon.com>
+        <20200102075315.22652-6-sblbir@amazon.com>
+        <yq1blrg2agh.fsf@oracle.com> <20200108150612.GD10975@lst.de>
+Date:   Wed, 08 Jan 2020 21:53:38 -0500
+In-Reply-To: <20200108150612.GD10975@lst.de> (Christoph Hellwig's message of
+        "Wed, 8 Jan 2020 16:06:12 +0100")
+Message-ID: <yq1muaxz6fh.fsf@oracle.com>
+User-Agent: Gnus/5.13 (Gnus v5.13) Emacs/26.1.92 (gnu/linux)
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <20200108133735.GB4455@infradead.org>
-User-Agent: Mutt/1.12.1 (2019-06-15)
-X-Scanned-By: MIMEDefang 2.84 on 10.5.11.22
+Content-Type: text/plain
+X-Proofpoint-Virus-Version: vendor=nai engine=6000 definitions=9494 signatures=668685
+X-Proofpoint-Spam-Details: rule=notspam policy=default score=0 suspectscore=0 malwarescore=0
+ phishscore=0 bulkscore=0 spamscore=0 mlxscore=0 mlxlogscore=975
+ adultscore=0 classifier=spam adjust=0 reason=mlx scancount=1
+ engine=8.0.1-1911140001 definitions=main-2001090026
+X-Proofpoint-Virus-Version: vendor=nai engine=6000 definitions=9494 signatures=668685
+X-Proofpoint-Spam-Details: rule=notspam policy=default score=0 priorityscore=1501 malwarescore=0
+ suspectscore=0 phishscore=0 bulkscore=0 spamscore=0 clxscore=1015
+ lowpriorityscore=0 mlxscore=0 impostorscore=0 mlxlogscore=999 adultscore=0
+ classifier=spam adjust=0 reason=mlx scancount=1 engine=8.0.1-1911140001
+ definitions=main-2001090026
 Sender: linux-block-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-On Wed, Jan 08, 2020 at 05:37:35AM -0800, Christoph Hellwig wrote:
-> 
-> > +void bio_truncate(struct bio *bio, unsigned new_size)
-> 
-> This function really needs a kerneldoc or similar comment describing
-> what it does in detail.
 
-OK, will do that.
+Christoph,
 
-> 
-> > +	if (bio_data_dir(bio) != READ)
-> > +		goto exit;
-> 
-> This really should check the passed in op for REQ_OP_READ directly instead
-> of just the direction on the potentially not fully set up bio.
+>> We already emit an SDEV_EVT_CAPACITY_CHANGE_REPORTED event if device
+>> capacity changes. However, this event does not automatically cause
+>> revalidation.
+>
+> Who is looking at these sdev specific events?  (And who is looking
+> at the virtio/xenblk ones?)  It  makes a lot of sense to have one event
+> supported by all devices.  But don't ask me which one would be the best..
 
-It has been addressed in:
+Users typically have site-specific udev rules or similar. There is no
+standard entity handling these events. Sadly.
 
-https://git.kernel.org/pub/scm/linux/kernel/git/axboe/linux-block.git/commit/?h=block-5.5&id=802ca0381befe29ba0783e08e3369f9e87ef9d0d
+I'm all for standardizing on RESIZE=1. However, we can't really get rid
+of the emitting existing SDEV* event without breaking existing setups.
 
-
-Thanks,
-Ming
-
+-- 
+Martin K. Petersen	Oracle Linux Engineering
