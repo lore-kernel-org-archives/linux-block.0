@@ -7,253 +7,190 @@ X-Spam-Status: No, score=-8.4 required=3.0 tests=DKIMWL_WL_HIGH,DKIM_SIGNED,
 	MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,USER_AGENT_SANE_1
 	autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 68EE4C33C9E
-	for <linux-block@archiver.kernel.org>; Thu,  9 Jan 2020 01:00:13 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 3D5DBC33C9E
+	for <linux-block@archiver.kernel.org>; Thu,  9 Jan 2020 01:36:09 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.kernel.org (Postfix) with ESMTP id 35BCD2067D
-	for <linux-block@archiver.kernel.org>; Thu,  9 Jan 2020 01:00:13 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id 042F0205F4
+	for <linux-block@archiver.kernel.org>; Thu,  9 Jan 2020 01:36:09 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=pass (2048-bit key) header.d=oracle.com header.i=@oracle.com header.b="FYDHltDJ"
+	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="Mk6ZJSBj"
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1726758AbgAIBAM (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Wed, 8 Jan 2020 20:00:12 -0500
-Received: from aserp2120.oracle.com ([141.146.126.78]:35018 "EHLO
-        aserp2120.oracle.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1727777AbgAIBAM (ORCPT
-        <rfc822;linux-block@vger.kernel.org>); Wed, 8 Jan 2020 20:00:12 -0500
-Received: from pps.filterd (aserp2120.oracle.com [127.0.0.1])
-        by aserp2120.oracle.com (8.16.0.27/8.16.0.27) with SMTP id 0090wLNK047958;
-        Thu, 9 Jan 2020 00:58:52 GMT
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=oracle.com; h=subject : to : cc :
- references : from : message-id : date : mime-version : in-reply-to :
- content-type : content-transfer-encoding; s=corp-2019-08-05;
- bh=U9W9OGdyVHVyoP6glrzGJi9ys2HKa08nDmzlsOwBhyU=;
- b=FYDHltDJR+ZZHaiC5MYg8Ls6mMnDXnd+Dp6qfe2PSSD9z9wJfrBwEeGuJn6SGY/I9ZDU
- FqSSIWeJI+4THksuaGly3UxDhI1H0js94NZmOkEU49zMZrkHD6kPy7wmUBh/bFj8vJI/
- Yu9jglywk1IJhCpoBoF+LVdqp4Nvs824qQGn0/b7THlnYhOgG87QlHcvulyP1GLGRwLe
- ucBSrmlqEob8BBPMUnEBV9WdJ7icK4FunoANuLrGifzy0n4SQQcMv8OZfSmW92vQZhYe
- 8fx171Jw285kxF8MJ3axVuadfy0tC7e8/tygyBqwH2yei3Z+cK29tEftpMKPXTYAUREr BQ== 
-Received: from userp3030.oracle.com (userp3030.oracle.com [156.151.31.80])
-        by aserp2120.oracle.com with ESMTP id 2xajnq7f5j-1
-        (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=OK);
-        Thu, 09 Jan 2020 00:58:52 +0000
-Received: from pps.filterd (userp3030.oracle.com [127.0.0.1])
-        by userp3030.oracle.com (8.16.0.27/8.16.0.27) with SMTP id 0090rqRO143766;
-        Thu, 9 Jan 2020 00:56:51 GMT
-Received: from aserv0121.oracle.com (aserv0121.oracle.com [141.146.126.235])
-        by userp3030.oracle.com with ESMTP id 2xdmrx1e82-1
-        (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=OK);
-        Thu, 09 Jan 2020 00:56:51 +0000
-Received: from abhmp0020.oracle.com (abhmp0020.oracle.com [141.146.116.26])
-        by aserv0121.oracle.com (8.14.4/8.13.8) with ESMTP id 0090umQG025466;
-        Thu, 9 Jan 2020 00:56:49 GMT
-Received: from [192.168.1.14] (/114.88.246.185)
-        by default (Oracle Beehive Gateway v4.0)
-        with ESMTP ; Wed, 08 Jan 2020 16:56:48 -0800
-Subject: Re: [PATCH] block: streamline merge possibility checks
-To:     Dmitry Fomichev <Dmitry.Fomichev@wdc.com>,
-        Christoph Hellwig <hch@infradead.org>
-Cc:     "linux-block@vger.kernel.org" <linux-block@vger.kernel.org>,
-        Jens Axboe <axboe@kernel.dk>,
-        Damien Le Moal <Damien.LeMoal@wdc.com>
-References: <20191218194156.29430-1-dmitry.fomichev@wdc.com>
- <df9c90e7-9aa7-4f77-7161-1bc38de6f8ba@oracle.com>
- <20200108134437.GF4455@infradead.org>
- <BN8PR04MB643390C7263ACE2AFBDF5917E13E0@BN8PR04MB6433.namprd04.prod.outlook.com>
-From:   Bob Liu <bob.liu@oracle.com>
-Message-ID: <4dea4331-9de3-e6b7-c453-05f9baeaec00@oracle.com>
-Date:   Thu, 9 Jan 2020 08:56:41 +0800
-User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:60.0) Gecko/20100101
- Thunderbird/60.5.1
+        id S1727417AbgAIBgI (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Wed, 8 Jan 2020 20:36:08 -0500
+Received: from us-smtp-delivery-1.mimecast.com ([207.211.31.120]:23787 "EHLO
+        us-smtp-1.mimecast.com" rhost-flags-OK-OK-OK-FAIL) by vger.kernel.org
+        with ESMTP id S1726654AbgAIBgI (ORCPT
+        <rfc822;linux-block@vger.kernel.org>); Wed, 8 Jan 2020 20:36:08 -0500
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+        s=mimecast20190719; t=1578533767;
+        h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+         to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+         in-reply-to:in-reply-to:references:references;
+        bh=YhyWrWDGvcl94uzmvSKGpPrbMTLcTs6IkrsCj7b5ty0=;
+        b=Mk6ZJSBj+49Qp6a8Qk7+b87KB6dyj5tdolXfWE/E1/+hOD3WlkRC15kZvohxGr6FxBq24i
+        MfDPg/ypfO8Svjd04mI0SiZUZj1EJqgaNkYwURs2U76cxq+XaQtkSBSUZMPjV04BZ+NKM2
+        UDMwLKWDVnycv7KlXRH/gp4EMhzaiZM=
+Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
+ [209.132.183.4]) (Using TLS) by relay.mimecast.com with ESMTP id
+ us-mta-333-CX9vaYQMOhG1QaRRuC85zQ-1; Wed, 08 Jan 2020 20:36:03 -0500
+X-MC-Unique: CX9vaYQMOhG1QaRRuC85zQ-1
+Received: from smtp.corp.redhat.com (int-mx07.intmail.prod.int.phx2.redhat.com [10.5.11.22])
+        (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
+        (No client certificate requested)
+        by mimecast-mx01.redhat.com (Postfix) with ESMTPS id CC8948024D2;
+        Thu,  9 Jan 2020 01:36:01 +0000 (UTC)
+Received: from ming.t460p (ovpn-8-20.pek2.redhat.com [10.72.8.20])
+        by smtp.corp.redhat.com (Postfix) with ESMTPS id CA79210842A9;
+        Thu,  9 Jan 2020 01:35:55 +0000 (UTC)
+Date:   Thu, 9 Jan 2020 09:35:51 +0800
+From:   Ming Lei <ming.lei@redhat.com>
+To:     Yufen Yu <yuyufen@huawei.com>
+Cc:     axboe@kernel.dk, linux-block@vger.kernel.org, houtao1@huawei.com,
+        hch@lst.de, yi.zhang@huawei.com, zhengchuan@huawei.com
+Subject: Re: [PATCH] block: cache index instead of part self to avoid
+ use-after-free
+Message-ID: <20200109013551.GB9655@ming.t460p>
+References: <20200106073510.10825-1-yuyufen@huawei.com>
 MIME-Version: 1.0
-In-Reply-To: <BN8PR04MB643390C7263ACE2AFBDF5917E13E0@BN8PR04MB6433.namprd04.prod.outlook.com>
-Content-Type: text/plain; charset=utf-8
-Content-Language: en-US
-Content-Transfer-Encoding: 7bit
-X-Proofpoint-Virus-Version: vendor=nai engine=6000 definitions=9494 signatures=668685
-X-Proofpoint-Spam-Details: rule=notspam policy=default score=0 suspectscore=0 malwarescore=0
- phishscore=0 bulkscore=0 spamscore=0 mlxscore=0 mlxlogscore=999
- adultscore=0 classifier=spam adjust=0 reason=mlx scancount=1
- engine=8.0.1-1911140001 definitions=main-2001090006
-X-Proofpoint-Virus-Version: vendor=nai engine=6000 definitions=9494 signatures=668685
-X-Proofpoint-Spam-Details: rule=notspam policy=default score=0 priorityscore=1501 malwarescore=0
- suspectscore=0 phishscore=0 bulkscore=0 spamscore=0 clxscore=1015
- lowpriorityscore=0 mlxscore=0 impostorscore=0 mlxlogscore=999 adultscore=0
- classifier=spam adjust=0 reason=mlx scancount=1 engine=8.0.1-1911140001
- definitions=main-2001090007
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <20200106073510.10825-1-yuyufen@huawei.com>
+User-Agent: Mutt/1.12.1 (2019-06-15)
+X-Scanned-By: MIMEDefang 2.84 on 10.5.11.22
 Sender: linux-block-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-On 1/9/20 6:02 AM, Dmitry Fomichev wrote:
->> -----Original Message-----
->> From: Christoph Hellwig <hch@infradead.org>
->> Sent: Wednesday, January 8, 2020 8:45 AM
->> To: Bob Liu <bob.liu@oracle.com>
->> Cc: Dmitry Fomichev <Dmitry.Fomichev@wdc.com>; linux-
->> block@vger.kernel.org; Jens Axboe <axboe@kernel.dk>; Damien Le Moal
->> <Damien.LeMoal@wdc.com>
->> Subject: Re: [PATCH] block: streamline merge possibility checks
->>
->> On Fri, Dec 20, 2019 at 02:50:05PM +0800, Bob Liu wrote:
->>> On 12/19/19 3:41 AM, Dmitry Fomichev wrote:
->>>> Checks for data direction in attempt_merge() and blk_rq_merge_ok()
->>>
->>> Speak about these two functions, do you think attempt_merge() can be
->> built on blk_rq_merge_ok()?
->>> Things like..
->>> diff --git a/block/blk-merge.c b/block/blk-merge.c
->>> index 48e6725..2a00c4c 100644
->>> --- a/block/blk-merge.c
->>> +++ b/block/blk-merge.c
->>> @@ -724,28 +724,7 @@ static enum elv_merge blk_try_req_merge(struct
->> request *req,
->>>  static struct request *attempt_merge(struct request_queue *q,
->>>                                      struct request *req, struct request *next)
->>>  {
->>> -       if (!rq_mergeable(req) || !rq_mergeable(next))
->>> -               return NULL;
->>> -
->>> -       if (req_op(req) != req_op(next))
->>> -               return NULL;
->>> -
->>> -       if (rq_data_dir(req) != rq_data_dir(next)
->>> -           || req->rq_disk != next->rq_disk)
->>> -               return NULL;
->>> -
->>> -       if (req_op(req) == REQ_OP_WRITE_SAME &&
->>> -           !blk_write_same_mergeable(req->bio, next->bio))
->>> -               return NULL;
->>> -
->>> -       /*
->>> -        * Don't allow merge of different write hints, or for a hint with
->>> -        * non-hint IO.
->>> -        */
->>> -       if (req->write_hint != next->write_hint)
->>> -               return NULL;
->>> -
->>> -       if (req->ioprio != next->ioprio)
->>> +       if (!blk_rq_merge_ok(req, next->bio))
->>>                 return NULL;
->>
->> This looks sensible, but we might have to be a bit more careful.
->> rq_mergeable checks for RQF_NOMERGE_FLAGS and various ops, while
->> bio_mergeable is missing those.  So I think you need to go through
->> carefully if we need to keep any extra checks, but otherwise using
->> blk_rq_merge_ok looks sensible.
+On Mon, Jan 06, 2020 at 03:35:10PM +0800, Yufen Yu wrote:
+> When delete partition executes concurrently with IOs issue,
+> it may cause use-after-free on part in disk_map_sector_rcu()
+> as following:
 > 
-> I tried this patch as is and, indeed, it leads to blktests failures and filesystem
-> errors, apparently because of the RQF_NOMERGE_FLAGS  difference.
-> However, the patch below seems to work - I've been running my host system
-> with it for a couple of days with no issues. This one is added on top of
-> "block: streamline merge possibility checks" patch.
+> blk_account_io_start(req1)  delete_partition  blk_account_io_start(req2)
 > 
-> From: Dmitry Fomichev <dmitry.fomichev@wdc.com>
-> Date: Wed, 8 Jan 2020 14:24:06 -0500
-> Subject: [PATCH] block: simplify merge checks
+> rcu_read_lock()
+> disk_map_sector_rcu
+> part = rcu_dereference(ptbl->part[4])
+>                            rcu_assign_pointer(ptbl->part[4], NULL);
+>                            rcu_assign_pointer(ptbl->last_lookup, NULL);
+> rcu_assign_pointer(ptbl->last_lookup, part);
 > 
-> The code parts to decide on merge possibility in attempt_merge() and
-> blk_rq_merge_ok() look very similar. It is possible to move these
-> checks to a common inline helper function.
+>                            hd_struct_kill(part)
+> !hd_struct_try_get
+>   part = &rq->rq_disk->part0;
+> rcu_read_unlock()
+>                            __delete_partition
+>                            call_rcu
+>                                             rcu_read_lock
+>                                             disk_map_sector_rcu
+>                                             part = rcu_dereference(ptbl->last_lookup);
 > 
-> Suggested-by: Bob Liu <bob.liu@oracle.com>
-> Signed-off-by: Dmitry Fomichev <dmitry.fomichev@wdc.com>
+>                            delete_partition_work_fn
+>                            free(part)
+>                                             hd_struct_try_get(part)
+>                                             BUG_ON use-after-free
+> 
+> req1 try to get 'ptbl->part[4]', while the part is beening
+> deleted. Although the delete_partition() will set last_lookup
+> as NULL, req1 can overwrite it as 'part[4]' again.
+> 
+> After calling call_rcu() and free() for the part, req2 can
+> access the part by last_lookup, resulting in use after free.
+> 
+> In fact, this bug has been reported by syzbot:
+>     https://lkml.org/lkml/2019/1/4/357
+> 
+> To fix the bug, we try to cache index of part[] instead of
+> part[i] itself in last_lookup. Even if the index may been
+> re-assign, others can either get part[i] as value of NULL,
+> or get the new allocated part[i] after call_rcu. Both of
+> them is okay.
+> 
+> Signed-off-by: Yufen Yu <yuyufen@huawei.com>
 > ---
->  block/blk-merge.c | 56 +++++++++++++++++++++++++++--------------------
->  1 file changed, 32 insertions(+), 24 deletions(-)
+>  block/genhd.c             | 15 +++++++++------
+>  block/partition-generic.c |  2 +-
+>  include/linux/genhd.h     |  3 ++-
+>  3 files changed, 12 insertions(+), 8 deletions(-)
 > 
-> diff --git a/block/blk-merge.c b/block/blk-merge.c
-> index f68d67b367d6..49052a53051f 100644
-> --- a/block/blk-merge.c
-> +++ b/block/blk-merge.c
-> @@ -732,6 +732,36 @@ static enum elv_merge blk_try_req_merge(struct request *req,
->  	return ELEVATOR_NO_MERGE;
+> diff --git a/block/genhd.c b/block/genhd.c
+> index ff6268970ddc..97447281a4f5 100644
+> --- a/block/genhd.c
+> +++ b/block/genhd.c
+> @@ -282,18 +282,21 @@ struct hd_struct *disk_map_sector_rcu(struct gendisk *disk, sector_t sector)
+>  	struct disk_part_tbl *ptbl;
+>  	struct hd_struct *part;
+>  	int i;
+> +	int last_lookup;
+>  
+>  	ptbl = rcu_dereference(disk->part_tbl);
+> -
+> -	part = rcu_dereference(ptbl->last_lookup);
+> -	if (part && sector_in_part(part, sector))
+> -		return part;
+> +	last_lookup = READ_ONCE(ptbl->last_lookup);
+> +	if (last_lookup > 0 && last_lookup < ptbl->len) {
+> +		part = rcu_dereference(ptbl->part[last_lookup]);
+> +		if (part && sector_in_part(part, sector))
+> +			return part;
+> +	}
+>  
+>  	for (i = 1; i < ptbl->len; i++) {
+>  		part = rcu_dereference(ptbl->part[i]);
+>  
+>  		if (part && sector_in_part(part, sector)) {
+> -			rcu_assign_pointer(ptbl->last_lookup, part);
+> +			WRITE_ONCE(ptbl->last_lookup, i);
+>  			return part;
+>  		}
+>  	}
+> @@ -1263,7 +1266,7 @@ static void disk_replace_part_tbl(struct gendisk *disk,
+>  	rcu_assign_pointer(disk->part_tbl, new_ptbl);
+>  
+>  	if (old_ptbl) {
+> -		rcu_assign_pointer(old_ptbl->last_lookup, NULL);
+> +		WRITE_ONCE(old_ptbl->last_lookup, 0);
+>  		kfree_rcu(old_ptbl, rcu_head);
+>  	}
 >  }
+> diff --git a/block/partition-generic.c b/block/partition-generic.c
+> index 1d20c9cf213f..a9fd24ae3acb 100644
+> --- a/block/partition-generic.c
+> +++ b/block/partition-generic.c
+> @@ -284,7 +284,7 @@ void delete_partition(struct gendisk *disk, int partno)
+>  		return;
 >  
-> +static inline bool blk_rq_mergeable(struct request *rq, struct bio *bio)
-> +{
-> +	if (!rq_mergeable(rq))
-> +		return false;
-> +
-> +	if (req_op(rq) != bio_op(bio))
-> +		return false;
-> +
-> +	/* must be same device */
-> +	if (rq->rq_disk != bio->bi_disk)
-> +		return false;
-> +
-> +	/* must be using the same buffer */
-> +	if (req_op(rq) == REQ_OP_WRITE_SAME &&
-> +	    !blk_write_same_mergeable(rq->bio, bio))
-> +		return false;
-> +
-> +	/*
-> +	 * Don't allow merge of different write hints, or for a hint with
-> +	 * non-hint IO.
-> +	 */
-> +	if (rq->write_hint != bio->bi_write_hint)
-> +		return false;
-> +
-> +	if (rq->ioprio != bio_prio(bio))
-> +		return false;
-> +
-> +	return true;
-> +}
-> +
->  /*
->   * For non-mq, this has to be called with the request spinlock acquired.
->   * For mq with scheduling, the appropriate queue wide lock should be held.
-> @@ -739,7 +769,7 @@ static enum elv_merge blk_try_req_merge(struct request *req,
->  static struct request *attempt_merge(struct request_queue *q,
->  				     struct request *req, struct request *next)
->  {
-> -	if (!blk_rq_merge_ok(req, next->bio))
-> +	if (!rq_mergeable(next) || !blk_rq_mergeable(req, next->bio))
->  		return NULL;
+>  	rcu_assign_pointer(ptbl->part[partno], NULL);
+> -	rcu_assign_pointer(ptbl->last_lookup, NULL);
+> +	WRITE_ONCE(ptbl->last_lookup, 0);
+>  	kobject_put(part->holder_dir);
+>  	device_del(part_to_dev(part));
 >  
->  	/*
-> @@ -841,35 +871,13 @@ int blk_attempt_req_merge(struct request_queue *q, struct request *rq,
->  
->  bool blk_rq_merge_ok(struct request *rq, struct bio *bio)
->  {
-> -	if (!rq_mergeable(rq) || !bio_mergeable(bio))
-> -		return false;
-> -
-> -	if (req_op(rq) != bio_op(bio))
-> -		return false;
-> -
-> -	/* must be same device */
-> -	if (rq->rq_disk != bio->bi_disk)
-> +	if (!bio_mergeable(bio) || !blk_rq_mergeable(rq, bio))
->  		return false;
->  
+> diff --git a/include/linux/genhd.h b/include/linux/genhd.h
+> index 8bb63027e4d6..9be4fb8f8b8b 100644
+> --- a/include/linux/genhd.h
+> +++ b/include/linux/genhd.h
+> @@ -160,7 +160,8 @@ enum {
+>  struct disk_part_tbl {
+>  	struct rcu_head rcu_head;
+>  	int len;
+> -	struct hd_struct __rcu *last_lookup;
+> +	/* Cache last lookup part[] index */
+> +	int last_lookup;
+>  	struct hd_struct __rcu *part[];
+>  };
 
-Nitpick, I think bio_mergeable(bio) can also put inside blk_rq_mergeable().
-Anyway, looks fine to me, thanks!
-Reviewed-by: Bob Liu <bob.liu@oracle.com>
+As we discussed in the following link:
 
->  	/* only merge integrity protected bio into ditto rq */
->  	if (blk_integrity_merge_bio(rq->q, rq, bio) == false)
->  		return false;
->  
-> -	/* must be using the same buffer */
-> -	if (req_op(rq) == REQ_OP_WRITE_SAME &&
-> -	    !blk_write_same_mergeable(rq->bio, bio))
-> -		return false;
-> -
-> -	/*
-> -	 * Don't allow merge of different write hints, or for a hint with
-> -	 * non-hint IO.
-> -	 */
-> -	if (rq->write_hint != bio->bi_write_hint)
-> -		return false;
-> -
-> -	if (rq->ioprio != bio_prio(bio))
-> -		return false;
-> -
->  	return true;
->  }
->  
-> 
+https://lore.kernel.org/linux-block/5cc465cc-d68c-088e-0729-2695279c7853@huawei.com/T/#m9a959cc91ff8c6387f83aa5c505581159b5b6571
+
+This way works, but adding a little overhead to the fast path, one indirect
+memory reference, especially ->part[->last_lookup] may take one extra cacheline.
+
+I will post one patch to fix the issue without adding the extra overhead.
+
+
+Thanks,
+Ming
 
