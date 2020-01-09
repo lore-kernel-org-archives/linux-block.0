@@ -2,124 +2,180 @@ Return-Path: <SRS0=+EVs=26=vger.kernel.org=linux-block-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-2.4 required=3.0 tests=DKIMWL_WL_HIGH,DKIM_SIGNED,
-	DKIM_VALID,DKIM_VALID_AU,HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,
-	SPF_HELO_NONE,SPF_PASS,USER_AGENT_SANE_1 autolearn=no autolearn_force=no
-	version=3.4.0
+X-Spam-Status: No, score=-7.2 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
+	MAILING_LIST_MULTI,MENTIONS_GIT_HOSTING,SPF_HELO_NONE,SPF_PASS,
+	USER_AGENT_SANE_1 autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 4DFF6C33CA1
-	for <linux-block@archiver.kernel.org>; Thu,  9 Jan 2020 22:07:47 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 9E395C282DD
+	for <linux-block@archiver.kernel.org>; Thu,  9 Jan 2020 23:22:51 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.kernel.org (Postfix) with ESMTP id 2089D2077B
-	for <linux-block@archiver.kernel.org>; Thu,  9 Jan 2020 22:07:47 +0000 (UTC)
-Authentication-Results: mail.kernel.org;
-	dkim=pass (2048-bit key) header.d=nvidia.com header.i=@nvidia.com header.b="pAGT+6E4"
+	by mail.kernel.org (Postfix) with ESMTP id 7BBB0205F4
+	for <linux-block@archiver.kernel.org>; Thu,  9 Jan 2020 23:22:51 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1728965AbgAIWHl (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Thu, 9 Jan 2020 17:07:41 -0500
-Received: from hqnvemgate26.nvidia.com ([216.228.121.65]:12965 "EHLO
-        hqnvemgate26.nvidia.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1725775AbgAIWHk (ORCPT
-        <rfc822;linux-block@vger.kernel.org>); Thu, 9 Jan 2020 17:07:40 -0500
-Received: from hqpgpgate101.nvidia.com (Not Verified[216.228.121.13]) by hqnvemgate26.nvidia.com (using TLS: TLSv1.2, DES-CBC3-SHA)
-        id <B5e17a4190000>; Thu, 09 Jan 2020 14:07:21 -0800
-Received: from hqmail.nvidia.com ([172.20.161.6])
-  by hqpgpgate101.nvidia.com (PGP Universal service);
-  Thu, 09 Jan 2020 14:07:39 -0800
-X-PGP-Universal: processed;
-        by hqpgpgate101.nvidia.com on Thu, 09 Jan 2020 14:07:39 -0800
-Received: from [10.110.48.28] (10.124.1.5) by HQMAIL107.nvidia.com
- (172.20.187.13) with Microsoft SMTP Server (TLS) id 15.0.1473.3; Thu, 9 Jan
- 2020 22:07:38 +0000
-Subject: Re: [PATCH v12 00/22] mm/gup: prereqs to track dma-pinned pages:
- FOLL_PIN
-To:     Andrew Morton <akpm@linux-foundation.org>
-CC:     Al Viro <viro@zeniv.linux.org.uk>,
-        Alex Williamson <alex.williamson@redhat.com>,
-        Benjamin Herrenschmidt <benh@kernel.crashing.org>,
-        =?UTF-8?B?QmrDtnJuIFTDtnBlbA==?= <bjorn.topel@intel.com>,
-        Christoph Hellwig <hch@infradead.org>,
-        Dan Williams <dan.j.williams@intel.com>,
-        Daniel Vetter <daniel@ffwll.ch>,
-        Dave Chinner <david@fromorbit.com>,
-        David Airlie <airlied@linux.ie>,
-        "David S . Miller" <davem@davemloft.net>,
-        Ira Weiny <ira.weiny@intel.com>, Jan Kara <jack@suse.cz>,
-        Jason Gunthorpe <jgg@ziepe.ca>, Jens Axboe <axboe@kernel.dk>,
-        Jonathan Corbet <corbet@lwn.net>,
-        =?UTF-8?B?SsOpcsO0bWUgR2xpc3Nl?= <jglisse@redhat.com>,
-        "Kirill A . Shutemov" <kirill@shutemov.name>,
-        Magnus Karlsson <magnus.karlsson@intel.com>,
-        Mauro Carvalho Chehab <mchehab@kernel.org>,
-        Michael Ellerman <mpe@ellerman.id.au>,
-        Michal Hocko <mhocko@suse.com>,
-        Mike Kravetz <mike.kravetz@oracle.com>,
-        Paul Mackerras <paulus@samba.org>,
-        Shuah Khan <shuah@kernel.org>,
-        Vlastimil Babka <vbabka@suse.cz>, <bpf@vger.kernel.org>,
-        <dri-devel@lists.freedesktop.org>, <kvm@vger.kernel.org>,
-        <linux-block@vger.kernel.org>, <linux-doc@vger.kernel.org>,
-        <linux-fsdevel@vger.kernel.org>, <linux-kselftest@vger.kernel.org>,
-        <linux-media@vger.kernel.org>, <linux-rdma@vger.kernel.org>,
-        <linuxppc-dev@lists.ozlabs.org>, <netdev@vger.kernel.org>,
-        <linux-mm@kvack.org>, LKML <linux-kernel@vger.kernel.org>
-References: <20200107224558.2362728-1-jhubbard@nvidia.com>
-From:   John Hubbard <jhubbard@nvidia.com>
-X-Nvconfidentiality: public
-Message-ID: <2a9145d4-586e-6489-64e4-0c54f47afaa1@nvidia.com>
-Date:   Thu, 9 Jan 2020 14:07:38 -0800
-User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:68.0) Gecko/20100101
- Thunderbird/68.3.1
+        id S1726299AbgAIXWv (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Thu, 9 Jan 2020 18:22:51 -0500
+Received: from mail104.syd.optusnet.com.au ([211.29.132.246]:58458 "EHLO
+        mail104.syd.optusnet.com.au" rhost-flags-OK-OK-OK-OK)
+        by vger.kernel.org with ESMTP id S1725840AbgAIXWu (ORCPT
+        <rfc822;linux-block@vger.kernel.org>);
+        Thu, 9 Jan 2020 18:22:50 -0500
+Received: from dread.disaster.area (pa49-180-68-255.pa.nsw.optusnet.com.au [49.180.68.255])
+        by mail104.syd.optusnet.com.au (Postfix) with ESMTPS id 868EE820917;
+        Fri, 10 Jan 2020 10:22:45 +1100 (AEDT)
+Received: from dave by dread.disaster.area with local (Exim 4.92.3)
+        (envelope-from <david@fromorbit.com>)
+        id 1iph8W-0006Qu-Dy; Fri, 10 Jan 2020 10:22:44 +1100
+Date:   Fri, 10 Jan 2020 10:22:44 +1100
+From:   Dave Chinner <david@fromorbit.com>
+To:     Tony Asleson <tasleson@redhat.com>,
+        Sweet Tea Dorminy <sweettea@redhat.com>,
+        James Bottomley <James.Bottomley@hansenpartnership.com>,
+        linux-scsi@vger.kernel.org, linux-block@vger.kernel.org,
+        linux-fsdevel@vger.kernel.org
+Subject: Re: [RFC 9/9] __xfs_printk: Add durable name to output
+Message-ID: <20200109232244.GT23195@dread.disaster.area>
+References: <20191223225558.19242-10-tasleson@redhat.com>
+ <20200104025620.GC23195@dread.disaster.area>
+ <5ad7cf7b-e261-102c-afdc-fa34bed98921@redhat.com>
+ <20200106220233.GK23195@dread.disaster.area>
+ <CAMeeMh-zr309TzbC3ayKUKRniat+rzurgzmeM5LJYMFVDj7bLA@mail.gmail.com>
+ <20200107012353.GO23195@dread.disaster.area>
+ <4ce83a0e-13e1-6245-33a3-5c109aec4bf1@redhat.com>
+ <20200108021002.GR23195@dread.disaster.area>
+ <9e449c65-193c-d69c-1454-b1059221e5dc@redhat.com>
+ <20200109014117.GB3809@agk-dp.fab.redhat.com>
 MIME-Version: 1.0
-In-Reply-To: <20200107224558.2362728-1-jhubbard@nvidia.com>
-X-Originating-IP: [10.124.1.5]
-X-ClientProxiedBy: HQMAIL111.nvidia.com (172.20.187.18) To
- HQMAIL107.nvidia.com (172.20.187.13)
-Content-Type: text/plain; charset="utf-8"
-Content-Language: en-US
-Content-Transfer-Encoding: 7bit
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=nvidia.com; s=n1;
-        t=1578607641; bh=+NEvkiCKN4muU9xEMv7O0vL5DDgA+srq0dD5KyM2g5Y=;
-        h=X-PGP-Universal:Subject:To:CC:References:From:X-Nvconfidentiality:
-         Message-ID:Date:User-Agent:MIME-Version:In-Reply-To:
-         X-Originating-IP:X-ClientProxiedBy:Content-Type:Content-Language:
-         Content-Transfer-Encoding;
-        b=pAGT+6E4t/5Sgzls83W8rrhD73PbNnbQX0v+uLgN6NdK6ox1s0YILXA5+Q9WkB7U5
-         Qgdq4MfQKXM00HXiVUvw/MN1+0Npjsn2yckDImY4OPUy9vKTHUQrRr5b/32qyPv6Y4
-         G8uphKhloBfTQ9ova5uKctNKv/z/ybtCLuSP2dniMP6oLwVdc9frqv+uSdiahegES7
-         HZtKpaUzMnUGCyRfUKLB2LXhSyGZIEwOR/UkaAhKUOx0B4NaRtt8Qz56svVPCLTYZD
-         6dBjR9cwNa9He9WTH1/ZpC5nBgZ5v8YIJX6cYUd/1MLjMgnC8wrJfdT7uC+HoO76Fq
-         StnhQb6FNJNXA==
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <20200109014117.GB3809@agk-dp.fab.redhat.com>
+User-Agent: Mutt/1.10.1 (2018-07-13)
+X-Optus-CM-Score: 0
+X-Optus-CM-Analysis: v=2.3 cv=X6os11be c=1 sm=1 tr=0
+        a=sbdTpStuSq8iNQE8viVliQ==:117 a=sbdTpStuSq8iNQE8viVliQ==:17
+        a=jpOVt7BSZ2e4Z31A5e1TngXxSK0=:19 a=kj9zAlcOel0A:10 a=Jdjhy38mL1oA:10
+        a=hoDmsdNMAAAA:20 a=GFaoHKnqAAAA:8 a=7-415B0cAAAA:8
+        a=VQnnGOFCwwFJJO5165wA:9 a=CjuIK1q_8ugA:10 a=Vh1PrrggmBitVpCIy7ZX:22
+        a=biEYGPWJfzWAr4FL6Ov7:22 a=pHzHmUro8NiASowvMSCR:22
+        a=nt3jZW36AmriUCFCBwmW:22
 Sender: linux-block-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-On 1/7/20 2:45 PM, John Hubbard wrote:
-> Hi,
+On Thu, Jan 09, 2020 at 01:41:17AM +0000, Alasdair G Kergon wrote:
+> On Wed, Jan 08, 2020 at 10:53:13AM -0600, Tony Asleson wrote:
+> > We are not removing any existing information, we are adding.
 > 
-> The "track FOLL_PIN pages" would have been the very next patch, but it is
-> not included here because I'm still debugging a bug report from Leon.
-> Let's get all of the prerequisite work (it's been reviewed) into the tree
-> so that future reviews are easier. It's clear that any fixes that are
-> required to the tracking patch, won't affect these patches here.
+> A difficulty with this approach is:  Where do you stop when your storage
+> configuration is complicated and changing?  Do you add the complete
+> relevant part of the storage stack configuration to every storage
+> message in the kernel so that it is easy to search later?
 > 
-> This implements an API naming change (put_user_page*() -->
-> unpin_user_page*()), and also adds FOLL_PIN page support, up to
-> *but not including* actually tracking FOLL_PIN pages. It extends
-> the FOLL_PIN support to a few select subsystems. More subsystems will
-> be added in follow up work.
+> Or do you catch the messages in userspace and add some of this
+> information there before sending them on to your favourite log message
+> database?  (ref. peripety, various rsyslog extensions)
 > 
+> > I think all the file systems should include their FS UUID in the FS log
+> > messages too, but that is not part of the problem we are trying to solve.
+> 
+> Each layer (subsystem) should already be tagging its messages in an
+> easy-to-parse way so that all those relating to the same object (e.g.
+> filesystem instance, disk) at its level of the stack can easily be
+> matched together later.  Where this doesn't already happen, we should
+> certainly be fixing that as it's a pre-requisite for any sensible
+> post-processing: As long as the right information got recorded, it can
+> all be joined together on demand later by some userspace software.
 
-Hi Andrew and all,
+*nod*
 
-To clarify: I'm hoping that this series can go into 5.6.
+That was the essence of my suggestion that the filesystem mount log
+notification emits it's persistent identifier. If you need it to be
+logged, that's where the verbose identifier output should be....
 
-Meanwhile, I'm working on tracking down and solving the problem that Leon
-reported, in the "track FOLL_PIN pages" patch, and that patch is not part of
-this series.
+> > The user has to systematically and methodically go through the logs
+> > trying to deduce what the identifier was referring to at the time of the
+> > error.  This isn't trivial and virtually impossible at times depending
+> > on circumstances.
+> 
+> So how about logging what these identifiers reference at different times
+> in a way that is easy to query later?
+> 
+> Come to think of it, we already get uevents when the references change,
+> and udev rules even already now create neat "by-*" links for us.  Maybe
+> we just need to log better what udev is actually already doing?
 
-thanks,
+Right, this is essentially what I've been trying to point out - I
+even used the by-uuid links as an example of how the filesystem is
+persistently identified by existing system boot infrastructure. :)
+
+> Then we could reproduce what the storage configuration looked like at
+> any particular time in the past to provide the missing context for
+> the identifiers in the log messages.
+> 
+>                     ---------------------
+>  
+> Which seems like an appropriate time to introduce storage-logger.
+> 
+>     https://github.com/lvmteam/storage-logger
+> 
+>     Fedora rawhide packages:
+>       https://copr.fedorainfracloud.org/coprs/agk/storage-logger/ 
+> 
+> The goal of this particular project is to maintain a record of the
+> storage configuration as it changes over time.  It should provide a
+> quick way to check the state of a system at a specified time in the
+> past.
+> 
+> The initial logging implementation is triggered by storage uevents and
+> consists of two components:
+> 
+> 1. A new udev rule file, 99-zzz-storage-logger.rules, which runs after
+> all the other rules have run and invokes:
+> 
+> 2. A script, udev_storage_logger.sh, that captures relevant
+> information about devices that changed and stores it in the system
+> journal.
+> 
+> The effect is to log the data from relevant uevents plus some
+> supplementary information (including device-mapper tables, for example).
+> It does not yet handle filesystem-related events.
+
+There are very few filesystem uevents issued that you could log,
+anyway. Certainly nothing standardised across filesystems....
+
+> Two methods to query the data are offered:
+> 
+> 1. journalctl
+> Data is tagged with the identifier UDEVLOG and retrievable as
+> key-value pairs.
+>   journalctl -t UDEVLOG --output verbose
+>   journalctl -t UDEVLOG --output json
+>     --since 'YYYY-MM-DD HH:MM:SS' 
+>     --until 'YYYY-MM-DD HH:MM:SS'
+>   journalctl -t UDEVLOG --output verbose
+>     --output-fields=PERSISTENT_STORAGE_ID,MAJOR,MINOR
+>      PERSISTENT_STORAGE_ID=dm-name-vg1-lvol0
+> 
+> 2. lsblkj  [appended j for journal]
+> This lsblk wrapper reprocesses the logged uevents to reconstruct a
+> dummy system environment that "looks like" the system did at a
+> specified earlier time and then runs lsblk against it.
+
+Yeah, and if you add the equivalent of 'lsblk -f' then you also get
+the fs UUID to identify the filesystem on the block device at a
+given time....
+
+> Yes, I'm looking for feedback to help to decide whether or not it's
+> worth developing this any further.
+
+This seems like a more flexible approach to me - it allows for
+text-based system loggers a hook to capture this device
+information, too, and hence implement their own post-processing
+scripts to provide the same lifetime information.
+
+Cheers,
+
+Dave.
 -- 
-John Hubbard
-NVIDIA
+Dave Chinner
+david@fromorbit.com
