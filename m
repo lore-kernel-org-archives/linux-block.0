@@ -2,114 +2,103 @@ Return-Path: <SRS0=/LTC=27=vger.kernel.org=linux-block-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-7.2 required=3.0 tests=DKIM_SIGNED,DKIM_VALID,
-	HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,MENTIONS_GIT_HOSTING,
-	SPF_HELO_NONE,SPF_PASS,USER_AGENT_SANE_1 autolearn=ham autolearn_force=no
+X-Spam-Status: No, score=-0.8 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
+	MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS autolearn=no autolearn_force=no
 	version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id E9433C282DD
-	for <linux-block@archiver.kernel.org>; Fri, 10 Jan 2020 18:11:22 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id D7E03C282DD
+	for <linux-block@archiver.kernel.org>; Fri, 10 Jan 2020 19:43:18 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.kernel.org (Postfix) with ESMTP id BB80A2080D
-	for <linux-block@archiver.kernel.org>; Fri, 10 Jan 2020 18:11:22 +0000 (UTC)
-Authentication-Results: mail.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel-dk.20150623.gappssmtp.com header.i=@kernel-dk.20150623.gappssmtp.com header.b="cfFoDfeM"
+	by mail.kernel.org (Postfix) with ESMTP id B0E8E20880
+	for <linux-block@archiver.kernel.org>; Fri, 10 Jan 2020 19:43:18 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1728496AbgAJSLW (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Fri, 10 Jan 2020 13:11:22 -0500
-Received: from mail-pf1-f195.google.com ([209.85.210.195]:38200 "EHLO
-        mail-pf1-f195.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1727742AbgAJSLW (ORCPT
+        id S1728681AbgAJTnR (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Fri, 10 Jan 2020 14:43:17 -0500
+Received: from Galois.linutronix.de ([193.142.43.55]:59586 "EHLO
+        Galois.linutronix.de" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S1727812AbgAJTnR (ORCPT
         <rfc822;linux-block@vger.kernel.org>);
-        Fri, 10 Jan 2020 13:11:22 -0500
-Received: by mail-pf1-f195.google.com with SMTP id x185so1504886pfc.5
-        for <linux-block@vger.kernel.org>; Fri, 10 Jan 2020 10:11:21 -0800 (PST)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=kernel-dk.20150623.gappssmtp.com; s=20150623;
-        h=to:cc:from:subject:message-id:date:user-agent:mime-version
-         :content-language:content-transfer-encoding;
-        bh=Zd/4PHH09oDT26HSXxoIBJR5pD9D4kV59rXf7Uwf2Bs=;
-        b=cfFoDfeMAFzDxon9xAhd6qwW8artFpgcF1i3+Qg0GgjBFCu0UafFnZj744OPnehyd6
-         jtP3Hsv+UKqDenB3Zk8Y34c/v7nC/rXXNcGjCO5//9gr9G1uCzw3HoHsq1IQgnqNcdQ4
-         zFeOFKWev2uLzlxNp0W1e0oNKML5hyJ3FwfO8eOVJsR9x5nj9MkX11k7lizDH4/CwAJv
-         xh4wSJPrfM3jbHyN5AwG/3VeaF6iWRhEWyYMea7HP4Rm22tyb8LvvmtzKV3J8E44O7NG
-         VsjvB4SqqWNZZBQcrwzS3D/njGvGbmeSRZ6MX3hhegVyZ32B1G8rN/k0Oxk2Gkrlsjzs
-         PRaw==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20161025;
-        h=x-gm-message-state:to:cc:from:subject:message-id:date:user-agent
-         :mime-version:content-language:content-transfer-encoding;
-        bh=Zd/4PHH09oDT26HSXxoIBJR5pD9D4kV59rXf7Uwf2Bs=;
-        b=BSH7fC8V5Jt6Yq/jlOExffJALhXofdSvnqfWE0/mBs0AqjTpk/30LAQPHAOqpu+Pt6
-         Fa5X/asbZxmVQO7MJl0ll/cuwnN2Y95rnxf9F4c6tp7leHm+f2fPAYTMeG2dDjCIpXQk
-         EiuUY15flngn+MC9145QCyxyVjK7OBgSGGCJREzmnkixdvyMp8yAMoSzsP4QYTklJuwn
-         e5G6UUL8oxK3Gb+RASDjg+iwqt9NTsne43MGLMcuGek7zFzSjUHZn/EYK/rHaaWIeFEB
-         BikPCu5KwzqUX3GURetn7M7qif8u3jPyEBHX7bCUEnjvpsVUcrQqnPzpvvqS9Xamog3B
-         QFTA==
-X-Gm-Message-State: APjAAAWccb7cQPoo7bRj4LMD33q33XVkWrDxos1dsOPXsbQr7+BE8w1B
-        gXM/UTPsVj9ZhPIhE+BrBwdJPZrVTzc=
-X-Google-Smtp-Source: APXvYqwds9IRlrsk2s5mFQaUVi5x2ReG/aRSnojAzCkWeqnvq/NOQxTEF8wiylwznSpxrIC1/cewqw==
-X-Received: by 2002:a63:500c:: with SMTP id e12mr5828654pgb.214.1578679881049;
-        Fri, 10 Jan 2020 10:11:21 -0800 (PST)
-Received: from [192.168.1.188] ([66.219.217.145])
-        by smtp.gmail.com with ESMTPSA id u26sm3521238pfn.46.2020.01.10.10.11.20
-        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
-        Fri, 10 Jan 2020 10:11:20 -0800 (PST)
-To:     Linus Torvalds <torvalds@linux-foundation.org>
-Cc:     "linux-block@vger.kernel.org" <linux-block@vger.kernel.org>
-From:   Jens Axboe <axboe@kernel.dk>
-Subject: [GIT PULL] Block fixes for 5.5-rc
-Message-ID: <09fa9f3f-ca5c-f98a-d4a5-446810906107@kernel.dk>
-Date:   Fri, 10 Jan 2020 11:11:19 -0700
-User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:68.0) Gecko/20100101
- Thunderbird/68.2.2
+        Fri, 10 Jan 2020 14:43:17 -0500
+Received: from p5b06da22.dip0.t-ipconnect.de ([91.6.218.34] helo=nanos.tec.linutronix.de)
+        by Galois.linutronix.de with esmtpsa (TLS1.2:DHE_RSA_AES_256_CBC_SHA256:256)
+        (Exim 4.80)
+        (envelope-from <tglx@linutronix.de>)
+        id 1iq0Be-0003nc-R0; Fri, 10 Jan 2020 20:43:14 +0100
+Received: by nanos.tec.linutronix.de (Postfix, from userid 1000)
+        id 2C984105BDB; Fri, 10 Jan 2020 20:43:14 +0100 (CET)
+From:   Thomas Gleixner <tglx@linutronix.de>
+To:     Ming Lei <ming.lei@redhat.com>
+Cc:     Peter Xu <peterx@redhat.com>, Juri Lelli <juri.lelli@redhat.com>,
+        Ming Lei <minlei@redhat.com>,
+        Linux Kernel Mailing List <linux-kernel@vger.kernel.org>,
+        linux-block@vger.kernel.org
+Subject: Re: Kernel-managed IRQ affinity (cont)
+In-Reply-To: <20200110012802.GA4501@ming.t460p>
+References: <20191216195712.GA161272@xz-x1> <20191219082819.GB15731@ming.t460p> <20191219143214.GA50561@xz-x1> <20191219161115.GA18672@ming.t460p> <87eew8l7oz.fsf@nanos.tec.linutronix.de> <20200110012802.GA4501@ming.t460p>
+Date:   Fri, 10 Jan 2020 20:43:14 +0100
+Message-ID: <87v9pjrtbh.fsf@nanos.tec.linutronix.de>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=utf-8
-Content-Language: en-US
-Content-Transfer-Encoding: 7bit
+Content-Type: text/plain
+X-Linutronix-Spam-Score: -1.0
+X-Linutronix-Spam-Level: -
+X-Linutronix-Spam-Status: No , -1.0 points, 5.0 required,  ALL_TRUSTED=-1,SHORTCIRCUIT=-0.0001
 Sender: linux-block-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-Hi Linus,
+Ming,
 
-A few fixes that should go into this round. I popped out a patch in the
-middle this morning as we're still working on that, that particular
-patch is fixing a regression with 32-bit with the last segment split
-fix. I'll send that in once we're happy with it.
+Ming Lei <ming.lei@redhat.com> writes:
+> On Thu, Jan 09, 2020 at 09:02:20PM +0100, Thomas Gleixner wrote:
+>> Ming Lei <ming.lei@redhat.com> writes:
+>>
+>> This is duct tape engineering with absolutely no semantics. I can't even
+>> figure out the intent of this 'managed_irq' parameter.
+>
+> The intent is to isolate the specified CPUs from handling managed
+> interrupt.
 
-This pull request contains two NVMe fixes via Keith, removal of a dead
-function, and a fix for the bio op for read truncates (Ming).
+That's what I figured, but it still does not provide semantics and works
+just for specific cases.
 
-Please pull!
+> We can do that. The big problem is that the RT case can't guarantee that
+> IO won't be submitted from isolated CPU always. blk-mq's queue mapping
+> relies on the setup affinity, so un-known behavior(kernel crash, or io
+> hang, or other) may be caused if we exclude isolated CPUs from interrupt
+> affinity.
+>
+> That is why I try to exclude isolated CPUs from interrupt effective affinity,
+> turns out the approach is simple and doable.
 
+Yes, it's doable. But it still is inconsistent behaviour. Assume the
+following configuration:
 
-  git://git.kernel.dk/linux-block.git tags/block-5.5-2020-01-10
+  8 CPUs CPU0,1 assigned for housekeeping
 
+With 8 queues the proposed change does nothing because each queue is
+mapped to exactly one CPU.
 
-----------------------------------------------------------------
-Amit Engel (1):
-      nvmet: fix per feat data len for get_feature
+With 4 queues you get the following:
 
-Jens Axboe (1):
-      block: remove unused mp_bvec_last_segment
+ CPU0,1       queue 0
+ CPU2,3       queue 1
+ CPU4,5       queue 2
+ CPU6,7       queue 3
 
-Keith Busch (1):
-      nvme: Translate more status codes to blk_status_t
+No effect on the isolated CPUs either.
 
-Ming Lei (1):
-      fs: move guard_bio_eod() after bio_set_op_attrs
+With 2 queues you get the following:
 
- block/bio.c                     | 12 +++++++++++-
- drivers/nvme/host/core.c        |  2 ++
- drivers/nvme/target/admin-cmd.c | 12 +++++++++++-
- fs/buffer.c                     |  8 ++++----
- fs/internal.h                   |  2 +-
- fs/mpage.c                      |  2 +-
- include/linux/bvec.h            | 22 ----------------------
- 7 files changed, 30 insertions(+), 30 deletions(-)
+ CPU0,1,2,3   queue 0
+ CPU4,5,6,7   queue 1
 
--- 
-Jens Axboe
+So here the isolated CPUs 2 and 3 get the isolation, but 4-7
+not. That's perhaps intended, but definitely not documented.
 
+So you really need to make your mind up and describe what the intended
+effect of this is and why you think that the result is correct.
+
+Thanks,
+
+       tglx
