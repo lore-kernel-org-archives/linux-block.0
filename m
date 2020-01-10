@@ -2,121 +2,96 @@ Return-Path: <SRS0=/LTC=27=vger.kernel.org=linux-block-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-2.4 required=3.0 tests=DKIMWL_WL_HIGH,DKIM_SIGNED,
+X-Spam-Status: No, score=-7.4 required=3.0 tests=DKIMWL_WL_HIGH,DKIM_SIGNED,
 	DKIM_VALID,DKIM_VALID_AU,HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,
-	SPF_HELO_NONE,SPF_PASS,USER_AGENT_SANE_1 autolearn=no autolearn_force=no
-	version=3.4.0
+	MENTIONS_GIT_HOSTING,SPF_HELO_NONE,SPF_PASS,USER_AGENT_SANE_1 autolearn=ham
+	autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id EA8BBC33CA2
-	for <linux-block@archiver.kernel.org>; Fri, 10 Jan 2020 02:00:59 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id D86A9C3F68F
+	for <linux-block@archiver.kernel.org>; Fri, 10 Jan 2020 02:58:16 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.kernel.org (Postfix) with ESMTP id C15A02064C
-	for <linux-block@archiver.kernel.org>; Fri, 10 Jan 2020 02:00:59 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id A58502075D
+	for <linux-block@archiver.kernel.org>; Fri, 10 Jan 2020 02:58:16 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="fn6VlKK3"
+	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="YKNolHmi"
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1730708AbgAJCA7 (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Thu, 9 Jan 2020 21:00:59 -0500
-Received: from us-smtp-1.mimecast.com ([207.211.31.81]:58108 "EHLO
+        id S1730965AbgAJC6P (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Thu, 9 Jan 2020 21:58:15 -0500
+Received: from us-smtp-1.mimecast.com ([207.211.31.81]:24156 "EHLO
         us-smtp-delivery-1.mimecast.com" rhost-flags-OK-OK-OK-FAIL)
-        by vger.kernel.org with ESMTP id S1730619AbgAJCA6 (ORCPT
+        by vger.kernel.org with ESMTP id S1730952AbgAJC6P (ORCPT
         <rfc822;linux-block@vger.kernel.org>);
-        Thu, 9 Jan 2020 21:00:58 -0500
+        Thu, 9 Jan 2020 21:58:15 -0500
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-        s=mimecast20190719; t=1578621657;
+        s=mimecast20190719; t=1578625093;
         h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
          to:to:cc:cc:mime-version:mime-version:content-type:content-type:
          in-reply-to:in-reply-to:references:references;
-        bh=TIpC/krxLydDnHVW/RNCGJrbKjBHiQ/9nuaNV71WzMg=;
-        b=fn6VlKK326yL3AQdehoZKHQxh6rb3VC9/32G+c8iFrphi5UhOIkpO6Ghu3LIDXIGWIL8DL
-        9Begjm+iHjvyBIrJo5USgZXwpR3DKsKWSidzd45SmdjGRZJzn1w5PzCJG1RrlrON3OiiHx
-        HkB61u58FHl0YGBOplOtUEEKACWISK4=
+        bh=yQq8OjZQe+jrASIwtflhAXk/e88ivOD4URwk9vFRX54=;
+        b=YKNolHmi3xqX3f/R3Tp/qdln/0w4KvXwke3RUAqNCSO9OuWE5dF2kAsSVtVaHLMbPEpWEd
+        jRsK7m8kYm5hxmMiZIFjAjU8hTtugj4sja5HywtEng58Yrn0ll7nFc/gDMem8aJfH1nIgf
+        nLwrGNufxlpj/rQ+QbnZO5TT9/4pmgA=
 Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
  [209.132.183.4]) (Using TLS) by relay.mimecast.com with ESMTP id
- us-mta-253-2IjvPvvuNNqdHnpMOhEJtA-1; Thu, 09 Jan 2020 21:00:53 -0500
-X-MC-Unique: 2IjvPvvuNNqdHnpMOhEJtA-1
-Received: from smtp.corp.redhat.com (int-mx03.intmail.prod.int.phx2.redhat.com [10.5.11.13])
+ us-mta-337-jEimyCIWOWC6_uyc-Amy7w-1; Thu, 09 Jan 2020 21:58:12 -0500
+X-MC-Unique: jEimyCIWOWC6_uyc-Amy7w-1
+Received: from smtp.corp.redhat.com (int-mx06.intmail.prod.int.phx2.redhat.com [10.5.11.16])
         (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
         (No client certificate requested)
-        by mimecast-mx01.redhat.com (Postfix) with ESMTPS id 1565B1800D4E;
-        Fri, 10 Jan 2020 02:00:51 +0000 (UTC)
+        by mimecast-mx01.redhat.com (Postfix) with ESMTPS id 16890DB6C;
+        Fri, 10 Jan 2020 02:58:11 +0000 (UTC)
 Received: from ming.t460p (ovpn-8-24.pek2.redhat.com [10.72.8.24])
-        by smtp.corp.redhat.com (Postfix) with ESMTPS id 8ADE486CA7;
-        Fri, 10 Jan 2020 02:00:42 +0000 (UTC)
-Date:   Fri, 10 Jan 2020 10:00:38 +0800
+        by smtp.corp.redhat.com (Postfix) with ESMTPS id D92E05C28C;
+        Fri, 10 Jan 2020 02:58:05 +0000 (UTC)
+Date:   Fri, 10 Jan 2020 10:58:01 +0800
 From:   Ming Lei <ming.lei@redhat.com>
-To:     John Garry <john.garry@huawei.com>
-Cc:     Sumit Saxena <sumit.saxena@broadcom.com>,
-        Hannes Reinecke <hare@suse.de>,
-        "Martin K. Petersen" <martin.petersen@oracle.com>,
-        Jens Axboe <axboe@kernel.dk>, Christoph Hellwig <hch@lst.de>,
-        James Bottomley <james.bottomley@hansenpartnership.com>,
-        Linux SCSI List <linux-scsi@vger.kernel.org>,
-        linux-block@vger.kernel.org, Hannes Reinecke <hare@suse.com>
-Subject: Re: [PATCH 09/11] megaraid_sas: switch fusion adapters to MQ
-Message-ID: <20200110020038.GB4501@ming.t460p>
-References: <20191202153914.84722-1-hare@suse.de>
- <20191202153914.84722-10-hare@suse.de>
- <CAL2rwxqjiRTuZ0ntfaHHzG7z-VmxRQCXYyxZeX9eDMrmX+dbGg@mail.gmail.com>
- <339f089f-26aa-1cbe-416b-67809ea6791f@huawei.com>
+To:     Jens Axboe <axboe@kernel.dk>
+Cc:     Christoph Hellwig <hch@infradead.org>, linux-block@vger.kernel.org
+Subject: Re: [PATCH] block: fix splitting segments
+Message-ID: <20200110025801.GC4501@ming.t460p>
+References: <20191229023230.28940-1-ming.lei@redhat.com>
+ <20200108140248.GA2896@infradead.org>
+ <20200109020341.GC9655@ming.t460p>
+ <20200109071616.GA32217@infradead.org>
+ <cd3f3aa8-4880-f06b-7ac5-1982b890ca53@kernel.dk>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=us-ascii
 Content-Disposition: inline
-In-Reply-To: <339f089f-26aa-1cbe-416b-67809ea6791f@huawei.com>
+In-Reply-To: <cd3f3aa8-4880-f06b-7ac5-1982b890ca53@kernel.dk>
 User-Agent: Mutt/1.12.1 (2019-06-15)
-X-Scanned-By: MIMEDefang 2.79 on 10.5.11.13
+X-Scanned-By: MIMEDefang 2.79 on 10.5.11.16
 Sender: linux-block-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-On Thu, Jan 09, 2020 at 11:55:12AM +0000, John Garry wrote:
-> On 09/12/2019 10:10, Sumit Saxena wrote:
-> > On Mon, Dec 2, 2019 at 9:09 PM Hannes Reinecke <hare@suse.de> wrote:
-> > > 
-> > > Fusion adapters can steer completions to individual queues, and
-> > > we now have support for shared host-wide tags.
-> > > So we can enable multiqueue support for fusion adapters and
-> > > drop the hand-crafted interrupt affinity settings.
+On Thu, Jan 09, 2020 at 08:18:04AM -0700, Jens Axboe wrote:
+> On 1/9/20 12:16 AM, Christoph Hellwig wrote:
+> > On Thu, Jan 09, 2020 at 10:03:41AM +0800, Ming Lei wrote:
+> >> It has been addressed in:
+> >>
+> >> https://git.kernel.org/pub/scm/linux/kernel/git/axboe/linux-block.git/commit/?h=block-5.5&id=ecd255974caa45901d0b8fab03626e0a18fbc81a
 > > 
-> > Hi Hannes,
-> > 
-> > Ming Lei also proposed similar changes in megaraid_sas driver some
-> > time back and it had resulted in performance drop-
-> > https://patchwork.kernel.org/patch/10969511/
-> > 
-> > So, we will do some performance tests with this patch and update you.
-> > 
+> > That is probably correct, but still highly suboptimal for most 32-bit
+> > architectures where physical addresses are 32 bits wide.  To fix that
+> > the proper phys_addr_t type should be used.
 > 
-> Hi Sumit,
-> 
-> I was wondering if you had a chance to do this test yet?
-> 
-> It would be good to know, so we can try to progress this work.
+> I'll swap it for phys_addr_t - we used to use dma_address_t or something
+> like that, but I missed this type.
 
-Looks most of the comment in the following link isn't addressed:
+Guenter mentioned that 'page_to_phys(start_page) as well as offset are
+sometimes 0'[1].
 
-https://lore.kernel.org/linux-block/20191129002540.GA1829@ming.t460p/
+If that(zero page physical address) can happen when phys_addr_t is 32bit,
+I guess phys_addr_t may not work too.
 
-> Firstly too much((nr_hw_queues - 1) times) memory is wasted. Secondly IO
-> latency could be increased by too deep scheduler queue depth. Finally CPU
-> could be wasted in the retrying of running busy hw queue.
-> 
-> Wrt. driver tags, this patch may be worse, given the average limit for
-> each LUN is reduced by (nr_hw_queues) times, see hctx_may_queue().
-> 
-> Another change is bt_wait_ptr(). Before your patches, there is single
-> .wait_index, now the number of .wait_index is changed to nr_hw_queues.
-> 
-> Also the run queue number is increased a lot in SCSI's IO completion, see
-> scsi_end_request().
+Guener, could you test the patch in link[2] again?
 
-I guess memory waste won't be a blocker.
 
-But it may not be one accepted behavior to reduce average active queue
-depth for each LUN by nr_hw_queues times, meantime scheduler queue depth
-is increased by nr_hw_queues times, compared with single queue.
+[1] https://lore.kernel.org/linux-block/20200108023822.GB28075@ming.t460p/T/#m5862216b960454fc41a85204defbb887983bfd75
+[2] https://git.kernel.org/pub/scm/linux/kernel/git/axboe/linux-block.git/commit/?h=block-5.5&id=b6a89c4a9590663f80486662fe9a9c1f4cee31f4
 
-thanks,
+
+Thanks,
 Ming
 
