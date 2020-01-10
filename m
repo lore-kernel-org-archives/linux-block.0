@@ -6,81 +6,115 @@ X-Spam-Status: No, score=-0.8 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
 	MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS autolearn=no autolearn_force=no
 	version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 7A8DAC282DD
-	for <linux-block@archiver.kernel.org>; Fri, 10 Jan 2020 15:09:47 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id B9FFCC33CA3
+	for <linux-block@archiver.kernel.org>; Fri, 10 Jan 2020 15:21:39 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.kernel.org (Postfix) with ESMTP id 5125A2080D
-	for <linux-block@archiver.kernel.org>; Fri, 10 Jan 2020 15:09:47 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id 9931D2072E
+	for <linux-block@archiver.kernel.org>; Fri, 10 Jan 2020 15:21:39 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1728174AbgAJPJq (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Fri, 10 Jan 2020 10:09:46 -0500
-Received: from mx2.suse.de ([195.135.220.15]:41422 "EHLO mx2.suse.de"
-        rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-        id S1728152AbgAJPJq (ORCPT <rfc822;linux-block@vger.kernel.org>);
-        Fri, 10 Jan 2020 10:09:46 -0500
-X-Virus-Scanned: by amavisd-new at test-mx.suse.de
-Received: from relay2.suse.de (unknown [195.135.220.254])
-        by mx2.suse.de (Postfix) with ESMTP id 86A6DB166;
-        Fri, 10 Jan 2020 15:09:44 +0000 (UTC)
+        id S1728152AbgAJPVj (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Fri, 10 Jan 2020 10:21:39 -0500
+Received: from mout.kundenserver.de ([212.227.126.135]:44173 "EHLO
+        mout.kundenserver.de" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S1727866AbgAJPVi (ORCPT
+        <rfc822;linux-block@vger.kernel.org>);
+        Fri, 10 Jan 2020 10:21:38 -0500
+Received: from mail-qk1-f180.google.com ([209.85.222.180]) by
+ mrelayeu.kundenserver.de (mreue010 [212.227.15.129]) with ESMTPSA (Nemesis)
+ id 1MgeXk-1jJU2H14VI-00h7Yf; Fri, 10 Jan 2020 16:21:37 +0100
+Received: by mail-qk1-f180.google.com with SMTP id z14so2127774qkg.9;
+        Fri, 10 Jan 2020 07:21:36 -0800 (PST)
+X-Gm-Message-State: APjAAAWRtTDVL2BkweDS7o+nrg8gpULb6WSNA3zWSSan6BRR5sKBI6dP
+        oCBaswEHO5+D3Ep74M7MrYCIRylb0tXDvds8xu4=
+X-Google-Smtp-Source: APXvYqxSgcGBQK+tkeWMU2jn5QS6q8AIe0DuLAWuh/dj+ivOIV5/alMrbKn0qhZMQok6A0tTJ0ciEf6xGfK5TXH33Ek=
+X-Received: by 2002:a05:620a:a5b:: with SMTP id j27mr3688833qka.286.1578669696060;
+ Fri, 10 Jan 2020 07:21:36 -0800 (PST)
 MIME-Version: 1.0
-Content-Type: text/plain; charset=US-ASCII;
- format=flowed
-Content-Transfer-Encoding: 7bit
-Date:   Fri, 10 Jan 2020 16:09:43 +0100
-From:   Roman Penyaev <rpenyaev@suse.de>
-To:     Jinpu Wang <jinpu.wang@cloud.ionos.com>
-Cc:     Bart Van Assche <bvanassche@acm.org>,
-        Jack Wang <jinpuwang@gmail.com>, linux-block@vger.kernel.org,
-        linux-rdma@vger.kernel.org, Jens Axboe <axboe@kernel.dk>,
-        Christoph Hellwig <hch@infradead.org>,
-        Sagi Grimberg <sagi@grimberg.me>,
-        Leon Romanovsky <leon@kernel.org>,
-        Doug Ledford <dledford@redhat.com>,
-        Danil Kipnis <danil.kipnis@cloud.ionos.com>
-Subject: Re: [PATCH v6 17/25] rnbd: client: main functionality
-In-Reply-To: <CAMGffEm3tp_hjQT2kw9yKbuoXrkF5g6f-3prvx6buHoT+Mpb1Q@mail.gmail.com>
-References: <20191230102942.18395-1-jinpuwang@gmail.com>
- <20191230102942.18395-18-jinpuwang@gmail.com>
- <aa7eeeda-b3d7-4a26-9043-53ce8c80eef1@acm.org>
- <CAMGffEm3tp_hjQT2kw9yKbuoXrkF5g6f-3prvx6buHoT+Mpb1Q@mail.gmail.com>
-Message-ID: <2616c4cd0aabcd112256fe2e3d7b9a24@suse.de>
-X-Sender: rpenyaev@suse.de
-User-Agent: Roundcube Webmail
+References: <20200107084659.uyaucu73yd5rhim3@kili.mountain>
+ <CAK8P3a1iUADRcjWEMZjVuCKyESXA7fHEypvFK7vEQ0CseXfmtg@mail.gmail.com> <20200107151651.GA27042@kadam>
+In-Reply-To: <20200107151651.GA27042@kadam>
+From:   Arnd Bergmann <arnd@arndb.de>
+Date:   Fri, 10 Jan 2020 16:21:19 +0100
+X-Gmail-Original-Message-ID: <CAK8P3a1NFgJ1Em3k8N6MRtYeWMby4w=Ku22=dmXUjWZt=axJiQ@mail.gmail.com>
+Message-ID: <CAK8P3a1NFgJ1Em3k8N6MRtYeWMby4w=Ku22=dmXUjWZt=axJiQ@mail.gmail.com>
+Subject: Re: [bug report] compat_ioctl: move CDROM_SEND_PACKET handling into scsi
+To:     Dan Carpenter <dan.carpenter@oracle.com>
+Cc:     linux-block <linux-block@vger.kernel.org>,
+        Hans Verkuil <hverkuil@xs4all.nl>,
+        Linux Media Mailing List <linux-media@vger.kernel.org>
+Content-Type: text/plain; charset="UTF-8"
+X-Provags-ID: V03:K1:1bTlgwmVU0eIZNQegFBAkNJXlseBkTbghT17Idg47oWfboLHoOV
+ dZPfflICBF56oPg8e8mB78Y5bJz0Mo0fu6yH9ELrkzLH6jcZRFOShcUs9zwSu9LZfd9q7YN
+ VqhoIy59c+T9Xyiln6T7Fpys5vjqBpxhNWFdC2qdsgEMh4wH6F+urAVIV8ot3ZvFy4i/Zx5
+ /E1Mv3PVZQf8C5xyXkNkA==
+X-UI-Out-Filterresults: notjunk:1;V03:K0:24qKiPfrG+c=:s9xYFiIQa/CZk5uvE++3iw
+ 6iWxbIcwndnt1h9nfPX4SQ7sxnIuqvvCHZIM98lhB5f/ItjaUy2VmvUwjY9viNEhuP0xiRzPV
+ 5YVz9niS8w4nppKwwjXD1GDkl1cegoWX0vHmptKLTMASEtU0okkVzw4ET6SOEgT7eiGWM0lMI
+ 490PivkQ034VLwjcaHlayhiu1+bXv5L2o6PmWewyHdtQHmWUWKmz6cQC2V3vkgcmj/KOLRSGC
+ KsBU2KALyqPQ90Ie00BLIKi4cnNoTrK5j4IDhjQk9/udl++asH9cxo/bhhMavkRpdj0dJHsNA
+ U5gzO1mMqIcad6rwkmyrADrpP46SZ/PyhpgK76WvELellh5RUi5/IVL++BQUf1sMvw90RUrdL
+ r1PR7tsonVgNwClWUgTkSAJWYFSXjibZx+EGtp1SWN0QckJydQuEo0ABAGOHCfGi2iKid3TA1
+ YuS0iWPLMGmuyL2LVNNb8jFcuZCvEdFuPrkXdvgSpo8vZsQSJnqOLcI0Bnyy3A/Xjr4r0en68
+ cKgPAVFCcu0oegEyqCW7XEEKl01L6uehLxDOAsDwBC94h0TJdjM5Vvj0l1mnsbqYh1xxmiFQT
+ JBLFMHMDu3ab7Xlc8PJfSgBVmuRc0F+EoKukam6DFuoV84Z3+kqr3aiwQ2sivWzoMLTjX0Weo
+ zdAlHLhz7wYhQQXvvE+8xiUMvrWNhpXarWogJHb5fIDrXoICyRH+mtqbfGzSEDWsNfTd05Kb0
+ RJ3SJZxNZaJWWB88xKVEpAPSnUKpx20oxoDZejXdC2QOGzkSL00eoPHI6eXUxQaeknTfD/wsG
+ 5SMDJiy7kvS5/kaNtGLhEAW4qQChTd+LO36PMZwYqC9GslEEGmEbV9tDvcPYU9iCSXeauRrpK
+ FF05upNyqcdkQZu0snvA==
 Sender: linux-block-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-On 2020-01-10 15:45, Jinpu Wang wrote:
->> > +{
->> > +     DEFINE_WAIT_FUNC(wait, autoremove_wake_function);
->> > +
->> > +     prepare_to_wait(&sess->rtrs_waitq, &wait, TASK_UNINTERRUPTIBLE);
->> > +     if (IS_ERR_OR_NULL(sess->rtrs)) {
->> > +             finish_wait(&sess->rtrs_waitq, &wait);
->> > +             return;
->> > +     }
->> > +     mutex_unlock(&sess_lock);
->> > +     /* After unlock session can be freed, so careful */
->> > +     schedule();
->> > +     mutex_lock(&sess_lock);
->> > +}
->> 
->> How can a function that calls schedule() and that is not surrounded by 
->> a
->> loop be correct? What if e.g. schedule() finishes due to a spurious 
->> wakeup?
-> I checked in git history, this no clean explanation why we have to
-> call the mutex_unlock/schedul/mutex_lock magic
-> It's allowed to call schedule inside mutex, seems we can remove the
-> code snip, @Roman Penyaev do you remember why it was introduced?
+On Tue, Jan 7, 2020 at 4:17 PM Dan Carpenter <dan.carpenter@oracle.com> wrote:
+>
+> On Tue, Jan 07, 2020 at 04:03:12PM +0100, Arnd Bergmann wrote:
+> > On Tue, Jan 7, 2020 at 9:49 AM Dan Carpenter <dan.carpenter@oracle.com> wrote:
+> > >
+> > > Hello Arnd Bergmann,
+> > >
+> > > The patch f3ee6e63a9df: "compat_ioctl: move CDROM_SEND_PACKET
+> > > handling into scsi" from Nov 28, 2019, leads to the following static
+> > > checker warning:
+> > >
+> > >         block/scsi_ioctl.c:703 scsi_put_cdrom_generic_arg()
+> > >         warn: check that 'cgc32' doesn't leak information (struct has a hole after 'data_direction')
+> > >
+> > > block/scsi_ioctl.c
+> > >    686  static int scsi_put_cdrom_generic_arg(const struct cdrom_generic_command *cgc,
+> > >    687                                        void __user *arg)
+> > >    688  {
+> > >    689  #ifdef CONFIG_COMPAT
+> > >    690          if (in_compat_syscall()) {
+> > >    691                  struct compat_cdrom_generic_command cgc32 = {
+> > >    692                          .buffer         = (uintptr_t)(cgc->buffer),
+> > >    693                          .buflen         = cgc->buflen,
+> > >    694                          .stat           = cgc->stat,
+> > >    695                          .sense          = (uintptr_t)(cgc->sense),
+> > >    696                          .data_direction = cgc->data_direction,
+> > >    697                          .quiet          = cgc->quiet,
+> > >    698                          .timeout        = cgc->timeout,
+> > >    699                          .reserved[0]    = (uintptr_t)(cgc->reserved[0]),
+> > >    700                  };
+> > >
+> > > It's possible that initializations like this don't clear out the struct
+> > > hole but I haven't seen a compiler which is affected.  So maybe it's
+> > > fine?
+> >
+> > I thlought we already rely on this to initialize the entire structure, but
+> > trying out a test case shows that it does happen:
+>
+> There aren't that many cases where we rely on it to happen.  Under 20
+> so far as Smatch can detect.  I'm not really certain what the correct
+> approach is to deal with them...  I think they pretty much all work
+> fine with existing compilers.
 
-The loop in question is in the caller, see __find_and_get_sess().
-You can't leave mutex locked and call schedule(), you will catch a
-deadlock with a caller of free_sess(), which has just put the last
-reference and is about to take the sess_lock in order to delete
-the session from the list.
+After looking a bit more into this, I'm now fairly convinced this is a
+real problem. On gcc, this is prevented from causing too much harm
+by the structleak plugin, but that is not always enabled.
 
---
-Roman
+I'll send fixes for the ones I recently introduced. Can you send me a list
+of the other instances that smatch finds? Maybe I can take a look at
+those as well.
 
+      Arnd
