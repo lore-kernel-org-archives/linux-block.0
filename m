@@ -2,110 +2,134 @@ Return-Path: <SRS0=/LTC=27=vger.kernel.org=linux-block-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-0.8 required=3.0 tests=DKIM_SIGNED,DKIM_VALID,
-	DKIM_VALID_AU,HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SPF_HELO_NONE,
-	SPF_PASS autolearn=no autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-2.4 required=3.0 tests=DKIMWL_WL_HIGH,DKIM_SIGNED,
+	DKIM_VALID,DKIM_VALID_AU,HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,
+	SPF_HELO_NONE,SPF_PASS,USER_AGENT_SANE_1 autolearn=no autolearn_force=no
+	version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id B5610C282DD
-	for <linux-block@archiver.kernel.org>; Fri, 10 Jan 2020 15:29:37 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 80FB4C282DD
+	for <linux-block@archiver.kernel.org>; Fri, 10 Jan 2020 16:13:26 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.kernel.org (Postfix) with ESMTP id 8817D2072E
-	for <linux-block@archiver.kernel.org>; Fri, 10 Jan 2020 15:29:37 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id 534E6206ED
+	for <linux-block@archiver.kernel.org>; Fri, 10 Jan 2020 16:13:26 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=pass (2048-bit key) header.d=cloud.ionos.com header.i=@cloud.ionos.com header.b="GAMgQnrS"
+	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="hpJMIR5F"
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1728239AbgAJP3h (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Fri, 10 Jan 2020 10:29:37 -0500
-Received: from mail-io1-f65.google.com ([209.85.166.65]:36707 "EHLO
-        mail-io1-f65.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1728174AbgAJP3g (ORCPT
+        id S1728408AbgAJQNZ (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Fri, 10 Jan 2020 11:13:25 -0500
+Received: from us-smtp-1.mimecast.com ([205.139.110.61]:48360 "EHLO
+        us-smtp-delivery-1.mimecast.com" rhost-flags-OK-OK-OK-FAIL)
+        by vger.kernel.org with ESMTP id S1728370AbgAJQNZ (ORCPT
         <rfc822;linux-block@vger.kernel.org>);
-        Fri, 10 Jan 2020 10:29:36 -0500
-Received: by mail-io1-f65.google.com with SMTP id d15so2522126iog.3
-        for <linux-block@vger.kernel.org>; Fri, 10 Jan 2020 07:29:36 -0800 (PST)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=cloud.ionos.com; s=google;
-        h=mime-version:references:in-reply-to:from:date:message-id:subject:to
-         :cc;
-        bh=ZfzBvLVaLfcC8MbhjwsOW/embYs9WIRxulSBH2qocNA=;
-        b=GAMgQnrSF6wgqqM36N9i8V+PIkhsoDk1u/4anelYspbzhfrHifeqcs30OJMNQdHCZT
-         IpfSRef0bzBMY8iRZ7dSh8D48FEhMbARrb0fz4jhd4N61KCQXgyyaksmtYLiNWHPBjAk
-         kB8KWBzBp7XK5brIsYXIpDcnEcST8omppsNJxnWG+Byp0E73lfX+3XHpqVIjT0LOwrFM
-         XRNTuxqiDSzWL5LOqEzlOt9OR9VuBvfZBbp3QcBa+ZsXQmTLLt3WHO+hhttbEsK/5sDd
-         kO8jgb8eQnn0NzDc4E8l3LrF5UcrfLW43D+3IYxepuaHVZ1gAe5KtUxh2/Bsn4xXy+t/
-         vhHA==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20161025;
-        h=x-gm-message-state:mime-version:references:in-reply-to:from:date
-         :message-id:subject:to:cc;
-        bh=ZfzBvLVaLfcC8MbhjwsOW/embYs9WIRxulSBH2qocNA=;
-        b=Nu+I7fjdAvMHhCXDqduM+W3Qs/CxzjgHneXzduvnTDum5lUVngz8p6/gSC++MXp3k8
-         a33AfwYZvfXg9x3qTC7ThjeXekTLD43aAg7Rm3PfYUh6QmeIGajdmAwXTu4y2GqNelVZ
-         +H3xM32U+N9w7Cef/IRzDWD2vthQiuichzV45bw77o02L1J3JXHLCpXmlbqpFw+Es5cJ
-         U06WfUj5mD50dJmwE/dEel6fTT5Tl6oPmFRGxc2jLzMlPYqlrulX/5gfQd6iEiz6XDSg
-         HvV0kSIRLaXKQkW3OP8s8/obd0aUhv/jgvff+T9pBTxEU9pNtjNR/1g0RPrFG6481dGo
-         TPAQ==
-X-Gm-Message-State: APjAAAXPka9WXLn9LxWdNBWUHYkLxelJJ0FGKFPwixWLGc+2KZ0PKFxm
-        Ub7a3hww4vsL3QM5v73uHXr4aWEJP1jFDfC1t0ct4w==
-X-Google-Smtp-Source: APXvYqyyaJ0gWjC4q0caz5dhO00lGaRLMNtszPOZCNngBrp6Qmwvqi4fSypIKh1WtlEyQvUPId9akuCfJ3vYrxMffRc=
-X-Received: by 2002:a05:6638:72c:: with SMTP id j12mr3574118jad.136.1578670176138;
- Fri, 10 Jan 2020 07:29:36 -0800 (PST)
+        Fri, 10 Jan 2020 11:13:25 -0500
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+        s=mimecast20190719; t=1578672803;
+        h=from:from:reply-to:reply-to:subject:subject:date:date:
+         message-id:message-id:to:to:cc:cc:mime-version:mime-version:
+         content-type:content-type:
+         content-transfer-encoding:content-transfer-encoding:
+         in-reply-to:in-reply-to:references:references;
+        bh=+gbNvw7DusZ3sQwul8iryEZTFdBmNVR9bva3qUdYsY4=;
+        b=hpJMIR5F13OCbazDTsOdxkQoKSUeMkiGJDxIgSQDcxhCItCPIOGbwEUWPy6m7hsNWEhvH2
+        1PWKyZgHyqCOY2JH2Q2zWfXMgx/ING3mEhmQXSX9GCF7QlnhDXv1HCCRdEalajfOAXsD6l
+        e4lPh3KD2NSbTzRSPKmc4TIVWVH2O4U=
+Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
+ [209.132.183.4]) (Using TLS) by relay.mimecast.com with ESMTP id
+ us-mta-48-OBVkk_1dMDibbmxfoD4nWQ-1; Fri, 10 Jan 2020 11:13:22 -0500
+X-MC-Unique: OBVkk_1dMDibbmxfoD4nWQ-1
+Received: from smtp.corp.redhat.com (int-mx05.intmail.prod.int.phx2.redhat.com [10.5.11.15])
+        (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
+        (No client certificate requested)
+        by mimecast-mx01.redhat.com (Postfix) with ESMTPS id 12B7A800EBF;
+        Fri, 10 Jan 2020 16:13:21 +0000 (UTC)
+Received: from [10.3.112.35] (ovpn-112-35.phx2.redhat.com [10.3.112.35])
+        by smtp.corp.redhat.com (Postfix) with ESMTP id 18F177C40A;
+        Fri, 10 Jan 2020 16:13:18 +0000 (UTC)
+Reply-To: tasleson@redhat.com
+Subject: Re: [RFC 9/9] __xfs_printk: Add durable name to output
+To:     Dave Chinner <david@fromorbit.com>,
+        Sweet Tea Dorminy <sweettea@redhat.com>,
+        James Bottomley <James.Bottomley@hansenpartnership.com>,
+        linux-scsi@vger.kernel.org, linux-block@vger.kernel.org,
+        linux-fsdevel@vger.kernel.org
+References: <20191223225558.19242-1-tasleson@redhat.com>
+ <20191223225558.19242-10-tasleson@redhat.com>
+ <20200104025620.GC23195@dread.disaster.area>
+ <5ad7cf7b-e261-102c-afdc-fa34bed98921@redhat.com>
+ <20200106220233.GK23195@dread.disaster.area>
+ <CAMeeMh-zr309TzbC3ayKUKRniat+rzurgzmeM5LJYMFVDj7bLA@mail.gmail.com>
+ <20200107012353.GO23195@dread.disaster.area>
+ <4ce83a0e-13e1-6245-33a3-5c109aec4bf1@redhat.com>
+ <20200108021002.GR23195@dread.disaster.area>
+ <9e449c65-193c-d69c-1454-b1059221e5dc@redhat.com>
+ <20200109014117.GB3809@agk-dp.fab.redhat.com>
+From:   Tony Asleson <tasleson@redhat.com>
+Organization: Red Hat
+Cc:     David Lehman <dlehman@redhat.com>
+Message-ID: <2e6a3baa-44af-dac0-5e0c-2bf9a4723e72@redhat.com>
+Date:   Fri, 10 Jan 2020 10:13:17 -0600
+User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:68.0) Gecko/20100101
+ Thunderbird/68.2.2
 MIME-Version: 1.0
-References: <20191230102942.18395-1-jinpuwang@gmail.com> <20191230102942.18395-18-jinpuwang@gmail.com>
- <aa7eeeda-b3d7-4a26-9043-53ce8c80eef1@acm.org> <CAMGffEm3tp_hjQT2kw9yKbuoXrkF5g6f-3prvx6buHoT+Mpb1Q@mail.gmail.com>
- <2616c4cd0aabcd112256fe2e3d7b9a24@suse.de>
-In-Reply-To: <2616c4cd0aabcd112256fe2e3d7b9a24@suse.de>
-From:   Jinpu Wang <jinpu.wang@cloud.ionos.com>
-Date:   Fri, 10 Jan 2020 16:29:25 +0100
-Message-ID: <CAMGffE=F1r29pFeKjjrfenPPAj_1s3_m-UbfygReKVXnkqbZSQ@mail.gmail.com>
-Subject: Re: [PATCH v6 17/25] rnbd: client: main functionality
-To:     Roman Penyaev <rpenyaev@suse.de>
-Cc:     Bart Van Assche <bvanassche@acm.org>,
-        Jack Wang <jinpuwang@gmail.com>, linux-block@vger.kernel.org,
-        linux-rdma@vger.kernel.org, Jens Axboe <axboe@kernel.dk>,
-        Christoph Hellwig <hch@infradead.org>,
-        Sagi Grimberg <sagi@grimberg.me>,
-        Leon Romanovsky <leon@kernel.org>,
-        Doug Ledford <dledford@redhat.com>,
-        Danil Kipnis <danil.kipnis@cloud.ionos.com>
-Content-Type: text/plain; charset="UTF-8"
+In-Reply-To: <20200109014117.GB3809@agk-dp.fab.redhat.com>
+Content-Type: text/plain; charset=utf-8
+Content-Language: en-US
+Content-Transfer-Encoding: 7bit
+X-Scanned-By: MIMEDefang 2.79 on 10.5.11.15
 Sender: linux-block-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-On Fri, Jan 10, 2020 at 4:09 PM Roman Penyaev <rpenyaev@suse.de> wrote:
->
-> On 2020-01-10 15:45, Jinpu Wang wrote:
-> >> > +{
-> >> > +     DEFINE_WAIT_FUNC(wait, autoremove_wake_function);
-> >> > +
-> >> > +     prepare_to_wait(&sess->rtrs_waitq, &wait, TASK_UNINTERRUPTIBLE);
-> >> > +     if (IS_ERR_OR_NULL(sess->rtrs)) {
-> >> > +             finish_wait(&sess->rtrs_waitq, &wait);
-> >> > +             return;
-> >> > +     }
-> >> > +     mutex_unlock(&sess_lock);
-> >> > +     /* After unlock session can be freed, so careful */
-> >> > +     schedule();
-> >> > +     mutex_lock(&sess_lock);
-> >> > +}
-> >>
-> >> How can a function that calls schedule() and that is not surrounded by
-> >> a
-> >> loop be correct? What if e.g. schedule() finishes due to a spurious
-> >> wakeup?
-> > I checked in git history, this no clean explanation why we have to
-> > call the mutex_unlock/schedul/mutex_lock magic
-> > It's allowed to call schedule inside mutex, seems we can remove the
-> > code snip, @Roman Penyaev do you remember why it was introduced?
->
-> The loop in question is in the caller, see __find_and_get_sess().
-> You can't leave mutex locked and call schedule(), you will catch a
-> deadlock with a caller of free_sess(), which has just put the last
-> reference and is about to take the sess_lock in order to delete
-> the session from the list.
->
-> --
-> Roman
-Thanks Roman for quick reply, will extend the comment
+On 1/8/20 7:41 PM, Alasdair G Kergon wrote:
+> The goal of this particular project is to maintain a record of the
+> storage configuration as it changes over time.  It should provide a
+> quick way to check the state of a system at a specified time in the
+> past.
+
+This helps with one aspect of the problem, it leaves a bread crumb which
+states that at this point in time /dev/sda was the attachment point for
+some device, eg. wwn-0x5002538844580000.
+
+> The initial logging implementation is triggered by storage uevents and
+> consists of two components:
+> 
+> 1. A new udev rule file, 99-zzz-storage-logger.rules, which runs after
+> all the other rules have run and invokes:
+> 
+> 2. A script, udev_storage_logger.sh, that captures relevant
+> information about devices that changed and stores it in the system
+> journal.
+> 
+> The effect is to log the data from relevant uevents plus some
+> supplementary information (including device-mapper tables, for example).
+> It does not yet handle filesystem-related events.
+> 
+> Two methods to query the data are offered:
+> 
+> 1. journalctl
+> Data is tagged with the identifier UDEVLOG and retrievable as
+> key-value pairs.
+>   journalctl -t UDEVLOG --output verbose
+>   journalctl -t UDEVLOG --output json
+>     --since 'YYYY-MM-DD HH:MM:SS' 
+>     --until 'YYYY-MM-DD HH:MM:SS'
+>   journalctl -t UDEVLOG --output verbose
+>     --output-fields=PERSISTENT_STORAGE_ID,MAJOR,MINOR
+>      PERSISTENT_STORAGE_ID=dm-name-vg1-lvol0
+> 
+> 2. lsblkj  [appended j for journal]
+> This lsblk wrapper reprocesses the logged uevents to reconstruct a
+> dummy system environment that "looks like" the system did at a
+> specified earlier time and then runs lsblk against it.
+
+You've outlined how to view and filter on the added data and how to
+figure out what the configuration looked like a some point in the past,
+that adds one more piece of the puzzle.
+
+However, how would a user simply show all the log messages for a
+specific device over time?  It looks like journalctl would need to have
+logic added to make this a seamless user experience, yes?
+
+Perhaps I'm missing something that makes the outlined use case above work?
+
