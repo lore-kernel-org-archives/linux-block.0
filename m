@@ -2,174 +2,85 @@ Return-Path: <SRS0=/LTC=27=vger.kernel.org=linux-block-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-0.8 required=3.0 tests=DKIM_SIGNED,DKIM_VALID,
-	DKIM_VALID_AU,HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SPF_HELO_NONE,
-	SPF_PASS autolearn=no autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-0.8 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
+	MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS autolearn=no autolearn_force=no
+	version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id A96F3C33CA4
-	for <linux-block@archiver.kernel.org>; Fri, 10 Jan 2020 14:45:52 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 7A8DAC282DD
+	for <linux-block@archiver.kernel.org>; Fri, 10 Jan 2020 15:09:47 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.kernel.org (Postfix) with ESMTP id 8057920842
-	for <linux-block@archiver.kernel.org>; Fri, 10 Jan 2020 14:45:52 +0000 (UTC)
-Authentication-Results: mail.kernel.org;
-	dkim=pass (2048-bit key) header.d=cloud.ionos.com header.i=@cloud.ionos.com header.b="Vf3RNYi+"
+	by mail.kernel.org (Postfix) with ESMTP id 5125A2080D
+	for <linux-block@archiver.kernel.org>; Fri, 10 Jan 2020 15:09:47 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1727989AbgAJOpv (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Fri, 10 Jan 2020 09:45:51 -0500
-Received: from mail-io1-f68.google.com ([209.85.166.68]:37092 "EHLO
-        mail-io1-f68.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1728012AbgAJOpv (ORCPT
-        <rfc822;linux-block@vger.kernel.org>);
-        Fri, 10 Jan 2020 09:45:51 -0500
-Received: by mail-io1-f68.google.com with SMTP id k24so2338975ioc.4
-        for <linux-block@vger.kernel.org>; Fri, 10 Jan 2020 06:45:51 -0800 (PST)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=cloud.ionos.com; s=google;
-        h=mime-version:references:in-reply-to:from:date:message-id:subject:to
-         :cc;
-        bh=NPS+4vbJTb3h1ZYEXQxKrZ6be8Q4D5T0gpOiYiwlMLQ=;
-        b=Vf3RNYi+bJ0hnbwNHhRRjqz4NiSO9zOvrI77T1ZB53SXRlIucJUZfrGhX17PnK28hb
-         xgC+eTOHDlN6VEZ8Id5mqttqiinrTaMSn7l9ObyM6OkD8qkpiCEdLelPkKPJrQ8jbMes
-         Z95Mwht+bkkrfkqb1WV2GYp7l6zo1Q8yIfWEGVDH52CGURRFinx46PryMmPF1/aRWZ1E
-         MDnez3IvLY+79tvb3tbhuHIvcw9QFM2ni5Lgv/v7t+RCS67S70KlE7li+QK74H+zTKwS
-         7MUJuwNoCRySUnC92pnKapkxMddJozogPKUucrfDotovy4brVz6wrfjNdZ95SOqFh9FY
-         OTeQ==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20161025;
-        h=x-gm-message-state:mime-version:references:in-reply-to:from:date
-         :message-id:subject:to:cc;
-        bh=NPS+4vbJTb3h1ZYEXQxKrZ6be8Q4D5T0gpOiYiwlMLQ=;
-        b=FPp1JYXyHGy/CKLSSpdxqdjrQfsBgYYV97kBHmt2VPDXHhZhu6GgHVFSl5A1HphP0+
-         QRA39sSUrUHnKi8I90NF8soclYgoEnIb/AtQJ7cip6D5g0/L9cBWMN3sYJ+CMDjcqNIy
-         tArwqLrnftV9Bbc3+Ugm8oMW+ZwrmnKL9QHKQDqch72uDWMnb5reeTryJ3SEcdV+s32c
-         IWpadEPXadLhluit5PweBRntXql5AwDOXiHwVhlPhpspiWU0iahuQDREpm7auIgkgL0f
-         YiJJmsLaz32XGZHI6EW2MkqEDdDPMMkjayZWRxyY64zP3NBV+yl1EKfedlIMOvKZAE7x
-         8nPw==
-X-Gm-Message-State: APjAAAX9f37vTRoBWQzxd9DGIrRTnQiqr4jOceBUGBBYMs9gQcu43D1n
-        jRcccYC/BgqU8Ok2AM5/QXNYc70UMcEmVbWLYE8eow==
-X-Google-Smtp-Source: APXvYqy2PixOpxCY56TnWOfvL9+jgmMPg77A8pen2GTqIb3424QBdGz1L8eDrFcYosH5twvoy/jpn2LSEaxbNmEsU/g=
-X-Received: by 2002:a6b:600f:: with SMTP id r15mr2709398iog.54.1578667550545;
- Fri, 10 Jan 2020 06:45:50 -0800 (PST)
+        id S1728174AbgAJPJq (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Fri, 10 Jan 2020 10:09:46 -0500
+Received: from mx2.suse.de ([195.135.220.15]:41422 "EHLO mx2.suse.de"
+        rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
+        id S1728152AbgAJPJq (ORCPT <rfc822;linux-block@vger.kernel.org>);
+        Fri, 10 Jan 2020 10:09:46 -0500
+X-Virus-Scanned: by amavisd-new at test-mx.suse.de
+Received: from relay2.suse.de (unknown [195.135.220.254])
+        by mx2.suse.de (Postfix) with ESMTP id 86A6DB166;
+        Fri, 10 Jan 2020 15:09:44 +0000 (UTC)
 MIME-Version: 1.0
-References: <20191230102942.18395-1-jinpuwang@gmail.com> <20191230102942.18395-18-jinpuwang@gmail.com>
- <aa7eeeda-b3d7-4a26-9043-53ce8c80eef1@acm.org>
-In-Reply-To: <aa7eeeda-b3d7-4a26-9043-53ce8c80eef1@acm.org>
-From:   Jinpu Wang <jinpu.wang@cloud.ionos.com>
-Date:   Fri, 10 Jan 2020 15:45:39 +0100
-Message-ID: <CAMGffEm3tp_hjQT2kw9yKbuoXrkF5g6f-3prvx6buHoT+Mpb1Q@mail.gmail.com>
-Subject: Re: [PATCH v6 17/25] rnbd: client: main functionality
-To:     Bart Van Assche <bvanassche@acm.org>, rpenyaev@suse.de
-Cc:     Jack Wang <jinpuwang@gmail.com>, linux-block@vger.kernel.org,
+Content-Type: text/plain; charset=US-ASCII;
+ format=flowed
+Content-Transfer-Encoding: 7bit
+Date:   Fri, 10 Jan 2020 16:09:43 +0100
+From:   Roman Penyaev <rpenyaev@suse.de>
+To:     Jinpu Wang <jinpu.wang@cloud.ionos.com>
+Cc:     Bart Van Assche <bvanassche@acm.org>,
+        Jack Wang <jinpuwang@gmail.com>, linux-block@vger.kernel.org,
         linux-rdma@vger.kernel.org, Jens Axboe <axboe@kernel.dk>,
         Christoph Hellwig <hch@infradead.org>,
         Sagi Grimberg <sagi@grimberg.me>,
         Leon Romanovsky <leon@kernel.org>,
         Doug Ledford <dledford@redhat.com>,
         Danil Kipnis <danil.kipnis@cloud.ionos.com>
-Content-Type: text/plain; charset="UTF-8"
+Subject: Re: [PATCH v6 17/25] rnbd: client: main functionality
+In-Reply-To: <CAMGffEm3tp_hjQT2kw9yKbuoXrkF5g6f-3prvx6buHoT+Mpb1Q@mail.gmail.com>
+References: <20191230102942.18395-1-jinpuwang@gmail.com>
+ <20191230102942.18395-18-jinpuwang@gmail.com>
+ <aa7eeeda-b3d7-4a26-9043-53ce8c80eef1@acm.org>
+ <CAMGffEm3tp_hjQT2kw9yKbuoXrkF5g6f-3prvx6buHoT+Mpb1Q@mail.gmail.com>
+Message-ID: <2616c4cd0aabcd112256fe2e3d7b9a24@suse.de>
+X-Sender: rpenyaev@suse.de
+User-Agent: Roundcube Webmail
 Sender: linux-block-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-> > +{
-> > +     DEFINE_WAIT_FUNC(wait, autoremove_wake_function);
-> > +
-> > +     prepare_to_wait(&sess->rtrs_waitq, &wait, TASK_UNINTERRUPTIBLE);
-> > +     if (IS_ERR_OR_NULL(sess->rtrs)) {
-> > +             finish_wait(&sess->rtrs_waitq, &wait);
-> > +             return;
-> > +     }
-> > +     mutex_unlock(&sess_lock);
-> > +     /* After unlock session can be freed, so careful */
-> > +     schedule();
-> > +     mutex_lock(&sess_lock);
-> > +}
->
-> How can a function that calls schedule() and that is not surrounded by a
-> loop be correct? What if e.g. schedule() finishes due to a spurious wakeup?
-I checked in git history, this no clean explanation why we have to
-call the mutex_unlock/schedul/mutex_lock magic
-It's allowed to call schedule inside mutex, seems we can remove the
-code snip, @Roman Penyaev do you remember why it was introduced?
->
-> > +static struct rnbd_clt_session *__find_and_get_sess(const char *sessname)
-> > +__releases(&sess_lock)
-> > +__acquires(&sess_lock)
-> > +{
-> > +     struct rnbd_clt_session *sess;
-> > +     int err;
-> > +
-> > +again:
-> > +     list_for_each_entry(sess, &sess_list, list) {
-> > +             if (strcmp(sessname, sess->sessname))
-> > +                     continue;
-> > +
-> > +             if (unlikely(sess->rtrs_ready && IS_ERR_OR_NULL(sess->rtrs)))
-> > +                     /*
-> > +                      * No RTRS connection, session is dying.
-> > +                      */
-> > +                     continue;
-> > +
-> > +             if (likely(rnbd_clt_get_sess(sess))) {
-> > +                     /*
-> > +                      * Alive session is found, wait for RTRS connection.
-> > +                      */
-> > +                     mutex_unlock(&sess_lock);
-> > +                     err = wait_for_rtrs_connection(sess);
-> > +                     if (unlikely(err))
-> > +                             rnbd_clt_put_sess(sess);
-> > +                     mutex_lock(&sess_lock);
-> > +
-> > +                     if (unlikely(err))
-> > +                             /* Session is dying, repeat the loop */
-> > +                             goto again;
-> > +
-> > +                     return sess;
-> > +             }
-> > +             /*
-> > +              * Ref is 0, session is dying, wait for RTRS disconnect
-> > +              * in order to avoid session names clashes.
-> > +              */
-> > +             wait_for_rtrs_disconnection(sess);
-> > +             /*
-> > +              * RTRS is disconnected and soon session will be freed,
-> > +              * so repeat a loop.
-> > +              */
-> > +             goto again;
-> > +     }
-> > +
-> > +     return NULL;
-> > +}
->
-> Since wait_for_rtrs_disconnection() unlocks sess_lock, can the
-> list_for_each_entry() above trigger a use-after-free of sess->next?
+On 2020-01-10 15:45, Jinpu Wang wrote:
+>> > +{
+>> > +     DEFINE_WAIT_FUNC(wait, autoremove_wake_function);
+>> > +
+>> > +     prepare_to_wait(&sess->rtrs_waitq, &wait, TASK_UNINTERRUPTIBLE);
+>> > +     if (IS_ERR_OR_NULL(sess->rtrs)) {
+>> > +             finish_wait(&sess->rtrs_waitq, &wait);
+>> > +             return;
+>> > +     }
+>> > +     mutex_unlock(&sess_lock);
+>> > +     /* After unlock session can be freed, so careful */
+>> > +     schedule();
+>> > +     mutex_lock(&sess_lock);
+>> > +}
+>> 
+>> How can a function that calls schedule() and that is not surrounded by 
+>> a
+>> loop be correct? What if e.g. schedule() finishes due to a spurious 
+>> wakeup?
+> I checked in git history, this no clean explanation why we have to
+> call the mutex_unlock/schedul/mutex_lock magic
+> It's allowed to call schedule inside mutex, seems we can remove the
+> code snip, @Roman Penyaev do you remember why it was introduced?
 
+The loop in question is in the caller, see __find_and_get_sess().
+You can't leave mutex locked and call schedule(), you will catch a
+deadlock with a caller of free_sess(), which has just put the last
+reference and is about to take the sess_lock in order to delete
+the session from the list.
 
->
-> > +static size_t rnbd_clt_get_sg_size(struct scatterlist *sglist, u32 len)
-> > +{
-> > +     struct scatterlist *sg;
-> > +     size_t tsize = 0;
-> > +     int i;
-> > +
-> > +     for_each_sg(sglist, sg, len, i)
-> > +             tsize += sg->length;
-> > +     return tsize;
-> > +}
->
-> Please follow the example of other block drivers and use blk_rq_bytes()
-> instead of iterating over the sg-list.
-    The amount of data that belongs to an I/O and the amount of data that
-    should be read or written to the disk (bi_size) can differ.
+--
+Roman
 
-    E.g. When WRITE_SAME is used, only a small amount of data is
-    transfered that is then written repeatedly over a lot of sectors.
-
-    this is why we get the size of data to be transfered via RTRS by
-summing up the size
-    of the scather-gather list entries.
-
-Will add a comment.
-
-Thanks
