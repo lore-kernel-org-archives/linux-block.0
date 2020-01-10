@@ -1,181 +1,177 @@
-Return-Path: <SRS0=+EVs=26=vger.kernel.org=linux-block-owner@kernel.org>
+Return-Path: <SRS0=/LTC=27=vger.kernel.org=linux-block-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-7.2 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
-	MAILING_LIST_MULTI,MENTIONS_GIT_HOSTING,SPF_HELO_NONE,SPF_PASS,
-	USER_AGENT_SANE_1 autolearn=ham autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-5.4 required=3.0 tests=DKIMWL_WL_HIGH,DKIM_SIGNED,
+	DKIM_VALID,DKIM_VALID_AU,HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,
+	MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,USER_AGENT_SANE_1 autolearn=ham
+	autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 9E395C282DD
-	for <linux-block@archiver.kernel.org>; Thu,  9 Jan 2020 23:22:51 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id D13F5C32771
+	for <linux-block@archiver.kernel.org>; Fri, 10 Jan 2020 01:28:22 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.kernel.org (Postfix) with ESMTP id 7BBB0205F4
-	for <linux-block@archiver.kernel.org>; Thu,  9 Jan 2020 23:22:51 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id A5DCE2072E
+	for <linux-block@archiver.kernel.org>; Fri, 10 Jan 2020 01:28:22 +0000 (UTC)
+Authentication-Results: mail.kernel.org;
+	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="WXhgzDhd"
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1726299AbgAIXWv (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Thu, 9 Jan 2020 18:22:51 -0500
-Received: from mail104.syd.optusnet.com.au ([211.29.132.246]:58458 "EHLO
-        mail104.syd.optusnet.com.au" rhost-flags-OK-OK-OK-OK)
-        by vger.kernel.org with ESMTP id S1725840AbgAIXWu (ORCPT
+        id S1730579AbgAJB2W (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Thu, 9 Jan 2020 20:28:22 -0500
+Received: from us-smtp-1.mimecast.com ([205.139.110.61]:60269 "EHLO
+        us-smtp-delivery-1.mimecast.com" rhost-flags-OK-OK-OK-FAIL)
+        by vger.kernel.org with ESMTP id S1730575AbgAJB2V (ORCPT
         <rfc822;linux-block@vger.kernel.org>);
-        Thu, 9 Jan 2020 18:22:50 -0500
-Received: from dread.disaster.area (pa49-180-68-255.pa.nsw.optusnet.com.au [49.180.68.255])
-        by mail104.syd.optusnet.com.au (Postfix) with ESMTPS id 868EE820917;
-        Fri, 10 Jan 2020 10:22:45 +1100 (AEDT)
-Received: from dave by dread.disaster.area with local (Exim 4.92.3)
-        (envelope-from <david@fromorbit.com>)
-        id 1iph8W-0006Qu-Dy; Fri, 10 Jan 2020 10:22:44 +1100
-Date:   Fri, 10 Jan 2020 10:22:44 +1100
-From:   Dave Chinner <david@fromorbit.com>
-To:     Tony Asleson <tasleson@redhat.com>,
-        Sweet Tea Dorminy <sweettea@redhat.com>,
-        James Bottomley <James.Bottomley@hansenpartnership.com>,
-        linux-scsi@vger.kernel.org, linux-block@vger.kernel.org,
-        linux-fsdevel@vger.kernel.org
-Subject: Re: [RFC 9/9] __xfs_printk: Add durable name to output
-Message-ID: <20200109232244.GT23195@dread.disaster.area>
-References: <20191223225558.19242-10-tasleson@redhat.com>
- <20200104025620.GC23195@dread.disaster.area>
- <5ad7cf7b-e261-102c-afdc-fa34bed98921@redhat.com>
- <20200106220233.GK23195@dread.disaster.area>
- <CAMeeMh-zr309TzbC3ayKUKRniat+rzurgzmeM5LJYMFVDj7bLA@mail.gmail.com>
- <20200107012353.GO23195@dread.disaster.area>
- <4ce83a0e-13e1-6245-33a3-5c109aec4bf1@redhat.com>
- <20200108021002.GR23195@dread.disaster.area>
- <9e449c65-193c-d69c-1454-b1059221e5dc@redhat.com>
- <20200109014117.GB3809@agk-dp.fab.redhat.com>
+        Thu, 9 Jan 2020 20:28:21 -0500
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+        s=mimecast20190719; t=1578619700;
+        h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+         to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+         in-reply-to:in-reply-to:references:references;
+        bh=LSyKA3j/3j2EtToo9WAdYh474h7JYo+Na8uCUw7EHS4=;
+        b=WXhgzDhdBAJX0QNA6pwIY/I9/XdWZA+JQq05zBkjs5Ahuq1/vLkUsX2SLTc6fLVCEXFQVM
+        Tj6kpnKcBsDvEdsm5R4zF0qbH0AVi2S9sRyiGUZWsoWIYlOQQc79vK0nJhVQVf4+vCIGIF
+        pBuVaRHiDuduuImrP0NTa916LsZQ7rE=
+Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
+ [209.132.183.4]) (Using TLS) by relay.mimecast.com with ESMTP id
+ us-mta-432-ecGkSfZ6Pzy1gJ8MEkslLw-1; Thu, 09 Jan 2020 20:28:19 -0500
+X-MC-Unique: ecGkSfZ6Pzy1gJ8MEkslLw-1
+Received: from smtp.corp.redhat.com (int-mx03.intmail.prod.int.phx2.redhat.com [10.5.11.13])
+        (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
+        (No client certificate requested)
+        by mimecast-mx01.redhat.com (Postfix) with ESMTPS id DFDF9800EBF;
+        Fri, 10 Jan 2020 01:28:17 +0000 (UTC)
+Received: from ming.t460p (ovpn-8-24.pek2.redhat.com [10.72.8.24])
+        by smtp.corp.redhat.com (Postfix) with ESMTPS id E613D86CA7;
+        Fri, 10 Jan 2020 01:28:06 +0000 (UTC)
+Date:   Fri, 10 Jan 2020 09:28:02 +0800
+From:   Ming Lei <ming.lei@redhat.com>
+To:     Thomas Gleixner <tglx@linutronix.de>
+Cc:     Peter Xu <peterx@redhat.com>, Juri Lelli <juri.lelli@redhat.com>,
+        Ming Lei <minlei@redhat.com>,
+        Linux Kernel Mailing List <linux-kernel@vger.kernel.org>,
+        linux-block@vger.kernel.org
+Subject: Re: Kernel-managed IRQ affinity (cont)
+Message-ID: <20200110012802.GA4501@ming.t460p>
+References: <20191216195712.GA161272@xz-x1>
+ <20191219082819.GB15731@ming.t460p>
+ <20191219143214.GA50561@xz-x1>
+ <20191219161115.GA18672@ming.t460p>
+ <87eew8l7oz.fsf@nanos.tec.linutronix.de>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=us-ascii
 Content-Disposition: inline
-In-Reply-To: <20200109014117.GB3809@agk-dp.fab.redhat.com>
-User-Agent: Mutt/1.10.1 (2018-07-13)
-X-Optus-CM-Score: 0
-X-Optus-CM-Analysis: v=2.3 cv=X6os11be c=1 sm=1 tr=0
-        a=sbdTpStuSq8iNQE8viVliQ==:117 a=sbdTpStuSq8iNQE8viVliQ==:17
-        a=jpOVt7BSZ2e4Z31A5e1TngXxSK0=:19 a=kj9zAlcOel0A:10 a=Jdjhy38mL1oA:10
-        a=hoDmsdNMAAAA:20 a=GFaoHKnqAAAA:8 a=7-415B0cAAAA:8
-        a=VQnnGOFCwwFJJO5165wA:9 a=CjuIK1q_8ugA:10 a=Vh1PrrggmBitVpCIy7ZX:22
-        a=biEYGPWJfzWAr4FL6Ov7:22 a=pHzHmUro8NiASowvMSCR:22
-        a=nt3jZW36AmriUCFCBwmW:22
+In-Reply-To: <87eew8l7oz.fsf@nanos.tec.linutronix.de>
+User-Agent: Mutt/1.12.1 (2019-06-15)
+X-Scanned-By: MIMEDefang 2.79 on 10.5.11.13
 Sender: linux-block-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-On Thu, Jan 09, 2020 at 01:41:17AM +0000, Alasdair G Kergon wrote:
-> On Wed, Jan 08, 2020 at 10:53:13AM -0600, Tony Asleson wrote:
-> > We are not removing any existing information, we are adding.
-> 
-> A difficulty with this approach is:  Where do you stop when your storage
-> configuration is complicated and changing?  Do you add the complete
-> relevant part of the storage stack configuration to every storage
-> message in the kernel so that it is easy to search later?
-> 
-> Or do you catch the messages in userspace and add some of this
-> information there before sending them on to your favourite log message
-> database?  (ref. peripety, various rsyslog extensions)
-> 
-> > I think all the file systems should include their FS UUID in the FS log
-> > messages too, but that is not part of the problem we are trying to solve.
-> 
-> Each layer (subsystem) should already be tagging its messages in an
-> easy-to-parse way so that all those relating to the same object (e.g.
-> filesystem instance, disk) at its level of the stack can easily be
-> matched together later.  Where this doesn't already happen, we should
-> certainly be fixing that as it's a pre-requisite for any sensible
-> post-processing: As long as the right information got recorded, it can
-> all be joined together on demand later by some userspace software.
+Hello Thomas,
 
-*nod*
+On Thu, Jan 09, 2020 at 09:02:20PM +0100, Thomas Gleixner wrote:
+> Ming,
+> 
+> Ming Lei <ming.lei@redhat.com> writes:
+> 
+> > On Thu, Dec 19, 2019 at 09:32:14AM -0500, Peter Xu wrote:
+> >> ... this one seems to be more appealing at least to me.
+> >
+> > OK, please try the following patch:
+> >
+> >
+> > diff --git a/include/linux/sched/isolation.h b/include/linux/sched/isolation.h
+> > index 6c8512d3be88..0fbcbacd1b29 100644
+> > --- a/include/linux/sched/isolation.h
+> > +++ b/include/linux/sched/isolation.h
+> > @@ -13,6 +13,7 @@ enum hk_flags {
+> >  	HK_FLAG_TICK		= (1 << 4),
+> >  	HK_FLAG_DOMAIN		= (1 << 5),
+> >  	HK_FLAG_WQ		= (1 << 6),
+> > +	HK_FLAG_MANAGED_IRQ	= (1 << 7),
+> >  };
+> >  
+> >  #ifdef CONFIG_CPU_ISOLATION
+> > diff --git a/kernel/irq/manage.c b/kernel/irq/manage.c
+> > index 1753486b440c..0a75a09cc4e8 100644
+> > --- a/kernel/irq/manage.c
+> > +++ b/kernel/irq/manage.c
+> > @@ -20,6 +20,7 @@
+> >  #include <linux/sched/task.h>
+> >  #include <uapi/linux/sched/types.h>
+> >  #include <linux/task_work.h>
+> > +#include <linux/sched/isolation.h>
+> >  
+> >  #include "internals.h"
+> >  
+> > @@ -212,12 +213,33 @@ int irq_do_set_affinity(struct irq_data *data, const struct cpumask *mask,
+> >  {
+> >  	struct irq_desc *desc = irq_data_to_desc(data);
+> >  	struct irq_chip *chip = irq_data_get_irq_chip(data);
+> > +	const struct cpumask *housekeeping_mask =
+> > +		housekeeping_cpumask(HK_FLAG_MANAGED_IRQ);
+> >  	int ret;
+> > +	cpumask_var_t tmp_mask;
+> >  
+> >  	if (!chip || !chip->irq_set_affinity)
+> >  		return -EINVAL;
+> >  
+> > -	ret = chip->irq_set_affinity(data, mask, force);
+> > +	if (!zalloc_cpumask_var(&tmp_mask, GFP_KERNEL))
+> > +		return -EINVAL;
+> 
+> That's wrong. This code is called with interrupts disabled, so
+> GFP_KERNEL is wrong. And NO, we won't do a GFP_ATOMIC allocation here.
 
-That was the essence of my suggestion that the filesystem mount log
-notification emits it's persistent identifier. If you need it to be
-logged, that's where the verbose identifier output should be....
+OK, looks desc->lock is held.
 
-> > The user has to systematically and methodically go through the logs
-> > trying to deduce what the identifier was referring to at the time of the
-> > error.  This isn't trivial and virtually impossible at times depending
-> > on circumstances.
 > 
-> So how about logging what these identifiers reference at different times
-> in a way that is easy to query later?
+> > +	/*
+> > +	 * Userspace can't change managed irq's affinity, make sure
+> > +	 * that isolated CPU won't be selected as the effective CPU
+> > +	 * if this irq's affinity includes both isolated CPU and
+> > +	 * housekeeping CPU.
+> > +	 *
+> > +	 * This way guarantees that isolated CPU won't be interrupted
+> > +	 * by IO submitted from housekeeping CPU.
+> > +	 */
+> > +	if (irqd_affinity_is_managed(data) &&
+> > +			cpumask_intersects(mask, housekeeping_mask))
+> > +		cpumask_and(tmp_mask, mask, housekeeping_mask);
 > 
-> Come to think of it, we already get uevents when the references change,
-> and udev rules even already now create neat "by-*" links for us.  Maybe
-> we just need to log better what udev is actually already doing?
+> This is duct tape engineering with absolutely no semantics. I can't even
+> figure out the intent of this 'managed_irq' parameter.
 
-Right, this is essentially what I've been trying to point out - I
-even used the by-uuid links as an example of how the filesystem is
-persistently identified by existing system boot infrastructure. :)
+The intent is to isolate the specified CPUs from handling managed interrupt.
 
-> Then we could reproduce what the storage configuration looked like at
-> any particular time in the past to provide the missing context for
-> the identifiers in the log messages.
-> 
->                     ---------------------
->  
-> Which seems like an appropriate time to introduce storage-logger.
-> 
->     https://github.com/lvmteam/storage-logger
-> 
->     Fedora rawhide packages:
->       https://copr.fedorainfracloud.org/coprs/agk/storage-logger/ 
-> 
-> The goal of this particular project is to maintain a record of the
-> storage configuration as it changes over time.  It should provide a
-> quick way to check the state of a system at a specified time in the
-> past.
-> 
-> The initial logging implementation is triggered by storage uevents and
-> consists of two components:
-> 
-> 1. A new udev rule file, 99-zzz-storage-logger.rules, which runs after
-> all the other rules have run and invokes:
-> 
-> 2. A script, udev_storage_logger.sh, that captures relevant
-> information about devices that changed and stores it in the system
-> journal.
-> 
-> The effect is to log the data from relevant uevents plus some
-> supplementary information (including device-mapper tables, for example).
-> It does not yet handle filesystem-related events.
+For non-managed interrupt, the isolation is done via userspace because
+userspace is allowed to change non-manage interrupt's affinity.
 
-There are very few filesystem uevents issued that you could log,
-anyway. Certainly nothing standardised across filesystems....
-
-> Two methods to query the data are offered:
 > 
-> 1. journalctl
-> Data is tagged with the identifier UDEVLOG and retrievable as
-> key-value pairs.
->   journalctl -t UDEVLOG --output verbose
->   journalctl -t UDEVLOG --output json
->     --since 'YYYY-MM-DD HH:MM:SS' 
->     --until 'YYYY-MM-DD HH:MM:SS'
->   journalctl -t UDEVLOG --output verbose
->     --output-fields=PERSISTENT_STORAGE_ID,MAJOR,MINOR
->      PERSISTENT_STORAGE_ID=dm-name-vg1-lvol0
+> If the intent is to keep managed device interrupts away from isolated
+> cores then you really want to do that when the interrupts are spread and
+> not in the middle of the affinity setter code.
 > 
-> 2. lsblkj  [appended j for journal]
-> This lsblk wrapper reprocesses the logged uevents to reconstruct a
-> dummy system environment that "looks like" the system did at a
-> specified earlier time and then runs lsblk against it.
+> But first you need to define how that mask should work:
+> 
+>  1) Exclude CPUs from managed interrupt spreading completely
+> 
+>  2) Exclude CPUs only when the resulting spreading contains
+>     housekeeping CPUs
+> 
+>  3) Whatever ...
 
-Yeah, and if you add the equivalent of 'lsblk -f' then you also get
-the fs UUID to identify the filesystem on the block device at a
-given time....
+We can do that. The big problem is that the RT case can't guarantee that
+IO won't be submitted from isolated CPU always. blk-mq's queue mapping
+relies on the setup affinity, so un-known behavior(kernel crash, or io
+hang, or other) may be caused if we exclude isolated CPUs from interrupt
+affinity.
 
-> Yes, I'm looking for feedback to help to decide whether or not it's
-> worth developing this any further.
+That is why I try to exclude isolated CPUs from interrupt effective affinity,
+turns out the approach is simple and doable.
 
-This seems like a more flexible approach to me - it allows for
-text-based system loggers a hook to capture this device
-information, too, and hence implement their own post-processing
-scripts to provide the same lifetime information.
 
-Cheers,
+Thanks,
+Ming
 
-Dave.
--- 
-Dave Chinner
-david@fromorbit.com
