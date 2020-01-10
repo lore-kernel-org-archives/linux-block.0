@@ -2,42 +2,42 @@ Return-Path: <SRS0=/LTC=27=vger.kernel.org=linux-block-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-9.1 required=3.0 tests=DKIMWL_WL_HIGH,DKIM_SIGNED,
-	DKIM_VALID,DKIM_VALID_AU,MAILING_LIST_MULTI,MENTIONS_GIT_HOSTING,
+X-Spam-Status: No, score=-10.1 required=3.0 tests=DKIMWL_WL_HIGH,DKIM_SIGNED,
+	DKIM_VALID,DKIM_VALID_AU,INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,
 	SPF_HELO_NONE,SPF_PASS,USER_AGENT_GIT autolearn=unavailable
 	autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id EA06CC33C99
-	for <linux-block@archiver.kernel.org>; Fri, 10 Jan 2020 06:18:29 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id B0AE7C33CAC
+	for <linux-block@archiver.kernel.org>; Fri, 10 Jan 2020 06:18:30 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.kernel.org (Postfix) with ESMTP id B90D620673
-	for <linux-block@archiver.kernel.org>; Fri, 10 Jan 2020 06:18:29 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id 84E1C20673
+	for <linux-block@archiver.kernel.org>; Fri, 10 Jan 2020 06:18:30 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=default; t=1578637109;
-	bh=E83v9s/velUj5ZMKMl2BVwEb+LgFHUZZtzb8Bqy9gU4=;
-	h=From:To:Cc:Subject:Date:List-ID:From;
-	b=I2QtVgY33imcRfjONlE8gFYCSdCQa1HsyLjkiYBmmNWYciiuf3KUElHN0CXS8R+x2
-	 WntM0Y+nGbwZ014wz+0u6LIIyFJkCBUeeI7x7otMj6BQubVIoH19UVhg/yUnyop2dC
-	 d3nlSB6UE+iSifOqE+NwfJ+CVdPNydZQNrXlGVDg=
+	s=default; t=1578637110;
+	bh=CXnjOYm1iTDjojjdsIRWTNlwicfcXj4LVXbnFJeFR2o=;
+	h=From:To:Cc:Subject:Date:In-Reply-To:References:List-ID:From;
+	b=QsKrXGp7aVJEP+cpwyZEjanRmeyw8Ml8h6sK6WjcXU7lmIDF3dfMehWwoVPXD+HgN
+	 R5uG4a+Ok4HE2tYGrsKZtTVrkxllYe88qUIB91VIPYEY1sCuC4QEGHYRIaffEZD61h
+	 yvL5N3Coc57lDwo23NBt+I4SQ7qZMUwfQLrfQUF8=
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1731441AbgAJGS0 (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Fri, 10 Jan 2020 01:18:26 -0500
-Received: from mail.kernel.org ([198.145.29.99]:52690 "EHLO mail.kernel.org"
+        id S1731434AbgAJGS3 (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Fri, 10 Jan 2020 01:18:29 -0500
+Received: from mail.kernel.org ([198.145.29.99]:52848 "EHLO mail.kernel.org"
         rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-        id S1725797AbgAJGS0 (ORCPT <rfc822;linux-block@vger.kernel.org>);
-        Fri, 10 Jan 2020 01:18:26 -0500
+        id S1731465AbgAJGS2 (ORCPT <rfc822;linux-block@vger.kernel.org>);
+        Fri, 10 Jan 2020 01:18:28 -0500
 Received: from sol.localdomain (c-24-5-143-220.hsd1.ca.comcast.net [24.5.143.220])
         (using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
         (No client certificate requested)
-        by mail.kernel.org (Postfix) with ESMTPSA id 67DDD20673;
-        Fri, 10 Jan 2020 06:18:24 +0000 (UTC)
+        by mail.kernel.org (Postfix) with ESMTPSA id B88D920838;
+        Fri, 10 Jan 2020 06:18:26 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-        s=default; t=1578637104;
-        bh=E83v9s/velUj5ZMKMl2BVwEb+LgFHUZZtzb8Bqy9gU4=;
-        h=From:To:Cc:Subject:Date:From;
-        b=xyN7PM3sGWyQc+Q3C57MHsA5e3wjktENkcTqPjjN48EhTVMfLAOcEH7WXcehyQGC6
-         CqtX3KktH3VHkouuRDRBfqb+OHlpZenFzzhBLqVYkQH/7WfrzKZ0q/vtCiat2KM09/
-         /73s9E3NXSaD1yHiJUh5GvaXRcpQoPXGGxrOfGV8=
+        s=default; t=1578637107;
+        bh=CXnjOYm1iTDjojjdsIRWTNlwicfcXj4LVXbnFJeFR2o=;
+        h=From:To:Cc:Subject:Date:In-Reply-To:References:From;
+        b=kmb0Iyc9tu/rxA/ezfektn4+xbD8O/KI0wSPSI6WPESopr4jFdCCoLqlj1ssipQ5D
+         +iQVFzbMgld/0e+uZf4U7ONdoaINq/8u9n4qsttx1wep3Uh8KjmwhNTZjkGT7vDQnu
+         A0jG1DmClF5SdOEZwAkqU5xwfK8UYIRoFfhHwLmw=
 From:   Eric Biggers <ebiggers@kernel.org>
 To:     linux-scsi@vger.kernel.org, linux-arm-msm@vger.kernel.org
 Cc:     linux-block@vger.kernel.org, linux-fscrypt@vger.kernel.org,
@@ -52,10 +52,12 @@ Cc:     linux-block@vger.kernel.org, linux-fscrypt@vger.kernel.org,
         Satya Tangirala <satyat@google.com>,
         Jaegeuk Kim <jaegeuk@kernel.org>,
         "Theodore Y . Ts'o" <tytso@mit.edu>
-Subject: [RFC PATCH 0/5] Inline crypto support on DragonBoard 845c
-Date:   Thu,  9 Jan 2020 22:16:29 -0800
-Message-Id: <20200110061634.46742-1-ebiggers@kernel.org>
+Subject: [RFC PATCH 4/5] scsi: ufs: add program_key() variant op
+Date:   Thu,  9 Jan 2020 22:16:33 -0800
+Message-Id: <20200110061634.46742-5-ebiggers@kernel.org>
 X-Mailer: git-send-email 2.24.1
+In-Reply-To: <20200110061634.46742-1-ebiggers@kernel.org>
+References: <20200110061634.46742-1-ebiggers@kernel.org>
 MIME-Version: 1.0
 Content-Transfer-Encoding: 8bit
 Sender: linux-block-owner@vger.kernel.org
@@ -63,63 +65,117 @@ Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-Hello,
+From: Eric Biggers <ebiggers@google.com>
 
-This patchset implements UFS inline crypto support on the DragonBoard
-845c, using the Qualcomm Inline Crypto Engine (ICE) that's present on
-the Snapdragon 845 SoC.
+On Snapdragon SoCs, the Linux kernel isn't permitted to directly access
+the standard UFS crypto configuration registers.  Instead, programming
+and evicting keys must be done through vendor-specific SMC calls.
 
-This is based on top of the patchset "[PATCH v6 0/9] Inline Encryption
-Support" by Satya Tangirala, which adds support for the UFS standard
-inline crypto, the block layer changes needed to use inline crypto, and
-support for inline crypto in fscrypt (ext4 and f2fs encryption).  Link:
-https://lkml.kernel.org/r/20191218145136.172774-1-satyat@google.com
+To support this hardware, add a ->program_key() method to
+'struct ufs_hba_variant_ops'.  This allows overriding the UFS standard
+key programming procedure.
 
-This new patchset is mostly a RFC showing hardware inline crypto working
-on a publicly available development board that runs the mainline Linux
-kernel.  While patches 1-2 could be applied now, patches 3-5 depend on
-the main "Inline Encryption Support" patchset being merged first.
+Signed-off-by: Eric Biggers <ebiggers@google.com>
+---
+ drivers/scsi/ufs/ufshcd-crypto.c | 24 ++++++++++++++++++------
+ drivers/scsi/ufs/ufshcd.h        |  5 +++++
+ 2 files changed, 23 insertions(+), 6 deletions(-)
 
-Most of the logic needed to use ICE is already handled by ufshcd-crypto
-and the blk-crypto framework, which are introduced by the "Inline
-Encryption Support" patchset.  Therefore, this new patchset just adds
-the vendor-specific parts.  I also only implemented support for version
-3 of the ICE hardware, which seems to be easier to use than older
-versions; and for now I only implemented UFS support, not eMMC.
-
-Due to these factors, I was able to greatly simplify the driver from the
-vendor's original.  It seems to work fine in some preliminary testing
-with fscrypt, and with a blk-crypto self-test I'm also working on.  But
-I'd appreciate feedback from anyone who may be more familiar with this
-hardware as to whether I might have missed anything important.
-
-This patchset is also available in git at
-https://git.kernel.org/pub/scm/linux/kernel/git/ebiggers/linux.git/tag/?h=db845c-crypto-v1
-
-Eric Biggers (5):
-  firmware: qcom_scm: Add support for programming inline crypto keys
-  arm64: dts: sdm845: add Inline Crypto Engine registers and clock
-  scsi: ufs: add quirk to disable inline crypto support
-  scsi: ufs: add program_key() variant op
-  scsi: ufs-qcom: add Inline Crypto Engine support
-
- MAINTAINERS                          |   2 +-
- arch/arm64/boot/dts/qcom/sdm845.dtsi |  13 +-
- drivers/firmware/qcom_scm-32.c       |  14 ++
- drivers/firmware/qcom_scm-64.c       |  31 ++++
- drivers/firmware/qcom_scm.c          |  78 +++++++++
- drivers/firmware/qcom_scm.h          |   9 +
- drivers/scsi/ufs/Kconfig             |   1 +
- drivers/scsi/ufs/Makefile            |   4 +-
- drivers/scsi/ufs/ufs-qcom-ice.c      | 247 +++++++++++++++++++++++++++
- drivers/scsi/ufs/ufs-qcom.c          |  14 +-
- drivers/scsi/ufs/ufs-qcom.h          |  35 ++++
- drivers/scsi/ufs/ufshcd-crypto.c     |  27 ++-
- drivers/scsi/ufs/ufshcd.h            |  12 ++
- include/linux/qcom_scm.h             |  17 ++
- 14 files changed, 490 insertions(+), 14 deletions(-)
- create mode 100644 drivers/scsi/ufs/ufs-qcom-ice.c
-
+diff --git a/drivers/scsi/ufs/ufshcd-crypto.c b/drivers/scsi/ufs/ufshcd-crypto.c
+index 2c34beb47f8e0..4b9e4d5770643 100644
+--- a/drivers/scsi/ufs/ufshcd-crypto.c
++++ b/drivers/scsi/ufs/ufshcd-crypto.c
+@@ -117,15 +117,21 @@ static int ufshcd_crypto_cfg_entry_write_key(union ufs_crypto_cfg_entry *cfg,
+ 	return -EINVAL;
+ }
+ 
+-static void ufshcd_program_key(struct ufs_hba *hba,
+-			       const union ufs_crypto_cfg_entry *cfg,
+-			       int slot)
++static int ufshcd_program_key(struct ufs_hba *hba,
++			      const union ufs_crypto_cfg_entry *cfg, int slot)
+ {
+ 	int i;
+ 	u32 slot_offset = hba->crypto_cfg_register + slot * sizeof(*cfg);
++	int err;
+ 
+ 	pm_runtime_get_sync(hba->dev);
+ 	ufshcd_hold(hba, false);
++
++	if (hba->vops->program_key) {
++		err = hba->vops->program_key(hba, cfg, slot);
++		goto out;
++	}
++
+ 	/* Clear the dword 16 */
+ 	ufshcd_writel(hba, 0, slot_offset + 16 * sizeof(cfg->reg_val[0]));
+ 	/* Ensure that CFGE is cleared before programming the key */
+@@ -145,15 +151,20 @@ static void ufshcd_program_key(struct ufs_hba *hba,
+ 	ufshcd_writel(hba, le32_to_cpu(cfg->reg_val[16]),
+ 		      slot_offset + 16 * sizeof(cfg->reg_val[0]));
+ 	wmb();
++	err = 0;
++out:
+ 	ufshcd_release(hba);
+ 	pm_runtime_put_sync(hba->dev);
++	return err;
+ }
+ 
+ static void ufshcd_clear_keyslot(struct ufs_hba *hba, int slot)
+ {
+ 	union ufs_crypto_cfg_entry cfg = { 0 };
++	int err;
+ 
+-	ufshcd_program_key(hba, &cfg, slot);
++	err = ufshcd_program_key(hba, &cfg, slot);
++	WARN_ON_ONCE(err);
+ }
+ 
+ /* Clear all keyslots at driver init time */
+@@ -198,10 +209,11 @@ static int ufshcd_crypto_keyslot_program(struct keyslot_manager *ksm,
+ 	if (err)
+ 		return err;
+ 
+-	ufshcd_program_key(hba, &cfg, slot);
++	err = ufshcd_program_key(hba, &cfg, slot);
+ 
+ 	memzero_explicit(&cfg, sizeof(cfg));
+-	return 0;
++
++	return err;
+ }
+ 
+ static int ufshcd_crypto_keyslot_evict(struct keyslot_manager *ksm,
+diff --git a/drivers/scsi/ufs/ufshcd.h b/drivers/scsi/ufs/ufshcd.h
+index b6f0d08a98a8b..cd0969b93d070 100644
+--- a/drivers/scsi/ufs/ufshcd.h
++++ b/drivers/scsi/ufs/ufshcd.h
+@@ -280,6 +280,8 @@ struct ufs_pwr_mode_info {
+ 	struct ufs_pa_layer_attr info;
+ };
+ 
++union ufs_crypto_cfg_entry;
++
+ /**
+  * struct ufs_hba_variant_ops - variant specific callbacks
+  * @name: variant name
+@@ -307,6 +309,7 @@ struct ufs_pwr_mode_info {
+  * @dbg_register_dump: used to dump controller debug information
+  * @phy_initialization: used to initialize phys
+  * @device_reset: called to issue a reset pulse on the UFS device
++ * @program_key: program an inline encryption key into a keyslot
+  */
+ struct ufs_hba_variant_ops {
+ 	const char *name;
+@@ -336,6 +339,8 @@ struct ufs_hba_variant_ops {
+ 	void	(*dbg_register_dump)(struct ufs_hba *hba);
+ 	int	(*phy_initialization)(struct ufs_hba *);
+ 	void	(*device_reset)(struct ufs_hba *hba);
++	int	(*program_key)(struct ufs_hba *hba,
++			       const union ufs_crypto_cfg_entry *cfg, int slot);
+ };
+ 
+ /* clock gating state  */
 -- 
 2.24.1
 
