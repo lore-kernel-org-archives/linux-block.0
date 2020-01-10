@@ -2,160 +2,123 @@ Return-Path: <SRS0=/LTC=27=vger.kernel.org=linux-block-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-8.2 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
-	INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,
-	USER_AGENT_SANE_1 autolearn=ham autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-0.8 required=3.0 tests=DKIMWL_WL_HIGH,DKIM_SIGNED,
+	DKIM_VALID,DKIM_VALID_AU,HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,
+	SPF_HELO_NONE,SPF_PASS,UNPARSEABLE_RELAY autolearn=no autolearn_force=no
+	version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id B44B6C33C99
-	for <linux-block@archiver.kernel.org>; Fri, 10 Jan 2020 05:10:36 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 6F9E7C33C99
+	for <linux-block@archiver.kernel.org>; Fri, 10 Jan 2020 05:34:23 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.kernel.org (Postfix) with ESMTP id 8F41420721
-	for <linux-block@archiver.kernel.org>; Fri, 10 Jan 2020 05:10:36 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id 420472073A
+	for <linux-block@archiver.kernel.org>; Fri, 10 Jan 2020 05:34:23 +0000 (UTC)
+Authentication-Results: mail.kernel.org;
+	dkim=pass (2048-bit key) header.d=oracle.com header.i=@oracle.com header.b="n1Zn+uUK"
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1725880AbgAJFKg (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Fri, 10 Jan 2020 00:10:36 -0500
-Received: from szxga07-in.huawei.com ([45.249.212.35]:55026 "EHLO huawei.com"
-        rhost-flags-OK-OK-OK-FAIL) by vger.kernel.org with ESMTP
-        id S1725799AbgAJFKf (ORCPT <rfc822;linux-block@vger.kernel.org>);
-        Fri, 10 Jan 2020 00:10:35 -0500
-Received: from DGGEMS411-HUB.china.huawei.com (unknown [172.30.72.59])
-        by Forcepoint Email with ESMTP id 4478DB566B8B45BDBD5B;
-        Fri, 10 Jan 2020 13:10:32 +0800 (CST)
-Received: from [127.0.0.1] (10.173.220.183) by DGGEMS411-HUB.china.huawei.com
- (10.3.19.211) with Microsoft SMTP Server id 14.3.439.0; Fri, 10 Jan 2020
- 13:10:21 +0800
-To:     Jens Axboe <axboe@kernel.dk>, <linux-block@vger.kernel.org>,
-        "linux-kernel@vger.kernel.org" <linux-kernel@vger.kernel.org>,
-        <npiggin@suse.de>
-CC:     Mingfangsen <mingfangsen@huawei.com>, Guiyao <guiyao@huawei.com>,
-        zhangsaisai <zhangsaisai@huawei.com>,
-        "wubo (T)" <wubo40@huawei.com>, <behlendorf1@llnl.gov>,
-        <amwang@redhat.com>
-From:   Zhiqiang Liu <liuzhiqiang26@huawei.com>
-Subject: [PATCH] brd: check parameter validation before register_blkdev func
-Message-ID: <342ee238-0e7c-c213-eecc-7062f24985cc@huawei.com>
-Date:   Fri, 10 Jan 2020 13:10:20 +0800
-User-Agent: Mozilla/5.0 (Windows NT 10.0; WOW64; rv:68.0) Gecko/20100101
- Thunderbird/68.2.2
+        id S1726671AbgAJFeW (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Fri, 10 Jan 2020 00:34:22 -0500
+Received: from aserp2120.oracle.com ([141.146.126.78]:50342 "EHLO
+        aserp2120.oracle.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S1726096AbgAJFeW (ORCPT
+        <rfc822;linux-block@vger.kernel.org>);
+        Fri, 10 Jan 2020 00:34:22 -0500
+Received: from pps.filterd (aserp2120.oracle.com [127.0.0.1])
+        by aserp2120.oracle.com (8.16.0.27/8.16.0.27) with SMTP id 00A5NNMX031215;
+        Fri, 10 Jan 2020 05:33:41 GMT
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=oracle.com; h=to : cc : subject :
+ from : references : date : in-reply-to : message-id : mime-version :
+ content-type; s=corp-2019-08-05;
+ bh=IY5ypyWB8E0NmjrXstQmSbrKj69APzR1aWp/wYV3cCM=;
+ b=n1Zn+uUKIbGajBv+fxV0zAXxrdFGkcPLS5xYgLavxm4mmAnjqQ0PgL5ryM6p7aXpgq37
+ hEPh1k96klPemk7mZ8fDXrR+cU1C+OWj2JjeU3npupNb6rA7uo7jEpWvvZK86QW4ZwUh
+ s6JwpoT4q5dPR5Ln4WgCknvgueVVorv+c/uF2ViQJBcpMvwOxwkTFw3F4lFUgI1JlaFJ
+ pOVMkDjP3CqLHRDJYg9P9LfKlTe5ST/cvz433esof96u3kCogSV5q1vjNUhgsetRe8vC
+ 65NJXlD0hY/OltdB4kCs0eyY8HxoJQmQ7pEEQq7ZjPpPKZhFO8k3g6j726OZYC1P6DgE vg== 
+Received: from userp3030.oracle.com (userp3030.oracle.com [156.151.31.80])
+        by aserp2120.oracle.com with ESMTP id 2xajnqfq75-1
+        (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=OK);
+        Fri, 10 Jan 2020 05:33:41 +0000
+Received: from pps.filterd (userp3030.oracle.com [127.0.0.1])
+        by userp3030.oracle.com (8.16.0.27/8.16.0.27) with SMTP id 00A5Oge4175226;
+        Fri, 10 Jan 2020 05:33:40 GMT
+Received: from userv0121.oracle.com (userv0121.oracle.com [156.151.31.72])
+        by userp3030.oracle.com with ESMTP id 2xeh8yxj4f-1
+        (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=OK);
+        Fri, 10 Jan 2020 05:33:40 +0000
+Received: from abhmp0020.oracle.com (abhmp0020.oracle.com [141.146.116.26])
+        by userv0121.oracle.com (8.14.4/8.13.8) with ESMTP id 00A5XVT1011528;
+        Fri, 10 Jan 2020 05:33:32 GMT
+Received: from ca-mkp.ca.oracle.com (/10.159.214.123)
+        by default (Oracle Beehive Gateway v4.0)
+        with ESMTP ; Thu, 09 Jan 2020 21:33:31 -0800
+To:     Bart Van Assche <bvanassche@acm.org>
+Cc:     Chaitanya Kulkarni <Chaitanya.Kulkarni@wdc.com>,
+        "linux-block\@vger.kernel.org" <linux-block@vger.kernel.org>,
+        "linux-scsi\@vger.kernel.org" <linux-scsi@vger.kernel.org>,
+        "linux-nvme\@lists.infradead.org" <linux-nvme@lists.infradead.org>,
+        "dm-devel\@redhat.com" <dm-devel@redhat.com>,
+        "lsf-pc\@lists.linux-foundation.org" 
+        <lsf-pc@lists.linux-foundation.org>,
+        "axboe\@kernel.dk" <axboe@kernel.dk>,
+        "hare\@suse.de" <hare@suse.de>,
+        "Martin K. Petersen" <martin.petersen@oracle.com>,
+        Keith Busch <kbusch@kernel.org>,
+        Christoph Hellwig <hch@lst.de>,
+        Stephen Bates <sbates@raithlin.com>,
+        "msnitzer\@redhat.com" <msnitzer@redhat.com>,
+        "mpatocka\@redhat.com" <mpatocka@redhat.com>,
+        "zach.brown\@ni.com" <zach.brown@ni.com>,
+        "roland\@purestorage.com" <roland@purestorage.com>,
+        "rwheeler\@redhat.com" <rwheeler@redhat.com>,
+        "frederick.knight\@netapp.com" <frederick.knight@netapp.com>,
+        Matias Bjorling <Matias.Bjorling@wdc.com>
+Subject: Re: [LSF/MM/BFP ATTEND] [LSF/MM/BFP TOPIC] Storage: Copy Offload
+From:   "Martin K. Petersen" <martin.petersen@oracle.com>
+Organization: Oracle Corporation
+References: <BYAPR04MB5749820C322B40C7DBBBCA02863F0@BYAPR04MB5749.namprd04.prod.outlook.com>
+        <fda88fd3-2d75-085e-ca15-a29f89c1e781@acm.org>
+Date:   Fri, 10 Jan 2020 00:33:27 -0500
+In-Reply-To: <fda88fd3-2d75-085e-ca15-a29f89c1e781@acm.org> (Bart Van Assche's
+        message of "Wed, 8 Jan 2020 19:18:54 -0800")
+Message-ID: <yq1pnfrx4d4.fsf@oracle.com>
+User-Agent: Gnus/5.13 (Gnus v5.13) Emacs/26.1.92 (gnu/linux)
 MIME-Version: 1.0
-Content-Type: text/plain; charset="utf-8"
-Content-Language: en-US
-Content-Transfer-Encoding: 7bit
-X-Originating-IP: [10.173.220.183]
-X-CFilter-Loop: Reflected
+Content-Type: text/plain
+X-Proofpoint-Virus-Version: vendor=nai engine=6000 definitions=9495 signatures=668685
+X-Proofpoint-Spam-Details: rule=notspam policy=default score=0 suspectscore=0 malwarescore=0
+ phishscore=0 bulkscore=0 spamscore=0 mlxscore=0 mlxlogscore=999
+ adultscore=0 classifier=spam adjust=0 reason=mlx scancount=1
+ engine=8.0.1-1911140001 definitions=main-2001100047
+X-Proofpoint-Virus-Version: vendor=nai engine=6000 definitions=9495 signatures=668685
+X-Proofpoint-Spam-Details: rule=notspam policy=default score=0 priorityscore=1501 malwarescore=0
+ suspectscore=0 phishscore=0 bulkscore=0 spamscore=0 clxscore=1011
+ lowpriorityscore=0 mlxscore=0 impostorscore=0 mlxlogscore=999 adultscore=0
+ classifier=spam adjust=0 reason=mlx scancount=1 engine=8.0.1-1911140001
+ definitions=main-2001100047
 Sender: linux-block-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
 
-In brd_init func, rd_nr num of brd_device are firstly allocated
-and add in brd_devices, then brd_devices are traversed to add each
-brd_device by calling add_disk func. When allocating brd_device,
-the disk->first_minor is set to i * max_part, if rd_nr * max_part
-is larger than MINORMASK, two different brd_device may have the same
-devt, then only one of them can be successfully added.
-when rmmod brd.ko, it will cause oops when calling brd_exit.
+Bart,
 
-Follow those steps:
-  # modprobe brd rd_nr=3 rd_size=102400 max_part=1048576
-  # rmmod brd
-then, the oops will appear.
+> * Copying must be supported not only within a single storage device but
+>   also between storage devices.
 
-Oops log:
-[  726.613722] Call trace:
-[  726.614175]  kernfs_find_ns+0x24/0x130
-[  726.614852]  kernfs_find_and_get_ns+0x44/0x68
-[  726.615749]  sysfs_remove_group+0x38/0xb0
-[  726.616520]  blk_trace_remove_sysfs+0x1c/0x28
-[  726.617320]  blk_unregister_queue+0x98/0x100
-[  726.618105]  del_gendisk+0x144/0x2b8
-[  726.618759]  brd_exit+0x68/0x560 [brd]
-[  726.619501]  __arm64_sys_delete_module+0x19c/0x2a0
-[  726.620384]  el0_svc_common+0x78/0x130
-[  726.621057]  el0_svc_handler+0x38/0x78
-[  726.621738]  el0_svc+0x8/0xc
-[  726.622259] Code: aa0203f6 aa0103f7 aa1e03e0 d503201f (7940e260)
+Identifying which devices to permit copies between has been challenging.
+That has since been addressed in T10.
 
-Here, we add brd_check_par_valid func to check parameter
-validation before register_blkdev func.
+> * VMware, which uses XCOPY (with a one-byte length ID, aka LID1).
 
-Signed-off-by: Zhiqiang Liu <liuzhiqiang26@huawei.com>
----
- drivers/block/brd.c | 33 ++++++++++++++++++++++++++-------
- 1 file changed, 26 insertions(+), 7 deletions(-)
+I don't think LID1 vs LID4 is particularly interesting for the Linux use
+case. It's just an additional command tag since the copy manager is a
+third party.
 
-diff --git a/drivers/block/brd.c b/drivers/block/brd.c
-index df8103dd40ac..3a4510b2c24f 100644
---- a/drivers/block/brd.c
-+++ b/drivers/block/brd.c
-@@ -330,16 +330,16 @@ static const struct block_device_operations brd_fops = {
- /*
-  * And now the modules code and kernel interface.
-  */
--static int rd_nr = CONFIG_BLK_DEV_RAM_COUNT;
--module_param(rd_nr, int, 0444);
-+static unsigned int rd_nr = CONFIG_BLK_DEV_RAM_COUNT;
-+module_param(rd_nr, uint, 0444);
- MODULE_PARM_DESC(rd_nr, "Maximum number of brd devices");
+> * Microsoft, which uses ODX (aka LID4 because it has a four-byte length
+>   ID).
 
- unsigned long rd_size = CONFIG_BLK_DEV_RAM_SIZE;
- module_param(rd_size, ulong, 0444);
- MODULE_PARM_DESC(rd_size, "Size of each RAM disk in kbytes.");
+Microsoft uses the token commands.
 
--static int max_part = 1;
--module_param(max_part, int, 0444);
-+static unsigned int max_part = 1;
-+module_param(max_part, uint, 0444);
- MODULE_PARM_DESC(max_part, "Num Minors to reserve between devices");
-
- MODULE_LICENSE("GPL");
-@@ -468,10 +468,25 @@ static struct kobject *brd_probe(dev_t dev, int *part, void *data)
- 	return kobj;
- }
-
-+static inline int brd_check_par_valid(void)
-+{
-+	if (unlikely(!rd_nr))
-+		rd_nr = 1;
-+
-+	if (unlikely(!max_part))
-+		max_part = 1;
-+
-+	if (rd_nr * max_part > MINORMASK)
-+		return -EINVAL;
-+
-+	return 0;
-+
-+}
-+
- static int __init brd_init(void)
- {
- 	struct brd_device *brd, *next;
--	int i;
-+	int i, ret;
-
- 	/*
- 	 * brd module now has a feature to instantiate underlying device
-@@ -488,11 +503,15 @@ static int __init brd_init(void)
- 	 *	dynamically.
- 	 */
-
-+	ret = brd_check_par_valid();
-+	if (ret) {
-+		pr_info("brd: invalid parameter setting!!!\n");
-+		return ret;
-+	}
-+
- 	if (register_blkdev(RAMDISK_MAJOR, "ramdisk"))
- 		return -EIO;
-
--	if (unlikely(!max_part))
--		max_part = 1;
-
- 	for (i = 0; i < rd_nr; i++) {
- 		brd = brd_alloc(i);
 -- 
-2.19.1
-
-
+Martin K. Petersen	Oracle Linux Engineering
