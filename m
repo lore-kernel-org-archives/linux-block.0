@@ -2,153 +2,125 @@ Return-Path: <SRS0=o2oO=3A=vger.kernel.org=linux-block-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-2.4 required=3.0 tests=DKIMWL_WL_HIGH,DKIM_SIGNED,
-	DKIM_VALID,DKIM_VALID_AU,HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,
-	SPF_HELO_NONE,SPF_PASS,USER_AGENT_SANE_1 autolearn=no autolearn_force=no
-	version=3.4.0
+X-Spam-Status: No, score=-8.2 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
+	INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,
+	USER_AGENT_SANE_1 autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id DA0D7C33CA2
-	for <linux-block@archiver.kernel.org>; Sat, 11 Jan 2020 02:48:55 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id CF014C33C9E
+	for <linux-block@archiver.kernel.org>; Sat, 11 Jan 2020 04:50:57 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.kernel.org (Postfix) with ESMTP id 9FAE620721
-	for <linux-block@archiver.kernel.org>; Sat, 11 Jan 2020 02:48:55 +0000 (UTC)
-Authentication-Results: mail.kernel.org;
-	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="Vy5ZskNf"
+	by mail.kernel.org (Postfix) with ESMTP id AAAE32053B
+	for <linux-block@archiver.kernel.org>; Sat, 11 Jan 2020 04:50:57 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1728187AbgAKCsz (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Fri, 10 Jan 2020 21:48:55 -0500
-Received: from us-smtp-2.mimecast.com ([207.211.31.81]:53385 "EHLO
-        us-smtp-delivery-1.mimecast.com" rhost-flags-OK-OK-OK-FAIL)
-        by vger.kernel.org with ESMTP id S1728120AbgAKCsy (ORCPT
+        id S1728340AbgAKEu4 (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Fri, 10 Jan 2020 23:50:56 -0500
+Received: from mail-pj1-f67.google.com ([209.85.216.67]:50255 "EHLO
+        mail-pj1-f67.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S1728328AbgAKEu4 (ORCPT
         <rfc822;linux-block@vger.kernel.org>);
-        Fri, 10 Jan 2020 21:48:54 -0500
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-        s=mimecast20190719; t=1578710933;
-        h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-         to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-         in-reply-to:in-reply-to:references:references;
-        bh=yyBF0xPIxCR6ZxPQyowHmzsUIxzVycle+XUdhruB+uU=;
-        b=Vy5ZskNf7b933SSZcXVt6XFsLhHPEwa0+yDkG8/hfouYguW37FzIo3qhaG9qkS+0ZHqLyK
-        H2NQW/RL8c4gpzEZzgt1n99SYERIqEXaWJLze9pHbkgwOWk+UkTVrDhMqz+zfUPMVU/Y4/
-        SJZP7nLm4KuZrwOZx1s5k1i2e83l1ro=
-Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
- [209.132.183.4]) (Using TLS) by relay.mimecast.com with ESMTP id
- us-mta-357-bc-YXPzBO-Grb9vXyF4O6A-1; Fri, 10 Jan 2020 21:48:51 -0500
-X-MC-Unique: bc-YXPzBO-Grb9vXyF4O6A-1
-Received: from smtp.corp.redhat.com (int-mx01.intmail.prod.int.phx2.redhat.com [10.5.11.11])
-        (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
-        (No client certificate requested)
-        by mimecast-mx01.redhat.com (Postfix) with ESMTPS id 623841800D4E;
-        Sat, 11 Jan 2020 02:48:50 +0000 (UTC)
-Received: from ming.t460p (ovpn-8-16.pek2.redhat.com [10.72.8.16])
-        by smtp.corp.redhat.com (Postfix) with ESMTPS id 617118068F;
-        Sat, 11 Jan 2020 02:48:39 +0000 (UTC)
-Date:   Sat, 11 Jan 2020 10:48:35 +0800
-From:   Ming Lei <ming.lei@redhat.com>
-To:     Thomas Gleixner <tglx@linutronix.de>
-Cc:     Peter Xu <peterx@redhat.com>, Juri Lelli <juri.lelli@redhat.com>,
-        Ming Lei <minlei@redhat.com>,
-        Linux Kernel Mailing List <linux-kernel@vger.kernel.org>,
-        linux-block@vger.kernel.org
-Subject: Re: Kernel-managed IRQ affinity (cont)
-Message-ID: <20200111024835.GA24575@ming.t460p>
-References: <20191216195712.GA161272@xz-x1>
- <20191219082819.GB15731@ming.t460p>
- <20191219143214.GA50561@xz-x1>
- <20191219161115.GA18672@ming.t460p>
- <87eew8l7oz.fsf@nanos.tec.linutronix.de>
- <20200110012802.GA4501@ming.t460p>
- <87v9pjrtbh.fsf@nanos.tec.linutronix.de>
+        Fri, 10 Jan 2020 23:50:56 -0500
+Received: by mail-pj1-f67.google.com with SMTP id r67so1818287pjb.0;
+        Fri, 10 Jan 2020 20:50:56 -0800 (PST)
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20161025;
+        h=x-gm-message-state:subject:to:cc:references:from:autocrypt
+         :message-id:date:user-agent:mime-version:in-reply-to
+         :content-language:content-transfer-encoding;
+        bh=Cxclp8Q8/lgnVCpTy2D6gxi3NrsYfm8lBT4BEaAJheA=;
+        b=lrUDuhSZF5LpZJbJ8wI6/OhPCDXMmaxqrXkksXSSANK27UhKyretZFOsVbzOuKOucc
+         E+TVZk5KB1Y+O05+uQUzpTvrCJ8RZn/8ZBgrLC8q/Zsl8JUk1XdWGJMz3nRVt3aT0mOU
+         9iRkQcRsTchMDiIsSYEGLO2koV+S8ypm00HHY70uEuc48UnZgqF1HpDpz0gMkmYfKl5C
+         ajaWRe+IJbIhwdNP3qxnjOkgc4EsiLL6rCGDjPE78+kpY5+HtJAql8g4/61+e2ufA5EU
+         T31Iy1gnjQb2HaZlQPMeAIqNaOAtoPzga+A907nw3S4whLjzVZ90F0jTUUpNhdKyDHPV
+         sKTQ==
+X-Gm-Message-State: APjAAAV+NKAIiqeBoobLTN71iWJqY/k79KX4tvstwq7pKEFJ4tQhkqbQ
+        u8Q9k36Nvc56WqDcslWThuE=
+X-Google-Smtp-Source: APXvYqzVS9RANobbBwOTijb4E/cAooz3YHxtaVLk0bKfJpNqZ0XR+ZCE0ECZ/i61AS3jJCYx98rb4A==
+X-Received: by 2002:a17:90a:9bc3:: with SMTP id b3mr9468947pjw.64.1578718255651;
+        Fri, 10 Jan 2020 20:50:55 -0800 (PST)
+Received: from ?IPv6:2601:647:4000:d7:a1c6:ca99:4ff4:5a3b? ([2601:647:4000:d7:a1c6:ca99:4ff4:5a3b])
+        by smtp.gmail.com with ESMTPSA id v23sm4458658pjh.4.2020.01.10.20.50.54
+        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
+        Fri, 10 Jan 2020 20:50:54 -0800 (PST)
+Subject: Re: [PATCH] kdev_t: mask mi with MINORMASK in MKDEV macro
+To:     Zhiqiang Liu <liuzhiqiang26@huawei.com>,
+        "linux-kernel@vger.kernel.org" <linux-kernel@vger.kernel.org>,
+        linux-block@vger.kernel.org, dhowells@redhat.com,
+        akpm@linux-foundation.org, torvalds@linux-foundation.org
+Cc:     bywxiaobai@163.com, Mingfangsen <mingfangsen@huawei.com>,
+        Guiyao <guiyao@huawei.com>, zhangsaisai <zhangsaisai@huawei.com>,
+        renxudong <renxudong1@huawei.com>
+References: <5d384dcb-5590-60f8-a4e1-efa6b8da151f@huawei.com>
+From:   Bart Van Assche <bvanassche@acm.org>
+Autocrypt: addr=bvanassche@acm.org; prefer-encrypt=mutual; keydata=
+ mQENBFSOu4oBCADcRWxVUvkkvRmmwTwIjIJvZOu6wNm+dz5AF4z0FHW2KNZL3oheO3P8UZWr
+ LQOrCfRcK8e/sIs2Y2D3Lg/SL7qqbMehGEYcJptu6mKkywBfoYbtBkVoJ/jQsi2H0vBiiCOy
+ fmxMHIPcYxaJdXxrOG2UO4B60Y/BzE6OrPDT44w4cZA9DH5xialliWU447Bts8TJNa3lZKS1
+ AvW1ZklbvJfAJJAwzDih35LxU2fcWbmhPa7EO2DCv/LM1B10GBB/oQB5kvlq4aA2PSIWkqz4
+ 3SI5kCPSsygD6wKnbRsvNn2mIACva6VHdm62A7xel5dJRfpQjXj2snd1F/YNoNc66UUTABEB
+ AAG0JEJhcnQgVmFuIEFzc2NoZSA8YnZhbmFzc2NoZUBhY20ub3JnPokBOQQTAQIAIwUCVI67
+ igIbAwcLCQgHAwIBBhUIAgkKCwQWAgMBAh4BAheAAAoJEHFcPTXFzhAJ8QkH/1AdXblKL65M
+ Y1Zk1bYKnkAb4a98LxCPm/pJBilvci6boefwlBDZ2NZuuYWYgyrehMB5H+q+Kq4P0IBbTqTa
+ jTPAANn62A6jwJ0FnCn6YaM9TZQjM1F7LoDX3v+oAkaoXuq0dQ4hnxQNu792bi6QyVdZUvKc
+ macVFVgfK9n04mL7RzjO3f+X4midKt/s+G+IPr4DGlrq+WH27eDbpUR3aYRk8EgbgGKvQFdD
+ CEBFJi+5ZKOArmJVBSk21RHDpqyz6Vit3rjep7c1SN8s7NhVi9cjkKmMDM7KYhXkWc10lKx2
+ RTkFI30rkDm4U+JpdAd2+tP3tjGf9AyGGinpzE2XY1K5AQ0EVI67igEIAKiSyd0nECrgz+H5
+ PcFDGYQpGDMTl8MOPCKw/F3diXPuj2eql4xSbAdbUCJzk2ETif5s3twT2ER8cUTEVOaCEUY3
+ eOiaFgQ+nGLx4BXqqGewikPJCe+UBjFnH1m2/IFn4T9jPZkV8xlkKmDUqMK5EV9n3eQLkn5g
+ lco+FepTtmbkSCCjd91EfThVbNYpVQ5ZjdBCXN66CKyJDMJ85HVr5rmXG/nqriTh6cv1l1Js
+ T7AFvvPjUPknS6d+BETMhTkbGzoyS+sywEsQAgA+BMCxBH4LvUmHYhpS+W6CiZ3ZMxjO8Hgc
+ ++w1mLeRUvda3i4/U8wDT3SWuHcB3DWlcppECLkAEQEAAYkBHwQYAQIACQUCVI67igIbDAAK
+ CRBxXD01xc4QCZ4dB/0QrnEasxjM0PGeXK5hcZMT9Eo998alUfn5XU0RQDYdwp6/kMEXMdmT
+ oH0F0xB3SQ8WVSXA9rrc4EBvZruWQ+5/zjVrhhfUAx12CzL4oQ9Ro2k45daYaonKTANYG22y
+ //x8dLe2Fv1By4SKGhmzwH87uXxbTJAUxiWIi1np0z3/RDnoVyfmfbbL1DY7zf2hYXLLzsJR
+ mSsED/1nlJ9Oq5fALdNEPgDyPUerqHxcmIub+pF0AzJoYHK5punqpqfGmqPbjxrJLPJfHVKy
+ goMj5DlBMoYqEgpbwdUYkH6QdizJJCur4icy8GUNbisFYABeoJ91pnD4IGei3MTdvINSZI5e
+Message-ID: <d890c06e-5b56-629a-2e9f-bc19209238e4@acm.org>
+Date:   Fri, 10 Jan 2020 20:50:53 -0800
+User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:68.0) Gecko/20100101
+ Thunderbird/68.3.1
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <87v9pjrtbh.fsf@nanos.tec.linutronix.de>
-User-Agent: Mutt/1.12.1 (2019-06-15)
-X-Scanned-By: MIMEDefang 2.79 on 10.5.11.11
+In-Reply-To: <5d384dcb-5590-60f8-a4e1-efa6b8da151f@huawei.com>
+Content-Type: text/plain; charset=utf-8
+Content-Language: en-US
+Content-Transfer-Encoding: 7bit
 Sender: linux-block-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-Hi Thomas,
+On 2020-01-09 22:37, Zhiqiang Liu wrote:
+> 
+> In MKDEV macro, if mi is larger than MINORMASK, the major will be
+> affected by mi. For example, set dev = MKDEV(2, (1U << MINORBITS)),
+> then MAJOR(dev) will be equal to 3, incorrectly.
+> 
+> Here, we mask mi with MINORMASK in MKDEV macro.
+> 
+> Signed-off-by: Zhiqiang Liu <liuzhiqiang26@huawei.com>
+> ---
+>  include/linux/kdev_t.h | 2 +-
+>  1 file changed, 1 insertion(+), 1 deletion(-)
+> 
+> diff --git a/include/linux/kdev_t.h b/include/linux/kdev_t.h
+> index 85b5151911cf..40a9423720b2 100644
+> --- a/include/linux/kdev_t.h
+> +++ b/include/linux/kdev_t.h
+> @@ -9,7 +9,7 @@
+> 
+>  #define MAJOR(dev)	((unsigned int) ((dev) >> MINORBITS))
+>  #define MINOR(dev)	((unsigned int) ((dev) & MINORMASK))
+> -#define MKDEV(ma,mi)	(((ma) << MINORBITS) | (mi))
+> +#define MKDEV(ma, mi)	(((ma) << MINORBITS) | ((mi) & MINORMASK))
+> 
+>  #define print_dev_t(buffer, dev)					\
+>  	sprintf((buffer), "%u:%u\n", MAJOR(dev), MINOR(dev))
 
-On Fri, Jan 10, 2020 at 08:43:14PM +0100, Thomas Gleixner wrote:
-> Ming,
-> 
-> Ming Lei <ming.lei@redhat.com> writes:
-> > On Thu, Jan 09, 2020 at 09:02:20PM +0100, Thomas Gleixner wrote:
-> >> Ming Lei <ming.lei@redhat.com> writes:
-> >>
-> >> This is duct tape engineering with absolutely no semantics. I can't even
-> >> figure out the intent of this 'managed_irq' parameter.
-> >
-> > The intent is to isolate the specified CPUs from handling managed
-> > interrupt.
-> 
-> That's what I figured, but it still does not provide semantics and works
-> just for specific cases.
-> 
-> > We can do that. The big problem is that the RT case can't guarantee that
-> > IO won't be submitted from isolated CPU always. blk-mq's queue mapping
-> > relies on the setup affinity, so un-known behavior(kernel crash, or io
-> > hang, or other) may be caused if we exclude isolated CPUs from interrupt
-> > affinity.
-> >
-> > That is why I try to exclude isolated CPUs from interrupt effective affinity,
-> > turns out the approach is simple and doable.
-> 
-> Yes, it's doable. But it still is inconsistent behaviour. Assume the
-> following configuration:
-> 
->   8 CPUs CPU0,1 assigned for housekeeping
-> 
-> With 8 queues the proposed change does nothing because each queue is
-> mapped to exactly one CPU.
-
-That is expected behavior for this RT case, given userspace won't submit
-IO from isolated CPUs.
-
-> 
-> With 4 queues you get the following:
-> 
->  CPU0,1       queue 0
->  CPU2,3       queue 1
->  CPU4,5       queue 2
->  CPU6,7       queue 3
-> 
-> No effect on the isolated CPUs either.
-> 
-> With 2 queues you get the following:
-> 
->  CPU0,1,2,3   queue 0
->  CPU4,5,6,7   queue 1
-> 
-> So here the isolated CPUs 2 and 3 get the isolation, but 4-7
-> not. That's perhaps intended, but definitely not documented.
-
-That is intentional change, given no IO will be submitted from 4-7
-most of times in RT case, so it is fine to select effective CPU from
-isolated CPUs in this case. As peter mentioned, IO may just be submitted
-from isolated CPUs during booting. Once the system is setup, no IO
-comes from isolated CPUs, then no interrupt is delivered to isolated
-CPUs, then meet RT's requirement.
-
-We can document this change somewhere.
-
-> 
-> So you really need to make your mind up and describe what the intended
-> effect of this is and why you think that the result is correct.
-
-In short, if there is at least one housekeeping available in the
-interrupt's affinity, we choose effective CPU from housekeeping CPUs.
-Otherwise, keep the current behavior wrt. selecting effective CPU.
-
-With this approach, no interrupts can be delivered to isolated CPUs
-if no IOs are submitted from these CPUs.
-
-Please let us know if it addresses your concerns.
-
+Shouldn't the users of MKDEV() be fixed instead of changing the MKDEV()
+definition?
 
 Thanks,
-Ming
+
+Bart.
+
 
