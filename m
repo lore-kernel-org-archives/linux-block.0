@@ -2,106 +2,164 @@ Return-Path: <SRS0=JObX=3C=vger.kernel.org=linux-block-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-0.6 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
-	HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS
-	autolearn=no autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-8.2 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
+	INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,
+	USER_AGENT_SANE_1 autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 4175BC33CA8
-	for <linux-block@archiver.kernel.org>; Mon, 13 Jan 2020 09:55:19 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 2E866C33CA8
+	for <linux-block@archiver.kernel.org>; Mon, 13 Jan 2020 09:55:35 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.kernel.org (Postfix) with ESMTP id 0E3E32080D
-	for <linux-block@archiver.kernel.org>; Mon, 13 Jan 2020 09:55:18 +0000 (UTC)
-Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (1024-bit key) header.d=citrix.com header.i=@citrix.com header.b="dKY7z9FV"
+	by mail.kernel.org (Postfix) with ESMTP id 0C0D32082E
+	for <linux-block@archiver.kernel.org>; Mon, 13 Jan 2020 09:55:34 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1726109AbgAMJzS (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Mon, 13 Jan 2020 04:55:18 -0500
-Received: from esa3.hc3370-68.iphmx.com ([216.71.145.155]:33588 "EHLO
-        esa3.hc3370-68.iphmx.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1725992AbgAMJzS (ORCPT
-        <rfc822;linux-block@vger.kernel.org>);
-        Mon, 13 Jan 2020 04:55:18 -0500
-DKIM-Signature: v=1; a=rsa-sha256; c=simple/simple;
-  d=citrix.com; s=securemail; t=1578909318;
-  h=date:from:to:cc:subject:message-id:references:
-   mime-version:in-reply-to;
-  bh=x7xJTqB14LWoSFgsa+eCPpwC/buUotSsSvKgqBM35Yo=;
-  b=dKY7z9FVWudV/rhTiuEzFU/hRXj83jaUogSIKR6swvPsj6I+4KC6TKKT
-   4bvZAmhWQ6gppWjIGpSYfQ99TRP/KG3s/qjBou8wB6G58muStnKvtq/oA
-   strYSdpPJaCWId6ilYRuaXBdOEk0XfOv+cXEC0WdFuDmgaObCB0GhAAvG
-   Q=;
-Authentication-Results: esa3.hc3370-68.iphmx.com; dkim=none (message not signed) header.i=none; spf=None smtp.pra=roger.pau@citrix.com; spf=Pass smtp.mailfrom=roger.pau@citrix.com; spf=None smtp.helo=postmaster@mail.citrix.com
-Received-SPF: None (esa3.hc3370-68.iphmx.com: no sender
-  authenticity information available from domain of
-  roger.pau@citrix.com) identity=pra; client-ip=162.221.158.21;
-  receiver=esa3.hc3370-68.iphmx.com;
-  envelope-from="roger.pau@citrix.com";
-  x-sender="roger.pau@citrix.com";
-  x-conformance=sidf_compatible
-Received-SPF: Pass (esa3.hc3370-68.iphmx.com: domain of
-  roger.pau@citrix.com designates 162.221.158.21 as permitted
-  sender) identity=mailfrom; client-ip=162.221.158.21;
-  receiver=esa3.hc3370-68.iphmx.com;
-  envelope-from="roger.pau@citrix.com";
-  x-sender="roger.pau@citrix.com";
-  x-conformance=sidf_compatible; x-record-type="v=spf1";
-  x-record-text="v=spf1 ip4:209.167.231.154 ip4:178.63.86.133
-  ip4:195.66.111.40/30 ip4:85.115.9.32/28 ip4:199.102.83.4
-  ip4:192.28.146.160 ip4:192.28.146.107 ip4:216.52.6.88
-  ip4:216.52.6.188 ip4:162.221.158.21 ip4:162.221.156.83
-  ip4:168.245.78.127 ~all"
-Received-SPF: None (esa3.hc3370-68.iphmx.com: no sender
-  authenticity information available from domain of
-  postmaster@mail.citrix.com) identity=helo;
-  client-ip=162.221.158.21; receiver=esa3.hc3370-68.iphmx.com;
-  envelope-from="roger.pau@citrix.com";
-  x-sender="postmaster@mail.citrix.com";
-  x-conformance=sidf_compatible
-IronPort-SDR: JfT05Zxv6Ttu7bOIRF8cT096SWH96bNNGjcAzINGkIUCaMfRd2VuA5qaKWjU42bxNdu9S6FVSU
- kMxRM8gCs1bbBPg9Og6QUvQ3/TjuamvJwVv645LEHV/R9y6VcRYt4hjWOqr6Qj+WjzWIv5N1kq
- q4sukZK2YwbRqNq/68uhdVRuGkJMro9uHe4CSGhBbea9oVtGSNybIgs97GurbC5O5ZlRFdoxqj
- Y0/rNRUS75owEXBcJbc5/qKGsTg7GCUqtNqWdla6dMvu3fXuhIH0oqh9zsAZT4+nUaO7O10lD1
- MdU=
-X-SBRS: 2.7
-X-MesageID: 10812478
-X-Ironport-Server: esa3.hc3370-68.iphmx.com
-X-Remote-IP: 162.221.158.21
-X-Policy: $RELAYED
-X-IronPort-AV: E=Sophos;i="5.69,428,1571716800"; 
-   d="scan'208";a="10812478"
-Date:   Mon, 13 Jan 2020 10:55:07 +0100
-From:   Roger Pau =?iso-8859-1?Q?Monn=E9?= <roger.pau@citrix.com>
-To:     SeongJae Park <sjpark@amazon.com>
-CC:     <jgross@suse.com>, <axboe@kernel.dk>, <konrad.wilk@oracle.com>,
-        <linux-block@vger.kernel.org>, <pdurrant@amazon.com>,
-        <linux-kernel@vger.kernel.org>, <sj38.park@gmail.com>,
-        <xen-devel@lists.xenproject.org>
-Subject: Re: [Xen-devel] [PATCH v13 0/5] xenbus/backend: Add memory pressure
- handler callback
-Message-ID: <20200113095507.GE11756@Air-de-Roger>
-References: <20191218183718.31719-1-sjpark@amazon.com>
- <20200113094952.30727-1-sjpark@amazon.com>
+        id S1726127AbgAMJze (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Mon, 13 Jan 2020 04:55:34 -0500
+Received: from szxga05-in.huawei.com ([45.249.212.191]:8706 "EHLO huawei.com"
+        rhost-flags-OK-OK-OK-FAIL) by vger.kernel.org with ESMTP
+        id S1725992AbgAMJzd (ORCPT <rfc822;linux-block@vger.kernel.org>);
+        Mon, 13 Jan 2020 04:55:33 -0500
+Received: from DGGEMS404-HUB.china.huawei.com (unknown [172.30.72.58])
+        by Forcepoint Email with ESMTP id 8F77852A9ADE8E8B305D;
+        Mon, 13 Jan 2020 17:55:31 +0800 (CST)
+Received: from [127.0.0.1] (10.173.220.183) by DGGEMS404-HUB.china.huawei.com
+ (10.3.19.204) with Microsoft SMTP Server id 14.3.439.0; Mon, 13 Jan 2020
+ 17:55:21 +0800
+Subject: Re: [PATCH] brd: check parameter validation before register_blkdev
+ func
+From:   Zhiqiang Liu <liuzhiqiang26@huawei.com>
+To:     Jens Axboe <axboe@kernel.dk>
+CC:     <linux-block@vger.kernel.org>,
+        "linux-kernel@vger.kernel.org" <linux-kernel@vger.kernel.org>,
+        <npiggin@suse.de>, Mingfangsen <mingfangsen@huawei.com>,
+        Guiyao <guiyao@huawei.com>, zhangsaisai <zhangsaisai@huawei.com>,
+        "wubo (T)" <wubo40@huawei.com>, <behlendorf1@llnl.gov>,
+        <amwang@redhat.com>, <behlendorf1@llnl.gov>, <amwang@redhat.com>
+References: <342ee238-0e7c-c213-eecc-7062f24985cc@huawei.com>
+Message-ID: <30d9e90c-3da0-fdfd-c3b2-aeff5a136448@huawei.com>
+Date:   Mon, 13 Jan 2020 17:55:19 +0800
+User-Agent: Mozilla/5.0 (Windows NT 10.0; WOW64; rv:68.0) Gecko/20100101
+ Thunderbird/68.2.2
 MIME-Version: 1.0
-Content-Type: text/plain; charset="us-ascii"
-Content-Disposition: inline
-In-Reply-To: <20200113094952.30727-1-sjpark@amazon.com>
-X-ClientProxiedBy: AMSPEX02CAS02.citrite.net (10.69.22.113) To
- AMSPEX02CL01.citrite.net (10.69.22.125)
+In-Reply-To: <342ee238-0e7c-c213-eecc-7062f24985cc@huawei.com>
+Content-Type: text/plain; charset="utf-8"
+Content-Language: en-US
+Content-Transfer-Encoding: 7bit
+X-Originating-IP: [10.173.220.183]
+X-CFilter-Loop: Reflected
 Sender: linux-block-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-On Mon, Jan 13, 2020 at 10:49:52AM +0100, SeongJae Park wrote:
-> Every patch of this patchset got at least one 'Reviewed-by' or 'Acked-by' from
-> appropriate maintainers by last Wednesday, and after that, got no comment yet.
-> May I ask some more comments?
+Friendly ping...
 
-I'm not sure why more comments are needed, patches have all the
-relevant Acks and will be pushed in due time unless someone has
-objections.
+On 2020/1/10 13:10, Zhiqiang Liu wrote:
+> 
+> In brd_init func, rd_nr num of brd_device are firstly allocated
+> and add in brd_devices, then brd_devices are traversed to add each
+> brd_device by calling add_disk func. When allocating brd_device,
+> the disk->first_minor is set to i * max_part, if rd_nr * max_part
+> is larger than MINORMASK, two different brd_device may have the same
+> devt, then only one of them can be successfully added.
+> when rmmod brd.ko, it will cause oops when calling brd_exit.
+> 
+> Follow those steps:
+>   # modprobe brd rd_nr=3 rd_size=102400 max_part=1048576
+>   # rmmod brd
+> then, the oops will appear.
+> 
+> Oops log:
+> [  726.613722] Call trace:
+> [  726.614175]  kernfs_find_ns+0x24/0x130
+> [  726.614852]  kernfs_find_and_get_ns+0x44/0x68
+> [  726.615749]  sysfs_remove_group+0x38/0xb0
+> [  726.616520]  blk_trace_remove_sysfs+0x1c/0x28
+> [  726.617320]  blk_unregister_queue+0x98/0x100
+> [  726.618105]  del_gendisk+0x144/0x2b8
+> [  726.618759]  brd_exit+0x68/0x560 [brd]
+> [  726.619501]  __arm64_sys_delete_module+0x19c/0x2a0
+> [  726.620384]  el0_svc_common+0x78/0x130
+> [  726.621057]  el0_svc_handler+0x38/0x78
+> [  726.621738]  el0_svc+0x8/0xc
+> [  726.622259] Code: aa0203f6 aa0103f7 aa1e03e0 d503201f (7940e260)
+> 
+> Here, we add brd_check_par_valid func to check parameter
+> validation before register_blkdev func.
+> 
+> Signed-off-by: Zhiqiang Liu <liuzhiqiang26@huawei.com>
+> ---
+>  drivers/block/brd.c | 33 ++++++++++++++++++++++++++-------
+>  1 file changed, 26 insertions(+), 7 deletions(-)
+> 
+> diff --git a/drivers/block/brd.c b/drivers/block/brd.c
+> index df8103dd40ac..3a4510b2c24f 100644
+> --- a/drivers/block/brd.c
+> +++ b/drivers/block/brd.c
+> @@ -330,16 +330,16 @@ static const struct block_device_operations brd_fops = {
+>  /*
+>   * And now the modules code and kernel interface.
+>   */
+> -static int rd_nr = CONFIG_BLK_DEV_RAM_COUNT;
+> -module_param(rd_nr, int, 0444);
+> +static unsigned int rd_nr = CONFIG_BLK_DEV_RAM_COUNT;
+> +module_param(rd_nr, uint, 0444);
+>  MODULE_PARM_DESC(rd_nr, "Maximum number of brd devices");
+> 
+>  unsigned long rd_size = CONFIG_BLK_DEV_RAM_SIZE;
+>  module_param(rd_size, ulong, 0444);
+>  MODULE_PARM_DESC(rd_size, "Size of each RAM disk in kbytes.");
+> 
+> -static int max_part = 1;
+> -module_param(max_part, int, 0444);
+> +static unsigned int max_part = 1;
+> +module_param(max_part, uint, 0444);
+>  MODULE_PARM_DESC(max_part, "Num Minors to reserve between devices");
+> 
+>  MODULE_LICENSE("GPL");
+> @@ -468,10 +468,25 @@ static struct kobject *brd_probe(dev_t dev, int *part, void *data)
+>  	return kobj;
+>  }
+> 
+> +static inline int brd_check_par_valid(void)
+> +{
+> +	if (unlikely(!rd_nr))
+> +		rd_nr = 1;
+> +
+> +	if (unlikely(!max_part))
+> +		max_part = 1;
+> +
+> +	if (rd_nr * max_part > MINORMASK)
+> +		return -EINVAL;
+> +
+> +	return 0;
+> +
+> +}
+> +
+>  static int __init brd_init(void)
+>  {
+>  	struct brd_device *brd, *next;
+> -	int i;
+> +	int i, ret;
+> 
+>  	/*
+>  	 * brd module now has a feature to instantiate underlying device
+> @@ -488,11 +503,15 @@ static int __init brd_init(void)
+>  	 *	dynamically.
+>  	 */
+> 
+> +	ret = brd_check_par_valid();
+> +	if (ret) {
+> +		pr_info("brd: invalid parameter setting!!!\n");
+> +		return ret;
+> +	}
+> +
+>  	if (register_blkdev(RAMDISK_MAJOR, "ramdisk"))
+>  		return -EIO;
+> 
+> -	if (unlikely(!max_part))
+> -		max_part = 1;
+> 
+>  	for (i = 0; i < rd_nr; i++) {
+>  		brd = brd_alloc(i);
+> 
 
-Please be patient and wait at least until the next merge window, this
-patches are not bug fixes so pushing them now would be wrong.
-
-Roger.
