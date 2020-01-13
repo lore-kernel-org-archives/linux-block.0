@@ -2,168 +2,193 @@ Return-Path: <SRS0=JObX=3C=vger.kernel.org=linux-block-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-8.2 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
-	INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,
-	USER_AGENT_SANE_1 autolearn=ham autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-2.2 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
+	MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,USER_AGENT_SANE_1 autolearn=no
+	autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 28AD4C33CAD
-	for <linux-block@archiver.kernel.org>; Mon, 13 Jan 2020 13:43:37 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id EA1EFC33CA9
+	for <linux-block@archiver.kernel.org>; Mon, 13 Jan 2020 17:42:24 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.kernel.org (Postfix) with ESMTP id 05D3E21739
-	for <linux-block@archiver.kernel.org>; Mon, 13 Jan 2020 13:43:36 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id C04E4207FF
+	for <linux-block@archiver.kernel.org>; Mon, 13 Jan 2020 17:42:24 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1726163AbgAMNng (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Mon, 13 Jan 2020 08:43:36 -0500
-Received: from szxga06-in.huawei.com ([45.249.212.32]:43196 "EHLO huawei.com"
+        id S1726435AbgAMRmY (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Mon, 13 Jan 2020 12:42:24 -0500
+Received: from lhrrgout.huawei.com ([185.176.76.210]:2262 "EHLO huawei.com"
         rhost-flags-OK-OK-OK-FAIL) by vger.kernel.org with ESMTP
-        id S1726074AbgAMNng (ORCPT <rfc822;linux-block@vger.kernel.org>);
-        Mon, 13 Jan 2020 08:43:36 -0500
-Received: from DGGEMS405-HUB.china.huawei.com (unknown [172.30.72.59])
-        by Forcepoint Email with ESMTP id 48A226060FD661410D1E;
-        Mon, 13 Jan 2020 21:43:34 +0800 (CST)
-Received: from [127.0.0.1] (10.173.220.183) by DGGEMS405-HUB.china.huawei.com
- (10.3.19.205) with Microsoft SMTP Server id 14.3.439.0; Mon, 13 Jan 2020
- 21:43:24 +0800
-To:     <axboe@kernel.dk>, Ming Lei <ming.lei@redhat.com>
-CC:     <linux-block@vger.kernel.org>,
-        "linux-kernel@vger.kernel.org" <linux-kernel@vger.kernel.org>,
-        Mingfangsen <mingfangsen@huawei.com>, Guiyao <guiyao@huawei.com>,
-        zhangsaisai <zhangsaisai@huawei.com>,
-        "wubo (T)" <wubo40@huawei.com>
-From:   Zhiqiang Liu <liuzhiqiang26@huawei.com>
-Subject: [PATCH V2] brd: check parameter validation before register_blkdev
- func
-Message-ID: <8b32ff09-74aa-3b92-38e4-aab12f47597b@huawei.com>
-Date:   Mon, 13 Jan 2020 21:43:23 +0800
+        id S1726109AbgAMRmY (ORCPT <rfc822;linux-block@vger.kernel.org>);
+        Mon, 13 Jan 2020 12:42:24 -0500
+Received: from LHREML713-CAH.china.huawei.com (unknown [172.18.7.107])
+        by Forcepoint Email with ESMTP id B1BE3156685E0162AFE2;
+        Mon, 13 Jan 2020 17:42:21 +0000 (GMT)
+Received: from lhreml724-chm.china.huawei.com (10.201.108.75) by
+ LHREML713-CAH.china.huawei.com (10.201.108.36) with Microsoft SMTP Server
+ (TLS) id 14.3.408.0; Mon, 13 Jan 2020 17:42:21 +0000
+Received: from [127.0.0.1] (10.202.226.43) by lhreml724-chm.china.huawei.com
+ (10.201.108.75) with Microsoft SMTP Server (version=TLS1_2,
+ cipher=TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256) id 15.1.1713.5; Mon, 13 Jan
+ 2020 17:42:21 +0000
+Subject: Re: [PATCH 09/11] megaraid_sas: switch fusion adapters to MQ
+To:     Sumit Saxena <sumit.saxena@broadcom.com>,
+        Hannes Reinecke <hare@suse.de>
+CC:     "Martin K. Petersen" <martin.petersen@oracle.com>,
+        Jens Axboe <axboe@kernel.dk>, Christoph Hellwig <hch@lst.de>,
+        James Bottomley <james.bottomley@hansenpartnership.com>,
+        Ming Lei <ming.lei@redhat.com>,
+        Linux SCSI List <linux-scsi@vger.kernel.org>,
+        <linux-block@vger.kernel.org>, Hannes Reinecke <hare@suse.com>
+References: <20191202153914.84722-1-hare@suse.de>
+ <20191202153914.84722-10-hare@suse.de>
+ <CAL2rwxqjiRTuZ0ntfaHHzG7z-VmxRQCXYyxZeX9eDMrmX+dbGg@mail.gmail.com>
+ <efe9c1e7-fa10-3bae-eacd-58d43295d6da@suse.de>
+ <CAL2rwxotoWakFS4DPe85hZ4VAgd_zw8pL+B5ckHR9NwEf+-L=g@mail.gmail.com>
+From:   John Garry <john.garry@huawei.com>
+Message-ID: <11034edd-732a-3dd5-0bdc-891b9de05e56@huawei.com>
+Date:   Mon, 13 Jan 2020 17:42:20 +0000
 User-Agent: Mozilla/5.0 (Windows NT 10.0; WOW64; rv:68.0) Gecko/20100101
- Thunderbird/68.2.2
+ Thunderbird/68.1.2
 MIME-Version: 1.0
-Content-Type: text/plain; charset="utf-8"
+In-Reply-To: <CAL2rwxotoWakFS4DPe85hZ4VAgd_zw8pL+B5ckHR9NwEf+-L=g@mail.gmail.com>
+Content-Type: text/plain; charset="utf-8"; format=flowed
 Content-Language: en-US
 Content-Transfer-Encoding: 7bit
-X-Originating-IP: [10.173.220.183]
+X-Originating-IP: [10.202.226.43]
+X-ClientProxiedBy: lhreml729-chm.china.huawei.com (10.201.108.80) To
+ lhreml724-chm.china.huawei.com (10.201.108.75)
 X-CFilter-Loop: Reflected
 Sender: linux-block-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-In brd_init func, rd_nr num of brd_device are firstly allocated
-and add in brd_devices, then brd_devices are traversed to add each
-brd_device by calling add_disk func. When allocating brd_device,
-the disk->first_minor is set to i * max_part, if rd_nr * max_part
-is larger than MINORMASK, two different brd_device may have the same
-devt, then only one of them can be successfully added.
-when rmmod brd.ko, it will cause oops when calling brd_exit.
+On 10/01/2020 04:00, Sumit Saxena wrote:
+> On Mon, Dec 9, 2019 at 4:32 PM Hannes Reinecke <hare@suse.de> wrote:
+>>
+>> On 12/9/19 11:10 AM, Sumit Saxena wrote:
+>>> On Mon, Dec 2, 2019 at 9:09 PM Hannes Reinecke <hare@suse.de> wrote:
+>>>>
+>>>> Fusion adapters can steer completions to individual queues, and
+>>>> we now have support for shared host-wide tags.
+>>>> So we can enable multiqueue support for fusion adapters and
+>>>> drop the hand-crafted interrupt affinity settings.
+>>>
+>>> Hi Hannes,
+>>>
+>>> Ming Lei also proposed similar changes in megaraid_sas driver some
+>>> time back and it had resulted in performance drop-
+>>> https://patchwork.kernel.org/patch/10969511/
+>>>
+>>> So, we will do some performance tests with this patch and update you.
+>>> Thank you.
+>>
+>> I'm aware of the results of Ming Leis work, but I do hope this patchset
+>> performs better.
+>>
+>> And when you do performance measurements, can you please run with both,
+>> 'none' I/O scheduler and 'mq-deadline' I/O scheduler?
+>> I've measured quite a performance improvements when using mq-deadline,
+>> up to the point where I've gotten on-par performance with the original,
+>> non-mq, implementation.
+>> (As a data point, on my setup I've measured about 270k IOPS and 1092
+>> MB/s througput, running on just 2 SSDs).
+>>asas_build_ldio_fusion
+>> But thanks for doing a performance test here.
+> 
+> Hi Hannes,
+> 
+> Sorry for the delay in replying, I observed a few issues with this patchset:
+> 
+> 1. "blk_mq_unique_tag_to_hwq(tag)" does not return MSI-x vector to
+> which IO submitter CPU is affined with. Due to this IO submission and
+> completion CPUs are different which causes performance drop for low
+> latency workloads.
 
-Follow those steps:
-  # modprobe brd rd_nr=3 rd_size=102400 max_part=1048576
-  # rmmod brd
-then, the oops will appear.
+Hi Sumit,
 
-Oops log:
-[  726.613722] Call trace:
-[  726.614175]  kernfs_find_ns+0x24/0x130
-[  726.614852]  kernfs_find_and_get_ns+0x44/0x68
-[  726.615749]  sysfs_remove_group+0x38/0xb0
-[  726.616520]  blk_trace_remove_sysfs+0x1c/0x28
-[  726.617320]  blk_unregister_queue+0x98/0x100
-[  726.618105]  del_gendisk+0x144/0x2b8
-[  726.618759]  brd_exit+0x68/0x560 [brd]
-[  726.619501]  __arm64_sys_delete_module+0x19c/0x2a0
-[  726.620384]  el0_svc_common+0x78/0x130
-[  726.621057]  el0_svc_handler+0x38/0x78
-[  726.621738]  el0_svc+0x8/0xc
-[  726.622259] Code: aa0203f6 aa0103f7 aa1e03e0 d503201f (7940e260)
+So the new code has:
 
-Here, we add brd_check_par_valid func to check parameter
-validation before register_blkdev func.
+megasas_build_ldio_fusion()
+{
 
---
-V1->V2: add more checks in brd_check_par_valid as suggested by Ming Lei.
+cmd->request_desc->SCSIIO.MSIxIndex =
+blk_mq_unique_tag_to_hwq(tag);
 
-Signed-off-by: Zhiqiang Liu <liuzhiqiang26@huawei.com>
----
- drivers/block/brd.c | 39 ++++++++++++++++++++++++++++++++-------
- 1 file changed, 32 insertions(+), 7 deletions(-)
+}
 
-diff --git a/drivers/block/brd.c b/drivers/block/brd.c
-index df8103dd40ac..f211ee7d32b3 100644
---- a/drivers/block/brd.c
-+++ b/drivers/block/brd.c
-@@ -330,16 +330,16 @@ static const struct block_device_operations brd_fops = {
- /*
-  * And now the modules code and kernel interface.
-  */
--static int rd_nr = CONFIG_BLK_DEV_RAM_COUNT;
--module_param(rd_nr, int, 0444);
-+static unsigned int rd_nr = CONFIG_BLK_DEV_RAM_COUNT;
-+module_param(rd_nr, uint, 0444);
- MODULE_PARM_DESC(rd_nr, "Maximum number of brd devices");
+So the value here is hw queue index from blk-mq point of view, and not 
+megaraid_sas msix index, as you alluded to.
 
- unsigned long rd_size = CONFIG_BLK_DEV_RAM_SIZE;
- module_param(rd_size, ulong, 0444);
- MODULE_PARM_DESC(rd_size, "Size of each RAM disk in kbytes.");
+So we get 80 msix, 8 are reserved for low_latency_index_start (that's 
+how it seems to me), and we report other 72 as #hw queues = 72 to SCSI 
+midlayer.
 
--static int max_part = 1;
--module_param(max_part, int, 0444);
-+static unsigned int max_part = 1;
-+module_param(max_part, uint, 0444);
- MODULE_PARM_DESC(max_part, "Num Minors to reserve between devices");
+So I think that this should be:
 
- MODULE_LICENSE("GPL");
-@@ -468,10 +468,31 @@ static struct kobject *brd_probe(dev_t dev, int *part, void *data)
- 	return kobj;
- }
-
-+static inline int brd_check_par_valid(void)
-+{
-+	if (unlikely(!rd_nr))
-+		rd_nr = 1;
-+
-+	if (unlikely(!max_part))
-+		max_part = 1;
-+
-+	if (max_part > DISK_MAX_PARTS) {
-+		pr_info("brd: max_part can't be larger than %d, reset max_part = %d.\n",
-+			DISK_MAX_PARTS, DISK_MAX_PARTS);
-+		max_part = DISK_MAX_PARTS;
-+	}
-+
-+	if (rd_nr > MINORMASK / max_part)
-+		return -EINVAL;
-+
-+	return 0;
-+
-+}
-+
- static int __init brd_init(void)
- {
- 	struct brd_device *brd, *next;
--	int i;
-+	int i, ret;
-
- 	/*
- 	 * brd module now has a feature to instantiate underlying device
-@@ -488,11 +509,15 @@ static int __init brd_init(void)
- 	 *	dynamically.
- 	 */
-
-+	ret = brd_check_par_valid();
-+	if (ret) {
-+		pr_err("brd: invalid parameter setting!!!\n");
-+		return ret;
-+	}
-+
- 	if (register_blkdev(RAMDISK_MAJOR, "ramdisk"))
- 		return -EIO;
-
--	if (unlikely(!max_part))
--		max_part = 1;
-
- 	for (i = 0; i < rd_nr; i++) {
- 		brd = brd_alloc(i);
--- 
-2.19.1
+cmd->request_desc->SCSIIO.MSIxIndex =
+blk_mq_unique_tag_to_hwq(tag) + low_latency_index_start;
 
 
+> 
+> lspcu:
+> 
+> # lscpu
+> Architecture:          x86_64
+> CPU op-mode(s):        32-bit, 64-bit
+> Byte Order:            Little Endian
+> CPU(s):                72
+> On-line CPU(s) list:   0-71
+> Thread(s) per core:    2
+> Core(s) per socket:    18
+> Socket(s):             2
+> NUMA node(s):          2
+> Vendor ID:             GenuineIntel
+> CPU family:            6
+> Model:                 85
+> Model name:            Intel(R) Xeon(R) Gold 6150 CPU @ 2.70GHz
+> Stepping:              4
+> CPU MHz:               3204.246
+> CPU max MHz:           3700.0000
+> CPU min MHz:           1200.0000
+> BogoMIPS:              5400.00
+> Virtualization:        VT-x
+> L1d cache:             32K
+> L1i cache:             32K
+> L2 cache:              1024K
+> L3 cache:              25344K
+> NUMA node0 CPU(s):     0-17,36-53
+> NUMA node1 CPU(s):     18-35,54-71
+> Flags:                 fpu vme de pse tsc msr pae mce cx8 apic sep
+> mtrr pge mca cmov pat pse36 clflush dts acpi mmx fxsr sse sse2 ss ht
+> tm pbe s
+> yscall nx pdpe1gb rdtscp lm constant_tsc art arch_perfmon pebs bts
+> rep_good nopl xtopology nonstop_tsc cpuid aperfmperf pni pclmulqdq
+> dtes64 monitor
+> ds_cpl vmx smx est tm2 ssse3 sdbg fma cx16 xtpr pdcm pcid dca sse4_1
+> sse4_2 x2apic movbe popcnt tsc_deadline_timer xsave avx f16c rdrand
+> lahf_lm abm
+> 3dnowprefetch cpuid_fault epb cat_l3 cdp_l3 invpcid_single intel_ppin
+> mba tpr_shadow vnmi flexpriority ept vpid ept_ad fsgsbase tsc_adjust
+> bmi1 hle
+> avx2 smep bmi2 erms invpcid rtm cqm mpx rdt_a avx512f avx512dq rdseed
+> adx smap clflushopt clwb intel_pt avx512cd avx512bw avx512vl xsaveopt
+> xsavec
+> xgetbv1 xsaves cqm_llc cqm_occup_llc cqm_mbm_total cqm_mbm_lo
+> 
+> 
+
+[snip]
+
+> 4. This patch removes below code from driver so what this piece of
+> code does is broken-
+> 
+> 
+> -                               if (instance->adapter_type >= INVADER_SERIES &&
+> -                                   !instance->msix_combined) {
+> -                                       instance->msix_load_balance = true;
+> -                                       instance->smp_affinity_enable = false;
+> -                               }
+
+Does this code need to be re-added? Would this have affected your test?
+
+Thanks,
+John
