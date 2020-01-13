@@ -2,93 +2,131 @@ Return-Path: <SRS0=JObX=3C=vger.kernel.org=linux-block-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-3.9 required=3.0 tests=DKIMWL_WL_HIGH,DKIM_SIGNED,
-	DKIM_VALID,DKIM_VALID_AU,HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,
-	SPF_HELO_NONE,SPF_PASS,USER_AGENT_GIT autolearn=no autolearn_force=no
-	version=3.4.0
+X-Spam-Status: No, score=-9.8 required=3.0 tests=DKIM_SIGNED,DKIM_VALID,
+	DKIM_VALID_AU,HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,
+	SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,USER_AGENT_GIT autolearn=ham
+	autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 8215EC33CA8
-	for <linux-block@archiver.kernel.org>; Mon, 13 Jan 2020 09:59:59 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id E6431C33CAD
+	for <linux-block@archiver.kernel.org>; Mon, 13 Jan 2020 10:27:33 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.kernel.org (Postfix) with ESMTP id 516C42082E
-	for <linux-block@archiver.kernel.org>; Mon, 13 Jan 2020 09:59:59 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id B87C9207E0
+	for <linux-block@archiver.kernel.org>; Mon, 13 Jan 2020 10:27:33 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=pass (1024-bit key) header.d=amazon.com header.i=@amazon.com header.b="gMACNyW5"
+	dkim=pass (2048-bit key) header.d=inango-systems.com header.i=@inango-systems.com header.b="bF5v9klE"
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1727323AbgAMJ76 (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Mon, 13 Jan 2020 04:59:58 -0500
-Received: from smtp-fw-4101.amazon.com ([72.21.198.25]:8550 "EHLO
-        smtp-fw-4101.amazon.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1725978AbgAMJ76 (ORCPT
+        id S1728761AbgAMK1d (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Mon, 13 Jan 2020 05:27:33 -0500
+Received: from mail.inango-systems.com ([178.238.230.57]:50846 "EHLO
+        mail.inango-sw.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S1727014AbgAMK1d (ORCPT
         <rfc822;linux-block@vger.kernel.org>);
-        Mon, 13 Jan 2020 04:59:58 -0500
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-  d=amazon.com; i=@amazon.com; q=dns/txt; s=amazon201209;
-  t=1578909597; x=1610445597;
-  h=from:to:cc:subject:date:message-id:mime-version:
-   in-reply-to:content-transfer-encoding;
-  bh=NLk0Q2nA10kWUDxhQp+mKV/5Lh/SEbObpJbRFWy+cF4=;
-  b=gMACNyW5g21a/wSmZ3cQwlWkbqfn5wHAd2O1kWZCcuEDLRF4NdUuR24f
-   eky5j1d5DdkJrwBLN9qdx89luO3lvXfwxcnTLGexjeporrspRiwGjfVNJ
-   vrRckUyOQAUuUeu3Vn/qfR0Ddb26KVkoR6YUkG9yiUYPnvGy+emZXdwGw
-   M=;
-IronPort-SDR: 7UWxbXmeu6JLqhKd8TBlEtlwkYdPo3Dw/eqPtp8mbwamMLLQ+nGXJQbjrWOVHH98mInXf1z9Mv
- v1hiiYT81YKg==
-X-IronPort-AV: E=Sophos;i="5.69,428,1571702400"; 
-   d="scan'208";a="12078578"
-Received: from iad12-co-svc-p1-lb1-vlan3.amazon.com (HELO email-inbound-relay-1d-9ec21598.us-east-1.amazon.com) ([10.43.8.6])
-  by smtp-border-fw-out-4101.iad4.amazon.com with ESMTP; 13 Jan 2020 09:59:57 +0000
-Received: from EX13MTAUEA002.ant.amazon.com (iad55-ws-svc-p15-lb9-vlan3.iad.amazon.com [10.40.159.166])
-        by email-inbound-relay-1d-9ec21598.us-east-1.amazon.com (Postfix) with ESMTPS id E0229A20D0;
-        Mon, 13 Jan 2020 09:59:54 +0000 (UTC)
-Received: from EX13D31EUA001.ant.amazon.com (10.43.165.15) by
- EX13MTAUEA002.ant.amazon.com (10.43.61.77) with Microsoft SMTP Server (TLS)
- id 15.0.1236.3; Mon, 13 Jan 2020 09:59:54 +0000
-Received: from u886c93fd17d25d.ant.amazon.com (10.43.160.92) by
- EX13D31EUA001.ant.amazon.com (10.43.165.15) with Microsoft SMTP Server (TLS)
- id 15.0.1367.3; Mon, 13 Jan 2020 09:59:49 +0000
-From:   SeongJae Park <sjpark@amazon.com>
-To:     =?UTF-8?q?Roger=20Pau=20Monn=C3=A9?= <roger.pau@citrix.com>
-CC:     SeongJae Park <sjpark@amazon.com>, <jgross@suse.com>,
-        <axboe@kernel.dk>, <konrad.wilk@oracle.com>, <pdurrant@amazon.com>,
-        <sj38.park@gmail.com>, <linux-kernel@vger.kernel.org>,
-        <linux-block@vger.kernel.org>, <xen-devel@lists.xenproject.org>
-Subject: Re: Re: [Xen-devel] [PATCH v13 0/5] xenbus/backend: Add memory pressure handler callback
-Date:   Mon, 13 Jan 2020 10:59:32 +0100
-Message-ID: <20200113095932.602-1-sjpark@amazon.com>
+        Mon, 13 Jan 2020 05:27:33 -0500
+Received: from localhost (localhost [127.0.0.1])
+        by mail.inango-sw.com (Postfix) with ESMTP id 54C431080786;
+        Mon, 13 Jan 2020 12:27:30 +0200 (IST)
+Received: from mail.inango-sw.com ([127.0.0.1])
+        by localhost (mail.inango-sw.com [127.0.0.1]) (amavisd-new, port 10032)
+        with ESMTP id 6RZ3lKHhyPMI; Mon, 13 Jan 2020 12:27:29 +0200 (IST)
+Received: from localhost (localhost [127.0.0.1])
+        by mail.inango-sw.com (Postfix) with ESMTP id E19E71080790;
+        Mon, 13 Jan 2020 12:27:28 +0200 (IST)
+DKIM-Filter: OpenDKIM Filter v2.10.3 mail.inango-sw.com E19E71080790
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=inango-systems.com;
+        s=45A440E0-D841-11E8-B985-5FCC721607E0; t=1578911248;
+        bh=THTE1okMxz8IYZP5XaSN31O51fGXzRMX71TEetGqCAs=;
+        h=From:To:Date:Message-Id;
+        b=bF5v9klEHwgnw8MspBJCle0YY3J0qXaa+Uw1ccqeMsegQTqxIrEN6YgRnDreCXzK2
+         RQIjyN2ZlnlV4+tZDVBw4N8Q00i7dsi+24aciLaRHIar/70CNiNUD8gkMvpvaMqJTO
+         uUC1mczcRg0Bvc/1PKWw47hu76o3Sq/rDHPUWJQNSPD5w2vB8WQOEyblhIoH2SIm3S
+         EeDTo3iQAaC9mfx2VOotVJ7HUsa1Vo7g/hbXdFEvVlWmna4Q9prXXeEBZk60iwz55e
+         GkI4a4CcVe7srrFo5+9zOt36fKbsEEZo4DEscGnPUcETd38Pr4d80D2vmLkmD+EcmC
+         FyxH55K3mikjA==
+X-Virus-Scanned: amavisd-new at inango-sw.com
+Received: from mail.inango-sw.com ([127.0.0.1])
+        by localhost (mail.inango-sw.com [127.0.0.1]) (amavisd-new, port 10026)
+        with ESMTP id kQ81MXoXyOqu; Mon, 13 Jan 2020 12:27:28 +0200 (IST)
+Received: from nmerinov.inango.loc (unknown [194.60.247.123])
+        by mail.inango-sw.com (Postfix) with ESMTPSA id E1E281080782;
+        Mon, 13 Jan 2020 12:27:27 +0200 (IST)
+From:   Nikolai Merinov <n.merinov@inango-systems.com>
+To:     hch@infradead.org, Davidlohr Bueso <dave@stgolabs.net>,
+        Jens Axboe <axboe@kernel.dk>, Ard Biesheuvel <ardb@kernel.org>,
+        linux-efi@vger.kernel.org, linux-block@vger.kernel.org,
+        linux-kernel@vger.kernel.org
+Cc:     Nikolai Merinov <n.merinov@inango-systems.com>
+Subject: [PATCH v3] partitions/efi: Fix partition name parsing in GUID partition entry
+Date:   Mon, 13 Jan 2020 15:27:23 +0500
+Message-Id: <26f7bd89f212f68b03a4b207e96d8702c9049015.1578910723.git.n.merinov@inango-systems.com>
 X-Mailer: git-send-email 2.17.1
-MIME-Version: 1.0
-In-Reply-To: <20200113095507.GE11756@Air-de-Roger> (raw)
-Content-Type: text/plain; charset="UTF-8"
-Content-Transfer-Encoding: 8bit
-X-Originating-IP: [10.43.160.92]
-X-ClientProxiedBy: EX13D32UWA001.ant.amazon.com (10.43.160.4) To
- EX13D31EUA001.ant.amazon.com (10.43.165.15)
+In-Reply-To: <20200108133926.GC4455@infradead.org>
+References: <20181124162123.21300-1-n.merinov@inango-systems.com> <20191224092119.4581-1-n.merinov@inango-systems.com> <20200108133926.GC4455@infradead.org>
 Sender: linux-block-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-On Mon, 13 Jan 2020 10:55:07 +0100 "Roger Pau Monné" <roger.pau@citrix.com> wrote:
+GUID partition entry defined to have a partition name as 36 UTF-16LE
+code units. This means that on big-endian platforms ASCII symbols
+would be read with 0xXX00 efi_char16_t character code. In order to
+correctly extract ASCII characters from a partition name field we
+should be converted from 16LE to CPU architecture.
 
-> On Mon, Jan 13, 2020 at 10:49:52AM +0100, SeongJae Park wrote:
-> > Every patch of this patchset got at least one 'Reviewed-by' or 'Acked-by' from
-> > appropriate maintainers by last Wednesday, and after that, got no comment yet.
-> > May I ask some more comments?
-> 
-> I'm not sure why more comments are needed, patches have all the
-> relevant Acks and will be pushed in due time unless someone has
-> objections.
-> 
-> Please be patient and wait at least until the next merge window, this
-> patches are not bug fixes so pushing them now would be wrong.
+The problem exists on all big endian platforms.
 
-Ok, I will.  Thank you for your quick and nice reply.
+Signed-off-by: Nikolai Merinov <n.merinov@inango-systems.com>
+---
+ block/partitions/efi.c | 3 ++-
+ block/partitions/efi.h | 2 +-
+ include/linux/efi.h    | 5 +++++
+ 3 files changed, 8 insertions(+), 2 deletions(-)
 
+diff --git a/block/partitions/efi.c b/block/partitions/efi.c
+index db2fef7dfc47..f1d0820de844 100644
+--- a/block/partitions/efi.c
++++ b/block/partitions/efi.c
+@@ -715,7 +715,8 @@ int efi_partition(struct parsed_partitions *state)
+ 				ARRAY_SIZE(ptes[i].partition_name));
+ 		info->volname[label_max] = 0;
+ 		while (label_count < label_max) {
+-			u8 c = ptes[i].partition_name[label_count] & 0xff;
++			u8 c = 0xff & efi_char16le_to_cpu(
++					ptes[i].partition_name[label_count]);
+ 			if (c && !isprint(c))
+ 				c = '!';
+ 			info->volname[label_count] = c;
+diff --git a/block/partitions/efi.h b/block/partitions/efi.h
+index 3e8576157575..4d4cae0bb79e 100644
+--- a/block/partitions/efi.h
++++ b/block/partitions/efi.h
+@@ -88,7 +88,7 @@ typedef struct _gpt_entry {
+ 	__le64 starting_lba;
+ 	__le64 ending_lba;
+ 	gpt_entry_attributes attributes;
+-	efi_char16_t partition_name[72 / sizeof (efi_char16_t)];
++	efi_char16le_t partition_name[72 / sizeof(efi_char16le_t)];
+ } __packed gpt_entry;
+ 
+ typedef struct _gpt_mbr_record {
+diff --git a/include/linux/efi.h b/include/linux/efi.h
+index aa54586db7a5..47882f2d45db 100644
+--- a/include/linux/efi.h
++++ b/include/linux/efi.h
+@@ -45,9 +45,14 @@
+ typedef unsigned long efi_status_t;
+ typedef u8 efi_bool_t;
+ typedef u16 efi_char16_t;		/* UNICODE character */
++typedef __le16 efi_char16le_t;		/* UTF16-LE */
++typedef __be16 efi_char16be_t;		/* UTF16-BE */
+ typedef u64 efi_physical_addr_t;
+ typedef void *efi_handle_t;
+ 
++#define efi_char16le_to_cpu le16_to_cpu
++#define efi_char16be_to_cpu be16_to_cpu
++
+ /*
+  * The UEFI spec and EDK2 reference implementation both define EFI_GUID as
+  * struct { u32 a; u16; b; u16 c; u8 d[8]; }; and so the implied alignment
+-- 
+2.17.1
 
-Thanks,
-SeongJae Park
-
-> 
-> Roger.
-> 
