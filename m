@@ -2,147 +2,248 @@ Return-Path: <SRS0=JLuE=3D=vger.kernel.org=linux-block-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-2.2 required=3.0 tests=DKIM_SIGNED,DKIM_VALID,
-	HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,
-	USER_AGENT_SANE_1 autolearn=no autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-2.2 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
+	MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,USER_AGENT_SANE_1 autolearn=no
+	autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id D9567C33CA9
-	for <linux-block@archiver.kernel.org>; Tue, 14 Jan 2020 04:09:45 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id CE46FC33CA9
+	for <linux-block@archiver.kernel.org>; Tue, 14 Jan 2020 07:05:39 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.kernel.org (Postfix) with ESMTP id AA97E21556
-	for <linux-block@archiver.kernel.org>; Tue, 14 Jan 2020 04:09:45 +0000 (UTC)
-Authentication-Results: mail.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel-dk.20150623.gappssmtp.com header.i=@kernel-dk.20150623.gappssmtp.com header.b="PiAlwUbo"
+	by mail.kernel.org (Postfix) with ESMTP id 8E7CA207E0
+	for <linux-block@archiver.kernel.org>; Tue, 14 Jan 2020 07:05:39 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1728734AbgANEJp (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Mon, 13 Jan 2020 23:09:45 -0500
-Received: from mail-pl1-f193.google.com ([209.85.214.193]:34435 "EHLO
-        mail-pl1-f193.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1728516AbgANEJo (ORCPT
-        <rfc822;linux-block@vger.kernel.org>);
-        Mon, 13 Jan 2020 23:09:44 -0500
-Received: by mail-pl1-f193.google.com with SMTP id g9so2481685plq.1
-        for <linux-block@vger.kernel.org>; Mon, 13 Jan 2020 20:09:44 -0800 (PST)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=kernel-dk.20150623.gappssmtp.com; s=20150623;
-        h=subject:to:cc:references:from:message-id:date:user-agent
-         :mime-version:in-reply-to:content-language:content-transfer-encoding;
-        bh=lk1AizI1EHV9lSqOaMe1Vebf9sR0lxBjnFVTRCczpIM=;
-        b=PiAlwUboHVv6bfzcwpZfmQi5dJbPDlbsxU8GeeKbOkqu4/epqzrLc1s5ggWhZ5gtQT
-         uHL60mx+QCQq+fOtUB8J/SIWwgkk5SA02E13pPwnW5WiJoWF+DlrwqtmCRYWbXtOy2bk
-         kgNBVh2HyzDGZ6kNTNypH6S1qjcPxKSdTcfAXTFMPXFXE7CaaUjJsUz0ZstO0AMKvpij
-         pxyRlN1q0rThmXiKYB3B4yDjl9Q23o+KA242EtsMqcMsV6uUhO+Yv8mPNSFkEx933kIW
-         9EHsM0ymtYgn5iyYBaxmWB0MliHn6SFj5fmmzFEM2+F+u9TdRaCiFlFpFnzNqi6maZNl
-         e4wg==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20161025;
-        h=x-gm-message-state:subject:to:cc:references:from:message-id:date
-         :user-agent:mime-version:in-reply-to:content-language
-         :content-transfer-encoding;
-        bh=lk1AizI1EHV9lSqOaMe1Vebf9sR0lxBjnFVTRCczpIM=;
-        b=BL9/Lhz+wtmme7L9GvnjNb0cVGmsKoPpT4qXyQl/PrGR91euoqbvNvCyBKldsqQBFT
-         +cYH9b06LL6JfC/G73AUDzQuxbPfrBkgBs79b16SSQQbyGxiVX381pXkSYB47XiLTg2e
-         RU/eFYE/Syy+Yw8oLTFu+6tRKNa9Qa95uyg7s+30GZmADuSY5DcsOGDiDZi4VBoCinXR
-         CnGQDREEgWzF9yD6jWHZ8fv84iqBMCd9rtXjHu5fdwpSBZ4kc29b6JLExeqUGejIFhv+
-         u3vPQFYT77Tp4JUzumdwxiV54zM4l1Q/z9JqL3swy67+7CGU+vUNrX9zjRR95NZc/O7d
-         7YXw==
-X-Gm-Message-State: APjAAAVzmgaYJ4UNb42SMHEcB1m8a8E81p4QQrBS3j3c44evMBBTecs0
-        zsv4cAlmM9FJpu1sogbTHWojBA==
-X-Google-Smtp-Source: APXvYqxnmPZsSb6Jb7K6zwUhM8ksX99PCWuKR5aTnx5csBcmJBdgcPIRJc9vhsJKuCExuubN4dRa3g==
-X-Received: by 2002:a17:90a:ba91:: with SMTP id t17mr26931172pjr.74.1578974983877;
-        Mon, 13 Jan 2020 20:09:43 -0800 (PST)
-Received: from [192.168.1.188] ([66.219.217.145])
-        by smtp.gmail.com with ESMTPSA id x197sm16474368pfc.1.2020.01.13.20.09.42
-        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
-        Mon, 13 Jan 2020 20:09:43 -0800 (PST)
-Subject: Re: [BUG] bisected to: block: fix splitting segments on boundary
- masks
-To:     Steven Rostedt <rostedt@goodmis.org>,
-        LKML <linux-kernel@vger.kernel.org>
-Cc:     Chris Mason <clm@fb.com>, Ming Lei <ming.lei@redhat.com>,
-        linux-block@vger.kernel.org,
-        Linus Torvalds <torvalds@linux-foundation.org>
-References: <20200113221317.0e27f0a9@rorschach.local.home>
-From:   Jens Axboe <axboe@kernel.dk>
-Message-ID: <e8bd9824-20ff-03e0-c289-e77c4f6669af@kernel.dk>
-Date:   Mon, 13 Jan 2020 21:09:41 -0700
-User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:68.0) Gecko/20100101
- Thunderbird/68.2.2
+        id S1728797AbgANHFj (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Tue, 14 Jan 2020 02:05:39 -0500
+Received: from mx2.suse.de ([195.135.220.15]:53700 "EHLO mx2.suse.de"
+        rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
+        id S1728794AbgANHFi (ORCPT <rfc822;linux-block@vger.kernel.org>);
+        Tue, 14 Jan 2020 02:05:38 -0500
+X-Virus-Scanned: by amavisd-new at test-mx.suse.de
+Received: from relay2.suse.de (unknown [195.135.220.254])
+        by mx2.suse.de (Postfix) with ESMTP id 00923AEB1;
+        Tue, 14 Jan 2020 07:05:34 +0000 (UTC)
+Subject: Re: [PATCH 09/11] megaraid_sas: switch fusion adapters to MQ
+To:     John Garry <john.garry@huawei.com>,
+        Sumit Saxena <sumit.saxena@broadcom.com>
+Cc:     "Martin K. Petersen" <martin.petersen@oracle.com>,
+        Jens Axboe <axboe@kernel.dk>, Christoph Hellwig <hch@lst.de>,
+        James Bottomley <james.bottomley@hansenpartnership.com>,
+        Ming Lei <ming.lei@redhat.com>,
+        Linux SCSI List <linux-scsi@vger.kernel.org>,
+        linux-block@vger.kernel.org, Hannes Reinecke <hare@suse.com>
+References: <20191202153914.84722-1-hare@suse.de>
+ <20191202153914.84722-10-hare@suse.de>
+ <CAL2rwxqjiRTuZ0ntfaHHzG7z-VmxRQCXYyxZeX9eDMrmX+dbGg@mail.gmail.com>
+ <efe9c1e7-fa10-3bae-eacd-58d43295d6da@suse.de>
+ <CAL2rwxotoWakFS4DPe85hZ4VAgd_zw8pL+B5ckHR9NwEf+-L=g@mail.gmail.com>
+ <11034edd-732a-3dd5-0bdc-891b9de05e56@huawei.com>
+From:   Hannes Reinecke <hare@suse.de>
+Openpgp: preference=signencrypt
+Autocrypt: addr=hare@suse.de; prefer-encrypt=mutual; keydata=
+ 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
+ azzYF4VRJsdl+d0MCaSy8mUh
+Message-ID: <661fd3db-0254-c209-8fb3-f3aa35bac431@suse.de>
+Date:   Tue, 14 Jan 2020 08:05:33 +0100
+User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:60.0) Gecko/20100101
+ Thunderbird/60.7.2
 MIME-Version: 1.0
-In-Reply-To: <20200113221317.0e27f0a9@rorschach.local.home>
-Content-Type: text/plain; charset=windows-1252
+In-Reply-To: <11034edd-732a-3dd5-0bdc-891b9de05e56@huawei.com>
+Content-Type: text/plain; charset=utf-8
 Content-Language: en-US
-Content-Transfer-Encoding: 7bit
+Content-Transfer-Encoding: 8bit
 Sender: linux-block-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-On 1/13/20 8:13 PM, Steven Rostedt wrote:
-> Hi!
+On 1/13/20 6:42 PM, John Garry wrote:
+> On 10/01/2020 04:00, Sumit Saxena wrote:
+>> On Mon, Dec 9, 2019 at 4:32 PM Hannes Reinecke <hare@suse.de> wrote:
+>>>
+>>> On 12/9/19 11:10 AM, Sumit Saxena wrote:
+>>>> On Mon, Dec 2, 2019 at 9:09 PM Hannes Reinecke <hare@suse.de> wrote:
+>>>>>
+>>>>> Fusion adapters can steer completions to individual queues, and
+>>>>> we now have support for shared host-wide tags.
+>>>>> So we can enable multiqueue support for fusion adapters and
+>>>>> drop the hand-crafted interrupt affinity settings.
+>>>>
+>>>> Hi Hannes,
+>>>>
+>>>> Ming Lei also proposed similar changes in megaraid_sas driver some
+>>>> time back and it had resulted in performance drop-
+>>>> https://patchwork.kernel.org/patch/10969511/
+>>>>
+>>>> So, we will do some performance tests with this patch and update you.
+>>>> Thank you.
+>>>
+>>> I'm aware of the results of Ming Leis work, but I do hope this patchset
+>>> performs better.
+>>>
+>>> And when you do performance measurements, can you please run with both,
+>>> 'none' I/O scheduler and 'mq-deadline' I/O scheduler?
+>>> I've measured quite a performance improvements when using mq-deadline,
+>>> up to the point where I've gotten on-par performance with the original,
+>>> non-mq, implementation.
+>>> (As a data point, on my setup I've measured about 270k IOPS and 1092
+>>> MB/s througput, running on just 2 SSDs).
+>>> asas_build_ldio_fusion
+>>> But thanks for doing a performance test here.
+>>
+>> Hi Hannes,
+>>
+>> Sorry for the delay in replying, I observed a few issues with this
+>> patchset:
+>>
+>> 1. "blk_mq_unique_tag_to_hwq(tag)" does not return MSI-x vector to
+>> which IO submitter CPU is affined with. Due to this IO submission and
+>> completion CPUs are different which causes performance drop for low
+>> latency workloads.
 > 
-> Running one of my ftrace stress tests, I hit this bug:
-> (On i386, haven't tested on x86_64 yet)
+> Hi Sumit,
 > 
-> ------------[ cut here ]------------
-> kernel BUG at block/bio.c:1885!
-> invalid opcode: 0000 [#1] SMP PTI
-> CPU: 1 PID: 105 Comm: kworker/u8:6 Not tainted 5.5.0-rc4-test+ #365
-> Hardware name: MSI MS-7823/CSM-H87M-G43 (MS-7823), BIOS V1.6 02/22/2014
-> Workqueue: writeback wb_workfn (flush-8:0)
-> EIP: bio_split+0xf/0x67
-> Code: 89 d8 e8 90 0f 02 00 85 c0 79 09 89 d8 31 db e8 e0 fa ff ff 89 d8 5b 5e 5f 5d c3 e8 db 5b d2 ff 55 89 e5 57 56 53 85 d2 7f 02 <0f> 0b 8b 58 20 c1 eb 09 39 d3 77 02 0f 0b 89 cb 8b 4d 08 89 d6 89
-> EAX: e2ddb600 EBX: ec74bc80 ECX: 00000c00 EDX: 00000000
-> ESI: 00000000 EDI: 00025000 EBP: ec74bbec ESP: ec74bbe0
-> DS: 007b ES: 007b FS: 00d8 GS: 00e0 SS: 0068 EFLAGS: 00010246
-> CR0: 80050033 CR2: 025c7ed4 CR3: 270bc000 CR4: 001406f0
-> Call Trace:
->  __blk_queue_split+0x327/0x40b
->  ? blk_mq_try_issue_directly+0x91/0x91
->  ? blk_mq_try_issue_directly+0x91/0x91
->  blk_mq_make_request+0x6e/0x407
->  ? function_trace_call+0xb8/0xdc
->  ? blk_mq_try_issue_directly+0x91/0x91
->  generic_make_request+0xc7/0x1e1
->  submit_bio+0x113/0x12b
->  ? ftrace_call+0x5/0x15
->  ext4_io_submit+0x47/0x51
->  ext4_writepages+0x53d/0x6ee
->  ? trace_function+0xcc/0xd4
->  ? page_writeback_cpu_online+0x11/0x11
->  do_writepages+0x29/0x55
->  __writeback_single_inode+0xc4/0x420
->  writeback_sb_inodes+0x239/0x395
->  __writeback_inodes_wb+0x5c/0x8b
->  ? trace_trigger_soft_disabled+0x40/0x40
->  wb_writeback+0x175/0x30a
->  wb_workfn+0x255/0x348
->  ? function_trace_call+0xb8/0xdc
->  ? inode_wait_for_writeback+0x28/0x28
->  process_one_work+0x25e/0x3d1
->  worker_thread+0x170/0x21f
->  kthread+0xe1/0xe3
->  ? rescuer_thread+0x217/0x217
->  ? kthread_worker_fn+0x116/0x116
->  ret_from_fork+0x2e/0x38
-> Modules linked in: ip6t_REJECT nf_reject_ipv6 ip6table_filter ip6_tables ipv6 crc_ccitt realtek ppdev r8169 parport_pc parport
-> ---[ end trace 7b7d4d993e5ceea3 ]---
+> So the new code has:
 > 
-> It is very reproducible and I bisected it to 429120f3df2dba ("block: fix
-> splitting segments on boundary masks")
+> megasas_build_ldio_fusion()
+> {
 > 
-> The test is simply:
+> cmd->request_desc->SCSIIO.MSIxIndex =
+> blk_mq_unique_tag_to_hwq(tag);
 > 
->  # perf record -o perf-test.dat -a -- \
->    trace-cmd record -e all -p function ./hackbench 20
->  # trace-cmd report > /tmp/tempfile
+> }
 > 
-> It appears to crash on the trace-cmd report.
+> So the value here is hw queue index from blk-mq point of view, and not
+> megaraid_sas msix index, as you alluded to.
+> 
+> So we get 80 msix, 8 are reserved for low_latency_index_start (that's
+> how it seems to me), and we report other 72 as #hw queues = 72 to SCSI
+> midlayer.
+> 
+> So I think that this should be:
+> 
+> cmd->request_desc->SCSIIO.MSIxIndex =
+> blk_mq_unique_tag_to_hwq(tag) + low_latency_index_start;
+> 
+> 
+Indeed, that sounds reasonable.
+(The whole queue mapping stuff isn't exactly well documented :-( )
 
-Can you try:
+I'll be updating the patch.
 
-https://git.kernel.dk/cgit/linux-block/commit/?h=block-5.5&id=1ca6b68e516b3de3707ae2cec9e206c8f9dd816e
+>>
+>> lspcu:
+>>
+>> # lscpu
+>> Architecture:          x86_64
+>> CPU op-mode(s):        32-bit, 64-bit
+>> Byte Order:            Little Endian
+>> CPU(s):                72
+>> On-line CPU(s) list:   0-71
+>> Thread(s) per core:    2
+>> Core(s) per socket:    18
+>> Socket(s):             2
+>> NUMA node(s):          2
+>> Vendor ID:             GenuineIntel
+>> CPU family:            6
+>> Model:                 85
+>> Model name:            Intel(R) Xeon(R) Gold 6150 CPU @ 2.70GHz
+>> Stepping:              4
+>> CPU MHz:               3204.246
+>> CPU max MHz:           3700.0000
+>> CPU min MHz:           1200.0000
+>> BogoMIPS:              5400.00
+>> Virtualization:        VT-x
+>> L1d cache:             32K
+>> L1i cache:             32K
+>> L2 cache:              1024K
+>> L3 cache:              25344K
+>> NUMA node0 CPU(s):     0-17,36-53
+>> NUMA node1 CPU(s):     18-35,54-71
+>> Flags:                 fpu vme de pse tsc msr pae mce cx8 apic sep
+>> mtrr pge mca cmov pat pse36 clflush dts acpi mmx fxsr sse sse2 ss ht
+>> tm pbe s
+>> yscall nx pdpe1gb rdtscp lm constant_tsc art arch_perfmon pebs bts
+>> rep_good nopl xtopology nonstop_tsc cpuid aperfmperf pni pclmulqdq
+>> dtes64 monitor
+>> ds_cpl vmx smx est tm2 ssse3 sdbg fma cx16 xtpr pdcm pcid dca sse4_1
+>> sse4_2 x2apic movbe popcnt tsc_deadline_timer xsave avx f16c rdrand
+>> lahf_lm abm
+>> 3dnowprefetch cpuid_fault epb cat_l3 cdp_l3 invpcid_single intel_ppin
+>> mba tpr_shadow vnmi flexpriority ept vpid ept_ad fsgsbase tsc_adjust
+>> bmi1 hle
+>> avx2 smep bmi2 erms invpcid rtm cqm mpx rdt_a avx512f avx512dq rdseed
+>> adx smap clflushopt clwb intel_pt avx512cd avx512bw avx512vl xsaveopt
+>> xsavec
+>> xgetbv1 xsaves cqm_llc cqm_occup_llc cqm_mbm_total cqm_mbm_lo
+>>
+>>
+> 
+> [snip]
+> 
+>> 4. This patch removes below code from driver so what this piece of
+>> code does is broken-
+>>
+>>
+>> -                               if (instance->adapter_type >=
+>> INVADER_SERIES &&
+>> -                                   !instance->msix_combined) {
+>> -                                       instance->msix_load_balance =
+>> true;
+>> -                                       instance->smp_affinity_enable
+>> = false;
+>> -                               }
+> 
+> Does this code need to be re-added? Would this have affected your test?
+> Primarily this patch was required to enable interrupt affinity on my
+machine (Lenovo RAID 930-8i).
+Can you give me some information why the code is present in the first
+place? Some hardware limitation, maybe?
 
+Cheers,
+
+Hannes
 -- 
-Jens Axboe
-
+Dr. Hannes Reinecke		      Teamlead Storage & Networking
+hare@suse.de			                  +49 911 74053 688
+SUSE Software Solutions Germany GmbH, Maxfeldstr. 5, 90409 Nürnberg
+HRB 36809 (AG Nürnberg), GF: Felix Imendörffer
