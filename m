@@ -2,112 +2,108 @@ Return-Path: <SRS0=JLuE=3D=vger.kernel.org=linux-block-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-7.6 required=3.0 tests=DKIMWL_WL_HIGH,DKIM_SIGNED,
-	DKIM_VALID,DKIM_VALID_AU,MAILING_LIST_MULTI,MENTIONS_GIT_HOSTING,
-	SPF_HELO_NONE,SPF_PASS,USER_AGENT_SANE_1 autolearn=ham autolearn_force=no
-	version=3.4.0
+X-Spam-Status: No, score=-0.8 required=3.0 tests=DKIMWL_WL_HIGH,DKIM_SIGNED,
+	DKIM_VALID,HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SPF_HELO_NONE,
+	SPF_PASS autolearn=no autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 00E1BC33C9E
-	for <linux-block@archiver.kernel.org>; Tue, 14 Jan 2020 21:52:52 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 5B9ADC47409
+	for <linux-block@archiver.kernel.org>; Tue, 14 Jan 2020 23:29:41 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.kernel.org (Postfix) with ESMTP id C3AF924670
-	for <linux-block@archiver.kernel.org>; Tue, 14 Jan 2020 21:52:51 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id 272F52467E
+	for <linux-block@archiver.kernel.org>; Tue, 14 Jan 2020 23:29:41 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=default; t=1579038771;
-	bh=ADmuG+8TueSxoUloNtkKFy+ooo54PCPEldX1LT6pn30=;
-	h=Date:From:To:Cc:Subject:References:In-Reply-To:List-ID:From;
-	b=mYbZe2uhxdz6y+xiq+a/HlSZ71kLuQ/Y4ltA5zmKO0stdb+yJMCIt4ag2P6yJzLmP
-	 C4BlArxkYAsrhX7rUTF9MBBqBwSrjz4OXDv9DprXPgLiKd4tvdvg3Vr59J6QEGBZ3C
-	 sUJv6uAnCi804Ap1pWz5i1nLRdqYLT6tU6cPc2s0=
+	s=default; t=1579044581;
+	bh=k4eU69C07g5/9QQrVCph8KAUUUUEi8RmXHDj6/HO/Ik=;
+	h=Date:From:To:Cc:Subject:In-Reply-To:References:List-ID:From;
+	b=zwRQMKQkXR6cw4XyP6QvMKwj1lz34ArVaGrsdoe1f2uLUV95/loZMV6nomNvjvJ7i
+	 Y91Dzn0t7rDzYbP6dlbnkf2wwzRuX7zsPx/WU/vdrHCj34PG91bFsUgHibN3mNAfzt
+	 txwN41GhwShQ+5laGK6mNcifpilEAjEmF7cSs30A=
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1727102AbgANVwv (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Tue, 14 Jan 2020 16:52:51 -0500
-Received: from mail.kernel.org ([198.145.29.99]:43992 "EHLO mail.kernel.org"
+        id S1728883AbgANX3b (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Tue, 14 Jan 2020 18:29:31 -0500
+Received: from mail.kernel.org ([198.145.29.99]:34880 "EHLO mail.kernel.org"
         rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-        id S1726491AbgANVwv (ORCPT <rfc822;linux-block@vger.kernel.org>);
-        Tue, 14 Jan 2020 16:52:51 -0500
-Received: from gmail.com (unknown [104.132.1.77])
+        id S1728650AbgANX3b (ORCPT <rfc822;linux-block@vger.kernel.org>);
+        Tue, 14 Jan 2020 18:29:31 -0500
+Received: from localhost.localdomain (c-73-231-172-41.hsd1.ca.comcast.net [73.231.172.41])
         (using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
         (No client certificate requested)
-        by mail.kernel.org (Postfix) with ESMTPSA id 683F524658;
-        Tue, 14 Jan 2020 21:52:50 +0000 (UTC)
+        by mail.kernel.org (Postfix) with ESMTPSA id 76F8C24679;
+        Tue, 14 Jan 2020 23:29:29 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-        s=default; t=1579038770;
-        bh=ADmuG+8TueSxoUloNtkKFy+ooo54PCPEldX1LT6pn30=;
-        h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
-        b=nYGlYmYB/Rvb3YVPs4ANkYjVHMK/hvse2YTpP/bsaDg7Yuu6nHDogWDSfmz47te/k
-         nbhZQRex3i0KiklagvHgoV+ZQAV1LjChZXqSh1RcL9LbvSaR8MF0Fkf7ZFfI3tjtHH
-         4efhorDfy5ubD4LTgMpIDjQ1/vKqtRyjZ7t+zKYI=
-Date:   Tue, 14 Jan 2020 13:52:48 -0800
-From:   Eric Biggers <ebiggers@kernel.org>
-To:     Mike Snitzer <snitzer@redhat.com>
-Cc:     LVM2 development <lvm-devel@redhat.com>, markus.schade@gmail.com,
-        ejt@redhat.com, linux-block@vger.kernel.org, dm-devel@redhat.com,
-        joe.thornber@gmail.com, dm-devel@lists.ewheeler.net
-Subject: Re: kernel BUG at drivers/md/persistent-data/dm-space-map-disk.c:178
-Message-ID: <20200114215248.GK41220@gmail.com>
-References: <alpine.LRH.2.11.1909251814220.15810@mx.ewheeler.net>
- <alpine.LRH.2.11.1912201829300.26683@mx.ewheeler.net>
- <alpine.LRH.2.11.1912270137420.26683@mx.ewheeler.net>
- <alpine.LRH.2.11.1912271946380.26683@mx.ewheeler.net>
- <20200107103546.asf4tmlfdmk6xsub@reti>
- <20200107104627.plviq37qhok2igt4@reti>
- <20200107122825.qr7o5d6dpwa6kv62@reti>
-MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <20200107122825.qr7o5d6dpwa6kv62@reti>
-User-Agent: Mutt/1.10.1 (2018-07-13)
+        s=default; t=1579044570;
+        bh=k4eU69C07g5/9QQrVCph8KAUUUUEi8RmXHDj6/HO/Ik=;
+        h=Date:From:To:Cc:Subject:In-Reply-To:References:From;
+        b=Gu0y5RtywBnxt/5MHNzmIuAGL99UYOUTR4MOUoFz/V8A0XNK0I0bw+ID9QXrLG+b9
+         4yxWu1bIpxAgRKCCzCYPru9Le6et10vSO5ADJMjyl++hjxh7tjrdlkd5kSXYwv5i4H
+         zD3MC1qTDzqpxI561Q50RCSE3Ph+HIgvwbWCQkns=
+Date:   Tue, 14 Jan 2020 15:29:29 -0800
+From:   Andrew Morton <akpm@linux-foundation.org>
+To:     John Hubbard <jhubbard@nvidia.com>
+Cc:     Al Viro <viro@zeniv.linux.org.uk>,
+        Alex Williamson <alex.williamson@redhat.com>,
+        Benjamin Herrenschmidt <benh@kernel.crashing.org>,
+        =?ISO-8859-1?Q?Bj=F6rn_T=F6pel?= <bjorn.topel@intel.com>,
+        Christoph Hellwig <hch@infradead.org>,
+        Dan Williams <dan.j.williams@intel.com>,
+        Daniel Vetter <daniel@ffwll.ch>,
+        Dave Chinner <david@fromorbit.com>,
+        David Airlie <airlied@linux.ie>,
+        "David S . Miller" <davem@davemloft.net>,
+        Ira Weiny <ira.weiny@intel.com>, Jan Kara <jack@suse.cz>,
+        Jason Gunthorpe <jgg@ziepe.ca>, Jens Axboe <axboe@kernel.dk>,
+        Jonathan Corbet <corbet@lwn.net>,
+        =?ISO-8859-1?Q?J=E9r?= =?ISO-8859-1?Q?=F4me?= Glisse 
+        <jglisse@redhat.com>, "Kirill A . Shutemov" <kirill@shutemov.name>,
+        Magnus Karlsson <magnus.karlsson@intel.com>,
+        Mauro Carvalho Chehab <mchehab@kernel.org>,
+        Michael Ellerman <mpe@ellerman.id.au>,
+        Michal Hocko <mhocko@suse.com>,
+        Mike Kravetz <mike.kravetz@oracle.com>,
+        Paul Mackerras <paulus@samba.org>,
+        Shuah Khan <shuah@kernel.org>,
+        Vlastimil Babka <vbabka@suse.cz>, <bpf@vger.kernel.org>,
+        <dri-devel@lists.freedesktop.org>, <kvm@vger.kernel.org>,
+        <linux-block@vger.kernel.org>, <linux-doc@vger.kernel.org>,
+        <linux-fsdevel@vger.kernel.org>, <linux-kselftest@vger.kernel.org>,
+        <linux-media@vger.kernel.org>, <linux-rdma@vger.kernel.org>,
+        <linuxppc-dev@lists.ozlabs.org>, <netdev@vger.kernel.org>,
+        <linux-mm@kvack.org>, LKML <linux-kernel@vger.kernel.org>
+Subject: Re: [PATCH v12 00/22] mm/gup: prereqs to track dma-pinned pages:
+ FOLL_PIN
+Message-Id: <20200114152929.807fecabfe2258ae2707a88b@linux-foundation.org>
+In-Reply-To: <9d7f3c1a-6020-bdec-c513-80c5399e55d7@nvidia.com>
+References: <20200107224558.2362728-1-jhubbard@nvidia.com>
+        <2a9145d4-586e-6489-64e4-0c54f47afaa1@nvidia.com>
+        <9d7f3c1a-6020-bdec-c513-80c5399e55d7@nvidia.com>
+X-Mailer: Sylpheed 3.5.1 (GTK+ 2.24.31; x86_64-pc-linux-gnu)
+Mime-Version: 1.0
+Content-Type: text/plain; charset=US-ASCII
+Content-Transfer-Encoding: 7bit
 Sender: linux-block-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-On Tue, Jan 07, 2020 at 12:28:25PM +0000, Joe Thornber wrote:
-> On Tue, Jan 07, 2020 at 10:46:27AM +0000, Joe Thornber wrote:
-> > I'll get a patch to you later today.
-> 
-> Eric,
-> 
-> Patch below.  I've run it through a bunch of tests in the dm test suite.  But
-> obviously I have never hit your issue.  Will do more testing today.
-> 
-> - Joe
-> 
-> 
-> 
-> Author: Joe Thornber <ejt@redhat.com>
-> Date:   Tue Jan 7 11:58:42 2020 +0000
-> 
->     [dm-thin, dm-cache] Fix bug in space-maps.
->     
->     The space-maps track the reference counts for disk blocks.  There are variants
->     for tracking metadata blocks, and data blocks.
->     
->     We implement transactionality by never touching blocks from the previous
->     transaction, so we can rollback in the event of a crash.
->     
->     When allocating a new block we need to ensure the block is free (has reference
->     count of 0) in both the current and previous transaction.  Prior to this patch we
->     were doing this by searching for a free block in the previous transaction, and
->     relying on a 'begin' counter to track where the last allocation in the current
->     transaction was.  This 'begin' field was not being updated in all code paths (eg,
->     increment of a data block reference count due to breaking sharing of a neighbour
->     block in the same btree leaf).
->     
->     This patch keeps the 'begin' field, but now it's just a hint to speed up the search.
->     Instead we search the current transaction for a free block, and then double check
->     it's free in the old transaction.  Much simpler.
-> 
+On Tue, 14 Jan 2020 12:15:08 -0800 John Hubbard <jhubbard@nvidia.com> wrote:
 
-I happened to notice this patch is on the linux-dm/for-next branch
-(https://git.kernel.org/pub/scm/linux/kernel/git/device-mapper/linux-dm.git/commit/?h=for-next&id=2137c0dcc04b24efb4c38d4b46b7194575718dd5)
-and it has:
+> > 
+> > Hi Andrew and all,
+> > 
+> > To clarify: I'm hoping that this series can go into 5.6.
+> > 
+> > Meanwhile, I'm working on tracking down and solving the problem that Leon
+> > reported, in the "track FOLL_PIN pages" patch, and that patch is not part of
+> > this series.
+> > 
+> 
+> Hi Andrew and all,
+> 
+> Any thoughts on this?
 
-	Reported-by: Eric Biggers <ebiggers@google.com>
+5.6 is late.  But it was in -mm before (briefly) and appears to be
+mature and well-reviewed.
 
-This is wrong, I didn't report this.  I think you meant to put:
+I'll toss it in there and shall push it into -next hopefully today. 
+Let's decide 2-3 weeks hence.
 
-	Reported-by: Eric Wheeler <dm-devel@lists.ewheeler.net>
-
-- Eric (the other one)
