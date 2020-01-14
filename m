@@ -2,108 +2,147 @@ Return-Path: <SRS0=JLuE=3D=vger.kernel.org=linux-block-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-0.8 required=3.0 tests=DKIMWL_WL_HIGH,DKIM_SIGNED,
-	DKIM_VALID,HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SPF_HELO_NONE,
-	SPF_PASS autolearn=no autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-2.4 required=3.0 tests=DKIMWL_WL_HIGH,DKIM_SIGNED,
+	DKIM_VALID,DKIM_VALID_AU,HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,
+	SPF_HELO_NONE,SPF_PASS,USER_AGENT_SANE_1 autolearn=no autolearn_force=no
+	version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 5B9ADC47409
-	for <linux-block@archiver.kernel.org>; Tue, 14 Jan 2020 23:29:41 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id BE32BC33C9E
+	for <linux-block@archiver.kernel.org>; Tue, 14 Jan 2020 23:38:32 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.kernel.org (Postfix) with ESMTP id 272F52467E
-	for <linux-block@archiver.kernel.org>; Tue, 14 Jan 2020 23:29:41 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=default; t=1579044581;
-	bh=k4eU69C07g5/9QQrVCph8KAUUUUEi8RmXHDj6/HO/Ik=;
-	h=Date:From:To:Cc:Subject:In-Reply-To:References:List-ID:From;
-	b=zwRQMKQkXR6cw4XyP6QvMKwj1lz34ArVaGrsdoe1f2uLUV95/loZMV6nomNvjvJ7i
-	 Y91Dzn0t7rDzYbP6dlbnkf2wwzRuX7zsPx/WU/vdrHCj34PG91bFsUgHibN3mNAfzt
-	 txwN41GhwShQ+5laGK6mNcifpilEAjEmF7cSs30A=
+	by mail.kernel.org (Postfix) with ESMTP id 8DC252075B
+	for <linux-block@archiver.kernel.org>; Tue, 14 Jan 2020 23:38:32 +0000 (UTC)
+Authentication-Results: mail.kernel.org;
+	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="XRomDGNa"
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1728883AbgANX3b (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Tue, 14 Jan 2020 18:29:31 -0500
-Received: from mail.kernel.org ([198.145.29.99]:34880 "EHLO mail.kernel.org"
-        rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-        id S1728650AbgANX3b (ORCPT <rfc822;linux-block@vger.kernel.org>);
-        Tue, 14 Jan 2020 18:29:31 -0500
-Received: from localhost.localdomain (c-73-231-172-41.hsd1.ca.comcast.net [73.231.172.41])
-        (using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+        id S1728774AbgANXic (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Tue, 14 Jan 2020 18:38:32 -0500
+Received: from us-smtp-1.mimecast.com ([207.211.31.81]:35904 "EHLO
+        us-smtp-delivery-1.mimecast.com" rhost-flags-OK-OK-OK-FAIL)
+        by vger.kernel.org with ESMTP id S1728656AbgANXib (ORCPT
+        <rfc822;linux-block@vger.kernel.org>);
+        Tue, 14 Jan 2020 18:38:31 -0500
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+        s=mimecast20190719; t=1579045111;
+        h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+         to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+         in-reply-to:in-reply-to:references:references;
+        bh=GUAdJUKTIjqZ8UnAr0WHyyOOhCddPy1gM8C7ltHr6Bc=;
+        b=XRomDGNa3xZKv3R/QV35Sx3NO0W54zG1L+h2xGDStdHLOqRoc0fJ5VAO+JFWeJalc+T4gI
+        xVRbvBg9mfMWx16mRVzpXdBYFioLD8KlcWoqNmHPix8Gti9FZxFMwDj9atPINNWixgEGsI
+        TCK8UjA2R/K+VksF7PnwngdsqpYwGgI=
+Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
+ [209.132.183.4]) (Using TLS) by relay.mimecast.com with ESMTP id
+ us-mta-359-1O9xelYaNtOOPnOOt9HTOw-1; Tue, 14 Jan 2020 18:38:30 -0500
+X-MC-Unique: 1O9xelYaNtOOPnOOt9HTOw-1
+Received: from smtp.corp.redhat.com (int-mx05.intmail.prod.int.phx2.redhat.com [10.5.11.15])
+        (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
         (No client certificate requested)
-        by mail.kernel.org (Postfix) with ESMTPSA id 76F8C24679;
-        Tue, 14 Jan 2020 23:29:29 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-        s=default; t=1579044570;
-        bh=k4eU69C07g5/9QQrVCph8KAUUUUEi8RmXHDj6/HO/Ik=;
-        h=Date:From:To:Cc:Subject:In-Reply-To:References:From;
-        b=Gu0y5RtywBnxt/5MHNzmIuAGL99UYOUTR4MOUoFz/V8A0XNK0I0bw+ID9QXrLG+b9
-         4yxWu1bIpxAgRKCCzCYPru9Le6et10vSO5ADJMjyl++hjxh7tjrdlkd5kSXYwv5i4H
-         zD3MC1qTDzqpxI561Q50RCSE3Ph+HIgvwbWCQkns=
-Date:   Tue, 14 Jan 2020 15:29:29 -0800
-From:   Andrew Morton <akpm@linux-foundation.org>
-To:     John Hubbard <jhubbard@nvidia.com>
-Cc:     Al Viro <viro@zeniv.linux.org.uk>,
-        Alex Williamson <alex.williamson@redhat.com>,
-        Benjamin Herrenschmidt <benh@kernel.crashing.org>,
-        =?ISO-8859-1?Q?Bj=F6rn_T=F6pel?= <bjorn.topel@intel.com>,
-        Christoph Hellwig <hch@infradead.org>,
-        Dan Williams <dan.j.williams@intel.com>,
-        Daniel Vetter <daniel@ffwll.ch>,
-        Dave Chinner <david@fromorbit.com>,
-        David Airlie <airlied@linux.ie>,
-        "David S . Miller" <davem@davemloft.net>,
-        Ira Weiny <ira.weiny@intel.com>, Jan Kara <jack@suse.cz>,
-        Jason Gunthorpe <jgg@ziepe.ca>, Jens Axboe <axboe@kernel.dk>,
-        Jonathan Corbet <corbet@lwn.net>,
-        =?ISO-8859-1?Q?J=E9r?= =?ISO-8859-1?Q?=F4me?= Glisse 
-        <jglisse@redhat.com>, "Kirill A . Shutemov" <kirill@shutemov.name>,
-        Magnus Karlsson <magnus.karlsson@intel.com>,
-        Mauro Carvalho Chehab <mchehab@kernel.org>,
-        Michael Ellerman <mpe@ellerman.id.au>,
-        Michal Hocko <mhocko@suse.com>,
-        Mike Kravetz <mike.kravetz@oracle.com>,
-        Paul Mackerras <paulus@samba.org>,
-        Shuah Khan <shuah@kernel.org>,
-        Vlastimil Babka <vbabka@suse.cz>, <bpf@vger.kernel.org>,
-        <dri-devel@lists.freedesktop.org>, <kvm@vger.kernel.org>,
-        <linux-block@vger.kernel.org>, <linux-doc@vger.kernel.org>,
-        <linux-fsdevel@vger.kernel.org>, <linux-kselftest@vger.kernel.org>,
-        <linux-media@vger.kernel.org>, <linux-rdma@vger.kernel.org>,
-        <linuxppc-dev@lists.ozlabs.org>, <netdev@vger.kernel.org>,
-        <linux-mm@kvack.org>, LKML <linux-kernel@vger.kernel.org>
-Subject: Re: [PATCH v12 00/22] mm/gup: prereqs to track dma-pinned pages:
- FOLL_PIN
-Message-Id: <20200114152929.807fecabfe2258ae2707a88b@linux-foundation.org>
-In-Reply-To: <9d7f3c1a-6020-bdec-c513-80c5399e55d7@nvidia.com>
-References: <20200107224558.2362728-1-jhubbard@nvidia.com>
-        <2a9145d4-586e-6489-64e4-0c54f47afaa1@nvidia.com>
-        <9d7f3c1a-6020-bdec-c513-80c5399e55d7@nvidia.com>
-X-Mailer: Sylpheed 3.5.1 (GTK+ 2.24.31; x86_64-pc-linux-gnu)
-Mime-Version: 1.0
-Content-Type: text/plain; charset=US-ASCII
-Content-Transfer-Encoding: 7bit
+        by mimecast-mx01.redhat.com (Postfix) with ESMTPS id 0EFE3801E7B;
+        Tue, 14 Jan 2020 23:38:29 +0000 (UTC)
+Received: from ming.t460p (ovpn-8-16.pek2.redhat.com [10.72.8.16])
+        by smtp.corp.redhat.com (Postfix) with ESMTPS id 308F67BA48;
+        Tue, 14 Jan 2020 23:38:18 +0000 (UTC)
+Date:   Wed, 15 Jan 2020 07:38:14 +0800
+From:   Ming Lei <ming.lei@redhat.com>
+To:     Thomas Gleixner <tglx@linutronix.de>
+Cc:     Peter Xu <peterx@redhat.com>, Juri Lelli <juri.lelli@redhat.com>,
+        Ming Lei <minlei@redhat.com>,
+        Linux Kernel Mailing List <linux-kernel@vger.kernel.org>,
+        linux-block@vger.kernel.org
+Subject: Re: Kernel-managed IRQ affinity (cont)
+Message-ID: <20200114233814.GA6281@ming.t460p>
+References: <20191216195712.GA161272@xz-x1>
+ <20191219082819.GB15731@ming.t460p>
+ <20191219143214.GA50561@xz-x1>
+ <20191219161115.GA18672@ming.t460p>
+ <87eew8l7oz.fsf@nanos.tec.linutronix.de>
+ <20200110012802.GA4501@ming.t460p>
+ <87v9pjrtbh.fsf@nanos.tec.linutronix.de>
+ <20200111024835.GA24575@ming.t460p>
+ <87r202b19f.fsf@nanos.tec.linutronix.de>
+MIME-Version: 1.0
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <87r202b19f.fsf@nanos.tec.linutronix.de>
+User-Agent: Mutt/1.12.1 (2019-06-15)
+X-Scanned-By: MIMEDefang 2.79 on 10.5.11.15
 Sender: linux-block-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-On Tue, 14 Jan 2020 12:15:08 -0800 John Hubbard <jhubbard@nvidia.com> wrote:
+Hi Thomas,
 
-> > 
-> > Hi Andrew and all,
-> > 
-> > To clarify: I'm hoping that this series can go into 5.6.
-> > 
-> > Meanwhile, I'm working on tracking down and solving the problem that Leon
-> > reported, in the "track FOLL_PIN pages" patch, and that patch is not part of
-> > this series.
-> > 
+On Tue, Jan 14, 2020 at 02:45:00PM +0100, Thomas Gleixner wrote:
+> Ming,
 > 
-> Hi Andrew and all,
+> Ming Lei <ming.lei@redhat.com> writes:
+> > On Fri, Jan 10, 2020 at 08:43:14PM +0100, Thomas Gleixner wrote:
+> >> Ming Lei <ming.lei@redhat.com> writes:
+> >> > That is why I try to exclude isolated CPUs from interrupt effective affinity,
+> >> > turns out the approach is simple and doable.
+> >> 
+> >> Yes, it's doable. But it still is inconsistent behaviour. Assume the
+> >> following configuration:
+> >> 
+> >>   8 CPUs CPU0,1 assigned for housekeeping
+> >> 
+> >> With 8 queues the proposed change does nothing because each queue is
+> >> mapped to exactly one CPU.
+> >
+> > That is expected behavior for this RT case, given userspace won't submit
+> > IO from isolated CPUs.
 > 
-> Any thoughts on this?
+> What is _this_ RT case? We really don't implement policy for a specific
+> use case. If the kernel implements a policy then it has to be generally
+> useful and practical.
 
-5.6 is late.  But it was in -mm before (briefly) and appears to be
-mature and well-reviewed.
+Maybe the word of 'RT case' isn't accurate, I thought isolated CPUs is only
+used for realtime cases, at least that is Peter's usage, maybe I was
+wrong.
 
-I'll toss it in there and shall push it into -next hopefully today. 
-Let's decide 2-3 weeks hence.
+But it can be generic for all isolated CPUs cases, in which users
+don't want managed interrupts to disturb the isolated CPU cores.
+
+> 
+> >> With 4 queues you get the following:
+> >> 
+> >>  CPU0,1       queue 0
+> >>  CPU2,3       queue 1
+> >>  CPU4,5       queue 2
+> >>  CPU6,7       queue 3
+> >> 
+> >> No effect on the isolated CPUs either.
+> >> 
+> >> With 2 queues you get the following:
+> >> 
+> >>  CPU0,1,2,3   queue 0
+> >>  CPU4,5,6,7   queue 1
+> >> 
+> >> So here the isolated CPUs 2 and 3 get the isolation, but 4-7
+> >> not. That's perhaps intended, but definitely not documented.
+> >
+> > That is intentional change, given no IO will be submitted from 4-7
+> > most of times in RT case, so it is fine to select effective CPU from
+> > isolated CPUs in this case. As peter mentioned, IO may just be submitted
+> > from isolated CPUs during booting. Once the system is setup, no IO
+> > comes from isolated CPUs, then no interrupt is delivered to isolated
+> > CPUs, then meet RT's requirement.
+> 
+> Again. This is a specific usecase. Is this generally applicable?
+
+As mentioned above, it can be applied for all isolated CPUs, when users
+don't want managed interrupts to disturb these CPU cores.
+
+> 
+> > We can document this change somewhere.
+> 
+> Yes, this needs to be documented very clearly with that command line
+> parameter.
+
+OK, will do that in formal post.
+
+Thanks, 
+Ming
 
