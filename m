@@ -2,134 +2,143 @@ Return-Path: <SRS0=JLuE=3D=vger.kernel.org=linux-block-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-2.2 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
-	MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,USER_AGENT_SANE_1 autolearn=no
-	autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-2.4 required=3.0 tests=DKIMWL_WL_HIGH,DKIM_SIGNED,
+	DKIM_VALID,DKIM_VALID_AU,HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,
+	SPF_HELO_NONE,SPF_PASS,USER_AGENT_SANE_1 autolearn=no autolearn_force=no
+	version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id C7452C33CB1
-	for <linux-block@archiver.kernel.org>; Tue, 14 Jan 2020 13:57:12 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 6B454C33CB2
+	for <linux-block@archiver.kernel.org>; Tue, 14 Jan 2020 20:15:21 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.kernel.org (Postfix) with ESMTP id A2814214AF
-	for <linux-block@archiver.kernel.org>; Tue, 14 Jan 2020 13:57:12 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id 407E124670
+	for <linux-block@archiver.kernel.org>; Tue, 14 Jan 2020 20:15:21 +0000 (UTC)
+Authentication-Results: mail.kernel.org;
+	dkim=pass (2048-bit key) header.d=nvidia.com header.i=@nvidia.com header.b="bNQcHd+k"
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1726450AbgANN5M (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Tue, 14 Jan 2020 08:57:12 -0500
-Received: from lhrrgout.huawei.com ([185.176.76.210]:2267 "EHLO huawei.com"
-        rhost-flags-OK-OK-OK-FAIL) by vger.kernel.org with ESMTP
-        id S1726115AbgANN5M (ORCPT <rfc822;linux-block@vger.kernel.org>);
-        Tue, 14 Jan 2020 08:57:12 -0500
-Received: from lhreml707-cah.china.huawei.com (unknown [172.18.7.108])
-        by Forcepoint Email with ESMTP id DD3B4B0CEBEA626A9554;
-        Tue, 14 Jan 2020 13:57:09 +0000 (GMT)
-Received: from lhreml724-chm.china.huawei.com (10.201.108.75) by
- lhreml707-cah.china.huawei.com (10.201.108.48) with Microsoft SMTP Server
- (TLS) id 14.3.408.0; Tue, 14 Jan 2020 13:57:09 +0000
-Received: from [127.0.0.1] (10.202.226.43) by lhreml724-chm.china.huawei.com
- (10.201.108.75) with Microsoft SMTP Server (version=TLS1_2,
- cipher=TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256) id 15.1.1713.5; Tue, 14 Jan
- 2020 13:57:09 +0000
-Subject: Re: [PATCH 09/11] megaraid_sas: switch fusion adapters to MQ
-From:   John Garry <john.garry@huawei.com>
-To:     Ming Lei <ming.lei@redhat.com>
-CC:     Sumit Saxena <sumit.saxena@broadcom.com>,
-        Hannes Reinecke <hare@suse.de>,
-        "Martin K. Petersen" <martin.petersen@oracle.com>,
-        Jens Axboe <axboe@kernel.dk>, Christoph Hellwig <hch@lst.de>,
-        James Bottomley <james.bottomley@hansenpartnership.com>,
-        Linux SCSI List <linux-scsi@vger.kernel.org>,
-        <linux-block@vger.kernel.org>, Hannes Reinecke <hare@suse.com>
-References: <20191202153914.84722-1-hare@suse.de>
- <20191202153914.84722-10-hare@suse.de>
- <CAL2rwxqjiRTuZ0ntfaHHzG7z-VmxRQCXYyxZeX9eDMrmX+dbGg@mail.gmail.com>
- <339f089f-26aa-1cbe-416b-67809ea6791f@huawei.com>
- <20200110020038.GB4501@ming.t460p>
- <1383a868-76d8-5c26-556d-7374e189b7ce@huawei.com>
-Message-ID: <71cf0932-ab93-675c-4d7c-37889c003468@huawei.com>
-Date:   Tue, 14 Jan 2020 13:57:08 +0000
-User-Agent: Mozilla/5.0 (Windows NT 10.0; WOW64; rv:68.0) Gecko/20100101
- Thunderbird/68.1.2
+        id S1727556AbgANUPM (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Tue, 14 Jan 2020 15:15:12 -0500
+Received: from hqnvemgate25.nvidia.com ([216.228.121.64]:13500 "EHLO
+        hqnvemgate25.nvidia.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S1726839AbgANUPL (ORCPT
+        <rfc822;linux-block@vger.kernel.org>);
+        Tue, 14 Jan 2020 15:15:11 -0500
+Received: from hqpgpgate101.nvidia.com (Not Verified[216.228.121.13]) by hqnvemgate25.nvidia.com (using TLS: TLSv1.2, DES-CBC3-SHA)
+        id <B5e1e21390001>; Tue, 14 Jan 2020 12:14:49 -0800
+Received: from hqmail.nvidia.com ([172.20.161.6])
+  by hqpgpgate101.nvidia.com (PGP Universal service);
+  Tue, 14 Jan 2020 12:15:09 -0800
+X-PGP-Universal: processed;
+        by hqpgpgate101.nvidia.com on Tue, 14 Jan 2020 12:15:09 -0800
+Received: from [10.110.48.28] (10.124.1.5) by HQMAIL107.nvidia.com
+ (172.20.187.13) with Microsoft SMTP Server (TLS) id 15.0.1473.3; Tue, 14 Jan
+ 2020 20:15:09 +0000
+Subject: Re: [PATCH v12 00/22] mm/gup: prereqs to track dma-pinned pages:
+ FOLL_PIN
+From:   John Hubbard <jhubbard@nvidia.com>
+To:     Andrew Morton <akpm@linux-foundation.org>
+CC:     Al Viro <viro@zeniv.linux.org.uk>,
+        Alex Williamson <alex.williamson@redhat.com>,
+        Benjamin Herrenschmidt <benh@kernel.crashing.org>,
+        =?UTF-8?B?QmrDtnJuIFTDtnBlbA==?= <bjorn.topel@intel.com>,
+        Christoph Hellwig <hch@infradead.org>,
+        Dan Williams <dan.j.williams@intel.com>,
+        Daniel Vetter <daniel@ffwll.ch>,
+        Dave Chinner <david@fromorbit.com>,
+        David Airlie <airlied@linux.ie>,
+        "David S . Miller" <davem@davemloft.net>,
+        Ira Weiny <ira.weiny@intel.com>, Jan Kara <jack@suse.cz>,
+        Jason Gunthorpe <jgg@ziepe.ca>, Jens Axboe <axboe@kernel.dk>,
+        Jonathan Corbet <corbet@lwn.net>,
+        =?UTF-8?B?SsOpcsO0bWUgR2xpc3Nl?= <jglisse@redhat.com>,
+        "Kirill A . Shutemov" <kirill@shutemov.name>,
+        Magnus Karlsson <magnus.karlsson@intel.com>,
+        Mauro Carvalho Chehab <mchehab@kernel.org>,
+        Michael Ellerman <mpe@ellerman.id.au>,
+        Michal Hocko <mhocko@suse.com>,
+        Mike Kravetz <mike.kravetz@oracle.com>,
+        Paul Mackerras <paulus@samba.org>,
+        Shuah Khan <shuah@kernel.org>,
+        Vlastimil Babka <vbabka@suse.cz>, <bpf@vger.kernel.org>,
+        <dri-devel@lists.freedesktop.org>, <kvm@vger.kernel.org>,
+        <linux-block@vger.kernel.org>, <linux-doc@vger.kernel.org>,
+        <linux-fsdevel@vger.kernel.org>, <linux-kselftest@vger.kernel.org>,
+        <linux-media@vger.kernel.org>, <linux-rdma@vger.kernel.org>,
+        <linuxppc-dev@lists.ozlabs.org>, <netdev@vger.kernel.org>,
+        <linux-mm@kvack.org>, LKML <linux-kernel@vger.kernel.org>
+References: <20200107224558.2362728-1-jhubbard@nvidia.com>
+ <2a9145d4-586e-6489-64e4-0c54f47afaa1@nvidia.com>
+X-Nvconfidentiality: public
+Message-ID: <9d7f3c1a-6020-bdec-c513-80c5399e55d7@nvidia.com>
+Date:   Tue, 14 Jan 2020 12:15:08 -0800
+User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:68.0) Gecko/20100101
+ Thunderbird/68.4.1
 MIME-Version: 1.0
-In-Reply-To: <1383a868-76d8-5c26-556d-7374e189b7ce@huawei.com>
-Content-Type: text/plain; charset="utf-8"; format=flowed
+In-Reply-To: <2a9145d4-586e-6489-64e4-0c54f47afaa1@nvidia.com>
+X-Originating-IP: [10.124.1.5]
+X-ClientProxiedBy: HQMAIL111.nvidia.com (172.20.187.18) To
+ HQMAIL107.nvidia.com (172.20.187.13)
+Content-Type: text/plain; charset="utf-8"
 Content-Language: en-US
 Content-Transfer-Encoding: 7bit
-X-Originating-IP: [10.202.226.43]
-X-ClientProxiedBy: lhreml729-chm.china.huawei.com (10.201.108.80) To
- lhreml724-chm.china.huawei.com (10.201.108.75)
-X-CFilter-Loop: Reflected
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=nvidia.com; s=n1;
+        t=1579032890; bh=wLxNzNFRStaOZ7jAQIV4tH1wBKaWmBKZBOUdkq/PVGQ=;
+        h=X-PGP-Universal:Subject:From:To:CC:References:X-Nvconfidentiality:
+         Message-ID:Date:User-Agent:MIME-Version:In-Reply-To:
+         X-Originating-IP:X-ClientProxiedBy:Content-Type:Content-Language:
+         Content-Transfer-Encoding;
+        b=bNQcHd+kt2S6qArSD90PMkNX5LSRoo2toPf1fdY/D3ysgVjnnuMPbcBLvU4mGjBbT
+         LR4uZiIEi3/mAViybdXB1PH001dny/ndD230xDMGlhs7NAYpQR6mGLaj5Fl0H44uol
+         s/WH8SaFGbiYHrC+Jf2F7bChe3A2NqguquLvhseggPHll2epR/FoT6c0YMA6JGSKkp
+         eSDWR40pps95gbxdKKvy2DClT3lBSMdUwcemTQnf2Jrxy6nLuQLIDhcegQ+kyGcscI
+         uknj/1R1Mw2ETSzcXASW/vo/Q3g+SHupTZUPph9j3ZAnq/QlpAxhi10ckpA46Ke/0I
+         HjefW3dJ5Akvg==
 Sender: linux-block-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-On 10/01/2020 12:09, John Garry wrote:
->>>>>
->>>>> Fusion adapters can steer completions to individual queues, and
->>>>> we now have support for shared host-wide tags.
->>>>> So we can enable multiqueue support for fusion adapters and
->>>>> drop the hand-crafted interrupt affinity settings.
->>>>
->>>> Hi Hannes,
->>>>
->>>> Ming Lei also proposed similar changes in megaraid_sas driver some
->>>> time back and it had resulted in performance drop-
->>>> https://patchwork.kernel.org/patch/10969511/
->>>>
->>>> So, we will do some performance tests with this patch and update you.
->>>>
->>>
->>> Hi Sumit,
->>>
->>> I was wondering if you had a chance to do this test yet?
->>>
->>> It would be good to know, so we can try to progress this work.
+On 1/9/20 2:07 PM, John Hubbard wrote:
+> On 1/7/20 2:45 PM, John Hubbard wrote:
+>> Hi,
 >>
->> Looks most of the comment in the following link isn't addressed:
+>> The "track FOLL_PIN pages" would have been the very next patch, but it is
+>> not included here because I'm still debugging a bug report from Leon.
+>> Let's get all of the prerequisite work (it's been reviewed) into the tree
+>> so that future reviews are easier. It's clear that any fixes that are
+>> required to the tracking patch, won't affect these patches here.
 >>
->> https://lore.kernel.org/linux-block/20191129002540.GA1829@ming.t460p/
-> 
-> OK, but I was waiting for results first, which I hoped would not take 
-> too long. They weren't forgotten, for sure. Let me check them now.
-
-Hi Ming,
-
-I think that your questions here were related to the shared scheduler 
-tags, which was Hannes' proposal (I initially had it in v2 series, but 
-dropped it for v3).
-
-I was just content to maintain the concept of shared driver tags.
-
-Thanks,
-John
-
-> 
->>
->>> Firstly too much((nr_hw_queues - 1) times) memory is wasted. Secondly IO
->>> latency could be increased by too deep scheduler queue depth. Finally 
->>> CPU
->>> could be wasted in the retrying of running busy hw queue.
->>>
->>> Wrt. driver tags, this patch may be worse, given the average limit for
->>> each LUN is reduced by (nr_hw_queues) times, see hctx_may_queue().
->>>
->>> Another change is bt_wait_ptr(). Before your patches, there is single
->>> .wait_index, now the number of .wait_index is changed to nr_hw_queues.
->>>
->>> Also the run queue number is increased a lot in SCSI's IO completion, 
->>> see
->>> scsi_end_request().
->>
->> I guess memory waste won't be a blocker.
-> 
-> Yeah, that's a trade-off. And, as I remember, memory waste does not seem 
-> extreme.
-> 
->>
->> But it may not be one accepted behavior to reduce average active queue
->> depth for each LUN by nr_hw_queues times, meantime scheduler queue depth
->> is increased by nr_hw_queues times, compared with single queue.
+>> This implements an API naming change (put_user_page*() -->
+>> unpin_user_page*()), and also adds FOLL_PIN page support, up to
+>> *but not including* actually tracking FOLL_PIN pages. It extends
+>> the FOLL_PIN support to a few select subsystems. More subsystems will
+>> be added in follow up work.
 >>
 > 
-> Thanks,
-> John
+> Hi Andrew and all,
+> 
+> To clarify: I'm hoping that this series can go into 5.6.
+> 
+> Meanwhile, I'm working on tracking down and solving the problem that Leon
+> reported, in the "track FOLL_PIN pages" patch, and that patch is not part of
+> this series.
+> 
 
+Hi Andrew and all,
+
+Any thoughts on this?
+
+As for the not-included-yet tracking patch, my local testing still suggests the
+need to allow for larger refcounts of huge pages (in other words, I can write a test
+to pin huge pages many times, and overflow with the same backtrace that Leon has
+reported).
+
+The second struct page (I recall Jan suggested) can hold those, so I'm going to proceed
+with that approach, while waiting to see if Leon has any more test data for me.
+
+Again, I think this series is worth getting out of the way, in the meantime.
+
+
+thanks,
+-- 
+John Hubbard
+NVIDIA
