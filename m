@@ -2,121 +2,134 @@ Return-Path: <SRS0=JLuE=3D=vger.kernel.org=linux-block-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-0.8 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
-	MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS autolearn=no autolearn_force=no
-	version=3.4.0
+X-Spam-Status: No, score=-2.2 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
+	MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,USER_AGENT_SANE_1 autolearn=no
+	autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 321A1C33CB1
-	for <linux-block@archiver.kernel.org>; Tue, 14 Jan 2020 13:45:05 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id C7452C33CB1
+	for <linux-block@archiver.kernel.org>; Tue, 14 Jan 2020 13:57:12 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.kernel.org (Postfix) with ESMTP id 0A04C2187F
-	for <linux-block@archiver.kernel.org>; Tue, 14 Jan 2020 13:45:05 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id A2814214AF
+	for <linux-block@archiver.kernel.org>; Tue, 14 Jan 2020 13:57:12 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1728741AbgANNpE (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Tue, 14 Jan 2020 08:45:04 -0500
-Received: from Galois.linutronix.de ([193.142.43.55]:43576 "EHLO
-        Galois.linutronix.de" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1726878AbgANNpE (ORCPT
-        <rfc822;linux-block@vger.kernel.org>);
-        Tue, 14 Jan 2020 08:45:04 -0500
-Received: from p5b06da22.dip0.t-ipconnect.de ([91.6.218.34] helo=nanos.tec.linutronix.de)
-        by Galois.linutronix.de with esmtpsa (TLS1.2:DHE_RSA_AES_256_CBC_SHA256:256)
-        (Exim 4.80)
-        (envelope-from <tglx@linutronix.de>)
-        id 1irMVB-0006cA-B3; Tue, 14 Jan 2020 14:45:01 +0100
-Received: by nanos.tec.linutronix.de (Postfix, from userid 1000)
-        id 7615A101DEE; Tue, 14 Jan 2020 14:45:00 +0100 (CET)
-From:   Thomas Gleixner <tglx@linutronix.de>
+        id S1726450AbgANN5M (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Tue, 14 Jan 2020 08:57:12 -0500
+Received: from lhrrgout.huawei.com ([185.176.76.210]:2267 "EHLO huawei.com"
+        rhost-flags-OK-OK-OK-FAIL) by vger.kernel.org with ESMTP
+        id S1726115AbgANN5M (ORCPT <rfc822;linux-block@vger.kernel.org>);
+        Tue, 14 Jan 2020 08:57:12 -0500
+Received: from lhreml707-cah.china.huawei.com (unknown [172.18.7.108])
+        by Forcepoint Email with ESMTP id DD3B4B0CEBEA626A9554;
+        Tue, 14 Jan 2020 13:57:09 +0000 (GMT)
+Received: from lhreml724-chm.china.huawei.com (10.201.108.75) by
+ lhreml707-cah.china.huawei.com (10.201.108.48) with Microsoft SMTP Server
+ (TLS) id 14.3.408.0; Tue, 14 Jan 2020 13:57:09 +0000
+Received: from [127.0.0.1] (10.202.226.43) by lhreml724-chm.china.huawei.com
+ (10.201.108.75) with Microsoft SMTP Server (version=TLS1_2,
+ cipher=TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256) id 15.1.1713.5; Tue, 14 Jan
+ 2020 13:57:09 +0000
+Subject: Re: [PATCH 09/11] megaraid_sas: switch fusion adapters to MQ
+From:   John Garry <john.garry@huawei.com>
 To:     Ming Lei <ming.lei@redhat.com>
-Cc:     Peter Xu <peterx@redhat.com>, Juri Lelli <juri.lelli@redhat.com>,
-        Ming Lei <minlei@redhat.com>,
-        Linux Kernel Mailing List <linux-kernel@vger.kernel.org>,
-        linux-block@vger.kernel.org
-Subject: Re: Kernel-managed IRQ affinity (cont)
-In-Reply-To: <20200111024835.GA24575@ming.t460p>
-References: <20191216195712.GA161272@xz-x1> <20191219082819.GB15731@ming.t460p> <20191219143214.GA50561@xz-x1> <20191219161115.GA18672@ming.t460p> <87eew8l7oz.fsf@nanos.tec.linutronix.de> <20200110012802.GA4501@ming.t460p> <87v9pjrtbh.fsf@nanos.tec.linutronix.de> <20200111024835.GA24575@ming.t460p>
-Date:   Tue, 14 Jan 2020 14:45:00 +0100
-Message-ID: <87r202b19f.fsf@nanos.tec.linutronix.de>
+CC:     Sumit Saxena <sumit.saxena@broadcom.com>,
+        Hannes Reinecke <hare@suse.de>,
+        "Martin K. Petersen" <martin.petersen@oracle.com>,
+        Jens Axboe <axboe@kernel.dk>, Christoph Hellwig <hch@lst.de>,
+        James Bottomley <james.bottomley@hansenpartnership.com>,
+        Linux SCSI List <linux-scsi@vger.kernel.org>,
+        <linux-block@vger.kernel.org>, Hannes Reinecke <hare@suse.com>
+References: <20191202153914.84722-1-hare@suse.de>
+ <20191202153914.84722-10-hare@suse.de>
+ <CAL2rwxqjiRTuZ0ntfaHHzG7z-VmxRQCXYyxZeX9eDMrmX+dbGg@mail.gmail.com>
+ <339f089f-26aa-1cbe-416b-67809ea6791f@huawei.com>
+ <20200110020038.GB4501@ming.t460p>
+ <1383a868-76d8-5c26-556d-7374e189b7ce@huawei.com>
+Message-ID: <71cf0932-ab93-675c-4d7c-37889c003468@huawei.com>
+Date:   Tue, 14 Jan 2020 13:57:08 +0000
+User-Agent: Mozilla/5.0 (Windows NT 10.0; WOW64; rv:68.0) Gecko/20100101
+ Thunderbird/68.1.2
 MIME-Version: 1.0
-Content-Type: text/plain
-X-Linutronix-Spam-Score: -1.0
-X-Linutronix-Spam-Level: -
-X-Linutronix-Spam-Status: No , -1.0 points, 5.0 required,  ALL_TRUSTED=-1,SHORTCIRCUIT=-0.0001
+In-Reply-To: <1383a868-76d8-5c26-556d-7374e189b7ce@huawei.com>
+Content-Type: text/plain; charset="utf-8"; format=flowed
+Content-Language: en-US
+Content-Transfer-Encoding: 7bit
+X-Originating-IP: [10.202.226.43]
+X-ClientProxiedBy: lhreml729-chm.china.huawei.com (10.201.108.80) To
+ lhreml724-chm.china.huawei.com (10.201.108.75)
+X-CFilter-Loop: Reflected
 Sender: linux-block-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-Ming,
+On 10/01/2020 12:09, John Garry wrote:
+>>>>>
+>>>>> Fusion adapters can steer completions to individual queues, and
+>>>>> we now have support for shared host-wide tags.
+>>>>> So we can enable multiqueue support for fusion adapters and
+>>>>> drop the hand-crafted interrupt affinity settings.
+>>>>
+>>>> Hi Hannes,
+>>>>
+>>>> Ming Lei also proposed similar changes in megaraid_sas driver some
+>>>> time back and it had resulted in performance drop-
+>>>> https://patchwork.kernel.org/patch/10969511/
+>>>>
+>>>> So, we will do some performance tests with this patch and update you.
+>>>>
+>>>
+>>> Hi Sumit,
+>>>
+>>> I was wondering if you had a chance to do this test yet?
+>>>
+>>> It would be good to know, so we can try to progress this work.
+>>
+>> Looks most of the comment in the following link isn't addressed:
+>>
+>> https://lore.kernel.org/linux-block/20191129002540.GA1829@ming.t460p/
+> 
+> OK, but I was waiting for results first, which I hoped would not take 
+> too long. They weren't forgotten, for sure. Let me check them now.
 
-Ming Lei <ming.lei@redhat.com> writes:
-> On Fri, Jan 10, 2020 at 08:43:14PM +0100, Thomas Gleixner wrote:
->> Ming Lei <ming.lei@redhat.com> writes:
->> > That is why I try to exclude isolated CPUs from interrupt effective affinity,
->> > turns out the approach is simple and doable.
->> 
->> Yes, it's doable. But it still is inconsistent behaviour. Assume the
->> following configuration:
->> 
->>   8 CPUs CPU0,1 assigned for housekeeping
->> 
->> With 8 queues the proposed change does nothing because each queue is
->> mapped to exactly one CPU.
->
-> That is expected behavior for this RT case, given userspace won't submit
-> IO from isolated CPUs.
+Hi Ming,
 
-What is _this_ RT case? We really don't implement policy for a specific
-use case. If the kernel implements a policy then it has to be generally
-useful and practical.
+I think that your questions here were related to the shared scheduler 
+tags, which was Hannes' proposal (I initially had it in v2 series, but 
+dropped it for v3).
 
->> With 4 queues you get the following:
->> 
->>  CPU0,1       queue 0
->>  CPU2,3       queue 1
->>  CPU4,5       queue 2
->>  CPU6,7       queue 3
->> 
->> No effect on the isolated CPUs either.
->> 
->> With 2 queues you get the following:
->> 
->>  CPU0,1,2,3   queue 0
->>  CPU4,5,6,7   queue 1
->> 
->> So here the isolated CPUs 2 and 3 get the isolation, but 4-7
->> not. That's perhaps intended, but definitely not documented.
->
-> That is intentional change, given no IO will be submitted from 4-7
-> most of times in RT case, so it is fine to select effective CPU from
-> isolated CPUs in this case. As peter mentioned, IO may just be submitted
-> from isolated CPUs during booting. Once the system is setup, no IO
-> comes from isolated CPUs, then no interrupt is delivered to isolated
-> CPUs, then meet RT's requirement.
-
-Again. This is a specific usecase. Is this generally applicable?
-
-> We can document this change somewhere.
-
-Yes, this needs to be documented very clearly with that command line
-parameter.
-
->> So you really need to make your mind up and describe what the intended
->> effect of this is and why you think that the result is correct.
->
-> In short, if there is at least one housekeeping available in the
-> interrupt's affinity, we choose effective CPU from housekeeping CPUs.
-> Otherwise, keep the current behavior wrt. selecting effective CPU.
->
-> With this approach, no interrupts can be delivered to isolated CPUs
-> if no IOs are submitted from these CPUs.
->
-> Please let us know if it addresses your concerns.
-
-Mostly. See above.
+I was just content to maintain the concept of shared driver tags.
 
 Thanks,
+John
 
-        tglx
-
+> 
+>>
+>>> Firstly too much((nr_hw_queues - 1) times) memory is wasted. Secondly IO
+>>> latency could be increased by too deep scheduler queue depth. Finally 
+>>> CPU
+>>> could be wasted in the retrying of running busy hw queue.
+>>>
+>>> Wrt. driver tags, this patch may be worse, given the average limit for
+>>> each LUN is reduced by (nr_hw_queues) times, see hctx_may_queue().
+>>>
+>>> Another change is bt_wait_ptr(). Before your patches, there is single
+>>> .wait_index, now the number of .wait_index is changed to nr_hw_queues.
+>>>
+>>> Also the run queue number is increased a lot in SCSI's IO completion, 
+>>> see
+>>> scsi_end_request().
+>>
+>> I guess memory waste won't be a blocker.
+> 
+> Yeah, that's a trade-off. And, as I remember, memory waste does not seem 
+> extreme.
+> 
+>>
+>> But it may not be one accepted behavior to reduce average active queue
+>> depth for each LUN by nr_hw_queues times, meantime scheduler queue depth
+>> is increased by nr_hw_queues times, compared with single queue.
+>>
+> 
+> Thanks,
+> John
 
