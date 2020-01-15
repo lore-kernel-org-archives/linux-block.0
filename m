@@ -2,285 +2,378 @@ Return-Path: <SRS0=otcQ=3E=vger.kernel.org=linux-block-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-8.4 required=3.0 tests=DKIMWL_WL_HIGH,DKIM_SIGNED,
-	DKIM_VALID,DKIM_VALID_AU,HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,
-	MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,USER_AGENT_SANE_1
-	autolearn=ham autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-5.9 required=3.0 tests=DKIMWL_WL_HIGH,DKIM_SIGNED,
+	DKIM_VALID,DKIM_VALID_AU,HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,
+	MENTIONS_GIT_HOSTING,SPF_HELO_NONE,SPF_PASS autolearn=unavailable
+	autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 7AEA4C33CB1
-	for <linux-block@archiver.kernel.org>; Wed, 15 Jan 2020 12:08:15 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 18AB5C33CB1
+	for <linux-block@archiver.kernel.org>; Wed, 15 Jan 2020 13:30:54 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.kernel.org (Postfix) with ESMTP id 435B62077B
-	for <linux-block@archiver.kernel.org>; Wed, 15 Jan 2020 12:08:15 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id D59DA2084D
+	for <linux-block@archiver.kernel.org>; Wed, 15 Jan 2020 13:30:53 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="Ji3A+DPj"
+	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="fkVzISqp"
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1730156AbgAOMIO (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Wed, 15 Jan 2020 07:08:14 -0500
-Received: from us-smtp-delivery-1.mimecast.com ([205.139.110.120]:42337 "EHLO
-        us-smtp-1.mimecast.com" rhost-flags-OK-OK-OK-FAIL) by vger.kernel.org
-        with ESMTP id S1726165AbgAOMIO (ORCPT
+        id S1726483AbgAONat (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Wed, 15 Jan 2020 08:30:49 -0500
+Received: from us-smtp-1.mimecast.com ([205.139.110.61]:25134 "EHLO
+        us-smtp-delivery-1.mimecast.com" rhost-flags-OK-OK-OK-FAIL)
+        by vger.kernel.org with ESMTP id S1726501AbgAONar (ORCPT
         <rfc822;linux-block@vger.kernel.org>);
-        Wed, 15 Jan 2020 07:08:14 -0500
+        Wed, 15 Jan 2020 08:30:47 -0500
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-        s=mimecast20190719; t=1579090091;
+        s=mimecast20190719; t=1579095045;
         h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
          to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-         in-reply-to:in-reply-to:references:references;
-        bh=yci8QqmUG9eX0bqdhdqmXnydR/+o5Bc1jvXfsSImcjU=;
-        b=Ji3A+DPjVzt9mltAV4TGPZwB9Ew1NsX++ur9I57/LfPt0Gu4pgJ7jt7sUNewLUI30qhbWo
-        17WBRcBo+pLKd7jOfqCP51Xn7EYgLwlC8kRyfCrAjVOouDO0BGizO660SDp6ED+pAUcTlR
-        cC9zkpWVUCOMh6/W8yBJYuVEzBg4yfQ=
+         content-transfer-encoding:content-transfer-encoding;
+        bh=dSuwXOkLNc2+9CyhIpo9YFvHDt0jRh9GE8hPRzqPdYM=;
+        b=fkVzISqpU3byc3/4wB74jubV1wIRdWezhku1IJggvIw6J0TLmP1ugy/F0SeXMCHPCMlcqN
+        +1+EMpvrTFuJn1IPt9LRPuYKiNwa5f1gODyD6FHRH9/zvXOqBBqyJrrejSn+kpHbW9NUWz
+        LBXQhTVySy88pnhTGTfJwCweefflIas=
 Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
  [209.132.183.4]) (Using TLS) by relay.mimecast.com with ESMTP id
- us-mta-190-fEGBndkcMICk-5N39HdhKw-1; Wed, 15 Jan 2020 07:08:08 -0500
-X-MC-Unique: fEGBndkcMICk-5N39HdhKw-1
-Received: from smtp.corp.redhat.com (int-mx04.intmail.prod.int.phx2.redhat.com [10.5.11.14])
+ us-mta-246-yUq0FqlTM4qAN6FBI1N9QA-1; Wed, 15 Jan 2020 08:30:42 -0500
+X-MC-Unique: yUq0FqlTM4qAN6FBI1N9QA-1
+Received: from smtp.corp.redhat.com (int-mx08.intmail.prod.int.phx2.redhat.com [10.5.11.23])
         (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
         (No client certificate requested)
-        by mimecast-mx01.redhat.com (Postfix) with ESMTPS id B452410054E3;
-        Wed, 15 Jan 2020 12:08:07 +0000 (UTC)
-Received: from ming.t460p (ovpn-8-17.pek2.redhat.com [10.72.8.17])
-        by smtp.corp.redhat.com (Postfix) with ESMTPS id 103955D9C5;
-        Wed, 15 Jan 2020 12:08:02 +0000 (UTC)
-Date:   Wed, 15 Jan 2020 20:07:57 +0800
-From:   Ming Lei <ming.lei@redhat.com>
-To:     Jens Axboe <axboe@kernel.dk>
-Cc:     linux-block@vger.kernel.org
-Subject: Re: [PATCH 6/6] blk-mq: allocate tags in batches
-Message-ID: <20200115120757.GA30398@ming.t460p>
-References: <20200107163037.31745-1-axboe@kernel.dk>
- <20200107163037.31745-7-axboe@kernel.dk>
+        by mimecast-mx01.redhat.com (Postfix) with ESMTPS id D4ED36A2B2;
+        Wed, 15 Jan 2020 13:30:39 +0000 (UTC)
+Received: from warthog.procyon.org.uk (ovpn-120-52.rdu2.redhat.com [10.10.120.52])
+        by smtp.corp.redhat.com (Postfix) with ESMTP id 853AD19757;
+        Wed, 15 Jan 2020 13:30:36 +0000 (UTC)
+Subject: [RFC PATCH 00/14] pipe: Keyrings,
+ Block and USB notifications [ver #3]
+From:   David Howells <dhowells@redhat.com>
+To:     torvalds@linux-foundation.org
+Cc:     dhowells@redhat.com,
+        Greg Kroah-Hartman <gregkh@linuxfoundation.org>,
+        Casey Schaufler <casey@schaufler-ca.com>,
+        Stephen Smalley <sds@tycho.nsa.gov>, nicolas.dichtel@6wind.com,
+        raven@themaw.net, Christian Brauner <christian@brauner.io>,
+        dhowells@redhat.com, keyrings@vger.kernel.org,
+        linux-usb@vger.kernel.org, linux-block@vger.kernel.org,
+        linux-security-module@vger.kernel.org,
+        linux-fsdevel@vger.kernel.org, linux-api@vger.kernel.org,
+        linux-security-module@vger.kernel.org, linux-kernel@vger.kernel.org
+Date:   Wed, 15 Jan 2020 13:30:35 +0000
+Message-ID: <157909503552.20155.3030058841911628518.stgit@warthog.procyon.org.uk>
+User-Agent: StGit/unknown-version
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <20200107163037.31745-7-axboe@kernel.dk>
-User-Agent: Mutt/1.12.1 (2019-06-15)
-X-Scanned-By: MIMEDefang 2.79 on 10.5.11.14
+Content-Type: text/plain; charset="utf-8"
+Content-Transfer-Encoding: 7bit
+X-Scanned-By: MIMEDefang 2.84 on 10.5.11.23
 Sender: linux-block-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-On Tue, Jan 07, 2020 at 09:30:37AM -0700, Jens Axboe wrote:
-> Instead of grabbing tags one by one, grab a batch and store the local
-> cache in the software queue. Then subsequent tag allocations can just
-> grab free tags from there, without having to hit the shared tag map.
-> 
-> We flush these batches out if we run out of tags on the hardware queue.
-> The intent here is this should rarely happen.
-> 
-> This works very well in practice, with anywhere from 40-60 batch counts
-> seen regularly in testing.
 
-Could you describe your test a bit? I am just wondering if multi-task IO
-can perform well as before.
+Here's a set of patches to add a general notification queue concept and to
+add event sources such as:
 
-> 
-> Signed-off-by: Jens Axboe <axboe@kernel.dk>
-> ---
->  block/blk-mq-debugfs.c |  18 +++++++
->  block/blk-mq-tag.c     | 104 ++++++++++++++++++++++++++++++++++++++++-
->  block/blk-mq-tag.h     |   3 ++
->  block/blk-mq.c         |  16 +++++--
->  block/blk-mq.h         |   5 ++
->  include/linux/blk-mq.h |   2 +
->  6 files changed, 144 insertions(+), 4 deletions(-)
-> 
-> diff --git a/block/blk-mq-debugfs.c b/block/blk-mq-debugfs.c
-> index e789f830ff59..914be72d080e 100644
-> --- a/block/blk-mq-debugfs.c
-> +++ b/block/blk-mq-debugfs.c
-> @@ -659,6 +659,23 @@ CTX_RQ_SEQ_OPS(default, HCTX_TYPE_DEFAULT);
->  CTX_RQ_SEQ_OPS(read, HCTX_TYPE_READ);
->  CTX_RQ_SEQ_OPS(poll, HCTX_TYPE_POLL);
->  
-> +static ssize_t ctx_tag_hit_write(void *data, const char __user *buf,
-> +				    size_t count, loff_t *ppos)
-> +{
-> +	struct blk_mq_ctx *ctx = data;
-> +
-> +	ctx->tag_hit = ctx->tag_refill = 0;
-> +	return count;
-> +}
-> +
-> +static int ctx_tag_hit_show(void *data, struct seq_file *m)
-> +{
-> +	struct blk_mq_ctx *ctx = data;
-> +
-> +	seq_printf(m, "hit=%lu refills=%lu\n", ctx->tag_hit, ctx->tag_refill);
-> +	return 0;
-> +}
-> +
->  static int ctx_dispatched_show(void *data, struct seq_file *m)
->  {
->  	struct blk_mq_ctx *ctx = data;
-> @@ -800,6 +817,7 @@ static const struct blk_mq_debugfs_attr blk_mq_debugfs_ctx_attrs[] = {
->  	{"read_rq_list", 0400, .seq_ops = &ctx_read_rq_list_seq_ops},
->  	{"poll_rq_list", 0400, .seq_ops = &ctx_poll_rq_list_seq_ops},
->  	{"dispatched", 0600, ctx_dispatched_show, ctx_dispatched_write},
-> +	{"tag_hit", 0600, ctx_tag_hit_show, ctx_tag_hit_write},
->  	{"merged", 0600, ctx_merged_show, ctx_merged_write},
->  	{"completed", 0600, ctx_completed_show, ctx_completed_write},
->  	{},
-> diff --git a/block/blk-mq-tag.c b/block/blk-mq-tag.c
-> index fbacde454718..94c1f16c6c71 100644
-> --- a/block/blk-mq-tag.c
-> +++ b/block/blk-mq-tag.c
-> @@ -99,6 +99,100 @@ static int __blk_mq_get_tag(struct blk_mq_alloc_data *data,
->  		return __sbitmap_queue_get(bt);
->  }
->  
-> +static void ctx_flush_ipi(void *data)
-> +{
-> +	struct blk_mq_hw_ctx *hctx = data;
-> +	struct sbitmap_queue *bt = &hctx->tags->bitmap_tags;
-> +	struct blk_mq_ctx *ctx;
-> +	unsigned int i;
-> +
-> +	ctx = __blk_mq_get_ctx(hctx->queue, smp_processor_id());
-> +
-> +	for (i = 0; i < hctx->queue->tag_set->nr_maps; i++) {
-> +		struct blk_mq_ctx_type *type = &ctx->type[i];
-> +
-> +		if (!type->tags)
-> +			continue;
-> +
-> +		__sbitmap_queue_clear_batch(bt, type->tag_offset, type->tags);
-> +		type->tags = 0;
-> +	}
-> +	atomic_dec(&hctx->flush_pending);
-> +}
-> +
-> +void blk_mq_tag_ctx_flush_batch(struct blk_mq_hw_ctx *hctx,
-> +				struct blk_mq_ctx *ctx)
-> +{
-> +	atomic_inc(&hctx->flush_pending);
-> +	smp_call_function_single(ctx->cpu, ctx_flush_ipi, hctx, false);
-> +}
-> +
-> +static void blk_mq_tag_flush_batches(struct blk_mq_hw_ctx *hctx)
-> +{
-> +	if (atomic_cmpxchg(&hctx->flush_pending, 0, hctx->nr_ctx))
-> +		return;
-> +	preempt_disable();
-> +	if (cpumask_test_cpu(smp_processor_id(), hctx->cpumask))
-> +		ctx_flush_ipi(hctx);
-> +	smp_call_function_many(hctx->cpumask, ctx_flush_ipi, hctx, false);
-> +	preempt_enable();
-> +}
-> +
-> +void blk_mq_tag_queue_flush_batches(struct request_queue *q)
-> +{
-> +	struct blk_mq_hw_ctx *hctx;
-> +	unsigned int i;
-> +
-> +	queue_for_each_hw_ctx(q, hctx, i)
-> +		blk_mq_tag_flush_batches(hctx);
-> +}
-> +
-> +static int blk_mq_get_tag_batch(struct blk_mq_alloc_data *data)
-> +{
-> +	struct blk_mq_hw_ctx *hctx = data->hctx;
-> +	struct blk_mq_ctx_type *type;
-> +	struct blk_mq_ctx *ctx = data->ctx;
-> +	struct blk_mq_tags *tags;
-> +	struct sbitmap_queue *bt;
-> +	int tag = -1;
-> +
-> +	if (!ctx || (data->flags & BLK_MQ_REQ_INTERNAL))
-> +		return -1;
-> +
-> +	tags = hctx->tags;
-> +	bt = &tags->bitmap_tags;
-> +	/* don't do batches for round-robin or (very) sparse maps */
-> +	if (bt->round_robin || bt->sb.shift < ilog2(BITS_PER_LONG) - 1)
-> +		return -1;
-> +
-> +	/* we could make do with preempt disable, but we need to block flush */
-> +	local_irq_disable();
-> +	if (unlikely(ctx->cpu != smp_processor_id()))
-> +		goto out;
-> +
-> +	type = &ctx->type[hctx->type];
-> +
-> +	if (type->tags) {
-> +get_tag:
-> +		ctx->tag_hit++;
-> +
-> +		tag = __ffs(type->tags);
-> +		type->tags &= ~(1UL << tag);
-> +		tag += type->tag_offset;
-> +out:
-> +		local_irq_enable();
-> +		return tag;
-> +	}
-> +
-> +	/* no current tag cache, attempt to refill a batch */
-> +	if (!__sbitmap_queue_get_batch(bt, &type->tag_offset, &type->tags)) {
-> +		ctx->tag_refill++;
-> +		goto get_tag;
-> +	}
-> +
-> +	goto out;
-> +}
-> +
->  unsigned int blk_mq_get_tag(struct blk_mq_alloc_data *data)
->  {
->  	struct blk_mq_tags *tags = blk_mq_tags_from_data(data);
-> @@ -116,8 +210,13 @@ unsigned int blk_mq_get_tag(struct blk_mq_alloc_data *data)
->  		bt = &tags->breserved_tags;
->  		tag_offset = 0;
->  	} else {
-> -		bt = &tags->bitmap_tags;
->  		tag_offset = tags->nr_reserved_tags;
-> +
-> +		tag = blk_mq_get_tag_batch(data);
-> +		if (tag != -1)
-> +			goto found_tag;
-> +
-> +		bt = &tags->bitmap_tags;
->  	}
->  
->  	tag = __blk_mq_get_tag(data, bt);
-> @@ -152,6 +251,9 @@ unsigned int blk_mq_get_tag(struct blk_mq_alloc_data *data)
->  		if (tag != -1)
->  			break;
->  
-> +		if (!(data->flags & BLK_MQ_REQ_RESERVED))
-> +			blk_mq_tag_flush_batches(data->hctx);
-> +
->  		bt_prev = bt;
->  		io_schedule();
->  
-> diff --git a/block/blk-mq-tag.h b/block/blk-mq-tag.h
-> index 15bc74acb57e..b5964fff1630 100644
-> --- a/block/blk-mq-tag.h
-> +++ b/block/blk-mq-tag.h
-> @@ -34,6 +34,9 @@ extern int blk_mq_tag_update_depth(struct blk_mq_hw_ctx *hctx,
->  extern void blk_mq_tag_wakeup_all(struct blk_mq_tags *tags, bool);
->  void blk_mq_queue_tag_busy_iter(struct request_queue *q, busy_iter_fn *fn,
->  		void *priv);
-> +void blk_mq_tag_queue_flush_batches(struct request_queue *q);
-> +void blk_mq_tag_ctx_flush_batch(struct blk_mq_hw_ctx *hctx,
-> +				struct blk_mq_ctx *ctx);
->  
->  static inline struct sbq_wait_state *bt_wait_ptr(struct sbitmap_queue *bt,
->  						 struct blk_mq_hw_ctx *hctx)
-> diff --git a/block/blk-mq.c b/block/blk-mq.c
-> index cc48a0ffa5ec..81140f61a7c9 100644
-> --- a/block/blk-mq.c
-> +++ b/block/blk-mq.c
-> @@ -2255,6 +2255,8 @@ static int blk_mq_hctx_notify_dead(unsigned int cpu, struct hlist_node *node)
->  	ctx = __blk_mq_get_ctx(hctx->queue, cpu);
->  	type = hctx->type;
->  
-> +	blk_mq_tag_ctx_flush_batch(hctx, ctx);
+ (1) Keys/keyrings, such as linking and unlinking keys and changing their
+     attributes.
 
-When blk_mq_hctx_notify_dead() is called, the 'cpu' has been offline
-already, so the flush via IPI may not work as expected.
+ (2) General device events (single common queue) including:
+
+     - Block layer events, such as device errors
+
+     - USB subsystem events, such as device attach/remove, device reset,
+       device errors.
+
+I have patches for adding superblock and mount topology watches also,
+though those are not in this set as there are other dependencies.
+
+LSM hooks are included:
+
+ (1) A set of hooks are provided that allow an LSM to rule on whether or
+     not a watch may be set.  Each of these hooks takes a different
+     "watched object" parameter, so they're not really shareable.  The LSM
+     should use current's credentials.  [Wanted by SELinux & Smack]
+
+ (2) A hook is provided to allow an LSM to rule on whether or not a
+     particular message may be posted to a particular queue.  This is given
+     the credentials from the event generator (which may be the system) and
+     the watch setter.  [Wanted by Smack]
+
+I've provided SELinux and Smack with implementations of some of these hooks.
+
+Why:
+
+ (1) Key/keyring notifications.
+
+     If you have your kerberos tickets in a file/directory, your gnome desktop
+     will monitor that using something like fanotify and tell you if your
+     credentials cache changes.
+
+     We also have the ability to cache your kerberos tickets in the session,
+     user or persistent keyring so that it isn't left around on disk across a
+     reboot or logout.  Keyrings, however, cannot currently be monitored
+     asynchronously, so the desktop has to poll for it - not so good on a
+     laptop.
+
+     This source will allow the desktop to avoid the need to poll.
+
+ (2) USB notifications.
+
+     GregKH was looking for a way to do USB notifications as I was looking to
+     find additional sources to implement.  I'm not sure how he wants to use
+     them, but I'll let him speak to that himself.
+
+ (3) Block notifications.
+
+     This one I was thinking that I could make something like ddrescue better
+     by letting it get notifications this way.  This was a target of
+     convenience since I had a dodgy disk I was trying to rescue.
+
+     It could also potentially be used help systemd, say, detect broken
+     devices and avoid trying to unmount them when trying to reboot the machine.
+
+     I can drop this for now if you prefer.
+
+ (4) Mount notifications.
+
+     This one is wanted to avoid repeated trawling of /proc/mounts or similar
+     to work out changes to the mount object attributes and mount topology.
+     I'm told that the proc file holding the namespace_sem is a point of
+     contention, especially as the process of generating the text descriptions
+     of the mounts/superblocks can be quite involved.
+
+     The notifications directly indicate the mounts involved in any particular
+     event and what the change was.  You can poll /proc/mounts, but all you
+     know is that something changed; you don't know what and you don't know
+     how and reading that file may race with multiple changed being effected.
+
+     I pair this with a new fsinfo() system call that allows, amongst other
+     things, the ability to retrieve in one go an { id, change counter } tuple
+     from all the children of a specified mount, allowing buffer overruns to
+     be cleaned up quickly.
+
+     It's not just Red Hat that's potentially interested in this:
+
+	https://lore.kernel.org/linux-fsdevel/293c9bd3-f530-d75e-c353-ddeabac27cf6@6wind.com/
+
+ (5) Superblock notifications.
+
+     This one is provided to allow systemd or the desktop to more easily
+     detect events such as I/O errors and EDQUOT/ENOSPC.
+
+Design decisions:
+
+ (1) The notification queue is built on top of a standard pipe.  Messages
+     are effectively spliced in.  The pipe is opened with a special flag:
+
+	pipe2(fds, O_NOTIFICATION_PIPE);
+
+     The special flag has the same value as O_EXCL (which doesn't seem like
+     it will ever be applicable in this context)[?].  It is given up front
+     to make it a lot easier to prohibit splice and co. from accessing the
+     pipe.
+
+     [?] Should this be done some other way?  I'd rather not use up a new
+     O_* flag if I can avoid it - should I add a pipe3() system call
+     instead?
+
+     The pipe is then configured::
+
+	ioctl(fds[1], IOC_WATCH_QUEUE_SET_SIZE, queue_depth);
+	ioctl(fds[1], IOC_WATCH_QUEUE_SET_FILTER, &filter);
+
+     Messages are then read out of the pipe using read().
+
+ (2) It should be possible to allow write() to insert data into the
+     notification pipes too, but this is currently disabled as the kernel
+     has to be able to insert messages into the pipe *without* holding
+     pipe->mutex and the code to make this work needs careful auditing.
+
+ (3) sendfile(), splice() and vmsplice() are disabled on notification pipes
+     because of the pipe->mutex issue and also because they sometimes want
+     to revert what they just did - but one or more notification messages
+     might've been interleaved in the ring.
+
+ (4) The kernel inserts messages with the wait queue spinlock held.  This
+     means that pipe_read() and pipe_write() have to take the spinlock to
+     update the queue pointers.
+
+ (5) Records in the buffer are binary, typed and have a length so that they
+     can be of varying size.
+
+     This allows multiple heterogeneous sources to share a common buffer;
+     there are 16 million types available, of which I've used just a few,
+     so there is scope for others to be used.  Tags may be specified when a
+     watchpoint is created to help distinguish the sources.
+
+ (6) Records are filterable as types have up to 256 subtypes that can be
+     individually filtered.  Other filtration is also available.
+
+ (7) Notification pipes don't interfere with each other; each may be bound
+     to a different set of watches.  Any particular notification will be
+     copied to all the queues that are currently watching for it - and only
+     those that are watching for it.
+
+ (8) When recording a notification, the kernel will not sleep, but will
+     rather mark a queue as having lost a message if there's insufficient
+     space.  read() will fabricate a loss notification message at an
+     appropriate point later.
+
+ (9) The notification pipe is created and then watchpoints are attached to
+     it, using one of:
+
+	keyctl_watch_key(KEY_SPEC_SESSION_KEYRING, fds[1], 0x01);
+	watch_devices(fds[1], 0x02, 0);
+
+     where in both cases, fd indicates the queue and the number after is a
+     tag between 0 and 255.
+
+(10) Watches are removed if either the notification pipe is destroyed or
+     the watched object is destroyed.  In the latter case, a message will
+     be generated indicating the enforced watch removal.
 
 
-Thanks,
-Ming
+Things I want to avoid:
+
+ (1) Introducing features that make the core VFS dependent on the network
+     stack or networking namespaces (ie. usage of netlink).
+
+ (2) Dumping all this stuff into dmesg and having a daemon that sits there
+     parsing the output and distributing it as this then puts the
+     responsibility for security into userspace and makes handling
+     namespaces tricky.  Further, dmesg might not exist or might be
+     inaccessible inside a container.
+
+ (3) Letting users see events they shouldn't be able to see.
+
+
+Testing and manpages:
+
+ (*) The keyutils tree has a pipe-watch branch that has keyctl commands for
+     making use of notifications.  Proposed manual pages can also be found
+     on this branch, though a couple of them really need to go to the main
+     manpages repository instead.
+
+     If the kernel supports the watching of keys, then running "make test"
+     on that branch will cause the testing infrastructure to spawn a
+     monitoring process on the side that monitors a notifications pipe for
+     all the key/keyring changes induced by the tests and they'll all be
+     checked off to make sure they happened.
+
+	https://git.kernel.org/pub/scm/linux/kernel/git/dhowells/keyutils.git/log/?h=pipe-watch
+
+ (*) A test program is provided (samples/watch_queue/watch_test) that can
+     be used to monitor for keyrings, some USB and some block device
+     events.  Information on the notifications is simply logged to stdout.
+
+The kernel patches can also be found here:
+
+	https://git.kernel.org/pub/scm/linux/kernel/git/dhowells/linux-fs.git/log/?h=notifications-pipe-core
+
+Changes:
+
+ ver #3:
+
+ (*) Rebase to after latest upstream pipe patches.
+ (*) Fix a missing ref get in add_watch_to_object().
+
+ ver #2:
+
+ (*) Declare O_NOTIFICATION_PIPE to use and switch it to be the same value
+     as O_EXCL rather then O_TMPFILE (the latter is a bit nasty in its
+     implementation).
+
+ ver #1:
+
+ (*) Build on top of standard pipes instead of having a driver.
+
+David
+---
+David Howells (14):
+      uapi: General notification queue definitions
+      security: Add hooks to rule on setting a watch
+      security: Add a hook for the point of notification insertion
+      pipe: Add O_NOTIFICATION_PIPE
+      pipe: Add general notification queue support
+      keys: Add a notification facility
+      Add sample notification program
+      pipe: Allow buffers to be marked read-whole-or-error for notifications
+      pipe: Add notification lossage handling
+      Add a general, global device notification watch list
+      block: Add block layer notifications
+      usb: Add USB subsystem notifications
+      selinux: Implement the watch_key security hook
+      smack: Implement the watch_key and post_notification hooks
+
+
+ Documentation/security/keys/core.rst               |   58 ++
+ Documentation/userspace-api/ioctl/ioctl-number.rst |    1 
+ Documentation/watch_queue.rst                      |  385 ++++++++++++
+ arch/alpha/kernel/syscalls/syscall.tbl             |    1 
+ arch/arm/tools/syscall.tbl                         |    1 
+ arch/arm64/include/asm/unistd.h                    |    2 
+ arch/arm64/include/asm/unistd32.h                  |    2 
+ arch/ia64/kernel/syscalls/syscall.tbl              |    1 
+ arch/m68k/kernel/syscalls/syscall.tbl              |    1 
+ arch/microblaze/kernel/syscalls/syscall.tbl        |    1 
+ arch/mips/kernel/syscalls/syscall_n32.tbl          |    1 
+ arch/mips/kernel/syscalls/syscall_n64.tbl          |    1 
+ arch/mips/kernel/syscalls/syscall_o32.tbl          |    1 
+ arch/parisc/kernel/syscalls/syscall.tbl            |    1 
+ arch/powerpc/kernel/syscalls/syscall.tbl           |    1 
+ arch/s390/kernel/syscalls/syscall.tbl              |    1 
+ arch/sh/kernel/syscalls/syscall.tbl                |    1 
+ arch/sparc/kernel/syscalls/syscall.tbl             |    1 
+ arch/x86/entry/syscalls/syscall_32.tbl             |    1 
+ arch/x86/entry/syscalls/syscall_64.tbl             |    1 
+ arch/xtensa/kernel/syscalls/syscall.tbl            |    1 
+ block/Kconfig                                      |    9 
+ block/blk-core.c                                   |   29 +
+ drivers/base/Kconfig                               |    9 
+ drivers/base/Makefile                              |    1 
+ drivers/base/watch.c                               |   90 +++
+ drivers/usb/core/Kconfig                           |    9 
+ drivers/usb/core/devio.c                           |   47 +
+ drivers/usb/core/hub.c                             |    4 
+ fs/pipe.c                                          |  242 +++++--
+ fs/splice.c                                        |   12 
+ include/linux/blkdev.h                             |   15 
+ include/linux/device.h                             |    7 
+ include/linux/key.h                                |    3 
+ include/linux/lsm_audit.h                          |    1 
+ include/linux/lsm_hooks.h                          |   38 +
+ include/linux/pipe_fs_i.h                          |   27 +
+ include/linux/security.h                           |   31 +
+ include/linux/syscalls.h                           |    1 
+ include/linux/usb.h                                |   18 +
+ include/linux/watch_queue.h                        |  127 ++++
+ include/uapi/asm-generic/unistd.h                  |    4 
+ include/uapi/linux/keyctl.h                        |    2 
+ include/uapi/linux/watch_queue.h                   |  158 +++++
+ init/Kconfig                                       |   12 
+ kernel/Makefile                                    |    1 
+ kernel/sys_ni.c                                    |    1 
+ kernel/watch_queue.c                               |  659 ++++++++++++++++++++
+ samples/Kconfig                                    |    6 
+ samples/Makefile                                   |    1 
+ samples/watch_queue/Makefile                       |    7 
+ samples/watch_queue/watch_test.c                   |  251 ++++++++
+ security/keys/Kconfig                              |    9 
+ security/keys/compat.c                             |    3 
+ security/keys/gc.c                                 |    5 
+ security/keys/internal.h                           |   30 +
+ security/keys/key.c                                |   38 +
+ security/keys/keyctl.c                             |   99 +++
+ security/keys/keyring.c                            |   20 -
+ security/keys/request_key.c                        |    4 
+ security/security.c                                |   23 +
+ security/selinux/hooks.c                           |   14 
+ security/smack/smack_lsm.c                         |   82 ++
+ 63 files changed, 2506 insertions(+), 107 deletions(-)
+ create mode 100644 Documentation/watch_queue.rst
+ create mode 100644 drivers/base/watch.c
+ create mode 100644 include/linux/watch_queue.h
+ create mode 100644 include/uapi/linux/watch_queue.h
+ create mode 100644 kernel/watch_queue.c
+ create mode 100644 samples/watch_queue/Makefile
+ create mode 100644 samples/watch_queue/watch_test.c
 
