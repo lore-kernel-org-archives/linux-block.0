@@ -2,53 +2,54 @@ Return-Path: <SRS0=otcQ=3E=vger.kernel.org=linux-block-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-5.2 required=3.0 tests=DKIMWL_WL_HIGH,DKIM_SIGNED,
+X-Spam-Status: No, score=-6.9 required=3.0 tests=DKIMWL_WL_HIGH,DKIM_SIGNED,
 	DKIM_VALID,DKIM_VALID_AU,HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,
-	MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,URIBL_BLACK
-	autolearn=unavailable autolearn_force=no version=3.4.0
+	MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS autolearn=ham
+	autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id D5014C33CB3
-	for <linux-block@archiver.kernel.org>; Wed, 15 Jan 2020 13:32:48 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 7AF9AC33CB1
+	for <linux-block@archiver.kernel.org>; Wed, 15 Jan 2020 13:32:51 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.kernel.org (Postfix) with ESMTP id 975F92077B
-	for <linux-block@archiver.kernel.org>; Wed, 15 Jan 2020 13:32:48 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id 4FCD92077B
+	for <linux-block@archiver.kernel.org>; Wed, 15 Jan 2020 13:32:51 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="fUOK91om"
+	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="HuSYNWEw"
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1729015AbgAONcr (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Wed, 15 Jan 2020 08:32:47 -0500
-Received: from us-smtp-1.mimecast.com ([205.139.110.61]:27334 "EHLO
-        us-smtp-delivery-1.mimecast.com" rhost-flags-OK-OK-OK-FAIL)
-        by vger.kernel.org with ESMTP id S1728915AbgAONc0 (ORCPT
+        id S1729427AbgAONcu (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Wed, 15 Jan 2020 08:32:50 -0500
+Received: from us-smtp-delivery-1.mimecast.com ([207.211.31.120]:31815 "EHLO
+        us-smtp-1.mimecast.com" rhost-flags-OK-OK-OK-FAIL) by vger.kernel.org
+        with ESMTP id S1729107AbgAONcu (ORCPT
         <rfc822;linux-block@vger.kernel.org>);
-        Wed, 15 Jan 2020 08:32:26 -0500
+        Wed, 15 Jan 2020 08:32:50 -0500
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-        s=mimecast20190719; t=1579095145;
+        s=mimecast20190719; t=1579095169;
         h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
          to:to:cc:cc:mime-version:mime-version:content-type:content-type:
          content-transfer-encoding:content-transfer-encoding:
          in-reply-to:in-reply-to:references:references;
-        bh=xw/f3n5bD2UHropjz/lBOnsY06YP1A7ZbnfKqMhhuJc=;
-        b=fUOK91om8ppPW56IoaqEQdAxQHaJL/u4nToc6U+a/21DjdLtqNR2uZyBYN8KGnNtqZqrA7
-        m8GYR84tsrKn2Yv/1tRWpyIWJgtMYGAmlUU+hqJYiE3vxJ9imp1xESWy6AlW/UZOWBmvyj
-        RaTYSXWINfsOOUjFKqQVhVxQ3pPvnFI=
+        bh=utVDqKWa9w0MxbNr+//nh4VRwHhuaYt/H7MzHznHw2c=;
+        b=HuSYNWEwFntXJUigqVy5RbjDP/E9XoQ8fIBTTcgAtjB3+PRvM1cD46EgMDIFUzHby7vXcB
+        qtkn7lEgoVBHeaJX5dKQeBzv1m1WpUt6CSGtsWpmSIuf2wAULjkzyO3G5pgTtubBTvEQzL
+        Q0DUAi4lYIWpvJz7t4GJYepRd12fYYw=
 Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
  [209.132.183.4]) (Using TLS) by relay.mimecast.com with ESMTP id
- us-mta-116-cbtRm0YyPgSkOTBs1g_Kiw-1; Wed, 15 Jan 2020 08:32:19 -0500
-X-MC-Unique: cbtRm0YyPgSkOTBs1g_Kiw-1
-Received: from smtp.corp.redhat.com (int-mx06.intmail.prod.int.phx2.redhat.com [10.5.11.16])
+ us-mta-205-Z5OoyMoLMUy-Z43N4Lej6A-1; Wed, 15 Jan 2020 08:32:45 -0500
+X-MC-Unique: Z5OoyMoLMUy-Z43N4Lej6A-1
+Received: from smtp.corp.redhat.com (int-mx02.intmail.prod.int.phx2.redhat.com [10.5.11.12])
         (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
         (No client certificate requested)
-        by mimecast-mx01.redhat.com (Postfix) with ESMTPS id 78721800D50;
-        Wed, 15 Jan 2020 13:32:17 +0000 (UTC)
+        by mimecast-mx01.redhat.com (Postfix) with ESMTPS id 7F4DE801E72;
+        Wed, 15 Jan 2020 13:32:43 +0000 (UTC)
 Received: from warthog.procyon.org.uk (ovpn-120-52.rdu2.redhat.com [10.10.120.52])
-        by smtp.corp.redhat.com (Postfix) with ESMTP id BB2595C28C;
-        Wed, 15 Jan 2020 13:32:14 +0000 (UTC)
+        by smtp.corp.redhat.com (Postfix) with ESMTP id C3C2660BF4;
+        Wed, 15 Jan 2020 13:32:40 +0000 (UTC)
 Organization: Red Hat UK Ltd. Registered Address: Red Hat UK Ltd, Amberley
  Place, 107-111 Peascod Street, Windsor, Berkshire, SI4 1TE, United
  Kingdom.
  Registered in England and Wales under Company Registration No. 3798903
-Subject: [RFC PATCH 11/14] block: Add block layer notifications [ver #3]
+Subject: [RFC PATCH 14/14] smack: Implement the watch_key and
+ post_notification hooks [ver #3]
 From:   David Howells <dhowells@redhat.com>
 To:     torvalds@linux-foundation.org
 Cc:     dhowells@redhat.com,
@@ -61,321 +62,159 @@ Cc:     dhowells@redhat.com,
         linux-security-module@vger.kernel.org,
         linux-fsdevel@vger.kernel.org, linux-api@vger.kernel.org,
         linux-security-module@vger.kernel.org, linux-kernel@vger.kernel.org
-Date:   Wed, 15 Jan 2020 13:32:14 +0000
-Message-ID: <157909513401.20155.11696586597485616420.stgit@warthog.procyon.org.uk>
+Date:   Wed, 15 Jan 2020 13:32:40 +0000
+Message-ID: <157909516006.20155.16914270465856385214.stgit@warthog.procyon.org.uk>
 In-Reply-To: <157909503552.20155.3030058841911628518.stgit@warthog.procyon.org.uk>
 References: <157909503552.20155.3030058841911628518.stgit@warthog.procyon.org.uk>
 User-Agent: StGit/unknown-version
 MIME-Version: 1.0
 Content-Type: text/plain; charset="utf-8"
 Content-Transfer-Encoding: 7bit
-X-Scanned-By: MIMEDefang 2.79 on 10.5.11.16
+X-Scanned-By: MIMEDefang 2.79 on 10.5.11.12
 Sender: linux-block-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-Add a block layer notification mechanism whereby notifications about
-block-layer events such as I/O errors, can be reported to a monitoring
-process asynchronously.
+Implement the watch_key security hook in Smack to make sure that a key
+grants the caller Read permission in order to set a watch on a key.
 
-Firstly, an event queue needs to be created:
+Also implement the post_notification security hook to make sure that the
+notification source is granted Write permission by the watch queue.
 
-	pipe2(fds, O_NOTIFICATION_PIPE);
-	ioctl(fds[1], IOC_WATCH_QUEUE_SET_SIZE, 256);
-
-then a notification can be set up to report block notifications via that
-queue:
-
-	struct watch_notification_filter filter = {
-		.nr_filters = 1,
-		.filters = {
-			[0] = {
-				.type = WATCH_TYPE_BLOCK_NOTIFY,
-				.subtype_filter[0] = UINT_MAX;
-			},
-		},
-	};
-	ioctl(fds[1], IOC_WATCH_QUEUE_SET_FILTER, &filter);
-	watch_devices(fds[1], 12);
-
-After that, records will be placed into the queue when, for example, errors
-occur on a block device.  Records are of the following format:
-
-	struct block_notification {
-		struct watch_notification watch;
-		__u64	dev;
-		__u64	sector;
-	} *n;
-
-Where:
-
-	n->watch.type will be WATCH_TYPE_BLOCK_NOTIFY
-
-	n->watch.subtype will be the type of notification, such as
-	NOTIFY_BLOCK_ERROR_CRITICAL_MEDIUM.
-
-	n->watch.info & WATCH_INFO_LENGTH will indicate the length of the
-	record.
-
-	n->watch.info & WATCH_INFO_ID will be the second argument to
-	watch_devices(), shifted.
-
-	n->dev will be the device numbers munged together.
-
-	n->sector will indicate the affected sector (if appropriate for the
-	event).
-
-Note that it is permissible for event records to be of variable length -
-or, at least, the length may be dependent on the subtype.
+For the moment, the watch_devices security hook is left unimplemented as
+it's not obvious what the object should be since the queue is global and
+didn't previously exist.
 
 Signed-off-by: David Howells <dhowells@redhat.com>
+Acked-by: Casey Schaufler <casey@schaufler-ca.com>
 ---
 
- Documentation/watch_queue.rst    |    4 +++-
- block/Kconfig                    |    9 +++++++++
- block/blk-core.c                 |   29 ++++++++++++++++++++++++++++
- include/linux/blkdev.h           |   15 ++++++++++++++
- include/uapi/linux/watch_queue.h |   30 ++++++++++++++++++++++++++++-
- samples/watch_queue/watch_test.c |   40 +++++++++++++++++++++++++++++++++++++-
- 6 files changed, 124 insertions(+), 3 deletions(-)
+ include/linux/lsm_audit.h  |    1 +
+ security/smack/smack_lsm.c |   82 +++++++++++++++++++++++++++++++++++++++++++-
+ 2 files changed, 82 insertions(+), 1 deletion(-)
 
-diff --git a/Documentation/watch_queue.rst b/Documentation/watch_queue.rst
-index ed592700be0e..f2299f631ae8 100644
---- a/Documentation/watch_queue.rst
-+++ b/Documentation/watch_queue.rst
-@@ -8,7 +8,9 @@ opened by userspace.  This can be used in conjunction with::
+diff --git a/include/linux/lsm_audit.h b/include/linux/lsm_audit.h
+index 915330abf6e5..734d67889826 100644
+--- a/include/linux/lsm_audit.h
++++ b/include/linux/lsm_audit.h
+@@ -74,6 +74,7 @@ struct common_audit_data {
+ #define LSM_AUDIT_DATA_FILE	12
+ #define LSM_AUDIT_DATA_IBPKEY	13
+ #define LSM_AUDIT_DATA_IBENDPORT 14
++#define LSM_AUDIT_DATA_NOTIFICATION 15
+ 	union 	{
+ 		struct path path;
+ 		struct dentry *dentry;
+diff --git a/security/smack/smack_lsm.c b/security/smack/smack_lsm.c
+index ecea41ce919b..71b6f37d49c1 100644
+--- a/security/smack/smack_lsm.c
++++ b/security/smack/smack_lsm.c
+@@ -4273,7 +4273,7 @@ static int smack_key_permission(key_ref_t key_ref,
+ 	if (tkp == NULL)
+ 		return -EACCES;
  
-   * Key/keyring notifications
+-	if (smack_privileged_cred(CAP_MAC_OVERRIDE, cred))
++	if (smack_privileged(CAP_MAC_OVERRIDE))
+ 		return 0;
  
--  * General device event notifications
-+  * General device event notifications, including::
-+
-+    * Block layer event notifications
- 
- 
- The notifications buffers can be enabled by:
-diff --git a/block/Kconfig b/block/Kconfig
-index c23094a14a2b..9fa6ce2177bc 100644
---- a/block/Kconfig
-+++ b/block/Kconfig
-@@ -181,6 +181,15 @@ config BLK_SED_OPAL
- 	Enabling this option enables users to setup/unlock/lock
- 	Locking ranges for SED devices using the Opal protocol.
- 
-+config BLK_NOTIFICATIONS
-+	bool "Block layer event notifications"
-+	depends on DEVICE_NOTIFICATIONS
-+	help
-+	  This option provides support for getting block layer event
-+	  notifications.  This makes use of the /dev/watch_queue misc device to
-+	  handle the notification buffer and provides the device_notify() system
-+	  call to enable/disable watches.
-+
- menu "Partition Types"
- 
- source "block/partitions/Kconfig"
-diff --git a/block/blk-core.c b/block/blk-core.c
-index 089e890ab208..50a5de025d5e 100644
---- a/block/blk-core.c
-+++ b/block/blk-core.c
-@@ -187,6 +187,22 @@ static const struct {
- 	[BLK_STS_IOERR]		= { -EIO,	"I/O" },
- };
- 
-+#ifdef CONFIG_BLK_NOTIFICATIONS
-+static const
-+enum block_notification_type blk_notifications[ARRAY_SIZE(blk_errors)] = {
-+	[BLK_STS_TIMEOUT]	= NOTIFY_BLOCK_ERROR_TIMEOUT,
-+	[BLK_STS_NOSPC]		= NOTIFY_BLOCK_ERROR_NO_SPACE,
-+	[BLK_STS_TRANSPORT]	= NOTIFY_BLOCK_ERROR_RECOVERABLE_TRANSPORT,
-+	[BLK_STS_TARGET]	= NOTIFY_BLOCK_ERROR_CRITICAL_TARGET,
-+	[BLK_STS_NEXUS]		= NOTIFY_BLOCK_ERROR_CRITICAL_NEXUS,
-+	[BLK_STS_MEDIUM]	= NOTIFY_BLOCK_ERROR_CRITICAL_MEDIUM,
-+	[BLK_STS_PROTECTION]	= NOTIFY_BLOCK_ERROR_PROTECTION,
-+	[BLK_STS_RESOURCE]	= NOTIFY_BLOCK_ERROR_KERNEL_RESOURCE,
-+	[BLK_STS_DEV_RESOURCE]	= NOTIFY_BLOCK_ERROR_DEVICE_RESOURCE,
-+	[BLK_STS_IOERR]		= NOTIFY_BLOCK_ERROR_IO,
-+};
-+#endif
-+
- blk_status_t errno_to_blk_status(int errno)
- {
- 	int i;
-@@ -227,6 +243,19 @@ static void print_req_error(struct request *req, blk_status_t status,
- 		req->cmd_flags & ~REQ_OP_MASK,
- 		req->nr_phys_segments,
- 		IOPRIO_PRIO_CLASS(req->ioprio));
-+
-+#ifdef CONFIG_BLK_NOTIFICATIONS
-+	if (blk_notifications[idx]) {
-+		struct block_notification n = {
-+			.watch.type	= WATCH_TYPE_BLOCK_NOTIFY,
-+			.watch.subtype	= blk_notifications[idx],
-+			.watch.info	= watch_sizeof(n),
-+			.dev		= req->rq_disk ? disk_devt(req->rq_disk) : 0,
-+			.sector		= blk_rq_pos(req),
-+		};
-+		post_block_notification(&n);
-+	}
-+#endif
+ #ifdef CONFIG_AUDIT
+@@ -4319,8 +4319,81 @@ static int smack_key_getsecurity(struct key *key, char **_buffer)
+ 	return length;
  }
  
- static void req_bio_endio(struct request *rq, struct bio *bio,
-diff --git a/include/linux/blkdev.h b/include/linux/blkdev.h
-index 47eb22a3b7f9..3cd1853dbdac 100644
---- a/include/linux/blkdev.h
-+++ b/include/linux/blkdev.h
-@@ -27,6 +27,7 @@
- #include <linux/percpu-refcount.h>
- #include <linux/scatterlist.h>
- #include <linux/blkzoned.h>
-+#include <linux/watch_queue.h>
- 
- struct module;
- struct scsi_ioctl_command;
-@@ -1770,6 +1771,20 @@ static inline bool blk_req_can_dispatch_to_zone(struct request *rq)
- }
- #endif /* CONFIG_BLK_DEV_ZONED */
- 
-+#ifdef CONFIG_BLK_NOTIFICATIONS
-+static inline void post_block_notification(struct block_notification *n)
-+{
-+	u64 id = 0; /* Might want to allow dev# here. */
 +
-+	post_device_notification(&n->watch, id);
-+}
-+#else
-+static inline void post_block_notification(struct block_notification *n)
-+{
-+}
-+#endif
-+
-+
- #else /* CONFIG_BLOCK */
- 
- struct block_device;
-diff --git a/include/uapi/linux/watch_queue.h b/include/uapi/linux/watch_queue.h
-index c3d8320b5d3a..557771413242 100644
---- a/include/uapi/linux/watch_queue.h
-+++ b/include/uapi/linux/watch_queue.h
-@@ -14,7 +14,8 @@
- enum watch_notification_type {
- 	WATCH_TYPE_META		= 0,	/* Special record */
- 	WATCH_TYPE_KEY_NOTIFY	= 1,	/* Key change event notification */
--	WATCH_TYPE__NR		= 2
-+	WATCH_TYPE_BLOCK_NOTIFY	= 2,	/* Block layer event notification */
-+	WATCH_TYPE__NR		= 3
- };
- 
- enum watch_meta_notification_subtype {
-@@ -101,4 +102,31 @@ struct key_notification {
- 	__u32	aux;		/* Per-type auxiliary data */
- };
- 
-+/*
-+ * Type of block layer notification.
++#ifdef CONFIG_KEY_NOTIFICATIONS
++/**
++ * smack_watch_key - Smack access to watch a key for notifications.
++ * @key: The key to be watched
++ *
++ * Return 0 if the @watch->cred has permission to read from the key object and
++ * an error otherwise.
 + */
-+enum block_notification_type {
-+	NOTIFY_BLOCK_ERROR_TIMEOUT		= 1, /* Timeout error */
-+	NOTIFY_BLOCK_ERROR_NO_SPACE		= 2, /* Critical space allocation error */
-+	NOTIFY_BLOCK_ERROR_RECOVERABLE_TRANSPORT = 3, /* Recoverable transport error */
-+	NOTIFY_BLOCK_ERROR_CRITICAL_TARGET	= 4, /* Critical target error */
-+	NOTIFY_BLOCK_ERROR_CRITICAL_NEXUS	= 5, /* Critical nexus error */
-+	NOTIFY_BLOCK_ERROR_CRITICAL_MEDIUM	= 6, /* Critical medium error */
-+	NOTIFY_BLOCK_ERROR_PROTECTION		= 7, /* Protection error */
-+	NOTIFY_BLOCK_ERROR_KERNEL_RESOURCE	= 8, /* Kernel resource error */
-+	NOTIFY_BLOCK_ERROR_DEVICE_RESOURCE	= 9, /* Device resource error */
-+	NOTIFY_BLOCK_ERROR_IO			= 10, /* Other I/O error */
-+};
-+
-+/*
-+ * Block layer notification record.
-+ * - watch.type = WATCH_TYPE_BLOCK_NOTIFY
-+ * - watch.subtype = enum block_notification_type
-+ */
-+struct block_notification {
-+	struct watch_notification watch; /* WATCH_TYPE_BLOCK_NOTIFY */
-+	__u64	dev;			/* Device number */
-+	__u64	sector;			/* Affected sector */
-+};
-+
- #endif /* _UAPI_LINUX_WATCH_QUEUE_H */
-diff --git a/samples/watch_queue/watch_test.c b/samples/watch_queue/watch_test.c
-index 0eaff5dc04c3..f5260fb792d1 100644
---- a/samples/watch_queue/watch_test.c
-+++ b/samples/watch_queue/watch_test.c
-@@ -58,6 +58,32 @@ static void saw_key_change(struct watch_notification *n, size_t len)
- 	       k->key_id, n->subtype, key_subtypes[n->subtype], k->aux);
- }
- 
-+static const char *block_subtypes[256] = {
-+	[NOTIFY_BLOCK_ERROR_TIMEOUT]			= "timeout",
-+	[NOTIFY_BLOCK_ERROR_NO_SPACE]			= "critical space allocation",
-+	[NOTIFY_BLOCK_ERROR_RECOVERABLE_TRANSPORT]	= "recoverable transport",
-+	[NOTIFY_BLOCK_ERROR_CRITICAL_TARGET]		= "critical target",
-+	[NOTIFY_BLOCK_ERROR_CRITICAL_NEXUS]		= "critical nexus",
-+	[NOTIFY_BLOCK_ERROR_CRITICAL_MEDIUM]		= "critical medium",
-+	[NOTIFY_BLOCK_ERROR_PROTECTION]			= "protection",
-+	[NOTIFY_BLOCK_ERROR_KERNEL_RESOURCE]		= "kernel resource",
-+	[NOTIFY_BLOCK_ERROR_DEVICE_RESOURCE]		= "device resource",
-+	[NOTIFY_BLOCK_ERROR_IO]				= "I/O",
-+};
-+
-+static void saw_block_change(struct watch_notification *n, size_t len)
++static int smack_watch_key(struct key *key)
 +{
-+	struct block_notification *b = (struct block_notification *)n;
++	struct smk_audit_info ad;
++	struct smack_known *tkp = smk_of_current();
++	int rc;
 +
-+	if (len < sizeof(struct block_notification))
-+		return;
++	if (key == NULL)
++		return -EINVAL;
++	/*
++	 * If the key hasn't been initialized give it access so that
++	 * it may do so.
++	 */
++	if (key->security == NULL)
++		return 0;
++	/*
++	 * This should not occur
++	 */
++	if (tkp == NULL)
++		return -EACCES;
 +
-+	printf("BLOCK %08llx e=%u[%s] s=%llx\n",
-+	       (unsigned long long)b->dev,
-+	       n->subtype, block_subtypes[n->subtype],
-+	       (unsigned long long)b->sector);
++	if (smack_privileged_cred(CAP_MAC_OVERRIDE, current_cred()))
++		return 0;
++
++#ifdef CONFIG_AUDIT
++	smk_ad_init(&ad, __func__, LSM_AUDIT_DATA_KEY);
++	ad.a.u.key_struct.key = key->serial;
++	ad.a.u.key_struct.key_desc = key->description;
++#endif
++	rc = smk_access(tkp, key->security, MAY_READ, &ad);
++	rc = smk_bu_note("key watch", tkp, key->security, MAY_READ, rc);
++	return rc;
 +}
++#endif /* CONFIG_KEY_NOTIFICATIONS */
+ #endif /* CONFIG_KEYS */
+ 
++#ifdef CONFIG_WATCH_QUEUE
++/**
++ * smack_post_notification - Smack access to post a notification to a queue
++ * @w_cred: The credentials of the watcher.
++ * @cred: The credentials of the event source (may be NULL).
++ * @n: The notification message to be posted.
++ */
++static int smack_post_notification(const struct cred *w_cred,
++				   const struct cred *cred,
++				   struct watch_notification *n)
++{
++	struct smk_audit_info ad;
++	struct smack_known *subj, *obj;
++	int rc;
++
++	/* Always let maintenance notifications through. */
++	if (n->type == WATCH_TYPE_META)
++		return 0;
++
++	if (!cred)
++		return 0;
++	subj = smk_of_task(smack_cred(cred));
++	obj = smk_of_task(smack_cred(w_cred));
++
++	smk_ad_init(&ad, __func__, LSM_AUDIT_DATA_NOTIFICATION);
++	rc = smk_access(subj, obj, MAY_WRITE, &ad);
++	rc = smk_bu_note("notification", subj, obj, MAY_WRITE, rc);
++	return rc;
++}
++#endif /* CONFIG_WATCH_QUEUE */
 +
  /*
-  * Consume and display events.
-  */
-@@ -131,6 +157,9 @@ static void consumer(int fd)
- 			case WATCH_TYPE_KEY_NOTIFY:
- 				saw_key_change(&n.n, len);
- 				break;
-+			case WATCH_TYPE_BLOCK_NOTIFY:
-+				saw_block_change(&n.n, len);
-+				break;
- 			default:
- 				printf("other type\n");
- 				break;
-@@ -142,12 +171,16 @@ static void consumer(int fd)
- }
+  * Smack Audit hooks
+  *
+@@ -4709,8 +4782,15 @@ static struct security_hook_list smack_hooks[] __lsm_ro_after_init = {
+ 	LSM_HOOK_INIT(key_free, smack_key_free),
+ 	LSM_HOOK_INIT(key_permission, smack_key_permission),
+ 	LSM_HOOK_INIT(key_getsecurity, smack_key_getsecurity),
++#ifdef CONFIG_KEY_NOTIFICATIONS
++	LSM_HOOK_INIT(watch_key, smack_watch_key),
++#endif
+ #endif /* CONFIG_KEYS */
  
- static struct watch_notification_filter filter = {
--	.nr_filters	= 1,
-+	.nr_filters	= 2,
- 	.filters = {
- 		[0]	= {
- 			.type			= WATCH_TYPE_KEY_NOTIFY,
- 			.subtype_filter[0]	= UINT_MAX,
- 		},
-+		[1]	= {
-+			.type			= WATCH_TYPE_BLOCK_NOTIFY,
-+			.subtype_filter[0]	= UINT_MAX,
-+		},
- 	},
- };
- 
-@@ -181,6 +214,11 @@ int main(int argc, char **argv)
- 		exit(1);
- 	}
- 
-+	if (syscall(__NR_watch_devices, fd, 0x04, 0) == -1) {
-+		perror("watch_devices");
-+		exit(1);
-+	}
++#ifdef CONFIG_WATCH_QUEUE
++	LSM_HOOK_INIT(post_notification, smack_post_notification),
++#endif
 +
- 	consumer(fd);
- 	exit(0);
- }
+  /* Audit hooks */
+ #ifdef CONFIG_AUDIT
+ 	LSM_HOOK_INIT(audit_rule_init, smack_audit_rule_init),
 
