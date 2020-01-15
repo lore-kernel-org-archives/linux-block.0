@@ -2,97 +2,142 @@ Return-Path: <SRS0=otcQ=3E=vger.kernel.org=linux-block-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-0.6 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
-	HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS
-	autolearn=no autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-5.4 required=3.0 tests=FROM_LOCAL_HEX,
+	HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,MENTIONS_GIT_HOSTING,
+	SPF_HELO_NONE,SPF_PASS autolearn=unavailable autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id CA65AC3F68F
-	for <linux-block@archiver.kernel.org>; Wed, 15 Jan 2020 15:30:42 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 84D7DC33CB1
+	for <linux-block@archiver.kernel.org>; Wed, 15 Jan 2020 16:15:18 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.kernel.org (Postfix) with ESMTP id A1BD62467A
-	for <linux-block@archiver.kernel.org>; Wed, 15 Jan 2020 15:30:42 +0000 (UTC)
-Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (2048-bit key) header.d=infradead.org header.i=@infradead.org header.b="KTafuKCn"
+	by mail.kernel.org (Postfix) with ESMTP id 5C459214AF
+	for <linux-block@archiver.kernel.org>; Wed, 15 Jan 2020 16:15:18 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1726483AbgAOPal (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Wed, 15 Jan 2020 10:30:41 -0500
-Received: from bombadil.infradead.org ([198.137.202.133]:50916 "EHLO
-        bombadil.infradead.org" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1726132AbgAOPal (ORCPT
+        id S1728901AbgAOQPN (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Wed, 15 Jan 2020 11:15:13 -0500
+Received: from mail-il1-f200.google.com ([209.85.166.200]:39399 "EHLO
+        mail-il1-f200.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S1726248AbgAOQPN (ORCPT
         <rfc822;linux-block@vger.kernel.org>);
-        Wed, 15 Jan 2020 10:30:41 -0500
-DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed;
-        d=infradead.org; s=bombadil.20170209; h=In-Reply-To:Content-Type:MIME-Version
-        :References:Message-ID:Subject:Cc:To:From:Date:Sender:Reply-To:
-        Content-Transfer-Encoding:Content-ID:Content-Description:Resent-Date:
-        Resent-From:Resent-Sender:Resent-To:Resent-Cc:Resent-Message-ID:List-Id:
-        List-Help:List-Unsubscribe:List-Subscribe:List-Post:List-Owner:List-Archive;
-         bh=hlxbWHBq8lfTBkbbWblALE5WfMIrcmCMtir+afT5h7g=; b=KTafuKCnLEQxrDndx0KF1DZxC
-        rnKdoLI6sypMh61W+oBSzZckG9nErVqXpqRux90/jnJHBoNxCmDRhLN16rsx5kcLMMQTzpNlRHW3V
-        Kn+EfBOj9xXDn+MMy1P1Ce1dDs4zbgiDeuR8jQgZiUt61hA4+gx5SghScUnsRQG1ziTZYHV9R9Zgf
-        pJxhgaR5AeWS3+N32IQliDA3Jqotb5XQKegSIoZaLpNN+GhynXNs1L5cGpIhmQbJynCGULBXCRnjC
-        vAgzg7hshbf2g9UxNsiPKchC1nKbZKVYFzdAbYAS/fNwV5Y2i+QhIqJe1mPDizEBhtnZaTAQECgQV
-        KQqONFysg==;
-Received: from hch by bombadil.infradead.org with local (Exim 4.92.3 #3 (Red Hat Linux))
-        id 1irkce-0002dy-Qu; Wed, 15 Jan 2020 15:30:20 +0000
-Date:   Wed, 15 Jan 2020 07:30:20 -0800
-From:   Christoph Hellwig <hch@infradead.org>
-To:     John Hubbard <jhubbard@nvidia.com>
-Cc:     Andrew Morton <akpm@linux-foundation.org>,
-        Al Viro <viro@zeniv.linux.org.uk>,
-        Alex Williamson <alex.williamson@redhat.com>,
-        Benjamin Herrenschmidt <benh@kernel.crashing.org>,
-        =?iso-8859-1?Q?Bj=F6rn_T=F6pel?= <bjorn.topel@intel.com>,
-        Christoph Hellwig <hch@infradead.org>,
-        Dan Williams <dan.j.williams@intel.com>,
-        Daniel Vetter <daniel@ffwll.ch>,
-        Dave Chinner <david@fromorbit.com>,
-        David Airlie <airlied@linux.ie>,
-        "David S . Miller" <davem@davemloft.net>,
-        Ira Weiny <ira.weiny@intel.com>, Jan Kara <jack@suse.cz>,
-        Jason Gunthorpe <jgg@ziepe.ca>, Jens Axboe <axboe@kernel.dk>,
-        Jonathan Corbet <corbet@lwn.net>,
-        =?iso-8859-1?B?Suly9G1l?= Glisse <jglisse@redhat.com>,
-        "Kirill A . Shutemov" <kirill@shutemov.name>,
-        Magnus Karlsson <magnus.karlsson@intel.com>,
-        Mauro Carvalho Chehab <mchehab@kernel.org>,
-        Michael Ellerman <mpe@ellerman.id.au>,
-        Michal Hocko <mhocko@suse.com>,
-        Mike Kravetz <mike.kravetz@oracle.com>,
-        Paul Mackerras <paulus@samba.org>,
-        Shuah Khan <shuah@kernel.org>,
-        Vlastimil Babka <vbabka@suse.cz>, bpf@vger.kernel.org,
-        dri-devel@lists.freedesktop.org, kvm@vger.kernel.org,
-        linux-block@vger.kernel.org, linux-doc@vger.kernel.org,
-        linux-fsdevel@vger.kernel.org, linux-kselftest@vger.kernel.org,
-        linux-media@vger.kernel.org, linux-rdma@vger.kernel.org,
-        linuxppc-dev@lists.ozlabs.org, netdev@vger.kernel.org,
-        linux-mm@kvack.org, LKML <linux-kernel@vger.kernel.org>,
-        Mike Rapoport <rppt@linux.ibm.com>
-Subject: Re: [PATCH v12 11/22] mm/gup: introduce pin_user_pages*() and
- FOLL_PIN
-Message-ID: <20200115153020.GF19546@infradead.org>
-References: <20200107224558.2362728-1-jhubbard@nvidia.com>
- <20200107224558.2362728-12-jhubbard@nvidia.com>
+        Wed, 15 Jan 2020 11:15:13 -0500
+Received: by mail-il1-f200.google.com with SMTP id n6so13750765ile.6
+        for <linux-block@vger.kernel.org>; Wed, 15 Jan 2020 08:15:13 -0800 (PST)
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20161025;
+        h=x-gm-message-state:mime-version:date:message-id:subject:from:to;
+        bh=0Cf6ZphCZYNLk3aMASlUpbTauK9EgyI+kH/XKXJeTh8=;
+        b=J8dd0qWWJtIgwhIjrBMsBA47QOT6ql9JQ8lv7t4jUZn0BzMai0wF8pb24IdyZ/Q6pZ
+         femKMbs0/YzBU+UJeJAivStyltU9JZZbBKOmpJb/OboJkO714EejbCPydAXwWA01LQFP
+         wdZ0T1/c9G17FSSUHkhdY1Hj7nXVXwd9MdOgIB9202kC5iElfPbCt8oLjA5k9TUYZ5l9
+         mPAZfTjpW/W50v3otxRGCBiQbOw9xNziyENNSQ/FsMuGvexLQm5n0dij1Il+ngldXh5+
+         nHkCUY3e2wkpGD5UempVowGmRTB4bi9UTkCAvzIWC/T8euB/eQ2H3zLnvDPB81f49nMB
+         312w==
+X-Gm-Message-State: APjAAAW93d2y+DZjvhD7VN1cq//CaL4b3jF56a/gMEJIp85UO++VZpvN
+        2TF2thcp0qnEBg9jvgA1CMp5FYETX4MPPN3sa3kE+WY7tPor
+X-Google-Smtp-Source: APXvYqwfRsBBbJBifQ7RCfcxQmK6ZLIT8rJpubcScU624bYMWwroDHBbnv0d4FhB+q1u791/Q3siJ2cps49pYQN5i0SrbL5a7ymR
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <20200107224558.2362728-12-jhubbard@nvidia.com>
-X-SRS-Rewrite: SMTP reverse-path rewritten from <hch@infradead.org> by bombadil.infradead.org. See http://www.infradead.org/rpr.html
+X-Received: by 2002:a6b:8ecd:: with SMTP id q196mr22125597iod.136.1579104912850;
+ Wed, 15 Jan 2020 08:15:12 -0800 (PST)
+Date:   Wed, 15 Jan 2020 08:15:12 -0800
+X-Google-Appengine-App-Id: s~syzkaller
+X-Google-Appengine-App-Id-Alias: syzkaller
+Message-ID: <00000000000064c69e059c3003f6@google.com>
+Subject: WARNING in schedule_bh
+From:   syzbot <syzbot+bfc0855888f853dca7ad@syzkaller.appspotmail.com>
+To:     axboe@kernel.dk, dri-devel@lists.freedesktop.org,
+        efremov@linux.com, linaro-mm-sig@lists.linaro.org,
+        linux-block@vger.kernel.org, linux-kernel@vger.kernel.org,
+        linux-media@vger.kernel.org, sumit.semwal@linaro.org,
+        syzkaller-bugs@googlegroups.com
+Content-Type: text/plain; charset="UTF-8"; format=flowed; delsp=yes
 Sender: linux-block-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-On Tue, Jan 07, 2020 at 02:45:47PM -0800, John Hubbard wrote:
-> Introduce pin_user_pages*() variations of get_user_pages*() calls,
-> and also pin_longterm_pages*() variations.
-> 
-> For now, these are placeholder calls, until the various call sites
-> are converted to use the correct get_user_pages*() or
-> pin_user_pages*() API.
+Hello,
 
-What do the pure placeholders buy us?  The API itself looks ok,
-but until it actually is properly implemented it doesn't help at
-all, and we've had all kinds of bad experiences with these sorts
-of stub APIs.
+syzbot found the following crash on:
+
+HEAD commit:    95e20af9 Merge tag 'nfs-for-5.5-2' of git://git.linux-nfs...
+git tree:       upstream
+console output: https://syzkaller.appspot.com/x/log.txt?x=17648c21e00000
+kernel config:  https://syzkaller.appspot.com/x/.config?x=d9290aeb7e6cf1c4
+dashboard link: https://syzkaller.appspot.com/bug?extid=bfc0855888f853dca7ad
+compiler:       gcc (GCC) 9.0.0 20181231 (experimental)
+userspace arch: i386
+
+Unfortunately, I don't have any reproducer for this crash yet.
+
+IMPORTANT: if you fix the bug, please add the following tag to the commit:
+Reported-by: syzbot+bfc0855888f853dca7ad@syzkaller.appspotmail.com
+
+------------[ cut here ]------------
+WARNING: CPU: 3 PID: 12339 at drivers/block/floppy.c:985  
+schedule_bh+0x67/0x70 drivers/block/floppy.c:985
+Kernel panic - not syncing: panic_on_warn set ...
+CPU: 3 PID: 12339 Comm: syz-executor.1 Not tainted 5.5.0-rc6-syzkaller #0
+Hardware name: QEMU Standard PC (Q35 + ICH9, 2009), BIOS  
+rel-1.12.0-59-gc9ba5276e321-prebuilt.qemu.org 04/01/2014
+Call Trace:
+  __dump_stack lib/dump_stack.c:77 [inline]
+  dump_stack+0x197/0x210 lib/dump_stack.c:118
+  panic+0x2e3/0x75c kernel/panic.c:221
+  __warn.cold+0x2f/0x3e kernel/panic.c:582
+  report_bug+0x289/0x300 lib/bug.c:195
+  fixup_bug arch/x86/kernel/traps.c:174 [inline]
+  fixup_bug arch/x86/kernel/traps.c:169 [inline]
+  do_error_trap+0x11b/0x200 arch/x86/kernel/traps.c:267
+  do_invalid_op+0x37/0x50 arch/x86/kernel/traps.c:286
+  invalid_op+0x23/0x30 arch/x86/entry/entry_64.S:1027
+RIP: 0010:schedule_bh+0x67/0x70 drivers/block/floppy.c:985
+Code: fd 48 8b 35 8b 82 ab 07 48 c7 c2 c0 80 00 8a bf 40 00 00 00 4c 89 25  
+98 7d ab 07 e8 93 51 e3 fc 5b 41 5c 5d c3 e8 09 4a 0b fd <0f> 0b eb ce 0f  
+1f 44 00 00 55 48 89 e5 e8 f7 49 0b fd 48 c7 c7 10
+RSP: 0018:ffffc900075774b0 EFLAGS: 00010212
+RAX: 0000000000040000 RBX: 0000000000000001 RCX: ffffc900039f0000
+RDX: 00000000000086ed RSI: ffffffff8469ab77 RDI: 0000000000000007
+RBP: ffffc900075774c0 R08: ffff888028b50d40 R09: fffffbfff1401019
+R10: fffffbfff1401018 R11: ffffffff8a0080c7 R12: ffffffff846a94a0
+R13: ffffffff846a94a0 R14: 0000000000000001 R15: 0000000000000001
+  wait_til_done+0x88/0x370 drivers/block/floppy.c:1977
+  poll_drive+0xd5/0xf0 drivers/block/floppy.c:2939
+  floppy_check_events+0x39f/0x440 drivers/block/floppy.c:4107
+  disk_check_events+0x13b/0x5c0 block/genhd.c:1859
+  disk_clear_events+0x143/0x318 block/genhd.c:1819
+  check_disk_change+0x79/0x140 fs/block_dev.c:1488
+  floppy_open+0x6ba/0xae0 drivers/block/floppy.c:4067
+  __blkdev_get+0x34f/0x1650 fs/block_dev.c:1604
+  blkdev_get+0x47/0x2c0 fs/block_dev.c:1736
+  blkdev_open+0x205/0x290 fs/block_dev.c:1875
+  do_dentry_open+0x4e6/0x1380 fs/open.c:797
+  vfs_open+0xa0/0xd0 fs/open.c:914
+  do_last fs/namei.c:3420 [inline]
+  path_openat+0x10df/0x4500 fs/namei.c:3537
+  do_filp_open+0x1a1/0x280 fs/namei.c:3567
+  do_sys_open+0x3fe/0x5d0 fs/open.c:1097
+  __do_compat_sys_open fs/open.c:1134 [inline]
+  __se_compat_sys_open fs/open.c:1132 [inline]
+  __ia32_compat_sys_open+0x79/0xb0 fs/open.c:1132
+  do_syscall_32_irqs_on arch/x86/entry/common.c:337 [inline]
+  do_fast_syscall_32+0x27b/0xe16 arch/x86/entry/common.c:408
+  entry_SYSENTER_compat+0x70/0x7f arch/x86/entry/entry_64_compat.S:139
+RIP: 0023:0xf7fa9a39
+Code: 00 00 00 89 d3 5b 5e 5f 5d c3 b8 80 96 98 00 eb c4 8b 04 24 c3 8b 1c  
+24 c3 8b 34 24 c3 8b 3c 24 c3 51 52 55 89 e5 0f 34 cd 80 <5d> 5a 59 c3 90  
+90 90 90 eb 0d 90 90 90 90 90 90 90 90 90 90 90 90
+RSP: 002b:00000000f5da4c04 EFLAGS: 00000293 ORIG_RAX: 0000000000000005
+RAX: ffffffffffffffda RBX: 00000000f5da4cc0 RCX: 0000000000000000
+RDX: 0000000000000000 RSI: 0000000066666667 RDI: 00000000f5da4cc0
+RBP: 0000000000000000 R08: 0000000000000000 R09: 0000000000000000
+R10: 0000000000000000 R11: 0000000000000000 R12: 0000000000000000
+R13: 0000000000000000 R14: 0000000000000000 R15: 0000000000000000
+Kernel Offset: disabled
+
+
+---
+This bug is generated by a bot. It may contain errors.
+See https://goo.gl/tpsmEJ for more information about syzbot.
+syzbot engineers can be reached at syzkaller@googlegroups.com.
+
+syzbot will keep track of this bug report. See:
+https://goo.gl/tpsmEJ#status for how to communicate with syzbot.
