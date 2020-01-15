@@ -2,93 +2,186 @@ Return-Path: <SRS0=otcQ=3E=vger.kernel.org=linux-block-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-0.9 required=3.0 tests=DKIMWL_WL_HIGH,DKIM_SIGNED,
+X-Spam-Status: No, score=-2.4 required=3.0 tests=DKIMWL_WL_HIGH,DKIM_SIGNED,
 	DKIM_VALID,DKIM_VALID_AU,HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,
-	SPF_HELO_NONE,SPF_PASS autolearn=no autolearn_force=no version=3.4.0
+	SPF_HELO_NONE,SPF_PASS,USER_AGENT_SANE_1 autolearn=no autolearn_force=no
+	version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id B675CC32771
-	for <linux-block@archiver.kernel.org>; Wed, 15 Jan 2020 21:07:44 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id EC71AC33CB2
+	for <linux-block@archiver.kernel.org>; Wed, 15 Jan 2020 21:19:45 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.kernel.org (Postfix) with ESMTP id 87FA72084D
-	for <linux-block@archiver.kernel.org>; Wed, 15 Jan 2020 21:07:44 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id C1DF124680
+	for <linux-block@archiver.kernel.org>; Wed, 15 Jan 2020 21:19:45 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="FUtAoghN"
+	dkim=pass (2048-bit key) header.d=nvidia.com header.i=@nvidia.com header.b="jj9z8sIt"
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1728911AbgAOVHn (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Wed, 15 Jan 2020 16:07:43 -0500
-Received: from us-smtp-1.mimecast.com ([205.139.110.61]:30660 "EHLO
-        us-smtp-delivery-1.mimecast.com" rhost-flags-OK-OK-OK-FAIL)
-        by vger.kernel.org with ESMTP id S1728903AbgAOVHn (ORCPT
+        id S1729866AbgAOVTp (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Wed, 15 Jan 2020 16:19:45 -0500
+Received: from hqnvemgate25.nvidia.com ([216.228.121.64]:11075 "EHLO
+        hqnvemgate25.nvidia.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S1729263AbgAOVTo (ORCPT
         <rfc822;linux-block@vger.kernel.org>);
-        Wed, 15 Jan 2020 16:07:43 -0500
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-        s=mimecast20190719; t=1579122462;
-        h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-         to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-         in-reply-to:in-reply-to:references:references;
-        bh=LdDxJ4TaImd6q6K/Midoj6ftwyCpFTFDZIo2bBl0h+Y=;
-        b=FUtAoghNpFoQ/pYbsQUaBJaAJsazv9ag2BvveRlmncoMeJesW4AJko+8Min24MZDyuMebx
-        fNcSzqYRTti16HEzQolEkEDE2xvU5EdekBjQjf9xKr5+diC0RUS8x9whP4F1g+xlCJBBKn
-        HqS3Zx3chhhN7SbN0AXHi13EA41nJvs=
-Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
- [209.132.183.4]) (Using TLS) by relay.mimecast.com with ESMTP id
- us-mta-248-Nm7f_jTgN36eBJiQzWf3_A-1; Wed, 15 Jan 2020 16:07:41 -0500
-X-MC-Unique: Nm7f_jTgN36eBJiQzWf3_A-1
-Received: from smtp.corp.redhat.com (int-mx07.intmail.prod.int.phx2.redhat.com [10.5.11.22])
-        (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
-        (No client certificate requested)
-        by mimecast-mx01.redhat.com (Postfix) with ESMTPS id C4A13801E6C;
-        Wed, 15 Jan 2020 21:07:38 +0000 (UTC)
-Received: from warthog.procyon.org.uk (ovpn-120-52.rdu2.redhat.com [10.10.120.52])
-        by smtp.corp.redhat.com (Postfix) with ESMTP id 97A721000329;
-        Wed, 15 Jan 2020 21:07:35 +0000 (UTC)
-Organization: Red Hat UK Ltd. Registered Address: Red Hat UK Ltd, Amberley
-        Place, 107-111 Peascod Street, Windsor, Berkshire, SI4 1TE, United
-        Kingdom.
-        Registered in England and Wales under Company Registration No. 3798903
-From:   David Howells <dhowells@redhat.com>
-In-Reply-To: <CAHk-=wjrrOgznCy3yUmcmQY1z_7vXVr6GbvKiy8cLvWbxpmzcw@mail.gmail.com>
-References: <CAHk-=wjrrOgznCy3yUmcmQY1z_7vXVr6GbvKiy8cLvWbxpmzcw@mail.gmail.com> <157909503552.20155.3030058841911628518.stgit@warthog.procyon.org.uk>
-To:     Linus Torvalds <torvalds@linux-foundation.org>,
-        Greg Kroah-Hartman <gregkh@linuxfoundation.org>
-Cc:     dhowells@redhat.com, Casey Schaufler <casey@schaufler-ca.com>,
-        Stephen Smalley <sds@tycho.nsa.gov>,
-        Nicolas Dichtel <nicolas.dichtel@6wind.com>,
-        Ian Kent <raven@themaw.net>,
-        Christian Brauner <christian@brauner.io>,
-        keyrings@vger.kernel.org, linux-usb@vger.kernel.org,
-        linux-block <linux-block@vger.kernel.org>,
-        LSM List <linux-security-module@vger.kernel.org>,
-        linux-fsdevel <linux-fsdevel@vger.kernel.org>,
-        Linux API <linux-api@vger.kernel.org>,
-        Linux Kernel Mailing List <linux-kernel@vger.kernel.org>
-Subject: Re: [RFC PATCH 00/14] pipe: Keyrings, Block and USB notifications [ver #3]
+        Wed, 15 Jan 2020 16:19:44 -0500
+Received: from hqpgpgate101.nvidia.com (Not Verified[216.228.121.13]) by hqnvemgate25.nvidia.com (using TLS: TLSv1.2, DES-CBC3-SHA)
+        id <B5e1f81da0000>; Wed, 15 Jan 2020 13:19:22 -0800
+Received: from hqmail.nvidia.com ([172.20.161.6])
+  by hqpgpgate101.nvidia.com (PGP Universal service);
+  Wed, 15 Jan 2020 13:19:42 -0800
+X-PGP-Universal: processed;
+        by hqpgpgate101.nvidia.com on Wed, 15 Jan 2020 13:19:42 -0800
+Received: from [10.110.48.28] (10.124.1.5) by HQMAIL107.nvidia.com
+ (172.20.187.13) with Microsoft SMTP Server (TLS) id 15.0.1473.3; Wed, 15 Jan
+ 2020 21:19:42 +0000
+Subject: Re: [PATCH v12 04/22] mm: devmap: refactor 1-based refcounting for
+ ZONE_DEVICE pages
+To:     Christoph Hellwig <hch@infradead.org>
+CC:     Andrew Morton <akpm@linux-foundation.org>,
+        Al Viro <viro@zeniv.linux.org.uk>,
+        Alex Williamson <alex.williamson@redhat.com>,
+        Benjamin Herrenschmidt <benh@kernel.crashing.org>,
+        =?UTF-8?B?QmrDtnJuIFTDtnBlbA==?= <bjorn.topel@intel.com>,
+        Dan Williams <dan.j.williams@intel.com>,
+        Daniel Vetter <daniel@ffwll.ch>,
+        Dave Chinner <david@fromorbit.com>,
+        David Airlie <airlied@linux.ie>,
+        "David S . Miller" <davem@davemloft.net>,
+        Ira Weiny <ira.weiny@intel.com>, Jan Kara <jack@suse.cz>,
+        Jason Gunthorpe <jgg@ziepe.ca>, Jens Axboe <axboe@kernel.dk>,
+        Jonathan Corbet <corbet@lwn.net>,
+        =?UTF-8?B?SsOpcsO0bWUgR2xpc3Nl?= <jglisse@redhat.com>,
+        "Kirill A . Shutemov" <kirill@shutemov.name>,
+        Magnus Karlsson <magnus.karlsson@intel.com>,
+        Mauro Carvalho Chehab <mchehab@kernel.org>,
+        Michael Ellerman <mpe@ellerman.id.au>,
+        Michal Hocko <mhocko@suse.com>,
+        Mike Kravetz <mike.kravetz@oracle.com>,
+        Paul Mackerras <paulus@samba.org>,
+        Shuah Khan <shuah@kernel.org>,
+        Vlastimil Babka <vbabka@suse.cz>, <bpf@vger.kernel.org>,
+        <dri-devel@lists.freedesktop.org>, <kvm@vger.kernel.org>,
+        <linux-block@vger.kernel.org>, <linux-doc@vger.kernel.org>,
+        <linux-fsdevel@vger.kernel.org>, <linux-kselftest@vger.kernel.org>,
+        <linux-media@vger.kernel.org>, <linux-rdma@vger.kernel.org>,
+        <linuxppc-dev@lists.ozlabs.org>, <netdev@vger.kernel.org>,
+        <linux-mm@kvack.org>, LKML <linux-kernel@vger.kernel.org>,
+        Christoph Hellwig <hch@lst.de>
+References: <20200107224558.2362728-1-jhubbard@nvidia.com>
+ <20200107224558.2362728-5-jhubbard@nvidia.com>
+ <20200115152306.GA19546@infradead.org>
+X-Nvconfidentiality: public
+From:   John Hubbard <jhubbard@nvidia.com>
+Message-ID: <4707f191-86f8-db4a-c3de-0a84b415b658@nvidia.com>
+Date:   Wed, 15 Jan 2020 13:19:41 -0800
+User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:68.0) Gecko/20100101
+ Thunderbird/68.4.1
 MIME-Version: 1.0
-Content-Type: text/plain; charset="us-ascii"
-Content-ID: <24898.1579122454.1@warthog.procyon.org.uk>
-Date:   Wed, 15 Jan 2020 21:07:34 +0000
-Message-ID: <24899.1579122454@warthog.procyon.org.uk>
-X-Scanned-By: MIMEDefang 2.84 on 10.5.11.22
+In-Reply-To: <20200115152306.GA19546@infradead.org>
+X-Originating-IP: [10.124.1.5]
+X-ClientProxiedBy: HQMAIL105.nvidia.com (172.20.187.12) To
+ HQMAIL107.nvidia.com (172.20.187.13)
+Content-Type: text/plain; charset="utf-8"
+Content-Language: en-US
+Content-Transfer-Encoding: 7bit
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=nvidia.com; s=n1;
+        t=1579123162; bh=GeG6npnwyerPXrXB3bHbzqY7iBJ1oGmlF7ZkUct1x7k=;
+        h=X-PGP-Universal:Subject:To:CC:References:X-Nvconfidentiality:From:
+         Message-ID:Date:User-Agent:MIME-Version:In-Reply-To:
+         X-Originating-IP:X-ClientProxiedBy:Content-Type:Content-Language:
+         Content-Transfer-Encoding;
+        b=jj9z8sItAejAXuqLJp407Y0oGvSfSmMgC2Khnl/UaD4X75Jfs+E4VVRGeSQsgj4wP
+         14n675+NVsxapYKvaJVbv9kK8eZuWxvO3Y6Z1FaTdzbTeZYm8ghKmuNIE5C0gACdNX
+         GRKd75x36rcOJr0kw/HdaVzIwMxuti46gF1ZGWWpciXiVKzpgvI3qlfJhfyWO1skXq
+         uplmy/sgWDjhYQkuOFvVaYpZjSy0ueb1q0Sh/SzXH1k9SEC0ZieDiM/hkNzj/S5EwR
+         OOf7dWtMC6wOQv1+ifMLfIwYfX7dbiwP1/6cV/7beAaEJMsZqU2lquKgjSAKnqyNBE
+         3XR6j/+C8nurA==
 Sender: linux-block-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-Linus Torvalds <torvalds@linux-foundation.org> wrote:
+On 1/15/20 7:23 AM, Christoph Hellwig wrote:
+...
+> 
+> I'm really not sold on this scheme.  Note that I think it is
+> particularly bad, but it also doesn't seem any better than what
+> we had before, and it introduced quite a bit more code.
+> 
 
-> So I no longer hate the implementation, but I do want to see the
-> actual user space users come out of the woodwork and try this out for
-> their use cases.
+Hi Christoph,
 
-I'll see if I can get someone to help fix this:
+All by itself, yes. But the very next patch (which needs a little 
+rework for other reasons, so not included here) needs to reuse some of 
+these functions within __unpin_devmap_managed_user_page():
 
-	https://bugzilla.redhat.com/show_bug.cgi?id=1551648
+    page_is_devmap_managed()
+    free_devmap_managed_page()
 
-for the KEYRING kerberos cache using notifications.  Note that the primary
-thrust of this BZ is with KCM cache, but it affects KEYRING as well.
+That patch was posted as part of the v11 series [1], and it did this:
 
-Also, I'll poke Greg, since he was interested in using it for USB
-notifications.
++#ifdef CONFIG_DEV_PAGEMAP_OPS
++static bool __unpin_devmap_managed_user_page(struct page *page)
++{
++	int count;
++
++	if (!page_is_devmap_managed(page))
++		return false;
++
++	count = page_ref_sub_return(page, GUP_PIN_COUNTING_BIAS);
++
++	__update_proc_vmstat(page, NR_FOLL_PIN_RETURNED, 1);
++	/*
++	 * devmap page refcounts are 1-based, rather than 0-based: if
++	 * refcount is 1, then the page is free and the refcount is
++	 * stable because nobody holds a reference on the page.
++	 */
++	if (count == 1)
++		free_devmap_managed_page(page);
++	else if (!count)
++		__put_page(page);
++
++	return true;
++}
++#else
++static bool __unpin_devmap_managed_user_page(struct page *page)
++{
++	return false;
++}
++#endif /* CONFIG_DEV_PAGEMAP_OPS */
++
++/**
++ * unpin_user_page() - release a dma-pinned page
++ * @page:            pointer to page to be released
++ *
++ * Pages that were pinned via pin_user_pages*() must be released via either
++ * unpin_user_page(), or one of the unpin_user_pages*() routines. This is so
++ * that such pages can be separately tracked and uniquely handled. In
++ * particular, interactions with RDMA and filesystems need special handling.
++ */
++void unpin_user_page(struct page *page)
++{
++	page = compound_head(page);
++
++	/*
++	 * For devmap managed pages we need to catch refcount transition from
++	 * GUP_PIN_COUNTING_BIAS to 1, when refcount reach one it means the
++	 * page is free and we need to inform the device driver through
++	 * callback. See include/linux/memremap.h and HMM for details.
++	 */
++	if (__unpin_devmap_managed_user_page(page))
++		return;
++
++	if (page_ref_sub_and_test(page, GUP_PIN_COUNTING_BIAS))
++		__put_page(page);
++
++	__update_proc_vmstat(page, NR_FOLL_PIN_RETURNED, 1);
++}
++EXPORT_SYMBOL(unpin_user_page);
 
-David
 
+[1] https://lore.kernel.org/r/20191216222537.491123-24-jhubbard@nvidia.com  
+    [PATCH v11 23/25] mm/gup: track FOLL_PIN pages
+
+thanks,
+-- 
+John Hubbard
+NVIDIA
