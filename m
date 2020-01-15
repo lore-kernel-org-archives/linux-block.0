@@ -2,201 +2,159 @@ Return-Path: <SRS0=otcQ=3E=vger.kernel.org=linux-block-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-8.4 required=3.0 tests=DKIMWL_WL_HIGH,DKIM_SIGNED,
-	DKIM_VALID,DKIM_VALID_AU,HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,
-	MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,USER_AGENT_SANE_1
-	autolearn=ham autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-6.8 required=3.0 tests=DKIM_SIGNED,DKIM_VALID,
+	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,
+	SPF_HELO_NONE,SPF_PASS autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 1A81FC33C9E
-	for <linux-block@archiver.kernel.org>; Wed, 15 Jan 2020 02:27:46 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id EB022C33CB1
+	for <linux-block@archiver.kernel.org>; Wed, 15 Jan 2020 07:29:19 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.kernel.org (Postfix) with ESMTP id D754F24671
-	for <linux-block@archiver.kernel.org>; Wed, 15 Jan 2020 02:27:45 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id 9204F2187F
+	for <linux-block@archiver.kernel.org>; Wed, 15 Jan 2020 07:29:18 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="Bw2vwbgo"
+	dkim=fail reason="signature verification failed" (2048-bit key) header.d=wdc.com header.i=@wdc.com header.b="Ej7M5IxH";
+	dkim=pass (1024-bit key) header.d=sharedspace.onmicrosoft.com header.i=@sharedspace.onmicrosoft.com header.b="U6JZWtMZ"
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1728884AbgAOC1o (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Tue, 14 Jan 2020 21:27:44 -0500
-Received: from us-smtp-delivery-1.mimecast.com ([207.211.31.120]:29754 "EHLO
-        us-smtp-1.mimecast.com" rhost-flags-OK-OK-OK-FAIL) by vger.kernel.org
-        with ESMTP id S1728877AbgAOC1o (ORCPT
+        id S1726085AbgAOH3R (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Wed, 15 Jan 2020 02:29:17 -0500
+Received: from esa1.hgst.iphmx.com ([68.232.141.245]:21629 "EHLO
+        esa1.hgst.iphmx.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S1726075AbgAOH3R (ORCPT
         <rfc822;linux-block@vger.kernel.org>);
-        Tue, 14 Jan 2020 21:27:44 -0500
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-        s=mimecast20190719; t=1579055262;
-        h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-         to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-         content-transfer-encoding:content-transfer-encoding:
-         in-reply-to:in-reply-to:references:references;
-        bh=6MX/KqGc3zFqH4ifets/x9qWKK78+84NEcESsqTPOJo=;
-        b=Bw2vwbgoKHUMpnd+j2yf22voyvpcl+WuC2Afpjewu4Cs2jgW65qrHMKuU1I8Nq70YL2c9h
-        syHlDd5K9XjRZtE/dSA0iAWgZi9HAMfF6I0vQqR4Kb+Nz5pW0A+ZptYMMoJQJhP/Qp2xRb
-        9ZtCkAtOlx4sSep6TA5g3JLjVMpojIM=
-Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
- [209.132.183.4]) (Using TLS) by relay.mimecast.com with ESMTP id
- us-mta-287-ib40Bu_HNEi4h-Uz0Q1jfw-1; Tue, 14 Jan 2020 21:27:38 -0500
-X-MC-Unique: ib40Bu_HNEi4h-Uz0Q1jfw-1
-Received: from smtp.corp.redhat.com (int-mx06.intmail.prod.int.phx2.redhat.com [10.5.11.16])
-        (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
-        (No client certificate requested)
-        by mimecast-mx01.redhat.com (Postfix) with ESMTPS id 3852E107ACC5;
-        Wed, 15 Jan 2020 02:27:37 +0000 (UTC)
-Received: from ming.t460p (ovpn-8-26.pek2.redhat.com [10.72.8.26])
-        by smtp.corp.redhat.com (Postfix) with ESMTPS id 05D645C1D6;
-        Wed, 15 Jan 2020 02:27:29 +0000 (UTC)
-Date:   Wed, 15 Jan 2020 10:27:25 +0800
-From:   Ming Lei <ming.lei@redhat.com>
-To:     Zhiqiang Liu <liuzhiqiang26@huawei.com>
-Cc:     Jens Axboe <axboe@kernel.dk>, linux-block@vger.kernel.org,
-        "linux-kernel@vger.kernel.org" <linux-kernel@vger.kernel.org>,
-        Mingfangsen <mingfangsen@huawei.com>, Guiyao <guiyao@huawei.com>,
-        zhangsaisai <zhangsaisai@huawei.com>,
-        "wubo (T)" <wubo40@huawei.com>
-Subject: Re: [PATCH V3] brd: check and limit max_part par
-Message-ID: <20200115022725.GA14585@ming.t460p>
-References: <c8236e55-f64f-ef40-b394-8b7e86ce50df@huawei.com>
-MIME-Version: 1.0
-Content-Type: text/plain; charset=iso-8859-1
-Content-Disposition: inline
-In-Reply-To: <c8236e55-f64f-ef40-b394-8b7e86ce50df@huawei.com>
-User-Agent: Mutt/1.12.1 (2019-06-15)
-X-Scanned-By: MIMEDefang 2.79 on 10.5.11.16
+        Wed, 15 Jan 2020 02:29:17 -0500
+DKIM-Signature: v=1; a=rsa-sha256; c=simple/simple;
+  d=wdc.com; i=@wdc.com; q=dns/txt; s=dkim.wdc.com;
+  t=1579073357; x=1610609357;
+  h=from:to:subject:date:message-id:references:
+   content-transfer-encoding:mime-version;
+  bh=soZFibgbYRYOIRmfL8l9Q6VKp/t7E/jNstDOhrskWd8=;
+  b=Ej7M5IxHkHR07BAG4/ogcK2PlKGj4JLScYrD7/GrUUFAaghcA/aqd2nM
+   L6kk/soW3W7lYXYB1BBICR93f2E0KCX+8Q5YrzYUak8h4eW+K49Kk3GUP
+   5BW3mqPKzgL0Hf7dqOPJ0Ik/tu1nvrOtYXq68sXc1h6H2Jjvgr4mTJUi1
+   LsyKnwLunOvFld/7dbEDD0PL4jkaVHNJQjjac0oPQkS7GZ21vbL/RxmPb
+   do0kN9ldp3RvWL4VNuvsab1CCxIobOH5BAHXFYJX5yqZqGA/o762b21+l
+   yaGgFDmEWF+2p+85pOkWpchgYwm8Wb1lXZX+90c4X9uU5EQoI5xL3whyk
+   w==;
+IronPort-SDR: 75y8TrB4oCW9PINMDmYo6b1HISQZIjhjZhzGBy0Cq0CNCWHqYUoLhFdU/xUucgPFk+jNgRGKM/
+ 2khwh3etMMu+d5XrDWIKI1wfXzTqnZjZ4Z4Cgjb1J9IzyA6/MNSe3flxp8Rr0bYv331Q4VShKw
+ y2xguL5sjTJqzTYuWbo9dKPIYkK4PRlmSIJe5MYdLYAxexfte2b6LesTpOlljHkwnv4wMsnc4Y
+ ICDlaKNwjmVrRKt7bBy+f/9+TS3a/dAOOCrKm9DOSphKdgbLMJyyCRzKOcuNVcEPmyFyVmHcma
+ yMo=
+X-IronPort-AV: E=Sophos;i="5.70,321,1574092800"; 
+   d="scan'208";a="235319192"
+Received: from mail-co1nam04lp2054.outbound.protection.outlook.com (HELO NAM04-CO1-obe.outbound.protection.outlook.com) ([104.47.45.54])
+  by ob1.hgst.iphmx.com with ESMTP; 15 Jan 2020 15:29:16 +0800
+ARC-Seal: i=1; a=rsa-sha256; s=arcselector9901; d=microsoft.com; cv=none;
+ b=ItVqG3t7TI4CIa79mdYxCrN+6AM+PM1OTtBxDbK83LCNRfnkJ7CEdl6DnB2nSTk7zSwxejy4CDQFqMcXg3QzrWeP3w8MsICnuGAHJDvQw33ZI98rOlQe15eFHPEtsfdS9OOic6j5HAO02GA+uYKGGqaxxagTJguWKSPT2aP4RxzE0VkJrQ+FDmNm3IjuY0Y6HCir3uisFYc6V2tT0jZDhV+L8sTF/UkqidAqcftW4RzmwJBsw4ONndKK8FG+njd35mc4nwIjS8Z9CGUg7RQjpoIBWzYzwHX7ii9v6KzOsyZyNpWZZChcEKborVhTYPn8h4BokgjreGstC+Pks9Os2w==
+ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com;
+ s=arcselector9901;
+ h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
+ bh=yer36vDH5fw/qOTHfCzhT+ZtQ9EgNWIRstWqG9yRPmk=;
+ b=ekPmnI0LpMB0CrbnevzdMewMG+rQs7SkBPZzmEkdtOqJmqpHM7Coqp66GgVy+0ESl/5S6Wy2qqP0Oc0PDba0H9VK/8MYYWpB0dRDIP5ftaWTnopNect2aVJQRtXDMj3RwpIiv2TtIePYGyEzReBV015G0Kxmc9VNTvhp8SMhanH+wZut5hx945ClAX1r0az+aZOlAeKOouGgy1tLdiK1f+iIMpDvtj4SY+Nn9tBdevdmQ00vzuCa4vQ7evBu0zBn1FFGWEzsAMUksmQn/wD7VlFsT9oBNUvO59J+LTvt4sw1XDrweP0lmHzzIkVFW1FOSgfHF7BTtVCXNy6dPYbCbw==
+ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass
+ smtp.mailfrom=wdc.com; dmarc=pass action=none header.from=wdc.com; dkim=pass
+ header.d=wdc.com; arc=none
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+ d=sharedspace.onmicrosoft.com; s=selector2-sharedspace-onmicrosoft-com;
+ h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
+ bh=yer36vDH5fw/qOTHfCzhT+ZtQ9EgNWIRstWqG9yRPmk=;
+ b=U6JZWtMZyXFEEXoKFJL7473ipMPAHdq3HpXsA5HCw94sO7jA66aHTKOxsP6EpRPevvVSdjCyyaxfXM5rfVL4+7rM/I8z5/dS9z+gAaxddVUSC7lGZeGDjQvDKy5sd7pmm0Pe2HzSD9nqZE/D8ROkr0W2waeAv1a1oNDXe586cio=
+Received: from BYAPR04MB5816.namprd04.prod.outlook.com (20.179.59.16) by
+ BYAPR04MB5687.namprd04.prod.outlook.com (20.179.59.202) with Microsoft SMTP
+ Server (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
+ 15.20.2644.18; Wed, 15 Jan 2020 07:29:16 +0000
+Received: from BYAPR04MB5816.namprd04.prod.outlook.com
+ ([fe80::cd8e:d1de:e661:a61]) by BYAPR04MB5816.namprd04.prod.outlook.com
+ ([fe80::cd8e:d1de:e661:a61%5]) with mapi id 15.20.2644.015; Wed, 15 Jan 2020
+ 07:29:15 +0000
+From:   Damien Le Moal <Damien.LeMoal@wdc.com>
+To:     "linux-block@vger.kernel.org" <linux-block@vger.kernel.org>,
+        Jens Axboe <axboe@kernel.dk>
+Subject: Re: [PATCH] null_blk: Fix zone write handling
+Thread-Topic: [PATCH] null_blk: Fix zone write handling
+Thread-Index: AQHVxqo3UcNzV3ADyU6cwEKyJH2hUQ==
+Date:   Wed, 15 Jan 2020 07:29:15 +0000
+Message-ID: <BYAPR04MB58169D42D5D2C23AB20AF0CCE7370@BYAPR04MB5816.namprd04.prod.outlook.com>
+References: <20200109050355.585524-1-damien.lemoal@wdc.com>
+Accept-Language: en-US
+Content-Language: en-US
+X-MS-Has-Attach: 
+X-MS-TNEF-Correlator: 
+authentication-results: spf=none (sender IP is )
+ smtp.mailfrom=Damien.LeMoal@wdc.com; 
+x-originating-ip: [129.253.180.115]
+x-ms-publictraffictype: Email
+x-ms-office365-filtering-ht: Tenant
+x-ms-office365-filtering-correlation-id: a12958e0-9786-4970-423e-08d7998ca047
+x-ms-traffictypediagnostic: BYAPR04MB5687:
+x-microsoft-antispam-prvs: <BYAPR04MB5687CF79AE1050C16E31BCA9E7370@BYAPR04MB5687.namprd04.prod.outlook.com>
+wdcipoutbound: EOP-TRUE
+x-ms-oob-tlc-oobclassifiers: OLM:4125;
+x-forefront-prvs: 02830F0362
+x-forefront-antispam-report: SFV:NSPM;SFS:(10019020)(4636009)(136003)(366004)(376002)(346002)(396003)(39860400002)(199004)(189003)(8936002)(6506007)(53546011)(26005)(186003)(81156014)(81166006)(8676002)(7696005)(478600001)(2906002)(66946007)(66446008)(64756008)(66556008)(66476007)(86362001)(316002)(110136005)(76116006)(91956017)(52536014)(33656002)(9686003)(55016002)(5660300002)(71200400001);DIR:OUT;SFP:1102;SCL:1;SRVR:BYAPR04MB5687;H:BYAPR04MB5816.namprd04.prod.outlook.com;FPR:;SPF:None;LANG:en;PTR:InfoNoRecords;A:1;MX:1;
+x-ms-exchange-senderadcheck: 1
+x-microsoft-antispam: BCL:0;
+x-microsoft-antispam-message-info: 0mM+uOMW6AUE9L41nBqefIK/7UvbENH55hLrB6lvMMXgryRl5eFnjx2cm4fjlijWLigxi4jdZol6aba9cNw1xSLU9ZIzJUA+Y6AVMbRvM1oiDUIeJQcuayEEAuh6KyRQsrrmx6saP5jJEKR0WlYNQkF2okK7A/7daYBLQ0dVmIEvqX8qYDZDLShE8wuX6m4oiSN/kdGSPtI2Gsfj9qo1Kr4bCfNyM9pQgVTXTOCxMGcMNg06zQjJBIXAPzY5P84Ksm75qy8MeJEpppJSWLvre90tchH3qy/DrOFdWzLt2YudPrZ9d7h9j7f5UFAHO4Lgw1Hki/38oPsd9orYv4WWCopAc897M2Q9JYmSuMy79lGz3bVZtHX7QKXyuwaV9L3Ypt9nMkD1R5mYdzkxU73JzvSFmx40052zax75QvZT/nITRHFLFF2uWnEXuOFJ+Eik
+x-ms-exchange-transport-forked: True
+Content-Type: text/plain; charset="us-ascii"
 Content-Transfer-Encoding: quoted-printable
+MIME-Version: 1.0
+X-OriginatorOrg: wdc.com
+X-MS-Exchange-CrossTenant-Network-Message-Id: a12958e0-9786-4970-423e-08d7998ca047
+X-MS-Exchange-CrossTenant-originalarrivaltime: 15 Jan 2020 07:29:15.8630
+ (UTC)
+X-MS-Exchange-CrossTenant-fromentityheader: Hosted
+X-MS-Exchange-CrossTenant-id: b61c8803-16f3-4c35-9b17-6f65f441df86
+X-MS-Exchange-CrossTenant-mailboxtype: HOSTED
+X-MS-Exchange-CrossTenant-userprincipalname: DIVkRR5hyeAhlxtVLOcruCk0EqZX8I2kFF80IXz1JzBVOSn1NLbsfdR3AzFF5t0siCfV9lfYdJAxX61HCp+1xg==
+X-MS-Exchange-Transport-CrossTenantHeadersStamped: BYAPR04MB5687
 Sender: linux-block-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-On Tue, Jan 14, 2020 at 07:56:07PM +0800, Zhiqiang Liu wrote:
->=20
-> In brd_init func, rd_nr num of brd_device are firstly allocated
-> and add in brd_devices, then brd_devices are traversed to add each
-> brd_device by calling add_disk func. When allocating brd_device,
-> the disk->first_minor is set to i * max_part, if rd_nr * max_part
-> is larger than MINORMASK, two different brd_device may have the same
-> devt, then only one of them can be successfully added.
-> when rmmod brd.ko, it will cause oops when calling brd_exit.
->=20
-> Follow those steps:
->   # modprobe brd rd_nr=3D3 rd_size=3D102400 max_part=3D1048576
->   # rmmod brd
-> then, the oops will appear.
->=20
-> Oops log:
-> [  726.613722] Call trace:
-> [  726.614175]  kernfs_find_ns+0x24/0x130
-> [  726.614852]  kernfs_find_and_get_ns+0x44/0x68
-> [  726.615749]  sysfs_remove_group+0x38/0xb0
-> [  726.616520]  blk_trace_remove_sysfs+0x1c/0x28
-> [  726.617320]  blk_unregister_queue+0x98/0x100
-> [  726.618105]  del_gendisk+0x144/0x2b8
-> [  726.618759]  brd_exit+0x68/0x560 [brd]
-> [  726.619501]  __arm64_sys_delete_module+0x19c/0x2a0
-> [  726.620384]  el0_svc_common+0x78/0x130
-> [  726.621057]  el0_svc_handler+0x38/0x78
-> [  726.621738]  el0_svc+0x8/0xc
-> [  726.622259] Code: aa0203f6 aa0103f7 aa1e03e0 d503201f (7940e260)
->=20
-> Here, we add brd_check_and_reset_par func to check and limit max_part p=
-ar.
->=20
-> --
-> V2->V3: (suggested by Ming Lei)
->  - clear .minors when running out of consecutive minor space in brd_all=
-oc
->  - remove limit of rd_nr
->=20
-> V1->V2: add more checks in brd_check_par_valid as suggested by Ming Lei=
-.
->=20
-> Signed-off-by: Zhiqiang Liu <liuzhiqiang26@huawei.com>
-> ---
->  drivers/block/brd.c | 35 ++++++++++++++++++++++++++++-------
->  1 file changed, 28 insertions(+), 7 deletions(-)
->=20
-> diff --git a/drivers/block/brd.c b/drivers/block/brd.c
-> index df8103dd40ac..2295a0bafb5e 100644
-> --- a/drivers/block/brd.c
-> +++ b/drivers/block/brd.c
-> @@ -330,16 +330,16 @@ static const struct block_device_operations brd_f=
-ops =3D {
->  /*
->   * And now the modules code and kernel interface.
->   */
-> -static int rd_nr =3D CONFIG_BLK_DEV_RAM_COUNT;
-> -module_param(rd_nr, int, 0444);
-> +static unsigned int rd_nr =3D CONFIG_BLK_DEV_RAM_COUNT;
-> +module_param(rd_nr, uint, 0444);
-
-The above change isn't needed.
-
->  MODULE_PARM_DESC(rd_nr, "Maximum number of brd devices");
->=20
->  unsigned long rd_size =3D CONFIG_BLK_DEV_RAM_SIZE;
->  module_param(rd_size, ulong, 0444);
->  MODULE_PARM_DESC(rd_size, "Size of each RAM disk in kbytes.");
->=20
-> -static int max_part =3D 1;
-> -module_param(max_part, int, 0444);
-> +static unsigned int max_part =3D 1;
-> +module_param(max_part, uint, 0444);
-
-The above change isn't needed.
-
->  MODULE_PARM_DESC(max_part, "Num Minors to reserve between devices");
->=20
->  MODULE_LICENSE("GPL");
-> @@ -393,7 +393,14 @@ static struct brd_device *brd_alloc(int i)
->  	if (!disk)
->  		goto out_free_queue;
->  	disk->major		=3D RAMDISK_MAJOR;
-> -	disk->first_minor	=3D i * max_part;
-> +	/*
-> +	 * Clear .minors when running out of consecutive minor space since
-> +	 * GENHD_FL_EXT_DEVT is set, and we can allocate from extended devt.
-> +	 */
-> +	if ((i * disk->minors) & ~MINORMASK)
-> +		disk->minors =3D 0;
-> +	else
-> +		disk->first_minor =3D i * disk->minors;
-
-The above looks a bit ugly, one nice way could be to change in
-brd_alloc():
-
-	disk =3D brd->brd_disk =3D alloc_disk(((i * max_part) & ~MINORMASK) ?
-		0 : max_part);
-
->  	disk->fops		=3D &brd_fops;
->  	disk->private_data	=3D brd;
->  	disk->queue		=3D brd->brd_queue;
-> @@ -468,6 +475,21 @@ static struct kobject *brd_probe(dev_t dev, int *p=
-art, void *data)
->  	return kobj;
->  }
->=20
-> +static inline void brd_check_and_reset_par(void)
-> +{
-> +	if (unlikely(!rd_nr))
-> +		rd_nr =3D 1;
-
-zero rd_nr should work as expected, given user can create dev file via
-mknod, and brd_probe() will be called for populate brd disk/queue when
-the disk file is opened.
-
-> +static inline void brd_check_and_reset_par(void)
-> +{
-> + =A0 =A0 =A0 if (unlikely(!rd_nr))
-> + =A0 =A0 =A0 =A0 =A0 =A0 =A0 rd_nr =3D 1;
-> +
-> + =A0 =A0 =A0 if (unlikely(!max_part))
-> + =A0 =A0 =A0 =A0 =A0 =A0 =A0 max_part =3D 1;
-
-Another limit is that 'max_part' needs to be divided exactly by (1U <<
-MINORBITS), something like:
-
-	max_part =3D 1UL << fls(max_part);
-
-
-Thanks,=20
-Ming
-
+Jens,=0A=
+=0A=
+Ping ?=0A=
+=0A=
+On 2020/01/09 14:04, Damien Le Moal wrote:=0A=
+> null_zone_write() only allows writing empty and implicitly opened zones.=
+=0A=
+> Writing to closed and explicitly opened zones must also be allowed and=0A=
+> the zone condition must be transitioned to implicit open if the zone=0A=
+> is not explicitly opened already.=0A=
+> =0A=
+> Fixes: da644b2cc1a4 ("null_blk: add zone open, close, and finish support"=
+)=0A=
+> Signed-off-by: Damien Le Moal <damien.lemoal@wdc.com>=0A=
+> ---=0A=
+>  drivers/block/null_blk_zoned.c | 4 +++-=0A=
+>  1 file changed, 3 insertions(+), 1 deletion(-)=0A=
+> =0A=
+> diff --git a/drivers/block/null_blk_zoned.c b/drivers/block/null_blk_zone=
+d.c=0A=
+> index 5cf49d9db95e..ed34785dd64b 100644=0A=
+> --- a/drivers/block/null_blk_zoned.c=0A=
+> +++ b/drivers/block/null_blk_zoned.c=0A=
+> @@ -129,11 +129,13 @@ static blk_status_t null_zone_write(struct nullb_cm=
+d *cmd, sector_t sector,=0A=
+>  		return BLK_STS_IOERR;=0A=
+>  	case BLK_ZONE_COND_EMPTY:=0A=
+>  	case BLK_ZONE_COND_IMP_OPEN:=0A=
+> +	case BLK_ZONE_COND_EXP_OPEN:=0A=
+> +	case BLK_ZONE_COND_CLOSED:=0A=
+>  		/* Writes must be at the write pointer position */=0A=
+>  		if (sector !=3D zone->wp)=0A=
+>  			return BLK_STS_IOERR;=0A=
+>  =0A=
+> -		if (zone->cond =3D=3D BLK_ZONE_COND_EMPTY)=0A=
+> +		if (zone->cond !=3D BLK_ZONE_COND_EXP_OPEN)=0A=
+>  			zone->cond =3D BLK_ZONE_COND_IMP_OPEN;=0A=
+>  =0A=
+>  		zone->wp +=3D nr_sectors;=0A=
+> =0A=
+=0A=
+=0A=
+-- =0A=
+Damien Le Moal=0A=
+Western Digital Research=0A=
