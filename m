@@ -2,192 +2,177 @@ Return-Path: <SRS0=7rSP=3F=vger.kernel.org=linux-block-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-6.9 required=3.0 tests=DKIM_SIGNED,DKIM_VALID,
-	DKIM_VALID_AU,HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,
-	SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS autolearn=unavailable autolearn_force=no
-	version=3.4.0
+X-Spam-Status: No, score=-7.3 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
+	MAILING_LIST_MULTI,MENTIONS_GIT_HOSTING,SPF_HELO_NONE,SPF_PASS,
+	USER_AGENT_SANE_1 autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 41303C33CB6
-	for <linux-block@archiver.kernel.org>; Thu, 16 Jan 2020 16:24:29 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 4E240C33CB1
+	for <linux-block@archiver.kernel.org>; Thu, 16 Jan 2020 16:41:08 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.kernel.org (Postfix) with ESMTP id 15BE92077C
-	for <linux-block@archiver.kernel.org>; Thu, 16 Jan 2020 16:24:29 +0000 (UTC)
-Authentication-Results: mail.kernel.org;
-	dkim=pass (2048-bit key) header.d=cloud.ionos.com header.i=@cloud.ionos.com header.b="PyLaSZFm"
+	by mail.kernel.org (Postfix) with ESMTP id 2954C2081E
+	for <linux-block@archiver.kernel.org>; Thu, 16 Jan 2020 16:41:08 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1726872AbgAPQY2 (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Thu, 16 Jan 2020 11:24:28 -0500
-Received: from mail-io1-f68.google.com ([209.85.166.68]:43448 "EHLO
-        mail-io1-f68.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1726864AbgAPQY2 (ORCPT
+        id S1726892AbgAPQlH (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Thu, 16 Jan 2020 11:41:07 -0500
+Received: from mail-pg1-f193.google.com ([209.85.215.193]:46592 "EHLO
+        mail-pg1-f193.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S1726785AbgAPQlH (ORCPT
         <rfc822;linux-block@vger.kernel.org>);
-        Thu, 16 Jan 2020 11:24:28 -0500
-Received: by mail-io1-f68.google.com with SMTP id n21so22458181ioo.10
-        for <linux-block@vger.kernel.org>; Thu, 16 Jan 2020 08:24:27 -0800 (PST)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=cloud.ionos.com; s=google;
-        h=mime-version:references:in-reply-to:from:date:message-id:subject:to
-         :cc;
-        bh=apIz2+9yoUfuStq5UMu8JP8acA1lx+rNR0oTEq6+/+s=;
-        b=PyLaSZFmKclzKXc2mofAeRISHMo3IWIZvYOyzXjwWgiLonnaYcHRnYY5Svxx66yr7f
-         jLGOtmtEc53zsMlgG6EdXnP4HHgPAhPlGnNFM8X3Y0V+pcglmBH8kHbl+hSAHmN8gUD2
-         H9FpdGXns3IiBm3bbIpeGscEvRwjhxG67Z9nHKF08lQF0ljI6NviuoRo+fmTUOu+ALa1
-         FE6W2xv4JWmwA1MJswmHEBnY3KIAo6mAnSdC0eTvFoFw8ltYmc+0W4percxA0OQUEYg1
-         XLbIO803hHOeZbjtYia3DefqH70LdH5+s3ihhmc0NF0nTdJbwxybtvvXP5/+CljjgUhR
-         O2Bw==
+        Thu, 16 Jan 2020 11:41:07 -0500
+Received: by mail-pg1-f193.google.com with SMTP id z124so10136564pgb.13;
+        Thu, 16 Jan 2020 08:41:06 -0800 (PST)
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=1e100.net; s=20161025;
-        h=x-gm-message-state:mime-version:references:in-reply-to:from:date
-         :message-id:subject:to:cc;
-        bh=apIz2+9yoUfuStq5UMu8JP8acA1lx+rNR0oTEq6+/+s=;
-        b=YVEbu339SSWu50VOg3zT8TWNtRAqjGzMqvIWCCHxo+oPf1nayZlL3L/JZCCJV6hcuB
-         Ga2P4IZE0uxkUTfxoZhBuExWOMYDtUPAkl3pgiiHgc4zWmQMadwG1qkNecrfF0zYqHQV
-         dDuPZH19s1iULX/9E2T05ddoTghbVl22CaJPNwS4lA4LDo4DOFukKNWwEreSQ9RIwsZW
-         mSJnCCHLSetjdrdcd6LqDOGCrzeSWSj0V+dhTC+uHOzqM6TQGy4/wQbniSwfbG28GV7Q
-         PTWDMaiwLLEBEYQgBjFOMFCHAW0TLsrpbwHemFzIJPHegCjGzvmPzrDiAFTtQ55FqUT4
-         eIaw==
-X-Gm-Message-State: APjAAAXnw8DW1M37ZqqAyDJ5nXeINtbT7ev7SY8yrB7if9K1nvHItKSn
-        IN2wmW7CONuzD6w1ysgWqckC7Oe4hxnrrq7eavxYXQ==
-X-Google-Smtp-Source: APXvYqwEbz/nPKl0Ju6yl68j4LvWHYZBTDI1g6S3NJ2/g8vGUHJa7Caj1TYzBMwRrxOdVH7Rk3i+WPh3WyrLmfJlF2Y=
-X-Received: by 2002:a02:ca10:: with SMTP id i16mr30169945jak.10.1579191867085;
- Thu, 16 Jan 2020 08:24:27 -0800 (PST)
-MIME-Version: 1.0
-References: <20200116125915.14815-1-jinpuwang@gmail.com> <20200116125915.14815-7-jinpuwang@gmail.com>
- <20200116145300.GC12433@unreal> <CAMGffE=pym8iz4OVxx7s6i37AU+KPFN3AeVrCTOpLx+N8A9dEQ@mail.gmail.com>
- <20200116155800.GA18467@unreal>
-In-Reply-To: <20200116155800.GA18467@unreal>
-From:   Jinpu Wang <jinpu.wang@cloud.ionos.com>
-Date:   Thu, 16 Jan 2020 17:24:16 +0100
-Message-ID: <CAMGffEkLHNPJ3feWhX0vnjr3hasVp3=+Z76wO3-07s9+Te=7Pw@mail.gmail.com>
-Subject: Re: [PATCH v7 06/25] RDMA/rtrs: client: main functionality
-To:     Leon Romanovsky <leon@kernel.org>
-Cc:     Jack Wang <jinpuwang@gmail.com>, linux-block@vger.kernel.org,
-        linux-rdma@vger.kernel.org, Jens Axboe <axboe@kernel.dk>,
+        h=x-gm-message-state:subject:to:cc:references:from:message-id:date
+         :user-agent:mime-version:in-reply-to:content-language
+         :content-transfer-encoding;
+        bh=k0Id4Clg1ftIoxJ/BWAT25mN758+UEydrwdSsgMjlqk=;
+        b=ERd61KLRdyNqdI24JKJBUR/8UPfSHzPsG3t8tC8MlB1lKE13s7L00knzwL1gZPgNp9
+         brasRMrMHiQkF9tsPrKQEuMMLUFBcrGlk8go2evsreFB0uzwR851blPJS6bH6wx91n2R
+         AyibHSHwv0xj6LvZ6kc5MOOxmgaK9wgP2Wu9Lr/s3lj117e7WODDA3Hv7qr0BZFKtsLm
+         sYLHHoHy6pQx5v8dlU4ac+9L604gccph7aZsDbhrs1upMgMAZloA+bL38rQ1mE293tVY
+         j1ebmR6hgyE1/7LFVDlbHWftgzwyRj5OU9u1sl/Y/Gbivm5RN1btLnRZuTuU+fOYEDzt
+         xnBQ==
+X-Gm-Message-State: APjAAAUlQgAuj6/2NcEFHxo5KLVpX1/lTILy1fDdTW9B7rfP84PqI+d0
+        uke3DPJ/u+Oo1/g6nDiWZqc=
+X-Google-Smtp-Source: APXvYqxb863dQg1qm+Wl5XNuNZQvk+Oe813NsAAICA7AGZfiAUxcKhreFaU17zhTToyJgmiUcnz5FQ==
+X-Received: by 2002:a63:3f4f:: with SMTP id m76mr39223349pga.353.1579192866365;
+        Thu, 16 Jan 2020 08:41:06 -0800 (PST)
+Received: from desktop-bart.svl.corp.google.com ([2620:15c:2cd:202:4308:52a3:24b6:2c60])
+        by smtp.gmail.com with ESMTPSA id 3sm26023303pfi.13.2020.01.16.08.41.05
+        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
+        Thu, 16 Jan 2020 08:41:05 -0800 (PST)
+Subject: Re: [PATCH v5 00/25] RTRS (former IBTRS) rdma transport library and
+ the corresponding RNBD (former IBNBD) rdma network block device
+To:     Jinpu Wang <jinpu.wang@cloud.ionos.com>
+Cc:     Jason Gunthorpe <jgg@ziepe.ca>, Jack Wang <jinpuwang@gmail.com>,
+        linux-block@vger.kernel.org, linux-rdma@vger.kernel.org,
+        Jens Axboe <axboe@kernel.dk>,
         Christoph Hellwig <hch@infradead.org>,
         Sagi Grimberg <sagi@grimberg.me>,
-        Bart Van Assche <bvanassche@acm.org>,
+        Leon Romanovsky <leon@kernel.org>,
         Doug Ledford <dledford@redhat.com>,
-        Jason Gunthorpe <jgg@ziepe.ca>,
-        Danil Kipnis <danil.kipnis@cloud.ionos.com>,
-        Roman Penyaev <rpenyaev@suse.de>
-Content-Type: text/plain; charset="UTF-8"
+        Danil Kipnis <danil.kipnis@cloud.ionos.com>, rpenyaev@suse.de
+References: <20191220155109.8959-1-jinpuwang@gmail.com>
+ <20200102181859.GC9282@ziepe.ca>
+ <CAMGffE=h24jmi0RnYks_rur71qrXCxJnPB5+cCACR50hKF6QRA@mail.gmail.com>
+ <d5be42e2-94d4-ad13-43ac-fcc1bb108ad0@acm.org>
+ <CAMGffEntYmFfGD8BGEtykoFXD_3DvNWQ8hrRmDoLtdr9ykTwug@mail.gmail.com>
+ <CAMGffEm=1ai=vkxLV7Qp0z3M-98BDej4mpc4WnsOpSHUJWuPeA@mail.gmail.com>
+From:   Bart Van Assche <bvanassche@acm.org>
+Message-ID: <c0c05209-1f43-c242-96d6-1944e43d207c@acm.org>
+Date:   Thu, 16 Jan 2020 08:41:04 -0800
+User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:68.0) Gecko/20100101
+ Thunderbird/68.2.2
+MIME-Version: 1.0
+In-Reply-To: <CAMGffEm=1ai=vkxLV7Qp0z3M-98BDej4mpc4WnsOpSHUJWuPeA@mail.gmail.com>
+Content-Type: text/plain; charset=utf-8; format=flowed
+Content-Language: en-US
+Content-Transfer-Encoding: 7bit
 Sender: linux-block-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-On Thu, Jan 16, 2020 at 4:58 PM Leon Romanovsky <leon@kernel.org> wrote:
->
-> On Thu, Jan 16, 2020 at 04:43:41PM +0100, Jinpu Wang wrote:
-> > On Thu, Jan 16, 2020 at 3:53 PM Leon Romanovsky <leon@kernel.org> wrote:
-> > >
-> > > On Thu, Jan 16, 2020 at 01:58:56PM +0100, Jack Wang wrote:
-> > > > From: Jack Wang <jinpu.wang@cloud.ionos.com>
-> > > >
-> > > > This is main functionality of rtrs-client module, which manages
-> > > > set of RDMA connections for each rtrs session, does multipathing,
-> > > > load balancing and failover of RDMA requests.
-> > > >
-> > > > Signed-off-by: Danil Kipnis <danil.kipnis@cloud.ionos.com>
-> > > > Signed-off-by: Jack Wang <jinpu.wang@cloud.ionos.com>
-> > > > ---
-> > > >  drivers/infiniband/ulp/rtrs/rtrs-clt.c | 2967 ++++++++++++++++++++++++
-> > > >  1 file changed, 2967 insertions(+)
-> > > >  create mode 100644 drivers/infiniband/ulp/rtrs/rtrs-clt.c
-> > > >
-> > > > diff --git a/drivers/infiniband/ulp/rtrs/rtrs-clt.c b/drivers/infiniband/ulp/rtrs/rtrs-clt.c
-> > > > new file mode 100644
-> > > > index 000000000000..717d19d4d930
-> > > > --- /dev/null
-> > > > +++ b/drivers/infiniband/ulp/rtrs/rtrs-clt.c
-> > > > @@ -0,0 +1,2967 @@
-> > > > +// SPDX-License-Identifier: GPL-2.0-or-later
-> > > > +/*
-> > > > + * RDMA Transport Layer
-> > > > + *
-> > > > + * Copyright (c) 2014 - 2018 ProfitBricks GmbH. All rights reserved.
-> > > > + *
-> > > > + * Copyright (c) 2018 - 2019 1&1 IONOS Cloud GmbH. All rights reserved.
-> > > > + *
-> > > > + * Copyright (c) 2019 - 2020 1&1 IONOS SE. All rights reserved.
-> > >
-> > > Please no extra lines between Copyright lines.
-> > I checked in kernel tree, seems most of Copyright indeed contain no
-> > extra line in between
-> >
-> > >
-> > > > + */
-> > > > +
-> > > > +#undef pr_fmt
-> > > > +#define pr_fmt(fmt) KBUILD_MODNAME " L" __stringify(__LINE__) ": " fmt
-> > >
-> > > I never understood this pr_fmt() thing, do we really need it?
-> > you can custorm the format for print, include modue name and line
-> > number in this case, it's quite useful for debugging.
->
-> The idea that messages are needed to be unique and don't rely on line
-> numbers.
-Then you have to check all other message in order to be unique, that
-is too much :)
->
-> > >
-> > > > +
-> > > > +#include <linux/module.h>
-> > > > +#include <linux/rculist.h>
-> > > > +#include <linux/blkdev.h> /* for BLK_MAX_SEGMENT_SIZE */
-> > > > +
-> > > > +#include "rtrs-clt.h"
-> > > > +#include "rtrs-log.h"
-> > > > +
-> > > > +#define RTRS_CONNECT_TIMEOUT_MS 30000
-> > > > +
-> > > > +MODULE_DESCRIPTION("RDMA Transport Client");
-> > > > +MODULE_LICENSE("GPL");
-> > > > +
-> > > > +static ushort nr_cons_per_session;
-> > > > +module_param(nr_cons_per_session, ushort, 0444);
-> > > > +MODULE_PARM_DESC(nr_cons_per_session,
-> > > > +              "Number of connections per session. (default: nr_cpu_ids)");
-> > > > +
-> > > > +static int retry_cnt = 7;
-> > > > +module_param_named(retry_cnt, retry_cnt, int, 0644);
-> > > > +MODULE_PARM_DESC(retry_cnt,
-> > > > +              "Number of times to send the message if the remote side didn't respond with Ack or Nack (default: 7, min: "
-> > > > +              __stringify(MIN_RTR_CNT) ", max: "
-> > > > +              __stringify(MAX_RTR_CNT) ")");
-> > > > +
-> > > > +static int __read_mostly noreg_cnt;
-> > > > +module_param_named(noreg_cnt, noreg_cnt, int, 0444);
-> > > > +MODULE_PARM_DESC(noreg_cnt,
-> > > > +              "Max number of SG entries when MR registration does not happen (default: 0)");
-> > >
-> > > We don't like modules in new code.
-> > could you elaberate a bit, no module paramters? which one? all?
->
-> All of them.
-Ok
+On 1/7/20 2:56 AM, Jinpu Wang wrote:
+> On Mon, Jan 6, 2020 at 6:07 PM Jinpu Wang <jinpu.wang@cloud.ionos.com> wrote:
+>>
+>> On Fri, Jan 3, 2020 at 5:29 PM Bart Van Assche <bvanassche@acm.org> wrote:
+>>>
+>>> On 1/3/20 4:39 AM, Jinpu Wang wrote:
+>>>> Performance results for the v5.5-rc1 kernel are here:
+>>>>     link: https://github.com/ionos-enterprise/ibnbd/tree/develop/performance/v5-v5.5-rc1
+>>>>
+>>>> Some workloads RNBD are faster, some workloads NVMeoF are faster.
+>>>
+>>> Thank you for having shared these graphs.
+>>>
+>>> Do the graphs in RNBD-SinglePath.pdf show that NVMeOF achieves similar
+>>> or higher IOPS, higher bandwidth and lower latency than RNBD for
+>>> workloads with a block size of 4 KB and also for mixed workloads with
+>>> less than 20 disks, whether or not invalidation is enabled for RNBD?
+>> Hi Bart,
+>>
+>> Yes, that's the result on one pair of Server with Connect X4 HCA, I
+>> did another test on another
+>> 2 servers with Connect X5 HCA, results are quite different, we will
+>> double-check the
+>> performance results also on old machines, will share new results later.
+>>
+> here are the results with ConnectX5 HCA MT4119 + Intel(R) Xeon(R) Gold
+> 6130 CPU @ 2.10GHz, sorry no graph for now,
+> will prepare the next round.
+> 
+>   disks   4k nvme dual  4k nvme single    4k rnbd dual  4k rnbd single
+> 4k rnbd-inv dual  4k rnbd-inv single
+>     x1  251637.436256   254312.068793   270886.311369   260934.306569
+>    218632.336766       190800.519948
+>     x2  460894.610539   463925.907409   496318.068193   466374.862514
+>     418960.30397       372848.815118
+>     x3  603263.673633    605004.49955   675073.892611   614552.144786
+>    586223.077692       524221.977802
+>     x4  731648.935106   733174.482552   850245.575442   743062.493751
+>    744380.361964       656861.813819
+>     x5  827732.326767   827444.855514  1026939.306069   840515.548445
+>    897801.719828       762707.329267
+>     x6  876705.329467     873963.0037  1142399.960004    876974.70253
+>   1037773.522648       834073.892611
+>     x7  893808.719128   893268.073193  1239282.471753   892728.027197
+>   1135570.742926       871336.966303
+>     x8  906589.741026   905938.006199  1287178.964207   906189.381062
+>     1225040.9959       895292.070793
+>     x9   912048.09519   912400.259974  1386211.878812   913885.311469
+>   1302472.964884       910176.282372
+>    x10  915566.243376   915602.739726   1442959.70403   916288.871113
+>   1350296.325879        914966.40336
+>    x11  917116.188381   916905.809419  1418574.942506   916264.373563
+>   1370438.698083       915255.874413
+>    x12  915852.814719   917710.128987  1423534.546545   916348.386452
+>   1352357.364264       914966.656684
+>    x13   919042.69573   918819.536093  1429697.830217   917631.036896
+>   1378083.824558       916519.161677
+>    x14   920000.49995    920031.59684  1443317.268273   917562.843716
+>    1395023.56936       918935.706429
+>    x15  920160.883912   920367.363264  1445306.425863   918278.472153
+>   1440776.944611       916352.265921
+>    x16  920652.869426   920673.832617  1454705.229477   917902.948526
+>     1455708.2501       918198.001998
+>    x17  916892.310769   916883.623275  1491071.841948   918936.706329
+>   1436507.428457       917182.934132
+>    x18  917247.775222   917762.523748  1612129.058036   918546.835949
+>   1488716.583417       919521.095781
+>    x19  920084.791521   920349.930014   1615690.87821   915371.496958
+>    1406747.32954       918347.248577
+>    x20  922339.232154   922208.058388  1591415.958404   917922.631526
+>   1343806.744488       918903.393214
+>    x21  923141.771646   923297.040592  1581547.169811   919371.025795
+>   1342568.406347       919157.752944
+>    x22  923063.787243   924072.385523  1574972.846162   919173.713143
+>   1340318.639673       920577.995403
+>    x23  923549.490102   924643.471306  1573597.440256   918705.060385
+>   1333047.771337       917469.027431
+>    x24  925584.483103   925224.955009  1578143.485651    921744.15117
+>   1321494.708466       920001.498352
+>    x25  926165.366927   926842.031594  1579288.271173   921845.392764
+>   1319902.568202       920448.830702
+>    x26  926852.729454   927382.123575  1585351.318945    922669.59912
+>   1325670.791338       919137.796847
+>    x27  928196.260748   928093.981204  1581427.557244   921379.155436
+>   1325009.972078       919017.550858
+>    x28  929330.433913   929606.778644  1581726.527347   924325.834833
+>   1331721.074174       919557.761373
+>    x29  929885.522895   929876.924615  1578317.436513   922977.240966
+>    1333612.86783       921094.386736
+>    x30  930635.972805   930599.520144  1583537.946205   922746.107784
+>   1333446.651362       922821.171531
+
+Hi Jack,
+
+What does "dual" mean? What explains the big difference between the NVMe 
+and RNBD results for the "dual" columns?
+
+Thanks,
+
+Bart.
 
 
-
-snip
-> > > > +static bool __rtrs_clt_change_state(struct rtrs_clt_sess *sess,
-> > > > +                                  enum rtrs_clt_state new_state)
-> > > > +{
-> > > > +     enum rtrs_clt_state old_state;
-> > > > +     bool changed = false;
-> > > > +
-> > > > +     lockdep_assert_held(&sess->state_wq.lock);
-> > > > +
-> > > > +     old_state = sess->state;
-> > > > +     switch (new_state) {
-> > > > +     case RTRS_CLT_CONNECTING:
-> > > > +             switch (old_state) {
-> > >
-> > > Double switch is better to be avoided.
-> > what's the better way to do it?
->
-> Rewrite function to be more readable.
-Frankly I think it's easy to read, depends on old_state change to new state.
-see also scsi_device_set_state
-
-Thanks
