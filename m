@@ -2,195 +2,197 @@ Return-Path: <SRS0=7rSP=3F=vger.kernel.org=linux-block-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-10.1 required=3.0 tests=DKIMWL_WL_HIGH,DKIM_SIGNED,
-	DKIM_VALID,DKIM_VALID_AU,INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,
-	SPF_HELO_NONE,SPF_PASS,USER_AGENT_GIT autolearn=unavailable
+X-Spam-Status: No, score=-2.3 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
+	MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,USER_AGENT_SANE_1 autolearn=no
 	autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id C92CFC33CB8
-	for <linux-block@archiver.kernel.org>; Thu, 16 Jan 2020 17:50:38 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id E9696C33CB3
+	for <linux-block@archiver.kernel.org>; Thu, 16 Jan 2020 17:52:22 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.kernel.org (Postfix) with ESMTP id A4EAE246D9
-	for <linux-block@archiver.kernel.org>; Thu, 16 Jan 2020 17:50:38 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=default; t=1579197038;
-	bh=Q6zmAgSLet3zsI54m+5yKR2ggqICHSEN3q7Rnia/DQ8=;
-	h=From:To:Cc:Subject:Date:In-Reply-To:References:List-ID:From;
-	b=lN7SeCkFvFDpQmUZ/vzMkF+uSNADrWhLCsx+FRaEo5hMcaIkOhYV2osrVq+meuooL
-	 UsNOSkwPvOgVyPBKdds3LdOluYpGfOcJbN4fZrirNI6hnkgMiS/gy4qPjdl7jTuK9B
-	 1MudJRat2RetU7ZDvoyQ2bg8IttWt5D4NPjdw1Rs=
+	by mail.kernel.org (Postfix) with ESMTP id CE12A24695
+	for <linux-block@archiver.kernel.org>; Thu, 16 Jan 2020 17:52:22 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S2406481AbgAPRpp (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Thu, 16 Jan 2020 12:45:45 -0500
-Received: from mail.kernel.org ([198.145.29.99]:37850 "EHLO mail.kernel.org"
+        id S2406186AbgAPRpZ (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Thu, 16 Jan 2020 12:45:25 -0500
+Received: from mx2.suse.de ([195.135.220.15]:40788 "EHLO mx2.suse.de"
         rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-        id S2406406AbgAPRpp (ORCPT <rfc822;linux-block@vger.kernel.org>);
-        Thu, 16 Jan 2020 12:45:45 -0500
-Received: from sasha-vm.mshome.net (c-73-47-72-35.hsd1.nh.comcast.net [73.47.72.35])
-        (using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
-        (No client certificate requested)
-        by mail.kernel.org (Postfix) with ESMTPSA id 7F29A24765;
-        Thu, 16 Jan 2020 17:45:42 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-        s=default; t=1579196744;
-        bh=Q6zmAgSLet3zsI54m+5yKR2ggqICHSEN3q7Rnia/DQ8=;
-        h=From:To:Cc:Subject:Date:In-Reply-To:References:From;
-        b=nvIA8CLlWNBZsw8U36uRvHh9gTYTLwxL8319NDK6jLRxGvyObiPiOhnNTMAYg7CML
-         hpHCxw4fwTrjWaxCylN/yNr98/kZgqlJHjDJlKsHbsQkLZRitP3JmdhNScjA3eG/qL
-         xWjHIOEip19iD1StMZKS0LUuDksm4V4c4ErrFAl8=
-From:   Sasha Levin <sashal@kernel.org>
-To:     linux-kernel@vger.kernel.org, stable@vger.kernel.org
-Cc:     "Eric W. Biederman" <ebiederm@xmission.com>,
-        ronnie sahlberg <ronniesahlberg@gmail.com>,
-        =?UTF-8?q?Christoph=20B=C3=B6hmwalder?= 
-        <christoph.boehmwalder@linbit.com>,
-        Steve French <smfrench@gmail.com>,
-        Philipp Reisner <philipp.reisner@linbit.com>,
-        David Laight <David.Laight@ACULAB.COM>,
-        Sasha Levin <sashal@kernel.org>, drbd-dev@lists.linbit.com,
-        linux-block@vger.kernel.org, linux-cifs@vger.kernel.org,
-        samba-technical@lists.samba.org
-Subject: [PATCH AUTOSEL 4.4 123/174] signal: Allow cifs and drbd to receive their terminating signals
-Date:   Thu, 16 Jan 2020 12:42:00 -0500
-Message-Id: <20200116174251.24326-123-sashal@kernel.org>
-X-Mailer: git-send-email 2.20.1
-In-Reply-To: <20200116174251.24326-1-sashal@kernel.org>
-References: <20200116174251.24326-1-sashal@kernel.org>
+        id S1729991AbgAPRpZ (ORCPT <rfc822;linux-block@vger.kernel.org>);
+        Thu, 16 Jan 2020 12:45:25 -0500
+X-Virus-Scanned: by amavisd-new at test-mx.suse.de
+Received: from relay2.suse.de (unknown [195.135.220.254])
+        by mx2.suse.de (Postfix) with ESMTP id CBBC9AF2C;
+        Thu, 16 Jan 2020 17:45:21 +0000 (UTC)
+Subject: Re: [PATCH 09/11] megaraid_sas: switch fusion adapters to MQ
+To:     John Garry <john.garry@huawei.com>,
+        Sumit Saxena <sumit.saxena@broadcom.com>
+Cc:     "Martin K. Petersen" <martin.petersen@oracle.com>,
+        Jens Axboe <axboe@kernel.dk>, Christoph Hellwig <hch@lst.de>,
+        James Bottomley <james.bottomley@hansenpartnership.com>,
+        Ming Lei <ming.lei@redhat.com>,
+        Linux SCSI List <linux-scsi@vger.kernel.org>,
+        linux-block@vger.kernel.org, Hannes Reinecke <hare@suse.com>
+References: <20191202153914.84722-1-hare@suse.de>
+ <20191202153914.84722-10-hare@suse.de>
+ <CAL2rwxqjiRTuZ0ntfaHHzG7z-VmxRQCXYyxZeX9eDMrmX+dbGg@mail.gmail.com>
+ <efe9c1e7-fa10-3bae-eacd-58d43295d6da@suse.de>
+ <CAL2rwxotoWakFS4DPe85hZ4VAgd_zw8pL+B5ckHR9NwEf+-L=g@mail.gmail.com>
+ <11034edd-732a-3dd5-0bdc-891b9de05e56@huawei.com>
+ <661fd3db-0254-c209-8fb3-f3aa35bac431@suse.de>
+ <f3102e65-4201-bf4f-7127-a1e85b18ab59@huawei.com>
+From:   Hannes Reinecke <hare@suse.de>
+Message-ID: <6684b87d-a8e0-3524-b381-6bc26b5456f8@suse.de>
+Date:   Thu, 16 Jan 2020 18:45:20 +0100
+User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:68.0) Gecko/20100101
+ Thunderbird/68.2.1
 MIME-Version: 1.0
-Content-Type: text/plain; charset=UTF-8
-X-stable: review
-X-Patchwork-Hint: Ignore
+In-Reply-To: <f3102e65-4201-bf4f-7127-a1e85b18ab59@huawei.com>
+Content-Type: text/plain; charset=utf-8; format=flowed
+Content-Language: en-US
 Content-Transfer-Encoding: 8bit
 Sender: linux-block-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-From: "Eric W. Biederman" <ebiederm@xmission.com>
+On 1/16/20 4:47 PM, John Garry wrote:
+> 
+>>>>
+>>>> Hi Hannes,
+>>>>
+>>>> Sorry for the delay in replying, I observed a few issues with this
+>>>> patchset:
+>>>>
+>>>> 1. "blk_mq_unique_tag_to_hwq(tag)" does not return MSI-x vector to
+>>>> which IO submitter CPU is affined with. Due to this IO submission and
+>>>> completion CPUs are different which causes performance drop for low
+>>>> latency workloads.
+>>>
+>>> Hi Sumit,
+>>>
+>>> So the new code has:
+>>>
+>>> megasas_build_ldio_fusion()
+>>> {
+>>>
+>>> cmd->request_desc->SCSIIO.MSIxIndex =
+>>> blk_mq_unique_tag_to_hwq(tag);
+>>>
+>>> }
+>>>
+>>> So the value here is hw queue index from blk-mq point of view, and not
+>>> megaraid_sas msix index, as you alluded to.
+>>>
+>>> So we get 80 msix, 8 are reserved for low_latency_index_start (that's
+>>> how it seems to me), and we report other 72 as #hw queues = 72 to SCSI
+>>> midlayer.
+>>>
+>>> So I think that this should be:
+>>>
+>>> cmd->request_desc->SCSIIO.MSIxIndex =
+>>> blk_mq_unique_tag_to_hwq(tag) + low_latency_index_start;
+>>>
+>>>
+>> Indeed, that sounds reasonable.
+>> (The whole queue mapping stuff isn't exactly well documented :-( )
+>>
+> 
+> Yeah, there's certainly lots of knobs and levers in this driver.
+> 
+>> I'll be updating the patch.
+> 
+> About this one:
+> 
+>  > 2. Seeing below stack traces/messages in dmesg during driver unload –
+>  >
+>  > [2565601.054366] Call Trace:
+>  > [2565601.054368]  blk_mq_free_map_and_requests+0x28/0x50
+>  > [2565601.054369]  blk_mq_free_tag_set+0x1d/0x90
+>  > [2565601.054370]  scsi_host_dev_release+0x8a/0xf0
+>  > [2565601.054370]  device_release+0x27/0x80
+>  > [2565601.054371]  kobject_cleanup+0x61/0x190
+>  > [2565601.054373]  megasas_detach_one+0x4c1/0x650 [megaraid_sas]
+>  > [2565601.054374]  pci_device_remove+0x3b/0xc0
+>  > [2565601.054375]  device_release_driver_internal+0xec/0x1b0
+>  > [2565601.054376]  driver_detach+0x46/0x90
+>  > [2565601.054377]  bus_remove_driver+0x58/0xd0
+>  > [2565601.054378]  pci_unregister_driver+0x26/0xa0
+>  > [2565601.054379]  megasas_exit+0x91/0x882 [megaraid_sas]
+>  > [2565601.054381]  __x64_sys_delete_module+0x16c/0x250
+>  > [2565601.054382]  do_syscall_64+0x5b/0x1b0
+>  > [2565601.054383]  entry_SYSCALL_64_after_hwframe+0x44/0xa9
+>  > [2565601.054383] RIP: 0033:0x7f7212a82837
+>  > [2565601.054384] RSP: 002b:00007ffdfa2dcea8 EFLAGS: 00000202 ORIG_RAX:
+>  > 00000000000000b0
+>  > [2565601.054385] RAX: ffffffffffffffda RBX: 0000000000b6e2e0 RCX:
+>  > 00007f7212a82837
+>  > [2565601.054385] RDX: 00007f7212af3ac0 RSI: 0000000000000800 RDI:
+>  > 0000000000b6e348
+>  > [2565601.054386] RBP: 0000000000000000 R08: 00007f7212d47060 R09:
+>  > 00007f7212af3ac0
+>  > [2565601.054386] R10: 00007ffdfa2dcbc0 R11: 0000000000000202 R12:
+>  > 00007ffdfa2dd71c
+>  > [2565601.054387] R13: 0000000000000000 R14: 0000000000b6e2e0 R15:
+>  > 0000000000b6e010
+>  > [2565601.054387] ---[ end trace 38899303bd85e838 ]---
+> 
+> 
+> I see it also for hisi_sas_v3_hw.
+> 
+> And so I don't understand the code change here, specifically where the 
+> WARN is generated:
+> 
+> void blk_mq_free_rqs(struct blk_mq_tag_set *set, struct blk_mq_tags *tags,
+>               unsigned int hctx_idx)
+> {
+>      struct page *page;
+>      int i;
+> 
+>      if (tags->rqs) {
+>          for (i = 0; i < tags->nr_tags; i++)
+>              if (WARN_ON(tags->rqs[i]))
+>                  tags->rqs[i] = NULL; <--- here
+>      }
+> 
+> 
+> I thought that tags->rqs[i] was just a holder for a pointer to a static 
+> tag, like assigned here:
+> 
+> static struct request *blk_mq_rq_ctx_init(struct blk_mq_alloc_data *data,
+> unsigned int tag, unsigned int op, u64 alloc_time_ns)
+> {
+>      struct blk_mq_tags *tags = blk_mq_tags_from_data(data);
+>      struct request *rq = tags->static_rqs[tag];
+> 
+>      ...
+> 
+>      rq->tag = tag;
+>      rq->internal_tag = -1;
+>      data->hctx->tags->rqs[rq->tag] = rq;
+> 
+>      ...
+> }
+> 
+> So I don't know why we need to WARN if unset, and then also clear it. 
+> The memory is freed pretty soon after this anyway.
+> 
+Indeed, ->rqs is a holder, referencing an entry in ->static_rqs.
+Point here is that ->rqs is set when allocating a request, and should be 
+zeroed when freeing the request.
+And then this above patch would warn us if there's an imbalance, ie an 
+allocated request didn't get freed.
+But apparently the latter part didn't happen, leaving us with stale 
+entries in ->rqs.
+Either we fix that, or we drop the WARN_ON.
+Personally I like clearing of the ->rqs pointer (as then it's easier to 
+track use-after-free issues), but then this might have performance 
+implications, and Jens might have some views about it.
+So I'm fine with dropping it.
 
-[ Upstream commit 33da8e7c814f77310250bb54a9db36a44c5de784 ]
+Cheers,
 
-My recent to change to only use force_sig for a synchronous events
-wound up breaking signal reception cifs and drbd.  I had overlooked
-the fact that by default kthreads start out with all signals set to
-SIG_IGN.  So a change I thought was safe turned out to have made it
-impossible for those kernel thread to catch their signals.
-
-Reverting the work on force_sig is a bad idea because what the code
-was doing was very much a misuse of force_sig.  As the way force_sig
-ultimately allowed the signal to happen was to change the signal
-handler to SIG_DFL.  Which after the first signal will allow userspace
-to send signals to these kernel threads.  At least for
-wake_ack_receiver in drbd that does not appear actively wrong.
-
-So correct this problem by adding allow_kernel_signal that will allow
-signals whose siginfo reports they were sent by the kernel through,
-but will not allow userspace generated signals, and update cifs and
-drbd to call allow_kernel_signal in an appropriate place so that their
-thread can receive this signal.
-
-Fixing things this way ensures that userspace won't be able to send
-signals and cause problems, that it is clear which signals the
-threads are expecting to receive, and it guarantees that nothing
-else in the system will be affected.
-
-This change was partly inspired by similar cifs and drbd patches that
-added allow_signal.
-
-Reported-by: ronnie sahlberg <ronniesahlberg@gmail.com>
-Reported-by: Christoph Böhmwalder <christoph.boehmwalder@linbit.com>
-Tested-by: Christoph Böhmwalder <christoph.boehmwalder@linbit.com>
-Cc: Steve French <smfrench@gmail.com>
-Cc: Philipp Reisner <philipp.reisner@linbit.com>
-Cc: David Laight <David.Laight@ACULAB.COM>
-Fixes: 247bc9470b1e ("cifs: fix rmmod regression in cifs.ko caused by force_sig changes")
-Fixes: 72abe3bcf091 ("signal/cifs: Fix cifs_put_tcp_session to call send_sig instead of force_sig")
-Fixes: fee109901f39 ("signal/drbd: Use send_sig not force_sig")
-Fixes: 3cf5d076fb4d ("signal: Remove task parameter from force_sig")
-Signed-off-by: "Eric W. Biederman" <ebiederm@xmission.com>
-Signed-off-by: Sasha Levin <sashal@kernel.org>
----
- drivers/block/drbd/drbd_main.c |  2 ++
- fs/cifs/connect.c              |  2 +-
- include/linux/signal.h         | 15 ++++++++++++++-
- kernel/signal.c                |  5 +++++
- 4 files changed, 22 insertions(+), 2 deletions(-)
-
-diff --git a/drivers/block/drbd/drbd_main.c b/drivers/block/drbd/drbd_main.c
-index 385ec4ae3394..456350bd24b3 100644
---- a/drivers/block/drbd/drbd_main.c
-+++ b/drivers/block/drbd/drbd_main.c
-@@ -331,6 +331,8 @@ static int drbd_thread_setup(void *arg)
- 		 thi->name[0],
- 		 resource->name);
- 
-+	allow_kernel_signal(DRBD_SIGKILL);
-+	allow_kernel_signal(SIGXCPU);
- restart:
- 	retval = thi->function(thi);
- 
-diff --git a/fs/cifs/connect.c b/fs/cifs/connect.c
-index f44281a5eb9f..4bde8acca455 100644
---- a/fs/cifs/connect.c
-+++ b/fs/cifs/connect.c
-@@ -939,7 +939,7 @@ cifs_demultiplex_thread(void *p)
- 		mempool_resize(cifs_req_poolp, length + cifs_min_rcv);
- 
- 	set_freezable();
--	allow_signal(SIGKILL);
-+	allow_kernel_signal(SIGKILL);
- 	while (server->tcpStatus != CifsExiting) {
- 		if (try_to_freeze())
- 			continue;
-diff --git a/include/linux/signal.h b/include/linux/signal.h
-index bcc094cb697c..649cd9fc63ca 100644
---- a/include/linux/signal.h
-+++ b/include/linux/signal.h
-@@ -313,6 +313,9 @@ extern void signal_setup_done(int failed, struct ksignal *ksig, int stepping);
- extern void exit_signals(struct task_struct *tsk);
- extern void kernel_sigaction(int, __sighandler_t);
- 
-+#define SIG_KTHREAD ((__force __sighandler_t)2)
-+#define SIG_KTHREAD_KERNEL ((__force __sighandler_t)3)
-+
- static inline void allow_signal(int sig)
- {
- 	/*
-@@ -320,7 +323,17 @@ static inline void allow_signal(int sig)
- 	 * know it'll be handled, so that they don't get converted to
- 	 * SIGKILL or just silently dropped.
- 	 */
--	kernel_sigaction(sig, (__force __sighandler_t)2);
-+	kernel_sigaction(sig, SIG_KTHREAD);
-+}
-+
-+static inline void allow_kernel_signal(int sig)
-+{
-+	/*
-+	 * Kernel threads handle their own signals. Let the signal code
-+	 * know signals sent by the kernel will be handled, so that they
-+	 * don't get silently dropped.
-+	 */
-+	kernel_sigaction(sig, SIG_KTHREAD_KERNEL);
- }
- 
- static inline void disallow_signal(int sig)
-diff --git a/kernel/signal.c b/kernel/signal.c
-index 3095b2309876..7e4a4b199a11 100644
---- a/kernel/signal.c
-+++ b/kernel/signal.c
-@@ -79,6 +79,11 @@ static int sig_task_ignored(struct task_struct *t, int sig, bool force)
- 	    handler == SIG_DFL && !(force && sig_kernel_only(sig)))
- 		return 1;
- 
-+	/* Only allow kernel generated signals to this kthread */
-+	if (unlikely((t->flags & PF_KTHREAD) &&
-+		     (handler == SIG_KTHREAD_KERNEL) && !force))
-+		return true;
-+
- 	return sig_handler_ignored(handler, sig);
- }
- 
+Hannes
 -- 
-2.20.1
-
+Dr. Hannes Reinecke            Teamlead Storage & Networking
+hare@suse.de                               +49 911 74053 688
+SUSE Software Solutions GmbH, Maxfeldstr. 5, 90409 Nürnberg
+HRB 36809 (AG Nürnberg), Geschäftsführer: Felix Imendörffer
