@@ -2,73 +2,71 @@ Return-Path: <SRS0=7rSP=3F=vger.kernel.org=linux-block-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-5.3 required=3.0 tests=DKIM_SIGNED,DKIM_VALID,
-	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,SPF_HELO_NONE,
-	SPF_PASS,USER_AGENT_SANE_1 autolearn=ham autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-2.3 required=3.0 tests=DKIM_SIGNED,DKIM_VALID,
+	HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,
+	USER_AGENT_SANE_1 autolearn=no autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id A39DAC33CB1
-	for <linux-block@archiver.kernel.org>; Thu, 16 Jan 2020 04:42:29 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id EF999C33CB1
+	for <linux-block@archiver.kernel.org>; Thu, 16 Jan 2020 04:43:43 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.kernel.org (Postfix) with ESMTP id 766EC20748
-	for <linux-block@archiver.kernel.org>; Thu, 16 Jan 2020 04:42:29 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id BFF8820748
+	for <linux-block@archiver.kernel.org>; Thu, 16 Jan 2020 04:43:43 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel-dk.20150623.gappssmtp.com header.i=@kernel-dk.20150623.gappssmtp.com header.b="bGkDp6+e"
+	dkim=pass (2048-bit key) header.d=kernel-dk.20150623.gappssmtp.com header.i=@kernel-dk.20150623.gappssmtp.com header.b="WJBVY3nC"
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1729188AbgAPEm2 (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Wed, 15 Jan 2020 23:42:28 -0500
-Received: from mail-pl1-f196.google.com ([209.85.214.196]:37407 "EHLO
-        mail-pl1-f196.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1729138AbgAPEm2 (ORCPT
+        id S1726552AbgAPEnn (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Wed, 15 Jan 2020 23:43:43 -0500
+Received: from mail-pj1-f66.google.com ([209.85.216.66]:53677 "EHLO
+        mail-pj1-f66.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S1729138AbgAPEnn (ORCPT
         <rfc822;linux-block@vger.kernel.org>);
-        Wed, 15 Jan 2020 23:42:28 -0500
-Received: by mail-pl1-f196.google.com with SMTP id c23so7798826plz.4
-        for <linux-block@vger.kernel.org>; Wed, 15 Jan 2020 20:42:28 -0800 (PST)
+        Wed, 15 Jan 2020 23:43:43 -0500
+Received: by mail-pj1-f66.google.com with SMTP id n96so937745pjc.3
+        for <linux-block@vger.kernel.org>; Wed, 15 Jan 2020 20:43:42 -0800 (PST)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=kernel-dk.20150623.gappssmtp.com; s=20150623;
-        h=subject:from:to:cc:references:message-id:date:user-agent
+        h=subject:to:cc:references:from:message-id:date:user-agent
          :mime-version:in-reply-to:content-language:content-transfer-encoding;
-        bh=Xipnalrq0OU4degfJBjGIJ927VLjRVVTYviHU6YSMSQ=;
-        b=bGkDp6+e0r+R7CoK7bRfBkgnMMuhpNPb1M2ipaUW1F6L5bnxmpcHiCY6i7hlSrmbTu
-         8dM9PYxzWfrvXrvJ/dhpMR+u5XYQuuDrqVdVwhh0cuycZVzuEGXYkVTj5Y77umTC4NYB
-         SW3WFNoqIPhoT0XoQhMG5eRYLBQAp2khATAZ+byaEOigywUvPrsZbX+Vn8Xb0i08c4Hn
-         kc8/pT3veLnfuMD3R+wh7w7aELfa42vNTJu8Fedw8W080bzOkbBuZFm6K50ctn4w2DfV
-         Y7yf1r5R4YOnUSmdteBCcLxIK8v2USMSWFVVy15U9hGC9D0pwwZJU4xTTHH4mdAcBlBH
-         F/Ww==
+        bh=tQOS9ykL8kDiDpFhWlW2cOv2Kzb1Z6JcIaDHRAWaufU=;
+        b=WJBVY3nCN+GyBuVTM1QYsofvrmOXGph08lGYpnvCuF2D+M88uj4+OP5MKiGtBRHxg9
+         HnvnMWYkPTmEv9Zv0ZDGmoM/SYHgPKaXX+gCDOAZGgUpJN2hl+IWVg4XBB/6WIj/Ey+s
+         blEroMTCohOFOgfzEKNsF/JU6KuO5uuCZqCuwk9TM52gMHxbliPeAp2cKms8qDud3P8t
+         05kd2GQJDrS7+u2Tv2MLusQ66jq7O93NiB+DgkRZViSZ8Et5GFVYGJSvJ7eG6hr4pLjb
+         ji+fzx59BogME+3RZ3TV7uk2BdDJ1jpUqdVIhJ8dauAG9RyONSzQoU9idTKuKH7sdeJA
+         ntGA==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=1e100.net; s=20161025;
-        h=x-gm-message-state:subject:from:to:cc:references:message-id:date
+        h=x-gm-message-state:subject:to:cc:references:from:message-id:date
          :user-agent:mime-version:in-reply-to:content-language
          :content-transfer-encoding;
-        bh=Xipnalrq0OU4degfJBjGIJ927VLjRVVTYviHU6YSMSQ=;
-        b=osw/mxPkCNNBXl9VYdKr4d0qYw65S3GBwHz+qMEjFnAc+z+TQTM2KueMwtZcj8zf6h
-         SRebdUfCUPxDI2yaZq/K5gOT4j8yG1bmm5tj3l2f9MG0MgHXVpBeLHajCjkWpnP2oUP+
-         bzll7kBZXJxNn7W2Koq8KTxkGDKDihIxO+TptkfSb5nEIH/WeLaekXl28leOnvowmNBx
-         kXma2QBSHRp+cz4SQ6h3noWkwJfp9SNAcEsMRNQ0qCt4UKn6AT1mX74OoIboT0FsQ0PV
-         VRAWvVtjwtW9pReun3mfqBjsZWxqTKIV5GILp4aE4v56jVokclK5nl0o/3WPlfkopBsi
-         ffAQ==
-X-Gm-Message-State: APjAAAV3poojntZzbVPGaMpPd5smL6/9C8sFwMTeRJ4VzeOREWR+0+5y
-        VUPO+TVKBl6krW3PlgLhNQtqvozRIsU=
-X-Google-Smtp-Source: APXvYqwMtYxxuzf7jvIoJIBuOINNrBfvekIQtdAnnofGvrFRUk2AJVT8RqDV8H/yYyuDn6grFpx2YA==
-X-Received: by 2002:a17:902:8ec6:: with SMTP id x6mr9450855plo.179.1579149747474;
-        Wed, 15 Jan 2020 20:42:27 -0800 (PST)
+        bh=tQOS9ykL8kDiDpFhWlW2cOv2Kzb1Z6JcIaDHRAWaufU=;
+        b=UUhk0O8KlIwfaF0LoddMykT524K7iSmk/FhLNUNCLtCHXSCKmoSkaeFmeHxcMeORGD
+         +2Rsg29PIObojywwymkoEDSXsVLI6sJRKzfRP2c+LQHx8Otb19Xoui8uwxdq+/LO27oL
+         G3yPQxShz2fiMftauTaCC0ASU64uBm9zJ4/8icuSiI+C4FfJgmVKxidHVlGABJnAyd4M
+         ciMCxF6NmhAwV32UIEh/esAOOJPW93/Mf/QYCuW9n3nPbQryFW/tkpuvi/v2Mb7NXby6
+         uUaouapj18Y9NouffUpHFYV7Mj1zsuldoRGmo/FsqFA9Jp29tWkPlS9X+u0Sal+X4o6n
+         XX8Q==
+X-Gm-Message-State: APjAAAWWjdFMiWkOxy5LaUcjzBJSgHdgzib1FRfNSP2WsHQtsKx28bd1
+        dmsuNxIk+IiXNWpU3bf2mm4cghGdiNM=
+X-Google-Smtp-Source: APXvYqzOne459gI8+ok09JE1JN36m1QzqwT/j4wr0q9YgDvHpfW1mqNP0LmmW1pvFG8+z+uaV60IZg==
+X-Received: by 2002:a17:902:8f8e:: with SMTP id z14mr22136266plo.195.1579149822350;
+        Wed, 15 Jan 2020 20:43:42 -0800 (PST)
 Received: from [192.168.1.188] ([66.219.217.145])
-        by smtp.gmail.com with ESMTPSA id k1sm22734560pgk.90.2020.01.15.20.42.26
+        by smtp.gmail.com with ESMTPSA id z30sm22451520pff.131.2020.01.15.20.43.41
         (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
-        Wed, 15 Jan 2020 20:42:27 -0800 (PST)
-Subject: Re: [RFC 2/2] io_uring: acquire ctx->uring_lock before calling
- io_issue_sqe()
+        Wed, 15 Jan 2020 20:43:41 -0800 (PST)
+Subject: Re: [PATCH] block: fix an integer overflow in logical block size
+To:     Mikulas Patocka <mpatocka@redhat.com>
+Cc:     dm-devel@redhat.com, linux-block@vger.kernel.org,
+        Mike Snitzer <msnitzer@redhat.com>
+References: <alpine.LRH.2.02.2001150833180.31494@file01.intranet.prod.int.rdu2.redhat.com>
 From:   Jens Axboe <axboe@kernel.dk>
-To:     Bijan Mottahedeh <bijan.mottahedeh@oracle.com>
-Cc:     linux-block@vger.kernel.org
-References: <1579142266-64789-1-git-send-email-bijan.mottahedeh@oracle.com>
- <1579142266-64789-3-git-send-email-bijan.mottahedeh@oracle.com>
- <9b359dde-3bb6-5886-264b-4bee90be9e25@kernel.dk>
-Message-ID: <8f7986c7-e5b4-8f24-1c71-666c01b16c8b@kernel.dk>
-Date:   Wed, 15 Jan 2020 21:42:25 -0700
+Message-ID: <c013af2b-d5b9-06d9-e617-db882cde4a37@kernel.dk>
+Date:   Wed, 15 Jan 2020 21:43:40 -0700
 User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:68.0) Gecko/20100101
  Thunderbird/68.2.2
 MIME-Version: 1.0
-In-Reply-To: <9b359dde-3bb6-5886-264b-4bee90be9e25@kernel.dk>
+In-Reply-To: <alpine.LRH.2.02.2001150833180.31494@file01.intranet.prod.int.rdu2.redhat.com>
 Content-Type: text/plain; charset=utf-8
 Content-Language: en-US
 Content-Transfer-Encoding: 7bit
@@ -77,47 +75,27 @@ Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-On 1/15/20 9:34 PM, Jens Axboe wrote:
-> On 1/15/20 7:37 PM, Bijan Mottahedeh wrote:
->> io_issue_sqe() calls io_iopoll_req_issued() which manipulates poll_list,
->> so acquire ctx->uring_lock beforehand similar to other instances of
->> calling io_issue_sqe().
+On 1/15/20 6:35 AM, Mikulas Patocka wrote:
+> Logical block size has type unsigned short. That means that it can be at
+> most 32768. However, there are architectures that can run with 64k pages
+> (for example arm64) and on these architectures, it may be possible to
+> create block devices with 64k block size.
 > 
-> Is the below not enough?
+> For exmaple (run this on an architecture with 64k pages):
+> # modprobe brd rd_size=1048576
+> # dmsetup create cache --table "0 `blockdev --getsize /dev/ram0` writecache s /dev/ram0 /dev/ram1 65536 0"
+> # mkfs.ext4 -b 65536 /dev/mapper/cache
+> # mount -t ext4 /dev/mapper/cache /mnt/test
+> 
+> Mount will fail with this error because it tries to read the superblock using 2-sector
+> access:
+>   device-mapper: writecache: I/O is not aligned, sector 2, size 1024, block size 65536
+>   EXT4-fs (dm-0): unable to read superblock
+> 
+> This patch changes the logical block size from unsigned short to unsigned
+> int to avoid the overflow.
 
-This should be better, we have two that set ->in_async, and only one
-doesn't hold the mutex.
-
-If this works for you, can you resend patch 2 with that? Also add a:
-
-Fixes: 8a4955ff1cca ("io_uring: sqthread should grab ctx->uring_lock for submissions")
-
-to it as well. Thanks!
-
-diff --git a/fs/io_uring.c b/fs/io_uring.c
-index 3130ed16456e..52e5764540e4 100644
---- a/fs/io_uring.c
-+++ b/fs/io_uring.c
-@@ -3286,10 +3286,19 @@ static int io_issue_sqe(struct io_kiocb *req, const struct io_uring_sqe *sqe,
- 		return ret;
- 
- 	if (ctx->flags & IORING_SETUP_IOPOLL) {
-+		const bool in_async = io_wq_current_is_worker();
-+
- 		if (req->result == -EAGAIN)
- 			return -EAGAIN;
- 
-+		/* workqueue context doesn't hold uring_lock, grab it now */
-+		if (in_async)
-+			mutex_lock(&ctx->uring_lock);
-+
- 		io_iopoll_req_issued(req);
-+
-+		if (in_async)
-+			mutex_unlock(&ctx->uring_lock);
- 	}
- 
- 	return 0;
+Thanks, applied.
 
 -- 
 Jens Axboe
