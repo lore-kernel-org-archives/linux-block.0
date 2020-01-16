@@ -2,197 +2,104 @@ Return-Path: <SRS0=7rSP=3F=vger.kernel.org=linux-block-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-2.3 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
-	MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,USER_AGENT_SANE_1 autolearn=no
+X-Spam-Status: No, score=-10.1 required=3.0 tests=DKIMWL_WL_HIGH,DKIM_SIGNED,
+	DKIM_VALID,DKIM_VALID_AU,INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,
+	SPF_HELO_NONE,SPF_PASS,USER_AGENT_GIT autolearn=unavailable
 	autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id E9696C33CB3
-	for <linux-block@archiver.kernel.org>; Thu, 16 Jan 2020 17:52:22 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id C781BC33CAF
+	for <linux-block@archiver.kernel.org>; Thu, 16 Jan 2020 17:56:41 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.kernel.org (Postfix) with ESMTP id CE12A24695
-	for <linux-block@archiver.kernel.org>; Thu, 16 Jan 2020 17:52:22 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id 9AA362073A
+	for <linux-block@archiver.kernel.org>; Thu, 16 Jan 2020 17:56:41 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+	s=default; t=1579197401;
+	bh=EsOFQ6AR3Udi8fHehBcmn+Mp+kyo+XV+cNAgevfSMpo=;
+	h=From:To:Cc:Subject:Date:In-Reply-To:References:List-ID:From;
+	b=VfTs9m/MprzH/OU1zK47kMmjOJrlvIgNDAwyZtP8yg0BodJfNKrmhW4twKvtb5M8r
+	 OiOX4csSZHc5NhzokRSNPKsncFKH/q9DYibhHfjJAbH6v6IDoSvoRdYEsBEQ+WjrIJ
+	 Vs5kGXfx4RMRdQm827ST2NRWFRBNgDnLHhZjC/pQ=
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S2406186AbgAPRpZ (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Thu, 16 Jan 2020 12:45:25 -0500
-Received: from mx2.suse.de ([195.135.220.15]:40788 "EHLO mx2.suse.de"
+        id S1729138AbgAPR4c (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Thu, 16 Jan 2020 12:56:32 -0500
+Received: from mail.kernel.org ([198.145.29.99]:34352 "EHLO mail.kernel.org"
         rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-        id S1729991AbgAPRpZ (ORCPT <rfc822;linux-block@vger.kernel.org>);
-        Thu, 16 Jan 2020 12:45:25 -0500
-X-Virus-Scanned: by amavisd-new at test-mx.suse.de
-Received: from relay2.suse.de (unknown [195.135.220.254])
-        by mx2.suse.de (Postfix) with ESMTP id CBBC9AF2C;
-        Thu, 16 Jan 2020 17:45:21 +0000 (UTC)
-Subject: Re: [PATCH 09/11] megaraid_sas: switch fusion adapters to MQ
-To:     John Garry <john.garry@huawei.com>,
-        Sumit Saxena <sumit.saxena@broadcom.com>
-Cc:     "Martin K. Petersen" <martin.petersen@oracle.com>,
-        Jens Axboe <axboe@kernel.dk>, Christoph Hellwig <hch@lst.de>,
-        James Bottomley <james.bottomley@hansenpartnership.com>,
-        Ming Lei <ming.lei@redhat.com>,
-        Linux SCSI List <linux-scsi@vger.kernel.org>,
-        linux-block@vger.kernel.org, Hannes Reinecke <hare@suse.com>
-References: <20191202153914.84722-1-hare@suse.de>
- <20191202153914.84722-10-hare@suse.de>
- <CAL2rwxqjiRTuZ0ntfaHHzG7z-VmxRQCXYyxZeX9eDMrmX+dbGg@mail.gmail.com>
- <efe9c1e7-fa10-3bae-eacd-58d43295d6da@suse.de>
- <CAL2rwxotoWakFS4DPe85hZ4VAgd_zw8pL+B5ckHR9NwEf+-L=g@mail.gmail.com>
- <11034edd-732a-3dd5-0bdc-891b9de05e56@huawei.com>
- <661fd3db-0254-c209-8fb3-f3aa35bac431@suse.de>
- <f3102e65-4201-bf4f-7127-a1e85b18ab59@huawei.com>
-From:   Hannes Reinecke <hare@suse.de>
-Message-ID: <6684b87d-a8e0-3524-b381-6bc26b5456f8@suse.de>
-Date:   Thu, 16 Jan 2020 18:45:20 +0100
-User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:68.0) Gecko/20100101
- Thunderbird/68.2.1
+        id S2394016AbgAPRnw (ORCPT <rfc822;linux-block@vger.kernel.org>);
+        Thu, 16 Jan 2020 12:43:52 -0500
+Received: from sasha-vm.mshome.net (c-73-47-72-35.hsd1.nh.comcast.net [73.47.72.35])
+        (using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+        (No client certificate requested)
+        by mail.kernel.org (Postfix) with ESMTPSA id 171B524730;
+        Thu, 16 Jan 2020 17:43:51 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+        s=default; t=1579196632;
+        bh=EsOFQ6AR3Udi8fHehBcmn+Mp+kyo+XV+cNAgevfSMpo=;
+        h=From:To:Cc:Subject:Date:In-Reply-To:References:From;
+        b=P9MeyV8BIva7G8TguXK+h2HGW3XWtRk6i5yL12svV/jEAAL1hU/eq9tqZ48zVUxJr
+         Px8wqRqF+xnqe2LEVzkdxmfzbMnKJS5PV6xMb1XwkcUtso4a1Ne5z6N4rufYJRNOHS
+         2lkF8E+zViWbkQQx5MIe5zNY4FB0IDCeaSo0CyOU=
+From:   Sasha Levin <sashal@kernel.org>
+To:     linux-kernel@vger.kernel.org, stable@vger.kernel.org
+Cc:     Ming Lei <ming.lei@redhat.com>, Omar Sandoval <osandov@fb.com>,
+        Christoph Hellwig <hch@lst.de>, Jens Axboe <axboe@kernel.dk>,
+        Sasha Levin <sashal@kernel.org>, linux-block@vger.kernel.org
+Subject: [PATCH AUTOSEL 4.4 045/174] block: don't use bio->bi_vcnt to figure out segment number
+Date:   Thu, 16 Jan 2020 12:40:42 -0500
+Message-Id: <20200116174251.24326-45-sashal@kernel.org>
+X-Mailer: git-send-email 2.20.1
+In-Reply-To: <20200116174251.24326-1-sashal@kernel.org>
+References: <20200116174251.24326-1-sashal@kernel.org>
 MIME-Version: 1.0
-In-Reply-To: <f3102e65-4201-bf4f-7127-a1e85b18ab59@huawei.com>
-Content-Type: text/plain; charset=utf-8; format=flowed
-Content-Language: en-US
+X-stable: review
+X-Patchwork-Hint: Ignore
 Content-Transfer-Encoding: 8bit
 Sender: linux-block-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-On 1/16/20 4:47 PM, John Garry wrote:
-> 
->>>>
->>>> Hi Hannes,
->>>>
->>>> Sorry for the delay in replying, I observed a few issues with this
->>>> patchset:
->>>>
->>>> 1. "blk_mq_unique_tag_to_hwq(tag)" does not return MSI-x vector to
->>>> which IO submitter CPU is affined with. Due to this IO submission and
->>>> completion CPUs are different which causes performance drop for low
->>>> latency workloads.
->>>
->>> Hi Sumit,
->>>
->>> So the new code has:
->>>
->>> megasas_build_ldio_fusion()
->>> {
->>>
->>> cmd->request_desc->SCSIIO.MSIxIndex =
->>> blk_mq_unique_tag_to_hwq(tag);
->>>
->>> }
->>>
->>> So the value here is hw queue index from blk-mq point of view, and not
->>> megaraid_sas msix index, as you alluded to.
->>>
->>> So we get 80 msix, 8 are reserved for low_latency_index_start (that's
->>> how it seems to me), and we report other 72 as #hw queues = 72 to SCSI
->>> midlayer.
->>>
->>> So I think that this should be:
->>>
->>> cmd->request_desc->SCSIIO.MSIxIndex =
->>> blk_mq_unique_tag_to_hwq(tag) + low_latency_index_start;
->>>
->>>
->> Indeed, that sounds reasonable.
->> (The whole queue mapping stuff isn't exactly well documented :-( )
->>
-> 
-> Yeah, there's certainly lots of knobs and levers in this driver.
-> 
->> I'll be updating the patch.
-> 
-> About this one:
-> 
->  > 2. Seeing below stack traces/messages in dmesg during driver unload –
->  >
->  > [2565601.054366] Call Trace:
->  > [2565601.054368]  blk_mq_free_map_and_requests+0x28/0x50
->  > [2565601.054369]  blk_mq_free_tag_set+0x1d/0x90
->  > [2565601.054370]  scsi_host_dev_release+0x8a/0xf0
->  > [2565601.054370]  device_release+0x27/0x80
->  > [2565601.054371]  kobject_cleanup+0x61/0x190
->  > [2565601.054373]  megasas_detach_one+0x4c1/0x650 [megaraid_sas]
->  > [2565601.054374]  pci_device_remove+0x3b/0xc0
->  > [2565601.054375]  device_release_driver_internal+0xec/0x1b0
->  > [2565601.054376]  driver_detach+0x46/0x90
->  > [2565601.054377]  bus_remove_driver+0x58/0xd0
->  > [2565601.054378]  pci_unregister_driver+0x26/0xa0
->  > [2565601.054379]  megasas_exit+0x91/0x882 [megaraid_sas]
->  > [2565601.054381]  __x64_sys_delete_module+0x16c/0x250
->  > [2565601.054382]  do_syscall_64+0x5b/0x1b0
->  > [2565601.054383]  entry_SYSCALL_64_after_hwframe+0x44/0xa9
->  > [2565601.054383] RIP: 0033:0x7f7212a82837
->  > [2565601.054384] RSP: 002b:00007ffdfa2dcea8 EFLAGS: 00000202 ORIG_RAX:
->  > 00000000000000b0
->  > [2565601.054385] RAX: ffffffffffffffda RBX: 0000000000b6e2e0 RCX:
->  > 00007f7212a82837
->  > [2565601.054385] RDX: 00007f7212af3ac0 RSI: 0000000000000800 RDI:
->  > 0000000000b6e348
->  > [2565601.054386] RBP: 0000000000000000 R08: 00007f7212d47060 R09:
->  > 00007f7212af3ac0
->  > [2565601.054386] R10: 00007ffdfa2dcbc0 R11: 0000000000000202 R12:
->  > 00007ffdfa2dd71c
->  > [2565601.054387] R13: 0000000000000000 R14: 0000000000b6e2e0 R15:
->  > 0000000000b6e010
->  > [2565601.054387] ---[ end trace 38899303bd85e838 ]---
-> 
-> 
-> I see it also for hisi_sas_v3_hw.
-> 
-> And so I don't understand the code change here, specifically where the 
-> WARN is generated:
-> 
-> void blk_mq_free_rqs(struct blk_mq_tag_set *set, struct blk_mq_tags *tags,
->               unsigned int hctx_idx)
-> {
->      struct page *page;
->      int i;
-> 
->      if (tags->rqs) {
->          for (i = 0; i < tags->nr_tags; i++)
->              if (WARN_ON(tags->rqs[i]))
->                  tags->rqs[i] = NULL; <--- here
->      }
-> 
-> 
-> I thought that tags->rqs[i] was just a holder for a pointer to a static 
-> tag, like assigned here:
-> 
-> static struct request *blk_mq_rq_ctx_init(struct blk_mq_alloc_data *data,
-> unsigned int tag, unsigned int op, u64 alloc_time_ns)
-> {
->      struct blk_mq_tags *tags = blk_mq_tags_from_data(data);
->      struct request *rq = tags->static_rqs[tag];
-> 
->      ...
-> 
->      rq->tag = tag;
->      rq->internal_tag = -1;
->      data->hctx->tags->rqs[rq->tag] = rq;
-> 
->      ...
-> }
-> 
-> So I don't know why we need to WARN if unset, and then also clear it. 
-> The memory is freed pretty soon after this anyway.
-> 
-Indeed, ->rqs is a holder, referencing an entry in ->static_rqs.
-Point here is that ->rqs is set when allocating a request, and should be 
-zeroed when freeing the request.
-And then this above patch would warn us if there's an imbalance, ie an 
-allocated request didn't get freed.
-But apparently the latter part didn't happen, leaving us with stale 
-entries in ->rqs.
-Either we fix that, or we drop the WARN_ON.
-Personally I like clearing of the ->rqs pointer (as then it's easier to 
-track use-after-free issues), but then this might have performance 
-implications, and Jens might have some views about it.
-So I'm fine with dropping it.
+From: Ming Lei <ming.lei@redhat.com>
 
-Cheers,
+[ Upstream commit 1a67356e9a4829da2935dd338630a550c59c8489 ]
 
-Hannes
+It is wrong to use bio->bi_vcnt to figure out how many segments
+there are in the bio even though CLONED flag isn't set on this bio,
+because this bio may be splitted or advanced.
+
+So always use bio_segments() in blk_recount_segments(), and it shouldn't
+cause any performance loss now because the physical segment number is figured
+out in blk_queue_split() and BIO_SEG_VALID is set meantime since
+bdced438acd83ad83a6c ("block: setup bi_phys_segments after splitting").
+
+Reviewed-by: Omar Sandoval <osandov@fb.com>
+Reviewed-by: Christoph Hellwig <hch@lst.de>
+Fixes: 76d8137a3113 ("blk-merge: recaculate segment if it isn't less than max segments")
+Signed-off-by: Ming Lei <ming.lei@redhat.com>
+Signed-off-by: Jens Axboe <axboe@kernel.dk>
+Signed-off-by: Sasha Levin <sashal@kernel.org>
+---
+ block/blk-merge.c | 8 +-------
+ 1 file changed, 1 insertion(+), 7 deletions(-)
+
+diff --git a/block/blk-merge.c b/block/blk-merge.c
+index 7225511cf0b4..b8f1eaeeaac2 100644
+--- a/block/blk-merge.c
++++ b/block/blk-merge.c
+@@ -296,13 +296,7 @@ void blk_recalc_rq_segments(struct request *rq)
+ 
+ void blk_recount_segments(struct request_queue *q, struct bio *bio)
+ {
+-	unsigned short seg_cnt;
+-
+-	/* estimate segment number by bi_vcnt for non-cloned bio */
+-	if (bio_flagged(bio, BIO_CLONED))
+-		seg_cnt = bio_segments(bio);
+-	else
+-		seg_cnt = bio->bi_vcnt;
++	unsigned short seg_cnt = bio_segments(bio);
+ 
+ 	if (test_bit(QUEUE_FLAG_NO_SG_MERGE, &q->queue_flags) &&
+ 			(seg_cnt < queue_max_segments(q)))
 -- 
-Dr. Hannes Reinecke            Teamlead Storage & Networking
-hare@suse.de                               +49 911 74053 688
-SUSE Software Solutions GmbH, Maxfeldstr. 5, 90409 Nürnberg
-HRB 36809 (AG Nürnberg), Geschäftsführer: Felix Imendörffer
+2.20.1
+
