@@ -2,328 +2,262 @@ Return-Path: <SRS0=7rSP=3F=vger.kernel.org=linux-block-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-6.9 required=3.0 tests=DKIM_SIGNED,DKIM_VALID,
-	DKIM_VALID_AU,HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,
-	SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS autolearn=ham autolearn_force=no
-	version=3.4.0
+X-Spam-Status: No, score=-2.3 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
+	MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,USER_AGENT_SANE_1 autolearn=no
+	autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 616F4C33CB1
-	for <linux-block@archiver.kernel.org>; Thu, 16 Jan 2020 15:43:54 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 2A630C33CB1
+	for <linux-block@archiver.kernel.org>; Thu, 16 Jan 2020 15:47:52 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.kernel.org (Postfix) with ESMTP id 1D6A7206D9
-	for <linux-block@archiver.kernel.org>; Thu, 16 Jan 2020 15:43:54 +0000 (UTC)
-Authentication-Results: mail.kernel.org;
-	dkim=pass (2048-bit key) header.d=cloud.ionos.com header.i=@cloud.ionos.com header.b="TofA1eDa"
+	by mail.kernel.org (Postfix) with ESMTP id EFC7E206D9
+	for <linux-block@archiver.kernel.org>; Thu, 16 Jan 2020 15:47:51 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1726410AbgAPPnx (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Thu, 16 Jan 2020 10:43:53 -0500
-Received: from mail-il1-f195.google.com ([209.85.166.195]:39518 "EHLO
-        mail-il1-f195.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1726088AbgAPPnx (ORCPT
-        <rfc822;linux-block@vger.kernel.org>);
-        Thu, 16 Jan 2020 10:43:53 -0500
-Received: by mail-il1-f195.google.com with SMTP id x5so18529796ila.6
-        for <linux-block@vger.kernel.org>; Thu, 16 Jan 2020 07:43:52 -0800 (PST)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=cloud.ionos.com; s=google;
-        h=mime-version:references:in-reply-to:from:date:message-id:subject:to
-         :cc;
-        bh=V7NtQVFYuoN006upYOgpmqdSyQ5XPtcPUMm1fkAVS/Y=;
-        b=TofA1eDaO8D1AaJqEolcfDMai7ywnDjrsM30jRU+FMDixzN2OueuY8B9mxkV0GV+8Y
-         OfmHYyMfZ+OLXu4FXhS+Xl2FhMTC59hh8vCcYwGuVdhgTShrMYPb/1QB2qBgJ+MbUhb0
-         Urct8wFBHXin3iltmtO1G6jC3y0bMiWDSg44HISIpQH65yyiFa4vE63UTyjBh0sn766O
-         xCcyBOmSdPMH4b7pBzgiBZtsZ7ADi3lYe/Aczuibd06gFUQiCAFsQXA/tr60EBW6cfo4
-         ocJWn5ILsuG38dRi8jo6NR1lllVQYgOQhhCsEezyia1u8xTHbH/Uf2cCrrBIPP272+OK
-         vPDA==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20161025;
-        h=x-gm-message-state:mime-version:references:in-reply-to:from:date
-         :message-id:subject:to:cc;
-        bh=V7NtQVFYuoN006upYOgpmqdSyQ5XPtcPUMm1fkAVS/Y=;
-        b=fSKxeABNE88bjc/z2EtbszBJRuPIWrhegXu7Qhzt6YH12UE6PQ6qXBWPh0exMPV3pR
-         uC1pg8JKg53NEFbDa7bQEQe/SfQpmAoIHS5p5aKV3dAsZV73tgGQqGbVQtlIun1y3ejI
-         3Xyj4Qm7m1wFdYa7kMf3wITnuxAqCr36aQ54IjF1xcq9wEqFNujTkRoUVMFErzMmTFy7
-         5cRjg5JnewfUafcXgb4EDj6j5QS1Yq9Q7mpE8bkOgetXmcKFEdXs4udOVG4GxClp4kVl
-         +0JcREEb1+mNEL9BVppQvX7fQpj2quRI6gu2SOxIn1xTVOYOk31nEkb1Tmel/obHymDB
-         rN/Q==
-X-Gm-Message-State: APjAAAV/1TE5nnz7YeXdqjTXKB+Ufg6yWeG7FLv5CDdWNlwqBUvSMm8o
-        bE3XPQyGOaq5DvcLxT67GwmJW+/XuMv/lRRt24c59w==
-X-Google-Smtp-Source: APXvYqyoGaOv69K2rVjeej744/fs/HnISXbrMB7lHYxuzqRrRJOHLURM/X2P+fu91eASKK7CizY8MCarwkQ6hcOf5Ig=
-X-Received: by 2002:a05:6e02:4d2:: with SMTP id f18mr3923488ils.54.1579189432201;
- Thu, 16 Jan 2020 07:43:52 -0800 (PST)
+        id S1726871AbgAPPrv (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Thu, 16 Jan 2020 10:47:51 -0500
+Received: from lhrrgout.huawei.com ([185.176.76.210]:2274 "EHLO huawei.com"
+        rhost-flags-OK-OK-OK-FAIL) by vger.kernel.org with ESMTP
+        id S1726689AbgAPPrv (ORCPT <rfc822;linux-block@vger.kernel.org>);
+        Thu, 16 Jan 2020 10:47:51 -0500
+Received: from lhreml704-cah.china.huawei.com (unknown [172.18.7.107])
+        by Forcepoint Email with ESMTP id 47C0C7AAF1F8ED092E14;
+        Thu, 16 Jan 2020 15:47:48 +0000 (GMT)
+Received: from lhreml724-chm.china.huawei.com (10.201.108.75) by
+ lhreml704-cah.china.huawei.com (10.201.108.45) with Microsoft SMTP Server
+ (TLS) id 14.3.408.0; Thu, 16 Jan 2020 15:47:28 +0000
+Received: from [127.0.0.1] (10.202.226.43) by lhreml724-chm.china.huawei.com
+ (10.201.108.75) with Microsoft SMTP Server (version=TLS1_2,
+ cipher=TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256) id 15.1.1713.5; Thu, 16 Jan
+ 2020 15:47:28 +0000
+Subject: Re: [PATCH 09/11] megaraid_sas: switch fusion adapters to MQ
+To:     Hannes Reinecke <hare@suse.de>,
+        Sumit Saxena <sumit.saxena@broadcom.com>
+CC:     "Martin K. Petersen" <martin.petersen@oracle.com>,
+        Jens Axboe <axboe@kernel.dk>, Christoph Hellwig <hch@lst.de>,
+        James Bottomley <james.bottomley@hansenpartnership.com>,
+        Ming Lei <ming.lei@redhat.com>,
+        Linux SCSI List <linux-scsi@vger.kernel.org>,
+        <linux-block@vger.kernel.org>, Hannes Reinecke <hare@suse.com>
+References: <20191202153914.84722-1-hare@suse.de>
+ <20191202153914.84722-10-hare@suse.de>
+ <CAL2rwxqjiRTuZ0ntfaHHzG7z-VmxRQCXYyxZeX9eDMrmX+dbGg@mail.gmail.com>
+ <efe9c1e7-fa10-3bae-eacd-58d43295d6da@suse.de>
+ <CAL2rwxotoWakFS4DPe85hZ4VAgd_zw8pL+B5ckHR9NwEf+-L=g@mail.gmail.com>
+ <11034edd-732a-3dd5-0bdc-891b9de05e56@huawei.com>
+ <661fd3db-0254-c209-8fb3-f3aa35bac431@suse.de>
+From:   John Garry <john.garry@huawei.com>
+Message-ID: <f3102e65-4201-bf4f-7127-a1e85b18ab59@huawei.com>
+Date:   Thu, 16 Jan 2020 15:47:27 +0000
+User-Agent: Mozilla/5.0 (Windows NT 10.0; WOW64; rv:68.0) Gecko/20100101
+ Thunderbird/68.1.2
 MIME-Version: 1.0
-References: <20200116125915.14815-1-jinpuwang@gmail.com> <20200116125915.14815-7-jinpuwang@gmail.com>
- <20200116145300.GC12433@unreal>
-In-Reply-To: <20200116145300.GC12433@unreal>
-From:   Jinpu Wang <jinpu.wang@cloud.ionos.com>
-Date:   Thu, 16 Jan 2020 16:43:41 +0100
-Message-ID: <CAMGffE=pym8iz4OVxx7s6i37AU+KPFN3AeVrCTOpLx+N8A9dEQ@mail.gmail.com>
-Subject: Re: [PATCH v7 06/25] RDMA/rtrs: client: main functionality
-To:     Leon Romanovsky <leon@kernel.org>
-Cc:     Jack Wang <jinpuwang@gmail.com>, linux-block@vger.kernel.org,
-        linux-rdma@vger.kernel.org, Jens Axboe <axboe@kernel.dk>,
-        Christoph Hellwig <hch@infradead.org>,
-        Sagi Grimberg <sagi@grimberg.me>,
-        Bart Van Assche <bvanassche@acm.org>,
-        Doug Ledford <dledford@redhat.com>,
-        Jason Gunthorpe <jgg@ziepe.ca>,
-        Danil Kipnis <danil.kipnis@cloud.ionos.com>,
-        Roman Penyaev <rpenyaev@suse.de>
-Content-Type: text/plain; charset="UTF-8"
+In-Reply-To: <661fd3db-0254-c209-8fb3-f3aa35bac431@suse.de>
+Content-Type: text/plain; charset="utf-8"; format=flowed
+Content-Language: en-US
+Content-Transfer-Encoding: 8bit
+X-Originating-IP: [10.202.226.43]
+X-ClientProxiedBy: lhreml730-chm.china.huawei.com (10.201.108.81) To
+ lhreml724-chm.china.huawei.com (10.201.108.75)
+X-CFilter-Loop: Reflected
 Sender: linux-block-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-On Thu, Jan 16, 2020 at 3:53 PM Leon Romanovsky <leon@kernel.org> wrote:
->
-> On Thu, Jan 16, 2020 at 01:58:56PM +0100, Jack Wang wrote:
-> > From: Jack Wang <jinpu.wang@cloud.ionos.com>
-> >
-> > This is main functionality of rtrs-client module, which manages
-> > set of RDMA connections for each rtrs session, does multipathing,
-> > load balancing and failover of RDMA requests.
-> >
-> > Signed-off-by: Danil Kipnis <danil.kipnis@cloud.ionos.com>
-> > Signed-off-by: Jack Wang <jinpu.wang@cloud.ionos.com>
-> > ---
-> >  drivers/infiniband/ulp/rtrs/rtrs-clt.c | 2967 ++++++++++++++++++++++++
-> >  1 file changed, 2967 insertions(+)
-> >  create mode 100644 drivers/infiniband/ulp/rtrs/rtrs-clt.c
-> >
-> > diff --git a/drivers/infiniband/ulp/rtrs/rtrs-clt.c b/drivers/infiniband/ulp/rtrs/rtrs-clt.c
-> > new file mode 100644
-> > index 000000000000..717d19d4d930
-> > --- /dev/null
-> > +++ b/drivers/infiniband/ulp/rtrs/rtrs-clt.c
-> > @@ -0,0 +1,2967 @@
-> > +// SPDX-License-Identifier: GPL-2.0-or-later
-> > +/*
-> > + * RDMA Transport Layer
-> > + *
-> > + * Copyright (c) 2014 - 2018 ProfitBricks GmbH. All rights reserved.
-> > + *
-> > + * Copyright (c) 2018 - 2019 1&1 IONOS Cloud GmbH. All rights reserved.
-> > + *
-> > + * Copyright (c) 2019 - 2020 1&1 IONOS SE. All rights reserved.
->
-> Please no extra lines between Copyright lines.
-I checked in kernel tree, seems most of Copyright indeed contain no
-extra line in between
 
->
-> > + */
-> > +
-> > +#undef pr_fmt
-> > +#define pr_fmt(fmt) KBUILD_MODNAME " L" __stringify(__LINE__) ": " fmt
->
-> I never understood this pr_fmt() thing, do we really need it?
-you can custorm the format for print, include modue name and line
-number in this case, it's quite useful for debugging.
->
-> > +
-> > +#include <linux/module.h>
-> > +#include <linux/rculist.h>
-> > +#include <linux/blkdev.h> /* for BLK_MAX_SEGMENT_SIZE */
-> > +
-> > +#include "rtrs-clt.h"
-> > +#include "rtrs-log.h"
-> > +
-> > +#define RTRS_CONNECT_TIMEOUT_MS 30000
-> > +
-> > +MODULE_DESCRIPTION("RDMA Transport Client");
-> > +MODULE_LICENSE("GPL");
-> > +
-> > +static ushort nr_cons_per_session;
-> > +module_param(nr_cons_per_session, ushort, 0444);
-> > +MODULE_PARM_DESC(nr_cons_per_session,
-> > +              "Number of connections per session. (default: nr_cpu_ids)");
-> > +
-> > +static int retry_cnt = 7;
-> > +module_param_named(retry_cnt, retry_cnt, int, 0644);
-> > +MODULE_PARM_DESC(retry_cnt,
-> > +              "Number of times to send the message if the remote side didn't respond with Ack or Nack (default: 7, min: "
-> > +              __stringify(MIN_RTR_CNT) ", max: "
-> > +              __stringify(MAX_RTR_CNT) ")");
-> > +
-> > +static int __read_mostly noreg_cnt;
-> > +module_param_named(noreg_cnt, noreg_cnt, int, 0444);
-> > +MODULE_PARM_DESC(noreg_cnt,
-> > +              "Max number of SG entries when MR registration does not happen (default: 0)");
->
-> We don't like modules in new code.
-could you elaberate a bit, no module paramters? which one? all?
+>>>
+>>> Hi Hannes,
+>>>
+>>> Sorry for the delay in replying, I observed a few issues with this
+>>> patchset:
+>>>
+>>> 1. "blk_mq_unique_tag_to_hwq(tag)" does not return MSI-x vector to
+>>> which IO submitter CPU is affined with. Due to this IO submission and
+>>> completion CPUs are different which causes performance drop for low
+>>> latency workloads.
+>>
+>> Hi Sumit,
+>>
+>> So the new code has:
+>>
+>> megasas_build_ldio_fusion()
+>> {
+>>
+>> cmd->request_desc->SCSIIO.MSIxIndex =
+>> blk_mq_unique_tag_to_hwq(tag);
+>>
+>> }
+>>
+>> So the value here is hw queue index from blk-mq point of view, and not
+>> megaraid_sas msix index, as you alluded to.
+>>
+>> So we get 80 msix, 8 are reserved for low_latency_index_start (that's
+>> how it seems to me), and we report other 72 as #hw queues = 72 to SCSI
+>> midlayer.
+>>
+>> So I think that this should be:
+>>
+>> cmd->request_desc->SCSIIO.MSIxIndex =
+>> blk_mq_unique_tag_to_hwq(tag) + low_latency_index_start;
+>>
+>>
+> Indeed, that sounds reasonable.
+> (The whole queue mapping stuff isn't exactly well documented :-( )
+> 
 
->
-> > +
-> > +static const struct rtrs_rdma_dev_pd_ops dev_pd_ops;
-> > +static struct rtrs_rdma_dev_pd dev_pd = {
-> > +     .ops = &dev_pd_ops
-> > +};
-> > +
-> > +static struct workqueue_struct *rtrs_wq;
-> > +static struct class *rtrs_clt_dev_class;
-> > +
-> > +static inline bool rtrs_clt_is_connected(const struct rtrs_clt *clt)
-> > +{
-> > +     struct rtrs_clt_sess *sess;
-> > +     bool connected = false;
-> > +
-> > +     rcu_read_lock();
-> > +     list_for_each_entry_rcu(sess, &clt->paths_list, s.entry)
-> > +             connected |= (READ_ONCE(sess->state) == RTRS_CLT_CONNECTED);
-> > +     rcu_read_unlock();
-> > +
-> > +     return connected;
-> > +}
-> > +
-> > +static inline struct rtrs_permit *
-> > +__rtrs_get_permit(struct rtrs_clt *clt, enum rtrs_clt_con_type con_type)
-> > +{
-> > +     size_t max_depth = clt->queue_depth;
-> > +     struct rtrs_permit *permit;
-> > +     int cpu, bit;
-> > +
-> > +     /* Combined with cq_vector, we pin the IO to the the cpu it comes */
-> > +     cpu = get_cpu();
-> > +     do {
-> > +             bit = find_first_zero_bit(clt->permits_map, max_depth);
-> > +             if (unlikely(bit >= max_depth)) {
-> > +                     put_cpu();
-> > +                     return NULL;
-> > +             }
-> > +
-> > +     } while (unlikely(test_and_set_bit_lock(bit, clt->permits_map)));
-> > +     put_cpu();
-> > +
-> > +     permit = GET_PERMIT(clt, bit);
-> > +     WARN_ON(permit->mem_id != bit);
-> > +     permit->cpu_id = cpu;
-> > +     permit->con_type = con_type;
-> > +
-> > +     return permit;
-> > +}
-> > +
-> > +static inline void __rtrs_put_permit(struct rtrs_clt *clt,
-> > +                                   struct rtrs_permit *permit)
-> > +{
-> > +     clear_bit_unlock(permit->mem_id, clt->permits_map);
-> > +}
-> > +
-> > +struct rtrs_permit *rtrs_clt_get_permit(struct rtrs_clt *clt,
-> > +                                       enum rtrs_clt_con_type con_type,
-> > +                                       int can_wait)
-> > +{
-> > +     struct rtrs_permit *permit;
-> > +     DEFINE_WAIT(wait);
-> > +
-> > +     permit = __rtrs_get_permit(clt, con_type);
-> > +     if (likely(permit) || !can_wait)
-> > +             return permit;
-> > +
-> > +     do {
-> > +             prepare_to_wait(&clt->permits_wait, &wait,
-> > +                             TASK_UNINTERRUPTIBLE);
-> > +             permit = __rtrs_get_permit(clt, con_type);
-> > +             if (likely(permit))
-> > +                     break;
-> > +
-> > +             io_schedule();
-> > +     } while (1);
-> > +
-> > +     finish_wait(&clt->permits_wait, &wait);
-> > +
-> > +     return permit;
-> > +}
-> > +EXPORT_SYMBOL(rtrs_clt_get_permit);
-> > +
-> > +void rtrs_clt_put_permit(struct rtrs_clt *clt, struct rtrs_permit *permit)
-> > +{
-> > +     if (WARN_ON(!test_bit(permit->mem_id, clt->permits_map)))
-> > +             return;
-> > +
-> > +     __rtrs_put_permit(clt, permit);
-> > +
-> > +     /*
-> > +      * Putting a permit is a barrier, so we will observe
-> > +      * new entry in the wait list, no worries.
-> > +      */
-> > +     if (waitqueue_active(&clt->permits_wait))
->
-> Where do you put permit? Does it include barrier?
-__rtrs_put_permit calls clear_bit_unlock which includes barrier
-rnbd-clt call rtrs_clt_put_permit before finish the request to block layer.
->
-> > +             wake_up(&clt->permits_wait);
-> > +}
-> > +EXPORT_SYMBOL(rtrs_clt_put_permit);
-> > +
-> > +struct rtrs_permit *rtrs_permit_from_pdu(void *pdu)
-> > +{
-> > +     return pdu - sizeof(struct rtrs_permit);
->
-> C standard doesn't allow pointer arithmetic on void*.
-gcc never complains,  searched aournd:
-https://stackoverflow.com/questions/3523145/pointer-arithmetic-for-void-pointer-in-c
+Yeah, there's certainly lots of knobs and levers in this driver.
 
-You're right, will fix.
+> I'll be updating the patch.
 
->
-> > +}
-> > +EXPORT_SYMBOL(rtrs_permit_from_pdu);
-> > +
-> > +void *rtrs_permit_to_pdu(struct rtrs_permit *permit)
-> > +{
-> > +     return permit + 1;
-> > +}
-> > +EXPORT_SYMBOL(rtrs_permit_to_pdu);
-> > +
-> > +/**
-> > + * rtrs_permit_to_clt_con() - returns RDMA connection pointer by the permit
-> > + * @sess: client session pointer
-> > + * @permit: permit for the allocation of the RDMA buffer
-> > + * Note:
-> > + *     IO connection starts from 1.
-> > + *     0 connection is for user messages.
-> > + */
-> > +static
-> > +struct rtrs_clt_con *rtrs_permit_to_clt_con(struct rtrs_clt_sess *sess,
-> > +                                         struct rtrs_permit *permit)
-> > +{
-> > +     int id = 0;
-> > +
-> > +     if (likely(permit->con_type == RTRS_IO_CON))
-> > +             id = (permit->cpu_id % (sess->s.con_num - 1)) + 1;
-> > +
-> > +     return to_clt_con(sess->s.con[id]);
-> > +}
-> > +
-> > +static bool __rtrs_clt_change_state(struct rtrs_clt_sess *sess,
-> > +                                  enum rtrs_clt_state new_state)
-> > +{
-> > +     enum rtrs_clt_state old_state;
-> > +     bool changed = false;
-> > +
-> > +     lockdep_assert_held(&sess->state_wq.lock);
-> > +
-> > +     old_state = sess->state;
-> > +     switch (new_state) {
-> > +     case RTRS_CLT_CONNECTING:
-> > +             switch (old_state) {
->
-> Double switch is better to be avoided.
-what's the better way to do it?
->
-> > +             case RTRS_CLT_RECONNECTING:
-> > +                     changed = true;
-> > +                     /* FALLTHRU */
-> > +             default:
-> > +                     break;
-> > +             }
-> > +             break;
->
->
-> ....
->
-> Thanks
-Thanks
+About this one:
+
+ > 2. Seeing below stack traces/messages in dmesg during driver unload –
+ >
+ > [2565601.054366] Call Trace:
+ > [2565601.054368]  blk_mq_free_map_and_requests+0x28/0x50
+ > [2565601.054369]  blk_mq_free_tag_set+0x1d/0x90
+ > [2565601.054370]  scsi_host_dev_release+0x8a/0xf0
+ > [2565601.054370]  device_release+0x27/0x80
+ > [2565601.054371]  kobject_cleanup+0x61/0x190
+ > [2565601.054373]  megasas_detach_one+0x4c1/0x650 [megaraid_sas]
+ > [2565601.054374]  pci_device_remove+0x3b/0xc0
+ > [2565601.054375]  device_release_driver_internal+0xec/0x1b0
+ > [2565601.054376]  driver_detach+0x46/0x90
+ > [2565601.054377]  bus_remove_driver+0x58/0xd0
+ > [2565601.054378]  pci_unregister_driver+0x26/0xa0
+ > [2565601.054379]  megasas_exit+0x91/0x882 [megaraid_sas]
+ > [2565601.054381]  __x64_sys_delete_module+0x16c/0x250
+ > [2565601.054382]  do_syscall_64+0x5b/0x1b0
+ > [2565601.054383]  entry_SYSCALL_64_after_hwframe+0x44/0xa9
+ > [2565601.054383] RIP: 0033:0x7f7212a82837
+ > [2565601.054384] RSP: 002b:00007ffdfa2dcea8 EFLAGS: 00000202 ORIG_RAX:
+ > 00000000000000b0
+ > [2565601.054385] RAX: ffffffffffffffda RBX: 0000000000b6e2e0 RCX:
+ > 00007f7212a82837
+ > [2565601.054385] RDX: 00007f7212af3ac0 RSI: 0000000000000800 RDI:
+ > 0000000000b6e348
+ > [2565601.054386] RBP: 0000000000000000 R08: 00007f7212d47060 R09:
+ > 00007f7212af3ac0
+ > [2565601.054386] R10: 00007ffdfa2dcbc0 R11: 0000000000000202 R12:
+ > 00007ffdfa2dd71c
+ > [2565601.054387] R13: 0000000000000000 R14: 0000000000b6e2e0 R15:
+ > 0000000000b6e010
+ > [2565601.054387] ---[ end trace 38899303bd85e838 ]---
+
+
+I see it also for hisi_sas_v3_hw.
+
+And so I don't understand the code change here, specifically where the 
+WARN is generated:
+
+void blk_mq_free_rqs(struct blk_mq_tag_set *set, struct blk_mq_tags *tags,
+		     unsigned int hctx_idx)
+{
+	struct page *page;
+	int i;
+
+	if (tags->rqs) {
+		for (i = 0; i < tags->nr_tags; i++)
+			if (WARN_ON(tags->rqs[i]))
+				tags->rqs[i] = NULL; <--- here
+	}
+
+
+I thought that tags->rqs[i] was just a holder for a pointer to a static 
+tag, like assigned here:
+
+static struct request *blk_mq_rq_ctx_init(struct blk_mq_alloc_data *data,
+unsigned int tag, unsigned int op, u64 alloc_time_ns)
+{
+	struct blk_mq_tags *tags = blk_mq_tags_from_data(data);
+	struct request *rq = tags->static_rqs[tag];
+
+	...
+
+	rq->tag = tag;
+	rq->internal_tag = -1;
+	data->hctx->tags->rqs[rq->tag] = rq;
+
+	...
+}
+
+So I don't know why we need to WARN if unset, and then also clear it. 
+The memory is freed pretty soon after this anyway.
+
+Thanks,
+John
+
+> 
+>>>
+>>> lspcu:
+>>>
+>>> # lscpu
+>>> Architecture:          x86_64
+>>> CPU op-mode(s):        32-bit, 64-bit
+>>> Byte Order:            Little Endian
+>>> CPU(s):                72
+>>> On-line CPU(s) list:   0-71
+>>> Thread(s) per core:    2
+>>> Core(s) per socket:    18
+>>> Socket(s):             2
+>>> NUMA node(s):          2
+>>> Vendor ID:             GenuineIntel
+>>> CPU family:            6
+>>> Model:                 85
+>>> Model name:            Intel(R) Xeon(R) Gold 6150 CPU @ 2.70GHz
+>>> Stepping:              4
+>>> CPU MHz:               3204.246
+>>> CPU max MHz:           3700.0000
+>>> CPU min MHz:           1200.0000
+>>> BogoMIPS:              5400.00
+>>> Virtualization:        VT-x
+>>> L1d cache:             32K
+>>> L1i cache:             32K
+>>> L2 cache:              1024K
+>>> L3 cache:              25344K
+>>> NUMA node0 CPU(s):     0-17,36-53
+>>> NUMA node1 CPU(s):     18-35,54-71
+>>> Flags:                 fpu vme de pse tsc msr pae mce cx8 apic sep
+>>> mtrr pge mca cmov pat pse36 clflush dts acpi mmx fxsr sse sse2 ss ht
+>>> tm pbe s
+>>> yscall nx pdpe1gb rdtscp lm constant_tsc art arch_perfmon pebs bts
+>>> rep_good nopl xtopology nonstop_tsc cpuid aperfmperf pni pclmulqdq
+>>> dtes64 monitor
+>>> ds_cpl vmx smx est tm2 ssse3 sdbg fma cx16 xtpr pdcm pcid dca sse4_1
+>>> sse4_2 x2apic movbe popcnt tsc_deadline_timer xsave avx f16c rdrand
+>>> lahf_lm abm
+>>> 3dnowprefetch cpuid_fault epb cat_l3 cdp_l3 invpcid_single intel_ppin
+>>> mba tpr_shadow vnmi flexpriority ept vpid ept_ad fsgsbase tsc_adjust
+>>> bmi1 hle
+>>> avx2 smep bmi2 erms invpcid rtm cqm mpx rdt_a avx512f avx512dq rdseed
+>>> adx smap clflushopt clwb intel_pt avx512cd avx512bw avx512vl xsaveopt
+>>> xsavec
+>>> xgetbv1 xsaves cqm_llc cqm_occup_llc cqm_mbm_total cqm_mbm_lo
+>>>
+>>>
+>>
+>> [snip]
+>>
+>>> 4. This patch removes below code from driver so what this piece of
+>>> code does is broken-
+>>>
+>>>
+>>> -                               if (instance->adapter_type >=
+>>> INVADER_SERIES &&
+>>> -                                   !instance->msix_combined) {
+>>> -                                       instance->msix_load_balance =
+>>> true;
+>>> -                                       instance->smp_affinity_enable
+>>> = false;
+>>> -                               }
+>>
+>> Does this code need to be re-added? Would this have affected your test?
+>> Primarily this patch was required to enable interrupt affinity on my
+> machine (Lenovo RAID 930-8i).
+> Can you give me some information why the code is present in the first
+> place? Some hardware limitation, maybe?
+> 
+> Cheers,
+> 
+> Hannes
+> 
+
