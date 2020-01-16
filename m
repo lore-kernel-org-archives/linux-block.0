@@ -2,136 +2,144 @@ Return-Path: <SRS0=7rSP=3F=vger.kernel.org=linux-block-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-2.3 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
-	MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,USER_AGENT_SANE_1 autolearn=no
-	autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-6.8 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
+	INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS
+	autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id CE995C33CB1
-	for <linux-block@archiver.kernel.org>; Thu, 16 Jan 2020 12:18:05 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 797CAC33CB1
+	for <linux-block@archiver.kernel.org>; Thu, 16 Jan 2020 12:36:38 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.kernel.org (Postfix) with ESMTP id AAAB3207FF
-	for <linux-block@archiver.kernel.org>; Thu, 16 Jan 2020 12:18:05 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id 5597D21582
+	for <linux-block@archiver.kernel.org>; Thu, 16 Jan 2020 12:36:38 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1726084AbgAPMSF (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Thu, 16 Jan 2020 07:18:05 -0500
-Received: from lhrrgout.huawei.com ([185.176.76.210]:2273 "EHLO huawei.com"
-        rhost-flags-OK-OK-OK-FAIL) by vger.kernel.org with ESMTP
-        id S1726100AbgAPMSE (ORCPT <rfc822;linux-block@vger.kernel.org>);
-        Thu, 16 Jan 2020 07:18:04 -0500
-Received: from lhreml701-cah.china.huawei.com (unknown [172.18.7.108])
-        by Forcepoint Email with ESMTP id 650C1496F414022771CF;
-        Thu, 16 Jan 2020 12:18:01 +0000 (GMT)
-Received: from lhreml724-chm.china.huawei.com (10.201.108.75) by
- lhreml701-cah.china.huawei.com (10.201.108.42) with Microsoft SMTP Server
- (TLS) id 14.3.408.0; Thu, 16 Jan 2020 12:18:00 +0000
-Received: from [127.0.0.1] (10.202.226.43) by lhreml724-chm.china.huawei.com
- (10.201.108.75) with Microsoft SMTP Server (version=TLS1_2,
- cipher=TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256) id 15.1.1713.5; Thu, 16 Jan
- 2020 12:18:00 +0000
-From:   John Garry <john.garry@huawei.com>
-Subject: Re: [Question] about shared tags for SCSI drivers
-To:     Ming Lei <ming.lei@redhat.com>, Yufen Yu <yuyufen@huawei.com>
-CC:     "linux-block@vger.kernel.org" <linux-block@vger.kernel.org>,
-        "axboe@kernel.dk" <axboe@kernel.dk>, <hare@suse.de>,
-        Bart Van Assche <bvanassche@acm.org>
-References: <bd959b9f-78dd-e0e7-0421-8d7e3cd2f41b@huawei.com>
- <20200116090347.GA7438@ming.t460p>
-Message-ID: <26ba5f43-e3f7-9b10-9b1b-af9b9742b2d4@huawei.com>
-Date:   Thu, 16 Jan 2020 12:17:59 +0000
-User-Agent: Mozilla/5.0 (Windows NT 10.0; WOW64; rv:68.0) Gecko/20100101
- Thunderbird/68.1.2
+        id S1726187AbgAPMgh (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Thu, 16 Jan 2020 07:36:37 -0500
+Received: from relay.sw.ru ([185.231.240.75]:39066 "EHLO relay.sw.ru"
+        rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
+        id S1726084AbgAPMgh (ORCPT <rfc822;linux-block@vger.kernel.org>);
+        Thu, 16 Jan 2020 07:36:37 -0500
+Received: from dhcp-172-16-24-104.sw.ru ([172.16.24.104] helo=localhost.localdomain)
+        by relay.sw.ru with esmtp (Exim 4.92.3)
+        (envelope-from <ktkhai@virtuozzo.com>)
+        id 1is4NS-0000yP-4A; Thu, 16 Jan 2020 15:35:58 +0300
+Subject: [PATCH block v2 1/3] block: Add @flags argument to
+ bdev_write_zeroes_sectors()
+From:   Kirill Tkhai <ktkhai@virtuozzo.com>
+To:     linux-block@vger.kernel.org, linux-kernel@vger.kernel.org,
+        martin.petersen@oracle.com, axboe@kernel.dk, tytso@mit.edu,
+        adilger.kernel@dilger.ca, Chaitanya.Kulkarni@wdc.com,
+        darrick.wong@oracle.com, ming.lei@redhat.com, osandov@fb.com,
+        jthumshirn@suse.de, minwoo.im.dev@gmail.com, damien.lemoal@wdc.com,
+        andrea.parri@amarulasolutions.com, hare@suse.com, tj@kernel.org,
+        ajay.joshi@wdc.com, sagi@grimberg.me, dsterba@suse.com,
+        chaitanya.kulkarni@wdc.com, bvanassche@acm.org,
+        dhowells@redhat.com, asml.silence@gmail.com, ktkhai@virtuozzo.com
+Date:   Thu, 16 Jan 2020 15:35:58 +0300
+Message-ID: <157917815798.88675.11900718803129164489.stgit@localhost.localdomain>
+In-Reply-To: <157917805422.88675.6477661554332322975.stgit@localhost.localdomain>
+References: <157917805422.88675.6477661554332322975.stgit@localhost.localdomain>
+User-Agent: StGit/0.19
 MIME-Version: 1.0
-In-Reply-To: <20200116090347.GA7438@ming.t460p>
-Content-Type: text/plain; charset="utf-8"; format=flowed
-Content-Language: en-US
+Content-Type: text/plain; charset="utf-8"
 Content-Transfer-Encoding: 7bit
-X-Originating-IP: [10.202.226.43]
-X-ClientProxiedBy: lhreml730-chm.china.huawei.com (10.201.108.81) To
- lhreml724-chm.china.huawei.com (10.201.108.75)
-X-CFilter-Loop: Reflected
 Sender: linux-block-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-On 16/01/2020 09:03, Ming Lei wrote:
+This is a preparation for next patch, which introduces
+a new flag BLKDEV_ZERO_ALLOCATE for calls, which need
+only allocation of blocks and don't need actual blocks
+zeroing.
 
-(fixed title)
+CC: Martin K. Petersen <martin.petersen@oracle.com>
+Signed-off-by: Kirill Tkhai <ktkhai@virtuozzo.com>
+---
+ block/blk-lib.c                     |    6 +++---
+ drivers/md/dm-kcopyd.c              |    2 +-
+ drivers/target/target_core_iblock.c |    4 ++--
+ include/linux/blkdev.h              |    3 ++-
+ 4 files changed, 8 insertions(+), 7 deletions(-)
 
-> On Thu, Jan 16, 2020 at 12:06:02PM +0800, Yufen Yu wrote:
->> Hi, all
->>
->> Shared tags is introduced to maintains a notion of fairness between
->> active users. This may be good for nvme with multiple namespace to
->> avoid starving some users. Right?
-> 
-> Actually nvme namespace is LUN of scsi world.
-> 
-> Shared tags isn't for maintaining fairness, it is just natural sw
-> implementation of scsi host's tags, since every scsi host shares
-> tags among all LUNs. If the SCSI host supports real MQ, the tags
-> is hw-queue wide, otherwise it is host wide.
-> 
->>
->> However, I don't understand why we introduce the shared tag for SCSI.
->> IMO, there are two concerns for scsi shared tag:
->>
->> 1) For now, 'shost->can_queue' is used as queue depth in block layer.
+diff --git a/block/blk-lib.c b/block/blk-lib.c
+index 5f2c429d4378..3e38c93cfc53 100644
+--- a/block/blk-lib.c
++++ b/block/blk-lib.c
+@@ -224,7 +224,7 @@ static int __blkdev_issue_write_zeroes(struct block_device *bdev,
+ 		return -EPERM;
+ 
+ 	/* Ensure that max_write_zeroes_sectors doesn't overflow bi_size */
+-	max_write_zeroes_sectors = bdev_write_zeroes_sectors(bdev);
++	max_write_zeroes_sectors = bdev_write_zeroes_sectors(bdev, 0);
+ 
+ 	if (max_write_zeroes_sectors == 0)
+ 		return -EOPNOTSUPP;
+@@ -362,7 +362,7 @@ int blkdev_issue_zeroout(struct block_device *bdev, sector_t sector,
+ 	sector_t bs_mask;
+ 	struct bio *bio;
+ 	struct blk_plug plug;
+-	bool try_write_zeroes = !!bdev_write_zeroes_sectors(bdev);
++	bool try_write_zeroes = !!bdev_write_zeroes_sectors(bdev, 0);
+ 
+ 	bs_mask = (bdev_logical_block_size(bdev) >> 9) - 1;
+ 	if ((sector | nr_sects) & bs_mask)
+@@ -391,7 +391,7 @@ int blkdev_issue_zeroout(struct block_device *bdev, sector_t sector,
+ 			try_write_zeroes = false;
+ 			goto retry;
+ 		}
+-		if (!bdev_write_zeroes_sectors(bdev)) {
++		if (!bdev_write_zeroes_sectors(bdev, 0)) {
+ 			/*
+ 			 * Zeroing offload support was indicated, but the
+ 			 * device reported ILLEGAL REQUEST (for some devices
+diff --git a/drivers/md/dm-kcopyd.c b/drivers/md/dm-kcopyd.c
+index 1bbe4a34ef4c..f1b8e7926dd4 100644
+--- a/drivers/md/dm-kcopyd.c
++++ b/drivers/md/dm-kcopyd.c
+@@ -831,7 +831,7 @@ void dm_kcopyd_copy(struct dm_kcopyd_client *kc, struct dm_io_region *from,
+ 		 */
+ 		job->rw = REQ_OP_WRITE_ZEROES;
+ 		for (i = 0; i < job->num_dests; i++)
+-			if (!bdev_write_zeroes_sectors(job->dests[i].bdev)) {
++			if (!bdev_write_zeroes_sectors(job->dests[i].bdev, 0)) {
+ 				job->rw = WRITE;
+ 				break;
+ 			}
+diff --git a/drivers/target/target_core_iblock.c b/drivers/target/target_core_iblock.c
+index 51ffd5c002de..73a63e197bf5 100644
+--- a/drivers/target/target_core_iblock.c
++++ b/drivers/target/target_core_iblock.c
+@@ -117,7 +117,7 @@ static int iblock_configure_device(struct se_device *dev)
+ 	 * Enable write same emulation for IBLOCK and use 0xFFFF as
+ 	 * the smaller WRITE_SAME(10) only has a two-byte block count.
+ 	 */
+-	max_write_zeroes_sectors = bdev_write_zeroes_sectors(bd);
++	max_write_zeroes_sectors = bdev_write_zeroes_sectors(bd, 0);
+ 	if (max_write_zeroes_sectors)
+ 		dev->dev_attrib.max_write_same_len = max_write_zeroes_sectors;
+ 	else
+@@ -468,7 +468,7 @@ iblock_execute_write_same(struct se_cmd *cmd)
+ 		return TCM_INVALID_CDB_FIELD;
+ 	}
+ 
+-	if (bdev_write_zeroes_sectors(bdev)) {
++	if (bdev_write_zeroes_sectors(bdev, 0)) {
+ 		if (!iblock_execute_zero_out(bdev, cmd))
+ 			return 0;
+ 	}
+diff --git a/include/linux/blkdev.h b/include/linux/blkdev.h
+index c45779f00cbd..4cd69552df9a 100644
+--- a/include/linux/blkdev.h
++++ b/include/linux/blkdev.h
+@@ -1418,7 +1418,8 @@ static inline unsigned int bdev_write_same(struct block_device *bdev)
+ 	return 0;
+ }
+ 
+-static inline unsigned int bdev_write_zeroes_sectors(struct block_device *bdev)
++static inline unsigned int bdev_write_zeroes_sectors(struct block_device *bdev,
++						     unsigned int flags)
+ {
+ 	struct request_queue *q = bdev_get_queue(bdev);
+ 
 
-Note that in scsi_alloc_sdev(), sdev default queue depth is set to 
-shost->cmd_per_lun. Slightly different for ATA devices - see 
-ata_scsi_dev_config().
-
-There is then also the scsi_host_template.change_queue_depth() callback 
-for SCSI hosts can use to set this.
-
->> And all target drivers share tags on one host. Then, the max tags for
->> each target can get:
->>
->> 	depth = max((bt->sb.depth + users - 1) / users, 4U);
-
-The host HW is limited by the amount of simultaneous commands it can 
-issue, regardless of where these tags are managed.
-
-And you seem to be assuming in this equation that all users will own a 
-subset of host tags, which is not true.
-
->>
->> But, each target driver may have their own capacity of tags and queue depth.
->> Does shared tag limit target device bandwidth?
-> 
-> No, if the 'target driver' means LUN, each LUN hasn't its independent
-> tags, maybe it has its own queue depth, which is often for maintaining
-> fairness among all active LUNs, not real queue depth.
-> 
-> You may see the patches[1] which try to bypass per-LUN queue depth for SSD.
-> 
-> [1] https://lore.kernel.org/linux-block/20191118103117.978-1-ming.lei@redhat.com/
-> 
->>
->> 2) When add new target or remove device, it may need to freeze other device
->> to update hctx->flags of BLK_MQ_F_TAG_SHARED. That may hurt performance.
-> 
-> Add/removing device isn't a frequent event, so it shouldn't be a real
-> issue, or you have seen effect on real use case?
-> 
->>
->> Recently we discuss abort hostwide shared tags for SCSI[0] and sharing tags
->> across hardware queues[1]. These discussion are abort shared tag. But, I
->> confuse whether shared tag across hardware queues can solve my concerns as mentioned.
-> 
-> Both [1] and [0] are for converting some single queue SCSI host into MQ
-> because these HBAs support multiple reply queue for completing request,
-> meantime they only have single tags(so they are SQ driver now). So far
-> not many such kind of hardwares(HPSA, hisi sas, megaraid_sas, ...).
-> 
-> 
-> Thanks,
-> Ming
-> 
-
-thanks Ming
-
-> .
-> 
 
