@@ -2,135 +2,142 @@ Return-Path: <SRS0=7rSP=3F=vger.kernel.org=linux-block-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-2.3 required=3.0 tests=DKIM_SIGNED,DKIM_VALID,
-	HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,
-	USER_AGENT_SANE_1 autolearn=no autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-2.4 required=3.0 tests=DKIMWL_WL_HIGH,DKIM_SIGNED,
+	DKIM_VALID,DKIM_VALID_AU,HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,
+	SPF_HELO_NONE,SPF_PASS,USER_AGENT_SANE_1 autolearn=no autolearn_force=no
+	version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id D56F7C33CAF
-	for <linux-block@archiver.kernel.org>; Thu, 16 Jan 2020 20:02:38 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 64671C33CAF
+	for <linux-block@archiver.kernel.org>; Thu, 16 Jan 2020 20:33:25 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.kernel.org (Postfix) with ESMTP id A55C62064C
-	for <linux-block@archiver.kernel.org>; Thu, 16 Jan 2020 20:02:38 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id 397A02075B
+	for <linux-block@archiver.kernel.org>; Thu, 16 Jan 2020 20:33:25 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel-dk.20150623.gappssmtp.com header.i=@kernel-dk.20150623.gappssmtp.com header.b="ieSfAt4E"
+	dkim=pass (2048-bit key) header.d=nvidia.com header.i=@nvidia.com header.b="B3a+nJMY"
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1729342AbgAPUCi (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Thu, 16 Jan 2020 15:02:38 -0500
-Received: from mail-pj1-f65.google.com ([209.85.216.65]:35514 "EHLO
-        mail-pj1-f65.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1729100AbgAPUCh (ORCPT
+        id S1729425AbgAPUdY (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Thu, 16 Jan 2020 15:33:24 -0500
+Received: from hqnvemgate24.nvidia.com ([216.228.121.143]:3910 "EHLO
+        hqnvemgate24.nvidia.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S1729067AbgAPUdY (ORCPT
         <rfc822;linux-block@vger.kernel.org>);
-        Thu, 16 Jan 2020 15:02:37 -0500
-Received: by mail-pj1-f65.google.com with SMTP id s7so2163712pjc.0
-        for <linux-block@vger.kernel.org>; Thu, 16 Jan 2020 12:02:37 -0800 (PST)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=kernel-dk.20150623.gappssmtp.com; s=20150623;
-        h=subject:to:cc:references:from:message-id:date:user-agent
-         :mime-version:in-reply-to:content-language:content-transfer-encoding;
-        bh=9m+rC+oUDolU1XALd3i8OyKuH4mxh+m2TciQNEVn8O0=;
-        b=ieSfAt4ECnxqa8cYWLvKBJN7d7uKIygQjPqx/MZS2YAX0XTkQAr1lJ8IWiXtUl8nD+
-         u9HRJDekI1Dp+FRWxoquVQOWKhQELaw8zvPWy9gJN+hG86BWvUNRlF3XB8N5ncbxJZTT
-         gHdZurBQ/OwpmzRfUPVxHtvFPksBq/OgZ0pMypB1A6sn3DADO7gA325jB/kV3sai1NOs
-         tUGg1MyBzFVELB39jNnTksHPdHXsh7fcoBFAA53DirIlby0cbxVZFTtnubihNWC0wzpU
-         HQbRyYhG4AhorZRHB7f0XjELPLiXoNeXMVIV9rSwmtzK5C9VWddHYc8ueOt0h1Q0sW8W
-         c0Vw==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20161025;
-        h=x-gm-message-state:subject:to:cc:references:from:message-id:date
-         :user-agent:mime-version:in-reply-to:content-language
-         :content-transfer-encoding;
-        bh=9m+rC+oUDolU1XALd3i8OyKuH4mxh+m2TciQNEVn8O0=;
-        b=Zb2C6e1Isco41gFYo7nLCTOT34em3QoPs+/yiwmKFbTpmGM8XW6WcM8/yJmiUMgjLN
-         1OCFURSoYML6HwWM1xXceAwJ78RYsg+bM9q/vPSDWuKao8YqO5tyw8J6d8dBKwuyxFcM
-         5ErlElzwREQwCdxT4ZIBBvLk3jvEaqYf/O7cu4oH5pKMacbUgDZ7Jr0bSfJoJZqioDWu
-         P7q7UYB0kbohxnX2x7LIyYVQ076YVU3qAI8zmxNG8Zo9OlXW1S4EOSWpxgforVONiZoZ
-         ZpPiP1uzaBh41bh8hkCRRndBNT0wQY3fnav0A7tLH9uWOKi+U9yG1dPNLtc3W+dPd8D+
-         IRcQ==
-X-Gm-Message-State: APjAAAVdUxqxIFJ69UjRvSRSdy7X1ms0elzAyTFSYwm4L3wac8HO9hML
-        nWUEn0Q65EjLdeqhl+6ez0UvMw==
-X-Google-Smtp-Source: APXvYqwspA/ISVxq7O+kTNMHPp/+Ds3gQg1UEVb7NDrnymuJaIe3jmDH6uqM0kJudwXVbwaNhIeTgg==
-X-Received: by 2002:a17:90a:cc04:: with SMTP id b4mr1059251pju.136.1579204957167;
-        Thu, 16 Jan 2020 12:02:37 -0800 (PST)
-Received: from ?IPv6:2620:10d:c081:1132::1012? ([2620:10d:c090:180::ab9])
-        by smtp.gmail.com with ESMTPSA id d22sm26131500pfo.187.2020.01.16.12.02.36
-        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
-        Thu, 16 Jan 2020 12:02:36 -0800 (PST)
-Subject: Re: [RFC 2/2] io_uring: acquire ctx->uring_lock before calling
- io_issue_sqe()
-To:     Bijan Mottahedeh <bijan.mottahedeh@oracle.com>
-Cc:     linux-block@vger.kernel.org, Christoph Hellwig <hch@lst.de>,
-        Keith Busch <keith.busch@gmail.com>
-References: <1579142266-64789-1-git-send-email-bijan.mottahedeh@oracle.com>
- <1579142266-64789-3-git-send-email-bijan.mottahedeh@oracle.com>
- <9b359dde-3bb6-5886-264b-4bee90be9e25@kernel.dk>
- <8f7986c7-e5b4-8f24-1c71-666c01b16c8b@kernel.dk>
- <1397cd55-37a6-4e14-91ac-eb3c35e7d962@kernel.dk>
- <b43835cd-3bd6-705e-df51-923bbec78c67@oracle.com>
-From:   Jens Axboe <axboe@kernel.dk>
-Message-ID: <18346d15-d89d-9d28-1ef8-77574d44dce7@kernel.dk>
-Date:   Thu, 16 Jan 2020 13:02:35 -0700
+        Thu, 16 Jan 2020 15:33:24 -0500
+Received: from hqpgpgate102.nvidia.com (Not Verified[216.228.121.13]) by hqnvemgate24.nvidia.com (using TLS: TLSv1.2, DES-CBC3-SHA)
+        id <B5e20c8570000>; Thu, 16 Jan 2020 12:32:23 -0800
+Received: from hqmail.nvidia.com ([172.20.161.6])
+  by hqpgpgate102.nvidia.com (PGP Universal service);
+  Thu, 16 Jan 2020 12:33:20 -0800
+X-PGP-Universal: processed;
+        by hqpgpgate102.nvidia.com on Thu, 16 Jan 2020 12:33:20 -0800
+Received: from [10.2.160.8] (10.124.1.5) by HQMAIL107.nvidia.com
+ (172.20.187.13) with Microsoft SMTP Server (TLS) id 15.0.1473.3; Thu, 16 Jan
+ 2020 20:33:19 +0000
+Subject: Re: [PATCH v12 04/22] mm: devmap: refactor 1-based refcounting for
+ ZONE_DEVICE pages
+To:     Christoph Hellwig <hch@infradead.org>
+CC:     Andrew Morton <akpm@linux-foundation.org>,
+        Al Viro <viro@zeniv.linux.org.uk>,
+        Alex Williamson <alex.williamson@redhat.com>,
+        Benjamin Herrenschmidt <benh@kernel.crashing.org>,
+        =?UTF-8?B?QmrDtnJuIFTDtnBlbA==?= <bjorn.topel@intel.com>,
+        Dan Williams <dan.j.williams@intel.com>,
+        Daniel Vetter <daniel@ffwll.ch>,
+        Dave Chinner <david@fromorbit.com>,
+        David Airlie <airlied@linux.ie>,
+        "David S . Miller" <davem@davemloft.net>,
+        Ira Weiny <ira.weiny@intel.com>, Jan Kara <jack@suse.cz>,
+        Jason Gunthorpe <jgg@ziepe.ca>, Jens Axboe <axboe@kernel.dk>,
+        Jonathan Corbet <corbet@lwn.net>,
+        =?UTF-8?B?SsOpcsO0bWUgR2xpc3Nl?= <jglisse@redhat.com>,
+        "Kirill A . Shutemov" <kirill@shutemov.name>,
+        Magnus Karlsson <magnus.karlsson@intel.com>,
+        Mauro Carvalho Chehab <mchehab@kernel.org>,
+        Michael Ellerman <mpe@ellerman.id.au>,
+        Michal Hocko <mhocko@suse.com>,
+        Mike Kravetz <mike.kravetz@oracle.com>,
+        Paul Mackerras <paulus@samba.org>,
+        Shuah Khan <shuah@kernel.org>,
+        Vlastimil Babka <vbabka@suse.cz>, <bpf@vger.kernel.org>,
+        <dri-devel@lists.freedesktop.org>, <kvm@vger.kernel.org>,
+        <linux-block@vger.kernel.org>, <linux-doc@vger.kernel.org>,
+        <linux-fsdevel@vger.kernel.org>, <linux-kselftest@vger.kernel.org>,
+        <linux-media@vger.kernel.org>, <linux-rdma@vger.kernel.org>,
+        <linuxppc-dev@lists.ozlabs.org>, <netdev@vger.kernel.org>,
+        <linux-mm@kvack.org>, LKML <linux-kernel@vger.kernel.org>,
+        Christoph Hellwig <hch@lst.de>
+References: <20200107224558.2362728-1-jhubbard@nvidia.com>
+ <20200107224558.2362728-5-jhubbard@nvidia.com>
+ <20200115152306.GA19546@infradead.org>
+ <4707f191-86f8-db4a-c3de-0a84b415b658@nvidia.com>
+ <20200116093712.GA11011@infradead.org>
+From:   John Hubbard <jhubbard@nvidia.com>
+X-Nvconfidentiality: public
+Message-ID: <ccf2723a-dcce-57d3-f63d-ee96dbf6653a@nvidia.com>
+Date:   Thu, 16 Jan 2020 12:30:26 -0800
 User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:68.0) Gecko/20100101
- Thunderbird/68.2.2
+ Thunderbird/68.4.1
 MIME-Version: 1.0
-In-Reply-To: <b43835cd-3bd6-705e-df51-923bbec78c67@oracle.com>
-Content-Type: text/plain; charset=utf-8
+In-Reply-To: <20200116093712.GA11011@infradead.org>
+X-Originating-IP: [10.124.1.5]
+X-ClientProxiedBy: HQMAIL111.nvidia.com (172.20.187.18) To
+ HQMAIL107.nvidia.com (172.20.187.13)
+Content-Type: text/plain; charset="utf-8"; format=flowed
 Content-Language: en-US
-Content-Transfer-Encoding: 8bit
+Content-Transfer-Encoding: 7bit
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=nvidia.com; s=n1;
+        t=1579206743; bh=EQpRDmAadXrYPrWI0G8MSYR7uqZas3jC8zZTGB2Hfnk=;
+        h=X-PGP-Universal:Subject:To:CC:References:From:X-Nvconfidentiality:
+         Message-ID:Date:User-Agent:MIME-Version:In-Reply-To:
+         X-Originating-IP:X-ClientProxiedBy:Content-Type:Content-Language:
+         Content-Transfer-Encoding;
+        b=B3a+nJMY1e/PvYKAT7LBGlwa/kugx+AfoqbMvj/EyT3hxrpeJ7sQMsWMdJQlxzKho
+         jy2YJ47pzKLca9QqrMI2qpXvMA46wU1dfzb3yzBY8NTIGraOJl+bg0Pq/59xdUBLNS
+         /bnG7fSxkcGgsGNzlzCgQWOOUXWSDOgkuZxsp+8IlbnfinKUcliv6MqWXSulEsNyXv
+         EIh2GmNEud9hkIp72ZuHMkWrhgwhMDnw4xjgxdJ2+W90cT6UoDxxzOl8PDPrjhQ9p0
+         IklTRq4Mlrg+UVduRNOxi7jCeWI/98S5JYFUwVk8qaaNzULyUj0q2zlHy86g76FXcR
+         ZxTytDejWJDcw==
 Sender: linux-block-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-On 1/16/20 12:08 PM, Bijan Mottahedeh wrote:
-> On 1/16/2020 8:22 AM, Jens Axboe wrote:
->> On 1/15/20 9:42 PM, Jens Axboe wrote:
->>> On 1/15/20 9:34 PM, Jens Axboe wrote:
->>>> On 1/15/20 7:37 PM, Bijan Mottahedeh wrote:
->>>>> io_issue_sqe() calls io_iopoll_req_issued() which manipulates poll_list,
->>>>> so acquire ctx->uring_lock beforehand similar to other instances of
->>>>> calling io_issue_sqe().
->>>> Is the below not enough?
->>> This should be better, we have two that set ->in_async, and only one
->>> doesn't hold the mutex.
+On 1/16/20 1:37 AM, Christoph Hellwig wrote:
+> On Wed, Jan 15, 2020 at 01:19:41PM -0800, John Hubbard wrote:
+>> On 1/15/20 7:23 AM, Christoph Hellwig wrote:
+>> ...
 >>>
->>> If this works for you, can you resend patch 2 with that? Also add a:
+>>> I'm really not sold on this scheme.  Note that I think it is
+>>> particularly bad, but it also doesn't seem any better than what
+>>> we had before, and it introduced quite a bit more code.
 >>>
->>> Fixes: 8a4955ff1cca ("io_uring: sqthread should grab ctx->uring_lock for submissions")
->>>
->>> to it as well. Thanks!
->> I tested and queued this up:
 >>
->> https://git.kernel.dk/cgit/linux-block/commit/?h=io_uring-5.5&id=11ba820bf163e224bf5dd44e545a66a44a5b1d7a
+>> Hi Christoph,
 >>
->> Please let me know if this works, it sits on top of the ->result patch you
->> sent in.
->>
-> That works, thanks.
+>> All by itself, yes. But the very next patch (which needs a little
+>> rework for other reasons, so not included here) needs to reuse some of
+>> these functions within __unpin_devmap_managed_user_page():
 > 
-> I'm however still seeing a use-after-free error in the request 
-> completion path in nvme_unmap_data().  It happens only when testing with 
-> large block sizes in fio, typically > 128k, e.g. bs=256k will always hit it.
-> 
-> This is the error:
-> 
-> DMA-API: nvme 0000:00:04.0: device driver tries to free DMA memory it 
-> has not allocated [device address=0x6b6b6b6b6b6b6b6b] [size=1802201963 
-> bytes]
-> 
-> and this warning occasionally:
-> 
-> WARN_ON_ONCE(blk_mq_rq_state(rq) != MQ_RQ_IDLE);
-> 
-> It seems like a request might be issued multiple times but I can't see 
-> anything in io_uring code that would account for it.
+> Well, then combine it with the series that actually does the change.
 
-Both of them indicate reuse, and I agree I don't think it's io_uring. It
-really feels like an issue with nvme when a poll queue is shared, but I
-haven't been able to pin point what it is yet.
 
-The 128K is interesting, that would seem to indicate that it's related to
-splitting of the IO (which would create > 1 IO per submitted IO).
+OK, that makes sense. I just double-checked with a quick test run, that it
+doesn't have dependencies with the rest of this series, and it came out clean,
+so:
 
+Andrew, could you please remove just this one patch from mmotm and linux-next?
+
+
+> 
+> Also my vaguely recollection is that we had some idea on how to get rid
+> of the off by one refcounting for the zone device pages, which would be
+> a much better outcome.
+> 
+
+Yes, I recall that Dan Williams mentioned it, but I don't think he provided
+any details yet.
+
+
+thanks,
 -- 
-Jens Axboe
-
+John Hubbard
+NVIDIA
