@@ -2,101 +2,195 @@ Return-Path: <SRS0=7rSP=3F=vger.kernel.org=linux-block-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-0.9 required=3.0 tests=DKIM_SIGNED,DKIM_VALID,
-	DKIM_VALID_AU,HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SPF_HELO_NONE,
-	SPF_PASS autolearn=no autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-10.1 required=3.0 tests=DKIMWL_WL_HIGH,DKIM_SIGNED,
+	DKIM_VALID,DKIM_VALID_AU,INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,
+	SPF_HELO_NONE,SPF_PASS,USER_AGENT_GIT autolearn=unavailable
+	autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 50F10C33CB1
-	for <linux-block@archiver.kernel.org>; Thu, 16 Jan 2020 16:48:34 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id C92CFC33CB8
+	for <linux-block@archiver.kernel.org>; Thu, 16 Jan 2020 17:50:38 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.kernel.org (Postfix) with ESMTP id 253CA207FF
-	for <linux-block@archiver.kernel.org>; Thu, 16 Jan 2020 16:48:34 +0000 (UTC)
-Authentication-Results: mail.kernel.org;
-	dkim=pass (2048-bit key) header.d=cloud.ionos.com header.i=@cloud.ionos.com header.b="PbMEuBcJ"
+	by mail.kernel.org (Postfix) with ESMTP id A4EAE246D9
+	for <linux-block@archiver.kernel.org>; Thu, 16 Jan 2020 17:50:38 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+	s=default; t=1579197038;
+	bh=Q6zmAgSLet3zsI54m+5yKR2ggqICHSEN3q7Rnia/DQ8=;
+	h=From:To:Cc:Subject:Date:In-Reply-To:References:List-ID:From;
+	b=lN7SeCkFvFDpQmUZ/vzMkF+uSNADrWhLCsx+FRaEo5hMcaIkOhYV2osrVq+meuooL
+	 UsNOSkwPvOgVyPBKdds3LdOluYpGfOcJbN4fZrirNI6hnkgMiS/gy4qPjdl7jTuK9B
+	 1MudJRat2RetU7ZDvoyQ2bg8IttWt5D4NPjdw1Rs=
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1729485AbgAPQsc (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Thu, 16 Jan 2020 11:48:32 -0500
-Received: from mail-il1-f196.google.com ([209.85.166.196]:43367 "EHLO
-        mail-il1-f196.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1730232AbgAPQsa (ORCPT
-        <rfc822;linux-block@vger.kernel.org>);
-        Thu, 16 Jan 2020 11:48:30 -0500
-Received: by mail-il1-f196.google.com with SMTP id v69so18756687ili.10
-        for <linux-block@vger.kernel.org>; Thu, 16 Jan 2020 08:48:30 -0800 (PST)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=cloud.ionos.com; s=google;
-        h=mime-version:references:in-reply-to:from:date:message-id:subject:to
-         :cc;
-        bh=bFLululrHyNVTerjV5qHGSuYnmSk+QWZwMjtdQsoK/0=;
-        b=PbMEuBcJAwCk3nMl9/l/u/X8Erkh52bBa9x/blf0HuWLu6Jca1LktHJ1lftbuyHEUz
-         bBYfMofflBjMVTqc+JYEKd8hgz9TFkGmO7ny94+irja4ELai5SlgLffjZcEopWFK9Xj1
-         Z7spjwzPgWQOSvfWsYelLk5u6cruLt2eUb3LwNkunvLROcQ7ddIn/NEkcoe/HqfbE3LF
-         sH9SNIH+lwL4Em87tAvgXD4r/UplkR/rZXfIOJ3W1bteGFxoOdDRFBl5PtPTH0Qb69EW
-         B9Gp2Ca2eCm+TQW6il0nlbCgwh9oCqzQ1Me4pOiIoKYnP5UbAcof0tiu4JJKVp/MecCt
-         lNIQ==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20161025;
-        h=x-gm-message-state:mime-version:references:in-reply-to:from:date
-         :message-id:subject:to:cc;
-        bh=bFLululrHyNVTerjV5qHGSuYnmSk+QWZwMjtdQsoK/0=;
-        b=iiuxm7/Rd0Z5X7VUtDY5iCrmwgkVYSFL4/bMrKVnL45TXu1F0DaAOvAS2UHNPI45TB
-         hucctEqCKHgBdV1lc3682L8/3YT1E+NMmhyb7Y0TXX0RsalJ1EaC+MvwPcnPOntpLp19
-         nMOHqtCb9BrpH7cdaQpJ5gWpLm19fmrJldnt8DnCrMNtUE9sNKE3scKWdaL/S6hjj6KT
-         YFPJx9STzt4jWhNJaQC1/mGEYu+Gg5w6w8yoDGBA1u0TZHsU1CqXgRON6l68hIguKszV
-         lSXv7DcQq5BJsPWiUPpLK7mPavvpurVFzTdGNd49TC3BYum+ysCm7iXSmQatsl4z1p8J
-         Z/Bg==
-X-Gm-Message-State: APjAAAXcgwZ2/An8hokirTaYAt13trdB6msqClQIhygnEyfO0qbA8kW/
-        W3QNYQV7P4OX7n30BG/dGqSRD0URi3gKZCn49KLY8A==
-X-Google-Smtp-Source: APXvYqwsk6jeD0P2DEllAtVfuNPrwHKY6gD0RDqyTH2mR+m786/lNvecRXjSb2uDyeKol/hWpYHP2nTVq7rq5LZT+Q8=
-X-Received: by 2002:a05:6e02:f0f:: with SMTP id x15mr4147307ilj.298.1579193310228;
- Thu, 16 Jan 2020 08:48:30 -0800 (PST)
+        id S2406481AbgAPRpp (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Thu, 16 Jan 2020 12:45:45 -0500
+Received: from mail.kernel.org ([198.145.29.99]:37850 "EHLO mail.kernel.org"
+        rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
+        id S2406406AbgAPRpp (ORCPT <rfc822;linux-block@vger.kernel.org>);
+        Thu, 16 Jan 2020 12:45:45 -0500
+Received: from sasha-vm.mshome.net (c-73-47-72-35.hsd1.nh.comcast.net [73.47.72.35])
+        (using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+        (No client certificate requested)
+        by mail.kernel.org (Postfix) with ESMTPSA id 7F29A24765;
+        Thu, 16 Jan 2020 17:45:42 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+        s=default; t=1579196744;
+        bh=Q6zmAgSLet3zsI54m+5yKR2ggqICHSEN3q7Rnia/DQ8=;
+        h=From:To:Cc:Subject:Date:In-Reply-To:References:From;
+        b=nvIA8CLlWNBZsw8U36uRvHh9gTYTLwxL8319NDK6jLRxGvyObiPiOhnNTMAYg7CML
+         hpHCxw4fwTrjWaxCylN/yNr98/kZgqlJHjDJlKsHbsQkLZRitP3JmdhNScjA3eG/qL
+         xWjHIOEip19iD1StMZKS0LUuDksm4V4c4ErrFAl8=
+From:   Sasha Levin <sashal@kernel.org>
+To:     linux-kernel@vger.kernel.org, stable@vger.kernel.org
+Cc:     "Eric W. Biederman" <ebiederm@xmission.com>,
+        ronnie sahlberg <ronniesahlberg@gmail.com>,
+        =?UTF-8?q?Christoph=20B=C3=B6hmwalder?= 
+        <christoph.boehmwalder@linbit.com>,
+        Steve French <smfrench@gmail.com>,
+        Philipp Reisner <philipp.reisner@linbit.com>,
+        David Laight <David.Laight@ACULAB.COM>,
+        Sasha Levin <sashal@kernel.org>, drbd-dev@lists.linbit.com,
+        linux-block@vger.kernel.org, linux-cifs@vger.kernel.org,
+        samba-technical@lists.samba.org
+Subject: [PATCH AUTOSEL 4.4 123/174] signal: Allow cifs and drbd to receive their terminating signals
+Date:   Thu, 16 Jan 2020 12:42:00 -0500
+Message-Id: <20200116174251.24326-123-sashal@kernel.org>
+X-Mailer: git-send-email 2.20.1
+In-Reply-To: <20200116174251.24326-1-sashal@kernel.org>
+References: <20200116174251.24326-1-sashal@kernel.org>
 MIME-Version: 1.0
-References: <20200116125915.14815-1-jinpuwang@gmail.com> <20200116125915.14815-7-jinpuwang@gmail.com>
- <20200116145300.GC12433@unreal> <CAMGffE=pym8iz4OVxx7s6i37AU+KPFN3AeVrCTOpLx+N8A9dEQ@mail.gmail.com>
- <20200116155301.GC10759@ziepe.ca>
-In-Reply-To: <20200116155301.GC10759@ziepe.ca>
-From:   Jinpu Wang <jinpu.wang@cloud.ionos.com>
-Date:   Thu, 16 Jan 2020 17:48:19 +0100
-Message-ID: <CAMGffE=0VX2SwNFBd+EeR3Grh=bSGrkGFqbWkORYoocDbYUy6g@mail.gmail.com>
-Subject: Re: [PATCH v7 06/25] RDMA/rtrs: client: main functionality
-To:     Jason Gunthorpe <jgg@ziepe.ca>
-Cc:     Leon Romanovsky <leon@kernel.org>, Jack Wang <jinpuwang@gmail.com>,
-        linux-block@vger.kernel.org, linux-rdma@vger.kernel.org,
-        Jens Axboe <axboe@kernel.dk>,
-        Christoph Hellwig <hch@infradead.org>,
-        Sagi Grimberg <sagi@grimberg.me>,
-        Bart Van Assche <bvanassche@acm.org>,
-        Doug Ledford <dledford@redhat.com>,
-        Danil Kipnis <danil.kipnis@cloud.ionos.com>,
-        Roman Penyaev <rpenyaev@suse.de>
-Content-Type: text/plain; charset="UTF-8"
+Content-Type: text/plain; charset=UTF-8
+X-stable: review
+X-Patchwork-Hint: Ignore
+Content-Transfer-Encoding: 8bit
 Sender: linux-block-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-On Thu, Jan 16, 2020 at 4:53 PM Jason Gunthorpe <jgg@ziepe.ca> wrote:
->
-> On Thu, Jan 16, 2020 at 04:43:41PM +0100, Jinpu Wang wrote:
-> > > > +             wake_up(&clt->permits_wait);
-> > > > +}
-> > > > +EXPORT_SYMBOL(rtrs_clt_put_permit);
-> > > > +
-> > > > +struct rtrs_permit *rtrs_permit_from_pdu(void *pdu)
-> > > > +{
-> > > > +     return pdu - sizeof(struct rtrs_permit);
-> > >
-> > > C standard doesn't allow pointer arithmetic on void*.
-> > gcc never complains,  searched aournd:
-> > https://stackoverflow.com/questions/3523145/pointer-arithmetic-for-void-pointer-in-c
-> >
-> > You're right, will fix.
->
-> The kernel extensively uses a gcc extension treating arithmatic on a
-> void * as the same as a u8, you can leave it for kernel code.
->
-> But is generally a big question why code is written like that, always
-> better to use a struct and container_of
->
-> Jason
-Thanks, in fact, it's just a function not used, will remove.
+From: "Eric W. Biederman" <ebiederm@xmission.com>
+
+[ Upstream commit 33da8e7c814f77310250bb54a9db36a44c5de784 ]
+
+My recent to change to only use force_sig for a synchronous events
+wound up breaking signal reception cifs and drbd.  I had overlooked
+the fact that by default kthreads start out with all signals set to
+SIG_IGN.  So a change I thought was safe turned out to have made it
+impossible for those kernel thread to catch their signals.
+
+Reverting the work on force_sig is a bad idea because what the code
+was doing was very much a misuse of force_sig.  As the way force_sig
+ultimately allowed the signal to happen was to change the signal
+handler to SIG_DFL.  Which after the first signal will allow userspace
+to send signals to these kernel threads.  At least for
+wake_ack_receiver in drbd that does not appear actively wrong.
+
+So correct this problem by adding allow_kernel_signal that will allow
+signals whose siginfo reports they were sent by the kernel through,
+but will not allow userspace generated signals, and update cifs and
+drbd to call allow_kernel_signal in an appropriate place so that their
+thread can receive this signal.
+
+Fixing things this way ensures that userspace won't be able to send
+signals and cause problems, that it is clear which signals the
+threads are expecting to receive, and it guarantees that nothing
+else in the system will be affected.
+
+This change was partly inspired by similar cifs and drbd patches that
+added allow_signal.
+
+Reported-by: ronnie sahlberg <ronniesahlberg@gmail.com>
+Reported-by: Christoph Böhmwalder <christoph.boehmwalder@linbit.com>
+Tested-by: Christoph Böhmwalder <christoph.boehmwalder@linbit.com>
+Cc: Steve French <smfrench@gmail.com>
+Cc: Philipp Reisner <philipp.reisner@linbit.com>
+Cc: David Laight <David.Laight@ACULAB.COM>
+Fixes: 247bc9470b1e ("cifs: fix rmmod regression in cifs.ko caused by force_sig changes")
+Fixes: 72abe3bcf091 ("signal/cifs: Fix cifs_put_tcp_session to call send_sig instead of force_sig")
+Fixes: fee109901f39 ("signal/drbd: Use send_sig not force_sig")
+Fixes: 3cf5d076fb4d ("signal: Remove task parameter from force_sig")
+Signed-off-by: "Eric W. Biederman" <ebiederm@xmission.com>
+Signed-off-by: Sasha Levin <sashal@kernel.org>
+---
+ drivers/block/drbd/drbd_main.c |  2 ++
+ fs/cifs/connect.c              |  2 +-
+ include/linux/signal.h         | 15 ++++++++++++++-
+ kernel/signal.c                |  5 +++++
+ 4 files changed, 22 insertions(+), 2 deletions(-)
+
+diff --git a/drivers/block/drbd/drbd_main.c b/drivers/block/drbd/drbd_main.c
+index 385ec4ae3394..456350bd24b3 100644
+--- a/drivers/block/drbd/drbd_main.c
++++ b/drivers/block/drbd/drbd_main.c
+@@ -331,6 +331,8 @@ static int drbd_thread_setup(void *arg)
+ 		 thi->name[0],
+ 		 resource->name);
+ 
++	allow_kernel_signal(DRBD_SIGKILL);
++	allow_kernel_signal(SIGXCPU);
+ restart:
+ 	retval = thi->function(thi);
+ 
+diff --git a/fs/cifs/connect.c b/fs/cifs/connect.c
+index f44281a5eb9f..4bde8acca455 100644
+--- a/fs/cifs/connect.c
++++ b/fs/cifs/connect.c
+@@ -939,7 +939,7 @@ cifs_demultiplex_thread(void *p)
+ 		mempool_resize(cifs_req_poolp, length + cifs_min_rcv);
+ 
+ 	set_freezable();
+-	allow_signal(SIGKILL);
++	allow_kernel_signal(SIGKILL);
+ 	while (server->tcpStatus != CifsExiting) {
+ 		if (try_to_freeze())
+ 			continue;
+diff --git a/include/linux/signal.h b/include/linux/signal.h
+index bcc094cb697c..649cd9fc63ca 100644
+--- a/include/linux/signal.h
++++ b/include/linux/signal.h
+@@ -313,6 +313,9 @@ extern void signal_setup_done(int failed, struct ksignal *ksig, int stepping);
+ extern void exit_signals(struct task_struct *tsk);
+ extern void kernel_sigaction(int, __sighandler_t);
+ 
++#define SIG_KTHREAD ((__force __sighandler_t)2)
++#define SIG_KTHREAD_KERNEL ((__force __sighandler_t)3)
++
+ static inline void allow_signal(int sig)
+ {
+ 	/*
+@@ -320,7 +323,17 @@ static inline void allow_signal(int sig)
+ 	 * know it'll be handled, so that they don't get converted to
+ 	 * SIGKILL or just silently dropped.
+ 	 */
+-	kernel_sigaction(sig, (__force __sighandler_t)2);
++	kernel_sigaction(sig, SIG_KTHREAD);
++}
++
++static inline void allow_kernel_signal(int sig)
++{
++	/*
++	 * Kernel threads handle their own signals. Let the signal code
++	 * know signals sent by the kernel will be handled, so that they
++	 * don't get silently dropped.
++	 */
++	kernel_sigaction(sig, SIG_KTHREAD_KERNEL);
+ }
+ 
+ static inline void disallow_signal(int sig)
+diff --git a/kernel/signal.c b/kernel/signal.c
+index 3095b2309876..7e4a4b199a11 100644
+--- a/kernel/signal.c
++++ b/kernel/signal.c
+@@ -79,6 +79,11 @@ static int sig_task_ignored(struct task_struct *t, int sig, bool force)
+ 	    handler == SIG_DFL && !(force && sig_kernel_only(sig)))
+ 		return 1;
+ 
++	/* Only allow kernel generated signals to this kthread */
++	if (unlikely((t->flags & PF_KTHREAD) &&
++		     (handler == SIG_KTHREAD_KERNEL) && !force))
++		return true;
++
+ 	return sig_handler_ignored(handler, sig);
+ }
+ 
+-- 
+2.20.1
+
