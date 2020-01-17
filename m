@@ -2,159 +2,107 @@ Return-Path: <SRS0=x5xE=3G=vger.kernel.org=linux-block-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-9.6 required=3.0 tests=DKIM_SIGNED,DKIM_VALID,
-	DKIM_VALID_AU,FREEMAIL_FORGED_FROMDOMAIN,FREEMAIL_FROM,
-	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,
-	SPF_HELO_NONE,SPF_PASS,USER_AGENT_GIT autolearn=unavailable
+X-Spam-Status: No, score=-2.3 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
+	MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,USER_AGENT_SANE_1 autolearn=no
 	autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id F27B3C33CB6
-	for <linux-block@archiver.kernel.org>; Fri, 17 Jan 2020 05:25:52 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 8FD8FC33CB1
+	for <linux-block@archiver.kernel.org>; Fri, 17 Jan 2020 07:19:30 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.kernel.org (Postfix) with ESMTP id C8C5A214AF
-	for <linux-block@archiver.kernel.org>; Fri, 17 Jan 2020 05:25:52 +0000 (UTC)
-Authentication-Results: mail.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="Ia2y461W"
+	by mail.kernel.org (Postfix) with ESMTP id 6B56D2073A
+	for <linux-block@archiver.kernel.org>; Fri, 17 Jan 2020 07:19:30 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1729399AbgAQFZg (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Fri, 17 Jan 2020 00:25:36 -0500
-Received: from mail-pl1-f193.google.com ([209.85.214.193]:36412 "EHLO
-        mail-pl1-f193.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1729365AbgAQFZf (ORCPT
-        <rfc822;linux-block@vger.kernel.org>);
-        Fri, 17 Jan 2020 00:25:35 -0500
-Received: by mail-pl1-f193.google.com with SMTP id a6so9385626plm.3;
-        Thu, 16 Jan 2020 21:25:34 -0800 (PST)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20161025;
-        h=from:to:cc:subject:date:message-id:in-reply-to:references
-         :in-reply-to:references;
-        bh=vshR8ZZS65iuxTZnSrp2TIMyJRg+REwdcMvoNFK8Uas=;
-        b=Ia2y461WWqsew/Nr0qQp/XeD57dkMTXASnn1DHFrRDSCoOUf9ZWqHP29B40IwljdiW
-         c7fwiMwpu0DuUBZ0j+20I2vqt70/3Ga8kpwaORFwFjwI8JdeO96uOKcAMotMG/SKzcmf
-         ZEp7gGEmQcB6a+iQ3i7udYPPME8CkGLAxt4hTHp0I6lTDgOoOBvSr8UOTpEFl3l63KpE
-         z962g7q80l6nH+/55zrcZpyAv05Qb/GkFbqXZna0FOSo+QPCDvrIJVk3vh0EU92d0GM2
-         U9lMFrKVLHNWuv7xpzsIakdqsTu+JVzk6vIJ4romGMlzK1TICpGQw+WsXoRn6ML0/guy
-         Lz4w==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20161025;
-        h=x-gm-message-state:from:to:cc:subject:date:message-id:in-reply-to
-         :references:in-reply-to:references;
-        bh=vshR8ZZS65iuxTZnSrp2TIMyJRg+REwdcMvoNFK8Uas=;
-        b=q1/rhe7/7Va+VS2PV/I6Z8HQfk0UIM0ikpIAuU5agQto7CgB7WMvJD+Etyojj/XsDA
-         1YReenJUStS01NXYIfDWKBkTceTLeoh9O65qAGwR2aFA9m5/sbHst5m207E/wZcrhcbA
-         k3iKUrxeS+6mHNpI/uboYKtTO+89923FCKmJtJAwf43+qvrfNZFpmQU1H6C77YiQl65m
-         TouPs+AOpel83/bQ1xwf4SUTN+QoHSZ2qrj7pS3aoX+RkYaDnlndOq8E69UZGWuq+qzu
-         8hLhglwXYAiLPWsCLaibOEwDOS4lYZGn+lp6FK94Rg+5vqUDmJG/kUuqVXdtIGVtLYhB
-         lRWw==
-X-Gm-Message-State: APjAAAX3YOw2O4I2QqzgkjacveEF7yDK2nnBKPd8XaqhzQVf0NY+5EUV
-        aLwsbxrlftCu/m2OzDmITAY=
-X-Google-Smtp-Source: APXvYqz+7uHPswUe5D1+F7j/RyQcwdr1sC1jzDwbyO/TfPqswW7E23SRHl7atkmaCnGuxMSHbqgtlA==
-X-Received: by 2002:a17:90a:d0c5:: with SMTP id y5mr3544709pjw.126.1579238734646;
-        Thu, 16 Jan 2020 21:25:34 -0800 (PST)
-Received: from baolinwangubtpc.spreadtrum.com ([117.18.48.82])
-        by smtp.gmail.com with ESMTPSA id c26sm28844756pfj.101.2020.01.16.21.25.31
-        (version=TLS1 cipher=ECDHE-RSA-AES128-SHA bits=128/128);
-        Thu, 16 Jan 2020 21:25:34 -0800 (PST)
-From:   Baolin Wang <baolin.wang7@gmail.com>
-To:     axboe@kernel.dk, paolo.valente@linaro.org, adrian.hunter@intel.com,
-        ulf.hansson@linaro.org
-Cc:     zhang.lyra@gmail.com, orsonzhai@gmail.com, arnd@arndb.de,
-        linus.walleij@linaro.org, baolin.wang7@gmail.com,
-        linux-mmc@vger.kernel.org, linux-kernel@vger.kernel.org,
-        linux-block@vger.kernel.org
-Subject: [RFC PATCH 6/8] mmc: host: sdhci: Remove redundant sg_count member of struct sdhci_host
-Date:   Fri, 17 Jan 2020 13:24:25 +0800
-Message-Id: <07402baeaf54340483c8aa15c324939ba31e0473.1579164456.git.baolin.wang7@gmail.com>
-X-Mailer: git-send-email 1.7.9.5
-In-Reply-To: <cover.1579164455.git.baolin.wang7@gmail.com>
-References: <cover.1579164455.git.baolin.wang7@gmail.com>
-In-Reply-To: <cover.1579164455.git.baolin.wang7@gmail.com>
-References: <cover.1579164455.git.baolin.wang7@gmail.com>
+        id S1727136AbgAQHT3 (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Fri, 17 Jan 2020 02:19:29 -0500
+Received: from szxga06-in.huawei.com ([45.249.212.32]:41790 "EHLO huawei.com"
+        rhost-flags-OK-OK-OK-FAIL) by vger.kernel.org with ESMTP
+        id S1726675AbgAQHT3 (ORCPT <rfc822;linux-block@vger.kernel.org>);
+        Fri, 17 Jan 2020 02:19:29 -0500
+Received: from DGGEMS411-HUB.china.huawei.com (unknown [172.30.72.59])
+        by Forcepoint Email with ESMTP id 8AE6167721C7C7AD0231;
+        Fri, 17 Jan 2020 15:19:27 +0800 (CST)
+Received: from [10.173.221.193] (10.173.221.193) by
+ DGGEMS411-HUB.china.huawei.com (10.3.19.211) with Microsoft SMTP Server id
+ 14.3.439.0; Fri, 17 Jan 2020 15:19:19 +0800
+Subject: Re: [Question] about shared tags for SCSI drivers
+To:     Ming Lei <ming.lei@redhat.com>
+CC:     "linux-block@vger.kernel.org" <linux-block@vger.kernel.org>,
+        <john.garry@huawei.com>, "axboe@kernel.dk" <axboe@kernel.dk>,
+        <hare@suse.de>, Bart Van Assche <bvanassche@acm.org>,
+        yanaijie <yanaijie@huawei.com>
+References: <bd959b9f-78dd-e0e7-0421-8d7e3cd2f41b@huawei.com>
+ <20200116090347.GA7438@ming.t460p>
+From:   Yufen Yu <yuyufen@huawei.com>
+Message-ID: <825dc368-1b97-b418-dc71-6541b1c20a70@huawei.com>
+Date:   Fri, 17 Jan 2020 15:19:18 +0800
+User-Agent: Mozilla/5.0 (Windows NT 10.0; Win64; x64; rv:68.0) Gecko/20100101
+ Thunderbird/68.3.1
+MIME-Version: 1.0
+In-Reply-To: <20200116090347.GA7438@ming.t460p>
+Content-Type: text/plain; charset="utf-8"; format=flowed
+Content-Language: en-US
+Content-Transfer-Encoding: 7bit
+X-Originating-IP: [10.173.221.193]
+X-CFilter-Loop: Reflected
 Sender: linux-block-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-The mmc_data structure has a member to save the mapped sg count, so
-no need introduce a redundant sg_count of struct sdhci_host, remove it.
-This is also a preparation patch to support ADMA3 transfer mode.
+Hi, ming
 
-Signed-off-by: Baolin Wang <baolin.wang7@gmail.com>
----
- drivers/mmc/host/sdhci.c |   12 +++++-------
- drivers/mmc/host/sdhci.h |    2 --
- 2 files changed, 5 insertions(+), 9 deletions(-)
+On 2020/1/16 17:03, Ming Lei wrote:
+> On Thu, Jan 16, 2020 at 12:06:02PM +0800, Yufen Yu wrote:
+>> Hi, all
+>>
+>> Shared tags is introduced to maintains a notion of fairness between
+>> active users. This may be good for nvme with multiple namespace to
+>> avoid starving some users. Right?
+> 
+> Actually nvme namespace is LUN of scsi world.
+> 
+> Shared tags isn't for maintaining fairness, it is just natural sw
+> implementation of scsi host's tags, since every scsi host shares
+> tags among all LUNs. If the SCSI host supports real MQ, the tags
+> is hw-queue wide, otherwise it is host wide.
+> 
+>>
+>> However, I don't understand why we introduce the shared tag for SCSI.
+>> IMO, there are two concerns for scsi shared tag:
+>>
+>> 1) For now, 'shost->can_queue' is used as queue depth in block layer.
+>> And all target drivers share tags on one host. Then, the max tags for
+>> each target can get:
+>>
+>> 	depth = max((bt->sb.depth + users - 1) / users, 4U);
+>>
+>> But, each target driver may have their own capacity of tags and queue depth.
+>> Does shared tag limit target device bandwidth?
+> 
+> No, if the 'target driver' means LUN, each LUN hasn't its independent
+> tags, maybe it has its own queue depth, which is often for maintaining
+> fairness among all active LUNs, not real queue depth.
+> 
+> You may see the patches[1] which try to bypass per-LUN queue depth for SSD.
+> 
+> [1] https://lore.kernel.org/linux-block/20191118103117.978-1-ming.lei@redhat.com/
+> 
+>>
+>> 2) When add new target or remove device, it may need to freeze other device
+>> to update hctx->flags of BLK_MQ_F_TAG_SHARED. That may hurt performance.
+> 
+> Add/removing device isn't a frequent event, so it shouldn't be a real
+> issue, or you have seen effect on real use case?
 
-diff --git a/drivers/mmc/host/sdhci.c b/drivers/mmc/host/sdhci.c
-index f517121..645785d 100644
---- a/drivers/mmc/host/sdhci.c
-+++ b/drivers/mmc/host/sdhci.c
-@@ -707,7 +707,7 @@ static void sdhci_adma_mark_end(void *desc)
- }
- 
- static void sdhci_adma_table_pre(struct sdhci_host *host,
--	struct mmc_data *data, int sg_count)
-+	struct mmc_data *data)
- {
- 	struct scatterlist *sg;
- 	unsigned long flags;
-@@ -721,14 +721,12 @@ static void sdhci_adma_table_pre(struct sdhci_host *host,
- 	 * We currently guess that it is LE.
- 	 */
- 
--	host->sg_count = sg_count;
--
- 	desc = host->adma_table;
- 	align = host->align_buffer;
- 
- 	align_addr = host->align_addr;
- 
--	for_each_sg(data->sg, sg, host->sg_count, i) {
-+	for_each_sg(data->sg, sg, data->sg_count, i) {
- 		addr = sg_dma_address(sg);
- 		len = sg_dma_len(sg);
- 
-@@ -800,7 +798,7 @@ static void sdhci_adma_table_post(struct sdhci_host *host,
- 		bool has_unaligned = false;
- 
- 		/* Do a quick scan of the SG list for any unaligned mappings */
--		for_each_sg(data->sg, sg, host->sg_count, i)
-+		for_each_sg(data->sg, sg, data->sg_count, i)
- 			if (sg_dma_address(sg) & SDHCI_ADMA2_MASK) {
- 				has_unaligned = true;
- 				break;
-@@ -812,7 +810,7 @@ static void sdhci_adma_table_post(struct sdhci_host *host,
- 
- 			align = host->align_buffer;
- 
--			for_each_sg(data->sg, sg, host->sg_count, i) {
-+			for_each_sg(data->sg, sg, data->sg_count, i) {
- 				if (sg_dma_address(sg) & SDHCI_ADMA2_MASK) {
- 					size = SDHCI_ADMA2_ALIGN -
- 					       (sg_dma_address(sg) & SDHCI_ADMA2_MASK);
-@@ -1110,7 +1108,7 @@ static void sdhci_prepare_data(struct sdhci_host *host, struct mmc_command *cmd)
- 			WARN_ON(1);
- 			host->flags &= ~SDHCI_REQ_USE_DMA;
- 		} else if (host->flags & SDHCI_USE_ADMA) {
--			sdhci_adma_table_pre(host, data, sg_cnt);
-+			sdhci_adma_table_pre(host, data);
- 			sdhci_set_adma_addr(host, host->adma_addr);
- 		} else {
- 			WARN_ON(sg_cnt != 1);
-diff --git a/drivers/mmc/host/sdhci.h b/drivers/mmc/host/sdhci.h
-index a5df807..7bbdd8a 100644
---- a/drivers/mmc/host/sdhci.h
-+++ b/drivers/mmc/host/sdhci.h
-@@ -585,8 +585,6 @@ struct sdhci_host {
- 	struct sg_mapping_iter sg_miter;	/* SG state for PIO */
- 	unsigned int blocks;	/* remaining PIO blocks */
- 
--	int sg_count;		/* Mapped sg entries */
--
- 	void *adma_table;	/* ADMA descriptor table */
- 	void *align_buffer;	/* Bounce buffer */
- 	void *integr_table;	/* ADMA3 intergrate descriptor table */
--- 
-1.7.9.5
+Thanks a lot for your detailed explanation.
 
+We found that removing scsi device will delay a long time (such as 6 * 30s)
+for waiting the other device in the same host to complete all IOs, where
+some IO retry multiple times. If our driver allowed more times to retry,
+removing device will wait longer. That is not expected.
+
+In fact, that is not problem before switching scsi blk-mq. All target
+devices are independent when removing.
+
+Thanks,
+Yufen
