@@ -2,190 +2,137 @@ Return-Path: <SRS0=x5xE=3G=vger.kernel.org=linux-block-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-0.6 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
-	HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS
-	autolearn=no autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-2.4 required=3.0 tests=DKIMWL_WL_HIGH,DKIM_SIGNED,
+	DKIM_VALID,DKIM_VALID_AU,HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,
+	SPF_HELO_NONE,SPF_PASS,USER_AGENT_SANE_1 autolearn=no autolearn_force=no
+	version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id D1269C33CB1
-	for <linux-block@archiver.kernel.org>; Fri, 17 Jan 2020 09:10:04 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 4FF3CC33CB1
+	for <linux-block@archiver.kernel.org>; Fri, 17 Jan 2020 10:16:20 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.kernel.org (Postfix) with ESMTP id A29E120728
-	for <linux-block@archiver.kernel.org>; Fri, 17 Jan 2020 09:10:04 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id 255A02082F
+	for <linux-block@archiver.kernel.org>; Fri, 17 Jan 2020 10:16:20 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (2048-bit key) header.d=infradead.org header.i=@infradead.org header.b="EasjWtx2"
+	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="DPYiUE6x"
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1727667AbgAQJKE (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Fri, 17 Jan 2020 04:10:04 -0500
-Received: from bombadil.infradead.org ([198.137.202.133]:57798 "EHLO
-        bombadil.infradead.org" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1726578AbgAQJKD (ORCPT
+        id S1726409AbgAQKQT (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Fri, 17 Jan 2020 05:16:19 -0500
+Received: from us-smtp-2.mimecast.com ([207.211.31.81]:46634 "EHLO
+        us-smtp-delivery-1.mimecast.com" rhost-flags-OK-OK-OK-FAIL)
+        by vger.kernel.org with ESMTP id S1726085AbgAQKQT (ORCPT
         <rfc822;linux-block@vger.kernel.org>);
-        Fri, 17 Jan 2020 04:10:03 -0500
-DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed;
-        d=infradead.org; s=bombadil.20170209; h=In-Reply-To:Content-Type:MIME-Version
-        :References:Message-ID:Subject:Cc:To:From:Date:Sender:Reply-To:
-        Content-Transfer-Encoding:Content-ID:Content-Description:Resent-Date:
-        Resent-From:Resent-Sender:Resent-To:Resent-Cc:Resent-Message-ID:List-Id:
-        List-Help:List-Unsubscribe:List-Subscribe:List-Post:List-Owner:List-Archive;
-         bh=f4eyNM5fsPgOOY4QDJvW14GgucAlbHSYncJzegpCbtU=; b=EasjWtx2ZDM+Vic8u4b0zIX56
-        mL1kdrcaoohx/ZphkqoevRgkROCelukaVUG0z2PgOf1kJkebHCUXalqhwMvPwO4R9Dde4gRQRzOpe
-        jGF6+08wzTpDW08filohfCVQ+Mb2lcni59HDk7+VkXWEsvgwCPLThQsChIV0FtcvJMzoKPK3mcWnH
-        CjMo8SfFoenOpYZMgKmgFXPs9ncIBe2waxEuTDh0nxofAaKW019ZOhz2iALgWJpJRpX/vHUy9Ba9j
-        7dmeV1cQtQps2ZSj4ZpLzcDwaqwJkIvP8yDzIQ6SkBM99dW3GiYh90bWNI4tbW05C+dyN00uMXo//
-        laBgfaXwQ==;
-Received: from hch by bombadil.infradead.org with local (Exim 4.92.3 #3 (Red Hat Linux))
-        id 1isNdi-00031J-Oo; Fri, 17 Jan 2020 09:10:02 +0000
-Date:   Fri, 17 Jan 2020 01:10:02 -0800
-From:   Christoph Hellwig <hch@infradead.org>
-To:     Satya Tangirala <satyat@google.com>
-Cc:     linux-block@vger.kernel.org, linux-scsi@vger.kernel.org,
-        linux-fscrypt@vger.kernel.org, linux-fsdevel@vger.kernel.org,
-        linux-f2fs-devel@lists.sourceforge.net,
-        Barani Muthukumaran <bmuthuku@qti.qualcomm.com>,
-        Kuohong Wang <kuohong.wang@mediatek.com>,
-        Kim Boojin <boojin.kim@samsung.com>
-Subject: Re: [PATCH v6 1/9] block: Keyslot Manager for Inline Encryption
-Message-ID: <20200117091002.GA15396@infradead.org>
-References: <20191218145136.172774-1-satyat@google.com>
- <20191218145136.172774-2-satyat@google.com>
+        Fri, 17 Jan 2020 05:16:19 -0500
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+        s=mimecast20190719; t=1579256178;
+        h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+         to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+         in-reply-to:in-reply-to:references:references;
+        bh=rwRXymUwAkMDCgXlcoxUIxeW4ktjQFA/XyK4tMjm+kE=;
+        b=DPYiUE6xGSj1g26efI/uZjZMm+ze5NcG0qRZ9Bog1Og0b5BQsWbrJY8OdDwXfDe9CGIkle
+        bhPpdkjOTeVcNy7gaeGmS1ASXJrWHE6LW2qT/HQo2Y8LZA4x1USJ2TcEEaH25uhrHR0Htf
+        TZDyDVD8m0u5Ato/fx/W8/Fv7kPtVAY=
+Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
+ [209.132.183.4]) (Using TLS) by relay.mimecast.com with ESMTP id
+ us-mta-155-Ja14PRT2NIGpP9fDSIURlg-1; Fri, 17 Jan 2020 05:16:15 -0500
+X-MC-Unique: Ja14PRT2NIGpP9fDSIURlg-1
+Received: from smtp.corp.redhat.com (int-mx07.intmail.prod.int.phx2.redhat.com [10.5.11.22])
+        (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
+        (No client certificate requested)
+        by mimecast-mx01.redhat.com (Postfix) with ESMTPS id 89D0B800D48;
+        Fri, 17 Jan 2020 10:16:13 +0000 (UTC)
+Received: from ming.t460p (ovpn-8-17.pek2.redhat.com [10.72.8.17])
+        by smtp.corp.redhat.com (Postfix) with ESMTPS id 738E210016DA;
+        Fri, 17 Jan 2020 10:16:06 +0000 (UTC)
+Date:   Fri, 17 Jan 2020 18:16:02 +0800
+From:   Ming Lei <ming.lei@redhat.com>
+To:     Yufen Yu <yuyufen@huawei.com>
+Cc:     "linux-block@vger.kernel.org" <linux-block@vger.kernel.org>,
+        john.garry@huawei.com, "axboe@kernel.dk" <axboe@kernel.dk>,
+        hare@suse.de, Bart Van Assche <bvanassche@acm.org>,
+        yanaijie <yanaijie@huawei.com>
+Subject: Re: [Question] about shared tags for SCSI drivers
+Message-ID: <20200117101602.GA22310@ming.t460p>
+References: <bd959b9f-78dd-e0e7-0421-8d7e3cd2f41b@huawei.com>
+ <20200116090347.GA7438@ming.t460p>
+ <825dc368-1b97-b418-dc71-6541b1c20a70@huawei.com>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=us-ascii
 Content-Disposition: inline
-In-Reply-To: <20191218145136.172774-2-satyat@google.com>
-X-SRS-Rewrite: SMTP reverse-path rewritten from <hch@infradead.org> by bombadil.infradead.org. See http://www.infradead.org/rpr.html
+In-Reply-To: <825dc368-1b97-b418-dc71-6541b1c20a70@huawei.com>
+User-Agent: Mutt/1.12.1 (2019-06-15)
+X-Scanned-By: MIMEDefang 2.84 on 10.5.11.22
 Sender: linux-block-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-> +struct keyslot_manager {
-> +	unsigned int num_slots;
-> +	struct keyslot_mgmt_ll_ops ksm_ll_ops;
-> +	unsigned int crypto_mode_supported[BLK_ENCRYPTION_MODE_MAX];
-> +	void *ll_priv_data;
-> +
-> +	/* Protects programming and evicting keys from the device */
-> +	struct rw_semaphore lock;
-> +
-> +	/* List of idle slots, with least recently used slot at front */
-> +	wait_queue_head_t idle_slots_wait_queue;
-> +	struct list_head idle_slots;
-> +	spinlock_t idle_slots_lock;
-> +
-> +	/*
-> +	 * Hash table which maps key hashes to keyslots, so that we can find a
-> +	 * key's keyslot in O(1) time rather than O(num_slots).  Protected by
-> +	 * 'lock'.  A cryptographic hash function is used so that timing attacks
-> +	 * can't leak information about the raw keys.
-> +	 */
-> +	struct hlist_head *slot_hashtable;
-> +	unsigned int slot_hashtable_size;
-> +
-> +	/* Per-keyslot data */
-> +	struct keyslot slots[];
-> +};
+On Fri, Jan 17, 2020 at 03:19:18PM +0800, Yufen Yu wrote:
+> Hi, ming
+> 
+> On 2020/1/16 17:03, Ming Lei wrote:
+> > On Thu, Jan 16, 2020 at 12:06:02PM +0800, Yufen Yu wrote:
+> > > Hi, all
+> > > 
+> > > Shared tags is introduced to maintains a notion of fairness between
+> > > active users. This may be good for nvme with multiple namespace to
+> > > avoid starving some users. Right?
+> > 
+> > Actually nvme namespace is LUN of scsi world.
+> > 
+> > Shared tags isn't for maintaining fairness, it is just natural sw
+> > implementation of scsi host's tags, since every scsi host shares
+> > tags among all LUNs. If the SCSI host supports real MQ, the tags
+> > is hw-queue wide, otherwise it is host wide.
+> > 
+> > > 
+> > > However, I don't understand why we introduce the shared tag for SCSI.
+> > > IMO, there are two concerns for scsi shared tag:
+> > > 
+> > > 1) For now, 'shost->can_queue' is used as queue depth in block layer.
+> > > And all target drivers share tags on one host. Then, the max tags for
+> > > each target can get:
+> > > 
+> > > 	depth = max((bt->sb.depth + users - 1) / users, 4U);
+> > > 
+> > > But, each target driver may have their own capacity of tags and queue depth.
+> > > Does shared tag limit target device bandwidth?
+> > 
+> > No, if the 'target driver' means LUN, each LUN hasn't its independent
+> > tags, maybe it has its own queue depth, which is often for maintaining
+> > fairness among all active LUNs, not real queue depth.
+> > 
+> > You may see the patches[1] which try to bypass per-LUN queue depth for SSD.
+> > 
+> > [1] https://lore.kernel.org/linux-block/20191118103117.978-1-ming.lei@redhat.com/
+> > 
+> > > 
+> > > 2) When add new target or remove device, it may need to freeze other device
+> > > to update hctx->flags of BLK_MQ_F_TAG_SHARED. That may hurt performance.
+> > 
+> > Add/removing device isn't a frequent event, so it shouldn't be a real
+> > issue, or you have seen effect on real use case?
+> 
+> Thanks a lot for your detailed explanation.
+> 
+> We found that removing scsi device will delay a long time (such as 6 * 30s)
+> for waiting the other device in the same host to complete all IOs, where
+> some IO retry multiple times. If our driver allowed more times to retry,
+> removing device will wait longer. That is not expected.
 
-Is there a rationale for making this structure private?  If it was
-exposed we could embedd it into the containing structure (although
-the slots would need a dynamic allocation), and instead of the
-keyslot_manager_private helper, the caller could simply use
-container_of.
+I'd suggest you to figure out why IO timeout is triggered in your
+device.
 
-> +struct keyslot_manager *keyslot_manager_create(unsigned int num_slots,
-> +	const struct keyslot_mgmt_ll_ops *ksm_ll_ops,
-> +	const unsigned int crypto_mode_supported[BLK_ENCRYPTION_MODE_MAX],
-> +	void *ll_priv_data)
+> 
+> In fact, that is not problem before switching scsi blk-mq. All target
+> devices are independent when removing.
 
-.. and then the caller could simply set the ops and the supported modes
-array directly in the structure, simplifying the interface even further.
+Is there IO timeout triggered before switching to scsi-mq?
 
-> +static int find_keyslot(struct keyslot_manager *ksm,
-> +			const struct blk_crypto_key *key)
-> +{
-> +	const struct hlist_head *head = hash_bucket_for_key(ksm, key);
-> +	const struct keyslot *slotp;
-> +
-> +	hlist_for_each_entry(slotp, head, hash_node) {
-> +		if (slotp->key.hash == key->hash &&
-> +		    slotp->key.crypto_mode == key->crypto_mode &&
-> +		    slotp->key.data_unit_size == key->data_unit_size &&
-> +		    !crypto_memneq(slotp->key.raw, key->raw, key->size))
-> +			return slotp - ksm->slots;
-> +	}
-> +	return -ENOKEY;
-> +}
+I guess it shouldn't be one issue if io timeout isn't triggered.
 
-I'd return the actual slot pointer here, as that seems the more natural
-fit.  Then factor the pointer arithmetics into a little helper to make
-it obvious for those few places that need the actual slot number.
+However, there is still something we can improve, such as,
+start concurrent queue freeze in blk_mq_update_tag_set_depth().
 
-Also can you add proper subsystem prefix to the various symbol names?
+Thanks,
+Ming
 
-> +void keyslot_manager_get_slot(struct keyslot_manager *ksm, unsigned int slot)
-> +{
-> +	if (WARN_ON(slot >= ksm->num_slots))
-> +		return;
-> +
-> +	WARN_ON(atomic_inc_return(&ksm->slots[slot].slot_refs) < 2);
-> +}
-> +
-> +/**
-> + * keyslot_manager_put_slot() - Release a reference to a slot
-> + * @ksm: The keyslot manager to release the reference from.
-> + * @slot: The slot to release the reference from.
-> + *
-> + * Context: Any context.
-> + */
-> +void keyslot_manager_put_slot(struct keyslot_manager *ksm, unsigned int slot)
-> +{
-> +	unsigned long flags;
-> +
-> +	if (WARN_ON(slot >= ksm->num_slots))
-> +		return;
-> +
-> +	if (atomic_dec_and_lock_irqsave(&ksm->slots[slot].slot_refs,
-> +					&ksm->idle_slots_lock, flags)) {
-> +		list_add_tail(&ksm->slots[slot].idle_slot_node,
-> +			      &ksm->idle_slots);
-> +		spin_unlock_irqrestore(&ksm->idle_slots_lock, flags);
-> +		wake_up(&ksm->idle_slots_wait_queue);
-> +	}
-> +}
-
-How about passing the bio_crypt_ctx structure instead of the not very
-nicely typed slot index?  Also if we merge the files both these helpers
-should probably just go away and me merged into the 1 or 2 callers that
-exist.
-
-> +#ifdef CONFIG_BLK_INLINE_ENCRYPTION
-> +
-> +#define BLK_CRYPTO_MAX_KEY_SIZE		64
-> +
-> +/**
-> + * struct blk_crypto_key - an inline encryption key
-> + * @crypto_mode: encryption algorithm this key is for
-> + * @data_unit_size: the data unit size for all encryption/decryptions with this
-> + *	key.  This is the size in bytes of each individual plaintext and
-> + *	ciphertext.  This is always a power of 2.  It might be e.g. the
-> + *	filesystem block size or the disk sector size.
-> + * @data_unit_size_bits: log2 of data_unit_size
-> + * @size: size of this key in bytes (determined by @crypto_mode)
-> + * @hash: hash of this key, for keyslot manager use only
-> + * @raw: the raw bytes of this key.  Only the first @size bytes are used.
-> + *
-> + * A blk_crypto_key is immutable once created, and many bios can reference it at
-> + * the same time.  It must not be freed until all bios using it have completed.
-> + */
-> +struct blk_crypto_key {
-> +	enum blk_crypto_mode_num crypto_mode;
-> +	unsigned int data_unit_size;
-> +	unsigned int data_unit_size_bits;
-> +	unsigned int size;
-> +	unsigned int hash;
-> +	u8 raw[BLK_CRYPTO_MAX_KEY_SIZE];
-> +};
-> +
-> +#endif /* CONFIG_BLK_INLINE_ENCRYPTION */
-> +#endif /* CONFIG_BLOCK */
-
-I don't think we need any ifdefs around these declarations.
