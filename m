@@ -8,54 +8,54 @@ X-Spam-Status: No, score=-9.6 required=3.0 tests=DKIM_SIGNED,DKIM_VALID,
 	SPF_HELO_NONE,SPF_PASS,USER_AGENT_GIT autolearn=ham autolearn_force=no
 	version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 54B74C33CB7
-	for <linux-block@archiver.kernel.org>; Fri, 17 Jan 2020 05:25:27 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id DF86BC33CB6
+	for <linux-block@archiver.kernel.org>; Fri, 17 Jan 2020 05:25:30 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.kernel.org (Postfix) with ESMTP id 0B6CD20842
-	for <linux-block@archiver.kernel.org>; Fri, 17 Jan 2020 05:25:27 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id A1B6B20842
+	for <linux-block@archiver.kernel.org>; Fri, 17 Jan 2020 05:25:30 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="MmoRabuB"
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="eIjbotbE"
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1729256AbgAQFZ0 (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Fri, 17 Jan 2020 00:25:26 -0500
-Received: from mail-pf1-f195.google.com ([209.85.210.195]:43357 "EHLO
-        mail-pf1-f195.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1729247AbgAQFZZ (ORCPT
+        id S1729247AbgAQFZ2 (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Fri, 17 Jan 2020 00:25:28 -0500
+Received: from mail-pf1-f193.google.com ([209.85.210.193]:39546 "EHLO
+        mail-pf1-f193.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S1729221AbgAQFZ2 (ORCPT
         <rfc822;linux-block@vger.kernel.org>);
-        Fri, 17 Jan 2020 00:25:25 -0500
-Received: by mail-pf1-f195.google.com with SMTP id x6so11379303pfo.10;
-        Thu, 16 Jan 2020 21:25:23 -0800 (PST)
+        Fri, 17 Jan 2020 00:25:28 -0500
+Received: by mail-pf1-f193.google.com with SMTP id q10so11387770pfs.6;
+        Thu, 16 Jan 2020 21:25:27 -0800 (PST)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=gmail.com; s=20161025;
         h=from:to:cc:subject:date:message-id:in-reply-to:references
          :in-reply-to:references;
-        bh=/WG2iQgLHGShIMmm9+FFgsfln8TiyvQKnoRvhMx5wMQ=;
-        b=MmoRabuBuA3+ELwShUAWka+szte9HUdod3jk9G1BuqHWzjbp5zXR9XdLCYojr1C2UY
-         nAklWhCb48BZy8OAuIXDBJq1oo0Rqqb6BiMMTIW6mRFyhkqbhQLr86OVyVAe/IeAcBrW
-         cAdZ0ktAHhj3eleco6skM+F4WIR4AwkL/3+f4RUkJZViShbePV3ecDglds1HmZz8E0rP
-         nk6Bi961FOim1bo7DRqY+aQp98IY2r78CNxIBOU3Q4fMZVEncpa5eWiJ72sOxu6d3oZF
-         kvg2lF/ggoNcfeJjtm+4BHl1iB7uVYmDqn+Y0wvB8rYQDTr/Z9UYt9wtCfEMofg+tIjt
-         qOuA==
+        bh=dQSh2h3aMK8EaKhySKU03OMe1JMqWE38g+hICD3IyDA=;
+        b=eIjbotbEzzZ0a+eChatjgrszxvO7wFMA9oHMeLsRr/VadGSqVE31aZWn6DkQJtAdI+
+         diNw9J6Jk80HJCy7aWRlPIXrUaEsbKZhJUwlczXcM3GnbKPDTx1PMEb1FTblSVuQZxW+
+         VI+WVlfxU3AdsEImzIXrrKRLf0jEvJVq7r4fjroxXiAqYrU9dKHM0Q2XFYo/vXVrGKSe
+         8jrbxpmzzhiQ5aGt9ksP5icsqHjm/pwR8FJiN9pbUt8rCxrR7hBYvGNQlyag/qSpL1tu
+         6pTUnCDrK7BC7r1bNKcdaHR1IIxEH/yJKdQvDrqWmcXLFa/ZTp0F8r3KLLAOToeevyCU
+         9dPw==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=1e100.net; s=20161025;
         h=x-gm-message-state:from:to:cc:subject:date:message-id:in-reply-to
          :references:in-reply-to:references;
-        bh=/WG2iQgLHGShIMmm9+FFgsfln8TiyvQKnoRvhMx5wMQ=;
-        b=MGF7mm1OcAYYkNv05fxoIOQROY19ddV4LqnHDp2eZFLqgOguBmKOLnFnyLOSEf86Zz
-         jSx02UBNg304U+zQRpeflz6A/zdflxGYqSPzErG546Htn9lgv9EHBn6ZPD+wCiAHWTw+
-         E54hVr4EtyCM0PcZW2BhIwMcJ9vJseePdkWXtZpDUU1kaz6Nohayvl4AgisSplBGfSss
-         KwjLptRi7TdjxjaIH8B7uxi2r7IV95ZS0NwvShWt9n5/wvEb+fLZ1pIrakEH9x3Zgnyy
-         Iz/xKWFtnttg9d7s1uv+B/xtPw9G1Y4bw2NUCMxCRWCNaCa4H2gR96YiQQRcwYJ20G7N
-         ofUA==
-X-Gm-Message-State: APjAAAXIhHcfvjA8Tr5FIf8FluVRW6q9gDbRw1QtQ+59Eki1hyRq5lh/
-        YhB2qnnQJHYlALUhGAJukrA=
-X-Google-Smtp-Source: APXvYqyHWGV15eskLKsXEKjmH1OjZ9ypbfB3mYpzeXIuF60ja1JmBcbtbecxNtK+A4u/DWtZ2BV6Vw==
-X-Received: by 2002:a63:5f91:: with SMTP id t139mr42520741pgb.185.1579238722975;
-        Thu, 16 Jan 2020 21:25:22 -0800 (PST)
+        bh=dQSh2h3aMK8EaKhySKU03OMe1JMqWE38g+hICD3IyDA=;
+        b=LLhExOdOrQgUOw18Tq+sEB2NviWyzSlDQwDWKPjhl91AXwSfvhdq8kXndHsUgatR5k
+         gKnfDAv+yIXzH3rFniIvetuDSwE64jaxTaba5GOj2kvKiyHvbYYdXTS5VB1miRvuRDnl
+         xorjZAolPxlY6yfgPrrXFmmBpBDnHtV86+npf8wRMAm/Pna8y6PFM8btYr2EJVLQyH4Z
+         aEIXLWPsn5mFBMC6JAkSqeZ3bOi3P2iqGN5sI5G2SeJfAu63GHQyThP55woKWl/U8f/b
+         5g4Rklq7PQdV5LuHotHRu6zVN5CGOTmeWyqeI4W/5pkRHRSQ59XbrvaSI2KSYrjGj/rs
+         uSsQ==
+X-Gm-Message-State: APjAAAUxPDlMv72tpZCkMDRdjibEx7y7LJjDw7kMgZn78QhHZfb63uUB
+        73bZ8yFt9RVdkZRNpCMUF3ICwUY0
+X-Google-Smtp-Source: APXvYqxNmkZwyGMMMgEl1JnWlWxJjKAUPGVwASK+XxgtEYKgnKVZ7rZ4IOOsSU9SVrtyuLbq/jUojA==
+X-Received: by 2002:a65:64c6:: with SMTP id t6mr42217562pgv.392.1579238727035;
+        Thu, 16 Jan 2020 21:25:27 -0800 (PST)
 Received: from baolinwangubtpc.spreadtrum.com ([117.18.48.82])
-        by smtp.gmail.com with ESMTPSA id c26sm28844756pfj.101.2020.01.16.21.25.19
+        by smtp.gmail.com with ESMTPSA id c26sm28844756pfj.101.2020.01.16.21.25.23
         (version=TLS1 cipher=ECDHE-RSA-AES128-SHA bits=128/128);
-        Thu, 16 Jan 2020 21:25:22 -0800 (PST)
+        Thu, 16 Jan 2020 21:25:26 -0800 (PST)
 From:   Baolin Wang <baolin.wang7@gmail.com>
 To:     axboe@kernel.dk, paolo.valente@linaro.org, adrian.hunter@intel.com,
         ulf.hansson@linaro.org
@@ -63,9 +63,9 @@ Cc:     zhang.lyra@gmail.com, orsonzhai@gmail.com, arnd@arndb.de,
         linus.walleij@linaro.org, baolin.wang7@gmail.com,
         linux-mmc@vger.kernel.org, linux-kernel@vger.kernel.org,
         linux-block@vger.kernel.org
-Subject: [RFC PATCH 3/8] mmc: Add MMC packed request support for MMC software queue
-Date:   Fri, 17 Jan 2020 13:24:22 +0800
-Message-Id: <53da23898ab36c45ad5298e508ef7d81ecd7e8b8.1579164456.git.baolin.wang7@gmail.com>
+Subject: [RFC PATCH 4/8] mmc: host: sdhci: Introduce ADMA3 transfer mode
+Date:   Fri, 17 Jan 2020 13:24:23 +0800
+Message-Id: <0ac890d2820f3b7bd8abc1030730f1ce7442499a.1579164456.git.baolin.wang7@gmail.com>
 X-Mailer: git-send-email 1.7.9.5
 In-Reply-To: <cover.1579164455.git.baolin.wang7@gmail.com>
 References: <cover.1579164455.git.baolin.wang7@gmail.com>
@@ -76,752 +76,313 @@ Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-Some SD controllers can support packed command or packed request, that
-means it can package several requests to host controller to be handled
-at one time, which can reduce interrutps and improve the DMA transfer.
-As a result, the I/O performence can be improved.
+The standard SD host controller can support ADMA3 transfer mode optionally.
+The ADMA3 uses command descriptor to issue an SD command, and a multi-block
+data transfer is programmed by using a pair of command descriptor and ADMA2
+descriptor. ADMA3 performs multiple of multi-block data transfer by using
+integrated descriptor.
 
-Thus this patch adds MMC packed function to support packed requests or
-packed command based on the MMC software queue.
-
-The basic concept of this function is that, we try to collect more
-requests from block layer as much as possible to be linked into
-MMC packed queue by mmc_blk_cqe_issue_rw_rq(). When the last
-request of the hardware queue comes, or the collected request numbers
-are larger than 16, or a larger request comes, then we can start to
-pakage a packed request to host controller. The MMC packed function
-also supplies packed algorithm operations to help to package qualified
-requests. After finishing the packed request, the MMC packed function
-will help to complete each request, at the same time, the MMC packed
-queue will allow to collect more requests from block layer. After
-completing each request, the MMC packed function can try to package
-another packed request to host controller directly in the complete path,
-if there are enough requests in MMC packed queue or the request pending
-flag is not set. If the pending flag was set, we should let the
-mmc_blk_cqe_issue_rw_rq() collect more request as much as possible.i
+This is a preparation patch to add ADMA3 structures and help to expand the
+ADMA buffer for support ADMA3 transfer mode.
 
 Signed-off-by: Baolin Wang <baolin.wang7@gmail.com>
 ---
- drivers/mmc/core/block.c      |   22 ++-
- drivers/mmc/core/block.h      |    3 +-
- drivers/mmc/core/core.c       |   26 ++++
- drivers/mmc/core/core.h       |    2 +
- drivers/mmc/core/queue.c      |   22 ++-
- drivers/mmc/host/mmc_hsq.c    |  310 ++++++++++++++++++++++++++++++++++++-----
- drivers/mmc/host/mmc_hsq.h    |   26 +++-
- drivers/mmc/host/sdhci-sprd.c |    2 +-
- include/linux/mmc/core.h      |    6 +
- include/linux/mmc/host.h      |    9 ++
- 10 files changed, 375 insertions(+), 53 deletions(-)
+ drivers/mmc/host/sdhci.c |  106 ++++++++++++++++++++++++++++++++++++++--------
+ drivers/mmc/host/sdhci.h |   48 +++++++++++++++++++++
+ 2 files changed, 137 insertions(+), 17 deletions(-)
 
-diff --git a/drivers/mmc/core/block.c b/drivers/mmc/core/block.c
-index eb5f15f..0715ad0 100644
---- a/drivers/mmc/core/block.c
-+++ b/drivers/mmc/core/block.c
-@@ -1537,7 +1537,8 @@ static int mmc_blk_cqe_issue_flush(struct mmc_queue *mq, struct request *req)
- 	return mmc_blk_cqe_start_req(mq->card->host, mrq);
- }
+diff --git a/drivers/mmc/host/sdhci.c b/drivers/mmc/host/sdhci.c
+index 004f789..907a35e 100644
+--- a/drivers/mmc/host/sdhci.c
++++ b/drivers/mmc/host/sdhci.c
+@@ -771,7 +771,8 @@ static void sdhci_adma_table_pre(struct sdhci_host *host,
+ 		 * If this triggers then we have a calculation bug
+ 		 * somewhere. :/
+ 		 */
+-		WARN_ON((desc - host->adma_table) >= host->adma_table_sz);
++		WARN_ON((desc - host->adma_table) >=
++			host->adma_table_sz * host->adma3_table_cnt);
+ 	}
  
--static int mmc_blk_swq_issue_rw_rq(struct mmc_queue *mq, struct request *req)
-+static int mmc_blk_swq_issue_rw_rq(struct mmc_queue *mq, struct request *req,
-+				   bool last)
- {
- 	struct mmc_queue_req *mqrq = req_to_mmc_queue_req(req);
- 	struct mmc_host *host = mq->card->host;
-@@ -1548,19 +1549,25 @@ static int mmc_blk_swq_issue_rw_rq(struct mmc_queue *mq, struct request *req)
- 	mmc_pre_req(host, &mqrq->brq.mrq);
+ 	if (host->quirks & SDHCI_QUIRK_NO_ENDATTR_IN_NOPDESC) {
+@@ -3805,10 +3806,17 @@ int sdhci_setup_host(struct sdhci_host *host)
+ 		(host->caps & SDHCI_CAN_DO_ADMA2))
+ 		host->flags |= SDHCI_USE_ADMA;
  
- 	err = mmc_cqe_start_req(host, &mqrq->brq.mrq);
--	if (err)
-+	if (err) {
- 		mmc_post_req(host, &mqrq->brq.mrq, err);
-+		return err;
++	if ((host->quirks2 & SDHCI_QUIRK2_USE_ADMA3_SUPPORT) &&
++	    (host->flags & SDHCI_USE_ADMA) &&
++	    (host->caps1 & SDHCI_CAN_DO_ADMA3)) {
++		DBG("Enable ADMA3 mode for data transfer\n");
++		host->flags |= SDHCI_USE_ADMA3;
 +	}
- 
--	return err;
-+	if (last)
-+		mmc_cqe_commit_rqs(host, true);
 +
-+	return 0;
- }
+ 	if ((host->quirks & SDHCI_QUIRK_BROKEN_ADMA) &&
+ 		(host->flags & SDHCI_USE_ADMA)) {
+ 		DBG("Disabling ADMA as it is marked broken\n");
+-		host->flags &= ~SDHCI_USE_ADMA;
++		host->flags &= ~(SDHCI_USE_ADMA | SDHCI_USE_ADMA3);
+ 	}
  
--static int mmc_blk_cqe_issue_rw_rq(struct mmc_queue *mq, struct request *req)
-+static int mmc_blk_cqe_issue_rw_rq(struct mmc_queue *mq, struct request *req,
-+				   bool last)
- {
- 	struct mmc_queue_req *mqrq = req_to_mmc_queue_req(req);
- 	struct mmc_host *host = mq->card->host;
+ 	if (sdhci_can_64bit_dma(host))
+@@ -3826,7 +3834,7 @@ int sdhci_setup_host(struct sdhci_host *host)
+ 		if (ret) {
+ 			pr_warn("%s: No suitable DMA available - falling back to PIO\n",
+ 				mmc_hostname(mmc));
+-			host->flags &= ~(SDHCI_USE_SDMA | SDHCI_USE_ADMA);
++			host->flags &= ~(SDHCI_USE_SDMA | SDHCI_USE_ADMA | SDHCI_USE_ADMA3);
  
- 	if (host->swq_enabled)
--		return mmc_blk_swq_issue_rw_rq(mq, req);
-+		return mmc_blk_swq_issue_rw_rq(mq, req, last);
+ 			ret = 0;
+ 		}
+@@ -3850,31 +3858,68 @@ int sdhci_setup_host(struct sdhci_host *host)
+ 			host->desc_sz = SDHCI_ADMA2_32_DESC_SZ;
+ 		}
  
- 	mmc_blk_data_prep(mq, mqrq, 0, NULL, NULL);
++		host->adma3_table_cnt = 1;
++
++		if (host->flags & SDHCI_USE_ADMA3) {
++			/* We can package maximum 16 requests once */
++			host->adma3_table_cnt = SDHCI_MAX_ADMA3_ENTRIES;
++
++			if (host->flags & SDHCI_USE_64_BIT_DMA)
++				host->integr_desc_sz = SDHCI_INTEGR_64_DESC_SZ;
++			else
++				host->integr_desc_sz = SDHCI_INTEGR_32_DESC_SZ;
++
++			host->cmd_desc_sz = SDHCI_ADMA3_CMD_DESC_SZ;
++			host->cmd_table_sz = host->adma3_table_cnt *
++				SDHCI_ADMA3_CMD_DESC_SZ * SDHCI_ADMA3_CMD_DESC_ENTRIES;
++
++			buf = dma_alloc_coherent(mmc_dev(mmc),
++						 host->adma3_table_cnt *
++						 host->integr_desc_sz,
++						 &dma, GFP_KERNEL);
++			if (!buf) {
++				pr_warn("%s: Unable to allocate ADMA3 integrated buffers - falling back to ADMA\n",
++					mmc_hostname(mmc));
++				host->flags &= ~SDHCI_USE_ADMA3;
++				host->adma3_table_cnt = 1;
++			} else {
++				host->integr_table = buf;
++				host->integr_addr = dma;
++			}
++		}
++
+ 		host->align_buffer_sz = SDHCI_MAX_SEGS * SDHCI_ADMA2_ALIGN;
+ 		/*
+ 		 * Use zalloc to zero the reserved high 32-bits of 128-bit
+ 		 * descriptors so that they never need to be written.
+ 		 */
+ 		buf = dma_alloc_coherent(mmc_dev(mmc),
+-					 host->align_buffer_sz + host->adma_table_sz,
++					 host->align_buffer_sz *
++					 host->adma3_table_cnt +
++					 host->cmd_table_sz +
++					 host->adma_table_sz *
++					 host->adma3_table_cnt,
+ 					 &dma, GFP_KERNEL);
+ 		if (!buf) {
+ 			pr_warn("%s: Unable to allocate ADMA buffers - falling back to standard DMA\n",
+ 				mmc_hostname(mmc));
+-			host->flags &= ~SDHCI_USE_ADMA;
+-		} else if ((dma + host->align_buffer_sz) &
++			host->flags &= ~(SDHCI_USE_ADMA | SDHCI_USE_ADMA3);
++		} else if ((dma + host->align_buffer_sz * host->adma3_table_cnt) &
+ 			   (SDHCI_ADMA2_DESC_ALIGN - 1)) {
+ 			pr_warn("%s: unable to allocate aligned ADMA descriptor\n",
+ 				mmc_hostname(mmc));
+-			host->flags &= ~SDHCI_USE_ADMA;
+-			dma_free_coherent(mmc_dev(mmc), host->align_buffer_sz +
+-					  host->adma_table_sz, buf, dma);
++			host->flags &= ~(SDHCI_USE_ADMA | SDHCI_USE_ADMA3);
++			dma_free_coherent(mmc_dev(mmc), host->align_buffer_sz *
++					  host->adma3_table_cnt +
++					  host->cmd_table_sz +
++					  host->adma_table_sz *
++					  host->adma3_table_cnt, buf, dma);
+ 		} else {
+ 			host->align_buffer = buf;
+ 			host->align_addr = dma;
  
-@@ -2236,7 +2243,8 @@ static int mmc_blk_wait_for_idle(struct mmc_queue *mq, struct mmc_host *host)
- 	return mmc_blk_rw_wait(mq, NULL);
- }
- 
--enum mmc_issued mmc_blk_mq_issue_rq(struct mmc_queue *mq, struct request *req)
-+enum mmc_issued mmc_blk_mq_issue_rq(struct mmc_queue *mq, struct request *req,
-+				    bool last)
- {
- 	struct mmc_blk_data *md = mq->blkdata;
- 	struct mmc_card *card = md->queue.card;
-@@ -2280,7 +2288,7 @@ enum mmc_issued mmc_blk_mq_issue_rq(struct mmc_queue *mq, struct request *req)
- 		case REQ_OP_READ:
- 		case REQ_OP_WRITE:
- 			if (mq->use_cqe)
--				ret = mmc_blk_cqe_issue_rw_rq(mq, req);
-+				ret = mmc_blk_cqe_issue_rw_rq(mq, req, last);
- 			else
- 				ret = mmc_blk_mq_issue_rw_rq(mq, req);
- 			break;
-diff --git a/drivers/mmc/core/block.h b/drivers/mmc/core/block.h
-index 31153f6..8bfb89f 100644
---- a/drivers/mmc/core/block.h
-+++ b/drivers/mmc/core/block.h
-@@ -9,7 +9,8 @@
- 
- enum mmc_issued;
- 
--enum mmc_issued mmc_blk_mq_issue_rq(struct mmc_queue *mq, struct request *req);
-+enum mmc_issued mmc_blk_mq_issue_rq(struct mmc_queue *mq, struct request *req,
-+				    bool last);
- void mmc_blk_mq_complete(struct request *req);
- void mmc_blk_mq_recovery(struct mmc_queue *mq);
- 
-diff --git a/drivers/mmc/core/core.c b/drivers/mmc/core/core.c
-index abf8f5e..987aa17 100644
---- a/drivers/mmc/core/core.c
-+++ b/drivers/mmc/core/core.c
-@@ -329,6 +329,7 @@ static int mmc_mrq_prep(struct mmc_host *host, struct mmc_request *mrq)
+-			host->adma_table = buf + host->align_buffer_sz;
+-			host->adma_addr = dma + host->align_buffer_sz;
++			host->adma_table = buf + host->align_buffer_sz * host->adma3_table_cnt;
++			host->adma_addr = dma + host->align_buffer_sz * host->adma3_table_cnt;
  		}
  	}
  
-+	INIT_LIST_HEAD(&mrq->list);
- 	return 0;
- }
+@@ -4273,12 +4318,21 @@ int sdhci_setup_host(struct sdhci_host *host)
+ 		regulator_disable(mmc->supply.vqmmc);
+ undma:
+ 	if (host->align_buffer)
+-		dma_free_coherent(mmc_dev(mmc), host->align_buffer_sz +
+-				  host->adma_table_sz, host->align_buffer,
++		dma_free_coherent(mmc_dev(mmc),
++				  host->align_buffer_sz * host->adma3_table_cnt +
++				  host->cmd_table_sz +
++				  host->adma_table_sz * host->adma3_table_cnt,
++				  host->align_buffer,
+ 				  host->align_addr);
+ 	host->adma_table = NULL;
+ 	host->align_buffer = NULL;
  
-@@ -536,6 +537,31 @@ void mmc_cqe_post_req(struct mmc_host *host, struct mmc_request *mrq)
- }
- EXPORT_SYMBOL(mmc_cqe_post_req);
- 
-+/**
-+ *	mmc_cqe_commit_rqs - Commit requests pending in CQE
-+ *	@host: MMC host
-+ *	@last: Indicate if the last request from block layer
-+ */
-+void mmc_cqe_commit_rqs(struct mmc_host *host, bool last)
-+{
-+	if (host->cqe_ops->cqe_commit_rqs)
-+		host->cqe_ops->cqe_commit_rqs(host, last);
-+}
-+EXPORT_SYMBOL(mmc_cqe_commit_rqs);
++	if (host->integr_table)
++		dma_free_coherent(mmc_dev(mmc),
++				  host->adma3_table_cnt * host->integr_desc_sz,
++				  host->integr_table, host->integr_addr);
++	host->integr_table = NULL;
 +
-+/**
-+ *	mmc_cqe_is_busy - If CQE is busy or not
-+ *	@host: MMC host
-+ */
-+bool mmc_cqe_is_busy(struct mmc_host *host)
-+{
-+	if (host->cqe_ops->cqe_is_busy)
-+		return host->cqe_ops->cqe_is_busy(host);
-+
-+	return false;
-+}
-+EXPORT_SYMBOL(mmc_cqe_is_busy);
-+
- /* Arbitrary 1 second timeout */
- #define MMC_CQE_RECOVERY_TIMEOUT	1000
- 
-diff --git a/drivers/mmc/core/core.h b/drivers/mmc/core/core.h
-index 575ac02..e72e6f1 100644
---- a/drivers/mmc/core/core.h
-+++ b/drivers/mmc/core/core.h
-@@ -139,6 +139,8 @@ static inline void mmc_claim_host(struct mmc_host *host)
- int mmc_cqe_start_req(struct mmc_host *host, struct mmc_request *mrq);
- void mmc_cqe_post_req(struct mmc_host *host, struct mmc_request *mrq);
- int mmc_cqe_recovery(struct mmc_host *host);
-+void mmc_cqe_commit_rqs(struct mmc_host *host, bool last);
-+bool mmc_cqe_is_busy(struct mmc_host *host);
- 
- /**
-  *	mmc_pre_req - Prepare for a new request
-diff --git a/drivers/mmc/core/queue.c b/drivers/mmc/core/queue.c
-index d9086c1..e9967bf 100644
---- a/drivers/mmc/core/queue.c
-+++ b/drivers/mmc/core/queue.c
-@@ -285,11 +285,7 @@ static blk_status_t mmc_mq_queue_rq(struct blk_mq_hw_ctx *hctx,
- 		}
- 		break;
- 	case MMC_ISSUE_ASYNC:
--		/*
--		 * For MMC host software queue, we only allow 2 requests in
--		 * flight to avoid a long latency.
--		 */
--		if (host->swq_enabled && mq->in_flight[issue_type] > 2) {
-+		if (mq->use_cqe && mmc_cqe_is_busy(host)) {
- 			spin_unlock_irq(&mq->lock);
- 			return BLK_STS_RESOURCE;
- 		}
-@@ -330,7 +326,7 @@ static blk_status_t mmc_mq_queue_rq(struct blk_mq_hw_ctx *hctx,
- 
- 	blk_mq_start_request(req);
- 
--	issued = mmc_blk_mq_issue_rq(mq, req);
-+	issued = mmc_blk_mq_issue_rq(mq, req, bd->last);
- 
- 	switch (issued) {
- 	case MMC_REQ_BUSY:
-@@ -362,8 +358,19 @@ static blk_status_t mmc_mq_queue_rq(struct blk_mq_hw_ctx *hctx,
  	return ret;
  }
+ EXPORT_SYMBOL_GPL(sdhci_setup_host);
+@@ -4291,11 +4345,20 @@ void sdhci_cleanup_host(struct sdhci_host *host)
+ 		regulator_disable(mmc->supply.vqmmc);
  
-+static void mmc_mq_commit_rqs(struct blk_mq_hw_ctx *hctx)
-+{
-+	struct mmc_queue *mq = hctx->queue->queuedata;
-+	struct mmc_card *card = mq->card;
-+	struct mmc_host *host = card->host;
+ 	if (host->align_buffer)
+-		dma_free_coherent(mmc_dev(mmc), host->align_buffer_sz +
+-				  host->adma_table_sz, host->align_buffer,
++		dma_free_coherent(mmc_dev(mmc),
++				  host->align_buffer_sz * host->adma3_table_cnt +
++				  host->cmd_table_sz +
++				  host->adma_table_sz * host->adma3_table_cnt,
++				  host->align_buffer,
+ 				  host->align_addr);
+ 	host->adma_table = NULL;
+ 	host->align_buffer = NULL;
 +
-+	if (mq->use_cqe)
-+		mmc_cqe_commit_rqs(host, false);
-+}
-+
- static const struct blk_mq_ops mmc_mq_ops = {
- 	.queue_rq	= mmc_mq_queue_rq,
-+	.commit_rqs	= mmc_mq_commit_rqs,
- 	.init_request	= mmc_mq_init_request,
- 	.exit_request	= mmc_mq_exit_request,
- 	.complete	= mmc_blk_mq_complete,
-@@ -390,6 +397,9 @@ static void mmc_setup_queue(struct mmc_queue *mq, struct mmc_card *card)
- 		     "merging was advertised but not possible");
- 	blk_queue_max_segments(mq->queue, mmc_get_max_segments(host));
++	if (host->integr_table)
++		dma_free_coherent(mmc_dev(mmc),
++				  host->adma3_table_cnt * host->integr_desc_sz,
++				  host->integr_table, host->integr_addr);
++	host->integr_table = NULL;
+ }
+ EXPORT_SYMBOL_GPL(sdhci_cleanup_host);
  
-+	if (host->max_packed_reqs != 0)
-+		blk_queue_max_batch_requests(mq->queue, host->max_packed_reqs);
-+
- 	if (mmc_card_mmc(card))
- 		block_size = card->ext_csd.data_sector_size;
+@@ -4423,12 +4486,21 @@ void sdhci_remove_host(struct sdhci_host *host, int dead)
+ 		regulator_disable(mmc->supply.vqmmc);
  
-diff --git a/drivers/mmc/host/mmc_hsq.c b/drivers/mmc/host/mmc_hsq.c
-index 6a6bdd0..1eef0f8 100644
---- a/drivers/mmc/host/mmc_hsq.c
-+++ b/drivers/mmc/host/mmc_hsq.c
-@@ -8,22 +8,54 @@
+ 	if (host->align_buffer)
+-		dma_free_coherent(mmc_dev(mmc), host->align_buffer_sz +
+-				  host->adma_table_sz, host->align_buffer,
++		dma_free_coherent(mmc_dev(mmc),
++				  host->align_buffer_sz * host->adma3_table_cnt +
++				  host->cmd_table_sz +
++				  host->adma_table_sz * host->adma3_table_cnt,
++				  host->align_buffer,
+ 				  host->align_addr);
  
- #include <linux/mmc/card.h>
- #include <linux/mmc/host.h>
-+#include <linux/mmc/mmc.h>
- 
- #include "mmc_hsq.h"
- 
- #define HSQ_NUM_SLOTS	32
- #define HSQ_INVALID_TAG	HSQ_NUM_SLOTS
- 
-+#define HSQ_PACKED_FLUSH_BLOCKS	256
-+#define HSQ_PACKED_QUEUE_DEPTH	64
+ 	host->adma_table = NULL;
+ 	host->align_buffer = NULL;
 +
-+/**
-+ * mmc_hsq_packed_algo_rw - the algorithm to package read or write requests
-+ * @mmc: the host controller
-+ *
-+ * TODO: we can add more condition to decide if we can package this
-+ * request or not.
-+ */
-+void mmc_hsq_packed_algo_rw(struct mmc_host *mmc)
-+{
-+	struct mmc_hsq *hsq = mmc->cqe_private;
-+	struct hsq_packed *packed = hsq->packed;
-+	struct mmc_packed_request *prq = &packed->prq;
-+	struct mmc_request *mrq, *t;
-+	u32 i = 0;
-+
-+	list_for_each_entry_safe(mrq, t, &packed->list, list) {
-+		if (++i > packed->max_entries)
-+			break;
-+
-+		list_move_tail(&mrq->list, &prq->list);
-+		prq->nr_reqs++;
-+	}
-+}
-+EXPORT_SYMBOL_GPL(mmc_hsq_packed_algo_rw);
-+
- static void mmc_hsq_pump_requests(struct mmc_hsq *hsq)
- {
-+	struct hsq_packed *packed = hsq->packed;
- 	struct mmc_host *mmc = hsq->mmc;
- 	struct hsq_slot *slot;
-+	struct mmc_request *mrq;
- 	unsigned long flags;
-+	int ret;
- 
- 	spin_lock_irqsave(&hsq->lock, flags);
- 
- 	/* Make sure we are not already running a request now */
--	if (hsq->mrq) {
-+	if (hsq->mrq || (packed && packed->prq.nr_reqs)) {
- 		spin_unlock_irqrestore(&hsq->lock, flags);
- 		return;
- 	}
-@@ -34,16 +66,58 @@ static void mmc_hsq_pump_requests(struct mmc_hsq *hsq)
- 		return;
- 	}
- 
--	slot = &hsq->slot[hsq->next_tag];
--	hsq->mrq = slot->mrq;
--	hsq->qcnt--;
-+	if (packed) {
-+		/* Try to package requests */
-+		packed->ops->packed_algo(mmc);
-+
-+		packed->busy = true;
-+		hsq->qcnt -= packed->prq.nr_reqs;
-+	} else {
-+		slot = &hsq->slot[hsq->next_tag];
-+		hsq->mrq = slot->mrq;
-+		hsq->qcnt--;
-+	}
- 
- 	spin_unlock_irqrestore(&hsq->lock, flags);
- 
--	if (mmc->ops->request_atomic)
--		mmc->ops->request_atomic(mmc, hsq->mrq);
--	else
--		mmc->ops->request(mmc, hsq->mrq);
-+	if (!packed) {
-+		if (mmc->ops->request_atomic)
-+			mmc->ops->request_atomic(mmc, hsq->mrq);
-+		else
-+			mmc->ops->request(mmc, hsq->mrq);
-+
-+		return;
-+	}
-+
-+	if (packed->ops->prepare_hardware) {
-+		ret = packed->ops->prepare_hardware(mmc);
-+		if (ret) {
-+			pr_err("failed to prepare hardware\n");
-+			goto error;
-+		}
-+	}
-+
-+	ret = packed->ops->packed_request(mmc, &packed->prq);
-+	if (ret) {
-+		pr_err("failed to packed requests\n");
-+		goto error;
-+	}
-+
-+	return;
-+
-+error:
-+	spin_lock_irqsave(&hsq->lock, flags);
-+
-+	list_for_each_entry(mrq, &packed->prq.list, list) {
-+		struct mmc_data *data = mrq->data;
-+
-+		data->error = ret;
-+		data->bytes_xfered = 0;
-+	}
-+
-+	spin_unlock_irqrestore(&hsq->lock, flags);
-+
-+	mmc_hsq_finalize_packed_request(mmc, &packed->prq);
++	if (host->integr_table)
++		dma_free_coherent(mmc_dev(mmc),
++				  host->adma3_table_cnt * host->integr_desc_sz,
++				  host->integr_table, host->integr_addr);
++	host->integr_table = NULL;
  }
  
- static void mmc_hsq_update_next_tag(struct mmc_hsq *hsq, int remains)
-@@ -85,16 +159,24 @@ static void mmc_hsq_update_next_tag(struct mmc_hsq *hsq, int remains)
+ EXPORT_SYMBOL_GPL(sdhci_remove_host);
+diff --git a/drivers/mmc/host/sdhci.h b/drivers/mmc/host/sdhci.h
+index cecc64b..a5df807 100644
+--- a/drivers/mmc/host/sdhci.h
++++ b/drivers/mmc/host/sdhci.h
+@@ -274,6 +274,9 @@
+ #define SDHCI_PRESET_SDCLK_FREQ_MASK   0x3FF
+ #define SDHCI_PRESET_SDCLK_FREQ_SHIFT	0
  
- static void mmc_hsq_post_request(struct mmc_hsq *hsq)
- {
-+	struct hsq_packed *packed = hsq->packed;
-+	bool need_pump;
- 	unsigned long flags;
- 	int remains;
++#define SDHCI_ADMA3_ADDRESS	0x78
++#define SDHCI_ADMA3_ADDRESS_HI	0x7c
++
+ #define SDHCI_SLOT_INT_STATUS	0xFC
  
- 	spin_lock_irqsave(&hsq->lock, flags);
+ #define SDHCI_HOST_VERSION	0xFE
+@@ -346,6 +349,41 @@ struct sdhci_adma2_64_desc {
+ #define ADMA2_NOP_END_VALID	0x3
+ #define ADMA2_END		0x2
  
- 	remains = hsq->qcnt;
--	hsq->mrq = NULL;
--
--	/* Update the next available tag to be queued. */
--	mmc_hsq_update_next_tag(hsq, remains);
-+	if (packed) {
-+		need_pump = !packed->rqs_pending;
-+		packed->prq.nr_reqs = 0;
-+	} else {
-+		need_pump = true;
-+		hsq->mrq = NULL;
++#define SDHCI_MAX_ADMA3_ENTRIES	16
 +
-+		/* Update the next available tag to be queued. */
-+		mmc_hsq_update_next_tag(hsq, remains);
-+	}
++/* ADMA3 command descriptor */
++struct sdhci_adma3_cmd_desc {
++	__le32	cmd;
++	__le32	reg;
++}  __packed __aligned(4);
++
++#define ADMA3_TRAN_VALID	0x9
++#define ADMA3_TRAN_END		0xb
++
++/* ADMA3 command descriptor size */
++#define SDHCI_ADMA3_CMD_DESC_ENTRIES	4
++#define SDHCI_ADMA3_CMD_DESC_SZ		8
++
++/* ADMA3 integrated 32-bit descriptor */
++struct sdhci_integr_32_desc {
++	__le32	cmd;
++	__le32	addr;
++}  __packed __aligned(4);
++
++#define SDHCI_INTEGR_32_DESC_SZ		8
++
++/* ADMA3 integrated 64-bit descriptor. */
++struct sdhci_integr_64_desc {
++	__le32	cmd;
++	__le32	addr_lo;
++	__le32	addr_hi;
++}  __packed __aligned(4);
++
++#define SDHCI_INTEGR_64_DESC_SZ		16
++
++#define ADMA3_INTEGR_TRAN_VALID		0x39
++#define ADMA3_INTEGR_TRAN_END		0x3b
++
+ /*
+  * Maximum segments assuming a 512KiB maximum requisition size and a minimum
+  * 4KiB page size.
+@@ -482,6 +520,8 @@ struct sdhci_host {
+  * block count.
+  */
+ #define SDHCI_QUIRK2_USE_32BIT_BLK_CNT			(1<<18)
++/* use ADMA3 for data read/write if hardware supports */
++#define SDHCI_QUIRK2_USE_ADMA3_SUPPORT			(1<<19)
  
- 	if (hsq->waiting_for_idle && !remains) {
- 		hsq->waiting_for_idle = false;
-@@ -110,10 +192,17 @@ static void mmc_hsq_post_request(struct mmc_hsq *hsq)
- 	spin_unlock_irqrestore(&hsq->lock, flags);
+ 	int irq;		/* Device IRQ */
+ 	void __iomem *ioaddr;	/* Mapped address */
+@@ -517,6 +557,7 @@ struct sdhci_host {
+ #define SDHCI_SIGNALING_330	(1<<14)	/* Host is capable of 3.3V signaling */
+ #define SDHCI_SIGNALING_180	(1<<15)	/* Host is capable of 1.8V signaling */
+ #define SDHCI_SIGNALING_120	(1<<16)	/* Host is capable of 1.2V signaling */
++#define SDHCI_USE_ADMA3		(1<<17)	/* Host is ADMA3 capable */
  
- 	 /*
--	  * Try to pump new request to host controller as fast as possible,
--	  * after completing previous request.
--	  */
--	if (remains > 0)
-+	 * For non-packed request mode, we should try to pump new request to
-+	 * host controller as fast as possible if there are pending requests,
-+	 * after completing previous request.
-+	 *
-+	 * For packed request mode, If there are not enough requests in queue
-+	 * and the request pending flag was set, then do not pump requests here,
-+	 * instead we should let the mmc_blk_swq_issue_rw_rq() combine more
-+	 * requests and pump them.
-+	 */
-+	if ((need_pump && remains > 0) ||
-+	    (packed && remains >= packed->max_entries))
- 		mmc_hsq_pump_requests(hsq);
- }
+ 	unsigned int version;	/* SDHCI spec. version */
  
-@@ -152,6 +241,104 @@ bool mmc_hsq_finalize_request(struct mmc_host *mmc, struct mmc_request *mrq)
- }
- EXPORT_SYMBOL_GPL(mmc_hsq_finalize_request);
+@@ -548,14 +589,19 @@ struct sdhci_host {
  
-+/**
-+ * mmc_hsq_finalize_packed_request - finalize one packed request
-+ * @mmc: the host controller
-+ * @prq: the packed request need to be finalized
-+ */
-+void mmc_hsq_finalize_packed_request(struct mmc_host *mmc,
-+				     struct mmc_packed_request *prq)
-+{
-+	struct mmc_hsq *hsq = mmc->cqe_private;
-+	struct hsq_packed *packed = hsq->packed;
-+	struct mmc_request *mrq, *t;
-+	LIST_HEAD(head);
-+	unsigned long flags;
-+
-+	if (!packed || !prq)
-+		return;
-+
-+	if (packed->ops->unprepare_hardware &&
-+	    packed->ops->unprepare_hardware(mmc))
-+		pr_err("failed to unprepare hardware\n");
-+
-+	/*
-+	 * Clear busy flag to allow collecting more requests into command
-+	 * queue, but now we can not pump them to controller, we should wait
-+	 * for all requests are completed. During the period of completing
-+	 * requests, we should collect more requests from block layer as much
-+	 * as possible.
-+	 */
-+	spin_lock_irqsave(&hsq->lock, flags);
-+	list_splice_tail_init(&prq->list, &head);
-+	packed->busy = false;
-+	spin_unlock_irqrestore(&hsq->lock, flags);
-+
-+	list_for_each_entry_safe(mrq, t, &head, list) {
-+		list_del(&mrq->list);
-+
-+		mmc_cqe_request_done(mmc, mrq);
-+	}
-+
-+	mmc_hsq_post_request(hsq);
-+}
-+EXPORT_SYMBOL_GPL(mmc_hsq_finalize_packed_request);
-+
-+static void mmc_hsq_commit_rqs(struct mmc_host *mmc, bool last)
-+{
-+	struct mmc_hsq *hsq = mmc->cqe_private;
-+	struct hsq_packed *packed = hsq->packed;
-+
-+	if (!packed)
-+		return;
-+
-+	spin_lock_irq(&hsq->lock);
-+
-+	/* Set pending flag which indicates more request will be coming */
-+	if (!last && !packed->rqs_pending)
-+		packed->rqs_pending = true;
-+
-+	spin_unlock_irq(&hsq->lock);
-+
-+	/*
-+	 * If the last request is coming in hardware queue, then pump requests
-+	 * to controller as fast as possible.
-+	 */
-+	if (last)
-+		mmc_hsq_pump_requests(hsq);
-+}
-+
-+static bool mmc_hsq_is_busy(struct mmc_host *mmc)
-+{
-+	struct mmc_hsq *hsq = mmc->cqe_private;
-+	struct hsq_packed *packed = hsq->packed;
-+	unsigned long flags;
-+	bool busy;
-+
-+	spin_lock_irqsave(&hsq->lock, flags);
-+
-+	/*
-+	 * For packed mode, when hardware is busy, we can only allow maximum
-+	 * packed number requests to be ready in software queue to be queued
-+	 * after previous packed request is completed, which avoiding long
-+	 * latency.
-+	 *
-+	 * For non-packed mode, we can only allow 2 requests in flight to avoid
-+	 * long latency.
-+	 *
-+	 * Otherwise return BLK_STS_RESOURCE to tell block layer to dispatch
-+	 * requests later.
-+	 */
-+	if (packed)
-+		busy = packed->busy && hsq->qcnt >= packed->max_entries;
-+	else
-+		busy = hsq->qcnt > 1;
-+
-+	spin_unlock_irqrestore(&hsq->lock, flags);
-+
-+	return busy;
-+}
-+
- static void mmc_hsq_recovery_start(struct mmc_host *mmc)
- {
- 	struct mmc_hsq *hsq = mmc->cqe_private;
-@@ -187,7 +374,8 @@ static void mmc_hsq_recovery_finish(struct mmc_host *mmc)
- static int mmc_hsq_request(struct mmc_host *mmc, struct mmc_request *mrq)
- {
- 	struct mmc_hsq *hsq = mmc->cqe_private;
--	int tag = mrq->tag;
-+	struct hsq_packed *packed = hsq->packed;
-+	int nr_rqs = 0, tag = mrq->tag;
+ 	void *adma_table;	/* ADMA descriptor table */
+ 	void *align_buffer;	/* Bounce buffer */
++	void *integr_table;	/* ADMA3 intergrate descriptor table */
  
- 	spin_lock_irq(&hsq->lock);
+ 	size_t adma_table_sz;	/* ADMA descriptor table size */
+ 	size_t align_buffer_sz;	/* Bounce buffer size */
++	size_t cmd_table_sz;	/* ADMA3 command descriptor table size */
  
-@@ -202,20 +390,41 @@ static int mmc_hsq_request(struct mmc_host *mmc, struct mmc_request *mrq)
- 		return -EBUSY;
- 	}
+ 	dma_addr_t adma_addr;	/* Mapped ADMA descr. table */
+ 	dma_addr_t align_addr;	/* Mapped bounce buffer */
++	dma_addr_t integr_addr;	/* Mapped ADMA3 intergrate descr. table */
  
--	hsq->slot[tag].mrq = mrq;
-+	hsq->qcnt++;
+ 	unsigned int desc_sz;	/* ADMA descriptor size */
++	unsigned int cmd_desc_sz;	/* ADMA3 command descriptor size */
++	unsigned int integr_desc_sz;	/* ADMA3 intergrate descriptor size */
  
--	/*
--	 * Set the next tag as current request tag if no available
--	 * next tag.
--	 */
--	if (hsq->next_tag == HSQ_INVALID_TAG)
--		hsq->next_tag = tag;
-+	if (packed) {
-+		list_add_tail(&mrq->list, &packed->list);
+ 	struct workqueue_struct *complete_wq;	/* Request completion wq */
+ 	struct work_struct	complete_work;	/* Request completion work */
+@@ -601,6 +647,8 @@ struct sdhci_host {
  
--	hsq->qcnt++;
-+		/* New request comes, then clear pending flag */
-+		if (packed->rqs_pending)
-+			packed->rqs_pending = false;
-+
-+		nr_rqs = hsq->qcnt;
-+	} else {
-+		hsq->slot[tag].mrq = mrq;
-+
-+		/*
-+		 * Set the next tag as current request tag if no available
-+		 * next tag.
-+		 */
-+		if (hsq->next_tag == HSQ_INVALID_TAG)
-+			hsq->next_tag = tag;
-+	}
+ 	/* Host ADMA table count */
+ 	u32			adma_table_cnt;
++	/* Host ADMA3 table count */
++	u32			adma3_table_cnt;
  
- 	spin_unlock_irq(&hsq->lock);
+ 	u64			data_timeout;
  
--	mmc_hsq_pump_requests(hsq);
-+	/*
-+	 * For non-packed request mode, we should pump requests as soon as
-+	 * possible.
-+	 *
-+	 * For the packed request mode, if it is a larger request or the
-+	 * request count is larger than the maximum packed number, we
-+	 * should pump requests to controller. Otherwise we should try to
-+	 * combine requests as much as we can.
-+	 */
-+	if (!packed || mrq->data->blocks > HSQ_PACKED_FLUSH_BLOCKS ||
-+	    nr_rqs >= packed->max_entries)
-+		mmc_hsq_pump_requests(hsq);
- 
- 	return 0;
- }
-@@ -228,12 +437,17 @@ static void mmc_hsq_post_req(struct mmc_host *mmc, struct mmc_request *mrq)
- 
- static bool mmc_hsq_queue_is_idle(struct mmc_hsq *hsq, int *ret)
- {
-+	struct hsq_packed *packed = hsq->packed;
- 	bool is_idle;
- 
- 	spin_lock_irq(&hsq->lock);
- 
--	is_idle = (!hsq->mrq && !hsq->qcnt) ||
--		hsq->recovery_halt;
-+	if (packed)
-+		is_idle = (!packed->prq.nr_reqs && !hsq->qcnt) ||
-+			hsq->recovery_halt;
-+	else
-+		is_idle = (!hsq->mrq && !hsq->qcnt) ||
-+			hsq->recovery_halt;
- 
- 	*ret = hsq->recovery_halt ? -EBUSY : 0;
- 	hsq->waiting_for_idle = !is_idle;
-@@ -310,18 +524,40 @@ static int mmc_hsq_enable(struct mmc_host *mmc, struct mmc_card *card)
- 	.cqe_wait_for_idle = mmc_hsq_wait_for_idle,
- 	.cqe_recovery_start = mmc_hsq_recovery_start,
- 	.cqe_recovery_finish = mmc_hsq_recovery_finish,
-+	.cqe_is_busy = mmc_hsq_is_busy,
-+	.cqe_commit_rqs = mmc_hsq_commit_rqs,
- };
- 
--int mmc_hsq_init(struct mmc_hsq *hsq, struct mmc_host *mmc)
-+int mmc_hsq_init(struct mmc_hsq *hsq, struct mmc_host *mmc,
-+		 const struct hsq_packed_ops *ops, int max_packed)
- {
--	hsq->num_slots = HSQ_NUM_SLOTS;
--	hsq->next_tag = HSQ_INVALID_TAG;
--	mmc->cqe_qdepth = HSQ_NUM_SLOTS;
--
--	hsq->slot = devm_kcalloc(mmc_dev(mmc), hsq->num_slots,
--				 sizeof(struct hsq_slot), GFP_KERNEL);
--	if (!hsq->slot)
--		return -ENOMEM;
-+	if (ops && max_packed > 1) {
-+		struct hsq_packed *packed;
-+
-+		packed = devm_kzalloc(mmc_dev(mmc), sizeof(struct hsq_packed),
-+				      GFP_KERNEL);
-+		if (!packed)
-+			return -ENOMEM;
-+
-+		packed->ops = ops;
-+		packed->max_entries = max_packed;
-+		INIT_LIST_HEAD(&packed->list);
-+		INIT_LIST_HEAD(&packed->prq.list);
-+
-+		hsq->packed = packed;
-+		mmc->cqe_qdepth = HSQ_PACKED_QUEUE_DEPTH;
-+		mmc->max_packed_reqs = max_packed;
-+	} else {
-+		hsq->num_slots = HSQ_NUM_SLOTS;
-+		hsq->next_tag = HSQ_INVALID_TAG;
-+		mmc->cqe_qdepth = HSQ_NUM_SLOTS;
-+
-+		hsq->slot = devm_kcalloc(mmc_dev(mmc), hsq->num_slots,
-+					 sizeof(struct hsq_slot),
-+					 GFP_KERNEL);
-+		if (!hsq->slot)
-+			return -ENOMEM;
-+	}
- 
- 	hsq->mmc = mmc;
- 	hsq->mmc->cqe_private = hsq;
-diff --git a/drivers/mmc/host/mmc_hsq.h b/drivers/mmc/host/mmc_hsq.h
-index d51beb7..c3d3bc7 100644
---- a/drivers/mmc/host/mmc_hsq.h
-+++ b/drivers/mmc/host/mmc_hsq.h
-@@ -2,6 +2,24 @@
- #ifndef LINUX_MMC_HSQ_H
- #define LINUX_MMC_HSQ_H
- 
-+struct hsq_packed_ops {
-+	void (*packed_algo)(struct mmc_host *mmc);
-+	int (*prepare_hardware)(struct mmc_host *mmc);
-+	int (*unprepare_hardware)(struct mmc_host *mmc);
-+	int (*packed_request)(struct mmc_host *mmc,
-+			      struct mmc_packed_request *prq);
-+};
-+
-+struct hsq_packed {
-+	bool busy;
-+	bool rqs_pending;
-+	int max_entries;
-+
-+	struct list_head list;
-+	struct mmc_packed_request prq;
-+	const struct hsq_packed_ops *ops;
-+};
-+
- struct hsq_slot {
- 	struct mmc_request *mrq;
- };
-@@ -20,11 +38,17 @@ struct mmc_hsq {
- 	bool enabled;
- 	bool waiting_for_idle;
- 	bool recovery_halt;
-+
-+	struct hsq_packed *packed;
- };
- 
--int mmc_hsq_init(struct mmc_hsq *hsq, struct mmc_host *mmc);
-+int mmc_hsq_init(struct mmc_hsq *hsq, struct mmc_host *mmc,
-+		 const struct hsq_packed_ops *ops, int max_packed);
- void mmc_hsq_suspend(struct mmc_host *mmc);
- int mmc_hsq_resume(struct mmc_host *mmc);
- bool mmc_hsq_finalize_request(struct mmc_host *mmc, struct mmc_request *mrq);
-+void mmc_hsq_finalize_packed_request(struct mmc_host *mmc,
-+				     struct mmc_packed_request *prq);
-+void mmc_hsq_packed_algo_rw(struct mmc_host *mmc);
- 
- #endif
-diff --git a/drivers/mmc/host/sdhci-sprd.c b/drivers/mmc/host/sdhci-sprd.c
-index ae9acb8..49afe1c 100644
---- a/drivers/mmc/host/sdhci-sprd.c
-+++ b/drivers/mmc/host/sdhci-sprd.c
-@@ -676,7 +676,7 @@ static int sdhci_sprd_probe(struct platform_device *pdev)
- 		goto err_cleanup_host;
- 	}
- 
--	ret = mmc_hsq_init(hsq, host->mmc);
-+	ret = mmc_hsq_init(hsq, host->mmc, NULL, 0);
- 	if (ret)
- 		goto err_cleanup_host;
- 
-diff --git a/include/linux/mmc/core.h b/include/linux/mmc/core.h
-index b7ba881..b1be983 100644
---- a/include/linux/mmc/core.h
-+++ b/include/linux/mmc/core.h
-@@ -165,6 +165,12 @@ struct mmc_request {
- 	bool			cap_cmd_during_tfr;
- 
- 	int			tag;
-+	struct list_head	list;
-+};
-+
-+struct mmc_packed_request {
-+	struct list_head list;
-+	u32 nr_reqs;
- };
- 
- struct mmc_card;
-diff --git a/include/linux/mmc/host.h b/include/linux/mmc/host.h
-index cc1a79b..7ac5be1 100644
---- a/include/linux/mmc/host.h
-+++ b/include/linux/mmc/host.h
-@@ -216,6 +216,14 @@ struct mmc_cqe_ops {
- 	 * will have zero data bytes transferred.
- 	 */
- 	void	(*cqe_recovery_finish)(struct mmc_host *host);
-+
-+	/* If CQE is busy or not. */
-+	bool	(*cqe_is_busy)(struct mmc_host *host);
-+	/*
-+	 * Serve the purpose of kicking the hardware to handle pending
-+	 * requests.
-+	 */
-+	void	(*cqe_commit_rqs)(struct mmc_host *host, bool last);
- };
- 
- struct mmc_async_req {
-@@ -385,6 +393,7 @@ struct mmc_host {
- 	unsigned int		max_blk_size;	/* maximum size of one mmc block */
- 	unsigned int		max_blk_count;	/* maximum number of blocks in one req */
- 	unsigned int		max_busy_timeout; /* max busy timeout in ms */
-+	unsigned int		max_packed_reqs;  /* max number of requests can be packed */
- 
- 	/* private data */
- 	spinlock_t		lock;		/* lock for claim and bus ops */
 -- 
 1.7.9.5
 
