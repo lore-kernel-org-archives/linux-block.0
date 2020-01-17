@@ -2,116 +2,67 @@ Return-Path: <SRS0=x5xE=3G=vger.kernel.org=linux-block-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-0.6 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
-	HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS
-	autolearn=no autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-6.1 required=3.0 tests=DKIMWL_WL_HIGH,DKIM_SIGNED,
+	DKIM_VALID,DKIM_VALID_AU,MAILING_LIST_MULTI,MENTIONS_GIT_HOSTING,
+	SPF_HELO_NONE,SPF_PASS autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 643A4C33CB7
-	for <linux-block@archiver.kernel.org>; Fri, 17 Jan 2020 13:58:10 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 8381BC33CB1
+	for <linux-block@archiver.kernel.org>; Fri, 17 Jan 2020 14:05:08 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.kernel.org (Postfix) with ESMTP id 3ABC32073A
-	for <linux-block@archiver.kernel.org>; Fri, 17 Jan 2020 13:58:10 +0000 (UTC)
-Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (2048-bit key) header.d=infradead.org header.i=@infradead.org header.b="I4YcAs1V"
+	by mail.kernel.org (Postfix) with ESMTP id 5AE9E2083E
+	for <linux-block@archiver.kernel.org>; Fri, 17 Jan 2020 14:05:08 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+	s=default; t=1579269908;
+	bh=cc3sqYz90t58t7rjWzjZLNl420jeBvbRG/mZ+ki3w0o=;
+	h=Subject:From:In-Reply-To:References:Date:To:Cc:List-ID:From;
+	b=rETk2/J7CMpuzAOU/KnIo0rOxSoEz2fmWZu4tkq0ffu1Xmqwqm9Od6KSAKItsOmFv
+	 AoPCQ20q7+DP/aaQpKnJoIfSvP287OBV0xVUBnfXEwmRFEek5N0q3mYlTD0kWFvXv/
+	 dceL63RE6amGOvuxf3HTfdOHfC5ZiuvgB09sPfqY=
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1727043AbgAQN6J (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Fri, 17 Jan 2020 08:58:09 -0500
-Received: from bombadil.infradead.org ([198.137.202.133]:54138 "EHLO
-        bombadil.infradead.org" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1726587AbgAQN6I (ORCPT
-        <rfc822;linux-block@vger.kernel.org>);
-        Fri, 17 Jan 2020 08:58:08 -0500
-DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed;
-        d=infradead.org; s=bombadil.20170209; h=In-Reply-To:Content-Type:MIME-Version
-        :References:Message-ID:Subject:Cc:To:From:Date:Sender:Reply-To:
-        Content-Transfer-Encoding:Content-ID:Content-Description:Resent-Date:
-        Resent-From:Resent-Sender:Resent-To:Resent-Cc:Resent-Message-ID:List-Id:
-        List-Help:List-Unsubscribe:List-Subscribe:List-Post:List-Owner:List-Archive;
-         bh=sA5uuJQ04YeT72bao/JNQ4IKdK/ivCsVISnYxzEFHZQ=; b=I4YcAs1VzPP57kXD99FyxS6XW
-        udZnW6lIH/c0erbsKZyO4mlV41IrhFb0FtbmGZjE2j3wvNCVBn83nZbwMpC7xMM8PkhHl4JaX38gS
-        ch2fXnVCh2yaaVKgMcJV+nxYiYZHTDK2aSJqkjmlvmBrbYOh2cqYX+D3/GTMVdNWLJWYS/BKo2G7s
-        AMDimyFz4NjLSsw6RsTS3KUNnVoyud1DUgZYXJX0BzlfMadoWs/+Z0TveQvoM1Rm2HxvaQ1TaPDty
-        X+OSfDf0IQoL1PY6RZFwLhVmmXariSS08QBAO7KCdLRXGUOUTFSPvXq0c0Udie99E6perf4pv1X8u
-        Wcg9y6Y2w==;
-Received: from hch by bombadil.infradead.org with local (Exim 4.92.3 #3 (Red Hat Linux))
-        id 1isS8W-0006WI-9s; Fri, 17 Jan 2020 13:58:08 +0000
-Date:   Fri, 17 Jan 2020 05:58:08 -0800
-From:   Christoph Hellwig <hch@infradead.org>
-To:     Satya Tangirala <satyat@google.com>
-Cc:     linux-block@vger.kernel.org, linux-scsi@vger.kernel.org,
-        linux-fscrypt@vger.kernel.org, linux-fsdevel@vger.kernel.org,
-        linux-f2fs-devel@lists.sourceforge.net,
-        Barani Muthukumaran <bmuthuku@qti.qualcomm.com>,
-        Kuohong Wang <kuohong.wang@mediatek.com>,
-        Kim Boojin <boojin.kim@samsung.com>
-Subject: Re: [PATCH v6 6/9] scsi: ufs: Add inline encryption support to UFS
-Message-ID: <20200117135808.GB5670@infradead.org>
-References: <20191218145136.172774-1-satyat@google.com>
- <20191218145136.172774-7-satyat@google.com>
-MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <20191218145136.172774-7-satyat@google.com>
-X-SRS-Rewrite: SMTP reverse-path rewritten from <hch@infradead.org> by bombadil.infradead.org. See http://www.infradead.org/rpr.html
+        id S1728680AbgAQOFH (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Fri, 17 Jan 2020 09:05:07 -0500
+Received: from mail.kernel.org ([198.145.29.99]:47566 "EHLO mail.kernel.org"
+        rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
+        id S1726885AbgAQOFE (ORCPT <rfc822;linux-block@vger.kernel.org>);
+        Fri, 17 Jan 2020 09:05:04 -0500
+Subject: Re: [GIT PULL] Block fixes for 5.5-rc7
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+        s=default; t=1579269904;
+        bh=cc3sqYz90t58t7rjWzjZLNl420jeBvbRG/mZ+ki3w0o=;
+        h=From:In-Reply-To:References:Date:To:Cc:From;
+        b=RMgnpMF8rPklIMZT2fglM37vyay/XkKXmz6r9lq34RoX/J4UzLei3On0JcXuJ4G2z
+         eWAlTmqmO6KKO83h2D0UMmQACuWc7k1pEB/BxAhhtcNzXGNz7kqX1gLym6Xdg2iC5z
+         70J1cFowfCPIRGNZsSN9XKdKr89W+S++9Uta10Fg=
+From:   pr-tracker-bot@kernel.org
+In-Reply-To: <3351f62c-671a-11d6-db8d-d78366bbf50b@kernel.dk>
+References: <3351f62c-671a-11d6-db8d-d78366bbf50b@kernel.dk>
+X-PR-Tracked-List-Id: <linux-block.vger.kernel.org>
+X-PR-Tracked-Message-Id: <3351f62c-671a-11d6-db8d-d78366bbf50b@kernel.dk>
+X-PR-Tracked-Remote: git://git.kernel.dk/linux-block.git
+ tags/block-5.5-2020-01-16
+X-PR-Tracked-Commit-Id: ad6bf88a6c19a39fb3b0045d78ea880325dfcf15
+X-PR-Merge-Tree: torvalds/linux.git
+X-PR-Merge-Refname: refs/heads/master
+X-PR-Merge-Commit-Id: 5ffdff81cff9ae697b1d57fea9a86b6c6ede6078
+Message-Id: <157926990435.9623.1830717615857427771.pr-tracker-bot@kernel.org>
+Date:   Fri, 17 Jan 2020 14:05:04 +0000
+To:     Jens Axboe <axboe@kernel.dk>
+Cc:     Linus Torvalds <torvalds@linux-foundation.org>,
+        "linux-block@vger.kernel.org" <linux-block@vger.kernel.org>
 Sender: linux-block-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-On Wed, Dec 18, 2019 at 06:51:33AM -0800, Satya Tangirala wrote:
-> Wire up ufshcd.c with the UFS Crypto API, the block layer inline
-> encryption additions and the keyslot manager.
+The pull request you sent on Thu, 16 Jan 2020 21:33:46 -0700:
 
-I think this patch should be merged into the previous patch, as the
-previous one isn't useful without wiring it up.
+> git://git.kernel.dk/linux-block.git tags/block-5.5-2020-01-16
 
-> +int ufshcd_prepare_lrbp_crypto(struct ufs_hba *hba,
-> +			       struct scsi_cmnd *cmd,
-> +			       struct ufshcd_lrb *lrbp)
-> +{
-> +	struct bio_crypt_ctx *bc;
-> +
-> +	if (!bio_crypt_should_process(cmd->request)) {
-> +		lrbp->crypto_enable = false;
-> +		return 0;
-> +	}
+has been merged into torvalds/linux.git:
+https://git.kernel.org/torvalds/c/5ffdff81cff9ae697b1d57fea9a86b6c6ede6078
 
-I think this check belongs into the caller so that there is no function
-call overhead for the !inline crypto case.  If you extend the
-conditional
-to
+Thank you!
 
-	if (!IS_ENABLED(CONFIG_SCSI_UFS_CRYPTO) ||
-	    !bio_crypt_should_process(cmd->request))
-
-you also don't need the stub for ufshcd_prepare_lrbp_crypto.
-
-> +EXPORT_SYMBOL_GPL(ufshcd_prepare_lrbp_crypto);
-
-No need to export this function.
-
-> +	if (ufshcd_lrbp_crypto_enabled(lrbp)) {
-> +#if IS_ENABLED(CONFIG_SCSI_UFS_CRYPTO)
-> +		dword_0 |= UTP_REQ_DESC_CRYPTO_ENABLE_CMD;
-> +		dword_0 |= lrbp->crypto_key_slot;
-> +		req_desc->header.dword_1 =
-> +			cpu_to_le32(lower_32_bits(lrbp->data_unit_num));
-> +		req_desc->header.dword_3 =
-> +			cpu_to_le32(upper_32_bits(lrbp->data_unit_num));
-> +#endif /* CONFIG_SCSI_UFS_CRYPTO */
-
-This can be a plain old ifdef without the IS_ENABLED obsfucation.
-
-> +#if IS_ENABLED(CONFIG_SCSI_UFS_CRYPTO)
-> +	lrbp->crypto_enable = false; /* No crypto operations */
-> +#endif
-
-Same here.
-
-> +#if IS_ENABLED(CONFIG_SCSI_UFS_CRYPTO)
-> +	bool crypto_enable;
-> +	u8 crypto_key_slot;
-> +	u64 data_unit_num;
-> +#endif /* CONFIG_SCSI_UFS_CRYPTO */
-
-.. and here.
+-- 
+Deet-doot-dot, I am a bot.
+https://korg.wiki.kernel.org/userdoc/prtracker
