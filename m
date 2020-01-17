@@ -2,107 +2,136 @@ Return-Path: <SRS0=x5xE=3G=vger.kernel.org=linux-block-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-2.3 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
-	MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,USER_AGENT_SANE_1 autolearn=no
-	autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-0.6 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
+	HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS
+	autolearn=no autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 8FD8FC33CB1
-	for <linux-block@archiver.kernel.org>; Fri, 17 Jan 2020 07:19:30 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 37064C33CB1
+	for <linux-block@archiver.kernel.org>; Fri, 17 Jan 2020 08:32:26 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.kernel.org (Postfix) with ESMTP id 6B56D2073A
-	for <linux-block@archiver.kernel.org>; Fri, 17 Jan 2020 07:19:30 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id 08DCA2083E
+	for <linux-block@archiver.kernel.org>; Fri, 17 Jan 2020 08:32:25 +0000 (UTC)
+Authentication-Results: mail.kernel.org;
+	dkim=fail reason="signature verification failed" (2048-bit key) header.d=infradead.org header.i=@infradead.org header.b="Tpb+CKn0"
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1727136AbgAQHT3 (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Fri, 17 Jan 2020 02:19:29 -0500
-Received: from szxga06-in.huawei.com ([45.249.212.32]:41790 "EHLO huawei.com"
-        rhost-flags-OK-OK-OK-FAIL) by vger.kernel.org with ESMTP
-        id S1726675AbgAQHT3 (ORCPT <rfc822;linux-block@vger.kernel.org>);
-        Fri, 17 Jan 2020 02:19:29 -0500
-Received: from DGGEMS411-HUB.china.huawei.com (unknown [172.30.72.59])
-        by Forcepoint Email with ESMTP id 8AE6167721C7C7AD0231;
-        Fri, 17 Jan 2020 15:19:27 +0800 (CST)
-Received: from [10.173.221.193] (10.173.221.193) by
- DGGEMS411-HUB.china.huawei.com (10.3.19.211) with Microsoft SMTP Server id
- 14.3.439.0; Fri, 17 Jan 2020 15:19:19 +0800
-Subject: Re: [Question] about shared tags for SCSI drivers
-To:     Ming Lei <ming.lei@redhat.com>
-CC:     "linux-block@vger.kernel.org" <linux-block@vger.kernel.org>,
-        <john.garry@huawei.com>, "axboe@kernel.dk" <axboe@kernel.dk>,
-        <hare@suse.de>, Bart Van Assche <bvanassche@acm.org>,
-        yanaijie <yanaijie@huawei.com>
-References: <bd959b9f-78dd-e0e7-0421-8d7e3cd2f41b@huawei.com>
- <20200116090347.GA7438@ming.t460p>
-From:   Yufen Yu <yuyufen@huawei.com>
-Message-ID: <825dc368-1b97-b418-dc71-6541b1c20a70@huawei.com>
-Date:   Fri, 17 Jan 2020 15:19:18 +0800
-User-Agent: Mozilla/5.0 (Windows NT 10.0; Win64; x64; rv:68.0) Gecko/20100101
- Thunderbird/68.3.1
+        id S1729334AbgAQIcZ (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Fri, 17 Jan 2020 03:32:25 -0500
+Received: from bombadil.infradead.org ([198.137.202.133]:52620 "EHLO
+        bombadil.infradead.org" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S1727002AbgAQIcZ (ORCPT
+        <rfc822;linux-block@vger.kernel.org>);
+        Fri, 17 Jan 2020 03:32:25 -0500
+DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed;
+        d=infradead.org; s=bombadil.20170209; h=In-Reply-To:Content-Type:MIME-Version
+        :References:Message-ID:Subject:Cc:To:From:Date:Sender:Reply-To:
+        Content-Transfer-Encoding:Content-ID:Content-Description:Resent-Date:
+        Resent-From:Resent-Sender:Resent-To:Resent-Cc:Resent-Message-ID:List-Id:
+        List-Help:List-Unsubscribe:List-Subscribe:List-Post:List-Owner:List-Archive;
+         bh=Y9Ep/eeYbaIxxVmlhJEobd6cxmZ0LGEzXqlvP1MkkLE=; b=Tpb+CKn0VYnlSFFimCbPKAl7h
+        NZt0oWSreQSTUNdpWR/rpSkjPMbJwbLyrAXp0GXq85PtjBXoFw1Nb17SKs1nb5c+lJDtvebqaP6Nn
+        PJ3v9S6vdmcJ81DbbxbqxjY8815Mn4BGtmTDozpzMMRhnF1qTOr+AfAu59zqZPjRG2rgRvwDB1W3D
+        I35Kd62ZVVxFsEssqdYG5Ss2a9MA70WeqsGgU19KnbRkhtdLVkZ+munwtJYkhd/4VFVgZAJCn+Ed1
+        8mVPnJ5nfpCrYyOiUTPWXC88Fl42EawWl32m5908L829v3FaylM7QIRNMMmEaG0oa96IcftbBfqbS
+        vmrXSPRBA==;
+Received: from hch by bombadil.infradead.org with local (Exim 4.92.3 #3 (Red Hat Linux))
+        id 1isN3F-0004ZQ-RD; Fri, 17 Jan 2020 08:32:21 +0000
+Date:   Fri, 17 Jan 2020 00:32:21 -0800
+From:   Christoph Hellwig <hch@infradead.org>
+To:     Eric Biggers <ebiggers@kernel.org>
+Cc:     Christoph Hellwig <hch@infradead.org>,
+        "Martin K. Petersen" <martin.petersen@oracle.com>,
+        "Darrick J. Wong" <darrick.wong@oracle.com>,
+        Satya Tangirala <satyat@google.com>,
+        linux-block@vger.kernel.org, linux-scsi@vger.kernel.org,
+        linux-fscrypt@vger.kernel.org, linux-fsdevel@vger.kernel.org,
+        linux-f2fs-devel@lists.sourceforge.net,
+        Barani Muthukumaran <bmuthuku@qti.qualcomm.com>,
+        Kuohong Wang <kuohong.wang@mediatek.com>,
+        Kim Boojin <boojin.kim@samsung.com>
+Subject: Re: [PATCH v6 2/9] block: Add encryption context to struct bio
+Message-ID: <20200117083221.GA324@infradead.org>
+References: <20191218145136.172774-1-satyat@google.com>
+ <20191218145136.172774-3-satyat@google.com>
+ <20191218212116.GA7476@magnolia>
+ <yq1y2v9e37b.fsf@oracle.com>
+ <20191218222726.GC47399@gmail.com>
+ <yq1fthhdttv.fsf@oracle.com>
+ <20200108140730.GC2896@infradead.org>
+ <20200108172629.GA232722@sol.localdomain>
 MIME-Version: 1.0
-In-Reply-To: <20200116090347.GA7438@ming.t460p>
-Content-Type: text/plain; charset="utf-8"; format=flowed
-Content-Language: en-US
-Content-Transfer-Encoding: 7bit
-X-Originating-IP: [10.173.221.193]
-X-CFilter-Loop: Reflected
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <20200108172629.GA232722@sol.localdomain>
+X-SRS-Rewrite: SMTP reverse-path rewritten from <hch@infradead.org> by bombadil.infradead.org. See http://www.infradead.org/rpr.html
 Sender: linux-block-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-Hi, ming
+Hi Eric,
 
-On 2020/1/16 17:03, Ming Lei wrote:
-> On Thu, Jan 16, 2020 at 12:06:02PM +0800, Yufen Yu wrote:
->> Hi, all
->>
->> Shared tags is introduced to maintains a notion of fairness between
->> active users. This may be good for nvme with multiple namespace to
->> avoid starving some users. Right?
-> 
-> Actually nvme namespace is LUN of scsi world.
-> 
-> Shared tags isn't for maintaining fairness, it is just natural sw
-> implementation of scsi host's tags, since every scsi host shares
-> tags among all LUNs. If the SCSI host supports real MQ, the tags
-> is hw-queue wide, otherwise it is host wide.
-> 
->>
->> However, I don't understand why we introduce the shared tag for SCSI.
->> IMO, there are two concerns for scsi shared tag:
->>
->> 1) For now, 'shost->can_queue' is used as queue depth in block layer.
->> And all target drivers share tags on one host. Then, the max tags for
->> each target can get:
->>
->> 	depth = max((bt->sb.depth + users - 1) / users, 4U);
->>
->> But, each target driver may have their own capacity of tags and queue depth.
->> Does shared tag limit target device bandwidth?
-> 
-> No, if the 'target driver' means LUN, each LUN hasn't its independent
-> tags, maybe it has its own queue depth, which is often for maintaining
-> fairness among all active LUNs, not real queue depth.
-> 
-> You may see the patches[1] which try to bypass per-LUN queue depth for SSD.
-> 
-> [1] https://lore.kernel.org/linux-block/20191118103117.978-1-ming.lei@redhat.com/
-> 
->>
->> 2) When add new target or remove device, it may need to freeze other device
->> to update hctx->flags of BLK_MQ_F_TAG_SHARED. That may hurt performance.
-> 
-> Add/removing device isn't a frequent event, so it shouldn't be a real
-> issue, or you have seen effect on real use case?
+On Wed, Jan 08, 2020 at 09:26:29AM -0800, Eric Biggers wrote:
+> The NVMe "key per I/O" draft is heavily flawed, and I don't think it will be
+> useful at all in the Linux kernel context.  The problem is that, as far as I
+> can tell, it doesn't allow the encryption algorithm and IVs to be selected,
+> or even standardized or made discoverable in any way.  It does say that
+> AES-256 must be supported, but it doesn't say which mode of operation (i.e.
+> it could be something inappropriate for disk encryption, like ECB), nor
+> does it say whether AES-256 has to be the default or not, and if it's not
+> the default how to discover that and select AES-256.
 
-Thanks a lot for your detailed explanation.
+I've talked to people involved with the TCG side of this spec, where
+all the interesting crypto happens.  Currently the plan is to support
+KMIP wrapper keys, which specify the exact algorithm and operation
+mode, and algorithms and modes for the initial version are planned to
+be AES 256/512 XTS.  I also had a chat with an involved person and
+they understand the principle that for the inline crypto to be trusted
+it needs to be interoperable with (trusted) software algorithms.  So
+I don't think it is all doom.
 
-We found that removing scsi device will delay a long time (such as 6 * 30s)
-for waiting the other device in the same host to complete all IOs, where
-some IO retry multiple times. If our driver allowed more times to retry,
-removing device will wait longer. That is not expected.
+> IV generation is also unspecified, so it
+> could be something insecure like always using the same IV.
 
-In fact, that is not problem before switching scsi blk-mq. All target
-devices are independent when removing.
+From talking to one of the initiators of the spec, no it is not intended
+to be unspecified, but indeed tied to the LBA (see below).
 
-Thanks,
-Yufen
+> Also, since "key per I/O" won't allow selecting IVs, all the encrypted data will
+> be tied to its physical location on-disk.  That will make "key per I/O" unusable
+> in any case where encrypted blocks are moved without the key, e.g.
+> filesystem-level encryption on many filesystems.
+
+File systems don't move data around all that often (saying that with my
+fs developer hat on).  In traditional file systems only defragmentation
+will move data around, with extent refcounting it can also happen for
+dedup, and for file systems that write out of place data gets moved
+when parts of a block are rewritten, but in that case a read modify
+write cycle is perfomed in the Linux code anyway, so it will go through
+the inline encryption engined on the way and the way out.
+
+So in other words - specifying an IV would be useful for some use cases,
+but I don't think it is a deal blocker. Even without that is is useful
+for block device level encryption, and could have some usefulness for
+file system encryption usage.
+
+I think that adding an IV would eventually be useful, but fitting that
+into NVMe won't be easy, as you'd need to find a way to specify the IV
+for each submission queue entry, which requires growing it, or finding
+some way to extend it out of band.
+
+> I've already raised these concerns in the NVMe and TCG Storage working groups,
+> and the people working on it refused to make any changes, as they consider "key
+> per I/O" to be more akin to the TCG Opal self-encrypting drive specification,
+> and not actually intended to be "inline encryption".
+
+While I have my fair share of issues how the spec is developed that
+isn't my impression, and at least for the verifyable part I heard
+contrary statements.  Feel free to contact me offline to make sure we
+can move this into the right direction.
+
+> So let's not over-engineer this kernel patchset to support some broken
+> vaporware, please.
+
+Not sharing bio fields for integrity and encryption actually keeps
+the patchset simpler (although uses more memory if both options are
+enabled).  So my main point here is to not over engineer it for broken
+premise that won't be true soon.
