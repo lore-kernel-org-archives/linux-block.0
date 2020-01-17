@@ -2,135 +2,72 @@ Return-Path: <SRS0=x5xE=3G=vger.kernel.org=linux-block-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-9.8 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
-	INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,
-	USER_AGENT_GIT autolearn=ham autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-3.6 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
+	HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,
+	SPF_PASS autolearn=no autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 89860C33CB1
-	for <linux-block@archiver.kernel.org>; Fri, 17 Jan 2020 11:51:07 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 9044AC33CB1
+	for <linux-block@archiver.kernel.org>; Fri, 17 Jan 2020 12:32:00 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.kernel.org (Postfix) with ESMTP id 63E742083E
-	for <linux-block@archiver.kernel.org>; Fri, 17 Jan 2020 11:51:07 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id 539202082F
+	for <linux-block@archiver.kernel.org>; Fri, 17 Jan 2020 12:32:00 +0000 (UTC)
+Authentication-Results: mail.kernel.org;
+	dkim=fail reason="signature verification failed" (2048-bit key) header.d=infradead.org header.i=@infradead.org header.b="hiJtxfwj"
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1726974AbgAQLvH (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Fri, 17 Jan 2020 06:51:07 -0500
-Received: from szxga07-in.huawei.com ([45.249.212.35]:35410 "EHLO huawei.com"
-        rhost-flags-OK-OK-OK-FAIL) by vger.kernel.org with ESMTP
-        id S1726689AbgAQLvG (ORCPT <rfc822;linux-block@vger.kernel.org>);
-        Fri, 17 Jan 2020 06:51:06 -0500
-Received: from DGGEMS411-HUB.china.huawei.com (unknown [172.30.72.59])
-        by Forcepoint Email with ESMTP id A345CB9D861EFE57526B;
-        Fri, 17 Jan 2020 19:51:03 +0800 (CST)
-Received: from huawei.com (10.175.124.28) by DGGEMS411-HUB.china.huawei.com
- (10.3.19.211) with Microsoft SMTP Server id 14.3.439.0; Fri, 17 Jan 2020
- 19:50:54 +0800
-From:   Sun Ke <sunke32@huawei.com>
-To:     <josef@toxicpanda.com>, <axboe@kernel.dk>, <sunke32@huawei.com>
-CC:     <linux-block@vger.kernel.org>, <nbd@other.debian.org>,
-        <linux-kernel@vger.kernel.org>
-Subject: [PATCH] nbd: fix potential NULL pointer fault in connect and disconnect process
-Date:   Fri, 17 Jan 2020 19:50:05 +0800
-Message-ID: <20200117115005.37006-1-sunke32@huawei.com>
-X-Mailer: git-send-email 2.17.2
+        id S1726973AbgAQMb7 (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Fri, 17 Jan 2020 07:31:59 -0500
+Received: from bombadil.infradead.org ([198.137.202.133]:43268 "EHLO
+        bombadil.infradead.org" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S1726812AbgAQMb7 (ORCPT
+        <rfc822;linux-block@vger.kernel.org>);
+        Fri, 17 Jan 2020 07:31:59 -0500
+DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed;
+        d=infradead.org; s=bombadil.20170209; h=In-Reply-To:Content-Type:MIME-Version
+        :References:Message-ID:Subject:Cc:To:From:Date:Sender:Reply-To:
+        Content-Transfer-Encoding:Content-ID:Content-Description:Resent-Date:
+        Resent-From:Resent-Sender:Resent-To:Resent-Cc:Resent-Message-ID:List-Id:
+        List-Help:List-Unsubscribe:List-Subscribe:List-Post:List-Owner:List-Archive;
+         bh=nZrBKTkYJeqcb/cXGamX396QKjxFmliww7OTt1Ylid8=; b=hiJtxfwjhqJa9nokZWYLYX7OI
+        JRfsiyJjs5tsU8pvG6Yh3cLx3vmXA729b5fQ7PMcI+nPi9x4rqNa1RRLmQdwmrZExc11yVHoGCGZj
+        +RzNKQoyfueuOTnuZvIoKfoThLiNl+srvy7F3ZZj5+ghKIL8zRRp8Du5Ka/vJgh8dBBj8ZL5MU4Rk
+        vPtJFort+fWwLuty8vXNdf4Ta2IobUr5txSUbfaiOwHkZDpF8RTymGAS+AcsWs88pxnTqiVUb9gHG
+        Ky4u+cjUGLIzLLBxSjwRvbkFpp5MUNbw01aXQ9cAV9uJGHAYL+a3Etebo8EUWilSvtc0IRIhFcwax
+        m34ReJbiw==;
+Received: from hch by bombadil.infradead.org with local (Exim 4.92.3 #3 (Red Hat Linux))
+        id 1isQn7-0002E1-OF; Fri, 17 Jan 2020 12:31:57 +0000
+Date:   Fri, 17 Jan 2020 04:31:57 -0800
+From:   Christoph Hellwig <hch@infradead.org>
+To:     Satya Tangirala <satyat@google.com>
+Cc:     linux-block@vger.kernel.org, linux-scsi@vger.kernel.org,
+        linux-fscrypt@vger.kernel.org, linux-fsdevel@vger.kernel.org,
+        linux-f2fs-devel@lists.sourceforge.net,
+        Barani Muthukumaran <bmuthuku@qti.qualcomm.com>,
+        Kuohong Wang <kuohong.wang@mediatek.com>,
+        Kim Boojin <boojin.kim@samsung.com>
+Subject: Re: [PATCH v6 4/9] scsi: ufs: UFS driver v2.1 spec crypto additions
+Message-ID: <20200117123157.GA8481@infradead.org>
+References: <20191218145136.172774-1-satyat@google.com>
+ <20191218145136.172774-5-satyat@google.com>
 MIME-Version: 1.0
-Content-Type: text/plain
-X-Originating-IP: [10.175.124.28]
-X-CFilter-Loop: Reflected
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <20191218145136.172774-5-satyat@google.com>
+X-SRS-Rewrite: SMTP reverse-path rewritten from <hch@infradead.org> by bombadil.infradead.org. See http://www.infradead.org/rpr.html
 Sender: linux-block-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-Connect and disconnect a nbd device repeatedly, will cause
-NULL pointer fault.
+On Wed, Dec 18, 2019 at 06:51:31AM -0800, Satya Tangirala wrote:
+> Add the crypto registers and structs defined in v2.1 of the JEDEC UFSHCI
+> specification in preparation to add support for inline encryption to
+> UFS.
+> 
+> Signed-off-by: Satya Tangirala <satyat@google.com>
+> ---
+>  drivers/scsi/ufs/ufshcd.c |  2 ++
+>  drivers/scsi/ufs/ufshcd.h |  5 +++
+>  drivers/scsi/ufs/ufshci.h | 67 +++++++++++++++++++++++++++++++++++++--
+>  3 files changed, 72 insertions(+), 2 deletions(-)
 
-It will appear by the steps:
-1. Connect the nbd device and disconnect it, but now nbd device
-   is not disconnected totally.
-2. Connect the same nbd device again immediately, it will fail
-   in nbd_start_device with a EBUSY return value.
-3. Wait a second to make sure the last config_refs is reduced
-   and run nbd_config_put to disconnect the nbd device totally.
-4. Start another process to open the nbd_device, config_refs
-   will increase and at the same time disconnect it.
-
-To fix it, add a NBD_HAS_STARTED flag. Set it in nbd_start_device_ioctl
-and nbd_genl_connect if nbd device is started successfully.
-Clear it in nbd_config_put. Test it in nbd_genl_disconnect and
-nbd_genl_reconfigure.
-
-Signed-off-by: Sun Ke <sunke32@huawei.com>
----
- drivers/block/nbd.c | 21 +++++++++++++++++++++
- 1 file changed, 21 insertions(+)
-
-diff --git a/drivers/block/nbd.c b/drivers/block/nbd.c
-index b4607dd96185..ddd364e208ab 100644
---- a/drivers/block/nbd.c
-+++ b/drivers/block/nbd.c
-@@ -83,6 +83,7 @@ struct link_dead_args {
- 
- #define NBD_DESTROY_ON_DISCONNECT	0
- #define NBD_DISCONNECT_REQUESTED	1
-+#define NBD_HAS_STARTED				2
- 
- struct nbd_config {
- 	u32 flags;
-@@ -1215,6 +1216,7 @@ static void nbd_config_put(struct nbd_device *nbd)
- 		nbd->disk->queue->limits.discard_alignment = 0;
- 		blk_queue_max_discard_sectors(nbd->disk->queue, UINT_MAX);
- 		blk_queue_flag_clear(QUEUE_FLAG_DISCARD, nbd->disk->queue);
-+		clear_bit(NBD_HAS_STARTED, &nbd->flags);
- 
- 		mutex_unlock(&nbd->config_lock);
- 		nbd_put(nbd);
-@@ -1290,6 +1292,8 @@ static int nbd_start_device_ioctl(struct nbd_device *nbd, struct block_device *b
- 	ret = nbd_start_device(nbd);
- 	if (ret)
- 		return ret;
-+	else
-+		set_bit(NBD_HAS_STARTED, &nbd->flags);
- 
- 	if (max_part)
- 		bdev->bd_invalidated = 1;
-@@ -1961,6 +1965,7 @@ static int nbd_genl_connect(struct sk_buff *skb, struct genl_info *info)
- 	mutex_unlock(&nbd->config_lock);
- 	if (!ret) {
- 		set_bit(NBD_RT_HAS_CONFIG_REF, &config->runtime_flags);
-+		set_bit(NBD_HAS_STARTED, &nbd->flags);
- 		refcount_inc(&nbd->config_refs);
- 		nbd_connect_reply(info, nbd->index);
- 	}
-@@ -2008,6 +2013,14 @@ static int nbd_genl_disconnect(struct sk_buff *skb, struct genl_info *info)
- 		       index);
- 		return -EINVAL;
- 	}
-+
-+	if (!test_bit(NBD_HAS_STARTED, &nbd->flags)) {
-+		mutex_unlock(&nbd_index_mutex);
-+		printk(KERN_ERR "nbd: device at index %d failed to start\n",
-+		       index);
-+		return -EBUSY;
-+	}
-+
- 	if (!refcount_inc_not_zero(&nbd->refs)) {
- 		mutex_unlock(&nbd_index_mutex);
- 		printk(KERN_ERR "nbd: device at index %d is going down\n",
-@@ -2049,6 +2062,14 @@ static int nbd_genl_reconfigure(struct sk_buff *skb, struct genl_info *info)
- 		       index);
- 		return -EINVAL;
- 	}
-+
-+	if (!test_bit(NBD_HAS_STARTED, &nbd->flags)) {
-+		mutex_unlock(&nbd_index_mutex);
-+		printk(KERN_ERR "nbd: device at index %d failed to start\n",
-+		       index);
-+		return -EBUSY;
-+	}
-+
- 	if (!refcount_inc_not_zero(&nbd->refs)) {
- 		mutex_unlock(&nbd_index_mutex);
- 		printk(KERN_ERR "nbd: device at index %d is going down\n",
--- 
-2.17.2
-
+I'd merge this into the next patch.
