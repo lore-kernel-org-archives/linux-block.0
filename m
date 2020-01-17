@@ -2,97 +2,114 @@ Return-Path: <SRS0=x5xE=3G=vger.kernel.org=linux-block-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-9.8 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
-	INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,
-	USER_AGENT_GIT autolearn=ham autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-3.6 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
+	HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,
+	SPF_PASS autolearn=no autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 2740AC33CB1
-	for <linux-block@archiver.kernel.org>; Fri, 17 Jan 2020 14:40:02 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 40DFFC33CB1
+	for <linux-block@archiver.kernel.org>; Fri, 17 Jan 2020 15:13:36 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.kernel.org (Postfix) with ESMTP id 0204822525
-	for <linux-block@archiver.kernel.org>; Fri, 17 Jan 2020 14:40:01 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id 135B12072E
+	for <linux-block@archiver.kernel.org>; Fri, 17 Jan 2020 15:13:36 +0000 (UTC)
+Authentication-Results: mail.kernel.org;
+	dkim=fail reason="signature verification failed" (1024-bit key) header.d=citrix.com header.i=@citrix.com header.b="PsMSRXeE"
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1728982AbgAQOkB (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Fri, 17 Jan 2020 09:40:01 -0500
-Received: from mx2.suse.de ([195.135.220.15]:58472 "EHLO mx2.suse.de"
-        rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-        id S1728512AbgAQOkA (ORCPT <rfc822;linux-block@vger.kernel.org>);
-        Fri, 17 Jan 2020 09:40:00 -0500
-X-Virus-Scanned: by amavisd-new at test-mx.suse.de
-Received: from relay2.suse.de (unknown [195.135.220.254])
-        by mx2.suse.de (Postfix) with ESMTP id 59B93B17A;
-        Fri, 17 Jan 2020 14:39:58 +0000 (UTC)
-From:   Juergen Gross <jgross@suse.com>
-To:     xen-devel@lists.xenproject.org, linux-block@vger.kernel.org,
-        linux-kernel@vger.kernel.org
-Cc:     Juergen Gross <jgross@suse.com>,
+        id S1728831AbgAQPNf (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Fri, 17 Jan 2020 10:13:35 -0500
+Received: from esa5.hc3370-68.iphmx.com ([216.71.155.168]:19426 "EHLO
+        esa5.hc3370-68.iphmx.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S1728739AbgAQPNf (ORCPT
+        <rfc822;linux-block@vger.kernel.org>);
+        Fri, 17 Jan 2020 10:13:35 -0500
+DKIM-Signature: v=1; a=rsa-sha256; c=simple/simple;
+  d=citrix.com; s=securemail; t=1579274014;
+  h=date:from:to:cc:subject:message-id:references:
+   mime-version:content-transfer-encoding:in-reply-to;
+  bh=tR8JPZbHUxcZYXs3lZBKPNz8XTBMiBMdbSOleTglRB8=;
+  b=PsMSRXeEGo/JtnRfZ0Wr2+7+X/OBrUWLAHjSAy0lT4OGrPzVTldbCO1c
+   6JsdTFBB3RUYt8ZVNZOfjaDlolFXsMF0Wlu9XjjT865qkvxqM5RfHWg2d
+   EtUNhHTk8pjFhv87vliSUQ/AosmSnFQ2ueVxRG7tC56Gcj/0kXrFiXAmr
+   Q=;
+Authentication-Results: esa5.hc3370-68.iphmx.com; dkim=none (message not signed) header.i=none; spf=None smtp.pra=roger.pau@citrix.com; spf=Pass smtp.mailfrom=roger.pau@citrix.com; spf=None smtp.helo=postmaster@mail.citrix.com
+Received-SPF: None (esa5.hc3370-68.iphmx.com: no sender
+  authenticity information available from domain of
+  roger.pau@citrix.com) identity=pra; client-ip=162.221.158.21;
+  receiver=esa5.hc3370-68.iphmx.com;
+  envelope-from="roger.pau@citrix.com";
+  x-sender="roger.pau@citrix.com";
+  x-conformance=sidf_compatible
+Received-SPF: Pass (esa5.hc3370-68.iphmx.com: domain of
+  roger.pau@citrix.com designates 162.221.158.21 as permitted
+  sender) identity=mailfrom; client-ip=162.221.158.21;
+  receiver=esa5.hc3370-68.iphmx.com;
+  envelope-from="roger.pau@citrix.com";
+  x-sender="roger.pau@citrix.com";
+  x-conformance=sidf_compatible; x-record-type="v=spf1";
+  x-record-text="v=spf1 ip4:209.167.231.154 ip4:178.63.86.133
+  ip4:195.66.111.40/30 ip4:85.115.9.32/28 ip4:199.102.83.4
+  ip4:192.28.146.160 ip4:192.28.146.107 ip4:216.52.6.88
+  ip4:216.52.6.188 ip4:162.221.158.21 ip4:162.221.156.83
+  ip4:168.245.78.127 ~all"
+Received-SPF: None (esa5.hc3370-68.iphmx.com: no sender
+  authenticity information available from domain of
+  postmaster@mail.citrix.com) identity=helo;
+  client-ip=162.221.158.21; receiver=esa5.hc3370-68.iphmx.com;
+  envelope-from="roger.pau@citrix.com";
+  x-sender="postmaster@mail.citrix.com";
+  x-conformance=sidf_compatible
+IronPort-SDR: MsqHqo/exLDBnrLIXYxKtkRAkIRd8DjhZPa9DS0cCXIi5VRV8F/SHzhPUKSaKvvctb3jOKo46/
+ Nm6wmJ0zJxkLagzwnNszZjvEsnU/lFq3kluQOaxXk6fMMUQxOwxdelpkuM21DBBOcpGjBW4dv/
+ kc9WUZeUnFl0Eq41vtfo8XYJD6Kl6jTuxkCBU6XSjgsGcLrks6RH+Bie/lbsWRu3sfbcI2st6q
+ dVrqNu9WhdtryEZERBHTNHTECnHKBii+dEVWkczpONl4H4/1u7OR2f1p0PPyhXCHTCMFA4qFn1
+ 0OY=
+X-SBRS: 2.7
+X-MesageID: 11445514
+X-Ironport-Server: esa5.hc3370-68.iphmx.com
+X-Remote-IP: 162.221.158.21
+X-Policy: $RELAYED
+X-IronPort-AV: E=Sophos;i="5.70,330,1574139600"; 
+   d="scan'208";a="11445514"
+Date:   Fri, 17 Jan 2020 16:13:24 +0100
+From:   Roger Pau =?iso-8859-1?Q?Monn=E9?= <roger.pau@citrix.com>
+To:     Juergen Gross <jgross@suse.com>
+CC:     <xen-devel@lists.xenproject.org>, <linux-block@vger.kernel.org>,
+        <linux-kernel@vger.kernel.org>,
         Konrad Rzeszutek Wilk <konrad.wilk@oracle.com>,
-        =?UTF-8?q?Roger=20Pau=20Monn=C3=A9?= <roger.pau@citrix.com>,
         Boris Ostrovsky <boris.ostrovsky@oracle.com>,
         Stefano Stabellini <sstabellini@kernel.org>,
         Jens Axboe <axboe@kernel.dk>
-Subject: [PATCH] xen/blkfront: limit allocated memory size to actual use case
-Date:   Fri, 17 Jan 2020 15:39:55 +0100
-Message-Id: <20200117143955.18892-1-jgross@suse.com>
-X-Mailer: git-send-email 2.16.4
+Subject: Re: [PATCH] xen/blkfront: limit allocated memory size to actual use
+ case
+Message-ID: <20200117151324.GS11756@Air-de-Roger>
+References: <20200117143955.18892-1-jgross@suse.com>
+MIME-Version: 1.0
+Content-Type: text/plain; charset="iso-8859-1"
+Content-Disposition: inline
+Content-Transfer-Encoding: 8bit
+In-Reply-To: <20200117143955.18892-1-jgross@suse.com>
+X-ClientProxiedBy: AMSPEX02CAS02.citrite.net (10.69.22.113) To
+ AMSPEX02CL01.citrite.net (10.69.22.125)
 Sender: linux-block-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-Today the Xen blkfront driver allocates memory for one struct
-blkfront_ring_info for each communication ring. This structure is
-statically sized for the maximum supported configuration resulting
-in a size of more than 90 kB.
+On Fri, Jan 17, 2020 at 03:39:55PM +0100, Juergen Gross wrote:
+> Today the Xen blkfront driver allocates memory for one struct
+> blkfront_ring_info for each communication ring. This structure is
+> statically sized for the maximum supported configuration resulting
+> in a size of more than 90 kB.
+> 
+> As the main size contributor is one array inside the struct, the
+> memory allocation can easily be limited by moving this array to be
+> the last structure element and to allocate only the memory for the
+> actually needed array size.
+> 
+> Signed-off-by: Juergen Gross <jgross@suse.com>
 
-As the main size contributor is one array inside the struct, the
-memory allocation can easily be limited by moving this array to be
-the last structure element and to allocate only the memory for the
-actually needed array size.
+Acked-by: Roger Pau Monné <roger.pau@citrix.com>
 
-Signed-off-by: Juergen Gross <jgross@suse.com>
----
- drivers/block/xen-blkfront.c | 8 +++-----
- 1 file changed, 3 insertions(+), 5 deletions(-)
+Thanks! It would be nice to backport this, but I'm not sure it would
+qualify as a bug fix.
 
-diff --git a/drivers/block/xen-blkfront.c b/drivers/block/xen-blkfront.c
-index c02be06c5299..61491167da19 100644
---- a/drivers/block/xen-blkfront.c
-+++ b/drivers/block/xen-blkfront.c
-@@ -151,9 +151,6 @@ MODULE_PARM_DESC(max_ring_page_order, "Maximum order of pages to be used for the
- #define BLK_RING_SIZE(info)	\
- 	__CONST_RING_SIZE(blkif, XEN_PAGE_SIZE * (info)->nr_ring_pages)
- 
--#define BLK_MAX_RING_SIZE	\
--	__CONST_RING_SIZE(blkif, XEN_PAGE_SIZE * XENBUS_MAX_RING_GRANTS)
--
- /*
-  * ring-ref%u i=(-1UL) would take 11 characters + 'ring-ref' is 8, so 19
-  * characters are enough. Define to 20 to keep consistent with backend.
-@@ -177,12 +174,12 @@ struct blkfront_ring_info {
- 	unsigned int evtchn, irq;
- 	struct work_struct work;
- 	struct gnttab_free_callback callback;
--	struct blk_shadow shadow[BLK_MAX_RING_SIZE];
- 	struct list_head indirect_pages;
- 	struct list_head grants;
- 	unsigned int persistent_gnts_c;
- 	unsigned long shadow_free;
- 	struct blkfront_info *dev_info;
-+	struct blk_shadow shadow[];
- };
- 
- /*
-@@ -1915,7 +1912,8 @@ static int negotiate_mq(struct blkfront_info *info)
- 		info->nr_rings = 1;
- 
- 	info->rinfo = kvcalloc(info->nr_rings,
--			       sizeof(struct blkfront_ring_info),
-+			       struct_size(info->rinfo, shadow,
-+					   BLK_RING_SIZE(info)),
- 			       GFP_KERNEL);
- 	if (!info->rinfo) {
- 		xenbus_dev_fatal(info->xbdev, -ENOMEM, "allocating ring_info structure");
--- 
-2.16.4
-
+Roger.
