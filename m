@@ -2,412 +2,198 @@ Return-Path: <SRS0=3pRW=3I=vger.kernel.org=linux-block-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-8.4 required=3.0 tests=DKIMWL_WL_HIGH,DKIM_SIGNED,
-	DKIM_VALID,DKIM_VALID_AU,HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,
-	MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,USER_AGENT_SANE_1
-	autolearn=ham autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-8.3 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
+	INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,
+	USER_AGENT_SANE_1 autolearn=unavailable autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 830FDC32771
-	for <linux-block@archiver.kernel.org>; Sun, 19 Jan 2020 01:51:30 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 749A2C33CB1
+	for <linux-block@archiver.kernel.org>; Sun, 19 Jan 2020 06:28:03 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.kernel.org (Postfix) with ESMTP id 418BC2469C
-	for <linux-block@archiver.kernel.org>; Sun, 19 Jan 2020 01:51:30 +0000 (UTC)
-Authentication-Results: mail.kernel.org;
-	dkim=pass (2048-bit key) header.d=oracle.com header.i=@oracle.com header.b="To5TQzlq"
+	by mail.kernel.org (Postfix) with ESMTP id 3B6BD2071C
+	for <linux-block@archiver.kernel.org>; Sun, 19 Jan 2020 06:28:03 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1727106AbgASBv3 (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Sat, 18 Jan 2020 20:51:29 -0500
-Received: from userp2130.oracle.com ([156.151.31.86]:51622 "EHLO
-        userp2130.oracle.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1727083AbgASBv3 (ORCPT
-        <rfc822;linux-block@vger.kernel.org>);
-        Sat, 18 Jan 2020 20:51:29 -0500
-Received: from pps.filterd (userp2130.oracle.com [127.0.0.1])
-        by userp2130.oracle.com (8.16.0.27/8.16.0.27) with SMTP id 00J1jIBU003640;
-        Sun, 19 Jan 2020 01:51:00 GMT
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=oracle.com; h=subject : to :
- references : from : message-id : date : mime-version : in-reply-to :
- content-type : content-transfer-encoding; s=corp-2019-08-05;
- bh=s0Nw00Y4JjWza9n2e3uai+yryQXezFbkIp8aZjxQEeY=;
- b=To5TQzlqVDqlh0P7EWiShvHARzo/G50h1DU2NVu15J+28cP9DwoCpg/3UUzvCkSbSYJ6
- tkdkHe4WaCH4NQHwBZtjnEw5LLJ783xFRj/rMOJMQlZlOLcch1zTG8XVex0Xp9Xx9FJG
- XO7nIEeGCuMkxI6mkNsNoI/op4BTfKzdr31Lgg6GTco6ONGWGgrvec9kvAgZ4X+rSeGm
- LDEALQcYIvuLbdb0xLj8gJwW3ZWnUm3Nd+byU5c2D4szdx6iwJdW4x2A4oCv68EmyS97
- bTQX9lZYbVh55z3ilETJXK7abHNL4u2fVGdvBqSewZv9ORM87su//lb2vbtqjhjNiUxe Zw== 
-Received: from userp3020.oracle.com (userp3020.oracle.com [156.151.31.79])
-        by userp2130.oracle.com with ESMTP id 2xkseu2bpg-1
-        (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=OK);
-        Sun, 19 Jan 2020 01:50:59 +0000
-Received: from pps.filterd (userp3020.oracle.com [127.0.0.1])
-        by userp3020.oracle.com (8.16.0.27/8.16.0.27) with SMTP id 00J1i3sF194583;
-        Sun, 19 Jan 2020 01:50:59 GMT
-Received: from aserv0122.oracle.com (aserv0122.oracle.com [141.146.126.236])
-        by userp3020.oracle.com with ESMTP id 2xmc5hay8d-1
-        (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=OK);
-        Sun, 19 Jan 2020 01:50:59 +0000
-Received: from abhmp0020.oracle.com (abhmp0020.oracle.com [141.146.116.26])
-        by aserv0122.oracle.com (8.14.4/8.14.4) with ESMTP id 00J1ouD4014964;
-        Sun, 19 Jan 2020 01:50:56 GMT
-Received: from [192.168.1.14] (/114.88.246.185)
-        by default (Oracle Beehive Gateway v4.0)
-        with ESMTP ; Sat, 18 Jan 2020 17:50:56 -0800
-Subject: Re: [PATCH block v2 2/3] block: Add support for REQ_NOZERO flag
-To:     Kirill Tkhai <ktkhai@virtuozzo.com>, linux-block@vger.kernel.org,
-        linux-kernel@vger.kernel.org, martin.petersen@oracle.com,
-        axboe@kernel.dk, tytso@mit.edu, adilger.kernel@dilger.ca,
-        Chaitanya.Kulkarni@wdc.com, darrick.wong@oracle.com,
-        ming.lei@redhat.com, osandov@fb.com, jthumshirn@suse.de,
-        minwoo.im.dev@gmail.com, damien.lemoal@wdc.com,
-        andrea.parri@amarulasolutions.com, hare@suse.com, tj@kernel.org,
-        ajay.joshi@wdc.com, sagi@grimberg.me, dsterba@suse.com,
-        bvanassche@acm.org, dhowells@redhat.com, asml.silence@gmail.com
-References: <157917805422.88675.6477661554332322975.stgit@localhost.localdomain>
- <157917816325.88675.16481772163916741596.stgit@localhost.localdomain>
-From:   Bob Liu <bob.liu@oracle.com>
-Message-ID: <a6f36a19-0607-fc1e-d2da-37aa00c4b76e@oracle.com>
-Date:   Sun, 19 Jan 2020 09:50:43 +0800
-User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:60.0) Gecko/20100101
- Thunderbird/60.5.1
+        id S1725895AbgASG1U (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Sun, 19 Jan 2020 01:27:20 -0500
+Received: from szxga04-in.huawei.com ([45.249.212.190]:9663 "EHLO huawei.com"
+        rhost-flags-OK-OK-OK-FAIL) by vger.kernel.org with ESMTP
+        id S1725809AbgASG1T (ORCPT <rfc822;linux-block@vger.kernel.org>);
+        Sun, 19 Jan 2020 01:27:19 -0500
+Received: from DGGEMS410-HUB.china.huawei.com (unknown [172.30.72.60])
+        by Forcepoint Email with ESMTP id 08CAC7AFB64B14A4709A;
+        Sun, 19 Jan 2020 14:27:17 +0800 (CST)
+Received: from [127.0.0.1] (10.173.222.66) by DGGEMS410-HUB.china.huawei.com
+ (10.3.19.210) with Microsoft SMTP Server id 14.3.439.0; Sun, 19 Jan 2020
+ 14:27:16 +0800
+Subject: Re: [PATCH] nbd: fix potential NULL pointer fault in connect and
+ disconnect process
+To:     Josef Bacik <josef@toxicpanda.com>, <axboe@kernel.dk>
+CC:     <linux-block@vger.kernel.org>, <nbd@other.debian.org>,
+        <linux-kernel@vger.kernel.org>
+References: <20200117115005.37006-1-sunke32@huawei.com>
+ <875eaffb-d1e1-2d7e-09c9-81bab345e707@toxicpanda.com>
+From:   "sunke (E)" <sunke32@huawei.com>
+Message-ID: <8bfc7d03-8944-f435-4ae6-e50b62911621@huawei.com>
+Date:   Sun, 19 Jan 2020 14:27:15 +0800
+User-Agent: Mozilla/5.0 (Windows NT 10.0; WOW64; rv:68.0) Gecko/20100101
+ Thunderbird/68.2.2
 MIME-Version: 1.0
-In-Reply-To: <157917816325.88675.16481772163916741596.stgit@localhost.localdomain>
-Content-Type: text/plain; charset=utf-8
-Content-Language: en-US
-Content-Transfer-Encoding: 7bit
-X-Proofpoint-Virus-Version: vendor=nai engine=6000 definitions=9504 signatures=668685
-X-Proofpoint-Spam-Details: rule=notspam policy=default score=0 suspectscore=2 malwarescore=0
- phishscore=0 bulkscore=0 spamscore=0 mlxscore=0 mlxlogscore=999
- adultscore=0 classifier=spam adjust=0 reason=mlx scancount=1
- engine=8.0.1-1911140001 definitions=main-2001190011
-X-Proofpoint-Virus-Version: vendor=nai engine=6000 definitions=9504 signatures=668685
-X-Proofpoint-Spam-Details: rule=notspam policy=default score=0 priorityscore=1501 malwarescore=0
- suspectscore=2 phishscore=0 bulkscore=0 spamscore=0 clxscore=1015
- lowpriorityscore=0 mlxscore=0 impostorscore=0 mlxlogscore=999 adultscore=0
- classifier=spam adjust=0 reason=mlx scancount=1 engine=8.0.1-1911140001
- definitions=main-2001190011
+In-Reply-To: <875eaffb-d1e1-2d7e-09c9-81bab345e707@toxicpanda.com>
+Content-Type: text/plain; charset="utf-8"; format=flowed
+Content-Transfer-Encoding: 8bit
+X-Originating-IP: [10.173.222.66]
+X-CFilter-Loop: Reflected
 Sender: linux-block-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-On 1/16/20 8:36 PM, Kirill Tkhai wrote:
-> This adds support for REQ_NOZERO extension of REQ_OP_WRITE_ZEROES
-> operation, which encourages a block device driver to just allocate
-> blocks (or mark them allocated) instead of actual blocks zeroing.
-> REQ_NOZERO is aimed to be used for network filesystems providing
-> a block device interface. Also, block devices, which map a file
-> on other filesystem (like loop), may use this for less fragmentation
-> and batching fallocate() requests. Hypervisors like QEMU may
-> introduce optimizations of clusters allocations based on this.
+
+
+在 2020/1/17 22:18, Josef Bacik 写道:
+> On 1/17/20 6:50 AM, Sun Ke wrote:
+>> Connect and disconnect a nbd device repeatedly, will cause
+>> NULL pointer fault.
+>>
+>> It will appear by the steps:
+>> 1. Connect the nbd device and disconnect it, but now nbd device
+>>     is not disconnected totally.
+>> 2. Connect the same nbd device again immediately, it will fail
+>>     in nbd_start_device with a EBUSY return value.
+>> 3. Wait a second to make sure the last config_refs is reduced
+>>     and run nbd_config_put to disconnect the nbd device totally.
+>> 4. Start another process to open the nbd_device, config_refs
+>>     will increase and at the same time disconnect it.
+>>
+>> To fix it, add a NBD_HAS_STARTED flag. Set it in nbd_start_device_ioctl
+>> and nbd_genl_connect if nbd device is started successfully.
+>> Clear it in nbd_config_put. Test it in nbd_genl_disconnect and
+>> nbd_genl_reconfigure.
 > 
-> BLKDEV_ZERO_ALLOCATE is a new corresponding flag for
-> blkdev_issue_zeroout().
->> CC: Martin K. Petersen <martin.petersen@oracle.com>
-> Signed-off-by: Kirill Tkhai <ktkhai@virtuozzo.com>
-> ---
->  block/blk-core.c          |    6 +++---
->  block/blk-lib.c           |   17 ++++++++++-------
->  block/blk-merge.c         |    9 ++++++---
->  block/blk-settings.c      |   17 +++++++++++++++++
->  fs/block_dev.c            |    4 ++++
->  include/linux/blk_types.h |    5 ++++-
->  include/linux/blkdev.h    |   31 ++++++++++++++++++++++++-------
->  7 files changed, 68 insertions(+), 21 deletions(-)
+> I don't doubt what you are seeing, but what exactly are we NULL pointer 
+> dereferencing?  I can't quite figure it out from the steps.
+The root case is when do disconnect, pointers in structure nbd_device 
+will not be free immeditily, it should wait for the last config_refs to 
+be decreased.
+
+I got this kernel NULL pointer dereference report:
+
+[  256.454582] Dev nbd0: unable to read RDB block 0
+[  256.455611] Dev nbd0: unable to read RDB block 0
+[  256.457528] Dev nbd0: unable to read RDB block 0
+[  256.458742] Dev nbd0: unable to read RDB block 0
+[  256.516375] Dev nbd0: unable to read RDB block 0
+[  257.468970] BUG: kernel NULL pointer dereference, address: 
+0000000000000020
+[  257.469645] #PF: supervisor write access in kernel mode
+[  257.470445] #PF: error_code(0x0002) - not-present page
+[  257.470888] PGD 12ecb7067 P4D 12ecb7067 PUD 12f3f2067 PMD 0
+[  257.471384] Oops: 0002 [#1] SMP
+[  257.471671] CPU: 1 PID: 1651 Comm: nbd-client Not tainted 
+5.5.0-rc5-00039-gae6088216ce4 #22
+[  257.472501] Hardware name: QEMU Standard PC (i440FX + PIIX, 1996), 
+BIOS ?-20180531_142017-buildhw-08.phx2.fedoraproject.org-1.fc28 04/01/2014
+[  257.473776] RIP: 0010:mutex_lock+0x29/0x60
+[  257.474593] Code: 00 0f 1f 44 00 00 53 48 89 fb 48 83 05 cf f8 01 02 
+01 e8 ea bd ff ff 48 83 05 ca f8 01 02 01 31 c0 65 48 8b 14 25 00 7d 01 
+00 <f0> 48 0f b1 13 74 f
+[  257.476221] RSP: 0018:ffffc900004cfa10 EFLAGS: 00010246
+[  257.476670] RAX: 0000000000000000 RBX: 0000000000000020 RCX: 
+0000000000000000
+[  257.477289] RDX: ffff88812f524a00 RSI: ffffffff82e44212 RDI: 
+0000000000000020
+[  257.477999] RBP: ffffc900004cfab0 R08: ffff88813bc6c110 R09: 
+0000000000000000
+[  257.478617] R10: 8080808080808080 R11: 0000000000000018 R12: 
+ffff88813584b000
+[  257.479228] R13: ffffffff838b1f00 R14: ffffc900004cfbb8 R15: 
+ffffc900004cfa40
+[  257.479871] FS:  00007f0c30d75b40(0000) GS:ffff88813bc40000(0000) 
+knlGS:0000000000000000
+[  257.480569] CS:  0010 DS: 0000 ES: 0000 CR0: 0000000080050033
+[  257.481336] CR2: 0000000000000020 CR3: 000000012f5ea000 CR4: 
+00000000000006e0
+[  257.481980] Call Trace:
+[  257.482262]  flush_workqueue+0x91/0x690
+[  257.482627]  ? nbd_size_update+0x180/0x180 [nbd]
+[  257.483063]  nbd_disconnect_and_put+0x80/0xd0 [nbd]
+[  257.483497]  nbd_genl_disconnect+0x153/0x2d0 [nbd]
+[  257.483969]  genl_rcv_msg+0x2ab/0x620
+[  257.484302]  ? netlink_unicast+0x3b8/0x5e0
+[  257.484663]  ? __nlmsg_put+0x78/0x90
+[  257.485009]  ? genl_family_rcv_msg_attrs_parse+0x1a0/0x1a0
+[  257.485488]  netlink_rcv_skb+0x5a/0x1a0
+[  257.485849]  genl_rcv+0x34/0x60
+[  257.486129]  netlink_unicast+0x2a4/0x5e0
+[  257.486468]  netlink_sendmsg+0x369/0x6b0
+[  257.486854]  ? rw_copy_check_uvector+0x50/0x1d0
+[  257.487257]  ____sys_sendmsg+0x1f7/0x370
+[  257.487604]  ? copy_msghdr_from_user+0xff/0x1e0
+[  257.488016]  ___sys_sendmsg+0x8c/0xe0
+[  257.488335]  ? copy_msghdr_from_user+0xff/0x1e0
+[  257.488730]  ? ___sys_recvmsg+0xa1/0xe0
+[  257.489091]  ? handle_mm_fault+0x199/0x390
+[  257.489454]  __sys_sendmsg+0x6b/0xe0
+[  257.489766]  __x64_sys_sendmsg+0x23/0x30
+[  257.490149]  do_syscall_64+0xab/0x410
+[  257.490474]  entry_SYSCALL_64_after_hwframe+0x44/0xa9
+[  257.490942] RIP: 0033:0x7f0c3047cb87
+[  257.491288] Code: 64 89 02 48 c7 c0 ff ff ff ff eb b9 0f 1f 80 00 00 
+00 00 8b 05 6a 2b 2c 00 48 63 d2 48 63 ff 85 c0 75 18 b8 2e 00 00 00 0f 
+05 <48> 3d 00 f0 ff ff 8
+[  257.492940] RSP: 002b:00007ffefb59db28 EFLAGS: 00000246 ORIG_RAX: 
+000000000000002e
+[  257.493627] RAX: ffffffffffffffda RBX: 00000000023b0120 RCX: 
+00007f0c3047cb87
+[  257.494497] RDX: 0000000000000000 RSI: 00007ffefb59db60 RDI: 
+0000000000000003
+[  257.495116] RBP: 00000000023b01f0 R08: 0000000000000014 R09: 
+0000000000000002
+[  257.495731] R10: 0000000000000006 R11: 0000000000000246 R12: 
+00000000023b0030
+[  257.496356] R13: 00007ffefb59db60 R14: 0000000000000001 R15: 
+00000000ffffffff
+[  257.496989] Modules linked in: nbd
+[  257.497580] CR2: 0000000000000020
+
+Thanks,
+
+Ke
+
 > 
-> diff --git a/block/blk-core.c b/block/blk-core.c
-> index 50a5de025d5e..2edcd55624f1 100644
-> --- a/block/blk-core.c
-> +++ b/block/blk-core.c
-> @@ -978,7 +978,7 @@ generic_make_request_checks(struct bio *bio)
->  			goto not_supported;
->  		break;
->  	case REQ_OP_WRITE_ZEROES:
-> -		if (!q->limits.max_write_zeroes_sectors)
-> +		if (!blk_queue_get_max_write_zeroes_sectors(q, bio->bi_opf))
->  			goto not_supported;
->  		break;
->  	default:
-> @@ -1250,10 +1250,10 @@ EXPORT_SYMBOL(submit_bio);
->  static int blk_cloned_rq_check_limits(struct request_queue *q,
->  				      struct request *rq)
->  {
-> -	if (blk_rq_sectors(rq) > blk_queue_get_max_sectors(q, req_op(rq))) {
-> +	if (blk_rq_sectors(rq) > blk_queue_get_max_sectors(q, rq->cmd_flags)) {
->  		printk(KERN_ERR "%s: over max size limit. (%u > %u)\n",
->  			__func__, blk_rq_sectors(rq),
-> -			blk_queue_get_max_sectors(q, req_op(rq)));
-> +			blk_queue_get_max_sectors(q, rq->cmd_flags));
->  		return -EIO;
->  	}
->  
-> diff --git a/block/blk-lib.c b/block/blk-lib.c
-> index 3e38c93cfc53..3e80279eb029 100644
-> --- a/block/blk-lib.c
-> +++ b/block/blk-lib.c
-> @@ -214,7 +214,7 @@ static int __blkdev_issue_write_zeroes(struct block_device *bdev,
->  		struct bio **biop, unsigned flags)
->  {
->  	struct bio *bio = *biop;
-> -	unsigned int max_write_zeroes_sectors;
-> +	unsigned int max_write_zeroes_sectors, req_flags = 0;
->  	struct request_queue *q = bdev_get_queue(bdev);
->  
->  	if (!q)
-> @@ -224,18 +224,21 @@ static int __blkdev_issue_write_zeroes(struct block_device *bdev,
->  		return -EPERM;
->  
->  	/* Ensure that max_write_zeroes_sectors doesn't overflow bi_size */
-> -	max_write_zeroes_sectors = bdev_write_zeroes_sectors(bdev, 0);
-> +	max_write_zeroes_sectors = bdev_write_zeroes_sectors(bdev, flags);
->  
->  	if (max_write_zeroes_sectors == 0)
->  		return -EOPNOTSUPP;
->  
-> +	if (flags & BLKDEV_ZERO_NOUNMAP)
-> +		req_flags |= REQ_NOUNMAP;
-> +	if (flags & BLKDEV_ZERO_ALLOCATE)
-> +		req_flags |= REQ_NOZERO|REQ_NOUNMAP;
-> +
->  	while (nr_sects) {
->  		bio = blk_next_bio(bio, 0, gfp_mask);
->  		bio->bi_iter.bi_sector = sector;
->  		bio_set_dev(bio, bdev);
-> -		bio->bi_opf = REQ_OP_WRITE_ZEROES;
-> -		if (flags & BLKDEV_ZERO_NOUNMAP)
-> -			bio->bi_opf |= REQ_NOUNMAP;
-> +		bio->bi_opf = REQ_OP_WRITE_ZEROES | req_flags;
->  
->  		if (nr_sects > max_write_zeroes_sectors) {
->  			bio->bi_iter.bi_size = max_write_zeroes_sectors << 9;
-> @@ -362,7 +365,7 @@ int blkdev_issue_zeroout(struct block_device *bdev, sector_t sector,
->  	sector_t bs_mask;
->  	struct bio *bio;
->  	struct blk_plug plug;
-> -	bool try_write_zeroes = !!bdev_write_zeroes_sectors(bdev, 0);
-> +	bool try_write_zeroes = !!bdev_write_zeroes_sectors(bdev, flags);
->  
->  	bs_mask = (bdev_logical_block_size(bdev) >> 9) - 1;
->  	if ((sector | nr_sects) & bs_mask)
-> @@ -391,7 +394,7 @@ int blkdev_issue_zeroout(struct block_device *bdev, sector_t sector,
->  			try_write_zeroes = false;
->  			goto retry;
->  		}
-> -		if (!bdev_write_zeroes_sectors(bdev, 0)) {
-> +		if (!bdev_write_zeroes_sectors(bdev, flags)) {
->  			/*
->  			 * Zeroing offload support was indicated, but the
->  			 * device reported ILLEGAL REQUEST (for some devices
-> diff --git a/block/blk-merge.c b/block/blk-merge.c
-> index 347782a24a35..e3ce4b87bbaa 100644
-> --- a/block/blk-merge.c
-> +++ b/block/blk-merge.c
-> @@ -105,15 +105,18 @@ static struct bio *blk_bio_discard_split(struct request_queue *q,
->  static struct bio *blk_bio_write_zeroes_split(struct request_queue *q,
->  		struct bio *bio, struct bio_set *bs, unsigned *nsegs)
->  {
-> +	unsigned int max_sectors;
-> +
-> +	max_sectors = blk_queue_get_max_write_zeroes_sectors(q, bio->bi_opf);
->  	*nsegs = 0;
->  
-> -	if (!q->limits.max_write_zeroes_sectors)
-> +	if (!max_sectors)
->  		return NULL;
->  
-> -	if (bio_sectors(bio) <= q->limits.max_write_zeroes_sectors)
-> +	if (bio_sectors(bio) <= max_sectors)
->  		return NULL;
->  
-> -	return bio_split(bio, q->limits.max_write_zeroes_sectors, GFP_NOIO, bs);
-> +	return bio_split(bio, max_sectors, GFP_NOIO, bs);
->  }
->  
->  static struct bio *blk_bio_write_same_split(struct request_queue *q,
-> diff --git a/block/blk-settings.c b/block/blk-settings.c
-> index 5f6dcc7a47bd..f682374c5106 100644
-> --- a/block/blk-settings.c
-> +++ b/block/blk-settings.c
-> @@ -48,6 +48,7 @@ void blk_set_default_limits(struct queue_limits *lim)
->  	lim->chunk_sectors = 0;
->  	lim->max_write_same_sectors = 0;
->  	lim->max_write_zeroes_sectors = 0;
-> +	lim->max_allocate_sectors = 0;
->  	lim->max_discard_sectors = 0;
->  	lim->max_hw_discard_sectors = 0;
->  	lim->discard_granularity = 0;
-> @@ -83,6 +84,7 @@ void blk_set_stacking_limits(struct queue_limits *lim)
->  	lim->max_dev_sectors = UINT_MAX;
->  	lim->max_write_same_sectors = UINT_MAX;
->  	lim->max_write_zeroes_sectors = UINT_MAX;
-> +	lim->max_allocate_sectors = UINT_MAX;
->  }
->  EXPORT_SYMBOL(blk_set_stacking_limits);
->  
-> @@ -257,6 +259,19 @@ void blk_queue_max_write_zeroes_sectors(struct request_queue *q,
->  }
->  EXPORT_SYMBOL(blk_queue_max_write_zeroes_sectors);
->  
-> +/**
-> + * blk_queue_max_allocate_sectors - set max sectors for a single
-> + *                                  allocate request
-> + * @q:  the request queue for the device
-> + * @max_allocate_sectors: maximum number of sectors to write per command
-> + **/
-> +void blk_queue_max_allocate_sectors(struct request_queue *q,
-> +		unsigned int max_allocate_sectors)
-> +{
-> +	q->limits.max_allocate_sectors = max_allocate_sectors;
-> +}
-> +EXPORT_SYMBOL(blk_queue_max_allocate_sectors);
-> +
-
-I'd suggest split this to a separated patch.
-
->  /**
->   * blk_queue_max_segments - set max hw segments for a request for this queue
->   * @q:  the request queue for the device
-> @@ -506,6 +521,8 @@ int blk_stack_limits(struct queue_limits *t, struct queue_limits *b,
->  					b->max_write_same_sectors);
->  	t->max_write_zeroes_sectors = min(t->max_write_zeroes_sectors,
->  					b->max_write_zeroes_sectors);
-> +	t->max_allocate_sectors = min(t->max_allocate_sectors,
-> +					b->max_allocate_sectors);
->  	t->bounce_pfn = min_not_zero(t->bounce_pfn, b->bounce_pfn);
->  
->  	t->seg_boundary_mask = min_not_zero(t->seg_boundary_mask,
-> diff --git a/fs/block_dev.c b/fs/block_dev.c
-> index 69bf2fb6f7cd..1ffef894b3bd 100644
-> --- a/fs/block_dev.c
-> +++ b/fs/block_dev.c
-> @@ -2122,6 +2122,10 @@ static long blkdev_fallocate(struct file *file, int mode, loff_t start,
->  		error = blkdev_issue_zeroout(bdev, start >> 9, len >> 9,
->  					     GFP_KERNEL, BLKDEV_ZERO_NOFALLBACK);
->  		break;
-> +	case FALLOC_FL_KEEP_SIZE:
-> +		error = blkdev_issue_zeroout(bdev, start >> 9, len >> 9,
-> +			GFP_KERNEL, BLKDEV_ZERO_ALLOCATE | BLKDEV_ZERO_NOFALLBACK);
-> +		break;
->  	case FALLOC_FL_PUNCH_HOLE | FALLOC_FL_KEEP_SIZE | FALLOC_FL_NO_HIDE_STALE:
->  		error = blkdev_issue_discard(bdev, start >> 9, len >> 9,
->  					     GFP_KERNEL, 0);
-> diff --git a/include/linux/blk_types.h b/include/linux/blk_types.h
-> index 70254ae11769..9ed166860099 100644
-> --- a/include/linux/blk_types.h
-> +++ b/include/linux/blk_types.h
-> @@ -335,7 +335,9 @@ enum req_flag_bits {
->  
->  	/* command specific flags for REQ_OP_WRITE_ZEROES: */
->  	__REQ_NOUNMAP,		/* do not free blocks when zeroing */
-> -
-> +	__REQ_NOZERO,		/* only notify about allocated blocks,
-> +				 * and do not actual zero them
-> +				 */
->  	__REQ_HIPRI,
->  
->  	/* for driver use */
-> @@ -362,6 +364,7 @@ enum req_flag_bits {
->  #define REQ_CGROUP_PUNT		(1ULL << __REQ_CGROUP_PUNT)
->  
->  #define REQ_NOUNMAP		(1ULL << __REQ_NOUNMAP)
-> +#define REQ_NOZERO		(1ULL << __REQ_NOZERO)
->  #define REQ_HIPRI		(1ULL << __REQ_HIPRI)
->  
->  #define REQ_DRV			(1ULL << __REQ_DRV)
-> diff --git a/include/linux/blkdev.h b/include/linux/blkdev.h
-> index 4cd69552df9a..f4ec5db64432 100644
-> --- a/include/linux/blkdev.h
-> +++ b/include/linux/blkdev.h
-> @@ -336,6 +336,7 @@ struct queue_limits {
->  	unsigned int		max_hw_discard_sectors;
->  	unsigned int		max_write_same_sectors;
->  	unsigned int		max_write_zeroes_sectors;
-> +	unsigned int		max_allocate_sectors;
->  	unsigned int		discard_granularity;
->  	unsigned int		discard_alignment;
->  
-> @@ -988,9 +989,19 @@ static inline struct bio_vec req_bvec(struct request *rq)
->  	return mp_bvec_iter_bvec(rq->bio->bi_io_vec, rq->bio->bi_iter);
->  }
->  
-> +static inline unsigned int blk_queue_get_max_write_zeroes_sectors(
-> +		struct request_queue *q, unsigned int op_flags)
-> +{
-> +	if (op_flags & REQ_NOZERO)
-> +		return q->limits.max_allocate_sectors;
-> +	return q->limits.max_write_zeroes_sectors;
-> +}
-> +
-
-And this one.
-Also, should we consider other code path used q->limits.max_write_zeroes_sectors?
-
-Regards,
-Bob
-
->  static inline unsigned int blk_queue_get_max_sectors(struct request_queue *q,
-> -						     int op)
-> +						     unsigned int op_flags)
->  {
-> +	int op = op_flags & REQ_OP_MASK;
-> +
->  	if (unlikely(op == REQ_OP_DISCARD || op == REQ_OP_SECURE_ERASE))
->  		return min(q->limits.max_discard_sectors,
->  			   UINT_MAX >> SECTOR_SHIFT);
-> @@ -999,7 +1010,7 @@ static inline unsigned int blk_queue_get_max_sectors(struct request_queue *q,
->  		return q->limits.max_write_same_sectors;
->  
->  	if (unlikely(op == REQ_OP_WRITE_ZEROES))
-> -		return q->limits.max_write_zeroes_sectors;
-> +		return blk_queue_get_max_write_zeroes_sectors(q, op_flags);
->  
->  	return q->limits.max_sectors;
->  }
-> @@ -1029,10 +1040,10 @@ static inline unsigned int blk_rq_get_max_sectors(struct request *rq,
->  	if (!q->limits.chunk_sectors ||
->  	    req_op(rq) == REQ_OP_DISCARD ||
->  	    req_op(rq) == REQ_OP_SECURE_ERASE)
-> -		return blk_queue_get_max_sectors(q, req_op(rq));
-> +		return blk_queue_get_max_sectors(q, rq->cmd_flags);
->  
->  	return min(blk_max_size_offset(q, offset),
-> -			blk_queue_get_max_sectors(q, req_op(rq)));
-> +			blk_queue_get_max_sectors(q, rq->cmd_flags));
->  }
->  
->  static inline unsigned int blk_rq_count_bios(struct request *rq)
-> @@ -1078,6 +1089,8 @@ extern void blk_queue_max_write_same_sectors(struct request_queue *q,
->  		unsigned int max_write_same_sectors);
->  extern void blk_queue_max_write_zeroes_sectors(struct request_queue *q,
->  		unsigned int max_write_same_sectors);
-> +extern void blk_queue_max_allocate_sectors(struct request_queue *q,
-> +		unsigned int max_allocate_sectors);
->  extern void blk_queue_logical_block_size(struct request_queue *, unsigned short);
->  extern void blk_queue_physical_block_size(struct request_queue *, unsigned int);
->  extern void blk_queue_alignment_offset(struct request_queue *q,
-> @@ -1219,6 +1232,7 @@ extern int __blkdev_issue_discard(struct block_device *bdev, sector_t sector,
->  
->  #define BLKDEV_ZERO_NOUNMAP	(1 << 0)  /* do not free blocks */
->  #define BLKDEV_ZERO_NOFALLBACK	(1 << 1)  /* don't write explicit zeroes */
-> +#define BLKDEV_ZERO_ALLOCATE	(1 << 2)  /* allocate range of blocks */
->  
->  extern int __blkdev_issue_zeroout(struct block_device *bdev, sector_t sector,
->  		sector_t nr_sects, gfp_t gfp_mask, struct bio **biop,
-> @@ -1423,10 +1437,13 @@ static inline unsigned int bdev_write_zeroes_sectors(struct block_device *bdev,
->  {
->  	struct request_queue *q = bdev_get_queue(bdev);
->  
-> -	if (q)
-> -		return q->limits.max_write_zeroes_sectors;
-> +	if (!q)
-> +		return 0;
->  
-> -	return 0;
-> +	if (flags & BLKDEV_ZERO_ALLOCATE)
-> +		return q->limits.max_allocate_sectors;
-> +	else
-> +		return q->limits.max_write_zeroes_sectors;
->  }
->  
->  static inline enum blk_zoned_model bdev_zoned_model(struct block_device *bdev)
+>>
+>> Signed-off-by: Sun Ke <sunke32@huawei.com>
+>> ---
+>>   drivers/block/nbd.c | 21 +++++++++++++++++++++
+>>   1 file changed, 21 insertions(+)
+>>
+>> diff --git a/drivers/block/nbd.c b/drivers/block/nbd.c
+>> index b4607dd96185..ddd364e208ab 100644
+>> --- a/drivers/block/nbd.c
+>> +++ b/drivers/block/nbd.c
+>> @@ -83,6 +83,7 @@ struct link_dead_args {
+>>   #define NBD_DESTROY_ON_DISCONNECT    0
+>>   #define NBD_DISCONNECT_REQUESTED    1
+>> +#define NBD_HAS_STARTED                2
+>>   struct nbd_config {
+>>       u32 flags;
+>> @@ -1215,6 +1216,7 @@ static void nbd_config_put(struct nbd_device *nbd)
+>>           nbd->disk->queue->limits.discard_alignment = 0;
+>>           blk_queue_max_discard_sectors(nbd->disk->queue, UINT_MAX);
+>>           blk_queue_flag_clear(QUEUE_FLAG_DISCARD, nbd->disk->queue);
+>> +        clear_bit(NBD_HAS_STARTED, &nbd->flags);
+>>           mutex_unlock(&nbd->config_lock);
+>>           nbd_put(nbd);
+>> @@ -1290,6 +1292,8 @@ static int nbd_start_device_ioctl(struct 
+>> nbd_device *nbd, struct block_device *b
+>>       ret = nbd_start_device(nbd);
+>>       if (ret)
+>>           return ret;
+>> +    else
+>> +        set_bit(NBD_HAS_STARTED, &nbd->flags);
 > 
+> The else is superfluous here.  Thanks,
 > 
+> Josef
+> 
+> .
 
