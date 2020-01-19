@@ -2,112 +2,133 @@ Return-Path: <SRS0=3pRW=3I=vger.kernel.org=linux-block-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-6.9 required=3.0 tests=DKIMWL_WL_HIGH,DKIM_SIGNED,
-	DKIM_VALID,DKIM_VALID_AU,HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,
-	MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS autolearn=ham
+X-Spam-Status: No, score=-2.3 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
+	MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,USER_AGENT_SANE_1 autolearn=no
 	autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id B3AF4C33CB1
-	for <linux-block@archiver.kernel.org>; Sun, 19 Jan 2020 07:15:30 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id BA363C33CB1
+	for <linux-block@archiver.kernel.org>; Sun, 19 Jan 2020 13:57:53 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.kernel.org (Postfix) with ESMTP id 8A93F2081E
-	for <linux-block@archiver.kernel.org>; Sun, 19 Jan 2020 07:15:30 +0000 (UTC)
-Authentication-Results: mail.kernel.org;
-	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="YeN/z+VY"
+	by mail.kernel.org (Postfix) with ESMTP id 9391C20684
+	for <linux-block@archiver.kernel.org>; Sun, 19 Jan 2020 13:57:53 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1726621AbgASHPa (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Sun, 19 Jan 2020 02:15:30 -0500
-Received: from us-smtp-delivery-1.mimecast.com ([205.139.110.120]:37772 "EHLO
-        us-smtp-1.mimecast.com" rhost-flags-OK-OK-OK-FAIL) by vger.kernel.org
-        with ESMTP id S1726584AbgASHPa (ORCPT
-        <rfc822;linux-block@vger.kernel.org>);
-        Sun, 19 Jan 2020 02:15:30 -0500
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-        s=mimecast20190719; t=1579418128;
-        h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-         to:to:cc:cc:mime-version:mime-version:
-         content-transfer-encoding:content-transfer-encoding:
-         in-reply-to:in-reply-to:references:references;
-        bh=Pn4SA7nmTt+ix5HXMB4kLh+eSavv2+gG8CXaUSteEw4=;
-        b=YeN/z+VYAEz14OESAlwDSpwVRE9c9vHq/g71JoCVhK69fVcKLPyG5Rhvh0qWPx6NVp6WLm
-        dBQ6kDb8LPxpT43IyG2WVcjY/+mQSTw9NrPTdN+IaZ9b5aoqvONWXrmc7nv3JKM0zjaIjT
-        R0UzZvkjKS1Loc98cvtN1YUkeEQp9bo=
-Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
- [209.132.183.4]) (Using TLS) by relay.mimecast.com with ESMTP id
- us-mta-230-1Q2T7_OJMieiKD9k-A8Svg-1; Sun, 19 Jan 2020 02:15:25 -0500
-X-MC-Unique: 1Q2T7_OJMieiKD9k-A8Svg-1
-Received: from smtp.corp.redhat.com (int-mx01.intmail.prod.int.phx2.redhat.com [10.5.11.11])
-        (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
-        (No client certificate requested)
-        by mimecast-mx01.redhat.com (Postfix) with ESMTPS id 8845D800D41;
-        Sun, 19 Jan 2020 07:15:23 +0000 (UTC)
-Received: from localhost (ovpn-8-23.pek2.redhat.com [10.72.8.23])
-        by smtp.corp.redhat.com (Postfix) with ESMTP id 7B25684BC8;
-        Sun, 19 Jan 2020 07:15:20 +0000 (UTC)
-From:   Ming Lei <ming.lei@redhat.com>
-To:     James Bottomley <James.Bottomley@HansenPartnership.com>,
-        linux-scsi@vger.kernel.org,
-        "Martin K . Petersen" <martin.petersen@oracle.com>
-Cc:     linux-block@vger.kernel.org, Jens Axboe <axboe@kernel.dk>,
-        Ming Lei <ming.lei@redhat.com>,
-        Sathya Prakash <sathya.prakash@broadcom.com>,
-        Chaitra P B <chaitra.basappa@broadcom.com>,
-        Suganath Prabu Subramani 
-        <suganath-prabu.subramani@broadcom.com>,
-        Kashyap Desai <kashyap.desai@broadcom.com>,
-        Sumit Saxena <sumit.saxena@broadcom.com>,
-        Shivasharan S <shivasharan.srikanteshwara@broadcom.com>,
-        "Ewan D . Milne" <emilne@redhat.com>,
-        Christoph Hellwig <hch@lst.de>, Hannes Reinecke <hare@suse.de>,
-        Bart Van Assche <bart.vanassche@wdc.com>
-Subject: [PATCH 6/6] scsi: megaraid: set flag of no_device_queue_for_ssd
-Date:   Sun, 19 Jan 2020 15:14:32 +0800
-Message-Id: <20200119071432.18558-7-ming.lei@redhat.com>
-In-Reply-To: <20200119071432.18558-1-ming.lei@redhat.com>
-References: <20200119071432.18558-1-ming.lei@redhat.com>
+        id S1726860AbgASN5w (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Sun, 19 Jan 2020 08:57:52 -0500
+Received: from szxga05-in.huawei.com ([45.249.212.191]:9202 "EHLO huawei.com"
+        rhost-flags-OK-OK-OK-FAIL) by vger.kernel.org with ESMTP
+        id S1726798AbgASN5w (ORCPT <rfc822;linux-block@vger.kernel.org>);
+        Sun, 19 Jan 2020 08:57:52 -0500
+Received: from DGGEMS414-HUB.china.huawei.com (unknown [172.30.72.59])
+        by Forcepoint Email with ESMTP id 32DB0FD208351914C84A;
+        Sun, 19 Jan 2020 21:57:50 +0800 (CST)
+Received: from [10.173.221.193] (10.173.221.193) by
+ DGGEMS414-HUB.china.huawei.com (10.3.19.214) with Microsoft SMTP Server id
+ 14.3.439.0; Sun, 19 Jan 2020 21:57:41 +0800
+Subject: Re: [Question] about shared tags for SCSI drivers
+To:     Ming Lei <ming.lei@redhat.com>
+CC:     "linux-block@vger.kernel.org" <linux-block@vger.kernel.org>,
+        <john.garry@huawei.com>, "axboe@kernel.dk" <axboe@kernel.dk>,
+        <hare@suse.de>, Bart Van Assche <bvanassche@acm.org>,
+        yanaijie <yanaijie@huawei.com>
+References: <bd959b9f-78dd-e0e7-0421-8d7e3cd2f41b@huawei.com>
+ <20200116090347.GA7438@ming.t460p>
+ <825dc368-1b97-b418-dc71-6541b1c20a70@huawei.com>
+ <20200117101602.GA22310@ming.t460p>
+From:   Yufen Yu <yuyufen@huawei.com>
+Message-ID: <f58d9961-b5c5-ef41-2ca7-372106a4a913@huawei.com>
+Date:   Sun, 19 Jan 2020 21:57:40 +0800
+User-Agent: Mozilla/5.0 (Windows NT 10.0; Win64; x64; rv:68.0) Gecko/20100101
+ Thunderbird/68.3.1
 MIME-Version: 1.0
-X-Scanned-By: MIMEDefang 2.79 on 10.5.11.11
-Content-Transfer-Encoding: quoted-printable
+In-Reply-To: <20200117101602.GA22310@ming.t460p>
+Content-Type: text/plain; charset="utf-8"; format=flowed
+Content-Language: en-US
+Content-Transfer-Encoding: 7bit
+X-Originating-IP: [10.173.221.193]
+X-CFilter-Loop: Reflected
 Sender: linux-block-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-megraraid sas is one high end HBA, and the IOPS may reach million level.
-As discussed before, megaraid sas performance can be improved on SSD
-when the device busy check is bypassed.
 
-So set the flag of no_device_queue_for_ssd for megaraid sas.
 
-Cc: Sathya Prakash <sathya.prakash@broadcom.com>
-Cc: Chaitra P B <chaitra.basappa@broadcom.com>
-Cc: Suganath Prabu Subramani <suganath-prabu.subramani@broadcom.com>
-Cc: Kashyap Desai <kashyap.desai@broadcom.com>
-Cc: Sumit Saxena <sumit.saxena@broadcom.com>
-Cc: Shivasharan S <shivasharan.srikanteshwara@broadcom.com>
-Cc: Ewan D. Milne <emilne@redhat.com>
-Cc: Christoph Hellwig <hch@lst.de>,
-Cc: Hannes Reinecke <hare@suse.de>
-Cc: Bart Van Assche <bart.vanassche@wdc.com>
-Signed-off-by: Ming Lei <ming.lei@redhat.com>
----
- drivers/scsi/megaraid/megaraid_sas_base.c | 1 +
- 1 file changed, 1 insertion(+)
+On 2020/1/17 18:16, Ming Lei wrote:
+> On Fri, Jan 17, 2020 at 03:19:18PM +0800, Yufen Yu wrote:
+>> Hi, ming
+>>
+>> On 2020/1/16 17:03, Ming Lei wrote:
+>>> On Thu, Jan 16, 2020 at 12:06:02PM +0800, Yufen Yu wrote:
+>>>> Hi, all
+>>>>
+>>>> Shared tags is introduced to maintains a notion of fairness between
+>>>> active users. This may be good for nvme with multiple namespace to
+>>>> avoid starving some users. Right?
+>>>
+>>> Actually nvme namespace is LUN of scsi world.
+>>>
+>>> Shared tags isn't for maintaining fairness, it is just natural sw
+>>> implementation of scsi host's tags, since every scsi host shares
+>>> tags among all LUNs. If the SCSI host supports real MQ, the tags
+>>> is hw-queue wide, otherwise it is host wide.
+>>>
+>>>>
+>>>> However, I don't understand why we introduce the shared tag for SCSI.
+>>>> IMO, there are two concerns for scsi shared tag:
+>>>>
+>>>> 1) For now, 'shost->can_queue' is used as queue depth in block layer.
+>>>> And all target drivers share tags on one host. Then, the max tags for
+>>>> each target can get:
+>>>>
+>>>> 	depth = max((bt->sb.depth + users - 1) / users, 4U);
+>>>>
+>>>> But, each target driver may have their own capacity of tags and queue depth.
+>>>> Does shared tag limit target device bandwidth?
+>>>
+>>> No, if the 'target driver' means LUN, each LUN hasn't its independent
+>>> tags, maybe it has its own queue depth, which is often for maintaining
+>>> fairness among all active LUNs, not real queue depth.
+>>>
+>>> You may see the patches[1] which try to bypass per-LUN queue depth for SSD.
+>>>
+>>> [1] https://lore.kernel.org/linux-block/20191118103117.978-1-ming.lei@redhat.com/
+>>>
+>>>>
+>>>> 2) When add new target or remove device, it may need to freeze other device
+>>>> to update hctx->flags of BLK_MQ_F_TAG_SHARED. That may hurt performance.
+>>>
+>>> Add/removing device isn't a frequent event, so it shouldn't be a real
+>>> issue, or you have seen effect on real use case?
+>>
+>> Thanks a lot for your detailed explanation.
+>>
+>> We found that removing scsi device will delay a long time (such as 6 * 30s)
+>> for waiting the other device in the same host to complete all IOs, where
+>> some IO retry multiple times. If our driver allowed more times to retry,
+>> removing device will wait longer. That is not expected.
+> 
+> I'd suggest you to figure out why IO timeout is triggered in your
+> device.
+> 
 
-diff --git a/drivers/scsi/megaraid/megaraid_sas_base.c b/drivers/scsi/meg=
-araid/megaraid_sas_base.c
-index 43cbc749f66c..8f3770af7382 100644
---- a/drivers/scsi/megaraid/megaraid_sas_base.c
-+++ b/drivers/scsi/megaraid/megaraid_sas_base.c
-@@ -3424,6 +3424,7 @@ static struct scsi_host_template megasas_template =3D=
- {
- 	.bios_param =3D megasas_bios_param,
- 	.change_queue_depth =3D scsi_change_queue_depth,
- 	.max_segment_size =3D 0xffffffff,
-+	.no_device_queue_for_ssd =3D 1,
- };
-=20
- /**
---=20
-2.20.1
+I agree with your suggestion. But we cannot prevent IO timeout and
+retrying multiple times in device. Right? I think we should handle
+gently even in that situation.
 
+>>
+>> In fact, that is not problem before switching scsi blk-mq. All target
+>> devices are independent when removing.
+> 
+> Is there IO timeout triggered before switching to scsi-mq?
+> 
+> I guess it shouldn't be one issue if io timeout isn't triggered >
+> However, there is still something we can improve, such as,
+> start concurrent queue freeze in blk_mq_update_tag_set_depth().
+
+Before switching scsi-mq, timeout have been triggered as well.
+But there is no delay when remove device. And it would not need to
+wait IOs in the other device to complete. So, I also think we may
+need to improve the freeze for scsi-mq.
+
+Thanks,
+Yufen
