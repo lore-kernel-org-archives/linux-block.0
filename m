@@ -2,133 +2,176 @@ Return-Path: <SRS0=3pRW=3I=vger.kernel.org=linux-block-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-2.3 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
-	MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,USER_AGENT_SANE_1 autolearn=no
-	autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-7.1 required=3.0 tests=DKIMWL_WL_HIGH,DKIM_SIGNED,
+	DKIM_VALID,DKIM_VALID_AU,INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,
+	SPF_HELO_NONE,SPF_PASS autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id BA363C33CB1
-	for <linux-block@archiver.kernel.org>; Sun, 19 Jan 2020 13:57:53 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 728E5C33CB1
+	for <linux-block@archiver.kernel.org>; Sun, 19 Jan 2020 14:48:42 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.kernel.org (Postfix) with ESMTP id 9391C20684
-	for <linux-block@archiver.kernel.org>; Sun, 19 Jan 2020 13:57:53 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id 3F36F2072B
+	for <linux-block@archiver.kernel.org>; Sun, 19 Jan 2020 14:48:42 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+	s=default; t=1579445322;
+	bh=h0OccMla/A1fPRNcbM4J8EJeEen0km861giS0yVbNuI=;
+	h=Date:From:To:Cc:Subject:References:In-Reply-To:List-ID:From;
+	b=hK8WK1CD10c1X2aNw4KoOqXmjOtqTswk/2VCLPYhiXF3Fl11lrE/erzQa3bPP89uS
+	 ZLIr0xjCRVg5LNZCkazCU5wzH9HCdoObh9VdcWGsdf/jN7YSYwRlpR8xnoAtj7lAqq
+	 R6UJlFxjAYfg18+ziKuy0Ih6/zNdMs1WtN+yMZBc=
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1726860AbgASN5w (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Sun, 19 Jan 2020 08:57:52 -0500
-Received: from szxga05-in.huawei.com ([45.249.212.191]:9202 "EHLO huawei.com"
-        rhost-flags-OK-OK-OK-FAIL) by vger.kernel.org with ESMTP
-        id S1726798AbgASN5w (ORCPT <rfc822;linux-block@vger.kernel.org>);
-        Sun, 19 Jan 2020 08:57:52 -0500
-Received: from DGGEMS414-HUB.china.huawei.com (unknown [172.30.72.59])
-        by Forcepoint Email with ESMTP id 32DB0FD208351914C84A;
-        Sun, 19 Jan 2020 21:57:50 +0800 (CST)
-Received: from [10.173.221.193] (10.173.221.193) by
- DGGEMS414-HUB.china.huawei.com (10.3.19.214) with Microsoft SMTP Server id
- 14.3.439.0; Sun, 19 Jan 2020 21:57:41 +0800
-Subject: Re: [Question] about shared tags for SCSI drivers
-To:     Ming Lei <ming.lei@redhat.com>
-CC:     "linux-block@vger.kernel.org" <linux-block@vger.kernel.org>,
-        <john.garry@huawei.com>, "axboe@kernel.dk" <axboe@kernel.dk>,
-        <hare@suse.de>, Bart Van Assche <bvanassche@acm.org>,
-        yanaijie <yanaijie@huawei.com>
-References: <bd959b9f-78dd-e0e7-0421-8d7e3cd2f41b@huawei.com>
- <20200116090347.GA7438@ming.t460p>
- <825dc368-1b97-b418-dc71-6541b1c20a70@huawei.com>
- <20200117101602.GA22310@ming.t460p>
-From:   Yufen Yu <yuyufen@huawei.com>
-Message-ID: <f58d9961-b5c5-ef41-2ca7-372106a4a913@huawei.com>
-Date:   Sun, 19 Jan 2020 21:57:40 +0800
-User-Agent: Mozilla/5.0 (Windows NT 10.0; Win64; x64; rv:68.0) Gecko/20100101
- Thunderbird/68.3.1
+        id S1726890AbgASOsl (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Sun, 19 Jan 2020 09:48:41 -0500
+Received: from mail.kernel.org ([198.145.29.99]:54844 "EHLO mail.kernel.org"
+        rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
+        id S1726778AbgASOsl (ORCPT <rfc822;linux-block@vger.kernel.org>);
+        Sun, 19 Jan 2020 09:48:41 -0500
+Received: from localhost (unknown [193.47.165.251])
+        (using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+        (No client certificate requested)
+        by mail.kernel.org (Postfix) with ESMTPSA id E632620684;
+        Sun, 19 Jan 2020 14:48:39 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+        s=default; t=1579445320;
+        bh=h0OccMla/A1fPRNcbM4J8EJeEen0km861giS0yVbNuI=;
+        h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
+        b=rHOkWOtNoq5tbL4H5TExYk084il/0c0utd3VT6ksbXowsGxLmpwKShrGhhoDNMMSZ
+         JfxTPNz2hGgpIk42pjtPEF+bnjKouRC58siY4z8GfF6VSGr+UsvSAef3AlGyEixDMB
+         f73x9BwdkjTbCn/N5qorfPt4RYbFMXhQuJywaZRk=
+Date:   Sun, 19 Jan 2020 16:48:37 +0200
+From:   Leon Romanovsky <leon@kernel.org>
+To:     Jack Wang <jinpuwang@gmail.com>
+Cc:     linux-block@vger.kernel.org, linux-rdma@vger.kernel.org,
+        axboe@kernel.dk, hch@infradead.org, sagi@grimberg.me,
+        bvanassche@acm.org, dledford@redhat.com, jgg@ziepe.ca,
+        danil.kipnis@cloud.ionos.com, jinpu.wang@cloud.ionos.com,
+        rpenyaev@suse.de
+Subject: Re: [PATCH v7 04/25] RDMA/rtrs: core: lib functions shared between
+ client and server modules
+Message-ID: <20200119144837.GE51881@unreal>
+References: <20200116125915.14815-1-jinpuwang@gmail.com>
+ <20200116125915.14815-5-jinpuwang@gmail.com>
 MIME-Version: 1.0
-In-Reply-To: <20200117101602.GA22310@ming.t460p>
-Content-Type: text/plain; charset="utf-8"; format=flowed
-Content-Language: en-US
-Content-Transfer-Encoding: 7bit
-X-Originating-IP: [10.173.221.193]
-X-CFilter-Loop: Reflected
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <20200116125915.14815-5-jinpuwang@gmail.com>
 Sender: linux-block-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
+On Thu, Jan 16, 2020 at 01:58:54PM +0100, Jack Wang wrote:
+> From: Jack Wang <jinpu.wang@cloud.ionos.com>
+>
+> This is a set of library functions existing as a rtrs-core module,
+> used by client and server modules.
+>
+> Mainly these functions wrap IB and RDMA calls and provide a bit higher
+> abstraction for implementing of RTRS protocol on client or server
+> sides.
+>
+> Signed-off-by: Danil Kipnis <danil.kipnis@cloud.ionos.com>
+> Signed-off-by: Jack Wang <jinpu.wang@cloud.ionos.com>
+> ---
+>  drivers/infiniband/ulp/rtrs/rtrs.c | 597 +++++++++++++++++++++++++++++
+>  1 file changed, 597 insertions(+)
+>  create mode 100644 drivers/infiniband/ulp/rtrs/rtrs.c
+>
+> diff --git a/drivers/infiniband/ulp/rtrs/rtrs.c b/drivers/infiniband/ulp/rtrs/rtrs.c
+> new file mode 100644
+> index 000000000000..7b84d76e2a67
+> --- /dev/null
+> +++ b/drivers/infiniband/ulp/rtrs/rtrs.c
+> @@ -0,0 +1,597 @@
+> +// SPDX-License-Identifier: GPL-2.0-or-later
+> +/*
+> + * RDMA Transport Layer
+> + *
+> + * Copyright (c) 2014 - 2018 ProfitBricks GmbH. All rights reserved.
+> + *
+> + * Copyright (c) 2018 - 2019 1&1 IONOS Cloud GmbH. All rights reserved.
+> + *
+> + * Copyright (c) 2019 - 2020 1&1 IONOS SE. All rights reserved.
+> + */
+> +#undef pr_fmt
+> +#define pr_fmt(fmt) KBUILD_MODNAME " L" __stringify(__LINE__) ": " fmt
+> +
+> +#include <linux/module.h>
+> +#include <linux/inet.h>
+> +
+> +#include "rtrs-pri.h"
+> +#include "rtrs-log.h"
+> +
+> +MODULE_DESCRIPTION("RDMA Transport Core");
+> +MODULE_LICENSE("GPL");
+> +
+> +struct rtrs_iu *rtrs_iu_alloc(u32 queue_size, size_t size, gfp_t gfp_mask,
+> +			      struct ib_device *dma_dev,
+> +			      enum dma_data_direction dir,
+> +			      void (*done)(struct ib_cq *cq, struct ib_wc *wc))
+> +{
+> +	struct rtrs_iu *ius, *iu;
+> +	int i;
+> +
+> +	WARN_ON(!queue_size);
+> +	ius = kcalloc(queue_size, sizeof(*ius), gfp_mask);
+> +	if (unlikely(!ius))
+> +		return NULL;
 
+Let's do not add useless WARN_ON() and unlikely to every error path.
 
-On 2020/1/17 18:16, Ming Lei wrote:
-> On Fri, Jan 17, 2020 at 03:19:18PM +0800, Yufen Yu wrote:
->> Hi, ming
->>
->> On 2020/1/16 17:03, Ming Lei wrote:
->>> On Thu, Jan 16, 2020 at 12:06:02PM +0800, Yufen Yu wrote:
->>>> Hi, all
->>>>
->>>> Shared tags is introduced to maintains a notion of fairness between
->>>> active users. This may be good for nvme with multiple namespace to
->>>> avoid starving some users. Right?
->>>
->>> Actually nvme namespace is LUN of scsi world.
->>>
->>> Shared tags isn't for maintaining fairness, it is just natural sw
->>> implementation of scsi host's tags, since every scsi host shares
->>> tags among all LUNs. If the SCSI host supports real MQ, the tags
->>> is hw-queue wide, otherwise it is host wide.
->>>
->>>>
->>>> However, I don't understand why we introduce the shared tag for SCSI.
->>>> IMO, there are two concerns for scsi shared tag:
->>>>
->>>> 1) For now, 'shost->can_queue' is used as queue depth in block layer.
->>>> And all target drivers share tags on one host. Then, the max tags for
->>>> each target can get:
->>>>
->>>> 	depth = max((bt->sb.depth + users - 1) / users, 4U);
->>>>
->>>> But, each target driver may have their own capacity of tags and queue depth.
->>>> Does shared tag limit target device bandwidth?
->>>
->>> No, if the 'target driver' means LUN, each LUN hasn't its independent
->>> tags, maybe it has its own queue depth, which is often for maintaining
->>> fairness among all active LUNs, not real queue depth.
->>>
->>> You may see the patches[1] which try to bypass per-LUN queue depth for SSD.
->>>
->>> [1] https://lore.kernel.org/linux-block/20191118103117.978-1-ming.lei@redhat.com/
->>>
->>>>
->>>> 2) When add new target or remove device, it may need to freeze other device
->>>> to update hctx->flags of BLK_MQ_F_TAG_SHARED. That may hurt performance.
->>>
->>> Add/removing device isn't a frequent event, so it shouldn't be a real
->>> issue, or you have seen effect on real use case?
->>
->> Thanks a lot for your detailed explanation.
->>
->> We found that removing scsi device will delay a long time (such as 6 * 30s)
->> for waiting the other device in the same host to complete all IOs, where
->> some IO retry multiple times. If our driver allowed more times to retry,
->> removing device will wait longer. That is not expected.
-> 
-> I'd suggest you to figure out why IO timeout is triggered in your
-> device.
-> 
+> +	for (i = 0; i < queue_size; i++) {
+> +		iu = &ius[i];
+> +		iu->buf = kzalloc(size, gfp_mask);
+> +		if (unlikely(!iu->buf))
+> +			goto err;
+> +
+> +		iu->dma_addr = ib_dma_map_single(dma_dev, iu->buf, size, dir);
+> +		if (unlikely(ib_dma_mapping_error(dma_dev, iu->dma_addr)))
+> +			goto err;
+> +
+> +		iu->cqe.done  = done;
+> +		iu->size      = size;
+> +		iu->direction = dir;
+> +	}
+> +	return ius;
+> +err:
+> +	rtrs_iu_free(ius, dir, dma_dev, i);
+> +	return NULL;
+> +}
+> +EXPORT_SYMBOL_GPL(rtrs_iu_alloc);
+> +
+> +void rtrs_iu_free(struct rtrs_iu *ius, enum dma_data_direction dir,
+> +		   struct ib_device *ibdev, u32 queue_size)
+> +{
+> +	struct rtrs_iu *iu;
+> +	int i;
+> +
+> +	if (!ius)
+> +		return;
+> +
+> +	for (i = 0; i < queue_size; i++) {
+> +		iu = &ius[i];
+> +		ib_dma_unmap_single(ibdev, iu->dma_addr, iu->size, dir);
+> +		kfree(iu->buf);
+> +	}
+> +	kfree(ius);
+> +}
+> +EXPORT_SYMBOL_GPL(rtrs_iu_free);
+> +
+> +int rtrs_iu_post_recv(struct rtrs_con *con, struct rtrs_iu *iu)
+> +{
+> +	struct rtrs_sess *sess = con->sess;
+> +	struct ib_recv_wr wr;
+> +	struct ib_sge list;
+> +
+> +	list.addr   = iu->dma_addr;
+> +	list.length = iu->size;
+> +	list.lkey   = sess->dev->ib_pd->local_dma_lkey;
+> +
+> +	if (WARN_ON(list.length == 0)) {
+> +		rtrs_wrn(con->sess,
+> +			  "Posting receive work request failed, sg list is empty\n");
 
-I agree with your suggestion. But we cannot prevent IO timeout and
-retrying multiple times in device. Right? I think we should handle
-gently even in that situation.
+Both WARN_ON and warning message?
 
->>
->> In fact, that is not problem before switching scsi blk-mq. All target
->> devices are independent when removing.
-> 
-> Is there IO timeout triggered before switching to scsi-mq?
-> 
-> I guess it shouldn't be one issue if io timeout isn't triggered >
-> However, there is still something we can improve, such as,
-> start concurrent queue freeze in blk_mq_update_tag_set_depth().
-
-Before switching scsi-mq, timeout have been triggered as well.
-But there is no delay when remove device. And it would not need to
-wait IOs in the other device to complete. So, I also think we may
-need to improve the freeze for scsi-mq.
-
-Thanks,
-Yufen
+Thanks
