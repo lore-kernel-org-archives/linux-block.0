@@ -2,172 +2,169 @@ Return-Path: <SRS0=Aqm6=3J=vger.kernel.org=linux-block-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-9.6 required=3.0 tests=DKIM_SIGNED,DKIM_VALID,
-	DKIM_VALID_AU,FREEMAIL_FORGED_FROMDOMAIN,FREEMAIL_FROM,
-	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,
-	SPF_HELO_NONE,SPF_PASS,USER_AGENT_GIT autolearn=ham autolearn_force=no
+X-Spam-Status: No, score=-2.4 required=3.0 tests=DKIMWL_WL_HIGH,DKIM_SIGNED,
+	DKIM_VALID,DKIM_VALID_AU,HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,
+	SPF_HELO_NONE,SPF_PASS,USER_AGENT_SANE_1 autolearn=no autolearn_force=no
 	version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id E86C6C32771
-	for <linux-block@archiver.kernel.org>; Mon, 20 Jan 2020 22:26:43 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id B5989C33CAA
+	for <linux-block@archiver.kernel.org>; Mon, 20 Jan 2020 22:59:16 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.kernel.org (Postfix) with ESMTP id B408222522
-	for <linux-block@archiver.kernel.org>; Mon, 20 Jan 2020 22:26:43 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id 8A74722522
+	for <linux-block@archiver.kernel.org>; Mon, 20 Jan 2020 22:59:16 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="eyvVr/Vd"
+	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="WMoUJnxP"
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1726816AbgATW0n (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Mon, 20 Jan 2020 17:26:43 -0500
-Received: from mail-pl1-f193.google.com ([209.85.214.193]:43464 "EHLO
-        mail-pl1-f193.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1726752AbgATW0n (ORCPT
+        id S1726816AbgATW7P (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Mon, 20 Jan 2020 17:59:15 -0500
+Received: from us-smtp-delivery-1.mimecast.com ([207.211.31.120]:52633 "EHLO
+        us-smtp-1.mimecast.com" rhost-flags-OK-OK-OK-FAIL) by vger.kernel.org
+        with ESMTP id S1726607AbgATW7P (ORCPT
         <rfc822;linux-block@vger.kernel.org>);
-        Mon, 20 Jan 2020 17:26:43 -0500
-Received: by mail-pl1-f193.google.com with SMTP id p27so412510pli.10;
-        Mon, 20 Jan 2020 14:26:42 -0800 (PST)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20161025;
-        h=from:to:cc:subject:date:message-id:mime-version
-         :content-transfer-encoding;
-        bh=qPHXmfgTKX2jhDKGAsUFE7QXN74mgD0rsNUEzaus+QA=;
-        b=eyvVr/VdB9Sz4J21uRBIcJ/5PKkVVxf60DWhKnlCnPhPGDGEsZRAdZa/foPHOd/LDW
-         DnHWi7p+dz4hNMKO8ENxFHk7Obmjz0VTKrzS/WIomKaU/faRTVbxIUI/V0PRc2BnWSk9
-         AS85dphzxlt+/SpdU9yuJgdiO9TnlyqnY0aV5luHNYTJ+WqI1lLIdGjmn2l5P2pCXwou
-         dcRqRo8EPn3rgRylp1P8JCL3BkfAGVuGPoEwOG5+6rdNhKr4h1qr80Ek2OQWzFrqg7y+
-         XXFziPy2lUUg/4pQ/tScV4DwIgSkibaAPUNS7Lh1PNQXQPt1p3WENcsUJBGajqIAyw2w
-         LRRg==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20161025;
-        h=x-gm-message-state:from:to:cc:subject:date:message-id:mime-version
-         :content-transfer-encoding;
-        bh=qPHXmfgTKX2jhDKGAsUFE7QXN74mgD0rsNUEzaus+QA=;
-        b=Ffs8xIM/BC/ujqpojqDiVby1qHU8AhOgUvojkRSko7dRBdZfROLlAa8/rHXpHXxTcB
-         T2sFxaEvmPUnnrcfTmfTzxp2IOWf9fjduYpoaerizp9auI5US/oEFChauwfICxoS8T8O
-         xCgRj/1sKxK0yY2jk/IDOyH4lX+dA8IGIv8f5qfrJZZiU9myrtxKNr0YVPKGLPInS31M
-         JxLByDVloAcshnY6YJwZlcfFnSkxbTgVm91YWi59oO4PIB3zn2E+Pa3bjqM1aNEfbGab
-         uCX3lBuwVrslpOl+AEHfpI31bMScaSHZqN8shQV0XLDNB/I9ArbkQILO4KdUnEJ/ATg6
-         EtAQ==
-X-Gm-Message-State: APjAAAV+eAW3be+n/ioZQQwjpW6lzkhb1Nqy0R5MBbBrdLZUaIH1kZ7z
-        hf4v+IMU3stb1qM3A+8A5TzJpx5iwy0=
-X-Google-Smtp-Source: APXvYqxX5GDDR8FP/ent9qARAT8WgUzuWm6S9rRLHQlTncdNJ1guWbbpNwN91TAN74LpsKQl+niJvg==
-X-Received: by 2002:a17:902:7596:: with SMTP id j22mr2024446pll.335.1579559201782;
-        Mon, 20 Jan 2020 14:26:41 -0800 (PST)
-Received: from tw-172-25-31-76.office.twttr.net ([8.25.197.24])
-        by smtp.gmail.com with ESMTPSA id o16sm38649873pgl.58.2020.01.20.14.26.41
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Mon, 20 Jan 2020 14:26:41 -0800 (PST)
-From:   Cong Wang <xiyou.wangcong@gmail.com>
-To:     linux-kernel@vger.kernel.org
-Cc:     linux-block@vger.kernel.org, Cong Wang <xiyou.wangcong@gmail.com>,
-        Jens Axboe <axboe@kernel.dk>,
-        Steven Rostedt <rostedt@goodmis.org>
-Subject: [Patch v2] block: introduce block_rq_error tracepoint
-Date:   Mon, 20 Jan 2020 14:26:18 -0800
-Message-Id: <20200120222618.1456-1-xiyou.wangcong@gmail.com>
-X-Mailer: git-send-email 2.21.1
+        Mon, 20 Jan 2020 17:59:15 -0500
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+        s=mimecast20190719; t=1579561154;
+        h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+         to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+         content-transfer-encoding:content-transfer-encoding:
+         in-reply-to:in-reply-to:references:references;
+        bh=UYSjWv1dfnioBe8F1SvdnjqlkR0e7zTphIpvFJSRRIE=;
+        b=WMoUJnxPrxB3Lp6s0xqQE2I42FEfi8x6pN8GOOmRzyovzTaSEeuxf24WjXyk6R9I6D7j83
+        PxYg5hlYwI4AgFBIZ9+CdbhtXaEDpT7kHpAyqXWtc71+AZ1wOk+JUee13x7tucvp1kAKkW
+        hYbR312d+kIH0Twz+l7klogrenh1Q7k=
+Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
+ [209.132.183.4]) (Using TLS) by relay.mimecast.com with ESMTP id
+ us-mta-305-FxJAN8_wOWiCy0tquRdetw-1; Mon, 20 Jan 2020 17:59:10 -0500
+X-MC-Unique: FxJAN8_wOWiCy0tquRdetw-1
+Received: from smtp.corp.redhat.com (int-mx07.intmail.prod.int.phx2.redhat.com [10.5.11.22])
+        (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
+        (No client certificate requested)
+        by mimecast-mx01.redhat.com (Postfix) with ESMTPS id 2F5CB18FF661;
+        Mon, 20 Jan 2020 22:59:09 +0000 (UTC)
+Received: from ming.t460p (ovpn-8-16.pek2.redhat.com [10.72.8.16])
+        by smtp.corp.redhat.com (Postfix) with ESMTPS id AF5D61001B2D;
+        Mon, 20 Jan 2020 22:59:02 +0000 (UTC)
+Date:   Tue, 21 Jan 2020 06:58:58 +0800
+From:   Ming Lei <ming.lei@redhat.com>
+To:     Zhiqiang Liu <liuzhiqiang26@huawei.com>
+Cc:     Jens Axboe <axboe@kernel.dk>, linux-block@vger.kernel.org,
+        "linux-kernel@vger.kernel.org" <linux-kernel@vger.kernel.org>,
+        Mingfangsen <mingfangsen@huawei.com>, Guiyao <guiyao@huawei.com>,
+        zhangsaisai <zhangsaisai@huawei.com>,
+        "wubo (T)" <wubo40@huawei.com>
+Subject: Re: [PATCH V3] brd: check and limit max_part par
+Message-ID: <20200120225858.GB19571@ming.t460p>
+References: <c8236e55-f64f-ef40-b394-8b7e86ce50df@huawei.com>
+ <20200115022725.GA14585@ming.t460p>
+ <ce5823ea-2183-90df-05b0-c02d1f654be3@huawei.com>
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
+Content-Type: text/plain; charset=iso-8859-1
+Content-Disposition: inline
+In-Reply-To: <ce5823ea-2183-90df-05b0-c02d1f654be3@huawei.com>
+User-Agent: Mutt/1.12.1 (2019-06-15)
+X-Scanned-By: MIMEDefang 2.84 on 10.5.11.22
+Content-Transfer-Encoding: quoted-printable
 Sender: linux-block-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-Currently, rasdaemon uses the existing tracepoint block_rq_complete
-and filters out non-error cases in order to capture block disk errors.
+On Mon, Jan 20, 2020 at 09:14:50PM +0800, Zhiqiang Liu wrote:
+>=20
+>=20
+> On 2020/1/15 10:27, Ming Lei wrote:
+>=20
+> >=20
+> >>  MODULE_PARM_DESC(rd_nr, "Maximum number of brd devices");
+> >>
+> >>  unsigned long rd_size =3D CONFIG_BLK_DEV_RAM_SIZE;
+> >>  module_param(rd_size, ulong, 0444);
+> >>  MODULE_PARM_DESC(rd_size, "Size of each RAM disk in kbytes.");
+> >>
+> >> -static int max_part =3D 1;
+> >> -module_param(max_part, int, 0444);
+> >> +static unsigned int max_part =3D 1;
+> >> +module_param(max_part, uint, 0444);
+> >=20
+> > The above change isn't needed.
+> Thanks for your suggestion.
+> I will remove that in v4 patch.
+> >=20
+> >>  MODULE_PARM_DESC(max_part, "Num Minors to reserve between devices")=
+;
+> >>
+> >>  MODULE_LICENSE("GPL");
+> >> @@ -393,7 +393,14 @@ static struct brd_device *brd_alloc(int i)
+> >>  	if (!disk)
+> >>  		goto out_free_queue;
+> >>  	disk->major		=3D RAMDISK_MAJOR;
+> >> -	disk->first_minor	=3D i * max_part;
+> >> +	/*
+> >> +	 * Clear .minors when running out of consecutive minor space since
+> >> +	 * GENHD_FL_EXT_DEVT is set, and we can allocate from extended dev=
+t.
+> >> +	 */
+> >> +	if ((i * disk->minors) & ~MINORMASK)
+> >> +		disk->minors =3D 0;
+> >> +	else
+> >> +		disk->first_minor =3D i * disk->minors;
+> >=20
+> > The above looks a bit ugly, one nice way could be to change in
+> > brd_alloc():
+> >=20
+> > 	disk =3D brd->brd_disk =3D alloc_disk(((i * max_part) & ~MINORMASK) =
+?
+> > 		0 : max_part);
+>=20
+> I will change it as your suggestion.
+>=20
+> >=20
+> >>  	disk->fops		=3D &brd_fops;
+> >>  	disk->private_data	=3D brd;
+> >>  	disk->queue		=3D brd->brd_queue;
+> >> @@ -468,6 +475,21 @@ static struct kobject *brd_probe(dev_t dev, int=
+ *part, void *data)
+> >>  	return kobj;
+> >>  }
+> >>
+> >> +static inline void brd_check_and_reset_par(void)
+> >> +{
+> >> +	if (unlikely(!rd_nr))
+> >> +		rd_nr =3D 1;
+> >=20
+> > zero rd_nr should work as expected, given user can create dev file vi=
+a
+> > mknod, and brd_probe() will be called for populate brd disk/queue whe=
+n
+> > the disk file is opened.
+> >=20
+> >> +static inline void brd_check_and_reset_par(void)
+> >> +{
+> >> + =A0 =A0 =A0 if (unlikely(!rd_nr))
+> >> + =A0 =A0 =A0 =A0 =A0 =A0 =A0 rd_nr =3D 1;
+> >> +
+> >> + =A0 =A0 =A0 if (unlikely(!max_part))
+> >> + =A0 =A0 =A0 =A0 =A0 =A0 =A0 max_part =3D 1;
+> >=20
+> > Another limit is that 'max_part' needs to be divided exactly by (1U <=
+<
+> > MINORBITS), something like:
+> >=20
+> > 	max_part =3D 1UL << fls(max_part)
+>=20
+> Do we have to limit that 'max_part' needs to be divided exactly by (1U =
+<<
+> > MINORBITS)? As your suggestion, the i * max_part is larger than MINOR=
+MASK,
+> we can allocate from extended devt.
 
-But there are a few problems with this approach:
+Exact dividing is for reserving same minors for all disks with
+RAMDISK_MAJOR, otherwise there is still chance to get same dev_t when
+adding partitions.
 
-1. Even kernel trace filter could do the filtering work, there is
-   still some overhead after we enable this tracepoint.
+Extended devt is for covering more disks, not related with 'max_part'.
 
-2. The filter is merely based on errno, which does not align with kernel
-   logic to check the errors for print_req_error().
 
-3. block_rq_complete only provides dev major and minor to identify
-   the block device, it is not convenient to use in user-space.
-
-So introduce a new tracepoint block_rq_error just for the error case
-and provides the device name for convenience too. With this patch,
-rasdaemon could switch to block_rq_error.
-
-Cc: Jens Axboe <axboe@kernel.dk>
-Cc: Steven Rostedt <rostedt@goodmis.org>
-Signed-off-by: Cong Wang <xiyou.wangcong@gmail.com>
----
- block/blk-core.c             |  4 +++-
- include/trace/events/block.h | 43 ++++++++++++++++++++++++++++++++++++
- 2 files changed, 46 insertions(+), 1 deletion(-)
-
-diff --git a/block/blk-core.c b/block/blk-core.c
-index 089e890ab208..0c7ad70d06be 100644
---- a/block/blk-core.c
-+++ b/block/blk-core.c
-@@ -1450,8 +1450,10 @@ bool blk_update_request(struct request *req, blk_status_t error,
- #endif
- 
- 	if (unlikely(error && !blk_rq_is_passthrough(req) &&
--		     !(req->rq_flags & RQF_QUIET)))
-+		     !(req->rq_flags & RQF_QUIET))) {
-+		trace_block_rq_error(req, blk_status_to_errno(error), nr_bytes);
- 		print_req_error(req, error, __func__);
-+	}
- 
- 	blk_account_io_completion(req, nr_bytes);
- 
-diff --git a/include/trace/events/block.h b/include/trace/events/block.h
-index 81b43f5bdf23..37e99be19536 100644
---- a/include/trace/events/block.h
-+++ b/include/trace/events/block.h
-@@ -145,6 +145,49 @@ TRACE_EVENT(block_rq_complete,
- 		  __entry->nr_sector, __entry->error)
- );
- 
-+/**
-+ * block_rq_error - block IO operation error reported by device driver
-+ * @rq: block operations request
-+ * @error: status code
-+ * @nr_bytes: number of completed bytes
-+ *
-+ * The block_rq_error tracepoint event indicates that some portion
-+ * of operation request has failed as reported by the device driver.
-+ */
-+TRACE_EVENT(block_rq_error,
-+
-+	TP_PROTO(struct request *rq, int error, unsigned int nr_bytes),
-+
-+	TP_ARGS(rq, error, nr_bytes),
-+
-+	TP_STRUCT__entry(
-+		__field(  dev_t,	dev			)
-+		__dynamic_array( char,  name,	DISK_NAME_LEN	)
-+		__field(  sector_t,	sector			)
-+		__field(  unsigned int,	nr_sector		)
-+		__field(  int,		error			)
-+		__array(  char,		rwbs,	RWBS_LEN	)
-+		__dynamic_array( char,	cmd,	1		)
-+	),
-+
-+	TP_fast_assign(
-+		__entry->dev	   = rq->rq_disk ? disk_devt(rq->rq_disk) : 0;
-+		__assign_str(name,   rq->rq_disk ? rq->rq_disk->disk_name : "?");
-+		__entry->sector    = blk_rq_pos(rq);
-+		__entry->nr_sector = nr_bytes >> 9;
-+		__entry->error     = error;
-+
-+		blk_fill_rwbs(__entry->rwbs, rq->cmd_flags, nr_bytes);
-+		__get_str(cmd)[0] = '\0';
-+	),
-+
-+	TP_printk("%d,%d %s %s (%s) %llu + %u [%d]",
-+		  MAJOR(__entry->dev), MINOR(__entry->dev),
-+		  __get_str(name), __entry->rwbs, __get_str(cmd),
-+		  (unsigned long long)__entry->sector,
-+		  __entry->nr_sector, __entry->error)
-+);
-+
- DECLARE_EVENT_CLASS(block_rq,
- 
- 	TP_PROTO(struct request_queue *q, struct request *rq),
--- 
-2.21.1
+Thanks,
+Ming
 
