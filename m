@@ -2,210 +2,154 @@ Return-Path: <SRS0=Aqm6=3J=vger.kernel.org=linux-block-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-6.8 required=3.0 tests=DKIM_SIGNED,DKIM_VALID,
-	DKIM_VALID_AU,HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,
-	SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS autolearn=ham autolearn_force=no
-	version=3.4.0
+X-Spam-Status: No, score=-8.2 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
+	INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,
+	URIBL_BLOCKED,USER_AGENT_SANE_2 autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 5D90EC2D0DB
-	for <linux-block@archiver.kernel.org>; Mon, 20 Jan 2020 17:31:04 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id C5152C2D0DB
+	for <linux-block@archiver.kernel.org>; Mon, 20 Jan 2020 18:28:15 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.kernel.org (Postfix) with ESMTP id 2FD5721835
-	for <linux-block@archiver.kernel.org>; Mon, 20 Jan 2020 17:31:04 +0000 (UTC)
-Authentication-Results: mail.kernel.org;
-	dkim=pass (2048-bit key) header.d=cloud.ionos.com header.i=@cloud.ionos.com header.b="H5mbDOJR"
+	by mail.kernel.org (Postfix) with ESMTP id A563F22525
+	for <linux-block@archiver.kernel.org>; Mon, 20 Jan 2020 18:28:15 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1726991AbgATRbD (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Mon, 20 Jan 2020 12:31:03 -0500
-Received: from mail-io1-f67.google.com ([209.85.166.67]:34023 "EHLO
-        mail-io1-f67.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1726982AbgATRbD (ORCPT
-        <rfc822;linux-block@vger.kernel.org>);
-        Mon, 20 Jan 2020 12:31:03 -0500
-Received: by mail-io1-f67.google.com with SMTP id z193so34505566iof.1
-        for <linux-block@vger.kernel.org>; Mon, 20 Jan 2020 09:31:02 -0800 (PST)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=cloud.ionos.com; s=google;
-        h=mime-version:references:in-reply-to:from:date:message-id:subject:to
-         :cc;
-        bh=5BJlqX/66I069N73XeW4rXMR5CUG0kXb0Zp80KRIp8s=;
-        b=H5mbDOJRzQ/6FawqIuLtmdHU+itECK8icsEFW0dFD1reax9SYMryb5WeU+QLlGZdVf
-         5O6tdiyxf3J1dMLs94LV1qRw1w9dJTRMwF9NrRXRvB5ytDyqdyegKfLbCTNxWRBWkg0U
-         z3STG/YOghf7rBnW/uB0G8zEgthqwx4fI3fwFx+cshh3x93ViVBiouliRvl/U84iyOLd
-         +cL5TjgX4XMpWpCDxqFYm3SsBbe+wkZw3ignwncO8o/e13VjlUlXpzIpoQExYYIX9b0f
-         NzbtOOrb7uXpbdBYo3x+idibhKBuQ3W4YI/JbQIxXGoQFSTJSKvzyLOYIodbgqnkTj/A
-         iR/Q==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20161025;
-        h=x-gm-message-state:mime-version:references:in-reply-to:from:date
-         :message-id:subject:to:cc;
-        bh=5BJlqX/66I069N73XeW4rXMR5CUG0kXb0Zp80KRIp8s=;
-        b=EUzbvCUQ0cWAr1scghKXbK5I93pRWsnOaI5zzLFk0oNPlw3SHM95rUX8Q9FK0TlOh9
-         qKQ9CC6CZOoQVEmwBAk4JgDUisXtwjTdlVhZ6LR+7pc8PfThfVb2cYch1wr+R1wZlDDe
-         TpKdcJjmrwMElyu7sEvkT0I3k99zUCCz4BG3LcyLs8pKqk+iFaK9SkNaoAEQecjCFHle
-         3UYvrpdnGAJwFgVhAy9UkEQOTi1iNG3HhvD5OyhyQMfIbYzaiMBVDpLu5SAjgtU5GB1l
-         Rbub+uPcfHWkcuecu4OLG1UBDmhLx4rkHmt911QKKsmkSki1LpG87kG8q/ft2xr/pS5d
-         Mnkw==
-X-Gm-Message-State: APjAAAUSDS8UpsQ2SdWOP6Twb1Otl6fhRZf0qVfFFrQBFa0o0xjWNse4
-        /Jcg3BspyrvuDarbaX/7ld9sRjoz0VNMApoeeTDYlQ==
-X-Google-Smtp-Source: APXvYqw4b3gNE0fb6oLmVNOv4q89TLRTdSh1RBhpPKd2v7CfGerBbMkxQHjvAGS+pzFIPDjZzblLxoIlRwZSOVYCWoA=
-X-Received: by 2002:a02:ca10:: with SMTP id i16mr132059jak.10.1579541462411;
- Mon, 20 Jan 2020 09:31:02 -0800 (PST)
+        id S1726876AbgATS2P (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Mon, 20 Jan 2020 13:28:15 -0500
+Received: from mail.kernel.org ([198.145.29.99]:58904 "EHLO mail.kernel.org"
+        rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
+        id S1726642AbgATS2P (ORCPT <rfc822;linux-block@vger.kernel.org>);
+        Mon, 20 Jan 2020 13:28:15 -0500
+Received: from gandalf.local.home (cpe-66-24-58-225.stny.res.rr.com [66.24.58.225])
+        (using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+        (No client certificate requested)
+        by mail.kernel.org (Postfix) with ESMTPSA id 9CA2422525;
+        Mon, 20 Jan 2020 18:28:13 +0000 (UTC)
+Date:   Mon, 20 Jan 2020 13:28:12 -0500
+From:   Steven Rostedt <rostedt@goodmis.org>
+To:     Cong Wang <xiyou.wangcong@gmail.com>
+Cc:     linux-kernel@vger.kernel.org, linux-block@vger.kernel.org,
+        Jens Axboe <axboe@kernel.dk>
+Subject: Re: [PATCH] block: introduce block_rq_error tracepoint
+Message-ID: <20200120132812.384274d3@gandalf.local.home>
+In-Reply-To: <20200110221500.19678-1-xiyou.wangcong@gmail.com>
+References: <20200110221500.19678-1-xiyou.wangcong@gmail.com>
+X-Mailer: Claws Mail 3.17.3 (GTK+ 2.24.32; x86_64-pc-linux-gnu)
 MIME-Version: 1.0
-References: <20200116125915.14815-1-jinpuwang@gmail.com> <20200116125915.14815-18-jinpuwang@gmail.com>
- <20200120134815.GH51881@unreal>
-In-Reply-To: <20200120134815.GH51881@unreal>
-From:   Jinpu Wang <jinpu.wang@cloud.ionos.com>
-Date:   Mon, 20 Jan 2020 18:30:51 +0100
-Message-ID: <CAMGffE=+wX2h6bSp+ZwTowWq8NOutVnCfXFqxMupZNCGGOh0sg@mail.gmail.com>
-Subject: Re: [PATCH v7 17/25] block/rnbd: client: main functionality
-To:     Leon Romanovsky <leon@kernel.org>
-Cc:     Jack Wang <jinpuwang@gmail.com>, linux-block@vger.kernel.org,
-        linux-rdma@vger.kernel.org, Jens Axboe <axboe@kernel.dk>,
-        Christoph Hellwig <hch@infradead.org>,
-        Sagi Grimberg <sagi@grimberg.me>,
-        Bart Van Assche <bvanassche@acm.org>,
-        Doug Ledford <dledford@redhat.com>,
-        Jason Gunthorpe <jgg@ziepe.ca>,
-        Danil Kipnis <danil.kipnis@cloud.ionos.com>,
-        Roman Penyaev <rpenyaev@suse.de>
-Content-Type: text/plain; charset="UTF-8"
+Content-Type: text/plain; charset=US-ASCII
+Content-Transfer-Encoding: 7bit
 Sender: linux-block-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-On Mon, Jan 20, 2020 at 2:48 PM Leon Romanovsky <leon@kernel.org> wrote:
->
-> On Thu, Jan 16, 2020 at 01:59:07PM +0100, Jack Wang wrote:
-> > From: Jack Wang <jinpu.wang@cloud.ionos.com>
-> >
-> > This is main functionality of rnbd-client module, which provides
-> > interface to map remote device as local block device /dev/rnbd<N>
-> > and feeds RTRS with IO requests.
-> >
-> > Signed-off-by: Danil Kipnis <danil.kipnis@cloud.ionos.com>
-> > Signed-off-by: Jack Wang <jinpu.wang@cloud.ionos.com>
-> > ---
-> >  drivers/block/rnbd/rnbd-clt.c | 1730 +++++++++++++++++++++++++++++++++
-> >  1 file changed, 1730 insertions(+)
-> >  create mode 100644 drivers/block/rnbd/rnbd-clt.c
-> >
-> > diff --git a/drivers/block/rnbd/rnbd-clt.c b/drivers/block/rnbd/rnbd-clt.c
-> > new file mode 100644
-> > index 000000000000..7d8cb38d3969
-> > --- /dev/null
-> > +++ b/drivers/block/rnbd/rnbd-clt.c
-> > @@ -0,0 +1,1730 @@
-> > +// SPDX-License-Identifier: GPL-2.0-or-later
-> > +/*
-> > + * RDMA Network Block Driver
-> > + *
-> > + * Copyright (c) 2014 - 2018 ProfitBricks GmbH. All rights reserved.
-> > + *
-> > + * Copyright (c) 2018 - 2019 1&1 IONOS Cloud GmbH. All rights reserved.
-> > + *
-> > + * Copyright (c) 2019 - 2020 1&1 IONOS SE. All rights reserved.
-> > + */
-> > +
-> > +#undef pr_fmt
-> > +#define pr_fmt(fmt) KBUILD_MODNAME " L" __stringify(__LINE__) ": " fmt
-> > +
-> > +#include <linux/module.h>
-> > +#include <linux/blkdev.h>
-> > +#include <linux/hdreg.h>
-> > +#include <linux/scatterlist.h>
-> > +#include <linux/idr.h>
-> > +
-> > +#include "rnbd-clt.h"
-> > +
-> > +MODULE_DESCRIPTION("RDMA Network Block Device Client");
-> > +MODULE_LICENSE("GPL");
-> > +
-> > +static int rnbd_client_major;
-> > +static DEFINE_IDA(index_ida);
-> > +static DEFINE_MUTEX(ida_lock);
-> > +static DEFINE_MUTEX(sess_lock);
-> > +static LIST_HEAD(sess_list);
-> > +
-> > +/*
-> > + * Maximum number of partitions an instance can have.
-> > + * 6 bits = 64 minors = 63 partitions (one minor is used for the device itself)
-> > + */
-> > +#define RNBD_PART_BITS               6
-> > +
-> > +static inline bool rnbd_clt_get_sess(struct rnbd_clt_session *sess)
-> > +{
-> > +     return refcount_inc_not_zero(&sess->refcount);
-> > +}
-> > +
-> > +static void free_sess(struct rnbd_clt_session *sess);
-> > +
-> > +static void rnbd_clt_put_sess(struct rnbd_clt_session *sess)
-> > +{
-> > +     might_sleep();
-> > +
-> > +     if (refcount_dec_and_test(&sess->refcount))
-> > +             free_sess(sess);
-> > +}
->
-> I see that this code is for drivers/block and maybe it is a way to do it
-> there, but in RDMA, we don't like abstraction of general and well-known
-> kernel APIs. It looks like kref to me.
-I can try to convert to kref interface if other guys also think it's necessary.
+On Fri, 10 Jan 2020 14:15:00 -0800
+Cong Wang <xiyou.wangcong@gmail.com> wrote:
 
->
-> > +
-> > +static inline bool rnbd_clt_dev_is_mapped(struct rnbd_clt_dev *dev)
-> > +{
-> > +     return dev->dev_state == DEV_STATE_MAPPED;
-> > +}
-> > +
-> > +static void rnbd_clt_put_dev(struct rnbd_clt_dev *dev)
-> > +{
-> > +     might_sleep();
-> > +
-> > +     if (refcount_dec_and_test(&dev->refcount)) {
-> > +             mutex_lock(&ida_lock);
-> > +             ida_simple_remove(&index_ida, dev->clt_device_id);
-> > +             mutex_unlock(&ida_lock);
-> > +             kfree(dev->hw_queues);
-> > +             rnbd_clt_put_sess(dev->sess);
-> > +             kfree(dev);
-> > +     }
-> > +}
-> > +
-> > +static inline bool rnbd_clt_get_dev(struct rnbd_clt_dev *dev)
-> > +{
-> > +     return refcount_inc_not_zero(&dev->refcount);
-> > +}
-> > +
-> > +static int rnbd_clt_set_dev_attr(struct rnbd_clt_dev *dev,
-> > +                              const struct rnbd_msg_open_rsp *rsp)
-> > +{
-> > +     struct rnbd_clt_session *sess = dev->sess;
-> > +
-> > +     if (unlikely(!rsp->logical_block_size))
-> > +             return -EINVAL;
->
-> unlikely() again.
-will remove.
+> Currently, rasdaemon uses the existing tracepoint block_rq_complete
+> and filters out non-error cases in order to capture block disk errors.
+> 
+> But there are a few problems with this approach:
+> 
+> 1. Even kernel trace filter could do the filtering work, there is
+>    still some overhead after we enable this tracepoint.
+> 
+> 2. The filter is merely based on errno, which does not align with kernel
+>    logic to check the errors for print_req_error().
+> 
+> 3. block_rq_complete only provides dev major and minor to identify
+>    the block device, it is not convenient to use in user-space.
+> 
+> So introduce a new tracepoint block_rq_error just for the error case
+> and provides the device name for convenience too. With this patch,
+> rasdaemon could switch to block_rq_error.
+> 
+> Cc: Jens Axboe <axboe@kernel.dk>
+> Cc: Steven Rostedt <rostedt@goodmis.org>
+> Signed-off-by: Cong Wang <xiyou.wangcong@gmail.com>
+> ---
+>  block/blk-core.c             |  4 +++-
+>  include/trace/events/block.h | 43 ++++++++++++++++++++++++++++++++++++
+>  2 files changed, 46 insertions(+), 1 deletion(-)
+> 
+> diff --git a/block/blk-core.c b/block/blk-core.c
+> index 089e890ab208..0c7ad70d06be 100644
+> --- a/block/blk-core.c
+> +++ b/block/blk-core.c
+> @@ -1450,8 +1450,10 @@ bool blk_update_request(struct request *req, blk_status_t error,
+>  #endif
+>  
+>  	if (unlikely(error && !blk_rq_is_passthrough(req) &&
+> -		     !(req->rq_flags & RQF_QUIET)))
+> +		     !(req->rq_flags & RQF_QUIET))) {
+> +		trace_block_rq_error(req, blk_status_to_errno(error), nr_bytes);
+>  		print_req_error(req, error, __func__);
+> +	}
+>  
+>  	blk_account_io_completion(req, nr_bytes);
+>  
+> diff --git a/include/trace/events/block.h b/include/trace/events/block.h
+> index 81b43f5bdf23..a0f63f4d50c4 100644
+> --- a/include/trace/events/block.h
+> +++ b/include/trace/events/block.h
+> @@ -145,6 +145,49 @@ TRACE_EVENT(block_rq_complete,
+>  		  __entry->nr_sector, __entry->error)
+>  );
+>  
+> +/**
+> + * block_rq_error - block IO operation error reported by device driver
+> + * @rq: block operations request
+> + * @error: status code
+> + * @nr_bytes: number of completed bytes
+> + *
+> + * The block_rq_error tracepoint event indicates that some portion
+> + * of operation request has failed as reported by the device driver.
+> + */
+> +TRACE_EVENT(block_rq_error,
+> +
+> +	TP_PROTO(struct request *rq, int error, unsigned int nr_bytes),
+> +
+> +	TP_ARGS(rq, error, nr_bytes),
+> +
+> +	TP_STRUCT__entry(
+> +		__field(  dev_t,	dev			)
+> +		__field(  char *,	name			)
 
-snip
-> > +static void rnbd_put_iu(struct rnbd_clt_session *sess, struct rnbd_iu *iu)
-> > +{
-> > +     if (atomic_dec_and_test(&iu->refcount))
-> > +             rnbd_put_permit(sess, iu->permit);
-> > +}
-> > +
-> > +static void rnbd_softirq_done_fn(struct request *rq)
-> > +{
-> > +     struct rnbd_clt_dev *dev        = rq->rq_disk->private_data;
-> > +     struct rnbd_clt_session *sess   = dev->sess;a
->
-> Please no vertical alignment in new code, it adds a lot of churn if such
-> line is changed later and creates difficulties for the backports.
-It does look nicer when it can be aligned. I don't get why backport is
-an argument here.
+Please make this a string() field and not a pointer to name.
 
-Thanks
+> +		__field(  sector_t,	sector			)
+> +		__field(  unsigned int,	nr_sector		)
+> +		__field(  int,		error			)
+> +		__array(  char,		rwbs,	RWBS_LEN	)
+> +		__dynamic_array( char,	cmd,	1		)
+> +	),
+> +
+> +	TP_fast_assign(
+> +		__entry->dev	   = rq->rq_disk ? disk_devt(rq->rq_disk) : 0;
+> +		__entry->name	   = rq->rq_disk ? rq->rq_disk->disk_name : "?";
+> +		__entry->sector    = blk_rq_pos(rq);
+> +		__entry->nr_sector = nr_bytes >> 9;
+> +		__entry->error     = error;
+> +
+> +		blk_fill_rwbs(__entry->rwbs, rq->cmd_flags, nr_bytes);
+> +		__get_str(cmd)[0] = '\0';
+> +	),
+> +
+> +	TP_printk("%d,%d %s %s (%s) %llu + %u [%d]",
+> +		  MAJOR(__entry->dev), MINOR(__entry->dev),
+> +		  __entry->name, __entry->rwbs, __get_str(cmd),
+
+The ring buffer will hold a pointer to a location that may no longer
+exist, and cause a fault when read. Also, this makes the user space
+utilities trace-cmd and perf useless to know what the name is, as they
+read the raw ring buffer data directly.
+
+-- Steve
+
+
+> +		  (unsigned long long)__entry->sector,
+> +		  __entry->nr_sector, __entry->error)
+> +);
+> +
+>  DECLARE_EVENT_CLASS(block_rq,
+>  
+>  	TP_PROTO(struct request_queue *q, struct request *rq),
+
