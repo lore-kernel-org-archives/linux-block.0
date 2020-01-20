@@ -1,128 +1,347 @@
-Return-Path: <SRS0=3pRW=3I=vger.kernel.org=linux-block-owner@kernel.org>
+Return-Path: <SRS0=Aqm6=3J=vger.kernel.org=linux-block-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-2.3 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
-	MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,USER_AGENT_SANE_1 autolearn=no
-	autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-8.2 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
+	INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,
+	USER_AGENT_SANE_1 autolearn=unavailable autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 5B341C33CAF
-	for <linux-block@archiver.kernel.org>; Sun, 19 Jan 2020 20:58:28 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 063ACC2D0DB
+	for <linux-block@archiver.kernel.org>; Mon, 20 Jan 2020 10:03:19 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.kernel.org (Postfix) with ESMTP id 2D4B2206D7
-	for <linux-block@archiver.kernel.org>; Sun, 19 Jan 2020 20:58:28 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id BF73B2087E
+	for <linux-block@archiver.kernel.org>; Mon, 20 Jan 2020 10:03:18 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1728721AbgASU61 (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Sun, 19 Jan 2020 15:58:27 -0500
-Received: from mail-pj1-f66.google.com ([209.85.216.66]:51707 "EHLO
-        mail-pj1-f66.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1727556AbgASU61 (ORCPT
-        <rfc822;linux-block@vger.kernel.org>);
-        Sun, 19 Jan 2020 15:58:27 -0500
-Received: by mail-pj1-f66.google.com with SMTP id d15so5745565pjw.1;
-        Sun, 19 Jan 2020 12:58:27 -0800 (PST)
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20161025;
-        h=x-gm-message-state:subject:to:cc:references:from:autocrypt
-         :message-id:date:user-agent:mime-version:in-reply-to
-         :content-language:content-transfer-encoding;
-        bh=sDRF0S+xxClm8hhrU117sfSXJq23LM47I4S3KoYDs2o=;
-        b=ZsbDSAY4h2ReHyrouj0anoEbSWXXGACuh6Ajuxq+5LbQyrmYCILMoeKkrn73iVKCxu
-         tnIdevfvGjWXKmFuLF0hOEBE2klVWx12qlNWpxXdr+sDbWVcdcNlfIxMSBf8zBje2+cy
-         rC+i6D6YOLWPUnbK1VoeEEqcQFISpIw3+G+MpXugq/ej4y29ncpEBB60wT+TwDb1+2Qx
-         VbHA/DnVejjHXiuvOPvw6Srk3SZbNyoaVjQBVLt1Tsa/MUqIVA57oIa/4VIrN/8HciH3
-         i1LDmC/VLyWX4YV7h5xzJFBXvX4+j60DtQHCV9Ix22oud3lfNhRSIemQSYv0ysWs85f6
-         yhsA==
-X-Gm-Message-State: APjAAAVEaJPoRZEntqLnl9r+uku9/JJ5zsESAc4x8zDnTmXbSH6o+v6R
-        HEoO788xp/Ee9q9pVtDweCtK2Zq3
-X-Google-Smtp-Source: APXvYqx2MQ2Kiu0RvlhV4RdMSj3W4nMMbUVec6HjWSvK+LhwrqLu9rWnBbLib9yCrZPzcu/UwqNovA==
-X-Received: by 2002:a17:902:7296:: with SMTP id d22mr11942628pll.55.1579467506627;
-        Sun, 19 Jan 2020 12:58:26 -0800 (PST)
-Received: from ?IPv6:2601:647:4000:d7:781f:ca33:6085:f83a? ([2601:647:4000:d7:781f:ca33:6085:f83a])
-        by smtp.gmail.com with ESMTPSA id b19sm35718450pfo.56.2020.01.19.12.58.25
-        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
-        Sun, 19 Jan 2020 12:58:25 -0800 (PST)
-Subject: Re: [PATCH 5/6] scsi: core: don't limit per-LUN queue depth for SSD
- when HBA needs
-To:     Ming Lei <ming.lei@redhat.com>,
-        James Bottomley <James.Bottomley@HansenPartnership.com>,
-        linux-scsi@vger.kernel.org,
-        "Martin K . Petersen" <martin.petersen@oracle.com>
-Cc:     linux-block@vger.kernel.org, Jens Axboe <axboe@kernel.dk>,
-        Sathya Prakash <sathya.prakash@broadcom.com>,
-        Chaitra P B <chaitra.basappa@broadcom.com>,
-        Suganath Prabu Subramani 
-        <suganath-prabu.subramani@broadcom.com>,
-        Kashyap Desai <kashyap.desai@broadcom.com>,
-        Sumit Saxena <sumit.saxena@broadcom.com>,
-        Shivasharan S <shivasharan.srikanteshwara@broadcom.com>,
-        "Ewan D . Milne" <emilne@redhat.com>,
-        Christoph Hellwig <hch@lst.de>, Hannes Reinecke <hare@suse.de>,
-        Bart Van Assche <bart.vanassche@wdc.com>
-References: <20200119071432.18558-1-ming.lei@redhat.com>
- <20200119071432.18558-6-ming.lei@redhat.com>
-From:   Bart Van Assche <bvanassche@acm.org>
-Autocrypt: addr=bvanassche@acm.org; prefer-encrypt=mutual; keydata=
- mQENBFSOu4oBCADcRWxVUvkkvRmmwTwIjIJvZOu6wNm+dz5AF4z0FHW2KNZL3oheO3P8UZWr
- LQOrCfRcK8e/sIs2Y2D3Lg/SL7qqbMehGEYcJptu6mKkywBfoYbtBkVoJ/jQsi2H0vBiiCOy
- fmxMHIPcYxaJdXxrOG2UO4B60Y/BzE6OrPDT44w4cZA9DH5xialliWU447Bts8TJNa3lZKS1
- AvW1ZklbvJfAJJAwzDih35LxU2fcWbmhPa7EO2DCv/LM1B10GBB/oQB5kvlq4aA2PSIWkqz4
- 3SI5kCPSsygD6wKnbRsvNn2mIACva6VHdm62A7xel5dJRfpQjXj2snd1F/YNoNc66UUTABEB
- AAG0JEJhcnQgVmFuIEFzc2NoZSA8YnZhbmFzc2NoZUBhY20ub3JnPokBOQQTAQIAIwUCVI67
- igIbAwcLCQgHAwIBBhUIAgkKCwQWAgMBAh4BAheAAAoJEHFcPTXFzhAJ8QkH/1AdXblKL65M
- Y1Zk1bYKnkAb4a98LxCPm/pJBilvci6boefwlBDZ2NZuuYWYgyrehMB5H+q+Kq4P0IBbTqTa
- jTPAANn62A6jwJ0FnCn6YaM9TZQjM1F7LoDX3v+oAkaoXuq0dQ4hnxQNu792bi6QyVdZUvKc
- macVFVgfK9n04mL7RzjO3f+X4midKt/s+G+IPr4DGlrq+WH27eDbpUR3aYRk8EgbgGKvQFdD
- CEBFJi+5ZKOArmJVBSk21RHDpqyz6Vit3rjep7c1SN8s7NhVi9cjkKmMDM7KYhXkWc10lKx2
- RTkFI30rkDm4U+JpdAd2+tP3tjGf9AyGGinpzE2XY1K5AQ0EVI67igEIAKiSyd0nECrgz+H5
- PcFDGYQpGDMTl8MOPCKw/F3diXPuj2eql4xSbAdbUCJzk2ETif5s3twT2ER8cUTEVOaCEUY3
- eOiaFgQ+nGLx4BXqqGewikPJCe+UBjFnH1m2/IFn4T9jPZkV8xlkKmDUqMK5EV9n3eQLkn5g
- lco+FepTtmbkSCCjd91EfThVbNYpVQ5ZjdBCXN66CKyJDMJ85HVr5rmXG/nqriTh6cv1l1Js
- T7AFvvPjUPknS6d+BETMhTkbGzoyS+sywEsQAgA+BMCxBH4LvUmHYhpS+W6CiZ3ZMxjO8Hgc
- ++w1mLeRUvda3i4/U8wDT3SWuHcB3DWlcppECLkAEQEAAYkBHwQYAQIACQUCVI67igIbDAAK
- CRBxXD01xc4QCZ4dB/0QrnEasxjM0PGeXK5hcZMT9Eo998alUfn5XU0RQDYdwp6/kMEXMdmT
- oH0F0xB3SQ8WVSXA9rrc4EBvZruWQ+5/zjVrhhfUAx12CzL4oQ9Ro2k45daYaonKTANYG22y
- //x8dLe2Fv1By4SKGhmzwH87uXxbTJAUxiWIi1np0z3/RDnoVyfmfbbL1DY7zf2hYXLLzsJR
- mSsED/1nlJ9Oq5fALdNEPgDyPUerqHxcmIub+pF0AzJoYHK5punqpqfGmqPbjxrJLPJfHVKy
- goMj5DlBMoYqEgpbwdUYkH6QdizJJCur4icy8GUNbisFYABeoJ91pnD4IGei3MTdvINSZI5e
-Message-ID: <5a467267-e990-45d1-4b69-18d8c0cd17b3@acm.org>
-Date:   Sun, 19 Jan 2020 12:58:24 -0800
+        id S1726130AbgATKDR (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Mon, 20 Jan 2020 05:03:17 -0500
+Received: from relay.sw.ru ([185.231.240.75]:37130 "EHLO relay.sw.ru"
+        rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
+        id S1726465AbgATKDR (ORCPT <rfc822;linux-block@vger.kernel.org>);
+        Mon, 20 Jan 2020 05:03:17 -0500
+Received: from dhcp-172-16-24-104.sw.ru ([172.16.24.104])
+        by relay.sw.ru with esmtp (Exim 4.92.3)
+        (envelope-from <ktkhai@virtuozzo.com>)
+        id 1itTsh-00089v-6Y; Mon, 20 Jan 2020 13:02:03 +0300
+Subject: Re: [PATCH block v2 2/3] block: Add support for REQ_NOZERO flag
+To:     Bob Liu <bob.liu@oracle.com>, linux-block@vger.kernel.org,
+        linux-kernel@vger.kernel.org, martin.petersen@oracle.com,
+        axboe@kernel.dk, tytso@mit.edu, adilger.kernel@dilger.ca,
+        Chaitanya.Kulkarni@wdc.com, darrick.wong@oracle.com,
+        ming.lei@redhat.com, osandov@fb.com, jthumshirn@suse.de,
+        minwoo.im.dev@gmail.com, damien.lemoal@wdc.com,
+        andrea.parri@amarulasolutions.com, hare@suse.com, tj@kernel.org,
+        ajay.joshi@wdc.com, sagi@grimberg.me, dsterba@suse.com,
+        bvanassche@acm.org, dhowells@redhat.com, asml.silence@gmail.com
+References: <157917805422.88675.6477661554332322975.stgit@localhost.localdomain>
+ <157917816325.88675.16481772163916741596.stgit@localhost.localdomain>
+ <a6f36a19-0607-fc1e-d2da-37aa00c4b76e@oracle.com>
+From:   Kirill Tkhai <ktkhai@virtuozzo.com>
+Message-ID: <fe055cf4-db28-e72d-c247-3a9c921919f5@virtuozzo.com>
+Date:   Mon, 20 Jan 2020 13:02:02 +0300
 User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:68.0) Gecko/20100101
  Thunderbird/68.4.1
 MIME-Version: 1.0
-In-Reply-To: <20200119071432.18558-6-ming.lei@redhat.com>
+In-Reply-To: <a6f36a19-0607-fc1e-d2da-37aa00c4b76e@oracle.com>
 Content-Type: text/plain; charset=utf-8
 Content-Language: en-US
-Content-Transfer-Encoding: 8bit
+Content-Transfer-Encoding: 7bit
 Sender: linux-block-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-On 2020-01-18 23:14, Ming Lei wrote:
-> +static inline bool scsi_bypass_device_busy(struct scsi_device *sdev)
-> +{
-> +	struct Scsi_Host *shost = sdev->host;
-> +
-> +	if (!shost->hostt->no_device_queue_for_ssd)
-> +		return false;
-> +
-> +	return blk_queue_nonrot(sdev->request_queue);
-> +}
+On 19.01.2020 04:50, Bob Liu wrote:
+> On 1/16/20 8:36 PM, Kirill Tkhai wrote:
+>> This adds support for REQ_NOZERO extension of REQ_OP_WRITE_ZEROES
+>> operation, which encourages a block device driver to just allocate
+>> blocks (or mark them allocated) instead of actual blocks zeroing.
+>> REQ_NOZERO is aimed to be used for network filesystems providing
+>> a block device interface. Also, block devices, which map a file
+>> on other filesystem (like loop), may use this for less fragmentation
+>> and batching fallocate() requests. Hypervisors like QEMU may
+>> introduce optimizations of clusters allocations based on this.
+>>
+>> BLKDEV_ZERO_ALLOCATE is a new corresponding flag for
+>> blkdev_issue_zeroout().
+>>> CC: Martin K. Petersen <martin.petersen@oracle.com>
+>> Signed-off-by: Kirill Tkhai <ktkhai@virtuozzo.com>
+>> ---
+>>  block/blk-core.c          |    6 +++---
+>>  block/blk-lib.c           |   17 ++++++++++-------
+>>  block/blk-merge.c         |    9 ++++++---
+>>  block/blk-settings.c      |   17 +++++++++++++++++
+>>  fs/block_dev.c            |    4 ++++
+>>  include/linux/blk_types.h |    5 ++++-
+>>  include/linux/blkdev.h    |   31 ++++++++++++++++++++++++-------
+>>  7 files changed, 68 insertions(+), 21 deletions(-)
+>>
+>> diff --git a/block/blk-core.c b/block/blk-core.c
+>> index 50a5de025d5e..2edcd55624f1 100644
+>> --- a/block/blk-core.c
+>> +++ b/block/blk-core.c
+>> @@ -978,7 +978,7 @@ generic_make_request_checks(struct bio *bio)
+>>  			goto not_supported;
+>>  		break;
+>>  	case REQ_OP_WRITE_ZEROES:
+>> -		if (!q->limits.max_write_zeroes_sectors)
+>> +		if (!blk_queue_get_max_write_zeroes_sectors(q, bio->bi_opf))
+>>  			goto not_supported;
+>>  		break;
+>>  	default:
+>> @@ -1250,10 +1250,10 @@ EXPORT_SYMBOL(submit_bio);
+>>  static int blk_cloned_rq_check_limits(struct request_queue *q,
+>>  				      struct request *rq)
+>>  {
+>> -	if (blk_rq_sectors(rq) > blk_queue_get_max_sectors(q, req_op(rq))) {
+>> +	if (blk_rq_sectors(rq) > blk_queue_get_max_sectors(q, rq->cmd_flags)) {
+>>  		printk(KERN_ERR "%s: over max size limit. (%u > %u)\n",
+>>  			__func__, blk_rq_sectors(rq),
+>> -			blk_queue_get_max_sectors(q, req_op(rq)));
+>> +			blk_queue_get_max_sectors(q, rq->cmd_flags));
+>>  		return -EIO;
+>>  	}
+>>  
+>> diff --git a/block/blk-lib.c b/block/blk-lib.c
+>> index 3e38c93cfc53..3e80279eb029 100644
+>> --- a/block/blk-lib.c
+>> +++ b/block/blk-lib.c
+>> @@ -214,7 +214,7 @@ static int __blkdev_issue_write_zeroes(struct block_device *bdev,
+>>  		struct bio **biop, unsigned flags)
+>>  {
+>>  	struct bio *bio = *biop;
+>> -	unsigned int max_write_zeroes_sectors;
+>> +	unsigned int max_write_zeroes_sectors, req_flags = 0;
+>>  	struct request_queue *q = bdev_get_queue(bdev);
+>>  
+>>  	if (!q)
+>> @@ -224,18 +224,21 @@ static int __blkdev_issue_write_zeroes(struct block_device *bdev,
+>>  		return -EPERM;
+>>  
+>>  	/* Ensure that max_write_zeroes_sectors doesn't overflow bi_size */
+>> -	max_write_zeroes_sectors = bdev_write_zeroes_sectors(bdev, 0);
+>> +	max_write_zeroes_sectors = bdev_write_zeroes_sectors(bdev, flags);
+>>  
+>>  	if (max_write_zeroes_sectors == 0)
+>>  		return -EOPNOTSUPP;
+>>  
+>> +	if (flags & BLKDEV_ZERO_NOUNMAP)
+>> +		req_flags |= REQ_NOUNMAP;
+>> +	if (flags & BLKDEV_ZERO_ALLOCATE)
+>> +		req_flags |= REQ_NOZERO|REQ_NOUNMAP;
+>> +
+>>  	while (nr_sects) {
+>>  		bio = blk_next_bio(bio, 0, gfp_mask);
+>>  		bio->bi_iter.bi_sector = sector;
+>>  		bio_set_dev(bio, bdev);
+>> -		bio->bi_opf = REQ_OP_WRITE_ZEROES;
+>> -		if (flags & BLKDEV_ZERO_NOUNMAP)
+>> -			bio->bi_opf |= REQ_NOUNMAP;
+>> +		bio->bi_opf = REQ_OP_WRITE_ZEROES | req_flags;
+>>  
+>>  		if (nr_sects > max_write_zeroes_sectors) {
+>>  			bio->bi_iter.bi_size = max_write_zeroes_sectors << 9;
+>> @@ -362,7 +365,7 @@ int blkdev_issue_zeroout(struct block_device *bdev, sector_t sector,
+>>  	sector_t bs_mask;
+>>  	struct bio *bio;
+>>  	struct blk_plug plug;
+>> -	bool try_write_zeroes = !!bdev_write_zeroes_sectors(bdev, 0);
+>> +	bool try_write_zeroes = !!bdev_write_zeroes_sectors(bdev, flags);
+>>  
+>>  	bs_mask = (bdev_logical_block_size(bdev) >> 9) - 1;
+>>  	if ((sector | nr_sects) & bs_mask)
+>> @@ -391,7 +394,7 @@ int blkdev_issue_zeroout(struct block_device *bdev, sector_t sector,
+>>  			try_write_zeroes = false;
+>>  			goto retry;
+>>  		}
+>> -		if (!bdev_write_zeroes_sectors(bdev, 0)) {
+>> +		if (!bdev_write_zeroes_sectors(bdev, flags)) {
+>>  			/*
+>>  			 * Zeroing offload support was indicated, but the
+>>  			 * device reported ILLEGAL REQUEST (for some devices
+>> diff --git a/block/blk-merge.c b/block/blk-merge.c
+>> index 347782a24a35..e3ce4b87bbaa 100644
+>> --- a/block/blk-merge.c
+>> +++ b/block/blk-merge.c
+>> @@ -105,15 +105,18 @@ static struct bio *blk_bio_discard_split(struct request_queue *q,
+>>  static struct bio *blk_bio_write_zeroes_split(struct request_queue *q,
+>>  		struct bio *bio, struct bio_set *bs, unsigned *nsegs)
+>>  {
+>> +	unsigned int max_sectors;
+>> +
+>> +	max_sectors = blk_queue_get_max_write_zeroes_sectors(q, bio->bi_opf);
+>>  	*nsegs = 0;
+>>  
+>> -	if (!q->limits.max_write_zeroes_sectors)
+>> +	if (!max_sectors)
+>>  		return NULL;
+>>  
+>> -	if (bio_sectors(bio) <= q->limits.max_write_zeroes_sectors)
+>> +	if (bio_sectors(bio) <= max_sectors)
+>>  		return NULL;
+>>  
+>> -	return bio_split(bio, q->limits.max_write_zeroes_sectors, GFP_NOIO, bs);
+>> +	return bio_split(bio, max_sectors, GFP_NOIO, bs);
+>>  }
+>>  
+>>  static struct bio *blk_bio_write_same_split(struct request_queue *q,
+>> diff --git a/block/blk-settings.c b/block/blk-settings.c
+>> index 5f6dcc7a47bd..f682374c5106 100644
+>> --- a/block/blk-settings.c
+>> +++ b/block/blk-settings.c
+>> @@ -48,6 +48,7 @@ void blk_set_default_limits(struct queue_limits *lim)
+>>  	lim->chunk_sectors = 0;
+>>  	lim->max_write_same_sectors = 0;
+>>  	lim->max_write_zeroes_sectors = 0;
+>> +	lim->max_allocate_sectors = 0;
+>>  	lim->max_discard_sectors = 0;
+>>  	lim->max_hw_discard_sectors = 0;
+>>  	lim->discard_granularity = 0;
+>> @@ -83,6 +84,7 @@ void blk_set_stacking_limits(struct queue_limits *lim)
+>>  	lim->max_dev_sectors = UINT_MAX;
+>>  	lim->max_write_same_sectors = UINT_MAX;
+>>  	lim->max_write_zeroes_sectors = UINT_MAX;
+>> +	lim->max_allocate_sectors = UINT_MAX;
+>>  }
+>>  EXPORT_SYMBOL(blk_set_stacking_limits);
+>>  
+>> @@ -257,6 +259,19 @@ void blk_queue_max_write_zeroes_sectors(struct request_queue *q,
+>>  }
+>>  EXPORT_SYMBOL(blk_queue_max_write_zeroes_sectors);
+>>  
+>> +/**
+>> + * blk_queue_max_allocate_sectors - set max sectors for a single
+>> + *                                  allocate request
+>> + * @q:  the request queue for the device
+>> + * @max_allocate_sectors: maximum number of sectors to write per command
+>> + **/
+>> +void blk_queue_max_allocate_sectors(struct request_queue *q,
+>> +		unsigned int max_allocate_sectors)
+>> +{
+>> +	q->limits.max_allocate_sectors = max_allocate_sectors;
+>> +}
+>> +EXPORT_SYMBOL(blk_queue_max_allocate_sectors);
+>> +
+> 
+> I'd suggest split this to a separated patch.
 
-In other words, sdev->device_busy is maintained for all SCSI devices
-except for those SSDs controlled by a SCSI LLD driver that has
-no_device_queue_for_ssd set in its host template. I'd like to see
-different behavior, namely that sdev->device_busy is not maintained for
-any SSD except if that SSD really needs the sdev->device_busy counter.
-The blacklist mechanism may be more appropriate to mark such SSDs than
-the SCSI host template.
+Yeah, this function is used in [3/3] only, so in may go after this patch [2/3] as a separate patch.
 
-What I also noticed is that most scsi_bypass_device_busy() calls have an
-exclamation mark (!) in front of these calls. I think that inverting the
-return value and renaming this function into e.g.
-scsi_maintain_device_busy() would result in code that is easier to read.
+>>  /**
+>>   * blk_queue_max_segments - set max hw segments for a request for this queue
+>>   * @q:  the request queue for the device
+>> @@ -506,6 +521,8 @@ int blk_stack_limits(struct queue_limits *t, struct queue_limits *b,
+>>  					b->max_write_same_sectors);
+>>  	t->max_write_zeroes_sectors = min(t->max_write_zeroes_sectors,
+>>  					b->max_write_zeroes_sectors);
+>> +	t->max_allocate_sectors = min(t->max_allocate_sectors,
+>> +					b->max_allocate_sectors);
+>>  	t->bounce_pfn = min_not_zero(t->bounce_pfn, b->bounce_pfn);
+>>  
+>>  	t->seg_boundary_mask = min_not_zero(t->seg_boundary_mask,
+>> diff --git a/fs/block_dev.c b/fs/block_dev.c
+>> index 69bf2fb6f7cd..1ffef894b3bd 100644
+>> --- a/fs/block_dev.c
+>> +++ b/fs/block_dev.c
+>> @@ -2122,6 +2122,10 @@ static long blkdev_fallocate(struct file *file, int mode, loff_t start,
+>>  		error = blkdev_issue_zeroout(bdev, start >> 9, len >> 9,
+>>  					     GFP_KERNEL, BLKDEV_ZERO_NOFALLBACK);
+>>  		break;
+>> +	case FALLOC_FL_KEEP_SIZE:
+>> +		error = blkdev_issue_zeroout(bdev, start >> 9, len >> 9,
+>> +			GFP_KERNEL, BLKDEV_ZERO_ALLOCATE | BLKDEV_ZERO_NOFALLBACK);
+>> +		break;
+>>  	case FALLOC_FL_PUNCH_HOLE | FALLOC_FL_KEEP_SIZE | FALLOC_FL_NO_HIDE_STALE:
+>>  		error = blkdev_issue_discard(bdev, start >> 9, len >> 9,
+>>  					     GFP_KERNEL, 0);
+>> diff --git a/include/linux/blk_types.h b/include/linux/blk_types.h
+>> index 70254ae11769..9ed166860099 100644
+>> --- a/include/linux/blk_types.h
+>> +++ b/include/linux/blk_types.h
+>> @@ -335,7 +335,9 @@ enum req_flag_bits {
+>>  
+>>  	/* command specific flags for REQ_OP_WRITE_ZEROES: */
+>>  	__REQ_NOUNMAP,		/* do not free blocks when zeroing */
+>> -
+>> +	__REQ_NOZERO,		/* only notify about allocated blocks,
+>> +				 * and do not actual zero them
+>> +				 */
+>>  	__REQ_HIPRI,
+>>  
+>>  	/* for driver use */
+>> @@ -362,6 +364,7 @@ enum req_flag_bits {
+>>  #define REQ_CGROUP_PUNT		(1ULL << __REQ_CGROUP_PUNT)
+>>  
+>>  #define REQ_NOUNMAP		(1ULL << __REQ_NOUNMAP)
+>> +#define REQ_NOZERO		(1ULL << __REQ_NOZERO)
+>>  #define REQ_HIPRI		(1ULL << __REQ_HIPRI)
+>>  
+>>  #define REQ_DRV			(1ULL << __REQ_DRV)
+>> diff --git a/include/linux/blkdev.h b/include/linux/blkdev.h
+>> index 4cd69552df9a..f4ec5db64432 100644
+>> --- a/include/linux/blkdev.h
+>> +++ b/include/linux/blkdev.h
+>> @@ -336,6 +336,7 @@ struct queue_limits {
+>>  	unsigned int		max_hw_discard_sectors;
+>>  	unsigned int		max_write_same_sectors;
+>>  	unsigned int		max_write_zeroes_sectors;
+>> +	unsigned int		max_allocate_sectors;
+>>  	unsigned int		discard_granularity;
+>>  	unsigned int		discard_alignment;
+>>  
+>> @@ -988,9 +989,19 @@ static inline struct bio_vec req_bvec(struct request *rq)
+>>  	return mp_bvec_iter_bvec(rq->bio->bi_io_vec, rq->bio->bi_iter);
+>>  }
+>>  
+>> +static inline unsigned int blk_queue_get_max_write_zeroes_sectors(
+>> +		struct request_queue *q, unsigned int op_flags)
+>> +{
+>> +	if (op_flags & REQ_NOZERO)
+>> +		return q->limits.max_allocate_sectors;
+>> +	return q->limits.max_write_zeroes_sectors;
+>> +}
+>> +
+> 
+> And this one.
+
+It looks it won't be good, since this will require to declare REQ_NOZERO
+in a separate patch. This will tear off the flag declaration from the logic.
+
+> Also, should we consider other code path used q->limits.max_write_zeroes_sectors?
+
+Other code paths should not dereference q->limits.max_allocate_sectors, unless
+it is directly set in not-zero value. In case of max_allocate_sectors is zero,
+high-level primitives (generic_make_request_checks(), __blkdev_issue_write_zeroes(), ..)
+complete such the bios immediately. Other drivers may need additional work
+to support this, and really only subset of drivers need support of this, so this is
+not a subject of this patchset.
+
+Hm, it looks like there is an exception, which may inherit stack limits from children.
+Device-mapper will pick all the limits we enable for children.
+We may disable REQ_WRITE_ZEROES|REQ_NOZERO directly there, since it's not supported
+in this driver yet.
+
+Are you hinting at this here?
+
+diff --git a/drivers/md/dm-table.c b/drivers/md/dm-table.c
+index 0a2cc197f62b..b8aa5f6f9ce1 100644
+--- a/drivers/md/dm-table.c
++++ b/drivers/md/dm-table.c
+@@ -489,6 +489,7 @@ static int dm_set_device_limits(struct dm_target *ti, struct dm_dev *dev,
+ 		       (unsigned long long) start << SECTOR_SHIFT);
+ 
+ 	limits->zoned = blk_queue_zoned_model(q);
++	limits->max_allocate_sectors = 0;
+ 
+ 	return 0;
+ }
+@@ -1548,6 +1549,7 @@ int dm_calculate_queue_limits(struct dm_table *table,
+ 			       dm_device_name(table->md),
+ 			       (unsigned long long) ti->begin,
+ 			       (unsigned long long) ti->len);
++		limits->max_allocate_sectors = 0;
+ 
+ 		/*
+ 		 * FIXME: this should likely be moved to blk_stack_limits(), would
 
 Thanks,
-
-Bart.
+Kirill
