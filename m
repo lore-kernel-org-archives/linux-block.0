@@ -4,63 +4,61 @@ X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 X-Spam-Level: 
 X-Spam-Status: No, score=-6.8 required=3.0 tests=DKIM_SIGNED,DKIM_VALID,
 	DKIM_VALID_AU,HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,
-	SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS autolearn=unavailable autolearn_force=no
+	SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS autolearn=ham autolearn_force=no
 	version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id B3041C2D0DB
-	for <linux-block@archiver.kernel.org>; Mon, 20 Jan 2020 14:08:12 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 5D90EC2D0DB
+	for <linux-block@archiver.kernel.org>; Mon, 20 Jan 2020 17:31:04 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.kernel.org (Postfix) with ESMTP id 8008222314
-	for <linux-block@archiver.kernel.org>; Mon, 20 Jan 2020 14:08:12 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id 2FD5721835
+	for <linux-block@archiver.kernel.org>; Mon, 20 Jan 2020 17:31:04 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=pass (2048-bit key) header.d=cloud.ionos.com header.i=@cloud.ionos.com header.b="KCBWcrM8"
+	dkim=pass (2048-bit key) header.d=cloud.ionos.com header.i=@cloud.ionos.com header.b="H5mbDOJR"
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1727071AbgATOIL (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Mon, 20 Jan 2020 09:08:11 -0500
-Received: from mail-il1-f194.google.com ([209.85.166.194]:37194 "EHLO
-        mail-il1-f194.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1726626AbgATOIL (ORCPT
+        id S1726991AbgATRbD (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Mon, 20 Jan 2020 12:31:03 -0500
+Received: from mail-io1-f67.google.com ([209.85.166.67]:34023 "EHLO
+        mail-io1-f67.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S1726982AbgATRbD (ORCPT
         <rfc822;linux-block@vger.kernel.org>);
-        Mon, 20 Jan 2020 09:08:11 -0500
-Received: by mail-il1-f194.google.com with SMTP id t8so27364290iln.4
-        for <linux-block@vger.kernel.org>; Mon, 20 Jan 2020 06:08:11 -0800 (PST)
+        Mon, 20 Jan 2020 12:31:03 -0500
+Received: by mail-io1-f67.google.com with SMTP id z193so34505566iof.1
+        for <linux-block@vger.kernel.org>; Mon, 20 Jan 2020 09:31:02 -0800 (PST)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=cloud.ionos.com; s=google;
         h=mime-version:references:in-reply-to:from:date:message-id:subject:to
          :cc;
-        bh=A5hSL60LdZGKQtvyhR3VUcG6oxpc8PtdSJlAQB1hYco=;
-        b=KCBWcrM8hDzs0DR0hFis0NRPgcSBb1ktNCuErjGESSSKyhx23aLvXV6GcI07iuxqW3
-         iYpbc43a6pX4T+kGlpGT3whM9k4soRxnfcdkovprYPDzY3bhpUOmr5VGRRtRtsijnUCd
-         AI45LzBgCx/l37+AtGxkSuwVyNbAwjrQICdKUkwhD4+D3nr5KmSz7XGl6lb6Fh35vePN
-         k0yjaJEFyJ1R0QeQZU0BZLBVi+8vvE773jMVjDrJYbal1C0qybqd/wKpeO72Pe9IOgAR
-         pDS35+85Vl3UrnHRZkHwfSRfrm7m5FcbviTahw6AToze6Yp8x401jeRx9rigsdn+mhMX
-         0hwg==
+        bh=5BJlqX/66I069N73XeW4rXMR5CUG0kXb0Zp80KRIp8s=;
+        b=H5mbDOJRzQ/6FawqIuLtmdHU+itECK8icsEFW0dFD1reax9SYMryb5WeU+QLlGZdVf
+         5O6tdiyxf3J1dMLs94LV1qRw1w9dJTRMwF9NrRXRvB5ytDyqdyegKfLbCTNxWRBWkg0U
+         z3STG/YOghf7rBnW/uB0G8zEgthqwx4fI3fwFx+cshh3x93ViVBiouliRvl/U84iyOLd
+         +cL5TjgX4XMpWpCDxqFYm3SsBbe+wkZw3ignwncO8o/e13VjlUlXpzIpoQExYYIX9b0f
+         NzbtOOrb7uXpbdBYo3x+idibhKBuQ3W4YI/JbQIxXGoQFSTJSKvzyLOYIodbgqnkTj/A
+         iR/Q==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=1e100.net; s=20161025;
         h=x-gm-message-state:mime-version:references:in-reply-to:from:date
          :message-id:subject:to:cc;
-        bh=A5hSL60LdZGKQtvyhR3VUcG6oxpc8PtdSJlAQB1hYco=;
-        b=gMDDtNkaPCGjs2BSqa7ze2ZePZqukGHyhqEQvMY3NBlgm1f/9l4PiMRM9KqHjiFoVt
-         V25f/lMdVmKSYfTZfXDD+AG+nquTigmPy1N9ENmh1X3OclnPrrd8o4f+ffq328Z8e+Z1
-         GvglSOWqq0igVBH4wIEhl1+VSlzb07vwlwLSkcURqNAiuxeEiDrHiJNUp8iIPhfReolp
-         ytBVy9aRlebbThLq1toPEHE0piduXJsuGRwO/3av7f9w59ESESXwvjAxwyi3+E9OviLP
-         McfOBDSp+KgTQvCX/iZVCJ2hhXIYL/3wlM8vRLRAjDrlDUs1TWJQgoTbS5zhYKyg9VSz
-         GrJA==
-X-Gm-Message-State: APjAAAWlohLo3BRMXe4/Y1lSTXcu+m5K53osMEZFSHMwcNTqH3SjDVC9
-        gcQWOc2gxJRo5EFws8++ZW4FQE27lKKjcSsqwPzGTg==
-X-Google-Smtp-Source: APXvYqzWFzRC394EaVcab9GedauvlaKCw3FfVNMTu/oo39WxmNhoR0xeIupZqjN6XpXZpL/kyMREhwXuqy+u8NAf7xo=
-X-Received: by 2002:a05:6e02:f0f:: with SMTP id x15mr10701631ilj.298.1579529290979;
- Mon, 20 Jan 2020 06:08:10 -0800 (PST)
+        bh=5BJlqX/66I069N73XeW4rXMR5CUG0kXb0Zp80KRIp8s=;
+        b=EUzbvCUQ0cWAr1scghKXbK5I93pRWsnOaI5zzLFk0oNPlw3SHM95rUX8Q9FK0TlOh9
+         qKQ9CC6CZOoQVEmwBAk4JgDUisXtwjTdlVhZ6LR+7pc8PfThfVb2cYch1wr+R1wZlDDe
+         TpKdcJjmrwMElyu7sEvkT0I3k99zUCCz4BG3LcyLs8pKqk+iFaK9SkNaoAEQecjCFHle
+         3UYvrpdnGAJwFgVhAy9UkEQOTi1iNG3HhvD5OyhyQMfIbYzaiMBVDpLu5SAjgtU5GB1l
+         Rbub+uPcfHWkcuecu4OLG1UBDmhLx4rkHmt911QKKsmkSki1LpG87kG8q/ft2xr/pS5d
+         Mnkw==
+X-Gm-Message-State: APjAAAUSDS8UpsQ2SdWOP6Twb1Otl6fhRZf0qVfFFrQBFa0o0xjWNse4
+        /Jcg3BspyrvuDarbaX/7ld9sRjoz0VNMApoeeTDYlQ==
+X-Google-Smtp-Source: APXvYqw4b3gNE0fb6oLmVNOv4q89TLRTdSh1RBhpPKd2v7CfGerBbMkxQHjvAGS+pzFIPDjZzblLxoIlRwZSOVYCWoA=
+X-Received: by 2002:a02:ca10:: with SMTP id i16mr132059jak.10.1579541462411;
+ Mon, 20 Jan 2020 09:31:02 -0800 (PST)
 MIME-Version: 1.0
-References: <20200116125915.14815-1-jinpuwang@gmail.com> <20200116125915.14815-5-jinpuwang@gmail.com>
- <20200119144837.GE51881@unreal> <CAMGffEn-_hbuXBSp=xV+uZa3ZJ21PNvCuedVLHKUPLf+QxbL7w@mail.gmail.com>
- <20200120133006.GG51881@unreal>
-In-Reply-To: <20200120133006.GG51881@unreal>
+References: <20200116125915.14815-1-jinpuwang@gmail.com> <20200116125915.14815-18-jinpuwang@gmail.com>
+ <20200120134815.GH51881@unreal>
+In-Reply-To: <20200120134815.GH51881@unreal>
 From:   Jinpu Wang <jinpu.wang@cloud.ionos.com>
-Date:   Mon, 20 Jan 2020 15:08:00 +0100
-Message-ID: <CAMGffE=2OZLkBsaANFvcy80Se8rbs+s0VTL3=2WKpiQP-LxiuA@mail.gmail.com>
-Subject: Re: [PATCH v7 04/25] RDMA/rtrs: core: lib functions shared between
- client and server modules
+Date:   Mon, 20 Jan 2020 18:30:51 +0100
+Message-ID: <CAMGffE=+wX2h6bSp+ZwTowWq8NOutVnCfXFqxMupZNCGGOh0sg@mail.gmail.com>
+Subject: Re: [PATCH v7 17/25] block/rnbd: client: main functionality
 To:     Leon Romanovsky <leon@kernel.org>
 Cc:     Jack Wang <jinpuwang@gmail.com>, linux-block@vger.kernel.org,
         linux-rdma@vger.kernel.org, Jens Axboe <axboe@kernel.dk>,
@@ -77,78 +75,137 @@ Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-On Mon, Jan 20, 2020 at 2:30 PM Leon Romanovsky <leon@kernel.org> wrote:
+On Mon, Jan 20, 2020 at 2:48 PM Leon Romanovsky <leon@kernel.org> wrote:
 >
-> On Mon, Jan 20, 2020 at 12:32:00PM +0100, Jinpu Wang wrote:
-> > On Sun, Jan 19, 2020 at 3:48 PM Leon Romanovsky <leon@kernel.org> wrote:
-> > >
-> > > On Thu, Jan 16, 2020 at 01:58:54PM +0100, Jack Wang wrote:
-> > > > From: Jack Wang <jinpu.wang@cloud.ionos.com>
-> > > >
-> > > > This is a set of library functions existing as a rtrs-core module,
-> > > > used by client and server modules.
-> > > >
-> > > > Mainly these functions wrap IB and RDMA calls and provide a bit higher
-> > > > abstraction for implementing of RTRS protocol on client or server
-> > > > sides.
-> > > >
-> > > > Signed-off-by: Danil Kipnis <danil.kipnis@cloud.ionos.com>
-> > > > Signed-off-by: Jack Wang <jinpu.wang@cloud.ionos.com>
-> > > > ---
-> > > >  drivers/infiniband/ulp/rtrs/rtrs.c | 597 +++++++++++++++++++++++++++++
-> > > >  1 file changed, 597 insertions(+)
-> > > >  create mode 100644 drivers/infiniband/ulp/rtrs/rtrs.c
-> > > >
-> > > > diff --git a/drivers/infiniband/ulp/rtrs/rtrs.c b/drivers/infiniband/ulp/rtrs/rtrs.c
-> > > > new file mode 100644
-> > > > index 000000000000..7b84d76e2a67
-> > > > --- /dev/null
-> > > > +++ b/drivers/infiniband/ulp/rtrs/rtrs.c
-> > > > @@ -0,0 +1,597 @@
-> > > > +// SPDX-License-Identifier: GPL-2.0-or-later
-> > > > +/*
-> > > > + * RDMA Transport Layer
-> > > > + *
-> > > > + * Copyright (c) 2014 - 2018 ProfitBricks GmbH. All rights reserved.
-> > > > + *
-> > > > + * Copyright (c) 2018 - 2019 1&1 IONOS Cloud GmbH. All rights reserved.
-> > > > + *
-> > > > + * Copyright (c) 2019 - 2020 1&1 IONOS SE. All rights reserved.
-> > > > + */
-> > > > +#undef pr_fmt
-> > > > +#define pr_fmt(fmt) KBUILD_MODNAME " L" __stringify(__LINE__) ": " fmt
-> > > > +
-> > > > +#include <linux/module.h>
-> > > > +#include <linux/inet.h>
-> > > > +
-> > > > +#include "rtrs-pri.h"
-> > > > +#include "rtrs-log.h"
-> > > > +
-> > > > +MODULE_DESCRIPTION("RDMA Transport Core");
-> > > > +MODULE_LICENSE("GPL");
-> > > > +
-> > > > +struct rtrs_iu *rtrs_iu_alloc(u32 queue_size, size_t size, gfp_t gfp_mask,
-> > > > +                           struct ib_device *dma_dev,
-> > > > +                           enum dma_data_direction dir,
-> > > > +                           void (*done)(struct ib_cq *cq, struct ib_wc *wc))
-> > > > +{
-> > > > +     struct rtrs_iu *ius, *iu;
-> > > > +     int i;
-> > > > +
-> > > > +     WARN_ON(!queue_size);
-> > > > +     ius = kcalloc(queue_size, sizeof(*ius), gfp_mask);
-> > > > +     if (unlikely(!ius))
-> > > > +             return NULL;
-> > >
-> > > Let's do not add useless WARN_ON() and unlikely to every error path.
-> > I can remove the WARN_ON, but the unlikey for error case seems normal to use,
-> > small size memory allocation is unlikely to fail.
+> On Thu, Jan 16, 2020 at 01:59:07PM +0100, Jack Wang wrote:
+> > From: Jack Wang <jinpu.wang@cloud.ionos.com>
+> >
+> > This is main functionality of rnbd-client module, which provides
+> > interface to map remote device as local block device /dev/rnbd<N>
+> > and feeds RTRS with IO requests.
+> >
+> > Signed-off-by: Danil Kipnis <danil.kipnis@cloud.ionos.com>
+> > Signed-off-by: Jack Wang <jinpu.wang@cloud.ionos.com>
+> > ---
+> >  drivers/block/rnbd/rnbd-clt.c | 1730 +++++++++++++++++++++++++++++++++
+> >  1 file changed, 1730 insertions(+)
+> >  create mode 100644 drivers/block/rnbd/rnbd-clt.c
+> >
+> > diff --git a/drivers/block/rnbd/rnbd-clt.c b/drivers/block/rnbd/rnbd-clt.c
+> > new file mode 100644
+> > index 000000000000..7d8cb38d3969
+> > --- /dev/null
+> > +++ b/drivers/block/rnbd/rnbd-clt.c
+> > @@ -0,0 +1,1730 @@
+> > +// SPDX-License-Identifier: GPL-2.0-or-later
+> > +/*
+> > + * RDMA Network Block Driver
+> > + *
+> > + * Copyright (c) 2014 - 2018 ProfitBricks GmbH. All rights reserved.
+> > + *
+> > + * Copyright (c) 2018 - 2019 1&1 IONOS Cloud GmbH. All rights reserved.
+> > + *
+> > + * Copyright (c) 2019 - 2020 1&1 IONOS SE. All rights reserved.
+> > + */
+> > +
+> > +#undef pr_fmt
+> > +#define pr_fmt(fmt) KBUILD_MODNAME " L" __stringify(__LINE__) ": " fmt
+> > +
+> > +#include <linux/module.h>
+> > +#include <linux/blkdev.h>
+> > +#include <linux/hdreg.h>
+> > +#include <linux/scatterlist.h>
+> > +#include <linux/idr.h>
+> > +
+> > +#include "rnbd-clt.h"
+> > +
+> > +MODULE_DESCRIPTION("RDMA Network Block Device Client");
+> > +MODULE_LICENSE("GPL");
+> > +
+> > +static int rnbd_client_major;
+> > +static DEFINE_IDA(index_ida);
+> > +static DEFINE_MUTEX(ida_lock);
+> > +static DEFINE_MUTEX(sess_lock);
+> > +static LIST_HEAD(sess_list);
+> > +
+> > +/*
+> > + * Maximum number of partitions an instance can have.
+> > + * 6 bits = 64 minors = 63 partitions (one minor is used for the device itself)
+> > + */
+> > +#define RNBD_PART_BITS               6
+> > +
+> > +static inline bool rnbd_clt_get_sess(struct rnbd_clt_session *sess)
+> > +{
+> > +     return refcount_inc_not_zero(&sess->refcount);
+> > +}
+> > +
+> > +static void free_sess(struct rnbd_clt_session *sess);
+> > +
+> > +static void rnbd_clt_put_sess(struct rnbd_clt_session *sess)
+> > +{
+> > +     might_sleep();
+> > +
+> > +     if (refcount_dec_and_test(&sess->refcount))
+> > +             free_sess(sess);
+> > +}
 >
-> The unlikely() makes sense in data-path only and mostly it doesn't give
-> any performance advantage, kcalloc() in this function means that this
-> function is not performance oriented.
->
+> I see that this code is for drivers/block and maybe it is a way to do it
+> there, but in RDMA, we don't like abstraction of general and well-known
+> kernel APIs. It looks like kref to me.
+I can try to convert to kref interface if other guys also think it's necessary.
 
-Thanks for the clarification, it is not in the data path, sure can be
-removed, we will review the usage
-and remove the unnecessary ones.
+>
+> > +
+> > +static inline bool rnbd_clt_dev_is_mapped(struct rnbd_clt_dev *dev)
+> > +{
+> > +     return dev->dev_state == DEV_STATE_MAPPED;
+> > +}
+> > +
+> > +static void rnbd_clt_put_dev(struct rnbd_clt_dev *dev)
+> > +{
+> > +     might_sleep();
+> > +
+> > +     if (refcount_dec_and_test(&dev->refcount)) {
+> > +             mutex_lock(&ida_lock);
+> > +             ida_simple_remove(&index_ida, dev->clt_device_id);
+> > +             mutex_unlock(&ida_lock);
+> > +             kfree(dev->hw_queues);
+> > +             rnbd_clt_put_sess(dev->sess);
+> > +             kfree(dev);
+> > +     }
+> > +}
+> > +
+> > +static inline bool rnbd_clt_get_dev(struct rnbd_clt_dev *dev)
+> > +{
+> > +     return refcount_inc_not_zero(&dev->refcount);
+> > +}
+> > +
+> > +static int rnbd_clt_set_dev_attr(struct rnbd_clt_dev *dev,
+> > +                              const struct rnbd_msg_open_rsp *rsp)
+> > +{
+> > +     struct rnbd_clt_session *sess = dev->sess;
+> > +
+> > +     if (unlikely(!rsp->logical_block_size))
+> > +             return -EINVAL;
+>
+> unlikely() again.
+will remove.
+
+snip
+> > +static void rnbd_put_iu(struct rnbd_clt_session *sess, struct rnbd_iu *iu)
+> > +{
+> > +     if (atomic_dec_and_test(&iu->refcount))
+> > +             rnbd_put_permit(sess, iu->permit);
+> > +}
+> > +
+> > +static void rnbd_softirq_done_fn(struct request *rq)
+> > +{
+> > +     struct rnbd_clt_dev *dev        = rq->rq_disk->private_data;
+> > +     struct rnbd_clt_session *sess   = dev->sess;a
+>
+> Please no vertical alignment in new code, it adds a lot of churn if such
+> line is changed later and creates difficulties for the backports.
+It does look nicer when it can be aligned. I don't get why backport is
+an argument here.
+
+Thanks
