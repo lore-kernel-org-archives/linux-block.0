@@ -2,28 +2,28 @@ Return-Path: <SRS0=2A/1=3K=vger.kernel.org=linux-block-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-6.8 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
-	INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS
-	autolearn=unavailable autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-3.8 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
+	MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS autolearn=no
+	autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 37F9CC33CAA
-	for <linux-block@archiver.kernel.org>; Tue, 21 Jan 2020 10:19:40 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 9A02EC33CAA
+	for <linux-block@archiver.kernel.org>; Tue, 21 Jan 2020 10:19:43 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.kernel.org (Postfix) with ESMTP id 16A912465B
-	for <linux-block@archiver.kernel.org>; Tue, 21 Jan 2020 10:19:40 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id 77E0424656
+	for <linux-block@archiver.kernel.org>; Tue, 21 Jan 2020 10:19:43 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1728797AbgAUKTR (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Tue, 21 Jan 2020 05:19:17 -0500
-Received: from relay.sw.ru ([185.231.240.75]:56158 "EHLO relay.sw.ru"
+        id S1729624AbgAUKTj (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Tue, 21 Jan 2020 05:19:39 -0500
+Received: from relay.sw.ru ([185.231.240.75]:56168 "EHLO relay.sw.ru"
         rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-        id S1727220AbgAUKTQ (ORCPT <rfc822;linux-block@vger.kernel.org>);
-        Tue, 21 Jan 2020 05:19:16 -0500
+        id S1729259AbgAUKTR (ORCPT <rfc822;linux-block@vger.kernel.org>);
+        Tue, 21 Jan 2020 05:19:17 -0500
 Received: from dhcp-172-16-24-104.sw.ru ([172.16.24.104] helo=localhost.localdomain)
         by relay.sw.ru with esmtp (Exim 4.92.3)
         (envelope-from <ktkhai@virtuozzo.com>)
-        id 1itqcP-00068F-AM; Tue, 21 Jan 2020 13:18:45 +0300
-Subject: [PATCH v3 1/7] block: Add @flags argument to
- bdev_write_zeroes_sectors()
+        id 1itqcJ-00068A-Oo; Tue, 21 Jan 2020 13:18:40 +0300
+Subject: [PATCH v3 0/7] block: Introduce REQ_ALLOCATE flag for
+ REQ_OP_WRITE_ZEROES
 From:   Kirill Tkhai <ktkhai@virtuozzo.com>
 To:     linux-block@vger.kernel.org, linux-kernel@vger.kernel.org,
         martin.petersen@oracle.com, bob.liu@oracle.com, axboe@kernel.dk,
@@ -36,10 +36,8 @@ To:     linux-block@vger.kernel.org, linux-kernel@vger.kernel.org,
         ajay.joshi@wdc.com, sagi@grimberg.me, dsterba@suse.com,
         chaitanya.kulkarni@wdc.com, bvanassche@acm.org,
         dhowells@redhat.com, asml.silence@gmail.com, ktkhai@virtuozzo.com
-Date:   Tue, 21 Jan 2020 13:18:45 +0300
-Message-ID: <157960192519.97730.8341845276703499643.stgit@localhost.localdomain>
-In-Reply-To: <157960153921.97730.9973412459876396302.stgit@localhost.localdomain>
-References: <157960153921.97730.9973412459876396302.stgit@localhost.localdomain>
+Date:   Tue, 21 Jan 2020 13:18:39 +0300
+Message-ID: <157960153921.97730.9973412459876396302.stgit@localhost.localdomain>
 User-Agent: StGit/0.19
 MIME-Version: 1.0
 Content-Type: text/plain; charset="utf-8"
@@ -49,100 +47,76 @@ Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-This is a preparation for next patch, which introduces
-a new flag BLKDEV_ZERO_ALLOCATE for calls, which need
-only allocation of blocks and don't need actual blocks
-zeroing.
+(was "[PATCH block v2 0/3] block: Introduce REQ_NOZERO flag
+      for REQ_OP_WRITE_ZEROES operation";
+ was "[PATCH RFC 0/3] block,ext4: Introduce REQ_OP_ASSIGN_RANGE
+      to reflect extents allocation in block device internals")
 
-Signed-off-by: Kirill Tkhai <ktkhai@virtuozzo.com>
-Reviewed-by: Bob Liu <bob.liu@oracle.com>
-Reviewed-by: Martin K. Petersen <martin.petersen@oracle.com>
+v3: Rename REQ_NOZERO to REQ_ALLOCATE.
+    Split helpers to separate patches.
+    Add a patch, disabling max_allocate_sectors inheritance for dm.
+
+v2: Introduce new flag for REQ_OP_WRITE_ZEROES instead of
+    introduction a new operation as suggested by Martin K. Petersen.
+    Removed ext4-related patch to focus on block changes
+    for now.
+
+Information about continuous extent placement may be useful
+for some block devices. Say, distributed network filesystems,
+which provide block device interface, may use this information
+for better blocks placement over the nodes in their cluster,
+and for better performance. Block devices, which map a file
+on another filesystem (loop), may request the same length extent
+on underlining filesystem for less fragmentation and for batching
+allocation requests. Also, hypervisors like QEMU may use this
+information for optimization of cluster allocations.
+
+This patchset introduces REQ_ALLOCATE flag for REQ_OP_WRITE_ZEROES,
+which makes a block device to allocate blocks instead of actual
+blocks zeroing. This may be used for forwarding user's fallocate(0)
+requests into block device internals. E.g., in loop driver this
+will result in allocation extents in backing-file, so subsequent
+write won't fail by the reason of no available space. Distributed
+network filesystems will be able to assign specific servers for
+specific extents, so subsequent write will be more efficient.
+
+Patches [1-3/7] are preparation on helper functions, patch [4/7]
+introduces REQ_ALLOCATE flag and implements all the logic,
+patch [5/7] adds one more helper, patch [6/7] disables REQ_ALLOCATE
+for dm, which inherits limits from underlining block devices,
+patch [7/7] adds loop as the first user of the flag.
+
+Note, that here is only block-related patches, example of usage
+for ext4 with a performance numbers may be seen in [1].
+
+[1] https://lore.kernel.org/linux-ext4/157599697369.12112.10138136904533871162.stgit@localhost.localdomain/T/#me5bdd5cc313e14de615d81bea214f355ae975db0
+
 ---
- block/blk-lib.c                     |    6 +++---
+
+Kirill Tkhai (7):
+      block: Add @flags argument to bdev_write_zeroes_sectors()
+      block: Pass op_flags into blk_queue_get_max_sectors()
+      block: Introduce blk_queue_get_max_write_zeroes_sectors()
+      block: Add support for REQ_ALLOCATE flag
+      block: Add blk_queue_max_allocate_sectors()
+      dm: Directly disable max_allocate_sectors for now
+      loop: Add support for REQ_ALLOCATE
+
+
+ block/blk-core.c                    |    6 +++---
+ block/blk-lib.c                     |   17 ++++++++++-------
+ block/blk-merge.c                   |    9 ++++++---
+ block/blk-settings.c                |   17 +++++++++++++++++
+ drivers/block/loop.c                |   15 ++++++++++++---
  drivers/md/dm-kcopyd.c              |    2 +-
+ drivers/md/dm-table.c               |    2 ++
+ drivers/md/md.h                     |    1 +
  drivers/target/target_core_iblock.c |    4 ++--
- include/linux/blkdev.h              |    3 ++-
- 4 files changed, 8 insertions(+), 7 deletions(-)
+ fs/block_dev.c                      |    4 ++++
+ include/linux/blk_types.h           |    5 ++++-
+ include/linux/blkdev.h              |   34 ++++++++++++++++++++++++++--------
+ 12 files changed, 88 insertions(+), 28 deletions(-)
 
-diff --git a/block/blk-lib.c b/block/blk-lib.c
-index 5f2c429d4378..3e38c93cfc53 100644
---- a/block/blk-lib.c
-+++ b/block/blk-lib.c
-@@ -224,7 +224,7 @@ static int __blkdev_issue_write_zeroes(struct block_device *bdev,
- 		return -EPERM;
- 
- 	/* Ensure that max_write_zeroes_sectors doesn't overflow bi_size */
--	max_write_zeroes_sectors = bdev_write_zeroes_sectors(bdev);
-+	max_write_zeroes_sectors = bdev_write_zeroes_sectors(bdev, 0);
- 
- 	if (max_write_zeroes_sectors == 0)
- 		return -EOPNOTSUPP;
-@@ -362,7 +362,7 @@ int blkdev_issue_zeroout(struct block_device *bdev, sector_t sector,
- 	sector_t bs_mask;
- 	struct bio *bio;
- 	struct blk_plug plug;
--	bool try_write_zeroes = !!bdev_write_zeroes_sectors(bdev);
-+	bool try_write_zeroes = !!bdev_write_zeroes_sectors(bdev, 0);
- 
- 	bs_mask = (bdev_logical_block_size(bdev) >> 9) - 1;
- 	if ((sector | nr_sects) & bs_mask)
-@@ -391,7 +391,7 @@ int blkdev_issue_zeroout(struct block_device *bdev, sector_t sector,
- 			try_write_zeroes = false;
- 			goto retry;
- 		}
--		if (!bdev_write_zeroes_sectors(bdev)) {
-+		if (!bdev_write_zeroes_sectors(bdev, 0)) {
- 			/*
- 			 * Zeroing offload support was indicated, but the
- 			 * device reported ILLEGAL REQUEST (for some devices
-diff --git a/drivers/md/dm-kcopyd.c b/drivers/md/dm-kcopyd.c
-index 1bbe4a34ef4c..f1b8e7926dd4 100644
---- a/drivers/md/dm-kcopyd.c
-+++ b/drivers/md/dm-kcopyd.c
-@@ -831,7 +831,7 @@ void dm_kcopyd_copy(struct dm_kcopyd_client *kc, struct dm_io_region *from,
- 		 */
- 		job->rw = REQ_OP_WRITE_ZEROES;
- 		for (i = 0; i < job->num_dests; i++)
--			if (!bdev_write_zeroes_sectors(job->dests[i].bdev)) {
-+			if (!bdev_write_zeroes_sectors(job->dests[i].bdev, 0)) {
- 				job->rw = WRITE;
- 				break;
- 			}
-diff --git a/drivers/target/target_core_iblock.c b/drivers/target/target_core_iblock.c
-index 51ffd5c002de..73a63e197bf5 100644
---- a/drivers/target/target_core_iblock.c
-+++ b/drivers/target/target_core_iblock.c
-@@ -117,7 +117,7 @@ static int iblock_configure_device(struct se_device *dev)
- 	 * Enable write same emulation for IBLOCK and use 0xFFFF as
- 	 * the smaller WRITE_SAME(10) only has a two-byte block count.
- 	 */
--	max_write_zeroes_sectors = bdev_write_zeroes_sectors(bd);
-+	max_write_zeroes_sectors = bdev_write_zeroes_sectors(bd, 0);
- 	if (max_write_zeroes_sectors)
- 		dev->dev_attrib.max_write_same_len = max_write_zeroes_sectors;
- 	else
-@@ -468,7 +468,7 @@ iblock_execute_write_same(struct se_cmd *cmd)
- 		return TCM_INVALID_CDB_FIELD;
- 	}
- 
--	if (bdev_write_zeroes_sectors(bdev)) {
-+	if (bdev_write_zeroes_sectors(bdev, 0)) {
- 		if (!iblock_execute_zero_out(bdev, cmd))
- 			return 0;
- 	}
-diff --git a/include/linux/blkdev.h b/include/linux/blkdev.h
-index 04cfa798a365..0f1127d0b043 100644
---- a/include/linux/blkdev.h
-+++ b/include/linux/blkdev.h
-@@ -1418,7 +1418,8 @@ static inline unsigned int bdev_write_same(struct block_device *bdev)
- 	return 0;
- }
- 
--static inline unsigned int bdev_write_zeroes_sectors(struct block_device *bdev)
-+static inline unsigned int bdev_write_zeroes_sectors(struct block_device *bdev,
-+						     unsigned int flags)
- {
- 	struct request_queue *q = bdev_get_queue(bdev);
- 
-
+--
+Signed-off-by: Kirill Tkhai <ktkhai@virtuozzo.com>
 
