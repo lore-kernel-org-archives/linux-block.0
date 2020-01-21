@@ -2,133 +2,215 @@ Return-Path: <SRS0=2A/1=3K=vger.kernel.org=linux-block-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-8.2 required=3.0 tests=DKIM_SIGNED,DKIM_VALID,
-	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,
-	SPF_HELO_NONE,SPF_PASS,USER_AGENT_SANE_1 autolearn=unavailable
-	autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-8.1 required=3.0 tests=DKIMWL_WL_MED,DKIM_SIGNED,
+	DKIM_VALID,DKIM_VALID_AU,FSL_HELO_FAKE,HEADER_FROM_DIFFERENT_DOMAINS,
+	MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,USER_AGENT_SANE_1,
+	USER_IN_DEF_DKIM_WL autolearn=no autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id BAB17C2D0CE
-	for <linux-block@archiver.kernel.org>; Tue, 21 Jan 2020 21:25:20 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 8D0A5C3F68F
+	for <linux-block@archiver.kernel.org>; Tue, 21 Jan 2020 22:05:30 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.kernel.org (Postfix) with ESMTP id 8BD39217F4
-	for <linux-block@archiver.kernel.org>; Tue, 21 Jan 2020 21:25:20 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id 6377C2465B
+	for <linux-block@archiver.kernel.org>; Tue, 21 Jan 2020 22:05:30 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel-dk.20150623.gappssmtp.com header.i=@kernel-dk.20150623.gappssmtp.com header.b="qXjTaDPw"
+	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="b+DkuJVK"
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1728827AbgAUVZU (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Tue, 21 Jan 2020 16:25:20 -0500
-Received: from mail-il1-f194.google.com ([209.85.166.194]:45359 "EHLO
-        mail-il1-f194.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1728776AbgAUVZT (ORCPT
+        id S1729043AbgAUWF3 (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Tue, 21 Jan 2020 17:05:29 -0500
+Received: from mail-pg1-f193.google.com ([209.85.215.193]:40571 "EHLO
+        mail-pg1-f193.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S1729016AbgAUWF2 (ORCPT
         <rfc822;linux-block@vger.kernel.org>);
-        Tue, 21 Jan 2020 16:25:19 -0500
-Received: by mail-il1-f194.google.com with SMTP id p8so3484720iln.12
-        for <linux-block@vger.kernel.org>; Tue, 21 Jan 2020 13:25:19 -0800 (PST)
+        Tue, 21 Jan 2020 17:05:28 -0500
+Received: by mail-pg1-f193.google.com with SMTP id k25so2257169pgt.7
+        for <linux-block@vger.kernel.org>; Tue, 21 Jan 2020 14:05:28 -0800 (PST)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=kernel-dk.20150623.gappssmtp.com; s=20150623;
-        h=subject:to:cc:references:from:message-id:date:user-agent
-         :mime-version:in-reply-to:content-language:content-transfer-encoding;
-        bh=FHCvw3BPgEGuM+0lfBGPIFX9bQ88tvGWWuXcX9fLsHY=;
-        b=qXjTaDPwyPUafBpzuhsi1ITIYQBhCPvnUaCq5unGMHCEZID3D2E7vNgrj6YiQvb/Dl
-         vW9/+EL1jdb/jKYwudEW7PEOy42rH/0t0IodwwMAFEi6g61Z+4pkFeAgoXgMG8744qJx
-         Bcnmf9Nw/RgVRm44x07L8eeTfw9WBSjXU8fU2Dxq+J1G4yrto2eDUAFSPCRVLoKr26/V
-         l+ioFMzci7six7lSmV3a9jjjqfg4nBXF6IY8k8yzr/POU+0w/K2xAHpaE5MEnFUse493
-         zCAdGwD6tByHfhs5dJN4hytggJKVC22sHrK5U/BwKxLCQ5FLDDSjqXhqA+3kChv/v2sh
-         /O+g==
+        d=google.com; s=20161025;
+        h=date:from:to:cc:subject:message-id:references:mime-version
+         :content-disposition:in-reply-to:user-agent;
+        bh=MHL1t/EyEsW/kDCQVsvBnpYeqWiiNR3Qofvm72VP2xo=;
+        b=b+DkuJVKIKETrJ5dpTxidfDLzDLkavoiNLhArG3sMhvs1V6c3puRQUI9pG9KRYRWPd
+         8fRSkviBHz+tFzxp4t+VfIOdI/jgi3sJ8Vewc009gojBVO6V1BECgJK5222fsEzQXJQm
+         wbAnTgKeIHbOU4Tr5RKZqicWx20WuZ71yUO7sN1kR4zsn3mD7Zznv4+GsRhRluFNXZeS
+         DWYSw9vYZzXEm7IIrBEuVWdlXIRxeFhGVZcjpgT2fJKpY4FFj1SMuLJIJkxJTe5YPqoE
+         FIMd1Y6nmyaf6ERoXAdUmhkH+AVj9CIIhltvG0/65sNQMh+6F+GSHDHh8Fzlp3CXn/CF
+         WCHQ==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=1e100.net; s=20161025;
-        h=x-gm-message-state:subject:to:cc:references:from:message-id:date
-         :user-agent:mime-version:in-reply-to:content-language
-         :content-transfer-encoding;
-        bh=FHCvw3BPgEGuM+0lfBGPIFX9bQ88tvGWWuXcX9fLsHY=;
-        b=j6bhq07/JJRVCoCPbnxl+ShAwlwx7jIw8XCQvDadiwR35O9oWel6k6sGplOzGnoX1T
-         Xvlu6BA0Gbqx/C8C8fTJBpk9emYLmjk11f/e6V0bKLcZy+8bekXtTiPPCWHk/43FyAJ/
-         vj22Lm5dkb/jXaXTDcJEIHa95ETXQBZMarj1hXUkaOvQkXNXx9St8Q0I8YgMeySMI2cq
-         7WDLvdsdnSstQE0N9lGmA03Rh+My4ShcBK1V/kJgOQREiDwZmZ2ll4c1AQCl5L4uFwBL
-         C8CrLqqg5A+anqPCQ8TKJuQ42nknyZ90ks6S+Jga/Pj47Dd1ujQqzGxkhI5J5ENpy9FJ
-         zRwA==
-X-Gm-Message-State: APjAAAXus1j6MAAYc3m5614mWBYc/m+8H/Aa2KLir2W8uNbwGAFkIUJH
-        8GzVsvAx/8EXe88v2HQ4/UUzlA==
-X-Google-Smtp-Source: APXvYqxPLzlyge3FdUW1OJLyyZvj9cGo8aGoZ7RSW91nft7bFum48eXlAWOVjm4i1elqSsWJy65tCg==
-X-Received: by 2002:a92:9e97:: with SMTP id s23mr5712813ilk.139.1579641919076;
-        Tue, 21 Jan 2020 13:25:19 -0800 (PST)
-Received: from [192.168.1.159] ([65.144.74.34])
-        by smtp.gmail.com with ESMTPSA id l8sm9854822ioc.42.2020.01.21.13.25.17
-        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
-        Tue, 21 Jan 2020 13:25:18 -0800 (PST)
-Subject: Re: [PATCH] nbd: add a flush_workqueue in nbd_start_device
-To:     Josef Bacik <josef@toxicpanda.com>, Sun Ke <sunke32@huawei.com>,
-        mchristi@redhat.com
-Cc:     linux-block@vger.kernel.org, nbd@other.debian.org,
-        linux-kernel@vger.kernel.org
-References: <20200121124813.13332-1-sunke32@huawei.com>
- <82a3eb7e-883c-a091-feec-27f3937491ab@toxicpanda.com>
-From:   Jens Axboe <axboe@kernel.dk>
-Message-ID: <83d21549-66a0-0e76-89e5-1303c5b19102@kernel.dk>
-Date:   Tue, 21 Jan 2020 14:25:17 -0700
-User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:68.0) Gecko/20100101
- Thunderbird/68.4.1
+        h=x-gm-message-state:date:from:to:cc:subject:message-id:references
+         :mime-version:content-disposition:in-reply-to:user-agent;
+        bh=MHL1t/EyEsW/kDCQVsvBnpYeqWiiNR3Qofvm72VP2xo=;
+        b=GyCIIiClNXT/Hxghoki+bwa3avSyhDWMr53ESDSXA5j+FFoyNKkQq9+tYhO1IsGVuz
+         0WpzPg6dE7oTdKbUKFEcuepQ45vXYgZZcPgriBiNzUC+J4DwoD/s4ppqj/vRp5NDSnLB
+         tEqDujtDpZ++T15n+E72zMcR4ekH35X5b5cby4B5e8IixHOnwrdAo1aru9mAIAyZlvOU
+         zsv0PxT2u0uJWF3V1koQF2LPZL/KDL24WX/jDvsP6JpXdRI9nMSN9FC6oywe0EOkBZx2
+         REc1Cajm02tFMdyJ+zf1e1UYUATZUhp0kY6Rd1SB3mzkfhWutYuaUWQXv0Zx1ojH8mlr
+         zShA==
+X-Gm-Message-State: APjAAAUbW02jLEtPd1wXByPLpECKPsOCmVe8wm4YPI86YMj+SVPHoljD
+        upTz8uimshvsYk8WLt8JYkiiAg==
+X-Google-Smtp-Source: APXvYqwh8OnW+eP9V0DrV7fz7N0b2aotldt8ipMvaida+/kr2JuRziMzbgGUGDkawpb/E1PWbTxPyg==
+X-Received: by 2002:a63:6d8d:: with SMTP id i135mr7771059pgc.90.1579644327592;
+        Tue, 21 Jan 2020 14:05:27 -0800 (PST)
+Received: from google.com ([2620:15c:201:0:7f8c:9d6e:20b8:e324])
+        by smtp.gmail.com with ESMTPSA id a16sm41620400pgb.5.2020.01.21.14.05.26
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Tue, 21 Jan 2020 14:05:27 -0800 (PST)
+Date:   Tue, 21 Jan 2020 14:05:22 -0800
+From:   Satya Tangirala <satyat@google.com>
+To:     Eric Biggers <ebiggers@kernel.org>
+Cc:     Christoph Hellwig <hch@infradead.org>,
+        "Martin K. Petersen" <martin.petersen@oracle.com>,
+        "Darrick J. Wong" <darrick.wong@oracle.com>,
+        linux-block@vger.kernel.org, linux-scsi@vger.kernel.org,
+        linux-fscrypt@vger.kernel.org, linux-fsdevel@vger.kernel.org,
+        linux-f2fs-devel@lists.sourceforge.net,
+        Barani Muthukumaran <bmuthuku@qti.qualcomm.com>,
+        Kuohong Wang <kuohong.wang@mediatek.com>,
+        Kim Boojin <boojin.kim@samsung.com>
+Subject: Re: [PATCH v6 2/9] block: Add encryption context to struct bio
+Message-ID: <20200121220522.GA243816@google.com>
+References: <20191218145136.172774-1-satyat@google.com>
+ <20191218145136.172774-3-satyat@google.com>
+ <20191218212116.GA7476@magnolia>
+ <yq1y2v9e37b.fsf@oracle.com>
+ <20191218222726.GC47399@gmail.com>
+ <yq1fthhdttv.fsf@oracle.com>
+ <20200108140730.GC2896@infradead.org>
+ <20200108172629.GA232722@sol.localdomain>
+ <20200117083221.GA324@infradead.org>
+ <20200118051132.GC3290@sol.localdomain>
 MIME-Version: 1.0
-In-Reply-To: <82a3eb7e-883c-a091-feec-27f3937491ab@toxicpanda.com>
-Content-Type: text/plain; charset=utf-8
-Content-Language: en-US
-Content-Transfer-Encoding: 7bit
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <20200118051132.GC3290@sol.localdomain>
+User-Agent: Mutt/1.10.1 (2018-07-13)
 Sender: linux-block-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-On 1/21/20 7:00 AM, Josef Bacik wrote:
-> On 1/21/20 7:48 AM, Sun Ke wrote:
->> When kzalloc fail, may cause trying to destroy the
->> workqueue from inside the workqueue.
->>
->> If num_connections is m (2 < m), and NO.1 ~ NO.n
->> (1 < n < m) kzalloc are successful. The NO.(n + 1)
->> failed. Then, nbd_start_device will return ENOMEM
->> to nbd_start_device_ioctl, and nbd_start_device_ioctl
->> will return immediately without running flush_workqueue.
->> However, we still have n recv threads. If nbd_release
->> run first, recv threads may have to drop the last
->> config_refs and try to destroy the workqueue from
->> inside the workqueue.
->>
->> To fix it, add a flush_workqueue in nbd_start_device.
->>
->> Fixes: e9e006f5fcf2 ("nbd: fix max number of supported devs")
->> Signed-off-by: Sun Ke <sunke32@huawei.com>
->> ---
->>   drivers/block/nbd.c | 7 ++++++-
->>   1 file changed, 6 insertions(+), 1 deletion(-)
->>
->> diff --git a/drivers/block/nbd.c b/drivers/block/nbd.c
->> index b4607dd96185..dd1f8c2c6169 100644
->> --- a/drivers/block/nbd.c
->> +++ b/drivers/block/nbd.c
->> @@ -1264,7 +1264,12 @@ static int nbd_start_device(struct nbd_device *nbd)
->>   
->>   		args = kzalloc(sizeof(*args), GFP_KERNEL);
->>   		if (!args) {
->> -			sock_shutdown(nbd);
->> +			if (i == 0)
->> +				sock_shutdown(nbd);
->> +			else {
->> +				sock_shutdown(nbd);
->> +				flush_workqueue(nbd->recv_workq);
->> +			}
+On Fri, Jan 17, 2020 at 09:11:32PM -0800, Eric Biggers wrote:
+> On Fri, Jan 17, 2020 at 12:32:21AM -0800, Christoph Hellwig wrote:
+> > 
+> > File systems don't move data around all that often (saying that with my
+> > fs developer hat on).  In traditional file systems only defragmentation
+> > will move data around, with extent refcounting it can also happen for
+> > dedup, and for file systems that write out of place data gets moved
+> > when parts of a block are rewritten, but in that case a read modify
+> > write cycle is perfomed in the Linux code anyway, so it will go through
+> > the inline encryption engined on the way and the way out.
+> > 
+> > So in other words - specifying an IV would be useful for some use cases,
+> > but I don't think it is a deal blocker. Even without that is is useful
+> > for block device level encryption, and could have some usefulness for
+> > file system encryption usage.
+> > 
+> > I think that adding an IV would eventually be useful, but fitting that
+> > into NVMe won't be easy, as you'd need to find a way to specify the IV
+> > for each submission queue entry, which requires growing it, or finding
+> > some way to extend it out of band.
 > 
-> Just for readability sake why don't we just flush_workqueue()
-> unconditionally, and add a comment so we know why in the future.
+> Sure, people have even done inline crypto on ext4 before (downstream), using the
+> LBA for the IV.  But log-structured filesystems like f2fs move data blocks
+> around *without the encryption key*; and at least for fscrypt, f2fs support is
+> essential.  In any case it's also awkward having the physical on-disk location
+> determine the ciphertext on-disk, as then the result isn't fully controlled by
+> the encryption settings you set, but also based on where your filesystem is
+> located on-disk (with extra fun occurring if there's any sort of remapping layer
+> in between).  But sure, it's not *useless* to not be able to specify the IV,
+> it's just annoying and less useful.
+> 
+> [I was also a bit surprised to see that NVMe won't actually allow specify the
+> IV, as I thought you had objected to the naming of the INLINE_CRYPT_OPTIMIZED
+> fscrypt policy flag partly on the grounds that NVMe would support IVs longer
+> than the 64 bits that UFS is limited to.  Perhaps I misunderstood though.]
+> 
+> > > So let's not over-engineer this kernel patchset to support some broken
+> > > vaporware, please.
+> > 
+> > Not sharing bio fields for integrity and encryption actually keeps
+> > the patchset simpler (although uses more memory if both options are
+> > enabled).  So my main point here is to not over engineer it for broken
+> > premise that won't be true soon.
+> 
+> Well there are 3 options:
+> 
+> (a) Separate fields for bi_crypt_context and bi_integrity
+> (b) bi_crypt_context and bi_integrity in union
+> (c) One pointer that can support both features,
+>     e.g. linked list of tagged structs.
+> 
+> It sounds like you're advocating for (a), but I had misunderstood and thought
+> you're advocating for (c).  We'd of course be fine with (a) as it's the
+> simplest, but other people are saying they prefer (b).
+> 
+> Satya, to resolve this I think you should check how hard (b) is to implement --
+> i.e. is it easy, or is it really tricky to ensure the features are never used
+> together?  (Considering that it's probably not just a matter of whether any
+> hardware supports both features, as dm-integrity supports blk-integrity in
+> software and blk-crypto-fallback supports blk-crypto in software.)
+> 
+> - Eric
 
-Or maybe just make it:
+What I have right now for v7 of the patch series was my attempt at (b) (since
+some were saying they prefer it) - it may still be incomplete though because I
+missed something, but here's what I think it involved:
 
-	sock_shutdown(nbd);
-	if (i)
-		flush_workqueue(nbd->recv_workq);
+1) bi_crypt_context is never set after bi_integrity, so I don't check if
+   bi_integrity is set or not when setting bi_crypt_context - this keeps the
+   code cleaner when setting the bi_crypt_context.
 
-which does the same thing, but is still readable. The current code with
-the shutdown duplication is just a bit odd. Needs a comment either way.
+2) I made it error whenever we try to set bi_integrity on a bio with
+   REQ_BLK_CRYPTO.
 
--- 
-Jens Axboe
+3) There is an issue with the way the blk-crypto-fallback interacts with bio
+   integrity. One of the goals of the fallback is to make it inline encryption
+   transparent to the upper layers (i.e. as far as the upper layers are
+   concerned there should be no difference whether there is actual hardware
+   inline encryption support or whether the fallback is used instead).
 
+   The issue is, when the fallback encrypts a bio, it clones the bio and
+   encrypts the pages in the clone, but the clone won't have a bi_crypt_context
+   (since otherwise, when the clone is resubmitted, blk-crypto would incorrectly
+   assume that the clone needs to be encrypted once again). When bi_integrity is
+   set on the clone, there won't be any error detected since REQ_BLK_CRYPTO
+   won't be set on the clone. However, if hardware inline encryption support had
+   been present, and the blk-crypto had not used the fallback, the same bio
+   would have bi_crypt_context set when we try to set bi_integrity, which would
+   then fail.
+
+   To fix this issue, I introduced another flag REQ_NO_SPECIAL (subject to being
+   renamed when I think of/someone suggests a better name), which when set on
+   the bio, indicates that bi_integrity (and in future whatever other fields
+   share the same union, shouldn't be set on that bio. I can probably do away
+   with the new flag and just set REQ_BLK_CRYPTO and also set
+   bi_crypt_context = NULL to signify the same thing, but either way, it doesn't
+   seem like a very clean solution to me.
+
+4) I don't think there's actually an issue with dm-integrity as long as when we
+   add support for inline encryption to dm, we ensure that if any of the child
+   targets is dm-integrity, then the dm device says it doesn't support any
+   crypto mode. This way, encryption is always consistently done before
+   integrity calculation, which is always consistently done before decryption
+   (and when dm-integrity is not using the internal hash, then the bio will fail
+   because of (2), but this is still consistent whether or not hardware inline
+   encryption support is present.
+
+However, even if we decide to do (a), I'll still need to ensure that when bio
+integrity and blk-crypto are used together, the results are consistent
+regardless of whether hardware inline crypto support is present. So I either
+disallow bio integrity to be used with blk-crypto, in which case I'll need to
+do something similar to what I had to do in (3) like introduce REQ_NO_SPECIAL
+and we also lose the advantage of not having the two fields shared in a union,
+or I allow them to be used together while ensuring consistent results by
+maybe doing something like forcing blk-crypto to fallback to the crypto API
+whenever the target device for a bio has a bio integrity profile (and whatever
+checks are done in bio_integrity_prep).
+
+So I'm not sure if (a) is a lot easier or cleaner. But unlike (b), (a)
+does give us the option of using the two features together....if it seems
+likely that we'll want to use both these features together at some point,
+then maybe I should switch back to (a), and for now just disallow the two
+features from being used together since that's still easier than trying to get
+them both to work together, and once we know for sure that we want to use both
+together, we can make the necessary additions then?
