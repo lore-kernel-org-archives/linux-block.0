@@ -2,283 +2,133 @@ Return-Path: <SRS0=2A/1=3K=vger.kernel.org=linux-block-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-6.5 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
-	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,SPF_HELO_NONE,
-	SPF_PASS,USER_AGENT_GIT autolearn=unavailable autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-8.2 required=3.0 tests=DKIM_SIGNED,DKIM_VALID,
+	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,
+	SPF_HELO_NONE,SPF_PASS,USER_AGENT_SANE_1 autolearn=unavailable
+	autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id EFD06C33CAF
-	for <linux-block@archiver.kernel.org>; Tue, 21 Jan 2020 20:10:59 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id BAB17C2D0CE
+	for <linux-block@archiver.kernel.org>; Tue, 21 Jan 2020 21:25:20 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.kernel.org (Postfix) with ESMTP id B36E924656
-	for <linux-block@archiver.kernel.org>; Tue, 21 Jan 2020 20:10:59 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id 8BD39217F4
+	for <linux-block@archiver.kernel.org>; Tue, 21 Jan 2020 21:25:20 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (1024-bit key) header.d=rubrik.com header.i=@rubrik.com header.b="HqMKzLjJ"
+	dkim=pass (2048-bit key) header.d=kernel-dk.20150623.gappssmtp.com header.i=@kernel-dk.20150623.gappssmtp.com header.b="qXjTaDPw"
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1726926AbgAUUK6 (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Tue, 21 Jan 2020 15:10:58 -0500
-Received: from mail-pf1-f195.google.com ([209.85.210.195]:39131 "EHLO
-        mail-pf1-f195.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1728988AbgAUUK5 (ORCPT
+        id S1728827AbgAUVZU (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Tue, 21 Jan 2020 16:25:20 -0500
+Received: from mail-il1-f194.google.com ([209.85.166.194]:45359 "EHLO
+        mail-il1-f194.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S1728776AbgAUVZT (ORCPT
         <rfc822;linux-block@vger.kernel.org>);
-        Tue, 21 Jan 2020 15:10:57 -0500
-Received: by mail-pf1-f195.google.com with SMTP id q10so2047199pfs.6
-        for <linux-block@vger.kernel.org>; Tue, 21 Jan 2020 12:10:56 -0800 (PST)
+        Tue, 21 Jan 2020 16:25:19 -0500
+Received: by mail-il1-f194.google.com with SMTP id p8so3484720iln.12
+        for <linux-block@vger.kernel.org>; Tue, 21 Jan 2020 13:25:19 -0800 (PST)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=rubrik.com; s=google;
-        h=from:to:cc:subject:date:message-id:in-reply-to:references;
-        bh=V7x1RRyGfuYglkor9RuyO4Y73p0EzGbXZRnd3Ti6cGk=;
-        b=HqMKzLjJyGF7uLhsUEWIf0GkZfXWx042LzYroOD4Cq6h3/yCsKKUdgVSw6B1idneRI
-         wCoWZ32LCQucJzca9JnqcowR2pkPjgtz8uuUbhG40AQhpkdryyoxBeHa3zLkXKXZyVu1
-         JLMalQZMeF9FhmqajVbKKHbm3gR2D0RHWSoK8=
+        d=kernel-dk.20150623.gappssmtp.com; s=20150623;
+        h=subject:to:cc:references:from:message-id:date:user-agent
+         :mime-version:in-reply-to:content-language:content-transfer-encoding;
+        bh=FHCvw3BPgEGuM+0lfBGPIFX9bQ88tvGWWuXcX9fLsHY=;
+        b=qXjTaDPwyPUafBpzuhsi1ITIYQBhCPvnUaCq5unGMHCEZID3D2E7vNgrj6YiQvb/Dl
+         vW9/+EL1jdb/jKYwudEW7PEOy42rH/0t0IodwwMAFEi6g61Z+4pkFeAgoXgMG8744qJx
+         Bcnmf9Nw/RgVRm44x07L8eeTfw9WBSjXU8fU2Dxq+J1G4yrto2eDUAFSPCRVLoKr26/V
+         l+ioFMzci7six7lSmV3a9jjjqfg4nBXF6IY8k8yzr/POU+0w/K2xAHpaE5MEnFUse493
+         zCAdGwD6tByHfhs5dJN4hytggJKVC22sHrK5U/BwKxLCQ5FLDDSjqXhqA+3kChv/v2sh
+         /O+g==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=1e100.net; s=20161025;
-        h=x-gm-message-state:from:to:cc:subject:date:message-id:in-reply-to
-         :references;
-        bh=V7x1RRyGfuYglkor9RuyO4Y73p0EzGbXZRnd3Ti6cGk=;
-        b=o4fR2g8gk5GnBN+rq5bbBo6XIN6g2M2WYZFStNIeO2lcerij3QcT+sIa9mjc7oXK99
-         axxPBYy4YiDuVYWYg9tM04zMJq/LnVNmW6t8fw/AxDnWmWL5mUjV4atmPQze5bCOZM0a
-         BPv+TgI8zPHn/9MZ0x/eyxjjL6GhXuwqB8QK74dkJzZP3sVg0qU/CscyD1oYvWP4Oo3x
-         CMbZpbKNnIAFrPWLgV6BEpdERzxl5G+E7Yjf08PKmKKYGyuefJL+9r1jzFHCmGMn/0iy
-         HiiA5AdmsPIaxJl9uXhcHuyQWjbrHLH0IX6T0uVG6qQJb2jkT3qiAq2dLYa9wgmTIFfS
-         +wuw==
-X-Gm-Message-State: APjAAAWz70zQi+W+1oDNTZiltKUCIQexTVhE76Xw0nyZRP1yhaoGeHYy
-        l974ucgAsyCJgJ7yhCzkxzWL
-X-Google-Smtp-Source: APXvYqxrwBvo3xOpapumFEXc7IagIyCzeX7NrbqfHbdzUfll2f5sCHBMRkkel7JSq/2rvo9sAAvmKQ==
-X-Received: by 2002:a63:e4f:: with SMTP id 15mr6927609pgo.398.1579637455722;
-        Tue, 21 Jan 2020 12:10:55 -0800 (PST)
-Received: from fa2cb4acc48b.colo.rubrik.com ([4.7.92.14])
-        by smtp.gmail.com with ESMTPSA id b1sm34490612pfp.44.2020.01.21.12.10.54
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Tue, 21 Jan 2020 12:10:55 -0800 (PST)
-From:   "muraliraja.muniraju" <muraliraja.muniraju@rubrik.com>
-Cc:     Chaitanya.Kulkarni@wdc.com,
-        "muraliraja.muniraju" <muraliraja.muniraju@rubrik.com>,
-        Jens Axboe <axboe@kernel.dk>, linux-block@vger.kernel.org,
+        h=x-gm-message-state:subject:to:cc:references:from:message-id:date
+         :user-agent:mime-version:in-reply-to:content-language
+         :content-transfer-encoding;
+        bh=FHCvw3BPgEGuM+0lfBGPIFX9bQ88tvGWWuXcX9fLsHY=;
+        b=j6bhq07/JJRVCoCPbnxl+ShAwlwx7jIw8XCQvDadiwR35O9oWel6k6sGplOzGnoX1T
+         Xvlu6BA0Gbqx/C8C8fTJBpk9emYLmjk11f/e6V0bKLcZy+8bekXtTiPPCWHk/43FyAJ/
+         vj22Lm5dkb/jXaXTDcJEIHa95ETXQBZMarj1hXUkaOvQkXNXx9St8Q0I8YgMeySMI2cq
+         7WDLvdsdnSstQE0N9lGmA03Rh+My4ShcBK1V/kJgOQREiDwZmZ2ll4c1AQCl5L4uFwBL
+         C8CrLqqg5A+anqPCQ8TKJuQ42nknyZ90ks6S+Jga/Pj47Dd1ujQqzGxkhI5J5ENpy9FJ
+         zRwA==
+X-Gm-Message-State: APjAAAXus1j6MAAYc3m5614mWBYc/m+8H/Aa2KLir2W8uNbwGAFkIUJH
+        8GzVsvAx/8EXe88v2HQ4/UUzlA==
+X-Google-Smtp-Source: APXvYqxPLzlyge3FdUW1OJLyyZvj9cGo8aGoZ7RSW91nft7bFum48eXlAWOVjm4i1elqSsWJy65tCg==
+X-Received: by 2002:a92:9e97:: with SMTP id s23mr5712813ilk.139.1579641919076;
+        Tue, 21 Jan 2020 13:25:19 -0800 (PST)
+Received: from [192.168.1.159] ([65.144.74.34])
+        by smtp.gmail.com with ESMTPSA id l8sm9854822ioc.42.2020.01.21.13.25.17
+        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
+        Tue, 21 Jan 2020 13:25:18 -0800 (PST)
+Subject: Re: [PATCH] nbd: add a flush_workqueue in nbd_start_device
+To:     Josef Bacik <josef@toxicpanda.com>, Sun Ke <sunke32@huawei.com>,
+        mchristi@redhat.com
+Cc:     linux-block@vger.kernel.org, nbd@other.debian.org,
         linux-kernel@vger.kernel.org
-Subject: Re [PATCH] Adding multiple workers to the loop device.
-Date:   Tue, 21 Jan 2020 20:10:12 +0000
-Message-Id: <20200121201014.52345-1-muraliraja.muniraju@rubrik.com>
-X-Mailer: git-send-email 2.17.1
-In-Reply-To: <DM6PR04MB5754D8E261B4200AA62D442D860D0@DM6PR04MB5754.namprd04.prod.outlook.com>
-References: <DM6PR04MB5754D8E261B4200AA62D442D860D0@DM6PR04MB5754.namprd04.prod.outlook.com>
-To:     unlisted-recipients:; (no To-header on input)
+References: <20200121124813.13332-1-sunke32@huawei.com>
+ <82a3eb7e-883c-a091-feec-27f3937491ab@toxicpanda.com>
+From:   Jens Axboe <axboe@kernel.dk>
+Message-ID: <83d21549-66a0-0e76-89e5-1303c5b19102@kernel.dk>
+Date:   Tue, 21 Jan 2020 14:25:17 -0700
+User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:68.0) Gecko/20100101
+ Thunderbird/68.4.1
+MIME-Version: 1.0
+In-Reply-To: <82a3eb7e-883c-a091-feec-27f3937491ab@toxicpanda.com>
+Content-Type: text/plain; charset=utf-8
+Content-Language: en-US
+Content-Transfer-Encoding: 7bit
 Sender: linux-block-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-Below is the dd results that I ran with the worker and without the worker changes.
-Enhanced Loop has the changes and ran with 1,2,3,4 workers with 4 dds running on the same loop device.
-Normal Loop is 1 worker(the existing code) with 4 dd's running on the same loop device.
-Enhanced loop
-1 - READ: io=21981MB, aggrb=187558KB/s, minb=187558KB/s, maxb=187558KB/s, mint=120008msec, maxt=120008msec
-2 - READ: io=41109MB, aggrb=350785KB/s, minb=350785KB/s, maxb=350785KB/s, mint=120004msec, maxt=120004msec
-3 - READ: io=45927MB, aggrb=391802KB/s, minb=391802KB/s, maxb=391802KB/s, mint=120033msec, maxt=120033msec
-4 - READ: io=45771MB, aggrb=390543KB/s, minb=390543KB/s, maxb=390543KB/s, mint=120011msec, maxt=120011msec
-Normal loop
-1 - READ: io=18432MB, aggrb=157201KB/s, minb=157201KB/s, maxb=157201KB/s, mint=120065msec, maxt=120065msec
-2 - READ: io=18762MB, aggrb=160035KB/s, minb=160035KB/s, maxb=160035KB/s, mint=120050msec, maxt=120050msec
-3 - READ: io=18174MB, aggrb=155058KB/s, minb=155058KB/s, maxb=155058KB/s, mint=120020msec, maxt=120020msec
-4 - READ: io=20559MB, aggrb=175407KB/s, minb=175407KB/s, maxb=175407KB/s, mint=120020msec, maxt=120020msec
+On 1/21/20 7:00 AM, Josef Bacik wrote:
+> On 1/21/20 7:48 AM, Sun Ke wrote:
+>> When kzalloc fail, may cause trying to destroy the
+>> workqueue from inside the workqueue.
+>>
+>> If num_connections is m (2 < m), and NO.1 ~ NO.n
+>> (1 < n < m) kzalloc are successful. The NO.(n + 1)
+>> failed. Then, nbd_start_device will return ENOMEM
+>> to nbd_start_device_ioctl, and nbd_start_device_ioctl
+>> will return immediately without running flush_workqueue.
+>> However, we still have n recv threads. If nbd_release
+>> run first, recv threads may have to drop the last
+>> config_refs and try to destroy the workqueue from
+>> inside the workqueue.
+>>
+>> To fix it, add a flush_workqueue in nbd_start_device.
+>>
+>> Fixes: e9e006f5fcf2 ("nbd: fix max number of supported devs")
+>> Signed-off-by: Sun Ke <sunke32@huawei.com>
+>> ---
+>>   drivers/block/nbd.c | 7 ++++++-
+>>   1 file changed, 6 insertions(+), 1 deletion(-)
+>>
+>> diff --git a/drivers/block/nbd.c b/drivers/block/nbd.c
+>> index b4607dd96185..dd1f8c2c6169 100644
+>> --- a/drivers/block/nbd.c
+>> +++ b/drivers/block/nbd.c
+>> @@ -1264,7 +1264,12 @@ static int nbd_start_device(struct nbd_device *nbd)
+>>   
+>>   		args = kzalloc(sizeof(*args), GFP_KERNEL);
+>>   		if (!args) {
+>> -			sock_shutdown(nbd);
+>> +			if (i == 0)
+>> +				sock_shutdown(nbd);
+>> +			else {
+>> +				sock_shutdown(nbd);
+>> +				flush_workqueue(nbd->recv_workq);
+>> +			}
+> 
+> Just for readability sake why don't we just flush_workqueue()
+> unconditionally, and add a comment so we know why in the future.
 
-The Enhanced loop is the current patch with number of workers to be 4. Beyond 4 workers I did not see a significant changes.
+Or maybe just make it:
 
-Current loop device implementation has a single kthread worker and
-drains one request at a time to completion. If the underneath device is
-slow then this reduces the concurrency significantly. To help in these
-cases, adding multiple loop workers increases the concurrency. Also to
-retain the old behaviour the default number of loop workers is 1 and can
-be tuned via the ioctl.
----
- drivers/block/loop.c      | 68 +++++++++++++++++++++++++++++++++------
- drivers/block/loop.h      |  9 ++++--
- include/uapi/linux/loop.h |  1 +
- 3 files changed, 67 insertions(+), 11 deletions(-)
+	sock_shutdown(nbd);
+	if (i)
+		flush_workqueue(nbd->recv_workq);
 
-diff --git a/drivers/block/loop.c b/drivers/block/loop.c
-index 739b372a5112..97ec9485140c 100644
---- a/drivers/block/loop.c
-+++ b/drivers/block/loop.c
-@@ -793,6 +793,13 @@ static ssize_t loop_attr_backing_file_show(struct loop_device *lo, char *buf)
- 	return ret;
- }
- 
-+static ssize_t loop_attr_num_loop_workers_show(struct loop_device *lo,
-+						char *buf)
-+{
-+	return sprintf(buf, "%llu\n",
-+			(unsigned long long)lo->num_loop_workers);
-+}
-+
- static ssize_t loop_attr_offset_show(struct loop_device *lo, char *buf)
- {
- 	return sprintf(buf, "%llu\n", (unsigned long long)lo->lo_offset);
-@@ -830,6 +837,7 @@ LOOP_ATTR_RO(sizelimit);
- LOOP_ATTR_RO(autoclear);
- LOOP_ATTR_RO(partscan);
- LOOP_ATTR_RO(dio);
-+LOOP_ATTR_RO(num_loop_workers);
- 
- static struct attribute *loop_attrs[] = {
- 	&loop_attr_backing_file.attr,
-@@ -838,6 +846,7 @@ static struct attribute *loop_attrs[] = {
- 	&loop_attr_autoclear.attr,
- 	&loop_attr_partscan.attr,
- 	&loop_attr_dio.attr,
-+	&loop_attr_num_loop_workers.attr,
- 	NULL,
- };
- 
-@@ -889,10 +898,19 @@ static void loop_config_discard(struct loop_device *lo)
- 	blk_queue_flag_set(QUEUE_FLAG_DISCARD, q);
- }
- 
-+static void loop_queue_cleanup(struct loop_device *lo, int num_workers)
-+{
-+	int i;
-+
-+	for (i = 0; i < num_workers; i++)
-+		kthread_flush_worker(&(lo->workers[i]));
-+	for (i = 0; i < num_workers; i++)
-+		kthread_stop(lo->worker_tasks[i]);
-+}
-+
- static void loop_unprepare_queue(struct loop_device *lo)
- {
--	kthread_flush_worker(&lo->worker);
--	kthread_stop(lo->worker_task);
-+	loop_queue_cleanup(lo, lo->num_loop_workers);
- }
- 
- static int loop_kthread_worker_fn(void *worker_ptr)
-@@ -903,13 +921,22 @@ static int loop_kthread_worker_fn(void *worker_ptr)
- 
- static int loop_prepare_queue(struct loop_device *lo)
- {
--	kthread_init_worker(&lo->worker);
--	lo->worker_task = kthread_run(loop_kthread_worker_fn,
--			&lo->worker, "loop%d", lo->lo_number);
--	if (IS_ERR(lo->worker_task))
--		return -ENOMEM;
--	set_user_nice(lo->worker_task, MIN_NICE);
-+	int i = 0;
-+
-+	for (i = 0; i < lo->num_loop_workers; i++) {
-+		kthread_init_worker(&(lo->workers[i]));
-+		lo->worker_tasks[i] = kthread_run(
-+				loop_kthread_worker_fn, &(lo->workers[i]),
-+				"loop%d(%d)", lo->lo_number, i);
-+		if (IS_ERR((lo->worker_tasks[i])))
-+			goto err;
-+		set_user_nice(lo->worker_tasks[i], MIN_NICE);
-+	}
- 	return 0;
-+err:
-+	// Cleanup the previous indices, 0 to i-1
-+	loop_queue_cleanup(lo, i);
-+	return -ENOMEM;
- }
- 
- static void loop_update_rotational(struct loop_device *lo)
-@@ -1529,6 +1556,16 @@ static int loop_set_dio(struct loop_device *lo, unsigned long arg)
- 	return error;
- }
- 
-+static int loop_set_num_workers(struct loop_device *lo, unsigned long arg)
-+{
-+	if (lo->lo_state != Lo_unbound)
-+		return -ENXIO;
-+	if (arg < 1 || arg > MAX_LOOP_WORKER_THREADS)
-+		return -EINVAL;
-+	lo->num_loop_workers = arg;
-+	return 0;
-+}
-+
- static int loop_set_block_size(struct loop_device *lo, unsigned long arg)
- {
- 	int err = 0;
-@@ -1584,6 +1621,9 @@ static int lo_simple_ioctl(struct loop_device *lo, unsigned int cmd,
- 	case LOOP_SET_BLOCK_SIZE:
- 		err = loop_set_block_size(lo, arg);
- 		break;
-+	case LOOP_SET_WORKERS:
-+		err = loop_set_num_workers(lo, arg);
-+		break;
- 	default:
- 		err = lo->ioctl ? lo->ioctl(lo, cmd, arg) : -EINVAL;
- 	}
-@@ -1907,6 +1947,7 @@ static blk_status_t loop_queue_rq(struct blk_mq_hw_ctx *hctx,
- 	struct request *rq = bd->rq;
- 	struct loop_cmd *cmd = blk_mq_rq_to_pdu(rq);
- 	struct loop_device *lo = rq->q->queuedata;
-+	unsigned int inx;
- 
- 	blk_mq_start_request(rq);
- 
-@@ -1932,7 +1973,14 @@ static blk_status_t loop_queue_rq(struct blk_mq_hw_ctx *hctx,
- 	} else
- #endif
- 		cmd->css = NULL;
--	kthread_queue_work(&lo->worker, &cmd->work);
-+
-+	// Round robin the incoming requests across multiple threads
-+	// by having a monitorically increasing number indexing
-+	// by modulo number of workers.
-+	inx = lo->current_queue_inx;
-+	inx = inx % lo->num_loop_workers;
-+	kthread_queue_work(&lo->workers[inx], &cmd->work);
-+	lo->current_queue_inx += 1;
- 
- 	return BLK_STS_OK;
- }
-@@ -2014,6 +2062,8 @@ static int loop_add(struct loop_device **l, int i)
- 	lo->tag_set.cmd_size = sizeof(struct loop_cmd);
- 	lo->tag_set.flags = BLK_MQ_F_SHOULD_MERGE;
- 	lo->tag_set.driver_data = lo;
-+	lo->num_loop_workers = DEFAULT_LOOP_WORKERS;
-+	lo->current_queue_inx = 0;
- 
- 	err = blk_mq_alloc_tag_set(&lo->tag_set);
- 	if (err)
-diff --git a/drivers/block/loop.h b/drivers/block/loop.h
-index af75a5ee4094..09d1cc4f9b6b 100644
---- a/drivers/block/loop.h
-+++ b/drivers/block/loop.h
-@@ -26,6 +26,9 @@ enum {
- 
- struct loop_func_table;
- 
-+#define MAX_LOOP_WORKER_THREADS 8
-+#define DEFAULT_LOOP_WORKERS 1
-+
- struct loop_device {
- 	int		lo_number;
- 	atomic_t	lo_refcnt;
-@@ -54,8 +57,10 @@ struct loop_device {
- 
- 	spinlock_t		lo_lock;
- 	int			lo_state;
--	struct kthread_worker	worker;
--	struct task_struct	*worker_task;
-+	struct kthread_worker	workers[MAX_LOOP_WORKER_THREADS];
-+	struct task_struct	*worker_tasks[MAX_LOOP_WORKER_THREADS];
-+	unsigned int		current_queue_inx;
-+	int			num_loop_workers;
- 	bool			use_dio;
- 	bool			sysfs_inited;
- 
-diff --git a/include/uapi/linux/loop.h b/include/uapi/linux/loop.h
-index 080a8df134ef..a1b689832bb4 100644
---- a/include/uapi/linux/loop.h
-+++ b/include/uapi/linux/loop.h
-@@ -90,6 +90,7 @@ struct loop_info64 {
- #define LOOP_SET_CAPACITY	0x4C07
- #define LOOP_SET_DIRECT_IO	0x4C08
- #define LOOP_SET_BLOCK_SIZE	0x4C09
-+#define LOOP_SET_WORKERS	0x4C0A
- 
- /* /dev/loop-control interface */
- #define LOOP_CTL_ADD		0x4C80
+which does the same thing, but is still readable. The current code with
+the shutdown duplication is just a bit odd. Needs a comment either way.
+
 -- 
-2.17.1
+Jens Axboe
 
