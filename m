@@ -4,25 +4,25 @@ X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 X-Spam-Level: 
 X-Spam-Status: No, score=-6.8 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
 	INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS
-	autolearn=ham autolearn_force=no version=3.4.0
+	autolearn=unavailable autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id D4BF4C2D0DB
-	for <linux-block@archiver.kernel.org>; Tue, 21 Jan 2020 10:19:19 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id B1DC3C33CAA
+	for <linux-block@archiver.kernel.org>; Tue, 21 Jan 2020 10:19:30 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.kernel.org (Postfix) with ESMTP id AABC224656
-	for <linux-block@archiver.kernel.org>; Tue, 21 Jan 2020 10:19:19 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id 9267324684
+	for <linux-block@archiver.kernel.org>; Tue, 21 Jan 2020 10:19:30 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1729441AbgAUKTS (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Tue, 21 Jan 2020 05:19:18 -0500
-Received: from relay.sw.ru ([185.231.240.75]:56174 "EHLO relay.sw.ru"
+        id S1729592AbgAUKT0 (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Tue, 21 Jan 2020 05:19:26 -0500
+Received: from relay.sw.ru ([185.231.240.75]:56292 "EHLO relay.sw.ru"
         rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-        id S1729324AbgAUKTS (ORCPT <rfc822;linux-block@vger.kernel.org>);
-        Tue, 21 Jan 2020 05:19:18 -0500
+        id S1729547AbgAUKT0 (ORCPT <rfc822;linux-block@vger.kernel.org>);
+        Tue, 21 Jan 2020 05:19:26 -0500
 Received: from dhcp-172-16-24-104.sw.ru ([172.16.24.104] helo=localhost.localdomain)
         by relay.sw.ru with esmtp (Exim 4.92.3)
         (envelope-from <ktkhai@virtuozzo.com>)
-        id 1itqcf-00068c-6j; Tue, 21 Jan 2020 13:19:01 +0300
-Subject: [PATCH v3 4/7] block: Add support for REQ_ALLOCATE flag
+        id 1itqcs-000692-3J; Tue, 21 Jan 2020 13:19:14 +0300
+Subject: [PATCH v3 6/7] dm: Directly disable max_allocate_sectors for now
 From:   Kirill Tkhai <ktkhai@virtuozzo.com>
 To:     linux-block@vger.kernel.org, linux-kernel@vger.kernel.org,
         martin.petersen@oracle.com, bob.liu@oracle.com, axboe@kernel.dk,
@@ -35,8 +35,8 @@ To:     linux-block@vger.kernel.org, linux-kernel@vger.kernel.org,
         ajay.joshi@wdc.com, sagi@grimberg.me, dsterba@suse.com,
         chaitanya.kulkarni@wdc.com, bvanassche@acm.org,
         dhowells@redhat.com, asml.silence@gmail.com, ktkhai@virtuozzo.com
-Date:   Tue, 21 Jan 2020 13:19:01 +0300
-Message-ID: <157960194104.97730.12158120414253617992.stgit@localhost.localdomain>
+Date:   Tue, 21 Jan 2020 13:19:12 +0300
+Message-ID: <157960195201.97730.125791396853976710.stgit@localhost.localdomain>
 In-Reply-To: <157960153921.97730.9973412459876396302.stgit@localhost.localdomain>
 References: <157960153921.97730.9973412459876396302.stgit@localhost.localdomain>
 User-Agent: StGit/0.19
@@ -48,196 +48,50 @@ Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-This adds support for REQ_ALLOCATE extension of REQ_OP_WRITE_ZEROES
-operation, which encourages a block device driver to just allocate
-blocks (or mark them allocated) instead of actual blocks zeroing.
-REQ_ALLOCATE is aimed to be used for network filesystems providing
-a block device interface. Also, block devices, which map a file
-on other filesystem (like loop), may use this for less fragmentation
-and batching fallocate() requests. Hypervisors like QEMU may
-introduce optimizations of clusters allocations based on this.
+Since dm inherits limits from underlining block devices,
+this patch directly disables max_allocate_sectors for dm
+till full allocation support is implemented.
 
-BLKDEV_ZERO_ALLOCATE is a new corresponding flag for
-blkdev_issue_zeroout().
+This prevents high-level primitives (generic_make_request_checks(),
+__blkdev_issue_write_zeroes(), ...) from sending REQ_ALLOCATE
+requests.
 
 Signed-off-by: Kirill Tkhai <ktkhai@virtuozzo.com>
 ---
- block/blk-lib.c           |   17 ++++++++++-------
- block/blk-settings.c      |    4 ++++
- fs/block_dev.c            |    4 ++++
- include/linux/blk_types.h |    5 ++++-
- include/linux/blkdev.h    |   13 ++++++++++---
- 5 files changed, 32 insertions(+), 11 deletions(-)
+ drivers/md/dm-table.c |    2 ++
+ drivers/md/md.h       |    1 +
+ 2 files changed, 3 insertions(+)
 
-diff --git a/block/blk-lib.c b/block/blk-lib.c
-index 3e38c93cfc53..9cd6f86523ba 100644
---- a/block/blk-lib.c
-+++ b/block/blk-lib.c
-@@ -214,7 +214,7 @@ static int __blkdev_issue_write_zeroes(struct block_device *bdev,
- 		struct bio **biop, unsigned flags)
- {
- 	struct bio *bio = *biop;
--	unsigned int max_write_zeroes_sectors;
-+	unsigned int max_write_zeroes_sectors, req_flags = 0;
- 	struct request_queue *q = bdev_get_queue(bdev);
+diff --git a/drivers/md/dm-table.c b/drivers/md/dm-table.c
+index 0a2cc197f62b..e245c0d882aa 100644
+--- a/drivers/md/dm-table.c
++++ b/drivers/md/dm-table.c
+@@ -489,6 +489,7 @@ static int dm_set_device_limits(struct dm_target *ti, struct dm_dev *dev,
+ 		       (unsigned long long) start << SECTOR_SHIFT);
  
- 	if (!q)
-@@ -224,18 +224,21 @@ static int __blkdev_issue_write_zeroes(struct block_device *bdev,
- 		return -EPERM;
+ 	limits->zoned = blk_queue_zoned_model(q);
++	blk_queue_max_allocate_sectors(q, 0);
  
- 	/* Ensure that max_write_zeroes_sectors doesn't overflow bi_size */
--	max_write_zeroes_sectors = bdev_write_zeroes_sectors(bdev, 0);
-+	max_write_zeroes_sectors = bdev_write_zeroes_sectors(bdev, flags);
- 
- 	if (max_write_zeroes_sectors == 0)
- 		return -EOPNOTSUPP;
- 
-+	if (flags & BLKDEV_ZERO_NOUNMAP)
-+		req_flags |= REQ_NOUNMAP;
-+	if (flags & BLKDEV_ZERO_ALLOCATE)
-+		req_flags |= REQ_ALLOCATE|REQ_NOUNMAP;
-+
- 	while (nr_sects) {
- 		bio = blk_next_bio(bio, 0, gfp_mask);
- 		bio->bi_iter.bi_sector = sector;
- 		bio_set_dev(bio, bdev);
--		bio->bi_opf = REQ_OP_WRITE_ZEROES;
--		if (flags & BLKDEV_ZERO_NOUNMAP)
--			bio->bi_opf |= REQ_NOUNMAP;
-+		bio->bi_opf = REQ_OP_WRITE_ZEROES | req_flags;
- 
- 		if (nr_sects > max_write_zeroes_sectors) {
- 			bio->bi_iter.bi_size = max_write_zeroes_sectors << 9;
-@@ -362,7 +365,7 @@ int blkdev_issue_zeroout(struct block_device *bdev, sector_t sector,
- 	sector_t bs_mask;
- 	struct bio *bio;
- 	struct blk_plug plug;
--	bool try_write_zeroes = !!bdev_write_zeroes_sectors(bdev, 0);
-+	bool try_write_zeroes = !!bdev_write_zeroes_sectors(bdev, flags);
- 
- 	bs_mask = (bdev_logical_block_size(bdev) >> 9) - 1;
- 	if ((sector | nr_sects) & bs_mask)
-@@ -391,7 +394,7 @@ int blkdev_issue_zeroout(struct block_device *bdev, sector_t sector,
- 			try_write_zeroes = false;
- 			goto retry;
- 		}
--		if (!bdev_write_zeroes_sectors(bdev, 0)) {
-+		if (!bdev_write_zeroes_sectors(bdev, flags)) {
- 			/*
- 			 * Zeroing offload support was indicated, but the
- 			 * device reported ILLEGAL REQUEST (for some devices
-diff --git a/block/blk-settings.c b/block/blk-settings.c
-index c8eda2e7b91e..81468cd454a6 100644
---- a/block/blk-settings.c
-+++ b/block/blk-settings.c
-@@ -48,6 +48,7 @@ void blk_set_default_limits(struct queue_limits *lim)
- 	lim->chunk_sectors = 0;
- 	lim->max_write_same_sectors = 0;
- 	lim->max_write_zeroes_sectors = 0;
-+	lim->max_allocate_sectors = 0;
- 	lim->max_discard_sectors = 0;
- 	lim->max_hw_discard_sectors = 0;
- 	lim->discard_granularity = 0;
-@@ -83,6 +84,7 @@ void blk_set_stacking_limits(struct queue_limits *lim)
- 	lim->max_dev_sectors = UINT_MAX;
- 	lim->max_write_same_sectors = UINT_MAX;
- 	lim->max_write_zeroes_sectors = UINT_MAX;
-+	lim->max_allocate_sectors = UINT_MAX;
+ 	return 0;
  }
- EXPORT_SYMBOL(blk_set_stacking_limits);
+@@ -1548,6 +1549,7 @@ int dm_calculate_queue_limits(struct dm_table *table,
+ 			       dm_device_name(table->md),
+ 			       (unsigned long long) ti->begin,
+ 			       (unsigned long long) ti->len);
++		limits->max_allocate_sectors = 0;
  
-@@ -506,6 +508,8 @@ int blk_stack_limits(struct queue_limits *t, struct queue_limits *b,
- 					b->max_write_same_sectors);
- 	t->max_write_zeroes_sectors = min(t->max_write_zeroes_sectors,
- 					b->max_write_zeroes_sectors);
-+	t->max_allocate_sectors = min(t->max_allocate_sectors,
-+					b->max_allocate_sectors);
- 	t->bounce_pfn = min_not_zero(t->bounce_pfn, b->bounce_pfn);
- 
- 	t->seg_boundary_mask = min_not_zero(t->seg_boundary_mask,
-diff --git a/fs/block_dev.c b/fs/block_dev.c
-index 69bf2fb6f7cd..1ffef894b3bd 100644
---- a/fs/block_dev.c
-+++ b/fs/block_dev.c
-@@ -2122,6 +2122,10 @@ static long blkdev_fallocate(struct file *file, int mode, loff_t start,
- 		error = blkdev_issue_zeroout(bdev, start >> 9, len >> 9,
- 					     GFP_KERNEL, BLKDEV_ZERO_NOFALLBACK);
- 		break;
-+	case FALLOC_FL_KEEP_SIZE:
-+		error = blkdev_issue_zeroout(bdev, start >> 9, len >> 9,
-+			GFP_KERNEL, BLKDEV_ZERO_ALLOCATE | BLKDEV_ZERO_NOFALLBACK);
-+		break;
- 	case FALLOC_FL_PUNCH_HOLE | FALLOC_FL_KEEP_SIZE | FALLOC_FL_NO_HIDE_STALE:
- 		error = blkdev_issue_discard(bdev, start >> 9, len >> 9,
- 					     GFP_KERNEL, 0);
-diff --git a/include/linux/blk_types.h b/include/linux/blk_types.h
-index 70254ae11769..86accd2caa4e 100644
---- a/include/linux/blk_types.h
-+++ b/include/linux/blk_types.h
-@@ -335,7 +335,9 @@ enum req_flag_bits {
- 
- 	/* command specific flags for REQ_OP_WRITE_ZEROES: */
- 	__REQ_NOUNMAP,		/* do not free blocks when zeroing */
--
-+	__REQ_ALLOCATE,		/* only notify about allocated blocks,
-+				 * and do not actually zero them
-+				 */
- 	__REQ_HIPRI,
- 
- 	/* for driver use */
-@@ -362,6 +364,7 @@ enum req_flag_bits {
- #define REQ_CGROUP_PUNT		(1ULL << __REQ_CGROUP_PUNT)
- 
- #define REQ_NOUNMAP		(1ULL << __REQ_NOUNMAP)
-+#define REQ_ALLOCATE		(1ULL << __REQ_ALLOCATE)
- #define REQ_HIPRI		(1ULL << __REQ_HIPRI)
- 
- #define REQ_DRV			(1ULL << __REQ_DRV)
-diff --git a/include/linux/blkdev.h b/include/linux/blkdev.h
-index 264202fa3bf8..20c94a7f9411 100644
---- a/include/linux/blkdev.h
-+++ b/include/linux/blkdev.h
-@@ -337,6 +337,7 @@ struct queue_limits {
- 	unsigned int		max_hw_discard_sectors;
- 	unsigned int		max_write_same_sectors;
- 	unsigned int		max_write_zeroes_sectors;
-+	unsigned int		max_allocate_sectors;
- 	unsigned int		discard_granularity;
- 	unsigned int		discard_alignment;
- 
-@@ -991,6 +992,8 @@ static inline struct bio_vec req_bvec(struct request *rq)
- static inline unsigned int blk_queue_get_max_write_zeroes_sectors(
- 		struct request_queue *q, unsigned int op_flags)
- {
-+	if (op_flags & REQ_ALLOCATE)
-+		return q->limits.max_allocate_sectors;
- 	return q->limits.max_write_zeroes_sectors;
+ 		/*
+ 		 * FIXME: this should likely be moved to blk_stack_limits(), would
+diff --git a/drivers/md/md.h b/drivers/md/md.h
+index acd681939112..b9b6d78035a2 100644
+--- a/drivers/md/md.h
++++ b/drivers/md/md.h
+@@ -798,5 +798,6 @@ static inline void mddev_check_write_zeroes(struct mddev *mddev, struct bio *bio
+ 	if (bio_op(bio) == REQ_OP_WRITE_ZEROES &&
+ 	    !bio->bi_disk->queue->limits.max_write_zeroes_sectors)
+ 		mddev->queue->limits.max_write_zeroes_sectors = 0;
++	blk_queue_max_allocate_sectors(mddev->queue);
  }
- 
-@@ -1227,6 +1230,7 @@ extern int __blkdev_issue_discard(struct block_device *bdev, sector_t sector,
- 
- #define BLKDEV_ZERO_NOUNMAP	(1 << 0)  /* do not free blocks */
- #define BLKDEV_ZERO_NOFALLBACK	(1 << 1)  /* don't write explicit zeroes */
-+#define BLKDEV_ZERO_ALLOCATE	(1 << 2)  /* allocate range of blocks */
- 
- extern int __blkdev_issue_zeroout(struct block_device *bdev, sector_t sector,
- 		sector_t nr_sects, gfp_t gfp_mask, struct bio **biop,
-@@ -1431,10 +1435,13 @@ static inline unsigned int bdev_write_zeroes_sectors(struct block_device *bdev,
- {
- 	struct request_queue *q = bdev_get_queue(bdev);
- 
--	if (q)
--		return q->limits.max_write_zeroes_sectors;
-+	if (!q)
-+		return 0;
- 
--	return 0;
-+	if (flags & BLKDEV_ZERO_ALLOCATE)
-+		return q->limits.max_allocate_sectors;
-+	else
-+		return q->limits.max_write_zeroes_sectors;
- }
- 
- static inline enum blk_zoned_model bdev_zoned_model(struct block_device *bdev)
+ #endif /* _MD_MD_H */
 
 
