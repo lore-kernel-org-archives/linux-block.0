@@ -2,108 +2,82 @@ Return-Path: <SRS0=2A/1=3K=vger.kernel.org=linux-block-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-0.9 required=3.0 tests=DKIMWL_WL_HIGH,DKIM_SIGNED,
-	DKIM_VALID,DKIM_VALID_AU,HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,
-	SPF_HELO_NONE,SPF_PASS autolearn=no autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-3.5 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
+	HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,
+	USER_AGENT_GIT autolearn=no autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 9DAAAC2D0CE
-	for <linux-block@archiver.kernel.org>; Tue, 21 Jan 2020 19:57:24 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id C3C7CC33CAF
+	for <linux-block@archiver.kernel.org>; Tue, 21 Jan 2020 20:01:38 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.kernel.org (Postfix) with ESMTP id 6FA6924655
-	for <linux-block@archiver.kernel.org>; Tue, 21 Jan 2020 19:57:24 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id 9A85A24656
+	for <linux-block@archiver.kernel.org>; Tue, 21 Jan 2020 20:01:38 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=pass (1024-bit key) header.d=amazon.com header.i=@amazon.com header.b="HA7b8DlP"
+	dkim=fail reason="signature verification failed" (1024-bit key) header.d=rubrik.com header.i=@rubrik.com header.b="XDaBLmaG"
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1728928AbgAUT5X (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Tue, 21 Jan 2020 14:57:23 -0500
-Received: from smtp-fw-6001.amazon.com ([52.95.48.154]:46319 "EHLO
-        smtp-fw-6001.amazon.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1727383AbgAUT5X (ORCPT
+        id S1728205AbgAUUBi (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Tue, 21 Jan 2020 15:01:38 -0500
+Received: from mail-pg1-f195.google.com ([209.85.215.195]:37983 "EHLO
+        mail-pg1-f195.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S1727829AbgAUUBi (ORCPT
         <rfc822;linux-block@vger.kernel.org>);
-        Tue, 21 Jan 2020 14:57:23 -0500
+        Tue, 21 Jan 2020 15:01:38 -0500
+Received: by mail-pg1-f195.google.com with SMTP id a33so2087547pgm.5
+        for <linux-block@vger.kernel.org>; Tue, 21 Jan 2020 12:01:37 -0800 (PST)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-  d=amazon.com; i=@amazon.com; q=dns/txt; s=amazon201209;
-  t=1579636643; x=1611172643;
-  h=from:to:cc:subject:date:message-id:references:
-   in-reply-to:content-id:content-transfer-encoding:
-   mime-version;
-  bh=2AM9PR3Tvgu7t+SfNKaHveu2VLV9169Zlv+ZZ4N0qpA=;
-  b=HA7b8DlPnUOmZA9DIOUODnU04DHXGby0dzXoe2753OOaWi1TJwRZ+jLX
-   4X19yilgzzGP6frkWBbM33gBK7JXzkfp1P/VALClm+ep10yZEbP3CFWa3
-   5DINg/eE5D3kHFDvY/1dMa7Xg+/g9J8HZCjvJ2i3zbbP2atohPwsvJWAS
-   w=;
-IronPort-SDR: lY544I0KRAUsk4zKrPAMJmf3DphIrhLymowpbI89rShMVyOxxuTd5Dv3rwxoF3PoPih7muUPU3
- ObTngVwRiScA==
-X-IronPort-AV: E=Sophos;i="5.70,347,1574121600"; 
-   d="scan'208";a="14090811"
-Received: from iad12-co-svc-p1-lb1-vlan3.amazon.com (HELO email-inbound-relay-1a-7d76a15f.us-east-1.amazon.com) ([10.43.8.6])
-  by smtp-border-fw-out-6001.iad6.amazon.com with ESMTP; 21 Jan 2020 19:57:23 +0000
-Received: from EX13MTAUWB001.ant.amazon.com (iad55-ws-svc-p15-lb9-vlan2.iad.amazon.com [10.40.159.162])
-        by email-inbound-relay-1a-7d76a15f.us-east-1.amazon.com (Postfix) with ESMTPS id DF83CA2743;
-        Tue, 21 Jan 2020 19:57:19 +0000 (UTC)
-Received: from EX13D11UWB004.ant.amazon.com (10.43.161.90) by
- EX13MTAUWB001.ant.amazon.com (10.43.161.207) with Microsoft SMTP Server (TLS)
- id 15.0.1367.3; Tue, 21 Jan 2020 19:57:19 +0000
-Received: from EX13D01UWB002.ant.amazon.com (10.43.161.136) by
- EX13D11UWB004.ant.amazon.com (10.43.161.90) with Microsoft SMTP Server (TLS)
- id 15.0.1367.3; Tue, 21 Jan 2020 19:57:19 +0000
-Received: from EX13D01UWB002.ant.amazon.com ([10.43.161.136]) by
- EX13d01UWB002.ant.amazon.com ([10.43.161.136]) with mapi id 15.00.1367.000;
- Tue, 21 Jan 2020 19:57:19 +0000
-From:   "Singh, Balbir" <sblbir@amazon.com>
-To:     "hch@lst.de" <hch@lst.de>,
-        "martin.petersen@oracle.com" <martin.petersen@oracle.com>
-CC:     "linux-kernel@vger.kernel.org" <linux-kernel@vger.kernel.org>,
-        "linux-block@vger.kernel.org" <linux-block@vger.kernel.org>,
-        "Sangaraju, Someswarudu" <ssomesh@amazon.com>,
-        "jejb@linux.ibm.com" <jejb@linux.ibm.com>,
-        "axboe@kernel.dk" <axboe@kernel.dk>,
-        "mst@redhat.com" <mst@redhat.com>,
-        "linux-nvme@lists.infradead.org" <linux-nvme@lists.infradead.org>,
-        "Chaitanya.Kulkarni@wdc.com" <Chaitanya.Kulkarni@wdc.com>
-Subject: Re: [resend v1 1/5] block/genhd: Notify udev about capacity change
-Thread-Topic: [resend v1 1/5] block/genhd: Notify udev about capacity change
-Thread-Index: AQHVxdHjydawp/BwQkuXvP0PUEOjWqfg3jQAgBTAIAA=
-Date:   Tue, 21 Jan 2020 19:57:18 +0000
-Message-ID: <a1a36b7163c10fd6c9450ba631f26b9ce23dc3f7.camel@amazon.com>
-References: <20200102075315.22652-1-sblbir@amazon.com>
-         <20200102075315.22652-2-sblbir@amazon.com> <yq1ftgs2b6g.fsf@oracle.com>
-         <d1635bae908b59fb4fd7de7c90ffbd5b73de7542.camel@amazon.com>
-         <yq17e221vvt.fsf@oracle.com> <20200108150428.GB10975@lst.de>
-In-Reply-To: <20200108150428.GB10975@lst.de>
-Accept-Language: en-GB, en-US
-Content-Language: en-US
-X-MS-Has-Attach: 
-X-MS-TNEF-Correlator: 
-x-ms-exchange-messagesentrepresentingtype: 1
-x-ms-exchange-transport-fromentityheader: Hosted
-x-originating-ip: [10.43.160.48]
-Content-Type: text/plain; charset="utf-8"
-Content-ID: <AB767E631009EE4F8B8589D586BA62FF@amazon.com>
-Content-Transfer-Encoding: base64
-MIME-Version: 1.0
+        d=rubrik.com; s=google;
+        h=from:to:cc:subject:date:message-id:in-reply-to:references;
+        bh=qfjJsIdbdeYfyoWYZI/v+xL9rsxmnFotagk/efJxZeQ=;
+        b=XDaBLmaGKsvEWcDjGHgeVwG57SWuGhclAo6G2PUcE/5Zi8tJOPIcpFOalPhI2YjcIz
+         ErPPyTkWJN5jZA2W4o6xO0KAyc986aY9CLTLXDnzUq38kfIwOpJ+nbpQ6vrUoD5qsNmH
+         MXy+/DUOOrBFVv7w63wFCl4WZ2mLcqcJSMtjg=
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20161025;
+        h=x-gm-message-state:from:to:cc:subject:date:message-id:in-reply-to
+         :references;
+        bh=qfjJsIdbdeYfyoWYZI/v+xL9rsxmnFotagk/efJxZeQ=;
+        b=AmPHOtGIVe/XauclnoF9V5lwpytmHHO8FqdLLkZtTZbq0VOgAcl0I/gr3s9gpdK7m1
+         n2zCX5QuiozA+LZFv7Tn4s2sMwiru5nPygBmlNX8lDoMY1EpHRyqFagGgwNAfeuMK50i
+         RqTkvhgfYo4EXCRWtGiS3sYseuN2X+zvmQCWUxVbS+C1kOokVtFk1PxtS1S/GjEXStc6
+         LNo5EulSv8+gU8Tf5Gjvvx5DJhvD5paj0diHhcfvQnsOvD4t6n0uYkE6OapDFqYP6ZQH
+         HmoomeZgEcL89BNoDQRtjH/IIl8M1KRI6VyGqM6MEjuT+dxl0Q9Uv449bxWYW52a+TgI
+         2Opg==
+X-Gm-Message-State: APjAAAUU5BBxhGuwq3Hbe4k/arm39/1e3egAYDktBcxne0JQi85P7pG6
+        nUgiOqM8HBU8dEbdEbMYYciN
+X-Google-Smtp-Source: APXvYqx6+px4l0XmU+9V7IVWwJwCbBzMl171NAwatnATO+rYrz+LfLVcaRFQF3IahVgYFFZvBIWQJA==
+X-Received: by 2002:a63:6c86:: with SMTP id h128mr6631935pgc.200.1579636897415;
+        Tue, 21 Jan 2020 12:01:37 -0800 (PST)
+Received: from fa2cb4acc48b.colo.rubrik.com ([4.7.92.14])
+        by smtp.gmail.com with ESMTPSA id p28sm42443677pgb.93.2020.01.21.12.01.36
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Tue, 21 Jan 2020 12:01:36 -0800 (PST)
+From:   "muraliraja.muniraju" <muraliraja.muniraju@rubrik.com>
+Cc:     axboe@kernel.dk,
+        "muraliraja.muniraju" <muraliraja.muniraju@rubrik.com>,
+        linux-block@vger.kernel.org, linux-kernel@vger.kernel.org
+Subject: Re: [PATCH] Adding multiple workers to the loop device.
+Date:   Tue, 21 Jan 2020 20:01:08 +0000
+Message-Id: <20200121200110.52231-1-muraliraja.muniraju@rubrik.com>
+X-Mailer: git-send-email 2.17.1
+In-Reply-To: <DM6PR04MB5754D8E261B4200AA62D442D860D0@DM6PR04MB5754.namprd04.prod.outlook.com>
+References: <DM6PR04MB5754D8E261B4200AA62D442D860D0@DM6PR04MB5754.namprd04.prod.outlook.com>
+To:     unlisted-recipients:; (no To-header on input)
 Sender: linux-block-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-T24gV2VkLCAyMDIwLTAxLTA4IGF0IDE2OjA0ICswMTAwLCBoY2hAbHN0LmRlIHdyb3RlOg0KPiBP
-biBUdWUsIEphbiAwNywgMjAyMCBhdCAxMDoxNTozNFBNIC0wNTAwLCBNYXJ0aW4gSy4gUGV0ZXJz
-ZW4gd3JvdGU6DQo+ID4gDQo+ID4gQmFsYmlyLA0KPiA+IA0KPiA+ID4gSSBkaWQgdGhpcyB0byBh
-dm9pZCBoYXZpbmcgdG8gZW5mb3JjZSB0aGF0IHNldF9jYXBhY2l0eSgpIGltcGxpZWQgYQ0KPiA+
-ID4gbm90aWZpY2F0aW9uLiBMYXJnZWx5IHRvIGNvbnRyb2wgdGhlIGltcGFjdCBvZiB0aGUgY2hh
-bmdlIGJ5IGRlZmF1bHQuDQo+ID4gDQo+ID4gV2hhdCBJIHRob3VnaHQuIEknbSBPSyB3aXRoIHNl
-dF9jYXBhY2l0eV9hbmRfbm90aWZ5KCksIGJ0dy4NCj4gDQo+IFRvIHNvbWUgZXh0ZW50IGl0IG1p
-Z2h0IG1ha2Ugc2Vuc2UgdG8gYWx3YXlzIG5vdGlmeSBmcm9tIHNldF9jYXBhY2l0eQ0KPiBhbmQg
-aGF2ZSBhIHNldF9jYXBhY2l0eV9ub25vdGlmeSBpZiB3ZSBkb24ndCB3YW50IHRvIG5vdGlmeSwg
-YXMgaW4NCj4gZ2VuZXJhbCB3ZSBwcm9iYWJseSBzaG91bGQgbm90aWZ5IHVubGVzcyB3ZSBoYXZl
-IGEgZ29vZCByZWFzb24gbm90IHRvLg0KDQpJIGFtIG5vdCBzdXJlIGlmIHRoaXMgaXMgdGhlIHJp
-Z2h0IHBhdGgsIHNpbmNlIHdpdGggdGhlIG5ldyBpbnRlcmZhY2UsIHdlJ2xsDQpub3cgaGF2ZSBy
-ZXZhbGlkYXRlIGRpc2sgYml0cyBidWlsdCBpbnRvIHRoZSBmdW5jdGlvbiAoc2VlIHRoZSBjb21t
-ZW50cyBmcm9tDQpCb2IgZWFybGllcikuIEknZCBiZSBoYXBwaWVyIGNvbnZlcnRpbmcgaW50ZXJm
-YWNlcyBhIGZldyBhdCBhIHRpbWUsIEEgcXVpY2sNCmdyZXAgZm91bmQgb3ZlciAxMDAgcmVmZXJl
-bmNlcyBhbmQgSSBhbSBub3QgZXZlbiBzdXJlIGhvdyBtYW55IG9mIHRoZW0gYXJlDQpyZXNpemFi
-bGUgd2l0aG91dCBob3RwbHVnIGluL291dCBvbiB0aGUgZmx5LiBIZW5jZSwgSSBsaW1pdGVkIG15
-c2VsZiB0byB0aGUNCnNtYWxsIHN1YnNldCwgSSBjb3VsZCBjb25zaWRlciBleHBhbmRpbmcgaXQg
-bGF0ZXIgYmFzZWQgb24gdGhlIG5lZWQgYW5kIHRoZWlyDQphYmlsaXR5IHRvIHJlc2l6ZSBvbiB0
-aGUgZmx5DQoNCkJhbGJpciBTaW5naC4NCg==
+Below is the dd results that I ran with the worker and without the worker changes. 
+Enhanced Loop has the changes and ran with 1,2,3,4 workers with 4 dds running on the same loop device.
+Normal Loop is 1 worker(the existing code) with 4 dd's running on the same loop device.
+Enhanced loop
+1 - READ: io=21981MB, aggrb=187558KB/s, minb=187558KB/s, maxb=187558KB/s, mint=120008msec, maxt=120008msec
+2 - READ: io=41109MB, aggrb=350785KB/s, minb=350785KB/s, maxb=350785KB/s, mint=120004msec, maxt=120004msec
+3 - READ: io=45927MB, aggrb=391802KB/s, minb=391802KB/s, maxb=391802KB/s, mint=120033msec, maxt=120033msec
+4 - READ: io=45771MB, aggrb=390543KB/s, minb=390543KB/s, maxb=390543KB/s, mint=120011msec, maxt=120011msec
+Normal loop
+1 - READ: io=18432MB, aggrb=157201KB/s, minb=157201KB/s, maxb=157201KB/s, mint=120065msec, maxt=120065msec
+2 - READ: io=18762MB, aggrb=160035KB/s, minb=160035KB/s, maxb=160035KB/s, mint=120050msec, maxt=120050msec
+3 - READ: io=18174MB, aggrb=155058KB/s, minb=155058KB/s, maxb=155058KB/s, mint=120020msec, maxt=120020msec
+4 - READ: io=20559MB, aggrb=175407KB/s, minb=175407KB/s, maxb=175407KB/s, mint=120020msec, maxt=120020msec
+
+The Enhanced loop is the current patch with number of workers to be 4. Beyond 4 workers I did not see a significant changes.
