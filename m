@@ -2,73 +2,52 @@ Return-Path: <SRS0=2A/1=3K=vger.kernel.org=linux-block-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-8.2 required=3.0 tests=DKIM_SIGNED,DKIM_VALID,
-	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,
-	SPF_HELO_NONE,SPF_PASS,USER_AGENT_SANE_1 autolearn=ham autolearn_force=no
-	version=3.4.0
+X-Spam-Status: No, score=-5.2 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
+	MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,USER_AGENT_SANE_1
+	autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 41502C2D0CE
-	for <linux-block@archiver.kernel.org>; Tue, 21 Jan 2020 14:09:30 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id B9CFFC2D0CE
+	for <linux-block@archiver.kernel.org>; Tue, 21 Jan 2020 14:21:59 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.kernel.org (Postfix) with ESMTP id 0C947217F4
-	for <linux-block@archiver.kernel.org>; Tue, 21 Jan 2020 14:09:30 +0000 (UTC)
-Authentication-Results: mail.kernel.org;
-	dkim=pass (2048-bit key) header.d=toxicpanda-com.20150623.gappssmtp.com header.i=@toxicpanda-com.20150623.gappssmtp.com header.b="U0aT5pb5"
+	by mail.kernel.org (Postfix) with ESMTP id 96C1B217F4
+	for <linux-block@archiver.kernel.org>; Tue, 21 Jan 2020 14:21:59 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1728709AbgAUOJ3 (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Tue, 21 Jan 2020 09:09:29 -0500
-Received: from mail-qk1-f196.google.com ([209.85.222.196]:44861 "EHLO
-        mail-qk1-f196.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1727508AbgAUOJ3 (ORCPT
-        <rfc822;linux-block@vger.kernel.org>);
-        Tue, 21 Jan 2020 09:09:29 -0500
-Received: by mail-qk1-f196.google.com with SMTP id v195so2604963qkb.11
-        for <linux-block@vger.kernel.org>; Tue, 21 Jan 2020 06:09:28 -0800 (PST)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=toxicpanda-com.20150623.gappssmtp.com; s=20150623;
-        h=subject:to:cc:references:from:message-id:date:user-agent
-         :mime-version:in-reply-to:content-language:content-transfer-encoding;
-        bh=MXMAlZrf6RWqgu1sZHLz9u+/Sa6aM/FrrOMx7Y5CS+U=;
-        b=U0aT5pb5FoHZj5lISYTKH5SvegT1CwAlwWnXDVcU6MVD4WJMBL4/fWmH1qaQ2YSwUV
-         eUXDAKu0ADfvrB0kuVG3ZhJ0AFq553As9ukd2UrMxzPtIK+LiURUpvHSl4wYJIKZLBZ5
-         WMwphxiW4auh9oesjHPDimGLxo8R9n5B0fbppZnIpAFIXoR3uJjUew7y4/89ys4+beRZ
-         QkR7UWQNR0zBXPk/LXNixzs7s7gxbAsWgNl9mMzREHTzbL9lrXbV8PbBvAg1vqP4sr8/
-         fiTKtismOtboFx20pNHqT6F4HVs5/5aEcnHto8mWtBPrHQfh/bp8eMbnR7b94ejl/g3z
-         KTYg==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20161025;
-        h=x-gm-message-state:subject:to:cc:references:from:message-id:date
-         :user-agent:mime-version:in-reply-to:content-language
-         :content-transfer-encoding;
-        bh=MXMAlZrf6RWqgu1sZHLz9u+/Sa6aM/FrrOMx7Y5CS+U=;
-        b=noEftTc7ZkK9x6t8fw69yRsDHMYLDBiWSGAOePRevu5HDediYq0zZNjwUXkUyOfDOu
-         h8TZelQHw7TzUkaku8zUXlurtEw5YqozlEoSpygr5vfpY/gu166PR3R/a3CIJqc03PIU
-         WbRwgO5hhRjsY/lMry6l+xgj7T/DYRyRPNLudVoOsnOwmlMTe/OEDr3D7GjjW5SZg73l
-         SZlv1MT/9WoYZyBkDli4fnlZoIjAEQlXLJS7+XvBn18R6aahIYskNnl1KIGegHTT67IF
-         WdSSbjcuAFEdBtxaOWfroL+Ld3aKUgOeBeoAaN2PIhB/+QrH055zqTD4b+PtPIaKeJnz
-         Hj8Q==
-X-Gm-Message-State: APjAAAV5iXinHk7N41NeR9T4Q7yKruyjaeGZ3ooAOOdevATTJ6m8IY+Y
-        O1+hRECkayDgJgmPUVd6UpOg4Q==
-X-Google-Smtp-Source: APXvYqzbepHCf8odvOuFZORhg4stdqBChkK/lRhRxCuHcOGffbvJ/jV9yysnaPWYPxVgZaBof9w8Sw==
-X-Received: by 2002:a37:b783:: with SMTP id h125mr4507737qkf.75.1579615768137;
-        Tue, 21 Jan 2020 06:09:28 -0800 (PST)
-Received: from ?IPv6:2620:10d:c0a8:1102:ce0:3629:8daa:1271? ([2620:10d:c091:480::822a])
-        by smtp.gmail.com with ESMTPSA id r28sm19712087qtr.3.2020.01.21.06.09.27
-        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
-        Tue, 21 Jan 2020 06:09:27 -0800 (PST)
-Subject: Re: [v2] nbd: fix potential NULL pointer fault in nbd_genl_disconnect
-To:     Sun Ke <sunke32@huawei.com>, axboe@kernel.dk, mchristi@redhat.com
-Cc:     linux-block@vger.kernel.org, nbd@other.debian.org,
-        linux-kernel@vger.kernel.org
-References: <20200120124549.27648-1-sunke32@huawei.com>
-From:   Josef Bacik <josef@toxicpanda.com>
-Message-ID: <8bb961fe-3412-9c3c-ad9b-54d446e90bf0@toxicpanda.com>
-Date:   Tue, 21 Jan 2020 09:09:26 -0500
-User-Agent: Mozilla/5.0 (Macintosh; Intel Mac OS X 10.14; rv:68.0)
- Gecko/20100101 Thunderbird/68.4.1
+        id S1729140AbgAUOV7 (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Tue, 21 Jan 2020 09:21:59 -0500
+Received: from relay.sw.ru ([185.231.240.75]:38308 "EHLO relay.sw.ru"
+        rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
+        id S1729030AbgAUOV7 (ORCPT <rfc822;linux-block@vger.kernel.org>);
+        Tue, 21 Jan 2020 09:21:59 -0500
+Received: from dhcp-172-16-24-104.sw.ru ([172.16.24.104])
+        by relay.sw.ru with esmtp (Exim 4.92.3)
+        (envelope-from <ktkhai@virtuozzo.com>)
+        id 1ituOd-0000iX-C4; Tue, 21 Jan 2020 17:20:47 +0300
+Subject: Re: [PATCH v4 6/7] dm: Directly disable max_allocate_sectors for now
+To:     Mike Snitzer <snitzer@redhat.com>
+Cc:     linux-block@vger.kernel.org, linux-kernel@vger.kernel.org,
+        martin.petersen@oracle.com, bob.liu@oracle.com, axboe@kernel.dk,
+        agk@redhat.com, dm-devel@redhat.com, song@kernel.org,
+        tytso@mit.edu, adilger.kernel@dilger.ca,
+        Chaitanya.Kulkarni@wdc.com, darrick.wong@oracle.com,
+        ming.lei@redhat.com, osandov@fb.com, jthumshirn@suse.de,
+        minwoo.im.dev@gmail.com, damien.lemoal@wdc.com,
+        andrea.parri@amarulasolutions.com, hare@suse.com, tj@kernel.org,
+        ajay.joshi@wdc.com, sagi@grimberg.me, dsterba@suse.com,
+        bvanassche@acm.org, dhowells@redhat.com, asml.silence@gmail.com
+References: <157960325642.108120.13626623438131044304.stgit@localhost.localdomain>
+ <157960337238.108120.18048939587162465175.stgit@localhost.localdomain>
+ <20200121122458.GA9365@redhat.com>
+ <f7e0fb38-a894-da33-c46b-e192ed907ee0@virtuozzo.com>
+ <619a7a14-44e6-eca7-c1ea-3f04abeee53d@virtuozzo.com>
+ <20200121134840.GA9944@redhat.com>
+From:   Kirill Tkhai <ktkhai@virtuozzo.com>
+Message-ID: <a19d5957-9aaa-b518-5855-e5fa2b5d3b22@virtuozzo.com>
+Date:   Tue, 21 Jan 2020 17:20:46 +0300
+User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:68.0) Gecko/20100101
+ Thunderbird/68.4.1
 MIME-Version: 1.0
-In-Reply-To: <20200120124549.27648-1-sunke32@huawei.com>
-Content-Type: text/plain; charset=utf-8; format=flowed
+In-Reply-To: <20200121134840.GA9944@redhat.com>
+Content-Type: text/plain; charset=utf-8
 Content-Language: en-US
 Content-Transfer-Encoding: 7bit
 Sender: linux-block-owner@vger.kernel.org
@@ -76,54 +55,75 @@ Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-On 1/20/20 7:45 AM, Sun Ke wrote:
-> Open /dev/nbdX first, the config_refs will be 1 and
-> the pointers in nbd_device are still null. Disconnect
-> /dev/nbdX, then reference a null recv_workq. The
-> protection by config_refs in nbd_genl_disconnect is useless.
+On 21.01.2020 16:48, Mike Snitzer wrote:
+> On Tue, Jan 21 2020 at  8:33am -0500,
+> Kirill Tkhai <ktkhai@virtuozzo.com> wrote:
 > 
-> To fix it, just add a check for a non null task_recv in
-> nbd_genl_disconnect.
+>> On 21.01.2020 15:36, Kirill Tkhai wrote:
+>>> On 21.01.2020 15:24, Mike Snitzer wrote:
+>>>> On Tue, Jan 21 2020 at  5:42am -0500,
+>>>> Kirill Tkhai <ktkhai@virtuozzo.com> wrote:
+>>>>
+>>>>> Since dm inherits limits from underlining block devices,
+>>>>> this patch directly disables max_allocate_sectors for dm
+>>>>> till full allocation support is implemented.
+>>>>>
+>>>>> This prevents high-level primitives (generic_make_request_checks(),
+>>>>> __blkdev_issue_write_zeroes(), ...) from sending REQ_ALLOCATE
+>>>>> requests.
+>>>>>
+>>>>> Signed-off-by: Kirill Tkhai <ktkhai@virtuozzo.com>
+>>>>> ---
+>>>>>  drivers/md/dm-table.c |    2 ++
+>>>>>  drivers/md/md.h       |    1 +
+>>>>>  2 files changed, 3 insertions(+)
+>>>>
+>>>> You're mixing DM and MD changes in the same patch.
+>>>>
+>>>> But I'm wondering if it might be best to set this default for stacking
+>>>> devices in blk_set_stacking_limits()?
+>>>>
+>>>> And then it is up to each stacking driver to override as needed.
+>>>
+>>> Hm. Sound like a good idea. This "lim->max_allocate_sectors = 0" in blk_set_stacking_limits()
+>>> should work for dm's dm_calculate_queue_limits(), since it calls blk_stack_limits(), which is:
+>>>
+>>> 	t->max_allocate_sectors = min(t->max_allocate_sectors,
+>>> 				      b->max_allocate_sectors);
+>>>
+>>> Could you please tell is this fix is also enough for md?
+>>
+>> It looks like it's enough since queue defaults are set in md_alloc()->blk_set_stacking_limits().
+>> In case of we set "max_allocate_sectors = 0", in further it can be changed only manually,
+>> but nobody does this.
 > 
-> Signed-off-by: Sun Ke <sunke32@huawei.com>
-> ---
-> v1 -> v2:
+> Yes, it will work to disable this capability for MD and DM.
 > 
-> add an omitted mutex_unlock.
-> ---
->   drivers/block/nbd.c | 4 ++++
->   1 file changed, 4 insertions(+)
+> But if/when a stacked device _dooes_ want to support this then it'll be
+> awkward to override this stacking default to allow blk_stack_limits()
+> to properly stack up this limit.  blk_limits are extremely fiddley so
+> this isn't necessarily new.  But by explicitly defaulting to 0 and then
+> having blk_stack_limits use min() for this limit: it results in stacking
+> drivers needing to clumsily unwind the default.  E.g. DM will need to
+> tweak its blk_stack_limits() related code to allow override that
+> actually _does_  stack up the underlying devices' capability (and not
+> just impose its own limit that ignores the underlying devices).
 > 
-> diff --git a/drivers/block/nbd.c b/drivers/block/nbd.c
-> index b4607dd96185..668bc9cb92ed 100644
-> --- a/drivers/block/nbd.c
-> +++ b/drivers/block/nbd.c
-> @@ -2008,6 +2008,10 @@ static int nbd_genl_disconnect(struct sk_buff *skb, struct genl_info *info)
->   		       index);
->   		return -EINVAL;
->   	}
-> +	if (!nbd->task_recv) {
-> +		mutex_unlock(&nbd_index_mutex);
-> +		return -EINVAL;
-> +	}
->   	if (!refcount_inc_not_zero(&nbd->refs)) {
->   		mutex_unlock(&nbd_index_mutex);
->   		printk(KERN_ERR "nbd: device at index %d is going down\n",
-> 
+> So I'm not convinced this is the right way to go (be it the v4 approach
+> you took or the cleaner use of blk_set_stacking_limits I suggested).
 
-This doesn't even really protect us, we need to have the nbd->config_lock held 
-here to make sure it's ok.  The IOCTL path is safe because it creates the device 
-on open so it's sure to exist by the time we get to the disconnect, we don't 
-have that for genl_disconnect.  So I'd add the config_mutex before getting the 
-config_ref, and then do the check, something like
+Is there a strong vision about the way we should go? Or you leave this choose
+up to me?
 
-mutex_lock(&nbd->config_lock);
-if (!refcount_inc_not_zero(&nbd->refs)) {
-}
-if (!nbd->recv_workq) {
-}
-mutex_unlock(&nbd->config_lock);
+> And to be clear, I'm interested in having DM thinp support this
+> capability to preallocate blocks.
 
-Thanks,
+My opinion is it would be better to not mix several subsystem related
+support in a single patch set. Both of the approaches (v4 or that you
+suggested) do not prevents us to implement allocation support in next
+patch series. After we have the base functionality enabled, we may add
+support in other subsystems and drivers one by one with more focus
+on the subsystem specificities and with the best possible attention.
 
-Josef
+Regards,
+Kirill
