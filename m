@@ -2,131 +2,212 @@ Return-Path: <SRS0=Jk+C=3L=vger.kernel.org=linux-block-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-0.8 required=3.0 tests=DKIM_SIGNED,DKIM_VALID,
-	DKIM_VALID_AU,HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SPF_HELO_NONE,
-	SPF_PASS autolearn=no autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-7.4 required=3.0 tests=DKIMWL_WL_HIGH,DKIM_SIGNED,
+	DKIM_VALID,DKIM_VALID_AU,HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,
+	MENTIONS_GIT_HOSTING,SPF_HELO_NONE,SPF_PASS,USER_AGENT_SANE_1
+	autolearn=unavailable autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 719A9C2D0DB
-	for <linux-block@archiver.kernel.org>; Wed, 22 Jan 2020 17:34:35 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 60157C2D0DB
+	for <linux-block@archiver.kernel.org>; Wed, 22 Jan 2020 18:27:24 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.kernel.org (Postfix) with ESMTP id 2890524656
-	for <linux-block@archiver.kernel.org>; Wed, 22 Jan 2020 17:34:35 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id 3504E24656
+	for <linux-block@archiver.kernel.org>; Wed, 22 Jan 2020 18:27:24 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=pass (1024-bit key) header.d=fb.com header.i=@fb.com header.b="BLxkJdDn";
-	dkim=pass (1024-bit key) header.d=fb.onmicrosoft.com header.i=@fb.onmicrosoft.com header.b="CKw+N1XC"
+	dkim=pass (2048-bit key) header.d=nvidia.com header.i=@nvidia.com header.b="oKVuFui6"
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1725924AbgAVReb (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Wed, 22 Jan 2020 12:34:31 -0500
-Received: from mx0a-00082601.pphosted.com ([67.231.145.42]:19802 "EHLO
-        mx0a-00082601.pphosted.com" rhost-flags-OK-OK-OK-OK)
-        by vger.kernel.org with ESMTP id S1725802AbgAVReb (ORCPT
+        id S1725933AbgAVS1X (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Wed, 22 Jan 2020 13:27:23 -0500
+Received: from hqnvemgate24.nvidia.com ([216.228.121.143]:5964 "EHLO
+        hqnvemgate24.nvidia.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S1725884AbgAVS1X (ORCPT
         <rfc822;linux-block@vger.kernel.org>);
-        Wed, 22 Jan 2020 12:34:31 -0500
-Received: from pps.filterd (m0148461.ppops.net [127.0.0.1])
-        by mx0a-00082601.pphosted.com (8.16.0.42/8.16.0.42) with SMTP id 00MHT3Rv024470;
-        Wed, 22 Jan 2020 09:34:23 -0800
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=fb.com; h=from : to : cc : subject
- : date : message-id : references : in-reply-to : content-type : content-id
- : content-transfer-encoding : mime-version; s=facebook;
- bh=9ikigDQWioGUMN9jy0X/P0bJBgPbp4gwfzlBdNffQL0=;
- b=BLxkJdDnnJiVIXZXKVGSIW2aXQqs9TJT2VetsHLZylpkzX/JR+l7eRwvpjZwuCC7rUr+
- OxptBqKW18CFJeM2hl065xJQ/CuAAaDMQTFB3g5J2S/6ILg1taK7TYHoHVosyzJW/4jg
- QfayCqQkoD6C7ih9TgkhhZDiq7L5UdjUTJY= 
-Received: from mail.thefacebook.com ([163.114.132.120])
-        by mx0a-00082601.pphosted.com with ESMTP id 2xp72pcv8d-2
-        (version=TLSv1.2 cipher=ECDHE-RSA-AES128-GCM-SHA256 bits=128 verify=NOT);
-        Wed, 22 Jan 2020 09:34:23 -0800
-Received: from NAM12-MW2-obe.outbound.protection.outlook.com (100.104.98.9) by
- o365-in.thefacebook.com (100.104.94.196) with Microsoft SMTP Server
- (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256) id
- 15.1.1779.2; Wed, 22 Jan 2020 09:34:22 -0800
-ARC-Seal: i=1; a=rsa-sha256; s=arcselector9901; d=microsoft.com; cv=none;
- b=bkfu4Sf1AfGel0T8on27nNBIbssF8OEIEDS/eGBWQC+G0oYLcx5b4GcWiJ3D9Re0/xrSu64nVAoTFuBZpdE/5XvHkuLbnBDHeloUUalLKlUtnBCGa8/Uil9aq3fxmW4L2bQFRws+MWfHv4v/4WW96F1P1JfdbsLmSkUodZQiPJrjnZULE9cRCWiiIK8t8k/HV/njFmdru0HgmkOun3B/gqRHSzN8nmhTNkXpVwiFj689wrizEYNCLQZjFrfiDvXtJm4nPhOvJPpFl/sdf+27wlSGisIsQ4Z8uAU1oeRooY+6WW3XJ4H3Wmwp8NFRfkXBuAs6OLsOHY/qcmg8vs2W4Q==
-ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com;
- s=arcselector9901;
- h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
- bh=9ikigDQWioGUMN9jy0X/P0bJBgPbp4gwfzlBdNffQL0=;
- b=gCb1seWpwRgC1kcxMoSdatEd9nBJPH6Iu5DCS5s4KBTdYpicTcHAZunz0hdEVkby+QJ+v256S7r6hOJXQlz2iNpwVlBzAeSfh8B7z3QQCC+iWBvg8rAyoE2EfHEyn8CfYoum+el1OFRsNcT0esdw5tF8tOybO71b1sJdnZ0mWx+vgcpmJ0HhbYg36yx+EZRSyVMX56gXUU17VdDwhXbrTezHtwULeCwPgFokMA8oq5eVndCSUaUOhJEi485sKAYlYcPNaHY2KnjM7cvQKcVJCAlhWAw7QhKnN8GL+2sQesVuk305g6TDIWn4Jx4Ri7fIjzbNkhmhwXXDNtiFBbIjrw==
-ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass
- smtp.mailfrom=fb.com; dmarc=pass action=none header.from=fb.com; dkim=pass
- header.d=fb.com; arc=none
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=fb.onmicrosoft.com;
- s=selector2-fb-onmicrosoft-com;
- h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
- bh=9ikigDQWioGUMN9jy0X/P0bJBgPbp4gwfzlBdNffQL0=;
- b=CKw+N1XC13D21AX0VuSUR2pknNKdFDpg/8c3I1xqriC+OCDcM/Gl+cApMTf4MARHjjsBsWvVhqJTylFD5Te79E4yDH6v0SIkOafAelG8ybHcbFBEqR7yF3390fFOL+kAiWMAeSD1yxlaLX2ed5hH5oCcI+eo0xj76imUEW6v7V4=
-Received: from DM6PR15MB2796.namprd15.prod.outlook.com (20.179.160.22) by
- DM6PR15MB3449.namprd15.prod.outlook.com (20.179.51.210) with Microsoft SMTP
- Server (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
- 15.20.2644.20; Wed, 22 Jan 2020 17:34:21 +0000
-Received: from DM6PR15MB2796.namprd15.prod.outlook.com
- ([fe80::98e8:d7ac:731d:43e]) by DM6PR15MB2796.namprd15.prod.outlook.com
- ([fe80::98e8:d7ac:731d:43e%5]) with mapi id 15.20.2644.028; Wed, 22 Jan 2020
- 17:34:21 +0000
-Received: from [192.168.1.159] (65.144.74.34) by CH2PR19CA0002.namprd19.prod.outlook.com (2603:10b6:610:4d::12) with Microsoft SMTP Server (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.2665.19 via Frontend Transport; Wed, 22 Jan 2020 17:34:20 +0000
-From:   Jens Axboe <axboe@fb.com>
-To:     Wen Yang <wenyang@linux.alibaba.com>,
-        Paolo Valente <paolo.valente@linaro.org>
-CC:     "linux-block@vger.kernel.org" <linux-block@vger.kernel.org>,
-        "linux-kernel@vger.kernel.org" <linux-kernel@vger.kernel.org>
-Subject: Re: [PATCH] block, bfq: improve arithmetic division in bfq_delta()
-Thread-Topic: [PATCH] block, bfq: improve arithmetic division in bfq_delta()
-Thread-Index: AQHVz3kZJxAcCxE2OkKIbzF0Rq3PFaf29WYA
-Date:   Wed, 22 Jan 2020 17:34:21 +0000
-Message-ID: <b5d9c9a6-2678-6256-0e21-ec88dfc115b3@fb.com>
-References: <20200120100443.45563-1-wenyang@linux.alibaba.com>
-In-Reply-To: <20200120100443.45563-1-wenyang@linux.alibaba.com>
-Accept-Language: en-US
-Content-Language: en-US
-X-MS-Has-Attach: 
-X-MS-TNEF-Correlator: 
-x-clientproxiedby: CH2PR19CA0002.namprd19.prod.outlook.com
- (2603:10b6:610:4d::12) To DM6PR15MB2796.namprd15.prod.outlook.com
- (2603:10b6:5:1a0::22)
-x-ms-exchange-messagesentrepresentingtype: 1
-x-originating-ip: [65.144.74.34]
-x-ms-publictraffictype: Email
-x-ms-office365-filtering-correlation-id: 89cc3572-bc43-4834-818c-08d79f61509a
-x-ms-traffictypediagnostic: DM6PR15MB3449:
-x-microsoft-antispam-prvs: <DM6PR15MB3449FB59EDEF3318F8D63218C00C0@DM6PR15MB3449.namprd15.prod.outlook.com>
-x-fb-source: Internal
-x-ms-oob-tlc-oobclassifiers: OLM:3276;
-x-forefront-prvs: 029097202E
-x-forefront-antispam-report: SFV:NSPM;SFS:(10019020)(366004)(189003)(199004)(31686004)(8676002)(6486002)(186003)(81156014)(8936002)(81166006)(66556008)(66476007)(66446008)(86362001)(52116002)(64756008)(36756003)(66946007)(31696002)(71200400001)(498600001)(2616005)(4326008)(16526019)(5660300002)(26005)(558084003)(53546011)(956004)(54906003)(2906002)(16576012)(110136005)(25903002);DIR:OUT;SFP:1102;SCL:1;SRVR:DM6PR15MB3449;H:DM6PR15MB2796.namprd15.prod.outlook.com;FPR:;SPF:None;LANG:en;PTR:InfoNoRecords;MX:1;A:1;
-received-spf: None (protection.outlook.com: fb.com does not designate
- permitted sender hosts)
-x-ms-exchange-senderadcheck: 1
-x-microsoft-antispam: BCL:0;
-x-microsoft-antispam-message-info: iwjIbuAlt4Wuhcb9Zh1OrSOXDtdnGlzD1Q0V1HJmuv8k8Ej582uUHFY3KPi5JijoUwdkQS8FeSo4pGtbTksc2cGWUmplWSEpPIQIpKe7sRwMn1IXUbK3Ihsj6DpWdsEi7mNFG/ibTSxyRl66a7b+cWw3V1M7DwBXF9oYdQ8Llip7gkrLKiNEKA8hmzQuAZdjRhMeNfXKRkPjdQ6Zc6+V9mNTJ+ghPQJuA2DiTns3bGTsgUSo4cd8satyyH4hvBhIzhIKz+eNAvKtXbXdTjOwUzvLen5V6HudNnk1zaIUMHqqta+FGBGZRoLtBNJnz3HZJWihFsNDIEwOLIGCQxQtgIbQCX0K5zNnHWjzMraqpL5ZoL9Gq+mND5WoCh+RLa7o01KPUUrdgy77QPFCdHYsRHy8xAA4aV4abLp+exlUConul0LjTyf1NteJmEPLIS5G3EkCGdbk/TTackbm5RFZoZYZZnVrbLCe4YpTKMWbEDzQDUMtaBFwnH3R7RRVCBcd
-x-ms-exchange-transport-forked: True
-Content-Type: text/plain; charset="utf-8"
-Content-ID: <149C30DBD6B5F0478C86BF0A04FBCC8A@namprd15.prod.outlook.com>
-Content-Transfer-Encoding: base64
+        Wed, 22 Jan 2020 13:27:23 -0500
+Received: from hqpgpgate102.nvidia.com (Not Verified[216.228.121.13]) by hqnvemgate24.nvidia.com (using TLS: TLSv1.2, DES-CBC3-SHA)
+        id <B5e2893d10001>; Wed, 22 Jan 2020 10:26:25 -0800
+Received: from hqmail.nvidia.com ([172.20.161.6])
+  by hqpgpgate102.nvidia.com (PGP Universal service);
+  Wed, 22 Jan 2020 10:27:09 -0800
+X-PGP-Universal: processed;
+        by hqpgpgate102.nvidia.com on Wed, 22 Jan 2020 10:27:09 -0800
+Received: from [10.110.48.28] (10.124.1.5) by HQMAIL107.nvidia.com
+ (172.20.187.13) with Microsoft SMTP Server (TLS) id 15.0.1473.3; Wed, 22 Jan
+ 2020 18:27:09 +0000
+Subject: Re: [Lsf-pc][LSF/MM/BPF TOPIC] Generic page write protection
+To:     <jglisse@redhat.com>, <lsf-pc@lists.linux-foundation.org>
+CC:     Andrea Arcangeli <aarcange@redhat.com>,
+        <linux-fsdevel@vger.kernel.org>, <linux-block@vger.kernel.org>,
+        <linux-mm@kvack.org>, lsf-pc <lsf-pc@lists.linux-foundation.org>
+References: <20200122023222.75347-1-jglisse@redhat.com>
+X-Nvconfidentiality: public
+From:   John Hubbard <jhubbard@nvidia.com>
+Message-ID: <174cd3a0-43e5-d8bd-5cc3-d562f5727283@nvidia.com>
+Date:   Wed, 22 Jan 2020 10:27:08 -0800
+User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:68.0) Gecko/20100101
+ Thunderbird/68.4.1
 MIME-Version: 1.0
-X-MS-Exchange-CrossTenant-Network-Message-Id: 89cc3572-bc43-4834-818c-08d79f61509a
-X-MS-Exchange-CrossTenant-originalarrivaltime: 22 Jan 2020 17:34:21.2129
- (UTC)
-X-MS-Exchange-CrossTenant-fromentityheader: Hosted
-X-MS-Exchange-CrossTenant-id: 8ae927fe-1255-47a7-a2af-5f3a069daaa2
-X-MS-Exchange-CrossTenant-mailboxtype: HOSTED
-X-MS-Exchange-CrossTenant-userprincipalname: BCTVjb2NCGPEx49jpQ7TbgtFGHn5BtFXM4FAsiG8NJ6DnnYhk9jPvFdRqwWWtqNG
-X-MS-Exchange-Transport-CrossTenantHeadersStamped: DM6PR15MB3449
-X-OriginatorOrg: fb.com
-X-Proofpoint-Virus-Version: vendor=fsecure engine=2.50.10434:6.0.138,18.0.572
- definitions=2020-01-22_07:2020-01-22,2020-01-22 signatures=0
-X-Proofpoint-Spam-Details: rule=fb_default_notspam policy=fb_default score=0 mlxscore=0
- mlxlogscore=728 impostorscore=0 adultscore=0 suspectscore=0 bulkscore=0
- spamscore=0 lowpriorityscore=0 malwarescore=0 clxscore=1011 phishscore=0
- priorityscore=1501 classifier=spam adjust=0 reason=mlx scancount=1
- engine=8.12.0-1910280000 definitions=main-2001220151
-X-FB-Internal: deliver
+In-Reply-To: <20200122023222.75347-1-jglisse@redhat.com>
+X-Originating-IP: [10.124.1.5]
+X-ClientProxiedBy: HQMAIL111.nvidia.com (172.20.187.18) To
+ HQMAIL107.nvidia.com (172.20.187.13)
+Content-Type: text/plain; charset="utf-8"
+Content-Language: en-US
+Content-Transfer-Encoding: quoted-printable
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=nvidia.com; s=n1;
+        t=1579717585; bh=zM1GZj8JqKU2+u42J7V4E+rUU+HYAAUatSe9FzyeLvo=;
+        h=X-PGP-Universal:Subject:To:CC:References:X-Nvconfidentiality:From:
+         Message-ID:Date:User-Agent:MIME-Version:In-Reply-To:
+         X-Originating-IP:X-ClientProxiedBy:Content-Type:Content-Language:
+         Content-Transfer-Encoding;
+        b=oKVuFui6iUjT/PoUawkl8P6jpwCGz3cOGcMmtlNAW93lnyegrDlC2dXTN+YzAmJih
+         dkOvkbW/KIykbkayZViIbe88ZvDAJ1A8VghOOEubR4K2ays+2YFnKzerEPeSVUutQX
+         hl5VJzFOAIbbyYJr2rylGxVQeQwCYhO7yWJS/4XfujGQ/8WKKCY+dcZgR13a4QneZA
+         iE1dzJtE11e7sd7C7MLxusF4V7Wo1ATcM6milQiEld3qrEV3QlDKPzKDHRqtDrdbta
+         o5Z1SswkBaKNoMw96ohNLDuadmEF4FwbKXBq21nCz9CAxKmHX44dIBN2ocNrVgwGwu
+         /WTJ88VrIMZfQ==
 Sender: linux-block-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-T24gMS8yMC8yMCAzOjA0IEFNLCBXZW4gWWFuZyB3cm90ZToNCj4gZG9fZGl2KCkgZG9lcyBhIDY0
-LWJ5LTMyIGRpdmlzaW9uLiBVc2UgZGl2NjRfdWwoKSBpbnN0ZWFkIG9mIGl0DQo+IGlmIHRoZSBk
-aXZpc29yIGlzIHVuc2lnbmVkIGxvbmcsIHRvIGF2b2lkIHRydW5jYXRpb24gdG8gMzItYml0Lg0K
-PiBBbmQgYXMgYSBuaWNlIHNpZGUgZWZmZWN0IGFsc28gY2xlYW5zIHVwIHRoZSBmdW5jdGlvbiBh
-IGJpdC4NCg0KQXBwbGllZCwgdGhhbmtzLg0KDQotLSANCkplbnMgQXhib2UNCg0K
+Adding: lsf-pc
+
+On 1/21/20 6:32 PM, jglisse@redhat.com wrote:
+> From: J=C3=A9r=C3=B4me Glisse <jglisse@redhat.com>
+>=20
+>=20
+> Provide a generic way to write protect page (=C3=A0 la KSM) to enable new=
+ mm
+> optimization:
+>     - KSM (kernel share memory) to deduplicate pages (for file
+>       back pages too not only anonymous memory like today)
+>     - page duplication NUMA (read only duplication) in multiple
+>       different physical page. For instance share library code
+>       having a copy on each NUMA node. Or in case like GPU/FPGA
+>       duplicating memory read only inside the local device memory.
+>     ...
+>=20
+> Note that this write protection is intend to be broken at anytime in
+> reasonable time (like KSM today) so that we never block more than
+> necessary anything that need to write to the page.
+>=20
+>=20
+> The goal is to provide a mechanism that work for both anonymous and
+> file back memory. For this we need to a pointer inside struct page.
+> For anonymous memory KSM uses the anon_vma field which correspond
+> to mapping field for file back pages.
+>=20
+> So to allow generic write protection for file back pages we need to
+> avoid relying on struct page mapping field in the various kernel code
+> path that do use it today.
+>=20
+> The page->mapping fields is use in 5 different ways:
+>  [1]- Functions operating on file, we can get the mapping from the file
+>       (issue here is that we might need to pass the file down the call-
+>       stack)
+>=20
+>  [2]- Core/arch mm functions, those do not care about the file (if they
+>       do then it means they are vma related and we can get the mapping
+>       from the vma). Those functions only want to be able to walk all
+>       the pte point to the page (for instance memory compaction, memory
+>       reclaim, ...). We can provide the exact same functionality for
+>       write protected pages (like KSM does today).
+>=20
+>  [3]- Block layer when I/O fails. This depends on fs, for instance for
+>       fs which uses buffer_head we can update buffer_head to store the
+>       mapping instead of the block_device as we can get the block_device
+>       from the mapping but not the mapping from the block_device.
+>=20
+>       So solving this is mostly filesystem specific but i have not seen
+>       any fs that could not be updated properly so that block layer can
+>       report I/O failures without relying on page->mapping
+>=20
+>  [4]- Debugging (mostly procfs/sysfs files to dump memory states). Those
+>       do not need the mapping per say, we just need to report page states
+>       (and thus write protection information if page is write protected).
+>=20
+>  [5]- GUP (get user page) if something calls GUP in write mode then we
+>       need to break write protection (like KSM today). GUPed page should
+>       not be write protected as we do not know what the GUPers is doing
+>       with the page.
+>=20
+>=20
+> Most of the patchset deals with [1], [2] and [3] ([4] and [5] are mostly
+> trivial).
+>=20
+> For [1] we only need to pass down the mapping to all fs and vfs callback
+> functions (this is mostly achieve with coccinelle). Roughly speaking the
+> patches are generated with following pseudo code:
+>=20
+> add_mapping_parameter(func)
+> {
+>     function_add_parameter(func, mapping);
+>=20
+>     for_each_function_calling (caller, func) {
+>         calling_add_parameter(caller, func, mapping);
+>=20
+>         if (function_parameters_contains(caller, mapping|file))
+>             continue;
+>=20
+>         add_mapping_parameter(caller);
+>     }
+> }
+>=20
+> passdown_mapping()
+> {
+>     for_each_function_in_fs (func, fs_functions) {
+>         if (!function_body_contains(func, page->mapping))
+>             continue;
+>=20
+>         if (function_parameters_contains(func, mapping|file))
+>             continue;
+>=20
+>         add_mapping_parameter(func);
+>     }
+> }
+>=20
+> For [2] KSM is generalized and extended so that both anonymous and file
+> back pages can be handled by a common write protected page case.
+>=20
+> For [3] it depends on the filesystem (fs which uses buffer_head are
+> easily handled by storing mapping into the buffer_head struct).
+>=20
+>=20
+> To avoid any regression risks the page->mapping field is left intact as
+> today for non write protect pages. This means that if you do not use the
+> page write protection mechanism then it can not regress. This is achieve
+> by using an helper function that take the mapping from the context
+> (current function parameter, see above on how function are updated) and
+> the struct page. If the page is not write protected then it uses the
+> mapping from the struct page (just like today). The only difference
+> between before and after the patchset is that all fs functions that do
+> need the mapping for a page now also do get it as a parameter but only
+> use the parameter mapping pointer if the page is write protected.
+>=20
+> Note also that i do not believe that once confidence is high that we
+> always passdown the correct mapping down each callstack, it does not
+> mean we will be able to get rid of the struct page mapping field.
+>=20
+> I posted patchset before [*1] and i intend to post an updated patchset
+> before LSF/MM/BPF. I also talked about this at LSF/MM 2018. I still
+> believe this will a topic that warrent a discussion with FS/MM and
+> block device folks.
+>=20
+>=20
+> [*1] https://lwn.net/Articles/751050/
+>      https://cgit.freedesktop.org/~glisse/linux/log/?h=3Dgeneric-write-pr=
+otection-rfc
+> [*2] https://lwn.net/Articles/752564/
+>=20
+>=20
+> To: lsf-pc@lists.linux-foundation.org
+> Cc: Andrea Arcangeli <aarcange@redhat.com>
+> Cc: linux-fsdevel@vger.kernel.org
+> Cc: linux-block@vger.kernel.org
+> Cc: linux-mm@kvack.org
+>=20
+>=20
+
+thanks,
+--=20
+John Hubbard
+NVIDIA
