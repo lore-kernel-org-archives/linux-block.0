@@ -1,216 +1,145 @@
-Return-Path: <SRS0=2A/1=3K=vger.kernel.org=linux-block-owner@kernel.org>
+Return-Path: <SRS0=Jk+C=3L=vger.kernel.org=linux-block-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-8.1 required=3.0 tests=DKIMWL_WL_MED,DKIM_SIGNED,
-	DKIM_VALID,DKIM_VALID_AU,FSL_HELO_FAKE,HEADER_FROM_DIFFERENT_DOMAINS,
-	MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,USER_AGENT_SANE_1,
-	USER_IN_DEF_DKIM_WL autolearn=no autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-5.2 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
+	INCLUDES_PATCH,MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,USER_AGENT_SANE_2
+	autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 8D0A5C3F68F
-	for <linux-block@archiver.kernel.org>; Tue, 21 Jan 2020 22:05:30 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 8F6DCC2D0CE
+	for <linux-block@archiver.kernel.org>; Wed, 22 Jan 2020 00:01:03 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.kernel.org (Postfix) with ESMTP id 6377C2465B
-	for <linux-block@archiver.kernel.org>; Tue, 21 Jan 2020 22:05:30 +0000 (UTC)
-Authentication-Results: mail.kernel.org;
-	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="b+DkuJVK"
+	by mail.kernel.org (Postfix) with ESMTP id 65D3F21734
+	for <linux-block@archiver.kernel.org>; Wed, 22 Jan 2020 00:01:03 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1729043AbgAUWF3 (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Tue, 21 Jan 2020 17:05:29 -0500
-Received: from mail-pg1-f193.google.com ([209.85.215.193]:40571 "EHLO
-        mail-pg1-f193.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1729016AbgAUWF2 (ORCPT
-        <rfc822;linux-block@vger.kernel.org>);
-        Tue, 21 Jan 2020 17:05:28 -0500
-Received: by mail-pg1-f193.google.com with SMTP id k25so2257169pgt.7
-        for <linux-block@vger.kernel.org>; Tue, 21 Jan 2020 14:05:28 -0800 (PST)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=google.com; s=20161025;
-        h=date:from:to:cc:subject:message-id:references:mime-version
-         :content-disposition:in-reply-to:user-agent;
-        bh=MHL1t/EyEsW/kDCQVsvBnpYeqWiiNR3Qofvm72VP2xo=;
-        b=b+DkuJVKIKETrJ5dpTxidfDLzDLkavoiNLhArG3sMhvs1V6c3puRQUI9pG9KRYRWPd
-         8fRSkviBHz+tFzxp4t+VfIOdI/jgi3sJ8Vewc009gojBVO6V1BECgJK5222fsEzQXJQm
-         wbAnTgKeIHbOU4Tr5RKZqicWx20WuZ71yUO7sN1kR4zsn3mD7Zznv4+GsRhRluFNXZeS
-         DWYSw9vYZzXEm7IIrBEuVWdlXIRxeFhGVZcjpgT2fJKpY4FFj1SMuLJIJkxJTe5YPqoE
-         FIMd1Y6nmyaf6ERoXAdUmhkH+AVj9CIIhltvG0/65sNQMh+6F+GSHDHh8Fzlp3CXn/CF
-         WCHQ==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20161025;
-        h=x-gm-message-state:date:from:to:cc:subject:message-id:references
-         :mime-version:content-disposition:in-reply-to:user-agent;
-        bh=MHL1t/EyEsW/kDCQVsvBnpYeqWiiNR3Qofvm72VP2xo=;
-        b=GyCIIiClNXT/Hxghoki+bwa3avSyhDWMr53ESDSXA5j+FFoyNKkQq9+tYhO1IsGVuz
-         0WpzPg6dE7oTdKbUKFEcuepQ45vXYgZZcPgriBiNzUC+J4DwoD/s4ppqj/vRp5NDSnLB
-         tEqDujtDpZ++T15n+E72zMcR4ekH35X5b5cby4B5e8IixHOnwrdAo1aru9mAIAyZlvOU
-         zsv0PxT2u0uJWF3V1koQF2LPZL/KDL24WX/jDvsP6JpXdRI9nMSN9FC6oywe0EOkBZx2
-         REc1Cajm02tFMdyJ+zf1e1UYUATZUhp0kY6Rd1SB3mzkfhWutYuaUWQXv0Zx1ojH8mlr
-         zShA==
-X-Gm-Message-State: APjAAAUbW02jLEtPd1wXByPLpECKPsOCmVe8wm4YPI86YMj+SVPHoljD
-        upTz8uimshvsYk8WLt8JYkiiAg==
-X-Google-Smtp-Source: APXvYqwh8OnW+eP9V0DrV7fz7N0b2aotldt8ipMvaida+/kr2JuRziMzbgGUGDkawpb/E1PWbTxPyg==
-X-Received: by 2002:a63:6d8d:: with SMTP id i135mr7771059pgc.90.1579644327592;
-        Tue, 21 Jan 2020 14:05:27 -0800 (PST)
-Received: from google.com ([2620:15c:201:0:7f8c:9d6e:20b8:e324])
-        by smtp.gmail.com with ESMTPSA id a16sm41620400pgb.5.2020.01.21.14.05.26
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Tue, 21 Jan 2020 14:05:27 -0800 (PST)
-Date:   Tue, 21 Jan 2020 14:05:22 -0800
-From:   Satya Tangirala <satyat@google.com>
-To:     Eric Biggers <ebiggers@kernel.org>
-Cc:     Christoph Hellwig <hch@infradead.org>,
-        "Martin K. Petersen" <martin.petersen@oracle.com>,
-        "Darrick J. Wong" <darrick.wong@oracle.com>,
-        linux-block@vger.kernel.org, linux-scsi@vger.kernel.org,
-        linux-fscrypt@vger.kernel.org, linux-fsdevel@vger.kernel.org,
-        linux-f2fs-devel@lists.sourceforge.net,
-        Barani Muthukumaran <bmuthuku@qti.qualcomm.com>,
-        Kuohong Wang <kuohong.wang@mediatek.com>,
-        Kim Boojin <boojin.kim@samsung.com>
-Subject: Re: [PATCH v6 2/9] block: Add encryption context to struct bio
-Message-ID: <20200121220522.GA243816@google.com>
-References: <20191218145136.172774-1-satyat@google.com>
- <20191218145136.172774-3-satyat@google.com>
- <20191218212116.GA7476@magnolia>
- <yq1y2v9e37b.fsf@oracle.com>
- <20191218222726.GC47399@gmail.com>
- <yq1fthhdttv.fsf@oracle.com>
- <20200108140730.GC2896@infradead.org>
- <20200108172629.GA232722@sol.localdomain>
- <20200117083221.GA324@infradead.org>
- <20200118051132.GC3290@sol.localdomain>
+        id S1726876AbgAVABC (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Tue, 21 Jan 2020 19:01:02 -0500
+Received: from mail.kernel.org ([198.145.29.99]:51930 "EHLO mail.kernel.org"
+        rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
+        id S1726780AbgAVABC (ORCPT <rfc822;linux-block@vger.kernel.org>);
+        Tue, 21 Jan 2020 19:01:02 -0500
+Received: from gandalf.local.home (cpe-66-24-58-225.stny.res.rr.com [66.24.58.225])
+        (using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+        (No client certificate requested)
+        by mail.kernel.org (Postfix) with ESMTPSA id 231DC21734;
+        Wed, 22 Jan 2020 00:01:01 +0000 (UTC)
+Date:   Tue, 21 Jan 2020 19:00:59 -0500
+From:   Steven Rostedt <rostedt@goodmis.org>
+To:     Cong Wang <xiyou.wangcong@gmail.com>
+Cc:     linux-kernel@vger.kernel.org, linux-block@vger.kernel.org,
+        Jens Axboe <axboe@kernel.dk>
+Subject: Re: [Patch v2] block: introduce block_rq_error tracepoint
+Message-ID: <20200121190059.7ae9f7a9@gandalf.local.home>
+In-Reply-To: <20200120222618.1456-1-xiyou.wangcong@gmail.com>
+References: <20200120222618.1456-1-xiyou.wangcong@gmail.com>
+X-Mailer: Claws Mail 3.17.3 (GTK+ 2.24.32; x86_64-pc-linux-gnu)
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <20200118051132.GC3290@sol.localdomain>
-User-Agent: Mutt/1.10.1 (2018-07-13)
+Content-Type: text/plain; charset=US-ASCII
+Content-Transfer-Encoding: 7bit
 Sender: linux-block-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-On Fri, Jan 17, 2020 at 09:11:32PM -0800, Eric Biggers wrote:
-> On Fri, Jan 17, 2020 at 12:32:21AM -0800, Christoph Hellwig wrote:
-> > 
-> > File systems don't move data around all that often (saying that with my
-> > fs developer hat on).  In traditional file systems only defragmentation
-> > will move data around, with extent refcounting it can also happen for
-> > dedup, and for file systems that write out of place data gets moved
-> > when parts of a block are rewritten, but in that case a read modify
-> > write cycle is perfomed in the Linux code anyway, so it will go through
-> > the inline encryption engined on the way and the way out.
-> > 
-> > So in other words - specifying an IV would be useful for some use cases,
-> > but I don't think it is a deal blocker. Even without that is is useful
-> > for block device level encryption, and could have some usefulness for
-> > file system encryption usage.
-> > 
-> > I think that adding an IV would eventually be useful, but fitting that
-> > into NVMe won't be easy, as you'd need to find a way to specify the IV
-> > for each submission queue entry, which requires growing it, or finding
-> > some way to extend it out of band.
+On Mon, 20 Jan 2020 14:26:18 -0800
+Cong Wang <xiyou.wangcong@gmail.com> wrote:
+
+> ---
+>  block/blk-core.c             |  4 +++-
+>  include/trace/events/block.h | 43 ++++++++++++++++++++++++++++++++++++
+>  2 files changed, 46 insertions(+), 1 deletion(-)
 > 
-> Sure, people have even done inline crypto on ext4 before (downstream), using the
-> LBA for the IV.  But log-structured filesystems like f2fs move data blocks
-> around *without the encryption key*; and at least for fscrypt, f2fs support is
-> essential.  In any case it's also awkward having the physical on-disk location
-> determine the ciphertext on-disk, as then the result isn't fully controlled by
-> the encryption settings you set, but also based on where your filesystem is
-> located on-disk (with extra fun occurring if there's any sort of remapping layer
-> in between).  But sure, it's not *useless* to not be able to specify the IV,
-> it's just annoying and less useful.
-> 
-> [I was also a bit surprised to see that NVMe won't actually allow specify the
-> IV, as I thought you had objected to the naming of the INLINE_CRYPT_OPTIMIZED
-> fscrypt policy flag partly on the grounds that NVMe would support IVs longer
-> than the 64 bits that UFS is limited to.  Perhaps I misunderstood though.]
-> 
-> > > So let's not over-engineer this kernel patchset to support some broken
-> > > vaporware, please.
-> > 
-> > Not sharing bio fields for integrity and encryption actually keeps
-> > the patchset simpler (although uses more memory if both options are
-> > enabled).  So my main point here is to not over engineer it for broken
-> > premise that won't be true soon.
-> 
-> Well there are 3 options:
-> 
-> (a) Separate fields for bi_crypt_context and bi_integrity
-> (b) bi_crypt_context and bi_integrity in union
-> (c) One pointer that can support both features,
->     e.g. linked list of tagged structs.
-> 
-> It sounds like you're advocating for (a), but I had misunderstood and thought
-> you're advocating for (c).  We'd of course be fine with (a) as it's the
-> simplest, but other people are saying they prefer (b).
-> 
-> Satya, to resolve this I think you should check how hard (b) is to implement --
-> i.e. is it easy, or is it really tricky to ensure the features are never used
-> together?  (Considering that it's probably not just a matter of whether any
-> hardware supports both features, as dm-integrity supports blk-integrity in
-> software and blk-crypto-fallback supports blk-crypto in software.)
-> 
-> - Eric
+> diff --git a/block/blk-core.c b/block/blk-core.c
+> index 089e890ab208..0c7ad70d06be 100644
+> --- a/block/blk-core.c
+> +++ b/block/blk-core.c
+> @@ -1450,8 +1450,10 @@ bool blk_update_request(struct request *req, blk_status_t error,
+>  #endif
+>  
+>  	if (unlikely(error && !blk_rq_is_passthrough(req) &&
+> -		     !(req->rq_flags & RQF_QUIET)))
+> +		     !(req->rq_flags & RQF_QUIET))) {
+> +		trace_block_rq_error(req, blk_status_to_errno(error), nr_bytes);
+>  		print_req_error(req, error, __func__);
+> +	}
+>  
+>  	blk_account_io_completion(req, nr_bytes);
+>  
+> diff --git a/include/trace/events/block.h b/include/trace/events/block.h
+> index 81b43f5bdf23..37e99be19536 100644
+> --- a/include/trace/events/block.h
+> +++ b/include/trace/events/block.h
+> @@ -145,6 +145,49 @@ TRACE_EVENT(block_rq_complete,
+>  		  __entry->nr_sector, __entry->error)
+>  );
+>  
+> +/**
+> + * block_rq_error - block IO operation error reported by device driver
+> + * @rq: block operations request
+> + * @error: status code
+> + * @nr_bytes: number of completed bytes
+> + *
+> + * The block_rq_error tracepoint event indicates that some portion
+> + * of operation request has failed as reported by the device driver.
+> + */
+> +TRACE_EVENT(block_rq_error,
+> +
+> +	TP_PROTO(struct request *rq, int error, unsigned int nr_bytes),
+> +
+> +	TP_ARGS(rq, error, nr_bytes),
+> +
+> +	TP_STRUCT__entry(
+> +		__field(  dev_t,	dev			)
+> +		__dynamic_array( char,  name,	DISK_NAME_LEN	)
 
-What I have right now for v7 of the patch series was my attempt at (b) (since
-some were saying they prefer it) - it may still be incomplete though because I
-missed something, but here's what I think it involved:
+Hmm, looks like I need to go and do a clean up of the kernel, and
+educate people on how to use dynamic arrays :-/
 
-1) bi_crypt_context is never set after bi_integrity, so I don't check if
-   bi_integrity is set or not when setting bi_crypt_context - this keeps the
-   code cleaner when setting the bi_crypt_context.
+The "len" field of a __dynamic_array() is to be a function to determine
+the length needed for each instance of an event. By having a constant
+there, it will be the same for every events, plus the meta data to hold
+the "dynamic" part of the array. This would be much better to simple
+use __array() instead.
 
-2) I made it error whenever we try to set bi_integrity on a bio with
-   REQ_BLK_CRYPTO.
+But as you use "__assign_str()" below, then it's expected that name is
+a nul terminated string. In which case, you want to define this as:
 
-3) There is an issue with the way the blk-crypto-fallback interacts with bio
-   integrity. One of the goals of the fallback is to make it inline encryption
-   transparent to the upper layers (i.e. as far as the upper layers are
-   concerned there should be no difference whether there is actual hardware
-   inline encryption support or whether the fallback is used instead).
+		__string( name, rq->rq_disk ? rq->rq_disk->disk_name : "?"  )
 
-   The issue is, when the fallback encrypts a bio, it clones the bio and
-   encrypts the pages in the clone, but the clone won't have a bi_crypt_context
-   (since otherwise, when the clone is resubmitted, blk-crypto would incorrectly
-   assume that the clone needs to be encrypted once again). When bi_integrity is
-   set on the clone, there won't be any error detected since REQ_BLK_CRYPTO
-   won't be set on the clone. However, if hardware inline encryption support had
-   been present, and the blk-crypto had not used the fallback, the same bio
-   would have bi_crypt_context set when we try to set bi_integrity, which would
-   then fail.
 
-   To fix this issue, I introduced another flag REQ_NO_SPECIAL (subject to being
-   renamed when I think of/someone suggests a better name), which when set on
-   the bio, indicates that bi_integrity (and in future whatever other fields
-   share the same union, shouldn't be set on that bio. I can probably do away
-   with the new flag and just set REQ_BLK_CRYPTO and also set
-   bi_crypt_context = NULL to signify the same thing, but either way, it doesn't
-   seem like a very clean solution to me.
+> +		__field(  sector_t,	sector			)
+> +		__field(  unsigned int,	nr_sector		)
+> +		__field(  int,		error			)
+> +		__array(  char,		rwbs,	RWBS_LEN	)
+> +		__dynamic_array( char,	cmd,	1		)
 
-4) I don't think there's actually an issue with dm-integrity as long as when we
-   add support for inline encryption to dm, we ensure that if any of the child
-   targets is dm-integrity, then the dm device says it doesn't support any
-   crypto mode. This way, encryption is always consistently done before
-   integrity calculation, which is always consistently done before decryption
-   (and when dm-integrity is not using the internal hash, then the bio will fail
-   because of (2), but this is still consistent whether or not hardware inline
-   encryption support is present.
+Not sure what you are doing with cmd. It appears to be always hard
+coded as an empty string?
 
-However, even if we decide to do (a), I'll still need to ensure that when bio
-integrity and blk-crypto are used together, the results are consistent
-regardless of whether hardware inline crypto support is present. So I either
-disallow bio integrity to be used with blk-crypto, in which case I'll need to
-do something similar to what I had to do in (3) like introduce REQ_NO_SPECIAL
-and we also lose the advantage of not having the two fields shared in a union,
-or I allow them to be used together while ensuring consistent results by
-maybe doing something like forcing blk-crypto to fallback to the crypto API
-whenever the target device for a bio has a bio integrity profile (and whatever
-checks are done in bio_integrity_prep).
+-- Steve
 
-So I'm not sure if (a) is a lot easier or cleaner. But unlike (b), (a)
-does give us the option of using the two features together....if it seems
-likely that we'll want to use both these features together at some point,
-then maybe I should switch back to (a), and for now just disallow the two
-features from being used together since that's still easier than trying to get
-them both to work together, and once we know for sure that we want to use both
-together, we can make the necessary additions then?
+
+> +	),
+> +
+> +	TP_fast_assign(
+> +		__entry->dev	   = rq->rq_disk ? disk_devt(rq->rq_disk) : 0;
+> +		__assign_str(name,   rq->rq_disk ? rq->rq_disk->disk_name : "?");
+> +		__entry->sector    = blk_rq_pos(rq);
+> +		__entry->nr_sector = nr_bytes >> 9;
+> +		__entry->error     = error;
+> +
+> +		blk_fill_rwbs(__entry->rwbs, rq->cmd_flags, nr_bytes);
+> +		__get_str(cmd)[0] = '\0';
+> +	),
+> +
+> +	TP_printk("%d,%d %s %s (%s) %llu + %u [%d]",
+> +		  MAJOR(__entry->dev), MINOR(__entry->dev),
+> +		  __get_str(name), __entry->rwbs, __get_str(cmd),
+> +		  (unsigned long long)__entry->sector,
+> +		  __entry->nr_sector, __entry->error)
+> +);
+> +
+>  DECLARE_EVENT_CLASS(block_rq,
+>  
+>  	TP_PROTO(struct request_queue *q, struct request *rq),
+
