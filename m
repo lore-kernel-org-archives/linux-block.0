@@ -6,58 +6,58 @@ X-Spam-Status: No, score=-0.8 required=3.0 tests=DKIM_SIGNED,DKIM_VALID,
 	DKIM_VALID_AU,HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SPF_HELO_NONE,
 	SPF_PASS autolearn=no autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 1647AC3F68F
-	for <linux-block@archiver.kernel.org>; Wed, 22 Jan 2020 12:52:18 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 3E3DDC2D0DB
+	for <linux-block@archiver.kernel.org>; Wed, 22 Jan 2020 13:12:32 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.kernel.org (Postfix) with ESMTP id DD6B324683
-	for <linux-block@archiver.kernel.org>; Wed, 22 Jan 2020 12:52:17 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id 0297220678
+	for <linux-block@archiver.kernel.org>; Wed, 22 Jan 2020 13:12:32 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=pass (2048-bit key) header.d=cloud.ionos.com header.i=@cloud.ionos.com header.b="JqTKdqIS"
+	dkim=pass (2048-bit key) header.d=cloud.ionos.com header.i=@cloud.ionos.com header.b="Z6DdYqcB"
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1728731AbgAVMwR (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Wed, 22 Jan 2020 07:52:17 -0500
-Received: from mail-io1-f65.google.com ([209.85.166.65]:36814 "EHLO
-        mail-io1-f65.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1727453AbgAVMwQ (ORCPT
+        id S1728811AbgAVNMb (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Wed, 22 Jan 2020 08:12:31 -0500
+Received: from mail-il1-f195.google.com ([209.85.166.195]:34343 "EHLO
+        mail-il1-f195.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S1726204AbgAVNMb (ORCPT
         <rfc822;linux-block@vger.kernel.org>);
-        Wed, 22 Jan 2020 07:52:16 -0500
-Received: by mail-io1-f65.google.com with SMTP id d15so6514849iog.3
-        for <linux-block@vger.kernel.org>; Wed, 22 Jan 2020 04:52:14 -0800 (PST)
+        Wed, 22 Jan 2020 08:12:31 -0500
+Received: by mail-il1-f195.google.com with SMTP id s15so5149810iln.1
+        for <linux-block@vger.kernel.org>; Wed, 22 Jan 2020 05:12:30 -0800 (PST)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=cloud.ionos.com; s=google;
         h=mime-version:references:in-reply-to:from:date:message-id:subject:to
          :cc;
-        bh=tyEqoE1cBRj4Tnu9o17cDo7KOBzKfVc7rH8CRyHUH6M=;
-        b=JqTKdqISTmyQnas3GxL8Fk/lQG/f4qinU1zIb0g2IpyFunWwUZvsW/EvsYvdjVM+Bv
-         nu3V2Rc4n2uDBlx4RTvIE96wo0/MVNXhg7rLoygcV4K0T8wtrSNwHF+xTtzI0Nk0P22a
-         eZnLXT2r1JBOxZlt5sK3eDR0FDjA3TG++1N51T70IJMlF+USOcHppVHsxGSTwDqEkbRK
-         Gviw9c19oPSeFJqJujGAgEqlCMp+uyrzCwpDAAAr6LM3QSjFd5+1JYX/P6icU23c0eMz
-         mnxCsc/2L6IPfpsS9ic+BZ7zExWKDBlQcLAoPCYFJwI5IVaLVB1fGZqu2c5MeycWKGyF
-         +gKA==
+        bh=uYeXMdsihSMOwiHXkfhLlg4c7EzfuiC7mnui5sXJKk0=;
+        b=Z6DdYqcBuBUYQDjIrMOct7lsz84rBvUXRWdqLtrCodlo+0eBrPX8lCuNEDnCheI8OE
+         n880QRXu6SHOmaI778zTUBym7BggXNwQ2oXbbZSpWThYowUQNjMoVD+tS8cPdcFoBaaj
+         3HIfTiXb4fceWvlvdSHrHpMRaVGVWUwZEyK1ct3Mv917Yd44cbJyN0NTyvO3+nva1zIu
+         8HYvPDGJ7BLw33A3pRc9sPUrXOjygcRAFLFp41bUfoT9Q7aMlpfx7Xu3+7LrrI1aKLqU
+         e588GQsRUqjQ+tRduymqyaFHXmSR65WfIAVb87AU8D0iL9VqWMinwStBz6qDv+tcLJB2
+         8+Kw==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=1e100.net; s=20161025;
         h=x-gm-message-state:mime-version:references:in-reply-to:from:date
          :message-id:subject:to:cc;
-        bh=tyEqoE1cBRj4Tnu9o17cDo7KOBzKfVc7rH8CRyHUH6M=;
-        b=MvIPajK4E6iTap70H+z6hHxKRvoVTCtKXNnVYdOcvuRnh203lk+4zHvoh93/bmNeSc
-         6ZO+Pzp9Ki4SV4CmYv8r6M4CIVstBOGSd4H42RhEyNLlZyx0lBiz6lZo3XSGVtxv1WbN
-         rkQqCKuQwnht4+Fg5w4KIKwceycIvu7EFApu+A386HnJbfaxzzGQVUifpAfMRvlXfhGl
-         LJ+/wzPvEkkMX9XgbdtPvfyRygXfAF/FChXc7sqOTONifI+NipRN4Ic5q92Y67xvfQBt
-         WbLVLAUL3UWOtvc+BlQYHnRwqxFvtsQLTu2kV2Si7Qrsajjfi3aFdfwYiGm6wUc/aOl5
-         Dj9w==
-X-Gm-Message-State: APjAAAVJ/J6VwuCJeIFBDGsWV6ftTGW4EP5zdHTNWpVsvu1U3MwrZxNP
-        mZRrKOorsIkSri9qeKYIhuIBh5tvIW6J5HgmyFmOV399v1A=
-X-Google-Smtp-Source: APXvYqxID7Q54LszheaS02fViYtPI2sHLFaFa53vmLJsRK30UqbYvBxn+oKpLOtdx004tpasSf7dszUamb48MDjNhLY=
-X-Received: by 2002:a6b:600f:: with SMTP id r15mr6548900iog.54.1579697534119;
- Wed, 22 Jan 2020 04:52:14 -0800 (PST)
+        bh=uYeXMdsihSMOwiHXkfhLlg4c7EzfuiC7mnui5sXJKk0=;
+        b=B1S3j+qcx4A5/QiNtqYJV+8JstwoG5s1XFpy8PRd1qkPVF4z8+FPJSYGchZSsgJA9i
+         0OsM+AU70o14JJYRc+TtrUlxNdhpkRXgeaLAinreJtBj7Aelx7u927s0qRSjPPimd4nd
+         rtKfTxrPeO4JuTWpKM1ziXwSJYilIK9Fs2kBL9/pukCsPfEaQh7LMINwJAw5dak2hv6M
+         Q5x0K8HeFQBfESHPD7bHvcGSjIGxbRZZC7Sll2Fmfg+Zy9fJ9iec8lrFfkOnCZwNf4yc
+         IBZuc6KIAIccVVOiClQgaYOKW4r2u1aB6zjzZLhYbqwuqJG3h70t5QKZl0TAP6xsGeGB
+         ImcA==
+X-Gm-Message-State: APjAAAWzYa6hlDaJLXsTRvL5zgDGIbqx27jKaCJSjcjmH4VSNtpbEC+r
+        p6Qa9DrHU9duasUJDaZEc1X7lTOHrJ6c2qJ0K4YcwA==
+X-Google-Smtp-Source: APXvYqx5fw2Xsj3AGQSmRszVP61ZNxriWWG6c9kYX6VETrDzQ0tPB4qXM+fnsecAYtT2MSsRderZSrJCRKz1z9yvLBo=
+X-Received: by 2002:a05:6e02:4d2:: with SMTP id f18mr7650379ils.54.1579698750114;
+ Wed, 22 Jan 2020 05:12:30 -0800 (PST)
 MIME-Version: 1.0
 References: <20200116125915.14815-1-jinpuwang@gmail.com> <20200116125915.14815-18-jinpuwang@gmail.com>
- <20200120134815.GH51881@unreal> <CAMGffE=+wX2h6bSp+ZwTowWq8NOutVnCfXFqxMupZNCGGOh0sg@mail.gmail.com>
- <20200122123119.GC7018@unreal>
-In-Reply-To: <20200122123119.GC7018@unreal>
+ <20200120134815.GH51881@unreal> <CAMGffEkt1v+OkWOZfFBitYpqYHxB2+RHSjZbbLBZFPSuRXPMXQ@mail.gmail.com>
+ <20200122122548.GB7018@unreal>
+In-Reply-To: <20200122122548.GB7018@unreal>
 From:   Jinpu Wang <jinpu.wang@cloud.ionos.com>
-Date:   Wed, 22 Jan 2020 13:52:03 +0100
-Message-ID: <CAMGffEn_q9862+CwfRb3WjWzuy6wnCwdgqmtHOoAfqNVeGC-2w@mail.gmail.com>
+Date:   Wed, 22 Jan 2020 14:12:19 +0100
+Message-ID: <CAMGffEmpRvruSn6iz6EfgfAjE9xrnsihwPaQU8Ft9e7qLD5avw@mail.gmail.com>
 Subject: Re: [PATCH v7 17/25] block/rnbd: client: main functionality
 To:     Leon Romanovsky <leon@kernel.org>
 Cc:     Jack Wang <jinpuwang@gmail.com>, linux-block@vger.kernel.org,
@@ -75,25 +75,124 @@ Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-> > > Please no vertical alignment in new code, it adds a lot of churn if such
-> > > line is changed later and creates difficulties for the backports.
-> > It does look nicer when it can be aligned. I don't get why backport is
-> > an argument here.
+On Wed, Jan 22, 2020 at 1:25 PM Leon Romanovsky <leon@kernel.org> wrote:
 >
-> The backport thing will be problematic once some fix is needed which
-> will require addition of extra variable.
+> On Wed, Jan 22, 2020 at 12:22:43PM +0100, Jinpu Wang wrote:
+> > > > +/**
+> > > > + * rnbd_get_cpu_qlist() - finds a list with HW queues to be rerun
+> > > > + * @sess:    Session to find a queue for
+> > > > + * @cpu:     Cpu to start the search from
+> > > > + *
+> > > > + * Description:
+> > > > + *     Each CPU has a list of HW queues, which needs to be rerun.  If a list
+> > > > + *     is not empty - it is marked with a bit.  This function finds first
+> > > > + *     set bit in a bitmap and returns corresponding CPU list.
+> > > > + */
+> > > > +static struct rnbd_cpu_qlist *
+> > > > +rnbd_get_cpu_qlist(struct rnbd_clt_session *sess, int cpu)
+> > > > +{
+> > > > +     int bit;
+> > > > +
+> > > > +     /* First half */
+> > > > +     bit = find_next_bit(sess->cpu_queues_bm, nr_cpu_ids, cpu);
+> > >
+> > > Is it protected by any lock?
+> > We hold requeue_lock when set/clear bit, and disable preemption via
+> > get_cpu_ptr when find_next_bit.
+> > even it fails to get latest bit, it just cause an rerun the queue.
 >
-> Imagine such situation, where you will need to add such variable.
+> It is not clear here at all.
 >
->      struct rnbd_clt_dev *dev        = rq->rq_disk->private_data;
->      struct rnbd_clt_session *sess   = dev->sess;
-> +    struct rnbd_clt_session *sess_very_long_variable = ....;
+> > >
+> > > > +     if (bit < nr_cpu_ids) {
+> > > > +             return per_cpu_ptr(sess->cpu_queues, bit);
+> > > > +     } else if (cpu != 0) {
+> > > > +             /* Second half */
+> > > > +             bit = find_next_bit(sess->cpu_queues_bm, cpu, 0);
+> > > > +             if (bit < cpu)
+> > > > +                     return per_cpu_ptr(sess->cpu_queues, bit);
+> > > > +     }
+> > > > +
+> > > > +     return NULL;
+> > > > +}
+> > > > +
+> > > > +static inline int nxt_cpu(int cpu)
+> > > > +{
+> > > > +     return (cpu + 1) % nr_cpu_ids;
+> > > > +}
+> > > > +
+> > > > +/**
+> > > > + * rnbd_rerun_if_needed() - rerun next queue marked as stopped
+> > > > + * @sess:    Session to rerun a queue on
+> > > > + *
+> > > > + * Description:
+> > > > + *     Each CPU has it's own list of HW queues, which should be rerun.
+> > > > + *     Function finds such list with HW queues, takes a list lock, picks up
+> > > > + *     the first HW queue out of the list and requeues it.
+> > > > + *
+> > > > + * Return:
+> > > > + *     True if the queue was requeued, false otherwise.
+> > > > + *
+> > > > + * Context:
+> > > > + *     Does not matter.
+> > > > + */
+> > > > +static inline bool rnbd_rerun_if_needed(struct rnbd_clt_session *sess)
+> > >
+> > > No inline function in C files.
+> > First time saw such request, there are so many inline functions in C
 >
-> You will need to update vertical alignment for all variables and it
-> can create huge churn out of nowhere. The standard approach is to
-> avoid vertical space alignments from the beginning.
+> 15) The inline disease
+> https://elixir.bootlin.com/linux/latest/source/Documentation/process/coding-style.rst#L882
+ok, will review the inline usage, and drop some.
+>
+> > files across the tree
+> > grep inline drivers/infiniband/core/*.c
+> > drivers/infiniband/core/addr.c:static inline bool
+> > ib_nl_is_good_ip_resp(const struct nlmsghdr *nlh)
+> > drivers/infiniband/core/cma.c:static inline u8 cma_get_ip_ver(const
+> > struct cma_hdr *hdr)
+> > drivers/infiniband/core/cma.c:static inline void cma_set_ip_ver(struct
+> > cma_hdr *hdr, u8 ip_ver)
+> > drivers/infiniband/core/cma.c:static inline void release_mc(struct kref *kref)
+> > drivers/infiniband/core/cma.c:static inline struct sockaddr
+> > *cma_src_addr(struct rdma_id_private *id_priv)
+> > drivers/infiniband/core/cma.c:static inline struct sockaddr
+> > *cma_dst_addr(struct rdma_id_private *id_priv)
+> >
+> > >
+> > > > +{
+> > > > +     struct rnbd_queue *q = NULL;
+> > > > +     struct rnbd_cpu_qlist *cpu_q;
+> > > > +     unsigned long flags;
+> > > > +     int *cpup;
+> > > > +
+> > > > +     /*
+> > > > +      * To keep fairness and not to let other queues starve we always
+> > > > +      * try to wake up someone else in round-robin manner.  That of course
+> > > > +      * increases latency but queues always have a chance to be executed.
+> > > > +      */
+> > > > +     cpup = get_cpu_ptr(sess->cpu_rr);
+> > > > +     for (cpu_q = rnbd_get_cpu_qlist(sess, nxt_cpu(*cpup)); cpu_q;
+> > > > +          cpu_q = rnbd_get_cpu_qlist(sess, nxt_cpu(cpu_q->cpu))) {
+> > > > +             if (!spin_trylock_irqsave(&cpu_q->requeue_lock, flags))
+> > > > +                     continue;
+> > > > +             if (likely(test_bit(cpu_q->cpu, sess->cpu_queues_bm))) {
+> > >
+> > > Success oriented approach please.
+> > sorry, I don't quite get your point.
+>
+> The flows are better to be written:
+> if (err)
+>   return or conitnue
+> <...>
+> do_something
+>
+> in your case
+> if (!test_bit(...))
+>  continue;
+> do_work_here.
+In our case,
+ if we failed to get requeue_lock, we continue to next cpu_q and do the work
+I guess you miss read the code.
 
-Thanks for the explanation,  I get your points now, but in that case,
-you can also choose a not so
-long name to keep the alignment. Even you have no choice for a shorter name,
-breaking the alignment is the last thing we have to worry about.
+Thanks
