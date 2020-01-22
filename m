@@ -2,97 +2,171 @@ Return-Path: <SRS0=Jk+C=3L=vger.kernel.org=linux-block-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-6.8 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
-	INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS
-	autolearn=ham autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-0.8 required=3.0 tests=DKIM_SIGNED,DKIM_VALID,
+	DKIM_VALID_AU,HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SPF_HELO_NONE,
+	SPF_PASS autolearn=no autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id A50D9C33CAF
-	for <linux-block@archiver.kernel.org>; Wed, 22 Jan 2020 10:58:51 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 57851C33CB6
+	for <linux-block@archiver.kernel.org>; Wed, 22 Jan 2020 11:22:56 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.kernel.org (Postfix) with ESMTP id 7BE0D21734
-	for <linux-block@archiver.kernel.org>; Wed, 22 Jan 2020 10:58:51 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id 2D21724685
+	for <linux-block@archiver.kernel.org>; Wed, 22 Jan 2020 11:22:56 +0000 (UTC)
+Authentication-Results: mail.kernel.org;
+	dkim=pass (2048-bit key) header.d=cloud.ionos.com header.i=@cloud.ionos.com header.b="hFzLiDN2"
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1728733AbgAVK6u (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Wed, 22 Jan 2020 05:58:50 -0500
-Received: from relay.sw.ru ([185.231.240.75]:49986 "EHLO relay.sw.ru"
-        rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-        id S1726219AbgAVK6a (ORCPT <rfc822;linux-block@vger.kernel.org>);
-        Wed, 22 Jan 2020 05:58:30 -0500
-Received: from dhcp-172-16-24-104.sw.ru ([172.16.24.104] helo=localhost.localdomain)
-        by relay.sw.ru with esmtp (Exim 4.92.3)
-        (envelope-from <ktkhai@virtuozzo.com>)
-        id 1iuDiF-0002gk-Mt; Wed, 22 Jan 2020 13:58:19 +0300
-Subject: [PATCH v5 5/6] block: Add blk_queue_max_allocate_sectors()
-From:   Kirill Tkhai <ktkhai@virtuozzo.com>
-To:     linux-block@vger.kernel.org, linux-kernel@vger.kernel.org,
-        martin.petersen@oracle.com, bob.liu@oracle.com, axboe@kernel.dk,
-        agk@redhat.com, snitzer@redhat.com, dm-devel@redhat.com,
-        song@kernel.org, tytso@mit.edu, adilger.kernel@dilger.ca,
-        Chaitanya.Kulkarni@wdc.com, darrick.wong@oracle.com,
-        ming.lei@redhat.com, osandov@fb.com, jthumshirn@suse.de,
-        minwoo.im.dev@gmail.com, damien.lemoal@wdc.com,
-        andrea.parri@amarulasolutions.com, hare@suse.com, tj@kernel.org,
-        ajay.joshi@wdc.com, sagi@grimberg.me, dsterba@suse.com,
-        chaitanya.kulkarni@wdc.com, bvanassche@acm.org,
-        dhowells@redhat.com, asml.silence@gmail.com, ktkhai@virtuozzo.com
-Date:   Wed, 22 Jan 2020 13:58:19 +0300
-Message-ID: <157969069942.174869.16164846993802944407.stgit@localhost.localdomain>
-In-Reply-To: <157968992539.174869.7490844754165043549.stgit@localhost.localdomain>
-References: <157968992539.174869.7490844754165043549.stgit@localhost.localdomain>
-User-Agent: StGit/0.19
+        id S1726049AbgAVLWz (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Wed, 22 Jan 2020 06:22:55 -0500
+Received: from mail-il1-f194.google.com ([209.85.166.194]:37942 "EHLO
+        mail-il1-f194.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S1725911AbgAVLWz (ORCPT
+        <rfc822;linux-block@vger.kernel.org>);
+        Wed, 22 Jan 2020 06:22:55 -0500
+Received: by mail-il1-f194.google.com with SMTP id f5so4880641ilq.5
+        for <linux-block@vger.kernel.org>; Wed, 22 Jan 2020 03:22:54 -0800 (PST)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=cloud.ionos.com; s=google;
+        h=mime-version:references:in-reply-to:from:date:message-id:subject:to
+         :cc;
+        bh=uUH030Ucjx6wSEh1Tt9g3o7Wsr/XQCAziEWCTfW8SaU=;
+        b=hFzLiDN2F6hBrM+mkVatQqv7WzKq5KtkV6j6dpCDUcjBK9CXbj1bzvr9AqOHVTOPhP
+         QiF0lZMIGQ3CdgBg4Lm/p7D9WmZcnlTjqkBKs5BoxaWmpvZA8vQyIFTHyJY8372CfgX6
+         y6sV6/x9VhLkexaQo2QAk2/6zccDRKl5/5K92RBfaKqMZTKMLjoyX1s52OapBjP+qeJu
+         uLpUiIhcJYzgXNq+xk2nwmWW+UDTg1JdgxLRIAtuKh82umP0ZAKJzkil1zGgQmCKS4oa
+         88+z443ylZjUmfHe9A2/eoVsBcOorD2Zwnp7/hNJ93URcHXBBae31XpZDE+UwE6Ietn2
+         TXxg==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20161025;
+        h=x-gm-message-state:mime-version:references:in-reply-to:from:date
+         :message-id:subject:to:cc;
+        bh=uUH030Ucjx6wSEh1Tt9g3o7Wsr/XQCAziEWCTfW8SaU=;
+        b=km9x74UwdKQl7cXkM2msL7XYsHw48zeYJQyo4mhVeaA4cqSSZCU0dVqb4i6p0bTzcA
+         zkqZPk+Y0Sf1g2FXlLhjjJJ08ZaEx/zyExHTVApFTnsS1f6f+652K+dv9EJksjz0khXT
+         2Czs35m2ODySQLL7bRzb682E5hglbkYYtatELtVNrlRUTwV7NhPW33O5TFfKJ7iSEycs
+         oQqp18+FUmiiMBgELJ5kvwMiN3Pl1aViQKgMTQhYAsEOiy0ElhrrPiTspZ0xIyI/hxEW
+         kY0X0yWh0cnggRYxr1TeACMqlbqRXqzeK++fqcc0AIZLWg3qCzNczlfBh1R/2u4mChOZ
+         MoRg==
+X-Gm-Message-State: APjAAAWVc/wEBdc6zgeSLbyz/6SJPHa/FDGdE+3LHkXcp75ZyBwCEzZ4
+        Sn8t8/qvhboItqedmH9pDKvUiVKApmjNZynkksrnAg==
+X-Google-Smtp-Source: APXvYqzTMw8qEqKroHt7vwE597QMda9Tc/gz8Br0vBdbrDEYp5bQ1g4btVjQp1LbkwgUVxCU41VQGL82druMFSll0KI=
+X-Received: by 2002:a05:6e02:f0f:: with SMTP id x15mr7381160ilj.298.1579692174515;
+ Wed, 22 Jan 2020 03:22:54 -0800 (PST)
 MIME-Version: 1.0
-Content-Type: text/plain; charset="utf-8"
-Content-Transfer-Encoding: 7bit
+References: <20200116125915.14815-1-jinpuwang@gmail.com> <20200116125915.14815-18-jinpuwang@gmail.com>
+ <20200120134815.GH51881@unreal>
+In-Reply-To: <20200120134815.GH51881@unreal>
+From:   Jinpu Wang <jinpu.wang@cloud.ionos.com>
+Date:   Wed, 22 Jan 2020 12:22:43 +0100
+Message-ID: <CAMGffEkt1v+OkWOZfFBitYpqYHxB2+RHSjZbbLBZFPSuRXPMXQ@mail.gmail.com>
+Subject: Re: [PATCH v7 17/25] block/rnbd: client: main functionality
+To:     Leon Romanovsky <leon@kernel.org>
+Cc:     Jack Wang <jinpuwang@gmail.com>, linux-block@vger.kernel.org,
+        linux-rdma@vger.kernel.org, Jens Axboe <axboe@kernel.dk>,
+        Christoph Hellwig <hch@infradead.org>,
+        Sagi Grimberg <sagi@grimberg.me>,
+        Bart Van Assche <bvanassche@acm.org>,
+        Doug Ledford <dledford@redhat.com>,
+        Jason Gunthorpe <jgg@ziepe.ca>,
+        Danil Kipnis <danil.kipnis@cloud.ionos.com>,
+        Roman Penyaev <rpenyaev@suse.de>
+Content-Type: text/plain; charset="UTF-8"
 Sender: linux-block-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-This is a new helper to assign max_allocate_sectors
-limit of block device queue.
+> > +/**
+> > + * rnbd_get_cpu_qlist() - finds a list with HW queues to be rerun
+> > + * @sess:    Session to find a queue for
+> > + * @cpu:     Cpu to start the search from
+> > + *
+> > + * Description:
+> > + *     Each CPU has a list of HW queues, which needs to be rerun.  If a list
+> > + *     is not empty - it is marked with a bit.  This function finds first
+> > + *     set bit in a bitmap and returns corresponding CPU list.
+> > + */
+> > +static struct rnbd_cpu_qlist *
+> > +rnbd_get_cpu_qlist(struct rnbd_clt_session *sess, int cpu)
+> > +{
+> > +     int bit;
+> > +
+> > +     /* First half */
+> > +     bit = find_next_bit(sess->cpu_queues_bm, nr_cpu_ids, cpu);
+>
+> Is it protected by any lock?
+We hold requeue_lock when set/clear bit, and disable preemption via
+get_cpu_ptr when find_next_bit.
+even it fails to get latest bit, it just cause an rerun the queue.
+>
+> > +     if (bit < nr_cpu_ids) {
+> > +             return per_cpu_ptr(sess->cpu_queues, bit);
+> > +     } else if (cpu != 0) {
+> > +             /* Second half */
+> > +             bit = find_next_bit(sess->cpu_queues_bm, cpu, 0);
+> > +             if (bit < cpu)
+> > +                     return per_cpu_ptr(sess->cpu_queues, bit);
+> > +     }
+> > +
+> > +     return NULL;
+> > +}
+> > +
+> > +static inline int nxt_cpu(int cpu)
+> > +{
+> > +     return (cpu + 1) % nr_cpu_ids;
+> > +}
+> > +
+> > +/**
+> > + * rnbd_rerun_if_needed() - rerun next queue marked as stopped
+> > + * @sess:    Session to rerun a queue on
+> > + *
+> > + * Description:
+> > + *     Each CPU has it's own list of HW queues, which should be rerun.
+> > + *     Function finds such list with HW queues, takes a list lock, picks up
+> > + *     the first HW queue out of the list and requeues it.
+> > + *
+> > + * Return:
+> > + *     True if the queue was requeued, false otherwise.
+> > + *
+> > + * Context:
+> > + *     Does not matter.
+> > + */
+> > +static inline bool rnbd_rerun_if_needed(struct rnbd_clt_session *sess)
+>
+> No inline function in C files.
+First time saw such request, there are so many inline functions in C
+files across the tree
+grep inline drivers/infiniband/core/*.c
+drivers/infiniband/core/addr.c:static inline bool
+ib_nl_is_good_ip_resp(const struct nlmsghdr *nlh)
+drivers/infiniband/core/cma.c:static inline u8 cma_get_ip_ver(const
+struct cma_hdr *hdr)
+drivers/infiniband/core/cma.c:static inline void cma_set_ip_ver(struct
+cma_hdr *hdr, u8 ip_ver)
+drivers/infiniband/core/cma.c:static inline void release_mc(struct kref *kref)
+drivers/infiniband/core/cma.c:static inline struct sockaddr
+*cma_src_addr(struct rdma_id_private *id_priv)
+drivers/infiniband/core/cma.c:static inline struct sockaddr
+*cma_dst_addr(struct rdma_id_private *id_priv)
 
-Signed-off-by: Kirill Tkhai <ktkhai@virtuozzo.com>
----
- block/blk-settings.c   |   13 +++++++++++++
- include/linux/blkdev.h |    2 ++
- 2 files changed, 15 insertions(+)
+>
+> > +{
+> > +     struct rnbd_queue *q = NULL;
+> > +     struct rnbd_cpu_qlist *cpu_q;
+> > +     unsigned long flags;
+> > +     int *cpup;
+> > +
+> > +     /*
+> > +      * To keep fairness and not to let other queues starve we always
+> > +      * try to wake up someone else in round-robin manner.  That of course
+> > +      * increases latency but queues always have a chance to be executed.
+> > +      */
+> > +     cpup = get_cpu_ptr(sess->cpu_rr);
+> > +     for (cpu_q = rnbd_get_cpu_qlist(sess, nxt_cpu(*cpup)); cpu_q;
+> > +          cpu_q = rnbd_get_cpu_qlist(sess, nxt_cpu(cpu_q->cpu))) {
+> > +             if (!spin_trylock_irqsave(&cpu_q->requeue_lock, flags))
+> > +                     continue;
+> > +             if (likely(test_bit(cpu_q->cpu, sess->cpu_queues_bm))) {
+>
+> Success oriented approach please.
+sorry, I don't quite get your point.
 
-diff --git a/block/blk-settings.c b/block/blk-settings.c
-index 8d5df9d37239..24cf8fbbd125 100644
---- a/block/blk-settings.c
-+++ b/block/blk-settings.c
-@@ -259,6 +259,19 @@ void blk_queue_max_write_zeroes_sectors(struct request_queue *q,
- }
- EXPORT_SYMBOL(blk_queue_max_write_zeroes_sectors);
- 
-+/**
-+ * blk_queue_max_allocate_sectors - set max sectors for a single
-+ *                                  allocate request
-+ * @q:  the request queue for the device
-+ * @max_allocate_sectors: maximum number of sectors to write per command
-+ **/
-+void blk_queue_max_allocate_sectors(struct request_queue *q,
-+		unsigned int max_allocate_sectors)
-+{
-+	q->limits.max_allocate_sectors = max_allocate_sectors;
-+}
-+EXPORT_SYMBOL(blk_queue_max_allocate_sectors);
-+
- /**
-  * blk_queue_max_segments - set max hw segments for a request for this queue
-  * @q:  the request queue for the device
-diff --git a/include/linux/blkdev.h b/include/linux/blkdev.h
-index 20c94a7f9411..249dce6dd436 100644
---- a/include/linux/blkdev.h
-+++ b/include/linux/blkdev.h
-@@ -1089,6 +1089,8 @@ extern void blk_queue_max_write_same_sectors(struct request_queue *q,
- 		unsigned int max_write_same_sectors);
- extern void blk_queue_max_write_zeroes_sectors(struct request_queue *q,
- 		unsigned int max_write_same_sectors);
-+extern void blk_queue_max_allocate_sectors(struct request_queue *q,
-+		unsigned int max_allocate_sectors);
- extern void blk_queue_logical_block_size(struct request_queue *, unsigned int);
- extern void blk_queue_physical_block_size(struct request_queue *, unsigned int);
- extern void blk_queue_alignment_offset(struct request_queue *q,
-
-
+Thanks Leon for review.
