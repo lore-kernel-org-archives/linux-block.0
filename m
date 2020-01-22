@@ -2,44 +2,65 @@ Return-Path: <SRS0=Jk+C=3L=vger.kernel.org=linux-block-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-1.1 required=3.0 tests=DKIMWL_WL_HIGH,DKIM_SIGNED,
-	DKIM_VALID,DKIM_VALID_AU,MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS
-	autolearn=no autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-0.8 required=3.0 tests=DKIM_SIGNED,DKIM_VALID,
+	DKIM_VALID_AU,HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SPF_HELO_NONE,
+	SPF_PASS autolearn=no autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 19132C33CB6
-	for <linux-block@archiver.kernel.org>; Wed, 22 Jan 2020 14:07:26 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 1C150C33CB6
+	for <linux-block@archiver.kernel.org>; Wed, 22 Jan 2020 14:18:23 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.kernel.org (Postfix) with ESMTP id E1EFD24684
-	for <linux-block@archiver.kernel.org>; Wed, 22 Jan 2020 14:07:25 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=default; t=1579702046;
-	bh=Wy8Pr0E20M1TkFfD3kbyzyKhQuyBCG5ThscUojUfzXU=;
-	h=Date:From:To:Cc:Subject:References:In-Reply-To:List-ID:From;
-	b=z2+btF4bgFfzN65zWX447IfTlZaCoukLX/t4yWi0GcnnINMDvpfdEVCuvgtcSUEC8
-	 S3Nke69e6cF88ul2ZH5Nc8ME/natrVmhR3x346nOJUFDMmCCdkbm18bBONIcR27gfG
-	 RltzWkM0h9wsvGI0ecSpAEhG10KmCgYyqxgRGDAQ=
+	by mail.kernel.org (Postfix) with ESMTP id DAECE2467A
+	for <linux-block@archiver.kernel.org>; Wed, 22 Jan 2020 14:18:22 +0000 (UTC)
+Authentication-Results: mail.kernel.org;
+	dkim=pass (2048-bit key) header.d=cloud.ionos.com header.i=@cloud.ionos.com header.b="NHAPZAKF"
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1726026AbgAVOHZ (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Wed, 22 Jan 2020 09:07:25 -0500
-Received: from mail.kernel.org ([198.145.29.99]:48382 "EHLO mail.kernel.org"
-        rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-        id S1725805AbgAVOHZ (ORCPT <rfc822;linux-block@vger.kernel.org>);
-        Wed, 22 Jan 2020 09:07:25 -0500
-Received: from localhost (unknown [213.57.247.131])
-        (using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
-        (No client certificate requested)
-        by mail.kernel.org (Postfix) with ESMTPSA id 19AF52071E;
-        Wed, 22 Jan 2020 14:07:22 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-        s=default; t=1579702043;
-        bh=Wy8Pr0E20M1TkFfD3kbyzyKhQuyBCG5ThscUojUfzXU=;
-        h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
-        b=y3iORS1SPpk40TWx1YMBLIlj4LHI82M44rmPOsHCDrQrTLliyDdVvn5b/eKtw4Cy9
-         KTrXYOjeR1wCj5sPNdh0B7579dCsjeckCMNMGtWK5fN9RMUUksyOOhHi25UgAMfEqR
-         03ZoRBLqbH9l0VklzL8OssO38P9xM8EN5VeB6Z9A=
-Date:   Wed, 22 Jan 2020 16:07:20 +0200
-From:   Leon Romanovsky <leon@kernel.org>
-To:     Jinpu Wang <jinpu.wang@cloud.ionos.com>
+        id S1725870AbgAVOSW (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Wed, 22 Jan 2020 09:18:22 -0500
+Received: from mail-il1-f195.google.com ([209.85.166.195]:38811 "EHLO
+        mail-il1-f195.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S1725868AbgAVOSV (ORCPT
+        <rfc822;linux-block@vger.kernel.org>);
+        Wed, 22 Jan 2020 09:18:21 -0500
+Received: by mail-il1-f195.google.com with SMTP id f5so5264986ilq.5
+        for <linux-block@vger.kernel.org>; Wed, 22 Jan 2020 06:18:21 -0800 (PST)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=cloud.ionos.com; s=google;
+        h=mime-version:references:in-reply-to:from:date:message-id:subject:to
+         :cc;
+        bh=2rSXbPxc+vPk2rll0UdFyNjloC/tpgGA8kXN6kcDemo=;
+        b=NHAPZAKFgQ4RFvL4QGNy/MghS3gvkmsskZnE3R6u9Lg6fR5VbQHgI+SvVQHMCULizF
+         tCzOL1AQY68Vg59WhAelbLc4PQyoSybM+7DG3iT/nd9LsZAUVVMFFNJqwJzV/iIZvYVK
+         ATGayot9BzU476I9S6TebwUIHcL/7jpYpynJ7W2/38Vapz05J0+yAuFPUcPDDqm/Q1E6
+         wkVEiLy+WTIxku7sl4AeDOfjszl6LY74aaNgB78JVGXRd5drw94LMzytzCCdd2eHbh0l
+         HMAT3MbxI7KYNfCCaUlYszwSifuYZoBG7VMeXidXaUqzO0/d2bbkgHLtN5lcovPdUi9E
+         T5Lg==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20161025;
+        h=x-gm-message-state:mime-version:references:in-reply-to:from:date
+         :message-id:subject:to:cc;
+        bh=2rSXbPxc+vPk2rll0UdFyNjloC/tpgGA8kXN6kcDemo=;
+        b=GwLmmk7B+qBJh+o6dyGHXdN3rfnbHaOIthaj314gnwkWURTfNz7UKQB8LRCS2cz6qX
+         AmcutNXoqyeisvWFlLsFcCNDdH9NXM5/RjfLRNnHyQH4x6e0wi0JYTcIwpyByz+7Kr+w
+         twdh4eP6fTAHn2CtJzIWuJMmYzFF//4o7Hnp2bCzASpGUpggyaRMxOw8JdsyWUU4AQKl
+         QTNsV38at9pUHgbcgZcjukFBxKBaAgOw7XhsEJB62FUQthNk+thu94kVVRAFmolIrYms
+         9yJsHZ6Y2rzvMQC3P0KS9prUWGd90rX1Xg7z2O14mTXpWEnL7BwYwbA1cHkDMctk4PKr
+         LPMw==
+X-Gm-Message-State: APjAAAVm7MC/tVrvQaMCuu1oM2+kaGgwdgGf8n2mXqcPkLxZjpdhj++T
+        nIUJva+WuN207kT4TmCGtdKPdjmZLg+vH23IMNvQIw==
+X-Google-Smtp-Source: APXvYqzUSpNmMZ18hRy1zYr3oy8mbljVUzvgVW1X3MWoQDRPBuJywDZLcVlUuZnxOspkT9tbNXTFobPMYHIF2LlepPY=
+X-Received: by 2002:a05:6e02:4d2:: with SMTP id f18mr7920906ils.54.1579702700862;
+ Wed, 22 Jan 2020 06:18:20 -0800 (PST)
+MIME-Version: 1.0
+References: <20200116125915.14815-1-jinpuwang@gmail.com> <20200116125915.14815-18-jinpuwang@gmail.com>
+ <20200120134815.GH51881@unreal> <CAMGffEkt1v+OkWOZfFBitYpqYHxB2+RHSjZbbLBZFPSuRXPMXQ@mail.gmail.com>
+ <20200122122548.GB7018@unreal> <CAMGffEmpRvruSn6iz6EfgfAjE9xrnsihwPaQU8Ft9e7qLD5avw@mail.gmail.com>
+ <20200122140720.GF7018@unreal>
+In-Reply-To: <20200122140720.GF7018@unreal>
+From:   Jinpu Wang <jinpu.wang@cloud.ionos.com>
+Date:   Wed, 22 Jan 2020 15:18:09 +0100
+Message-ID: <CAMGffEkePsQ1rXAR4iaOjf41nGXVNJGQ0dmURWwfm44YmNZ93w@mail.gmail.com>
+Subject: Re: [PATCH v7 17/25] block/rnbd: client: main functionality
+To:     Leon Romanovsky <leon@kernel.org>
 Cc:     Jack Wang <jinpuwang@gmail.com>, linux-block@vger.kernel.org,
         linux-rdma@vger.kernel.org, Jens Axboe <axboe@kernel.dk>,
         Christoph Hellwig <hch@infradead.org>,
@@ -49,159 +70,153 @@ Cc:     Jack Wang <jinpuwang@gmail.com>, linux-block@vger.kernel.org,
         Jason Gunthorpe <jgg@ziepe.ca>,
         Danil Kipnis <danil.kipnis@cloud.ionos.com>,
         Roman Penyaev <rpenyaev@suse.de>
-Subject: Re: [PATCH v7 17/25] block/rnbd: client: main functionality
-Message-ID: <20200122140720.GF7018@unreal>
-References: <20200116125915.14815-1-jinpuwang@gmail.com>
- <20200116125915.14815-18-jinpuwang@gmail.com>
- <20200120134815.GH51881@unreal>
- <CAMGffEkt1v+OkWOZfFBitYpqYHxB2+RHSjZbbLBZFPSuRXPMXQ@mail.gmail.com>
- <20200122122548.GB7018@unreal>
- <CAMGffEmpRvruSn6iz6EfgfAjE9xrnsihwPaQU8Ft9e7qLD5avw@mail.gmail.com>
-MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <CAMGffEmpRvruSn6iz6EfgfAjE9xrnsihwPaQU8Ft9e7qLD5avw@mail.gmail.com>
+Content-Type: text/plain; charset="UTF-8"
 Sender: linux-block-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-On Wed, Jan 22, 2020 at 02:12:19PM +0100, Jinpu Wang wrote:
-> On Wed, Jan 22, 2020 at 1:25 PM Leon Romanovsky <leon@kernel.org> wrote:
-> >
-> > On Wed, Jan 22, 2020 at 12:22:43PM +0100, Jinpu Wang wrote:
-> > > > > +/**
-> > > > > + * rnbd_get_cpu_qlist() - finds a list with HW queues to be rerun
-> > > > > + * @sess:    Session to find a queue for
-> > > > > + * @cpu:     Cpu to start the search from
-> > > > > + *
-> > > > > + * Description:
-> > > > > + *     Each CPU has a list of HW queues, which needs to be rerun.  If a list
-> > > > > + *     is not empty - it is marked with a bit.  This function finds first
-> > > > > + *     set bit in a bitmap and returns corresponding CPU list.
-> > > > > + */
-> > > > > +static struct rnbd_cpu_qlist *
-> > > > > +rnbd_get_cpu_qlist(struct rnbd_clt_session *sess, int cpu)
-> > > > > +{
-> > > > > +     int bit;
-> > > > > +
-> > > > > +     /* First half */
-> > > > > +     bit = find_next_bit(sess->cpu_queues_bm, nr_cpu_ids, cpu);
-> > > >
-> > > > Is it protected by any lock?
-> > > We hold requeue_lock when set/clear bit, and disable preemption via
-> > > get_cpu_ptr when find_next_bit.
-> > > even it fails to get latest bit, it just cause an rerun the queue.
-> >
-> > It is not clear here at all.
-> >
-> > > >
-> > > > > +     if (bit < nr_cpu_ids) {
-> > > > > +             return per_cpu_ptr(sess->cpu_queues, bit);
-> > > > > +     } else if (cpu != 0) {
-> > > > > +             /* Second half */
-> > > > > +             bit = find_next_bit(sess->cpu_queues_bm, cpu, 0);
-> > > > > +             if (bit < cpu)
-> > > > > +                     return per_cpu_ptr(sess->cpu_queues, bit);
-> > > > > +     }
-> > > > > +
-> > > > > +     return NULL;
-> > > > > +}
-> > > > > +
-> > > > > +static inline int nxt_cpu(int cpu)
-> > > > > +{
-> > > > > +     return (cpu + 1) % nr_cpu_ids;
-> > > > > +}
-> > > > > +
-> > > > > +/**
-> > > > > + * rnbd_rerun_if_needed() - rerun next queue marked as stopped
-> > > > > + * @sess:    Session to rerun a queue on
-> > > > > + *
-> > > > > + * Description:
-> > > > > + *     Each CPU has it's own list of HW queues, which should be rerun.
-> > > > > + *     Function finds such list with HW queues, takes a list lock, picks up
-> > > > > + *     the first HW queue out of the list and requeues it.
-> > > > > + *
-> > > > > + * Return:
-> > > > > + *     True if the queue was requeued, false otherwise.
-> > > > > + *
-> > > > > + * Context:
-> > > > > + *     Does not matter.
-> > > > > + */
-> > > > > +static inline bool rnbd_rerun_if_needed(struct rnbd_clt_session *sess)
-> > > >
-> > > > No inline function in C files.
-> > > First time saw such request, there are so many inline functions in C
-> >
-> > 15) The inline disease
-> > https://elixir.bootlin.com/linux/latest/source/Documentation/process/coding-style.rst#L882
-> ok, will review the inline usage, and drop some.
-> >
-> > > files across the tree
-> > > grep inline drivers/infiniband/core/*.c
-> > > drivers/infiniband/core/addr.c:static inline bool
-> > > ib_nl_is_good_ip_resp(const struct nlmsghdr *nlh)
-> > > drivers/infiniband/core/cma.c:static inline u8 cma_get_ip_ver(const
-> > > struct cma_hdr *hdr)
-> > > drivers/infiniband/core/cma.c:static inline void cma_set_ip_ver(struct
-> > > cma_hdr *hdr, u8 ip_ver)
-> > > drivers/infiniband/core/cma.c:static inline void release_mc(struct kref *kref)
-> > > drivers/infiniband/core/cma.c:static inline struct sockaddr
-> > > *cma_src_addr(struct rdma_id_private *id_priv)
-> > > drivers/infiniband/core/cma.c:static inline struct sockaddr
-> > > *cma_dst_addr(struct rdma_id_private *id_priv)
-> > >
-> > > >
-> > > > > +{
-> > > > > +     struct rnbd_queue *q = NULL;
-> > > > > +     struct rnbd_cpu_qlist *cpu_q;
-> > > > > +     unsigned long flags;
-> > > > > +     int *cpup;
-> > > > > +
-> > > > > +     /*
-> > > > > +      * To keep fairness and not to let other queues starve we always
-> > > > > +      * try to wake up someone else in round-robin manner.  That of course
-> > > > > +      * increases latency but queues always have a chance to be executed.
-> > > > > +      */
-> > > > > +     cpup = get_cpu_ptr(sess->cpu_rr);
-> > > > > +     for (cpu_q = rnbd_get_cpu_qlist(sess, nxt_cpu(*cpup)); cpu_q;
-> > > > > +          cpu_q = rnbd_get_cpu_qlist(sess, nxt_cpu(cpu_q->cpu))) {
-> > > > > +             if (!spin_trylock_irqsave(&cpu_q->requeue_lock, flags))
-> > > > > +                     continue;
-> > > > > +             if (likely(test_bit(cpu_q->cpu, sess->cpu_queues_bm))) {
-> > > >
-> > > > Success oriented approach please.
-> > > sorry, I don't quite get your point.
-> >
-> > The flows are better to be written:
-> > if (err)
-> >   return or conitnue
-> > <...>
-> > do_something
-> >
-> > in your case
-> > if (!test_bit(...))
-> >  continue;
-> > do_work_here.
-> In our case,
->  if we failed to get requeue_lock, we continue to next cpu_q and do the work
-> I guess you miss read the code.
-
-I don't think so, this is is how it is expected to be.
-
-+               if (!spin_trylock_irqsave(&cpu_q->requeue_lock, flags))
-+                       continue;
-+               if (!test_bit(cpu_q->cpu, sess->cpu_queues_bm))
-+                       goto unlock;
-+
-+               q = list_first_entry_or_null(&cpu_q->requeue_list,
-+                                            typeof(*q), requeue_list);
-+               if (!q)
-+                      goto clear_bit;
-+                list_del_init(&q->requeue_list);
-+                clear_bit_unlock(0, &q->in_list);
- ....
-
-
+On Wed, Jan 22, 2020 at 3:07 PM Leon Romanovsky <leon@kernel.org> wrote:
 >
-> Thanks
+> On Wed, Jan 22, 2020 at 02:12:19PM +0100, Jinpu Wang wrote:
+> > On Wed, Jan 22, 2020 at 1:25 PM Leon Romanovsky <leon@kernel.org> wrote:
+> > >
+> > > On Wed, Jan 22, 2020 at 12:22:43PM +0100, Jinpu Wang wrote:
+> > > > > > +/**
+> > > > > > + * rnbd_get_cpu_qlist() - finds a list with HW queues to be rerun
+> > > > > > + * @sess:    Session to find a queue for
+> > > > > > + * @cpu:     Cpu to start the search from
+> > > > > > + *
+> > > > > > + * Description:
+> > > > > > + *     Each CPU has a list of HW queues, which needs to be rerun.  If a list
+> > > > > > + *     is not empty - it is marked with a bit.  This function finds first
+> > > > > > + *     set bit in a bitmap and returns corresponding CPU list.
+> > > > > > + */
+> > > > > > +static struct rnbd_cpu_qlist *
+> > > > > > +rnbd_get_cpu_qlist(struct rnbd_clt_session *sess, int cpu)
+> > > > > > +{
+> > > > > > +     int bit;
+> > > > > > +
+> > > > > > +     /* First half */
+> > > > > > +     bit = find_next_bit(sess->cpu_queues_bm, nr_cpu_ids, cpu);
+> > > > >
+> > > > > Is it protected by any lock?
+> > > > We hold requeue_lock when set/clear bit, and disable preemption via
+> > > > get_cpu_ptr when find_next_bit.
+> > > > even it fails to get latest bit, it just cause an rerun the queue.
+> > >
+> > > It is not clear here at all.
+> > >
+> > > > >
+> > > > > > +     if (bit < nr_cpu_ids) {
+> > > > > > +             return per_cpu_ptr(sess->cpu_queues, bit);
+> > > > > > +     } else if (cpu != 0) {
+> > > > > > +             /* Second half */
+> > > > > > +             bit = find_next_bit(sess->cpu_queues_bm, cpu, 0);
+> > > > > > +             if (bit < cpu)
+> > > > > > +                     return per_cpu_ptr(sess->cpu_queues, bit);
+> > > > > > +     }
+> > > > > > +
+> > > > > > +     return NULL;
+> > > > > > +}
+> > > > > > +
+> > > > > > +static inline int nxt_cpu(int cpu)
+> > > > > > +{
+> > > > > > +     return (cpu + 1) % nr_cpu_ids;
+> > > > > > +}
+> > > > > > +
+> > > > > > +/**
+> > > > > > + * rnbd_rerun_if_needed() - rerun next queue marked as stopped
+> > > > > > + * @sess:    Session to rerun a queue on
+> > > > > > + *
+> > > > > > + * Description:
+> > > > > > + *     Each CPU has it's own list of HW queues, which should be rerun.
+> > > > > > + *     Function finds such list with HW queues, takes a list lock, picks up
+> > > > > > + *     the first HW queue out of the list and requeues it.
+> > > > > > + *
+> > > > > > + * Return:
+> > > > > > + *     True if the queue was requeued, false otherwise.
+> > > > > > + *
+> > > > > > + * Context:
+> > > > > > + *     Does not matter.
+> > > > > > + */
+> > > > > > +static inline bool rnbd_rerun_if_needed(struct rnbd_clt_session *sess)
+> > > > >
+> > > > > No inline function in C files.
+> > > > First time saw such request, there are so many inline functions in C
+> > >
+> > > 15) The inline disease
+> > > https://elixir.bootlin.com/linux/latest/source/Documentation/process/coding-style.rst#L882
+> > ok, will review the inline usage, and drop some.
+> > >
+> > > > files across the tree
+> > > > grep inline drivers/infiniband/core/*.c
+> > > > drivers/infiniband/core/addr.c:static inline bool
+> > > > ib_nl_is_good_ip_resp(const struct nlmsghdr *nlh)
+> > > > drivers/infiniband/core/cma.c:static inline u8 cma_get_ip_ver(const
+> > > > struct cma_hdr *hdr)
+> > > > drivers/infiniband/core/cma.c:static inline void cma_set_ip_ver(struct
+> > > > cma_hdr *hdr, u8 ip_ver)
+> > > > drivers/infiniband/core/cma.c:static inline void release_mc(struct kref *kref)
+> > > > drivers/infiniband/core/cma.c:static inline struct sockaddr
+> > > > *cma_src_addr(struct rdma_id_private *id_priv)
+> > > > drivers/infiniband/core/cma.c:static inline struct sockaddr
+> > > > *cma_dst_addr(struct rdma_id_private *id_priv)
+> > > >
+> > > > >
+> > > > > > +{
+> > > > > > +     struct rnbd_queue *q = NULL;
+> > > > > > +     struct rnbd_cpu_qlist *cpu_q;
+> > > > > > +     unsigned long flags;
+> > > > > > +     int *cpup;
+> > > > > > +
+> > > > > > +     /*
+> > > > > > +      * To keep fairness and not to let other queues starve we always
+> > > > > > +      * try to wake up someone else in round-robin manner.  That of course
+> > > > > > +      * increases latency but queues always have a chance to be executed.
+> > > > > > +      */
+> > > > > > +     cpup = get_cpu_ptr(sess->cpu_rr);
+> > > > > > +     for (cpu_q = rnbd_get_cpu_qlist(sess, nxt_cpu(*cpup)); cpu_q;
+> > > > > > +          cpu_q = rnbd_get_cpu_qlist(sess, nxt_cpu(cpu_q->cpu))) {
+> > > > > > +             if (!spin_trylock_irqsave(&cpu_q->requeue_lock, flags))
+> > > > > > +                     continue;
+> > > > > > +             if (likely(test_bit(cpu_q->cpu, sess->cpu_queues_bm))) {
+> > > > >
+> > > > > Success oriented approach please.
+> > > > sorry, I don't quite get your point.
+> > >
+> > > The flows are better to be written:
+> > > if (err)
+> > >   return or conitnue
+> > > <...>
+> > > do_something
+> > >
+> > > in your case
+> > > if (!test_bit(...))
+> > >  continue;
+> > > do_work_here.
+> > In our case,
+> >  if we failed to get requeue_lock, we continue to next cpu_q and do the work
+> > I guess you miss read the code.
+>
+> I don't think so, this is is how it is expected to be.
+>
+> +               if (!spin_trylock_irqsave(&cpu_q->requeue_lock, flags))
+> +                       continue;
+> +               if (!test_bit(cpu_q->cpu, sess->cpu_queues_bm))
+> +                       goto unlock;
+> +
+> +               q = list_first_entry_or_null(&cpu_q->requeue_list,
+> +                                            typeof(*q), requeue_list);
+> +               if (!q)
+> +                      goto clear_bit;
+> +                list_del_init(&q->requeue_list);
+> +                clear_bit_unlock(0, &q->in_list);
+>  ....
+>
+>
+> >
+> > Thanks
+Got it, I will prepare a patch and test it with our regression test
+
+Thanks
