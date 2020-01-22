@@ -2,244 +2,215 @@ Return-Path: <SRS0=Jk+C=3L=vger.kernel.org=linux-block-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-7.4 required=3.0 tests=DKIMWL_WL_HIGH,DKIM_SIGNED,
+X-Spam-Status: No, score=-0.9 required=3.0 tests=DKIMWL_WL_HIGH,DKIM_SIGNED,
 	DKIM_VALID,DKIM_VALID_AU,HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,
-	MENTIONS_GIT_HOSTING,SPF_HELO_NONE,SPF_PASS,USER_AGENT_SANE_1
-	autolearn=unavailable autolearn_force=no version=3.4.0
+	SPF_HELO_NONE,SPF_PASS autolearn=no autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id C2B8EC32771
-	for <linux-block@archiver.kernel.org>; Wed, 22 Jan 2020 04:41:49 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 6AEA8C33CB6
+	for <linux-block@archiver.kernel.org>; Wed, 22 Jan 2020 05:24:30 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.kernel.org (Postfix) with ESMTP id 8E9BE2071E
-	for <linux-block@archiver.kernel.org>; Wed, 22 Jan 2020 04:41:49 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id 38F262465A
+	for <linux-block@archiver.kernel.org>; Wed, 22 Jan 2020 05:24:30 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=pass (2048-bit key) header.d=nvidia.com header.i=@nvidia.com header.b="o0vgxUUK"
+	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="E59LJAWh"
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1729019AbgAVElr (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Tue, 21 Jan 2020 23:41:47 -0500
-Received: from hqnvemgate26.nvidia.com ([216.228.121.65]:16855 "EHLO
-        hqnvemgate26.nvidia.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1727141AbgAVElr (ORCPT
+        id S1725883AbgAVFY3 (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Wed, 22 Jan 2020 00:24:29 -0500
+Received: from us-smtp-1.mimecast.com ([205.139.110.61]:27823 "EHLO
+        us-smtp-delivery-1.mimecast.com" rhost-flags-OK-OK-OK-FAIL)
+        by vger.kernel.org with ESMTP id S1725730AbgAVFY3 (ORCPT
         <rfc822;linux-block@vger.kernel.org>);
-        Tue, 21 Jan 2020 23:41:47 -0500
-Received: from hqpgpgate102.nvidia.com (Not Verified[216.228.121.13]) by hqnvemgate26.nvidia.com (using TLS: TLSv1.2, DES-CBC3-SHA)
-        id <B5e27d2780000>; Tue, 21 Jan 2020 20:41:28 -0800
-Received: from hqmail.nvidia.com ([172.20.161.6])
-  by hqpgpgate102.nvidia.com (PGP Universal service);
-  Tue, 21 Jan 2020 20:41:43 -0800
-X-PGP-Universal: processed;
-        by hqpgpgate102.nvidia.com on Tue, 21 Jan 2020 20:41:43 -0800
-Received: from [10.110.48.28] (10.124.1.5) by HQMAIL107.nvidia.com
- (172.20.187.13) with Microsoft SMTP Server (TLS) id 15.0.1473.3; Wed, 22 Jan
- 2020 04:41:42 +0000
+        Wed, 22 Jan 2020 00:24:29 -0500
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+        s=mimecast20190719; t=1579670667;
+        h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+         to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+         content-transfer-encoding:content-transfer-encoding:
+         in-reply-to:in-reply-to:references:references;
+        bh=lqD6NkPb0a0cRYm99h6Qp0ka2aQ8TvFNBsgz8XqdNWo=;
+        b=E59LJAWhCOHonapSdmndG+WBLOtN9QSiS6M9eA9rsthh9ddTR8TUItN8f3sk/NVpvkPTld
+        YmvU9ieSZ8FKmtjcVPwAzO2kD/14t7CkvA90t/GrVb7d4FIlmmH3EXe9B5XruoWUyDuoZL
+        9HoubIZZGxjnJvDZ9hSIUSjVf/o1kjw=
+Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
+ [209.132.183.4]) (Using TLS) by relay.mimecast.com with ESMTP id
+ us-mta-330-6M1irsAyOiKcV_gd7QM_3g-1; Wed, 22 Jan 2020 00:24:23 -0500
+X-MC-Unique: 6M1irsAyOiKcV_gd7QM_3g-1
+Received: from smtp.corp.redhat.com (int-mx02.intmail.prod.int.phx2.redhat.com [10.5.11.12])
+        (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
+        (No client certificate requested)
+        by mimecast-mx01.redhat.com (Postfix) with ESMTPS id 7F3AD1005502;
+        Wed, 22 Jan 2020 05:24:22 +0000 (UTC)
+Received: from redhat.com (ovpn-112-7.rdu2.redhat.com [10.10.112.7])
+        by smtp.corp.redhat.com (Postfix) with ESMTPS id 80EAF60C81;
+        Wed, 22 Jan 2020 05:24:20 +0000 (UTC)
+Date:   Tue, 21 Jan 2020 21:21:18 -0800
+From:   Jerome Glisse <jglisse@redhat.com>
+To:     Gao Xiang <hsiangkao@aol.com>
+Cc:     lsf-pc@lists.linux-foundation.org,
+        Andrea Arcangeli <aarcange@redhat.com>,
+        linux-fsdevel@vger.kernel.org, linux-block@vger.kernel.org,
+        linux-mm@kvack.org
 Subject: Re: [LSF/MM/BPF TOPIC] Generic page write protection
-To:     <jglisse@redhat.com>, <lsf-pc@lists.linux-foundation.org>
-CC:     Andrea Arcangeli <aarcange@redhat.com>,
-        <linux-fsdevel@vger.kernel.org>, <linux-block@vger.kernel.org>,
-        <linux-mm@kvack.org>
+Message-ID: <20200122052118.GE76712@redhat.com>
 References: <20200122023222.75347-1-jglisse@redhat.com>
-From:   John Hubbard <jhubbard@nvidia.com>
-X-Nvconfidentiality: public
-Message-ID: <3415c50e-1cda-4562-7c3e-2663aa531ff3@nvidia.com>
-Date:   Tue, 21 Jan 2020 20:41:42 -0800
-User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:68.0) Gecko/20100101
- Thunderbird/68.4.1
+ <20200122042832.GA6542@hsiangkao-HP-ZHAN-66-Pro-G1>
 MIME-Version: 1.0
-In-Reply-To: <20200122023222.75347-1-jglisse@redhat.com>
-X-Originating-IP: [10.124.1.5]
-X-ClientProxiedBy: HQMAIL111.nvidia.com (172.20.187.18) To
- HQMAIL107.nvidia.com (172.20.187.13)
-Content-Type: text/plain; charset="utf-8"
-Content-Language: en-US
+Content-Type: text/plain; charset=iso-8859-1
+Content-Disposition: inline
+In-Reply-To: <20200122042832.GA6542@hsiangkao-HP-ZHAN-66-Pro-G1>
+X-Scanned-By: MIMEDefang 2.79 on 10.5.11.12
 Content-Transfer-Encoding: quoted-printable
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=nvidia.com; s=n1;
-        t=1579668088; bh=ylTs7FsP6rk+f1H+TrUrJkpghB5i+/oWPauYKJRAHro=;
-        h=X-PGP-Universal:Subject:To:CC:References:From:X-Nvconfidentiality:
-         Message-ID:Date:User-Agent:MIME-Version:In-Reply-To:
-         X-Originating-IP:X-ClientProxiedBy:Content-Type:Content-Language:
-         Content-Transfer-Encoding;
-        b=o0vgxUUK8rYj27pWbpe1ev4EhNvJ3WcLE0uDJY+5VQWynoxPLnzUmbspLfR2A59mt
-         xlVLy4M7/FRuyJiHn8RNPL1QSkv2hkqcmXLdw8UyKCKxkBHwcj91aO1TdrbgfTP7xw
-         PvX9gJw9LPK77UP7bO1nCERRzVQcTareFCwECYNbhzZ5adeSVLXVrZXA6BSBovIlp2
-         FcJ+/Gv5skUY6im4YpuPHMBa8omzTnm4SnpHsHqcvokMu2uoWE1opbp2dpnNOe044i
-         I5zehV1FiRGwEH0+xiFxH/4B2gjTGXQ1ID8SxKRHhPSO0N6Gqb6c6rYiB51Bf1btTe
-         UBI9RqfNAEiXw==
 Sender: linux-block-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-On 1/21/20 6:32 PM, jglisse@redhat.com wrote:
-> From: J=C3=A9r=C3=B4me Glisse <jglisse@redhat.com>
+On Wed, Jan 22, 2020 at 12:28:39PM +0800, Gao Xiang wrote:
+> Hi J=EF=BF=BDr=EF=BF=BDme,
 >=20
+> On Tue, Jan 21, 2020 at 06:32:22PM -0800, jglisse@redhat.com wrote:
+> > From: J=EF=BF=BDr=EF=BF=BDme Glisse <jglisse@redhat.com>
+> >=20
+> >=20
 >=20
-> Provide a generic way to write protect page (=C3=A0 la KSM) to enable new=
- mm
-> optimization:
+> <snip>
+>=20
+> >=20
+> > To avoid any regression risks the page->mapping field is left intact =
+as
+> > today for non write protect pages. This means that if you do not use =
+the
+> > page write protection mechanism then it can not regress. This is achi=
+eve
+> > by using an helper function that take the mapping from the context
+> > (current function parameter, see above on how function are updated) a=
+nd
+> > the struct page. If the page is not write protected then it uses the
+> > mapping from the struct page (just like today). The only difference
+> > between before and after the patchset is that all fs functions that d=
+o
+> > need the mapping for a page now also do get it as a parameter but onl=
+y
+> > use the parameter mapping pointer if the page is write protected.
+> >=20
+> > Note also that i do not believe that once confidence is high that we
+> > always passdown the correct mapping down each callstack, it does not
+> > mean we will be able to get rid of the struct page mapping field.
+>=20
+> This feature is awesome and I might have some premature words here...
+>=20
+> In short, are you suggesting completely getting rid of all way to acces=
+s
+> mapping directly from struct page (other than by page->private or somet=
+hing
+> else like calling trace)?
 
-Hi Jerome,=20
+No, all access to page->mapping are replace by:
+    struct address_space *fs_page_mapping(struct page *page,
+                                          struct address_space *mapping)
+    {
+        if (unlikely(!PageIsWriteProtected(page)))
+            return page->mapping;
+        return mapping;
+    }
 
-I am very interested in this feature and discussion. Thanks for posting
-this topic.
+All function that where doing direct dereference are updated to use this
+helper. If the function already has mapping in its context then it is
+easy (there is a lot of place like that because you have file or inode or
+mapping available from the function context).
 
+If function does not have file, inode or mapping in its context then a
+new mapping parameter is added to that function and all call site are
+updated (and this does recurse ie if call site do not have file,inode or
+mapping then a mapping parameter is added to them too ...).
 
->     - KSM (kernel share memory) to deduplicate pages (for file
->       back pages too not only anonymous memory like today)
->     - page duplication NUMA (read only duplication) in multiple
->       different physical page. For instance share library code
->       having a copy on each NUMA node. Or in case like GPU/FPGA
->       duplicating memory read only inside the local device memory.
+This takes care of all fs code. The mm code is split between code that
+deal with vma where we can get the mapping from the vma and mm code that
+just want to walk all the CPU pte pointing to the page. In this latter
+case we just need to provide CPU pte walkers for write protected pages
+(like KSM does today).
 
-
-And also, for the benefit of non-GPU-centric folks, let me add that
-something like this is required in order to do GPU atomic operations
-to system memory, in support of OpenCL Compute (as opposed to Graphics)
-atomic ops.
-
-GPUs can use both read duplication and atomics to great effect. It's=20
-something we've wanted for a while now.
-
-A bit more below:
-
-
->     ...
->=20
-> Note that this write protection is intend to be broken at anytime in
-> reasonable time (like KSM today) so that we never block more than
-> necessary anything that need to write to the page.
->=20
->=20
-> The goal is to provide a mechanism that work for both anonymous and
-> file back memory. For this we need to a pointer inside struct page.
-> For anonymous memory KSM uses the anon_vma field which correspond
-> to mapping field for file back pages.
->=20
-> So to allow generic write protection for file back pages we need to
-> avoid relying on struct page mapping field in the various kernel code
-> path that do use it today.
->=20
-> The page->mapping fields is use in 5 different ways:
->  [1]- Functions operating on file, we can get the mapping from the file
->       (issue here is that we might need to pass the file down the call-
->       stack)
->=20
->  [2]- Core/arch mm functions, those do not care about the file (if they
->       do then it means they are vma related and we can get the mapping
->       from the vma). Those functions only want to be able to walk all
->       the pte point to the page (for instance memory compaction, memory
->       reclaim, ...). We can provide the exact same functionality for
->       write protected pages (like KSM does today).
->=20
->  [3]- Block layer when I/O fails. This depends on fs, for instance for
->       fs which uses buffer_head we can update buffer_head to store the
->       mapping instead of the block_device as we can get the block_device
->       from the mapping but not the mapping from the block_device.
->=20
->       So solving this is mostly filesystem specific but i have not seen
->       any fs that could not be updated properly so that block layer can
->       report I/O failures without relying on page->mapping
->=20
->  [4]- Debugging (mostly procfs/sysfs files to dump memory states). Those
->       do not need the mapping per say, we just need to report page states
->       (and thus write protection information if page is write protected).
->=20
->  [5]- GUP (get user page) if something calls GUP in write mode then we
->       need to break write protection (like KSM today). GUPed page should
->       not be write protected as we do not know what the GUPers is doing
->       with the page.
->=20
-
-Yes, this is a reasonable constraint. It's a lot harder to make the page
-globally write-protected against *everything* (physically-addressed pages
-from a non-CPU device included), and providing write protection at the
-virtual address level is not quite as difficult. And it will still provide
-most of what we'd want.
-
-If a programmer sets up memory to get gup-pinned, and also wants to do
-OpenCL atomics to it, we're going to have to say that's just not supported
-this year. But it's still a major new capability and the constraint is
-not hard to explain.
+The block device code only need the mapping on io error and they are
+different strategy depending on individual fs. fs using buffer_head
+can easily be updated. For other they are different solution and they
+can be updated one at a time with tailor solution.
 
 
-thanks,
---=20
-John Hubbard
-NVIDIA
+> I'm not sure if all cases can be handled without page->mapping easily (=
+or
+> handled effectively) since mapping field could also be used to indicate=
+/judge
+> truncated pages or some other filesystem specific states (okay, I think=
+ there
+> could be some replacement, but it seems a huge project...)
+
+I forgot to talk about truncate, all place that test for truncate are
+updated to:
+    bool fs_page_is_truncated(struct page *page,
+                              struct address_space *mapping)
+    {
+        if (unlikely(!PageIsWriteProtected(page)))
+            return !page->mapping || mapping !=3D page->mapping;
+        return wp_page_is_protected(page, mapping);
+    }
+
+Where wp_page_is_protected() will use common write protect mm code
+(look at mm/ksm.c as it will be mostly that) to determine if the page
+have been truncated. Also code doing truncation will have to special
+case write protected page but that's easy enough.
+
+
+> Currently, page->private is a per-page user-defined field, yet I don't =
+think
+> it could always be used as a pointer pointing to some structure. It can=
+ be
+> simply used to store some unsigned long values for some kinds of filesy=
+stem
+> pages as well...
+
+For fs that use buffer_head i change buffer_head struct to store mapping
+and not block_device. For other fs it will depend on the individual fs
+but i am not changing page->private, i might only change the struct that
+page->private points to for that specific fs.
 
 >=20
-> Most of the patchset deals with [1], [2] and [3] ([4] and [5] are mostly
-> trivial).
+> It might some ineffective to convert such above usage to individual per=
+-page
+> structure pointers --- from cacheline or extra memory overhead view...
 >=20
-> For [1] we only need to pass down the mapping to all fs and vfs callback
-> functions (this is mostly achieve with coccinelle). Roughly speaking the
-> patches are generated with following pseudo code:
+> So I think at least there could be some another way to get its content
+> source (inode or sub-inode granularity, a reverse way) effectively...
+> by some field in struct page directly or indirectly...
 >=20
-> add_mapping_parameter(func)
-> {
->     function_add_parameter(func, mapping);
+> I agree that the usage of page->mapping field is complicated for now.
+> I'm looking forward some unique way to mark the page type for a filesys=
+tem
+> to use (inode or fs internal special pages) or even extend to analymous
+> pages [1]. However, it seems a huge project to keep from some regressio=
+n...
+
+Note that page->mapping stays _untouch_ if page is not write protected
+so there is no memory lookup overhead, the only overhead is the extra
+branch to test if the page is write protected or not.
+
+So if you do not use the write protection feature then you can not
+regress ie page->mapping is untouch and that's what get use like it is
+today. So it can not regress unless i do stupid mistake, but that's
+what review is for ;)).
+
 >=20
->     for_each_function_calling (caller, func) {
->         calling_add_parameter(caller, func, mapping);
+> I'm interested in related stuffs, some conclusion and I saw the article=
+ of
+> LSF/MM 2018 although my English isn't good...
 >=20
->         if (function_parameters_contains(caller, mapping|file))
->             continue;
+> If something wrong, please kindly point out...
 >=20
->         add_mapping_parameter(caller);
->     }
-> }
->=20
-> passdown_mapping()
-> {
->     for_each_function_in_fs (func, fs_functions) {
->         if (!function_body_contains(func, page->mapping))
->             continue;
->=20
->         if (function_parameters_contains(func, mapping|file))
->             continue;
->=20
->         add_mapping_parameter(func);
->     }
-> }
->=20
-> For [2] KSM is generalized and extended so that both anonymous and file
-> back pages can be handled by a common write protected page case.
->=20
-> For [3] it depends on the filesystem (fs which uses buffer_head are
-> easily handled by storing mapping into the buffer_head struct).
->=20
->=20
-> To avoid any regression risks the page->mapping field is left intact as
-> today for non write protect pages. This means that if you do not use the
-> page write protection mechanism then it can not regress. This is achieve
-> by using an helper function that take the mapping from the context
-> (current function parameter, see above on how function are updated) and
-> the struct page. If the page is not write protected then it uses the
-> mapping from the struct page (just like today). The only difference
-> between before and after the patchset is that all fs functions that do
-> need the mapping for a page now also do get it as a parameter but only
-> use the parameter mapping pointer if the page is write protected.
->=20
-> Note also that i do not believe that once confidence is high that we
-> always passdown the correct mapping down each callstack, it does not
-> mean we will be able to get rid of the struct page mapping field.
->=20
-> I posted patchset before [*1] and i intend to post an updated patchset
-> before LSF/MM/BPF. I also talked about this at LSF/MM 2018. I still
-> believe this will a topic that warrent a discussion with FS/MM and
-> block device folks.
->=20
->=20
-> [*1] https://lwn.net/Articles/751050/
->      https://cgit.freedesktop.org/~glisse/linux/log/?h=3Dgeneric-write-pr=
-otection-rfc
-> [*2] https://lwn.net/Articles/752564/
->=20
->=20
-> To: lsf-pc@lists.linux-foundation.org
-> Cc: Andrea Arcangeli <aarcange@redhat.com>
-> Cc: linux-fsdevel@vger.kernel.org
-> Cc: linux-block@vger.kernel.org
-> Cc: linux-mm@kvack.org
->=20
->=20
+> [1] https://lore.kernel.org/r/20191030172234.GA7018@hsiangkao-HP-ZHAN-6=
+6-Pro-G1
+
+Missed that thread thank you for the pointer, i have some reading to do :=
+)
+
+Cheers,
+J=E9r=F4me Glisse
 
