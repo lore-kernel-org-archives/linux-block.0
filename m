@@ -6,98 +6,82 @@ X-Spam-Status: No, score=-2.2 required=3.0 tests=DKIM_SIGNED,DKIM_VALID,
 	HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,
 	USER_AGENT_SANE_1 autolearn=no autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id E4AFEC2D0DB
-	for <linux-block@archiver.kernel.org>; Thu, 23 Jan 2020 18:31:51 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id AEE93C2D0DB
+	for <linux-block@archiver.kernel.org>; Thu, 23 Jan 2020 18:41:57 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.kernel.org (Postfix) with ESMTP id BBAD32253D
-	for <linux-block@archiver.kernel.org>; Thu, 23 Jan 2020 18:31:51 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id 7A6CD21D7E
+	for <linux-block@archiver.kernel.org>; Thu, 23 Jan 2020 18:41:57 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel-dk.20150623.gappssmtp.com header.i=@kernel-dk.20150623.gappssmtp.com header.b="bRBVYENX"
+	dkim=pass (2048-bit key) header.d=kernel-dk.20150623.gappssmtp.com header.i=@kernel-dk.20150623.gappssmtp.com header.b="qrnuqwTb"
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1728139AbgAWSbv (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Thu, 23 Jan 2020 13:31:51 -0500
-Received: from mail-pf1-f195.google.com ([209.85.210.195]:43052 "EHLO
-        mail-pf1-f195.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1727278AbgAWSbv (ORCPT
+        id S1728655AbgAWSl4 (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Thu, 23 Jan 2020 13:41:56 -0500
+Received: from mail-pg1-f193.google.com ([209.85.215.193]:35365 "EHLO
+        mail-pg1-f193.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S1728767AbgAWSl4 (ORCPT
         <rfc822;linux-block@vger.kernel.org>);
-        Thu, 23 Jan 2020 13:31:51 -0500
-Received: by mail-pf1-f195.google.com with SMTP id x6so1914159pfo.10
-        for <linux-block@vger.kernel.org>; Thu, 23 Jan 2020 10:31:50 -0800 (PST)
+        Thu, 23 Jan 2020 13:41:56 -0500
+Received: by mail-pg1-f193.google.com with SMTP id l24so1815828pgk.2
+        for <linux-block@vger.kernel.org>; Thu, 23 Jan 2020 10:41:56 -0800 (PST)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=kernel-dk.20150623.gappssmtp.com; s=20150623;
         h=subject:to:cc:references:from:message-id:date:user-agent
          :mime-version:in-reply-to:content-language:content-transfer-encoding;
-        bh=LqCb1Dt+8mE8Agcb/iqdFZzhbVwp04Pt6cT0H4D6ED4=;
-        b=bRBVYENXWp60SUcaoF11dpBkoJCBql2gRZ4VyfCikfWJvaHAA/cJ5AI1rjE8FBH/7R
-         4Y27VAmrHM8kJfv56gArb5Tk68B4NEnMe6bWgqN1IGXwkjg69uBbx3w06NeYNipNRW0l
-         58pixsljpnJfZkDnboLZmNO25dV2wOt0LN/tmA0qRI9ojbVymHj1ewAueb1GoIPrIYK0
-         F7HTw+8Ifj1gMusJIaqU5sRvPTfjqR65G8TSbqv+Tnr8OR9nGkcid3nmgTqtwjkkcoZl
-         e/26jQqCncB1+Itzo0BDb3Oqi0qksRHLbxzdsZ2mvmlXXf7/MT60unpSX0wn/NsYkZtc
-         pIVA==
+        bh=hVVJiVofuq6jqT8tysqA5aMKgAsODtyC1uhbEikyAQ8=;
+        b=qrnuqwTbuWLKb92ONC2CXaYTQWIYfF8DxdwKhjeaVXX6GAs7puvD94VO3ij/4IcOsk
+         QliauhYOoWF4e4na4cD1Pve2IFiHHDPMc/r9o7NLl9AuTRiu7gJ4AKJYo4OsLW5LRV4F
+         1IiT1yR8dcgGaLN4wfGR6Kn4vky0fGbPGMXf9Soc5VsFaWCemq0stfHFjiPn/U5KSQLS
+         +wS24wFzJm21kkj+wSckN6tilYc98lc4PfKRh/EXA5g9/Hte1mxFZuaF6rBqGqIUPnpX
+         aFnQaE/NxMZna4tB6oAf7PkQ4EVqDvyyj6g9Sa59qLEG+NaXcBS9/cokO/DAU/GA27EH
+         Im7A==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=1e100.net; s=20161025;
         h=x-gm-message-state:subject:to:cc:references:from:message-id:date
          :user-agent:mime-version:in-reply-to:content-language
          :content-transfer-encoding;
-        bh=LqCb1Dt+8mE8Agcb/iqdFZzhbVwp04Pt6cT0H4D6ED4=;
-        b=FWfpVLoAAxAXzmgcyIJXvHHVZ+0brQiN7Ghgxu4TqHq8YhuygnwD4dydYumIi9AC6w
-         i020aP/KK9+fDQ31yoznJIeC1whjgO9bBIaYvzDRtF84532AYMfRBKliKND5KwmTTJvb
-         X3i2wY6BGOkBokPdYU37dMf5RS7KpFSNU9i3Ylvlhzd2Ac7HV1ol4uSaQuInmx786gaU
-         tLOrHsOKp+q8RAm4VAbhNMvEPdBNoN3v34lCgM+070XWUzkO9zcb8kjxO0Da09kdNKUw
-         3WU8YTJsRR8pApcYg5PxHcND59RX9pjKWXnOipquzWAFbZ6DGTBRN4dSjxSgCyepVJLD
-         givQ==
-X-Gm-Message-State: APjAAAVypEIi3+5quDLs1PpxWdjmNfFIM8W36z61oszUPCBDTPatVbAQ
-        AXFaQzF1xunCuGyEXf/queYzTzJHXRg=
-X-Google-Smtp-Source: APXvYqygJNTq990y7Czijur2ORNhRHnzVsQiRaBxQJNIhUFa/R3VZxrjI0VS4GOCnri2QJp/Ezz+KA==
-X-Received: by 2002:a63:4287:: with SMTP id p129mr147630pga.122.1579804310189;
-        Thu, 23 Jan 2020 10:31:50 -0800 (PST)
+        bh=hVVJiVofuq6jqT8tysqA5aMKgAsODtyC1uhbEikyAQ8=;
+        b=P5yGLBgmRAdkuPKcJ+EoVE7ceFX+Wo1Dynzw6BHmXIMy1h5uNjSlpQYwHHCFoB0uuy
+         bm6YG1Jr90ZpMl5BA1tPCBfLHSWBE2yEq422bn3iKmMMZyyINPuDcFa29mR9jH7lO6pt
+         +fA/k3eMgutYyvKVdaIMu+LIoQ2ytU/lkWPdXKE474PM2uawCd6QMxC+8KCiA883ujWh
+         8c16qIhOiVAqEbzI2m+CmrPjLFxW/SWSABeMKpRX1g6e/34Qf0+z+ione4fCqZAzTjHo
+         u4ELAdwS0GttgcOiSFpvH3sAf+7Cv2pDMUfBS64TPVRwkwZgU9L+RAAA51WLh5n9GeCA
+         CqSA==
+X-Gm-Message-State: APjAAAVEmCjyRzvLqqj+MvDdBBgfDt9beUKfyNleht5ybbRG/A5ZYBKZ
+        IQPxi0M5iDKK40Asuex8HFt8ZQ==
+X-Google-Smtp-Source: APXvYqxyUlS85/lEfnr4wwXVf6rmaypUzEXpVAItiquKi8D7EUEX0nSWXUwQiG3fuTzpGObtNiSJDQ==
+X-Received: by 2002:a63:1210:: with SMTP id h16mr139816pgl.171.1579804915805;
+        Thu, 23 Jan 2020 10:41:55 -0800 (PST)
 Received: from ?IPv6:2600:380:4562:fb25:b980:6664:b71f:35b5? ([2600:380:4562:fb25:b980:6664:b71f:35b5])
-        by smtp.gmail.com with ESMTPSA id f81sm3305215pfa.118.2020.01.23.10.31.48
+        by smtp.gmail.com with ESMTPSA id s26sm3520454pfe.166.2020.01.23.10.41.54
         (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
-        Thu, 23 Jan 2020 10:31:49 -0800 (PST)
-Subject: Re: [PATCH 14/17] bcache: back to cache all readahead I/Os
-To:     Coly Li <colyli@suse.de>, Michael Lyle <mlyle@lyle.org>
-Cc:     linux-bcache <linux-bcache@vger.kernel.org>,
-        linux-block@vger.kernel.org, stable <stable@vger.kernel.org>
-References: <20200123170142.98974-1-colyli@suse.de>
- <20200123170142.98974-15-colyli@suse.de>
- <CAJ+L6qckUd+Kw8_jKov0dNnSiGxxvXSgc=2dPai+1ANaEdfWPQ@mail.gmail.com>
- <efdfdd2b-b22e-42d1-c642-6c398db6864c@suse.de>
+        Thu, 23 Jan 2020 10:41:55 -0800 (PST)
+Subject: Re: [PATCH] partitions/ldm: fix spelling mistake "to" -> "too"
+To:     Colin King <colin.king@canonical.com>,
+        Richard Russon <ldm@flatcap.org>,
+        linux-ntfs-dev@lists.sourceforge.net, linux-block@vger.kernel.org
+Cc:     kernel-janitors@vger.kernel.org, linux-kernel@vger.kernel.org
+References: <20200123002921.2832716-1-colin.king@canonical.com>
 From:   Jens Axboe <axboe@kernel.dk>
-Message-ID: <31f7f6b4-98ea-3cf6-44cc-a9ba67484eb0@kernel.dk>
-Date:   Thu, 23 Jan 2020 11:31:47 -0700
+Message-ID: <0d383b8a-b2c5-7669-f989-4239531d3fc0@kernel.dk>
+Date:   Thu, 23 Jan 2020 11:41:53 -0700
 User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:68.0) Gecko/20100101
  Thunderbird/68.4.1
 MIME-Version: 1.0
-In-Reply-To: <efdfdd2b-b22e-42d1-c642-6c398db6864c@suse.de>
+In-Reply-To: <20200123002921.2832716-1-colin.king@canonical.com>
 Content-Type: text/plain; charset=utf-8
 Content-Language: en-US
-Content-Transfer-Encoding: 8bit
+Content-Transfer-Encoding: 7bit
 Sender: linux-block-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-On 1/23/20 10:27 AM, Coly Li wrote:
-> On 2020/1/24 1:19 上午, Michael Lyle wrote:
->> Hi Coly and Jens--
->>
->> One concern I have with this is that it's going to wear out
->> limited-lifetime SSDs a -lot- faster.  Was any thought given to making
->> this a tunable instead of just changing the behavior?  Even if we have
->> an anecdote or two that it seems to have increased performance for
->> some workloads, I don't expect it will have increased performance in
->> general and it may even be costly for some workloads (it all comes
->> down to what is more useful in the cache-- somewhat-recently readahead
->> data, or the data that it is displacing).
+On 1/22/20 5:29 PM, Colin King wrote:
+> From: Colin Ian King <colin.king@canonical.com>
 > 
-> Hi Mike,
-> 
-> Copied. This is good suggestion, I will do it after I back from Lunar
-> New Year vacation, and submit it with other tested patches in following
-> v5.6-rc versions.
+> There is a spelling mistake in a ldm_error message. Fix it.
 
-Do you want me to just drop this patch for now from the series?
+Applied, thanks.
 
 -- 
 Jens Axboe
