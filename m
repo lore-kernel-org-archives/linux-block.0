@@ -2,65 +2,109 @@ Return-Path: <SRS0=CgA1=3M=vger.kernel.org=linux-block-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-9.8 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
-	INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,
-	USER_AGENT_GIT autolearn=ham autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-3.8 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
+	MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,USER_AGENT_GIT autolearn=no
+	autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id CC5B9C2D0DB
-	for <linux-block@archiver.kernel.org>; Thu, 23 Jan 2020 12:44:37 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id B505DC2D0DB
+	for <linux-block@archiver.kernel.org>; Thu, 23 Jan 2020 17:01:03 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.kernel.org (Postfix) with ESMTP id A72E621835
-	for <linux-block@archiver.kernel.org>; Thu, 23 Jan 2020 12:44:37 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id 93F0E24125
+	for <linux-block@archiver.kernel.org>; Thu, 23 Jan 2020 17:01:03 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1726204AbgAWMog (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Thu, 23 Jan 2020 07:44:36 -0500
-Received: from mx2.suse.de ([195.135.220.15]:52714 "EHLO mx2.suse.de"
+        id S1729986AbgAWRBC (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Thu, 23 Jan 2020 12:01:02 -0500
+Received: from mx2.suse.de ([195.135.220.15]:50674 "EHLO mx2.suse.de"
         rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-        id S1726026AbgAWMog (ORCPT <rfc822;linux-block@vger.kernel.org>);
-        Thu, 23 Jan 2020 07:44:36 -0500
+        id S1729936AbgAWRBC (ORCPT <rfc822;linux-block@vger.kernel.org>);
+        Thu, 23 Jan 2020 12:01:02 -0500
 X-Virus-Scanned: by amavisd-new at test-mx.suse.de
 Received: from relay2.suse.de (unknown [195.135.220.254])
-        by mx2.suse.de (Postfix) with ESMTP id D889FAD0F;
-        Thu, 23 Jan 2020 12:44:34 +0000 (UTC)
-From:   Hannes Reinecke <hare@suse.de>
-To:     Ilya Dromov <idryomov@gmail.com>
-Cc:     Sage Weil <sage@redhat.com>, Jens Axboe <axboe@kernel.dk>,
-        ceph-devel@vger.kernel.org, linux-block@vger.kernel.org,
-        Hannes Reinecke <hare@suse.de>,
-        David Disseldorp <ddiss@suse.com>,
-        Hannes Reinecke <hare@suse.com>
-Subject: [PATCH] rbd: set the 'device' link in sysfs
-Date:   Thu, 23 Jan 2020 13:44:33 +0100
-Message-Id: <20200123124433.121939-1-hare@suse.de>
+        by mx2.suse.de (Postfix) with ESMTP id C9E42AF59;
+        Thu, 23 Jan 2020 17:01:00 +0000 (UTC)
+From:   colyli@suse.de
+To:     axboe@kernel.dk
+Cc:     linux-bcache@vger.kernel.org, linux-block@vger.kernel.org,
+        Coly Li <colyli@suse.de>
+Subject: [PATCH 00/17] bcache patches for Linux v5.16
+Date:   Fri, 24 Jan 2020 01:00:02 +0800
+Message-Id: <20200123170019.98872-1-colyli@suse.de>
 X-Mailer: git-send-email 2.16.4
 Sender: linux-block-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-The rbd driver already provides additional information in sysfs
-under /sys/bus/rbd, so we should set the 'device' link in the block
-device to reference this information.
+From: Coly Li <colyli@suse.de>
 
-Cc: David Disseldorp <ddiss@suse.com>
-Signed-off-by: Hannes Reinecke <hare@suse.com>
+Hi Jens,
+
+Here are the bcache patches for Linux v5.16.
+In this series, we have 5 contributors including me,
+- Ben Dooks and Guoju Fang contributes minor changes,
+- Liang Chen contributes a patch to fix a bcache super block page leak
+  issue.
+- Christoph Hellwig contributes a set of changes to improve the on-disk
+  format for super block I/O, and his patches pluses Liang Chen's patch
+  will make bcache supports kernel page size larger than 4KB. Now bcache
+  can work on machines (e.g. ARM64) which have 8KB or larger kernel page
+  size.
+- I fixes some minor issue from Christoph's patches. And there are
+  effort to make bcache shrink btree node cache more aggressive when
+  system memory usage is in pressure. There are two importent fixes for
+  performance regression (Cc to Linux-stable),
+  - Fix extra I/O when aggressively flushing dirty btree node pages in
+    bcache journal code. 
+  - Back to cache all readahead I/Os for small random I/Os.
+
+There are still some patches under testing. Once they passes my testing,
+I will submit them in following v5.6-rc versions.
+
+Please take these patches, and thank you in advance.
+
+Coly Li
 ---
- drivers/block/rbd.c | 2 +-
- 1 file changed, 1 insertion(+), 1 deletion(-)
 
-diff --git a/drivers/block/rbd.c b/drivers/block/rbd.c
-index 9f1f8689e316..3240b7744aeb 100644
---- a/drivers/block/rbd.c
-+++ b/drivers/block/rbd.c
-@@ -6938,7 +6938,7 @@ static ssize_t do_rbd_add(struct bus_type *bus,
- 	if (rc)
- 		goto err_out_image_lock;
- 
--	add_disk(rbd_dev->disk);
-+	device_add_disk(&rbd_dev->dev, rbd_dev->disk, NULL);
- 	/* see rbd_init_disk() */
- 	blk_put_queue(rbd_dev->disk->queue);
- 
+Ben Dooks (Codethink) (1):
+  lib: crc64: include <linux/crc64.h> for 'crc64_be'
+
+Christoph Hellwig (6):
+  bcache: use a separate data structure for the on-disk super block
+  bcache: rework error unwinding in register_bcache
+  bcache: transfer the sb_page reference to register_{bdev,cache}
+  bcache: return a pointer to the on-disk sb from read_super
+  bcache: store a pointer to the on-disk sb in the cache and cached_dev
+    structures
+  bcache: use read_cache_page_gfp to read the superblock
+
+Coly Li (8):
+  bcache: properly initialize 'path' and 'err' in register_bcache()
+  bcache: fix use-after-free in register_bcache()
+  bcache: add code comments for state->pool in __btree_sort()
+  bcache: avoid unnecessary btree nodes flushing in btree_flush_write()
+  bcache: back to cache all readahead I/Os
+  bcache: remove member accessed from struct btree
+  bcache: reap c->btree_cache_freeable from the tail in bch_mca_scan()
+  bcache: reap from tail of c->btree_cache in bch_mca_scan()
+
+Guoju Fang (1):
+  bcache: print written and keys in trace_bcache_btree_write
+
+Liang Chen (1):
+  bcache: cached_dev_free needs to put the sb page
+
+ drivers/md/bcache/bcache.h    |   2 +
+ drivers/md/bcache/bset.c      |   5 ++
+ drivers/md/bcache/btree.c     |  24 ++++----
+ drivers/md/bcache/btree.h     |   2 -
+ drivers/md/bcache/journal.c   |  80 +++++++++++++++++++++++--
+ drivers/md/bcache/request.c   |   9 ---
+ drivers/md/bcache/super.c     | 136 ++++++++++++++++++++++--------------------
+ include/trace/events/bcache.h |   3 +-
+ include/uapi/linux/bcache.h   |  52 ++++++++++++++++
+ lib/crc64.c                   |   1 +
+ 10 files changed, 218 insertions(+), 96 deletions(-)
+
 -- 
 2.16.4
 
