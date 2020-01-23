@@ -6,29 +6,29 @@ X-Spam-Status: No, score=-3.8 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
 	MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,USER_AGENT_GIT autolearn=no
 	autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id B505DC2D0DB
-	for <linux-block@archiver.kernel.org>; Thu, 23 Jan 2020 17:01:03 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 22C19C2D0DB
+	for <linux-block@archiver.kernel.org>; Thu, 23 Jan 2020 17:02:01 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.kernel.org (Postfix) with ESMTP id 93F0E24125
-	for <linux-block@archiver.kernel.org>; Thu, 23 Jan 2020 17:01:03 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id 011512071E
+	for <linux-block@archiver.kernel.org>; Thu, 23 Jan 2020 17:02:01 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1729986AbgAWRBC (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Thu, 23 Jan 2020 12:01:02 -0500
-Received: from mx2.suse.de ([195.135.220.15]:50674 "EHLO mx2.suse.de"
+        id S1729824AbgAWRCA (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Thu, 23 Jan 2020 12:02:00 -0500
+Received: from mx2.suse.de ([195.135.220.15]:51092 "EHLO mx2.suse.de"
         rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-        id S1729936AbgAWRBC (ORCPT <rfc822;linux-block@vger.kernel.org>);
-        Thu, 23 Jan 2020 12:01:02 -0500
+        id S1728899AbgAWRCA (ORCPT <rfc822;linux-block@vger.kernel.org>);
+        Thu, 23 Jan 2020 12:02:00 -0500
 X-Virus-Scanned: by amavisd-new at test-mx.suse.de
 Received: from relay2.suse.de (unknown [195.135.220.254])
-        by mx2.suse.de (Postfix) with ESMTP id C9E42AF59;
-        Thu, 23 Jan 2020 17:01:00 +0000 (UTC)
+        by mx2.suse.de (Postfix) with ESMTP id 713A2AD78;
+        Thu, 23 Jan 2020 17:01:58 +0000 (UTC)
 From:   colyli@suse.de
 To:     axboe@kernel.dk
 Cc:     linux-bcache@vger.kernel.org, linux-block@vger.kernel.org,
         Coly Li <colyli@suse.de>
-Subject: [PATCH 00/17] bcache patches for Linux v5.16
-Date:   Fri, 24 Jan 2020 01:00:02 +0800
-Message-Id: <20200123170019.98872-1-colyli@suse.de>
+Subject: [PATCH 00/17] bcache patches for Linux v5.6
+Date:   Fri, 24 Jan 2020 01:01:25 +0800
+Message-Id: <20200123170142.98974-1-colyli@suse.de>
 X-Mailer: git-send-email 2.16.4
 Sender: linux-block-owner@vger.kernel.org
 Precedence: bulk
@@ -39,7 +39,7 @@ From: Coly Li <colyli@suse.de>
 
 Hi Jens,
 
-Here are the bcache patches for Linux v5.16.
+Here are the bcache patches for Linux v5.6.
 In this series, we have 5 contributors including me,
 - Ben Dooks and Guoju Fang contributes minor changes,
 - Liang Chen contributes a patch to fix a bcache super block page leak
