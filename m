@@ -2,99 +2,149 @@ Return-Path: <SRS0=CgA1=3M=vger.kernel.org=linux-block-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-0.6 required=3.0 tests=DKIM_SIGNED,DKIM_VALID,
-	DKIM_VALID_AU,FREEMAIL_FORGED_FROMDOMAIN,FREEMAIL_FROM,
-	HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS
-	autolearn=no autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-2.4 required=3.0 tests=DKIMWL_WL_HIGH,DKIM_SIGNED,
+	DKIM_VALID,DKIM_VALID_AU,HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,
+	SPF_HELO_NONE,SPF_PASS,USER_AGENT_SANE_1 autolearn=no autolearn_force=no
+	version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 4AAE3C32771
-	for <linux-block@archiver.kernel.org>; Thu, 23 Jan 2020 01:40:53 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 2A5C3C32771
+	for <linux-block@archiver.kernel.org>; Thu, 23 Jan 2020 02:54:55 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.kernel.org (Postfix) with ESMTP id 1602724673
-	for <linux-block@archiver.kernel.org>; Thu, 23 Jan 2020 01:40:53 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id EF96B24125
+	for <linux-block@archiver.kernel.org>; Thu, 23 Jan 2020 02:54:54 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="BmLthYi7"
+	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="ApLmwZQ+"
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1726004AbgAWBkw (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Wed, 22 Jan 2020 20:40:52 -0500
-Received: from mail-wm1-f66.google.com ([209.85.128.66]:33973 "EHLO
-        mail-wm1-f66.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1725943AbgAWBkw (ORCPT
+        id S1726026AbgAWCyy (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Wed, 22 Jan 2020 21:54:54 -0500
+Received: from us-smtp-1.mimecast.com ([207.211.31.81]:42712 "EHLO
+        us-smtp-delivery-1.mimecast.com" rhost-flags-OK-OK-OK-FAIL)
+        by vger.kernel.org with ESMTP id S1725989AbgAWCyy (ORCPT
         <rfc822;linux-block@vger.kernel.org>);
-        Wed, 22 Jan 2020 20:40:52 -0500
-Received: by mail-wm1-f66.google.com with SMTP id s144so763431wme.1;
-        Wed, 22 Jan 2020 17:40:50 -0800 (PST)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20161025;
-        h=mime-version:references:in-reply-to:from:date:message-id:subject:to
-         :cc;
-        bh=dxERX3Z6knme8mbg8LLRPMLRshct8bmUqfHIkVOFyXY=;
-        b=BmLthYi7yXkfQqaQ/Yu82ME78VMEz+g2Svn8AFdCwzluDqcrVEoyEk9kGRn2RdO+lI
-         d+uRAQ+iRqo1cgq1fb6tHIk1rQVRy4suxQVKjRzcKyEP+2RfTxHP9L6wWfmoay+UH3Ji
-         sAalggte4whNe9wzmJvrkRwmjAuQyLbp1TQcI1WHqWkpZb55JrhlHVOzFVavrSHoJL/Y
-         PJ/D2XPtRsLkWuc4IG2DP9MhD44oL60DB3+ggjXEX9mJz7c4ChZ45ZG2Nn6vZ3R9/JXA
-         BwNLTFcDSMdVwHH0hraSI8SCD1D3ZqHuztdTcJmQFRzdDmfhdzHbfa+e4sJA2Lg16+RS
-         t5Rg==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20161025;
-        h=x-gm-message-state:mime-version:references:in-reply-to:from:date
-         :message-id:subject:to:cc;
-        bh=dxERX3Z6knme8mbg8LLRPMLRshct8bmUqfHIkVOFyXY=;
-        b=KFy7CqcoTcEu1+ORbD/i/LJfAUnserpccSoyp0AhWQ+QeWxfPlGM6hUJMSrUljPD7s
-         qTrFONDsk45q6+29YnjA8adEchrXrS2tqj3zKGGC8DfC3m5UntzMt+xH7ZHPtILexw+7
-         QB5SlIc/1Y6wl3EWGdoUosLxuU2wXywdvAr4krelTr65ZKI2/9FAuUtq8nf7Y4ZaDWaM
-         wJvszQOkPaJTqdDp61jju0FJLc0vetDa7ftLgMe7ij0WZ7d52Rsq3yLvKuzVegoNRdpp
-         hIXmejdF3QLGArRxrFnMjskIDCVapuT7ZixSh8mca596duE6P0hbqRWkl47qzf8TaTx2
-         2Zfw==
-X-Gm-Message-State: APjAAAXdG1TNqDnmNVec7qv/EHNUNOYLtVDmHTaAmmzqhTQBKbiTAozR
-        FdRyYZOUM4GylgpKoqip5kMR0VtCFIcam95ROHgQE0N3a70CdQ==
-X-Google-Smtp-Source: APXvYqx/VfVrGYkRjQq9xgDLNm+4N559pc8TMzBq3MRYjQ9MPzm7WfGRD0wnnSNjXNWIlKNYioVh0v1DAm/m1PHswuc=
-X-Received: by 2002:a1c:cc06:: with SMTP id h6mr1148278wmb.118.1579743649711;
- Wed, 22 Jan 2020 17:40:49 -0800 (PST)
-MIME-Version: 1.0
-References: <DM6PR04MB5754D8E261B4200AA62D442D860D0@DM6PR04MB5754.namprd04.prod.outlook.com>
- <20200121201014.52345-1-muraliraja.muniraju@rubrik.com>
-In-Reply-To: <20200121201014.52345-1-muraliraja.muniraju@rubrik.com>
-From:   Ming Lei <tom.leiming@gmail.com>
-Date:   Thu, 23 Jan 2020 09:40:38 +0800
-Message-ID: <CACVXFVN2QteGv=mWpVimZ9y2yzLZOOthB9muFsxTG3LkWWpwfA@mail.gmail.com>
-Subject: Re: Re [PATCH] Adding multiple workers to the loop device.
-To:     "muraliraja.muniraju" <muraliraja.muniraju@rubrik.com>
-Cc:     Chaitanya Kulkarni <Chaitanya.Kulkarni@wdc.com>,
+        Wed, 22 Jan 2020 21:54:54 -0500
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+        s=mimecast20190719; t=1579748092;
+        h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+         to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+         in-reply-to:in-reply-to:references:references;
+        bh=IjYQVjPqOQ1qGfooRJJ7hb+eYyaT9PGEQqIBw0hq/MA=;
+        b=ApLmwZQ+/gGJLvRo2ek3RAZvrn8VgEu2BBwVTvCzbn9AnIh/EyZsvd52Q8MbhEACDe6vmb
+        Jw3Y1bhbF8ZEr7CRWLNwq5q4h5a3f2uU3mZnbM4kbV8VReZJyKSqBlUSnw/sR9+XEV+kcm
+        R4L0OOA/BrigdRGh3xUFlbiuenfzhMk=
+Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
+ [209.132.183.4]) (Using TLS) by relay.mimecast.com with ESMTP id
+ us-mta-309-WLOrVAL8PoitTupn_QVZeg-1; Wed, 22 Jan 2020 21:54:46 -0500
+X-MC-Unique: WLOrVAL8PoitTupn_QVZeg-1
+Received: from smtp.corp.redhat.com (int-mx01.intmail.prod.int.phx2.redhat.com [10.5.11.11])
+        (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
+        (No client certificate requested)
+        by mimecast-mx01.redhat.com (Postfix) with ESMTPS id 7E2A01005513;
+        Thu, 23 Jan 2020 02:54:44 +0000 (UTC)
+Received: from ming.t460p (ovpn-8-16.pek2.redhat.com [10.72.8.16])
+        by smtp.corp.redhat.com (Postfix) with ESMTPS id 9FCA480A46;
+        Thu, 23 Jan 2020 02:54:33 +0000 (UTC)
+Date:   Thu, 23 Jan 2020 10:54:29 +0800
+From:   Ming Lei <ming.lei@redhat.com>
+To:     "Martin K. Petersen" <martin.petersen@oracle.com>
+Cc:     James Bottomley <James.Bottomley@hansenpartnership.com>,
+        linux-scsi@vger.kernel.org, linux-block@vger.kernel.org,
         Jens Axboe <axboe@kernel.dk>,
-        linux-block <linux-block@vger.kernel.org>,
-        Linux Kernel Mailing List <linux-kernel@vger.kernel.org>
-Content-Type: text/plain; charset="UTF-8"
+        Sathya Prakash <sathya.prakash@broadcom.com>,
+        Chaitra P B <chaitra.basappa@broadcom.com>,
+        Suganath Prabu Subramani 
+        <suganath-prabu.subramani@broadcom.com>,
+        Kashyap Desai <kashyap.desai@broadcom.com>,
+        Sumit Saxena <sumit.saxena@broadcom.com>,
+        Shivasharan S <shivasharan.srikanteshwara@broadcom.com>,
+        "Ewan D . Milne" <emilne@redhat.com>,
+        Christoph Hellwig <hch@lst.de>, Hannes Reinecke <hare@suse.de>,
+        Bart Van Assche <bart.vanassche@wdc.com>
+Subject: Re: [PATCH 5/6] scsi: core: don't limit per-LUN queue depth for SSD
+ when HBA needs
+Message-ID: <20200123025429.GA5191@ming.t460p>
+References: <20200119071432.18558-1-ming.lei@redhat.com>
+ <20200119071432.18558-6-ming.lei@redhat.com>
+ <yq1y2u1if7t.fsf@oracle.com>
+MIME-Version: 1.0
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <yq1y2u1if7t.fsf@oracle.com>
+User-Agent: Mutt/1.12.1 (2019-06-15)
+X-Scanned-By: MIMEDefang 2.79 on 10.5.11.11
 Sender: linux-block-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-On Wed, Jan 22, 2020 at 4:11 AM muraliraja.muniraju
-<muraliraja.muniraju@rubrik.com> wrote:
->
-> Below is the dd results that I ran with the worker and without the worker changes.
-> Enhanced Loop has the changes and ran with 1,2,3,4 workers with 4 dds running on the same loop device.
-> Normal Loop is 1 worker(the existing code) with 4 dd's running on the same loop device.
-> Enhanced loop
-> 1 - READ: io=21981MB, aggrb=187558KB/s, minb=187558KB/s, maxb=187558KB/s, mint=120008msec, maxt=120008msec
-> 2 - READ: io=41109MB, aggrb=350785KB/s, minb=350785KB/s, maxb=350785KB/s, mint=120004msec, maxt=120004msec
-> 3 - READ: io=45927MB, aggrb=391802KB/s, minb=391802KB/s, maxb=391802KB/s, mint=120033msec, maxt=120033msec
-> 4 - READ: io=45771MB, aggrb=390543KB/s, minb=390543KB/s, maxb=390543KB/s, mint=120011msec, maxt=120011msec
-> Normal loop
-> 1 - READ: io=18432MB, aggrb=157201KB/s, minb=157201KB/s, maxb=157201KB/s, mint=120065msec, maxt=120065msec
-> 2 - READ: io=18762MB, aggrb=160035KB/s, minb=160035KB/s, maxb=160035KB/s, mint=120050msec, maxt=120050msec
-> 3 - READ: io=18174MB, aggrb=155058KB/s, minb=155058KB/s, maxb=155058KB/s, mint=120020msec, maxt=120020msec
-> 4 - READ: io=20559MB, aggrb=175407KB/s, minb=175407KB/s, maxb=175407KB/s, mint=120020msec, maxt=120020msec
+Hi Martin,
 
-Could you share your exact test command?
+On Mon, Jan 20, 2020 at 11:52:06PM -0500, Martin K. Petersen wrote:
+> 
+> Ming,
+> 
+> > NVMe doesn't have such per-request-queue(namespace) queue depth, so it
+> > is reasonable to ignore the limit for SCSI SSD too.
+> 
+> It is really not. A free host tag does not guarantee that the target
+> device can queue the command.
 
-Multiple jobs may hurt performance in case of sequential IOs on HDD backend.
-Also the 1st version of the loop dio patch uses normal wq, I remembered that
-random IOperformance isn't improved much, meantime sequential IO perf drops
-with normal wq, whentesting SSD backend.
+Yeah, I agree.
 
-So I took kthread worker.
+> 
+> The assumption that SSDs are somehow special because they are "fast" is
+> not valid. Given the common hardware queue depth for a SAS device of
+> ~128 it is often trivial to drive a device into a congestion
+> scenario. We see it all the time for non-rotational devices, SSDs and
+> arrays alike. The SSD heuristic is simply not going to fly.
+
+In reality, the channel number of SSD is very limited, it should be
+dozens of in enterprise grade SSD, so the device itself can be
+saturated by limited in-flight IOs.
+
+However, it depends on if the target device returns the congestion
+to host. From my observation, looks there isn't such feedback
+from NVMe target.
+
+If SSD target device doesn't provide such kind of congestion feedback,
+tracking in-flight per-LUN IO via .device_busy doesn't make any
+difference.
+
+Even if there was such SSD target which provides such congestion
+feedback, bypassing .device_busy won't cause big effect too since
+blk-mq's SCHED_RESTART will retry this IO returning STS_RESOURCE
+only after another in-flight one is completed.
+
+> 
+> Don't get me wrong, I am very sympathetic to obliterating device_busy in
+> the hot path. I just don't think it is as easy as just ignoring the
+> counter and hope for the best. Dynamic queue depth management is an
+> integral part of the SCSI protocol, not something we can just decide to
+> bypass because a device claims to be of a certain media type or speed.
+
+At least, Broadcom guys tests this patch on megaraid raid and the results
+shows that big improvement was got, that is why the flag is only set
+on megaraid host.
+
+> 
+> I would prefer not to touch drivers that rely on cmd_per_lun / untagged
+> operation and focus exclusively on the ones that use .track_queue_depth.
+> For those we could consider an adaptive queue depth management scheme.
+> Something like not maintaining device_busy until we actually get a
+> QUEUE_FULL condition. And then rely on the existing queue depth ramp up
+> heuristics to determine when to disable the busy counter again. Maybe
+> with an additional watermark or time limit to avoid flip-flopping.
+> 
+> If that approach turns out to work, we should convert all remaining
+> non-legacy drivers to .track_queue_depth so we only have two driver
+> queuing flavors to worry about.
+
+In theory, .track_queue_depth may only improve sequential IO's
+performance for HDD., not very effective for SSD. Or just save a bit
+CPU cycles in case of SSD.
+
+I will study the related drivers/device a bit more wrt. track_queue_depth().
+
 
 Thanks,
-Ming Lei
+Ming
+
