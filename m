@@ -2,87 +2,113 @@ Return-Path: <SRS0=CgA1=3M=vger.kernel.org=linux-block-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-2.2 required=3.0 tests=DKIM_SIGNED,DKIM_VALID,
-	HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,
-	USER_AGENT_SANE_1 autolearn=no autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-6.6 required=3.0 tests=DKIM_SIGNED,DKIM_VALID,
+	DKIM_VALID_AU,FREEMAIL_FORGED_FROMDOMAIN,FREEMAIL_FROM,
+	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,
+	SPF_HELO_NONE,SPF_PASS autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id AEE93C2D0DB
-	for <linux-block@archiver.kernel.org>; Thu, 23 Jan 2020 18:41:57 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 27843C2D0DB
+	for <linux-block@archiver.kernel.org>; Thu, 23 Jan 2020 18:45:31 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.kernel.org (Postfix) with ESMTP id 7A6CD21D7E
-	for <linux-block@archiver.kernel.org>; Thu, 23 Jan 2020 18:41:57 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id EC38221D7E
+	for <linux-block@archiver.kernel.org>; Thu, 23 Jan 2020 18:45:30 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel-dk.20150623.gappssmtp.com header.i=@kernel-dk.20150623.gappssmtp.com header.b="qrnuqwTb"
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="DmKpHAhl"
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1728655AbgAWSl4 (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Thu, 23 Jan 2020 13:41:56 -0500
-Received: from mail-pg1-f193.google.com ([209.85.215.193]:35365 "EHLO
-        mail-pg1-f193.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1728767AbgAWSl4 (ORCPT
+        id S1728931AbgAWSpa (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Thu, 23 Jan 2020 13:45:30 -0500
+Received: from mail-il1-f195.google.com ([209.85.166.195]:45153 "EHLO
+        mail-il1-f195.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S1728925AbgAWSpa (ORCPT
         <rfc822;linux-block@vger.kernel.org>);
-        Thu, 23 Jan 2020 13:41:56 -0500
-Received: by mail-pg1-f193.google.com with SMTP id l24so1815828pgk.2
-        for <linux-block@vger.kernel.org>; Thu, 23 Jan 2020 10:41:56 -0800 (PST)
+        Thu, 23 Jan 2020 13:45:30 -0500
+Received: by mail-il1-f195.google.com with SMTP id p8so2820447iln.12;
+        Thu, 23 Jan 2020 10:45:30 -0800 (PST)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=kernel-dk.20150623.gappssmtp.com; s=20150623;
-        h=subject:to:cc:references:from:message-id:date:user-agent
-         :mime-version:in-reply-to:content-language:content-transfer-encoding;
-        bh=hVVJiVofuq6jqT8tysqA5aMKgAsODtyC1uhbEikyAQ8=;
-        b=qrnuqwTbuWLKb92ONC2CXaYTQWIYfF8DxdwKhjeaVXX6GAs7puvD94VO3ij/4IcOsk
-         QliauhYOoWF4e4na4cD1Pve2IFiHHDPMc/r9o7NLl9AuTRiu7gJ4AKJYo4OsLW5LRV4F
-         1IiT1yR8dcgGaLN4wfGR6Kn4vky0fGbPGMXf9Soc5VsFaWCemq0stfHFjiPn/U5KSQLS
-         +wS24wFzJm21kkj+wSckN6tilYc98lc4PfKRh/EXA5g9/Hte1mxFZuaF6rBqGqIUPnpX
-         aFnQaE/NxMZna4tB6oAf7PkQ4EVqDvyyj6g9Sa59qLEG+NaXcBS9/cokO/DAU/GA27EH
-         Im7A==
+        d=gmail.com; s=20161025;
+        h=mime-version:references:in-reply-to:from:date:message-id:subject:to
+         :cc;
+        bh=jqmdmEm77sBszWxMUPKZElU9PD8xFdEXqN5HtNYE0uU=;
+        b=DmKpHAhlzwFjW7eRo23NnmHfzO88DK0KRRsFl5leUCFKUA7M1ccDOqfMfYXlttbgDR
+         oqbzY0umDtT8wYedyF7VeSqItjtlf5/znvJPJh/Ecdu5DELDwvlmwaHxTg63qs8f/FGA
+         yUyD8pBzI3xjEPiHoEntMxPErGQRXferxcs4C8DQ4+ig+2ZTpvy0BZtn8uIIG6r2rl3Q
+         eomVhvpchihAqc5ZSnvb7R6WBhfdhWndrmPok1O+6DDM/zJZZbF+QCY3ygeAzEumrrnq
+         raGzn7sgpZFfEQ9JxMMOixOoLfjAqazHD7IFRMg2JISUemEzDkdLXU+L4MXFlce0aTqE
+         hncg==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=1e100.net; s=20161025;
-        h=x-gm-message-state:subject:to:cc:references:from:message-id:date
-         :user-agent:mime-version:in-reply-to:content-language
-         :content-transfer-encoding;
-        bh=hVVJiVofuq6jqT8tysqA5aMKgAsODtyC1uhbEikyAQ8=;
-        b=P5yGLBgmRAdkuPKcJ+EoVE7ceFX+Wo1Dynzw6BHmXIMy1h5uNjSlpQYwHHCFoB0uuy
-         bm6YG1Jr90ZpMl5BA1tPCBfLHSWBE2yEq422bn3iKmMMZyyINPuDcFa29mR9jH7lO6pt
-         +fA/k3eMgutYyvKVdaIMu+LIoQ2ytU/lkWPdXKE474PM2uawCd6QMxC+8KCiA883ujWh
-         8c16qIhOiVAqEbzI2m+CmrPjLFxW/SWSABeMKpRX1g6e/34Qf0+z+ione4fCqZAzTjHo
-         u4ELAdwS0GttgcOiSFpvH3sAf+7Cv2pDMUfBS64TPVRwkwZgU9L+RAAA51WLh5n9GeCA
-         CqSA==
-X-Gm-Message-State: APjAAAVEmCjyRzvLqqj+MvDdBBgfDt9beUKfyNleht5ybbRG/A5ZYBKZ
-        IQPxi0M5iDKK40Asuex8HFt8ZQ==
-X-Google-Smtp-Source: APXvYqxyUlS85/lEfnr4wwXVf6rmaypUzEXpVAItiquKi8D7EUEX0nSWXUwQiG3fuTzpGObtNiSJDQ==
-X-Received: by 2002:a63:1210:: with SMTP id h16mr139816pgl.171.1579804915805;
-        Thu, 23 Jan 2020 10:41:55 -0800 (PST)
-Received: from ?IPv6:2600:380:4562:fb25:b980:6664:b71f:35b5? ([2600:380:4562:fb25:b980:6664:b71f:35b5])
-        by smtp.gmail.com with ESMTPSA id s26sm3520454pfe.166.2020.01.23.10.41.54
-        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
-        Thu, 23 Jan 2020 10:41:55 -0800 (PST)
-Subject: Re: [PATCH] partitions/ldm: fix spelling mistake "to" -> "too"
-To:     Colin King <colin.king@canonical.com>,
-        Richard Russon <ldm@flatcap.org>,
-        linux-ntfs-dev@lists.sourceforge.net, linux-block@vger.kernel.org
-Cc:     kernel-janitors@vger.kernel.org, linux-kernel@vger.kernel.org
-References: <20200123002921.2832716-1-colin.king@canonical.com>
-From:   Jens Axboe <axboe@kernel.dk>
-Message-ID: <0d383b8a-b2c5-7669-f989-4239531d3fc0@kernel.dk>
-Date:   Thu, 23 Jan 2020 11:41:53 -0700
-User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:68.0) Gecko/20100101
- Thunderbird/68.4.1
+        h=x-gm-message-state:mime-version:references:in-reply-to:from:date
+         :message-id:subject:to:cc;
+        bh=jqmdmEm77sBszWxMUPKZElU9PD8xFdEXqN5HtNYE0uU=;
+        b=UBXWK4+0ShfVx7y9BlAXPC63e/2JsjcSsLIFCW7v9HFzf0HRPL6QdaZwMrIQJNdeSh
+         dCswHQw/H3KOtaczfV+uc615c6GNAacYmf/JcmNl21y3Nx3WqFsbx9PCEj+oq1JZaq+T
+         ZlI7wgZd6+XBdaEtK3MTKgId+Yce9mYgdzsLB7j2nXrnliGSN+Zp8ohK5leFwYJSom/l
+         lfppxnBVgEZE99Kogjk0T7nA34ho+3IoFKWg+DssvjJMukqDIMlO46DEbgOz3C1zttl2
+         oDnGSaoZI5RPOffLQMRUXm3gEcPotToCVonlyUOn0DzD2dNVhYLAo8DOX5/qRIt9U36M
+         3Vng==
+X-Gm-Message-State: APjAAAVUKxhuXm9jBychbHHLVAYFUh5MPPI0KMGVwwFMOdaCcyEXpCQG
+        m0xzlfZs//MC2YgvIE6dm73kgCslQTdBRExDefL7SMk4mUY=
+X-Google-Smtp-Source: APXvYqzrD010a8tVjlhYrS9I6Mk8vwmBCjYvKtTNSGeY2icOWGWBCtsxLW/HuGrq/vrSXWKFMtfRtASIe3dsKmseTFQ=
+X-Received: by 2002:a92:ccd0:: with SMTP id u16mr12785384ilq.215.1579805129635;
+ Thu, 23 Jan 2020 10:45:29 -0800 (PST)
 MIME-Version: 1.0
-In-Reply-To: <20200123002921.2832716-1-colin.king@canonical.com>
-Content-Type: text/plain; charset=utf-8
-Content-Language: en-US
-Content-Transfer-Encoding: 7bit
+References: <20200123124433.121939-1-hare@suse.de>
+In-Reply-To: <20200123124433.121939-1-hare@suse.de>
+From:   Ilya Dryomov <idryomov@gmail.com>
+Date:   Thu, 23 Jan 2020 19:45:32 +0100
+Message-ID: <CAOi1vP8Q44jLNoq+LTm8GRX687wfwLkJ3WRW_DWvY7nYUtPQxQ@mail.gmail.com>
+Subject: Re: [PATCH] rbd: set the 'device' link in sysfs
+To:     Hannes Reinecke <hare@suse.de>
+Cc:     Sage Weil <sage@redhat.com>, Jens Axboe <axboe@kernel.dk>,
+        Ceph Development <ceph-devel@vger.kernel.org>,
+        linux-block <linux-block@vger.kernel.org>,
+        David Disseldorp <ddiss@suse.com>,
+        Hannes Reinecke <hare@suse.com>
+Content-Type: text/plain; charset="UTF-8"
 Sender: linux-block-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-On 1/22/20 5:29 PM, Colin King wrote:
-> From: Colin Ian King <colin.king@canonical.com>
-> 
-> There is a spelling mistake in a ldm_error message. Fix it.
+On Thu, Jan 23, 2020 at 1:44 PM Hannes Reinecke <hare@suse.de> wrote:
+>
+> The rbd driver already provides additional information in sysfs
+> under /sys/bus/rbd, so we should set the 'device' link in the block
+> device to reference this information.
+>
+> Cc: David Disseldorp <ddiss@suse.com>
+> Signed-off-by: Hannes Reinecke <hare@suse.com>
+> ---
+>  drivers/block/rbd.c | 2 +-
+>  1 file changed, 1 insertion(+), 1 deletion(-)
+>
+> diff --git a/drivers/block/rbd.c b/drivers/block/rbd.c
+> index 9f1f8689e316..3240b7744aeb 100644
+> --- a/drivers/block/rbd.c
+> +++ b/drivers/block/rbd.c
+> @@ -6938,7 +6938,7 @@ static ssize_t do_rbd_add(struct bus_type *bus,
+>         if (rc)
+>                 goto err_out_image_lock;
+>
+> -       add_disk(rbd_dev->disk);
+> +       device_add_disk(&rbd_dev->dev, rbd_dev->disk, NULL);
+>         /* see rbd_init_disk() */
+>         blk_put_queue(rbd_dev->disk->queue);
 
-Applied, thanks.
+Hi Hannes,
 
--- 
-Jens Axboe
+I looked at this a while ago and didn't go through with the patch
+because I wasn't sure whether this symlink can point to something
+arbitrary.  IIRC it usually points a couple of levels up, to some
+parent.  In the rbd case, this would be a completely different tree:
+/sys/devices/virtual -> /sys/bus/rbd.
 
+Do you know if there is precedent for this in some other driver?
+Are you sure it's not going to break any assumptions?
+
+How did this came up?  I'm curious because rbd(8) is only utility
+that I know of that (somewhat) cares.
+
+Thanks,
+
+                Ilya
