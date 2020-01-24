@@ -2,167 +2,232 @@ Return-Path: <SRS0=eyh1=3N=vger.kernel.org=linux-block-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-0.9 required=3.0 tests=DKIMWL_WL_HIGH,DKIM_SIGNED,
-	DKIM_VALID,DKIM_VALID_AU,HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,
-	SPF_HELO_NONE,SPF_PASS autolearn=no autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-7.3 required=3.0 tests=DKIM_SIGNED,DKIM_VALID,
+	HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,MENTIONS_GIT_HOSTING,
+	SPF_HELO_NONE,SPF_PASS,USER_AGENT_SANE_1 autolearn=unavailable
+	autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id A0EC8C2D0DB
-	for <linux-block@archiver.kernel.org>; Fri, 24 Jan 2020 12:44:08 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 85C61C35242
+	for <linux-block@archiver.kernel.org>; Fri, 24 Jan 2020 14:23:27 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.kernel.org (Postfix) with ESMTP id 730032070A
-	for <linux-block@archiver.kernel.org>; Fri, 24 Jan 2020 12:44:08 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id 5091E24125
+	for <linux-block@archiver.kernel.org>; Fri, 24 Jan 2020 14:23:27 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=pass (1024-bit key) header.d=broadcom.com header.i=@broadcom.com header.b="IOag6tP3"
+	dkim=pass (2048-bit key) header.d=arrikto-com.20150623.gappssmtp.com header.i=@arrikto-com.20150623.gappssmtp.com header.b="TbF89NBr"
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1729721AbgAXMoH (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Fri, 24 Jan 2020 07:44:07 -0500
-Received: from mail-ot1-f66.google.com ([209.85.210.66]:38767 "EHLO
-        mail-ot1-f66.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1729609AbgAXMoH (ORCPT
+        id S1730974AbgAXOX0 (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Fri, 24 Jan 2020 09:23:26 -0500
+Received: from mail-lf1-f65.google.com ([209.85.167.65]:40213 "EHLO
+        mail-lf1-f65.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S1731685AbgAXOXZ (ORCPT
         <rfc822;linux-block@vger.kernel.org>);
-        Fri, 24 Jan 2020 07:44:07 -0500
-Received: by mail-ot1-f66.google.com with SMTP id z9so1465707oth.5
-        for <linux-block@vger.kernel.org>; Fri, 24 Jan 2020 04:44:07 -0800 (PST)
+        Fri, 24 Jan 2020 09:23:25 -0500
+Received: by mail-lf1-f65.google.com with SMTP id c23so1231601lfi.7
+        for <linux-block@vger.kernel.org>; Fri, 24 Jan 2020 06:23:22 -0800 (PST)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=broadcom.com; s=google;
-        h=mime-version:references:in-reply-to:from:date:message-id:subject:to
-         :cc:content-transfer-encoding;
-        bh=EcauhiWAwaqH1U+TqXb6ywn1b4F/ZwJaD8W5VGiPmnQ=;
-        b=IOag6tP3JotisDvbYzJOn5yT9Vong9OLJEJuV5eqD+CgZqaBq409BEMu/5PO1I7Uhn
-         X9k0972Nekwd2vNnv47vU9IetbfHKGEdiHs/WQcRuZxlZOXtvjd0Aost/79hkGB7d6fD
-         DqUoeQwymmLlfgRUO1FDjYdIPEwbX7TJ/0ggg=
+        d=arrikto-com.20150623.gappssmtp.com; s=20150623;
+        h=subject:to:cc:references:from:message-id:date:user-agent
+         :mime-version:in-reply-to:content-language:content-transfer-encoding;
+        bh=M7Z8KguGyGrtLfBMqY4wl99vU+N7ApmZw1y+IbjQEx0=;
+        b=TbF89NBrPPtjbS1P/FwyWSe2nucdwaM3kEujRt5kLsRMVFROqH9NQRxQmABrsIhhPp
+         SpB7JmLw4eAdnKL6c7VYyEeRZwIoNchwIliPsTOznaUpWABB6caAUy5145uw/iclv6UM
+         h0Spd29IN39wMT+jIr6fp8x5MZa4fNiZTMk/X5pgfPoGL/sxmENh4rZn0ilVb/G1V4iT
+         6+UEglC+0uEu9gFgBXevCz89sUnlWTu9BOUDS3jIq7sBahbQgkCFQV3vN7u+avzs/3dq
+         PvGIGn5GcGEKrYWzcJl6s3CDEC2MR6aZkwhyWfz+h/wvmyFiNETQ6v53gyBnIdPFEND/
+         2ovw==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=1e100.net; s=20161025;
-        h=x-gm-message-state:mime-version:references:in-reply-to:from:date
-         :message-id:subject:to:cc:content-transfer-encoding;
-        bh=EcauhiWAwaqH1U+TqXb6ywn1b4F/ZwJaD8W5VGiPmnQ=;
-        b=ewCZgGPesXmD2J6fnxlAaaQJAHtZ4Mnbz7nSmH2z1Ex346lwEZlT2SMSD+V2CAdiKq
-         FCJt2q2u08DmrtkXE2qqM+aDb9sk5ehzJpGzE3rjVoG+Z2kpU6waX94eyoyrQI6ugt53
-         /nKMSoE+V4xAHT/5F6lXjwDD/VugP5YSFQvVPN7dEMwZFNNNvm9HXOfBSE64RO9D5WWk
-         nd73WTyLXgysGmGzcXA8yC0zXnSItxO9WIjlnHQjbB+Cqfa2wM2GeBFr60WMFn3OBVMn
-         dUmsTR9JQ8ZZeguaCiuW/inbO+m0ZvJjYIokH17fG6ReLFg0KpEiXN49qjQalEW929t1
-         wZXw==
-X-Gm-Message-State: APjAAAXx3z80TeWwnNstUxxJCG+ZbC2NOiTcJlgRmY1KXjorfi43gNa6
-        xuxbs2W0nRpRHDF+Qt8aeMNGnIUWQF2mr+dT75rPz7a9Le3txg==
-X-Google-Smtp-Source: APXvYqyzw/mGJc5NEMRtJr6aKe5QMI52QpLsTEPhGQFDPwYJ/ySV0blQLhanABAdiL8KrP2xD9owJ7Ez4MzB/LDe3XE=
-X-Received: by 2002:a9d:23b5:: with SMTP id t50mr2453840otb.122.1579869846907;
- Fri, 24 Jan 2020 04:44:06 -0800 (PST)
+        h=x-gm-message-state:subject:to:cc:references:from:message-id:date
+         :user-agent:mime-version:in-reply-to:content-language
+         :content-transfer-encoding;
+        bh=M7Z8KguGyGrtLfBMqY4wl99vU+N7ApmZw1y+IbjQEx0=;
+        b=cCkQD0qljxEFG/RRiJgpVDsQH+zLOZnh7jO+HfGOmbV5L4iWtB6aVss1JBCik9Kha0
+         zHFSewZN0zFkw3a4udTwIn+NJKUI8u0++DNZ+Mbhv9wXvVdfUfBBq4qzYdsBMTtI03kX
+         F+y71esB3B7cRGs606557Cxz4ogpgTXPrTsjbFHLjTj/IZOsQ4E7Cz+qzCDU9ofMAUCe
+         lnPcNthyZWE9JrLS5A9cpYohtnSR/cuitHX9q9YqNSrXl3lJA3iO/SfkU01/iZhjyC/t
+         dCEY9p3bd6fw3z0gW23f7/o2Zfdkyt61ABU4TE+zKJ0K5cBYL/3oJFht1HkNEc3KlA1Q
+         IJqw==
+X-Gm-Message-State: APjAAAXODuanJehSAmkNl5hnA7OAaxzQrGk3IzKNPNA+j1RPnYoulf2F
+        804WAb4TgR7CF2lsL8cLmUww2w==
+X-Google-Smtp-Source: APXvYqxYFxC8cAjCsNefWipfW5e+yY7MTZfna3SxpxHUdRcvEVbmwtNUP/9O6SCBCuYG19sj+hF7LQ==
+X-Received: by 2002:ac2:5388:: with SMTP id g8mr1495011lfh.43.1579875801941;
+        Fri, 24 Jan 2020 06:23:21 -0800 (PST)
+Received: from [10.94.250.133] ([31.177.62.212])
+        by smtp.gmail.com with ESMTPSA id r21sm3158951ljn.64.2020.01.24.06.23.19
+        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
+        Fri, 24 Jan 2020 06:23:21 -0800 (PST)
+Subject: Re: [LSF/MM/BFP ATTEND] [LSF/MM/BFP TOPIC] Storage: Copy Offload
+To:     Chaitanya Kulkarni <Chaitanya.Kulkarni@wdc.com>,
+        "linux-block@vger.kernel.org" <linux-block@vger.kernel.org>,
+        "linux-scsi@vger.kernel.org" <linux-scsi@vger.kernel.org>,
+        "linux-nvme@lists.infradead.org" <linux-nvme@lists.infradead.org>,
+        "dm-devel@redhat.com" <dm-devel@redhat.com>,
+        "lsf-pc@lists.linux-foundation.org" 
+        <lsf-pc@lists.linux-foundation.org>
+Cc:     "axboe@kernel.dk" <axboe@kernel.dk>,
+        "bvanassche@acm.org" <bvanassche@acm.org>,
+        "hare@suse.de" <hare@suse.de>,
+        "Martin K. Petersen" <martin.petersen@oracle.com>,
+        Keith Busch <kbusch@kernel.org>,
+        Christoph Hellwig <hch@lst.de>,
+        Stephen Bates <sbates@raithlin.com>,
+        "msnitzer@redhat.com" <msnitzer@redhat.com>,
+        "mpatocka@redhat.com" <mpatocka@redhat.com>,
+        "zach.brown@ni.com" <zach.brown@ni.com>,
+        "roland@purestorage.com" <roland@purestorage.com>,
+        "rwheeler@redhat.com" <rwheeler@redhat.com>,
+        "frederick.knight@netapp.com" <frederick.knight@netapp.com>,
+        Matias Bjorling <Matias.Bjorling@wdc.com>
+References: <BYAPR04MB5749820C322B40C7DBBBCA02863F0@BYAPR04MB5749.namprd04.prod.outlook.com>
+From:   Nikos Tsironis <ntsironis@arrikto.com>
+Message-ID: <e67bf36e-18cb-a170-39ad-a1081fae5e50@arrikto.com>
+Date:   Fri, 24 Jan 2020 16:23:18 +0200
+User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:68.0) Gecko/20100101
+ Thunderbird/68.4.1
 MIME-Version: 1.0
-References: <20200119071432.18558-1-ming.lei@redhat.com> <20200119071432.18558-6-ming.lei@redhat.com>
- <yq1y2u1if7t.fsf@oracle.com> <20200123025429.GA5191@ming.t460p>
- <yq1sgk5ejix.fsf@oracle.com> <20200124015957.GA17387@ming.t460p>
-In-Reply-To: <20200124015957.GA17387@ming.t460p>
-From:   Sumit Saxena <sumit.saxena@broadcom.com>
-Date:   Fri, 24 Jan 2020 18:13:40 +0530
-Message-ID: <CAL2rwxrLVeAZmFPGvOOqDrea8Nh3p1Cb5BSd4r4noC_8AzRtHg@mail.gmail.com>
-Subject: Re: [PATCH 5/6] scsi: core: don't limit per-LUN queue depth for SSD
- when HBA needs
-To:     Ming Lei <ming.lei@redhat.com>
-Cc:     "Martin K. Petersen" <martin.petersen@oracle.com>,
-        James Bottomley <James.Bottomley@hansenpartnership.com>,
-        Linux SCSI List <linux-scsi@vger.kernel.org>,
-        linux-block@vger.kernel.org, Jens Axboe <axboe@kernel.dk>,
-        Sathya Prakash <sathya.prakash@broadcom.com>,
-        Chaitra P B <chaitra.basappa@broadcom.com>,
-        Suganath Prabu Subramani 
-        <suganath-prabu.subramani@broadcom.com>,
-        Kashyap Desai <kashyap.desai@broadcom.com>,
-        Shivasharan S <shivasharan.srikanteshwara@broadcom.com>,
-        "Ewan D . Milne" <emilne@redhat.com>,
-        Christoph Hellwig <hch@lst.de>, Hannes Reinecke <hare@suse.de>,
-        Bart Van Assche <bart.vanassche@wdc.com>
-Content-Type: text/plain; charset="UTF-8"
-Content-Transfer-Encoding: quoted-printable
+In-Reply-To: <BYAPR04MB5749820C322B40C7DBBBCA02863F0@BYAPR04MB5749.namprd04.prod.outlook.com>
+Content-Type: text/plain; charset=utf-8; format=flowed
+Content-Language: en-US
+Content-Transfer-Encoding: 8bit
 Sender: linux-block-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-On Fri, Jan 24, 2020 at 7:30 AM Ming Lei <ming.lei@redhat.com> wrote:
->
-> Hi Martin,
->
-> On Thu, Jan 23, 2020 at 08:21:42PM -0500, Martin K. Petersen wrote:
-> >
-> > Ming,
-> >
-> > > However, it depends on if the target device returns the congestion to
-> > > host. From my observation, looks there isn't such feedback from NVMe
-> > > target.
-> >
-> > It happens all the time with SCSI devices. It is imperative that this
-> > keeps working.
-> >
-> > > Even if there was such SSD target which provides such congestion
-> > > feedback, bypassing .device_busy won't cause big effect too since
-> > > blk-mq's SCHED_RESTART will retry this IO returning STS_RESOURCE only
-> > > after another in-flight one is completed.
-> >
-> > The reason we back off is that it allows the device to recover by
-> > temporarily reducing its workload. In addition, the lower queue depth
-> > alleviates the risk of commands timing out leading to application I/O
-> > failures.
->
-> The timeout risk may only happen when driver/device doesn't return
-> congestion feedback, meantime the host queue depth is big enough.
->
-> So far we don't see such issue on NVMe which hw queue depth is 1023, and
-> the hw queue count is often 32+, and not see such timeout report
-> when there are so many inflight IOs(32 * 1023) on single LUN.
->
-> Also megaraid sas's queue depth is much less than (32 * 1023), so it
-> seems much unlikely to happen.
->
-> Megaraid guys, could you clarify if it is one issue? Kashyap, Sumit
-> and Shivasharan?
+On 1/7/20 8:14 PM, Chaitanya Kulkarni wrote:
+> Hi all,
+> 
+> * Background :-
+> -----------------------------------------------------------------------
+> 
+> Copy offload is a feature that allows file-systems or storage devices
+> to be instructed to copy files/logical blocks without requiring
+> involvement of the local CPU.
+> 
+> With reference to the RISC-V summit keynote [1] single threaded
+> performance is limiting due to Denard scaling and multi-threaded
+> performance is slowing down due Moore's law limitations. With the rise
+> of SNIA Computation Technical Storage Working Group (TWG) [2],
+> offloading computations to the device or over the fabrics is becoming
+> popular as there are several solutions available [2]. One of the common
+> operation which is popular in the kernel and is not merged yet is Copy
+> offload over the fabrics or on to the device.
+> 
+> * Problem :-
+> -----------------------------------------------------------------------
+> 
+> The original work which is done by Martin is present here [3]. The
+> latest work which is posted by Mikulas [4] is not merged yet. These two
+> approaches are totally different from each other. Several storage
+> vendors discourage mixing copy offload requests with regular READ/WRITE
+> I/O. Also, the fact that the operation fails if a copy request ever
+> needs to be split as it traverses the stack it has the unfortunate
+> side-effect of preventing copy offload from working in pretty much
+> every common deployment configuration out there.
+> 
+> * Current state of the work :-
+> -----------------------------------------------------------------------
+> 
+> With [3] being hard to handle arbitrary DM/MD stacking without
+> splitting the command in two, one for copying IN and one for copying
+> OUT. Which is then demonstrated by the [4] why [3] it is not a suitable
+> candidate. Also, with [4] there is an unresolved problem with the
+> two-command approach about how to handle changes to the DM layout
+> between an IN and OUT operations.
+> 
+> * Why Linux Kernel Storage System needs Copy Offload support now ?
+> -----------------------------------------------------------------------
+> 
+> With the rise of the SNIA Computational Storage TWG and solutions [2],
+> existing SCSI XCopy support in the protocol, recent advancement in the
+> Linux Kernel File System for Zoned devices (Zonefs [5]), Peer to Peer
+> DMA support in the Linux Kernel mainly for NVMe devices [7] and
+> eventually NVMe Devices and subsystem (NVMe PCIe/NVMeOF) will benefit
+> from Copy offload operation.
+> 
+> With this background we have significant number of use-cases which are
+> strong candidates waiting for outstanding Linux Kernel Block Layer Copy
+> Offload support, so that Linux Kernel Storage subsystem can to address
+> previously mentioned problems [1] and allow efficient offloading of the
+> data related operations. (Such as move/copy etc.)
+> 
+> For reference following is the list of the use-cases/candidates waiting
+> for Copy Offload support :-
+> 
+> 1. SCSI-attached storage arrays.
+> 2. Stacking drivers supporting XCopy DM/MD.
+> 3. Computational Storage solutions.
+> 7. File systems :- Local, NFS and Zonefs.
+> 4. Block devices :- Distributed, local, and Zoned devices.
+> 5. Peer to Peer DMA support solutions.
+> 6. Potentially NVMe subsystem both NVMe PCIe and NVMeOF.
+> 
+> * What we will discuss in the proposed session ?
+> -----------------------------------------------------------------------
+> 
+> I'd like to propose a session to go over this topic to understand :-
+> 
+> 1. What are the blockers for Copy Offload implementation ?
+> 2. Discussion about having a file system interface.
+> 3. Discussion about having right system call for user-space.
+> 4. What is the right way to move this work forward ?
+> 5. How can we help to contribute and move this work forward ?
+> 
+> * Required Participants :-
+> -----------------------------------------------------------------------
+> 
+> I'd like to invite block layer, device drivers and file system
+> developers to:-
+> 
+> 1. Share their opinion on the topic.
+> 2. Share their experience and any other issues with [4].
+> 3. Uncover additional details that are missing from this proposal.
+> 
+> Required attendees :-
+> 
+> Martin K. Petersen
+> Jens Axboe
+> Christoph Hellwig
+> Bart Van Assche
+> Stephen Bates
+> Zach Brown
+> Roland Dreier
+> Ric Wheeler
+> Trond Myklebust
+> Mike Snitzer
+> Keith Busch
+> Sagi Grimberg
+> Hannes Reinecke
+> Frederick Knight
+> Mikulas Patocka
+> Matias Bjørling
+> 
+> [1]https://content.riscv.org/wp-content/uploads/2018/12/A-New-Golden-Age-for-Computer-Architecture-History-Challenges-and-Opportunities-David-Patterson-.pdf
+> [2] https://www.snia.org/computational
+> https://www.napatech.com/support/resources/solution-descriptions/napatech-smartnic-solution-for-hardware-offload/
+>        https://www.eideticom.com/products.html
+> https://www.xilinx.com/applications/data-center/computational-storage.html
+> [3] git://git.kernel.org/pub/scm/linux/kernel/git/mkp/linux.git xcopy
+> [4] https://www.spinics.net/lists/linux-block/msg00599.html
+> [5] https://lwn.net/Articles/793585/
+> [6] https://nvmexpress.org/new-nvmetm-specification-defines-zoned-
+> namespaces-zns-as-go-to-industry-technology/
+> [7] https://github.com/sbates130272/linux-p2pmem
+> [8] https://kernel.dk/io_uring.pdf
+> 
+> Regards,
+> Chaitanya
+> 
 
-Hi Ming, Martin,
+This is a very interesting topic and I would like to participate in the
+discussion too.
 
-megaraid_sas driver does not enable =E2=80=9C.track_queue_depth=E2=80=9D, s=
-o
-megaraid_sas adapters never used QUEUE FULL interface of Linux SCSI
-layer. Most of the handling of QUEUE FULL is managed by MegaRAID
-controller Firmware and it also manages reducing drive level QD (like
-ramp up/down).
-
-"mpt3sas" adapters support QUEUE FULL based on IOCCapabilities of
-Firmware.  Default configuration is Firmware will manage QUEUE FULL.
-This is not same as Linux SCSI level handling. It is delayed retry in
-Firmware. It means, we should not expect IO timeout in case of QUEUE
-FULL from device since firmware can handle it as delayed retry. User
-can disable Firmware handling QUEUE FULL condition (through customized
-firmware) and allow QUEUE FULL return back to SCSI layer.  This
-feature is called =E2=80=9CMPI2_IOCFACTS_CAPABILITY_TASK_SET_FULL_HANDLING=
-=E2=80=9D.
-So for mpt3sas driver, we may use QUEUE FULL handling of OS. We can
-opt to enable =E2=80=9Cno_device_queue_for_ssd=E2=80=9D for mpt3sas driver =
-only if FW
-does not expose MPI2_IOCFACTS_CAPABILITY_TASK_SET_FULL_HANDLING.
+The dm-clone target would also benefit from copy offload, as it heavily
+employs dm-kcopyd. I have been exploring redesigning kcopyd in order to
+achieve increased IOPS in dm-clone and dm-snapshot for small copies over
+NVMe devices, but copy offload sounds even more promising, especially
+for larger copies happening in the background (as is the case with
+dm-clone's background hydration).
 
 Thanks,
-Sumit
-
->
-> >
-> > > At least, Broadcom guys tests this patch on megaraid raid and the
-> > > results shows that big improvement was got, that is why the flag is
-> > > only set on megaraid host.
-> >
-> > I do not question that it improves performance. That's not my point.
-> >
-> > > In theory, .track_queue_depth may only improve sequential IO's
-> > > performance for HDD., not very effective for SSD. Or just save a bit
-> > > CPU cycles in case of SSD.
-> >
-> > This is not about performance. This is about how the system behaves whe=
-n
-> > a device is starved for resources or experiencing transient failures.
->
-> Could you explain a bit how this patch changes the system beaviror? I
-> understand the EH just retries the incompleted requests, which total
-> number is just less than host queue depth.
->
->
-> Thanks,
-> Ming
->
+Nikos
