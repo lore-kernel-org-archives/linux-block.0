@@ -2,126 +2,107 @@ Return-Path: <SRS0=eyh1=3N=vger.kernel.org=linux-block-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-5.9 required=3.0 tests=DKIM_SIGNED,DKIM_VALID,
-	DKIM_VALID_AU,HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,
-	MENTIONS_GIT_HOSTING,SPF_HELO_NONE,SPF_PASS autolearn=ham autolearn_force=no
-	version=3.4.0
+X-Spam-Status: No, score=-5.3 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
+	MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,USER_AGENT_SANE_1
+	autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 390C9C2D0DB
-	for <linux-block@archiver.kernel.org>; Fri, 24 Jan 2020 20:55:02 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id BD268C35242
+	for <linux-block@archiver.kernel.org>; Fri, 24 Jan 2020 21:16:50 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.kernel.org (Postfix) with ESMTP id 0AB0B2081E
-	for <linux-block@archiver.kernel.org>; Fri, 24 Jan 2020 20:55:02 +0000 (UTC)
-Authentication-Results: mail.kernel.org;
-	dkim=pass (2048-bit key) header.d=cloud.ionos.com header.i=@cloud.ionos.com header.b="e2WK6xep"
+	by mail.kernel.org (Postfix) with ESMTP id 9E6522072C
+	for <linux-block@archiver.kernel.org>; Fri, 24 Jan 2020 21:16:50 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1729098AbgAXUzB (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Fri, 24 Jan 2020 15:55:01 -0500
-Received: from mail-il1-f195.google.com ([209.85.166.195]:34824 "EHLO
-        mail-il1-f195.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1727295AbgAXUzB (ORCPT
+        id S1726080AbgAXVQu (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Fri, 24 Jan 2020 16:16:50 -0500
+Received: from mail104.syd.optusnet.com.au ([211.29.132.246]:55401 "EHLO
+        mail104.syd.optusnet.com.au" rhost-flags-OK-OK-OK-OK)
+        by vger.kernel.org with ESMTP id S1725765AbgAXVQu (ORCPT
         <rfc822;linux-block@vger.kernel.org>);
-        Fri, 24 Jan 2020 15:55:01 -0500
-Received: by mail-il1-f195.google.com with SMTP id g12so2693665ild.2
-        for <linux-block@vger.kernel.org>; Fri, 24 Jan 2020 12:55:01 -0800 (PST)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=cloud.ionos.com; s=google;
-        h=mime-version:references:in-reply-to:from:date:message-id:subject:to
-         :cc;
-        bh=0n9u51frLq42YXKsunChQaFJhmu3sf5UYr42H8mSzXw=;
-        b=e2WK6xepBBB4EtzGMwqE4iZ6I7TEZG6kivlxfnbRGABVPMUeWRhbk7sJ0AlQ41+rwW
-         vr1XSWWVZdvAF3Rojw/D/uXTMD4I9pCKZyz2nb4FihBVr1vt7Yc0kPqo9S01F0T38ccl
-         aWE+KB8nHY/+RMJmIcnPv01KZmjNozGnfIcZtQPrGNDqEm4i1hIF2rmJEiyqzRVGjwV4
-         zvhgVw4r2a9mpveyXRTc826jwOTNOGzlScBbwPP83droAePq/8fq6Egg4fSECRXFl+/X
-         xTfoRvvzDUTc9Ge8gfR2JEcBx8nhLKZyt3aovXRWuz94FwZ7E6SgvfGuu9/FWs3tn5/1
-         oeSQ==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20161025;
-        h=x-gm-message-state:mime-version:references:in-reply-to:from:date
-         :message-id:subject:to:cc;
-        bh=0n9u51frLq42YXKsunChQaFJhmu3sf5UYr42H8mSzXw=;
-        b=caBN5Zp+w7Cq+ZAVRw2IJcXnZUyxB46UO4rdT+rLUGIvfFnI/AaZ3JDOJTeB5dMegv
-         EhXa2muj50cWf6JElas1bc0in+gauiDg2ykq0Qv8u1WqZUtQgViHGCe579wmDzkQitBw
-         ina508uacEY7S3S9K3MWdkJgbj2oL1ObuUGpegK+kMTqyCCt87U28h5Wu3fF/lYYmHoj
-         DyP6c+0Eeyo06vgVw9hIm8tX1Ng+YXzV5GWd0R+usci3mJRXhL8r7zTbeZGfuCBLCjsI
-         Bfj609rEhWTwECFzHY0+66ztn3H/UyXoHpZtK1mxY4FGDAmNrN/RXrGK5q7B7/MKYcqO
-         o6nA==
-X-Gm-Message-State: APjAAAX0Vinq8rtisufwFgGQrUnjSlosi9UacLu1gCkOJ+px0t4gneA6
-        eqKSe6X3IBBtZL+IaLWARvFXk5zfN/NcrmDqql26cA==
-X-Google-Smtp-Source: APXvYqz0AtvAHedtY5gehru+dAerzBiUAXq+YrmyX+8ObY9I8Jr7SyNAQggbUfCicKDPQDc9yHO3tH/caNLRJkwTvuo=
-X-Received: by 2002:a05:6e02:f0f:: with SMTP id x15mr4685344ilj.298.1579899300670;
- Fri, 24 Jan 2020 12:55:00 -0800 (PST)
+        Fri, 24 Jan 2020 16:16:50 -0500
+Received: from dread.disaster.area (pa49-195-162-125.pa.nsw.optusnet.com.au [49.195.162.125])
+        by mail104.syd.optusnet.com.au (Postfix) with ESMTPS id 991D1820C75;
+        Sat, 25 Jan 2020 08:16:44 +1100 (AEDT)
+Received: from dave by dread.disaster.area with local (Exim 4.92.3)
+        (envelope-from <david@fromorbit.com>)
+        id 1iv6Jm-00079w-Ii; Sat, 25 Jan 2020 08:16:42 +1100
+Date:   Sat, 25 Jan 2020 08:16:42 +1100
+From:   Dave Chinner <david@fromorbit.com>
+To:     Mike Christie <mchristi@redhat.com>
+Cc:     Shakeel Butt <shakeelb@google.com>,
+        Andrew Morton <akpm@linux-foundation.org>,
+        linux-api@vger.kernel.org, idryomov@gmail.com,
+        Michal Hocko <mhocko@kernel.org>,
+        Linux MM <linux-mm@kvack.org>,
+        LKML <linux-kernel@vger.kernel.org>, linux-scsi@vger.kernel.org,
+        linux-fsdevel <linux-fsdevel@vger.kernel.org>,
+        linux-block@vger.kernel.org, martin@urbackup.org,
+        Damien.LeMoal@wdc.com, Michal Hocko <mhocko@suse.com>,
+        Masato Suzuki <masato.suzuki@wdc.com>
+Subject: Re: [PATCH] Add prctl support for controlling mem reclaim V4
+Message-ID: <20200124211642.GB7216@dread.disaster.area>
+References: <20191112001900.9206-1-mchristi@redhat.com>
+ <CALvZod47XyD2x8TuZcb9PgeVY14JBwNhsUpN3RAeAt+RJJC=hg@mail.gmail.com>
+ <5E2B19C9.6080907@redhat.com>
 MIME-Version: 1.0
-References: <20200124204753.13154-1-jinpuwang@gmail.com>
-In-Reply-To: <20200124204753.13154-1-jinpuwang@gmail.com>
-From:   Jinpu Wang <jinpu.wang@cloud.ionos.com>
-Date:   Fri, 24 Jan 2020 21:54:49 +0100
-Message-ID: <CAMGffEnKMZ1=KeEjTgm2K-JdMkfQnVHCNHCU+HtzzW6SjOUD9Q@mail.gmail.com>
-Subject: Re: [PATCH v8 00/25] RTRS (former IBTRS) RDMA Transport Library and
- RNBD (former IBNBD) RDMA Network Block Device
-To:     Jack Wang <jinpuwang@gmail.com>
-Cc:     linux-block@vger.kernel.org, linux-rdma@vger.kernel.org,
-        Jens Axboe <axboe@kernel.dk>,
-        Christoph Hellwig <hch@infradead.org>,
-        Sagi Grimberg <sagi@grimberg.me>,
-        Bart Van Assche <bvanassche@acm.org>,
-        Leon Romanovsky <leon@kernel.org>,
-        Doug Ledford <dledford@redhat.com>,
-        Jason Gunthorpe <jgg@ziepe.ca>,
-        Danil Kipnis <danil.kipnis@cloud.ionos.com>,
-        Roman Penyaev <rpenyaev@suse.de>
-Content-Type: text/plain; charset="UTF-8"
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <5E2B19C9.6080907@redhat.com>
+User-Agent: Mutt/1.10.1 (2018-07-13)
+X-Optus-CM-Score: 0
+X-Optus-CM-Analysis: v=2.3 cv=LYdCFQXi c=1 sm=1 tr=0
+        a=eqEhQ2W7mF93FbYHClaXRw==:117 a=eqEhQ2W7mF93FbYHClaXRw==:17
+        a=jpOVt7BSZ2e4Z31A5e1TngXxSK0=:19 a=kj9zAlcOel0A:10 a=Jdjhy38mL1oA:10
+        a=20KFwNOVAAAA:8 a=iox4zFpeAAAA:8 a=JF9118EUAAAA:8 a=VwQbUJbxAAAA:8
+        a=7-415B0cAAAA:8 a=3XgbrJ93Oiw9jx1WlK8A:9 a=CjuIK1q_8ugA:10
+        a=WzC6qhA0u3u7Ye7llzcV:22 a=xVlTc564ipvMDusKsbsT:22
+        a=AjGcO6oz07-iQ99wixmX:22 a=biEYGPWJfzWAr4FL6Ov7:22
 Sender: linux-block-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-On Fri, Jan 24, 2020 at 9:47 PM Jack Wang <jinpuwang@gmail.com> wrote:
->
-> Hi all,
->
-> Here is v8 of  the RTRS (former IBTRS) RDMA Transport Library and the
-> corresponding RNBD (former IBNBD) RDMA Network Block Device, which includes
-> changes to address comments from the community.
->
-> Introduction
-> -------------
->
-> RTRS (RDMA Transport) is a reliable high speed transport library
-> which allows for establishing connection between client and server
-> machines via RDMA. It is based on RDMA-CM, so expect also to support RoCE
-> and iWARP, but we mainly tested in IB environment. It is optimized to
-> transfer (read/write) IO blocks in the sense that it follows the BIO
-> semantics of providing the possibility to either write data from a
-> scatter-gather list to the remote side or to request ("read") data
-> transfer from the remote side into a given set of buffers.
->
-> RTRS is multipath capable and provides I/O fail-over and load-balancing
-> functionality, i.e. in RTRS terminology, an RTRS path is a set of RDMA
-> connections and particular path is selected according to the load-balancing
-> policy. It can be used for other components beside RNBD.
->
-> Module parameter always_invalidate is introduced for the security problem
-> discussed in LPC RDMA MC 2019. When always_invalidate=Y, on the server side we
-> invalidate each rdma buffer before we hand it over to RNBD server and
-> then pass it to the block layer. A new rkey is generated and registered for the
-> buffer after it returns back from the block layer and RNBD server.
-> The new rkey is sent back to the client along with the IO result.
-> The procedure is the default behaviour of the driver. This invalidation and
-> registration on each IO causes performance drop of up to 20%. A user of the
-> driver may choose to load the modules with this mechanism switched off
-> (always_invalidate=N), if he understands and can take the risk of a malicious
-> client being able to corrupt memory of a server it is connected to. This might
-> be a reasonable option in a scenario where all the clients and all the servers
-> are located within a secure datacenter.
->
-> RNBD (RDMA Network Block Device) is a pair of kernel modules
-> (client and server) that allow for remote access of a block device on
-> the server over RTRS protocol. After being mapped, the remote block
-> devices can be accessed on the client side as local block devices.
-> Internally RNBD uses RTRS as an RDMA transport library.
->
-> Commits for kernel can be found here:
->    https://github.com/ionos-enterprise/ibnbd/commits/linux-5.5-rc6-ibnbd-v7
-Sorry, forgot to update the link:
-https://github.com/ionos-enterprise/ibnbd/tree/linux-5.5-rc7-ibnbd-v8
+On Fri, Jan 24, 2020 at 10:22:33AM -0600, Mike Christie wrote:
+> On 12/05/2019 04:43 PM, Shakeel Butt wrote:
+> > On Mon, Nov 11, 2019 at 4:19 PM Mike Christie <mchristi@redhat.com> wrote:
+> >> This patch adds a new prctl command that daemons can use after they have
+> >> done their initial setup, and before they start to do allocations that
+> >> are in the IO path. It sets the PF_MEMALLOC_NOIO and PF_LESS_THROTTLE
+> >> flags so both userspace block and FS threads can use it to avoid the
+> >> allocation recursion and try to prevent from being throttled while
+> >> writing out data to free up memory.
+> >>
+> >> Signed-off-by: Mike Christie <mchristi@redhat.com>
+> >> Acked-by: Michal Hocko <mhocko@suse.com>
+> >> Tested-by: Masato Suzuki <masato.suzuki@wdc.com>
+> >> Reviewed-by: Damien Le Moal <damien.lemoal@wdc.com>
+> > 
+> > I suppose this patch should be routed through MM tree, so, CCing Andrew.
+> >
+> 
+> Andrew and other mm/storage developers,
+> 
+> Do I need to handle anything else for this patch, or are there any other
+> concerns? Is this maybe something we want to talk about at a quick LSF
+> session?
+> 
+> I have retested it with Linus's current tree. It still applies cleanly
+> (just some offsets), and fixes the problem described above we have been
+> hitting.
+
+I must have missed this version being posted (just looked it up on
+lore.kernel.org). As far as I'm concerned this is good to go and it
+is absolutely necessary for userspace IO stacks to function
+correctly.
+
+Reviewed-by: Dave Chinner <dchinner@redhat.com>
+
+If no manintainer picks it up before the next merge window, then I
+recommend resending the latest version to Linus asking him to merge
+it.
+
+Cheers,
+
+Dave.
+-- 
+Dave Chinner
+david@fromorbit.com
