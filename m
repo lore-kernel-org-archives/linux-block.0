@@ -2,213 +2,279 @@ Return-Path: <SRS0=eyh1=3N=vger.kernel.org=linux-block-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-8.1 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
-	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,
-	SPF_HELO_NONE,SPF_PASS,USER_AGENT_SANE_1 autolearn=unavailable
-	autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-8.4 required=3.0 tests=DKIMWL_WL_HIGH,DKIM_SIGNED,
+	DKIM_VALID,DKIM_VALID_AU,HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,
+	MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,UNPARSEABLE_RELAY,
+	USER_AGENT_SANE_1 autolearn=unavailable autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 15BCCC2D0CE
-	for <linux-block@archiver.kernel.org>; Fri, 24 Jan 2020 21:57:08 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 0DD67C2D0CE
+	for <linux-block@archiver.kernel.org>; Fri, 24 Jan 2020 22:10:05 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.kernel.org (Postfix) with ESMTP id D0FAE2071E
-	for <linux-block@archiver.kernel.org>; Fri, 24 Jan 2020 21:57:07 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id CA3222077C
+	for <linux-block@archiver.kernel.org>; Fri, 24 Jan 2020 22:10:04 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (2048-bit key) header.d=embeddedor.com header.i=@embeddedor.com header.b="Zhqc3Oc2"
+	dkim=pass (2048-bit key) header.d=oracle.com header.i=@oracle.com header.b="sTob2ZKH"
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1726545AbgAXV5H (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Fri, 24 Jan 2020 16:57:07 -0500
-Received: from gateway31.websitewelcome.com ([192.185.143.36]:18194 "EHLO
-        gateway31.websitewelcome.com" rhost-flags-OK-OK-OK-OK)
-        by vger.kernel.org with ESMTP id S1725887AbgAXV5H (ORCPT
+        id S1729014AbgAXWKA (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Fri, 24 Jan 2020 17:10:00 -0500
+Received: from userp2130.oracle.com ([156.151.31.86]:34106 "EHLO
+        userp2130.oracle.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S1725821AbgAXWKA (ORCPT
         <rfc822;linux-block@vger.kernel.org>);
-        Fri, 24 Jan 2020 16:57:07 -0500
-X-Greylist: delayed 1502 seconds by postgrey-1.27 at vger.kernel.org; Fri, 24 Jan 2020 16:57:06 EST
-Received: from cm16.websitewelcome.com (cm16.websitewelcome.com [100.42.49.19])
-        by gateway31.websitewelcome.com (Postfix) with ESMTP id 0B02518C9B
-        for <linux-block@vger.kernel.org>; Fri, 24 Jan 2020 15:10:56 -0600 (CST)
-Received: from gator4166.hostgator.com ([108.167.133.22])
-        by cmsmtp with SMTP
-        id v6EBi5lPUuRkOv6ECiQ0qI; Fri, 24 Jan 2020 15:10:56 -0600
-X-Authority-Reason: nr=8
-DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed;
-        d=embeddedor.com; s=default; h=Content-Transfer-Encoding:Content-Type:
-        In-Reply-To:MIME-Version:Date:Message-ID:From:References:Cc:To:Subject:Sender
-        :Reply-To:Content-ID:Content-Description:Resent-Date:Resent-From:
-        Resent-Sender:Resent-To:Resent-Cc:Resent-Message-ID:List-Id:List-Help:
-        List-Unsubscribe:List-Subscribe:List-Post:List-Owner:List-Archive;
-        bh=1EpH8LoV2wKCDxmGEvKAlzcq+d1bdGaTLz6SBk7EsoA=; b=Zhqc3Oc2s9jnh7Gj4BALhfaPFG
-        B4vX/BUf9Nk3wzOtLdOt9kxZXSKhaLG03cHatyCg9VUf4uIaGZOxFR6P1B/miQ4WxfIHEsIVk95au
-        ol1pV7iI+9Gav6L+F0cR8EzpcS4Q1oCm2UTW/Hi1X+OpMi0zcaptzizCrgWSTQ1GBii56FX/o6cxG
-        pEvA/TF4t53F3/KJZObRoZ3qr3agLf0NaNda/+sm3MogW7qHwtkd6/QeBfysQblAhLytp/8QsQuOf
-        RwlfLJXJL3dqY48PlnmujZjwo4iC22LtQ2ZiN+Z/m5/C9aMN2l6VxzLh2e5PcY9TsSKf/uTMp3iGp
-        PcUF4SMw==;
-Received: from [201.162.161.199] (port=60838 helo=[192.168.43.131])
-        by gator4166.hostgator.com with esmtpsa (TLSv1.2:ECDHE-RSA-AES128-GCM-SHA256:128)
-        (Exim 4.92)
-        (envelope-from <gustavo@embeddedor.com>)
-        id 1iv6EB-001MCI-B1; Fri, 24 Jan 2020 15:10:55 -0600
-Subject: Re: [PATCH] drbd fifo_alloc: use struct_size
-To:     Stephen Kitt <steve@sk2.org>,
-        Philipp Reisner <philipp.reisner@linbit.com>,
-        Lars Ellenberg <lars.ellenberg@linbit.com>,
-        Jens Axboe <axboe@kernel.dk>, drbd-dev@lists.linbit.com
-Cc:     linux-block@vger.kernel.org, linux-kernel@vger.kernel.org
-References: <20200124200307.1808593-1-steve@sk2.org>
-From:   "Gustavo A. R. Silva" <gustavo@embeddedor.com>
-Autocrypt: addr=gustavo@embeddedor.com; keydata=
- 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
- VtSixD1uOgytAP7RWS474w==
-Message-ID: <6016329a-4dac-ac23-9e6f-5da3dd3fefa0@embeddedor.com>
-Date:   Fri, 24 Jan 2020 15:12:59 -0600
-User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:68.0) Gecko/20100101
- Thunderbird/68.4.1
+        Fri, 24 Jan 2020 17:10:00 -0500
+Received: from pps.filterd (userp2130.oracle.com [127.0.0.1])
+        by userp2130.oracle.com (8.16.0.27/8.16.0.27) with SMTP id 00OM7vp2073519;
+        Fri, 24 Jan 2020 22:09:34 GMT
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=oracle.com; h=date : from : to : cc
+ : subject : message-id : references : mime-version : content-type :
+ in-reply-to; s=corp-2019-08-05;
+ bh=AQMu01bBZSMrwBnm99PHvoG2dSfTkech6ze+KIzsMkc=;
+ b=sTob2ZKHKoUU446q/ibefW10Tizoa3M/FGdfUzzI7qDwluvaCpxIoDPzrBztMLLG1rJd
+ rnrjfxxH7c1JH7gSMKrH8XVRHVTQVvyz9ccNFHlHTvfGqN2lDDs0DkIno/fbyp9UeJvR
+ 8NFCKpGQXOCWG+LGxqpPdfI1WqB+zZSbs1raQb2HUtLf5/ERFRXV4IC5X+QgCFkx2dwr
+ R6yCmzUalUP+4YEyeGlwa3wucp8tAYc5d6HOrVaXmO/+78la0Lvbuvmy93YsN9HM/suY
+ G9CdMkJWfJMZ84YfioM4I8UTeLB5JMZfR/U9CnFdialpYnMnm2YMt3ze7waKA4gEFxn4 PQ== 
+Received: from aserp3030.oracle.com (aserp3030.oracle.com [141.146.126.71])
+        by userp2130.oracle.com with ESMTP id 2xksev3ub7-1
+        (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=OK);
+        Fri, 24 Jan 2020 22:09:34 +0000
+Received: from pps.filterd (aserp3030.oracle.com [127.0.0.1])
+        by aserp3030.oracle.com (8.16.0.27/8.16.0.27) with SMTP id 00OM8j8J016395;
+        Fri, 24 Jan 2020 22:09:33 GMT
+Received: from aserv0121.oracle.com (aserv0121.oracle.com [141.146.126.235])
+        by aserp3030.oracle.com with ESMTP id 2xqmufxk3b-1
+        (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=OK);
+        Fri, 24 Jan 2020 22:09:33 +0000
+Received: from abhmp0020.oracle.com (abhmp0020.oracle.com [141.146.116.26])
+        by aserv0121.oracle.com (8.14.4/8.13.8) with ESMTP id 00OM9VCb018104;
+        Fri, 24 Jan 2020 22:09:32 GMT
+Received: from localhost (/67.169.218.210)
+        by default (Oracle Beehive Gateway v4.0)
+        with ESMTP ; Fri, 24 Jan 2020 14:09:31 -0800
+Date:   Fri, 24 Jan 2020 14:09:29 -0800
+From:   "Darrick J. Wong" <darrick.wong@oracle.com>
+To:     Mike Christie <mchristi@redhat.com>
+Cc:     linux-api@vger.kernel.org, idryomov@gmail.com, mhocko@kernel.org,
+        david@fromorbit.com, linux-mm@kvack.org,
+        linux-kernel@vger.kernel.org, linux-scsi@vger.kernel.org,
+        linux-fsdevel@vger.kernel.org, linux-block@vger.kernel.org,
+        martin@urbackup.org, Damien.LeMoal@wdc.com,
+        Michal Hocko <mhocko@suse.com>,
+        Masato Suzuki <masato.suzuki@wdc.com>
+Subject: Re: [PATCH] Add prctl support for controlling mem reclaim V4
+Message-ID: <20200124220929.GD8236@magnolia>
+References: <20191112001900.9206-1-mchristi@redhat.com>
 MIME-Version: 1.0
-In-Reply-To: <20200124200307.1808593-1-steve@sk2.org>
-Content-Type: text/plain; charset=utf-8
-Content-Language: en-US
-Content-Transfer-Encoding: 7bit
-X-AntiAbuse: This header was added to track abuse, please include it with any abuse report
-X-AntiAbuse: Primary Hostname - gator4166.hostgator.com
-X-AntiAbuse: Original Domain - vger.kernel.org
-X-AntiAbuse: Originator/Caller UID/GID - [47 12] / [47 12]
-X-AntiAbuse: Sender Address Domain - embeddedor.com
-X-BWhitelist: no
-X-Source-IP: 201.162.161.199
-X-Source-L: No
-X-Exim-ID: 1iv6EB-001MCI-B1
-X-Source: 
-X-Source-Args: 
-X-Source-Dir: 
-X-Source-Sender: ([192.168.43.131]) [201.162.161.199]:60838
-X-Source-Auth: gustavo@embeddedor.com
-X-Email-Count: 6
-X-Source-Cap: Z3V6aWRpbmU7Z3V6aWRpbmU7Z2F0b3I0MTY2Lmhvc3RnYXRvci5jb20=
-X-Local-Domain: yes
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <20191112001900.9206-1-mchristi@redhat.com>
+User-Agent: Mutt/1.9.4 (2018-02-28)
+X-Proofpoint-Virus-Version: vendor=nai engine=6000 definitions=9510 signatures=668685
+X-Proofpoint-Spam-Details: rule=notspam policy=default score=0 suspectscore=2 malwarescore=0
+ phishscore=0 bulkscore=0 spamscore=0 mlxscore=0 mlxlogscore=999
+ adultscore=0 classifier=spam adjust=0 reason=mlx scancount=1
+ engine=8.0.1-1911140001 definitions=main-2001240179
+X-Proofpoint-Virus-Version: vendor=nai engine=6000 definitions=9510 signatures=668685
+X-Proofpoint-Spam-Details: rule=notspam policy=default score=0 priorityscore=1501 malwarescore=0
+ suspectscore=2 phishscore=0 bulkscore=0 spamscore=0 clxscore=1011
+ lowpriorityscore=0 mlxscore=0 impostorscore=0 mlxlogscore=999 adultscore=0
+ classifier=spam adjust=0 reason=mlx scancount=1 engine=8.0.1-1911140001
+ definitions=main-2001240179
 Sender: linux-block-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-
-
-On 1/24/20 14:03, Stephen Kitt wrote:
-> Switching to struct_size for the allocation in fifo_alloc avoids
-> hard-coding the type of fifo_buffer.values in fifo_alloc. It also
-> provides overflow protection; to avoid pessimistic code being
-> generated by the compiler as a result, this patch also switches
-> fifo_size to unsigned, propagating the change as appropriate.
+On Mon, Nov 11, 2019 at 06:19:00PM -0600, Mike Christie wrote:
+> There are several storage drivers like dm-multipath, iscsi, tcmu-runner,
+> amd nbd that have userspace components that can run in the IO path. For
+> example, iscsi and nbd's userspace deamons may need to recreate a socket
+> and/or send IO on it, and dm-multipath's daemon multipathd may need to
+> send SG IO or read/write IO to figure out the state of paths and re-set
+> them up.
 > 
-> Signed-off-by: Stephen Kitt <steve@sk2.org>
+> In the kernel these drivers have access to GFP_NOIO/GFP_NOFS and the
+> memalloc_*_save/restore functions to control the allocation behavior,
+> but for userspace we would end up hitting an allocation that ended up
+> writing data back to the same device we are trying to allocate for.
+> The device is then in a state of deadlock, because to execute IO the
+> device needs to allocate memory, but to allocate memory the memory
+> layers want execute IO to the device.
+> 
+> Here is an example with nbd using a local userspace daemon that performs
+> network IO to a remote server. We are using XFS on top of the nbd device,
+> but it can happen with any FS or other modules layered on top of the nbd
+> device that can write out data to free memory.  Here a nbd daemon helper
+> thread, msgr-worker-1, is performing a write/sendmsg on a socket to execute
+> a request. This kicks off a reclaim operation which results in a WRITE to
+> the nbd device and the nbd thread calling back into the mm layer.
+> 
 
-Reviewed-by: Gustavo A. R. Silva <gustavo@embeddedor.com>
+/me would like to see the documentation update to prctl(2).
 
-Thanks
---
-Gustavo
+Assuming that "set takes 0 or 1, get returns 0 or 1" is more or less how
+this interface is supposed to work,
 
+Reviewed-by: Darrick J. Wong <darrick.wong@oracle.com>
+
+--D
+
+> [ 1626.609191] msgr-worker-1   D    0  1026      1 0x00004000
+> [ 1626.609193] Call Trace:
+> [ 1626.609195]  ? __schedule+0x29b/0x630
+> [ 1626.609197]  ? wait_for_completion+0xe0/0x170
+> [ 1626.609198]  schedule+0x30/0xb0
+> [ 1626.609200]  schedule_timeout+0x1f6/0x2f0
+> [ 1626.609202]  ? blk_finish_plug+0x21/0x2e
+> [ 1626.609204]  ? _xfs_buf_ioapply+0x2e6/0x410
+> [ 1626.609206]  ? wait_for_completion+0xe0/0x170
+> [ 1626.609208]  wait_for_completion+0x108/0x170
+> [ 1626.609210]  ? wake_up_q+0x70/0x70
+> [ 1626.609212]  ? __xfs_buf_submit+0x12e/0x250
+> [ 1626.609214]  ? xfs_bwrite+0x25/0x60
+> [ 1626.609215]  xfs_buf_iowait+0x22/0xf0
+> [ 1626.609218]  __xfs_buf_submit+0x12e/0x250
+> [ 1626.609220]  xfs_bwrite+0x25/0x60
+> [ 1626.609222]  xfs_reclaim_inode+0x2e8/0x310
+> [ 1626.609224]  xfs_reclaim_inodes_ag+0x1b6/0x300
+> [ 1626.609227]  xfs_reclaim_inodes_nr+0x31/0x40
+> [ 1626.609228]  super_cache_scan+0x152/0x1a0
+> [ 1626.609231]  do_shrink_slab+0x12c/0x2d0
+> [ 1626.609233]  shrink_slab+0x9c/0x2a0
+> [ 1626.609235]  shrink_node+0xd7/0x470
+> [ 1626.609237]  do_try_to_free_pages+0xbf/0x380
+> [ 1626.609240]  try_to_free_pages+0xd9/0x1f0
+> [ 1626.609245]  __alloc_pages_slowpath+0x3a4/0xd30
+> [ 1626.609251]  ? ___slab_alloc+0x238/0x560
+> [ 1626.609254]  __alloc_pages_nodemask+0x30c/0x350
+> [ 1626.609259]  skb_page_frag_refill+0x97/0xd0
+> [ 1626.609274]  sk_page_frag_refill+0x1d/0x80
+> [ 1626.609279]  tcp_sendmsg_locked+0x2bb/0xdd0
+> [ 1626.609304]  tcp_sendmsg+0x27/0x40
+> [ 1626.609307]  sock_sendmsg+0x54/0x60
+> [ 1626.609308]  ___sys_sendmsg+0x29f/0x320
+> [ 1626.609313]  ? sock_poll+0x66/0xb0
+> [ 1626.609318]  ? ep_item_poll.isra.15+0x40/0xc0
+> [ 1626.609320]  ? ep_send_events_proc+0xe6/0x230
+> [ 1626.609322]  ? hrtimer_try_to_cancel+0x54/0xf0
+> [ 1626.609324]  ? ep_read_events_proc+0xc0/0xc0
+> [ 1626.609326]  ? _raw_write_unlock_irq+0xa/0x20
+> [ 1626.609327]  ? ep_scan_ready_list.constprop.19+0x218/0x230
+> [ 1626.609329]  ? __hrtimer_init+0xb0/0xb0
+> [ 1626.609331]  ? _raw_spin_unlock_irq+0xa/0x20
+> [ 1626.609334]  ? ep_poll+0x26c/0x4a0
+> [ 1626.609337]  ? tcp_tsq_write.part.54+0xa0/0xa0
+> [ 1626.609339]  ? release_sock+0x43/0x90
+> [ 1626.609341]  ? _raw_spin_unlock_bh+0xa/0x20
+> [ 1626.609342]  __sys_sendmsg+0x47/0x80
+> [ 1626.609347]  do_syscall_64+0x5f/0x1c0
+> [ 1626.609349]  ? prepare_exit_to_usermode+0x75/0xa0
+> [ 1626.609351]  entry_SYSCALL_64_after_hwframe+0x44/0xa9
+> 
+> This patch adds a new prctl command that daemons can use after they have
+> done their initial setup, and before they start to do allocations that
+> are in the IO path. It sets the PF_MEMALLOC_NOIO and PF_LESS_THROTTLE
+> flags so both userspace block and FS threads can use it to avoid the
+> allocation recursion and try to prevent from being throttled while
+> writing out data to free up memory.
+> 
+> Signed-off-by: Mike Christie <mchristi@redhat.com>
+> Acked-by: Michal Hocko <mhocko@suse.com>
+> Tested-by: Masato Suzuki <masato.suzuki@wdc.com>
+> Reviewed-by: Damien Le Moal <damien.lemoal@wdc.com>
+> 
 > ---
->  drivers/block/drbd/drbd_int.h      | 2 +-
->  drivers/block/drbd/drbd_nl.c       | 3 ++-
->  drivers/block/drbd/drbd_receiver.c | 2 +-
->  drivers/block/drbd/drbd_worker.c   | 4 ++--
->  4 files changed, 6 insertions(+), 5 deletions(-)
 > 
-> diff --git a/drivers/block/drbd/drbd_int.h b/drivers/block/drbd/drbd_int.h
-> index ddbf56014c51..aae99a2d7bd4 100644
-> --- a/drivers/block/drbd/drbd_int.h
-> +++ b/drivers/block/drbd/drbd_int.h
-> @@ -622,7 +622,7 @@ struct fifo_buffer {
->  	int total; /* sum of all values */
->  	int values[0];
->  };
-> -extern struct fifo_buffer *fifo_alloc(int fifo_size);
-> +extern struct fifo_buffer *fifo_alloc(unsigned int fifo_size);
+> V4:
+> - Fix PR_GET_IO_FLUSHER check to match SET.
+> 
+> V3:
+> - Drop NOFS, set PF_LESS_THROTTLE and rename prctl flag to reflect it
+> is more general and can support both FS and block devices. Both fuse
+> and block device daemons, nbd and tcmu-runner, have been tested to
+> confirm the more restrictive PF_MEMALLOC_NOIO also works for fuse.
+> 
+> - Use CAP_SYS_RESOURCE instead of admin.
+> 
+> V2:
+> - Use prctl instead of procfs.
+> - Add support for NOFS for fuse.
+> - Check permissions.
+> 
+> 
+>  include/uapi/linux/capability.h |  1 +
+>  include/uapi/linux/prctl.h      |  4 ++++
+>  kernel/sys.c                    | 25 +++++++++++++++++++++++++
+>  3 files changed, 30 insertions(+)
+> 
+> diff --git a/include/uapi/linux/capability.h b/include/uapi/linux/capability.h
+> index 240fdb9a60f6..272dc69fa080 100644
+> --- a/include/uapi/linux/capability.h
+> +++ b/include/uapi/linux/capability.h
+> @@ -301,6 +301,7 @@ struct vfs_ns_cap_data {
+>  /* Allow more than 64hz interrupts from the real-time clock */
+>  /* Override max number of consoles on console allocation */
+>  /* Override max number of keymaps */
+> +/* Control memory reclaim behavior */
 >  
->  /* flag bits per connection */
->  enum {
-> diff --git a/drivers/block/drbd/drbd_nl.c b/drivers/block/drbd/drbd_nl.c
-> index de2f94d0103a..da4a3ebe04ef 100644
-> --- a/drivers/block/drbd/drbd_nl.c
-> +++ b/drivers/block/drbd/drbd_nl.c
-> @@ -1575,7 +1575,8 @@ int drbd_adm_disk_opts(struct sk_buff *skb, struct genl_info *info)
->  	struct drbd_device *device;
->  	struct disk_conf *new_disk_conf, *old_disk_conf;
->  	struct fifo_buffer *old_plan = NULL, *new_plan = NULL;
-> -	int err, fifo_size;
-> +	int err;
-> +	unsigned int fifo_size;
+>  #define CAP_SYS_RESOURCE     24
 >  
->  	retcode = drbd_adm_prepare(&adm_ctx, skb, info, DRBD_ADM_NEED_MINOR);
->  	if (!adm_ctx.reply_skb)
-> diff --git a/drivers/block/drbd/drbd_receiver.c b/drivers/block/drbd/drbd_receiver.c
-> index 2b3103c30857..79e216446030 100644
-> --- a/drivers/block/drbd/drbd_receiver.c
-> +++ b/drivers/block/drbd/drbd_receiver.c
-> @@ -3887,7 +3887,7 @@ static int receive_SyncParam(struct drbd_connection *connection, struct packet_i
->  	struct disk_conf *old_disk_conf = NULL, *new_disk_conf = NULL;
->  	const int apv = connection->agreed_pro_version;
->  	struct fifo_buffer *old_plan = NULL, *new_plan = NULL;
-> -	int fifo_size = 0;
-> +	unsigned int fifo_size = 0;
->  	int err;
+> diff --git a/include/uapi/linux/prctl.h b/include/uapi/linux/prctl.h
+> index 7da1b37b27aa..07b4f8131e36 100644
+> --- a/include/uapi/linux/prctl.h
+> +++ b/include/uapi/linux/prctl.h
+> @@ -234,4 +234,8 @@ struct prctl_mm_map {
+>  #define PR_GET_TAGGED_ADDR_CTRL		56
+>  # define PR_TAGGED_ADDR_ENABLE		(1UL << 0)
 >  
->  	peer_device = conn_peer_device(connection, pi->vnr);
-> diff --git a/drivers/block/drbd/drbd_worker.c b/drivers/block/drbd/drbd_worker.c
-> index 5bdcc70ad589..b7f605c6e231 100644
-> --- a/drivers/block/drbd/drbd_worker.c
-> +++ b/drivers/block/drbd/drbd_worker.c
-> @@ -482,11 +482,11 @@ static void fifo_add_val(struct fifo_buffer *fb, int value)
->  		fb->values[i] += value;
+> +/* Control reclaim behavior when allocating memory */
+> +#define PR_SET_IO_FLUSHER		57
+> +#define PR_GET_IO_FLUSHER		58
+> +
+>  #endif /* _LINUX_PRCTL_H */
+> diff --git a/kernel/sys.c b/kernel/sys.c
+> index a611d1d58c7d..c1a360370d09 100644
+> --- a/kernel/sys.c
+> +++ b/kernel/sys.c
+> @@ -2259,6 +2259,8 @@ int __weak arch_prctl_spec_ctrl_set(struct task_struct *t, unsigned long which,
+>  	return -EINVAL;
 >  }
 >  
-> -struct fifo_buffer *fifo_alloc(int fifo_size)
-> +struct fifo_buffer *fifo_alloc(unsigned int fifo_size)
+> +#define PR_IO_FLUSHER (PF_MEMALLOC_NOIO | PF_LESS_THROTTLE)
+> +
+>  SYSCALL_DEFINE5(prctl, int, option, unsigned long, arg2, unsigned long, arg3,
+>  		unsigned long, arg4, unsigned long, arg5)
 >  {
->  	struct fifo_buffer *fb;
->  
-> -	fb = kzalloc(sizeof(struct fifo_buffer) + sizeof(int) * fifo_size, GFP_NOIO);
-> +	fb = kzalloc(struct_size(fb, values, fifo_size), GFP_NOIO);
->  	if (!fb)
->  		return NULL;
->  
+> @@ -2486,6 +2488,29 @@ SYSCALL_DEFINE5(prctl, int, option, unsigned long, arg2, unsigned long, arg3,
+>  			return -EINVAL;
+>  		error = GET_TAGGED_ADDR_CTRL();
+>  		break;
+> +	case PR_SET_IO_FLUSHER:
+> +		if (!capable(CAP_SYS_RESOURCE))
+> +			return -EPERM;
+> +
+> +		if (arg3 || arg4 || arg5)
+> +			return -EINVAL;
+> +
+> +		if (arg2 == 1)
+> +			current->flags |= PR_IO_FLUSHER;
+> +		else if (!arg2)
+> +			current->flags &= ~PR_IO_FLUSHER;
+> +		else
+> +			return -EINVAL;
+> +		break;
+> +	case PR_GET_IO_FLUSHER:
+> +		if (!capable(CAP_SYS_RESOURCE))
+> +			return -EPERM;
+> +
+> +		if (arg2 || arg3 || arg4 || arg5)
+> +			return -EINVAL;
+> +
+> +		error = (current->flags & PR_IO_FLUSHER) == PR_IO_FLUSHER;
+> +		break;
+>  	default:
+>  		error = -EINVAL;
+>  		break;
+> -- 
+> 2.20.1
 > 
