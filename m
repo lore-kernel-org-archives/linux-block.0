@@ -2,157 +2,167 @@ Return-Path: <SRS0=eyh1=3N=vger.kernel.org=linux-block-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-8.3 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
-	INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,
-	USER_AGENT_SANE_1 autolearn=ham autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-0.9 required=3.0 tests=DKIMWL_WL_HIGH,DKIM_SIGNED,
+	DKIM_VALID,DKIM_VALID_AU,HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,
+	SPF_HELO_NONE,SPF_PASS autolearn=no autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 2604BC2D0CE
-	for <linux-block@archiver.kernel.org>; Fri, 24 Jan 2020 07:04:05 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id A0EC8C2D0DB
+	for <linux-block@archiver.kernel.org>; Fri, 24 Jan 2020 12:44:08 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.kernel.org (Postfix) with ESMTP id E54E92075D
-	for <linux-block@archiver.kernel.org>; Fri, 24 Jan 2020 07:04:04 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id 730032070A
+	for <linux-block@archiver.kernel.org>; Fri, 24 Jan 2020 12:44:08 +0000 (UTC)
+Authentication-Results: mail.kernel.org;
+	dkim=pass (1024-bit key) header.d=broadcom.com header.i=@broadcom.com header.b="IOag6tP3"
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1730885AbgAXHED (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Fri, 24 Jan 2020 02:04:03 -0500
-Received: from mx2.suse.de ([195.135.220.15]:33322 "EHLO mx2.suse.de"
-        rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-        id S1730779AbgAXHED (ORCPT <rfc822;linux-block@vger.kernel.org>);
-        Fri, 24 Jan 2020 02:04:03 -0500
-X-Virus-Scanned: by amavisd-new at test-mx.suse.de
-Received: from relay2.suse.de (unknown [195.135.220.254])
-        by mx2.suse.de (Postfix) with ESMTP id 49CEEAE07;
-        Fri, 24 Jan 2020 07:03:59 +0000 (UTC)
-Subject: Re: [PATCH] rbd: set the 'device' link in sysfs
-To:     Ilya Dryomov <idryomov@gmail.com>
-Cc:     Sage Weil <sage@redhat.com>, Jens Axboe <axboe@kernel.dk>,
-        Ceph Development <ceph-devel@vger.kernel.org>,
-        linux-block <linux-block@vger.kernel.org>,
-        David Disseldorp <ddiss@suse.com>,
-        Hannes Reinecke <hare@suse.com>
-References: <20200123124433.121939-1-hare@suse.de>
- <CAOi1vP8Q44jLNoq+LTm8GRX687wfwLkJ3WRW_DWvY7nYUtPQxQ@mail.gmail.com>
-From:   Hannes Reinecke <hare@suse.de>
-Openpgp: preference=signencrypt
-Autocrypt: addr=hare@suse.de; prefer-encrypt=mutual; keydata=
- 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
- azzYF4VRJsdl+d0MCaSy8mUh
-Message-ID: <fe3fcf53-94fb-84b8-75ed-6375d81e1452@suse.de>
-Date:   Fri, 24 Jan 2020 08:03:58 +0100
-User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:60.0) Gecko/20100101
- Thunderbird/60.7.2
+        id S1729721AbgAXMoH (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Fri, 24 Jan 2020 07:44:07 -0500
+Received: from mail-ot1-f66.google.com ([209.85.210.66]:38767 "EHLO
+        mail-ot1-f66.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S1729609AbgAXMoH (ORCPT
+        <rfc822;linux-block@vger.kernel.org>);
+        Fri, 24 Jan 2020 07:44:07 -0500
+Received: by mail-ot1-f66.google.com with SMTP id z9so1465707oth.5
+        for <linux-block@vger.kernel.org>; Fri, 24 Jan 2020 04:44:07 -0800 (PST)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=broadcom.com; s=google;
+        h=mime-version:references:in-reply-to:from:date:message-id:subject:to
+         :cc:content-transfer-encoding;
+        bh=EcauhiWAwaqH1U+TqXb6ywn1b4F/ZwJaD8W5VGiPmnQ=;
+        b=IOag6tP3JotisDvbYzJOn5yT9Vong9OLJEJuV5eqD+CgZqaBq409BEMu/5PO1I7Uhn
+         X9k0972Nekwd2vNnv47vU9IetbfHKGEdiHs/WQcRuZxlZOXtvjd0Aost/79hkGB7d6fD
+         DqUoeQwymmLlfgRUO1FDjYdIPEwbX7TJ/0ggg=
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20161025;
+        h=x-gm-message-state:mime-version:references:in-reply-to:from:date
+         :message-id:subject:to:cc:content-transfer-encoding;
+        bh=EcauhiWAwaqH1U+TqXb6ywn1b4F/ZwJaD8W5VGiPmnQ=;
+        b=ewCZgGPesXmD2J6fnxlAaaQJAHtZ4Mnbz7nSmH2z1Ex346lwEZlT2SMSD+V2CAdiKq
+         FCJt2q2u08DmrtkXE2qqM+aDb9sk5ehzJpGzE3rjVoG+Z2kpU6waX94eyoyrQI6ugt53
+         /nKMSoE+V4xAHT/5F6lXjwDD/VugP5YSFQvVPN7dEMwZFNNNvm9HXOfBSE64RO9D5WWk
+         nd73WTyLXgysGmGzcXA8yC0zXnSItxO9WIjlnHQjbB+Cqfa2wM2GeBFr60WMFn3OBVMn
+         dUmsTR9JQ8ZZeguaCiuW/inbO+m0ZvJjYIokH17fG6ReLFg0KpEiXN49qjQalEW929t1
+         wZXw==
+X-Gm-Message-State: APjAAAXx3z80TeWwnNstUxxJCG+ZbC2NOiTcJlgRmY1KXjorfi43gNa6
+        xuxbs2W0nRpRHDF+Qt8aeMNGnIUWQF2mr+dT75rPz7a9Le3txg==
+X-Google-Smtp-Source: APXvYqyzw/mGJc5NEMRtJr6aKe5QMI52QpLsTEPhGQFDPwYJ/ySV0blQLhanABAdiL8KrP2xD9owJ7Ez4MzB/LDe3XE=
+X-Received: by 2002:a9d:23b5:: with SMTP id t50mr2453840otb.122.1579869846907;
+ Fri, 24 Jan 2020 04:44:06 -0800 (PST)
 MIME-Version: 1.0
-In-Reply-To: <CAOi1vP8Q44jLNoq+LTm8GRX687wfwLkJ3WRW_DWvY7nYUtPQxQ@mail.gmail.com>
-Content-Type: text/plain; charset=utf-8
-Content-Language: en-US
-Content-Transfer-Encoding: 8bit
+References: <20200119071432.18558-1-ming.lei@redhat.com> <20200119071432.18558-6-ming.lei@redhat.com>
+ <yq1y2u1if7t.fsf@oracle.com> <20200123025429.GA5191@ming.t460p>
+ <yq1sgk5ejix.fsf@oracle.com> <20200124015957.GA17387@ming.t460p>
+In-Reply-To: <20200124015957.GA17387@ming.t460p>
+From:   Sumit Saxena <sumit.saxena@broadcom.com>
+Date:   Fri, 24 Jan 2020 18:13:40 +0530
+Message-ID: <CAL2rwxrLVeAZmFPGvOOqDrea8Nh3p1Cb5BSd4r4noC_8AzRtHg@mail.gmail.com>
+Subject: Re: [PATCH 5/6] scsi: core: don't limit per-LUN queue depth for SSD
+ when HBA needs
+To:     Ming Lei <ming.lei@redhat.com>
+Cc:     "Martin K. Petersen" <martin.petersen@oracle.com>,
+        James Bottomley <James.Bottomley@hansenpartnership.com>,
+        Linux SCSI List <linux-scsi@vger.kernel.org>,
+        linux-block@vger.kernel.org, Jens Axboe <axboe@kernel.dk>,
+        Sathya Prakash <sathya.prakash@broadcom.com>,
+        Chaitra P B <chaitra.basappa@broadcom.com>,
+        Suganath Prabu Subramani 
+        <suganath-prabu.subramani@broadcom.com>,
+        Kashyap Desai <kashyap.desai@broadcom.com>,
+        Shivasharan S <shivasharan.srikanteshwara@broadcom.com>,
+        "Ewan D . Milne" <emilne@redhat.com>,
+        Christoph Hellwig <hch@lst.de>, Hannes Reinecke <hare@suse.de>,
+        Bart Van Assche <bart.vanassche@wdc.com>
+Content-Type: text/plain; charset="UTF-8"
+Content-Transfer-Encoding: quoted-printable
 Sender: linux-block-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-On 1/23/20 7:45 PM, Ilya Dryomov wrote:
-> On Thu, Jan 23, 2020 at 1:44 PM Hannes Reinecke <hare@suse.de> wrote:
->>
->> The rbd driver already provides additional information in sysfs
->> under /sys/bus/rbd, so we should set the 'device' link in the block
->> device to reference this information.
->>
->> Cc: David Disseldorp <ddiss@suse.com>
->> Signed-off-by: Hannes Reinecke <hare@suse.com>
->> ---
->>  drivers/block/rbd.c | 2 +-
->>  1 file changed, 1 insertion(+), 1 deletion(-)
->>
->> diff --git a/drivers/block/rbd.c b/drivers/block/rbd.c
->> index 9f1f8689e316..3240b7744aeb 100644
->> --- a/drivers/block/rbd.c
->> +++ b/drivers/block/rbd.c
->> @@ -6938,7 +6938,7 @@ static ssize_t do_rbd_add(struct bus_type *bus,
->>         if (rc)
->>                 goto err_out_image_lock;
->>
->> -       add_disk(rbd_dev->disk);
->> +       device_add_disk(&rbd_dev->dev, rbd_dev->disk, NULL);
->>         /* see rbd_init_disk() */
->>         blk_put_queue(rbd_dev->disk->queue);
-> 
-> Hi Hannes,
-> 
-> I looked at this a while ago and didn't go through with the patch
-> because I wasn't sure whether this symlink can point to something
-> arbitrary.  IIRC it usually points a couple of levels up, to some
-> parent.  In the rbd case, this would be a completely different tree:
-> /sys/devices/virtual -> /sys/bus/rbd.
-> 
-Yes, this is expected.
-The 'device' link will _always_ point into a different tree; the
-accessor via /sys/block or /sys/bus are assumed to be virtual entries,
-with the 'device' link pointing to the underlying device.
-In our case the underlying device is also a virtual entity, but that's okay.
+On Fri, Jan 24, 2020 at 7:30 AM Ming Lei <ming.lei@redhat.com> wrote:
+>
+> Hi Martin,
+>
+> On Thu, Jan 23, 2020 at 08:21:42PM -0500, Martin K. Petersen wrote:
+> >
+> > Ming,
+> >
+> > > However, it depends on if the target device returns the congestion to
+> > > host. From my observation, looks there isn't such feedback from NVMe
+> > > target.
+> >
+> > It happens all the time with SCSI devices. It is imperative that this
+> > keeps working.
+> >
+> > > Even if there was such SSD target which provides such congestion
+> > > feedback, bypassing .device_busy won't cause big effect too since
+> > > blk-mq's SCHED_RESTART will retry this IO returning STS_RESOURCE only
+> > > after another in-flight one is completed.
+> >
+> > The reason we back off is that it allows the device to recover by
+> > temporarily reducing its workload. In addition, the lower queue depth
+> > alleviates the risk of commands timing out leading to application I/O
+> > failures.
+>
+> The timeout risk may only happen when driver/device doesn't return
+> congestion feedback, meantime the host queue depth is big enough.
+>
+> So far we don't see such issue on NVMe which hw queue depth is 1023, and
+> the hw queue count is often 32+, and not see such timeout report
+> when there are so many inflight IOs(32 * 1023) on single LUN.
+>
+> Also megaraid sas's queue depth is much less than (32 * 1023), so it
+> seems much unlikely to happen.
+>
+> Megaraid guys, could you clarify if it is one issue? Kashyap, Sumit
+> and Shivasharan?
 
-> Do you know if there is precedent for this in some other driver?
-> Are you sure it's not going to break any assumptions?
-> 
-Things like iscsi do the very same thing.
-And no, it doesn't break assumptions; quite the contrary.
+Hi Ming, Martin,
 
-> How did this came up?  I'm curious because rbd(8) is only utility
-> that I know of that (somewhat) cares.
-> 
-That's me digging through the rbd driver and see if I could hook up
-nvme-over-fabrics as a frontend to ceph/rbd.
-As such I needed to find some information about the rbd device, and
-found that while the driver provides additional information under
-/sys/devices/rbd/X, this information is not linked to /sys/block/rbdX.
-And this patch just links these to bits of information together, so that
-now you can get the driver specific informations by following the
-'device' link like all the other drivers do, too.
+megaraid_sas driver does not enable =E2=80=9C.track_queue_depth=E2=80=9D, s=
+o
+megaraid_sas adapters never used QUEUE FULL interface of Linux SCSI
+layer. Most of the handling of QUEUE FULL is managed by MegaRAID
+controller Firmware and it also manages reducing drive level QD (like
+ramp up/down).
 
-Cheers,
+"mpt3sas" adapters support QUEUE FULL based on IOCCapabilities of
+Firmware.  Default configuration is Firmware will manage QUEUE FULL.
+This is not same as Linux SCSI level handling. It is delayed retry in
+Firmware. It means, we should not expect IO timeout in case of QUEUE
+FULL from device since firmware can handle it as delayed retry. User
+can disable Firmware handling QUEUE FULL condition (through customized
+firmware) and allow QUEUE FULL return back to SCSI layer.  This
+feature is called =E2=80=9CMPI2_IOCFACTS_CAPABILITY_TASK_SET_FULL_HANDLING=
+=E2=80=9D.
+So for mpt3sas driver, we may use QUEUE FULL handling of OS. We can
+opt to enable =E2=80=9Cno_device_queue_for_ssd=E2=80=9D for mpt3sas driver =
+only if FW
+does not expose MPI2_IOCFACTS_CAPABILITY_TASK_SET_FULL_HANDLING.
 
-Hannes
--- 
-Dr. Hannes Reinecke		      Teamlead Storage & Networking
-hare@suse.de			                  +49 911 74053 688
-SUSE Software Solutions Germany GmbH, Maxfeldstr. 5, 90409 Nürnberg
-HRB 36809 (AG Nürnberg), GF: Felix Imendörffer
+Thanks,
+Sumit
+
+>
+> >
+> > > At least, Broadcom guys tests this patch on megaraid raid and the
+> > > results shows that big improvement was got, that is why the flag is
+> > > only set on megaraid host.
+> >
+> > I do not question that it improves performance. That's not my point.
+> >
+> > > In theory, .track_queue_depth may only improve sequential IO's
+> > > performance for HDD., not very effective for SSD. Or just save a bit
+> > > CPU cycles in case of SSD.
+> >
+> > This is not about performance. This is about how the system behaves whe=
+n
+> > a device is starved for resources or experiencing transient failures.
+>
+> Could you explain a bit how this patch changes the system beaviror? I
+> understand the EH just retries the incompleted requests, which total
+> number is just less than host queue depth.
+>
+>
+> Thanks,
+> Ming
+>
