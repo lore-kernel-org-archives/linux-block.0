@@ -2,115 +2,131 @@ Return-Path: <SRS0=eyh1=3N=vger.kernel.org=linux-block-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-2.2 required=3.0 tests=DKIM_SIGNED,DKIM_VALID,
-	HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,
-	USER_AGENT_SANE_1 autolearn=no autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-0.8 required=3.0 tests=DKIMWL_WL_HIGH,DKIM_SIGNED,
+	DKIM_VALID,DKIM_VALID_AU,HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,
+	SPF_HELO_NONE,SPF_PASS,UNPARSEABLE_RELAY autolearn=no autolearn_force=no
+	version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id EE67BC35240
-	for <linux-block@archiver.kernel.org>; Fri, 24 Jan 2020 01:14:25 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id EA65BC35242
+	for <linux-block@archiver.kernel.org>; Fri, 24 Jan 2020 01:22:07 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.kernel.org (Postfix) with ESMTP id B91A12087E
-	for <linux-block@archiver.kernel.org>; Fri, 24 Jan 2020 01:14:25 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id B8E01207FF
+	for <linux-block@archiver.kernel.org>; Fri, 24 Jan 2020 01:22:07 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel-dk.20150623.gappssmtp.com header.i=@kernel-dk.20150623.gappssmtp.com header.b="fzaaW/KZ"
+	dkim=pass (2048-bit key) header.d=oracle.com header.i=@oracle.com header.b="qpgDHEW2"
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1729151AbgAXBOZ (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Thu, 23 Jan 2020 20:14:25 -0500
-Received: from mail-pg1-f195.google.com ([209.85.215.195]:40117 "EHLO
-        mail-pg1-f195.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1730302AbgAXBOY (ORCPT
+        id S1729819AbgAXBWH (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Thu, 23 Jan 2020 20:22:07 -0500
+Received: from userp2130.oracle.com ([156.151.31.86]:41576 "EHLO
+        userp2130.oracle.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S1729151AbgAXBWG (ORCPT
         <rfc822;linux-block@vger.kernel.org>);
-        Thu, 23 Jan 2020 20:14:24 -0500
-Received: by mail-pg1-f195.google.com with SMTP id k25so145627pgt.7
-        for <linux-block@vger.kernel.org>; Thu, 23 Jan 2020 17:14:24 -0800 (PST)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=kernel-dk.20150623.gappssmtp.com; s=20150623;
-        h=subject:to:cc:references:from:message-id:date:user-agent
-         :mime-version:in-reply-to:content-language:content-transfer-encoding;
-        bh=d/C7aUYJTHQhwaao3+gD60wS4QAXQx/hM6I1wIffSJs=;
-        b=fzaaW/KZ9B8G71DauBM19VGPslUtbmlIYJKyYq7ZLBp7hAgRlB8x5Nt5mAK2+ai8xZ
-         ktZ2YPKJ5HoZIJVecr2xPjPLbKnpZ8ZENdvMQjXVDQect5BUXD2amTQp8Z60i5u10MGu
-         Vyvqg6hqC/jgdKlZ2bubRyMekAOoUL7wBvWrwt2FHGxVhXbGa3lc58JgfEUju1u17imP
-         BtZll8y4O7yvc+CtBnQn0IMnKxQKMLTMOhl4XQ7cR/bLcWpclAQiMZ07lHmAFvCeXemH
-         dpdmybADm8KYCBhH/EMneVoXA7fJLK6rmPKuL3Hx+yeb/w3THHLVPKiYNCnOvml21KJT
-         Khmg==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20161025;
-        h=x-gm-message-state:subject:to:cc:references:from:message-id:date
-         :user-agent:mime-version:in-reply-to:content-language
-         :content-transfer-encoding;
-        bh=d/C7aUYJTHQhwaao3+gD60wS4QAXQx/hM6I1wIffSJs=;
-        b=UKLybPPqvEocYpfRFOcoi8/gNkdvBSLZLWxQheUKy1uiPteREbsoS9eRqDXMxgZ63J
-         bgTryTwKbge8FNXDf0x2p4VQZVD/ebu7wwTxCzAEFGcC/798EpMPPwGGrXpsDCY9rCE0
-         OvfZt6awe0MXxK/5UzGClCYxtfhWE7CNG7Zey0M9szVl3wrNzeUWuMvn8FMehwfu9Hi/
-         sPkvh05H4HQuq6cpURG4uKFgpAZvfuNQqAOYXZMBlXORwq6QsM7DslBfapwSZxC3R2Cf
-         1Cq06UaWymY8A836yjK6zq5zJeQV6e+TYhf4tWIMxeI/wxwJvXZOuOksSyn9oVcmQL0E
-         /SKQ==
-X-Gm-Message-State: APjAAAXw++b+Q3qH5mHIOCB8D7l3JyrKJPZK9d1XwN19GybNVZS9FG60
-        7lXiRYwEdPNp3UIc8CGXmfKhwA==
-X-Google-Smtp-Source: APXvYqx720e+PGy1MaQyQL/p07/L46E8myHpIewE7Rg1kzPHTOVVKdsC8DRLM0DeGQr+4z7FsjUojw==
-X-Received: by 2002:aa7:9d87:: with SMTP id f7mr978368pfq.138.1579828463979;
-        Thu, 23 Jan 2020 17:14:23 -0800 (PST)
-Received: from [192.168.201.136] ([50.234.116.4])
-        by smtp.gmail.com with ESMTPSA id q6sm3770589pfh.127.2020.01.23.17.14.22
-        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
-        Thu, 23 Jan 2020 17:14:23 -0800 (PST)
-Subject: Re: [PATCH 14/17] bcache: back to cache all readahead I/Os
-To:     Coly Li <colyli@suse.de>
-Cc:     Michael Lyle <mlyle@lyle.org>,
-        linux-bcache <linux-bcache@vger.kernel.org>,
-        linux-block@vger.kernel.org, stable <stable@vger.kernel.org>
-References: <20200123170142.98974-1-colyli@suse.de>
- <20200123170142.98974-15-colyli@suse.de>
- <CAJ+L6qckUd+Kw8_jKov0dNnSiGxxvXSgc=2dPai+1ANaEdfWPQ@mail.gmail.com>
- <efdfdd2b-b22e-42d1-c642-6c398db6864c@suse.de>
- <31f7f6b4-98ea-3cf6-44cc-a9ba67484eb0@kernel.dk>
- <6373da22-9dc1-9525-4048-2c533407c917@suse.de>
-From:   Jens Axboe <axboe@kernel.dk>
-Message-ID: <6d72473b-db79-d32a-055c-05a34f2d2b12@kernel.dk>
-Date:   Thu, 23 Jan 2020 18:14:22 -0700
-User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:68.0) Gecko/20100101
- Thunderbird/68.4.1
+        Thu, 23 Jan 2020 20:22:06 -0500
+Received: from pps.filterd (userp2130.oracle.com [127.0.0.1])
+        by userp2130.oracle.com (8.16.0.27/8.16.0.27) with SMTP id 00O13lK0067647;
+        Fri, 24 Jan 2020 01:21:53 GMT
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=oracle.com; h=to : cc : subject :
+ from : references : date : in-reply-to : message-id : mime-version :
+ content-type; s=corp-2019-08-05;
+ bh=HSNXIrkKWzqjrkxH38nhSRbK/7lFLmAHJTkSh4hVzYE=;
+ b=qpgDHEW2UigTVKvxBVTCFbVPUrc9p0cqX5Z9c7d/3oQJOURzVv2cZt7RAUfn8jUmXMAC
+ IhwBDobcUgModjU4f5BuRG8zCzTRjyhUmC8gwyHZ7HO8dGCn9SXtw5s2mZTteWB9VHUh
+ 5xPMdITQibqfXN621wNZzSB/kYheHPvpjaq6n0zoCaB4Dw/EDnCRN8/O3rjt2FdSnRwT
+ +FQ8hZDGfUHwUeh2HhhmHSv9Wen6XMjXpBobP0tUBx3VZ1tEV62byIJjkKAr/t48cTbC
+ e8B0pvYoUU4j8hsqOFiMijX8PxE/OwB0+rLJV78XXPBc1GAGY5fqIFjK5FGQIZoqCo0n vQ== 
+Received: from aserp3020.oracle.com (aserp3020.oracle.com [141.146.126.70])
+        by userp2130.oracle.com with ESMTP id 2xkseux6p3-1
+        (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=OK);
+        Fri, 24 Jan 2020 01:21:53 +0000
+Received: from pps.filterd (aserp3020.oracle.com [127.0.0.1])
+        by aserp3020.oracle.com (8.16.0.27/8.16.0.27) with SMTP id 00O12XYb049263;
+        Fri, 24 Jan 2020 01:21:52 GMT
+Received: from userv0122.oracle.com (userv0122.oracle.com [156.151.31.75])
+        by aserp3020.oracle.com with ESMTP id 2xqmwbct90-1
+        (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=OK);
+        Fri, 24 Jan 2020 01:21:52 +0000
+Received: from abhmp0013.oracle.com (abhmp0013.oracle.com [141.146.116.19])
+        by userv0122.oracle.com (8.14.4/8.14.4) with ESMTP id 00O1Lk3v001499;
+        Fri, 24 Jan 2020 01:21:46 GMT
+Received: from ca-mkp.ca.oracle.com (/10.159.214.123)
+        by default (Oracle Beehive Gateway v4.0)
+        with ESMTP ; Thu, 23 Jan 2020 17:21:46 -0800
+To:     Ming Lei <ming.lei@redhat.com>
+Cc:     "Martin K. Petersen" <martin.petersen@oracle.com>,
+        James Bottomley <James.Bottomley@hansenpartnership.com>,
+        linux-scsi@vger.kernel.org, linux-block@vger.kernel.org,
+        Jens Axboe <axboe@kernel.dk>,
+        Sathya Prakash <sathya.prakash@broadcom.com>,
+        Chaitra P B <chaitra.basappa@broadcom.com>,
+        Suganath Prabu Subramani 
+        <suganath-prabu.subramani@broadcom.com>,
+        Kashyap Desai <kashyap.desai@broadcom.com>,
+        Sumit Saxena <sumit.saxena@broadcom.com>,
+        Shivasharan S <shivasharan.srikanteshwara@broadcom.com>,
+        "Ewan D . Milne" <emilne@redhat.com>,
+        Christoph Hellwig <hch@lst.de>, Hannes Reinecke <hare@suse.de>,
+        Bart Van Assche <bart.vanassche@wdc.com>
+Subject: Re: [PATCH 5/6] scsi: core: don't limit per-LUN queue depth for SSD when HBA needs
+From:   "Martin K. Petersen" <martin.petersen@oracle.com>
+Organization: Oracle Corporation
+References: <20200119071432.18558-1-ming.lei@redhat.com>
+        <20200119071432.18558-6-ming.lei@redhat.com>
+        <yq1y2u1if7t.fsf@oracle.com> <20200123025429.GA5191@ming.t460p>
+Date:   Thu, 23 Jan 2020 20:21:42 -0500
+In-Reply-To: <20200123025429.GA5191@ming.t460p> (Ming Lei's message of "Thu,
+        23 Jan 2020 10:54:29 +0800")
+Message-ID: <yq1sgk5ejix.fsf@oracle.com>
+User-Agent: Gnus/5.13 (Gnus v5.13) Emacs/26.1.92 (gnu/linux)
 MIME-Version: 1.0
-In-Reply-To: <6373da22-9dc1-9525-4048-2c533407c917@suse.de>
-Content-Type: text/plain; charset=utf-8
-Content-Language: en-US
-Content-Transfer-Encoding: 8bit
+Content-Type: text/plain
+X-Proofpoint-Virus-Version: vendor=nai engine=6000 definitions=9509 signatures=668685
+X-Proofpoint-Spam-Details: rule=notspam policy=default score=0 suspectscore=0 malwarescore=0
+ phishscore=0 bulkscore=0 spamscore=0 mlxscore=0 mlxlogscore=999
+ adultscore=0 classifier=spam adjust=0 reason=mlx scancount=1
+ engine=8.0.1-1911140001 definitions=main-2001240006
+X-Proofpoint-Virus-Version: vendor=nai engine=6000 definitions=9509 signatures=668685
+X-Proofpoint-Spam-Details: rule=notspam policy=default score=0 priorityscore=1501 malwarescore=0
+ suspectscore=0 phishscore=0 bulkscore=0 spamscore=0 clxscore=1015
+ lowpriorityscore=0 mlxscore=0 impostorscore=0 mlxlogscore=999 adultscore=0
+ classifier=spam adjust=0 reason=mlx scancount=1 engine=8.0.1-1911140001
+ definitions=main-2001240006
 Sender: linux-block-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-On 1/23/20 5:49 PM, Coly Li wrote:
-> On 2020/1/24 2:31 上午, Jens Axboe wrote:
->> On 1/23/20 10:27 AM, Coly Li wrote:
->>> On 2020/1/24 1:19 上午, Michael Lyle wrote:
->>>> Hi Coly and Jens--
->>>>
->>>> One concern I have with this is that it's going to wear out
->>>> limited-lifetime SSDs a -lot- faster.  Was any thought given to making
->>>> this a tunable instead of just changing the behavior?  Even if we have
->>>> an anecdote or two that it seems to have increased performance for
->>>> some workloads, I don't expect it will have increased performance in
->>>> general and it may even be costly for some workloads (it all comes
->>>> down to what is more useful in the cache-- somewhat-recently readahead
->>>> data, or the data that it is displacing).
->>>
->>> Hi Mike,
->>>
->>> Copied. This is good suggestion, I will do it after I back from Lunar
->>> New Year vacation, and submit it with other tested patches in following
->>> v5.6-rc versions.
->>
->> Do you want me to just drop this patch for now from the series?
->>
-> Hi Jens,
-> 
-> OK, please drop this patch from this series. I will re-submit the patch
-> with sysfs interface later with other patches.
 
-Sounds good, I queued up the rest for 5.6.
+Ming,
+
+> However, it depends on if the target device returns the congestion to
+> host. From my observation, looks there isn't such feedback from NVMe
+> target.
+
+It happens all the time with SCSI devices. It is imperative that this
+keeps working.
+
+> Even if there was such SSD target which provides such congestion
+> feedback, bypassing .device_busy won't cause big effect too since
+> blk-mq's SCHED_RESTART will retry this IO returning STS_RESOURCE only
+> after another in-flight one is completed.
+
+The reason we back off is that it allows the device to recover by
+temporarily reducing its workload. In addition, the lower queue depth
+alleviates the risk of commands timing out leading to application I/O
+failures.
+
+> At least, Broadcom guys tests this patch on megaraid raid and the
+> results shows that big improvement was got, that is why the flag is
+> only set on megaraid host.
+
+I do not question that it improves performance. That's not my point.
+
+> In theory, .track_queue_depth may only improve sequential IO's
+> performance for HDD., not very effective for SSD. Or just save a bit
+> CPU cycles in case of SSD.
+
+This is not about performance. This is about how the system behaves when
+a device is starved for resources or experiencing transient failures.
 
 -- 
-Jens Axboe
-
+Martin K. Petersen	Oracle Linux Engineering
