@@ -2,130 +2,124 @@ Return-Path: <SRS0=eyh1=3N=vger.kernel.org=linux-block-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-0.9 required=3.0 tests=DKIMWL_WL_HIGH,DKIM_SIGNED,
-	DKIM_VALID,DKIM_VALID_AU,HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,
-	SPF_HELO_NONE,SPF_PASS autolearn=no autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-9.8 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
+	INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,
+	USER_AGENT_GIT autolearn=unavailable autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 82731C2D0DB
-	for <linux-block@archiver.kernel.org>; Fri, 24 Jan 2020 19:41:26 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 23250C2D0DB
+	for <linux-block@archiver.kernel.org>; Fri, 24 Jan 2020 20:40:11 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.kernel.org (Postfix) with ESMTP id 4AAD32081E
-	for <linux-block@archiver.kernel.org>; Fri, 24 Jan 2020 19:41:26 +0000 (UTC)
-Authentication-Results: mail.kernel.org;
-	dkim=pass (1024-bit key) header.d=broadcom.com header.i=@broadcom.com header.b="YSzUg3W1"
+	by mail.kernel.org (Postfix) with ESMTP id 0069D2075D
+	for <linux-block@archiver.kernel.org>; Fri, 24 Jan 2020 20:40:10 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S2390897AbgAXTlZ (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Fri, 24 Jan 2020 14:41:25 -0500
-Received: from mail-wr1-f68.google.com ([209.85.221.68]:44462 "EHLO
-        mail-wr1-f68.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S2390186AbgAXTlZ (ORCPT
+        id S2387476AbgAXUkK (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Fri, 24 Jan 2020 15:40:10 -0500
+Received: from 6.mo177.mail-out.ovh.net ([46.105.51.249]:45506 "EHLO
+        6.mo177.mail-out.ovh.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S2387464AbgAXUkK (ORCPT
         <rfc822;linux-block@vger.kernel.org>);
-        Fri, 24 Jan 2020 14:41:25 -0500
-Received: by mail-wr1-f68.google.com with SMTP id q10so3390730wrm.11
-        for <linux-block@vger.kernel.org>; Fri, 24 Jan 2020 11:41:24 -0800 (PST)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=broadcom.com; s=google;
-        h=from:references:in-reply-to:mime-version:thread-index:date
-         :message-id:subject:to:cc;
-        bh=KIoPgyD/uHdbw/hRYTLjyyF+abTVqKoC6UW0RlLuccs=;
-        b=YSzUg3W1HrCe+bgYHDU9A0rFSo+FDvP0TNM2cdGv2aU850+fH2rOc0kr+f4tAwTuKK
-         kXOpry1/o1XfYoJsz10jBzghAUIEvWJxoCwxppP+RhN0/YG3QoXP0eFOgNKr0qI5aUGL
-         V+hNCqsvRf5qAriFUeJFu/DXbUMa/BSlhMmOU=
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20161025;
-        h=x-gm-message-state:from:references:in-reply-to:mime-version
-         :thread-index:date:message-id:subject:to:cc;
-        bh=KIoPgyD/uHdbw/hRYTLjyyF+abTVqKoC6UW0RlLuccs=;
-        b=Ao4vduh2pxyVff1o5AtklwTRUwSvOWNGiNYkXmtaKxOPzoFDlb7VaNcp/zrPo3/wEb
-         UgQiRtNPHof17lAZu0le0apDcaqTEcGv+an1u1IE2lxuYCPaPJpv3FQrw7Ra99X5EtfO
-         RCUYg5AXCvRIrx7zSXFdSfxPeG/xdJe7pQxjtb+MlZjNNmdQ7nKLSXKybQIXKAh9A3cV
-         jkuRdwyb3EsFx1PIyDy4DS4k8nyE0AuFGgVdH1lN3MukxsCU41JQbhrnuKUvb96+FhXY
-         /BvHN1VRrOYclqy54KcsJ1aZ5r+C5E5PtN4ZmnugYufbCBohGulPoZIW0D1yRpkMO559
-         3vuQ==
-X-Gm-Message-State: APjAAAWbQsdYstZZA6e9vgCXEYiAfHNCaCrdHm3qBF7sU3zW+LmCmF8n
-        cQ+6bwKPgYBrDpZlK3KmpqFT5eCFy1kLNdDyIvSoPw==
-X-Google-Smtp-Source: APXvYqyhuBrPE/e3gFMMRLeHpcFhRXQfqhqgPcw7PaiCrm6PIHL+eijqzcE8xi4WLy1ltHKdOS5umamvzo+dv6cSptA=
-X-Received: by 2002:adf:f3cc:: with SMTP id g12mr5922428wrp.236.1579894883745;
- Fri, 24 Jan 2020 11:41:23 -0800 (PST)
-From:   Sumanesh Samanta <sumanesh.samanta@broadcom.com>
-References: <20200119071432.18558-1-ming.lei@redhat.com>        <20200119071432.18558-6-ming.lei@redhat.com>
- <yq1y2u1if7t.fsf@oracle.com>   <ab676c4c-03fb-7eb9-6212-129eb83d0ee8@broadcom.com>
- <yq1iml1ehtl.fsf@oracle.com>
-In-Reply-To: <yq1iml1ehtl.fsf@oracle.com>
+        Fri, 24 Jan 2020 15:40:10 -0500
+X-Greylist: delayed 1198 seconds by postgrey-1.27 at vger.kernel.org; Fri, 24 Jan 2020 15:40:09 EST
+Received: from player746.ha.ovh.net (unknown [10.110.103.121])
+        by mo177.mail-out.ovh.net (Postfix) with ESMTP id E3108121118
+        for <linux-block@vger.kernel.org>; Fri, 24 Jan 2020 21:03:44 +0100 (CET)
+Received: from sk2.org (unknown [77.240.182.90])
+        (Authenticated sender: steve@sk2.org)
+        by player746.ha.ovh.net (Postfix) with ESMTPSA id 2A304EB0DCF2;
+        Fri, 24 Jan 2020 20:03:38 +0000 (UTC)
+From:   Stephen Kitt <steve@sk2.org>
+To:     Philipp Reisner <philipp.reisner@linbit.com>,
+        Lars Ellenberg <lars.ellenberg@linbit.com>,
+        Jens Axboe <axboe@kernel.dk>, drbd-dev@lists.linbit.com
+Cc:     linux-block@vger.kernel.org, linux-kernel@vger.kernel.org,
+        Stephen Kitt <steve@sk2.org>
+Subject: [PATCH] drbd fifo_alloc: use struct_size
+Date:   Fri, 24 Jan 2020 21:03:07 +0100
+Message-Id: <20200124200307.1808593-1-steve@sk2.org>
+X-Mailer: git-send-email 2.24.1
 MIME-Version: 1.0
-X-Mailer: Microsoft Outlook 16.0
-Thread-Index: AQMGKWhM81/SGNPryz/MgrKjfT/XowLUtWFaAjRd+LcBvgdOhwHnm/r4pVQPsFA=
-Date:   Fri, 24 Jan 2020 12:41:20 -0700
-Message-ID: <f4f06cf8459c21749335c6b7a4cfe729@mail.gmail.com>
-Subject: RE: [PATCH 5/6] scsi: core: don't limit per-LUN queue depth for SSD
- when HBA needs
-To:     "Martin K. Petersen" <martin.petersen@oracle.com>,
-        linux-scsi@vger.kernel.org
-Cc:     James Bottomley <James.Bottomley@hansenpartnership.com>,
-        Jens Axboe <axboe@kernel.dk>,
-        Sathya Prakash <sathya.prakash@broadcom.com>,
-        Chaitra P B <chaitra.basappa@broadcom.com>,
-        Suganath Prabu Subramani 
-        <suganath-prabu.subramani@broadcom.com>,
-        Kashyap Desai <kashyap.desai@broadcom.com>,
-        Shivasharan S <shivasharan.srikanteshwara@broadcom.com>,
-        "Ewan D . Milne" <emilne@redhat.com>,
-        Christoph Hellwig <hch@lst.de>, Hannes Reinecke <hare@suse.de>,
-        Bart Van Assche <bart.vanassche@wdc.com>,
-        Ming Lei <ming.lei@redhat.com>, linux-block@vger.kernel.org,
-        Sumit Saxena <sumit.saxena@broadcom.com>
-Content-Type: text/plain; charset="UTF-8"
+Content-Transfer-Encoding: 8bit
+X-Ovh-Tracer-Id: 5593470739511987563
+X-VR-SPAMSTATE: OK
+X-VR-SPAMSCORE: -100
+X-VR-SPAMCAUSE: gggruggvucftvghtrhhoucdtuddrgedugedrvdeggddufedtucetufdoteggodetrfdotffvucfrrhhofhhilhgvmecuqfggjfdpvefjgfevmfevgfenuceurghilhhouhhtmecuhedttdenucesvcftvggtihhpihgvnhhtshculddquddttddmnecujfgurhephffvufffkffoggfgsedtkeertdertddtnecuhfhrohhmpefuthgvphhhvghnucfmihhtthcuoehsthgvvhgvsehskhdvrdhorhhgqeenucfkpheptddrtddrtddrtddpjeejrddvgedtrddukedvrdeltdenucevlhhushhtvghrufhiiigvpedtnecurfgrrhgrmhepmhhouggvpehsmhhtphdqohhuthdphhgvlhhopehplhgrhigvrhejgeeirdhhrgdrohhvhhdrnhgvthdpihhnvghtpedtrddtrddtrddtpdhmrghilhhfrhhomhepshhtvghvvgesshhkvddrohhrghdprhgtphhtthhopehlihhnuhigqdgslhhotghksehvghgvrhdrkhgvrhhnvghlrdhorhhg
 Sender: linux-block-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-Hi Martin,
+Switching to struct_size for the allocation in fifo_alloc avoids
+hard-coding the type of fifo_buffer.values in fifo_alloc. It also
+provides overflow protection; to avoid pessimistic code being
+generated by the compiler as a result, this patch also switches
+fifo_size to unsigned, propagating the change as appropriate.
 
->> Please read what I proposed. megaraid VDs don't report QUEUE_FULL so
-you would not trigger the device_busy counter.
+Signed-off-by: Stephen Kitt <steve@sk2.org>
+---
+ drivers/block/drbd/drbd_int.h      | 2 +-
+ drivers/block/drbd/drbd_nl.c       | 3 ++-
+ drivers/block/drbd/drbd_receiver.c | 2 +-
+ drivers/block/drbd/drbd_worker.c   | 4 ++--
+ 4 files changed, 6 insertions(+), 5 deletions(-)
 
-Yes, megaraid does not use set track_queue_depth, and never reports
-QUEUE_FULL . Instead of relying on QUEUE_FULL and some complex heuristics
-of when to start tracking device_busy, why can't we simply use  "
-track_queue_depth" ( along with the other flag that Ming added) to decide
-which devices need queue depth tracking, and track device_busy only for
-them?
-
->>Something like not maintaining device_busy until we actually get a
->>QUEUE_FULL condition. And then rely on the existing queue depth ramp up
->>heuristics to determine when to disable the busy counter again.
-
-I am not sure how we can suddenly start tracking device_busy on the fly,
-if we do not know how many IO are already pending for that device? Won't
-device_busy have a high chance of getting negative ( or at least wrong
-value) when pending IOs start getting completed?
-
-Thanks,
-Sumanesh
-
-
------Original Message-----
-From: Martin K. Petersen <martin.petersen@oracle.com>
-Sent: Thursday, January 23, 2020 6:59 PM
-To: Sumanesh Samanta <sumanesh.samanta@broadcom.com>
-Cc: linux-scsi@vger.kernel.org; Martin K. Petersen
-<martin.petersen@oracle.com>
-Subject: Re: [PATCH 5/6] scsi: core: don't limit per-LUN queue depth for
-SSD when HBA needs
-
-
-Sumanesh,
-
-> The high-end controllers might expose a SCSI interface, but can have
-> all kind of devices (NVMe/SCSI/SATA) behind it, and has its own
-> capability to queue IO and feed to devices as needed. Those devices
-> should not be penalized with the overhead of the device_busy counter,
-> just because they chose to expose themselves has SCSI devices (for
-> historical and backward compatibility reasons).
-
-Please read what I proposed. megaraid VDs don't report QUEUE_FULL so you
-would not trigger the device_busy counter.
-
+diff --git a/drivers/block/drbd/drbd_int.h b/drivers/block/drbd/drbd_int.h
+index ddbf56014c51..aae99a2d7bd4 100644
+--- a/drivers/block/drbd/drbd_int.h
++++ b/drivers/block/drbd/drbd_int.h
+@@ -622,7 +622,7 @@ struct fifo_buffer {
+ 	int total; /* sum of all values */
+ 	int values[0];
+ };
+-extern struct fifo_buffer *fifo_alloc(int fifo_size);
++extern struct fifo_buffer *fifo_alloc(unsigned int fifo_size);
+ 
+ /* flag bits per connection */
+ enum {
+diff --git a/drivers/block/drbd/drbd_nl.c b/drivers/block/drbd/drbd_nl.c
+index de2f94d0103a..da4a3ebe04ef 100644
+--- a/drivers/block/drbd/drbd_nl.c
++++ b/drivers/block/drbd/drbd_nl.c
+@@ -1575,7 +1575,8 @@ int drbd_adm_disk_opts(struct sk_buff *skb, struct genl_info *info)
+ 	struct drbd_device *device;
+ 	struct disk_conf *new_disk_conf, *old_disk_conf;
+ 	struct fifo_buffer *old_plan = NULL, *new_plan = NULL;
+-	int err, fifo_size;
++	int err;
++	unsigned int fifo_size;
+ 
+ 	retcode = drbd_adm_prepare(&adm_ctx, skb, info, DRBD_ADM_NEED_MINOR);
+ 	if (!adm_ctx.reply_skb)
+diff --git a/drivers/block/drbd/drbd_receiver.c b/drivers/block/drbd/drbd_receiver.c
+index 2b3103c30857..79e216446030 100644
+--- a/drivers/block/drbd/drbd_receiver.c
++++ b/drivers/block/drbd/drbd_receiver.c
+@@ -3887,7 +3887,7 @@ static int receive_SyncParam(struct drbd_connection *connection, struct packet_i
+ 	struct disk_conf *old_disk_conf = NULL, *new_disk_conf = NULL;
+ 	const int apv = connection->agreed_pro_version;
+ 	struct fifo_buffer *old_plan = NULL, *new_plan = NULL;
+-	int fifo_size = 0;
++	unsigned int fifo_size = 0;
+ 	int err;
+ 
+ 	peer_device = conn_peer_device(connection, pi->vnr);
+diff --git a/drivers/block/drbd/drbd_worker.c b/drivers/block/drbd/drbd_worker.c
+index 5bdcc70ad589..b7f605c6e231 100644
+--- a/drivers/block/drbd/drbd_worker.c
++++ b/drivers/block/drbd/drbd_worker.c
+@@ -482,11 +482,11 @@ static void fifo_add_val(struct fifo_buffer *fb, int value)
+ 		fb->values[i] += value;
+ }
+ 
+-struct fifo_buffer *fifo_alloc(int fifo_size)
++struct fifo_buffer *fifo_alloc(unsigned int fifo_size)
+ {
+ 	struct fifo_buffer *fb;
+ 
+-	fb = kzalloc(sizeof(struct fifo_buffer) + sizeof(int) * fifo_size, GFP_NOIO);
++	fb = kzalloc(struct_size(fb, values, fifo_size), GFP_NOIO);
+ 	if (!fb)
+ 		return NULL;
+ 
 -- 
-Martin K. Petersen	Oracle Linux Engineering
+2.24.1
+
