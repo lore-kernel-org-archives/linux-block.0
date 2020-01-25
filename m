@@ -1,280 +1,158 @@
-Return-Path: <SRS0=eyh1=3N=vger.kernel.org=linux-block-owner@kernel.org>
+Return-Path: <SRS0=P8sc=3O=vger.kernel.org=linux-block-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
 X-Spam-Status: No, score=-8.4 required=3.0 tests=DKIMWL_WL_HIGH,DKIM_SIGNED,
 	DKIM_VALID,DKIM_VALID_AU,HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,
-	MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,UNPARSEABLE_RELAY,
+	MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED,
 	USER_AGENT_SANE_1 autolearn=unavailable autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 0DD67C2D0CE
-	for <linux-block@archiver.kernel.org>; Fri, 24 Jan 2020 22:10:05 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 38B6DC2D0CE
+	for <linux-block@archiver.kernel.org>; Sat, 25 Jan 2020 02:38:53 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.kernel.org (Postfix) with ESMTP id CA3222077C
-	for <linux-block@archiver.kernel.org>; Fri, 24 Jan 2020 22:10:04 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id F2EB32071A
+	for <linux-block@archiver.kernel.org>; Sat, 25 Jan 2020 02:38:52 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=pass (2048-bit key) header.d=oracle.com header.i=@oracle.com header.b="sTob2ZKH"
+	dkim=pass (2048-bit key) header.d=oracle.com header.i=@oracle.com header.b="mgQNPS21"
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1729014AbgAXWKA (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Fri, 24 Jan 2020 17:10:00 -0500
-Received: from userp2130.oracle.com ([156.151.31.86]:34106 "EHLO
-        userp2130.oracle.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1725821AbgAXWKA (ORCPT
+        id S2387685AbgAYCik (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Fri, 24 Jan 2020 21:38:40 -0500
+Received: from userp2120.oracle.com ([156.151.31.85]:47376 "EHLO
+        userp2120.oracle.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S2387675AbgAYCij (ORCPT
         <rfc822;linux-block@vger.kernel.org>);
-        Fri, 24 Jan 2020 17:10:00 -0500
-Received: from pps.filterd (userp2130.oracle.com [127.0.0.1])
-        by userp2130.oracle.com (8.16.0.27/8.16.0.27) with SMTP id 00OM7vp2073519;
-        Fri, 24 Jan 2020 22:09:34 GMT
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=oracle.com; h=date : from : to : cc
- : subject : message-id : references : mime-version : content-type :
- in-reply-to; s=corp-2019-08-05;
- bh=AQMu01bBZSMrwBnm99PHvoG2dSfTkech6ze+KIzsMkc=;
- b=sTob2ZKHKoUU446q/ibefW10Tizoa3M/FGdfUzzI7qDwluvaCpxIoDPzrBztMLLG1rJd
- rnrjfxxH7c1JH7gSMKrH8XVRHVTQVvyz9ccNFHlHTvfGqN2lDDs0DkIno/fbyp9UeJvR
- 8NFCKpGQXOCWG+LGxqpPdfI1WqB+zZSbs1raQb2HUtLf5/ERFRXV4IC5X+QgCFkx2dwr
- R6yCmzUalUP+4YEyeGlwa3wucp8tAYc5d6HOrVaXmO/+78la0Lvbuvmy93YsN9HM/suY
- G9CdMkJWfJMZ84YfioM4I8UTeLB5JMZfR/U9CnFdialpYnMnm2YMt3ze7waKA4gEFxn4 PQ== 
-Received: from aserp3030.oracle.com (aserp3030.oracle.com [141.146.126.71])
-        by userp2130.oracle.com with ESMTP id 2xksev3ub7-1
+        Fri, 24 Jan 2020 21:38:39 -0500
+Received: from pps.filterd (userp2120.oracle.com [127.0.0.1])
+        by userp2120.oracle.com (8.16.0.27/8.16.0.27) with SMTP id 00P2Y8PA022556;
+        Sat, 25 Jan 2020 02:38:12 GMT
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=oracle.com; h=subject : to :
+ references : from : message-id : date : mime-version : in-reply-to :
+ content-type : content-transfer-encoding; s=corp-2019-08-05;
+ bh=OVf19r+SZgHVKf5GnsEzTB2gGGuOXL2zSODru/PROg0=;
+ b=mgQNPS2116ovCqnMpsButoW6vS4LYIYcoYRt5A/+1r5FxTImu5Crz4ZGHKP7tls6nSaJ
+ WR3Jj+ApzSTn6AfOT9S/yPm67SxGZpqYVORTgffzqBP1Dbuorv08FGog/iJLSfBhXaHU
+ GGY9CM4quGWVMrqxs0sO8mzxMa6rrNK8Kk2T7xg8C2PF2w895/P79gVa0UQ5gbDybdO4
+ +Jhjm0QwZ/E52mGn98jqz+jCi1C36B/PfmJVgyRrdF1bSpN8mbMNVtS0I1RkxV28AFUc
+ lJjrHrSt6hJDrVRuVatC0d+F+cTHm+V/eL3bOwpm/b55NLNnGzs/xoR+K6B8PrFwdxij 2A== 
+Received: from userp3020.oracle.com (userp3020.oracle.com [156.151.31.79])
+        by userp2120.oracle.com with ESMTP id 2xktnrv593-1
         (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=OK);
-        Fri, 24 Jan 2020 22:09:34 +0000
-Received: from pps.filterd (aserp3030.oracle.com [127.0.0.1])
-        by aserp3030.oracle.com (8.16.0.27/8.16.0.27) with SMTP id 00OM8j8J016395;
-        Fri, 24 Jan 2020 22:09:33 GMT
-Received: from aserv0121.oracle.com (aserv0121.oracle.com [141.146.126.235])
-        by aserp3030.oracle.com with ESMTP id 2xqmufxk3b-1
+        Sat, 25 Jan 2020 02:38:12 +0000
+Received: from pps.filterd (userp3020.oracle.com [127.0.0.1])
+        by userp3020.oracle.com (8.16.0.27/8.16.0.27) with SMTP id 00P2YF9A110642;
+        Sat, 25 Jan 2020 02:38:12 GMT
+Received: from userv0121.oracle.com (userv0121.oracle.com [156.151.31.72])
+        by userp3020.oracle.com with ESMTP id 2xrd0rr2bq-1
         (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=OK);
-        Fri, 24 Jan 2020 22:09:33 +0000
-Received: from abhmp0020.oracle.com (abhmp0020.oracle.com [141.146.116.26])
-        by aserv0121.oracle.com (8.14.4/8.13.8) with ESMTP id 00OM9VCb018104;
-        Fri, 24 Jan 2020 22:09:32 GMT
-Received: from localhost (/67.169.218.210)
+        Sat, 25 Jan 2020 02:38:12 +0000
+Received: from abhmp0002.oracle.com (abhmp0002.oracle.com [141.146.116.8])
+        by userv0121.oracle.com (8.14.4/8.13.8) with ESMTP id 00P2c4cC021548;
+        Sat, 25 Jan 2020 02:38:05 GMT
+Received: from [192.168.0.110] (/39.176.206.183)
         by default (Oracle Beehive Gateway v4.0)
-        with ESMTP ; Fri, 24 Jan 2020 14:09:31 -0800
-Date:   Fri, 24 Jan 2020 14:09:29 -0800
-From:   "Darrick J. Wong" <darrick.wong@oracle.com>
-To:     Mike Christie <mchristi@redhat.com>
-Cc:     linux-api@vger.kernel.org, idryomov@gmail.com, mhocko@kernel.org,
-        david@fromorbit.com, linux-mm@kvack.org,
-        linux-kernel@vger.kernel.org, linux-scsi@vger.kernel.org,
-        linux-fsdevel@vger.kernel.org, linux-block@vger.kernel.org,
-        martin@urbackup.org, Damien.LeMoal@wdc.com,
-        Michal Hocko <mhocko@suse.com>,
-        Masato Suzuki <masato.suzuki@wdc.com>
-Subject: Re: [PATCH] Add prctl support for controlling mem reclaim V4
-Message-ID: <20200124220929.GD8236@magnolia>
-References: <20191112001900.9206-1-mchristi@redhat.com>
+        with ESMTP ; Fri, 24 Jan 2020 18:38:04 -0800
+Subject: Re: [PATCH v5 2/6] block: Pass op_flags into
+ blk_queue_get_max_sectors()
+To:     Kirill Tkhai <ktkhai@virtuozzo.com>, linux-block@vger.kernel.org,
+        linux-kernel@vger.kernel.org, martin.petersen@oracle.com,
+        axboe@kernel.dk, agk@redhat.com, snitzer@redhat.com,
+        dm-devel@redhat.com, song@kernel.org, tytso@mit.edu,
+        adilger.kernel@dilger.ca, Chaitanya.Kulkarni@wdc.com,
+        darrick.wong@oracle.com, ming.lei@redhat.com, osandov@fb.com,
+        jthumshirn@suse.de, minwoo.im.dev@gmail.com, damien.lemoal@wdc.com,
+        andrea.parri@amarulasolutions.com, hare@suse.com, tj@kernel.org,
+        ajay.joshi@wdc.com, sagi@grimberg.me, dsterba@suse.com,
+        bvanassche@acm.org, dhowells@redhat.com, asml.silence@gmail.com
+References: <157968992539.174869.7490844754165043549.stgit@localhost.localdomain>
+ <157969068296.174869.13461609442947913096.stgit@localhost.localdomain>
+From:   Bob Liu <bob.liu@oracle.com>
+Message-ID: <8b77117b-1cc0-a379-2cdf-554a8060206c@oracle.com>
+Date:   Sat, 25 Jan 2020 10:37:51 +0800
+User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:60.0) Gecko/20100101
+ Thunderbird/60.5.1
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <20191112001900.9206-1-mchristi@redhat.com>
-User-Agent: Mutt/1.9.4 (2018-02-28)
+In-Reply-To: <157969068296.174869.13461609442947913096.stgit@localhost.localdomain>
+Content-Type: text/plain; charset=utf-8
+Content-Language: en-US
+Content-Transfer-Encoding: 7bit
 X-Proofpoint-Virus-Version: vendor=nai engine=6000 definitions=9510 signatures=668685
-X-Proofpoint-Spam-Details: rule=notspam policy=default score=0 suspectscore=2 malwarescore=0
+X-Proofpoint-Spam-Details: rule=notspam policy=default score=0 suspectscore=0 malwarescore=0
  phishscore=0 bulkscore=0 spamscore=0 mlxscore=0 mlxlogscore=999
  adultscore=0 classifier=spam adjust=0 reason=mlx scancount=1
- engine=8.0.1-1911140001 definitions=main-2001240179
+ engine=8.0.1-1911140001 definitions=main-2001250021
 X-Proofpoint-Virus-Version: vendor=nai engine=6000 definitions=9510 signatures=668685
 X-Proofpoint-Spam-Details: rule=notspam policy=default score=0 priorityscore=1501 malwarescore=0
- suspectscore=2 phishscore=0 bulkscore=0 spamscore=0 clxscore=1011
+ suspectscore=0 phishscore=0 bulkscore=0 spamscore=0 clxscore=1011
  lowpriorityscore=0 mlxscore=0 impostorscore=0 mlxlogscore=999 adultscore=0
  classifier=spam adjust=0 reason=mlx scancount=1 engine=8.0.1-1911140001
- definitions=main-2001240179
+ definitions=main-2001250021
 Sender: linux-block-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-On Mon, Nov 11, 2019 at 06:19:00PM -0600, Mike Christie wrote:
-> There are several storage drivers like dm-multipath, iscsi, tcmu-runner,
-> amd nbd that have userspace components that can run in the IO path. For
-> example, iscsi and nbd's userspace deamons may need to recreate a socket
-> and/or send IO on it, and dm-multipath's daemon multipathd may need to
-> send SG IO or read/write IO to figure out the state of paths and re-set
-> them up.
+On 1/22/20 6:58 PM, Kirill Tkhai wrote:
+> This preparation patch changes argument type, and now
+> the function takes full op_flags instead of just op code.
 > 
-> In the kernel these drivers have access to GFP_NOIO/GFP_NOFS and the
-> memalloc_*_save/restore functions to control the allocation behavior,
-> but for userspace we would end up hitting an allocation that ended up
-> writing data back to the same device we are trying to allocate for.
-> The device is then in a state of deadlock, because to execute IO the
-> device needs to allocate memory, but to allocate memory the memory
-> layers want execute IO to the device.
-> 
-> Here is an example with nbd using a local userspace daemon that performs
-> network IO to a remote server. We are using XFS on top of the nbd device,
-> but it can happen with any FS or other modules layered on top of the nbd
-> device that can write out data to free memory.  Here a nbd daemon helper
-> thread, msgr-worker-1, is performing a write/sendmsg on a socket to execute
-> a request. This kicks off a reclaim operation which results in a WRITE to
-> the nbd device and the nbd thread calling back into the mm layer.
-> 
-
-/me would like to see the documentation update to prctl(2).
-
-Assuming that "set takes 0 or 1, get returns 0 or 1" is more or less how
-this interface is supposed to work,
-
-Reviewed-by: Darrick J. Wong <darrick.wong@oracle.com>
-
---D
-
-> [ 1626.609191] msgr-worker-1   D    0  1026      1 0x00004000
-> [ 1626.609193] Call Trace:
-> [ 1626.609195]  ? __schedule+0x29b/0x630
-> [ 1626.609197]  ? wait_for_completion+0xe0/0x170
-> [ 1626.609198]  schedule+0x30/0xb0
-> [ 1626.609200]  schedule_timeout+0x1f6/0x2f0
-> [ 1626.609202]  ? blk_finish_plug+0x21/0x2e
-> [ 1626.609204]  ? _xfs_buf_ioapply+0x2e6/0x410
-> [ 1626.609206]  ? wait_for_completion+0xe0/0x170
-> [ 1626.609208]  wait_for_completion+0x108/0x170
-> [ 1626.609210]  ? wake_up_q+0x70/0x70
-> [ 1626.609212]  ? __xfs_buf_submit+0x12e/0x250
-> [ 1626.609214]  ? xfs_bwrite+0x25/0x60
-> [ 1626.609215]  xfs_buf_iowait+0x22/0xf0
-> [ 1626.609218]  __xfs_buf_submit+0x12e/0x250
-> [ 1626.609220]  xfs_bwrite+0x25/0x60
-> [ 1626.609222]  xfs_reclaim_inode+0x2e8/0x310
-> [ 1626.609224]  xfs_reclaim_inodes_ag+0x1b6/0x300
-> [ 1626.609227]  xfs_reclaim_inodes_nr+0x31/0x40
-> [ 1626.609228]  super_cache_scan+0x152/0x1a0
-> [ 1626.609231]  do_shrink_slab+0x12c/0x2d0
-> [ 1626.609233]  shrink_slab+0x9c/0x2a0
-> [ 1626.609235]  shrink_node+0xd7/0x470
-> [ 1626.609237]  do_try_to_free_pages+0xbf/0x380
-> [ 1626.609240]  try_to_free_pages+0xd9/0x1f0
-> [ 1626.609245]  __alloc_pages_slowpath+0x3a4/0xd30
-> [ 1626.609251]  ? ___slab_alloc+0x238/0x560
-> [ 1626.609254]  __alloc_pages_nodemask+0x30c/0x350
-> [ 1626.609259]  skb_page_frag_refill+0x97/0xd0
-> [ 1626.609274]  sk_page_frag_refill+0x1d/0x80
-> [ 1626.609279]  tcp_sendmsg_locked+0x2bb/0xdd0
-> [ 1626.609304]  tcp_sendmsg+0x27/0x40
-> [ 1626.609307]  sock_sendmsg+0x54/0x60
-> [ 1626.609308]  ___sys_sendmsg+0x29f/0x320
-> [ 1626.609313]  ? sock_poll+0x66/0xb0
-> [ 1626.609318]  ? ep_item_poll.isra.15+0x40/0xc0
-> [ 1626.609320]  ? ep_send_events_proc+0xe6/0x230
-> [ 1626.609322]  ? hrtimer_try_to_cancel+0x54/0xf0
-> [ 1626.609324]  ? ep_read_events_proc+0xc0/0xc0
-> [ 1626.609326]  ? _raw_write_unlock_irq+0xa/0x20
-> [ 1626.609327]  ? ep_scan_ready_list.constprop.19+0x218/0x230
-> [ 1626.609329]  ? __hrtimer_init+0xb0/0xb0
-> [ 1626.609331]  ? _raw_spin_unlock_irq+0xa/0x20
-> [ 1626.609334]  ? ep_poll+0x26c/0x4a0
-> [ 1626.609337]  ? tcp_tsq_write.part.54+0xa0/0xa0
-> [ 1626.609339]  ? release_sock+0x43/0x90
-> [ 1626.609341]  ? _raw_spin_unlock_bh+0xa/0x20
-> [ 1626.609342]  __sys_sendmsg+0x47/0x80
-> [ 1626.609347]  do_syscall_64+0x5f/0x1c0
-> [ 1626.609349]  ? prepare_exit_to_usermode+0x75/0xa0
-> [ 1626.609351]  entry_SYSCALL_64_after_hwframe+0x44/0xa9
-> 
-> This patch adds a new prctl command that daemons can use after they have
-> done their initial setup, and before they start to do allocations that
-> are in the IO path. It sets the PF_MEMALLOC_NOIO and PF_LESS_THROTTLE
-> flags so both userspace block and FS threads can use it to avoid the
-> allocation recursion and try to prevent from being throttled while
-> writing out data to free up memory.
-> 
-> Signed-off-by: Mike Christie <mchristi@redhat.com>
-> Acked-by: Michal Hocko <mhocko@suse.com>
-> Tested-by: Masato Suzuki <masato.suzuki@wdc.com>
-> Reviewed-by: Damien Le Moal <damien.lemoal@wdc.com>
-> 
+> Signed-off-by: Kirill Tkhai <ktkhai@virtuozzo.com>
 > ---
+>  block/blk-core.c       |    4 ++--
+>  include/linux/blkdev.h |    8 +++++---
+>  2 files changed, 7 insertions(+), 5 deletions(-)
 > 
-> V4:
-> - Fix PR_GET_IO_FLUSHER check to match SET.
-> 
-> V3:
-> - Drop NOFS, set PF_LESS_THROTTLE and rename prctl flag to reflect it
-> is more general and can support both FS and block devices. Both fuse
-> and block device daemons, nbd and tcmu-runner, have been tested to
-> confirm the more restrictive PF_MEMALLOC_NOIO also works for fuse.
-> 
-> - Use CAP_SYS_RESOURCE instead of admin.
-> 
-> V2:
-> - Use prctl instead of procfs.
-> - Add support for NOFS for fuse.
-> - Check permissions.
-> 
-> 
->  include/uapi/linux/capability.h |  1 +
->  include/uapi/linux/prctl.h      |  4 ++++
->  kernel/sys.c                    | 25 +++++++++++++++++++++++++
->  3 files changed, 30 insertions(+)
-> 
-> diff --git a/include/uapi/linux/capability.h b/include/uapi/linux/capability.h
-> index 240fdb9a60f6..272dc69fa080 100644
-> --- a/include/uapi/linux/capability.h
-> +++ b/include/uapi/linux/capability.h
-> @@ -301,6 +301,7 @@ struct vfs_ns_cap_data {
->  /* Allow more than 64hz interrupts from the real-time clock */
->  /* Override max number of consoles on console allocation */
->  /* Override max number of keymaps */
-> +/* Control memory reclaim behavior */
+> diff --git a/block/blk-core.c b/block/blk-core.c
+> index 50a5de025d5e..ac2634bcda1f 100644
+> --- a/block/blk-core.c
+> +++ b/block/blk-core.c
+> @@ -1250,10 +1250,10 @@ EXPORT_SYMBOL(submit_bio);
+>  static int blk_cloned_rq_check_limits(struct request_queue *q,
+>  				      struct request *rq)
+>  {
+> -	if (blk_rq_sectors(rq) > blk_queue_get_max_sectors(q, req_op(rq))) {
+> +	if (blk_rq_sectors(rq) > blk_queue_get_max_sectors(q, rq->cmd_flags)) {
+>  		printk(KERN_ERR "%s: over max size limit. (%u > %u)\n",
+>  			__func__, blk_rq_sectors(rq),
+> -			blk_queue_get_max_sectors(q, req_op(rq)));
+> +			blk_queue_get_max_sectors(q, rq->cmd_flags));
+>  		return -EIO;
+>  	}
 >  
->  #define CAP_SYS_RESOURCE     24
->  
-> diff --git a/include/uapi/linux/prctl.h b/include/uapi/linux/prctl.h
-> index 7da1b37b27aa..07b4f8131e36 100644
-> --- a/include/uapi/linux/prctl.h
-> +++ b/include/uapi/linux/prctl.h
-> @@ -234,4 +234,8 @@ struct prctl_mm_map {
->  #define PR_GET_TAGGED_ADDR_CTRL		56
->  # define PR_TAGGED_ADDR_ENABLE		(1UL << 0)
->  
-> +/* Control reclaim behavior when allocating memory */
-> +#define PR_SET_IO_FLUSHER		57
-> +#define PR_GET_IO_FLUSHER		58
-> +
->  #endif /* _LINUX_PRCTL_H */
-> diff --git a/kernel/sys.c b/kernel/sys.c
-> index a611d1d58c7d..c1a360370d09 100644
-> --- a/kernel/sys.c
-> +++ b/kernel/sys.c
-> @@ -2259,6 +2259,8 @@ int __weak arch_prctl_spec_ctrl_set(struct task_struct *t, unsigned long which,
->  	return -EINVAL;
+> diff --git a/include/linux/blkdev.h b/include/linux/blkdev.h
+> index 0f1127d0b043..23a5850f35f6 100644
+> --- a/include/linux/blkdev.h
+> +++ b/include/linux/blkdev.h
+> @@ -989,8 +989,10 @@ static inline struct bio_vec req_bvec(struct request *rq)
 >  }
 >  
-> +#define PR_IO_FLUSHER (PF_MEMALLOC_NOIO | PF_LESS_THROTTLE)
-> +
->  SYSCALL_DEFINE5(prctl, int, option, unsigned long, arg2, unsigned long, arg3,
->  		unsigned long, arg4, unsigned long, arg5)
+>  static inline unsigned int blk_queue_get_max_sectors(struct request_queue *q,
+> -						     int op)
+> +						     unsigned int op_flags)
 >  {
-> @@ -2486,6 +2488,29 @@ SYSCALL_DEFINE5(prctl, int, option, unsigned long, arg2, unsigned long, arg3,
->  			return -EINVAL;
->  		error = GET_TAGGED_ADDR_CTRL();
->  		break;
-> +	case PR_SET_IO_FLUSHER:
-> +		if (!capable(CAP_SYS_RESOURCE))
-> +			return -EPERM;
+> +	int op = op_flags & REQ_OP_MASK;
 > +
-> +		if (arg3 || arg4 || arg5)
-> +			return -EINVAL;
-> +
-> +		if (arg2 == 1)
-> +			current->flags |= PR_IO_FLUSHER;
-> +		else if (!arg2)
-> +			current->flags &= ~PR_IO_FLUSHER;
-> +		else
-> +			return -EINVAL;
-> +		break;
-> +	case PR_GET_IO_FLUSHER:
-> +		if (!capable(CAP_SYS_RESOURCE))
-> +			return -EPERM;
-> +
-> +		if (arg2 || arg3 || arg4 || arg5)
-> +			return -EINVAL;
-> +
-> +		error = (current->flags & PR_IO_FLUSHER) == PR_IO_FLUSHER;
-> +		break;
->  	default:
->  		error = -EINVAL;
->  		break;
-> -- 
-> 2.20.1
+
+Nitpick. int op = req_op(rq);
+
+Anyway, looks good to me.
+Reviewed-by: Bob Liu <bob.liu@oracle.com>
+
+>  	if (unlikely(op == REQ_OP_DISCARD || op == REQ_OP_SECURE_ERASE))
+>  		return min(q->limits.max_discard_sectors,
+>  			   UINT_MAX >> SECTOR_SHIFT);
+> @@ -1029,10 +1031,10 @@ static inline unsigned int blk_rq_get_max_sectors(struct request *rq,
+>  	if (!q->limits.chunk_sectors ||
+>  	    req_op(rq) == REQ_OP_DISCARD ||
+>  	    req_op(rq) == REQ_OP_SECURE_ERASE)
+> -		return blk_queue_get_max_sectors(q, req_op(rq));
+> +		return blk_queue_get_max_sectors(q, rq->cmd_flags);
+>  
+>  	return min(blk_max_size_offset(q, offset),
+> -			blk_queue_get_max_sectors(q, req_op(rq)));
+> +			blk_queue_get_max_sectors(q, rq->cmd_flags));
+>  }
+>  
+>  static inline unsigned int blk_rq_count_bios(struct request *rq)
 > 
+> 
+
