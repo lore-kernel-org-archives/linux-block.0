@@ -2,75 +2,68 @@ Return-Path: <SRS0=p+1D=3P=vger.kernel.org=linux-block-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-5.3 required=3.0 tests=DKIM_SIGNED,DKIM_VALID,
-	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,SPF_HELO_NONE,
-	SPF_PASS,USER_AGENT_SANE_1 autolearn=ham autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-7.3 required=3.0 tests=DKIM_SIGNED,DKIM_VALID,
+	HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,MENTIONS_GIT_HOSTING,
+	SPF_HELO_NONE,SPF_PASS,USER_AGENT_SANE_1 autolearn=ham autolearn_force=no
+	version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 63EB9C35247
-	for <linux-block@archiver.kernel.org>; Sun, 26 Jan 2020 17:17:04 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id EE656C2D0DB
+	for <linux-block@archiver.kernel.org>; Sun, 26 Jan 2020 17:32:07 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.kernel.org (Postfix) with ESMTP id 341C720702
-	for <linux-block@archiver.kernel.org>; Sun, 26 Jan 2020 17:17:04 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id B86C220708
+	for <linux-block@archiver.kernel.org>; Sun, 26 Jan 2020 17:32:07 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel-dk.20150623.gappssmtp.com header.i=@kernel-dk.20150623.gappssmtp.com header.b="FVvWfp/t"
+	dkim=pass (2048-bit key) header.d=kernel-dk.20150623.gappssmtp.com header.i=@kernel-dk.20150623.gappssmtp.com header.b="sk8ePj6p"
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1726571AbgAZRRD (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Sun, 26 Jan 2020 12:17:03 -0500
-Received: from mail-pl1-f193.google.com ([209.85.214.193]:35383 "EHLO
-        mail-pl1-f193.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1726339AbgAZRRD (ORCPT
+        id S1726179AbgAZRcH (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Sun, 26 Jan 2020 12:32:07 -0500
+Received: from mail-pg1-f195.google.com ([209.85.215.195]:44207 "EHLO
+        mail-pg1-f195.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S1726087AbgAZRcG (ORCPT
         <rfc822;linux-block@vger.kernel.org>);
-        Sun, 26 Jan 2020 12:17:03 -0500
-Received: by mail-pl1-f193.google.com with SMTP id g6so2899192plt.2
-        for <linux-block@vger.kernel.org>; Sun, 26 Jan 2020 09:17:03 -0800 (PST)
+        Sun, 26 Jan 2020 12:32:06 -0500
+Received: by mail-pg1-f195.google.com with SMTP id x7so3954847pgl.11
+        for <linux-block@vger.kernel.org>; Sun, 26 Jan 2020 09:32:06 -0800 (PST)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=kernel-dk.20150623.gappssmtp.com; s=20150623;
-        h=subject:from:to:cc:references:message-id:date:user-agent
-         :mime-version:in-reply-to:content-language:content-transfer-encoding;
-        bh=sNV793+0cycsAhcHF8cv23AfCjhutUJI8XZukCzTbCU=;
-        b=FVvWfp/tztsdAQcRG5Rci1crrbXT9URtlcwg6BhUmCDHI+CavYwe6NHJ9YM+MznIfl
-         /XIh0QRjO+cbnuSns6vKfAVEDox0PQfiv39oXoObL2MfiPpTM6CPOuRCOsFRC9UEVRvq
-         trJi7lec3gmRIEB+p61X6QvoI0T+C5A/nkBh0lIOBt6eZl7NCshifRrgA2eNKwPJP14e
-         ulyZcaUJWVhhdlnGN/znFtqvF8FPsTOxbb8I14rOP94PexGv6Lvf6GSoiAHGCCLcFipc
-         Ak2UeHO2QQUYuJL3yQqiymuQFb+4oobskgEvI8Il7b8or2XmJrFAwnWN0bLwAKaiqWfg
-         31Xw==
+        h=to:cc:from:subject:message-id:date:user-agent:mime-version
+         :content-language:content-transfer-encoding;
+        bh=0HZDBDvDYqsKTzDP1l3UbI6xKbEIO2AvsS9tOgpJ3Gs=;
+        b=sk8ePj6plKOvIdoRkxZ+lqi3upAoRTIGJfCXPb+8bvPolxLnhV4ihxSFCbWAZMjkXj
+         V/2An44ZFqxReGWiikRFgeXKXGcQbL3pNOn/XFwx4cVPJTlKPIWsHtK/hroSFC58vhpS
+         LV7n5XmsG6Xx9ec2HnRpag7WcfrSpr/Zj2vF8a0qT/d4DlY7JUKEvqlA2rU2iFQMj7el
+         Gg9RWFtXafglcn4UNKr3P8j9yfu6hDfK9FGJ/0ptfSsvCQY9BU1HYw2G5xAxouIYNR5b
+         LG7wzYrSy311tLdF4NzMN85LZCuLIqdKyzfdG7/b6EzdP01DvrgWdvumJnM6vJLn5UcI
+         y2WA==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=1e100.net; s=20161025;
-        h=x-gm-message-state:subject:from:to:cc:references:message-id:date
-         :user-agent:mime-version:in-reply-to:content-language
-         :content-transfer-encoding;
-        bh=sNV793+0cycsAhcHF8cv23AfCjhutUJI8XZukCzTbCU=;
-        b=W4YKMrcHoyW0jvioPGct4lutv0eipOdId08WWGQSoGzCGxIwHB77RlqmNmu448XlzM
-         T7lBYzqoMv1L+ycBpZIamwQjHLj6clXm3mNyhfA2cTXbPKMdUj4xP8cM9FxYeTdOpb9e
-         O6MehnwBzwoygQ2AC/PFkzIF8ElNgOrBApaAea9RCoXQPjLhz2nyRD3+vGVDQ2Tpkva7
-         TtwBVi1Wj6lodzwG5Da2oaN1pXRE+dd+g/BXYjfUHGe2753KwI/4/CAKQFBUBUJuFjT/
-         qj5Xxj810WLHzjdV+OUFdn5jqq9ZZ+O3yChvLgr2EWtUZr5iYW/XIqwOB95TXaYrvsOm
-         QVFA==
-X-Gm-Message-State: APjAAAVF9HDjDPo4RJBc/te41u7YS/nVDg0fETN0ruIKhs0k361aUrkl
-        zYJq8rIYUPtwqsEMt7P91ITEpg==
-X-Google-Smtp-Source: APXvYqy9zSy9tuxtT+VumjEcIX7MmU599ZVrh6QD7SfB4UlILYyVD2HalIFSX4f3cwZ8f+FBpkvF9A==
-X-Received: by 2002:a17:90a:a10c:: with SMTP id s12mr10139586pjp.47.1580059022601;
-        Sun, 26 Jan 2020 09:17:02 -0800 (PST)
+        h=x-gm-message-state:to:cc:from:subject:message-id:date:user-agent
+         :mime-version:content-language:content-transfer-encoding;
+        bh=0HZDBDvDYqsKTzDP1l3UbI6xKbEIO2AvsS9tOgpJ3Gs=;
+        b=FJl2uCmfef6K4k1ptLSxBZ7vc+5sNTdOn/POJo4X+jBrqrWCW/JYbCo9Nt4dNffQEA
+         FFooTYHA7pe1cmiFLnCJGiXbsBIrK7jaL0l74I5nVqt7xCDVdDs8rvFRYtkLZn8i+T/R
+         YpdB4Xsoe4l1Nbm34ibvitQaaaDZYjm9rLcsXSqxf+awGri/7pCXKeKQcniSIiGJAzg7
+         TGBCj6UDBFeqbybGoVkvLHWv5h4tfuHvSnsjrou+W3YKsZB0OlQ7L/hZ5Gak0d3rzSc0
+         1wqflBlkBErCmA4OtR8qPj6+iKfnqF+jy5n1T6WMycV9V751AzUtAuIZofZ6gZUnXkaC
+         2cUA==
+X-Gm-Message-State: APjAAAW14QQ2tW8+3gSdL3pz8o139P0eApAhatHRn4C9GyZSxndsOR6V
+        /GNlUNAkH2qUEfI3CQK0Bl+CeTlB1Zk=
+X-Google-Smtp-Source: APXvYqwciDe24Qs0nFx0zJFZU3M8vu5HREIaqV5PCxkLXheuGxRvY7pQQ3KgN6XeXNYfdBqI+xbE5A==
+X-Received: by 2002:a63:4b52:: with SMTP id k18mr15072078pgl.371.1580059926030;
+        Sun, 26 Jan 2020 09:32:06 -0800 (PST)
 Received: from [192.168.1.188] ([66.219.217.145])
-        by smtp.gmail.com with ESMTPSA id m22sm13634498pgn.8.2020.01.26.09.17.01
+        by smtp.gmail.com with ESMTPSA id d194sm13157134pfd.159.2020.01.26.09.32.05
         (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
-        Sun, 26 Jan 2020 09:17:02 -0800 (PST)
-Subject: Re: [PATCH 2/4] io_uring: io_uring: add support for async work
- inheriting files
+        Sun, 26 Jan 2020 09:32:05 -0800 (PST)
+To:     Linus Torvalds <torvalds@linux-foundation.org>
+Cc:     "linux-block@vger.kernel.org" <linux-block@vger.kernel.org>
 From:   Jens Axboe <axboe@kernel.dk>
-To:     Andres Freund <andres@anarazel.de>
-Cc:     linux-block@vger.kernel.org, io-uring <io-uring@vger.kernel.org>,
-        davem@davemloft.net, netdev@vger.kernel.org, jannh@google.com
-References: <20191025173037.13486-1-axboe@kernel.dk>
- <20191025173037.13486-3-axboe@kernel.dk>
- <20200126101207.oqovstqfr4iddc3p@alap3.anarazel.de>
- <1f9a5869-845a-f7ca-7530-49e407602023@kernel.dk>
-Message-ID: <e9e79b75-9e0f-1a36-5618-e8d27e995cc1@kernel.dk>
-Date:   Sun, 26 Jan 2020 10:17:00 -0700
+Subject: [GIT PULL] Block fix for 5.5-final
+Message-ID: <4deb18d9-34fd-c780-dbb4-f544d30ac807@kernel.dk>
+Date:   Sun, 26 Jan 2020 10:32:04 -0700
 User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:68.0) Gecko/20100101
  Thunderbird/68.4.1
 MIME-Version: 1.0
-In-Reply-To: <1f9a5869-845a-f7ca-7530-49e407602023@kernel.dk>
 Content-Type: text/plain; charset=utf-8
 Content-Language: en-US
 Content-Transfer-Encoding: 7bit
@@ -79,75 +72,28 @@ Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-On 1/26/20 10:10 AM, Jens Axboe wrote:
-> On 1/26/20 3:12 AM, Andres Freund wrote:
->> Hi,
->>
->> On 2019-10-25 11:30:35 -0600, Jens Axboe wrote:
->>> This is in preparation for adding opcodes that need to add new files
->>> in a process file table, system calls like open(2) or accept4(2).
->>>
->>> If an opcode needs this, it must set IO_WQ_WORK_NEEDS_FILES in the work
->>> item. If work that needs to get punted to async context have this
->>> set, the async worker will assume the original task file table before
->>> executing the work.
->>>
->>> Note that opcodes that need access to the current files of an
->>> application cannot be done through IORING_SETUP_SQPOLL.
->>
->>
->> Unfortunately this partially breaks sharing a uring across with forked
->> off processes, even though it initially appears to work:
->>
->>
->>> +static int io_uring_flush(struct file *file, void *data)
->>> +{
->>> +	struct io_ring_ctx *ctx = file->private_data;
->>> +
->>> +	io_uring_cancel_files(ctx, data);
->>> +	if (fatal_signal_pending(current) || (current->flags & PF_EXITING))
->>> +		io_wq_cancel_all(ctx->io_wq);
->>> +	return 0;
->>> +}
->>
->> Once one process having the uring fd open (even if it were just a fork
->> never touching the uring, I believe) exits, this prevents the uring from
->> being usable for any async tasks. The process exiting closes the fd,
->> which triggers flush. io_wq_cancel_all() sets IO_WQ_BIT_CANCEL, which
->> never gets unset, which causes all future async sqes to be be
->> immediately returned as -ECANCELLED by the worker, via io_req_cancelled.
->>
->> It's not clear to me why a close() should cancel the the wq (nor clear
->> the entire backlog, after 1d7bb1d50fb4)? Couldn't that even just be a
->> dup()ed fd? Or a fork that immediately exec()s?
->>
->> After rudely ifdefing out the above if, and reverting 44d282796f81, my
->> WIP io_uring using version of postgres appears to pass its tests - which
->> are very sparse at this point - again with 5.5-rc7.
-> 
-> We need to cancel work items using the files from this process if it
-> exits, but I think we should be fine not canceling all work. Especially
-> since thet setting of IO_WQ_BIT_CANCEL is a one way street...  I'm assuming
-> the below works for you?
+Hi Linus,
 
-Could be even simpler, for shared ring setup, it also doesn't make any sense
-to flush the cq ring on exit.
+Unfortunately this weekend we had a few last minute reports, one was for
+block (the other io_uring, pull request coming later there). The
+partition disable for zoned devices was overly restrictive, it can work
+(and be supported) just fine for host-aware variants. Here's a fix
+ensuring that's the case so we don't break existing users of that.
 
-diff --git a/fs/io_uring.c b/fs/io_uring.c
-index e5b502091804..e54556b0fcc6 100644
---- a/fs/io_uring.c
-+++ b/fs/io_uring.c
-@@ -5044,10 +5044,6 @@ static int io_uring_flush(struct file *file, void *data)
- 	struct io_ring_ctx *ctx = file->private_data;
- 
- 	io_uring_cancel_files(ctx, data);
--	if (fatal_signal_pending(current) || (current->flags & PF_EXITING)) {
--		io_cqring_overflow_flush(ctx, true);
--		io_wq_cancel_all(ctx->io_wq);
--	}
- 	return 0;
- }
- 
+Please pull!
+
+
+  git://git.kernel.dk/linux-block.git tags/block-5.5-2020-01-26
+
+
+----------------------------------------------------------------
+Christoph Hellwig (1):
+      block: allow partitions on host aware zone devices
+
+ block/partition-generic.c | 26 ++++++++++++++++++++++----
+ drivers/scsi/sd.c         |  9 +++++----
+ include/linux/genhd.h     | 12 ++++++++++++
+ 3 files changed, 39 insertions(+), 8 deletions(-)
 
 -- 
 Jens Axboe
