@@ -7,66 +7,66 @@ X-Spam-Status: No, score=-7.2 required=3.0 tests=DKIM_SIGNED,DKIM_VALID,
 	SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED,USER_AGENT_SANE_1 autolearn=ham
 	autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id CDA4AC2D0DB
-	for <linux-block@archiver.kernel.org>; Mon, 27 Jan 2020 19:35:11 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 122ACC2D0DB
+	for <linux-block@archiver.kernel.org>; Mon, 27 Jan 2020 19:38:17 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.kernel.org (Postfix) with ESMTP id 9D04E24681
-	for <linux-block@archiver.kernel.org>; Mon, 27 Jan 2020 19:35:11 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id D70D124679
+	for <linux-block@archiver.kernel.org>; Mon, 27 Jan 2020 19:38:16 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel-dk.20150623.gappssmtp.com header.i=@kernel-dk.20150623.gappssmtp.com header.b="KzOXaDIo"
+	dkim=pass (2048-bit key) header.d=kernel-dk.20150623.gappssmtp.com header.i=@kernel-dk.20150623.gappssmtp.com header.b="WTTyEJcN"
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1726004AbgA0TfL (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Mon, 27 Jan 2020 14:35:11 -0500
-Received: from mail-pf1-f195.google.com ([209.85.210.195]:41189 "EHLO
-        mail-pf1-f195.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1725845AbgA0TfL (ORCPT
+        id S1725990AbgA0TiQ (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Mon, 27 Jan 2020 14:38:16 -0500
+Received: from mail-pf1-f193.google.com ([209.85.210.193]:38044 "EHLO
+        mail-pf1-f193.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S1725975AbgA0TiQ (ORCPT
         <rfc822;linux-block@vger.kernel.org>);
-        Mon, 27 Jan 2020 14:35:11 -0500
-Received: by mail-pf1-f195.google.com with SMTP id w62so5363347pfw.8
-        for <linux-block@vger.kernel.org>; Mon, 27 Jan 2020 11:35:10 -0800 (PST)
+        Mon, 27 Jan 2020 14:38:16 -0500
+Received: by mail-pf1-f193.google.com with SMTP id x185so5375467pfc.5
+        for <linux-block@vger.kernel.org>; Mon, 27 Jan 2020 11:38:15 -0800 (PST)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=kernel-dk.20150623.gappssmtp.com; s=20150623;
         h=to:cc:from:subject:message-id:date:user-agent:mime-version
          :content-language:content-transfer-encoding;
-        bh=2yn86+GKDEiTDAG+Fx4VdeLqpfzep1e8GJZc8Z8KOAk=;
-        b=KzOXaDIoTJ1uVwYlE+JP60v5axRy6CVhrz6DPTKxtNnoPcPIy//RTXn6laY6yVbcpF
-         905XI+e1CIenyVzB/UHjj+OsZM4OKW5pyqJWTurGVpSKPKee6pO8gMFZYKf/BNo0PkXs
-         d26GGQQWucXbB+1Bx3KkoES1LVGd8GvcsXdNHYSO9832WnWKQpUsqz/KbB402Ti/fhOH
-         VNwbsIyTLMZTrUBhaljriFnjAYB/XSqZ2m96TPCu+7EzBAqvyauF+dfLXblLltOmW5LO
-         NgTVvMcKYayVCCmhBdnnp7HUoJ5ScaGPwfL8qpzFTfBKU8PsvoQdrdWyauyZIm5v7SLC
-         kYAA==
+        bh=IviKpoSVXk3V+icqZuLHtitdbGwv55zNNuWiiDfwmg8=;
+        b=WTTyEJcNLyE5qrdwgIr9zr2uHDb4MvkBqUvOy8WbYFs8J3a6ae11e92HirRKHxj2yz
+         Uo2FpNbuvxNK43xTBZe+OeUY0W8b9S/KOFwz9viZfcbY8kp2Bt9ZXmhvrwjQvbthhWsY
+         fAcef+OgOgeDL3njNpbkisTJnhn17ocCv+BweyHnCfwiOomzWhUfpww6BQ8+v811BrvG
+         eav8BkbYXWNYv7zLkJNPhg1dqHGjTinKLUj4zfmDXoYe0LCzQ+VjmUx7qE3YO7NrT/5M
+         G/7q757HlBGKyFkIIaPADMKFIz/OgVlWih0Gop6tIU8dYK3RblRr+kZz3FXSv/HtNZYy
+         j/YQ==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=1e100.net; s=20161025;
         h=x-gm-message-state:to:cc:from:subject:message-id:date:user-agent
          :mime-version:content-language:content-transfer-encoding;
-        bh=2yn86+GKDEiTDAG+Fx4VdeLqpfzep1e8GJZc8Z8KOAk=;
-        b=ra5EhpEmoJ3y4gqWRSewILJ3xaVKRYP7IAO0w1OvznpA1pKnKjKE+DByE5Ek3/f3SN
-         p2agDC8CTmTZAUgUrInwoIs6QEYoiPdCfjmwLPQKYApPlsY0HtdEDZlMxy38LwqjFQ/w
-         hAFto0gIFVK9NeU+yhOc9DR4J5TNGPwF9NvEwvged2vkJZiqEdV5sPYO53Tu8GsHwihv
-         huK5T4xxZmRiJBE8W8H9b/ywIKQL8Ns1nrrdCb5W4rCYpSp14b7qkxTHopyX4nPOlnaf
-         MYuiMZ/RYUR7I8IX05RUHs4FRtIOAEsM+cN7ctBwkboiU22pHp0mrj5iy44XHItzXZpe
-         63NQ==
-X-Gm-Message-State: APjAAAXcDpTpq0WAj+c2cP9WHknpFXOAlVSgFb2i2UER23CVUO6GSsfd
-        cvK91sRTH7z1Oc/brLscpAKzRZ+uRQs=
-X-Google-Smtp-Source: APXvYqwhvQGj+pjlXrsw0Yzc0NyWVe1xyNqy8KbeY3V30Di+odY7Omp5IBMlQOb5UySPSApeLibnPw==
-X-Received: by 2002:a65:6447:: with SMTP id s7mr21933085pgv.325.1580153709834;
-        Mon, 27 Jan 2020 11:35:09 -0800 (PST)
+        bh=IviKpoSVXk3V+icqZuLHtitdbGwv55zNNuWiiDfwmg8=;
+        b=WE63G87jIni0jJecPn8Rob8cG9tXAqAE+tjy0Thnki3Zomjkxtv2DY4X/Y5+7m6g1z
+         dTcfKB4p4cgSMqLRXIJ4I/pqMVHgYzqdfssIWeVy5xmvuv0yh8eGe1KIf9bfNz8OLjBJ
+         Z1zab6Z5ej1SDAuvvJeAULSOmcTrwYGg4Dlk/8RWYk5GY/tIP09SknIQ3moMsmpJ8vOd
+         09sHf4YIUuXhdPxiT2wstHzXt/IScIJ/bYfwIPOJfiHN6EhardDb7a7s/+aD5FJXsCxo
+         RhCi4glOWtIzjbaIZ+t0dUNleL64/W/Z123/A6isUyVJW3BEhzlLbCLC59000WLlBruS
+         IYgA==
+X-Gm-Message-State: APjAAAUFqyLh4S/zPwwW5ZSRi/sPflWGFdDOjeKAM4Pn4XH+vCBv9q65
+        g4h38VvpU7Tq6w7Bl3j4srLhEdRB1lA=
+X-Google-Smtp-Source: APXvYqwzZoNK2YiYdZGAGAal9TDAUMuiYpb876nydBWcVMMyrb8xxPeTFA8oFxxkfcako3w0kOjTvA==
+X-Received: by 2002:a63:1f16:: with SMTP id f22mr20194293pgf.2.1580153895169;
+        Mon, 27 Jan 2020 11:38:15 -0800 (PST)
 Received: from ?IPv6:2620:10d:c081:1133::11c2? ([2620:10d:c090:180::dec1])
-        by smtp.gmail.com with ESMTPSA id b15sm17044553pgh.40.2020.01.27.11.35.09
+        by smtp.gmail.com with ESMTPSA id l14sm16224361pjq.5.2020.01.27.11.38.14
         (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
-        Mon, 27 Jan 2020 11:35:09 -0800 (PST)
+        Mon, 27 Jan 2020 11:38:14 -0800 (PST)
 To:     Linus Torvalds <torvalds@linux-foundation.org>
 Cc:     "linux-block@vger.kernel.org" <linux-block@vger.kernel.org>
 From:   Jens Axboe <axboe@kernel.dk>
-Subject: [GIT PULL] Core block changes for 5.6-rc
-Message-ID: <80ededdb-90de-6120-4250-252f019d78b4@kernel.dk>
-Date:   Mon, 27 Jan 2020 12:35:07 -0700
+Subject: [GIT PULL] Block driver changes for 5.6-rc
+Message-ID: <d6948ecb-b1c2-9822-307a-a2dd52cf6759@kernel.dk>
+Date:   Mon, 27 Jan 2020 12:38:13 -0700
 User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:68.0) Gecko/20100101
  Thunderbird/68.4.1
 MIME-Version: 1.0
 Content-Type: text/plain; charset=utf-8
 Content-Language: en-US
-Content-Transfer-Encoding: 8bit
+Content-Transfer-Encoding: 7bit
 Sender: linux-block-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
@@ -74,62 +74,90 @@ X-Mailing-List: linux-block@vger.kernel.org
 
 Hi Linus,
 
-This may be the most quiet round we've had in years. I'm not
-complaining. Really not a lot to detail here, outside of spelling and
-documentation improvements/fixes, we have:
+On top of the core changes, though not even strictly needed this time as
+they are no dependencies, here are the block driver changes queued up
+for 5.6. Like the core side, not a lot of changes here, just two main
+items:
 
-- Allow t10-pi to be modular (Herbert)
+- Series of patches (via Coly) with fixes for bcache (Coly, Christoph)
 
-- Remove dead code in bfq (Alex)
-
-- Mark zone management requests with REQ_SYNC (Chaitanya)
-
-- BFQ division improvement (Wen)
-
-- Small series improving plugging (Pavel)
+- MD pull request from Song
 
 Please pull!
 
 
-  git://git.kernel.dk/linux-block.git tags/for-5.6/block-2020-01-27
+  git://git.kernel.dk/linux-block.git tags/for-5.6/drivers-2020-01-27
 
 
 ----------------------------------------------------------------
-Alex Shi (1):
-      block/bfq: remove unused bfq_class_rt which never used
+Ben Dooks (Codethink) (1):
+      lib: crc64: include <linux/crc64.h> for 'crc64_be'
 
-André Almeida (1):
-      blk-mq: Document functions for sending request
+Christoph Hellwig (6):
+      bcache: use a separate data structure for the on-disk super block
+      bcache: rework error unwinding in register_bcache
+      bcache: transfer the sb_page reference to register_{bdev,cache}
+      bcache: return a pointer to the on-disk sb from read_super
+      bcache: store a pointer to the on-disk sb in the cache and cached_dev structures
+      bcache: use read_cache_page_gfp to read the superblock
 
-Chaitanya Kulkarni (1):
-      block: mark zone-mgmt bios with REQ_SYNC
+Coly Li (7):
+      bcache: properly initialize 'path' and 'err' in register_bcache()
+      bcache: fix use-after-free in register_bcache()
+      bcache: add code comments for state->pool in __btree_sort()
+      bcache: avoid unnecessary btree nodes flushing in btree_flush_write()
+      bcache: remove member accessed from struct btree
+      bcache: reap c->btree_cache_freeable from the tail in bch_mca_scan()
+      bcache: reap from tail of c->btree_cache in bch_mca_scan()
 
-Colin Ian King (1):
-      partitions/ldm: fix spelling mistake "to" -> "too"
+Guoju Fang (1):
+      bcache: print written and keys in trace_bcache_btree_write
 
-Herbert Xu (1):
-      block: Allow t10-pi to be modular
+Guoqing Jiang (11):
+      raid5: remove worker_cnt_per_group argument from alloc_thread_groups
+      md: rename wb stuffs
+      md: fix a typo s/creat/create
+      md: prepare for enable raid1 io serialization
+      md: add serialize_policy sysfs node for raid1
+      md: reorgnize mddev_create/destroy_serial_pool
+      raid1: serialize the overlap write
+      md: don't destroy serial_info_pool if serialize_policy is true
+      md: introduce a new struct for IO serialization
+      md/raid1: use bucket based mechanism for IO serialization
+      md/raid1: introduce wait_for_serialization
 
-Pavel Begunkov (3):
-      blk-mq: optimise rq sort function
-      list: introduce list_for_each_continue()
-      blk-mq: optimise blk_mq_flush_plug_list()
+Jens Axboe (1):
+      Merge branch 'md-next' of git://git.kernel.org/.../song/md into for-5.6/drivers
 
-Wen Yang (1):
-      block, bfq: improve arithmetic division in bfq_delta()
+Liang Chen (1):
+      bcache: cached_dev_free needs to put the sb page
 
- block/Kconfig             |   6 +-
- block/Makefile            |   3 +-
- block/bfq-iosched.c       |   1 -
- block/bfq-wf2q.c          |   5 +-
- block/blk-mq.c            | 154 +++++++++++++++++++++++++++++++---------------
- block/blk-zoned.c         |   2 +-
- block/partitions/ldm.c    |   2 +-
- block/t10-pi.c            |   3 +
- drivers/nvme/host/Kconfig |   1 +
- drivers/scsi/Kconfig      |   1 +
- include/linux/list.h      |  10 +++
- 11 files changed, 131 insertions(+), 57 deletions(-)
+Zhengyuan Liu (3):
+      raid6/test: fix a compilation error
+      raid6/test: fix a compilation warning
+      md/raid6: fix algorithm choice under larger PAGE_SIZE
+
+Zhiqiang Liu (1):
+      md-bitmap: small cleanups
+
+ drivers/md/bcache/bcache.h    |   2 +
+ drivers/md/bcache/bset.c      |   5 +
+ drivers/md/bcache/btree.c     |  24 ++--
+ drivers/md/bcache/btree.h     |   2 -
+ drivers/md/bcache/journal.c   |  80 ++++++++++++-
+ drivers/md/bcache/super.c     | 136 +++++++++++-----------
+ drivers/md/md-bitmap.c        |  25 ++---
+ drivers/md/md.c               | 254 +++++++++++++++++++++++++++++++++---------
+ drivers/md/md.h               |  45 +++++---
+ drivers/md/raid1.c            | 111 +++++++++---------
+ drivers/md/raid5.c            |  21 ++--
+ include/linux/raid/pq.h       |   7 +-
+ include/trace/events/bcache.h |   3 +-
+ include/uapi/linux/bcache.h   |  52 +++++++++
+ lib/crc64.c                   |   1 +
+ lib/raid6/algos.c             |  63 +++++++----
+ lib/raid6/mktables.c          |   2 +-
+ 17 files changed, 571 insertions(+), 262 deletions(-)
 
 -- 
 Jens Axboe
