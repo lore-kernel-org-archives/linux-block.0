@@ -2,145 +2,263 @@ Return-Path: <SRS0=/Ic2=3Q=vger.kernel.org=linux-block-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-9.8 required=3.0 tests=DKIMWL_WL_HIGH,DKIM_SIGNED,
-	DKIM_VALID,DKIM_VALID_AU,HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,
-	MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED,
-	USER_AGENT_GIT autolearn=ham autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-8.2 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
+	INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,
+	URIBL_BLOCKED,USER_AGENT_SANE_1 autolearn=unavailable autolearn_force=no
+	version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 49D23C32771
-	for <linux-block@archiver.kernel.org>; Mon, 27 Jan 2020 08:20:22 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 8AF93C32771
+	for <linux-block@archiver.kernel.org>; Mon, 27 Jan 2020 08:34:44 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.kernel.org (Postfix) with ESMTP id 1B4F621734
-	for <linux-block@archiver.kernel.org>; Mon, 27 Jan 2020 08:20:22 +0000 (UTC)
-Authentication-Results: mail.kernel.org;
-	dkim=pass (1024-bit key) header.d=amazon.com header.i=@amazon.com header.b="XLcKm8FA"
+	by mail.kernel.org (Postfix) with ESMTP id 5F710214DB
+	for <linux-block@archiver.kernel.org>; Mon, 27 Jan 2020 08:34:44 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1729073AbgA0IUV (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Mon, 27 Jan 2020 03:20:21 -0500
-Received: from smtp-fw-6001.amazon.com ([52.95.48.154]:30718 "EHLO
-        smtp-fw-6001.amazon.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1725955AbgA0IUV (ORCPT
-        <rfc822;linux-block@vger.kernel.org>);
-        Mon, 27 Jan 2020 03:20:21 -0500
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-  d=amazon.com; i=@amazon.com; q=dns/txt; s=amazon201209;
-  t=1580113221; x=1611649221;
-  h=from:to:cc:subject:date:message-id:in-reply-to:
-   references:mime-version:content-transfer-encoding;
-  bh=I0bGMY0UnkD1SQDKudWK+VHlWYQo9kxn8xvkLvZ6+gw=;
-  b=XLcKm8FAcgjV4pp0WWnzqFGlPql+ruqX6bDl1rXKLgY7VGN4vTseioDn
-   HlBHN9j4sAakI3mE45ngq7M8hsrObyU5/fO00iZk+SJIHtEaztlDLv+H2
-   hQWacGVt4/ddCe6LEIq6PhdqQF34+Yf5SqDR7A42/E/0ykDPiiTscUx55
-   c=;
-IronPort-SDR: nJ6CGo/h7Rj8evct5993fDuaqqM8Fs4H2y02wDFZ2uT5VCpoe44uYjQlucDgefYn99dFDE3SE8
- G+O8acrjKseA==
-X-IronPort-AV: E=Sophos;i="5.70,369,1574121600"; 
-   d="scan'208";a="14868091"
-Received: from iad12-co-svc-p1-lb1-vlan3.amazon.com (HELO email-inbound-relay-2b-a7fdc47a.us-west-2.amazon.com) ([10.43.8.6])
-  by smtp-border-fw-out-6001.iad6.amazon.com with ESMTP; 27 Jan 2020 08:20:20 +0000
-Received: from EX13MTAUEA002.ant.amazon.com (pdx4-ws-svc-p6-lb7-vlan2.pdx.amazon.com [10.170.41.162])
-        by email-inbound-relay-2b-a7fdc47a.us-west-2.amazon.com (Postfix) with ESMTPS id 2F458C5A7D;
-        Mon, 27 Jan 2020 08:20:16 +0000 (UTC)
-Received: from EX13D31EUA001.ant.amazon.com (10.43.165.15) by
- EX13MTAUEA002.ant.amazon.com (10.43.61.77) with Microsoft SMTP Server (TLS)
- id 15.0.1236.3; Mon, 27 Jan 2020 08:20:16 +0000
-Received: from u886c93fd17d25d.ant.amazon.com (10.43.161.78) by
- EX13D31EUA001.ant.amazon.com (10.43.165.15) with Microsoft SMTP Server (TLS)
- id 15.0.1367.3; Mon, 27 Jan 2020 08:20:11 +0000
-From:   <sjpark@amazon.com>
-To:     <jgross@suse.com>, <roger.pau@citrix.com>, <axboe@kernel.dk>
-CC:     SeongJae Park <sjpark@amazon.de>, <konrad.wilk@oracle.com>,
-        <pdurrant@amazon.com>, <xen-devel@lists.xenproject.org>,
-        <linux-block@vger.kernel.org>, <linux-kernel@vger.kernel.org>
-Subject: [PATCH v14 5/5] xen/blkback: Consistently insert one empty line between functions
-Date:   Mon, 27 Jan 2020 09:19:57 +0100
-Message-ID: <20200127081957.21509-1-sjpark@amazon.com>
-X-Mailer: git-send-email 2.17.1
-In-Reply-To: <20200127081812.21216-1-sjpark@amazon.com>
-References: <20200127081812.21216-1-sjpark@amazon.com>
+        id S1726164AbgA0Ien (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Mon, 27 Jan 2020 03:34:43 -0500
+Received: from relay.sw.ru ([185.231.240.75]:50960 "EHLO relay.sw.ru"
+        rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
+        id S1726004AbgA0Ien (ORCPT <rfc822;linux-block@vger.kernel.org>);
+        Mon, 27 Jan 2020 03:34:43 -0500
+Received: from dhcp-172-16-24-104.sw.ru ([172.16.24.104])
+        by relay.sw.ru with esmtp (Exim 4.92.3)
+        (envelope-from <ktkhai@virtuozzo.com>)
+        id 1ivzpk-000801-50; Mon, 27 Jan 2020 11:33:24 +0300
+Subject: Re: [PATCH v5 4/6] block: Add support for REQ_ALLOCATE flag
+To:     Bob Liu <bob.liu@oracle.com>, linux-block@vger.kernel.org,
+        linux-kernel@vger.kernel.org, martin.petersen@oracle.com,
+        axboe@kernel.dk, agk@redhat.com, snitzer@redhat.com,
+        dm-devel@redhat.com, song@kernel.org, tytso@mit.edu,
+        adilger.kernel@dilger.ca, Chaitanya.Kulkarni@wdc.com,
+        darrick.wong@oracle.com, ming.lei@redhat.com, osandov@fb.com,
+        jthumshirn@suse.de, minwoo.im.dev@gmail.com, damien.lemoal@wdc.com,
+        andrea.parri@amarulasolutions.com, hare@suse.com, tj@kernel.org,
+        ajay.joshi@wdc.com, sagi@grimberg.me, dsterba@suse.com,
+        bvanassche@acm.org, dhowells@redhat.com, asml.silence@gmail.com
+References: <157968992539.174869.7490844754165043549.stgit@localhost.localdomain>
+ <157969069360.174869.18184061012552778480.stgit@localhost.localdomain>
+ <b33500eb-8e7c-9e25-b7bc-9309e426cfc3@oracle.com>
+From:   Kirill Tkhai <ktkhai@virtuozzo.com>
+Message-ID: <75e959fd-0c84-1a27-9016-994e7998609c@virtuozzo.com>
+Date:   Mon, 27 Jan 2020 11:33:22 +0300
+User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:68.0) Gecko/20100101
+ Thunderbird/68.4.1
 MIME-Version: 1.0
-Content-Type: text/plain; charset="UTF-8"
-Content-Transfer-Encoding: 8bit
-X-Originating-IP: [10.43.161.78]
-X-ClientProxiedBy: EX13D25UWB001.ant.amazon.com (10.43.161.245) To
- EX13D31EUA001.ant.amazon.com (10.43.165.15)
+In-Reply-To: <b33500eb-8e7c-9e25-b7bc-9309e426cfc3@oracle.com>
+Content-Type: text/plain; charset=utf-8
+Content-Language: en-US
+Content-Transfer-Encoding: 7bit
 Sender: linux-block-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-From: SeongJae Park <sjpark@amazon.de>
+On 25.01.2020 06:18, Bob Liu wrote:
+> On 1/22/20 6:58 PM, Kirill Tkhai wrote:
+>> This adds support for REQ_ALLOCATE extension of REQ_OP_WRITE_ZEROES
+>> operation, which encourages a block device driver to just allocate
+>> blocks (or mark them allocated) instead of actual blocks zeroing.
+>> REQ_ALLOCATE is aimed to be used for network filesystems providing
+>> a block device interface. Also, block devices, which map a file
+>> on other filesystem (like loop), may use this for less fragmentation
+>> and batching fallocate() requests. Hypervisors like QEMU may
+>> introduce optimizations of clusters allocations based on this.
+>>
+>> BLKDEV_ZERO_ALLOCATE is a new corresponding flag for
+>> blkdev_issue_zeroout().
+>>
+>> Stacking devices start from zero max_allocate_sectors limit for now,
+>> and the support is going to be implemented separate for each device
+>> in the future.
+>>
+>> Signed-off-by: Kirill Tkhai <ktkhai@virtuozzo.com>
+>> ---
+>>  block/blk-lib.c           |   17 ++++++++++-------
+>>  block/blk-settings.c      |    4 ++++
+>>  fs/block_dev.c            |    4 ++++
+>>  include/linux/blk_types.h |    5 ++++-
+>>  include/linux/blkdev.h    |   13 ++++++++++---
+>>  5 files changed, 32 insertions(+), 11 deletions(-)
+>>
+> 
+> This patch and following two are looks fine to me.
+> Feel free to add.
+> Reviewed-by: Bob Liu <bob.liu@oracle.com>
 
-The number of empty lines between functions in the xenbus.c is
-inconsistent.  This trivial style cleanup commit fixes the file to
-consistently place only one empty line.
+Thank you, Bob.
 
-Acked-by: Roger Pau Monné <roger.pau@citrix.com>
-Signed-off-by: SeongJae Park <sjpark@amazon.de>
----
- drivers/block/xen-blkback/xenbus.c | 7 ++-----
- 1 file changed, 2 insertions(+), 5 deletions(-)
-
-diff --git a/drivers/block/xen-blkback/xenbus.c b/drivers/block/xen-blkback/xenbus.c
-index 55960190b774..42944d41aea0 100644
---- a/drivers/block/xen-blkback/xenbus.c
-+++ b/drivers/block/xen-blkback/xenbus.c
-@@ -467,7 +467,6 @@ static void xenvbd_sysfs_delif(struct xenbus_device *dev)
- 	device_remove_file(&dev->dev, &dev_attr_physical_device);
- }
+Kirill
  
--
- static void xen_vbd_free(struct xen_vbd *vbd)
- {
- 	if (vbd->bdev)
-@@ -524,6 +523,7 @@ static int xen_vbd_create(struct xen_blkif *blkif, blkif_vdev_t handle,
- 		handle, blkif->domid);
- 	return 0;
- }
-+
- static int xen_blkbk_remove(struct xenbus_device *dev)
- {
- 	struct backend_info *be = dev_get_drvdata(&dev->dev);
-@@ -607,6 +607,7 @@ static void xen_blkbk_discard(struct xenbus_transaction xbt, struct backend_info
- 	if (err)
- 		dev_warn(&dev->dev, "writing feature-discard (%d)", err);
- }
-+
- int xen_blkbk_barrier(struct xenbus_transaction xbt,
- 		      struct backend_info *be, int state)
- {
-@@ -691,7 +692,6 @@ static int xen_blkbk_probe(struct xenbus_device *dev,
- 	return err;
- }
- 
--
- /*
-  * Callback received when the hotplug scripts have placed the physical-device
-  * node.  Read it and the mode node, and create a vbd.  If the frontend is
-@@ -783,7 +783,6 @@ static void backend_changed(struct xenbus_watch *watch,
- 	}
- }
- 
--
- /*
-  * Callback received when the frontend's state changes.
-  */
-@@ -858,7 +857,6 @@ static void frontend_changed(struct xenbus_device *dev,
- 	}
- }
- 
--
- /* Once a memory pressure is detected, squeeze free page pools for a while. */
- static unsigned int buffer_squeeze_duration_ms = 10;
- module_param_named(buffer_squeeze_duration_ms,
-@@ -881,7 +879,6 @@ static void reclaim_memory(struct xenbus_device *dev)
- 
- /* ** Connection ** */
- 
--
- /*
-  * Write the physical details regarding the block device to the store, and
-  * switch to Connected state.
--- 
-2.17.1
+>> diff --git a/block/blk-lib.c b/block/blk-lib.c
+>> index 3e38c93cfc53..9cd6f86523ba 100644
+>> --- a/block/blk-lib.c
+>> +++ b/block/blk-lib.c
+>> @@ -214,7 +214,7 @@ static int __blkdev_issue_write_zeroes(struct block_device *bdev,
+>>  		struct bio **biop, unsigned flags)
+>>  {
+>>  	struct bio *bio = *biop;
+>> -	unsigned int max_write_zeroes_sectors;
+>> +	unsigned int max_write_zeroes_sectors, req_flags = 0;
+>>  	struct request_queue *q = bdev_get_queue(bdev);
+>>  
+>>  	if (!q)
+>> @@ -224,18 +224,21 @@ static int __blkdev_issue_write_zeroes(struct block_device *bdev,
+>>  		return -EPERM;
+>>  
+>>  	/* Ensure that max_write_zeroes_sectors doesn't overflow bi_size */
+>> -	max_write_zeroes_sectors = bdev_write_zeroes_sectors(bdev, 0);
+>> +	max_write_zeroes_sectors = bdev_write_zeroes_sectors(bdev, flags);
+>>  
+>>  	if (max_write_zeroes_sectors == 0)
+>>  		return -EOPNOTSUPP;
+>>  
+>> +	if (flags & BLKDEV_ZERO_NOUNMAP)
+>> +		req_flags |= REQ_NOUNMAP;
+>> +	if (flags & BLKDEV_ZERO_ALLOCATE)
+>> +		req_flags |= REQ_ALLOCATE|REQ_NOUNMAP;
+>> +
+>>  	while (nr_sects) {
+>>  		bio = blk_next_bio(bio, 0, gfp_mask);
+>>  		bio->bi_iter.bi_sector = sector;
+>>  		bio_set_dev(bio, bdev);
+>> -		bio->bi_opf = REQ_OP_WRITE_ZEROES;
+>> -		if (flags & BLKDEV_ZERO_NOUNMAP)
+>> -			bio->bi_opf |= REQ_NOUNMAP;
+>> +		bio->bi_opf = REQ_OP_WRITE_ZEROES | req_flags;
+>>  
+>>  		if (nr_sects > max_write_zeroes_sectors) {
+>>  			bio->bi_iter.bi_size = max_write_zeroes_sectors << 9;
+>> @@ -362,7 +365,7 @@ int blkdev_issue_zeroout(struct block_device *bdev, sector_t sector,
+>>  	sector_t bs_mask;
+>>  	struct bio *bio;
+>>  	struct blk_plug plug;
+>> -	bool try_write_zeroes = !!bdev_write_zeroes_sectors(bdev, 0);
+>> +	bool try_write_zeroes = !!bdev_write_zeroes_sectors(bdev, flags);
+>>  
+>>  	bs_mask = (bdev_logical_block_size(bdev) >> 9) - 1;
+>>  	if ((sector | nr_sects) & bs_mask)
+>> @@ -391,7 +394,7 @@ int blkdev_issue_zeroout(struct block_device *bdev, sector_t sector,
+>>  			try_write_zeroes = false;
+>>  			goto retry;
+>>  		}
+>> -		if (!bdev_write_zeroes_sectors(bdev, 0)) {
+>> +		if (!bdev_write_zeroes_sectors(bdev, flags)) {
+>>  			/*
+>>  			 * Zeroing offload support was indicated, but the
+>>  			 * device reported ILLEGAL REQUEST (for some devices
+>> diff --git a/block/blk-settings.c b/block/blk-settings.c
+>> index c8eda2e7b91e..8d5df9d37239 100644
+>> --- a/block/blk-settings.c
+>> +++ b/block/blk-settings.c
+>> @@ -48,6 +48,7 @@ void blk_set_default_limits(struct queue_limits *lim)
+>>  	lim->chunk_sectors = 0;
+>>  	lim->max_write_same_sectors = 0;
+>>  	lim->max_write_zeroes_sectors = 0;
+>> +	lim->max_allocate_sectors = 0;
+>>  	lim->max_discard_sectors = 0;
+>>  	lim->max_hw_discard_sectors = 0;
+>>  	lim->discard_granularity = 0;
+>> @@ -83,6 +84,7 @@ void blk_set_stacking_limits(struct queue_limits *lim)
+>>  	lim->max_dev_sectors = UINT_MAX;
+>>  	lim->max_write_same_sectors = UINT_MAX;
+>>  	lim->max_write_zeroes_sectors = UINT_MAX;
+>> +	lim->max_allocate_sectors = 0;
+>>  }
+>>  EXPORT_SYMBOL(blk_set_stacking_limits);
+>>  
+>> @@ -506,6 +508,8 @@ int blk_stack_limits(struct queue_limits *t, struct queue_limits *b,
+>>  					b->max_write_same_sectors);
+>>  	t->max_write_zeroes_sectors = min(t->max_write_zeroes_sectors,
+>>  					b->max_write_zeroes_sectors);
+>> +	t->max_allocate_sectors = min(t->max_allocate_sectors,
+>> +					b->max_allocate_sectors);
+>>  	t->bounce_pfn = min_not_zero(t->bounce_pfn, b->bounce_pfn);
+>>  
+>>  	t->seg_boundary_mask = min_not_zero(t->seg_boundary_mask,
+>> diff --git a/fs/block_dev.c b/fs/block_dev.c
+>> index 69bf2fb6f7cd..1ffef894b3bd 100644
+>> --- a/fs/block_dev.c
+>> +++ b/fs/block_dev.c
+>> @@ -2122,6 +2122,10 @@ static long blkdev_fallocate(struct file *file, int mode, loff_t start,
+>>  		error = blkdev_issue_zeroout(bdev, start >> 9, len >> 9,
+>>  					     GFP_KERNEL, BLKDEV_ZERO_NOFALLBACK);
+>>  		break;
+>> +	case FALLOC_FL_KEEP_SIZE:
+>> +		error = blkdev_issue_zeroout(bdev, start >> 9, len >> 9,
+>> +			GFP_KERNEL, BLKDEV_ZERO_ALLOCATE | BLKDEV_ZERO_NOFALLBACK);
+>> +		break;
+>>  	case FALLOC_FL_PUNCH_HOLE | FALLOC_FL_KEEP_SIZE | FALLOC_FL_NO_HIDE_STALE:
+>>  		error = blkdev_issue_discard(bdev, start >> 9, len >> 9,
+>>  					     GFP_KERNEL, 0);
+>> diff --git a/include/linux/blk_types.h b/include/linux/blk_types.h
+>> index 70254ae11769..86accd2caa4e 100644
+>> --- a/include/linux/blk_types.h
+>> +++ b/include/linux/blk_types.h
+>> @@ -335,7 +335,9 @@ enum req_flag_bits {
+>>  
+>>  	/* command specific flags for REQ_OP_WRITE_ZEROES: */
+>>  	__REQ_NOUNMAP,		/* do not free blocks when zeroing */
+>> -
+>> +	__REQ_ALLOCATE,		/* only notify about allocated blocks,
+>> +				 * and do not actually zero them
+>> +				 */
+>>  	__REQ_HIPRI,
+>>  
+>>  	/* for driver use */
+>> @@ -362,6 +364,7 @@ enum req_flag_bits {
+>>  #define REQ_CGROUP_PUNT		(1ULL << __REQ_CGROUP_PUNT)
+>>  
+>>  #define REQ_NOUNMAP		(1ULL << __REQ_NOUNMAP)
+>> +#define REQ_ALLOCATE		(1ULL << __REQ_ALLOCATE)
+>>  #define REQ_HIPRI		(1ULL << __REQ_HIPRI)
+>>  
+>>  #define REQ_DRV			(1ULL << __REQ_DRV)
+>> diff --git a/include/linux/blkdev.h b/include/linux/blkdev.h
+>> index 264202fa3bf8..20c94a7f9411 100644
+>> --- a/include/linux/blkdev.h
+>> +++ b/include/linux/blkdev.h
+>> @@ -337,6 +337,7 @@ struct queue_limits {
+>>  	unsigned int		max_hw_discard_sectors;
+>>  	unsigned int		max_write_same_sectors;
+>>  	unsigned int		max_write_zeroes_sectors;
+>> +	unsigned int		max_allocate_sectors;
+>>  	unsigned int		discard_granularity;
+>>  	unsigned int		discard_alignment;
+>>  
+>> @@ -991,6 +992,8 @@ static inline struct bio_vec req_bvec(struct request *rq)
+>>  static inline unsigned int blk_queue_get_max_write_zeroes_sectors(
+>>  		struct request_queue *q, unsigned int op_flags)
+>>  {
+>> +	if (op_flags & REQ_ALLOCATE)
+>> +		return q->limits.max_allocate_sectors;
+>>  	return q->limits.max_write_zeroes_sectors;
+>>  }
+>>  
+>> @@ -1227,6 +1230,7 @@ extern int __blkdev_issue_discard(struct block_device *bdev, sector_t sector,
+>>  
+>>  #define BLKDEV_ZERO_NOUNMAP	(1 << 0)  /* do not free blocks */
+>>  #define BLKDEV_ZERO_NOFALLBACK	(1 << 1)  /* don't write explicit zeroes */
+>> +#define BLKDEV_ZERO_ALLOCATE	(1 << 2)  /* allocate range of blocks */
+>>  
+>>  extern int __blkdev_issue_zeroout(struct block_device *bdev, sector_t sector,
+>>  		sector_t nr_sects, gfp_t gfp_mask, struct bio **biop,
+>> @@ -1431,10 +1435,13 @@ static inline unsigned int bdev_write_zeroes_sectors(struct block_device *bdev,
+>>  {
+>>  	struct request_queue *q = bdev_get_queue(bdev);
+>>  
+>> -	if (q)
+>> -		return q->limits.max_write_zeroes_sectors;
+>> +	if (!q)
+>> +		return 0;
+>>  
+>> -	return 0;
+>> +	if (flags & BLKDEV_ZERO_ALLOCATE)
+>> +		return q->limits.max_allocate_sectors;
+>> +	else
+>> +		return q->limits.max_write_zeroes_sectors;
+>>  }
+>>  
+>>  static inline enum blk_zoned_model bdev_zoned_model(struct block_device *bdev)
+>>
+>>
+> 
 
