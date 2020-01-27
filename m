@@ -2,123 +2,128 @@ Return-Path: <SRS0=/Ic2=3Q=vger.kernel.org=linux-block-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-8.2 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
-	INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,
-	URIBL_BLOCKED,USER_AGENT_SANE_1 autolearn=ham autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-6.6 required=3.0 tests=DKIM_SIGNED,DKIM_VALID,
+	DKIM_VALID_AU,FREEMAIL_FORGED_FROMDOMAIN,FREEMAIL_FROM,
+	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,
+	SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED autolearn=ham autolearn_force=no
+	version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id D1999C32771
-	for <linux-block@archiver.kernel.org>; Mon, 27 Jan 2020 10:10:01 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 9C1D6C32771
+	for <linux-block@archiver.kernel.org>; Mon, 27 Jan 2020 10:29:46 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.kernel.org (Postfix) with ESMTP id A1FA32071E
-	for <linux-block@archiver.kernel.org>; Mon, 27 Jan 2020 10:10:01 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id 629C7207FD
+	for <linux-block@archiver.kernel.org>; Mon, 27 Jan 2020 10:29:46 +0000 (UTC)
+Authentication-Results: mail.kernel.org;
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="twSPjZF9"
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1726179AbgA0KKB (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Mon, 27 Jan 2020 05:10:01 -0500
-Received: from relay.sw.ru ([185.231.240.75]:54034 "EHLO relay.sw.ru"
-        rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-        id S1726173AbgA0KKA (ORCPT <rfc822;linux-block@vger.kernel.org>);
-        Mon, 27 Jan 2020 05:10:00 -0500
-Received: from dhcp-172-16-24-104.sw.ru ([172.16.24.104])
-        by relay.sw.ru with esmtp (Exim 4.92.3)
-        (envelope-from <ktkhai@virtuozzo.com>)
-        id 1iw1KG-0000ID-Aj; Mon, 27 Jan 2020 13:09:00 +0300
-Subject: Re: [PATCH v5 2/6] block: Pass op_flags into
- blk_queue_get_max_sectors()
-To:     Bob Liu <bob.liu@oracle.com>, linux-block@vger.kernel.org,
-        linux-kernel@vger.kernel.org, martin.petersen@oracle.com,
-        axboe@kernel.dk, agk@redhat.com, snitzer@redhat.com,
-        dm-devel@redhat.com, song@kernel.org, tytso@mit.edu,
-        adilger.kernel@dilger.ca, Chaitanya.Kulkarni@wdc.com,
-        darrick.wong@oracle.com, ming.lei@redhat.com, osandov@fb.com,
-        jthumshirn@suse.de, minwoo.im.dev@gmail.com, damien.lemoal@wdc.com,
-        andrea.parri@amarulasolutions.com, hare@suse.com, tj@kernel.org,
-        ajay.joshi@wdc.com, sagi@grimberg.me, dsterba@suse.com,
-        bvanassche@acm.org, dhowells@redhat.com, asml.silence@gmail.com
-References: <157968992539.174869.7490844754165043549.stgit@localhost.localdomain>
- <157969068296.174869.13461609442947913096.stgit@localhost.localdomain>
- <8b77117b-1cc0-a379-2cdf-554a8060206c@oracle.com>
-From:   Kirill Tkhai <ktkhai@virtuozzo.com>
-Message-ID: <b0e1cd11-da05-3a84-9c64-14375f61515d@virtuozzo.com>
-Date:   Mon, 27 Jan 2020 13:08:59 +0300
-User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:68.0) Gecko/20100101
- Thunderbird/68.4.2
+        id S1729613AbgA0K3p (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Mon, 27 Jan 2020 05:29:45 -0500
+Received: from mail-io1-f66.google.com ([209.85.166.66]:41174 "EHLO
+        mail-io1-f66.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S1729293AbgA0K3p (ORCPT
+        <rfc822;linux-block@vger.kernel.org>);
+        Mon, 27 Jan 2020 05:29:45 -0500
+Received: by mail-io1-f66.google.com with SMTP id m25so9353569ioo.8;
+        Mon, 27 Jan 2020 02:29:45 -0800 (PST)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=gmail.com; s=20161025;
+        h=mime-version:references:in-reply-to:from:date:message-id:subject:to
+         :cc;
+        bh=8smK5gP/nG8y3xUOFyqTowNi76jCKan8I/IqaA550Jg=;
+        b=twSPjZF9ERl+JtZ2Bc4n4yjkQk5mMc4TsfSxeJr9KDsyIFWxepqNAThfwYS65+IXOt
+         jI/1+1lZK8zEBOfJyr0+UvaK3RLccBVS3Ox0U/8aT0CBNdtZ88VD/LCKHVGiFNQ4udCE
+         kBI3ja2Oj+crzFVqiVy1QvRGZO/eoqQIj5z5IiC0nkw1rpQahkaeoxuxBeU4Sg3+YDkL
+         aC2bCoF7ApODxKGTcehoqAO5gc+0UuZS0UEzPPQp5eSnYwrsT6kz+GRp+n2F2vkoKevf
+         eHHkOkc8tSjeWtg6Nl6/nTAC3MWmgK353VtaxvEUKCB8iIWcC5iVpV3f2f2Qm1psTvTz
+         XgVg==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20161025;
+        h=x-gm-message-state:mime-version:references:in-reply-to:from:date
+         :message-id:subject:to:cc;
+        bh=8smK5gP/nG8y3xUOFyqTowNi76jCKan8I/IqaA550Jg=;
+        b=FQQZY67Q0cGEg0hJqWdeHIWeKgDaoPz0iHpmzbnX5TVp/5VHAImXFVxeCN19AAOOer
+         I/vLY8eo2dw0o8KTlbiSekuS9KGpoK6Q4xyuM1F9DqRvxWELgzMgRjwV6fzKmylt0VU6
+         zpnbTS7LLO67VcMZMPsci2jbmhTGQaG5PUySMf4vUx8mP1lOmkEfMkEw+EVlAcZn+Q9L
+         iDhMcZvAzjM7uqzOeaCyZMuzhfHtD99FKegFQ/cY6tWnOsjjzlPChHfHHhfw26zmD/7k
+         8UqEdFwOwhuSESNnkeb1ONhLm+xxYalBcZHFeTTnOJ3kY3wH2k3/s9gzRtxI03NcfJOG
+         3LVg==
+X-Gm-Message-State: APjAAAW9YnO+PdS90UUwdbMoz2luOSWKORFzoqZpmgBLzBJWW1TH0Vaa
+        vjQkQWyE2Cv1IPzXYrY8Nv+QWG52Qu0WoPxGSvk=
+X-Google-Smtp-Source: APXvYqz7T+0EXbGyk0YeoKw4pqZFx7gtTJf9iDx40rHzqrhnP/ctayEi2YiUa++d6yOSehAyi6xD+/g8bggsPJfYE2Q=
+X-Received: by 2002:a6b:17c4:: with SMTP id 187mr11646757iox.143.1580120984691;
+ Mon, 27 Jan 2020 02:29:44 -0800 (PST)
 MIME-Version: 1.0
-In-Reply-To: <8b77117b-1cc0-a379-2cdf-554a8060206c@oracle.com>
-Content-Type: text/plain; charset=utf-8
-Content-Language: en-US
-Content-Transfer-Encoding: 7bit
+References: <20200123124433.121939-1-hare@suse.de> <CAOi1vP8Q44jLNoq+LTm8GRX687wfwLkJ3WRW_DWvY7nYUtPQxQ@mail.gmail.com>
+ <fe3fcf53-94fb-84b8-75ed-6375d81e1452@suse.de>
+In-Reply-To: <fe3fcf53-94fb-84b8-75ed-6375d81e1452@suse.de>
+From:   Ilya Dryomov <idryomov@gmail.com>
+Date:   Mon, 27 Jan 2020 11:29:51 +0100
+Message-ID: <CAOi1vP85wu8R3h2pQ7wt2udtwbTgbHq25_cxvQD+zwU0UCW+hw@mail.gmail.com>
+Subject: Re: [PATCH] rbd: set the 'device' link in sysfs
+To:     Hannes Reinecke <hare@suse.de>
+Cc:     Sage Weil <sage@redhat.com>, Jens Axboe <axboe@kernel.dk>,
+        Ceph Development <ceph-devel@vger.kernel.org>,
+        linux-block <linux-block@vger.kernel.org>,
+        David Disseldorp <ddiss@suse.com>,
+        Hannes Reinecke <hare@suse.com>
+Content-Type: text/plain; charset="UTF-8"
 Sender: linux-block-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-On 25.01.2020 05:37, Bob Liu wrote:
-> On 1/22/20 6:58 PM, Kirill Tkhai wrote:
->> This preparation patch changes argument type, and now
->> the function takes full op_flags instead of just op code.
->>
->> Signed-off-by: Kirill Tkhai <ktkhai@virtuozzo.com>
->> ---
->>  block/blk-core.c       |    4 ++--
->>  include/linux/blkdev.h |    8 +++++---
->>  2 files changed, 7 insertions(+), 5 deletions(-)
->>
->> diff --git a/block/blk-core.c b/block/blk-core.c
->> index 50a5de025d5e..ac2634bcda1f 100644
->> --- a/block/blk-core.c
->> +++ b/block/blk-core.c
->> @@ -1250,10 +1250,10 @@ EXPORT_SYMBOL(submit_bio);
->>  static int blk_cloned_rq_check_limits(struct request_queue *q,
->>  				      struct request *rq)
->>  {
->> -	if (blk_rq_sectors(rq) > blk_queue_get_max_sectors(q, req_op(rq))) {
->> +	if (blk_rq_sectors(rq) > blk_queue_get_max_sectors(q, rq->cmd_flags)) {
->>  		printk(KERN_ERR "%s: over max size limit. (%u > %u)\n",
->>  			__func__, blk_rq_sectors(rq),
->> -			blk_queue_get_max_sectors(q, req_op(rq)));
->> +			blk_queue_get_max_sectors(q, rq->cmd_flags));
->>  		return -EIO;
->>  	}
->>  
->> diff --git a/include/linux/blkdev.h b/include/linux/blkdev.h
->> index 0f1127d0b043..23a5850f35f6 100644
->> --- a/include/linux/blkdev.h
->> +++ b/include/linux/blkdev.h
->> @@ -989,8 +989,10 @@ static inline struct bio_vec req_bvec(struct request *rq)
->>  }
->>  
->>  static inline unsigned int blk_queue_get_max_sectors(struct request_queue *q,
->> -						     int op)
->> +						     unsigned int op_flags)
->>  {
->> +	int op = op_flags & REQ_OP_MASK;
->> +
-> 
-> Nitpick. int op = req_op(rq);
-> 
-> Anyway, looks good to me.
-> Reviewed-by: Bob Liu <bob.liu@oracle.com>
+On Fri, Jan 24, 2020 at 8:03 AM Hannes Reinecke <hare@suse.de> wrote:
+>
+> On 1/23/20 7:45 PM, Ilya Dryomov wrote:
+> > On Thu, Jan 23, 2020 at 1:44 PM Hannes Reinecke <hare@suse.de> wrote:
+> >>
+> >> The rbd driver already provides additional information in sysfs
+> >> under /sys/bus/rbd, so we should set the 'device' link in the block
+> >> device to reference this information.
+> >>
+> >> Cc: David Disseldorp <ddiss@suse.com>
+> >> Signed-off-by: Hannes Reinecke <hare@suse.com>
+> >> ---
+> >>  drivers/block/rbd.c | 2 +-
+> >>  1 file changed, 1 insertion(+), 1 deletion(-)
+> >>
+> >> diff --git a/drivers/block/rbd.c b/drivers/block/rbd.c
+> >> index 9f1f8689e316..3240b7744aeb 100644
+> >> --- a/drivers/block/rbd.c
+> >> +++ b/drivers/block/rbd.c
+> >> @@ -6938,7 +6938,7 @@ static ssize_t do_rbd_add(struct bus_type *bus,
+> >>         if (rc)
+> >>                 goto err_out_image_lock;
+> >>
+> >> -       add_disk(rbd_dev->disk);
+> >> +       device_add_disk(&rbd_dev->dev, rbd_dev->disk, NULL);
+> >>         /* see rbd_init_disk() */
+> >>         blk_put_queue(rbd_dev->disk->queue);
+> >
+> > Hi Hannes,
+> >
+> > I looked at this a while ago and didn't go through with the patch
+> > because I wasn't sure whether this symlink can point to something
+> > arbitrary.  IIRC it usually points a couple of levels up, to some
+> > parent.  In the rbd case, this would be a completely different tree:
+> > /sys/devices/virtual -> /sys/bus/rbd.
+> >
+> Yes, this is expected.
+> The 'device' link will _always_ point into a different tree; the
+> accessor via /sys/block or /sys/bus are assumed to be virtual entries,
+> with the 'device' link pointing to the underlying device.
+> In our case the underlying device is also a virtual entity, but that's okay.
+>
+> > Do you know if there is precedent for this in some other driver?
+> > Are you sure it's not going to break any assumptions?
+> >
+> Things like iscsi do the very same thing.
+> And no, it doesn't break assumptions; quite the contrary.
 
-Thanks, Bob. I'll merge this nitpick and your "Reviewed-by" at next resend.
-It will be after merge window is closed, and new patches are welcomed.
+I see, thanks for the explanation.
 
->>  	if (unlikely(op == REQ_OP_DISCARD || op == REQ_OP_SECURE_ERASE))
->>  		return min(q->limits.max_discard_sectors,
->>  			   UINT_MAX >> SECTOR_SHIFT);
->> @@ -1029,10 +1031,10 @@ static inline unsigned int blk_rq_get_max_sectors(struct request *rq,
->>  	if (!q->limits.chunk_sectors ||
->>  	    req_op(rq) == REQ_OP_DISCARD ||
->>  	    req_op(rq) == REQ_OP_SECURE_ERASE)
->> -		return blk_queue_get_max_sectors(q, req_op(rq));
->> +		return blk_queue_get_max_sectors(q, rq->cmd_flags);
->>  
->>  	return min(blk_max_size_offset(q, offset),
->> -			blk_queue_get_max_sectors(q, req_op(rq)));
->> +			blk_queue_get_max_sectors(q, rq->cmd_flags));
->>  }
->>  
->>  static inline unsigned int blk_rq_count_bios(struct request *rq)
->>
->>
-> 
+Queued up for 5.6.
 
+Thanks,
+
+                Ilya
