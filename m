@@ -2,31 +2,32 @@ Return-Path: <SRS0=qLSf=3R=vger.kernel.org=linux-block-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-7.5 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
-	INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,
-	URIBL_SBL,URIBL_SBL_A,USER_AGENT_SANE_1 autolearn=unavailable
-	autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-12.5 required=3.0
+	tests=HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,
+	MENTIONS_GIT_HOSTING,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,URIBL_SBL,
+	URIBL_SBL_A,USER_AGENT_SANE_1 autolearn=unavailable autolearn_force=no
+	version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 9AB9CC2D0DB
-	for <linux-block@archiver.kernel.org>; Tue, 28 Jan 2020 12:10:25 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id DC1BCC33CB3
+	for <linux-block@archiver.kernel.org>; Tue, 28 Jan 2020 12:10:26 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.kernel.org (Postfix) with ESMTP id 5E2EB2468A
-	for <linux-block@archiver.kernel.org>; Tue, 28 Jan 2020 12:10:25 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id A90B92468D
+	for <linux-block@archiver.kernel.org>; Tue, 28 Jan 2020 12:10:26 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1726063AbgA1MKY (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Tue, 28 Jan 2020 07:10:24 -0500
-Received: from 22.17.110.36.static.bjtelecom.net ([36.110.17.22]:17236 "HELO
-        bsf02.didichuxing.com" rhost-flags-OK-FAIL-OK-FAIL) by vger.kernel.org
-        with SMTP id S1725951AbgA1MKY (ORCPT
+        id S1725959AbgA1MK0 (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Tue, 28 Jan 2020 07:10:26 -0500
+Received: from mx2.didichuxing.com ([36.110.17.22]:14712 "HELO
+        bsf02.didichuxing.com" rhost-flags-OK-OK-OK-FAIL) by vger.kernel.org
+        with SMTP id S1726010AbgA1MKZ (ORCPT
         <rfc822;linux-block@vger.kernel.org>);
-        Tue, 28 Jan 2020 07:10:24 -0500
-X-ASG-Debug-ID: 1580212352-0e41082813877660001-Cu09wu
-Received: from mail.didiglobal.com (localhost [172.20.36.245]) by bsf02.didichuxing.com with ESMTP id IGrohZmG1rklzFOT; Tue, 28 Jan 2020 19:52:32 +0800 (CST)
+        Tue, 28 Jan 2020 07:10:25 -0500
+X-ASG-Debug-ID: 1580212431-0e410828158777d0001-Cu09wu
+Received: from mail.didiglobal.com (localhost [172.20.36.204]) by bsf02.didichuxing.com with ESMTP id LgdgU1CFZIDZquNQ; Tue, 28 Jan 2020 19:53:51 +0800 (CST)
 X-Barracuda-Envelope-From: zhangweiping@didiglobal.com
 Received: from 192.168.3.9 (172.22.50.20) by BJSGEXMBX03.didichuxing.com
  (172.20.15.133) with Microsoft SMTP Server (TLS) id 15.0.1473.3; Tue, 28 Jan
- 2020 19:52:32 +0800
-Date:   Tue, 28 Jan 2020 19:52:31 +0800
+ 2020 19:53:51 +0800
+Date:   Tue, 28 Jan 2020 19:53:50 +0800
 From:   Weiping Zhang <zhangweiping@didiglobal.com>
 To:     <axboe@kernel.dk>, <tj@kernel.org>, <hch@lst.de>,
         <bvanassche@acm.org>, <keith.busch@intel.com>,
@@ -34,9 +35,9 @@ To:     <axboe@kernel.dk>, <tj@kernel.org>, <hch@lst.de>,
         <edmund.nadolski@intel.com>
 CC:     <linux-block@vger.kernel.org>, <cgroups@vger.kernel.org>,
         <linux-nvme@lists.infradead.org>
-Subject: [PATCH v4 1/5] block: add weighted round robin for blkcgroup
-Message-ID: <79d9823e0bd750d3634f45a19c1310b6c62f92b7.1580211965.git.zhangweiping@didiglobal.com>
-X-ASG-Orig-Subj: [PATCH v4 1/5] block: add weighted round robin for blkcgroup
+Subject: [PATCH v4 5/5] nvme: add support weighted round robin queue
+Message-ID: <07208789e2010bbf9a509df96a4523e03a498d87.1580211965.git.zhangweiping@didiglobal.com>
+X-ASG-Orig-Subj: [PATCH v4 5/5] nvme: add support weighted round robin queue
 Mail-Followup-To: axboe@kernel.dk, tj@kernel.org, hch@lst.de,
         bvanassche@acm.org, keith.busch@intel.com, minwoo.im.dev@gmail.com,
         tglx@linutronix.de, edmund.nadolski@intel.com,
@@ -51,11 +52,11 @@ User-Agent: Mutt/1.5.21 (2010-09-15)
 X-Originating-IP: [172.22.50.20]
 X-ClientProxiedBy: BJEXCAS01.didichuxing.com (172.20.36.235) To
  BJSGEXMBX03.didichuxing.com (172.20.15.133)
-X-Barracuda-Connect: localhost[172.20.36.245]
-X-Barracuda-Start-Time: 1580212352
+X-Barracuda-Connect: localhost[172.20.36.204]
+X-Barracuda-Start-Time: 1580212431
 X-Barracuda-URL: https://bsf02.didichuxing.com:443/cgi-mod/mark.cgi
 X-Virus-Scanned: by bsmtpd at didichuxing.com
-X-Barracuda-Scan-Msg-Size: 10908
+X-Barracuda-Scan-Msg-Size: 16129
 X-Barracuda-BRTS-Status: 1
 X-Barracuda-Bayes: INNOCENT GLOBAL 0.0000 1.0000 -2.0210
 X-Barracuda-Spam-Score: -2.02
@@ -69,355 +70,480 @@ Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-Each block cgroup can select a weighted round robin type to make
-its io requests go to the specified haredware queue. Now we support
-four round robin type urgent, high, medium, low like what nvme specification
-dose.
+This patch enalbe Weithed Round Robin if nvme device support it.
+We add four module parameters wrr_urgent_queues, wrr_high_queeus,
+wrr_medium_queues, wrr_low_queues to control the number of queues for
+specified priority. If device doesn't support WRR, all these four
+parameters will be forced reset to 0. If device support WRR, but
+all of these four parameters are 0, nvme dirver will not enable WRR
+when set CC.EN to 1.
+
+Now nvme support five types hardware queue:
+poll:		if io was marked for poll
+wrr_low:	weighted round robin low
+wrr_medium:	weighted round robin medium
+wrr_high:	weighted round robin high
+wrr_urgent:	weighted round robin urgent
+read:		io read, if blkcg's wrr is none and the io is not poll
+defaut:		for write/flush, if blkcg's wrr is none and is not poll
+
+The read, default and poll submission queue's priority is medium, when
+nvme's wrr was enabled.
+
+Test result:
+
+CPU:    Intel(R) Xeon(R) Platinum 8160 CPU @ 2.10GHz
+NVME:   Intel SSDPE2KX020T8 P4510 2TB
+
+[root@tmp-201812-d1802-818396173 low]# nvme show-regs /dev/nvme0n1
+cap     : 2078030fff
+version : 10200
+intms   : 0
+intmc   : 0
+cc      : 460801
+csts    : 1
+nssr    : 0
+aqa     : 1f001f
+asq     : 5f7cc08000
+acq     : 5f5ac23000
+cmbloc  : 0
+cmbsz   : 0
+
+Run fio-1, fio-2, fio-3 in parallel,
+
+For RR(round robin) these three fio nearly get same iops or bps,
+if we set blkio.wrr for different priority, the WRR "high" will
+get more iops/bps than "medium" and "low".
+
+RR:
+fio-1: echo "259:0 none" > /sys/fs/cgroup/blkio/high/blkio.wrr
+fio-2: echo "259:0 none" > /sys/fs/cgroup/blkio/medium/blkio.wrr
+fio-3: echo "259:0 none" > /sys/fs/cgroup/blkio/low/blkio.wrr
+
+WRR:
+fio-1: echo "259:0 high" > /sys/fs/cgroup/blkio/high/blkio.wrr
+fio-2: echo "259:0 medium" > /sys/fs/cgroup/blkio/medium/blkio.wrr
+fio-3: echo "259:0 low" > /sys/fs/cgroup/blkio/low/blkio.wrr
+
+Test script:
+https://github.com/dublio/nvme-wrr/blob/master/test_wrr.sh
+
+Test result:
+randread             (RR)IOPS        (RR)latency     (WRR)IOPS       (WRR)latency
+--------------------------------------------------------------------------------
+randread_high        217474          3528.49         404451          1897.17
+randread_medium      217473          3528.56         202349          3793.54
+randread_low         217978          3520.98         67419           11386.43
+
+randwrite            (RR)IOPS        (RR)latency     (WRR)IOPS       (WRR)latency
+--------------------------------------------------------------------------------
+randwrite_high       144946          5295.34         277401          2766.66
+randwrite_medium     144861          5296.85         138710          5532.28
+randwrite_low        145105          5289.36         46316           16569.54
+
+read                 (RR)BW          (RR)latency     (WRR)BW         (WRR)latency
+--------------------------------------------------------------------------------
+read_high            956191          410823.48       1790273         219427.11
+read_medium          920096          426887.25       897644          437760.17
+read_low             928076          423248.05       302899          1297195.34
+
+write                (RR)BW          (RR)latency     (WRR)BW         (WRR)latency
+--------------------------------------------------------------------------------
+write_high           737211          532359.31       1194013         328970.70
+write_medium         759052          516902.66       600626          653876.69
+write_low            782348          501309.47       203754          1928779.39
 
 Signed-off-by: Weiping Zhang <zhangweiping@didiglobal.com>
 ---
- block/blk-cgroup.c         | 91 ++++++++++++++++++++++++++++++++++++++++++++++
- block/blk-mq-debugfs.c     |  4 ++
- block/blk-mq-sched.c       |  5 ++-
- block/blk-mq-tag.c         |  4 +-
- block/blk-mq-tag.h         |  2 +-
- block/blk-mq.c             | 12 ++++--
- block/blk-mq.h             | 20 +++++++++-
- block/blk.h                |  2 +-
- include/linux/blk-cgroup.h |  2 +
- include/linux/blk-mq.h     | 18 +++++++++
- 10 files changed, 150 insertions(+), 10 deletions(-)
+ drivers/nvme/host/nvme.h  |   1 +
+ drivers/nvme/host/pci.c   | 230 +++++++++++++++++++++++++++++++++++++---------
+ include/linux/interrupt.h |   2 +-
+ include/linux/nvme.h      |   2 +
+ 4 files changed, 193 insertions(+), 42 deletions(-)
 
-diff --git a/block/blk-cgroup.c b/block/blk-cgroup.c
-index a229b94d5390..a81888c7cb2d 100644
---- a/block/blk-cgroup.c
-+++ b/block/blk-cgroup.c
-@@ -830,6 +830,91 @@ static int blkcg_print_stat(struct seq_file *sf, void *v)
+diff --git a/drivers/nvme/host/nvme.h b/drivers/nvme/host/nvme.h
+index a1df74f2eed3..4ebbefe4281d 100644
+--- a/drivers/nvme/host/nvme.h
++++ b/drivers/nvme/host/nvme.h
+@@ -250,6 +250,7 @@ struct nvme_ctrl {
+ 	unsigned int shutdown_timeout;
+ 	unsigned int kato;
+ 	bool subsystem;
++	bool wrr_enabled;
+ 	unsigned long quirks;
+ 	struct nvme_id_power_state psd[32];
+ 	struct nvme_effects_log *effects;
+diff --git a/drivers/nvme/host/pci.c b/drivers/nvme/host/pci.c
+index 1002f3f0349c..0c3bea9e7d83 100644
+--- a/drivers/nvme/host/pci.c
++++ b/drivers/nvme/host/pci.c
+@@ -78,6 +78,22 @@ static unsigned int poll_queues;
+ module_param(poll_queues, uint, 0644);
+ MODULE_PARM_DESC(poll_queues, "Number of queues to use for polled IO.");
+ 
++static int wrr_low_queues;
++module_param(wrr_low_queues, int, 0644);
++MODULE_PARM_DESC(wrr_low_queues, "Number of WRR low queues.");
++
++static int wrr_medium_queues;
++module_param(wrr_medium_queues, int, 0644);
++MODULE_PARM_DESC(wrr_medium_queues, "Number of WRR medium queues.");
++
++static int wrr_high_queues;
++module_param(wrr_high_queues, int, 0644);
++MODULE_PARM_DESC(wrr_high_queues, "Number of WRR high queues.");
++
++static int wrr_urgent_queues;
++module_param(wrr_urgent_queues, int, 0644);
++MODULE_PARM_DESC(wrr_urgent_queues, "Number of WRR urgent queues.");
++
+ struct nvme_dev;
+ struct nvme_queue;
+ 
+@@ -209,6 +225,14 @@ struct nvme_iod {
+ 	struct scatterlist *sg;
+ };
+ 
++static inline bool nvme_is_wrr_allocated(struct nvme_dev *dev)
++{
++	return dev->io_queues[HCTX_TYPE_WRR_LOW] +
++		dev->io_queues[HCTX_TYPE_WRR_MEDIUM] +
++		dev->io_queues[HCTX_TYPE_WRR_HIGH] +
++		dev->io_queues[HCTX_TYPE_WRR_URGENT] > 0;
++}
++
+ static unsigned int max_io_queues(void)
+ {
+ 	return num_possible_cpus() + read_queues + poll_queues;
+@@ -1131,19 +1155,24 @@ static int adapter_alloc_cq(struct nvme_dev *dev, u16 qid,
+ }
+ 
+ static int adapter_alloc_sq(struct nvme_dev *dev, u16 qid,
+-						struct nvme_queue *nvmeq)
++				struct nvme_queue *nvmeq, int wrr_flag)
+ {
+ 	struct nvme_ctrl *ctrl = &dev->ctrl;
+ 	struct nvme_command c;
+ 	int flags = NVME_QUEUE_PHYS_CONTIG;
+ 
+-	/*
+-	 * Some drives have a bug that auto-enables WRRU if MEDIUM isn't
+-	 * set. Since URGENT priority is zeroes, it makes all queues
+-	 * URGENT.
+-	 */
+-	if (ctrl->quirks & NVME_QUIRK_MEDIUM_PRIO_SQ)
+-		flags |= NVME_SQ_PRIO_MEDIUM;
++
++	if (!dev->ctrl.wrr_enabled && !nvme_is_wrr_allocated(dev)) {
++		/*
++		 * Some drives have a bug that auto-enables WRRU if MEDIUM isn't
++		 * set. Since URGENT priority is zeroes, it makes all queues
++		 * URGENT.
++		 */
++		if (ctrl->quirks & NVME_QUIRK_MEDIUM_PRIO_SQ)
++			flags |= NVME_SQ_PRIO_MEDIUM;
++	} else {
++		flags |= wrr_flag;
++	}
+ 
+ 	/*
+ 	 * Note: we (ab)use the fact that the prp fields survive if no data
+@@ -1513,11 +1542,51 @@ static void nvme_init_queue(struct nvme_queue *nvmeq, u16 qid)
+ 	wmb(); /* ensure the first interrupt sees the initialization */
+ }
+ 
+-static int nvme_create_queue(struct nvme_queue *nvmeq, int qid, bool polled)
++static int nvme_create_queue(struct nvme_queue *nvmeq, int qid)
+ {
+ 	struct nvme_dev *dev = nvmeq->dev;
+-	int result;
+ 	u16 vector = 0;
++	int start, end, result, wrr_flag;
++	bool polled = false;
++	enum hctx_type type;
++
++	/* 0 for admain queue, io queue index >= 1 */
++	start = 1;
++	/* get hardware context type base on qid */
++	for (type = HCTX_TYPE_DEFAULT; type < HCTX_MAX_TYPES; type++) {
++		end = start + dev->io_queues[type] - 1;
++		if (qid >= start && qid <= end)
++			break;
++		start = end + 1;
++	}
++
++	if (type == HCTX_TYPE_POLL)
++		polled = true;
++
++	if (dev->ctrl.wrr_enabled && nvme_is_wrr_allocated(dev)) {
++		/* set read,poll,default to medium by default */
++		switch (type) {
++		case HCTX_TYPE_WRR_LOW:
++			wrr_flag = NVME_SQ_PRIO_LOW;
++			break;
++		case HCTX_TYPE_WRR_MEDIUM:
++		case HCTX_TYPE_POLL:
++		case HCTX_TYPE_DEFAULT:
++		case HCTX_TYPE_READ:
++			wrr_flag = NVME_SQ_PRIO_MEDIUM;
++			break;
++		case HCTX_TYPE_WRR_HIGH:
++			wrr_flag = NVME_SQ_PRIO_HIGH;
++			break;
++		case HCTX_TYPE_WRR_URGENT:
++			wrr_flag = NVME_SQ_PRIO_URGENT;
++			break;
++		default:
++			return -EINVAL;
++		}
++	} else {
++		wrr_flag = NVME_SQ_PRIO_IGNORE;
++	}
+ 
+ 	clear_bit(NVMEQ_DELETE_ERROR, &nvmeq->flags);
+ 
+@@ -1534,7 +1603,7 @@ static int nvme_create_queue(struct nvme_queue *nvmeq, int qid, bool polled)
+ 	if (result)
+ 		return result;
+ 
+-	result = adapter_alloc_sq(dev, qid, nvmeq);
++	result = adapter_alloc_sq(dev, qid, nvmeq, wrr_flag);
+ 	if (result < 0)
+ 		return result;
+ 	if (result)
+@@ -1704,7 +1773,7 @@ static int nvme_pci_configure_admin_queue(struct nvme_dev *dev)
+ 
+ static int nvme_create_io_queues(struct nvme_dev *dev)
+ {
+-	unsigned i, max, rw_queues;
++	unsigned i, max;
+ 	int ret = 0;
+ 
+ 	for (i = dev->ctrl.queue_count; i <= dev->max_qid; i++) {
+@@ -1715,17 +1784,8 @@ static int nvme_create_io_queues(struct nvme_dev *dev)
+ 	}
+ 
+ 	max = min(dev->max_qid, dev->ctrl.queue_count - 1);
+-	if (max != 1 && dev->io_queues[HCTX_TYPE_POLL]) {
+-		rw_queues = dev->io_queues[HCTX_TYPE_DEFAULT] +
+-				dev->io_queues[HCTX_TYPE_READ];
+-	} else {
+-		rw_queues = max;
+-	}
+-
+ 	for (i = dev->online_queues; i <= max; i++) {
+-		bool polled = i > rw_queues;
+-
+-		ret = nvme_create_queue(&dev->queues[i], i, polled);
++		ret = nvme_create_queue(&dev->queues[i], i);
+ 		if (ret)
+ 			break;
+ 	}
+@@ -2006,7 +2066,9 @@ static int nvme_setup_host_mem(struct nvme_dev *dev)
+ static void nvme_calc_irq_sets(struct irq_affinity *affd, unsigned int nrirqs)
+ {
+ 	struct nvme_dev *dev = affd->priv;
+-	unsigned int nr_read_queues;
++	unsigned int nr_total, nr, nr_read, nr_default;
++	unsigned int nr_wrr_urgent, nr_wrr_high, nr_wrr_medium, nr_wrr_low;
++	unsigned int nr_sets;
+ 
+ 	/*
+ 	 * If there is no interupt available for queues, ensure that
+@@ -2019,20 +2081,75 @@ static void nvme_calc_irq_sets(struct irq_affinity *affd, unsigned int nrirqs)
+ 	 * If 'read_queues' > 0, ensure it leaves room for at least one write
+ 	 * queue.
+ 	 */
+-	if (!nrirqs || nrirqs == 1) {
++	if (!nrirqs)
+ 		nrirqs = 1;
+-		nr_read_queues = 0;
+-	} else if (read_queues >= nrirqs) {
+-		nr_read_queues = nrirqs - 1;
+-	} else {
+-		nr_read_queues = read_queues;
+-	}
+ 
+-	dev->io_queues[HCTX_TYPE_DEFAULT] = nrirqs - nr_read_queues;
+-	affd->set_size[HCTX_TYPE_DEFAULT] = nrirqs - nr_read_queues;
+-	dev->io_queues[HCTX_TYPE_READ] = nr_read_queues;
+-	affd->set_size[HCTX_TYPE_READ] = nr_read_queues;
+-	affd->nr_sets = nr_read_queues ? 2 : 1;
++	nr_total = nrirqs;
++
++	nr_read = nr_wrr_urgent = nr_wrr_high = nr_wrr_medium = nr_wrr_low = 0;
++
++	/* set default to 1, add all the rest queue to default at last */
++	nr = nr_default = 1;
++	nr_sets = 1;
++	nr_total -= nr;
++	if (!nr_total)
++		goto done;
++
++	/* read queues */
++	nr_sets++;
++	nr_read = nr = read_queues > nr_total ? nr_total : read_queues;
++	nr_total -= nr;
++	if (!nr_total)
++		goto done;
++
++	/* wrr low queues */
++	nr_sets++;
++	nr_wrr_low = nr = wrr_low_queues > nr_total ? nr_total : wrr_low_queues;
++	nr_total -= nr;
++	if (!nr_total)
++		goto done;
++
++	/* wrr medium queues */
++	nr_sets++;
++	nr_wrr_medium = nr =
++		wrr_medium_queues > nr_total ? nr_total : wrr_medium_queues;
++	nr_total -= nr;
++	if (!nr_total)
++		goto done;
++
++	/* wrr high queues */
++	nr_sets++;
++	nr_wrr_high = nr =
++		wrr_high_queues > nr_total ? nr_total : wrr_high_queues;
++	nr_total -= nr;
++	if (!nr_total)
++		goto done;
++
++	/* wrr urgent queues */
++	nr_sets++;
++	nr_wrr_urgent = nr =
++		wrr_urgent_queues > nr_total ? nr_total : wrr_urgent_queues;
++	nr_total -= nr;
++	if (!nr_total)
++		goto done;
++
++	/* add all the rest queue to default */
++	nr_default += nr_total;
++
++done:
++	dev->io_queues[HCTX_TYPE_DEFAULT] = nr_default;
++	affd->set_size[HCTX_TYPE_DEFAULT] = nr_default;
++	dev->io_queues[HCTX_TYPE_READ] = nr_read;
++	affd->set_size[HCTX_TYPE_READ] = nr_read;
++	dev->io_queues[HCTX_TYPE_WRR_LOW] = nr_wrr_low;
++	affd->set_size[HCTX_TYPE_WRR_LOW] = nr_wrr_low;
++	dev->io_queues[HCTX_TYPE_WRR_MEDIUM] = nr_wrr_medium;
++	affd->set_size[HCTX_TYPE_WRR_MEDIUM] = nr_wrr_medium;
++	dev->io_queues[HCTX_TYPE_WRR_HIGH] = nr_wrr_high;
++	affd->set_size[HCTX_TYPE_WRR_HIGH] = nr_wrr_high;
++	dev->io_queues[HCTX_TYPE_WRR_URGENT] = nr_wrr_urgent;
++	affd->set_size[HCTX_TYPE_WRR_URGENT] = nr_wrr_urgent;
++	affd->nr_sets = nr_sets;
+ }
+ 
+ static int nvme_setup_irqs(struct nvme_dev *dev, unsigned int nr_io_queues)
+@@ -2061,6 +2178,10 @@ static int nvme_setup_irqs(struct nvme_dev *dev, unsigned int nr_io_queues)
+ 	/* Initialize for the single interrupt case */
+ 	dev->io_queues[HCTX_TYPE_DEFAULT] = 1;
+ 	dev->io_queues[HCTX_TYPE_READ] = 0;
++	dev->io_queues[HCTX_TYPE_WRR_LOW] = 0;
++	dev->io_queues[HCTX_TYPE_WRR_MEDIUM] = 0;
++	dev->io_queues[HCTX_TYPE_WRR_HIGH] = 0;
++	dev->io_queues[HCTX_TYPE_WRR_URGENT] = 0;
+ 
+ 	/*
+ 	 * Some Apple controllers require all queues to use the
+@@ -2162,10 +2283,16 @@ static int nvme_setup_io_queues(struct nvme_dev *dev)
+ 		nvme_suspend_io_queues(dev);
+ 		goto retry;
+ 	}
+-	dev_info(dev->ctrl.device, "%d/%d/%d default/read/poll queues\n",
++
++	dev_info(dev->ctrl.device, "%d/%d/%d/%d/%d/%d/%d "
++			"default/read/poll/low/medium/high/urgent queues\n",
+ 					dev->io_queues[HCTX_TYPE_DEFAULT],
+ 					dev->io_queues[HCTX_TYPE_READ],
+-					dev->io_queues[HCTX_TYPE_POLL]);
++					dev->io_queues[HCTX_TYPE_POLL],
++					dev->io_queues[HCTX_TYPE_WRR_LOW],
++					dev->io_queues[HCTX_TYPE_WRR_MEDIUM],
++					dev->io_queues[HCTX_TYPE_WRR_HIGH],
++					dev->io_queues[HCTX_TYPE_WRR_URGENT]);
  	return 0;
  }
  
-+static const char *blk_wrr_name[BLK_WRR_COUNT] = {
-+	[BLK_WRR_NONE]		= "none",
-+	[BLK_WRR_LOW]		= "low",
-+	[BLK_WRR_MEDIUM]	= "medium",
-+	[BLK_WRR_HIGH]		= "high",
-+	[BLK_WRR_URGENT]	= "urgent",
-+};
+@@ -2251,9 +2378,7 @@ static void nvme_dev_add(struct nvme_dev *dev)
+ 	if (!dev->ctrl.tagset) {
+ 		dev->tagset.ops = &nvme_mq_ops;
+ 		dev->tagset.nr_hw_queues = dev->online_queues - 1;
+-		dev->tagset.nr_maps = 2; /* default + read */
+-		if (dev->io_queues[HCTX_TYPE_POLL])
+-			dev->tagset.nr_maps++;
++		dev->tagset.nr_maps = HCTX_MAX_TYPES;
+ 		dev->tagset.timeout = NVME_IO_TIMEOUT;
+ 		dev->tagset.numa_node = dev_to_node(dev->dev);
+ 		dev->tagset.queue_depth =
+@@ -2688,7 +2813,30 @@ static int nvme_pci_get_address(struct nvme_ctrl *ctrl, char *buf, int size)
+ 
+ static void nvme_pci_get_ams(struct nvme_ctrl *ctrl, u32 *ams)
+ {
+-	*ams = NVME_CC_AMS_RR;
++	/* if deivce doesn't support WRR, force reset wrr queues to 0 */
++	if (!NVME_CAP_AMS_WRRU(ctrl->cap)) {
++		wrr_low_queues = 0;
++		wrr_medium_queues = 0;
++		wrr_high_queues = 0;
++		wrr_urgent_queues = 0;
 +
-+static inline const char *blk_wrr_to_name(int wrr)
-+{
-+	if (wrr < BLK_WRR_NONE || wrr >= BLK_WRR_COUNT)
-+		return "wrong";
-+
-+	return blk_wrr_name[wrr];
-+}
-+
-+static ssize_t blkcg_wrr_write(struct kernfs_open_file *of,
-+			 char *buf, size_t nbytes, loff_t off)
-+{
-+	struct blkcg *blkcg = css_to_blkcg(of_css(of));
-+	struct gendisk *disk;
-+	struct request_queue *q;
-+	struct blkcg_gq *blkg;
-+	unsigned int major, minor;
-+	int wrr, key_len, part, ret;
-+	char *body;
-+
-+	if (sscanf(buf, "%u:%u%n", &major, &minor, &key_len) != 2)
-+		return -EINVAL;
-+
-+	body = buf + key_len;
-+	if (!isspace(*body))
-+		return -EINVAL;
-+	body = skip_spaces(body);
-+	wrr = sysfs_match_string(blk_wrr_name, body);
-+	if (wrr == BLK_WRR_COUNT)
-+		return -EINVAL;
-+
-+	disk = get_gendisk(MKDEV(major, minor), &part);
-+	if (!disk)
-+		return -ENODEV;
-+	if (part) {
-+		ret = -EINVAL;
-+		goto fail;
++		*ams = NVME_CC_AMS_RR;
++		ctrl->wrr_enabled = false;
++		return;
 +	}
 +
-+	q = disk->queue;
-+
-+	blkg = blkg_lookup_create(blkcg, q);
-+
-+	atomic_set(&blkg->wrr, wrr);
-+	put_disk_and_module(disk);
-+
-+	return nbytes;
-+fail:
-+	put_disk_and_module(disk);
-+	return ret;
-+}
-+
-+static int blkcg_wrr_show(struct seq_file *sf, void *v)
-+{
-+	struct blkcg *blkcg = css_to_blkcg(seq_css(sf));
-+	struct blkcg_gq *blkg;
-+
-+	rcu_read_lock();
-+
-+	hlist_for_each_entry_rcu(blkg, &blkcg->blkg_list, blkcg_node) {
-+		const char *dname;
-+		char *buf;
-+		size_t size = seq_get_buf(sf, &buf), off = 0;
-+
-+		dname = blkg_dev_name(blkg);
-+		if (!dname)
-+			continue;
-+
-+		off += scnprintf(buf+off, size-off, "%s %s\n", dname,
-+			blk_wrr_to_name(atomic_read(&blkg->wrr)));
-+		seq_commit(sf, off);
++	/*
++	 * if device support WRR and all wrr queues are  0, don't enable
++	 * device's WRR.
++	 */
++	if ((wrr_low_queues + wrr_medium_queues + wrr_high_queues +
++				wrr_urgent_queues) > 0) {
++		*ams = NVME_CC_AMS_WRRU;
++		ctrl->wrr_enabled = true;
++	} else {
++		*ams = NVME_CC_AMS_RR;
++		ctrl->wrr_enabled = false;
 +	}
-+
-+	rcu_read_unlock();
-+	return 0;
-+}
-+
-+
- static struct cftype blkcg_files[] = {
- 	{
- 		.name = "stat",
-@@ -844,6 +929,12 @@ static struct cftype blkcg_legacy_files[] = {
- 		.name = "reset_stats",
- 		.write_u64 = blkcg_reset_stats,
- 	},
-+	{
-+		.name = "wrr",
-+		.flags = CFTYPE_NOT_ON_ROOT,
-+		.write = blkcg_wrr_write,
-+		.seq_show = blkcg_wrr_show,
-+	},
- 	{ }	/* terminate */
- };
- 
-diff --git a/block/blk-mq-debugfs.c b/block/blk-mq-debugfs.c
-index b3f2ba483992..455e5a21ee0c 100644
---- a/block/blk-mq-debugfs.c
-+++ b/block/blk-mq-debugfs.c
-@@ -420,6 +420,10 @@ static int hctx_busy_show(void *data, struct seq_file *m)
- static const char *const hctx_types[] = {
- 	[HCTX_TYPE_DEFAULT]	= "default",
- 	[HCTX_TYPE_READ]	= "read",
-+	[HCTX_TYPE_WRR_LOW]	= "wrr_low",
-+	[HCTX_TYPE_WRR_MEDIUM]	= "wrr_medium",
-+	[HCTX_TYPE_WRR_HIGH]	= "wrr_high",
-+	[HCTX_TYPE_WRR_URGENT]	= "wrr_urgent",
- 	[HCTX_TYPE_POLL]	= "poll",
- };
- 
-diff --git a/block/blk-mq-sched.c b/block/blk-mq-sched.c
-index ca22afd47b3d..32e948445eb0 100644
---- a/block/blk-mq-sched.c
-+++ b/block/blk-mq-sched.c
-@@ -7,6 +7,7 @@
- #include <linux/kernel.h>
- #include <linux/module.h>
- #include <linux/blk-mq.h>
-+#include <linux/blk-cgroup.h>
- 
- #include <trace/events/block.h>
- 
-@@ -326,7 +327,9 @@ bool __blk_mq_sched_bio_merge(struct request_queue *q, struct bio *bio,
- {
- 	struct elevator_queue *e = q->elevator;
- 	struct blk_mq_ctx *ctx = blk_mq_get_ctx(q);
--	struct blk_mq_hw_ctx *hctx = blk_mq_map_queue(q, bio->bi_opf, ctx);
-+	struct blkcg_gq *blkg = bio->bi_blkg;
-+	int wrr = blkg ? atomic_read(&blkg->wrr) : BLK_WRR_NONE;
-+	struct blk_mq_hw_ctx *hctx = blk_mq_map_queue(q, bio->bi_opf, ctx, wrr);
- 	bool ret = false;
- 	enum hctx_type type;
- 
-diff --git a/block/blk-mq-tag.c b/block/blk-mq-tag.c
-index fbacde454718..e46d2c34a27f 100644
---- a/block/blk-mq-tag.c
-+++ b/block/blk-mq-tag.c
-@@ -99,7 +99,7 @@ static int __blk_mq_get_tag(struct blk_mq_alloc_data *data,
- 		return __sbitmap_queue_get(bt);
  }
  
--unsigned int blk_mq_get_tag(struct blk_mq_alloc_data *data)
-+unsigned int blk_mq_get_tag(struct blk_mq_alloc_data *data, int wrr)
- {
- 	struct blk_mq_tags *tags = blk_mq_tags_from_data(data);
- 	struct sbitmap_queue *bt;
-@@ -159,7 +159,7 @@ unsigned int blk_mq_get_tag(struct blk_mq_alloc_data *data)
- 
- 		data->ctx = blk_mq_get_ctx(data->q);
- 		data->hctx = blk_mq_map_queue(data->q, data->cmd_flags,
--						data->ctx);
-+						data->ctx, wrr);
- 		tags = blk_mq_tags_from_data(data);
- 		if (data->flags & BLK_MQ_REQ_RESERVED)
- 			bt = &tags->breserved_tags;
-diff --git a/block/blk-mq-tag.h b/block/blk-mq-tag.h
-index 15bc74acb57e..5d951a0f32fe 100644
---- a/block/blk-mq-tag.h
-+++ b/block/blk-mq-tag.h
-@@ -25,7 +25,7 @@ struct blk_mq_tags {
- extern struct blk_mq_tags *blk_mq_init_tags(unsigned int nr_tags, unsigned int reserved_tags, int node, int alloc_policy);
- extern void blk_mq_free_tags(struct blk_mq_tags *tags);
- 
--extern unsigned int blk_mq_get_tag(struct blk_mq_alloc_data *data);
-+extern unsigned int blk_mq_get_tag(struct blk_mq_alloc_data *data, int wrr);
- extern void blk_mq_put_tag(struct blk_mq_hw_ctx *hctx, struct blk_mq_tags *tags,
- 			   struct blk_mq_ctx *ctx, unsigned int tag);
- extern int blk_mq_tag_update_depth(struct blk_mq_hw_ctx *hctx,
-diff --git a/block/blk-mq.c b/block/blk-mq.c
-index a12b1763508d..26383bde2792 100644
---- a/block/blk-mq.c
-+++ b/block/blk-mq.c
-@@ -340,6 +340,12 @@ static struct request *blk_mq_get_request(struct request_queue *q,
- 	unsigned int tag;
- 	bool clear_ctx_on_error = false;
- 	u64 alloc_time_ns = 0;
-+	int wrr;
-+
-+	if (bio && bio->bi_blkg)
-+		wrr = atomic_read(&bio->bi_blkg->wrr);
-+	else
-+		wrr = BLK_WRR_NONE;
- 
- 	blk_queue_enter_live(q);
- 
-@@ -354,7 +360,7 @@ static struct request *blk_mq_get_request(struct request_queue *q,
- 	}
- 	if (likely(!data->hctx))
- 		data->hctx = blk_mq_map_queue(q, data->cmd_flags,
--						data->ctx);
-+						data->ctx, wrr);
- 	if (data->cmd_flags & REQ_NOWAIT)
- 		data->flags |= BLK_MQ_REQ_NOWAIT;
- 
-@@ -374,7 +380,7 @@ static struct request *blk_mq_get_request(struct request_queue *q,
- 		blk_mq_tag_busy(data->hctx);
- 	}
- 
--	tag = blk_mq_get_tag(data);
-+	tag = blk_mq_get_tag(data, wrr);
- 	if (tag == BLK_MQ_TAG_FAIL) {
- 		if (clear_ctx_on_error)
- 			data->ctx = NULL;
-@@ -1044,7 +1050,7 @@ bool blk_mq_get_driver_tag(struct request *rq)
- 		data.flags |= BLK_MQ_REQ_RESERVED;
- 
- 	shared = blk_mq_tag_busy(data.hctx);
--	rq->tag = blk_mq_get_tag(&data);
-+	rq->tag = blk_mq_get_tag(&data, BLK_WRR_NONE);
- 	if (rq->tag >= 0) {
- 		if (shared) {
- 			rq->rq_flags |= RQF_MQ_INFLIGHT;
-diff --git a/block/blk-mq.h b/block/blk-mq.h
-index eaaca8fc1c28..e6aac5b46edb 100644
---- a/block/blk-mq.h
-+++ b/block/blk-mq.h
-@@ -101,7 +101,8 @@ static inline struct blk_mq_hw_ctx *blk_mq_map_queue_type(struct request_queue *
-  */
- static inline struct blk_mq_hw_ctx *blk_mq_map_queue(struct request_queue *q,
- 						     unsigned int flags,
--						     struct blk_mq_ctx *ctx)
-+						     struct blk_mq_ctx *ctx,
-+						     int wrr)
- {
- 	enum hctx_type type = HCTX_TYPE_DEFAULT;
- 
-@@ -110,7 +111,22 @@ static inline struct blk_mq_hw_ctx *blk_mq_map_queue(struct request_queue *q,
- 	 */
- 	if (flags & REQ_HIPRI)
- 		type = HCTX_TYPE_POLL;
--	else if ((flags & REQ_OP_MASK) == REQ_OP_READ)
-+	else if (wrr > BLK_WRR_NONE && wrr < BLK_WRR_COUNT) {
-+		switch (wrr) {
-+		case BLK_WRR_LOW:
-+			type = HCTX_TYPE_WRR_LOW;
-+			break;
-+		case BLK_WRR_MEDIUM:
-+			type = HCTX_TYPE_WRR_MEDIUM;
-+			break;
-+		case BLK_WRR_HIGH:
-+			type = HCTX_TYPE_WRR_HIGH;
-+			break;
-+		default:
-+			type = HCTX_TYPE_WRR_URGENT;
-+			break;
-+		}
-+	} else if ((flags & REQ_OP_MASK) == REQ_OP_READ)
- 		type = HCTX_TYPE_READ;
- 	
- 	return ctx->hctxs[type];
-diff --git a/block/blk.h b/block/blk.h
-index 6842f28c033e..ba97a6a35a73 100644
---- a/block/blk.h
-+++ b/block/blk.h
-@@ -40,7 +40,7 @@ extern struct ida blk_queue_ida;
- static inline struct blk_flush_queue *
- blk_get_flush_queue(struct request_queue *q, struct blk_mq_ctx *ctx)
- {
--	return blk_mq_map_queue(q, REQ_OP_FLUSH, ctx)->fq;
-+	return blk_mq_map_queue(q, REQ_OP_FLUSH, ctx, BLK_WRR_NONE)->fq;
- }
- 
- static inline void __blk_get_queue(struct request_queue *q)
-diff --git a/include/linux/blk-cgroup.h b/include/linux/blk-cgroup.h
-index e4a6949fd171..aab168a36d88 100644
---- a/include/linux/blk-cgroup.h
-+++ b/include/linux/blk-cgroup.h
-@@ -138,6 +138,8 @@ struct blkcg_gq {
- 	atomic64_t			delay_start;
- 	u64				last_delay;
- 	int				last_use;
-+	/* weighted round robin */
-+	atomic_t			wrr;
- 
- 	struct rcu_head			rcu_head;
- };
-diff --git a/include/linux/blk-mq.h b/include/linux/blk-mq.h
-index 11cfd6470b1a..e210778a94f0 100644
---- a/include/linux/blk-mq.h
-+++ b/include/linux/blk-mq.h
-@@ -193,17 +193,35 @@ struct blk_mq_queue_map {
-  * enum hctx_type - Type of hardware queue
-  * @HCTX_TYPE_DEFAULT:	All I/O not otherwise accounted for.
-  * @HCTX_TYPE_READ:	Just for READ I/O.
-+ * @HCTX_TYPE_WRR_LOW:     Weighted Round Robin low priority, when I/O is not polled.
-+ * @HCTX_TYPE_WRR_MEDIUM:  Weighted Round Robin medium priority, when I/O is not polled.
-+ * @HCTX_TYPE_WRR_HIGH:    Weighted Round Robin high priority, when I/O is not polled.
-+ * @HCTX_TYPE_WRR_URGENT:  Weighted Round Robin urgent priority, when I/O is not polled.
-  * @HCTX_TYPE_POLL:	Polled I/O of any kind.
-  * @HCTX_MAX_TYPES:	Number of types of hctx.
-  */
- enum hctx_type {
- 	HCTX_TYPE_DEFAULT,
- 	HCTX_TYPE_READ,
-+	HCTX_TYPE_WRR_LOW,
-+	HCTX_TYPE_WRR_MEDIUM,
-+	HCTX_TYPE_WRR_HIGH,
-+	HCTX_TYPE_WRR_URGENT,
- 	HCTX_TYPE_POLL,
- 
- 	HCTX_MAX_TYPES,
+ static const struct nvme_ctrl_ops nvme_pci_ctrl_ops = {
+diff --git a/include/linux/interrupt.h b/include/linux/interrupt.h
+index c5fe60ec6b84..eec8a5fc0922 100644
+--- a/include/linux/interrupt.h
++++ b/include/linux/interrupt.h
+@@ -273,7 +273,7 @@ struct irq_affinity_notify {
+ 	void (*release)(struct kref *ref);
  };
  
-+enum blk_wrr {
-+	BLK_WRR_NONE,
-+	BLK_WRR_LOW,
-+	BLK_WRR_MEDIUM,
-+	BLK_WRR_HIGH,
-+	BLK_WRR_URGENT,
-+
-+	BLK_WRR_COUNT,
-+};
-+
+-#define	IRQ_AFFINITY_MAX_SETS  4
++#define	IRQ_AFFINITY_MAX_SETS  7
+ 
  /**
-  * struct blk_mq_tag_set - tag set that can be shared between request queues
-  * @map:	   One or more ctx -> hctx mappings. One map exists for each
+  * struct irq_affinity - Description for automatic irq affinity assignements
+diff --git a/include/linux/nvme.h b/include/linux/nvme.h
+index 6fe9121e4d27..695a7bb5b5d8 100644
+--- a/include/linux/nvme.h
++++ b/include/linux/nvme.h
+@@ -127,6 +127,7 @@ enum {
+ };
+ 
+ #define NVME_CAP_MQES(cap)	((cap) & 0xffff)
++#define NVME_CAP_AMS_WRRU(cap)	((cap) & (1 << 17))
+ #define NVME_CAP_TIMEOUT(cap)	(((cap) >> 24) & 0xff)
+ #define NVME_CAP_STRIDE(cap)	(((cap) >> 32) & 0xf)
+ #define NVME_CAP_NSSRC(cap)	(((cap) >> 36) & 0x1)
+@@ -895,6 +896,7 @@ enum {
+ 	NVME_SQ_PRIO_HIGH	= (1 << 1),
+ 	NVME_SQ_PRIO_MEDIUM	= (2 << 1),
+ 	NVME_SQ_PRIO_LOW	= (3 << 1),
++	NVME_SQ_PRIO_IGNORE	= NVME_SQ_PRIO_URGENT,
+ 	NVME_FEAT_ARBITRATION	= 0x01,
+ 	NVME_FEAT_POWER_MGMT	= 0x02,
+ 	NVME_FEAT_LBA_RANGE	= 0x03,
 -- 
 2.14.1
 
