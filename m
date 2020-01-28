@@ -4,29 +4,29 @@ X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 X-Spam-Level: 
 X-Spam-Status: No, score=-7.5 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
 	INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,
-	URIBL_SBL,URIBL_SBL_A,USER_AGENT_SANE_1 autolearn=ham autolearn_force=no
-	version=3.4.0
+	URIBL_SBL,URIBL_SBL_A,USER_AGENT_SANE_1 autolearn=unavailable
+	autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id E7E1AC33CB3
-	for <linux-block@archiver.kernel.org>; Tue, 28 Jan 2020 12:08:15 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 2E14AC2D0DB
+	for <linux-block@archiver.kernel.org>; Tue, 28 Jan 2020 12:08:17 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.kernel.org (Postfix) with ESMTP id C800D24681
-	for <linux-block@archiver.kernel.org>; Tue, 28 Jan 2020 12:08:15 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id 0D42A24681
+	for <linux-block@archiver.kernel.org>; Tue, 28 Jan 2020 12:08:17 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1726072AbgA1MIP (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Tue, 28 Jan 2020 07:08:15 -0500
-Received: from 22.17.110.36.static.bjtelecom.net ([36.110.17.22]:23088 "HELO
-        bsf01.didichuxing.com" rhost-flags-OK-FAIL-OK-FAIL) by vger.kernel.org
-        with SMTP id S1726057AbgA1MIP (ORCPT
+        id S1726010AbgA1MIQ (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Tue, 28 Jan 2020 07:08:16 -0500
+Received: from mx2.didichuxing.com ([36.110.17.22]:14707 "HELO
+        bsf01.didichuxing.com" rhost-flags-OK-OK-OK-FAIL) by vger.kernel.org
+        with SMTP id S1726067AbgA1MIQ (ORCPT
         <rfc822;linux-block@vger.kernel.org>);
-        Tue, 28 Jan 2020 07:08:15 -0500
-X-ASG-Debug-ID: 1580212421-0e40884f7314c6d30001-Cu09wu
-Received: from mail.didiglobal.com (localhost [172.20.36.207]) by bsf01.didichuxing.com with ESMTP id WvI5Fr8csBiVuXnK; Tue, 28 Jan 2020 19:53:41 +0800 (CST)
+        Tue, 28 Jan 2020 07:08:16 -0500
+X-ASG-Debug-ID: 1580212398-0e40884f7214c6cd0001-Cu09wu
+Received: from mail.didiglobal.com (localhost [172.20.36.192]) by bsf01.didichuxing.com with ESMTP id Xs4FY41PjgkVZAf7; Tue, 28 Jan 2020 19:53:18 +0800 (CST)
 X-Barracuda-Envelope-From: zhangweiping@didiglobal.com
 Received: from 192.168.3.9 (172.22.50.20) by BJSGEXMBX03.didichuxing.com
  (172.20.15.133) with Microsoft SMTP Server (TLS) id 15.0.1473.3; Tue, 28 Jan
- 2020 19:53:41 +0800
-Date:   Tue, 28 Jan 2020 19:53:40 +0800
+ 2020 19:53:18 +0800
+Date:   Tue, 28 Jan 2020 19:53:17 +0800
 From:   Weiping Zhang <zhangweiping@didiglobal.com>
 To:     <axboe@kernel.dk>, <tj@kernel.org>, <hch@lst.de>,
         <bvanassche@acm.org>, <keith.busch@intel.com>,
@@ -34,11 +34,9 @@ To:     <axboe@kernel.dk>, <tj@kernel.org>, <hch@lst.de>,
         <edmund.nadolski@intel.com>
 CC:     <linux-block@vger.kernel.org>, <cgroups@vger.kernel.org>,
         <linux-nvme@lists.infradead.org>
-Subject: [PATCH v4 4/5] genirq/affinity: allow driver's discontigous affinity
- set
-Message-ID: <c044e71afa25fdf65ca9abd21f8a5032e1b424eb.1580211965.git.zhangweiping@didiglobal.com>
-X-ASG-Orig-Subj: [PATCH v4 4/5] genirq/affinity: allow driver's discontigous affinity
- set
+Subject: [PATCH v4 2/5] nvme: add get_ams for nvme_ctrl_ops
+Message-ID: <c52934f8c18130b32749d3096a7951daa48bb35e.1580211965.git.zhangweiping@didiglobal.com>
+X-ASG-Orig-Subj: [PATCH v4 2/5] nvme: add get_ams for nvme_ctrl_ops
 Mail-Followup-To: axboe@kernel.dk, tj@kernel.org, hch@lst.de,
         bvanassche@acm.org, keith.busch@intel.com, minwoo.im.dev@gmail.com,
         tglx@linutronix.de, edmund.nadolski@intel.com,
@@ -53,11 +51,11 @@ User-Agent: Mutt/1.5.21 (2010-09-15)
 X-Originating-IP: [172.22.50.20]
 X-ClientProxiedBy: BJEXCAS01.didichuxing.com (172.20.36.235) To
  BJSGEXMBX03.didichuxing.com (172.20.15.133)
-X-Barracuda-Connect: localhost[172.20.36.207]
-X-Barracuda-Start-Time: 1580212421
+X-Barracuda-Connect: localhost[172.20.36.192]
+X-Barracuda-Start-Time: 1580212398
 X-Barracuda-URL: https://bsf01.didichuxing.com:443/cgi-mod/mark.cgi
 X-Virus-Scanned: by bsmtpd at didichuxing.com
-X-Barracuda-Scan-Msg-Size: 977
+X-Barracuda-Scan-Msg-Size: 3211
 X-Barracuda-BRTS-Status: 1
 X-Barracuda-Bayes: INNOCENT GLOBAL 0.0000 1.0000 -2.0210
 X-Barracuda-Spam-Score: -2.02
@@ -71,32 +69,96 @@ Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-nvme driver will add 4 sets for supporting NVMe weighted round robin,
-and some of these sets may be empty(depends on user configuration),
-so each particular set is assigned one static index for avoiding the
-management trouble, then the empty set will be been by
-irq_create_affinity_masks(). This patch make API more compatible.
+The get_ams() will return the AMS(Arbitration Mechanism Selected)
+from the driver.
 
 Signed-off-by: Weiping Zhang <zhangweiping@didiglobal.com>
 ---
- kernel/irq/affinity.c | 4 ++++
- 1 file changed, 4 insertions(+)
+ drivers/nvme/host/core.c | 9 ++++++++-
+ drivers/nvme/host/nvme.h | 1 +
+ drivers/nvme/host/pci.c  | 6 ++++++
+ include/linux/nvme.h     | 1 +
+ 4 files changed, 16 insertions(+), 1 deletion(-)
 
-diff --git a/kernel/irq/affinity.c b/kernel/irq/affinity.c
-index 4d89ad4fae3b..83154615cc9d 100644
---- a/kernel/irq/affinity.c
-+++ b/kernel/irq/affinity.c
-@@ -462,6 +462,10 @@ irq_create_affinity_masks(unsigned int nvecs, struct irq_affinity *affd)
- 		unsigned int this_vecs = affd->set_size[i];
- 		int ret;
+diff --git a/drivers/nvme/host/core.c b/drivers/nvme/host/core.c
+index 6ec03507da68..2275f1756369 100644
+--- a/drivers/nvme/host/core.c
++++ b/drivers/nvme/host/core.c
+@@ -2119,6 +2119,7 @@ int nvme_enable_ctrl(struct nvme_ctrl *ctrl)
+ 	 */
+ 	unsigned dev_page_min, page_shift = 12;
+ 	int ret;
++	u32 ams = NVME_CC_AMS_RR;
  
-+		/* skip empty affinity set */
-+		if (this_vecs == 0)
-+			continue;
+ 	ret = ctrl->ops->reg_read64(ctrl, NVME_REG_CAP, &ctrl->cap);
+ 	if (ret) {
+@@ -2134,11 +2135,17 @@ int nvme_enable_ctrl(struct nvme_ctrl *ctrl)
+ 		return -ENODEV;
+ 	}
+ 
++	/* get Arbitration Mechanism Selected */
++	if (ctrl->ops->get_ams) {
++		ctrl->ops->get_ams(ctrl, &ams);
++		ams &= NVME_CC_AMS_MASK;
++	}
 +
- 		ret = irq_build_affinity_masks(curvec, this_vecs,
- 					       curvec, masks);
- 		if (ret) {
+ 	ctrl->page_size = 1 << page_shift;
+ 
+ 	ctrl->ctrl_config = NVME_CC_CSS_NVM;
+ 	ctrl->ctrl_config |= (page_shift - 12) << NVME_CC_MPS_SHIFT;
+-	ctrl->ctrl_config |= NVME_CC_AMS_RR | NVME_CC_SHN_NONE;
++	ctrl->ctrl_config |= ams | NVME_CC_SHN_NONE;
+ 	ctrl->ctrl_config |= NVME_CC_IOSQES | NVME_CC_IOCQES;
+ 	ctrl->ctrl_config |= NVME_CC_ENABLE;
+ 
+diff --git a/drivers/nvme/host/nvme.h b/drivers/nvme/host/nvme.h
+index 1024fec7914c..a1df74f2eed3 100644
+--- a/drivers/nvme/host/nvme.h
++++ b/drivers/nvme/host/nvme.h
+@@ -407,6 +407,7 @@ struct nvme_ctrl_ops {
+ 	void (*submit_async_event)(struct nvme_ctrl *ctrl);
+ 	void (*delete_ctrl)(struct nvme_ctrl *ctrl);
+ 	int (*get_address)(struct nvme_ctrl *ctrl, char *buf, int size);
++	void (*get_ams)(struct nvme_ctrl *ctrl, u32 *ams);
+ };
+ 
+ #ifdef CONFIG_FAULT_INJECTION_DEBUG_FS
+diff --git a/drivers/nvme/host/pci.c b/drivers/nvme/host/pci.c
+index 445c2ee2a01d..e460c7310187 100644
+--- a/drivers/nvme/host/pci.c
++++ b/drivers/nvme/host/pci.c
+@@ -2688,6 +2688,11 @@ static int nvme_pci_get_address(struct nvme_ctrl *ctrl, char *buf, int size)
+ 	return snprintf(buf, size, "%s", dev_name(&pdev->dev));
+ }
+ 
++static void nvme_pci_get_ams(struct nvme_ctrl *ctrl, u32 *ams)
++{
++	*ams = NVME_CC_AMS_RR;
++}
++
+ static const struct nvme_ctrl_ops nvme_pci_ctrl_ops = {
+ 	.name			= "pcie",
+ 	.module			= THIS_MODULE,
+@@ -2699,6 +2704,7 @@ static const struct nvme_ctrl_ops nvme_pci_ctrl_ops = {
+ 	.free_ctrl		= nvme_pci_free_ctrl,
+ 	.submit_async_event	= nvme_pci_submit_async_event,
+ 	.get_address		= nvme_pci_get_address,
++	.get_ams		= nvme_pci_get_ams,
+ };
+ 
+ static int nvme_dev_map(struct nvme_dev *dev)
+diff --git a/include/linux/nvme.h b/include/linux/nvme.h
+index 3d5189f46cb1..6fe9121e4d27 100644
+--- a/include/linux/nvme.h
++++ b/include/linux/nvme.h
+@@ -171,6 +171,7 @@ enum {
+ 	NVME_CC_AMS_RR		= 0 << NVME_CC_AMS_SHIFT,
+ 	NVME_CC_AMS_WRRU	= 1 << NVME_CC_AMS_SHIFT,
+ 	NVME_CC_AMS_VS		= 7 << NVME_CC_AMS_SHIFT,
++	NVME_CC_AMS_MASK	= 7 << NVME_CC_AMS_SHIFT,
+ 	NVME_CC_SHN_NONE	= 0 << NVME_CC_SHN_SHIFT,
+ 	NVME_CC_SHN_NORMAL	= 1 << NVME_CC_SHN_SHIFT,
+ 	NVME_CC_SHN_ABRUPT	= 2 << NVME_CC_SHN_SHIFT,
 -- 
 2.14.1
 
