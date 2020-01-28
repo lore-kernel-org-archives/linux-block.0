@@ -2,143 +2,192 @@ Return-Path: <SRS0=qLSf=3R=vger.kernel.org=linux-block-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-3.8 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
-	MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS autolearn=no
-	autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-2.4 required=3.0 tests=DKIMWL_WL_HIGH,DKIM_SIGNED,
+	DKIM_VALID,DKIM_VALID_AU,HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,
+	SPF_HELO_NONE,SPF_PASS,USER_AGENT_SANE_1 autolearn=no autolearn_force=no
+	version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 7B415C2D0DB
-	for <linux-block@archiver.kernel.org>; Tue, 28 Jan 2020 19:28:13 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id E4D71C2D0DB
+	for <linux-block@archiver.kernel.org>; Tue, 28 Jan 2020 20:35:05 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.kernel.org (Postfix) with ESMTP id 4E6C924681
-	for <linux-block@archiver.kernel.org>; Tue, 28 Jan 2020 19:28:13 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id 9F6DB2073A
+	for <linux-block@archiver.kernel.org>; Tue, 28 Jan 2020 20:35:05 +0000 (UTC)
+Authentication-Results: mail.kernel.org;
+	dkim=pass (2048-bit key) header.d=oracle.com header.i=@oracle.com header.b="EU6ZQ7Vp"
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1726002AbgA1T2M convert rfc822-to-8bit (ORCPT
-        <rfc822;linux-block@archiver.kernel.org>);
-        Tue, 28 Jan 2020 14:28:12 -0500
-Received: from mx0b-002e3701.pphosted.com ([148.163.143.35]:15120 "EHLO
-        mx0b-002e3701.pphosted.com" rhost-flags-OK-OK-OK-OK)
-        by vger.kernel.org with ESMTP id S1726162AbgA1T2M (ORCPT
+        id S1726182AbgA1UfE (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Tue, 28 Jan 2020 15:35:04 -0500
+Received: from userp2130.oracle.com ([156.151.31.86]:41882 "EHLO
+        userp2130.oracle.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S1726143AbgA1UfE (ORCPT
         <rfc822;linux-block@vger.kernel.org>);
-        Tue, 28 Jan 2020 14:28:12 -0500
-Received: from pps.filterd (m0150244.ppops.net [127.0.0.1])
-        by mx0b-002e3701.pphosted.com (8.16.0.42/8.16.0.42) with SMTP id 00SJMpgL014432;
-        Tue, 28 Jan 2020 19:28:04 GMT
-Received: from g2t2353.austin.hpe.com (g2t2353.austin.hpe.com [15.233.44.26])
-        by mx0b-002e3701.pphosted.com with ESMTP id 2xtrm6sab9-1
-        (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
-        Tue, 28 Jan 2020 19:28:04 +0000
-Received: from G2W6311.americas.hpqcorp.net (g2w6311.austin.hp.com [16.197.64.53])
-        (using TLSv1.2 with cipher ECDHE-RSA-AES256-SHA384 (256/256 bits))
-        (No client certificate requested)
-        by g2t2353.austin.hpe.com (Postfix) with ESMTPS id 20104A5;
-        Tue, 28 Jan 2020 19:28:02 +0000 (UTC)
-Received: from G4W9327.americas.hpqcorp.net (16.208.32.97) by
- G2W6311.americas.hpqcorp.net (16.197.64.53) with Microsoft SMTP Server (TLS)
- id 15.0.1367.3; Tue, 28 Jan 2020 19:27:52 +0000
-Received: from G2W6311.americas.hpqcorp.net (16.197.64.53) by
- G4W9327.americas.hpqcorp.net (16.208.32.97) with Microsoft SMTP Server (TLS)
- id 15.0.1367.3; Tue, 28 Jan 2020 19:27:52 +0000
-Received: from NAM10-MW2-obe.outbound.protection.outlook.com (15.241.52.10) by
- G2W6311.americas.hpqcorp.net (16.197.64.53) with Microsoft SMTP Server (TLS)
- id 15.0.1367.3 via Frontend Transport; Tue, 28 Jan 2020 19:27:51 +0000
-ARC-Seal: i=1; a=rsa-sha256; s=arcselector9901; d=microsoft.com; cv=none;
- b=jv/7gkpBNPTbnnrA4yEpOKi3euFaBKpez0Epc2155bG6Z5ZE2wM1buvaNYr53fg//4YJFkKP1P+ejGmNlrX+QK070Upi1OB6/ORpRXGRLPxAfGtjFhtfHCwJcI0HVU9GVi9/6QqYk3sWWMpChVBOwLGUwqrodmzjU74F3UTXil0ekVq3ABgRzz0lYLc1DU5tJfsYrKAjPRf8p+cJbsLvlcEnSV5YMLsl/WHkeS3T4GAKq2a3xhAMJI8vEDy52GZjwEANRXLnWEa1sUmODZrfUMT7N08q1CJ3sGC/H2yy36X7A6rp1jl9g1b1PiJIJ38klrY2nTCuVn9B9QxiVOkvxg==
-ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com;
- s=arcselector9901;
- h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
- bh=BASqoOINSZ6l9CEAFiun0vBL4kcd3tBhyDC2QaIkKaA=;
- b=a416L7o8oxOYDJ5MEDjquisTW2veyo74iHS1vTu9GyoC2fErj/tSHBDeIQ78oo5TEYz1l9jZoQPJ3BEvrmkO2RXf3QVyf8J6dNI7THuLe1KrCltf5EjRt63Lk5vgI7lzFvQm8ELUKQB/M3cpuE2f/5LfGF6alQoNbmj/AJFYuBKWV7+nFLEz4YrCZY8ozIjnlYPYaWfa+YnDj7WGPpyNtnh+P3IIvuJwaUt44lkiuHx+7qkfIzxMyDZbZq3hnzRuEyjPMCvWSy3xjR7VYAZEsBsfz+inkVs0G581JA2LPBDSQUpPEu6jqQexqes/Ub+bxUF+T8JzLo5gyrUd35zggA==
-ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass
- smtp.mailfrom=hpe.com; dmarc=pass action=none header.from=hpe.com; dkim=pass
- header.d=hpe.com; arc=none
-Received: from CS1PR8401MB1237.NAMPRD84.PROD.OUTLOOK.COM (10.169.97.143) by
- CS1PR8401MB0502.NAMPRD84.PROD.OUTLOOK.COM (10.169.14.140) with Microsoft SMTP
- Server (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
- 15.20.2665.24; Tue, 28 Jan 2020 19:27:50 +0000
-Received: from CS1PR8401MB1237.NAMPRD84.PROD.OUTLOOK.COM
- ([fe80::6913:a11a:3f11:fa4f]) by CS1PR8401MB1237.NAMPRD84.PROD.OUTLOOK.COM
- ([fe80::6913:a11a:3f11:fa4f%3]) with mapi id 15.20.2665.026; Tue, 28 Jan 2020
- 19:27:50 +0000
-From:   "Elliott, Robert (Servers)" <elliott@hpe.com>
-To:     Daniel Wagner <dwagner@suse.de>,
-        "linux-block@vger.kernel.org" <linux-block@vger.kernel.org>
-CC:     Johannes Thumshirn <Johannes.Thumshirn@wdc.com>,
-        Logan Gunthorpe <logang@deltatee.com>,
-        Omar Sandoval <osandov@fb.com>
-Subject: RE: [PATCH blktests v1 2/2] nmve/018: Reword misleading error message
-Thread-Topic: [PATCH blktests v1 2/2] nmve/018: Reword misleading error
- message
-Thread-Index: AQHV1bc8suLzVScMOUmStC4vuY1U9qgAdWlg
-Date:   Tue, 28 Jan 2020 19:27:50 +0000
-Message-ID: <CS1PR8401MB1237A6FBBBA1436C93F89B78AB0A0@CS1PR8401MB1237.NAMPRD84.PROD.OUTLOOK.COM>
-References: <20200128084434.128750-1-dwagner@suse.de>
- <20200128084434.128750-3-dwagner@suse.de>
-In-Reply-To: <20200128084434.128750-3-dwagner@suse.de>
-Accept-Language: en-US
-Content-Language: en-US
-X-MS-Has-Attach: 
-X-MS-TNEF-Correlator: 
-x-originating-ip: [15.211.195.7]
-x-ms-publictraffictype: Email
-x-ms-office365-filtering-ht: Tenant
-x-ms-office365-filtering-correlation-id: 2efef4ed-99eb-410c-a839-08d7a4282a03
-x-ms-traffictypediagnostic: CS1PR8401MB0502:
-x-microsoft-antispam-prvs: <CS1PR8401MB05026D7DB8794727A211B37CAB0A0@CS1PR8401MB0502.NAMPRD84.PROD.OUTLOOK.COM>
-x-ms-oob-tlc-oobclassifiers: OLM:2276;
-x-forefront-prvs: 029651C7A1
-x-forefront-antispam-report: SFV:NSPM;SFS:(10019020)(346002)(396003)(136003)(39860400002)(366004)(376002)(199004)(189003)(4744005)(9686003)(186003)(4326008)(53546011)(6506007)(26005)(52536014)(54906003)(5660300002)(110136005)(81166006)(71200400001)(55016002)(81156014)(8676002)(8936002)(316002)(86362001)(7696005)(76116006)(66476007)(66946007)(15650500001)(66446008)(478600001)(64756008)(66556008)(33656002)(2906002);DIR:OUT;SFP:1102;SCL:1;SRVR:CS1PR8401MB0502;H:CS1PR8401MB1237.NAMPRD84.PROD.OUTLOOK.COM;FPR:;SPF:None;LANG:en;PTR:InfoNoRecords;A:1;MX:1;
-received-spf: None (protection.outlook.com: hpe.com does not designate
- permitted sender hosts)
-x-ms-exchange-senderadcheck: 1
-x-microsoft-antispam: BCL:0;
-x-microsoft-antispam-message-info: +H8kDqJe2Ey2r4QleONlGbdDBkUBiLzoqWtb/FBgRqWX8xgYWVt8NGaRYMbaNcpW9gjgjIavqsmBY+aIpOcTsI7qmzR+Qh8N8X09R7f7o5A/hdjrBWIy4Y4QlFsK6Q/3FM3B9h0dDHZg0WVfXU5UaB+3ofwEvXoh6HqrCbjGQ/SzO8B6AIE6CWvsBAJZzZu+bIAaOYRPeDnfWwxSfPyatiGUD9OqSCg7RebU0/4kxXNljT/kD6g+IlS8SScm5TqSQPm3hml/NHQZbKGqDip2YgIBEshK9aQ8vuoOmpLF445nz9+vRpBBIODv7ypseVLNN6vmEacd+PKSkuL7YW77o9yp52Ctux37xHNNNKJOfS73+z1tQuFNdcXW13kcrU1DdCJ8n/mL6ZAy8Fd4qaCtCg5aIPgJMAAU5EVRJpYgkyNA39JHbzrOObH53UWV/JvA
-x-ms-exchange-antispam-messagedata: zPVHr6wq0yxJdm0dVRKglaNHY483t+NYHmJYp9DbyTWMvYDwr+t7yniyH93WzHWOvIrs018UYRODQkpoZbk76dDbcRp3i6K0Z5BTyJIQhlnIRwLPqh8FYBxmtbpAXyu53pIkbETUQPYyHGlxhFsMwA==
-x-ms-exchange-transport-forked: True
-Content-Type: text/plain; charset="us-ascii"
-Content-Transfer-Encoding: 8BIT
+        Tue, 28 Jan 2020 15:35:04 -0500
+Received: from pps.filterd (userp2130.oracle.com [127.0.0.1])
+        by userp2130.oracle.com (8.16.0.27/8.16.0.27) with SMTP id 00SKXAEJ071715;
+        Tue, 28 Jan 2020 20:34:57 GMT
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=oracle.com; h=subject : to : cc :
+ references : from : message-id : date : mime-version : in-reply-to :
+ content-type : content-transfer-encoding; s=corp-2019-08-05;
+ bh=d3nOduFGNMIRVklSOzDpeqy27FD3AOXJuXt0+MEgZ0o=;
+ b=EU6ZQ7VpYAJYZAAKgZdb3lg6RzYa/fVHt12I48Q/ok8jGnMJjwkMWpcuGjsxPhzcFOjI
+ fLfhcMbLhO6dWp7z8Rv4DtsI234GG79eNuGUzbn2IJTkXvqSm6cq8FFvY5LvA6op8JpC
+ 82H0Zp0CEm5iyiOGFT89OIAuM7tdkkdv3e2cSTGjwyJ9ex5ESZHrYzVxggynXqLDsjlP
+ i8wibGM8pZSWwQlpDG7KIRSjaU31917LZ2Ns+o75Fp/p/RZGjZHp+dUUEllxgGo0Iv23
+ WvPfhl4LcsFe+YPIDQI6pvhZ5ym/c/BKSKtVv1md/JWW6HZF32XC+qYcL6tPY5lsyvsG 9g== 
+Received: from userp3020.oracle.com (userp3020.oracle.com [156.151.31.79])
+        by userp2130.oracle.com with ESMTP id 2xrd3u8xdw-1
+        (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=OK);
+        Tue, 28 Jan 2020 20:34:57 +0000
+Received: from pps.filterd (userp3020.oracle.com [127.0.0.1])
+        by userp3020.oracle.com (8.16.0.27/8.16.0.27) with SMTP id 00SKYeqX138945;
+        Tue, 28 Jan 2020 20:34:57 GMT
+Received: from userv0121.oracle.com (userv0121.oracle.com [156.151.31.72])
+        by userp3020.oracle.com with ESMTP id 2xta8jj2vx-1
+        (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=OK);
+        Tue, 28 Jan 2020 20:34:56 +0000
+Received: from abhmp0004.oracle.com (abhmp0004.oracle.com [141.146.116.10])
+        by userv0121.oracle.com (8.14.4/8.13.8) with ESMTP id 00SKYqJm017795;
+        Tue, 28 Jan 2020 20:34:53 GMT
+Received: from [10.154.146.35] (/10.154.146.35)
+        by default (Oracle Beehive Gateway v4.0)
+        with ESMTP ; Tue, 28 Jan 2020 12:34:52 -0800
+Subject: Re: [RFC 2/2] io_uring: acquire ctx->uring_lock before calling
+ io_issue_sqe()
+To:     Jens Axboe <axboe@kernel.dk>
+Cc:     linux-block@vger.kernel.org, Christoph Hellwig <hch@lst.de>,
+        Keith Busch <keith.busch@gmail.com>
+References: <1579142266-64789-1-git-send-email-bijan.mottahedeh@oracle.com>
+ <1579142266-64789-3-git-send-email-bijan.mottahedeh@oracle.com>
+ <9b359dde-3bb6-5886-264b-4bee90be9e25@kernel.dk>
+ <8f7986c7-e5b4-8f24-1c71-666c01b16c8b@kernel.dk>
+ <1397cd55-37a6-4e14-91ac-eb3c35e7d962@kernel.dk>
+ <b43835cd-3bd6-705e-df51-923bbec78c67@oracle.com>
+ <18346d15-d89d-9d28-1ef8-77574d44dce7@kernel.dk>
+ <229bd8ea-cd65-c77a-ad58-2a79f3bd0c5b@oracle.com>
+ <a316d3fe-4162-8274-a74a-2d13a4caf011@kernel.dk>
+From:   Bijan Mottahedeh <bijan.mottahedeh@oracle.com>
+Message-ID: <f56a8767-c754-b2e9-bfea-1ced197a05d7@oracle.com>
+Date:   Tue, 28 Jan 2020 12:34:49 -0800
+User-Agent: Mozilla/5.0 (Windows NT 6.1; WOW64; rv:68.0) Gecko/20100101
+ Thunderbird/68.4.1
 MIME-Version: 1.0
-X-MS-Exchange-CrossTenant-Network-Message-Id: 2efef4ed-99eb-410c-a839-08d7a4282a03
-X-MS-Exchange-CrossTenant-originalarrivaltime: 28 Jan 2020 19:27:50.6054
- (UTC)
-X-MS-Exchange-CrossTenant-fromentityheader: Hosted
-X-MS-Exchange-CrossTenant-id: 105b2061-b669-4b31-92ac-24d304d195dc
-X-MS-Exchange-CrossTenant-mailboxtype: HOSTED
-X-MS-Exchange-CrossTenant-userprincipalname: FBTDDUjD040pJVBZ3jqyOx2VfUr/EcQuyWgq0wgZyiU+g8Kpd4W083wChT5Z78Lz
-X-MS-Exchange-Transport-CrossTenantHeadersStamped: CS1PR8401MB0502
-X-OriginatorOrg: hpe.com
-X-HPE-SCL: -1
-X-Proofpoint-Virus-Version: vendor=fsecure engine=2.50.10434:6.0.138,18.0.572
- definitions=2020-01-28_07:2020-01-28,2020-01-28 signatures=0
-X-Proofpoint-Spam-Details: rule=outbound_notspam policy=outbound score=0 phishscore=0 mlxscore=0
- priorityscore=1501 suspectscore=0 adultscore=0 malwarescore=0 bulkscore=0
- lowpriorityscore=0 clxscore=1011 impostorscore=0 spamscore=0
- mlxlogscore=999 classifier=spam adjust=0 reason=mlx scancount=1
- engine=8.12.0-1911200001 definitions=main-2001280145
+In-Reply-To: <a316d3fe-4162-8274-a74a-2d13a4caf011@kernel.dk>
+Content-Type: text/plain; charset=utf-8; format=flowed
+Content-Transfer-Encoding: 8bit
+Content-Language: en-US
+X-Antivirus: Avast (VPS 200127-0, 01/27/2020), Outbound message
+X-Antivirus-Status: Clean
+X-Proofpoint-Virus-Version: vendor=nai engine=6000 definitions=9514 signatures=668685
+X-Proofpoint-Spam-Details: rule=notspam policy=default score=0 suspectscore=0 malwarescore=0
+ phishscore=0 bulkscore=0 spamscore=0 mlxscore=0 mlxlogscore=999
+ adultscore=0 classifier=spam adjust=0 reason=mlx scancount=1
+ engine=8.0.1-1911140001 definitions=main-2001280154
+X-Proofpoint-Virus-Version: vendor=nai engine=6000 definitions=9514 signatures=668685
+X-Proofpoint-Spam-Details: rule=notspam policy=default score=0 priorityscore=1501 malwarescore=0
+ suspectscore=0 phishscore=0 bulkscore=0 spamscore=0 clxscore=1015
+ lowpriorityscore=0 mlxscore=0 impostorscore=0 mlxlogscore=999 adultscore=0
+ classifier=spam adjust=0 reason=mlx scancount=1 engine=8.0.1-1911140001
+ definitions=main-2001280154
 Sender: linux-block-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-> -----Original Message-----
-> From: linux-block-owner@vger.kernel.org <linux-block-
-> owner@vger.kernel.org> On Behalf Of Daniel Wagner
-> Sent: Tuesday, January 28, 2020 2:45 AM
-> Subject: [PATCH blktests v1 2/2] nmve/018: Reword misleading error message
-> 
-> 'nvme read' is expected to fail, though the error message "ERROR:
-> Successfully..." is misleading. Reword the error text to clarify the
-> real indent of the test and what failed.
+On 1/16/2020 1:26 PM, Jens Axboe wrote:
+> On 1/16/20 2:04 PM, Bijan Mottahedeh wrote:
+>> On 1/16/2020 12:02 PM, Jens Axboe wrote:
+>>> On 1/16/20 12:08 PM, Bijan Mottahedeh wrote:
+>>>> On 1/16/2020 8:22 AM, Jens Axboe wrote:
+>>>>> On 1/15/20 9:42 PM, Jens Axboe wrote:
+>>>>>> On 1/15/20 9:34 PM, Jens Axboe wrote:
+>>>>>>> On 1/15/20 7:37 PM, Bijan Mottahedeh wrote:
+>>>>>>>> io_issue_sqe() calls io_iopoll_req_issued() which manipulates poll_list,
+>>>>>>>> so acquire ctx->uring_lock beforehand similar to other instances of
+>>>>>>>> calling io_issue_sqe().
+>>>>>>> Is the below not enough?
+>>>>>> This should be better, we have two that set ->in_async, and only one
+>>>>>> doesn't hold the mutex.
+>>>>>>
+>>>>>> If this works for you, can you resend patch 2 with that? Also add a:
+>>>>>>
+>>>>>> Fixes: 8a4955ff1cca ("io_uring: sqthread should grab ctx->uring_lock for submissions")
+>>>>>>
+>>>>>> to it as well. Thanks!
+>>>>> I tested and queued this up:
+>>>>>
+>>>>> https://git.kernel.dk/cgit/linux-block/commit/?h=io_uring-5.5&id=11ba820bf163e224bf5dd44e545a66a44a5b1d7a
+>>>>>
+>>>>> Please let me know if this works, it sits on top of the ->result patch you
+>>>>> sent in.
+>>>>>
+>>>> That works, thanks.
+>>>>
+>>>> I'm however still seeing a use-after-free error in the request
+>>>> completion path in nvme_unmap_data().  It happens only when testing with
+>>>> large block sizes in fio, typically > 128k, e.g. bs=256k will always hit it.
+>>>>
+>>>> This is the error:
+>>>>
+>>>> DMA-API: nvme 0000:00:04.0: device driver tries to free DMA memory it
+>>>> has not allocated [device address=0x6b6b6b6b6b6b6b6b] [size=1802201963
+>>>> bytes]
+>>>>
+>>>> and this warning occasionally:
+>>>>
+>>>> WARN_ON_ONCE(blk_mq_rq_state(rq) != MQ_RQ_IDLE);
+>>>>
+>>>> It seems like a request might be issued multiple times but I can't see
+>>>> anything in io_uring code that would account for it.
+>>> Both of them indicate reuse, and I agree I don't think it's io_uring. It
+>>> really feels like an issue with nvme when a poll queue is shared, but I
+>>> haven't been able to pin point what it is yet.
+>>>
+>>> The 128K is interesting, that would seem to indicate that it's related to
+>>> splitting of the IO (which would create > 1 IO per submitted IO).
+>>>
+>> Where does the split take place?  I had suspected that it might be
+>> related to the submit_bio() loop in __blkdev_direct_IO() but I don't
+>> think I saw multiple submit_bio() calls or maybe I missed something.
+> See the path from blk_mq_make_request() -> __blk_queue_split() ->
+> blk_bio_segment_split(). The bio is built and submitted, then split if
+> it violates any size constraints. The splits are submitted through
+> generic_make_request(), so that might be why you didn't see multiple
+> submit_bio() calls.
+>
 
-intent
+I think the problem is in __blkdev_direct_IO() and not related to 
+request size:
 
-> 
-> Reported-by: Logan Gunthorpe <logang@deltatee.com>
-> Signed-off-by: Daniel Wagner <dwagner@suse.de>
-...
-> -		&& echo "ERROR: Successfully read out of device lba range"
-> +		&& echo "ERROR: nvme read was successful for out of range lba"
-> 
+                         qc = submit_bio(bio);
 
-To avoid being picked up by a grep for "success", you could use:
-    ERROR: nvme read for out of range LBA was not rejected
+                         if (polled)
+                                 WRITE_ONCE(iocb->ki_cookie, qc);
+
+
+The first call to submit_bio() when dio->is_sync is not set won't have 
+acquired a bio ref through bio_get() and so the bio/dio could be freed 
+when ki_cookie is set.
+
+With the specific io_uring test, this happens because 
+blk_mq_make_request()->blk_mq_get_request() fails and so terminates the 
+request.
+
+As for the fix for polled io (!is_sync) case, I'm wondering if 
+dio->multi_bio is really necessary in __blkdev_direct_IO(). Can we call 
+bio_get() unconditionally after the call to bio_alloc_bioset(), set 
+dio->ref = 1, and increment it for additional submit bio calls?  Would 
+it make sense to do away with multi_bio?
+
+Also, I'm not clear on how is_sync + mult_bio case is supposed to work.  
+__blkdev_direct_IO() polls for *a* completion in the request's hctx and 
+not *the* request completion itself, so what does that tell us for 
+multi_bio + is_sync? Is the polling supposed to guarantee that all 
+constituent bios for a mult_bio request have completed before return?
+
+
+--bijan
+
+
+PS I couldn't see 256k requests being split via __blk_queue_split(), 
+still not sure how that works.
 
