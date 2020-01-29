@@ -2,192 +2,204 @@ Return-Path: <SRS0=SUnH=3S=vger.kernel.org=linux-block-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-12.4 required=3.0 tests=DKIMWL_WL_HIGH,DKIM_SIGNED,
-	DKIM_VALID,DKIM_VALID_AU,HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PULL_REQUEST,
-	MAILING_LIST_MULTI,MENTIONS_GIT_HOSTING,SPF_HELO_NONE,SPF_PASS,
-	USER_AGENT_SANE_1 autolearn=ham autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-3.5 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
+	HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,
+	USER_AGENT_GIT autolearn=no autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 726BCC2D0DB
-	for <linux-block@archiver.kernel.org>; Wed, 29 Jan 2020 17:17:20 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 5E9E4C2D0DB
+	for <linux-block@archiver.kernel.org>; Wed, 29 Jan 2020 23:29:26 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.kernel.org (Postfix) with ESMTP id 3CDF920720
-	for <linux-block@archiver.kernel.org>; Wed, 29 Jan 2020 17:17:20 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id 1C67D206D5
+	for <linux-block@archiver.kernel.org>; Wed, 29 Jan 2020 23:29:26 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="Yyb9wI0k"
+	dkim=fail reason="signature verification failed" (2048-bit key) header.d=wdc.com header.i=@wdc.com header.b="H9IQZNQE"
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1726945AbgA2RRT (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Wed, 29 Jan 2020 12:17:19 -0500
-Received: from us-smtp-1.mimecast.com ([205.139.110.61]:60403 "EHLO
-        us-smtp-delivery-1.mimecast.com" rhost-flags-OK-OK-OK-FAIL)
-        by vger.kernel.org with ESMTP id S1726647AbgA2RRT (ORCPT
+        id S1726528AbgA2X3Z (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Wed, 29 Jan 2020 18:29:25 -0500
+Received: from esa4.hgst.iphmx.com ([216.71.154.42]:24315 "EHLO
+        esa4.hgst.iphmx.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S1726401AbgA2X3Z (ORCPT
         <rfc822;linux-block@vger.kernel.org>);
-        Wed, 29 Jan 2020 12:17:19 -0500
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-        s=mimecast20190719; t=1580318237;
-        h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-         to:to:cc:cc:mime-version:mime-version:content-type:content-type;
-        bh=TZt5KIcmC4t4McDT3OSuRA2r9QpzOQjAUfIdeQrTVzM=;
-        b=Yyb9wI0kXvCw5kCxSsxDKEI/G7TRvtZawWH6O/Z3KbBAP2KScAqshRth+Cx7+m/BeuV3/l
-        QLhtPIxaOi0osho6KwA7HsMuUInZAXv/r7+Vx8FhlZuMs+hpikWSMV8ZmiiZnmEL907I5b
-        04Q6PweiQanGuGqhYWmR+Q61hgqV+7Y=
-Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
- [209.132.183.4]) (Using TLS) by relay.mimecast.com with ESMTP id
- us-mta-376-gGGcyiE_PVyuN1pAjXk0LA-1; Wed, 29 Jan 2020 12:17:15 -0500
-X-MC-Unique: gGGcyiE_PVyuN1pAjXk0LA-1
-Received: from smtp.corp.redhat.com (int-mx04.intmail.prod.int.phx2.redhat.com [10.5.11.14])
-        (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
-        (No client certificate requested)
-        by mimecast-mx01.redhat.com (Postfix) with ESMTPS id BAFA5100550E;
-        Wed, 29 Jan 2020 17:17:12 +0000 (UTC)
-Received: from localhost (unknown [10.18.25.174])
-        by smtp.corp.redhat.com (Postfix) with ESMTPS id B1CCF5D9C5;
-        Wed, 29 Jan 2020 17:17:04 +0000 (UTC)
-Date:   Wed, 29 Jan 2020 12:17:03 -0500
-From:   Mike Snitzer <snitzer@redhat.com>
-To:     Linus Torvalds <torvalds@linux-foundation.org>
-Cc:     dm-devel@redhat.com, linux-block@vger.kernel.org,
-        Alasdair G Kergon <agk@redhat.com>,
-        Anatol Pomazau <anatol@google.com>,
-        Bryan Gurney <bgurney@redhat.com>,
-        Dmitry Fomichev <dmitry.fomichev@wdc.com>,
-        Heinz Mauelshagen <heinzm@redhat.com>,
-        Jeffle Xu <jefflexu@linux.alibaba.com>,
-        Joe Thornber <ejt@redhat.com>,
-        Mikulas Patocka <mpatocka@redhat.com>,
-        Milan Broz <gmazyland@gmail.com>,
-        "xianrong.zhou" <xianrong.zhou@transsion.com>,
-        zhengbin <zhengbin13@huawei.com>
-Subject: [git pull] device mapper changes for 5.6
-Message-ID: <20200129171703.GA26110@redhat.com>
+        Wed, 29 Jan 2020 18:29:25 -0500
+DKIM-Signature: v=1; a=rsa-sha256; c=simple/simple;
+  d=wdc.com; i=@wdc.com; q=dns/txt; s=dkim.wdc.com;
+  t=1580340564; x=1611876564;
+  h=from:to:cc:subject:date:message-id:mime-version:
+   content-transfer-encoding;
+  bh=smzJ9aLrfZQAYLsAFApydMD2EtHWMA2/FV/r3qlGdVQ=;
+  b=H9IQZNQEfIPr4/RZ2nfS0VDQsnFFpnUEKKVxX2dC7g0/amTt8P3d00xc
+   F20TnE7XoTO8gWHonuxuX1sQ8kLrEHGTY2YO83zkdlrqlmlyilOOD04Iz
+   uON395db82m5joOBoA5jVihmpruol6pWvPugIuSM6molx3z+q90F8K1d/
+   4IjsGjVlimHMPHfY1SUxRSDiXqCIa8F8dJpB3klunV8EPkwA9ujd+cJ22
+   8Nro9l5wcGfaBjawY0uvOZtyuGrWhaZ/zaAp/pNUUXilR5goFD5qf+HrF
+   8EvfZ0sLtRl8silyEA7C3RUGEYjYBZSHxSUS6sPI3x+dqh8yERkLb0tBr
+   w==;
+IronPort-SDR: fzY+EEAYnXTRPqTtQndMlZXAR5RsP+lB7SNdo7POF/4P3FPaDYoFtIEuPCf4I0tbyRETf5so8a
+ jVQ5363qFBgq6pjH//ob67EwORpMMVrN1OXuuiIFWyuSh5Xv4YaV2FftqJmnjanNkd2QPz0osY
+ 59Np51ory+m63kKkRE739WWB9oZwnUubpbr7CPYJkTj5WZIfiqR0TuLKECLAfhJjWXpuOq/h59
+ lRJ95A0HMr1yx0HOObvCRFrTFiSTzRze/12OyuuhEhFIRskizULGUhvDIUZfHy+1eXmz5qfmO1
+ 9DQ=
+X-IronPort-AV: E=Sophos;i="5.70,379,1574092800"; 
+   d="scan'208";a="128691689"
+Received: from h199-255-45-14.hgst.com (HELO uls-op-cesaep01.wdc.com) ([199.255.45.14])
+  by ob1.hgst.iphmx.com with ESMTP; 30 Jan 2020 07:29:23 +0800
+IronPort-SDR: y6Zh5eheB/TCh3q9SoBtqy68X3eyvMODXrKD9trIGn6Xk3vB4riBHizhmernqzWqHFFjculgL1
+ Ub7S83mCLoVn6ypkwtQGMu+Lc1GXZbYJ2CBHxaVjT6JR8YbFw89kVXZEStpy6i3iWIqayexJsV
+ LQkgzJfcsF+rKBTfMW0s1Pmq6MkrEFCca3vGbn4rDwx4OhC9prTDOK7dD8Yb3ZpDMLRwBpMpc/
+ v/pVp/A9R/D8iLKD7+F6YjnhR6adNjYrAJU/YbDTy56UnsTvs8nYmzaL/XpK4EBPq+sMtjlDNn
+ av8kdP/p4E0u8cTL+fgM3Zg1
+Received: from uls-op-cesaip01.wdc.com ([10.248.3.36])
+  by uls-op-cesaep01.wdc.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 29 Jan 2020 15:22:36 -0800
+IronPort-SDR: liBZ+o5bt2p6wTYvaZcxXBghRE4XJlqf98IhZuF8dDoPxuEMVI0jeCl63SHUJySWZsOkPxT3XH
+ 7QjiaXBZd0nSazaK5yZ9JamH0N8zviNAzVkOQpQ8ZTMd6G9zaeTERnHZWQ7on8czrnn61gIIER
+ AZhvyK7TdsC5hugdqRWQ1HNpURnqs0zWNMCgcsOag4jAXkZtBmyf/PYPLLVu5x+9DWezSnHmqg
+ BD6qMpNZP6JelVSwJxP5nNy0Rc0H1/RWqq4K1zFCRzze9WDyUyCb5dwdHKRO5skdAYqV/i/UyU
+ 87Y=
+WDCIronportException: Internal
+Received: from iouring.labspan.wdc.com (HELO iouring.sc.wdc.com) ([10.6.138.107])
+  by uls-op-cesaip01.wdc.com with ESMTP; 29 Jan 2020 15:29:24 -0800
+From:   Chaitanya Kulkarni <chaitanya.kulkarni@wdc.com>
+To:     linux-block@vger.kernel.org, linux-nvme@lists.infradead.org
+Cc:     Chaitanya Kulkarni <chaitanya.kulkarni@wdc.com>
+Subject: [PATCH 0/5 blktest] nvme: add cntlid and model testcases
+Date:   Wed, 29 Jan 2020 15:29:16 -0800
+Message-Id: <20200129232921.11771-1-chaitanya.kulkarni@wdc.com>
+X-Mailer: git-send-email 2.24.0
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-User-Agent: Mutt/1.5.21 (2010-09-15)
-X-Scanned-By: MIMEDefang 2.79 on 10.5.11.14
+Content-Transfer-Encoding: 8bit
 Sender: linux-block-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-Hi Linus,
+This is a small patch-series which adds two new testcases for
+setting up controller IDs and model from configfs.
 
-The following changes since commit c79f46a282390e0f5b306007bf7b11a46d529538:
+Regards,
+Chaitanya
 
-  Linux 5.5-rc5 (2020-01-05 14:23:27 -0800)
 
-are available in the Git repository at:
+Chaitanya Kulkarni (5):
+  nvme: allow target subsys set cntlid min/max
+  nvme: test target cntlid min cntlid max
+  nvme: allow target subsys set model
+  nvme: test target model attribute
+  nvme: make new testcases backward compatible
 
-  git://git.kernel.org/pub/scm/linux/kernel/git/device-mapper/linux-dm.git tags/for-5.6/dm-changes
+ tests/nvme/033     | 61 ++++++++++++++++++++++++++++++++++++++++++++
+ tests/nvme/033.out |  4 +++
+ tests/nvme/034     | 63 ++++++++++++++++++++++++++++++++++++++++++++++
+ tests/nvme/034.out |  3 +++
+ tests/nvme/rc      | 24 ++++++++++++++++++
+ 5 files changed, 155 insertions(+)
+ create mode 100755 tests/nvme/033
+ create mode 100644 tests/nvme/033.out
+ create mode 100755 tests/nvme/034
+ create mode 100644 tests/nvme/034.out
 
-for you to fetch changes up to 47ace7e012b9f7ad71d43ac9063d335ea3d6820b:
+Test Log :-
 
-  dm: fix potential for q->make_request_fn NULL pointer (2020-01-27 14:52:36 -0500)
+Without cntlid_min/max and model patches :-
 
-Please pull, thanks!
-Mike
+nvme/002 (create many subsystems and test discovery)         [passed]
+    runtime  15.246s  ...  15.053s
+nvme/003 (test if we're sending keep-alives to a discovery controller) [passed]
+    runtime  10.057s  ...  10.063s
+./check: no group or test named nvme/0004
+nvme/005 (reset local loopback target)                       [not run]
+    nvme_core module does not have parameter multipath
+nvme/006 (create an NVMeOF target with a block device-backed ns) [passed]
+    runtime  0.057s  ...  0.065s
+nvme/007 (create an NVMeOF target with a file-backed ns)     [passed]
+    runtime  0.036s  ...  0.038s
+nvme/008 (create an NVMeOF host with a block device-backed ns) [passed]
+    runtime  1.233s  ...  1.240s
+nvme/009 (create an NVMeOF host with a file-backed ns)       [passed]
+    runtime  1.203s  ...  1.208s
+nvme/014 (flush a NVMeOF block device-backed ns)             [passed]
+    runtime  14.572s  ...  16.051s
+nvme/015 (unit test for NVMe flush for file backed ns)       [passed]
+    runtime  13.584s  ...  13.948s
+nvme/016 (create/delete many NVMeOF block device-backed ns and test discovery) [passed]
+    runtime  9.877s  ...  10.750s
+nvme/017 (create/delete many file-ns and test discovery)     [passed]
+    runtime  18.902s  ...  15.584s
+nvme/019 (test NVMe DSM Discard command on NVMeOF block-device ns) [passed]
+    runtime  1.217s  ...  1.237s
+nvme/020 (test NVMe DSM Discard command on NVMeOF file-backed ns) [passed]
+    runtime  1.204s  ...  1.193s
+nvme/021 (test NVMe list command on NVMeOF file-backed ns)   [passed]
+    runtime  1.204s  ...  1.195s
+nvme/022 (test NVMe reset command on NVMeOF file-backed ns)  [passed]
+    runtime    ...  1.334s
+nvme/023 (test NVMe smart-log command on NVMeOF block-device ns) [passed]
+    runtime  1.218s  ...  1.231s
+nvme/024 (test NVMe smart-log command on NVMeOF file-backed ns) [passed]
+    runtime  1.207s  ...  1.196s
+nvme/025 (test NVMe effects-log command on NVMeOF file-backed ns) [passed]
+    runtime  1.191s  ...  1.195s
+nvme/026 (test NVMe ns-descs command on NVMeOF file-backed ns) [passed]
+    runtime  1.192s  ...  1.196s
+nvme/027 (test NVMe ns-rescan command on NVMeOF file-backed ns) [passed]
+    runtime  1.211s  ...  1.191s
+nvme/028 (test NVMe list-subsys command on NVMeOF file-backed ns) [passed]
+    runtime  1.204s  ...  1.211s
+nvme/033 (Test NVMeOF target cntlid[min|max] attributes)     [not run]
+    attr_cntlid_[min|max] not found
+nvme/034 (Test NVMeOF target model attribute)                [not run]
+    attr_cntlid_model not found
 
-----------------------------------------------------------------
-- Fix DM core's potential for q->make_request_fn NULL pointer in the
-  unlikely case that a DM device is created without a DM table and
-  then accessed due to upper-layer userspace code or user error.
+With cntlid_min/max and model patches :-
 
-- Fix DM thin-provisioning's metadata_pre_commit_callback to not use
-  memory after it is free'd.  Also refactor code to disallow changing
-  the thin-pool's data device once in use -- doing so guarantees smae
-  lifetime of pool's data device relative to the pool metadata.
+nvme/002 (create many subsystems and test discovery)         [passed]
+    runtime  15.053s  ...  11.918s
+nvme/003 (test if we're sending keep-alives to a discovery controller) [passed]
+    runtime  10.063s  ...  10.058s
+./check: no group or test named nvme/0004
+nvme/005 (reset local loopback target)                       [not run]
+    nvme_core module does not have parameter multipath
+nvme/006 (create an NVMeOF target with a block device-backed ns) [passed]
+    runtime  0.065s  ...  0.065s
+nvme/007 (create an NVMeOF target with a file-backed ns)     [passed]
+    runtime  0.038s  ...  0.036s
+nvme/008 (create an NVMeOF host with a block device-backed ns) [passed]
+    runtime  1.240s  ...  1.239s
+nvme/009 (create an NVMeOF host with a file-backed ns)       [passed]
+    runtime  1.208s  ...  1.207s
+nvme/014 (flush a NVMeOF block device-backed ns)             [passed]
+    runtime  16.051s  ...  15.345s
+nvme/015 (unit test for NVMe flush for file backed ns)       [passed]
+    runtime  13.948s  ...  13.977s
+nvme/016 (create/delete many NVMeOF block device-backed ns and test discovery) [passed]
+    runtime  10.750s  ...  9.698s
+nvme/017 (create/delete many file-ns and test discovery)     [passed]
+    runtime  15.584s  ...  15.514s
+nvme/019 (test NVMe DSM Discard command on NVMeOF block-device ns) [passed]
+    runtime  1.237s  ...  1.232s
+nvme/020 (test NVMe DSM Discard command on NVMeOF file-backed ns) [passed]
+    runtime  1.193s  ...  1.192s
+nvme/021 (test NVMe list command on NVMeOF file-backed ns)   [passed]
+    runtime  1.195s  ...  1.195s
+nvme/022 (test NVMe reset command on NVMeOF file-backed ns)  [passed]
+    runtime  1.334s  ...  1.340s
+nvme/023 (test NVMe smart-log command on NVMeOF block-device ns) [passed]
+    runtime  1.231s  ...  1.218s
+nvme/024 (test NVMe smart-log command on NVMeOF file-backed ns) [passed]
+    runtime  1.196s  ...  1.205s
+nvme/025 (test NVMe effects-log command on NVMeOF file-backed ns) [passed]
+    runtime  1.195s  ...  1.191s
+nvme/026 (test NVMe ns-descs command on NVMeOF file-backed ns) [passed]
+    runtime  1.196s  ...  1.186s
+nvme/027 (test NVMe ns-rescan command on NVMeOF file-backed ns) [passed]
+    runtime  1.191s  ...  1.192s
+nvme/028 (test NVMe list-subsys command on NVMeOF file-backed ns) [passed]
+    runtime  1.211s  ...  1.187s
+nvme/033 (Test NVMeOF target cntlid[min|max] attributes)     [passed]
+    runtime  1.213s  ...  1.200s
+nvme/034 (Test NVMeOF target model attribute)                [passed]
+    runtime  1.223s  ...  1.204s
 
-- Fix DM space maps used by DM thinp and DM cache to avoid reuse of a
-  already used block. This race was identified with extremely heavy
-  snapshot use in the context of DM thin provisioning.
 
-- Fix DM raid's table status relative to an active rebuild.
-
-- Fix DM crypt to use GFP_NOIO rather than GFP_NOFS in call to
-  skcipher_request_alloc(). Also fix benbi IV constructor crash if
-  used in authenticated mode.
-
-- Add DM crypt support for Elephant diffuser to allow for Bitlocker
-  compatibility.
-
-- Fix DM verity target to not prefetch hash blocks for data that has
-  already been verified.
-
-- Fix DM writecache's incorrect flush sequence during commit when in
-  SSD mode.
-
-- Improve DM writecache's sequential write performance on SSDs.
-
-- Add DM zoned target support for zone sizes smaller than 128MiB.
-
-- Add DM multipath 'queue_if_no_path_timeout_secs' module param to
-  allow timeout if path isn't reinstated. This allows users a kernel
-  safety-net against IO hanging indefinitely, due to no active paths,
-  that has historically only been provided by multipathd userspace.
-
-- Various DM code cleanups to use true/false rather than 1/0, a
-  variable rename in dm-dust, and fix for a math error in comment for
-  DM thin metadata's ondisk format.
-
-----------------------------------------------------------------
-Anatol Pomazau (1):
-      dm mpath: Add timeout mechanism for queue_if_no_path
-
-Bryan Gurney (1):
-      dm dust: change ret to r in dust_map_write
-
-Dmitry Fomichev (1):
-      dm zoned: support zone sizes smaller than 128MiB
-
-Heinz Mauelshagen (1):
-      dm raid: table line rebuild status fixes
-
-Jeffle Xu (1):
-      dm thin metadata: Fix trivial math error in on-disk format documentation
-
-Joe Thornber (1):
-      dm space map common: fix to ensure new block isn't already in use
-
-Mike Snitzer (3):
-      dm thin metadata: use pool locking at end of dm_pool_metadata_close
-      dm thin: fix use-after-free in metadata_pre_commit_callback
-      dm: fix potential for q->make_request_fn NULL pointer
-
-Mikulas Patocka (5):
-      dm crypt: fix GFP flags passed to skcipher_request_alloc()
-      dm writecache: fix incorrect flush sequence when doing SSD mode commit
-      dm thin: don't allow changing data device during thin-pool reload
-      dm thin: change data device's flush_bio to be member of struct pool
-      dm writecache: improve performance of large linear writes on SSDs
-
-Milan Broz (2):
-      dm crypt: Implement Elephant diffuser for Bitlocker compatibility
-      dm crypt: fix benbi IV constructor crash if used in authenticated mode
-
-xianrong.zhou (1):
-      dm verity: don't prefetch hash blocks for already-verified data
-
-zhengbin (4):
-      dm mpath: use true/false for bool variable
-      dm bio prison v2: use true/false for bool variable
-      dm snapshot: use true/false for bool variable
-      dm thin metadata: use true/false for bool variable
-
- .../admin-guide/device-mapper/dm-raid.rst          |   2 +
- drivers/md/dm-bio-prison-v2.c                      |   2 +-
- drivers/md/dm-crypt.c                              | 335 ++++++++++++++++++++-
- drivers/md/dm-dust.c                               |   6 +-
- drivers/md/dm-mpath.c                              |  68 ++++-
- drivers/md/dm-raid.c                               |  43 +--
- drivers/md/dm-snap.c                               |   6 +-
- drivers/md/dm-thin-metadata.c                      |  22 +-
- drivers/md/dm-thin.c                               |  36 ++-
- drivers/md/dm-verity-target.c                      |  18 +-
- drivers/md/dm-writecache.c                         |  71 +++--
- drivers/md/dm-zoned-metadata.c                     |  23 +-
- drivers/md/dm.c                                    |   9 +-
- drivers/md/persistent-data/dm-space-map-common.c   |  27 ++
- drivers/md/persistent-data/dm-space-map-common.h   |   2 +
- drivers/md/persistent-data/dm-space-map-disk.c     |   6 +-
- drivers/md/persistent-data/dm-space-map-metadata.c |   5 +-
- 17 files changed, 580 insertions(+), 101 deletions(-)
+-- 
+2.22.1
 
