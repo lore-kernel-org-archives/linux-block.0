@@ -7,64 +7,64 @@ X-Spam-Status: No, score=-9.5 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
 	SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED,USER_AGENT_GIT autolearn=ham
 	autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 9E520C33CB7
-	for <linux-block@archiver.kernel.org>; Wed, 29 Jan 2020 23:29:33 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 4F8A6C35240
+	for <linux-block@archiver.kernel.org>; Wed, 29 Jan 2020 23:29:34 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.kernel.org (Postfix) with ESMTP id 74817206F0
-	for <linux-block@archiver.kernel.org>; Wed, 29 Jan 2020 23:29:33 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id 2438F206D5
+	for <linux-block@archiver.kernel.org>; Wed, 29 Jan 2020 23:29:34 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (2048-bit key) header.d=wdc.com header.i=@wdc.com header.b="eR/icbVD"
+	dkim=fail reason="signature verification failed" (2048-bit key) header.d=wdc.com header.i=@wdc.com header.b="Kh97kVwz"
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1726663AbgA2X3d (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        id S1726671AbgA2X3d (ORCPT <rfc822;linux-block@archiver.kernel.org>);
         Wed, 29 Jan 2020 18:29:33 -0500
 Received: from esa4.hgst.iphmx.com ([216.71.154.42]:24315 "EHLO
         esa4.hgst.iphmx.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1726401AbgA2X3c (ORCPT
+        with ESMTP id S1726401AbgA2X3d (ORCPT
         <rfc822;linux-block@vger.kernel.org>);
-        Wed, 29 Jan 2020 18:29:32 -0500
+        Wed, 29 Jan 2020 18:29:33 -0500
 DKIM-Signature: v=1; a=rsa-sha256; c=simple/simple;
   d=wdc.com; i=@wdc.com; q=dns/txt; s=dkim.wdc.com;
-  t=1580340572; x=1611876572;
+  t=1580340573; x=1611876573;
   h=from:to:cc:subject:date:message-id:in-reply-to:
    references:mime-version:content-transfer-encoding;
-  bh=yhegzVwY8X2y0VM3m5FGUcNSnFAXWRc3w6Nd/G8krxw=;
-  b=eR/icbVDb8CHETbOPOzfVf1uSWq8qf3+PHU1Vd22wgmMNAjSR4LrFyk5
-   cZqwij4fAhAYOqLvzvQrFyaQcrfRwDrxdbnnfz6ZQlCipKwyu1kp9jDW5
-   YNtmLuO5FSfhJ7AMXEcKhlJ3EsQ+76EF4fODisORUpwY4CJvYbVYpmVe7
-   l460bgBaXJZSg+XKo6I7zLj1t1xXL7OKDhzq9YtuemLt7WA81xVePnr8y
-   tivq3muCX29927NaLVurUGVLTvWT6fVp/+adJN7/pvATsFdGRJgv/jjIl
-   Bc5Bh7GLE6xF63eA8RALd4i0GkO0O3SBLuJpXjkPArTp9O1PgyFlK8EBM
-   Q==;
-IronPort-SDR: BTrubU08Yrjcs6u0gpsuzdp7glXk3gU16Y237aQ9aD8pZ8RkcAMTxTbizukgTQJ/et88nlj3OP
- hPiMieARIwgvplFZEbPBsC+36mNkuYFM5QcvkVVlvdee4X76s91wnmqCrzg5lLjQdOH+h1ZQ3b
- aEUPzRbqSu++Q944f/FOu6NEQe75J9eO2k6QDvNXRsXXVuLIlOixUBxpM5w5p7GV96p/9oFgpT
- pRKDAhPTAR7peCMlfGu+Ui8PxypV4KaL+GxJMIeukCe/AbAg5OGP4oW+/SCuX523Sv3bIu3n3I
- UJM=
+  bh=KXZsNyr6H+GgS1XHW+oCnKz+5nhllTOXchAqtu9WpTE=;
+  b=Kh97kVwzi1uYcTgpoKHnr7c0htZXkKIl9FPJy8FrFo+aagNY8Liq7Cpj
+   pecq//5ZTmQEKBqZWC4P5OFzDJaArte/X9t47QyhBDY6FqMKfs8oaXTzA
+   argcrk8/xPkGTf/fxHkNzQMUlEwsMVix4e9Fh9vhtbnGqydiYouqQ9Pe6
+   77fj7FJA4/mylQKaiUT2SvRR/iKjz+fBPJXxQX0aGg3mg+d/t7Vld9c7I
+   zIyvmAfPgOCzsWdeuD3KhQG6aFPljBIpUIpQ9aCm97AmK9Z9JfbCMz+wl
+   yoqPytaJPsUtP7lZaLBRU/sdqsxt4Md7mox1UYhecrwGJ+vRBrsfMTME3
+   A==;
+IronPort-SDR: 9edk02KLuF3RvpSiUt+XhdS/l5YS6K62oKEFOwd5dBm6CYkynnfkaVeqzOxD3HDo5vWOKT/8XK
+ hR3h1OYVrAm5Zf34f3HHwMYfmDLM1mgK81gW3LrkVIwwIGemFLd+TZmBO/z5RJ5du3s3R2WS22
+ bvJYxC1bg5YKhuSti1R/H20PUAmYDjWO8l7IpGBfv4MpNaQpGHXfylIhGsCSX3o+RDQ5J/+/H/
+ XZxuTgeVJ0y8BBK3RgWmxfLw61XCBd6XBPwgVGDePbpaJb4huSAkVPQkEGhUKfJvLBwzrPyWsl
+ 75c=
 X-IronPort-AV: E=Sophos;i="5.70,379,1574092800"; 
-   d="scan'208";a="128691696"
+   d="scan'208";a="128691698"
 Received: from h199-255-45-14.hgst.com (HELO uls-op-cesaep01.wdc.com) ([199.255.45.14])
-  by ob1.hgst.iphmx.com with ESMTP; 30 Jan 2020 07:29:32 +0800
-IronPort-SDR: QFRtojkkeFg9jmqfxsZALIX5QbNZJ3ALnwmjrjLVXkbMDsHfSiMxPY2fgN6n4kCVoY1asFS8yo
- V3JcP439V+PLLdP5opsgUChcEnN8VGb/9GCq67xvWKxUmuA6a/X9P7SXwaCN3krWPMm7iCpt6x
- H9k9eqRDJNBX1wlwb4c/FzyrH5Uw1foTLD764Iy2pQ9UYJIXpOCG+/Ju5EwFRdjcnL2ocxSJx5
- wVMr5vtg9o+F9Q9Ft+Ms8W9nzaf+OPEFAIEtfAQOzeKvh89ElaONqPo8bHcmbwVM464nAuEPv4
- rt8+EXSK5lmI06RgH6ux2fxa
+  by ob1.hgst.iphmx.com with ESMTP; 30 Jan 2020 07:29:33 +0800
+IronPort-SDR: PWP0xArGjb/+Z0g+3ZeYRtO/cujMsrU+iO7FZK7sMrHk2/glbi8Ad+FjOQmTwoRTLeoTpAuB5u
+ Fd5JEfWOFSOOtoF29/4My62RWkA/aLO+nw9zp7qNKiL+LV19+LFLIT1kpuhQ7UHsisdfZVfgRI
+ 34M/c7QspnD1JwyYrqI9bW+fIlKzayJZTWjTfOY7A2JfJn5zPTJt6fcbinW+pcrtf1ntfcY0nO
+ R4od+Dyj0fYoY9sFbFJfYT+EXx9NNE7HapJbZkDp4u3pKwuZ+2+4JHk73d0Kmb4dUmO2xYVF8I
+ wsnt8MqLDCzYPRNPndIH8aVw
 Received: from uls-op-cesaip01.wdc.com ([10.248.3.36])
-  by uls-op-cesaep01.wdc.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 29 Jan 2020 15:22:44 -0800
-IronPort-SDR: QBrRE3i19TU7CMyH/+/ZQ2KESII2BUI7FX+WNJk99N93BFvc3LrphHytr8UhtizdCxCfLKaEwY
- 42sMvhuutrFd3wEjHJxETIHM5hwZzR8vPSQYW3pjgFlZ/XQlsOvp7A0u2OdXk2kbhqS0g0yB4e
- 96pu9II8ucDfpt1BChg/ipurvxToTDXvA25zfFk7vseIsTtWTbprnPGJ6e2vekP0bK97BMFcQ1
- 50cntKO00WRY/0VVGK11Guj4bRUxglOfk/muaIsGM2BK/sVPnvwtgjusEk09eh3E6e/n6KsbeM
- bUU=
+  by uls-op-cesaep01.wdc.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 29 Jan 2020 15:22:45 -0800
+IronPort-SDR: +Fg+K68EUDIVpRmHuf0S6I/mwkBrljSa5T8RJpGzPLemxJPtQ/eeT8+hdmj4s+TO3xbMtWLijM
+ 0ekH1rT2WIJVZIWUdEXtuyVBgX8kWvdTvYQfu6gfHd7NdUcfXFyhcRc/yBeThlvZZ6OWpEskP4
+ lLansx0+vPIlNRiZS4Ll8SVWnjK0oJHzeA00YLWiJobtD3ARFxI3ym+kve1ge4Lg9A4ZwhH2zb
+ Kbqocnda3m/2FW2Dvn6tToxTDfrJmVgBji2cgsEilRzxn54CIUVm9mKvrsMkVYGuW0LGwmwaH1
+ EDI=
 WDCIronportException: Internal
 Received: from iouring.labspan.wdc.com (HELO iouring.sc.wdc.com) ([10.6.138.107])
-  by uls-op-cesaip01.wdc.com with ESMTP; 29 Jan 2020 15:29:32 -0800
+  by uls-op-cesaip01.wdc.com with ESMTP; 29 Jan 2020 15:29:33 -0800
 From:   Chaitanya Kulkarni <chaitanya.kulkarni@wdc.com>
 To:     linux-block@vger.kernel.org, linux-nvme@lists.infradead.org
 Cc:     Chaitanya Kulkarni <chaitanya.kulkarni@wdc.com>
-Subject: [PATCH 3/5 blktests] nvme: allow target subsys set model
-Date:   Wed, 29 Jan 2020 15:29:19 -0800
-Message-Id: <20200129232921.11771-4-chaitanya.kulkarni@wdc.com>
+Subject: [PATCH 4/5 blktests] nvme: test target model attribute
+Date:   Wed, 29 Jan 2020 15:29:20 -0800
+Message-Id: <20200129232921.11771-5-chaitanya.kulkarni@wdc.com>
 X-Mailer: git-send-email 2.24.0
 In-Reply-To: <20200129232921.11771-1-chaitanya.kulkarni@wdc.com>
 References: <20200129232921.11771-1-chaitanya.kulkarni@wdc.com>
@@ -75,36 +75,92 @@ Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-This patch updates helper function create_nvmet_subsystem() to handle
-newly introduced model attribute.
+The new testcases exercises newly added cntlid [min|max] attribute for
+NVMeOF target.
 
 Signed-off-by: Chaitanya Kulkarni <chaitanya.kulkarni@wdc.com>
 ---
- tests/nvme/rc | 4 ++++
- 1 file changed, 4 insertions(+)
+ tests/nvme/034     | 60 ++++++++++++++++++++++++++++++++++++++++++++++
+ tests/nvme/034.out |  3 +++
+ 2 files changed, 63 insertions(+)
+ create mode 100755 tests/nvme/034
+ create mode 100644 tests/nvme/034.out
 
-diff --git a/tests/nvme/rc b/tests/nvme/rc
-index d1fa796..377c7f7 100644
---- a/tests/nvme/rc
-+++ b/tests/nvme/rc
-@@ -123,6 +123,7 @@ _create_nvmet_subsystem() {
- 	local uuid=$3
- 	local cntlid_min=$4
- 	local cntlid_max=$5
-+	local model=$6
- 	local cfs_path="${NVMET_CFS}/subsystems/${nvmet_subsystem}"
- 
- 	mkdir -p "${cfs_path}"
-@@ -133,6 +134,9 @@ _create_nvmet_subsystem() {
- 		echo ${cntlid_min} > ${cfs_path}/attr_cntlid_min
- 		echo ${cntlid_max} > ${cfs_path}/attr_cntlid_max
- 	fi
-+	if [ $# -eq 6 ] && [ -f ${cfs_path}/attr_model ]; then
-+		echo ${model} > ${cfs_path}/attr_model
+diff --git a/tests/nvme/034 b/tests/nvme/034
+new file mode 100755
+index 0000000..1a55ff9
+--- /dev/null
++++ b/tests/nvme/034
+@@ -0,0 +1,60 @@
++#!/bin/bash
++# SPDX-License-Identifier: GPL-2.0+
++# Copyright (c) 2017-2018 Western Digital Corporation or its affiliates.
++#
++# Test NVMeOF target cntlid[min|max] attributes.
++
++. tests/nvme/rc
++
++DESCRIPTION="Test NVMeOF target model attribute"
++QUICK=1
++
++requires() {
++	_have_program nvme && _have_modules loop nvme-loop nvmet && \
++		_have_configfs
++}
++
++test() {
++	echo "Running ${TEST_NAME}"
++
++	_setup_nvmet
++
++	local port
++	local result
++	local nvmedev
++	local loop_dev
++	local model="test~model"
++	local file_path="$TMPDIR/img"
++	local subsys_name="blktests-subsystem-1"
++
++	truncate -s 1G "${file_path}"
++
++	loop_dev="$(losetup -f --show "${file_path}")"
++
++	_create_nvmet_subsystem "${subsys_name}" "${loop_dev}" \
++		"91fdba0d-f87b-4c25-b80f-db7be1418b9e" 0 100 ${model}
++	port="$(_create_nvmet_port "loop")"
++	_add_nvmet_subsys_to_port "${port}" "${subsys_name}"
++
++	nvme connect -t loop -n "${subsys_name}"
++
++	udevadm settle
++
++	nvmedev="$(_find_nvme_loop_dev)"
++	nvme list | grep ${nvmedev}n1 | grep -q test~model
++	result=$?
++
++	nvme disconnect -n "${subsys_name}"
++
++	_remove_nvmet_subsystem_from_port "${port}" "${subsys_name}"
++	_remove_nvmet_subsystem "${subsys_name}"
++	_remove_nvmet_port "${port}"
++
++	losetup -d "${loop_dev}"
++
++	rm "${file_path}"
++
++	if [ ${result} -eq 0 ]; then
++		echo "Test complete"
 +	fi
- }
- 
- _remove_nvmet_ns() {
++}
+diff --git a/tests/nvme/034.out b/tests/nvme/034.out
+new file mode 100644
+index 0000000..0a7bd2f
+--- /dev/null
++++ b/tests/nvme/034.out
+@@ -0,0 +1,3 @@
++Running nvme/034
++NQN:blktests-subsystem-1 disconnected 1 controller(s)
++Test complete
 -- 
 2.22.1
 
