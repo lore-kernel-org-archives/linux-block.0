@@ -2,121 +2,132 @@ Return-Path: <SRS0=k455=3T=vger.kernel.org=linux-block-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-0.8 required=3.0 tests=DKIM_SIGNED,DKIM_VALID,
-	DKIM_VALID_AU,HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SPF_HELO_NONE,
-	SPF_PASS autolearn=no autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-6.8 required=3.0 tests=DKIM_SIGNED,DKIM_VALID,
+	DKIM_VALID_AU,HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,
+	SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS autolearn=ham autolearn_force=no
+	version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 758CBC35240
-	for <linux-block@archiver.kernel.org>; Thu, 30 Jan 2020 14:27:40 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 4BE3BC35240
+	for <linux-block@archiver.kernel.org>; Thu, 30 Jan 2020 14:53:25 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.kernel.org (Postfix) with ESMTP id 4C352214DB
-	for <linux-block@archiver.kernel.org>; Thu, 30 Jan 2020 14:27:40 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id 21C79206F0
+	for <linux-block@archiver.kernel.org>; Thu, 30 Jan 2020 14:53:25 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=pass (2048-bit key) header.d=kroah.com header.i=@kroah.com header.b="ANWYYMcT";
-	dkim=pass (2048-bit key) header.d=messagingengine.com header.i=@messagingengine.com header.b="x1NEv0k8"
+	dkim=pass (1024-bit key) header.d=yandex-team.ru header.i=@yandex-team.ru header.b="EJtQgDYT"
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1727161AbgA3O1j (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Thu, 30 Jan 2020 09:27:39 -0500
-Received: from wout1-smtp.messagingengine.com ([64.147.123.24]:45415 "EHLO
-        wout1-smtp.messagingengine.com" rhost-flags-OK-OK-OK-OK)
-        by vger.kernel.org with ESMTP id S1727139AbgA3O1j (ORCPT
+        id S1727211AbgA3OxY (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Thu, 30 Jan 2020 09:53:24 -0500
+Received: from forwardcorp1j.mail.yandex.net ([5.45.199.163]:41388 "EHLO
+        forwardcorp1j.mail.yandex.net" rhost-flags-OK-OK-OK-OK)
+        by vger.kernel.org with ESMTP id S1727107AbgA3OxY (ORCPT
         <rfc822;linux-block@vger.kernel.org>);
-        Thu, 30 Jan 2020 09:27:39 -0500
-Received: from compute2.internal (compute2.nyi.internal [10.202.2.42])
-        by mailout.west.internal (Postfix) with ESMTP id 1AF4F46B;
-        Thu, 30 Jan 2020 09:27:38 -0500 (EST)
-Received: from mailfrontend2 ([10.202.2.163])
-  by compute2.internal (MEProxy); Thu, 30 Jan 2020 09:27:38 -0500
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=kroah.com; h=
-        date:from:to:cc:subject:message-id:references:mime-version
-        :content-type:in-reply-to; s=fm2; bh=TUlawlgTzSpWq0b/d5uMRU4UHNv
-        MoXG4k8rumQ7y4nQ=; b=ANWYYMcTm9CdmwokO6s+mB5Uqb4qTkCYGNxO6uUZOtF
-        Dw0yuuPmINUkwOtwT4VB2nnyeJ4dDw1no2mz119yKckhaihRlApcmQx6H6Rt7tzc
-        hecjkheWs7NzXSzcTbYqldMQODgCQVixQrgFRaDwVoHKcLh648yBDlvp/RIQ62Xn
-        8cmz9sVIyw8PzFVrLiINSeMwrS+cpRFIWNWgssbN3GYukxl50fdm2jYX0KiyWrGc
-        WwP6KE5yr2rP/2A5wnFEpiacaueXkrOTNsTY49bVhhBFG6pHSg3Hvyx9L5lZtFSg
-        h8IyiVxLhxBwgxgRsa5wFrYn7KF2sbqOcoZe+kIA4/A==
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=
-        messagingengine.com; h=cc:content-type:date:from:in-reply-to
-        :message-id:mime-version:references:subject:to:x-me-proxy
-        :x-me-proxy:x-me-sender:x-me-sender:x-sasl-enc; s=fm1; bh=TUlawl
-        gTzSpWq0b/d5uMRU4UHNvMoXG4k8rumQ7y4nQ=; b=x1NEv0k8GlSFzWy+U9f76Y
-        suyasDkyfUiTHgx1+YS7WG5gs7jVjYsUHLKeAD/bNWNc/KAKdCQUFz8q8yCav6/V
-        oKi+hSwEu7AlAujIX+ZfrXsbNR5KuFPnGzrp3OT9m8O2ZMLoxYBL3l7WjFZYAlTE
-        qSo9C9clj2CFGqb1jAqDh6n3bHD1LbUfXHzF3ayyuAsIP4kfhE2WcPTpN+PsgMoU
-        73rxmYtzHN9h2HhLQPVFbi7VMRDRDfCmv3RR96vIszSL2PJsy+SKYafx1dul/t57
-        Z4l0ye0IZoFI86CoPHhhnpv+1W7FHBEmE6ay34++UaptgWM7daFm5DdyYPlJdvgw
-        ==
-X-ME-Sender: <xms:2ecyXoI6wgxNj_Lt2kov8jhv1v65TgbtUDua11Zyu1ROhacGUGJ5BA>
-X-ME-Proxy-Cause: gggruggvucftvghtrhhoucdtuddrgedugedrfeekgdeigecutefuodetggdotefrodftvf
-    curfhrohhfihhlvgemucfhrghsthforghilhdpqfgfvfdpuffrtefokffrpgfnqfghnecu
-    uegrihhlohhuthemuceftddtnecusecvtfgvtghiphhivghnthhsucdlqddutddtmdenuc
-    fjughrpeffhffvuffkfhggtggujgesthdtredttddtvdenucfhrhhomhepifhrvghgucfm
-    jfcuoehgrhgvgheskhhrohgrhhdrtghomheqnecukfhppeekgedrvdeguddrudelkedrud
-    ekudenucevlhhushhtvghrufhiiigvpedtnecurfgrrhgrmhepmhgrihhlfhhrohhmpehg
-    rhgvgheskhhrohgrhhdrtghomh
-X-ME-Proxy: <xmx:2ecyXkQa9LSrpopBdXtKJugqfbbbTZrenzFIHf6760-9izGKBU34ZQ>
-    <xmx:2ecyXk267fdL7ZJAaQdVqC_ni3QWV5o38CcZU1ynom1NtaQSFE4Fpw>
-    <xmx:2ecyXqB0Q_TWaJrvh1QkPuOFJLG2d209yd8DRkivcvp8KjxtjyrYQA>
-    <xmx:2ecyXuHesRBVYCcfTWtN7_iuYha7lJi9SeHM3v5taE6NbezrDPtJwQ>
-Received: from localhost (unknown [84.241.198.181])
-        by mail.messagingengine.com (Postfix) with ESMTPA id D5FED3060A08;
-        Thu, 30 Jan 2020 09:27:36 -0500 (EST)
-Date:   Thu, 30 Jan 2020 15:27:35 +0100
-From:   Greg KH <greg@kroah.com>
-To:     Konstantin Khlebnikov <khlebnikov@yandex-team.ru>
-Cc:     Stable <stable@vger.kernel.org>,
-        linux-block <linux-block@vger.kernel.org>,
-        Jens Axboe <axboe@kernel.dk>, Ming Lei <ming.lei@redhat.com>,
-        Dmitry Monakhov <dmtrmonakhov@yandex-team.ru>
-Subject: Re: [4.19.y] 32-bit overflow in __blkdev_issue_discard()
-Message-ID: <20200130142735.GA963927@kroah.com>
-References: <ad8d7c2d-9bbe-6d2e-db20-d208b5563c09@yandex-team.ru>
+        Thu, 30 Jan 2020 09:53:24 -0500
+Received: from mxbackcorp1j.mail.yandex.net (mxbackcorp1j.mail.yandex.net [IPv6:2a02:6b8:0:1619::162])
+        by forwardcorp1j.mail.yandex.net (Yandex) with ESMTP id 7C3462E09A7;
+        Thu, 30 Jan 2020 17:53:21 +0300 (MSK)
+Received: from vla5-58875c36c028.qloud-c.yandex.net (vla5-58875c36c028.qloud-c.yandex.net [2a02:6b8:c18:340b:0:640:5887:5c36])
+        by mxbackcorp1j.mail.yandex.net (mxbackcorp/Yandex) with ESMTP id wvfQYkFNLV-rHd4Cgwg;
+        Thu, 30 Jan 2020 17:53:21 +0300
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=yandex-team.ru; s=default;
+        t=1580396001; bh=Y84bH2KsE1kXNrx8LdIiH0KlztbKiZ7lW4YKF45II9M=;
+        h=Message-ID:Date:To:From:Subject:Cc;
+        b=EJtQgDYTUBZfqOWTf1Haall3wHsHinWyL7C0tp+ryWWcKPnZEpFjtqD5k1N7SxWW3
+         sx6fhpRzm5YBbHZHOpZn8sDuwaKXLdDBh2AjyRvJzYL/uFbvhRahVjNmqkQ6Y7tuQZ
+         dvwQUEjJxAYti8zVeVN+mkBUgNDQ53L4g1tJMJ38=
+Authentication-Results: mxbackcorp1j.mail.yandex.net; dkim=pass header.i=@yandex-team.ru
+Received: from dynamic-red.dhcp.yndx.net (dynamic-red.dhcp.yndx.net [2a02:6b8:0:40c:8448:fbcc:1dac:c863])
+        by vla5-58875c36c028.qloud-c.yandex.net (smtpcorp/Yandex) with ESMTPSA id 8PJ41Vi2La-rHXSwIY1;
+        Thu, 30 Jan 2020 17:53:17 +0300
+        (using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+        (Client certificate not present)
+Subject: [PATCH v4.19 1/2] block: cleanup __blkdev_issue_discard()
+From:   Konstantin Khlebnikov <khlebnikov@yandex-team.ru>
+To:     Greg KH <greg@kroah.com>, Stable <stable@vger.kernel.org>
+Cc:     linux-block <linux-block@vger.kernel.org>,
+        Jens Axboe <axboe@kernel.dk>,
+        Dave Chinner <dchinner@redhat.com>,
+        Dmitry Monakhov <dmtrmonakhov@yandex-team.ru>,
+        Ming Lei <ming.lei@redhat.com>
+Date:   Thu, 30 Jan 2020 17:53:16 +0300
+Message-ID: <158039599680.4465.7011319825891038466.stgit@buzz>
+User-Agent: StGit/0.17.1-dirty
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <ad8d7c2d-9bbe-6d2e-db20-d208b5563c09@yandex-team.ru>
+Content-Type: text/plain; charset="utf-8"
+Content-Transfer-Encoding: 7bit
 Sender: linux-block-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-On Thu, Jan 30, 2020 at 03:10:42PM +0300, Konstantin Khlebnikov wrote:
-> Please consider including into 4.19 upstream commits
-> 
-> ba5d73851e71847ba7f7f4c27a1a6e1f5ab91c79
-> ("block: cleanup __blkdev_issue_discard()")
-> 
-> and
-> 
-> 4800bf7bc8c725e955fcbc6191cc872f43f506d3
-> ("block: fix 32 bit overflow in __blkdev_issue_discard()")
+From: Ming Lei <ming.lei@redhat.com>
 
-THis patch does not apply to the 4.19 tree :(
+Commit ba5d73851e71847ba7f7f4c27a1a6e1f5ab91c79 upstream.
 
-> Overflow of unsigned long "req_sects" (fixed in second patch)
-> actually exist here much longer.
-> 
-> And 4.19 commit 744889b7cbb56a64f957e65ade7cb65fe3f35714
-> ("block: don't deal with discard limit in blkdev_issue_discard()")
-> make it worse by replacing
-> 
-> req_sects = min_t(sector_t, nr_sects, q->limits.max_discard_sectors);
-> 
-> with
-> 
-> unsigned int req_sects = nr_sects;
-> 
-> 
-> because now discard length isn't cut by max_discard_sectors it easily overflows.
-> As a result BLKDISCARD fails unexpectedly:
-> 
-> ioctl(3, BLKDISCARD, [0, 0x20000000000])  = -1 EOPNOTSUPP (Operation not supported)
+Cleanup __blkdev_issue_discard() a bit:
 
-I don't understand.  Can you provide backported and working patches for
-the 4.19.y series so that I can apply them that way to show exactly what
-you have changed here?
+- remove local variable of 'end_sect'
+- remove code block of 'fail'
 
-thanks,
+Cc: Mike Snitzer <snitzer@redhat.com>
+Cc: Christoph Hellwig <hch@lst.de>
+Cc: Xiao Ni <xni@redhat.com>
+Cc: Mariusz Dabrowski <mariusz.dabrowski@intel.com>
+Tested-by: Rui Salvaterra <rsalvaterra@gmail.com>
+Signed-off-by: Ming Lei <ming.lei@redhat.com>
+Signed-off-by: Jens Axboe <axboe@kernel.dk>
+Signed-off-by: Konstantin Khlebnikov <khlebnikov@yandex-team.ru>
+---
+ block/blk-lib.c |   23 ++++++-----------------
+ 1 file changed, 6 insertions(+), 17 deletions(-)
 
-greg k-h
+diff --git a/block/blk-lib.c b/block/blk-lib.c
+index 1f196cf0aa5d..41088d5466c1 100644
+--- a/block/blk-lib.c
++++ b/block/blk-lib.c
+@@ -52,15 +52,12 @@ int __blkdev_issue_discard(struct block_device *bdev, sector_t sector,
+ 	if ((sector | nr_sects) & bs_mask)
+ 		return -EINVAL;
+ 
+-	while (nr_sects) {
+-		unsigned int req_sects = nr_sects;
+-		sector_t end_sect;
+-
+-		if (!req_sects)
+-			goto fail;
+-		req_sects = min(req_sects, bio_allowed_max_sectors(q));
++	if (!nr_sects)
++		return -EINVAL;
+ 
+-		end_sect = sector + req_sects;
++	while (nr_sects) {
++		unsigned int req_sects = min_t(unsigned int, nr_sects,
++				bio_allowed_max_sectors(q));
+ 
+ 		bio = next_bio(bio, 0, gfp_mask);
+ 		bio->bi_iter.bi_sector = sector;
+@@ -68,8 +65,8 @@ int __blkdev_issue_discard(struct block_device *bdev, sector_t sector,
+ 		bio_set_op_attrs(bio, op, 0);
+ 
+ 		bio->bi_iter.bi_size = req_sects << 9;
++		sector += req_sects;
+ 		nr_sects -= req_sects;
+-		sector = end_sect;
+ 
+ 		/*
+ 		 * We can loop for a long time in here, if someone does
+@@ -82,14 +79,6 @@ int __blkdev_issue_discard(struct block_device *bdev, sector_t sector,
+ 
+ 	*biop = bio;
+ 	return 0;
+-
+-fail:
+-	if (bio) {
+-		submit_bio_wait(bio);
+-		bio_put(bio);
+-	}
+-	*biop = NULL;
+-	return -EOPNOTSUPP;
+ }
+ EXPORT_SYMBOL(__blkdev_issue_discard);
+ 
+
