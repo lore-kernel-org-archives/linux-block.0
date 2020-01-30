@@ -2,90 +2,78 @@ Return-Path: <SRS0=k455=3T=vger.kernel.org=linux-block-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-2.2 required=3.0 tests=DKIM_SIGNED,DKIM_VALID,
-	HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,
-	USER_AGENT_SANE_1 autolearn=no autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-6.1 required=3.0 tests=DKIMWL_WL_HIGH,DKIM_SIGNED,
+	DKIM_VALID,DKIM_VALID_AU,MAILING_LIST_MULTI,MENTIONS_GIT_HOSTING,
+	SPF_HELO_NONE,SPF_PASS autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id A8B1CC35240
-	for <linux-block@archiver.kernel.org>; Thu, 30 Jan 2020 04:04:14 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 85F10C35240
+	for <linux-block@archiver.kernel.org>; Thu, 30 Jan 2020 04:15:14 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.kernel.org (Postfix) with ESMTP id 7DE96206F0
-	for <linux-block@archiver.kernel.org>; Thu, 30 Jan 2020 04:04:14 +0000 (UTC)
-Authentication-Results: mail.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel-dk.20150623.gappssmtp.com header.i=@kernel-dk.20150623.gappssmtp.com header.b="2CM33z3Q"
+	by mail.kernel.org (Postfix) with ESMTP id 5B23620CC7
+	for <linux-block@archiver.kernel.org>; Thu, 30 Jan 2020 04:15:14 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+	s=default; t=1580357714;
+	bh=HwiiqARjoKZmkqiQs2KmY3uhpxXOAVWnArAIic5cM94=;
+	h=Subject:From:In-Reply-To:References:Date:To:Cc:List-ID:From;
+	b=bOTGXphCMAtcjs/vpVTewvkruub5WCXXcvps8Xyyo0RuHeJhr9Bmy1jH9CPGEvW/I
+	 fenR0v+qaY+aJCYC9ST5z6c+664IUHNc3vT1Zqs/cRrln6eaFr7jgNdcGuY3BF3ou+
+	 4QH84HUakT+S7/K88qA878aJPwGbJ6NuysdwZUkM=
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1726811AbgA3EEN (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Wed, 29 Jan 2020 23:04:13 -0500
-Received: from mail-pg1-f195.google.com ([209.85.215.195]:43529 "EHLO
-        mail-pg1-f195.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1727020AbgA3EEN (ORCPT
-        <rfc822;linux-block@vger.kernel.org>);
-        Wed, 29 Jan 2020 23:04:13 -0500
-Received: by mail-pg1-f195.google.com with SMTP id u131so924536pgc.10
-        for <linux-block@vger.kernel.org>; Wed, 29 Jan 2020 20:04:11 -0800 (PST)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=kernel-dk.20150623.gappssmtp.com; s=20150623;
-        h=subject:to:cc:references:from:message-id:date:user-agent
-         :mime-version:in-reply-to:content-language:content-transfer-encoding;
-        bh=pvvVT/b95UaLpYd8lIo04uOv4SDYk7PHg7fzm5Afymw=;
-        b=2CM33z3QmNsLGizAUud8ZrRtcS/UOJVh5srO6r0beE7dVVirSjyUJu5uQbG3wAp+1j
-         igd5VCWO6Rh8WcpPgbCzn/iOdFGAqmclnWh0idY9BDEcZvb8O3xACKrJcCrO0OHWMdcq
-         x0gzeZkIYTrIil50MthvcQxlBLvgEaiZS/6VnOfXiADJd/0akppJPB9uEdD6YU2+No8q
-         w/F5aHJsL9e9kGlTGyHtzjzKWqzEdgL1BL/EeyQoGS/lINLfuj0gi33Eyanul2MMl7Dj
-         JIiHVq9Mj5pq+/+5Zh8f3kdl7zJjHAOgGykuowufHJNu87NGEweXdXwHyyMDxiOQI3lb
-         oBbw==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20161025;
-        h=x-gm-message-state:subject:to:cc:references:from:message-id:date
-         :user-agent:mime-version:in-reply-to:content-language
-         :content-transfer-encoding;
-        bh=pvvVT/b95UaLpYd8lIo04uOv4SDYk7PHg7fzm5Afymw=;
-        b=mPxVWq/+YuTb/lF6q1UDhFoYKhE4Xv7iPgu+fnmDQruTEduWPNKarcZoqKbhrzbhnW
-         oppFM5Hys81YjOd3wSwEX7N/xG4K67Grtzqo4S904h1+KN7sx7xZQY+6etVgjmiqNpli
-         paAy1U2Qk7TYq1qG5HKtb7CE7CnWBlWDOhdhDiWeeYQNvtb5KJAJmCq/IvdXwv4amGvq
-         Pu62fGEbYOXJ3eScPTehsqHzNpChODX46lqFGZf/1iiMvSj/Mq04sLAGTVG7hK4DNhs+
-         KTYgw628YMS9mr7xFGmC9ZzyLir8tvijRYPyxP4i4jhe1V4NpgnO1GjaKn7stKMrGucR
-         sn/w==
-X-Gm-Message-State: APjAAAV9oeM74p+AfQTV5qOAAwDi6+oqqgRtDJ72n1CtqWXa5/P0AvJY
-        f0aJvZcSy7hFfp2a1BAGGLdPzu7/exY=
-X-Google-Smtp-Source: APXvYqyYGaaUNWka3uFLfMuBa+lGiX1WFHjW2SY2k8buO6fFUnR0D0ORcRdfeZ5QHe0LDpgZX/ZFlA==
-X-Received: by 2002:a63:78c:: with SMTP id 134mr2473976pgh.279.1580357051523;
-        Wed, 29 Jan 2020 20:04:11 -0800 (PST)
-Received: from [192.168.1.188] ([66.219.217.145])
-        by smtp.gmail.com with ESMTPSA id j17sm4483515pfa.28.2020.01.29.20.04.10
-        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
-        Wed, 29 Jan 2020 20:04:11 -0800 (PST)
-Subject: Re: [PATCH] drbd fifo_alloc: use struct_size
-To:     Stephen Kitt <steve@sk2.org>,
-        Philipp Reisner <philipp.reisner@linbit.com>,
-        Lars Ellenberg <lars.ellenberg@linbit.com>,
-        drbd-dev@lists.linbit.com
-Cc:     linux-block@vger.kernel.org, linux-kernel@vger.kernel.org
-References: <20200124200307.1808593-1-steve@sk2.org>
-From:   Jens Axboe <axboe@kernel.dk>
-Message-ID: <a74b5267-5eb5-a050-75ea-e108a5115805@kernel.dk>
-Date:   Wed, 29 Jan 2020 21:04:09 -0700
-User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:68.0) Gecko/20100101
- Thunderbird/68.4.1
-MIME-Version: 1.0
-In-Reply-To: <20200124200307.1808593-1-steve@sk2.org>
-Content-Type: text/plain; charset=utf-8
-Content-Language: en-US
-Content-Transfer-Encoding: 7bit
+        id S1727483AbgA3EPM (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Wed, 29 Jan 2020 23:15:12 -0500
+Received: from mail.kernel.org ([198.145.29.99]:45694 "EHLO mail.kernel.org"
+        rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
+        id S1726833AbgA3EPL (ORCPT <rfc822;linux-block@vger.kernel.org>);
+        Wed, 29 Jan 2020 23:15:11 -0500
+Subject: Re: [git pull] device mapper changes for 5.6
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+        s=default; t=1580357711;
+        bh=HwiiqARjoKZmkqiQs2KmY3uhpxXOAVWnArAIic5cM94=;
+        h=From:In-Reply-To:References:Date:To:Cc:From;
+        b=Ay4QpQQkQLmC22WQxQElBS2mUmjAE5bhicaRwDURSRPNokbfoFjMzXtr0+h08Zy29
+         +qvqLUksAXxKb+0HqLexKqwLa/rV9qzio5IrJ9f6TeMwFx9Lw4Q1k8w18bwr9PaFEo
+         M9sFHL9a9bBGtDqkEfD+29SxDyMnvtwf7u2yxpGo=
+From:   pr-tracker-bot@kernel.org
+In-Reply-To: <20200129171703.GA26110@redhat.com>
+References: <20200129171703.GA26110@redhat.com>
+X-PR-Tracked-List-Id: <linux-block.vger.kernel.org>
+X-PR-Tracked-Message-Id: <20200129171703.GA26110@redhat.com>
+X-PR-Tracked-Remote: git://git.kernel.org/pub/scm/linux/kernel/git/device-mapper/linux-dm.git
+ tags/for-5.6/dm-changes
+X-PR-Tracked-Commit-Id: 47ace7e012b9f7ad71d43ac9063d335ea3d6820b
+X-PR-Merge-Tree: torvalds/linux.git
+X-PR-Merge-Refname: refs/heads/master
+X-PR-Merge-Commit-Id: e9f8ca0ae7b7bc9a032b429929431c626a69dd5e
+Message-Id: <158035771095.9636.946294396868543275.pr-tracker-bot@kernel.org>
+Date:   Thu, 30 Jan 2020 04:15:10 +0000
+To:     Mike Snitzer <snitzer@redhat.com>
+Cc:     Linus Torvalds <torvalds@linux-foundation.org>,
+        dm-devel@redhat.com, linux-block@vger.kernel.org,
+        Alasdair G Kergon <agk@redhat.com>,
+        Anatol Pomazau <anatol@google.com>,
+        Bryan Gurney <bgurney@redhat.com>,
+        Dmitry Fomichev <dmitry.fomichev@wdc.com>,
+        Heinz Mauelshagen <heinzm@redhat.com>,
+        Jeffle Xu <jefflexu@linux.alibaba.com>,
+        Joe Thornber <ejt@redhat.com>,
+        Mikulas Patocka <mpatocka@redhat.com>,
+        Milan Broz <gmazyland@gmail.com>,
+        "xianrong.zhou" <xianrong.zhou@transsion.com>,
+        zhengbin <zhengbin13@huawei.com>
 Sender: linux-block-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-On 1/24/20 1:03 PM, Stephen Kitt wrote:
-> Switching to struct_size for the allocation in fifo_alloc avoids
-> hard-coding the type of fifo_buffer.values in fifo_alloc. It also
-> provides overflow protection; to avoid pessimistic code being
-> generated by the compiler as a result, this patch also switches
-> fifo_size to unsigned, propagating the change as appropriate.
+The pull request you sent on Wed, 29 Jan 2020 12:17:03 -0500:
 
-Applied, thanks.
+> git://git.kernel.org/pub/scm/linux/kernel/git/device-mapper/linux-dm.git tags/for-5.6/dm-changes
+
+has been merged into torvalds/linux.git:
+https://git.kernel.org/torvalds/c/e9f8ca0ae7b7bc9a032b429929431c626a69dd5e
+
+Thank you!
 
 -- 
-Jens Axboe
-
+Deet-doot-dot, I am a bot.
+https://korg.wiki.kernel.org/userdoc/prtracker
