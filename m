@@ -2,70 +2,96 @@ Return-Path: <SRS0=MKaG=3U=vger.kernel.org=linux-block-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-0.6 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
-	HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS
+X-Spam-Status: No, score=-2.2 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
+	MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED,USER_AGENT_SANE_1
 	autolearn=no autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id E9D47C35240
-	for <linux-block@archiver.kernel.org>; Fri, 31 Jan 2020 06:42:32 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id B0AC1C33CB2
+	for <linux-block@archiver.kernel.org>; Fri, 31 Jan 2020 09:18:32 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.kernel.org (Postfix) with ESMTP id C08E821734
-	for <linux-block@archiver.kernel.org>; Fri, 31 Jan 2020 06:42:32 +0000 (UTC)
-Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (2048-bit key) header.d=infradead.org header.i=@infradead.org header.b="mbwTRV+J"
+	by mail.kernel.org (Postfix) with ESMTP id 7FE4A20CC7
+	for <linux-block@archiver.kernel.org>; Fri, 31 Jan 2020 09:18:32 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1726023AbgAaGmc (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Fri, 31 Jan 2020 01:42:32 -0500
-Received: from bombadil.infradead.org ([198.137.202.133]:53334 "EHLO
-        bombadil.infradead.org" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1725832AbgAaGmb (ORCPT
-        <rfc822;linux-block@vger.kernel.org>);
-        Fri, 31 Jan 2020 01:42:31 -0500
-DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed;
-        d=infradead.org; s=bombadil.20170209; h=In-Reply-To:Content-Type:MIME-Version
-        :References:Message-ID:Subject:Cc:To:From:Date:Sender:Reply-To:
-        Content-Transfer-Encoding:Content-ID:Content-Description:Resent-Date:
-        Resent-From:Resent-Sender:Resent-To:Resent-Cc:Resent-Message-ID:List-Id:
-        List-Help:List-Unsubscribe:List-Subscribe:List-Post:List-Owner:List-Archive;
-         bh=4RziqBNwPU1PXyuUYR4uTQ9MUQMUjgsmxUEvgGf8uVg=; b=mbwTRV+JFE7kOQ/Zc1q7EWWLo
-        b/r6VaG5PA2zFHi4pvVcHg00QQM2cM663Xq1D41XOwf0UQdQdBNI2xvUvvuRWZc0z3F9LIYg5uvSB
-        Od2BHuooTiRfcTGuydXKRdUSEgl6XNVJsSYSUM37WQMbf/wb7XNSVQDdHWL3GqkwTsluhlPKhw6S/
-        EP3EB4/pADxjzTK6JdQpS2tIBSbJEw8Ly4vzgw/v+FJrXluZhHIuqgyn0eOfaxQ3TI9XX6banLZW8
-        zNWG9hIz5ggAbgKPzcd24gpk7VbDWT32ozJTEJsOQql+384AXzT7RsS4uJWfpkFJ7BZl+lVgNVI5k
-        PbQlk0vAw==;
-Received: from hch by bombadil.infradead.org with local (Exim 4.92.3 #3 (Red Hat Linux))
-        id 1ixQ0c-0000EL-Oy; Fri, 31 Jan 2020 06:42:30 +0000
-Date:   Thu, 30 Jan 2020 22:42:30 -0800
-From:   Christoph Hellwig <hch@infradead.org>
-To:     Bijan Mottahedeh <bijan.mottahedeh@oracle.com>
-Cc:     axboe@kernel.dk, linux-block@vger.kernel.org,
-        io-uring@vger.kernel.org
-Subject: Re: [PATCH 1/1] block: Manage bio references so the bio persists
- until necessary
-Message-ID: <20200131064230.GA28151@infradead.org>
-References: <1580441022-59129-1-git-send-email-bijan.mottahedeh@oracle.com>
- <1580441022-59129-2-git-send-email-bijan.mottahedeh@oracle.com>
+        id S1728198AbgAaJQd (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Fri, 31 Jan 2020 04:16:33 -0500
+Received: from relay.sw.ru ([185.231.240.75]:39718 "EHLO relay.sw.ru"
+        rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
+        id S1728159AbgAaJQd (ORCPT <rfc822;linux-block@vger.kernel.org>);
+        Fri, 31 Jan 2020 04:16:33 -0500
+Received: from dhcp-172-16-24-104.sw.ru ([172.16.24.104])
+        by relay.sw.ru with esmtp (Exim 4.92.3)
+        (envelope-from <ktkhai@virtuozzo.com>)
+        id 1ixSOT-0007Vt-8L; Fri, 31 Jan 2020 12:15:17 +0300
+Subject: Re: [PATCH block v2 2/3] block: Add support for REQ_NOZERO flag
+To:     Christoph Hellwig <hch@infradead.org>,
+        "Martin K. Petersen" <martin.petersen@oracle.com>
+Cc:     linux-block@vger.kernel.org, linux-kernel@vger.kernel.org,
+        axboe@kernel.dk, tytso@mit.edu, adilger.kernel@dilger.ca,
+        Chaitanya.Kulkarni@wdc.com, darrick.wong@oracle.com,
+        ming.lei@redhat.com, osandov@fb.com, jthumshirn@suse.de,
+        minwoo.im.dev@gmail.com, damien.lemoal@wdc.com,
+        andrea.parri@amarulasolutions.com, hare@suse.com, tj@kernel.org,
+        ajay.joshi@wdc.com, sagi@grimberg.me, dsterba@suse.com,
+        bvanassche@acm.org, dhowells@redhat.com, asml.silence@gmail.com
+References: <157917805422.88675.6477661554332322975.stgit@localhost.localdomain>
+ <157917816325.88675.16481772163916741596.stgit@localhost.localdomain>
+ <yq14kwpibf6.fsf@oracle.com> <20200131062343.GA6267@infradead.org>
+From:   Kirill Tkhai <ktkhai@virtuozzo.com>
+Message-ID: <683bb62a-9667-d2c7-0437-7a6343819382@virtuozzo.com>
+Date:   Fri, 31 Jan 2020 12:15:17 +0300
+User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:68.0) Gecko/20100101
+ Thunderbird/68.4.2
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <1580441022-59129-2-git-send-email-bijan.mottahedeh@oracle.com>
-X-SRS-Rewrite: SMTP reverse-path rewritten from <hch@infradead.org> by bombadil.infradead.org. See http://www.infradead.org/rpr.html
+In-Reply-To: <20200131062343.GA6267@infradead.org>
+Content-Type: text/plain; charset=utf-8
+Content-Language: en-US
+Content-Transfer-Encoding: 7bit
 Sender: linux-block-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-On Thu, Jan 30, 2020 at 07:23:42PM -0800, Bijan Mottahedeh wrote:
-> Get a reference to a bio, so it won't be freed if end_io() gets to
-> it before submit_io() returns.  Defer the release of the first bio
-> in a mult-bio request until the last end_io() since the first bio is
-> embedded in the dio structure and must therefore persist through an
-> entire multi-bio request.
+Hi, Christoph,
 
-Can you explain the issue a little more?
+On 31.01.2020 09:23, Christoph Hellwig wrote:
+> On Tue, Jan 21, 2020 at 01:14:05AM -0500, Martin K. Petersen wrote:
+>> I find there is some dissonance between using BLKDEV_ZERO_ALLOCATE to
+>> describe this operation in one case and REQ_NOZERO in the other.
+>>
+>> I understand why not zeroing is important in your case. However, I think
+>> the allocation aspect is semantically more important. Also, in the case
+>> of SCSI, the allocated blocks will typically appear zeroed. So from that
+>> perspective REQ_NOZERO doesn't really make sense. I would really prefer
+>> to use REQ_ALLOCATE to describe this operation. I agree that "do not
+>> write every block" is important too. I just don't have a good suggestion
+>> for how to express that as an additional qualifier to REQ_ALLOCATE_?.
+> 
+> Agreed.  Nevermind the problem of a REQ_OP_WRITE_ZEROES operations with
+> a NOZERO flag causing a massive confusion to the reader.
+> 
+>> Also, adding to the confusion: In the context of SCSI, ANCHOR requires
+>> UNMAP. So my head hurts a bit when I read REQ_NOZERO|REQ_NOUNMAP and
+>> have to translate that into ANCHOR|UNMAP.
+>>
+>> Longer term, I think we should consider introducing REQ_OP_SINGLE_RANGE
+>> or something like that as an umbrella operation that can be used to
+>> describe zeroing, allocating, and other things that operate on a single
+>> LBA range with no payload. Thus removing both the writiness and the
+>> zeroness from the existing REQ_OP_WRITE_ZEROES conduit.
+> 
+> What is the benefit of a multipler there?  Given all this flags
+> confusion I'm almost tempted to just split up REQ_OP_WRITE_ZEROES into
+> REQ_OP_ALLOCATE ("cheap") and REQ_OP_WRITE_ZEROES ("potentially
+> expensive") and just let the caller handle the difference.  Everytime
+> we try to encode semantic differences into flags we're eventually
+> running into trouble.  Sais the person that added REQ_UNMAP..
 
-The initial bio is embedded into the dio, and will have a reference
-until the bio_put call at the end of the function, so we can't have
-a race for that one and won't ever need the refcount for the single
-bio case.  Avoiding the atomic is pretty important for aio/uring
-performance.
+We started from separated REQ_OP_ASSIGN_RANGE in v1, but then we decided
+to use a modifier because this looks better and scatters less over
+I/O stack. See "[PATCH RFC 0/3] block,ext4: Introduce REQ_OP_ASSIGN_RANGE
+to reflect extents allocation in block device internals" series for the details.
+(https://lkml.org/lkml/2020/1/7/1616 and neighbouring messages).
+
+Last version of the patchset is v5 and it's here: https://lkml.org/lkml/2020/1/22/643
+
+Kirill
