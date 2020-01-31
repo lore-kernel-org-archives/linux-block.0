@@ -7,63 +7,63 @@ X-Spam-Status: No, score=-9.8 required=3.0 tests=DKIM_SIGNED,DKIM_VALID,
 	SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED,USER_AGENT_GIT
 	autolearn=unavailable autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 6C316C33CB7
-	for <linux-block@archiver.kernel.org>; Fri, 31 Jan 2020 09:25:18 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 4DFBDC33CB2
+	for <linux-block@archiver.kernel.org>; Fri, 31 Jan 2020 09:25:19 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.kernel.org (Postfix) with ESMTP id 367BC21734
-	for <linux-block@archiver.kernel.org>; Fri, 31 Jan 2020 09:25:18 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id 23A00215A4
+	for <linux-block@archiver.kernel.org>; Fri, 31 Jan 2020 09:25:19 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=pass (2048-bit key) header.d=linaro.org header.i=@linaro.org header.b="WEc5i+wM"
+	dkim=pass (2048-bit key) header.d=linaro.org header.i=@linaro.org header.b="iRXRSb4D"
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1728324AbgAaJZO (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Fri, 31 Jan 2020 04:25:14 -0500
-Received: from mail-wm1-f68.google.com ([209.85.128.68]:52122 "EHLO
+        id S1728284AbgAaJZB (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Fri, 31 Jan 2020 04:25:01 -0500
+Received: from mail-wm1-f68.google.com ([209.85.128.68]:35633 "EHLO
         mail-wm1-f68.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1728279AbgAaJZC (ORCPT
+        with ESMTP id S1728274AbgAaJZB (ORCPT
         <rfc822;linux-block@vger.kernel.org>);
-        Fri, 31 Jan 2020 04:25:02 -0500
-Received: by mail-wm1-f68.google.com with SMTP id t23so7095515wmi.1
-        for <linux-block@vger.kernel.org>; Fri, 31 Jan 2020 01:25:01 -0800 (PST)
+        Fri, 31 Jan 2020 04:25:01 -0500
+Received: by mail-wm1-f68.google.com with SMTP id b17so7864685wmb.0
+        for <linux-block@vger.kernel.org>; Fri, 31 Jan 2020 01:25:00 -0800 (PST)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=linaro.org; s=google;
         h=from:to:cc:subject:date:message-id:in-reply-to:references
          :mime-version:content-transfer-encoding;
-        bh=EYMuqQIhNyGIyUO9+d/0zXKDzQMWFHlzvVLFhG2VePE=;
-        b=WEc5i+wMCiAyLuk0tSUYxfVp66mFw8A7FGbPTItb8JCJX8wGBEY81gDxK9JNBsW+Hc
-         hhyQtR6a7WYFoSrkKUat+wBmuKUegtsjerK2gqF79tbjgYCJ9rIrHvwUklvZx2U5b6Gs
-         tHZRxWq+df3pKHA/3FNK87d0wzzLoChmf5Q51517VgVC2noembzyD1zVCJrshupZRJZQ
-         EcNP6zW7NmeT5lGlA9dgFjIqXgeMp38ymYFXv6bk8pCWgyOS9NieRF0Hik3Gr6ivNWrC
-         AEcYPvW68s9NDVXoKNqBAA8zunGXTmO7xxb6qreV7M6reHq9uyE05zY2gns/vZ5pVVdX
-         F76g==
+        bh=9S9BwHx5UyCKJX2JPPBf1rlNAUg9PfPZ0MUkcYcdubg=;
+        b=iRXRSb4DE5RRgBR+1dzaU40ae0vmJbAJrH7ssWKCDoti6cVtCXOhHrRgtxLuu74K7I
+         Tw3sJ1uQbf05gkl/PqtpOVRtDGHMsSlfL9YBa91dbcrDEUTDRl7PR0uucmawserg4suP
+         dVsMWzYSzrUpjPPNlKlnyl9QLhCqdHohs4I5rQ4ngR46zzjF+o6Iro7l0p9RQ+jqhj3t
+         GCHSdSsbC9Ez9HMVWP5wRpZO2Mm7sYiWuL0BTzrWlE8QkhY6/PtCQ7lUy4k+/ZmhuXjI
+         msLBIUrrrUE62KX/PYyadwpxp/5qeUMb/NCwLHBukakYpsIZHrjnt5ZcWgkKTa+3iIxE
+         HuUQ==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=1e100.net; s=20161025;
         h=x-gm-message-state:from:to:cc:subject:date:message-id:in-reply-to
          :references:mime-version:content-transfer-encoding;
-        bh=EYMuqQIhNyGIyUO9+d/0zXKDzQMWFHlzvVLFhG2VePE=;
-        b=t99v19VXZL3GGfbeQLMkhAB3MrYekEyqk9dfMa4A3oqnYhAaO6YjhXgV+LQhb/O4HO
-         MW5cx429Rnzk6+eH2gnQiKE+fXiigNii+qXssGmLmd4l0jJP5C0BrIzQnYpLd5fgVuZW
-         kdO1IuARbOXW8fM59FJxW6GJW24yfI6LQtUlVL1zTmvd5b3kMJfUpJGAy1T43WsKabsk
-         vmOMDY4k9WSL0k9ewHXQqMxomv8NUSNDr7kY4SoXm2wFGchdifak6EoNl2s3fiPbT1/m
-         8zk+Iep4mKCF3tIWUs90JdAI+OFGu4x2yhlr2H24DsZCXlsTQ59AeoR6LlXgtUE0JqyQ
-         IyKg==
-X-Gm-Message-State: APjAAAUp7aMyexQ5kJsrxxILHhIQP1WtYbVsidC5Y1Jm+cqxXbWuEGhC
-        u/2IK1a+j2KlMV1t0liYls1fug==
-X-Google-Smtp-Source: APXvYqwAzr3TIiTKUwDgtKvzj4Ik3+GCPAkjxsrEqUp6NEGoz0CfTNgDeLNnEFSoxKU74ROWUheixw==
-X-Received: by 2002:a1c:7c18:: with SMTP id x24mr11661261wmc.185.1580462700684;
-        Fri, 31 Jan 2020 01:25:00 -0800 (PST)
-Received: from localhost.localdomain (88-147-73-186.dyn.eolo.it. [88.147.73.186])
-        by smtp.gmail.com with ESMTPSA id 16sm10144364wmi.0.2020.01.31.01.24.59
-        (version=TLS1_2 cipher=ECDHE-RSA-AES128-GCM-SHA256 bits=128/128);
+        bh=9S9BwHx5UyCKJX2JPPBf1rlNAUg9PfPZ0MUkcYcdubg=;
+        b=Wlf8c2cyWkSK28fPqT9e0P2bFT6vPsnDWlYejvQI8KLnFA6kh0riB74w1UV0Hv6A/6
+         1JFae26+C+ak1Bzh8yzgjWnzAbkb7F6LijQYxAKYpg56xDAwDkFb4GzwTQJu1OSSa8wo
+         vr7hdxgyrQONwyXr7R+HNN1IrKUwCMYKbJGzzOQOGs6hVHTDZYxldzoCyMULh0Lfmk9p
+         sxS0crw/cEM5LlRISxiKXj2wCF84i2E/rmGYrRnSgz4J0VZcB5Zl0yxBOlg0Fo5M/nKy
+         6QyePw1n3VmBysQ+bFQvSA+7qHFrvYsudHPtnOHqrMq6IhOQw1jXMXrAmxg8mCqZScE+
+         EZZg==
+X-Gm-Message-State: APjAAAXaDj8M9FIh3RqJH2SMoi43wb2RQ/X3F9j3kbfYrKN/s9rB7kzl
+        fNeKRjzHt1WDXwp05xJnYWsaIQ==
+X-Google-Smtp-Source: APXvYqxB4qSPUHX306OsPESk96PbfKWReeeWyRX+ZbnNBODPZNtLG1E8CogAmQhcBFk6/5MNcZOwqQ==
+X-Received: by 2002:a1c:545d:: with SMTP id p29mr11760504wmi.91.1580462699266;
         Fri, 31 Jan 2020 01:24:59 -0800 (PST)
+Received: from localhost.localdomain (88-147-73-186.dyn.eolo.it. [88.147.73.186])
+        by smtp.gmail.com with ESMTPSA id 16sm10144364wmi.0.2020.01.31.01.24.58
+        (version=TLS1_2 cipher=ECDHE-RSA-AES128-GCM-SHA256 bits=128/128);
+        Fri, 31 Jan 2020 01:24:58 -0800 (PST)
 From:   Paolo Valente <paolo.valente@linaro.org>
 To:     Jens Axboe <axboe@kernel.dk>
 Cc:     linux-block@vger.kernel.org, linux-kernel@vger.kernel.org,
         bfq-iosched@googlegroups.com, oleksandr@natalenko.name,
         patdung100@gmail.com, cevich@redhat.com,
         Paolo Valente <paolo.valente@linaro.org>
-Subject: [PATCH BUGFIX 4/6] block, bfq: extend incomplete name of field on_st
-Date:   Fri, 31 Jan 2020 10:24:07 +0100
-Message-Id: <20200131092409.10867-5-paolo.valente@linaro.org>
+Subject: [PATCH BUGFIX 3/6] block, bfq: get extra ref to prevent a queue from being freed during a group move
+Date:   Fri, 31 Jan 2020 10:24:06 +0100
+Message-Id: <20200131092409.10867-4-paolo.valente@linaro.org>
 X-Mailer: git-send-email 2.20.1
 In-Reply-To: <20200131092409.10867-1-paolo.valente@linaro.org>
 References: <20200131092409.10867-1-paolo.valente@linaro.org>
@@ -74,101 +74,48 @@ Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-The flag on_st in the bfq_entity data structure is true if the entity
-is on a service tree or is in service. Yet the name of the field,
-confusingly, does not mention the second, very important case. Extend
-the name to mention the second case too.
+In bfq_bfqq_move(), the bfq_queue, say Q, to be moved to a new group
+may happen to be deactivated in the scheduling data structures of the
+source group (and then activated in the destination group). If Q is
+referred only by the data structures in the source group when the
+deactivation happens, then Q is freed upon the deactivation.
 
+This commit addresses this issue by getting an extra reference before
+the possible deactivation, and releasing this extra reference after Q
+has been moved.
+
+Tested-by: Chris Evich <cevich@redhat.com>
 Signed-off-by: Paolo Valente <paolo.valente@linaro.org>
 ---
- block/bfq-cgroup.c  |  2 +-
- block/bfq-iosched.c |  2 +-
- block/bfq-iosched.h |  2 +-
- block/bfq-wf2q.c    | 11 +++++++----
- 4 files changed, 10 insertions(+), 7 deletions(-)
+ block/bfq-cgroup.c | 8 ++++++++
+ 1 file changed, 8 insertions(+)
 
 diff --git a/block/bfq-cgroup.c b/block/bfq-cgroup.c
-index 8ab7f18ff8cb..c818c64766e5 100644
+index e1419edde2ec..8ab7f18ff8cb 100644
 --- a/block/bfq-cgroup.c
 +++ b/block/bfq-cgroup.c
-@@ -659,7 +659,7 @@ void bfq_bfqq_move(struct bfq_data *bfqd, struct bfq_queue *bfqq,
+@@ -651,6 +651,12 @@ void bfq_bfqq_move(struct bfq_data *bfqd, struct bfq_queue *bfqq,
+ 		bfq_bfqq_expire(bfqd, bfqd->in_service_queue,
+ 				false, BFQQE_PREEMPTED);
  
++	/*
++	 * get extra reference to prevent bfqq from being freed in
++	 * next possible deactivate
++	 */
++	bfqq->ref++;
++
  	if (bfq_bfqq_busy(bfqq))
  		bfq_deactivate_bfqq(bfqd, bfqq, false, false);
--	else if (entity->on_st)
-+	else if (entity->on_st_or_in_serv)
- 		bfq_put_idle_entity(bfq_entity_service_tree(entity), entity);
- 	bfqg_and_blkg_put(bfqq_group(bfqq));
+ 	else if (entity->on_st)
+@@ -670,6 +676,8 @@ void bfq_bfqq_move(struct bfq_data *bfqd, struct bfq_queue *bfqq,
  
-diff --git a/block/bfq-iosched.c b/block/bfq-iosched.c
-index 15dfb0844644..28770ec7c06f 100644
---- a/block/bfq-iosched.c
-+++ b/block/bfq-iosched.c
-@@ -1059,7 +1059,7 @@ bfq_bfqq_resume_state(struct bfq_queue *bfqq, struct bfq_data *bfqd,
- 
- static int bfqq_process_refs(struct bfq_queue *bfqq)
- {
--	return bfqq->ref - bfqq->allocated - bfqq->entity.on_st -
-+	return bfqq->ref - bfqq->allocated - bfqq->entity.on_st_or_in_serv -
- 		(bfqq->weight_counter != NULL);
+ 	if (!bfqd->in_service_queue && !bfqd->rq_in_driver)
+ 		bfq_schedule_dispatch(bfqd);
++	/* release extra ref taken above */
++	bfq_put_queue(bfqq);
  }
  
-diff --git a/block/bfq-iosched.h b/block/bfq-iosched.h
-index 8526f20c53bc..f1cb89def7f8 100644
---- a/block/bfq-iosched.h
-+++ b/block/bfq-iosched.h
-@@ -150,7 +150,7 @@ struct bfq_entity {
- 	 * Flag, true if the entity is on a tree (either the active or
- 	 * the idle one of its service_tree) or is in service.
- 	 */
--	bool on_st;
-+	bool on_st_or_in_serv;
- 
- 	/* B-WF2Q+ start and finish timestamps [sectors/weight] */
- 	u64 start, finish;
-diff --git a/block/bfq-wf2q.c b/block/bfq-wf2q.c
-index ffe9ce9faa89..26776bdbdf36 100644
---- a/block/bfq-wf2q.c
-+++ b/block/bfq-wf2q.c
-@@ -645,7 +645,7 @@ static void bfq_forget_entity(struct bfq_service_tree *st,
- {
- 	struct bfq_queue *bfqq = bfq_entity_to_bfqq(entity);
- 
--	entity->on_st = false;
-+	entity->on_st_or_in_serv = false;
- 	st->wsum -= entity->weight;
- 	if (bfqq && !is_in_service)
- 		bfq_put_queue(bfqq);
-@@ -999,7 +999,7 @@ static void __bfq_activate_entity(struct bfq_entity *entity,
- 		 */
- 		bfq_get_entity(entity);
- 
--		entity->on_st = true;
-+		entity->on_st_or_in_serv = true;
- 	}
- 
- #ifdef CONFIG_BFQ_GROUP_IOSCHED
-@@ -1165,7 +1165,10 @@ bool __bfq_deactivate_entity(struct bfq_entity *entity, bool ins_into_idle_tree)
- 	struct bfq_service_tree *st;
- 	bool is_in_service;
- 
--	if (!entity->on_st) /* entity never activated, or already inactive */
-+	if (!entity->on_st_or_in_serv) /*
-+					* entity never activated, or
-+					* already inactive
-+					*/
- 		return false;
- 
- 	/*
-@@ -1620,7 +1623,7 @@ bool __bfq_bfqd_reset_in_service(struct bfq_data *bfqd)
- 	 * service tree either, then release the service reference to
- 	 * the queue it represents (taken with bfq_get_entity).
- 	 */
--	if (!in_serv_entity->on_st) {
-+	if (!in_serv_entity->on_st_or_in_serv) {
- 		/*
- 		 * If no process is referencing in_serv_bfqq any
- 		 * longer, then the service reference may be the only
+ /**
 -- 
 2.20.1
 
