@@ -6,65 +6,58 @@ X-Spam-Status: No, score=-0.6 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
 	HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS
 	autolearn=no autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 25369C33CB2
-	for <linux-block@archiver.kernel.org>; Fri, 31 Jan 2020 06:35:30 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 02183C33CB2
+	for <linux-block@archiver.kernel.org>; Fri, 31 Jan 2020 06:36:55 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.kernel.org (Postfix) with ESMTP id EB35D20678
-	for <linux-block@archiver.kernel.org>; Fri, 31 Jan 2020 06:35:29 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id C7E28214D8
+	for <linux-block@archiver.kernel.org>; Fri, 31 Jan 2020 06:36:54 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (2048-bit key) header.d=infradead.org header.i=@infradead.org header.b="PKBfhEHp"
+	dkim=fail reason="signature verification failed" (2048-bit key) header.d=infradead.org header.i=@infradead.org header.b="cs3mINyj"
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1726017AbgAaGf3 (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Fri, 31 Jan 2020 01:35:29 -0500
-Received: from bombadil.infradead.org ([198.137.202.133]:53166 "EHLO
+        id S1726017AbgAaGgy (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Fri, 31 Jan 2020 01:36:54 -0500
+Received: from bombadil.infradead.org ([198.137.202.133]:53192 "EHLO
         bombadil.infradead.org" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1725815AbgAaGf3 (ORCPT
+        with ESMTP id S1725815AbgAaGgy (ORCPT
         <rfc822;linux-block@vger.kernel.org>);
-        Fri, 31 Jan 2020 01:35:29 -0500
+        Fri, 31 Jan 2020 01:36:54 -0500
 DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed;
         d=infradead.org; s=bombadil.20170209; h=In-Reply-To:Content-Type:MIME-Version
         :References:Message-ID:Subject:Cc:To:From:Date:Sender:Reply-To:
         Content-Transfer-Encoding:Content-ID:Content-Description:Resent-Date:
         Resent-From:Resent-Sender:Resent-To:Resent-Cc:Resent-Message-ID:List-Id:
         List-Help:List-Unsubscribe:List-Subscribe:List-Post:List-Owner:List-Archive;
-         bh=BW2En7pNvZHFAlYVYPJhv8/Lsw4xkSZ3vMI5gF+lSjk=; b=PKBfhEHpbX4Au31TW/i23h6On
-        d1QKv08tCb/QNV7z3y2HMuppnzJsQFhzzFbwPCcauiX+txiFbnz00NfqbM0Rc9roWmI1FycutUX2g
-        bnHooMO2UvS1UyOQjq+e7q0HQbwdCMB5R6huwhOSBHQTpBC/YS3dWdlcKhr8MlhpAuGhsIlITTBM6
-        K8NZHsOXFJMonEJFJ1fqaOGzOtipTo7xw2sGIP/zqfifNBz3l/c3DfY3HT18RpCZmG26RdCFSe+I0
-        dFn8crWyLbl6QhXOn2OePRE8tPGoyHRjRzxBD3K8Dz2VknHIS15efKgaCZITTvsT0IBGmiW+FZ6Ok
-        GLsdkVoug==;
+         bh=4C91OmxMHJbf2dvjbKRIv7O9Ffsa52p52fBfuWZA76w=; b=cs3mINyjlbh/P8XlEo6zHtKcX
+        gz0hU18eOOvnenPCLVFQW6LHiiMVTfOu6vo0xwy3rWX6uc5XJpJNaF/da1A70uVDkkSbtDkJZObVu
+        4UNlGDc6c6cpc4oKKO3KDH818j2nwPWJQjpghd9jYhfsp82l1UhE6bsX7zfIVM+ssHqI0h7VsFnIF
+        Vo/ThkTRjF7ub39ros8yJm0q4T+Zo7v5/YXEwYNyYKRre8HAeNmhw4s+vHs90dWo8gleevzDc7Yfv
+        GZGPUlTF9gQKR1zDarlf7SZrtRbAwk6x8L/BC62uyBWtJXsFW3vAhxCKzluRzbtt/VsTMvmotVzcj
+        Cj0g85HNQ==;
 Received: from hch by bombadil.infradead.org with local (Exim 4.92.3 #3 (Red Hat Linux))
-        id 1ixPtn-00076I-Ry; Fri, 31 Jan 2020 06:35:27 +0000
-Date:   Thu, 30 Jan 2020 22:35:27 -0800
+        id 1ixPvB-000799-A5; Fri, 31 Jan 2020 06:36:53 +0000
+Date:   Thu, 30 Jan 2020 22:36:53 -0800
 From:   Christoph Hellwig <hch@infradead.org>
-To:     Jens Axboe <axboe@kernel.dk>
-Cc:     Andrzej Jakowski <andrzej.jakowski@linux.intel.com>,
-        song@kernel.org, linux-block@vger.kernel.org,
+To:     Andrzej Jakowski <andrzej.jakowski@linux.intel.com>
+Cc:     axboe@kernel.dk, song@kernel.org, linux-block@vger.kernel.org,
         linux-raid@vger.kernel.org,
         Artur Paszkiewicz <artur.paszkiewicz@intel.com>
-Subject: Re: [PATCH 1/2] block: introduce polling on bio level
-Message-ID: <20200131063527.GC6267@infradead.org>
+Subject: Re: [PATCH 2/2] md: enable io polling
+Message-ID: <20200131063653.GD6267@infradead.org>
 References: <20200126044138.5066-1-andrzej.jakowski@linux.intel.com>
- <20200126044138.5066-2-andrzej.jakowski@linux.intel.com>
- <de27b35e-a713-dc9d-5164-0397c0dff285@kernel.dk>
+ <20200126044138.5066-3-andrzej.jakowski@linux.intel.com>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=us-ascii
 Content-Disposition: inline
-In-Reply-To: <de27b35e-a713-dc9d-5164-0397c0dff285@kernel.dk>
+In-Reply-To: <20200126044138.5066-3-andrzej.jakowski@linux.intel.com>
 X-SRS-Rewrite: SMTP reverse-path rewritten from <hch@infradead.org> by bombadil.infradead.org. See http://www.infradead.org/rpr.html
 Sender: linux-block-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-On Wed, Jan 29, 2020 at 09:01:49PM -0700, Jens Axboe wrote:
-> blk_poll() used to be a pointer in the queue, but since we just had
-> one implementation, we got rid of it. Might make sense to
-> reintroduce that, and just make it an optimized indirect call. I
-> think that would be prettier than add the bio hack in the middle of
-> it, and you're having to add a queue pointer anyway.
+> +	rdev_for_each(rdev, mddev) {
+> +		if (rdev->raid_disk >= 0 && !test_bit(Faulty, &rdev->flags)) {
+> +			rv = blk_poll(bdev_get_queue(rdev->bdev), cookie, false);
 
-Well, the other reason is to avoid an indirect call for the blk-mq
-case, which are fairly expensive.  In fact I'm pretty sure we avoid
-indirect calls from the bio layer into blk-mq entirely for the fast
-path at the moment, and it would be great to keep it that way.
+This adds a > 80 char line.  But if you just use a continue to skip
+the not allicable ones you even clean up the code while avoiding that.
