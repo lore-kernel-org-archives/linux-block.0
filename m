@@ -2,119 +2,102 @@ Return-Path: <SRS0=MKaG=3U=vger.kernel.org=linux-block-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-2.4 required=3.0 tests=DKIMWL_WL_HIGH,DKIM_SIGNED,
+X-Spam-Status: No, score=-3.9 required=3.0 tests=DKIMWL_WL_HIGH,DKIM_SIGNED,
 	DKIM_VALID,DKIM_VALID_AU,HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,
-	SPF_HELO_NONE,SPF_PASS,UNPARSEABLE_RELAY,USER_AGENT_SANE_1 autolearn=no
+	SPF_HELO_NONE,SPF_PASS,UNPARSEABLE_RELAY,USER_AGENT_GIT autolearn=no
 	autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 5EC60C35240
-	for <linux-block@archiver.kernel.org>; Fri, 31 Jan 2020 00:45:06 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 27FD8C3F68F
+	for <linux-block@archiver.kernel.org>; Fri, 31 Jan 2020 03:24:30 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.kernel.org (Postfix) with ESMTP id 345F321734
-	for <linux-block@archiver.kernel.org>; Fri, 31 Jan 2020 00:45:06 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id EEA9E20CC7
+	for <linux-block@archiver.kernel.org>; Fri, 31 Jan 2020 03:24:29 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=pass (2048-bit key) header.d=oracle.com header.i=@oracle.com header.b="A95ia+q/"
+	dkim=pass (2048-bit key) header.d=oracle.com header.i=@oracle.com header.b="DYc5XR+a"
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1727614AbgAaApF (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Thu, 30 Jan 2020 19:45:05 -0500
-Received: from aserp2120.oracle.com ([141.146.126.78]:41404 "EHLO
-        aserp2120.oracle.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1727610AbgAaApF (ORCPT
+        id S1727831AbgAaDY3 (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Thu, 30 Jan 2020 22:24:29 -0500
+Received: from userp2130.oracle.com ([156.151.31.86]:59220 "EHLO
+        userp2130.oracle.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S1727827AbgAaDY3 (ORCPT
         <rfc822;linux-block@vger.kernel.org>);
-        Thu, 30 Jan 2020 19:45:05 -0500
-Received: from pps.filterd (aserp2120.oracle.com [127.0.0.1])
-        by aserp2120.oracle.com (8.16.0.27/8.16.0.27) with SMTP id 00V0dXd9194591;
-        Fri, 31 Jan 2020 00:45:01 GMT
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=oracle.com; h=date : from : to : cc
- : subject : message-id : mime-version : content-type; s=corp-2019-08-05;
- bh=QO49yaLlTpavEKGg3qkRs5wkh1oOD1x0YDVwidst4aE=;
- b=A95ia+q/Yzkg6emKpSixNPs0ejz5Ztah+2+nH5EJwmc+RAQ5tQ/Jkoi2j9iNUND6LunF
- T7z2DSK5zTHTC364XB6blAsvrAS2ZB1rJhbFxIGY2LCL7NBY4HJOyALpVtsRqfY/dQML
- r+FxcfM2UNtdjkbXAKCY1fowYrEMvxd3ZceHLz30i2NiRR4ZVhVzjgb4Q7c/izgOY7wz
- 7INeEnlM3B6zveIoujcZIgmpLXdfLC1k8nfdR6AUs8UUvHLsYrzotpjA7zm5rIvGLKmq
- W8jinwfdJrwzHnC9zy18Gc193zla4+sTWBJ405Al/CRR5rIcDbwuI4//UI128kqd1WCv dA== 
-Received: from userp3020.oracle.com (userp3020.oracle.com [156.151.31.79])
-        by aserp2120.oracle.com with ESMTP id 2xrdmqykmh-1
+        Thu, 30 Jan 2020 22:24:29 -0500
+Received: from pps.filterd (userp2130.oracle.com [127.0.0.1])
+        by userp2130.oracle.com (8.16.0.27/8.16.0.27) with SMTP id 00V3NeZN134325;
+        Fri, 31 Jan 2020 03:24:26 GMT
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=oracle.com; h=from : to : cc :
+ subject : date : message-id; s=corp-2019-08-05;
+ bh=e9udwEvAI2f1erE+tmYWEs722/8u1w85VhRstQ7aDXc=;
+ b=DYc5XR+aSy6gvSPdhrQzc7pdmKyWFBoppkm1pGTthnICeDmzINIupCxW1n6/s1MSpjvr
+ LffyRaGxLKate6tD59AS76jIXqeeCCxAArfKFMUEMvZRP7Son+dWqMFfm5qBtFPxJQ2c
+ paEEGxbbWpMrCzoU7iTOeUbla0s56AiApqx2AfvwHHmVrUIVj5aQpbzDFu5YTfKDnAs2
+ NUouMo8m/WoakxxVGciApWahYVo+6CiwzD5vZCT+OVML8DKg06yA4P5MNS3UNhyPVbik
+ I9dVBzSoOGed6ASEHOtgoBVWBB4Z8PYIao0kBVhqjSKTQCoxdjMkopVYblW5xFfmMjp3 sg== 
+Received: from userp3030.oracle.com (userp3030.oracle.com [156.151.31.80])
+        by userp2130.oracle.com with ESMTP id 2xrd3uqvy3-1
         (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=OK);
-        Fri, 31 Jan 2020 00:45:01 +0000
-Received: from pps.filterd (userp3020.oracle.com [127.0.0.1])
-        by userp3020.oracle.com (8.16.0.27/8.16.0.27) with SMTP id 00V0dOxZ140921;
-        Fri, 31 Jan 2020 00:45:00 GMT
-Received: from userv0122.oracle.com (userv0122.oracle.com [156.151.31.75])
-        by userp3020.oracle.com with ESMTP id 2xu8e9x1xk-1
+        Fri, 31 Jan 2020 03:24:26 +0000
+Received: from pps.filterd (userp3030.oracle.com [127.0.0.1])
+        by userp3030.oracle.com (8.16.0.27/8.16.0.27) with SMTP id 00V3OIA5155488;
+        Fri, 31 Jan 2020 03:24:26 GMT
+Received: from aserv0121.oracle.com (aserv0121.oracle.com [141.146.126.235])
+        by userp3030.oracle.com with ESMTP id 2xv9bvmbbe-1
         (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=OK);
-        Fri, 31 Jan 2020 00:45:00 +0000
-Received: from abhmp0016.oracle.com (abhmp0016.oracle.com [141.146.116.22])
-        by userv0122.oracle.com (8.14.4/8.14.4) with ESMTP id 00V0ixH8024004;
-        Fri, 31 Jan 2020 00:45:00 GMT
-Received: from localhost (/10.145.179.16)
+        Fri, 31 Jan 2020 03:24:25 +0000
+Received: from abhmp0005.oracle.com (abhmp0005.oracle.com [141.146.116.11])
+        by aserv0121.oracle.com (8.14.4/8.13.8) with ESMTP id 00V3NuBq026203;
+        Fri, 31 Jan 2020 03:23:56 GMT
+Received: from ca-ldom147.us.oracle.com (/10.129.68.131)
         by default (Oracle Beehive Gateway v4.0)
-        with ESMTP ; Thu, 30 Jan 2020 16:44:48 -0800
-Date:   Thu, 30 Jan 2020 16:44:47 -0800
-From:   "Darrick J. Wong" <darrick.wong@oracle.com>
-To:     lsf-pc@lists.linux-foundation.org
-Cc:     linux-fsdevel <linux-fsdevel@vger.kernel.org>,
-        linux-xfs <linux-xfs@vger.kernel.org>,
-        linux-block@vger.kernel.org, martin.petersen@oracle.com,
-        Allison Collins <allison.henderson@oracle.com>,
-        bob.liu@oracle.com
-Subject: [LSF/MM/BPF TOPIC] selectively cramming things onto struct bio
-Message-ID: <20200131004447.GA6869@magnolia>
-MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-User-Agent: Mutt/1.9.4 (2018-02-28)
+        with ESMTP ; Thu, 30 Jan 2020 19:23:55 -0800
+From:   Bijan Mottahedeh <bijan.mottahedeh@oracle.com>
+To:     axboe@kernel.dk
+Cc:     linux-block@vger.kernel.org, io-uring@vger.kernel.org
+Subject: [PATCH 0/1] block: Manage bio references so the bio persists until necessary
+Date:   Thu, 30 Jan 2020 19:23:41 -0800
+Message-Id: <1580441022-59129-1-git-send-email-bijan.mottahedeh@oracle.com>
+X-Mailer: git-send-email 1.8.3.1
 X-Proofpoint-Virus-Version: vendor=nai engine=6000 definitions=9516 signatures=668685
-X-Proofpoint-Spam-Details: rule=notspam policy=default score=0 suspectscore=0 malwarescore=0
- phishscore=0 bulkscore=0 spamscore=0 mlxscore=0 mlxlogscore=999
+X-Proofpoint-Spam-Details: rule=notspam policy=default score=0 suspectscore=3 malwarescore=0
+ phishscore=0 bulkscore=0 spamscore=0 mlxscore=0 mlxlogscore=827
  adultscore=0 classifier=spam adjust=0 reason=mlx scancount=1
- engine=8.0.1-1911140001 definitions=main-2001310002
+ engine=8.0.1-1911140001 definitions=main-2001310028
 X-Proofpoint-Virus-Version: vendor=nai engine=6000 definitions=9516 signatures=668685
 X-Proofpoint-Spam-Details: rule=notspam policy=default score=0 priorityscore=1501 malwarescore=0
- suspectscore=0 phishscore=0 bulkscore=0 spamscore=0 clxscore=1015
- lowpriorityscore=0 mlxscore=0 impostorscore=0 mlxlogscore=999 adultscore=0
+ suspectscore=3 phishscore=0 bulkscore=0 spamscore=0 clxscore=1015
+ lowpriorityscore=0 mlxscore=0 impostorscore=0 mlxlogscore=900 adultscore=0
  classifier=spam adjust=0 reason=mlx scancount=1 engine=8.0.1-1911140001
- definitions=main-2001310002
+ definitions=main-2001310028
 Sender: linux-block-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-Hi everyone,
+This patch addresses a bio reference count problem encountered while
+debugging a different, use-after-free bug with the fio test below.
 
-Several months ago, there was a discussion[1] about enhancing XFS to
-take a more active role in recoverying damaged blocks from a redundant
-storage device when the block device doesn't signal an error but the
-filesystem can tell that something is wrong.
+The original use-after-free bug is still hit however.
 
-Yes, we (XFS) would like to be able to exhaust all available storage
-redundancy before we resort to rebuilding lost metadata, and we'd like
-to do that without implementing our own RAID layer.
+[global]
+filename=/dev/nvme0n1
+rw=randread
+bs=4k
+direct=1
+time_based=1
+randrepeat=1
+gtod_reduce=1
+[fiotest]
 
-In the end, the largest stumbling block seems to be how to attach
-additional instructions to struct bio.  Jens rejected the idea of adding
-more pointers or more bytes to a struct bio since we'd be forcing
-everyone to pay the extra memory price for a feature that in the ideal
-situation will be used infrequently.
 
-I think Martin Petersen tried to introduce separate bio pools so that we
-only end up using larger bios for devices that really need it, but ran
-into some difficulty with the usage model for how that would work.  (We
-could, in theory, need to attach integrity data *and* retry attributes
-to the same disk access).
+fio nvme.fio --readonly --ioengine=io_uring --iodepth 1024 --fixedbufs 
+--hipri --numjobs=$1 --runtime=$2
 
-So I propose a discussion of what exactly are the combinations of bio
-attributes that are needed by block layer callers.  IIRC, the DIF/DIX
-support code need to be able to attach the integrity data on its own;
-whereas XFS already knows which device and which replica it would like
-to try.  If the storage isn't total crap it shouldn't need to use the
-feature all that often.
+Bijan Mottahedeh (1):
+  block: Manage bio references so the bio persists until necessary
 
-While we're on the topic of replica selection and discovery, let's also
-bikeshed how to figure out how many replicas are even available.
+ fs/block_dev.c | 78 ++++++++++++++++++++++++++++++----------------------------
+ 1 file changed, 40 insertions(+), 38 deletions(-)
 
-(Yes, yes, the crazydragon rears his head again...;)
+-- 
+1.8.3.1
 
---D
-
-[1] https://lore.kernel.org/linux-block/1543376991-5764-1-git-send-email-allison.henderson@oracle.com/
