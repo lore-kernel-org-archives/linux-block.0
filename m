@@ -2,94 +2,102 @@ Return-Path: <SRS0=MKaG=3U=vger.kernel.org=linux-block-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-2.4 required=3.0 tests=DKIM_SIGNED,DKIM_VALID,
-	DKIM_VALID_AU,HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SPF_HELO_NONE,
-	SPF_PASS,USER_AGENT_SANE_1 autolearn=no autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-2.2 required=3.0 tests=DKIM_SIGNED,DKIM_VALID,
+	HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,
+	USER_AGENT_SANE_1 autolearn=no autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 8500BC2D0DB
-	for <linux-block@archiver.kernel.org>; Fri, 31 Jan 2020 16:54:26 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id A7AE8C35240
+	for <linux-block@archiver.kernel.org>; Fri, 31 Jan 2020 17:04:14 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.kernel.org (Postfix) with ESMTP id 576362173E
-	for <linux-block@archiver.kernel.org>; Fri, 31 Jan 2020 16:54:26 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id 7F071215A4
+	for <linux-block@archiver.kernel.org>; Fri, 31 Jan 2020 17:04:14 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=pass (2048-bit key) header.d=ziepe.ca header.i=@ziepe.ca header.b="Z3Ug4eIY"
+	dkim=pass (2048-bit key) header.d=kernel-dk.20150623.gappssmtp.com header.i=@kernel-dk.20150623.gappssmtp.com header.b="Gg6arANk"
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1726803AbgAaQyZ (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Fri, 31 Jan 2020 11:54:25 -0500
-Received: from mail-qk1-f194.google.com ([209.85.222.194]:45855 "EHLO
-        mail-qk1-f194.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1726330AbgAaQyX (ORCPT
+        id S1726804AbgAaREO (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Fri, 31 Jan 2020 12:04:14 -0500
+Received: from mail-pf1-f195.google.com ([209.85.210.195]:37223 "EHLO
+        mail-pf1-f195.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S1726758AbgAaREN (ORCPT
         <rfc822;linux-block@vger.kernel.org>);
-        Fri, 31 Jan 2020 11:54:23 -0500
-Received: by mail-qk1-f194.google.com with SMTP id x1so7151822qkl.12
-        for <linux-block@vger.kernel.org>; Fri, 31 Jan 2020 08:54:22 -0800 (PST)
+        Fri, 31 Jan 2020 12:04:13 -0500
+Received: by mail-pf1-f195.google.com with SMTP id p14so3645334pfn.4
+        for <linux-block@vger.kernel.org>; Fri, 31 Jan 2020 09:04:13 -0800 (PST)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=ziepe.ca; s=google;
-        h=date:from:to:cc:subject:message-id:references:mime-version
-         :content-disposition:in-reply-to:user-agent;
-        bh=L5O0NmvtxOCRBD6C//NMF69VfE9OSlCosAzQuN128Ro=;
-        b=Z3Ug4eIYQzo5seKFAgwv6DETsrT3LXx4wuz/PCafwsiD8um5kGzYfAVqFDJ93xqV1M
-         TAF6qWGdume7dkBYpouPxwrnygCIuGbMOolCwSR0sR4lmuaS50146gb/VSHPmFjcWDyG
-         vnkfyqZj/fi16TFTBiq/uEshRDhsNw/i3TMFjeEX6T2mf+vFbwA+1kjif3p6EWpoFCKY
-         GelTfY5y3e+i1udJqP+jThXciIVH7yMZiFKVPA47nbAdNDgacCNRcyXJsfvLeC/jirC9
-         OaAbT9K5GRWm2oINluyJSQBHKvIYE0+zpYEWazDBZpuJUuoNHU/OohQV2415ZiZ3Jr5p
-         xTVg==
+        d=kernel-dk.20150623.gappssmtp.com; s=20150623;
+        h=subject:to:cc:references:from:message-id:date:user-agent
+         :mime-version:in-reply-to:content-language:content-transfer-encoding;
+        bh=/mexr6QxywWf7SyyCZ/1qPELsIC6fZwcFBl68p0go0A=;
+        b=Gg6arANkQecrnwiS0ssiZ+ogKlxeHoTs1rBaRbrfl88qKEMNvvkrRDW7AC6S5VVAH7
+         k/G9Ccv/9VnMaU8m1KuVvJmqieI4IozsVhwR5n+IlMSX1vhuVtnVTyJfBxJwNz6LMdmK
+         wW8OnrR3CKna8kkcxoDvoZMmFl6mg4v+lGPbrcre4cKp0SULZKb3iQZdL9HOdVh+qLSS
+         CHKaHcfGu+kABU4Ru/6EKIHAMUwivt3a8nuHuTDhkggi+7AddSZYvNBf63vW9nANUwz2
+         3yNeccnt9+FgSfE2sRUmcf9GNr1cTnwRAyC5lySCURJ7UHE43Ya8hH910yRe51/NhOcA
+         n94Q==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=1e100.net; s=20161025;
-        h=x-gm-message-state:date:from:to:cc:subject:message-id:references
-         :mime-version:content-disposition:in-reply-to:user-agent;
-        bh=L5O0NmvtxOCRBD6C//NMF69VfE9OSlCosAzQuN128Ro=;
-        b=Nej2bsgw/koWEbxe5bES/XFqVFKgc8j3NCcg0TwEV9XXDofQWnE/njFM7STuynipiH
-         bNAGYXkZtlnY0HdTaTyhU7HFVDoeTuSKEAVS2q93gpjGr4GRqCClgsnR4kkSw1RLcHfg
-         xJzN1fvm0MtCGYs2tWrc2D5Z4L6rh0C+FuPa2SZYtI+Z4jUGIXMXm3txPSx/BaPqQfIo
-         Vh6wsGxdzIg97do8znGclUL+tdbz7DWq39Rjg6oG5nKAbMzHCWp+aTWSNhZw0EWfsDzR
-         vLKIk8XH4AUdni4Awk5CURuqMobIh2xqvNy4iiumGSiOwgTT0UJtasLFBSpoYSEXmXtu
-         pUog==
-X-Gm-Message-State: APjAAAXBZpgX7e1boCCmsLP68YgTur+IPmmBRePrJ3UH6rt8tQvqVWm2
-        Wyx0Xj0IIiJIGchoscv5YRXJ8Q==
-X-Google-Smtp-Source: APXvYqyLkxEfL+i/amhI5M21lDRyuxz4/MI5YfleT2Y0Ia71InXZKBHJRbWMYHO1N29/fXX2zXOJJw==
-X-Received: by 2002:a37:9dc8:: with SMTP id g191mr11563871qke.171.1580489662201;
-        Fri, 31 Jan 2020 08:54:22 -0800 (PST)
-Received: from ziepe.ca (hlfxns017vw-142-68-57-212.dhcp-dynamic.fibreop.ns.bellaliant.net. [142.68.57.212])
-        by smtp.gmail.com with ESMTPSA id h12sm5143919qtn.56.2020.01.31.08.54.21
-        (version=TLS1_2 cipher=ECDHE-RSA-CHACHA20-POLY1305 bits=256/256);
-        Fri, 31 Jan 2020 08:54:21 -0800 (PST)
-Received: from jgg by mlx.ziepe.ca with local (Exim 4.90_1)
-        (envelope-from <jgg@ziepe.ca>)
-        id 1ixZYj-0002Rv-2T; Fri, 31 Jan 2020 12:54:21 -0400
-Date:   Fri, 31 Jan 2020 12:54:21 -0400
-From:   Jason Gunthorpe <jgg@ziepe.ca>
-To:     Danil Kipnis <danil.kipnis@cloud.ionos.com>
+        h=x-gm-message-state:subject:to:cc:references:from:message-id:date
+         :user-agent:mime-version:in-reply-to:content-language
+         :content-transfer-encoding;
+        bh=/mexr6QxywWf7SyyCZ/1qPELsIC6fZwcFBl68p0go0A=;
+        b=loFPwKem7PVc9EIxLBygIDB45of23ADNt0l8iyZfCf945sPsV36bc3PZSXkWYkgIFA
+         KmtZqC8vj55aCyaEhdwSAUtckqi9yQLU+ZF3fl2yeLZf0xLDddVc1iA54kgN70Lihq+T
+         DZqxWiQgZ/mr7r8je8sYGaiVXy1O9dL65/zfY0h270VdKd1d1au80zF+TM58eEz9SeC4
+         lMrQ3K5ZikIE6JlbtSUOqY2T3h6IatgMu7rDtxJEXp9VjUzcqJWyC0khjT8YpMOgreO2
+         5nhc1IKUpeHyMXLfaXdWE2rCKhMkRoJKSfD+NKJ+EZi5NxWfp9tobFhyxv9o2UyIYi0u
+         Gz2A==
+X-Gm-Message-State: APjAAAUZCVTYn2CQwALOihl7sgLzypmmtePYQfY9wxpXoVUubTd1BSIU
+        k+jmS/EJAyePwzMu7txl2lwwCw==
+X-Google-Smtp-Source: APXvYqzugkrNDN1dVqfcUPo751wL1S4sm+GCpT133MZqLi4TplgGregCwMah+gB4XJze8st1JMMaEQ==
+X-Received: by 2002:a63:1f0c:: with SMTP id f12mr11601678pgf.247.1580490253195;
+        Fri, 31 Jan 2020 09:04:13 -0800 (PST)
+Received: from ?IPv6:2620:10d:c081:1131::1371? ([2620:10d:c090:180::d1ba])
+        by smtp.gmail.com with ESMTPSA id v25sm10808615pfe.147.2020.01.31.09.04.11
+        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
+        Fri, 31 Jan 2020 09:04:12 -0800 (PST)
+Subject: Re: [PATCH v8 00/25] RTRS (former IBTRS) RDMA Transport Library and
+ RNBD (former IBNBD) RDMA Network Block Device
+To:     Jason Gunthorpe <jgg@ziepe.ca>,
+        Danil Kipnis <danil.kipnis@cloud.ionos.com>
 Cc:     Jack Wang <jinpuwang@gmail.com>, linux-block@vger.kernel.org,
-        linux-rdma@vger.kernel.org, Jens Axboe <axboe@kernel.dk>,
-        Christoph Hellwig <hch@infradead.org>,
+        linux-rdma@vger.kernel.org, Christoph Hellwig <hch@infradead.org>,
         Sagi Grimberg <sagi@grimberg.me>,
         Bart Van Assche <bvanassche@acm.org>,
         Leon Romanovsky <leon@kernel.org>,
         Doug Ledford <dledford@redhat.com>,
         Jack Wang <jinpu.wang@cloud.ionos.com>, rpenyaev@suse.de
-Subject: Re: [PATCH v8 00/25] RTRS (former IBTRS) RDMA Transport Library and
- RNBD (former IBNBD) RDMA Network Block Device
-Message-ID: <20200131165421.GB29820@ziepe.ca>
 References: <20200124204753.13154-1-jinpuwang@gmail.com>
  <CAHg0HuzLLHqp_76ThLhUdHGG_986Oxvvr15h_13T12eEWjyAxA@mail.gmail.com>
+ <20200131165421.GB29820@ziepe.ca>
+From:   Jens Axboe <axboe@kernel.dk>
+Message-ID: <f657d371-3b23-e4b2-50b3-db47cd521e1f@kernel.dk>
+Date:   Fri, 31 Jan 2020 10:04:10 -0700
+User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:68.0) Gecko/20100101
+ Thunderbird/68.4.1
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <CAHg0HuzLLHqp_76ThLhUdHGG_986Oxvvr15h_13T12eEWjyAxA@mail.gmail.com>
-User-Agent: Mutt/1.9.4 (2018-02-28)
+In-Reply-To: <20200131165421.GB29820@ziepe.ca>
+Content-Type: text/plain; charset=utf-8
+Content-Language: en-US
+Content-Transfer-Encoding: 7bit
 Sender: linux-block-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-On Fri, Jan 31, 2020 at 05:50:44PM +0100, Danil Kipnis wrote:
-> Hi Doug, Hi Jason, Hi Jens, Hi All,
+On 1/31/20 9:54 AM, Jason Gunthorpe wrote:
+> On Fri, Jan 31, 2020 at 05:50:44PM +0100, Danil Kipnis wrote:
+>> Hi Doug, Hi Jason, Hi Jens, Hi All,
+>>
+>> since we didn't get any new comments for the V8 prepared by Jack a
+>> week ago do you think rnbd/rtrs could be merged in the current merge
+>> window?
 > 
-> since we didn't get any new comments for the V8 prepared by Jack a
-> week ago do you think rnbd/rtrs could be merged in the current merge
-> window?
+> No, the cut off for something large like this would be rc4ish
 
-No, the cut off for something large like this would be rc4ish
+Since it's been around for a while, I would have taken it in a bit
+later than that. But not now, definitely too late. If folks are
+happy with it, we can get it queued for 5.7.
 
-Jason
+-- 
+Jens Axboe
+
