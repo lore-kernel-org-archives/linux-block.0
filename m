@@ -2,144 +2,114 @@ Return-Path: <SRS0=MKaG=3U=vger.kernel.org=linux-block-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-6.8 required=3.0 tests=DKIM_SIGNED,DKIM_VALID,
-	DKIM_VALID_AU,HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,
-	SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED autolearn=ham
-	autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-5.6 required=3.0 tests=DKIM_SIGNED,DKIM_VALID,
+	DKIM_VALID_AU,FREEMAIL_FORGED_FROMDOMAIN,FREEMAIL_FROM,
+	HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,MENTIONS_GIT_HOSTING,
+	SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED autolearn=ham autolearn_force=no
+	version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id E6B71C33CB2
-	for <linux-block@archiver.kernel.org>; Fri, 31 Jan 2020 10:41:29 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 552EFC33CB2
+	for <linux-block@archiver.kernel.org>; Fri, 31 Jan 2020 10:58:27 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.kernel.org (Postfix) with ESMTP id B8A8D206F0
-	for <linux-block@archiver.kernel.org>; Fri, 31 Jan 2020 10:41:29 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id 278B920705
+	for <linux-block@archiver.kernel.org>; Fri, 31 Jan 2020 10:58:27 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=pass (2048-bit key) header.d=linaro.org header.i=@linaro.org header.b="x3C9KHV3"
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="CaW/VNMj"
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1728325AbgAaKl3 (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Fri, 31 Jan 2020 05:41:29 -0500
-Received: from mail-wm1-f68.google.com ([209.85.128.68]:39545 "EHLO
-        mail-wm1-f68.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1728317AbgAaKl2 (ORCPT
+        id S1728325AbgAaK60 (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Fri, 31 Jan 2020 05:58:26 -0500
+Received: from mail-wr1-f68.google.com ([209.85.221.68]:44431 "EHLO
+        mail-wr1-f68.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S1728268AbgAaK60 (ORCPT
         <rfc822;linux-block@vger.kernel.org>);
-        Fri, 31 Jan 2020 05:41:28 -0500
-Received: by mail-wm1-f68.google.com with SMTP id c84so8084194wme.4
-        for <linux-block@vger.kernel.org>; Fri, 31 Jan 2020 02:41:27 -0800 (PST)
+        Fri, 31 Jan 2020 05:58:26 -0500
+Received: by mail-wr1-f68.google.com with SMTP id m16so8038287wrx.11
+        for <linux-block@vger.kernel.org>; Fri, 31 Jan 2020 02:58:25 -0800 (PST)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=linaro.org; s=google;
-        h=mime-version:subject:from:in-reply-to:date:cc
-         :content-transfer-encoding:message-id:references:to;
-        bh=WZop4bdwwGLO+EHfABQjAxDwhkz6UEFKkDSsUCMxnGI=;
-        b=x3C9KHV3dsuebpyTMEa658xzfgYeOafa4rxar9/uPB6IHwukAWRbBfChhel6mE2liX
-         VueNN7HDIkRtL7UYhcG/OL1s5wMYFgSrxjZMIchbpqNkDQxsoLVZDJVUzzwP57NyKGyN
-         G0hjEhz9uuaj7H2WwBYs0pj7+QnbxYwwh/qjBoVSSQIyEx+IJNay8ZMjyk0kfoG6ruea
-         onTQXickJmwVdIQwkDygb0uu9Sb7hh0Hj1SSYNL6XIfgMdJC4de38xu47E9DzbLYpVAV
-         FfMbfvZ1dtVDVT+EJnLpDovbJ3wmntmjwB91Ebr3veuJrHcQmzb2ryN2fS8I6fpGIixW
-         jlWg==
+        d=gmail.com; s=20161025;
+        h=mime-version:references:in-reply-to:from:date:message-id:subject:to
+         :cc;
+        bh=u7Gk9cPCkTSDWbB6q2tFBeDsbXEH+JlFhYj6vVW0a78=;
+        b=CaW/VNMjLavLEKQ9zQkokXUu91Rs6qoKPOjeTO05XgmSs5hWoGjo6OjbvD+NnW0576
+         lqlLGYwz410Xp7UHQerU0r8SGQGJ5Xf8Ti1CKsgMr2CrXq5Bc6tXXu0RGmC5PQEDTb8g
+         OwSAtHSxs/G6ePgghgLRuKsu9DudRe+Un//tD3dtHw1bV1Y3mv7kxULkZeXz0CWJP0ej
+         YQlgsSRoimQyN3YU2OYoZeU27F+EZv6SmXxDbVzeVWCIe4Yfy2pPRYvprOhs8QJdFAib
+         GM6bRYPJtbcoEBqmxPIVozA1elcJbYp6YwSTe++19yEBg8Z4/3EvlFiimahKtlc5qc7+
+         PGPA==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=1e100.net; s=20161025;
-        h=x-gm-message-state:mime-version:subject:from:in-reply-to:date:cc
-         :content-transfer-encoding:message-id:references:to;
-        bh=WZop4bdwwGLO+EHfABQjAxDwhkz6UEFKkDSsUCMxnGI=;
-        b=NiTuX+UdFSEVzzbiKmT1iggiDmHe3Y8Obf0nzLx4Nt/n2QBXQuG92AwOdipgOXJL79
-         JTuyJIWeJ7465Q5VrjQhQ3qcFtK76l3SRnGxV5vi0BhNWz2ab3jna+xIgs3K3wdzQvpc
-         xOQcz6b6XoJrC61yew0GuukXXBJPws1qfv/oxzIeFiE9GD4s6vfjEk8Y9qmGLRJGr9t9
-         wRAWBtfq7sg05boFK7eGmS7PIQmTtSkI1bsLHqa8JyLZmNfOHXJ1RIfDyxcC6bRIZbST
-         Y/26wJiqGuPZ2OrQqyDHQuerBcR9yQA4kw5Fz7FU+GmDTPvAdtCVpVEZ3vLb2YgNEEQi
-         98OA==
-X-Gm-Message-State: APjAAAVbFpmbGPANeuEXlFfFFlfuX6kh/g9AphLO5ImabT4lgepPhBov
-        7kPx2lG45Ax05YMbitCa2X4CCQ==
-X-Google-Smtp-Source: APXvYqx7ZVm9hQ9hoVigAiJxyvIb0rHBteqCvOFhLesfY0gz8mAbf4HPdpFD1DAt4Kcm4NCKKQRM5g==
-X-Received: by 2002:a1c:9849:: with SMTP id a70mr11079056wme.76.1580467286817;
-        Fri, 31 Jan 2020 02:41:26 -0800 (PST)
-Received: from [192.168.0.103] (88-147-73-186.dyn.eolo.it. [88.147.73.186])
-        by smtp.gmail.com with ESMTPSA id m7sm10871957wrr.40.2020.01.31.02.41.25
-        (version=TLS1_2 cipher=ECDHE-RSA-AES128-GCM-SHA256 bits=128/128);
-        Fri, 31 Jan 2020 02:41:26 -0800 (PST)
-Content-Type: text/plain;
-        charset=us-ascii
-Mime-Version: 1.0 (Mac OS X Mail 12.4 \(3445.104.11\))
-Subject: Re: [PATCH BUGFIX 3/6] block, bfq: get extra ref to prevent a queue
- from being freed during a group move
-From:   Paolo Valente <paolo.valente@linaro.org>
-In-Reply-To: <784c55c0f37a1a448c31e73e28bef6f8@natalenko.name>
-Date:   Fri, 31 Jan 2020 11:41:24 +0100
-Cc:     Jens Axboe <axboe@kernel.dk>, linux-block@vger.kernel.org,
-        linux-kernel@vger.kernel.org, bfq-iosched@googlegroups.com,
-        patdung100@gmail.com, cevich@redhat.com
-Content-Transfer-Encoding: quoted-printable
-Message-Id: <4D4E431C-D4B7-43DD-AB66-67ED5EA807DE@linaro.org>
-References: <20200131092409.10867-1-paolo.valente@linaro.org>
- <20200131092409.10867-4-paolo.valente@linaro.org>
- <784c55c0f37a1a448c31e73e28bef6f8@natalenko.name>
-To:     Oleksandr Natalenko <oleksandr@natalenko.name>
-X-Mailer: Apple Mail (2.3445.104.11)
+        h=x-gm-message-state:mime-version:references:in-reply-to:from:date
+         :message-id:subject:to:cc;
+        bh=u7Gk9cPCkTSDWbB6q2tFBeDsbXEH+JlFhYj6vVW0a78=;
+        b=gBjPR46JFrZu7zxHF8kBLpHzL8htlJlY0gCLplQzBPcRgteppuWkZwuhubaLE1VlTy
+         yhCfwnEaJ2sOfj21vSeBe3UX+0n1zGdac0DStryDadg9gZJOJYVkxgn26Q7aFXpxDaK+
+         2TI/EQ+wzr7HZOmtbmF5ogKuBfJSlu6EbdoALhKgyEH0MmdHGhJF2dpYezcwXYFy3fNd
+         ybxnrcCI8sKJvgrbCYSTXS34+poFG+GwBmj/O82x+zWbdS8+GzQJHQ2iYbBgkzV9Utt3
+         ZONz5L3LBqPfBwdwTgOUUexF2n6GnTTPBj+TJxEpJhtS7rB+8WiQjWpXINPYVUZGz1kM
+         EkRA==
+X-Gm-Message-State: APjAAAW0Fgk4YJEV7rXLxGPQYRoQq9wM/gP8l7SF1ApWSLtydRIMrhSQ
+        DOZJX/Hy0KkNcwMKDjkVZ2TsalaBdveXLSGd8p0=
+X-Google-Smtp-Source: APXvYqwSoiD3EswQat0PkEr32vEVKUQdWmV2A3IsT3Apct8EPPvVSsmFkK3mTljG5qgmpE5srYiS+Xb1Xtf/l3ZEfOk=
+X-Received: by 2002:adf:db84:: with SMTP id u4mr11666377wri.317.1580468304721;
+ Fri, 31 Jan 2020 02:58:24 -0800 (PST)
+MIME-Version: 1.0
+References: <20200115114409.28895-1-ming.lei@redhat.com> <929dbfac-de46-a947-6a2c-f4d8d504c631@huawei.com>
+ <6dbe8c9f-af4e-3157-b6e9-6bbf43efb1e1@huawei.com> <CACVXFVN8io2Pj1HZWLy=z1dbDrE3h9Q6B0DA4gdGOdK3+bRRPg@mail.gmail.com>
+ <b1f67efb-585d-e0c1-460f-52be0041b37a@huawei.com>
+In-Reply-To: <b1f67efb-585d-e0c1-460f-52be0041b37a@huawei.com>
+From:   Ming Lei <tom.leiming@gmail.com>
+Date:   Fri, 31 Jan 2020 18:58:12 +0800
+Message-ID: <CACVXFVOk3cnRqyngYjHPPtLM1Wn8p3=hP8C3tBns9nDQAnoCyQ@mail.gmail.com>
+Subject: Re: [PATCH V5 0/6] blk-mq: improvement CPU hotplug
+To:     John Garry <john.garry@huawei.com>
+Cc:     Ming Lei <ming.lei@redhat.com>, Jens Axboe <axboe@kernel.dk>,
+        linux-block <linux-block@vger.kernel.org>,
+        Bart Van Assche <bvanassche@acm.org>,
+        Hannes Reinecke <hare@suse.com>,
+        Christoph Hellwig <hch@lst.de>,
+        Thomas Gleixner <tglx@linutronix.de>,
+        Keith Busch <keith.busch@intel.com>,
+        "chenxiang (M)" <chenxiang66@hisilicon.com>
+Content-Type: text/plain; charset="UTF-8"
 Sender: linux-block-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-[RESENDING, BECAUSE BOUNCED OFF]
+On Fri, Jan 31, 2020 at 6:24 PM John Garry <john.garry@huawei.com> wrote:
+>
+> >> [  141.976109] Call trace:
+> >> [  141.978550]  __switch_to+0xbc/0x218
+> >> [  141.982029]  blk_mq_run_work_fn+0x1c/0x28
+> >> [  141.986027]  process_one_work+0x1e0/0x358
+> >> [  141.990025]  worker_thread+0x40/0x488
+> >> [  141.993678]  kthread+0x118/0x120
+> >> [  141.996897]  ret_from_fork+0x10/0x18
+> >
+> > Hi John,
+> >
+> > Thanks for your test!
+> >
+>
+> Hi Ming,
+>
+> > Could you test the following patchset and only the last one is changed?
+> >
+> > https://github.com/ming1/linux/commits/my_for_5.6_block
+>
+> For SCSI testing, I will ask my colleague Xiang Chen to test when he
+> returns to work. So I did not see this issue for my SCSI testing for
+> your original v5, but I was only using 1x as opposed to maybe 20x SAS disks.
+>
+> BTW, did you test NVMe? For some reason I could not trigger a scenario
+> where we're draining the outstanding requests for a queue which is being
+> deactivated - I mean, the queues were always already quiesced.
 
-> Il giorno 31 gen 2020, alle ore 11:20, Oleksandr Natalenko =
-<oleksandr@natalenko.name> ha scritto:
->=20
-> Hello.
->=20
-> On 31.01.2020 10:24, Paolo Valente wrote:
->> In bfq_bfqq_move(), the bfq_queue, say Q, to be moved to a new group
->> may happen to be deactivated in the scheduling data structures of the
->> source group (and then activated in the destination group). If Q is
->> referred only by the data structures in the source group when the
->> deactivation happens, then Q is freed upon the deactivation.
->> This commit addresses this issue by getting an extra reference before
->> the possible deactivation, and releasing this extra reference after Q
->> has been moved.
->> Tested-by: Chris Evich <cevich@redhat.com>
->> Signed-off-by: Paolo Valente <paolo.valente@linaro.org>
->> ---
->> block/bfq-cgroup.c | 8 ++++++++
->> 1 file changed, 8 insertions(+)
->> diff --git a/block/bfq-cgroup.c b/block/bfq-cgroup.c
->> index e1419edde2ec..8ab7f18ff8cb 100644
->> --- a/block/bfq-cgroup.c
->> +++ b/block/bfq-cgroup.c
->> @@ -651,6 +651,12 @@ void bfq_bfqq_move(struct bfq_data *bfqd, struct
->> bfq_queue *bfqq,
->> 		bfq_bfqq_expire(bfqd, bfqd->in_service_queue,
->> 				false, BFQQE_PREEMPTED);
->> +	/*
->> +	 * get extra reference to prevent bfqq from being freed in
->> +	 * next possible deactivate
->> +	 */
->> +	bfqq->ref++;
->=20
-> Shouldn't this be hidden under some macro (bfq_get_queue_ref(), for =
-instance) and also converted from int into refcount_t?
->=20
+I run cpu hotplug test on both NVMe and SCSI in KVM, and fio just runs
+as expected.
 
-Yeah, that's in my (long) todo list.  Unfortunately, all BFQ code
-handles that ref increment in that rustic way (inherited from CFQ).
-It would take a little time to fix and check all occurrences.  This
-fix is probably more critical, as this bug is crashing machines in some
-configurations.  But I promise I won't forget your right suggestion.
-
+NVMe is often 1:1 mapping, so it might be a bit difficult to trigger
+draining in-flight IOs.
 
 Thanks,
-Paolo
-
->> +
->> 	if (bfq_bfqq_busy(bfqq))
->> 		bfq_deactivate_bfqq(bfqd, bfqq, false, false);
->> 	else if (entity->on_st)
->> @@ -670,6 +676,8 @@ void bfq_bfqq_move(struct bfq_data *bfqd, struct
->> bfq_queue *bfqq,
->> 	if (!bfqd->in_service_queue && !bfqd->rq_in_driver)
->> 		bfq_schedule_dispatch(bfqd);
->> +	/* release extra ref taken above */
->> +	bfq_put_queue(bfqq);
->> }
->> /**
->=20
-> --=20
->  Oleksandr Natalenko (post-factum)
-
+Ming Lei
