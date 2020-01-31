@@ -2,114 +2,121 @@ Return-Path: <SRS0=MKaG=3U=vger.kernel.org=linux-block-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-5.6 required=3.0 tests=DKIM_SIGNED,DKIM_VALID,
+X-Spam-Status: No, score=-0.6 required=3.0 tests=DKIM_SIGNED,DKIM_VALID,
 	DKIM_VALID_AU,FREEMAIL_FORGED_FROMDOMAIN,FREEMAIL_FROM,
-	HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,MENTIONS_GIT_HOSTING,
-	SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED autolearn=ham autolearn_force=no
-	version=3.4.0
+	HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS
+	autolearn=no autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 552EFC33CB2
-	for <linux-block@archiver.kernel.org>; Fri, 31 Jan 2020 10:58:27 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 9658EC33CB2
+	for <linux-block@archiver.kernel.org>; Fri, 31 Jan 2020 11:39:53 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.kernel.org (Postfix) with ESMTP id 278B920705
-	for <linux-block@archiver.kernel.org>; Fri, 31 Jan 2020 10:58:27 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id 6BB39215A4
+	for <linux-block@archiver.kernel.org>; Fri, 31 Jan 2020 11:39:53 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="CaW/VNMj"
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="UoDJlWRe"
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1728325AbgAaK60 (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Fri, 31 Jan 2020 05:58:26 -0500
-Received: from mail-wr1-f68.google.com ([209.85.221.68]:44431 "EHLO
+        id S1728451AbgAaLjw (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Fri, 31 Jan 2020 06:39:52 -0500
+Received: from mail-wr1-f68.google.com ([209.85.221.68]:38982 "EHLO
         mail-wr1-f68.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1728268AbgAaK60 (ORCPT
+        with ESMTP id S1728387AbgAaLjw (ORCPT
         <rfc822;linux-block@vger.kernel.org>);
-        Fri, 31 Jan 2020 05:58:26 -0500
-Received: by mail-wr1-f68.google.com with SMTP id m16so8038287wrx.11
-        for <linux-block@vger.kernel.org>; Fri, 31 Jan 2020 02:58:25 -0800 (PST)
+        Fri, 31 Jan 2020 06:39:52 -0500
+Received: by mail-wr1-f68.google.com with SMTP id y11so8216906wrt.6;
+        Fri, 31 Jan 2020 03:39:50 -0800 (PST)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=gmail.com; s=20161025;
         h=mime-version:references:in-reply-to:from:date:message-id:subject:to
          :cc;
-        bh=u7Gk9cPCkTSDWbB6q2tFBeDsbXEH+JlFhYj6vVW0a78=;
-        b=CaW/VNMjLavLEKQ9zQkokXUu91Rs6qoKPOjeTO05XgmSs5hWoGjo6OjbvD+NnW0576
-         lqlLGYwz410Xp7UHQerU0r8SGQGJ5Xf8Ti1CKsgMr2CrXq5Bc6tXXu0RGmC5PQEDTb8g
-         OwSAtHSxs/G6ePgghgLRuKsu9DudRe+Un//tD3dtHw1bV1Y3mv7kxULkZeXz0CWJP0ej
-         YQlgsSRoimQyN3YU2OYoZeU27F+EZv6SmXxDbVzeVWCIe4Yfy2pPRYvprOhs8QJdFAib
-         GM6bRYPJtbcoEBqmxPIVozA1elcJbYp6YwSTe++19yEBg8Z4/3EvlFiimahKtlc5qc7+
-         PGPA==
+        bh=QhYC5mE6RR4tjYtuK2g5HsZYuZDvuJqptbcVBacA2Zo=;
+        b=UoDJlWRe6Fo86qb57CA6MOgUqvlRupLe1BhKKcte3rFM+IeHG7VJr/NUc4CA3vlJBa
+         trPkHPRhOHa0yNmkJ58MN+kyrFGkQp9PpOfr5YBV39DRaxSxOn7j/InxE/Sm3iWm3INF
+         PxuAard+utG//saqLnHU527taOKKgrkxy9xMamqpn5DSNINsCazFM7Ea+p4h7WmssLdg
+         Zj/M6fxqoxBnVqomdvLeRBDrbYKGzHl4GZd31frHFpJbwTviw3hBQn4rslwhc+4NBpb3
+         khGeZEnEih4CBDQUPrABpvf+kGka72hDrh0DQql8iVXVhv86jNN+dAxY7ArIYE/yWmUe
+         7K9w==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=1e100.net; s=20161025;
         h=x-gm-message-state:mime-version:references:in-reply-to:from:date
          :message-id:subject:to:cc;
-        bh=u7Gk9cPCkTSDWbB6q2tFBeDsbXEH+JlFhYj6vVW0a78=;
-        b=gBjPR46JFrZu7zxHF8kBLpHzL8htlJlY0gCLplQzBPcRgteppuWkZwuhubaLE1VlTy
-         yhCfwnEaJ2sOfj21vSeBe3UX+0n1zGdac0DStryDadg9gZJOJYVkxgn26Q7aFXpxDaK+
-         2TI/EQ+wzr7HZOmtbmF5ogKuBfJSlu6EbdoALhKgyEH0MmdHGhJF2dpYezcwXYFy3fNd
-         ybxnrcCI8sKJvgrbCYSTXS34+poFG+GwBmj/O82x+zWbdS8+GzQJHQ2iYbBgkzV9Utt3
-         ZONz5L3LBqPfBwdwTgOUUexF2n6GnTTPBj+TJxEpJhtS7rB+8WiQjWpXINPYVUZGz1kM
-         EkRA==
-X-Gm-Message-State: APjAAAW0Fgk4YJEV7rXLxGPQYRoQq9wM/gP8l7SF1ApWSLtydRIMrhSQ
-        DOZJX/Hy0KkNcwMKDjkVZ2TsalaBdveXLSGd8p0=
-X-Google-Smtp-Source: APXvYqwSoiD3EswQat0PkEr32vEVKUQdWmV2A3IsT3Apct8EPPvVSsmFkK3mTljG5qgmpE5srYiS+Xb1Xtf/l3ZEfOk=
-X-Received: by 2002:adf:db84:: with SMTP id u4mr11666377wri.317.1580468304721;
- Fri, 31 Jan 2020 02:58:24 -0800 (PST)
+        bh=QhYC5mE6RR4tjYtuK2g5HsZYuZDvuJqptbcVBacA2Zo=;
+        b=q0TQAQzK/+NirrvZl7EKXRDPHKV+mFNJYGe9b4EMLmXKB2PrPSRGlyTbihH1nDWBB2
+         E7egSgHdDY/jc2ZvZGeUcIkW+iDtn7nmJ+zn3FaFQBcduOl29Ib1XFHanxdfLEIZqVAO
+         bLzs+3hgfTyDkTGWoW3MxvRbQeVZ9iidDOkF4+z4c8PGfZoCPKYqneMBdfYAjt17uKmE
+         U4yyw77dqEG8O2ARIvQYjRIYt40Tv6d8h88ND2bQb1MSwEFsxUe/DFfYWPEMAOuD19OS
+         iiVYjtq0IUmeQytlWpJTbfJWxzxF/oklcDpXMlOBZzL3g8KXnJd5Cw4S9T2CkNG1AGYb
+         45cw==
+X-Gm-Message-State: APjAAAVDV86f64Y8YY4rcQkuDFy0UXPWOzrrOLFOdJGxg+TOviaKWClF
+        xvkg2urJISPvCz5s/cqOFRrfb6CdsbF7QPmRJ3Q=
+X-Google-Smtp-Source: APXvYqzMxePQypAgwHTbVgQ5HeLXvX5i5zPNY8LRrRphYS8c31b9NqkQM92SZ2saOi6vydlHHZKSSuHkkm8kjV+ZbEM=
+X-Received: by 2002:adf:db84:: with SMTP id u4mr11889498wri.317.1580470790057;
+ Fri, 31 Jan 2020 03:39:50 -0800 (PST)
 MIME-Version: 1.0
-References: <20200115114409.28895-1-ming.lei@redhat.com> <929dbfac-de46-a947-6a2c-f4d8d504c631@huawei.com>
- <6dbe8c9f-af4e-3157-b6e9-6bbf43efb1e1@huawei.com> <CACVXFVN8io2Pj1HZWLy=z1dbDrE3h9Q6B0DA4gdGOdK3+bRRPg@mail.gmail.com>
- <b1f67efb-585d-e0c1-460f-52be0041b37a@huawei.com>
-In-Reply-To: <b1f67efb-585d-e0c1-460f-52be0041b37a@huawei.com>
+References: <20200119071432.18558-1-ming.lei@redhat.com> <20200119071432.18558-6-ming.lei@redhat.com>
+ <yq1y2u1if7t.fsf@oracle.com> <ab676c4c-03fb-7eb9-6212-129eb83d0ee8@broadcom.com>
+ <yq1iml1ehtl.fsf@oracle.com> <f4f06cf8459c21749335c6b7a4cfe729@mail.gmail.com>
+ <yq1blqo9plo.fsf@oracle.com>
+In-Reply-To: <yq1blqo9plo.fsf@oracle.com>
 From:   Ming Lei <tom.leiming@gmail.com>
-Date:   Fri, 31 Jan 2020 18:58:12 +0800
-Message-ID: <CACVXFVOk3cnRqyngYjHPPtLM1Wn8p3=hP8C3tBns9nDQAnoCyQ@mail.gmail.com>
-Subject: Re: [PATCH V5 0/6] blk-mq: improvement CPU hotplug
-To:     John Garry <john.garry@huawei.com>
-Cc:     Ming Lei <ming.lei@redhat.com>, Jens Axboe <axboe@kernel.dk>,
+Date:   Fri, 31 Jan 2020 19:39:38 +0800
+Message-ID: <CACVXFVMqejMZaOT0ynnMehQF4rJf32eTW2ahoYz6oE9p+GwWEg@mail.gmail.com>
+Subject: Re: [PATCH 5/6] scsi: core: don't limit per-LUN queue depth for SSD
+ when HBA needs
+To:     "Martin K. Petersen" <martin.petersen@oracle.com>
+Cc:     Sumanesh Samanta <sumanesh.samanta@broadcom.com>,
+        Linux SCSI List <linux-scsi@vger.kernel.org>,
+        James Bottomley <James.Bottomley@hansenpartnership.com>,
+        Jens Axboe <axboe@kernel.dk>,
+        Sathya Prakash <sathya.prakash@broadcom.com>,
+        Chaitra P B <chaitra.basappa@broadcom.com>,
+        Suganath Prabu Subramani 
+        <suganath-prabu.subramani@broadcom.com>,
+        Kashyap Desai <kashyap.desai@broadcom.com>,
+        Shivasharan S <shivasharan.srikanteshwara@broadcom.com>,
+        "Ewan D . Milne" <emilne@redhat.com>,
+        Christoph Hellwig <hch@lst.de>, Hannes Reinecke <hare@suse.de>,
+        Bart Van Assche <bart.vanassche@wdc.com>,
+        Ming Lei <ming.lei@redhat.com>,
         linux-block <linux-block@vger.kernel.org>,
-        Bart Van Assche <bvanassche@acm.org>,
-        Hannes Reinecke <hare@suse.com>,
-        Christoph Hellwig <hch@lst.de>,
-        Thomas Gleixner <tglx@linutronix.de>,
-        Keith Busch <keith.busch@intel.com>,
-        "chenxiang (M)" <chenxiang66@hisilicon.com>
+        Sumit Saxena <sumit.saxena@broadcom.com>
 Content-Type: text/plain; charset="UTF-8"
 Sender: linux-block-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-On Fri, Jan 31, 2020 at 6:24 PM John Garry <john.garry@huawei.com> wrote:
->
-> >> [  141.976109] Call trace:
-> >> [  141.978550]  __switch_to+0xbc/0x218
-> >> [  141.982029]  blk_mq_run_work_fn+0x1c/0x28
-> >> [  141.986027]  process_one_work+0x1e0/0x358
-> >> [  141.990025]  worker_thread+0x40/0x488
-> >> [  141.993678]  kthread+0x118/0x120
-> >> [  141.996897]  ret_from_fork+0x10/0x18
-> >
-> > Hi John,
-> >
-> > Thanks for your test!
-> >
->
-> Hi Ming,
->
-> > Could you test the following patchset and only the last one is changed?
-> >
-> > https://github.com/ming1/linux/commits/my_for_5.6_block
->
-> For SCSI testing, I will ask my colleague Xiang Chen to test when he
-> returns to work. So I did not see this issue for my SCSI testing for
-> your original v5, but I was only using 1x as opposed to maybe 20x SAS disks.
->
-> BTW, did you test NVMe? For some reason I could not trigger a scenario
-> where we're draining the outstanding requests for a queue which is being
-> deactivated - I mean, the queues were always already quiesced.
+Hi Martin,
 
-I run cpu hotplug test on both NVMe and SCSI in KVM, and fio just runs
-as expected.
+On Tue, Jan 28, 2020 at 12:24 PM Martin K. Petersen
+<martin.petersen@oracle.com> wrote:
+>
+>
+> Sumanesh,
+>
+> > Instead of relying on QUEUE_FULL and some complex heuristics of when
+> > to start tracking device_busy, why can't we simply use "
+> > track_queue_depth" ( along with the other flag that Ming added) to
+> > decide which devices need queue depth tracking, and track device_busy
+> > only for them?
+>
+> Because I am interested in addressing the device_busy contention problem
+> for all of our non-legacy drivers. I.e. not just for controllers that
+> happen to queue internally.
 
-NVMe is often 1:1 mapping, so it might be a bit difficult to trigger
-draining in-flight IOs.
+Can we just do it for controllers without 'track_queue_depth' and SSD now?
+
+>
+> > I am not sure how we can suddenly start tracking device_busy on the fly,
+> > if we do not know how many IO are already pending for that device?
+>
+> We know that from the tags. It's just not hot path material.
+
+In case of 'track_queue_depth', cost for tracking queue depth has to be paid,
+which can be too big to get expected perf on high end HBA.
+
+sbitmap might be used for this purpose, but not sure if it can scale well enough
+for this purpose.
+
 
 Thanks,
 Ming Lei
