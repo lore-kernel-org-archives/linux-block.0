@@ -2,256 +2,235 @@ Return-Path: <SRS0=MKaG=3U=vger.kernel.org=linux-block-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-6.6 required=3.0 tests=DKIM_SIGNED,DKIM_VALID,
+X-Spam-Status: No, score=-5.6 required=3.0 tests=DKIM_SIGNED,DKIM_VALID,
 	DKIM_VALID_AU,FREEMAIL_FORGED_FROMDOMAIN,FREEMAIL_FROM,
-	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,
+	HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,MENTIONS_GIT_HOSTING,
 	SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED autolearn=ham autolearn_force=no
 	version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 13A1BC33CB2
-	for <linux-block@archiver.kernel.org>; Fri, 31 Jan 2020 09:50:04 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id E9A0BC33CB2
+	for <linux-block@archiver.kernel.org>; Fri, 31 Jan 2020 10:04:18 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.kernel.org (Postfix) with ESMTP id BEA5520707
-	for <linux-block@archiver.kernel.org>; Fri, 31 Jan 2020 09:50:03 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id AF1B8206F0
+	for <linux-block@archiver.kernel.org>; Fri, 31 Jan 2020 10:04:18 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="oc3LLI/R"
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="NY1H6rtn"
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1728213AbgAaJuD (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Fri, 31 Jan 2020 04:50:03 -0500
-Received: from mail-io1-f68.google.com ([209.85.166.68]:39984 "EHLO
-        mail-io1-f68.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1728160AbgAaJuC (ORCPT
+        id S1728260AbgAaKES (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Fri, 31 Jan 2020 05:04:18 -0500
+Received: from mail-wm1-f65.google.com ([209.85.128.65]:40103 "EHLO
+        mail-wm1-f65.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S1728160AbgAaKES (ORCPT
         <rfc822;linux-block@vger.kernel.org>);
-        Fri, 31 Jan 2020 04:50:02 -0500
-Received: by mail-io1-f68.google.com with SMTP id x1so7452376iop.7;
-        Fri, 31 Jan 2020 01:50:02 -0800 (PST)
+        Fri, 31 Jan 2020 05:04:18 -0500
+Received: by mail-wm1-f65.google.com with SMTP id t14so7959791wmi.5
+        for <linux-block@vger.kernel.org>; Fri, 31 Jan 2020 02:04:15 -0800 (PST)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=gmail.com; s=20161025;
         h=mime-version:references:in-reply-to:from:date:message-id:subject:to
          :cc;
-        bh=fmM/bFlNhYJ6pK3y4fj2TMdyoYPF2i614veuquv5rYA=;
-        b=oc3LLI/RWNL3QTbNfmJPQ8/JdesRbh5tlwy1mo/InsGarsP79OFh6kHrDEhTeqqQa4
-         N3ShmbiAbTkTVbCAM+iTUhuQz66KOXOeEteRrPmKYys9+60skMiuzKRbPp+T1CjZmx66
-         zUvBKpZUPhbZMu7mLavki7HuVMCICTNKnfPR7djNJRvrM5WORILhueNacUnoRfTOzq8x
-         GWRZ36eNV0EaWNxRVqIRSt6TsOLrbIxLSH9Zr7ZBFEZStbsG92wtWmKdTMHG1Z/hR07M
-         fmhMjRoE7WFkrWQXFL5i5111EbTotrg3+j6rtvFSjaz+vqjtg/ZHr1Q/sCg2WfeW5Etz
-         nfEA==
+        bh=CBcsp5V62vbcl7mY5vhGyGkY3HRKhHaLulxYDPu2cyE=;
+        b=NY1H6rtnQqRWGoGpgz9fBFoSbxS/4tuPgFNSB9b93J5ALNVUSKIdWOFQs6StYx4oom
+         Oj+yvpu6LIQBv3/avUeoK4JZwkRbE8GVdCjF6pYg7XdldVDKl+8ParQd+CRynie0DEXR
+         ecb+S/1Ime8umOQ9QOi+ly2nVRmH9VX1i5r2XvvPzlH+q/MpXu/GVk78iyYvWMJ2OAvd
+         4TLZr/DGi2JEfWKNrLIoUsZKaFgn/rXbsDiToOsI502m55PklKF99NNBPUeNCCJDPtVP
+         WWjeFie132KPWcpwVeiBysNEuL+I09VKzYM4Y/sKTFquSqAlV1F4US8BUmqXWyvYfTQz
+         ZizQ==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=1e100.net; s=20161025;
         h=x-gm-message-state:mime-version:references:in-reply-to:from:date
          :message-id:subject:to:cc;
-        bh=fmM/bFlNhYJ6pK3y4fj2TMdyoYPF2i614veuquv5rYA=;
-        b=ZXN0Tcvsu6V0N4ky+qzWhIpHnF68nzzR3mS4XYB/WQBWrAEG7BiiyOfP9XlR26SBYP
-         ScAa6BF09pVsYS5jh6lxzmrw9cYNTGtO6F7hHZMBwXj6tk3Ubv8ZbAXlZKgP3WZGW+nk
-         Zbjzr6rVlK4A1uI1GaQvEIkqeZfPu6Y3Pv+7PK4po/SZdprb56LD+46P+CQx1BoYHom+
-         fvDQGaJ/+AdlkOjG8B+KwpHi6NMXtFXoFpqHpkPw2gIrcRcid3XQvje8lNNbyH6QwjF7
-         19mYzQXhXYHeXf7gyyeIgArTpw3D3fzGfkaFPiLS1JymmhrP8wjSCg7Dl7InceIKqLar
-         fJBQ==
-X-Gm-Message-State: APjAAAUwQNbZRJxptG1ipALf4IBdwK4hHb5R9t3moDdgFtnhv/VxGM46
-        O1XdZrZX7OrLsxfvb5pwKwTv+4bJWDVgtkC46Nc=
-X-Google-Smtp-Source: APXvYqx5mtx3j9hBpuAXIek6JBrbsplBDT4bCtGM+p18owB6Eot0XI+DijaiKL2UodCt44WmEG6jVqGKNwh2RAEh1nI=
-X-Received: by 2002:a02:ce5c:: with SMTP id y28mr7739371jar.96.1580464201898;
- Fri, 31 Jan 2020 01:50:01 -0800 (PST)
+        bh=CBcsp5V62vbcl7mY5vhGyGkY3HRKhHaLulxYDPu2cyE=;
+        b=K1qGBcU2MFTl/gr/pDZ3zhMlNhbQ+o+d8zWP8Tn7lyhneRyRHcm8cBUqaMgmncOn4W
+         ICuvlttI5lKfUZhTB0HLwAieburPyBXLXZN8nRVT7Aqn2usGc6d/zhB+zSvSdrGUVzRi
+         pp4lJ9wk/NGwrlGSFzBBdVnU5mGkwpPr5QgEzrdFXU0VWkg55blQWxujeI9a8dNvJgod
+         w5Z4CLH6EXxn27WlH47pyxMnzhY8p/VH6Wzsim56/n9ymdnO/+b8jS0bhVgmswLCApye
+         ZxnvRPR1DShmXN7T+J0KHBk99wd38Hu6GZoCw9o4CUQIg8ZMNaMZQflguDeymSIr0Kgz
+         MSIA==
+X-Gm-Message-State: APjAAAXroqQQ5nk2nAIb1m1bNC59Wk9qmJZI/stWqnlYo8frSDHE6rLc
+        ZlQesx1DK9AlKhV+09uKKHRzTxKkhvRMg/7slO8=
+X-Google-Smtp-Source: APXvYqwiF3K2GiMuI/wzwrqnv/BQedmWfyNHRtB8xyHC4ZcW99dzu+hHp5zpGX1wEU9px+HTIiA38QOCnnA3I+SGNng=
+X-Received: by 2002:a1c:a9c3:: with SMTP id s186mr10657868wme.64.1580465054257;
+ Fri, 31 Jan 2020 02:04:14 -0800 (PST)
 MIME-Version: 1.0
-References: <20200130114258.8482-1-hare@suse.de> <2fc165f5ad9ea0ec8a0878eabe800ca0af3e10b8.camel@redhat.com>
- <b786e9dd-02c1-e117-db92-aa3f50804bc7@suse.de>
-In-Reply-To: <b786e9dd-02c1-e117-db92-aa3f50804bc7@suse.de>
-From:   Ilya Dryomov <idryomov@gmail.com>
-Date:   Fri, 31 Jan 2020 10:50:12 +0100
-Message-ID: <CAOi1vP8U=vpFiKmbeheMKQiy6y_XfGBgCvLZF_OQbhz78x2iTg@mail.gmail.com>
-Subject: Re: [PATCH] rbd: lock object request list
-To:     Hannes Reinecke <hare@suse.de>
-Cc:     Laurence Oberman <loberman@redhat.com>,
-        Sage Weil <sage@redhat.com>, Jens Axboe <axboe@kernel.dk>,
-        Ceph Development <ceph-devel@vger.kernel.org>,
-        linux-block <linux-block@vger.kernel.org>
+References: <20200115114409.28895-1-ming.lei@redhat.com> <929dbfac-de46-a947-6a2c-f4d8d504c631@huawei.com>
+ <6dbe8c9f-af4e-3157-b6e9-6bbf43efb1e1@huawei.com>
+In-Reply-To: <6dbe8c9f-af4e-3157-b6e9-6bbf43efb1e1@huawei.com>
+From:   Ming Lei <tom.leiming@gmail.com>
+Date:   Fri, 31 Jan 2020 18:04:02 +0800
+Message-ID: <CACVXFVN8io2Pj1HZWLy=z1dbDrE3h9Q6B0DA4gdGOdK3+bRRPg@mail.gmail.com>
+Subject: Re: [PATCH V5 0/6] blk-mq: improvement CPU hotplug
+To:     John Garry <john.garry@huawei.com>
+Cc:     Ming Lei <ming.lei@redhat.com>, Jens Axboe <axboe@kernel.dk>,
+        linux-block <linux-block@vger.kernel.org>,
+        Bart Van Assche <bvanassche@acm.org>,
+        Hannes Reinecke <hare@suse.com>,
+        Christoph Hellwig <hch@lst.de>,
+        Thomas Gleixner <tglx@linutronix.de>,
+        Keith Busch <keith.busch@intel.com>,
+        chenxiang <chenxiang66@hisilicon.com>
 Content-Type: text/plain; charset="UTF-8"
 Sender: linux-block-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-On Thu, Jan 30, 2020 at 4:39 PM Hannes Reinecke <hare@suse.de> wrote:
+On Mon, Jan 20, 2020 at 9:24 PM John Garry <john.garry@huawei.com> wrote:
 >
-> On 1/30/20 3:26 PM, Laurence Oberman wrote:
-> > On Thu, 2020-01-30 at 12:42 +0100, Hannes Reinecke wrote:
-> >> The object request list can be accessed from various contexts
-> >> so we need to lock it to avoid concurrent modifications and
-> >> random crashes.
+> On 15/01/2020 17:00, John Garry wrote:
+> > On 15/01/2020 11:44, Ming Lei wrote:
+> >> Hi,
 > >>
-> >> Signed-off-by: Hannes Reinecke <hare@suse.de>
-> >> ---
-> >>  drivers/block/rbd.c | 31 ++++++++++++++++++++++++-------
-> >>  1 file changed, 24 insertions(+), 7 deletions(-)
+> >> Thomas mentioned:
+> >>      "
+> >>       That was the constraint of managed interrupts from the very
+> >> beginning:
+> >>        The driver/subsystem has to quiesce the interrupt line and the
+> >> associated
+> >>        queue _before_ it gets shutdown in CPU unplug and not fiddle
+> >> with it
+> >>        until it's restarted by the core when the CPU is plugged in again.
+> >>      "
 > >>
-> >> diff --git a/drivers/block/rbd.c b/drivers/block/rbd.c
-> >> index 5710b2a8609c..ddc170661607 100644
-> >> --- a/drivers/block/rbd.c
-> >> +++ b/drivers/block/rbd.c
-> >> @@ -344,6 +344,7 @@ struct rbd_img_request {
+> >> But no drivers or blk-mq do that before one hctx becomes inactive(all
+> >> CPUs for one hctx are offline), and even it is worse, blk-mq stills tries
+> >> to run hw queue after hctx is dead, see blk_mq_hctx_notify_dead().
 > >>
-> >>      struct list_head        lock_item;
-> >>      struct list_head        object_extents; /* obj_req.ex structs */
-> >> +    struct mutex            object_mutex;
+> >> This patchset tries to address the issue by two stages:
 > >>
-> >>      struct mutex            state_mutex;
-> >>      struct pending_result   pending;
-> >> @@ -1664,6 +1665,7 @@ static struct rbd_img_request
-> >> *rbd_img_request_create(
-> >>      INIT_LIST_HEAD(&img_request->lock_item);
-> >>      INIT_LIST_HEAD(&img_request->object_extents);
-> >>      mutex_init(&img_request->state_mutex);
-> >> +    mutex_init(&img_request->object_mutex);
-> >>      kref_init(&img_request->kref);
+> >> 1) add one new cpuhp state of CPUHP_AP_BLK_MQ_ONLINE
 > >>
-> >>      return img_request;
-> >> @@ -1680,8 +1682,10 @@ static void rbd_img_request_destroy(struct
-> >> kref *kref)
-> >>      dout("%s: img %p\n", __func__, img_request);
+> >> - mark the hctx as internal stopped, and drain all in-flight requests
+> >> if the hctx is going to be dead.
 > >>
-> >>      WARN_ON(!list_empty(&img_request->lock_item));
-> >> +    mutex_lock(&img_request->object_mutex);
-> >>      for_each_obj_request_safe(img_request, obj_request,
-> >> next_obj_request)
-> >>              rbd_img_obj_request_del(img_request, obj_request);
-> >> +    mutex_unlock(&img_request->object_mutex);
+> >> 2) re-submit IO in the state of CPUHP_BLK_MQ_DEAD after the hctx
+> >> becomes dead
 > >>
-> >>      if (img_request_layered_test(img_request)) {
-> >>              img_request_layered_clear(img_request);
-> >> @@ -2486,6 +2490,7 @@ static int __rbd_img_fill_request(struct
-> >> rbd_img_request *img_req)
-> >>      struct rbd_obj_request *obj_req, *next_obj_req;
-> >>      int ret;
+> >> - steal bios from the request, and resubmit them via
+> >> generic_make_request(),
+> >> then these IO will be mapped to other live hctx for dispatch
 > >>
-> >> +    mutex_lock(&img_req->object_mutex);
-> >>      for_each_obj_request_safe(img_req, obj_req, next_obj_req) {
-> >>              switch (img_req->op_type) {
-> >>              case OBJ_OP_READ:
-> >> @@ -2510,7 +2515,7 @@ static int __rbd_img_fill_request(struct
-> >> rbd_img_request *img_req)
-> >>                      continue;
-> >>              }
-> >>      }
-> >> -
-> >> +    mutex_unlock(&img_req->object_mutex);
-> >>      img_req->state = RBD_IMG_START;
-> >>      return 0;
-> >>  }
-> >> @@ -2569,6 +2574,7 @@ static int rbd_img_fill_request_nocopy(struct
-> >> rbd_img_request *img_req,
-> >>       * position in the provided bio (list) or bio_vec array.
-> >>       */
-> >>      fctx->iter = *fctx->pos;
-> >> +    mutex_lock(&img_req->object_mutex);
-> >>      for (i = 0; i < num_img_extents; i++) {
-> >>              ret = ceph_file_to_extents(&img_req->rbd_dev->layout,
-> >>                                         img_extents[i].fe_off,
-> >> @@ -2576,10 +2582,12 @@ static int rbd_img_fill_request_nocopy(struct
-> >> rbd_img_request *img_req,
-> >>                                         &img_req->object_extents,
-> >>                                         alloc_object_extent,
-> >> img_req,
-> >>                                         fctx->set_pos_fn, &fctx-
-> >>> iter);
-> >> -            if (ret)
-> >> +            if (ret) {
-> >> +                    mutex_unlock(&img_req->object_mutex);
-> >>                      return ret;
-> >> +            }
-> >>      }
-> >> -
-> >> +    mutex_unlock(&img_req->object_mutex);
-> >>      return __rbd_img_fill_request(img_req);
-> >>  }
+> >> Please comment & review, thanks!
 > >>
-> >> @@ -2620,6 +2628,7 @@ static int rbd_img_fill_request(struct
-> >> rbd_img_request *img_req,
-> >>       * or bio_vec array because when mapped, those bio_vecs can
-> >> straddle
-> >>       * stripe unit boundaries.
-> >>       */
-> >> +    mutex_lock(&img_req->object_mutex);
-> >>      fctx->iter = *fctx->pos;
-> >>      for (i = 0; i < num_img_extents; i++) {
-> >>              ret = ceph_file_to_extents(&rbd_dev->layout,
-> >> @@ -2629,15 +2638,17 @@ static int rbd_img_fill_request(struct
-> >> rbd_img_request *img_req,
-> >>                                         alloc_object_extent,
-> >> img_req,
-> >>                                         fctx->count_fn, &fctx-
-> >>> iter);
-> >>              if (ret)
-> >> -                    return ret;
-> >> +                    goto out_unlock;
-> >>      }
+> >> V5:
+> >>     - rename BLK_MQ_S_INTERNAL_STOPPED as BLK_MQ_S_INACTIVE
+> >>     - re-factor code for re-submit requests in cpu dead hotplug handler
+> >>     - address requeue corner case
 > >>
-> >>      for_each_obj_request(img_req, obj_req) {
-> >>              obj_req->bvec_pos.bvecs = kmalloc_array(obj_req-
-> >>> bvec_count,
-> >>                                            sizeof(*obj_req-
-> >>> bvec_pos.bvecs),
-> >>                                            GFP_NOIO);
-> >> -            if (!obj_req->bvec_pos.bvecs)
-> >> -                    return -ENOMEM;
-> >> +            if (!obj_req->bvec_pos.bvecs) {
-> >> +                    ret = -ENOMEM;
-> >> +                    goto out_unlock;
-> >> +            }
-> >>      }
+> >> V4:
+> >>     - resubmit IOs in dispatch list in case that this hctx is dead
 > >>
-> >>      /*
-> >> @@ -2652,10 +2663,14 @@ static int rbd_img_fill_request(struct
-> >> rbd_img_request *img_req,
-> >>                                         &img_req->object_extents,
-> >>                                         fctx->copy_fn, &fctx->iter);
-> >>              if (ret)
-> >> -                    return ret;
-> >> +                    goto out_unlock;
-> >>      }
-> >> +    mutex_unlock(&img_req->object_mutex);
+> >> V3:
+> >>     - re-organize patch 2 & 3 a bit for addressing Hannes's comment
+> >>     - fix patch 4 for avoiding potential deadlock, as found by Hannes
 > >>
-> >>      return __rbd_img_fill_request(img_req);
-> >> +out_unlock:
-> >> +    mutex_unlock(&img_req->object_mutex);
-> >> +    return ret;
-> >>  }
+> >> V2:
+> >>     - patch4 & patch 5 in V1 have been merged to block tree, so remove
+> >>       them
+> >>     - address comments from John Garry and Minwoo
 > >>
-> >>  static int rbd_img_fill_nodata(struct rbd_img_request *img_req,
-> >> @@ -3552,6 +3567,7 @@ static void rbd_img_object_requests(struct
-> >> rbd_img_request *img_req)
 > >>
-> >>      rbd_assert(!img_req->pending.result && !img_req-
-> >>> pending.num_pending);
-> >>
-> >> +    mutex_lock(&img_req->object_mutex);
-> >>      for_each_obj_request(img_req, obj_req) {
-> >>              int result = 0;
-> >>
-> >> @@ -3564,6 +3580,7 @@ static void rbd_img_object_requests(struct
-> >> rbd_img_request *img_req)
-> >>                      img_req->pending.num_pending++;
-> >>              }
-> >>      }
-> >> +    mutex_unlock(&img_req->object_mutex);
-> >>  }
-> >>
-> >>  static bool rbd_img_advance(struct rbd_img_request *img_req, int
-> >> *result)
-> >
-> > Looks good to me. Just wonder how we escaped this for so long.
-> >
-> > Reviewed-by: Laurence Oberman <loberman@redhat.com>
-> >
-> The whole state machine is utterly fragile.
-> I'll be posting a patchset to clean stuff up somewhat,
-> but it's still a beast.
+>
+> Hi Ming,
+>
+> Colleague Xiang Chen found this:
+>
+> Starting 40 processes
+> Jobs: 40 (f=40)
+> Jobs: 40 (f=40): [RRRRRRRRRRRRRRRRRRRRRRRRRRRRRRRRRRRRRRRR] [8.3% done]
+> [2899MB/0KB/0KB /s] [742K/0/0 iops] [eta 00m:33s]
+> Jobs: 40 (f=40): [RRRRRRRRRRRRRRRRRRRRRRRRRRRRRRRRRRRRRRRR] [11.1% done]
+> [2892MB/0KB/0KB /s] [740K/0/0 iops] [eta 00m:32s]
+> Jobs: 40 (f=40): [RRRRRRRRRRRRRRRRRRRRRRRRRRRRRRRRRRRRRRRR] [13.9% done]
+> [2887MB/0KB/0KB /s] [739K/0/0 iops] [eta 00m:31s]
+> Jobs: 40 (f=40): [RRRRRRRRRRRRRRRRRRRRRRRRRRRRRRRRRRRRRRRR] [16.7% done]
+> [2850MB/0KB/0KB /s] [730K/0/0 iops] [eta 00m:30s]
+> Jobs: 40 (f=40): [RRRRRRRRRRRRRRRRRRRRRRRRRRRRRRRRRRRRRRRR] [19.4% done]
+> [2834MB/0KB/0KB /s] [726K/0/0 iops] [eta 00m:29s]
+> Jobs: 40 (f=40): [RRRRRRRRRRRRRRRRRRRRRRRRRRRRRRRRRRRRRRRR] [22.2% done]
+> [2827MB/0KB/0KB /s] [724K/0/0 iops] [eta 00m:28s]
+> Jobs: 40 (f=40): [RRRRRRRRRRRRRRRRRRRRRRRRRRRRRRRRRRRRRRRR] [25.0% done]
+> [2804MB/0KB/0KB /s] [718K/0/0 iops] [eta 00m:27s]
+> Jobs: 40 (f=40): [RRRRRRRRRRRRRRRRRRRRRRRRRRRRRRRRRRRRRRRR] [27.8% done]
+> [2783MB/0KB/0KB /s] [713K/0/0 iops] [eta 00m:26s]
+> [  112.990292] CPU16: shutdown
+> [  112.993113] psci: CPU16 killed (polled 0 ms)
+> [  113.029429] CPU15: shutdown
+> [  113.032245] psci: CPU15 killed (polled 0 ms)
+> [  113.073649] CPU14: shutdown
+> [  113.076461] psci: CPU14 killed (polled 0 ms)
+> Jobs: 40 (f=40): [RRRRRRRRRRRRRRRRRRRRRRRRRRRRRR[  113.121258] CPU13:
+> shutdown
+> RRRRRRRRRR] [30.[  113.124247] psci: CPU13 killed (polled 0 ms)
+> 6% done] [2772MB/0KB/0KB /s] [710K/0/0 iops] [eta 00m:25s]
+> [  113.177108] IRQ 600: no longer affine to CPU12
+> [  113.183185] CPU12: shutdown
+> [  113.186001] psci: CPU12 killed (polled 0 ms)
+> [  113.242555] CPU11: shutdown
+> [  113.245368] psci: CPU11 killed (polled 0 ms)
+> [  113.302598] CPU10: shutdown
+> [  113.305420] psci: CPU10 killed (polled 0 ms)
+> [  113.365757] CPU9: shutdown
+> [  113.368489] psci: CPU9 killed (polled 0 ms)
+> [  113.611904] IRQ 599: no longer affine to CPU8
+> [  113.620611] CPU8: shutdown
+> [  113.623340] psci: CPU8 killed (polled 0 ms)
+> Jobs: 40 (f=40): [RRRRRRRRRRRRRRRRRRRRRRRRRRRRRRRRRRRRRRRR] [33.3% done]
+> [2765MB/0KB/0KB /s] [708K/0/0 iops] [eta 00m:24s]
+> Jobs: 40 (f=40): [RRRRRRRRRRRRRRRRRRRRRRRRRRRRRRRRRRRRRRRR] [36.1% done]
+> [2767MB/0KB/0KB /s] [708K/0/0 iops] [eta 00m:23s]
+> Jobs: 40 (f=40): [RRRRRRRRRRRRRRRRRRRRRRRRRRRRRRRRRRRRRRRR] [38.9% done]
+> [2771MB/0KB/0KB /s] [709K/0/0 iops] [eta 00m:22s]
+> Jobs: 40 (f=40): [RRRRRRRRRRRRRRRRRRRRRRRRRRRRRRRRRRRRRRRR] [41.7% done]
+> [2780MB/0KB/0KB /s] [712K/0/0 iops] [eta 00m:21s]
+> Jobs: 40 (f=40): [RRRRRRRRRRRRRRRRRRRRRRRRRRRRRRRRRRRRRRRR] [44.4% done]
+> [2731MB/0KB/0KB /s] [699K/0/0 iops] [eta 00m:20s]
+> Jobs: 40 (f=40): [RRRRRRRRRRRRRRRRRRRRRRRRRRRRRRRRRRRRRRRR] [47.2% done]
+> [2757MB/0KB/0KB /s] [706K/0/0 iops] [eta 00m:19s]
+> Jobs: 40 (f=40): [RRRRRRRRRRRRRRRRRRRRRRRRRRRRRRRRRRRRRRRR] [50.0% done]
+> [2764MB/0KB/0KB /s] [708K/0/0 iops] [eta 00m:18s]
+> [  120.762141] ------------[ cut here ]------------
+> [  120.766760] WARNING: CPU: 0 PID: 10 at block/blk.h:299
+> generic_make_request_checks+0x480/0x4e8
+> [  120.775348] Modules linked in:
+> [  120.778397] CPU: 0 PID: 10 Comm: ksoftirqd/0 Not tainted 5.5.0-
+>
+> Then this:
+>
+> 1158048319d:18h:40m:34s]
+> Jobs: 40 (f=40): [RRRRRRRRRRRRRRRRRRRRRRRRRRRRRRRRRRRRRRRR] [0.0% done]
+> [0KB/0KB/0KB /s] [0/0/0 iops] [eta 1158049605d:23h:03m:30s]
+> [  141.915198] rcu: INFO: rcu_preempt detected stalls on CPUs/tasks:
+> [  141.921280] rcu:     96-...0: (4 GPs behind) idle=af6/0/0x1
+> softirq=90/90 fqs=2626
+> [  141.928658] rcu:     99-...0: (2 GPs behind)
+> idle=b82/1/0x4000000000000000 softirq=82/82 fqs=2627
+> [  141.937339]  (detected by 17, t=5254 jiffies, g=3925, q=545)
+> [  141.942985] Task dump for CPU 96:
+> [  141.946292] swapper/96      R  running task        0     0      1
+> 0x0000002a
+> [  141.953321] Call trace:
+> [  141.955763]  __switch_to+0xbc/0x218
+> [  141.959244]  0x0
+> [  141.961079] Task dump for CPU 99:
+> [  141.964385] kworker/99:1H   R  running task        0  3473      2
+> 0x0000022a
+> [  141.971417] Workqueue: kblockd blk_mq_run_work_fn
+> [  141.976109] Call trace:
+> [  141.978550]  __switch_to+0xbc/0x218
+> [  141.982029]  blk_mq_run_work_fn+0x1c/0x28
+> [  141.986027]  process_one_work+0x1e0/0x358
+> [  141.990025]  worker_thread+0x40/0x488
+> [  141.993678]  kthread+0x118/0x120
+> [  141.996897]  ret_from_fork+0x10/0x18
 
-What do you want me to do about this patch then?
+Hi John,
 
-> I'm rather surprised that it doesn't break more often ...
+Thanks for your test!
 
-If you or Laurence saw it break, I would appreciate the details.
+Could you test the following patchset and only the last one is changed?
+
+https://github.com/ming1/linux/commits/my_for_5.6_block
 
 Thanks,
-
-                Ilya
+Ming Lei
