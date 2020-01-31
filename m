@@ -2,115 +2,106 @@ Return-Path: <SRS0=MKaG=3U=vger.kernel.org=linux-block-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-2.2 required=3.0 tests=DKIM_SIGNED,DKIM_VALID,
-	HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,
-	URIBL_BLOCKED,USER_AGENT_SANE_1 autolearn=no autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-2.4 required=3.0 tests=DKIM_SIGNED,DKIM_VALID,
+	DKIM_VALID_AU,HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SPF_HELO_NONE,
+	SPF_PASS,USER_AGENT_SANE_1 autolearn=no autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id BFA8EC33CB7
-	for <linux-block@archiver.kernel.org>; Fri, 31 Jan 2020 17:49:19 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 78221C35240
+	for <linux-block@archiver.kernel.org>; Fri, 31 Jan 2020 17:49:29 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.kernel.org (Postfix) with ESMTP id 9A419214D8
-	for <linux-block@archiver.kernel.org>; Fri, 31 Jan 2020 17:49:19 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id 53F63217BA
+	for <linux-block@archiver.kernel.org>; Fri, 31 Jan 2020 17:49:29 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel-dk.20150623.gappssmtp.com header.i=@kernel-dk.20150623.gappssmtp.com header.b="JG8n7NOW"
+	dkim=pass (2048-bit key) header.d=ziepe.ca header.i=@ziepe.ca header.b="jmx0SJKH"
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1727170AbgAaRtT (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Fri, 31 Jan 2020 12:49:19 -0500
-Received: from mail-pg1-f196.google.com ([209.85.215.196]:44305 "EHLO
-        mail-pg1-f196.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1726989AbgAaRtT (ORCPT
+        id S1727105AbgAaRt2 (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Fri, 31 Jan 2020 12:49:28 -0500
+Received: from mail-qv1-f65.google.com ([209.85.219.65]:39023 "EHLO
+        mail-qv1-f65.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S1726989AbgAaRt2 (ORCPT
         <rfc822;linux-block@vger.kernel.org>);
-        Fri, 31 Jan 2020 12:49:19 -0500
-Received: by mail-pg1-f196.google.com with SMTP id x7so3824302pgl.11
-        for <linux-block@vger.kernel.org>; Fri, 31 Jan 2020 09:49:17 -0800 (PST)
+        Fri, 31 Jan 2020 12:49:28 -0500
+Received: by mail-qv1-f65.google.com with SMTP id y8so3651819qvk.6
+        for <linux-block@vger.kernel.org>; Fri, 31 Jan 2020 09:49:27 -0800 (PST)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=kernel-dk.20150623.gappssmtp.com; s=20150623;
-        h=subject:to:cc:references:from:message-id:date:user-agent
-         :mime-version:in-reply-to:content-language:content-transfer-encoding;
-        bh=NqY9ETg9tXvM0DorJighH08vOiPBH+VJKGXzPrmcnPk=;
-        b=JG8n7NOW3H7smU/BqfmUQ9vQSuVhYCsJxa2ijzKfNYekDTREKAliqYsTlsM9vPhnXE
-         lLwuKFD8BPffeYiLv+B9+dsggX2q1f8z5fJ/uOl1ISmPijCedZNI7+8OGppuBT3PJkbB
-         NfWdqb4fHYnxYHUYQssffDl/aqH2EWi5ZgkcROnZnEupuk1Fz87hcvzoShF5bK3CJlUy
-         tCZz8YoN/4kX+Ye9jGTOBTmFbvs7Mt4YxJhMuzUh0DQrGrOiNSypSVN0I6d5ky0K59oM
-         z9NSLtQd/fA4enZiO00/H/QM6TPpslzDmd4euD73Be2S3g49C+NIziTLoZsrRUhHBwHX
-         OMkQ==
+        d=ziepe.ca; s=google;
+        h=date:from:to:cc:subject:message-id:references:mime-version
+         :content-disposition:in-reply-to:user-agent;
+        bh=t9FfkXkAT6xKBWkUXQbIOJ6JHX49jFODgFWHOIXBg1w=;
+        b=jmx0SJKHL82uuWWrWuhMCkRoxrAOJfz64tmdhZdmh1hLQuP1YeEkGaWa/H7fjf8+sS
+         TFNFvUVezrA1pC6ZHE8pYBnAT4+hrlpcrmnNBUQAYh1HwwZ5ew3zvwioG1ejLiOfrGVJ
+         Ztn5zNIXk9k4sKUC7yKfgjq3yJWJQ6k1t73SSQAluTairCgNauvLd9u4/D0mJdgI70ZT
+         38l1zp51JNmgdVZOHKxRkRxHfrdA7ZGL4NUQTDA3NwbecAhkQuiGKwf0p6dMXhKu+FbI
+         od8THO3UKZ/6RzYbVResrvUbG/J3QhnI/HW/GqQ5gFoMed6TkaW/4M5epvDJBVdQOIGZ
+         mbcQ==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=1e100.net; s=20161025;
-        h=x-gm-message-state:subject:to:cc:references:from:message-id:date
-         :user-agent:mime-version:in-reply-to:content-language
-         :content-transfer-encoding;
-        bh=NqY9ETg9tXvM0DorJighH08vOiPBH+VJKGXzPrmcnPk=;
-        b=DZmy9B5BabQiVwwvPxWj7/XnGaG0o1OAFryegZAoPnLbasb0dznj7tGgiLIzvp+QFO
-         enddDsUguBaIQEoanjVAMXiblAhhf8DBisl1A1AmgMGZyq0eAP5EhHPrtkzvLuJfARhj
-         nfltPa9Il4T3iqjTOOesDRJeXEYmE3YcInqQwfL0BaJyQH1I+HvhafXTpM3XVDOC0dXl
-         eVHLQkenAMvwdvswjiO86oFGazn5JDWnTUXJFVlhSO+wtOZPe6c201xC5RrOZCBwr3WM
-         MrkOUxCrtispR6YqR7rcw9MAM03aKqFr+Sd9RIDBCqjbUvx2QbIIzt3cCsmhwyqVZBU3
-         58Kw==
-X-Gm-Message-State: APjAAAXuBZxi+75SNMnArgHAOJXBc0HNNhHbVCTrbVwaGgeDHjf+N2Vl
-        K0M/ZLRgY0lOKx/maD1EzWq35A==
-X-Google-Smtp-Source: APXvYqwu+UIm8Bjlim0xjKh3/nW4mAcpLcRNzFX452/LXS9hYMCHjG+jnmAkuJheoIDlE6wjQsS+BQ==
-X-Received: by 2002:a63:190c:: with SMTP id z12mr10556079pgl.1.1580492956578;
-        Fri, 31 Jan 2020 09:49:16 -0800 (PST)
-Received: from ?IPv6:2620:10d:c081:1131::1371? ([2620:10d:c090:180::d1ba])
-        by smtp.gmail.com with ESMTPSA id r6sm11034572pfh.91.2020.01.31.09.49.14
-        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
-        Fri, 31 Jan 2020 09:49:15 -0800 (PST)
-Subject: Re: [PATCH v8 00/25] RTRS (former IBTRS) RDMA Transport Library and
- RNBD (former IBNBD) RDMA Network Block Device
-To:     Jinpu Wang <jinpuwang@gmail.com>, Jason Gunthorpe <jgg@ziepe.ca>
+        h=x-gm-message-state:date:from:to:cc:subject:message-id:references
+         :mime-version:content-disposition:in-reply-to:user-agent;
+        bh=t9FfkXkAT6xKBWkUXQbIOJ6JHX49jFODgFWHOIXBg1w=;
+        b=JcbZMs7V7/sB0Z4su2u7Y8ekUvKavO06unh3X/AvAxuWN7HrPBVz2qbhsLaFPtm1GP
+         h6XGNuw7McN9IhsVbtwSIStzMk3KgFVXYDnk+lDTOsCr5gTartkp0JksedyyWKewtrt1
+         VLMmR288Ae/Is/dnvLn9ezRRybJLejuZigpmLE07Y8irL1h/gHS9lTPnrOeAlr6LE6wX
+         k+dQoGsbXZganP6NUHXTEWjGadvbO//Tp+RCvpQC531oxtSx2v5jr/EEEU5NgplCqp/m
+         6DlZ//MCxzfq2d8X5cV2+9+4k2xdaFCwK7HVzfzZFQkOoQha7NsE8itRhnOlUx/j8SXq
+         8duQ==
+X-Gm-Message-State: APjAAAVxlp63EOM2mF+StcofaDIKMNNdUh+AcDD86qnhR15O4BrndqhG
+        SN3WBLKcEYOX/mTaKhWcirT5rg==
+X-Google-Smtp-Source: APXvYqxeyK8QHeaGgorwgPTzP0+Uj1Tk6KOymggyxz+kne/OqiozqVi6c8guKYnfHLFuAbROOKFP+A==
+X-Received: by 2002:a0c:bf0b:: with SMTP id m11mr11612357qvi.63.1580492967433;
+        Fri, 31 Jan 2020 09:49:27 -0800 (PST)
+Received: from ziepe.ca (hlfxns017vw-142-68-57-212.dhcp-dynamic.fibreop.ns.bellaliant.net. [142.68.57.212])
+        by smtp.gmail.com with ESMTPSA id t29sm4833535qkm.27.2020.01.31.09.49.26
+        (version=TLS1_2 cipher=ECDHE-RSA-CHACHA20-POLY1305 bits=256/256);
+        Fri, 31 Jan 2020 09:49:27 -0800 (PST)
+Received: from jgg by mlx.ziepe.ca with local (Exim 4.90_1)
+        (envelope-from <jgg@ziepe.ca>)
+        id 1ixaQ2-00035N-GO; Fri, 31 Jan 2020 13:49:26 -0400
+Date:   Fri, 31 Jan 2020 13:49:26 -0400
+From:   Jason Gunthorpe <jgg@ziepe.ca>
+To:     Jens Axboe <axboe@kernel.dk>
 Cc:     Danil Kipnis <danil.kipnis@cloud.ionos.com>,
-        linux-block@vger.kernel.org, linux-rdma@vger.kernel.org,
-        Christoph Hellwig <hch@infradead.org>,
+        Jack Wang <jinpuwang@gmail.com>, linux-block@vger.kernel.org,
+        linux-rdma@vger.kernel.org, Christoph Hellwig <hch@infradead.org>,
         Sagi Grimberg <sagi@grimberg.me>,
         Bart Van Assche <bvanassche@acm.org>,
         Leon Romanovsky <leon@kernel.org>,
         Doug Ledford <dledford@redhat.com>,
         Jack Wang <jinpu.wang@cloud.ionos.com>, rpenyaev@suse.de
+Subject: Re: [PATCH v8 00/25] RTRS (former IBTRS) RDMA Transport Library and
+ RNBD (former IBNBD) RDMA Network Block Device
+Message-ID: <20200131174926.GC29820@ziepe.ca>
 References: <20200124204753.13154-1-jinpuwang@gmail.com>
  <CAHg0HuzLLHqp_76ThLhUdHGG_986Oxvvr15h_13T12eEWjyAxA@mail.gmail.com>
  <20200131165421.GB29820@ziepe.ca>
  <f657d371-3b23-e4b2-50b3-db47cd521e1f@kernel.dk>
- <CAD9gYJLVMVPjQcCj0aqbAW3CD86JQoFNvzJwGziRXT8B2UT0VQ@mail.gmail.com>
-From:   Jens Axboe <axboe@kernel.dk>
-Message-ID: <a1aaa047-3a44-11a7-19a1-e150a9df4616@kernel.dk>
-Date:   Fri, 31 Jan 2020 10:49:14 -0700
-User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:68.0) Gecko/20100101
- Thunderbird/68.4.1
 MIME-Version: 1.0
-In-Reply-To: <CAD9gYJLVMVPjQcCj0aqbAW3CD86JQoFNvzJwGziRXT8B2UT0VQ@mail.gmail.com>
-Content-Type: text/plain; charset=utf-8
-Content-Language: en-US
-Content-Transfer-Encoding: 8bit
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <f657d371-3b23-e4b2-50b3-db47cd521e1f@kernel.dk>
+User-Agent: Mutt/1.9.4 (2018-02-28)
 Sender: linux-block-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-On 1/31/20 10:28 AM, Jinpu Wang wrote:
-> Jens Axboe <axboe@kernel.dk> 于2020年1月31日周五 下午6:04写道：
->>
->> On 1/31/20 9:54 AM, Jason Gunthorpe wrote:
->>> On Fri, Jan 31, 2020 at 05:50:44PM +0100, Danil Kipnis wrote:
->>>> Hi Doug, Hi Jason, Hi Jens, Hi All,
->>>>
->>>> since we didn't get any new comments for the V8 prepared by Jack a
->>>> week ago do you think rnbd/rtrs could be merged in the current merge
->>>> window?
->>>
->>> No, the cut off for something large like this would be rc4ish
->>
->> Since it's been around for a while, I would have taken it in a bit
->> later than that. But not now, definitely too late. If folks are
->> happy with it, we can get it queued for 5.7.
->>
->> --
->> Jens Axboe
+On Fri, Jan 31, 2020 at 10:04:10AM -0700, Jens Axboe wrote:
+> On 1/31/20 9:54 AM, Jason Gunthorpe wrote:
+> > On Fri, Jan 31, 2020 at 05:50:44PM +0100, Danil Kipnis wrote:
+> >> Hi Doug, Hi Jason, Hi Jens, Hi All,
+> >>
+> >> since we didn't get any new comments for the V8 prepared by Jack a
+> >> week ago do you think rnbd/rtrs could be merged in the current merge
+> >> window?
+> > 
+> > No, the cut off for something large like this would be rc4ish
 > 
-> Thanks Jason, thanks Jens, then we will prepare later another round for 5.7
+> Since it's been around for a while, I would have taken it in a bit
+> later than that. But not now, definitely too late. If folks are
+> happy with it, we can get it queued for 5.7.
 
-It would also be really nice to see official sign-offs (reviews) from non
-ionos people...
+I'm still sore from taking the last big driver too late and getting
+about 2 weeks of little bug fixes from all the cross-arch compilation
+and what not :)
 
--- 
-Jens Axboe
-
+Jason
