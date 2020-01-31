@@ -6,30 +6,30 @@ X-Spam-Status: No, score=-9.7 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
 	INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,
 	URIBL_BLOCKED,USER_AGENT_GIT autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 0C39EC35240
+	by smtp.lore.kernel.org (Postfix) with ESMTP id BAA9DC35246
 	for <linux-block@archiver.kernel.org>; Fri, 31 Jan 2020 10:38:15 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.kernel.org (Postfix) with ESMTP id E0E87206F0
-	for <linux-block@archiver.kernel.org>; Fri, 31 Jan 2020 10:38:14 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id 9AC3620CC7
+	for <linux-block@archiver.kernel.org>; Fri, 31 Jan 2020 10:38:15 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1728383AbgAaKiG (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        id S1728401AbgAaKiG (ORCPT <rfc822;linux-block@archiver.kernel.org>);
         Fri, 31 Jan 2020 05:38:06 -0500
-Received: from mx2.suse.de ([195.135.220.15]:55860 "EHLO mx2.suse.de"
+Received: from mx2.suse.de ([195.135.220.15]:55858 "EHLO mx2.suse.de"
         rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-        id S1728385AbgAaKiF (ORCPT <rfc822;linux-block@vger.kernel.org>);
+        id S1728390AbgAaKiF (ORCPT <rfc822;linux-block@vger.kernel.org>);
         Fri, 31 Jan 2020 05:38:05 -0500
 X-Virus-Scanned: by amavisd-new at test-mx.suse.de
 Received: from relay2.suse.de (unknown [195.135.220.254])
-        by mx2.suse.de (Postfix) with ESMTP id 0EBB2B027;
-        Fri, 31 Jan 2020 10:38:02 +0000 (UTC)
+        by mx2.suse.de (Postfix) with ESMTP id E189CB011;
+        Fri, 31 Jan 2020 10:38:01 +0000 (UTC)
 From:   Hannes Reinecke <hare@suse.de>
 To:     Ilya Dryomov <idryomov@gmail.com>
 Cc:     Sage Weil <sage@redhat.com>, Daniel Disseldorp <ddiss@suse.com>,
         Jens Axboe <axboe@kernel.dk>, ceph-devel@vger.kernel.org,
         linux-block@vger.kernel.org, Hannes Reinecke <hare@suse.de>
-Subject: [PATCH 12/15] rbd: kill img_request kref
-Date:   Fri, 31 Jan 2020 11:37:36 +0100
-Message-Id: <20200131103739.136098-13-hare@suse.de>
+Subject: [PATCH 05/15] rbd: reorder switch statement in rbd_advance_write()
+Date:   Fri, 31 Jan 2020 11:37:29 +0100
+Message-Id: <20200131103739.136098-6-hare@suse.de>
 X-Mailer: git-send-email 2.16.4
 In-Reply-To: <20200131103739.136098-1-hare@suse.de>
 References: <20200131103739.136098-1-hare@suse.de>
@@ -38,99 +38,118 @@ Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-The reference counter is never increased, so we can as well call
-rbd_img_request_destroy() directly and drop the kref.
+Reorder switch statement to avoid the use of a label/goto
+statement and add a 'done' state to indicate that the state
+machine has completed.
 
 Signed-off-by: Hannes Reinecke <hare@suse.de>
 ---
- drivers/block/rbd.c | 24 +++++-------------------
- 1 file changed, 5 insertions(+), 19 deletions(-)
+ drivers/block/rbd.c | 36 +++++++++++++++++++++++++-----------
+ 1 file changed, 25 insertions(+), 11 deletions(-)
 
 diff --git a/drivers/block/rbd.c b/drivers/block/rbd.c
-index db04401c4d8b..2566d6bd8230 100644
+index 4d7857667e9c..766d67e4d5e5 100644
 --- a/drivers/block/rbd.c
 +++ b/drivers/block/rbd.c
-@@ -351,7 +351,6 @@ struct rbd_img_request {
+@@ -267,7 +267,8 @@ enum rbd_obj_read_state {
+  * even if there is a parent).
+  */
+ enum rbd_obj_write_state {
+-	RBD_OBJ_WRITE_START = 1,
++	RBD_OBJ_WRITE_DONE,
++	RBD_OBJ_WRITE_START,
+ 	RBD_OBJ_WRITE_PRE_OBJECT_MAP,
+ 	RBD_OBJ_WRITE_OBJECT,
+ 	__RBD_OBJ_WRITE_COPYUP,
+@@ -3382,31 +3383,37 @@ static bool rbd_obj_advance_write(struct rbd_obj_request *obj_req, int *result)
+ 	int ret;
  
- 	int			pending_result;
- 	struct work_struct	work;
--	struct kref		kref;
- };
+ again:
++	dout("%s: obj %p state %d\n", __func__, obj_req, obj_req->write_state);
+ 	switch (obj_req->write_state) {
+ 	case RBD_OBJ_WRITE_START:
+ 		rbd_assert(!*result);
  
- #define for_each_obj_request(ireq, oreq) \
-@@ -1329,15 +1328,6 @@ static void rbd_obj_request_put(struct rbd_obj_request *obj_request)
- 	kref_put(&obj_request->kref, rbd_obj_request_destroy);
- }
+-		if (rbd_obj_write_is_noop(obj_req))
++		if (rbd_obj_write_is_noop(obj_req)) {
++			obj_req->write_state = RBD_OBJ_WRITE_DONE;
+ 			return true;
++		}
  
--static void rbd_img_request_destroy(struct kref *kref);
--static void rbd_img_request_put(struct rbd_img_request *img_request)
--{
--	rbd_assert(img_request != NULL);
--	dout("%s: img %p (was %d)\n", __func__, img_request,
--		kref_read(&img_request->kref));
--	kref_put(&img_request->kref, rbd_img_request_destroy);
--}
+ 		ret = rbd_obj_write_pre_object_map(obj_req);
+ 		if (ret < 0) {
+ 			*result = ret;
++			obj_req->write_state = RBD_OBJ_WRITE_DONE;
+ 			return true;
+ 		}
+ 		obj_req->write_state = RBD_OBJ_WRITE_PRE_OBJECT_MAP;
+-		if (ret > 0)
+-			goto again;
+-		return false;
++		if (ret == 0)
++			return false;
++		/* fall through */
+ 	case RBD_OBJ_WRITE_PRE_OBJECT_MAP:
+ 		if (*result) {
+ 			rbd_warn(rbd_dev, "pre object map update failed: %d",
+ 				 *result);
++			obj_req->write_state = RBD_OBJ_WRITE_DONE;
+ 			return true;
+ 		}
+ 		ret = rbd_obj_write_object(obj_req);
+ 		if (ret) {
+ 			*result = ret;
++			obj_req->write_state = RBD_OBJ_WRITE_DONE;
+ 			return true;
+ 		}
+ 		obj_req->write_state = RBD_OBJ_WRITE_OBJECT;
+@@ -3426,33 +3433,40 @@ static bool rbd_obj_advance_write(struct rbd_obj_request *obj_req, int *result)
+ 			if (obj_req->flags & RBD_OBJ_FLAG_DELETION)
+ 				*result = 0;
+ 		}
+-		if (*result)
++		if (*result) {
++			obj_req->write_state = RBD_OBJ_WRITE_DONE;
+ 			return true;
 -
- static inline void rbd_img_obj_request_add(struct rbd_img_request *img_request,
- 					struct rbd_obj_request *obj_request)
- {
-@@ -1674,19 +1664,15 @@ static struct rbd_img_request *rbd_img_request_create(
- 	INIT_LIST_HEAD(&img_request->lock_item);
- 	INIT_LIST_HEAD(&img_request->object_extents);
- 	mutex_init(&img_request->object_mutex);
--	kref_init(&img_request->kref);
- 
- 	return img_request;
- }
- 
--static void rbd_img_request_destroy(struct kref *kref)
-+static void rbd_img_request_destroy(struct rbd_img_request *img_request)
- {
--	struct rbd_img_request *img_request;
- 	struct rbd_obj_request *obj_request;
- 	struct rbd_obj_request *next_obj_request;
- 
--	img_request = container_of(kref, struct rbd_img_request, kref);
--
- 	dout("%s: img %p\n", __func__, img_request);
- 
- 	WARN_ON(!list_empty(&img_request->lock_item));
-@@ -2920,7 +2906,7 @@ static int rbd_obj_read_from_parent(struct rbd_obj_request *obj_req)
- 					      obj_req->copyup_bvecs);
- 	}
- 	if (ret) {
--		rbd_img_request_put(child_img_req);
-+		rbd_img_request_destroy(child_img_req);
- 		return ret;
- 	}
- 
-@@ -3726,7 +3712,7 @@ static void rbd_img_end_child_request(struct rbd_img_request *img_req,
- {
- 	struct rbd_obj_request *obj_req = img_req->callback_data;
- 
--	rbd_img_request_put(img_req);
-+	rbd_img_request_destroy(img_req);
- 	rbd_obj_handle_request(obj_req, result);
- }
- 
-@@ -3734,7 +3720,7 @@ static void rbd_img_end_request(struct rbd_img_request *img_req, int result)
- {
- 	struct request *rq = img_req->callback_data;
- 
--	rbd_img_request_put(img_req);
-+	rbd_img_request_destroy(img_req);
- 	blk_mq_end_request(rq, errno_to_blk_status(result));
- }
- 
-@@ -4886,7 +4872,7 @@ static void rbd_queue_workfn(struct work_struct *work)
- 	return;
- 
- err_img_request:
--	rbd_img_request_put(img_request);
-+	rbd_img_request_destroy(img_request);
- err_rq:
- 	if (result)
- 		rbd_warn(rbd_dev, "%s %llx at %llx result %d",
++		}
+ 		obj_req->write_state = RBD_OBJ_WRITE_COPYUP;
+ 		goto again;
+ 	case __RBD_OBJ_WRITE_COPYUP:
+ 		if (!rbd_obj_advance_copyup(obj_req, result))
+ 			return false;
++		obj_req->write_state = RBD_OBJ_WRITE_COPYUP;
+ 		/* fall through */
+ 	case RBD_OBJ_WRITE_COPYUP:
+ 		if (*result) {
+ 			rbd_warn(rbd_dev, "copyup failed: %d", *result);
++			obj_req->write_state = RBD_OBJ_WRITE_DONE;
+ 			return true;
+ 		}
++		obj_req->write_state = RBD_OBJ_WRITE_POST_OBJECT_MAP;
+ 		ret = rbd_obj_write_post_object_map(obj_req);
+ 		if (ret < 0) {
+ 			*result = ret;
++			obj_req->write_state = RBD_OBJ_WRITE_DONE;
+ 			return true;
+ 		}
+-		obj_req->write_state = RBD_OBJ_WRITE_POST_OBJECT_MAP;
+-		if (ret > 0)
+-			goto again;
+-		return false;
++		if (ret == 0)
++			return false;
++		/* fall through */
+ 	case RBD_OBJ_WRITE_POST_OBJECT_MAP:
+ 		if (*result)
+ 			rbd_warn(rbd_dev, "post object map update failed: %d",
+ 				 *result);
++		obj_req->write_state = RBD_OBJ_WRITE_DONE;
++		/* fall through */
++	case RBD_OBJ_WRITE_DONE:
+ 		return true;
+ 	default:
+ 		BUG();
 -- 
 2.16.4
 
