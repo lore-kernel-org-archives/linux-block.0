@@ -6,58 +6,66 @@ X-Spam-Status: No, score=-0.6 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
 	HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS
 	autolearn=no autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 02183C33CB2
-	for <linux-block@archiver.kernel.org>; Fri, 31 Jan 2020 06:36:55 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id E9D47C35240
+	for <linux-block@archiver.kernel.org>; Fri, 31 Jan 2020 06:42:32 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.kernel.org (Postfix) with ESMTP id C7E28214D8
-	for <linux-block@archiver.kernel.org>; Fri, 31 Jan 2020 06:36:54 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id C08E821734
+	for <linux-block@archiver.kernel.org>; Fri, 31 Jan 2020 06:42:32 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (2048-bit key) header.d=infradead.org header.i=@infradead.org header.b="cs3mINyj"
+	dkim=fail reason="signature verification failed" (2048-bit key) header.d=infradead.org header.i=@infradead.org header.b="mbwTRV+J"
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1726017AbgAaGgy (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Fri, 31 Jan 2020 01:36:54 -0500
-Received: from bombadil.infradead.org ([198.137.202.133]:53192 "EHLO
+        id S1726023AbgAaGmc (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Fri, 31 Jan 2020 01:42:32 -0500
+Received: from bombadil.infradead.org ([198.137.202.133]:53334 "EHLO
         bombadil.infradead.org" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1725815AbgAaGgy (ORCPT
+        with ESMTP id S1725832AbgAaGmb (ORCPT
         <rfc822;linux-block@vger.kernel.org>);
-        Fri, 31 Jan 2020 01:36:54 -0500
+        Fri, 31 Jan 2020 01:42:31 -0500
 DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed;
         d=infradead.org; s=bombadil.20170209; h=In-Reply-To:Content-Type:MIME-Version
         :References:Message-ID:Subject:Cc:To:From:Date:Sender:Reply-To:
         Content-Transfer-Encoding:Content-ID:Content-Description:Resent-Date:
         Resent-From:Resent-Sender:Resent-To:Resent-Cc:Resent-Message-ID:List-Id:
         List-Help:List-Unsubscribe:List-Subscribe:List-Post:List-Owner:List-Archive;
-         bh=4C91OmxMHJbf2dvjbKRIv7O9Ffsa52p52fBfuWZA76w=; b=cs3mINyjlbh/P8XlEo6zHtKcX
-        gz0hU18eOOvnenPCLVFQW6LHiiMVTfOu6vo0xwy3rWX6uc5XJpJNaF/da1A70uVDkkSbtDkJZObVu
-        4UNlGDc6c6cpc4oKKO3KDH818j2nwPWJQjpghd9jYhfsp82l1UhE6bsX7zfIVM+ssHqI0h7VsFnIF
-        Vo/ThkTRjF7ub39ros8yJm0q4T+Zo7v5/YXEwYNyYKRre8HAeNmhw4s+vHs90dWo8gleevzDc7Yfv
-        GZGPUlTF9gQKR1zDarlf7SZrtRbAwk6x8L/BC62uyBWtJXsFW3vAhxCKzluRzbtt/VsTMvmotVzcj
-        Cj0g85HNQ==;
+         bh=4RziqBNwPU1PXyuUYR4uTQ9MUQMUjgsmxUEvgGf8uVg=; b=mbwTRV+JFE7kOQ/Zc1q7EWWLo
+        b/r6VaG5PA2zFHi4pvVcHg00QQM2cM663Xq1D41XOwf0UQdQdBNI2xvUvvuRWZc0z3F9LIYg5uvSB
+        Od2BHuooTiRfcTGuydXKRdUSEgl6XNVJsSYSUM37WQMbf/wb7XNSVQDdHWL3GqkwTsluhlPKhw6S/
+        EP3EB4/pADxjzTK6JdQpS2tIBSbJEw8Ly4vzgw/v+FJrXluZhHIuqgyn0eOfaxQ3TI9XX6banLZW8
+        zNWG9hIz5ggAbgKPzcd24gpk7VbDWT32ozJTEJsOQql+384AXzT7RsS4uJWfpkFJ7BZl+lVgNVI5k
+        PbQlk0vAw==;
 Received: from hch by bombadil.infradead.org with local (Exim 4.92.3 #3 (Red Hat Linux))
-        id 1ixPvB-000799-A5; Fri, 31 Jan 2020 06:36:53 +0000
-Date:   Thu, 30 Jan 2020 22:36:53 -0800
+        id 1ixQ0c-0000EL-Oy; Fri, 31 Jan 2020 06:42:30 +0000
+Date:   Thu, 30 Jan 2020 22:42:30 -0800
 From:   Christoph Hellwig <hch@infradead.org>
-To:     Andrzej Jakowski <andrzej.jakowski@linux.intel.com>
-Cc:     axboe@kernel.dk, song@kernel.org, linux-block@vger.kernel.org,
-        linux-raid@vger.kernel.org,
-        Artur Paszkiewicz <artur.paszkiewicz@intel.com>
-Subject: Re: [PATCH 2/2] md: enable io polling
-Message-ID: <20200131063653.GD6267@infradead.org>
-References: <20200126044138.5066-1-andrzej.jakowski@linux.intel.com>
- <20200126044138.5066-3-andrzej.jakowski@linux.intel.com>
+To:     Bijan Mottahedeh <bijan.mottahedeh@oracle.com>
+Cc:     axboe@kernel.dk, linux-block@vger.kernel.org,
+        io-uring@vger.kernel.org
+Subject: Re: [PATCH 1/1] block: Manage bio references so the bio persists
+ until necessary
+Message-ID: <20200131064230.GA28151@infradead.org>
+References: <1580441022-59129-1-git-send-email-bijan.mottahedeh@oracle.com>
+ <1580441022-59129-2-git-send-email-bijan.mottahedeh@oracle.com>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=us-ascii
 Content-Disposition: inline
-In-Reply-To: <20200126044138.5066-3-andrzej.jakowski@linux.intel.com>
+In-Reply-To: <1580441022-59129-2-git-send-email-bijan.mottahedeh@oracle.com>
 X-SRS-Rewrite: SMTP reverse-path rewritten from <hch@infradead.org> by bombadil.infradead.org. See http://www.infradead.org/rpr.html
 Sender: linux-block-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-> +	rdev_for_each(rdev, mddev) {
-> +		if (rdev->raid_disk >= 0 && !test_bit(Faulty, &rdev->flags)) {
-> +			rv = blk_poll(bdev_get_queue(rdev->bdev), cookie, false);
+On Thu, Jan 30, 2020 at 07:23:42PM -0800, Bijan Mottahedeh wrote:
+> Get a reference to a bio, so it won't be freed if end_io() gets to
+> it before submit_io() returns.  Defer the release of the first bio
+> in a mult-bio request until the last end_io() since the first bio is
+> embedded in the dio structure and must therefore persist through an
+> entire multi-bio request.
 
-This adds a > 80 char line.  But if you just use a continue to skip
-the not allicable ones you even clean up the code while avoiding that.
+Can you explain the issue a little more?
+
+The initial bio is embedded into the dio, and will have a reference
+until the bio_put call at the end of the function, so we can't have
+a race for that one and won't ever need the refcount for the single
+bio case.  Avoiding the atomic is pretty important for aio/uring
+performance.
