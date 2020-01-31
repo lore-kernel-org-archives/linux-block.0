@@ -2,68 +2,71 @@ Return-Path: <SRS0=MKaG=3U=vger.kernel.org=linux-block-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-3.9 required=3.0 tests=DKIM_SIGNED,DKIM_VALID,
-	DKIM_VALID_AU,HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SPF_HELO_NONE,
-	SPF_PASS,USER_AGENT_GIT autolearn=no autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-9.8 required=3.0 tests=DKIM_SIGNED,DKIM_VALID,
+	DKIM_VALID_AU,HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,
+	SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED,USER_AGENT_GIT
+	autolearn=unavailable autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 5AD03C33CB2
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 862E8C47409
 	for <linux-block@archiver.kernel.org>; Fri, 31 Jan 2020 09:25:22 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.kernel.org (Postfix) with ESMTP id 2F72620705
+	by mail.kernel.org (Postfix) with ESMTP id 5C7EF21734
 	for <linux-block@archiver.kernel.org>; Fri, 31 Jan 2020 09:25:22 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=pass (2048-bit key) header.d=linaro.org header.i=@linaro.org header.b="ui7hbxTO"
+	dkim=pass (2048-bit key) header.d=linaro.org header.i=@linaro.org header.b="cg+0ln31"
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1728260AbgAaJY7 (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Fri, 31 Jan 2020 04:24:59 -0500
-Received: from mail-wm1-f66.google.com ([209.85.128.66]:53191 "EHLO
-        mail-wm1-f66.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1728230AbgAaJY7 (ORCPT
+        id S1728247AbgAaJZV (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Fri, 31 Jan 2020 04:25:21 -0500
+Received: from mail-wm1-f67.google.com ([209.85.128.67]:54275 "EHLO
+        mail-wm1-f67.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S1728259AbgAaJY7 (ORCPT
         <rfc822;linux-block@vger.kernel.org>);
         Fri, 31 Jan 2020 04:24:59 -0500
-Received: by mail-wm1-f66.google.com with SMTP id p9so7086019wmc.2
-        for <linux-block@vger.kernel.org>; Fri, 31 Jan 2020 01:24:56 -0800 (PST)
+Received: by mail-wm1-f67.google.com with SMTP id g1so7068804wmh.4
+        for <linux-block@vger.kernel.org>; Fri, 31 Jan 2020 01:24:57 -0800 (PST)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=linaro.org; s=google;
-        h=from:to:cc:subject:date:message-id:mime-version
-         :content-transfer-encoding;
-        bh=vSXbMxnOg8YIX/3kR6+7l+XVNm8PvjjA37JEVs4qXJA=;
-        b=ui7hbxTOZhC0wBm4XNnnM0Qrgnmx1S1n0GrL/Laudw0hYYdsR1GLIa9vOUBxjFZlHz
-         HhUqsfWj+95bLSa2fDIqoAy2Sju/2K+fz2mPXDywWxSV9lAQNBE+sibovuiLHGDn2Prc
-         ts8yBm+V8hKRLucF6mM+5eGEnjgbMResPLnLf/15pN9uHZtj/qWPBth7G5O0cFI62R1Q
-         rPrruQnZ0uu+PVy+Lx2pwT4PKKZcD3H/USUe5xcWlKF+KPCBZ78CkF8gtcKU0r32MACG
-         ZVt+ZjVbWcZ5MHz/pAqB1m1kSJWBdYp4SL6FZcgsZMg868zQsB2SMjufSaUHf2HvDowP
-         s0CQ==
+        h=from:to:cc:subject:date:message-id:in-reply-to:references
+         :mime-version:content-transfer-encoding;
+        bh=wqMailTmZiDzGAaQzZRxkipnoj+fRUU9PJ6V3DKETq8=;
+        b=cg+0ln31NwklwCB7MdEWW8MYShl/I69uRq/+lHKzxdRZ96HLCFrwcuZLt+lSqzk7nW
+         qcnS1o0KGzDAJ3Zx4vC3/JQYx7272k6nDjqQZ3fmMVmfmsHLeOQAMrO28UnGbNi3gM15
+         CpFeDHgtWvJUnC2HffD6RGczVRbyy9SPQC7gBzHEasBRS3e+1VLcGcmPnhfIu/1Kqswk
+         uKU/+fDMpNyB3VUZUWW4p13Iv+F36S3KJ6rMIrmUAD3czTDhzESGp07SwXHe4Ty/0bVA
+         A8+3DKtLQtwv9phsvdLm3L6H8F3EbbqjlWpIvD9vARKaGPlD44fJsEsMzNkWhrV/MAgS
+         thQw==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=1e100.net; s=20161025;
-        h=x-gm-message-state:from:to:cc:subject:date:message-id:mime-version
-         :content-transfer-encoding;
-        bh=vSXbMxnOg8YIX/3kR6+7l+XVNm8PvjjA37JEVs4qXJA=;
-        b=UYtLbECYX1MtOTkV37OFn1XPpMZ/Up/XcMr7tMd6O5bEpds2dgyQnGwYktEzDIwMcE
-         6ioN6FAhkSut+1ik7eR3NiK8C9DzRbbolTUPyVlDERXqrxBqnK4PVdVzzgVN02tBOEKd
-         AABPl+KEoiqQ1yE6NREso3PHmImCW5A2+o9l6ZUpzZd5eE2cOxu2P9JexMWwDifXcvuL
-         uoSeQBplOLFGKdPVANcFV/jwPeNG2sEFbbVnKOwUHG56wfvK+BhhBbmLF4byLHuZTCNa
-         DkRsIZWu+PnvegtxTpXKZSrAvAyttNmyK0bfiE1kwb4JJ7Soxg5oOpQBN0zWDbfG4XWJ
-         eqGg==
-X-Gm-Message-State: APjAAAU5ffUZ1NojXyv+uQAZMZC1ILMNkjxv8+btryOU0yY0o6KEbfRz
-        aVimgpcFP/Ng4ixU691MDep7wA==
-X-Google-Smtp-Source: APXvYqwIzUPuurz2q/j3XhmwutPdbx25t66VPpjsBDm8EXvsA9RKUuu8D/EHwhxi1yQ72R9rcNqNdA==
-X-Received: by 2002:a1c:7c11:: with SMTP id x17mr11703127wmc.168.1580462695648;
-        Fri, 31 Jan 2020 01:24:55 -0800 (PST)
+        h=x-gm-message-state:from:to:cc:subject:date:message-id:in-reply-to
+         :references:mime-version:content-transfer-encoding;
+        bh=wqMailTmZiDzGAaQzZRxkipnoj+fRUU9PJ6V3DKETq8=;
+        b=YR/aSMo6JveJXQxJqP5eef8wzmnhHaDbEPMnaA8DzpJ3+va3AJcBBPzrTuL3yWxGvc
+         hhYQPOMR3OBbLhi7bIds8SlEjrV/2QZuI3Z9z+ewhRmt4YhweAsg7GdeNBi8zL+bMGo2
+         3TFIuNc9nuwgiTXxQmx+ActIAXVFccDvhPsu1Miu+e8jmtg/kV2//pQcQ5hlfCFR9KI6
+         auvy4OMXZDV3i72q6Xz++wAJ98PR9m1aPeMLXtrk977CY/lFtqv53QmXgLMK1kAXiSCu
+         HB7+9aMzBgVaHB68ABf7zPiwG9IEwF50t8Eb3/OzCRBp84JGhsb9+L1bPWiJv2G82F3m
+         zsgA==
+X-Gm-Message-State: APjAAAWNUc+YVRzKLUU8diwElJBaN9FFnq7QXzWhLv/swzJf5r52ulZK
+        cBMCZARZ0iirYQS6AlUrshKrMg==
+X-Google-Smtp-Source: APXvYqwrdqLrYbDRrX76bBTfOceHiNyXfbVom/20wFvv7o5waUNKFqTZ4kzC62WNF3Jm9I2zZXHVvA==
+X-Received: by 2002:a05:600c:2109:: with SMTP id u9mr11380404wml.183.1580462696845;
+        Fri, 31 Jan 2020 01:24:56 -0800 (PST)
 Received: from localhost.localdomain (88-147-73-186.dyn.eolo.it. [88.147.73.186])
-        by smtp.gmail.com with ESMTPSA id 16sm10144364wmi.0.2020.01.31.01.24.54
+        by smtp.gmail.com with ESMTPSA id 16sm10144364wmi.0.2020.01.31.01.24.55
         (version=TLS1_2 cipher=ECDHE-RSA-AES128-GCM-SHA256 bits=128/128);
-        Fri, 31 Jan 2020 01:24:54 -0800 (PST)
+        Fri, 31 Jan 2020 01:24:56 -0800 (PST)
 From:   Paolo Valente <paolo.valente@linaro.org>
 To:     Jens Axboe <axboe@kernel.dk>
 Cc:     linux-block@vger.kernel.org, linux-kernel@vger.kernel.org,
         bfq-iosched@googlegroups.com, oleksandr@natalenko.name,
         patdung100@gmail.com, cevich@redhat.com,
         Paolo Valente <paolo.valente@linaro.org>
-Subject: [PATCH BUGFIX 0/6] block, bfq: series of fixes, and not only, for some recently reported issues
-Date:   Fri, 31 Jan 2020 10:24:03 +0100
-Message-Id: <20200131092409.10867-1-paolo.valente@linaro.org>
+Subject: [PATCH BUGFIX 1/6] block, bfq: do not plug I/O for bfq_queues with no proc refs
+Date:   Fri, 31 Jan 2020 10:24:04 +0100
+Message-Id: <20200131092409.10867-2-paolo.valente@linaro.org>
 X-Mailer: git-send-email 2.20.1
+In-Reply-To: <20200131092409.10867-1-paolo.valente@linaro.org>
+References: <20200131092409.10867-1-paolo.valente@linaro.org>
 MIME-Version: 1.0
 Content-Transfer-Encoding: 8bit
 Sender: linux-block-owner@vger.kernel.org
@@ -71,30 +74,67 @@ Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-Hi Jens,
-these patches are mostly fixes for the issues reported in [1, 2]. All
-patches have been publicly tested in the dev version of BFQ.
+Commit 478de3380c1c ("block, bfq: deschedule empty bfq_queues not
+referred by any process") fixed commit 3726112ec731 ("block, bfq:
+re-schedule empty queues if they deserve I/O plugging") by
+descheduling an empty bfq_queue when it remains with not process
+reference. Yet, this still left a case uncovered: an empty bfq_queue
+with not process reference that remains in service. This happens for
+an in-service sync bfq_queue that is deemed to deserve I/O-dispatch
+plugging when it remains empty. Yet no new requests will arrive for
+such a bfq_queue if no process sends requests to it any longer. Even
+worse, the bfq_queue may happen to be prematurely freed while still in
+service (because there may remain no reference to it any longer).
 
-Thanks,
-Paolo
+This commit solves this problem by preventing I/O dispatch from being
+plugged for the in-service bfq_queue, if the latter has no process
+reference (the bfq_queue is then prevented from remaining in service).
 
-[1] https://bugzilla.redhat.com/show_bug.cgi?id=1767539
-[2] https://bugzilla.kernel.org/show_bug.cgi?id=205447
+Fixes: 3726112ec731 ("block, bfq: re-schedule empty queues if they deserve I/O plugging")
+Reported-by: Patrick Dung <patdung100@gmail.com>
+Tested-by: Patrick Dung <patdung100@gmail.com>
+Signed-off-by: Paolo Valente <paolo.valente@linaro.org>
+---
+ block/bfq-iosched.c | 12 ++++++++++++
+ 1 file changed, 12 insertions(+)
 
-Paolo Valente (6):
-  block, bfq: do not plug I/O for bfq_queues with no proc refs
-  block, bfq: do not insert oom queue into position tree
-  block, bfq: get extra ref to prevent a queue from being freed during a
-    group move
-  block, bfq: extend incomplete name of field on_st
-  block, bfq: get a ref to a group when adding it to a service tree
-  block, bfq: clarify the goal of bfq_split_bfqq()
-
- block/bfq-cgroup.c  | 12 ++++++++++--
- block/bfq-iosched.c | 20 +++++++++++++++++++-
- block/bfq-iosched.h |  3 ++-
- block/bfq-wf2q.c    | 27 ++++++++++++++++++++++-----
- 4 files changed, 53 insertions(+), 9 deletions(-)
-
---
+diff --git a/block/bfq-iosched.c b/block/bfq-iosched.c
+index 4686b68b48b4..55d4328e7c12 100644
+--- a/block/bfq-iosched.c
++++ b/block/bfq-iosched.c
+@@ -3443,6 +3443,10 @@ static void bfq_dispatch_remove(struct request_queue *q, struct request *rq)
+ static bool idling_needed_for_service_guarantees(struct bfq_data *bfqd,
+ 						 struct bfq_queue *bfqq)
+ {
++	/* No point in idling for bfqq if it won't get requests any longer */
++	if (unlikely(!bfqq_process_refs(bfqq)))
++		return false;
++
+ 	return (bfqq->wr_coeff > 1 &&
+ 		(bfqd->wr_busy_queues <
+ 		 bfq_tot_busy_queues(bfqd) ||
+@@ -4076,6 +4080,10 @@ static bool idling_boosts_thr_without_issues(struct bfq_data *bfqd,
+ 		bfqq_sequential_and_IO_bound,
+ 		idling_boosts_thr;
+ 
++	/* No point in idling for bfqq if it won't get requests any longer */
++	if (unlikely(!bfqq_process_refs(bfqq)))
++		return false;
++
+ 	bfqq_sequential_and_IO_bound = !BFQQ_SEEKY(bfqq) &&
+ 		bfq_bfqq_IO_bound(bfqq) && bfq_bfqq_has_short_ttime(bfqq);
+ 
+@@ -4169,6 +4177,10 @@ static bool bfq_better_to_idle(struct bfq_queue *bfqq)
+ 	struct bfq_data *bfqd = bfqq->bfqd;
+ 	bool idling_boosts_thr_with_no_issue, idling_needed_for_service_guar;
+ 
++	/* No point in idling for bfqq if it won't get requests any longer */
++	if (unlikely(!bfqq_process_refs(bfqq)))
++		return false;
++
+ 	if (unlikely(bfqd->strict_guarantees))
+ 		return true;
+ 
+-- 
 2.20.1
+
