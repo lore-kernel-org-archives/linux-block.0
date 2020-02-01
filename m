@@ -2,168 +2,267 @@ Return-Path: <SRS0=B3LW=3V=vger.kernel.org=linux-block-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-0.8 required=3.0 tests=DKIM_SIGNED,DKIM_VALID,
-	DKIM_VALID_AU,HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SPF_HELO_NONE,
-	SPF_PASS autolearn=no autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-7.6 required=3.0 tests=DKIMWL_WL_HIGH,DKIM_SIGNED,
+	DKIM_VALID,DKIM_VALID_AU,MAILING_LIST_MULTI,MENTIONS_GIT_HOSTING,
+	SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED,USER_AGENT_SANE_2 autolearn=ham
+	autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 3ADCCC33C9E
-	for <linux-block@archiver.kernel.org>; Sat,  1 Feb 2020 10:33:49 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 2912EC33C9E
+	for <linux-block@archiver.kernel.org>; Sat,  1 Feb 2020 11:05:46 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.kernel.org (Postfix) with ESMTP id ECA502067C
-	for <linux-block@archiver.kernel.org>; Sat,  1 Feb 2020 10:33:48 +0000 (UTC)
-Authentication-Results: mail.kernel.org;
-	dkim=pass (2048-bit key) header.d=anarazel.de header.i=@anarazel.de header.b="BybiAnlY";
-	dkim=pass (2048-bit key) header.d=messagingengine.com header.i=@messagingengine.com header.b="QeL8UH42"
+	by mail.kernel.org (Postfix) with ESMTP id D8C0C206F0
+	for <linux-block@archiver.kernel.org>; Sat,  1 Feb 2020 11:05:45 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+	s=default; t=1580555146;
+	bh=MmnUad1/SVXDshe3b4fWDYgahKsmS7jd9ndtexZNX1E=;
+	h=Date:From:To:Cc:Subject:In-Reply-To:References:List-ID:From;
+	b=aC4a7dmdXQ+wd4A9o8nljwC2MHf3AtkP8ht6II8YybqRNqpnHqTb38wLeOreNY6bh
+	 OUJdJUr1Sff7SoF2cHxuzLFh0P3tCjFwzjeArM6Ple9T6RIdBS20DfyTh7hHd+xr8L
+	 eWt3i5J9R1x/KvSzRQE9fs/SnNeMGf81w581YUZk=
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1726335AbgBAKds (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Sat, 1 Feb 2020 05:33:48 -0500
-Received: from wout4-smtp.messagingengine.com ([64.147.123.20]:53515 "EHLO
-        wout4-smtp.messagingengine.com" rhost-flags-OK-OK-OK-OK)
-        by vger.kernel.org with ESMTP id S1726297AbgBAKdr (ORCPT
-        <rfc822;linux-block@vger.kernel.org>);
-        Sat, 1 Feb 2020 05:33:47 -0500
-Received: from compute5.internal (compute5.nyi.internal [10.202.2.45])
-        by mailout.west.internal (Postfix) with ESMTP id 4071D4C4;
-        Sat,  1 Feb 2020 05:33:46 -0500 (EST)
-Received: from mailfrontend2 ([10.202.2.163])
-  by compute5.internal (MEProxy); Sat, 01 Feb 2020 05:33:46 -0500
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=anarazel.de; h=
-        date:from:to:cc:subject:message-id:references:mime-version
-        :content-type:in-reply-to; s=fm3; bh=2ixvT2Cpjuf+3JgsEZKQR8NzhQJ
-        h/pDTdGylFM212no=; b=BybiAnlYT8fZq9f126FXFlOulEy4SItZLz90jPGnp9B
-        sUGzVcPRM2r9tRqYnFpvqb/nOc0rdJ6EpZCsHhawR2lyFIlxJJe74y9Tqb5Ev59G
-        Xc7l0brF8nePpYrSY09I0KxrhftKMRSr8tr9N1hFu7fWAz2DWVbflDo+Rd1V1PIm
-        9AaDB2OPss3/pE+3LMSTSdYw3rDBB2KGEkBOK8aEkgt5GGh+ixdcbG98RwQtWZ/+
-        9oCcKfrEEhJXzqEDSaOz7jTZYtjjeYYdW3YVnJiDOiEphUFD2e06PCpOAS1u8slg
-        XlnAKQRthGfcC5yR4ClHdinWIOGYnVi3jgWr9L92NSw==
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=
-        messagingengine.com; h=cc:content-type:date:from:in-reply-to
-        :message-id:mime-version:references:subject:to:x-me-proxy
-        :x-me-proxy:x-me-sender:x-me-sender:x-sasl-enc; s=fm1; bh=2ixvT2
-        Cpjuf+3JgsEZKQR8NzhQJh/pDTdGylFM212no=; b=QeL8UH420iudpUpVyBBrLS
-        3OwR5xR9+4J2suHdBj8bJV7L18WUhHT8CCnj009U23vJqA6+wKLWHiJqsQKTFo/Y
-        zKNnOzmAm3nlP7xamLEFV/P+KfeE9nMFoFMm7Pi3B1DE6HAGsIGCmXRY8MJdlud/
-        zIAFZ8ssix864xyIklJbR1XdO10oTd9ytI0hKcnmuJd/M8FbzAWTUiUZnA6KMwpe
-        ZrMAsfa26XVrGs1rvuXlpGynYYXqHdUZA44G8Q5TVfmv8+eqknkcWrx7cjulVSgK
-        HK4y8NM9bh7/L0HnzPjD1HRux2miLFEH9rYpbpx52bsHbJbnsv7h+dhcHFOTZYBg
-        ==
-X-ME-Sender: <xms:B1Q1XgZmC_xa8tEhX-OUxnsc1b24BjBK-pCHr2UED78qP3AQ77ewVw>
-X-ME-Proxy-Cause: gggruggvucftvghtrhhoucdtuddrgedugedrgedvgdduiecutefuodetggdotefrodftvf
-    curfhrohhfihhlvgemucfhrghsthforghilhdpqfgfvfdpuffrtefokffrpgfnqfghnecu
-    uegrihhlohhuthemuceftddtnecusecvtfgvtghiphhivghnthhsucdlqddutddtmdenuc
-    fjughrpeffhffvuffkfhggtggujgesthdtredttddtvdenucfhrhhomheptehnughrvghs
-    ucfhrhgvuhhnugcuoegrnhgurhgvshesrghnrghrrgiivghlrdguvgeqnecukfhppedvud
-    dvrdejiedrvdehfedrudejudenucevlhhushhtvghrufhiiigvpedtnecurfgrrhgrmhep
-    mhgrihhlfhhrohhmpegrnhgurhgvshesrghnrghrrgiivghlrdguvg
-X-ME-Proxy: <xmx:B1Q1XigGK0ODk4npDJGsYcZhsyFUTUl7ykGsRlfwa3HmwW03XWMpqw>
-    <xmx:B1Q1XtULlI0tUXIhSTqRtwq79amIcdfCct8cwQ2Nf9EOZCBVnwa8kQ>
-    <xmx:B1Q1XkVSZqa43b-_uUwzYdO8Ud8aXRkddoFF95E9W8uLEOEJ-Ny0jw>
-    <xmx:CVQ1XukHbeh8-wS72xRqv2ATW6Bapoop4o-2t0BeNWD7T2HvtZHQhA>
-Received: from intern.anarazel.de (unknown [212.76.253.171])
-        by mail.messagingengine.com (Postfix) with ESMTPA id 960193060A08;
-        Sat,  1 Feb 2020 05:33:43 -0500 (EST)
-Date:   Sat, 1 Feb 2020 02:33:42 -0800
-From:   Andres Freund <andres@anarazel.de>
-To:     Chris Mason <clm@fb.com>
-Cc:     Dave Chinner <david@fromorbit.com>, Jens Axboe <axboe@kernel.dk>,
-        Linus Torvalds <torvalds@linux-foundation.org>,
-        Linux-MM <linux-mm@kvack.org>,
-        linux-fsdevel <linux-fsdevel@vger.kernel.org>,
+        id S1726297AbgBALFp (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Sat, 1 Feb 2020 06:05:45 -0500
+Received: from mail.kernel.org ([198.145.29.99]:56746 "EHLO mail.kernel.org"
+        rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
+        id S1726175AbgBALFp (ORCPT <rfc822;linux-block@vger.kernel.org>);
+        Sat, 1 Feb 2020 06:05:45 -0500
+Received: from disco-boy.misterjones.org (disco-boy.misterjones.org [51.254.78.96])
+        (using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+        (No client certificate requested)
+        by mail.kernel.org (Postfix) with ESMTPSA id C585E206E3;
+        Sat,  1 Feb 2020 11:05:43 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+        s=default; t=1580555143;
+        bh=MmnUad1/SVXDshe3b4fWDYgahKsmS7jd9ndtexZNX1E=;
+        h=Date:From:To:Cc:Subject:In-Reply-To:References:From;
+        b=KtXJ8xe8xdZflLpv0RyAEjzqpy+sitAXGrettxvyDOEI67jh3fmWcqMdZurJ1PS7p
+         g7619DQKlzmR7iWv/Ouj5zJRoB80/1QwQo/OdUwC9/k0j6yni6LyqfUd3T/1Rn9WCk
+         ggmFEU+e71+TIdm4dhimUihVwkiG/Opck14StcWo=
+Received: from 78.163-31-62.static.virginmediabusiness.co.uk ([62.31.163.78] helo=why)
+        by disco-boy.misterjones.org with esmtpsa (TLS1.3:ECDHE_RSA_AES_256_GCM_SHA384:256)
+        (Exim 4.92)
+        (envelope-from <maz@kernel.org>)
+        id 1ixqar-002Ujj-IK; Sat, 01 Feb 2020 11:05:41 +0000
+Date:   Sat, 1 Feb 2020 11:05:39 +0000
+From:   Marc Zyngier <maz@kernel.org>
+To:     Ming Lei <tom.leiming@gmail.com>,
+        John Garry <john.garry@huawei.com>
+Cc:     Ming Lei <ming.lei@redhat.com>, Jens Axboe <axboe@kernel.dk>,
         linux-block <linux-block@vger.kernel.org>,
-        Matthew Wilcox <willy@infradead.org>,
-        Johannes Weiner <hannes@cmpxchg.org>
-Subject: Re: [PATCHSET v3 0/5] Support for RWF_UNCACHED
-Message-ID: <20200201103342.ktxbrhaqqhbrtg7p@alap3.anarazel.de>
-References: <CAHk-=wjz3LE1kznro1dozhk9i9Dr4pCnkj7Fuccn2xdWeGHawQ@mail.gmail.com>
- <d0adcde2-3106-4fea-c047-4d17111bab70@kernel.dk>
- <e43a2700-8625-e136-dc9d-d0d2da5d96ac@kernel.dk>
- <CAHk-=wje8i3DVcO=fMC4tzKTS5+eHv0anrVZa_JENQt08T=qCQ@mail.gmail.com>
- <0d4e3954-c467-30a7-5a8e-7c4180275533@kernel.dk>
- <CAHk-=whk4bcVPvtAv5OmHiW5z6AXgCLFhO4YrXD7o0XC+K-aHw@mail.gmail.com>
- <fef996ca-a4ed-9633-1f79-91292a984a20@kernel.dk>
- <e7fc6b37-8106-4fe2-479c-05c3f2b1c1f1@kernel.dk>
- <20191212221818.GG19213@dread.disaster.area>
- <C08B7F86-C3D6-47C6-AB17-6F234EA33687@fb.com>
+        Bart Van Assche <bvanassche@acm.org>,
+        Hannes Reinecke <hare@suse.com>,
+        Christoph Hellwig <hch@lst.de>,
+        Thomas Gleixner <tglx@linutronix.de>,
+        "chenxiang (M)" <chenxiang66@hisilicon.com>,
+        Keith Busch <kbusch@kernel.org>
+Subject: Re: [PATCH V5 0/6] blk-mq: improvement CPU hotplug
+Message-ID: <20200201110539.03db5434@why>
+In-Reply-To: <CACVXFVNiBOBdtwuW=q4aSmUMAnn6Gfpg6BGhcQu44s58NZ08Ww@mail.gmail.com>
+References: <20200115114409.28895-1-ming.lei@redhat.com>
+        <929dbfac-de46-a947-6a2c-f4d8d504c631@huawei.com>
+        <6dbe8c9f-af4e-3157-b6e9-6bbf43efb1e1@huawei.com>
+        <CACVXFVN8io2Pj1HZWLy=z1dbDrE3h9Q6B0DA4gdGOdK3+bRRPg@mail.gmail.com>
+        <b1f67efb-585d-e0c1-460f-52be0041b37a@huawei.com>
+        <CACVXFVOk3cnRqyngYjHPPtLM1Wn8p3=hP8C3tBns9nDQAnoCyQ@mail.gmail.com>
+        <14cb0d17-f9e6-ffa8-7a98-bd602c72273f@huawei.com>
+        <56502aa9-d4ad-5ede-5184-13f1817c77d7@huawei.com>
+        <CACVXFVNiBOBdtwuW=q4aSmUMAnn6Gfpg6BGhcQu44s58NZ08Ww@mail.gmail.com>
+Organization: Approximate
+X-Mailer: Claws Mail 3.17.4 (GTK+ 2.24.32; x86_64-pc-linux-gnu)
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <C08B7F86-C3D6-47C6-AB17-6F234EA33687@fb.com>
+Content-Type: text/plain; charset=US-ASCII
+Content-Transfer-Encoding: 7bit
+X-SA-Exim-Connect-IP: 62.31.163.78
+X-SA-Exim-Rcpt-To: tom.leiming@gmail.com, john.garry@huawei.com, ming.lei@redhat.com, axboe@kernel.dk, linux-block@vger.kernel.org, bvanassche@acm.org, hare@suse.com, hch@lst.de, tglx@linutronix.de, chenxiang66@hisilicon.com, kbusch@kernel.org
+X-SA-Exim-Mail-From: maz@kernel.org
+X-SA-Exim-Scanned: No (on disco-boy.misterjones.org); SAEximRunCond expanded to false
 Sender: linux-block-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-Hi,
+On Sat, 1 Feb 2020 09:31:17 +0800
+Ming Lei <tom.leiming@gmail.com> wrote:
 
-On 2019-12-13 01:32:10 +0000, Chris Mason wrote:
-> Grepping through the code shows a wonderful assortment of helpers to
-> control the cache, and RWF_UNCACHED would be both cleaner and faster
-> than what we have today.  I'm on the fence about asking for
-> RWF_FILE_RANGE_WRITE (+/- naming) to force writes to start without
-> pitching pages, but we can talk to some service owners to see how useful
-> that would be.   They can always chain a sync_file_range() in io_uring,
-> but RWF_ would be lower overhead if it were a common pattern.
+> On Sat, Feb 1, 2020 at 2:02 AM John Garry <john.garry@huawei.com> wrote:
+> >
+> > On 31/01/2020 17:51, John Garry wrote:  
+> > > +- Keith  
+> >
+> > + Marc, on rare chance that this is related to the GIC
+> >  
+> > >
+> > > On 31/01/2020 10:58, Ming Lei wrote:  
+> > >> On Fri, Jan 31, 2020 at 6:24 PM John Garry <john.garry@huawei.com> wrote:  
+> > >>>  
+> > >>>>> [  141.976109] Call trace:
+> > >>>>> [  141.978550]  __switch_to+0xbc/0x218
+> > >>>>> [  141.982029]  blk_mq_run_work_fn+0x1c/0x28
+> > >>>>> [  141.986027]  process_one_work+0x1e0/0x358
+> > >>>>> [  141.990025]  worker_thread+0x40/0x488
+> > >>>>> [  141.993678]  kthread+0x118/0x120
+> > >>>>> [  141.996897]  ret_from_fork+0x10/0x18  
+> > >>>>
+> > >>>> Hi John,
+> > >>>>
+> > >>>> Thanks for your test!
+> > >>>>  
+> > >>>
+> > >>> Hi Ming,
+> > >>>  
+> > >>>> Could you test the following patchset and only the last one is changed?
+> > >>>>
+> > >>>> https://github.com/ming1/linux/commits/my_for_5.6_block  
+> > >>>
+> > >>> For SCSI testing, I will ask my colleague Xiang Chen to test when he
+> > >>> returns to work. So I did not see this issue for my SCSI testing for
+> > >>> your original v5, but I was only using 1x as opposed to maybe 20x SAS
+> > >>> disks.
+> > >>>
+> > >>> BTW, did you test NVMe? For some reason I could not trigger a scenario
+> > >>> where we're draining the outstanding requests for a queue which is being
+> > >>> deactivated - I mean, the queues were always already quiesced.  
+> > >>
+> > >> I run cpu hotplug test on both NVMe and SCSI in KVM, and fio just runs
+> > >> as expected.
+> > >>
+> > >> NVMe is often 1:1 mapping, so it might be a bit difficult to trigger
+> > >> draining in-flight IOs.  
+> > >
+> > > I generally have a 4:1 mapping for my NVMe cards - so many CPUs.
+> > >
+> > > But more alarming is that I see this on every run:
+> > >
+> > > [  246.378744] psci: CPU6 killed (polled 0 ms)
+> > > [  246.427955] irq_migrate_all_off_this_cpu: 3 callbacks suppressed
+> > > [  246.427956] IRQ 822: no longer affine to CPU7
+> > > [  246.438586] CPU7: shutdown
+> > > [  246.441300] psci: CPU7 killed (polled 0 ms)
+> > > [  247.015206] pcieport 0000:00:08.0: can't change power state from
+> > > D3cold to D0 (config space inaccessible)
+> > > Jobs: 6[  267.503159] rcu: INFO: rcu_preempt detected stalls on CPUs/tasks:
+> > > [  267.509244] rcu: 25-...0: (1 GPs behind)
+> > > idle=11e/1/0x4000000000000000 softirq=1175/1177 fqs=2626
+> > > [  267.518283] (detected by 0, t=5255 jiffies, g=14001, q=1787)
+> > > [  267.524016] Task dump for CPU 25:
+> > > [  267.527318] irqbalance      R  running task        0  1275      1
+> > > 0x00000002
+> > > [  267.534354] Call trace:
+> > > [  267.536790]  __switch_to+0xbc/0x218
+> > > [  267.540266]  0xffff800014c53d68
+> > > Jobs: 6 (f=6): [R(6)][96.0%][r=0KiB/s[  278.195193] nvme nvme1:
+> > > controller is down; will reset: CSTS=0xffffffff, PCI_STATUS=0xffff
+> > > ,w=0KiB/s][r=0,w=0 IOPS][eta 00m:[  278.205197] nvme nvme0: controller
+> > > is down; will reset: CSTS=0xffffffff, PCI_STATUS=0xffff
+> > > Jobs: 6 (f=6): [R(6)][0.0%][r=0KiB/s,w=0KiB/s][r=0,w=0 IO[  330.523157]
+> > > rcu: INFO: rcu_preempt detected stalls on CPUs/tasks:
+> > > [  330.529242] rcu: 25-...0: (1 GPs behind)
+> > > idle=11e/1/0x4000000000000000 softirq=1175/1177 fqs=10503
+> > > [  330.538366] (detected by 0, t=21010 jiffies, g=14001, q=2318)
+> > > [  330.544186] Task dump for CPU 25:
+> > > [  330.547488] irqbalance      R  running task        0  1275      1
+> > > 0x00000002
+> > > [  330.554523] Call trace:
+> > > [  330.556958]  __switch_to+0xbc/0x218
+> > > [  330.560434]  0xffff800014c53d68
+> > > [  393.543155] rcu: INFO: rcu_preempt detected stalls on CPUs/tasks:
+> > > [  393.549242] rcu: 25-...0: (1 GPs behind)
+> > > idle=11e/1/0x4000000000000000 softirq=1175/1177 fqs=18379
+> > > [  393.558366] (detected by 8, t=36765 jiffies, g=14001, q=2385)
+> > > [  393.564187] Task dump for CPU 25:
+> > > [  393.567488] irqbalance      R  running task        0  1275      1
+> > > 0x00000002
+> > > [  393.574523] Call trace:
+> > > [  393.576960]  __switch_to+0xbc/0x218
+> > > [  393.580435]  0xffff800014c53d68
+> > > [  456.567156] rcu: INFO: rcu_preempt detected stalls on CPUs/tasks:
+> > > [  456.573246] rcu: 25-...0: (1 GPs behind)
+> > > idle=11e/1/0x4000000000000000 softirq=1175/1177 fqs=26255
+> > > [  456.582389] (detected by 90, t=52520 jiffies, g=14001, q=2397)
+> > > [  456.588296] Task dump for CPU 25:
+> > > [  456.591601] irqbalance      R  running task        0  1275      1
+> > > 0x00000002
+> > > [  456.598638] Call trace:
+> > > [  456.601078]  __switch_to+0xbc/0x218
+> > > [  456.604556]  0xffff800014c53d68
+> > > [  519.587152] rcu: INFO: rcu_preempt detected stalls on CPUs/tasks:
+> > > [  519.593235] rcu: 25-...0: (1 GPs behind)
+> > > idle=11e/1/0x4000000000000000 softirq=1175/1177 fqs=34131
+> > > [  519.602357] (detected by 90, t=68275 jiffies, g=14001, q=2405)
+> > > [  519.608264] Task dump for CPU 25:
+> > > [  519.611566] irqbalance      R  running task        0  1275      1
+> > > 0x00000002
+> > > [  519.618601] Call trace:
+> > > [  519.621036]  __switch_to+0xbc/0x218
+> > > [  519.624511]  0xffff800014c53d68
+> > > [  582.603153] rcu: INFO: rcu_preempt detected stalls on CPUs/tasks:
+> > > [  582.609236] rcu: 25-...0: (1 GPs behind)
+> > > idle=11e/1/0x4000000000000000 softirq=1175/1177 fqs=42006
+> > > [  582.618358] (detected by 90, t=84029 jiffies, g=14001, q=2409)
+> > > [  582.624265] Task dump for CPU 25:
+> > > [  582.627567] irqbalance      R  running task        0  1275      1
+> > > 0x00000002
+> > > [  582.634601] Call trace:
+> > > [  582.637036]  __switch_to+0xbc/0x218
+> > > [  582.640511]  0xffff800014c53d68
+> > >
+> > >
+> > > I tested v5.5 and I cannot see this, but your branch is based in 5.5-rc2
+> > > with lots of other stuff on top. The only thing I changed was
+> > > nvme.use_threaded_interrupts = 1.  
+> >
+> > Uhh, now I do with v5.5:
+> >
+> > [  705.354601] CPU22: shutdown
+> > [  705.357395] psci: CPU22 killed (polled 0 ms)
+> > [  705.402837] CPU23: shutdown
+> > [  705.405630] psci: CPU23 killed (polled 0 ms)
+> > [  705.666716] CPU24: shutdown
+> > [  705.669512] psci: CPU24 killed (polled 0 ms)
+> > [  705.966753] CPU25: shutdown
+> > [  705.969548] psci: CPU25 killed (polled 0 ms)
+> > [  706.250771] CPU26: shutdown=2347MiB/s,w=0KiB/s][r=601k,w=0 IOPS][eta
+> > 00m:13s]
+> > [  706.253565] psci: CPU26 killed (polled 0 ms)
+> > [  706.514728] CPU27: shutdown
+> > [  706.517523] psci: CPU27 killed (polled 0 ms)
+> > [  706.826708] CPU28: shutdown
+> > [  706.829502] psci: CPU28 killed (polled 0 ms)
+> > [  707.130916] CPU29: shutdown=2134MiB/s,w=0KiB/s][r=546k,w=0 IOPS][eta
+> > 00m:12s]
+> > [  707.133714] psci: CPU29 killed (polled 0 ms)
+> > [  707.439066] CPU30: shutdown
+> > [  707.441870] psci: CPU30 killed (polled 0 ms)
+> > [  707.706727] CPU31: shutdown
+> > [  707.709526] psci: CPU31 killed (polled 0 ms)
+> > [  708.521853] pcieport 0000:00:08.0: can't change power state from
+> > D3cold to D0 (config space inaccessible)
+> > [  728.741808] rcu: INFO: rcu_preempt detected stalls on
+> > CPUs/tasks:80d:00h:35m:42s]
+> > [  728.747895] rcu: 48-...0: (0 ticks this GP)
+> > idle=b3e/1/0x4000000000000000 softirq=5548/5548 fqs=2626
+> > [  728.757197] (detected by 63, t=5255 jiffies, g=40989, q=1890)
+> > [  728.763018] Task dump for CPU 48:
+> > [  728.766321] irqbalance      R  running task        0  1272      1
+> > 0x00000002
+> > [  728.773358] Call trace:
+> > [  728.775801]  __switch_to+0xbc/0x218
+> > [  728.779283]  gic_set_affinity+0x16c/0x1d8  
+> ...
+> 
+> gic_set_affinity shouldn't have switched out, so looks like one gic
+> issue.
 
-FWIW, for postgres something that'd allow us to do writes that
+Given that gic_set_affinity doesn't sleep, this looks pretty unlikely.
+And __irq_set_affinity() holds a spinlock with irq disabled, so I can't
+really explain how you'd get there. I've just booted a lockdep enabled
+v5.5 on my D05, moved SPIs around (because that's the only way to reach
+this code), and nothing caught fire.
 
-a) Doesn't remove pages from the pagecache if they're already there.
-b) Doesn't delay writeback to some unpredictable point later.
+Either the stack trace isn't reliable (when I read things like
+"80d:00h:35m:42s" in the trace, I'm a bit suspicious), or CPU hotplug is
+doing something really funky here.
 
-   The later write causes both latency issues, and often under-utilizes
-   write bandwidth for a while. For most cases where we write, we know
-   that we're not likely to write the same page again soon.
-
-c) Doesn't (except maybe temporarily) bring pages into the pagecache, if
-   they weren't before.
-
-   In the cases where the page previously wasn't in the page cache, and
-   we wrote it out, it's very likely to have been resident for long
-   enough in our cache, that the kernel caching it for the future isn't
-   useful.
-
-would be really helpful. Right now we simulate that to some degree by
-doing normal buffered writes followed by sync_file_range(WRITE).
-
-For most environments always using O_DIRECT isn't really an option for
-us, as we can't rely on settings being tuned well enough (i.e. using a
-large enough application cache), as well as continuing to want to
-support setups where using a large enough postgres buffer cache isn't an
-option because it'd prevent putting a number of variably used database
-servers on one piece of hardware.
-
-(There's also postgres side issues preventing us from doing O_DIRECT
-performantly, partially because we so far couldn't rely on AIO, due to
-also using buffered IO, but we're fixing that now.)
-
-
-For us a per-request interface where we'd have to fulfill all the
-requirements for O_DIRECT, but where neither reads nor writes would
-cause a page to move in/out of the pagecache, would be optimal for a
-good part of our IO. Especially when we still could get zero-copy IO for
-the pretty common case that there's no pagecache presence for a file at
-all.
-
-That'd allow us to use zero copy writes for the common case of a file's
-data fitting entirely in our cache, and us only occasionally writing the
-deta out at checkpoints. And do zero copy reads for the the cases where
-we know it's unnecessary for the kernel to cache (e.g. because we are
-scanning a few TB of data on a machine with less memory, because we're
-re-filling our cache after a restart, or because it's a maintenance
-operation doing the reading). But still rely on the kernel page cache
-for other reads where the kernel caching when memory is available is a
-huge benefit.  Some well tuned workloads would turn that off, to only
-use O_DIRECT, but everyone else would benefit with that being the
-default.
-
-We can concoct an approximation of that behaviour with a mix of
-sync_file_range() (to force writeback), RWF_NOWAIT (to see if we should
-read with O_DIRECT) and mmap()/mincore()/munmap() (to determine if
-writes should use O_DIRECT). But that's quite a bit of overhead.
-
-The reason that specifying this on a per-request basis would be useful
-is mainly that that would allow us to avoid having to either have two
-sets of FDs, or having to turn O_DIRECT on/off with fcntl.
-
-Greetings,
-
-Andres Freund
+	M.
+-- 
+Jazz is not dead. It just smells funny...
