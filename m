@@ -2,113 +2,72 @@ Return-Path: <SRS0=B3LW=3V=vger.kernel.org=linux-block-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-2.2 required=3.0 tests=DKIM_SIGNED,DKIM_VALID,
-	HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,
-	USER_AGENT_SANE_1 autolearn=no autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-0.6 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
+	HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS
+	autolearn=no autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 778C5C33C9E
-	for <linux-block@archiver.kernel.org>; Sat,  1 Feb 2020 04:48:56 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 072B7C33C9E
+	for <linux-block@archiver.kernel.org>; Sat,  1 Feb 2020 08:20:45 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.kernel.org (Postfix) with ESMTP id 480B3206D3
-	for <linux-block@archiver.kernel.org>; Sat,  1 Feb 2020 04:48:56 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id BF6E22067C
+	for <linux-block@archiver.kernel.org>; Sat,  1 Feb 2020 08:20:44 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel-dk.20150623.gappssmtp.com header.i=@kernel-dk.20150623.gappssmtp.com header.b="HBZz1k+W"
+	dkim=fail reason="signature verification failed" (2048-bit key) header.d=infradead.org header.i=@infradead.org header.b="oIO7D1Dm"
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1727156AbgBAEsw (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Fri, 31 Jan 2020 23:48:52 -0500
-Received: from mail-pg1-f193.google.com ([209.85.215.193]:44714 "EHLO
-        mail-pg1-f193.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1726772AbgBAEsv (ORCPT
-        <rfc822;linux-block@vger.kernel.org>);
-        Fri, 31 Jan 2020 23:48:51 -0500
-Received: by mail-pg1-f193.google.com with SMTP id x7so4665837pgl.11
-        for <linux-block@vger.kernel.org>; Fri, 31 Jan 2020 20:48:50 -0800 (PST)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=kernel-dk.20150623.gappssmtp.com; s=20150623;
-        h=subject:to:cc:references:from:message-id:date:user-agent
-         :mime-version:in-reply-to:content-language:content-transfer-encoding;
-        bh=SDiRJgIexvsCRZyBGBkTLxhYXwLjtWjl6c8nsRIE3KI=;
-        b=HBZz1k+Wprky9UL45iCfSEdfdTFJ3ZF6QhbNruPR0fUAbcYvUerrtVj7qkTM047lft
-         8BElWoGLtA/lNBXCt2J+ks/ph1k2Hza6tplCjFwGcM7mZUho5XfOjlqFoS2o1H8gXket
-         Yw8F9ap1aqe7PZ3c6pAyyrawdUZe/SMbgOy3gKMW+uAtVh5qnnljKK2L7Qf0IOqCcMHT
-         xyUHKX3uyc6rGLHboDxnhFAR8iwpzBDOlLjeO3fq5lokQqHMloU+yqA1Wcy3+8M+1Fz4
-         tadcu2Ak1t5pgBFPxY/E75URx36YERI4lJeXY+UMEsXL+zuU3VLOvBk9sjipG5/yh7D9
-         hAsA==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20161025;
-        h=x-gm-message-state:subject:to:cc:references:from:message-id:date
-         :user-agent:mime-version:in-reply-to:content-language
-         :content-transfer-encoding;
-        bh=SDiRJgIexvsCRZyBGBkTLxhYXwLjtWjl6c8nsRIE3KI=;
-        b=osJ0P+jRha5ttRww64fAZZuIp6VaKAGznDcTTYpd1c9nvjDRlMQGYhaVVgra2PxOrJ
-         xansjF/IjiFV62Ga4jQwQWLypmda9eJd2f5RFGe9ukdHPuuf9lRQjOJ9IBH42V6ODnYK
-         6L5Oi8scYukKT2YN7SBdX7Wv05uOi9lVUVCZ3yV6dVm4NCU6FfJdNB7jGcQfrJbiMpBY
-         SwcDUlzLi0H+fyvXNZgQ1dWGYxsk/Fz0jU//IBC9iqGNLbyPdzpE0xp8xSYF60lhS35F
-         Ew/a3tGQJiqeGiZDz4EGd+CRfuHuVEiIMw5U1EhvtPbujcZpywewRM91/VGyTLW6cJxG
-         4AvQ==
-X-Gm-Message-State: APjAAAWPOkrYfFX5wfcq2ttiRNRRqJkeeYDuHV8nYqrnb938Rrr0T3iH
-        /iZUPop4auPWvxqc4xHCnD+kxw==
-X-Google-Smtp-Source: APXvYqxF2uIMQQW0jF0M5Zly1z9uI1Fu8uIiVzlx8pi0NCLvu3s+9xUFEpIh3UMBmTJssLHk0XfxsA==
-X-Received: by 2002:a63:f148:: with SMTP id o8mr14545058pgk.314.1580532530019;
-        Fri, 31 Jan 2020 20:48:50 -0800 (PST)
-Received: from [192.168.1.188] ([66.219.217.145])
-        by smtp.gmail.com with ESMTPSA id d24sm13108879pfq.75.2020.01.31.20.48.48
-        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
-        Fri, 31 Jan 2020 20:48:49 -0800 (PST)
-Subject: Re: [PATCH BUGFIX 0/6] block, bfq: series of fixes, and not only, for
- some recently reported issues
-To:     Paolo Valente <paolo.valente@linaro.org>
-Cc:     linux-block@vger.kernel.org, linux-kernel@vger.kernel.org,
-        bfq-iosched@googlegroups.com, oleksandr@natalenko.name,
-        patdung100@gmail.com, cevich@redhat.com
-References: <20200131092409.10867-1-paolo.valente@linaro.org>
-From:   Jens Axboe <axboe@kernel.dk>
-Message-ID: <f0480d87-41a3-c056-854e-e480461bbd96@kernel.dk>
-Date:   Fri, 31 Jan 2020 21:48:47 -0700
-User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:68.0) Gecko/20100101
- Thunderbird/68.4.1
+        id S1726197AbgBAIUm (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Sat, 1 Feb 2020 03:20:42 -0500
+Received: from bombadil.infradead.org ([198.137.202.133]:38840 "EHLO
+        bombadil.infradead.org" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S1726133AbgBAIUl (ORCPT
+        <rfc822;linux-block@vger.kernel.org>); Sat, 1 Feb 2020 03:20:41 -0500
+DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed;
+        d=infradead.org; s=bombadil.20170209; h=In-Reply-To:Content-Type:MIME-Version
+        :References:Message-ID:Subject:Cc:To:From:Date:Sender:Reply-To:
+        Content-Transfer-Encoding:Content-ID:Content-Description:Resent-Date:
+        Resent-From:Resent-Sender:Resent-To:Resent-Cc:Resent-Message-ID:List-Id:
+        List-Help:List-Unsubscribe:List-Subscribe:List-Post:List-Owner:List-Archive;
+         bh=gE9Mx3W9x+ojBglaKL+EtPiMsFFLFj22q4iMOnSc8TM=; b=oIO7D1DmZpP8/qRY7jm6xdQb/
+        VPeEbhJkRP+/M27gI9gnFQ4p0zh/L4svRplLCAP9x9cTrhoIYGduRUHT9zjbk/ctMo1UXdcVlOpJv
+        VYUbUYCj2/6yb0SZRHVPPbKsZjGDrR6HFB+a2Z8WALrd2uSfONMCycox4paInD6sMEqHJeHzeCE7Y
+        QDX+YZJcEqkN3aDPVisx4RBep9af/vcUWuVonYXwAektJibZf8QhaEy8AAPBvzdE4LUn8S5KPz7ZZ
+        /rPw7im7gZbz3tnqpp/BajGRsha5NSf0MR22+vh9iHsdKI1EKl/ydsHtpS/CdGLobDOs474H6ZSzg
+        YnKzjERYw==;
+Received: from hch by bombadil.infradead.org with local (Exim 4.92.3 #3 (Red Hat Linux))
+        id 1ixo14-0003cQ-1S; Sat, 01 Feb 2020 08:20:34 +0000
+Date:   Sat, 1 Feb 2020 00:20:34 -0800
+From:   Christoph Hellwig <hch@infradead.org>
+To:     Andrzej Jakowski <andrzej.jakowski@linux.intel.com>
+Cc:     Christoph Hellwig <hch@infradead.org>, axboe@kernel.dk,
+        song@kernel.org, linux-block@vger.kernel.org,
+        linux-raid@vger.kernel.org,
+        Artur Paszkiewicz <artur.paszkiewicz@intel.com>
+Subject: Re: [PATCH 1/2] block: introduce polling on bio level
+Message-ID: <20200201082034.GA8423@infradead.org>
+References: <20200126044138.5066-1-andrzej.jakowski@linux.intel.com>
+ <20200126044138.5066-2-andrzej.jakowski@linux.intel.com>
+ <20200131063407.GB6267@infradead.org>
+ <081badca-ab0f-f666-1e5e-71992f93a157@linux.intel.com>
 MIME-Version: 1.0
-In-Reply-To: <20200131092409.10867-1-paolo.valente@linaro.org>
-Content-Type: text/plain; charset=utf-8
-Content-Language: en-US
-Content-Transfer-Encoding: 7bit
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <081badca-ab0f-f666-1e5e-71992f93a157@linux.intel.com>
+X-SRS-Rewrite: SMTP reverse-path rewritten from <hch@infradead.org> by bombadil.infradead.org. See http://www.infradead.org/rpr.html
 Sender: linux-block-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-On 1/31/20 2:24 AM, Paolo Valente wrote:
-> Hi Jens,
-> these patches are mostly fixes for the issues reported in [1, 2]. All
-> patches have been publicly tested in the dev version of BFQ.
+On Fri, Jan 31, 2020 at 11:51:43AM -0700, Andrzej Jakowski wrote:
+> On 1/30/20 11:34 PM, Christoph Hellwig wrote:
+> > Can you explain this check?  This looks weird to me  I think we need
+> > a generalized check if a make_request based driver supports REQ_NOWAIT
+> > instead (and as a separate patch / patchset).
 > 
-> Thanks,
-> Paolo
-> 
-> [1] https://bugzilla.redhat.com/show_bug.cgi?id=1767539
-> [2] https://bugzilla.kernel.org/show_bug.cgi?id=205447
-> 
-> Paolo Valente (6):
->   block, bfq: do not plug I/O for bfq_queues with no proc refs
->   block, bfq: do not insert oom queue into position tree
->   block, bfq: get extra ref to prevent a queue from being freed during a
->     group move
->   block, bfq: extend incomplete name of field on_st
->   block, bfq: get a ref to a group when adding it to a service tree
->   block, bfq: clarify the goal of bfq_split_bfqq()
-> 
->  block/bfq-cgroup.c  | 12 ++++++++++--
->  block/bfq-iosched.c | 20 +++++++++++++++++++-
->  block/bfq-iosched.h |  3 ++-
->  block/bfq-wf2q.c    | 27 ++++++++++++++++++++++-----
->  4 files changed, 53 insertions(+), 9 deletions(-)
+> Original check used to reject polled IO for stackable block devices as "not
+> supported". To solve that situation I introduced additional check to reject
+> all non REQ_HIPRI requests. That check is not intended to generalize, like
+> you indicated, but to conservatively select which requests to accept.
+> Perhaps there is better way to do that. Any suggestions?
 
-I wish some of these had been sent sooner, they really should have been
-sent in a few weeks ago. Just took a quick look at the bug reports, and
-at least one of the bugs mentions looks like it had a fix available 2
-months ago. Have they been in -next? They are all marked as bug fixes,
-should they have stable tags? All of them, some of them?
-
--- 
-Jens Axboe
-
+REQ_NOWAIT and REQ_HIPRI are completley unrelated concepts and they need
+to be dealt with entirely separately.
