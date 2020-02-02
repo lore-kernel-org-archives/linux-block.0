@@ -1,88 +1,79 @@
-Return-Path: <SRS0=B3LW=3V=vger.kernel.org=linux-block-owner@kernel.org>
+Return-Path: <SRS0=AIK+=3W=vger.kernel.org=linux-block-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-2.2 required=3.0 tests=DKIM_SIGNED,DKIM_VALID,
-	HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,
-	USER_AGENT_SANE_1 autolearn=no autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-5.4 required=3.0 tests=FROM_LOCAL_HEX,
+	HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,MENTIONS_GIT_HOSTING,
+	SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED autolearn=unavailable autolearn_force=no
+	version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 1A459C33CB3
-	for <linux-block@archiver.kernel.org>; Sat,  1 Feb 2020 14:58:17 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 6A439C3524A
+	for <linux-block@archiver.kernel.org>; Sun,  2 Feb 2020 07:05:05 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.kernel.org (Postfix) with ESMTP id C558B2051A
-	for <linux-block@archiver.kernel.org>; Sat,  1 Feb 2020 14:58:16 +0000 (UTC)
-Authentication-Results: mail.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel-dk.20150623.gappssmtp.com header.i=@kernel-dk.20150623.gappssmtp.com header.b="nttcNARI"
+	by mail.kernel.org (Postfix) with ESMTP id 409DA206E6
+	for <linux-block@archiver.kernel.org>; Sun,  2 Feb 2020 07:05:05 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1726536AbgBAO6Q (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Sat, 1 Feb 2020 09:58:16 -0500
-Received: from mail-pf1-f193.google.com ([209.85.210.193]:45093 "EHLO
-        mail-pf1-f193.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1726604AbgBAO6Q (ORCPT
-        <rfc822;linux-block@vger.kernel.org>); Sat, 1 Feb 2020 09:58:16 -0500
-Received: by mail-pf1-f193.google.com with SMTP id 2so5010812pfg.12
-        for <linux-block@vger.kernel.org>; Sat, 01 Feb 2020 06:58:14 -0800 (PST)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=kernel-dk.20150623.gappssmtp.com; s=20150623;
-        h=subject:to:cc:references:from:message-id:date:user-agent
-         :mime-version:in-reply-to:content-language:content-transfer-encoding;
-        bh=V+84GWr3lNxKTeqdrIO3Ly1rWoYrT/g923krQ6rxDLw=;
-        b=nttcNARINoiVnToJQunZTfaUhhCBA/lUHMZKSsL/PkfJQDSSmbsIzYDmu7Jy0+zWZS
-         Bib1xY7D1kZwY5XL/ggpmVqhw10/GXgDwV/LhiKMcvRT8n99ISMJSX6PP0Bc+4Mz9ArH
-         DjCQ/FjvH+aJXKjKOpKMmgjYKT2Abq/rrLrSXCUxT/MoytsQhT/mlocpypg7i5b7F22V
-         4mmWS9tBntu8EMIzywFqr6P1UiOK4MayR8mXM2aCRRykVQh58zHoXPQCnERgLLbJAzYt
-         ctIpXqASP4qjy8u0N1CgV6TYPlwvcBCcdpsufRu1QoXrps4DZu+uoGevjeyglWDwkvCV
-         F0iA==
+        id S1726836AbgBBHFC (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Sun, 2 Feb 2020 02:05:02 -0500
+Received: from mail-io1-f70.google.com ([209.85.166.70]:56284 "EHLO
+        mail-io1-f70.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S1726834AbgBBHFC (ORCPT
+        <rfc822;linux-block@vger.kernel.org>); Sun, 2 Feb 2020 02:05:02 -0500
+Received: by mail-io1-f70.google.com with SMTP id z21so7189157iob.22
+        for <linux-block@vger.kernel.org>; Sat, 01 Feb 2020 23:05:01 -0800 (PST)
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=1e100.net; s=20161025;
-        h=x-gm-message-state:subject:to:cc:references:from:message-id:date
-         :user-agent:mime-version:in-reply-to:content-language
-         :content-transfer-encoding;
-        bh=V+84GWr3lNxKTeqdrIO3Ly1rWoYrT/g923krQ6rxDLw=;
-        b=MCJtXqS+NOqDdYG6h6BYfJM5E1EGpAyICHoKvOPQt4SuOhvBaYY4gk2Nx6xADM323d
-         zoh8L8BnGGbmF2iGp7pRilpTHzTfo9TfbagpjfqzbFFxDlWnWn0Ah0DczU8mZDcYZOJW
-         Gf4W868ovV5zMTjcQoXZ6c5DOpD3Hmm1C3uXXMTyAnZcDNCM801KfyVUnNQjswwXITak
-         zxh8T8YpvkF9xa1v1YzxUFlM/VTnykqIXQ3hfXz0/9avle7JzDd07CcUanGhBo2AyTLg
-         bmdgg32dM8HWcKixCZ97RbhAM9JI2A4MRFRtIGIsbiV81briAuVogbYW2jg/VLnVu1Wm
-         PxKQ==
-X-Gm-Message-State: APjAAAXZCI9VStsFW8EHSr9Mv6Qt2xevXxtAcmtxjWz4i7qNlg4NpN+p
-        4WwnY/p1T+XTgKfJskvBvYJJqBikybo=
-X-Google-Smtp-Source: APXvYqy+LLvTgvNXz+iQuaKSqdszQer18XNv+HwNu+J3eA4SeYPHlNcmFIxZUipJFZqyTHWyJG79CQ==
-X-Received: by 2002:a63:ce55:: with SMTP id r21mr15390338pgi.156.1580569093462;
-        Sat, 01 Feb 2020 06:58:13 -0800 (PST)
-Received: from [192.168.1.188] ([66.219.217.145])
-        by smtp.gmail.com with ESMTPSA id r3sm14648747pfg.145.2020.02.01.06.58.12
-        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
-        Sat, 01 Feb 2020 06:58:13 -0800 (PST)
-Subject: Re: [PATCH 0/5] bcache patches for Linux v5.6-rc1
-To:     Coly Li <colyli@suse.de>
-Cc:     linux-bcache@vger.kernel.org, linux-block@vger.kernel.org
-References: <20200201144235.94110-1-colyli@suse.de>
-From:   Jens Axboe <axboe@kernel.dk>
-Message-ID: <fee4f649-eb8a-e7af-70d6-ad75e9a4c8bc@kernel.dk>
-Date:   Sat, 1 Feb 2020 07:58:11 -0700
-User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:68.0) Gecko/20100101
- Thunderbird/68.4.1
+        h=x-gm-message-state:mime-version:date:in-reply-to:message-id:subject
+         :from:to;
+        bh=Fqcj080fpjW3YleUBFYycrIBXVF2KLfVb8A0MJTatPs=;
+        b=oxLdzbz0WfJYRBIzeE5U3t5elxJ5MJ8YtAkni1gbvayVhA9XviprlEXVq9vH9uCtpX
+         7jTxmBfIbZo9pUjIsYyO9VSUrJOaKJsN354rzwtZEUg7IzQTMaVCWHBj6EofXyqzg4PB
+         N0NER2YczMlHMOOCt2frqh5J+waQqcLiBLJwFcgg9rzo/3q+Or2S9VWUcywAN9ZpCDkR
+         nPBOcZY/C5v/P8Q6YOUaFJ5zdPe9xNVjVJF0Lw0oT56DfY+PcVGYte5QzINc3ehMkjhu
+         QN4h4e/dyLxttZ1ZRPL2d5qi3vqDQqAQ+rAEg10ZtfvcmqLjFyLTKDpT0P9qgpIiKltw
+         bNFg==
+X-Gm-Message-State: APjAAAWJr6wqPm7vVeuQzT1IXQcZ7LYjEkx9lrDtJsGdf24ouHpu2ywL
+        e/YcefTKag4wJ15N4ZPwhT91yA86rkS7J7fSeozcnRlCdp0J
+X-Google-Smtp-Source: APXvYqxfBgVwZ/hal5pak54Hcteg+t0Fij/8KIMoja/+eLHlPRn9E4SfA6mh3Gdu3ROVJtSS+LFRs6S4yHL4Rd9kab/BnsMwYdze
 MIME-Version: 1.0
-In-Reply-To: <20200201144235.94110-1-colyli@suse.de>
-Content-Type: text/plain; charset=utf-8
-Content-Language: en-US
-Content-Transfer-Encoding: 7bit
+X-Received: by 2002:a5e:8e4c:: with SMTP id r12mr14311646ioo.119.1580627101442;
+ Sat, 01 Feb 2020 23:05:01 -0800 (PST)
+Date:   Sat, 01 Feb 2020 23:05:01 -0800
+In-Reply-To: <0000000000001a1ef1059b1a27c7@google.com>
+X-Google-Appengine-App-Id: s~syzkaller
+X-Google-Appengine-App-Id-Alias: syzkaller
+Message-ID: <000000000000e76ba6059d926c08@google.com>
+Subject: Re: INFO: task hung in __generic_file_fsync (2)
+From:   syzbot <syzbot+44c32606d8669fb0d45c@syzkaller.appspotmail.com>
+To:     akpm@linux-foundation.org, axboe@kernel.dk, dave@stgolabs.net,
+        hch@lst.de, linux-block@vger.kernel.org,
+        linux-fsdevel@vger.kernel.org, linux-kernel@vger.kernel.org,
+        linux-mm@kvack.org, ming.lei@redhat.com, osandov@fb.com,
+        syzkaller-bugs@googlegroups.com, viro@zeniv.linux.org.uk
+Content-Type: text/plain; charset="UTF-8"
 Sender: linux-block-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-On 2/1/20 7:42 AM, Coly Li wrote:
-> Hi Jens,
-> 
-> Here are the bcache patches for Linux v5.6-rc1. All the patches are
-> tested and survived my I/O pressure tests for 24+ hours intotal.
-> 
-> Please take them. Thank you in advance.
+syzbot suspects this bug was fixed by commit:
 
-Applied for 5.6, thanks.
+commit 85a8ce62c2eabe28b9d76ca4eecf37922402df93
+Author: Ming Lei <ming.lei@redhat.com>
+Date:   Fri Dec 27 23:05:48 2019 +0000
 
--- 
-Jens Axboe
+    block: add bio_truncate to fix guard_bio_eod
 
+bisection log:  https://syzkaller.appspot.com/x/bisect.txt?x=13ebe101e00000
+start commit:   bf8d1cd4 Merge tag 'scsi-fixes' of git://git.kernel.org/pu..
+git tree:       upstream
+kernel config:  https://syzkaller.appspot.com/x/.config?x=ed9d672709340e35
+dashboard link: https://syzkaller.appspot.com/bug?extid=44c32606d8669fb0d45c
+syz repro:      https://syzkaller.appspot.com/x/repro.syz?x=137e2615e00000
+C reproducer:   https://syzkaller.appspot.com/x/repro.c?x=11306971e00000
+
+If the result looks correct, please mark the bug fixed by replying with:
+
+#syz fix: block: add bio_truncate to fix guard_bio_eod
+
+For information about bisection process see: https://goo.gl/tpsmEJ#bisection
