@@ -2,263 +2,176 @@ Return-Path: <SRS0=KNqY=3X=vger.kernel.org=linux-block-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-8.4 required=3.0 tests=DKIMWL_WL_HIGH,DKIM_SIGNED,
-	DKIM_VALID,DKIM_VALID_AU,HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,
-	MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,USER_AGENT_SANE_1
-	autolearn=ham autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-2.3 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
+	MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,USER_AGENT_SANE_1 autolearn=no
+	autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 83DFFC33CAC
-	for <linux-block@archiver.kernel.org>; Mon,  3 Feb 2020 12:47:48 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 3DF76C33CAC
+	for <linux-block@archiver.kernel.org>; Mon,  3 Feb 2020 12:56:26 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.kernel.org (Postfix) with ESMTP id 412BB2082E
-	for <linux-block@archiver.kernel.org>; Mon,  3 Feb 2020 12:47:48 +0000 (UTC)
-Authentication-Results: mail.kernel.org;
-	dkim=pass (2048-bit key) header.d=oracle.com header.i=@oracle.com header.b="Mad1y2dn"
+	by mail.kernel.org (Postfix) with ESMTP id 12B682080D
+	for <linux-block@archiver.kernel.org>; Mon,  3 Feb 2020 12:56:26 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1727536AbgBCMrr (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Mon, 3 Feb 2020 07:47:47 -0500
-Received: from aserp2120.oracle.com ([141.146.126.78]:56408 "EHLO
-        aserp2120.oracle.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1726082AbgBCMrr (ORCPT
-        <rfc822;linux-block@vger.kernel.org>); Mon, 3 Feb 2020 07:47:47 -0500
-Received: from pps.filterd (aserp2120.oracle.com [127.0.0.1])
-        by aserp2120.oracle.com (8.16.0.27/8.16.0.27) with SMTP id 013Chlqq085654;
-        Mon, 3 Feb 2020 12:47:38 GMT
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=oracle.com; h=subject : to : cc :
- references : from : message-id : date : mime-version : in-reply-to :
- content-type : content-transfer-encoding; s=corp-2019-08-05;
- bh=ymieb8r5iJqXnptnfctTY8y8oyoIMl0c/VCZqPwFlXo=;
- b=Mad1y2dnLVOfUiWWSsNeJQ+CCTBDbzx3VevwXCsUfOTHRne28HyBUWNI9XrvLepP/j+o
- XDUr1GnDElPCsR6JbJ+yoVsCsLFD+TUNHJwgL3quVcGtqix6NaGsZ4llj5vVMn3mS4tB
- ZGe5mD+qQyc1Bra+NpT51dFSPfAtg2a97He99GZxJU8WbUoi2I3SsDwzy5QilqJMJD+p
- IPbWRmGPjN3ks3ts6roCCVzPGu1CcJhyo6xKxQj6LZynnhEw5K+fhuR/MSp4VjCZfJy2
- dGH9mcxt3KsSgE4P7lGSIZ+cz2zSGFH2ENiBkKjZugm456n7ceogMAS3O6hUwglnggLs 3Q== 
-Received: from userp3030.oracle.com (userp3030.oracle.com [156.151.31.80])
-        by aserp2120.oracle.com with ESMTP id 2xw19q7hgf-1
-        (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=OK);
-        Mon, 03 Feb 2020 12:47:38 +0000
-Received: from pps.filterd (userp3030.oracle.com [127.0.0.1])
-        by userp3030.oracle.com (8.16.0.27/8.16.0.27) with SMTP id 013CiMiH139378;
-        Mon, 3 Feb 2020 12:45:37 GMT
-Received: from userv0121.oracle.com (userv0121.oracle.com [156.151.31.72])
-        by userp3030.oracle.com with ESMTP id 2xwjt3xuns-1
-        (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=OK);
-        Mon, 03 Feb 2020 12:45:37 +0000
-Received: from abhmp0009.oracle.com (abhmp0009.oracle.com [141.146.116.15])
-        by userv0121.oracle.com (8.14.4/8.13.8) with ESMTP id 013CjaQ3003775;
-        Mon, 3 Feb 2020 12:45:36 GMT
-Received: from [192.168.1.14] (/114.88.246.185)
-        by default (Oracle Beehive Gateway v4.0)
-        with ESMTP ; Mon, 03 Feb 2020 04:45:36 -0800
-Subject: Re: [RFC PATCH] dm-zoned: extend the way of exposing zoned block
- device
-To:     Damien Le Moal <Damien.LeMoal@wdc.com>,
-        "dm-devel@redhat.com" <dm-devel@redhat.com>
-Cc:     "linux-block@vger.kernel.org" <linux-block@vger.kernel.org>,
-        "snitzer@redhat.com" <snitzer@redhat.com>,
-        Dmitry Fomichev <Dmitry.Fomichev@wdc.com>,
-        "martin.petersen@oracle.com" <martin.petersen@oracle.com>
-References: <20200108071212.27230-1-Nobody@nobody.com>
- <BYAPR04MB5816BA749332D2FC6CE3993AE73E0@BYAPR04MB5816.namprd04.prod.outlook.com>
-From:   Bob Liu <bob.liu@oracle.com>
-Message-ID: <c4ba178c-f5cf-4dd1-784b-e372d6b09f62@oracle.com>
-Date:   Mon, 3 Feb 2020 20:45:25 +0800
-User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:60.0) Gecko/20100101
- Thunderbird/60.5.1
+        id S1728045AbgBCM4Z (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Mon, 3 Feb 2020 07:56:25 -0500
+Received: from lhrrgout.huawei.com ([185.176.76.210]:2353 "EHLO huawei.com"
+        rhost-flags-OK-OK-OK-FAIL) by vger.kernel.org with ESMTP
+        id S1727509AbgBCM4Z (ORCPT <rfc822;linux-block@vger.kernel.org>);
+        Mon, 3 Feb 2020 07:56:25 -0500
+Received: from lhreml704-cah.china.huawei.com (unknown [172.18.7.108])
+        by Forcepoint Email with ESMTP id A1C631525722C4BA05A5;
+        Mon,  3 Feb 2020 12:56:23 +0000 (GMT)
+Received: from lhreml724-chm.china.huawei.com (10.201.108.75) by
+ lhreml704-cah.china.huawei.com (10.201.108.45) with Microsoft SMTP Server
+ (TLS) id 14.3.408.0; Mon, 3 Feb 2020 12:56:23 +0000
+Received: from [127.0.0.1] (10.202.226.45) by lhreml724-chm.china.huawei.com
+ (10.201.108.75) with Microsoft SMTP Server (version=TLS1_2,
+ cipher=TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256) id 15.1.1713.5; Mon, 3 Feb 2020
+ 12:56:22 +0000
+Subject: Re: [PATCH V5 0/6] blk-mq: improvement CPU hotplug
+To:     Ming Lei <tom.leiming@gmail.com>
+CC:     Thomas Gleixner <tglx@linutronix.de>,
+        Marc Zyngier <maz@kernel.org>,
+        "Ming Lei" <ming.lei@redhat.com>, Jens Axboe <axboe@kernel.dk>,
+        linux-block <linux-block@vger.kernel.org>,
+        Bart Van Assche <bvanassche@acm.org>,
+        "Hannes Reinecke" <hare@suse.com>, Christoph Hellwig <hch@lst.de>,
+        "chenxiang (M)" <chenxiang66@hisilicon.com>,
+        Keith Busch <kbusch@kernel.org>,
+        "liudongdong (C)" <liudongdong3@huawei.com>,
+        wanghuiqiang <wanghuiqiang@huawei.com>,
+        "Wangzhou (B)" <wangzhou1@hisilicon.com>
+References: <20200115114409.28895-1-ming.lei@redhat.com>
+ <929dbfac-de46-a947-6a2c-f4d8d504c631@huawei.com>
+ <6dbe8c9f-af4e-3157-b6e9-6bbf43efb1e1@huawei.com>
+ <CACVXFVN8io2Pj1HZWLy=z1dbDrE3h9Q6B0DA4gdGOdK3+bRRPg@mail.gmail.com>
+ <b1f67efb-585d-e0c1-460f-52be0041b37a@huawei.com>
+ <CACVXFVOk3cnRqyngYjHPPtLM1Wn8p3=hP8C3tBns9nDQAnoCyQ@mail.gmail.com>
+ <14cb0d17-f9e6-ffa8-7a98-bd602c72273f@huawei.com>
+ <56502aa9-d4ad-5ede-5184-13f1817c77d7@huawei.com>
+ <CACVXFVNiBOBdtwuW=q4aSmUMAnn6Gfpg6BGhcQu44s58NZ08Ww@mail.gmail.com>
+ <20200201110539.03db5434@why> <87sgjutufz.fsf@nanos.tec.linutronix.de>
+ <3db522f4-c0c3-ce0f-b0e3-57ee1176bbf8@huawei.com>
+ <797432ab-1ef5-92e3-b512-bdcee57d1053@huawei.com>
+ <CACVXFVOijCDjFa339Dyxnp9_0W5UjDyF-a42Dmo-6pogu+rp5Q@mail.gmail.com>
+From:   John Garry <john.garry@huawei.com>
+Message-ID: <b0f35177-70f3-541d-996b-ebb364634225@huawei.com>
+Date:   Mon, 3 Feb 2020 12:56:21 +0000
+User-Agent: Mozilla/5.0 (Windows NT 10.0; WOW64; rv:68.0) Gecko/20100101
+ Thunderbird/68.1.2
 MIME-Version: 1.0
-In-Reply-To: <BYAPR04MB5816BA749332D2FC6CE3993AE73E0@BYAPR04MB5816.namprd04.prod.outlook.com>
-Content-Type: text/plain; charset=utf-8
+In-Reply-To: <CACVXFVOijCDjFa339Dyxnp9_0W5UjDyF-a42Dmo-6pogu+rp5Q@mail.gmail.com>
+Content-Type: text/plain; charset="utf-8"; format=flowed
 Content-Language: en-US
 Content-Transfer-Encoding: 7bit
-X-Proofpoint-Virus-Version: vendor=nai engine=6000 definitions=9519 signatures=668685
-X-Proofpoint-Spam-Details: rule=notspam policy=default score=0 suspectscore=0 malwarescore=0
- phishscore=0 bulkscore=0 spamscore=0 mlxscore=0 mlxlogscore=999
- adultscore=0 classifier=spam adjust=0 reason=mlx scancount=1
- engine=8.0.1-1911140001 definitions=main-2002030097
-X-Proofpoint-Virus-Version: vendor=nai engine=6000 definitions=9519 signatures=668685
-X-Proofpoint-Spam-Details: rule=notspam policy=default score=0 priorityscore=1501 malwarescore=0
- suspectscore=0 phishscore=0 bulkscore=0 spamscore=0 clxscore=1015
- lowpriorityscore=0 mlxscore=0 impostorscore=0 mlxlogscore=999 adultscore=0
- classifier=spam adjust=0 reason=mlx scancount=1 engine=8.0.1-1911140001
- definitions=main-2002030097
+X-Originating-IP: [10.202.226.45]
+X-ClientProxiedBy: lhreml720-chm.china.huawei.com (10.201.108.71) To
+ lhreml724-chm.china.huawei.com (10.201.108.75)
+X-CFilter-Loop: Reflected
 Sender: linux-block-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-On 1/8/20 3:40 PM, Damien Le Moal wrote:
-> On 2020/01/08 16:13, Nobody wrote:
->> From: Bob Liu <bob.liu@oracle.com>
+>>>
+>>> Jobs: 6 ([  519.858094] nvme nvme1: controller is down; will reset:
+>>> CSTS=0xffffffff, PCI_STATUS=0xffff
+>>>
+>>> And some NVMe error also coincides with the hang. Another run has this:
+>>>
+>>>    [  247.015206] pcieport 0000:00:08.0: can't change power state from
+>>>    D3cold to D0 (config space inaccessible)
+>>>
+>>> I did test v5.4 previously and did not see this, but that would have
+>>> included the v4 patchset in the $subject. I'll test v5.4 without that
+>>> patchset now.
 >>
->> Motivation:
->> Now the dm-zoned device mapper target exposes a zoned block device(ZBC) as a
->> regular block device by storing metadata and buffering random writes in
->> conventional zones.
->> This way is not very flexible, there must be enough conventional zones and the
->> performance may be constrained.
->> By putting metadata(also buffering random writes) in separated device we can get
->> more flexibility and potential performance improvement e.g by storing metadata
->> in faster device like persistent memory.
->>
->> This patch try to split the metadata of dm-zoned to an extra block
->> device instead of zoned block device itself.
->> (Buffering random writes also in the todo list.)
->>
->> Patch is at the very early stage, just want to receive some feedback about
->> this extension.
->> Another option is to create an new md-zoned device with separated metadata
->> device based on md framework.
+>> So v5.4 does have this issue also:
 > 
-> For metadata only, it should not be hard at all to move to another
-> conventional zone device. It will however be a little more tricky for
-> conventional zones used for data since dm-zoned assumes that this random
-> write space is also zoned. Moving this space to a conventional device
-> requires implementing a zone emulation (fake zones) for the regular
-> drive, using a zone size that matches the size of sequential zones.
-> 
-> Beyond this, dm-zoned also needs to be changed to accept partial drives
-> and the dm core code to accept mixing of regular and zoned disks (that
-> is forbidden now).
-> 
-> Another approach worth exploring is stacking dm-zoned as is on top of a
-> modified dm-linear with the ability to emulate conventional zones on top
-> of a regular block device (you only need report zones method
-> implemented). 
+> v5.5?
 
-Looks like the only way to do this emulation is in user space tool(dm-zoned-tools).
-Write metadata(which contains emulated zone information constructed by dm-zoned-tools)
-into regular block device.
-It's impossible to add code to every regular block device for emulating conventional zones. 
+I am saying that both v5.4 and v5.5 have the issue. Below is the kernel 
+hang snippet for v5.4.
+
+> 
+>>
+>> [  705.669512] psci: CPU24 killed (polled 0 ms)
+>> [  705.966753] CPU25: shutdown
+>> [  705.969548] psci: CPU25 killed (polled 0 ms)
+>> [  706.250771] CPU26: shutdown=2347MiB/s,w=0KiB/s][r=601k,w=0 IOPS][eta
+>> 00m:13s]
+>> [  706.253565] psci: CPU26 killed (polled 0 ms)
+>> [  706.514728] CPU27: shutdown
+>> [  706.517523] psci: CPU27 killed (polled 0 ms)
+>> [  706.826708] CPU28: shutdown
+>> [  706.829502] psci: CPU28 killed (polled 0 ms)
+>> [  707.130916] CPU29: shutdown=2134MiB/s,w=0KiB/s][r=546k,w=0 IOPS][eta
+>> 00m:12s]
+>> [  707.133714] psci: CPU29 killed (polled 0 ms)
+>> [  707.439066] CPU30: shutdown
+>> [  707.441870] psci: CPU30 killed (polled 0 ms)
+>> [  707.706727] CPU31: shutdown
+>> [  707.709526] psci: CPU31 killed (polled 0 ms)
+>> [  708.521853] pcieport 0000:00:08.0: can't change power state from
+>> D3cold to D0 (config space inaccessible)
+>> [  728.741808] rcu: INFO: rcu_preempt detected stalls on
+>> CPUs/tasks:80d:00h:35m:42s]
+>> [  728.747895] rcu: 48-...0: (0 ticks this GP)
+>> idle=b3e/1/0x4000000000000000 softirq=5548/5548 fqs=2626
+>> [  728.757197] (detected by 63, t=5255 jiffies, g=40989, q=1890)
+>> [  728.763018] Task dump for CPU 48:
+>> [  728.766321] irqbalance      R  running task        0  1272      1
+>> 0x00000002
+>> [  728.773358] Call trace:
+>> [  728.775801]  __switch_to+0xbc/0x218
+>> [  728.779283]  gic_set_affinity+0x16c/0x1d8
+>> [  728.783282]  irq_do_set_affinity+0x30/0xd0
+>> [  728.787365]  irq_set_affinity_locked+0xc8/0xf0
+>> [  728.791796]  __irq_set_affinity+0x4c/0x80
+>> [  728.795794]  write_irq_affinity.isra.7+0x104/0x120
+>> [  728.800572]  irq_affinity_proc_write+0x1c/0x28
+>> [  728.805008]  proc_reg_write+0x78/0xb8
+>> [  728.808660]  __vfs_write+0x18/0x38
+>> [  728.812050]  vfs_write+0xb4/0x1e0
+>> [  728.815352]  ksys_write+0x68/0xf8
+>> [  728.818655]  __arm64_sys_write+0x18/0x20
+>> [  728.822567]  el0_svc_common.constprop.2+0x64/0x160
+>> [  728.827345]  el0_svc_handler+0x20/0x80
+>> [  728.831082]  el0_sync_handler+0xe4/0x188
+>> [  728.834991]  el0_sync+0x140/0x180
+>> [  738.993844] nvme nvme1: controller is down; will reset:
+>> CSTS=0xffffffff, PCI_STATUS=0xffff
+>> [  791.761810] rcu: INFO: rcu_preempt detected stalls on
+>> CPUs/tasks:63d:14h:24m:13s]
+>> [  791.767897] rcu: 48-...0: (0 ticks this GP)
+>> idle=b3e/1/0x4000000000000000 softirq=5548/5548 fqs=10495
+>> [  791.777281] (detected by 54, t=21010 jiffies, g=40989, q=2396)
+>> [  791.783189] Task dump for CPU 48:
+>> [  791.786491] irqbalance      R  running task        0  1272      1
+>> 0x00000002
+>> [  791.793528] Call trace:
+>> [  791.795964]  __switch_to+0xbc/0x218
+>> [  791.799441]  gic_set_affinity+0x16c/0x1d8
+>> [  791.803439]  irq_do_set_affinity+0x30/0xd0
+>> [  791.807522]  irq_set_affinity_locked+0xc8/0xf0
+>> [  791.811953]  __irq_set_affinity+0x4c/0x80
+>> [  791.815949]  write_irq_affinity.isra.7+0x104/0x120
+>> [  791.820727]  irq_affinity_proc_write+0x1c/0x28
+>> [  791.825158]  proc_reg_write+0x78/0xb8
+>> [  791.828808]  __vfs_write+0x18/0x38
+>> [  791.832197]  vfs_write+0xb4/0x1e0
+>> [  791.835500]  ksys_write+0x68/0xf8
+>> [  791.838802]  __arm64_sys_write+0x18/0x20
+>> [  791.842712]  el0_svc_common.constprop.2+0x64/0x160
+>> [  791.847490]  el0_svc_handler+0x20/0x80
+>> [  791.851226]  el0_sync_handler+0xe4/0x188
+>> [  791.855135]  el0_sync+0x140/0x180
+>> Jobs: 6 (f=6): [R(6)][0.0%][r=0KiB/s
+> 
+> Can you trigger it after disabling irqbalance?
+
+No, so tested by killing the irqbalance process and it ran for 25 
+minutes without issue.
 
 Thanks,
-Bob
-
-> That is much easier to do. We actually hacked something
-> like that last month to see the performance change and saw a jump from
-> 56 MB/s to 250 MB/s for write intensive workloads (file creation on
-> ext4). I am not so warm in this approach though as it modifies dm-linear
-> and we want to keep it very lean and simple. Modifying dm-zoned to allow
-> support for a device pair is a better approach I think.
-> 
->>
->> Signed-off-by: Bob Liu <bob.liu@oracle.com>
->> ---
->>  drivers/md/dm-zoned-metadata.c |  6 +++---
->>  drivers/md/dm-zoned-target.c   | 15 +++++++++++++--
->>  drivers/md/dm-zoned.h          |  1 +
->>  3 files changed, 17 insertions(+), 5 deletions(-)
->>
->> diff --git a/drivers/md/dm-zoned-metadata.c b/drivers/md/dm-zoned-metadata.c
->> index 22b3cb0..89cd554 100644
->> --- a/drivers/md/dm-zoned-metadata.c
->> +++ b/drivers/md/dm-zoned-metadata.c
->> @@ -439,7 +439,7 @@ static struct dmz_mblock *dmz_get_mblock_slow(struct dmz_metadata *zmd,
->>  
->>  	/* Submit read BIO */
->>  	bio->bi_iter.bi_sector = dmz_blk2sect(block);
->> -	bio_set_dev(bio, zmd->dev->bdev);
->> +	bio_set_dev(bio, zmd->dev->meta_bdev);
->>  	bio->bi_private = mblk;
->>  	bio->bi_end_io = dmz_mblock_bio_end_io;
->>  	bio_set_op_attrs(bio, REQ_OP_READ, REQ_META | REQ_PRIO);
->> @@ -593,7 +593,7 @@ static int dmz_write_mblock(struct dmz_metadata *zmd, struct dmz_mblock *mblk,
->>  	set_bit(DMZ_META_WRITING, &mblk->state);
->>  
->>  	bio->bi_iter.bi_sector = dmz_blk2sect(block);
->> -	bio_set_dev(bio, zmd->dev->bdev);
->> +	bio_set_dev(bio, zmd->dev->meta_bdev);
->>  	bio->bi_private = mblk;
->>  	bio->bi_end_io = dmz_mblock_bio_end_io;
->>  	bio_set_op_attrs(bio, REQ_OP_WRITE, REQ_META | REQ_PRIO);
->> @@ -620,7 +620,7 @@ static int dmz_rdwr_block(struct dmz_metadata *zmd, int op, sector_t block,
->>  		return -ENOMEM;
->>  
->>  	bio->bi_iter.bi_sector = dmz_blk2sect(block);
->> -	bio_set_dev(bio, zmd->dev->bdev);
->> +	bio_set_dev(bio, zmd->dev->meta_bdev);
->>  	bio_set_op_attrs(bio, op, REQ_SYNC | REQ_META | REQ_PRIO);
->>  	bio_add_page(bio, page, DMZ_BLOCK_SIZE, 0);
->>  	ret = submit_bio_wait(bio);
->> diff --git a/drivers/md/dm-zoned-target.c b/drivers/md/dm-zoned-target.c
->> index 70a1063..55c64fe 100644
->> --- a/drivers/md/dm-zoned-target.c
->> +++ b/drivers/md/dm-zoned-target.c
->> @@ -39,6 +39,7 @@ struct dm_chunk_work {
->>   */
->>  struct dmz_target {
->>  	struct dm_dev		*ddev;
->> +	struct dm_dev           *metadata_dev;
-> 
-> This naming would be confusing as it implies metadata only. If you also
-> want to move the random write zones to a regular device, then I would
-> suggest names like:
-> 
-> ddev -> zoned_bdev (the zoned device, e.g. SMR disk)
-> metadata_dev -> reg_bdev (regular block device, e.g. an SSD)
-> 
-> The metadata+random write (fake) zones space can use the regular block
-> device, and all sequential zones are assumed to be on the zoned device.
-> Care must be taken to handle the case of a zoned device that has
-> conventional zones: these could be used as is, not needing any reclaim,
-> so potentially contributing to further optimization.
-> 
->>  
->>  	unsigned long		flags;
->>  
->> @@ -701,6 +702,7 @@ static int dmz_get_zoned_device(struct dm_target *ti, char *path)
->>  		goto err;
->>  	}
->>  
->> +	dev->meta_bdev = dmz->metadata_dev->bdev;
->>  	dev->bdev = dmz->ddev->bdev;
->>  	(void)bdevname(dev->bdev, dev->name);
->>  
->> @@ -761,7 +763,7 @@ static int dmz_ctr(struct dm_target *ti, unsigned int argc, char **argv)
->>  	int ret;
->>  
->>  	/* Check arguments */
->> -	if (argc != 1) {
->> +	if (argc != 2) {
->>  		ti->error = "Invalid argument count";
->>  		return -EINVAL;
->>  	}
->> @@ -774,8 +776,16 @@ static int dmz_ctr(struct dm_target *ti, unsigned int argc, char **argv)
->>  	}
->>  	ti->private = dmz;
->>  
->> +	/* Get the metadata block device */
->> +	ret = dm_get_device(ti, argv[0], dm_table_get_mode(ti->table),
->> +			&dmz->metadata_dev);
->> +	if (ret) {
->> +		dmz->metadata_dev = NULL;
->> +		goto err;
->> +	}
->> +
->>  	/* Get the target zoned block device */
->> -	ret = dmz_get_zoned_device(ti, argv[0]);
->> +	ret = dmz_get_zoned_device(ti, argv[1]);
->>  	if (ret) {
->>  		dmz->ddev = NULL;
->>  		goto err;
->> @@ -856,6 +866,7 @@ static int dmz_ctr(struct dm_target *ti, unsigned int argc, char **argv)
->>  err_dev:
->>  	dmz_put_zoned_device(ti);
->>  err:
->> +	dm_put_device(ti, dmz->metadata_dev);
->>  	kfree(dmz);
->>  
->>  	return ret;
->> diff --git a/drivers/md/dm-zoned.h b/drivers/md/dm-zoned.h
->> index 5b5e493..e789ff5 100644
->> --- a/drivers/md/dm-zoned.h
->> +++ b/drivers/md/dm-zoned.h
->> @@ -50,6 +50,7 @@
->>   */
->>  struct dmz_dev {
->>  	struct block_device	*bdev;
->> +	struct block_device     *meta_bdev;
->>  
->>  	char			name[BDEVNAME_SIZE];
->>  
->>
-
+John
