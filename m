@@ -2,102 +2,165 @@ Return-Path: <SRS0=KNqY=3X=vger.kernel.org=linux-block-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-0.8 required=3.0 tests=DKIM_SIGNED,DKIM_VALID,
-	DKIM_VALID_AU,HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SPF_HELO_NONE,
-	SPF_PASS,URIBL_BLOCKED autolearn=no autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-8.4 required=3.0 tests=DKIMWL_WL_HIGH,DKIM_SIGNED,
+	DKIM_VALID,DKIM_VALID_AU,HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,
+	MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,USER_AGENT_SANE_1
+	autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 5EB03C3524D
-	for <linux-block@archiver.kernel.org>; Mon,  3 Feb 2020 12:18:59 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id F1DB1C33CAC
+	for <linux-block@archiver.kernel.org>; Mon,  3 Feb 2020 12:26:19 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.kernel.org (Postfix) with ESMTP id E8ECF2086A
-	for <linux-block@archiver.kernel.org>; Mon,  3 Feb 2020 12:18:58 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id BC75020658
+	for <linux-block@archiver.kernel.org>; Mon,  3 Feb 2020 12:26:19 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=pass (1024-bit key) header.d=natalenko.name header.i=@natalenko.name header.b="w016ND5I"
+	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="MWWeKH5B"
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1727924AbgBCMS6 (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Mon, 3 Feb 2020 07:18:58 -0500
-Received: from vulcan.natalenko.name ([104.207.131.136]:48330 "EHLO
-        vulcan.natalenko.name" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1727910AbgBCMS5 (ORCPT
-        <rfc822;linux-block@vger.kernel.org>); Mon, 3 Feb 2020 07:18:57 -0500
-Received: from mail.natalenko.name (vulcan.natalenko.name [IPv6:fe80::5400:ff:fe0c:dfa0])
-        (using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
-         key-exchange X25519 server-signature RSA-PSS (2048 bits) server-digest SHA256)
-        (No client certificate requested)
-        by vulcan.natalenko.name (Postfix) with ESMTPSA id EF5026B1283;
-        Mon,  3 Feb 2020 13:18:53 +0100 (CET)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=natalenko.name;
-        s=dkim-20170712; t=1580732334;
+        id S1728132AbgBCM0T (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Mon, 3 Feb 2020 07:26:19 -0500
+Received: from us-smtp-1.mimecast.com ([205.139.110.61]:23454 "EHLO
+        us-smtp-delivery-1.mimecast.com" rhost-flags-OK-OK-OK-FAIL)
+        by vger.kernel.org with ESMTP id S1728129AbgBCM0T (ORCPT
+        <rfc822;linux-block@vger.kernel.org>);
+        Mon, 3 Feb 2020 07:26:19 -0500
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+        s=mimecast20190719; t=1580732778;
         h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
          to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-         content-transfer-encoding:content-transfer-encoding:
          in-reply-to:in-reply-to:references:references;
-        bh=UUaZsIgfN4rwth55A/e8XsKo48z1Y+WrEE3i3Ao4g9w=;
-        b=w016ND5I9cnvobILmyGaNCSqLaAW9XD1rxaN66vCzNauL7CVS2YPNxdXMgXqWalH+KLCbQ
-        fw+D4sfk1KZ9CWCVPPv8x9ZZ0z2BhaVYGQY1sG4WWitOJAumHInm1gKQUAibea+8j2Dz7c
-        njP5IvTdhRsm6qRz8IQ+fAR7HkaAGSQ=
-MIME-Version: 1.0
-Content-Type: text/plain; charset=US-ASCII;
- format=flowed
-Content-Transfer-Encoding: 7bit
-Date:   Mon, 03 Feb 2020 13:18:53 +0100
-From:   Oleksandr Natalenko <oleksandr@natalenko.name>
-To:     Paolo Valente <paolo.valente@linaro.org>
+        bh=1G3DiOYC0S4Ba+SCWCudiO7SLYfZsEB+L93ae7aN88g=;
+        b=MWWeKH5BEDhzlifBHskqs7MNTqdhrdsducnkx6yPlyjFSgD6HVzI3X3zzm0cVZUdsuykuU
+        ZqlMQPGrX2Zntl9pRRaJnBmVJEHCmdQx29FenVcO4ErABnKkYNIW2i1f8CeRuscOFO2DLh
+        NPjddRlB89lQa91QZiVhJG/F68AqMIE=
+Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
+ [209.132.183.4]) (Using TLS) by relay.mimecast.com with ESMTP id
+ us-mta-208-hmNPL9KLPyeBBu-orpI8Qg-1; Mon, 03 Feb 2020 07:26:14 -0500
+X-MC-Unique: hmNPL9KLPyeBBu-orpI8Qg-1
+Received: from smtp.corp.redhat.com (int-mx07.intmail.prod.int.phx2.redhat.com [10.5.11.22])
+        (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
+        (No client certificate requested)
+        by mimecast-mx01.redhat.com (Postfix) with ESMTPS id 07DA213E6;
+        Mon,  3 Feb 2020 12:26:13 +0000 (UTC)
+Received: from ming.t460p (ovpn-8-25.pek2.redhat.com [10.72.8.25])
+        by smtp.corp.redhat.com (Postfix) with ESMTPS id 03DE310841A3;
+        Mon,  3 Feb 2020 12:26:06 +0000 (UTC)
+Date:   Mon, 3 Feb 2020 20:26:02 +0800
+From:   Ming Lei <ming.lei@redhat.com>
+To:     Zhiqiang Liu <liuzhiqiang26@huawei.com>
 Cc:     Jens Axboe <axboe@kernel.dk>, linux-block@vger.kernel.org,
-        linux-kernel@vger.kernel.org, bfq-iosched@googlegroups.com,
-        patdung100@gmail.com, cevich@redhat.com
-Subject: Re: [PATCH BUGFIX V2 0/7] block, bfq: series of fixes, and not only,
- for some recently reported issues
-In-Reply-To: <20200203104100.16965-1-paolo.valente@linaro.org>
-References: <20200203104100.16965-1-paolo.valente@linaro.org>
-User-Agent: Roundcube Webmail/1.4.2
-Message-ID: <eb00f4213d90e1d1b171bbfc0dd5a3e6@natalenko.name>
-X-Sender: oleksandr@natalenko.name
+        "linux-kernel@vger.kernel.org" <linux-kernel@vger.kernel.org>,
+        Mingfangsen <mingfangsen@huawei.com>, Guiyao <guiyao@huawei.com>,
+        Louhongxiang <louhongxiang@huawei.com>
+Subject: Re: [PATCH V4] brd: check and limit max_part par
+Message-ID: <20200203122005.GB31450@ming.t460p>
+References: <76ad8074-c2ba-4bb3-3e8b-3a4925999964@huawei.com>
+MIME-Version: 1.0
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <76ad8074-c2ba-4bb3-3e8b-3a4925999964@huawei.com>
+User-Agent: Mutt/1.12.1 (2019-06-15)
+X-Scanned-By: MIMEDefang 2.84 on 10.5.11.22
 Sender: linux-block-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-On 03.02.2020 11:40, Paolo Valente wrote:
-> Hi Jens,
-> this the V2 of the series. The only change is the removal of ifdefs
-> from around gets and puts of bfq groups. As I wrote in my previous
-> cover letter, these patches are mostly fixes for the issues reported
-> in [1, 2]. All patches have been publicly tested in the dev version of
-> BFQ.
+On Tue, Jan 21, 2020 at 12:04:41PM +0800, Zhiqiang Liu wrote:
 > 
-> Thanks,
-> Paolo
+> In brd_init func, rd_nr num of brd_device are firstly allocated
+> and add in brd_devices, then brd_devices are traversed to add each
+> brd_device by calling add_disk func. When allocating brd_device,
+> the disk->first_minor is set to i * max_part, if rd_nr * max_part
+> is larger than MINORMASK, two different brd_device may have the same
+> devt, then only one of them can be successfully added.
+> when rmmod brd.ko, it will cause oops when calling brd_exit.
 > 
-> [1] https://bugzilla.redhat.com/show_bug.cgi?id=1767539
-> [2] https://bugzilla.kernel.org/show_bug.cgi?id=205447
+> Follow those steps:
+>   # modprobe brd rd_nr=3 rd_size=102400 max_part=1048576
+>   # rmmod brd
+> then, the oops will appear.
 > 
-> Paolo Valente (7):
->   block, bfq: do not plug I/O for bfq_queues with no proc refs
->   block, bfq: do not insert oom queue into position tree
->   block, bfq: get extra ref to prevent a queue from being freed during 
-> a
->     group move
->   block, bfq: extend incomplete name of field on_st
->   block, bfq: remove ifdefs from around gets/puts of bfq groups
->   block, bfq: get a ref to a group when adding it to a service tree
->   block, bfq: clarify the goal of bfq_split_bfqq()
+> Oops log:
+> [  726.613722] Call trace:
+> [  726.614175]  kernfs_find_ns+0x24/0x130
+> [  726.614852]  kernfs_find_and_get_ns+0x44/0x68
+> [  726.615749]  sysfs_remove_group+0x38/0xb0
+> [  726.616520]  blk_trace_remove_sysfs+0x1c/0x28
+> [  726.617320]  blk_unregister_queue+0x98/0x100
+> [  726.618105]  del_gendisk+0x144/0x2b8
+> [  726.618759]  brd_exit+0x68/0x560 [brd]
+> [  726.619501]  __arm64_sys_delete_module+0x19c/0x2a0
+> [  726.620384]  el0_svc_common+0x78/0x130
+> [  726.621057]  el0_svc_handler+0x38/0x78
+> [  726.621738]  el0_svc+0x8/0xc
+> [  726.622259] Code: aa0203f6 aa0103f7 aa1e03e0 d503201f (7940e260)
 > 
->  block/bfq-cgroup.c  | 16 ++++++++++++++--
->  block/bfq-iosched.c | 26 ++++++++++++++++++++------
->  block/bfq-iosched.h |  4 +++-
->  block/bfq-wf2q.c    | 23 +++++++++++++++++------
->  4 files changed, 54 insertions(+), 15 deletions(-)
+> Here, we add brd_check_and_reset_par func to check and limit max_part par.
 > 
 > --
-> 2.20.1
+> V3->V4:(suggested by Ming Lei)
+>  - remove useless change
+>  - add one limit of max_part
+> 
+> V2->V3: (suggested by Ming Lei)
+>  - clear .minors when running out of consecutive minor space in brd_alloc
+>  - remove limit of rd_nr
+> 
+> V1->V2: add more checks in brd_check_par_valid as suggested by Ming Lei.
+> 
+> Signed-off-by: Zhiqiang Liu <liuzhiqiang26@huawei.com>
+> ---
+>  drivers/block/brd.c | 27 +++++++++++++++++++++++----
+>  1 file changed, 23 insertions(+), 4 deletions(-)
+> 
+> diff --git a/drivers/block/brd.c b/drivers/block/brd.c
+> index df8103dd40ac..4684f95e3369 100644
+> --- a/drivers/block/brd.c
+> +++ b/drivers/block/brd.c
+> @@ -389,11 +389,12 @@ static struct brd_device *brd_alloc(int i)
+>  	 *  is harmless)
+>  	 */
+>  	blk_queue_physical_block_size(brd->brd_queue, PAGE_SIZE);
+> -	disk = brd->brd_disk = alloc_disk(max_part);
+> +	disk = brd->brd_disk = alloc_disk(((i * max_part) & ~MINORMASK) ?
+> +			0 : max_part);
+>  	if (!disk)
+>  		goto out_free_queue;
+>  	disk->major		= RAMDISK_MAJOR;
+> -	disk->first_minor	= i * max_part;
+> +	disk->first_minor	= i * disk->minors;
 
-Feel free to add:
+The above change isn't necessary.
 
-Tested-by: Oleksandr Natalenko <oleksandr@natalenko.name>
+>  	disk->fops		= &brd_fops;
+>  	disk->private_data	= brd;
+>  	disk->queue		= brd->brd_queue;
+> @@ -468,6 +469,25 @@ static struct kobject *brd_probe(dev_t dev, int *part, void *data)
+>  	return kobj;
+>  }
+> 
+> +static inline void brd_check_and_reset_par(void)
+> +{
+> +	if (unlikely(!max_part))
+> +		max_part = 1;
+> +
+> +	if (max_part > DISK_MAX_PARTS) {
+> +		pr_info("brd: max_part can't be larger than %d, reset max_part = %d.\n",
+> +			DISK_MAX_PARTS, DISK_MAX_PARTS);
+> +		max_part = DISK_MAX_PARTS;
+> +	}
+> +
+> +	/*
+> +	 * make sure 'max_part' can be divided exactly by (1U << MINORBITS),
+> +	 * otherwise, it is possiable to get same dev_t when adding partitions.
+> +	 */
+> +	if ((1U << MINORBITS) % max_part != 0)
+> +		max_part = 1UL << fls(max_part);
+> +}
 
-since I'm running v5.5 with this series applied for a couple of days 
-already without any visible smoke.
+You should move the above change before capping it to DISK_MAX_PARTS
+since  1UL << fls() may increase 'max_part'.
 
--- 
-   Oleksandr Natalenko (post-factum)
+
+Thanks, 
+Ming
+
