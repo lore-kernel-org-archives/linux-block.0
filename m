@@ -6,96 +6,58 @@ X-Spam-Status: No, score=-0.6 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
 	HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS
 	autolearn=no autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id EF1ABC3524F
-	for <linux-block@archiver.kernel.org>; Mon,  3 Feb 2020 08:34:26 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 38BC7C3524D
+	for <linux-block@archiver.kernel.org>; Mon,  3 Feb 2020 08:36:31 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.kernel.org (Postfix) with ESMTP id C508C20658
-	for <linux-block@archiver.kernel.org>; Mon,  3 Feb 2020 08:34:26 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id 0268420658
+	for <linux-block@archiver.kernel.org>; Mon,  3 Feb 2020 08:36:31 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (2048-bit key) header.d=infradead.org header.i=@infradead.org header.b="TPzCq1rZ"
+	dkim=fail reason="signature verification failed" (2048-bit key) header.d=infradead.org header.i=@infradead.org header.b="b5WCKpMM"
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1727654AbgBCIe0 (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Mon, 3 Feb 2020 03:34:26 -0500
-Received: from bombadil.infradead.org ([198.137.202.133]:46850 "EHLO
+        id S1727588AbgBCIga (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Mon, 3 Feb 2020 03:36:30 -0500
+Received: from bombadil.infradead.org ([198.137.202.133]:48846 "EHLO
         bombadil.infradead.org" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1727631AbgBCIeZ (ORCPT
-        <rfc822;linux-block@vger.kernel.org>); Mon, 3 Feb 2020 03:34:25 -0500
+        with ESMTP id S1726244AbgBCIga (ORCPT
+        <rfc822;linux-block@vger.kernel.org>); Mon, 3 Feb 2020 03:36:30 -0500
 DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed;
-        d=infradead.org; s=bombadil.20170209; h=In-Reply-To:Content-Transfer-Encoding
-        :Content-Type:MIME-Version:References:Message-ID:Subject:Cc:To:From:Date:
-        Sender:Reply-To:Content-ID:Content-Description:Resent-Date:Resent-From:
-        Resent-Sender:Resent-To:Resent-Cc:Resent-Message-ID:List-Id:List-Help:
-        List-Unsubscribe:List-Subscribe:List-Post:List-Owner:List-Archive;
-        bh=ISKvjtxCsGxQouTQF8hu8PX2HbDANACxqq7KIY//4yE=; b=TPzCq1rZNQC4MjD4/eHCYwj++B
-        uVkU7m7QWlHdOnu8gaUR58eZEvw7weYpohE4czQxabBGG6w+j8y6ijFb1xN3GhASBC3JjF9S/Zr6R
-        f8XFaqiMBzkmZyDJ+N6cc+Aa3Ep31qWgJc9ryJiDx47o8kevpkWci4EI1nJL73B2pw2WBxHa6URH0
-        HmIpPHWELtR4k8dAKk/pzRcs/DPRXvCQ/UewHMTo/lGO2tlAWfcj58tbTObn5bIBi7oz8bz4dHslp
-        B995uUl8bhowcH1NsDyYedCv+hKhkb17CNEjtFaxqrOTWAu62luPFIyeqwSkmPjTUCgJT7dXS4Qta
-        Gx/Dt/Lw==;
+        d=infradead.org; s=bombadil.20170209; h=In-Reply-To:Content-Type:MIME-Version
+        :References:Message-ID:Subject:Cc:To:From:Date:Sender:Reply-To:
+        Content-Transfer-Encoding:Content-ID:Content-Description:Resent-Date:
+        Resent-From:Resent-Sender:Resent-To:Resent-Cc:Resent-Message-ID:List-Id:
+        List-Help:List-Unsubscribe:List-Subscribe:List-Post:List-Owner:List-Archive;
+         bh=G2pDsW29Nx79ibmycfMTPTv+ChirvYgSU5iRViYofm4=; b=b5WCKpMM24O6CPxEP7SZ4ApZP
+        aABNRwlt6K/4mqfZC/oLtj1KXFt8hGQnWg2mPkwBzppibtbBCTzdW4B1PdcTlb/Ek9hhwyVtdNK3L
+        c4j+39Y25HCxGZez10pwRkIPh7UBB6Dwa7m9M4dCeY+0Wyey1mh5MNzplw86pSAB/3s9eD/pK+H3d
+        eEVcUtKdDV2UTQonY9Qt8C62PfVs/01GuZR8jIQ+5U+sOZuOY/8/jhpazhoLOp798XpP8d7gsKfw2
+        8Cp9OVc76gZK/7oTpkb6PL5e/qVIDDHMvijRNupyBam94Ac7/reMDR1iDqJEW/DsD7pIO+YJEt0sq
+        E0DrxmmmQ==;
 Received: from hch by bombadil.infradead.org with local (Exim 4.92.3 #3 (Red Hat Linux))
-        id 1iyXBW-0001Eo-4p; Mon, 03 Feb 2020 08:34:22 +0000
-Date:   Mon, 3 Feb 2020 00:34:22 -0800
+        id 1iyXDS-0003Ni-O0; Mon, 03 Feb 2020 08:36:22 +0000
+Date:   Mon, 3 Feb 2020 00:36:22 -0800
 From:   Christoph Hellwig <hch@infradead.org>
-To:     Bijan Mottahedeh <bijan.mottahedeh@oracle.com>
-Cc:     Christoph Hellwig <hch@infradead.org>, axboe@kernel.dk,
-        linux-block@vger.kernel.org, io-uring@vger.kernel.org
-Subject: Re: [PATCH 1/1] block: Manage bio references so the bio persists
- until necessary
-Message-ID: <20200203083422.GA2671@infradead.org>
-References: <1580441022-59129-1-git-send-email-bijan.mottahedeh@oracle.com>
- <1580441022-59129-2-git-send-email-bijan.mottahedeh@oracle.com>
- <20200131064230.GA28151@infradead.org>
- <9f29fbc7-baf3-00d1-a20c-d2a115439db2@oracle.com>
+To:     Hannes Reinecke <hare@suse.de>
+Cc:     Ilya Dryomov <idryomov@gmail.com>, Sage Weil <sage@redhat.com>,
+        Daniel Disseldorp <ddiss@suse.com>,
+        Jens Axboe <axboe@kernel.dk>, ceph-devel@vger.kernel.org,
+        linux-block@vger.kernel.org
+Subject: Re: [PATCH 15/15] rbd: switch to blk-mq
+Message-ID: <20200203083622.GA5005@infradead.org>
+References: <20200131103739.136098-1-hare@suse.de>
+ <20200131103739.136098-16-hare@suse.de>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=iso-8859-1
+Content-Type: text/plain; charset=us-ascii
 Content-Disposition: inline
-Content-Transfer-Encoding: 8bit
-In-Reply-To: <9f29fbc7-baf3-00d1-a20c-d2a115439db2@oracle.com>
+In-Reply-To: <20200131103739.136098-16-hare@suse.de>
 X-SRS-Rewrite: SMTP reverse-path rewritten from <hch@infradead.org> by bombadil.infradead.org. See http://www.infradead.org/rpr.html
 Sender: linux-block-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-On Fri, Jan 31, 2020 at 06:08:16PM +0000, Bijan Mottahedeh wrote:
-> I think the problem is that in the async case, bio_get() is not called for
-> the initial bio *before* the submit_bio() call for that bio:
-> 
->     if (dio->is_sync) {
->         dio->waiter = current;
->         bio_get(bio);
->     } else {
->         dio->iocb = iocb;
->     }
-> 
-> 
-> The bio_get() call for the async case happens too late, after the
-> submit_bio() call:
-> 
->         if (!dio->multi_bio) {
->             /*
->              * AIO needs an extra reference to ensure the dio
->              * structure which is embedded into the first bio
->              * stays around.
->              */
->             if (!is_sync)
->                 bio_get(bio);
->             dio->multi_bio = true;
->             atomic_set(&dio->ref, 2);
->         } else {
->             atomic_inc(&dio->ref);
->         }
+On Fri, Jan 31, 2020 at 11:37:39AM +0100, Hannes Reinecke wrote:
+> Allocate one queue per CPU and get a performance boost from
+> higher parallelism.
 
-That actualy is before the submit_bio call, which is just below that
-code.
-
->
-> 
-> See my previous message on the mailing list titled "io_uring: acquire
-> ctx->uring_lock before calling io_issue_sqe()" for the more details but
-> basically blkdev_bio_end_io() can be called before submit_bio() returns and
-> therefore free the initial bio.  I think it is the unconditional bio_put()
-> at the end that does it.
-
-But we never access the bio after submit_bio returns for the single
-bio async case, so I still don't understand the problem.
+Well, the driver already is using blk-mq so your subject is incorrect.
+I think you want to say something like "rbd: support multiple queues"
