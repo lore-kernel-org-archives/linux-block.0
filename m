@@ -2,169 +2,100 @@ Return-Path: <SRS0=KNqY=3X=vger.kernel.org=linux-block-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-9.6 required=3.0 tests=DKIM_SIGNED,DKIM_VALID,
-	DKIM_VALID_AU,FREEMAIL_FORGED_FROMDOMAIN,FREEMAIL_FROM,
-	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,
-	SPF_HELO_NONE,SPF_PASS,USER_AGENT_GIT autolearn=unavailable
-	autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-0.6 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
+	HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS
+	autolearn=no autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 8C249C33C9E
-	for <linux-block@archiver.kernel.org>; Mon,  3 Feb 2020 05:37:23 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id EF1ABC3524F
+	for <linux-block@archiver.kernel.org>; Mon,  3 Feb 2020 08:34:26 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.kernel.org (Postfix) with ESMTP id 5E3112080D
-	for <linux-block@archiver.kernel.org>; Mon,  3 Feb 2020 05:37:23 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id C508C20658
+	for <linux-block@archiver.kernel.org>; Mon,  3 Feb 2020 08:34:26 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="EfW/QbJn"
+	dkim=fail reason="signature verification failed" (2048-bit key) header.d=infradead.org header.i=@infradead.org header.b="TPzCq1rZ"
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1727394AbgBCFhW (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Mon, 3 Feb 2020 00:37:22 -0500
-Received: from mail-pg1-f180.google.com ([209.85.215.180]:35973 "EHLO
-        mail-pg1-f180.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1727496AbgBCFhW (ORCPT
-        <rfc822;linux-block@vger.kernel.org>); Mon, 3 Feb 2020 00:37:22 -0500
-Received: by mail-pg1-f180.google.com with SMTP id k3so7182196pgc.3;
-        Sun, 02 Feb 2020 21:37:21 -0800 (PST)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20161025;
-        h=from:to:cc:subject:date:message-id:mime-version
-         :content-transfer-encoding;
-        bh=od7Z1FJ07CsMHs7dn27tq7etJRWPdotU0tt4EY8WHv4=;
-        b=EfW/QbJnbycVtEhwdvT/Iuqu1DJ4URWnMKchwUQQtssqvBzQ64W2xigdR2bH7l95Cx
-         r6ONLAgI6LeLA30RMWWpXmMSv2/jhzwYOAaHjp4ZSdEgXE2iKVF6twj8iAcPXMqaclTD
-         T0emWrDG8CT3JeUHv1r3jRzttg5N2jC5BKNgMt/HESEKhk+/xctzpIUYGnG4WlomLdiP
-         Vg5fxmYAG3lJ4nNuenALh69xSw9GE0G4GDUDfEcqMS4JGAl+qpki6tNhuCFI6FxFkI16
-         wJd9wG/+f8Qn+c3kX+8Q7rmoq35gGeJZtwhzFi/mGbCZmm2djvxLFH3shX00/HgVmkeA
-         jntg==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20161025;
-        h=x-gm-message-state:from:to:cc:subject:date:message-id:mime-version
-         :content-transfer-encoding;
-        bh=od7Z1FJ07CsMHs7dn27tq7etJRWPdotU0tt4EY8WHv4=;
-        b=j0eaiRCJFeeZdvrltdtA0lpC0zOJPT2HarT/9AcxXwXNJHUsLjxn7P2U1ZkpAwx88k
-         ILatYSlItYVZLyFN7ao32Zf+8D1m+EQ1LRXgK9VdbE8G+tBP9GppwwIKTGarFT7M/rP3
-         eAEPSrm0AfwKO1NiyVSsShETL2mHQeiAl/7RahvjziRbhwwyaYdkFNXGStkSEaAke48a
-         XaL4GdFnuZRCtI8wxP5Whu43b9pWZL6CTkb9aQ7gAxgVlzgx09Heu2QjuQROxrSuVVHi
-         HZfXsIPIlJ2iEp9M0ZVh04he5HlS7JgKEl37EJY46H0kvZvNl89xy5VXl3Hdke8gDsJi
-         A8tw==
-X-Gm-Message-State: APjAAAX4b8gyDyUD5Yrg/1zKizenp6bDyXsddKQ9XGikfAdHZjt5wSTu
-        lbbtgvg6zotoTOlQr5oeVZWipU6h
-X-Google-Smtp-Source: APXvYqxLSDqFv8aXKB4MW8ZB7Gb01xxVky60IJZmJX7PqAPosw/8TlW0qqY0jR8Y0Vn4e15mKoJGYQ==
-X-Received: by 2002:aa7:85d8:: with SMTP id z24mr24091099pfn.202.1580708241194;
-        Sun, 02 Feb 2020 21:37:21 -0800 (PST)
-Received: from tw-172-25-31-76.office.twttr.net ([8.25.197.24])
-        by smtp.gmail.com with ESMTPSA id gx18sm19816337pjb.8.2020.02.02.21.37.20
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Sun, 02 Feb 2020 21:37:20 -0800 (PST)
-From:   Cong Wang <xiyou.wangcong@gmail.com>
-To:     linux-block@vger.kernel.org
-Cc:     linux-kernel@vger.kernel.org, Cong Wang <xiyou.wangcong@gmail.com>,
-        Jens Axboe <axboe@kernel.dk>,
-        Steven Rostedt <rostedt@goodmis.org>
-Subject: [Patch v3] block: introduce block_rq_error tracepoint
-Date:   Sun,  2 Feb 2020 21:36:50 -0800
-Message-Id: <20200203053650.8923-1-xiyou.wangcong@gmail.com>
-X-Mailer: git-send-email 2.21.1
+        id S1727654AbgBCIe0 (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Mon, 3 Feb 2020 03:34:26 -0500
+Received: from bombadil.infradead.org ([198.137.202.133]:46850 "EHLO
+        bombadil.infradead.org" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S1727631AbgBCIeZ (ORCPT
+        <rfc822;linux-block@vger.kernel.org>); Mon, 3 Feb 2020 03:34:25 -0500
+DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed;
+        d=infradead.org; s=bombadil.20170209; h=In-Reply-To:Content-Transfer-Encoding
+        :Content-Type:MIME-Version:References:Message-ID:Subject:Cc:To:From:Date:
+        Sender:Reply-To:Content-ID:Content-Description:Resent-Date:Resent-From:
+        Resent-Sender:Resent-To:Resent-Cc:Resent-Message-ID:List-Id:List-Help:
+        List-Unsubscribe:List-Subscribe:List-Post:List-Owner:List-Archive;
+        bh=ISKvjtxCsGxQouTQF8hu8PX2HbDANACxqq7KIY//4yE=; b=TPzCq1rZNQC4MjD4/eHCYwj++B
+        uVkU7m7QWlHdOnu8gaUR58eZEvw7weYpohE4czQxabBGG6w+j8y6ijFb1xN3GhASBC3JjF9S/Zr6R
+        f8XFaqiMBzkmZyDJ+N6cc+Aa3Ep31qWgJc9ryJiDx47o8kevpkWci4EI1nJL73B2pw2WBxHa6URH0
+        HmIpPHWELtR4k8dAKk/pzRcs/DPRXvCQ/UewHMTo/lGO2tlAWfcj58tbTObn5bIBi7oz8bz4dHslp
+        B995uUl8bhowcH1NsDyYedCv+hKhkb17CNEjtFaxqrOTWAu62luPFIyeqwSkmPjTUCgJT7dXS4Qta
+        Gx/Dt/Lw==;
+Received: from hch by bombadil.infradead.org with local (Exim 4.92.3 #3 (Red Hat Linux))
+        id 1iyXBW-0001Eo-4p; Mon, 03 Feb 2020 08:34:22 +0000
+Date:   Mon, 3 Feb 2020 00:34:22 -0800
+From:   Christoph Hellwig <hch@infradead.org>
+To:     Bijan Mottahedeh <bijan.mottahedeh@oracle.com>
+Cc:     Christoph Hellwig <hch@infradead.org>, axboe@kernel.dk,
+        linux-block@vger.kernel.org, io-uring@vger.kernel.org
+Subject: Re: [PATCH 1/1] block: Manage bio references so the bio persists
+ until necessary
+Message-ID: <20200203083422.GA2671@infradead.org>
+References: <1580441022-59129-1-git-send-email-bijan.mottahedeh@oracle.com>
+ <1580441022-59129-2-git-send-email-bijan.mottahedeh@oracle.com>
+ <20200131064230.GA28151@infradead.org>
+ <9f29fbc7-baf3-00d1-a20c-d2a115439db2@oracle.com>
 MIME-Version: 1.0
+Content-Type: text/plain; charset=iso-8859-1
+Content-Disposition: inline
 Content-Transfer-Encoding: 8bit
+In-Reply-To: <9f29fbc7-baf3-00d1-a20c-d2a115439db2@oracle.com>
+X-SRS-Rewrite: SMTP reverse-path rewritten from <hch@infradead.org> by bombadil.infradead.org. See http://www.infradead.org/rpr.html
 Sender: linux-block-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-Currently, rasdaemon uses the existing tracepoint block_rq_complete
-and filters out non-error cases in order to capture block disk errors.
+On Fri, Jan 31, 2020 at 06:08:16PM +0000, Bijan Mottahedeh wrote:
+> I think the problem is that in the async case, bio_get() is not called for
+> the initial bio *before* the submit_bio() call for that bio:
+> 
+>     if (dio->is_sync) {
+>         dio->waiter = current;
+>         bio_get(bio);
+>     } else {
+>         dio->iocb = iocb;
+>     }
+> 
+> 
+> The bio_get() call for the async case happens too late, after the
+> submit_bio() call:
+> 
+>         if (!dio->multi_bio) {
+>             /*
+>              * AIO needs an extra reference to ensure the dio
+>              * structure which is embedded into the first bio
+>              * stays around.
+>              */
+>             if (!is_sync)
+>                 bio_get(bio);
+>             dio->multi_bio = true;
+>             atomic_set(&dio->ref, 2);
+>         } else {
+>             atomic_inc(&dio->ref);
+>         }
 
-But there are a few problems with this approach:
+That actualy is before the submit_bio call, which is just below that
+code.
 
-1. Even kernel trace filter could do the filtering work, there is
-   still some overhead after we enable this tracepoint.
+>
+> 
+> See my previous message on the mailing list titled "io_uring: acquire
+> ctx->uring_lock before calling io_issue_sqe()" for the more details but
+> basically blkdev_bio_end_io() can be called before submit_bio() returns and
+> therefore free the initial bio.  I think it is the unconditional bio_put()
+> at the end that does it.
 
-2. The filter is merely based on errno, which does not align with kernel
-   logic to check the errors for print_req_error().
-
-3. block_rq_complete only provides dev major and minor to identify
-   the block device, it is not convenient to use in user-space.
-
-So introduce a new tracepoint block_rq_error just for the error case
-and provides the device name for convenience too. With this patch,
-rasdaemon could switch to block_rq_error.
-
-Cc: Jens Axboe <axboe@kernel.dk>
-Cc: Steven Rostedt <rostedt@goodmis.org>
-Signed-off-by: Cong Wang <xiyou.wangcong@gmail.com>
----
- block/blk-core.c             |  4 +++-
- include/trace/events/block.h | 41 ++++++++++++++++++++++++++++++++++++
- 2 files changed, 44 insertions(+), 1 deletion(-)
-
-diff --git a/block/blk-core.c b/block/blk-core.c
-index 089e890ab208..0c7ad70d06be 100644
---- a/block/blk-core.c
-+++ b/block/blk-core.c
-@@ -1450,8 +1450,10 @@ bool blk_update_request(struct request *req, blk_status_t error,
- #endif
- 
- 	if (unlikely(error && !blk_rq_is_passthrough(req) &&
--		     !(req->rq_flags & RQF_QUIET)))
-+		     !(req->rq_flags & RQF_QUIET))) {
-+		trace_block_rq_error(req, blk_status_to_errno(error), nr_bytes);
- 		print_req_error(req, error, __func__);
-+	}
- 
- 	blk_account_io_completion(req, nr_bytes);
- 
-diff --git a/include/trace/events/block.h b/include/trace/events/block.h
-index 81b43f5bdf23..575054e7cfa0 100644
---- a/include/trace/events/block.h
-+++ b/include/trace/events/block.h
-@@ -145,6 +145,47 @@ TRACE_EVENT(block_rq_complete,
- 		  __entry->nr_sector, __entry->error)
- );
- 
-+/**
-+ * block_rq_error - block IO operation error reported by device driver
-+ * @rq: block operations request
-+ * @error: status code
-+ * @nr_bytes: number of completed bytes
-+ *
-+ * The block_rq_error tracepoint event indicates that some portion
-+ * of operation request has failed as reported by the device driver.
-+ */
-+TRACE_EVENT(block_rq_error,
-+
-+	TP_PROTO(struct request *rq, int error, unsigned int nr_bytes),
-+
-+	TP_ARGS(rq, error, nr_bytes),
-+
-+	TP_STRUCT__entry(
-+		__field(  dev_t,	dev			)
-+		__string( name,		rq->rq_disk ? rq->rq_disk->disk_name : "?")
-+		__field(  sector_t,	sector			)
-+		__field(  unsigned int,	nr_sector		)
-+		__field(  int,		error			)
-+		__array(  char,		rwbs,	RWBS_LEN	)
-+	),
-+
-+	TP_fast_assign(
-+		__entry->dev	   = rq->rq_disk ? disk_devt(rq->rq_disk) : 0;
-+		__assign_str(name,   rq->rq_disk ? rq->rq_disk->disk_name : "?");
-+		__entry->sector    = blk_rq_pos(rq);
-+		__entry->nr_sector = nr_bytes >> 9;
-+		__entry->error     = error;
-+
-+		blk_fill_rwbs(__entry->rwbs, rq->cmd_flags, nr_bytes);
-+	),
-+
-+	TP_printk("%d,%d %s %s %llu + %u [%d]",
-+		  MAJOR(__entry->dev), MINOR(__entry->dev),
-+		  __get_str(name), __entry->rwbs,
-+		  (unsigned long long)__entry->sector,
-+		  __entry->nr_sector, __entry->error)
-+);
-+
- DECLARE_EVENT_CLASS(block_rq,
- 
- 	TP_PROTO(struct request_queue *q, struct request *rq),
--- 
-2.21.1
-
+But we never access the bio after submit_bio returns for the single
+bio async case, so I still don't understand the problem.
