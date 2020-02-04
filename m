@@ -2,158 +2,169 @@ Return-Path: <SRS0=vwZl=3Y=vger.kernel.org=linux-block-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-8.2 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
-	INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,
-	URIBL_BLOCKED,USER_AGENT_SANE_1 autolearn=ham autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=0.1 required=3.0 tests=DKIM_SIGNED,DKIM_VALID,
+	DKIM_VALID_AU,FREEMAIL_FORGED_FROMDOMAIN,FREEMAIL_FROM,
+	HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,
+	URIBL_BLOCKED,URIBL_SBL,URIBL_SBL_A autolearn=no autolearn_force=no
+	version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 7DEFAC35247
-	for <linux-block@archiver.kernel.org>; Tue,  4 Feb 2020 02:44:28 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 6E1FCC3524A
+	for <linux-block@archiver.kernel.org>; Tue,  4 Feb 2020 03:11:38 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.kernel.org (Postfix) with ESMTP id 5BD5D20732
-	for <linux-block@archiver.kernel.org>; Tue,  4 Feb 2020 02:44:28 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id 4099D2084E
+	for <linux-block@archiver.kernel.org>; Tue,  4 Feb 2020 03:11:38 +0000 (UTC)
+Authentication-Results: mail.kernel.org;
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="lx/YInbr"
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1726853AbgBDCo1 (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Mon, 3 Feb 2020 21:44:27 -0500
-Received: from szxga04-in.huawei.com ([45.249.212.190]:10146 "EHLO huawei.com"
-        rhost-flags-OK-OK-OK-FAIL) by vger.kernel.org with ESMTP
-        id S1726561AbgBDCo1 (ORCPT <rfc822;linux-block@vger.kernel.org>);
-        Mon, 3 Feb 2020 21:44:27 -0500
-Received: from DGGEMS410-HUB.china.huawei.com (unknown [172.30.72.59])
-        by Forcepoint Email with ESMTP id B9A3A66404176C707E8E;
-        Tue,  4 Feb 2020 10:44:25 +0800 (CST)
-Received: from [127.0.0.1] (10.173.220.183) by DGGEMS410-HUB.china.huawei.com
- (10.3.19.210) with Microsoft SMTP Server id 14.3.439.0; Tue, 4 Feb 2020
- 10:44:19 +0800
-To:     Ming Lei <ming.lei@redhat.com>, Jens Axboe <axboe@kernel.dk>
-CC:     <linux-block@vger.kernel.org>, <linux-kernel@vger.kernel.org>,
-        Mingfangsen <mingfangsen@huawei.com>,
-        "wubo (T)" <wubo40@huawei.com>, Guiyao <guiyao@huawei.com>,
-        Yanxiaodan <yanxiaodan@huawei.com>
-From:   Zhiqiang Liu <liuzhiqiang26@huawei.com>
-Subject: [PATCH V5] brd: check and limit max_part par
-Message-ID: <3f053491-d8c1-7092-58d1-85afaa2e68df@huawei.com>
-Date:   Tue, 4 Feb 2020 10:44:18 +0800
-User-Agent: Mozilla/5.0 (Windows NT 10.0; WOW64; rv:68.0) Gecko/20100101
- Thunderbird/68.2.2
+        id S1726992AbgBDDLh (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Mon, 3 Feb 2020 22:11:37 -0500
+Received: from mail-qk1-f196.google.com ([209.85.222.196]:35480 "EHLO
+        mail-qk1-f196.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S1726834AbgBDDLh (ORCPT
+        <rfc822;linux-block@vger.kernel.org>); Mon, 3 Feb 2020 22:11:37 -0500
+Received: by mail-qk1-f196.google.com with SMTP id q15so16591962qki.2;
+        Mon, 03 Feb 2020 19:11:36 -0800 (PST)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=gmail.com; s=20161025;
+        h=mime-version:references:in-reply-to:from:date:message-id:subject:to
+         :cc:content-transfer-encoding;
+        bh=AQPvBn3+mpVQXLNFO7ln9Q3PQvFlywhORrkpfNdpRp4=;
+        b=lx/YInbrNokwp5yZHxjAiGDoPWM9E2DKV37xld9nufJgcj4+Tu1yfL43ucz5nevePk
+         LnNz27D4HpwIJGOaTtk8C0MnOYpbcXav3fJZY1FTPUOUG1wd2ISFOdZw4aXORQ0UotB3
+         aPQMrXfuZ9/XNp4AIJOLGII5exFcPoOrViq9q3w3ZpzwInKdATwSVGJjkuJJyU6XRao4
+         Y/ce3+O/FdwAZchKSzYBNHF22kFxA7zs3yzQfoJnOmxc+h6c/dZPdPxpon6xN25l17HF
+         UyJS4pIwV5OLOvhsvCt4lMEbafQFOGDHUXmz8sdLPFUjMFAtgWdOkMEVYcwKUhSU7XO6
+         wLZg==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20161025;
+        h=x-gm-message-state:mime-version:references:in-reply-to:from:date
+         :message-id:subject:to:cc:content-transfer-encoding;
+        bh=AQPvBn3+mpVQXLNFO7ln9Q3PQvFlywhORrkpfNdpRp4=;
+        b=F6zcQsi+r4uYlfqOUPpOqk0hjz16J2kh/PrHfnXx0lTUFVP7k60sI0Knww8Wns6d4o
+         x/keRPgcESYv0a9V+BLQXGG2bHqrNMY8jSK3g0rUKk4PGxGVI4Nz6FVd0qc7DFZIGms6
+         n7bkPwFlRr0gpyZF6FnOIHskCrPAbrSKV7WlFvA3C6JQThzylog75lldJm7nnAUzU+OQ
+         G3weri47nvReL9SEdMxpcbPn+LLqbZhqm0Rnx1axZ8qvGd71nefrWpr70Kan2OBm6cuC
+         LAfBvoy8C2xMWE0C3iWUnBpJrw0YlI4Evmw5ThWCFI6LPU7KqiqnEu4xAPVN5K0F+1Vt
+         AG7w==
+X-Gm-Message-State: APjAAAUe7F4k2styQt+S9rVfPmBcabM3aN2syTthFIR/40sevAuAXVTJ
+        N64YdLpkzBkTMPFbQ7kleKMPv1//cAT/P533SmjM5pG5
+X-Google-Smtp-Source: APXvYqwLxRaEyV3jwYdLDHu21TDE2JoYFeQudgfpqPsVtLg1JHeGtIi431wOJ0Z8XJYxLgSzUWQB3rh7Kr+aDHb0gag=
+X-Received: by 2002:ae9:e10e:: with SMTP id g14mr27537827qkm.430.1580785896457;
+ Mon, 03 Feb 2020 19:11:36 -0800 (PST)
 MIME-Version: 1.0
-Content-Type: text/plain; charset="utf-8"
-Content-Language: en-US
-Content-Transfer-Encoding: 7bit
-X-Originating-IP: [10.173.220.183]
-X-CFilter-Loop: Reflected
+References: <cover.1580211965.git.zhangweiping@didiglobal.com>
+ <c044e71afa25fdf65ca9abd21f8a5032e1b424eb.1580211965.git.zhangweiping@didiglobal.com>
+ <871rrevfmz.fsf@nanos.tec.linutronix.de>
+In-Reply-To: <871rrevfmz.fsf@nanos.tec.linutronix.de>
+From:   Weiping Zhang <zwp10758@gmail.com>
+Date:   Tue, 4 Feb 2020 11:11:25 +0800
+Message-ID: <CAA70yB7ThwiaGFkM6J-cja4OcD0oH_6KTwH7vpmp9mVG0Xte4w@mail.gmail.com>
+Subject: Re: [PATCH v4 4/5] genirq/affinity: allow driver's discontigous
+ affinity set
+To:     Thomas Gleixner <tglx@linutronix.de>
+Cc:     Weiping Zhang <zhangweiping@didiglobal.com>,
+        Jens Axboe <axboe@kernel.dk>, Tejun Heo <tj@kernel.org>,
+        Christoph Hellwig <hch@lst.de>,
+        Bart Van Assche <bvanassche@acm.org>, keith.busch@intel.com,
+        Minwoo Im <minwoo.im.dev@gmail.com>,
+        "Nadolski, Edmund" <edmund.nadolski@intel.com>,
+        linux-block@vger.kernel.org, cgroups@vger.kernel.org,
+        linux-nvme@lists.infradead.org
+Content-Type: text/plain; charset="UTF-8"
+Content-Transfer-Encoding: quoted-printable
 Sender: linux-block-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
+Thomas Gleixner <tglx@linutronix.de> =E4=BA=8E2020=E5=B9=B42=E6=9C=881=E6=
+=97=A5=E5=91=A8=E5=85=AD =E4=B8=8B=E5=8D=885:19=E5=86=99=E9=81=93=EF=BC=9A
+>
+> Weiping Zhang <zhangweiping@didiglobal.com> writes:
+>
+> > nvme driver will add 4 sets for supporting NVMe weighted round robin,
+> > and some of these sets may be empty(depends on user configuration),
+> > so each particular set is assigned one static index for avoiding the
+> > management trouble, then the empty set will be been by
+> > irq_create_affinity_masks().
+>
+> What's the point of an empty interrupt set in the first place? This does
+> not make sense and smells like a really bad hack.
+>
+> Can you please explain in detail why this is required and why it
+> actually makes sense?
+>
+Hi Thomas,
+Sorry to late reply, I will post new patch to avoid creating empty sets.
+In this version, nvme add extra 4 sets, because nvme will split its
+io queues into 7 parts (poll, default, read, wrr_low, wrr_medium,
+wrr_high, wrr_urgent),
+the poll queues does not use irq, so nvme will has at most 6 irq sets.
+And nvme driver use
+two variables(dev->io_queues[index] and affd->set_size[index]) to
+track how many queues/irqs
+in each part. And the user may set some queues count to 0, for example:
+nvme use 96 io queues.
 
-In brd_init func, rd_nr num of brd_device are firstly allocated
-and add in brd_devices, then brd_devices are traversed to add each
-brd_device by calling add_disk func. When allocating brd_device,
-the disk->first_minor is set to i * max_part, if rd_nr * max_part
-is larger than MINORMASK, two different brd_device may have the same
-devt, then only one of them can be successfully added.
-when rmmod brd.ko, it will cause oops when calling brd_exit.
+default
+dev->io_queues[0]=3D90
+affd->set_size[0] =3D 90
 
-Follow those steps:
-  # modprobe brd rd_nr=3 rd_size=102400 max_part=1048576
-  # rmmod brd
-then, the oops will appear.
+read
+dev->io_queues[1]=3D0
+affd->set_size[1] =3D 0
 
-Oops log:
-[  726.613722] Call trace:
-[  726.614175]  kernfs_find_ns+0x24/0x130
-[  726.614852]  kernfs_find_and_get_ns+0x44/0x68
-[  726.615749]  sysfs_remove_group+0x38/0xb0
-[  726.616520]  blk_trace_remove_sysfs+0x1c/0x28
-[  726.617320]  blk_unregister_queue+0x98/0x100
-[  726.618105]  del_gendisk+0x144/0x2b8
-[  726.618759]  brd_exit+0x68/0x560 [brd]
-[  726.619501]  __arm64_sys_delete_module+0x19c/0x2a0
-[  726.620384]  el0_svc_common+0x78/0x130
-[  726.621057]  el0_svc_handler+0x38/0x78
-[  726.621738]  el0_svc+0x8/0xc
-[  726.622259] Code: aa0203f6 aa0103f7 aa1e03e0 d503201f (7940e260)
+wrr low
+dev->io_queues[2]=3D0
+affd->set_size[2] =3D 0
 
-Here, we add brd_check_and_reset_par func to check and limit max_part par.
+wrr medium
+dev->io_queues[3]=3D0
+affd->set_size[3] =3D 0
 
---
-V4->V5:(suggested by Ming Lei)
- - make sure max_part is not larger than DISK_MAX_PARTS
+wrr high
+dev->io_queues[4]=3D6
+affd->set_size[4] =3D 6
 
-V3->V4:(suggested by Ming Lei)
- - remove useless change
- - add one limit of max_part
+wrr urgent
+dev->io_queues[5]=3D0
+affd->set_size[5] =3D 0
 
-V2->V3: (suggested by Ming Lei)
- - clear .minors when running out of consecutive minor space in brd_alloc
- - remove limit of rd_nr
+In this case the index from 1 to 3 will has 0 irqs.
 
-V1->V2:
- - add more checks in brd_check_par_valid as suggested by Ming Lei.
+But actually, it's no need to use fixed index for io_queues and set_size,
+nvme just tells irq engine, how many irq_sets it has, and how may irqs
+in each set,
+so i will post V5 to solve this problem.
+        nr_sets =3D 1;
+        dev->io_queues[HCTX_TYPE_DEFAULT] =3D nr_default;
+        affd->set_size[nr_sets - 1] =3D nr_default;
+        dev->io_queues[HCTX_TYPE_READ] =3D nr_read;
+        if (nr_read) {
+                nr_sets++;
+                affd->set_size[nr_sets - 1] =3D nr_read;
+        }
+        dev->io_queues[HCTX_TYPE_WRR_LOW] =3D nr_wrr_low;
+        if (nr_wrr_low) {
+                nr_sets++;
+                affd->set_size[nr_sets - 1] =3D nr_wrr_low;
+        }
+        dev->io_queues[HCTX_TYPE_WRR_MEDIUM] =3D nr_wrr_medium;
+        if (nr_wrr_medium) {
+                nr_sets++;
+                affd->set_size[nr_sets - 1] =3D nr_wrr_medium;
+        }
+        dev->io_queues[HCTX_TYPE_WRR_HIGH] =3D nr_wrr_high;
+        if (nr_wrr_high) {
+                nr_sets++;
+                affd->set_size[nr_sets - 1] =3D nr_wrr_high;
+        }
+        dev->io_queues[HCTX_TYPE_WRR_URGENT] =3D nr_wrr_urgent;
+        if (nr_wrr_urgent) {
+                nr_sets++;
+                affd->set_size[nr_sets - 1] =3D nr_wrr_urgent;
+        }
+        affd->nr_sets =3D nr_sets;
 
-Signed-off-by: Zhiqiang Liu <liuzhiqiang26@huawei.com>
-Reviewed-by: Bob Liu <bob.liu@oracle.com>
----
- drivers/block/brd.c | 27 +++++++++++++++++++++++----
- 1 file changed, 23 insertions(+), 4 deletions(-)
-
-diff --git a/drivers/block/brd.c b/drivers/block/brd.c
-index df8103dd40ac..6b9db3f63cb7 100644
---- a/drivers/block/brd.c
-+++ b/drivers/block/brd.c
-@@ -389,11 +389,12 @@ static struct brd_device *brd_alloc(int i)
- 	 *  is harmless)
- 	 */
- 	blk_queue_physical_block_size(brd->brd_queue, PAGE_SIZE);
--	disk = brd->brd_disk = alloc_disk(max_part);
-+	disk = brd->brd_disk = alloc_disk(((i * max_part) & ~MINORMASK) ?
-+			0 : max_part);
- 	if (!disk)
- 		goto out_free_queue;
- 	disk->major		= RAMDISK_MAJOR;
--	disk->first_minor	= i * max_part;
-+	disk->first_minor	= i * disk->minors;
- 	disk->fops		= &brd_fops;
- 	disk->private_data	= brd;
- 	disk->queue		= brd->brd_queue;
-@@ -468,6 +469,25 @@ static struct kobject *brd_probe(dev_t dev, int *part, void *data)
- 	return kobj;
- }
-
-+static inline void brd_check_and_reset_par(void)
-+{
-+	if (unlikely(!max_part))
-+		max_part = 1;
-+
-+	/*
-+	 * make sure 'max_part' can be divided exactly by (1U << MINORBITS),
-+	 * otherwise, it is possiable to get same dev_t when adding partitions.
-+	 */
-+	if ((1U << MINORBITS) % max_part != 0)
-+		max_part = 1UL << fls(max_part);
-+
-+	if (max_part > DISK_MAX_PARTS) {
-+		pr_info("brd: max_part can't be larger than %d, reset max_part = %d.\n",
-+			DISK_MAX_PARTS, DISK_MAX_PARTS);
-+		max_part = DISK_MAX_PARTS;
-+	}
-+}
-+
- static int __init brd_init(void)
- {
- 	struct brd_device *brd, *next;
-@@ -491,8 +511,7 @@ static int __init brd_init(void)
- 	if (register_blkdev(RAMDISK_MAJOR, "ramdisk"))
- 		return -EIO;
-
--	if (unlikely(!max_part))
--		max_part = 1;
-+	brd_check_and_reset_par();
-
- 	for (i = 0; i < rd_nr; i++) {
- 		brd = brd_alloc(i);
--- 
-2.19.1
-
-
+Thanks
+Weiping
