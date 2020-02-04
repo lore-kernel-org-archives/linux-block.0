@@ -2,141 +2,123 @@ Return-Path: <SRS0=vwZl=3Y=vger.kernel.org=linux-block-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-14.4 required=3.0 tests=DKIMWL_WL_MED,DKIM_SIGNED,
+X-Spam-Status: No, score=-17.4 required=3.0 tests=DKIMWL_WL_MED,DKIM_SIGNED,
 	DKIM_VALID,DKIM_VALID_AU,HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,
-	MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,USER_IN_DEF_DKIM_WL
-	autolearn=unavailable autolearn_force=no version=3.4.0
+	MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,USER_AGENT_GIT,
+	USER_IN_DEF_DKIM_WL autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 68D26C3524B
-	for <linux-block@archiver.kernel.org>; Tue,  4 Feb 2020 18:26:46 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id F3828C35247
+	for <linux-block@archiver.kernel.org>; Tue,  4 Feb 2020 19:37:16 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.kernel.org (Postfix) with ESMTP id 3DEE42087E
-	for <linux-block@archiver.kernel.org>; Tue,  4 Feb 2020 18:26:46 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id BDE602082E
+	for <linux-block@archiver.kernel.org>; Tue,  4 Feb 2020 19:37:16 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="WHBqARzU"
+	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="WCXOdwFB"
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1727394AbgBDS0p (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Tue, 4 Feb 2020 13:26:45 -0500
-Received: from mail-il1-f195.google.com ([209.85.166.195]:40127 "EHLO
-        mail-il1-f195.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1727382AbgBDS0o (ORCPT
-        <rfc822;linux-block@vger.kernel.org>); Tue, 4 Feb 2020 13:26:44 -0500
-Received: by mail-il1-f195.google.com with SMTP id i7so16741973ilr.7
-        for <linux-block@vger.kernel.org>; Tue, 04 Feb 2020 10:26:42 -0800 (PST)
+        id S1727369AbgBDThQ (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Tue, 4 Feb 2020 14:37:16 -0500
+Received: from mail-vk1-f202.google.com ([209.85.221.202]:38346 "EHLO
+        mail-vk1-f202.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S1727358AbgBDThQ (ORCPT
+        <rfc822;linux-block@vger.kernel.org>); Tue, 4 Feb 2020 14:37:16 -0500
+Received: by mail-vk1-f202.google.com with SMTP id h197so6237197vka.5
+        for <linux-block@vger.kernel.org>; Tue, 04 Feb 2020 11:37:15 -0800 (PST)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=google.com; s=20161025;
-        h=mime-version:references:in-reply-to:from:date:message-id:subject:to
+        h=date:in-reply-to:message-id:mime-version:references:subject:from:to
          :cc;
-        bh=vXW19wXJC3hVKT8Q66ZK6uUNSfw5Qexl8aHI+Ttvtxs=;
-        b=WHBqARzUWFjo+MMe3akW5up70rA/ST5BWP8DO296nQBjZJ4mNrYdyCelzTgqa3aDt1
-         pUmZOE5j+5GS7tEjY22hT/hcjlyEI/hBQgEMbEX9bUDk+/TU68QF8NQky2ZwkjT3ouio
-         kEREvuPj90Q9fkwac5nGf/66rjfMk0ANG1/jPZeIOaccvYa6k6SkfRJYD5Jro35nOB21
-         CtR2qo1S5SudrdMHwsvJXklMjL34qvYuvfSZC9Ry1cGLb/QWeJhuJq6kzgugG7sMLhEC
-         vdZyg2mcdBnYCsc5O7qDg53GB0OT9qIN44HTAefcAaSzCBYikoEu/pL0UnDZVEIh23g4
-         vPRQ==
+        bh=bOYykdGyEwLVePDzOkgL79k9V9HNutxercPdQBvYEZo=;
+        b=WCXOdwFBOV7WwP9es+bVVn5HvO3QP22jf7symCGYwMS4Sp9u0zhxgUkFk9qJEw4OS5
+         VnLPfRuK0QM30SywQiZS0JOjnIKg7dPsB2Er5SEw+qnP697/xol5eVrZk2xZYC7inZq2
+         A9/z6fnSE2S9meQxw5N6my263ukaH4+lsy5u/otGczNaoPwQk4CilolFvt2ZvKViwnNU
+         yLOpnZyIAmGmsOEhbC06KpiYUqrrLtud5RSOcOR5TG9GyT6QJ0WRnrAknRSDSeLq+oIc
+         JKucULGK4Jmc8uXjn+3td9SX3R6GEKZr9LtRJs8V82Z+3HYhdAesGXYS2e72RsX/rjaI
+         fAeQ==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=1e100.net; s=20161025;
-        h=x-gm-message-state:mime-version:references:in-reply-to:from:date
-         :message-id:subject:to:cc;
-        bh=vXW19wXJC3hVKT8Q66ZK6uUNSfw5Qexl8aHI+Ttvtxs=;
-        b=Wy6Za40UUb523h9HtV35s2KZqM7n04ILxxNH1bSmXpwMlzGCPMV+/grnFFUHHWWpaS
-         ZCO9yvFfe0gT/2uxS4o1WSndoseEho5+abNONqzFwEeQFcZDo4Z8JMzwPzCjTSrH/ytK
-         4BDQd5nFHhqLdxOu7pZKB/S/PnkSjb7FPZ1j/OqCqqZoDr2jY6IA48u21Eg6uFRIR2c0
-         kcKW9h6IlmB7ucMh282s3s8W0t96/1ydzsYlz9SXAW0UBRXUi2c7xj4RqHAfomd5bIIX
-         dIsYKhWkmUxg4l5rXrGDTZ33zXn0iIJV/g4i+OF5VreZeueG4oV3r6M3stZcww4OY2QA
-         3f4Q==
-X-Gm-Message-State: APjAAAXSOJbyFog4kFwBGYPEeRhU+fyIxLLicTzl0O0PvA/slWa2bdO3
-        iisRM/yoIu36TXLPhJ+DgxjjukGuOPU+EBLdtCG62g==
-X-Google-Smtp-Source: APXvYqyWlZJUlxQ2VY87YbQcTXag2pqAuJZii8aCl5eXc/BIwIavBIBZoHQXyGZml0g66L+XiREwrBzGWy5ET7lYbYQ=
-X-Received: by 2002:a05:6e02:df2:: with SMTP id m18mr28041600ilj.56.1580840801910;
- Tue, 04 Feb 2020 10:26:41 -0800 (PST)
-MIME-Version: 1.0
-References: <CAKUOC8U03G27b6E7Z6mBo6RB=D7bKS_MQPwexEZiA7SOt_Lyvw@mail.gmail.com>
- <20200203205950.127629-1-sqazi@google.com> <20200204092004.GB19922@ming.t460p>
-In-Reply-To: <20200204092004.GB19922@ming.t460p>
+        h=x-gm-message-state:date:in-reply-to:message-id:mime-version
+         :references:subject:from:to:cc;
+        bh=bOYykdGyEwLVePDzOkgL79k9V9HNutxercPdQBvYEZo=;
+        b=IX/vSGj85EKh8vNqfLHk4cMESJnUsd9uedYIOaUOpG9/+07bA+fiAGwsl3xzryiSIR
+         6OnUVPiQVol9hUhgIbTtSrg7R3Tp7jvOkpiyGKj4sGt/OxPOKiqTV+WGiNkQOFN/8EAQ
+         XlXRVcwC648CxyGi0qLl/dOpy27nYzUrPFhV1mnOOVKeir9nqFNpPnQO8dofILilLkX5
+         uRLAKsiyCs/Ssp6QcjzJmkQPAUqsoPJn0WadQHWZk6OKt0jb9aYm8FBrYDUpC/buvI9x
+         OYix//iqSPbTlwunda1DEmZBBxMxL43mbIi35ZSpYc/THu7YlaCufs0AOVdp/MRcfrGf
+         VvIQ==
+X-Gm-Message-State: APjAAAWcmxTn3UR5VcPlp+xuUoIgMYrCc6iHMKkxjpCzbORzwplnUhwv
+        FjB74e+/w6OPoa/oXDedu5jRaBI6mQ==
+X-Google-Smtp-Source: APXvYqxsBJ450rR2WsKYmQiAz1XK7OefPHziYVK/Ufte9i3SQvIef9RFobk/w4jMq3ocySVNfwD+zihNnw==
+X-Received: by 2002:a1f:3a8a:: with SMTP id h132mr18646495vka.95.1580845034920;
+ Tue, 04 Feb 2020 11:37:14 -0800 (PST)
+Date:   Tue,  4 Feb 2020 11:37:11 -0800
+In-Reply-To: <CAKUOC8Xvxa8nixstFOdjuf7_sCZNV6EqSDxTAQZjLhvf86LESA@mail.gmail.com>
+Message-Id: <20200204193711.257285-1-sqazi@google.com>
+Mime-Version: 1.0
+References: <CAKUOC8Xvxa8nixstFOdjuf7_sCZNV6EqSDxTAQZjLhvf86LESA@mail.gmail.com>
+X-Mailer: git-send-email 2.25.0.341.g760bfbb309-goog
+Subject: [PATCH] block: Limit number of items taken from the I/O scheduler in
+ one go
 From:   Salman Qazi <sqazi@google.com>
-Date:   Tue, 4 Feb 2020 10:26:29 -0800
-Message-ID: <CAKUOC8Xvxa8nixstFOdjuf7_sCZNV6EqSDxTAQZjLhvf86LESA@mail.gmail.com>
-Subject: Re: [PATCH] block: Limit number of items taken from the I/O scheduler
- in one go
-To:     Ming Lei <ming.lei@redhat.com>
-Cc:     Bart Van Assche <bvanassche@acm.org>, Jens Axboe <axboe@kernel.dk>,
-        linux-block@vger.kernel.org,
-        Linux Kernel Mailing List <linux-kernel@vger.kernel.org>,
-        Jesse Barnes <jsbarnes@google.com>,
-        Gwendal Grignou <gwendal@google.com>
+To:     Jens Axboe <axboe@kernel.dk>, Ming Lei <ming.lei@redhat.com>,
+        Bart Van Assche <bvanassche@acm.org>,
+        linux-block@vger.kernel.org, linux-kernel@vger.kernel.org
+Cc:     Jesse Barnes <jsbarnes@google.com>,
+        Gwendal Grignou <gwendal@google.com>,
+        Hannes Reinecke <hare@suse.com>,
+        Christoph Hellwig <hch@lst.de>, Salman Qazi <sqazi@google.com>
 Content-Type: text/plain; charset="UTF-8"
 Sender: linux-block-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-On Tue, Feb 4, 2020 at 1:20 AM Ming Lei <ming.lei@redhat.com> wrote:
->
-> On Mon, Feb 03, 2020 at 12:59:50PM -0800, Salman Qazi wrote:
-> > We observed that it is possible for a flush to bypass the I/O
-> > scheduler and get added to hctx->dispatch in blk_mq_sched_bypass_insert.
->
-> We always bypass io scheduler for flush request.
->
-> > This can happen while a kworker is running blk_mq_do_dispatch_sched call
-> > in blk_mq_sched_dispatch_requests.
-> >
-> > However, the blk_mq_do_dispatch_sched call doesn't end in bounded time.
-> > As a result, the flush can sit there indefinitely, as the I/O scheduler
-> > feeds an arbitrary number of requests to the hardware.
->
-> blk-mq supposes to handle requests in hctx->dispatch with higher
-> priority, see blk_mq_sched_dispatch_requests().
->
-> However, there is single hctx->run_work, so async run queue for dispatching
-> flush request can only be run until another async run queue from scheduler
-> is done.
->
-> >
-> > The solution is to periodically poll hctx->dispatch in
-> > blk_mq_do_dispatch_sched, to put a bound on the latency of the commands
-> > sitting there.
-> >
-> > Signed-off-by: Salman Qazi <sqazi@google.com>
-> > ---
-> >  block/blk-mq-sched.c   |  6 ++++++
-> >  block/blk-mq.c         |  4 ++++
-> >  block/blk-sysfs.c      | 33 +++++++++++++++++++++++++++++++++
-> >  include/linux/blkdev.h |  2 ++
-> >  4 files changed, 45 insertions(+)
-> >
-> > diff --git a/block/blk-mq-sched.c b/block/blk-mq-sched.c
-> > index ca22afd47b3d..75cdec64b9c7 100644
-> > --- a/block/blk-mq-sched.c
-> > +++ b/block/blk-mq-sched.c
-> > @@ -90,6 +90,7 @@ static void blk_mq_do_dispatch_sched(struct blk_mq_hw_ctx *hctx)
-> >       struct request_queue *q = hctx->queue;
-> >       struct elevator_queue *e = q->elevator;
-> >       LIST_HEAD(rq_list);
-> > +     int count = 0;
-> >
-> >       do {
-> >               struct request *rq;
-> > @@ -97,6 +98,10 @@ static void blk_mq_do_dispatch_sched(struct blk_mq_hw_ctx *hctx)
-> >               if (e->type->ops.has_work && !e->type->ops.has_work(hctx))
-> >                       break;
-> >
-> > +             if (count > 0 && count % q->max_sched_batch == 0 &&
-> > +                 !list_empty_careful(&hctx->dispatch))
-> > +                     break;
->
-> q->max_sched_batch may not be needed, and it is reasonable to always
-> disaptch requests in hctx->dispatch first.
->
-> Also such trick is missed in dispatch from sw queue.
+Flushes bypass the I/O scheduler and get added to hctx->dispatch
+in blk_mq_sched_bypass_insert.  This can happen while a kworker is running
+hctx->run_work work item and is past the point in
+blk_mq_sched_dispatch_requests where hctx->dispatch is checked.
 
-I will update the commit message, drop max_sched_batch and just turn
-it into a simple check and add the same
-thing to the dispatch from the sw queue.
+The blk_mq_do_dispatch_sched call is not guaranteed to end in bounded time,
+because the I/O scheduler can feed an arbitrary number of commands.
 
->
->
-> Thanks,
-> Ming
->
+Since we have only one hctx->run_work, the commands waiting in
+hctx->dispatch will wait an arbitrary length of time for run_work to be
+rerun.
+
+A similar phenomenon exists with dispatches from the software queue.
+
+The solution is to poll hctx->dispatch in blk_mq_do_dispatch_sched and
+blk_mq_do_dispatch_ctx and return from the run_work handler and let it
+rerun.
+
+Signed-off-by: Salman Qazi <sqazi@google.com>
+---
+ block/blk-mq-sched.c | 6 ++++++
+ 1 file changed, 6 insertions(+)
+
+diff --git a/block/blk-mq-sched.c b/block/blk-mq-sched.c
+index ca22afd47b3d..d1b8b31bc3d4 100644
+--- a/block/blk-mq-sched.c
++++ b/block/blk-mq-sched.c
+@@ -97,6 +97,9 @@ static void blk_mq_do_dispatch_sched(struct blk_mq_hw_ctx *hctx)
+ 		if (e->type->ops.has_work && !e->type->ops.has_work(hctx))
+ 			break;
+ 
++		if (!list_empty_careful(&hctx->dispatch))
++			break;
++
+ 		if (!blk_mq_get_dispatch_budget(hctx))
+ 			break;
+ 
+@@ -140,6 +143,9 @@ static void blk_mq_do_dispatch_ctx(struct blk_mq_hw_ctx *hctx)
+ 	do {
+ 		struct request *rq;
+ 
++		if (!list_empty_careful(&hctx->dispatch))
++			break;
++
+ 		if (!sbitmap_any_bit_set(&hctx->ctx_map))
+ 			break;
+ 
+-- 
+2.25.0.341.g760bfbb309-goog
+
