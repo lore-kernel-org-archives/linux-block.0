@@ -2,213 +2,141 @@ Return-Path: <SRS0=vwZl=3Y=vger.kernel.org=linux-block-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-8.3 required=3.0 tests=DKIMWL_WL_HIGH,DKIM_SIGNED,
+X-Spam-Status: No, score=-14.4 required=3.0 tests=DKIMWL_WL_MED,DKIM_SIGNED,
 	DKIM_VALID,DKIM_VALID_AU,HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,
-	MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,UNPARSEABLE_RELAY,
-	URIBL_BLOCKED,USER_AGENT_SANE_1 autolearn=unavailable autolearn_force=no
-	version=3.4.0
+	MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,USER_IN_DEF_DKIM_WL
+	autolearn=unavailable autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 6D1A6C35247
-	for <linux-block@archiver.kernel.org>; Tue,  4 Feb 2020 15:42:51 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 68D26C3524B
+	for <linux-block@archiver.kernel.org>; Tue,  4 Feb 2020 18:26:46 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.kernel.org (Postfix) with ESMTP id 38B9820674
-	for <linux-block@archiver.kernel.org>; Tue,  4 Feb 2020 15:42:51 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id 3DEE42087E
+	for <linux-block@archiver.kernel.org>; Tue,  4 Feb 2020 18:26:46 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=pass (2048-bit key) header.d=oracle.com header.i=@oracle.com header.b="se9k4nHA"
+	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="WHBqARzU"
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1727358AbgBDPmu (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Tue, 4 Feb 2020 10:42:50 -0500
-Received: from aserp2120.oracle.com ([141.146.126.78]:32816 "EHLO
-        aserp2120.oracle.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1727355AbgBDPmu (ORCPT
-        <rfc822;linux-block@vger.kernel.org>); Tue, 4 Feb 2020 10:42:50 -0500
-Received: from pps.filterd (aserp2120.oracle.com [127.0.0.1])
-        by aserp2120.oracle.com (8.16.0.27/8.16.0.27) with SMTP id 014FQhJu028494;
-        Tue, 4 Feb 2020 15:42:32 GMT
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=oracle.com; h=date : from : to : cc
- : subject : message-id : references : mime-version : content-type :
- in-reply-to; s=corp-2019-08-05;
- bh=BkCJj1wbpDQpEaJd8Pp44nAdFDUujg4/EtggoC8UgxY=;
- b=se9k4nHAqXLl++Apslw+adto4Nz+vGGDtX/NW55rUyx32BkRzuWYjJLuR8OMZD1VteWg
- zh/f77RAcav/yWUBJsdKoDEDX2cOxUPhbnT8tFQqRTvBoTN6L6esSoI8WQNJ3F74f+/9
- /SVBS7OgDGRBRIPKdhYP8Zu3m4AFEVgcBrX/itr5xU96AE8Ux7arklbHWJqEEtYXR93v
- fv8Zw00nIYdJHs3kZviamKC9QWb42laCkzosGsCUi2KBvfYeduQgLZp4FQIL4HncL3lJ
- cxNqLaQd+OfE847l22VLAFx4HI+HANYGzk+P6kaKzm6oDb7nSYdGnUe2hRuGRdp4U9zx jg== 
-Received: from aserp3030.oracle.com (aserp3030.oracle.com [141.146.126.71])
-        by aserp2120.oracle.com with ESMTP id 2xw19qffke-1
-        (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=OK);
-        Tue, 04 Feb 2020 15:42:32 +0000
-Received: from pps.filterd (aserp3030.oracle.com [127.0.0.1])
-        by aserp3030.oracle.com (8.16.0.27/8.16.0.27) with SMTP id 014FOK8U169795;
-        Tue, 4 Feb 2020 15:42:32 GMT
-Received: from userv0122.oracle.com (userv0122.oracle.com [156.151.31.75])
-        by aserp3030.oracle.com with ESMTP id 2xxw0x8txj-1
-        (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=OK);
-        Tue, 04 Feb 2020 15:42:31 +0000
-Received: from abhmp0005.oracle.com (abhmp0005.oracle.com [141.146.116.11])
-        by userv0122.oracle.com (8.14.4/8.14.4) with ESMTP id 014FgUS1008045;
-        Tue, 4 Feb 2020 15:42:30 GMT
-Received: from localhost (/67.169.218.210)
-        by default (Oracle Beehive Gateway v4.0)
-        with ESMTP ; Tue, 04 Feb 2020 07:42:29 -0800
-Date:   Tue, 4 Feb 2020 07:42:29 -0800
-From:   "Darrick J. Wong" <darrick.wong@oracle.com>
-To:     Naohiro Aota <naohiro.aota@wdc.com>
-Cc:     linux-mm@kvack.org, linux-fsdevel@vger.kernel.org,
-        linux-block@vger.kernel.org,
-        Andrew Morton <akpm@linux-foundation.org>,
-        Christoph Hellwig <hch@infradead.org>
-Subject: Re: [PATCH] mm, swap: unlock inode in error path of claim_swapfile
-Message-ID: <20200204154229.GC6874@magnolia>
-References: <20200204095943.727666-1-naohiro.aota@wdc.com>
+        id S1727394AbgBDS0p (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Tue, 4 Feb 2020 13:26:45 -0500
+Received: from mail-il1-f195.google.com ([209.85.166.195]:40127 "EHLO
+        mail-il1-f195.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S1727382AbgBDS0o (ORCPT
+        <rfc822;linux-block@vger.kernel.org>); Tue, 4 Feb 2020 13:26:44 -0500
+Received: by mail-il1-f195.google.com with SMTP id i7so16741973ilr.7
+        for <linux-block@vger.kernel.org>; Tue, 04 Feb 2020 10:26:42 -0800 (PST)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=google.com; s=20161025;
+        h=mime-version:references:in-reply-to:from:date:message-id:subject:to
+         :cc;
+        bh=vXW19wXJC3hVKT8Q66ZK6uUNSfw5Qexl8aHI+Ttvtxs=;
+        b=WHBqARzUWFjo+MMe3akW5up70rA/ST5BWP8DO296nQBjZJ4mNrYdyCelzTgqa3aDt1
+         pUmZOE5j+5GS7tEjY22hT/hcjlyEI/hBQgEMbEX9bUDk+/TU68QF8NQky2ZwkjT3ouio
+         kEREvuPj90Q9fkwac5nGf/66rjfMk0ANG1/jPZeIOaccvYa6k6SkfRJYD5Jro35nOB21
+         CtR2qo1S5SudrdMHwsvJXklMjL34qvYuvfSZC9Ry1cGLb/QWeJhuJq6kzgugG7sMLhEC
+         vdZyg2mcdBnYCsc5O7qDg53GB0OT9qIN44HTAefcAaSzCBYikoEu/pL0UnDZVEIh23g4
+         vPRQ==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20161025;
+        h=x-gm-message-state:mime-version:references:in-reply-to:from:date
+         :message-id:subject:to:cc;
+        bh=vXW19wXJC3hVKT8Q66ZK6uUNSfw5Qexl8aHI+Ttvtxs=;
+        b=Wy6Za40UUb523h9HtV35s2KZqM7n04ILxxNH1bSmXpwMlzGCPMV+/grnFFUHHWWpaS
+         ZCO9yvFfe0gT/2uxS4o1WSndoseEho5+abNONqzFwEeQFcZDo4Z8JMzwPzCjTSrH/ytK
+         4BDQd5nFHhqLdxOu7pZKB/S/PnkSjb7FPZ1j/OqCqqZoDr2jY6IA48u21Eg6uFRIR2c0
+         kcKW9h6IlmB7ucMh282s3s8W0t96/1ydzsYlz9SXAW0UBRXUi2c7xj4RqHAfomd5bIIX
+         dIsYKhWkmUxg4l5rXrGDTZ33zXn0iIJV/g4i+OF5VreZeueG4oV3r6M3stZcww4OY2QA
+         3f4Q==
+X-Gm-Message-State: APjAAAXSOJbyFog4kFwBGYPEeRhU+fyIxLLicTzl0O0PvA/slWa2bdO3
+        iisRM/yoIu36TXLPhJ+DgxjjukGuOPU+EBLdtCG62g==
+X-Google-Smtp-Source: APXvYqyWlZJUlxQ2VY87YbQcTXag2pqAuJZii8aCl5eXc/BIwIavBIBZoHQXyGZml0g66L+XiREwrBzGWy5ET7lYbYQ=
+X-Received: by 2002:a05:6e02:df2:: with SMTP id m18mr28041600ilj.56.1580840801910;
+ Tue, 04 Feb 2020 10:26:41 -0800 (PST)
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <20200204095943.727666-1-naohiro.aota@wdc.com>
-User-Agent: Mutt/1.9.4 (2018-02-28)
-X-Proofpoint-Virus-Version: vendor=nai engine=6000 definitions=9520 signatures=668685
-X-Proofpoint-Spam-Details: rule=notspam policy=default score=0 suspectscore=2 malwarescore=0
- phishscore=0 bulkscore=0 spamscore=0 mlxscore=0 mlxlogscore=999
- adultscore=0 classifier=spam adjust=0 reason=mlx scancount=1
- engine=8.0.1-1911140001 definitions=main-2002040106
-X-Proofpoint-Virus-Version: vendor=nai engine=6000 definitions=9520 signatures=668685
-X-Proofpoint-Spam-Details: rule=notspam policy=default score=0 priorityscore=1501 malwarescore=0
- suspectscore=2 phishscore=0 bulkscore=0 spamscore=0 clxscore=1015
- lowpriorityscore=0 mlxscore=0 impostorscore=0 mlxlogscore=999 adultscore=0
- classifier=spam adjust=0 reason=mlx scancount=1 engine=8.0.1-1911140001
- definitions=main-2002040106
+References: <CAKUOC8U03G27b6E7Z6mBo6RB=D7bKS_MQPwexEZiA7SOt_Lyvw@mail.gmail.com>
+ <20200203205950.127629-1-sqazi@google.com> <20200204092004.GB19922@ming.t460p>
+In-Reply-To: <20200204092004.GB19922@ming.t460p>
+From:   Salman Qazi <sqazi@google.com>
+Date:   Tue, 4 Feb 2020 10:26:29 -0800
+Message-ID: <CAKUOC8Xvxa8nixstFOdjuf7_sCZNV6EqSDxTAQZjLhvf86LESA@mail.gmail.com>
+Subject: Re: [PATCH] block: Limit number of items taken from the I/O scheduler
+ in one go
+To:     Ming Lei <ming.lei@redhat.com>
+Cc:     Bart Van Assche <bvanassche@acm.org>, Jens Axboe <axboe@kernel.dk>,
+        linux-block@vger.kernel.org,
+        Linux Kernel Mailing List <linux-kernel@vger.kernel.org>,
+        Jesse Barnes <jsbarnes@google.com>,
+        Gwendal Grignou <gwendal@google.com>
+Content-Type: text/plain; charset="UTF-8"
 Sender: linux-block-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-On Tue, Feb 04, 2020 at 06:59:43PM +0900, Naohiro Aota wrote:
-> claim_swapfile() currently keeps the inode locked when it is successful, or
-> the file is already swapfile (with -EBUSY). And, on the other error cases,
-> it does not lock the inode.
-> 
-> This inconsistency of the lock state and return value is quite confusing
-> and actually causing a bad unlock balance as below in the "bad_swap"
-> section of __do_sys_swapon().
-> 
-> This commit fixes this issue by unlocking the inode on the error path. It
-> also reverts blocksize and releases bdev, so that the caller can safely
-> forget about the inode.
-> 
->     =====================================
->     WARNING: bad unlock balance detected!
->     5.5.0-rc7+ #176 Not tainted
->     -------------------------------------
->     swapon/4294 is trying to release lock (&sb->s_type->i_mutex_key) at:
->     [<ffffffff8173a6eb>] __do_sys_swapon+0x94b/0x3550
->     but there are no more locks to release!
-> 
->     other info that might help us debug this:
->     no locks held by swapon/4294.
-> 
->     stack backtrace:
->     CPU: 5 PID: 4294 Comm: swapon Not tainted 5.5.0-rc7-BTRFS-ZNS+ #176
->     Hardware name: ASUS All Series/H87-PRO, BIOS 2102 07/29/2014
->     Call Trace:
->      dump_stack+0xa1/0xea
->      ? __do_sys_swapon+0x94b/0x3550
->      print_unlock_imbalance_bug.cold+0x114/0x123
->      ? __do_sys_swapon+0x94b/0x3550
->      lock_release+0x562/0xed0
->      ? kvfree+0x31/0x40
->      ? lock_downgrade+0x770/0x770
->      ? kvfree+0x31/0x40
->      ? rcu_read_lock_sched_held+0xa1/0xd0
->      ? rcu_read_lock_bh_held+0xb0/0xb0
->      up_write+0x2d/0x490
->      ? kfree+0x293/0x2f0
->      __do_sys_swapon+0x94b/0x3550
->      ? putname+0xb0/0xf0
->      ? kmem_cache_free+0x2e7/0x370
->      ? do_sys_open+0x184/0x3e0
->      ? generic_max_swapfile_size+0x40/0x40
->      ? do_syscall_64+0x27/0x4b0
->      ? entry_SYSCALL_64_after_hwframe+0x49/0xbe
->      ? lockdep_hardirqs_on+0x38c/0x590
->      __x64_sys_swapon+0x54/0x80
->      do_syscall_64+0xa4/0x4b0
->      entry_SYSCALL_64_after_hwframe+0x49/0xbe
->     RIP: 0033:0x7f15da0a0dc7
-> 
-> Fixes: 1638045c3677 ("mm: set S_SWAPFILE on blockdev swap devices")
-> Signed-off-by: Naohiro Aota <naohiro.aota@wdc.com>
-> ---
->  mm/swapfile.c | 29 ++++++++++++++++++++++-------
->  1 file changed, 22 insertions(+), 7 deletions(-)
-> 
-> diff --git a/mm/swapfile.c b/mm/swapfile.c
-> index bb3261d45b6a..dd5d7fa42282 100644
-> --- a/mm/swapfile.c
-> +++ b/mm/swapfile.c
-> @@ -2886,24 +2886,37 @@ static int claim_swapfile(struct swap_info_struct *p, struct inode *inode)
->  		p->old_block_size = block_size(p->bdev);
->  		error = set_blocksize(p->bdev, PAGE_SIZE);
->  		if (error < 0)
-> -			return error;
-> +			goto err;
->  		/*
->  		 * Zoned block devices contain zones that have a sequential
->  		 * write only restriction.  Hence zoned block devices are not
->  		 * suitable for swapping.  Disallow them here.
->  		 */
-> -		if (blk_queue_is_zoned(p->bdev->bd_queue))
-> -			return -EINVAL;
-> +		if (blk_queue_is_zoned(p->bdev->bd_queue)) {
-> +			error = -EINVAL;
-> +			goto err;
-> +		}
->  		p->flags |= SWP_BLKDEV;
->  	} else if (S_ISREG(inode->i_mode)) {
->  		p->bdev = inode->i_sb->s_bdev;
->  	}
->  
->  	inode_lock(inode);
-> -	if (IS_SWAPFILE(inode))
-> -		return -EBUSY;
-> +	if (IS_SWAPFILE(inode)) {
-> +		inode_unlock(inode);
-> +		error = -EBUSY;
-> +		goto err;
-> +	}
->  
->  	return 0;
-> +
-> +err:
-> +	if (S_ISBLK(inode->i_mode)) {
-> +		set_blocksize(p->bdev, p->old_block_size);
-> +		blkdev_put(p->bdev, FMODE_READ | FMODE_WRITE | FMODE_EXCL);
-> +	}
-> +
-> +	return error;
->  }
->  
->  
-> @@ -3157,10 +3170,12 @@ SYSCALL_DEFINE2(swapon, const char __user *, specialfile, int, swap_flags)
->  	mapping = swap_file->f_mapping;
->  	inode = mapping->host;
->  
-> -	/* If S_ISREG(inode->i_mode) will do inode_lock(inode); */
-> +	/* do inode_lock(inode); */
+On Tue, Feb 4, 2020 at 1:20 AM Ming Lei <ming.lei@redhat.com> wrote:
+>
+> On Mon, Feb 03, 2020 at 12:59:50PM -0800, Salman Qazi wrote:
+> > We observed that it is possible for a flush to bypass the I/O
+> > scheduler and get added to hctx->dispatch in blk_mq_sched_bypass_insert.
+>
+> We always bypass io scheduler for flush request.
+>
+> > This can happen while a kworker is running blk_mq_do_dispatch_sched call
+> > in blk_mq_sched_dispatch_requests.
+> >
+> > However, the blk_mq_do_dispatch_sched call doesn't end in bounded time.
+> > As a result, the flush can sit there indefinitely, as the I/O scheduler
+> > feeds an arbitrary number of requests to the hardware.
+>
+> blk-mq supposes to handle requests in hctx->dispatch with higher
+> priority, see blk_mq_sched_dispatch_requests().
+>
+> However, there is single hctx->run_work, so async run queue for dispatching
+> flush request can only be run until another async run queue from scheduler
+> is done.
+>
+> >
+> > The solution is to periodically poll hctx->dispatch in
+> > blk_mq_do_dispatch_sched, to put a bound on the latency of the commands
+> > sitting there.
+> >
+> > Signed-off-by: Salman Qazi <sqazi@google.com>
+> > ---
+> >  block/blk-mq-sched.c   |  6 ++++++
+> >  block/blk-mq.c         |  4 ++++
+> >  block/blk-sysfs.c      | 33 +++++++++++++++++++++++++++++++++
+> >  include/linux/blkdev.h |  2 ++
+> >  4 files changed, 45 insertions(+)
+> >
+> > diff --git a/block/blk-mq-sched.c b/block/blk-mq-sched.c
+> > index ca22afd47b3d..75cdec64b9c7 100644
+> > --- a/block/blk-mq-sched.c
+> > +++ b/block/blk-mq-sched.c
+> > @@ -90,6 +90,7 @@ static void blk_mq_do_dispatch_sched(struct blk_mq_hw_ctx *hctx)
+> >       struct request_queue *q = hctx->queue;
+> >       struct elevator_queue *e = q->elevator;
+> >       LIST_HEAD(rq_list);
+> > +     int count = 0;
+> >
+> >       do {
+> >               struct request *rq;
+> > @@ -97,6 +98,10 @@ static void blk_mq_do_dispatch_sched(struct blk_mq_hw_ctx *hctx)
+> >               if (e->type->ops.has_work && !e->type->ops.has_work(hctx))
+> >                       break;
+> >
+> > +             if (count > 0 && count % q->max_sched_batch == 0 &&
+> > +                 !list_empty_careful(&hctx->dispatch))
+> > +                     break;
+>
+> q->max_sched_batch may not be needed, and it is reasonable to always
+> disaptch requests in hctx->dispatch first.
+>
+> Also such trick is missed in dispatch from sw queue.
 
-What if we made this function responsible for calling inode_lock (and
-unlock) instead of splitting it between sys_swapon and claim_swapfile?
+I will update the commit message, drop max_sched_batch and just turn
+it into a simple check and add the same
+thing to the dispatch from the sw queue.
 
---D
-
->  	error = claim_swapfile(p, inode);
-> -	if (unlikely(error))
-> +	if (unlikely(error)) {
-> +		inode = NULL;
->  		goto bad_swap;
-> +	}
->  
->  	/*
->  	 * Read the swap header.
-> -- 
-> 2.25.0
-> 
+>
+>
+> Thanks,
+> Ming
+>
