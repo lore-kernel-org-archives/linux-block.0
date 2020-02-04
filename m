@@ -2,96 +2,132 @@ Return-Path: <SRS0=vwZl=3Y=vger.kernel.org=linux-block-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-0.8 required=3.0 tests=DKIM_SIGNED,DKIM_VALID,
-	DKIM_VALID_AU,HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SPF_HELO_NONE,
-	SPF_PASS,URIBL_BLOCKED autolearn=no autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-5.2 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
+	MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED,
+	USER_AGENT_SANE_1 autolearn=unavailable autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 1F159C2D0B1
-	for <linux-block@archiver.kernel.org>; Tue,  4 Feb 2020 10:56:18 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 734C2C2D0B1
+	for <linux-block@archiver.kernel.org>; Tue,  4 Feb 2020 11:18:39 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.kernel.org (Postfix) with ESMTP id E11CD2082E
-	for <linux-block@archiver.kernel.org>; Tue,  4 Feb 2020 10:56:17 +0000 (UTC)
-Authentication-Results: mail.kernel.org;
-	dkim=pass (2048-bit key) header.d=linaro.org header.i=@linaro.org header.b="FCkHhGiC"
+	by mail.kernel.org (Postfix) with ESMTP id 530392087E
+	for <linux-block@archiver.kernel.org>; Tue,  4 Feb 2020 11:18:39 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1726965AbgBDK4R (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Tue, 4 Feb 2020 05:56:17 -0500
-Received: from mail-wr1-f47.google.com ([209.85.221.47]:45866 "EHLO
-        mail-wr1-f47.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1726741AbgBDK4R (ORCPT
-        <rfc822;linux-block@vger.kernel.org>); Tue, 4 Feb 2020 05:56:17 -0500
-Received: by mail-wr1-f47.google.com with SMTP id a6so22364839wrx.12
-        for <linux-block@vger.kernel.org>; Tue, 04 Feb 2020 02:56:14 -0800 (PST)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=linaro.org; s=google;
-        h=from:content-transfer-encoding:mime-version:subject:message-id:date
-         :to;
-        bh=aFK/2Wx9FJn4idRKXvPZxNTTRMJvAhHEsYoqajP1MSI=;
-        b=FCkHhGiCGFzYm8QL8ohCiHrU50S3YbZrqUKQx9ENpCz1pnvAS32YVno3xo2W2YDRKC
-         9caV80aQ7MJS4R1YdVhZ/KKrSkiIhGNkHmoPgc6vAu/N2GROpzAfX3MeNS7RZeKzC6bX
-         34KIB1k8NsrqYrgL8G6xnrlOFpNH1FwdeRIvRjS3OrTCrluHKkPEHw1MFtwrOsHfWqrP
-         0Z7kGoYki8cfFIk2Y2bVFEfPl5d3DTpSeY4/vV21UH9Faw/ZnOmnOrc+JzreBY9bNk6f
-         zsdUqxo2IgXa3qN1E8Ajtu0PhI9JJbmaBAQNKtsQCioJk2y9SAlqxzRgd7vJJmBAz4GR
-         9KXw==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20161025;
-        h=x-gm-message-state:from:content-transfer-encoding:mime-version
-         :subject:message-id:date:to;
-        bh=aFK/2Wx9FJn4idRKXvPZxNTTRMJvAhHEsYoqajP1MSI=;
-        b=XHMxBZOVRNWvYbKY7bNBAkQvj0x44Vx1xzbRQFiSi5rSHTRsuYDsDNGp52knCLXhaO
-         V8F9gXOVuH3HcRC8Q62qOdJ3iTFXufBZuI2DPOm3j0ObwaMftOTwIwrWnbcov0ALZZRJ
-         dXBmn4PJ3y1vwTFyyH3W4x7SYEP4cMqHlw9DK6FaC9/pke6gPCC/jtS2hd5mpRu6oREL
-         HoKrzVLVwSlAs8+cJJR8CQ17DNcD789CXfjj+Cis1eCgJavH6iud8S+gs9dFba10Ez31
-         Xsoz1HZzzwvE6PJV0u/v8vYU2k7gBjs+X5RaAjcGLnSDK+iYUEzQJTSNHyATrgIkkll6
-         Yzmw==
-X-Gm-Message-State: APjAAAUL5cIVyHODRf8afpfyIuJrX8IpLOvBy677dukJhuJiU4iTIdwq
-        /NTp3gm2FzSuw+wsUzmuiYPd6g==
-X-Google-Smtp-Source: APXvYqw1Oa/hxZAD99pI9BwduC9xQUnAEU1O/WRAI4t+KljppZzMNF3xio/ajfgRJJGlJeVa+iqFfA==
-X-Received: by 2002:a05:6000:1012:: with SMTP id a18mr11626832wrx.113.1580813773499;
-        Tue, 04 Feb 2020 02:56:13 -0800 (PST)
-Received: from [192.168.0.103] (84-33-74-252.dyn.eolo.it. [84.33.74.252])
-        by smtp.gmail.com with ESMTPSA id g21sm3325955wmh.17.2020.02.04.02.56.11
-        (version=TLS1_2 cipher=ECDHE-RSA-AES128-GCM-SHA256 bits=128/128);
-        Tue, 04 Feb 2020 02:56:12 -0800 (PST)
-From:   Paolo Valente <paolo.valente@linaro.org>
-Content-Type: text/plain;
-        charset=us-ascii
-Content-Transfer-Encoding: quoted-printable
-Mime-Version: 1.0 (Mac OS X Mail 12.4 \(3445.104.11\))
-Subject: iocost_monitor.py tells that iocost is not enabled
-Message-Id: <8FD4B865-5984-476F-BE47-98938D162749@linaro.org>
-Date:   Tue, 4 Feb 2020 11:56:10 +0100
-To:     Tejun Heo <tj@kernel.org>,
-        linux-block <linux-block@vger.kernel.org>
-X-Mailer: Apple Mail (2.3445.104.11)
+        id S1727136AbgBDLSi (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Tue, 4 Feb 2020 06:18:38 -0500
+Received: from szxga04-in.huawei.com ([45.249.212.190]:10152 "EHLO huawei.com"
+        rhost-flags-OK-OK-OK-FAIL) by vger.kernel.org with ESMTP
+        id S1726898AbgBDLSi (ORCPT <rfc822;linux-block@vger.kernel.org>);
+        Tue, 4 Feb 2020 06:18:38 -0500
+Received: from DGGEMS413-HUB.china.huawei.com (unknown [172.30.72.58])
+        by Forcepoint Email with ESMTP id 1844E1A56B88039184FB;
+        Tue,  4 Feb 2020 19:18:33 +0800 (CST)
+Received: from [127.0.0.1] (10.173.220.183) by DGGEMS413-HUB.china.huawei.com
+ (10.3.19.213) with Microsoft SMTP Server id 14.3.439.0; Tue, 4 Feb 2020
+ 19:18:27 +0800
+Subject: Re: [PATCH V5] brd: check and limit max_part par
+To:     Ming Lei <ming.lei@redhat.com>
+CC:     Jens Axboe <axboe@kernel.dk>, <linux-block@vger.kernel.org>,
+        <linux-kernel@vger.kernel.org>,
+        Mingfangsen <mingfangsen@huawei.com>,
+        "wubo (T)" <wubo40@huawei.com>, Guiyao <guiyao@huawei.com>,
+        Yanxiaodan <yanxiaodan@huawei.com>
+References: <3f053491-d8c1-7092-58d1-85afaa2e68df@huawei.com>
+ <20200204085218.GA19922@ming.t460p>
+From:   Zhiqiang Liu <liuzhiqiang26@huawei.com>
+Message-ID: <9ca2aa6a-6d61-16e3-678c-b91fd28b0b88@huawei.com>
+Date:   Tue, 4 Feb 2020 19:18:26 +0800
+User-Agent: Mozilla/5.0 (Windows NT 10.0; WOW64; rv:68.0) Gecko/20100101
+ Thunderbird/68.2.2
+MIME-Version: 1.0
+In-Reply-To: <20200204085218.GA19922@ming.t460p>
+Content-Type: text/plain; charset="utf-8"
+Content-Language: en-US
+Content-Transfer-Encoding: 7bit
+X-Originating-IP: [10.173.220.183]
+X-CFilter-Loop: Reflected
 Sender: linux-block-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-Hi Tejun,
-the following:
 
-$ cd linux/tools/cgroup
-$ sudo python3 iocost_monitor.py sda
 
-tells:
+On 2020/2/4 16:52, Ming Lei wrote:
+> On Tue, Feb 04, 2020 at 10:44:18AM +0800, Zhiqiang Liu wrote:
+>>
+>> In brd_init func, rd_nr num of brd_device are firstly allocated
+>> and add in brd_devices, then brd_devices are traversed to add each
+>> brd_device by calling add_disk func. When allocating brd_device,
+>> the disk->first_minor is set to i * max_part, if rd_nr * max_part
+>> is larger than MINORMASK, two different brd_device may have the same
+>> devt, then only one of them can be successfully added.
+>> when rmmod brd.ko, it will cause oops when calling brd_exit.
+>>
+>> Follow those steps:
+>>   # modprobe brd rd_nr=3 rd_size=102400 max_part=1048576
+>>   # rmmod brd
+>> then, the oops will appear.
+>>
+>> Oops log:
+>> [  726.613722] Call trace:
+>> [  726.614175]  kernfs_find_ns+0x24/0x130
+>> [  726.614852]  kernfs_find_and_get_ns+0x44/0x68
+>> [  726.615749]  sysfs_remove_group+0x38/0xb0
+>> [  726.616520]  blk_trace_remove_sysfs+0x1c/0x28
+>> [  726.617320]  blk_unregister_queue+0x98/0x100
+>> [  726.618105]  del_gendisk+0x144/0x2b8
+>> [  726.618759]  brd_exit+0x68/0x560 [brd]
+>> [  726.619501]  __arm64_sys_delete_module+0x19c/0x2a0
+>> [  726.620384]  el0_svc_common+0x78/0x130
+>> [  726.621057]  el0_svc_handler+0x38/0x78
+>> [  726.621738]  el0_svc+0x8/0xc
+>> [  726.622259] Code: aa0203f6 aa0103f7 aa1e03e0 d503201f (7940e260)
+>>
+>> Here, we add brd_check_and_reset_par func to check and limit max_part par.
+>>
+>> --
+>> V4->V5:(suggested by Ming Lei)
+>>  - make sure max_part is not larger than DISK_MAX_PARTS
+>>
+>> V3->V4:(suggested by Ming Lei)
+>>  - remove useless change
+>>  - add one limit of max_part
+>>
+>> V2->V3: (suggested by Ming Lei)
+>>  - clear .minors when running out of consecutive minor space in brd_alloc
+>>  - remove limit of rd_nr
+>>
+>> V1->V2:
+>>  - add more checks in brd_check_par_valid as suggested by Ming Lei.
+>>
+>> Signed-off-by: Zhiqiang Liu <liuzhiqiang26@huawei.com>
+>> Reviewed-by: Bob Liu <bob.liu@oracle.com>
+>> ---
+>>  drivers/block/brd.c | 27 +++++++++++++++++++++++----
+>>  1 file changed, 23 insertions(+), 4 deletions(-)
+>>
+>> diff --git a/drivers/block/brd.c b/drivers/block/brd.c
+>> index df8103dd40ac..6b9db3f63cb7 100644
+>> --- a/drivers/block/brd.c
+>> +++ b/drivers/block/brd.c
+>> @@ -389,11 +389,12 @@ static struct brd_device *brd_alloc(int i)
+>>  	 *  is harmless)
+>>  	 */
+>>  	blk_queue_physical_block_size(brd->brd_queue, PAGE_SIZE);
+>> -	disk = brd->brd_disk = alloc_disk(max_part);
+>> +	disk = brd->brd_disk = alloc_disk(((i * max_part) & ~MINORMASK) ?
+>> +			0 : max_part);
+>>  	if (!disk)
+>>  		goto out_free_queue;
+>>  	disk->major		= RAMDISK_MAJOR;
+>> -	disk->first_minor	= i * max_part;
+>> +	disk->first_minor	= i * disk->minors;
+> 
+> As I told you, the above change isn't needed, otherwise:
+> 
+> Reviewed-by: Ming Lei <ming.lei@redhat.com>
 
-The kernel does not have iocost enabled
+Sorry for missing that. I will remove these in v6 patch.
+Thanks for your patience.
 
-Yet:
-$ cat /sys/fs/cgroup/unified/io.cost.qos=20
-8:0 enable=3D1 ctrl=3Duser rpct=3D95.00 rlat=3D2500 wpct=3D95.00 =
-wlat=3D5000 min=3D1.00 max=3D10000.00
-$ cat /sys/block/sda/dev
-8:0
 
-If useful:
-$ cat io.cost.model=20
-8:0 ctrl=3Duser model=3Dlinear rbps=3D528156881 rseqiops=3D73442 =
-rrandiops=3D72800 wbps=3D386453414 wseqiops=3D79718 wrandiops=3D73186
-
-What am doing wrong?
-
-Thanks,
-Paolo=
