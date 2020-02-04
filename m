@@ -2,139 +2,161 @@ Return-Path: <SRS0=vwZl=3Y=vger.kernel.org=linux-block-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-8.1 required=3.0 tests=DKIMWL_WL_MED,DKIM_SIGNED,
-	DKIM_VALID,DKIM_VALID_AU,FSL_HELO_FAKE,HEADER_FROM_DIFFERENT_DOMAINS,
-	MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,USER_AGENT_SANE_1,
-	USER_IN_DEF_DKIM_WL autolearn=no autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-2.3 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
+	MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,USER_AGENT_SANE_1 autolearn=no
+	autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 07681C3524B
-	for <linux-block@archiver.kernel.org>; Tue,  4 Feb 2020 03:39:24 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 0CEFBC3524A
+	for <linux-block@archiver.kernel.org>; Tue,  4 Feb 2020 03:47:06 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.kernel.org (Postfix) with ESMTP id C4C6620CC7
-	for <linux-block@archiver.kernel.org>; Tue,  4 Feb 2020 03:39:23 +0000 (UTC)
-Authentication-Results: mail.kernel.org;
-	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="V35oksgS"
+	by mail.kernel.org (Postfix) with ESMTP id D76E92080D
+	for <linux-block@archiver.kernel.org>; Tue,  4 Feb 2020 03:47:05 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1727063AbgBDDjW (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Mon, 3 Feb 2020 22:39:22 -0500
-Received: from mail-pl1-f195.google.com ([209.85.214.195]:42422 "EHLO
-        mail-pl1-f195.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1726930AbgBDDjW (ORCPT
-        <rfc822;linux-block@vger.kernel.org>); Mon, 3 Feb 2020 22:39:22 -0500
-Received: by mail-pl1-f195.google.com with SMTP id e8so4070808plt.9
-        for <linux-block@vger.kernel.org>; Mon, 03 Feb 2020 19:39:21 -0800 (PST)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=google.com; s=20161025;
-        h=date:from:to:cc:subject:message-id:references:mime-version
-         :content-disposition:in-reply-to:user-agent;
-        bh=mPedbGLBNu2L3k6HSm0HBzkbV9veK3pUwD/I6GC5AJI=;
-        b=V35oksgSkm4ljAJXfpnCVS3GtTn17dSUeg2MvjUD8k9o4vbf9KU6/80bq/BynnK1Qf
-         IsJGGcd5RzKRTU+nuDS2OYIOc9FrCpdpjRZyPBPFE4VGdh8TVYGf/KZWj18ekArH9rB1
-         w8p1F8d+QpPkaiSpRGyBDkj03c0jf2DQ57xf2Mxcugwiy69Pm15KEyOVkkUu7FV9znsq
-         UVvWnmAFcbKMwQUVUJe/J9SizvP5DudE2sXnJ5u1ewncR+bSgjEEpmtsP8PzxWChcBCK
-         6pM/4UvjdlaLkbLMTSJpg7PKD37OS6sT9PM/ja7gJe1oJXxJfSA2WaA9rGwsQ7HAVGGd
-         1tug==
+        id S1726834AbgBDDrF (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Mon, 3 Feb 2020 22:47:05 -0500
+Received: from mail-pj1-f66.google.com ([209.85.216.66]:51685 "EHLO
+        mail-pj1-f66.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S1726694AbgBDDrF (ORCPT
+        <rfc822;linux-block@vger.kernel.org>); Mon, 3 Feb 2020 22:47:05 -0500
+Received: by mail-pj1-f66.google.com with SMTP id fa20so731665pjb.1;
+        Mon, 03 Feb 2020 19:47:04 -0800 (PST)
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=1e100.net; s=20161025;
-        h=x-gm-message-state:date:from:to:cc:subject:message-id:references
-         :mime-version:content-disposition:in-reply-to:user-agent;
-        bh=mPedbGLBNu2L3k6HSm0HBzkbV9veK3pUwD/I6GC5AJI=;
-        b=bMH/2EU7xOrdnQCLuQXOTE+eyRZVk6SWbjzl/P67etZbI36UoBYj2/QuHq2wdhwXvi
-         Ql73bhZ/z/pXO5ax9FTmuNeRG7rPFPyLNqoG6NHCt2+i9mxV8wRClyH+c2kyAzh/DgS2
-         X0AMNkKumyynvGE9woW2Rgz0vD3ntise9/whIKfsiTf/C/n+plWtCq8BLOhvotcQY70c
-         fn7d6H0bvQWIb45dnHr73hi4gJrDPXXjjl5bIVw5KBDXBO5UsORit6d2op1fD4hgp5lf
-         fjeK9m0pYBj8XzdcY01JpCLedqCQk1AJcTP7f6wXdgk8C5/cqi11l15MyZ812sHfhWmc
-         zaog==
-X-Gm-Message-State: APjAAAU+uh9aBeOPX/ifM8uAwOKZMo/nHbbMOvnj18uVEOEWuatuo7ED
-        LBt6Q5T1/Baawwmube5mCQwrog==
-X-Google-Smtp-Source: APXvYqw1B1BjXGg0r30M6wu7yNLM6kBYQXBj/o7bHXB1/TSf0blx3HAUudnmN5lGww82QU4/vn4Bug==
-X-Received: by 2002:a17:902:8b85:: with SMTP id ay5mr25055691plb.253.1580787560953;
-        Mon, 03 Feb 2020 19:39:20 -0800 (PST)
-Received: from google.com ([2620:15c:201:0:7f8c:9d6e:20b8:e324])
-        by smtp.gmail.com with ESMTPSA id g10sm10397099pfo.166.2020.02.03.19.39.20
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Mon, 03 Feb 2020 19:39:20 -0800 (PST)
-Date:   Mon, 3 Feb 2020 19:39:15 -0800
-From:   Satya Tangirala <satyat@google.com>
-To:     Christoph Hellwig <hch@infradead.org>
-Cc:     linux-block@vger.kernel.org, linux-scsi@vger.kernel.org,
-        linux-fscrypt@vger.kernel.org, linux-fsdevel@vger.kernel.org,
-        linux-f2fs-devel@lists.sourceforge.net,
-        Barani Muthukumaran <bmuthuku@qti.qualcomm.com>,
-        Kuohong Wang <kuohong.wang@mediatek.com>,
-        Kim Boojin <boojin.kim@samsung.com>
-Subject: Re: [PATCH v6 0/9] Inline Encryption Support
-Message-ID: <20200204033915.GA122248@google.com>
-References: <20191218145136.172774-1-satyat@google.com>
- <20200108140556.GB2896@infradead.org>
- <20200108184305.GA173657@google.com>
- <20200117085210.GA5473@infradead.org>
- <20200201005341.GA134917@google.com>
- <20200203091558.GA28527@infradead.org>
+        h=x-gm-message-state:subject:to:cc:references:from:autocrypt
+         :message-id:date:user-agent:mime-version:in-reply-to
+         :content-language:content-transfer-encoding;
+        bh=zm95E5W3qylf1xofGmZybtsQrBmHFZgpDMArHsN2yOI=;
+        b=B36baNmjHONSyq7KggayB6n8rWy5kiDAocDWePLNQaSu4G2IvGB5PXDyn1y7zanHIP
+         aokNiLrKS1U+b2XRnHZL6JY4q+/CorkCBAmMMScKGPYijlpsvDbAeCdI+r4yvZC5RGTp
+         tQii2j/Uuce126O2xlYGCS/To4KO7DxjPj0zMR9ahoPulQ7bNfVdSlf0+r5DuH0zmb9e
+         9F/Vxo67gW1tc30u3hN2z84vWkM403gvKX733am/1m8XBh+NzODTiAz4/fYFh4Mwu6jU
+         JBaf2lOdDn33LGnrGpsvXRRnYpfXqRjoPRFQTQ8gLSHQjEypTkhecC1vssBPd4YcIidC
+         JGgg==
+X-Gm-Message-State: APjAAAUur9avbeFqIHN8M8/9TVsqC3Rc68HuXCWNllv/1uSwTwJUcmmz
+        l5lpGfdxHbGP1Qk4Xr9Wo7kWc4ou
+X-Google-Smtp-Source: APXvYqw0Qc9XYi7lldzBn5XRHmkjwM1P7xUlWRjEptadKkJ0RvENoQHOjNpNijW2wz6FE4zDeAGpHA==
+X-Received: by 2002:a17:90b:f0f:: with SMTP id br15mr3316479pjb.138.1580788024303;
+        Mon, 03 Feb 2020 19:47:04 -0800 (PST)
+Received: from ?IPv6:2601:647:4000:d7:39ff:b3e1:a9e7:4382? ([2601:647:4000:d7:39ff:b3e1:a9e7:4382])
+        by smtp.gmail.com with ESMTPSA id 133sm21996869pfy.14.2020.02.03.19.47.03
+        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
+        Mon, 03 Feb 2020 19:47:03 -0800 (PST)
+Subject: Re: [PATCH] block: Limit number of items taken from the I/O scheduler
+ in one go
+To:     Salman Qazi <sqazi@google.com>, Jens Axboe <axboe@kernel.dk>,
+        linux-block@vger.kernel.org, linux-kernel@vger.kernel.org
+Cc:     Jesse Barnes <jsbarnes@google.com>,
+        Gwendal Grignou <gwendal@google.com>,
+        Christoph Hellwig <hch@lst.de>, Ming Lei <ming.lei@redhat.com>,
+        Hannes Reinecke <hare@suse.com>
+References: <CAKUOC8U03G27b6E7Z6mBo6RB=D7bKS_MQPwexEZiA7SOt_Lyvw@mail.gmail.com>
+ <20200203205950.127629-1-sqazi@google.com>
+From:   Bart Van Assche <bvanassche@acm.org>
+Autocrypt: addr=bvanassche@acm.org; prefer-encrypt=mutual; keydata=
+ mQENBFSOu4oBCADcRWxVUvkkvRmmwTwIjIJvZOu6wNm+dz5AF4z0FHW2KNZL3oheO3P8UZWr
+ LQOrCfRcK8e/sIs2Y2D3Lg/SL7qqbMehGEYcJptu6mKkywBfoYbtBkVoJ/jQsi2H0vBiiCOy
+ fmxMHIPcYxaJdXxrOG2UO4B60Y/BzE6OrPDT44w4cZA9DH5xialliWU447Bts8TJNa3lZKS1
+ AvW1ZklbvJfAJJAwzDih35LxU2fcWbmhPa7EO2DCv/LM1B10GBB/oQB5kvlq4aA2PSIWkqz4
+ 3SI5kCPSsygD6wKnbRsvNn2mIACva6VHdm62A7xel5dJRfpQjXj2snd1F/YNoNc66UUTABEB
+ AAG0JEJhcnQgVmFuIEFzc2NoZSA8YnZhbmFzc2NoZUBhY20ub3JnPokBOQQTAQIAIwUCVI67
+ igIbAwcLCQgHAwIBBhUIAgkKCwQWAgMBAh4BAheAAAoJEHFcPTXFzhAJ8QkH/1AdXblKL65M
+ Y1Zk1bYKnkAb4a98LxCPm/pJBilvci6boefwlBDZ2NZuuYWYgyrehMB5H+q+Kq4P0IBbTqTa
+ jTPAANn62A6jwJ0FnCn6YaM9TZQjM1F7LoDX3v+oAkaoXuq0dQ4hnxQNu792bi6QyVdZUvKc
+ macVFVgfK9n04mL7RzjO3f+X4midKt/s+G+IPr4DGlrq+WH27eDbpUR3aYRk8EgbgGKvQFdD
+ CEBFJi+5ZKOArmJVBSk21RHDpqyz6Vit3rjep7c1SN8s7NhVi9cjkKmMDM7KYhXkWc10lKx2
+ RTkFI30rkDm4U+JpdAd2+tP3tjGf9AyGGinpzE2XY1K5AQ0EVI67igEIAKiSyd0nECrgz+H5
+ PcFDGYQpGDMTl8MOPCKw/F3diXPuj2eql4xSbAdbUCJzk2ETif5s3twT2ER8cUTEVOaCEUY3
+ eOiaFgQ+nGLx4BXqqGewikPJCe+UBjFnH1m2/IFn4T9jPZkV8xlkKmDUqMK5EV9n3eQLkn5g
+ lco+FepTtmbkSCCjd91EfThVbNYpVQ5ZjdBCXN66CKyJDMJ85HVr5rmXG/nqriTh6cv1l1Js
+ T7AFvvPjUPknS6d+BETMhTkbGzoyS+sywEsQAgA+BMCxBH4LvUmHYhpS+W6CiZ3ZMxjO8Hgc
+ ++w1mLeRUvda3i4/U8wDT3SWuHcB3DWlcppECLkAEQEAAYkBHwQYAQIACQUCVI67igIbDAAK
+ CRBxXD01xc4QCZ4dB/0QrnEasxjM0PGeXK5hcZMT9Eo998alUfn5XU0RQDYdwp6/kMEXMdmT
+ oH0F0xB3SQ8WVSXA9rrc4EBvZruWQ+5/zjVrhhfUAx12CzL4oQ9Ro2k45daYaonKTANYG22y
+ //x8dLe2Fv1By4SKGhmzwH87uXxbTJAUxiWIi1np0z3/RDnoVyfmfbbL1DY7zf2hYXLLzsJR
+ mSsED/1nlJ9Oq5fALdNEPgDyPUerqHxcmIub+pF0AzJoYHK5punqpqfGmqPbjxrJLPJfHVKy
+ goMj5DlBMoYqEgpbwdUYkH6QdizJJCur4icy8GUNbisFYABeoJ91pnD4IGei3MTdvINSZI5e
+Message-ID: <6499bf21-df25-3881-4252-8c51a9785bb7@acm.org>
+Date:   Mon, 3 Feb 2020 19:47:02 -0800
+User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:68.0) Gecko/20100101
+ Thunderbird/68.4.1
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <20200203091558.GA28527@infradead.org>
-User-Agent: Mutt/1.10.1 (2018-07-13)
+In-Reply-To: <20200203205950.127629-1-sqazi@google.com>
+Content-Type: text/plain; charset=utf-8
+Content-Language: en-US
+Content-Transfer-Encoding: 7bit
 Sender: linux-block-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-On Mon, Feb 03, 2020 at 01:15:58AM -0800, Christoph Hellwig wrote:
-> On Fri, Jan 31, 2020 at 04:53:41PM -0800, Satya Tangirala wrote:
-> > So I tried reading through more of blk-mq and the IO schedulers to figure
-> > out how to do this. As far as I can tell, requests may be merged with
-> > each other until they're taken off the scheduler. So ideally, we'd
-> > program a keyslot for a request when it's taken off the scheduler, but
-> > this happens from within an atomic context. Otoh, programming a keyslot
-> > might cause the thread to sleep (in the event that all keyslots are in use
-> > by other in-flight requests). Unless I'm missing something, or you had some
-> > other different idea in mind, I think it's a lot easier to stick to letting
-> > blk-crypto program keyslots and manage them per-bio...
+On 2020-02-03 12:59, Salman Qazi wrote:
+> We observed that it is possible for a flush to bypass the I/O
+> scheduler and get added to hctx->dispatch in blk_mq_sched_bypass_insert.
+> This can happen while a kworker is running blk_mq_do_dispatch_sched call
+> in blk_mq_sched_dispatch_requests.
 > 
-> But as far as I understand from reading the code it only sleeps because
-> it waits for another key slot to be released.  Which is exactly like
-> any other resource constraint in the storage device.  In that case
-> ->queue_rq returns BLK_STS_RESOURCE (or you do the equivalent in the
-> blk-mq code) and the queue gets woken again once the resource is
-> available.
-Wouldn't that mean that all the other requests in the queue, even ones that
-don't even need any inline encryption, also don't get processed until the
-queue is woken up again? And if so, are we really ok with that?
+> However, the blk_mq_do_dispatch_sched call doesn't end in bounded time.
+> As a result, the flush can sit there indefinitely, as the I/O scheduler
+> feeds an arbitrary number of requests to the hardware.
+> 
+> The solution is to periodically poll hctx->dispatch in
+> blk_mq_do_dispatch_sched, to put a bound on the latency of the commands
+> sitting there.
 
-As you said, we'd need the queue to wake up once a keyslot is available.
-It's possible that only some hardware queues and not others get blocked
-because of keyslot programming, so ideally, we could somehow make the
-correct hardware queue(s) wake up once a keyslot is freed. But the keyslot
-manager can't assume that it's actually blk-mq that's being used
-underneath, so if we want to get the keyslot manager to do something once
-a keyslot was freed, it would need some generic way to signal that to
-blk-mq. We can also just wait around for the queue to restart by itself
-after some time delay and try to program the keyslot again at that point,
-although I wouldn't want to do that because in the current design we know
-exactly when a keyslot is freed, and we don't need to rely on potentially
-inefficient guesswork about when we can successfully program a keyslot.
-Maybe we're alright with waking up all the queues rather than only the
-ones that really need it? But in any case, I don't know yet what the
-best way to solve this problem is.
+(added Christoph, Ming and Hannes to the Cc-list)
 
-We would also need to make changes to handle programming keyslots in
-some of the other make_request_fns besides blk_mq_make_request too
-(wherever relevant, at least) which adds more complexity. Overall, it seems
-to me like trying to manage programming of keyslots on a per-request basis
-is maybe more code than what we have now, and I'm not sure what we're
-really buying by doing it (other than perhaps the performance benefit of
-having to get fewer refcounts on a variable and fewer comparisions of
-cryptographic keys).
+Thank you for having posted a patch; that really helps.
 
-Also I forgot to mention this in my previous mail, but there may be some
-drivers/devices whose keyslots cannot be programmed from an atomic context,
-so this approach which might make things difficult in those situations (the
-UFS v2.1 spec, which I followed while implementing support for inline
-crypto for UFS, does not care whether we're in an atomic context or not,
-but there might be specifications for other drivers, or even some
-particular UFS inline encryption hardware that do).
+I see that my name occurs first in the "To:" list. Since Jens is the
+block layer maintainer I think Jens should have been mentioned first.
 
-So unless you have strong objections, I'd want to continue programming
-keyslots per-bio for the above reasons.
+In version v4.20 of the Linux kernel I found the following in the legacy
+block layer code:
+* From blk_insert_flush():
+	list_add_tail(&rq->queuelist, &q->queue_head);
+* From elv_next_request():
+	list_for_each_entry(rq, &q->queue_head, queuelist)
+
+I think this means that the legacy block layer sent flush requests to
+the scheduler instead of directly to the block driver. How about
+modifying the blk-mq code such that it mimics that approach? I'm asking
+this because this patch, although the code looks clean, doesn't seem the
+best solution to me.
+
+> +		if (count > 0 && count % q->max_sched_batch == 0 &&
+> +		    !list_empty_careful(&hctx->dispatch))
+> +			break;
+
+A modulo operation in the hot path? Please don't do that.
+
+> +static ssize_t queue_max_sched_batch_store(struct request_queue *q,
+> +					   const char *page,
+> +					   size_t count)
+> +{
+> +	int err, val;
+> +
+> +	if (!q->mq_ops)
+> +		return -EINVAL;
+> +
+> +	err = kstrtoint(page, 10, &val);
+> +	if (err < 0)
+> +		return err;
+> +
+> +	if (val <= 0)
+> +		return -EINVAL;
+> +
+> +	q->max_sched_batch = val;
+> +
+> +	return count;
+> +}
+
+Has it been considered to use kstrtouint() instead of checking whether
+the value returned by kstrtoint() is positive?
+
+> +	int			max_sched_batch;
+
+unsigned int?
+
+Thanks,
+
+Bart.
