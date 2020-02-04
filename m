@@ -4,140 +4,126 @@ X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 X-Spam-Level: 
 X-Spam-Status: No, score=-8.4 required=3.0 tests=DKIMWL_WL_HIGH,DKIM_SIGNED,
 	DKIM_VALID,DKIM_VALID_AU,HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,
-	MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED,
-	USER_AGENT_SANE_1 autolearn=ham autolearn_force=no version=3.4.0
+	MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,USER_AGENT_SANE_1
+	autolearn=unavailable autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 85D85C2D0B1
-	for <linux-block@archiver.kernel.org>; Tue,  4 Feb 2020 08:52:37 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id B7412C2D0B1
+	for <linux-block@archiver.kernel.org>; Tue,  4 Feb 2020 09:20:23 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.kernel.org (Postfix) with ESMTP id 575AF2087E
-	for <linux-block@archiver.kernel.org>; Tue,  4 Feb 2020 08:52:37 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id 8D0B421744
+	for <linux-block@archiver.kernel.org>; Tue,  4 Feb 2020 09:20:23 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="RuAABrbQ"
+	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="F7pH7zl/"
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1726684AbgBDIwg (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Tue, 4 Feb 2020 03:52:36 -0500
-Received: from us-smtp-delivery-1.mimecast.com ([205.139.110.120]:20448 "EHLO
+        id S1726506AbgBDJUW (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Tue, 4 Feb 2020 04:20:22 -0500
+Received: from us-smtp-delivery-1.mimecast.com ([205.139.110.120]:30317 "EHLO
         us-smtp-1.mimecast.com" rhost-flags-OK-OK-OK-FAIL) by vger.kernel.org
-        with ESMTP id S1726053AbgBDIwg (ORCPT
-        <rfc822;linux-block@vger.kernel.org>); Tue, 4 Feb 2020 03:52:36 -0500
+        with ESMTP id S1726992AbgBDJUW (ORCPT
+        <rfc822;linux-block@vger.kernel.org>); Tue, 4 Feb 2020 04:20:22 -0500
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-        s=mimecast20190719; t=1580806354;
+        s=mimecast20190719; t=1580808020;
         h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
          to:to:cc:cc:mime-version:mime-version:content-type:content-type:
          in-reply-to:in-reply-to:references:references;
-        bh=YDDftAtPJN7YLmiKkApk/wNe+ULS/HSMN+9U0StbKz4=;
-        b=RuAABrbQZIo0i6eNctSfXSahbKX6zZbXfopqnw5rehnvPkxUVZvaZlM90l7Dho3BU3aRZm
-        XEM9nP+9/2GWKZqhbNpqy4Fdi+hCSs8oaptjzBHHKHzB3wMhtXrvAHIWumyqxdyQaV+7Fg
-        EWcnPKOKB/9wcy/AUZymiX3diUV+ii0=
+        bh=4HmF44R80GKRh8aK+Z42+sLW1TADRobX8DrtXDK9DG0=;
+        b=F7pH7zl/ZwLcMeuaR2LWTzScFMbsPDIVw20mZpyozRRH4kaBPO4nlxL+PbZ37Z1hGbZfLy
+        PrKoRrI/zUId18fpKsx8eVYotHFevwbefLNDUThthrRTmmH9QJ0bEfpzoc+z5wll24hF8Q
+        KuYCRJGQK44QS1F5SRLwh3BTYItYIHs=
 Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
  [209.132.183.4]) (Using TLS) by relay.mimecast.com with ESMTP id
- us-mta-224-NJboiqNtOkaW0opL38iU4A-1; Tue, 04 Feb 2020 03:52:31 -0500
-X-MC-Unique: NJboiqNtOkaW0opL38iU4A-1
-Received: from smtp.corp.redhat.com (int-mx01.intmail.prod.int.phx2.redhat.com [10.5.11.11])
+ us-mta-226-f5tWAjK_NNumwGHVwxlfuA-1; Tue, 04 Feb 2020 04:20:17 -0500
+X-MC-Unique: f5tWAjK_NNumwGHVwxlfuA-1
+Received: from smtp.corp.redhat.com (int-mx05.intmail.prod.int.phx2.redhat.com [10.5.11.15])
         (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
         (No client certificate requested)
-        by mimecast-mx01.redhat.com (Postfix) with ESMTPS id 7C79E13E6;
-        Tue,  4 Feb 2020 08:52:29 +0000 (UTC)
+        by mimecast-mx01.redhat.com (Postfix) with ESMTPS id 8CF4F18A6EC6;
+        Tue,  4 Feb 2020 09:20:14 +0000 (UTC)
 Received: from ming.t460p (ovpn-8-32.pek2.redhat.com [10.72.8.32])
-        by smtp.corp.redhat.com (Postfix) with ESMTPS id 108B989F01;
-        Tue,  4 Feb 2020 08:52:22 +0000 (UTC)
-Date:   Tue, 4 Feb 2020 16:52:18 +0800
+        by smtp.corp.redhat.com (Postfix) with ESMTPS id 759B690F57;
+        Tue,  4 Feb 2020 09:20:08 +0000 (UTC)
+Date:   Tue, 4 Feb 2020 17:20:04 +0800
 From:   Ming Lei <ming.lei@redhat.com>
-To:     Zhiqiang Liu <liuzhiqiang26@huawei.com>
-Cc:     Jens Axboe <axboe@kernel.dk>, linux-block@vger.kernel.org,
-        linux-kernel@vger.kernel.org, Mingfangsen <mingfangsen@huawei.com>,
-        "wubo (T)" <wubo40@huawei.com>, Guiyao <guiyao@huawei.com>,
-        Yanxiaodan <yanxiaodan@huawei.com>
-Subject: Re: [PATCH V5] brd: check and limit max_part par
-Message-ID: <20200204085218.GA19922@ming.t460p>
-References: <3f053491-d8c1-7092-58d1-85afaa2e68df@huawei.com>
+To:     Salman Qazi <sqazi@google.com>
+Cc:     Bart Van Assche <bvanassche@acm.org>, Jens Axboe <axboe@kernel.dk>,
+        linux-block@vger.kernel.org, linux-kernel@vger.kernel.org,
+        Jesse Barnes <jsbarnes@google.com>,
+        Gwendal Grignou <gwendal@google.com>
+Subject: Re: [PATCH] block: Limit number of items taken from the I/O
+ scheduler in one go
+Message-ID: <20200204092004.GB19922@ming.t460p>
+References: <CAKUOC8U03G27b6E7Z6mBo6RB=D7bKS_MQPwexEZiA7SOt_Lyvw@mail.gmail.com>
+ <20200203205950.127629-1-sqazi@google.com>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=us-ascii
 Content-Disposition: inline
-In-Reply-To: <3f053491-d8c1-7092-58d1-85afaa2e68df@huawei.com>
+In-Reply-To: <20200203205950.127629-1-sqazi@google.com>
 User-Agent: Mutt/1.12.1 (2019-06-15)
-X-Scanned-By: MIMEDefang 2.79 on 10.5.11.11
+X-Scanned-By: MIMEDefang 2.79 on 10.5.11.15
 Sender: linux-block-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-On Tue, Feb 04, 2020 at 10:44:18AM +0800, Zhiqiang Liu wrote:
+On Mon, Feb 03, 2020 at 12:59:50PM -0800, Salman Qazi wrote:
+> We observed that it is possible for a flush to bypass the I/O
+> scheduler and get added to hctx->dispatch in blk_mq_sched_bypass_insert.
+
+We always bypass io scheduler for flush request.
+
+> This can happen while a kworker is running blk_mq_do_dispatch_sched call
+> in blk_mq_sched_dispatch_requests.
 > 
-> In brd_init func, rd_nr num of brd_device are firstly allocated
-> and add in brd_devices, then brd_devices are traversed to add each
-> brd_device by calling add_disk func. When allocating brd_device,
-> the disk->first_minor is set to i * max_part, if rd_nr * max_part
-> is larger than MINORMASK, two different brd_device may have the same
-> devt, then only one of them can be successfully added.
-> when rmmod brd.ko, it will cause oops when calling brd_exit.
+> However, the blk_mq_do_dispatch_sched call doesn't end in bounded time.
+> As a result, the flush can sit there indefinitely, as the I/O scheduler
+> feeds an arbitrary number of requests to the hardware.
+
+blk-mq supposes to handle requests in hctx->dispatch with higher
+priority, see blk_mq_sched_dispatch_requests().
+
+However, there is single hctx->run_work, so async run queue for dispatching
+flush request can only be run until another async run queue from scheduler
+is done.
+
 > 
-> Follow those steps:
->   # modprobe brd rd_nr=3 rd_size=102400 max_part=1048576
->   # rmmod brd
-> then, the oops will appear.
+> The solution is to periodically poll hctx->dispatch in
+> blk_mq_do_dispatch_sched, to put a bound on the latency of the commands
+> sitting there.
 > 
-> Oops log:
-> [  726.613722] Call trace:
-> [  726.614175]  kernfs_find_ns+0x24/0x130
-> [  726.614852]  kernfs_find_and_get_ns+0x44/0x68
-> [  726.615749]  sysfs_remove_group+0x38/0xb0
-> [  726.616520]  blk_trace_remove_sysfs+0x1c/0x28
-> [  726.617320]  blk_unregister_queue+0x98/0x100
-> [  726.618105]  del_gendisk+0x144/0x2b8
-> [  726.618759]  brd_exit+0x68/0x560 [brd]
-> [  726.619501]  __arm64_sys_delete_module+0x19c/0x2a0
-> [  726.620384]  el0_svc_common+0x78/0x130
-> [  726.621057]  el0_svc_handler+0x38/0x78
-> [  726.621738]  el0_svc+0x8/0xc
-> [  726.622259] Code: aa0203f6 aa0103f7 aa1e03e0 d503201f (7940e260)
-> 
-> Here, we add brd_check_and_reset_par func to check and limit max_part par.
-> 
-> --
-> V4->V5:(suggested by Ming Lei)
->  - make sure max_part is not larger than DISK_MAX_PARTS
-> 
-> V3->V4:(suggested by Ming Lei)
->  - remove useless change
->  - add one limit of max_part
-> 
-> V2->V3: (suggested by Ming Lei)
->  - clear .minors when running out of consecutive minor space in brd_alloc
->  - remove limit of rd_nr
-> 
-> V1->V2:
->  - add more checks in brd_check_par_valid as suggested by Ming Lei.
-> 
-> Signed-off-by: Zhiqiang Liu <liuzhiqiang26@huawei.com>
-> Reviewed-by: Bob Liu <bob.liu@oracle.com>
+> Signed-off-by: Salman Qazi <sqazi@google.com>
 > ---
->  drivers/block/brd.c | 27 +++++++++++++++++++++++----
->  1 file changed, 23 insertions(+), 4 deletions(-)
+>  block/blk-mq-sched.c   |  6 ++++++
+>  block/blk-mq.c         |  4 ++++
+>  block/blk-sysfs.c      | 33 +++++++++++++++++++++++++++++++++
+>  include/linux/blkdev.h |  2 ++
+>  4 files changed, 45 insertions(+)
 > 
-> diff --git a/drivers/block/brd.c b/drivers/block/brd.c
-> index df8103dd40ac..6b9db3f63cb7 100644
-> --- a/drivers/block/brd.c
-> +++ b/drivers/block/brd.c
-> @@ -389,11 +389,12 @@ static struct brd_device *brd_alloc(int i)
->  	 *  is harmless)
->  	 */
->  	blk_queue_physical_block_size(brd->brd_queue, PAGE_SIZE);
-> -	disk = brd->brd_disk = alloc_disk(max_part);
-> +	disk = brd->brd_disk = alloc_disk(((i * max_part) & ~MINORMASK) ?
-> +			0 : max_part);
->  	if (!disk)
->  		goto out_free_queue;
->  	disk->major		= RAMDISK_MAJOR;
-> -	disk->first_minor	= i * max_part;
-> +	disk->first_minor	= i * disk->minors;
+> diff --git a/block/blk-mq-sched.c b/block/blk-mq-sched.c
+> index ca22afd47b3d..75cdec64b9c7 100644
+> --- a/block/blk-mq-sched.c
+> +++ b/block/blk-mq-sched.c
+> @@ -90,6 +90,7 @@ static void blk_mq_do_dispatch_sched(struct blk_mq_hw_ctx *hctx)
+>  	struct request_queue *q = hctx->queue;
+>  	struct elevator_queue *e = q->elevator;
+>  	LIST_HEAD(rq_list);
+> +	int count = 0;
+>  
+>  	do {
+>  		struct request *rq;
+> @@ -97,6 +98,10 @@ static void blk_mq_do_dispatch_sched(struct blk_mq_hw_ctx *hctx)
+>  		if (e->type->ops.has_work && !e->type->ops.has_work(hctx))
+>  			break;
+>  
+> +		if (count > 0 && count % q->max_sched_batch == 0 &&
+> +		    !list_empty_careful(&hctx->dispatch))
+> +			break;
 
-As I told you, the above change isn't needed, otherwise:
+q->max_sched_batch may not be needed, and it is reasonable to always
+disaptch requests in hctx->dispatch first.
 
-Reviewed-by: Ming Lei <ming.lei@redhat.com>
+Also such trick is missed in dispatch from sw queue.
 
 
-Thanks, 
+Thanks,
 Ming
 
