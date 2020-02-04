@@ -2,106 +2,105 @@ Return-Path: <SRS0=vwZl=3Y=vger.kernel.org=linux-block-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-0.6 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
-	HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS
-	autolearn=no autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-2.6 required=3.0 tests=DKIMWL_WL_HIGH,DKIM_SIGNED,
+	DKIM_VALID,DKIM_VALID_AU,MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,
+	USER_AGENT_SANE_1 autolearn=no autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 7E3D5C3524D
-	for <linux-block@archiver.kernel.org>; Tue,  4 Feb 2020 14:58:35 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id A9230C35247
+	for <linux-block@archiver.kernel.org>; Tue,  4 Feb 2020 15:42:10 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.kernel.org (Postfix) with ESMTP id 52CCB20674
-	for <linux-block@archiver.kernel.org>; Tue,  4 Feb 2020 14:58:35 +0000 (UTC)
-Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (2048-bit key) header.d=infradead.org header.i=@infradead.org header.b="jToIu+2g"
+	by mail.kernel.org (Postfix) with ESMTP id 73EB42082E
+	for <linux-block@archiver.kernel.org>; Tue,  4 Feb 2020 15:42:10 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+	s=default; t=1580830930;
+	bh=BjJC7k92nscSHgX3QEP5TLsEjNIcUbWPSbm8tJPQCms=;
+	h=Date:From:To:Subject:References:In-Reply-To:List-ID:From;
+	b=gXo/PsUpBdP6E7ksv797K0zE+Bk6IJC7D6t8K+B4W33eiWQed1n5jFIlbRG1YolIj
+	 RtAMg1yvElU5HnZG65YX3IhctputGjATAgETutp2oPB4IzbvrOgTCY1CxSArgl2izp
+	 NZomnqV8MpylTX88y4xDg8/siKlWwiktUXEwp0/E=
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1727290AbgBDO6e (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Tue, 4 Feb 2020 09:58:34 -0500
-Received: from bombadil.infradead.org ([198.137.202.133]:35520 "EHLO
-        bombadil.infradead.org" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1727267AbgBDO6e (ORCPT
-        <rfc822;linux-block@vger.kernel.org>); Tue, 4 Feb 2020 09:58:34 -0500
-DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed;
-        d=infradead.org; s=bombadil.20170209; h=In-Reply-To:Content-Type:MIME-Version
-        :References:Message-ID:Subject:Cc:To:From:Date:Sender:Reply-To:
-        Content-Transfer-Encoding:Content-ID:Content-Description;
-        bh=AfAKF0TXjgF6cXOTs0IpvR8bmv7Y5y+OTvhW+uwkYRk=; b=jToIu+2geApo4hExEekSN8//Dd
-        2Rr+plF0PB/eoNuH+8VtbAXDE4wYNJTu1b6Hwfffr8N7g3sN6DCWKoRtmBGp+SWEVhVij0/295+Xm
-        3KYG9tLY7mPgoajeQTZgnjfrZ6xrGHk8TzUFisU2KUe3DsgMpPSiIh3ixf2CkKWhkGlX/KElGf4dk
-        iZlJn5y8HhHxHYup8syqlIqOrhpMUibNDf2+udSBBTeqGaFZy2Kf3MVIgiD56cJ3muEF4LrO4XjLd
-        fU8nHmNSSwQ/sLJtRKRlo+OkWXSuQnCeW7JZuczjuyrd1raDGzt3bW6Mw90hAGtEGOlHripIRvONT
-        GICtGCaw==;
-Received: from hch by bombadil.infradead.org with local (Exim 4.92.3 #3 (Red Hat Linux))
-        id 1iyzeq-0001AI-T3; Tue, 04 Feb 2020 14:58:32 +0000
-Date:   Tue, 4 Feb 2020 06:58:32 -0800
-From:   Christoph Hellwig <hch@infradead.org>
-To:     Satya Tangirala <satyat@google.com>
-Cc:     Christoph Hellwig <hch@infradead.org>, linux-block@vger.kernel.org,
-        linux-scsi@vger.kernel.org, linux-fscrypt@vger.kernel.org,
-        linux-fsdevel@vger.kernel.org,
-        linux-f2fs-devel@lists.sourceforge.net,
-        Barani Muthukumaran <bmuthuku@qti.qualcomm.com>,
-        Kuohong Wang <kuohong.wang@mediatek.com>,
-        Kim Boojin <boojin.kim@samsung.com>
-Subject: Re: [PATCH v6 0/9] Inline Encryption Support
-Message-ID: <20200204145832.GA28393@infradead.org>
-References: <20191218145136.172774-1-satyat@google.com>
- <20200108140556.GB2896@infradead.org>
- <20200108184305.GA173657@google.com>
- <20200117085210.GA5473@infradead.org>
- <20200201005341.GA134917@google.com>
- <20200203091558.GA28527@infradead.org>
- <20200204033915.GA122248@google.com>
+        id S1727305AbgBDPmJ (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Tue, 4 Feb 2020 10:42:09 -0500
+Received: from mail.kernel.org ([198.145.29.99]:56872 "EHLO mail.kernel.org"
+        rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
+        id S1727290AbgBDPmJ (ORCPT <rfc822;linux-block@vger.kernel.org>);
+        Tue, 4 Feb 2020 10:42:09 -0500
+Received: from redsun51.ssa.fujisawa.hgst.com (unknown [199.255.47.7])
+        (using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+        (No client certificate requested)
+        by mail.kernel.org (Postfix) with ESMTPSA id 6310720674;
+        Tue,  4 Feb 2020 15:42:07 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+        s=default; t=1580830928;
+        bh=BjJC7k92nscSHgX3QEP5TLsEjNIcUbWPSbm8tJPQCms=;
+        h=Date:From:To:Subject:References:In-Reply-To:From;
+        b=vDF1etBtRok8p/4+IjEevyVwRJwKpsalx/+GC/Bk2GJ74irf9F6c/odDItuYwXFMI
+         1I3YruT5lJl36VvIxUcSqTsUyYzKlMoTqc2uwQEE2UmAQT5DIJPCOT2Xv03TzC57KJ
+         RRVAxNfhvxGZP2J/g+wn4CSC7JHif4ES6SMGAnDA=
+Date:   Wed, 5 Feb 2020 00:42:00 +0900
+From:   Keith Busch <kbusch@kernel.org>
+To:     axboe@kernel.dk, tj@kernel.org, hch@lst.de, bvanassche@acm.org,
+        minwoo.im.dev@gmail.com, tglx@linutronix.de, ming.lei@redhat.com,
+        edmund.nadolski@intel.com, linux-block@vger.kernel.org,
+        cgroups@vger.kernel.org, linux-nvme@lists.infradead.org
+Subject: Re: [PATCH v5 0/4] Add support Weighted Round Robin for blkcg and
+ nvme
+Message-ID: <20200204154200.GA5831@redsun51.ssa.fujisawa.hgst.com>
+References: <cover.1580786525.git.zhangweiping@didiglobal.com>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=us-ascii
 Content-Disposition: inline
-In-Reply-To: <20200204033915.GA122248@google.com>
-X-SRS-Rewrite: SMTP reverse-path rewritten from <hch@infradead.org> by bombadil.infradead.org. See http://www.infradead.org/rpr.html
+In-Reply-To: <cover.1580786525.git.zhangweiping@didiglobal.com>
+User-Agent: Mutt/1.12.1 (2019-06-15)
 Sender: linux-block-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-On Mon, Feb 03, 2020 at 07:39:15PM -0800, Satya Tangirala wrote:
-> Wouldn't that mean that all the other requests in the queue, even ones that
-> don't even need any inline encryption, also don't get processed until the
-> queue is woken up again?
+On Tue, Feb 04, 2020 at 11:30:45AM +0800, Weiping Zhang wrote:
+> This series try to add Weighted Round Robin for block cgroup and nvme
+> driver. When multiple containers share a single nvme device, we want
+> to protect IO critical container from not be interfernced by other
+> containers. We add blkio.wrr interface to user to control their IO
+> priority. The blkio.wrr accept five level priorities, which contains
+> "urgent", "high", "medium", "low" and "none", the "none" is used for
+> disable WRR for this cgroup.
 
-For the basic implementation yes.
+The NVMe protocol really doesn't define WRR to be a mechanism to mitigate
+interference, though. It defines credits among the weighted queues
+only for command fetching, and an urgent strict priority class that
+starves the rest. It has nothing to do with how the controller should
+prioritize completion of those commands, even if it may be reasonable to
+assume influencing when the command is fetched should affect its
+completion.
 
-> And if so, are we really ok with that?
+On the "weighted" strict priority, there's nothing separating "high"
+from "low" other than the name: the "set features" credit assignment
+can invert which queues have higher command fetch rates such that the
+"low" is favoured over the "high".
 
-That depends on the use cases.  With the fscrypt setup are we still
-going to see unencrypted I/O to the device as well?  If so we'll need
-to refine the setup and only queue up unencrypted requests.  But I'd
-still try to dumb version first and then refine it.
+There's no protection against the "urgent" class starving others: normal
+IO will timeout and trigger repeated controller resets, while polled IO
+will consume 100% of CPU cycles without making any progress if we make
+this type of queue available without any additional code to ensure the
+host behaves..
 
-> As you said, we'd need the queue to wake up once a keyslot is available.
-> It's possible that only some hardware queues and not others get blocked
-> because of keyslot programming, so ideally, we could somehow make the
-> correct hardware queue(s) wake up once a keyslot is freed. But the keyslot
-> manager can't assume that it's actually blk-mq that's being used
-> underneath,
+On the driver implementation, the number of module parameters being
+added here is problematic. We already have 2 special classes of queues,
+and defining this at the module level is considered too coarse when
+the system has different devices on opposite ends of the capability
+spectrum. For example, users want polled queues for the fast devices,
+and none for the slower tier. We just don't have a good mechanism to
+define per-controller resources, and more queue classes will make this
+problem worse.
 
-Why?  The legacy requet code is long gone.
+On the blk-mq side, this implementation doesn't work with the IO
+schedulers. If one is in use, requests may be reordered such that a
+request on your high-priority hctx may be dispatched later than more
+recent ones associated with lower priority. I don't think that's what
+you'd want to happen, so priority should be considered with schedulers
+too.
 
-> Also I forgot to mention this in my previous mail, but there may be some
-> drivers/devices whose keyslots cannot be programmed from an atomic context,
-> so this approach which might make things difficult in those situations (the
-> UFS v2.1 spec, which I followed while implementing support for inline
-> crypto for UFS, does not care whether we're in an atomic context or not,
-> but there might be specifications for other drivers, or even some
-> particular UFS inline encryption hardware that do).
-
-We have an option to never call ->queue_rq from atomic context
-(BLK_MQ_F_BLOCKING).  But do you know of existing hardware that behaves
-like this or is it just hypothetical?
-
-> So unless you have strong objections, I'd want to continue programming
-> keyslots per-bio for the above reasons.
-
-I'm pretty sure from looking at the code that doing inline encryption
-at the bio level is the wrong approach.  That isn't supposed to end
-the discussion, but especially things like waking up after a keyslot
-becomes available fits much better into the request layer resource
-model that is built around queuing limitations, and not the make_request
-model that assumes the driver can always queue.
+But really, though, NVMe's WRR is too heavy weight and difficult to use.
+The techincal work group can come up with something better, but it looks
+like they've lost interest in TPAR 4011 (no discussion in 2 years, afaics).
