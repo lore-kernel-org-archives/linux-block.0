@@ -2,105 +2,213 @@ Return-Path: <SRS0=vwZl=3Y=vger.kernel.org=linux-block-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-2.6 required=3.0 tests=DKIMWL_WL_HIGH,DKIM_SIGNED,
-	DKIM_VALID,DKIM_VALID_AU,MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,
-	USER_AGENT_SANE_1 autolearn=no autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-8.3 required=3.0 tests=DKIMWL_WL_HIGH,DKIM_SIGNED,
+	DKIM_VALID,DKIM_VALID_AU,HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,
+	MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,UNPARSEABLE_RELAY,
+	URIBL_BLOCKED,USER_AGENT_SANE_1 autolearn=unavailable autolearn_force=no
+	version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id A9230C35247
-	for <linux-block@archiver.kernel.org>; Tue,  4 Feb 2020 15:42:10 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 6D1A6C35247
+	for <linux-block@archiver.kernel.org>; Tue,  4 Feb 2020 15:42:51 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.kernel.org (Postfix) with ESMTP id 73EB42082E
-	for <linux-block@archiver.kernel.org>; Tue,  4 Feb 2020 15:42:10 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=default; t=1580830930;
-	bh=BjJC7k92nscSHgX3QEP5TLsEjNIcUbWPSbm8tJPQCms=;
-	h=Date:From:To:Subject:References:In-Reply-To:List-ID:From;
-	b=gXo/PsUpBdP6E7ksv797K0zE+Bk6IJC7D6t8K+B4W33eiWQed1n5jFIlbRG1YolIj
-	 RtAMg1yvElU5HnZG65YX3IhctputGjATAgETutp2oPB4IzbvrOgTCY1CxSArgl2izp
-	 NZomnqV8MpylTX88y4xDg8/siKlWwiktUXEwp0/E=
+	by mail.kernel.org (Postfix) with ESMTP id 38B9820674
+	for <linux-block@archiver.kernel.org>; Tue,  4 Feb 2020 15:42:51 +0000 (UTC)
+Authentication-Results: mail.kernel.org;
+	dkim=pass (2048-bit key) header.d=oracle.com header.i=@oracle.com header.b="se9k4nHA"
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1727305AbgBDPmJ (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Tue, 4 Feb 2020 10:42:09 -0500
-Received: from mail.kernel.org ([198.145.29.99]:56872 "EHLO mail.kernel.org"
-        rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-        id S1727290AbgBDPmJ (ORCPT <rfc822;linux-block@vger.kernel.org>);
-        Tue, 4 Feb 2020 10:42:09 -0500
-Received: from redsun51.ssa.fujisawa.hgst.com (unknown [199.255.47.7])
-        (using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
-        (No client certificate requested)
-        by mail.kernel.org (Postfix) with ESMTPSA id 6310720674;
-        Tue,  4 Feb 2020 15:42:07 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-        s=default; t=1580830928;
-        bh=BjJC7k92nscSHgX3QEP5TLsEjNIcUbWPSbm8tJPQCms=;
-        h=Date:From:To:Subject:References:In-Reply-To:From;
-        b=vDF1etBtRok8p/4+IjEevyVwRJwKpsalx/+GC/Bk2GJ74irf9F6c/odDItuYwXFMI
-         1I3YruT5lJl36VvIxUcSqTsUyYzKlMoTqc2uwQEE2UmAQT5DIJPCOT2Xv03TzC57KJ
-         RRVAxNfhvxGZP2J/g+wn4CSC7JHif4ES6SMGAnDA=
-Date:   Wed, 5 Feb 2020 00:42:00 +0900
-From:   Keith Busch <kbusch@kernel.org>
-To:     axboe@kernel.dk, tj@kernel.org, hch@lst.de, bvanassche@acm.org,
-        minwoo.im.dev@gmail.com, tglx@linutronix.de, ming.lei@redhat.com,
-        edmund.nadolski@intel.com, linux-block@vger.kernel.org,
-        cgroups@vger.kernel.org, linux-nvme@lists.infradead.org
-Subject: Re: [PATCH v5 0/4] Add support Weighted Round Robin for blkcg and
- nvme
-Message-ID: <20200204154200.GA5831@redsun51.ssa.fujisawa.hgst.com>
-References: <cover.1580786525.git.zhangweiping@didiglobal.com>
+        id S1727358AbgBDPmu (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Tue, 4 Feb 2020 10:42:50 -0500
+Received: from aserp2120.oracle.com ([141.146.126.78]:32816 "EHLO
+        aserp2120.oracle.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S1727355AbgBDPmu (ORCPT
+        <rfc822;linux-block@vger.kernel.org>); Tue, 4 Feb 2020 10:42:50 -0500
+Received: from pps.filterd (aserp2120.oracle.com [127.0.0.1])
+        by aserp2120.oracle.com (8.16.0.27/8.16.0.27) with SMTP id 014FQhJu028494;
+        Tue, 4 Feb 2020 15:42:32 GMT
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=oracle.com; h=date : from : to : cc
+ : subject : message-id : references : mime-version : content-type :
+ in-reply-to; s=corp-2019-08-05;
+ bh=BkCJj1wbpDQpEaJd8Pp44nAdFDUujg4/EtggoC8UgxY=;
+ b=se9k4nHAqXLl++Apslw+adto4Nz+vGGDtX/NW55rUyx32BkRzuWYjJLuR8OMZD1VteWg
+ zh/f77RAcav/yWUBJsdKoDEDX2cOxUPhbnT8tFQqRTvBoTN6L6esSoI8WQNJ3F74f+/9
+ /SVBS7OgDGRBRIPKdhYP8Zu3m4AFEVgcBrX/itr5xU96AE8Ux7arklbHWJqEEtYXR93v
+ fv8Zw00nIYdJHs3kZviamKC9QWb42laCkzosGsCUi2KBvfYeduQgLZp4FQIL4HncL3lJ
+ cxNqLaQd+OfE847l22VLAFx4HI+HANYGzk+P6kaKzm6oDb7nSYdGnUe2hRuGRdp4U9zx jg== 
+Received: from aserp3030.oracle.com (aserp3030.oracle.com [141.146.126.71])
+        by aserp2120.oracle.com with ESMTP id 2xw19qffke-1
+        (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=OK);
+        Tue, 04 Feb 2020 15:42:32 +0000
+Received: from pps.filterd (aserp3030.oracle.com [127.0.0.1])
+        by aserp3030.oracle.com (8.16.0.27/8.16.0.27) with SMTP id 014FOK8U169795;
+        Tue, 4 Feb 2020 15:42:32 GMT
+Received: from userv0122.oracle.com (userv0122.oracle.com [156.151.31.75])
+        by aserp3030.oracle.com with ESMTP id 2xxw0x8txj-1
+        (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=OK);
+        Tue, 04 Feb 2020 15:42:31 +0000
+Received: from abhmp0005.oracle.com (abhmp0005.oracle.com [141.146.116.11])
+        by userv0122.oracle.com (8.14.4/8.14.4) with ESMTP id 014FgUS1008045;
+        Tue, 4 Feb 2020 15:42:30 GMT
+Received: from localhost (/67.169.218.210)
+        by default (Oracle Beehive Gateway v4.0)
+        with ESMTP ; Tue, 04 Feb 2020 07:42:29 -0800
+Date:   Tue, 4 Feb 2020 07:42:29 -0800
+From:   "Darrick J. Wong" <darrick.wong@oracle.com>
+To:     Naohiro Aota <naohiro.aota@wdc.com>
+Cc:     linux-mm@kvack.org, linux-fsdevel@vger.kernel.org,
+        linux-block@vger.kernel.org,
+        Andrew Morton <akpm@linux-foundation.org>,
+        Christoph Hellwig <hch@infradead.org>
+Subject: Re: [PATCH] mm, swap: unlock inode in error path of claim_swapfile
+Message-ID: <20200204154229.GC6874@magnolia>
+References: <20200204095943.727666-1-naohiro.aota@wdc.com>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=us-ascii
 Content-Disposition: inline
-In-Reply-To: <cover.1580786525.git.zhangweiping@didiglobal.com>
-User-Agent: Mutt/1.12.1 (2019-06-15)
+In-Reply-To: <20200204095943.727666-1-naohiro.aota@wdc.com>
+User-Agent: Mutt/1.9.4 (2018-02-28)
+X-Proofpoint-Virus-Version: vendor=nai engine=6000 definitions=9520 signatures=668685
+X-Proofpoint-Spam-Details: rule=notspam policy=default score=0 suspectscore=2 malwarescore=0
+ phishscore=0 bulkscore=0 spamscore=0 mlxscore=0 mlxlogscore=999
+ adultscore=0 classifier=spam adjust=0 reason=mlx scancount=1
+ engine=8.0.1-1911140001 definitions=main-2002040106
+X-Proofpoint-Virus-Version: vendor=nai engine=6000 definitions=9520 signatures=668685
+X-Proofpoint-Spam-Details: rule=notspam policy=default score=0 priorityscore=1501 malwarescore=0
+ suspectscore=2 phishscore=0 bulkscore=0 spamscore=0 clxscore=1015
+ lowpriorityscore=0 mlxscore=0 impostorscore=0 mlxlogscore=999 adultscore=0
+ classifier=spam adjust=0 reason=mlx scancount=1 engine=8.0.1-1911140001
+ definitions=main-2002040106
 Sender: linux-block-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-On Tue, Feb 04, 2020 at 11:30:45AM +0800, Weiping Zhang wrote:
-> This series try to add Weighted Round Robin for block cgroup and nvme
-> driver. When multiple containers share a single nvme device, we want
-> to protect IO critical container from not be interfernced by other
-> containers. We add blkio.wrr interface to user to control their IO
-> priority. The blkio.wrr accept five level priorities, which contains
-> "urgent", "high", "medium", "low" and "none", the "none" is used for
-> disable WRR for this cgroup.
+On Tue, Feb 04, 2020 at 06:59:43PM +0900, Naohiro Aota wrote:
+> claim_swapfile() currently keeps the inode locked when it is successful, or
+> the file is already swapfile (with -EBUSY). And, on the other error cases,
+> it does not lock the inode.
+> 
+> This inconsistency of the lock state and return value is quite confusing
+> and actually causing a bad unlock balance as below in the "bad_swap"
+> section of __do_sys_swapon().
+> 
+> This commit fixes this issue by unlocking the inode on the error path. It
+> also reverts blocksize and releases bdev, so that the caller can safely
+> forget about the inode.
+> 
+>     =====================================
+>     WARNING: bad unlock balance detected!
+>     5.5.0-rc7+ #176 Not tainted
+>     -------------------------------------
+>     swapon/4294 is trying to release lock (&sb->s_type->i_mutex_key) at:
+>     [<ffffffff8173a6eb>] __do_sys_swapon+0x94b/0x3550
+>     but there are no more locks to release!
+> 
+>     other info that might help us debug this:
+>     no locks held by swapon/4294.
+> 
+>     stack backtrace:
+>     CPU: 5 PID: 4294 Comm: swapon Not tainted 5.5.0-rc7-BTRFS-ZNS+ #176
+>     Hardware name: ASUS All Series/H87-PRO, BIOS 2102 07/29/2014
+>     Call Trace:
+>      dump_stack+0xa1/0xea
+>      ? __do_sys_swapon+0x94b/0x3550
+>      print_unlock_imbalance_bug.cold+0x114/0x123
+>      ? __do_sys_swapon+0x94b/0x3550
+>      lock_release+0x562/0xed0
+>      ? kvfree+0x31/0x40
+>      ? lock_downgrade+0x770/0x770
+>      ? kvfree+0x31/0x40
+>      ? rcu_read_lock_sched_held+0xa1/0xd0
+>      ? rcu_read_lock_bh_held+0xb0/0xb0
+>      up_write+0x2d/0x490
+>      ? kfree+0x293/0x2f0
+>      __do_sys_swapon+0x94b/0x3550
+>      ? putname+0xb0/0xf0
+>      ? kmem_cache_free+0x2e7/0x370
+>      ? do_sys_open+0x184/0x3e0
+>      ? generic_max_swapfile_size+0x40/0x40
+>      ? do_syscall_64+0x27/0x4b0
+>      ? entry_SYSCALL_64_after_hwframe+0x49/0xbe
+>      ? lockdep_hardirqs_on+0x38c/0x590
+>      __x64_sys_swapon+0x54/0x80
+>      do_syscall_64+0xa4/0x4b0
+>      entry_SYSCALL_64_after_hwframe+0x49/0xbe
+>     RIP: 0033:0x7f15da0a0dc7
+> 
+> Fixes: 1638045c3677 ("mm: set S_SWAPFILE on blockdev swap devices")
+> Signed-off-by: Naohiro Aota <naohiro.aota@wdc.com>
+> ---
+>  mm/swapfile.c | 29 ++++++++++++++++++++++-------
+>  1 file changed, 22 insertions(+), 7 deletions(-)
+> 
+> diff --git a/mm/swapfile.c b/mm/swapfile.c
+> index bb3261d45b6a..dd5d7fa42282 100644
+> --- a/mm/swapfile.c
+> +++ b/mm/swapfile.c
+> @@ -2886,24 +2886,37 @@ static int claim_swapfile(struct swap_info_struct *p, struct inode *inode)
+>  		p->old_block_size = block_size(p->bdev);
+>  		error = set_blocksize(p->bdev, PAGE_SIZE);
+>  		if (error < 0)
+> -			return error;
+> +			goto err;
+>  		/*
+>  		 * Zoned block devices contain zones that have a sequential
+>  		 * write only restriction.  Hence zoned block devices are not
+>  		 * suitable for swapping.  Disallow them here.
+>  		 */
+> -		if (blk_queue_is_zoned(p->bdev->bd_queue))
+> -			return -EINVAL;
+> +		if (blk_queue_is_zoned(p->bdev->bd_queue)) {
+> +			error = -EINVAL;
+> +			goto err;
+> +		}
+>  		p->flags |= SWP_BLKDEV;
+>  	} else if (S_ISREG(inode->i_mode)) {
+>  		p->bdev = inode->i_sb->s_bdev;
+>  	}
+>  
+>  	inode_lock(inode);
+> -	if (IS_SWAPFILE(inode))
+> -		return -EBUSY;
+> +	if (IS_SWAPFILE(inode)) {
+> +		inode_unlock(inode);
+> +		error = -EBUSY;
+> +		goto err;
+> +	}
+>  
+>  	return 0;
+> +
+> +err:
+> +	if (S_ISBLK(inode->i_mode)) {
+> +		set_blocksize(p->bdev, p->old_block_size);
+> +		blkdev_put(p->bdev, FMODE_READ | FMODE_WRITE | FMODE_EXCL);
+> +	}
+> +
+> +	return error;
+>  }
+>  
+>  
+> @@ -3157,10 +3170,12 @@ SYSCALL_DEFINE2(swapon, const char __user *, specialfile, int, swap_flags)
+>  	mapping = swap_file->f_mapping;
+>  	inode = mapping->host;
+>  
+> -	/* If S_ISREG(inode->i_mode) will do inode_lock(inode); */
+> +	/* do inode_lock(inode); */
 
-The NVMe protocol really doesn't define WRR to be a mechanism to mitigate
-interference, though. It defines credits among the weighted queues
-only for command fetching, and an urgent strict priority class that
-starves the rest. It has nothing to do with how the controller should
-prioritize completion of those commands, even if it may be reasonable to
-assume influencing when the command is fetched should affect its
-completion.
+What if we made this function responsible for calling inode_lock (and
+unlock) instead of splitting it between sys_swapon and claim_swapfile?
 
-On the "weighted" strict priority, there's nothing separating "high"
-from "low" other than the name: the "set features" credit assignment
-can invert which queues have higher command fetch rates such that the
-"low" is favoured over the "high".
+--D
 
-There's no protection against the "urgent" class starving others: normal
-IO will timeout and trigger repeated controller resets, while polled IO
-will consume 100% of CPU cycles without making any progress if we make
-this type of queue available without any additional code to ensure the
-host behaves..
-
-On the driver implementation, the number of module parameters being
-added here is problematic. We already have 2 special classes of queues,
-and defining this at the module level is considered too coarse when
-the system has different devices on opposite ends of the capability
-spectrum. For example, users want polled queues for the fast devices,
-and none for the slower tier. We just don't have a good mechanism to
-define per-controller resources, and more queue classes will make this
-problem worse.
-
-On the blk-mq side, this implementation doesn't work with the IO
-schedulers. If one is in use, requests may be reordered such that a
-request on your high-priority hctx may be dispatched later than more
-recent ones associated with lower priority. I don't think that's what
-you'd want to happen, so priority should be considered with schedulers
-too.
-
-But really, though, NVMe's WRR is too heavy weight and difficult to use.
-The techincal work group can come up with something better, but it looks
-like they've lost interest in TPAR 4011 (no discussion in 2 years, afaics).
+>  	error = claim_swapfile(p, inode);
+> -	if (unlikely(error))
+> +	if (unlikely(error)) {
+> +		inode = NULL;
+>  		goto bad_swap;
+> +	}
+>  
+>  	/*
+>  	 * Read the swap header.
+> -- 
+> 2.25.0
+> 
