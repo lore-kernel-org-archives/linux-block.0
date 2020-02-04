@@ -2,124 +2,126 @@ Return-Path: <SRS0=vwZl=3Y=vger.kernel.org=linux-block-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-2.3 required=3.0 tests=DKIM_SIGNED,DKIM_VALID,
-	HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,
-	USER_AGENT_SANE_1 autolearn=no autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-0.8 required=3.0 tests=DKIMWL_WL_HIGH,DKIM_SIGNED,
+	DKIM_VALID,DKIM_VALID_AU,FSL_HELO_FAKE,MAILING_LIST_MULTI,SPF_HELO_NONE,
+	SPF_PASS,USER_AGENT_SANE_1 autolearn=no autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id E3E01C35247
-	for <linux-block@archiver.kernel.org>; Tue,  4 Feb 2020 20:59:48 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id F365AC3F68F
+	for <linux-block@archiver.kernel.org>; Tue,  4 Feb 2020 21:21:15 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.kernel.org (Postfix) with ESMTP id B4D342084E
-	for <linux-block@archiver.kernel.org>; Tue,  4 Feb 2020 20:59:48 +0000 (UTC)
-Authentication-Results: mail.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel-dk.20150623.gappssmtp.com header.i=@kernel-dk.20150623.gappssmtp.com header.b="AVuAMkdQ"
+	by mail.kernel.org (Postfix) with ESMTP id C5AE321744
+	for <linux-block@archiver.kernel.org>; Tue,  4 Feb 2020 21:21:15 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+	s=default; t=1580851275;
+	bh=KKB12bjPksD5iDE0UW+8PafWpWM7BZjKsP6ut1aSK0A=;
+	h=Date:From:To:Cc:Subject:References:In-Reply-To:List-ID:From;
+	b=LbkREw/Dq5V6KJfewMjCfMrYQcujL0wEwiiK0Vx4pzrJiltyIKIrkbPCWNcl4xaMw
+	 W9RIl0NV7aFOvKZXjHlhPpsw3fbnotleqHTNGCQ4t6oV0PpsAiPqc8hL2p/bQZlTb3
+	 HUF3gRZkRgTo9/iYo+7vi8E+NliBAQRApm5XPUN8=
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1727450AbgBDU7s (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Tue, 4 Feb 2020 15:59:48 -0500
-Received: from mail-io1-f68.google.com ([209.85.166.68]:36321 "EHLO
-        mail-io1-f68.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1727382AbgBDU7s (ORCPT
-        <rfc822;linux-block@vger.kernel.org>); Tue, 4 Feb 2020 15:59:48 -0500
-Received: by mail-io1-f68.google.com with SMTP id d15so22624108iog.3
-        for <linux-block@vger.kernel.org>; Tue, 04 Feb 2020 12:59:46 -0800 (PST)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=kernel-dk.20150623.gappssmtp.com; s=20150623;
-        h=subject:to:cc:references:from:message-id:date:user-agent
-         :mime-version:in-reply-to:content-language:content-transfer-encoding;
-        bh=wcoCSL79vCMpL4xbAIQZtZxYV6URdwM3aAy8gbih72U=;
-        b=AVuAMkdQ83IhrPAGvOB81omosd9y2/W7kJ1IbTzAd03hFvfCnuKBf9QFkq7mPPjo00
-         xipS9/+FIBcT6FikYTJqnkp8UYcIu3aUpD9bTIU6qpTmb37ladSbLuknSbi1p21Tzdg+
-         wyc68t8WGZFkOpz73QxOYrqbPoyFu/LhVqdZS2/h59aY3ofahzFDvCGpv+/8p6bLIfUb
-         8SGOethG/GmI3OXXBM/9v8MzbHZAnc7sLlQ3GONt2yxLiDbUXRyLDFMbkjTg+4aMkwUS
-         4jrdzKurScXFy82HdMoNHSDoluNV0Ms4euWCWC9xnGbH//vz9m9HO6glOoaFEGNkKJ4I
-         nNHw==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20161025;
-        h=x-gm-message-state:subject:to:cc:references:from:message-id:date
-         :user-agent:mime-version:in-reply-to:content-language
-         :content-transfer-encoding;
-        bh=wcoCSL79vCMpL4xbAIQZtZxYV6URdwM3aAy8gbih72U=;
-        b=WEnejsdRKx5iyFftZEHfRHNxlh9ddUpgP9ajZroaCc0TxxNmacONLtexlsNOJUeVKz
-         8LWxq3xeqkTT38xAPkA9TZrhuCC3+f1x7LlmjJP2tdv1jVqkTMYUnb1AMrdA8EsxXOlz
-         KrqhikC5lgHlPc+U3JYOm2zkak+At5qun1XSiHb9OUo0ZEQToEv/EEPHqU5SmDL6SqK0
-         biPs4Aff9idRKkllZXG07NEJWrSFl9ro1gA2m2GAJeb+lHkcJbl/YMi6uyRPCYqoA/aW
-         BX2x6+NUAO4xqiN1M4vyzDaKy0K7Dow9PSyJ9OIYU9iLVGGRzU0Z0Vt3ccZ94LleJ+KY
-         nBhA==
-X-Gm-Message-State: APjAAAU+gR7e1BM1EGZQ7UdaYSfvH9DfEqP7BLyLMbtgv0Iu48zSfQs7
-        z3TgJCrOh+DFQ4cL7+/7TSKuhA==
-X-Google-Smtp-Source: APXvYqwHasdSja9IbPNJm+N/4hDJQSShJ6cMBEbdL/EmsnMKk93VlHXamEEowYviNlWzEQD0PlBckw==
-X-Received: by 2002:a5d:9285:: with SMTP id s5mr25050555iom.85.1580849985986;
-        Tue, 04 Feb 2020 12:59:45 -0800 (PST)
-Received: from [192.168.1.159] ([65.144.74.34])
-        by smtp.gmail.com with ESMTPSA id o6sm6213345ilm.74.2020.02.04.12.59.44
-        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
-        Tue, 04 Feb 2020 12:59:45 -0800 (PST)
-Subject: Re: [PATCH 1/1] block: Manage bio references so the bio persists
- until necessary
-To:     Christoph Hellwig <hch@infradead.org>,
-        Bijan Mottahedeh <bijan.mottahedeh@oracle.com>
-Cc:     linux-block@vger.kernel.org, io-uring@vger.kernel.org
-References: <1580441022-59129-1-git-send-email-bijan.mottahedeh@oracle.com>
- <1580441022-59129-2-git-send-email-bijan.mottahedeh@oracle.com>
- <20200131064230.GA28151@infradead.org>
- <9f29fbc7-baf3-00d1-a20c-d2a115439db2@oracle.com>
- <20200203083422.GA2671@infradead.org>
- <aaecd43b-dd44-f6c5-4e2d-1772cf135d2a@oracle.com>
- <20200204075124.GA29349@infradead.org>
-From:   Jens Axboe <axboe@kernel.dk>
-Message-ID: <46bf2ea0-7677-44af-8e23-45a10710ca3d@kernel.dk>
-Date:   Tue, 4 Feb 2020 13:59:44 -0700
-User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:68.0) Gecko/20100101
- Thunderbird/68.4.1
+        id S1727451AbgBDVVO (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Tue, 4 Feb 2020 16:21:14 -0500
+Received: from mail.kernel.org ([198.145.29.99]:37454 "EHLO mail.kernel.org"
+        rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
+        id S1727566AbgBDVVO (ORCPT <rfc822;linux-block@vger.kernel.org>);
+        Tue, 4 Feb 2020 16:21:14 -0500
+Received: from gmail.com (unknown [104.132.1.77])
+        (using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+        (No client certificate requested)
+        by mail.kernel.org (Postfix) with ESMTPSA id EB9E52082E;
+        Tue,  4 Feb 2020 21:21:12 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+        s=default; t=1580851273;
+        bh=KKB12bjPksD5iDE0UW+8PafWpWM7BZjKsP6ut1aSK0A=;
+        h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
+        b=oxmTWCjiquUMY/wLyhosQzPiJUtMVJpf+m1lgxRnrRYaMOAsKMe+YztcbPWFAAUfW
+         iI4xdmUCwP/eczU9zRInuGln1AqHPidnOQJDDwEhMnsC7PSPpuh221PGtC+P6WWC9o
+         fNNO9pXc/hjVFXtQuzkp0Oh/c6mafWyPFwBNDC30=
+Date:   Tue, 4 Feb 2020 13:21:11 -0800
+From:   Eric Biggers <ebiggers@kernel.org>
+To:     Christoph Hellwig <hch@infradead.org>
+Cc:     Satya Tangirala <satyat@google.com>, linux-block@vger.kernel.org,
+        linux-scsi@vger.kernel.org, linux-fscrypt@vger.kernel.org,
+        linux-fsdevel@vger.kernel.org,
+        linux-f2fs-devel@lists.sourceforge.net,
+        Barani Muthukumaran <bmuthuku@qti.qualcomm.com>,
+        Kuohong Wang <kuohong.wang@mediatek.com>,
+        Kim Boojin <boojin.kim@samsung.com>
+Subject: Re: [PATCH v6 0/9] Inline Encryption Support
+Message-ID: <20200204212110.GA122850@gmail.com>
+References: <20191218145136.172774-1-satyat@google.com>
+ <20200108140556.GB2896@infradead.org>
+ <20200108184305.GA173657@google.com>
+ <20200117085210.GA5473@infradead.org>
+ <20200201005341.GA134917@google.com>
+ <20200203091558.GA28527@infradead.org>
+ <20200204033915.GA122248@google.com>
+ <20200204145832.GA28393@infradead.org>
 MIME-Version: 1.0
-In-Reply-To: <20200204075124.GA29349@infradead.org>
-Content-Type: text/plain; charset=utf-8
-Content-Language: en-US
-Content-Transfer-Encoding: 7bit
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <20200204145832.GA28393@infradead.org>
+User-Agent: Mutt/1.10.1 (2018-07-13)
 Sender: linux-block-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-On 2/4/20 12:51 AM, Christoph Hellwig wrote:
-> On Mon, Feb 03, 2020 at 01:07:48PM -0800, Bijan Mottahedeh wrote:
->> My concern is with the code below for the single bio async case:
->>
->>                            qc = submit_bio(bio);
->>
->>                            if (polled)
->>                                    WRITE_ONCE(iocb->ki_cookie, qc);
->>
->> The bio/dio can be freed before the the cookie is written which is what I'm
->> seeing, and I thought this may lead to a scenario where that iocb request
->> could be completed, freed, reallocated, and resubmitted in io_uring layer;
->> i.e., I thought the cookie could be written into the wrong iocb.
+On Tue, Feb 04, 2020 at 06:58:32AM -0800, Christoph Hellwig wrote:
+> On Mon, Feb 03, 2020 at 07:39:15PM -0800, Satya Tangirala wrote:
+> > Wouldn't that mean that all the other requests in the queue, even ones that
+> > don't even need any inline encryption, also don't get processed until the
+> > queue is woken up again?
 > 
-> I think we do have a potential use after free of the iocb here.
-> But taking a bio reference isn't going to help with that, as the iocb
-> and bio/dio life times are unrelated.
+> For the basic implementation yes.
 > 
-> I vaguely remember having that discussion with Jens a while ago, and
-> tried to pass a pointer to the qc to submit_bio so that we can set
-> it at submission time, but he came up with a reason why that might not
-> be required.  I'd have to dig out all notes unless Jens remembers
-> better.
+> > And if so, are we really ok with that?
+> 
+> That depends on the use cases.  With the fscrypt setup are we still
+> going to see unencrypted I/O to the device as well?  If so we'll need
+> to refine the setup and only queue up unencrypted requests.  But I'd
+> still try to dumb version first and then refine it.
 
-Don't remember that either, so I'd have to dig out emails! But looking
-at it now, for the async case with io_uring, the iocb is embedded in the
-io_kiocb from io_uring. We hold two references to the io_kiocb, one for
-submit and one for completion. Hence even if the bio completes
-immediately and someone else finds the completion before the application
-doing this submit, we still hold the submission reference to the
-io_kiocb. Hence I don't really see how we can end up with a
-use-after-free situation here.
+Definitely, for several reasons:
 
-IIRC, Bijan had traces showing this can happen, KASAN complaining about
-it. Which makes me think that I'm missing a case here, though I don't
-immediately see what it is.
+- Not all files on the filesystem are necessarily encrypted.
+- Filesystem metadata is not encrypted (except for filenames, but those don't
+  use inline encryption).
+- Encryption isn't necessarily being used on all partitions on the disk.
 
-Bijan, could post your trace again, I can't seem to find it?
+It's also not just about unencrypted vs. encrypted, since just because someone
+is waiting for one keyslot doesn't mean we should pause all encrypted I/O to the
+device for all keyslots.
 
--- 
-Jens Axboe
+> 
+> > As you said, we'd need the queue to wake up once a keyslot is available.
+> > It's possible that only some hardware queues and not others get blocked
+> > because of keyslot programming, so ideally, we could somehow make the
+> > correct hardware queue(s) wake up once a keyslot is freed. But the keyslot
+> > manager can't assume that it's actually blk-mq that's being used
+> > underneath,
+> 
+> Why?  The legacy requet code is long gone.
+> 
+> > Also I forgot to mention this in my previous mail, but there may be some
+> > drivers/devices whose keyslots cannot be programmed from an atomic context,
+> > so this approach which might make things difficult in those situations (the
+> > UFS v2.1 spec, which I followed while implementing support for inline
+> > crypto for UFS, does not care whether we're in an atomic context or not,
+> > but there might be specifications for other drivers, or even some
+> > particular UFS inline encryption hardware that do).
+> 
+> We have an option to never call ->queue_rq from atomic context
+> (BLK_MQ_F_BLOCKING).  But do you know of existing hardware that behaves
+> like this or is it just hypothetical?
 
+Maybe -- check the Qualcomm ICE (Inline Crypto Engine) driver I posted at
+https://lkml.kernel.org/linux-block/20200110061634.46742-1-ebiggers@kernel.org/.
+The hardware requires vendor-specific SMC calls to program keys, rather than the
+UFS standard way.  It's currently blocking, since the code to make the SMC calls
+in drivers/firmware/qcom_scm*.c uses GFP_KERNEL and mutex_lock().
+
+I'll test whether it can work in atomic context by using GFP_ATOMIC and
+qcom_scm_call_atomic() instead.  (Adding a spinlock might be needed too.)
+
+- Eric
