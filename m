@@ -2,58 +2,58 @@ Return-Path: <SRS0=DGx4=32=vger.kernel.org=linux-block-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-3.7 required=3.0 tests=DKIM_SIGNED,DKIM_VALID,
-	HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,
-	SPF_PASS,URIBL_BLOCKED autolearn=no autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-0.8 required=3.0 tests=DKIM_SIGNED,DKIM_VALID,
+	HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS
+	autolearn=no autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 0C050C2D0B1
-	for <linux-block@archiver.kernel.org>; Thu,  6 Feb 2020 15:27:09 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 41B02C33CAC
+	for <linux-block@archiver.kernel.org>; Thu,  6 Feb 2020 15:46:28 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.kernel.org (Postfix) with ESMTP id D136922314
-	for <linux-block@archiver.kernel.org>; Thu,  6 Feb 2020 15:27:08 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id 122962192A
+	for <linux-block@archiver.kernel.org>; Thu,  6 Feb 2020 15:46:28 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=pass (2048-bit key) header.d=cmpxchg-org.20150623.gappssmtp.com header.i=@cmpxchg-org.20150623.gappssmtp.com header.b="yqZ/FZfL"
+	dkim=pass (2048-bit key) header.d=cmpxchg-org.20150623.gappssmtp.com header.i=@cmpxchg-org.20150623.gappssmtp.com header.b="0gXevC6a"
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1727492AbgBFP1I (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Thu, 6 Feb 2020 10:27:08 -0500
-Received: from mail-qk1-f194.google.com ([209.85.222.194]:34426 "EHLO
-        mail-qk1-f194.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1727477AbgBFP1I (ORCPT
-        <rfc822;linux-block@vger.kernel.org>); Thu, 6 Feb 2020 10:27:08 -0500
-Received: by mail-qk1-f194.google.com with SMTP id n184so1106039qkn.1
-        for <linux-block@vger.kernel.org>; Thu, 06 Feb 2020 07:27:06 -0800 (PST)
+        id S1727675AbgBFPq1 (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Thu, 6 Feb 2020 10:46:27 -0500
+Received: from mail-qk1-f196.google.com ([209.85.222.196]:34096 "EHLO
+        mail-qk1-f196.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S1727662AbgBFPq1 (ORCPT
+        <rfc822;linux-block@vger.kernel.org>); Thu, 6 Feb 2020 10:46:27 -0500
+Received: by mail-qk1-f196.google.com with SMTP id n184so1174857qkn.1
+        for <linux-block@vger.kernel.org>; Thu, 06 Feb 2020 07:46:26 -0800 (PST)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=cmpxchg-org.20150623.gappssmtp.com; s=20150623;
         h=date:from:to:cc:subject:message-id:references:mime-version
          :content-disposition:in-reply-to;
-        bh=XZOggLanx1OakxhbvmLypkwLB6o7BwYbW0LP99Ryt1o=;
-        b=yqZ/FZfL7rzCP/2Jqs5bBr0b3LqQr+WLoYGIPyBGKw6323lJiZKUFKys6E+VHeTJf2
-         Q6Piw50B5YbifhP9CblDm+U1GrvZEKZfGAIM/WgHxJp8L+nPX03q6D8VELhZ9R6NOLtJ
-         0N0BATZjWI1IczjjfHIveuTCnUgMe+YptD0IpellozuQtXZMs1KXJDOQoRD808ussEVS
-         Oeq1YPf/gA/4zQLcWiJBTPhyXQkV4fdKw2VzJoUCEkl+iDXax7CtlZ/cnhsc9SesEK6s
-         rSpSpV2Ot3fvi+Ga5GgVIr1vsjh5V4Ifnz9qtatPI8rzuX97IK5IffeOowrdFDe+hNk2
-         Ak9A==
+        bh=kRRvyBPWT8Es74STxomqTpDHCa76gQjLB2CCJUssayM=;
+        b=0gXevC6aEU0IZUlb9/scF02jWHTiU00qYk9LUijF/5hdiUCvqa3NevcaCnTmUvmIZJ
+         CYl8Ti03GJNi5pVRpJqPN5HOA8djad0yBQW9pK1tLsRFlhHCIXSm+pLiNRbNLQAJyYBb
+         8hB7k5FpnOV9OvPz6HvFNMEhfAGLY8OO2Tbooi/mlTZ1d0gBgQ7mhUyPkm0pn09Lr09x
+         dhaCfJ5w00U3iDJU2nz/apuWVj+wqT0tTZZjH+MAiTH97+aChNnm99JtRN1E3cl5C62J
+         uG+Z9gfVIqQMx3/mFI+VdLgQ+QdjDNLLJ5HtIe8hotQ+LY7VXECCoCGTXi7SuNk1OtnH
+         8ujQ==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=1e100.net; s=20161025;
         h=x-gm-message-state:date:from:to:cc:subject:message-id:references
          :mime-version:content-disposition:in-reply-to;
-        bh=XZOggLanx1OakxhbvmLypkwLB6o7BwYbW0LP99Ryt1o=;
-        b=Uyp4RAfA+GRg5UOYFE4ymvwGvIpfh8i0CnERQHUcbTpq2oYm4xgXQJ7W44aO5ZN62s
-         z6d8l5Lw1Zkv01kNVc2pjsJ88IDq4m2SRAQ6rPSX8JMBQ31h/asu4gJFA0OYc6ZCYVBM
-         pILLsxcM8uHG0Zv28qd/vJfYjNiztAnZUlmAMwrbnsuGikTLS03LNRN6vtWMVRs6sbTM
-         l7Sxgg4XsY2bZT9MwZX25siXjTtzeCJ/KdstKwxCuGZx4inFzQzKTHEG4UxYCi5z9NoF
-         I5pjkC+HfWvjsskFZRMpANhuMpMZeucbMXckbIoQNPYv7FJ59Y/qp9bEz1s/AiYVp++E
-         9K7g==
-X-Gm-Message-State: APjAAAWbLq9kNFTgAU9NMgs+U3rod+BlrkVS8ekiBbIuHfMUR3ZMs1EZ
-        5aOc1Fkk/1HZIufdwc75WGPPaA==
-X-Google-Smtp-Source: APXvYqwoCWoPoxMsBmJ48AbMG+4iF96O7gepmNsPc8GfJXUuFMj8rT6ge/PsiVIYjdA9hTy/JKrEoQ==
-X-Received: by 2002:a05:620a:7f4:: with SMTP id k20mr2931953qkk.483.1581002826313;
-        Thu, 06 Feb 2020 07:27:06 -0800 (PST)
+        bh=kRRvyBPWT8Es74STxomqTpDHCa76gQjLB2CCJUssayM=;
+        b=VATQHZQ/X9Nv5KXLGbaV8tUxyom3i+csUo4+rhTkY9ngfSizd35JUFf46j9loHQNa8
+         WOc6VQBQiKnPOPLyWtE2/Lt1c6cxW4RqfT672buSjczh8X/PWmdMBLrnp5lAHvqifaQd
+         Ig7JhsN+NdEPTOj6R/xDuVc09uDHQ7gZPN/CaAv8+Jm0wknh9Y0SupUQWHk6gAH6GXBh
+         VzGgEjQG67ciVm1q2Ezs3GBGHMzxAM/jjeMYtP82Bdq5ubA9dw49n96l2f/FLaWkhMYG
+         M+EUuQQiyY8CkLqsnXT/ATMkcWeykB+gWlV7CB/Y418eyaT2IyZ4paaaeCZzm/QQJF+w
+         TFhg==
+X-Gm-Message-State: APjAAAXTnMe0dDtHn8l0XVNcCYRs7XesnrLZ7yWQuSqJRgI2DOUda6pm
+        ZeCw+oFB7zSh+i07dpRFPK9bWA==
+X-Google-Smtp-Source: APXvYqyMsmQpyg9uEjfMfe0RGA/Dtl5TtuYO75M1CcYm9p74JGnF1dhnxvivzvRQG/vj+RNZiyRUkw==
+X-Received: by 2002:a05:620a:1112:: with SMTP id o18mr3046650qkk.126.1581003985950;
+        Thu, 06 Feb 2020 07:46:25 -0800 (PST)
 Received: from localhost (pool-108-27-252-85.nycmny.fios.verizon.net. [108.27.252.85])
-        by smtp.gmail.com with ESMTPSA id b24sm1741820qto.71.2020.02.06.07.27.05
+        by smtp.gmail.com with ESMTPSA id t7sm1574736qkm.136.2020.02.06.07.46.24
         (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Thu, 06 Feb 2020 07:27:05 -0800 (PST)
-Date:   Thu, 6 Feb 2020 10:27:04 -0500
+        Thu, 06 Feb 2020 07:46:25 -0800 (PST)
+Date:   Thu, 6 Feb 2020 10:46:24 -0500
 From:   Johannes Weiner <hannes@cmpxchg.org>
 To:     Dan Schatzberg <dschatzberg@fb.com>
 Cc:     Jens Axboe <axboe@kernel.dk>, Tejun Heo <tj@kernel.org>,
@@ -67,41 +67,92 @@ Cc:     Jens Axboe <axboe@kernel.dk>, Tejun Heo <tj@kernel.org>,
         "open list:CONTROL GROUP (CGROUP)" <cgroups@vger.kernel.org>,
         "open list:CONTROL GROUP - MEMORY RESOURCE CONTROLLER (MEMCG)" 
         <linux-mm@kvack.org>
-Subject: Re: [PATCH 1/2] mm: Charge current memcg when no mm is set
-Message-ID: <20200206152704.GA24735@cmpxchg.org>
+Subject: Re: [PATCH 2/2] loop: charge i/o per cgroup
+Message-ID: <20200206154624.GB24735@cmpxchg.org>
 References: <20200205223348.880610-1-dschatzberg@fb.com>
- <20200205223348.880610-2-dschatzberg@fb.com>
+ <20200205223348.880610-3-dschatzberg@fb.com>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=us-ascii
 Content-Disposition: inline
-In-Reply-To: <20200205223348.880610-2-dschatzberg@fb.com>
+In-Reply-To: <20200205223348.880610-3-dschatzberg@fb.com>
 Sender: linux-block-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-On Wed, Feb 05, 2020 at 02:33:47PM -0800, Dan Schatzberg wrote:
-> This modifies the shmem and mm charge logic so that now if there is no
-> mm set (as in the case of tmpfs backed loop device), we charge the
-> current memcg, if set.
-> 
-> Signed-off-by: Dan Schatzberg <dschatzberg@fb.com>
+Hello Dan,
 
-Acked-by: Johannes Weiner <hannes@cmpxchg.org>
+On Wed, Feb 05, 2020 at 02:33:48PM -0800, Dan Schatzberg wrote:
+> @@ -1925,14 +1990,13 @@ static blk_status_t loop_queue_rq(struct blk_mq_hw_ctx *hctx,
+>  	}
+>  
+>  	/* always use the first bio's css */
+> +	cmd->blk_css = NULL;
+>  #ifdef CONFIG_BLK_CGROUP
+> -	if (cmd->use_aio && rq->bio && rq->bio->bi_blkg) {
+> -		cmd->css = &bio_blkcg(rq->bio)->css;
+> -		css_get(cmd->css);
+> -	} else
+> +	if (rq->bio && rq->bio->bi_blkg)
+> +		cmd->blk_css = &bio_blkcg(rq->bio)->css;
+>  #endif
+> -		cmd->css = NULL;
+> -	kthread_queue_work(&lo->worker, &cmd->work);
+> +
+> +	loop_queue_work(lo, cmd);
+>  
+>  	return BLK_STS_OK;
+>  }
+> @@ -1942,6 +2006,9 @@ static void loop_handle_cmd(struct loop_cmd *cmd)
+>  	struct request *rq = blk_mq_rq_from_pdu(cmd);
+>  	const bool write = op_is_write(req_op(rq));
+>  	struct loop_device *lo = rq->q->queuedata;
+> +#ifdef CONFIG_MEMCG
+> +	struct cgroup_subsys_state *mem_css;
+> +#endif
+>  	int ret = 0;
+>  
+>  	if (write && (lo->lo_flags & LO_FLAGS_READ_ONLY)) {
+> @@ -1949,8 +2016,24 @@ static void loop_handle_cmd(struct loop_cmd *cmd)
+>  		goto failed;
+>  	}
+>  
+> +	if (cmd->blk_css) {
+> +#ifdef CONFIG_MEMCG
+> +		mem_css = cgroup_get_e_css(cmd->blk_css->cgroup,
+> +					&memory_cgrp_subsys);
+> +		memalloc_use_memcg(mem_cgroup_from_css(mem_css));
+> +#endif
+> +		kthread_associate_blkcg(cmd->blk_css);
+> +	}
+> +
+>  	ret = do_req_filebacked(lo, rq);
+> - failed:
+> +
+> +	if (cmd->blk_css) {
+> +		kthread_associate_blkcg(NULL);
+> +#ifdef CONFIG_MEMCG
+> +		memalloc_unuse_memcg();
+> +#endif
 
-It's a dependency for 2/2, but it's also an overdue cleanup IMO: it's
-always been a bit weird that memalloc_use_memcg() worked for kernel
-allocations but was silently ignored for user pages.
+cgroup_get_e_css() acquires a reference, it looks like you're missing
+a css_put() here.
 
-This patch establishes a precedence order for who gets charged:
+I also wonder why you look up blk_css and mem_css in separate
+places. Since you already renamed cmd->css to cmd->blk_css, can you
+also add cmd->mem_css and pair up their lookup and refcounting?
 
-1. If there is a memcg associated with the page already, that memcg is
-   charged. This happens during swapin.
+This should make loop_handle_cmd() a bit more straight-forward:
 
-2. If an explicit mm is passed, mm->memcg is charged. This happens
-   during page faults, which can be triggered in remote VMs (eg gup).
+	if (cmd->blk_css)
+		kthread_associate_blkcg(cmd->blk_css);
+	if (cmd->mem_css)
+		memalloc_use_memcg(mem_cgroup_from_css(mem_css));
 
-3. Otherwise consult the current process context. If it has configured
-   a current->active_memcg, use that. Otherwise, current->mm->memcg.
+	ret = do_req_filebacked(lo, rq);
 
-Thanks Dan
+	memalloc_unuse_memcg();
+	kthread_associate_blkcg(NULL);
+
+All these functions have dummy implementations for !CONFIG_BLK_CGROUP,
+!CONFIG_MEMCG etc., so it shouldn't require any additional ifdefs.
