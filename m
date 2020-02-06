@@ -2,116 +2,106 @@ Return-Path: <SRS0=DGx4=32=vger.kernel.org=linux-block-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-0.8 required=3.0 tests=DKIM_SIGNED,DKIM_VALID,
-	DKIM_VALID_AU,HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SPF_HELO_NONE,
+X-Spam-Status: No, score=-3.7 required=3.0 tests=DKIM_SIGNED,DKIM_VALID,
+	HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,
 	SPF_PASS,URIBL_BLOCKED autolearn=no autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 92248C2D0B1
-	for <linux-block@archiver.kernel.org>; Thu,  6 Feb 2020 15:12:34 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 0C050C2D0B1
+	for <linux-block@archiver.kernel.org>; Thu,  6 Feb 2020 15:27:09 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.kernel.org (Postfix) with ESMTP id 693E921741
-	for <linux-block@archiver.kernel.org>; Thu,  6 Feb 2020 15:12:34 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id D136922314
+	for <linux-block@archiver.kernel.org>; Thu,  6 Feb 2020 15:27:08 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=pass (2048-bit key) header.d=cloud.ionos.com header.i=@cloud.ionos.com header.b="UlbpSUBF"
+	dkim=pass (2048-bit key) header.d=cmpxchg-org.20150623.gappssmtp.com header.i=@cmpxchg-org.20150623.gappssmtp.com header.b="yqZ/FZfL"
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1727546AbgBFPMe (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Thu, 6 Feb 2020 10:12:34 -0500
-Received: from mail-io1-f68.google.com ([209.85.166.68]:45038 "EHLO
-        mail-io1-f68.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1727522AbgBFPMd (ORCPT
-        <rfc822;linux-block@vger.kernel.org>); Thu, 6 Feb 2020 10:12:33 -0500
-Received: by mail-io1-f68.google.com with SMTP id z16so6646336iod.11
-        for <linux-block@vger.kernel.org>; Thu, 06 Feb 2020 07:12:33 -0800 (PST)
+        id S1727492AbgBFP1I (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Thu, 6 Feb 2020 10:27:08 -0500
+Received: from mail-qk1-f194.google.com ([209.85.222.194]:34426 "EHLO
+        mail-qk1-f194.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S1727477AbgBFP1I (ORCPT
+        <rfc822;linux-block@vger.kernel.org>); Thu, 6 Feb 2020 10:27:08 -0500
+Received: by mail-qk1-f194.google.com with SMTP id n184so1106039qkn.1
+        for <linux-block@vger.kernel.org>; Thu, 06 Feb 2020 07:27:06 -0800 (PST)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=cloud.ionos.com; s=google;
-        h=mime-version:references:in-reply-to:from:date:message-id:subject:to
-         :cc:content-transfer-encoding;
-        bh=NFX9PHYeo0qPeSWsJtZXokl7Vof3F1YQpHRtpPWtkpY=;
-        b=UlbpSUBFBxx8El/quG4ajBq5NwipqivNaQaPrksvqHPfRT0yBPSFwjtdUfyeyF/BD/
-         iCe7874+rcdMMwBaUq27P9UPDD1G6cuxtmTkXhBheAM8IN1VOLfprVwGl24cKtpdssnN
-         jcYT+/1bENGMg3XOrp6eEFX1BdM9eVrFLrbrMS7U6yWaK0tJE6Q9Rc3/k8wSWvDZL+HW
-         LMnO9lAi9/FLKOgJ3gSy4rV/5kVlDDxkmmE/6QUn575Z009KOGmHCL+H2XfqtWfQjXiE
-         pkZBDfJEhwoS0l1nrKOtb70z3KEuhZV8Aj+6re0lBh/8TAAOAd0iMNqG4XlammpKqTD3
-         cHHQ==
+        d=cmpxchg-org.20150623.gappssmtp.com; s=20150623;
+        h=date:from:to:cc:subject:message-id:references:mime-version
+         :content-disposition:in-reply-to;
+        bh=XZOggLanx1OakxhbvmLypkwLB6o7BwYbW0LP99Ryt1o=;
+        b=yqZ/FZfL7rzCP/2Jqs5bBr0b3LqQr+WLoYGIPyBGKw6323lJiZKUFKys6E+VHeTJf2
+         Q6Piw50B5YbifhP9CblDm+U1GrvZEKZfGAIM/WgHxJp8L+nPX03q6D8VELhZ9R6NOLtJ
+         0N0BATZjWI1IczjjfHIveuTCnUgMe+YptD0IpellozuQtXZMs1KXJDOQoRD808ussEVS
+         Oeq1YPf/gA/4zQLcWiJBTPhyXQkV4fdKw2VzJoUCEkl+iDXax7CtlZ/cnhsc9SesEK6s
+         rSpSpV2Ot3fvi+Ga5GgVIr1vsjh5V4Ifnz9qtatPI8rzuX97IK5IffeOowrdFDe+hNk2
+         Ak9A==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=1e100.net; s=20161025;
-        h=x-gm-message-state:mime-version:references:in-reply-to:from:date
-         :message-id:subject:to:cc:content-transfer-encoding;
-        bh=NFX9PHYeo0qPeSWsJtZXokl7Vof3F1YQpHRtpPWtkpY=;
-        b=bdGWkhwRCO1RwxwyuR+NCiImWhRYCJPdQnTb4TrANlAwSLMy9jUZ83RV4st1nKSXdG
-         G3ztK+suHqYPZxcy7D69Xc/ZlCpEtIo09Cg5FvOB/yMqodDjtnMo+9M/X30ZgFPWbRCc
-         4fBPL14pJd/JPEfthKMuC+ZuR53fnNoRTO+LPatp/20QFQb6zaF3vwrgZivZlSlsKtov
-         z9ga2nec5AtsnkXQqm6KZv2XmZ5KpilfEflI6s5xDeOd1DbDJV+lxSnmYwquGdpX/HmX
-         NCAY4ZSti4Gi1/6uo+XCazcDG04NnHIvkGX52Fd2rpPsN13abO72+I0pJdaPcMG1bizm
-         zejQ==
-X-Gm-Message-State: APjAAAXCbam1CoifczrWXP+oxANmFowZ+6gHwsLEnxv19JF5QKA9Tuxx
-        rpQv+Q+dVB66y++6gGqzUtMK39/gwDCHPEAX1dskGw==
-X-Google-Smtp-Source: APXvYqz34nz5LOo4cPevM5VjCan65rNEmC8gpMnYrVmkWcWrLsj1pagcMHSfVnCNE6Yk+4D6E8kC2dFyTPt0auIIe/Q=
-X-Received: by 2002:a6b:5902:: with SMTP id n2mr23788156iob.298.1581001953120;
- Thu, 06 Feb 2020 07:12:33 -0800 (PST)
+        h=x-gm-message-state:date:from:to:cc:subject:message-id:references
+         :mime-version:content-disposition:in-reply-to;
+        bh=XZOggLanx1OakxhbvmLypkwLB6o7BwYbW0LP99Ryt1o=;
+        b=Uyp4RAfA+GRg5UOYFE4ymvwGvIpfh8i0CnERQHUcbTpq2oYm4xgXQJ7W44aO5ZN62s
+         z6d8l5Lw1Zkv01kNVc2pjsJ88IDq4m2SRAQ6rPSX8JMBQ31h/asu4gJFA0OYc6ZCYVBM
+         pILLsxcM8uHG0Zv28qd/vJfYjNiztAnZUlmAMwrbnsuGikTLS03LNRN6vtWMVRs6sbTM
+         l7Sxgg4XsY2bZT9MwZX25siXjTtzeCJ/KdstKwxCuGZx4inFzQzKTHEG4UxYCi5z9NoF
+         I5pjkC+HfWvjsskFZRMpANhuMpMZeucbMXckbIoQNPYv7FJ59Y/qp9bEz1s/AiYVp++E
+         9K7g==
+X-Gm-Message-State: APjAAAWbLq9kNFTgAU9NMgs+U3rod+BlrkVS8ekiBbIuHfMUR3ZMs1EZ
+        5aOc1Fkk/1HZIufdwc75WGPPaA==
+X-Google-Smtp-Source: APXvYqwoCWoPoxMsBmJ48AbMG+4iF96O7gepmNsPc8GfJXUuFMj8rT6ge/PsiVIYjdA9hTy/JKrEoQ==
+X-Received: by 2002:a05:620a:7f4:: with SMTP id k20mr2931953qkk.483.1581002826313;
+        Thu, 06 Feb 2020 07:27:06 -0800 (PST)
+Received: from localhost (pool-108-27-252-85.nycmny.fios.verizon.net. [108.27.252.85])
+        by smtp.gmail.com with ESMTPSA id b24sm1741820qto.71.2020.02.06.07.27.05
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Thu, 06 Feb 2020 07:27:05 -0800 (PST)
+Date:   Thu, 6 Feb 2020 10:27:04 -0500
+From:   Johannes Weiner <hannes@cmpxchg.org>
+To:     Dan Schatzberg <dschatzberg@fb.com>
+Cc:     Jens Axboe <axboe@kernel.dk>, Tejun Heo <tj@kernel.org>,
+        Li Zefan <lizefan@huawei.com>,
+        Michal Hocko <mhocko@kernel.org>,
+        Vladimir Davydov <vdavydov.dev@gmail.com>,
+        Andrew Morton <akpm@linux-foundation.org>,
+        Hugh Dickins <hughd@google.com>,
+        "open list:BLOCK LAYER" <linux-block@vger.kernel.org>,
+        open list <linux-kernel@vger.kernel.org>,
+        "open list:CONTROL GROUP (CGROUP)" <cgroups@vger.kernel.org>,
+        "open list:CONTROL GROUP - MEMORY RESOURCE CONTROLLER (MEMCG)" 
+        <linux-mm@kvack.org>
+Subject: Re: [PATCH 1/2] mm: Charge current memcg when no mm is set
+Message-ID: <20200206152704.GA24735@cmpxchg.org>
+References: <20200205223348.880610-1-dschatzberg@fb.com>
+ <20200205223348.880610-2-dschatzberg@fb.com>
 MIME-Version: 1.0
-References: <20200124204753.13154-1-jinpuwang@gmail.com> <CAHg0HuzLLHqp_76ThLhUdHGG_986Oxvvr15h_13T12eEWjyAxA@mail.gmail.com>
- <20200131165421.GB29820@ziepe.ca> <f657d371-3b23-e4b2-50b3-db47cd521e1f@kernel.dk>
- <CAD9gYJLVMVPjQcCj0aqbAW3CD86JQoFNvzJwGziRXT8B2UT0VQ@mail.gmail.com> <a1aaa047-3a44-11a7-19a1-e150a9df4616@kernel.dk>
-In-Reply-To: <a1aaa047-3a44-11a7-19a1-e150a9df4616@kernel.dk>
-From:   Jinpu Wang <jinpu.wang@cloud.ionos.com>
-Date:   Thu, 6 Feb 2020 16:12:22 +0100
-Message-ID: <CAMGffEkLkwkd73Q+m46VeOw0UnzZ0EkZQF-QcSZjyqNcqigZPw@mail.gmail.com>
-Subject: Re: [PATCH v8 00/25] RTRS (former IBTRS) RDMA Transport Library and
- RNBD (former IBNBD) RDMA Network Block Device
-To:     Jens Axboe <axboe@kernel.dk>, Bart Van Assche <bvanassche@acm.org>,
-        Leon Romanovsky <leon@kernel.org>
-Cc:     Jinpu Wang <jinpuwang@gmail.com>, Jason Gunthorpe <jgg@ziepe.ca>,
-        Danil Kipnis <danil.kipnis@cloud.ionos.com>,
-        linux-block@vger.kernel.org, linux-rdma@vger.kernel.org,
-        Christoph Hellwig <hch@infradead.org>,
-        Sagi Grimberg <sagi@grimberg.me>,
-        Doug Ledford <dledford@redhat.com>,
-        Roman Penyaev <rpenyaev@suse.de>
-Content-Type: text/plain; charset="UTF-8"
-Content-Transfer-Encoding: quoted-printable
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <20200205223348.880610-2-dschatzberg@fb.com>
 Sender: linux-block-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-On Fri, Jan 31, 2020 at 6:49 PM Jens Axboe <axboe@kernel.dk> wrote:
->
-> On 1/31/20 10:28 AM, Jinpu Wang wrote:
-> > Jens Axboe <axboe@kernel.dk> =E4=BA=8E2020=E5=B9=B41=E6=9C=8831=E6=97=
-=A5=E5=91=A8=E4=BA=94 =E4=B8=8B=E5=8D=886:04=E5=86=99=E9=81=93=EF=BC=9A
-> >>
-> >> On 1/31/20 9:54 AM, Jason Gunthorpe wrote:
-> >>> On Fri, Jan 31, 2020 at 05:50:44PM +0100, Danil Kipnis wrote:
-> >>>> Hi Doug, Hi Jason, Hi Jens, Hi All,
-> >>>>
-> >>>> since we didn't get any new comments for the V8 prepared by Jack a
-> >>>> week ago do you think rnbd/rtrs could be merged in the current merge
-> >>>> window?
-> >>>
-> >>> No, the cut off for something large like this would be rc4ish
-> >>
-> >> Since it's been around for a while, I would have taken it in a bit
-> >> later than that. But not now, definitely too late. If folks are
-> >> happy with it, we can get it queued for 5.7.
-> >>
-> >> --
-> >> Jens Axboe
-> >
-> > Thanks Jason, thanks Jens, then we will prepare later another round for=
- 5.7
->
-> It would also be really nice to see official sign-offs (reviews) from non
-> ionos people...
+On Wed, Feb 05, 2020 at 02:33:47PM -0800, Dan Schatzberg wrote:
+> This modifies the shmem and mm charge logic so that now if there is no
+> mm set (as in the case of tmpfs backed loop device), we charge the
+> current memcg, if set.
+> 
+> Signed-off-by: Dan Schatzberg <dschatzberg@fb.com>
 
-Totally agree.
-Hi Bart, hi Leon,
+Acked-by: Johannes Weiner <hannes@cmpxchg.org>
 
-Both of you spent quite some time to review the code, could you give a
-Reviewed-by for some of the patches you've reviewed?
+It's a dependency for 2/2, but it's also an overdue cleanup IMO: it's
+always been a bit weird that memalloc_use_memcg() worked for kernel
+allocations but was silently ignored for user pages.
 
-Thanks,
-Jack Wang
+This patch establishes a precedence order for who gets charged:
 
-PS: sorry for the slow reply, I'm on parental leave currently, can
-only find short time checking emails.
+1. If there is a memcg associated with the page already, that memcg is
+   charged. This happens during swapin.
+
+2. If an explicit mm is passed, mm->memcg is charged. This happens
+   during page faults, which can be triggered in remote VMs (eg gup).
+
+3. Otherwise consult the current process context. If it has configured
+   a current->active_memcg, use that. Otherwise, current->mm->memcg.
+
+Thanks Dan
