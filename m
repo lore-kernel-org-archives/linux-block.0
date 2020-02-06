@@ -2,212 +2,169 @@ Return-Path: <SRS0=DGx4=32=vger.kernel.org=linux-block-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-8.4 required=3.0 tests=DKIMWL_WL_HIGH,DKIM_SIGNED,
-	DKIM_VALID,DKIM_VALID_AU,HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,
-	MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,USER_AGENT_SANE_1
-	autolearn=ham autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-9.7 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
+	INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,
+	URIBL_BLOCKED,USER_AGENT_GIT autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id BAE3CC2D0B1
-	for <linux-block@archiver.kernel.org>; Thu,  6 Feb 2020 10:18:54 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 3D400C2D0B1
+	for <linux-block@archiver.kernel.org>; Thu,  6 Feb 2020 11:12:06 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.kernel.org (Postfix) with ESMTP id 8487920730
-	for <linux-block@archiver.kernel.org>; Thu,  6 Feb 2020 10:18:54 +0000 (UTC)
-Authentication-Results: mail.kernel.org;
-	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="iSAL6LD3"
+	by mail.kernel.org (Postfix) with ESMTP id 17333206CC
+	for <linux-block@archiver.kernel.org>; Thu,  6 Feb 2020 11:12:06 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1728263AbgBFKSx (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Thu, 6 Feb 2020 05:18:53 -0500
-Received: from us-smtp-1.mimecast.com ([205.139.110.61]:54391 "EHLO
-        us-smtp-delivery-1.mimecast.com" rhost-flags-OK-OK-OK-FAIL)
-        by vger.kernel.org with ESMTP id S1727543AbgBFKSx (ORCPT
-        <rfc822;linux-block@vger.kernel.org>);
-        Thu, 6 Feb 2020 05:18:53 -0500
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-        s=mimecast20190719; t=1580984332;
-        h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-         to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-         in-reply-to:in-reply-to:references:references;
-        bh=qYx7nxy35oQa847aQrZyTE+tisI9xWrPZxJO4oWsCAg=;
-        b=iSAL6LD3QopjessPwfTfKGIUbw3wUCX9YSusR1G2rwFfBpwjO4cnNbP3afrhPlRH1cOsUQ
-        cprJOvqUGup//C+xE5gUgKNkWVtYDiFaTS6p/Kv7MioLRqPXUv4P52b6UWX6LUm7/k5fif
-        DzkJ4s9qILTrhTMTCIQb7RemBf8MuO0=
-Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
- [209.132.183.4]) (Using TLS) by relay.mimecast.com with ESMTP id
- us-mta-374-HKibw01BPSaRy8qccL2PHQ-1; Thu, 06 Feb 2020 05:18:48 -0500
-X-MC-Unique: HKibw01BPSaRy8qccL2PHQ-1
-Received: from smtp.corp.redhat.com (int-mx05.intmail.prod.int.phx2.redhat.com [10.5.11.15])
-        (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
-        (No client certificate requested)
-        by mimecast-mx01.redhat.com (Postfix) with ESMTPS id 5945D8010F6;
-        Thu,  6 Feb 2020 10:18:46 +0000 (UTC)
-Received: from ming.t460p (ovpn-8-25.pek2.redhat.com [10.72.8.25])
-        by smtp.corp.redhat.com (Postfix) with ESMTPS id 81F21790E7;
-        Thu,  6 Feb 2020 10:18:38 +0000 (UTC)
-Date:   Thu, 6 Feb 2020 18:18:33 +0800
-From:   Ming Lei <ming.lei@redhat.com>
-To:     Salman Qazi <sqazi@google.com>
-Cc:     Jens Axboe <axboe@kernel.dk>, Bart Van Assche <bvanassche@acm.org>,
-        linux-block@vger.kernel.org, linux-kernel@vger.kernel.org,
-        Jesse Barnes <jsbarnes@google.com>,
-        Gwendal Grignou <gwendal@google.com>,
-        Hannes Reinecke <hare@suse.com>, Christoph Hellwig <hch@lst.de>
-Subject: Re: [PATCH] block: Limit number of items taken from the I/O
- scheduler in one go
-Message-ID: <20200206101833.GA20943@ming.t460p>
-References: <20200205045526.GA15286@ming.t460p>
- <20200205195706.49438-1-sqazi@google.com>
+        id S1727561AbgBFLMF (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Thu, 6 Feb 2020 06:12:05 -0500
+Received: from szxga06-in.huawei.com ([45.249.212.32]:36448 "EHLO huawei.com"
+        rhost-flags-OK-OK-OK-FAIL) by vger.kernel.org with ESMTP
+        id S1727560AbgBFLMF (ORCPT <rfc822;linux-block@vger.kernel.org>);
+        Thu, 6 Feb 2020 06:12:05 -0500
+Received: from DGGEMS411-HUB.china.huawei.com (unknown [172.30.72.58])
+        by Forcepoint Email with ESMTP id 90BFE2624F6B1E4B9F84;
+        Thu,  6 Feb 2020 19:11:55 +0800 (CST)
+Received: from huawei.com (10.175.124.28) by DGGEMS411-HUB.china.huawei.com
+ (10.3.19.211) with Microsoft SMTP Server id 14.3.439.0; Thu, 6 Feb 2020
+ 19:11:46 +0800
+From:   yu kuai <yukuai3@huawei.com>
+To:     <axboe@kernel.dk>, <ming.lei@redhat.com>,
+        <chaitanya.kulkarni@wdc.com>, <damien.lemoal@wdc.com>,
+        <bvanassche@acm.org>, <dhowells@redhat.com>,
+        <asml.silence@gmail.com>, <ajay.joshi@wdc.com>
+CC:     <linux-block@vger.kernel.org>, <linux-kernel@vger.kernel.org>,
+        <yukuai3@huawei.com>, <yi.zhang@huawei.com>,
+        <zhangxiaoxu5@huawei.com>, <luoshijie1@huawei.com>
+Subject: [PATCH] block: revert pushing the final release of request_queue to a workqueue.
+Date:   Thu, 6 Feb 2020 19:10:52 +0800
+Message-ID: <20200206111052.45356-1-yukuai3@huawei.com>
+X-Mailer: git-send-email 2.17.2
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <20200205195706.49438-1-sqazi@google.com>
-User-Agent: Mutt/1.12.1 (2019-06-15)
-X-Scanned-By: MIMEDefang 2.79 on 10.5.11.15
+Content-Type: text/plain
+X-Originating-IP: [10.175.124.28]
+X-CFilter-Loop: Reflected
 Sender: linux-block-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-On Wed, Feb 05, 2020 at 11:57:06AM -0800, Salman Qazi wrote:
-> Flushes bypass the I/O scheduler and get added to hctx->dispatch
-> in blk_mq_sched_bypass_insert.  This can happen while a kworker is running
-> hctx->run_work work item and is past the point in
-> blk_mq_sched_dispatch_requests where hctx->dispatch is checked.
-> 
-> The blk_mq_do_dispatch_sched call is not guaranteed to end in bounded time,
-> because the I/O scheduler can feed an arbitrary number of commands.
-> 
-> Since we have only one hctx->run_work, the commands waiting in
-> hctx->dispatch will wait an arbitrary length of time for run_work to be
-> rerun.
-> 
-> A similar phenomenon exists with dispatches from the software queue.
-> 
-> The solution is to poll hctx->dispatch in blk_mq_do_dispatch_sched and
-> blk_mq_do_dispatch_ctx and return from the run_work handler and let it
-> rerun.
-> 
-> Signed-off-by: Salman Qazi <sqazi@google.com>
-> ---
->  block/blk-mq-sched.c | 37 +++++++++++++++++++++++++++++++------
->  1 file changed, 31 insertions(+), 6 deletions(-)
-> 
-> diff --git a/block/blk-mq-sched.c b/block/blk-mq-sched.c
-> index ca22afd47b3d..52249fddeb66 100644
-> --- a/block/blk-mq-sched.c
-> +++ b/block/blk-mq-sched.c
-> @@ -84,12 +84,16 @@ void blk_mq_sched_restart(struct blk_mq_hw_ctx *hctx)
->   * Only SCSI implements .get_budget and .put_budget, and SCSI restarts
->   * its queue by itself in its completion handler, so we don't need to
->   * restart queue if .get_budget() returns BLK_STS_NO_RESOURCE.
-> + *
-> + * Returns true if hctx->dispatch was found non-empty and
-> + * run_work has to be run again.
->   */
-> -static void blk_mq_do_dispatch_sched(struct blk_mq_hw_ctx *hctx)
-> +static bool blk_mq_do_dispatch_sched(struct blk_mq_hw_ctx *hctx)
->  {
->  	struct request_queue *q = hctx->queue;
->  	struct elevator_queue *e = q->elevator;
->  	LIST_HEAD(rq_list);
-> +	bool ret = false;
->  
->  	do {
->  		struct request *rq;
-> @@ -97,6 +101,11 @@ static void blk_mq_do_dispatch_sched(struct blk_mq_hw_ctx *hctx)
->  		if (e->type->ops.has_work && !e->type->ops.has_work(hctx))
->  			break;
->  
-> +		if (!list_empty_careful(&hctx->dispatch)) {
-> +			ret = true;
-> +			break;
-> +		}
-> +
->  		if (!blk_mq_get_dispatch_budget(hctx))
->  			break;
->  
-> @@ -113,6 +122,8 @@ static void blk_mq_do_dispatch_sched(struct blk_mq_hw_ctx *hctx)
->  		 */
->  		list_add(&rq->queuelist, &rq_list);
->  	} while (blk_mq_dispatch_rq_list(q, &rq_list, true));
-> +
-> +	return ret;
->  }
->  
->  static struct blk_mq_ctx *blk_mq_next_ctx(struct blk_mq_hw_ctx *hctx,
-> @@ -130,16 +141,25 @@ static struct blk_mq_ctx *blk_mq_next_ctx(struct blk_mq_hw_ctx *hctx,
->   * Only SCSI implements .get_budget and .put_budget, and SCSI restarts
->   * its queue by itself in its completion handler, so we don't need to
->   * restart queue if .get_budget() returns BLK_STS_NO_RESOURCE.
-> + *
-> + * Returns true if hctx->dispatch was found non-empty and
-> + * run_work has to be run again.
->   */
-> -static void blk_mq_do_dispatch_ctx(struct blk_mq_hw_ctx *hctx)
-> +static bool blk_mq_do_dispatch_ctx(struct blk_mq_hw_ctx *hctx)
->  {
->  	struct request_queue *q = hctx->queue;
->  	LIST_HEAD(rq_list);
->  	struct blk_mq_ctx *ctx = READ_ONCE(hctx->dispatch_from);
-> +	bool ret = false;
->  
->  	do {
->  		struct request *rq;
->  
-> +		if (!list_empty_careful(&hctx->dispatch)) {
-> +			ret = true;
-> +			break;
-> +		}
-> +
->  		if (!sbitmap_any_bit_set(&hctx->ctx_map))
->  			break;
->  
-> @@ -165,6 +185,7 @@ static void blk_mq_do_dispatch_ctx(struct blk_mq_hw_ctx *hctx)
->  	} while (blk_mq_dispatch_rq_list(q, &rq_list, true));
->  
->  	WRITE_ONCE(hctx->dispatch_from, ctx);
-> +	return ret;
->  }
->  
->  void blk_mq_sched_dispatch_requests(struct blk_mq_hw_ctx *hctx)
-> @@ -172,6 +193,7 @@ void blk_mq_sched_dispatch_requests(struct blk_mq_hw_ctx *hctx)
->  	struct request_queue *q = hctx->queue;
->  	struct elevator_queue *e = q->elevator;
->  	const bool has_sched_dispatch = e && e->type->ops.dispatch_request;
-> +	bool run_again = false;
->  	LIST_HEAD(rq_list);
->  
->  	/* RCU or SRCU read lock is needed before checking quiesced flag */
-> @@ -208,19 +230,22 @@ void blk_mq_sched_dispatch_requests(struct blk_mq_hw_ctx *hctx)
->  		blk_mq_sched_mark_restart_hctx(hctx);
->  		if (blk_mq_dispatch_rq_list(q, &rq_list, false)) {
->  			if (has_sched_dispatch)
-> -				blk_mq_do_dispatch_sched(hctx);
-> +				run_again = blk_mq_do_dispatch_sched(hctx);
->  			else
-> -				blk_mq_do_dispatch_ctx(hctx);
-> +				run_again = blk_mq_do_dispatch_ctx(hctx);
->  		}
->  	} else if (has_sched_dispatch) {
-> -		blk_mq_do_dispatch_sched(hctx);
-> +		run_again = blk_mq_do_dispatch_sched(hctx);
->  	} else if (hctx->dispatch_busy) {
->  		/* dequeue request one by one from sw queue if queue is busy */
-> -		blk_mq_do_dispatch_ctx(hctx);
-> +		run_again = blk_mq_do_dispatch_ctx(hctx);
->  	} else {
->  		blk_mq_flush_busy_ctxs(hctx, &rq_list);
->  		blk_mq_dispatch_rq_list(q, &rq_list, false);
->  	}
-> +
-> +	if (run_again)
-> +		blk_mq_run_hw_queue(hctx, true);
+syzbot is reporting use after free bug in debugfs_remove[1].
 
-One improvement may be to run again locally in this function by
-limited times(such as 1) first, then switch to blk_mq_run_hw_queue()
-if run again is still needed.
+This is because in request_queue, 'q->debugfs_dir' and
+'q->blk_trace->dir' could be the same dir. And in __blk_release_queue(),
+blk_mq_debugfs_unregister() will remove everything inside the dir.
 
-This way may save one async run hw queue.
+With futher investigation of the reporduce repro, the problem can be
+reporduced by following procedure:
 
-Thanks,
-Ming
+1. LOOP_CTL_ADD, create a request_queue q1, blk_mq_debugfs_register() will
+create the dir.
+2. LOOP_CTL_REMOVE, blk_release_queue() will add q1 to release queue.
+3. LOOP_CTL_ADD, create another request_queue q2,blk_mq_debugfs_register()
+will fail because the dir aready exist.
+4. BLKTRACESETUP, create two files(msg and dropped) inside the dir.
+5. call __blk_release_queue() for q1, debugfs_remove_recursive() will
+delete the files created in step 4.
+6. LOOP_CTL_REMOVE, blk_release_queue() will add q2 to release queue.
+And when __blk_release_queue() is called for q2, blk_trace_shutdown() will
+try to release the two files created in step 4, wich are aready released
+in step 5.
+
+|thread1		  |kworker	             |thread2               |
+| ----------------------- | ------------------------ | -------------------- |
+|loop_control_ioctl       |                          |                      |
+| loop_add                |                          |                      |
+|  blk_mq_debugfs_register|                          |                      |
+|   debugfs_create_dir    |                          |                      |
+|loop_control_ioctl       |                          |                      |
+| loop_remove		  |                          |                      |
+|  blk_release_queue      |                          |                      |
+|   schedule_work         |                          |                      |
+|			  |			     |loop_control_ioctl    |
+|			  |			     | loop_add             |
+|			  |			     |  ...                 |
+|			  |			     |blk_trace_ioctl       |
+|			  |			     | __blk_trace_setup    |
+|			  |			     |   debugfs_create_file|
+|			  |__blk_release_queue       |                      |
+|			  | blk_mq_debugfs_unregister|                      |
+|			  |  debugfs_remove_recursive|                      |
+|			  |			     |loop_control_ioctl    |
+|			  |			     | loop_remove          |
+|			  |			     |  ...                 |
+|			  |__blk_release_queue       |                      |
+|			  | blk_trace_shutdown       |                      |
+|			  |  debugfs_remove          |                      |
+
+commit dc9edc44de6c ("block: Fix a blk_exit_rl() regression") pushed the
+final release of request_queue to a workqueue, witch is not necessary
+since commit 1e9364283764 ("blk-sysfs: Rework documention of
+__blk_release_queue").
+
+[1] https://syzkaller.appspot.com/bug?extid=903b72a010ad6b7a40f2
+References: CVE-2019-19770
+Fixes: commit dc9edc44de6c ("block: Fix a blk_exit_rl() regression")
+Reported-by: syzbot <syz...@syzkaller.appspotmail.com>
+Signed-off-by: yu kuai <yukuai3@huawei.com>
+---
+ block/blk-sysfs.c      | 18 +++++-------------
+ include/linux/blkdev.h |  2 --
+ 2 files changed, 5 insertions(+), 15 deletions(-)
+
+diff --git a/block/blk-sysfs.c b/block/blk-sysfs.c
+index fca9b158f4a0..3f448292099d 100644
+--- a/block/blk-sysfs.c
++++ b/block/blk-sysfs.c
+@@ -862,8 +862,8 @@ static void blk_exit_queue(struct request_queue *q)
+ 
+ 
+ /**
+- * __blk_release_queue - release a request queue
+- * @work: pointer to the release_work member of the request queue to be released
++ * blk_release_queue - release a request queue
++ * @@kobj:    the kobj belonging to the request queue to be released
+  *
+  * Description:
+  *     This function is called when a block device is being unregistered. The
+@@ -873,9 +873,10 @@ static void blk_exit_queue(struct request_queue *q)
+  *     of the request queue reaches zero, blk_release_queue is called to release
+  *     all allocated resources of the request queue.
+  */
+-static void __blk_release_queue(struct work_struct *work)
++static void blk_release_queue(struct kobject *kobj)
+ {
+-	struct request_queue *q = container_of(work, typeof(*q), release_work);
++	struct request_queue *q =
++		container_of(kobj, struct request_queue, kobj);
+ 
+ 	if (test_bit(QUEUE_FLAG_POLL_STATS, &q->queue_flags))
+ 		blk_stat_remove_callback(q, q->poll_cb);
+@@ -904,15 +905,6 @@ static void __blk_release_queue(struct work_struct *work)
+ 	call_rcu(&q->rcu_head, blk_free_queue_rcu);
+ }
+ 
+-static void blk_release_queue(struct kobject *kobj)
+-{
+-	struct request_queue *q =
+-		container_of(kobj, struct request_queue, kobj);
+-
+-	INIT_WORK(&q->release_work, __blk_release_queue);
+-	schedule_work(&q->release_work);
+-}
+-
+ static const struct sysfs_ops queue_sysfs_ops = {
+ 	.show	= queue_attr_show,
+ 	.store	= queue_attr_store,
+diff --git a/include/linux/blkdev.h b/include/linux/blkdev.h
+index 04cfa798a365..dff4d032c78a 100644
+--- a/include/linux/blkdev.h
++++ b/include/linux/blkdev.h
+@@ -580,8 +580,6 @@ struct request_queue {
+ 
+ 	size_t			cmd_size;
+ 
+-	struct work_struct	release_work;
+-
+ #define BLK_MAX_WRITE_HINTS	5
+ 	u64			write_hints[BLK_MAX_WRITE_HINTS];
+ };
+-- 
+2.17.2
 
