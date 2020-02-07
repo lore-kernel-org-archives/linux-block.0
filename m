@@ -2,94 +2,92 @@ Return-Path: <SRS0=URwg=33=vger.kernel.org=linux-block-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-0.6 required=3.0 tests=DKIM_SIGNED,DKIM_VALID,
-	DKIM_VALID_AU,FREEMAIL_FORGED_FROMDOMAIN,FREEMAIL_FROM,
-	HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,
-	URIBL_BLOCKED autolearn=no autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-2.2 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
+	MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,USER_AGENT_SANE_1 autolearn=no
+	autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 7E35FC2BA83
-	for <linux-block@archiver.kernel.org>; Fri,  7 Feb 2020 20:02:22 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 0F97FC2BA83
+	for <linux-block@archiver.kernel.org>; Fri,  7 Feb 2020 20:19:40 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.kernel.org (Postfix) with ESMTP id 512D5214AF
-	for <linux-block@archiver.kernel.org>; Fri,  7 Feb 2020 20:02:22 +0000 (UTC)
-Authentication-Results: mail.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="PdrH595H"
+	by mail.kernel.org (Postfix) with ESMTP id DC9A0214AF
+	for <linux-block@archiver.kernel.org>; Fri,  7 Feb 2020 20:19:39 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1727018AbgBGUCV (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Fri, 7 Feb 2020 15:02:21 -0500
-Received: from mail-io1-f68.google.com ([209.85.166.68]:38905 "EHLO
-        mail-io1-f68.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1727012AbgBGUCV (ORCPT
-        <rfc822;linux-block@vger.kernel.org>); Fri, 7 Feb 2020 15:02:21 -0500
-Received: by mail-io1-f68.google.com with SMTP id s24so855551iog.5;
-        Fri, 07 Feb 2020 12:02:20 -0800 (PST)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20161025;
-        h=mime-version:in-reply-to:references:from:date:message-id:subject:to
-         :cc;
-        bh=ObGffXOL5VBl+6FfHz5jFepyN+90co8pbuYkAV1+kJE=;
-        b=PdrH595HtGa9FPdkP6FveQWORDzceL3dqn7chKwjW7CJ+op5ZGt5wOH40lbbNI+WCk
-         jpHd1/lUpWA+gaCwXp6RVAM+Y1eokJg7ew/FJHA0E3xFM6zPlcCc0aSxaFlmhVC19UCz
-         ZMnUSaa0LKX3n24qqEuOkvjz65meJHzemH5KKw0WbS2XskToFwkY5Ufx0FUPdIuWDBv0
-         J2VHzWy9suqL0WnHQWHh4h71LFUUIT0XzDePf88IFmKqWXayoI3mwA7iw5UthFBTgJ0a
-         mRUdvGhHAlvZHLzrZ2eQocbWC6gCXWb3nUc4UoqdnqVGrG4vxOZBUGLrPSZ4FGf45gMX
-         9okg==
+        id S1727522AbgBGUTg (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Fri, 7 Feb 2020 15:19:36 -0500
+Received: from mail-pg1-f179.google.com ([209.85.215.179]:44770 "EHLO
+        mail-pg1-f179.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S1727012AbgBGUTg (ORCPT
+        <rfc822;linux-block@vger.kernel.org>); Fri, 7 Feb 2020 15:19:36 -0500
+Received: by mail-pg1-f179.google.com with SMTP id g3so332596pgs.11;
+        Fri, 07 Feb 2020 12:19:36 -0800 (PST)
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=1e100.net; s=20161025;
-        h=x-gm-message-state:mime-version:in-reply-to:references:from:date
-         :message-id:subject:to:cc;
-        bh=ObGffXOL5VBl+6FfHz5jFepyN+90co8pbuYkAV1+kJE=;
-        b=CbTVxlY2LHCIomUyOn2wIUT0QU/FKm3iKQAwDm+mGCesmzFdmlZy8xBhBPc7mcUeqh
-         idO1Z7+Loa12gXZXFeImZHo/9tdA4vJ4Vr3c34uwE1e/fl9F1h7sFmmXt8SDl1QxSZLi
-         05LOIMIg9fp6NcdMmESEaH02rQyjS/KCHP0lIwDyUHIbNBWuoi1muJhVjf89/7Fkq6Xk
-         svlTdhf+hXXrv8zzLf5kBAc6pbvkUly+Qm9hDyVQriBSybUW6qGM5gANpt02sYj6K/r0
-         cgb/XVCFs9pZXrD0NfJvoKDjPpFuFiXIxvTef1y0JHRkAJ85hFLlsmvKA9rHchg+5fw7
-         d+GQ==
-X-Gm-Message-State: APjAAAX+Oy6j6cvH4XrTJV01Jr7O1V8iSRZfgb00nkElsd1EqEvkCnCz
-        wRL65tzm8YBXuchGfp4BcdMGb9PlO+y6c2dGtTk=
-X-Google-Smtp-Source: APXvYqzr9EKMP9gEcMKsqVij2k0eQYE1W3W48hKowb/xTOZi90SWhlNjvEDfr1GsLUtEJl0v4PiyYDyNQyO8E9KAEko=
-X-Received: by 2002:a5d:8956:: with SMTP id b22mr102017iot.263.1581105740222;
- Fri, 07 Feb 2020 12:02:20 -0800 (PST)
+        h=x-gm-message-state:subject:to:cc:references:from:message-id:date
+         :user-agent:mime-version:in-reply-to:content-language
+         :content-transfer-encoding;
+        bh=enhiSx1rzR+RPq1L2dMhTge0oU78rWexnmv2B9uDahc=;
+        b=L/eXjbpiLLO8dt+sG7QV4cwHntNZenWNM6pMMGM91FBhPBnf50w5X9hndlswSQG0Zj
+         uWmTsrSl07w2DKI4AYJzi7r19w6O16EwpH10QtTqDbG0msyVeRvYJulNOexI07maj41s
+         g+JA9uYCEVyDHzAipZ4L/E+IuH9ETzxWpx1WRKesPEF96r1ZjoYiV1Ypvv7Bx+bGLLL4
+         RnfxgrVd5Pn358tst+sYfGgdgMh6e98vNenNzUQbatnbFo9CRaY5kyNglWLQ8KSinlbc
+         +OzFfYvfpZpRarar/augMolL+5Wil2134yvlDgLgBtmKmvQGeTj7jWcLz1wEDH98sDph
+         t+dQ==
+X-Gm-Message-State: APjAAAU3wKCj0KnRJcuoVlNJKlO24hUa2OaRgtOCrE06Dyzpf3ad8tSW
+        fk6cXeSZ0+WU/UVxSLVkmLc=
+X-Google-Smtp-Source: APXvYqx1ZkV8JQQI7A49xmP/CjlVkZxuoAIhEJHvJAY7U3XidYSCCYa7X46WCvwlDDelOk+QTg+u3g==
+X-Received: by 2002:a63:61d3:: with SMTP id v202mr1029013pgb.184.1581106775569;
+        Fri, 07 Feb 2020 12:19:35 -0800 (PST)
+Received: from desktop-bart.svl.corp.google.com ([2620:15c:2cd:202:4308:52a3:24b6:2c60])
+        by smtp.gmail.com with ESMTPSA id r9sm4025420pfl.136.2020.02.07.12.19.33
+        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
+        Fri, 07 Feb 2020 12:19:34 -0800 (PST)
+Subject: Re: [PATCH] block: Limit number of items taken from the I/O scheduler
+ in one go
+To:     Salman Qazi <sqazi@google.com>
+Cc:     Jens Axboe <axboe@kernel.dk>, Ming Lei <ming.lei@redhat.com>,
+        linux-block@vger.kernel.org,
+        Linux Kernel Mailing List <linux-kernel@vger.kernel.org>,
+        Jesse Barnes <jsbarnes@google.com>,
+        Gwendal Grignou <gwendal@google.com>,
+        Hannes Reinecke <hare@suse.com>, Christoph Hellwig <hch@lst.de>
+References: <20200206101833.GA20943@ming.t460p>
+ <20200206211222.83170-1-sqazi@google.com>
+ <5707b17f-e5d7-c274-de6a-694098c4e9a2@acm.org>
+ <CAKUOC8X0OFqJ09Y+nrPQiMLiRjpKMm0Ucci_33UJEM8HvQ=H1Q@mail.gmail.com>
+From:   Bart Van Assche <bvanassche@acm.org>
+Message-ID: <10c64a02-91fe-c2af-4c0c-dc9677f9b223@acm.org>
+Date:   Fri, 7 Feb 2020 12:19:33 -0800
+User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:68.0) Gecko/20100101
+ Thunderbird/68.3.0
 MIME-Version: 1.0
-Received: by 2002:ad5:5442:0:0:0:0:0 with HTTP; Fri, 7 Feb 2020 12:02:19 -0800 (PST)
-In-Reply-To: <CAK8P3a2n6qttV0hhMHjb7XngA6-Aj4Q9Q_6LdK7LgyoYSvQJSw@mail.gmail.com>
-References: <20191217221708.3730997-21-arnd@arndb.de> <20200207072210.10134-1-youling257@gmail.com>
- <CAK8P3a2n6qttV0hhMHjb7XngA6-Aj4Q9Q_6LdK7LgyoYSvQJSw@mail.gmail.com>
-From:   youling 257 <youling257@gmail.com>
-Date:   Sat, 8 Feb 2020 04:02:19 +0800
-Message-ID: <CAOzgRdZGLoWyjXdw+BHmfqJBzfskwC+4ANTxTdaS2wmRoNgPpA@mail.gmail.com>
-Subject: Re: [PATCH v2 20/27] compat_ioctl: simplify the implementation
-To:     Arnd Bergmann <arnd@arndb.de>
-Cc:     Jens Axboe <axboe@kernel.dk>,
-        "James E.J. Bottomley" <jejb@linux.ibm.com>,
-        "Martin K. Petersen" <martin.petersen@oracle.com>,
-        linux-scsi <linux-scsi@vger.kernel.org>,
-        "linux-kernel@vger.kernel.org" <linux-kernel@vger.kernel.org>,
-        linux-block <linux-block@vger.kernel.org>,
-        Linux FS-devel Mailing List <linux-fsdevel@vger.kernel.org>
-Content-Type: text/plain; charset="UTF-8"
+In-Reply-To: <CAKUOC8X0OFqJ09Y+nrPQiMLiRjpKMm0Ucci_33UJEM8HvQ=H1Q@mail.gmail.com>
+Content-Type: text/plain; charset=utf-8; format=flowed
+Content-Language: en-US
+Content-Transfer-Encoding: 7bit
 Sender: linux-block-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-Test [PATCH] compat_ioctl: fix FIONREAD on devices, fixed my problem.
+On 2/7/20 10:45 AM, Salman Qazi wrote:
+> If I were to write this as a for-loop, it will look like this:
+> 
+> for (i = 0; i == 0 || (run_again && i < 2); i++) {
+> /* another level of 8 character wide indentation */
+>      run_again = false;
+>     /* a bunch of code that possibly sets run_again to true
+> }
+> 
+> if (run_again)
+>      blk_mq_run_hw_queue(hctx, true);
 
-2020-02-08 1:06 GMT+08:00, Arnd Bergmann <arnd@arndb.de>:
-> On Fri, Feb 7, 2020 at 8:22 AM youling257 <youling257@gmail.com> wrote:
->>
->> This patch cause a problem on 64bit kernel 32bit userspace.
->> My 32bit Androidx86 userspace run on 64bit mainline kernel, this patch
->> caused some app not detect root permission.
->
-> Thanks for you work in bisecting the issue to my patch, sorry to have
-> caused you trouble. After Christian Zigotzky
-> also reported a problem in this file, I have been able to find a
-> specific bug and just submitted a patch for it.
->
-> Please have a look if that fix addresses your problem, as it's
-> possible that there was more than one bug introduced
-> by the original patch.
->
->        Arnd
->
+That's not what I meant. What I meant is a loop that iterates at most 
+two times and also to break out of the loop if run_again == false.
+
+BTW, I share your concern about the additional indentation by eight 
+positions. How about avoiding deeper indentation by introducing a new 
+function?
+
+Thanks,
+
+Bart.
