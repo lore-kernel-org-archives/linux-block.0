@@ -2,184 +2,232 @@ Return-Path: <SRS0=URwg=33=vger.kernel.org=linux-block-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-8.3 required=3.0 tests=DKIMWL_WL_MED,DKIM_SIGNED,
-	DKIM_VALID,DKIM_VALID_AU,HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,
-	SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED,USER_IN_DEF_DKIM_WL autolearn=no
-	autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-17.4 required=3.0 tests=DKIMWL_WL_MED,DKIM_SIGNED,
+	DKIM_VALID,DKIM_VALID_AU,HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,
+	MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,USER_AGENT_GIT,
+	USER_IN_DEF_DKIM_WL autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id AED9BC2BA83
-	for <linux-block@archiver.kernel.org>; Fri,  7 Feb 2020 18:45:26 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id E31CEC2BA83
+	for <linux-block@archiver.kernel.org>; Fri,  7 Feb 2020 19:04:22 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.kernel.org (Postfix) with ESMTP id 828AF21775
-	for <linux-block@archiver.kernel.org>; Fri,  7 Feb 2020 18:45:26 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id AB4E421775
+	for <linux-block@archiver.kernel.org>; Fri,  7 Feb 2020 19:04:22 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="Yq3BqGLv"
+	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="Xerrw3TJ"
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1727175AbgBGSpZ (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Fri, 7 Feb 2020 13:45:25 -0500
-Received: from mail-io1-f67.google.com ([209.85.166.67]:41938 "EHLO
-        mail-io1-f67.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1727162AbgBGSpZ (ORCPT
-        <rfc822;linux-block@vger.kernel.org>); Fri, 7 Feb 2020 13:45:25 -0500
-Received: by mail-io1-f67.google.com with SMTP id m25so595013ioo.8
-        for <linux-block@vger.kernel.org>; Fri, 07 Feb 2020 10:45:24 -0800 (PST)
+        id S1726951AbgBGTEW (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Fri, 7 Feb 2020 14:04:22 -0500
+Received: from mail-pf1-f202.google.com ([209.85.210.202]:48696 "EHLO
+        mail-pf1-f202.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S1726900AbgBGTEW (ORCPT
+        <rfc822;linux-block@vger.kernel.org>); Fri, 7 Feb 2020 14:04:22 -0500
+Received: by mail-pf1-f202.google.com with SMTP id y73so274909pfg.15
+        for <linux-block@vger.kernel.org>; Fri, 07 Feb 2020 11:04:21 -0800 (PST)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=google.com; s=20161025;
-        h=mime-version:references:in-reply-to:from:date:message-id:subject:to
+        h=date:in-reply-to:message-id:mime-version:references:subject:from:to
          :cc;
-        bh=xv1kvEcWkzcNvNPqv64VfZraoKRdXQxBTXoh9bslLzQ=;
-        b=Yq3BqGLv9D7m0CRiQahwggqXEm7STfDWVMLYIDKxdzLlpIMkFGG1P/WrnRBslzBAJ6
-         WeroT6qPoJWwh5T9AvKYDnEvpa97qeNpqDwC/ItOsc846qDyR6A8tUELeiqZI1gROvyC
-         wZO55uuYYT6ie4TXyY/VjnRC/6K0fd+wBEdTVg6vSyZ0245naO9XBsGILb+SaAgDuKZs
-         mpGU8p0OAu7xPosBeUbIe3T4myXaH++Gk+3mH+L1HrWdBEX2noZZWBXEH4lbYBr2Chg1
-         DXu5hQG8KqgR2zJLkGEhw89CT3XGfw4C5NtgGc4s8qmdahja6x/NM9z+z78h9Iiw6F4r
-         dpLA==
+        bh=6k2s/kP7P/1oyMoKNfLB/ONi4ScN/Bk9jjz8tyC1cbQ=;
+        b=Xerrw3TJoqDXADoGgj2sx6wHvUaaUIArxvt8DrAN0sH7iIlguYclxifJuhAnbJ/Kvh
+         i2QngOz24wX0UtYXMQr95SsUCy5nw8VCPF0hMp44ab72te1u01umVExt3rsDeec6lMyq
+         R5QEfJUeQH4tb7N+U6zuK90g1EVm2809dqCZXcVA23T1Pt5vQLTMORu1sfxCvovLSh6X
+         HxM9VF1izK/ZGABW4J34BWDxh4XcGOxnzTGLe/gHVKu0Mb1k+JI99WpGZ5FP9i+hAwzI
+         74879ppofWUivcJlPZuNC3YxTl3Jb5kW81HPW7IAgvLQnXEzAWarx8WCptPuPHxPT6eo
+         Phpg==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=1e100.net; s=20161025;
-        h=x-gm-message-state:mime-version:references:in-reply-to:from:date
-         :message-id:subject:to:cc;
-        bh=xv1kvEcWkzcNvNPqv64VfZraoKRdXQxBTXoh9bslLzQ=;
-        b=sOLBUAw+/BbPf/ZYDWYkeDnahzqTHiHNwERfBNSreW5JC7nNkk0dCTGNbzLWPnn5HV
-         6N++/RsPwHtiQFW5/t3RI1E1Aw1+zO+jzfZnyLgpz1bBnE9lNXVZK3lWDWZs9jOuG3BG
-         xoV2mHsUDyGeNNjZ5CS/m7Dv/rf8NVIfj7Y6J8ny/p8y00JbjuA4l9JkpHpNQmbi/8u6
-         Xy9qh80T7fSkFxVrV7EgjWGbIgXF/wtfPjpdVoM51qCaDai4Zj0w0+AomWDTDCYkTOUF
-         Vpr00SQghh6gj/COto17PcN9+xRKF6ZmndWO/uVo/+ew2OfeJNub4HNol8sCkWBFxdI7
-         hW7g==
-X-Gm-Message-State: APjAAAUQopWnhm0YnHzqbaaVsbgXsrADKyFY/cePeZOEgTRddSprvUE+
-        5d/51aoM0iaCh8RfTbE2lEJMmxzpx+7VCMugOdWEoA==
-X-Google-Smtp-Source: APXvYqygZ0ibySu8hVzqQaib2EPPXlBM0zvGZ6nI7HuYV1xfw/4eVle9rNlFoNDR8s+8b+s1WmGkYpD6ug5SQ3fb038=
-X-Received: by 2002:a5d:9285:: with SMTP id s5mr618138iom.85.1581101124081;
- Fri, 07 Feb 2020 10:45:24 -0800 (PST)
-MIME-Version: 1.0
-References: <20200206101833.GA20943@ming.t460p> <20200206211222.83170-1-sqazi@google.com>
- <5707b17f-e5d7-c274-de6a-694098c4e9a2@acm.org>
-In-Reply-To: <5707b17f-e5d7-c274-de6a-694098c4e9a2@acm.org>
+        h=x-gm-message-state:date:in-reply-to:message-id:mime-version
+         :references:subject:from:to:cc;
+        bh=6k2s/kP7P/1oyMoKNfLB/ONi4ScN/Bk9jjz8tyC1cbQ=;
+        b=FqhnV5iL/ozVAKPRV4AV0RDmLgNWCf2lvxii2BmDTkLA16r87AtImdX3LVZuJQ8VEa
+         cSYDRUURjpdKgYAPHDlmk5QOhOnX49SOSeSzMAynxiCehPZ0BkhAmjPX9ksj5dm7yUrS
+         f3OfGgy4AgjFJy9UL3amGq99g0IptCdFJmyHk3VgtnX1McmEcXNLThgvsGJ2ltjZ1XEc
+         ha37qelZoaRwLbYy6Z1GsWwoj003ZoXRlWwTcrMtkrY6/JmZm2sFiT/qr6XiQJr4lFYY
+         2bvV0YCx7Vkn4uDxxHyeOAAJNjpo7wOqbqm+sMwccHYVcOkVW5TSv7nu9C7KhhNsY5bU
+         +mdg==
+X-Gm-Message-State: APjAAAWEf+YN5MEjtWXMwKo2ZzTdUOGBSvNO3uEWYvuo8PhzgepA/rxN
+        fzZqx1y3r1Bd9ohGaVRvyDpXJD9bfg==
+X-Google-Smtp-Source: APXvYqyP+yVA+HDRl9WoIEfnIeP9t5JHk5Hv9UIckjFnXBqmjJ4nXrBlLXicseJ+cqKUZud5pqKHFf6DeQ==
+X-Received: by 2002:a63:7b5a:: with SMTP id k26mr706109pgn.406.1581102260764;
+ Fri, 07 Feb 2020 11:04:20 -0800 (PST)
+Date:   Fri,  7 Feb 2020 11:04:16 -0800
+In-Reply-To: <CAKUOC8X0OFqJ09Y+nrPQiMLiRjpKMm0Ucci_33UJEM8HvQ=H1Q@mail.gmail.com>
+Message-Id: <20200207190416.99928-1-sqazi@google.com>
+Mime-Version: 1.0
+References: <CAKUOC8X0OFqJ09Y+nrPQiMLiRjpKMm0Ucci_33UJEM8HvQ=H1Q@mail.gmail.com>
+X-Mailer: git-send-email 2.25.0.341.g760bfbb309-goog
+Subject: [PATCH] block: Limit number of items taken from the I/O scheduler in
+ one go
 From:   Salman Qazi <sqazi@google.com>
-Date:   Fri, 7 Feb 2020 10:45:12 -0800
-Message-ID: <CAKUOC8X0OFqJ09Y+nrPQiMLiRjpKMm0Ucci_33UJEM8HvQ=H1Q@mail.gmail.com>
-Subject: Re: [PATCH] block: Limit number of items taken from the I/O scheduler
- in one go
-To:     Bart Van Assche <bvanassche@acm.org>
-Cc:     Jens Axboe <axboe@kernel.dk>, Ming Lei <ming.lei@redhat.com>,
-        linux-block@vger.kernel.org,
-        Linux Kernel Mailing List <linux-kernel@vger.kernel.org>,
-        Jesse Barnes <jsbarnes@google.com>,
+To:     Jens Axboe <axboe@kernel.dk>, Ming Lei <ming.lei@redhat.com>,
+        Bart Van Assche <bvanassche@acm.org>,
+        linux-block@vger.kernel.org, linux-kernel@vger.kernel.org
+Cc:     Jesse Barnes <jsbarnes@google.com>,
         Gwendal Grignou <gwendal@google.com>,
-        Hannes Reinecke <hare@suse.com>, Christoph Hellwig <hch@lst.de>
+        Hannes Reinecke <hare@suse.com>,
+        Christoph Hellwig <hch@lst.de>, Salman Qazi <sqazi@google.com>
 Content-Type: text/plain; charset="UTF-8"
 Sender: linux-block-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-On Fri, Feb 7, 2020 at 7:26 AM Bart Van Assche <bvanassche@acm.org> wrote:
->
-> On 2020-02-06 13:12, Salman Qazi wrote:
-> > + *
-> > + * Returns true if hctx->dispatch was found non-empty and
-> > + * run_work has to be run again.
->
-> Please elaborate this comment and explain why this is necessary (to
-> avoid that flush processing is postponed forever).
->
-> > + * Returns true if hctx->dispatch was found non-empty and
-> > + * run_work has to be run again.
->
-> Same comment here.
+Flushes bypass the I/O scheduler and get added to hctx->dispatch
+in blk_mq_sched_bypass_insert.  This can happen while a kworker is running
+hctx->run_work work item and is past the point in
+blk_mq_sched_dispatch_requests where hctx->dispatch is checked.
 
-Will do.
+The blk_mq_do_dispatch_sched call is not guaranteed to end in bounded time,
+because the I/O scheduler can feed an arbitrary number of commands.
 
->
-> > +again:
-> > +     run_again = false;
-> > +
-> >       /*
-> >        * If we have previous entries on our dispatch list, grab them first for
-> >        * more fair dispatch.
-> > @@ -208,19 +234,28 @@ void blk_mq_sched_dispatch_requests(struct blk_mq_hw_ctx *hctx)
-> >               blk_mq_sched_mark_restart_hctx(hctx);
-> >               if (blk_mq_dispatch_rq_list(q, &rq_list, false)) {
-> >                       if (has_sched_dispatch)
-> > -                             blk_mq_do_dispatch_sched(hctx);
-> > +                             run_again = blk_mq_do_dispatch_sched(hctx);
-> >                       else
-> > -                             blk_mq_do_dispatch_ctx(hctx);
-> > +                             run_again = blk_mq_do_dispatch_ctx(hctx);
-> >               }
-> >       } else if (has_sched_dispatch) {
-> > -             blk_mq_do_dispatch_sched(hctx);
-> > +             run_again = blk_mq_do_dispatch_sched(hctx);
-> >       } else if (hctx->dispatch_busy) {
-> >               /* dequeue request one by one from sw queue if queue is busy */
-> > -             blk_mq_do_dispatch_ctx(hctx);
-> > +             run_again = blk_mq_do_dispatch_ctx(hctx);
-> >       } else {
-> >               blk_mq_flush_busy_ctxs(hctx, &rq_list);
-> >               blk_mq_dispatch_rq_list(q, &rq_list, false);
-> >       }
-> > +
-> > +     if (run_again) {
-> > +             if (!restarted) {
-> > +                     restarted = true;
-> > +                     goto again;
-> > +             }
-> > +
-> > +             blk_mq_run_hw_queue(hctx, true);
-> > +     }
->
-> So this patch changes blk_mq_sched_dispatch_requests() such that it
-> iterates at most two times? How about implementing that loop with an
-> explicit for-loop? I think that will make
-> blk_mq_sched_dispatch_requests() easier to read. As you may know forward
-> goto's are accepted in kernel code but backward goto's are frowned upon.
->
+Since we have only one hctx->run_work, the commands waiting in
+hctx->dispatch will wait an arbitrary length of time for run_work to be
+rerun.
 
-About the goto, I don't know if backwards gotos in general are frowned
-upon.  There are plenty of examples
-in the kernel source.  This particular label, 'again' for instance:
+A similar phenomenon exists with dispatches from the software queue.
 
-$ grep -r again: mm/|wc -l
-22
-$ grep -r again: block/|wc -l
-4
+The solution is to poll hctx->dispatch in blk_mq_do_dispatch_sched and
+blk_mq_do_dispatch_ctx and return from the run_work handler and let it
+rerun.
 
-But, just because others have done it doesn't mean I should.  So, I
-will attempt to explain why I think this is a good idea.
-If I were to write this as a for-loop, it will look like this:
+Signed-off-by: Salman Qazi <sqazi@google.com>
+Reviewed-by: Ming Lei <ming.lei@redhat.com>
+---
+ block/blk-mq-sched.c | 49 ++++++++++++++++++++++++++++++++++++++------
+ 1 file changed, 43 insertions(+), 6 deletions(-)
 
-for (i = 0; i == 0 || (run_again && i < 2); i++) {
-/* another level of 8 character wide indentation */
-    run_again = false;
-   /* a bunch of code that possibly sets run_again to true
-}
+diff --git a/block/blk-mq-sched.c b/block/blk-mq-sched.c
+index ca22afd47b3d..3e78c5bbb4d9 100644
+--- a/block/blk-mq-sched.c
++++ b/block/blk-mq-sched.c
+@@ -84,12 +84,17 @@ void blk_mq_sched_restart(struct blk_mq_hw_ctx *hctx)
+  * Only SCSI implements .get_budget and .put_budget, and SCSI restarts
+  * its queue by itself in its completion handler, so we don't need to
+  * restart queue if .get_budget() returns BLK_STS_NO_RESOURCE.
++ *
++ * Returns true if hctx->dispatch was found non-empty and
++ * run_work has to be run again.  This is necessary to avoid
++ * starving flushes.
+  */
+-static void blk_mq_do_dispatch_sched(struct blk_mq_hw_ctx *hctx)
++static bool blk_mq_do_dispatch_sched(struct blk_mq_hw_ctx *hctx)
+ {
+ 	struct request_queue *q = hctx->queue;
+ 	struct elevator_queue *e = q->elevator;
+ 	LIST_HEAD(rq_list);
++	bool ret = false;
+ 
+ 	do {
+ 		struct request *rq;
+@@ -97,6 +102,11 @@ static void blk_mq_do_dispatch_sched(struct blk_mq_hw_ctx *hctx)
+ 		if (e->type->ops.has_work && !e->type->ops.has_work(hctx))
+ 			break;
+ 
++		if (!list_empty_careful(&hctx->dispatch)) {
++			ret = true;
++			break;
++		}
++
+ 		if (!blk_mq_get_dispatch_budget(hctx))
+ 			break;
+ 
+@@ -113,6 +123,8 @@ static void blk_mq_do_dispatch_sched(struct blk_mq_hw_ctx *hctx)
+ 		 */
+ 		list_add(&rq->queuelist, &rq_list);
+ 	} while (blk_mq_dispatch_rq_list(q, &rq_list, true));
++
++	return ret;
+ }
+ 
+ static struct blk_mq_ctx *blk_mq_next_ctx(struct blk_mq_hw_ctx *hctx,
+@@ -130,16 +142,26 @@ static struct blk_mq_ctx *blk_mq_next_ctx(struct blk_mq_hw_ctx *hctx,
+  * Only SCSI implements .get_budget and .put_budget, and SCSI restarts
+  * its queue by itself in its completion handler, so we don't need to
+  * restart queue if .get_budget() returns BLK_STS_NO_RESOURCE.
++ *
++ * Returns true if hctx->dispatch was found non-empty and
++ * run_work has to be run again.  This is necessary to avoid
++ * starving flushes.
+  */
+-static void blk_mq_do_dispatch_ctx(struct blk_mq_hw_ctx *hctx)
++static bool blk_mq_do_dispatch_ctx(struct blk_mq_hw_ctx *hctx)
+ {
+ 	struct request_queue *q = hctx->queue;
+ 	LIST_HEAD(rq_list);
+ 	struct blk_mq_ctx *ctx = READ_ONCE(hctx->dispatch_from);
++	bool ret = false;
+ 
+ 	do {
+ 		struct request *rq;
+ 
++		if (!list_empty_careful(&hctx->dispatch)) {
++			ret = true;
++			break;
++		}
++
+ 		if (!sbitmap_any_bit_set(&hctx->ctx_map))
+ 			break;
+ 
+@@ -165,6 +187,7 @@ static void blk_mq_do_dispatch_ctx(struct blk_mq_hw_ctx *hctx)
+ 	} while (blk_mq_dispatch_rq_list(q, &rq_list, true));
+ 
+ 	WRITE_ONCE(hctx->dispatch_from, ctx);
++	return ret;
+ }
+ 
+ void blk_mq_sched_dispatch_requests(struct blk_mq_hw_ctx *hctx)
+@@ -172,6 +195,8 @@ void blk_mq_sched_dispatch_requests(struct blk_mq_hw_ctx *hctx)
+ 	struct request_queue *q = hctx->queue;
+ 	struct elevator_queue *e = q->elevator;
+ 	const bool has_sched_dispatch = e && e->type->ops.dispatch_request;
++	bool run_again;
++	bool restarted = false;
+ 	LIST_HEAD(rq_list);
+ 
+ 	/* RCU or SRCU read lock is needed before checking quiesced flag */
+@@ -180,6 +205,9 @@ void blk_mq_sched_dispatch_requests(struct blk_mq_hw_ctx *hctx)
+ 
+ 	hctx->run++;
+ 
++again:
++	run_again = false;
++
+ 	/*
+ 	 * If we have previous entries on our dispatch list, grab them first for
+ 	 * more fair dispatch.
+@@ -208,19 +236,28 @@ void blk_mq_sched_dispatch_requests(struct blk_mq_hw_ctx *hctx)
+ 		blk_mq_sched_mark_restart_hctx(hctx);
+ 		if (blk_mq_dispatch_rq_list(q, &rq_list, false)) {
+ 			if (has_sched_dispatch)
+-				blk_mq_do_dispatch_sched(hctx);
++				run_again = blk_mq_do_dispatch_sched(hctx);
+ 			else
+-				blk_mq_do_dispatch_ctx(hctx);
++				run_again = blk_mq_do_dispatch_ctx(hctx);
+ 		}
+ 	} else if (has_sched_dispatch) {
+-		blk_mq_do_dispatch_sched(hctx);
++		run_again = blk_mq_do_dispatch_sched(hctx);
+ 	} else if (hctx->dispatch_busy) {
+ 		/* dequeue request one by one from sw queue if queue is busy */
+-		blk_mq_do_dispatch_ctx(hctx);
++		run_again = blk_mq_do_dispatch_ctx(hctx);
+ 	} else {
+ 		blk_mq_flush_busy_ctxs(hctx, &rq_list);
+ 		blk_mq_dispatch_rq_list(q, &rq_list, false);
+ 	}
++
++	if (run_again) {
++		if (!restarted) {
++			restarted = true;
++			goto again;
++		}
++
++		blk_mq_run_hw_queue(hctx, true);
++	}
+ }
+ 
+ bool blk_mq_sched_try_merge(struct request_queue *q, struct bio *bio,
+-- 
+2.25.0.341.g760bfbb309-goog
 
-if (run_again)
-    blk_mq_run_hw_queue(hctx, true);
-
-[Another alternative is to set run_again to true, and simplify the for-loop
-condition to run_again && i < 2.  But, again, lots of verbiage and a boolean
-in the for-loop condition.]
-
-The for-loop is far from idiomatic.  It's not clear what it does when
-you first look at it.
-It distracts from the common path of the code, which is something that
-almost always
-runs exactly once.  There is now an additional level of indentation.
-The readers of the
-code aren't any better off, because they still have to figure out what
-run_again is and if
-they care about it.  And the only way to do that is to read the entire
-body of the loop, and
-comments at the top of the functions.
-
-The goto in this case preserves the intent of the code better.  It is
-dealing with an exceptional
-and unusual case.  Indeed this kind of use is not unusual in the
-kernel, for instance to deal
-with possible but unlikely races.
-
-Just my $0.02.
-
-> Thanks,
->
-> Bart.
