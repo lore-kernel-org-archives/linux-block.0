@@ -2,129 +2,177 @@ Return-Path: <SRS0=URwg=33=vger.kernel.org=linux-block-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-8.3 required=3.0 tests=DKIMWL_WL_MED,DKIM_SIGNED,
-	DKIM_VALID,DKIM_VALID_AU,HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,
-	SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED,USER_IN_DEF_DKIM_WL autolearn=no
+X-Spam-Status: No, score=-6.8 required=3.0 tests=DKIM_SIGNED,DKIM_VALID,
+	DKIM_VALID_AU,HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,
+	SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED autolearn=ham
 	autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id A4641C2BA83
-	for <linux-block@archiver.kernel.org>; Fri,  7 Feb 2020 20:38:12 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id C6192C2BA83
+	for <linux-block@archiver.kernel.org>; Fri,  7 Feb 2020 21:18:10 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.kernel.org (Postfix) with ESMTP id 7BDD7222C2
-	for <linux-block@archiver.kernel.org>; Fri,  7 Feb 2020 20:38:12 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id 9A947222C2
+	for <linux-block@archiver.kernel.org>; Fri,  7 Feb 2020 21:18:10 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="H0AXpVHi"
+	dkim=pass (1024-bit key) header.d=chrisdown.name header.i=@chrisdown.name header.b="GfoGaC+/"
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1727195AbgBGUiL (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Fri, 7 Feb 2020 15:38:11 -0500
-Received: from mail-il1-f193.google.com ([209.85.166.193]:35247 "EHLO
-        mail-il1-f193.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1727005AbgBGUiK (ORCPT
-        <rfc822;linux-block@vger.kernel.org>); Fri, 7 Feb 2020 15:38:10 -0500
-Received: by mail-il1-f193.google.com with SMTP id g12so700769ild.2
-        for <linux-block@vger.kernel.org>; Fri, 07 Feb 2020 12:38:09 -0800 (PST)
+        id S1726987AbgBGVSK (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Fri, 7 Feb 2020 16:18:10 -0500
+Received: from mail-wr1-f66.google.com ([209.85.221.66]:38433 "EHLO
+        mail-wr1-f66.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S1726947AbgBGVSJ (ORCPT
+        <rfc822;linux-block@vger.kernel.org>); Fri, 7 Feb 2020 16:18:09 -0500
+Received: by mail-wr1-f66.google.com with SMTP id y17so547164wrh.5
+        for <linux-block@vger.kernel.org>; Fri, 07 Feb 2020 13:18:09 -0800 (PST)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=google.com; s=20161025;
-        h=mime-version:references:in-reply-to:from:date:message-id:subject:to
-         :cc;
-        bh=Dg4oON5J4q1fP44KHqOQveBtLzhE62D/XRXrye9zUFs=;
-        b=H0AXpVHi3OoVTO5fMc/MD/deUKtMKczIoMcgUbYSgxYbrqJgdaHtDiU4YpHoR6SOQo
-         ANzA42tykPyEQj6LIC+i+fKdwMEG7htXYQMrFnRkY+U8kTKi4GtgpLOfC/S92/LLUmzT
-         H2IWFt8QKHw6JLdIu44Eq2stfN3FbZ4RU/vKyQszPtE2ujYpQfC411+6tlpTBOkEnc8R
-         j9qUeuO76mFpi4ryetJraTCoBySQVeOqlGm3JKDYcstbMH+qbtBTGy16AwrE/4fvl8Uw
-         prWpNBk8XfObuiJbH75+YPZQ39M85395DyhxR61gWaeBVnfMpFvt6ILxcSw+3YGlVbxu
-         xc4A==
+        d=chrisdown.name; s=google;
+        h=date:from:to:cc:subject:message-id:references:mime-version
+         :content-disposition:in-reply-to;
+        bh=s3/+t3C/iGaUgSEBBn4UBiEXAA3Z2xiPjiTjCVmDGl8=;
+        b=GfoGaC+/D2IbhwLnfJa3biAe5iPkr+OuRXLKcIZgOZFgYGtGR/dc32KDVeiUu1TXk0
+         eWPSWbZikyLpSAEg8CB0va7Ozm1hhXJZLf0Y/bQn/fhxnQL9eZUGeWjN+xq/u9jl7qtc
+         WAnaA0kz6pznkybaVC/dd561pV315aJX4mGaU=
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=1e100.net; s=20161025;
-        h=x-gm-message-state:mime-version:references:in-reply-to:from:date
-         :message-id:subject:to:cc;
-        bh=Dg4oON5J4q1fP44KHqOQveBtLzhE62D/XRXrye9zUFs=;
-        b=VfTN9MNO1Iu1W9bhayVwF6fB8Pct3y3bpYXw3Zs5VT3GMuu9J14s5t0sVakhXQgXcS
-         3saoObFZvO8emI4gvMe9ntEhR+Kdm09pp9cOMMzlbbW7nD9QR/q3895IBfEbZdye8ayP
-         PIYgam/dMRD0lhRIxOW12elyb5wngeCflX6goIJkZ8EyvXgeJrzv/dFHaIlfpn6czVA6
-         bm+GXgpEoCWMtNw3D3m/mW3y3oY6zG9N6pZCA0+ggL8UTIxjwRsUEgl7O9XZwYP0xGmN
-         UdXCxygZVFmFuy4/u9+Gr+5eH6WT/bV6oJWHdIjdOHJ9Tx4cEUvJo0CMv9iVe+dxotEK
-         dR0Q==
-X-Gm-Message-State: APjAAAUr0htQGpviSPXrhgBii3twpqfBuJwnySMuPpFDz2cUe9wMFBQr
-        kX2g9n4aH/rzUdaoeSAK2Y5t86vAYSFX7h1CBM+4XA==
-X-Google-Smtp-Source: APXvYqyTqUEaeiRszM4nM+OgnMVDTccPNheMsyBNPQIZ4n7gi3IrYrOGJJCZk5Op6+0SWXNMyDf3QEdg9TZqFqZVb4E=
-X-Received: by 2002:a92:af99:: with SMTP id v25mr1287002ill.289.1581107888526;
- Fri, 07 Feb 2020 12:38:08 -0800 (PST)
+        h=x-gm-message-state:date:from:to:cc:subject:message-id:references
+         :mime-version:content-disposition:in-reply-to;
+        bh=s3/+t3C/iGaUgSEBBn4UBiEXAA3Z2xiPjiTjCVmDGl8=;
+        b=KRaCvTWdvqDbzOrR4pAvKVNO4g4FPTHkWbgoFQ2f9KW+/4Hy/SJmNNL7Bk8PzjAF4A
+         jyIWGpsikBqwrAWL61mmNKcPqWXKNqCj6OhXRHo1oSX/kwwQyfT96m7qcXquxT25U6ah
+         m6GjvxyfBIiCiri7Yti4LWIi2SWN3Na3ZVu8Q9aAf9mOxg5TSsYowOQIAQFJ0tnYPDub
+         8h9jNw/JHzFxjlanfm2eDs3LtVm3rpVNP8rlesj0NPiIhSfhkkC4C6EglTnzJ5eCgsBc
+         /oly/wwu0CDjQbqzYmKkzlm7ytpFo6exMlyxAJtnu3N107gu8tO8PMUgyXfDLJ+/h3fN
+         Qr2A==
+X-Gm-Message-State: APjAAAWtFHBqFasSLjCqW4UDQqTV+IDT3V2QJDwsBPadJhg4Sdd5utbo
+        LplJjS5AKbRhPt4xUokEXVhMnw==
+X-Google-Smtp-Source: APXvYqxec00hS/YwBZ499yu47bZwrCh/oZd5f0f9T0ew/bFtZ3FCmODRG59pIZ1Nw2V66uA6cc49Eg==
+X-Received: by 2002:adf:e88f:: with SMTP id d15mr912024wrm.186.1581110288231;
+        Fri, 07 Feb 2020 13:18:08 -0800 (PST)
+Received: from localhost ([2a01:4b00:8432:8a00:63de:dd93:20be:f460])
+        by smtp.gmail.com with ESMTPSA id c9sm4672886wme.41.2020.02.07.13.18.07
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Fri, 07 Feb 2020 13:18:07 -0800 (PST)
+Date:   Fri, 7 Feb 2020 21:18:07 +0000
+From:   Chris Down <chris@chrisdown.name>
+To:     Dan Schatzberg <dschatzberg@fb.com>
+Cc:     Jens Axboe <axboe@kernel.dk>, Tejun Heo <tj@kernel.org>,
+        Li Zefan <lizefan@huawei.com>,
+        Johannes Weiner <hannes@cmpxchg.org>,
+        Michal Hocko <mhocko@kernel.org>,
+        Vladimir Davydov <vdavydov.dev@gmail.com>,
+        Hugh Dickins <hughd@google.com>,
+        Andrew Morton <akpm@linux-foundation.org>,
+        Roman Gushchin <guro@fb.com>,
+        Shakeel Butt <shakeelb@google.com>,
+        Thomas Gleixner <tglx@linutronix.de>,
+        "open list:BLOCK LAYER" <linux-block@vger.kernel.org>,
+        open list <linux-kernel@vger.kernel.org>,
+        "open list:CONTROL GROUP (CGROUP)" <cgroups@vger.kernel.org>,
+        "open list:CONTROL GROUP - MEMORY RESOURCE CONTROLLER (MEMCG)" 
+        <linux-mm@kvack.org>
+Subject: Re: [PATCH v2 2/3] mm: Charge active memcg when no mm is set
+Message-ID: <20200207211807.GA138184@chrisdown.name>
+References: <cover.1581088326.git.dschatzberg@fb.com>
+ <8e41630b9d1c5d00f92a00f998285fa6003af5eb.1581088326.git.dschatzberg@fb.com>
 MIME-Version: 1.0
-References: <20200206101833.GA20943@ming.t460p> <20200206211222.83170-1-sqazi@google.com>
- <5707b17f-e5d7-c274-de6a-694098c4e9a2@acm.org> <CAKUOC8X0OFqJ09Y+nrPQiMLiRjpKMm0Ucci_33UJEM8HvQ=H1Q@mail.gmail.com>
- <10c64a02-91fe-c2af-4c0c-dc9677f9b223@acm.org>
-In-Reply-To: <10c64a02-91fe-c2af-4c0c-dc9677f9b223@acm.org>
-From:   Salman Qazi <sqazi@google.com>
-Date:   Fri, 7 Feb 2020 12:37:56 -0800
-Message-ID: <CAKUOC8X=fzXjt=5qZ+tkq3iKnu7NHhPfT_t0JyzcmZg49ZEq4A@mail.gmail.com>
-Subject: Re: [PATCH] block: Limit number of items taken from the I/O scheduler
- in one go
-To:     Bart Van Assche <bvanassche@acm.org>
-Cc:     Jens Axboe <axboe@kernel.dk>, Ming Lei <ming.lei@redhat.com>,
-        linux-block@vger.kernel.org,
-        Linux Kernel Mailing List <linux-kernel@vger.kernel.org>,
-        Jesse Barnes <jsbarnes@google.com>,
-        Gwendal Grignou <gwendal@google.com>,
-        Hannes Reinecke <hare@suse.com>, Christoph Hellwig <hch@lst.de>
-Content-Type: text/plain; charset="UTF-8"
+Content-Type: text/plain; charset=us-ascii; format=flowed
+Content-Disposition: inline
+In-Reply-To: <8e41630b9d1c5d00f92a00f998285fa6003af5eb.1581088326.git.dschatzberg@fb.com>
 Sender: linux-block-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-On Fri, Feb 7, 2020 at 12:19 PM Bart Van Assche <bvanassche@acm.org> wrote:
+Dan Schatzberg writes:
+>This is a dependency for 3/3
+
+This can be omitted, since "3" won't mean anything in the change history (and 
+patch series are generally considered as a unit unless there are explicit 
+requests to split them out).
+
+>memalloc_use_memcg() worked for kernel allocations but was silently
+>ignored for user pages.
 >
-> On 2/7/20 10:45 AM, Salman Qazi wrote:
-> > If I were to write this as a for-loop, it will look like this:
-> >
-> > for (i = 0; i == 0 || (run_again && i < 2); i++) {
-> > /* another level of 8 character wide indentation */
-> >      run_again = false;
-> >     /* a bunch of code that possibly sets run_again to true
-> > }
-> >
-> > if (run_again)
-> >      blk_mq_run_hw_queue(hctx, true);
+>This patch establishes a precedence order for who gets charged:
 >
-> That's not what I meant. What I meant is a loop that iterates at most
-> two times and also to break out of the loop if run_again == false.
+>1. If there is a memcg associated with the page already, that memcg is
+>   charged. This happens during swapin.
 >
-
-I picked the most compact variant to demonstrate the problem.  Adding
-breaks isn't
-really helping the readability.
-
-for (i = 0; i < 2; i++) {
-  run_again = false;
-/* bunch of code that possibly sets it to true */
-...
- if (!run_again)
-    break;
-}
-if (run_again)
-    blk_mq_run_hw_queue(hctx, true);
-
-When I read this, I initially assume that the loop in general runs
-twice and that this is the common case.  It has the
-same problem with conveying intent.  Perhaps, more importantly, the
-point of using programming constructs is to shorten and simplify the
-code.
-There are still two if-statements in addition to the loop. We haven't
-gained much by introducing the loop.
-
-> BTW, I share your concern about the additional indentation by eight
-> positions. How about avoiding deeper indentation by introducing a new
-> function?
-
-If there was a benefit to introducing the loop, this would be a good
-call.  But the way I see it, the introduction of another
-function is yet another way in which the introduction of the loop
-makes the code less readable.
-
-This is not a hill I want to die on.  If the maintainer agrees with
-you on this point, I will use a loop.
+>2. If an explicit mm is passed, mm->memcg is charged. This happens
+>   during page faults, which can be triggered in remote VMs (eg gup).
 >
-> Thanks,
+>3. Otherwise consult the current process context. If it has configured
+>   a current->active_memcg, use that. Otherwise, current->mm->memcg.
 >
-> Bart.
+>Signed-off-by: Dan Schatzberg <dschatzberg@fb.com>
+>Acked-by: Johannes Weiner <hannes@cmpxchg.org>
+
+Thanks, this seems reasonable. One (minor and optional) suggestion would be to 
+make the title more clear that this is a change in 
+try_charge/memalloc_use_memcg behaviour overall rather than a charge site, 
+since this wasn't what I expected to find when I saw the patch title :-)
+
+I only have one other question about behaviour when there is no active_memcg 
+and mm/memcg in try_charge are NULL below, but assuming that's been checked:
+
+Acked-by: Chris Down <chris@chrisdown.name>
+
+>---
+> mm/memcontrol.c | 11 ++++++++---
+> mm/shmem.c      |  2 +-
+> 2 files changed, 9 insertions(+), 4 deletions(-)
+>
+>diff --git a/mm/memcontrol.c b/mm/memcontrol.c
+>index f7da3ff135ed..69935d166bdb 100644
+>--- a/mm/memcontrol.c
+>+++ b/mm/memcontrol.c
+>@@ -6812,7 +6812,8 @@ enum mem_cgroup_protection mem_cgroup_protected(struct mem_cgroup *root,
+>  * @compound: charge the page as compound or small page
+>  *
+>  * Try to charge @page to the memcg that @mm belongs to, reclaiming
+>- * pages according to @gfp_mask if necessary.
+>+ * pages according to @gfp_mask if necessary. If @mm is NULL, try to
+>+ * charge to the active memcg.
+>  *
+>  * Returns 0 on success, with *@memcgp pointing to the charged memcg.
+>  * Otherwise, an error code is returned.
+>@@ -6856,8 +6857,12 @@ int mem_cgroup_try_charge(struct page *page, struct mm_struct *mm,
+> 		}
+> 	}
+>
+>-	if (!memcg)
+>-		memcg = get_mem_cgroup_from_mm(mm);
+>+	if (!memcg) {
+>+		if (!mm)
+>+			memcg = get_mem_cgroup_from_current();
+>+		else
+>+			memcg = get_mem_cgroup_from_mm(mm);
+>+	}
+
+Just to do due diligence, did we double check whether this results in any 
+unintentional shift in accounting for those passing in both mm and memcg as 
+NULL with no current->active_memcg set, since previously we never even tried to 
+consult current->mm and always used root_mem_cgroup in get_mem_cgroup_from_mm?
+
+It's entirely possible that this results in exactly the same outcome as before 
+just by different means, but with the number of try_charge callsites I'm not 
+totally certain of that.
+
+>
+> 	ret = try_charge(memcg, gfp_mask, nr_pages, false);
+>
+>diff --git a/mm/shmem.c b/mm/shmem.c
+>index ca74ede9e40b..70aabd9aba1a 100644
+>--- a/mm/shmem.c
+>+++ b/mm/shmem.c
+>@@ -1748,7 +1748,7 @@ static int shmem_getpage_gfp(struct inode *inode, pgoff_t index,
+> 	}
+>
+> 	sbinfo = SHMEM_SB(inode->i_sb);
+>-	charge_mm = vma ? vma->vm_mm : current->mm;
+>+	charge_mm = vma ? vma->vm_mm : NULL;
+>
+> 	page = find_lock_entry(mapping, index);
+> 	if (xa_is_value(page)) {
+>--
+>2.17.1
+>
