@@ -2,98 +2,71 @@ Return-Path: <SRS0=URwg=33=vger.kernel.org=linux-block-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-3.7 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
-	INCLUDES_PATCH,MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED
-	autolearn=no autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-2.2 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
+	MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,USER_AGENT_SANE_1 autolearn=no
+	autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id CB168C352A4
-	for <linux-block@archiver.kernel.org>; Fri,  7 Feb 2020 05:07:19 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 5256EC2D0B1
+	for <linux-block@archiver.kernel.org>; Fri,  7 Feb 2020 06:02:36 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.kernel.org (Postfix) with ESMTP id A2F8722522
-	for <linux-block@archiver.kernel.org>; Fri,  7 Feb 2020 05:07:19 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id 24CD42082E
+	for <linux-block@archiver.kernel.org>; Fri,  7 Feb 2020 06:02:36 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1726019AbgBGFHP (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Fri, 7 Feb 2020 00:07:15 -0500
-Received: from zeniv.linux.org.uk ([195.92.253.2]:37808 "EHLO
-        ZenIV.linux.org.uk" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1725837AbgBGFHP (ORCPT
-        <rfc822;linux-block@vger.kernel.org>); Fri, 7 Feb 2020 00:07:15 -0500
-Received: from viro by ZenIV.linux.org.uk with local (Exim 4.92.3 #3 (Red Hat Linux))
-        id 1izvr8-008chp-EV; Fri, 07 Feb 2020 05:07:06 +0000
-Date:   Fri, 7 Feb 2020 05:07:06 +0000
-From:   Al Viro <viro@zeniv.linux.org.uk>
-To:     syzbot <syzbot+c23efa0cc68e79d551fc@syzkaller.appspotmail.com>
-Cc:     axboe@kernel.dk, ceph-devel@vger.kernel.org,
-        darrick.wong@oracle.com, dhowells@redhat.com,
-        dongsheng.yang@easystack.cn, gregkh@linuxfoundation.org,
-        idryomov@gmail.com, kstewart@linuxfoundation.org,
-        linux-block@vger.kernel.org, linux-fsdevel@vger.kernel.org,
-        linux-kernel@vger.kernel.org, linux-xfs@vger.kernel.org,
-        sage@redhat.com, syzkaller-bugs@googlegroups.com,
-        tglx@linutronix.de
-Subject: Re: KASAN: slab-out-of-bounds Read in suffix_kstrtoint
-Message-ID: <20200207050706.GC23230@ZenIV.linux.org.uk>
-References: <000000000000860811059df44228@google.com>
+        id S1726451AbgBGGCf (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Fri, 7 Feb 2020 01:02:35 -0500
+Received: from szxga06-in.huawei.com ([45.249.212.32]:46692 "EHLO huawei.com"
+        rhost-flags-OK-OK-OK-FAIL) by vger.kernel.org with ESMTP
+        id S1726400AbgBGGCf (ORCPT <rfc822;linux-block@vger.kernel.org>);
+        Fri, 7 Feb 2020 01:02:35 -0500
+Received: from DGGEMS412-HUB.china.huawei.com (unknown [172.30.72.60])
+        by Forcepoint Email with ESMTP id CC793CBFF9FB168A0E80;
+        Fri,  7 Feb 2020 14:02:31 +0800 (CST)
+Received: from [127.0.0.1] (10.173.220.66) by DGGEMS412-HUB.china.huawei.com
+ (10.3.19.212) with Microsoft SMTP Server id 14.3.439.0; Fri, 7 Feb 2020
+ 14:02:22 +0800
+Subject: Re: [PATCH] block: revert pushing the final release of request_queue
+ to a workqueue.
+To:     Bart Van Assche <bvanassche@acm.org>, <axboe@kernel.dk>,
+        <ming.lei@redhat.com>, <chaitanya.kulkarni@wdc.com>,
+        <damien.lemoal@wdc.com>, <dhowells@redhat.com>,
+        <asml.silence@gmail.com>, <ajay.joshi@wdc.com>
+CC:     <linux-block@vger.kernel.org>, <linux-kernel@vger.kernel.org>,
+        <yi.zhang@huawei.com>, <zhangxiaoxu5@huawei.com>,
+        <luoshijie1@huawei.com>
+References: <20200206111052.45356-1-yukuai3@huawei.com>
+ <51b4cd75-2b19-3e4d-7ead-409c77c44b70@acm.org>
+From:   "yukuai (C)" <yukuai3@huawei.com>
+Message-ID: <d253d904-fe37-c1cd-05f5-a02f7c5730d3@huawei.com>
+Date:   Fri, 7 Feb 2020 14:02:21 +0800
+User-Agent: Mozilla/5.0 (Windows NT 10.0; WOW64; rv:60.0) Gecko/20100101
+ Thunderbird/60.8.0
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <000000000000860811059df44228@google.com>
+In-Reply-To: <51b4cd75-2b19-3e4d-7ead-409c77c44b70@acm.org>
+Content-Type: text/plain; charset="utf-8"; format=flowed
+Content-Transfer-Encoding: 7bit
+X-Originating-IP: [10.173.220.66]
+X-CFilter-Loop: Reflected
 Sender: linux-block-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-On Thu, Feb 06, 2020 at 07:48:17PM -0800, syzbot wrote:
-> Hello,
-> 
-> syzbot found the following crash on:
-> 
-> HEAD commit:    a0c61bf1 Add linux-next specific files for 20200206
-> git tree:       linux-next
-> console output: https://syzkaller.appspot.com/x/log.txt?x=13925e6ee00000
-> kernel config:  https://syzkaller.appspot.com/x/.config?x=7d320d6d9afdaecd
-> dashboard link: https://syzkaller.appspot.com/bug?extid=c23efa0cc68e79d551fc
-> compiler:       gcc (GCC) 9.0.0 20181231 (experimental)
-> syz repro:      https://syzkaller.appspot.com/x/repro.syz?x=1725bad9e00000
-> C reproducer:   https://syzkaller.appspot.com/x/repro.c?x=15ac3c5ee00000
-> 
-> The bug was bisected to:
-> 
-> commit 61dff92158775e70c0183f4f52c3a5a071dbc24b
-> Author: Al Viro <viro@zeniv.linux.org.uk>
-> Date:   Tue Dec 17 19:15:04 2019 +0000
-> 
->     Pass consistent param->type to fs_parse()
-> 
-> bisection log:  https://syzkaller.appspot.com/x/bisect.txt?x=11fa020de00000
-> final crash:    https://syzkaller.appspot.com/x/report.txt?x=13fa020de00000
-> console output: https://syzkaller.appspot.com/x/log.txt?x=15fa020de00000
-> 
-> IMPORTANT: if you fix the bug, please add the following tag to the commit:
-> Reported-by: syzbot+c23efa0cc68e79d551fc@syzkaller.appspotmail.com
-> Fixes: 61dff9215877 ("Pass consistent param->type to fs_parse()")
+On 2020/2/7 12:09, Bart Van Assche wrote:
+> I think the second commit reference is wrong. Did you perhaps want to
+> refer to commit 7b36a7189fc3 ("block: don't call ioc_exit_icq() with the
+> queue lock held for blk-mq")? That is the commit that removed the
+> locking from blk_release_queue() and that makes it safe to revert commit
+> dc9edc44de6c.
 
-Argh...  OK, I see what's going on.
+Thank you for your response.
 
-commit 296713d91a7df022b0edf20d55f83554b4f95ba1
-Author: Al Viro <viro@zeniv.linux.org.uk>
-Date:   Fri Feb 7 00:02:11 2020 -0500
+Commit 1e9364283764 just fix some comments, real funtional modification
+should before that. And I do agree that commit 7b36a7189fc3 is the right
+one.
 
-    do not accept empty strings for fsparam_string()
-    
-    Reported-by: syzbot+c23efa0cc68e79d551fc@syzkaller.appspotmail.com
-    Fixes: 61dff9215877 ("Pass consistent param->type to fs_parse()")
+By the way, do you agree the way I fix the CVE? I can send a V2 patch if
+you do.
 
-diff --git a/fs/fs_parser.c b/fs/fs_parser.c
-index fdc047b804b2..7e6fb43f9541 100644
---- a/fs/fs_parser.c
-+++ b/fs/fs_parser.c
-@@ -256,7 +256,7 @@ EXPORT_SYMBOL(fs_param_is_enum);
- int fs_param_is_string(struct p_log *log, const struct fs_parameter_spec *p,
- 		       struct fs_parameter *param, struct fs_parse_result *result)
- {
--	if (param->type != fs_value_is_string)
-+	if (param->type != fs_value_is_string || !*param->string)
- 		return fs_param_bad_value(log, param);
- 	return 0;
- }
+Thanks!
+Yu Kuai
+
