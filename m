@@ -7,63 +7,65 @@ X-Spam-Status: No, score=-5.1 required=3.0 tests=DKIM_SIGNED,DKIM_VALID,
 	HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,
 	SPF_PASS,USER_AGENT_SANE_1 autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 85476C352A4
-	for <linux-block@archiver.kernel.org>; Mon, 10 Feb 2020 22:08:23 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 604AEC352A4
+	for <linux-block@archiver.kernel.org>; Mon, 10 Feb 2020 22:20:51 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.kernel.org (Postfix) with ESMTP id 5696020838
-	for <linux-block@archiver.kernel.org>; Mon, 10 Feb 2020 22:08:23 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id 2F9B520714
+	for <linux-block@archiver.kernel.org>; Mon, 10 Feb 2020 22:20:51 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="f31MFElp"
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="f4Cm5z/1"
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1727385AbgBJWIW (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Mon, 10 Feb 2020 17:08:22 -0500
-Received: from mail-wm1-f68.google.com ([209.85.128.68]:40525 "EHLO
-        mail-wm1-f68.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1727254AbgBJWIW (ORCPT
+        id S1727422AbgBJWUu (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Mon, 10 Feb 2020 17:20:50 -0500
+Received: from mail-wr1-f65.google.com ([209.85.221.65]:47090 "EHLO
+        mail-wr1-f65.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S1727385AbgBJWUu (ORCPT
         <rfc822;linux-block@vger.kernel.org>);
-        Mon, 10 Feb 2020 17:08:22 -0500
-Received: by mail-wm1-f68.google.com with SMTP id t14so1042438wmi.5
-        for <linux-block@vger.kernel.org>; Mon, 10 Feb 2020 14:08:19 -0800 (PST)
+        Mon, 10 Feb 2020 17:20:50 -0500
+Received: by mail-wr1-f65.google.com with SMTP id z7so9712031wrl.13
+        for <linux-block@vger.kernel.org>; Mon, 10 Feb 2020 14:20:49 -0800 (PST)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=gmail.com; s=20161025;
-        h=date:from:to:cc:subject:message-id:mime-version:content-disposition
-         :user-agent;
-        bh=XfRs1Z/gkEiU+y6kKP5DVhnKr86XXD3K2Le+pLZJl9E=;
-        b=f31MFElpqkv6cJQ4vP4a9oGuEHuECQvNnr6USgQEbu2Q2BuJx35QinQMX7uG30I+eb
-         NpBfd/T1ybbl25gYJ16klX1GIkhU0rZZazdMVRhSG+059agt5XI9UPcoScZBk3EHcESV
-         d71Qv3Phgu5VpM+/Adw97H1aARowCN3VatbY2vkggFksr6OVEKyBRMFNJvmcMr8W13jT
-         zyfya9TO9J9w8/stya2CI2TtmAV3K+POD5IR5C3aaUmbGBXrratP44EXhYnvHfcp9Cgi
-         sPtUDTI69fa3Rs2P+sh2poUccnYXcgT74qcWMrC0iEdPGK6BlfSLQ80Jv8nbNB2Y6EMV
-         3JGg==
+        h=date:from:to:cc:subject:message-id:references:mime-version
+         :content-disposition:in-reply-to:user-agent;
+        bh=0GPnstPH6DXeOW6ivPKBTV0ZmntX0HoiFnDoh6wA9dU=;
+        b=f4Cm5z/1e+Zi3v9FOh8dVfbHLcL6BatIKIhJ7zTEEoLT+wfLpj2e5H4Uq4mOYhd73J
+         AMGnnnVGbO+dZljBwAYXyBfizs+XnPEHc8XAcECWOM519ZJzdaTWK75+EeEnKhCzj8tG
+         OJDt8Of4nVpHe2acGXPDD5Y8A+s9youMCOvLqvkn3jabNAwBWC2sQxezyQEGFVWPNDNY
+         k68IQ+1SIuXx+bVcFV3szjV1EBUEv3N1KHY+PlMiLgzDU17ArMC3dXL7BLZ9P7FZ7W0d
+         4j74y98CbrjNDlgpz1RwE4OvRzXDD8c3osaJh5CQv2cunS9jLn6deR9IceVwlXm/2pXI
+         y3Gg==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=1e100.net; s=20161025;
-        h=x-gm-message-state:date:from:to:cc:subject:message-id:mime-version
-         :content-disposition:user-agent;
-        bh=XfRs1Z/gkEiU+y6kKP5DVhnKr86XXD3K2Le+pLZJl9E=;
-        b=UemFXZqIeFOA6QjNUBL0jxTMAI4n5ijP7sQhgqZ2fLKsBhvYkyik42621xSoeIYpyb
-         AjTMweW5rNOed09O5MuGz0K5ki4kFN7B9KYj05SZZIdExp60CbGGS8g7XPLhpre8vxoX
-         cUhm6ttLxu+K++EsWNC2Vo3xwxOhxGxywP8xc/Yghg7VU4dFoVVGwES9y0zp2b4KA/Jq
-         74Z9qinlBqvskQXKRRQNoPeCI65Gq9/RDMspqwONu3lnT8hFcYYB3ghDdv35g5pJNMp4
-         6hg7CSTEX5pEUSIiT4ygI1wNtbW6ASSPM/3fIAWNoguv74p3AzgNDICrhaq2Ns8HCwFb
-         Wl5g==
-X-Gm-Message-State: APjAAAVwMaR+wXo7pekJEmrVjvvWk59Wcik14AYvjQbyJ0NXZBCGutt5
-        rBC8aYehTnZQXM2odKrEEg==
-X-Google-Smtp-Source: APXvYqyfgzxJePa9xTqEWgkH8DXZIIPYWzNNhfGRr+MTHtKajaf9KVGFAcQeUNTrLfpyn875jrOEQg==
-X-Received: by 2002:a05:600c:d7:: with SMTP id u23mr1126780wmm.145.1581372498884;
-        Mon, 10 Feb 2020 14:08:18 -0800 (PST)
+        h=x-gm-message-state:date:from:to:cc:subject:message-id:references
+         :mime-version:content-disposition:in-reply-to:user-agent;
+        bh=0GPnstPH6DXeOW6ivPKBTV0ZmntX0HoiFnDoh6wA9dU=;
+        b=Fkw6LAWoW53RcW8gaXnP8nkx4+4JN8SescnYvhK2nInvltdy1iOuQJ3HuPB6QIrXpZ
+         tQQha339sCRUVnBVOEZ+PxYc5Ssm+NUzKhViyT4sc0JfjO4OjvvNGaHOzijNrjJY0Euo
+         PpLuBo/1BlFGeXqKYLd5qzKUNeiAOFd/Vvi0Yf01LLX0lr9vKdDq31LFTJJouWZk7LEC
+         A58z84CsnTg+i0lMNhA07MPVyw+o2WKtDb8zxuYqqUjtaSQbHb7MMS9h4RUA4PvZ3y+G
+         H71khCMykHn0vj501D0foEecE4+IXpjXdMG+EWSa6vyjHrFOiA406sdJPKsDUjBa2hpN
+         htFw==
+X-Gm-Message-State: APjAAAX5tf/1ntZpFraBUnJCzVjpFPkKath14kjjTTOkedmJuXKg9vZj
+        tbqWROcYniJureMaZfob+qkhZ8U=
+X-Google-Smtp-Source: APXvYqxyPfN/TUyI2lEr5/mjtaxTIX3FxJISgjXH6wMTNMbX+pnnlVywRnY2GeQzrSNiheSZjo4IZg==
+X-Received: by 2002:adf:b352:: with SMTP id k18mr4039736wrd.242.1581373248396;
+        Mon, 10 Feb 2020 14:20:48 -0800 (PST)
 Received: from avx2 ([46.53.254.169])
-        by smtp.gmail.com with ESMTPSA id w22sm887242wmk.34.2020.02.10.14.08.17
+        by smtp.gmail.com with ESMTPSA id e17sm2166152wrn.62.2020.02.10.14.20.47
         (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Mon, 10 Feb 2020 14:08:18 -0800 (PST)
-Date:   Tue, 11 Feb 2020 01:08:16 +0300
+        Mon, 10 Feb 2020 14:20:47 -0800 (PST)
+Date:   Tue, 11 Feb 2020 01:20:45 +0300
 From:   Alexey Dobriyan <adobriyan@gmail.com>
 To:     axboe@kernel.dk
 Cc:     linux-block@vger.kernel.org, damien.lemoal@wdc.com
-Subject: [PATCH] block: support arbitrary zone size
-Message-ID: <20200210220816.GA7769@avx2>
+Subject: [PATCH v2] block: support arbitrary zone size
+Message-ID: <20200210222045.GA1495@avx2>
+References: <20200210220816.GA7769@avx2>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=utf-8
 Content-Disposition: inline
+In-Reply-To: <20200210220816.GA7769@avx2>
 User-Agent: Mutt/1.10.1 (2018-07-13)
 Sender: linux-block-owner@vger.kernel.org
 Precedence: bulk
@@ -74,6 +76,8 @@ SK hynix is going to ship ZNS device with zone size not being power of 2.
 
 Signed-off-by: Alexey Dobriyan (SK hynix) <adobriyan@gmail.com>
 ---
+
+	v2: fixup one ">>ilog2"/div conversion :-/
 
  block/blk-settings.c           |    4 +---
  block/blk-zoned.c              |   10 +++++-----
@@ -164,7 +168,7 @@ Signed-off-by: Alexey Dobriyan (SK hynix) <adobriyan@gmail.com>
  static inline unsigned int null_zone_no(struct nullb_device *dev, sector_t sect)
  {
 -	return sect >> ilog2(dev->zone_size_sects);
-+	return div64_u64(sect, dev->zone_size_sects * SECTOR_SIZE);
++	return div64_u64(sect, dev->zone_size_sects);
  }
  
  int null_zone_init(struct nullb_device *dev)
