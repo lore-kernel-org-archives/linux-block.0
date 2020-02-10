@@ -2,130 +2,72 @@ Return-Path: <SRS0=SfBO=36=vger.kernel.org=linux-block-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-0.9 required=3.0 tests=DKIMWL_WL_HIGH,DKIM_SIGNED,
-	DKIM_VALID,DKIM_VALID_AU,HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,
-	SPF_HELO_NONE,SPF_PASS autolearn=no autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-1.1 required=3.0 tests=DKIMWL_WL_HIGH,DKIM_SIGNED,
+	DKIM_VALID,DKIM_VALID_AU,MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS
+	autolearn=no autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 76758C35254
-	for <linux-block@archiver.kernel.org>; Mon, 10 Feb 2020 19:37:02 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 2652EC352A4
+	for <linux-block@archiver.kernel.org>; Mon, 10 Feb 2020 20:43:17 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.kernel.org (Postfix) with ESMTP id 111A820715
-	for <linux-block@archiver.kernel.org>; Mon, 10 Feb 2020 19:37:02 +0000 (UTC)
-Authentication-Results: mail.kernel.org;
-	dkim=pass (2048-bit key) header.d=seagate.com header.i=@seagate.com header.b="1mQH3RRo";
-	dkim=pass (2048-bit key) header.d=seagate.com header.i=@seagate.com header.b="Xd9kZ/Sq"
+	by mail.kernel.org (Postfix) with ESMTP id E93AD2168B
+	for <linux-block@archiver.kernel.org>; Mon, 10 Feb 2020 20:43:16 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+	s=default; t=1581367397;
+	bh=KwCHrWA0wev45KvANN3aYLit9yFcWT8lnBqLoNfSfto=;
+	h=Date:From:To:Cc:Subject:References:In-Reply-To:List-ID:From;
+	b=1kTEOIhEtv9Mn7k9M6DHZjsmcqyUudICioUJ7bZp1gMbLUIy4/omRiXHDbaam+W8J
+	 gOaKMjr0ugBnGdh1ChZazCn+IK20aMaIjDdIl3c4jp0PId74l9SptZ3kw/NMLO3JCS
+	 Vz5hI2Soech66lCaxpnx43bEj2P9AUhuF43YYOI0=
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1727433AbgBJThB (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Mon, 10 Feb 2020 14:37:01 -0500
-Received: from mx0a-00003501.pphosted.com ([67.231.144.15]:10540 "EHLO
-        mx0a-00003501.pphosted.com" rhost-flags-OK-OK-OK-OK)
-        by vger.kernel.org with ESMTP id S1727003AbgBJThB (ORCPT
-        <rfc822;linux-block@vger.kernel.org>);
-        Mon, 10 Feb 2020 14:37:01 -0500
-X-Greylist: delayed 995 seconds by postgrey-1.27 at vger.kernel.org; Mon, 10 Feb 2020 14:37:00 EST
-Received: from pps.filterd (m0075552.ppops.net [127.0.0.1])
-        by mx0a-00003501.pphosted.com (8.16.0.42/8.16.0.42) with SMTP id 01AJKLZh011870
-        for <linux-block@vger.kernel.org>; Mon, 10 Feb 2020 14:20:25 -0500
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=seagate.com; h=mime-version : from
- : date : message-id : subject : to : content-type :
- content-transfer-encoding; s=proofpoint;
- bh=32cRl0psfZlFIfgYEJUg/zrSsrp5gweGrD+uloloHgg=;
- b=1mQH3RRoEWlGJjZymsCSC4xv3W6N/R6hdUiPatdQd5pwAeQv8VhYBndggHd34iF2xpYR
- CCp4bd5CiAgRm8GRN5MhWgJPzjwauDNbVWYGRAnOlcwlPjH11xmTwI6VgOBYYF3r6vk+
- hS+bmztQ+otfVpPu4AyYHhoY4hC4vVmxcRG+OksTwUdoUfRUDYGtt7MwnMCHn7E4KZYl
- 6DyOr9OP6c96Nk1GY0jhTNK1VjgG4CeDwEpHU8ZnPkIYtpYyIexNrh3FhfxyzT9+K3i/
- 8vuhNKmfVjktPMNjnn5zDV3+rR/PJeEvYxsHrIdvSRBs5k8FFo/+diJuHsmZT03pGeWC 6A== 
-Authentication-Results: seagate.com;
-        dkim=pass header.d=seagate.com header.s=google
-Received: from mail-wr1-f71.google.com (mail-wr1-f71.google.com [209.85.221.71])
-        by mx0a-00003501.pphosted.com with ESMTP id 2y2b9fxtks-1
-        (version=TLSv1.2 cipher=ECDHE-RSA-AES128-GCM-SHA256 bits=128 verify=NOT)
-        for <linux-block@vger.kernel.org>; Mon, 10 Feb 2020 14:20:24 -0500
-Received: by mail-wr1-f71.google.com with SMTP id r1so1496768wrc.15
-        for <linux-block@vger.kernel.org>; Mon, 10 Feb 2020 11:20:24 -0800 (PST)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=seagate.com; s=google;
-        h=mime-version:from:date:message-id:subject:to
-         :content-transfer-encoding;
-        bh=32cRl0psfZlFIfgYEJUg/zrSsrp5gweGrD+uloloHgg=;
-        b=Xd9kZ/SqKLDIWcPnfJQIgsPgcBCHbkQ/WeU9lluDf6gS51rNgiyGCuuTWnc33o3ywP
-         XwF6aqDwi7KCs6V0rxnse0jSI+80WwP+TtgGxQAwUwafels9QZ6814iuPfzCFPLurW/L
-         tVxNhPLr9DOgoX8i5yLlQKlXKgpGynrksBOklASKIoFjVbHmaQI5XdgrL5J/lhQlBqGG
-         LCbeC/MvxP/L2lJpaLiXjGvIcYqnVVWZ/Dd3F3qwc5yLKqQxRfk55gAqWFkg16svVQVW
-         rw8FwP6LEkX1ins9JvRe1MLyOsjE5XPJlg/RmkMM1zNStcidfQhSKaJC2sC/dRiT4diP
-         KX+A==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20161025;
-        h=x-gm-message-state:mime-version:from:date:message-id:subject:to
-         :content-transfer-encoding;
-        bh=32cRl0psfZlFIfgYEJUg/zrSsrp5gweGrD+uloloHgg=;
-        b=rh/OZ45b6/Y6uixQacKimA24itnFCFInuX9hlBSQufFwSpopnzOiA8wDkZvbfBo2Jq
-         bLZHntn6bdkLS1OACWOaPNEZSx70Zr0QnBTZVPVMxrnf8+WuXaEmeeb5ap1Qan/jUPqm
-         wQNbDQ6oq74qpbmVse8YXb3sPcg1HFbRN+fqfO5vMDh/S8xERBtIrSQe3lcFZpoK4hR9
-         jNFODUpvV5U2kjN8JzSCxkZZNQxWBg4/mbQg9kAwt1Oa6fTH07XnWMRLZgCnahH02oMD
-         CIla1/EZOb3wWEguxC1iTZYz/7gnkXCFGy/MlQVqHUELBhaexj7+n6CrOz0NftV0zEOQ
-         ZRNQ==
-X-Gm-Message-State: APjAAAW8n2KNa/QWmlS+5+0s4oVTEu7f01EETuwt+Qsc9WNRi/W1FWHL
-        7CX2J7yHXcpHf+hKyPYG5ztTev8XrWH0tDZ2scsk19hq4EP1c9++0ymaatTMDHcGOLAqjIlDWwb
-        /dF+5tCegHFkQaE+SDFIju+OiLxPbHNOLVq4mmCIq+/oIkETbzZRWaMhjEjtQ+6LQ
-X-Received: by 2002:a05:600c:2058:: with SMTP id p24mr460532wmg.96.1581362422472;
-        Mon, 10 Feb 2020 11:20:22 -0800 (PST)
-X-Google-Smtp-Source: APXvYqzhho0hM0btYOROp4KxprD57xotc9dLtYEXfb79Mb66f6GNtPbrW35WAKNR4Bou5GMAW+EvJ4NgI1qm/L1c9iY=
-X-Received: by 2002:a05:600c:2058:: with SMTP id p24mr460504wmg.96.1581362422072;
- Mon, 10 Feb 2020 11:20:22 -0800 (PST)
-MIME-Version: 1.0
-From:   Tim Walker <tim.t.walker@seagate.com>
-Date:   Mon, 10 Feb 2020 14:20:10 -0500
-Message-ID: <CANo=J14resJ4U1nufoiDq+ULd0k-orRCsYah8Dve-y8uCjA62Q@mail.gmail.com>
-Subject: [LSF/MM/BPF TOPIC] NVMe HDD
-To:     linux-block@vger.kernel.org,
+        id S1727003AbgBJUnQ (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Mon, 10 Feb 2020 15:43:16 -0500
+Received: from mail.kernel.org ([198.145.29.99]:34868 "EHLO mail.kernel.org"
+        rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
+        id S1726563AbgBJUnQ (ORCPT <rfc822;linux-block@vger.kernel.org>);
+        Mon, 10 Feb 2020 15:43:16 -0500
+Received: from dhcp-10-100-145-180.wdl.wdc.com (unknown [199.255.45.60])
+        (using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+        (No client certificate requested)
+        by mail.kernel.org (Postfix) with ESMTPSA id 30B81214DB;
+        Mon, 10 Feb 2020 20:43:15 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+        s=default; t=1581367395;
+        bh=KwCHrWA0wev45KvANN3aYLit9yFcWT8lnBqLoNfSfto=;
+        h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
+        b=fka3jkqKrIkS/psSk5OgilmAPgjyLDfVTYwfRIQHQT3TyEoMXHlEFQ64fhkC/1+hb
+         cjtrxqEWWbNkjWg+w0dXmwniLwJ7anlBdzRaZN27CFODTA/ZjtWfczVjkYt2vnS4VV
+         YD1/rdBYN8xbNKNRpg1bZF7kuRkjp59Gj2SSKe7A=
+Date:   Mon, 10 Feb 2020 12:43:13 -0800
+From:   Keith Busch <kbusch@kernel.org>
+To:     Tim Walker <tim.t.walker@seagate.com>
+Cc:     linux-block@vger.kernel.org,
         linux-scsi <linux-scsi@vger.kernel.org>,
         linux-nvme@lists.infradead.org
-Content-Type: text/plain; charset="UTF-8"
-Content-Transfer-Encoding: quoted-printable
-X-Proofpoint-PolicyRoute: Outbound
-X-Proofpoint-Virus-Version: vendor=fsecure engine=2.50.10434:6.0.138,18.0.572
- definitions=2020-02-10_07:2020-02-10,2020-02-10 signatures=0
-X-Proofpoint-Spam-Details: rule=notspam policy=default score=0 phishscore=0 spamscore=0 adultscore=0
- clxscore=1011 impostorscore=0 bulkscore=0 suspectscore=1
- lowpriorityscore=0 priorityscore=1501 mlxlogscore=913 mlxscore=0
- malwarescore=0 classifier=spam adjust=0 reason=mlx scancount=1
- engine=8.12.0-2001150001 definitions=main-2002100143
-X-Proofpoint-Spam-Policy: Default Domain Policy
+Subject: Re: [LSF/MM/BPF TOPIC] NVMe HDD
+Message-ID: <20200210204313.GA3736@dhcp-10-100-145-180.wdl.wdc.com>
+References: <CANo=J14resJ4U1nufoiDq+ULd0k-orRCsYah8Dve-y8uCjA62Q@mail.gmail.com>
+MIME-Version: 1.0
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <CANo=J14resJ4U1nufoiDq+ULd0k-orRCsYah8Dve-y8uCjA62Q@mail.gmail.com>
 Sender: linux-block-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-Background:
+On Mon, Feb 10, 2020 at 02:20:10PM -0500, Tim Walker wrote:
+> -What Linux storage stack assumptions do we need to be aware of as we
+> develop these devices with drastically different performance
+> characteristics than traditional NAND? For example, what schedular or
+> device driver level changes will be needed to integrate NVMe HDDs?
 
-NVMe specification has hardened over the decade and now NVMe devices
-are well integrated into our customers=E2=80=99 systems. As we look forward=
-,
-moving HDDs to the NVMe command set eliminates the SAS IOC and driver
-stack, consolidating on a single access method for rotational and
-static storage technologies. PCIe-NVMe offers near-SATA interface
-costs, features and performance suitable for high-cap HDDs, and
-optimal interoperability for storage automation, tiering, and
-management. We will share some early conceptual results and proposed
-salient design goals and challenges surrounding an NVMe HDD.
+Right now the nvme driver unconditionally sets QUEUE_FLAG_NONROT
+(non-rational, i.e. ssd), on all nvme namespace's request_queue flags. We
+need the specification to define a capability bit or field associated
+with the namespace to tell the driver otherwise, then we can propogate
+that information up to the block layer.
 
-
-Discussion Proposal:
-
-We=E2=80=99d like to share our views and solicit input on:
-
--What Linux storage stack assumptions do we need to be aware of as we
-develop these devices with drastically different performance
-characteristics than traditional NAND? For example, what schedular or
-device driver level changes will be needed to integrate NVMe HDDs?
-
--Are there NVMe feature trade-offs that make sense for HDDs that won=E2=80=
-=99t
-break the HDD-SSD interoperability goals?
-
--How would upcoming multi-actuator HDDs impact NVMe?
-
-
-Regards,
-Tim Walker
+Even without that, an otherwise spec compliant HDD should function as an
+nvme device with existing software, but I would be interested to hear
+additional ideas or feature gaps with other protocols that should be
+considered in order to make an nvme hdd work well.
