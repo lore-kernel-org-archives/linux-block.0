@@ -2,100 +2,130 @@ Return-Path: <SRS0=SfBO=36=vger.kernel.org=linux-block-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-2.2 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
-	MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,USER_AGENT_SANE_1 autolearn=no
-	autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-3.8 required=3.0 tests=DKIMWL_WL_HIGH,DKIM_SIGNED,
+	DKIM_VALID,HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,
+	SPF_HELO_NONE,SPF_PASS autolearn=no autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 3846DC352A4
-	for <linux-block@archiver.kernel.org>; Mon, 10 Feb 2020 03:54:24 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id B6204C35254
+	for <linux-block@archiver.kernel.org>; Mon, 10 Feb 2020 04:16:15 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.kernel.org (Postfix) with ESMTP id 191A021775
-	for <linux-block@archiver.kernel.org>; Mon, 10 Feb 2020 03:54:24 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id 66145214DB
+	for <linux-block@archiver.kernel.org>; Mon, 10 Feb 2020 04:16:15 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+	s=default; t=1581308175;
+	bh=nXYmlFSwyHQs6qYhtrGmfUzzDBURe/MKElHOFDZXMlA=;
+	h=Date:From:To:Cc:Subject:In-Reply-To:References:List-ID:From;
+	b=zVylB3XW5/6dKMTT8XFtGcF74EYtaF4Z6CWzwnVk96qPP12MxH5gfoFcKFSBwVTiD
+	 is5B1mogf+qeeZe3dZd5TgjLq19FwhxnHrXwf0QDAT+QXVx3coaKK5+K0Ux+XTA328
+	 KBfi+8EuG3fKQTXtuOuYTpNv0AEVsZDxEh5wDa+4=
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1727079AbgBJDyX (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Sun, 9 Feb 2020 22:54:23 -0500
-Received: from mail-pl1-f194.google.com ([209.85.214.194]:43879 "EHLO
-        mail-pl1-f194.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1726944AbgBJDyX (ORCPT
-        <rfc822;linux-block@vger.kernel.org>); Sun, 9 Feb 2020 22:54:23 -0500
-Received: by mail-pl1-f194.google.com with SMTP id p11so2259675plq.10;
-        Sun, 09 Feb 2020 19:54:21 -0800 (PST)
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20161025;
-        h=x-gm-message-state:subject:to:cc:references:from:autocrypt
-         :message-id:date:user-agent:mime-version:in-reply-to
-         :content-language:content-transfer-encoding;
-        bh=ScLq+uxFxJJ8h5yf9gT2oaJ4q5A422rvmbSfgGHlTkI=;
-        b=asreeiCON18FbpnBX5EvnmAIGq2DUq/FwXgodffnSmKY2EyOhhc2s6kH3BKPw58wqf
-         LlrchaTsM8+6yxkvFjkmNIaejwxvgftHrZ44BODYHUKMfF+IJYrX5KCOS8leu77S25FV
-         EuakRrrtD5j+qIZv06DzTgBTJI78HpKQMgxIglt508ysxLHzMuH7ShhCr+UYX4UfW59A
-         awNpeR7RHXtUsGc3pyvVuComcJkc5+DC/WX96WYIcOxGmLwQCIxA7Mvu2Dw4FTlnvk7/
-         ZjXNlBnpZx4ZkRxdV8ezUJoGbuBQt4XN2EvH3YmcQT39OaqqVQ8b85rRGleDInEudam5
-         df5Q==
-X-Gm-Message-State: APjAAAXMlZXUajyHbBrGmRrUfGlZTlnerIl7wX4G4kR7l4CDRcESVemQ
-        KAnI8m+Kkrak3m2C9BBPgfSQ4dZv3hA=
-X-Google-Smtp-Source: APXvYqzgLuQm5NOq5Yew8JsNhvwWoOjoaqOaGv7crlQb1vt/yr6df4a5+SoDJnh8Bzunu3vWZLgV9w==
-X-Received: by 2002:a17:90a:1b42:: with SMTP id q60mr17706605pjq.108.1581306860815;
-        Sun, 09 Feb 2020 19:54:20 -0800 (PST)
-Received: from ?IPv6:2601:647:4000:d7:20b3:5fd0:4962:3980? ([2601:647:4000:d7:20b3:5fd0:4962:3980])
-        by smtp.gmail.com with ESMTPSA id h13sm9640150pjc.9.2020.02.09.19.54.19
-        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
-        Sun, 09 Feb 2020 19:54:19 -0800 (PST)
-Subject: Re: [PATCH] blktrace: Protect q->blk_trace with RCU
-To:     Jan Kara <jack@suse.cz>, Jens Axboe <axboe@kernel.dk>
-Cc:     linux-block@vger.kernel.org, tristmd@gmail.com,
-        stable@vger.kernel.org
-References: <20200206142812.25989-1-jack@suse.cz>
-From:   Bart Van Assche <bvanassche@acm.org>
-Autocrypt: addr=bvanassche@acm.org; prefer-encrypt=mutual; keydata=
- mQENBFSOu4oBCADcRWxVUvkkvRmmwTwIjIJvZOu6wNm+dz5AF4z0FHW2KNZL3oheO3P8UZWr
- LQOrCfRcK8e/sIs2Y2D3Lg/SL7qqbMehGEYcJptu6mKkywBfoYbtBkVoJ/jQsi2H0vBiiCOy
- fmxMHIPcYxaJdXxrOG2UO4B60Y/BzE6OrPDT44w4cZA9DH5xialliWU447Bts8TJNa3lZKS1
- AvW1ZklbvJfAJJAwzDih35LxU2fcWbmhPa7EO2DCv/LM1B10GBB/oQB5kvlq4aA2PSIWkqz4
- 3SI5kCPSsygD6wKnbRsvNn2mIACva6VHdm62A7xel5dJRfpQjXj2snd1F/YNoNc66UUTABEB
- AAG0JEJhcnQgVmFuIEFzc2NoZSA8YnZhbmFzc2NoZUBhY20ub3JnPokBOQQTAQIAIwUCVI67
- igIbAwcLCQgHAwIBBhUIAgkKCwQWAgMBAh4BAheAAAoJEHFcPTXFzhAJ8QkH/1AdXblKL65M
- Y1Zk1bYKnkAb4a98LxCPm/pJBilvci6boefwlBDZ2NZuuYWYgyrehMB5H+q+Kq4P0IBbTqTa
- jTPAANn62A6jwJ0FnCn6YaM9TZQjM1F7LoDX3v+oAkaoXuq0dQ4hnxQNu792bi6QyVdZUvKc
- macVFVgfK9n04mL7RzjO3f+X4midKt/s+G+IPr4DGlrq+WH27eDbpUR3aYRk8EgbgGKvQFdD
- CEBFJi+5ZKOArmJVBSk21RHDpqyz6Vit3rjep7c1SN8s7NhVi9cjkKmMDM7KYhXkWc10lKx2
- RTkFI30rkDm4U+JpdAd2+tP3tjGf9AyGGinpzE2XY1K5AQ0EVI67igEIAKiSyd0nECrgz+H5
- PcFDGYQpGDMTl8MOPCKw/F3diXPuj2eql4xSbAdbUCJzk2ETif5s3twT2ER8cUTEVOaCEUY3
- eOiaFgQ+nGLx4BXqqGewikPJCe+UBjFnH1m2/IFn4T9jPZkV8xlkKmDUqMK5EV9n3eQLkn5g
- lco+FepTtmbkSCCjd91EfThVbNYpVQ5ZjdBCXN66CKyJDMJ85HVr5rmXG/nqriTh6cv1l1Js
- T7AFvvPjUPknS6d+BETMhTkbGzoyS+sywEsQAgA+BMCxBH4LvUmHYhpS+W6CiZ3ZMxjO8Hgc
- ++w1mLeRUvda3i4/U8wDT3SWuHcB3DWlcppECLkAEQEAAYkBHwQYAQIACQUCVI67igIbDAAK
- CRBxXD01xc4QCZ4dB/0QrnEasxjM0PGeXK5hcZMT9Eo998alUfn5XU0RQDYdwp6/kMEXMdmT
- oH0F0xB3SQ8WVSXA9rrc4EBvZruWQ+5/zjVrhhfUAx12CzL4oQ9Ro2k45daYaonKTANYG22y
- //x8dLe2Fv1By4SKGhmzwH87uXxbTJAUxiWIi1np0z3/RDnoVyfmfbbL1DY7zf2hYXLLzsJR
- mSsED/1nlJ9Oq5fALdNEPgDyPUerqHxcmIub+pF0AzJoYHK5punqpqfGmqPbjxrJLPJfHVKy
- goMj5DlBMoYqEgpbwdUYkH6QdizJJCur4icy8GUNbisFYABeoJ91pnD4IGei3MTdvINSZI5e
-Message-ID: <6a49e67f-e621-939e-11d5-b614fa8da7d8@acm.org>
-Date:   Sun, 9 Feb 2020 19:54:18 -0800
-User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:68.0) Gecko/20100101
- Thunderbird/68.4.2
-MIME-Version: 1.0
-In-Reply-To: <20200206142812.25989-1-jack@suse.cz>
-Content-Type: text/plain; charset=utf-8
-Content-Language: en-US
+        id S1726950AbgBJEQO (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Sun, 9 Feb 2020 23:16:14 -0500
+Received: from mail.kernel.org ([198.145.29.99]:40654 "EHLO mail.kernel.org"
+        rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
+        id S1726944AbgBJEQO (ORCPT <rfc822;linux-block@vger.kernel.org>);
+        Sun, 9 Feb 2020 23:16:14 -0500
+Received: from localhost.localdomain (c-73-231-172-41.hsd1.ca.comcast.net [73.231.172.41])
+        (using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+        (No client certificate requested)
+        by mail.kernel.org (Postfix) with ESMTPSA id 63385208C4;
+        Mon, 10 Feb 2020 04:16:13 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+        s=default; t=1581308173;
+        bh=nXYmlFSwyHQs6qYhtrGmfUzzDBURe/MKElHOFDZXMlA=;
+        h=Date:From:To:Cc:Subject:In-Reply-To:References:From;
+        b=qP2KLxi4EabEgWS1NlSK3Ty6R/ZpvA2J3f1t0wixGyaZwg4bih+vw/XYqZ9FWYbzn
+         wuJy8TrOExVCjWHkeLig7vYn4ENRutSDb6fh3obeZMocOoqR3ilrTrtZ34Wotha4dk
+         fNjWd10OJqoSt/7c6+YMhOLbyio257afQFt4651I=
+Date:   Sun, 9 Feb 2020 20:16:12 -0800
+From:   Andrew Morton <akpm@linux-foundation.org>
+To:     Naohiro Aota <naohiro.aota@wdc.com>
+Cc:     linux-mm@kvack.org, linux-fsdevel@vger.kernel.org,
+        linux-block@vger.kernel.org, Christoph Hellwig <hch@infradead.org>,
+        "Darrick J . Wong" <darrick.wong@oracle.com>
+Subject: Re: [PATCH v2] mm, swap: move inode_lock out of claim_swapfile
+Message-Id: <20200209201612.e5f234b357823df574104cb9@linux-foundation.org>
+In-Reply-To: <20200206090132.154869-1-naohiro.aota@wdc.com>
+References: <20200206090132.154869-1-naohiro.aota@wdc.com>
+X-Mailer: Sylpheed 3.5.1 (GTK+ 2.24.31; x86_64-pc-linux-gnu)
+Mime-Version: 1.0
+Content-Type: text/plain; charset=US-ASCII
 Content-Transfer-Encoding: 7bit
 Sender: linux-block-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-On 2020-02-06 06:28, Jan Kara wrote:
-> KASAN is reporting that __blk_add_trace() has a use-after-free issue
-> when accessing q->blk_trace. Indeed the switching of block tracing (and
-> thus eventual freeing of q->blk_trace) is completely unsynchronized with
-> the currently running tracing and thus it can happen that the blk_trace
-> structure is being freed just while __blk_add_trace() works on it.
-> Protect accesses to q->blk_trace by RCU during tracing and make sure we
-> wait for the end of RCU grace period when shutting down tracing. Luckily
-> that is rare enough event that we can afford that. Note that postponing
-> the freeing of blk_trace to an RCU callback should better be avoided as
-> it could have unexpected user visible side-effects as debugfs files
-> would be still existing for a short while block tracing has been shut
-> down.
+On Thu,  6 Feb 2020 18:01:32 +0900 Naohiro Aota <naohiro.aota@wdc.com> wrote:
 
-Reviewed-by: Bart Van Assche <bvanassche@acm.org>
+> claim_swapfile() currently keeps the inode locked when it is successful, or
+> the file is already swapfile (with -EBUSY). And, on the other error cases,
+> it does not lock the inode.
+> 
+> This inconsistency of the lock state and return value is quite confusing
+> and actually causing a bad unlock balance as below in the "bad_swap"
+> section of __do_sys_swapon().
+> 
+> This commit fixes this issue by moving the inode_lock() and IS_SWAPFILE
+> check out of claim_swapfile(). The inode is unlocked in
+> "bad_swap_unlock_inode" section, so that the inode is ensured to be
+> unlocked at "bad_swap". Thus, error handling codes after the locking now
+> jumps to "bad_swap_unlock_inode" instead of "bad_swap".
+> 
+>     =====================================
+>     WARNING: bad unlock balance detected!
+>     5.5.0-rc7+ #176 Not tainted
+>     -------------------------------------
+>     swapon/4294 is trying to release lock (&sb->s_type->i_mutex_key) at:
+>     [<ffffffff8173a6eb>] __do_sys_swapon+0x94b/0x3550
+>     but there are no more locks to release!
+> 
+>     other info that might help us debug this:
+>     no locks held by swapon/4294.
+> 
+>     stack backtrace:
+>     CPU: 5 PID: 4294 Comm: swapon Not tainted 5.5.0-rc7-BTRFS-ZNS+ #176
+>     Hardware name: ASUS All Series/H87-PRO, BIOS 2102 07/29/2014
+>     Call Trace:
+>      dump_stack+0xa1/0xea
+>      ? __do_sys_swapon+0x94b/0x3550
+>      print_unlock_imbalance_bug.cold+0x114/0x123
+>      ? __do_sys_swapon+0x94b/0x3550
+>      lock_release+0x562/0xed0
+>      ? kvfree+0x31/0x40
+>      ? lock_downgrade+0x770/0x770
+>      ? kvfree+0x31/0x40
+>      ? rcu_read_lock_sched_held+0xa1/0xd0
+>      ? rcu_read_lock_bh_held+0xb0/0xb0
+>      up_write+0x2d/0x490
+>      ? kfree+0x293/0x2f0
+>      __do_sys_swapon+0x94b/0x3550
+>      ? putname+0xb0/0xf0
+>      ? kmem_cache_free+0x2e7/0x370
+>      ? do_sys_open+0x184/0x3e0
+>      ? generic_max_swapfile_size+0x40/0x40
+>      ? do_syscall_64+0x27/0x4b0
+>      ? entry_SYSCALL_64_after_hwframe+0x49/0xbe
+>      ? lockdep_hardirqs_on+0x38c/0x590
+>      __x64_sys_swapon+0x54/0x80
+>      do_syscall_64+0xa4/0x4b0
+>      entry_SYSCALL_64_after_hwframe+0x49/0xbe
+>     RIP: 0033:0x7f15da0a0dc7
+> 
+>  mm/swapfile.c | 41 ++++++++++++++++++++---------------------
+>  1 file changed, 20 insertions(+), 21 deletions(-)
+> 
+> diff --git a/mm/swapfile.c b/mm/swapfile.c
+> index bb3261d45b6a..2c4c349e1101 100644
+> --- a/mm/swapfile.c
+> +++ b/mm/swapfile.c
+
+Look correct to me.
+
+But I don't think this code at the end of sys_swapon():
+
+	if (inode)
+		inode_unlock(inode);
+
+will ever execute?  `inode' is always NULL here?
+
