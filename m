@@ -2,164 +2,137 @@ Return-Path: <SRS0=uOpu=37=vger.kernel.org=linux-block-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-9.8 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
+X-Spam-Status: No, score=-8.2 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
 	INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,
-	URIBL_BLOCKED,USER_AGENT_GIT autolearn=ham autolearn_force=no version=3.4.0
+	URIBL_BLOCKED,USER_AGENT_SANE_1 autolearn=unavailable autolearn_force=no
+	version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 3459AC35242
-	for <linux-block@archiver.kernel.org>; Tue, 11 Feb 2020 03:52:45 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 2D480C35242
+	for <linux-block@archiver.kernel.org>; Tue, 11 Feb 2020 04:13:01 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.kernel.org (Postfix) with ESMTP id 1456D20714
-	for <linux-block@archiver.kernel.org>; Tue, 11 Feb 2020 03:52:45 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id E7FB620838
+	for <linux-block@archiver.kernel.org>; Tue, 11 Feb 2020 04:13:00 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1727953AbgBKDwo (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Mon, 10 Feb 2020 22:52:44 -0500
-Received: from szxga05-in.huawei.com ([45.249.212.191]:9720 "EHLO huawei.com"
+        id S1727928AbgBKENA (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Mon, 10 Feb 2020 23:13:00 -0500
+Received: from szxga05-in.huawei.com ([45.249.212.191]:9721 "EHLO huawei.com"
         rhost-flags-OK-OK-OK-FAIL) by vger.kernel.org with ESMTP
-        id S1727800AbgBKDwo (ORCPT <rfc822;linux-block@vger.kernel.org>);
-        Mon, 10 Feb 2020 22:52:44 -0500
-Received: from DGGEMS412-HUB.china.huawei.com (unknown [172.30.72.59])
-        by Forcepoint Email with ESMTP id 0293FC4337C545197046;
-        Tue, 11 Feb 2020 11:52:42 +0800 (CST)
-Received: from huawei.com (10.175.124.28) by DGGEMS412-HUB.china.huawei.com
- (10.3.19.212) with Microsoft SMTP Server id 14.3.439.0; Tue, 11 Feb 2020
- 11:52:33 +0800
-From:   yu kuai <yukuai3@huawei.com>
-To:     <axboe@kernel.dk>, <ming.lei@redhat.com>
-CC:     <yukuai3@huawei.com>, <yi.zhang@huawei.com>,
-        <zhangxiaoxu5@huawei.com>, <luoshijie1@huawei.com>,
-        <linux-block@vger.kernel.org>, <linux-kernel@vger.kernel.org>
-Subject: [PATCH] block: rename 'q->debugfs_dir' in blk_unregister_queue()
-Date:   Tue, 11 Feb 2020 11:51:37 +0800
-Message-ID: <20200211035137.19454-1-yukuai3@huawei.com>
-X-Mailer: git-send-email 2.17.2
+        id S1727728AbgBKENA (ORCPT <rfc822;linux-block@vger.kernel.org>);
+        Mon, 10 Feb 2020 23:13:00 -0500
+Received: from DGGEMS402-HUB.china.huawei.com (unknown [172.30.72.58])
+        by Forcepoint Email with ESMTP id 0053940FAABA12F48003;
+        Tue, 11 Feb 2020 12:12:54 +0800 (CST)
+Received: from [127.0.0.1] (10.173.222.66) by DGGEMS402-HUB.china.huawei.com
+ (10.3.19.202) with Microsoft SMTP Server id 14.3.439.0; Tue, 11 Feb 2020
+ 12:12:49 +0800
+Subject: Re: [v3] nbd: fix potential NULL pointer fault in nbd_genl_disconnect
+To:     Mike Christie <mchristi@redhat.com>, <josef@toxicpanda.com>,
+        <axboe@kernel.dk>
+CC:     <linux-block@vger.kernel.org>, <nbd@other.debian.org>,
+        <linux-kernel@vger.kernel.org>
+References: <20200210073241.41813-1-sunke32@huawei.com>
+ <5E418D62.8090102@redhat.com>
+From:   "sunke (E)" <sunke32@huawei.com>
+Message-ID: <c3531fc5-73b3-6ef4-816e-97f491f45c18@huawei.com>
+Date:   Tue, 11 Feb 2020 12:12:48 +0800
+User-Agent: Mozilla/5.0 (Windows NT 10.0; WOW64; rv:68.0) Gecko/20100101
+ Thunderbird/68.2.2
 MIME-Version: 1.0
-Content-Type: text/plain
-X-Originating-IP: [10.175.124.28]
+In-Reply-To: <5E418D62.8090102@redhat.com>
+Content-Type: text/plain; charset="UTF-8"; format=flowed
+Content-Transfer-Encoding: 8bit
+X-Originating-IP: [10.173.222.66]
 X-CFilter-Loop: Reflected
 Sender: linux-block-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-syzbot is reporting use after free bug in debugfs_remove[1].
 
-This is because in request_queue, 'q->debugfs_dir' and
-'q->blk_trace->dir' could be the same dir. And in __blk_release_queue(),
-blk_mq_debugfs_unregister() will remove everything inside the dir.
 
-With futher investigation of the reporduce repro, the problem can be
-reporduced by following procedure:
+在 2020/2/11 1:05, Mike Christie 写道:
+> On 02/10/2020 01:32 AM, Sun Ke wrote:
+>> Open /dev/nbdX first, the config_refs will be 1 and
+>> the pointers in nbd_device are still null. Disconnect
+>> /dev/nbdX, then reference a null recv_workq. The
+>> protection by config_refs in nbd_genl_disconnect is useless.
+>>
+>> To fix it, just add a check for a non null task_recv in
+>> nbd_genl_disconnect.
+>>
+>> Signed-off-by: Sun Ke <sunke32@huawei.com>
+>> ---
+>> v1 -> v2:
+>> Add an omitted mutex_unlock.
+>>
+>> v2 -> v3:
+>> Add nbd->config_lock, suggested by Josef.
+>> ---
+>>   drivers/block/nbd.c | 8 ++++++++
+>>   1 file changed, 8 insertions(+)
+>>
+>> diff --git a/drivers/block/nbd.c b/drivers/block/nbd.c
+>> index b4607dd96185..870b3fd0c101 100644
+>> --- a/drivers/block/nbd.c
+>> +++ b/drivers/block/nbd.c
+>> @@ -2008,12 +2008,20 @@ static int nbd_genl_disconnect(struct sk_buff *skb, struct genl_info *info)
+>>   		       index);
+>>   		return -EINVAL;
+>>   	}
+>> +	mutex_lock(&nbd->config_lock);
+>>   	if (!refcount_inc_not_zero(&nbd->refs)) {
+>> +		mutex_unlock(&nbd->config_lock);
+>>   		mutex_unlock(&nbd_index_mutex);
+>>   		printk(KERN_ERR "nbd: device at index %d is going down\n",
+>>   		       index);
+>>   		return -EINVAL;
+>>   	}
+>> +	if (!nbd->recv_workq) {
+>> +		mutex_unlock(&nbd->config_lock);
+>> +		mutex_unlock(&nbd_index_mutex);
+>> +		return -EINVAL;
+>> +	}
+>> +	mutex_unlock(&nbd->config_lock);
+>>   	mutex_unlock(&nbd_index_mutex);
+>>   	if (!refcount_inc_not_zero(&nbd->config_refs)) {
+>>   		nbd_put(nbd);
+>>
+> 
+> With my other patch then we will not need this right? It handles your
+> case by just being integrated with the existing checks in:
+> 
+> nbd_disconnect_and_put->nbd_clear_sock->sock_shutdown
+> 
+> ...
+> 
+> static void sock_shutdown(struct nbd_device *nbd)
+> {
+> 
+> ....
+> 
+>          if (config->num_connections == 0)
+>                  return;
+> 
+> 
+> num_connections is zero for your case since we never did a
+> nbd_genl_disconnect so we would return here.
+> 
+> 
+> .
+> 
+Hi Mike
 
-1. LOOP_CTL_ADD, create a request_queue q1, blk_mq_debugfs_register() will
-create the dir.
-2. LOOP_CTL_REMOVE, blk_release_queue() will add q1 to release queue.
-3. LOOP_CTL_ADD, create another request_queue q2,blk_mq_debugfs_register()
-will fail because the dir aready exist.
-4. BLKTRACESETUP, create two files(msg and dropped) inside the dir.
-5. call __blk_release_queue() for q1, debugfs_remove_recursive() will
-delete the files created in step 4.
-6. LOOP_CTL_REMOVE, blk_release_queue() will add q2 to release queue.
-And when __blk_release_queue() is called for q2, blk_trace_shutdown() will
-try to release the two files created in step 4, wich are aready released
-in step 5.
+Your point is not right totally.
 
-|thread1		  |kworker	             |thread2               |
-| ----------------------- | ------------------------ | -------------------- |
-|loop_control_ioctl       |                          |                      |
-| loop_add                |                          |                      |
-|  blk_mq_debugfs_register|                          |                      |
-|   debugfs_create_dir    |                          |                      |
-|loop_control_ioctl       |                          |                      |
-| loop_remove		  |                          |                      |
-|  blk_release_queue      |                          |                      |
-|   schedule_work         |                          |                      |
-|			  |			     |loop_control_ioctl    |
-|			  |			     | loop_add             |
-|			  |			     |  ...                 |
-|			  |			     |blk_trace_ioctl       |
-|			  |			     | __blk_trace_setup    |
-|			  |			     |   debugfs_create_file|
-|			  |__blk_release_queue       |                      |
-|			  | blk_mq_debugfs_unregister|                      |
-|			  |  debugfs_remove_recursive|                      |
-|			  |			     |loop_control_ioctl    |
-|			  |			     | loop_remove          |
-|			  |			     |  ...                 |
-|			  |__blk_release_queue       |                      |
-|			  | blk_trace_shutdown       |                      |
-|			  |  debugfs_remove          |                      |
+Yes, config->num_connections is 0 and will return in sock_shutdown. Then 
+it will back to nbd_disconnect_and_put and do flush_workqueue 
+(nbd->recv_workq).
 
-commit dc9edc44de6c ("block: Fix a blk_exit_rl() regression") pushed the
-final release of request_queue to a workqueue, so, when loop_add() is
-called again(step 3), __blk_release_queue() might not been called yet,
-which causes the problem.
+nbd_disconnect_and_put
+	->nbd_clear_sock
+		->sock_shutdown
+	->flush_workqueue
 
-Fix the problem by renaming 'q->debugfs_dir' in blk_unregister_queue().
-
-[1] https://syzkaller.appspot.com/bug?extid=903b72a010ad6b7a40f2
-References: CVE-2019-19770
-Fixes: commit dc9edc44de6c ("block: Fix a blk_exit_rl() regression")
-Reported-by: syzbot <syz...@syzkaller.appspotmail.com>
-Signed-off-by: yu kuai <yukuai3@huawei.com>
----
- block/blk-sysfs.c | 29 +++++++++++++++++++++++++++++
- 1 file changed, 29 insertions(+)
-
-diff --git a/block/blk-sysfs.c b/block/blk-sysfs.c
-index fca9b158f4a0..69d28b3f52d0 100644
---- a/block/blk-sysfs.c
-+++ b/block/blk-sysfs.c
-@@ -11,6 +11,7 @@
- #include <linux/blktrace_api.h>
- #include <linux/blk-mq.h>
- #include <linux/blk-cgroup.h>
-+#include <linux/debugfs.h>
- 
- #include "blk.h"
- #include "blk-mq.h"
-@@ -1011,6 +1012,33 @@ int blk_register_queue(struct gendisk *disk)
- }
- EXPORT_SYMBOL_GPL(blk_register_queue);
- 
-+/*
-+ * blk_prepare_release_queue - rename q->debugfs_dir
-+ * @q: request_queue of which the dir to be renamed belong to.
-+ *
-+ * Because the final release of request_queue is in a workqueue, the
-+ * cleanup might not been finished yet while the same device start to
-+ * create. It's not correct if q->debugfs_dir still exist while trying
-+ * to create a new one.
-+ */
-+static struct dentry *blk_prepare_release_queue(struct request_queue *q)
-+{
-+	struct dentry *new = NULL;
-+	char name[DNAME_INLINE_LEN];
-+	int i = 0;
-+
-+	if (IS_ERR_OR_NULL(q->debugfs_dir))
-+		return q->debugfs_dir;
-+
-+	while (new == NULL) {
-+		sprintf(name, "ready_to_remove_%d", i++);
-+		new = debugfs_rename(blk_debugfs_root, q->debugfs_dir,
-+				     blk_debugfs_root, name);
-+	}
-+
-+	return new;
-+}
-+
- /**
-  * blk_unregister_queue - counterpart of blk_register_queue()
-  * @disk: Disk of which the request queue should be unregistered from sysfs.
-@@ -1039,6 +1067,7 @@ void blk_unregister_queue(struct gendisk *disk)
- 	mutex_unlock(&q->sysfs_lock);
- 
- 	mutex_lock(&q->sysfs_dir_lock);
-+	q->debugfs_dir = blk_prepare_release_queue(q);
- 	/*
- 	 * Remove the sysfs attributes before unregistering the queue data
- 	 * structures that can be modified through sysfs.
--- 
-2.17.2
+Thanks,
+Sun Ke
 
