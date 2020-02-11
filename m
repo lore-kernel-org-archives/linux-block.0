@@ -2,179 +2,164 @@ Return-Path: <SRS0=uOpu=37=vger.kernel.org=linux-block-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-5.9 required=3.0 tests=DKIM_SIGNED,DKIM_VALID,
-	DKIM_VALID_AU,HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,
-	MENTIONS_GIT_HOSTING,SPF_HELO_NONE,SPF_PASS autolearn=unavailable
-	autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-9.8 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
+	INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,
+	URIBL_BLOCKED,USER_AGENT_GIT autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 08DF9C352A5
-	for <linux-block@archiver.kernel.org>; Tue, 11 Feb 2020 01:05:58 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 3459AC35242
+	for <linux-block@archiver.kernel.org>; Tue, 11 Feb 2020 03:52:45 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.kernel.org (Postfix) with ESMTP id D62C82080C
-	for <linux-block@archiver.kernel.org>; Tue, 11 Feb 2020 01:05:57 +0000 (UTC)
-Authentication-Results: mail.kernel.org;
-	dkim=pass (2048-bit key) header.d=anarazel.de header.i=@anarazel.de header.b="V3Z2D62h";
-	dkim=pass (2048-bit key) header.d=messagingengine.com header.i=@messagingengine.com header.b="Htshbs9y"
+	by mail.kernel.org (Postfix) with ESMTP id 1456D20714
+	for <linux-block@archiver.kernel.org>; Tue, 11 Feb 2020 03:52:45 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1727546AbgBKBF5 (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Mon, 10 Feb 2020 20:05:57 -0500
-Received: from wnew1-smtp.messagingengine.com ([64.147.123.26]:55373 "EHLO
-        wnew1-smtp.messagingengine.com" rhost-flags-OK-OK-OK-OK)
-        by vger.kernel.org with ESMTP id S1727505AbgBKBF4 (ORCPT
-        <rfc822;linux-block@vger.kernel.org>);
-        Mon, 10 Feb 2020 20:05:56 -0500
-X-Greylist: delayed 566 seconds by postgrey-1.27 at vger.kernel.org; Mon, 10 Feb 2020 20:05:56 EST
-Received: from compute5.internal (compute5.nyi.internal [10.202.2.45])
-        by mailnew.west.internal (Postfix) with ESMTP id 7842D616;
-        Mon, 10 Feb 2020 19:56:29 -0500 (EST)
-Received: from mailfrontend2 ([10.202.2.163])
-  by compute5.internal (MEProxy); Mon, 10 Feb 2020 19:56:30 -0500
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=anarazel.de; h=
-        date:from:to:cc:subject:message-id:references:mime-version
-        :content-type:in-reply-to; s=fm3; bh=BRKC1Q2crlqSmyJltbGVPx60D4o
-        E6HR1IKWysJB/xmk=; b=V3Z2D62h2p2geUkz1ivzOU/STOqjNIPDn0Nt4X8KrWs
-        4cRhPbM20kAxyZv9un1daHYw7TZcAFobebmYpWwbsPrlSx65MTLayVDjc2ftUdUG
-        QlggkEtUJfgvdz/dqgwl5KtAaTe3u+Fq3h2f6V6H2uGpvkNDs22Ws3QFNy2lNheY
-        FPImjQhi1NTxyzo2eLpHf92QARyUyj3UislevoqCP6YE6O6wjT9KeTWuiV7DYBiX
-        qRLDp7xScsr6zc/BsX9YVZsQFx33Jqb/yqGXKTFePJDE31NHzbGhw3DfdeES7djf
-        LokYUWl9dq/Wh7LCYGbpKc84fyZtueqRlZN28wL7LFA==
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=
-        messagingengine.com; h=cc:content-type:date:from:in-reply-to
-        :message-id:mime-version:references:subject:to:x-me-proxy
-        :x-me-proxy:x-me-sender:x-me-sender:x-sasl-enc; s=fm2; bh=BRKC1Q
-        2crlqSmyJltbGVPx60D4oE6HR1IKWysJB/xmk=; b=Htshbs9ypNG6jEppMXTnn8
-        cFsnUxgiqPDZLIKLOH9WeXUfT/cTKOkm+AuDs9XiCgCCQs6Nl7U9Ee2C1YXlxPDi
-        Tla4D8TMbNoq1qMQOtVkL2ld45vD//jVug62+vNcuPkri0rr8voQrImeXh3OkOAa
-        q+bKUXbREfMMcx+voJkooztPI8hVFOyRshBkvEaBxgSnh/D3i8i8KQavbrstjdFz
-        XVpmeh5y+R5AxP+ECB7oX7Tfq3WmP/W+h1WP3m6KRUOUo9WvLdG4Z+7WxL/ON6Lr
-        GrXPKA43zlm+x56y0LWVCf/n03I89pg6FJmqca+oFg5yZIsC6t0KkzT9COS59taw
-        ==
-X-ME-Sender: <xms:vPtBXtyM2ztfKtemdxr7di2FeyiO9JOs3htTwSwNHghvmtIhZwcc8Q>
-X-ME-Proxy-Cause: gggruggvucftvghtrhhoucdtuddrgedugedriedvgddvjecutefuodetggdotefrodftvf
-    curfhrohhfihhlvgemucfhrghsthforghilhdpqfgfvfdpuffrtefokffrpgfnqfghnecu
-    uegrihhlohhuthemuceftddtnecusecvtfgvtghiphhivghnthhsucdlqddutddtmdenuc
-    fjughrpeffhffvuffkfhggtggujgesthdtredttddtvdenucfhrhhomheptehnughrvghs
-    ucfhrhgvuhhnugcuoegrnhgurhgvshesrghnrghrrgiivghlrdguvgeqnecuffhomhgrih
-    hnpehkvghrnhgvlhdrohhrghenucfkphepieejrdduiedtrddvudejrddvhedtnecuvehl
-    uhhsthgvrhfuihiivgeptdenucfrrghrrghmpehmrghilhhfrhhomheprghnughrvghsse
-    grnhgrrhgriigvlhdruggv
-X-ME-Proxy: <xmx:vPtBXkDqDa_oJdxnD02XP-QYN1Ilt1u5O2NAOpBQ5LLs3ReOgDO7KQ>
-    <xmx:vPtBXgJKwvzzk7kOkz32scZWplNg74F2fWtyqKFCro9Lx1Gl7E8DUA>
-    <xmx:vPtBXkN8kIb0XEZTbwinLnIgrFzIOEf9tuxSbfDNeY_qTHXCN_aI-g>
-    <xmx:vftBXmRMXBgZM7LgwQFLrSWk-w66oJWQUE8irDhrWy7-U2xTHvoIvPHm41A>
-Received: from intern.anarazel.de (c-67-160-217-250.hsd1.ca.comcast.net [67.160.217.250])
-        by mail.messagingengine.com (Postfix) with ESMTPA id DB4F03060840;
-        Mon, 10 Feb 2020 19:56:27 -0500 (EST)
-Date:   Mon, 10 Feb 2020 16:56:26 -0800
-From:   Andres Freund <andres@anarazel.de>
-To:     Linus Torvalds <torvalds@linux-foundation.org>
-Cc:     David Howells <dhowells@redhat.com>,
-        Greg Kroah-Hartman <gregkh@linuxfoundation.org>,
-        Casey Schaufler <casey@schaufler-ca.com>,
-        Stephen Smalley <sds@tycho.nsa.gov>,
-        Nicolas Dichtel <nicolas.dichtel@6wind.com>,
-        Ian Kent <raven@themaw.net>,
-        Christian Brauner <christian@brauner.io>,
-        keyrings@vger.kernel.org, linux-usb@vger.kernel.org,
-        linux-block <linux-block@vger.kernel.org>,
-        LSM List <linux-security-module@vger.kernel.org>,
-        linux-fsdevel <linux-fsdevel@vger.kernel.org>,
-        Linux API <linux-api@vger.kernel.org>,
-        Linux Kernel Mailing List <linux-kernel@vger.kernel.org>
-Subject: Re: [RFC PATCH 00/14] pipe: Keyrings, Block and USB notifications
- [ver #3]
-Message-ID: <20200211005626.7yqjf5rbs3vbwagd@alap3.anarazel.de>
-References: <157909503552.20155.3030058841911628518.stgit@warthog.procyon.org.uk>
- <CAHk-=wjrrOgznCy3yUmcmQY1z_7vXVr6GbvKiy8cLvWbxpmzcw@mail.gmail.com>
+        id S1727953AbgBKDwo (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Mon, 10 Feb 2020 22:52:44 -0500
+Received: from szxga05-in.huawei.com ([45.249.212.191]:9720 "EHLO huawei.com"
+        rhost-flags-OK-OK-OK-FAIL) by vger.kernel.org with ESMTP
+        id S1727800AbgBKDwo (ORCPT <rfc822;linux-block@vger.kernel.org>);
+        Mon, 10 Feb 2020 22:52:44 -0500
+Received: from DGGEMS412-HUB.china.huawei.com (unknown [172.30.72.59])
+        by Forcepoint Email with ESMTP id 0293FC4337C545197046;
+        Tue, 11 Feb 2020 11:52:42 +0800 (CST)
+Received: from huawei.com (10.175.124.28) by DGGEMS412-HUB.china.huawei.com
+ (10.3.19.212) with Microsoft SMTP Server id 14.3.439.0; Tue, 11 Feb 2020
+ 11:52:33 +0800
+From:   yu kuai <yukuai3@huawei.com>
+To:     <axboe@kernel.dk>, <ming.lei@redhat.com>
+CC:     <yukuai3@huawei.com>, <yi.zhang@huawei.com>,
+        <zhangxiaoxu5@huawei.com>, <luoshijie1@huawei.com>,
+        <linux-block@vger.kernel.org>, <linux-kernel@vger.kernel.org>
+Subject: [PATCH] block: rename 'q->debugfs_dir' in blk_unregister_queue()
+Date:   Tue, 11 Feb 2020 11:51:37 +0800
+Message-ID: <20200211035137.19454-1-yukuai3@huawei.com>
+X-Mailer: git-send-email 2.17.2
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <CAHk-=wjrrOgznCy3yUmcmQY1z_7vXVr6GbvKiy8cLvWbxpmzcw@mail.gmail.com>
+Content-Type: text/plain
+X-Originating-IP: [10.175.124.28]
+X-CFilter-Loop: Reflected
 Sender: linux-block-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-Hi,
+syzbot is reporting use after free bug in debugfs_remove[1].
 
-I only just now noticed this work after Dave Chinner pointed towards the
-feature in the email leading to
-https://lore.kernel.org/linux-fsdevel/20200211000405.5fohxgpt554gmnhu@alap3.anarazel.de/
+This is because in request_queue, 'q->debugfs_dir' and
+'q->blk_trace->dir' could be the same dir. And in __blk_release_queue(),
+blk_mq_debugfs_unregister() will remove everything inside the dir.
 
-On 2020-01-15 12:10:32 -0800, Linus Torvalds wrote:
-> So I no longer hate the implementation, but I do want to see the
-> actual user space users come out of the woodwork and try this out for
-> their use cases.
+With futher investigation of the reporduce repro, the problem can be
+reporduced by following procedure:
 
-Postgres has been looking for something roughly like this, fwiw (or
-well, been forced to).
+1. LOOP_CTL_ADD, create a request_queue q1, blk_mq_debugfs_register() will
+create the dir.
+2. LOOP_CTL_REMOVE, blk_release_queue() will add q1 to release queue.
+3. LOOP_CTL_ADD, create another request_queue q2,blk_mq_debugfs_register()
+will fail because the dir aready exist.
+4. BLKTRACESETUP, create two files(msg and dropped) inside the dir.
+5. call __blk_release_queue() for q1, debugfs_remove_recursive() will
+delete the files created in step 4.
+6. LOOP_CTL_REMOVE, blk_release_queue() will add q2 to release queue.
+And when __blk_release_queue() is called for q2, blk_trace_shutdown() will
+try to release the two files created in step 4, wich are aready released
+in step 5.
 
-While it's better than it used to be (due to b4678df184b3), we still
-have problems to reliably detect buffered IO errors, especially when
-done across multiple processes.  We can't easily keep an fd open that
-predates all writes to a file until, and ensure that fsyncs will happen
-only on that fd. The primary reasons for that are
-1) every connection (& some internal jobs) is a process, and neither do
-want to to fsyncing each touched file in short-lived connections, nor is
-it desirable to have to add the complication of having to transfer fds
-between processes just to reliably get an error in fsync().
-2) we have to cope with having more files open than allowed, so we have
-a layer that limits the number of OS level FDs open at the same time. We
-don't want to fsync whenever we have to juggle open fds though, as
-that'd be too costly.
+|thread1		  |kworker	             |thread2               |
+| ----------------------- | ------------------------ | -------------------- |
+|loop_control_ioctl       |                          |                      |
+| loop_add                |                          |                      |
+|  blk_mq_debugfs_register|                          |                      |
+|   debugfs_create_dir    |                          |                      |
+|loop_control_ioctl       |                          |                      |
+| loop_remove		  |                          |                      |
+|  blk_release_queue      |                          |                      |
+|   schedule_work         |                          |                      |
+|			  |			     |loop_control_ioctl    |
+|			  |			     | loop_add             |
+|			  |			     |  ...                 |
+|			  |			     |blk_trace_ioctl       |
+|			  |			     | __blk_trace_setup    |
+|			  |			     |   debugfs_create_file|
+|			  |__blk_release_queue       |                      |
+|			  | blk_mq_debugfs_unregister|                      |
+|			  |  debugfs_remove_recursive|                      |
+|			  |			     |loop_control_ioctl    |
+|			  |			     | loop_remove          |
+|			  |			     |  ...                 |
+|			  |__blk_release_queue       |                      |
+|			  | blk_trace_shutdown       |                      |
+|			  |  debugfs_remove          |                      |
 
-So it'd good to have a way to *reliably* know when writeback io failed,
-so we can abort a checkpoint if necessary, and instead perform journal
-replay.
+commit dc9edc44de6c ("block: Fix a blk_exit_rl() regression") pushed the
+final release of request_queue to a workqueue, so, when loop_add() is
+called again(step 3), __blk_release_queue() might not been called yet,
+which causes the problem.
 
+Fix the problem by renaming 'q->debugfs_dir' in blk_unregister_queue().
 
-For our purposes we'd probably want errors on the fs/superblock level,
-rather than block devices. It's not always easy to map between blockdevs
-and relevant filesystems, there are errors above the block layer, and we
-definitely don'tt want to crash & restart a database just because
-somebody pulled an USB storage device that didn't have any of the
-database's data on it.
+[1] https://syzkaller.appspot.com/bug?extid=903b72a010ad6b7a40f2
+References: CVE-2019-19770
+Fixes: commit dc9edc44de6c ("block: Fix a blk_exit_rl() regression")
+Reported-by: syzbot <syz...@syzkaller.appspotmail.com>
+Signed-off-by: yu kuai <yukuai3@huawei.com>
+---
+ block/blk-sysfs.c | 29 +++++++++++++++++++++++++++++
+ 1 file changed, 29 insertions(+)
 
-An earlier version of this patchset had some support for that, albeit
-perhaps not fully implemented (no errors raised, afaict?):
-https://git.kernel.org/pub/scm/linux/kernel/git/dhowells/linux-fs.git/commit/?h=notifications&id=338eec77a0cb29a7d2ae9350066c1990408ae58e
-
-Is the plan to pick this up again once the basic feature is in?
-
-
-A few notes from the email referenced above (that actually seem to belong
-into this thread more than the other:
-
-1) From the angle of reliably needing to detect writeback errors, I find it
-somewhat concerning that an LSM may end up entirely filtering away error
-notifications, without a consumer being able to detect that:
-
-+void __post_watch_notification(struct watch_list *wlist,
-+			       struct watch_notification *n,
-+			       const struct cred *cred,
-+			       u64 id)
+diff --git a/block/blk-sysfs.c b/block/blk-sysfs.c
+index fca9b158f4a0..69d28b3f52d0 100644
+--- a/block/blk-sysfs.c
++++ b/block/blk-sysfs.c
+@@ -11,6 +11,7 @@
+ #include <linux/blktrace_api.h>
+ #include <linux/blk-mq.h>
+ #include <linux/blk-cgroup.h>
++#include <linux/debugfs.h>
+ 
+ #include "blk.h"
+ #include "blk-mq.h"
+@@ -1011,6 +1012,33 @@ int blk_register_queue(struct gendisk *disk)
+ }
+ EXPORT_SYMBOL_GPL(blk_register_queue);
+ 
++/*
++ * blk_prepare_release_queue - rename q->debugfs_dir
++ * @q: request_queue of which the dir to be renamed belong to.
++ *
++ * Because the final release of request_queue is in a workqueue, the
++ * cleanup might not been finished yet while the same device start to
++ * create. It's not correct if q->debugfs_dir still exist while trying
++ * to create a new one.
++ */
++static struct dentry *blk_prepare_release_queue(struct request_queue *q)
 +{
-...
-+		if (security_post_notification(watch->cred, cred, n) < 0)
-+			continue;
++	struct dentry *new = NULL;
++	char name[DNAME_INLINE_LEN];
++	int i = 0;
++
++	if (IS_ERR_OR_NULL(q->debugfs_dir))
++		return q->debugfs_dir;
++
++	while (new == NULL) {
++		sprintf(name, "ready_to_remove_%d", i++);
++		new = debugfs_rename(blk_debugfs_root, q->debugfs_dir,
++				     blk_debugfs_root, name);
++	}
++
++	return new;
++}
++
+ /**
+  * blk_unregister_queue - counterpart of blk_register_queue()
+  * @disk: Disk of which the request queue should be unregistered from sysfs.
+@@ -1039,6 +1067,7 @@ void blk_unregister_queue(struct gendisk *disk)
+ 	mutex_unlock(&q->sysfs_lock);
+ 
+ 	mutex_lock(&q->sysfs_dir_lock);
++	q->debugfs_dir = blk_prepare_release_queue(q);
+ 	/*
+ 	 * Remove the sysfs attributes before unregistering the queue data
+ 	 * structures that can be modified through sysfs.
+-- 
+2.17.2
 
-It's an unpleasant thought that an overly restrictive [-ly configured]
-LSM could lead to silently swallowing data integrity errors.
-
-2) It'd be good if there were documentation, aimed at userland consumers
-of this, explaining what the delivery guarantees are. To be useful for
-us, it needs to be guaranteed that consuming all notifications ensures
-that there are no pending notifications queued up somewhere (so we can
-do fsync(data); fsync(journal); check_for_errors();
-durable_rename(checkpoint_state.tmp, checkpoint_state);).
-
-3) What will the permission model for accessing the notifications be?
-It seems currently anyone, even within a container/namespace or
-something, will see blockdev errors from everywhere?  The earlier
-superblock support (I'm not sure I like that name btw, hard to
-understand for us userspace folks), seems to have required exec
-permission, but nothing else.
-
-Greetings,
-
-Andres Freund
