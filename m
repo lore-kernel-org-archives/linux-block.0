@@ -2,131 +2,110 @@ Return-Path: <SRS0=TQg9=4A=vger.kernel.org=linux-block-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-13.1 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
-	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,
-	MENTIONS_GIT_HOSTING,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,USER_AGENT_SANE_1
-	autolearn=unavailable autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-5.1 required=3.0 tests=DKIM_SIGNED,DKIM_VALID,
+	DKIM_VALID_AU,FREEMAIL_FORGED_FROMDOMAIN,FREEMAIL_FROM,
+	HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,
+	SPF_PASS,USER_AGENT_SANE_1 autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id D26F1C352A4
-	for <linux-block@archiver.kernel.org>; Wed, 12 Feb 2020 20:07:38 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id CD691C352A4
+	for <linux-block@archiver.kernel.org>; Wed, 12 Feb 2020 20:23:25 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.kernel.org (Postfix) with ESMTP id A4BD721739
-	for <linux-block@archiver.kernel.org>; Wed, 12 Feb 2020 20:07:38 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id 9ADC921734
+	for <linux-block@archiver.kernel.org>; Wed, 12 Feb 2020 20:23:25 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (2048-bit key) header.d=embeddedor.com header.i=@embeddedor.com header.b="wSKpavxf"
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="VI24w9HH"
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1727548AbgBLUHi (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Wed, 12 Feb 2020 15:07:38 -0500
-Received: from gateway20.websitewelcome.com ([192.185.70.14]:29743 "EHLO
-        gateway20.websitewelcome.com" rhost-flags-OK-OK-OK-OK)
-        by vger.kernel.org with ESMTP id S1727439AbgBLUHh (ORCPT
+        id S1727600AbgBLUXZ (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Wed, 12 Feb 2020 15:23:25 -0500
+Received: from mail-wr1-f67.google.com ([209.85.221.67]:35574 "EHLO
+        mail-wr1-f67.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S1727548AbgBLUXY (ORCPT
         <rfc822;linux-block@vger.kernel.org>);
-        Wed, 12 Feb 2020 15:07:37 -0500
-X-Greylist: delayed 1448 seconds by postgrey-1.27 at vger.kernel.org; Wed, 12 Feb 2020 15:07:37 EST
-Received: from cm12.websitewelcome.com (cm12.websitewelcome.com [100.42.49.8])
-        by gateway20.websitewelcome.com (Postfix) with ESMTP id A8A9B400C647D
-        for <linux-block@vger.kernel.org>; Wed, 12 Feb 2020 12:29:52 -0600 (CST)
-Received: from gator4166.hostgator.com ([108.167.133.22])
-        by cmsmtp with SMTP
-        id 1xuzj1WJuvBMd1xuzj0B0F; Wed, 12 Feb 2020 13:43:29 -0600
-X-Authority-Reason: nr=8
-DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed;
-        d=embeddedor.com; s=default; h=Content-Type:MIME-Version:Message-ID:Subject:
-        Cc:To:From:Date:Sender:Reply-To:Content-Transfer-Encoding:Content-ID:
-        Content-Description:Resent-Date:Resent-From:Resent-Sender:Resent-To:Resent-Cc
-        :Resent-Message-ID:In-Reply-To:References:List-Id:List-Help:List-Unsubscribe:
-        List-Subscribe:List-Post:List-Owner:List-Archive;
-        bh=8FWXDkVW2wDjkeRVhdg2pGdPCjOZiCetHczI8jearAI=; b=wSKpavxf1MKDOkewMMDptIziQj
-        DKEcF0hjxEfd0gk75Qp79sxH8dhY+hhDeWpcCIx9QAFYbqFP3+R7bFE+iVYGPE5y9Pwhw19A/7WhE
-        wPYL/clnYeUdUCxyP/VgOMCW63JJulyeaEJUVyBYcyD8ZHMzXVFcvs00OyjQz5PUpnGAdfm5vE1SA
-        mJ4ThVrzbKA0dEo3MwZsh2ma+OPwToVT3lxS683aHSHTZR4fWcpJ+H9vwCOXbQjD0M9LZHiQiCfk7
-        tkxXgukA5hR4/0ev8m4yQqJNm+YkBEUWeb9VpWiNkkkWdSMYtzl0EHwdxxx6UKc7p58e6P7HOJViY
-        CCH6iSmQ==;
-Received: from [201.144.174.25] (port=23782 helo=embeddedor)
-        by gator4166.hostgator.com with esmtpa (Exim 4.92)
-        (envelope-from <gustavo@embeddedor.com>)
-        id 1j1xux-001DLa-VL; Wed, 12 Feb 2020 13:43:28 -0600
-Date:   Wed, 12 Feb 2020 13:46:02 -0600
-From:   "Gustavo A. R. Silva" <gustavo@embeddedor.com>
-To:     Joshua Morris <josh.h.morris@us.ibm.com>,
-        Philip Kelleher <pjk1939@linux.ibm.com>,
-        Jens Axboe <axboe@kernel.dk>
-Cc:     linux-block@vger.kernel.org, linux-kernel@vger.kernel.org,
-        "Gustavo A. R. Silva" <gustavo@embeddedor.com>
-Subject: [PATCH] rsxx: Replace zero-length array with flexible-array member
-Message-ID: <20200212194602.GA31712@embeddedor>
+        Wed, 12 Feb 2020 15:23:24 -0500
+Received: by mail-wr1-f67.google.com with SMTP id w12so3992663wrt.2
+        for <linux-block@vger.kernel.org>; Wed, 12 Feb 2020 12:23:23 -0800 (PST)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=gmail.com; s=20161025;
+        h=date:from:to:cc:subject:message-id:mime-version:content-disposition
+         :user-agent;
+        bh=yWsKB+a3ZjYcN/0REYG1TMy1vc1xk8C1cBkr08M7nvk=;
+        b=VI24w9HHfDbU2qSN86AeWXKzwALWZY5q1p6AJHdf/G+NF2t2iFSpPdNkeBEC8WH4NB
+         zb/Otv1eO0dOzYG09kHAqN9FVUxz/gtZvGRPrYjlB2GtDmu4MskXvE79Iyu73BJAzajk
+         twtTyNvwwwIY40fqbH1sRXCEk2rC0LTZf2DWtLygBsxt72WJuqSZi+JxwYzMJZt/z+KB
+         /p6DwbWsMnXUJ3DlaBkT7H8IejyLF78CS8lgCCUJ8PeCQoSQqjqxdIdS5YSs5hoP3S4n
+         h8p74ggUtj+b/lCXTl5u0xc2a2o55qkEW/woKj33oRhXqNrUS/+TUmPkgr6WjvmBuapJ
+         nKRA==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20161025;
+        h=x-gm-message-state:date:from:to:cc:subject:message-id:mime-version
+         :content-disposition:user-agent;
+        bh=yWsKB+a3ZjYcN/0REYG1TMy1vc1xk8C1cBkr08M7nvk=;
+        b=syvrdIfY8lDcJAsXJ2faXFK3NDoT90ayi5A7bVcDXyRzk+2Ep6yK3S/mqR8BlBjves
+         xW0v26APl5kJlf62pkKa0fOi8iVkKDxWOTTMub/VvjVqAwslWCFuYfLKNlFbpuCKHucx
+         osAN0O+7RH0DhP++9wEVS6+/vjgq8xtEJ8Q4mu32cWni4Vj9v3ObnmrEkBrRcf6JAX+Z
+         5BhZJ31oxRiMnNi++AO88oVQRajNNd2QK/GAnPIO4pdydwkTKohHn/sn+UKhmS4TVO4X
+         fOyREHHb2ye4aqP15siPftGh4sPlL5kFUbRMh4+b9ZSHSnOFilb7/TQnWwEPwZupSCg2
+         zPTg==
+X-Gm-Message-State: APjAAAWaHjC2B259V558+z7nZSogvigxCffOuMKJod/vovHbJJl7hdB4
+        FVreSz9w7nwt/SFgtMTKhM7DJbs=
+X-Google-Smtp-Source: APXvYqxubkOCT0XfKgvlKmVJD40n2Kye7exIBsHeirjVFTWpucnbfZOWkStkQG/v/l+OPTKuRiIcNw==
+X-Received: by 2002:a5d:62c8:: with SMTP id o8mr16718056wrv.316.1581539002918;
+        Wed, 12 Feb 2020 12:23:22 -0800 (PST)
+Received: from avx2 ([46.53.253.3])
+        by smtp.gmail.com with ESMTPSA id z11sm1902377wrv.96.2020.02.12.12.23.22
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Wed, 12 Feb 2020 12:23:22 -0800 (PST)
+Date:   Wed, 12 Feb 2020 23:23:20 +0300
+From:   Alexey Dobriyan <adobriyan@gmail.com>
+To:     axboe@kernel.dk
+Cc:     linux-block@vger.kernel.org
+Subject: [PATCH] null_blk: fix spurious IO errors after failed past-wp access
+Message-ID: <20200212202320.GA2704@avx2>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
+Content-Type: text/plain; charset=utf-8
 Content-Disposition: inline
-User-Agent: Mutt/1.9.4 (2018-02-28)
-X-AntiAbuse: This header was added to track abuse, please include it with any abuse report
-X-AntiAbuse: Primary Hostname - gator4166.hostgator.com
-X-AntiAbuse: Original Domain - vger.kernel.org
-X-AntiAbuse: Originator/Caller UID/GID - [47 12] / [47 12]
-X-AntiAbuse: Sender Address Domain - embeddedor.com
-X-BWhitelist: no
-X-Source-IP: 201.144.174.25
-X-Source-L: No
-X-Exim-ID: 1j1xux-001DLa-VL
-X-Source: 
-X-Source-Args: 
-X-Source-Dir: 
-X-Source-Sender: (embeddedor) [201.144.174.25]:23782
-X-Source-Auth: gustavo@embeddedor.com
-X-Email-Count: 40
-X-Source-Cap: Z3V6aWRpbmU7Z3V6aWRpbmU7Z2F0b3I0MTY2Lmhvc3RnYXRvci5jb20=
-X-Local-Domain: yes
+User-Agent: Mutt/1.10.1 (2018-07-13)
 Sender: linux-block-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-The current codebase makes use of the zero-length array language
-extension to the C90 standard, but the preferred mechanism to declare
-variable-length types such as these ones is a flexible array member[1][2],
-introduced in C99:
+Steps to reproduce:
 
-struct foo {
-        int stuff;
-        struct boo array[];
-};
+	BLKRESETZONE zone 0
 
-By making use of the mechanism above, we will get a compiler warning
-in case the flexible array does not occur last in the structure, which
-will help us prevent some kind of undefined behavior bugs from being
-inadvertenly introduced[3] to the codebase from now on.
+	// force EIO
+	pwrite(fd, buf, 4096, 4096);
 
-Also, notice that, dynamic memory allocations won't be affected by
-this change:
+	[issue more IO including zone ioctls]
 
-"Flexible array members have incomplete type, and so the sizeof operator
-may not be applied. As a quirk of the original implementation of
-zero-length arrays, sizeof evaluates to zero."[1]
+It will start failing randomly including IO to unrelated zones because of
+->error "reuse". Trigger can be partition detection as well if test is not
+run immediately which is even more entertaining.
 
-This issue was found with the help of Coccinelle.
+The fix is of course to clear ->error where necessary.
 
-[1] https://gcc.gnu.org/onlinedocs/gcc/Zero-Length.html
-[2] https://github.com/KSPP/linux/issues/21
-[3] commit 76497732932f ("cxgb3/l2t: Fix undefined behaviour")
-
-Signed-off-by: Gustavo A. R. Silva <gustavo@embeddedor.com>
+Signed-off-by: Alexey Dobriyan (SK hynix) <adobriyan@gmail.com>
 ---
- drivers/block/rsxx/dma.c | 2 +-
- 1 file changed, 1 insertion(+), 1 deletion(-)
 
-diff --git a/drivers/block/rsxx/dma.c b/drivers/block/rsxx/dma.c
-index 111eb659e66d..1914f5488b22 100644
---- a/drivers/block/rsxx/dma.c
-+++ b/drivers/block/rsxx/dma.c
-@@ -80,7 +80,7 @@ struct dma_tracker {
- struct dma_tracker_list {
- 	spinlock_t		lock;
- 	int			head;
--	struct dma_tracker	list[0];
-+	struct dma_tracker	list[];
- };
- 
- 
--- 
-2.25.0
+ drivers/block/null_blk_main.c |    2 ++
+ 1 file changed, 2 insertions(+)
 
+--- a/drivers/block/null_blk_main.c
++++ b/drivers/block/null_blk_main.c
+@@ -605,6 +605,7 @@ static struct nullb_cmd *__alloc_cmd(struct nullb_queue *nq)
+ 	if (tag != -1U) {
+ 		cmd = &nq->cmds[tag];
+ 		cmd->tag = tag;
++		cmd->error = BLK_STS_OK;
+ 		cmd->nq = nq;
+ 		if (nq->dev->irqmode == NULL_IRQ_TIMER) {
+ 			hrtimer_init(&cmd->timer, CLOCK_MONOTONIC,
+@@ -1385,6 +1386,7 @@ static blk_status_t null_queue_rq(struct blk_mq_hw_ctx *hctx,
+ 		cmd->timer.function = null_cmd_timer_expired;
+ 	}
+ 	cmd->rq = bd->rq;
++	cmd->error = BLK_STS_OK;
+ 	cmd->nq = nq;
+ 
+ 	blk_mq_start_request(bd->rq);
