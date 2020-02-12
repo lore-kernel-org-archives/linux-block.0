@@ -2,100 +2,75 @@ Return-Path: <SRS0=TQg9=4A=vger.kernel.org=linux-block-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-4.1 required=3.0 tests=DKIMWL_WL_HIGH,DKIM_SIGNED,
-	DKIM_VALID,DKIM_VALID_AU,MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,
-	SPF_PASS autolearn=no autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-0.8 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
+	MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS autolearn=no autolearn_force=no
+	version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 6BDE8C352A4
-	for <linux-block@archiver.kernel.org>; Wed, 12 Feb 2020 23:06:43 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 949DDC352A4
+	for <linux-block@archiver.kernel.org>; Wed, 12 Feb 2020 23:07:08 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.kernel.org (Postfix) with ESMTP id 3AB602173E
-	for <linux-block@archiver.kernel.org>; Wed, 12 Feb 2020 23:06:43 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=default; t=1581548803;
-	bh=/DTM3tuBfNcqOdOs7khZQoo5hKkjgvInIUwodckq8Tw=;
-	h=Date:From:To:Cc:Subject:References:In-Reply-To:List-ID:From;
-	b=kA91gEWKI9b2JrAH4L1Si9qq/x3bPe0+GD6Cl3kqPsMBiLswgDza/xcivq8Fc5i+D
-	 kHoVzQgZ3kKfQeeVMsAIQJt9DVOUo4RV8Pv+Eoxn2Ow2VNe7ITKovpXJzDNeeW89cI
-	 5Njbdz5YN4+YPMb4Mq0oVkCYRwNx6NyaUd+gP6hU=
+	by mail.kernel.org (Postfix) with ESMTP id 65BCE2168B
+	for <linux-block@archiver.kernel.org>; Wed, 12 Feb 2020 23:07:08 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1728674AbgBLXGm (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Wed, 12 Feb 2020 18:06:42 -0500
-Received: from mail-qk1-f193.google.com ([209.85.222.193]:46305 "EHLO
-        mail-qk1-f193.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1727692AbgBLXGm (ORCPT
+        id S1729133AbgBLXHH (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Wed, 12 Feb 2020 18:07:07 -0500
+Received: from outgoing-auth-1.mit.edu ([18.9.28.11]:47354 "EHLO
+        outgoing.mit.edu" rhost-flags-OK-OK-OK-FAIL) by vger.kernel.org
+        with ESMTP id S1727692AbgBLXHH (ORCPT
         <rfc822;linux-block@vger.kernel.org>);
-        Wed, 12 Feb 2020 18:06:42 -0500
-Received: by mail-qk1-f193.google.com with SMTP id u124so3328411qkh.13;
-        Wed, 12 Feb 2020 15:06:41 -0800 (PST)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20161025;
-        h=sender:date:from:to:cc:subject:message-id:references:mime-version
-         :content-disposition:in-reply-to;
-        bh=jrnsMbO/zuCHlgaM/a/FjOvE1m1S8Xf2JYCWP8EYCzM=;
-        b=j25pRrxQLvVZl/hEdj5hXOzR1QKKISX1INcpFeUQwW54ZkvXglE2Q8is0HTnPgMVhY
-         +rrllujU687I53A7vCShJl/TveRHUdGZ7FLptbaNixQzozpWPI0q2u00LR0jlKDRjkuP
-         d0JFMpSmy6fiaW+th1QywF2c8Kw4Qq1NGxrlOZvw6+qow4skZ3y1Ywg9vLEP/OLLL+uH
-         tvDX3ICWcLknKYTPQoH6mOUomjQnTai2SXty1W3W1b0zZ35Oqj3GFmY81AZurUAiiUWR
-         5zka7dCR9XMARQQxkUKkhslnuVIlmbsMgSRGtPvWpe/4ckBcScSgES52ks4wZSQK18sd
-         MsTQ==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20161025;
-        h=x-gm-message-state:sender:date:from:to:cc:subject:message-id
-         :references:mime-version:content-disposition:in-reply-to;
-        bh=jrnsMbO/zuCHlgaM/a/FjOvE1m1S8Xf2JYCWP8EYCzM=;
-        b=jCpO0mq4tiS60s+0tvdbwId92LqygdA0JJmgGwn0/NJwN05lbpdg1u5w//fY0E2XYv
-         nlYI5m8qPwi9yQFQrc7Nxq3nnUT15QXEWjLQNJwHgd0l86bp/JyAaEMy18wfsGztu8aN
-         VJOHMquqlidFbxGhXUbunYfpfZJm/HE1k24wuc1aqqSEOWmVXjTae9bw9ziOBmxMjgJr
-         BQJZSl/f+7sf9hGo2wakzkBgNJ2GFb0ib74HQeXc2X/Ian4voOgZe5/or+PtM7BxR8YI
-         04zyihQ51Bv1vNWhwPCnY8YOauGs2I/zgiPogaLVdstuDKbUAKGgDax3WtSm7Hz0HfVH
-         UJrg==
-X-Gm-Message-State: APjAAAXQ29A28l0omkOyEVFsNQP8/X90MgZJUu+cZh0BulN/yG7XhNfe
-        OzjUXNGBVYGHMUXQYYwuPRY=
-X-Google-Smtp-Source: APXvYqzyupirnc7FNqs6+23Z+NrOu4SQsRZxZIR/DBtolDAuCBUvyT7P4LDYC1xY7Hzx8LVsTZx3Cg==
-X-Received: by 2002:a37:4894:: with SMTP id v142mr9221211qka.220.1581548801036;
-        Wed, 12 Feb 2020 15:06:41 -0800 (PST)
-Received: from localhost ([2620:10d:c091:500::1:985a])
-        by smtp.gmail.com with ESMTPSA id b7sm224522qka.67.2020.02.12.15.06.40
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Wed, 12 Feb 2020 15:06:40 -0800 (PST)
-Date:   Wed, 12 Feb 2020 18:06:39 -0500
-From:   Tejun Heo <tj@kernel.org>
-To:     Dan Schatzberg <dschatzberg@fb.com>
-Cc:     Jens Axboe <axboe@kernel.dk>, Li Zefan <lizefan@huawei.com>,
-        Johannes Weiner <hannes@cmpxchg.org>,
-        Michal Hocko <mhocko@kernel.org>,
-        Vladimir Davydov <vdavydov.dev@gmail.com>,
-        Andrew Morton <akpm@linux-foundation.org>,
-        Hugh Dickins <hughd@google.com>,
-        "open list:BLOCK LAYER" <linux-block@vger.kernel.org>,
-        open list <linux-kernel@vger.kernel.org>,
-        "open list:CONTROL GROUP (CGROUP)" <cgroups@vger.kernel.org>,
-        "open list:CONTROL GROUP - MEMORY RESOURCE CONTROLLER (MEMCG)" 
-        <linux-mm@kvack.org>
-Subject: Re: [PATCH 1/2] mm: Charge current memcg when no mm is set
-Message-ID: <20200212230639.GC88887@mtj.thefacebook.com>
-References: <20200205223348.880610-1-dschatzberg@fb.com>
- <20200205223348.880610-2-dschatzberg@fb.com>
+        Wed, 12 Feb 2020 18:07:07 -0500
+Received: from callcc.thunk.org (guestnat-104-133-0-101.corp.google.com [104.133.0.101] (may be forged))
+        (authenticated bits=0)
+        (User authenticated as tytso@ATHENA.MIT.EDU)
+        by outgoing.mit.edu (8.14.7/8.12.4) with ESMTP id 01CN6rwI006237
+        (version=TLSv1/SSLv3 cipher=DHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
+        Wed, 12 Feb 2020 18:06:53 -0500
+Received: by callcc.thunk.org (Postfix, from userid 15806)
+        id CAA92420324; Wed, 12 Feb 2020 18:06:52 -0500 (EST)
+Date:   Wed, 12 Feb 2020 18:06:52 -0500
+From:   "Theodore Y. Ts'o" <tytso@mit.edu>
+To:     Salman Qazi <sqazi@google.com>
+Cc:     Jens Axboe <axboe@kernel.dk>, Ming Lei <ming.lei@redhat.com>,
+        Bart Van Assche <bvanassche@acm.org>,
+        Christoph Hellwig <hch@lst.de>,
+        Linux Kernel Mailing List <linux-kernel@vger.kernel.org>,
+        linux-block@vger.kernel.org, Gwendal Grignou <gwendal@google.com>,
+        Jesse Barnes <jsbarnes@google.com>
+Subject: Re: BLKSECDISCARD ioctl and hung tasks
+Message-ID: <20200212230652.GA145444@mit.edu>
+References: <CAKUOC8VN5n+YnFLPbQWa1hKp+vOWH26FKS92R+h4EvS=e11jFA@mail.gmail.com>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=us-ascii
 Content-Disposition: inline
-In-Reply-To: <20200205223348.880610-2-dschatzberg@fb.com>
+In-Reply-To: <CAKUOC8VN5n+YnFLPbQWa1hKp+vOWH26FKS92R+h4EvS=e11jFA@mail.gmail.com>
 Sender: linux-block-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-On Wed, Feb 05, 2020 at 02:33:47PM -0800, Dan Schatzberg wrote:
-> This modifies the shmem and mm charge logic so that now if there is no
-> mm set (as in the case of tmpfs backed loop device), we charge the
-> current memcg, if set.
-> 
-> Signed-off-by: Dan Schatzberg <dschatzberg@fb.com>
+This is a problem we've been strugging with in other contexts.  For
+example, if you have the hung task timer set to 2 minutes, and the
+system to panic if the hung task timer exceeds that, and an NFS server
+which the client is writing to crashes, and it takes longer for the
+NFS server to come back, that might be a situation where we might want
+to exempt the hung task warning from panic'ing the system.  On the
+other hand, if the process is failing to schedule for other reasons,
+maybe we would still want the hung task timeout to go off.
 
-Acked-by: Tejun Heo <tj@kernel.org>
+So I've been meditating over whether the right answer is to just
+globally configure the hung task timer to something like 5 or 10
+minutes (which would require no kernel changes, yay?), or have some
+way of telling the hung task timeout logic that it shouldn't apply, or
+should have a different timeout, when we're waiting for I/O to
+complete.
 
-Thanks.
+It seems to me that perhaps there's a different solution here for your
+specific case, which is what if there is a asynchronous version of
+BLKSECDISCARD, either using io_uring or some other interface?  That
+bypasses the whole issue of how do we modulate the hung task timeout
+when it's a situation where maybe it's OK for a userspace thread to
+block for more than 120 seconds, without having to either completely
+disable the hung task timeout, or changing it globally to some much
+larger value.
 
--- 
-tejun
+					- Ted
