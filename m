@@ -2,84 +2,124 @@ Return-Path: <SRS0=TQg9=4A=vger.kernel.org=linux-block-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-1.1 required=3.0 tests=DKIMWL_WL_HIGH,DKIM_SIGNED,
-	DKIM_VALID,DKIM_VALID_AU,MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS
-	autolearn=no autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-3.8 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
+	MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS autolearn=no
+	autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 50E9EC352A4
-	for <linux-block@archiver.kernel.org>; Wed, 12 Feb 2020 21:20:07 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 90D85C352A4
+	for <linux-block@archiver.kernel.org>; Wed, 12 Feb 2020 21:21:30 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.kernel.org (Postfix) with ESMTP id 19FD1206D7
-	for <linux-block@archiver.kernel.org>; Wed, 12 Feb 2020 21:20:07 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=default; t=1581542407;
-	bh=GIcfLJ/kAlm0Ag1pvocMMuNM0n6xyVSBoWBw0xNFnJM=;
-	h=Date:From:To:Cc:Subject:References:In-Reply-To:List-ID:From;
-	b=wK663bjtwqkgV/VZ9bC0JyuMEVVBesoT/dq048K1PsjC8kfaFmZoqsIzXwvvUnjKF
-	 4jxr1rZZM0H5CWLm9sL681duLlRXtaR9WMTSejaUak9DLQVlDxo0SQcw5ysuTUwE2Y
-	 x5UBwqMwtK9jEB7ibAQf9j7I1YBR/gmE4NpexA7Y=
+	by mail.kernel.org (Postfix) with ESMTP id 6CD7A2467C
+	for <linux-block@archiver.kernel.org>; Wed, 12 Feb 2020 21:21:30 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1727947AbgBLVUG (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Wed, 12 Feb 2020 16:20:06 -0500
-Received: from mail-qt1-f180.google.com ([209.85.160.180]:37253 "EHLO
-        mail-qt1-f180.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1727548AbgBLVUG (ORCPT
+        id S1727420AbgBLVVa (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Wed, 12 Feb 2020 16:21:30 -0500
+Received: from freki.datenkhaos.de ([81.7.17.101]:38118 "EHLO
+        freki.datenkhaos.de" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S1727548AbgBLVV3 (ORCPT
         <rfc822;linux-block@vger.kernel.org>);
-        Wed, 12 Feb 2020 16:20:06 -0500
-Received: by mail-qt1-f180.google.com with SMTP id w47so2777923qtk.4
-        for <linux-block@vger.kernel.org>; Wed, 12 Feb 2020 13:20:05 -0800 (PST)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20161025;
-        h=sender:date:from:to:cc:subject:message-id:references:mime-version
-         :content-disposition:in-reply-to;
-        bh=1bU26zeh4MdvuXmPDJT4p/4xaGLd8hghveN0fr+YHY4=;
-        b=Tv8esNDefrmk6Kmupm/EaTHf5ru45YLxxKqNNXRtAkjaOpWSIkrYF7ukgonzPJtxtI
-         VTXwBRSnGvkB52o0AXsJpZ/CEopmaaKj9kAZ44DADajQ0Rx42OL8WGbkptPAWhTsXwQD
-         3+CTMy1x3F9kNFtlEf+ecVOcA4HlOPUJxOROaVMZMjxPDNIu92BFIWopQuOYndUs2TZu
-         cUpUnTvKx5Phfb3S2mFJsDBSC3gwq1ZDXmRyd8TvhyUqzp3b8o4Eh/l6XJ1Lu6f0ORR6
-         SsylezaiR9VrEFGjUrSigplD/+rIaqMtX/d4JDogrHZ7JjQ1Ns82RELnTtPqq2BZJIKp
-         2SiA==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20161025;
-        h=x-gm-message-state:sender:date:from:to:cc:subject:message-id
-         :references:mime-version:content-disposition:in-reply-to;
-        bh=1bU26zeh4MdvuXmPDJT4p/4xaGLd8hghveN0fr+YHY4=;
-        b=hEP+VcOhbuMiEEn2BvdwNBLLDucwCE5s9oAOWFGKm4Wnzgt9zKKoQ+98veZq7+vX0X
-         sAE7RgiW/b2vCNaA+aybhJDofbXi1LoerhYgh2zboGGNu3kbmgHFR4xggJqhUToMV6nJ
-         bMA6LUXRlcBIb+LF+uPIxhL5IYLVwoqXlAhhKmFK57GWmDfDdZrKx+RMpIETuX/qYj40
-         FKOHCRR9SuUrciDnr79GyITLS02VBxIwcKK4J0L0yvy6qw4Tlkfi2lZsJJ3KnTQnbzPP
-         +xQIqVdd7bMK+1mIcbCyDsAQ2I5Q13ZXiOK7v36eQ1eY4y06He/1WqnhYfSEvm4FOdbs
-         aBqg==
-X-Gm-Message-State: APjAAAVqTw6g4F9rj1Zp1i2fu1+Ji85NzD6FYjTddhdOnCvHoXzznGSz
-        PxFsJGOT6pCCUlAew2gtfB0=
-X-Google-Smtp-Source: APXvYqwiKoGH+Fide9YL6ATH4CTwLKYFzJDPZMJBo6X3q/gMEPXa8DYj1BEQ0TXNUKxJtj1UVk0qYg==
-X-Received: by 2002:ac8:1ca:: with SMTP id b10mr8779886qtg.314.1581542405153;
-        Wed, 12 Feb 2020 13:20:05 -0800 (PST)
-Received: from localhost ([2620:10d:c091:500::1:985a])
-        by smtp.gmail.com with ESMTPSA id w41sm211462qtj.49.2020.02.12.13.20.04
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Wed, 12 Feb 2020 13:20:04 -0800 (PST)
-Date:   Wed, 12 Feb 2020 16:20:04 -0500
-From:   Tejun Heo <tj@kernel.org>
-To:     Paolo Valente <paolo.valente@linaro.org>
-Cc:     linux-block <linux-block@vger.kernel.org>
-Subject: Re: iocost_monitor.py tells that iocost is not enabled
-Message-ID: <20200212212004.GD80993@mtj.thefacebook.com>
-References: <8FD4B865-5984-476F-BE47-98938D162749@linaro.org>
+        Wed, 12 Feb 2020 16:21:29 -0500
+X-Greylist: delayed 385 seconds by postgrey-1.27 at vger.kernel.org; Wed, 12 Feb 2020 16:21:27 EST
+Received: from localhost (localhost [127.0.0.1])
+        by freki.datenkhaos.de (Postfix) with ESMTP id 7666A22882CB;
+        Wed, 12 Feb 2020 22:15:01 +0100 (CET)
+Received: from freki.datenkhaos.de ([127.0.0.1])
+        by localhost (freki.datenkhaos.de [127.0.0.1]) (amavisd-new, port 10024)
+        with ESMTP id bCFkDBKXADtd; Wed, 12 Feb 2020 22:14:57 +0100 (CET)
+Received: from latitude (x4e367a0e.dyn.telefonica.de [78.54.122.14])
+        (using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
+         key-exchange X25519 server-signature RSA-PSS (2048 bits) server-digest SHA256)
+        (No client certificate requested)
+        by freki.datenkhaos.de (Postfix) with ESMTPSA;
+        Wed, 12 Feb 2020 22:14:57 +0100 (CET)
+Date:   Wed, 12 Feb 2020 22:14:52 +0100
+From:   Johannes Hirte <johannes.hirte@datenkhaos.de>
+To:     Arnd Bergmann <arnd@arndb.de>
+Cc:     "James E.J. Bottomley" <jejb@linux.ibm.com>,
+        "Martin K. Petersen" <martin.petersen@oracle.com>,
+        "Michael S. Tsirkin" <mst@redhat.com>,
+        Jason Wang <jasowang@redhat.com>,
+        Paolo Bonzini <pbonzini@redhat.com>,
+        Stefan Hajnoczi <stefanha@redhat.com>,
+        Jens Axboe <axboe@kernel.dk>,
+        Doug Gilbert <dgilbert@interlog.com>,
+        Kai =?utf-8?B?TcOka2lzYXJh?= <Kai.Makisara@kolumbus.fi>,
+        Alexander Viro <viro@zeniv.linux.org.uk>,
+        Dongli Zhang <dongli.zhang@oracle.com>,
+        Thomas Gleixner <tglx@linutronix.de>,
+        Bart Van Assche <bvanassche@acm.org>,
+        Hannes Reinecke <hare@suse.com>,
+        Damien Le Moal <damien.lemoal@wdc.com>,
+        John Garry <john.garry@huawei.com>,
+        Martin Wilck <mwilck@suse.com>,
+        Heiko Carstens <heiko.carstens@de.ibm.com>,
+        "Gustavo A. R. Silva" <gustavo@embeddedor.com>,
+        Ira Weiny <ira.weiny@intel.com>, Iustin Pop <iustin@k1024.org>,
+        "Darrick J. Wong" <darrick.wong@oracle.com>,
+        virtualization@lists.linux-foundation.org,
+        linux-block@vger.kernel.org, linux-kernel@vger.kernel.org,
+        linux-scsi@vger.kernel.org, linux-fsdevel@vger.kernel.org
+Subject: Re: [PATCH v3 13/22] compat_ioctl: scsi: move ioctl handling into
+ drivers
+Message-ID: <20200212211452.GA5726@latitude>
+References: <20200102145552.1853992-1-arnd@arndb.de>
+ <20200102145552.1853992-14-arnd@arndb.de>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
+Content-Type: text/plain; charset=utf-8
 Content-Disposition: inline
-In-Reply-To: <8FD4B865-5984-476F-BE47-98938D162749@linaro.org>
+In-Reply-To: <20200102145552.1853992-14-arnd@arndb.de>
 Sender: linux-block-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-There was a change to drgn which required a minor update to the script
-(9ea37e24d4a9). Can you see whether you see the failure w/ the commit
-applied?
+On 2020 Jan 02, Arnd Bergmann wrote:
+> Each driver calling scsi_ioctl() gets an equivalent compat_ioctl()
+> handler that implements the same commands by calling scsi_compat_ioctl().
+> 
+> The scsi_cmd_ioctl() and scsi_cmd_blk_ioctl() functions are compatible
+> at this point, so any driver that calls those can do so for both native
+> and compat mode, with the argument passed through compat_ptr().
+> 
+> With this, we can remove the entries from fs/compat_ioctl.c.  The new
+> code is larger, but should be easier to maintain and keep updated with
+> newly added commands.
+> 
+> Signed-off-by: Arnd Bergmann <arnd@arndb.de>
+> ---
+>  drivers/block/virtio_blk.c |   3 +
+>  drivers/scsi/ch.c          |   9 ++-
+>  drivers/scsi/sd.c          |  50 ++++++--------
+>  drivers/scsi/sg.c          |  44 ++++++++-----
+>  drivers/scsi/sr.c          |  57 ++++++++++++++--
+>  drivers/scsi/st.c          |  51 ++++++++------
+>  fs/compat_ioctl.c          | 132 +------------------------------------
+>  7 files changed, 142 insertions(+), 204 deletions(-)
+> 
 
-Thanks.
+This breaks libcdio. cd-info now results in:
+
+cd-info version 2.1.0 x86_64-pc-linux-gnu
+Copyright (c) 2003-2005, 2007-2008, 2011-2015, 2017 R. Bernstein
+This is free software; see the source for copying conditions.
+There is NO warranty; not even for MERCHANTABILITY or FITNESS FOR A
+PARTICULAR PURPOSE.
+CD location   : /dev/cdrom
+CD driver name: GNU/Linux
+   access mode: IOCTL
+
+Error in getting drive hardware properties
+Error in getting drive reading properties
+Error in getting drive writing properties
+__________________________________
+
+Disc mode is listed as: CD-DA
+++ WARN: error in ioctl CDROMREADTOCHDR: Bad address
+
+cd-info: Can't get first track number. I give up.
+
 
 -- 
-tejun
+Regards,
+  Johannes Hirte
+
