@@ -2,63 +2,84 @@ Return-Path: <SRS0=TQg9=4A=vger.kernel.org=linux-block-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-2.3 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
-	MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,USER_AGENT_SANE_1 autolearn=no
-	autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-1.1 required=3.0 tests=DKIMWL_WL_HIGH,DKIM_SIGNED,
+	DKIM_VALID,DKIM_VALID_AU,MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS
+	autolearn=no autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 71851C352A4
-	for <linux-block@archiver.kernel.org>; Wed, 12 Feb 2020 21:00:13 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 50E9EC352A4
+	for <linux-block@archiver.kernel.org>; Wed, 12 Feb 2020 21:20:07 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.kernel.org (Postfix) with ESMTP id 4D29624677
-	for <linux-block@archiver.kernel.org>; Wed, 12 Feb 2020 21:00:13 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id 19FD1206D7
+	for <linux-block@archiver.kernel.org>; Wed, 12 Feb 2020 21:20:07 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+	s=default; t=1581542407;
+	bh=GIcfLJ/kAlm0Ag1pvocMMuNM0n6xyVSBoWBw0xNFnJM=;
+	h=Date:From:To:Cc:Subject:References:In-Reply-To:List-ID:From;
+	b=wK663bjtwqkgV/VZ9bC0JyuMEVVBesoT/dq048K1PsjC8kfaFmZoqsIzXwvvUnjKF
+	 4jxr1rZZM0H5CWLm9sL681duLlRXtaR9WMTSejaUak9DLQVlDxo0SQcw5ysuTUwE2Y
+	 x5UBwqMwtK9jEB7ibAQf9j7I1YBR/gmE4NpexA7Y=
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1727420AbgBLVAM (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Wed, 12 Feb 2020 16:00:12 -0500
-Received: from mga18.intel.com ([134.134.136.126]:15887 "EHLO mga18.intel.com"
-        rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-        id S1727138AbgBLVAM (ORCPT <rfc822;linux-block@vger.kernel.org>);
-        Wed, 12 Feb 2020 16:00:12 -0500
-X-Amp-Result: SKIPPED(no attachment in message)
-X-Amp-File-Uploaded: False
-Received: from fmsmga004.fm.intel.com ([10.253.24.48])
-  by orsmga106.jf.intel.com with ESMTP/TLS/DHE-RSA-AES256-GCM-SHA384; 12 Feb 2020 13:00:11 -0800
-X-IronPort-AV: E=Sophos;i="5.70,434,1574150400"; 
-   d="scan'208";a="256948918"
-Received: from unknown (HELO localhost.localdomain) ([10.232.115.133])
-  by fmsmga004-auth.fm.intel.com with ESMTP/TLS/DHE-RSA-AES256-SHA; 12 Feb 2020 13:00:10 -0800
-Subject: Re: [PATCH v2 2/2] md: enable io polling
-To:     Keith Busch <kbusch@kernel.org>
-Cc:     axboe@kernel.dk, song@kernel.org, linux-block@vger.kernel.org,
-        linux-raid@vger.kernel.org,
-        Artur Paszkiewicz <artur.paszkiewicz@intel.com>
-References: <20200211191729.4745-1-andrzej.jakowski@linux.intel.com>
- <20200211191729.4745-3-andrzej.jakowski@linux.intel.com>
- <20200211211334.GB3837@redsun51.ssa.fujisawa.hgst.com>
-From:   Andrzej Jakowski <andrzej.jakowski@linux.intel.com>
-Message-ID: <e9941d4d-c403-4177-526d-b3086207f31a@linux.intel.com>
-Date:   Wed, 12 Feb 2020 14:00:10 -0700
-User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:68.0) Gecko/20100101
- Thunderbird/68.2.2
+        id S1727947AbgBLVUG (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Wed, 12 Feb 2020 16:20:06 -0500
+Received: from mail-qt1-f180.google.com ([209.85.160.180]:37253 "EHLO
+        mail-qt1-f180.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S1727548AbgBLVUG (ORCPT
+        <rfc822;linux-block@vger.kernel.org>);
+        Wed, 12 Feb 2020 16:20:06 -0500
+Received: by mail-qt1-f180.google.com with SMTP id w47so2777923qtk.4
+        for <linux-block@vger.kernel.org>; Wed, 12 Feb 2020 13:20:05 -0800 (PST)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=gmail.com; s=20161025;
+        h=sender:date:from:to:cc:subject:message-id:references:mime-version
+         :content-disposition:in-reply-to;
+        bh=1bU26zeh4MdvuXmPDJT4p/4xaGLd8hghveN0fr+YHY4=;
+        b=Tv8esNDefrmk6Kmupm/EaTHf5ru45YLxxKqNNXRtAkjaOpWSIkrYF7ukgonzPJtxtI
+         VTXwBRSnGvkB52o0AXsJpZ/CEopmaaKj9kAZ44DADajQ0Rx42OL8WGbkptPAWhTsXwQD
+         3+CTMy1x3F9kNFtlEf+ecVOcA4HlOPUJxOROaVMZMjxPDNIu92BFIWopQuOYndUs2TZu
+         cUpUnTvKx5Phfb3S2mFJsDBSC3gwq1ZDXmRyd8TvhyUqzp3b8o4Eh/l6XJ1Lu6f0ORR6
+         SsylezaiR9VrEFGjUrSigplD/+rIaqMtX/d4JDogrHZ7JjQ1Ns82RELnTtPqq2BZJIKp
+         2SiA==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20161025;
+        h=x-gm-message-state:sender:date:from:to:cc:subject:message-id
+         :references:mime-version:content-disposition:in-reply-to;
+        bh=1bU26zeh4MdvuXmPDJT4p/4xaGLd8hghveN0fr+YHY4=;
+        b=hEP+VcOhbuMiEEn2BvdwNBLLDucwCE5s9oAOWFGKm4Wnzgt9zKKoQ+98veZq7+vX0X
+         sAE7RgiW/b2vCNaA+aybhJDofbXi1LoerhYgh2zboGGNu3kbmgHFR4xggJqhUToMV6nJ
+         bMA6LUXRlcBIb+LF+uPIxhL5IYLVwoqXlAhhKmFK57GWmDfDdZrKx+RMpIETuX/qYj40
+         FKOHCRR9SuUrciDnr79GyITLS02VBxIwcKK4J0L0yvy6qw4Tlkfi2lZsJJ3KnTQnbzPP
+         +xQIqVdd7bMK+1mIcbCyDsAQ2I5Q13ZXiOK7v36eQ1eY4y06He/1WqnhYfSEvm4FOdbs
+         aBqg==
+X-Gm-Message-State: APjAAAVqTw6g4F9rj1Zp1i2fu1+Ji85NzD6FYjTddhdOnCvHoXzznGSz
+        PxFsJGOT6pCCUlAew2gtfB0=
+X-Google-Smtp-Source: APXvYqwiKoGH+Fide9YL6ATH4CTwLKYFzJDPZMJBo6X3q/gMEPXa8DYj1BEQ0TXNUKxJtj1UVk0qYg==
+X-Received: by 2002:ac8:1ca:: with SMTP id b10mr8779886qtg.314.1581542405153;
+        Wed, 12 Feb 2020 13:20:05 -0800 (PST)
+Received: from localhost ([2620:10d:c091:500::1:985a])
+        by smtp.gmail.com with ESMTPSA id w41sm211462qtj.49.2020.02.12.13.20.04
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Wed, 12 Feb 2020 13:20:04 -0800 (PST)
+Date:   Wed, 12 Feb 2020 16:20:04 -0500
+From:   Tejun Heo <tj@kernel.org>
+To:     Paolo Valente <paolo.valente@linaro.org>
+Cc:     linux-block <linux-block@vger.kernel.org>
+Subject: Re: iocost_monitor.py tells that iocost is not enabled
+Message-ID: <20200212212004.GD80993@mtj.thefacebook.com>
+References: <8FD4B865-5984-476F-BE47-98938D162749@linaro.org>
 MIME-Version: 1.0
-In-Reply-To: <20200211211334.GB3837@redsun51.ssa.fujisawa.hgst.com>
-Content-Type: text/plain; charset=utf-8
-Content-Language: en-US
-Content-Transfer-Encoding: 7bit
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <8FD4B865-5984-476F-BE47-98938D162749@linaro.org>
 Sender: linux-block-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-On 2/11/20 2:13 PM, Keith Busch wrote:
-> I must be missing something: md's make_request_fn always returns
-> BLK_QC_T_NONE for the cookie, and that couldn't get past blk_poll's
-> blk_qc_t_valid(cookie) check. How does the initial blk_poll() caller get
-> a valid cookie for an md backing device's request_queue? And how is the
-> same cookie valid for more than one request_queue?
+There was a change to drgn which required a minor update to the script
+(9ea37e24d4a9). Can you see whether you see the failure w/ the commit
+applied?
 
-That's true md_make_request() always returns BLK_QC_T_NONE. md_make_request()
-recursively calls generic_make_request() for the underlying device (e.g. nvme).
-That block io request directed to member disk is added into bio_list and is 
-processed later by top level generic_make_request(). generic_make_request() 
-returns cookie that is returned by blk_mq_make_request().
-That cookie is later used to poll for completion. 
+Thanks.
+
+-- 
+tejun
