@@ -2,307 +2,131 @@ Return-Path: <SRS0=TQg9=4A=vger.kernel.org=linux-block-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-8.3 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
-	INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,
-	USER_AGENT_SANE_1 autolearn=ham autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-13.1 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
+	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,
+	MENTIONS_GIT_HOSTING,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,USER_AGENT_SANE_1
+	autolearn=unavailable autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 9AB89C352A4
-	for <linux-block@archiver.kernel.org>; Wed, 12 Feb 2020 20:04:23 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id D26F1C352A4
+	for <linux-block@archiver.kernel.org>; Wed, 12 Feb 2020 20:07:38 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.kernel.org (Postfix) with ESMTP id 6528121739
-	for <linux-block@archiver.kernel.org>; Wed, 12 Feb 2020 20:04:23 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id A4BD721739
+	for <linux-block@archiver.kernel.org>; Wed, 12 Feb 2020 20:07:38 +0000 (UTC)
+Authentication-Results: mail.kernel.org;
+	dkim=fail reason="signature verification failed" (2048-bit key) header.d=embeddedor.com header.i=@embeddedor.com header.b="wSKpavxf"
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1727923AbgBLUEW (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Wed, 12 Feb 2020 15:04:22 -0500
-Received: from relay.sw.ru ([185.231.240.75]:47892 "EHLO relay.sw.ru"
-        rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-        id S1727600AbgBLUEW (ORCPT <rfc822;linux-block@vger.kernel.org>);
-        Wed, 12 Feb 2020 15:04:22 -0500
-Received: from [192.168.15.120]
-        by relay.sw.ru with esmtp (Exim 4.92.3)
-        (envelope-from <ktkhai@virtuozzo.com>)
-        id 1j1yEt-0007oX-5E; Wed, 12 Feb 2020 23:04:03 +0300
-Subject: Re: [PATCH v6 4/6] block: Add support for REQ_ALLOCATE flag
-To:     "Darrick J. Wong" <darrick.wong@oracle.com>
-Cc:     martin.petersen@oracle.com, bob.liu@oracle.com, axboe@kernel.dk,
-        agk@redhat.com, snitzer@redhat.com, dm-devel@redhat.com,
-        song@kernel.org, tytso@mit.edu, adilger.kernel@dilger.ca,
-        Chaitanya.Kulkarni@wdc.com, ming.lei@redhat.com, osandov@fb.com,
-        jthumshirn@suse.de, minwoo.im.dev@gmail.com, damien.lemoal@wdc.com,
-        andrea.parri@amarulasolutions.com, hare@suse.com, tj@kernel.org,
-        ajay.joshi@wdc.com, sagi@grimberg.me, dsterba@suse.com,
-        bvanassche@acm.org, dhowells@redhat.com, asml.silence@gmail.com,
-        linux-block@vger.kernel.org, linux-kernel@vger.kernel.org
-References: <158132703141.239613.3550455492676290009.stgit@localhost.localdomain>
- <158132723311.239613.5269033996109738831.stgit@localhost.localdomain>
- <20200212165837.GL6874@magnolia>
- <092f2dc2-7bb7-d5dd-9a54-e9430940ece9@virtuozzo.com>
- <20200212183129.GO6874@magnolia>
-From:   Kirill Tkhai <ktkhai@virtuozzo.com>
-Message-ID: <45b40cef-eabf-0699-50a6-c9a3b2fc4bdd@virtuozzo.com>
-Date:   Wed, 12 Feb 2020 23:04:02 +0300
-User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:68.0) Gecko/20100101
- Thunderbird/68.4.2
+        id S1727548AbgBLUHi (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Wed, 12 Feb 2020 15:07:38 -0500
+Received: from gateway20.websitewelcome.com ([192.185.70.14]:29743 "EHLO
+        gateway20.websitewelcome.com" rhost-flags-OK-OK-OK-OK)
+        by vger.kernel.org with ESMTP id S1727439AbgBLUHh (ORCPT
+        <rfc822;linux-block@vger.kernel.org>);
+        Wed, 12 Feb 2020 15:07:37 -0500
+X-Greylist: delayed 1448 seconds by postgrey-1.27 at vger.kernel.org; Wed, 12 Feb 2020 15:07:37 EST
+Received: from cm12.websitewelcome.com (cm12.websitewelcome.com [100.42.49.8])
+        by gateway20.websitewelcome.com (Postfix) with ESMTP id A8A9B400C647D
+        for <linux-block@vger.kernel.org>; Wed, 12 Feb 2020 12:29:52 -0600 (CST)
+Received: from gator4166.hostgator.com ([108.167.133.22])
+        by cmsmtp with SMTP
+        id 1xuzj1WJuvBMd1xuzj0B0F; Wed, 12 Feb 2020 13:43:29 -0600
+X-Authority-Reason: nr=8
+DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed;
+        d=embeddedor.com; s=default; h=Content-Type:MIME-Version:Message-ID:Subject:
+        Cc:To:From:Date:Sender:Reply-To:Content-Transfer-Encoding:Content-ID:
+        Content-Description:Resent-Date:Resent-From:Resent-Sender:Resent-To:Resent-Cc
+        :Resent-Message-ID:In-Reply-To:References:List-Id:List-Help:List-Unsubscribe:
+        List-Subscribe:List-Post:List-Owner:List-Archive;
+        bh=8FWXDkVW2wDjkeRVhdg2pGdPCjOZiCetHczI8jearAI=; b=wSKpavxf1MKDOkewMMDptIziQj
+        DKEcF0hjxEfd0gk75Qp79sxH8dhY+hhDeWpcCIx9QAFYbqFP3+R7bFE+iVYGPE5y9Pwhw19A/7WhE
+        wPYL/clnYeUdUCxyP/VgOMCW63JJulyeaEJUVyBYcyD8ZHMzXVFcvs00OyjQz5PUpnGAdfm5vE1SA
+        mJ4ThVrzbKA0dEo3MwZsh2ma+OPwToVT3lxS683aHSHTZR4fWcpJ+H9vwCOXbQjD0M9LZHiQiCfk7
+        tkxXgukA5hR4/0ev8m4yQqJNm+YkBEUWeb9VpWiNkkkWdSMYtzl0EHwdxxx6UKc7p58e6P7HOJViY
+        CCH6iSmQ==;
+Received: from [201.144.174.25] (port=23782 helo=embeddedor)
+        by gator4166.hostgator.com with esmtpa (Exim 4.92)
+        (envelope-from <gustavo@embeddedor.com>)
+        id 1j1xux-001DLa-VL; Wed, 12 Feb 2020 13:43:28 -0600
+Date:   Wed, 12 Feb 2020 13:46:02 -0600
+From:   "Gustavo A. R. Silva" <gustavo@embeddedor.com>
+To:     Joshua Morris <josh.h.morris@us.ibm.com>,
+        Philip Kelleher <pjk1939@linux.ibm.com>,
+        Jens Axboe <axboe@kernel.dk>
+Cc:     linux-block@vger.kernel.org, linux-kernel@vger.kernel.org,
+        "Gustavo A. R. Silva" <gustavo@embeddedor.com>
+Subject: [PATCH] rsxx: Replace zero-length array with flexible-array member
+Message-ID: <20200212194602.GA31712@embeddedor>
 MIME-Version: 1.0
-In-Reply-To: <20200212183129.GO6874@magnolia>
-Content-Type: text/plain; charset=utf-8
-Content-Language: en-US
-Content-Transfer-Encoding: 7bit
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+User-Agent: Mutt/1.9.4 (2018-02-28)
+X-AntiAbuse: This header was added to track abuse, please include it with any abuse report
+X-AntiAbuse: Primary Hostname - gator4166.hostgator.com
+X-AntiAbuse: Original Domain - vger.kernel.org
+X-AntiAbuse: Originator/Caller UID/GID - [47 12] / [47 12]
+X-AntiAbuse: Sender Address Domain - embeddedor.com
+X-BWhitelist: no
+X-Source-IP: 201.144.174.25
+X-Source-L: No
+X-Exim-ID: 1j1xux-001DLa-VL
+X-Source: 
+X-Source-Args: 
+X-Source-Dir: 
+X-Source-Sender: (embeddedor) [201.144.174.25]:23782
+X-Source-Auth: gustavo@embeddedor.com
+X-Email-Count: 40
+X-Source-Cap: Z3V6aWRpbmU7Z3V6aWRpbmU7Z2F0b3I0MTY2Lmhvc3RnYXRvci5jb20=
+X-Local-Domain: yes
 Sender: linux-block-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-On 12.02.2020 21:31, Darrick J. Wong wrote:
-> On Wed, Feb 12, 2020 at 08:33:52PM +0300, Kirill Tkhai wrote:
->> Hi, Darrick,
->>
->> On 12.02.2020 19:58, Darrick J. Wong wrote:
->>> On Mon, Feb 10, 2020 at 12:33:53PM +0300, Kirill Tkhai wrote:
->>>> This adds support for REQ_ALLOCATE extension of REQ_OP_WRITE_ZEROES
->>>> operation, which encourages a block device driver to just allocate
->>>> blocks (or mark them allocated) instead of actual blocks zeroing.
->>>> REQ_ALLOCATE is aimed to be used for network filesystems providing
->>>> a block device interface. Also, block devices, which map a file
->>>> on other filesystem (like loop), may use this for less fragmentation
->>>> and batching fallocate() requests. Hypervisors like QEMU may
->>>> introduce optimizations of clusters allocations based on this.
->>>>
->>>> BLKDEV_ZERO_ALLOCATE is a new corresponding flag for
->>>> blkdev_issue_zeroout().
->>>>
->>>> Stacking devices start from zero max_allocate_sectors limit for now,
->>>> and the support is going to be implemented separate for each device
->>>> in the future.
->>>>
->>>> Signed-off-by: Kirill Tkhai <ktkhai@virtuozzo.com>
->>>> Reviewed-by: Bob Liu <bob.liu@oracle.com>
->>>> ---
->>>>  block/blk-lib.c           |   17 ++++++++++-------
->>>>  block/blk-settings.c      |    4 ++++
->>>>  fs/block_dev.c            |    4 ++++
->>>>  include/linux/blk_types.h |    5 ++++-
->>>>  include/linux/blkdev.h    |   13 ++++++++++---
->>>>  5 files changed, 32 insertions(+), 11 deletions(-)
->>>>
->>>> diff --git a/block/blk-lib.c b/block/blk-lib.c
->>>> index 3e38c93cfc53..9cd6f86523ba 100644
->>>> --- a/block/blk-lib.c
->>>> +++ b/block/blk-lib.c
->>>> @@ -214,7 +214,7 @@ static int __blkdev_issue_write_zeroes(struct block_device *bdev,
->>>>  		struct bio **biop, unsigned flags)
->>>>  {
->>>>  	struct bio *bio = *biop;
->>>> -	unsigned int max_write_zeroes_sectors;
->>>> +	unsigned int max_write_zeroes_sectors, req_flags = 0;
->>>>  	struct request_queue *q = bdev_get_queue(bdev);
->>>>  
->>>>  	if (!q)
->>>> @@ -224,18 +224,21 @@ static int __blkdev_issue_write_zeroes(struct block_device *bdev,
->>>>  		return -EPERM;
->>>>  
->>>>  	/* Ensure that max_write_zeroes_sectors doesn't overflow bi_size */
->>>> -	max_write_zeroes_sectors = bdev_write_zeroes_sectors(bdev, 0);
->>>> +	max_write_zeroes_sectors = bdev_write_zeroes_sectors(bdev, flags);
->>>>  
->>>>  	if (max_write_zeroes_sectors == 0)
->>>>  		return -EOPNOTSUPP;
->>>>  
->>>> +	if (flags & BLKDEV_ZERO_NOUNMAP)
->>>> +		req_flags |= REQ_NOUNMAP;
->>>> +	if (flags & BLKDEV_ZERO_ALLOCATE)
->>>> +		req_flags |= REQ_ALLOCATE|REQ_NOUNMAP;
->>>> +
->>>>  	while (nr_sects) {
->>>>  		bio = blk_next_bio(bio, 0, gfp_mask);
->>>>  		bio->bi_iter.bi_sector = sector;
->>>>  		bio_set_dev(bio, bdev);
->>>> -		bio->bi_opf = REQ_OP_WRITE_ZEROES;
->>>> -		if (flags & BLKDEV_ZERO_NOUNMAP)
->>>> -			bio->bi_opf |= REQ_NOUNMAP;
->>>> +		bio->bi_opf = REQ_OP_WRITE_ZEROES | req_flags;
->>>>  
->>>>  		if (nr_sects > max_write_zeroes_sectors) {
->>>>  			bio->bi_iter.bi_size = max_write_zeroes_sectors << 9;
->>>> @@ -362,7 +365,7 @@ int blkdev_issue_zeroout(struct block_device *bdev, sector_t sector,
->>>>  	sector_t bs_mask;
->>>>  	struct bio *bio;
->>>>  	struct blk_plug plug;
->>>> -	bool try_write_zeroes = !!bdev_write_zeroes_sectors(bdev, 0);
->>>> +	bool try_write_zeroes = !!bdev_write_zeroes_sectors(bdev, flags);
->>>>  
->>>>  	bs_mask = (bdev_logical_block_size(bdev) >> 9) - 1;
->>>>  	if ((sector | nr_sects) & bs_mask)
->>>> @@ -391,7 +394,7 @@ int blkdev_issue_zeroout(struct block_device *bdev, sector_t sector,
->>>>  			try_write_zeroes = false;
->>>>  			goto retry;
->>>>  		}
->>>> -		if (!bdev_write_zeroes_sectors(bdev, 0)) {
->>>> +		if (!bdev_write_zeroes_sectors(bdev, flags)) {
->>>>  			/*
->>>>  			 * Zeroing offload support was indicated, but the
->>>>  			 * device reported ILLEGAL REQUEST (for some devices
->>>> diff --git a/block/blk-settings.c b/block/blk-settings.c
->>>> index c8eda2e7b91e..8d5df9d37239 100644
->>>> --- a/block/blk-settings.c
->>>> +++ b/block/blk-settings.c
->>>> @@ -48,6 +48,7 @@ void blk_set_default_limits(struct queue_limits *lim)
->>>>  	lim->chunk_sectors = 0;
->>>>  	lim->max_write_same_sectors = 0;
->>>>  	lim->max_write_zeroes_sectors = 0;
->>>> +	lim->max_allocate_sectors = 0;
->>>>  	lim->max_discard_sectors = 0;
->>>>  	lim->max_hw_discard_sectors = 0;
->>>>  	lim->discard_granularity = 0;
->>>> @@ -83,6 +84,7 @@ void blk_set_stacking_limits(struct queue_limits *lim)
->>>>  	lim->max_dev_sectors = UINT_MAX;
->>>>  	lim->max_write_same_sectors = UINT_MAX;
->>>>  	lim->max_write_zeroes_sectors = UINT_MAX;
->>>> +	lim->max_allocate_sectors = 0;
->>>>  }
->>>>  EXPORT_SYMBOL(blk_set_stacking_limits);
->>>>  
->>>> @@ -506,6 +508,8 @@ int blk_stack_limits(struct queue_limits *t, struct queue_limits *b,
->>>>  					b->max_write_same_sectors);
->>>>  	t->max_write_zeroes_sectors = min(t->max_write_zeroes_sectors,
->>>>  					b->max_write_zeroes_sectors);
->>>> +	t->max_allocate_sectors = min(t->max_allocate_sectors,
->>>> +					b->max_allocate_sectors);
->>>>  	t->bounce_pfn = min_not_zero(t->bounce_pfn, b->bounce_pfn);
->>>>  
->>>>  	t->seg_boundary_mask = min_not_zero(t->seg_boundary_mask,
->>>> diff --git a/fs/block_dev.c b/fs/block_dev.c
->>>> index 69bf2fb6f7cd..1ffef894b3bd 100644
->>>> --- a/fs/block_dev.c
->>>> +++ b/fs/block_dev.c
->>>> @@ -2122,6 +2122,10 @@ static long blkdev_fallocate(struct file *file, int mode, loff_t start,
->>>>  		error = blkdev_issue_zeroout(bdev, start >> 9, len >> 9,
->>>>  					     GFP_KERNEL, BLKDEV_ZERO_NOFALLBACK);
->>>>  		break;
->>>> +	case FALLOC_FL_KEEP_SIZE:
->>>> +		error = blkdev_issue_zeroout(bdev, start >> 9, len >> 9,
->>>> +			GFP_KERNEL, BLKDEV_ZERO_ALLOCATE | BLKDEV_ZERO_NOFALLBACK);
->>>
->>> I think this should be ^^^ indented to match the other calls.
->>
->> The only idea I have about this is something like the below. But the below is over 90 char...
->>
->> 		error = blkdev_issue_zeroout(bdev, start >> 9, len >> 9,
->> 					     GFP_KERNEL,
->> 					     BLKDEV_ZERO_ALLOCATE | BLKDEV_ZERO_NOFALLBACK);
->>
->> Could you please clarify what you mean?
-> 
-> I mostly meant that the indent for the nth lines ought to be more than a
-> single indent to make it easier to scan through the code, but you're
-> right, the kernel indentation style is uglier.  I could suggest
-> something like this, which actually does fit:
-> 
-> 	case FALLOC_FL_KEEP_SIZE:
-> 		error = blkdev_issue_zeroout(bdev, start >> 9, len >> 9,
-> 				GFP_KERNEL,
-> 				BLKDEV_ZERO_ALLOCATE | BLKDEV_ZERO_NOFALLBACK);
-> 		break;
-> 
-> But that's apparently apocryphal. :/
+The current codebase makes use of the zero-length array language
+extension to the C90 standard, but the preferred mechanism to declare
+variable-length types such as these ones is a flexible array member[1][2],
+introduced in C99:
 
-Just to mention.
+struct foo {
+        int stuff;
+        struct boo array[];
+};
 
-We could also introduce BLKDEV_ZERO_ALLOCATE_NOFALLBACK, which is combination
-of both bits. But this does not look good for me, since this make grep over
-kernel code more difficult. And it won't good to introduce a new identifier
-for a single place.
+By making use of the mechanism above, we will get a compiler warning
+in case the flexible array does not occur last in the structure, which
+will help us prevent some kind of undefined behavior bugs from being
+inadvertenly introduced[3] to the codebase from now on.
 
-> --D
-> 
->>>>  	case FALLOC_FL_PUNCH_HOLE | FALLOC_FL_KEEP_SIZE | FALLOC_FL_NO_HIDE_STALE:
->>>>  		error = blkdev_issue_discard(bdev, start >> 9, len >> 9,
->>>>  					     GFP_KERNEL, 0);
->>>> diff --git a/include/linux/blk_types.h b/include/linux/blk_types.h
->>>> index 70254ae11769..86accd2caa4e 100644
->>>> --- a/include/linux/blk_types.h
->>>> +++ b/include/linux/blk_types.h
->>>> @@ -335,7 +335,9 @@ enum req_flag_bits {
->>>>  
->>>>  	/* command specific flags for REQ_OP_WRITE_ZEROES: */
->>>>  	__REQ_NOUNMAP,		/* do not free blocks when zeroing */
->>>> -
->>>> +	__REQ_ALLOCATE,		/* only notify about allocated blocks,
->>>> +				 * and do not actually zero them
->>>
->>> "only notify"?  Is someone getting a notification?  Or are we simply
->>> "notifying" the device that it must ensure allocated blocks?
->>>
->>> If it's that last one, then perhaps this should be reworded:
->>>
->>> /*
->>>  * Ensure the LBA range is backed by physical storage
->>>  * without writing zeroes to the blocks.
->>>  */
->>
->> Sounds good.
->>  
->>>> +				 */
->>>>  	__REQ_HIPRI,
->>>>  
->>>>  	/* for driver use */
->>>> @@ -362,6 +364,7 @@ enum req_flag_bits {
->>>>  #define REQ_CGROUP_PUNT		(1ULL << __REQ_CGROUP_PUNT)
->>>>  
->>>>  #define REQ_NOUNMAP		(1ULL << __REQ_NOUNMAP)
->>>> +#define REQ_ALLOCATE		(1ULL << __REQ_ALLOCATE)
->>>>  #define REQ_HIPRI		(1ULL << __REQ_HIPRI)
->>>>  
->>>>  #define REQ_DRV			(1ULL << __REQ_DRV)
->>>> diff --git a/include/linux/blkdev.h b/include/linux/blkdev.h
->>>> index 55a714161684..40707f980a2e 100644
->>>> --- a/include/linux/blkdev.h
->>>> +++ b/include/linux/blkdev.h
->>>> @@ -336,6 +336,7 @@ struct queue_limits {
->>>>  	unsigned int		max_hw_discard_sectors;
->>>>  	unsigned int		max_write_same_sectors;
->>>>  	unsigned int		max_write_zeroes_sectors;
->>>> +	unsigned int		max_allocate_sectors;
->>>>  	unsigned int		discard_granularity;
->>>>  	unsigned int		discard_alignment;
->>>>  
->>>> @@ -990,6 +991,8 @@ static inline struct bio_vec req_bvec(struct request *rq)
->>>>  static inline unsigned int blk_queue_get_max_write_zeroes_sectors(
->>>>  		struct request_queue *q, unsigned int op_flags)
->>>>  {
->>>> +	if (op_flags & REQ_ALLOCATE)
->>>> +		return q->limits.max_allocate_sectors;
->>>>  	return q->limits.max_write_zeroes_sectors;
->>>>  }
->>>>  
->>>> @@ -1226,6 +1229,7 @@ extern int __blkdev_issue_discard(struct block_device *bdev, sector_t sector,
->>>>  
->>>>  #define BLKDEV_ZERO_NOUNMAP	(1 << 0)  /* do not free blocks */
->>>>  #define BLKDEV_ZERO_NOFALLBACK	(1 << 1)  /* don't write explicit zeroes */
->>>> +#define BLKDEV_ZERO_ALLOCATE	(1 << 2)  /* allocate range of blocks */
->>>>  
->>>>  extern int __blkdev_issue_zeroout(struct block_device *bdev, sector_t sector,
->>>>  		sector_t nr_sects, gfp_t gfp_mask, struct bio **biop,
->>>> @@ -1430,10 +1434,13 @@ static inline unsigned int bdev_write_zeroes_sectors(struct block_device *bdev,
->>>>  {
->>>>  	struct request_queue *q = bdev_get_queue(bdev);
->>>>  
->>>> -	if (q)
->>>> -		return q->limits.max_write_zeroes_sectors;
->>>> +	if (!q)
->>>> +		return 0;
->>>>  
->>>> -	return 0;
->>>> +	if (flags & BLKDEV_ZERO_ALLOCATE)
->>>> +		return q->limits.max_allocate_sectors;
->>>> +	else
->>>> +		return q->limits.max_write_zeroes_sectors;
->>>>  }
->>>>  
->>>>  static inline enum blk_zoned_model bdev_zoned_model(struct block_device *bdev)
->>>>
->>>>
->>
->> Thanks,
->> Kirill
+Also, notice that, dynamic memory allocations won't be affected by
+this change:
+
+"Flexible array members have incomplete type, and so the sizeof operator
+may not be applied. As a quirk of the original implementation of
+zero-length arrays, sizeof evaluates to zero."[1]
+
+This issue was found with the help of Coccinelle.
+
+[1] https://gcc.gnu.org/onlinedocs/gcc/Zero-Length.html
+[2] https://github.com/KSPP/linux/issues/21
+[3] commit 76497732932f ("cxgb3/l2t: Fix undefined behaviour")
+
+Signed-off-by: Gustavo A. R. Silva <gustavo@embeddedor.com>
+---
+ drivers/block/rsxx/dma.c | 2 +-
+ 1 file changed, 1 insertion(+), 1 deletion(-)
+
+diff --git a/drivers/block/rsxx/dma.c b/drivers/block/rsxx/dma.c
+index 111eb659e66d..1914f5488b22 100644
+--- a/drivers/block/rsxx/dma.c
++++ b/drivers/block/rsxx/dma.c
+@@ -80,7 +80,7 @@ struct dma_tracker {
+ struct dma_tracker_list {
+ 	spinlock_t		lock;
+ 	int			head;
+-	struct dma_tracker	list[0];
++	struct dma_tracker	list[];
+ };
+ 
+ 
+-- 
+2.25.0
 
