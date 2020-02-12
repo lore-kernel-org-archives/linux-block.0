@@ -2,201 +2,126 @@ Return-Path: <SRS0=TQg9=4A=vger.kernel.org=linux-block-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-2.4 required=3.0 tests=DKIMWL_WL_HIGH,DKIM_SIGNED,
+X-Spam-Status: No, score=-8.4 required=3.0 tests=DKIMWL_WL_MED,DKIM_SIGNED,
 	DKIM_VALID,DKIM_VALID_AU,HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,
-	SPF_HELO_NONE,SPF_PASS,USER_AGENT_SANE_1 autolearn=no autolearn_force=no
+	SPF_HELO_NONE,SPF_PASS,USER_IN_DEF_DKIM_WL autolearn=no autolearn_force=no
 	version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 8E5CDC3B186
-	for <linux-block@archiver.kernel.org>; Wed, 12 Feb 2020 22:03:45 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id E416FC3B187
+	for <linux-block@archiver.kernel.org>; Wed, 12 Feb 2020 22:27:23 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.kernel.org (Postfix) with ESMTP id 5776820848
-	for <linux-block@archiver.kernel.org>; Wed, 12 Feb 2020 22:03:45 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id BA79821569
+	for <linux-block@archiver.kernel.org>; Wed, 12 Feb 2020 22:27:23 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="hFTflqcQ"
+	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="iLXIzaiy"
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1728674AbgBLWDo (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Wed, 12 Feb 2020 17:03:44 -0500
-Received: from us-smtp-2.mimecast.com ([205.139.110.61]:33637 "EHLO
-        us-smtp-delivery-1.mimecast.com" rhost-flags-OK-OK-OK-FAIL)
-        by vger.kernel.org with ESMTP id S1727564AbgBLWDo (ORCPT
+        id S1727947AbgBLW1W (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Wed, 12 Feb 2020 17:27:22 -0500
+Received: from mail-io1-f42.google.com ([209.85.166.42]:33698 "EHLO
+        mail-io1-f42.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S1728447AbgBLW1W (ORCPT
         <rfc822;linux-block@vger.kernel.org>);
-        Wed, 12 Feb 2020 17:03:44 -0500
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-        s=mimecast20190719; t=1581545023;
-        h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-         to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-         content-transfer-encoding:content-transfer-encoding:
-         in-reply-to:in-reply-to:references:references;
-        bh=D8jRtKLNTMzQ9F4ovRApdC2gkFDizflEZtluJFlDclQ=;
-        b=hFTflqcQC6pcx4c2RNIfuvElVRHdfyMSA0rcnmYqIP4PBrn3JPESu7W19ZVDiNilisJYwW
-        bzC5wPRe6fBO9m4DsOe7yyTOXOL+GXPhpLlAqLtJ/Q57dV9hmbErrVFx6otx56uAB+oWR3
-        1S/UaCWdsKNp3C9KBZr2FgSIDFN0PaE=
-Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
- [209.132.183.4]) (Using TLS) by relay.mimecast.com with ESMTP id
- us-mta-386-lyrdfM_wMwaDWqk7cPTnxw-1; Wed, 12 Feb 2020 17:03:39 -0500
-X-MC-Unique: lyrdfM_wMwaDWqk7cPTnxw-1
-Received: from smtp.corp.redhat.com (int-mx03.intmail.prod.int.phx2.redhat.com [10.5.11.13])
-        (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
-        (No client certificate requested)
-        by mimecast-mx01.redhat.com (Postfix) with ESMTPS id 38ED08017CC;
-        Wed, 12 Feb 2020 22:03:38 +0000 (UTC)
-Received: from ming.t460p (ovpn-8-18.pek2.redhat.com [10.72.8.18])
-        by smtp.corp.redhat.com (Postfix) with ESMTPS id A89FB90069;
-        Wed, 12 Feb 2020 22:03:32 +0000 (UTC)
-Date:   Thu, 13 Feb 2020 06:03:28 +0800
-From:   Ming Lei <ming.lei@redhat.com>
-To:     Damien Le Moal <Damien.LeMoal@wdc.com>
-Cc:     Tim Walker <tim.t.walker@seagate.com>,
-        "linux-block@vger.kernel.org" <linux-block@vger.kernel.org>,
-        linux-scsi <linux-scsi@vger.kernel.org>,
-        "linux-nvme@lists.infradead.org" <linux-nvme@lists.infradead.org>
-Subject: Re: [LSF/MM/BPF TOPIC] NVMe HDD
-Message-ID: <20200212220328.GB25314@ming.t460p>
-References: <CANo=J14resJ4U1nufoiDq+ULd0k-orRCsYah8Dve-y8uCjA62Q@mail.gmail.com>
- <20200211122821.GA29811@ming.t460p>
- <CANo=J14iRK8K3bc1g3rLBp=QTLZQak0DcHkvgZS2f=xO_HFgxQ@mail.gmail.com>
- <BYAPR04MB5816AA843E63FFE2EA1D5D23E71B0@BYAPR04MB5816.namprd04.prod.outlook.com>
+        Wed, 12 Feb 2020 17:27:22 -0500
+Received: by mail-io1-f42.google.com with SMTP id z8so4198865ioh.0
+        for <linux-block@vger.kernel.org>; Wed, 12 Feb 2020 14:27:21 -0800 (PST)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=google.com; s=20161025;
+        h=mime-version:from:date:message-id:subject:to:cc;
+        bh=edt2I3RTLN6ychJeRY9QbcR2ZMw2DB5I2yqN3iENPXM=;
+        b=iLXIzaiyHsE/IhzFXtGEunG40WLt1XbwRtJtZ37nxisPw4UOfQhVHcR4pTNQvLr+j4
+         WMBXN4RMIGdBHVXbxKBOk02OQDUFfxM/S8VAXHg2ZbDyz5uJnEQFQQ6y4kf53K9HGaze
+         A1ajRqaNql2Os0POSjpqXo7TR19uMd2PD/A97TDhHEuCeAJVlkAW0M8EgINdTuLNA871
+         Y9pZl5PWhUhuadzFu1vdM03l09q/qA1A8OeB9zTbonvJh0phbdmf9xKRcDpGmD99OwZj
+         ZJ5ULRoemcknZc8UGFW6Z3PQcirSlmqQINH9ZZAsRZ79DlectxCB3GyFpVPVstTodPLk
+         pIdg==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20161025;
+        h=x-gm-message-state:mime-version:from:date:message-id:subject:to:cc;
+        bh=edt2I3RTLN6ychJeRY9QbcR2ZMw2DB5I2yqN3iENPXM=;
+        b=RQXxDQPHDyAkV5y0RoV/4A+5dRPAiH9WKy8u3HQNWv1vZ7+gMf/Lu8wUf42wnmyFW0
+         iiGbeXxmOs8/D4XZANKnY7knXOoAgxa/6qghWhVnrmwFYq2Jk3skG0xbRR9rVRS4KGmz
+         1js+2ZVEh4WSnoXwFIigf0oO4mBc8y0agEI/VVy+pTxbA6r2/ZgjBc+p44hgqdB2oNKA
+         S3UpR5cyrhkm8diShefY3/cN1ECute81XRzAUavSPFya7ufZuXllcCWm2RqQsR+frRtl
+         aI0c7UznDaKN1W/u03hPn10yJ2znnew+bgXKA8d2OFL9jcSoXELiCuk360eqcy7ev+Bs
+         AhHQ==
+X-Gm-Message-State: APjAAAWL9qLamNcDsII3PTvq9Pbuhse5Tl8NbyuoteRxx18iT7mXjcdl
+        gFuXByL6aYvplhgot8xrN5tJwXUee6WU4kSYwS0ITQ==
+X-Google-Smtp-Source: APXvYqyP2m7YArG2eKQ+in1Y8KsWY16aMk3DQQbmrK5tyQty0ShKXrchBomO1gm/wBbaf2EjEMdWFY+JAfBUNwmQ4WY=
+X-Received: by 2002:a5d:9157:: with SMTP id y23mr19527487ioq.199.1581546440844;
+ Wed, 12 Feb 2020 14:27:20 -0800 (PST)
 MIME-Version: 1.0
-Content-Type: text/plain; charset=utf-8
-Content-Disposition: inline
-In-Reply-To: <BYAPR04MB5816AA843E63FFE2EA1D5D23E71B0@BYAPR04MB5816.namprd04.prod.outlook.com>
-User-Agent: Mutt/1.12.1 (2019-06-15)
-X-Scanned-By: MIMEDefang 2.79 on 10.5.11.13
-Content-Transfer-Encoding: quoted-printable
+From:   Salman Qazi <sqazi@google.com>
+Date:   Wed, 12 Feb 2020 14:27:09 -0800
+Message-ID: <CAKUOC8VN5n+YnFLPbQWa1hKp+vOWH26FKS92R+h4EvS=e11jFA@mail.gmail.com>
+Subject: BLKSECDISCARD ioctl and hung tasks
+To:     Jens Axboe <axboe@kernel.dk>, Ming Lei <ming.lei@redhat.com>,
+        Bart Van Assche <bvanassche@acm.org>,
+        Christoph Hellwig <hch@lst.de>,
+        Linux Kernel Mailing List <linux-kernel@vger.kernel.org>,
+        linux-block@vger.kernel.org
+Cc:     Gwendal Grignou <gwendal@google.com>,
+        Jesse Barnes <jsbarnes@google.com>
+Content-Type: text/plain; charset="UTF-8"
 Sender: linux-block-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-On Wed, Feb 12, 2020 at 01:47:53AM +0000, Damien Le Moal wrote:
-> On 2020/02/12 4:01, Tim Walker wrote:
-> > On Tue, Feb 11, 2020 at 7:28 AM Ming Lei <ming.lei@redhat.com> wrote:
-> >>
-> >> On Mon, Feb 10, 2020 at 02:20:10PM -0500, Tim Walker wrote:
-> >>> Background:
-> >>>
-> >>> NVMe specification has hardened over the decade and now NVMe device=
-s
-> >>> are well integrated into our customers=E2=80=99 systems. As we look=
- forward,
-> >>> moving HDDs to the NVMe command set eliminates the SAS IOC and driv=
-er
-> >>> stack, consolidating on a single access method for rotational and
-> >>> static storage technologies. PCIe-NVMe offers near-SATA interface
-> >>> costs, features and performance suitable for high-cap HDDs, and
-> >>> optimal interoperability for storage automation, tiering, and
-> >>> management. We will share some early conceptual results and propose=
-d
-> >>> salient design goals and challenges surrounding an NVMe HDD.
-> >>
-> >> HDD. performance is very sensitive to IO order. Could you provide so=
-me
-> >> background info about NVMe HDD? Such as:
-> >>
-> >> - number of hw queues
-> >> - hw queue depth
-> >> - will NVMe sort/merge IO among all SQs or not?
-> >>
-> >>>
-> >>>
-> >>> Discussion Proposal:
-> >>>
-> >>> We=E2=80=99d like to share our views and solicit input on:
-> >>>
-> >>> -What Linux storage stack assumptions do we need to be aware of as =
-we
-> >>> develop these devices with drastically different performance
-> >>> characteristics than traditional NAND? For example, what schedular =
-or
-> >>> device driver level changes will be needed to integrate NVMe HDDs?
-> >>
-> >> IO merge is often important for HDD. IO merge is usually triggered w=
-hen
-> >> .queue_rq() returns STS_RESOURCE, so far this condition won't be
-> >> triggered for NVMe SSD.
-> >>
-> >> Also blk-mq kills BDI queue congestion and ioc batching, and causes
-> >> writeback performance regression[1][2].
-> >>
-> >> What I am thinking is that if we need to switch to use independent I=
-O
-> >> path for handling SSD and HDD. IO, given the two mediums are so
-> >> different from performance viewpoint.
-> >>
-> >> [1] https://urldefense.proofpoint.com/v2/url?u=3Dhttps-3A__lore.kern=
-el.org_linux-2Dscsi_Pine.LNX.4.44L0.1909181213141.1507-2D100000-40iolanth=
-e.rowland.org_&d=3DDwIFaQ&c=3DIGDlg0lD0b-nebmJJ0Kp8A&r=3DNW1X0yRHNNEluZ8s=
-OGXBxCbQJZPWcIkPT0Uy3ynVsFU&m=3DpSnHpt_uQQ73JV4VIQg1C_PVAcLvqBBtmyxQHwWjG=
-SM&s=3DtsnFP8bQIAq7G66B75LTe3vo4K14HbL9JJKsxl_LPAw&e=3D
-> >> [2] https://urldefense.proofpoint.com/v2/url?u=3Dhttps-3A__lore.kern=
-el.org_linux-2Dscsi_20191226083706.GA17974-40ming.t460p_&d=3DDwIFaQ&c=3DI=
-GDlg0lD0b-nebmJJ0Kp8A&r=3DNW1X0yRHNNEluZ8sOGXBxCbQJZPWcIkPT0Uy3ynVsFU&m=3D=
-pSnHpt_uQQ73JV4VIQg1C_PVAcLvqBBtmyxQHwWjGSM&s=3DGJwSxXtc_qZHKnrTqSbytUjuR=
-rrQgZpvV3bxZYFDHe4&e=3D
-> >>
-> >>
-> >> Thanks,
-> >> Ming
-> >>
-> >=20
-> > I would expect the drive would support a reasonable number of queues
-> > and a relatively deep queue depth, more in line with NVMe practices
-> > than SAS HDD's typical 128. But it probably doesn't make sense to
-> > queue up thousands of commands on something as slow as an HDD, and
-> > many customers keep queues < 32 for latency management.
->=20
-> Exposing an HDD through multiple-queues each with a high queue depth is
-> simply asking for troubles. Commands will end up spending so much time
-> sitting in the queues that they will timeout. This can already be obser=
-ved
-> with the smartpqi SAS HBA which exposes single drives as multiqueue blo=
-ck
-> devices with high queue depth. Exercising these drives heavily leads to
-> thousands of commands being queued and to timeouts. It is fairly easy t=
-o
-> trigger this without a manual change to the QD. This is on my to-do lis=
-t of
-> fixes for some time now (lacking time to do it).
+Hi,
 
-Just wondering why smartpqi SAS won't set one proper .cmd_per_lun for
-avoiding the issue, looks the driver simply assigns .can_queue to it,
-then it isn't strange to see the timeout issue. If .can_queue is a bit
-big, HDD. is easily saturated too long.
+So, here's another issue that we are grappling with, where we have a
+root-cause but don't currently have a good fix for.  BLKSECDISCARD is
+an operation used for securely destroying a subset of the data on a
+device.  Unfortunately, on SSDs, this is an operation with variable
+performance.  It can be O(minutes) in the worst case.  The
+pathological case is when many erase blocks on the flash contain a
+small amount of data that is part of the discard and a large amount of
+data that isn't.  In such cases, the erase blocks have to be copied
+almost in entirety to fresh blocks, in order to erase the sectors to
+be discarded. This can be thought of as a defragmentation operation on
+the drive and can be expected to cost in the same ballpark as
+rewriting most of the contents of the drive.
 
->=20
-> NVMe HDDs need to have an interface setup that match their speed, that =
-is,
-> something like a SAS interface: *single* queue pair with a max QD of 25=
-6 or
-> less depending on what the drive can take. Their is no TASK_SET_FULL
-> notification on NVMe, so throttling has to come from the max QD of the =
-SQ,
-> which the drive will advertise to the host.
->=20
-> > Merge and elevator are important to HDD performance. I don't believe
-> > NVMe should attempt to merge/sort across SQs. Can NVMe merge/sort
-> > within a SQ without driving large differences between SSD & HDD data
-> > paths?
->=20
-> As far as I know, there is no merging going on once requests are passed=
- to
-> the driver and added to an SQ. So this is beside the point.
-> The current default block scheduler for NVMe SSDs is "none". This is
-> decided based on the number of queues of the device. For NVMe drives th=
-at
-> have only a single queue *AND* the QUEUE_FLAG_NONROT flag cleared in th=
-eir
-> request queue will can fallback to the default spinning rust mq-deadlin=
-e
-> elevator. That will achieve command merging and LBA ordering needed for
-> good performance on HDDs.
+Therefore, it is possible for the thread waiting in the IOCTL in
+submit_bio_wait call in blkdev_issue_discard to wait for several
+minutes.  The hung task watchdog is usually configured for 2 minutes,
+and this can expire before the operation finishes.
 
-mq-deadline basically won't merge IO if STS_RESOURCE isn't returned from
-.queue_rq(), or blk_mq_get_dispatch_budget always return true. NVMe's
-.queue_rq() basically always returns STS_OK.
+This operation is very important to the security model of Chrome OS
+devices.  Therefore, we would like the kernel to survive this even if
+it takes several minutes.
 
+Three approaches come to mind:
 
-Thanks,=20
-Ming
+One approach is to somehow avoid waiting for a single monolithic
+operation and instead wait on bits and pieces of the operation.  These
+can be sized to finish within a reasonable timeframe.  The exact size
+is likely device-specific.  We already split these operations before
+issuing to the device, but the IOCTL thread is waiting for the whole
+rather than the parts. The hung task watchdog only sees the total
+amount of time the thread slept and not the forward progress taking
+place quietly.
 
+Another approach might be to do something in the spirit of the write
+system call: complete the partial operation (whatever the kernel
+thinks is reasonable), adjust the IOCTL argument and have the
+userspace reissue the syscall to continue the operation.  The second
+option should probably be done with a different IOCTL name to avoid
+breaking userspace.
+
+A third approach, which is perhaps more adventurous, is to have a
+notion of forward progress that a thread can export and the hung task
+watchdog can evaluate.  This can take the form of a function pointer
+and an argument.  The result of the function is a monotonically
+decreasing unsigned value.  When this value stops changing, we can
+conclude that the thread is hung.  This can be used in place of
+context switch count for tasks where this function is available.  This
+can potentially solve other similar issues, there is a way to tell if
+there is forward progress, but it is not as straightforward as the
+context switch count.
+
+What are your thoughts?
+
+Thanks in advance,
+
+Salman
