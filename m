@@ -5,76 +5,82 @@ X-Spam-Level:
 X-Spam-Status: No, score=-8.4 required=3.0 tests=DKIMWL_WL_HIGH,DKIM_SIGNED,
 	DKIM_VALID,DKIM_VALID_AU,HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,
 	MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,UNPARSEABLE_RELAY,
-	USER_AGENT_SANE_1 autolearn=unavailable autolearn_force=no version=3.4.0
+	USER_AGENT_SANE_1 autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id A5F11C2BA83
-	for <linux-block@archiver.kernel.org>; Wed, 12 Feb 2020 16:50:20 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 8A16FC2BA83
+	for <linux-block@archiver.kernel.org>; Wed, 12 Feb 2020 16:59:24 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.kernel.org (Postfix) with ESMTP id 746FF20724
-	for <linux-block@archiver.kernel.org>; Wed, 12 Feb 2020 16:50:20 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id 544FA206D7
+	for <linux-block@archiver.kernel.org>; Wed, 12 Feb 2020 16:59:24 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=pass (2048-bit key) header.d=oracle.com header.i=@oracle.com header.b="qZPfQarO"
+	dkim=pass (2048-bit key) header.d=oracle.com header.i=@oracle.com header.b="TXrZmYzh"
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1727007AbgBLQuT (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Wed, 12 Feb 2020 11:50:19 -0500
-Received: from userp2130.oracle.com ([156.151.31.86]:55822 "EHLO
+        id S1728422AbgBLQ7X (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Wed, 12 Feb 2020 11:59:23 -0500
+Received: from userp2130.oracle.com ([156.151.31.86]:41668 "EHLO
         userp2130.oracle.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1726728AbgBLQuT (ORCPT
+        with ESMTP id S1727600AbgBLQ7X (ORCPT
         <rfc822;linux-block@vger.kernel.org>);
-        Wed, 12 Feb 2020 11:50:19 -0500
+        Wed, 12 Feb 2020 11:59:23 -0500
 Received: from pps.filterd (userp2130.oracle.com [127.0.0.1])
-        by userp2130.oracle.com (8.16.0.42/8.16.0.42) with SMTP id 01CGcTse113041;
-        Wed, 12 Feb 2020 16:50:02 GMT
+        by userp2130.oracle.com (8.16.0.42/8.16.0.42) with SMTP id 01CGtOVl121429;
+        Wed, 12 Feb 2020 16:58:45 GMT
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=oracle.com; h=date : from : to : cc
  : subject : message-id : references : mime-version : content-type :
  in-reply-to; s=corp-2020-01-29;
- bh=P7Kw67h/ZApfPL1ZreJHw29g3oWW/typFfH0YIUrnvk=;
- b=qZPfQarOZK0SRaebBkOzD0Ycj0xv+n7wlFYN5TMkwXFYxV2Bor7KUYREBY8C8ayxauSf
- FslY5miwsK1XeIogc4LUoR2zgZ2qHgCuHDZffRsCn3iYx4HoY5DGBA6KolaFOCJ1sCmX
- uzXLkRDQuE1PJ/90a8o8swkXeVU/hx49GgQ4Nm1iG8YDoe7TiD7v6ML6PgYbzDRKAQH3
- kQ5Jv5uyaYCuzUbLFNO6sy7S/QfoUebyUyfjGgQU0OefaORk7mwLFvsZBM6Y+KQX4hD8
- CaFdWxvi8E4A9+L9Fj8sxu+RUk954RuukX+IuGIUtRYe/ZNQYWYkj4bOTN/Wo+s56DSl DA== 
-Received: from userp3030.oracle.com (userp3030.oracle.com [156.151.31.80])
-        by userp2130.oracle.com with ESMTP id 2y2k88c9bs-1
+ bh=I9mpgCY1Oxokgr9n0GWz7U2xRyXHvzAyC9jnnwDEPA8=;
+ b=TXrZmYzhVGOOyNNgFuab3uYn2N7wvgtQlOsGWkxfw9VfaE7CDyMzBnjbWB+KHwaZ/hVp
+ sMwzyf+szde0i+4EDzluf/USWBwaY7yc/bfzBIvpo1Sz7m9A37c8MXR0xKQ/SaFeXZbt
+ mATwrOndnfvLfaRSi5ItsRtplMlD8NOWJvPxiTpSdB6Tc0SyPtsCsqf0szUvzLOOjZ30
+ slUtExzevqmBF10EfvUf77z7uXQljW+7GAvfwpVskTbhGJICZS9WYGbZjiQ7D7Wjm+Bs
+ ektRFiNe0NnXSbbhTZsAQ1iIoHcc7nM6MY2DJ1uKfutxq9U3eH3C0WVx2HFyV9MK7guv 1g== 
+Received: from aserp3030.oracle.com (aserp3030.oracle.com [141.146.126.71])
+        by userp2130.oracle.com with ESMTP id 2y2k88cb8m-1
         (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=FAIL);
-        Wed, 12 Feb 2020 16:50:02 +0000
-Received: from pps.filterd (userp3030.oracle.com [127.0.0.1])
-        by userp3030.oracle.com (8.16.0.42/8.16.0.42) with SMTP id 01CGb2uj083361;
-        Wed, 12 Feb 2020 16:50:02 GMT
-Received: from userv0121.oracle.com (userv0121.oracle.com [156.151.31.72])
-        by userp3030.oracle.com with ESMTP id 2y4kaggdje-1
+        Wed, 12 Feb 2020 16:58:45 +0000
+Received: from pps.filterd (aserp3030.oracle.com [127.0.0.1])
+        by aserp3030.oracle.com (8.16.0.42/8.16.0.42) with SMTP id 01CGvj0n119038;
+        Wed, 12 Feb 2020 16:58:44 GMT
+Received: from aserv0122.oracle.com (aserv0122.oracle.com [141.146.126.236])
+        by aserp3030.oracle.com with ESMTP id 2y4k7x0tv9-1
         (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=OK);
-        Wed, 12 Feb 2020 16:50:02 +0000
-Received: from abhmp0002.oracle.com (abhmp0002.oracle.com [141.146.116.8])
-        by userv0121.oracle.com (8.14.4/8.13.8) with ESMTP id 01CGnvb3010870;
-        Wed, 12 Feb 2020 16:49:57 GMT
+        Wed, 12 Feb 2020 16:58:44 +0000
+Received: from abhmp0007.oracle.com (abhmp0007.oracle.com [141.146.116.13])
+        by aserv0122.oracle.com (8.14.4/8.14.4) with ESMTP id 01CGwesf008138;
+        Wed, 12 Feb 2020 16:58:40 GMT
 Received: from localhost (/10.159.151.237)
         by default (Oracle Beehive Gateway v4.0)
-        with ESMTP ; Wed, 12 Feb 2020 08:49:57 -0800
-Date:   Wed, 12 Feb 2020 08:49:56 -0800
+        with ESMTP ; Wed, 12 Feb 2020 08:58:40 -0800
+Date:   Wed, 12 Feb 2020 08:58:37 -0800
 From:   "Darrick J. Wong" <darrick.wong@oracle.com>
-To:     Naohiro Aota <naohiro.aota@wdc.com>
-Cc:     linux-mm@kvack.org, linux-fsdevel@vger.kernel.org,
-        linux-block@vger.kernel.org,
-        Andrew Morton <akpm@linux-foundation.org>,
-        Christoph Hellwig <hch@infradead.org>
-Subject: Re: [PATCH v2] mm, swap: move inode_lock out of claim_swapfile
-Message-ID: <20200212164956.GK6874@magnolia>
-References: <20200206090132.154869-1-naohiro.aota@wdc.com>
+To:     Kirill Tkhai <ktkhai@virtuozzo.com>
+Cc:     martin.petersen@oracle.com, bob.liu@oracle.com, axboe@kernel.dk,
+        agk@redhat.com, snitzer@redhat.com, dm-devel@redhat.com,
+        song@kernel.org, tytso@mit.edu, adilger.kernel@dilger.ca,
+        Chaitanya.Kulkarni@wdc.com, ming.lei@redhat.com, osandov@fb.com,
+        jthumshirn@suse.de, minwoo.im.dev@gmail.com, damien.lemoal@wdc.com,
+        andrea.parri@amarulasolutions.com, hare@suse.com, tj@kernel.org,
+        ajay.joshi@wdc.com, sagi@grimberg.me, dsterba@suse.com,
+        bvanassche@acm.org, dhowells@redhat.com, asml.silence@gmail.com,
+        linux-block@vger.kernel.org, linux-kernel@vger.kernel.org
+Subject: Re: [PATCH v6 4/6] block: Add support for REQ_ALLOCATE flag
+Message-ID: <20200212165837.GL6874@magnolia>
+References: <158132703141.239613.3550455492676290009.stgit@localhost.localdomain>
+ <158132723311.239613.5269033996109738831.stgit@localhost.localdomain>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=us-ascii
 Content-Disposition: inline
-In-Reply-To: <20200206090132.154869-1-naohiro.aota@wdc.com>
+In-Reply-To: <158132723311.239613.5269033996109738831.stgit@localhost.localdomain>
 User-Agent: Mutt/1.9.4 (2018-02-28)
 X-Proofpoint-Virus-Version: vendor=nai engine=6000 definitions=9529 signatures=668685
-X-Proofpoint-Spam-Details: rule=notspam policy=default score=0 phishscore=0 spamscore=0 bulkscore=0
- suspectscore=2 mlxscore=0 malwarescore=0 adultscore=0 mlxlogscore=999
- classifier=spam adjust=0 reason=mlx scancount=1 engine=8.12.0-2001150001
- definitions=main-2002120128
+X-Proofpoint-Spam-Details: rule=notspam policy=default score=0 mlxlogscore=999 adultscore=0
+ suspectscore=2 mlxscore=0 bulkscore=0 malwarescore=0 phishscore=0
+ spamscore=0 classifier=spam adjust=0 reason=mlx scancount=1
+ engine=8.12.0-2001150001 definitions=main-2002120128
 X-Proofpoint-Virus-Version: vendor=nai engine=6000 definitions=9529 signatures=668685
 X-Proofpoint-Spam-Details: rule=notspam policy=default score=0 adultscore=0 lowpriorityscore=0
  suspectscore=2 bulkscore=0 phishscore=0 mlxlogscore=999 mlxscore=0
- malwarescore=0 impostorscore=0 clxscore=1015 spamscore=0
+ malwarescore=0 impostorscore=0 clxscore=1011 spamscore=0
  priorityscore=1501 classifier=spam adjust=0 reason=mlx scancount=1
  engine=8.12.0-2001150001 definitions=main-2002120128
 Sender: linux-block-owner@vger.kernel.org
@@ -82,231 +88,218 @@ Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-On Thu, Feb 06, 2020 at 06:01:32PM +0900, Naohiro Aota wrote:
-> claim_swapfile() currently keeps the inode locked when it is successful, or
-> the file is already swapfile (with -EBUSY). And, on the other error cases,
-> it does not lock the inode.
+On Mon, Feb 10, 2020 at 12:33:53PM +0300, Kirill Tkhai wrote:
+> This adds support for REQ_ALLOCATE extension of REQ_OP_WRITE_ZEROES
+> operation, which encourages a block device driver to just allocate
+> blocks (or mark them allocated) instead of actual blocks zeroing.
+> REQ_ALLOCATE is aimed to be used for network filesystems providing
+> a block device interface. Also, block devices, which map a file
+> on other filesystem (like loop), may use this for less fragmentation
+> and batching fallocate() requests. Hypervisors like QEMU may
+> introduce optimizations of clusters allocations based on this.
 > 
-> This inconsistency of the lock state and return value is quite confusing
-> and actually causing a bad unlock balance as below in the "bad_swap"
-> section of __do_sys_swapon().
+> BLKDEV_ZERO_ALLOCATE is a new corresponding flag for
+> blkdev_issue_zeroout().
 > 
-> This commit fixes this issue by moving the inode_lock() and IS_SWAPFILE
-> check out of claim_swapfile(). The inode is unlocked in
-> "bad_swap_unlock_inode" section, so that the inode is ensured to be
-> unlocked at "bad_swap". Thus, error handling codes after the locking now
-> jumps to "bad_swap_unlock_inode" instead of "bad_swap".
+> Stacking devices start from zero max_allocate_sectors limit for now,
+> and the support is going to be implemented separate for each device
+> in the future.
 > 
->     =====================================
->     WARNING: bad unlock balance detected!
->     5.5.0-rc7+ #176 Not tainted
->     -------------------------------------
->     swapon/4294 is trying to release lock (&sb->s_type->i_mutex_key) at:
->     [<ffffffff8173a6eb>] __do_sys_swapon+0x94b/0x3550
->     but there are no more locks to release!
-> 
->     other info that might help us debug this:
->     no locks held by swapon/4294.
-> 
->     stack backtrace:
->     CPU: 5 PID: 4294 Comm: swapon Not tainted 5.5.0-rc7-BTRFS-ZNS+ #176
->     Hardware name: ASUS All Series/H87-PRO, BIOS 2102 07/29/2014
->     Call Trace:
->      dump_stack+0xa1/0xea
->      ? __do_sys_swapon+0x94b/0x3550
->      print_unlock_imbalance_bug.cold+0x114/0x123
->      ? __do_sys_swapon+0x94b/0x3550
->      lock_release+0x562/0xed0
->      ? kvfree+0x31/0x40
->      ? lock_downgrade+0x770/0x770
->      ? kvfree+0x31/0x40
->      ? rcu_read_lock_sched_held+0xa1/0xd0
->      ? rcu_read_lock_bh_held+0xb0/0xb0
->      up_write+0x2d/0x490
->      ? kfree+0x293/0x2f0
->      __do_sys_swapon+0x94b/0x3550
->      ? putname+0xb0/0xf0
->      ? kmem_cache_free+0x2e7/0x370
->      ? do_sys_open+0x184/0x3e0
->      ? generic_max_swapfile_size+0x40/0x40
->      ? do_syscall_64+0x27/0x4b0
->      ? entry_SYSCALL_64_after_hwframe+0x49/0xbe
->      ? lockdep_hardirqs_on+0x38c/0x590
->      __x64_sys_swapon+0x54/0x80
->      do_syscall_64+0xa4/0x4b0
->      entry_SYSCALL_64_after_hwframe+0x49/0xbe
->     RIP: 0033:0x7f15da0a0dc7
-> 
-> Fixes: 1638045c3677 ("mm: set S_SWAPFILE on blockdev swap devices")
-> Signed-off-by: Naohiro Aota <naohiro.aota@wdc.com>
+> Signed-off-by: Kirill Tkhai <ktkhai@virtuozzo.com>
+> Reviewed-by: Bob Liu <bob.liu@oracle.com>
 > ---
-> Changelog:
-> - Avoid taking inode lock in claim_swapfile()
-> - Change error handling
->   - Add "bad_swap_unlock_inode" section to ensure the inode is unlocked at
->     "bad_swap"
-> ---
->  mm/swapfile.c | 41 ++++++++++++++++++++---------------------
->  1 file changed, 20 insertions(+), 21 deletions(-)
+>  block/blk-lib.c           |   17 ++++++++++-------
+>  block/blk-settings.c      |    4 ++++
+>  fs/block_dev.c            |    4 ++++
+>  include/linux/blk_types.h |    5 ++++-
+>  include/linux/blkdev.h    |   13 ++++++++++---
+>  5 files changed, 32 insertions(+), 11 deletions(-)
 > 
-> diff --git a/mm/swapfile.c b/mm/swapfile.c
-> index bb3261d45b6a..2c4c349e1101 100644
-> --- a/mm/swapfile.c
-> +++ b/mm/swapfile.c
-> @@ -2899,10 +2899,6 @@ static int claim_swapfile(struct swap_info_struct *p, struct inode *inode)
->  		p->bdev = inode->i_sb->s_bdev;
->  	}
+> diff --git a/block/blk-lib.c b/block/blk-lib.c
+> index 3e38c93cfc53..9cd6f86523ba 100644
+> --- a/block/blk-lib.c
+> +++ b/block/blk-lib.c
+> @@ -214,7 +214,7 @@ static int __blkdev_issue_write_zeroes(struct block_device *bdev,
+>  		struct bio **biop, unsigned flags)
+>  {
+>  	struct bio *bio = *biop;
+> -	unsigned int max_write_zeroes_sectors;
+> +	unsigned int max_write_zeroes_sectors, req_flags = 0;
+>  	struct request_queue *q = bdev_get_queue(bdev);
 >  
-> -	inode_lock(inode);
-> -	if (IS_SWAPFILE(inode))
-> -		return -EBUSY;
-> -
->  	return 0;
->  }
+>  	if (!q)
+> @@ -224,18 +224,21 @@ static int __blkdev_issue_write_zeroes(struct block_device *bdev,
+>  		return -EPERM;
 >  
-> @@ -3157,36 +3153,41 @@ SYSCALL_DEFINE2(swapon, const char __user *, specialfile, int, swap_flags)
->  	mapping = swap_file->f_mapping;
->  	inode = mapping->host;
+>  	/* Ensure that max_write_zeroes_sectors doesn't overflow bi_size */
+> -	max_write_zeroes_sectors = bdev_write_zeroes_sectors(bdev, 0);
+> +	max_write_zeroes_sectors = bdev_write_zeroes_sectors(bdev, flags);
 >  
-> -	/* If S_ISREG(inode->i_mode) will do inode_lock(inode); */
->  	error = claim_swapfile(p, inode);
->  	if (unlikely(error))
->  		goto bad_swap;
+>  	if (max_write_zeroes_sectors == 0)
+>  		return -EOPNOTSUPP;
 >  
-> +	inode_lock(inode);
-> +	if (IS_SWAPFILE(inode)) {
-> +		error = -EBUSY;
-> +		goto bad_swap_unlock_inode;
-> +	}
+> +	if (flags & BLKDEV_ZERO_NOUNMAP)
+> +		req_flags |= REQ_NOUNMAP;
+> +	if (flags & BLKDEV_ZERO_ALLOCATE)
+> +		req_flags |= REQ_ALLOCATE|REQ_NOUNMAP;
 > +
->  	/*
->  	 * Read the swap header.
->  	 */
->  	if (!mapping->a_ops->readpage) {
->  		error = -EINVAL;
-> -		goto bad_swap;
-> +		goto bad_swap_unlock_inode;
->  	}
->  	page = read_mapping_page(mapping, 0, swap_file);
->  	if (IS_ERR(page)) {
->  		error = PTR_ERR(page);
-> -		goto bad_swap;
-> +		goto bad_swap_unlock_inode;
->  	}
->  	swap_header = kmap(page);
+>  	while (nr_sects) {
+>  		bio = blk_next_bio(bio, 0, gfp_mask);
+>  		bio->bi_iter.bi_sector = sector;
+>  		bio_set_dev(bio, bdev);
+> -		bio->bi_opf = REQ_OP_WRITE_ZEROES;
+> -		if (flags & BLKDEV_ZERO_NOUNMAP)
+> -			bio->bi_opf |= REQ_NOUNMAP;
+> +		bio->bi_opf = REQ_OP_WRITE_ZEROES | req_flags;
 >  
->  	maxpages = read_swap_header(p, swap_header, inode);
->  	if (unlikely(!maxpages)) {
->  		error = -EINVAL;
-> -		goto bad_swap;
-> +		goto bad_swap_unlock_inode;
->  	}
+>  		if (nr_sects > max_write_zeroes_sectors) {
+>  			bio->bi_iter.bi_size = max_write_zeroes_sectors << 9;
+> @@ -362,7 +365,7 @@ int blkdev_issue_zeroout(struct block_device *bdev, sector_t sector,
+>  	sector_t bs_mask;
+>  	struct bio *bio;
+>  	struct blk_plug plug;
+> -	bool try_write_zeroes = !!bdev_write_zeroes_sectors(bdev, 0);
+> +	bool try_write_zeroes = !!bdev_write_zeroes_sectors(bdev, flags);
 >  
->  	/* OK, set up the swap map and apply the bad block list */
->  	swap_map = vzalloc(maxpages);
->  	if (!swap_map) {
->  		error = -ENOMEM;
-> -		goto bad_swap;
-> +		goto bad_swap_unlock_inode;
->  	}
->  
->  	if (bdi_cap_stable_pages_required(inode_to_bdi(inode)))
-> @@ -3211,7 +3212,7 @@ SYSCALL_DEFINE2(swapon, const char __user *, specialfile, int, swap_flags)
->  					GFP_KERNEL);
->  		if (!cluster_info) {
->  			error = -ENOMEM;
-> -			goto bad_swap;
-> +			goto bad_swap_unlock_inode;
+>  	bs_mask = (bdev_logical_block_size(bdev) >> 9) - 1;
+>  	if ((sector | nr_sects) & bs_mask)
+> @@ -391,7 +394,7 @@ int blkdev_issue_zeroout(struct block_device *bdev, sector_t sector,
+>  			try_write_zeroes = false;
+>  			goto retry;
 >  		}
+> -		if (!bdev_write_zeroes_sectors(bdev, 0)) {
+> +		if (!bdev_write_zeroes_sectors(bdev, flags)) {
+>  			/*
+>  			 * Zeroing offload support was indicated, but the
+>  			 * device reported ILLEGAL REQUEST (for some devices
+> diff --git a/block/blk-settings.c b/block/blk-settings.c
+> index c8eda2e7b91e..8d5df9d37239 100644
+> --- a/block/blk-settings.c
+> +++ b/block/blk-settings.c
+> @@ -48,6 +48,7 @@ void blk_set_default_limits(struct queue_limits *lim)
+>  	lim->chunk_sectors = 0;
+>  	lim->max_write_same_sectors = 0;
+>  	lim->max_write_zeroes_sectors = 0;
+> +	lim->max_allocate_sectors = 0;
+>  	lim->max_discard_sectors = 0;
+>  	lim->max_hw_discard_sectors = 0;
+>  	lim->discard_granularity = 0;
+> @@ -83,6 +84,7 @@ void blk_set_stacking_limits(struct queue_limits *lim)
+>  	lim->max_dev_sectors = UINT_MAX;
+>  	lim->max_write_same_sectors = UINT_MAX;
+>  	lim->max_write_zeroes_sectors = UINT_MAX;
+> +	lim->max_allocate_sectors = 0;
+>  }
+>  EXPORT_SYMBOL(blk_set_stacking_limits);
 >  
->  		for (ci = 0; ci < nr_cluster; ci++)
-> @@ -3220,7 +3221,7 @@ SYSCALL_DEFINE2(swapon, const char __user *, specialfile, int, swap_flags)
->  		p->percpu_cluster = alloc_percpu(struct percpu_cluster);
->  		if (!p->percpu_cluster) {
->  			error = -ENOMEM;
-> -			goto bad_swap;
-> +			goto bad_swap_unlock_inode;
->  		}
->  		for_each_possible_cpu(cpu) {
->  			struct percpu_cluster *cluster;
-> @@ -3234,13 +3235,13 @@ SYSCALL_DEFINE2(swapon, const char __user *, specialfile, int, swap_flags)
+> @@ -506,6 +508,8 @@ int blk_stack_limits(struct queue_limits *t, struct queue_limits *b,
+>  					b->max_write_same_sectors);
+>  	t->max_write_zeroes_sectors = min(t->max_write_zeroes_sectors,
+>  					b->max_write_zeroes_sectors);
+> +	t->max_allocate_sectors = min(t->max_allocate_sectors,
+> +					b->max_allocate_sectors);
+>  	t->bounce_pfn = min_not_zero(t->bounce_pfn, b->bounce_pfn);
 >  
->  	error = swap_cgroup_swapon(p->type, maxpages);
->  	if (error)
-> -		goto bad_swap;
-> +		goto bad_swap_unlock_inode;
->  
->  	nr_extents = setup_swap_map_and_extents(p, swap_header, swap_map,
->  		cluster_info, maxpages, &span);
->  	if (unlikely(nr_extents < 0)) {
->  		error = nr_extents;
-> -		goto bad_swap;
-> +		goto bad_swap_unlock_inode;
->  	}
->  	/* frontswap enabled? set up bit-per-page map for frontswap */
->  	if (IS_ENABLED(CONFIG_FRONTSWAP))
-> @@ -3280,7 +3281,7 @@ SYSCALL_DEFINE2(swapon, const char __user *, specialfile, int, swap_flags)
->  
->  	error = init_swap_address_space(p->type, maxpages);
->  	if (error)
-> -		goto bad_swap;
-> +		goto bad_swap_unlock_inode;
->  
->  	/*
->  	 * Flush any pending IO and dirty mappings before we start using this
-> @@ -3290,7 +3291,7 @@ SYSCALL_DEFINE2(swapon, const char __user *, specialfile, int, swap_flags)
->  	error = inode_drain_writes(inode);
->  	if (error) {
->  		inode->i_flags &= ~S_SWAPFILE;
-> -		goto bad_swap;
-> +		goto bad_swap_unlock_inode;
->  	}
->  
->  	mutex_lock(&swapon_mutex);
-> @@ -3315,6 +3316,8 @@ SYSCALL_DEFINE2(swapon, const char __user *, specialfile, int, swap_flags)
->  
->  	error = 0;
->  	goto out;
+>  	t->seg_boundary_mask = min_not_zero(t->seg_boundary_mask,
+> diff --git a/fs/block_dev.c b/fs/block_dev.c
+> index 69bf2fb6f7cd..1ffef894b3bd 100644
+> --- a/fs/block_dev.c
+> +++ b/fs/block_dev.c
+> @@ -2122,6 +2122,10 @@ static long blkdev_fallocate(struct file *file, int mode, loff_t start,
+>  		error = blkdev_issue_zeroout(bdev, start >> 9, len >> 9,
+>  					     GFP_KERNEL, BLKDEV_ZERO_NOFALLBACK);
+>  		break;
+> +	case FALLOC_FL_KEEP_SIZE:
+> +		error = blkdev_issue_zeroout(bdev, start >> 9, len >> 9,
+> +			GFP_KERNEL, BLKDEV_ZERO_ALLOCATE | BLKDEV_ZERO_NOFALLBACK);
 
-Sorry to wander in late, but I don't see how we unlock the inode in the
-success case.  Before this patch, the "if (inode) inode_unlock(inode);"
-below out: would take care of this for both the success case and the
-bad_swap case, but now that's gone, and AFAICT after this patch we only
-unlock the inode when erroring out...
+I think this should be ^^^ indented to match the other calls.
 
-> +bad_swap_unlock_inode:
-> +	inode_unlock(inode);
+> +		break;
+>  	case FALLOC_FL_PUNCH_HOLE | FALLOC_FL_KEEP_SIZE | FALLOC_FL_NO_HIDE_STALE:
+>  		error = blkdev_issue_discard(bdev, start >> 9, len >> 9,
+>  					     GFP_KERNEL, 0);
+> diff --git a/include/linux/blk_types.h b/include/linux/blk_types.h
+> index 70254ae11769..86accd2caa4e 100644
+> --- a/include/linux/blk_types.h
+> +++ b/include/linux/blk_types.h
+> @@ -335,7 +335,9 @@ enum req_flag_bits {
+>  
+>  	/* command specific flags for REQ_OP_WRITE_ZEROES: */
+>  	__REQ_NOUNMAP,		/* do not free blocks when zeroing */
+> -
+> +	__REQ_ALLOCATE,		/* only notify about allocated blocks,
+> +				 * and do not actually zero them
 
-...since we never goto bad_swap_unlock_inode when error == 0, correct?
+"only notify"?  Is someone getting a notification?  Or are we simply
+"notifying" the device that it must ensure allocated blocks?
+
+If it's that last one, then perhaps this should be reworded:
+
+/*
+ * Ensure the LBA range is backed by physical storage
+ * without writing zeroes to the blocks.
+ */
 
 --D
 
->  bad_swap:
->  	free_percpu(p->percpu_cluster);
->  	p->percpu_cluster = NULL;
-> @@ -3322,6 +3325,7 @@ SYSCALL_DEFINE2(swapon, const char __user *, specialfile, int, swap_flags)
->  		set_blocksize(p->bdev, p->old_block_size);
->  		blkdev_put(p->bdev, FMODE_READ | FMODE_WRITE | FMODE_EXCL);
->  	}
-> +	inode = NULL;
->  	destroy_swap_extents(p);
->  	swap_cgroup_swapoff(p->type);
->  	spin_lock(&swap_lock);
-> @@ -3333,13 +3337,8 @@ SYSCALL_DEFINE2(swapon, const char __user *, specialfile, int, swap_flags)
->  	kvfree(frontswap_map);
->  	if (inced_nr_rotate_swap)
->  		atomic_dec(&nr_rotate_swap);
-> -	if (swap_file) {
-> -		if (inode) {
-> -			inode_unlock(inode);
-> -			inode = NULL;
-> -		}
-> +	if (swap_file)
->  		filp_close(swap_file, NULL);
-> -	}
->  out:
->  	if (page && !IS_ERR(page)) {
->  		kunmap(page);
-> -- 
-> 2.25.0
+> +				 */
+>  	__REQ_HIPRI,
+>  
+>  	/* for driver use */
+> @@ -362,6 +364,7 @@ enum req_flag_bits {
+>  #define REQ_CGROUP_PUNT		(1ULL << __REQ_CGROUP_PUNT)
+>  
+>  #define REQ_NOUNMAP		(1ULL << __REQ_NOUNMAP)
+> +#define REQ_ALLOCATE		(1ULL << __REQ_ALLOCATE)
+>  #define REQ_HIPRI		(1ULL << __REQ_HIPRI)
+>  
+>  #define REQ_DRV			(1ULL << __REQ_DRV)
+> diff --git a/include/linux/blkdev.h b/include/linux/blkdev.h
+> index 55a714161684..40707f980a2e 100644
+> --- a/include/linux/blkdev.h
+> +++ b/include/linux/blkdev.h
+> @@ -336,6 +336,7 @@ struct queue_limits {
+>  	unsigned int		max_hw_discard_sectors;
+>  	unsigned int		max_write_same_sectors;
+>  	unsigned int		max_write_zeroes_sectors;
+> +	unsigned int		max_allocate_sectors;
+>  	unsigned int		discard_granularity;
+>  	unsigned int		discard_alignment;
+>  
+> @@ -990,6 +991,8 @@ static inline struct bio_vec req_bvec(struct request *rq)
+>  static inline unsigned int blk_queue_get_max_write_zeroes_sectors(
+>  		struct request_queue *q, unsigned int op_flags)
+>  {
+> +	if (op_flags & REQ_ALLOCATE)
+> +		return q->limits.max_allocate_sectors;
+>  	return q->limits.max_write_zeroes_sectors;
+>  }
+>  
+> @@ -1226,6 +1229,7 @@ extern int __blkdev_issue_discard(struct block_device *bdev, sector_t sector,
+>  
+>  #define BLKDEV_ZERO_NOUNMAP	(1 << 0)  /* do not free blocks */
+>  #define BLKDEV_ZERO_NOFALLBACK	(1 << 1)  /* don't write explicit zeroes */
+> +#define BLKDEV_ZERO_ALLOCATE	(1 << 2)  /* allocate range of blocks */
+>  
+>  extern int __blkdev_issue_zeroout(struct block_device *bdev, sector_t sector,
+>  		sector_t nr_sects, gfp_t gfp_mask, struct bio **biop,
+> @@ -1430,10 +1434,13 @@ static inline unsigned int bdev_write_zeroes_sectors(struct block_device *bdev,
+>  {
+>  	struct request_queue *q = bdev_get_queue(bdev);
+>  
+> -	if (q)
+> -		return q->limits.max_write_zeroes_sectors;
+> +	if (!q)
+> +		return 0;
+>  
+> -	return 0;
+> +	if (flags & BLKDEV_ZERO_ALLOCATE)
+> +		return q->limits.max_allocate_sectors;
+> +	else
+> +		return q->limits.max_write_zeroes_sectors;
+>  }
+>  
+>  static inline enum blk_zoned_model bdev_zoned_model(struct block_device *bdev)
+> 
 > 
