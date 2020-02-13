@@ -2,251 +2,141 @@ Return-Path: <SRS0=GmId=4B=vger.kernel.org=linux-block-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-2.4 required=3.0 tests=DKIMWL_WL_HIGH,DKIM_SIGNED,
-	DKIM_VALID,DKIM_VALID_AU,HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,
-	SPF_HELO_NONE,SPF_PASS,USER_AGENT_SANE_1 autolearn=no autolearn_force=no
-	version=3.4.0
+X-Spam-Status: No, score=-5.2 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
+	MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED,
+	USER_AGENT_SANE_1 autolearn=unavailable autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 4D5A4C2BA83
-	for <linux-block@archiver.kernel.org>; Thu, 13 Feb 2020 07:54:05 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 1D0C7C2BA83
+	for <linux-block@archiver.kernel.org>; Thu, 13 Feb 2020 07:55:20 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.kernel.org (Postfix) with ESMTP id 15C012168B
-	for <linux-block@archiver.kernel.org>; Thu, 13 Feb 2020 07:54:05 +0000 (UTC)
-Authentication-Results: mail.kernel.org;
-	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="XzYHmt85"
+	by mail.kernel.org (Postfix) with ESMTP id EF1C22173E
+	for <linux-block@archiver.kernel.org>; Thu, 13 Feb 2020 07:55:19 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1729706AbgBMHyE (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Thu, 13 Feb 2020 02:54:04 -0500
-Received: from us-smtp-1.mimecast.com ([205.139.110.61]:27167 "EHLO
-        us-smtp-delivery-1.mimecast.com" rhost-flags-OK-OK-OK-FAIL)
-        by vger.kernel.org with ESMTP id S1729383AbgBMHyE (ORCPT
-        <rfc822;linux-block@vger.kernel.org>);
-        Thu, 13 Feb 2020 02:54:04 -0500
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-        s=mimecast20190719; t=1581580442;
-        h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-         to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-         content-transfer-encoding:content-transfer-encoding:
-         in-reply-to:in-reply-to:references:references;
-        bh=DhtNmiDUJW+7rS6fmiAxhTic8+FFuDLHqobM66ey41E=;
-        b=XzYHmt85CLGjb4zvKXvGWh1VaWIc3/lUyRe50NnHKFeTGMgQVYvfO4DHocgaJSpL/ngf94
-        EEC3CYTZB/Be5yQEkgKC7AtGNWtHIDOT3wYOXl8Cn5bdzKfb+F6YbPtU/mWaMlVWvSOhKB
-        /PcG473M9HQlH2qsGESK3SMFnvftrIg=
-Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
- [209.132.183.4]) (Using TLS) by relay.mimecast.com with ESMTP id
- us-mta-398-djjvqUcvMreLcUHNiznM5A-1; Thu, 13 Feb 2020 02:53:59 -0500
-X-MC-Unique: djjvqUcvMreLcUHNiznM5A-1
-Received: from smtp.corp.redhat.com (int-mx04.intmail.prod.int.phx2.redhat.com [10.5.11.14])
-        (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
-        (No client certificate requested)
-        by mimecast-mx01.redhat.com (Postfix) with ESMTPS id A0DD2101FC66;
-        Thu, 13 Feb 2020 07:53:58 +0000 (UTC)
-Received: from ming.t460p (ovpn-8-17.pek2.redhat.com [10.72.8.17])
-        by smtp.corp.redhat.com (Postfix) with ESMTPS id 1DA425DA7B;
-        Thu, 13 Feb 2020 07:53:52 +0000 (UTC)
-Date:   Thu, 13 Feb 2020 15:53:48 +0800
-From:   Ming Lei <ming.lei@redhat.com>
-To:     Damien Le Moal <Damien.LeMoal@wdc.com>
-Cc:     Tim Walker <tim.t.walker@seagate.com>,
-        "linux-block@vger.kernel.org" <linux-block@vger.kernel.org>,
-        linux-scsi <linux-scsi@vger.kernel.org>,
-        "linux-nvme@lists.infradead.org" <linux-nvme@lists.infradead.org>
-Subject: Re: [LSF/MM/BPF TOPIC] NVMe HDD
-Message-ID: <20200213075348.GA9144@ming.t460p>
-References: <CANo=J14resJ4U1nufoiDq+ULd0k-orRCsYah8Dve-y8uCjA62Q@mail.gmail.com>
- <20200211122821.GA29811@ming.t460p>
- <CANo=J14iRK8K3bc1g3rLBp=QTLZQak0DcHkvgZS2f=xO_HFgxQ@mail.gmail.com>
- <BYAPR04MB5816AA843E63FFE2EA1D5D23E71B0@BYAPR04MB5816.namprd04.prod.outlook.com>
- <20200212220328.GB25314@ming.t460p>
- <BYAPR04MB581622DDD1B8B56CEFF3C23AE71A0@BYAPR04MB5816.namprd04.prod.outlook.com>
+        id S1729757AbgBMHzT (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Thu, 13 Feb 2020 02:55:19 -0500
+Received: from relay.sw.ru ([185.231.240.75]:41694 "EHLO relay.sw.ru"
+        rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
+        id S1729692AbgBMHzT (ORCPT <rfc822;linux-block@vger.kernel.org>);
+        Thu, 13 Feb 2020 02:55:19 -0500
+Received: from [192.168.15.157]
+        by relay.sw.ru with esmtp (Exim 4.92.3)
+        (envelope-from <ktkhai@virtuozzo.com>)
+        id 1j29Kw-0001bZ-Iv; Thu, 13 Feb 2020 10:55:02 +0300
+Subject: Re: [PATCH v7 0/6] block: Introduce REQ_ALLOCATE flag for
+ REQ_OP_WRITE_ZEROES
+To:     axboe@kernel.dk
+Cc:     martin.petersen@oracle.com, bob.liu@oracle.com,
+        darrick.wong@oracle.com, agk@redhat.com, snitzer@redhat.com,
+        dm-devel@redhat.com, song@kernel.org, tytso@mit.edu,
+        adilger.kernel@dilger.ca, Chaitanya.Kulkarni@wdc.com,
+        ming.lei@redhat.com, osandov@fb.com, jthumshirn@suse.de,
+        minwoo.im.dev@gmail.com, damien.lemoal@wdc.com,
+        andrea.parri@amarulasolutions.com, hare@suse.com, tj@kernel.org,
+        ajay.joshi@wdc.com, sagi@grimberg.me, dsterba@suse.com,
+        bvanassche@acm.org, dhowells@redhat.com, asml.silence@gmail.com,
+        linux-block@vger.kernel.org, linux-kernel@vger.kernel.org
+References: <158157930219.111879.12072477040351921368.stgit@localhost.localdomain>
+From:   Kirill Tkhai <ktkhai@virtuozzo.com>
+Message-ID: <e2b7cbab-d91f-fd7b-de6f-a671caa6f5eb@virtuozzo.com>
+Date:   Thu, 13 Feb 2020 10:55:01 +0300
+User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:68.0) Gecko/20100101
+ Thunderbird/68.4.2
 MIME-Version: 1.0
+In-Reply-To: <158157930219.111879.12072477040351921368.stgit@localhost.localdomain>
 Content-Type: text/plain; charset=utf-8
-Content-Disposition: inline
-In-Reply-To: <BYAPR04MB581622DDD1B8B56CEFF3C23AE71A0@BYAPR04MB5816.namprd04.prod.outlook.com>
-User-Agent: Mutt/1.12.1 (2019-06-15)
-X-Scanned-By: MIMEDefang 2.79 on 10.5.11.14
-Content-Transfer-Encoding: quoted-printable
+Content-Language: en-US
+Content-Transfer-Encoding: 7bit
 Sender: linux-block-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-On Thu, Feb 13, 2020 at 02:40:41AM +0000, Damien Le Moal wrote:
-> Ming,
->=20
-> On 2020/02/13 7:03, Ming Lei wrote:
-> > On Wed, Feb 12, 2020 at 01:47:53AM +0000, Damien Le Moal wrote:
-> >> On 2020/02/12 4:01, Tim Walker wrote:
-> >>> On Tue, Feb 11, 2020 at 7:28 AM Ming Lei <ming.lei@redhat.com> wrot=
-e:
-> >>>>
-> >>>> On Mon, Feb 10, 2020 at 02:20:10PM -0500, Tim Walker wrote:
-> >>>>> Background:
-> >>>>>
-> >>>>> NVMe specification has hardened over the decade and now NVMe devi=
-ces
-> >>>>> are well integrated into our customers=E2=80=99 systems. As we lo=
-ok forward,
-> >>>>> moving HDDs to the NVMe command set eliminates the SAS IOC and dr=
-iver
-> >>>>> stack, consolidating on a single access method for rotational and
-> >>>>> static storage technologies. PCIe-NVMe offers near-SATA interface
-> >>>>> costs, features and performance suitable for high-cap HDDs, and
-> >>>>> optimal interoperability for storage automation, tiering, and
-> >>>>> management. We will share some early conceptual results and propo=
-sed
-> >>>>> salient design goals and challenges surrounding an NVMe HDD.
-> >>>>
-> >>>> HDD. performance is very sensitive to IO order. Could you provide =
-some
-> >>>> background info about NVMe HDD? Such as:
-> >>>>
-> >>>> - number of hw queues
-> >>>> - hw queue depth
-> >>>> - will NVMe sort/merge IO among all SQs or not?
-> >>>>
-> >>>>>
-> >>>>>
-> >>>>> Discussion Proposal:
-> >>>>>
-> >>>>> We=E2=80=99d like to share our views and solicit input on:
-> >>>>>
-> >>>>> -What Linux storage stack assumptions do we need to be aware of a=
-s we
-> >>>>> develop these devices with drastically different performance
-> >>>>> characteristics than traditional NAND? For example, what schedula=
-r or
-> >>>>> device driver level changes will be needed to integrate NVMe HDDs=
-?
-> >>>>
-> >>>> IO merge is often important for HDD. IO merge is usually triggered=
- when
-> >>>> .queue_rq() returns STS_RESOURCE, so far this condition won't be
-> >>>> triggered for NVMe SSD.
-> >>>>
-> >>>> Also blk-mq kills BDI queue congestion and ioc batching, and cause=
-s
-> >>>> writeback performance regression[1][2].
-> >>>>
-> >>>> What I am thinking is that if we need to switch to use independent=
- IO
-> >>>> path for handling SSD and HDD. IO, given the two mediums are so
-> >>>> different from performance viewpoint.
-> >>>>
-> >>>> [1] https://urldefense.proofpoint.com/v2/url?u=3Dhttps-3A__lore.ke=
-rnel.org_linux-2Dscsi_Pine.LNX.4.44L0.1909181213141.1507-2D100000-40iolan=
-the.rowland.org_&d=3DDwIFaQ&c=3DIGDlg0lD0b-nebmJJ0Kp8A&r=3DNW1X0yRHNNEluZ=
-8sOGXBxCbQJZPWcIkPT0Uy3ynVsFU&m=3DpSnHpt_uQQ73JV4VIQg1C_PVAcLvqBBtmyxQHwW=
-jGSM&s=3DtsnFP8bQIAq7G66B75LTe3vo4K14HbL9JJKsxl_LPAw&e=3D
-> >>>> [2] https://urldefense.proofpoint.com/v2/url?u=3Dhttps-3A__lore.ke=
-rnel.org_linux-2Dscsi_20191226083706.GA17974-40ming.t460p_&d=3DDwIFaQ&c=3D=
-IGDlg0lD0b-nebmJJ0Kp8A&r=3DNW1X0yRHNNEluZ8sOGXBxCbQJZPWcIkPT0Uy3ynVsFU&m=3D=
-pSnHpt_uQQ73JV4VIQg1C_PVAcLvqBBtmyxQHwWjGSM&s=3DGJwSxXtc_qZHKnrTqSbytUjuR=
-rrQgZpvV3bxZYFDHe4&e=3D
-> >>>>
-> >>>>
-> >>>> Thanks,
-> >>>> Ming
-> >>>>
-> >>>
-> >>> I would expect the drive would support a reasonable number of queue=
-s
-> >>> and a relatively deep queue depth, more in line with NVMe practices
-> >>> than SAS HDD's typical 128. But it probably doesn't make sense to
-> >>> queue up thousands of commands on something as slow as an HDD, and
-> >>> many customers keep queues < 32 for latency management.
-> >>
-> >> Exposing an HDD through multiple-queues each with a high queue depth=
- is
-> >> simply asking for troubles. Commands will end up spending so much ti=
-me
-> >> sitting in the queues that they will timeout. This can already be ob=
-served
-> >> with the smartpqi SAS HBA which exposes single drives as multiqueue =
-block
-> >> devices with high queue depth. Exercising these drives heavily leads=
- to
-> >> thousands of commands being queued and to timeouts. It is fairly eas=
-y to
-> >> trigger this without a manual change to the QD. This is on my to-do =
-list of
-> >> fixes for some time now (lacking time to do it).
-> >=20
-> > Just wondering why smartpqi SAS won't set one proper .cmd_per_lun for
-> > avoiding the issue, looks the driver simply assigns .can_queue to it,
-> > then it isn't strange to see the timeout issue. If .can_queue is a bi=
-t
-> > big, HDD. is easily saturated too long.
-> >=20
-> >>
-> >> NVMe HDDs need to have an interface setup that match their speed, th=
-at is,
-> >> something like a SAS interface: *single* queue pair with a max QD of=
- 256 or
-> >> less depending on what the drive can take. Their is no TASK_SET_FULL
-> >> notification on NVMe, so throttling has to come from the max QD of t=
-he SQ,
-> >> which the drive will advertise to the host.
-> >>
-> >>> Merge and elevator are important to HDD performance. I don't believ=
-e
-> >>> NVMe should attempt to merge/sort across SQs. Can NVMe merge/sort
-> >>> within a SQ without driving large differences between SSD & HDD dat=
-a
-> >>> paths?
-> >>
-> >> As far as I know, there is no merging going on once requests are pas=
-sed to
-> >> the driver and added to an SQ. So this is beside the point.
-> >> The current default block scheduler for NVMe SSDs is "none". This is
-> >> decided based on the number of queues of the device. For NVMe drives=
- that
-> >> have only a single queue *AND* the QUEUE_FLAG_NONROT flag cleared in=
- their
-> >> request queue will can fallback to the default spinning rust mq-dead=
-line
-> >> elevator. That will achieve command merging and LBA ordering needed =
-for
-> >> good performance on HDDs.
-> >=20
-> > mq-deadline basically won't merge IO if STS_RESOURCE isn't returned f=
-rom
-> > .queue_rq(), or blk_mq_get_dispatch_budget always return true. NVMe's
-> > .queue_rq() basically always returns STS_OK.
->=20
-> I am confused: when an elevator is set, ->queue_rq() is called for requ=
-ests
-> obtained from the elevator (with e->type->ops.dispatch_request()), afte=
-r
-> the requests went through it. And merging will happen at that stage whe=
-n
-> new requests are inserted in the elevator.
+Hi, Jens,
 
-When request is queued to lld via .queue_rq(), the request has been
-removed from scheduler queue. And IO merge is just done inside or
-against scheduler queue.
+could you please provide some comments on this? I sent v1 two months ago,
+and it would be great to know your vision of the functionality and
+the approach and whether it is going to go to block tree.
 
->=20
-> If the ->queue_rq() returns BLK_STS_RESOURCE or BLK_STS_DEV_RESOURCE, t=
-he
-> request is indeed requeued which offer more chances of further merging,=
- but
-> that is not the same as no merging happening.
-> Am I missing your point here ?
-
-BLK_STS_RESOURCE or BLK_STS_DEV_RESOURCE or getting no budget can be
-thought as device saturation feedback, then more requests can be
-gathered in scheduler queue since we don't dequeue request from
-scheduler queue when that happens, then IO merge is possible.
-
-Without any device saturation feedback from driver, block layer just
-dequeues request from scheduler queue with same speed of submission to
-hardware, then no IO can be merged.
-
-If you observe sequential IO on NVMe PCI, you will see no IO merge
-basically.
-
-=20
 Thanks,
-Ming
+Kirill
+
+On 13.02.2020 10:39, Kirill Tkhai wrote:
+> (was "[PATCH block v2 0/3] block: Introduce REQ_NOZERO flag
+>       for REQ_OP_WRITE_ZEROES operation";
+>  was "[PATCH RFC 0/3] block,ext4: Introduce REQ_OP_ASSIGN_RANGE
+>       to reflect extents allocation in block device internals")
+> 
+> v7: Two comments changed.
+> 
+> v6: req_op() cosmetic change.
+> 
+> v5: Kill dm|md patch, which disables REQ_ALLOCATE for these devices.
+>     Disable REQ_ALLOCATE for all stacking devices instead of this.
+> 
+> v4: Correct argument for mddev_check_write_zeroes().
+> 
+> v3: Rename REQ_NOZERO to REQ_ALLOCATE.
+>     Split helpers to separate patches.
+>     Add a patch, disabling max_allocate_sectors inheritance for dm.
+> 
+> v2: Introduce new flag for REQ_OP_WRITE_ZEROES instead of
+>     introduction a new operation as suggested by Martin K. Petersen.
+>     Removed ext4-related patch to focus on block changes
+>     for now.
+> 
+> Information about continuous extent placement may be useful
+> for some block devices. Say, distributed network filesystems,
+> which provide block device interface, may use this information
+> for better blocks placement over the nodes in their cluster,
+> and for better performance. Block devices, which map a file
+> on another filesystem (loop), may request the same length extent
+> on underlining filesystem for less fragmentation and for batching
+> allocation requests. Also, hypervisors like QEMU may use this
+> information for optimization of cluster allocations.
+> 
+> This patchset introduces REQ_ALLOCATE flag for REQ_OP_WRITE_ZEROES,
+> which makes a block device to allocate blocks instead of actual
+> blocks zeroing. This may be used for forwarding user's fallocate(0)
+> requests into block device internals. E.g., in loop driver this
+> will result in allocation extents in backing-file, so subsequent
+> write won't fail by the reason of no available space. Distributed
+> network filesystems will be able to assign specific servers for
+> specific extents, so subsequent write will be more efficient.
+> 
+> Patches [1-3/6] are preparation on helper functions, patch [4/6]
+> introduces REQ_ALLOCATE flag and implements all the logic,
+> patch [5/6] adds one more helper, patch [6/6] adds loop
+> as the first user of the flag.
+> 
+> Note, that here is only block-related patches, example of usage
+> for ext4 with a performance numbers may be seen in [1].
+> 
+> [1] https://lore.kernel.org/linux-ext4/157599697369.12112.10138136904533871162.stgit@localhost.localdomain/T/#me5bdd5cc313e14de615d81bea214f355ae975db0
+> ---
+> 
+> Kirill Tkhai (6):
+>       block: Add @flags argument to bdev_write_zeroes_sectors()
+>       block: Pass op_flags into blk_queue_get_max_sectors()
+>       block: Introduce blk_queue_get_max_write_zeroes_sectors()
+>       block: Add support for REQ_ALLOCATE flag
+>       block: Add blk_queue_max_allocate_sectors()
+>       loop: Add support for REQ_ALLOCATE
+> 
+> 
+>  block/blk-core.c                    |    6 +++---
+>  block/blk-lib.c                     |   17 ++++++++++-------
+>  block/blk-merge.c                   |    9 ++++++---
+>  block/blk-settings.c                |   17 +++++++++++++++++
+>  drivers/block/loop.c                |   20 +++++++++++++-------
+>  drivers/md/dm-kcopyd.c              |    2 +-
+>  drivers/target/target_core_iblock.c |    4 ++--
+>  fs/block_dev.c                      |    4 ++++
+>  include/linux/blk_types.h           |    6 ++++++
+>  include/linux/blkdev.h              |   34 ++++++++++++++++++++++++++--------
+>  10 files changed, 88 insertions(+), 31 deletions(-)
+> 
+> --
+> Signed-off-by: Kirill Tkhai <ktkhai@virtuozzo.com>
+> Reviewed-by: Bob Liu <bob.liu@oracle.com>
+> 
 
