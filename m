@@ -2,172 +2,148 @@ Return-Path: <SRS0=GmId=4B=vger.kernel.org=linux-block-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-8.3 required=3.0 tests=DKIMWL_WL_HIGH,DKIM_SIGNED,
+X-Spam-Status: No, score=-11.3 required=3.0 tests=DKIMWL_WL_MED,DKIM_SIGNED,
 	DKIM_VALID,DKIM_VALID_AU,HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,
-	MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,UNPARSEABLE_RELAY,
-	URIBL_BLOCKED,USER_AGENT_SANE_1 autolearn=unavailable autolearn_force=no
-	version=3.4.0
+	MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED,USER_IN_DEF_DKIM_WL
+	autolearn=no autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id A5B3CC2BA83
-	for <linux-block@archiver.kernel.org>; Thu, 13 Feb 2020 18:12:28 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id C6227C352A3
+	for <linux-block@archiver.kernel.org>; Thu, 13 Feb 2020 19:21:50 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.kernel.org (Postfix) with ESMTP id 8331F206CC
-	for <linux-block@archiver.kernel.org>; Thu, 13 Feb 2020 18:12:28 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id A078A2073A
+	for <linux-block@archiver.kernel.org>; Thu, 13 Feb 2020 19:21:50 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=pass (2048-bit key) header.d=oracle.com header.i=@oracle.com header.b="aKYwsRS0"
+	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="pS/rA/XQ"
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1727906AbgBMSM2 (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Thu, 13 Feb 2020 13:12:28 -0500
-Received: from userp2120.oracle.com ([156.151.31.85]:35386 "EHLO
-        userp2120.oracle.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1727683AbgBMSM1 (ORCPT
+        id S1728582AbgBMTVu (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Thu, 13 Feb 2020 14:21:50 -0500
+Received: from mail-io1-f66.google.com ([209.85.166.66]:38097 "EHLO
+        mail-io1-f66.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S1727076AbgBMTVt (ORCPT
         <rfc822;linux-block@vger.kernel.org>);
-        Thu, 13 Feb 2020 13:12:27 -0500
-Received: from pps.filterd (userp2120.oracle.com [127.0.0.1])
-        by userp2120.oracle.com (8.16.0.42/8.16.0.42) with SMTP id 01DI9ZhK142678;
-        Thu, 13 Feb 2020 18:11:51 GMT
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=oracle.com; h=date : from : to : cc
- : subject : message-id : references : mime-version : content-type :
- in-reply-to; s=corp-2020-01-29;
- bh=oUjiUJ1XIAp0MJir1ku+5R1eV8EDFgLwfjQqmIKY4JY=;
- b=aKYwsRS0tnqW1+EixuRwsvHEeuuZPpq6Ny7g60jXjqvl/6PpwZLPGnQ6RhChBO+13Wjw
- Fr7+ooTqyVrqQ8PW7o3WQysyHS0ae5s10S+bbMNrjyXkcn6srrbnvbqFu0wZpjzJm3D2
- 8MJYHNF01g78cUz7brTDYDo4vlAhBJMk0NbPQgjK8OT5UKDYjQDt3b36FMQciaaPi10e
- 9xfqWFiDzzZvPAB4CD/Ym6O+sgcXLFK0Y2ZNhPDVLcqeXusxeTTZAmG7D8un8YdpjLCO
- ZxdUQ8wYiH1lhbxeBi8T2R8dDQk5gfaTDeokE1VFqy3Y2egvErOfjp6rDygpFXCB9mRr Rw== 
-Received: from aserp3020.oracle.com (aserp3020.oracle.com [141.146.126.70])
-        by userp2120.oracle.com with ESMTP id 2y2p3sv69d-1
-        (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=OK);
-        Thu, 13 Feb 2020 18:11:51 +0000
-Received: from pps.filterd (aserp3020.oracle.com [127.0.0.1])
-        by aserp3020.oracle.com (8.16.0.42/8.16.0.42) with SMTP id 01DI7QRk140027;
-        Thu, 13 Feb 2020 18:11:50 GMT
-Received: from userv0121.oracle.com (userv0121.oracle.com [156.151.31.72])
-        by aserp3020.oracle.com with ESMTP id 2y4k37hvrw-1
-        (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=OK);
-        Thu, 13 Feb 2020 18:11:50 +0000
-Received: from abhmp0017.oracle.com (abhmp0017.oracle.com [141.146.116.23])
-        by userv0121.oracle.com (8.14.4/8.13.8) with ESMTP id 01DIBiLI007442;
-        Thu, 13 Feb 2020 18:11:44 GMT
-Received: from localhost (/67.169.218.210)
-        by default (Oracle Beehive Gateway v4.0)
-        with ESMTP ; Thu, 13 Feb 2020 10:11:43 -0800
-Date:   Thu, 13 Feb 2020 10:11:41 -0800
-From:   "Darrick J. Wong" <darrick.wong@oracle.com>
-To:     Kirill Tkhai <ktkhai@virtuozzo.com>
-Cc:     martin.petersen@oracle.com, bob.liu@oracle.com, axboe@kernel.dk,
-        agk@redhat.com, snitzer@redhat.com, dm-devel@redhat.com,
-        song@kernel.org, tytso@mit.edu, adilger.kernel@dilger.ca,
-        Chaitanya.Kulkarni@wdc.com, ming.lei@redhat.com, osandov@fb.com,
-        jthumshirn@suse.de, minwoo.im.dev@gmail.com, damien.lemoal@wdc.com,
-        andrea.parri@amarulasolutions.com, hare@suse.com, tj@kernel.org,
-        ajay.joshi@wdc.com, sagi@grimberg.me, dsterba@suse.com,
-        bvanassche@acm.org, dhowells@redhat.com, asml.silence@gmail.com,
-        linux-block@vger.kernel.org, linux-kernel@vger.kernel.org
-Subject: Re: [PATCH v7 6/6] loop: Add support for REQ_ALLOCATE
-Message-ID: <20200213181141.GT6874@magnolia>
-References: <158157930219.111879.12072477040351921368.stgit@localhost.localdomain>
- <158157957565.111879.5952051034259419400.stgit@localhost.localdomain>
+        Thu, 13 Feb 2020 14:21:49 -0500
+Received: by mail-io1-f66.google.com with SMTP id s24so7780672iog.5
+        for <linux-block@vger.kernel.org>; Thu, 13 Feb 2020 11:21:49 -0800 (PST)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=google.com; s=20161025;
+        h=mime-version:references:in-reply-to:from:date:message-id:subject:to
+         :cc;
+        bh=/QOUSXFhncnCv9tdGLgXn7t709p+c+vsJCaqhbGCgQg=;
+        b=pS/rA/XQrsxzALgzkkxUeROv/A+yx7tTwuLt9niMsfB6HwrxJMIlP3S2/4cJAI9Xxl
+         FEwPSATlEOu0eg2zmBQmE+QLH8NFhPJGMSP43gExdI76wnbvkqAkqVwfXFs/8+X4+ZMP
+         j9OHRJjNJPJf6srEwtDgNRoYZ2sM5AlxJ9JauV7+SkprHS0iAq04hzVRoYEkME95AMaA
+         KWBQrY3h2AZsrbxjz6W33oBVnW+96Q/3aKr5x/uyP6f08CkG52DwaC/wKWy8OelXOhHG
+         enBS8ih7VJX0/gHzC7y/6ktnVbeRNBA9p+kQy0prGSEVEFxHEx/6PeJiN5Xz0VnbYNg5
+         CaSQ==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20161025;
+        h=x-gm-message-state:mime-version:references:in-reply-to:from:date
+         :message-id:subject:to:cc;
+        bh=/QOUSXFhncnCv9tdGLgXn7t709p+c+vsJCaqhbGCgQg=;
+        b=K/i9zrlo4qdX7J3smlBPn2E6I8EjqfL4aApjHxRk1ENjL7MW0NSD7WPhvNaTdAbEy2
+         asOchqK76Ykt+RG1s0ItH3YgRFFbrzovtq3I/CdH99Z7whGJlPxs6veECsK82chxcE4r
+         H6keLGFGRsAmNdufrvogNs4X6cxvP2pCQ8IkSzgSyT4Tn4k0smwm79HsEx7AhCIAZgMO
+         6lxBUAyCFqWxagWyae/dwsnmWxEMSnd78Tx0oFHSkv5fAq+9amp0dtqcqcRYkDeVr1S+
+         pt1UE2EJ+fgpvUL6B2VJr+LtKsxaU/Q8jnyICfb6PaQOyuZGWVUjaeMmF44r2zOwSm1E
+         cf3w==
+X-Gm-Message-State: APjAAAXuUSK/5pCCnol3GPFlsA9d3u6M+SH4dsNq+Qt+WtG7dKRXzJEo
+        AKeTHyFekkMXSCAF7G8iDXeDwp2hBE2LnGVX392HrQ==
+X-Google-Smtp-Source: APXvYqwbrJIHiF6yo1n6cPB8dSDhRLQlDy6lDN6DDMGk6NwCczSxpnrZielmwNpETh3CvySMVqQQMDSUdbfC5OaU1zc=
+X-Received: by 2002:a5d:8c84:: with SMTP id g4mr23458168ion.289.1581621708984;
+ Thu, 13 Feb 2020 11:21:48 -0800 (PST)
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <158157957565.111879.5952051034259419400.stgit@localhost.localdomain>
-User-Agent: Mutt/1.9.4 (2018-02-28)
-X-Proofpoint-Virus-Version: vendor=nai engine=6000 definitions=9530 signatures=668685
-X-Proofpoint-Spam-Details: rule=notspam policy=default score=0 mlxscore=0 mlxlogscore=999 adultscore=0
- bulkscore=0 malwarescore=0 phishscore=0 suspectscore=0 spamscore=0
- classifier=spam adjust=0 reason=mlx scancount=1 engine=8.12.0-2001150001
- definitions=main-2002130128
-X-Proofpoint-Virus-Version: vendor=nai engine=6000 definitions=9530 signatures=668685
-X-Proofpoint-Spam-Details: rule=notspam policy=default score=0 spamscore=0 mlxscore=0 malwarescore=0
- suspectscore=0 mlxlogscore=999 priorityscore=1501 clxscore=1015
- impostorscore=0 lowpriorityscore=0 phishscore=0 adultscore=0 bulkscore=0
- classifier=spam adjust=0 reason=mlx scancount=1 engine=8.12.0-2001150001
- definitions=main-2002130128
+References: <CAKUOC8VN5n+YnFLPbQWa1hKp+vOWH26FKS92R+h4EvS=e11jFA@mail.gmail.com>
+ <20200213082643.GB9144@ming.t460p> <d2c77921-fdcd-4667-d21a-60700e6a2fa5@acm.org>
+In-Reply-To: <d2c77921-fdcd-4667-d21a-60700e6a2fa5@acm.org>
+From:   Salman Qazi <sqazi@google.com>
+Date:   Thu, 13 Feb 2020 11:21:37 -0800
+Message-ID: <CAKUOC8U1H8qJ+95pcF-fjeu9hag3P3Wm6XiOh26uXOkvpNngZg@mail.gmail.com>
+Subject: Re: BLKSECDISCARD ioctl and hung tasks
+To:     Bart Van Assche <bvanassche@acm.org>
+Cc:     Ming Lei <ming.lei@redhat.com>, Jens Axboe <axboe@kernel.dk>,
+        Christoph Hellwig <hch@lst.de>,
+        Linux Kernel Mailing List <linux-kernel@vger.kernel.org>,
+        linux-block@vger.kernel.org, Gwendal Grignou <gwendal@google.com>,
+        Jesse Barnes <jsbarnes@google.com>
+Content-Type: text/plain; charset="UTF-8"
 Sender: linux-block-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-On Thu, Feb 13, 2020 at 10:39:35AM +0300, Kirill Tkhai wrote:
-> Support for new modifier of REQ_OP_WRITE_ZEROES command.
-> This results in allocation extents in backing file instead
-> of actual blocks zeroing.
-> 
-> Signed-off-by: Kirill Tkhai <ktkhai@virtuozzo.com>
-> Reviewed-by: Bob Liu <bob.liu@oracle.com>
-> Reviewed-by: Darrick J. Wong <darrick.wong@oracle.com>
-> ---
->  drivers/block/loop.c |   20 +++++++++++++-------
->  1 file changed, 13 insertions(+), 7 deletions(-)
-> 
-> diff --git a/drivers/block/loop.c b/drivers/block/loop.c
-> index 739b372a5112..0704167a5aaa 100644
-> --- a/drivers/block/loop.c
-> +++ b/drivers/block/loop.c
-> @@ -581,6 +581,16 @@ static int lo_rw_aio(struct loop_device *lo, struct loop_cmd *cmd,
->  	return 0;
->  }
->  
+On Thu, Feb 13, 2020 at 9:48 AM Bart Van Assche <bvanassche@acm.org> wrote:
+>
+> On 2/13/20 12:26 AM, Ming Lei wrote:
+> > The approach used in blk_execute_rq() can be borrowed for workaround the
+> > issue, such as:
+> >
+> > diff --git a/block/bio.c b/block/bio.c
+> > index 94d697217887..c9ce19a86de7 100644
+> > --- a/block/bio.c
+> > +++ b/block/bio.c
+> > @@ -17,6 +17,7 @@
+> >   #include <linux/cgroup.h>
+> >   #include <linux/blk-cgroup.h>
+> >   #include <linux/highmem.h>
+> > +#include <linux/sched/sysctl.h>
+> >
+> >   #include <trace/events/block.h>
+> >   #include "blk.h"
+> > @@ -1019,12 +1020,19 @@ static void submit_bio_wait_endio(struct bio *bio)
+> >   int submit_bio_wait(struct bio *bio)
+> >   {
+> >       DECLARE_COMPLETION_ONSTACK_MAP(done, bio->bi_disk->lockdep_map);
+> > +     unsigned long hang_check;
+> >
+> >       bio->bi_private = &done;
+> >       bio->bi_end_io = submit_bio_wait_endio;
+> >       bio->bi_opf |= REQ_SYNC;
+> >       submit_bio(bio);
+> > -     wait_for_completion_io(&done);
+> > +
+> > +     /* Prevent hang_check timer from firing at us during very long I/O */
+> > +     hang_check = sysctl_hung_task_timeout_secs;
+> > +     if (hang_check)
+> > +             while (!wait_for_completion_io_timeout(&done, hang_check * (HZ/2)));
+> > +     else
+> > +             wait_for_completion_io(&done);
+> >
+> >       return blk_status_to_errno(bio->bi_status);
+> >   }
+>
+> Instead of suppressing the hung task complaints, has it been considered
+> to use the bio splitting mechanism to make discard bios smaller? Block
+> drivers may set a limit by calling blk_queue_max_discard_segments().
+>  From block/blk-settings.c:
+>
+> /**
+>   * blk_queue_max_discard_segments - set max segments for discard
+>   * requests
+>   * @q:  the request queue for the device
+>   * @max_segments:  max number of segments
+>   *
+>   * Description:
+>   *    Enables a low level driver to set an upper limit on the number of
+>   *    segments in a discard request.
+>   **/
+> void blk_queue_max_discard_segments(struct request_queue *q,
+>                 unsigned short max_segments)
+> {
+>         q->limits.max_discard_segments = max_segments;
+> }
+> EXPORT_SYMBOL_GPL(blk_queue_max_discard_segments);
+>
 
-Urgh, I meant "copy the comment directly to here", e.g.
+AFAICT, This is not actually sufficient, because the issuer of the bio
+is waiting for the entire bio, regardless of how it is split later.
+But, also there isn't a good mapping between the size of the secure
+discard and how long it will take.  If given the geometry of a flash
+device, it is not hard to construct a scenario where a relatively
+small secure discard (few thousand sectors) will take a very long time
+(multiple seconds).
 
-/*
- * Convert REQ_OP_WRITE_ZEROES modifiers into fallocate mode
- *
- * If the caller requires allocation, select that mode.  If the caller
- * doesn't want deallocation, call zeroout to write zeroes the range.
- * Otherwise, punch out the blocks.
- */
+Having said that, I don't like neutering the hung task timer either.
 
-The goal here is to reinforce the notion that FL_ZERO_RANGE is how we
-achieve nounmap zeroing...
-
---D
-
-> +static unsigned int write_zeroes_to_fallocate_mode(unsigned int flags)
-> +{
-> +	if (flags & REQ_ALLOCATE)
-> +		return 0;
-> +	if (flags & REQ_NOUNMAP)
-> +		return FALLOC_FL_ZERO_RANGE;
-> +	return FALLOC_FL_PUNCH_HOLE;
-> +}
-> +
->  static int do_req_filebacked(struct loop_device *lo, struct request *rq)
->  {
->  	struct loop_cmd *cmd = blk_mq_rq_to_pdu(rq);
-> @@ -599,14 +609,8 @@ static int do_req_filebacked(struct loop_device *lo, struct request *rq)
->  	case REQ_OP_FLUSH:
->  		return lo_req_flush(lo, rq);
->  	case REQ_OP_WRITE_ZEROES:
-> -		/*
-> -		 * If the caller doesn't want deallocation, call zeroout to
-> -		 * write zeroes the range.  Otherwise, punch them out.
-> -		 */
->  		return lo_fallocate(lo, rq, pos,
-> -			(rq->cmd_flags & REQ_NOUNMAP) ?
-> -				FALLOC_FL_ZERO_RANGE :
-> -				FALLOC_FL_PUNCH_HOLE);
-> +			write_zeroes_to_fallocate_mode(rq->cmd_flags));
->  	case REQ_OP_DISCARD:
->  		return lo_fallocate(lo, rq, pos, FALLOC_FL_PUNCH_HOLE);
->  	case REQ_OP_WRITE:
-> @@ -877,6 +881,7 @@ static void loop_config_discard(struct loop_device *lo)
->  		q->limits.discard_alignment = 0;
->  		blk_queue_max_discard_sectors(q, 0);
->  		blk_queue_max_write_zeroes_sectors(q, 0);
-> +		blk_queue_max_allocate_sectors(q, 0);
->  		blk_queue_flag_clear(QUEUE_FLAG_DISCARD, q);
->  		return;
->  	}
-> @@ -886,6 +891,7 @@ static void loop_config_discard(struct loop_device *lo)
->  
->  	blk_queue_max_discard_sectors(q, UINT_MAX >> 9);
->  	blk_queue_max_write_zeroes_sectors(q, UINT_MAX >> 9);
-> +	blk_queue_max_allocate_sectors(q, UINT_MAX >> 9);
->  	blk_queue_flag_set(QUEUE_FLAG_DISCARD, q);
->  }
->  
-> 
-> 
+> Thanks,
+>
+> Bart.
