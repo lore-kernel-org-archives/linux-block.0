@@ -2,89 +2,85 @@ Return-Path: <SRS0=GmId=4B=vger.kernel.org=linux-block-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-2.2 required=3.0 tests=DKIM_SIGNED,DKIM_VALID,
-	HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,
+X-Spam-Status: No, score=-2.6 required=3.0 tests=DKIMWL_WL_HIGH,DKIM_SIGNED,
+	DKIM_VALID,DKIM_VALID_AU,MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,
 	USER_AGENT_SANE_1 autolearn=no autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id E5BE5C2BA83
-	for <linux-block@archiver.kernel.org>; Thu, 13 Feb 2020 15:54:13 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 3F00BC2BA83
+	for <linux-block@archiver.kernel.org>; Thu, 13 Feb 2020 16:30:46 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.kernel.org (Postfix) with ESMTP id AFBCF20675
-	for <linux-block@archiver.kernel.org>; Thu, 13 Feb 2020 15:54:13 +0000 (UTC)
-Authentication-Results: mail.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel-dk.20150623.gappssmtp.com header.i=@kernel-dk.20150623.gappssmtp.com header.b="yfTDxgF5"
+	by mail.kernel.org (Postfix) with ESMTP id 0824924649
+	for <linux-block@archiver.kernel.org>; Thu, 13 Feb 2020 16:30:46 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+	s=default; t=1581611446;
+	bh=nsWJZz/XRgp46cV0agCDAmZPkwPwLp1ic2dkZW13uMI=;
+	h=Date:From:To:Cc:Subject:References:In-Reply-To:List-ID:From;
+	b=ddzQAuRnlCrx+eX7gnTSYGpv9XhUduifkbycl3sNtrSUZotvqFZhgv2VmDLP/1QKl
+	 hKft1cKHpJg9DQNl/JIyLUECPHh+CxEcHZXotjdd7KEuKRxI7aG94bmiChmxat1/fc
+	 RzmJ0Fr/crIW/53BhsNOkvi5k4phZXTD8Bh9OjKs=
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S2387644AbgBMPyM (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Thu, 13 Feb 2020 10:54:12 -0500
-Received: from mail-io1-f68.google.com ([209.85.166.68]:41502 "EHLO
-        mail-io1-f68.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1728933AbgBMPyM (ORCPT
-        <rfc822;linux-block@vger.kernel.org>);
-        Thu, 13 Feb 2020 10:54:12 -0500
-Received: by mail-io1-f68.google.com with SMTP id m25so6983997ioo.8
-        for <linux-block@vger.kernel.org>; Thu, 13 Feb 2020 07:54:11 -0800 (PST)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=kernel-dk.20150623.gappssmtp.com; s=20150623;
-        h=subject:to:cc:references:from:message-id:date:user-agent
-         :mime-version:in-reply-to:content-language:content-transfer-encoding;
-        bh=eIvReTS3Qjoh0tXO0AZKe1IM/rIuvGtF5twfce7QiCo=;
-        b=yfTDxgF5SWS1YF/UN8zpFCafDUZ34uo7IijCnGOq7x+ywJ6GYoR0yEgM9N0bBZh779
-         6vCbOxS9Rcaj64jVYUhxsx+DJc0rNF/Ux7L+QxyNe9tD8OpRzknH2xFIaxzBUjoyRBOc
-         Lsj0JMiDGvIFJ+W5IOr0cuv2kc8oizSmIOorW8Hsnmr/4NtdvB6Sz0oUIoMRzpM+5ELG
-         Gox5JRXyCYcdhJX/tkLK3JSW21B0DVlRbbgZv0250D7zNWzVjkJmhjeyYsxnj2dkWYYB
-         19qQOa7wlTyJ9REuObU1HR6Bt0hEDlJhhKF9+ogoXAoj/WhQZ2vVX22ifNWgBTlkuKLS
-         pLCg==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20161025;
-        h=x-gm-message-state:subject:to:cc:references:from:message-id:date
-         :user-agent:mime-version:in-reply-to:content-language
-         :content-transfer-encoding;
-        bh=eIvReTS3Qjoh0tXO0AZKe1IM/rIuvGtF5twfce7QiCo=;
-        b=ZPGNWtnv91y4v1wi4RQ7otd+0FebB6f+RpLpMxbVlw1g85vOy/03JOSGiXyiWYeJH2
-         9MxFRjeTzvFtnu8FfQj2d8VmM8n7SGBxM1PHAWC8oUBkbbBXJbaNUVTReYEOWxP5vo0S
-         SzDmjOrzedip3Nfv88DdLfYZXxy/ksi+UYzQJ9al2piV08798VhrHdKEeEUOq/vjaueM
-         B7zAPALDD70LWLp2e3tfqcRbB838W+RVA8g51R60fPv75AGtcz1do0+lgwelULT42Zrr
-         cYW0HxnKm5rglS34M7uJYpP9Ilp3WshuhQX+lT9x0iUyrNKcfqVdH4g1fTIjVnvJlesv
-         z5rg==
-X-Gm-Message-State: APjAAAWyL5oRfHL/qTIy7FQaaZNr9CpdGZsR+iwU4zMFZ+mFHzFMGNJr
-        VYIXtmJCbp8cQT0FrO0G0CWEZNVChcs=
-X-Google-Smtp-Source: APXvYqwGZfN4lk7ulX6F2FpaVGaM0d9VzIWAe4IBRaj+EZElMpyCZOm5zkJxHU69QZ5e4rG89Wqelg==
-X-Received: by 2002:a5d:878c:: with SMTP id f12mr22741292ion.164.1581609250827;
-        Thu, 13 Feb 2020 07:54:10 -0800 (PST)
-Received: from [192.168.1.159] ([65.144.74.34])
-        by smtp.gmail.com with ESMTPSA id f16sm987752ilq.16.2020.02.13.07.54.09
-        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
-        Thu, 13 Feb 2020 07:54:10 -0800 (PST)
-Subject: Re: [PATCH 0/3] bcache patches for Linux v5.6-rc2
-To:     Coly Li <colyli@suse.de>
-Cc:     linux-bcache@vger.kernel.org, linux-block@vger.kernel.org
-References: <20200213141207.77219-1-colyli@suse.de>
-From:   Jens Axboe <axboe@kernel.dk>
-Message-ID: <d724bf95-31f5-ae94-9774-d978c00ca544@kernel.dk>
-Date:   Thu, 13 Feb 2020 08:54:09 -0700
-User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:68.0) Gecko/20100101
- Thunderbird/68.4.1
+        id S1728047AbgBMQap (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Thu, 13 Feb 2020 11:30:45 -0500
+Received: from mail.kernel.org ([198.145.29.99]:35554 "EHLO mail.kernel.org"
+        rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
+        id S1727926AbgBMQap (ORCPT <rfc822;linux-block@vger.kernel.org>);
+        Thu, 13 Feb 2020 11:30:45 -0500
+Received: from redsun51.ssa.fujisawa.hgst.com (unknown [199.255.47.7])
+        (using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+        (No client certificate requested)
+        by mail.kernel.org (Postfix) with ESMTPSA id F3DB5217F4;
+        Thu, 13 Feb 2020 16:30:43 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+        s=default; t=1581611444;
+        bh=nsWJZz/XRgp46cV0agCDAmZPkwPwLp1ic2dkZW13uMI=;
+        h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
+        b=0rnNxsBFGlcfGbSG5+CPtnSIx21akwCBsUsO6wdm8O34Z+ufB7LBXP/sU8jM1/IAI
+         qPlyr6r7813v+7XU0QhXvqwNLFInRY775lp723vSXcB+xNbXJchlbi7zjiPjNIn0aK
+         HTV6p84oCg8+9UkaAdadR9A6sOBb1urepBHIDXvI=
+Date:   Fri, 14 Feb 2020 01:30:38 +0900
+From:   Keith Busch <kbusch@kernel.org>
+To:     Ming Lei <ming.lei@redhat.com>
+Cc:     Damien Le Moal <Damien.LeMoal@wdc.com>,
+        Tim Walker <tim.t.walker@seagate.com>,
+        "linux-block@vger.kernel.org" <linux-block@vger.kernel.org>,
+        linux-scsi <linux-scsi@vger.kernel.org>,
+        "linux-nvme@lists.infradead.org" <linux-nvme@lists.infradead.org>
+Subject: Re: [LSF/MM/BPF TOPIC] NVMe HDD
+Message-ID: <20200213163038.GB7634@redsun51.ssa.fujisawa.hgst.com>
+References: <CANo=J14resJ4U1nufoiDq+ULd0k-orRCsYah8Dve-y8uCjA62Q@mail.gmail.com>
+ <20200211122821.GA29811@ming.t460p>
+ <CANo=J14iRK8K3bc1g3rLBp=QTLZQak0DcHkvgZS2f=xO_HFgxQ@mail.gmail.com>
+ <BYAPR04MB5816AA843E63FFE2EA1D5D23E71B0@BYAPR04MB5816.namprd04.prod.outlook.com>
+ <20200212220328.GB25314@ming.t460p>
+ <BYAPR04MB581622DDD1B8B56CEFF3C23AE71A0@BYAPR04MB5816.namprd04.prod.outlook.com>
+ <20200213075348.GA9144@ming.t460p>
+ <BYAPR04MB58160C04182D5FE3A15842BBE71A0@BYAPR04MB5816.namprd04.prod.outlook.com>
+ <20200213083413.GC9144@ming.t460p>
 MIME-Version: 1.0
-In-Reply-To: <20200213141207.77219-1-colyli@suse.de>
-Content-Type: text/plain; charset=utf-8
-Content-Language: en-US
-Content-Transfer-Encoding: 7bit
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <20200213083413.GC9144@ming.t460p>
+User-Agent: Mutt/1.12.1 (2019-06-15)
 Sender: linux-block-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-On 2/13/20 7:12 AM, Coly Li wrote:
-> Hi Jens,
+On Thu, Feb 13, 2020 at 04:34:13PM +0800, Ming Lei wrote:
+> On Thu, Feb 13, 2020 at 08:24:36AM +0000, Damien Le Moal wrote:
+> > Got it. And since queue full will mean no more tags, submission will block
+> > on get_request() and there will be no chance in the elevator to merge
+> > anything (aside from opportunistic merging in plugs), isn't it ?
+> > So I guess NVMe HDDs will need some tuning in this area.
 > 
-> Here are 3 minor fixes Linux v5.6-rc2. The first 2 patches fix
-> kthread creating failure during bcache cache set starts up. The
-> last patch is a code clean up.
+> scheduler queue depth is usually 2 times of hw queue depth, so requests
+> ar usually enough for merging.
 > 
-> Please take them. Thanks in advance.
+> For NVMe, there isn't ns queue depth, such as scsi's device queue depth,
+> meantime the hw queue depth is big enough, so no chance to trigger merge.
 
-Applied, thanks.
-
--- 
-Jens Axboe
-
+Most NVMe devices contain a single namespace anyway, so the shared tag
+queue depth is effectively the ns queue depth, and an NVMe HDD should
+advertise queue count and depth capabilities orders of magnitude lower
+than what we're used to with nvme SSDs. That should get merging and
+BLK_STS_DEV_RESOURCE handling to occur as desired, right?
