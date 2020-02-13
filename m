@@ -2,103 +2,132 @@ Return-Path: <SRS0=GmId=4B=vger.kernel.org=linux-block-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-1.1 required=3.0 tests=DKIMWL_WL_HIGH,DKIM_SIGNED,
-	DKIM_VALID,DKIM_VALID_AU,MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS
-	autolearn=no autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-0.9 required=3.0 tests=DKIMWL_WL_HIGH,DKIM_SIGNED,
+	DKIM_VALID,DKIM_VALID_AU,HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,
+	SPF_HELO_NONE,SPF_PASS,UNPARSEABLE_RELAY autolearn=no autolearn_force=no
+	version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 7BCCDC352A3
-	for <linux-block@archiver.kernel.org>; Thu, 13 Feb 2020 03:48:21 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id D9CCBC3B188
+	for <linux-block@archiver.kernel.org>; Thu, 13 Feb 2020 04:17:16 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.kernel.org (Postfix) with ESMTP id 510A921734
-	for <linux-block@archiver.kernel.org>; Thu, 13 Feb 2020 03:48:21 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=default; t=1581565701;
-	bh=A/sum4cN+fJFH8KTL1/k6GWb/JisYfuI1zq3xrATJs0=;
-	h=Date:From:To:Cc:Subject:References:In-Reply-To:List-ID:From;
-	b=HjG27qdycOuBlnJGn60tUMRiFIYexuPv047Ud7myAXBxjqfZA8lAdvX33sdAzN4HU
-	 LIZS2BL3so9aDZS9MZwE9JXG2Ecb7FWgEZrvI7hQGv6WEFciMdYihME8WGdxHLaDiS
-	 Vrkuk8hMV+wzX2TfbjlxXt2dxMh4Qvo7z5NLAY5s=
+	by mail.kernel.org (Postfix) with ESMTP id B106F21734
+	for <linux-block@archiver.kernel.org>; Thu, 13 Feb 2020 04:17:16 +0000 (UTC)
+Authentication-Results: mail.kernel.org;
+	dkim=pass (2048-bit key) header.d=oracle.com header.i=@oracle.com header.b="iuJEyONS"
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1729617AbgBMDsU (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Wed, 12 Feb 2020 22:48:20 -0500
-Received: from mail-qk1-f193.google.com ([209.85.222.193]:41372 "EHLO
-        mail-qk1-f193.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1729470AbgBMDsU (ORCPT
+        id S1729603AbgBMERQ (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Wed, 12 Feb 2020 23:17:16 -0500
+Received: from userp2120.oracle.com ([156.151.31.85]:58020 "EHLO
+        userp2120.oracle.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S1729587AbgBMERP (ORCPT
         <rfc822;linux-block@vger.kernel.org>);
-        Wed, 12 Feb 2020 22:48:20 -0500
-Received: by mail-qk1-f193.google.com with SMTP id d11so4377492qko.8
-        for <linux-block@vger.kernel.org>; Wed, 12 Feb 2020 19:48:20 -0800 (PST)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20161025;
-        h=sender:date:from:to:cc:subject:message-id:references:mime-version
-         :content-disposition:in-reply-to;
-        bh=ULklmq5xuSAElXIxdRHBoIDGPBXQTHQq92zMeFakWro=;
-        b=vP6betWi1xiX+AUWZpTKau8Xl43dnfwdFUURuHLyisUsw1ISJ+loyf7yQb6tnds87j
-         3gu3phiIepalzGhbOCwJwZapuD/BGhC+LnzPHGM3u7OG2wHTyIMa0zMNIzbDGbEjbiWU
-         Ctmvv1g82/INRm/O46mhuO9vweSAhkuo0KpSsSy5Tj5F44q27SovS8TbBKW4jokymmK/
-         2dyL006PFGiJ7NAJaIAcYCLxvsDhipqGn/rQRFETaxDTcj/7kjlx8AP4KXpR+T1gCkyQ
-         L5JYNK6YeJF/x+nJ1pKSfbWtWU2LJ5Z+0G3773ReeFXXkzyzcJlrLkg4Dv3vCIW2kVdV
-         dNgg==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20161025;
-        h=x-gm-message-state:sender:date:from:to:cc:subject:message-id
-         :references:mime-version:content-disposition:in-reply-to;
-        bh=ULklmq5xuSAElXIxdRHBoIDGPBXQTHQq92zMeFakWro=;
-        b=Odkh/8IokdeX6NWfCqHZ7D5C9NF3r6KvQdQUfk33WeSHvbhO0167E5+rWFqrEuN9cE
-         tX8lBoBd9xp5vuhW7PSPv47Hg8VODwmP6Fg/HXNYo8/DihE15OzxrX7ZZveYiy1yogZO
-         KtsUjPiOaG4dnoH+G8qApJaFdrCJcF5gM9ntQrTyiW3wnVtys5xVk3ST1H0vUpeMm/xD
-         0dn9ruRygmByMBKrMJlUi+d404nNlDOS2CB4eg+J1gR2RciOxuMOZ2jtv+8QOUcYfq5z
-         gG5WJWaYgxNpN3zu9vQuVJ57kbZ9AuwEdbYQnp7kMzVUz6911A8PfRBcEFuNKTiQTN1R
-         Q/WA==
-X-Gm-Message-State: APjAAAWX90myw1a/LggS1xLvCZSKfUdLOwYD2ZlhDJg4C0c2ucsnCD34
-        qPVNs9iMl7XzTGn7+BZ+eL0=
-X-Google-Smtp-Source: APXvYqxy9hG7aBYe+AWpCOoCp2Ghxg6jkwMbFQSlNgKkZVnOO+Za36nMXTShPxj5tqo+jl6WxaQ55g==
-X-Received: by 2002:a05:620a:1537:: with SMTP id n23mr5163880qkk.476.1581565699477;
-        Wed, 12 Feb 2020 19:48:19 -0800 (PST)
-Received: from localhost ([71.172.127.161])
-        by smtp.gmail.com with ESMTPSA id i4sm617417qkf.111.2020.02.12.19.48.18
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Wed, 12 Feb 2020 19:48:18 -0800 (PST)
-Date:   Wed, 12 Feb 2020 22:48:18 -0500
-From:   Tejun Heo <tj@kernel.org>
-To:     Yufen Yu <yuyufen@huawei.com>
-Cc:     axboe@kernel.dk, linux-block@vger.kernel.org, jack@suse.cz,
-        bvanassche@acm.org
-Subject: Re: [PATCH] bdi: fix use-after-free for bdi device
-Message-ID: <20200213034818.GE88887@mtj.thefacebook.com>
-References: <20200211140038.146629-1-yuyufen@huawei.com>
- <b7cd6193-586b-f4e0-9a5d-cc961eafaf81@huawei.com>
- <20200212213344.GE80993@mtj.thefacebook.com>
- <fd9d78b9-1119-27cc-fa74-04cb85d4f578@huawei.com>
+        Wed, 12 Feb 2020 23:17:15 -0500
+Received: from pps.filterd (userp2120.oracle.com [127.0.0.1])
+        by userp2120.oracle.com (8.16.0.42/8.16.0.42) with SMTP id 01D49A0l002900;
+        Thu, 13 Feb 2020 04:17:06 GMT
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=oracle.com; h=to : cc : subject :
+ from : references : date : in-reply-to : message-id : mime-version :
+ content-type; s=corp-2020-01-29;
+ bh=+E+GllyTG9PBTs0Otk6DgALwahzxRyV7OBkh64owcPs=;
+ b=iuJEyONSvWF3OrCLcyLVAgmUZbk+WfbqPdWxh09YnCSyL0Vi5e63QeqHkiUdw83urnXW
+ 3DDa6EBiECTZAz30uTcBsHiSRLZlqySlQfqQD3OhzCzUoy3VMKTxGWPGtTyYGMlF5cBD
+ VyutPhKpeb3gawXo0tkcn4xjiXnU1NRaL5xT80XhrjpHroTqsit61+l4szXeeSQqwpeD
+ yFsnvQ9tK2xUrie24l2CxwztpiIjSsXaOt0Jl2D8XBaTJqkQHSgYyuxzoJ1lRsVjUMo+
+ 44xSovduSWGcL83MmZ8ga05QrHpAOyZr3iX4XETTu8FsG2bM267cDq1VTfg4iTv0l0VG Kg== 
+Received: from aserp3030.oracle.com (aserp3030.oracle.com [141.146.126.71])
+        by userp2120.oracle.com with ESMTP id 2y2p3spv62-1
+        (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=FAIL);
+        Thu, 13 Feb 2020 04:17:05 +0000
+Received: from pps.filterd (aserp3030.oracle.com [127.0.0.1])
+        by aserp3030.oracle.com (8.16.0.42/8.16.0.42) with SMTP id 01D47msM025637;
+        Thu, 13 Feb 2020 04:17:05 GMT
+Received: from userv0122.oracle.com (userv0122.oracle.com [156.151.31.75])
+        by aserp3030.oracle.com with ESMTP id 2y4k7xy1xf-1
+        (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=OK);
+        Thu, 13 Feb 2020 04:17:05 +0000
+Received: from abhmp0017.oracle.com (abhmp0017.oracle.com [141.146.116.23])
+        by userv0122.oracle.com (8.14.4/8.14.4) with ESMTP id 01D4H3DV014670;
+        Thu, 13 Feb 2020 04:17:03 GMT
+Received: from ca-mkp.ca.oracle.com (/10.159.214.123)
+        by default (Oracle Beehive Gateway v4.0)
+        with ESMTP ; Wed, 12 Feb 2020 20:17:03 -0800
+To:     Tim Walker <tim.t.walker@seagate.com>
+Cc:     "Martin K. Petersen" <martin.petersen@oracle.com>,
+        Damien Le Moal <Damien.LeMoal@wdc.com>,
+        Ming Lei <ming.lei@redhat.com>,
+        "linux-block\@vger.kernel.org" <linux-block@vger.kernel.org>,
+        linux-scsi <linux-scsi@vger.kernel.org>,
+        "linux-nvme\@lists.infradead.org" <linux-nvme@lists.infradead.org>
+Subject: Re: [LSF/MM/BPF TOPIC] NVMe HDD
+From:   "Martin K. Petersen" <martin.petersen@oracle.com>
+Organization: Oracle Corporation
+References: <CANo=J14resJ4U1nufoiDq+ULd0k-orRCsYah8Dve-y8uCjA62Q@mail.gmail.com>
+        <20200211122821.GA29811@ming.t460p>
+        <CANo=J14iRK8K3bc1g3rLBp=QTLZQak0DcHkvgZS2f=xO_HFgxQ@mail.gmail.com>
+        <BYAPR04MB5816AA843E63FFE2EA1D5D23E71B0@BYAPR04MB5816.namprd04.prod.outlook.com>
+        <yq1blq3rxzj.fsf@oracle.com>
+        <CANo=J16cDBUDWdV7tdY33UO0UT0t-g7jRfMVTxZpePvLew7Mxg@mail.gmail.com>
+Date:   Wed, 12 Feb 2020 23:17:00 -0500
+In-Reply-To: <CANo=J16cDBUDWdV7tdY33UO0UT0t-g7jRfMVTxZpePvLew7Mxg@mail.gmail.com>
+        (Tim Walker's message of "Wed, 12 Feb 2020 22:12:48 -0500")
+Message-ID: <yq1r1yzqfyb.fsf@oracle.com>
+User-Agent: Gnus/5.13 (Gnus v5.13) Emacs/26.1.92 (gnu/linux)
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <fd9d78b9-1119-27cc-fa74-04cb85d4f578@huawei.com>
+Content-Type: text/plain
+X-Proofpoint-Virus-Version: vendor=nai engine=6000 definitions=9529 signatures=668685
+X-Proofpoint-Spam-Details: rule=notspam policy=default score=0 mlxlogscore=999 adultscore=0
+ suspectscore=0 mlxscore=0 bulkscore=0 malwarescore=0 phishscore=0
+ spamscore=0 classifier=spam adjust=0 reason=mlx scancount=1
+ engine=8.12.0-2001150001 definitions=main-2002130031
+X-Proofpoint-Virus-Version: vendor=nai engine=6000 definitions=9529 signatures=668685
+X-Proofpoint-Spam-Details: rule=notspam policy=default score=0 spamscore=0 mlxscore=0 malwarescore=0
+ suspectscore=0 mlxlogscore=999 priorityscore=1501 clxscore=1015
+ impostorscore=0 lowpriorityscore=0 phishscore=0 adultscore=0 bulkscore=0
+ classifier=spam adjust=0 reason=mlx scancount=1 engine=8.12.0-2001150001
+ definitions=main-2002130031
 Sender: linux-block-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-Hello,
 
-On Thu, Feb 13, 2020 at 10:46:34AM +0800, Yufen Yu wrote:
-> For each time of register, bdi_register() will try to create a new 'dev'.
-> 
-> bdi_register
->     bdi_register_va
->         if (bdi->dev) // if bdi->dev is not NULL, return directly
->             return 0;
->         dev = device_create_vargs()...
-> 
-> So, I think freeing bdi->dev until bdi itself does may be a problem
-> for drivers that supported re-registration bdi, such as:
+Tim,
 
-Ugh, thanks for noticing that. I guess the right thing to do is then
-going full RCU. What do you think about expanding your previous patch
-so that ->dev has __rcu annotation, users use the RCU accessors and
-the device is destroyed asynchronously through call_rcu()?
+> SAS currently supports QD256, but the general consensus is that most
+> customers don't run anywhere near that deep. Does it help the system
+> for the HD to report a limited (256) max queue depth, or is it really
+> up to the system to decide many commands to queue?
 
-Thanks.
+People often artificially lower the queue depth to avoid timeouts. The
+default timeout is 30 seconds from an I/O is queued. However, many
+enterprise applications set the timeout to 3-5 seconds. Which means that
+with deep queues you'll quickly start seeing timeouts if a drive
+temporarily is having issues keeping up (media errors, excessive spare
+track seeks, etc.).
+
+Well-behaved devices will return QF/TSF if they have transient resource
+starvation or exceed internal QoS limits. QF will cause the SCSI stack
+to reduce the number of I/Os in flight. This allows the drive to recover
+from its congested state and reduces the potential of application and
+filesystem timeouts.
+
+> Regarding number of SQ pairs, I think HDD would function well with
+> only one. Some thoughts on why we would want >1:
+
+> -A priority-based SQ servicing algorithm that would permit
+> low-priority commands to be queued in a dedicated SQ.
+> -The host may want an SQ per actuator for multi-actuator devices.
+
+That's fine. I think we're just saying that the common practice of
+allocating very deep queues for each CPU core in the system will lead to
+problems since the host will inevitably be able to queue much more I/O
+than the drive can realistically complete.
+
+> Since NVMe doesn't guarantee command execution order, it seems the
+> zoned block version of an NVME HDD would need to support zone append.
+> Do you agree?
+
+Absolutely!
 
 -- 
-tejun
+Martin K. Petersen	Oracle Linux Engineering
