@@ -4,52 +4,52 @@ X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 X-Spam-Level: 
 X-Spam-Status: No, score=-10.1 required=3.0 tests=DKIMWL_WL_HIGH,DKIM_SIGNED,
 	DKIM_VALID,DKIM_VALID_AU,INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,
-	SPF_HELO_NONE,SPF_PASS,USER_AGENT_GIT autolearn=ham autolearn_force=no
-	version=3.4.0
+	SPF_HELO_NONE,SPF_PASS,USER_AGENT_GIT autolearn=unavailable
+	autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id AF171C3B1A1
-	for <linux-block@archiver.kernel.org>; Fri, 14 Feb 2020 16:29:58 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 54F05C2BA83
+	for <linux-block@archiver.kernel.org>; Fri, 14 Feb 2020 16:46:57 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.kernel.org (Postfix) with ESMTP id 86D9024694
-	for <linux-block@archiver.kernel.org>; Fri, 14 Feb 2020 16:29:58 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id 2D5082082F
+	for <linux-block@archiver.kernel.org>; Fri, 14 Feb 2020 16:46:57 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=default; t=1581697798;
-	bh=eD0+slTQEDPWptH6UvgJhptAS0AAfbbJ/DGCI2QLIbQ=;
+	s=default; t=1581698817;
+	bh=sXKr07LhSMJaxeyVmTeEL6LuRaf6FLMgJOtCXcSEip8=;
 	h=From:To:Cc:Subject:Date:In-Reply-To:References:List-ID:From;
-	b=gbfQt01mv5ncO5Vh7O0LIQ2NLGcJvqTIBZVtZU2Nw045Fjx9+EOuSTlmwBWlYC58U
-	 n2JSSxOalipmTWQvIz9D4TH/NptxOvCFnQ8ZD8XEVM8SyjEA/aoomR2Uze2vkwcyxs
-	 7IyO4IvvqRc20ATGQ2u8TZLRtIB9t5UAtN+DTXzc=
+	b=I9giBsoNzm2uBOhpAV6hZkW5SXYovwB6gRLuu5dsbXCzlh0q2mavm+nzBtrAMrzoH
+	 BstMRgZYuGQsOao4O5CPpkyfmZ/eiWtHSR5SUwOF4+xjwLXcr36MyYqI/qTdk58U4D
+	 r8As240tq96TzNsBEch7fylDQrLIL70KnqAJcoJY=
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S2406239AbgBNQ35 (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Fri, 14 Feb 2020 11:29:57 -0500
-Received: from mail.kernel.org ([198.145.29.99]:37116 "EHLO mail.kernel.org"
+        id S2405337AbgBNQVL (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Fri, 14 Feb 2020 11:21:11 -0500
+Received: from mail.kernel.org ([198.145.29.99]:55442 "EHLO mail.kernel.org"
         rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-        id S2406436AbgBNQ0a (ORCPT <rfc822;linux-block@vger.kernel.org>);
-        Fri, 14 Feb 2020 11:26:30 -0500
+        id S2405324AbgBNQVJ (ORCPT <rfc822;linux-block@vger.kernel.org>);
+        Fri, 14 Feb 2020 11:21:09 -0500
 Received: from sasha-vm.mshome.net (c-73-47-72-35.hsd1.nh.comcast.net [73.47.72.35])
         (using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
         (No client certificate requested)
-        by mail.kernel.org (Postfix) with ESMTPSA id F18B1246FB;
-        Fri, 14 Feb 2020 16:26:28 +0000 (UTC)
+        by mail.kernel.org (Postfix) with ESMTPSA id C956C24747;
+        Fri, 14 Feb 2020 16:21:07 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-        s=default; t=1581697589;
-        bh=eD0+slTQEDPWptH6UvgJhptAS0AAfbbJ/DGCI2QLIbQ=;
+        s=default; t=1581697268;
+        bh=sXKr07LhSMJaxeyVmTeEL6LuRaf6FLMgJOtCXcSEip8=;
         h=From:To:Cc:Subject:Date:In-Reply-To:References:From;
-        b=MU3lLoFbU/6Ar0wLrO66gpfqjczXUXX3JvW6T+D2/8x3o85Pym7OJRm3oAuv2trEc
-         mhERDY1IYyAkwZ8s9HTmyOJSyOWYlz6TcIHqWkn8DS21s1NubZJyTTW8o4MwoZci9C
-         HZlP5Q+xPRxnqpt7OJKs0EFFOHEUlwxz3sFSsF5Y=
+        b=V6Sg+1aYenfS/M2NIL1bVhvj7C0ZTE/BzV+ZF0fAmIbMUOEZSKDg4OZph3XrE0mHU
+         NQdmSC15lJgOXQWfouI6+Dc11isgt7Wpjvu+1mW5C4zFbtFXcgKuglfJu+PWskmCMr
+         rdClHNi2wE+Y9XetSJGK5Tvo0gHCMiUwEAi42uBU=
 From:   Sasha Levin <sashal@kernel.org>
 To:     linux-kernel@vger.kernel.org, stable@vger.kernel.org
 Cc:     Zhiqiang Liu <liuzhiqiang26@huawei.com>,
         Bob Liu <bob.liu@oracle.com>, Ming Lei <ming.lei@redhat.com>,
         Jens Axboe <axboe@kernel.dk>, Sasha Levin <sashal@kernel.org>,
         linux-block@vger.kernel.org
-Subject: [PATCH AUTOSEL 4.4 100/100] brd: check and limit max_part par
-Date:   Fri, 14 Feb 2020 11:24:24 -0500
-Message-Id: <20200214162425.21071-100-sashal@kernel.org>
+Subject: [PATCH AUTOSEL 4.14 182/186] brd: check and limit max_part par
+Date:   Fri, 14 Feb 2020 11:17:11 -0500
+Message-Id: <20200214161715.18113-182-sashal@kernel.org>
 X-Mailer: git-send-email 2.20.1
-In-Reply-To: <20200214162425.21071-1-sashal@kernel.org>
-References: <20200214162425.21071-1-sashal@kernel.org>
+In-Reply-To: <20200214161715.18113-1-sashal@kernel.org>
+References: <20200214161715.18113-1-sashal@kernel.org>
 MIME-Version: 1.0
 X-stable: review
 X-Patchwork-Hint: Ignore
@@ -121,10 +121,10 @@ Signed-off-by: Sasha Levin <sashal@kernel.org>
  1 file changed, 20 insertions(+), 2 deletions(-)
 
 diff --git a/drivers/block/brd.c b/drivers/block/brd.c
-index 1914c63ca8b1d..58c1138ad5e17 100644
+index 2d7178f7754ed..0129b1921cb36 100644
 --- a/drivers/block/brd.c
 +++ b/drivers/block/brd.c
-@@ -581,6 +581,25 @@ static struct kobject *brd_probe(dev_t dev, int *part, void *data)
+@@ -529,6 +529,25 @@ static struct kobject *brd_probe(dev_t dev, int *part, void *data)
  	return kobj;
  }
  
@@ -150,7 +150,7 @@ index 1914c63ca8b1d..58c1138ad5e17 100644
  static int __init brd_init(void)
  {
  	struct brd_device *brd, *next;
-@@ -604,8 +623,7 @@ static int __init brd_init(void)
+@@ -552,8 +571,7 @@ static int __init brd_init(void)
  	if (register_blkdev(RAMDISK_MAJOR, "ramdisk"))
  		return -EIO;
  
