@@ -1,79 +1,74 @@
-Return-Path: <SRS0=GmId=4B=vger.kernel.org=linux-block-owner@kernel.org>
+Return-Path: <SRS0=urI+=4C=vger.kernel.org=linux-block-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-11.3 required=3.0 tests=DKIMWL_WL_MED,DKIM_SIGNED,
+X-Spam-Status: No, score=-5.4 required=3.0 tests=DKIMWL_WL_HIGH,DKIM_SIGNED,
 	DKIM_VALID,DKIM_VALID_AU,HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,
-	MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED,USER_IN_DEF_DKIM_WL
-	autolearn=no autolearn_force=no version=3.4.0
+	MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,USER_AGENT_SANE_1
+	autolearn=unavailable autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 526E5C352A3
-	for <linux-block@archiver.kernel.org>; Thu, 13 Feb 2020 22:08:18 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id C04D2C352A3
+	for <linux-block@archiver.kernel.org>; Fri, 14 Feb 2020 00:26:00 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.kernel.org (Postfix) with ESMTP id 1634C217F4
-	for <linux-block@archiver.kernel.org>; Thu, 13 Feb 2020 22:08:18 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id 901E62187F
+	for <linux-block@archiver.kernel.org>; Fri, 14 Feb 2020 00:26:00 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="txT4jK1J"
+	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="eOPZJgj7"
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1727609AbgBMWIR (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Thu, 13 Feb 2020 17:08:17 -0500
-Received: from mail-io1-f67.google.com ([209.85.166.67]:42501 "EHLO
-        mail-io1-f67.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1726282AbgBMWIR (ORCPT
+        id S1727988AbgBNAZ7 (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Thu, 13 Feb 2020 19:25:59 -0500
+Received: from us-smtp-2.mimecast.com ([207.211.31.81]:41157 "EHLO
+        us-smtp-delivery-1.mimecast.com" rhost-flags-OK-OK-OK-FAIL)
+        by vger.kernel.org with ESMTP id S1727604AbgBNAZ7 (ORCPT
         <rfc822;linux-block@vger.kernel.org>);
-        Thu, 13 Feb 2020 17:08:17 -0500
-Received: by mail-io1-f67.google.com with SMTP id z1so7738884iom.9
-        for <linux-block@vger.kernel.org>; Thu, 13 Feb 2020 14:08:16 -0800 (PST)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=google.com; s=20161025;
-        h=mime-version:references:in-reply-to:from:date:message-id:subject:to
-         :cc;
-        bh=PvTmvGfvJmOv7sMbAjwocI81PqYWLyNw6wRoKoHV6qg=;
-        b=txT4jK1J0pBtT9kg3vVsCO4+fPlEEgl0mw/PQqXHnDzVPHf1XFGMXXGWSOkx36QT+M
-         VpDhUw85bVIZAXgTqTvaEkxT48Z8Ur8OA2/wpwNXs6gXisBx2OlaYnAJBEFD9B//46qP
-         t/oHlKKxqFBmo9MBOeYDZDgAE3p14qbAeZ+dlEVwugWXswqi914wl6jAMHuAR0eTPAi6
-         y2eJbwjJolAzw2xqxyimpS0RmJ3n9f6jKJ+20Q4ytQasqPlrw6fasVslAvVjRc/uCcvM
-         FauQ1mtCSUfKUPi83ludoUvB9+x1qfE9UyUxicbj//+lSrh9DMaC/nCAo/wZ26XukEI5
-         5yRg==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20161025;
-        h=x-gm-message-state:mime-version:references:in-reply-to:from:date
-         :message-id:subject:to:cc;
-        bh=PvTmvGfvJmOv7sMbAjwocI81PqYWLyNw6wRoKoHV6qg=;
-        b=tjs32zZpdceCWAsHU/U0xdFH8QV94wQQ05vIFm8LQ8RnNyxOB7uKAbwzmQ33SdsGsP
-         u7P9irPFWt2vR0+hL43C6MQKbNx+B6FNht2YKK2QuxHFrWNWcUxpEzu3Cp36YmrcY3wE
-         c9oTBQJYaynHaoFKIXqFJmXaQXa4HgHiuaL1wj8T/AlktT7Ycex8A5+3t8pdkK3FsQI9
-         wsujdPy7oTileMA8U8KlDhESvxzhY9biN3dCqrpiN5pP0Z6o/4nemdANFdoK2njI9erC
-         6oEAd2q0q99Vpa0ZsFN6X1nYjCEWY/rrGab8YHE4xkAa2TIGrFae6dIcmaBdmJZIPLb5
-         tHSw==
-X-Gm-Message-State: APjAAAXQX0erRSL4bfGb0UPLzMTuNsiA3kwM2FKiE+z0srpWRbhkMXQz
-        W26j+92IJNbe2h2ID0ur0ajNYgqroyd2NSimWQqk5g==
-X-Google-Smtp-Source: APXvYqzouCBHWn9pG6B4NKVnpMkjX7h2J2/kCFDH8mqr1st4quO6paJ726ZTIeLIe6O9RURzpeKV7WvozsevHmVpHHE=
-X-Received: by 2002:a02:7fd0:: with SMTP id r199mr94717jac.126.1581631696132;
- Thu, 13 Feb 2020 14:08:16 -0800 (PST)
-MIME-Version: 1.0
-References: <CAKUOC8VN5n+YnFLPbQWa1hKp+vOWH26FKS92R+h4EvS=e11jFA@mail.gmail.com>
- <20200213082643.GB9144@ming.t460p> <d2c77921-fdcd-4667-d21a-60700e6a2fa5@acm.org>
- <CAKUOC8U1H8qJ+95pcF-fjeu9hag3P3Wm6XiOh26uXOkvpNngZg@mail.gmail.com>
-In-Reply-To: <CAKUOC8U1H8qJ+95pcF-fjeu9hag3P3Wm6XiOh26uXOkvpNngZg@mail.gmail.com>
-From:   Salman Qazi <sqazi@google.com>
-Date:   Thu, 13 Feb 2020 14:08:04 -0800
-Message-ID: <CAKUOC8U9+x4SDji-v=1PEoHmcTQ40fU0sOt34+2v5qpfKwVbVQ@mail.gmail.com>
-Subject: Re: BLKSECDISCARD ioctl and hung tasks
-To:     Bart Van Assche <bvanassche@acm.org>
-Cc:     Ming Lei <ming.lei@redhat.com>, Jens Axboe <axboe@kernel.dk>,
+        Thu, 13 Feb 2020 19:25:59 -0500
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+        s=mimecast20190719; t=1581639959;
+        h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+         to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+         in-reply-to:in-reply-to:references:references;
+        bh=qOuyJfMfPTaKw6DAz8xXan7RlS4xgiXwLj+Ny+dnSmo=;
+        b=eOPZJgj7UL+o3Tm51Dl4XlWWzJ5xfwZAxsOvzy/bvlWyAnJFgWwxaRF1wkYojceV/hXJEl
+        /QWQjQUxyumi/R0R/BgiaZokRt3ZAY/6840fwvlSYmpdSbW55KUme8KuLQMOSozB0TLO0H
+        XiP/IQBCaHsNGsRMHoqYzz3J7iElU7U=
+Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
+ [209.132.183.4]) (Using TLS) by relay.mimecast.com with ESMTP id
+ us-mta-371-BM4H64XGMuWV1aBsm-tH9A-1; Thu, 13 Feb 2020 19:25:51 -0500
+X-MC-Unique: BM4H64XGMuWV1aBsm-tH9A-1
+Received: from smtp.corp.redhat.com (int-mx08.intmail.prod.int.phx2.redhat.com [10.5.11.23])
+        (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
+        (No client certificate requested)
+        by mimecast-mx01.redhat.com (Postfix) with ESMTPS id 507FE1851FC2;
+        Fri, 14 Feb 2020 00:25:49 +0000 (UTC)
+Received: from ming.t460p (ovpn-8-16.pek2.redhat.com [10.72.8.16])
+        by smtp.corp.redhat.com (Postfix) with ESMTPS id EA18219C70;
+        Fri, 14 Feb 2020 00:25:42 +0000 (UTC)
+Date:   Fri, 14 Feb 2020 08:25:38 +0800
+From:   Ming Lei <ming.lei@redhat.com>
+To:     Salman Qazi <sqazi@google.com>
+Cc:     Bart Van Assche <bvanassche@acm.org>, Jens Axboe <axboe@kernel.dk>,
         Christoph Hellwig <hch@lst.de>,
         Linux Kernel Mailing List <linux-kernel@vger.kernel.org>,
         linux-block@vger.kernel.org, Gwendal Grignou <gwendal@google.com>,
         Jesse Barnes <jsbarnes@google.com>
-Content-Type: text/plain; charset="UTF-8"
+Subject: Re: BLKSECDISCARD ioctl and hung tasks
+Message-ID: <20200214002538.GA4907@ming.t460p>
+References: <CAKUOC8VN5n+YnFLPbQWa1hKp+vOWH26FKS92R+h4EvS=e11jFA@mail.gmail.com>
+ <20200213082643.GB9144@ming.t460p>
+ <d2c77921-fdcd-4667-d21a-60700e6a2fa5@acm.org>
+ <CAKUOC8U1H8qJ+95pcF-fjeu9hag3P3Wm6XiOh26uXOkvpNngZg@mail.gmail.com>
+MIME-Version: 1.0
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <CAKUOC8U1H8qJ+95pcF-fjeu9hag3P3Wm6XiOh26uXOkvpNngZg@mail.gmail.com>
+User-Agent: Mutt/1.12.1 (2019-06-15)
+X-Scanned-By: MIMEDefang 2.84 on 10.5.11.23
 Sender: linux-block-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-On Thu, Feb 13, 2020 at 11:21 AM Salman Qazi <sqazi@google.com> wrote:
->
+On Thu, Feb 13, 2020 at 11:21:37AM -0800, Salman Qazi wrote:
 > On Thu, Feb 13, 2020 at 9:48 AM Bart Van Assche <bvanassche@acm.org> wrote:
 > >
 > > On 2/13/20 12:26 AM, Ming Lei wrote:
@@ -136,76 +131,26 @@ On Thu, Feb 13, 2020 at 11:21 AM Salman Qazi <sqazi@google.com> wrote:
 > > }
 > > EXPORT_SYMBOL_GPL(blk_queue_max_discard_segments);
 > >
->
+> 
 > AFAICT, This is not actually sufficient, because the issuer of the bio
 > is waiting for the entire bio, regardless of how it is split later.
+
+Right.
+
 > But, also there isn't a good mapping between the size of the secure
 > discard and how long it will take.  If given the geometry of a flash
 > device, it is not hard to construct a scenario where a relatively
 > small secure discard (few thousand sectors) will take a very long time
 > (multiple seconds).
->
+
+It isn't strange to see such implementation, and I also see discard
+request timeout.
+
+> 
 > Having said that, I don't like neutering the hung task timer either.
 
-In fact, it's worse than that.  Today, I was able to construct a case
-of a 4K discard on a particular device that took 100 seconds.  I did
-this
-by arranging to write a single copy of page 0 for every erase unit of
-the device, and wrote random LBAs to the rest of the erase unit.  I
-suspect the
-slow speed comes from the need to copy almost the entire device to
-erase all the stale copies of page 0.
+But it does fix the hung warning, doesn't it?
 
-#define _GNU_SOURCE
-#include <sys/types.h>
-#include <sys/stat.h>
-#include <sys/ioctl.h>
-#include <fcntl.h>
-#include <assert.h>
-#include <unistd.h>
-#include <linux/fs.h>
-#include <stdio.h>
-#include <stdlib.h>
-#include <time.h>
+thanks,
+Ming
 
-char page[8192];
-
-int main(int argc, char **argv)
-{
-        unsigned long start;
-        int fd;
-        int i;
-        char *page_aligned = (char *)(((unsigned long)page + 4095) & ~4095UL);
-        unsigned long range[2];
-        fd = open(argv[1], O_RDWR | O_DIRECT);
-        assert(fd >= 0);
-        range[0] = 0;
-        assert(ioctl(fd, BLKGETSIZE64, &range[1]) >= 0);
-        for (i = 0; i < range[1]; i += 4096) {
-                /* paranoia: incase there is any deduping */
-                page_aligned[0] = i;
-                /*
-                 * Almost always write randomly
-                 */
-                if (i % (4*1024*1024) != 0)
-                        assert(pwrite(fd, page_aligned, 4096,
-                              (lrand48() % range[1]) & ~4095UL) == 4096);
-                else
-                        /* except, once per erase block, write page 0 */
-                        assert(pwrite(fd, page_aligned, 4096, 0) == 4096);
-        }
-        start = time(NULL);
-
-        /* discard exactly one page */
-        range[1] = 4096;
-        printf("Starting discard %lu!\n", start);
-        assert(ioctl(fd, BLKSECDISCARD, &range) >= 0);
-        printf("Finished discard.  Took %lu!\n", time(NULL) - start);
-        close(fd);
-}
-
-
->
-> > Thanks,
-> >
-> > Bart.
