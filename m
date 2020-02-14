@@ -7,47 +7,49 @@ X-Spam-Status: No, score=-10.1 required=3.0 tests=DKIMWL_WL_HIGH,DKIM_SIGNED,
 	SPF_HELO_NONE,SPF_PASS,USER_AGENT_GIT autolearn=unavailable
 	autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 6D9E2C3F68F
-	for <linux-block@archiver.kernel.org>; Fri, 14 Feb 2020 17:39:46 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id C54D7C3F68F
+	for <linux-block@archiver.kernel.org>; Fri, 14 Feb 2020 17:39:49 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.kernel.org (Postfix) with ESMTP id 4702F20873
-	for <linux-block@archiver.kernel.org>; Fri, 14 Feb 2020 17:39:46 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id A28DD20873
+	for <linux-block@archiver.kernel.org>; Fri, 14 Feb 2020 17:39:49 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=default; t=1581701986;
-	bh=zXYDllGi1W/9ul4JnuG2KMjPEJFmSPCqF3M/JJp9SfE=;
+	s=default; t=1581701989;
+	bh=SW0AGWU43L1UZ/wqfndLFzbkWOYuZ1G2GYhqzyIz6A0=;
 	h=From:To:Cc:Subject:Date:In-Reply-To:References:List-ID:From;
-	b=I23oqvc1kGhrwukiYWcfG4dF73dUdBKQJwhZPxornW3KxJG+wJucJh3LZM3sjdXc8
-	 Ej74aVwombw82LPpetYu0JGZwk7ar2GxhBVqBXhXptsTq2QdfrHP4hQ6QubCtrM7p8
-	 yPW40mzrGp5Z333u0fvSQB8CSVhoz9MXXaDDVgdM=
+	b=Is+HIG6uWcdpbN8VCyRbq2miQpn82GQfW9LrVSzhKijzEeECg+dXJk/Q2taMfICLJ
+	 f2yqTP1OtAgmbW2nhLbe8kbm6/zFd/fONzZu/G0lHQzl6NS4o1GjzsLOqnTS96jWgk
+	 9KVilWsPEYsVo4foTHqNpBIZ+UHXv8xyMkUbnIpM=
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S2389880AbgBNQEP (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Fri, 14 Feb 2020 11:04:15 -0500
-Received: from mail.kernel.org ([198.145.29.99]:52170 "EHLO mail.kernel.org"
+        id S2389872AbgBNQEN (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Fri, 14 Feb 2020 11:04:13 -0500
+Received: from mail.kernel.org ([198.145.29.99]:52150 "EHLO mail.kernel.org"
         rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-        id S2389876AbgBNQEO (ORCPT <rfc822;linux-block@vger.kernel.org>);
-        Fri, 14 Feb 2020 11:04:14 -0500
+        id S2389419AbgBNQEN (ORCPT <rfc822;linux-block@vger.kernel.org>);
+        Fri, 14 Feb 2020 11:04:13 -0500
 Received: from sasha-vm.mshome.net (c-73-47-72-35.hsd1.nh.comcast.net [73.47.72.35])
         (using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
         (No client certificate requested)
-        by mail.kernel.org (Postfix) with ESMTPSA id 00ABA2467D;
-        Fri, 14 Feb 2020 16:04:12 +0000 (UTC)
+        by mail.kernel.org (Postfix) with ESMTPSA id 83B0324676;
+        Fri, 14 Feb 2020 16:04:11 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-        s=default; t=1581696253;
-        bh=zXYDllGi1W/9ul4JnuG2KMjPEJFmSPCqF3M/JJp9SfE=;
+        s=default; t=1581696252;
+        bh=SW0AGWU43L1UZ/wqfndLFzbkWOYuZ1G2GYhqzyIz6A0=;
         h=From:To:Cc:Subject:Date:In-Reply-To:References:From;
-        b=1Vpa9wxZnnRlyMklZg7rsbJMfdBp9vZC/aMs9l5zu7i3TCJv/VjQvvpXDizrtaPI5
-         oByHSON2CosWlHra/JE/emGAku7I65yNTgK6TisPVhSBbTMF3o098ZooYWOuOL6/ek
-         k6HfK+6f71Up8jXp1WwKpxOb/8DHaNZ9K34QZWQQ=
+        b=Kf7cEikS0RRI+SIXDPbwaFudJjuRWviMnoLMmVAaJlPqTljD67Sd+Pq/QKQmSGLnL
+         dOi4lvLWH6BuFT0772q7RbW3LyTQYHVCdSag66smQjbDrnyIlrxToSn0kxDyMgsWwv
+         ha1RBeVFekXmj6Jzfq2/sXT4rhgynOTNyaIDnGes=
 From:   Sasha Levin <sashal@kernel.org>
 To:     linux-kernel@vger.kernel.org, stable@vger.kernel.org
-Cc:     Paolo Valente <paolo.valente@linaro.org>,
-        Oleksandr Natalenko <oleksandr@natalenko.name>,
-        Patrick Dung <patdung100@gmail.com>,
-        Jens Axboe <axboe@kernel.dk>, Sasha Levin <sashal@kernel.org>,
-        linux-block@vger.kernel.org
-Subject: [PATCH AUTOSEL 5.4 109/459] block, bfq: do not plug I/O for bfq_queues with no proc refs
-Date:   Fri, 14 Feb 2020 10:55:59 -0500
-Message-Id: <20200214160149.11681-109-sashal@kernel.org>
+Cc:     Colin Ian King <colin.king@canonical.com>,
+        Minchan Kim <minchan@kernel.org>,
+        Sergey Senozhatsky <sergey.senozhatsky@gmail.com>,
+        Jens Axboe <axboe@kernel.dk>,
+        Andrew Morton <akpm@linux-foundation.org>,
+        Linus Torvalds <torvalds@linux-foundation.org>,
+        Sasha Levin <sashal@kernel.org>, linux-block@vger.kernel.org
+Subject: [PATCH AUTOSEL 5.4 108/459] drivers/block/zram/zram_drv.c: fix error return codes not being returned in writeback_store
+Date:   Fri, 14 Feb 2020 10:55:58 -0500
+Message-Id: <20200214160149.11681-108-sashal@kernel.org>
 X-Mailer: git-send-email 2.20.1
 In-Reply-To: <20200214160149.11681-1-sashal@kernel.org>
 References: <20200214160149.11681-1-sashal@kernel.org>
@@ -60,74 +62,53 @@ Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-From: Paolo Valente <paolo.valente@linaro.org>
+From: Colin Ian King <colin.king@canonical.com>
 
-[ Upstream commit f718b093277df582fbf8775548a4f163e664d282 ]
+[ Upstream commit 3b82a051c10143639a378dcd12019f2353cc9054 ]
 
-Commit 478de3380c1c ("block, bfq: deschedule empty bfq_queues not
-referred by any process") fixed commit 3726112ec731 ("block, bfq:
-re-schedule empty queues if they deserve I/O plugging") by
-descheduling an empty bfq_queue when it remains with not process
-reference. Yet, this still left a case uncovered: an empty bfq_queue
-with not process reference that remains in service. This happens for
-an in-service sync bfq_queue that is deemed to deserve I/O-dispatch
-plugging when it remains empty. Yet no new requests will arrive for
-such a bfq_queue if no process sends requests to it any longer. Even
-worse, the bfq_queue may happen to be prematurely freed while still in
-service (because there may remain no reference to it any longer).
+Currently when an error code -EIO or -ENOSPC in the for-loop of
+writeback_store the error code is being overwritten by a ret = len
+assignment at the end of the function and the error codes are being
+lost.  Fix this by assigning ret = len at the start of the function and
+remove the assignment from the end, hence allowing ret to be preserved
+when error codes are assigned to it.
 
-This commit solves this problem by preventing I/O dispatch from being
-plugged for the in-service bfq_queue, if the latter has no process
-reference (the bfq_queue is then prevented from remaining in service).
+Addresses Coverity ("Unused value")
 
-Fixes: 3726112ec731 ("block, bfq: re-schedule empty queues if they deserve I/O plugging")
-Tested-by: Oleksandr Natalenko <oleksandr@natalenko.name>
-Reported-by: Patrick Dung <patdung100@gmail.com>
-Tested-by: Patrick Dung <patdung100@gmail.com>
-Signed-off-by: Paolo Valente <paolo.valente@linaro.org>
-Signed-off-by: Jens Axboe <axboe@kernel.dk>
+Link: http://lkml.kernel.org/r/20191128122958.178290-1-colin.king@canonical.com
+Fixes: a939888ec38b ("zram: support idle/huge page writeback")
+Signed-off-by: Colin Ian King <colin.king@canonical.com>
+Acked-by: Minchan Kim <minchan@kernel.org>
+Cc: Sergey Senozhatsky <sergey.senozhatsky@gmail.com>
+Cc: Jens Axboe <axboe@kernel.dk>
+Signed-off-by: Andrew Morton <akpm@linux-foundation.org>
+Signed-off-by: Linus Torvalds <torvalds@linux-foundation.org>
 Signed-off-by: Sasha Levin <sashal@kernel.org>
 ---
- block/bfq-iosched.c | 12 ++++++++++++
- 1 file changed, 12 insertions(+)
+ drivers/block/zram/zram_drv.c | 3 +--
+ 1 file changed, 1 insertion(+), 2 deletions(-)
 
-diff --git a/block/bfq-iosched.c b/block/bfq-iosched.c
-index 0c6214497fcc1..5498d05b873d3 100644
---- a/block/bfq-iosched.c
-+++ b/block/bfq-iosched.c
-@@ -3444,6 +3444,10 @@ static void bfq_dispatch_remove(struct request_queue *q, struct request *rq)
- static bool idling_needed_for_service_guarantees(struct bfq_data *bfqd,
- 						 struct bfq_queue *bfqq)
- {
-+	/* No point in idling for bfqq if it won't get requests any longer */
-+	if (unlikely(!bfqq_process_refs(bfqq)))
-+		return false;
-+
- 	return (bfqq->wr_coeff > 1 &&
- 		(bfqd->wr_busy_queues <
- 		 bfq_tot_busy_queues(bfqd) ||
-@@ -4077,6 +4081,10 @@ static bool idling_boosts_thr_without_issues(struct bfq_data *bfqd,
- 		bfqq_sequential_and_IO_bound,
- 		idling_boosts_thr;
+diff --git a/drivers/block/zram/zram_drv.c b/drivers/block/zram/zram_drv.c
+index 4285e75e52c34..1bf4a908a0bd9 100644
+--- a/drivers/block/zram/zram_drv.c
++++ b/drivers/block/zram/zram_drv.c
+@@ -626,7 +626,7 @@ static ssize_t writeback_store(struct device *dev,
+ 	struct bio bio;
+ 	struct bio_vec bio_vec;
+ 	struct page *page;
+-	ssize_t ret;
++	ssize_t ret = len;
+ 	int mode;
+ 	unsigned long blk_idx = 0;
  
-+	/* No point in idling for bfqq if it won't get requests any longer */
-+	if (unlikely(!bfqq_process_refs(bfqq)))
-+		return false;
-+
- 	bfqq_sequential_and_IO_bound = !BFQQ_SEEKY(bfqq) &&
- 		bfq_bfqq_IO_bound(bfqq) && bfq_bfqq_has_short_ttime(bfqq);
+@@ -762,7 +762,6 @@ static ssize_t writeback_store(struct device *dev,
  
-@@ -4170,6 +4178,10 @@ static bool bfq_better_to_idle(struct bfq_queue *bfqq)
- 	struct bfq_data *bfqd = bfqq->bfqd;
- 	bool idling_boosts_thr_with_no_issue, idling_needed_for_service_guar;
- 
-+	/* No point in idling for bfqq if it won't get requests any longer */
-+	if (unlikely(!bfqq_process_refs(bfqq)))
-+		return false;
-+
- 	if (unlikely(bfqd->strict_guarantees))
- 		return true;
- 
+ 	if (blk_idx)
+ 		free_block_bdev(zram, blk_idx);
+-	ret = len;
+ 	__free_page(page);
+ release_init_lock:
+ 	up_read(&zram->init_lock);
 -- 
 2.20.1
 
